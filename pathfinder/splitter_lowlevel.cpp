@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name splitter_lowlevel.c	-	Low level funcs for Regions. 	*/
+/**@name splitter_lowlevel.c - Low level funcs for Regions.  */
 //
-//	(c) Copyright 1999-2003 by Ludovic Pollet
+// (c) Copyright 1999-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
-
-//@{
+// $Id$
 
 #ifdef MAP_REGIONS
 
+//@{
+
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -50,10 +50,10 @@
 #include "splitter_local.h"
 
 /**
-**		Remove a segment from a region
+** Remove a segment from a region
 **
-**		@param def		the RegionDefinition structure
-**		@param seg		the segment to remove
+** @param def    The RegionDefinition structure
+** @param seg    The segment to remove
 */
 void RegionDelSegment(RegionDefinition* def, RegionSegment* seg)
 {
@@ -73,12 +73,12 @@ void RegionDelSegment(RegionDefinition* def, RegionSegment* seg)
 }
 
 /**
-**		Add a segment to a region
+** Add a segment to a region
 **
-**		@param def		the RegionDefinition structure
-**		@param seg		the segment to add
+** @param def    The RegionDefinition structure
+** @param seg    The segment to add
 */
-void RegionAddSegment(RegionDefinition * def,int x0,int x1,int y)
+void RegionAddSegment(RegionDefinition* def,int x0,int x1,int y)
 {
 	RegionSegment* seg;
 	seg = (RegionSegment*) malloc(sizeof(RegionSegment));
@@ -99,14 +99,14 @@ void RegionAddSegment(RegionDefinition * def,int x0,int x1,int y)
 }
 
 /**
-**		Add a segment to a region. Eventually, existing segment are collapsed
+** Add a segment to a region. Eventually, existing segment are collapsed
 **
-**		@param def		the RegionDefinition structure
-**		@param x0		Minimum x of the segment
-**		@param x0		Maximum x of the segment
-**		@param y		Y coord of the segment
+** @param def    The RegionDefinition structure
+** @param x0     Minimum x of the segment
+** @param x1     Maximum x of the segment
+** @param y      Y coord of the segment
 */
-void RegionAppendSegment(RegionDefinition * def,int x0,int x1,int y)
+void RegionAppendSegment(RegionDefinition* def, int x0, int x1, int y)
 {
 	RegionSegment* seg;
 	seg = def->FirstSegment;
@@ -125,11 +125,11 @@ void RegionAppendSegment(RegionDefinition * def,int x0,int x1,int y)
 }
 
 /**
-**		Update min & max in a region
+** Update min & max in a region
 **
-**		@param def		the RegionDefinition structure
-**		@param x		X coord of a cell
-**		@param y		Y coord of a cell
+** @param def    The RegionDefinition structure
+** @param x      X coord of a cell
+** @param y      Y coord of a cell
 */
 void RegionUpdateMinMax(RegionDefinition* adef,int x,int y)
 {
@@ -156,14 +156,14 @@ void RegionUpdateMinMax(RegionDefinition* adef,int x,int y)
 
 
 /**
-**		Find A point one a region, closest to a given vertical line (x)
+** Find A point one a region, closest to a given vertical line (x)
 **
-**		@param def		the RegionDefinition structure
-**		@param x		x coord of the vertical line
-**		@param vx		X result value
-**		@param vy		Y result value
+** @param def    The RegionDefinition structure
+** @param x      x coord of the vertical line
+** @param vx     X result value
+** @param vy     Y result value
 */
-void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy)
+void RegionFindPointOnX(RegionDefinition* def,int x,int * vx,int * vy)
 {
 	RegionSegment *cur;
 	int bestx, besty, bestxdelta, bestydelta;
@@ -209,14 +209,14 @@ void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy)
 }
 
 /**
-**		Find A point one a region, closest to a given horizontal line (y)
+** Find A point one a region, closest to a given horizontal line (y)
 **
-**		@param def		the RegionDefinition structure
-**		@param x		y coord of the horizontal line
-**		@param vx		X result value
-**		@param vy		Y result value
+** @param def    The RegionDefinition structure
+** @param x      y coord of the horizontal line
+** @param vx     X result value
+** @param vy     Y result value
 */
-void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy)
+void RegionFindPointOnY(RegionDefinition* def,int y,int * vx,int * vy)
 {
 	RegionSegment *cur;
 	int bestx, besty, bestxdelta, bestydelta;
@@ -262,7 +262,7 @@ void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy)
 }
 
 /**
-**		Allocate the temp storage area
+** Allocate the temp storage area
 */
 void RegionTempStorageAllocate(void)
 {
@@ -270,7 +270,7 @@ void RegionTempStorageAllocate(void)
 }
 
 /**
-**		Free the temp storage area
+** Free the temp storage area
 */
 void RegionTempStorageFree(void)
 {
@@ -278,10 +278,10 @@ void RegionTempStorageFree(void)
 }
 
 /**
-**		Fill a region in the temp storage area
+** Fill a region in the temp storage area
 **
-**		@param adef		the region definition
-**		@param value		value to fill with
+** @param adef     The region definition
+** @param value    Value to fill with
 */
 void RegionTempStorageFillRegion(RegionDefinition* adef,int value)
 {
@@ -304,10 +304,10 @@ void RegionTempStorageFillRegion(RegionDefinition* adef,int value)
 }
 
 /**
-**		Unmark points of a regions in the temp storage area
+** Unmark points of a regions in the temp storage area
 **
-**		@param regid		the regiond ID
-**		@param markvalue cells with value == markvalue will become 0
+** @param regid       The regiond ID
+** @param markvalue   Cells with value == markvalue will become 0
 */
 void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue)
 {
@@ -333,16 +333,16 @@ void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue)
 }
 
 /**
-**		Mark some points of a region in the temp storage area
+** Mark some points of a region in the temp storage area
 **
-**		@param regid		the regiond ID
-**		@param points		MapPoint array
-**		@param nbpoint		MapPoint array size
-**		@param maxmak		Maximum number of point to mark
-**		@param markvalu		points get marked with this value
-**		@return				The number of points marked
+** @param regid      The regiond ID
+** @param points     MapPoint array
+** @param nbpoint    MapPoint array size
+** @param maxmak     Maximum number of point to mark
+** @param markvalue  Points get marked with this value
+** @return The number of points marked
 */
-static int RegionTempStorageMarkPoints(RegionId regid, MapPoint * points, int nbpoints, int maxmark,int markvalue)
+static int RegionTempStorageMarkPoints(RegionId regid, MapPoint* points, int nbpoints, int maxmark, int markvalue)
 {
 	int id;
 	int rslt;
@@ -374,11 +374,11 @@ static int RegionTempStorageMarkPoints(RegionId regid, MapPoint * points, int nb
 }
 
 /**
-**		Mark limits of a regions in the temp storage area
+** Mark limits of a regions in the temp storage area
 **
-**		@param regid		the regiond ID
-**		@param maxmak		Maximum number of point to mark
-**		@param markvalu		points get marked with this value
+** @param regid      The regiond ID
+** @param maxmak     Maximum number of point to mark
+** @param markvalue  Points get marked with this value
 */
 int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 {
@@ -472,19 +472,19 @@ int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 }
 
 /**
-**		Make marked points bigger ( mark their adjacent with markvalue + 1 )
-**		Multiple invoquation lead to bigger marks
+** Make marked points bigger ( mark their adjacent with markvalue + 1 )
+** Multiple invoquation lead to bigger marks
 **
-**		@param regid		the regiond ID
-**		@param maxmak		Maximum number of point to mark
-**		@param markvalu		points marked with this value will be "grown"
+** @param regid       The regiond ID
+** @param maxmak      Maximum number of point to mark
+** @param markvalue   Points marked with this value will be "grown"
 */
 int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
 {
 	int markednb;
-	RegionDefinition * adef;
-	RegionSegment * seg;
-	MapPoint * marked;
+	RegionDefinition* adef;
+	RegionSegment* seg;
+	MapPoint* marked;
 	int x,y;
 	int tx,ty;
 	int i;
@@ -535,15 +535,15 @@ int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
 }
 
 /**
-**		Set the connection count in rega for regb to value
+** Set the connection count in rega for regb to value
 **
-**		@param rega		The region to change connection value
-**		@param regb		Other region in the connection
-**		@param value		The new connection count between the two regions
+** @param rega    The region to change connection value
+** @param regb    Other region in the connection
+** @param value   The new connection count between the two regions
 */
 void RegionSetConnection(RegionId rega, RegionId regb, int value)
 {
-	RegionDefinition * adef;
+	RegionDefinition* adef;
 	int j;
 
 	adef = Regions + rega;
@@ -582,11 +582,11 @@ void RegionSetConnection(RegionId rega, RegionId regb, int value)
 }
 
 /**
-**		Add to the connection count in rega for regb to value
+** Add to the connection count in rega for regb to value
 **
-**		@param rega		The region to change connection value
-**		@param regb		Other region in the connection
-**		@param value		The value to add to the connection count between the two regions
+** @param rega    The region to change connection value
+** @param regb    Other region in the connection
+** @param value   The value to add to the connection count between the two regions
 */
 void RegionAddConnection(RegionId rega, RegionId regb,int value)
 {
@@ -627,11 +627,11 @@ void RegionAddConnection(RegionId rega, RegionId regb,int value)
 }
 
 /**
-**		Add a value to a connection count between two regions (symetrical)
+** Add a value to a connection count between two regions (symetrical)
 **
-**		@param rega		On of the region to change connection value
-**		@param regb		Other region in the connection
-**		@param value		The value to add to the connection count between the two regions
+** @param rega    On of the region to change connection value
+** @param regb    Other region in the connection
+** @param value   The value to add to the connection count between the two regions
 */
 void RegionAddBidirConnection(RegionId rega, RegionId regb,int value)
 {
@@ -640,13 +640,13 @@ void RegionAddBidirConnection(RegionId rega, RegionId regb,int value)
 }
 
 /**
-** 		Initialise a "CircularFiller", which fill points in the temp storage area.
+**  Initialise a "CircularFiller", which fill points in the temp storage area.
 **
-**		@param filler		pointer to a CircularFiller structure
-**		@param region		region to fill
-**		@param startx		start point x coord
-**		@param starty		start point y coord
-**		@param value		value it will fill with
+** @param filler    pointer to a CircularFiller structure
+** @param region    region to fill
+** @param startx    start point x coord
+** @param starty    start point y coord
+** @param value     value it will fill with
 */
 void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int starty, int value)
 {
@@ -663,9 +663,9 @@ void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int
 }
 
 /**
-**		Free a CircularFiller private structures
+** Free a CircularFiller private structures
 **
-**		@param filler		the filler to free
+** @param filler the filler to free
 */
 void CircularFillerDone(CircularFiller * filler)
 {
@@ -673,10 +673,10 @@ void CircularFillerDone(CircularFiller * filler)
 }
 
 /**
-**		Mark one point with a circularefiller
+** Mark one point with a circularefiller
 **
-**		@param filler		the filler
-**		@return 		1 if one point marked, 0 else
+** @param filler the filler
+** @return  1 if one point marked, 0 else
 */
 int CircularFillerStep(CircularFiller * filler)
 {
@@ -725,9 +725,9 @@ int CircularFillerStep(CircularFiller * filler)
 }
 
 /**
-**		Rescan a region to update its connections
+** Rescan a region to update its connections
 **
-**		@param regid		the region to scan
+** @param regid the region to scan
 */
 void RegionRescanAdjacents(RegionId regid)
 {
@@ -810,16 +810,16 @@ void RegionRescanAdjacents(RegionId regid)
 }
 
 /**
-** 		Adjust the connections of the given region, when taking cell x,y into account
-**		This function updates connections and eventually mark the region for a connex check
+**  Adjust the connections of the given region, when taking cell x,y into account
+** This function updates connections and eventually mark the region for a connex check
 **
-**		@param reg		the region
-**		@param x		X coord of the cell
-**		@param y		Y coord of the cell
-**		@param add		1 if cell is added to the region, 0 else
-**		@param bidir		Operate in both directions
+** @param reg      the region
+** @param x        X coord of the cell
+** @param y        Y coord of the cell
+** @param add      1 if cell is added to the region, 0 else
+** @param bidir    Operate in both directions
 */
-void RegionUpdateConnection(RegionId reg,int x,int y,int add,int bidir)
+void RegionUpdateConnection(RegionId reg, int x, int y, int add, int bidir)
 {
 	int adj;
 	int ax, ay;
@@ -846,6 +846,7 @@ void RegionUpdateConnection(RegionId reg,int x,int y,int add,int bidir)
 	}
 }
 
-
-#endif		// MAP_REGIONS
 //@}
+
+#endif // MAP_REGIONS
+

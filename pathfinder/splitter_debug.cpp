@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name splitter_debug.c	-	Map splitter into regions - debugging. 	*/
+/**@name splitter_debug.c - Map splitter into regions - debugging.  */
 //
-//	(c) Copyright 1999-2003 by Ludovic Pollet
+// (c) Copyright 1999-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 //@{
 
 #ifdef MAP_REGIONS
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -49,12 +49,12 @@
 #include "splitter_local.h"
 
 /**
-**		Start an xpm file for storing map representation (debug only)
+** Start an xpm file for storing map representation (debug only)
 **
-**		@param f		Output file
-**		@param sx		Image size (X)
-**		@param sy		Image size (Y)
-**		@param nbcols		Max number of colors
+** @param f        Output file
+** @param sx       Image size (X)
+** @param sy       Image size (Y)
+** @param nbcols   Max number of colors
 */
 static void StartXpm(FILE * f, int sx,int sy, int nbcols)
 {
@@ -92,8 +92,8 @@ static void StartXpm(FILE * f, int sx,int sy, int nbcols)
 }
 
 /**
-**		Assign each region a color in such a way that
-**		two adjacents regions will never have the same color
+** Assign each region a color in such a way that
+** two adjacents regions will never have the same color
 */
 static void RegionAssignColor(void)
 {
@@ -119,9 +119,9 @@ static void RegionAssignColor(void)
 }
 
 /**
-**		Full Debug
-**		Create a "debugregions.xpm" containing the splitted map
-**		Also call some debug functions
+** Full Debug
+** Create a "debugregions.xpm" containing the splitted map
+** Also call some debug functions
 */
 void MapSplitterDebug(void)
 {
@@ -220,9 +220,9 @@ void MapSplitterDebug(void)
 }
 
 /**
-**		Check that not mappable tile are not mapped,
-**		check that water is mapped in watter region,
-**		...
+** Check that not mappable tile are not mapped,
+** check that water is mapped in watter region,
+** ...
 */
 void RegionDebugWater(void)
 {
@@ -242,10 +242,10 @@ void RegionDebugWater(void)
 }
 
 /**
-**		Check existing connections for a given region
-**		and compare with existing values
+** Check existing connections for a given region
+** and compare with existing values
 **
-**		@param reg		the region
+** @param reg the region
 */
 static void RegionDebugConnexion(RegionId reg)
 {
@@ -254,12 +254,12 @@ static void RegionDebugConnexion(RegionId reg)
 	int Connections[MaxRegionNumber];
 	int ConnectionsCount[MaxRegionNumber];
 	int ConnectionNb;
-//	RegionDefinition * adef;
+// RegionDefinition * adef;
 
 	int tx,ty;
 	int x,y;
 	int i,j;
-//	int found;
+// int found;
 
 	seg = Regions[reg].FirstSegment;
 	ConnectionNb = 0;
@@ -327,7 +327,7 @@ static void RegionDebugConnexion(RegionId reg)
 }
 
 /**
-**		Find all existing connections between regions & compare to dynamic structure
+** Find all existing connections between regions & compare to dynamic structure
 **
 */
 void RegionDebugAllConnexions(void)
