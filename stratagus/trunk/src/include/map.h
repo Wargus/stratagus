@@ -192,6 +192,8 @@ extern void InitMap(void);
 extern int MarkDrawPosMap( int x, int y );
     /// Denote wether area in map is overlapping
 extern int AreaVisibleInMap( int sx, int sy, int ex, int ey );
+    /// Check if any area is visible
+extern int AnyAreaVisibleInMap( int sx, int sy, int ex, int ey );
     /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
 extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
     /// Set all entries in MustRedrawRow and MustRedrawTile
