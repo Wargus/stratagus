@@ -247,6 +247,7 @@ local int CclGroup(lua_State* l)
 		lua_error(l);
 	}
 
+	InitGroups();
 	grp = &Groups[(int)LuaToNumber(l, 1)];
 	grp->NumUnits = LuaToNumber(l, 2);
 	i = 0;
@@ -257,7 +258,7 @@ local int CclGroup(lua_State* l)
 		lua_rawgeti(l, 3, j + 1);
 		str = LuaToString(l, -1);
 		lua_pop(l, 1);
-		grp->Units[i++] = (Unit*)strtol(str + 1, NULL, 16);
+		grp->Units[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
 	}
 
 	return 0;
