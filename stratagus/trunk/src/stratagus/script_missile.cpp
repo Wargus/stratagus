@@ -122,6 +122,8 @@ local SCM CclDefineMissileType(SCM list)
 	    mtype->Sleep=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
 	    mtype->Speed=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("draw-level")) ) {
+	    mtype->DrawLevel=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("range")) ) {
 	    mtype->Range=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("impact-missile")) ) {

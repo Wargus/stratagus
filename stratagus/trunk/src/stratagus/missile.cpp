@@ -55,83 +55,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Missile-class this defines how a missile-type reacts.
-**
-**	@todo
-**		Here is something double defined, the whirlwind is
-**		ClassWhirlwind and also handled by controler.
-**
-**	FIXME:	We need no class or no controller.
-*/
-enum _missile_class_ {
-	/**
-	**	Missile does nothing
-	*/
-    MissileClassNone,
-	/**
-	**	Missile flies from x,y to x1,y1
-	*/
-    MissileClassPointToPoint,
-	/**
-	**	Missile flies from x,y to x1,y1 and stays there for a moment
-	*/
-    MissileClassPointToPointWithDelay,
-	/**
-	**	Missile don't move, than disappears
-	*/
-    MissileClassStayWithDelay,
-	/**
-	**	Missile flies from x,y to x1,y1 than bounces three times.
-	*/
-    MissileClassPointToPoint3Bounces,
-	/**
-	**	Missile flies from x,y to x1,y1 than changes into flame shield
-	*/
-    MissileClassFireball,
-	/**
-	**	Missile surround x,y
-	*/
-    MissileClassFlameShield,
-	/**
-	**	Missile appears at x,y, is blizzard
-	*/
-    MissileClassBlizzard,
-	/**
-	**	Missile appears at x,y, is death and decay
-	*/
-    MissileClassDeathDecay,
-	/**
-	**	Missile appears at x,y, is whirlwind
-	*/
-    MissileClassWhirlwind,
-	/**
-	**	Missile appears at x,y, than cycle through the frames up and
-	**	down.
-	*/
-    MissileClassCycleOnce,
-	/**
-	**	Missile flies from x,y to x1,y1 than shows hit animation.
-	*/
-    MissileClassPointToPointWithHit,
-	/**
-	**	Missile don't move, than checks the source unit for HP.
-	*/
-    MissileClassFire,
-	/**
-	**	Missile is controlled completely by Controller() function.
-	*/
-    MissileClassCustom,
-	/**
-	**	Missile shows the hit points.
-	*/
-    MissileClassHit,
-};
-
-/*----------------------------------------------------------------------------
---	Variables
-----------------------------------------------------------------------------*/
-
-/**
 **	Missile class names, used to load/save the missiles.
 */
 global const char* MissileClassNames[] = {
@@ -184,8 +107,6 @@ global MissileType* MissileTypeHit;		/// Hit missile-type
 IfDebug(
 global int NoWarningMissileType;		/// quiet ident lookup.
 );
-
-#define MAX_MISSILES	1800		/// maximum number of missiles
 
 local Missile* GlobalMissiles[MAX_MISSILES];	/// all global missiles on map
 local int NumGlobalMissiles;			/// currently used missiles
@@ -756,7 +677,7 @@ global int CheckMissileToBeDrawn(const Missile* missile)
 **	@param x	Screen pixel X position
 **	@param y	Screen pixel Y position
 */
-local void DrawMissile(const MissileType* mtype,int frame,int x,int y)
+global void DrawMissile(const MissileType* mtype,int frame,int x,int y)
 {
     // FIXME: This is a hack for mirrored sprites
     if( frame<0 ) {
@@ -766,19 +687,24 @@ local void DrawMissile(const MissileType* mtype,int frame,int x,int y)
     }
 }
 
+local int MissileDrawLevelCompare(const void *v1, const void *v2) 
+{
+    const Missile *c1 = *(Missile**)v1, *c2 = *(Missile**)v2;
+
+        return c1->Type->DrawLevel <= c2->Type->DrawLevel ? -1 : 1;
+}
 /**
 **	Draw all missiles on map.
 **
 **	@param vp	Viewport pointer.
 */
-global void DrawMissiles(const Viewport* vp)
+global int DrawMissiles(const Viewport* vp, Missile **table)
 {
-    const Missile* missile;
+    Missile* missile;
     Missile* const* missiles;
     Missile* const* missiles_end;
-    int x;
-    int y;
     int flag;
+    int nmissiles;
 
     //
     //	Loop through global missiles, than through locals.
@@ -786,6 +712,7 @@ global void DrawMissiles(const Viewport* vp)
     flag=1;
     missiles=GlobalMissiles;
     missiles_end=missiles+NumGlobalMissiles;
+    nmissiles=0;
     do {
 	for( ; missiles<missiles_end; ++missiles ) {
 	    missile=*missiles;
@@ -797,26 +724,17 @@ global void DrawMissiles(const Viewport* vp)
 	    }
 	    // Draw only visible missiles
 	    if( !flag || MissileVisibleInViewport(vp,missile) ) {
-		x = missile->X - vp->MapX * TileSizeX + vp->X;
-		y = missile->Y - vp->MapY * TileSizeY + vp->Y;
-		// FIXME: I should copy SourcePlayer for second level missiles.
-		if( missile->SourceUnit && missile->SourceUnit->Player ) {
-		    GraphicPlayerPixels(missile->SourceUnit->Player
-			    ,missile->Type->Sprite);
-		}
-		switch( missile->Type->Class ) {
-		    case MissileClassHit:
-			VideoDrawNumberClip(x,y,GameFont,missile->Damage);
-			break;
-		    default:
-			DrawMissile(missile->Type,missile->SpriteFrame,x,y);
-			break;
-		}
+	        table[nmissiles++] = missile;
 	    }
 	}
 	missiles=LocalMissiles;
 	missiles_end=missiles+NumLocalMissiles;
     } while( flag-- );
+    if( nmissiles ) {
+	qsort((void *)table,nmissiles,sizeof(Missile*),MissileDrawLevelCompare);
+    }
+
+    return nmissiles;
 }
 
 /**
