@@ -113,32 +113,36 @@ For the following syntax I use:
 	o player has the most quantity of unit-type near to unit-type
 	Which unit and how many units must the player at most have near to
         an other unit for the action.
+(if-rescued-near-unit <player> <op> <quantity> <unit> <unit>)
+        o player has the quantity of rescued unit-type near to unit-type
+        Which rescued unit and how many units must the player have near to a
+        unit for the action.
 (if-deaths <player> <op> <unit>)
 	o player has quantity of unit dies
         Which quantity of the unit must be lost by the player for the
 	action.
-<if-kills <player> <op> <unit>)
+(if-kills <player> <op> <unit>)
 	o player has quantity of unit-type killed
         Which quantity of the unit must be killed by the player for the
 	action.
-<if-kills-least <player> <op> <unit>)
+(if-kills-least <player> <op> <unit>)
 	o player has the least quantity of unit-type killed
         The player has killed the quantity of the unit at least for the
 	action.
-<if-kills-most <player> <op> <unit>)
+(if-kills-most <player> <op> <unit>)
 	o player has the most quantity of unit killed
         The player has killed the quantity of the unit at most for the action.
-<if-score <player> <op> <quantity>)
+(if-score <player> <op> <quantity>)
 	o player has the quantity of score
         If the player reaches the quantity of score the action is executed.
 (if-opponents <player> <op> <quantity>)
 	o player has quantity opponents remaining in game
         If less than quantity opponents of the player remaining in game the
 	action is executed.
-<if-elapsed <op> <quantity>)
+(if-elapsed <op> <quantity>)
 	o game run for duration
         If the game run for the duration game cycles the action is executed.
-<if-timer <op> <quantity>)
+(if-timer <op> <quantity>)
 	o countdown timer reaches quantity
         If the countdown timer reaches quantity the action is executed.
 
