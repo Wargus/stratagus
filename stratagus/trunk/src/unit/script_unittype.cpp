@@ -42,6 +42,10 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+IfDebug(
+extern int NoWarningUnitType;		/// quiet ident lookup.
+);
+
 local long SiodUnitTypeTag;		/// siod unit-type object
 
 /*----------------------------------------------------------------------------
@@ -71,13 +75,13 @@ local SCM CclDefineUnitType(SCM list)
 
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
+    IfDebug( i=NoWarningUnitType; NoWarningUnitType=1; );
     type=UnitTypeByIdent(str);
+    IfDebug( NoWarningUnitType=i; );
     if( type ) {
+	DebugLevel0Fn("Redefining unit-type `%s'\n",str);
 	CclFree(str);
     } else {
-	//
-	//	Allocate new memory. (+2 for start end empty last entry.)
-	//
 	type=NewUnitTypeSlot(str);
     }
 

@@ -43,6 +43,10 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+IfDebug(
+global int NoWarningUnitType;		/// quiet ident lookup.
+);
+
 /*
 **	Next unit type are used hardcoded in the source.
 **
@@ -1212,7 +1216,11 @@ global UnitType* UnitTypeByIdent(const char* ident)
 	return *type;
     }
 
-    DebugLevel0Fn("Name `%s' not found\n",ident);
+    IfDebug(
+	if( !NoWarningUnitType ) {
+	    DebugLevel0Fn("Name `%s' not found\n",ident);
+	}
+    );
 
     return NULL;
 }
