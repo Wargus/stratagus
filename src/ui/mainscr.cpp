@@ -10,12 +10,11 @@
 //
 /**@name mainscr.c	-	The main screen. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer and Valery Shchedrin
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer and Valery Shchedrin
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -249,7 +248,7 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Only for owning player.
     //
-    if( unit->Player!=ThisPlayer ) {
+    if( unit->Player!=ThisPlayer && !DEBUG ) {
 	return;
     }
 
@@ -1025,6 +1024,28 @@ global void DrawInfoPanel(void)
     if( UnitUnderCursor ) {
 	// FIXME: not correct for enemies units
 	DrawUnitInfo(UnitUnderCursor);
+    } else {
+	int x;
+	int y;
+	// FIXME: need some cool ideas for this.
+
+	x=TheUI.InfoPanelX+16;
+	y=TheUI.InfoPanelY+8;
+
+	VideoDrawText(x,y,GameFont,"FreeCraft");
+	y+=16;
+	VideoDrawText(x,y,GameFont,"Game Cycle:");
+	VideoDrawNumber(x+90,y,GameFont,FrameCounter);
+	y+=20;
+
+	for( i=0; i<PlayerMax; ++i ) {
+	    if( Players[i].Type!=PlayerNobody ) {
+		VideoDrawNumber(x,y,GameFont,i);
+		VideoDrawText(x+20,y,GameFont,Players[i].Name);
+		VideoDrawNumber(x+110,y,GameFont,Players[i].Score);
+		y+=14;
+	    }
+	}
     }
 }
 
