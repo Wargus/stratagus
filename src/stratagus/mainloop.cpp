@@ -493,8 +493,8 @@ global void GameMainLoop(void)
             //FIXME: this might be better placed somewhere at front of the
             //       program, as we now still have a game on the background and
             //       need to go through hte game-menu or supply a pud-file
-	    //UpdateDisplay();
-	    DebugTestDisplay();
+	    UpdateDisplay();
+	    //DebugTestDisplay();
 
 	    //
 	    // If double-buffered mode, we will display the contains of
