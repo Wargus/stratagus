@@ -10,7 +10,7 @@
 //
 /**@name mouse.c	-	The mouse handling. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -643,35 +643,25 @@ global void UIHandleMouseMove(int x,int y)
     if( GameCursor==TheUI.Scroll.Cursor ) {
 	int xo;
 	int yo;
+	int scroll;
 
-	// FIXME: Support with CTRL for faster scrolling.
+	if( KeyModifiers&ModifierControl ) {
+	    scroll=2;
+	} else {
+	    scroll=4;
+	}
+
 	xo = TheUI.MouseViewport->MapX;
 	yo = TheUI.MouseViewport->MapY;
-	if ( TheUI.ReverseMouseMove ) {
-	    if (x < CursorStartX) {
-		xo++;
-	    } else if (x > CursorStartX) {
-		xo--;
-	    }
-	    if (y < CursorStartY) {
-		yo++;
-	    } else if (y > CursorStartY) {
-		yo--;
-	    }
+	if( TheUI.ReverseMouseMove ) {
+	    xo+=(CursorStartX-x)/scroll;
+	    yo+=(CursorStartY-y)/scroll;
 	} else {
-	    if (x < CursorStartX) {
-		xo--;
-	    } else if (x > CursorStartX) {
-		xo++;
-	    }
-	    if (y < CursorStartY) {
-		yo--;
-	    } else if (y > CursorStartY) {
-		yo++;
-	    }
+	    xo+=(x-CursorStartX)/scroll;
+	    yo+=(y-CursorStartY)/scroll;
 	}
-	TheUI.WarpX = CursorStartX;
-	TheUI.WarpY = CursorStartY;
+	TheUI.WarpX=CursorStartX;
+	TheUI.WarpY=CursorStartY;
 	ViewportSetViewpoint(TheUI.MouseViewport, xo, yo);
 	return;
     }
