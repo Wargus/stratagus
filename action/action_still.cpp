@@ -150,6 +150,13 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     //
+    //	Auto cast spells
+    //
+    if( unit->AutoCastSpell && AutoCastSpell(unit, unit->AutoCastSpell) ) {
+	return;
+    }
+
+    //
     //	Workers and mage didn't attack automatic
     //
     if( type->CanAttack && !type->CowerWorker && !type->CowerMage ) {

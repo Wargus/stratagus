@@ -135,6 +135,7 @@
 #define IconActive	1		/// cursor on icon
 #define IconClicked	2		/// mouse button down on icon
 #define IconSelected	4		/// this the selected icon
+#define IconAutoCast	8		/// auto cast icon
 
 /*----------------------------------------------------------------------------
 --	Declarations

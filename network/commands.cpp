@@ -1093,6 +1093,25 @@ global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 }
 
 /**
+**	Send command: Unit auto spell cast.
+**
+**	@param unit	pointer to unit.
+**	@param spellid  Spell type id.
+**	@param on	1 for auto cast on, 0 for off.
+*/
+global void SendCommandAutoSpellCast(Unit* unit,int spellid,int on)
+{
+    if( NetworkFildes==-1 ) {
+	CommandLog("auto-spell-cast",unit,FlushCommands,on,-1,NoUnitP
+		,NULL,spellid);
+	CommandAutoSpellCast(unit,on?SpellTypeById(spellid):NULL);
+    } else {
+	NetworkSendCommand(MessageCommandSpellCast+spellid
+		,unit,on,-1,NoUnitP,NULL,FlushCommands);
+    }
+}
+
+/**
 **	Send command: Diplomacy changed.
 **
 **	@param player	Player which changes his state.
@@ -1362,13 +1381,18 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    break;
 	default:
 	    id = (msgnr&0x7f) - MessageCommandSpellCast;
-	    dest=NoUnitP;
-	    if( dstnr!=(unsigned short)0xFFFF ) {
-		dest=UnitSlots[dstnr];
-		DebugCheck( !dest || !dest->Type );
+	    if( y!=-1 ) {
+		dest=NoUnitP;
+		if( dstnr!=(unsigned short)0xFFFF ) {
+		    dest=UnitSlots[dstnr];
+		    DebugCheck( !dest || !dest->Type );
+		}
+		CommandLog("spell-cast",unit,status,x,y,dest,NULL,id);
+		CommandSpellCast(unit,x,y,dest,SpellTypeById(id),status);
+	    } else {
+		CommandLog("auto-spell-cast",unit,status,x,y,NoUnitP,NULL,id);
+		CommandAutoSpellCast(unit,x?SpellTypeById(id):NULL);
 	    }
-	    CommandLog("spell-cast",unit,status,x,y,dest,NULL,id);
-	    CommandSpellCast(unit,x,y,dest,SpellTypeById(id),status);
 	    break;
     }
 }

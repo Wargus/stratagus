@@ -1288,6 +1288,25 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 }
 
 /**
+**	Auto spell cast.
+**
+**	@param unit	pointer to unit.
+**	@param spell	Spell type pointer.
+*/
+global void CommandAutoSpellCast(Unit* unit,SpellType* spell)
+{
+    DebugLevel3Fn(": %d auto-spell-casts %s\n"
+	_C_ UnitNumber(unit) _C_ spell->Ident);
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
+	unit->AutoCastSpell=spell;
+    }
+}
+
+/**
 **	Diplomacy changed.
 **
 **	@param player	Player which changes his state.

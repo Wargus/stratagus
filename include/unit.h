@@ -361,6 +361,8 @@
 typedef struct _unit_ Unit;		/// unit itself
 typedef enum _unit_action_ UnitAction;	/// all possible unit actions
 
+typedef struct _spell_type_ SpellType;	/// base structure of a spell type
+
 /**
 **	Unit references over network, or for memory saving.
 */
@@ -553,6 +555,7 @@ struct _unit_ {
     Order	Orders[MAX_ORDERS];	/// orders to process
     Order	SavedOrder;		/// order to continue after current
     Order	NewOrder;		/// order for new trained units
+    SpellType*	AutoCastSpell;		/// spell to auto cast
 
     union _order_data_ {
     struct _order_move_ {
