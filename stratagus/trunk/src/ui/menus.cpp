@@ -104,6 +104,7 @@ local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
 local void SetCdPower(Menuitem *mi);
 local void SetFogOfWar(Menuitem *mi);
+local void SetCommandKey(Menuitem *mi);
 local void SetCdModeAll(Menuitem *mi);
 local void SetCdModeRandom(Menuitem *mi);
 
@@ -1260,17 +1261,24 @@ local Menuitem PreferencesMenuItems[] = {
     { MI_TYPE_GEM, 16, 36*1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 46, 36*1 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
 
+    { MI_TYPE_GEM, 16, 36*2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 46, 36*2 + 2, 0, GameFont, NULL, NULL, {{NULL,0}} },
+
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitPreferencesMenuItems() {
     MenuitemText   i0 = { "Preferences", MI_TFLAGS_CENTERED};
     MenuitemGem    i1 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar};
     MenuitemText   i2 = { "Fog of War Enabled", MI_TFLAGS_LALIGN};
-    MenuitemButton i3 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
+    MenuitemGem    i3 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCommandKey};
+    MenuitemText   i4 = { "Show command key", MI_TFLAGS_LALIGN};
+    MenuitemButton i5 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
     PreferencesMenuItems[0].d.text   = i0;
     PreferencesMenuItems[1].d.gem    = i1;
     PreferencesMenuItems[2].d.text   = i2;
-    PreferencesMenuItems[3].d.button = i3;
+    PreferencesMenuItems[3].d.gem    = i3;
+    PreferencesMenuItems[4].d.text   = i4;
+    PreferencesMenuItems[5].d.button = i5;
 }
 
 local Menuitem SpeedSettingsMenuItems[] = {
@@ -1375,23 +1383,44 @@ local Menuitem KeystrokeHelpMenuItems[] = {
 // FIXME: add newer helps
 local unsigned char *keystrokehelptexts[] = {
     "Alt-F  - toggle full screen",
+    "Alt-G  - toggle grab mouse",
     "Ctrl-S - mute sound",
-    "Alt-Q  - quit to main menu",
+    "Ctrl-M - mute music (NOT SUPPORTED)",
     "+      - increase game speed",
     "-      - decrease game speed",
     "Ctrl-P - pause game",
-    "Alt-G  - toggle grab mouse",
+    "PAUSE  - pause game",
+    "PRINT  - make screen shot",
+    "Alt-H  - help menu",
+    "Alt-R  - restart scenario (NOT SUPPORTED)",
+    "Alt-Q  - quit to main menu",
     "Alt-X  - quit game",
     "Alt-B  - toggle expand map",
+    "Alt-M  - game menu",
     "ENTER  - write a message",
+    "SPACE  - goto last event",
     "TAB    - hide/unhide terrain",
-
     "Alt-I  - find idle peon",
+    "Alt-C  - center on selected unit",
     "Alt-V  - next view port",
     "Ctrl-V - previous view port",
-    "F10    - game menu",
+    "^      - select nothing",
+    "#      - select group",
+    "##     - center on group",
+    "Ctrl-# - define group",
+    "Shift-#- add to group",
+    "Alt-#  - add to alternate group",
+    "F2-F4  - recall map position",
+    "Shift F2-F4 - save map postition",
     "F5     - game options",
+    "F7     - sound options",
+    "F8     - speed options",
+    "F9     - preferences",
+    "F10    - game menu",
+    "F11    - save game (NOT WORKING)",
+    "F12    - load game (NOT WORKING)",
 };
+
 local void InitKeystrokeHelpMenuItems() {
     MenuitemText     i0 = { "Keystroke Help Menu", MI_TFLAGS_CENTERED};
     MenuitemVslider  i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
@@ -1622,7 +1651,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	4, 4,
+	6, 6,
 	PreferencesMenuItems,
 	NULL,
     },
@@ -2576,6 +2605,12 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
     SoundOptions();
 }
 
+/**
+**	Toggle the map of war handling.
+**	Used in the preference menu.
+**
+**	@param mi	Menu item (not used).
+*/
 local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
 {
     if (!TheMap.NoFogOfWar) {
@@ -2588,6 +2623,17 @@ local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
         MapUpdateVisible();
     }
     MustRedraw &= ~RedrawMinimap;
+}
+
+/**
+**	Toggle showing the command chars on icons.
+**	Used in the preference menu.
+**
+**	@param mi	Menu item (not used).
+*/
+local void SetCommandKey(Menuitem *mi __attribute__((unused)))
+{
+    ShowCommandKey ^= 1;
 }
 
 local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
@@ -2628,17 +2674,31 @@ global void SpeedSettings(void)
     ProcessMenu(MENU_SPEED_SETTINGS, 1);
 }
 
+/**
+**	Enter the preferences menu.
+**	Setup if the options are enabled / disabled.
+**
+**	@todo	FIXME: The init should be done by the init callback.
+*/
 global void Preferences(void)
 {
-    if (!TheMap.NoFogOfWar)
+    if (!TheMap.NoFogOfWar) {
 	PreferencesMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
-    else
+    } else {
 	PreferencesMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    }
 
-    if (NetworkFildes == -1)
+    if (NetworkFildes == -1) {		// Not available in net games
 	PreferencesMenuItems[1].flags = MI_ENABLED;
-    else
+    } else {
 	PreferencesMenuItems[1].flags = MI_DISABLED;
+    }
+
+    if (ShowCommandKey) {
+	PreferencesMenuItems[3].d.gem.state = MI_GSTATE_CHECKED;
+    } else {
+	PreferencesMenuItems[3].d.gem.state = MI_GSTATE_UNCHECKED;
+    }
 
     ProcessMenu(MENU_PREFERENCES, 1);
 }
