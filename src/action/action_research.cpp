@@ -10,7 +10,7 @@
 //
 /**@name action_research.c - The research action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -88,7 +88,9 @@ void HandleActionResearch(Unit* unit)
 	}
 
 	if (unit->Type->NewAnimations) {
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Research);
+		unit->Type->NewAnimations->Research ?
+			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Research) :
+			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
 		if (unit->Wait) {
 			unit->Wait--;
 			return;

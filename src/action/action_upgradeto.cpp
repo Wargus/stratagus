@@ -67,7 +67,9 @@ void HandleActionUpgradeTo(Unit* unit)
 	}
 
 	if (unit->Type->NewAnimations) {
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Upgrade);
+		unit->Type->NewAnimations->Upgrade ?
+			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Upgrade) :
+			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
 		if (unit->Wait) {
 			unit->Wait--;
 			return;
