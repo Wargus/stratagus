@@ -354,11 +354,6 @@
 **    Information about resource harvesting. If NULL, it can't
 **    harvest it.
 **
-**  UnitType::MustBuildOnTop
-**
-**    Points to the type of building it must be build on or
-**    NoUnitP otherwise. Buggy, works for oil platforms.
-**
 **  UnitType::NeutralMinimapColorRGB
 **
 **    Says what color a unit will have when it's neutral and
@@ -720,7 +715,7 @@ struct _building_restrictions_ {
 		RestrictAddOn,          ///< We are refereing to the following restriction
 		RestrictOnTop,
 		RestrictDistance,
-		RestrictAttach,
+		RestrictDirection,
 		RestrictTiles,
 	} RestrictType;
 
@@ -734,6 +729,7 @@ struct _building_restrictions_ {
 
 		struct {
 			UnitType* Parent;
+			char* ParentName;    ///< building that is unit is an addon too.
 			int ReplaceOnDie;    ///< recreate the parent on destruction
 			int ReplaceOnBuild;  ///< remove the parent, or just build over it.
 		} OnTop;
@@ -884,7 +880,6 @@ struct _unit_type_ {
 	int CanStore[MaxCosts];             ///< Resources that we can store here.
 	int GivesResource;                  ///< The resource this unit gives.
 	ResourceInfo* ResInfo[MaxCosts];    ///< Resource information.
-	UnitType* MustBuildOnTop;           ///< Must be built on top of something.
 	BuildRestriction** BuildingRules;   ///< Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   ///< Minimap Color for Neutral Units.
 

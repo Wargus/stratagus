@@ -268,6 +268,7 @@ static void DrawBuildingCursor(void)
 	int mask;
 	const Viewport* vp;
 	int frame;
+	Unit* ontop;
 
 	// Align to grid
 	vp = TheUI.MouseViewport;
@@ -275,6 +276,7 @@ static void DrawBuildingCursor(void)
 	y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
 	BuildingCursorSX = mx = Viewport2MapX(vp, x);
 	BuildingCursorSY = my = Viewport2MapY(vp, y);
+	ontop = NULL;
 
 	//
 	//  Draw building
@@ -302,10 +304,13 @@ static void DrawBuildingCursor(void)
 	if (NumSelected) {
 		f = 1;
 		for (i = 0; f && i < NumSelected; ++i) {
-			f = CanBuildHere(Selected[i], CursorBuilding, mx, my);
+			f = ((ontop = CanBuildHere(Selected[i], CursorBuilding, mx, my)) != NULL);
+			// Assign ontop or NULL
+			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = CanBuildHere(NoUnitP, CursorBuilding, mx, my);
+		f = (CanBuildHere(NoUnitP, CursorBuilding, mx, my) != NULL);
+		ontop = NULL;
 	}
 
 	mask = CursorBuilding->MovementMask;
@@ -323,9 +328,9 @@ static void DrawBuildingCursor(void)
 	while (h--) {
 		w = w0;
 		while (w--) {
-			if (f && (CursorBuilding->MustBuildOnTop ||
+			if (f && (ontop ||
 					CanBuildOn(mx + w, my + h, MapFogFilterFlags(ThisPlayer, mx + w, my + h,
-						mask & ((NumSelected && !CursorBuilding->BuilderOutside &&
+						mask & ((NumSelected && 
 							Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
 								~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))) &&
 					IsMapFieldExplored(ThisPlayer, mx + w, my + h))  {

@@ -202,7 +202,8 @@ void DrawUnitSelection(const Unit* unit)
 				color = Players[i].Color;
 			}
 		}
-	} else if (CursorBuilding && unit->Type->Building &&
+	} else if (CursorBuilding && unit->Type->Building && 
+			unit->Orders[0].Action != UnitActionDie &&
 			(unit->Player == ThisPlayer ||
 				PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
 		// If building mark all own buildings
