@@ -50,7 +50,7 @@
 #ifdef USE_THREAD
 #error "not USE_SDLA and USE_THREAD"
 #endif
-#include <SDL/SDL_audio.h>
+#include <SDL_audio.h>
 #else
 #ifdef __linux__
 #   include <sys/ioctl.h>
