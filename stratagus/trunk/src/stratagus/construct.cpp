@@ -50,37 +50,37 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**		Construction type definition
+**  Construction type definition
 */
 global const char ConstructionType[] = "construction";
 
 /**
-**		Constructions.
+**  Constructions.
 */
 local Construction** Constructions;
 
 /**
-**		Table mapping the original construction numbers in puds to
-**		our internal string.
+**  Table mapping the original construction numbers in puds to
+**  our internal string.
 */
 global char** ConstructionWcNames;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Initialize  the constructions.
+**  Initialize  the constructions.
 */
 global void InitConstructions(void)
 {
 }
 
 /**
-**		Load the graphics for the constructions.
+**  Load the graphics for the constructions.
 **
-**		HELPME:		who make this better terrain depended and extendable
-**		HELPME: filename constuction.
+**  HELPME: who make this better terrain depended and extendable
+**  HELPME: filename constuction.
 */
 global void LoadConstructions(void)
 {
@@ -137,7 +137,7 @@ global void LoadConstructions(void)
 }
 
 /**
-**		Cleanup the constructions.
+**  Cleanup the constructions.
 */
 global void CleanConstructions(void)
 {
@@ -148,9 +148,9 @@ global void CleanConstructions(void)
 	ConstructionFrame* tmp;
 
 	//
-	//		Mapping original construction numbers in puds to our internal strings
+	//  Mapping original construction numbers in puds to our internal strings
 	//
-	if ((cp = ConstructionWcNames)) {		// Free all old names
+	if ((cp = ConstructionWcNames)) {
 		while (*cp) {
 			free(*cp++);
 		}
@@ -159,7 +159,7 @@ global void CleanConstructions(void)
 	}
 
 	//
-	//		Free the construction table.
+	//  Free the construction table.
 	//
 	if ((cop = Constructions)) {
 		while (*cop) {
@@ -193,11 +193,11 @@ global void CleanConstructions(void)
 }
 
 /**
-**		Get construction by identifier.
+**  Get construction by identifier.
 **
-**		@param ident		Identfier of the construction
+**  @param ident  Identfier of the construction
 **
-**		@return				Construction structure pointer
+**  @return       Construction structure pointer
 */
 global Construction* ConstructionByIdent(const char* ident)
 {
@@ -216,9 +216,9 @@ global Construction* ConstructionByIdent(const char* ident)
 }
 
 /**
-**		Get construction by original wc number.
+**  Get construction by original wc number.
 **
-**		@param num		Original number used in puds.
+**  @param num  Original number used in puds.
 */
 global Construction* ConstructionByWcNum(int num)
 {
@@ -228,9 +228,9 @@ global Construction* ConstructionByWcNum(int num)
 // ----------------------------------------------------------------------------
 
 /**
-**		Define construction mapping from original number to internal symbol
+**  Define construction mapping from original number to internal symbol
 **
-**		@param list		List of all names.
+**  @param list  List of all names.
 */
 local int CclDefineConstructionWcNames(lua_State* l)
 {
@@ -264,11 +264,11 @@ local int CclDefineConstructionWcNames(lua_State* l)
 }
 
 /**
-**		Parse the construction.
+**  Parse the construction.
 **
-**		@param list		List describing the construction.
+**  @param list  List describing the construction.
 **
-**		@note make this more flexible
+**  @note make this more flexible
 */
 local int CclDefineConstruction(lua_State* l)
 {
@@ -285,7 +285,7 @@ local int CclDefineConstruction(lua_State* l)
 		lua_error(l);
 	}
 
-	//		Slot identifier
+	// Slot identifier
 
 	str = strdup(LuaToString(l, 1));
 
@@ -306,7 +306,7 @@ local int CclDefineConstruction(lua_State* l)
 	construction->Ident = str;
 
 	//
-	//		Parse the arguments, in tagged format.
+	//  Parse the arguments, in tagged format.
 	//
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
@@ -455,7 +455,7 @@ local int CclDefineConstruction(lua_State* l)
 // ----------------------------------------------------------------------------
 
 /**
-**		Register CCL features for construction.
+**  Register CCL features for construction.
 */
 global void ConstructionCclRegister(void)
 {
@@ -463,4 +463,5 @@ global void ConstructionCclRegister(void)
 		CclDefineConstructionWcNames);
 	lua_register(Lua, "DefineConstruction", CclDefineConstruction);
 }
+
 //@}
