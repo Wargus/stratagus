@@ -209,6 +209,7 @@ void gc_protect(LISP *location);
 void gc_unprotect(LISP *location);
 void gc_protect_n(LISP *location,long n);
 void gc_protect_sym(LISP *location,char *st);
+long siod_used_cells(void);
 
 void __stdcall init_storage(void);
 void __stdcall init_slibu(void);
