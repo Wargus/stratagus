@@ -514,6 +514,16 @@ extern void VideoDrawX(const Graphic*, unsigned frame, int x, int y);
     ///	Draw a graphic object clipped and flipped in X direction.
 extern void VideoDrawClipX(const Graphic*, unsigned frame, int x, int y);
 
+    /// Translucent Functions
+    ///	Draw a graphic object unclipped.
+#define VideoDrawTrans50(o, f, x, y)	VideoDraw((o), (f), (x), (y))
+    ///	Draw a graphic object unclipped and flipped in X direction.
+#define VideoDrawXTrans50(o, f, x, y)	VideoDrawX((o), (f), (x), (y))
+    ///	Draw a graphic object clipped to the current clipping.
+#define VideoDrawClipTrans50(o, f, x, y)	VideoDrawClip((o), (f), (x), (y))
+    ///	Draw a graphic object clipped and flipped in X direction.
+#define VideoDrawClipXTrans50(o, f, x, y)	VideoDrawClipX((o), (f), (x), (y))
+
     ///	Draw a shadow graphic object clipped to the current clipping.
 extern void VideoDrawShadowClip(const Graphic*, unsigned frame,
     int x, int y);
@@ -1137,10 +1147,9 @@ extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 #define VideoDrawClip(o, f, x, y)	((o)->Type->DrawClip)((o), (f), (x), (y))
     ///	Draw a graphic object clipped and flipped in X direction.
 #define VideoDrawClipX(o, f, x, y)	((o)->Type->DrawClipX)((o), (f), (x), (y))
-    ///	Draw a shadow graphic object clipped to the current clipping.
 
-	///Translucide Functions
-   ///	Draw a graphic object unclipped.
+    /// Translucent Functions
+    ///	Draw a graphic object unclipped.
 #define VideoDrawTrans50(o, f, x, y)	((o)->Type->DrawTrans50)((o), (f), (x), (y))
     ///	Draw a graphic object unclipped and flipped in X direction.
 #define VideoDrawXTrans50(o, f, x, y)	((o)->Type->DrawXTrans50)((o), (f), (x), (y))
@@ -1148,8 +1157,8 @@ extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 #define VideoDrawClipTrans50(o, f, x, y)	((o)->Type->DrawClipTrans50)((o), (f), (x), (y))
     ///	Draw a graphic object clipped and flipped in X direction.
 #define VideoDrawClipXTrans50(o, f, x, y)	((o)->Type->DrawClipXTrans50)((o), (f), (x), (y))
-    ///	Draw a shadow graphic object clipped to the current clipping.
 
+    ///	Draw a shadow graphic object clipped to the current clipping.
 #define VideoDrawShadowClip(o, f, x, y)	((o)->Type->DrawShadowClip)((o),(f),(x),(y))
     ///	Draw a shadow graphic object clipped and flipped in X direction.
 #define VideoDrawShadowClipX(o, f, x, y)    ((o)->Type->DrawShadowClipX)((o),(f),(x),(y))
