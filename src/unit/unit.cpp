@@ -4144,7 +4144,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
 
     // 'type and 'player must be first, needed to create the unit slot
     fprintf(file,"'type '%s ",unit->Type->Ident);
-    fprintf(file,"'seen-type '%s ",unit->Type->Ident);
+    if( unit->SeenType ) {
+	fprintf(file,"'seen-type '%s ",unit->SeenType->Ident);
+    }
+    
     fprintf(file,"'player %d\n  ",unit->Player->Player);
 
     if( unit->Name ) {
@@ -4170,9 +4173,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file,"'stats 'S%08X\n  ",(int)unit->Stats);
     }
 #else
-    fprintf (file, "'stats %d\n  " ,unit->Player->Player);
+    fprintf(file, "'stats %d\n  " ,unit->Player->Player);
 #endif
     fprintf(file,"'pixel '(%d %d) ",unit->IX,unit->IY);
+    fprintf(file,"'seenpixel '(%d %d) ",unit->SeenIX,unit->SeenIY);
     fprintf(file,"'%sframe %d ",
 	    unit->Frame<0 ? "flipped-" : "" ,unit->Frame<0?-unit->Frame:unit->Frame);
     if( unit->SeenFrame!=UnitNotSeen ) {
@@ -4191,6 +4195,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
     if( unit->Destroyed ) {
 	fprintf(file," 'destroyed");
+    }
+    if( unit->SeenDestroyed ) {
+	fprintf(file," 'seendestroyed");
     }
     if( unit->Removed ) {
 	fprintf(file," 'removed");
