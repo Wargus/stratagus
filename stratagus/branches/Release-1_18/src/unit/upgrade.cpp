@@ -1282,8 +1282,8 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	    // UnMark the Unit sight for conversion
 	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 		src->TileWidth != dst->TileWidth ||
-		src->TileHeight != dst->TileHeight) && 
-		    !sightupgrade[numunits]->Removed) {
+		src->TileHeight != dst->TileHeight) &&
+	   	!unit->Removed) {
 		MapUnmarkSight(player,
 			unit->X+unit->Type->TileWidth/2,
 			unit->Y+unit->Type->TileHeight/2,
@@ -1302,7 +1302,7 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 		src->TileWidth != dst->TileWidth ||
 		src->TileHeight != dst->TileHeight) &&
-	   	!sightupgrade[numunits]->Removed) {
+	   	!unit->Removed) {
 		unit->CurrentSightRange=dst->Stats[player->Player].SightRange;
 		MapMarkSight(player,
 			unit->X+unit->Type->TileWidth/2,
