@@ -114,9 +114,10 @@ local void IntroCallbackButton2(unsigned button)
 /**
 **	Callback for input.
 */
-local void IntroCallbackKey1(unsigned key __attribute__((unused)),
-	unsigned keychar)
+local void IntroCallbackKey1(unsigned key, unsigned keychar)
 {
+    HandleKeyModifiersDown(key,keychar);
+
     if (UseContinueButton) {
 	if (keychar == 'c' || keychar == '\r') {
 	    ContinueButtonFlags |= MenuButtonClicked;
@@ -129,9 +130,10 @@ local void IntroCallbackKey1(unsigned key __attribute__((unused)),
 /**
 **	Callback for input.
 */
-local void IntroCallbackKey2(unsigned key,
-	unsigned keychar __attribute__((unused)))
+local void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
+    HandleKeyModifiersDown(key,keychar);
+
     if( UseContinueButton ) {
 	if( (key =='c' || key =='\r') &&
 	    (ContinueButtonFlags&MenuButtonClicked) ) {

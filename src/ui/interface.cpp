@@ -51,6 +51,7 @@
 #include "font.h"
 #include "campaign.h"
 #include "video.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -984,6 +985,27 @@ local int InputKey(int key)
     return 0;
 }
 
+
+/**
+**	Save a screenshot.
+*/
+local void Screenshot()
+{
+    CLFile *fd;
+    char filename[1024];
+    int i;
+
+    for( i=1; i<99; ++i ) {
+	sprintf(filename, "screen%02d.png", i);
+	if( !(fd = CLopen(filename)) ) {
+	    break;
+	}
+	CLclose(fd);
+    }
+    SaveScreenshotPNG(filename);
+}
+
+
 /**
 **	Update KeyModifiers if a key is pressed.
 **
@@ -1011,6 +1033,9 @@ global int HandleKeyModifiersDown(unsigned key,
 	    return 1;
 	case KeyCodeHyper:
 	    KeyModifiers|=ModifierHyper;
+	    return 1;
+	case KeyCodePrint:
+	    Screenshot();
 	    return 1;
 	default:
 	    break;
