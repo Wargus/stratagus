@@ -95,7 +95,7 @@ extern int CLseek(CLFile *file, long offset, int whence); ///  Library file seek
 extern char* LibraryFileName(const char* file,char* buffer);
 
     /// Read the contents of a directory
-extern int ReadDataDirectory(const char* dirname,char* suffix, FileList **flp);
+extern int ReadDataDirectory(const char* dirname,int (*filter)(char *,FileList *),FileList **flp);
 
 //@}
 

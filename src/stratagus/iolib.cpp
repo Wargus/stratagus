@@ -355,14 +355,6 @@ global char* LibraryFileName(const char* file,char* buffer)
     return buffer;
 }
 
-/**
-**	Generate a list of files within a specified directory
-**
-**	@param dirname	Directory to read.
-**	@param suffix	Optional suffix to check for.
-**
-**	@return		Pointer to FileList struct describing Files found.
-*/
 
 local int flqcmp(const void *v1, const void *v2)
 {
@@ -374,14 +366,23 @@ local int flqcmp(const void *v1, const void *v2)
 	return c2->type - c1->type;
 }
 
-global int ReadDataDirectory(const char* dirname,char* suffix, FileList **flp)
+/**
+**	Generate a list of files within a specified directory
+**
+**	@param dirname	Directory to read.
+**	@param filter	Optional xdata-filter function.
+**
+**	@return		Pointer to FileList struct describing Files found.
+*/
+
+global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *),FileList **flp)
 {
     DIR *dirp;
     struct dirent *dp;
     struct stat st;
     FileList *nfl, *fl = NULL;
     int n = 0;
-    char *cp, *lcp, *np;
+    char *cp, *np;
     char buffer[1024];
 
     strcpy(buffer, dirname);
@@ -414,49 +415,24 @@ global int ReadDataDirectory(const char* dirname,char* suffix, FileList **flp)
 			if (S_ISDIR(st.st_mode)) {
 			    nfl->name = strdup(np);
 			    nfl->type = 0;
+			    nfl->xdata = NULL;
 			} else {
-			    if (suffix == NULL) {
+			    nfl->type = -1;
+			    if (filter == NULL) {
 				nfl->name = strdup(np);
 				nfl->type = 1;
-			    } else {
-				cp = np;
-				cp--;
-				nfl->type = -1;
-				do {
-				    lcp = cp++;
-				    cp = strstr(cp, suffix);
-				} while (cp != NULL);
-				if (lcp >= np) {
-				    cp = lcp + strlen(suffix);
-#ifdef USE_ZLIB
-				    if (strcmp(cp, ".gz") == 0) {
-					*cp = 0;
-				    }
-#endif
-#ifdef USE_BZ2LIB
-				    if (strcmp(cp, ".bz2") == 0) {
-					*cp = 0;
-				    }
-#endif
-				    if (*cp == 0) {
-					nfl->type = 1;
-				    }
-				}
-				if (nfl->type > 0) {
-				    nfl->name = strdup(np);
+				nfl->xdata = NULL;
+			    } else if ((*filter)(buffer, nfl) == 0) {
+				if (n == 0) {
+				    free(fl);
+				    fl = NULL;
 				} else {
-				    if (n == 0) {
-					free(fl);
-					fl = NULL;
-				    } else {
-					fl = realloc(fl, sizeof(FileList) * n);
-				    }
-				    continue;
+				    fl = realloc(fl, sizeof(FileList) * n);
 				}
+				continue;
 			    }
 			}
 		    }
-		    nfl->xdata = NULL;
 		    n++;
 		}
 	    }
