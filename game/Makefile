@@ -32,6 +32,6 @@ MODULE  = game
 
 SRCS	= campaign.c trigger.c intro.c game.c savegame.c loadgame.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

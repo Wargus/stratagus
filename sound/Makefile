@@ -34,6 +34,6 @@ MODULE	= sound
 SRCS	= sound.c sound_server.c ccl_sound.c sound_id.c music.c \
 	  mad.c ogg.c flac.c wav.c unitsound.c libcda.c oss_audio.c sdl_audio.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

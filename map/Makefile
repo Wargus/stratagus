@@ -35,6 +35,6 @@ SRCS	= map.c map_draw.c ccl_map.c \
 	  map_fog.c map_rock.c map_wood.c map_wall.c \
 	  minimap.c tileset.c ccl_tileset.c map_save.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk
