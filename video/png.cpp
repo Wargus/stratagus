@@ -33,7 +33,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global unsigned char PalettePNG[768];	/// palette of last load png
+//global unsigned char PalettePNG[768];	/// palette of last load png
 #ifdef DEBUG
 extern unsigned AllocatedGraphicMemory;	/// counter for allocated video memory
 #endif
@@ -72,6 +72,7 @@ void CL_png_readfn(png_structp png_ptr,png_bytep data,png_size_t length)
 global Graphic* LoadGraphicPNG(const char* name)
 {
     Graphic* graphic;
+    Palette *PalettePNG;
     CLFile* fp;
     png_structp png_ptr;
     png_infop info_ptr;
@@ -124,6 +125,8 @@ global Graphic* LoadGraphicPNG(const char* name)
 
     //	Setup translators:
 
+    PalettePNG = (Palette *)calloc(256,sizeof(Palette));
+
     if( info_ptr->color_type==PNG_COLOR_TYPE_PALETTE ) {
 	DebugLevel3("Color palette\n");
 	if( info_ptr->valid&PNG_INFO_PLTE ) {
@@ -132,12 +135,12 @@ global Graphic* LoadGraphicPNG(const char* name)
 		abort();
 	    }
 	    for( i=0; i<info_ptr->num_palette; ++i ) {
-		PalettePNG[i*3+0]=info_ptr->palette[i].red>>2;
-		PalettePNG[i*3+1]=info_ptr->palette[i].green>>2;
-		PalettePNG[i*3+2]=info_ptr->palette[i].blue>>2;
+		PalettePNG[i].r=info_ptr->palette[i].red;
+		PalettePNG[i].g=info_ptr->palette[i].green;
+		PalettePNG[i].b=info_ptr->palette[i].blue;
 	    }
 	    for( ; i<256; ++i ) {
-		PalettePNG[i*3+0]=PalettePNG[i*3+1]=PalettePNG[i*3+2]=0;
+		PalettePNG[i].r=PalettePNG[i].g=PalettePNG[i].b=0;
 	    }
 	}
     }
@@ -198,6 +201,7 @@ global Graphic* LoadGraphicPNG(const char* name)
     CLclose(fp);
 
     graphic=MakeGraphic(8,w,h,data);	// data freed by make graphic
+    graphic->Palette=PalettePNG;  //FIXME: should this be part of MakeGraphic
 
     return graphic;
 }

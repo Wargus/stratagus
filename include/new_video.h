@@ -57,6 +57,20 @@ enum _sys_colors_ {
     ColorIconCycleEnd = 244
 };
 
+typedef unsigned char GraphicData;	/// generic graphic data type
+
+/// Palette structure.
+struct Palette {
+    /// RED COMPONENT
+    unsigned char r;
+    /// GREEN COMPONENT
+    unsigned char g;
+    /// BLUE COMPONENT
+    unsigned char b;
+};
+
+typedef struct Palette Palette;
+
 typedef enum _sys_colors_ SysColors;		/// System-Wide used colors.
 
 /**
@@ -135,11 +149,13 @@ typedef struct __graphic_type__ {
 **	General graphic object
 */
 struct __graphic__ {
-    GraphicType*	Type;		/// Object type dependend
-    unsigned		Width;		/// Width of the object
-    unsigned		Height;		/// Height of the object
-    unsigned		NumFrames;	/// Number of frames
-    void*		Frames;		/// Frames of the object
+  GraphicType*	        Type;		/// Object type dependend
+  Palette*              Palette;        /// Loaded Palette
+  GraphicData*          Pixels;
+  unsigned		Width;		/// Width of the object
+  unsigned		Height;		/// Height of the object
+  unsigned	        NumFrames;	/// Number of frames
+  void*		        Frames;		/// Frames of the object
 };
 
 /*----------------------------------------------------------------------------

@@ -546,7 +546,7 @@ local void DrawBuilding(Unit* unit)
 	n_frame = 128; // fancy buildings
     }
 
-    PlayerPixels(unit->Player);
+    RLEPlayerPixels(unit->Player,unit->Type->RleSprite);
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
@@ -610,7 +610,7 @@ local void DrawUnit(Unit* unit)
 
     DrawSelectionRectangle(unit,type,x,y);
 
-    PlayerPixels(unit->Player);
+    RLEPlayerPixels(unit->Player,unit->Type->RleSprite);
     DrawUnitType(type,unit->Frame,x,y);
 
     stats=unit->Stats;
