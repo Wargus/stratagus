@@ -1311,10 +1311,21 @@ global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x
 	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
 	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
 
-	// FIXME: This is a hack for mirrored sprites
-	if (frame < 0) {
-		VideoDrawClipX(sprite, -frame, x, y);
+	if (type->Flip) {
+		if (frame < 0) {
+			VideoDrawClipX(sprite, -frame, x, y);
+		} else {
+			VideoDrawClip(sprite, frame, x, y);
+		}
 	} else {
+		int row;
+
+		row = type->NumDirections / 2 + 1;
+		if (frame < 0) {
+			frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+		} else {
+			frame = (frame / row) * type->NumDirections + frame % row;
+		}
 		VideoDrawClip(sprite, frame, x, y);
 	}
 }
