@@ -104,7 +104,7 @@ extern void LoadScm(const char* scm,WorldMap* map);
 extern void LoadChk(const char* chk,WorldMap* map);
 
     /// Save a pud file
-extern void SavePud(const char* pud,const WorldMap* map);
+extern int SavePud(const char* pud,const WorldMap* map);
 
     /// Clean the pud module
 extern void CleanPud(void);
