@@ -265,9 +265,8 @@ void UpdateStats(int reset)
 **  Get the animations structure by ident.
 **
 **  @param ident  Identifier for the animation.
-**  @return  Pointer to the animation structure.
 **
-**  @todo Remove the use of scheme symbols to store, use own hash.
+**  @return  Pointer to the animation structure.
 */
 NewAnimations* NewAnimationsByIdent(const char* ident)
 {
@@ -277,7 +276,6 @@ NewAnimations* NewAnimationsByIdent(const char* ident)
 	if (tmp) {
 		return *tmp;
 	}
-	DebugPrint("Warning animation `%s' not found\n" _C_ ident);
 	return NULL;
 }
 

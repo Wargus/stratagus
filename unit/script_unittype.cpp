@@ -386,6 +386,9 @@ static int CclDefineUnitType(lua_State* l)
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NewAnimations")) {
 			type->NewAnimations = NewAnimationsByIdent(LuaToString(l, -1));
+			if (!type->NewAnimations) {
+				DebugPrint("Warning animation `%s' not found\n" _C_ LuaToString(l, -1));
+			}
 		} else if (!strcmp(value, "Icon")) {
 			if (redefine) {
 				free(type->Icon.Name);
