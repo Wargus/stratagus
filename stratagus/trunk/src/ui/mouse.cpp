@@ -268,7 +268,7 @@ global void DoRightButton(int sx, int sy)
 		    if (action == MouseActionSpellCast) {
 			// This is for demolition squads and such
 			DebugCheck(!unit->Type->CanCastSpell);
-			for (spellnum=0; !unit->Type->CanCastSpell[spellnum] &&
+			for (spellnum = 0; !unit->Type->CanCastSpell[spellnum] &&
 				spellnum < SpellTypeCount ; spellnum++) ;
 			DebugCheck(spellnum == SpellTypeCount);
 			SendCommandSpellCast(unit, x, y, dest, spellnum, flush);
@@ -343,12 +343,12 @@ global void DoRightButton(int sx, int sy)
 	    if (dest && dest->Type->GivesResource) {
                 dest->Blink = 4;
 	        DebugLevel3("Set rally point to a resource.\n");
-                SendCommandResource(Selected[i],dest, !(KeyModifiers & ModifierShift));
+                SendCommandResource(unit, dest, flush);
 	        continue;
 	    }
 	    if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
 	        DebugLevel3("Set rally point to a forest.\n");
-	        SendCommandResourceLoc(Selected[i], x, y,!(KeyModifiers & ModifierShift));
+	        SendCommandResourceLoc(unit, x, y, flush);
                 continue;
             }
 	    DebugLevel3("Set rally point to a location.\n");
@@ -823,14 +823,16 @@ global void UIHandleMouseMove(int x, int y)
 **	@param sx	X screen map position.
 **	@param sy	Y screen map position.
 */
-local void SendRepair(int sx, int sy)
+local int SendRepair(int sx, int sy)
 {
     int i;
     Unit* unit;
     Unit* dest;
     int x;
     int y;
+    int ret;
 
+    ret = 0;
     x = sx / TileSizeX;
     y = sy / TileSizeY;
 
@@ -842,11 +844,13 @@ local void SendRepair(int sx, int sy)
 	    unit = Selected[i];
 	    if (unit->Type->RepairRange) {
 		SendCommandRepair(unit, x, y, dest, !(KeyModifiers & ModifierShift));
+		ret = 1;
 	    } else {
 		DebugLevel0Fn("Non-worker repairs\n");
 	    }
 	}
     }
+    return ret;
 }
 
 /**
@@ -858,18 +862,21 @@ local void SendRepair(int sx, int sy)
 **	@todo	To reduce the CPU load for pathfinder, we should check if
 **		the destination is reachable and handle nice group movements.
 */
-local void SendMove(int sx, int sy)
+local int SendMove(int sx, int sy)
 {
     int i;
     int flush;
     Unit* unit;
     Unit* transporter;
+    int ret;
 
+    ret = 0;
     //  Move to a transporter.
     if ((transporter = UnitUnderCursor) &&
 	    (transporter->Type->Transporter) &&
 	    (transporter->Player == ThisPlayer)){
 	SendCommandStopUnit(transporter);
+	ret = 1;
     } else {
 	transporter = NULL;
     }
@@ -883,10 +890,13 @@ local void SendMove(int sx, int sy)
 	    DebugLevel3Fn("Board transporter\n");
 	    SendCommandFollow(transporter, unit, 0);
 	    SendCommandBoard(unit, -1, -1, transporter, flush);
+	    ret = 1;
 	} else {
 	    SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY, flush);
+	    ret = 1;
 	}
     }
+    return ret;
 }
 
 /**
@@ -903,16 +913,18 @@ local void SendMove(int sx, int sy)
 **
 **	@see Selected, @see NumSelected
 */
-local void SendAttack(int sx, int sy)
+local int SendAttack(int sx, int sy)
 {
     int i;
     Unit* unit;
     Unit* dest;
     int x;
     int y;
+    int ret;
 
-    x=sx / TileSizeX;
-    y=sy / TileSizeY;
+    ret = 0;
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
     for (i = 0; i < NumSelected; ++i) {
 	unit = Selected[i];
 	if (unit->Type->CanAttack || unit->Type->Building) {
@@ -924,11 +936,14 @@ local void SendAttack(int sx, int sy)
 	    }
 	    if (dest != unit) {	// don't let an unit self destruct
 		SendCommandAttack(unit, x, y, dest, !(KeyModifiers & ModifierShift));
+		ret = 1;
 	    }
 	} else {
 	    SendCommandMove(unit, x, y, !(KeyModifiers & ModifierShift));
+	    ret = 1;
 	}
     }
+    return ret;
 }
 
 /**
@@ -937,21 +952,26 @@ local void SendAttack(int sx, int sy)
 **	@param sx	X screen map position.
 **	@param sy	Y screen map position.
 */
-local void SendAttackGround(int sx, int sy)
+local int SendAttackGround(int sx, int sy)
 {
     int i;
     Unit* unit;
+    int ret;
 
+    ret = 0;
     for (i = 0; i < NumSelected; ++i) {
 	unit = Selected[i];
 	if (unit->Type->CanAttack) {
 	    SendCommandAttackGround(unit, sx / TileSizeX, sy / TileSizeY,
 		!(KeyModifiers & ModifierShift));
+	    ret = 1;
 	} else {
 	    SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY,
 		!(KeyModifiers & ModifierShift));
+	    ret = 1;
 	}
     }
+    return ret;
 }
 
 /**
@@ -959,16 +979,20 @@ local void SendAttackGround(int sx, int sy)
 **	@param sx	X screen map position.
 **	@param sy	Y screen map position.
 */
-local void SendPatrol(int sx, int sy)
+local int SendPatrol(int sx, int sy)
 {
     int i;
     Unit* unit;
+    int ret;
 
+    ret = 0;
     for (i = 0; i < NumSelected; ++i) {
 	unit = Selected[i];
 	SendCommandPatrol(unit, sx / TileSizeX, sy / TileSizeY,
 	    !(KeyModifiers & ModifierShift));
+	ret = 1;
     }
+    return ret;
 }
 
 /**
@@ -979,36 +1003,78 @@ local void SendPatrol(int sx, int sy)
 **
 **	@see Selected
 */
-local void SendResource(int sx, int sy)
+local int SendResource(int sx, int sy)
 {
     int i;
+    int x;
+    int y;
     int res;
+    Unit* unit;
     Unit* dest;
+    int ret;
+
+    ret = 0;
+    dest = UnitUnderCursor;
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
 
     for (i = 0; i < NumSelected; ++i) {
-	if ((dest = UnitUnderCursor) &&
-		(Selected[i]->Type->Harvester) &&
-		(res=dest->Type->GivesResource) &&
-		(Selected[i]->Type->ResInfo[res])) {
-	    dest->Blink = 4;
-	    DebugLevel3("RESOURCE\n");
-	    SendCommandResource(Selected[i],dest, !(KeyModifiers & ModifierShift));
-	    continue;
-	}
-	for (res = 0; res < MaxCosts; ++res) {
-	    if (Selected[i]->Type->Harvester &&
-		    Selected[i]->Type->ResInfo[res] &&
-		    Selected[i]->Type->ResInfo[res]->TerrainHarvester &&
-		    //  Full harvesters don't act.
-		    Selected[i]->Value < Selected[i]->Type->ResInfo[res]->ResourceCapacity &&
-		    IsMapFieldExplored(Selected[i]->Player, sx / TileSizeX, sy / TileSizeY) &&
-		    ForestOnMap(sx / TileSizeX, sy / TileSizeY)) {
+	unit = Selected[i];
+	if (unit->Type->Harvester) {
+	    if (dest &&
+		    (res = dest->Type->GivesResource) &&
+		    unit->Type->ResInfo[res] &&
+		    unit->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
+		    dest->Type->CanHarvest &&
+		    (dest->Player == unit->Player ||
+			(dest->Player->Player == PlayerMax - 1))) {
 		DebugLevel3("RESOURCE\n");
-		SendCommandResourceLoc(Selected[i], sx / TileSizeY, sy / TileSizeY,
-		    !(KeyModifiers & ModifierShift));
+		dest->Blink = 4;
+		SendCommandResource(Selected[i],dest, !(KeyModifiers & ModifierShift));
+		ret = 1;
+		continue;
+	    } else {
+		for (res = 0; res < MaxCosts; ++res) {
+		    if (unit->Type->ResInfo[res] &&
+			    unit->Type->ResInfo[res]->TerrainHarvester &&
+			    IsMapFieldExplored(unit->Player, x, y) &&
+			    ForestOnMap(x, y) &&
+			    Selected[i]->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
+			    ((unit->CurrentResource != res) ||
+				(unit->Value < unit->Type->ResInfo[res]->ResourceCapacity))) {
+			DebugLevel3("RESOURCE\n");
+			SendCommandResourceLoc(unit, x, y,
+			    !(KeyModifiers & ModifierShift));
+			ret = 1;
+			break;
+		    }
+		}
+		if (res != MaxCosts) {
+		    continue;
+		}
 	    }
 	}
+	if (unit->Type->Building) {
+	    if (dest && dest->Type->GivesResource) {
+                dest->Blink = 4;
+	        DebugLevel3("Set rally point to a resource.\n");
+                SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));
+		ret = 1;
+	        continue;
+	    }
+	    if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
+	        DebugLevel3("Set rally point to a forest.\n");
+	        SendCommandResourceLoc(unit, x, y, !(KeyModifiers & ModifierShift));
+		ret = 1;
+                continue;
+            }
+	    DebugLevel3("Set rally point to a location.\n");
+	    SendCommandMove(unit, x, y, !(KeyModifiers & ModifierShift));
+	    ret = 1;
+            continue;
+	}
     }
+    return ret;
 }
 
 /**
@@ -1017,15 +1083,19 @@ local void SendResource(int sx, int sy)
 **	@param sx	X screen map position.
 **	@param sy	Y screen map position.
 */
-local void SendUnload(int sx, int sy)
+local int SendUnload(int sx, int sy)
 {
     int i;
+    int ret;
 
+    ret = 0;
     for (i = 0; i < NumSelected; ++i) {
 	// FIXME: not only transporter selected?
 	SendCommandUnload(Selected[i], sx / TileSizeX, sy / TileSizeY, NoUnitP,
 	    !(KeyModifiers & ModifierShift));
+	ret = 1;
     }
+    return ret;
 }
 
 /**
@@ -1040,14 +1110,16 @@ local void SendUnload(int sx, int sy)
 **
 **	@see Selected, @see NumSelected
 */
-local void SendSpellCast(int sx, int sy)
+local int SendSpellCast(int sx, int sy)
 {
     int i;
     Unit *unit;
     Unit *dest;
     int x;
     int y;
+    int ret;
 
+    ret = 0;
     x = sx / TileSizeX;
     y = sy / TileSizeY;
     
@@ -1073,7 +1145,9 @@ local void SendSpellCast(int sx, int sy)
 	// CursorValue here holds the spell type id
 	SendCommandSpellCast(unit, x, y, dest, CursorValue,
 	    !(KeyModifiers & ModifierShift));
+	ret = 1;
     }
+    return ret;
 }
 
 /**
@@ -1087,47 +1161,52 @@ local void SendCommand(int sx, int sy)
     int i;
     int x;
     int y;
+    int ret;
 
+    ret = 0;
     x = sx / TileSizeX;
     y = sy / TileSizeY;
     CurrentButtonLevel = 0; // reset unit buttons to normal
     UpdateButtonPanel();
     switch (CursorAction) {
 	case ButtonMove:
-	    SendMove(sx, sy);
+	    ret = SendMove(sx, sy);
 	    break;
 	case ButtonRepair:
-	    SendRepair(sx, sy);
+	    ret = SendRepair(sx, sy);
 	    break;
 	case ButtonAttack:
-	    SendAttack(sx, sy);
+	    ret = SendAttack(sx, sy);
 	    break;
 	case ButtonAttackGround:
-	    SendAttackGround(sx, sy);
+	    ret = SendAttackGround(sx, sy);
 	    break;
 	case ButtonPatrol:
-	    SendPatrol(sx, sy);
+	    ret = SendPatrol(sx, sy);
 	    break;
 	case ButtonHarvest:
-	    SendResource(sx, sy);
+	    ret = SendResource(sx, sy);
 	    break;
 	case ButtonUnload:
-	    SendUnload(sx, sy);
+	    ret = SendUnload(sx, sy);
 	    break;
 	case ButtonSpellCast:
-	    SendSpellCast(sx, sy);
+	    ret = SendSpellCast(sx, sy);
 	    break;
 	default:
 	    DebugLevel1("Unsupported send action %d\n" _C_ CursorAction);
 	    break;
     }
 
-    //
-    //	Acknowledge the command with first selected unit.
-    //
-    for (i = 0; i < NumSelected; ++i) {
-	PlayUnitSound(Selected[i], VoiceAcknowledging);
-	break;
+    if (ret) {
+	// Acknowledge the command with first selected unit.
+	for (i = 0; i < NumSelected; ++i) {
+	    if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
+		PlayUnitSound(Selected[i], VoiceAcknowledging);
+		break;
+	    }
+	}
+	ShowOrdersCount = GameCycle + ShowOrders * CYCLES_PER_SECOND;
     }
 }
 
@@ -1327,7 +1406,7 @@ global void UIHandleButtonDown(unsigned button)
     if (CursorOn == CursorOnMap) {
 	DebugCheck(!TheUI.MouseViewport);
 
-	if ((MouseButtons&LeftButton) &&
+	if ((MouseButtons & LeftButton) &&
 		TheUI.SelectedViewport != TheUI.MouseViewport) {
 	    TheUI.SelectedViewport = TheUI.MouseViewport;
 	    MustRedraw = RedrawMinimapCursor | RedrawMap;
@@ -1339,7 +1418,7 @@ global void UIHandleButtonDown(unsigned button)
 	if (CursorBuilding) {
 	    // Possible Selected[0] was removed from map
 	    // need to make sure there is an unit to build
-	    if (Selected[0] && (MouseButtons&LeftButton)) {// enter select mode
+	    if (Selected[0] && (MouseButtons & LeftButton)) {// enter select mode
 		int x;
 		int y;
 		int i;
@@ -1359,7 +1438,7 @@ global void UIHandleButtonDown(unsigned button)
 			}
 		    }
 		}
-		if (CanBuildUnitType(Selected[0],CursorBuilding, x, y) &&
+		if (CanBuildUnitType(Selected[0], CursorBuilding, x, y) &&
 			(explored || ReplayRevealMap)) {
 		    PlayGameSound(GameSounds.PlacementSuccess.Sound,
 			MaxSampleVolume);
@@ -1680,14 +1759,11 @@ global void UIHandleButtonUp(unsigned button)
 	    // Select single unit
 	    //
 	    unit = NULL;
-	    if (NumSelected == 1) {
-		unit = Selected[0];
-	    }
 	    // cade: cannot select unit on invisible space
 	    // FIXME: johns: only complete invisibile units
 	    if (IsMapFieldVisible(ThisPlayer,
-		    Viewport2MapX(TheUI.MouseViewport,CursorX),
-		    Viewport2MapY(TheUI.MouseViewport,CursorY)) || ReplayRevealMap) {
+		    Viewport2MapX(TheUI.MouseViewport, CursorX),
+		    Viewport2MapY(TheUI.MouseViewport, CursorY)) || ReplayRevealMap) {
 		unit = UnitOnScreen(unit,
 		    CursorX - TheUI.MouseViewport->X + TheUI.MouseViewport->MapX * TileSizeX,
 		    CursorY - TheUI.MouseViewport->Y + TheUI.MouseViewport->MapY * TileSizeY);
@@ -1715,6 +1791,9 @@ global void UIHandleButtonUp(unsigned button)
 			(NumSelected != 1 || !Selected[0]->Type->Building) &&
 			(NumSelected != 1 || Selected[0]->Player == ThisPlayer)) {
 		    num = ToggleSelectUnit(unit);
+		    if (!num) {
+			SelectionChanged();
+		    }
 		} else {
 		    SelectSingleUnit(unit);
 		    num = 1;
