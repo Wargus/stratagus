@@ -2118,13 +2118,18 @@ local void VideoDraw8to16ClipTrans50(const Graphic* sprite, unsigned frame, int 
 				dp += *sp++;				// transparent
 				pp = dp - 1 + *sp++;				// opaque
 				while (dp < pp) {		// unroll
-					*dp++ =  ((*dp >> 1) & 0x7BEF)  +((pixels[*sp++] >> 1) & 0x7BEF);
-					*dp++ =  ((*dp >> 1) & 0x7BEF)  +((pixels[*sp++] >> 1) & 0x7BEF);
-						//*dp++ =  ((*dp >> 2) & 0x79E7) + ((pixels[*sp] >> 2) & 0x79E7) +((pixels[*sp++] >> 1) & 0x7BEF);
-					//*dp++ =  ((*dp >> 2) & 0x79E7) + ((pixels[*sp] >> 2) & 0x79E7) +((pixels[*sp++] >> 1) & 0x7BEF);
+					*dp =  ((*dp >> 1) & 0x7BEF)  +((pixels[*sp++] >> 1) & 0x7BEF);
+					++dp;
+					*dp =  ((*dp >> 1) & 0x7BEF)  +((pixels[*sp++] >> 1) & 0x7BEF);
+					++dp;
+#if 0
+					*dp++ =  ((*dp >> 2) & 0x79E7) + ((pixels[*sp] >> 2) & 0x79E7) +((pixels[*sp++] >> 1) & 0x7BEF);
+					*dp++ =  ((*dp >> 2) & 0x79E7) + ((pixels[*sp] >> 2) & 0x79E7) +((pixels[*sp++] >> 1) & 0x7BEF);
+#endif
 				}
 				if (dp <= pp) {
-					*dp++ =  ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					*dp =  ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					++dp;
 				}
 			} while (dp < lp);
 			dp += da;
@@ -2167,12 +2172,14 @@ middle_trans:
 middle_pixel:
 				if (pp < lp) {
 					while (dp < pp) {
-						*dp++ =  ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+						*dp =  ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+						++dp;
 					}
 					continue;
 				}
 				while (dp < lp) {
-					*dp++ =  ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					*dp =  ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					++dp;
 				}
 				sp += pp - dp;
 				dp = pp;
@@ -2392,11 +2399,14 @@ local void VideoDraw8to32ClipTrans50(const Graphic* sprite, unsigned frame, int 
 				dp += *sp++;				// transparent
 				pp = dp - 1 + *sp++;				// opaque
 				while (dp < pp) {		// unroll
-					*dp++ =  ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F) ;
-					*dp++ =  ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F) ;
+					*dp =  ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					++dp;
+					*dp =  ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					++dp;
 				}
 				if (dp <= pp) {
-					*dp++ = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					*dp = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					++dp;
 				}
 			} while (dp < lp);
 			dp += da;
@@ -2439,12 +2449,14 @@ middle_trans:
 middle_pixel:
 				if (pp < lp) {
 					while (dp < pp) {
-						*dp++ = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+						*dp = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+						++dp;
 					}
 					continue;
 				}
 				while (dp < lp) {
-					*dp++ = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					*dp = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					++dp;
 				}
 				sp += pp - dp;
 				dp = pp;
@@ -2668,11 +2680,14 @@ local void VideoDraw8to16ClipXTrans50(const Graphic* sprite, unsigned frame,
 				dp -= *sp++;				// transparent
 				pp = dp + 1 - *sp++;				// opaque
 				while (dp > pp) {
-					*dp-- = ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
-					*dp-- = ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					*dp = ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					--dp;
+					*dp = ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					--dp;
 				}
 				if (dp >= pp) {
-					*dp-- = ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					*dp = ((*dp >> 1) & 0x7BEF) + ((pixels[*sp++] >> 1) & 0x7BEF);
+					--dp;
 				}
 			} while (dp > lp);
 			dp += da;
@@ -2944,8 +2959,10 @@ local void VideoDraw8to32ClipXTrans50(const Graphic* sprite, unsigned frame
 				dp -= *sp++;				// transparent
 				pp = dp + 1 - *sp++;				// opaque
 				while (dp > pp) {
-					*dp-- = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
-					*dp-- = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					*dp = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					--dp;
+					*dp = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					--dp;
 				}
 				if (dp >= pp) {
 					*dp-- = pixels[*sp++];
@@ -2991,12 +3008,14 @@ middle_trans:
 middle_pixel:
 				if (pp > lp) {
 					while (dp > pp) {
-						*dp-- = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+						*dp = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+						--dp;
 					}
 					continue;
 				}
 				while (dp > lp) {
-					*dp-- = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					*dp = ((*dp >> 1) & 0x7F7F7F7F) + ((pixels[*sp++] >> 1) & 0x7F7F7F7F);
+					--dp;
 				}
 				sp += dp - pp;
 				dp = pp;
