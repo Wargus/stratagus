@@ -127,6 +127,13 @@ global void InitUserInterface(const char *race_name)
     //
     //	Calculations
     //
+    if( TheUI.MapArea.EndX > TheMap.Width*TileSizeX-1 ) {
+	TheUI.MapArea.EndX = TheMap.Width*TileSizeX-1;
+    }
+    if( TheUI.MapArea.EndY > TheMap.Height*TileSizeY-1 ) {
+	TheUI.MapArea.EndY = TheMap.Height*TileSizeY-1;
+    }
+
     TheUI.SelectedViewport=TheUI.Viewports;
 
     if( num_vps ) {
