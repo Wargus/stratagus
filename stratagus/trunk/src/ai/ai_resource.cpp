@@ -194,7 +194,7 @@ global int EnemyUnitsInDistance(const Unit* unit,unsigned range)
 	//	unusable unit
 	//
 	// FIXME: did SelectUnits already filter this.
-	if( dest->Removed || dest->Invisible
+	if( dest->Removed || dest->Invisible || !unit->HP
 		|| !(dest->Visible&(1<<player->Player))
 		|| dest->Orders[0].Action==UnitActionDie ) {
 	    DebugLevel0Fn("NO\n");
