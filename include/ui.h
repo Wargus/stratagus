@@ -184,8 +184,6 @@ typedef struct _ui_ {
     int		ResourceX;		/// Resource X position
     int		ResourceY;		/// Resource Y position
 
-    int		OriginalResources;	/// Original resource mode
-
     struct {
 #if 0
 	int	IconX;			/// Icon X position
