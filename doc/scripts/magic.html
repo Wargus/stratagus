@@ -177,7 +177,11 @@ missiles.
 you shot a missile at a unit, it would only damage that unit.  A value of 1 only
 affects the field where the missile hits.  A value of 2  would mean that the
 damage for that particular missile would be dealt for a range of 1 around the
-impact spot. All fields that aren't the center get only 50% of the damage.
+impact spot. All fields that aren't the center get only 1/SpashFactor of the damage.
+Fields 2 away get 1/(SplashFactor*2), and following...
+</dd>
+<dt>splash-factor</dt>
+<dd>The Splash divisor for damage done with range
 </dd>
 <dt>impact-missile</dt>
 <dd>You can use this to spawn another missile on impact. F.E. 'impact-missile 'missile-explosion
@@ -187,11 +191,11 @@ impact spot. All fields that aren't the center get only 50% of the damage.
 can be used to generate a chain of missiles.
 </dd>
 <dt>can-hit-owner</dt>
-<dd>This is a boolean value(#t or #f) that determines if the missile will affect
+<dd>Determines if the missile will affect
 the caster or not.
 </dd>
 <dt>firendly-fire</dt>
-<dd>This is a boolean value(#t or #f) that determines if the missile will damage
+<dd>Determines if the missile will damage
 units belonging to the same player of the caster or to an ally.
 </dd>
 </dl>
@@ -204,7 +208,7 @@ units belonging to the same player of the caster or to an ally.
       'num-directions 8
       'impact-sound "fireball hit"
       'class 'missile-class-point-to-point 'draw-level 50  'sleep 1 'speed 16 'range 1
-      'can-hit-owner #f 'friendly-fire #f)
+      'can-hit-owner)
 </pre>
 <h4>Used</h4>
 <a href="../../data/ccl/missiles.ccl"> $LIBARYPATH/ccl/missiles.ccl </a>
