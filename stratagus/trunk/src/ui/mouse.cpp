@@ -124,7 +124,7 @@ global void DoRightButton(int sx, int sy)
 	// Unit selected isn't owned by the player.
 	// You can't select your own units + foreign unit(s).
 	//
-	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
+	if (!CanSelectMultipleUnits(Selected[0]->Player) && 0) {
 		return;
 	}
 
@@ -1448,7 +1448,7 @@ global void UIHandleButtonDown(unsigned button)
 					}
 				}
 				if (CanBuildUnitTypeMask(Selected[0], CursorBuilding, x, y,
-					Selected[0]->Type->MovementMask & ~(MapFieldBuilding | MapFieldLandUnit | MapFieldSeaUnit)) &&
+					Selected[0]->Type->MovementMask) &&
 						(explored || ReplayRevealMap)) {
 					PlayGameSound(GameSounds.PlacementSuccess.Sound,
 						MaxSampleVolume);

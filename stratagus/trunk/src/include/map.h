@@ -364,6 +364,8 @@ extern  void MarkDrawEntireMap(void);
 //
 // in map_fog.c
 //
+	/// Filter map flags through fog
+extern int MapFogFilterFlags(Player* player, int x, int y, int mask);
 	/// Mark a tile for normal sight
 extern void MapMarkTileSight(const Player* player, int x, int y);
 	/// Unmark a tile for normal sight
