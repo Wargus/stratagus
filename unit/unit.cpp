@@ -123,9 +123,16 @@ global void ReleaseUnit(Unit* unit)
 	Unit* temp;
 
 	//
+	//	Call back to AI, for killed units.
+	//
+	if( (player=unit->Player) && player->Ai ) {
+	    AiUnitKilled(unit);
+	}
+
+	//
 	//	Remove the unit from the player's units table.
 	//
-	if( (player=unit->Player) ) {
+	if( player ) {
 	    DebugCheck( *unit->PlayerSlot!=unit );
 	    temp=player->Units[--player->TotalNumUnits];
 	    player->Units[player->TotalNumUnits]=NULL;

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ai.h		-	The ai headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __AI_H__
 #define __AI_H__
@@ -48,13 +47,24 @@ extern void AiCclRegister(void);	/// register ccl features
 --     Call Backs/Triggers
 --------------------------------------------------------*/
 
+    /// Called if AI unit is attacked
 extern void AiHelpMe(Unit* unit);
+    /// Called if AI unit is killed
+extern void AiUnitKilled(Unit* unit);
+    /// Called if AI needs more farms
+extern void AiNeedMoreFarms(Unit* unit,const UnitType* what);
+    /// Called if AI unit has completed work
 extern void AiWorkComplete(Unit* unit,Unit* what);
+    /// Called if AI unit can't build
 extern void AiCanNotBuild(Unit* unit,const UnitType* what);
+    /// Called if AI unit can't reach building place
 extern void AiCanNotReach(Unit* unit,const UnitType* what);
+    /// Called if AI unit has completed training
 extern void AiTrainingComplete(Unit* unit,Unit* what);
-extern void AiUpgradeToComplete(Unit* unit,Unit* what);
-extern void AiResearchComplete(Unit* unit,int what);
+    /// Called if AI unit has completed upgrade to
+extern void AiUpgradeToComplete(Unit* unit,const UnitType* what);
+    /// Called if AI unit has completed research
+extern void AiResearchComplete(Unit* unit,const Upgrade* what);
 
 //@}
 

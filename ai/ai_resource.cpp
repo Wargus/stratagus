@@ -106,7 +106,7 @@ local int AiBuildBuilding(const UnitType* type,UnitType* building)
     int x;
     int y;
 
-    DebugLevel0Fn("%s can made %s\n" _C_ type->Ident _C_ building->Ident);
+    DebugLevel3Fn("%s can made %s\n" _C_ type->Ident _C_ building->Ident);
 
     IfDebug( unit=NoUnitP; );
     //
@@ -125,7 +125,7 @@ local int AiBuildBuilding(const UnitType* type,UnitType* building)
     for( i=0; i<num; ++i ) {
 
 	unit=table[i];
-	DebugLevel0Fn("Have an unit to build %d :)\n" _C_ UnitNumber(unit));
+	DebugLevel3Fn("Have an unit to build %d :)\n" _C_ UnitNumber(unit));
 
 	//
 	//  Find place on that could be build.
@@ -134,7 +134,7 @@ local int AiBuildBuilding(const UnitType* type,UnitType* building)
 	    continue;
 	}
 
-	DebugLevel0Fn("Have a building place %d,%d :)\n" _C_ x _C_ y);
+	DebugLevel3Fn("Have a building place %d,%d :)\n" _C_ x _C_ y);
 
 	CommandBuildBuilding(unit, x, y, building,FlushCommands);
 
@@ -213,7 +213,7 @@ local int AiTrainUnit(const UnitType* type,UnitType* what)
     int i;
     int num;
 
-    DebugLevel0Fn("%s can made %s\n" _C_ type->Ident _C_ what->Ident);
+    DebugLevel3Fn("%s can made %s\n" _C_ type->Ident _C_ what->Ident);
 
     IfDebug( unit=NoUnitP; );
     //
@@ -230,7 +230,7 @@ local int AiTrainUnit(const UnitType* type,UnitType* what)
     for( i=0; i<num; ++i ) {
 
 	unit=table[i];
-	DebugLevel0Fn("Have an unit to train %d :)\n" _C_ UnitNumber(unit));
+	DebugLevel3Fn("Have an unit to train %d :)\n" _C_ UnitNumber(unit));
 
 	CommandTrainUnit(unit, what,FlushCommands);
 

@@ -187,8 +187,7 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
     if( AiFindBuildingPlace2(worker,type,dx,dy,1) ) {
 	return 1;
     }
-    return 0;
-    //return AiFindBuildingPlace2(worker,type,dx,dy,0);
+    return AiFindBuildingPlace2(worker,type,dx,dy,0);
 }
 
 //@}

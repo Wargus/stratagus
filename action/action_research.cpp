@@ -34,6 +34,7 @@
 #include "upgrade_structs.h"
 #include "upgrade.h"
 #include "interface.h"
+#include "ai.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -64,8 +65,8 @@ global void HandleActionResearch(Unit* unit)
 	if( unit->Player==ThisPlayer ) {
 	    SetMessage2(unit->X, unit->Y, "%s: Upgrade complete"
 		,unit->Type->Name );
-	} else {
-	    // FIXME: AiUpgradeToComplete(unit,type);
+	} else if( unit->Player->Ai ) {
+	    AiResearchComplete(unit,upgrade);
 	}
         UpgradeAcquire(unit->Player,upgrade);
 
