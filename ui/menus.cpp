@@ -1949,6 +1949,7 @@ local void GameUNSAction(Menuitem *mi, int i)
 
 local void GameTSSAction(Menuitem *mi, int i)
 {
+    // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
     int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
     if (!mi || mi->d.pulldown.curopt == i) {
