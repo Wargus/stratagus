@@ -173,6 +173,8 @@ global void SaveButtons(FILE* file)
 		fprintf(file,"'check-units-and");
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNetwork ) {
 		fprintf(file,"'check-network");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoNetwork ) {
+		fprintf(file,"'check-no-network");
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoWork ) {
 		fprintf(file,"'check-no-work");
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoResearch ) {
