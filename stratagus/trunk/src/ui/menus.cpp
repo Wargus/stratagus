@@ -1735,7 +1735,9 @@ local void GameMenuLoad(void)
 global void SoundOptions(void)
 {
 #ifdef WITH_SOUND
+#ifdef USE_LIBCDA
     int i = 17;
+#endif
     
     if (SoundFildes != -1)
 	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;
@@ -1821,13 +1823,12 @@ local void SetMusicPower(Menuitem *mi)
 
 local void SetCdPower(Menuitem *mi)
 {
-    int i = 17;
 #ifdef USE_SDLCD
     /// Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
 	if (SDL_CDStatus(CDRom) <= 1)
-	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
+	    SoundOptionsMenuItems[17].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
         SDL_CDStop(CDRom);
