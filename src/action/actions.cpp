@@ -6,11 +6,11 @@
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
-//        Stratagus - A free fantasy real time strategy game engine
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name actions.c - The actions. */
 //
-//      (c) Copyright 1998,2000-2004 by Lutz Sammer, Russell Smith
+//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 #include "player.h"
 #include "unit.h"
 #include "actions.h"
+#include "missile.h"
 #include "interface.h"
 #include "map.h"
 #include "sound.h"
@@ -136,6 +137,8 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				break;
 
 			case NewAnimationAttack:
+				FireMissile(unit);
+				unit->Invisible = 0; // unit is invisible until attacks
 				break;
 
 			case NewAnimationRotate:
