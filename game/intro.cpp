@@ -1399,8 +1399,7 @@ local SCM CclCredits(SCM list)
 	if (gh_eq_p(value, gh_symbol2scm("background"))) {
 	    GameCredits.Background = gh_scm2newstr(gh_car(list), NULL);
 	    list = gh_cdr(list);
-	}
-	if (gh_eq_p(value, gh_symbol2scm("name")) ||
+	} else if (gh_eq_p(value, gh_symbol2scm("name")) ||
 		gh_eq_p(value, gh_symbol2scm("title")) ||
 		gh_eq_p(value, gh_symbol2scm("comment"))) {
 	    n = get_c_string(gh_car(list));
@@ -1418,6 +1417,60 @@ local SCM CclCredits(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclCredits(lua_State* l)
+{
+    const char* value;
+    const char* n;
+    int nlen;
+    int len;
+    int args;
+    int j;
+
+    if (GameCredits.Background) {
+	free(GameCredits.Background);
+    }
+    GameCredits.Background = NULL;
+    if (GameCredits.Names) {
+	free(GameCredits.Names);
+	GameCredits.Names = (char*)malloc(1);
+	GameCredits.Names[0] = '\0';
+    }
+    len = 0;
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "background")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    GameCredits.Background = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "name") ||
+		!strcmp(value, "title") ||
+		!strcmp(value, "comment")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    n = lua_tostring(l, j + 1);
+	    nlen = strlen(n);
+	    GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
+	    if (len != 0) {
+		GameCredits.Names[len++] = '\n';
+	    }
+	    strcpy(GameCredits.Names + len, n);
+	    len += nlen;
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1429,6 +1482,8 @@ global void CreditsCclRegister(void)
     GameCredits.Names = NULL;
 #if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("credits", CclCredits);
+#elif defined(USE_LUA)
+    lua_register(Lua, "Credits", CclCredits);
 #endif
 }
 
