@@ -2654,7 +2654,7 @@ local int CclDefineMenuItem(lua_State* l)
 		} else if (!strcmp(value, "font")) {
 			item->font = CclFontByIdentifier(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "init")) {
-			if (!lua_isstring(l, j + 1) || !lua_isnil(l, j + 1)) {
+			if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
