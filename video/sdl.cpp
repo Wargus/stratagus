@@ -602,6 +602,8 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	int s;
 	SDL_Event event[1];
 	Uint32 ticks;
+	int interrupts;
+
 
 #if defined(WITH_SOUND) && !defined(USE_SDLA)
 	// FIXME: ugly hack, move into sound part!!!
@@ -634,16 +636,18 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	InputKeyTimeout(callbacks, ticks);
 	CursorAnimate(ticks);
 
+	interrupts = 0;
+
 	for (;;) {
 		//
 		//		Time of frame over? This makes the CPU happy. :(
 		//
 		ticks = SDL_GetTicks();
-		if (!VideoInterrupts && ticks + 11 < NextFrameTicks) {
+		if (!interrupts && ticks + 11 < NextFrameTicks) {
 			SDL_Delay(10);
 		}
 		while (ticks >= NextFrameTicks) {
-			++VideoInterrupts;
+			++interrupts;
 			FrameFraction += FrameRemainder;
 			if (FrameFraction > 10) {
 				FrameFraction -= 10;
@@ -723,28 +727,14 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 		//
 		//		No more input and time for frame over: return
 		//
-		if (!i && s <= 0 && VideoInterrupts) {
+		if (!i && s <= 0 && interrupts) {
 			break;
 		}
 	}
 
-	//
-	//		Prepare return, time for one frame is over.
-	//
-	VideoInterrupts = 0;
-
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;
 	}
-}
-
-/**
-**  Check video interrupt.
-**
-**  Display and count too slow frames.
-*/
-global void CheckVideoInterrupts(void)
-{
 }
 
 /**

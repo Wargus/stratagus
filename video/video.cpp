@@ -10,7 +10,7 @@
 //
 /**@name video.c - The universal video functions. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer and Nehal Mistry
+//      (c) Copyright 1999-2004 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -111,68 +111,63 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Structure of pushed clippings.
+**  Structure of pushed clippings.
 */
 typedef struct _clip_ {
-	struct _clip_*		Next;				/// next pushed clipping.
-	int						X1;				/// pushed clipping top left
-	int						Y1;				/// pushed clipping top left
-	int						X2;				/// pushed clipping bottom right
-	int						Y2;				/// pushed clipping bottom right
+	struct _clip_* Next;                /// next pushed clipping.
+	int X1;                             /// pushed clipping top left
+	int Y1;                             /// pushed clipping top left
+	int X2;                             /// pushed clipping bottom right
+	int Y2;                             /// pushed clipping bottom right
 } Clip;
 
 /*----------------------------------------------------------------------------
---		Externals
+--  Externals
 ----------------------------------------------------------------------------*/
 
-extern void InitVideoSdl(void);				/// Init SDL video hardware driver
+extern void InitVideoSdl(void);         /// Init SDL video hardware driver
 
-extern void SdlLockScreen(void);		/// Do SDL hardware lock
-extern void SdlUnlockScreen(void);		/// Do SDL hardware unlock
+extern void SdlLockScreen(void);        /// Do SDL hardware lock
+extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global char VideoFullScreen;				/// true fullscreen wanted
-global char VideoForceFullScreen;			/// fullscreen set from commandline
+global char VideoFullScreen;            /// true fullscreen wanted
+global char VideoForceFullScreen;       /// fullscreen set from commandline
 
-global int ColorCycleAll;				/// Flag Color Cycle with all palettes
+global int ColorCycleAll;               /// Flag Color Cycle with all palettes
 
-global int ClipX1;						/// current clipping top left
-global int ClipY1;						/// current clipping top left
-global int ClipX2;						/// current clipping bottom right
-global int ClipY2;						/// current clipping bottom right
+global int ClipX1;                      /// current clipping top left
+global int ClipY1;                      /// current clipping top left
+global int ClipX2;                      /// current clipping bottom right
+global int ClipY2;                      /// current clipping bottom right
 
-local Clip* Clips;						/// stack of all clips
-local Clip* ClipsGarbage;				/// garbage-list of available clips
-
-#ifdef DEBUG
-global unsigned AllocatedGraphicMemory; /// Allocated memory for objects
-#endif
+local Clip* Clips;                      /// stack of all clips
+local Clip* ClipsGarbage;               /// garbage-list of available clips
 
 	/**
-	**		Architecture-dependant video depth. Set by InitVideoXXX, if 0.
-	**		(8,15,16,24,32)
-	**		@see InitVideo @see InitVideoSdl
-	**		@see main
+	**  Architecture-dependant video depth. Set by InitVideoXXX, if 0.
+	**  (8,15,16,24,32)
+	**  @see InitVideo @see InitVideoSdl
+	**  @see main
 	*/
 global int VideoDepth;
 
 	/**
-	**		Architecture-dependant videomemory. Set by InitVideoXXX.
-	**		FIXME: need a new function to set it, see #ifdef SDL code
-	**		@see InitVideo @see InitVideoSdl
-	**		@see VMemType
+	**  Architecture-dependant videomemory. Set by InitVideoXXX.
+	**  FIXME: need a new function to set it, see #ifdef SDL code
+	**  @see InitVideo @see InitVideoSdl
+	**  @see VMemType
 	*/
 global SDL_Surface* TheScreen;
 
 global int VideoSyncSpeed = 100;            /// 0 disable interrupts
-global volatile int VideoInterrupts;        /// be happy, were are quicker
 global int SkipFrames;						/// Skip this frames
 
 global int ColorWaterCycleStart;
@@ -197,20 +192,20 @@ Uint32 ColorYellow;
 
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Clip Rectangle to another rectangle
+**  Clip Rectangle to another rectangle
 **
-**		@param left		Left X original rectangle coordinate.
-**		@param top		Top Y original rectangle coordinate.
-**		@param right		Right X original rectangle coordinate.
-**		@param bottom		Bottom Y original rectangle coordinate.
-**		@param x1		Left X bounding rectangle coordinate.
-**		@param y1		Top Y bounding rectangle coordinate.
-**		@param x2		Right X bounding rectangle coordinate.
-**		@param y2		Bottom Y bounding rectangle coordinate.
+**  @param left    Left X original rectangle coordinate.
+**  @param top     Top Y original rectangle coordinate.
+**  @param right   Right X original rectangle coordinate.
+**  @param bottom  Bottom Y original rectangle coordinate.
+**  @param x1      Left X bounding rectangle coordinate.
+**  @param y1      Top Y bounding rectangle coordinate.
+**  @param x2      Right X bounding rectangle coordinate.
+**  @param y2      Bottom Y bounding rectangle coordinate.
 **/
 global void ClipRectToRect(int* left, int* top, int* right,int* bottom,
 		int x1, int y1, int x2, int y2)
@@ -251,12 +246,12 @@ global void ClipRectToRect(int* left, int* top, int* right,int* bottom,
 }
 
 /**
-**		Set clipping for graphic routines.
+**  Set clipping for graphic routines.
 **
-**		@param left		Left X screen coordinate.
-**		@param top		Top Y screen coordinate.
-**		@param right		Right X screen coordinate.
-**		@param bottom		Bottom Y screen coordinate.
+**  @param left    Left X screen coordinate.
+**  @param top     Top Y screen coordinate.
+**  @param right   Right X screen coordinate.
+**  @param bottom  Bottom Y screen coordinate.
 */
 global void SetClipping(int left, int top, int right, int bottom)
 {
@@ -265,7 +260,7 @@ global void SetClipping(int left, int top, int right, int bottom)
 			top < 0 || top >= VideoHeight || right < 0 ||
 			right >= VideoWidth || bottom < 0 || bottom >= VideoHeight) {
 		DebugLevel0Fn("Wrong clipping %d->%d %d->%d, write cleaner code.\n" _C_
-				left _C_ right _C_ top _C_ bottom);
+			left _C_ right _C_ top _C_ bottom);
 //		DebugCheck(1);
 	}
 #endif
@@ -278,16 +273,16 @@ global void SetClipping(int left, int top, int right, int bottom)
 }
 
 /**
-**		Set clipping for graphic routines. This clips against the current clipping.
+**  Set clipping for graphic routines. This clips against the current clipping.
 **
-**		@param left		Left X screen coordinate.
-**		@param top		Top Y screen coordinate.
-**		@param right		Right X screen coordinate.
-**		@param bottom		Bottom Y screen coordinate.
+**  @param left    Left X screen coordinate.
+**  @param top     Top Y screen coordinate.
+**  @param right   Right X screen coordinate.
+**  @param bottom  Bottom Y screen coordinate.
 */
 global void SetClipToClip(int left, int top, int right, int bottom)
 {
-	//  No warnings... exceeding is expected.
+	// No warnings... exceeding is expected.
 	ClipRectToRect(&left, &top, &right, &bottom, ClipX1, ClipY1, ClipX2, ClipY2);
 
 	ClipX1 = left;
@@ -297,7 +292,7 @@ global void SetClipToClip(int left, int top, int right, int bottom)
 }
 
 /**
-**		Push current clipping.
+**  Push current clipping.
 */
 global void PushClipping(void)
 {
@@ -318,7 +313,7 @@ global void PushClipping(void)
 }
 
 /**
-**		Pop current clipping.
+**  Pop current clipping.
 */
 global void PopClipping(void)
 {
@@ -385,10 +380,10 @@ global void VideoPaletteListRemove(SDL_Surface* surface)
 }
 
 /**
-**		Load a picture and display it on the screen (full screen),
-**		changing the colormap and so on..
+**  Load a picture and display it on the screen (full screen),
+**  changing the colormap and so on..
 **
-**		@param name		Name of the picture (file) to display.
+**  @param name  Name of the picture (file) to display.
 */
 global void DisplayPicture(const char* name)
 {
@@ -478,11 +473,11 @@ global void ColorCycle(void)
 }
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Lock the screen for write access.
+**  Lock the screen for write access.
 */
 global void VideoLockScreen(void)
 {
@@ -492,7 +487,7 @@ global void VideoLockScreen(void)
 }
 
 /**
-**		Unlock the screen for write access.
+**  Unlock the screen for write access.
 */
 global void VideoUnlockScreen(void)
 {
@@ -502,7 +497,7 @@ global void VideoUnlockScreen(void)
 }
 
 /**
-**		Clear the video screen.
+**  Clear the video screen.
 */
 global void VideoClearScreen(void)
 {
@@ -510,7 +505,7 @@ global void VideoClearScreen(void)
 }
 
 /**
-**		Return ticks in ms since start.
+**  Return ticks in ms since start.
 */
 global unsigned long GetTicks(void)
 {
@@ -520,7 +515,7 @@ global unsigned long GetTicks(void)
 }
 
 /**
-**		Video initialize.
+**  Video initialize.
 */
 global void InitVideo(void)
 {
@@ -528,15 +523,10 @@ global void InitVideo(void)
 	InitVideoSdl();
 #endif
 
-	//
-	//		Init video sub modules
-	//
-	InitGraphic();
 	InitLineDraw();
-	InitSprite();
 
 #ifdef NEW_DECODRAW
-// Use the decoration mechanism to only redraw what is needed on screen update
+	// Use the decoration mechanism to only redraw what is needed on screen update
 	DecorationInit();
 #endif
 }

@@ -10,7 +10,7 @@
 //
 /**@name game.c - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Andreas Arens and
+//      (c) Copyright 1998-2004 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -452,11 +452,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	LoadDecorations();
 
 	InitSelections();
-
-	DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n" _C_
-		AllocatedGraphicMemory _C_
-		AllocatedGraphicMemory / 1024 _C_
-		AllocatedGraphicMemory / 1024 / 1024);
 
 	CreateMinimap();   // create minimap for pud
 	InitMap();         // setup draw functions
