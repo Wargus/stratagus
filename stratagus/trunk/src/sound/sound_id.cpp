@@ -50,10 +50,21 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#ifdef DOXYGEN				// no real code, only for document
+
+/**
+**	hash table used to store the mapping between sound name and sound id
+*/
+local int SoundIdHash[61];
+
+#else
+
 /**
 **	hash table used to store the mapping between sound name and sound id
 */
 local hashtable(int,61) SoundIdHash;
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -64,9 +75,48 @@ local hashtable(int,61) SoundIdHash;
 */
 global void DisplaySoundHashTable(void)
 {
+    struct hash_st st;
+
     fprintf(stderr,"Sound HashTable Begin\n");
     fprintf(stderr,__FUNCTION__": not written\n");
     fprintf(stderr,"Sound HashTable End\n");
+
+    hash_stat(SoundIdHash, &st); 
+    printf("nelem   : %d\n", st.nelem);
+    printf("hashsize: %d\n", st.hashsize);
+    printf("maxdepth: %d\n", st.maxdepth);
+    printf("middepth: %d.%03d\n", st.middepth / 1000, st.middepth % 1000);
+}
+
+/**
+**	Add a new mapping (sound name to sound id) in the hash table
+**
+**	@param name	Name of the sound (constant or malloced).
+**	@param id	Sound identifier.
+*/
+global void MapSound(const char* name,const SoundId id)
+{
+    *((SoundId*)hash_add(SoundIdHash,(char*)name))=id;
+}
+
+/**
+**	Maps a sound name to its id
+**
+**	@param name	Sound name.
+**
+**	@return		Sound idenfier for this name.
+*/
+global SoundId SoundIdForName(const char* name)
+{
+    const SoundId* result;
+
+    DebugCheck( !name );
+
+    if( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
+	return *result;
+    }
+    DebugLevel0("Can't find sound `%s' in sound table\n",name);
+    return NULL;
 }
 
 /**
@@ -95,37 +145,6 @@ global SoundId MakeSound(char* name,char* file[],unsigned char nb)
     // save the mapping from name to id in the hash table.
     MapSound(name,id);
     return id;
-}
-
-/**
-**	Maps a sound name to its id
-**
-**	@param name	Sound name.
-**
-**	@return		Sound idenfier for this name.
-*/
-global SoundId SoundIdForName(const char* name)
-{
-    const SoundId* result;
-
-    DebugCheck( !name );
-
-    if( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
-	return *result;
-    }
-    DebugLevel0("Can't find sound `%s' in sound table\n",name);
-    return NULL;
-}
-
-/**
-**	Add a new mapping (sound name to sound id) in the hash table
-**
-**	@param name	Name of the sound (constant or malloced).
-**	@param id	Sound identifier.
-*/
-global void MapSound(const char* name,const SoundId id)
-{
-    *((SoundId*)hash_add(SoundIdHash,(char*)name))=id;
 }
 
 /**
