@@ -267,7 +267,6 @@ local SCM CclDefineCursor(SCM list)
 	CclFree(s1);
 	CclFree(s2);
     } else {
-	DebugLevel0Fn("Not written %d %d\n",i,i+2);
 	ct=calloc(i+2,sizeof(CursorType));
 	memcpy(ct,Cursors,sizeof(CursorType)*i);
 	CclFree(Cursors);
