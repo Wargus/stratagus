@@ -224,7 +224,7 @@ local Missile* NewGlobalMissile(void)
 	Missile* missile;
 
 	// Check maximum missiles!
-	if (NumGlobalMissiles == MAX_MISSILES) {
+	if (NumGlobalMissiles == MAX_MISSILES - 1) {
 		fprintf(stderr, "Maximum of global missiles reached\n");
 		abort();
 		return NULL;
@@ -246,7 +246,7 @@ local Missile* NewLocalMissile(void)
 	Missile* missile;
 
 	// Check maximum missiles!
-	if (NumLocalMissiles == MAX_MISSILES * 8) {
+	if (NumLocalMissiles == MAX_LOCAL_MISSILES - 1) {
 		fprintf(stderr, "Maximum of local missiles reached\n");
 		abort();
 		return NULL;
