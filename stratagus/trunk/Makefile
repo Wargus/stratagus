@@ -156,8 +156,6 @@ distclean:	clean
 	$(RM) -r srcdoc/*
 	@echo
 
-clobber:	distclean
-
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
 	contrib/doxygen-freecraft.cfg \
@@ -287,22 +285,6 @@ dist: distlist
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 	du -h $(distdir)-src.tar.gz $(distdir)-src.zip
-
-small-dist: distlist
-	echo $(MISC) >>$(DISTLIST)
-	echo $(CCLS) >>$(DISTLIST)
-	echo $(DOCS) >>$(DISTLIST)
-	rm -rf $(distdir)
-	mkdir $(distdir)
-	chmod 777 $(distdir)
-	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	chmod -R a+rX $(distdir)
-	tar czhf $(distdir)-small.tar.gz $(distdir)
-	echo "(c) 2003 by the FreeCraft Project http://FreeCraft.Org" | \
-	zip -zq9r $(distdir)-small.zip $(distdir)
-	$(RM) $(DISTLIST)
-	$(RM) -r $(distdir)
-	du -h $(distdir)-small.tar.gz $(distdir)-small.zip
 
 bin-dist: all
 	$(RM) $(DISTLIST)
