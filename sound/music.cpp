@@ -67,7 +67,7 @@ global Sample* MusicSample;		/// Music samples
 #endif
 
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" ":all" or ":defined"
-global char *CDPlaySection = "menu";
+//global char *CDPlaySection = "menu";
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
 #endif
@@ -361,7 +361,7 @@ global int PlayCDRom(const char* name)
 	if (!strcmp(name, ":defined")) {
 	    CDMode = ":defined";
 	    track = cd_current_track();
-	    if (!strcmp(CDPlaySection, "showstats")) {
+	    if (PlaySection == PlaySectionStats) {
 		if (GameResult == GameVictory) {
 		    if (!ThisPlayer->Race && track != 8) {
 			cd_play(8);
@@ -375,20 +375,20 @@ global int PlayCDRom(const char* name)
 			cd_play(17);
 		    }
 		}
-	    } else if (!strcmp(CDPlaySection, "briefing")) {
+	    } else if (PlaySection == PlaySectionBriefing) {
 		if (!ThisPlayer->Race && track != 7) {
 		    cd_play(7);
 		} else if (ThisPlayer->Race && track != 15) {
 		    cd_play(15);
 		}
-	    } else if (!strcmp(CDPlaySection, "menu") && track != 15) {
+	    } else if ((PlaySection == PlaySectionMainMenu) && track != 15) {
 		cd_play(15);
-	    } else if (!strcmp(CDPlaySection, "game") && 
+	    } else if ((PlaySection == PlaySectionGame) && 
 		       !ThisPlayer->Race && (track < 3 || track > 6)) {
 		do CDTrack = (MyRand() % NumCDTracks) + 3;
 		while (CDTrack < 3 || CDTrack > 7); 
 		cd_play(CDTrack);
-	    } else if (!strcmp(CDPlaySection, "game") && 
+	    } else if ((PlaySection == PlaySectionGame) && 
 		       ThisPlayer->Race && (track < 10 || track > 14)) {
 		do CDTrack = (MyRand() % NumCDTracks) + 9;
 		while (CDTrack < 11 || CDTrack > 14); 

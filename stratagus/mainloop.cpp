@@ -639,7 +639,7 @@ global void GameMainLoop(void)
 
     MultiPlayerReplayEachCycle();
 
-    CDPlaySection = "game";
+    PlaySection = PlaySectionGame;
     CDRomCheck(NULL);
 
     while( GameRunning ) {
@@ -813,7 +813,7 @@ global void GameMainLoop(void)
     }
 
     if( GameResult==GameVictory || GameResult==GameDefeat ) {
-	CDPlaySection = "showstats";
+	PlaySection = PlaySectionStats;
 	CDRomCheck(NULL);
 	ShowStats();
     }
@@ -822,7 +822,6 @@ global void GameMainLoop(void)
     ReplayRevealMap=0;
     GamePaused=0;
     GodMode=0;
-    CDPlaySection = "menu";
 }
 
 //@}
