@@ -79,7 +79,7 @@ global char ShowCommandKey;
     /// All buttons for units
 local ButtonAction *UnitButtonTable[MAX_BUTTONS];
     /// buttons in UnitButtonTable
-local int UnitButtonCount;
+local int NumUnitButtons;
 
 /*----------------------------------------------------------------------------
 --      Functions
@@ -95,7 +95,7 @@ global void InitButtons(void)
     //
     //	Resolve the icon names.
     //
-    for (z = 0; z < UnitButtonCount; z++) {
+    for (z = 0; z < NumUnitButtons; z++) {
 	UnitButtonTable[z]->Icon.Icon 
 		= IconByIdent(UnitButtonTable[z]->Icon.Name);
     }
@@ -113,7 +113,7 @@ global void SaveButtons(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: buttons $Id$\n\n");
 
-    for( i=0; i<UnitButtonCount; ++i ) {
+    for( i=0; i<NumUnitButtons; ++i ) {
 	fprintf(file,"(define-button 'pos %d 'level %d 'icon '%s\n",
 		UnitButtonTable[i]->Pos,
 		UnitButtonTable[i]->Level,
@@ -196,7 +196,11 @@ global void SaveButtons(FILE* file)
 		fprintf(file,"'check-upgrade-to");
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckResearch ) {
 		fprintf(file,"'check-research");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckSingleResearch ) {
+		fprintf(file,"'check-single-research");
 	    } else {
+		DebugLevel0Fn("Unsupported check function %p\n",
+			UnitButtonTable[i]->Allowed);
 		fprintf(file,"%p",UnitButtonTable[i]->Allowed);
 	    }
 	    if( UnitButtonTable[i]->AllowStr ) {
@@ -242,11 +246,8 @@ global void SaveButtons(FILE* file)
 	fprintf(file,"))\n\n");
     }
 
-    fprintf(file,";;(set-show-command-key! %s)\n\n",
+    fprintf(file,"(set-show-command-key! %s)\n\n",
 	    ShowCommandKey ? "#t" : "#f");
-    if( ShowCommandKey ) {
-	fprintf(file,"(show-command-key)\n");
-    }
 }
 
 
@@ -331,7 +332,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 	sprintf(buf, ",%s,", umask);
     }
     ba->UnitMask = strdup(buf);
-    UnitButtonTable[UnitButtonCount++] = ba;
+    UnitButtonTable[NumUnitButtons++] = ba;
 
     // FIXME: check if already initited
     //DebugCheck(ba->Icon.Icon == NoIcon);// just checks, that's why at the end
@@ -348,7 +349,7 @@ global void CleanButtons(void)
     //
     //	Free the allocated buttons.
     //
-    for (z = 0; z < UnitButtonCount; z++) {
+    for (z = 0; z < NumUnitButtons; z++) {
 	DebugCheck(!UnitButtonTable[z]);
 	if( UnitButtonTable[z]->ValueStr ) {
 	    free(UnitButtonTable[z]->ValueStr);
@@ -361,7 +362,7 @@ global void CleanButtons(void)
 	}
 	free(UnitButtonTable[z]);
     }
-    UnitButtonCount = 0;
+    NumUnitButtons = 0;
 
     CurrentButtonLevel=0;
     CurrentButtons=NULL;
@@ -553,7 +554,7 @@ local void UpdateButtonPanelMultipleUnits(void)
 	    abort();
     }
 
-    for( z = 0; z < UnitButtonCount; z++ ) {
+    for( z = 0; z < NumUnitButtons; z++ ) {
 	if ( UnitButtonTable[z]->Level != CurrentButtonLevel ) {
 	    continue;
 	}
@@ -677,7 +678,7 @@ global void UpdateButtonPanel(void)
 	sprintf(unit_ident, ",%s,", unit->Type->Ident);
     }
 
-    for( z = 0; z < UnitButtonCount; z++ ) {
+    for( z = 0; z < NumUnitButtons; z++ ) {
 	//FIXME: we have to check and if these unit buttons are available
 	//       i.e. if button action is ButtonTrain for example check if
 	//        required unit is not restricted etc...
