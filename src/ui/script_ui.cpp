@@ -63,6 +63,8 @@ typedef struct _info_text_ {
 	int Y;                       ///< FIXME:docu
 } InfoText;                      ///< FIXME:docu
 
+_ButtonStyleHash ButtonStyleHash;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -571,17 +573,7 @@ static MenuButtonId scm2buttonid(lua_State* l, const char* value)
 {
 	MenuButtonId id;
 
-	if (!strcmp(value, "main")) {
-		id = MBUTTON_MAIN;
-	} else if (!strcmp(value, "network")) {
-		id = MBUTTON_NETWORK;
-	} else if (!strcmp(value, "gm-half")) {
-		id = MBUTTON_GM_HALF;
-	} else if (!strcmp(value, "132")) {
-		id = MBUTTON_132;
-	} else if (!strcmp(value, "gm-full")) {
-		id = MBUTTON_GM_FULL;
-	} else if (!strcmp(value, "gem-round")) {
+	if (!strcmp(value, "gem-round")) {
 		id = MBUTTON_GEM_ROUND;
 	} else if (!strcmp(value, "gem-square")) {
 		id = MBUTTON_GEM_SQUARE;
@@ -603,8 +595,6 @@ static MenuButtonId scm2buttonid(lua_State* l, const char* value)
 		id = MBUTTON_PULLDOWN;
 	} else if (!strcmp(value, "vthin")) {
 		id = MBUTTON_VTHIN;
-	} else if (!strcmp(value, "folder")) {
-		id = MBUTTON_FOLDER;
 	} else if (!strcmp(value, "sc-gem-round")) {
 		id = MBUTTON_SC_GEM_ROUND;
 	} else if (!strcmp(value, "sc-gem-square")) {
@@ -1730,7 +1720,11 @@ static int CclDefineUI(lua_State* l)
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
-							ui->MenuButton.Button = scm2buttonid(l, LuaToString(l, -1));
+							ui->MenuButton.Style = FindButtonStyle(LuaToString(l, -1));
+							if (!ui->MenuButton.Style) {
+								LuaError(l, "Invalid button style: %s" _C_
+									LuaToString(l, -1));
+							}
 							lua_pop(l, 1);
 						} else {
 							LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1781,7 +1775,11 @@ static int CclDefineUI(lua_State* l)
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkMenuButton.Button = scm2buttonid(l, LuaToString(l, -1));
+							ui->NetworkMenuButton.Style = FindButtonStyle(LuaToString(l, -1));
+							if (!ui->NetworkMenuButton.Style) {
+								LuaError(l, "Invalid button style: %s" _C_
+									LuaToString(l, -1));
+							}
 							lua_pop(l, 1);
 						} else {
 							LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1832,7 +1830,11 @@ static int CclDefineUI(lua_State* l)
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkDiplomacyButton.Button = scm2buttonid(l, LuaToString(l, -1));
+							ui->NetworkDiplomacyButton.Style = FindButtonStyle(LuaToString(l, -1));
+							if (!ui->NetworkDiplomacyButton.Style) {
+								LuaError(l, "Invalid button style: %s" _C_
+									LuaToString(l, -1));
+							}
 							lua_pop(l, 1);
 						} else {
 							LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2310,6 +2312,176 @@ static int CclSetFancyBuildings(lua_State* l)
 }
 
 /**
+**  Find a button style
+**
+**  @param style  Name of the style to find.
+**
+**  @return       Button style, NULL if not found.
+*/
+ButtonStyle* FindButtonStyle(const char* style)
+{
+	ButtonStyle** s;
+
+	s = (ButtonStyle**)hash_find(ButtonStyleHash, style);
+	if (!s) {
+		return NULL;
+	} else {
+		return *s;
+	}
+}
+
+/**
+**  Parse button style properties
+**
+**  @param l  Lua state.
+**  @param p  Properties to fill in.
+*/
+static void ParseButtonStyleProperties(lua_State* l, ButtonStyleProperties* p)
+{
+	const char* value;
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	lua_pushnil(l);
+	while (lua_next(l, -2)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "File")) {
+			value = LuaToString(l, -1);
+			if (!p->File || strcmp(p->File, value)) {
+				free(p->File);
+				VideoSafeFree(p->Sprite);
+				p->File = strdup(LuaToString(l, -1));
+			}
+		} else if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			p->Width = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			p->Height = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Frame")) {
+			p->Frame = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Border")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_pushnil(l);
+			while (lua_next(l, -2)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Color")) {
+					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+						LuaError(l, "incorrect argument");
+					}
+					lua_rawgeti(l, -1, 1);
+					p->BorderColorRGB.r = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 2);
+					p->BorderColorRGB.g = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 3);
+					p->BorderColorRGB.b = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "Size")) {
+					p->BorderSize = LuaToNumber(l, -1);
+				} else {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "TextOffset")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			p->TextOffsetX = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			p->TextOffsetY = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "TextNormalColor")) {
+			free(p->TextNormalColor);
+			p->TextNormalColor = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "TextReverseColor")) {
+			free(p->TextReverseColor);
+			p->TextReverseColor = strdup(LuaToString(l, -1));
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+	}
+}
+
+/**
+**  Define a button style
+**
+**  @param l  Lua state.
+*/
+static int CclDefineButtonStyle(lua_State* l)
+{
+	const char* style;
+	const char* value;
+	ButtonStyle* b;
+	ButtonStyle** bp;
+
+	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	style = LuaToString(l, 1);
+	bp = (ButtonStyle**)hash_find(ButtonStyleHash, (char*)style);
+	if (!bp) {
+		b = calloc(1, sizeof(*b));
+		*(ButtonStyle**)hash_add(ButtonStyleHash, style) = b;
+	} else {
+		b = *bp;
+	}
+
+	lua_pushnil(l);
+	while (lua_next(l, 2)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			b->Width = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			b->Height = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Font")) {
+			b->Font = FontByIdent(LuaToString(l, -1));
+		} else if (!strcmp(value, "TextNormalColor")) {
+			free(b->TextNormalColor);
+			b->TextNormalColor = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "TextReverseColor")) {
+			free(b->TextReverseColor);
+			b->TextReverseColor = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "Default")) {
+			ParseButtonStyleProperties(l, &b->Default);
+		} else if (!strcmp(value, "Hover")) {
+			ParseButtonStyleProperties(l, &b->Hover);
+		} else if (!strcmp(value, "Selected")) {
+			ParseButtonStyleProperties(l, &b->Selected);
+		} else if (!strcmp(value, "Clicked")) {
+			ParseButtonStyleProperties(l, &b->Clicked);
+		} else if (!strcmp(value, "Disabled")) {
+			ParseButtonStyleProperties(l, &b->Disabled);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+	}
+
+	return 0;
+}
+
+/**
 **  Define a menu
 **
 **  @param l  Lua state.
@@ -2409,12 +2581,6 @@ static int CclDefineMenu(lua_State* l)
 					if (menu->Items[i].d.button.text) {
 						free(menu->Items[i].d.button.text);
 					}
-					if (menu->Items[i].d.button.normalcolor) {
-						free(menu->Items[i].d.button.normalcolor);
-					}
-					if (menu->Items[i].d.button.reversecolor) {
-						free(menu->Items[i].d.button.normalcolor);
-					}
 				} else if (mitype == MI_TYPE_PULLDOWN) {
 					int j;
 					j = menu->Items[i].d.pulldown.noptions-1;
@@ -2422,33 +2588,9 @@ static int CclDefineMenu(lua_State* l)
 						free(menu->Items[i].d.pulldown.options[j]);
 					}
 					free(menu->Items[i].d.pulldown.options);
-					if (menu->Items[i].d.pulldown.normalcolor) {
-						free(menu->Items[i].d.pulldown.normalcolor);
-					}
-					if (menu->Items[i].d.pulldown.reversecolor) {
-						free(menu->Items[i].d.pulldown.normalcolor);
-					}
 				} else if (mitype == MI_TYPE_LISTBOX) {
-					if (menu->Items[i].d.listbox.normalcolor) {
-						free(menu->Items[i].d.listbox.normalcolor);
-					}
-					if (menu->Items[i].d.listbox.reversecolor) {
-						free(menu->Items[i].d.listbox.normalcolor);
-					}
 				} else if (mitype == MI_TYPE_INPUT) {
-					if (menu->Items[i].d.input.normalcolor) {
-						free(menu->Items[i].d.input.normalcolor);
-					}
-					if (menu->Items[i].d.input.reversecolor) {
-						free(menu->Items[i].d.input.normalcolor);
-					}
 				} else if (mitype == MI_TYPE_GEM) {
-					if (menu->Items[i].d.gem.normalcolor) {
-						free(menu->Items[i].d.gem.normalcolor);
-					}
-					if (menu->Items[i].d.gem.reversecolor) {
-						free(menu->Items[i].d.gem.normalcolor);
-					}
 				}
 			}
 			free(menu->Items);
@@ -2713,19 +2855,7 @@ static int CclDefineMenuItem(lua_State* l)
 					lua_pop(l, 1);
 					++k;
 
-					if (!strcmp(value, "size")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-							LuaError(l, "incorrect argument");
-						}
-						lua_rawgeti(l, -1, 1);
-						item->d.button.xsize = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						lua_rawgeti(l, -1, 2);
-						item->d.button.ysize = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "caption")) {
+					if (!strcmp(value, "caption")) {
 						lua_rawgeti(l, j + 1, k + 1);
 						if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
 							LuaError(l, "incorrect argument");
@@ -2770,17 +2900,10 @@ static int CclDefineMenuItem(lua_State* l)
 						lua_rawgeti(l, j + 1, k + 1);
 						value = LuaToString(l, -1);
 						lua_pop(l, 1);
-						item->d.button.button = scm2buttonid(l, value);
-					} else if (!strcmp(value, "color-normal")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.button.normalcolor = s1;
-					} else if (!strcmp(value, "color-reverse")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.button.reversecolor = s1;
+						item->d.button.style = FindButtonStyle(value);
+						if (!item->d.button.style) {
+							LuaError(l, "Invalid button style: %s" _C_ value);
+						}
 					} else {
 						LuaError(l, "Unsupported property: %s" _C_ value);
 					}
@@ -2879,16 +3002,6 @@ static int CclDefineMenuItem(lua_State* l)
 						lua_rawgeti(l, j + 1, k + 1);
 						item->d.pulldown.curopt = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "color-normal")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.pulldown.normalcolor = s1;
-					} else if (!strcmp(value, "color-reverse")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.pulldown.reversecolor = s1;
 					} else {
 						LuaError(l, "Unsupported property: %s" _C_ value);
 					}
@@ -2998,16 +3111,6 @@ static int CclDefineMenuItem(lua_State* l)
 						lua_rawgeti(l, j + 1, k + 1);
 						item->d.listbox.curopt = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "color-normal")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.listbox.normalcolor = s1;
-					} else if (!strcmp(value, "color-reverse")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.listbox.reversecolor = s1;
 					} else {
 						LuaError(l, "Unsupported property: %s" _C_ value);
 					}
@@ -4144,6 +4247,8 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "SetFancyBuildings", CclSetFancyBuildings);
 
 	lua_register(Lua, "DefineButton", CclDefineButton);
+
+	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
 
 	lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
 	lua_register(Lua, "DefineMenu", CclDefineMenu);
