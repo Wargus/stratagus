@@ -45,6 +45,7 @@
 #include "pathfinder.h"
 
 // FIXME: Should combine all the resource functions
+// FIXME: Should update buttons if the action changes?
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -211,7 +212,7 @@ local int ChopWood(Unit* unit)
 	    //	Update the display.
 	    //
             CheckUnitToBeDrawn(unit);
-	    if( unit->Selected ) {
+	    if( IsOnlySelected(unit) ) {	// update display
 		UpdateButtonPanel();
 	    }
 
