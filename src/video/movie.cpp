@@ -218,6 +218,7 @@ int PlayMovie(const char* name)
 		return -1;
 	}
 
+	StopMusic();
 	if ((sample = LoadVorbis(name, PlayAudioStream))) {
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
@@ -225,7 +226,6 @@ int PlayMovie(const char* name)
 			SoundFree(sample);
 			return 0;
 		}
-		StopMusic();
 		MusicSample = sample;
 		PlayingMusic = 1;
 	}
