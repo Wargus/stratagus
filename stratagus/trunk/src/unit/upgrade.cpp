@@ -40,9 +40,7 @@
 #include "depend.h"
 #include "interface.h"
 
-#ifdef NEW_FOW
 #include "map.h"
-#endif
 
 #include "myendian.h"
 
@@ -1278,17 +1276,15 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 		    -unit->Stats->HitPoints;
 	    // don't have such unit now
 	    player->UnitTypesCount[src->Type]--;
-#ifdef NEW_FOW
-	    // UnMark the Unit sight for conversion
-	    if (unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+	    // UnMark the Unit sight for conversion if on map
+	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 		src->TileWidth != dst->TileWidth ||
-		src->TileHeight != dst->TileHeight) {
+		src->TileHeight != dst->TileHeight) && !unit->Removed) {
 		MapUnmarkSight(player,
 			unit->X+unit->Type->TileWidth/2,
 			unit->Y+unit->Type->TileHeight/2,
 			unit->CurrentSightRange);
 	    }
-#endif
 	    unit->Type=dst;
 	    unit->Stats=&dst->Stats[player->Player];
 	    // and we have new one...
@@ -1297,17 +1293,15 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	    if( dst->CanCastSpell ) {
 		unit->Mana=MAGIC_FOR_NEW_UNITS;
 	    }
-#ifdef NEW_FOW
-	    if (unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 		src->TileWidth != dst->TileWidth ||
-		src->TileHeight != dst->TileHeight) {
+		src->TileHeight != dst->TileHeight) && !unit->Removed) {
 		unit->CurrentSightRange=dst->Stats[player->Player].SightRange;
 		MapMarkSight(player,
 			unit->X+unit->Type->TileWidth/2,
 			unit->Y+unit->Type->TileHeight/2,
 			unit->CurrentSightRange);
 	    }
-#endif
 	    
 	    CheckUnitToBeDrawn(unit);
 	//
@@ -1391,7 +1385,6 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 	    // upgrade stats     
 	    UnitTypes[z].Stats[pn].AttackRange += um->Modifier.AttackRange;
 	    UnitTypes[z].Stats[pn].SightRange += um->Modifier.SightRange;
-#ifdef NEW_FOW
 	    //If Sight range is upgraded, we need to change EVERY unit
 	    //to the new range, otherwise the counters get confused.
 	    if (um->Modifier.SightRange) {
@@ -1401,7 +1394,8 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 		numunits = FindUnitsByType(&UnitTypes[z],sightupgrade);
 		numunits--; // Change to 0 Start not 1 start
 		while (numunits >= 0) {
-		    if (sightupgrade[numunits]->Player->Player == player->Player) {
+		    if (sightupgrade[numunits]->Player->Player == player->Player &&
+		    	!sightupgrade[numunits]->Removed) {
 			/// Marking First is faster
 			MapMarkSight(player,
 					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
@@ -1416,7 +1410,6 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 		    numunits--;
 		}
 	    }
-#endif
 	    UnitTypes[z].Stats[pn].BasicDamage += um->Modifier.BasicDamage;
 	    UnitTypes[z].Stats[pn].PiercingDamage
 		    += um->Modifier.PiercingDamage;

@@ -160,21 +160,10 @@ local SCM CclFreeCraftMap(SCM list)
 			    if( gh_exact_p(gh_car(field)) ) {
 				TheMap.Fields[i].Value=
 					gh_scm2int(gh_car(field));
-
-#ifdef NEW_FOW
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("explored")) ) {
 				field=gh_cdr(field);
 				TheMap.Fields[i].Visible[gh_scm2int(gh_car(field))] = 1;
-#else
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("visible")) ) {
-				TheMap.Visible[0][i/32] |= 1<<(i%32);
-			    } else if( gh_eq_p(gh_car(field),
-					gh_symbol2scm("explored")) ) {
-				TheMap.Fields[i].Flags|=MapFieldExplored;
-#endif
-
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("human")) ) {
 				TheMap.Fields[i].Flags|=MapFieldHuman;

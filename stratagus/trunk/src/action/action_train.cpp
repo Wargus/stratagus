@@ -109,10 +109,9 @@ global void HandleActionTrain(Unit* unit)
 	nunit->X=unit->X;
 	nunit->Y=unit->Y;
 	type=unit->Type;
-#ifdef NEW_FOW
 	// Set unit to belong to the building building it.
 	nunit->Next=unit;
-#endif
+
 	DropOutOnSide(nunit,LookingW,type->TileWidth,type->TileHeight);
 
 	// set life span

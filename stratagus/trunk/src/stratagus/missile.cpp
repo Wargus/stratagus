@@ -599,7 +599,6 @@ global void FireMissile(Unit* unit)
     }
 
     if( goal && RevealAttacker ) {	// attacking units are seen
-#ifdef NEW_FOW
 	Unit* target;
 	// FIXME: Don't use UnitTypeByIdent during runtime.
 	target = MakeUnit(UnitTypeByIdent("unit-reveal-attacker"), unit->Player);
@@ -611,11 +610,6 @@ global void FireMissile(Unit* unit)
 	target->CurrentSightRange=target->Stats->SightRange;
 	MapMarkSight(target->Player,unit->X,unit->Y,target->CurrentSightRange);
 	CheckUnitToBeDrawn(target);
-#else
-	if( goal->Player==ThisPlayer || IsSharedVision(ThisPlayer,goal) ) {
-	    MapMarkSight(unit->X,unit->Y,1);
-	}
-#endif
     }
 
     //
