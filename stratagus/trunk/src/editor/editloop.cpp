@@ -55,10 +55,13 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define UNIT_ICON_X (ICON_WIDTH + 6)		// Unit mode icon
+#define UNIT_ICON_X (ICON_WIDTH + 7)		// Unit mode icon
 #define UNIT_ICON_Y (0)				// Unit mode icon
-#define TILE_ICON_X (ICON_WIDTH * 2 + 14)	// Tile mode icon
+#define TILE_ICON_X (ICON_WIDTH * 2 + 16)	// Tile mode icon
 #define TILE_ICON_Y (2)				// Tile mode icon
+
+#define TILE_WIDTH 32
+#define TILE_HEIGHT 32
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -74,6 +77,12 @@ local enum _editor_state_ {
 
 // FIXME: support for bigger tools 2x2, 3x3, 4x4.
 local int TileCursor;			/// Tile type number
+
+local enum _mode_buttons_ {
+    FIXMEButton=201,
+    UnitButton,
+    TileButton,
+};
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -317,6 +326,32 @@ local void DrawUnitIcons(void)
 }
 
 /**
+**	Draw a tile icon
+**
+**	@param tilenum	Tile number to display
+**	@param x	X display position
+**	@param y	Y display position
+*/
+local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y)
+{
+    VideoDrawRectangleClip(ColorBlack,x,y,TILE_WIDTH+7,TILE_HEIGHT+7);
+    VideoDrawRectangleClip(ColorBlack,x+1,y+1,TILE_WIDTH+5,TILE_HEIGHT+5);
+
+    VideoDrawVLine(ColorGray,x+TILE_WIDTH+4,y+5,TILE_HEIGHT-1);	// _|
+    VideoDrawVLine(ColorGray,x+TILE_WIDTH+5,y+5,TILE_HEIGHT-1);
+    VideoDrawHLine(ColorGray,x+5,y+TILE_HEIGHT+4,TILE_WIDTH+1);
+    VideoDrawHLine(ColorGray,x+5,y+TILE_HEIGHT+5,TILE_WIDTH+1);
+
+    VideoDrawHLine(ColorWhite,x+5,y+3,TILE_WIDTH+1);
+    VideoDrawHLine(ColorWhite,x+5,y+4,TILE_WIDTH+1);
+    VideoDrawVLine(ColorWhite,x+3,y+3,TILE_HEIGHT+3);
+    VideoDrawVLine(ColorWhite,x+4,y+3,TILE_HEIGHT+3);
+
+    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[tilenum]],
+	x + 4, y + 4);
+}
+
+/**
 **	Draw the editor panels.
 */
 local void DrawEditorPanel(void)
@@ -338,9 +373,7 @@ local void DrawEditorPanel(void)
     DebugCheck(!icon);
     DrawUnitIcon(Players, icon, 0, x + UNIT_ICON_X, y + UNIT_ICON_Y);
 
-    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 + 4 * 16]],
-	x + TILE_ICON_X, y + TILE_ICON_Y);
-    VideoDrawRectangle(ColorGray, x + TILE_ICON_X, y + TILE_ICON_Y, 32, 32);
+    DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y);
 
     switch (EditorState) {
 	case EditorSelecting:
@@ -594,34 +627,21 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 		ScreenMinimap2MapY(CursorY)-MapHeight/2);
 #endif /* SPLIT_SCREEN_SUPPORT */
 	}
-#if 0
-	else if( MouseButtons&RightButton ) {
-	    MakeLocalMissile(MissileTypeGreenCross,
-		ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2,
-		ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
-	    // DoRightButton() takes screen map coordinates
-	    DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX,
-	    ScreenMinimap2MapY(CursorY) * TileSizeY);
-	}
-#endif
     }
     //
     //	Click on mode area
     //
-    if (TheUI.InfoPanelX + 4 + UNIT_ICON_X < CursorX
-	    && CursorX < TheUI.InfoPanelX + 4 + UNIT_ICON_X + ICON_WIDTH
-	    && TheUI.InfoPanelY + 4 + UNIT_ICON_Y < CursorY
-	    && CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + ICON_HEIGHT) {
-	EditorState = EditorEditUnit;
-	return;
+    if (CursorOn == CursorOnButton) {
+	if (ButtonUnderCursor == UnitButton) {
+	    EditorState = EditorEditUnit;
+	    return;
+	}
+	if (ButtonUnderCursor == TileButton) {
+	    EditorState = EditorEditTile;
+	    return;
+	}
     }
-    if (TheUI.InfoPanelX + 4 + TILE_ICON_X < CursorX
-	    && CursorX < TheUI.InfoPanelX + 4 + TILE_ICON_X + 32
-	    && TheUI.InfoPanelY + 4 + TILE_ICON_Y < CursorY
-	    && CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + 32) {
-	EditorState = EditorEditTile;
-	return;
-    }
+
     //
     //	Click on tile area
     //
@@ -770,6 +790,7 @@ local void EditorCallbackMouse(int x, int y)
     MouseScrollState = ScrollNone;
     GameCursor = TheUI.Point.Cursor;
     CursorOn = -1;
+    ButtonUnderCursor = -1;
 
     //
     //	Minimap
@@ -820,8 +841,35 @@ local void EditorCallbackMouse(int x, int y)
 
     //
     //  Handle buttons
-    //  FIXME: just a copy from the engine.
     //
+    if (TheUI.InfoPanelX + 4 < CursorX
+	    && CursorX < TheUI.InfoPanelX + 4 + ICON_WIDTH+7
+	    && TheUI.InfoPanelY + 4 < CursorY
+	    && CursorY < TheUI.InfoPanelY + 4 + ICON_HEIGHT+7) {
+	// FIXME: what is this button?
+	ButtonUnderCursor = FIXMEButton;
+	CursorOn = CursorOnButton;
+	SetStatusLine("FIXME: What is this?");
+	return;
+    }
+    if (TheUI.InfoPanelX + 4 + UNIT_ICON_X < CursorX
+	    && CursorX < TheUI.InfoPanelX + 4 + UNIT_ICON_X + ICON_WIDTH+7
+	    && TheUI.InfoPanelY + 4 + UNIT_ICON_Y < CursorY
+	    && CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + ICON_HEIGHT+7) {
+	ButtonUnderCursor = UnitButton;
+	CursorOn = CursorOnButton;
+	SetStatusLine("Unit");
+	return;
+    }
+    if (TheUI.InfoPanelX + 4 + TILE_ICON_X < CursorX
+	    && CursorX < TheUI.InfoPanelX + 4 + TILE_ICON_X + TILE_WIDTH+7
+	    && TheUI.InfoPanelY + 4 + TILE_ICON_Y < CursorY
+	    && CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + TILE_HEIGHT+7) {
+	ButtonUnderCursor = TileButton;
+	CursorOn = CursorOnButton;
+	SetStatusLine("Tile");
+	return;
+    }
     for (i = 0; i < sizeof(TheUI.Buttons) / sizeof(*TheUI.Buttons); ++i) {
 	if (x < TheUI.Buttons[i].X
 		|| x > TheUI.Buttons[i].X + TheUI.Buttons[i].Width
@@ -860,9 +908,6 @@ local void EditorCallbackMouse(int x, int y)
     //
     if (CursorOn == CursorOnMap) {
 	viewport = TheUI.ActiveViewport;
-	if( UnitUnderCursor ) {
-	    ClearStatusLine();
-	}
 	UnitUnderCursor = UnitOnScreen(NULL,
 	    CursorX - TheUI.VP[viewport].X
 		+ TheUI.VP[viewport].MapX * TileSizeX,
@@ -882,6 +927,8 @@ local void EditorCallbackMouse(int x, int y)
     }
 
     //  Not reached if cursor is inside the scroll area
+
+    ClearStatusLine();
 }
 
 /**
@@ -972,6 +1019,7 @@ global void EditorMainLoop(void)
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+    Invalidate();
 }
 
 local void paul(void)
