@@ -217,7 +217,8 @@ global void DestroyMinimap(void)
 **
 **	@note This one of the hot-points in the program optimize and optimize!
 */
-global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unused)))
+global void DrawMinimap(int vx __attribute__((unused)),
+	int vy __attribute__((unused)))
 {
     static int red_phase;
     int new_phase;
@@ -401,17 +402,16 @@ global void DrawMinimapCursor(int vx,int vy)
     int w;
     int h;
     int i;
-    int v = TheUI.LastClickedVP;
-    unsigned MapWidth = TheUI.VP[v].MapWidth;
-    unsigned MapHeight = TheUI.VP[v].MapHeight;
 
     // Determine and save region below minimap cursor
     OldMinimapCursorX=x=TheUI.MinimapX+24+MinimapX+
 	    (vx*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorY=y=TheUI.MinimapY+2+MinimapY+
 	    (vy*MinimapScale)/MINIMAP_FAC;
-    OldMinimapCursorW=w=(MapWidth*MinimapScale)/MINIMAP_FAC;
-    OldMinimapCursorH=h=(MapHeight*MinimapScale)/MINIMAP_FAC;
+    i = TheUI.VP[TheUI.LastClickedVP].MapWidth;
+    OldMinimapCursorW=w=(i*MinimapScale)/MINIMAP_FAC;
+    i = TheUI.VP[TheUI.LastClickedVP].MapHeight;
+    OldMinimapCursorH=h=(i*MinimapScale)/MINIMAP_FAC;
     i=(w+1+h)*2*VideoTypeSize;
     if( OldMinimapCursorSize<i ) {
 	if( OldMinimapCursorImage ) {
