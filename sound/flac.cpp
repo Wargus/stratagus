@@ -63,8 +63,10 @@ typedef struct _my_user_ {
 **	@param status	Error state.
 **	@param user	User data.
 */
-local void FLAC_error_callback(const FLAC__StreamDecoder * stream,
-    FLAC__StreamDecoderErrorStatus status, void *user)
+local void FLAC_error_callback(
+	const FLAC__StreamDecoder * stream __attribute__((unused)),
+	FLAC__StreamDecoderErrorStatus status __attribute__((unused)),
+	void *user __attribute__((unused)))
 {
     DebugLevel0Fn(" %s\n",FLAC__StreamDecoderErrorStatusString[status]);
 }
@@ -79,9 +81,9 @@ local void FLAC_error_callback(const FLAC__StreamDecoder * stream,
 **
 **	@return		Error status.
 */
-local FLAC__StreamDecoderReadStatus FLAC_read_callback(const
-    FLAC__StreamDecoder * stream, FLAC__byte buffer[], unsigned int *bytes,
-    void *user)
+local FLAC__StreamDecoderReadStatus FLAC_read_callback(
+	const FLAC__StreamDecoder * stream __attribute__((unused)),
+	FLAC__byte buffer[], unsigned int *bytes, void *user)
 {
     int i;
     CLFile *f;
@@ -106,8 +108,9 @@ local FLAC__StreamDecoderReadStatus FLAC_read_callback(const
 **	@param metadata	metadata block
 **	@param user	User data.
 */
-local void FLAC_metadata_callback(const FLAC__StreamDecoder * stream,
-    const FLAC__StreamMetaData * metadata, void *user)
+local void FLAC_metadata_callback(
+	const FLAC__StreamDecoder * stream __attribute__((unused)),
+	const FLAC__StreamMetaData * metadata, void *user)
 {
     Sample *sample;
 
@@ -134,8 +137,8 @@ local void FLAC_metadata_callback(const FLAC__StreamDecoder * stream,
 **	@return		Error status.
 */
 local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
-    FLAC__StreamDecoder * stream, const FLAC__Frame * frame,
-    const FLAC__int32 * buffer[], void *user)
+    FLAC__StreamDecoder * stream __attribute__((unused)),
+    const FLAC__Frame * frame, const FLAC__int32 * buffer[], void *user)
 {
     Sample *sample;
     int i;
