@@ -30,8 +30,6 @@
 **
 **	typedef struct _icon_ Icon;
 **
-**	typedef Icon* IconId;
-**
 **	This structure contains all informations about an icon.
 **	Currently only rectangular static icons of 46x38 pixels are supported.
 **	In the future it is planned to support animated and not rectangular
@@ -86,9 +84,6 @@
 **		Graphic image containing the loaded graphics. Loaded by
 **		LoadIcons(). All icons belonging to the same icon file shares
 **		this structure.
-**
-**	@todo
-**		IconId can be removed, use Icon* for it.
 */
 
 /**
@@ -106,7 +101,7 @@
 **		files and during startup.  The name is resolved during game
 **		start and the pointer placed in the next field.
 **		@see Icon::Ident
-**		
+**
 **	IconConfig::Icon
 **
 **		Pointer to an icon. This pointer is resolved during game start.
@@ -164,7 +159,7 @@ typedef struct _icon_file_ {
     Graphic*	Graphic;		/// Graphic data loaded
 } IconFile;
 
-    ///	Icon: rectangle image used in menus.
+    ///	Icon: rectangle image used in menus
 typedef struct _icon_ {
     char*	Ident;			/// Icon identifier
     char*	Tileset;		/// Tileset identifier
@@ -182,14 +177,12 @@ typedef struct _icon_ {
     Graphic*	Graphic;		/// Graphic data loaded
 } Icon;
 
-typedef Icon* IconId;			/// Icon referencing
-
 #define NoIcon	NULL			/// used for errors == no valid icon
 
     ///	Icon reference (used in config tables)
 typedef struct _icon_config_ {
     char*	Name;			/// config icon name
-    IconId	Icon;			/// icon pointer to use to run time
+    Icon*	Icon;			/// icon pointer to use to run time
 } IconConfig;
 
 /*----------------------------------------------------------------------------
@@ -206,11 +199,12 @@ extern void InitIcons(void);			/// init icons
 extern void LoadIcons(void);			/// load icons
 extern void CleanIcons(void);			/// cleanup icons
 
-extern IconId IconByIdent(const char* ident);	/// name -> icon
-extern const char* IdentOfIcon(IconId icon);	/// icon -> name
-
-    /// draw icon of an unit
-extern void DrawUnitIcon(const Player*,IconId,unsigned,unsigned,unsigned);
+    /// Name -> icon
+extern Icon* IconByIdent(const char* ident);
+    /// Icon -> name
+extern const char* IdentOfIcon(const Icon* icon);
+    /// Draw icon of an unit
+extern void DrawUnitIcon(const Player*,Icon*,unsigned,unsigned,unsigned);
 
 extern void SaveIcons(FILE*);			/// Save icons
 extern void IconCclRegister(void);		/// register CCL features
