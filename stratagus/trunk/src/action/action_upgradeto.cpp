@@ -79,11 +79,10 @@ global void HandleActionUpgradeTo(Unit* unit)
 	player->UnitTypesCount[unit->Type->Type]++;
 	UpdateForNewUnit(unit,1);
 
-	// FIXME: SendNotify("upgrade-complete");
-	if( player==ThisPlayer ) {
-	    SetMessageEvent( unit->X, unit->Y, "Upgrade to %s complete",
-		    unit->Type->Name );
-	} else if( unit->Player->Ai ) {
+	
+	SetMessageEvent(player,NotifyGreen,unit->X, unit->Y,
+	    "Upgrade to %s complete", unit->Type->Name );
+	if( unit->Player->Ai ) {
 	    AiUpgradeToComplete(unit,type);
 	}
 	unit->Reset=unit->Wait=1;
