@@ -1861,8 +1861,8 @@ global void SpeedSettings(void)
 	SpeedSettingsMenuItems[i].d.hslider.percent = 0;
     if (SpeedSettingsMenuItems[i].d.hslider.percent > 100)
 	SpeedSettingsMenuItems[i].d.hslider.percent = 100;
-    SpeedSettingsMenuItems[i + 4].d.hslider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 9;
-    SpeedSettingsMenuItems[i + 8].d.hslider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 9;
+    SpeedSettingsMenuItems[i + 4].d.hslider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
+    SpeedSettingsMenuItems[i + 8].d.hslider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
     ProcessMenu(MENU_SPEED_SETTINGS, 1);
 }
 
@@ -2628,32 +2628,28 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
-		SetVideoSync();
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing game speed by 10%s\n", "%");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
-		SetVideoSync();
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
+		SetVideoSync();
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
-		    SetVideoSync();
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
-		    SetVideoSync();
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+    		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
+		SetVideoSync();
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -2674,19 +2670,17 @@ local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		TheUI.MouseScroll = 1;
-		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing mouse speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		TheUI.MouseScroll = 1;
-		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+	    TheUI.MouseScroll = 1;
+	    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    if (mi[1].d.hslider.percent == 0)
 		TheUI.MouseScroll = 0;
 	    break;
@@ -2694,14 +2688,12 @@ local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.MouseScroll = 1;
-		    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.MouseScroll = 1;
-		    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		TheUI.MouseScroll = 1;
+		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		if (mi[1].d.hslider.percent == 0)
 		    TheUI.MouseScroll = 0;
 		MustRedraw |= RedrawMenu;
@@ -2724,19 +2716,17 @@ local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing keyboard speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+	    TheUI.KeyScroll = 1;
+	    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    if (mi[1].d.hslider.percent == 0)
 		TheUI.KeyScroll = 0;
 	    break;
@@ -2744,14 +2734,12 @@ local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		TheUI.KeyScroll = 1;
+		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		if (mi[1].d.hslider.percent == 0)
 		    TheUI.KeyScroll = 0;
 		MustRedraw |= RedrawMenu;
