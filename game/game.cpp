@@ -403,7 +403,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	LoadCursors(ThisPlayer->RaceName);
 
 	InitMissileTypes();
-	LoadMissileSprites();
 	InitConstructions();
 	LoadConstructions();
 	LoadUnitTypes();

@@ -502,8 +502,8 @@ extern void MissileCclRegister(void);
 
 // In missile.c
 
-	/// load the graphics for the missiles
-extern void LoadMissileSprites(void);
+	/// load the graphics for a missile type
+extern void LoadMissileSprite(MissileType* mtype);
 	/// allocate an empty missile-type slot
 extern MissileType* NewMissileTypeSlot(char*);
 	/// Get missile-type by ident
@@ -518,7 +518,7 @@ extern void FireMissile(Unit*);
 extern int CheckMissileToBeDrawn(const Missile* missile);
 
 	/// Draw all missiles
-extern void DrawMissile(const MissileType* mtype, int frame, int x, int y);
+extern void DrawMissile(MissileType* mtype, int frame, int x, int y);
 extern int FindAndSortMissiles(const Viewport* vp, Missile** table);
 
 	/// handle all missiles

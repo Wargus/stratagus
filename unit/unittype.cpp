@@ -1354,91 +1354,81 @@ global void InitUnitTypes(int reset_player_stats)
 }
 
 /**
+**  Loads the Sprite for a unit type
+**
+**  @param unittype  type of unit to load
+*/
+global void LoadUnitTypeSprite(UnitType* unittype)
+{
+	const char* file;
+	char buf[4096];
+	ResourceInfo* resinfo;
+	int res;
+	UnitType* type;
+
+	if (unittype->SameSprite) {
+		type = UnitTypeByIdent(unittype->SameSprite);
+		if (!type) {
+			PrintFunction();
+			fprintf(stdout, "Unit-type %s not found\n", type->SameSprite);
+			ExitFatal(-1);
+		}
+	} else {
+		type = unittype;
+	}
+
+	if ((file = type->ShadowFile)) {
+		file = strcat(strcpy(buf, "graphics/"), file);
+		type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
+			type->ShadowHeight);
+		FlipGraphic(type->ShadowSprite);
+	}
+
+	if (type->Harvester) {
+		for (res = 0; res < MaxCosts; ++res) {
+			if ((resinfo = type->ResInfo[res])) {
+				if ((file = resinfo->FileWhenLoaded)) {
+					file = strcat(strcpy(buf, "graphics/"), file);
+					resinfo->SpriteWhenLoaded = LoadSprite(file, type->Width,
+						type->Height);
+					FlipGraphic(resinfo->SpriteWhenLoaded);
+				}
+				if ((file = resinfo->FileWhenEmpty)) {
+					file = strcat(strcpy(buf, "graphics/"), file);
+					resinfo->SpriteWhenEmpty = LoadSprite(file, type->Width,
+						type->Height);
+					FlipGraphic(resinfo->SpriteWhenEmpty);
+				}
+			}
+		}
+	}
+
+	file = type->File[TheMap.Terrain];
+	if (!file) {						// default one
+		file = type->File[0];
+	}
+	if (file) {
+		strcpy(buf, "graphics/");
+		strcat(buf, file);
+		type->Sprite = LoadSprite(buf, type->Width, type->Height);
+		FlipGraphic(type->Sprite);
+	}
+
+	if (unittype->SameSprite) {
+		unittype->Sprite = type->Sprite;
+	}
+}
+				
+/**
 **		Load the graphics for the unit-types.
 */
 global void LoadUnitTypes(void)
 {
 	UnitType* type;
-	const char* file;
-	char buf[1000];
 	int i;
-	int res;
-	ResourceInfo* resinfo;
-
-	for (i = 0; i < NumUnitTypes; ++i) {
-		type = UnitTypes[i];
-		if ((file = type->ShadowFile)) {
-			file = strcat(strcpy(buf, "graphics/"), file);
-			ShowLoadProgress("Unit `%s'", file);
-			type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
-				type->ShadowHeight);
-			FlipGraphic(type->ShadowSprite);
-		}
-
-		//  Load empty/loaded graphics
-		if (type->Harvester) {
-			for (res = 0; res < MaxCosts; ++res) {
-				if ((resinfo = type->ResInfo[res])) {
-					if ((file = resinfo->FileWhenLoaded)) {
-						file = strcat(strcpy(buf, "graphics/"), file);
-						ShowLoadProgress("Unit `%s'", file);
-						resinfo->SpriteWhenLoaded = LoadSprite(file, type->Width,
-							type->Height);
-						FlipGraphic(resinfo->SpriteWhenLoaded);
-					}
-					if ((file = resinfo->FileWhenEmpty)) {
-						file = strcat(strcpy(buf, "graphics/"), file);
-						ShowLoadProgress("Unit `%s'", file);
-						resinfo->SpriteWhenEmpty = LoadSprite(file, type->Width,
-							type->Height);
-						FlipGraphic(resinfo->SpriteWhenEmpty);
-					}
-				}
-			}
-		}
-
-		//
-		//		Unit-type uses the same sprite as an other.
-		//
-		if (type->SameSprite) {
-			continue;
-		}
-
-		//
-		//		FIXME: must handle terrain different!
-		//
-
-		file = type->File[TheMap.Terrain];
-		if (!file) {						// default one
-			file = type->File[0];
-		}
-		if (file) {
-			char* buf;
-
-			buf = alloca(strlen(file) + 9 + 1);
-			file = strcat(strcpy(buf, "graphics/"), file);
-			ShowLoadProgress("Unit `%s'", file);
-			type->Sprite = LoadSprite(file, type->Width, type->Height);
-			FlipGraphic(type->Sprite);
-		}
-	}
 
 	for (i = 0; i<NumUnitTypes; ++i) {
 		type = UnitTypes[i];
-		//
-		//		Unit-type uses the same sprite as an other.
-		//
-		if (type->SameSprite) {
-			const UnitType* unittype;
-
-			unittype = UnitTypeByIdent(type->SameSprite);
-			if (!unittype) {
-				PrintFunction();
-				fprintf(stdout, "Unit-type %s not found\n", type->SameSprite);
-				ExitFatal(-1);
-			}
-			type->Sprite = unittype->Sprite;
-		}
 
 		//
 		//		Lookup icons.
