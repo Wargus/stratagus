@@ -45,6 +45,14 @@
 #include "iolib.h"
 #include "iocompat.h"
 
+#ifdef USE_WIN32
+#define MNG_USE_DLL
+#else
+#define MNG_USE_SO
+#endif
+#include <libmng.h>
+#undef LOCAL
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -207,7 +215,7 @@ void DisplayMNG(Mng* mng, int x, int y)
 	SDL_Rect rect;
 
 	if (mng->Ticks <= GetTicks()) {
-		mng_display_resume(mng->Handle);
+		mng_display_resume((mng_handle)mng->Handle);
 	}
 	rect.x = x;
 	rect.y = y;
@@ -233,7 +241,7 @@ Mng* LoadMNG(const char* name)
 	mng = calloc(1, sizeof(Mng));
 	mng->Name = strdup(buf);
 	mng->Handle = mng_initialize(mng, my_alloc, my_free, MNG_NULL);
-	if (mng->Handle == MNG_NULL) {
+	if ((mng_handle)mng->Handle == MNG_NULL) {
 		// process error
 		mng = mng;
 	}
@@ -254,7 +262,7 @@ Mng* LoadMNG(const char* name)
 	}
 
 	if (!mng->Surface || mng->Iteration == 0x7fffffff) {
-		mng_cleanup(&mng->Handle);
+		mng_cleanup(&(mng_handle)mng->Handle);
 		free(mng->Buffer);
 		free(mng);
 		return NULL;
@@ -269,7 +277,7 @@ Mng* LoadMNG(const char* name)
 */
 void FreeMNG(Mng* mng)
 {
-	mng_cleanup(&mng->Handle);
+	mng_cleanup(&(mng_handle)mng->Handle);
 	SDL_FreeSurface(mng->Surface);
 	free(mng->Buffer);
 	free(mng->Name);
