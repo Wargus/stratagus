@@ -163,6 +163,7 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
     int size;
     int i;
     int ticks;
+    int n;
 
     ticks=GetTicks();
     DebugLevel0Fn("Trying `%s'\n" _C_ name);
@@ -173,10 +174,16 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 
     // Load complete file into memory, with realloc = slow
     size = 0;
-    buffer = malloc(16384);
-    while ((i = CLread(f, buffer + size, 16384)) == 16384) {
-	size += 16384;
-	buffer = realloc(buffer, size + 16384);
+    n = 16384;
+    buffer = malloc(n);
+    while ((i = CLread(f, buffer + size, n)) == n) {
+	size += n;
+	if (n < 1024*1024) {
+	    n <<= 1;
+	} else {
+	    n = 2*1024*1024;
+	}
+	buffer = realloc(buffer, size + n);
     }
     size += i;
     buffer = realloc(buffer, size);
@@ -212,7 +219,6 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 #endif
 	sample->Frequency = SoundFrequency;
 	sample->Length = 0;
-	PlayingMusic = 1;
 	return sample;
     }
 
