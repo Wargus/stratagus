@@ -185,8 +185,7 @@ extern void beos_init(int argc, char** argv);
 #ifdef __CYGWIN__
 #include <getopt.h>
 #endif
-#ifdef _MSC_VER
-//#include "etlib/getopt.h"
+#if defined(_MSC_VER) || defined(__MINGW32__)
 extern char* optarg;
 extern int optind;
 extern int getopt(int argc, char* const* argv, const char* opt);
@@ -200,15 +199,6 @@ extern int getopt(int argc, char* const* argv, const char* opt);
 
 #ifdef USE_SDL
 #include "SDL.h"
-#endif
-
-#ifdef __MINGW32__
-extern int opterr;
-extern int optind;
-extern int optopt;
-extern char *optarg;
-
-extern int getopt(int argc, char* const* argv, const char* opt);
 #endif
 
 #include "stratagus.h"
