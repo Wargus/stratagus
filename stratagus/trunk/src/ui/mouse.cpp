@@ -1190,7 +1190,6 @@ global void UIHandleButtonUp(unsigned button)
 	if( ButtonUnderCursor == 0 ) {
 	    GamePaused=1;
 	    SetStatusLine("Game Paused");
-	    HideAnyCursor();
 	    ProcessMenu(MENU_GAME, 0);
 	    return;
 	}
