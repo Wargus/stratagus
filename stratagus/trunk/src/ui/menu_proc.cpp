@@ -1060,6 +1060,9 @@ local void MenuHandleMouseMove(int x,int y)
 				mi->d.listbox.dohandler = 0;
 				mi->d.listbox.curopt = mi->d.listbox.cursel;
 				redraw_flag = 1;
+				if (mi->d.listbox.action) {
+				    (*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+				}
 			    }
 			}
 			break;
