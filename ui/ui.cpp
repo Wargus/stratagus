@@ -722,11 +722,13 @@ global void SetViewportMode (ViewportMode new_mode)
 	DebugLevel0Fn ("trying to set an unknown mode!!\n");
 	break;
     }
+#if 0
     VideoLockScreen ();
     VideoFillRectangleClip (ColorBlack, TheUI.MapArea.X, TheUI.MapArea.Y,
 		TheUI.MapArea.EndX - TheUI.MapArea.X + 1,
 		TheUI.MapArea.EndY - TheUI.MapArea.Y + 1);
     VideoUnlockScreen ();
+#endif
 }
 
 /**
