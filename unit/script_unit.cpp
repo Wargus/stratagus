@@ -952,6 +952,11 @@ local int CclUnit(lua_State* l)
 			MapMarkUnitSight(unit);
 	}
 
+	// Units Dieing may have sight
+	if (unit->Removed && unit->Orders[0].Action == UnitActionDie) {
+		MapMarkUnitSight(unit);
+	}
+
 	//		Place on map
 	if (!unit->Removed && !unit->Destroyed && !unit->Type->Vanishes) {
 		unit->Removed = 1;
