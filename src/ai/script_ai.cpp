@@ -1529,25 +1529,6 @@ local SCM CclAiWaitForce(SCM value)
 }
 
 /**
-**	Attack with force.
-**
-**	@param value	Force number.
-*/
-local SCM CclAiAttackWithForce(SCM value)
-{
-    int force;
-
-    force = gh_scm2int(value);
-    if (force < 0 || force >= AI_MAX_FORCES) {
-	errl("Force out of range", value);
-    }
-
-    AiAttackWithForce(force);
-
-    return SCM_BOOL_F;
-}
-
-/**
 **	Attack with force, on the current script hotspot.
 **
 **	@param value	Force number.
@@ -2110,7 +2091,6 @@ global void AiCclRegister(void)
 
     gh_new_procedure0_0("ai:idle", CclAiIdle);
     gh_new_procedure2_0("ai:timed-wait-force", CclAiTimedWaitForce);
-    gh_new_procedure1_0("ai:attack-with-force", CclAiAttackWithForce);
     gh_new_procedure1_0("ai:hotspot-attack-with-force", CclAiHotSpotAttackWithForce);
     gh_new_procedure1_0("ai:force-go-home", CclAiForceHome);
     gh_new_procedure1_0("ai:sleep", CclAiSleep);
