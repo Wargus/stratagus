@@ -1487,8 +1487,9 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			if (mi->d.listbox.curopt != 0)
 			    mi->d.listbox.curopt--;
 		    } else {
-			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1)
-			    mi->d.listbox.curopt++;
+			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1 && 
+			    mi->d.listbox.curopt != mi->d.listbox.noptions - 1)
+				mi->d.listbox.curopt++;
 		    }
 		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
 			/ (mi->d.listbox.noptions - 1);
