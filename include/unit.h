@@ -477,8 +477,8 @@ struct _unit_ {
 
 //	DISPLAY:
     UnitColors	Colors;			/// Player colors
-    char	IX;			/// X image displacement to map position
-    char	IY;			/// Y image displacement to map position
+    signed char	IX;			/// X image displacement to map position
+    signed char	IY;			/// Y image displacement to map position
     int		Frame;			/// Image frame: <0 is mirrored
     int		SeenFrame;		/// last seen frame/stage of buildings
 
@@ -838,7 +838,7 @@ extern int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table);
     /// Select units on tile
 extern int UnitCacheOnTile(int x,int y,Unit** table);
     /// Select unit on X,Y of type naval,fly,land
-extern Unit* UnitCacheOnXY(int x,int y,int type);
+extern Unit* UnitCacheOnXY(int x,int y,unsigned type);
     /// Print unit-cache statistic
 extern void UnitCacheStatistic(void);
     /// Initialize unit-cache
