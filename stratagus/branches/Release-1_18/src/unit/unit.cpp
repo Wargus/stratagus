@@ -4292,6 +4292,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Selected ) {
 	fprintf(file," 'selected");
     }
+    if( unit->Rescued ) {
+	fprintf(file," 'rescued");
+    }
 #ifdef NEW_FOW
     if( unit->Next && unit->Removed ) {
 	fprintf(file," 'host-tile '(%d %d) ",
