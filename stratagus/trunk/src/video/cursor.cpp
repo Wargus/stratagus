@@ -794,7 +794,8 @@ local void DrawBuildingCursor(void)
 #endif /* SPLIT_SCREEN_SUPPORT */
 	    // FIXME: The field is covered by fog of war!
 	    if( f && CanBuildOn(mx+w,my+h,mask &
-		    ((Selected[0]->X==mx+w && Selected[0]->Y==my+h)
+		    ((Selected[0]
+			    && Selected[0]->X==mx+w && Selected[0]->Y==my+h)
 			? ~(MapFieldLandUnit|MapFieldSeaUnit) : -1))
 		  && IsMapFieldExplored(mx+w,my+h) ) {
 		color=ColorGreen;
