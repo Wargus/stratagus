@@ -344,7 +344,33 @@ static const SampleType VorbisStreamSampleType = {
 	VorbisStreamFree,
 };
 
+static int VorbisRead(Sample* sample, void* buf, int len)
+{
+	if (len > sample->Len) {
+		len = sample->Len;
+	}
 
+	memcpy(buf, sample->Buffer + sample->Pos, len);
+	sample->Pos += len;
+	sample->Len -= len;
+
+	return len;
+}
+
+static void VorbisFree(Sample* sample)
+{
+	free(sample->User);
+	free(sample->Buffer);
+	free(sample);
+}
+
+/**
+** Ogg stream type structure.
+*/
+static const SampleType VorbisSampleType = {
+	VorbisRead,
+	VorbisFree,
+};
 
 /**
 **  Load vorbis.
@@ -383,16 +409,47 @@ Sample* LoadVorbis(const char* name,int flags)
 
 	sample->Len = 0;
 	sample->Pos = 0;
-//	sample->Buffer = malloc(sizeof(SOUND_BUFFER_SIZE));
+	sample->Buffer = malloc(SOUND_BUFFER_SIZE);
 	sample->User = data;
 	data->File = f;
 
 	if (flags & PlayAudioStream) {
-		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &VorbisStreamSampleType;
 	} else {
-		exit(-1);
-		// todo
+		char *buf;
+		int pos;
+		int ret;
+		int total;
+		ogg_page pg;
+		ogg_sync_state sync;
+		int i;
+
+		// find total size
+		pos = CLtell(f);
+		ogg_sync_init(&sync);
+		for (i = 0; ; ++i) {
+			CLseek(f, -1 * i * 4096, SEEK_END);
+			buf = ogg_sync_buffer(&sync, 4096);
+			CLread(f, buf, 8192);
+			ogg_sync_wrote(&sync, 8192);
+			if (ogg_sync_pageout(&sync, &pg) == 1 && ogg_page_eos(&pg)) {
+				total = ogg_page_granulepos(&pg) * 2 * sample->Channels;
+				break;
+			}
+		}
+		CLseek(f, pos, SEEK_SET);
+
+		buf = malloc(total);
+		pos = 0;
+
+		while ((ret = VorbisStreamRead(sample, buf + pos, 8192)))
+				pos += ret;
+
+		free(sample->Buffer);
+		sample->Len = total;
+		sample->Pos = 0;
+		sample->Buffer = buf;
+		sample->Type = &VorbisSampleType;
 	}
 
 	return sample;
