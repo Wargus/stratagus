@@ -101,6 +101,7 @@ local void LoadStratagusMap(const char* filename,
 #if defined(USE_GUILE) || defined(USE_SIOD)
     gh_load((char*)filename);
 #elif defined(USE_LUA)
+    LuaLoadFile(filename);
 #endif
     LcmPreventRecurse = 0;
 
