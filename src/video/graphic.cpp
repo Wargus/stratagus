@@ -683,7 +683,7 @@ global void ResizeGraphic(Graphic *g,int w,int h)
     for( i=0; i<h; ++i ) {
 	for( j=0; j<w; ++j ) {
 	    data[x] = ((unsigned char*)g->Frames)[
-		(i*g->Height+h/2)/h*g->Width + (j*g->Width+w/2)/w];
+		(i*g->Height/h)*g->Width + j*g->Width/w];
 	    ++x;
 	}
     }
