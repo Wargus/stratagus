@@ -1,14 +1,17 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name map_draw.c	-	The map drawing. */
+/**@name map_draw.c	-	The map drawing.
+**
+**	@todo FIXME: Johns: More to come: zooming, scaling, 64x64 tiles...
+*/
 //
 //	(c) Copyright 1999-2001 by Lutz Sammer
 //
@@ -25,6 +28,34 @@
 //	$Id$
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@def USE_SMART_TILECACHE
+**
+**	If USE_SMART_TILECACHE is defined, the code is compiled with
+**	the smart-tile-cache support. With the smart-tile-cache support a
+**	tile is only converted once to the video format, each consequent access
+**	use the ready converted image form the video memory.
+**
+**	Nothing is cached between frames. Slow with hardware video memory.
+**
+**	@see USE_TILECACHE
+*/
+
+/**
+**	@relates USE_TILECACHE
+**
+**	If USE_TILECACHE is defined, the code is compiled with the tile-cache
+**	support. With the tile-cache support a tile is only converted once to
+**	video format, each consequent access use the ready converted image form
+**	the cache memory. The LRU cache is of TileCacheSize.
+**
+**	@see TileCacheSize @see USE_SMART_TILECACHE
+*/
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -53,8 +84,9 @@
 
 #define noUSE_TILECACHE			/// defined use tile cache
 #define USE_SMART_TILECACHE		/// defined use a smart tile cache
+
 #ifdef DEBUG
-#define noTIMEIT			/// defines time function
+#define noTIMEIT			/// defined time function
 #endif
 
 #ifdef USE_TILECACHE	// {
@@ -74,24 +106,24 @@ typedef struct _tile_cache {
 
 /**
 **	Contains pointer, if the tile is cached.
-**	FIXME: could save memory here and only use how many tiles exits.
+**
+**	@note FIXME: could save memory here and only use how many tiles exits.
+**
+**	@see MaxTilesInTileset
 */
 local TileCache* TileCached[MaxTilesInTileset];
 
 /**
 **	Number of tile caches.
-**	FIXME: Not make this configurable by ccl
+**
+**	@todo FIXME: Not make this configurable by ccl
 */
 global int TileCacheSize=196;
 
 /**
 **	Last recent used cache tiles.
 */
-local struct dl_head TileCacheLRU[1] = {
-{   (struct dl_node*)&TileCacheLRU[0].null,	// FIXME: edgar will add
-    NULL,					//	 a marco for this
-    (struct dl_node*)&TileCacheLRU[0].first
-}};
+local DL_LIST(TileCacheLRU);
 
 #endif	// } USE_TILECACHE
 
@@ -99,7 +131,10 @@ local struct dl_head TileCacheLRU[1] = {
 
 /**
 **	Contains pointer, to last video position, where this tile was drawn.
-**	FIXME: could save memory here and only use how many tiles exits.
+**
+**	@note FIXME: could save memory here and only use how many tiles exits.
+**
+**	@see MaxTilesInTileset
 */
 local void* TileCached[MaxTilesInTileset];
 
@@ -107,23 +142,31 @@ local void* TileCached[MaxTilesInTileset];
 
 /**
 **	Low word contains pixel data for 16 bit modes.
-**	FIXME: should or could be moved into video part?
+**
+**	@note FIXME: should or could be moved into video part?
 */
 local unsigned int PixelsLow[256];
 
 /**
 **	High word contains pixel data for 16 bit modes.
-**	FIXME: should or could be moved into video part?
+**
+**	@note FIXME: should or could be moved into video part?
 */
 local unsigned int PixelsHigh[256];
 
 /**
 **	Flags must redraw map row.
+**	MustRedrawRow[y]!=0 This line of tiles must be redrawn.
+**
+**	@see MAXMAP_W 
 */
 global char MustRedrawRow[MAXMAP_W];
 
 /**
 **	Flags must redraw tile.
+**	MustRedrawRow[x+y*::MapWidth]!=0 This tile must be redrawn.
+**
+**	@see MAXMAP_W @see MAXMAP_H
 */
 global char MustRedrawTile[MAXMAP_W*MAXMAP_H];
 
@@ -146,15 +189,17 @@ global void (*MapDrawTile)(int,int,int);
 ----------------------------------------------------------------------------*/
 
 #if GRID==1
+    /// Draw less for grid display
 #define GRID_SUB	TileSizeX
 #else
+    /// Draw all (no grid enabled)
 #define GRID_SUB	0
 #endif
 
-// FIXME: Johns: More to come: zooming, scaling, 64x64 tiles...
-
 /**
 **	Do unroll 8x
+**
+**	@param x	Index passed to UNROLL2 incremented by 2.
 */
 #define UNROLL8(x)	\
     UNROLL2((x)+0);	\
@@ -164,6 +209,8 @@ global void (*MapDrawTile)(int,int,int);
 
 /**
 **	Do unroll 16x
+**
+**	@param x	Index passed to UNROLL8 incremented by 8.
 */
 #define UNROLL16(x)	\
     UNROLL8((x)+ 0);	\
@@ -171,6 +218,8 @@ global void (*MapDrawTile)(int,int,int);
 
 /**
 **	Do unroll 24x
+**
+**	@param x	Index passed to UNROLL8 incremented by 8.
 */
 #define UNROLL24(x)	\
     UNROLL8((x)+ 0);	\
@@ -179,6 +228,8 @@ global void (*MapDrawTile)(int,int,int);
 
 /**
 **	Do unroll 32x
+**
+**	@param x	Index passed to UNROLL8 incremented by 8.
 */
 #define UNROLL32(x)	\
     UNROLL8((x)+ 0);	\
@@ -198,7 +249,7 @@ global void (*MapDrawTile)(int,int,int);
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **	(50% cpu time was needed for this, now only 32%)
 **
 **	@see GRID
@@ -217,8 +268,9 @@ global void VideoDraw8Tile32(const unsigned char* data,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
-	dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]]; \
 	dp[x+1]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+1]]
 
 	UNROLL32(0);
@@ -244,7 +296,7 @@ global void VideoDraw8Tile32(const unsigned char* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **	(50% cpu time was needed for this, now only 32%)
 **
 **	@see GRID
@@ -272,6 +324,7 @@ global void VideoDraw16Tile32(const unsigned char* data,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*(unsigned int*)(dp+x+0)=PixelsLow[sp[x+0]]|PixelsHigh[sp[x+1]]
 
@@ -298,7 +351,7 @@ global void VideoDraw16Tile32(const unsigned char* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **	(50% cpu time was needed for this, now only 32%)
 **
 **	@see GRID
@@ -326,6 +379,7 @@ global void VideoDraw24Tile32(const unsigned char* data,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	dp[x+0]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+0]];	\
 	dp[x+1]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+1]]
@@ -352,7 +406,7 @@ global void VideoDraw24Tile32(const unsigned char* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **	(50% cpu time was needed for this, now only 32%)
 **
 **	@see GRID
@@ -371,6 +425,7 @@ global void VideoDraw32Tile32(const unsigned char* data,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	dp[x+0]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+0]];	\
 	dp[x+1]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+1]]
@@ -410,7 +465,7 @@ global void VideoDraw32Tile32(const unsigned char* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **
 **	@see GRID
 */
@@ -443,8 +498,9 @@ local void FillCache8AndDraw32(const unsigned char* data,VMemType8* cache
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)	\
-	vp[x+0]=dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	vp[x+0]=dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]]; \
 	vp[x+0]=dp[x+1]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+1]]
 
 	UNROLL32(0);
@@ -471,7 +527,7 @@ local void FillCache8AndDraw32(const unsigned char* data,VMemType8* cache
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **
 **	@see GRID
 */
@@ -504,6 +560,7 @@ local void FillCache16AndDraw32(const unsigned char* data,VMemType16* cache
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)	\
 	*(unsigned int*)(vp+x+0)=*(unsigned int*)(dp+x+0)	\
 		=PixelsLow[sp[x+0]]|PixelsHigh[sp[x+1]]
@@ -532,7 +589,7 @@ local void FillCache16AndDraw32(const unsigned char* data,VMemType16* cache
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **
 **	@see GRID
 */
@@ -565,6 +622,7 @@ local void FillCache24AndDraw32(const unsigned char* data,VMemType24* cache
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)	\
 	vp[x+0]=dp[x+0]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+0]]; \
 	vp[x+0]=dp[x+1]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+1]]
@@ -593,7 +651,7 @@ local void FillCache24AndDraw32(const unsigned char* data,VMemType24* cache
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 **
-**	This is a hot spot in the program.
+**	@note This is a hot spot in the program.
 **
 **	@see GRID
 */
@@ -626,6 +684,7 @@ local void FillCache32AndDraw32(const unsigned char* data,VMemType32* cache
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)	\
 	vp[x+0]=dp[x+0]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+0]]; \
 	vp[x+0]=dp[x+1]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+1]]
@@ -680,6 +739,7 @@ local void VideoDraw8Tile32FromCache(const VMemType8* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*(unsigned long*)(dp+x)=*(unsigned long*)(sp+x)
 
@@ -721,6 +781,7 @@ local void VideoDraw16Tile32FromCache(const VMemType16* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*(unsigned long*)(dp+x)=*(unsigned long*)(sp+x)
 
@@ -762,6 +823,7 @@ local void VideoDraw24Tile32FromCache(const VMemType24* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*(unsigned long*)(dp+x*2+0)=*(unsigned long*)(sp+x*2+0);	\
 	*(unsigned long*)(dp+x*2+1)=*(unsigned long*)(sp+x*2+1)
@@ -804,6 +866,7 @@ local void VideoDraw32Tile32FromCache(const VMemType32* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*(unsigned long*)(dp+x*2+0)=*(unsigned long*)(sp+x*2+0);	\
 	*(unsigned long*)(dp+x*2+1)=*(unsigned long*)(sp+x*2+1)
@@ -999,6 +1062,7 @@ local void VideoDraw8Tile32Cached(const VMemType8* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	((unsigned long*)dp)[x+0]=((unsigned long*)sp)[x+0]; \
 	((unsigned long*)dp)[x+1]=((unsigned long*)sp)[x+1]
@@ -1036,6 +1100,7 @@ local void VideoDraw16Tile32Cached(const VMemType16* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*(unsigned long*)(dp+x)=*(unsigned long*)(sp+x)
 
@@ -1072,6 +1137,7 @@ local void VideoDraw24Tile32Cached(const VMemType24* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*((unsigned long*)dp+x+0)=*((unsigned long*)sp+x+0);	\
 	*((unsigned long*)dp+x+1)=*((unsigned long*)sp+x+1)
@@ -1109,6 +1175,7 @@ local void VideoDraw32Tile32Cached(const VMemType32* graphic,int x,int y)
 
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
+	/// basic unroll code
 #define UNROLL2(x)		\
 	*(dp+x*2+0)=*(sp+x*2+0);	\
 	*(dp+x*2+1)=*(sp+x*2+1)
@@ -1294,17 +1361,18 @@ global void MapColorCycle(void)
 }
 
 /**
-**      Mark position inside screenmap be drawn for next display update.
+**	Mark position inside screenmap be drawn for next display update.
 **
-**      @param x,y  position in Map to be checked.
+**	@param x,y  position in Map to be checked.
 **
-**      @return     True if inside and marked, false otherwise.
+**	@return	    True if inside and marked, false otherwise.
 */
-global int MarkDrawPosMap( int x, int y ) {
+global int MarkDrawPosMap( int x, int y )
+{
     if ( (x-=MapX)>=0 && (y-=MapY)>=0 && x<MapWidth && y<MapHeight ) {
-  #ifdef NEW_MAPDRAW
+#ifdef NEW_MAPDRAW
       MustRedrawRow[y]=MustRedrawTile[y*MapWidth+x]=NEW_MAPDRAW;
-  #endif
+#endif
       MustRedraw|=RedrawMap;
       return 1;
     }
@@ -1312,95 +1380,99 @@ global int MarkDrawPosMap( int x, int y ) {
 }
 
 /**
-**      Denote wether area in screenmap is overlapping
+**	Denote wether area in screenmap is overlapping
 **
-**      @param sx,sy,ex,ey  area in Map to be checked.
+**	@param sx,sy,ex,ey  area in Map to be checked.
 **
-**      @return             True if overlapping, false otherwise.
+**	@return		    True if overlapping, false otherwise.
 */
-global int AreaVisibleInMap( int sx, int sy, int ex, int ey ) {
-    return ( sx>=MapX && sy>=MapY && ex<MapX+MapWidth && ey<MapY+MapHeight );
+global int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
+{
+    return sx>=MapX && sy>=MapY && ex<MapX+MapWidth && ey<MapY+MapHeight;
 }
 
 /**
-**      Check if a point is visible
+**	Check if a point is visible
 **
-**      @param x,y          point in Map to be checked.
+**	@param x,y	point in Map to be checked.
 **
-**      @return             True if point is in the visible map, false otherwise
+**	@return		True if point is in the visible map, false otherwise
 */
-local int PointInMap(int x, int y) {
-    return ((MapX <= x && x < MapX+MapWidth) &&
-	    (MapY <= y && y < MapY+MapHeight));
+local inline int PointOnScreen(int x, int y)
+{
+    return MapX <= x && x < MapX+MapWidth && MapY <= y && y < MapY+MapHeight;
 }
 
 /**
-**      Check if any part of an area is visible
+**	Check if any part of an area is visible
 **
-**      @param sx,sy,ex,ey  area in Map to be checked.
+**	@param sx,sy,ex,ey  area in Map to be checked.
 **
-**      @return             True if any part of area is visible, false otherwise
+**	@return		    True if any part of area is visible, false otherwise
 */
-global int AnyAreaVisibleInMap( int sx, int sy, int ex, int ey ) {
-    return ( PointInMap(sx,sy) || PointInMap(sx,ey)
-	|| PointInMap(ex,sy) || PointInMap(ex,ey) );
+global int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey )
+{
+    // FIXME: Can be faster written
+    return PointOnScreen(sx,sy) || PointOnScreen(sx,ey)
+	    || PointOnScreen(ex,sy) || PointOnScreen(ex,ey);
 }
 
 /**
+**	Mark overlapping area with screenmap be drawn for next display update.
 **
-**      Mark overlapping area with screenmap be drawn for next display update.
+**	@param sx,sy,ex,ey  area in Map to be checked.
 **
-**      @param sx,sy,ex,ey  area in Map to be checked.
-**      @return             True if overlapping and marked, false otherwise.
+**	@return		    True if overlapping and marked, false otherwise.
 **
+**	@see MustRedrawRow @see MustRedrawTile.
 */
-global int MarkDrawAreaMap( int sx, int sy, int ex, int ey ) {
-    if ( (ex-=MapX)>=0 && (ey-=MapY)>=0 &&
-	 ((sx-=MapX)<MapWidth || sx<0) && ((sy-=MapY)<MapHeight || sy<0) ) {
-  #ifdef NEW_MAPDRAW
-      char *row, *tile;
+global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
+{
+    if ((ex -= MapX) >= 0 && (ey -= MapY) >= 0 && ((sx -= MapX) < MapWidth
+	    || sx < 0) && ((sy -= MapY) < MapHeight || sy < 0)) {
+#ifdef NEW_MAPDRAW
+	char *row, *tile;
 
-    // Get area in screenmap
-      if ( sx < 0 )
-	sx = 0;
-      if ( ex >= MapWidth )
-	ex = MapWidth-1;
-      if ( sy < 0 )
-	sy = 0;
-      if ( ey >= MapHeight )
-	ey = MapHeight-1;
+	// Get area in screenmap
+	if (sx < 0) {
+	    sx = 0;
+	}
+	if (ex >= MapWidth) {
+	    ex = MapWidth - 1;
+	}
+	if (sy < 0) {
+	    sy = 0;
+	}
+	if (ey >= MapHeight) {
+	    ey = MapHeight - 1;
+	}
+	// Denote area in screenmap
+	row = MustRedrawRow + sy;
+	tile = MustRedrawTile + sy * MapWidth + sx;
+	ex -= sx;			//now: ex=width+1
+	ey -= sy;			//     ey=height+1
+	do {
+	    row[ey] = NEW_MAPDRAW;
+	    sx = ex;
+	    do {
+		tile[sx] = NEW_MAPDRAW;
+	    } while (--sx >= 0);
+	    tile += MapWidth;
+	} while (--ey >= 0);
+#endif
 
-    // Denote area in screenmap
-      row  = MustRedrawRow + sy;
-      tile = MustRedrawTile + sy*MapWidth+sx;
-      ex  -= sx;            //now: ex=width+1
-      ey  -= sy;            //     ey=height+1
-      do
-
-      {
-	row[ey]=NEW_MAPDRAW;
-	sx = ex;
-	do tile[sx]=NEW_MAPDRAW;
-	while ( --sx >= 0 );
-	tile += MapWidth;
-      }
-      while ( --ey >= 0 );
-  #endif
-
-      MustRedraw|=RedrawMap;
-      return 1;
+	MustRedraw |= RedrawMap;
+	return 1;
     }
     return 0;
 }
 
 /**
-**
-**      Enable entire map be drawn for next display update.
-**
+**	Enable entire map be drawn for next display update.
 */
 global void MarkDrawEntireMap(void)
 {
-    #ifdef NEW_MAPDRAW
+#ifdef NEW_MAPDRAW
     int i;
 
     for( i=0; i<MapHeight; ++i ) {
@@ -1409,7 +1481,7 @@ global void MarkDrawEntireMap(void)
     for( i=0; i<MapHeight*MapWidth; ++i ) {
 	MustRedrawTile[i]=1;
     }
-    #endif
+#endif
 
     MustRedraw|=RedrawMap;
 }
@@ -1420,26 +1492,27 @@ global void MarkDrawEntireMap(void)
 **	@param x	Map viewpoint x position.
 **	@param y	Map viewpoint y position.
 **
-** StephanR: variables explained below for screen:
+** StephanR: variables explained below for screen:<PRE>
 ** *---------------------------------------*
-** |                                       |
-** |          *-----------------------*    |<-TheUi.MapY,dy (in pixels)
-** |          |   |   |   |   |   |   |    |  |
-** |          |   |   |   |   |   |   |    |  |
-** |          |---+---+---+---+---+---|    |  |
-** |          |   |   |   |   |   |   |    |  |MapHeight (in tiles)
-** |          |   |   |   |   |   |   |    |  |
-** |          |---+---+---+---+---+---|    |  |
-** |          |   |   |   |   |   |   |    |  |
-** |          |   |   |   |   |   |   |    |  |
-** |          *-----------------------*    |<-ey,TheUI.MapEndY (in pixels)
-** |                                       |
-** |                                       |
+** |					   |
+** |	      *-----------------------*	   |<-TheUi.MapY,dy (in pixels)
+** |	      |	  |   |	  |   |	  |   |	   |  |
+** |	      |	  |   |	  |   |	  |   |	   |  |
+** |	      |---+---+---+---+---+---|	   |  |
+** |	      |	  |   |	  |   |	  |   |	   |  |MapHeight (in tiles)
+** |	      |	  |   |	  |   |	  |   |	   |  |
+** |	      |---+---+---+---+---+---|	   |  |
+** |	      |	  |   |	  |   |	  |   |	   |  |
+** |	      |	  |   |	  |   |	  |   |	   |  |
+** |	      *-----------------------*	   |<-ey,TheUI.MapEndY (in pixels)
+** |					   |
+** |					   |
 ** *---------------------------------------*
-**            ^                       ^
-**          dx|-----------------------|ex,TheUI.MapEndX (in pixels)
-** TheUI.MapX    MapWidth (in tiles)
+**	      ^			      ^
+**	    dx|-----------------------|ex,TheUI.MapEndX (in pixels)
+** TheUI.MapX	 MapWidth (in tiles)
 ** (in pixels)
+** </PRE>
 */
 global void DrawMapBackground(int x,int y)
 {
@@ -1512,6 +1585,8 @@ global void DrawMapBackground(int x,int y)
 /**
 **	Initialise the fog of war.
 **	Build tables, setup functions.
+**
+**	@see VideoBpp
 */
 void InitMap(void)
 {
