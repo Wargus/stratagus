@@ -171,6 +171,12 @@ void UpdateStats(int reset)
 				for (i = 0; i < MaxCosts; ++i) {
 					stats->Costs[i] = type->_Costs[i];
 				}
+				if (!stats->Variables) {
+					stats->Variables = calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
+				}
+				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
+					stats->Variables[i] = type->Variable[i];
+				}
 				if (type->Building) {
 					stats->Level = 0; // Disables level display
 				} else {
@@ -299,6 +305,13 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 	CLprintf(file, "\"piercing-damage\", %d, ", stats->PiercingDamage);
 	CLprintf(file, "\"hit-points\", %d,\n  ", stats->HitPoints);
 	CLprintf(file, "\"regeneration-rate\", %d,\n  ", stats->RegenerationRate);
+
+	for (j = NVARALREADYDEFINED; j < UnitTypeVar.NumberVariable; ++j) {
+		CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d},\n  ",
+			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
+			stats->Variables[j].Max, stats->Variables[j].Increase);
+	}
+
 	CLprintf(file, "\"costs\", {");
 	for (j = 0; j < MaxCosts; ++j) {
 		if (j) {
@@ -306,6 +319,7 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 		}
 		CLprintf(file, "\"%s\", %d,", DefaultResourceNames[j], stats->Costs[j]);
 	}
+
 	CLprintf(file, "})\n");
 }
 
@@ -685,6 +699,10 @@ void CleanUnitTypes(void)
 		free(type->BoolFlag);
 		free(type->CanTargetFlag);
 		free(type->CanTransport);
+
+		for (j = 0; j < PlayerMax; j++) {
+			free(type->Stats[j].Variables);
+		}
 
 		// Free Building Restrictions if there are any
 		if (type->BuildingRules) {

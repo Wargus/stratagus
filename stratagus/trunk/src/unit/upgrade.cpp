@@ -57,11 +57,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _unit_type_;
-
-static int AddUpgradeModifierBase(int, int, int, int, int, int, int, int,
-	int*, const int[UnitTypeMax], const char*, const char*, UnitType*);
-
 static void AllowUnitId(Player* player, int id, int units);
 static void AllowUpgradeId(Player* player, int id, char af);
 
@@ -214,6 +209,7 @@ void CleanUpgrades(void)
 	//  Free the upgrade modifiers.
 	//
 	for (i = 0; i < NumUpgradeModifiers; ++i) {
+		free(UpgradeModifiers[i]->Modifier.Variables);
 		free(UpgradeModifiers[i]);
 	}
 	NumUpgradeModifiers = 0;
@@ -587,80 +583,58 @@ void SaveUpgrades(CLFile* file)
 */
 static int CclDefineModifier(lua_State* l)
 {
-	const char* temp;
+	const char* key;
 	const char* value;
-	int uid;
-	int attack_range;
-	int sight_range;
-	int basic_damage;
-	int piercing_damage;
-	int armor;
-	int regeneration_rate;
-	int hit_points;
-	int costs[MaxCosts];
-	int units[UnitTypeMax];
-	char upgrades[UpgradeMax];
-	char apply_to[UnitTypeMax];
-	UnitType* convert_to;
+	UpgradeModifier* um;
 	int args;
 	int j;
 
 	args = lua_gettop(l);
-	j = 0;
 
-	attack_range = 0;
-	sight_range = 0;
-	basic_damage = 0;
-	piercing_damage = 0;
-	armor = 0;
-	hit_points = 0;
-	regeneration_rate = 0;
-	memset(costs, 0, sizeof(costs));
-	memset(units, 0, sizeof(units));
-	memset(upgrades, '?', sizeof(upgrades));
-	memset(apply_to, '?', sizeof(apply_to));
-	convert_to = NULL;
+	um = calloc(1, sizeof(*um));
 
-	value = LuaToString(l, j + 1);
-	uid = UpgradeIdByIdent(value);
-	++j;
+	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
+	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
+	um->Modifier.Variables = calloc(UnitTypeVar.NumberVariable, sizeof(*um->Modifier.Variables));
 
-	for (; j < args; ++j) {
+	um->UpgradeId = UpgradeIdByIdent(LuaToString(l, 1));
+
+	for (j = 1; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
 		lua_rawgeti(l, j + 1, 1);
-		temp = LuaToString(l, -1);
+		key = LuaToString(l, -1);
 		lua_pop(l, 1);
-		if (!strcmp(temp, "attack-range")) {
+		if (!strcmp(key, "attack-range")) {
 			lua_rawgeti(l, j + 1, 2);
-			attack_range = LuaToNumber(l, -1);
+			um->Modifier.AttackRange = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "sight-range")) {
+		} else if (!strcmp(key, "sight-range")) {
 			lua_rawgeti(l, j + 1, 2);
-			sight_range = LuaToNumber(l, -1);
+			um->Modifier.SightRange = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "basic-damage")) {
+		} else if (!strcmp(key, "basic-damage")) {
 			lua_rawgeti(l, j + 1, 2);
-			basic_damage = LuaToNumber(l, -1);
+			um->Modifier.BasicDamage = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "piercing-damage")) {
+		} else if (!strcmp(key, "piercing-damage")) {
 			lua_rawgeti(l, j + 1, 2);
-			piercing_damage = LuaToNumber(l, -1);
+			um->Modifier.PiercingDamage = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "armor")) {
+		} else if (!strcmp(key, "armor")) {
 			lua_rawgeti(l, j + 1, 2);
-			armor = LuaToNumber(l, -1);
+			um->Modifier.Armor = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "hit-points")) {
+		} else if (!strcmp(key, "hit-points")) {
 			lua_rawgeti(l, j + 1, 2);
-			hit_points = LuaToNumber(l, -1);
+			um->Modifier.HitPoints = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "regeneration-rate")) {
+		} else if (!strcmp(key, "regeneration-rate")) {
 			lua_rawgeti(l, j + 1, 2);
-			regeneration_rate = LuaToNumber(l, -1);
+			um->Modifier.RegenerationRate = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "cost")) {
+		} else if (!strcmp(key, "cost")) {
 			int i;
 
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
@@ -678,48 +652,63 @@ static int CclDefineModifier(lua_State* l)
 				LuaError(l, "Resource not found: %s" _C_ value);
 			}
 			lua_rawgeti(l, j + 1, 2);
-			costs[i] = LuaToNumber(l, -1);
+			um->Modifier.Costs[i] = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(temp, "allow-unit")) {
+		} else if (!strcmp(key, "allow-unit")) {
 			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			if (!strncmp(value, "unit-", 5)) {
 				lua_rawgeti(l, j + 1, 3);
-				units[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
+				um->ChangeUnits[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
 				LuaError(l, "unit expected");
 			}
-		} else if (!strcmp(temp, "allow")) {
+		} else if (!strcmp(key, "allow")) {
 			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			if (!strncmp(value, "upgrade-", 8)) {
 				lua_rawgeti(l, j + 1, 3);
-				upgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, -1);
+				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
 				LuaError(l, "upgrade expected");
 			}
-		} else if (!strcmp(temp, "apply-to")) {
+		} else if (!strcmp(key, "apply-to")) {
 			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			apply_to[UnitTypeIdByIdent(value)] = 'X';
-		} else if (!strcmp(temp, "convert-to")) {
+			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
+		} else if (!strcmp(key, "convert-to")) {
 			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			convert_to = UnitTypeByIdent(value);
+			um->ConvertTo = UnitTypeByIdent(value);
 		} else {
-			LuaError(l, "wrong tag: %s" _C_ temp);
+			int index; // variable index;
+
+			index = GetVariableIndex(key);
+			if (index != -1) {
+				lua_rawgeti(l, j + 1, 2);
+				if (lua_istable(l, -1)) {
+					DefineVariableField(l, um->Modifier.Variables + index, -1); // FIXME
+				} else if (lua_isnumber(l, -1)) {
+					um->Modifier.Variables[index].Enable = 1;
+					um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
+					um->Modifier.Variables[index].Max = LuaToNumber(l, -1);
+				} else {
+					LuaError(l, "bad argument type for '%s'\n" _C_ key);
+				}
+				lua_pop(l, 1);
+			} else {
+				LuaError(l, "wrong tag: %s" _C_ key);
+			}
 		}
 	}
 
-	AddUpgradeModifierBase(uid, attack_range, sight_range, basic_damage,
-		piercing_damage, armor, hit_points, regeneration_rate, costs,
-		units, upgrades, apply_to,convert_to);
+	UpgradeModifiers[NumUpgradeModifiers++] = um;
 
 	return 0;
 }
@@ -910,157 +899,6 @@ void UpgradesCclRegister(void)
 	lua_register(Lua, "DefineUpgradeWcNames", CclDefineUpgradeWcNames);
 }
 
-
-/*----------------------------------------------------------------------------
---  Init/Done/Add functions
-----------------------------------------------------------------------------*/
-
-/**
-**  Add a upgrade modifier.
-**
-**  @param uid                Upgrade identifier of the modifier.
-**  @param attack_range       Attack range modification.
-**  @param sight_range        Sight range modification.
-**  @param basic_damage       Basic damage modification.
-**  @param piercing_damage    Piercing damage modification.
-**  @param armor              Armor modification.
-**  @param hit_points         Hitpoint modification.
-**  @param regeneration_rate  Regenerations modification.
-**  @param costs              Costs modification.
-**  @param units              Changes in allowed units.
-**  @param af_upgrades        Changes in allow upgrades.
-**  @param apply_to           Applies to this units.
-**  @param convert_to         Converts units to this unit-type.
-**
-**  @return                 upgrade modifier id or -1 for error
-**                          (actually this id is useless, just error checking)
-*/
-static int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
-	int basic_damage, int piercing_damage, int armor,
-	int hit_points, int regeneration_rate, int* costs,
-	const int units[UnitTypeMax],
-	const char* af_upgrades, const char* apply_to, UnitType* convert_to)
-{
-	int i;
-	UpgradeModifier* um;
-
-	um = (UpgradeModifier*)malloc(sizeof(UpgradeModifier));
-	if (!um) {
-		return -1;
-	}
-
-	um->UpgradeId = uid;
-
-	// get/save stats modifiers
-	um->Modifier.AttackRange      = attack_range;
-	um->Modifier.SightRange       = sight_range;
-	um->Modifier.BasicDamage      = basic_damage;
-	um->Modifier.PiercingDamage   = piercing_damage;
-	um->Modifier.Armor            = armor;
-	um->Modifier.HitPoints        = hit_points;
-	um->Modifier.RegenerationRate = regeneration_rate;
-
-	for (i = 0; i < MaxCosts; ++i) {
-		um->Modifier.Costs[i] = costs[i];
-	}
-
-	memcpy(um->ChangeUnits, units, sizeof(um->ChangeUnits));
-	memcpy(um->ChangeUpgrades, af_upgrades, sizeof(um->ChangeUpgrades));
-	memcpy(um->ApplyTo, apply_to, sizeof(um->ApplyTo));
-
-	um->ConvertTo = convert_to;
-
-	UpgradeModifiers[NumUpgradeModifiers] = um;
-
-	return NumUpgradeModifiers++;
-}
-
-#if 0  // Not used.
-/**
-** returns upgrade modifier id or -1 for error (actually this id is
-** useless, just error checking)
-*/
-static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
-	int basic_damage, int piercing_damage, int armor,
-	int hit_points, int* costs,
-	const int units[UnitTypeMax],
-	// following are comma separated list of required string id's
-	const char* af_upgrades,
-	const char* apply_to // "unit-peon,unit-peasant"
-	)
-{
-	char* s1;
-	char* s2;
-	int i;
-	UpgradeModifier* um;
-
-	um = (UpgradeModifier*)malloc(sizeof(UpgradeModifier));
-	if (!um) {
-		return -1;
-	}
-
-	um->UpgradeId = uid;
-
-	// get/save stats modifiers
-	um->Modifier.AttackRange    = attack_range;
-	um->Modifier.SightRange     = sight_range;
-	um->Modifier.BasicDamage    = basic_damage;
-	um->Modifier.PiercingDamage = piercing_damage;
-	um->Modifier.Armor          = armor;
-	um->Modifier.HitPoints      = hit_points;
-
-	for (i = 0; i < MaxCosts; ++i) {
-		um->Modifier.Costs[i] = costs[i];
-	}
-
-	// FIXME: all the thing below is sensitive to the format of the string!
-	// FIXME: it will be good if things are checked for errors better!
-	// FIXME: perhaps the function `strtok()' should be replaced with local one?
-
-	memcpy(um->ChangeUnits, units, sizeof(um->ChangeUnits));
-	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
-	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
-
-	//
-	// get allow/forbid's for upgrades
-	//
-	s1 = strdup(af_upgrades);
-	Assert(s1);
-	for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
-		int id;
-		Assert(s2[0] == 'A' || s2[0] == 'F' || s2[0] == 'R');
-		Assert(s2[1] == ':');
-		id = UpgradeIdByIdent(s2 + 2);
-		if (id == -1) {
-			continue; // should we cancel all and return error?!
-		}
-		um->ChangeUpgrades[id] = s2[0];
-	}
-	free(s1);
-
-	//
-	// get units that are affected by this upgrade
-	//
-	s1 = strdup(apply_to);
-	Assert(s1);
-	for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
-		int id;
-
-		id = UnitTypeIdByIdent(s2);
-		if (id == -1) {
-			break; // cade: should we cancel all and return error?!
-		}
-		um->ApplyTo[id] = 'X'; // something other than '?'
-	}
-	free(s1);
-
-	UpgradeModifiers[NumUpgradeModifiers] = um;
-	NumUpgradeModifiers++;
-
-	return NumUpgradeModifiers - 1;
-}
-#endif
-
 /*----------------------------------------------------------------------------
 -- General/Map functions
 ----------------------------------------------------------------------------*/
@@ -1186,11 +1024,17 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 */
 static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 {
-	int z;
-	int j;
-	int pn;
+	int z;                      // iterator on upgrade or unittype.
+	int j;                      // iterator on cost or variable.
+	int pn;                     // player number.
+	int varModified;            // 0 if variable is not modified.
+	int numunits;               // number of unit of the current type.
+	Unit* unitupgrade[UnitMax]; // array of unit of the current type
+	Unit* unit;                 // current unit.
 
-	pn = player->Player;  // player number
+	Assert(player);
+	Assert(um);
+	pn = player->Player;
 	for (z = 0; z < UpgradeMax; ++z) {
 		// allow/forbid upgrades for player.  only if upgrade is not acquired
 
@@ -1228,20 +1072,14 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
 			if (um->Modifier.SightRange) {
-				int numunits;
-				Unit* sightupgrade[UnitMax];
-
-				numunits = FindUnitsByType(UnitTypes[z], sightupgrade);
-				numunits--; // Change to 0 Start not 1 start
-				while (numunits >= 0) {
-					if (sightupgrade[numunits]->Player->Player == player->Player &&
-								!sightupgrade[numunits]->Removed) {
-						MapUnmarkUnitSight(sightupgrade[numunits]);
-						sightupgrade[numunits]->CurrentSightRange =
-							UnitTypes[z]->Stats[pn].SightRange;
-						MapMarkUnitSight(sightupgrade[numunits]);
+				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
+				for (numunits--; numunits >= 0; --numunits) {
+					unit = unitupgrade[numunits];
+					if (unit->Player->Player == pn && !unit->Removed) {
+						MapUnmarkUnitSight(unit);
+						unit->CurrentSightRange = UnitTypes[z]->Stats[pn].SightRange;
+						MapMarkUnitSight(unit);
 					}
-					--numunits;
 				}
 			}
 			UnitTypes[z]->Stats[pn].BasicDamage += um->Modifier.BasicDamage;
@@ -1253,6 +1091,51 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			// upgrade costs :)
 			for (j = 0; j < MaxCosts; ++j) {
 				UnitTypes[z]->Stats[pn].Costs[j] += um->Modifier.Costs[j];
+			}
+
+			varModified = 0;
+			for (j = 0; j < UnitTypeVar.NumberVariable; j++) {
+				varModified |= um->Modifier.Variables[j].Value
+					| um->Modifier.Variables[j].Max
+					| um->Modifier.Variables[j].Increase;
+				UnitTypes[z]->Stats[pn].Variables[j].Value += um->Modifier.Variables[j].Value;
+				if (UnitTypes[z]->Stats[pn].Variables[j].Value < 0) {
+					UnitTypes[z]->Stats[pn].Variables[j].Value = 0;
+				}
+				UnitTypes[z]->Stats[pn].Variables[j].Max += um->Modifier.Variables[j].Max;
+				if (UnitTypes[z]->Stats[pn].Variables[j].Max < 0) {
+					UnitTypes[z]->Stats[pn].Variables[j].Max = 0;
+				}
+				if (UnitTypes[z]->Stats[pn].Variables[j].Value > UnitTypes[z]->Stats[pn].Variables[j].Max) {
+					UnitTypes[z]->Stats[pn].Variables[j].Value = UnitTypes[z]->Stats[pn].Variables[j].Max;
+				}
+				UnitTypes[z]->Stats[pn].Variables[j].Increase += um->Modifier.Variables[j].Increase;
+			}
+
+			// And now modify ingame units
+			if (varModified) {
+				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
+				numunits--; // Change to 0 Start not 1 start
+				for (; numunits >= 0; --numunits) {
+					unit = unitupgrade[numunits];
+					if (unit->Player->Player != player->Player) {
+						continue;
+					}
+					for (j = 0; j < UnitTypeVar.NumberVariable; j++) {
+						unit->Variable[j].Value += um->Modifier.Variables[j].Value;
+						if (unit->Variable[j].Value < 0) {
+							unit->Variable[j].Value = 0;
+						}
+						unit->Variable[j].Max += um->Modifier.Variables[j].Max;
+						if (unit->Variable[j].Max < 0) {
+							unit->Variable[j].Max = 0;
+						}
+						if (unit->Variable[j].Value > unit->Variable[j].Max) {
+							unit->Variable[j].Value = unit->Variable[j].Max;
+						}
+						unit->Variable[j].Increase += um->Modifier.Variables[j].Increase;
+					}
+				}
 			}
 
 			UnitTypes[z]->Stats[pn].Level++;
