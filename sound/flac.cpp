@@ -93,7 +93,7 @@ typedef struct _flac_data_ {
     FLAC__StreamDecoder* Stream;	/// Decoder stream
 } FlacData;
 
-#define FLAC_BUFFER_SIZE  (16 * 1024)            /// Buffer size to fill 
+#define FLAC_BUFFER_SIZE  (24 * 1024)            /// Buffer size to fill 
 
 
 /*----------------------------------------------------------------------------
@@ -304,11 +304,9 @@ local int FlacStreamRead(Sample* sample, void* buf, int len)
         memcpy(sample->Data, data->PointerInBuffer, sample->Length);
         data->PointerInBuffer = sample->Data;
 
-        data->Bytes = FLAC_BUFFER_SIZE - sample->Length;
+        data->Bytes = len - sample->Length;
 
 	while (data->Bytes > 0) {
-	    printf("bytes: %d\n", data->Bytes);
-	    printf("plelengt: %d\n", sample->Length);
 	    FLAC__stream_decoder_process_single(data->Stream);
 	}
 
