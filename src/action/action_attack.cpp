@@ -310,9 +310,9 @@ local void MoveToTarget(Unit* unit)
 		DebugLevel0Fn("Target not reachable\n");
 	    }
 	    if( unit->Orders[0].Goal ) {
-		RefsDebugCheck( !goal->Refs );
-		goal->Refs--;
-		RefsDebugCheck( !goal->Refs );
+		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+		unit->Orders[0].Goal->Refs--;
+		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 	    }
 	    unit->Orders[0]=unit->SavedOrder;
 	    NewResetPath(unit);
