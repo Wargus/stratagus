@@ -220,10 +220,14 @@ typedef struct _menuitem_checkbox_ {
 
 struct _menu_;
 typedef struct _menuitem_ {
-	int MiType;  /// @todo write docu
+	enum { MiTypeText = 1, MiTypeButton, MiTypePulldown, MiTypeListbox,
+		MiTypeVslider, MiTypeHslider, MiTypeDrawfunc, MiTypeInput,
+		MiTypeCheckbox
+	} MiType;
 	int XOfs;
 	int YOfs;
 	unsigned Flags;
+	unsigned char *Id;
 	int Font;
 	unsigned int LuaHandle;
 	struct _menu_* Menu;  /// backpointer for speedups
@@ -240,16 +244,6 @@ typedef struct _menuitem_ {
 		// ... add here ...
 	} D;
 } Menuitem;
-
-#define MI_TYPE_TEXT     1 /// @todo write docu
-#define MI_TYPE_BUTTON   2
-#define MI_TYPE_PULLDOWN 3
-#define MI_TYPE_LISTBOX  4
-#define MI_TYPE_VSLIDER  5
-#define MI_TYPE_DRAWFUNC 6
-#define MI_TYPE_INPUT    7
-#define MI_TYPE_CHECKBOX 8
-#define MI_TYPE_HSLIDER  9
 
 	/// for MI_TYPE_TEXT
 #define MI_TFLAGS_CENTERED 1

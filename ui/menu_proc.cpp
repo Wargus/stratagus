@@ -1110,44 +1110,44 @@ void DrawMenu(Menu* menu)
 	mip = NULL;
 	for (i = 0; i < n; ++i) {
 		switch (mi->MiType) {
-			case MI_TYPE_TEXT:
+			case MiTypeText:
 				if (!mi->D.Text.text) {
 					break;
 				}
 				DrawMenuText(&mi->D.Text, menu->X + mi->XOfs, menu->Y + mi->YOfs,
 					mi->Font, mi->Flags);
 				break;
-			case MI_TYPE_BUTTON:
+			case MiTypeButton:
 				UpdateMenuItemButton(mi);
 				DrawMenuButton(mi->D.Button.Style, mi->Flags,
 					menu->X + mi->XOfs, menu->Y + mi->YOfs,
 					mi->D.Button.Text);
 				break;
-			case MI_TYPE_PULLDOWN:
+			case MiTypePulldown:
 				if (mi->Flags & MenuButtonClicked) {
 					mip = mi; // Delay, due to possible overlaying!
 				} else {
 					DrawPulldown(mi, menu->X, menu->Y);
 				}
 				break;
-			case MI_TYPE_LISTBOX:
+			case MiTypeListbox:
 				DrawListbox(mi, menu->X, menu->Y);
 				break;
-			case MI_TYPE_VSLIDER:
+			case MiTypeVslider:
 				DrawVSlider(mi, menu->X, menu->Y);
 				break;
-			case MI_TYPE_HSLIDER:
+			case MiTypeHslider:
 				DrawHSlider(mi, menu->X, menu->Y);
 				break;
-			case MI_TYPE_DRAWFUNC:
+			case MiTypeDrawfunc:
 				if (mi->D.DrawFunc.draw) {
 					(*mi->D.DrawFunc.draw)(mi);
 				}
 				break;
-			case MI_TYPE_INPUT:
+			case MiTypeInput:
 				DrawInput(mi, menu->X, menu->Y);
 				break;
-			case MI_TYPE_CHECKBOX:
+			case MiTypeCheckbox:
 				DrawCheckbox(mi->D.Checkbox.Style, mi->Flags, mi->D.Checkbox.State,
 					menu->X + mi->XOfs, menu->Y + mi->YOfs,
 					mi->D.Checkbox.Text);
@@ -1283,7 +1283,7 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 	}
 
 	menu = CurrentMenu;
-	if (MenuButtonCurSel != -1 && menu->Items[MenuButtonCurSel].MiType == MI_TYPE_INPUT) {
+	if (MenuButtonCurSel != -1 && menu->Items[MenuButtonCurSel].MiType == MiTypeInput) {
 		mi = menu->Items + MenuButtonCurSel;
 		if (!(mi->Flags & MenuButtonDisabled)) {
 inkey:
@@ -1341,7 +1341,7 @@ normkey:
 		i = menu->NumItems;
 		while (i--) {
 			switch (mi->MiType) {
-				case MI_TYPE_BUTTON:
+				case MiTypeButton:
 					if (key == mi->D.Button.HotKey) {
 						if (!(mi->Flags & MenuButtonDisabled)) {
 							if (mi->D.Button.Handler) {
@@ -1363,29 +1363,29 @@ normkey:
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
 				switch (mi->MiType) {
-					case MI_TYPE_BUTTON:
+					case MiTypeButton:
 						if (mi->D.Button.Handler) {
 							(*mi->D.Button.Handler)();
 						} else if (mi->LuaHandle) {
 							CallHandler(mi->LuaHandle, 0);
 						}
 						return;
-					case MI_TYPE_LISTBOX:
+					case MiTypeListbox:
 						if (mi->D.Listbox.handler) {
 							(*mi->D.Listbox.handler)();
 						}
 						return;
-					case MI_TYPE_VSLIDER:
+					case MiTypeVslider:
 						if (mi->D.VSlider.handler) {
 							(*mi->D.VSlider.handler)();
 						}
 						return;
-					case MI_TYPE_HSLIDER:
+					case MiTypeHslider:
 						if (mi->D.HSlider.handler) {
 							(*mi->D.HSlider.handler)();
 						}
 						return;
-					case MI_TYPE_CHECKBOX:
+					case MiTypeCheckbox:
 						if (mi->D.Checkbox.Action) {
 							(*mi->D.Checkbox.Action)(mi);
 						} else if (mi->LuaHandle) {
@@ -1402,7 +1402,7 @@ normkey:
 				mi = menu->Items + MenuButtonCurSel;
 				if (!(mi->Flags & MenuButtonClicked)) {
 					switch (mi->MiType) {
-						case MI_TYPE_PULLDOWN:
+						case MiTypePulldown:
 							if (key == KeyCodeDown) {
 								if (mi->D.Pulldown.curopt + 1 < mi->D.Pulldown.noptions) {
 									mi->D.Pulldown.curopt++;
@@ -1422,7 +1422,7 @@ normkey:
 								CallHandler(mi->LuaHandle, mi->D.Pulldown.curopt);
 							}
 							break;
-						case MI_TYPE_LISTBOX:
+						case MiTypeListbox:
 							if (key == KeyCodeDown) {
 								if (mi->D.Listbox.curopt < mi->D.Listbox.noptions - 1) {
 									mi->D.Listbox.curopt++;
@@ -1451,11 +1451,11 @@ normkey:
 								CallHandler(mi[1].LuaHandle, mi[1].D.VSlider.percent);
 							}
 							break;
-						case MI_TYPE_VSLIDER:
+						case MiTypeVslider:
 							if (key == KeyCodeDown) {
 								mi->D.VSlider.cflags |= MI_CFLAGS_DOWN;
 								// Update listbox
-								if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+								if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
 									if (mi[-1].D.Listbox.startline + mi[-1].D.Listbox.nlines < mi[-1].D.Listbox.noptions) {
 										mi[-1].D.Listbox.startline++;
 									}
@@ -1463,7 +1463,7 @@ normkey:
 							} else {
 								mi->D.VSlider.cflags |= MI_CFLAGS_UP;
 								// Update listbox
-								if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+								if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
 									if (mi[-1].D.Listbox.startline > 0) {
 										mi[-1].D.Listbox.startline--;
 									}
@@ -1490,7 +1490,7 @@ normkey:
 				mi = menu->Items + MenuButtonCurSel;
 				if (!(mi->Flags & MenuButtonClicked)) {
 					switch (mi->MiType) {
-						case MI_TYPE_HSLIDER:
+						case MiTypeHslider:
 							if (key == KeyCodeLeft) {
 								mi->D.HSlider.percent -= 10;
 								if (mi->D.HSlider.percent < 0) {
@@ -1523,17 +1523,17 @@ normkey:
 				for (i = 0; i < n; ++i) {
 					mi = menu->Items + ((MenuButtonCurSel + i + 1) % n);
 					switch (mi->MiType) {
-						case MI_TYPE_PULLDOWN:
+						case MiTypePulldown:
 							if ((mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
 								continue;
 							}
 							/* FALL THROUGH */
-						case MI_TYPE_BUTTON:
-						case MI_TYPE_LISTBOX:
-						case MI_TYPE_VSLIDER:
-						case MI_TYPE_HSLIDER:
-						case MI_TYPE_INPUT:
-						case MI_TYPE_CHECKBOX:
+						case MiTypeButton:
+						case MiTypeListbox:
+						case MiTypeVslider:
+						case MiTypeHslider:
+						case MiTypeInput:
+						case MiTypeCheckbox:
 							if (mi->Flags & MenuButtonDisabled) {
 								break;
 							}
@@ -1557,7 +1557,7 @@ normkey:
 			i = menu->NumItems;
 			while (i--) {
 				switch (mi->MiType) {
-					case MI_TYPE_INPUT:
+					case MiTypeInput:
 						if (!(mi->Flags & MenuButtonDisabled)) {
 							if (MenuButtonCurSel != -1) {
 								menu->Items[MenuButtonCurSel].Flags &=
@@ -1598,7 +1598,7 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 	if (key == KeyCodeUp || key == KeyCodeDown) {
 		if (MenuButtonCurSel != -1) {
 			mi = menu->Items + MenuButtonCurSel;
-			if (mi->MiType == MI_TYPE_VSLIDER) {
+			if (mi->MiType == MiTypeVslider) {
 				if (key == KeyCodeDown) {
 					mi->D.VSlider.cflags &= ~MI_CFLAGS_DOWN;
 				} else {
@@ -1629,9 +1629,9 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 	menu = CurrentMenu;
 	mi = menu->Items + MenuButtonCurSel;
 	if (MenuButtonCurSel != -1) {
-		if (mi->MiType == MI_TYPE_INPUT) {
+		if (mi->MiType == MiTypeInput) {
 			MenuHandleKeyDown(key, keychar);
-		} else if (mi->MiType == MI_TYPE_VSLIDER || mi->MiType == MI_TYPE_LISTBOX) {
+		} else if (mi->MiType == MiTypeVslider || mi->MiType == MiTypeListbox) {
 			if (key == KeyCodeDown || key == KeyCodeUp) {
 				MenuHandleKeyDown(key, keychar);
 			}
@@ -1677,7 +1677,7 @@ static void MenuHandleMouseMove(int x, int y)
 	mi = menu->Items;
 	for (i = 0; i < n; ++i) {
 		if (!(mi->Flags & MenuButtonDisabled)) {
-			if (mi->MiType == MI_TYPE_PULLDOWN && (mi->Flags & MenuButtonClicked)) {
+			if (mi->MiType == MiTypePulldown && (mi->Flags & MenuButtonClicked)) {
 				xs = menu->X + mi->XOfs;
 				ys = menu->Y + mi->YOfs;
 				if (mi->D.Pulldown.button == MBUTTON_SC_PULLDOWN) {
@@ -1744,7 +1744,7 @@ static void MenuHandleMouseMove(int x, int y)
 			mi = menu->Items + i;
 			if (!(mi->Flags & MenuButtonDisabled)) {
 				switch (mi->MiType) {
-					case MI_TYPE_TEXT:
+					case MiTypeText:
 						if (!mi->D.Text.text || !mi->D.Text.action)
 							continue;
 						xs = menu->X + mi->XOfs;
@@ -1762,7 +1762,7 @@ static void MenuHandleMouseMove(int x, int y)
 						}
 						free(tmp);
 						break;
-					case MI_TYPE_CHECKBOX:
+					case MiTypeCheckbox:
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
 						if ((!mi->D.Checkbox.Text || x < xs - 1 || x > xs +
@@ -1778,7 +1778,7 @@ static void MenuHandleMouseMove(int x, int y)
 							continue;
 						}
 						break;
-					case MI_TYPE_BUTTON:
+					case MiTypeButton:
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.Button.Style->Width || y < ys ||
@@ -1791,7 +1791,7 @@ static void MenuHandleMouseMove(int x, int y)
 							continue;
 						}
 						break;
-					case MI_TYPE_INPUT:
+					case MiTypeInput:
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.Input.xsize
@@ -1804,7 +1804,7 @@ static void MenuHandleMouseMove(int x, int y)
 							continue;
 						}
 						break;
-					case MI_TYPE_PULLDOWN:
+					case MiTypePulldown:
 						if ((mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
 							continue;
 						}
@@ -1821,7 +1821,7 @@ static void MenuHandleMouseMove(int x, int y)
 							continue;
 						}
 						break;
-					case MI_TYPE_LISTBOX:
+					case MiTypeListbox:
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.Listbox.xsize || y < ys ||
@@ -1849,7 +1849,7 @@ static void MenuHandleMouseMove(int x, int y)
 							}
 						}
 						break;
-					case MI_TYPE_VSLIDER:
+					case MiTypeVslider:
 					{
 						int arrowsize;
 						int curper;
@@ -1908,7 +1908,7 @@ static void MenuHandleMouseMove(int x, int y)
 						}
 
 						// Update listbox
-						if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+						if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
 							if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
 								if (mi[-1].D.Listbox.noptions > mi[-1].D.Listbox.nlines) {
 									mi[-1].D.Listbox.startline = (curper *
@@ -1932,7 +1932,7 @@ static void MenuHandleMouseMove(int x, int y)
 						}
 						break;
 					}
-					case MI_TYPE_HSLIDER:
+					case MiTypeHslider:
 					{
 						int arrowsize;
 
@@ -2001,24 +2001,24 @@ static void MenuHandleMouseMove(int x, int y)
 						// break;
 				}
 				switch (mi->MiType) {
-					case MI_TYPE_CHECKBOX:
+					case MiTypeCheckbox:
 						if ((mi->D.Checkbox.State & (MI_CSTATE_PASSIVE | MI_CSTATE_INVISIBLE))) {
 							break;
 						}
 						/* FALL THROUGH */
-					case MI_TYPE_BUTTON:
-					case MI_TYPE_PULLDOWN:
-					case MI_TYPE_LISTBOX:
-					case MI_TYPE_VSLIDER:
-					case MI_TYPE_HSLIDER:
-					case MI_TYPE_TEXT:
+					case MiTypeButton:
+					case MiTypePulldown:
+					case MiTypeListbox:
+					case MiTypeVslider:
+					case MiTypeHslider:
+					case MiTypeText:
 						if (!(mi->Flags & MenuButtonActive)) {
 							mi->Flags |= MenuButtonActive;
 						}
 						MenuButtonUnderCursor = i;
 					default:
 						break;
-					case MI_TYPE_INPUT:
+					case MiTypeInput:
 						if (!(mi->Flags & MenuButtonActive)) {
 							mi->Flags |= MenuButtonActive;
 						}
@@ -2078,14 +2078,14 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			mi = menu->Items + MenuButtonUnderCursor;
 			if (!(mi->Flags & MenuButtonClicked)) {
 				switch (mi->MiType) {
-					case MI_TYPE_CHECKBOX:
-					case MI_TYPE_BUTTON:
-					case MI_TYPE_PULLDOWN:
-					case MI_TYPE_LISTBOX:
-					case MI_TYPE_VSLIDER:
-					case MI_TYPE_HSLIDER:
-					case MI_TYPE_INPUT:
-					case MI_TYPE_TEXT:
+					case MiTypeCheckbox:
+					case MiTypeButton:
+					case MiTypePulldown:
+					case MiTypeListbox:
+					case MiTypeVslider:
+					case MiTypeHslider:
+					case MiTypeInput:
+					case MiTypeText:
 						if (MenuButtonCurSel != -1) {
 							menu->Items[MenuButtonCurSel].Flags &= ~MenuButtonSelected;
 						}
@@ -2097,11 +2097,11 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			}
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 			switch (mi->MiType) {
-				case MI_TYPE_VSLIDER:
+				case MiTypeVslider:
 					mi->D.VSlider.cflags = mi->D.VSlider.cursel;
 
 					// Update listbox
-					if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+					if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
 						if (mi->D.VSlider.cflags & MI_CFLAGS_DOWN) {
 							if (mi[-1].D.Listbox.startline + mi[-1].D.Listbox.nlines < mi[-1].D.Listbox.noptions) {
 								mi[-1].D.Listbox.startline++;
@@ -2119,7 +2119,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
-				case MI_TYPE_HSLIDER:
+				case MiTypeHslider:
 					mi->D.HSlider.cflags = mi->D.HSlider.cursel;
 					if (mi->D.HSlider.cflags & MI_CFLAGS_RIGHT) {
 						mi->D.HSlider.percent += 10;
@@ -2136,13 +2136,13 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 					}
 					break;
-				case MI_TYPE_PULLDOWN:
+				case MiTypePulldown:
 					if (mi->D.Pulldown.curopt >= 0 &&
 							mi->D.Pulldown.curopt < mi->D.Pulldown.noptions) {
 						mi->D.Pulldown.cursel = mi->D.Pulldown.curopt;
 					}
 					break;
-				case MI_TYPE_LISTBOX:
+				case MiTypeListbox:
 					if (mi->D.Listbox.cursel != mi->D.Listbox.curopt) {
 						mi->D.Listbox.dohandler = 0;
 						mi->D.Listbox.curopt = mi->D.Listbox.cursel;
@@ -2166,7 +2166,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			mi = menu->Items + MenuButtonUnderCursor;
 			if (!(mi->Flags & MenuButtonClicked)) {
 				switch (mi->MiType) {
-					case MI_TYPE_INPUT:
+					case MiTypeInput:
 						PasteFromClipboard(mi);
 						if (mi->D.Input.action) {
 							(*mi->D.Input.action)(mi, 'x');
@@ -2186,7 +2186,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
 			switch (mi->MiType) {
-				case MI_TYPE_LISTBOX:
+				case MiTypeListbox:
 					if (mi->D.Listbox.startline > 0) {
 						mi->D.Listbox.startline--;
 					}
@@ -2201,11 +2201,11 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
-				case MI_TYPE_VSLIDER:
+				case MiTypeVslider:
 					mi->D.VSlider.cflags |= MI_CFLAGS_UP;
 
 					// Update listbox
-					if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+					if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
 						if (mi[-1].D.Listbox.startline > 0) {
 							mi[-1].D.Listbox.startline--;
 						}
@@ -2217,7 +2217,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					mi->D.VSlider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
-				case MI_TYPE_HSLIDER:
+				case MiTypeHslider:
 					mi->D.HSlider.percent -= 10;
 					if (mi->D.HSlider.percent < 0) {
 						mi->D.HSlider.percent = 0;
@@ -2228,7 +2228,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 					}
 					break;
-				case MI_TYPE_PULLDOWN:
+				case MiTypePulldown:
 					if (mi->D.Pulldown.curopt) {
 						--mi->D.Pulldown.curopt;
 						if (mi->D.Pulldown.action) {
@@ -2249,7 +2249,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
 			switch (mi->MiType) {
-				case MI_TYPE_LISTBOX:
+				case MiTypeListbox:
 					if (mi->D.Listbox.startline + mi->D.Listbox.nlines < mi->D.Listbox.noptions) {
 						mi->D.Listbox.startline++;
 					}
@@ -2259,11 +2259,11 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
-				case MI_TYPE_VSLIDER:
+				case MiTypeVslider:
 					mi->D.VSlider.cflags |= MI_CFLAGS_DOWN;
 
 					// Update listbox
-					if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+					if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
 						if (mi[-1].D.Listbox.startline + mi[-1].D.Listbox.nlines < mi[-1].D.Listbox.noptions) {
 							mi[-1].D.Listbox.startline++;
 						}
@@ -2275,7 +2275,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					mi->D.VSlider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
-				case MI_TYPE_HSLIDER:
+				case MiTypeHslider:
 					mi->D.HSlider.percent += 10;
 					if (mi->D.HSlider.percent > 100) {
 						mi->D.HSlider.percent = 100;
@@ -2286,7 +2286,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 					}
 					break;
-				case MI_TYPE_PULLDOWN:
+				case MiTypePulldown:
 					if (mi->D.Pulldown.curopt < mi->D.Pulldown.noptions - 1) {
 						++mi->D.Pulldown.curopt;
 						if (mi->D.Pulldown.action) {
@@ -2328,7 +2328,7 @@ static void MenuHandleButtonUp(unsigned b)
 		for (i = 0; i < n; ++i) {
 			mi = menu->Items + i;
 			switch (mi->MiType) {
-				case MI_TYPE_CHECKBOX:
+				case MiTypeCheckbox:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
@@ -2347,7 +2347,7 @@ static void MenuHandleButtonUp(unsigned b)
 						}
 					}
 					break;
-				case MI_TYPE_TEXT:
+				case MiTypeText:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
@@ -2359,7 +2359,7 @@ static void MenuHandleButtonUp(unsigned b)
 						}
 					}
 					break;
-				case MI_TYPE_BUTTON:
+				case MiTypeButton:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
@@ -2373,7 +2373,7 @@ static void MenuHandleButtonUp(unsigned b)
 						}
 					}
 					break;
-				case MI_TYPE_PULLDOWN:
+				case MiTypePulldown:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
@@ -2393,7 +2393,7 @@ static void MenuHandleButtonUp(unsigned b)
 						mi->D.Pulldown.cursel = 0;
 					}
 					break;
-				case MI_TYPE_LISTBOX:
+				case MiTypeListbox:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
@@ -2405,21 +2405,21 @@ static void MenuHandleButtonUp(unsigned b)
 						}
 					}
 					break;
-				case MI_TYPE_INPUT:
+				case MiTypeInput:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
 						// MAYBE ADD HERE
 					}
 					break;
-				case MI_TYPE_VSLIDER:
+				case MiTypeVslider:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
 						mi->D.VSlider.cflags = 0;
 					}
 					break;
-				case MI_TYPE_HSLIDER:
+				case MiTypeHslider:
 					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->Flags &= ~MenuButtonClicked;
@@ -2553,40 +2553,43 @@ void ProcessMenu(const char* menu_id, int loop)
 	for (i = 0; i < menu->NumItems; ++i) {
 		mi = menu->Items + i;
 		switch (mi->MiType) {
-			case MI_TYPE_BUTTON:
-			case MI_TYPE_PULLDOWN:
-			case MI_TYPE_LISTBOX:
-			case MI_TYPE_VSLIDER:
-			case MI_TYPE_HSLIDER:
-			case MI_TYPE_INPUT:
+			case MiTypeButton:
+			case MiTypePulldown:
+			case MiTypeListbox:
+			case MiTypeVslider:
+			case MiTypeHslider:
+			case MiTypeInput:
 				mi->Flags &= ~(MenuButtonClicked | MenuButtonActive | MenuButtonSelected);
 				if (i == menu->DefSel) {
 					mi->Flags |= MenuButtonSelected;
 					MenuButtonCurSel = i;
 				}
 				break;
+			default:
+				break;
+			
 		}
 		switch (mi->MiType) {
-			case MI_TYPE_PULLDOWN:
+			case MiTypePulldown:
 				mi->D.Pulldown.cursel = 0;
 				if (mi->D.Pulldown.defopt != -1) {
 					mi->D.Pulldown.curopt = mi->D.Pulldown.defopt;
 				}
 				break;
-			case MI_TYPE_LISTBOX:
+			case MiTypeListbox:
 				mi->D.Listbox.cursel = -1;
 				mi->D.Listbox.startline = 0;
 				if (mi->D.Listbox.defopt != -1) {
 					mi->D.Listbox.curopt = mi->D.Listbox.defopt;
 				}
 				break;
-			case MI_TYPE_VSLIDER:
+			case MiTypeVslider:
 				mi->D.VSlider.cflags = 0;
 				if (mi->D.VSlider.defper != -1) {
 					mi->D.VSlider.percent = mi->D.VSlider.defper;
 				}
 				break;
-			case MI_TYPE_HSLIDER:
+			case MiTypeHslider:
 				mi->D.HSlider.cflags = 0;
 				if (mi->D.HSlider.defper != -1) {
 					mi->D.HSlider.percent = mi->D.HSlider.defper;
