@@ -85,7 +85,7 @@ local SCM CclDefineUnitType(SCM list)
     IfDebug( NoWarningUnitType=i; );
     if( type ) {
 	DebugLevel0Fn("Redefining unit-type `%s'\n",str);
-	CclFree(str);
+	free(str);
     } else {
 	type=NewUnitTypeSlot(str);
     }
@@ -95,7 +95,7 @@ local SCM CclDefineUnitType(SCM list)
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
     DebugLevel3("\tName: %s\n",str);
-    CclFree(type->Name);
+    free(type->Name);
     type->Name=str;
 
     //	Graphic
@@ -105,21 +105,21 @@ local SCM CclDefineUnitType(SCM list)
     if( gh_symbol_p(value) || gh_string_p(value) ) {
 	str=gh_scm2newstr(value,NULL);
 	DebugLevel3("\tSame-Sprite: %s\n",str);
-	CclFree(type->SameSprite);
+	free(type->SameSprite);
 	type->SameSprite=str;
-	CclFree(type->File[0]);
+	free(type->File[0]);
 	type->File[0]=NULL;
-	CclFree(type->File[1]);
+	free(type->File[1]);
 	type->File[1]=NULL;
-	CclFree(type->File[2]);
+	free(type->File[2]);
 	type->File[2]=NULL;
-	CclFree(type->File[3]);
+	free(type->File[3]);
 	type->File[3]=NULL;
     } else {
 	if( gh_vector_length(value)!=4 ) {
 	    fprintf(stderr,"Wrong vector length\n");
 	}
-	CclFree(type->SameSprite);
+	free(type->SameSprite);
 	type->SameSprite=NULL;
 
 	temp=gh_vector_ref(value,gh_int2scm(0));
@@ -129,7 +129,7 @@ local SCM CclDefineUnitType(SCM list)
 	    str=gh_scm2newstr(temp,NULL);
 	}
 	DebugLevel3("\tFile-0: %s\n",str);
-	CclFree(type->File[0]);
+	free(type->File[0]);
 	type->File[0]=str;
 
 	temp=gh_vector_ref(value,gh_int2scm(1));
@@ -139,7 +139,7 @@ local SCM CclDefineUnitType(SCM list)
 	    str=gh_scm2newstr(temp,NULL);
 	}
 	DebugLevel3("\tFile-1: %s\n",str);
-	CclFree(type->File[1]);
+	free(type->File[1]);
 	type->File[1]=str;
 
 	temp=gh_vector_ref(value,gh_int2scm(2));
@@ -149,7 +149,7 @@ local SCM CclDefineUnitType(SCM list)
 	    str=gh_scm2newstr(temp,NULL);
 	}
 	DebugLevel3("\tFile-2: %s\n",str);
-	CclFree(type->File[2]);
+	free(type->File[2]);
 	type->File[2]=str;
 
 	temp=gh_vector_ref(value,gh_int2scm(3));
@@ -159,7 +159,7 @@ local SCM CclDefineUnitType(SCM list)
 	    str=gh_scm2newstr(temp,NULL);
 	}
 	DebugLevel3("\tFile-3: %s\n",str);
-	CclFree(type->File[3]);
+	free(type->File[3]);
 	type->File[3]=str;
     }
 
@@ -192,7 +192,7 @@ local SCM CclDefineUnitType(SCM list)
     str=gh_scm2newstr(value,NULL);
     DebugLevel3("\tIcon: %s\n",str);
 
-    CclFree(type->Icon.Name);
+    free(type->Icon.Name);
     type->Icon.Name=str;
 
     // Speed
@@ -409,7 +409,7 @@ local SCM CclDefineUnitType(SCM list)
     str=gh_scm2newstr(value,NULL);
     DebugLevel3("\tMissile: %s\n",str);
 
-    CclFree(type->Missile.Name);
+    free(type->Missile.Name);
     type->Missile.Name=str;
 
     // Corpse
@@ -417,7 +417,7 @@ local SCM CclDefineUnitType(SCM list)
     list=gh_cdr(list);
     temp=gh_car(list);
 
-    CclFree(type->CorpseName);
+    free(type->CorpseName);
     type->CorpseName=NULL;
     type->CorpseType=NULL;
     type->CorpseScript=0;
@@ -582,7 +582,7 @@ local SCM CclDefineUnitType(SCM list)
     } else {
 	str=gh_scm2newstr(temp,NULL);
     }
-    CclFree(type->Sound.Selected.Name);
+    free(type->Sound.Selected.Name);
     type->Sound.Selected.Name=str;
 
     temp=gh_vector_ref(value,gh_int2scm(1));
@@ -591,7 +591,7 @@ local SCM CclDefineUnitType(SCM list)
     } else {
 	str=gh_scm2newstr(temp,NULL);
     }
-    CclFree(type->Sound.Acknowledgement.Name);
+    free(type->Sound.Acknowledgement.Name);
     type->Sound.Acknowledgement.Name=str;
 
     temp=gh_vector_ref(value,gh_int2scm(2));
@@ -600,7 +600,7 @@ local SCM CclDefineUnitType(SCM list)
     } else {
 	str=gh_scm2newstr(temp,NULL);
     }
-    CclFree(type->Sound.Ready.Name);
+    free(type->Sound.Ready.Name);
     type->Sound.Ready.Name=str;
 
     temp=gh_vector_ref(value,gh_int2scm(3));
@@ -609,7 +609,7 @@ local SCM CclDefineUnitType(SCM list)
     } else {
 	str=gh_scm2newstr(temp,NULL);
     }
-    CclFree(type->Sound.Help.Name);
+    free(type->Sound.Help.Name);
     type->Sound.Help.Name=str;
 
     temp=gh_vector_ref(value,gh_int2scm(4));
@@ -618,7 +618,7 @@ local SCM CclDefineUnitType(SCM list)
     } else {
 	str=gh_scm2newstr(temp,NULL);
     }
-    CclFree(type->Sound.Dead.Name);
+    free(type->Sound.Dead.Name);
     type->Sound.Dead.Name=str;
 
     list=gh_cdr(list);
@@ -629,7 +629,7 @@ local SCM CclDefineUnitType(SCM list)
     } else {
 	str=gh_scm2newstr(value,NULL);
     }
-    CclFree(type->Weapon.Attack.Name);
+    free(type->Weapon.Attack.Name);
     type->Weapon.Attack.Name=str;
 
     return SCM_UNSPECIFIED;
@@ -846,7 +846,7 @@ local SCM CclSetUnitTypeName(SCM ptr,SCM name)
     UnitType* type;
 
     type=CclGetUnitType(ptr);
-    CclFree(type->Name);
+    free(type->Name);
     type->Name=gh_scm2newstr(name,NULL);
 
     return name;
@@ -883,13 +883,14 @@ local SCM CclSetUnitTypeProperty(SCM ptr,SCM property)
 
     type=CclGetUnitType(ptr);
 
-    if( !type->Property ) {		// first time use, protect for gc.
-	gc_protect(type->Property);
+    if( type->Property ) {
+	// FIXME: old value must be unprotected!!
     }
     if( !property ) {
 	DebugLevel0Fn("oops, my fault\n");
     }
     type->Property=property;
+    CclGcProtect(type->Property);
 
     return property;
 }

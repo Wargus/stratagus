@@ -10,12 +10,11 @@
 //
 /**@name upgrade.c	-	The upgrade/allow functions. */
 //
-//	(c) Copyright 1999-2001 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2002 by Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -187,8 +186,9 @@ global void CleanUpgrades(void)
     //	Free the upgrades.
     //
     for( i=0; i<UpgradesCount; ++i ) {
+	hash_del(UpgradeHash,Upgrades[i].Ident);
 	// FIXME: hash_del not supported
-	*(Upgrade**)hash_add(UpgradeHash,Upgrades[i].Ident)=NULL;
+	//*(Upgrade**)hash_add(UpgradeHash,Upgrades[i].Ident)=NULL;
 	free(Upgrades[i].Ident);
 	free(Upgrades[i].Icon.Name);
     }

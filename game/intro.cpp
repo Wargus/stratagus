@@ -312,12 +312,14 @@ global void ShowIntro(void)
     }
 
     free(text);
+    VideoFree(background);
 
     VideoLockScreen();
     VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
+
 
     CallbackMusicOn();
     // FIXME: should this be GameMusic?

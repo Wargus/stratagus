@@ -160,9 +160,6 @@ global void PlayMusic(const char* name)
     settings.mLoopCount=0;		// Disable looping
     ModPlug_SetSettings(&settings);
 
-    size=0;
-    buffer=malloc(8192);
-
     if( PlayingMusic ) {
 	if( ModFile ) {
 	    ModPlug_Unload(ModFile);
@@ -171,6 +168,7 @@ global void PlayMusic(const char* name)
 	PlayingMusic=0;
     }
 
+    buffer=malloc(8192);
     name=LibraryFileName(name,buffer);
 
     DebugLevel2Fn("Loading `%s'\n",name);
@@ -179,6 +177,8 @@ global void PlayMusic(const char* name)
 	printf("Can't open file `%s'\n",name);
 	return;
     }
+
+    size=0;
     while( (i=CLread(f,buffer+size,8192))==8192 ) {
 	size+=8192;
 	buffer=realloc(buffer,size+8192);
@@ -989,39 +989,46 @@ local Sample* LoadSample(const char* name)
 }
 
 /**
-**	Register a sound (can be a simple sound or a group)
+**	Ask the sound server to register a sound (and currently to load it)
+**	and to return an unique identifier for it. The unique identifier is
+**	memory pointer of the server.
+**
+**	@param files	An array of wav files.
+**	@param number	Number of files belonging together.
+**
+**	@return		the sound unique identifier
+**
+**	@todo	FIXME: Must handle the errors better.
 */
-global SoundId RegisterSound(char* file[],unsigned char number) {
-    //FIXME: handle errors
+global SoundId RegisterSound(char *files[], unsigned char number)
+{
     int i;
     ServerSoundId id;
 
-    id=(ServerSoundId)malloc(sizeof(*id));
-    if (number>1) {
-	// load a sound group
-	id->Sound.OneGroup=(Sample **)malloc(sizeof(Sample*)*number);
-	for(i=0;i<number;i++) {
-	    DebugLevel3("Registering `%s'\n",file[i]);
-	    id->Sound.OneGroup[i]=LoadSample(file[i]);
-	    if(id->Sound.OneGroup[i] == NULL) {
+    id = malloc(sizeof(*id));
+    if (number > 1) {			// load a sound group
+	id->Sound.OneGroup = malloc(sizeof(Sample *) * number);
+	for (i = 0; i < number; i++) {
+	    DebugLevel3("Registering `%s'\n", files[i]);
+	    id->Sound.OneGroup[i] = LoadSample(files[i]);
+	    if ( !id->Sound.OneGroup[i] ) {
 		free(id->Sound.OneGroup);
 		free(id);
 		return NO_SOUND;
 	    }
 	}
-	id->Number=number;
-    } else {
-	// load an unique sound
-	DebugLevel3("Registering `%s'\n",file[0]);
-	id->Sound.OneSound=LoadSample(file[0]);
-	if (id->Sound.OneSound == NULL) {
+	id->Number = number;
+    } else {				// load an unique sound
+	DebugLevel3("Registering `%s'\n", files[0]);
+	id->Sound.OneSound = LoadSample(files[0]);
+	if ( !id->Sound.OneSound ) {
 	    free(id);
 	    return NO_SOUND;
 	}
-	id->Number=ONE_SOUND;
+	id->Number = ONE_SOUND;
     }
-    id->Range=MAX_SOUND_RANGE;
-    return (SoundId)id;
+    id->Range = MAX_SOUND_RANGE;
+    return (SoundId) id;
 }
 
 /*

@@ -10,12 +10,11 @@
 //
 /**@name graphic.c	-	The general graphic functions. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -424,13 +423,17 @@ local long GetPaletteChecksum(const Palette* palette)
 */
 global Graphic* LoadGraphic(const char* name)
 {
-    PaletteLink * current_link = PaletteList, * prev_link = NULL;
+    PaletteLink * current_link;
+    PaletteLink * prev_link;
     VMemType * pixels;
     Graphic* graphic;
     long checksum;
     char buf[1024];
 
-    // FIXME: I want also support JPG file format!
+    // FIXME: I  want also support JPG file format!
+
+    current_link = PaletteList;
+    prev_link = NULL;
 
     if( !(graphic=LoadGraphicPNG(LibraryFileName(name,buf))) ) {
 	fprintf(stderr,"Can't load the graphic `%s'\n",name);
@@ -439,12 +442,13 @@ global Graphic* LoadGraphic(const char* name)
 
     checksum = GetPaletteChecksum(graphic->Palette);
     while(current_link != NULL){
-      if(current_link->Checksum == checksum)
+      if(current_link->Checksum == checksum) {
 	break;
+      }
       prev_link = current_link;
       current_link = current_link->Next;
     }
-    //Palette Not found
+    // Palette Not found
     if(current_link == NULL){
       pixels = VideoCreateNewPalette(graphic->Palette);
 
@@ -464,6 +468,7 @@ global Graphic* LoadGraphic(const char* name)
       pixels = current_link->Palette;
     }
     graphic->Pixels = pixels;
+
     free(graphic->Palette);
     graphic->Palette=NULL;		// JOHNS: why should we free this?
 

@@ -10,12 +10,11 @@
 //
 /**@name construct.c	-	The constructions. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -300,7 +299,7 @@ local SCM CclDefineConstruction(SCM list)
     }
     if( !ConstructionWcNames[i] ) {
 	DebugLevel0Fn("Construction not found.\n");
-	CclFree(str);
+	free(str);
 	return SCM_UNSPECIFIED;
     }
     construction=&Constructions[i];
@@ -336,7 +335,7 @@ local SCM CclDefineConstruction(SCM list)
 		}
 		sublist=gh_cdr(sublist);
 		free(str);
-		CclFree(construction->File[i]);
+		free(construction->File[i]);
 		construction->File[i]=gh_scm2newstr(gh_car(sublist),NULL);
 		sublist=gh_cdr(sublist);
 	    }

@@ -1174,7 +1174,6 @@ global void InitVideo(void)
     InitGraphic();
     InitLineDraw();
     InitSprite();
-    InitCursors();
 
     DebugLevel3Fn("%d %d\n",MapWidth,MapHeight);
 }

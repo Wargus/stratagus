@@ -328,7 +328,7 @@ global void MapMarkSight(int tx,int ty,int range)
 	for( i=x; i<=x+width; ++i ) {
 	    // FIXME: Can use quadrat table!
 	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<=range*range ) {
-		// FIXME: can combine more bits 
+		// FIXME: can combine more bits
 		if( !IsMapFieldVisible(i,y) ) {
 		    TheMap.Fields[i+y*TheMap.Width].Flags |= MapFieldExplored;
 		    TheMap.Visible[0][(i+y*TheMap.Width)/32]
@@ -1781,69 +1781,71 @@ global void InitMapFogOfWar(void)
 		if( !FogOfWarAlphaTable ) {
 		    FogOfWarAlphaTable=malloc(n*sizeof(VMemType8));
 		}
-              if ( lookup25trans8 ) // if enabled, make use of it in 8bpp ;)
-              {
-                unsigned int trans_color, j;
-                trans_color=Pixels8[ColorBlack];
-                trans_color<<=8;
+		if ( lookup25trans8 ) { // if enabled, make use of it in 8bpp ;)
+		    unsigned int trans_color, j;
 
-              //FIXME: determine which lookup table to use based on
-              //    FogOfWarSaturation,FogOfWarContrast and FogOfWarBrightness
-		for( j=0; j<n; ++j )
-                  ((VMemType8*)FogOfWarAlphaTable)[j] =
-                   lookup50trans8[ trans_color | j ];
-              } else {
-		for( i=0; i<n; ++i ) {
-		    int j;
-		    int l;
-		    int d;
+		    trans_color=Pixels8[ColorBlack];
+		    trans_color<<=8;
 
-		    r=GlobalPalette[i].r;
-		    g=GlobalPalette[i].g;
-		    b=GlobalPalette[i].b;
-		    DebugLevel3("%d,%d,%d\n",r,g,b);
-		    v=r+g+b;
-
-		    r= ((((r*3-v)*FogOfWarSaturation + v*100)
-			*FogOfWarContrast)
-			+FogOfWarBrightness*25600*3)/30000;
-		    g= ((((g*3-v)*FogOfWarSaturation + v*100)
-			*FogOfWarContrast)
-			+FogOfWarBrightness*25600*3)/30000;
-		    b= ((((b*3-v)*FogOfWarSaturation + v*100)
-			*FogOfWarContrast)
-			+FogOfWarBrightness*25600*3)/30000;
-
-		    // Boundings
-		    r= r<0 ? 0 : r>255 ? 255 : r;
-		    g= g<0 ? 0 : g>255 ? 255 : g;
-		    b= b<0 ? 0 : b>255 ? 255 : b;
-
-		    //
-		    //	Find the best matching color
-		    //
-		    l=i;
-		    d=256*3+256;
-		    for( j=0; j<256; ++j ) {
-			// simple color distance
-			v=(abs(GlobalPalette[j].r-r)
-			    +abs(GlobalPalette[j].g-g)
-			    +abs(GlobalPalette[j].b-b))*3
-			    // light
-			    +abs(GlobalPalette[j].r
-				+GlobalPalette[j].g
-				+GlobalPalette[j].b-(r+g+b))*1;
-			if( v<d ) {
-			    d=v;
-			    l=j;
-			}
+		    //FIXME: determine which lookup table to use based on
+		    //FIXME: FogOfWarSaturation,FogOfWarContrast and
+		    //FIXME: FogOfWarBrightness
+		    for( j=0; j<n; ++j ) {
+			((VMemType8*)FogOfWarAlphaTable)[j] =
+			    lookup50trans8[ trans_color | j ];
 		    }
-		    DebugLevel3("%d,%d,%d -> %d,%d,%d\n",r,g,b
-			    ,GlobalPalette[l].r,GlobalPalette[l].g
-			    ,GlobalPalette[l].b);
-		    ((VMemType8*)FogOfWarAlphaTable)[i]=l;
+		} else {
+		    for( i=0; i<n; ++i ) {
+			int j;
+			int l;
+			int d;
+
+			r=GlobalPalette[i].r;
+			g=GlobalPalette[i].g;
+			b=GlobalPalette[i].b;
+			DebugLevel3("%d,%d,%d\n",r,g,b);
+			v=r+g+b;
+
+			r= ((((r*3-v)*FogOfWarSaturation + v*100)
+			    *FogOfWarContrast)
+			    +FogOfWarBrightness*25600*3)/30000;
+			g= ((((g*3-v)*FogOfWarSaturation + v*100)
+			    *FogOfWarContrast)
+			    +FogOfWarBrightness*25600*3)/30000;
+			b= ((((b*3-v)*FogOfWarSaturation + v*100)
+			    *FogOfWarContrast)
+			    +FogOfWarBrightness*25600*3)/30000;
+
+			// Boundings
+			r= r<0 ? 0 : r>255 ? 255 : r;
+			g= g<0 ? 0 : g>255 ? 255 : g;
+			b= b<0 ? 0 : b>255 ? 255 : b;
+
+			//
+			//	Find the best matching color
+			//
+			l=i;
+			d=256*3+256;
+			for( j=0; j<256; ++j ) {
+			    // simple color distance
+			    v=(abs(GlobalPalette[j].r-r)
+				+abs(GlobalPalette[j].g-g)
+				+abs(GlobalPalette[j].b-b))*3
+				// light
+				+abs(GlobalPalette[j].r
+				    +GlobalPalette[j].g
+				    +GlobalPalette[j].b-(r+g+b))*1;
+			    if( v<d ) {
+				d=v;
+				l=j;
+			    }
+			}
+			DebugLevel3("%d,%d,%d -> %d,%d,%d\n",r,g,b
+				,GlobalPalette[l].r,GlobalPalette[l].g
+				,GlobalPalette[l].b);
+			((VMemType8*)FogOfWarAlphaTable)[i]=l;
+		    }
 		}
-             }
 
 		VideoDrawFog=VideoDraw8Fog32Alpha;
 		VideoDrawOnlyFog=VideoDraw8OnlyFog32Alpha;
@@ -1957,6 +1959,17 @@ build_table:
 		DebugLevel0Fn("Depth unsupported %d\n",VideoDepth);
 		break;
 	}
+    }
+}
+
+/**
+**	Cleanup the fog of war.
+*/
+global void CleanMapFogOfWar(void)
+{
+    if( FogOfWarAlphaTable ) {
+	free(FogOfWarAlphaTable);
+	FogOfWarAlphaTable=NULL;
     }
 }
 
