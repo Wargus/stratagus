@@ -512,7 +512,7 @@ local void DrawUnitIcons(void)
 	    y += 20;
 	}
 	if (i == CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody) {
-	    VideoDrawRectangle(ColorWhite,x + i % 8 * 20, y, 20, 20);
+	    VideoDrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
 	}
 	VideoDrawRectangle(
 	    i == CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody ?
@@ -1831,6 +1831,7 @@ local void CreateEditor(void)
 	//
 	TheMap.Info->MapTerrainName =
 	    strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
+	InitPlayers();
 	for (i = 0; i < PlayerMax; ++i) {
 	    if (i == PlayerNumNeutral) {
 		CreatePlayer(PlayerNeutral);
