@@ -10,7 +10,7 @@
 //
 /**@name commands.c - Global command handler - network support. */
 //
-//      (c) Copyright 2000-2004 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
+//      (c) Copyright 2000-2005 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -258,7 +258,7 @@ static void ApplyReplaySettings(void)
 /**
 **  Free a replay from memory
 **
-**  @param reply  Pointer to the replay to be freed
+**  @param replay  Pointer to the replay to be freed
 */
 static void DeleteReplay(FullReplay* replay)
 {

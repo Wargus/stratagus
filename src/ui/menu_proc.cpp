@@ -783,6 +783,7 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 **
 **  @param style  Checkbox style
 **  @param flags  State of Button (clicked, mouse over...)
+**  @param state  State
 **  @param x      X display position
 **  @param y      Y display position
 **  @param text   text to print on button
