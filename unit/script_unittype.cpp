@@ -652,9 +652,7 @@ local Animation * GetSingleAnimation(SCM list){
 
 global Animation ** UnitDie;
 global Animation ** UnitCorpse;
-global Animation ** UnitMoveAnimation;
 global Animation ** UnitStillAnimation;
-global Animation ** UnitAttack;
 
 /**
  ** Get animation data
@@ -682,26 +680,27 @@ local SCM CclAnimType(SCM list)
       
     }
     
-    switch( type){
+    switch( type ){
     case 0:
       UnitStillAnimation = whole_animation;
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
-	if( unittype->Animations ) {
-	  //CclFree(unittype->Animations->Still);
-	  unittype->Animations->Still=whole_animation[i];
+	if( !unittype->Animations ) {
+	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
 	}
+	CclFree(unittype->Animations->Still);
+        unittype->Animations->Still=whole_animation[i];
       }
       DebugLevel2("Loading UnitStillAnimation\n");
       break;
     case 1:
-      UnitMoveAnimation = whole_animation;
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
-	if( unittype->Animations ) {
-	  //CclFree(unittype->Animations->Move);
-	  unittype->Animations->Move=whole_animation[i];
+	if( !unittype->Animations ) {
+	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
 	}
+	CclFree(unittype->Animations->Move);
+	unittype->Animations->Move=whole_animation[i];
       }
       DebugLevel2("Loading UnitMoveAnimation\n");
       break;
@@ -709,10 +708,11 @@ local SCM CclAnimType(SCM list)
       UnitDie = whole_animation;
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
-	if( unittype->Animations ) {
-	  //CclFree(unittype->Animations->Die);
-	  unittype->Animations->Die=whole_animation[i];
+	if( !unittype->Animations ) {
+	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
 	}
+	CclFree(unittype->Animations->Die);
+	unittype->Animations->Die=whole_animation[i];
       }
       DebugLevel2("Loading UnitDie\n");
       break;
@@ -720,18 +720,21 @@ local SCM CclAnimType(SCM list)
       UnitCorpse = whole_animation;
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
+	if( !unittype->Animations ) {
+	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
+	}
 	// FIXME: corpse
       }
       DebugLevel2("Loading UnitCorpse\n");
       break;
     case 4:
-      UnitAttack = whole_animation;
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
-	if( unittype->Animations ) {
-	  //CclFree(unittype->Animations->Attack);
-	  unittype->Animations->Attack=whole_animation[i];
+	if( !unittype->Animations ) {
+	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
 	}
+	CclFree(unittype->Animations->Attack);
+	unittype->Animations->Attack=whole_animation[i];
       }
       DebugLevel2("Loading UnitAttack\n");
       break;

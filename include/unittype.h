@@ -346,15 +346,7 @@ extern UnitType UnitTypes[UnitTypeInternalMax];	/// all unit types
 #ifdef USE_CCL2
 extern Animation ** UnitDie;
 extern Animation ** UnitCorpse;
-extern Animation ** UnitMoveAnimation;
 extern Animation ** UnitStillAnimation;
-extern Animation ** UnitAttack;
-#else
-extern Animation* UnitDie[];
-//extern Animation* UnitCorpse[];
-extern Animation* UnitMoveAnimation[];
-extern Animation* UnitStillAnimation[];
-extern Animation* UnitAttack[];
 #endif
 
 /*----------------------------------------------------------------------------
