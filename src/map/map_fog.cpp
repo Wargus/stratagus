@@ -430,9 +430,11 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 **	@param tx	X center position.
 **	@param ty	Y center position.
 **	@param range	Radius to mark.
+**	@param dx	Delta in tiles in X direction.
+**	@param dy	Delta in tiles in Y direction.
 */
 global void MapMarkNewSight(const Player* player,int tx,int ty,int range
-	,int dx __attribute__((unused)),int dy __attribute__((unused)))
+	,int dx,int dy)
 {
     /// It's faster to mark then unmark.
     MapMarkSight(player,tx,ty,range);
