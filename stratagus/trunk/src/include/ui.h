@@ -170,7 +170,6 @@ typedef struct _ui_ {
     int		NumPanels;		/// Number of panels
 
     //	Resource line
-    GraphicConfig Resource;		/// Resource background
     int		ResourceX;		/// Resource X position
     int		ResourceY;		/// Resource Y position
 
