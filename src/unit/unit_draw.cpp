@@ -1118,7 +1118,8 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 **
 **	@todo FIXME: combine new shadow code with old shadow code.
 */
-global void DrawShadow(const Unit* unit, const UnitType* type, int x, int y)
+global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
+    int x, int y)
 {
     if (!type) {
 	DebugCheck(!unit);
@@ -1131,26 +1132,6 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int x, int y)
     //	frames.
     //
     if (type->Building) {
-	// What constrution shadow must be drawn?
-	if (unit && unit->Orders[0].Action == UnitActionBuilded &&
-		(unit->Constructed || VideoGraphicFrames(type->Sprite) <= 1)) {
-	    if (type->Construction->ShadowSprite) {
-		x -= (type->Construction->ShadowWidth -
-		    type->TileWidth * TileSizeX) / 2;
-		y -= (type->Construction->ShadowHeight -
-		    type->TileHeight * TileSizeY) / 2;
-		x += type->ShadowOffsetX;
-		y += type->ShadowOffsetY;
-		if (unit->Frame < 0) {
-		    VideoDrawShadowClipX(type->Construction->
-			ShadowSprite, -unit->Frame, x, y);
-		} else {
-		    VideoDrawShadowClip(type->Construction->ShadowSprite,
-			unit->Frame, x, y);
-		}
-	    }
-	    return;
-	}
 	// Draw normal shadow
 	if (type->ShadowSprite) {
 	    // FIXME: this can be combined with the unit else part.
@@ -1160,18 +1141,10 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int x, int y)
 		type->TileHeight * TileSizeY) / 2;
 	    x += type->ShadowOffsetX;
 	    y += type->ShadowOffsetY;
-	    if (unit) {
-		if (unit->Frame < 0) {
-		    VideoDrawShadowClipX(type->ShadowSprite, -unit->Frame, x, y);
-		} else {
-		    VideoDrawShadowClip(type->ShadowSprite, unit->Frame, x, y);
-		}
+	    if (frame < 0) {
+		VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
 	    } else {
-		// FIXME: correct frame?  taken from DrawBuildingCursor
-		VideoDrawShadowClip(type->ShadowSprite,
-		    CursorBuilding->Animations->Still[0].Frame +
-			(CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1),
-		    x, y);
+		VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
 	    }
 	}
 	return;
@@ -1190,18 +1163,10 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int x, int y)
 	x += type->ShadowOffsetX;
 	y += type->ShadowOffsetY;
 
-	if (unit) {
-	    if (unit->Frame < 0) {
-		VideoDrawShadowClipX(type->ShadowSprite, -unit->Frame, x, y);
-	    } else {
-		VideoDrawShadowClip(type->ShadowSprite, unit->Frame, x, y);
-	    }
+	if (frame < 0) {
+	    VideoDrawShadowClipX(type->ShadowSprite, -frame, x, y);
 	} else {
-	    // FIXME: correct frame?  taken from DrawBuildingCursor
-	    VideoDrawShadowClip(type->ShadowSprite,
-		CursorBuilding->Animations->Still[0].Frame +
-		    (CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1),
-		x, y);
+	    VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
 	}
 	return;
     }
@@ -1710,6 +1675,44 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 #endif
 
 /**
+**	Draw construction shadow.
+**
+**	@param unit	Unit pointer.
+**	@param frame	Frame number to draw.
+**	@param x	X position.
+**	@param y	Y position.
+*/
+local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
+{
+    ConstructionFrame* cframe;
+
+    cframe = unit->Data.Builded.Frame;
+    if (cframe->File == ConstructionFileConstruction) {
+	x -= (unit->Type->Construction->Width - unit->Type->TileWidth * TileSizeX) / 2;
+	y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
+//	x += type->ShadowOffsetX;
+//	y += type->ShadowOffsetY;
+	if (frame < 0) {
+	    VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
+		-frame, x, y);
+	} else {
+	    VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
+		frame, x, y);
+	}
+    } else {
+	x -= (unit->Type->ShadowWidth - unit->Type->TileWidth * TileSizeX) / 2;
+	y -= (unit->Type->ShadowHeight - unit->Type->TileHeight * TileSizeY) / 2;
+	x += unit->Type->ShadowOffsetX;
+	y += unit->Type->ShadowOffsetY;
+	if (frame < 0) {
+	    VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame, x, y);
+	} else {
+	    VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
+	}
+    }
+}
+
+/**
 **	Draw construction.
 **
 **	@param unit	Unit pointer.
@@ -1796,7 +1799,11 @@ global void DrawBuilding(const Unit* unit)
 	return;
     }
 
-    DrawShadow(unit, NULL, x, y);
+    if (state == 1 && constructed) {
+	DrawConstructionShadow(unit, frame, x, y);
+    } else {
+	DrawShadow(unit, NULL, frame, x, y);
+    }
 
     //
     //	Show that the unit is selected
@@ -1860,7 +1867,7 @@ global void DrawUnit(const Unit* unit)
 
     type = unit->Type;
 
-    DrawShadow(unit, NULL, x, y);
+    DrawShadow(unit, NULL, unit->Frame, x, y);
 
     //
     //	Show that the unit is selected
