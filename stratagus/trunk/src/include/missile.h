@@ -340,7 +340,7 @@ struct _CL_File_;
 ----------------------------------------------------------------------------*/
 
 #ifndef __STRUCT_MISSILETYPE__
-#define __STRUCT_MISSILETYPE__  ///< protect duplicate missile typedef
+#define __STRUCT_MISSILETYPE__  /// protect duplicate missile typedef
 
 /**
 **  Missile-type typedef
@@ -349,8 +349,8 @@ typedef struct _missile_type_ MissileType;
 
 #endif
 
-#define MAX_MISSILES 2048        ///< maximum number of missiles
-#define MAX_LOCAL_MISSILES 4096  ///< maximum number of local missiles
+#define MAX_MISSILES 2048        /// maximum number of missiles
+#define MAX_LOCAL_MISSILES 4096  /// maximum number of local missiles
 
 /**
 **  Missile-type-class typedef
@@ -394,37 +394,37 @@ enum _missile_class_ {
 
 	/// Base structure of missile-types
 struct _missile_type_ {
-	char* Ident;          ///< missile name
-	int   Transparency;   ///< missile transparency possible value is 50 (later 25 and 75)
-	int   Width;          ///< missile width in pixels
-	int   Height;         ///< missile height in pixels
-	int   DrawLevel;      ///< Level to draw missile at
-	int   SpriteFrames;   ///< number of sprite frames in graphic
-	int   NumDirections;  ///< number of directions missile can face
+	char* Ident;          /// missile name
+	int   Transparency;   /// missile transparency possible value is 50 (later 25 and 75)
+	int   Width;          /// missile width in pixels
+	int   Height;         /// missile height in pixels
+	int   DrawLevel;      /// Level to draw missile at
+	int   SpriteFrames;   /// number of sprite frames in graphic
+	int   NumDirections;  /// number of directions missile can face
 
 	/// @todo FireSound defined but not used!
-	SoundConfig FiredSound;   ///< fired sound
-	SoundConfig ImpactSound;  ///< impact sound for this missile-type
+	SoundConfig FiredSound;   /// fired sound
+	SoundConfig ImpactSound;  /// impact sound for this missile-type
 
-	unsigned Flip : 1;        ///< flip image when facing left
-	unsigned CanHitOwner : 1; ///< missile can hit the owner
-	unsigned FriendlyFire : 1;///< missile can't hit own units
+	unsigned Flip : 1;        /// flip image when facing left
+	unsigned CanHitOwner : 1; /// missile can hit the owner
+	unsigned FriendlyFire : 1;/// missile can't hit own units
 
-	MissileClass Class;       ///< missile class
-	int          NumBounces;  ///< number of bounces
-	int          StartDelay;  ///< missile start delay
-	int          Sleep;       ///< missile sleep
-	int          Speed;       ///< missile speed
+	MissileClass Class;       /// missile class
+	int          NumBounces;  /// number of bounces
+	int          StartDelay;  /// missile start delay
+	int          Sleep;       /// missile sleep
+	int          Speed;       /// missile speed
 
-	int          Range;          ///< missile damage range
-	int          SplashFactor;   ///< missile splash divisor
-	char*        ImpactName;     ///< impact missile-type name
-	MissileType* ImpactMissile;  ///< missile produces an impact
-	char*        SmokeName;      ///< impact missile-type name
-	MissileType* SmokeMissile;   ///< Trailling missile
+	int          Range;          /// missile damage range
+	int          SplashFactor;   /// missile splash divisor
+	char*        ImpactName;     /// impact missile-type name
+	MissileType* ImpactMissile;  /// missile produces an impact
+	char*        SmokeName;      /// impact missile-type name
+	MissileType* SmokeMissile;   /// Trailling missile
 
 // --- FILLED UP ---
-	struct _graphic_* G;         ///< missile graphic
+	struct _graphic_* G;         /// missile graphic
 };
 
 /*----------------------------------------------------------------------------
@@ -439,51 +439,51 @@ typedef void FuncController(Missile*);
 
 	/// Missile on the map
 struct _missile_ {
-	int SourceX;  ///< Missile Source X
-	int SourceY;  ///< Missile Source Y
-	int X;        ///< missile pixel position
-	int Y;        ///< missile pixel position
-	int DX;       ///< missile pixel destination
-	int DY;       ///< missile pixel destination
-	MissileType* Type;  ///< missile-type pointer
-	int SpriteFrame;  ///< sprite frame counter
-	int State;        ///< state
-	int AnimWait;     ///< Animation wait.
-	int Wait;         ///< delay between frames
-	int Delay;        ///< delay to showup
+	int SourceX;  /// Missile Source X
+	int SourceY;  /// Missile Source Y
+	int X;        /// missile pixel position
+	int Y;        /// missile pixel position
+	int DX;       /// missile pixel destination
+	int DY;       /// missile pixel destination
+	MissileType* Type;  /// missile-type pointer
+	int SpriteFrame;  /// sprite frame counter
+	int State;        /// state
+	int AnimWait;     /// Animation wait.
+	int Wait;         /// delay between frames
+	int Delay;        /// delay to showup
 
-	struct _unit_* SourceUnit;  ///< unit that fires (could be killed)
-	struct _unit_* TargetUnit;  ///< target unit, used for spells
+	struct _unit_* SourceUnit;  /// unit that fires (could be killed)
+	struct _unit_* TargetUnit;  /// target unit, used for spells
 
-	int Damage;  ///< direct damage that missile applies
+	int Damage;  /// direct damage that missile applies
 
-	int TTL;     ///< time to live (ticks) used for spells
-	int Hidden;  ///< If this is 1 then the missile is invisible
+	int TTL;     /// time to live (ticks) used for spells
+	int Hidden;  /// If this is 1 then the missile is invisible
 
 // Internal use:
-	int CurrentStep;  ///< Current step (0 <= x < TotalStep).
-	int TotalStep;    ///< Total step.
+	int CurrentStep;  /// Current step (0 <= x < TotalStep).
+	int TotalStep;    /// Total step.
 
-	unsigned  Local:1;      ///< missile is a local missile
-	Missile** MissileSlot;  ///< pointer to missile slot
+	unsigned  Local:1;      /// missile is a local missile
+	Missile** MissileSlot;  /// pointer to missile slot
 };
 
 typedef struct _burning_building_frame_ {
-	int          Percent;  ///< HP percent
-	MissileType* Missile;  ///< Missile to draw
-	struct _burning_building_frame_* Next;  ///< Next pointer
+	int          Percent;  /// HP percent
+	MissileType* Missile;  /// Missile to draw
+	struct _burning_building_frame_* Next;  /// Next pointer
 } BurningBuildingFrame;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern MissileType** MissileTypes;  ///< All missile-types
-extern int NumMissileTypes;        ///< Number of missile-types
+extern MissileType** MissileTypes;  /// All missile-types
+extern int NumMissileTypes;        /// Number of missile-types
 
-extern const char* MissileClassNames[];  ///< Missile class names
+extern const char* MissileClassNames[];  /// Missile class names
 
-extern BurningBuildingFrame* BurningBuildingFrames;  ///< Burning building frames
+extern BurningBuildingFrame* BurningBuildingFrames;  /// Burning building frames
 
 /*----------------------------------------------------------------------------
 --  Functions

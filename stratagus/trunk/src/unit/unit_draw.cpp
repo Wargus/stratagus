@@ -85,14 +85,14 @@ static inline max(int a, int b) { return a > b ? a : b; }
 ** Decoration: health, mana.
 */
 typedef struct {
-	char* File;       ///< File containing the graphics data
-	int HotX;         ///< X drawing position (relative)
-	int HotY;         ///< Y drawing position (relative)
-	int Width;        ///< width of the decoration
-	int Height;       ///< height of the decoration
+	char* File;       /// File containing the graphics data
+	int HotX;         /// X drawing position (relative)
+	int HotY;         /// Y drawing position (relative)
+	int Width;        /// width of the decoration
+	int Height;       /// height of the decoration
 
 // --- FILLED UP ---
-	Graphic* Sprite;  ///< loaded sprite images
+	Graphic* Sprite;  /// loaded sprite images
 } Decoration;
 
 
@@ -100,14 +100,14 @@ typedef struct {
 **	Structure grouping all Sprites for decoration.
 */
 typedef struct {
-	char** Name;             ///< Name of the sprite.
-	Decoration* SpriteArray; ///< Sprite to display variable.
-	int SpriteNumber;        ///< Size of SpriteArray (same as size of SriteName).
+	char** Name;             /// Name of the sprite.
+	Decoration* SpriteArray; /// Sprite to display variable.
+	int SpriteNumber;        /// Size of SpriteArray (same as size of SriteName).
 } DecoSpriteType;
 
-static DecoSpriteType DecoSprite; ///< All sprite's infos.
+static DecoSpriteType DecoSprite; /// All sprite's infos.
 
-static Decoration SpellSprite;    ///< Sprite to display the active spells on an unit.
+static Decoration SpellSprite;    /// Sprite to display the active spells on an unit.
 
 /**
 **  Sprite to display as the shadow of flying units.
@@ -116,11 +116,11 @@ static Decoration SpellSprite;    ///< Sprite to display the active spells on an
 */
 static Decoration ShadowSprite;
 
-int ShowSightRange;              ///< Flag: show right range
-int ShowReactionRange;           ///< Flag: show reaction range
-int ShowAttackRange;             ///< Flag: show attack range
-int ShowOrders;                  ///< Flag: show orders of unit on map
-unsigned long ShowOrdersCount;   ///< Show orders for some time
+int ShowSightRange;              /// Flag: show right range
+int ShowReactionRange;           /// Flag: show reaction range
+int ShowAttackRange;             /// Flag: show attack range
+int ShowOrders;                  /// Flag: show orders of unit on map
+unsigned long ShowOrdersCount;   /// Show orders for some time
 
 
 
@@ -149,7 +149,7 @@ DrawDecoFunc DrawStaticSprite;
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
-const Viewport* CurrentViewport;  ///< FIXME: quick hack for split screen
+const Viewport* CurrentViewport;  /// FIXME: quick hack for split screen
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

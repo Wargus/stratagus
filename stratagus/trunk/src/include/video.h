@@ -45,22 +45,22 @@
 #endif
 
 typedef struct _graphic_ {
-	char* File;                ///< Filename
-	SDL_Surface* Surface;      ///< Surface
+	char* File;                /// Filename
+	SDL_Surface* Surface;      /// Surface
 #ifndef USE_OPENGL
-	SDL_Surface* SurfaceFlip;  ///< Flipped surface
+	SDL_Surface* SurfaceFlip;  /// Flipped surface
 #endif
-	int Width;                 ///< Width of a frame
-	int Height;                ///< Height of a frame
-	int NumFrames;             ///< Number of frames
-	int GraphicWidth;          ///< Original graphic width
-	int GraphicHeight;         ///< Original graphic height
-	int Refs;                  ///< Uses of this graphic
+	int Width;                 /// Width of a frame
+	int Height;                /// Height of a frame
+	int NumFrames;             /// Number of frames
+	int GraphicWidth;          /// Original graphic width
+	int GraphicHeight;         /// Original graphic height
+	int Refs;                  /// Uses of this graphic
 #ifdef USE_OPENGL
-	GLfloat TextureWidth;      ///< Width of the texture
-	GLfloat TextureHeight;     ///< Height of the texture
-	GLuint* Textures;          ///< Texture names
-	GLuint* PlayerColorTextures[PlayerMax];///< Textures with player colors
+	GLfloat TextureWidth;      /// Width of the texture
+	GLfloat TextureHeight;     /// Height of the texture
+	GLuint* Textures;          /// Texture names
+	GLuint* PlayerColorTextures[PlayerMax];/// Textures with player colors
 #endif
 } Graphic;
 
@@ -74,9 +74,9 @@ typedef struct _mng_ {
 	unsigned long Ticks;
 	int Iteration;
 #ifdef USE_OPENGL
-	GLfloat TextureWidth;   ///< Width of the texture
-	GLfloat TextureHeight;  ///< Height of the texture
-	GLuint TextureName;     ///< Texture name
+	GLfloat TextureWidth;   /// Width of the texture
+	GLfloat TextureHeight;  /// Height of the texture
+	GLuint TextureName;     /// Texture name
 #endif
 } Mng;
 #endif
@@ -120,7 +120,7 @@ extern SDL_Palette* VideoCreateSharedPalette(const SDL_Palette* palette);
 	/// Free a shared hardware palette.
 extern void VideoFreeSharedPalette(SDL_Palette* palette);
 
-extern int ColorCycleAll; ///< Flag color cycle palettes
+extern int ColorCycleAll; /// Flag color cycle palettes
 
 /**
 **  Typedef for palette links.
@@ -131,11 +131,11 @@ typedef struct _palette_link_ PaletteLink;
 **  Links all palettes together to join the same palettes.
 */
 struct _palette_link_ {
-	SDL_Surface* Surface;               ///< Surface that contains palette
-	PaletteLink* Next;                  ///< Previous palette
+	SDL_Surface* Surface;               /// Surface that contains palette
+	PaletteLink* Next;                  /// Previous palette
 };
 
-extern PaletteLink* PaletteList; ///< List of all used palettes loaded
+extern PaletteLink* PaletteList; /// List of all used palettes loaded
 
 extern void VideoPaletteListAdd(SDL_Surface* surface);
 extern void VideoPaletteListRemove(SDL_Surface* surface);
@@ -320,9 +320,9 @@ extern unsigned long GetTicks(void);
 	/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 
-extern EventCallback* Callbacks;    ///< Current callbacks
-extern EventCallback GameCallbacks; ///< Game callbacks
-extern EventCallback MenuCallbacks; ///< Menu callbacks
+extern EventCallback* Callbacks;    /// Current callbacks
+extern EventCallback GameCallbacks; /// Game callbacks
+extern EventCallback MenuCallbacks; /// Menu callbacks
 
 extern Uint32 ColorBlack;
 extern Uint32 ColorDarkGreen;
@@ -334,12 +334,12 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
-extern int ColorWaterCycleStart;    ///< color # start for color cycling
-extern int ColorWaterCycleEnd;      ///< color # end   for color cycling
-extern int ColorIconCycleStart;     ///< color # start for color cycling
-extern int ColorIconCycleEnd;       ///< color # end   for color cycling
-extern int ColorBuildingCycleStart; ///< color # start for color cycling
-extern int ColorBuildingCycleEnd;   ///< color # end   for color cycling
+extern int ColorWaterCycleStart;    /// color # start for color cycling
+extern int ColorWaterCycleEnd;      /// color # end   for color cycling
+extern int ColorIconCycleStart;     /// color # start for color cycling
+extern int ColorIconCycleEnd;       /// color # end   for color cycling
+extern int ColorBuildingCycleStart; /// color # start for color cycling
+extern int ColorBuildingCycleEnd;   /// color # end   for color cycling
 
 #ifndef USE_OPENGL
 #define VideoMapRGB(f, r, g, b) SDL_MapRGB((f), (r), (g), (b))

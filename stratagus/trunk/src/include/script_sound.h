@@ -37,7 +37,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void SoundCclRegister(void);  ///< register ccl features
+extern void SoundCclRegister(void);  /// register ccl features
 
 //-----------------------------------------------------------------------------
 

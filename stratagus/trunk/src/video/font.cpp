@@ -53,23 +53,23 @@
 
 	/// Font color mapping
 typedef struct _font_color_mapping_ {
-	char* ColorName;                        ///< Font color name
-	SDL_Color Color[NumFontColors];         ///< Array of colors
+	char* ColorName;                        /// Font color name
+	SDL_Color Color[NumFontColors];         /// Array of colors
 } FontColorMapping;
 
-static FontColorMapping* FontColor;         ///< Current font color
+static FontColorMapping* FontColor;         /// Current font color
 
-static FontColorMapping* FontColorMappings; ///< Font color mappings
-static int NumFontColorMappings;            ///< Number of font color mappings
+static FontColorMapping* FontColorMappings; /// Font color mappings
+static int NumFontColorMappings;            /// Number of font color mappings
 
 	/// Font mapping
 typedef struct _font_mapping_ {
-	char* Ident;                            ///< Font name
-	int Font;                               ///< Ident number
-	struct _font_mapping_* Next;            ///< Next pointer
+	char* Ident;                            /// Font name
+	int Font;                               /// Ident number
+	struct _font_mapping_* Next;            /// Next pointer
 } FontMapping;
 
-static FontMapping* FontMappings;           ///< Font mappings
+static FontMapping* FontMappings;           /// Font mappings
 
 /**
 **  Fonts table
@@ -78,17 +78,17 @@ static FontMapping* FontMappings;           ///< Font mappings
 */
 static ColorFont Fonts[MaxFonts];
 
-static FontColorMapping* LastTextColor;    ///< Last text color
-static FontColorMapping* DefaultTextColor; ///< Default text color
-static FontColorMapping* ReverseTextColor; ///< Reverse text color
-static char* DefaultNormalColorIndex;      ///< Default normal color index
-static char* DefaultReverseColorIndex;     ///< Default reverse color index
+static FontColorMapping* LastTextColor;    /// Last text color
+static FontColorMapping* DefaultTextColor; /// Default text color
+static FontColorMapping* ReverseTextColor; /// Reverse text color
+static char* DefaultNormalColorIndex;      /// Default normal color index
+static char* DefaultReverseColorIndex;     /// Default reverse color index
 
 	/// Draw character with current video depth.
 static void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
 
 #ifdef USE_OPENGL
-static Graphic** FontColorGraphics[MaxFonts];   ///< Font color graphics
+static Graphic** FontColorGraphics[MaxFonts];   /// Font color graphics
 #endif
 
 /*----------------------------------------------------------------------------

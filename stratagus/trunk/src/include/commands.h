@@ -44,10 +44,10 @@
 ----------------------------------------------------------------------------*/
 
 typedef enum _replay_type_ {
-	ReplayNone,          ///< No replay
-	ReplaySinglePlayer,  ///< Single player replay
-	ReplayMultiPlayer,   ///< Multi player replay
-} ReplayType;            ///< Replay types
+	ReplayNone,          /// No replay
+	ReplaySinglePlayer,  /// Single player replay
+	ReplayMultiPlayer,   /// Multi player replay
+} ReplayType;            /// Replay types
 
 struct _CL_File_;
 struct _unit_;
@@ -58,8 +58,8 @@ struct _upgrade_;
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int CommandLogDisabled;     ///< True, if command log is off
-extern ReplayType ReplayGameType;  ///< Replay game type
+extern int CommandLogDisabled;     /// True, if command log is off
+extern ReplayType ReplayGameType;  /// Replay game type
 
 /*----------------------------------------------------------------------------
 --  Functions

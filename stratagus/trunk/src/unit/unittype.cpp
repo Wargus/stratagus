@@ -60,16 +60,16 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-UnitType* UnitTypes[UnitTypeMax];   ///< unit-types definition
-int NumUnitTypes;                   ///< number of unit-types made
+UnitType* UnitTypes[UnitTypeMax];   /// unit-types definition
+int NumUnitTypes;                   /// number of unit-types made
 
 /**
 **  Next unit type are used hardcoded in the source.
 **
 **  @todo find a way to make it configurable!
 */
-UnitType* UnitTypeHumanWall;       ///< Human wall
-UnitType* UnitTypeOrcWall;         ///< Orc wall
+UnitType* UnitTypeHumanWall;       /// Human wall
+UnitType* UnitTypeOrcWall;         /// Orc wall
 
 /**
 **  Mapping of W*rCr*ft number to our internal unit-type symbol.

@@ -57,10 +57,10 @@
 **  Private mp3 data structure to handle mp3 streaming.
 */
 typedef struct _mp3_data_ {
-	struct mad_decoder MadDecoder;           ///< Mad decoder handle
-	CLFile* MadFile;                         ///< File handle
-	unsigned char Buffer[MAD_INBUF_SIZE];    ///< Input buffer
-	int BufferLen;                           ///< Length of filled buffer
+	struct mad_decoder MadDecoder;           /// Mad decoder handle
+	CLFile* MadFile;                         /// File handle
+	unsigned char Buffer[MAD_INBUF_SIZE];    /// Input buffer
+	int BufferLen;                           /// Length of filled buffer
 } MadData;
 
 /*----------------------------------------------------------------------------

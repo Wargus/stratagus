@@ -60,19 +60,19 @@
 **  sound identifier.
 */
 typedef struct _simple_sound_ {
-	char* Name; ///< name of the sound
-	char* File; ///< corresponding sound file
+	char* Name; /// name of the sound
+	char* File; /// corresponding sound file
 } SimpleSound;
 
 /**
 **  Structure for remaping a sound to a new name.
 */
 typedef struct _sound_remap_ {
-	char* NewName;  ///< Name in unit-type definition
-	char* BaseName; ///< Name used in sound definition
+	char* NewName;  /// Name in unit-type definition
+	char* BaseName; /// Name used in sound definition
 } SoundRemap;
 
-#define MaxSimpleGroups 7 ///< maximal number of sounds pro group
+#define MaxSimpleGroups 7 /// maximal number of sounds pro group
 
 /**
 **  Sound group definition:
@@ -80,8 +80,8 @@ typedef struct _sound_remap_ {
 **  be used fot this sound identifier.
 */
 typedef struct _sound_group_ {
-	char* Name;                     ///< name of the group
-	char* Sounds[MaxSimpleGroups];  ///< list of sound files
+	char* Name;                     /// name of the group
+	char* Sounds[MaxSimpleGroups];  /// list of sound files
 } SoundGroup;
 
 /**
@@ -92,9 +92,9 @@ typedef struct _sound_group_ {
 **  the second groups is played.
 */
 typedef struct _selection_group_ {
-	char* Name;    ///< name of the selection sound
-	char* First;   ///< name of the sound
-	char* Second;  ///< name of the annoyed sound
+	char* Name;    /// name of the selection sound
+	char* First;   /// name of the sound
+	char* Second;  /// name of the annoyed sound
 } SelectionGroup;
 
 /*----------------------------------------------------------------------------

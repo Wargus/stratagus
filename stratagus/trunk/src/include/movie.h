@@ -56,7 +56,7 @@
 **  Ogg data structure to handle vorbis/theora streaming.
 */
 typedef struct _ogg_data_ {
-	CLFile* File;      ///< Ogg file handle
+	CLFile* File;      /// Ogg file handle
 	ogg_sync_state sync;
 	ogg_page page;
 

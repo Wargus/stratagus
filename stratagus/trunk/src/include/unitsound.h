@@ -49,8 +49,8 @@
 **  Sound definition
 */
 typedef struct _sound_config_ {
-	char*   Name;   ///< config sound name
-	SoundId Sound;  ///< identifier send to sound server
+	char*   Name;   /// config sound name
+	SoundId Sound;  /// identifier send to sound server
 } SoundConfig;
 
 /**
@@ -59,13 +59,13 @@ typedef struct _sound_config_ {
 **  Played for the various events.
 */
 typedef struct _unit_sound_ {
-	SoundConfig Selected;           ///< selected by user
-	SoundConfig Acknowledgement;    ///< acknowledge of use command
-	SoundConfig Ready;              ///< unit training... ready
-	SoundConfig Repair;             ///< unit repairing
-	SoundConfig Harvest[MaxCosts];  ///< unit harvesting
-	SoundConfig Help;               ///< unit is attacked
-	SoundConfig Dead;               ///< unit is killed
+	SoundConfig Selected;           /// selected by user
+	SoundConfig Acknowledgement;    /// acknowledge of use command
+	SoundConfig Ready;              /// unit training... ready
+	SoundConfig Repair;             /// unit repairing
+	SoundConfig Harvest[MaxCosts];  /// unit harvesting
+	SoundConfig Help;               /// unit is attacked
+	SoundConfig Dead;               /// unit is killed
 } UnitSound;
 
 /// @todo temporary solution should perhaps be a member of a more general weapon structure.
@@ -74,7 +74,7 @@ typedef struct _unit_sound_ {
 **  Attack sounds
 */
 typedef struct _weapon_sound_ {
-	SoundConfig Attack; ///< weapon is fired
+	SoundConfig Attack; /// weapon is fired
 } WeaponSound;
 
 /*----------------------------------------------------------------------------

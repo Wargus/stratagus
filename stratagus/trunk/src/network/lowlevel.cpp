@@ -58,11 +58,11 @@
 //  Variables
 //----------------------------------------------------------------------------
 
-int NetLastSocket;         ///< Last socket
-unsigned long NetLastHost; ///< Last host number (net format)
-int NetLastPort;           ///< Last port number (net format)
+int NetLastSocket;         /// Last socket
+unsigned long NetLastHost; /// Last host number (net format)
+int NetLastPort;           /// Last port number (net format)
 
-unsigned long NetLocalAddrs[MAX_LOC_IP]; ///< Local IP-Addrs of this host (net format)
+unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net format)
 
 //----------------------------------------------------------------------------
 //  Low level functions

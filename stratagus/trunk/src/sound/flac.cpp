@@ -55,8 +55,8 @@
 **  Private flac data structure to handle flac streaming.
 */
 typedef struct _flac_data_ {
-	FLAC__StreamDecoder* FlacStream;  ///< Decoder stream
-	CLFile* FlacFile;                 ///< File handle
+	FLAC__StreamDecoder* FlacStream;  /// Decoder stream
+	CLFile* FlacFile;                 /// File handle
 } FlacData;
 
 /*----------------------------------------------------------------------------

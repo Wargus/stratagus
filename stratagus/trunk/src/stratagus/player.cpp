@@ -57,12 +57,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int NumPlayers;                  ///< How many player slots used
-Player Players[PlayerMax];       ///< All players in play
-Player* ThisPlayer;              ///< Player on this computer
-PlayerRace PlayerRaces;          ///< Player races
+int NumPlayers;                  /// How many player slots used
+Player Players[PlayerMax];       /// All players in play
+Player* ThisPlayer;              /// Player on this computer
+PlayerRace PlayerRaces;          /// Player races
 
-int NoRescueCheck;               ///< Disable rescue check
+int NoRescueCheck;               /// Disable rescue check
 
 /**
 **  Colors used for minimap.

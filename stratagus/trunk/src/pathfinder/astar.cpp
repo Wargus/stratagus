@@ -49,16 +49,16 @@
 ----------------------------------------------------------------------------*/
 
 typedef struct _node_ {
-	char Direction;     ///< Direction for trace back
-	char InGoal;        ///< is this point in the goal
-	int CostFromStart;  ///< Real costs to reach this point
+	char Direction;     /// Direction for trace back
+	char InGoal;        /// is this point in the goal
+	int CostFromStart;  /// Real costs to reach this point
 } Node;
 
 typedef struct _open_ {
-	int X;     ///< X coordinate
-	int Y;     ///< Y coordinate
-	int O;     ///< Offset into matrix
-	int Costs; ///< complete costs to goal
+	int X;     /// X coordinate
+	int Y;     /// Y coordinate
+	int O;     /// Offset into matrix
+	int Costs; /// complete costs to goal
 } Open;
 
 /// heuristic cost fonction for a star

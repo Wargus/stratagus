@@ -54,7 +54,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-unsigned SyncHash; ///< Hash calculated to find sync failures
+unsigned SyncHash; /// Hash calculated to find sync failures
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -389,7 +389,7 @@
 -- Declarations
 ----------------------------------------------------------------------------*/
 
-typedef struct _unit_ Unit;            ///< unit itself
+typedef struct _unit_ Unit;            /// unit itself
 #ifdef USE_OPENGL
 struct _graphic_;
 #endif
@@ -418,77 +418,77 @@ typedef unsigned short UnitRef;
 **  @see HandleActionTable
 */
 typedef enum _unit_action_ {
-	UnitActionNone,         ///< No valid action
+	UnitActionNone,         /// No valid action
 
-	UnitActionStill,        ///< unit stand still, does nothing
-	UnitActionStandGround,  ///< unit stands ground
-	UnitActionFollow,       ///< unit follows units
-	UnitActionMove,         ///< unit moves to position/unit
-	UnitActionAttack,       ///< unit attacks position/unit
-	UnitActionAttackGround, ///< unit attacks ground
-	UnitActionDie,          ///< unit dies
+	UnitActionStill,        /// unit stand still, does nothing
+	UnitActionStandGround,  /// unit stands ground
+	UnitActionFollow,       /// unit follows units
+	UnitActionMove,         /// unit moves to position/unit
+	UnitActionAttack,       /// unit attacks position/unit
+	UnitActionAttackGround, /// unit attacks ground
+	UnitActionDie,          /// unit dies
 
-	UnitActionSpellCast,    ///< unit casts spell
+	UnitActionSpellCast,    /// unit casts spell
 
-	UnitActionTrain,        ///< building is training
-	UnitActionUpgradeTo,    ///< building is upgrading itself
-	UnitActionResearch,     ///< building is researching spell
-	UnitActionBuilt,      ///< building is under construction
+	UnitActionTrain,        /// building is training
+	UnitActionUpgradeTo,    /// building is upgrading itself
+	UnitActionResearch,     /// building is researching spell
+	UnitActionBuilt,      /// building is under construction
 
 // Compound actions
-	UnitActionBoard,        ///< unit entering transporter
-	UnitActionUnload,       ///< unit leaving transporter
-	UnitActionPatrol,       ///< unit paroling area
-	UnitActionBuild,        ///< unit builds building
+	UnitActionBoard,        /// unit entering transporter
+	UnitActionUnload,       /// unit leaving transporter
+	UnitActionPatrol,       /// unit paroling area
+	UnitActionBuild,        /// unit builds building
 
-	UnitActionRepair,       ///< unit repairing
-	UnitActionResource,     ///< unit harvesting resources
-	UnitActionReturnGoods   ///< unit returning any resource
+	UnitActionRepair,       /// unit repairing
+	UnitActionResource,     /// unit harvesting resources
+	UnitActionReturnGoods   /// unit returning any resource
 } UnitAction;
 
 /**
 **  Unit order structure.
 */
 typedef struct _order_ {
-	unsigned char Action;   ///< global action
-	unsigned char Flags;    ///< Order flags (unused)
-	int           Range;    ///< How far away
-	unsigned int  MinRange; ///< How far away minimum
-	unsigned char Width;    ///< Goal Width (used when Goal is not)
-	unsigned char Height;   ///< Goal Height (used when Goal is not)
+	unsigned char Action;   /// global action
+	unsigned char Flags;    /// Order flags (unused)
+	int           Range;    /// How far away
+	unsigned int  MinRange; /// How far away minimum
+	unsigned char Width;    /// Goal Width (used when Goal is not)
+	unsigned char Height;   /// Goal Height (used when Goal is not)
 
-	Unit*     Goal;         ///< goal of the order (if any)
-	int       X;            ///< or X tile coordinate of destination
-	int       Y;            ///< or Y tile coordinate of destination
-	struct _unit_type_* Type;///< Unit-type argument
+	Unit*     Goal;         /// goal of the order (if any)
+	int       X;            /// or X tile coordinate of destination
+	int       Y;            /// or Y tile coordinate of destination
+	struct _unit_type_* Type;/// Unit-type argument
 
 	union {
 		struct {
-			int X;                    ///< X position for patroling.
-			int Y;                    ///< Y position for patroling.
-		} Patrol;                     ///< position.
-		int ResourcePos;              ///< ResourcePos == (X<<16 | Y).
-		struct _spell_type_* Spell;   ///< spell when casting.
-		struct _upgrade_* Upgrade;    ///< upgrade.
-		struct _order_* Order;        ///< FIXME : seems to be a hack for free memory.
-	} Arg1;             ///< Extra command argument.
+			int X;                    /// X position for patroling.
+			int Y;                    /// Y position for patroling.
+		} Patrol;                     /// position.
+		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
+		struct _spell_type_* Spell;   /// spell when casting.
+		struct _upgrade_* Upgrade;    /// upgrade.
+		struct _order_* Order;        /// FIXME : seems to be a hack for free memory.
+	} Arg1;             /// Extra command argument.
 } Order;
 
 /**
 **  Voice groups for an unit
 */
 typedef enum _unit_voice_group_ {
-	VoiceSelected,          ///< If selected
-	VoiceAcknowledging,     ///< Acknowledge command
-	VoiceAttacking,         ///< FIXME: Should be removed?
-	VoiceReady,             ///< Command completed
-	VoiceHelpMe,            ///< If attacked
-	VoiceDying,             ///< If killed
-	VoiceWorkCompleted,     ///< only worker, work completed
-	VoiceBuilding,          ///< only for building under construction
-	VoiceDocking,           ///< only for transport reaching coast
-	VoiceRepairing,         ///< repairing
-	VoiceHarvesting,        ///< harvesting
+	VoiceSelected,          /// If selected
+	VoiceAcknowledging,     /// Acknowledge command
+	VoiceAttacking,         /// FIXME: Should be removed?
+	VoiceReady,             /// Command completed
+	VoiceHelpMe,            /// If attacked
+	VoiceDying,             /// If killed
+	VoiceWorkCompleted,     /// only worker, work completed
+	VoiceBuilding,          /// only for building under construction
+	VoiceDocking,           /// only for transport reaching coast
+	VoiceRepairing,         /// repairing
+	VoiceHarvesting,        /// harvesting
 } UnitVoiceGroup;
 
 /**
@@ -500,125 +500,125 @@ typedef enum _unit_voice_group_ {
 **          S
 */
 enum _directions_ {
-	LookingN  = 0 * 32,      ///< Unit looking north
-	LookingNE = 1 * 32,      ///< Unit looking north east
-	LookingE  = 2 * 32,      ///< Unit looking east
-	LookingSE = 3 * 32,      ///< Unit looking south east
-	LookingS  = 4 * 32,      ///< Unit looking south
-	LookingSW = 5 * 32,      ///< Unit looking south west
-	LookingW  = 6 * 32,      ///< Unit looking west
-	LookingNW = 7 * 32,      ///< Unit looking north west
+	LookingN  = 0 * 32,      /// Unit looking north
+	LookingNE = 1 * 32,      /// Unit looking north east
+	LookingE  = 2 * 32,      /// Unit looking east
+	LookingSE = 3 * 32,      /// Unit looking south east
+	LookingS  = 4 * 32,      /// Unit looking south
+	LookingSW = 5 * 32,      /// Unit looking south west
+	LookingW  = 6 * 32,      /// Unit looking west
+	LookingNW = 7 * 32,      /// Unit looking north west
 };
 
 
 	/// A linked list element.
 typedef struct _unit_list_item_ UnitListItem;
 struct _unit_list_item_ {
-	Unit*         Unit; ///< Points to the unit it links
-	UnitListItem* Prev; ///< Previous item.
-	UnitListItem* Next; ///< Next item.
+	Unit*         Unit; /// Points to the unit it links
+	UnitListItem* Prev; /// Previous item.
+	UnitListItem* Next; /// Next item.
 };
 
-#define NextDirection 32        ///< Next direction N->NE->E...
-#define UnitNotSeen 0x7fffffff  ///< Unit not seen, used by Unit::SeenFrame
+#define NextDirection 32        /// Next direction N->NE->E...
+#define UnitNotSeen 0x7fffffff  /// Unit not seen, used by Unit::SeenFrame
 
 	/// The big unit structure
 struct _unit_ {
 	// @note int is faster than shorts
-	int    Refs;         ///< Reference counter
-	int    Slot;         ///< Assigned slot number
-	Unit** UnitSlot;     ///< Slot pointer of Units
-	Unit** PlayerSlot;   ///< Slot pointer of Player->Units
+	int    Refs;         /// Reference counter
+	int    Slot;         /// Assigned slot number
+	Unit** UnitSlot;     /// Slot pointer of Units
+	Unit** PlayerSlot;   /// Slot pointer of Player->Units
 
-	Unit*         Next;          ///< Generic link pointer (on map)
-	UnitListItem* CacheLinks;    ///< Link nodes for unit cache
-	unsigned      CacheLock : 1; ///< Used to lock unit out of the cache.
+	Unit*         Next;          /// Generic link pointer (on map)
+	UnitListItem* CacheLinks;    /// Link nodes for unit cache
+	unsigned      CacheLock : 1; /// Used to lock unit out of the cache.
 
-	int   InsideCount;   ///< Number of units inside.
-	int   BoardCount;    ///< Number of units transported inside.
-	Unit* UnitInside;    ///< Pointer to one of the units inside.
-	Unit* Container;     ///< Pointer to the unit containing it (or 0)
-	Unit* NextContained; ///< Next unit in the container.
-	Unit* PrevContained; ///< Previous unit in the container.
+	int   InsideCount;   /// Number of units inside.
+	int   BoardCount;    /// Number of units transported inside.
+	Unit* UnitInside;    /// Pointer to one of the units inside.
+	Unit* Container;     /// Pointer to the unit containing it (or 0)
+	Unit* NextContained; /// Next unit in the container.
+	Unit* PrevContained; /// Previous unit in the container.
 
-	int X; ///< Map position X
-	int Y; ///< Map position Y
+	int X; /// Map position X
+	int Y; /// Map position Y
 
-	struct _unit_type_*  Type;    ///< Pointer to unit-type (peon,...)
-	Player*    Player;            ///< Owner of this unit
-	struct _unit_stats_* Stats;   ///< Current unit stats
-	int        CurrentSightRange; ///< Unit's Current Sight Range
+	struct _unit_type_*  Type;    /// Pointer to unit-type (peon,...)
+	Player*    Player;            /// Owner of this unit
+	struct _unit_stats_* Stats;   /// Current unit stats
+	int        CurrentSightRange; /// Unit's Current Sight Range
 
 // DISPLAY:
-	struct _unit_colors_* Colors; ///< Player colors
-	signed char IX;         ///< X image displacement to map position
-	signed char IY;         ///< Y image displacement to map position
-	int         Frame;      ///< Image frame: <0 is mirrored
+	struct _unit_colors_* Colors; /// Player colors
+	signed char IX;         /// X image displacement to map position
+	signed char IY;         /// Y image displacement to map position
+	int         Frame;      /// Image frame: <0 is mirrored
 
-	unsigned Direction : 8; ///< angle (0-255) unit looking
+	unsigned Direction : 8; /// angle (0-255) unit looking
 
-	unsigned long Attacked; ///< gamecycle unit was last attacked
+	unsigned long Attacked; /// gamecycle unit was last attacked
 
-	unsigned Burning : 1;   ///< unit is burning
-	unsigned Destroyed : 1; ///< unit is destroyed pending reference
-	unsigned Removed : 1;   ///< unit is removed (not on map)
-	unsigned Selected : 1;  ///< unit is selected
-	unsigned TeamSelected;  ///< unit is selected by a team member.
+	unsigned Burning : 1;   /// unit is burning
+	unsigned Destroyed : 1; /// unit is destroyed pending reference
+	unsigned Removed : 1;   /// unit is removed (not on map)
+	unsigned Selected : 1;  /// unit is selected
+	unsigned TeamSelected;  /// unit is selected by a team member.
 
-	unsigned Constructed : 1; ///< Unit is in construction
-	unsigned Active : 1;      ///< Unit is active for AI
-	unsigned Boarded : 1;     ///< Unit is on board a transporter.
-	Player*  RescuedFrom;     ///< The original owner of a rescued unit.
-							  ///< NULL if the unit was not rescued.
+	unsigned Constructed : 1; /// Unit is in construction
+	unsigned Active : 1;      /// Unit is active for AI
+	unsigned Boarded : 1;     /// Unit is on board a transporter.
+	Player*  RescuedFrom;     /// The original owner of a rescued unit.
+							  /// NULL if the unit was not rescued.
 	/* Seen stuff. */
-	char VisCount[PlayerMax]; ///< Unit visibility counts
+	char VisCount[PlayerMax]; /// Unit visibility counts
 	struct _seen_stuff_ {
-		unsigned            ByPlayer : PlayerMax;    ///< Track unit seen by player
-		int                 Frame;                   ///< last seen frame/stage of buildings
-		struct _unit_type_* Type;                    ///< Pointer to last seen unit-type
-		int                 X;                       ///< Last unit->X Seen
-		int                 Y;                       ///< Last unit->Y Seen
-		signed char         IX;                      ///< Seen X image displacement to map position
-		signed char         IY;                      ///< seen Y image displacement to map position
-		unsigned            Constructed : 1;         ///< Unit seen construction
-		unsigned            State : 3;               ///< Unit seen build/upgrade state
-		unsigned            Destroyed : PlayerMax;   ///< Unit seen destroyed or not
-		struct _construction_frame_* CFrame;         ///< Seen construction frame
+		unsigned            ByPlayer : PlayerMax;    /// Track unit seen by player
+		int                 Frame;                   /// last seen frame/stage of buildings
+		struct _unit_type_* Type;                    /// Pointer to last seen unit-type
+		int                 X;                       /// Last unit->X Seen
+		int                 Y;                       /// Last unit->Y Seen
+		signed char         IX;                      /// Seen X image displacement to map position
+		signed char         IY;                      /// seen Y image displacement to map position
+		unsigned            Constructed : 1;         /// Unit seen construction
+		unsigned            State : 3;               /// Unit seen build/upgrade state
+		unsigned            Destroyed : PlayerMax;   /// Unit seen destroyed or not
+		struct _construction_frame_* CFrame;         /// Seen construction frame
 	} Seen;
 
-	int Mana;               ///< mana points
-	int HP;                 ///< hit points
-	int XP;                 ///< experience points
-	int Kills;              ///< how many unit has this unit killed
-	struct _variable_type_* Variable; ///< array of User Defined variables.
+	int Mana;               /// mana points
+	int HP;                 /// hit points
+	int XP;                 /// experience points
+	int Kills;              /// how many unit has this unit killed
+	struct _variable_type_* Variable; /// array of User Defined variables.
 
-	unsigned long TTL;  ///< time to live
-	int Bloodlust;      ///< ticks bloodlust
-	int Haste;          ///< ticks haste (disables slow)
-	int Slow;           ///< ticks slow (disables haste)
-	int Invisible;      ///< ticks invisible
-	int FlameShield;    ///< ticks flame shield
-	int UnholyArmor;    ///< ticks unholy armor
+	unsigned long TTL;  /// time to live
+	int Bloodlust;      /// ticks bloodlust
+	int Haste;          /// ticks haste (disables slow)
+	int Slow;           /// ticks slow (disables haste)
+	int Invisible;      /// ticks invisible
+	int FlameShield;    /// ticks flame shield
+	int UnholyArmor;    /// ticks unholy armor
 
-	int GroupId;        ///< unit belongs to this group id
-	int LastGroup;      ///< unit belongs to this last group
+	int GroupId;        /// unit belongs to this group id
+	int LastGroup;      /// unit belongs to this last group
 
-	int ResourcesHeld;      ///< Resources Held by a unit
+	int ResourcesHeld;      /// Resources Held by a unit
 
-	unsigned SubAction : 8; ///< sub-action of unit
-	unsigned Wait;          ///< action counter
-	unsigned State : 8;     ///< action state
-#define MAX_UNIT_STATE 255  ///< biggest state for action
-	unsigned Reset : 1;     ///< can process new command
-	unsigned Blink : 3;     ///< Let selection rectangle blink
-	unsigned Moving : 1;    ///< The unit is moving
-	unsigned ReCast : 1;    ///< Recast again next cycle
+	unsigned SubAction : 8; /// sub-action of unit
+	unsigned Wait;          /// action counter
+	unsigned State : 8;     /// action state
+#define MAX_UNIT_STATE 255  /// biggest state for action
+	unsigned Reset : 1;     /// can process new command
+	unsigned Blink : 3;     /// Let selection rectangle blink
+	unsigned Moving : 1;    /// The unit is moving
+	unsigned ReCast : 1;    /// Recast again next cycle
 
 	struct _unit_anim_ {
-		const struct _new_animation_* Anim;         ///< Anim
-		const struct _new_animation_* CurrAnim;     ///< CurrAnim
-		int Wait;                                   ///< Wait
-		int Unbreakable;                            ///< Unbreakable
+		const struct _new_animation_* Anim;         /// Anim
+		const struct _new_animation_* CurrAnim;     /// CurrAnim
+		int Wait;                                   /// Wait
+		int Unbreakable;                            /// Unbreakable
 	} Anim;
 
 	/** set to random 1..100 when MakeUnit()
@@ -627,61 +627,61 @@ struct _unit_ {
 	unsigned Rs : 8;
 	unsigned char CurrentResource;
 
-	char OrderCount;            ///< how many orders in queue
-	char OrderFlush;            ///< cancel current order, take next
-	int  TotalOrders;           ///< Total Number of orders available
-	Order* Orders;              ///< orders to process
-	Order SavedOrder;           ///< order to continue after current
-	Order NewOrder;             ///< order for new trained units
-	char* AutoCastSpell;        ///< spells to auto cast
-	unsigned AutoRepair : 1;    ///< True if unit tries to repair on still action.
+	char OrderCount;            /// how many orders in queue
+	char OrderFlush;            /// cancel current order, take next
+	int  TotalOrders;           /// Total Number of orders available
+	Order* Orders;              /// orders to process
+	Order SavedOrder;           /// order to continue after current
+	Order NewOrder;             /// order for new trained units
+	char* AutoCastSpell;        /// spells to auto cast
+	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 
 	union _order_data_ {
 	struct _order_move_ {
-		char Fast;                  ///< Flag fast move (one step)
-		char Length;                ///< stored path length
-#define MAX_PATH_LENGTH 28          ///< max length of precalculated path
-		char Path[MAX_PATH_LENGTH]; ///< directions of stored path
-	} Move; ///< ActionMove,...
+		char Fast;                  /// Flag fast move (one step)
+		char Length;                /// stored path length
+#define MAX_PATH_LENGTH 28          /// max length of precalculated path
+		char Path[MAX_PATH_LENGTH]; /// directions of stored path
+	} Move; /// ActionMove,...
 	struct _order_built_ {
-		Unit* Worker;               ///< Worker building this unit
-		int Progress;               ///< Progress counter, in 1/100 cycles.
-		int Cancel;                 ///< Cancel construction
-		struct _construction_frame_* Frame; ///< Construction frame
-	} Built; ///< ActionBuilt,...
+		Unit* Worker;               /// Worker building this unit
+		int Progress;               /// Progress counter, in 1/100 cycles.
+		int Cancel;                 /// Cancel construction
+		struct _construction_frame_* Frame; /// Construction frame
+	} Built; /// ActionBuilt,...
 	struct _order_build_ {
-		int Cycles;                 ///< Cycles unit has been building for
-	} Build; ///< ActionBuild
+		int Cycles;                 /// Cycles unit has been building for
+	} Build; /// ActionBuild
 	struct _order_resource_ {
-		int Active; ///< how many units are harvesting from the resource.
-	} Resource; ///< Resource still
+		int Active; /// how many units are harvesting from the resource.
+	} Resource; /// Resource still
 	struct _order_resource_worker_ {
-		int TimeToHarvest;          ///< how much time until we harvest some more.
-		unsigned DoneHarvesting:1;  ///< Harvesting done, wait for action to break.
-	} ResWorker; ///< Worker harvesting
+		int TimeToHarvest;          /// how much time until we harvest some more.
+		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
+	} ResWorker; /// Worker harvesting
 	struct _order_repair_ {
-		int Cycles;                 ///< Cycles unit has been repairing for
-	} Repair; ///< Repairing unit
+		int Cycles;                 /// Cycles unit has been repairing for
+	} Repair; /// Repairing unit
 	struct _order_research_ {
-		struct _upgrade_* Upgrade;  ///< Upgrade researched
-	} Research; ///< Research action
+		struct _upgrade_* Upgrade;  /// Upgrade researched
+	} Research; /// Research action
 	struct _order_upgradeto_ {
-		int Ticks; ///< Ticks to complete
-	} UpgradeTo; ///< Upgrade to action
+		int Ticks; /// Ticks to complete
+	} UpgradeTo; /// Upgrade to action
 	struct _order_train_ {
-		int Ticks;                  ///< Ticks to complete
-	} Train; ///< Train units action
-	} Data; ///< Storage room for different commands
+		int Ticks;                  /// Ticks to complete
+	} Train; /// Train units action
+	} Data; /// Storage room for different commands
 
-	Unit* Goal; ///< Generic goal pointer
+	Unit* Goal; /// Generic goal pointer
 };
 
-#define NoUnitP (Unit*)0         ///< return value: for no unit found
-#define InfiniteDistance INT_MAX ///< the distance is unreachable
+#define NoUnitP (Unit*)0         /// return value: for no unit found
+#define InfiniteDistance INT_MAX /// the distance is unreachable
 
-#define FlushCommands 1          ///< Flush commands in queue
+#define FlushCommands 1          /// Flush commands in queue
 
-#define MAX_UNIT_SLOTS 65535     ///< Maximal number of used slots
+#define MAX_UNIT_SLOTS 65535     /// Maximal number of used slots
 
 /**
 **  Returns true, if unit is unusable. (for attacking,...)
@@ -733,38 +733,38 @@ struct _unit_ {
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern Unit* UnitSlots[MAX_UNIT_SLOTS]; ///< All possible units
-extern Unit** UnitSlotFree;             ///< First free unit slot
+extern Unit* UnitSlots[MAX_UNIT_SLOTS]; /// All possible units
+extern Unit** UnitSlotFree;             /// First free unit slot
 
-extern Unit* Units[MAX_UNIT_SLOTS]; ///< Units used
-extern int NumUnits;                ///< Number of units used
+extern Unit* Units[MAX_UNIT_SLOTS]; /// Units used
+extern int NumUnits;                /// Number of units used
 
 // in unit_draw.c
 /// @todo could be moved into the user interface ?
-extern int ShowSightRange;              ///< Flag: show right range
-extern int ShowReactionRange;           ///< Flag: show reaction range
-extern int ShowAttackRange;             ///< Flag: show attack range
-extern int ShowOrders;                  ///< Flag: show orders of unit on map
-extern unsigned long ShowOrdersCount;   ///< Show orders for some time
-extern int XpDamage;                    ///< unit XP adds more damage to attacks
-extern char EnableTrainingQueue;        ///< Config: training queues enabled
-extern char EnableBuildingCapture;      ///< Config: building capture enabled
-extern char RevealAttacker;             ///< Config: reveal attacker enabled
-extern const Viewport* CurrentViewport; ///< CurrentViewport
+extern int ShowSightRange;              /// Flag: show right range
+extern int ShowReactionRange;           /// Flag: show reaction range
+extern int ShowAttackRange;             /// Flag: show attack range
+extern int ShowOrders;                  /// Flag: show orders of unit on map
+extern unsigned long ShowOrdersCount;   /// Show orders for some time
+extern int XpDamage;                    /// unit XP adds more damage to attacks
+extern char EnableTrainingQueue;        /// Config: training queues enabled
+extern char EnableBuildingCapture;      /// Config: building capture enabled
+extern char RevealAttacker;             /// Config: reveal attacker enabled
+extern const Viewport* CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const Unit*);
 extern void (*DrawSelection)(Uint32, int, int, int, int);
-extern int MaxSelectable;                  ///< How many units could be selected
+extern int MaxSelectable;                  /// How many units could be selected
 
-extern Unit** Selected;                    ///< currently selected units
-extern Unit** TeamSelected[PlayerMax];     ///< teams currently selected units
-extern int    NumSelected;                 ///< how many units selected
-extern int    NumTeamSelected[PlayerMax];  ///< Number of Units a team member has selected
+extern Unit** Selected;                    /// currently selected units
+extern Unit** TeamSelected[PlayerMax];     /// teams currently selected units
+extern int    NumSelected;                 /// how many units selected
+extern int    NumTeamSelected[PlayerMax];  /// Number of Units a team member has selected
 
-extern Unit* ReleasedHead;                 ///< Head of the released unit list.
-extern Unit* ReleasedTail;                 ///< Tail of the released unit list.
+extern Unit* ReleasedHead;                 /// Head of the released unit list.
+extern Unit* ReleasedTail;                 /// Tail of the released unit list.
 
-extern Order* ReleasedOrderHead;           ///< Head of the released orders list.
-extern Order* ReleasedOrderTail;           ///< Tail of the released unit list.
+extern Order* ReleasedOrderHead;           /// Head of the released orders list.
+extern Order* ReleasedOrderTail;           /// Tail of the released unit list.
 
 /*----------------------------------------------------------------------------
 -- Functions
