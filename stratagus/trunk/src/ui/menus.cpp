@@ -38,7 +38,6 @@
 #include "freecraft.h"
 #include "video.h"
 #include "player.h"
-#include "image.h"
 #include "font.h"
 #include "tileset.h"
 #include "map.h"
@@ -571,6 +570,18 @@ local Menuitem ConnectingMenuItems[] = {
 };
 
 /**
+**	FIXME: Ari please look, this is now in TheUI.
+*/
+enum {
+    ImageNone,
+    ImagePanel1,
+    ImagePanel2,
+    ImagePanel3,
+    ImagePanel4,
+    ImagePanel5,
+};
+
+/**
 **	Menus
 */
 global Menu Menus[] = {
@@ -1033,8 +1044,38 @@ global void DrawMenu(int MenuId)
 	return;
     }
     menu = Menus + MenuId;
-    if (menu->image != ImageNone) {
-	DrawImage(menu->image,0,0,menu->x,menu->y);
+    switch( menu->image ) {
+	case ImagePanel1:
+	    VideoDrawSub(TheUI.GameMenuePanel.Graphic,0,0,
+		    VideoGraphicWidth(TheUI.GameMenuePanel.Graphic),
+		    VideoGraphicHeight(TheUI.GameMenuePanel.Graphic),
+		    menu->x,menu->y);
+	    break;
+	case ImagePanel2:
+	    VideoDrawSub(TheUI.Menue1Panel.Graphic,0,0,
+		    VideoGraphicWidth(TheUI.Menue1Panel.Graphic),
+		    VideoGraphicHeight(TheUI.Menue1Panel.Graphic),
+		    menu->x,menu->y);
+	    break;
+	case ImagePanel3:
+	    VideoDrawSub(TheUI.Menue2Panel.Graphic,0,0,
+		   VideoGraphicWidth(TheUI.Menue2Panel.Graphic),
+		   VideoGraphicHeight(TheUI.Menue2Panel.Graphic),
+		   menu->x,menu->y);
+	    break;
+	case ImagePanel4:
+	    VideoDrawSub(TheUI.VictoryPanel.Graphic,0,0,
+		   VideoGraphicWidth(TheUI.VictoryPanel.Graphic),
+		   VideoGraphicHeight(TheUI.VictoryPanel.Graphic),
+		   menu->x,menu->y);
+	    break;
+	case ImagePanel5:
+	    VideoDrawSub(TheUI.ScenarioPanel.Graphic,0,0,
+		   VideoGraphicWidth(TheUI.ScenarioPanel.Graphic),
+		   VideoGraphicHeight(TheUI.ScenarioPanel.Graphic),
+		   menu->x,menu->y);
+	default:
+	    break;
     }
     n = menu->nitems;
     mi = menu->items;

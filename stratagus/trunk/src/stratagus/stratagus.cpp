@@ -101,7 +101,6 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "freecraft.h"
 
 #include "video.h"
-#include "image.h"
 #include "tileset.h"
 #include "map.h"
 #include "minimap.h"
@@ -452,7 +451,6 @@ Use it at your own risk.\n\n");
     // All pre-start menues are orcish - may need to be switched later..
     SetDefaultTextColors(FontYellow,FontWhite);
     InitMenus(1);
-    LoadImages(1);
     LoadCursors("orc");
     InitSettings();
 
