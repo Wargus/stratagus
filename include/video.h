@@ -347,7 +347,7 @@ typedef struct _event_callback_ {
 ----------------------------------------------------------------------------*/
 
 extern PaletteLink* PaletteList;	/// List of all used palettes loaded
-extern int ColorCycleAll;		/// Flag color cycle all palettes
+extern int ColorCycleAll;		/// Flag color cycle palettes
 #ifdef DEBUG
 extern unsigned AllocatedGraphicMemory;	/// Allocated memory for objects
 extern unsigned CompressedGraphicMemory;/// memory for compressed objects
