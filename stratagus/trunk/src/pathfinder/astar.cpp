@@ -325,13 +325,8 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     x=unit->X;
     y=unit->Y;
     goal_reachable=0;
-#ifdef NEW_ORDERS
     r=unit->Orders[0].RangeX;
     goal=unit->Orders[0].Goal;
-#else
-    r=unit->Command.Data.Move.Range;
-    goal=unit->Command.Data.Move.Goal;
-#endif
 
     // Let's first mark goal
     if(goal) {
@@ -343,13 +338,8 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	gx=goal->X+goal->Type->TileHeight/2;
 	gy=goal->Y+goal->Type->TileWidth/2;
     } else {
-#ifdef NEW_ORDERS
 	cx=gx=unit->Orders[0].X;
 	cy=gy=unit->Orders[0].Y;
-#else
-	cx=gx=unit->Command.Data.Move.DX;
-	cy=gy=unit->Command.Data.Move.DY;
-#endif
 	ey=r;
 	sx=r;
 	r=0;
@@ -510,17 +500,10 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     // if the goal was not reachable, we replace it by the best point
     // this will speed up next path finding
     if(!goal_reachable) {
-#ifdef NEW_ORDERS
 	unit->Orders[0].Goal=0;
 	unit->Orders[0].X=ex;
 	unit->Orders[0].Y=ey;
-	ResetPath(unit->Orders[0]);
-#else
-	unit->Command.Data.Move.Goal=0;
-	unit->Command.Data.Move.DX=ex;
-	unit->Command.Data.Move.DY=ey;
-	ResetPath(unit->Command);
-#endif
+	NewResetPath(unit);
     }
     // now we need to backtrack
     path_length=0;
@@ -581,15 +564,10 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
     Unit* goal;
     UnitType* type;
 
-#ifdef NEW_ORDERS
     DebugCheck( unit->Orders[0].RangeX!=unit->Orders[0].RangeY );
 
     r=unit->Orders[0].RangeX;
     goal=unit->Orders[0].Goal;
-#else
-    r=unit->Command.Data.Move.Range;
-    goal=unit->Command.Data.Move.Goal;
-#endif
     x=unit->X;
     y=unit->Y;
     if( goal ) {			// goal unit
@@ -606,7 +584,6 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 	    return -1;
 	}
     } else {				// goal map field
-#ifdef NEW_ORDERS
 	if( x>=unit->Orders[0].X && x<=unit->Orders[0].X+r
 		&& y>=unit->Orders[0].Y && y<=unit->Orders[0].Y+r ) {
 	    DebugLevel3Fn("Field reached\n");
@@ -624,30 +601,6 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 		return -2;
 	    }
 	}
-#else
-	if( x>=unit->Command.Data.Move.DX
-		&& x<=unit->Command.Data.Move.DX+r
-		&& y>=unit->Command.Data.Move.DY
-		&& y<=unit->Command.Data.Move.DY+r ) {
-	    DebugLevel3Fn("Field reached\n");
-	    *pxd=*pyd=0;
-	    return -1;
-	}
-	// This reduces the processor use,
-	// If target isn't reachable and were beside it
-	if( r==0 && x>=unit->Command.Data.Move.DX-1
-		&& x<=unit->Command.Data.Move.DX+1
-		&& y>=unit->Command.Data.Move.DY-1
-		&& y<=unit->Command.Data.Move.DY+1 ) {
-	    if( !CheckedCanMoveToMask(unit->Command.Data.Move.DX
-		    ,unit->Command.Data.Move.DY
-		    ,UnitMovementMask(unit)) ) {	// blocked
-		DebugLevel3Fn("Field unreached\n");
-		*pxd=*pyd=0;
-		return -2;
-	    }
-	}
-#endif
     }
 
     return AStarFindPath(unit,pxd,pyd);
