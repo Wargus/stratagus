@@ -271,12 +271,20 @@ local void HandleUnitAction(Unit* unit)
 global void UnitActions(void)
 {
     Unit** table;
+    Unit** tend;
     Unit* unit;
 
     //
-    // Do all actions
+    //	Must copy table, units could be removed.
     //
-    for( table=Units; table<Units+NumUnits; table++ ) {
+    table=alloca(sizeof(Unit)*NumUnits);
+    tend=table+NumUnits;
+    memcpy(table,Units,sizeof(Unit)*NumUnits);
+
+    //
+    //	Do all actions
+    //
+    for( ; table<tend; table++ ) {
 	unit=*table;
 
 #if defined(UNIT_ON_MAP) && 0		// debug unit store
@@ -315,7 +323,7 @@ global void UnitActions(void)
 	}
 	HandleUnitAction(unit);
 	DebugCheck( *table!=unit );	// Removed is evil.
-#ifdef noDEBUG
+#ifdef no_DEBUG
 	//
 	//	Dump the unit to find the network unsyncron bug.
 	//
@@ -340,7 +348,7 @@ global void UnitActions(void)
 
 	fprintf(logf,"%d: ",FrameCounter);
 	fprintf(logf,"%Zd %s S%d/%d-%d P%d Refs %d\n",
-	    UnitNumber(unit),unit->Type->Ident,
+	    UnitNumber(unit),unit->Type ? unit->Type->Ident : "unit-killed",
 		unit->State,unit->SubAction,
 		unit->Orders[0].Action,
 		unit->Player->Player,unit->Refs);
