@@ -69,29 +69,44 @@ typedef struct _network_host_ {
 **	Connect state information of network systems active in current game.
 */
 typedef struct _network_state_ {
-    unsigned char	State;		/// Menu: ConnectState;
+    unsigned char	State;		/// Menu: ConnectState
     unsigned char	Ready;		/// Menu: Player is ready
     unsigned short	MsgCnt;		/// Menu: Counter for state msg of same type (detect unreachable)
     // Fill in here...
 } NetworkState;
 
 /**
+**	Multiplayer game setup menu state
+*/
+typedef struct _setup_state_ {
+    unsigned char	ResOpt;		/// Multiplayer Menu: Resources option
+    unsigned char	UnsOpt;		/// Multiplayer Menu: Unit # option
+    unsigned char	FwsOpt;		/// Multiplayer Menu: Fog of war option
+    unsigned char	TssOpt;		/// Multiplayer Menu: Tileset select option
+    unsigned char	CompOpt[8];	/// Multiplayer Menu: Free slot option selection
+    unsigned char	Ready[8];	/// Multiplayer Menu: Client ready state
+    unsigned char	Race[8];	/// Multiplayer Menu: Client race selection
+    // Fill in here...
+} ServerSetup;
+
+/**
 **	Network init message.
 */
 typedef struct _init_message_ {
-    unsigned char  Type;		/// Init message type.
-    unsigned char  SubType;		/// Init message subtype.
-    int		   FreeCraft;		/// FreeCraft engine version.
-    int		   Version;		/// Network protocol version.
+    unsigned char  Type;		/// Init message type
+    unsigned char  SubType;		/// Init message subtype
+    int		   FreeCraft;		/// FreeCraft engine version
+    int		   Version;		/// Network protocol version
     unsigned int   ConfUID;		/// Engine configuration UID (Checksum)	// FIXME: not available yet
     unsigned int   MapUID;		/// UID of map to play.	// FIXME: add MAP name, path, etc
     int		   Lag;			/// Lag time
     int		   Updates;		/// Update frequency
-    char	   HostsCount;		/// Number of hosts.
+    char	   HostsCount;		/// Number of hosts
 
     union {
-	NetworkHost	Hosts[PlayerMax];	/// Participant information.
+	NetworkHost	Hosts[PlayerMax];	/// Participant information
 	char		MapPath[256];
+	ServerSetup	State;			/// Server Setup State information 
     } u;
 } InitMessage;
 
@@ -154,7 +169,9 @@ extern NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host s
 extern int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
 extern char NetworkName[16];		/// Network menu: Name of local player
 extern int NetConnectRunning;		/// Network menu: Setup mode active
-extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
+extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state
+
+extern ServerSetup ServerSetupState;	/// Network menu: Multiplayer Server Menu selections state
 
 /*----------------------------------------------------------------------------
 --	Functions
