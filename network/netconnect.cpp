@@ -965,9 +965,6 @@ global void NetworkServerStartGame(void)
 // 	PlayerSetName(&Players[Hosts[i].PlyNr], Hosts[i].PlyName);
     }
 
-// ThisPlayer = &Players[Hosts[i].PlyNr];
-// PlayerSetName(ThisPlayer, NetworkName);
-
     // Prepare the final state message:
     statemsg.Type = MessageInitReply;
     statemsg.SubType = ICMState;
@@ -1058,8 +1055,23 @@ breakout:
     }
 
     DebugLevel0Fn("DONE: All configs acked - Now starting..\n");
+}
 
+/**
+**	Assign player slots and names in a network game..
+*/
+global void NetworkConnectSetupGame(void)
+{
+    int i;
 
+    ThisPlayer = &Players[NetLocalPlayerNumber];
+    PlayerSetName(ThisPlayer, NetworkName);
+    for (i = 0; i < HostsCount; ++i) {
+	PlayerSetName(&Players[Hosts[i].PlyNr], Hosts[i].PlyName);
+    }
+
+    // FIXME: evaluate ServerSetupState .....
+    // FIXME: must be done earlier during player creation!!!
 }
 
 /**
@@ -1406,8 +1418,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				    NetLocalPlayerNumber = ntohs(msg->u.Hosts[i].PlyNr);
 				    DebugLevel0Fn("SELF %d [%s]\n", ntohs(msg->u.Hosts[i].PlyNr),
 					    msg->u.Hosts[i].PlyName);
-				    // ThisPlayer = &Players[ntohs(msg->u.Hosts[i].PlyNr)];
-				    // PlayerSetName(ThisPlayer, NetworkName);
 				}
 			    }
 			    // server is last:
@@ -1417,6 +1427,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
 			    // PlayerSetName(&Players[Hosts[HostsCount].PlyNr], Hosts[HostsCount].PlyName);
 			    HostsCount++;
+			    NetPlayers = HostsCount + 1;
 			    DebugLevel0Fn("Server %d = %d.%d.%d.%d:%d [%s]\n",
 				    ntohs(msg->u.Hosts[i].PlyNr), NIPQUAD(ntohl(NetLastHost)),
 				    ntohs(NetLastPort), msg->u.Hosts[i].PlyName);

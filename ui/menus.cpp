@@ -3034,7 +3034,6 @@ local void TerminateNetConnect(void)
 	    return;
 
 	case ccs_started:
-	    DebugLevel1Fn("TerminateNetConnect: started\n");
 	    CustomGameStart();
 	    return;
 
