@@ -650,6 +650,31 @@ local SCM CclIfScore(SCM player,SCM operation,SCM quantity)
     return SCM_BOOL_F;
 }
 
+/**
+**	Number of game cycles elapsed
+*/
+local SCM CclIfElapsed(SCM operation,SCM quantity)
+{
+    int q;
+    const char* op;
+    CompareFunction Compare;
+
+    op=get_c_string(operation);
+    q=gh_scm2int(quantity);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-score: %s\n",op);
+	Exit(1);
+    }
+
+    if( Compare(GameCycle,q) ) {
+	return SCM_BOOL_T;
+    }
+
+    return SCM_BOOL_F;
+}
+
 // --------------------------------------------------------------------------
 //	Actions
 
@@ -746,6 +771,7 @@ global void TriggerCclRegister(void)
     gh_new_procedure4_0("if-resource",CclIfResource);
     gh_new_procedure3_0("if-kills",CclIfKills);
     gh_new_procedure3_0("if-score",CclIfScore);
+    gh_new_procedure2_0("if-elapsed",CclIfElapsed);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);
     gh_new_procedure0_0("action-defeat",CclActionDefeat);
