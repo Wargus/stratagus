@@ -410,6 +410,8 @@ extern int SpeedTrain;						/// Speed factor for training
 extern int SpeedUpgrade;                    /// Speed factor for upgrading
 extern int SpeedResearch;                   /// Speed factor for researching
 
+extern char UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
+
 extern unsigned SyncRandSeed;               /// Sync random seed value
 
 extern unsigned long GameCycle;             /// Game simulation cycle counter
