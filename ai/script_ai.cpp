@@ -1079,7 +1079,6 @@ local SCM CclDefineAiPlayer(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("need-mask")) ) {
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("need-food")) ) {
-	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("unit-type")) ) {
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("upgrade")) ) {
