@@ -49,14 +49,6 @@
 ----------------------------------------------------------------------------*/
 
 global WorldMap TheMap;			/// The current map
-
-#ifndef SPLIT_SCREEN_SUPPORT
-global unsigned MapX;			/// Map tile X start on display
-global unsigned MapY;			/// Map tile Y start on display
-global unsigned MapWidth;		/// Map width in tiles on display
-global unsigned MapHeight;		/// Map height in tiles on display
-#endif /* SPLIT_SCREEN_SUPPORT */
-
 global int FlagRevealMap;		/// Flag must reveal the map
 
 /*----------------------------------------------------------------------------
@@ -69,62 +61,62 @@ global int FlagRevealMap;		/// Flag must reveal the map
 **	@param x	Map X tile-position.
 **	@param y	Map Y tile-position.
 */
-global void MapMarkSeenTile( int x, int y )
+global void MapMarkSeenTile(int x, int y)
 {
     int tile;
     int seentile;
-    MapField* mf;
+    MapField *mf;
 
-    mf=TheMap.Fields+x+y*TheMap.Width;
+    mf = TheMap.Fields + x + y * TheMap.Width;
     //
     // Nothing changed? Seeing already the correct tile.
     //
-    if ((tile  = mf->Tile) == (seentile = mf->SeenTile)) {
+    if ((tile = mf->Tile) == (seentile = mf->SeenTile)) {
 	return;
     }
-    mf->SeenTile=tile;
+    mf->SeenTile = tile;
 
     // FIXME: this is needed, because tileset is loaded after this function
-    //		is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
-    if( !TheMap.Tileset ) {
+    //          is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
+    if (!TheMap.Tileset) {
 	return;
     }
 
     //
-    //	Handle wood changes. FIXME: check if for growing wood correct?
+    //  Handle wood changes. FIXME: check if for growing wood correct?
     //
-    if ( seentile != TheMap.Tileset->RemovedTree
-	    && tile == TheMap.Tileset->RemovedTree ) {
-	MapFixSeenWoodNeighbors( x, y );
-    } else if ( seentile == TheMap.Tileset->RemovedTree
-	    && tile != TheMap.Tileset->RemovedTree ) {
-	MapFixSeenWoodTile( x, y );
-    } else if ( ForestOnMap( x, y ) ) {
-	MapFixSeenWoodTile( x, y );
-	MapFixSeenWoodNeighbors( x, y );
+    if (seentile != TheMap.Tileset->RemovedTree
+	    && tile == TheMap.Tileset->RemovedTree) {
+	MapFixSeenWoodNeighbors(x, y);
+    } else if (seentile == TheMap.Tileset->RemovedTree
+	    && tile != TheMap.Tileset->RemovedTree) {
+	MapFixSeenWoodTile(x, y);
+    } else if (ForestOnMap(x, y)) {
+	MapFixSeenWoodTile(x, y);
+	MapFixSeenWoodNeighbors(x, y);
 
-    //
-    //	Handle rock changes.
-    //
-    } else if ( seentile != TheMap.Tileset->RemovedRock
-	    && tile == TheMap.Tileset->RemovedRock ) {
-	MapFixSeenRockNeighbors( x, y );
-    } else if ( seentile == TheMap.Tileset->RemovedRock
-	    && tile != TheMap.Tileset->RemovedRock ) {
-	MapFixSeenRockTile( x, y );
-    } else if ( RockOnMap( x, y ) ) {
-	MapFixSeenRockTile( x, y );
-	MapFixSeenRockNeighbors( x, y );
+	//
+	//  Handle rock changes.
+	//
+    } else if (seentile != TheMap.Tileset->RemovedRock
+	    && tile == TheMap.Tileset->RemovedRock) {
+	MapFixSeenRockNeighbors(x, y);
+    } else if (seentile == TheMap.Tileset->RemovedRock
+	    && tile != TheMap.Tileset->RemovedRock) {
+	MapFixSeenRockTile(x, y);
+    } else if (RockOnMap(x, y)) {
+	MapFixSeenRockTile(x, y);
+	MapFixSeenRockNeighbors(x, y);
 
-    //
-    //	Handle Walls changes.
-    //
-    } else if ( TheMap.Tileset->TileTypeTable[tile] == TileTypeHumanWall
+	//
+	//  Handle Walls changes.
+	//
+    } else if (TheMap.Tileset->TileTypeTable[tile] == TileTypeHumanWall
 	    || TheMap.Tileset->TileTypeTable[tile] == TileTypeOrcWall
 	    || TheMap.Tileset->TileTypeTable[seentile] == TileTypeHumanWall
-	    || TheMap.Tileset->TileTypeTable[seentile] == TileTypeOrcWall ) {
-	MapFixSeenWallTile( x, y );
-	MapFixSeenWallNeighbors( x, y );
+	    || TheMap.Tileset->TileTypeTable[seentile] == TileTypeOrcWall) {
+	MapFixSeenWallTile(x, y);
+	MapFixSeenWallNeighbors(x, y);
     }
 }
 
@@ -133,7 +125,8 @@ global void MapMarkSeenTile( int x, int y )
 */
 global void RevealMap(void)
 {
-    int ix, iy;
+    int ix;
+    int iy;
 
     for ( ix = 0; ix < TheMap.Width; ix++ ) {
 	for ( iy = 0; iy < TheMap.Height; iy++ ) {
@@ -156,8 +149,6 @@ global void RevealMap(void)
     }
 }
 
-#ifdef SPLIT_SCREEN_SUPPORT
-
 /**
 **	Change viewpoint of map viewport v to x,y.
 **
@@ -165,33 +156,34 @@ global void RevealMap(void)
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
-global void MapViewportSetViewpoint (int v, int x, int y)
+global void MapViewportSetViewpoint(int v, int x, int y)
 {
-    unsigned MapX = TheUI.VP[v].MapX;
-    unsigned MapY = TheUI.VP[v].MapY;
-    unsigned MapWidth = TheUI.VP[v].MapWidth;
-    unsigned MapHeight = TheUI.VP[v].MapHeight;
+    unsigned map_width;
+    unsigned map_height;
 
-    if (x==MapX && y==MapY) {
+    if (x == TheUI.VP[v].MapX && y == TheUI.VP[v].MapY) {
 	return;
     }
 
-    if( x<0 ) {
-	TheUI.VP[v].MapX=0;
-    } else if( x>TheMap.Width-MapWidth ) {
-	TheUI.VP[v].MapX=TheMap.Width-MapWidth;
+    map_width = TheUI.VP[v].MapWidth;
+    if (x < 0) {
+	TheUI.VP[v].MapX = 0;
+    } else if (x > TheMap.Width - map_width) {
+	TheUI.VP[v].MapX = TheMap.Width - map_width;
     } else {
-	TheUI.VP[v].MapX=x;
+	TheUI.VP[v].MapX = x;
     }
-    if( y<0 ) {
-	TheUI.VP[v].MapY=0;
-    } else if( y>TheMap.Height-MapHeight ) {
-	TheUI.VP[v].MapY=TheMap.Height-MapHeight;
+
+    map_height = TheUI.VP[v].MapHeight;
+    if (y < 0) {
+	TheUI.VP[v].MapY = 0;
+    } else if (y > TheMap.Height - map_height) {
+	TheUI.VP[v].MapY = TheMap.Height - map_height;
     } else {
-	TheUI.VP[v].MapY=y;
+	TheUI.VP[v].MapY = y;
     }
     MarkDrawEntireMap();
-    MustRedraw|=RedrawMinimap|RedrawMinimapCursor;
+    MustRedraw |= RedrawMinimap | RedrawMinimapCursor;
 }
 
 /**
@@ -201,58 +193,11 @@ global void MapViewportSetViewpoint (int v, int x, int y)
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
-global void MapCenterViewport (int v, int x,int y)
+global void MapCenterViewport(int v, int x, int y)
 {
-    unsigned MapWidth = TheUI.VP[v].MapWidth;
-    unsigned MapHeight = TheUI.VP[v].MapHeight;
-
-    MapViewportSetViewpoint(v, x-(MapWidth/2), y-(MapHeight/2));
+    MapViewportSetViewpoint(v,
+	    x - (TheUI.VP[v].MapWidth / 2), y - (TheUI.VP[v].MapHeight / 2));
 }
-
-#else /* SPLIT_SCREEN_SUPPORT */
-
-/**
-**	Change viewpoint of map to x,y
-**
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
-*/
-global void MapSetViewpoint(int x,int y)
-{
-    if (x==MapX && y==MapY) {
-	return;
-    }
-
-    if( x<0 ) {
-	MapX=0;
-    } else if( x>TheMap.Width-MapWidth ) {
-	MapX=TheMap.Width-MapWidth;
-    } else {
-	MapX=x;
-    }
-    if( y<0 ) {
-	MapY=0;
-    } else if( y>TheMap.Height-MapHeight ) {
-	MapY=TheMap.Height-MapHeight;
-    } else {
-	MapY=y;
-    }
-    MarkDrawEntireMap();
-    MustRedraw|=RedrawMinimap|RedrawMinimapCursor;
-}
-
-/**
-**	Center map viewpoint on x,y.
-**
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
-*/
-global void MapCenter(int x,int y)
-{
-    MapSetViewpoint(x-(MapWidth/2),y-(MapHeight/2));
-}
-
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 /*----------------------------------------------------------------------------
 --	Map queries
@@ -398,23 +343,32 @@ global int RockOnMap(int tx,int ty)
 
 #ifdef HIERARCHIC_PATHFINDER
 
-global inline unsigned short MapFieldGetRegId (int tx, int ty)
+/**
+**	FIXME: write the description of this function.
+*/
+global inline unsigned short MapFieldGetRegId(int tx, int ty)
 {
     return TheMap.Fields[ty * TheMap.Width + tx].RegId;
 }
 
-global inline void MapFieldSetRegId (int tx, int ty, unsigned short regid)
+/**
+**	FIXME: write the description of this function.
+*/
+global inline void MapFieldSetRegId(int tx, int ty, unsigned short regid)
 {
     TheMap.Fields[ty * TheMap.Width + tx].RegId = regid;
 }
 
-/* FIXME convert to a macro */
-global inline int MapFieldPassable (int tx, int ty, int mask)
+/**
+**	FIXME: write the description of this function.
+** 	@todo FIXME: convert to a macro
+*/
+global inline int MapFieldPassable(int tx, int ty, int mask)
 {
     return !(TheMap.Fields[ty * TheMap.Width + tx].Flags & mask);
 }
 
-#endif /* HIERARCHIC_PATHFINDER */
+#endif // HIERARCHIC_PATHFINDER
 
 /**
 **	Can move to this point, applying mask.
@@ -570,30 +524,29 @@ global int UnitMovementMask(const Unit* unit)
 */
 global void PreprocessMap(void)
 {
-    unsigned ix, iy;
+    unsigned ix;
+    unsigned iy;
     MapField* mf;
 
-    for ( ix = 0; ix < TheMap.Width; ix++ ) {
-	for ( iy = 0; iy < TheMap.Height; iy++ ) {
-	    mf=TheMap.Fields+ix+iy*TheMap.Width;
-	    mf->SeenTile=mf->Tile;
+    for (ix = 0; ix < TheMap.Width; ix++) {
+	for (iy = 0; iy < TheMap.Height; iy++) {
+	    mf = TheMap.Fields + ix + iy * TheMap.Width;
+	    mf->SeenTile = mf->Tile;
 	}
     }
 
     // it is required for fixing the wood that all tiles are marked as seen!
-    for ( ix = 0; ix < TheMap.Width; ix++ ) {
-	for ( iy = 0; iy < TheMap.Height; iy++ ) {
-	    MapFixWoodTile( ix, iy );
-	    MapFixSeenWoodTile( ix, iy );
-	    MapFixRockTile( ix, iy );
-	    MapFixSeenRockTile( ix, iy );
-	    MapFixWallTile( ix, iy );
-	    MapFixSeenWallTile( ix, iy );
+    for (ix = 0; ix < TheMap.Width; ix++) {
+	for (iy = 0; iy < TheMap.Height; iy++) {
+	    MapFixWoodTile(ix, iy);
+	    MapFixSeenWoodTile(ix, iy);
+	    MapFixRockTile(ix, iy);
+	    MapFixSeenRockTile(ix, iy);
+	    MapFixWallTile(ix, iy);
+	    MapFixSeenWallTile(ix, iy);
 	}
     }
 }
-
-#ifdef SPLIT_SCREEN_SUPPORT
 
 /**
 **	Convert viewport x coordinate to map tile x coordinate.
@@ -659,57 +612,6 @@ global int Map2ViewportY(int v, int y)
     return TheUI.VP[v].Y + ((y) - TheUI.VP[v].MapY) * TileSizeY;
 }
 
-#else /* SPLIT_SCREEN_SUPPORT */
-
-/**
-**	Convert a screen coordinate to map tile.
-**
-**	@param x	X screen coordinate.
-**
-**	@return		X tile number.
-*/
-global int Screen2MapX(int x)
-{
-    return (((x)-TheUI.MapX)/TileSizeX+MapX);
-}
-
-/**
-**	Convert a screen coordinate to map tile.
-**
-**	@param y	Y screen coordinate.
-**
-**	@return		Y tile number.
-*/
-global int Screen2MapY(int y)
-{
-    return (((y)-TheUI.MapY)/TileSizeY+MapY);
-}
-
-/**
-**	Convert a map tile into screen coordinate.
-**
-**	@param x	X tile number.
-**
-**	@return		X screen coordinate.
-*/
-global int Map2ScreenX(int x)
-{
-    return (TheUI.MapX+((x)-MapX)*TileSizeX);
-}
-
-/**
-**	Convert a map tile into screen coordinate.
-**
-**	@param y	Y tile number.
-**
-**	@return		Y screen coordinate.
-*/
-global int Map2ScreenY(int y)
-{
-    return (TheUI.MapY+((y)-MapY)*TileSizeY);
-}
-#endif /* SPLIT_SCREEN_SUPPORT */
-
 /**
 **	Release info about a map.
 **
@@ -740,7 +642,8 @@ global void CleanMap(void)
     // Tileset freeed by Tileset?
 
     FreeMapInfo(TheMap.Info);
-    memset(&TheMap,0,sizeof(TheMap));
+    memset(&TheMap, 0, sizeof(TheMap));
+    FlagRevealMap = 0;
 
     CleanMapFogOfWar();
 
