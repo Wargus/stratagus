@@ -1923,6 +1923,7 @@ global void EditorMainLoop(void)
 
     do {
 	EditorMapLoaded = 0;
+	EditorRunning = 1;
 
 	CreateEditor();
 
@@ -1945,7 +1946,6 @@ global void EditorMainLoop(void)
 	TheUI.LastClickedVP = 0;
 	TileCursorSize = 1;
 
-	EditorRunning = 1;
 	while (EditorRunning) {
 	    EditorUpdateDisplay();
 
