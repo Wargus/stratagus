@@ -759,6 +759,9 @@ global void GameMainLoop(void)
 	    if( Callbacks==&MenuCallbacks ) {
 		MustRedraw|=RedrawMenu;
 	    }
+	    if( CurrentMenu && CurrentMenu->image == ScPanel ) {
+		MustRedraw = RedrawEverything;
+	    }
 
 	    //For debuggin only: replace UpdateDisplay by DebugTestDisplay when
 	    //			 debugging linedraw routines..
