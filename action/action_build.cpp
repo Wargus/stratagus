@@ -257,6 +257,8 @@ global void HandleActionBuilded(Unit* unit)
 {
     Unit* worker;
     UnitType* type;
+    int i;
+    int n;
 
     type=unit->Type;
 
@@ -368,17 +370,20 @@ global void HandleActionBuilded(Unit* unit)
     //
     //	Update building states
     //
-    if( unit->Data.Builded.Sum*2>=unit->Stats->HitPoints ) {
-        if( (unit->Frame!=1 || unit->Constructed) ) {
-	  CheckUnitToBeDrawn(unit);
+    n=unit->Type->Construction->Sprite->NumFrames+2;
+    for( i=(n+1)/2; i>=1; --i ) {
+	if( unit->Data.Builded.Sum*n/i >= unit->Stats->HitPoints ) {
+	    if( unit->Frame!=i ) {
+		CheckUnitToBeDrawn(unit);
+	    }
+	    if( i==(n+1)/2 ) {
+		unit->Constructed=0;
+		unit->Frame=1;
+	    } else {
+		unit->Frame=i;
+	    }
+	    break;
 	}
-	unit->Constructed=0;
-	unit->Frame=1;
-    } else if( unit->Data.Builded.Sum*4>=unit->Stats->HitPoints ) {
-        if( unit->Frame!=1 ) {
-	  CheckUnitToBeDrawn(unit);
-	}
-	unit->Frame=1;
     }
 
     unit->Wait=5;
