@@ -48,7 +48,11 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
 ## NEW_AI:		New better improved AI code
 ## USE_TILECACHE:	Faster tile drawing, costs memory.
 ## USE_SMART_TILECACHE:	Faster tile drawing, slow with hardware video memory.
+## USE_LIBMODPLUG:	Use modplug audio player support.
 ## These aren't working yet:
+## USE_FFMPEG		Use ffmpeg video player support.
+## USE_FLAC:		Use flac audio player support.
+## USE_OGG:		Use ogg audio player support.
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Menu driven network set-up.
@@ -79,7 +83,7 @@ LOCAL_ZLIB="zlib-1.1.3"
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build14\""
+VERSION="-DVERSION=\"1.17pre1-build15\""
 UNIX=0
 BEOS=0
 WIN32=0
