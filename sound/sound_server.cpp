@@ -230,8 +230,8 @@ global void PlayMusic(const char* name)
 	    do {
 		if (CDTrack > NumCDTracks)
 		    CDTrack = 1;
+	    } while (cd_is_audio(++CDTrack) < 1);
 		cd_play(CDTrack);
-	    } while (cd_is_audio(CDTrack++) < 1);
 	    return;
 	}
 	
