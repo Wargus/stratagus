@@ -113,7 +113,9 @@ local void SpellMoveToTarget(Unit* unit)
 	unit->State = 0;
 	if( !unit->Type->Building ) {
 	    // FIXME: buildings could have directions
-	    UnitHeadingFromDeltaXY(unit, goal->X - unit->X, goal->Y - unit->Y);
+	    UnitHeadingFromDeltaXY(unit,
+		goal->X+(goal->Type->TileWidth-1)/2-unit->X,
+		goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
 	}
 	unit->SubAction++;		// cast the spell
 	return;
