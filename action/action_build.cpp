@@ -284,7 +284,9 @@ global void HandleActionBuilded(Unit* unit)
 	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
 		CancelBuildingCostsFactor);
 	// Cancel building
+#ifdef NEW_FOW
 	unit->CurrentSightRange=0;
+#endif
 	LetUnitDie(unit);
 	return;
     }
