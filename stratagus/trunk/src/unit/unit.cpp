@@ -209,7 +209,8 @@ void ReleaseUnit(Unit* unit)
 	// on the way. We must wait a little time before we could free the
 	// memory.
 	//
-	UnitCacheRemove(unit);
+	RemoveUnit(unit, NULL);
+
 	//
 	// Remove the unit from the global units table.
 	//
