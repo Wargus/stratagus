@@ -394,7 +394,8 @@ global void PlayerAddCostsFactor(Player* player,const int* costs,int factor)
     int i;
 
     for( i=1; i<MaxCosts; ++i ) {
-	player->Resources[i]+=costs[i]*100/factor;
+	DebugLevel3("%d %d\n",i,costs[i]*factor/100);
+	player->Resources[i]+=costs[i]*factor/100;
     }
     if( player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
