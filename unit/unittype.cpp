@@ -629,22 +629,22 @@ void LoadUnitTypes(void)
 static void CleanAnimation(NewAnimation* anim)
 {
 	int i;
-	NewAnimation* next;
+	NewAnimation* ptr;
 
-	while (anim) {
-		if (anim->Type == NewAnimationSound) {
-			free(anim->D.Sound.Name);
-		} else if (anim->Type == NewAnimationRandomSound) {
-			for (i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
-				free(anim->D.RandomSound.Name[i]);
+	ptr = anim;
+	while (ptr->Type) {
+		if (ptr->Type == NewAnimationSound) {
+			free(ptr->D.Sound.Name);
+		} else if (ptr->Type == NewAnimationRandomSound) {
+			for (i = 0; i < ptr->D.RandomSound.NumSounds; ++i) {
+				free(ptr->D.RandomSound.Name[i]);
 			}
-			free(anim->D.RandomSound.Name);
-			free(anim->D.RandomSound.Sound);
+			free(ptr->D.RandomSound.Name);
+			free(ptr->D.RandomSound.Sound);
 		}
-		next = anim->Next;
-		free(anim);
-		anim = next;
+		++ptr;
 	}
+	free(anim);
 }
 
 /**
