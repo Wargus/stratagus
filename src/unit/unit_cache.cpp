@@ -17,12 +17,11 @@
 //		Real quad tree.
 //		Priority search tree.
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -305,7 +304,7 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
     int level;
     int branch;
 
-    stack=alloca(sizeof(QuadTreeNode**)*(tree->Levels+2);
+    stack=alloca(sizeof(QuadTreeNode**)*(tree->Levels+2));
     StatisticDelete(tree);
 
     nodep=&tree->Root;
