@@ -32,13 +32,6 @@
 
 #ifdef USE_X11
 
-// FIXME: move this and clean up to new_X11.
-// FIXME: move this and clean up to new_X11.
-// FIXME: move this and clean up to new_X11.
-// FIXME: move this and clean up to new_X11.
-// FIXME: move this and clean up to new_X11.
-// FIXME: move this and clean up to new_X11.
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
