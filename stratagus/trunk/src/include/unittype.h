@@ -432,11 +432,6 @@
 #include "upgrade_structs.h"
 #include "construct.h"
 
-#ifndef __STRUCT_MISSILETYPE__
-#define __STRUCT_MISSILETYPE__
-typedef struct _missile_type_ MissileType;         /// Missile-type typedef
-#endif
-
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/

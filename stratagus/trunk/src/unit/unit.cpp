@@ -1079,21 +1079,17 @@ global int UnitKnownOnMap(const Unit* unit)
 /**
 **	Returns true, if unit is visible in viewport.
 **
-**	@param v	Viewport number.
+**	@param vp	Viewport number.
 **	@param unit	Unit to be checked.
 **	@return		True if visible, false otherwise.
 */
-global int UnitVisibleInViewport (int v, const Unit* unit)
+global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
 {
-    unsigned x;
-    unsigned y;
+    int x;
+    int y;
     int w;
     int w0;
     int h;
-    unsigned MapX = TheUI.VP[v].MapX;
-    unsigned MapY = TheUI.VP[v].MapY;
-    unsigned MapWidth = TheUI.VP[v].MapWidth;
-    unsigned MapHeight = TheUI.VP[v].MapHeight;
 
     DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
 
@@ -1126,8 +1122,8 @@ global int UnitVisibleInViewport (int v, const Unit* unit)
     y = unit->Y;
     w = w0 = unit->Type->TileWidth;
     h = unit->Type->TileHeight;
-    if( (x+w) < MapX || x > (MapX+MapWidth)
-	    || (y+h) < MapY || y > (MapY+MapHeight) ) {
+    if( (x+w) < vp->MapX || x > (vp->MapX+vp->MapWidth)
+	    || (y+h) < vp->MapY || y > (vp->MapY+vp->MapHeight) ) {
 	return 0;
     }
 
@@ -1156,10 +1152,11 @@ global int UnitVisibleInViewport (int v, const Unit* unit)
 */
 global int UnitVisibleOnScreen(const Unit* unit)
 {
-    int i;
+    const Viewport* vp;
 
-    for (i = 0; i < TheUI.NumViewports; i++) {
-	if (UnitVisibleInViewport(i, unit)) {
+    for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports;
+	    vp++) {
+	if (UnitVisibleInViewport(vp, unit)) {
 	    return 1;
 	}
     }
@@ -3531,14 +3528,14 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 */
 global int ViewPointDistance(int x, int y)
 {
-    const Viewport* v;
+    const Viewport *vp;
 
     // first compute the view point coordinate
-    v = &TheUI.VP[TheUI.LastClickedVP];
+    vp = TheUI.SelectedViewport;
 
     // then use MapDistance
-    return MapDistance(v->MapX + v->MapWidth / 2, v->MapY + v->MapHeight / 2,
-	x, y);
+    return MapDistance(vp->MapX + vp->MapWidth / 2,
+	vp->MapY + vp->MapHeight / 2, x, y);
 }
 
 /**
@@ -3551,13 +3548,13 @@ global int ViewPointDistance(int x, int y)
 */
 global int ViewPointDistanceToUnit(const Unit* dest)
 {
-    const Viewport* v;
+    const Viewport* vp;
 
     // first compute the view point coordinate
-    v = &TheUI.VP[TheUI.LastClickedVP];
+    vp = TheUI.SelectedViewport;
     // then use MapDistanceToUnit
-    return MapDistanceToUnit(v->MapX + v->MapWidth / 2,
-	    v->MapY + v->MapHeight / 2, dest);
+    return MapDistanceToUnit(vp->MapX + vp->MapWidth / 2,
+	    vp->MapY + vp->MapHeight / 2, dest);
 }
 
 /**

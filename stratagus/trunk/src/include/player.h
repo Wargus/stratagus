@@ -280,11 +280,6 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __STRUCT_PLAYER__
-#define __STRUCT_PLAYER__
-typedef struct _player_ Player;		/// player typedef
-#endif
-
 #include "upgrade_structs.h"
 #include "unittype.h"
 #include "unit.h"
@@ -293,6 +288,11 @@ typedef struct _player_ Player;		/// player typedef
 /*----------------------------------------------------------------------------
 --	Player type
 ----------------------------------------------------------------------------*/
+
+#ifndef __STRUCT_PLAYER__
+#define __STRUCT_PLAYER__		/// protect duplicate player typedef
+typedef struct _player_ Player;		/// player typedef
+#endif
 
     ///	Player structure
 struct _player_ {

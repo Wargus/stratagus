@@ -1778,13 +1778,12 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 /**
 **	Draw the map fog of war.
 **
-**	@param v	Viewport.
+**	@param vp	Viewport pointer.
 **	@param x	Map viewpoint x position.
 **	@param y	Map viewpoint y position.
 */
-global void DrawMapFogOfWar(int v, int x,int y)
+global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 {
-    Viewport* vp;
     int sx;
     int sy;
     int dx;
@@ -1802,7 +1801,6 @@ global void DrawMapFogOfWar(int v, int x,int y)
     static long mv=9999999;
 #endif
 
-    vp = &TheUI.VP[v];
     redraw_row=MustRedrawRow;		// flags must redraw or not
     redraw_tile=MustRedrawTile;
 

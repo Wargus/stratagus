@@ -156,7 +156,7 @@ local void UiCenterOnGroup(unsigned group)
 	    x+=(units[n]->X-x)/2;
 	    y+=(units[n]->Y-y)/2;
 	}
-	MapViewportCenter(TheUI.LastClickedVP,x,y);
+	ViewportCenterViewpoint(TheUI.SelectedViewport,x,y);
     }
 }
 
@@ -577,7 +577,7 @@ local void UiCenterOnSelected(void)
 	    x+=(Selected[n]->X-x)/2;
 	    y+=(Selected[n]->Y-y)/2;
 	}
-	MapViewportCenter(TheUI.LastClickedVP,x,y);
+	ViewportCenterViewpoint(TheUI.SelectedViewport,x,y);
     }
 }
 
@@ -588,11 +588,8 @@ local void UiCenterOnSelected(void)
 */
 local void UiSaveMapPosition(unsigned position)
 {
-    const Viewport *vp;
-
-    vp = &TheUI.VP[TheUI.LastClickedVP];
-    SavedMapPositionX[position] = vp->MapX;
-    SavedMapPositionY[position] = vp->MapY;
+    SavedMapPositionX[position] = TheUI.SelectedViewport->MapX;
+    SavedMapPositionY[position] = TheUI.SelectedViewport->MapY;
 }
 
 /**
@@ -602,9 +599,8 @@ local void UiSaveMapPosition(unsigned position)
 */
 local void UiRecallMapPosition(unsigned position)
 {
-    MapViewportSetViewpoint(TheUI.LastClickedVP,
-		SavedMapPositionX[position],
-		SavedMapPositionY[position]);
+    ViewportSetViewpoint(TheUI.SelectedViewport,
+	SavedMapPositionX[position], SavedMapPositionY[position]);
 }
 
 /**
@@ -639,7 +635,7 @@ local void UiFindIdleWorker(void)
 	CurrentButtonLevel=0;
 	UpdateButtonPanel();
 	PlayUnitSound(Selected[0],VoiceSelected);
-	MapViewportCenter(TheUI.LastClickedVP,unit->X,unit->Y);
+	ViewportCenterViewpoint(TheUI.SelectedViewport,unit->X,unit->Y);
     }
 }
 
@@ -658,10 +654,10 @@ local void UiToggleGrabMouse(void)
 */
 local void UiTrackUnit(void)
 {
-    if( TheUI.VP[TheUI.LastClickedVP].Unit == Selected[0] ) {
-	TheUI.VP[TheUI.LastClickedVP].Unit = NULL;
+    if( TheUI.SelectedViewport->Unit == Selected[0] ) {
+	TheUI.SelectedViewport->Unit = NULL;
     } else {
-	TheUI.VP[TheUI.LastClickedVP].Unit = Selected[0];
+	TheUI.SelectedViewport->Unit = Selected[0];
     }
 }
 

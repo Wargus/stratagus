@@ -878,8 +878,8 @@ global void CenterOnMessage(void)
     if (MessagesEventIndex >= MessagesEventCount) {
 	return;
     }
-    MapViewportCenter(TheUI.LastClickedVP, MessagesEventX[MessagesEventIndex],
-	MessagesEventY[MessagesEventIndex]);
+    ViewportCenterViewpoint(TheUI.SelectedViewport,
+	MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]);
     SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
     MessagesEventIndex++;
 }
@@ -1199,26 +1199,24 @@ global void DrawTimer(void)
     int hour;
     int min;
     int sec;
-    const Viewport* v;
 
-    if( !GameTimer.Init ) {
+    if (!GameTimer.Init) {
 	return;
     }
 
-    sec=GameTimer.Cycles/CYCLES_PER_SECOND % 60;
-    min=(GameTimer.Cycles/CYCLES_PER_SECOND / 60) % 60;
-    hour=(GameTimer.Cycles/CYCLES_PER_SECOND / 3600);
+    sec = GameTimer.Cycles / CYCLES_PER_SECOND % 60;
+    min = (GameTimer.Cycles / CYCLES_PER_SECOND / 60) % 60;
+    hour = (GameTimer.Cycles / CYCLES_PER_SECOND / 3600);
 
-    if( hour ) {
-	sprintf(buf,"%d:%02d:%02d",hour,min,sec);
+    if (hour) {
+	sprintf(buf, "%d:%02d:%02d", hour, min, sec);
     } else {
-	sprintf(buf,"%d:%02d",min,sec);
+	sprintf(buf, "%d:%02d", min, sec);
     }
 
-    v=&TheUI.VP[TheUI.LastClickedVP];
-
     // FIXME: make this configurable
-    VideoDrawText(v->EndX-70,v->Y+15,GameFont,buf);
+    VideoDrawText(TheUI.SelectedViewport->EndX - 70,
+	TheUI.SelectedViewport->Y + 15, GameFont, buf);
 }
 
 /**
