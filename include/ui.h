@@ -138,6 +138,7 @@ enum {
     ImagePanel3,	// 384 x 256
     ImagePanel4,	// 288 x 128
     ImagePanel5,	// 352 x 352
+    ScPanel,		// transparent any size
 };
 
 /**

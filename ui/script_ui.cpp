@@ -2235,6 +2235,8 @@ local SCM CclDefineMenu(SCM list)
 		item.image=ImagePanel4;
 	    } else if( gh_eq_p(value,gh_symbol2scm("panel5")) ) {
 		item.image=ImagePanel5;
+	    } else if( gh_eq_p(value,gh_symbol2scm("sc-panel")) ) {
+		item.image=ScPanel;
 	    } else {
 		s1=gh_scm2newstr(value, NULL);
 		fprintf(stderr, "Unsupported image %s\n", s1);
@@ -2367,6 +2369,8 @@ local MenuButtonId scm2buttonid(SCM value)
         id=MBUTTON_VTHIN;
     } else if ( gh_eq_p(value, gh_symbol2scm("folder")) ) {
         id=MBUTTON_FOLDER;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-button")) ) {
+        id=MBUTTON_SC_BUTTON;
     } else {
 	char *s1=gh_scm2newstr(value, NULL);
         fprintf(stderr, "Unsupported button %s\n", s1);
