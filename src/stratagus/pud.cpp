@@ -1176,7 +1176,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"SQM ",4) ) {
 	    unsigned short* sqm;
 
-	    if( length!=width*height*sizeof(short) ) {
+	    if( length!=width*height*(int)sizeof(short) ) {
 		DebugLevel1("wrong length of SQM  section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
@@ -1201,7 +1201,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"REGM",4) ) {
 	    unsigned short* regm;
 
-	    if( length!=width*height*sizeof(short) ) {
+	    if( length!=width*height*(int)sizeof(short) ) {
 		DebugLevel1("wrong length of REGM section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
