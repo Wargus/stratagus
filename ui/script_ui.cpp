@@ -475,7 +475,8 @@ static int CclDefineCursor(lua_State* l)
 	//
 	if (!ct) {
 		CursorMax++;
-		Cursors = realloc(Cursors, CursorMax * sizeof (*Cursors));
+		Cursors = realloc(Cursors, CursorMax * sizeof(CursorType));
+		memset(&Cursors[i], 0, sizeof(CursorType));
 		ct = &Cursors[i];
 		ct->Ident = strdup(name);
 		ct->Race = race ? strdup(race) : NULL;
