@@ -1088,10 +1088,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 	if ( !filename ) {
 	    NetPlayers = 0;
 
-#ifdef WITH_SOUND
 	    // Start new music for menus
 	    PlaySectionMusic(PlaySectionMainMenu);
-#endif
 
 	    EnableRedraw=RedrawMenu;
 
@@ -1134,9 +1132,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	CleanModules();
 	CleanFonts();
 
-#ifdef WITH_SOUND
 	PlaySectionMusic(PlaySectionMainMenu);
-#endif
 
 	LoadCcl();			// Reload the main config file
 
