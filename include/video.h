@@ -137,13 +137,14 @@ enum _sys_colors_ {
     ColorYellow = 251,
     ColorBlinkRed = 252,
     ColorViolett = 253,
-
-// FIXME: this should some where made configurable
-    ColorWaterCycleStart = 38,		/// color # start for color cycling
-    ColorWaterCycleEnd = 47,		/// color # end   for color cycling
-    ColorIconCycleStart = 240,		/// color # start for color cycling
-    ColorIconCycleEnd = 244		/// color # end   for color cycling
 };
+
+extern int ColorWaterCycleStart;	/// color # start for color cycling
+extern int ColorWaterCycleEnd;		/// color # end   for color cycling
+extern int ColorIconCycleStart;		/// color # start for color cycling
+extern int ColorIconCycleEnd;		/// color # end   for color cycling
+extern int ColorBuildingCycleStart;	/// color # start for color cycling
+extern int ColorBuildingCycleEnd;	/// color # end   for color cycling
 
 typedef enum _sys_colors_ SysColors;	/// System-Wide used colors.
 

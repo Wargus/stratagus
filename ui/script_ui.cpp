@@ -3283,6 +3283,48 @@ local SCM CclDefineButton(SCM list)
 }
 
 /**
+**	The next 6 functions set color cycling index
+**
+**	@param index	index
+**
+*/
+local SCM CclSetColorWaterCycleStart(SCM index)
+{
+    ColorWaterCycleStart = gh_scm2int(index);
+    return index;
+}
+
+local SCM CclSetColorWaterCycleEnd(SCM index)
+{
+    ColorWaterCycleEnd = gh_scm2int(index);
+    return index;
+}
+
+local SCM CclSetColorIconCycleStart(SCM index)
+{
+    ColorIconCycleStart = gh_scm2int(index);
+    return index;
+}
+
+local SCM CclSetColorIconCycleEnd(SCM index)
+{
+    ColorIconCycleEnd = gh_scm2int(index);
+    return index;
+}
+
+local SCM CclSetColorBuildingCycleStart(SCM index)
+{
+    ColorBuildingCycleStart = gh_scm2int(index);
+    return index;
+}
+
+local SCM CclSetColorBuildingCycleEnd(SCM index)
+{
+    ColorBuildingCycleEnd = gh_scm2int(index);
+    return index;
+}
+
+/**
 **	Set double-click delay.
 **
 **	@param delay	Delay in ms
@@ -3576,6 +3618,16 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedureN("define-menu-item",CclDefineMenuItem);
     gh_new_procedureN("define-menu",CclDefineMenu);
     gh_new_procedureN("define-menu-graphics",CclDefineMenuGraphics);
+
+    //
+    //	Color cycling
+    //
+    gh_new_procedure1_0("set-color-water-cycle-start!",CclSetColorWaterCycleStart);
+    gh_new_procedure1_0("set-color-water-cycle-end!",CclSetColorWaterCycleEnd);
+    gh_new_procedure1_0("set-color-icon-cycle-start!",CclSetColorIconCycleStart);
+    gh_new_procedure1_0("set-color-icon-cycle-end!",CclSetColorIconCycleEnd);
+    gh_new_procedure1_0("set-color-building-cycle-start!",CclSetColorBuildingCycleStart);
+    gh_new_procedure1_0("set-color-building-cycle-end!",CclSetColorBuildingCycleEnd);
 
     //
     //	Correct named functions
