@@ -562,10 +562,32 @@ case $ANSWER in
 	echo "Compiling with sound support"
 	echo "# Sound support" >> $RULESFILE
 	echo "DSOUND		= -DWITH_SOUND" >> $RULESFILE
-	if ! test "$USESDL" = 1 ; then
 
+	# Check for arts client
+	echo
+	if [ "`artsc-config --version 2>/dev/null` x" = " x" ] ; then
+	  echo "...You do not appear to have the arts client installed"
+	else
+	  echo -n "Do you want use arts daemon sound output? (y) "
+	  read $N ANSWERA
+	  echo
+	  case $ANSWERA in
+	    [nN])
+	        echo
+		echo "No arts daemon support"
+		;;
+	    *)
+		HAVEARTS=1
+		echo "ARTSC		= -DWITH_ARTSC \$(shell artsc-config --cflags)" >> $RULESFILE
+		echo "ARTSCLIB	= \$(shell artsc-config --libs)" >> $RULESFILE
+	        echo
+		echo "Compiling with arts daemon support"
+		;;
+	  esac
+	fi
+
+	if (test "$USESDL" != 1 -a "$HAVEARTS" != 1) ; then
 	  # Check for libpthread
-
 	  LIBCHECK="-lpthread"
 	  check_for_libs
 	  if test "$?" = 0 ; then
@@ -836,7 +858,7 @@ if [ "$BEOS" != 1 ] ; then
     # Libraries needed to build freecraft
     echo "CLONELIBS=$CLONELIBS \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
-    echo "	\$(FLACLIB) \$(OGGLIB) \$(MP3LIB) -lz -lm" >> $RULESFILE
+    echo "	\$(ARTSCLIB) \$(FLACLIB) \$(OGGLIB) \$(MP3LIB) -lz -lm" >> $RULESFILE
   else
     # Libraries needed to build tools
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
@@ -893,7 +915,7 @@ fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
 echo "	\$(DEBUG) \$(SDLCD) \$(LIBCDA) \\" >> $RULESFILE
-echo -n "	\$(FLAC) \$(OGG) \$(MAD) " >> $RULESFILE
+echo -n "	\$(ARTSC) \$(FLAC) \$(OGG) \$(MAD) " >> $RULESFILE
 
 echo
 echo -n "Are you using the WarCraft 2 Expansion CD? (n): "
