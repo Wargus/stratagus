@@ -1118,7 +1118,7 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
     //
     for( ; h-->0; ) {
 	for( w=w0; w-->0; ) {
-	    if( IsMapFieldVisible(ThisPlayer,x+w,y+h)
+	    if( IsMapFieldVisible(ThisPlayer,x+w,y+h) || ReplayRevealMap
 		    || (unit->Type->Building && unit->SeenFrame!=UnitNotSeen
 			&& IsMapFieldExplored(ThisPlayer,x+w,y+h)) ) {
 		return 1;
@@ -1822,10 +1822,10 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     if( unit->Next ) {
 	x=unit->Next->X;
 	y=unit->Next->Y;
-	DebugLevel0Fn("No building?\n");
     } else {
 	x=unit->X;
 	y=unit->Y;
+	DebugLevel0Fn("No building?\n");
     }
 #else
     n=SelectUnitsOnTile(unit->X,unit->Y,table);
