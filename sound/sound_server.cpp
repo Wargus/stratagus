@@ -296,12 +296,14 @@ global void CDRomCheck(void)
 **	@param sample	Input sample
 **	@param index	Position into input sample
 **	@param volume	Volume of the input sample
+**	@param stereo	Stereo (left/right) position of sample
 **	@param buffer	Output buffer
 **	@param size	Size of the output buffer to be filled
 **	
 **	@return		the number of bytes used to fill buffer
 **
 **	@todo		Can mix faster if signed 8 bit buffers are used.
+**	@todo	FIXME:	Remove float for stereo!
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 			      float stereo,int* buffer,int size)
