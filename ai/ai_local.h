@@ -217,6 +217,7 @@ typedef struct _ai_script_action_ {
 	               /// '((name evaluate-lambda run-script) ... )
 #elif defined(USE_LUA)
 	char* Action;  /// Name of lua table
+	char* Script;  /// Name of lua script
 #endif
 
 	int Defensive; /// Is this action usable for defense

@@ -590,9 +590,9 @@ global int AiFindGaugeId(lua_State* l)
 #endif
 
 /**
-**  FIXME: docu
+**  Find an unused script
 **
-**  @return  FIXME: docu
+**  @return  Number of unused script, -1 for no unused scripts
 */
 local int AiFindUnusedScript(void)
 {
@@ -601,16 +601,16 @@ local int AiFindUnusedScript(void)
 	for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
 #if defined(USE_GUILE) || defined(USE_SIOD)
 		if (gh_null_p(AiPlayer->Scripts[i].Script)) {
+#elif defined(USE_LUA)
+		if (!AiPlayer->Scripts[i].Script) {
+#endif
 			return i;
 		}
-#elif defined(USE_LUA)
-#endif
 	}
 	return -1;
 }
 
 /**
-**
 **  Evaluate the script ( given the current hotspot, ... )
 **  ( just call the get-need scheme function )
 **
@@ -636,9 +636,34 @@ local int AiEvaluateScript(SCM script)
 	return gh_scm2int(rslt);
 }
 #elif defined(USE_LUA)
-local int AiEvaluateScript()
+local int AiEvaluateScript(char* script)
 {
-	return 0;
+	int top;
+	int ret;
+
+	lua_pushstring(Lua, script);
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	if (!lua_istable(Lua, -1)) {
+		lua_error(Lua);
+	}
+	lua_pushstring(Lua, "Script");
+	lua_rawget(Lua, -2);
+	if (!lua_istable(Lua, -1)) {
+		lua_error(Lua);
+	}
+	top = lua_gettop(Lua);
+	lua_rawgeti(Lua, -1, 2);
+	lua_pushvalue(Lua, -3);
+	LuaCall(1, 0);
+	top = lua_gettop(Lua) - top;
+	if (top) {
+		ret = LuaToNumber(Lua, -top);
+		lua_pop(Lua, top);
+	} else {
+		ret = -1;
+	}
+	lua_pop(Lua, 2);
+	return ret;
 }
 #endif
 
@@ -728,13 +753,13 @@ global int AiEvaluateForceCost(int force, int total)
 				return -1;
 			}
 
-			// FIXME : all costs count the same there
+			// FIXME: all costs count the same there
 			// ( sum all costs ... )
 			for (i = 0; i < MaxCosts; ++i) {
 				globalCosts[i] += want * usedtype->_Costs[i];
 			}
 
-			// FIXME : buildtime is assumed to be proportionnal to hitpoints
+			// FIXME: buildtime is assumed to be proportionnal to hitpoints
 
 			// Time to build the first
 			globalTime += usedtype->_HitPoints;
@@ -751,17 +776,17 @@ global int AiEvaluateForceCost(int force, int total)
 	for (i = 0; i < MaxCosts; ++i) {
 		if (globalCosts[i]) {
 			own = AiPlayer->Player->Resources[i];
-			// FIXME : minimum 400 is hardcoded ...
+			// FIXME: minimum 400 is hardcoded ...
 			if (own < 400) {
 				own = 400;
 			}
-			// FIXME : are overflow possible here ?
+			// FIXME: are overflow possible here ?
 			cost += (100 * globalCosts[i] + 100 * own) / own;
 		}
 	}
 
 
-	// FIXME : 20 / 1 ratio between buildtime and cost is hardcoded
+	// FIXME: 20 / 1 ratio between buildtime and cost is hardcoded
 	// Here globalTime is ~ the sum of all HitPoints...
 	cost += globalTime / 20;
 
@@ -792,7 +817,7 @@ local void AiUpdateForce(int dst_force, int force)
 	int unitcount[UnitTypeMax + 1];
 	AiUnitType* aitype;
 
-	memset(unitcount, 0, (UnitTypeMax + 1) * sizeof(int));
+	memset(unitcount, 0, sizeof(unitcount));
 	AiForceSubstractWant(force, unitcount);
 	for (i = 0; i <= UnitTypeMax; ++i) {
 		unitcount[i] = -unitcount[i];
@@ -846,17 +871,13 @@ local int AiFindBestScript(int defend, AiScriptAction** foundBestScriptAction)
 
 		if ((defend && aiScriptAction->Defensive) ||
 				(!defend && aiScriptAction->Offensive)) {
-#if defined(USE_GUILE) || defined(USE_SIOD)
 			curValue = AiEvaluateScript(aiScriptAction->Action);
-#elif defined(USE_LUA)
-			curValue = -1;
-#endif
 			DebugLevel3Fn("evaluate script ");
 #if 0
 			gh_display(gh_car(gh_car(aiScriptAction->Action)));
 #endif
 			DebugLevel3Fn(" => %d\n" _C_ curValue);
-			if (curValue != -1 && (!bestScriptAction || (curValue <= bestValue))) {
+			if (curValue != -1 && (!bestScriptAction || curValue <= bestValue)) {
 				bestScriptAction = aiScriptAction;
 				bestValue = curValue;
 			}
@@ -877,7 +898,7 @@ local int AiFindBestScript(int defend, AiScriptAction** foundBestScriptAction)
 **  @param hotspotray  Size of the hotspot
 **  @param defend      Is this a defense script ?
 **
-**  @return            FIXME: docu
+**  @return            Number of script, 0 if none available
 */
 local int AiPrepareScript(int hotspotx, int hotspoty, int hotspotray, int defend)
 {
@@ -885,9 +906,9 @@ local int AiPrepareScript(int hotspotx, int hotspoty, int hotspotray, int defend
 
 	scriptid = AiFindUnusedScript();
 
-	// FIXME : scriptid>0
+	// FIXME: scriptid>0
 	if (scriptid == -1) {
-		// FIXME : should we kill a running script there ?
+		// FIXME: should we kill a running script there ?
 		//  ( maybe any attack script )
 		//  ( then a close "defend" script )
 		DebugLevel3Fn("no free defend script available...\n");
@@ -936,6 +957,17 @@ local void AiStartScript(AiScriptAction* script, char* ident)
 
 	snprintf(AiScript->Ident, 10, "%s", ident);
 #elif defined(USE_LUA)
+	// Compute force requirements.
+	AiEvaluateScript(script->Action);
+
+	// Launch the code.
+	AiScript->Script = script->Script;
+	AiScript->SleepCycles = 0;
+
+	// Don't add anymore units to this force.
+	AiPlayer->Force[AiScript->OwnForce].PopulateMode = AiForceDontPopulate;
+
+	snprintf(AiScript->Ident, 10, "%s", ident);
 #endif
 }
 
@@ -966,19 +998,16 @@ global void AiFindDefendScript(int attackX, int attackY)
 		return;
 	}
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
 	AiEvaluateScript(bestScriptAction->Action);
-#elif defined(USE_LUA)
-#endif
 
 	leftCost = AiEvaluateForceCost(AiScript->OwnForce, 0);
 	totalCost = AiEvaluateForceCost(AiScript->OwnForce, 1);
 	if (leftCost <= (7 * totalCost) / 10) {
-			DebugLevel3Fn("launch defense script\n");
-			AiStartScript(bestScriptAction, "defend");
+		DebugLevel3Fn("launch defense script\n");
+		AiStartScript(bestScriptAction, "defend");
 	} else {
 		DebugLevel3Fn("not ready for defense\n");
-			AiStartScript(bestScriptAction, "defend");
+		AiStartScript(bestScriptAction, "defend");
 	}
 }
 
@@ -1024,7 +1053,6 @@ local Unit* RandomPlayerUnit(Player* player)
 		}
 	}
 	return NoUnitP;
-
 }
 
 /**
@@ -1208,14 +1236,11 @@ global void AiPeriodicAttack(void)
 	if (bestActionEvaluation) {
 		DebugLevel3Fn("has a best script, value=%d, hotspot=%d\n" _C_ bestValue _C_
 			bestHotSpot);
-		// => lance si la force est à 80-90%...
+		// launch if the force is at 80-90%...
 		AiPrepareScript(bestActionEvaluation->HotSpotX, bestActionEvaluation->HotSpotY,
 			16, 0);
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
 		AiEvaluateScript(bestActionEvaluation->AiScriptAction->Action);
-#elif defined(USE_LUA)
-#endif
 
 		leftCost = AiEvaluateForceCost(AiScript->OwnForce, 0);
 		totalCost = AiEvaluateForceCost(AiScript->OwnForce, 1);
@@ -1224,10 +1249,10 @@ global void AiPeriodicAttack(void)
 				leftCost _C_ totalCost);
 		}
 
-		if (leftCost <= ((2 * totalCost) / 10)) {
+		if (leftCost <= (2 * totalCost) / 10) {
 			DebugLevel3Fn("Attack script !...\n");
 			AiStartScript(bestActionEvaluation->AiScriptAction, "attack");
-		} else if (leftCost <= ((9 * totalCost) / 10)) {
+		} else if (leftCost <= (9 * totalCost) / 10) {
 			DebugLevel3Fn("Not ready for attack script, wait...\n");
 
 			AiUpdateForce(1, AiScript->OwnForce);
@@ -1235,7 +1260,7 @@ global void AiPeriodicAttack(void)
 		} else {
 			DebugLevel3Fn("Attacking crisis ! reseting.\n");
 			AiEraseForce(1);
-			// FIXME : should update with lower values
+			// FIXME: should update with lower values
 			AiUpdateForce(1, AiScript->OwnForce);
 			AiEraseForce(AiScript->OwnForce);
 		}
