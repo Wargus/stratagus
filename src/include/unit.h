@@ -703,6 +703,7 @@ extern int XpDamage;				/// unit XP adds more damage to attacks
 extern char EnableTrainingQueue;	/// Config: training queues enabled
 extern char EnableBuildingCapture;	/// Config: building capture enabled
 extern char RevealAttacker;		/// Config: reveal attacker enabled
+extern const Viewport* CurrentViewport; /// CurrentViewport
    /// Draw the selection
 extern void (*DrawSelection)(const Unit*,const UnitType*,int,int);
 
@@ -761,7 +762,7 @@ extern void GetUnitMapArea( const Unit* unit,
                             int *sx, int *sy, int *ex, int *ey );
 #ifdef HIERARCHIC_PATHFINDER
     /// FIXME: more docu
-extern int UnitGetNextPathSegment (Unit * , int * , int * );
+extern int UnitGetNextPathSegment (const Unit * , int * , int * );
 #endif
     /// Increment mana of all magic units each second
 extern void UnitIncrementMana(void);
@@ -920,8 +921,11 @@ extern void SaveDecorations(FILE* file);
     /// Clean the decorations (health,mana) of units
 extern void CleanDecorations(void);
 
+    /// Draw A single Unit
+extern void DrawUnit(const Unit* unit);
+extern void DrawBuilding(const Unit* unit);
     /// Draw all units visible on map in viewport
-extern void DrawUnits(const void* vp);
+extern int DrawUnits(const Viewport* vp, Unit** table);
 
 //	in unit_find.c
     /// Select units in rectangle range

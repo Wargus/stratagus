@@ -97,7 +97,7 @@ global void (*DrawSelection)(const Unit* unit,const UnitType* type,int x,int y)
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
-local const Viewport* CurrentViewport;	/// FIXME: quick hack for split screen
+global const Viewport* CurrentViewport;	/// FIXME: quick hack for split screen
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1774,11 +1774,7 @@ local void DrawConstruction(const Unit* unit,int x,int y)
 **
 **	@param unit	Pointer to the building
 */
-#ifdef NEW_DECODRAW
-global void DrawBuilding(Unit* unit)
-#else
-local void DrawBuilding(Unit* unit)
-#endif
+global void DrawBuilding(const Unit* unit)
 {
     int x;
     int y;
@@ -1858,11 +1854,7 @@ local void DrawBuilding(Unit* unit)
 **
 **	@param unit	Pointer to the unit.
 */
-#ifdef NEW_DECODRAW
 global void DrawUnit(const Unit* unit)
-#else
-local void DrawUnit(const Unit* unit)
-#endif
 {
     int x;
     int y;
@@ -1897,6 +1889,12 @@ local void DrawUnit(const Unit* unit)
 #endif
 }
 
+local int DrawLevelCompare(const void *v1, const void *v2) {
+
+    const Unit *c1 = *(Unit**)v1, *c2 = *(Unit**)v2;
+
+    return c1->Type->DrawLevel <= c2->Type->DrawLevel ? -1 : 1;
+}
 /**
 **	Draw all units on visible map.
 **
@@ -1905,16 +1903,10 @@ local void DrawUnit(const Unit* unit)
 **	@todo FIXME: Must use the redraw tile flags in this function
 **		FIXME: Use const Viewport*
 */
-global void DrawUnits(const void* v)
+global int DrawUnits(const Viewport* vp, Unit** table)
 {
-    Unit* unit;
-    Unit* table[UnitMax];
     Unit** corpses;
     int n;
-    int i;
-    const Viewport* vp;
-
-    CurrentViewport = vp = v;
 
     //
     //  Select all units touching the viewpoint.
@@ -1923,63 +1915,34 @@ global void DrawUnits(const void* v)
 	vp->MapY + vp->MapHeight + 1, table);
 
     //
-    //  2a) corpse in their own cache.
+    //  Add Corpses to the list.
     //
     corpses = &CorpseList;
     while( *corpses ) {
 	if( UnitVisibleInViewport(vp,*corpses) && !(*corpses)->Destroyed ) {
-	    DrawUnit(*corpses);
+	    table[n++] = *corpses;
 	}
 	corpses=&(*corpses)->Next;
     }
 
     //
-    //  2a1) Destroyed Buildings
+    //  Add Destroyed Buildings
     //
     corpses = &DestroyedBuildings;
     while( *corpses ) {
 	if( UnitVisibleInViewport(vp,*corpses) && !(*corpses)->SeenDestroyed
 		&& (((*corpses)->Visible & 1<<ThisPlayer->Player)
 			|| !(*corpses)->Destroyed)) {
-	    DrawBuilding(*corpses);
+	    table[n++] = *corpses;
 	}
 	corpses=&(*corpses)->Next;
     }
-    //
-    //  2b) buildings
-    //
-    for (i = 0; i < n; ++i) {
-	unit = table[i];
-	if (!unit->Removed && UnitVisibleInViewport(vp, unit)) {
-	    if (unit->Type->Building) {
-		DrawBuilding(unit);
-		table[i] = NoUnitP;
-	    }
-	} else {
-	    table[i] = NoUnitP;
-	}
+    // Only draw if there are units to draw :)
+    if( n ) {
+	qsort((void *)table,n,sizeof(Unit*),DrawLevelCompare);
     }
-    //
-    //  3) land/sea units
-    //
-    for (i = 0; i < n; ++i) {
-	if (!(unit = table[i])) {
-	    continue;
-	}
-	if (unit->Type->UnitType != UnitTypeFly) {
-	    DrawUnit(unit);
-	    table[i] = NoUnitP;
-	}
-    }
-    //
-    //  5) flying units
-    //
-    for (i = 0; i < n; ++i) {
-	if (!(unit = table[i])) {
-	    continue;
-	}
-	DrawUnit(unit);
-    }
+
+    return n;
 }
 
 //@}

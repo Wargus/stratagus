@@ -274,7 +274,7 @@ local void DrawMenuButtonArea(void)
 	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
 	    GameFont,"Menu (~<F10~>)",NULL,NULL);
 
-#ifdef DEBUG
+#ifdef DRAW_DEBUG
     //
     //	Draw line for frame speed.
     //
@@ -330,6 +330,15 @@ local void DrawMenuButtonArea(void)
 */
 local void DrawMapViewport(Viewport* vp)
 {
+   Unit* table[UnitMax];
+   Missile* missiletable[MAX_MISSILES*9];
+   int nunits;
+   int nmissiles;
+   int i;
+   int j;
+   int x;
+   int y;
+
 #ifdef NEW_DECODRAW
     // Experimental new drawing mechanism, which can keep track of what is
     // overlapping and draw only that what has changed..
@@ -371,9 +380,68 @@ local void DrawMapViewport(Viewport* vp)
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
 	DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
-	DrawUnits(vp);
+	nunits = DrawUnits(vp,table);
+	nmissiles = DrawMissiles(vp, missiletable);
+	
+	i = 0;
+	j = 0;
+	CurrentViewport = vp;
+	while( i < nunits && j < nmissiles ) {
+	    if( table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel ) {
+		if ( UnitVisibleInViewport(vp, table[i]) ) {
+		    if( table[i]->Type->Building ) {
+			DrawBuilding(table[i]);
+		    } else {
+			DrawUnit(table[i]);
+		    }
+		}
+		i++;
+	    } else {
+		x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X;
+		y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
+		// FIXME: I should copy SourcePlayer for second level missiles.
+		if( missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player ) {
+		    GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
+		    	missiletable[j]->Type->Sprite);
+		}
+		switch( missiletable[j]->Type->Class ) {
+		    case MissileClassHit:
+			VideoDrawNumberClip(x,y,GameFont,missiletable[j]->Damage);
+			break;
+		    default:
+			DrawMissile(missiletable[j]->Type,missiletable[j]->SpriteFrame,x,y);
+			break;
+		}
+		j++;
+	    }
+	}
+	for( ; i < nunits; i++ ) {
+	    if ( UnitVisibleInViewport(vp, table[i]) ) {
+		if( table[i]->Type->Building ) {
+		    DrawBuilding(table[i]);
+		} else {
+		    DrawUnit(table[i]);
+		}
+	    }
+	}
+	for( ; j < nmissiles; j++ ) {
+	    x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X;
+	    y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
+	    // FIXME: I should copy SourcePlayer for second level missiles.
+	    if( missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player ) {
+		GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
+		    missiletable[j]->Type->Sprite);
+	    }
+	    switch( missiletable[j]->Type->Class ) {
+		case MissileClassHit:
+		    VideoDrawNumberClip(x,y,GameFont,missiletable[j]->Damage);
+		    break;
+		default:
+		    DrawMissile(missiletable[j]->Type,missiletable[j]->SpriteFrame,x,y);
+		    break;
+	    }
+	}
 	DrawMapFogOfWar(vp, vp->MapX, vp->MapY);
-	DrawMissiles(vp);
 	DrawConsole();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     }
