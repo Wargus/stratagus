@@ -211,6 +211,9 @@ local void EditTile(int x, int y, int tile)
     UpdateMinimapSeenXY(x, y);
     UpdateMinimapXY(x, y);
 
+    EditorTileChanged(x, y);
+
+#if 0
     //
     //  Fix the wood tiles.
     //
@@ -260,6 +263,7 @@ local void EditTile(int x, int y, int tile)
 	MapFixWallTile(x - 1, y + 0);
 	MapFixWallTile(x + 0, y - 1);
     }
+#endif
 }
 
 /**
@@ -450,9 +454,31 @@ local void DrawUnitIcons(void)
 	VideoDrawText(x, y, GameFont, buf);
     }
 
-    x = TheUI.InfoPanelX + 4;
-    y += 18;
+    //
+    //	Draw the unit selection buttons.
+    //
+    x = TheUI.InfoPanelX + 10;
+    y = TheUI.InfoPanelY + 140;
 
+    VideoDrawText(x + 28 * 0, y, GameFont, "Un");
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 0, y + 16);
+    VideoDrawText(x + 28 * 1, y, GameFont, "Bu");
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 1, y + 16);
+    VideoDrawText(x + 28 * 2, y, GameFont, "He");
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 2, y + 16);
+    VideoDrawText(x + 28 * 3, y, GameFont, "La");
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 3, y + 16);
+    VideoDrawText(x + 28 * 4, y, GameFont, "Wa");
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 4, y + 16);
+    VideoDrawText(x + 28 * 5, y, GameFont, "Ai");
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (1 ? 2 : 0), x + 28 * 5, y + 16);
+#if 0
     j = 0;
     for (i = 0; EditorUnitTypes[i]; ++i) {
 	const UnitType *type;
@@ -508,6 +534,35 @@ local void DrawUnitIcons(void)
     sprintf(buf, "Air units %d\n", j);
     VideoDrawText(x, y, GameFont, buf);
 
+#endif
+
+    //
+    //	Scroll bar for units. FIXME: drag not supported.
+    //
+    x = TheUI.ButtonPanelX + 4;
+    y = TheUI.ButtonPanelY + 4;
+    j = 176-8;
+
+    PushClipping();
+    SetClipping(0,0,x + j - 20,VideoHeight-1);
+    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+    PopClipping();
+    if (0) {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
+    } else {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
+    }
+    if (1) {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
+    } else {
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
+    }
+    i = (50 * (j - 54)) / 100;
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
+
+    //
+    //	Draw the unit icons.
+    //
     y = TheUI.ButtonPanelY + 24;
 
     i = UnitIndex;
@@ -540,27 +595,6 @@ local void DrawUnitIcons(void)
 	}
 	y += ICON_HEIGHT + 2;
     }
-
-    x = TheUI.ButtonPanelX + 4;
-    y = TheUI.ButtonPanelY + 4;
-    j = 176-8;
-
-    PushClipping();
-    SetClipping(0,0,x + j - 20,VideoHeight-1);
-    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
-    PopClipping();
-    if (0) {
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
-    } else {
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
-    }
-    if (1) {
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
-    } else {
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
-    }
-    i = (50 * (j - 54)) / 100;
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
 }
 
 /**
@@ -720,13 +754,9 @@ local void DrawEditorInfo(void)
     }
 
     sprintf(buf, "Editor: (%d %d)", x, y);
+    VideoDrawText(TheUI.ResourceX + 2, TheUI.ResourceY + 2, GameFont, buf);
+
     flags = TheMap.Fields[x + y * TheMap.Width].Flags;
-
-    x = TheUI.ResourceX + 2;
-    y = TheUI.ResourceY + 2;
-
-    VideoDrawText(x, y, GameFont, buf);
-
     sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
 	TheMap.Fields[x + y * TheMap.Width].Value, flags,
 	flags & MapFieldUnpassable	? 'u' : '-',
@@ -742,7 +772,9 @@ local void DrawEditorInfo(void)
 	flags & MapFieldAirUnit		? 'a' : '-',
 	flags & MapFieldSeaUnit		? 's' : '-',
 	flags & MapFieldBuilding	? 'b' : '-');
-    VideoDrawText(x + 150, y, GameFont, buf);
+    VideoDrawText(TheUI.ResourceX + 152, TheUI.ResourceY + 2, GameFont, buf);
+    sprintf(buf, "Tile: %d", TheMap.Fields[x + y * TheMap.Width].Tile);
+    VideoDrawText(TheUI.ResourceX + 302, TheUI.ResourceY + 2, GameFont, buf);
 }
 
 /**
@@ -1383,8 +1415,11 @@ local void EditorCallbackMouse(int x, int y)
 	    bx = TheUI.ButtonPanelX + 4;
 	    while (bx < TheUI.ButtonPanelX + 144) {
 		if (bx < x && x < bx + 32 && by < y && y < by + 32) {
-		    SetStatusLine(TheMap.Tileset->TileNames[
-			    TheMap.Tileset->BasicNameTable[i * 16 + 16]]);
+		    int j;
+
+		    // FIXME: i is wrong, must find the solid type
+		    j = TheMap.Tileset->BasicNameTable[i * 16 + 16];
+		    SetStatusLine(TheMap.Tileset->TileNames[j]);
 		    ButtonUnderCursor = i + 100;
 		    CursorOn = CursorOnButton;
 		    return;
