@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unit_find.c	-	The find/select for units. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -23,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "freecraft.h"
 #include "video.h"
@@ -34,6 +34,21 @@
 #include "interface.h"
 #include "tileset.h"
 #include "map.h"
+#include "pathfinder.h"
+
+/*----------------------------------------------------------------------------
+--	Defines
+----------------------------------------------------------------------------*/
+
+/*
+**	Configuration of the small (unit) AI.
+*/
+#define PRIORITY_FACTOR		(0x00010000*100)
+#define HEALTH_FACTOR		(0x00000001*100)
+#define DISTANCE_FACTOR		(0x00100000*100)
+#define INRANGE_FACTOR		(0x00010000*100)
+#define INRANGE_BONUS		(0x00100000*100)
+#define CANATTACK_BONUS		(0x00100000*100)
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -373,6 +388,10 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 --	Finding units for attack
 ----------------------------------------------------------------------------*/
 
+#if 0
+
+// Not used
+
 /**
 **	Enemy in range.
 **
@@ -403,10 +422,11 @@ global Unit* EnemyInRange(const Unit* unit,unsigned range)
 	    continue;
 	}
 
-	if( !IsEnemy(player,dest) ) {		// a friend
+	if( !IsEnemy(player,dest) ) {	// a friend or neutral
 	    continue;
 	}
 	if( MapDistanceToUnit(x,y,dest)>range ) {
+	    DebugLevel0Fn("Select units wrong?\n");
 	    continue;
 	}
 	return (Unit*)dest;
@@ -414,6 +434,12 @@ global Unit* EnemyInRange(const Unit* unit,unsigned range)
 
     return NoUnitP;
 }
+
+#endif
+
+#if 0
+
+// Old version
 
 /**
 **	Attack units in distance.
@@ -453,11 +479,6 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
     for( i=0; i<n; ++i ) {
 	dest=table[i];
 	// unusable unit
-	/*
-	if( UnitUnusable(dest) ) {
-	    continue;
-	}
-	*/
 	if( dest->Removed || dest->Command.Action==UnitActionDie ) {
 	    continue;
 	}
@@ -468,7 +489,7 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	}
 	IfDebug( 
 	    if( !dest->HP ) {
-		DebugLevel0(__FUNCTION__": HP==0\n");
+		DebugLevel0Fn("HP==0\n");
 		continue;
 	    }
 	);
@@ -497,6 +518,114 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 		    DebugLevel3("Less hit-points\n");
 		}
 	    }
+	}
+    }
+
+    // FIXME: No idea how to make this correct, without cast!!
+    return (Unit*)best_unit;
+}
+
+#endif
+
+/**
+**	Attack units in distance.
+**
+**		If the unit can attack must be handled by caller.
+**
+**	@param unit	Find in distance for this unit.
+**	@param range	Distance range to look.
+**
+**	@return		Unit to be attacked.
+*/
+global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
+{
+    const Unit* dest;
+    const UnitType* type;
+    const UnitType* dtype;
+    Unit* table[MAX_UNITS];
+    unsigned x;
+    unsigned y;
+    unsigned n;
+    unsigned i;
+    unsigned d;
+    int attackrange;
+    int cost;
+    const Player* player;
+    const Unit* best_unit;
+    int best_cost;
+
+    //
+    //	Select all units in range.
+    //
+    x=unit->X;
+    y=unit->Y;
+    n=SelectUnits(x-range,y-range,x+range+1,y+range+1,table);
+
+    best_unit=NoUnitP;
+    best_cost=INT_MAX;
+
+    player=unit->Player;
+    type=unit->Type;
+    attackrange=unit->Stats->AttackRange;
+    //
+    //	Find the best unit to attack
+    //
+    for( i=0; i<n; ++i ) {
+	dest=table[i];
+	//
+	//	unusable unit
+	//
+	if( dest->Removed || dest->Command.Action==UnitActionDie ) {
+	    continue;
+	}
+
+	if( !IsEnemy(player,dest) ) {	// a friend or neutral
+	    continue;
+	}
+
+	dtype=dest->Type;
+	if( !CanTarget(type,dtype) ) {	// can't be attacked.
+	    continue;
+	}
+
+	d=MapDistanceToUnit(x,y,dest);
+
+	//
+	//	Calculate the costs to attack the unit.
+	//	Unit with the smallest attack costs will be taken.
+	//
+	cost=0;
+	//
+	//	Priority 0-255
+	//
+	cost-=dtype->Priority*PRIORITY_FACTOR/100;
+	//
+	//	Remaining HP (Health) 0-65535
+	//
+	cost+=dest->HP*HEALTH_FACTOR/100;
+	//
+	//	Unit in attack range?
+	//
+	if( d<attackrange && d>type->MinAttackRange ) {
+	    cost+=d*INRANGE_FACTOR/100;
+	    cost-=INRANGE_BONUS/100;
+	} else {
+	    cost+=d*DISTANCE_FACTOR/100;
+	}
+	//
+	//	Unit can attack back.
+	//
+	if( CanTarget(dtype,type) ) {
+	    cost-=CANATTACK_BONUS/100;
+	}
+
+	DebugLevel0Fn("%s -> %s\t%08x\n",type->Ident,dtype->Ident,cost);
+	//
+	//	Take this target?
+	//
+	if( cost<best_cost && UnitReachable(unit,dest,attackrange) ) {
+	    best_unit=dest;
+	    best_cost=cost;
 	}
     }
 
