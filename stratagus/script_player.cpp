@@ -52,7 +52,6 @@
 local SCM CclPlayer(SCM list)
 {
     SCM value;
-    SCM data;
     SCM sublist;
     Player* player;
     int i;
@@ -79,7 +78,7 @@ local SCM CclPlayer(SCM list)
 	list=gh_cdr(list);
 
 	if( gh_eq_p(value,gh_symbol2scm("name")) ) {
-	    player->Name=gh_scm2newstr(data=gh_car(list),NULL);
+	    player->Name=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("type")) ) {
 	    value=gh_car(list);

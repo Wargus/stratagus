@@ -538,8 +538,8 @@ local SCM CclDefineUI(SCM list)
     //
     //	Some value defaults
     //
-#if 1
-    // This save the setup values
+
+    // This save the setup values FIXME: They are set by CCL.
 
     ui->Contrast=TheUI.Contrast;
     ui->Brightness=TheUI.Brightness;
@@ -556,23 +556,6 @@ local SCM CclDefineUI(SCM list)
     ui->MouseScale=TheUI.MouseScale;
 
     ui->OriginalResources=TheUI.OriginalResources;
-#else
-    ui->Contrast=100;
-    ui->Brightness=0;
-    ui->Saturation=100;
-
-    ui->MouseScroll=1;
-    ui->KeyScroll=1;
-    ui->ReverseMouseMove=0;
-
-    ui->WarpX=-1;
-    ui->WarpY=-1;
-
-    ui->MouseAdjust=MOUSEADJUST;
-    ui->MouseScale=MOUSESCALE;
-
-    ui->OriginalResources=0;
-#endif
 
     //
     //	Now the real values.
@@ -1590,7 +1573,7 @@ local SCM CclSetShowSightRange(SCM flag)
 {
     int old;
 
-    old=!ShowSightRange;
+    old=ShowSightRange;
     if( !gh_null_p(flag) ) {
 	if( gh_eq_p(flag,gh_symbol2scm("rectangle")) ) {
 	    ShowSightRange=1;
@@ -1603,7 +1586,7 @@ local SCM CclSetShowSightRange(SCM flag)
 	ShowSightRange=0;
     }
 
-    return gh_bool2scm(old);
+    return gh_int2scm(old);
 }
 
 /**
@@ -1617,10 +1600,20 @@ local SCM CclSetShowReactionRange(SCM flag)
 {
     int old;
 
-    old=!ShowReactionRange;
-    ShowReactionRange=gh_scm2bool(flag);
+    old=ShowReactionRange;
+    if( !gh_null_p(flag) ) {
+	if( gh_eq_p(flag,gh_symbol2scm("rectangle")) ) {
+	    ShowReactionRange=1;
+	} else if( gh_eq_p(flag,gh_symbol2scm("circle")) ) {
+	    ShowReactionRange=2;
+	} else {
+	    ShowReactionRange=3;
+	}
+    } else {
+	ShowReactionRange=0;
+    }
 
-    return gh_bool2scm(old);
+    return gh_int2scm(old);
 }
 
 /**
