@@ -31,7 +31,7 @@
 //@{
 
 //----------------------------------------------------------------------------
-//		Includes
+// Includes
 //----------------------------------------------------------------------------
 
 #include <string.h>
@@ -74,7 +74,7 @@
 #endif
 
 //----------------------------------------------------------------------------
-//		Variables
+// Variables
 //----------------------------------------------------------------------------
 
 	/// variable set when we are scrolling via keyboard
@@ -84,15 +84,15 @@ enum _scroll_state_ KeyScrollState = ScrollNone;
 enum _scroll_state_ MouseScrollState = ScrollNone;
 
 #if defined(DEBUG)
-jmp_buf MainLoopJmpBuf;				/// Hierarchic pathfinder error exit.
+jmp_buf MainLoopJmpBuf; ///< Hierarchic pathfinder error exit.
 #endif
 
-EventCallback* Callbacks;		/// Current callbacks
-EventCallback GameCallbacks;		/// Game callbacks
-EventCallback MenuCallbacks;		/// Menu callbacks
+EventCallback* Callbacks;    ///< Current callbacks
+EventCallback GameCallbacks; ///< Game callbacks
+EventCallback MenuCallbacks; ///< Menu callbacks
 
 //----------------------------------------------------------------------------
-//		Functions
+// Functions
 //----------------------------------------------------------------------------
 
 /**
@@ -469,7 +469,7 @@ void GameMainLoop(void)
 			// Check rescue of units.
 			//
 			switch (GameCycle % CYCLES_PER_SECOND) {
-				case 0:	// At cycle 0, start all ai players...
+				case 0: // At cycle 0, start all ai players...
 					if (GameCycle == 0) {
 						for (player = 0; player < NumPlayers; ++player) {
 							PlayersEachSecond(player);
@@ -480,15 +480,15 @@ void GameMainLoop(void)
 					break;
 				case 2:
 					break;
-				case 3:	// minimap update
+				case 3: // minimap update
 					UpdateMinimap();
 					break;
 				case 4:
 					break;
-				case 5:	// forest grow
+				case 5: // forest grow
 					RegenerateForest();
 					break;
-				case 6:	// overtaking units
+				case 6: // overtaking units
 					RescueUnits();
 					break;
 				default:
@@ -506,9 +506,9 @@ void GameMainLoop(void)
 			// FIXME: Not called while pause or in the user interface.
 			//
 			switch (GameCycle % ((CYCLES_PER_SECOND * VideoSyncSpeed / 100) + 1)) {
-				case 0:								// Check cd-rom
+				case 0: // Check cd-rom
 #if defined(USE_SDLCD)
-					if (!(GameCycle % 4)) {	// every 2nd second
+					if (!(GameCycle % 4)) { // every 2nd second
 						SDL_CreateThread(CDRomCheck, NULL);
 					}
 #elif defined(USE_LIBCDA) || defined(USE_CDDA)

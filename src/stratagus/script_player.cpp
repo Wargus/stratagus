@@ -803,7 +803,7 @@ static int CclSetPlayerData(lua_State* l)
 	if (!strcmp(data, "Name")) {
 		free(p->Name);
 		p->Name = strdup(LuaToString(l, 3));
-//	} else if (!strcmp(data, "RaceName")) {
+// } else if (!strcmp(data, "RaceName")) {
 	} else if (!strcmp(data, "Resources")) {
 		const char* res;
 		int i;
@@ -821,12 +821,12 @@ static int CclSetPlayerData(lua_State* l)
 			LuaError(l, "Invalid resource \"%s\"" _C_ res);
 		}
 		p->Resources[i] = LuaToNumber(l, 4);
-//	} else if (!strcmp(data, "UnitTypesCount")) {
-//	} else if (!strcmp(data, "AiEnabled")) {
-//	} else if (!strcmp(data, "TotalNumUnits")) {
-//	} else if (!strcmp(data, "NumBuildings")) {
-//	} else if (!strcmp(data, "Supply")) {
-//	} else if (!strcmp(data, "Demand")) {
+// } else if (!strcmp(data, "UnitTypesCount")) {
+// } else if (!strcmp(data, "AiEnabled")) {
+// } else if (!strcmp(data, "TotalNumUnits")) {
+// } else if (!strcmp(data, "NumBuildings")) {
+// } else if (!strcmp(data, "Supply")) {
+// } else if (!strcmp(data, "Demand")) {
 	} else if (!strcmp(data, "UnitLimit")) {
 		p->UnitLimit = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "BuildingLimit")) {

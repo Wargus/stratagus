@@ -93,7 +93,7 @@ void LoadConstructions(void)
 				continue;
 			}
 			file = (*cop)->File[TheMap.Terrain].File;
-			if (file) {						// default one
+			if (file) { // default one
 				(*cop)->Width = (*cop)->File[TheMap.Terrain].Width;
 				(*cop)->Height = (*cop)->File[TheMap.Terrain].Height;
 			} else {
@@ -238,7 +238,7 @@ static int CclDefineConstructionWcNames(lua_State* l)
 	int j;
 	char** cp;
 
-	if ((cp = ConstructionWcNames)) {		// Free all old names
+	if ((cp = ConstructionWcNames)) { // Free all old names
 		while (*cp) {
 			free(*cp++);
 		}
@@ -246,7 +246,7 @@ static int CclDefineConstructionWcNames(lua_State* l)
 	}
 
 	//
-	//		Get new table.
+	// Get new table.
 	//
 	i = lua_gettop(l);
 	ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));

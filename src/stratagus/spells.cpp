@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spells.c	-	The spell cast action. */
+/**@name spells.c - The spell cast action. */
 //
-//	(c) Copyright 1998-2003 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//	                           Jimmy Salmon and Joris DAUPHIN
+// (c) Copyright 1998-2003 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                            Jimmy Salmon and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,24 +27,24 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 /*
-**		And when we cast our final spell
-**		And we meet in our dreams
-**		A place that no one else can go
-**		Don't ever let your love die
-**		Don't ever go breaking this spell
+** And when we cast our final spell
+** And we meet in our dreams
+** A place that no one else can go
+** Don't ever let your love die
+** Don't ever go breaking this spell
 */
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Notes
+-- Notes
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -62,7 +62,7 @@
 #include "actions.h"
 
 /*----------------------------------------------------------------------------
---		Definitons
+-- Definitons
 ----------------------------------------------------------------------------*/
 #ifndef min
 #ifdef __GNUC__
@@ -83,11 +83,11 @@ static inline max(int a, int b) { return a > b ? a : b; }
 #endif
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		Define the names and effects of all im play available spells.
+** Define the names and effects of all im play available spells.
 */
 SpellType** SpellTypeTable;
 
@@ -96,7 +96,7 @@ SpellType** SpellTypeTable;
 int SpellTypeCount;
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 // ****************************************************************************
@@ -104,15 +104,15 @@ int SpellTypeCount;
 // ****************************************************************************
 
 /**
-** 		Cast demolish
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  Cast demolish
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
@@ -128,7 +128,7 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	Unit* table[UnitMax];
 
 	//
-	//		Allow error margins. (Lame, I know)
+	// Allow error margins. (Lame, I know)
 	//
 	xmin = x - action->Data.Demolish.Range - 2;
 	ymin = y - action->Data.Demolish.Range - 2;
@@ -148,7 +148,7 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	}
 
 	//
-	//		 Effect of the explosion on units. Don't bother if damage is 0
+	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (action->Data.Demolish.Damage) {
 		n = UnitCacheSelect(xmin, ymin, xmax, ymax, table);
@@ -162,7 +162,7 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	}
 
 	//
-	//		Terrain effect of the explosion
+	// Terrain effect of the explosion
 	//
 	for (ix = xmin; ix <= xmax; ++ix) {
 		for (iy = ymin; iy <= ymax; ++iy) {
@@ -183,16 +183,16 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 }
 
 /**
-**		Cast circle of power.
+** Cast circle of power.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused)),
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
@@ -221,16 +221,16 @@ int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused))
 }
 
 /**
-**		Cast Area Adjust Vitals on all valid units in range.
+** Cast Area Adjust Vitals on all valid units in range.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
@@ -252,7 +252,7 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 	caster->Mana -= spell->ManaCost;
 	for (j = 0; j < nunits; ++j) {
 		target = units[j];
-//		if (!PassCondition(caster, spell, target, x, y) {
+// if (!PassCondition(caster, spell, target, x, y) {
 		if (!CanCastSpell(caster, spell, target, x, y)) {
 			continue;
 		}
@@ -276,18 +276,18 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 }
 
 /**
-**		Cast area bombardment.
+** Cast area bombardment.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
-**      @internal: vladi: blizzard differs than original in this way:
-**       original: launches 50 shards at 5 random spots x 10 for 25 mana.
+**  @return             =!0 if spell should be repeated, 0 if not
+**  @internal: vladi: blizzard differs than original in this way:
+**   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
 int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
@@ -333,7 +333,7 @@ int CastAreaBombardment(Unit* caster, const SpellType* spell,
 			}
 			mis->Damage = damage;
 			// FIXME: not correct -- blizzard should continue even if mage is
-			//	   destroyed (though it will be quite short time...)
+			//    destroyed (though it will be quite short time...)
 			mis->SourceUnit = caster;
 			RefsIncrease(caster);
 		}
@@ -342,15 +342,15 @@ int CastAreaBombardment(Unit* caster, const SpellType* spell,
 }
 
 /**
-**		Evaluate missile location description.
+** Evaluate missile location description.
 **
-**      @param location     Parameters for location.
-**		@param caster		Unit that casts the spell
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
-**		@param resx		pointer to X coord of the result
-**		@param resy		pointer to Y coord of the result
+** @param location     Parameters for location.
+** @param caster       Unit that casts the spell
+** @param target       Target unit that spell is addressed to
+** @param x            X coord of target spot when/if target does not exist
+** @param y            Y coord of target spot when/if target does not exist
+** @param resx         pointer to X coord of the result
+** @param resy         pointer to Y coord of the result
 */
 static void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 	Unit* caster, Unit* target, int x, int y, int* resx, int* resy)
@@ -378,16 +378,16 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 }
 
 /**
-**		Cast spawn missile.
+** Cast spawn missile.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
@@ -418,16 +418,16 @@ int CastSpawnMissile(Unit* caster, const SpellType* spell,
 }
 
 /**
-**		Cast haste.
+** Cast haste.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
@@ -451,16 +451,16 @@ int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 }
 
 /**
-**		Cast healing. (or exorcism)
+** Cast healing. (or exorcism)
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
@@ -528,16 +528,16 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 }
 
 /**
-**		Cast polymorph.
+** Cast polymorph.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastPolymorph(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
@@ -590,16 +590,16 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 }
 
 /**
-**		Cast summon spell.
+** Cast summon spell.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**      @param action       Parameters of the spell.
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should be repeated, 0 if not
+**  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastSummon(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
@@ -639,8 +639,8 @@ int CastSummon(Unit* caster, const SpellType* spell,
 		DebugPrint("Summoning a %s\n" _C_ unittype->Name);
 
 		//
-		//		Create units.
-		//		FIXME: do summoned units count on food?
+		// Create units.
+		// FIXME: do summoned units count on food?
 		//
 		target = MakeUnit(unittype, caster->Player);
 		target->X = x;
@@ -652,7 +652,7 @@ int CastSummon(Unit* caster, const SpellType* spell,
 			target->TTL = GameCycle + ttl;
 		}
 		//
-		//		Revealers are always removed, since they don't have graphics
+		// Revealers are always removed, since they don't have graphics
 		//
 		if (target->Type->Revealer) {
 			DebugPrint("summoned unit is a revealer, removed.\n");
@@ -660,7 +660,7 @@ int CastSummon(Unit* caster, const SpellType* spell,
 			target->CurrentSightRange = target->Stats->SightRange;
 			MapMarkUnitSight(target);
 		} else {
-			//		This is a hack to walk around behaviour of DropOutOnSide
+			// This is a hack to walk around behaviour of DropOutOnSide
 			target->X++;
 			DropOutOnSide(target, LookingW, 0, 0);
 		}
@@ -675,13 +675,13 @@ int CastSummon(Unit* caster, const SpellType* spell,
 // ****************************************************************************
 
 /**
-**      Target constructor.
+**  Target constructor.
 **
-**      @param t            Type of target (unit, position).
-**      @param unit         Unit target.
-**      @param x            x coord of the target.
-**      @param y            y coord of the target.
-**      @return the new target.
+**  @param t            Type of target (unit, position).
+**  @param unit         Unit target.
+**  @param x            x coord of the target.
+**  @param y            y coord of the target.
+**  @return             the new target.
 */
 static Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 {
@@ -697,11 +697,11 @@ static Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 }
 
 /**
-**      Target constructor for unit.
+**  Target constructor for unit.
 **
-**      @param unit     Target unit.
+**  @param unit     Target unit.
 **
-**      @return the new target.
+**  @return the new target.
 */
 static Target* NewTargetUnit(const Unit* unit)
 {
@@ -710,12 +710,12 @@ static Target* NewTargetUnit(const Unit* unit)
 
 #if 0
 /**
-**      Target constructor for position.
+**  Target constructor for position.
 **
-**      @param x        x position.
-**      @param y        y position.
+**  @param x        x position.
+**  @param y        y position.
 **
-**      @return the new target.
+**  @return the new target.
 */
 static Target* NewTargetPosition(int x, int y)
 {
@@ -724,20 +724,20 @@ static Target* NewTargetPosition(int x, int y)
 #endif
 
 // ****************************************************************************
-//		Main local functions
+// Main local functions
 // ****************************************************************************
 
 /*
-**		Check the condition.
+**  Check the condition.
 **
-**		@param caster			Pointer to caster unit.
-**		@param spell 			Pointer to the spell to cast.
-**		@param target			Pointer to target unit, or 0 if it is a position spell.
-**		@param x				X position, or -1 if it is an unit spell.
-**		@param y				Y position, or -1 if it is an unit spell.
-**		@param condition		Pointer to condition info.
+**  @param caster      Pointer to caster unit.
+**  @param spell       Pointer to the spell to cast.
+**  @param target      Pointer to target unit, or 0 if it is a position spell.
+**  @param x           X position, or -1 if it is an unit spell.
+**  @param y           Y position, or -1 if it is an unit spell.
+**  @param condition   Pointer to condition info.
 **
-**		@return 1 if passed, 0 otherwise.
+**  @return            1 if passed, 0 otherwise.
 */
 static int PassCondition(const Unit* caster, const SpellType* spell, const Unit* target,
 	int x, int y, const ConditionInfo* condition)
@@ -796,7 +796,7 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 		}
 	}
 	//
-	//		Check vitals now.
+	// Check vitals now.
 	//
 	if (condition->MinHpPercent * target->Stats->HitPoints / 100 > target->HP) {
 		return 0;
@@ -812,9 +812,9 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 			return 0;
 		}
 	}
-	//		Check for slow/haste stuff
-	//		This should be used mostly for ai, if you want to keep casting
-	//		slow to no effect I can't see why should we stop you.
+	// Check for slow/haste stuff
+	// This should be used mostly for ai, if you want to keep casting
+	// slow to no effect I can't see why should we stop you.
 	if (condition->MaxSlowTicks < target->Slow) {
 		return 0;
 	}
@@ -834,14 +834,14 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 }
 
 /**
-**		Select the target for the autocast.
+**  Select the target for the autocast.
 **
-**		@param caster		Unit who would cast the spell.
-**		@param spell		Spell-type pointer.
+**  @param caster    Unit who would cast the spell.
+**  @param spell     Spell-type pointer.
 **
-**		@return Target*		choosen target or Null if spell can't be cast.
-**      @fixme should be global (for AI) ???
-**      @fixme write for position target.
+**  @return          Target* choosen target or Null if spell can't be cast.
+**  @todo FIXME: should be global (for AI) ???
+**  @todo FIXME: write for position target.
 */
 static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* spell)
 {
@@ -867,7 +867,7 @@ static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* 
 	range = spell->AutoCast->Range;
 
 	//
-	//		Select all units aroung the caster
+	// Select all units aroung the caster
 	//
 	nunits = UnitCacheSelect(caster->X - range, caster->Y - range,
 		caster->X + range + caster->Type->TileWidth,
@@ -883,7 +883,7 @@ static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* 
 	}
 
 	//
-	//		Check generic conditions. FIXME: a better way to do this?
+	// Check generic conditions. FIXME: a better way to do this?
 	//
 	if (autocast->Combat != CONDITION_TRUE) {
 		if ((autocast->Combat == CONDITION_ONLY) ^ (combat)) {
@@ -908,7 +908,7 @@ static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* 
 			//  but it is a must-have for AI. What about area-heal?
 		case TargetUnit:
 			//
-			//		The units are already selected.
+			// The units are already selected.
 			//  Check every unit if it is a possible target
 			//
 			for (i = 0, j = 0; i < nunits; ++i) {
@@ -921,11 +921,11 @@ static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* 
 			}
 			nunits = j;
 			//
-			//		Now select the best unit to target.
-			//		FIXME: Some really smart way to do this.
-			//		FIXME: Heal the unit with the lowest hit-points
-			//		FIXME: Bloodlust the unit with the highest hit-point
-			//		FIMXE: it will survive more
+			// Now select the best unit to target.
+			// FIXME: Some really smart way to do this.
+			// FIXME: Heal the unit with the lowest hit-points
+			// FIXME: Bloodlust the unit with the highest hit-point
+			// FIMXE: it will survive more
 			//
 			if (nunits != 0) {
 #if 0
@@ -933,7 +933,7 @@ static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* 
 				sort(table, nb_units, spell->autocast->f_order);
 				return NewTargetUnit(table[0]);
 #else
-				//		Best unit, random unit, oh well, same stuff.
+				// Best unit, random unit, oh well, same stuff.
 				i = SyncRand() % nunits;
 				return NewTargetUnit(table[i]);
 #endif
@@ -946,11 +946,11 @@ static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* 
 			return NULL;
 			break;
 		}
-	return NULL;		// Can't spell the auto-cast.
+	return NULL; // Can't spell the auto-cast.
 }
 
 // ****************************************************************************
-//		Public spell functions
+// Public spell functions
 // ****************************************************************************
 
 // ****************************************************************************
@@ -958,7 +958,7 @@ static Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* 
 // ****************************************************************************
 
 /**
-**		Spells constructor, inits spell id's and sounds
+** Spells constructor, inits spell id's and sounds
 */
 void InitSpells(void)
 {
@@ -988,11 +988,11 @@ SpellType* SpellTypeByIdent(const char* ident)
 // ****************************************************************************
 
 /**
-**		Check if spell is research for player \p player.
-**		@param		player : player for who we want to know if he knows the spell.
-**		@param		spellid : id of the spell to check.
+**  Check if spell is research for player \p player.
+**  @param player    player for who we want to know if he knows the spell.
+**  @param spellid   id of the spell to check.
 **
-**      @return 0 if spell is not available, else no null.
+**  @return          0 if spell is not available, else no null.
 */
 int SpellIsAvailable(const Player* player, int spellid)
 {
@@ -1005,11 +1005,11 @@ int SpellIsAvailable(const Player* player, int spellid)
 
 
 /**
-**		Check if the spell can be auto cast.
+**  Check if the spell can be auto cast.
 **
-**		@param spell		Spell-type pointer
+**  @param spell    Spell-type pointer
 **
-**		@return				1 if spell can be cast, 0 if not
+**  @return         1 if spell can be cast, 0 if not
 */
 int CanAutoCastSpell(const SpellType* spell)
 {
@@ -1017,16 +1017,16 @@ int CanAutoCastSpell(const SpellType* spell)
 }
 
 /**
-**		Check if unit can cast the spell.
+**  Check if unit can cast the spell.
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+**  @param caster    Unit that casts the spell
+**  @param spell     Spell-type pointer
+**  @param target    Target unit that spell is addressed to
+**  @param x         X coord of target spot when/if target does not exist
+**  @param y         Y coord of target spot when/if target does not exist
 **
-**		@return				=!0 if spell should/can casted, 0 if not
-**		@note caster must know the spell, and spell must be researched.
+**  @return          =!0 if spell should/can casted, 0 if not
+**  @note caster must know the spell, and spell must be researched.
 */
 int CanCastSpell(const Unit* caster, const SpellType* spell,
 	const Unit* target, int x, int y)
@@ -1038,12 +1038,12 @@ int CanCastSpell(const Unit* caster, const SpellType* spell,
 }
 
 /**
-**		Check if the spell can be auto cast and cast it.
+**  Check if the spell can be auto cast and cast it.
 **
-**		@param caster		Unit who can cast the spell.
-**		@param spell		Spell-type pointer.
+**  @param caster    Unit who can cast the spell.
+**  @param spell     Spell-type pointer.
 **
-**		@return				1 if spell is casted, 0 if not.
+**  @return          1 if spell is casted, 0 if not.
 */
 int AutoCastSpell(Unit* caster, const SpellType* spell)
 {
@@ -1058,8 +1058,8 @@ int AutoCastSpell(Unit* caster, const SpellType* spell)
 	if (target == NULL) {
 		return 0;
 	} else {
-		//		Must move before ?
-		//		FIXME: SpellType* of CommandSpellCast must be const.
+		// Must move before ?
+		// FIXME: SpellType* of CommandSpellCast must be const.
 		CommandSpellCast(caster, target->X, target->Y, target->unit,
 			(SpellType*)spell, FlushCommands);
 		free(target);
@@ -1068,15 +1068,15 @@ int AutoCastSpell(Unit* caster, const SpellType* spell)
 }
 
 /**
-**		Spell cast!
+** Spell cast!
 **
-**		@param caster		Unit that casts the spell
-**		@param spell		Spell-type pointer
-**		@param target		Target unit that spell is addressed to
-**		@param x		X coord of target spot when/if target does not exist
-**		@param y		Y coord of target spot when/if target does not exist
+** @param caster    Unit that casts the spell
+** @param spell     Spell-type pointer
+** @param target    Target unit that spell is addressed to
+** @param x         X coord of target spot when/if target does not exist
+** @param y         Y coord of target spot when/if target does not exist
 **
-**		@return				!=0 if spell should/can continue or 0 to stop
+** @return          !=0 if spell should/can continue or 0 to stop
 */
 int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	int x, int y)
@@ -1090,7 +1090,7 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 		y = target->Y;
 	}
 	//
-	//		For TargetSelf, you target.... YOURSELF
+	// For TargetSelf, you target.... YOURSELF
 	//
 	if (spell->Target == TargetSelf) {
 		x = caster->X;
@@ -1117,27 +1117,27 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 			act = act->Next;
 		}
 		//
-		//		Spells like blizzard are casted again.
-		//		This is sort of confusing, we do the test again, to
-		//		check if it will be possible to cast again. Otherwise,
-		//		when you're out of mana the caster will try again ( do the
-		//		anim but fail in this proc.
+		// Spells like blizzard are casted again.
+		// This is sort of confusing, we do the test again, to
+		// check if it will be possible to cast again. Otherwise,
+		// when you're out of mana the caster will try again ( do the
+		// anim but fail in this proc.
 		//
 		if (spell->RepeatCast && cont) {
 			return CanCastSpell(caster, spell, target, x, y);
 		}
 	}
 	//
-	//		Can't cast, STOP.
+	// Can't cast, STOP.
 	//
 	return 0;
 }
 
 /**
-**		Cleanup the spell subsystem.
+** Cleanup the spell subsystem.
 **
-**		@note: everything regarding spells is gone now.
-**		FIXME: not complete
+** @note: everything regarding spells is gone now.
+** FIXME: not complete
 */
 void CleanSpells(void)
 {
@@ -1164,7 +1164,7 @@ void CleanSpells(void)
 			free(spell->Condition);
 		}
 		//
-		//		Free Autocast.
+		// Free Autocast.
 		//
 		if (spell->AutoCast) {
 			if (spell->AutoCast->Condition) {
