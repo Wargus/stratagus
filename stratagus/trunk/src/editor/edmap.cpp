@@ -228,8 +228,8 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 local int TileFromQuad(unsigned fixed, unsigned quad)
 {
     int i;
-    int type1;
-    int type2;
+    unsigned type1;
+    unsigned type2;
     int base;
     int direction;
     //                 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
