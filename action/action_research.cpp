@@ -64,6 +64,7 @@ void HandleActionResearch(Unit* unit)
 	const Upgrade* upgrade;
 
 	if (!unit->SubAction) { // first entry
+		unit->Data.Research.Wait = 0;
 		upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1.Upgrade;
 #if 0
 		// FIXME: I want to support both, but with network we need this check
@@ -89,8 +90,8 @@ void HandleActionResearch(Unit* unit)
 	unit->Type->NewAnimations->Research ?
 		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Research) :
 		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
-	if (unit->Wait) {
-		unit->Wait--;
+	if (unit->Data.Research.Wait) {
+		unit->Data.Research.Wait--;
 		return;
 	}
 
@@ -114,7 +115,7 @@ void HandleActionResearch(Unit* unit)
 		return;
 	}
 
-	unit->Wait = CYCLES_PER_SECOND / 6;
+	unit->Data.Research.Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}

@@ -605,7 +605,6 @@ struct _unit_ {
 	int ResourcesHeld;      /// Resources Held by a unit
 
 	unsigned SubAction : 8; /// sub-action of unit
-	unsigned Wait;          /// action counter
 	unsigned State : 8;     /// action state
 	unsigned Blink : 3;     /// Let selection rectangle blink
 	unsigned Moving : 1;    /// The unit is moving
@@ -640,6 +639,9 @@ struct _unit_ {
 #define MAX_PATH_LENGTH 28          /// max length of precalculated path
 		char Path[MAX_PATH_LENGTH]; /// directions of stored path
 	} Move; /// ActionMove,...
+	struct _order_follow_ {
+		unsigned Wait;              /// action counter
+	} Follow; /// ActionFollow
 	struct _order_built_ {
 		Unit* Worker;               /// Worker building this unit
 		int Progress;               /// Progress counter, in 1/100 cycles.
@@ -648,25 +650,33 @@ struct _unit_ {
 	} Built; /// ActionBuilt,...
 	struct _order_build_ {
 		int Cycles;                 /// Cycles unit has been building for
+		unsigned Wait;              /// action counter
 	} Build; /// ActionBuild
+	struct _order_board_ {
+		unsigned Wait;              /// action counter
+	} Board; /// ActionBoard
 	struct _order_resource_ {
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 	struct _order_resource_worker_ {
 		int TimeToHarvest;          /// how much time until we harvest some more.
 		unsigned DoneHarvesting:1;  /// Harvesting done, wait for action to break.
+		unsigned Wait;              /// action counter
 	} ResWorker; /// Worker harvesting
 	struct _order_repair_ {
 		int Cycles;                 /// Cycles unit has been repairing for
 	} Repair; /// Repairing unit
 	struct _order_research_ {
 		struct _upgrade_* Upgrade;  /// Upgrade researched
+		unsigned Wait;              /// action counter
 	} Research; /// Research action
 	struct _order_upgradeto_ {
-		int Ticks; /// Ticks to complete
+		int Ticks;                  /// Ticks to complete
+		unsigned Wait;              /// action counter
 	} UpgradeTo; /// Upgrade to action
 	struct _order_train_ {
 		int Ticks;                  /// Ticks to complete
+		unsigned Wait;              /// action counter
 	} Train; /// Train units action
 	} Data; /// Storage room for different commands
 

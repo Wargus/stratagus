@@ -3747,7 +3747,6 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	}
 
 	CLprintf(file, "\"sub-action\", %d, ", unit->SubAction);
-	CLprintf(file, "\"wait\", %d, ", unit->Wait);
 	CLprintf(file, "\"state\", %d,", unit->State);
 	if (unit->Anim.Unbreakable) {
 		CLprintf(file, " \"unbreakable\",");
@@ -3805,11 +3804,23 @@ void SaveUnit(const Unit* unit, CLFile* file)
 				CLprintf(file, ", \"resource-active\", %d", unit->Data.Resource.Active);
 			}
 			break;
+		case UnitActionFollow:
+			CLprintf(file, ",\n  \"data-follow\", {");
+			CLprintf(file, "\"wait\", %d, ", unit->Data.Follow.Wait);
+			CLprintf(file, "}");
+			break;
 		case UnitActionResource:
 			CLprintf(file, ", \"data-res-worker\", {\"time-to-harvest\", %d,", unit->Data.ResWorker.TimeToHarvest);
 			if (unit->Data.ResWorker.DoneHarvesting) {
 				CLprintf(file, " \"done-harvesting\",");
 			}
+			CLprintf(file, "\"wait\", %d, ", unit->Data.ResWorker.Wait);
+			CLprintf(file, "}");
+			break;
+		case UnitActionBuild:
+			CLprintf(file, ",\n  \"data-build\", {");
+			CLprintf(file, "\"cycles\", %d, ", unit->Data.Build.Cycles);
+			CLprintf(file, "\"wait\", %d, ", unit->Data.Build.Wait);
 			CLprintf(file, "}");
 			break;
 		case UnitActionBuilt:
@@ -3838,19 +3849,27 @@ void SaveUnit(const Unit* unit, CLFile* file)
 				CLprintf(file, "}");
 				break;
 			}
+		case UnitActionBoard:
+			CLprintf(file, ",\n  \"data-board\", {");
+			CLprintf(file, "\"wait\", %d, ", unit->Data.Board.Wait);
+			CLprintf(file, "}");
+			break;
 		case UnitActionResearch:
 			CLprintf(file, ",\n  \"data-research\", {");
 			CLprintf(file, "\"ident\", \"%s\",", unit->Data.Research.Upgrade->Ident);
+			CLprintf(file, "\"wait\", %d, ", unit->Data.Research.Wait);
 			CLprintf(file, "}");
 			break;
 		case UnitActionUpgradeTo:
 			CLprintf(file, ",\n  \"data-upgrade-to\", {");
 			CLprintf(file, "\"ticks\", %d,", unit->Data.UpgradeTo.Ticks);
+			CLprintf(file, "\"wait\", %d, ", unit->Data.UpgradeTo.Wait);
 			CLprintf(file, "}");
 			break;
 		case UnitActionTrain:
 			CLprintf(file, ",\n  \"data-train\", {");
 			CLprintf(file, "\"ticks\", %d, ", unit->Data.Train.Ticks);
+			CLprintf(file, "\"wait\", %d, ", unit->Data.Train.Wait);
 			CLprintf(file, "}");
 			break;
 		default:
