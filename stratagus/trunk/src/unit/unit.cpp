@@ -1932,6 +1932,26 @@ global void DropOutAll(const Unit* source)
     // FIXME: Rewrite this use source->Next;
     Unit** table;
     Unit* unit;
+    int i;
+
+    i=0;
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	if( unit->Removed && unit->X==source->X && unit->Y==source->Y ) {
+	    ++i;
+	    DropOutOnSide(unit,LookingW
+		,source->Type->TileWidth,source->Type->TileHeight);
+	    DebugCheck( unit->Orders[0].Goal );
+	    unit->Orders[0].Action=UnitActionStill;
+	    unit->Wait=unit->Reset=1;
+	    unit->SubAction=0;
+	}
+    }
+    DebugLevel0Fn("Drop out %d of %d\n",i,source->Data.Resource.Active);
+#if 0
+    // FIXME: Rewrite this use source->Next;
+    Unit** table;
+    Unit* unit;
     Unit* table2[UnitMax];
     int i;
     int n;
@@ -1957,6 +1977,7 @@ global void DropOutAll(const Unit* source)
 	    }
 	}
     }
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -2216,8 +2237,8 @@ global Unit* FindGoldMine(const Unit* source __attribute__((unused)),
 	    continue;
 	}
 	d=MapDistanceToUnit(x,y,unit);
-	// FIXME: UnitReachable(source,unit) didn't work unit still in building
-	if( d<best_d /* && UnitReachable(source,unit) */ ) {
+	// FIXME: UnitReachable didn't work with unit inside
+	if( d<best_d /* && (d=UnitReachable(source,unit,1)) && d<best_d */ ) {
 	    best_d=d;
 	    best=unit;
 	}
@@ -2266,9 +2287,8 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	    continue;
 	}
 	d=MapDistanceToUnit(x,y,unit);
-	// FIXME: UnitReachable(source,unit) didn't work if way blocked
-	// by another worker
-	if( d<best_d  && UnitReachable(source,unit,1)  ) {
+	// FIXME: UnitReachable didn't work with unit inside
+	if( d<best_d /* && (d=UnitReachable(source,unit,1)) && d<best_d */ ) {
 	    best_d=d;
 	    best=unit;
 	}
@@ -2674,6 +2694,7 @@ global Unit* FindOilDeposit(const Unit* source,int x,int y)
 	if( unit->Type->StoresOil ) {
 	    d=MapDistanceToUnit(x,y,unit);
 	    if( d<best_d
+		    // FIXME: UnitReachable didn't work with unit inside
 		    /*&& (d=UnitReachable(source,unit,1)) && d<best_d*/ ) {
 		best_d=d;
 		best=unit;
