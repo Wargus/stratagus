@@ -1272,12 +1272,15 @@ global void MapColorCycle(void)
     }
 #endif
 
-    //
-    //	Convert 16 bit pixel table into two 32 bit tables.
-    //
-    for( i=0; i<256; ++i ) {
-	PixelsLow[i]=((VMemType16*)TheMap.TileData->Pixels)[i]&0xFFFF;
-	PixelsHigh[i]=(((VMemType16*)TheMap.TileData->Pixels)[i]&0xFFFF)<<16;
+    if( VideoDepth==15 || VideoDepth==16 ) {
+	//
+	//	Convert 16 bit pixel table into two 32 bit tables.
+	//
+	for( i=0; i<256; ++i ) {
+	    PixelsLow[i]=((VMemType16*)TheMap.TileData->Pixels)[i]&0xFFFF;
+	    PixelsHigh[i]=(((VMemType16*)TheMap.TileData->Pixels)[i]&0xFFFF)
+		    <<16;
+	}
     }
 }
 
