@@ -142,12 +142,13 @@ global void HandleActionFollow(Unit* unit)
 
     if( unit->Reset ) {
 	//
+	//	If our leader is dead or stops or attacks:
 	//	Attack any enemy in reaction range.
 	//		If don't set the goal, the unit can than choose a
 	//		better goal if moving nearer to enemy.
 	//
 	if( unit->Type->CanAttack && !unit->Type->Tower
-		&& (goal->Orders[0].Action==UnitActionAttack
+		&& (!goal || goal->Orders[0].Action==UnitActionAttack
 		    || goal->Orders[0].Action==UnitActionStill) ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
@@ -155,6 +156,7 @@ global void HandleActionFollow(Unit* unit)
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		// Save current command to come back.
 		unit->SavedOrder=unit->Orders[0];
+		// This stops the follow command and the attack is executed
 		unit->Orders[0].Action=UnitActionStill;
 		unit->Orders[0].Goal=NoUnitP;
 		unit->SubAction=0;
