@@ -339,7 +339,8 @@ global int PlayerCheckCosts(const Player* player,const int* costs)
 			,DEFAULT_NAMES[i],DEFAULT_ACTIONS[i],DEFAULT_NAMES[i]);
 		//	FIXME: use the general notify function vor this
 		if( player==ThisPlayer ) {
-		    SetMessageDup(buf); //FIXME: vladi: can SetMessage be used instead?
+		    //FIXME: vladi: can SetMessage be used instead?
+		    SetMessageDup(buf);
 		} else {
 		    DebugLevel3("Ai: %s.\n",buf);
 		}
