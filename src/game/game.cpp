@@ -543,9 +543,13 @@ global void CreateGame(char* filename, WorldMap* map)
 
     CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
     DestroyCursorBackground();
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 }
 
 /**
