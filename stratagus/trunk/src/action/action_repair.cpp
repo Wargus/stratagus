@@ -115,9 +115,14 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //
     for( i=1; i<MaxCosts; ++i ) {
 	if( player->Resources[i]<costs[i] ) {
-	  SetMessage("We need resources!");
-          // FIXME: perhaps we should not animate if no resources are available.
-	  return;
+	    // FIXME: general notify system
+	    // FIXME: we should say what resource
+	    if( player==ThisPlayer ) {
+		SetMessage("We need resources for repair!");
+	    }
+	    // FIXME: call back to AI?
+	    // FIXME: We shouldn't animate if no resources are available.
+	    return;
 	}
     }
     //
