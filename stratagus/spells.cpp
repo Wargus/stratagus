@@ -1255,10 +1255,22 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
     int i;
     int j;
     int combat;
+    AutoCastInfo* autocast;
 
     DebugCheck(!spell);
     DebugCheck(!spell->AutoCast);
     DebugCheck(!caster);
+
+    //
+    //	Ai cast should be a lot better. Use autocast if not found.
+    //
+    if (caster->Player->Ai&&spell->AICast) {
+	DebugLevel3Fn("The borg uses AI autocast XP.\n");
+	autocast=spell->AICast;
+    } else {
+	DebugLevel3Fn("You puny mortal, join the colective!\n");
+	autocast=spell->AutoCast;
+    }
 
     x=caster->X;
     y=caster->Y;
@@ -1282,8 +1294,8 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
     //
     //	Check generic conditions. FIXME: a better way to do this?
     //
-    if (spell->AutoCast->Combat!=CONDITION_TRUE) {
-	if ((spell->AutoCast->Combat==CONDITION_ONLY)^(combat)) {
+    if (autocast->Combat!=CONDITION_TRUE) {
+	if ((autocast->Combat==CONDITION_ONLY)^(combat)) {
 	    return 0;
 	}
     }
@@ -1293,8 +1305,8 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
 	    // TargetNone?
 	    return NewTargetNone();
 	case TargetSelf :
-	    if (PassCondition(caster, spell, caster, x, y, spell->Conditions) &&
-		    PassCondition(caster, spell, caster, x, y, spell->AutoCast->Condition)) {
+	    if (PassCondition(caster, spell, caster, x, y, spell->Condition) &&
+		    PassCondition(caster, spell, caster, x, y, autocast->Condition)) {
     	        return NewTargetUnit(caster);
     	    }
 	    return 0;
@@ -1314,8 +1326,8 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
 	    for (i = 0, j = 0; i < nunits; i++) {
 		//  FIXME: autocast conditions should include normal conditions.
 		//  FIXME: no, really, they should.
-		if (PassCondition(caster, spell, table[i], x, y, spell->Conditions) &&
-			PassCondition(caster, spell, table[i], x, y, spell->AutoCast->Condition)) {
+		if (PassCondition(caster, spell, table[i], x, y, spell->Condition) &&
+			PassCondition(caster, spell, table[i], x, y, autocast->Condition)) {
 		    table[j++] = table[i];
 		}
 	    }
@@ -1363,17 +1375,6 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
 global void InitSpells(void)
 {
 }
-
-/**
-**	Spells destructor (currently does nothing)
-*/
-global void DoneSpells()
-{
-// FIXME
-    free(SpellTypeTable);
-    // nothing yet
-}
-
 
 // ****************************************************************************
 // Get Spell.
@@ -1509,7 +1510,7 @@ global int CanCastSpell(const Unit *caster, const SpellType *spell,
 	return 0;
     }
 
-    return PassCondition(caster,spell,target,x,y,spell->Conditions);
+    return PassCondition(caster,spell,target,x,y,spell->Condition);
 }
 
 /**
@@ -1580,6 +1581,45 @@ global int SpellCast(Unit *caster, const SpellType *spell, Unit *target,
     return CanCastSpell(caster, spell, target, x, y) && spell->Action->CastFunction(caster, spell, target, x, y);
 }
 
+/*
+**	Cleanup the spell subsystem.
+**	
+**	@note: everything regarding spells is gone now.
+**	FIXME: not complete
+*/
+void CleanSpells(void)
+{
+    SpellType* spell;
+
+    DebugLevel0("Cleaning spells.\n");
+    for (spell = SpellTypeTable; spell < SpellTypeTable + SpellTypeCount; ++spell) {
+	free(spell->IdentName);
+	free(spell->Name);
+	free(spell->Action);
+	if (spell->Condition) {
+	    free(spell->Condition);
+	}
+	//
+	//	Free Autocast.
+	//
+	if (spell->AutoCast) {
+	    if (spell->AutoCast->Condition) {
+		free(spell->AutoCast->Condition);
+	    }
+	    free(spell->AutoCast);
+	}
+	if (spell->AICast) {
+	    if (spell->AICast->Condition) {
+		free(spell->AICast->Condition);
+	    }
+	    free(spell->AICast);
+	}
+	// FIXME: missile free somewhere else, right?
+    }
+    free(SpellTypeTable);
+    SpellTypeTable=0;
+    SpellTypeCount=0;
+}
 
 #if 0
 
@@ -1606,11 +1646,6 @@ global int SpellCast(Unit *caster, const SpellType *spell, Unit *target,
   different range, cost and time to live (possibly and other
   parameters as extensions)
 
-  FIXME: this should be configurable by CCL.
-
-  FIXME: 0x7F as unlimited range is too less for big maps.
-
- 
 */
 
 #endif

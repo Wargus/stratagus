@@ -233,10 +233,15 @@ typedef struct ConditionInfo {
 **
 */
 typedef struct {
-    ConditionInfo *Condition;		/// Conditions to cast the spell.
+    /// FIXME: this below is SQUARE!!!
     int Range;				/// Max range of the target.
+
+    ConditionInfo *Condition;		/// Conditions to cast the spell.
+
+    /// Detalied generic conditions (not per-target, where Condition is evaluated.)
     /// Combat mode is when there are hostile non-coward units around
     int Combat;				/// If it should be casted in combat
+
     /// FIXME: Add stuff here for target preference.
     /// FIXME: Heal units with the lowest hit points first.
 } AutoCastInfo;
@@ -255,19 +260,21 @@ typedef struct _spell_type_ {
     //	Spell Specifications
     TargetType	Target;			/// Targetting information. See TargetType.
     SpellActionType *Action;		/// More arguments for spell (damage, delay, additional sounds...).
-#define INFINITE_RANGE 0xFFFFFFF
+    
     int Range;				/// Max range of the target.
+#define INFINITE_RANGE 0xFFFFFFF
     int ManaCost;			/// required mana for each cast
 
     int DependencyId;			/// Id of upgrade, -1 if no upgrade needed for cast the spell.
-    ConditionInfo *Conditions;		/// Conditions to cast the spell. (generic (no test for each target))
+    ConditionInfo *Condition;		/// Conditions to cast the spell. (generic (no test for each target))
 
-//	Autocast	// FIXME : can use different for AI ? Use it in this structure ?
-    AutoCastInfo *AutoCast;		/// AutoCast information
+    // Autocast informations. No AICast means the AI use AutoCast.
+    AutoCastInfo *AutoCast;		/// AutoCast information for your own units
+    AutoCastInfo *AICast;		/// AutoCast information for ai. More detalied.
 
-//	Uses for graphics and sounds
-    SoundConfig SoundWhenCast;		/// sound played if cast
-    MissileType	*Missile;		/// missile fired on cast
+    //	Graphics and sounds. Add something else here?
+    SoundConfig SoundWhenCast;		/// Sound played if cast
+    MissileType	*Missile;		/// Missile fired on cast
 } SpellType;
 
 /*----------------------------------------------------------------------------
@@ -297,7 +304,7 @@ extern void InitSpells(void);
 extern void SaveSpells(CLFile * file);
 
 /// done spell tables
-extern void DoneSpells(void);
+extern void CleanSpells(void);
 
 /// return 1 if spell is availible, 0 if not (must upgrade)
 extern int SpellIsAvailable(const Player* player, int SpellId);
