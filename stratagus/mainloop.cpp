@@ -496,6 +496,11 @@ global void GameMainLoop(void)
 		case 6:				// overtaking units
 		    RescueUnits();
 		    break;
+		case 7:
+		    if( ShowOrdersCount ) {
+			ShowOrdersCount--;
+		    }
+		    break;
 	    }
 	}
 	//

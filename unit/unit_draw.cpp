@@ -55,25 +55,26 @@
 ----------------------------------------------------------------------------*/
 
 global int ShowHealthBar;		/// Flag: show health bar
-global int ShowHealthDot=1;		/// Flag: show health dot
+global int ShowHealthDot;		/// Flag: show health dot
 global int ShowManaBar;			/// Flag: show mana bar
-global int ShowManaDot=1;		/// Flag: show mana dot
-global int ShowNoFull=1;		/// Flag: show no full health or mana
-global int DecorationOnTop=1;		/// Flag: show health and mana on top
+global int ShowManaDot;			/// Flag: show mana dot
+global int ShowNoFull;			/// Flag: show no full health or mana
+global int DecorationOnTop;		/// Flag: show health and mana on top
 global int ShowSightRange;		/// Flag: show right range
 global int ShowReactionRange;		/// Flag: show reaction range
 global int ShowAttackRange;		/// Flag: show attack range
 global int ShowOrders;			/// Flag: show orders of unit on map
+global int ShowOrdersCount;		/// Show orders for some time
     /// Flag: health horizontal instead of vertical
-global int ShowHealthHorizontal=1;
+global int ShowHealthHorizontal;
     /// Flag: health horizontal instead of vertical
-global int ShowManaHorizontal=1;
+global int ShowManaHorizontal;
     /// Flag: show bars and dot energy only for selected
 global int ShowEnergySelectedOnly;
     /// Flag: show the health background long
-global int ShowHealthBackgroundLong=1;
+global int ShowHealthBackgroundLong;
     /// Flag: show the mana background long
-global int ShowManaBackgroundLong=1;
+global int ShowManaBackgroundLong;
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
@@ -1218,7 +1219,8 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
     //
     //	Show order.
     //
-    if( ShowOrders /*&& unit->Selected && (KeyModifiers&ModifierShift) */) {
+    if( ShowOrders || (unit->Selected
+	    && (ShowOrdersCount ||(KeyModifiers&ModifierShift))) ) {
 	ShowOrder(unit);
     }
 
@@ -1293,7 +1295,6 @@ local void DrawBuilding(Unit* unit)
     }
 
     type=unit->Type;
-    GraphicUnitPixels(unit,type->Sprite);
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
@@ -1307,11 +1308,13 @@ local void DrawBuilding(Unit* unit)
     //
     if( unit->Orders[0].Action==UnitActionBuilded ) {
 	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
+	    GraphicUnitPixels(unit,type->Construction->Sprite);
 	    DrawConstruction(type->Construction
 		,frame&127
 		,x+(type->TileWidth*TileSizeX)/2
 		,y+(type->TileHeight*TileSizeY)/2);
 	} else {
+	    GraphicUnitPixels(unit,type->Sprite);
 	    DrawUnitType(type,frame,x,y);
 	}
     //
@@ -1319,8 +1322,10 @@ local void DrawBuilding(Unit* unit)
     //
     } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
 	// FIXME: this frame is hardcoded!!!
+	GraphicUnitPixels(unit,unit->Orders[0].Type->Sprite);
 	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
     } else {
+	GraphicUnitPixels(unit,type->Sprite);
 	DrawUnitType(type,frame,x,y);
     }
 
