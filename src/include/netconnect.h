@@ -144,6 +144,7 @@ enum _net_client_con_state_ {
     ccs_badmap,			/* has received non-matching map-info */
     ccs_synced,
     ccs_async,			/* server user has changed selection */
+    ccs_changed,		/* client user has made menu selection */
     ccs_unreachable,
 };
 
@@ -165,6 +166,7 @@ extern int NetConnectRunning;		/// Network menu: Setup mode active
 extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state
 
 extern ServerSetup ServerSetupState;	/// Network menu: Multiplayer Server Menu selections state
+extern ServerSetup LocalSetupState;	/// Network menu: Multiplayer Client Menu selections local state
 
 /*----------------------------------------------------------------------------
 --	Functions
