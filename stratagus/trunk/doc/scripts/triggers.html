@@ -56,7 +56,6 @@
 <a href="#GetNumOpponents">GetNumOpponents</a>
 <a href="#IfRescuedNearUnit">IfRescuedNearUnit</a>
 <a href="#IfTimer">IfTimer</a>
-<a href="#IfUnit">IfUnit</a>
 <a href="#IfUnitAt">IfUnitAt</a>
 <hr>
 <h2>Intro - Introduction to trigger functions and variables</h2>
@@ -420,45 +419,6 @@ Return true if Timer "op" cycles quantity is true.
 IfTimer("==", 0)
 </pre>
 
-<a name="IfUnit"></a>
-<h3>IfUnit(player, op, quantity, unit-type)</h3>
-
-Return true if number of unit of type unit-type of the player "op" quantity is true.
-
-
-<dl>
-  <dt>player</dt>
-  <dd><pre>
-0 .. 16     Player number
-"any"       Matches any player
-"this"      Player on the local computer, Human player in the campaign.
-</pre></dd>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>quantity</dt>
-  <dd>Number to compare with number of rescued-unit</dd>
-  <dt>unit-type</dt>
-  <dd><pre>
-unit-name    Unit type of this name
-"any"        Matches any unit type
-"all"        All units (sum of units and buildings)
-"units"      All non building units
-"building"   All building units
-</pre></dd>
-</dl>
-
-<h4>Example</h4>
-<pre>
--- True when the player on the console has at least 8 archers.
-IfUnit("this", "&gt;=", 8, "unit-archer")
-</pre>
-
 <a name="IfUnitAt"></a>
 <h3>IfUnitAt(player, op, quantity, unit-type, {x1, y1}, {x2, y2})</h3>
  
@@ -506,5 +466,5 @@ IfUnitAt("this", "'&gt;=", 8, "unit-archer", {10, 10}, {12, 14})
 <hr>
 Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<address>(c) 2002-2003 by <a href="http://stratagus.org">
+<address>(c) 2002-2005 by <a href="http://stratagus.org">
 The Stratagus Project</a></address></body></html>
