@@ -20,13 +20,73 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _tileset_ tileset.h
+**
+**	\#include "tileset.h"
+**
+**	typedef struct _tileset_ Tileset;
+**
+**	This structure contains all informations about the tileset of the map.
+**	It defines the look and properties of the tiles. Currently only one
+**	tileset pro map is supported. In the future it is planned to support
+**	multiple tilesets on the same map. Also is planned to support animated
+**	tiles.
+**	Currently the tilesize is fixed to 32x32 pixels, to support later other
+**	sizes please use always the constants ::TileSizeX and ::TileSizeY.
+**
+**	The tileset structure members:
+**
+**	Tileset::Ident
+**
+**		FIXME: continue docu.
+**
+**	Tileset::Name
+**
+**	Tileset::File
+**
+**	Tileset::PaletteFile
+**
+**	Tileset::Table
+**
+**	Tileset::TileTypeTable
+**
+**	Tileset::AnimationTable
+**
+**	Tileset::ExtraTrees[6]
+**
+**	Tileset::TopOneTree
+**
+**	Tileset::MidOneTree
+**
+**	Tileset::BotOneTree
+**
+**	Tileset::RemovedTree
+**
+**	Tileset::GrowingTree[2]
+**
+**	Tileset::ExtraRocks[6]
+**
+**	Tileset::TopOneRock
+**
+**	Tileset::MidOneRock
+**
+**	Tileset::BotOneRock
+**
+**	Tileset::RemovedRock
+**
+*/
+
+/*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
 
 #define TileSizeX	32		/// Size of a tile in X
 #define TileSizeY	32		/// Size of a tile in Y
 
-//#define MaxTilesInTileset	1024	/// Current limit of tiles in tileset
 #define MaxTilesInTileset	3072	/// Current limit of tiles in tileset
 
 /**
@@ -47,9 +107,7 @@ enum _tile_type_ {
     TileTypeWater,			/// any water tile
 };
 
-/**
-**	Tileset definition.
-*/
+    ///	Tileset definition.
 typedef struct _tileset_ {
     char*	Ident;			/// tileset identifier
     char*	Name;			/// name for future extensions
@@ -58,26 +116,17 @@ typedef struct _tileset_ {
 
     const unsigned short* Table;	/// pud to internal conversion table
     unsigned char* TileTypeTable;	/// for fast lookup of tile type
+    // FIXME: currently unsupported.
     unsigned short* AnimationTable;	/// Tile Animation sequences
 
-#if 1
-    // FIXME: old code should be complete removed.
-    unsigned	HumanWall100Tile;	/// 100% wall
-    unsigned	HumanWall50Tile;	/// 100% wall
-    unsigned	HumanNoWallTile;	/// tile placed where walls are gone
-    unsigned	OrcWall100Tile;		/// 100% wall
-    unsigned	OrcWall50Tile;		/// 100% wall
-    unsigned	OrcNoWallTile;		/// tile placed where walls are gone
-#endif
-
-    unsigned	ExtraTrees[6];		/// extra tree tiles for removed
+    unsigned	ExtraTrees[6];		/// extra tree tiles for removing
     unsigned	TopOneTree;		/// tile for one tree top
     unsigned	MidOneTree;		/// tile for one tree middle
     unsigned	BotOneTree;		/// tile for one tree bottom
     unsigned	RemovedTree;		/// tile placed where trees are gone
     unsigned	GrowingTree[2];		/// Growing tree tiles
 
-    unsigned	ExtraRocks[6];		/// extra rock tiles for removed
+    unsigned	ExtraRocks[6];		/// extra rock tiles for removing
     unsigned	TopOneRock;		/// tile for one rock top
     unsigned	MidOneRock;		/// tile for one rock middle
     unsigned	BotOneRock;		/// tile for one rock bottom
@@ -116,8 +165,9 @@ extern void TilesetCclRegister(void);	/// Register CCL features for tileset
 --	Predicates
 ----------------------------------------------------------------------------*/
 
-// True if this is the fog color
+    /// True if this is the fog color. FIXME: fgp compatibility hack!
 #define COLOR_FOG_P(x) ((x) == 239 || (x) == 228)
+    /// Solid fog color number in global palette
 #define COLOR_FOG (0)
 
 //@}
