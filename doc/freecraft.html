@@ -115,7 +115,10 @@
 <LI>Correct fog of war (terrain changes are not shown).
 <LI>Nice looking fog of war (alpha-gray-scale)
 <LI>More resolutions 640x480, 800x600, 1024x768 and 1600x1200.
+<LI>Support for viewports.
+<LI>Support for OGG/MP3 background music.
 <LI>Support for up to 6 resources.
+<LI>Support for up to 15 players in local network.
 <LI>Internet play.
 </UL>
 
@@ -126,7 +129,8 @@
 <UL>
 <LI>Help with the map editor development.
 <LI>Write an AI editor.
-<LI>Write a video player. (fli or own format)
+<LI>Write a video player or add support for a video codec. (fli/mpeg or own
+    format)
 <LI>Create own tilesets and unit graphics.
 <LI>Create own sounds, voices, videos and campaigns.
 <LI>Create a jingle for startup and home-page.
@@ -134,11 +138,11 @@
 <LI>Improved network support (viewer, proxy, automatic lag detection)
 <LI>Write better sound routines. (with midi or xmi support, sound streaming)
 <LI>Write "wartools"  for demo-version.
-<LI>Port to X11 8bpp or 32bpp, full-screen and DGA support.
-<LI>Port to ggi.
-<LI>Port to msdos/djgpp.
 <LI>Write clone of the new game from the same company.
     (Graphic and sound formats are mostly the same.)
+<LI>Add support for sandtools to the engine.
+<LI>Port to X11 8bpp or 32bpp, full-screen and DGA support.
+<LI>Port to PocketPC's.
 <LI>Multi-language support
 <LI>And any other help is welcome.
 </UL>
@@ -174,6 +178,7 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     <LI>-l<BR>
 	Enable command log to <VAR>"command.log"</VAR>
     <LI>-p players<BR>
+	<B>Currently not supported!</B>
 	Number of network <VAR>players</VAR> to connect. This computer be
 	comes the game server.
     <LI>-n [localport:]serverhost[:port]<BR>
@@ -182,7 +187,8 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 	or the IP number like "192.168.1.1". <VAR>localport</VAR>
 	is the port number on the local computer, <VAR>port</VAR> is the 
 	port on the game server. The default ports are 6660. If you have a
-	firewall please let the port 6660/UDP through.
+	firewall please let the port 6660/UDP through. Can be used together
+	with the network GUI, this is than the default game server.
     <LI>-N name<BR>
 	Name of the player, for network play. Can be used together with
 	network GUI, this is than the default player name.
