@@ -1489,7 +1489,7 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 			op2 = next;
 		}
 		anim->D.RandomSound.NumSounds = count;
-		anim->D.RandomSound.Sound = calloc(count, sizeof(char*));
+		anim->D.RandomSound.Sound = calloc(count, sizeof(SoundId));
 	} else if (!strcmp(op1, "attack")) {
 		anim->Type = NewAnimationAttack;
 	} else if (!strcmp(op1, "rotate")) {
