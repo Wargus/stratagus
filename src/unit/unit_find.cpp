@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_find.c	-	The find/select for units. */
+/**@name unit_find.c - The find/select for units. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+// (c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -54,35 +54,35 @@
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
---		Defines
+-- Defines
 ----------------------------------------------------------------------------*/
 
 /*
-**		Configuration of the small (unit) AI.
+** Configuration of the small (unit) AI.
 */
-#define PRIORITY_FACTOR				0x00010000
-#define HEALTH_FACTOR				0x00000001
-#define DISTANCE_FACTOR				0x00100000
-#define INRANGE_FACTOR				0x00010000
-#define INRANGE_BONUS				0x01000000
-#define CANATTACK_BONUS				0x00100000
+#define PRIORITY_FACTOR   0x00010000
+#define HEALTH_FACTOR     0x00000001
+#define DISTANCE_FACTOR   0x00100000
+#define INRANGE_FACTOR    0x00010000
+#define INRANGE_BONUS     0x01000000
+#define CANATTACK_BONUS   0x00100000
 
 /*----------------------------------------------------------------------------
---		Local Data
+-- Local Data
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Select unit on X,Y of type naval,fly,land.
+** Select unit on X,Y of type naval,fly,land.
 **
-**		@param x		Map X tile position.
-**		@param y		Map Y tile position.
-**		@param type		UnitType::UnitType, naval,fly,land.
+** @param x       Map X tile position.
+** @param y       Map Y tile position.
+** @param type    UnitType::UnitType, naval,fly,land.
 **
-**		@return				Unit, if an unit of correct type is on the field.
+** @return        Unit, if an unit of correct type is on the field.
 */
 Unit* UnitCacheOnXY(int x, int y, unsigned type)
 {
@@ -103,12 +103,12 @@ Unit* UnitCacheOnXY(int x, int y, unsigned type)
 }
 
 /**
-**		Find all units of type.
+** Find all units of type.
 **
-**		@param type		type of unit requested
-**		@param table		table in which we have to store the units
+** @param type     type of unit requested
+** @param table    table in which we have to store the units
 **
-**		@return				Returns the number of units found.
+** @return         Returns the number of units found.
 */
 int FindUnitsByType(const UnitType* type, Unit** table)
 {
@@ -126,13 +126,13 @@ int FindUnitsByType(const UnitType* type, Unit** table)
 }
 
 /**
-**		Find all units of type.
+** Find all units of type.
 **
-**		@param player		we're looking for the units of this player
-**		@param type		type of unit requested
-**		@param table		table in which we have to store the units
+** @param player    we're looking for the units of this player
+** @param type      type of unit requested
+** @param table     table in which we have to store the units
 **
-**		@return				Returns the number of units found.
+** @return          Returns the number of units found.
 */
 int FindPlayerUnitsByType(const Player* player,const UnitType* type,
 	Unit** table)
@@ -160,12 +160,12 @@ int FindPlayerUnitsByType(const Player* player,const UnitType* type,
 }
 
 /**
-**		Unit on map tile, no special prefered.
+** Unit on map tile, no special prefered.
 **
-**		@param tx		X position on map, tile-based.
-**		@param ty		Y position on map, tile-based.
+** @param tx    X position on map, tile-based.
+** @param ty    Y position on map, tile-based.
 **
-**		@return				Returns first found unit on tile.
+** @return      Returns first found unit on tile.
 */
 Unit* UnitOnMapTile(int tx, int ty)
 {
@@ -187,12 +187,12 @@ Unit* UnitOnMapTile(int tx, int ty)
 }
 
 /**
-**		Repairable unit on map tile.
+** Repairable unit on map tile.
 **
-**		@param tx		X position on map, tile-based.
-**		@param ty		Y position on map, tile-based.
+** @param tx    X position on map, tile-based.
+** @param ty    Y position on map, tile-based.
 **
-**		@return				Returns repairable unit found on tile.
+** @return      Returns repairable unit found on tile.
 */
 Unit* RepairableOnMapTile(int tx, int ty)
 {
@@ -211,13 +211,13 @@ Unit* RepairableOnMapTile(int tx, int ty)
 }
 
 /**
-**		Choose targe on a map
+** Choose targe on a map
 **
-**		@param source		Unit which wants to attack.
-**		@param tx		X position to attack.
-**		@param ty		Y position to attack.
+** @param source    Unit which wants to attack.
+** @param tx        X position to attack.
+** @param ty        Y position to attack.
 **
-**		@return				Returns ideal target on map tile.
+** @return          Returns ideal target on map tile.
 */
 Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 {
@@ -246,7 +246,7 @@ Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 			continue;
 		}
 		//
-		//		Choose the best target.
+		// Choose the best target.
 		//
 		if (!best || best->Type->Priority < unit->Type->Priority) {
 			best = unit;
@@ -256,15 +256,15 @@ Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 }
 
 /**
-**		Choose target on map area.
+** Choose target on map area.
 **
-**		@param source		Unit which want to attack.
-**		@param x1		X position on map, tile-based.
-**		@param y1		Y position on map, tile-based.
-**		@param x2		X position on map, tile-based.
-**		@param y2		Y position on map, tile-based.
+** @param source    Unit which want to attack.
+** @param x1        X position on map, tile-based.
+** @param y1        Y position on map, tile-based.
+** @param x2        X position on map, tile-based.
+** @param y2        Y position on map, tile-based.
 **
-**		@return				Returns ideal target on map tile.
+** @return          Returns ideal target on map tile.
 */
 Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 {
@@ -292,7 +292,7 @@ Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 		}
 
 		//
-		//		Choose the best target.
+		// Choose the best target.
 		//
 		if (!best || best->Type->Priority < unit->Type->Priority) {
 			best = unit;
@@ -302,12 +302,12 @@ Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 }
 
 /**
-**		Transporter unit on map tile.
+** Transporter unit on map tile.
 **
-**		@param tx		X position on map, tile-based.
-**		@param ty		Y position on map, tile-based.
+** @param tx    X position on map, tile-based.
+** @param ty    Y position on map, tile-based.
 **
-**		@return				Returns transporter unit found on tile.
+** @return      Returns transporter unit found on tile.
 */
 Unit* TransporterOnMapTile(int tx, int ty)
 {
@@ -326,19 +326,19 @@ Unit* TransporterOnMapTile(int tx, int ty)
 
 #if 0
 /**
-**		Returns true if screen map position (x,y) is inside of
-**		the rectangle where the unit's sprite is drawn.
+** Returns true if screen map position (x,y) is inside of
+** the rectangle where the unit's sprite is drawn.
 **
-**		@param unit		Pointer to unit whose sprite is to be tested
-**		@param x		X position on screen map, pixel-based
-**		@param y		Y position on screen map, pixel-based
+** @param unit    Pointer to unit whose sprite is to be tested
+** @param x       X position on screen map, pixel-based
+** @param y       Y position on screen map, pixel-based
 **
-**		@return				true if (x,y) is inside the unit's sprite
+** @return        true if (x,y) is inside the unit's sprite
 */
 static int InsideUnitSprite(const Unit* unit, int x, int y)
 {
 	int ux;
-	int uy;				// position at which unit's sprite is currently drawn
+	int uy; // position at which unit's sprite is currently drawn
 	const UnitType* type;
 
 	type = unit->Type;
@@ -357,17 +357,17 @@ static int InsideUnitSprite(const Unit* unit, int x, int y)
 #endif
 
 /*----------------------------------------------------------------------------
---		Finding special units
+-- Finding special units
 ----------------------------------------------------------------------------*/
 
 /**
-** 		Find a unit on a map tile with a specific type
+**  Find a unit on a map tile with a specific type
 **
-**		@param tx		X position on map, tile-based.
-**		@param ty		Y position on map, tile-based.
-**		@param type		Unit Type to Find
+** @param tx      X position on map, tile-based.
+** @param ty      Y position on map, tile-based.
+** @param type    Unit Type to Find
 **
-**		@return				Returns the unit if found, or NoUnitP.
+** @return        Returns the unit if found, or NoUnitP.
 */
 Unit* UnitTypeOnMap(int tx, int ty, UnitType* type)
 {
@@ -385,13 +385,13 @@ Unit* UnitTypeOnMap(int tx, int ty, UnitType* type)
 }
 
 /**
-**		Resource on map tile
+** Resource on map tile
 **
-**		@param tx		X position on map, tile-based.
-**		@param ty		Y position on map, tile-based.
-**		@param resource		resource type.
+** @param tx          X position on map, tile-based.
+** @param ty          Y position on map, tile-based.
+** @param resource    resource type.
 **
-**		@return				Returns the deposit if found, or NoUnitP.
+** @return            Returns the deposit if found, or NoUnitP.
 */
 Unit* ResourceOnMap(int tx, int ty, int resource)
 {
@@ -413,13 +413,13 @@ Unit* ResourceOnMap(int tx, int ty, int resource)
 }
 
 /**
-**		Resource deposit on map tile
+** Resource deposit on map tile
 **
-**		@param tx		X position on map, tile-based.
-**		@param ty		Y position on map, tile-based.
-**		@param resource		resource type.
+** @param tx          X position on map, tile-based.
+** @param ty          Y position on map, tile-based.
+** @param resource    resource type.
 **
-**		@return				Returns the deposit if found, or NoUnitP.
+** @return            Returns the deposit if found, or NoUnitP.
 */
 Unit* ResourceDepositOnMap(int tx, int ty, int resource)
 {
@@ -440,23 +440,23 @@ Unit* ResourceDepositOnMap(int tx, int ty, int resource)
 }
 
 /*----------------------------------------------------------------------------
---		Finding units for attack
+-- Finding units for attack
 ----------------------------------------------------------------------------*/
 
 /**
-**		Attack units in distance, with large missile
+** Attack units in distance, with large missile
 **
-**				Choose the best target, that can be attacked. It takes into
-**				account allied unit which could be hit by the missile
+** Choose the best target, that can be attacked. It takes into
+** account allied unit which could be hit by the missile
 **
-**		@param u		Find in distance for this unit.
-**		@param range		Distance range to look.
+**  @param u        Find in distance for this unit.
+**  @param range    Distance range to look.
 **
-**		@return				Unit to be attacked.
+**  @return         Unit to be attacked.
 **
-**		@note		This could be improved, for better performance / better trade.
-**	  @note   Limited to attack range smaller than 16.
-**		@note		Will be moved to unit_ai.c soon.
+**  @note This could be improved, for better performance / better trade.
+**  @note   Limited to attack range smaller than 16.
+**  @note Will be moved to unit_ai.c soon.
 */
 static Unit* FindRangeAttack(Unit* u, int range)
 {
@@ -491,7 +491,7 @@ static Unit* FindRangeAttack(Unit* u, int range)
 	player = u->Player;
 
 	//  If catapult, count units near the target...
-	//	  FIXME : make it configurable
+	//   FIXME : make it configurable
 	//
 
 	missile_range = type->Missile.Missile->Range + range - 1;
@@ -507,13 +507,13 @@ static Unit* FindRangeAttack(Unit* u, int range)
 		x = u->Container->X;
 		y = u->Container->Y;
 		n = UnitCacheSelect(x - missile_range, y - missile_range,
-			x + missile_range + u->Container->Type->TileWidth, 
+			x + missile_range + u->Container->Type->TileWidth,
 			y + missile_range + u->Container->Type->TileHeight, table);
 	} else {
 		x = u->X;
 		y = u->Y;
 		n = UnitCacheSelect(x - missile_range, y - missile_range,
-			x + missile_range + u->Type->TileWidth, 
+			x + missile_range + u->Type->TileWidth,
 			y + missile_range + u->Type->TileHeight, table);
 	}
 
@@ -539,12 +539,12 @@ static Unit* FindRangeAttack(Unit* u, int range)
 		}
 
 		// won't be a target...
-		if (!CanTarget(type, dtype)) {		// can't be attacked.
+		if (!CanTarget(type, dtype)) { // can't be attacked.
 			table[i] = 0;
 			continue;
 		}
 
-		if (!IsEnemy(player, dest)) {		// a friend or neutral
+		if (!IsEnemy(player, dest)) { // a friend or neutral
 			table[i] = 0;
 
 			// Calc a negative cost
@@ -685,7 +685,7 @@ static Unit* FindRangeAttack(Unit* u, int range)
 			y = u->Y;
 		}
 
- 		// Make x,y relative to u->x...
+		// Make x,y relative to u->x...
 		x = x - u->X + missile_range + 1;
 		y = y - u->Y + missile_range + 1;
 
@@ -725,15 +725,15 @@ static Unit* FindRangeAttack(Unit* u, int range)
 }
 
 /**
-**		Attack units in distance.
+** Attack units in distance.
 **
-**				If the unit can attack must be handled by caller.
-**				Choose the best target, that can be attacked.
+** If the unit can attack must be handled by caller.
+** Choose the best target, that can be attacked.
 **
-**		@param unit		Find in distance for this unit.
-**		@param range		Distance range to look.
+**  @param unit     Find in distance for this unit.
+**  @param range    Distance range to look.
 **
-**		@return				Unit to be attacked.
+**  @return         Unit to be attacked.
 **
 */
 Unit* AttackUnitsInDistance(Unit* unit, int range)
@@ -760,7 +760,7 @@ Unit* AttackUnitsInDistance(Unit* unit, int range)
 	}
 
 	//
-	//		Select all units in range.
+	// Select all units in range.
 	//
 	x = unit->X;
 	y = unit->Y;
@@ -775,7 +775,7 @@ Unit* AttackUnitsInDistance(Unit* unit, int range)
 	attackrange = unit->Stats->AttackRange;
 
 	//
-	//		Find the best unit to attack
+	// Find the best unit to attack
 	//
 
 	for (i = 0; i < n; ++i) {
@@ -785,30 +785,30 @@ Unit* AttackUnitsInDistance(Unit* unit, int range)
 			continue;
 		}
 
-		if (!IsEnemy(player, dest)) {		// a friend or neutral
+		if (!IsEnemy(player, dest)) { // a friend or neutral
 			continue;
 		}
 
 		dtype = dest->Type;
-		if (!CanTarget(type, dtype)) {		// can't be attacked.
+		if (!CanTarget(type, dtype)) { // can't be attacked.
 			continue;
 		}
 
 		//
-		//		Calculate the costs to attack the unit.
-		//		Unit with the smallest attack costs will be taken.
+		// Calculate the costs to attack the unit.
+		// Unit with the smallest attack costs will be taken.
 		//
 		cost = 0;
 		//
-		//		Priority 0-255
+		// Priority 0-255
 		//
 		cost -= dtype->Priority * PRIORITY_FACTOR;
 		//
-		//		Remaining HP (Health) 0-65535
+		// Remaining HP (Health) 0-65535
 		//
 		cost += dest->HP * HEALTH_FACTOR;
 		//
-		//		Unit in attack range?
+		// Unit in attack range?
 		//
 		d = MapDistanceBetweenUnits(unit, dest);
 
@@ -823,14 +823,14 @@ Unit* AttackUnitsInDistance(Unit* unit, int range)
 			cost += d * DISTANCE_FACTOR;
 		}
 		//
-		//		Unit can attack back.
+		// Unit can attack back.
 		//
 		if (CanTarget(dtype, type)) {
 			cost -= CANATTACK_BONUS;
 		}
 
 		//
-		//		Take this target?
+		// Take this target?
 		//
 		if (cost < best_cost && (d < attackrange ||
 				UnitReachable(unit, dest, attackrange))) {
@@ -843,16 +843,16 @@ Unit* AttackUnitsInDistance(Unit* unit, int range)
 }
 
 /**
-**		Attack units in attack range.
+** Attack units in attack range.
 **
-**		@param unit		Find unit in attack range for this unit.
+** @param unit    Find unit in attack range for this unit.
 **
-**		@return				Pointer to unit which should be attacked.
+** @return        Pointer to unit which should be attacked.
 */
 Unit* AttackUnitsInRange(Unit* unit)
 {
 	//
-	//		Only units which can attack.
+	// Only units which can attack.
 	//
 #ifdef DEBUG
 	if (!unit->Type->CanAttack) {
@@ -866,11 +866,11 @@ Unit* AttackUnitsInRange(Unit* unit)
 }
 
 /**
-**		Attack units in reaction range.
+** Attack units in reaction range.
 **
-**		@param unit		Find unit in reaction range for this unit.
+** @param unit    Find unit in reaction range for this unit.
 **
-**		@return				Pointer to unit which should be attacked.
+** @return        Pointer to unit which should be attacked.
 */
 Unit* AttackUnitsInReactRange(Unit* unit)
 {
@@ -878,7 +878,7 @@ Unit* AttackUnitsInReactRange(Unit* unit)
 	const UnitType* type;
 
 	//
-	//		Only units which can attack.
+	// Only units which can attack.
 	//
 	type = unit->Type;
 #ifdef DEBUG

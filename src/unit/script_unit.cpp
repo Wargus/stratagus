@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <string.h>
@@ -168,7 +168,7 @@ void CclParseOrder(lua_State* l, Order* order)
 	int j;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	// Parse the list: (still everything could be changed!)
 	//
 	args = luaL_getn(l, -1);
 	for (j = 0; j < args; ++j) {
@@ -632,7 +632,7 @@ static int CclUnit(lua_State* l)
 	i = 0;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	// Parse the list: (still everything could be changed!)
 	//
 	for (; j < args; ++j) {
 		value = LuaToString(l, j + 1);
@@ -661,7 +661,7 @@ static int CclUnit(lua_State* l)
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
-			unit->Reset = 0;				// JOHNS ????
+			unit->Reset = 0; // JOHNS ????
 			Assert(unit->Slot == slot);
 		} else if (!strcmp(value, "next")) {
 			unit->Next = UnitSlots[(int)LuaToNumber(l, j + 1)];
@@ -930,7 +930,7 @@ static int CclUnit(lua_State* l)
 		MapMarkUnitSight(unit);
 	}
 
-	//		Place on map
+	// Place on map
 	if (!unit->Removed && !unit->Destroyed && !unit->Type->Vanishes) {
 		unit->Removed = 1;
 		PlaceUnit(unit, unit->X, unit->Y);
@@ -947,14 +947,14 @@ static int CclUnit(lua_State* l)
 		MapMarkUnitSight(unit);
 	}
 
-/*	if (unit->Moving) {
+/* if (unit->Moving) {
 		NewResetPath(unit);
 	}*/
 	// Fix Colors for rescued units.
 	if (unit->RescuedFrom) {
 		unit->Colors = &unit->RescuedFrom->UnitColors;
 	}
-	
+
 	return 0;
 }
 
@@ -1340,7 +1340,7 @@ static int CclGetUnitMana(lua_State* l)
 **
 **  @param l  Lua state.
 **
-**  @return				The new mana of the unit.
+**  @return The new mana of the unit.
 */
 static int CclSetUnitMana(lua_State* l)
 {
@@ -1465,8 +1465,8 @@ static int CclSlotUsage(lua_State* l)
 }
 
 /**
-**	Load the unit allocator state.
-**	We need to do this in order to make sure that the game allocates units
+** Load the unit allocator state.
+** We need to do this in order to make sure that the game allocates units
 **  in the exact same way.
 **
 **  @param l  Lua state.

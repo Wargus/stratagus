@@ -78,59 +78,54 @@ static inline max(int a, int b) { return a > b ? a : b; }
 
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-int ShowHealthBar;				/// Flag: show health bar
-int ShowHealthDot;				/// Flag: show health dot
-int ShowManaBar;						/// Flag: show mana bar
-int ShowManaDot;						/// Flag: show mana dot
-int ShowNoFull;						/// Flag: show no full health or mana
-int DecorationOnTop;				/// Flag: show health and mana on top
-int ShowSightRange;				/// Flag: show right range
-int ShowReactionRange;				/// Flag: show reaction range
-int ShowAttackRange;				/// Flag: show attack range
-int ShowOrders;						/// Flag: show orders of unit on map
-unsigned long ShowOrdersCount;		/// Show orders for some time
-	/// Flag: health horizontal instead of vertical
-int ShowHealthHorizontal;
-	/// Flag: health horizontal instead of vertical
-int ShowManaHorizontal;
-	/// Flag: show bars and dot energy only for selected
-int ShowEnergySelectedOnly;
-	/// Flag: show the health background long
-int ShowHealthBackgroundLong;
-	/// Flag: show the mana background long
-int ShowManaBackgroundLong;
+int ShowHealthBar;                ///< Flag: show health bar
+int ShowHealthDot;                ///< Flag: show health dot
+int ShowManaBar;                  ///< Flag: show mana bar
+int ShowManaDot;                  ///< Flag: show mana dot
+int ShowNoFull;                   ///< Flag: show no full health or mana
+int DecorationOnTop;              ///< Flag: show health and mana on top
+int ShowSightRange;               ///< Flag: show right range
+int ShowReactionRange;            ///< Flag: show reaction range
+int ShowAttackRange;              ///< Flag: show attack range
+int ShowOrders;                   ///< Flag: show orders of unit on map
+unsigned long ShowOrdersCount;    ///< Show orders for some time
+int ShowHealthHorizontal;         ///< Flag: health horizontal instead of vertical
+int ShowManaHorizontal;           ///< Flag: health horizontal instead of vertical
+int ShowEnergySelectedOnly;       ///< Flag: show bars and dot energy only for selected
+int ShowHealthBackgroundLong;     ///< Flag: show the health background long
+int ShowManaBackgroundLong;       ///< Flag: show the mana background long
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?
 
 /**
-**		Show that units are selected.
+** Show that units are selected.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+** @param color    FIXME
+** @param x1,y1    Coordinates of the top left corner.
+** @param x2,y2    Coordinates of the bottom right corner.
 */
 void (*DrawSelection)(Uint32 color, int x1, int y1,
 	int x2, int y2) = DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
-const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
+const Viewport* CurrentViewport;  ///< FIXME: quick hack for split screen
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /**
-**		Show selection marker around an unit.
+** Show selection marker around an unit.
 **
-**		@param unit		Pointer to unit.
+** @param unit    Pointer to unit.
 */
 void DrawUnitSelection(const Unit* unit)
 {
@@ -169,7 +164,7 @@ void DrawUnitSelection(const Unit* unit)
 				color = Players[i].Color;
 			}
 		}
-	} else if (CursorBuilding && unit->Type->Building && 
+	} else if (CursorBuilding && unit->Type->Building &&
 			(unit->Player == ThisPlayer ||
 				PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
 		// If building mark all own buildings
@@ -188,11 +183,11 @@ void DrawUnitSelection(const Unit* unit)
 }
 
 /**
-**		Don't show selected units.
+** Don't show selected units.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+** @param color
+** @param x1,y1    Coordinates of the top left corner.
+** @param x2,y2    Coordinates of the bottom right corner.
 */
 void DrawSelectionNone(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -200,11 +195,11 @@ void DrawSelectionNone(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Show selected units with circle.
+** Show selected units with circle.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+** @param color
+** @param x1,y1    Coordinates of the top left corner.
+** @param x2,y2    Coordinates of the bottom right corner.
 */
 void DrawSelectionCircle(Uint32 color, int x1, int x2,
 	int y1, int y2)
@@ -216,11 +211,11 @@ void DrawSelectionCircle(Uint32 color, int x1, int x2,
 }
 
 /**
-**		Show selected units with circle.
+** Show selected units with circle.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+** @param color
+** @param x1,y1    Coordinates of the top left corner.
+** @param x2,y2    Coordinates of the bottom right corner.
 */
 void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -232,11 +227,11 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Draw selected rectangle around the unit.
+** Draw selected rectangle around the unit.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+** @param color
+** @param x1,y1    Coordinates of the top left corner.
+** @param x2,y2    Coordinates of the bottom right corner.
 */
 void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -245,11 +240,11 @@ void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Draw selected rectangle around the unit.
+** Draw selected rectangle around the unit.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+** @param color
+** @param x1,y1    Coordinates of the top left corner.
+** @param x2,y2    Coordinates of the bottom right corner.
 */
 void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -260,11 +255,11 @@ void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Draw selected corners around the unit.
+** Draw selected corners around the unit.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+** @param color
+** @param x1,y1    Coordinates of the top left corner.
+** @param x2,y2    Coordinates of the bottom right corner.
 */
 void DrawSelectionCorners(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -285,17 +280,17 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Decoration: health, mana.
+** Decoration: health, mana.
 */
 typedef struct _decoration_ {
-	char*		File;						/// File containing the graphics data
-	int				HotX;						/// X drawing position (relative)
-	int				HotY;						/// Y drawing position (relative)
-	int				Width;						/// width of the decoration
-	int				Height;						/// height of the decoration
+	char* File;       ///< File containing the graphics data
+	int HotX;         ///< X drawing position (relative)
+	int HotY;         ///< Y drawing position (relative)
+	int Width;        ///< width of the decoration
+	int Height;       ///< height of the decoration
 
 // --- FILLED UP ---
-	Graphic*		Sprite;						/// loaded sprite images
+	Graphic* Sprite;  ///< loaded sprite images
 } Decoration;
 
 /**
@@ -751,7 +746,7 @@ static void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 			2, (f * type->BoxHeight) / 100);
 	}  else  {
 		//
-		//		Draw the black rectangle in full size?
+		// Draw the black rectangle in full size?
 		//
 		if (ShowManaBackgroundLong) {
 			VideoFillRectangleClip(ColorBlack,
@@ -797,20 +792,20 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 
 #ifdef REFS_DEBUG
 	//
-	//		Show the number of references.
+	// Show the number of references.
 	//
 	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit->Refs);
 #endif
 
 	//
-	//		Only for selected units?
+	// Only for selected units?
 	//
 	if (ShowEnergySelectedOnly && !unit->Selected) {
 		return;
 	}
 
 	//
-	//		Health bar on left side of unit.
+	// Health bar on left side of unit.
 	//
 	stats = unit->Stats;
 	//  Why remove the neutral race?
@@ -828,7 +823,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			}
 			if (ShowHealthHorizontal)  {
 				//
-				//		Draw the black rectangle in full size?
+				// Draw the black rectangle in full size?
 				//
 				if (ShowHealthBackgroundLong) {
 #ifdef DEBUG
@@ -882,7 +877,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	}
 
 	//
-	//		Health dot on left side of unit.
+	// Health dot on left side of unit.
 	//  Why skip the neutral units?
 	//
 	if ((unit->Player->Type != PlayerNeutral) && ShowHealthDot) {
@@ -926,24 +921,24 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	}
 
 	//
-	//		Mana bar on right side of unit. FIXME: combine bar and sprite
+	// Mana bar on right side of unit. FIXME: combine bar and sprite
 	//
 	if (ShowManaBar) {
 		if (type->CanCastSpell &&
 				!(ShowNoFull && unit->Mana == unit->Type->_MaxMana)) {
 			// s0m3body: mana bar should display mana proportionally
-			//				to unit's max mana (unit->Type->_MaxMana)
+			// to unit's max mana (unit->Type->_MaxMana)
 			DrawManaBar(x, y, type, unit->Type->_MaxMana, unit->Mana);
 		} else if (type->GivesResource) {
 			DrawManaBar(x, y, type, 655350, unit->Value);
 		}
 		//
-		//		Show working of units.
+		// Show working of units.
 		//
 		if (unit->Player == ThisPlayer) {
 
 			//
-			//		Building under constuction.
+			// Building under constuction.
 			//
 			/*
 			if (unit->Orders[0].Action == UnitActionBuilded) {
@@ -952,7 +947,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			*/
 
 			//
-			//		Building training units.
+			// Building training units.
 			//
 			if (unit->Orders[0].Action == UnitActionTrain) {
 				DrawManaBar(x, y, type, unit->Data.Train.What[0]->Stats[
@@ -960,7 +955,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Data.Train.Ticks);
 
 			//
-			//		Building upgrading to better type.
+			// Building upgrading to better type.
 			//
 			} else if (unit->Orders[0].Action == UnitActionUpgradeTo) {
 				DrawManaBar(x, y, type, unit->Orders[0].Type->Stats[
@@ -968,8 +963,8 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Data.UpgradeTo.Ticks);
 
 			//
-			//		Carry resource.
-			//		Don't display if empty.
+			// Carry resource.
+			// Don't display if empty.
 			//
 			} else if (unit->Type->Harvester && unit->CurrentResource && unit->Value > 0 &&
 				!(ShowNoFull && unit->Value == unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity)) {
@@ -978,7 +973,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Value);
 
 			//
-			//		Building research new technologie.
+			// Building research new technologie.
 			//
 			} else if (unit->Orders[0].Action == UnitActionResearch) {
 				DrawManaBar(x, y, type,
@@ -986,7 +981,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Player->UpgradeTimers.Upgrades[
 						unit->Data.Research.Upgrade - Upgrades]);
 			//
-			//		Transporter with units on board.
+			// Transporter with units on board.
 			//
 			} else if (unit->Type->Transporter) {
 				DrawManaBar(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
@@ -995,11 +990,11 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	}
 
 	//
-	//		Mana dot on right side of unit.
+	// Mana dot on right side of unit.
 	//
 	if (ShowManaDot) {
 		// s0m3body: MaxMana can vary for each unit,
-		// 				it is stored in unit->Type->_MaxMana
+		//  it is stored in unit->Type->_MaxMana
 		if (type->CanCastSpell &&
 				!(ShowNoFull && unit->Mana == unit->Type->_MaxMana)) {
 			DrawManaSprite(x, y, type,unit->Type->_MaxMana, unit->Mana);
@@ -1007,12 +1002,12 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			DrawManaSprite(x, y, type, 655350, unit->Value);
 		}
 		//
-		//		Show working of units.
+		// Show working of units.
 		//
 		if (unit->Player == ThisPlayer) {
 
 			//
-			//		Building under constuction.
+			// Building under constuction.
 			//
 			/*
 			if (unit->Orders[0].Action == UnitActionBuilded) {
@@ -1021,7 +1016,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			*/
 
 			//
-			//		Building training units.
+			// Building training units.
 			//
 			if (unit->Orders[0].Action == UnitActionTrain) {
 				DrawManaSprite(x, y, type, unit->Data.Train.What[0]->Stats[
@@ -1029,7 +1024,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Data.Train.Ticks);
 
 			//
-			//		Building upgrading to better type.
+			// Building upgrading to better type.
 			//
 			} else if (unit->Orders[0].Action == UnitActionUpgradeTo) {
 				DrawManaSprite(x,y,type,unit->Orders[0].Type->Stats[
@@ -1037,7 +1032,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Data.UpgradeTo.Ticks);
 
 			//
-			//		Carry resource.
+			// Carry resource.
 			//
 			} else if (unit->Type->Harvester && unit->CurrentResource && unit->Value > 0 &&
 				!(ShowNoFull && unit->Value == unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity)) {
@@ -1046,7 +1041,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Value);
 
 			//
-			//		Building research new technologie.
+			// Building research new technologie.
 			//
 			} else if (unit->Orders[0].Action == UnitActionResearch) {
 				DrawManaSprite(x, y, type,
@@ -1054,7 +1049,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 					unit->Player->UpgradeTimers.Upgrades[
 						unit->Data.Research.Upgrade-Upgrades]);
 			//
-			//		Transporter with units on board.
+			// Transporter with units on board.
 			//
 			} else if (unit->Type->Transporter) {
 				DrawManaSprite(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
@@ -1063,7 +1058,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	}
 
 	// FIXME: Johns there is 100% a way to remove this calculation from
-	//				runtime.
+	// runtime.
 	x1 = x;
 	y1 = y;
 	if (SpellSprite.HotX < 0) {
@@ -1091,10 +1086,10 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	if (unit->Bloodlust) {
 		VideoDrawClip(SpellSprite.Sprite, 0, x1, y1);
 	}
-	if (unit->Haste) {		// same slot as slow
+	if (unit->Haste) { // same slot as slow
 		VideoDrawClip(SpellSprite.Sprite, 1, x1 + 16, y1);
 	}
-	if (unit->Slow) {				// same slot as haste
+	if (unit->Slow) { // same slot as haste
 		VideoDrawClip(SpellSprite.Sprite, 2, x1 + 16, y1);
 	}
 	if (unit->Invisible) {
@@ -1105,7 +1100,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	}
 
 	//
-	//		Draw group number
+	// Draw group number
 	//
 	if (unit->Selected && unit->GroupId != 0) {
 		char buf[2];
@@ -1264,13 +1259,13 @@ void DrawPath(const Unit* unit)
 		y2 = unit->Orders[0].Y;
 	}
 
-	if (y1 > y2) {						// exchange coordinates
+	if (y1 > y2) { // exchange coordinates
 		x1 ^= x2;
 		x2 ^= x1;
 		x1 ^= x2;
 		y1 ^= y2;
 		y2 ^= y1;
-		y1 ^= y2;						// NOTE: ^= swap(x1,x2), swap(y1,y2)
+		y1 ^= y2; // NOTE: ^= swap(x1,x2), swap(y1,y2)
 	}
 	dy = y2 - y1;
 	dx = x2 - x1;
@@ -1281,7 +1276,7 @@ void DrawPath(const Unit* unit)
 		xstep = 1;
 	}
 
-	if (dy == 0) {						// horizontal line
+	if (dy == 0) { // horizontal line
 		if (dx == 0) {
 			return;
 		}
@@ -1298,7 +1293,7 @@ void DrawPath(const Unit* unit)
 		return;
 	}
 
-	if (dx == 0) {						// vertical line
+	if (dx == 0) { // vertical line
 		// CLIPPING
 		VideoDrawRectangleClip(ColorGray,
 			Map2ViewportX(CurrentViewport, x1) + TileSizeX / 2 - 3,
@@ -1316,7 +1311,7 @@ void DrawPath(const Unit* unit)
 		Map2ViewportX(CurrentViewport, x1) + TileSizeX / 2 - 3,
 		Map2ViewportY(CurrentViewport, y1) + TileSizeY / 2 - 3, 6, 6);
 
-	if (dx < dy) {						// step in vertical direction
+	if (dx < dy) { // step in vertical direction
 		d = dy - 1;
 		dx += dx;
 		dy += dy;
@@ -1334,7 +1329,7 @@ void DrawPath(const Unit* unit)
 		return;
 	}
 
-	if (dx > dy) {						// step in horizontal direction
+	if (dx > dy) { // step in horizontal direction
 		d = dx - 1;
 		dx += dx;
 		dy += dy;
@@ -1460,7 +1455,7 @@ static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order
 			y2 = Map2ViewportY(CurrentViewport, order->Y) + TileSizeY / 2;
 			// FALL THROUGH
 		case UnitActionAttack:
-			if (unit->SubAction & 2) {		// Show weak targets.
+			if (unit->SubAction & 2) { // Show weak targets.
 				e_color = ColorBlue;
 			} else {
 				e_color = ColorRed;
@@ -1595,7 +1590,7 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 	stats = unit->Stats;
 
 	//
-	//		For debug draw sight, react and attack range!
+	// For debug draw sight, react and attack range!
 	//
 	if (NumSelected == 1 && unit->Selected) {
 		if (ShowSightRange) {
@@ -1736,8 +1731,8 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 		if (unit->Type->Construction->ShadowSprite) {
 			x -= (unit->Type->Construction->Width - unit->Type->TileWidth * TileSizeX) / 2;
 			y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
-//			x += type->ShadowOffsetX;
-//			y += type->ShadowOffsetY;
+// x += type->ShadowOffsetX;
+// y += type->ShadowOffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
 					VideoDrawClipX(unit->Type->Construction->ShadowSprite,
@@ -1846,8 +1841,8 @@ void DrawUnit(const Unit* unit)
 	ResourceInfo* resinfo;
 	ConstructionFrame* cframe;
 	UnitType* type;
-	
-	if (unit->Type->Revealer) {				// Revealers are not drawn
+
+	if (unit->Type->Revealer) { // Revealers are not drawn
 		return;
 	}
 
@@ -1900,14 +1895,14 @@ void DrawUnit(const Unit* unit)
 	}
 
 	//
-	//		Show that the unit is selected
+	// Show that the unit is selected
 	//
 	DrawUnitSelection(unit);
 
 	GraphicUnitPixels(unit, type->Sprite);
 
 	//
-	//		Adjust sprite for Harvesters.
+	// Adjust sprite for Harvesters.
 	//
 	sprite = type->Sprite;
 #ifdef USE_OPENGL
@@ -1935,8 +1930,8 @@ void DrawUnit(const Unit* unit)
 	}
 
 	//
-	//		Now draw!
-	//		Buildings under construction/upgrade/ready.
+	// Now draw!
+	// Buildings under construction/upgrade/ready.
 	//
 	if (state == 1) {
 		if (constructed) {
@@ -1945,7 +1940,7 @@ void DrawUnit(const Unit* unit)
 				y + (type->TileHeight * TileSizeY) / 2);
 		}
 	//
-	//		Draw the future unit type, if upgrading to it.
+	// Draw the future unit type, if upgrading to it.
 	//
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!

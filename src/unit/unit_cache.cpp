@@ -26,16 +26,16 @@
 //      GNU General Public License for more details.
 //
 //      You should have received a copy of the GNU General Public License
-//	    along with this program; if not, write to the Free Software
-//	    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-//	    02111-1307, USA.
+//     along with this program; if not, write to the Free Software
+//     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+//     02111-1307, USA.
 //
-//		$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -170,9 +170,9 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 			listitem = TheMap.Fields[i * TheMap.Width + j].UnitCache;
 			for (; listitem; listitem = listitem->Next) {
 				//
-				//	To avoid getting an unit in multiple times we use a cache lock.
-				//	It should only be used in here, unless you somehow want the unit
-				//	to be out of cache.
+				// To avoid getting an unit in multiple times we use a cache lock.
+				// It should only be used in here, unless you somehow want the unit
+				// to be out of cache.
 				//
 				if (!listitem->Unit->CacheLock) {
 					listitem->Unit->CacheLock = 1;
@@ -183,7 +183,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 	}
 
 	//
-	//	Clean the cache locks, restore to original situation.
+	// Clean the cache locks, restore to original situation.
 	//
 	for (i = 0; i < n; ++i) {
 		table[i]->CacheLock = 0;
@@ -207,8 +207,8 @@ int UnitCacheOnTile(int x, int y, Unit** table)
 	int n;
 
 	//
-	//	Unlike in UnitCacheSelect, there's no way an unit can show up twice,
-	//	so there is no need for Cache Locks.
+	// Unlike in UnitCacheSelect, there's no way an unit can show up twice,
+	// so there is no need for Cache Locks.
 	//
 	n = 0;
 	listitem = TheMap.Fields[y * TheMap.Width + x].UnitCache;
