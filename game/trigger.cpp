@@ -48,11 +48,6 @@
 #include "interface.h"
 #include "unit.h"
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
-
-#define MAX_SWITCH 256 /// Maximum number of switches
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -62,7 +57,6 @@ Timer GameTimer; /// The game timer
 static unsigned long WaitFrame; /// Frame to wait for
 static int Trigger;
 static int WaitTrigger;
-static unsigned char Switch[MAX_SWITCH]; /// Switches
 static int* ActiveTriggers;
 
 /// Some data accessible for script during the game.
@@ -616,205 +610,6 @@ static int CclIfOpponents(lua_State* l)
 }
 
 /**
-**  Player has the quantity of resource.
-*/
-static int CclIfResource(lua_State* l)
-{
-	int plynr;
-	int q;
-	int pn;
-	const char* res;
-	const char* op;
-	CompareFunction compare;
-	int i;
-
-	if (lua_gettop(l) != 4) {
-		LuaError(l, "incorrect argument");
-	}
-
-	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
-	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	q = LuaToNumber(l, 3);
-	res = LuaToString(l, 4);
-
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-resource: %s" _C_ op);
-	}
-
-	if (plynr == -1) {
-		plynr = 0;
-		pn = PlayerMax;
-	} else {
-		pn = plynr + 1;
-	}
-
-	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(res, DefaultResourceNames[i])) {
-			for (; plynr < pn; ++plynr) {
-				if (compare(Players[plynr].Resources[i], q)) {
-					lua_pushboolean(l, 1);
-					return 1;
-				}
-			}
-			lua_pushboolean(l, 0);
-			return 1;
-		}
-	}
-	if (!strcmp(res, "all")) {
-		int j;
-		int sum;
-
-		sum = 0;
-		for (; plynr < pn; ++plynr) {
-			for (j = 1; j < MaxCosts; ++j) {
-				sum += Players[plynr].Resources[j];
-			}
-		}
-		if (compare(sum, q)) {
-			lua_pushboolean(l, 1);
-			return 1;
-		}
-	} else if (!strcmp(res, "any")) {
-		int j;
-
-		for (; plynr < pn; ++plynr) {
-			for (j = 1; j < MaxCosts; ++j) {
-				if (compare(Players[plynr].Resources[j], q)) {
-					lua_pushboolean(l, 1);
-					return 1;
-				}
-			}
-		}
-	}
-
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
-**  Player has quantity kills
-*/
-static int CclIfKills(lua_State* l)
-{
-	int plynr;
-	int q;
-	int pn;
-	int n;
-	const char* op;
-	CompareFunction compare;
-
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
-
-	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
-	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	q = LuaToNumber(l, 3);
-
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-kills: %s" _C_ op);
-	}
-
-	if (plynr == -1) {
-		plynr = 0;
-		pn = PlayerMax;
-	} else {
-		pn = plynr + 1;
-	}
-
-	for (n = 0; plynr < pn; ++plynr) {
-		if (compare(Players[plynr].TotalKills, q)) {
-			lua_pushboolean(l, 1);
-			return 1;
-		}
-	}
-
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
-**  Player has a certain score
-*/
-static int CclIfScore(lua_State* l)
-{
-	int plynr;
-	int q;
-	int pn;
-	int n;
-	const char* op;
-	CompareFunction compare;
-
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
-
-	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
-	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	q = LuaToNumber(l, 3);
-
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-score: %s" _C_ op);
-	}
-
-	if (plynr == -1) {
-		plynr = 0;
-		pn = PlayerMax;
-	} else {
-		pn = plynr + 1;
-	}
-
-	for (n = 0; plynr < pn; ++plynr) {
-		if (compare(Players[plynr].Score, q)) {
-			lua_pushboolean(l, 1);
-			return 1;
-		}
-	}
-
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
-**  Number of game cycles elapsed
-*/
-static int CclIfElapsed(lua_State* l)
-{
-	int q;
-	const char* op;
-	CompareFunction compare;
-
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-
-	op = LuaToString(l, 1);
-	q = LuaToNumber(l, 2);
-
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-elapsed: %s" _C_ op);
-	}
-
-	if (compare(GameCycle, q)) {
-		lua_pushboolean(l, 1);
-		return 1;
-	}
-
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
 **  Check the timer value
 */
 static int CclIfTimer(lua_State* l)
@@ -845,40 +640,6 @@ static int CclIfTimer(lua_State* l)
 		return 1;
 	}
 
-	lua_pushboolean(l, 0);
-	return 1;
-}
-
-/**
-**  Check the switch value
-*/
-static int CclIfSwitch(lua_State* l)
-{
-	int i;
-	unsigned char s;
-
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-
-	i = LuaToNumber(l, 1);
-	if (i < 0 || i >= MAX_SWITCH) {
-		LuaError(l, "Invalid switch number %i" _C_ i);
-	}
-
-	if (lua_isboolean(l, 2)) {
-		s = LuaToBoolean(l, 2);
-	} else {
-		s = LuaToNumber(l, 2);
-		if (s) {
-			s = 1;
-		}
-	}
-
-	if (Switch[i] == s) {
-		lua_pushboolean(l, 1);
-		return 1;
-	}
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -987,37 +748,6 @@ static int CclActionWait(lua_State* l)
 	WaitFrame = FrameCounter +
 		(FRAMES_PER_SECOND * VideoSyncSpeed / 100 * (int)LuaToNumber(l, 1) + 999) / 1000;
 	return 0;
-}
-
-/**
-**  Action stop timer
-*/
-static int CclActionSetSwitch(lua_State* l)
-{
-	int i;
-	unsigned char s;
-
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-
-	i = LuaToNumber(l, 1);
-	if (i < 0 || i >= MAX_SWITCH) {
-		LuaError(l, "Invalid switch number: %d" _C_ i);
-	}
-
-	if (lua_isboolean(l, 2)) {
-		s = LuaToBoolean(l, 2);
-	} else {
-		s = LuaToNumber(l, 2);
-		if (s) {
-			s = 1;
-		}
-	}
-
-	Switch[i] = s;
-	lua_pushvalue(l, 2);
-	return 1;
 }
 
 /**
@@ -1222,12 +952,7 @@ void TriggerCclRegister(void)
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
 	lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
 	lua_register(Lua, "IfOpponents", CclIfOpponents);
-	lua_register(Lua, "IfResource", CclIfResource);
-	lua_register(Lua, "IfKills", CclIfKills);
-	lua_register(Lua, "IfScore", CclIfScore);
-	lua_register(Lua, "IfElapsed", CclIfElapsed);
 	lua_register(Lua, "IfTimer", CclIfTimer);
-	lua_register(Lua, "IfSwitch", CclIfSwitch);
 	// Actions
 	lua_register(Lua, "ActionVictory", CclActionVictory);
 	lua_register(Lua, "ActionDefeat", CclActionDefeat);
@@ -1236,7 +961,7 @@ void TriggerCclRegister(void)
 	lua_register(Lua, "ActionStartTimer", CclActionStartTimer);
 	lua_register(Lua, "ActionStopTimer", CclActionStopTimer);
 	lua_register(Lua, "ActionWait", CclActionWait);
-	lua_register(Lua, "ActionSetSwitch", CclActionSetSwitch);
+
 }
 
 /**
@@ -1299,8 +1024,6 @@ void InitTriggers(void)
 		LuaCall(0, 1);
 	}
 	lua_pop(Lua, 1);
-
-	memset(Switch, 0, sizeof(Switch));
 }
 
 /**
