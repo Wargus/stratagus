@@ -38,9 +38,9 @@ AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
 AC_ARG_ENABLE(static,
     [  --enable-static	  Compile a static binary (default: no)])
 if test "$enable_static" != "yes"; then
-    STATIC_LDFLAGS="-static"
-else
     STATIC_LDFLAGS=
+else
+    STATIC_LDFLAGS="-static"
 fi
 AC_SUBST(STATIC_LDFLAGS)
 
