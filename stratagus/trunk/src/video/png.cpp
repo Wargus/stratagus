@@ -57,7 +57,7 @@
 **		@param data		byte address to read to.
 **		@param length		number of bytes to read.
 */
-local void CL_png_readfn(png_structp png_ptr, png_bytep data, png_size_t length)
+local void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	png_size_t check;
 
@@ -69,163 +69,236 @@ local void CL_png_readfn(png_structp png_ptr, png_bytep data, png_size_t length)
 }
 
 /**
-**		Load a png graphic file.
+**  Load a png graphic file.
+**  Modified function from SDL_Image
 **
-**		@param name		png filename to load.
+**  @param name  png filename to load.
 **
-**		@return				graphic object with loaded graphic, or NULL if failure.
-**
-**		@todo		FIXME: must support other formats than 8bit indexed
+**  @return      graphic object with loaded graphic, or NULL if failure.
 */
 global Graphic* LoadGraphicPNG(const char* name)
 {
 	Graphic* graphic;
-	SDL_Color* palettecolors;
 	CLFile* fp;
+	SDL_Surface* volatile surface;
 	png_structp png_ptr;
 	png_infop info_ptr;
-	unsigned char** lines;
-	unsigned char* data;
-	int h;
-	int w;
+	png_uint_32 width;
+	png_uint_32 height;
+	int bit_depth;
+	int color_type;
+	int interlace_type;
+	Uint32 Rmask;
+	Uint32 Gmask;
+	Uint32 Bmask;
+	Uint32 Amask;
+	SDL_Palette* palette;
+	png_bytep* volatile row_pointers;
+	int row;
 	int i;
+	volatile int ckey;
+	png_color_16* transv;
 
-	//
-	//		open + prepare
-	//
+	ckey = -1;
+
+	if (!name) {
+		return NULL;
+	}
 	if (!(fp = CLopen(name, CL_OPEN_READ))) {
 		perror("Can't open file");
 		return NULL;
 	}
+	graphic = NULL;
 
-	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (!png_ptr) {
-		CLclose(fp);
-		return NULL;
+	/* Initialize the data we will clean up when we're done */
+	png_ptr = NULL; info_ptr = NULL; row_pointers = NULL; surface = NULL;
+
+	/* Create the PNG loading context structure */
+	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+		NULL, NULL, NULL);
+	if (png_ptr == NULL){
+		fprintf(stderr, "Couldn't allocate memory for PNG file");
+		goto done;
 	}
+
+	/* Allocate/initialize the memory for image information.  REQUIRED. */
 	info_ptr = png_create_info_struct(png_ptr);
-	if (!info_ptr) {
-		png_destroy_read_struct(&png_ptr, NULL, NULL);
-		CLclose(fp);
-		return NULL;
+	if (info_ptr == NULL) {
+		fprintf(stderr, "Couldn't create image information for PNG file");
+		goto done;
 	}
+
+	/* Set error handling if you are using setjmp/longjmp method (this is
+	 * the normal method of doing things with libpng).  REQUIRED unless you
+	 * set up your own error handlers in png_create_read_struct() earlier.
+	 */
 	if (setjmp(png_ptr->jmpbuf)) {
-		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-		CLclose(fp);
-		return NULL;
+		fprintf(stderr, "Error reading the PNG file.");
+		goto done;
 	}
-	png_set_read_fn(png_ptr, fp, CL_png_readfn);
 
-	//
-	//		Setup ready, read header info.
-	//
+	/* Set up the input control */
+	png_set_read_fn(png_ptr, fp, CL_png_read_data);
+
+	/* Read PNG header info */
 	png_read_info(png_ptr, info_ptr);
+	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
+		&color_type, &interlace_type, NULL, NULL);
 
-	DebugLevel3("%s: width %ld height %ld = %ld bytes\n" _C_
-		name _C_ info_ptr->width _C_ info_ptr->height _C_
-		info_ptr->width * info_ptr->height);
-	DebugLevel3("%s: %s" _C_ name _C_
-		png_get_valid(png_ptr, info_ptr, PNG_INFO_PLTE) ? "palette" : "");
-	DebugLevel3(" %s" _C_
-		png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ? "transparent" : "");
-	DebugLevel3(" depth %d\n" _C_ info_ptr->bit_depth);
+	/* tell libpng to strip 16 bit/color files down to 8 bits/color */
+	png_set_strip_16(png_ptr) ;
 
-	//		Setup translators:
+	/* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
+	 * byte into separate bytes (useful for paletted and grayscale images).
+	 */
+	png_set_packing(png_ptr);
 
-	palettecolors = (SDL_Color*)calloc(256, sizeof(SDL_Color));
+	/* scale greyscale values to the range 0..255 */
+	if (color_type == PNG_COLOR_TYPE_GRAY) {
+		png_set_expand(png_ptr);
+	}
 
-	if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE) {
-		DebugLevel3("Color palette\n");
-		if (info_ptr->valid & PNG_INFO_PLTE) {
-			DebugLevel3Fn(" palette %d\n" _C_ info_ptr->num_palette);
-			if (info_ptr->num_palette > 256) {
-				abort();
+	/* For images with a single "transparent colour", set colour key;
+	 if more than one index has transparency, or if partially transparent
+	 entries exist, use full alpha channel */
+	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
+		int num_trans;
+		Uint8* trans;
+
+		png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans,
+			&transv);
+		if (color_type == PNG_COLOR_TYPE_PALETTE) {
+			/* Check if all tRNS entries are opaque except one */
+			int i;
+			int t;
+			
+			t = -1;
+			for (i = 0; i < num_trans; ++i) {
+				if (trans[i] == 0) {
+					if (t >= 0) {
+						break;
+					}
+					t = i;
+				} else if (trans[i] != 255) {
+					break;
+				}
 			}
+			if (i == num_trans) {
+				/* exactly one transparent index */
+				ckey = t;
+			} else {
+				/* more than one transparent index, or translucency */
+				png_set_expand(png_ptr);
+			}
+		} else {
+			ckey = 0; /* actual value will be set later */
+		}
+	}
+
+	if (color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+		png_set_gray_to_rgb(png_ptr);
+	}
+
+	png_read_update_info(png_ptr, info_ptr);
+
+	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
+		&color_type, &interlace_type, NULL, NULL);
+
+	/* Allocate the SDL surface to hold the image */
+	Rmask = Gmask = Bmask = Amask = 0 ; 
+	if (color_type != PNG_COLOR_TYPE_PALETTE) {
+		if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
+			Rmask = 0x000000FF;
+			Gmask = 0x0000FF00;
+			Bmask = 0x00FF0000;
+			Amask = (info_ptr->channels == 4) ? 0xFF000000 : 0;
+		} else {
+			int s;
+
+			s = (info_ptr->channels == 4) ? 0 : 8;
+			Rmask = 0xFF000000 >> s;
+			Gmask = 0x00FF0000 >> s;
+			Bmask = 0x0000FF00 >> s;
+			Amask = 0x000000FF >> s;
+		}
+	}
+	surface = SDL_AllocSurface(SDL_SWSURFACE, width, height,
+		bit_depth * info_ptr->channels, Rmask, Gmask, Bmask, Amask);
+	if (surface == NULL) {
+		fprintf(stderr, "Out of memory");
+		goto done;
+	}
+
+	if (ckey != -1) {
+		if (color_type != PNG_COLOR_TYPE_PALETTE) {
+			/* FIXME: Should these be truncated or shifted down? */
+			ckey = SDL_MapRGB(surface->format,
+				(Uint8)transv->red,
+				(Uint8)transv->green,
+				(Uint8)transv->blue);
+		}
+		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, ckey);
+	} else if (color_type == PNG_COLOR_TYPE_PALETTE) {
+		// Use 255 for transparency by default
+		// FIXME: make the images set transparency correctly
+		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, 255);
+	}
+
+	/* Create the array of pointers to image data */
+	row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
+	if (row_pointers == NULL) {
+		fprintf(stderr, "Out of memory");
+		SDL_FreeSurface(surface);
+		surface = NULL;
+		goto done;
+	}
+	for (row = 0; row < (int)height; ++row) {
+		row_pointers[row] = (png_bytep)
+			(Uint8 *)surface->pixels + row * surface->pitch;
+	}
+
+	/* Read the entire image in one go */
+	png_read_image(png_ptr, row_pointers);
+
+	/* read rest of file, get additional chunks in info_ptr - REQUIRED */
+	png_read_end(png_ptr, info_ptr);
+
+	/* Load the palette, if any */
+	palette = surface->format->palette;
+	if (palette) {
+		if (color_type == PNG_COLOR_TYPE_GRAY) {
+			palette->ncolors = 256;
+			for (i = 0; i < 256; ++i) {
+				palette->colors[i].r = i;
+				palette->colors[i].g = i;
+				palette->colors[i].b = i;
+			}
+		} else if (info_ptr->num_palette > 0) {
+			palette->ncolors = info_ptr->num_palette; 
 			for (i = 0; i < info_ptr->num_palette; ++i) {
-				palettecolors[i].r = info_ptr->palette[i].red;
-				palettecolors[i].g = info_ptr->palette[i].green;
-				palettecolors[i].b = info_ptr->palette[i].blue;
-			}
-			for (; i < 256; ++i) {
-				palettecolors[i].r = palettecolors[i].g = palettecolors[i].b = 0;
+				palette->colors[i].b = info_ptr->palette[i].blue;
+				palette->colors[i].g = info_ptr->palette[i].green;
+				palette->colors[i].r = info_ptr->palette[i].red;
 			}
 		}
 	}
 
-	if (info_ptr->bit_depth == 16) {
-		png_set_strip_16(png_ptr);
+	graphic = MakeGraphic(surface);
+
+done:   /* Clean up and return */
+	png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0,
+		(png_infopp)0);
+	if (row_pointers) {
+		free(row_pointers);
 	}
-	if (info_ptr->bit_depth < 8) {
-		png_set_packing(png_ptr);
-	}
-
-#if 0
-	//		Want 8 bit palette with transparent!
-	if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-			info_ptr->bit_depth < 8) {
-		png_set_expand(png_ptr);
-	}
-
-	if (0) {
-		extern unsigned char GlobalPalette[];
-
-		png_set_dither(png_ptr, GlobalPalette, 256, 256, NULL, 1);
-	}
-#endif
-
-	png_read_update_info(png_ptr, info_ptr);
-
-	//		Allocate and reserve memory.
-	w = info_ptr->width;
-	h = info_ptr->height;
-	if (info_ptr->width != info_ptr->rowbytes) {
-		DebugLevel0("width(%ld) != rowbytes(%ld) in file:%s\n" _C_
-			info_ptr->width _C_ info_ptr->rowbytes _C_ name);
-		abort();
-	}
-
-	lines = alloca(h * sizeof(*lines));
-	if (!lines) {
-		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-		CLclose(fp);
-		free(palettecolors);
-		return NULL;
-	}
-	data = malloc(h * w);
-	if (!data) {
-		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-		CLclose(fp);
-		free(palettecolors);
-		return NULL;
-	}
-#ifdef DEBUG
-	DebugLevel3Fn("%10d: %s: %d * %d\n" _C_ w * h _C_ name _C_ w _C_ h);
-	AllocatedGraphicMemory += h * w;
-#endif
-
-	for (i = 0; i < h; ++i) {				// start of lines
-		lines[i] = data + i * w;
-	}
-
-	//		Final read the image.
-
-	png_read_image(png_ptr, lines);
-	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 	CLclose(fp);
-
-	graphic = MakeGraphic(8, w, h, data, w * h);		// data freed by make graphic
-	SDL_SetPalette(graphic->Surface, SDL_LOGPAL | SDL_PHYSPAL, palettecolors, 0, 256);
-	SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, 255);
-
-	free(palettecolors);
-
 	return graphic;
 }
 
 /**
-**		Save a screenshot to a PNG file.
+**  Save a screenshot to a PNG file.
 **
-**		@param name		PNG filename to save.
+**  @param name  PNG filename to save.
 */
 global void SaveScreenshotPNG(const char* name)
 {
