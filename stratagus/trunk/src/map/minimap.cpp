@@ -206,7 +206,7 @@ global void CreateMinimap(void)
     MinimapTerrainGraphic=NewGraphic(8,MINIMAP_W,MINIMAP_H);
     memset(MinimapTerrainGraphic->Frames,0,MINIMAP_W*MINIMAP_H);
     MinimapGraphic=NewGraphic(8,MINIMAP_W,MINIMAP_H);
-    MinimapGraphic->Pixels=VideoCreateSharedPalette(GlobalPalette);
+    MinimapGraphic->Pixels=VideoCreateNewPalette(GlobalPalette);
     memset(MinimapGraphic->Frames,0,MINIMAP_W*MINIMAP_H);
 
     UpdateMinimapTerrain();
@@ -219,6 +219,10 @@ global void DestroyMinimap(void)
 {
     VideoSaveFree(MinimapTerrainGraphic);
     MinimapTerrainGraphic=NULL;
+    if( MinimapGraphic ) {
+	free(MinimapGraphic->Pixels);
+	MinimapGraphic->Pixels=NULL;
+    }
     VideoSaveFree(MinimapGraphic);
     MinimapGraphic=NULL;
     memset(Minimap2MapX,0,MINIMAP_W*sizeof(int));
