@@ -55,16 +55,16 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global enum _mouse_buttons_ MouseButtons;/// current pressed mouse buttons
+global enum _mouse_buttons_ MouseButtons;/// Current pressed mouse buttons
 
-global enum _key_modifiers_ KeyModifiers;/// current keyboard modifiers
+global enum _key_modifiers_ KeyModifiers;/// Current keyboard modifiers
 
 global Unit* UnitUnderCursor;		/// Unit under cursor
 global int ButtonUnderCursor=-1;	/// Button under cursor
 global char GameMenuButtonClicked;	/// Game menu button (F10) was clicked
 global char LeaveStops;			/// Mouse leaves windows stops scroll
 
-global enum _cursor_on_ CursorOn=CursorOnUnknown;	/// cursor on field
+global enum _cursor_on_ CursorOn=CursorOnUnknown;	/// Cursor on field
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -75,11 +75,11 @@ global enum _cursor_on_ CursorOn=CursorOnUnknown;	/// cursor on field
 */
 global void CancelBuildingMode(void)
 {
-    CursorBuilding=NULL;
-    MustRedraw|=RedrawCursor;
+    CursorBuilding = NULL;
+    MustRedraw |= RedrawCursor;
     ClearStatusLine();
     ClearCosts();
-    CurrentButtonLevel = 0; // reset unit buttons to normal
+    CurrentButtonLevel = 0;		// reset unit buttons to normal
     UpdateButtonPanel();
 }
 
@@ -101,7 +101,7 @@ local void DrawMouseCoordsOnMap(int x,int y)
 	DebugLevel0Fn("coords outside map %d,%d\n" _C_ x _C_ y);
 	return;
     }
-    VideoLockScreen ();
+    VideoLockScreen();
     VideoDrawSub(TheUI.MenuButton.Graphic,0,0
 	    ,TheUI.MenuButton.Graphic->Width
 	    ,TheUI.MenuButton.Graphic->Height
@@ -123,7 +123,7 @@ local void DrawMouseCoordsOnMap(int x,int y)
 //	    ,flags&MapFieldVisible	?'v':'-'
 	);
     VideoDrawText(TheUI.MenuButtonX+3,TheUI.MenuButtonY+3,GameFont,buf);
-    VideoUnlockScreen ();
+    VideoUnlockScreen();
     InvalidateArea(TheUI.MenuButtonX,TheUI.MenuButtonY
 	    ,TheUI.MenuButton.Graphic->Width
 	    ,TheUI.MenuButton.Graphic->Height);
@@ -136,7 +136,7 @@ local void DrawMouseCoordsOnMap(int x,int y)
 **	@param sx	X map position in pixels.
 **	@param sy	Y map position in pixels.
 */
-global void DoRightButton (int sx,int sy)
+global void DoRightButton(int sx,int sy)
 {
     int i;
     int x;
@@ -191,7 +191,7 @@ global void DoRightButton (int sx,int sy)
 	//
 	if( KeyModifiers&ModifierControl ) {
 	    // FIXME: what todo if more than one unit on that tile?
-	    dest=UnitOnScreenMapPosition (sx,sy);
+	    dest=UnitOnScreenMapPosition(sx,sy);
 	    if( dest ) {
 		if( dest!=unit ) {
 		    dest->Blink=4;
@@ -204,7 +204,7 @@ global void DoRightButton (int sx,int sy)
 	//
 	//	Enter transporters?
 	//
-	dest=TransporterOnScreenMapPosition (sx,sy);
+	dest=TransporterOnScreenMapPosition(sx,sy);
 	if( dest && dest->Type->Transporter
 		&& dest->Player==ThisPlayer
 		&& unit->Type->UnitType==UnitTypeLand ) {
@@ -261,7 +261,7 @@ global void DoRightButton (int sx,int sy)
 		}
 	    }
 
-	    dest=TargetOnScreenMapPosition (unit,sx,sy);
+	    dest=TargetOnScreenMapPosition(unit,sx,sy);
 	    if( dest ) {
 		if( IsEnemy(ThisPlayer,dest) ) {
 		    dest->Blink=4;
@@ -271,13 +271,13 @@ global void DoRightButton (int sx,int sy)
 	    }
 
 	    // cade: this is default repair action
-	    dest=RepairableOnScreenMapPosition (sx, sy);
+	    dest=RepairableOnScreenMapPosition(sx, sy);
 	    if( dest && dest->Type && dest->Player==ThisPlayer ) {
 		SendCommandRepair(unit,x,y,dest,flush);
 		continue;
 	    }
 
-	    dest=UnitOnScreenMapPosition (sx,sy);
+	    dest=UnitOnScreenMapPosition(sx,sy);
 	    if( dest ) {
 		// FIXME: should ally to self
 		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
@@ -316,7 +316,7 @@ global void DoRightButton (int sx,int sy)
 		}
 	    }
 
-	    dest=UnitOnScreenMapPosition (sx,sy);
+	    dest=UnitOnScreenMapPosition(sx,sy);
 	    if( dest ) {
 		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
@@ -370,7 +370,7 @@ global void DoRightButton (int sx,int sy)
 		}
 	    }
 
-	    dest=UnitOnScreenMapPosition (sx,sy);
+	    dest=UnitOnScreenMapPosition(sx,sy);
 	    if( dest ) {
 		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
@@ -408,7 +408,7 @@ global void DoRightButton (int sx,int sy)
 
 	// FIXME: attack/follow/board ...
 	if( action==MouseActionMove || action==MouseActionSail ) {
-	    dest=UnitOnScreenMapPosition (sx,sy);
+	    dest=UnitOnScreenMapPosition(sx,sy);
 	    if( dest ) {
 		// Follow allied units, but not self.
 		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
@@ -512,10 +512,10 @@ local void HandleMouseOn(int x,int y)
 	CursorOn = -1;
     }
 
-    viewport = GetViewport (x, y);
+    viewport = GetViewport(x, y);
     if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
 	TheUI.ActiveViewport = viewport;
-	DebugLevel0Fn ("active viewport changed to %d.\n" _C_ viewport);
+	DebugLevel0Fn("active viewport changed to %d.\n" _C_ viewport);
     }
 
     //
@@ -666,7 +666,7 @@ global void UIHandleMouseMove(int x,int y)
 	TheUI.WarpY = CursorStartY;
 	if (xo != TheUI.VP[TheUI.ActiveViewport].MapX ||
 		yo != TheUI.VP[TheUI.ActiveViewport].MapY) {
-	    MapViewportSetViewpoint (TheUI.ActiveViewport, xo, yo);
+	    MapViewportSetViewpoint(TheUI.ActiveViewport, xo, yo);
 	}
 	return;
     }
@@ -678,12 +678,14 @@ global void UIHandleMouseMove(int x,int y)
 
     //	Restrict mouse to minimap when dragging
     if( OldCursorOn==CursorOnMinimap && CursorOn!=CursorOnMinimap &&
-	(MouseButtons&LeftButton) ) {
-	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
+	    (MouseButtons&LeftButton) ) {
+	const Viewport *vp;
+
+	vp = &TheUI.VP[TheUI.ActiveViewport];
 	RestrictCursorToMinimap();
-	MapViewportSetViewpoint (TheUI.ActiveViewport
-		,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
-		,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
+	MapViewportSetViewpoint(TheUI.ActiveViewport
+		,ScreenMinimap2MapX(CursorX) - vp->MapWidth/2
+		,ScreenMinimap2MapY(CursorY) - vp->MapHeight/2);
 	return;
     }
 
@@ -697,10 +699,11 @@ global void UIHandleMouseMove(int x,int y)
     //cade: this is forbidden for unexplored and not visible space
     // FIXME: This must done new, moving units, scrolling...
     if( CursorOn==CursorOnMap ) {
-	if (IsMapFieldVisible (Viewport2MapX (TheUI.ActiveViewport, x),
-			Viewport2MapY(TheUI.ActiveViewport, y)) ) {
-	    int v = TheUI.ActiveViewport;
-	    UnitUnderCursor = UnitOnScreen (NULL
+	int v;
+
+	v = TheUI.ActiveViewport;
+	if (IsMapFieldVisible(Viewport2MapX(v, x), Viewport2MapY(v, y)) ) {
+	    UnitUnderCursor = UnitOnScreen(NULL
 		,x-TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX
 		,y-TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY);
 	}
@@ -708,7 +711,7 @@ global void UIHandleMouseMove(int x,int y)
 	mx=ScreenMinimap2MapX(x);
 	my=ScreenMinimap2MapY(y);
 	if( IsMapFieldVisible(mx,my) ) {
-	    UnitUnderCursor=UnitOnMapTile (mx,my);
+	    UnitUnderCursor=UnitOnMapTile(mx,my);
 	}
     }
 
@@ -737,10 +740,12 @@ global void UIHandleMouseMove(int x,int y)
 		//
 		//	Minimap move viewpoint
 		//
-		Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
-		MapViewportSetViewpoint (TheUI.ActiveViewport
-			,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
-			,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
+		const Viewport *vp;
+
+		vp = &TheUI.VP[TheUI.ActiveViewport];
+		MapViewportSetViewpoint(TheUI.ActiveViewport
+			,ScreenMinimap2MapX(CursorX) - vp->MapWidth/2
+			,ScreenMinimap2MapY(CursorY) - vp->MapHeight/2);
 	    }
 	}
 	// FIXME: must move minimap if right button is down !
@@ -772,9 +777,10 @@ global void UIHandleMouseMove(int x,int y)
 	//
 	//	Minimap move viewpoint
 	//
+	const Viewport* vp;
 
-	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
-	MapViewportSetViewpoint (TheUI.LastClickedVP
+	vp = &TheUI.VP[TheUI.ActiveViewport];
+	MapViewportSetViewpoint(TheUI.LastClickedVP
 		,ScreenMinimap2MapX(CursorX) - vp->MapWidth/2
 		,ScreenMinimap2MapY(CursorY) - vp->MapHeight/2);
 	CursorStartX=CursorX;
@@ -796,14 +802,17 @@ local void SendRepair(int sx,int sy)
     int i;
     Unit* unit;
     Unit* dest;
-    int x = sx / TileSizeX;
-    int y = sy / TileSizeY;
+    int x;
+    int y;
 
-    dest=RepairableOnScreenMapPosition (sx,sy);
+    dest=RepairableOnScreenMapPosition(sx,sy);
     if( !dest || !dest->Type || dest->Player!=ThisPlayer ) {
 	// FIXME: Should move test in repairable
 	dest=NoUnitP;
     }
+
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
 	if( unit->Type->CowerWorker ) {
@@ -850,18 +859,20 @@ local void SendMove(int x,int y)
 **
 **	@see Selected, @see NumSelected
 */
-local void SendAttack (int sx,int sy)
+local void SendAttack(int sx,int sy)
 {
     int i;
     Unit* unit;
     Unit* dest;
-    int x = sx / TileSizeX;
-    int y = sy / TileSizeY;
+    int x;
+    int y;
 
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
     for( i=0; i<NumSelected; i++ ) {
 	unit=Selected[i];
 	if( unit->Type->CanAttack || unit->Type->Building ) {
-	    dest=TargetOnScreenMapPosition (unit,sx,sy);
+	    dest=TargetOnScreenMapPosition(unit,sx,sy);
 	    DebugLevel3Fn("Attacking %p\n" _C_ dest);
 	    if( dest ) {
 		dest->Blink=4;
@@ -917,19 +928,21 @@ local void SendPatrol(int x,int y)
 **	@param sx	X screen map position
 **	@param sy	Y screen map position
 */
-local void SendDemolish (int sx,int sy)
+local void SendDemolish(int sx,int sy)
 {
     int i;
     Unit* unit;
     Unit* dest;
-    int x = sx / TileSizeX;
-    int y = sy / TileSizeY;
+    int x;
+    int y;
 
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
 	if( unit->Type->Volatile ) {
 	    // FIXME: choose correct unit no flying ...
-	    dest=TargetOnScreenMapPosition (unit,sx,sy);
+	    dest=TargetOnScreenMapPosition(unit,sx,sy);
 	    if( dest==unit ) {	// don't let an unit self destruct
 		dest=NoUnitP;
 	    }
@@ -999,15 +1012,17 @@ local void SendUnload(int x,int y)
 **
 **	@see Selected, @see NumSelected
 */
-local void SendSpellCast (int sx, int sy)
+local void SendSpellCast(int sx, int sy)
 {
     int i;
     Unit *unit;
     Unit *dest;
-    int x = sx / TileSizeX;
-    int y = sy / TileSizeY;
+    int x;
+    int y;
 
-    dest = UnitOnScreenMapPosition (sx, sy);
+    dest = UnitOnScreenMapPosition(sx, sy);
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n" _C_ dest _C_ x _C_ y);
     /*	NOTE: Vladi:
        This is a high-level function, it sends target spot and unit
@@ -1033,13 +1048,17 @@ local void SendSpellCast (int sx, int sy)
 **
 **	@param sx	X screen map position in pixels.
 **	@param sy	Y screen map position in pixels.
+**
+**	@todo pure chaos the arguments of the Send... functions are no equal.
 */
-local void SendCommand (int sx, int sy)
+local void SendCommand(int sx, int sy)
 {
     int i;
-    int x = sx / TileSizeX;
-    int y = sy / TileSizeY;
+    int x;
+    int y;
 
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
     CurrentButtonLevel = 0; // reset unit buttons to normal
     UpdateButtonPanel();
     switch( CursorAction ) {
@@ -1138,9 +1157,11 @@ local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
 */
 local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 {
-    int sx, sy;
-    Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
+    int sx;
+    int sy;
+    const Viewport* v;
 
+    v = &TheUI.VP[TheUI.ActiveViewport];
     //
     //	Clicking on the map.
     //
@@ -1162,7 +1183,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		    ,v->MapY*TileSizeY+CursorY - v->Y
 		    ,v->MapX*TileSizeX+CursorX - v->X
 		    ,v->MapY*TileSizeY+CursorY - v->Y);
-	    SendCommand (sx, sy);
+	    SendCommand(sx, sy);
 	}
 	return;
     }
@@ -1171,8 +1192,11 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
     //	Clicking on the minimap.
     //
     if( CursorOn==CursorOnMinimap ) {
-	int mx=ScreenMinimap2MapX(CursorX);
-	int my=ScreenMinimap2MapY(CursorY);
+	int mx;
+	int my;
+
+	mx=ScreenMinimap2MapX(CursorX);
+	my=ScreenMinimap2MapY(CursorY);
 	if( MouseButtons&LeftButton ) {
 	    sx=mx*TileSizeX;
 	    sy=my*TileSizeY;
@@ -1187,9 +1211,8 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		    ,sx+TileSizeX/2,sy+TileSizeY/2,0,0);
 	    SendCommand(sx,sy);
 	} else {
-	    int v = TheUI.ActiveViewport;
-	    MapViewportSetViewpoint (v, mx - TheUI.VP[v].MapWidth/2,
-			my - TheUI.VP[v].MapHeight/2);
+	    MapViewportSetViewpoint(TheUI.ActiveViewport,
+		    mx - v->MapWidth/2, my - v->MapHeight/2);
 	}
 	return;
     }
@@ -1227,7 +1250,7 @@ global void UIHandleButtonDown(unsigned button)
 /**
 **	Detect long selection click, FIXME: tempory hack to test the feature.
 */
-#define LongSelected (MouseButtons&((LeftButton<<MouseHoldShift)))
+#define LongSelected	(MouseButtons&((LeftButton<<MouseHoldShift)))
 
     if( LongSelected ) {
 	if( !OldValid ) {
@@ -1268,21 +1291,20 @@ global void UIHandleButtonDown(unsigned button)
     //	Cursor is on the map area
     //
     if( CursorOn==CursorOnMap ) {
-	TheUI.LastClickedVP = GetViewport (CursorX, CursorY);
-	DebugLevel0Fn ("last clicked viewport changed to %d.\n" _C_
+	TheUI.LastClickedVP = GetViewport(CursorX, CursorY);
+	DebugLevel0Fn("last clicked viewport changed to %d.\n" _C_
 		TheUI.LastClickedVP);
 	MustRedraw |= RedrawMinimapCursor | RedrawMap;
-	/* to redraw the cursor immediately (and avoid up to 1 sec delay */
+	// to redraw the cursor immediately (and avoid up to 1 sec delay
 	if( CursorBuilding ) {
 	    // Possible Selected[0] was removed from map
-	    // need to make sure there is a unit to build
-	    if( Selected[0]			// enter select mode
-		    && (MouseButtons&LeftButton) ) {
+	    // need to make sure there is an unit to build
+	    if( Selected[0] && (MouseButtons&LeftButton) ) {// enter select mode
 		int x;
 		int y;
 
-		x = Viewport2MapX (TheUI.ActiveViewport, CursorX);
-		y = Viewport2MapY (TheUI.ActiveViewport, CursorY);
+		x = Viewport2MapX(TheUI.ActiveViewport, CursorX);
+		y = Viewport2MapY(TheUI.ActiveViewport, CursorY);
 		// FIXME: error messages
 
 		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
@@ -1307,11 +1329,15 @@ global void UIHandleButtonDown(unsigned button)
 	}
 
 	if( MouseButtons&LeftButton ) { // enter select mode
-	    int v = TheUI.ActiveViewport;
+	    int v;
+
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
-	    CursorStartScrMapX = CursorStartX -TheUI.VP[v].X + TileSizeX * TheUI.VP[v].MapX;
-	    CursorStartScrMapY = CursorStartY -TheUI.VP[v].Y + TileSizeY * TheUI.VP[v].MapY;
+	    v = TheUI.ActiveViewport;
+	    CursorStartScrMapX = CursorStartX -
+		    TheUI.VP[v].X + TileSizeX * TheUI.VP[v].MapX;
+	    CursorStartScrMapY = CursorStartY -
+		    TheUI.VP[v].Y + TileSizeY * TheUI.VP[v].MapY;
 	    GameCursor=TheUI.Cross.Cursor;
 	    CursorState=CursorStateRectangle;
 	    MustRedraw|=RedrawCursor;
@@ -1326,10 +1352,13 @@ global void UIHandleButtonDown(unsigned button)
 		Unit* unit;
 		// FIXME: Rethink the complete chaos of coordinates here
 		// FIXME: Johns: Perhaps we should use a pixel map coordinates
-		int v = TheUI.ActiveViewport;
-		int x = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
-		int y = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
+		int v;
+		int x;
+		int y;
 
+		v = TheUI.ActiveViewport;
+		x = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
+		y = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
 		if( x>=TheMap.Width*TileSizeX ) {	// Reduce to map limits
 		    x = (TheMap.Width-1)*TileSizeX;
 		}
@@ -1337,15 +1366,17 @@ global void UIHandleButtonDown(unsigned button)
 		    y = (TheMap.Height-1)*TileSizeY;
 		}
 
-		unit = UnitOnScreenMapPosition (x, y);
+		unit = UnitOnScreenMapPosition(x, y);
 		if ( unit ) {	// if right click on building -- blink
 		    unit->Blink=4;
-		} else {		// if not not click on building -- green cross
+		} else {	// if not not click on building -- green cross
 		    MakeLocalMissile(MissileTypeGreenCross
-			,TheUI.VP[TheUI.ActiveViewport].MapX*TileSizeX+CursorX-TheUI.VP[TheUI.ActiveViewport].X
-			,TheUI.VP[TheUI.ActiveViewport].MapY*TileSizeY+CursorY-TheUI.VP[TheUI.ActiveViewport].Y,0,0);
+			,TheUI.VP[TheUI.ActiveViewport].MapX*TileSizeX
+			    +CursorX-TheUI.VP[TheUI.ActiveViewport].X
+			,TheUI.VP[TheUI.ActiveViewport].MapY*TileSizeY
+			    +CursorY-TheUI.VP[TheUI.ActiveViewport].Y,0,0);
 		}
-		DoRightButton (x, y);
+		DoRightButton(x, y);
 	    }
 	}
     //
@@ -1353,7 +1384,9 @@ global void UIHandleButtonDown(unsigned button)
     //
     } else if( CursorOn==CursorOnMinimap ) {
 	if( MouseButtons&LeftButton ) { // enter move mini-mode
-	    int v = TheUI.LastClickedVP;
+	    int v;
+
+	    v = TheUI.LastClickedVP;
 	    MapViewportSetViewpoint(v,
 		ScreenMinimap2MapX(CursorX)-TheUI.VP[v].MapWidth/2,
 		ScreenMinimap2MapY(CursorY)-TheUI.VP[v].MapHeight/2);
@@ -1363,7 +1396,7 @@ global void UIHandleButtonDown(unsigned button)
 			,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 			,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 		// DoRightButton() takes screen map coordinates
-		DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX,
+		DoRightButton(ScreenMinimap2MapX(CursorX) * TileSizeX,
 			ScreenMinimap2MapY(CursorY) * TileSizeY);
 	    }
 	}
@@ -1502,80 +1535,47 @@ global void UIHandleButtonUp(unsigned button)
 	//
 	if( CursorStartX<CursorX-1 || CursorStartX>CursorX+1
 		|| CursorStartY<CursorY-1 || CursorStartY>CursorY+1 ) {
-#if 0
-	    //
-	    //	Select rectangle
-	    //
-	    int x,y,w,h;
+	    int x0;
+	    int y0;
+	    int v;
+	    int x1;
+	    int y1;
 
-	    x = Screen2MapX(CursorStartX);
-	    y = Screen2MapY(CursorStartY);
-	    w = Screen2MapX(CursorX);
-	    h = Screen2MapY(CursorY);
-	    if (x>w) {
-		x ^= w;			// Hint: this swaps x and w
-		w ^= x;
-		x ^= w;
-	    }
-	    if (y>h) {
-		h ^= y;			// Hint: this swaps y and h
-		y ^= h;
-		h ^= y;
-	    }
-	    w -= x;
-	    h -= y;
-	    if( KeyModifiers&ModifierShift ) {
-		num=AddSelectedUnitsInRectangle(x,y,w,h);
-	    } else {
-		num=SelectUnitsInRectangle(x,y,w,h);
-	    }
-#endif
-	    int x0 = CursorStartScrMapX;
-	    int y0 = CursorStartScrMapY;
-	    int v = TheUI.ActiveViewport;
-	    int x1 = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
-	    int y1 = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
+	    x0 = CursorStartScrMapX;
+	    y0 = CursorStartScrMapY;
+	    v = TheUI.ActiveViewport;
+	    x1 = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
+	    y1 = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
+
 	    if (x0>x1) {
-		int swap=x0;	// this is faster and more readable than xor's
-				// JOHNS: no it is slower and more readable
-				// latimerius: gcc -O3 outputs this assembler
-				// for swap using a temp variable:
-				//      movl -4(%ebp),%eax
-				//	movl -8(%ebp),%edx
-				//	movl %edx,-4(%ebp)
-				//	movl %eax,-8(%ebp)
-				// using xor's:
-				// 	movl -4(%ebp),%edx
-				//	xorl -8(%ebp),%edx
-				//	movl -4(%ebp),%eax
-				//	movl %eax,-8(%ebp)
-				//	xorl %eax,%edx
-				//	movl %edx,-4(%ebp)
-				// Now I wonder how xor's can be faster.
+		int swap;
 
+		swap = x0;
 		x0 = x1;
 		x1 = swap;
 	    }
 	    if (y0>y1) {
-		int swap=y0;
+		int swap;
+
+		swap = y0;
 		y0 = y1;
 		y1 = swap;
 	    }
 	    if ( KeyModifiers & ModifierShift ) {
 		if( KeyModifiers & ModifierAlt ) {
-		    num=AddSelectedGroundUnitsInRectangle (x0, y0, x1, y1);
+		    num=AddSelectedGroundUnitsInRectangle(x0, y0, x1, y1);
 		} else if( KeyModifiers & ModifierControl ) {
-		    num=AddSelectedAirUnitsInRectangle (x0, y0, x1, y1);
+		    num=AddSelectedAirUnitsInRectangle(x0, y0, x1, y1);
 		} else {
-		    num=AddSelectedUnitsInRectangle (x0 ,y0, x1, y1);
+		    num=AddSelectedUnitsInRectangle(x0 ,y0, x1, y1);
 		}
 	    } else {
 		if( KeyModifiers & ModifierAlt ) {
-		    num=SelectGroundUnitsInRectangle (x0, y0, x1, y1);
+		    num=SelectGroundUnitsInRectangle(x0, y0, x1, y1);
 		} else if( KeyModifiers & ModifierControl ) {
-		    num=SelectAirUnitsInRectangle (x0, y0, x1, y1);
+		    num=SelectAirUnitsInRectangle(x0, y0, x1, y1);
 		} else {
-		    num=SelectUnitsInRectangle (x0, y0, x1, y1);
+		    num=SelectUnitsInRectangle(x0, y0, x1, y1);
 		}
 	    }
 	} else {
@@ -1589,7 +1589,7 @@ global void UIHandleButtonUp(unsigned button)
 	    // cade: cannot select unit on invisible space
 	    // FIXME: johns: only complete invisibile units
 	    if( IsMapFieldVisible(Viewport2MapX(TheUI.ActiveViewport,CursorX),
-			Viewport2MapY (TheUI.ActiveViewport,CursorY)) ) {
+			Viewport2MapY(TheUI.ActiveViewport,CursorY)) ) {
 		unit=UnitOnScreen(unit
 		    ,CursorX-TheUI.VP[TheUI.ActiveViewport].X+
 			TheUI.VP[TheUI.ActiveViewport].MapX*TileSizeX
