@@ -48,15 +48,10 @@
 #include "stratagus.h"
 
 #include "iocompat.h"
-
 #include "network.h"
 #include "netconnect.h"
 #include "ccl.h"
 #include "master.h"
-
-// FIXME: jim4: why is this defined?
-#define USE_WINSOCK
-
 #include "net_lowlevel.h"
 
 #ifdef USE_SDLA
@@ -68,7 +63,7 @@
 ----------------------------------------------------------------------------*/
 
 //###### For Magnant META SERVER
-local Socket sockfd;  // This is a TCP socket. 
+local Socket MetaServerFildes;  // This is a TCP socket. 
 global int MetaServerInUse;
 
 /*----------------------------------------------------------------------------
@@ -83,23 +78,21 @@ global int MetaServerInUse;
 */
 global int MetaInit(void)
 {
-    int TCPConnectStatus; // = 0 if not successful, -1 if not.
     int i; 
     char* reply;
 
     reply = NULL;
-    sockfd = NetworkFildes;
+    MetaServerFildes = NetworkFildes;
     for (i = 1234; i < 1244; ++i) {
-	sockfd = NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!sockfd) {...}
-	if (sockfd != -1) {
+	MetaServerFildes = NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
+	if (MetaServerFildes != (Socket)-1) {
 	    break;
 	}
     }
     
     // FIXME: Configurable Meta Server
-    TCPConnectStatus = NetConnectTCP(sockfd, NetResolveHost(MASTER_HOST), MASTER_PORT);
-
-    if (TCPConnectStatus == -1) {
+    i = NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT);
+    if (i == -1) {
 	//TODO: Notify player that connection was aborted...
 	return -1; 
     }
@@ -131,7 +124,7 @@ global int MetaInit(void)
 */
 global int MetaClose(void)
 {
-    NetCloseTCP(sockfd);
+    NetCloseTCP(MetaServerFildes);
     return 0;
 }
 
@@ -220,7 +213,8 @@ global int SendMetaCommand(char* command, char* format, ...)
     // Message Structure
     // <Stratagus> if for Magnant Compatibility, it may be removed
     // Player Name, Game Name, VERSION, Command, **Paramaters**
-    sprintf(s, "<Stratagus>\n%s\n%s\n%s\n%s\n", LocalPlayerName, GameName, VERSION, command);
+    sprintf(s, "<Stratagus>\n%s\n%s\n%s\n%s\n",
+	LocalPlayerName, GameName, VERSION, command);
 
     // Commands
     // Login - password
@@ -260,7 +254,7 @@ global int SendMetaCommand(char* command, char* format, ...)
     }
     strcat(s, p);
     size = strlen(s);
-    ret = NetSendTCP(sockfd, s, size);
+    ret = NetSendTCP(MetaServerFildes, s, size);
     free(p);
     free(s);
     return ret;
@@ -278,22 +272,22 @@ global int RecvMetaReply(char** reply)
     char* p;
     char buf[1024];
 
-    if (NetSocketReady(sockfd, 5000) == -1) {
+    if (NetSocketReady(MetaServerFildes, 5000) == -1) {
 	return -1;
     }
    
     p = NULL;
 
     // FIXME: Allow for large packets
-    n = NetRecvTCP(sockfd, &buf, 1024);
+    n = NetRecvTCP(MetaServerFildes, &buf, 1024);
     if (!(p = malloc(n + 1))) {
 	return -1;
     }
 
     // We know we now have the whole command.
     // Convert to standard notation
-    buf[n-1] = '\0';
-    buf[n-2] = '\n';
+    buf[n - 1] = '\0';
+    buf[n - 2] = '\n';
     strcpy(p, buf);
 
     *reply = p;
