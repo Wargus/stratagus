@@ -2014,7 +2014,7 @@ global void EditorMainLoop(void)
 	OldCommandLogDisabled = CommandLogDisabled;
 	CommandLogDisabled = 1;
 
-	do {
+	while (1) {
 		EditorMapLoaded = 0;
 		EditorRunning = 1;
 
@@ -2073,9 +2073,10 @@ global void EditorMainLoop(void)
 			WaitEventsOneFrame(&callbacks);
 		}
 
-		//
-		// Restore all for menu
-		//
+		if (!EditorMapLoaded) {
+			break;
+		}
+
 		CleanModules();
 
 		LoadCcl(); // Reload the main config file
@@ -2087,7 +2088,7 @@ global void EditorMainLoop(void)
 
 		VideoClearScreen();
 		Invalidate();
-	} while (EditorMapLoaded);
+	}
 
 	CommandLogDisabled = OldCommandLogDisabled;
 }
