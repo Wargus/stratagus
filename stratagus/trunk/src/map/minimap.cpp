@@ -295,20 +295,10 @@ global void DrawMinimap(int vx,int vy)
 	    continue;
 	}
 #else
-#if 0
-	flags=TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags;
-	// Draw only units on explored fields
-	if( !(flags&MapFieldExplored) ) {
-	    continue;
-	}
-	// Draw only units on visible fields
-	if( !(flags&MapFieldVisible) ) {
-	    continue;
-	}
-#endif
 	if( !UnitKnownOnMap(unit) ) {
 	    continue;
 	}
+	unit->SeenFrame = unit->Frame;
 #endif
 
 	// FIXME: submarine not visible
