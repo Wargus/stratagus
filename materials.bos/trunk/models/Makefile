@@ -1,4 +1,4 @@
-SUBDIRS = camera radar
+SUBDIRS = camera radar buggy
 
 .PHONY: clean subdirs $(SUBDIRS)
 
