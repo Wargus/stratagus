@@ -786,7 +786,10 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
 **	Find nearest point of unit.
 **
 **	@param unit	Pointer to unit.
-**	FIXME:		more docs from here
+**	@param tx	X tile map postion.
+**	@param ty	Y tile map postion.
+**	@param dx	Out: nearest point X tile map postion to (tx,ty).
+**	@param dy	Out: nearest point Y tile map postion to (tx,ty).
 */
 global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 {
@@ -1051,6 +1054,10 @@ global int UnitVisibleOnScreen(const Unit* unit)
 **      StephanR: Get area of tiles covered by unit, including its displacement
 **
 **      @param unit     Unit to be checked and set.
+**	@param sx	Out: Top left X tile map postion.
+**	@param sy	Out: Top left Y tile map postion.
+**	@param ex	Out: Bottom right X tile map postion.
+**	@param ey	Out: Bottom right Y tile map postion.
 **      @return         sx,sy,ex,ey defining area in Map
 */
 global void GetUnitMapArea( const Unit* unit,
@@ -1375,16 +1382,20 @@ global void UnitIncrementHealth(void)
 /**
 **	Change the unit's owner
 **
+**	@param unit		Unit which should be consigned.
 **	@param oldplayer	Old owning player.
 **	@param newplayer	New owning player.
 **
 **	@todo	FIXME: I think here are some failures, if building is build
 **		what is with the unit inside? or a main hall with workers
 **		inside?
+**		Parameter old player is redunant?
 */
 global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 {
     int i;
+
+    DebugCheck( unit->Player!=oldplayer );
 
     // For st*rcr*ft (dark archons),
     if( unit->Type->Transporter ) {
@@ -2208,7 +2219,7 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 /**
 **	Find the nearest gold mine for unit from x,y.
 **
-**	@param unit	Pointer for source unit.
+**	@param source	Pointer for source unit.
 **	@param x	X tile position to start.
 **	@param y	Y tile position to start.
 **
@@ -2253,14 +2264,13 @@ global Unit* FindGoldMine(const Unit* source __attribute__((unused)),
 }
 
 /**
-**	Find gold deposit.
+**	Find gold deposit (where we can deliver gold).
 **
-**	@param unit	Pointer for source unit.
-**	@param player	A deposit owning this player
+**	@param source	Pointer for source unit.
 **	@param x	X tile position to start.
 **	@param y	Y tile position to start.
 **
-**	@return		Pointer to the nearest gold mine.
+**	@return		Pointer to the nearest gold depot.
 */
 global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 {
@@ -2300,7 +2310,12 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 
 /**
 **	Find wood deposit.
+**
 **	@param player	A deposit owning this player
+**	@param x	X tile position to start.
+**	@param y	Y tile position to start.
+**
+**	@return		Pointer to the nearest wood depot.
 */
 global Unit* FindWoodDeposit(const Player* player,int x,int y)
 {
@@ -3272,36 +3287,44 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 }
 
 /**
-** compute the distance from the view point to a given point.
+**	Compute the distance from the view point to a given point.
+**
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
+**
+**	@todo
+**		FIXME: is it the correct place to put this function in?
 */
-//FIXME: is it the correct place to put this?
 global int ViewPointDistance(int x,int y)
 {
     int x_v;
     int y_v;
+
     // first compute the view point coordinate
     x_v=MapX+MapWidth/2;
     y_v=MapY+MapHeight/2;
+
     // then use MapDistance
     return MapDistance(x_v,y_v,x,y);
 }
 
 /**
-** compute the distance from the view point to a given unit.
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	Compute the distance from the view point to a given unit.
+**
 **	@param dest	Distance to this unit.
+**
+**	@todo
+**		FIXME: is it the correct place to put this function in?
 */
-//FIXME: is it the correct place to put this?
 global int ViewPointDistanceToUnit(const Unit* dest)
 {
     int x_v;
     int y_v;
+
     // first compute the view point coordinate
     x_v=MapX+MapWidth/2;
     y_v=MapY+MapHeight/2;
+
     // then use MapDistanceToUnit
     return MapDistanceToUnit(x_v,y_v,dest);
 }
