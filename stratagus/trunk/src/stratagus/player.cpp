@@ -201,7 +201,7 @@ global void SavePlayers(CLFile* file)
 	    CLprintf(file,"\n  'race '(");
 	    CLprintf(file,"\n    race %d",PlayerRaces.Race[i]);
 	    CLprintf(file,"\n    name %s",PlayerRaces.Name[i]);
-	    CLprintf(file,"\n    display %s",PlayerRaces.Display[i]);
+	    CLprintf(file,"\n    display \"%s\"",PlayerRaces.Display[i]);
 	    if( PlayerRaces.Visible[i] ) {
 		CLprintf(file,"\n    visible");
 	    }
@@ -220,7 +220,7 @@ global void SavePlayers(CLFile* file)
 	    CLprintf(file,"\n  'race '(");
 	    CLprintf(file,"\n    race %d",PlayerRaces.Race[i]);
 	    CLprintf(file,"\n    name %s",PlayerRaces.Name[i]);
-	    CLprintf(file,"\n    display %s",PlayerRaces.Display[i]);
+	    CLprintf(file,"\n    display \"%s\"",PlayerRaces.Display[i]);
 	    if( PlayerRaces.Visible[i] ) {
 		CLprintf(file,"\n    visible");
 	    }
