@@ -571,10 +571,6 @@ global void NetworkSendExtendedCommand(int command,int arg1,int arg2,int arg3,
     NetworkCommandQueue *ncq;
     NetworkExtendedCommand* nec;
 
-    DebugLevel3Fn("%d,%d,(%d,%d),%d,%s,%s\n",
-	command, unit->Slot, x, y, dest ? dest->Slot : -1,
-	type ? type->Ident : "-", status ? "flush" : "append");
-
     //
     //	FIXME: look if we can ignore this command.
     //		Duplicate commands can be ignored.

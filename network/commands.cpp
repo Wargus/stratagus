@@ -856,7 +856,7 @@ global void ParseExtendedCommand(unsigned char type,int status,
 	unsigned char arg1, unsigned short arg2, unsigned short arg3,
 	unsigned short arg4)
 {
-    DebugLevel3Fn(" %d cycle %lu\n", msgnr, GameCycle);
+    DebugLevel3Fn(" %d cycle %lu\n", type, GameCycle);
 
     // Note: destroyed units are handled by the action routines.
 
