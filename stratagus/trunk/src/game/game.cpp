@@ -171,6 +171,9 @@ global void CreateGame(char* filename, WorldMap* map)
     InitNetwork1();
 
     if (filename == NULL) {
+	if( strcmp(TitleMusic,MenuMusic) ) {	// Start new music for menus?
+	    PlayMusic(MenuMusic);
+	}
 	ProcessMenu(MENU_PRG_START, 1);
 	if( NetworkFildes!=-1 && NetPlayers<2 ) {
 	    ExitNetwork1();
