@@ -82,18 +82,18 @@ local SCM CclAStar(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("fixed-unit-cost")) ) {
 	    i=gh_scm2int(gh_car(list));
             list=gh_cdr(list);
-	    if( i <=0 ) {
+	    if( i <=3 ) {
 		PrintFunction();
-		fprintf(stdout,"Fixed unit crossing cost must be strictly positive\n");
+		fprintf(stdout,"Fixed unit crossing cost must be strictly > 3\n");
 	    } else {
 		AStarFixedUnitCrossingCost=i;
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("moving-unit-cost")) ) {
 	    i=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
-	    if( i<=0) {
+	    if( i<=3) {
 		PrintFunction();
-		fprintf(stdout,"Moving unit crossing cost must be strictly positive\n");
+		fprintf(stdout,"Moving unit crossing cost must be strictly > 3\n");
 	    } else {
 		AStarMovingUnitCrossingCost=i;
 	    }
