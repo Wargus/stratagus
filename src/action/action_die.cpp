@@ -65,19 +65,21 @@ global void HandleActionDie(Unit* unit)
     //
     if( unit->Reset ) {
 	DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
-#ifdef NEW_FOW
-	//Fixes sight from death
-	MapUnmarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
-	//unit->CurrentSightRange=unit->Type->Stats->SightRange;
-#endif
+
 	if( !unit->Type->CorpseType ) {
 	    ReleaseUnit(unit);
 	    return;
 	}
 
+#ifdef NEW_FOW
+	//Fixes sight from death
+	MapUnmarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
+	//unit->CurrentSightRange=unit->Type->Stats->SightRange;
+#endif
+
 	unit->State=unit->Type->CorpseScript;
 	unit->Type=unit->Type->CorpseType;
-
+        
 	CommandStopUnit(unit);		// This clears all order queues
 	IfDebug(
 	    if( unit->Orders[0].Action!=UnitActionDie ) {

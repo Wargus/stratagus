@@ -71,6 +71,8 @@ local Unit** ReleasedTail;		/// List tail of released units.
 
 global Unit* Units[MAX_UNIT_SLOTS];	/// Array of used slots
 global int NumUnits;			/// Number of slots used
+global Unit* DestroyedBuildings;	/// List of DestroyedBuildings
+global Unit* CorpseList;		/// List of Corpses On Map
 
 global int HitPointRegeneration;	/// Hit point regeneration for all units
 global int XpDamage;				/// Hit point regeneration for all units
@@ -101,6 +103,8 @@ global void InitUnitsMemory(void)
 
     ReleasedTail=&ReleasedHead;		// list of unfreed units.
     NumUnits=0;
+    DestroyedBuildings=NULL;
+    CorpseList=NULL;
 }
 
 #if 0
@@ -159,6 +163,12 @@ global void ReleaseUnit(Unit* unit)
 	//	Are more references remaining?
 	//
 	unit->Destroyed=1;		// mark as destroyed
+
+	//Update Corpse Cache
+	if( unit->Type->Vanishes && unit->Orders[0].Action == UnitActionDie ) {
+	    CorpseCacheRemove(unit);
+	}
+
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
 	    DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle
@@ -1549,10 +1559,10 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 #ifdef NEW_FOW
     MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
 	,unit->Y+unit->Type->TileHeight/2
-	,unit->Stats->SightRange);
+	,unit->CurrentSightRange);
     MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
 	,unit->Y+unit->Type->TileHeight/2
-	,unit->Stats->SightRange);
+	,unit->CurrentSightRange);
 #endif
 
     //
@@ -3264,6 +3274,7 @@ global void LetUnitDie(Unit* unit)
 		    || !unit->Type->Animations->Die );
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
+	    CorpseCacheInsert(unit);	//Insert into corpse list
 	    return;
 	}
 
@@ -3303,11 +3314,15 @@ global void LetUnitDie(Unit* unit)
     unit->Reset=0;
     unit->Wait=1;
     unit->Orders[0].Action=UnitActionDie;
+    if( unit->Type->CorpseType ) {
+	CorpseCacheInsert(unit);	//Insert into corpse list
+    }
+
 #ifdef NEW_FOW
     if( unit->Type->CorpseType ) {
 	unit->CurrentSightRange=unit->Type->CorpseType->Stats->SightRange;
     } else {
-	unit->CurrentSightRange=1;
+	unit->CurrentSightRange=0;
     }
     MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
 #endif

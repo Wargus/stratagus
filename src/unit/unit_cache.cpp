@@ -796,6 +796,39 @@ global void InitUnitCache(void)
 //****************************************************************************/
 
 /**
+**	Inserts a corpse into the current corpse list
+**
+**	@param unit	Unit pointer to insert into list
+**/
+global void CorpseCacheInsert(Unit* unit)
+{
+    unit->Next=CorpseList;
+    CorpseList=unit;
+}
+
+/**
+**	Removes a corpse from the current corpse list
+**
+**	@param unit	Unit pointer to remove from list
+**/
+global void CorpseCacheRemove(Unit* unit)
+{
+    Unit** prev;
+
+    prev=&CorpseList;
+    DebugCheck( !*prev );
+    while( *prev ) {			// find the unit, be bug friendly
+	if( *prev==unit ) {
+	    *prev=unit->Next;
+	    unit->Next=NULL;
+	    return;
+	}
+	prev=&(*prev)->Next;
+	DebugCheck( !*prev );
+    }
+}
+
+/**
 **	Insert new unit into cache.
 **
 **	@param unit	Unit pointer to place in cache.
