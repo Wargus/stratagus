@@ -323,7 +323,7 @@ local int CostMoveTo(Unit* unit, int ex,int ey,int mask,int current_cost) {
 	}
     }
     // Add cost of crossing unknown tiles if required
-    if( !IsMapFieldExplored(unit->Player,ex,ey) || AStarKnowUnknown ) {
+    if( !AStarKnowUnknown && !IsMapFieldExplored(unit->Player,ex,ey) ) {
 	// Tend against unknown tiles.
 	cost+=AStarUnknownTerrainCost;
     }
