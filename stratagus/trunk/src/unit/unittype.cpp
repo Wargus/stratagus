@@ -84,8 +84,6 @@ global UnitType*UnitTypeHumanTankerFull;	/// Human tanker full unit type pointer
 #endif
 global UnitType*UnitTypeHumanWorker;		/// Human worker
 global UnitType*UnitTypeOrcWorker;		/// Orc worker
-global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
-global UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
 global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
 global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
 global UnitType*UnitTypeHumanWall;		/// Human wall
@@ -809,9 +807,6 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 	case MouseActionHarvest:
 	    fprintf(file,"'right-harvest");
 	    break;
-	case MouseActionHaulOil:
-	    fprintf(file,"'right-haul-oil");
-	    break;
 	case MouseActionDemolish:
 	    fprintf(file,"'right-demolish");
 	    break;
@@ -829,6 +824,9 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     }
     if( type->CanAttack ) {
 	fprintf(file,"  'can-attack\n");
+    }
+    if( type->CanRepair ) {
+	fprintf(file,"  'can-repair\n");
     }
     if( type->CanTarget ) {
 	fprintf(file,"  ");
@@ -1223,8 +1221,6 @@ global void InitUnitTypes(int reset_player_stats)
     //
     UnitTypeHumanWorker=UnitTypeByIdent("unit-peasant");
     UnitTypeOrcWorker=UnitTypeByIdent("unit-peon");
-    UnitTypeHumanWorkerWithGold=UnitTypeByIdent("unit-peasant-with-gold");
-    UnitTypeOrcWorkerWithGold=UnitTypeByIdent("unit-peon-with-gold");
     UnitTypeHumanWorkerWithWood=UnitTypeByIdent("unit-peasant-with-wood");
     UnitTypeOrcWorkerWithWood=UnitTypeByIdent("unit-peon-with-wood");
     UnitTypeHumanWall=UnitTypeByIdent("unit-human-wall");
@@ -1448,8 +1444,6 @@ global void CleanUnitTypes(void)
     //
     UnitTypeHumanWorker=NULL;
     UnitTypeOrcWorker=NULL;
-    UnitTypeHumanWorkerWithGold=NULL;
-    UnitTypeOrcWorkerWithGold=NULL;
     UnitTypeHumanWorkerWithWood=NULL;
     UnitTypeOrcWorkerWithWood=NULL;
     UnitTypeHumanWall=NULL;

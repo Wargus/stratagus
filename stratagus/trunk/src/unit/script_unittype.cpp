@@ -356,8 +356,6 @@ local SCM CclDefineUnitType(SCM list)
 	    type->MouseAction=MouseActionMove;
 	} else if( gh_eq_p(value,gh_symbol2scm("right-harvest")) ) {
 	    type->MouseAction=MouseActionHarvest;
-	} else if( gh_eq_p(value,gh_symbol2scm("right-haul-oil")) ) {
-	    type->MouseAction=MouseActionHaulOil;
 	} else if( gh_eq_p(value,gh_symbol2scm("right-demolish")) ) {
 	    type->MouseAction=MouseActionDemolish;
 	} else if( gh_eq_p(value,gh_symbol2scm("right-sail")) ) {
@@ -367,6 +365,8 @@ local SCM CclDefineUnitType(SCM list)
 	    type->GroundAttack=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-attack")) ) {
 	    type->CanAttack=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("can-repair")) ) {
+	    type->CanRepair=1;
 
 	} else if( gh_eq_p(value,gh_symbol2scm("can-target-land")) ) {
 	    type->CanTarget|=CanTargetLand;

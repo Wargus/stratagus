@@ -102,9 +102,7 @@ extern void CommandBuildBuilding(Unit*,int,int,UnitType*,int);
 extern void CommandCancelBuilding(Unit* unit,Unit* worker);
     /// Prepare command harvest
 extern void CommandHarvest(Unit* unit,int x,int y,int flush);
-    /// Prepare command mine
-extern void CommandMineGold(Unit* unit,Unit* dest,int flush);
-    /// Prepare command haul
+    /// Prepare command resource
 extern void CommandResource(Unit* unit,Unit* dest,int flush);
     /// Prepare command return
 extern void CommandReturnGoods(Unit* unit,Unit* goal,int flush);
@@ -164,8 +162,6 @@ extern void HandleActionBoard(Unit* unit);
 extern void HandleActionUnload(Unit* unit);
     /// Handle command harvest
 extern void HandleActionHarvest(Unit* unit);
-    /// Handle command mine
-extern void HandleActionMineGold(Unit* unit);
     /// Handle command haul
 extern void HandleActionResource(Unit* unit);
     /// Handle command return

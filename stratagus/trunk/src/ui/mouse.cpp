@@ -201,98 +201,50 @@ global void DoRightButton(int sx,int sy)
 	//	Worker of human or orcs
 	//
 	if( action==MouseActionHarvest ) {
-	    if( type==UnitTypeOrcWorkerWithWood
-		    || type==UnitTypeHumanWorkerWithWood
-		    || type==UnitTypeOrcWorkerWithGold
-		    || type==UnitTypeHumanWorkerWithGold ) {
-		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
-		    if( dest->Player==unit->Player ) {
-			dest->Blink=4;
-			if( dest->Type->CanStore[GoldCost]
-				&& (type==UnitTypeOrcWorkerWithGold
-				    || type==UnitTypeHumanWorkerWithGold) ) {
-			    DebugLevel3("GOLD-DEPOSIT\n");
-			    SendCommandReturnGoods(unit,dest,flush);
-			    continue;
-			}
-			if( (dest->Type->CanStore[WoodCost])
-				&& (type==UnitTypeOrcWorkerWithWood
-				    || type==UnitTypeHumanWorkerWithWood) ) {
-			    DebugLevel3("WOOD-DEPOSIT\n");
-			    SendCommandReturnGoods(unit,dest,flush);
-			    continue;
-			}
-		    }
-		}
-	    } else {
-		if( IsMapFieldExplored(unit->Player,x,y) && ForestOnMap(x,y) ) {
-		    SendCommandHarvest(unit,x,y,flush);
-		    continue;
-		}
-		if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {
-		    dest->Blink=4;
-		    DebugLevel3("GOLD-MINE\n");
-		    SendCommandMineGold(unit,dest,flush);
-		    continue;
-		}
-	    }
-
-	    if( UnitUnderCursor
-		    && (dest=TargetOnScreenMapPosition(unit,sx,sy)) ) {
-		if( IsEnemy(unit->Player,dest) ) {
-		    dest->Blink=4;
-		    SendCommandAttack(unit,x,y,dest,flush);
-		    continue;
-		}
-	    }
-
-	    // cade: this is default repair action
-	    if( UnitUnderCursor
-		    && (dest=RepairableOnScreenMapPosition(sx, sy)) ) {
-		if( dest->Type && (dest->Player==unit->Player
-			|| IsAllied(unit->Player,dest)) ) {
-		    SendCommandRepair(unit,x,y,dest,flush);
-		    continue;
-		}
-	    }
-
-	    if( UnitUnderCursor && (dest=UnitOnScreenMapPosition(sx,sy)) ) {
-		// FIXME: should ally to self
-		if( (dest->Player==unit->Player || IsAllied(unit->Player,dest))
-			&& dest!=unit ) {
-		    dest->Blink=4;
-		    SendCommandFollow(unit,dest,flush);
-		    continue;
-		}
-	    }
-
-	    SendCommandMove(unit,x,y,flush);
-	    continue;
-	}
-
-	//
-	//	Tanker
-	//
-	if( action==MouseActionHaulOil ) {
-	    //  Return to deposit
-	    if( (unit->Type->Harvester) &&
-		    (unit->Value) &&
-		    (UnitUnderCursor) &&
-		    (dest=ResourceDepositOnMap(x,y,unit->Type->ResourceHarvested)) &&
-		    (dest->Player==unit->Player)) {
+	    //	Return wood cutter home
+	    if( (type==UnitTypeOrcWorkerWithWood ||
+		    type==UnitTypeHumanWorkerWithWood) &&
+		    (dest=ResourceDepositOnMap(x,y,WoodCost)) &&
+		    dest->Player==unit->Player) {
+		DebugLevel3("send to wood deposit.\n");
 		dest->Blink=4;
-		DebugLevel3Fn("Return to deposit.\n");
 		SendCommandReturnGoods(unit,dest,flush);
 		continue;
-	    } 
-	    //  Go and harvest
-	    if( (unit->Type->Harvester) &&
-		    (unit->Value<unit->Type->ResourceCapacity) &&
+	    }
+	    //	Send wood cutter to work
+	    if((type==UnitTypeOrcWorker||type==UnitTypeHumanWorker) &&
+		    IsMapFieldExplored(unit->Player,x,y) &&
+		    ForestOnMap(x,y) ) {
+		SendCommandHarvest(unit,x,y,flush);
+		continue;
+	    }
+	    if (unit->Type->Harvester&&UnitUnderCursor) {
+		//  Return a loaded harvester to deposit
+		if( (unit->Value>0) &&
+			(dest=ResourceDepositOnMap(x,y,unit->Type->ResourceHarvested)) &&
+			(dest->Player==unit->Player)) {
+		    dest->Blink=4;
+		    DebugLevel3Fn("Return to deposit.\n");
+		    SendCommandReturnGoods(unit,dest,flush);
+		    continue;
+		} 
+		//  Go and harvest
+		if( (unit->Value<unit->Type->ResourceCapacity) &&
+			(dest=ResourceOnMap(x,y,unit->Type->ResourceHarvested)) &&
+			((dest->Player==unit->Player) ||
+			 (dest->Player->Player==PlayerMax-1))) {
+		    dest->Blink=4;
+		    SendCommandResource(unit,dest,flush);
+		    continue;
+		}
+	    }
+	    //  Go and repair
+	    if ( (unit->Type->CanRepair) &&
 		    (UnitUnderCursor) &&
-		    (dest=ResourceOnMap(x,y,unit->Type->ResourceHarvested)) &&
-		    (dest->Player==unit->Player)) {
+		    (dest=RepairableOnScreenMapPosition(sx,sy)) &&
+		    ((dest->Player==unit->Player) || (IsAllied(dest->Player,dest)))) {
 		dest->Blink=4;
-		SendCommandResource(unit,dest,flush);
+		SendCommandRepair(unit,x,y,dest,flush);
 		continue;
 	    }
 	    //  Follow another unit
@@ -415,10 +367,10 @@ global void DoRightButton(int sx,int sy)
                 SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	        continue;
             }
-            if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {
+            if( UnitUnderCursor && (dest=ResourceOnMap(x,y,GoldCost)) ) {
 	        dest->Blink=4;
                 DebugLevel3("RALY POINT TO GOLD-MINE\n");
-	        SendCommandMineGold(Selected[i],dest,!(KeyModifiers&ModifierShift));
+	        SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	        continue;
 	    }
 	    if( IsMapFieldExplored(unit->Player,x,y) && ForestOnMap(x,y) ) {
@@ -1049,7 +1001,7 @@ local void SendHarvest(int x,int y)
 	if( UnitUnderCursor && (dest=ResourceOnMap(x,y,GoldCost)) ) {
 	    dest->Blink=4;
 	    DebugLevel3("GOLD-MINE\n");
-	    SendCommandMineGold(Selected[i],dest,!(KeyModifiers&ModifierShift));
+	    SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
 	SendCommandHarvest(Selected[i],x,y,!(KeyModifiers&ModifierShift));
