@@ -603,6 +603,10 @@ local SCM CclAiForce(SCM list)
 	count=gh_scm2int(gh_car(list));
 	list=gh_cdr(list);
 
+	if( !type ) {			// bulletproof
+	    continue;
+	}
+
 	//
 	//	Look if already in force.
 	//
