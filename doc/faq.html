@@ -44,35 +44,6 @@ For any questions not mentioned here, please visit
     A: Yes, if you compiled SDL with alsa support and you compiled stratagus
     using SDL video mode.<p>
 
-    <b>Q: Does Stratagus work with the W*rcr*ft 2 BNE version?</b><br>
-    A: No. The file format of this version is currently not supported.<p>
-
-
-    <b>Q: What W*rcr*ft 2 CD's do work with Stratagus?</b><br>
-    A: If you have any trouble with extracting, please contact us. 
-    Also if you have a CD not listed here, please send us the test results.
-
-	<ul>
-	    <li>US Expansion (both MAC/DOS)
-	    <li>US Original (both MAC/DOS)
-	    <li>UK/Australian Original
-	    <li>UK/Australian Expansion
-	    <li>German Original
-	    <li>German Expansion
-	    <li>Spanish Original
-	</ul><p>
-
-    <b>Q: Can I use Stratagus to join in a W*rcr*ft 2 network game?</b><br>
-    A: Sorry, Stratagus use its own network protocol. 
-    The protocol needs the exact same code executed on all machines, 
-    and it is not possible to have this with the original WC2, 
-    therefore you can only connect to a Stratagus server.<p>
-
-    <b>Q: What about other RTS games?</b><br>
-    A: St*rcr*ft and W*rcr*ft 1 support is in development. T*ber*an Sun 
-    may be added in the distant future. For the old C&amp;C games, you can 
-    use freecnc.<p>
-
     <b>Q: What ports does the Stratagus network protocol use?</b><br>
     A: 6660 by default, you may start stratagus with '-Pxxxx' flag to 
     use port xxxx instead.<p>
@@ -85,6 +56,12 @@ For any questions not mentioned here, please visit
     A: Install Stratagus to the C: drive. This has solved the problem for
     everybody who has had this bug.<p>
 
+	<b>Q: Stratagus runs really slow in large resolutions, what can I do?</b><br>
+	A: Versions of Stratagus from 2.1 update the screen every frame, and are
+	designed to be used with OpenGL support.  Using Software/SDL to update
+	large screens is too slow and will cause the game to be slow. Use
+	OpenGL if possible, or play in 640x480.<p>
+	
     <b>Q: I have installed the windows version, when I start Stratagus I get
     only the splash screen and the game stops, but consumes 100% CPU. What
     have I done wrong?</b><br>

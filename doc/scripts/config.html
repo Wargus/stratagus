@@ -49,6 +49,13 @@
 <hr>
 <a href="#AStar">AStar</a>
 <a href="#DecorationOnTop">DecorationOnTop</a>
+<a href="#+DefineDefaultIncomes">DefineDefaultIncomes</a>
+<a href="#+DefineDefaultResourceAmounts">DefineDefaultResourceAmounts</a>
+<a href="#+DefineDefaultResourceNames">DefineDefaultResourceNames</a>
+<a href="#+DefineDefaultResources">DefineDefaultResources</a>
+<a href="#+DefineDefaultResourcesHigh">DefineDefaultResourcesHigh</a>
+<a href="#+DefineDefaultResourcesLow">DefineDefaultResourcesLow</a>
+<a href="#+DefineDefaultResourcesMedium">DefineDefaultResourcesMedium</a>
 <a href="#HealthSprite">HealthSprite</a>
 <a href="#ManaSprite">ManaSprite</a>
 <a href="#RevealMap">RevealMap</a>
@@ -169,6 +176,44 @@ AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "u
 <h3>DecorationOnTop()</h3>
 
 Show bars and dots always on top.
+
+<a name="DefineDefaultIncomes"></a>
+<h3>DefineDefaultIncomes([number, number, ...])</h3>
+
+Defines the amount of resource to pickup by default when harvesting/collecting.
+When collecting gold for example you get 100 gold for a single pickup.
+
+<dl>
+<dt>number</dt>
+<dd>The amount of resource to collect by default per pickup.
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Define 7 default incomes
+	-- Resources "time", "gold", "wood", "oil", "ore", "stone", "coal"
+    DefineDefaultIncomes(0, 100, 100, 100, 100, 100, 100)
+</pre>
+
+<a name="DefineDefaultResourceAmounts"></a>
+<h3>DefineDefaultResourceAmounts()</h3>
+
+
+<a name="DefineDefaultResourceNames"></a>
+<h3>DefineDefaultResourceNames()</h3>
+<a name="DefineDefaultResources"></a>
+<h3>DefineDefaultResources()</h3>
+<a name="DefineDefaultResourcesHigh"></a>
+<h3>DefineDefaultResourcesHigh()</h3>
+<a name="DefineDefaultResourcesLow"></a>
+<h3>DefineDefaultResourcesLow()</h3>
+<a name="DefineDefaultResourcesMedium"></a>
+<h3>DefineDefaultResourcesMedium()</h3>
+
+
 
 <a name="HealthSprite"></a>
 <h3>HealthSprite(file, hotx, hoty, width, height)</h3>
