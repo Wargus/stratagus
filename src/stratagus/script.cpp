@@ -229,8 +229,7 @@ local int CclLoad(lua_State* l)
 	}
 	LibraryFileName(LuaToString(l, 1), buf);
 	if (LuaLoadFile(buf) == -1) {
-		lua_pushfstring(l, "Load failed: %s", LuaToString(l, 1));
-		lua_error(l);
+		DebugLevel0Fn("Load failed: %s" _C_ LuaToString(l, 1));
 	}
 	return 0;
 }
