@@ -65,7 +65,7 @@ local ccl_smob_type_t SiodUnitTypeTag;		/// siod unit-type object
 #elif defined(USE_LUA)
 #endif
 
-global char **BoolFlagName = NULL;	/// Name of user defined flag
+global char** BoolFlagName = NULL;	/// Name of user defined flag
 global int NumberBoolFlag = 0;		/// Number of defined flags.
 
 /*----------------------------------------------------------------------------
@@ -97,11 +97,7 @@ global unsigned CclGetResourceByName(lua_State* l)
     int i;
     const char* value;
 
-    if (!lua_isstring(l, -1)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-    value = lua_tostring(l, -1);
+    value = LuaToString(l, -1);
     for (i = 0; i < MaxCosts; ++i) {
 	if (!strcmp(value, DefaultResourceNames[i])) {
 	    return i;
@@ -705,7 +701,7 @@ local SCM CclDefineUnitType(SCM list)
     if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
 	printf("Unit-type `%s': right-attack is set, but can-attack is not\n", type->Name);
 	// ugly way to show the line number
-	errl("", SCM_UNSPECIFIED); 
+	errl("", SCM_UNSPECIFIED);
     }
 
     return SCM_UNSPECIFIED;
@@ -730,11 +726,7 @@ local int CclDefineUnitType(lua_State* l)
     j = 0;
 
     //	Slot identifier
-    if (!lua_isstring(l, j + 1)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-    str = strdup(lua_tostring(l, j + 1));
+    str = strdup(LuaToString(l, j + 1));
     ++j;
 
 #ifdef DEBUG
@@ -770,30 +762,18 @@ local int CclDefineUnitType(lua_State* l)
     //	Parse the list:	(still everything could be changed!)
     //
     for (; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, j + 1);
+	value = LuaToString(l, j + 1);
 	++j;
 	if (!strcmp(value, "name")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
 	    if (redefine) {
 		free(type->Name);
 	    }
-	    type->Name = strdup(lua_tostring(l, j + 1));
+	    type->Name = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "use")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
 	    if (redefine) {
 		free(type->SameSprite);
 	    }
-	    type->SameSprite = strdup(lua_tostring(l, j + 1));
+	    type->SameSprite = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "files")) {
 	    if (!lua_istable(l, j + 1)) {
 		lua_pushstring(l, "incorrect argument");
@@ -802,11 +782,7 @@ local int CclDefineUnitType(lua_State* l)
 	    subargs = luaL_getn(l, j + 1);
 	    for (k = 0; k < subargs; ++k) {
 		lua_rawgeti(l, j + 1, k + 1);
-		if (!lua_isstring(l, -1)) {
-		    lua_pushstring(l, "incorrect argument");
-		    lua_error(l);
-		}
-		value = lua_tostring(l, -1);
+		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++k;
 
@@ -829,11 +805,7 @@ local int CclDefineUnitType(lua_State* l)
 		    free(type->File[i]);
 		}
 		lua_rawgeti(l, j + 1, k + 1);
-		if (!lua_isstring(l, -1)) {
-		    lua_pushstring(l, "incorrect argument");
-		    lua_error(l);
-		}
-		type->File[i] = strdup(lua_tostring(l, -1));
+		type->File[i] = strdup(LuaToString(l, -1));
 		lua_pop(l, 1);
 	    }
 	} else if (!strcmp(value, "shadow")) {
@@ -868,34 +840,18 @@ local int CclDefineUnitType(lua_State* l)
 		lua_error(l);
 	    }
 	    lua_rawgeti(l, j + 1, 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Width = lua_tonumber(l, -1);
+	    type->Width = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, j + 1, 2);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Height = lua_tonumber(l, -1);
+	    type->Height = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "animations")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Animations = AnimationsByIdent(lua_tostring(l, j + 1));
+	    type->Animations = AnimationsByIdent(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "icon")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
 	    if (redefine) {
 		free(type->Icon.Name);
 	    }
-	    type->Icon.Name = strdup(lua_tostring(l, j + 1));
+	    type->Icon.Name = strdup(LuaToString(l, j + 1));
 	    type->Icon.Icon = NULL;
 	} else if (!strcmp(value, "costs")) {
 #if 0
@@ -921,85 +877,37 @@ local int CclDefineUnitType(lua_State* l)
 	    }
 #endif
 	} else if (!strcmp(value, "construction")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
 	    // FIXME: What if constructions aren't yet loaded?
-	    type->Construction = ConstructionByIdent(lua_tostring(l, j + 1));
+	    type->Construction = ConstructionByIdent(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "speed")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_Speed = lua_tonumber(l, j + 1);
+	    type->_Speed = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "draw-level")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->DrawLevel = lua_tonumber(l, j + 1);
+	    type->DrawLevel = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "max-on-board")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->MaxOnBoard = lua_tonumber(l, j + 1);
+	    type->MaxOnBoard = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "hit-points")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_HitPoints = lua_tonumber(l, j + 1);
+	    type->_HitPoints = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "regeneration-rate")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_RegenerationRate = lua_tonumber(l, j + 1);
+	    type->_RegenerationRate = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "burn-percent")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->BurnPercent = lua_tonumber(l, j + 1);
+	    type->BurnPercent = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "burn-damage-rate")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->BurnDamageRate = lua_tonumber(l, j + 1);
+	    type->BurnDamageRate = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "max-mana")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_MaxMana = lua_tonumber(l, j + 1);
+	    type->_MaxMana = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "tile-size")) {
 	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
 	    lua_rawgeti(l, j + 1, 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->TileWidth = lua_tonumber(l, -1);
+	    type->TileWidth = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, j + 1, 2);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->TileHeight = lua_tonumber(l, -1);
+	    type->TileHeight = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "must-build-on-top")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    value = lua_tostring(l, j + 1);
+	    value = LuaToString(l, j + 1);
 	    auxtype = UnitTypeByIdent(value);
 	    if (!auxtype) {
 		DebugLevel0("Build on top of undefined unit \"%s\".\n" _C_ str);
@@ -1029,119 +937,47 @@ local int CclDefineUnitType(lua_State* l)
 		lua_error(l);
 	    }
 	    lua_rawgeti(l, j + 1, 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->BoxWidth = lua_tonumber(l, -1);
+	    type->BoxWidth = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, j + 1, 2);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->BoxHeight = lua_tonumber(l, -1);
+	    type->BoxHeight = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "num-directions")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->NumDirections = lua_tonumber(l, j + 1);
+	    type->NumDirections = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "revealer")) {
 	    type->Revealer = 1;
 	    --j;
 	} else if (!strcmp(value, "sight-range")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_SightRange = lua_tonumber(l, j + 1);
+	    type->_SightRange = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "computer-reaction-range")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->ReactRangeComputer = lua_tonumber(l, j + 1);
+	    type->ReactRangeComputer = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "person-reaction-range")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->ReactRangePerson = lua_tonumber(l, j + 1);
+	    type->ReactRangePerson = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "armor")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_Armor = lua_tonumber(l, j + 1);
+	    type->_Armor = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "basic-damage")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_BasicDamage = lua_tonumber(l, j + 1);
+	    type->_BasicDamage = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "piercing-damage")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_PiercingDamage = lua_tonumber(l, j + 1);
+	    type->_PiercingDamage = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "missile")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Missile.Name = strdup(lua_tostring(l, j + 1));
+	    type->Missile.Name = strdup(LuaToString(l, j + 1));
 	    type->Missile.Missile = NULL;
 	} else if (!strcmp(value, "min-attack-range")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->MinAttackRange = lua_tonumber(l, j + 1);
+	    type->MinAttackRange = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "max-attack-range")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->_AttackRange = lua_tonumber(l, j + 1);
+	    type->_AttackRange = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "priority")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Priority = lua_tonumber(l, j + 1);
+	    type->Priority = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "annoy-computer-factor")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->AnnoyComputerFactor = lua_tonumber(l, j + 1);
+	    type->AnnoyComputerFactor = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "decay-rate")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->DecayRate = lua_tonumber(l, j + 1);
+	    type->DecayRate = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "points")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Points = lua_tonumber(l, j + 1);
+	    type->Points = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "demand")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Demand = lua_tonumber(l, j + 1);
+	    type->Demand = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "supply")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->Supply = lua_tonumber(l, j + 1);
+	    type->Supply = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "corpse")) {
 #if 0
 	    sublist = gh_car(list);
@@ -1154,12 +990,8 @@ local int CclDefineUnitType(lua_State* l)
 	    type->CorpseScript = gh_scm2int(gh_cadr(sublist));
 #endif
 	} else if (!strcmp(value, "explode-when-killed")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
 	    type->ExplodeWhenKilled = 1;
-	    type->Explosion.Name = strdup(lua_tostring(l, j + 1));
+	    type->Explosion.Name = strdup(LuaToString(l, j + 1));
 	    type->Explosion.Missile = NULL;
 	} else if (!strcmp(value, "type-land")) {
 	    type->UnitType = UnitTypeLand;
@@ -1197,17 +1029,9 @@ local int CclDefineUnitType(lua_State* l)
 	    type->CanAttack = 1;
 	    --j;
 	} else if (!strcmp(value, "repair-range")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->RepairRange = lua_tonumber(l, j + 1);
+	    type->RepairRange = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "repair-hp")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->RepairHP = lua_tonumber(l, j + 1);
+	    type->RepairHP = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "repair-costs")) {
 #if 0
 	    sublist = gh_car(list);
@@ -1242,11 +1066,7 @@ local int CclDefineUnitType(lua_State* l)
 	    type->BuilderLost = 1;
 	    --j;
 	} else if (!strcmp(value, "auto-build-rate")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->AutoBuildRate = lua_tonumber(l, j + 1);
+	    type->AutoBuildRate = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "shore-building")) {
 	    type->ShoreBuilding = 1;
 	    --j;
@@ -1260,17 +1080,9 @@ local int CclDefineUnitType(lua_State* l)
 	    type->SeaUnit = 1;
 	    --j;
 	} else if (!strcmp(value, "random-movement-probability")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->RandomMovementProbability = lua_tonumber(l, j + 1);
+	    type->RandomMovementProbability = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "clicks-to-explode")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->ClicksToExplode = lua_tonumber(l, j + 1);
+	    type->ClicksToExplode = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "permanent-cloak")) {
 	    type->PermanentCloak = 1;
 	    --j;
@@ -1338,11 +1150,7 @@ local int CclDefineUnitType(lua_State* l)
 	    type->GivesResource = CclGetResourceByName(l);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-workers")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    type->MaxWorkers = lua_tonumber(l, j + 1);
+	    type->MaxWorkers = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "can-harvest")) {
 	    type->CanHarvest = 1;
 	    --j;
@@ -1507,7 +1315,7 @@ local int CclDefineUnitType(lua_State* l)
 		    break;
 		}
 	    }
-            if (i != NumberBoolFlag) {
+	    if (i != NumberBoolFlag) {
 		continue;
 	    }
 	    // FIXME: this leaves a half initialized unit-type
@@ -1546,7 +1354,7 @@ local SCM CclDefineUnitStats(SCM list)
 
     type = UnitTypeByIdent(str = gh_scm2newstr(gh_car(list), NULL));
     DebugCheck(!type);
-    
+
     free(str);
     list = gh_cdr(list);
     i = gh_scm2int(gh_car(list));
@@ -1634,15 +1442,15 @@ global UnitType* CclGetUnitType(SCM ptr)
 
     // Be kind allow also strings or symbols
     if ((str = CclConvertToString(ptr)) != NULL)  {
-        DebugLevel3("CclGetUnitType: %s\n"_C_ str);
-        type = UnitTypeByIdent(str);
-        free(str);
-        return type;
+	DebugLevel3("CclGetUnitType: %s\n"_C_ str);
+	type = UnitTypeByIdent(str);
+	free(str);
+	return type;
     } else if (CclGetSmobType(ptr) == SiodUnitTypeTag)  {
-        return CclGetSmobData(ptr);
+	return CclGetSmobData(ptr);
     } else {
-        errl("CclGetUnitType: not an unit-type", ptr);
-        return 0;
+	errl("CclGetUnitType: not an unit-type", ptr);
+	return 0;
     }
 }
 #elif defined(USE_LUA)
@@ -1664,13 +1472,13 @@ local void CclUnitTypePrin1(SCM ptr, struct gen_printio* f)
     type = CclGetUnitType(ptr);
 
     if (type) {
-        if (type->Ident) {
-            sprintf(buf, "#<UnitType %p '%s'>", type, type->Ident);
-        } else {
-            sprintf(buf, "#<UnitType %p '(null)'>", type);
-        }
+	if (type->Ident) {
+	    sprintf(buf, "#<UnitType %p '%s'>", type, type->Ident);
+	} else {
+	    sprintf(buf, "#<UnitType %p '(null)'>", type);
+	}
     } else {
-        sprintf(buf, "#<UnitType NULL>");
+	sprintf(buf, "#<UnitType NULL>");
     }
 
     gput_st(f,buf);
@@ -1691,16 +1499,16 @@ local SCM CclUnitType(SCM ident)
 {
     char* str;
     UnitType* type;
-    
+
     str = CclConvertToString(ident);
     if (str) {
-        type = UnitTypeByIdent(str);
-        printf("CclUnitType: '%s' -> '%ld'\n", str, (long)type);
-        free(str);
-        return CclMakeSmobObj(SiodUnitTypeTag, type);
+	type = UnitTypeByIdent(str);
+	printf("CclUnitType: '%s' -> '%ld'\n", str, (long)type);
+	free(str);
+	return CclMakeSmobObj(SiodUnitTypeTag, type);
     } else {
-        errl("CclUnitType: no unittype by ident: ", ident);
-        return SCM_BOOL_F;
+	errl("CclUnitType: no unittype by ident: ", ident);
+	return SCM_BOOL_F;
     }
 }
 #elif defined(USE_LUA)
@@ -1721,8 +1529,8 @@ local SCM CclUnitTypeArray(void)
     array = cons_array(gh_int2scm(UnitTypeMax), NIL);
 
     for (i = 0; i < UnitTypeMax; ++i) {
-      value = CclMakeSmobObj(SiodUnitTypeTag, &UnitTypes[i]);
-      gh_vector_set_x(array, gh_int2scm(i), value);
+	value = CclMakeSmobObj(SiodUnitTypeTag, &UnitTypes[i]);
+	gh_vector_set_x(array, gh_int2scm(i), value);
     }
     return array;
 }
@@ -1900,11 +1708,7 @@ local int CclDefineUnitTypeWcNames(lua_State* l)
     }
 
     for (j = 0; j < i; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
@@ -2037,27 +1841,15 @@ local int CclDefineAnimations(lua_State* l)
     j = 0;
 
     resource = NULL;
-    if (!lua_isstring(l, j + 1)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-    str = lua_tostring(l, j + 1);
+    str = LuaToString(l, j + 1);
     ++j;
     anims = calloc(1, sizeof(Animations));
 
     for (; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	id = lua_tostring(l, j + 1);
+	id = LuaToString(l, j + 1);
 	++j;
 	if (!strcmp(id, "harvest")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    resource = lua_tostring(l, j + 1);
+	    resource = LuaToString(l, j + 1);
 	    ++j;
 	}
 
@@ -2075,32 +1867,16 @@ local int CclDefineAnimations(lua_State* l)
 		lua_error(l);
 	    }
 	    lua_rawgeti(l, -1, 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    t->Flags = lua_tonumber(l, -1);
+	    t->Flags = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, -1, 2);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    t->Pixel = lua_tonumber(l, -1);
+	    t->Pixel = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, -1, 3);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    t->Sleep = lua_tonumber(l, -1);
+	    t->Sleep = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    lua_rawgeti(l, -1, 4);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    i = lua_tonumber(l, -1);
+	    i = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	    t->Frame = i - frame;
 	    frame = i;
@@ -2176,22 +1952,22 @@ local SCM CclDefineBoolFlags(SCM list)
     int i;
 
     if (NumberBoolFlag != 0) {
-        DebugLevel0("Warning, Redefine Bool flags\n");
+	DebugLevel0("Warning, Redefine Bool flags\n");
     }
     while (!gh_null_p(list)) {
-        str = gh_scm2newstr(gh_car(list), NULL);
-        list = gh_cdr(list);
-        for (i = 0; i < NumberBoolFlag; ++i) {
-            if (!strcmp(str, BoolFlagName[i])) {
-                DebugLevel0("Warning, Bool flags already defined\n");
-                break;
-            }
+	str = gh_scm2newstr(gh_car(list), NULL);
+	list = gh_cdr(list);
+	for (i = 0; i < NumberBoolFlag; ++i) {
+	    if (!strcmp(str, BoolFlagName[i])) {
+		DebugLevel0("Warning, Bool flags already defined\n");
+		break;
+	    }
 	}
-        if (i != NumberBoolFlag) {
-            break;
+	if (i != NumberBoolFlag) {
+	    break;
 	}
-        BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof(*BoolFlagName));
-        BoolFlagName[NumberBoolFlag++] = str;
+	BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof(*BoolFlagName));
+	BoolFlagName[NumberBoolFlag++] = str;
     }
     return SCM_UNSPECIFIED;
 }
@@ -2204,26 +1980,22 @@ local int CclDefineBoolFlags(lua_State* l)
     int j;
 
     if (NumberBoolFlag != 0) {
-        DebugLevel0("Warning, Redefine Bool flags\n");
+	DebugLevel0("Warning, Redefine Bool flags\n");
     }
     args = lua_gettop(l);
     for (j = 0; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
+	str = strdup(LuaToString(l, j + 1));
+	for (i = 0; i < NumberBoolFlag; ++i) {
+	    if (!strcmp(str, BoolFlagName[i])) {
+		DebugLevel0("Warning, Bool flags already defined\n");
+		break;
+	    }
 	}
-        str = strdup(lua_tostring(l, j + 1));
-        for (i = 0; i < NumberBoolFlag; ++i) {
-            if (!strcmp(str, BoolFlagName[i])) {
-                DebugLevel0("Warning, Bool flags already defined\n");
-                break;
-            }
+	if (i != NumberBoolFlag) {
+	    break;
 	}
-        if (i != NumberBoolFlag) {
-            break;
-	}
-        BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof(*BoolFlagName));
-        BoolFlagName[NumberBoolFlag++] = str;
+	BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof(*BoolFlagName));
+	BoolFlagName[NumberBoolFlag++] = str;
     }
     return 0;
 }
@@ -2245,7 +2017,7 @@ global void UnitTypeCclRegister(void)
 
 #ifndef USE_GUILE
     set_print_hooks(SiodUnitTypeTag, CclUnitTypePrin1);
-#endif 
+#endif
 
     gh_new_procedure1_0("unit-type", CclUnitType);
     gh_new_procedure0_0("unit-type-array", CclUnitTypeArray);
