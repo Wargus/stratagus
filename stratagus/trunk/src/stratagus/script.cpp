@@ -234,7 +234,7 @@ static int CclLoad(lua_State* l)
 	}
 	LibraryFileName(LuaToString(l, 1), buf);
 	if (LuaLoadFile(buf) == -1) {
-		DebugPrint("Load failed: %s" _C_ LuaToString(l, 1));
+		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
 	}
 	return 0;
 }
@@ -265,7 +265,7 @@ static int CclSaveGame(lua_State* l)
 				strcat(buf, "/");
 				strcat(buf, LuaToString(l, -1));
 				if (LuaLoadFile(buf) == -1) {
-					DebugPrint("Load failed: %s" _C_ value);
+					DebugPrint("Load failed: %s\n" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "SyncHash")) {

@@ -69,26 +69,6 @@ static hashtable(int, 61) SoundIdHash;
 ----------------------------------------------------------------------------*/
 
 /**
-** Display the sound name hash table.
-*/
-void DisplaySoundHashTable(void)
-{
-	struct hash_st st;
-
-	fprintf(stdout,"Sound HashTable Begin\n");
-	PrintFunction();
-	fprintf(stdout,"FIXME: not written\n");
-	fprintf(stdout,"Sound HashTable End\n");
-
-	hash_stat(SoundIdHash, &st);
-	printf("nelem   : %d\n", st.nelem);
-	printf("hashsize: %d\n", st.hashsize);
-	printf("maxdepth: %d\n", st.maxdepth);
-	printf("middepth: %d.%03d\n", st.middepth / 1000, st.middepth % 1000);
-
-}
-
-/**
 ** Add a new mapping (sound name to sound id) in the hash table
 ** Create a new mapping between a name and an already valid sound id.
 **

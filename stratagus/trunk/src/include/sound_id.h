@@ -62,8 +62,6 @@ extern void MapSound(const char* sound_name, const SoundId id);
 	/// Make a sound group bound to identifier
 extern SoundId MakeSoundGroup(const char* name, SoundId first,
 	SoundId second);
-	/// Helper function, displays the mapping between sound names and sound ids
-extern void DisplaySoundHashTable(void);
 
 //@}
 
