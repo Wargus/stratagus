@@ -2532,6 +2532,7 @@ local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
+		TheUI.MouseScroll = 1;
 		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing mouse speed by 10");
@@ -2581,6 +2582,7 @@ local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
+		TheUI.KeyScroll = 1;
 		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing keyboard speed by 10");
