@@ -246,46 +246,45 @@ local SCM CclDisplaySounds(void) {
 **	Glue between c and scheme. Allows to specify some global game sounds
 **	in a ccl file.
 */
-local SCM CclDefineGameSounds(SCM list) {
+local SCM CclDefineGameSounds(SCM list)
+{
     //based on Johns CclGameMap function
     //FIXME: need much more error checking and handling
     //FIXME: should allow to define ALL the game sounds
     SCM name;
     SCM data;
+    char* str;
 
     while( !gh_null_p(list) ) {
 
 	name=gh_car(list);
+	list=gh_cdr(list);
 	if( !gh_symbol_p(name) ) {
-	    fprintf(stderr,"symbol expected\n");
+	    fprintf(stderr,__FUNCTION__": symbol expected\n");
 	    return list;
 	}
-	list=gh_cdr(list);
 	data=gh_car(list);
+	list=gh_cdr(list);
 	if (! CCL_SOUNDP(data) ) {
 	    fprintf(stderr,"Sound id expected\n");
 	    return list;
 	}
 	// prepare for next iteration
-	list=gh_cdr(list);
 	// let's handle now the different cases
 	if( gh_eq_p(name,gh_symbol2scm("click")) ) {
 	    GameSounds.Click.Sound=CCL_SOUND_ID(data);
-	    DebugLevel3("SoundClick %p\n",GameSounds.Click.Sound);
 	} else if ( gh_eq_p(name,gh_symbol2scm("placement-error")) ) {
 	    GameSounds.PlacementError.Sound=CCL_SOUND_ID(data);
-	    DebugLevel3("SoundPlacementError %p\n",
-		    GameSounds.PlacementError.Sound);
 	} else if ( gh_eq_p(name,gh_symbol2scm("placement-success")) ) {
 	    GameSounds.PlacementSuccess.Sound=CCL_SOUND_ID(data);
-	    DebugLevel3("SoundPlacementSuccess %p\n",
-		    GameSounds.PlacementSuccess.Sound);
 	} else if ( gh_eq_p(name,gh_symbol2scm("human-rescue")) ) {
 	    GameSounds.HumanRescue.Sound=CCL_SOUND_ID(data);
 	} else if ( gh_eq_p(name,gh_symbol2scm("orc-rescue")) ) {
 	    GameSounds.OrcRescue.Sound=CCL_SOUND_ID(data);
 	} else {
-	    fprintf(stderr,"Incorrect symbol %s\n",gh_scm2newstr(name,NULL));
+	    fprintf(stderr,"Incorrect symbol %s\n",
+		    str=gh_scm2newstr(name,NULL));
+	    free(str);
 	    return list;
 	}
     }
