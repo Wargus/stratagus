@@ -801,23 +801,27 @@ global void LoadPud(const char* pud,WorldMap* map)
 		int t;
 
 		t=PudReadWord(input);
-		switch( t ) {
-		    case TilesetSummer:
-			DebugLevel3("\tTerrain: SUMMER\n");
-			break;
-		    case TilesetWinter:
-			DebugLevel3("\tTerrain: WINTER\n");
-			break;
-		    case TilesetWasteland:
-			DebugLevel3("\tTerrain: WASTELAND\n");
-			break;
-		    case TilesetSwamp:
-			DebugLevel3("\tTerrain: SWAMP\n");
-			break;
-		    default:
-			DebugLevel1("Unknown terrain %d\n",t);
-			t=TilesetSummer;
-			break;
+		if (GameSettings.Terrain == SettingsPresetMapDefault) {
+		    switch( t ) {
+			case TilesetSummer:
+			    DebugLevel3("\tTerrain: SUMMER\n");
+			    break;
+			case TilesetWinter:
+			    DebugLevel3("\tTerrain: WINTER\n");
+			    break;
+			case TilesetWasteland:
+			    DebugLevel3("\tTerrain: WASTELAND\n");
+			    break;
+			case TilesetSwamp:
+			    DebugLevel3("\tTerrain: SWAMP\n");
+			    break;
+			default:
+			    DebugLevel1("Unknown terrain %d\n",t);
+			    t=TilesetSummer;
+			    break;
+		    }
+		} else {
+		    t = GameSettings.Terrain;
 		}
 		map->Terrain=t;
 		continue;
