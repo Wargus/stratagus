@@ -303,6 +303,17 @@ local void UiEnterMenu(void)
     ProcessMenu(MENU_GAME, 0);
 }
 
+local void UiEnterHelpMenu(void)
+{
+    GamePaused=1;
+    ProcessMenu(MENU_HELP, 1);
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
 /**
 **	Enter Options menu
 */
@@ -603,6 +614,9 @@ local int CommandKey(int key)
 	    break;
 
 	case KeyCodeF1:
+	    UiEnterHelpMenu();
+	    break;
+
 	case KeyCodeF2:
 	case KeyCodeF3:
 	case KeyCodeF4:			// Set/Goto place
