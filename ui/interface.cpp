@@ -1202,6 +1202,67 @@ global void HandleKeyRepeat(unsigned key __attribute__((unused)),
 }
 
 /**
+**	Handle the mouse in scroll area
+**
+**	@param x	Screen X position.
+**	@param y	Screen Y position.
+**
+**	@return		1 if the mouse is in the scroll area, 0 otherwise
+*/
+global int HandleMouseScrollArea(int x,int y)
+{
+    //	FIXME: perhaps I should change the complete scroll handling.
+    //	FIXME: show scrolling cursor only, if scrolling is possible
+    //	FIXME: scrolling with edge resistance
+    if( x<SCROLL_LEFT ) {
+	CursorOn=CursorOnScrollLeft;
+	MouseScrollState = ScrollLeft;
+	GameCursor=TheUI.ArrowW.Cursor;
+	if( y<SCROLL_UP ) {
+	    CursorOn=CursorOnScrollLeftUp;
+	    MouseScrollState = ScrollLeftUp;
+	    GameCursor=TheUI.ArrowNW.Cursor;
+	}
+	if( y>SCROLL_DOWN ) {
+	    CursorOn=CursorOnScrollLeftDown;
+	    MouseScrollState = ScrollLeftDown;
+	    GameCursor=TheUI.ArrowSW.Cursor;
+	}
+	return 1;
+    }
+    if( x>SCROLL_RIGHT ) {
+	CursorOn=CursorOnScrollRight;
+	MouseScrollState = ScrollRight;
+	GameCursor=TheUI.ArrowE.Cursor;
+	if( y<SCROLL_UP ) {
+	    CursorOn=CursorOnScrollRightUp;
+	    MouseScrollState = ScrollRightUp;
+	    GameCursor=TheUI.ArrowNE.Cursor;
+	}
+	if( y>SCROLL_DOWN ) {
+	    CursorOn=CursorOnScrollRightDown;
+	    MouseScrollState = ScrollRightDown;
+	    GameCursor=TheUI.ArrowSE.Cursor;
+	}
+	return 1;
+    }
+    if( y<SCROLL_UP ) {
+	CursorOn=CursorOnScrollUp;
+	MouseScrollState = ScrollUp;
+	GameCursor=TheUI.ArrowN.Cursor;
+	return 1;
+    }
+    if( y>SCROLL_DOWN ) {
+	CursorOn=CursorOnScrollDown;
+	MouseScrollState = ScrollDown;
+	GameCursor=TheUI.ArrowS.Cursor;
+	return 1;
+    }
+
+    return 0;
+}
+
+/**
 **	Keep coordinates in window and update cursor position
 **
 **	@param x	screen pixel X position.
