@@ -77,7 +77,7 @@ extern struct {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local char EditorRunning;		/// True editor is running
+global char EditorRunning;		/// True editor is running
 
 local enum _editor_state_ {
     EditorSelecting,			/// Select
