@@ -30,7 +30,7 @@ include $(TOPDIR)/$(RULESFILE)
 
 MODULE  = editor
 
-SRCS	= editloop.c
+SRCS	= editor.c editloop.c edmap.c
 
 OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
