@@ -139,6 +139,7 @@ extern void SdlUnlockScreen(void);		/// Do SDL hardware unlock
 ----------------------------------------------------------------------------*/
 
 global char VideoFullScreen;				/// true fullscreen wanted
+global char VideoForceFullScreen;			/// fullscreen set from commandline
 
 global int ColorCycleAll;				/// Flag Color Cycle with all palettes
 

@@ -240,7 +240,10 @@ local int CclSetVideoFullScreen(lua_State* l)
 	}
 	old = VideoFullScreen;
 	if (CclInConfigFile) {
-		VideoFullScreen = LuaToBoolean(l, 1);
+		// May have been set from the command line
+		if (!VideoForceFullScreen) {
+			VideoFullScreen = LuaToBoolean(l, 1);
+		}
 	}
 
 	lua_pushboolean(l, old);
