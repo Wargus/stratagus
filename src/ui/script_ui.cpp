@@ -312,7 +312,7 @@ local int CclSetTitleScreens(lua_State* l)
 						if (!strcmp(value, "Text")) {
 							TitleScreens[j]->Labels[k]->Text = strdup(LuaToString(l, -1));
 						} else if (!strcmp(value, "Font")) {
-							TitleScreens[j]->Labels[k]->Font = CclFontByIdentifier(LuaToString(l, -1));
+							TitleScreens[j]->Labels[k]->Font = FontByIdent(LuaToString(l, -1));
 						} else if (!strcmp(value, "Pos")) {
 							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 								LuaError(l, "incorrect argument");
@@ -696,7 +696,7 @@ local void CclParseInfoText(lua_State* l, InfoText* text)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "font")) {
 			lua_rawgeti(l, -1, j + 1);
-			text->Font = CclFontByIdentifier(LuaToString(l, -1));
+			text->Font = FontByIdent(LuaToString(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "pos")) {
 			lua_rawgeti(l, -1, j + 1);
@@ -1884,7 +1884,7 @@ local int CclDefineUI(lua_State* l)
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "font")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					ui->StatusLineFont = CclFontByIdentifier(LuaToString(l, -1));
+					ui->StatusLineFont = FontByIdent(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2519,7 +2519,7 @@ local int CclDefineMenuItem(lua_State* l)
 				}
 			}
 		} else if (!strcmp(value, "font")) {
-			item->font = CclFontByIdentifier(LuaToString(l, j + 1));
+			item->font = FontByIdent(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "init")) {
 			if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
 				LuaError(l, "incorrect argument");

@@ -103,6 +103,7 @@ typedef struct _color_font_ {
 
 /**
 **  Font selector for the font functions.
+**  FIXME: should be removed
 */
 enum _game_font_ {
 	SmallFont,       /// Small font used in stats
@@ -110,14 +111,9 @@ enum _game_font_ {
 	LargeFont,       /// Large font used in menus
 	SmallTitleFont,  /// Small font used in episoden titles
 	LargeTitleFont,  /// Large font used in episoden titles
-	User1Font,       /// User font 1
-	User2Font,       /// User font 2
-	User3Font,       /// User font 3
-	User4Font,       /// User font 4
-	User5Font,       /// User font 5
-	// ... more to come or not
-	MaxFonts,        /// Number of fonts supported
 };
+
+#define MaxFonts 10  /// Number of fonts supported
 
 /**
 **  Color selector for the font functions.
@@ -177,8 +173,10 @@ extern void FontsCclRegister(void);
 extern void CleanFonts(void);
 	/// Check if font is loaded
 extern int IsFontLoaded(unsigned font);
-	/// Font symbol to id
-extern int CclFontByIdentifier(const char* type);
+	/// Find font by identifier
+extern int FontByIdent(const char* ident);
+	// Find the name of a font.
+extern const char* FontName(int font);
 
 //@}
 
