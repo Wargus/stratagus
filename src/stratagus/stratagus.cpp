@@ -1232,6 +1232,8 @@ Use it at your own risk.\n\n");
 **	Exit clone.
 **
 **	Called from ALT-'X' key or exit game menus.
+**
+**	@param err	Error code to parse to shell.
 */
 global volatile void Exit(int err)
 {
@@ -1269,11 +1271,16 @@ global volatile void Exit(int err)
     exit(err);
 }
 
+/**
+**	Do a fatal exit.
+**
+**	Called on out of memory or crash.
+**
+**	@param err	Error code to parse to shell.
+*/
 global volatile void ExitFatal(int err)
 {
-#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     QuitCD();
-#endif
     exit(err);
 }
 
