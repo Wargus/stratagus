@@ -530,7 +530,6 @@ local void WaitForInput(int timeout)
 	callbacks.KeyReleased = WaitCallbackKey3;
 	callbacks.KeyRepeated = WaitCallbackKey4;
 	callbacks.NetworkEvent = NetworkEvent;
-	callbacks.SoundReady = WriteSound;
 
 	WaitNoEvent = 1;
 	timeout *= CYCLES_PER_SECOND;
@@ -645,11 +644,10 @@ global void MenuLoop(char* filename, WorldMap* map)
 				StopMusic();
 			}
 			PlaySectionMusic(PlaySectionMainMenu);
-#ifdef WITH_SOUND
+
 			if (!PlayingMusic && MenuMusic) {
 				PlayMusic(MenuMusic);
 			}
-#endif
 
 			EnableRedraw = RedrawMenu;
 
@@ -768,13 +766,12 @@ Use it at your own risk.\n\n");
 
 	// Setup video display
 	InitVideo();
-#ifdef WITH_SOUND
+
 	// Setup sound card
 	if (!SoundOff && InitSound()) {
 		SoundOff = 1;
 		SoundFildes = -1;
 	}
-#endif
 
 #ifndef DEBUG           // For debug it's better not to have:
 	srand(time(NULL));  // Random counter = random each start
@@ -912,9 +909,6 @@ global int main(int argc, char** argv)
 	char* p;
 
 	CompileOptions =
-#ifdef USE_THREAD
-		"THREAD "
-#endif
 #ifdef DEBUG
 		"DEBUG "
 #endif
@@ -927,14 +921,8 @@ global int main(int argc, char** argv)
 #ifdef USE_SDL
 		"SDL "
 #endif
-#ifdef USE_SDLA
-		"SDL-AUDIO "
-#endif
 #ifdef USE_SDLCD
 		"SDL-CD "
-#endif
-#ifdef WITH_SOUND
-		"SOUND "
 #endif
 #ifdef USE_LIBCDA
 		"LIBCDA "

@@ -40,8 +40,6 @@
 
 #include "stratagus.h"
 
-#ifdef WITH_SOUND		// {
-
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
@@ -316,7 +314,5 @@ global void MapUnitSounds(void)
 		}
 	}
 }
-
-#endif		// } WITH_SOUND
 
 //@}

@@ -37,8 +37,6 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#if defined(WITH_SOUND)		// {
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -423,7 +421,5 @@ global void PlaySoundFile(const char* name)
 	}
 	PlayGameSound(id, GlobalVolume);
 }
-
-#endif		// } WITH_SOUND
 
 //@}

@@ -64,12 +64,6 @@ extern SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second);
 	/// Helper function, displays the mapping between sound names and sound ids
 extern void DisplaySoundHashTable(void);
 
-#ifndef WITH_SOUND  // {
-
-#define SoundIdForName(n)  NULL ///< Dummy macro for without sound
-
-#endif  // } WITH_SOUND
-
 //@}
 
 #endif  // !__SOUND_ID_H__

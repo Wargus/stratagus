@@ -37,8 +37,6 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#if defined(WITH_SOUND) // {
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -338,7 +336,5 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 
 	return sample;
 }
-
-#endif		// } WITH_SOUND
 
 //@}

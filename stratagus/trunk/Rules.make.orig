@@ -53,7 +53,7 @@ SDLLIB		= $(shell sdl-config --static-libs)
 # Without SDL Sound (only not win32)
 #SDL		= -DUSE_SDL $(SDL_CFLAGS)
 # With SDL Sound
-SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
+SDL		= -DUSE_SDL $(SDL_CFLAGS)
 
 #------------------------------------------------------------------------------
 # Uncomment one of the next for the SDL support.

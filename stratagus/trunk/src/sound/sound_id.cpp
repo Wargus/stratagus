@@ -31,8 +31,6 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#ifdef WITH_SOUND		// {
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -181,7 +179,5 @@ global SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
 
 	return sound;
 }
-
-#endif		// } WITH_SOUND
 
 //@}

@@ -177,13 +177,11 @@ global void InitVideoSdl(void)
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 		if (SDL_Init(
-#ifdef USE_SDLA
-				SDL_INIT_AUDIO |
-#endif
 #ifdef DEBUG
 				SDL_INIT_NOPARACHUTE |
 #endif
-				SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
+				SDL_INIT_AUDIO | SDL_INIT_VIDEO |
+				SDL_INIT_TIMER) < 0 ) {
 			fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 			exit(1);
 		}
@@ -604,14 +602,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	Uint32 ticks;
 	int interrupts;
 
-
-#if defined(WITH_SOUND) && !defined(USE_SDLA)
-	// FIXME: ugly hack, move into sound part!!!
-	if (SoundFildes == -1) {
-		SoundOff = 1;
-	}
-#endif
-
 	if (!++FrameCounter) {
 		// FIXME: tests with frame counter now fails :(
 		// FIXME: Should happen in 68 years :)
@@ -674,18 +664,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 			FD_SET(NetworkFildes, &rfds);
 		}
 
-#ifndef USE_SDLA
-		//
-		//		Sound
-		//
-		if (!SoundOff && !SoundThreadRunning) {
-			if (SoundFildes > maxfd) {
-				maxfd = SoundFildes;
-			}
-			FD_SET(SoundFildes, &wfds);
-		}
-#endif
-
 #if 0
 		s = select(maxfd + 1, &rfds, &wfds, NULL,
 			(i = SDL_PollEvent(event)) ? &tv : NULL);
@@ -706,16 +684,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 		}
 
 		if (s > 0) {
-#ifndef USE_SDLA
-			//
-			//		Sound
-			//
-			if (!SoundOff && !SoundThreadRunning &&
-					FD_ISSET(SoundFildes, &wfds) ) {
-				callbacks->SoundReady();
-			}
-#endif
-
 			//
 			//		Network
 			//
