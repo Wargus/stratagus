@@ -1280,11 +1280,11 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			ToggleFullScreen();
 			break;
 
-		case 's': // ALT s F11 save pud menu
+		case 's': // ALT s F11 save map menu
 		case 'S':
 		case KeyCodeF11:
 			if (EditorSaveMenu() != -1) {
-				SetStatusLine("Pud saved");
+				SetStatusLine("Map saved");
 			}
 			InterfaceState = IfaceStateNormal;
 			break;

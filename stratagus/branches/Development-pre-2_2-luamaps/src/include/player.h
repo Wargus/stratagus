@@ -68,7 +68,7 @@
 **
 **  Player::Type
 **
-**    Type of the player. This field is setup from the level (PUD).
+**    Type of the player. This field is setup from the level (map).
 **    We support currently #PlayerNeutral,
 **    #PlayerNobody, #PlayerComputer, #PlayerPerson,
 **    #PlayerRescuePassive and #PlayerRescueActive.
@@ -84,7 +84,7 @@
 **  Player::Race
 **
 **    Race number of the player. This field is setup from the level
-**    (PUD). This number is mapped with #PlayerRaces to the symbolic
+**    map. This number is mapped with #PlayerRaces to the symbolic
 **    name Player::RaceName.
 **
 **  Player::AiName
@@ -384,7 +384,7 @@ enum PlayerRacesOld {
 #define PlayerRaceNeutral (PlayerRaces.Count-1)
 
 /**
-**  Types for the player (must fit to PUD!)
+**  Types for the player
 **
 **  #PlayerNeutral
 **

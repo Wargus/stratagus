@@ -184,9 +184,6 @@ void CleanPlayers(void)
 	memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 
-	//
-	// Mapping the original race numbers in puds to our internal strings
-	//
 	for (p = 0; p < PlayerRaces.Count; ++p) {
 		free(PlayerRaces.Name[p]);
 		free(PlayerRaces.Display[p]);

@@ -89,7 +89,7 @@ void MapMarkSeenTile(int x, int y)
 	mf->SeenTile = tile;
 
 	// FIXME: this is needed, because tileset is loaded after this function
-	//        is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
+	//        is needed LoadMap, PlaceUnit, ... MapMarkSeenTile
 	if (!TheMap.Tileset) {
 		return;
 	}

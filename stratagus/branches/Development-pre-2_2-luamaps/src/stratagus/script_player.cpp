@@ -883,7 +883,6 @@ static int CclSetPlayerData(lua_State* l)
 	return 0;
 }
 
-extern char** AiTypeWcNames;
 /**
 **  Set ai player algo.
 **

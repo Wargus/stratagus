@@ -3875,7 +3875,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 	// Use lag gem as KICK button
 	//  Notify clients about MAP change: (initial = 1...)
 
-	// Calculate available slots from pudinfo
+	// Calculate available slots from map info
 	for (c = h = i = 0; i < PlayerMax; i++) {
 		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
@@ -4012,7 +4012,7 @@ static void MultiClientUpdate(int initial)
 
 	menu = FindMenu("menu-net-multi-client");
 
-	//  Calculate available slots from pudinfo
+	//  Calculate available slots from map info
 	for (c = h = i = 0; i < PlayerMax; i++) {
 		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
@@ -4107,7 +4107,7 @@ static void MultiGameSetupInit(Menuitem* mi)
 	MultiGameFWSAction(NULL, mi->Menu->Items[27].D.Pulldown.defopt);
 
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
-	// Calculate available slots from pudinfo
+	// Calculate available slots from map info
 	for (h = i = 0; i < PlayerMax; i++) {
 		if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 			h++; // available interactive player slots
@@ -5050,7 +5050,7 @@ static void EditorMapPropertiesMenu(void)
 
 	menu->Items[6].D.Pulldown.defopt = TheMap.Info.MapTerrain;
 
-	// FIXME: Set the correct pud version
+	// FIXME: Remove the version pulldown
 	menu->Items[8].D.Pulldown.defopt = 1;
 	menu->Items[8].Flags = -1;
 
@@ -5101,8 +5101,6 @@ static void EditorMapPropertiesOk(void)
 		LoadIcons();
 		UpdateMinimapTerrain();
 	}
-
-	// FIXME: Save the pud version somewhere
 
 	EditorEndMenu();
 }

@@ -929,7 +929,7 @@ struct _unit_type_ {
 	struct _graphic_* ShadowSprite;          ///< Shadow sprite image
 };
 
-	/// @todo ARI: should be dynamic (lua..), JOHNS: Pud only supports 255.
+	/// @todo ARI: should be dynamic (lua..).
 	/// How many unit-types are currently supported
 #define UnitTypeMax 257
 
