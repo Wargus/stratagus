@@ -1194,6 +1194,7 @@ global void DrawMenu(int menu_id)
     if (menu_id == -1) {
 	return;
     }
+
     menu = Menus + menu_id;
     switch( menu->image ) {
 	case ImagePanel1:
@@ -1283,6 +1284,7 @@ global void DrawMenu(int menu_id)
     if (mip) {
 	DrawPulldown(mip,menu->x,menu->y);
     }
+
     InvalidateArea(menu->x,menu->y,menu->xsize,menu->ysize);
 }
 
@@ -1301,14 +1303,14 @@ local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 	VideoSetPalette(Menusbgnd->Pixels);
     }
 
-    VideoLockScreen();
+    // VideoLockScreen();
 
     // FIXME: bigger window ?
     VideoDrawSubClip(Menusbgnd,0,0,
 	Menusbgnd->Width,Menusbgnd->Height,
 	(VideoWidth-Menusbgnd->Width)/2,(VideoHeight-Menusbgnd->Height)/2);
 
-    VideoUnlockScreen();
+    // VideoUnlockScreen();
 }
 
 /**
@@ -1438,9 +1440,11 @@ local void SinglePlayerGameMenu(void)
 
 local void CampaignGameMenu(void)
 {
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
+
     GuiGameStarted = 0;
     ProcessMenu(MENU_CAMPAIN_SELECT, 1);
     if (GuiGameStarted) {
@@ -1450,9 +1454,11 @@ local void CampaignGameMenu(void)
 
 local void AllianceCampaignMenu(void)
 {
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
+
     // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
     ProcessMenu(MENU_CAMPAIN_CONT, 1);
@@ -1463,8 +1469,9 @@ local void AllianceCampaignMenu(void)
     PlayCampaign("human");
     GuiGameStarted = 1;
 
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
 
     // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
@@ -1473,9 +1480,11 @@ local void AllianceCampaignMenu(void)
 
 local void MysticalCampaignMenu(void)
 {
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
+
     // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
     ProcessMenu(MENU_CAMPAIN_CONT, 1);
@@ -1486,8 +1495,9 @@ local void MysticalCampaignMenu(void)
     PlayCampaign("orc");
     GuiGameStarted = 1;
 
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
 
     // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
@@ -1496,9 +1506,11 @@ local void MysticalCampaignMenu(void)
 
 local void Alliance2CampaignMenu(void)
 {
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
+
     // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
     ProcessMenu(MENU_CAMPAIN_CONT, 1);
@@ -1509,8 +1521,9 @@ local void Alliance2CampaignMenu(void)
     PlayCampaign("human-exp");
     GuiGameStarted = 1;
 
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
 
     // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
@@ -1519,9 +1532,11 @@ local void Alliance2CampaignMenu(void)
 
 local void Mystical2CampaignMenu(void)
 {
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
+
     // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
     ProcessMenu(MENU_CAMPAIN_CONT, 1);
@@ -1532,11 +1547,12 @@ local void Mystical2CampaignMenu(void)
     PlayCampaign("orc-exp");
     GuiGameStarted = 1;
 
-    DestroyCursorBackground();
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
 
-    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
+    // FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
     EndMenu();
 }
 
@@ -3102,13 +3118,17 @@ local void EndMenu(void)
 **
 **	@param menu_id	The menu number to process
 **	@param loop	Indicates to setup handlers and really 'Process'
+**
+**	@todo FIXME: This function is called from the event handler!!
 */
 global void ProcessMenu(int menu_id, int loop)
 {
     int i, oldncr;
     Menu *menu;
     Menuitem *mi;
-    int CurrentMenuSave = -1, MenuButtonUnderCursorSave = -1, MenuButtonCurSelSave = -1;
+    int CurrentMenuSave = -1;
+    int MenuButtonUnderCursorSave = -1;
+    int MenuButtonCurSelSave = -1;
 
     // Recursion protection:
     if (loop) {
@@ -3118,7 +3138,9 @@ global void ProcessMenu(int menu_id, int loop)
     }
 
     InterfaceState = IfaceStateMenu;
+    VideoLockScreen();
     HideAnyCursor();
+    VideoUnlockScreen();
     DestroyCursorBackground();
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
@@ -3173,7 +3195,11 @@ global void ProcessMenu(int menu_id, int loop)
 	MenuHandleMouseMove(CursorX,CursorY);	// This activates buttons as appropriate!
 	MustRedraw |= RedrawCursor;
     }
+
+
+    VideoLockScreen();
     DrawMenu(CurrentMenu);
+    VideoUnlockScreen();
 
     if (loop) {
 	while (CurrentMenu != -1) {

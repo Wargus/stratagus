@@ -812,6 +812,28 @@ global void RealizeVideoMemory(void)
 }
 
 /**
+**	Lock the screen for write access.
+*/
+global void SdlLockScreen(void)
+{
+    SDL_LockSurface(Screen);
+    VideoMemory=Screen->pixels;
+}
+
+/**
+**	Unlock the screen for write access.
+*/
+global void SdlUnlockScreen(void)
+{
+    SDL_UnlockSurface(Screen);
+#ifdef DEBUG
+    VideoMemory=NULL;			// Catch errors!
+#else
+    VideoMemory=Screen->pixels;		// Be kind
+#endif
+}
+
+/**
 **	Toggle grab mouse.
 */
 global void ToggleGrabMouse(void)
@@ -836,7 +858,79 @@ global void ToggleGrabMouse(void)
 */
 global void ToggleFullScreen(void)
 {
+#ifndef USE_WIN32
+    long framesize;
+    void *pixels;
+    SDL_Color *palette;
+    SDL_Rect clip;
+    int ncolors;
+    Uint32 flags;
+    int w;
+    int h;
+    int bpp;
+
+    if ( !Screen ) {			// don't bother if there's no surface.
+	return;
+    }
+
+    flags = Screen->flags;
+    w = Screen->w;
+    h = Screen->h;
+    bpp = Screen->format->BitsPerPixel;
+
+    SDL_GetClipRect(Screen, &clip);
+
+    // save the contents of the screen.
+    framesize = w * h * Screen->format->BytesPerPixel;
+    
+    if ( !(pixels = malloc(framesize)) ) {	// out of memory
+	return;
+    }
+    SDL_LockSurface(Screen);
+    memcpy(pixels, Screen->pixels, framesize);
+
+    IfDebug( palette=NULL; ncolors=0; );	// shut up compiler
+    if ( Screen->format->palette ) {
+	ncolors = Screen->format->palette->ncolors;
+	if ( !(palette = malloc(ncolors * sizeof(SDL_Color))) ) {
+	    free(pixels);
+	    return;
+	}
+	memcpy(palette, Screen->format->palette->colors,
+	    ncolors * sizeof(SDL_Color));
+    }
+    SDL_UnlockSurface(Screen);
+
+    Screen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
+    if( !Screen ) {
+	Screen = SDL_SetVideoMode(w, h, bpp, flags);
+	if ( !Screen ) {		// completely screwed.
+	    free(pixels);
+	    if( Screen->format->palette ) {
+		free(palette);
+	    }
+	    fprintf(stderr,"Toggle to fullscreen, crashed all\n");
+	    Exit(-1);
+	}
+    }
+
+    SDL_LockSurface(Screen);
+    memcpy(Screen->pixels, pixels, framesize);
+    free(pixels);
+
+    if ( Screen->format->palette ) {
+	// !!! FIXME : No idea if that flags param is right.
+	SDL_SetPalette(Screen, SDL_LOGPAL, palette, 0, ncolors);
+	free(palette);
+    }
+    SDL_UnlockSurface(Screen);
+
+    SDL_SetClipRect(Screen, &clip);
+
+    return;
+#else
     SDL_WM_ToggleFullScreen(Screen);
+#endif
 }
 
 #endif // } USE_SDL
