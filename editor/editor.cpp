@@ -41,7 +41,6 @@
 **	@li Edit allow section
 **	@li Create new puds
 **	@li Edit .cm files
-**	@li Edit amount of gold-mines, oil-patch, oil-platforms
 **	@li Upgraded unit-types should be shown different on map
 **
 */
