@@ -51,13 +51,6 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-/**
-**	Table for rock removable.
-**	@todo	Johns: I don't think this table or routines look correct.
-**		But they work correct.
-*/
-global int RockTable[20];
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -127,7 +120,7 @@ global void MapFixSeenRockTile(int x, int y)
 	    return;
 	}
     }
-    tile = RockTable[tile];
+    tile = TheMap.Tileset->RockTable[tile];
 
     mf = TheMap.Fields + x + y * TheMap.Width;
     if (tile == -1) {			// No valid rock remove it.
@@ -204,7 +197,7 @@ global void MapFixRockTile(int x, int y)
 	    Flags & MapFieldRocks)) {
 	tile |= 1 << 3;
     }
-    tile = RockTable[tile];
+    tile = TheMap.Tileset->RockTable[tile];
 
     if (tile == -1) {			// No valid rock remove it.
 	MapRemoveRock(x, y);

@@ -167,6 +167,11 @@
 **		Contains the tile numbers of a growing tree from small to big.
 **		@note Not yet used.
 **
+**	Tilset::WoodTable[16]
+**
+**		Table for wood removable. This table contains the tile which
+**		is placed after a tree removement, depending on the surrounding.
+**
 **	Tileset::ExtraRocks[6]
 **
 **		This are six extra tile numbers, which are needed if rocks are
@@ -192,6 +197,14 @@
 **
 **		The tile number of the tile placed where rocks are removed.
 **		Is created on the map by destroying rocks.
+**
+**	Tileset::RockTable[20]
+**
+**		Table for rock removable. Depending on the surrinding this
+**		table contains the new tile to be placed.
+**
+**	@todo	Johns: I don't think this table or routines look correct.
+**		But they work correct.
 **
 **	Tileset::HumanWallTable
 **
@@ -258,12 +271,14 @@ typedef struct _tileset_ {
     unsigned	BotOneTree;		/// Tile for one tree bottom
     unsigned	RemovedTree;		/// Tile placed where trees are gone
     unsigned	GrowingTree[2];		/// Growing tree tiles
+    int		WoodTable[16];		/// Table for tree removable
 
     unsigned	ExtraRocks[6];		/// Extra rock tiles for removing
     unsigned	TopOneRock;		/// Tile for one rock top
     unsigned	MidOneRock;		/// Tile for one rock middle
     unsigned	BotOneRock;		/// Tile for one rock bottom
     unsigned	RemovedRock;		/// Tile placed where rocks are gone
+    int		RockTable[20];		/// Removed rock placement table
 
     unsigned	HumanWallTable[16];	/// Human wall placement table
     unsigned	OrcWallTable[16];	/// Orc wall placement table
@@ -279,7 +294,6 @@ enum _tileset_nr_ {
 };
 
 // FIXME: allow more tilesets
-
 #define TilesetMax		4	/// Biggest supported tileset number
 
 /*----------------------------------------------------------------------------
