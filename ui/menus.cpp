@@ -1745,6 +1745,7 @@ local void GameMenuLoad(void)
 
 global void SoundOptions(void)
 {
+#ifdef WITH_SOUND
     int i = 17;
     
     if (SoundFildes != -1)
@@ -1769,13 +1770,14 @@ global void SoundOptions(void)
 #else
     SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
-    ProcessMenu(MENU_SOUND_OPTIONS, 1);    
+    ProcessMenu(MENU_SOUND_OPTIONS, 1);
+#endif // with sound
 }
 
 local void SetMasterPower(Menuitem *mi)
 {
-
-#ifdef USE_SDLA 
+#ifdef WITH_SOUND
+#ifdef USE_SDLA
     if (SoundFildes != -1) {
 	SDL_CloseAudio();
 	SoundFildes=-1;
@@ -1798,12 +1800,14 @@ local void SetMasterPower(Menuitem *mi)
 	SoundOff=0;
     }
 #endif 				
+#endif // with sound
     EndMenu();
     SoundOptions();
 }
 
 local void SetMusicPower(Menuitem *mi)
 {
+#ifdef WITH_SOUND
     SCM cb;
     
     if (PlayingMusic == 1) {
@@ -1821,6 +1825,7 @@ local void SetMusicPower(Menuitem *mi)
                 } 
             } 
     }
+#endif // with sound
     EndMenu();
     SoundOptions();
 }

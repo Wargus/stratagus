@@ -734,7 +734,9 @@ global volatile void Exit(int err)
 
 global volatile void ExitFatal(int err)
 {
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     QuitCD();
+#endif
     exit(err);
 }
 
