@@ -94,7 +94,7 @@ global unsigned long ShowOrdersCount;   ///< Show orders for some time
 #define RESEARCH_INDEX    3
 #define TRAINING_INDEX    4
 #define UPGRADINGTO_INDEX 5
-#define RESSOURCE_INDEX   6
+#define RESOURCE_INDEX   6
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?
@@ -102,7 +102,7 @@ global unsigned long ShowOrdersCount;   ///< Show orders for some time
 /**
 **  Show that units are selected.
 **
-**  @param color
+**  @param color  FIXME: docu
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
@@ -187,11 +187,11 @@ global void DrawUnitSelection(const Unit* unit)
 }
 
 /**
-**		Don't show selected units.
+**  Don't show selected units.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 global void DrawSelectionNone(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -199,11 +199,11 @@ global void DrawSelectionNone(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Show selected units with circle.
+**  Show selected units with circle.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 global void DrawSelectionCircle(Uint32 color, int x1, int x2,
 	int y1, int y2)
@@ -215,11 +215,11 @@ global void DrawSelectionCircle(Uint32 color, int x1, int x2,
 }
 
 /**
-**		Show selected units with circle.
+**  Show selected units with circle.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 global void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -231,11 +231,11 @@ global void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Draw selected rectangle around the unit.
+**  Draw selected rectangle around the unit.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 global void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -244,11 +244,11 @@ global void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Draw selected rectangle around the unit.
+**  Draw selected rectangle around the unit.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 global void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -259,11 +259,11 @@ global void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Draw selected corners around the unit.
+**  Draw selected corners around the unit.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 global void DrawSelectionCorners(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -287,11 +287,11 @@ global void DrawSelectionCorners(Uint32 color, int x1, int y1,
 **  Decoration: health, mana.
 */
 typedef struct _decoration_ {
-	char*		File;           ///< File containing the graphics data
-	int				HotX;       ///< X drawing position (relative)
-	int				HotY;       ///< Y drawing position (relative)
-	int				Width;      ///< width of the decoration
-	int				Height;     ///< height of the decoration
+	char* File;       ///< File containing the graphics data
+	int   HotX;       ///< X drawing position (relative)
+	int   HotY;       ///< Y drawing position (relative)
+	int   Width;      ///< width of the decoration
+	int   Height;     ///< height of the decoration
 
 // --- FILLED UP ---
 	Graphic*		Sprite;     ///< loaded sprite images
@@ -409,9 +409,9 @@ local int CclSpellSprite(lua_State* l)
 **  return the index of deco relative to index var.
 **  create if didn't exist before.
 **
-**  @param index index of the var
+**  @param index  index of the var
 **
-**  @return index for Deco[]
+**  @return       index for Deco[]
 **  @internal use only to not duplicate code..
 */
 local int GetIndexDeco(int index)
@@ -419,7 +419,7 @@ local int GetIndexDeco(int index)
 	int i;
 
 	Assert(index < UnitTypeVar.NumberVariable);
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		if (UnitTypeVar.DecoVar[i].Index == index) {
 			return i;
 		}
@@ -551,7 +551,7 @@ local int CclShowManaDot(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 1; i <= 6; i++) {
+	for (i = 1; i <= 6; ++i) {
 		j = GetIndexDeco(i);
 		UnitTypeVar.DecoVar[j].HideNeutral = 1;
 		UnitTypeVar.DecoVar[j].IsCenteredInX = 1;
@@ -585,7 +585,7 @@ local int CclShowManaHorizontal(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 1; i <= 6; i ++) { // For all index used Manabar
+	for (i = 1; i <= 6; ++i) { // For all index used Manabar
 		j = GetIndexDeco(i);
 		UnitTypeVar.DecoVar[j].HideNeutral = 1;
 		UnitTypeVar.DecoVar[j].IsCenteredInX = 1;
@@ -616,7 +616,7 @@ local int CclShowManaVertical(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 1; i <= 6; i ++) { // For all index used Manabar
+	for (i = 1; i <= 6; ++i) { // For all index used Manabar
 		j = GetIndexDeco(i);
 		UnitTypeVar.DecoVar[j].HideNeutral = 1;
 		UnitTypeVar.DecoVar[j].f = DrawBar;
@@ -651,7 +651,7 @@ local int CclShowEnergySelected(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		UnitTypeVar.DecoVar[i].ShowOnlySelected = 1;
 	}
 	return 0;
@@ -669,7 +669,7 @@ local int CclShowFull(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		UnitTypeVar.DecoVar[i].ShowWhenMax = 1;
 	}
 	return 0;
@@ -688,7 +688,7 @@ local int CclShowNoFull(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		UnitTypeVar.DecoVar[i].ShowWhenMax = 0;
 	}
 	return 0;
@@ -706,7 +706,7 @@ local int CclDecorationOnTop(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		UnitTypeVar.DecoVar[i].OffsetY = 0;
 	}
 	return 0;
@@ -724,8 +724,8 @@ global void DecorationCclRegister(void)
 	lua_register(Lua, "ShadowSprite", CclShadowSprite);
 	lua_register(Lua, "SpellSprite", CclSpellSprite);
 
-#if 1 // To be deleted ? alredy Replaced by DefineDecoration
-	// These fonctions ara aliases to DefineDecorations
+#if 1 // To be deleted ? already Replaced by DefineDecoration
+	// These functions ara aliases to DefineDecorations
 	lua_register(Lua, "ShowHealthBar", CclShowHealthBar);
 	lua_register(Lua, "ShowHealthDot", CclShowHealthDot);
 // adicionado por protoman
@@ -799,13 +799,13 @@ global void CleanDecorations(void)
 }
 
 /**
-**    Draw bar for variables.
+**  Draw bar for variables.
 **
-**    @param x     X screen pixel position
-**    @param y     Y screen pixel position
-**    @param unit  Unit pointer
-**    @param Deco  More data arguments
-**    @todo fix color configuration.
+**  @param x     X screen pixel position
+**  @param y     Y screen pixel position
+**  @param unit  Unit pointer
+**  @param Deco  More data arguments
+**  @todo fix color configuration.
 */
 global void DrawBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
@@ -871,13 +871,13 @@ global void DrawBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 }
 
 /**
-**    Print variable values (and max....).
+**  Print variable values (and max....).
 **
-**    @param x     X screen pixel position
-**    @param y     Y screen pixel position
-**    @param unit  Unit pointer
-**    @param Deco  More data arguments
-**    @todo fix font/color configuration.
+**  @param x     X screen pixel position
+**  @param y     Y screen pixel position
+**  @param unit  Unit pointer
+**  @param Deco  More data arguments
+**  @todo fix font/color configuration.
 */
 global void PrintValue(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
@@ -891,13 +891,13 @@ global void PrintValue(int x, int y, const Unit* unit, const DecoVarType* Deco)
 }
 
 /**
-**    Draw a sprite with is like a bar (several stages)
+**  Draw a sprite with is like a bar (several stages)
 **
-**    @param x     X screen pixel position
-**    @param y     Y screen pixel position
-**    @param unit  Unit pointer
-**    @param Deco  More data arguments
-**    @todo fix sprite configuration.
+**  @param x     X screen pixel position
+**  @param y     Y screen pixel position
+**  @param unit  Unit pointer
+**  @param Deco  More data arguments
+**  @todo fix sprite configuration.
 */
 global void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
@@ -936,13 +936,13 @@ global void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Dec
 }
 
 /**
-**    Draw a static sprite.
+**  Draw a static sprite.
 **
-**    @param x     X screen pixel position
-**    @param y     Y screen pixel position
-**    @param unit  Unit pointer
-**    @param Deco  More data arguments
-**    @todo fix sprite configuration configuration.
+**  @param x     X screen pixel position
+**  @param y     Y screen pixel position
+**  @param unit  Unit pointer
+**  @param Deco  More data arguments
+**  @todo fix sprite configuration configuration.
 */
 global void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
@@ -975,12 +975,12 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 
 #ifdef REFS_DEBUG
 	//
-	//		Show the number of references.
+	//  Show the number of references.
 	//
 	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit->Refs);
 #endif
 
-	for (i = 0; i <= RESSOURCE_INDEX; i++) { // default values
+	for (i = 0; i <= RESOURCE_INDEX; ++i) { // default values
 		unit->Variable[i].Value = 0;
 		unit->Variable[i].Max = 0;
 		unit->Variable[i].Enable = 1;
@@ -1022,14 +1022,14 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 
 	// Ressources.
 	if (type->GivesResource) {
-		unit->Variable[RESSOURCE_INDEX].Value = unit->Value;
-		unit->Variable[RESSOURCE_INDEX].Max = 655350; // FIXME use better value ?
+		unit->Variable[RESOURCE_INDEX].Value = unit->Value;
+		unit->Variable[RESOURCE_INDEX].Max = 655350; // FIXME use better value ?
 	} else if (type->Harvester && unit->CurrentResource) {
-		unit->Variable[RESSOURCE_INDEX].Value = unit->Value;
-		unit->Variable[RESSOURCE_INDEX].Max = type->ResInfo[unit->CurrentResource]->ResourceCapacity;
+		unit->Variable[RESOURCE_INDEX].Value = unit->Value;
+		unit->Variable[RESOURCE_INDEX].Max = type->ResInfo[unit->CurrentResource]->ResourceCapacity;
 	}
 
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
 		int value;
 		int max;
 		const DecoVarType *Deco;
@@ -1040,14 +1040,14 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 		max = unit->Variable[Deco->Index].Max;
 		Assert(value <= max);
 
-		if (!((value == 0 && !Deco->ShowWhenNull) || (value == max && !Deco->ShowWhenMax)
-			|| (Deco->HideHalf && value != 0 && value != max)
-			|| (!Deco->ShowIfNotEnable && !unit->Variable[i].Enable)
-			|| (Deco->ShowOnlySelected && !unit->Selected)
-			|| (unit->Player->Type == PlayerNeutral && Deco->HideNeutral)
-			|| (IsEnemy(ThisPlayer, unit) && !Deco->ShowOpponent)
-			|| (IsAllied(ThisPlayer, unit) && (unit->Player != ThisPlayer) && Deco->HideAllied)
-			|| max == 0)) {
+		if (!((value == 0 && !Deco->ShowWhenNull) || (value == max && !Deco->ShowWhenMax) ||
+				(Deco->HideHalf && value != 0 && value != max) ||
+				(!Deco->ShowIfNotEnable && !unit->Variable[i].Enable) ||
+				(Deco->ShowOnlySelected && !unit->Selected) ||
+				(unit->Player->Type == PlayerNeutral && Deco->HideNeutral) ||
+				(IsEnemy(ThisPlayer, unit) && !Deco->ShowOpponent) ||
+				(IsAllied(ThisPlayer, unit) && unit->Player != ThisPlayer && Deco->HideAllied) ||
+				max == 0)) {
 			Deco->f(
 				x + Deco->OffsetX + Deco->OffsetXPercent * unit->Type->TileWidth * TileSizeX / 100,
 				y + Deco->OffsetY + Deco->OffsetYPercent * unit->Type->TileHeight * TileSizeY / 100,
@@ -1368,7 +1368,7 @@ local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y
 	Unit* goal;
 
 	// FIXME: n0body: Check for goal gone?
-	if ((goal = order->Goal) && (!goal->Removed)) {
+	if ((goal = order->Goal) && !goal->Removed) {
 		// Order has a goal, get it's location.
 		*x = Map2ViewportX(CurrentViewport, goal->X) + goal->IX +
 			goal->Type->TileWidth * TileSizeX / 2;

@@ -1017,10 +1017,10 @@ global void CleanUnitTypes(void)
 	}
 	NumUnitTypes = 0;
 
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined flags
 		free(UnitTypeVar.BoolFlagName[i]);
 	}
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) { // User defined variables
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) { // User defined variables
 		free(UnitTypeVar.VariableName[i]);
 	}
 	free(UnitTypeVar.BoolFlagName);

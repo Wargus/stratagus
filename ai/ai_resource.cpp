@@ -257,9 +257,9 @@ local int AiBuildBuilding(const UnitType* type, UnitType* building)
 	// Remove all workers on the way building something
 	//
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; i++) {
+	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
-		for (x = 0; x < unit->OrderCount; x++) {
+		for (x = 0; x < unit->OrderCount; ++x) {
 			if (unit->Orders[x].Action == UnitActionBuild
 				|| unit->Orders[x].Action == UnitActionRepair) {
 				break;
@@ -366,7 +366,7 @@ local int AiTrainUnit(const UnitType* type, UnitType* what)
 	// Remove all units already doing something.
 	//
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; i++) {
+	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (UnitIdle(unit)) {
 			table[num++] = unit;
@@ -529,7 +529,7 @@ local int AiResearchUpgrade(const UnitType* type, Upgrade* what)
 	// Remove all units already doing something.
 	//
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; i++) {
+	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (UnitIdle(unit)) {
 			table[num++] = unit;
@@ -623,7 +623,7 @@ local int AiUpgradeTo(const UnitType* type, UnitType* what)
 	// Remove all units already doing something.
 	//
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; i++) {
+	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (UnitIdle(unit)) {
 			table[num++] = unit;
@@ -861,7 +861,7 @@ local void AiCollectResources(void)
 	// Collect statistics about the current assignment
 	//
 	percent_total = 100;
-	for (c = 0; c < MaxCosts; c++) {
+	for (c = 0; c < MaxCosts; ++c) {
 		num_units_with_resource[c] = 0;
 		num_units_assigned[c] = 0;
 		num_units_unassigned[c] = 0;
@@ -876,7 +876,7 @@ local void AiCollectResources(void)
 
 	n = AiPlayer->Player->TotalNumUnits;
 	units = AiPlayer->Player->Units;
-	for (i = 0; i < n; i++) {
+	for (i = 0; i < n; ++i) {
 		unit = units[i];
 		if (!unit->Type->Harvester) {
 			continue;
@@ -972,7 +972,7 @@ local void AiCollectResources(void)
 		// Try to complete each ressource in the priority order
 		//
 		unit = 0;
-		for (i = 0; i < MaxCosts; i++) {
+		for (i = 0; i < MaxCosts; ++i) {
 			c = priority_resource[i];
 
 			//
@@ -992,11 +992,11 @@ local void AiCollectResources(void)
 					units_unassigned[j][c] = units_unassigned[--num_units_unassigned[c]][c];
 
 					// remove it from other ressources
-					for (j = 0; j < MaxCosts; j++) {
+					for (j = 0; j < MaxCosts; ++j) {
 						if (j == c || !unit->Type->ResInfo[j]) {
 							continue;
 						}
-						for (k = 0; k < num_units_unassigned[j]; k++) {
+						for (k = 0; k < num_units_unassigned[j]; ++k) {
 							if (units_unassigned[k][j] == unit) {
 								units_unassigned[k][j] = units_unassigned[--num_units_unassigned[j]][j];
 								break;
@@ -1011,7 +1011,7 @@ local void AiCollectResources(void)
 			//
 			if (!unit) {
 				// Take from lower priority only (i+1).
-				for (j = i + 1; j < MaxCosts; j++) {
+				for (j = i + 1; j < MaxCosts; ++j) {
 					// Try to move worker from src_c to c
 					src_c = priority_resource[j];
 
@@ -1100,7 +1100,7 @@ local int AiRepairBuilding(const UnitType* type, Unit* building)
 
 	// Selection of mining workers.
 	nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
-	for (num = i = 0; i < nunits; i++) {
+	for (num = i = 0; i < nunits; ++i) {
 		unit = table[i];
 		if (unit->Type->RepairRange &&
 			(unit->Orders[0].Action == UnitActionResource ||
