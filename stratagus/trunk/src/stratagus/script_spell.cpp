@@ -98,10 +98,10 @@ local void ccl_spell_dependency(const char *id, SCM list, SpellType *spell)
 local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spellaction)
 {
     char* str;
-    
+    SCM	value = list;
+
     DebugCheck (spellaction == NULL);
 
-    SCM	value = list;
     value = gh_car(value);
 
     value=gh_car(list);
