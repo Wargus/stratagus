@@ -60,7 +60,6 @@
 #include "network.h"
 #include "ui.h"
 #include "unit.h"
-#include "deco.h"
 #include "trigger.h"
 #include "campaign.h"
 #include "sound_server.h"
