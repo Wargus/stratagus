@@ -2387,6 +2387,8 @@ local MenuButtonId scm2buttonid(SCM value)
         id=MBUTTON_SC_S_VCONT;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-hcont")) ) {
         id=MBUTTON_SC_S_HCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-pulldown")) ) {
+        id=MBUTTON_SC_PULLDOWN;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-button-left")) ) {
         id=MBUTTON_SC_BUTTON_LEFT;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-button")) ) {
