@@ -1067,6 +1067,7 @@ global int HandleCheats(const char* Input)
 	GameResult=GameDefeat;
     } else if (!strcmp(Input, "it is a good day to die") ) {
 	GodMode=1;
+	SetMessage("DIE!");
     } else {
 	ret=0;
     }
