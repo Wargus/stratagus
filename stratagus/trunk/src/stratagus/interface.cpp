@@ -148,6 +148,7 @@ local int CommandKey(int key)
 	    break;
     );
 #endif
+
 	case 'p':			// If pause-key didn't work
 	case 'P':
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
@@ -226,6 +227,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
+	    DebugLevel0Fn("%x\n",KeyModifiers);
 	    ToggleGrabMouse();
 	    break;
 
@@ -235,16 +237,14 @@ local int CommandKey(int key)
 		break;
 	    }
 #ifdef USE_SDL
-//#if SDL_VERSIONNUM(SDL_MAJOR_VERSION,SDL_MINOR_VERSION,SDL_PATCHLEVEL)>=1008
-#if (SDL_MAJOR_VERSION*1000+SDL_MINOR_VERSION+100+SDL_PATCHLEVEL)>=1008
 	    {
 	    #include <SDL/SDL.h>
 	    // FIXME: move to system api part!
 	    extern SDL_Surface *Screen;	// internal screen
 
+	    DebugLevel0Fn("%x\n",KeyModifiers);
 	    SDL_WM_ToggleFullScreen(Screen);
 	    }
-#endif
 #endif
 	    break;
 
