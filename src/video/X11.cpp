@@ -945,12 +945,22 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #ifndef USE_ITIMER
     ticks=X11GetTicks();
     if( ticks>NextFrameTicks ) {	// We are too slow :(
+#ifdef SPLIT_SCREEN_SUPPORT
+	IfDebug(
+	    VideoDrawText(TheUI.MapArea.X+10,TheUI.MapArea.Y+10,GameFont,
+		"SLOW FRAME!!");
+	    XClearArea(TheDisplay,TheMainWindow
+		,TheUI.MapArea.X+10,TheUI.MapArea.Y+10,13*13,13
+		,False);
+	);
+#else
 	IfDebug(
 	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	    XClearArea(TheDisplay,TheMainWindow
-		,TheUI.MapX+10,TheUI.MapX+10,13*13,13
+		,TheUI.MapX+10,TheUI.MapY+10,13*13,13
 		,False);
 	);
+#endif
 	++SlowFrameCounter;
     }
 #endif
