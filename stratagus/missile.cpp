@@ -531,14 +531,15 @@ global void FireMissile(Unit* unit)
     if( goal && RevealAttacker ) {	// attacking units are seen
 	Unit* target;
 	// FIXME: Don't use UnitTypeByIdent during runtime.
-	target = MakeUnit(UnitTypeByIdent("unit-reveal-attacker"), unit->Player);
+	target = MakeUnit(UnitTypeByIdent("unit-reveal-attacker"), goal->Player);
 	target->Orders[0].Action = UnitActionStill;
 	target->HP = 0;
 	target->X = unit->X;
 	target->Y = unit->Y;
 	target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
 	target->CurrentSightRange=target->Stats->SightRange;
-	MapMarkSight(target->Player,unit->X,unit->Y,target->CurrentSightRange);
+	// Little hack for the way the macro works :)
+	MapMarkUnitOnBoardSight(goal,unit);
 	CheckUnitToBeDrawn(target);
     }
 

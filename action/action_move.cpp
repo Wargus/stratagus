@@ -131,20 +131,23 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags&=~i;
 
 	UnitCacheRemove(unit);
+
+	MapUnmarkUnitSight(unit);
+	//  ummark sight for units inside too.
+	uninside=unit->UnitInside;
+	for( i=unit->InsideCount; i; uninside=uninside->NextContained,i-- ) {
+	    MapUnmarkUnitOnBoardSight(uninside,unit);
+	}
+
 	x=unit->X+=xd;
 	y=unit->Y+=yd;
 	UnitCacheInsert(unit);
 
-	TheMap.Fields[x+y*TheMap.Width].Flags|=i;
+	TheMap.Fields[x+y*TheMap.Width].Flags|=unit->Type->FieldFlags;
 
 	MustRedraw|=RedrawMinimap;
-	//
-	//	Update visible area.
-	//
-	x+=unit->Type->TileWidth/2;
-	y+=unit->Type->TileHeight/2;
 
-	MapMarkNewSight(unit->Player,x,y,unit->CurrentSightRange,xd,yd);
+	MapMarkUnitSight(unit);
 	//  Remove unit from the current selection
 	if( unit->Selected && !IsMapFieldVisible(ThisPlayer,unit->X,unit->Y)) {
 #ifndef NEW_UI
@@ -157,11 +160,9 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	}
 
 	//  Remark sight for units inside too.
-	if ( unit->Type->Transporter ) {
-	    uninside=unit->UnitInside;
-	    for( i=unit->InsideCount; i; uninside=uninside->NextContained,i-- ) {
-		MapMarkNewSight(uninside->Player,x,y,uninside->CurrentSightRange,xd,yd);
-	    }
+	uninside=unit->UnitInside;
+	for( i=unit->InsideCount; i; uninside=uninside->NextContained,i-- ) {
+	    MapMarkUnitOnBoardSight(uninside,unit);
 	}
 
 	//  Reveal Submarines and stuff.

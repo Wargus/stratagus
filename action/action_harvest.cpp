@@ -278,6 +278,7 @@ local int ReturnWithWood(Unit* unit)
     int i;
 
     destu=unit->Orders[0].Goal;
+    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
     DebugCheck( !destu );
 
     i=DoActionMove(unit);

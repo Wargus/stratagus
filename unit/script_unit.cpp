@@ -46,6 +46,7 @@
 #include "spells.h"
 #include "pathfinder.h"
 #include "trigger.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -557,11 +558,12 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("current-sight-range")) ) {
 	    unit->CurrentSightRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("host-tile")) ) {          
+	} else if( gh_eq_p(value,gh_symbol2scm("host-info")) ) {          
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    MapMarkSight(player,gh_scm2int(gh_car(value)),
-				gh_scm2int(gh_cadr(value)),
+	    MapMarkSight(player,gh_scm2int(gh_car(value)),gh_scm2int(gh_cadr(value)),
+				gh_scm2int(gh_cadr(gh_cdr(value))),
+				gh_scm2int(gh_cadr(gh_cdr(gh_cdr(value)))),
 				unit->CurrentSightRange);   
 	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
 	    value=gh_car(list);
@@ -722,11 +724,14 @@ local SCM CclUnit(SCM list)
 	    unit->OrderFlush=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("orders")) ) {
+	    int hp;
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    CclParseOrders(unit,sublist);
 	    // now we know unit's action so we can assign it to a player
+	    hp = unit->HP;
 	    AssignUnitToPlayer (unit, player);
+	    unit->HP = hp;
 	    if( unit->Orders[0].Action==UnitActionBuilded ) {
 		// HACK: the building is not ready yet
 		unit->Player->UnitTypesCount[type->Type]--;
@@ -738,12 +743,12 @@ local SCM CclUnit(SCM list)
 	    } else if( unit->Orders[0].Action==UnitActionDie ) {
 		CorpseCacheInsert(unit);
 	    }
+#if 0
 	    if( unit->Orders[0].Action==UnitActionDie &&
 		unit->Type->CorpseScript ) {
-		MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
-					unit->Y+unit->Type->TileHeight/2,
-					unit->CurrentSightRange);
+		MapMarkUnitSight(unit);
 	    }
+#endif
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -794,7 +799,7 @@ local SCM CclUnit(SCM list)
 
     //  Revealers are units that can see while removed
     if ( unit->Removed && unit->Type->Revealer ) {
-    	MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
+    	MapMarkUnitSight(unit);
     }
     
     //	Place on map
@@ -889,6 +894,78 @@ local SCM CclCreateUnit(SCM type,SCM player,SCM x,SCM y)
 }
 
 /**
+**	Order a unit
+**
+**	(order-unit player unit-type sloc dloc order)
+*/
+local SCM CclOrderUnit(SCM list)
+{
+    int plynr;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    int dx1;
+    int dy1;
+    int dx2;
+    int dy2;
+    const UnitType* unittype;
+    Unit* table[UnitMax];
+    Unit* unit;
+    int an;
+    int j;
+    char* order;
+
+    plynr=TriggerGetPlayer(gh_car(list));
+    list=gh_cdr(list);
+    unittype=TriggerGetUnitType(gh_car(list));
+    list=gh_cdr(list);
+    x1=gh_scm2int(gh_car(gh_car(list)));
+    y1=gh_scm2int(gh_car(gh_cdr(gh_car(list))));
+    x2=gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_car(list)))));
+    y2=gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_cdr(gh_car(list))))));
+    list=gh_cdr(list);
+    dx1=gh_scm2int(gh_car(gh_car(list)));
+    dy1=gh_scm2int(gh_car(gh_cdr(gh_car(list))));
+    if( !gh_null_p(gh_cdr(gh_cdr(gh_car(list)))) ) {
+	dx2=gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_car(list)))));
+	dy2=gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_cdr(gh_car(list))))));
+    } else {
+	dx2=dx1;
+	dy2=dy1;
+    }
+    list=gh_cdr(list);
+    order=gh_scm2newstr(gh_car(list),NULL);
+
+    an=SelectUnits(x1,y1,x2+1,y2+1,table);
+    for( j=0; j<an; ++j ) {
+	unit=table[j];
+	if( unittype==ANY_UNIT
+		|| (unittype==ALL_FOODUNITS && !unit->Type->Building)
+		|| (unittype==ALL_BUILDINGS && unit->Type->Building)
+		|| unittype==unit->Type ) {
+	    if( plynr==-1 || plynr==unit->Player->Player ) {
+		if( !strcmp(order,"move") ) {
+		    CommandMove(unit,(dx1+dx2)/2,(dy1+dy2)/2,1);
+		} else if( !strcmp(order,"attack") ) {
+		    Unit* attack;
+
+		    attack=TargetOnMap(unit,dx1,dy1,dx2,dy2);
+		    CommandAttack(unit,(dx1+dx2)/2,(dy1+dy2)/2,attack,1);
+		} else if( !strcmp(order,"patrol") ) {
+		    CommandPatrolUnit(unit,(dx1+dx2)/2,(dy1+dy2)/2,1);
+		} else {
+		    errl("Unsupported order",gh_car(list));
+		}
+	    }
+	}
+    }
+
+    free(order);
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Kill a unit
 **
 **	@param type	Unit-type of the unit,
@@ -939,7 +1016,7 @@ local SCM CclKillUnit(SCM type,SCM player)
 **
 **	@return		Returns the number of units killed.
 */
-local SCM CclKillUnitAt(SCM type,SCM player,SCM quantity,SCM loc1,SCM loc2)
+local SCM CclKillUnitAt(SCM type,SCM player,SCM quantity,SCM loc)
 {
     int plynr;
     int q;
@@ -957,10 +1034,10 @@ local SCM CclKillUnitAt(SCM type,SCM player,SCM quantity,SCM loc1,SCM loc2)
     plynr=TriggerGetPlayer(player);
     q=gh_scm2int(quantity);
     unittype=TriggerGetUnitType(type);
-    x1=gh_scm2int(gh_car(loc1));
-    y1=gh_scm2int(gh_car(gh_cdr(loc1)));
-    x2=gh_scm2int(gh_car(loc2));
-    y2=gh_scm2int(gh_car(gh_cdr(loc2)));
+    x1=gh_scm2int(gh_car(loc));
+    y1=gh_scm2int(gh_car(gh_cdr(loc)));
+    x2=gh_scm2int(gh_car(gh_cdr(gh_cdr(loc))));
+    y2=gh_scm2int(gh_car(gh_cdr(gh_cdr(gh_cdr(loc)))));
 
     an=SelectUnits(x1,y1,x2+1,y2+1,table);
     for( j=s=0; j<an && s<q; ++j ) {
@@ -1077,8 +1154,9 @@ global void UnitCclRegister(void)
     gh_new_procedure2_0("make-unit",CclMakeUnit);
     gh_new_procedure3_0("place-unit",CclPlaceUnit);
     gh_new_procedure4_0("create-unit",CclCreateUnit);
+    gh_new_procedureN("order-unit",CclOrderUnit);
     gh_new_procedure2_0("kill-unit",CclKillUnit);
-    gh_new_procedure5_0("kill-unit-at",CclKillUnitAt);
+    gh_new_procedure4_0("kill-unit-at",CclKillUnitAt);
 
     // unit member access functions
     gh_new_procedure1_0("get-unit-unholy-armor",CclGetUnitUnholyArmor);
