@@ -10,7 +10,7 @@
 //
 /**@name mainloop.c	-	The main game loop. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -744,11 +744,6 @@ global void GameMainLoop(void)
 	    PlayersEachCycle();		// handle players
 	    UpdateTimer();		// update game timer
 
-	    // FIXME: We don't do redraw if needed, costs to much cpu time
-	    if( MustRedraw!=RedrawEverything ) {
-		MustRedraw&=~RedrawMinimap; // FIXME: this a little hack!
-	    }
-
 	    //
 	    //	Work todo each second.
 	    //		Split into different frames, to reduce cpu time.
@@ -768,6 +763,7 @@ global void GameMainLoop(void)
 		    UnitIncrementHealth();	// berserker healing
 		    break;
 		case 2:				// minimap update
+		    UpdateMinimap();
 		    MustRedraw|=RedrawMinimap;
 		    break;
 		case 3:				// computer players
