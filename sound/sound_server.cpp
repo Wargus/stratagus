@@ -219,6 +219,7 @@ global void PlayMusic(const char* name)
 		return;
 	    }
 	    cd_get_tracks(&CDTrack, &NumCDTracks);
+	    --CDTrack;
 	}
     }
 
