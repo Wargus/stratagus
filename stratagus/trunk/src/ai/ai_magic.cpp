@@ -99,6 +99,64 @@ local void AiDoOgreMage(Unit* unit)
 {
     int r;
 
+    if( UpgradeIdentAvailable(AiPlayer->Player,"upgrade-bloodlust") ) {
+	if( unit->Mana>AiBloodlust->ManaCost ) {
+	    Unit* table[UnitMax];
+	    int n;
+	    int i;
+
+	    r=unit->Type->ReactRangeComputer;
+	    n=SelectUnits(unit->X-r,unit->Y-r,unit->X+r+1,unit->Y+r+1,table);
+	    if( n ) {
+		for( i=0; i<n; ++i ) {
+		    Unit* best;
+
+		    // a friend or neutral
+		    if( !IsEnemy(unit->Player,table[i]) ) {
+			continue;
+		    }
+		    if( !table[i]->Type->CanAttack ) {
+			continue;
+		    }
+		    //
+		    //	We have an enemy in range.
+		    //
+		    best=NoUnitP;
+		    for( i=0; i<n; ++i ) {
+			if( table[i]==unit 
+				|| table[i]->Bloodlust
+				|| !table[i]->Type->CanAttack ) {
+			    continue;
+			}
+			// Allied unit
+			// FIXME: should ally to self
+			if( unit->Player!=table[i]->Player && 
+				!IsAllied(unit->Player,table[i]) ) {
+			    continue;
+			}
+			r=MapDistanceBetweenUnits(unit,table[i]);
+			DebugLevel0Fn("Distance %d\n",r);
+			if( r<=1 ) {
+			    DebugLevel0Fn("`%s' cast bloodlust\n"
+				_C_ unit->Type->Ident);
+			    CommandSpellCast(unit,0,0,table[i],
+				AiBloodlust,FlushCommands);
+			    break;
+			}
+			if( r==2 ) {
+			    best=table[i];
+			}
+		    }
+		    if( best ) {
+			CommandSpellCast(unit,0,0,best,
+			    AiBloodlust,FlushCommands);
+		    }
+		    break;
+		}
+	    }
+	}
+    }
+
     if( unit->Orders[0].Action==UnitActionStill ) {
 	if( UpgradeIdentAvailable(AiPlayer->Player,"upgrade-eye-of-kilrogg")
 		&& UpgradeIdentAvailable(AiPlayer->Player,
@@ -138,14 +196,8 @@ local void AiDoPaladin(Unit* unit)
 			_C_ unit->Type->Ident);
 		    // Look around randomly
 		    r>>=5;
-		    x=r&0xFFFF;
-		    if( x>=TheMap.Width ) {
-			x=TheMap.Width-1;
-		    }
-		    y=SyncRand();
-		    if( y>=TheMap.Height ) {
-			y=TheMap.Height-1;
-		    }
+		    x=r%TheMap.Width;
+		    y=SyncRand()%TheMap.Height;
 		    CommandSpellCast(unit,x,y,NoUnitP,
 			AiHolyVision,FlushCommands);
 		}
@@ -190,14 +242,30 @@ global void AiCheckMagic(void)
 
 		// Let it move around randomly
 		r=SyncRand()>>4;
-		x=unit->X+(r&0x20) ? -(r&0x1F) : (r&0x1F);
-		if( x>=TheMap.Width ) {
-		    x=TheMap.Width-1;
+		if( r&0x20 ) {
+		    if( unit->X<(r&0x1F) ) {
+			x=0;
+		    } else {
+			x=unit->X-(r&0x1F);
+		    }
+		} else {
+		    x=unit->X+(r&0x1F);
+		    if( x>=TheMap.Width ) {
+			x=TheMap.Width-1;
+		    }
 		}
 		r>>=6;
-		y=unit->Y+(r&0x20) ? -(r&0x1F) : (r&0x1F);
-		if( y>=TheMap.Height ) {
-		    y=TheMap.Height-1;
+		if( r&0x20 ) {
+		    if( unit->Y<(r&0x1F) ) {
+			y=0;
+		    } else {
+			y=unit->Y-(r&0x1F);
+		    }
+		} else {
+		    y=unit->Y+(r&0x1F);
+		    if( y>=TheMap.Height ) {
+			y=TheMap.Height-1;
+		    }
 		}
 		CommandMove(unit,x,y,FlushCommands);
 	    }
