@@ -1331,7 +1331,7 @@ local SCM CclDefineAnimations(SCM list)
 */
 global void UnitTypeCclRegister(void)
 {
-    gh_new_procedureN("define-old-unit-type",CclDefineOldUnitType);
+    //gh_new_procedureN("define-old-unit-type",CclDefineOldUnitType);
     gh_new_procedureN("define-new-unit-type",CclDefineNewUnitType);
     gh_new_procedureN("define-unit-stats",CclDefineUnitStats);
 
