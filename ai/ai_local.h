@@ -168,7 +168,8 @@ typedef struct _player_ai_ {
 
     // forces
 #define AI_MAX_FORCES	10		/// How many forces are supported
-    AiForce	Force[AI_MAX_FORCES];	/// Forces controlled by AI
+#define AI_MAX_ATTACKING_FORCES	30	/// Attacking forces
+    AiForce	Force[AI_MAX_ATTACKING_FORCES];	/// Forces controlled by AI
 
     // resource manager
 
