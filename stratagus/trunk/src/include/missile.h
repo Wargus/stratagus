@@ -176,7 +176,18 @@
 **
 **	MissileType::ImpactMissile
 **
-**		Pointer to the impact missile-type.  Used during run time.
+**		Pointer to the impact missile-type. Used during run time.
+**
+**	MissileType::SmokeName
+**
+**		The name of the next (other) missile to generate a trailing smoke.  So it
+**		can be used to generate a chain of missiles.
+**		@note Used and should only be used during configuration and
+**		startup.
+**
+**	MissileType::SmokeMissile
+**
+**		Pointer to the smoke missile-type. Used during run time.
 **
 **	MissileType::Sprite
 **
@@ -201,6 +212,14 @@
 **	Missile::X Missile::Y
 **
 **		Missile current map position in pixels.  To convert a map tile
+**		position to pixel position use: (mapx*::TileSizeX+::TileSizeX/2)
+**		and (mapy*::TileSizeY+::TileSizeY/2)
+**		@note ::TileSizeX%2==0 && ::TileSizeY%2==0 and ::TileSizeX,
+**		::TileSizeY are currently fixed 32 pixels.
+**
+**	Missile::SourceX Missile::SourceY
+**
+**		Missile original map position in pixels.  To convert a map tile
 **		position to pixel position use: (mapx*::TileSizeX+::TileSizeX/2)
 **		and (mapy*::TileSizeY+::TileSizeY/2)
 **		@note ::TileSizeX%2==0 && ::TileSizeY%2==0 and ::TileSizeX,
@@ -235,7 +254,7 @@
 **	Missile::AnimWait
 **
 **		Animation wait. Used internally by missile actions, to run the
-**		animation in paralel with the rest.
+**		animation in parallel with the rest.
 **
 **	Missile::Wait
 **
@@ -275,24 +294,13 @@
 **		missile lives for ever and the lifetime is handled by
 **		Missile::Type:MissileType::Class
 **
-**	Missile::Controller
+**	Missile::CurrentStep
 **
-**		A function pointer to the function which controls the missile.
-**		Overwrites Missile::Type:MissileType::Class when !NULL.
+**		Movement step. Used for the different trajectories.
 **
-**	Missile::D
+**	Missile::TotalStep
 **
-**		Delta for Bresenham's line algorithm (point to point missiles).
-**
-**	Missile::Dx Missile::Dy
-**
-**		Delta x and y for Bresenham's line algorithm (point to point
-**		missiles).
-**
-**	Missile::Xstep Missile::Ystep
-**
-**		X and y step for Bresenham's line algorithm (point to point
-**		missiles).
+**		Maximum number of step. When CurrentStep >= TotalStep, the movement is finished.
 **
 **	Missile::Local
 **
@@ -343,11 +351,6 @@ typedef int MissileClass;
 /**
 **      Missile-class this defines how a missile-type reacts.
 **
-**      @todo
-**              Here is something double defined, the whirlwind is
-**              ClassWhirlwind and also handled by controler.
-**
-**      FIXME:  We need no class or no controller.
 */
 enum _missile_class_ {
 	//      Missile does nothing
@@ -409,6 +412,8 @@ struct _missile_type_ {
     int		Range;			/// missile damage range
     char*	ImpactName;		/// impact missile-type name
     MissileType*ImpactMissile;		/// missile produces an impact
+    char*	SmokeName;		/// impact missile-type name
+    MissileType*SmokeMissile;		/// Trailling missile
 
 // --- FILLED UP ---
     Graphic*	Sprite;			/// missile sprite image
@@ -426,6 +431,8 @@ typedef void FuncController(Missile *);
 
     /// Missile on the map
 struct _missile_ {
+    int		SourceX;		/// Missile Source X
+    int		SourceY;		/// Missile Source Y
     int		X;			/// missile pixel position
     int		Y;			/// missile pixel position
     int		DX;			/// missile pixel destination
@@ -445,16 +452,8 @@ struct _missile_ {
     int		TTL;			/// time to live (ticks) used for spells
 
 // Internal use:
-    int		D;			/// for point to point missiles
-    int		Dx;			/// delta x
-    int		Dy;			/// delta y
-    int		Xstep;			/// X step
-    int		Ystep;			/// Y step
-
-    long	Angle;			/// Angle, for parabolic missiles
-    long	Xl;			/// internal use. Will be removed later.
-    int		SourceX;		/// Missile Source X
-    int		SourceY;		/// Missile Source Y
+    int		CurrentStep;		/// Current step (0 <= x < TotalStep).
+    int		TotalStep;		/// Total step.
 
     unsigned	Local : 1;		/// missile is a local missile
     Missile**	MissileSlot;		/// pointer to missile slot
