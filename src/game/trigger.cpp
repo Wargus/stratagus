@@ -300,7 +300,7 @@ local int CclIfUnitAt(lua_State* l)
 		LuaError(l, "Illegal comparison operator in if-unit-at: %s" _C_ op);
 	}
 	q = LuaToNumber(l, 3);
-	lua_pushvalue(l, 1);
+	lua_pushvalue(l, 4);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 5) || luaL_getn(l, 5) != 2) {
