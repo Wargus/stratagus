@@ -4,13 +4,13 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________			     ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mouse.c	-	The mouse handling. */
+/**@name mouse.c - The mouse handling. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -59,7 +59,7 @@
 #include "spells.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 global enum _mouse_buttons_ MouseButtons;/// Current pressed mouse buttons
@@ -73,29 +73,29 @@ global char GameMenuButtonClicked;		/// Menu button was clicked
 global char GameDiplomacyButtonClicked; /// Diplomacy button was clicked
 global char LeaveStops;						/// Mouse leaves windows stops scroll
 
-global enum _cursor_on_ CursorOn=CursorOnUnknown;		/// Cursor on field
+global enum _cursor_on_ CursorOn = CursorOnUnknown;		/// Cursor on field
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Cancel building cursor mode.
+**  Cancel building cursor mode.
 */
 global void CancelBuildingMode(void)
 {
 	CursorBuilding = NULL;
 	ClearStatusLine();
 	ClearCosts();
-	CurrentButtonLevel = 0;				// reset unit buttons to normal
+	CurrentButtonLevel = 0;
 	UpdateButtonPanel();
 }
 
 /**
-**		Called when right button is pressed
+**  Called when right button is pressed
 **
-**		@param sx		X map position in pixels.
-**		@param sy		Y map position in pixels.
+**  @param sx  X map position in pixels.
+**  @param sy  Y map position in pixels.
 */
 global void DoRightButton(int sx, int sy)
 {
@@ -104,7 +104,7 @@ global void DoRightButton(int sx, int sy)
 	int y;
 	Unit* dest;
 	Unit* unit;
-	Unit* desttransporter = 0;
+	Unit* desttransporter;
 	UnitType* type;
 	int action;
 	int acknowledged;
@@ -112,16 +112,14 @@ global void DoRightButton(int sx, int sy)
 	int res;
 	int spellnum;
 
-	//
 	// No unit selected
-	//
 	if (!NumSelected) {
 		return;
 	}
 
 	//
-	// Unit selected isn't owned by the player.
-	// You can't select your own units + foreign unit(s).
+	//  Unit selected isn't owned by the player.
+	//  You can't select your own units + foreign unit(s).
 	//
 	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
 		return;
@@ -129,9 +127,10 @@ global void DoRightButton(int sx, int sy)
 
 	x = sx / TileSizeX;
 	y = sy / TileSizeY;
+	desttransporter = NoUnitP;
 
 	//
-	//		Right mouse with SHIFT appends command to old commands.
+	//  Right mouse with SHIFT appends command to old commands.
 	//
 	flush = !(KeyModifiers & ModifierShift);
 
@@ -141,13 +140,13 @@ global void DoRightButton(int sx, int sy)
 		dest = NULL;
 	}
 
-	// don't allow stopping enemy transporters!
-	if (dest && dest->Type->Transporter && (!dest->Type->Building) &&
+	// Don't allow stopping enemy transporters!
+	if (dest && dest->Type->Transporter && !dest->Type->Building &&
 			PlayersTeamed(ThisPlayer->Player, dest->Player->Player)) {
 		// n0b0dy: So we are clicking on a transporter. We have to:
 		// 1) Flush the transporters orders.
 		// 2) Tell the transporter to follow the units. We have to queue all
-		//	these follow orders, so the transport wil go and pick the up
+		//    these follow orders, so the transport will go and pick the up
 		// 3) Tell all selected land units to go board the transporter.
 		//
 		// Here we flush the order queue
@@ -176,23 +175,23 @@ global void DoRightButton(int sx, int sy)
 		DebugLevel3Fn("Mouse action %d\n" _C_ action);
 
 		//
-		//		Control + right click on unit is follow anything.
+		//  Control + right click on unit is follow anything.
 		//
-		if (KeyModifiers & ModifierControl && dest && dest!=unit) {
+		if ((KeyModifiers & ModifierControl) && dest && dest!=unit) {
 			dest->Blink = 4;
 			SendCommandFollow(unit, dest, flush);
 			continue;
 		}
 
 		//
-		//		Enter transporters?
+		//  Enter transporters?
 		//
 		if (dest && dest->Type->Transporter && dest->Player == unit->Player &&
 				unit->Type->UnitType == UnitTypeLand) {
 			dest->Blink = 4;
 			DebugLevel0Fn("Board transporter\n");
-			//  Let the transporter move to the unit. And QUEUE!!!
-			//  Don't do it for buildings.
+			// Let the transporter move to the unit. And QUEUE!!!
+			// Don't do it for buildings.
 			if (!dest->Type->Building) {
 				DebugLevel0Fn("Send command follow");
 				SendCommandFollow(dest, unit, 0);
@@ -202,12 +201,12 @@ global void DoRightButton(int sx, int sy)
 		}
 
 		//
-		//		Handle resource workers.
+		//  Handle resource workers.
 		//
 		if (action == MouseActionHarvest) {
 			if (unit->Type->Harvester) {
 				if (dest) {
-					//  Return a loaded harvester to deposit
+					// Return a loaded harvester to deposit
 					if (unit->Value > 0 &&
 							dest->Type->CanStore[unit->CurrentResource] &&
 							dest->Player == unit->Player) {
@@ -216,7 +215,7 @@ global void DoRightButton(int sx, int sy)
 						SendCommandReturnGoods(unit, dest, flush);
 						continue;
 					}
-					//  Go and harvest from a building
+					// Go and harvest from a building
 					if ((res = dest->Type->GivesResource) &&
 							unit->Type->ResInfo[res] &&
 							unit->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
@@ -246,7 +245,7 @@ global void DoRightButton(int sx, int sy)
 					}
 				}
 			}
-			//  Go and repair
+			// Go and repair
 			if (unit->Type->RepairRange && dest &&
 					dest->Type->RepairHP &&
 					dest->HP < dest->Stats->HitPoints &&
@@ -255,20 +254,20 @@ global void DoRightButton(int sx, int sy)
 				SendCommandRepair(unit, x, y, dest, flush);
 				continue;
 			}
-			//  Follow another unit
+			// Follow another unit
 			if (UnitUnderCursor && dest && dest != unit &&
 					(dest->Player == unit->Player || IsAllied(unit->Player, dest))) {
 				dest->Blink = 4;
 				SendCommandFollow(unit, dest, flush);
 				continue;
 			}
-			//  Move
+			// Move
 			SendCommandMove(unit, x, y, flush);
 			continue;
 		}
 
 		//
-		//		Fighters
+		//  Fighters
 		//
 		if (action == MouseActionSpellCast || action == MouseActionAttack) {
 			if (dest) {
@@ -345,9 +344,8 @@ global void DoRightButton(int sx, int sy)
 		}
 
 		//
-		//		Ships
+		//  Buildings
 		//
-
 		if (type->Building) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
@@ -370,10 +368,10 @@ global void DoRightButton(int sx, int sy)
 }
 
 /**
-**		Set flag on which area is the cursor.
+**  Set flag on which area is the cursor.
 **
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
+**  @param x  X map tile position.
+**  @param y  Y map tile position.
 */
 local void HandleMouseOn(int x, int y)
 {
@@ -384,7 +382,7 @@ local void HandleMouseOn(int x, int y)
 	DebugLevel3Fn("%d, %d\n" _C_ x _C_ y);
 
 	//
-	//		Handle buttons
+	//  Handle buttons
 	//
 	if (!IsNetworkGame()) {
 		if (TheUI.MenuButton.X != -1 && !BigMapMode) {
@@ -527,13 +525,14 @@ local void HandleMouseOn(int x, int y)
 		}
 	}
 
-	if (ButtonUnderCursor != -1) {		// remove old display
+	// remove old display
+	if (ButtonUnderCursor != -1) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = -1;
 	}
 
 	//
-	//		Minimap
+	//  Minimap
 	//
 	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
 			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH &&
@@ -543,8 +542,8 @@ local void HandleMouseOn(int x, int y)
 	}
 
 	//
-	//		Map
-	//				NOTE: Later this is not always true, with shaped maps view.
+	//  Map
+	//  NOTE: Later this is not always true, with shaped maps view.
 	//
 	if (x >= TheUI.MapArea.X && x <= TheUI.MapArea.EndX &&
 			y >= TheUI.MapArea.Y && y <= TheUI.MapArea.EndY) {
@@ -553,7 +552,8 @@ local void HandleMouseOn(int x, int y)
 		DebugLevel3Fn("viewport %d, %d\n" _C_ x _C_ y);
 		vp = GetViewport(x, y);
 		Assert(vp);
-		if (TheUI.MouseViewport != vp) {		// viewport changed
+		// viewport changed
+		if (TheUI.MouseViewport != vp) {
 			TheUI.MouseViewport = vp;
 			DebugLevel0Fn("current viewport changed to %d.\n" _C_
 				vp - TheUI.Viewports);
@@ -566,43 +566,38 @@ local void HandleMouseOn(int x, int y)
 	}
 
 	//
-	//		Scrolling Region Handling.
+	//  Scrolling Region Handling.
 	//
 	HandleMouseScrollArea(x, y);
 }
 
 /**
-**		Handle cursor exits the game window (only for some videomodes)
-**		FIXME: make it so that the game is partially 'paused'.
-**			   Game should run (for network play), but not react on or show
-**			   interactive events.
+**  Handle cursor exits the game window (only for some videomodes)
+**  FIXME: make it so that the game is partially 'paused'.
+**         Game should run (for network play), but not react on or show
+**         interactive events.
 */
 global void HandleMouseExit(void)
 {
-	if (!LeaveStops) {						// Disabled
+	// Disabled
+	if (!LeaveStops) {
 		return;
 	}
-	//
 	// Denote cursor not on anything in window (used?)
-	//
 	CursorOn = -1;
 
-	//
 	// Prevent scrolling while out of focus (on other applications) */
-	//
 	KeyScrollState = MouseScrollState = ScrollNone;
 
-	//
 	// Show hour-glass (to denote to the user, the game is waiting)
 	// FIXME: couldn't define a hour-glass that easily, so used pointer
-	//
 	CursorX = VideoWidth / 2;
 	CursorY = VideoHeight / 2;
 	GameCursor = TheUI.Point.Cursor;
 }
 
 /**
-**		Restrict mouse cursor to viewport.
+**  Restrict mouse cursor to viewport.
 */
 global void RestrictCursorToViewport(void)
 {
@@ -628,7 +623,7 @@ global void RestrictCursorToViewport(void)
 }
 
 /**
-**		Restrict mouse cursor to minimap
+**  Restrict mouse cursor to minimap
 */
 global void RestrictCursorToMinimap(void)
 {
@@ -654,10 +649,10 @@ global void RestrictCursorToMinimap(void)
 }
 
 /**
-**		Handle movement of the cursor.
+**  Handle movement of the cursor.
 **
-**		@param x		Screen X position.
-**		@param y		Screen Y position.
+**  @param x  Screen X position.
+**  @param y  Screen Y position.
 */
 global void UIHandleMouseMove(int x, int y)
 {
@@ -667,14 +662,14 @@ global void UIHandleMouseMove(int x, int y)
 
 	OldCursorOn = CursorOn;
 	//
-	//		Selecting units.
+	//  Selecting units.
 	//
 	if (CursorState == CursorStateRectangle) {
 		return;
 	}
 
 	//
-	//		Move map.
+	//  Move map.
 	//
 	if (GameCursor == TheUI.Scroll.Cursor) {
 		int xo;
@@ -693,9 +688,9 @@ global void UIHandleMouseMove(int x, int y)
 		SubScrollY += speed * (y - CursorStartY);
 
 		// only tile based scrolling is supported
-		xo		+= SubScrollX / TileSizeX;
+		xo += SubScrollX / TileSizeX;
 		SubScrollX = SubScrollX % TileSizeX;
-		yo		+= SubScrollY / TileSizeY;
+		yo += SubScrollY / TileSizeY;
 		SubScrollY = SubScrollY % TileSizeY;
 
 		TheUI.MouseWarpX = CursorStartX;
@@ -705,11 +700,11 @@ global void UIHandleMouseMove(int x, int y)
 	}
 
 	UnitUnderCursor = NULL;
-	GameCursor = TheUI.Point.Cursor;				// Reset
+	GameCursor = TheUI.Point.Cursor;  // Reset
 	HandleMouseOn(x, y);
 	DebugLevel3("MouseOn %d\n" _C_ CursorOn);
 
-	//		Restrict mouse to minimap when dragging
+	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap &&
 			(MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
@@ -719,13 +714,13 @@ global void UIHandleMouseMove(int x, int y)
 	}
 
 	//
-	//		User may be draging with button pressed.
+	//  User may be draging with button pressed.
 	//
 	if (GameMenuButtonClicked || GameDiplomacyButtonClicked) {
 		return;
 	}
 
-	//		This is forbidden for unexplored and not visible space
+	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
 	if (CursorOn == CursorOnMap) {
 		const Viewport* vp;
@@ -744,7 +739,7 @@ global void UIHandleMouseMove(int x, int y)
 		}
 	}
 
-	//NOTE: vladi: if unit is invisible, no cursor hint should be allowed
+	// NOTE: vladi: if unit is invisible, no cursor hint should be allowed
 	// FIXME: johns: not corrrect? Should I get informations about
 	// buildings under fog of war?
 	if (UnitUnderCursor && !UnitVisibleAsGoal(UnitUnderCursor, ThisPlayer) &&
@@ -753,7 +748,7 @@ global void UIHandleMouseMove(int x, int y)
 	}
 
 	//
-	//		Selecting target.
+	//  Selecting target.
 	//
 	if (CursorState == CursorStateSelect) {
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
@@ -767,7 +762,7 @@ global void UIHandleMouseMove(int x, int y)
 			}
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
 				//
-				//		Minimap move viewpoint
+				//  Minimap move viewpoint
 				//
 				ViewportCenterViewpoint(TheUI.SelectedViewport,
 					ScreenMinimap2MapX(CursorX),
@@ -779,11 +774,11 @@ global void UIHandleMouseMove(int x, int y)
 	}
 
 	//
-	//		Cursor pointing.
+	//  Cursor pointing.
 	//
 	if (CursorOn == CursorOnMap) {
 		//
-		//		Map
+		//  Map
 		//
 		if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration &&
 				(UnitVisible(UnitUnderCursor, ThisPlayer) || ReplayRevealMap)) {
@@ -795,7 +790,7 @@ global void UIHandleMouseMove(int x, int y)
 
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		//
-		//		Minimap move viewpoint
+		//  Minimap move viewpoint
 		//
 		ViewportCenterViewpoint(TheUI.SelectedViewport,
 			ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
@@ -808,10 +803,10 @@ global void UIHandleMouseMove(int x, int y)
 //.............................................................................
 
 /**
-**		Send selected units to repair
+**  Send selected units to repair
 **
-**		@param sx		X screen map position.
-**		@param sy		Y screen map position.
+**  @param sx  X screen map position.
+**  @param sy  Y screen map position.
 */
 local int SendRepair(int sx, int sy)
 {
@@ -827,8 +822,8 @@ local int SendRepair(int sx, int sy)
 	y = sy / TileSizeY;
 
 	// Check if the dest is repairable!
-	if ((dest = UnitUnderCursor) && (dest->HP < dest->Stats->HitPoints) &&
-			(dest->Type->RepairHP) &&
+	if ((dest = UnitUnderCursor) && dest->HP < dest->Stats->HitPoints &&
+			dest->Type->RepairHP &&
 			(dest->Player == ThisPlayer || IsAllied(ThisPlayer, dest))) {
 		for (i = 0; i < NumSelected; ++i) {
 			unit = Selected[i];
@@ -844,13 +839,13 @@ local int SendRepair(int sx, int sy)
 }
 
 /**
-**		Send selected units to point.
+**  Send selected units to point.
 **
-**		@param sx		X screen tile position.
-**		@param sy		Y screen tile position.
+**  @param sx  X screen tile position.
+**  @param sy  Y screen tile position.
 **
-**		@todo		To reduce the CPU load for pathfinder, we should check if
-**				the destination is reachable and handle nice group movements.
+**  @todo To reduce the CPU load for pathfinder, we should check if
+**        the destination is reachable and handle nice group movements.
 */
 local int SendMove(int sx, int sy)
 {
@@ -863,9 +858,9 @@ local int SendMove(int sx, int sy)
 	ret = 0;
 	//  Move to a transporter.
 	if ((transporter = UnitUnderCursor) &&
-			(transporter->Type->Transporter) &&
-			((transporter->Player == ThisPlayer) ||
-			PlayersTeamed(ThisPlayer->Player,transporter->Player->Player))) {
+			transporter->Type->Transporter &&
+			(transporter->Player == ThisPlayer ||
+				PlayersTeamed(ThisPlayer->Player, transporter->Player->Player))) {
 		SendCommandStopUnit(transporter);
 		ret = 1;
 	} else {
@@ -891,18 +886,18 @@ local int SendMove(int sx, int sy)
 }
 
 /**
-**		Send the current selected group attacking.
+**  Send the current selected group attacking.
 **
-**		To empty field:
-**				Move to this field attacking all enemy units in reaction range.
+**  To empty field:
+**    Move to this field attacking all enemy units in reaction range.
 **
-**		To unit:
-**				Move to unit attacking and tracing the unit until dead.
+**  To unit:
+**    Move to unit attacking and tracing the unit until dead.
 **
-**		@param sx		X screen map position.
-**		@param sy		Y screen map position.
+**  @param sx  X screen map position.
+**  @param sy  Y screen map position.
 **
-**		@see Selected, @see NumSelected
+**  @see Selected, @see NumSelected
 */
 local int SendAttack(int sx, int sy)
 {
@@ -925,7 +920,8 @@ local int SendAttack(int sx, int sy)
 			} else {
 				dest = NoUnitP;
 			}
-			if (dest != unit) {		// don't let an unit self destruct
+			// don't let an unit self destruct
+			if (dest != unit) {
 				SendCommandAttack(unit, x, y, dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
 			}
@@ -938,10 +934,10 @@ local int SendAttack(int sx, int sy)
 }
 
 /**
-**		Send the current selected group ground attacking.
+**  Send the current selected group ground attacking.
 **
-**		@param sx		X screen map position.
-**		@param sy		Y screen map position.
+**  @param sx  X screen map position.
+**  @param sy  Y screen map position.
 */
 local int SendAttackGround(int sx, int sy)
 {
@@ -966,9 +962,10 @@ local int SendAttackGround(int sx, int sy)
 }
 
 /**
-**		Let units patrol between current postion and the selected.
-**		@param sx		X screen map position.
-**		@param sy		Y screen map position.
+**  Let units patrol between current postion and the selected.
+**
+**  @param sx  X screen map position.
+**  @param sy  Y screen map position.
 */
 local int SendPatrol(int sx, int sy)
 {
@@ -987,12 +984,12 @@ local int SendPatrol(int sx, int sy)
 }
 
 /**
-**		Let units harvest wood/mine gold/haul oil
+**  Let units harvest wood/mine gold/haul oil
 **
-**		@param sx		X screen map position
-**		@param sy		Y screen map position
+**  @param sx  X screen map position
+**  @param sy  Y screen map position
 **
-**		@see Selected
+**  @see Selected
 */
 local int SendResource(int sx, int sy)
 {
@@ -1069,10 +1066,10 @@ local int SendResource(int sx, int sy)
 }
 
 /**
-**		Send selected units to unload passengers.
+**  Send selected units to unload passengers.
 **
-**		@param sx		X screen map position.
-**		@param sy		Y screen map position.
+**  @param sx  X screen map position.
+**  @param sy  Y screen map position.
 */
 local int SendUnload(int sx, int sy)
 {
@@ -1090,16 +1087,16 @@ local int SendUnload(int sx, int sy)
 }
 
 /**
-**		Send the current selected group for spell cast.
+**  Send the current selected group for spell cast.
 **
-**		To empty field:
-**		To unit:
-**				Spell cast on unit or on map spot.
+**  To empty field:
+**  To unit:
+**    Spell cast on unit or on map spot.
 **
-**		@param sx		X screen map position.
-**		@param sy		Y screen map position.
+**  @param sx  X screen map position.
+**  @param sy  Y screen map position.
 **
-**		@see Selected, @see NumSelected
+**  @see Selected, @see NumSelected
 */
 local int SendSpellCast(int sx, int sy)
 {
@@ -1125,13 +1122,15 @@ local int SendSpellCast(int sx, int sy)
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
 		if (!unit->Type->CanCastSpell) {
-			DebugLevel0Fn("but unit %d(%s) can't cast spells?\n"
-					_C_ unit->Slow _C_ unit->Type->Name);
-			continue;						// this unit cannot cast spell
+			DebugLevel0Fn("but unit %d(%s) can't cast spells?\n" _C_
+				unit->Slow _C_ unit->Type->Name);
+			// this unit cannot cast spell
+			continue;
 		}
 		if (dest && unit == dest) {
-			continue;						// no unit can cast spell on himself
+			// no unit can cast spell on himself
 			// n0b0dy: why not?
+			continue;
 		}
 		// CursorValue here holds the spell type id
 		SendCommandSpellCast(unit, x, y, dest, CursorValue,
@@ -1142,10 +1141,10 @@ local int SendSpellCast(int sx, int sy)
 }
 
 /**
-**		Send a command to selected units.
+**  Send a command to selected units.
 **
-**		@param sx		X screen map position
-**		@param sy		Y screen map position
+**  @param sx  X screen map position
+**  @param sy  Y screen map position
 */
 local void SendCommand(int sx, int sy)
 {
@@ -1157,7 +1156,7 @@ local void SendCommand(int sx, int sy)
 	ret = 0;
 	x = sx / TileSizeX;
 	y = sy / TileSizeY;
-	CurrentButtonLevel = 0; // reset unit buttons to normal
+	CurrentButtonLevel = 0;
 	UpdateButtonPanel();
 	switch (CursorAction) {
 		case ButtonMove:
@@ -1204,14 +1203,18 @@ local void SendCommand(int sx, int sy)
 //.............................................................................
 
 /**
-**		Mouse button press on selection/group area.
+**  Mouse button press on selection/group area.
 **
-**		@param num		Button number.
-**		@param button		Mouse Button pressed.
+**  @param num     Button number.
+**  @param button  Mouse Button pressed.
 */
-local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
+local void DoSelectionButtons(int num, unsigned button __attribute__((unused)))
 {
 	Unit* unit;
+
+	if (GameObserve || GamePaused) {
+		return;
+	}
 
 	if (num >= NumSelected || !(MouseButtons & LeftButton)) {
 		return;
@@ -1239,30 +1242,30 @@ local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
 
 	ClearStatusLine();
 	ClearCosts();
-	CurrentButtonLevel = 0;				// reset unit buttons to normal
+	CurrentButtonLevel = 0;
 	SelectionChanged();
 }
 
 //.............................................................................
 
 /**
-**		Handle mouse button pressed in select state.
+**  Handle mouse button pressed in select state.
 **
-**		Select state is used for target of patrol, attack, move, ....
+**  Select state is used for target of patrol, attack, move, ....
 **
-**		@param button		Button pressed down.
+**  @param button  Button pressed down.
 */
 local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 {
 	int sx;
 	int sy;
-	const Viewport* vp;
 
-	vp = TheUI.MouseViewport;
-
+	if (GameObserve || GamePaused) {
+		return;
+	}
 
 	//
-	//		Clicking on the map.
+	//  Clicking on the map.
 	//
 	if (CursorOn == CursorOnMap) {
 		ClearStatusLine();
@@ -1272,23 +1275,28 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		CurrentButtonLevel = 0;
 		UpdateButtonPanel();
 
-		sx = CursorX - vp->X + TileSizeX * vp->MapX + vp->OffsetX;
-		sy = CursorY - vp->Y + TileSizeY * vp->MapY + vp->OffsetY;
 		if (MouseButtons & LeftButton) {
+			const Viewport* vp;
+
+			vp = TheUI.MouseViewport;
 			if (ClickMissile) {
+				int mx;
+				int my;
+
+				mx = vp->MapX * TileSizeX + CursorX - vp->X + vp->OffsetX;
+				my = vp->MapY * TileSizeY + CursorY - vp->Y + vp->OffsetY;
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-					vp->MapX * TileSizeX+CursorX - vp->X + vp->OffsetX,
-					vp->MapY * TileSizeY+CursorY - vp->Y + vp->OffsetY,
-					vp->MapX * TileSizeX+CursorX - vp->X + vp->OffsetX,
-					vp->MapY * TileSizeY+CursorY - vp->Y + vp->OffsetY);
+					mx, my, mx, my);
 			}
+			sx = CursorX - vp->X + TileSizeX * vp->MapX + vp->OffsetX;
+			sy = CursorY - vp->Y + TileSizeY * vp->MapY + vp->OffsetY;
 			SendCommand(sx, sy);
 		}
 		return;
 	}
 
 	//
-	//		Clicking on the minimap.
+	//  Clicking on the minimap.
 	//
 	if (CursorOn == CursorOnMinimap) {
 		int mx;
@@ -1303,7 +1311,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 			ClearCosts();
 			CursorState = CursorStatePoint;
 			GameCursor = TheUI.Point.Cursor;
-			CurrentButtonLevel = 0; // reset unit buttons to normal
+			CurrentButtonLevel = 0;
 			UpdateButtonPanel();
 			if (ClickMissile) {
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
@@ -1328,14 +1336,14 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	ClearCosts();
 	CursorState = CursorStatePoint;
 	GameCursor = TheUI.Point.Cursor;
-	CurrentButtonLevel = 0; // reset unit buttons to normal
+	CurrentButtonLevel = 0;
 	UpdateButtonPanel();
 }
 
 /**
-**		Called if mouse button pressed down.
+**  Called if mouse button pressed down.
 **
-**		@param button		Button pressed down.
+**  @param button  Button pressed down.
 */
 global void UIHandleButtonDown(unsigned button)
 {
@@ -1348,7 +1356,7 @@ global void UIHandleButtonDown(unsigned button)
 	int i;
 
 /**
-**		Detect long selection click, FIXME: tempory hack to test the feature.
+**  Detect long selection click, FIXME: tempory hack to test the feature.
 */
 #define LongSelected (MouseButtons & ((LeftButton << MouseHoldShift)))
 
@@ -1373,22 +1381,21 @@ global void UIHandleButtonDown(unsigned button)
 		OldValid = 0;
 	}
 
-	if (CursorState == CursorStateRectangle) {		// select mode
+	// select mode
+	if (CursorState == CursorStateRectangle) {
 		return;
 	}
 
 	//
-	//		Selecting target. (Move,Attack,Patrol,... commands);
+	//  Selecting target. (Move,Attack,Patrol,... commands);
 	//
 	if (CursorState == CursorStateSelect) {
-		if (!GameObserve && !GamePaused) {
-			UISelectStateButtonDown(button);
-		}
+		UISelectStateButtonDown(button);
 		return;
 	}
 
 	//
-	//		Cursor is on the map area
+	//  Cursor is on the map area
 	//
 	if (CursorOn == CursorOnMap) {
 		Assert(TheUI.MouseViewport);
@@ -1431,7 +1438,7 @@ global void UIHandleButtonDown(unsigned button)
 						MaxSampleVolume);
 					SendCommandBuildBuilding(Selected[0], x, y, CursorBuilding,
 						!(KeyModifiers & ModifierShift));
-					if (!((KeyModifiers & ModifierAlt) || (KeyModifiers & ModifierShift))) {
+					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 						CancelBuildingMode();
 					}
 				} else {
@@ -1487,7 +1494,7 @@ global void UIHandleButtonDown(unsigned button)
 			}
 		}
 	//
-	//		Cursor is on the minimap area
+	//  Cursor is on the minimap area
 	//
 	} else if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
@@ -1506,19 +1513,17 @@ global void UIHandleButtonDown(unsigned button)
 			}
 		}
 	//
-	//		Cursor is on the buttons: group or command
+	//  Cursor is on the buttons: group or command
 	//
 	} else if (CursorOn == CursorOnButton) {
 		//
 		//		clicked on info panel - selection shown
 		//
 		if (NumSelected > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
-			if (!GameObserve && !GamePaused) {
-				DoSelectionButtons(ButtonUnderCursor, button);
-			}
+			DoSelectionButtons(ButtonUnderCursor, button);
 		} else if ((MouseButtons & LeftButton)) {
 			//
-			//		clicked on menu button
+			//  clicked on menu button
 			//
 			if (ButtonAreaUnderCursor == ButtonAreaMenu) {
 				if ((ButtonUnderCursor == ButtonUnderMenu ||
@@ -1532,7 +1537,7 @@ global void UIHandleButtonDown(unsigned button)
 					GameDiplomacyButtonClicked = 1;
 				}
 			//
-			//		clicked on selected button
+			//  clicked on selected button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaSelected) {
 				//
@@ -1545,7 +1550,7 @@ global void UIHandleButtonDown(unsigned button)
 						Selected[0]->IY + TileSizeY / 2);
 				}
 			//
-			//		clicked on training button
+			//  clicked on training button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 				if (!GameObserve && !GamePaused &&
@@ -1560,7 +1565,7 @@ global void UIHandleButtonDown(unsigned button)
 					}
 				}
 			//
-			//		clicked on upgrading button
+			//  clicked on upgrading button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
 				if (!GameObserve && !GamePaused &&
@@ -1572,7 +1577,7 @@ global void UIHandleButtonDown(unsigned button)
 					}
 				}
 			//
-			//		clicked on researching button
+			//  clicked on researching button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
 				if (!GameObserve && !GamePaused && 
@@ -1584,7 +1589,7 @@ global void UIHandleButtonDown(unsigned button)
 					}
 				}
 			//
-			//		clicked on button panel
+			//  clicked on button panel
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
 				//
@@ -1613,7 +1618,7 @@ global void UIHandleButtonDown(unsigned button)
 			}
 		} else if ((MouseButtons & MiddleButton)) {
 			//
-			//		clicked on info panel - single unit shown
+			//  clicked on info panel - single unit shown
 			//
 			if (ButtonAreaUnderCursor == ButtonAreaSelected &&
 					ButtonUnderCursor == 0 && NumSelected == 1) {
@@ -1630,22 +1635,22 @@ global void UIHandleButtonDown(unsigned button)
 }
 
 /**
-**		Called if mouse button released.
+**  Called if mouse button released.
 **
-**		@param button		Button released.
+**  @param button  Button released.
 */
 global void UIHandleButtonUp(unsigned button)
 {
 	//
-	//		Move map.
+	//  Move map.
 	//
 	if (GameCursor == TheUI.Scroll.Cursor) {
-		GameCursor = TheUI.Point.Cursor;				// Reset
+		GameCursor = TheUI.Point.Cursor;
 		return;
 	}
 
 	//
-	//		Menu (F10) button
+	//  Menu (F10) button
 	//
 	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
 		GameMenuButtonClicked = 0;
@@ -1689,7 +1694,7 @@ global void UIHandleButtonUp(unsigned button)
 
 		unit = NULL;
 		//
-		//		Little threshold
+		//  Little threshold
 		//
 		if (CursorStartX < CursorX - 1 || CursorStartX > CursorX + 1 ||
 				CursorStartY < CursorY - 1 || CursorStartY > CursorY + 1) {
@@ -1789,14 +1794,14 @@ global void UIHandleButtonUp(unsigned button)
 		if (num) {
 			ClearStatusLine();
 			ClearCosts();
-			CurrentButtonLevel = 0; // reset unit buttons to normal
+			CurrentButtonLevel = 0;
 			SelectionChanged();
 
 			//
-			//		Play selecting sound.
-			//				Buildings,
-			//				This player, or neutral unit (goldmine,critter)
-			//				Other clicks.
+			//  Play selecting sound.
+			//    Buildings,
+			//    This player, or neutral unit (goldmine,critter)
+			//    Other clicks.
 			//
 			if (NumSelected == 1) {
 				if (Selected[0]->Orders[0].Action == UnitActionBuilded) {
