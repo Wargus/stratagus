@@ -297,8 +297,8 @@ local Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
     missile->Y = sy - mtype->Height / 2;
     missile->DX = dx - mtype->Width / 2;
     missile->DY = dy - mtype->Height / 2;
-    missile->SourceX = sx;
-    missile->SourceY = sy;
+    missile->SourceX = missile->X;
+    missile->SourceY = missile->Y;
     missile->Type = mtype;
     missile->SpriteFrame = 0;
     missile->State = 0;
@@ -960,13 +960,13 @@ local int ParabolicCalc(Missile* missile, int amplitude)
     int thetha;
 
     missile->Xl -= missile->Xstep;
-    missile->X = (missile->Xl + 500) / 1000;
+    missile->X = (missile->Xl ) / 1000;
 
     xmid = (missile->SourceX + missile->DX) / 2;
     sinu = (missile->X - xmid) * (missile->X - xmid);
     thetha = missile->SourceX - xmid;
     missile->Y = ((missile->Angle * (missile->X - missile->SourceX)) -
-	amplitude * isqrt(-sinu + thetha * thetha) + missile->SourceY * 1000 + 500) / 1000;
+	amplitude * isqrt(-sinu + thetha * thetha) + missile->SourceY * 1000 + 500 ) / 1000;
 
     return 0;
 }
@@ -1007,7 +1007,7 @@ local int ParabolicMissile(Missile* missile)
 	} else {
 	    missile->Angle = 1;
 	}
-	missile->Xl = missile->X * 1000;
+	missile->Xl = missile->SourceX * 1000;
 
 	MissileNewHeadingFromXY(missile, dx * xstep, dy * ystep);
 
