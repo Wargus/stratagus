@@ -39,6 +39,11 @@
 
 #define MINIMAP_FAC	(16*3)		/// integer scale factor
 
+    /// unit attacked are shown red for at least this amount of cycles
+#define ATTACK_RED_DURATION	(1*CYCLES_PER_SECOND)
+    /// unit attacked are shown blinking for this amount of cycles
+#define ATTACK_BLINK_DURATION	(7*CYCLES_PER_SECOND)
+
     /// Update seen tile change in minimap
 #define UpdateMinimapSeenXY(tx,ty)
 
