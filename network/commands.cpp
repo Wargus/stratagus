@@ -411,7 +411,8 @@ global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
 /**
 **	Send command: Cancel training.
 **
-**	@param unit	pointer to unit.
+**	@param unit	Pointer to unit.
+**	@param slot	Slot of training queue to cancel.
 */
 global void SendCommandCancelTraining(Unit* unit,int slot)
 {
@@ -545,7 +546,8 @@ global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,i
 **	@param y	optional y map position.
 **	@param Dest	optional destination unit.
 */
-global void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x,unsigned short y,UnitRef Dest)
+global void ParseCommand(unsigned short Type,UnitRef Unum,
+	unsigned short x,unsigned short y,UnitRef Dest)
 {
     Unit *unit, *dest;
     int id, status;
@@ -554,9 +556,11 @@ global void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x,unsig
 
     unit=UnitSlots[Unum];
     DebugCheck( !unit );
+    //
+    //	Check if unit is already killed?
+    //
     if( unit->Destroyed ) {
-	DebugLevel0Fn(" destroyed unit skipping %Zd\n"
-		,UnitNumber(unit));
+	DebugLevel0Fn(" destroyed unit skipping %Zd\n",UnitNumber(unit));
 	return;
     }
 
