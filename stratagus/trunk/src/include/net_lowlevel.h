@@ -10,7 +10,7 @@
 //
 /**@name net_lowlevel.h - The network low level header file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -113,6 +113,14 @@ typedef int Socket;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+typedef struct _socket_set_ {
+	int MaxSockets;
+	Socket* Sockets;
+	int* SocketReady;
+	int NumSockets;
+	Socket MaxSockFD;
+} SocketSet;
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -153,6 +161,10 @@ extern int NetSendUDP(Socket sockfd, unsigned long host, int port,
 extern int NetSendTCP(Socket sockfd, const void* buf, int len);
 	/// Wait for socket ready.
 extern int NetSocketReady(Socket sockfd, int timeout);
+	/// Wait for socket set ready.
+extern int NetSocketSetReady(SocketSet* sockfd, int timeout);
+	/// Check if a socket in a socket set is ready.
+extern int NetSocketSetSocketReady(SocketSet* set, Socket socket);
 	/// Receive from a UDP socket.
 extern int NetRecvUDP(Socket sockfd, void* buf, int len);
 	/// Receive from a TCP socket.
@@ -161,6 +173,15 @@ extern int NetRecvTCP(Socket sockfd, void* buf, int len);
 extern int NetListenTCP(Socket sockfd);
 	/// Accept a connection on a TCP socket
 extern Socket NetAcceptTCP(Socket sockfd);
+
+	/// Allocate a socket set
+extern SocketSet* NetAllocSocketSet(void);
+	/// Add a socket to a socket set
+extern void NetAddSocket(SocketSet* set, Socket socket);
+	/// Delete a socket from a socket set
+extern void NetDelSocket(SocketSet* set, Socket socket);
+	/// Free a socket set
+extern void NetFreeSocketSet(SocketSet* set);
 
 //@}
 
