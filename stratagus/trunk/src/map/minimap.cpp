@@ -330,8 +330,8 @@ global void UpdateMinimap(void)
 	    table = &(*table)->Next;
 	    continue;
 	}
-	if (!UnitDrawableOnMap(*table) && (*table)->Seen.State != 3
-		&& !(*table)->Seen.Destroyed && (type = (*table)->Seen.Type) ) {
+	if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
+		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
 	    if( (*table)->Player->Player == PlayerNumNeutral ) {
 		color = (*table)->Type->NeutralMinimapColorRGB;
 	    } else {
@@ -363,13 +363,21 @@ global void UpdateMinimap(void)
 
 	unit = *table;
 
-	//
-	//	If the unit is not known on map don't draw it.
-	//	This function should cover shared vision and stuff.
-	//
-	if (!UnitDrawableOnMap(unit) && !ReplayRevealMap) {
+	if (unit->Removed) {		// Removed, inside another building
 	    continue;
 	}
+	if (unit->Invisible) {		// Can't be seen
+	    continue;
+	}
+	if (!(unit->Visible & (1 << ThisPlayer->Player))) {
+	    continue;			// Cloaked unit not visible
+	}
+
+	if (!UnitKnownOnMap(unit) && !ReplayRevealMap) {
+	    continue;
+	}
+
+	// FIXME: submarine not visible
 
 	type = unit->Type;
 	//
@@ -804,18 +812,13 @@ global void UpdateMinimap(void)
     //	FIXME: and other changes
     //
 
-    table = &CorpseList;
-
+    //	Draw Destroyed Buildings On Map
+    table = &DestroyedBuildings;
     while (*table) {
 	VMemType color;
 
-	// Only for buildings?
-	if (!(*table)->Type->Building) {
-	    table = &(*table)->Next;
-	    continue;
-	}
-	if (!UnitDrawableOnMap(*table) && (*table)->Seen.State != 3
-		&& !(*table)->Seen.Destroyed && (type = (*table)->Seen.Type) ) {
+	if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
+		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
 	    if( (*table)->Player->Player == PlayerNumNeutral ) {
 		color = VideoMapRGB((*table)->Type->NeutralMinimapColorRGB.D24.a,
 		        (*table)->Type->NeutralMinimapColorRGB.D24.b,
@@ -849,13 +852,21 @@ global void UpdateMinimap(void)
 
 	unit = *table;
 
-	//
-	//	If the unit is not known on map don't draw it.
-	//	This function should cover shared vision and stuff.
-	//
-	if (!UnitDrawableOnMap(unit) && !ReplayRevealMap) {
+	if (unit->Removed) {		// Removed, inside another building
 	    continue;
 	}
+	if (unit->Invisible) {		// Can't be seen
+	    continue;
+	}
+	if (!(unit->Visible & (1 << ThisPlayer->Player))) {
+	    continue;			// Cloaked unit not visible
+	}
+
+	if (!UnitKnownOnMap(unit) && !ReplayRevealMap) {
+	    continue;
+	}
+
+	// FIXME: submarine not visible
 
 	type = unit->Type;
 	//

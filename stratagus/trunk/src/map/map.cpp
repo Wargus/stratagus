@@ -132,35 +132,19 @@ global void MapMarkSeenTile(int x, int y)
 */
 global void RevealMap(void)
 {
-    int x;
-    int y;
-    int p;
+    int ix;
+    int iy;
 
-    DebugLevel1Fn("\n");
-    for (x = 0; x < TheMap.Width; ++x) {
-	for (y = 0; y < TheMap.Height; ++y) {
+    for (ix = 0; ix < TheMap.Width; ++ix) {
+	for (iy = 0; iy < TheMap.Height; ++iy) {
 	    int i;
 	    for (i = 0; i < PlayerMax; ++i) {
-		if (!TheMap.Fields[x+y*TheMap.Width].Visible[i]) {
-		    TheMap.Fields[x+y*TheMap.Width].Visible[i] = 1;
+		if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
+		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i] = 1;
 		}
 	    }
-	    MapMarkSeenTile(x, y);
-	}
-    }
-    //
-    //	Start a global unit seen recount. It's the best way.
-    //	We also have to copy seen values for every unit, and thus mark those units as
-    //	dicovered.
-    //
-    for (x = 0; x < NumUnits; ++x) {
-	for (p = 0; p < PlayerMax; ++p) {
-	    if (Players[p].Type == PlayerPerson && (!(Units[x]->SeenByPlayer & (1 << p))) &&
-		    Units[x]->Type->VisibleUnderFog && !Units[x]->VisCount[p]) {
-		DebugLevel0Fn("unit %d first seen by %d\n" _C_ Units[x]->Slot _C_ p);
-		UnitGoesUnderFog(Units[x], p);
-		Units[x]->SeenByPlayer |= (1 << p);
-	    }
+	    MapMarkSeenTile(ix, iy);
+	    UnitsMarkSeen(ix, iy);
 	}
     }
 }

@@ -142,7 +142,6 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 
 	UnitCacheRemove(unit);
 
-	MapMarkUnitDeltaSight(unit, xd, yd);
 	MapUnmarkUnitSight(unit);
 	//  ummark sight for units inside too.
 	uninside = unit->UnitInside;
@@ -158,6 +157,7 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 
 	MustRedraw |= RedrawMinimap;
 
+	MapMarkUnitSight(unit);
 	//  Remove unit from the current selection
 	if (unit->Selected && !IsMapFieldVisible(ThisPlayer, unit->X, unit->Y)) {
 	    if (NumSelected == 1) {          //  Remove building cursor
@@ -173,15 +173,15 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	    MapMarkUnitOnBoardSight(uninside, unit);
 	}
 
+	//  Reveal cloaked units.
+	if (unit->Type->DetectCloak) {
+	    MapDetectCloakedUnits(unit);
+	}
+
 	unit->IX = -xd * TileSizeX;
 	unit->IY = -yd * TileSizeY;
 	unit->Frame = 0;
 	UnitHeadingFromDeltaXY(unit, xd, yd);
-
-	//
-	//	Unit has moved, reference count is screwed.
-	//
-	UnitCountSeen(unit);
     } else {
 	xd = Heading2X[unit->Direction / NextDirection];
 	yd = Heading2Y[unit->Direction / NextDirection];
