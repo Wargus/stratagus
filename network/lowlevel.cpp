@@ -159,7 +159,6 @@ global void NetCloseUDP(int sockfd)
 
 #endif	// } !USE_SDL_NET && !USE_WINSOCK
 
-#ifdef DEBUG
 /**
 **	Resolve host in name or dotted quad notation.
 **
@@ -185,7 +184,6 @@ global unsigned long NetResolveHost(const char* host)
     }
     return INADDR_NONE;
 }
-#endif
 
 #ifdef NEW_NETMENUS
 // ARI: I knew how to write this for a unix environment,
@@ -374,6 +372,8 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
     sock_addr.sin_addr.s_addr = host;
     sock_addr.sin_port = port;
     sock_addr.sin_family = AF_INET;
+
+    //if( MyRand()%2 ) return 0;
 
     return sendto(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,n);
 }
