@@ -230,7 +230,6 @@ static Unit* CheckCanBuild(Unit* unit)
 		return NULL;
 	}
 
-	unit->SubAction = 40;
 	return ontop;
 }
 
@@ -306,7 +305,7 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
 		// FIXME: Should have a BuildRange?
 		unit->Orders[0].Range = unit->Type->RepairRange;
-		unit->SubAction = 50;
+		unit->SubAction = 40;
 		unit->Wait = 1;
 		RefsIncrease(build);
 		// Mark the new building seen.
@@ -404,12 +403,11 @@ void HandleActionBuild(Unit* unit)
 		MoveToLocation(unit);
 	}
 	if (20 <= unit->SubAction && unit->SubAction <= 30) {
-		ontop = CheckCanBuild(unit);
+		if ((ontop = CheckCanBuild(unit))) {
+			StartBuilding(unit, ontop);
+		}
 	}
 	if (unit->SubAction == 40) {
-		StartBuilding(unit, ontop);
-	}
-	if (unit->SubAction == 50) {
 		BuildBuilding(unit);
 	}
 }
