@@ -761,8 +761,7 @@ local void X11HandleKeyPress(const EventCallback* callbacks,KeySym keycode,
     int icode;
 
     icode=X112InternalKeycode(keycode);
-
-    callbacks->KeyPressed(icode,keychar);
+    InputKeyButtonPress(callbacks, X11GetTicks(), icode, keychar);
 }
 
 /**
@@ -778,8 +777,7 @@ local void X11HandleKeyRelease(const EventCallback* callbacks,KeySym keycode,
     int icode;
 
     icode=X112InternalKeycode(keycode);
-
-    callbacks->KeyReleased(icode,keychar);
+    InputKeyButtonRelease(callbacks, X11GetTicks(), icode, keychar);
 }
 
 /**
@@ -970,6 +968,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #endif
 
     InputMouseTimeout(callbacks,ticks);
+    InputKeyTimeout(callbacks,ticks);
 
     for( ;; ) {
 #ifdef SLOW_INPUT

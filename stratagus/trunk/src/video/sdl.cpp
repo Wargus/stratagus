@@ -593,6 +593,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
     InputMouseTimeout(callbacks,ticks);
     InputKeyTimeout(callbacks,ticks);
+
     for(;;) {
 	//
 	//	Time of frame over? This makes the CPU happy. :(
