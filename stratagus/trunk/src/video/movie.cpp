@@ -228,6 +228,7 @@ global int PlayMovie(const char* name, int flags)
     PB_INSTANCE* pbi;
     EventCallback callbacks;
     SDL_Rect rect;
+    int oldspeed;
 
     // FIXME: Should split this into lowlevel parts.
 
@@ -254,6 +255,7 @@ global int PlayMovie(const char* name, int flags)
     if (overlay->hw_overlay) {
 	DebugLevel0Fn("Got a hardware overlay.\n");
     }
+    oldspeed = VideoSyncSpeed;
     VideoSyncSpeed = avi->FPS100 / FRAMES_PER_SECOND;
     SetVideoSync();
 
@@ -327,6 +329,9 @@ global int PlayMovie(const char* name, int flags)
     SDL_FreeYUVOverlay(overlay);
 
     MovieClose(avi);
+
+    VideoSyncSpeed = oldspeed;
+    SetVideoSync();
 
     return 0;
 }
