@@ -38,6 +38,22 @@
 **	Visit the http://FreeCraft.Org web page for the latest news and
 **	../doc/readme.html for other documentations.
 **
+**	@section Modules Modules
+**
+**	This are the main modules of the FreeCraft engine.
+**
+**	@subsection Map Map
+**	@subsection Unit Unit
+**	@subsection Missile Missile
+**	@subsection Player Player
+**	@subsection Sound Sound
+**	@subsection Video Video
+**	@subsection Network Network
+**	@subsection Pathfinder Pathfinder
+**	@subsection AI AI
+**	@subsection CCL CCL
+**
+**
 */
 
 /*----------------------------------------------------------------------------
@@ -415,10 +431,12 @@ global volatile void Exit(int err)
 
     QuitSound();
     NetworkQuit();
-    DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
-	,FrameCounter,SlowFrameCounter
-	,(SlowFrameCounter*100)/(FrameCounter ? : 1));
+
+    ExitNetwork1();
     IfDebug(
+	DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
+	    ,FrameCounter,SlowFrameCounter
+	    ,(SlowFrameCounter*100)/(FrameCounter ? : 1));
 	UnitCacheStatistic();
 	DebugLevel0("Path: Error: %u Unreachable: %u OK: %u Depth: %u\n"
 		,PfCounterFail,PfCounterNotReachable
@@ -511,8 +529,8 @@ local void Usage(void)
 \t-l\t\tEnable command log to \"command.log\"\n\
 \t-p players\tNumber of players\n\
 \t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
-\t-L lag\t\tNetwork lag in # frames\n\
-\t-U update\tNetwork update frequence in # frames\n\
+\t-L lag\t\tNetwork lag in # frames (default 5 = 165ms)\n\
+\t-U update\tNetwork update frequence in # frames (default 5 = 6x pro s)\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
