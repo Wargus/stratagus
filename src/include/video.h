@@ -1126,8 +1126,8 @@ extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 
 	///		Free a graphic object.
 #define VideoFree(o)		((o)->Type->Free)((o))
-	///		Save (NULL) free a graphic object.
-#define VideoSaveFree(o) \
+	///		Safe (NULL) free a graphic object.
+#define VideoSafeFree(o) \
 	do { if ((o)) ((o)->Type->Free)((o)); } while(0)
 
 
