@@ -28,7 +28,7 @@
 ##-----------------------------------------------------------------------------
 ##	HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_FOW"
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_FOW -DBUILDING_DESTROYED"
 
 ## These could be used for experimental versions
 ## ---------------------------------------------
