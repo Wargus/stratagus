@@ -2780,18 +2780,17 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
 	cp = fsuffix + strlen(suf);
 #ifdef USE_ZLIB
 	if (strcmp(cp, ".gz") == 0) {
-	    *cp = 0;
+	    fl->type='z';
 	}
 #endif
 #ifdef USE_BZ2LIB
 	if (strcmp(cp, ".bz2") == 0) {
-	    *cp = 0;
+	    fl->type='b';
 	}
 #endif
-
 		if (strstr(pathbuf, ".sav")) {
-		    *fsuffix = 0;
-		    fl->type = 1;
+		    if (fl->type == -1)
+			fl->type = 'n';
 		    fl->name = strdup(np);
 		    fl->xdata = NULL;
 		    return 1;
@@ -2820,7 +2819,7 @@ local void LoadLBInit(Menuitem *mi)
 
     LoadLBExit(mi);
     
-    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, NULL,
+    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i != 0) {
 	if (i > 7) {
