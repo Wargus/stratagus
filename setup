@@ -122,7 +122,7 @@ fi
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17.1pre2\""
+VERSION="-DVERSION=\"1.17.1\""
 UNIX=0
 BEOS=0
 WIN32=0
