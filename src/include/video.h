@@ -293,6 +293,43 @@ extern volatile int VideoInterrupts;
 extern void (*VideoDrawPixel)(SysColors color,int x,int y);
 
     /**
+    **	Draw 25% translucent pixel (Alpha=64) unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    */
+extern void (*VideoDraw25TransPixel)(SysColors color,int x,int y);
+
+    /**
+    **	Draw 50% translucent pixel (Alpha=128) unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    */
+extern void (*VideoDraw50TransPixel)(SysColors color,int x,int y);
+
+    /**
+    **	Draw 75% translucent pixel (Alpha=192) unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    */
+extern void (*VideoDraw75TransPixel)(SysColors color,int x,int y);
+
+    /**
+    **	Draw translucent pixel unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransPixel)(SysColors color,int x,int y,int alpha);
+
+    /**
     **	Draw pixel clipped to current clip setting.
     **
     **	@param color	Color index.
@@ -300,6 +337,43 @@ extern void (*VideoDrawPixel)(SysColors color,int x,int y);
     **	@param y	y coordinate on the screen
     */
 extern void (*VideoDrawPixelClip)(SysColors color,int x,int y);
+
+    /**
+    **	Draw 25% translucent pixel clipped to current clip setting.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    */
+extern void (*VideoDraw25TransPixelClip)(SysColors color,int x,int y);
+
+    /**
+    **	Draw 50% translucent pixel clipped to current clip setting.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    */
+extern void (*VideoDraw50TransPixelClip)(SysColors color,int x,int y);
+
+    /**
+    **	Draw 75% translucent pixel clipped to current clip setting.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    */
+extern void (*VideoDraw75TransPixelClip)(SysColors color,int x,int y);
+
+    /**
+    **	Draw translucent pixel clipped to current clip setting.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransPixelClip)(SysColors color,int x,int y,int alpha);
 
     /**
     **	Draw vertical line unclipped.
@@ -313,6 +387,51 @@ extern void (*VideoDrawVLine)(SysColors color,int x,int y
 	,unsigned height);
 
     /**
+    **	Draw 25% translucent vertical line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    */
+extern void (*VideoDraw25TransVLine)(SysColors color,int x,int y
+	,unsigned height);
+
+    /**
+    **	Draw 50% translucent vertical line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    */
+extern void (*VideoDraw50TransVLine)(SysColors color,int x,int y
+	,unsigned height);
+
+    /**
+    **	Draw 75% translucent vertical line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    */
+extern void (*VideoDraw75TransVLine)(SysColors color,int x,int y
+	,unsigned height);
+
+    /**
+    **	Draw translucent vertical line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransVLine)(SysColors color,int x,int y
+	,unsigned height,int alpha);
+
+    /**
     **	Draw vertical line clipped to current clip setting
     **
     **	@param color	Color index.
@@ -322,6 +441,51 @@ extern void (*VideoDrawVLine)(SysColors color,int x,int y
     */
 extern void (*VideoDrawVLineClip)(SysColors color,int x,int y
 	,unsigned height);
+
+    /**
+    **	Draw 25% translucent vertical line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    */
+extern void (*VideoDraw25TransVLineClip)(SysColors color,int x,int y
+	,unsigned height);
+
+    /**
+    **	Draw 50% translucent vertical line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    */
+extern void (*VideoDraw50TransVLineClip)(SysColors color,int x,int y
+	,unsigned height);
+
+    /**
+    **	Draw 75% translucent vertical line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    */
+extern void (*VideoDraw75TransVLineClip)(SysColors color,int x,int y
+	,unsigned height);
+
+    /**
+    **	Draw translucent vertical line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param height	height of line.
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransVLineClip)(SysColors color,int x,int y
+	,unsigned height,int alpha);
 
     /**
     **	Draw horizontal line unclipped.
@@ -335,6 +499,51 @@ extern void (*VideoDrawHLine)(SysColors color,int x,int y
 	,unsigned width);
 
     /**
+    **	Draw 25% translucent horizontal line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    */
+extern void (*VideoDraw25TransHLine)(SysColors color,int x,int y
+	,unsigned width);
+
+    /**
+    **	Draw 50% translucent horizontal line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    */
+extern void (*VideoDraw50TransHLine)(SysColors color,int x,int y
+	,unsigned width);
+
+    /**
+    **	Draw 75% translucent horizontal line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    */
+extern void (*VideoDraw75TransHLine)(SysColors color,int x,int y
+	,unsigned width);
+
+    /**
+    **	Draw translucent horizontal line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransHLine)(SysColors color,int x,int y
+	,unsigned width,int alpha);
+
+    /**
     **	Draw horizontal line clipped to current clip setting
     **
     **	@param color	Color index.
@@ -344,6 +553,173 @@ extern void (*VideoDrawHLine)(SysColors color,int x,int y
     */
 extern void (*VideoDrawHLineClip)(SysColors color,int x,int y
 	,unsigned width);
+
+    /**
+    **	Draw 25% translucent horizontal line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    */
+extern void (*VideoDraw25TransHLineClip)(SysColors color,int x,int y
+	,unsigned width);
+
+    /**
+    **	Draw 50% translucent horizontal line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    */
+extern void (*VideoDraw50TransHLineClip)(SysColors color,int x,int y
+	,unsigned width);
+
+    /**
+    **	Draw 75% translucent horizontal line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    */
+extern void (*VideoDraw75TransHLineClip)(SysColors color,int x,int y
+	,unsigned width);
+
+    /**
+    **	Draw translucent horizontal line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param width	width of line.
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransHLineClip)(SysColors color,int x,int y
+	,unsigned width,int alpha);
+
+    /**
+    **	Draw rectangle.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDrawRectangle)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw 25% translucent rectangle.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDraw25TransRectangle)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw 50% translucent rectangle.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDraw50TransRectangle)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw 75% translucent rectangle.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDraw75TransRectangle)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw translucent rectangle.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransRectangle)(SysColors color,int x,int y
+	,unsigned w,unsigned h,int alpha);
+
+    /**
+    **	Draw rectangle clipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDrawRectangleClip)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw 25% translucent rectangle clipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDraw25TransRectangleClip)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw 50% translucent rectangle clipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDraw50TransRectangleClip)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw 75% translucent rectangle clipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    */
+extern void (*VideoDraw75TransRectangleClip)(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    /**
+    **	Draw translucent rectangle clipped.
+    **
+    **	@param color	Color index.
+    **	@param x	x coordinate on the screen
+    **	@param y	y coordinate on the screen
+    **	@param h	height of rectangle.
+    **	@param w	width of rectangle.
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransRectangleClip)(SysColors color,int x,int y
+	,unsigned w,unsigned h,int alpha);
 
     /// Does ColorCycling..
 extern void (*ColorCycle)(void);
@@ -381,6 +757,8 @@ extern void (*ColorCycle)(void);
 #define VideoDrawSubClipX(o,ix,iy,w,h,x,y) \
 	((o)->Type->DrawSubClipX)((o),(ix),(iy),(w),(h),(x),(y))
 
+#if 0
+// FIXME: not written
     ///	Draw a graphic object zoomed unclipped.
 #define VideoDrawZoom(o,f,x,y,z) \
 	((o)->Type->DrawZoom)((o),(f),(x),(y),(z))
@@ -406,6 +784,8 @@ extern void (*ColorCycle)(void);
     ///	Draw a part of graphic object zoomed clipped flipped in X direction.
 #define VideoDrawZoomSubClipX(o,ix,iy,w,h,x,y,z) \
 	((o)->Type->DrawZoomSubClipX)((o),(ix),(iy),(w),(h),(x),(y),(z))
+
+#endif
 
     ///	Free a graphic object.
 #define VideoFree(o)		((o)->Type->Free)((o))
@@ -469,12 +849,21 @@ extern void InitSprite(void);
     /// Init line draw
 extern void InitLineDraw(void);
 
-    ///	Draw rectangle clipped.
-extern void VideoDrawRectangleClip(SysColors color,int x,int y
-	,unsigned w,unsigned h);
-
     ///	Draw circle clipped.
 extern void VideoDrawCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw 25% translucent circle clipped.
+extern void VideoDraw25TransCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw 50% translucent circle clipped.
+extern void VideoDraw50TransCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw 75% translucent circle clipped.
+extern void VideoDraw75TransCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw translucent circle clipped.
+extern void VideoDrawTransCircleClip(SysColors color,int x,int y,unsigned r
+	,int alpha);
 
     ///	Fill rectangle clipped.
 extern void VideoFillRectangleClip(SysColors color,int x,int y
@@ -482,6 +871,19 @@ extern void VideoFillRectangleClip(SysColors color,int x,int y
 
     ///	Fill circle clipped.
 extern void VideoFillCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill 25% translucent circle clipped.
+extern void VideoFill25TransCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill 50% translucent circle clipped.
+extern void VideoFill50TransCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill 75% translucent circle clipped.
+extern void VideoFill75TransCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill translucent circle clipped.
+extern void VideoFillTransCircleClip(SysColors color,int x,int y,unsigned r
+	,int alpha);
 
     /**
     **	Set clipping for nearly all vector primitives. Functions which support
