@@ -313,8 +313,10 @@ local void VideoDrawSub8to32Clip(
 */
 local void FreeGraphic8(Graphic* graphic)
 {
-    IfDebug( AllocatedGraphicMemory-=graphic->Size );
-    IfDebug( AllocatedGraphicMemory-=sizeof(Graphic) );
+    IfDebug(AllocatedGraphicMemory -= graphic->Size);
+    IfDebug(AllocatedGraphicMemory -= sizeof(Graphic));
+
+    VideoFreeSharedPalette(graphic->Pixels);
     free(graphic->Frames);
     free(graphic);
 }
@@ -394,86 +396,29 @@ global Graphic* NewGraphic(
 }
 
 /**
-**	creates a checksum used to compare palettes.
-**	JOSH: change the method if you have better ideas.
-**	JOHNS: I say this also always :)
-**
-**	@param palette	Palette source.
-**
-**	@return		Calculated hash/checksum.
-*/
-local long GetPaletteChecksum(const Palette* palette)
-{
-    long retVal;
-    int i;
-
-    for(retVal = i = 0; i < 256; i++){
-	//This is designed to return different values if
-	// the pixels are in a different order.
-	retVal = ((palette[i].r+i)&0xff)+retVal;
-	retVal = ((palette[i].g+i)&0xff)+retVal;
-	retVal = ((palette[i].b+i)&0xff)+retVal;
-    }
-    return retVal;
-}
-
-/**
 **	Load graphic from file.
 **
 **	@param name	File name.
 **
 **	@return		Graphic object.
+**
+**	@todo		FIXME: I want also support JPG file format!
+**			FIXME: I want to support our own binary format!
+**			FIXME: Add support for 16bit indexed format!
 */
-global Graphic* LoadGraphic(const char* name)
+global Graphic* LoadGraphic(const char *name)
 {
-    PaletteLink * current_link;
-    PaletteLink * prev_link;
-    VMemType * pixels;
     Graphic* graphic;
-    long checksum;
     char buf[1024];
 
-    // FIXME: I  want also support JPG file format!
-
-    current_link = PaletteList;
-    prev_link = NULL;
-
-    if( !(graphic=LoadGraphicPNG(LibraryFileName(name,buf))) ) {
-	fprintf(stderr,"Can't load the graphic `%s'\n",name);
+    if (!(graphic = LoadGraphicPNG(LibraryFileName(name, buf)))) {
+	fprintf(stderr, "Can't load the graphic `%s'\n", name);
 	exit(-1);
     }
 
-    checksum = GetPaletteChecksum(graphic->Palette);
-    while(current_link != NULL){
-      if(current_link->Checksum == checksum) {
-	break;
-      }
-      prev_link = current_link;
-      current_link = current_link->Next;
-    }
-    // Palette Not found
-    if(current_link == NULL){
-      pixels = VideoCreateNewPalette(graphic->Palette);
-
-      DebugLevel0("loading new palette with %s\n",name);
-      if(prev_link == NULL){
-	PaletteList = (PaletteLink *)malloc(sizeof(PaletteLink));
-	PaletteList->Checksum = checksum;
-	PaletteList->Next = NULL;
-	PaletteList->Palette = pixels;
-      } else {
-	prev_link->Next = (PaletteLink *)malloc(sizeof(PaletteLink));
-	prev_link->Next->Checksum = checksum;
-	prev_link->Next->Next = NULL;
-	prev_link->Next->Palette = pixels;
-      }
-    } else {
-      pixels = current_link->Palette;
-    }
-    graphic->Pixels = pixels;
-
+    graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
     free(graphic->Palette);
-    graphic->Palette=NULL;		// JOHNS: why should we free this?
+    graphic->Palette = NULL;		// JOHNS: why should we free this?
 
     return graphic;
 }
