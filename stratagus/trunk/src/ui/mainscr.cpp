@@ -1,6 +1,6 @@
 //   ___________		     _________		      _____  __
 //   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\
 //    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
 //    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
@@ -513,7 +513,7 @@ global void ShiftMessages(void)
       {
       strcpy( Messages[z], "" );
       }
-  MessagesCount--;    
+  MessagesCount--;
 }
 
 /**
@@ -534,7 +534,7 @@ global void ShiftMessagesEvent(void)
       MessagesEventX[z] = -1;
       MessagesEventY[z] = -1;
       }
-  MessagesCount--;    
+  MessagesCount--;
 }
 
 /**
@@ -571,7 +571,7 @@ global void SetMessage( char* fmt, ... )
     va_end( va );
     if ( MessagesCount == MESSAGES_MAX )
       ShiftMessages();
-    strcpy( Messages[ MessagesCount ], temp );  
+    strcpy( Messages[ MessagesCount ], temp );
     MessagesCount++;
     MustRedraw|=RedrawMessage|RedrawMap;
     MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
@@ -596,16 +596,16 @@ global void SetMessage2( int x, int y, char* fmt, ... )
     va_end( va );
     if ( MessagesCount == MESSAGES_MAX )
       ShiftMessages();
-    strcpy( Messages[ MessagesCount ], temp );  
+    strcpy( Messages[ MessagesCount ], temp );
     MessagesCount++;
-    
+ 
     if ( MessagesEventCount == MESSAGES_MAX )
       ShiftMessagesEvent();
     strcpy( MessagesEvent[ MessagesEventCount ], temp );
     MessagesEventX[ MessagesEventCount ] = x;
     MessagesEventY[ MessagesEventCount ] = y;
     MessagesEventCount++;
-    
+ 
     MustRedraw|=RedrawMessage|RedrawMap;
     MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
 }
@@ -664,8 +664,8 @@ global void CenterOnMessage(void)
     MessagesEventIndex = 0;
   if ( MessagesEventIndex >= MessagesEventCount )
     return;
-  MapCenter( MessagesEventX[ MessagesEventIndex ], 
-             MessagesEventY[ MessagesEventIndex ] );  
+  MapCenter( MessagesEventX[ MessagesEventIndex ],
+             MessagesEventY[ MessagesEventIndex ] );
   SetMessage( "*Event: %s", MessagesEvent[ MessagesEventIndex ] );
   MessagesEventIndex++;
 }

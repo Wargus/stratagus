@@ -46,6 +46,14 @@
 */
 global int HandleActionDie(Unit* unit)
 {
+    if ( unit->Revealer )
+    {
+    unit->HP--;
+    if( unit->HP == 0 )
+      ReleaseUnit(unit);
+    return 0;
+    }
+
     //
     //	Show death animation
     //

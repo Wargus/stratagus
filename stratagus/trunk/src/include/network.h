@@ -105,7 +105,8 @@ extern void SendCommandResearch(Unit* unit,Upgrade* what,int flush);
 extern void SendCommandCancelResearch(Unit* unit);
     /// Send demolish command
 extern void SendCommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
-
+    /// Send spell cast command
+extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush);
 //@}
 
 #endif	// !__NETWORK_H__

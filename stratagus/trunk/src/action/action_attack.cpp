@@ -73,6 +73,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 
     if( flags&AnimationMissile ) {	// time to fire projectil
 	FireMissile(unit);
+	unit->Invisible = 0; // unit is invisible untill attacks
     }
 }
 
