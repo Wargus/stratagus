@@ -92,7 +92,8 @@ global void HandleActionTrain(Unit* unit)
 	if( player->Food<
 		player->NumFoodUnits+unit->Data.Train.What[0]->Demand ) {
 
-	    NotifyPlayer(player,NotifyYellow,unit->X,unit->Y,"Not enough food...build more farms.");
+	    NotifyPlayer(player,NotifyYellow,unit->X,unit->Y,
+		"Not enough food...build more farms.");
 	    if( unit->Player->Ai ) {
 		AiNeedMoreFarms(unit,unit->Orders[0].Type);
 	    }
@@ -119,8 +120,8 @@ global void HandleActionTrain(Unit* unit)
 	    nunit->TTL=GameCycle+type->DecayRate*6*CYCLES_PER_SECOND;
 	}
 
-	NotifyPlayer(player, NotifyYellow, nunit->X, nunit->Y, "New %s ready",
-	    nunit->Type->Name);
+	NotifyPlayer(player,NotifyYellow,nunit->X,nunit->Y,
+	    "New %s ready",nunit->Type->Name);
 	PlayUnitSound(nunit,VoiceReady);
 	if( unit->Player->Ai ) {
 	    AiTrainingComplete(unit,nunit);
