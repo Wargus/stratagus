@@ -162,9 +162,12 @@
 **		field where the missile hits.  A value of 2  would mean that
 **		the damage for that particular missile would be dealt for a range
 **		of 1 around the impact spot. All fields that aren't the center
-**		get only 50% of the damage.
-**		@note Can this value be higher? 3 (3x3 area with 25%),
-**		4 (4x4 area with 12.5%)! Yes, but is currently not written.
+**		get only 1/SpashFactor of the damage. Fields 2 away get
+**		1/(SplashFactor*2), and following...
+**
+**	MissileType::SplashFactor
+**
+**		Determines The Splash damage divisor, see Range
 **
 **	MissileType::ImpactName
 **
@@ -394,7 +397,6 @@ struct _missile_type_ {
     char*	Ident;			/// missile name
     char*	File;			/// missile sprite file
 
-	int		Transparency;	/// Missile transparency possible value is 50 (later 25 and 75)
     int		Width;			/// missile width in pixels
     int		Height;			/// missile height in pixels
     int		DrawLevel;		/// Level to draw missile at
@@ -415,6 +417,7 @@ struct _missile_type_ {
     int		Speed;			/// missile speed
 
     int		Range;			/// missile damage range
+    int		SplashFactor;		/// missile splash divisor
     char*	ImpactName;		/// impact missile-type name
     MissileType*ImpactMissile;		/// missile produces an impact
     char*	SmokeName;		/// impact missile-type name

@@ -240,23 +240,7 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		errl("Unsupported area-bombardment tag", value);
 	    }
 	}
-    } else if (gh_eq_p(value, gh_symbol2scm("reclaim"))) {
-	spellaction->CastFunction = CastReclaim;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("range"))) {
-		spellaction->Data.Demolish.Range = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.Demolish.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else {
-		errl("Unsupported reclaim tag", value);
-	    }
-
-    }
-	} else if (gh_eq_p(value, gh_symbol2scm("demolish"))) {
+    } else if (gh_eq_p(value, gh_symbol2scm("demolish"))) {
 	spellaction->CastFunction = CastDemolish;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
@@ -270,7 +254,6 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 	    } else {
 		errl("Unsupported demolish tag", value);
 	    }
-
 	}
     } else if (gh_eq_p(value, gh_symbol2scm("adjust-buffs"))) {
 	spellaction->CastFunction = CastAdjustBuffs;

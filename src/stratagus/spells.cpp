@@ -86,43 +86,6 @@ global int SpellTypeCount;
 // Cast the Spell
 // ****************************************************************************
 
-
-/**
-** 	Cast Reclaim
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastReclaim(Unit* caster, const SpellType* spell __attribute__((unused)),
-	const SpellActionType* action,Unit* target __attribute__((unused)), int x, int y)
-{
-	//UnitType* type;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->Action);
-    DebugCheck(!target);
-
-	PlayerAddCostsFactor(caster->Player, target->Stats->Costs, 50);
-    
-	if (spell->Missile) {
-	MakeMissile(spell->Missile,
-	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-	//FIXME: need to center the missile correctly
-    }
-    RemoveUnit(target, NULL);
-    UnitLost(target);
-    UnitClearOrders(target);
-    ReleaseUnit(target);
-    
-    return 0;
-}
-
 /**
 ** 	Cast demolish
 **	@param caster	Unit that casts the spell
@@ -219,7 +182,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
     // FIXME: vladi: cop should be placed only on explored land
     Unit* portal;
     UnitType* ptype;
-    
+
     DebugCheck(!caster);
     DebugCheck(!spell);
     DebugCheck(!spell->Action);
@@ -279,26 +242,26 @@ global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
     mana = action->Data.AreaAdjustVitals.Mana;
     caster->Mana -= spell->ManaCost;
     for (j = 0; j < nunits; ++j) {
-        target = units[j];
+	target = units[j];
 //	if (!PassCondition(caster, spell, target, x, y) {
 	if (!CanCastSpell(caster, spell, target, x, y)) {
 	    continue;
 	}
-        if (hp < 0) {
+	if (hp < 0) {
 	    HitUnit(caster, target, -hp);
-        } else {
+	} else {
 	    target->HP += hp;
 	    if (target->HP > target->Stats->HitPoints) {
 	        target->HP = target->Stats->HitPoints;
 	    }
-        }
-        target->Mana += mana;
-        if (target->Mana < 0) {
+	}
+	target->Mana += mana;
+	if (target->Mana < 0) {
 	    target->Mana = 0;
-        }
-        if (target->Mana > target->Type->_MaxMana) {
+	}
+	if (target->Mana > target->Type->_MaxMana) {
 	    target->Mana = target->Type->_MaxMana;
-        }
+	}
     }
     return 0;
 }
@@ -675,7 +638,7 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 		    (*corpses)->Y >= y - 1 && (*corpses)->Y <= y + 1) {
 		//
 		//  Found a corpse. eliminate it and proceed to summoning.
-		//  
+		//
 		x = (*corpses)->X;
 		y = (*corpses)->Y;
 		tempcorpse = *corpses;
@@ -687,7 +650,7 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 		corpses = &(*corpses)->Next;
 	    }
 	}
-    } else { 
+    } else {
 	cansummon = 1;
     }
 
@@ -703,7 +666,7 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 	target->Y = y;
 	//
 	//  set life span. ttl=0 results in a permanent unit.
-	//  
+	//
 	if (ttl) {
 	    target->TTL = GameCycle + ttl;
 	}
@@ -721,7 +684,7 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 	    DropOutOnSide(target, LookingW, 0, 0);
 	    CheckUnitToBeDrawn(target);
 	}
-	
+
 	caster->Mana -= spell->ManaCost;
 
 	MakeMissile(spell->Missile,
@@ -804,7 +767,7 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 	return 0;
     }
     //
-    //	Casting an unit spell without a target. 
+    //	Casting an unit spell without a target.
     //
     if (spell->Target == TargetUnit && !target) {
 	return 0;
@@ -827,15 +790,15 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 		return 0;
 	    }
 	}
-        for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
-            if (condition->BoolFlag[i] != CONDITION_TRUE) {
-                if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
-                    return 0;
-                }
-            }
+	for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+	    if (condition->BoolFlag[i] != CONDITION_TRUE) {
+		if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
+		    return 0;
+		}
+	    }
 	}
 	if (condition->Alliance != CONDITION_TRUE) {
-	    if ((condition->Alliance == CONDITION_ONLY) ^ 
+	    if ((condition->Alliance == CONDITION_ONLY) ^
 		    (IsAllied(caster->Player,target) || target->Player == caster->Player)) {
 		return 0;
 	    }
@@ -891,7 +854,7 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 **
 **	@param caster	Unit who would cast the spell.
 **	@param spell	Spell-type pointer.
-**	
+**
 **	@return Target*	choosen target or Null if spell can't be cast.
 **
 */
@@ -935,7 +898,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 	caster->Y + range + caster->Type->TileHeight, table);
     //
     //  Check every unit if it is hostile
-    // 
+    //
     combat = 0;
     for (i = 0; i < nunits; ++i) {
 	if (IsEnemy(caster->Player, table[i]) && !table[i]->Type->Coward) {
@@ -971,7 +934,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 	    //
 	    //	The units are already selected.
 	    //  Check every unit if it is a possible target
-	    // 
+	    //
 	    for (i = 0, j = 0; i < nunits; ++i) {
 		//  FIXME: autocast conditions should include normal conditions.
 		//  FIXME: no, really, they should.
@@ -981,9 +944,9 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 		}
 	    }
 	    nunits = j;
-	    //	
+	    //
 	    //	Now select the best unit to target.
-	    //	FIXME: Some really smart way to do this. 
+	    //	FIXME: Some really smart way to do this.
 	    //	FIXME: Heal the unit with the lowest hit-points
 	    //	FIXME: Bloodlust the unit with the highest hit-point
 	    //	FIMXE: it will survive more
@@ -1072,7 +1035,7 @@ global SpellType* SpellTypeByIdent(const char* ident)
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 global unsigned CclGetSpellByIdent(SCM value)
-{  
+{
     int i;
 
     for (i = 0; i < SpellTypeCount; ++i) {
@@ -1083,6 +1046,19 @@ global unsigned CclGetSpellByIdent(SCM value)
     return -1;
 }
 #elif defined(USE_LUA)
+global unsigned CclGetSpellByIdent(lua_State* l)
+{
+    int i;
+    const char* value;
+
+    value = LuaToString(l, -1);
+    for (i = 0; i < SpellTypeCount; ++i) {
+	if (!strcmp(value, SpellTypeTable[i].IdentName)) {
+	    return i;
+	}
+    }
+    return -1;
+}
 #endif
 
 /**
@@ -1105,12 +1081,12 @@ global SpellType* SpellTypeById(int id)
 /**
 **	Check if spell is research for player \p player.
 **	@param	player : player for who we want to know if he knows the spell.
-**	@param	id : 
+**	@param	id :
 */
 global int SpellIsAvailable(const Player* player, int spellid)
 {
     int dependencyId;
-    
+
     DebugCheck(!player);
     DebugCheck(!(0 <= spellid && spellid < SpellTypeCount));
 
@@ -1269,12 +1245,12 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
     //
     //	Can't cast, STOP.
     //
-    return 0; 
+    return 0;
 }
 
 /*
 **	Cleanup the spell subsystem.
-**	
+**
 **	@note: everything regarding spells is gone now.
 **	FIXME: not complete
 */
