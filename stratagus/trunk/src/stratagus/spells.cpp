@@ -1438,6 +1438,864 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 }
 
 /**
+**	Cast holy vision.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastHolyVision(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    unit->Mana -= spell->ManaCost;	// get mana cost
+    // FIXME: Don't use UnitTypeByIdent during runtime.
+    target = MakeUnit(UnitTypeByIdent("unit-revealer"), unit->Player);
+    target->Revealer = 1;
+    target->Orders[0].Action = UnitActionStill;
+    target->HP = 0;
+    target->X = x;
+    target->Y = y;
+    target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
+#ifdef NEW_FOW
+    target->CurrentSightRange=target->Stats->SightRange;
+    MapMarkSight(target->Player,x,y,target->CurrentSightRange);
+#endif
+    //target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
+    CheckUnitToBeDrawn(target);
+    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+
+    return 0;
+}
+
+/**
+**	Cast healing.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastHealing(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    // only can heal organic units
+    if (target && target->Type->Organic) {
+	// FIXME: johns this can be calculated
+	while (target->HP < target->Stats->HitPoints
+	       && unit->Mana > spell->ManaCost) {
+	    unit->Mana -= spell->ManaCost;	// get mana cost
+	    target->HP++;
+	}
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeHealing,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    } else {
+	// FIXME: johns: should we support healing near own units?
+    }
+
+    return 0;
+}
+
+/**
+**	Cast exorcism.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastExorcism(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    // FIXME: johns: the target is random selected within range of 6 fields
+    // exorcism works only on undead units
+    if (target && target->Type->IsUndead) {
+	// FIXME: johns this can be calculated
+	while (target->HP && unit->Mana > spell->ManaCost) {
+	    unit->Mana -= spell->ManaCost;	// get mana cost
+	    target->HP--;
+#ifdef USE_HP_FOR_XP
+	    unit->XP++;
+#endif
+	}
+	if (!target->HP) {
+	    unit->Player->Score += target->Type->Points;
+	    if (target->Type->Building) {
+		unit->Player->TotalRazings++;
+	    } else {
+		unit->Player->TotalKills++;
+	    }
+#ifndef USE_HP_FOR_XP
+	    unit->XP += target->Type->Points;
+#endif
+	    unit->Kills++;
+	    LetUnitDie(target);
+	}
+	// FIXME: If another target is around do more damage on it.
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeExorcism,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    } else {
+	// FIXME: vladi: exorcism effect should be disperced on near units
+    }
+
+    return 0;
+}
+
+/**
+**	Cast fireball.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastFireball(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    Missile *missile;
+    int sx;
+    int sy;
+    int dist;
+
+    // NOTE: fireball can be casted on spot
+    sx = unit->X;
+    sy = unit->Y;
+    dist = MapDistance(sx, sy, x, y);
+    x += ((x - sx) * 10) / dist;
+    y += ((y - sy) * 10) / dist;
+
+    sx = sx * TileSizeX + TileSizeX / 2;
+    sy = sy * TileSizeY + TileSizeY / 2;
+    x = x * TileSizeX + TileSizeX / 2;
+    y = y * TileSizeY + TileSizeY / 2;
+
+    unit->Mana -= spell->ManaCost;
+
+    PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
+    missile = MakeMissile(MissileTypeFireball, sx, sy, x, y);
+
+    missile->State = spell->TTL - (dist - 1) * 2;
+    missile->TTL = spell->TTL;
+    missile->Controller = SpellFireballController;
+    missile->SourceUnit = unit;
+    RefsDebugCheck(!unit->Refs || unit->Destroyed);
+    unit->Refs++;
+
+    return 0;
+}
+
+/**
+**	Cast slow.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastSlow(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if (target && !target->Type->Building
+	    && target->Slow < spell->TTL/CYCLES_PER_SECOND) {
+	// get mana cost
+	unit->Mana -= spell->ManaCost;
+	target->Slow = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
+	target->Haste = 0;
+	CheckUnitToBeDrawn(target);
+
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeSpell,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    }
+
+    return 0;
+}
+
+/**
+**	Cast flame shield.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastFlameShield(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if (target && !target->Type->Building
+	    && (target->Type->UnitType == UnitTypeLand
+		|| target->Type->UnitType == UnitTypeNaval)
+	    && target->FlameShield < spell->TTL) {
+	Missile* mis;
+
+	// get mana cost
+	unit->Mana -= spell->ManaCost;
+	target->FlameShield = spell->TTL;	// about 15 sec
+
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
+	mis->TTL = spell->TTL + 0*7;
+	mis->TargetUnit = target;
+	mis->Controller = SpellFlameShieldController;
+	RefsDebugCheck(!target->Refs || target->Destroyed);
+	target->Refs++;
+
+	mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
+	mis->TTL = spell->TTL + 1*7;
+	mis->TargetUnit = target;
+	mis->Controller = SpellFlameShieldController;
+	RefsDebugCheck(!target->Refs || target->Destroyed);
+	target->Refs++;
+
+	mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
+	mis->TTL = spell->TTL + 2*7;
+	mis->TargetUnit = target;
+	mis->Controller = SpellFlameShieldController;
+	RefsDebugCheck(!target->Refs || target->Destroyed);
+	target->Refs++;
+
+	mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
+	mis->TTL = spell->TTL + 3*7;
+	mis->TargetUnit = target;
+	mis->Controller = SpellFlameShieldController;
+	RefsDebugCheck(!target->Refs || target->Destroyed);
+	target->Refs++;
+
+	mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
+	mis->TTL = spell->TTL + 4*7;
+	mis->TargetUnit = target;
+	mis->Controller = SpellFlameShieldController;
+	RefsDebugCheck(!target->Refs || target->Destroyed);
+	target->Refs++;
+    }
+
+    return 0;
+}
+
+/**
+**	Cast invisibility.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastInvisibility(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if (target && !target->Type->Building
+		&& target->Invisible < spell->TTL/CYCLES_PER_SECOND) {
+	// get mana cost
+	unit->Mana -= spell->ManaCost;
+	if (target->Type->Volatile) {
+	    RemoveUnit(target,NULL);
+	    UnitLost(target);
+	    UnitClearOrders(target);
+	    ReleaseUnit(target);
+	    MakeMissile(MissileTypeExplosion,
+		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+	} else {
+	    // about 50 sec
+	    target->Invisible = spell->TTL/CYCLES_PER_SECOND;
+	    CheckUnitToBeDrawn(target);
+	}
+
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeSpell,
+		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    }
+
+    return 0;
+}
+
+/**
+**	Cast polymorph.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastPolymorph(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if (target && target->Type->Organic) {
+	UnitType* type;
+
+	unit->Player->Score+=target->Type->Points;
+	if (target->Type->Building) {
+	    unit->Player->TotalRazings++;
+	} else {
+	    unit->Player->TotalKills++;
+	}
+#ifdef USE_HP_FOR_XP
+	unit->XP += target->HP;
+#else
+	unit->XP += target->Type->Points;
+#endif
+	unit->Kills++;
+	// as said somewhere else -- no corpses :)
+	RemoveUnit(target,NULL);
+	UnitLost(target);
+	UnitClearOrders(target);
+	ReleaseUnit(target);
+	type=UnitTypeCritter;
+	if (UnitTypeCanMoveTo(x,y,type)) {
+	    MakeUnitAndPlace(x, y, type, Players+PlayerNumNeutral);
+	}
+
+	unit->Mana -= spell->ManaCost;
+
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeSpell,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    }
+
+    return 0;
+}
+
+/**
+**	Cast blizzard.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastBlizzard(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    int fields;
+    int shards;
+    Missile *mis;
+    int sx;
+    int sy;
+    int dx;
+    int dy;
+    int i;
+
+    //
+    //   NOTE: vladi: blizzard differs than original in this way:
+    //   original: launches 50 shards at 5 random spots x 10 for 25 mana
+    //
+
+    fields = 5;
+    shards = 10;
+
+    while (fields--) {
+	do {
+	    // find new destination in the map
+	    dx = x + SyncRand() % 5 - 2;
+	    dy = y + SyncRand() % 5 - 2;
+	} while (dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height);
+	//sx = dx - 1 - SyncRand() % 4;
+	//sy = dy - 1 - SyncRand() % 4;
+	sx = dx - 4;
+	sy = dy - 4;
+
+	for (i = 0; i < shards; ++i) {
+	    mis = MakeMissile(MissileTypeBlizzard,
+		    sx * TileSizeX + TileSizeX / 2,
+		    sy * TileSizeY + TileSizeY / 2,
+		    dx * TileSizeX + TileSizeX / 2,
+		    dy * TileSizeY + TileSizeY / 2);
+	    mis->Delay = i * mis->Type->Sleep * 2 * TileSizeX / mis->Type->Speed;
+	    mis->Damage = BLIZZARD_DAMAGE;
+	    // FIXME: not correct -- blizzard should continue even if mage is
+	    //       destroyed (though it will be quite short time...)
+	    mis->SourceUnit = unit;
+	    RefsDebugCheck(!unit->Refs || unit->Destroyed);
+	    unit->Refs++;
+	}
+    }
+
+    PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
+    unit->Mana -= spell->ManaCost;
+    if (unit->Mana > spell->ManaCost) {
+	return 1;
+    }
+
+    return 0;
+}
+
+/**
+**	Cast eye of vision.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastEyeOfVision(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    unit->Mana -= spell->ManaCost;
+
+    // FIXME: johns: the unit is placed on the wrong position
+    // FIXME: Don't use UnitTypeByIdent during runtime.
+    target=MakeUnit(UnitTypeByIdent("unit-eye-of-vision"),unit->Player);
+    target->X=x;
+    target->Y=y;
+    DropOutOnSide(target,LookingW,0,0);
+
+    // set life span
+    target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
+    CheckUnitToBeDrawn(target);
+
+    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+    MakeMissile(MissileTypeSpell,
+	x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+
+    return 0;
+}
+
+/**
+**	Cast bloodlust.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastBloodlust(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if (target && target->Type->Organic
+	    && target->Bloodlust < spell->TTL/CYCLES_PER_SECOND) {
+	// get mana cost
+	unit->Mana -= spell->ManaCost;
+	target->Bloodlust = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
+	CheckUnitToBeDrawn(target);
+
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeSpell,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    } else {
+	// FIXME: should we support making bloodlust in range?
+    }
+
+    return 0;
+}
+
+/**
+**	Cast runes.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastRunes(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    Missile *mis;
+
+    PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
+
+    if (IsMapFieldEmpty(x-1,y+0)) {
+	mis = MakeMissile(MissileTypeCustom,
+		x * TileSizeX + TileSizeX / 2 - TileSizeX,
+		y * TileSizeY + TileSizeY / 2,
+		x * TileSizeX + TileSizeX / 2 - TileSizeX,
+		y * TileSizeY + TileSizeY / 2);
+	mis->TTL = spell->TTL;
+	mis->Controller = SpellRunesController;
+	unit->Mana -= spell->ManaCost/5;
+    }
+
+    if (IsMapFieldEmpty(x+1,y+0)) {
+	mis = MakeMissile(MissileTypeCustom,
+		x * TileSizeX + TileSizeX / 2 + TileSizeX,
+		y * TileSizeY + TileSizeY / 2,
+		x * TileSizeX + TileSizeX / 2 + TileSizeX,
+		y * TileSizeY + TileSizeY / 2);
+	mis->TTL = spell->TTL;
+	mis->Controller = SpellRunesController;
+	unit->Mana -= spell->ManaCost/5;
+    }
+
+    if (IsMapFieldEmpty(x+0,y+0)) {
+	mis = MakeMissile(MissileTypeCustom,
+		x * TileSizeX + TileSizeX / 2,
+		y * TileSizeY + TileSizeY / 2,
+		x * TileSizeX + TileSizeX / 2,
+		y * TileSizeY + TileSizeY / 2);
+	mis->TTL = spell->TTL;
+	mis->Controller = SpellRunesController;
+	unit->Mana -= spell->ManaCost/5;
+    }
+
+    if (IsMapFieldEmpty(x+0,y-1)) {
+	mis = MakeMissile(MissileTypeCustom,
+		x * TileSizeX + TileSizeX / 2,
+		y * TileSizeY + TileSizeY / 2 - TileSizeY,
+		x * TileSizeX + TileSizeX / 2,
+		y * TileSizeY + TileSizeY / 2 - TileSizeY);
+	mis->TTL = spell->TTL;
+	mis->Controller = SpellRunesController;
+	unit->Mana -= spell->ManaCost/5;
+    }
+
+    if (IsMapFieldEmpty(x+0,y+1)) {
+	mis = MakeMissile(MissileTypeCustom,
+		x * TileSizeX + TileSizeX / 2,
+		y * TileSizeY + TileSizeY / 2 + TileSizeY,
+		x * TileSizeX + TileSizeX / 2,
+		y * TileSizeY + TileSizeY / 2 + TileSizeY);
+	mis->TTL = spell->TTL;
+	mis->Controller = SpellRunesController;
+	unit->Mana -= spell->ManaCost/5;
+    }
+
+    return 0;
+}
+
+/**
+**	Cast death coil.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastDeathCoil(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if ((target && target->Type->Organic) || (!target)) {
+	Missile *mis;
+	int sx = unit->X;
+	int sy = unit->Y;
+
+	unit->Mana -= spell->ManaCost;
+
+	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
+	mis = MakeMissile(MissileTypeDeathCoil,
+	    sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+
+	mis->SourceUnit = unit;
+	RefsDebugCheck(!unit->Refs || unit->Destroyed);
+	unit->Refs++;
+	if (target) {
+	    mis->TargetUnit = target;
+	    RefsDebugCheck(!target->Refs || target->Destroyed);
+	    target->Refs++;
+	}
+	mis->Controller = SpellDeathCoilController;
+    }
+
+    return 0;
+}
+
+/**
+**	Cast haste.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastHaste(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if (target && !target->Type->Building
+	    && target->Haste < spell->TTL/CYCLES_PER_SECOND) {
+	// get mana cost
+	unit->Mana -= spell->ManaCost;
+	target->Slow = 0;
+	target->Haste = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
+	CheckUnitToBeDrawn(target);
+
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeSpell,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    }
+
+    return 0;
+}
+
+/**
+**	Cast raise dead.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastRaiseDead(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    Unit **corpses;
+    Unit *tempcorpse;
+
+    corpses = &CorpseList;
+
+    while (*corpses) {
+	// FIXME: this tries to raise all corps, ohje
+	// FIXME: I can raise ships?
+	if ((*corpses)->Orders[0].Action == UnitActionDie
+		&& !(*corpses)->Type->Building
+		&& (*corpses)->X >= x-1 && (*corpses)->X <= x+1
+		&& (*corpses)->Y >= y-1 && (*corpses)->Y <= y+1) {
+
+	    // FIXME: did they count on food?
+	    // Can there be more than 1 skeleton created on the same tile? yes
+	    // FIXME: Don't use UnitTypeByIdent during runtime.
+	    target = MakeUnitAndPlace((*corpses)->X, (*corpses)->Y,
+		    UnitTypeByIdent("unit-skeleton"), unit->Player);
+	    // set life span
+	    target->TTL = GameCycle+
+		    target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
+	    CheckUnitToBeDrawn(target);
+
+	    tempcorpse = *corpses;
+	    corpses = &(*corpses)->Next;
+
+	    ReleaseUnit(tempcorpse);
+
+	    unit->Mana -= spell->ManaCost;
+	    if (unit->Mana < spell->ManaCost) {
+		break;
+	    }
+	} else {
+	    corpses = &(*corpses)->Next;
+	}
+    }
+
+    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+    MakeMissile(MissileTypeSpell,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+
+    return 0;
+}
+
+/**
+**	Cast whirlwind.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastWhirlwind(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    Missile *mis;
+
+    unit->Mana -= spell->ManaCost;
+
+    PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
+    mis = MakeMissile(MissileTypeWhirlwind,
+	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+
+    mis->TTL = spell->TTL;
+    mis->Controller = SpellWhirlwindController;
+
+    return 0;
+}
+
+/**
+**	Cast unholy armor.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastUnholyArmor(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    if (target && !target->Type->Building
+	    && target->UnholyArmor < spell->TTL/CYCLES_PER_SECOND) {
+	// get mana cost
+	unit->Mana -= spell->ManaCost;
+	if( target->Type->Volatile ) {
+	    RemoveUnit(target,NULL);
+	    UnitLost(target);
+	    UnitClearOrders(target);
+	    ReleaseUnit(target);
+	    MakeMissile(MissileTypeExplosion,
+		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+	} else {
+	    // about 13 sec
+	    target->UnholyArmor = spell->TTL/CYCLES_PER_SECOND;
+	    CheckUnitToBeDrawn(target);
+	}
+
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	MakeMissile(MissileTypeSpell,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    }
+
+    return 0;
+}
+
+/**
+**	Cast death and decay.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastDeathAndDecay(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    int fields;			// blizzard thing, yep :)
+    int shards;
+    Missile *mis;
+    int dx;
+    int dy;
+    int i;
+
+    fields = 5;
+    shards = 10;
+
+    while (fields--) {
+	do {
+	    // find new destination in the map
+	    dx = x + SyncRand() % 5 - 2;
+	    dy = y + SyncRand() % 5 - 2;
+	} while (dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height);
+
+	for (i = 0; i < shards; ++i) {
+	    mis = MakeMissile(MissileTypeDeathDecay,
+		    dx * TileSizeX + TileSizeX / 2,
+		    dy * TileSizeY + TileSizeY / 2,
+		    dx * TileSizeX + TileSizeX / 2,
+		    dy * TileSizeY + TileSizeY / 2);
+	    mis->Damage = DEATHANDDECAY_DAMAGE;
+	    //FIXME: not correct -- death and decay should continue even if
+	    //       death knight is destroyed (though it will be quite
+	    //       short time...)
+	    mis->Delay = i * mis->Type->Sleep
+		    * VideoGraphicFrames(mis->Type->Sprite);
+	    mis->SourceUnit = unit;
+	    RefsDebugCheck(!unit->Refs || unit->Destroyed);
+	    unit->Refs++;
+	}
+    }
+
+    PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
+
+    unit->Mana -= spell->ManaCost;
+    if (unit->Mana > spell->ManaCost) {
+	return 1;
+    }
+
+    return 0;
+}
+
+/**
+**	Cast circle of power.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+local int CastCircleOfPower(Unit* unit, const SpellType* spell, Unit* target,
+    int x, int y)
+{
+    // FIXME: vladi: cop should be placed only on explored land
+    // FIXME: Don't use UnitTypeByIdent during runtime.
+    Unit *cop;
+
+    cop = unit->Goal;
+    if (cop) {
+	// FIXME: if cop is already defined --> move it, but it doesn't work?
+	RemoveUnit(cop, NULL);
+	PlaceUnit(cop, x, y);
+    } else {
+	cop = MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-circle-of-power"),
+		unit->Player);
+    }
+    MakeMissile(MissileTypeSpell, x * TileSizeX + TileSizeX / 2,
+	y * TileSizeY + TileSizeY / 2, x * TileSizeX + TileSizeX / 2,
+	y * TileSizeY + TileSizeY / 2);
+
+    // Next is used to link to destination circle of power
+    unit->Goal = cop;
+    RefsDebugCheck(!cop->Refs || cop->Destroyed);
+    cop->Refs++;
+    //FIXME: setting destination circle of power should use mana
+
+    return 0;
+}
+
+/**
 **	Spell cast!
 **
 **	@param unit	Unit that casts the spell
@@ -1448,7 +2306,7 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 **
 **	@return		0 if spell should/can continue or =! 0 to stop
 */
-global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
+global int SpellCast(Unit* unit, const SpellType* spell, Unit* target,
 	int x, int y)
 {
     int repeat;
@@ -1464,8 +2322,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
     }
 
     DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
-		  unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_
-		  y);
+	unit->Type->Name _C_ target ? target->Type->Name : "none" _C_
+	x _C_ y);
 
     // the unit can collect mana during the move to target, so check is here...
 
@@ -1476,588 +2334,83 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
 //  ---human paladins---
     case SpellActionHolyVision:
-	unit->Mana -= spell->ManaCost;	// get mana cost
-	// FIXME: Don't use UnitTypeByIdent during runtime.
-	target = MakeUnit(UnitTypeByIdent("unit-revealer"), unit->Player);
-	target->Revealer = 1;
-	target->Orders[0].Action = UnitActionStill;
-	target->HP = 0;
-	target->X = x;
-	target->Y = y;
-	target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
-#ifdef NEW_FOW
-	target->CurrentSightRange=target->Stats->SightRange;
-	MapMarkSight(target->Player,x,y,target->CurrentSightRange);
-#endif
-	//target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
-	CheckUnitToBeDrawn(target);
-	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
+	repeat = CastHolyVision(unit, spell, target, x, y);
 	break;
 
     case SpellActionHealing:
-	// only can heal organic units
-	if (target && target->Type->Organic) {
-	    // FIXME: johns this can be calculated
-	    while (target->HP < target->Stats->HitPoints
-		   && unit->Mana > spell->ManaCost) {
-		unit->Mana -= spell->ManaCost;	// get mana cost
-		target->HP++;
-	    }
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeHealing,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	} else {
-	    // FIXME: johns: should we support healing near own units?
-	}
+	repeat = CastHealing(unit, spell, target, x, y);
 	break;
 
     case SpellActionExorcism:
-	// FIXME: johns: the target is random selected within range of 6 fields
-	// exorcism works only on undead units
-	if (target && target->Type->IsUndead) {
-	    // FIXME: johns this can be calculated
-	    while (target->HP && unit->Mana > spell->ManaCost) {
-		unit->Mana -= spell->ManaCost;	// get mana cost
-		target->HP--;
-#ifdef USE_HP_FOR_XP
-		unit->XP++;
-#endif
-	    }
-	    if( !target->HP ) {
-		unit->Player->Score+=target->Type->Points;
-		if( target->Type->Building ) {
-		    unit->Player->TotalRazings++;
-		} else {
-		    unit->Player->TotalKills++;
-		}
-#ifndef USE_HP_FOR_XP
-		unit->XP+=target->Type->Points;
-#endif
-		++unit->Kills;
-		LetUnitDie(target);
-	    }
-	    // FIXME: If another target is around do more damage on it.
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeExorcism,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	} else {
-	    //FIXME: vladi: exorcism effect should be disperced on near units
-	}
+	repeat = CastExorcism(unit, spell, target, x, y);
 	break;
 
 //  ---human mages---
     case SpellActionFireball:
-    {					//NOTE: fireball can be casted on spot
-	Missile *missile;
-	int sx;
-	int sy;
-	int dist;
-
-	sx = unit->X;
-	sy = unit->Y;
-	dist = MapDistance(sx, sy, x, y);
-	x += ((x - sx) * 10) / dist;
-	y += ((y - sy) * 10) / dist;
-
-	sx = sx * TileSizeX + TileSizeX / 2;
-	sy = sy * TileSizeY + TileSizeY / 2;
-	x = x * TileSizeX + TileSizeX / 2;
-	y = y * TileSizeY + TileSizeY / 2;
-
-	unit->Mana -= spell->ManaCost;
-
-	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
-	missile = MakeMissile(MissileTypeFireball, sx, sy, x, y);
-
-	missile->State = spell->TTL - (dist - 1) * 2;
-	missile->TTL = spell->TTL;
-	missile->Controller = SpellFireballController;
-	missile->SourceUnit = unit;
-	RefsDebugCheck(!unit->Refs || unit->Destroyed);
-	unit->Refs++;
-    }
+	repeat = CastFireball(unit, spell, target, x, y);
 	break;
 
     case SpellActionSlow:
-	if (target && !target->Type->Building
-		&& target->Slow < spell->TTL/CYCLES_PER_SECOND) {
-	    // get mana cost
-	    unit->Mana -= spell->ManaCost;
-	    target->Slow = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
-	    target->Haste = 0;
-	    CheckUnitToBeDrawn(target);
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	}
+	repeat = CastSlow(unit, spell, target, x, y);
 	break;
 
     case SpellActionFlameShield:
-	if (target && !target->Type->Building
-		&& (target->Type->UnitType == UnitTypeLand
-		    || target->Type->UnitType == UnitTypeNaval)
-		&& target->FlameShield < spell->TTL) {
-	    Missile* mis;
-
-	    // get mana cost
-	    unit->Mana -= spell->ManaCost;
-	    target->FlameShield = spell->TTL;	// about 15 sec
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
-	    mis->TTL = spell->TTL + 0*7;
-	    mis->TargetUnit = target;
-	    mis->Controller = SpellFlameShieldController;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
-	    mis->TTL = spell->TTL + 1*7;
-	    mis->TargetUnit = target;
-	    mis->Controller = SpellFlameShieldController;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
-	    mis->TTL = spell->TTL + 2*7;
-	    mis->TargetUnit = target;
-	    mis->Controller = SpellFlameShieldController;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
-	    mis->TTL = spell->TTL + 3*7;
-	    mis->TargetUnit = target;
-	    mis->Controller = SpellFlameShieldController;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-
-	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
-	    mis->TTL = spell->TTL + 4*7;
-	    mis->TargetUnit = target;
-	    mis->Controller = SpellFlameShieldController;
-	    RefsDebugCheck(!target->Refs || target->Destroyed);
-	    target->Refs++;
-	}
+	repeat = CastFlameShield(unit, spell, target, x, y);
 	break;
 
     case SpellActionInvisibility:
-	if (target && !target->Type->Building
-		    && target->Invisible < spell->TTL/CYCLES_PER_SECOND) {
-	    // get mana cost
-	    unit->Mana -= spell->ManaCost;
-	    if( target->Type->Volatile ) {
-		RemoveUnit(target,NULL);
-		UnitLost(target);
-		UnitClearOrders(target);
-		ReleaseUnit(target);
-		MakeMissile(MissileTypeExplosion,
-			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	    } else {
-		// about 50 sec
-		target->Invisible = spell->TTL/CYCLES_PER_SECOND;
-		CheckUnitToBeDrawn(target);
-	    }
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeSpell,
-		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	}
+	repeat = CastInvisibility(unit, spell, target, x, y);
 	break;
 
     case SpellActionPolymorph:
-	if (target && target->Type->Organic) {
-	    UnitType* type;
-
-	    unit->Player->Score+=target->Type->Points;
-	    if( target->Type->Building ) {
-		unit->Player->TotalRazings++;
-	    } else {
-		unit->Player->TotalKills++;
-	    }
-#ifdef USE_HP_FOR_XP
-	    unit->XP+=target->HP;
-#else
-	    unit->XP+=target->Type->Points;
-#endif
-	    ++unit->Kills;
-	    // as said somewhere else -- no corpses :)
-	    RemoveUnit(target,NULL);
-	    UnitLost(target);
-	    UnitClearOrders(target);
-	    ReleaseUnit(target);
-	    type=UnitTypeCritter;
-	    if( UnitTypeCanMoveTo(x,y,type) ) {
-		MakeUnitAndPlace(x, y, type, Players+PlayerNumNeutral);
-	    }
-
-	    unit->Mana -= spell->ManaCost;
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	}
+	repeat = CastPolymorph(unit, spell, target, x, y);
 	break;
 
     case SpellActionBlizzard:
-    {
-	/*
-	   NOTE: vladi: blizzard differs than original in this way:
-	   original: launches 50 shards at 5 random spots x 10 for 25 mana
-	 */
-	int fields = 5;
-	int shards = 10;
-
-	while (fields--) {
-	    Missile *mis;
-	    int sx, sy, dx, dy;
-	    int i;
-
-	    do {
-		// find new destination in the map
-		dx = x + SyncRand() % 5 - 2;
-		dy = y + SyncRand() % 5 - 2;
-	    } while (dx < 0 && dy < 0 && dx >= TheMap.Width
-		    && dy >= TheMap.Height);
-	    //sx = dx - 1 - SyncRand() % 4;
-	    //sy = dy - 1 - SyncRand() % 4;
-	    sx = dx - 4;
-	    sy = dy - 4;
-
-	    for( i=0; i<shards; ++i ) {
-		mis = MakeMissile(MissileTypeBlizzard,
-			sx * TileSizeX + TileSizeX / 2,
-			sy * TileSizeY + TileSizeY / 2,
-			dx * TileSizeX + TileSizeX / 2,
-			dy * TileSizeY + TileSizeY / 2);
-		mis->Delay=i*mis->Type->Sleep*2*TileSizeX/mis->Type->Speed;
-		mis->Damage = BLIZZARD_DAMAGE;
-	    //FIXME: not correct -- blizzard should continue even if mage is
-	    //       destroyed (though it will be quite short time...)
-		mis->SourceUnit = unit;
-		RefsDebugCheck(!unit->Refs || unit->Destroyed);
-		unit->Refs++;
-	    }
-	}
-
-	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
-	unit->Mana -= spell->ManaCost;
-	if (unit->Mana > spell->ManaCost) {
-	    repeat = 1;
-	}
-    }
+	repeat = CastBlizzard(unit, spell, target, x, y);
 	break;
 
 //  ---orc ogres---
     case SpellActionEyeOfVision:
-	unit->Mana -= spell->ManaCost;
-
-	// FIXME: johns: the unit is placed on the wrong position
-	// FIXME: Don't use UnitTypeByIdent during runtime.
-	target=MakeUnit(UnitTypeByIdent("unit-eye-of-vision"),unit->Player);
-	target->X=x;
-	target->Y=y;
-	DropOutOnSide(target,LookingW,0,0);
-
-	// set life span
-	target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
-	CheckUnitToBeDrawn(target);
-
-	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	MakeMissile(MissileTypeSpell,
-	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+	repeat = CastEyeOfVision(unit, spell, target, x, y);
 	break;
 
     case SpellActionBloodlust:
-	if (target && target->Type->Organic
-		&& target->Bloodlust < spell->TTL/CYCLES_PER_SECOND) {
-	    // get mana cost
-	    unit->Mana -= spell->ManaCost;
-	    target->Bloodlust = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
-	    CheckUnitToBeDrawn(target);
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	} else {
-	    // FIXME: should we support making bloodlust in range?
-	}
+	repeat = CastBloodlust(unit, spell, target, x, y);
 	break;
 
     case SpellActionRunes:
-    {
-	Missile *mis;
-
-	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
-
-	if( IsMapFieldEmpty(x-1,y+0) ) {
-	    mis = MakeMissile(MissileTypeCustom,
-		    x * TileSizeX + TileSizeX / 2 - TileSizeX,
-		    y * TileSizeY + TileSizeY / 2,
-		    x * TileSizeX + TileSizeX / 2 - TileSizeX,
-		    y * TileSizeY + TileSizeY / 2);
-	    mis->TTL = spell->TTL;
-	    mis->Controller = SpellRunesController;
-	    unit->Mana -= spell->ManaCost/5;
-	}
-
-	if( IsMapFieldEmpty(x+1,y+0) ) {
-	    mis = MakeMissile(MissileTypeCustom,
-		    x * TileSizeX + TileSizeX / 2 + TileSizeX,
-		    y * TileSizeY + TileSizeY / 2,
-		    x * TileSizeX + TileSizeX / 2 + TileSizeX,
-		    y * TileSizeY + TileSizeY / 2);
-	    mis->TTL = spell->TTL;
-	    mis->Controller = SpellRunesController;
-	    unit->Mana -= spell->ManaCost/5;
-	}
-
-	if( IsMapFieldEmpty(x+0,y+0) ) {
-	    mis = MakeMissile(MissileTypeCustom,
-		    x * TileSizeX + TileSizeX / 2,
-		    y * TileSizeY + TileSizeY / 2,
-		    x * TileSizeX + TileSizeX / 2,
-		    y * TileSizeY + TileSizeY / 2);
-	    mis->TTL = spell->TTL;
-	    mis->Controller = SpellRunesController;
-	    unit->Mana -= spell->ManaCost/5;
-	}
-
-	if( IsMapFieldEmpty(x+0,y-1) ) {
-	    mis = MakeMissile(MissileTypeCustom,
-		    x * TileSizeX + TileSizeX / 2,
-		    y * TileSizeY + TileSizeY / 2 - TileSizeY,
-		    x * TileSizeX + TileSizeX / 2,
-		    y * TileSizeY + TileSizeY / 2 - TileSizeY);
-	    mis->TTL = spell->TTL;
-	    mis->Controller = SpellRunesController;
-	    unit->Mana -= spell->ManaCost/5;
-	}
-
-	if( IsMapFieldEmpty(x+0,y+1) ) {
-	    mis = MakeMissile(MissileTypeCustom,
-		    x * TileSizeX + TileSizeX / 2,
-		    y * TileSizeY + TileSizeY / 2 + TileSizeY,
-		    x * TileSizeX + TileSizeX / 2,
-		    y * TileSizeY + TileSizeY / 2 + TileSizeY);
-	    mis->TTL = spell->TTL;
-	    mis->Controller = SpellRunesController;
-	    unit->Mana -= spell->ManaCost/5;
-	}
-
-    }
+	repeat = CastRunes(unit, spell, target, x, y);
 	break;
 
 //  ---orc death knights---
     case SpellActionDeathCoil:
-	if ((target && target->Type->Organic) || (!target)) {
-	    Missile *mis;
-	    int sx = unit->X;
-	    int sy = unit->Y;
-
-	    unit->Mana -= spell->ManaCost;
-
-	    PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
-	    mis = MakeMissile(MissileTypeDeathCoil,
-		sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-
-	    mis->SourceUnit = unit;
-	    RefsDebugCheck(!unit->Refs || unit->Destroyed);
-	    unit->Refs++;
-	    if (target) {
-		mis->TargetUnit = target;
-		RefsDebugCheck(!target->Refs || target->Destroyed);
-		target->Refs++;
-	    }
-	    mis->Controller = SpellDeathCoilController;
-	}
+	repeat = CastDeathCoil(unit, spell, target, x, y);
 	break;
 
     case SpellActionHaste:
-	if (target && !target->Type->Building
-		&& target->Haste < spell->TTL/CYCLES_PER_SECOND) {
-	    // get mana cost
-	    unit->Mana -= spell->ManaCost;
-	    target->Slow = 0;
-	    target->Haste = spell->TTL/CYCLES_PER_SECOND;	// about 25 sec
-	    CheckUnitToBeDrawn(target);
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	}
+	repeat = CastHaste(unit, spell, target, x, y);
 	break;
 
     case SpellActionRaiseDead:
-    {
-	Unit **corpses;
-	Unit *tempcorpse;
-
-	corpses = &CorpseList;
-
-	while( *corpses ) {
-	    // FIXME: this tries to raise all corps, ohje
-	    // FIXME: I can raise ships?
-	    if ( (*corpses)->Orders[0].Action == UnitActionDie
-		    && !(*corpses)->Type->Building
-		    && (*corpses)->X >= x-1 && (*corpses)->X <= x+1
-		    && (*corpses)->Y >= y-1 && (*corpses)->Y <= y+1) {
-
-		// FIXME: did they count on food?
-		// Can there be more than 1 skeleton created on the same tile? yes
-		// FIXME: Don't use UnitTypeByIdent during runtime.
-		target=MakeUnitAndPlace((*corpses)->X, (*corpses)->Y,
-			UnitTypeByIdent("unit-skeleton"), unit->Player);
-		// set life span
-		target->TTL=GameCycle+
-			target->Type->DecayRate*6*CYCLES_PER_SECOND;
-		CheckUnitToBeDrawn(target);
-
-		tempcorpse = *corpses;
-		corpses=&(*corpses)->Next;
-
-		ReleaseUnit( tempcorpse );
-
-		unit->Mana -= spell->ManaCost;
-		if( unit->Mana < spell->ManaCost ) {
-		    break;
-		}
-	    } else {
-		corpses=&(*corpses)->Next;
-	    }
-	}
-
-	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-    }
+	repeat = CastRaiseDead(unit, spell, target, x, y);
 	break;
 
     case SpellActionWhirlwind:
-    {
-	Missile *mis;
-
-	unit->Mana -= spell->ManaCost;
-
-	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
-	mis = MakeMissile(MissileTypeWhirlwind,
-	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-
-	mis->TTL = spell->TTL;
-	mis->Controller = SpellWhirlwindController;
-    }
+	repeat = CastWhirlwind(unit, spell, target, x, y);
 	break;
 
     case SpellActionUnholyArmor:
-	if (target && !target->Type->Building
-		&& target->UnholyArmor < spell->TTL/CYCLES_PER_SECOND) {
-	    // get mana cost
-	    unit->Mana -= spell->ManaCost;
-	    if( target->Type->Volatile ) {
-		RemoveUnit(target,NULL);
-		UnitLost(target);
-		UnitClearOrders(target);
-		ReleaseUnit(target);
-		MakeMissile(MissileTypeExplosion,
-			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	    } else {
-		// about 13 sec
-		target->UnholyArmor = spell->TTL/CYCLES_PER_SECOND;
-		CheckUnitToBeDrawn(target);
-	    }
-
-	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	}
+	repeat = CastUnholyArmor(unit, spell, target, x, y);
 	break;
 
     case SpellActionDeathAndDecay:
-    {
-	int fields = 5;			// blizzard thing, yep :)
-	int shards = 10;
-
-	while (fields--) {
-	    Missile *mis;
-	    int dx, dy;
-	    int i;
-
-	    do {
-		// find new destination in the map
-		dx = x + SyncRand() % 5 - 2;
-		dy = y + SyncRand() % 5 - 2;
-	    } while (dx < 0 && dy < 0 && dx >= TheMap.Width
-		   && dy >= TheMap.Height);
-
-	    for (i=0; i<shards; ++i) {
-		mis = MakeMissile(MissileTypeDeathDecay,
-			dx * TileSizeX + TileSizeX / 2,
-			dy * TileSizeY + TileSizeY / 2,
-			dx * TileSizeX + TileSizeX / 2,
-			dy * TileSizeY + TileSizeY / 2);
-		mis->Damage = DEATHANDDECAY_DAMAGE;
-		//FIXME: not correct -- death and decay should continue even if
-		//       death knight is destroyed (though it will be quite
-		//       short time...)
-		mis->Delay=i*mis->Type->Sleep
-			*VideoGraphicFrames(mis->Type->Sprite);
-		mis->SourceUnit = unit;
-		RefsDebugCheck(!unit->Refs || unit->Destroyed);
-		unit->Refs++;
-	    }
-	}
-
-	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
-
-	unit->Mana -= spell->ManaCost;
-	if (unit->Mana > spell->ManaCost) {
-	    repeat = 1;
-	}
-    }
+	repeat = CastDeathAndDecay(unit, spell, target, x, y);
 	break;
 
     case SpellActionCircleOfPower:
-    {
-	// FIXME: vladi: cop should be placed only on explored land
-	// FIXME: Don't use UnitTypeByIdent during runtime.
-	Unit *cop;
-
-	cop = unit->Goal;
-	if (cop) {
-	    // FIXME: if cop is already defined --> move it, but it doesn't work?
-	    RemoveUnit(cop, NULL);
-	    PlaceUnit(cop, x, y);
-	} else {
-	    cop =
-		MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-circle-of-power"),
-		    unit->Player);
-	}
-	MakeMissile(MissileTypeSpell, x * TileSizeX + TileSizeX / 2,
-	    y * TileSizeY + TileSizeY / 2, x * TileSizeX + TileSizeX / 2,
-	    y * TileSizeY + TileSizeY / 2);
-
-	// Next is used to link to destination circle of power
-	unit->Goal = cop;
-	RefsDebugCheck(!cop->Refs || cop->Destroyed);
-	cop->Refs++;
-	//FIXME: setting destination circle of power should use mana
-    }
-    break;
+	repeat = CastCircleOfPower(unit, spell, target, x, y);
+	break;
 
     default:
 	DebugLevel0Fn("Unknown spell action `%d'\n" _C_ spell->Action);
