@@ -93,11 +93,6 @@
 #include <SDL.h>
 #endif
 
-extern Sample* LoadFlac(const char* name);	/// Load a flac file
-extern Sample* LoadWav(const char* name);	/// Load a wav file
-extern Sample* LoadOgg(const char* name);	/// Load a ogg file
-extern Sample* LoadMp3(const char* name);	/// Load a mp3 file
-
 /*----------------------------------------------------------------------------
 --	Defines
 ----------------------------------------------------------------------------*/
@@ -141,165 +136,21 @@ global int WithSoundThread;		/// FIXME: docu
 global int SoundThreadRunning;		/// FIXME: docu
 
 #ifdef USE_SDLCD
-global SDL_CD *CDRom;
-#endif
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
-global char *CDMode = ":off";
-global int CDTrack;
-#endif
-#ifdef USE_LIBCDA
-global int NumCDTracks;
+global SDL_CD *CDRom;			/// SDL cdrom device
 #endif
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_LIBMODPLUG
-local ModPlugFile* ModFile;		/// Mod file loaded into memory
-
-/**
-**	Play a music file. Currently supported are .mod, .it, .s3m, .wav, .xm.
-**
-**	Some quick hacks for mods.
-**
-**	@param name	Name of sound file, format is automatic detected.
-*/
-global void PlayMusic(const char* name)
-{
-    ModPlug_Settings settings;
-    CLFile* f;
-    char* buffer;
-    int size;
-    int i;
-    
-    ModPlug_GetSettings(&settings);
-    settings.mFrequency=SoundFrequency;
-#ifdef USE_LIBMODPLUG32
-    settings.mBits=32;
-#else
-    settings.mBits=16;
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
+extern Sample* MusicSample;		/// Music samples
+extern int MusicIndex;			/// Music sample index
 #endif
 
-    settings.mLoopCount=0;		// Disable looping
-    ModPlug_SetSettings(&settings);
-    
-#ifdef USE_SDLCD
-    if (!strcmp(CDMode,":off")) {
-	if (!strncmp(name,":",1)) {
-	    SDL_Init(SDL_INIT_CDROM);
-	    CDRom = SDL_CDOpen(0);
-	    SDL_CDStatus(CDRom);
-	}
-    }
-    
-    if (!strncmp(name,":",1)) {
-	if (!CDRom) {
-	    fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
-	    return;
-	}
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
 
-	// if mode is play all tracks
-	if (!strcmp(name, ":all")) {
-	    CDMode = ":all";
-	    SDL_CDPlayTracks(CDRom, 0, 0, 0, 0);
-	    return;
-	}
-	
-	// if mode is play random tracks
-	if (!strcmp(name, ":random")) {
-	    CDMode = ":random";
-	    CDTrack = MyRand() % CDRom->numtracks;
-	    SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0);
-	    return;
-	}
-	return;
-    }
-#endif
-
-#ifdef USE_LIBCDA
-    if (!strcmp(CDMode,":off")) {
-	if (!strncmp(name,":",1)) {
-	    if (cd_init() < 0) {
-		fprintf(stderr,"Error initialising libcda \n");
-		return;
-	    }
-	    cd_get_tracks(&CDTrack, &NumCDTracks);
-	    if (NumCDTracks == 0)
-		return;
-	    --CDTrack;
-	}
-    }
-
-    if (!strncmp(name,":",1)) {
-
-        // if mode is play all tracks
-	if (!strcmp(name, ":all")) {
-	    CDMode = ":all";
-	    do {
-		if (CDTrack > NumCDTracks)
-		    CDTrack = 1;
-	    } while (cd_is_audio(++CDTrack) < 1);
-	    cd_play(CDTrack);
-	    return;
-	}
-	
-	// if mode is play random tracks
-	if (!strcmp(name, ":random")) {
-	    CDMode = ":random";
-	    do {
-		CDTrack = MyRand() % NumCDTracks;
-	    } while (cd_is_audio(CDTrack) < 1);
-	    cd_play(CDTrack);
-	    return;
-	}
-    }
-#endif
-
-    buffer=malloc(8192);
-    name=LibraryFileName(name,buffer);
-
-    DebugLevel2Fn("Loading `%s'\n",name);
-
-    if( !(f=CLopen(name)) ) {
-	printf("Can't open file `%s'\n",name);
-	return;
-    }
-
-    size=0;
-    while( (i=CLread(f,buffer+size,8192))==8192 ) {
-	size+=8192;
-	buffer=realloc(buffer,size+8192);
-    }
-    size+=i;
-    buffer=realloc(buffer,size);
-    DebugLevel0Fn("%d\n",size);
-
-    StopMusic();			// stop music before new music
-
-    ModFile=ModPlug_Load(buffer,size);
-
-    free(buffer);
-
-    if( ModFile ) {
-	DebugLevel0Fn("Started\n");
-	PlayingMusic=1;
-    }
-}
-
-/**
-**	Stop the current playing music.
-*/
-global void StopMusic(void)
-{
-    if( PlayingMusic ) {
-	PlayingMusic=0;			// Callback!
-	if( ModFile ) {
-	    ModPlug_Unload(ModFile);
-	    ModFile=NULL;
-	}
-    }
-}
+extern ModPlugFile* ModFile;		/// Mod file loaded into memory
 
 /**
 **	Mix music to stereo 32 bit.
@@ -307,49 +158,72 @@ global void StopMusic(void)
 **	@param buffer	Buffer for mixed samples.
 **	@param size	Number of samples that fits into buffer.
 */
-local void MixMusicToStereo32(int* buffer,int size)
+local void MixMusicToStereo32(int* buffer, int size)
 {
-#ifdef USE_LIBMODPLUG32
-    long* buf;
-#else
-    short* buf;
-#endif
     int i;
     int n;
-    
 
-    if( PlayingMusic ) {
-	DebugCheck( !ModFile );
-
-	buf=alloca(size*sizeof(*buf));
-
-	n=ModPlug_Read(ModFile,buf,size*sizeof(*buf));
-
-	for( i=0; i<n/sizeof(*buf); ++i ) {	// Add to our samples
+    if (PlayingMusic) {
+	n = 0;
+#ifdef USE_LIBMODPLUG
+	if (ModFile) {
 #ifdef USE_LIBMODPLUG32
-	    buffer[i]+=((buf[i]>>16)*MusicVolume)/256;
+	    long *buf;
 #else
-	    buffer[i]+=(buf[i]*MusicVolume)/256;
+	    short *buf;
 #endif
-	}
+	    buf = alloca(size * sizeof(*buf));
 
-	if( n!=size*sizeof(*buf) ) {		// End reached
-	    SCM cb;
+	    n = ModPlug_Read(ModFile, buf, size * sizeof(*buf));
 
-	    DebugLevel2Fn("End of music %d\n",i);
-	    PlayingMusic=0;
-	    if( ModFile ) {
-		ModPlug_Unload(ModFile);
+	    for (i = 0; i < n / sizeof(*buf); ++i) {	// Add to our samples
+#ifdef USE_LIBMODPLUG32
+		buffer[i] += ((buf[i] >> 16) * MusicVolume) / 256;
+#else
+		buffer[i] += (buf[i] * MusicVolume) / 256;
+#endif
 	    }
 
-	    if( CallbackMusic ) {
-		cb=gh_symbol2scm("music-stopped");
-		if( !gh_null_p(symbol_boundp(cb,NIL)) ) {
+	    n = n != size * sizeof(*buf);	// End reached?
+	}
+#endif
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
+	if (MusicSample) {
+	    short *buf;
+
+	    buf = (short *)(MusicSample->Data + MusicIndex);
+	    if (size * 2 > MusicSample->Length - MusicIndex) {
+		n = MusicSample->Length - MusicIndex;
+	    } else {
+		n = size * 2;
+	    }
+	    n >>= 1;
+	    for (i = 0; i < n; ++i) {	// Add to our samples
+		buffer[i] += (buf[i] * MusicVolume) / 256;
+	    }
+	    MusicIndex += i * 2;
+
+	    n = MusicIndex == MusicSample->Length;
+	}
+#endif
+
+	if (n) {			// End reached
+	    SCM cb;
+
+	    DebugLevel3Fn("End of music %d\n", i);
+	    PlayingMusic = 0;
+	    if (ModFile) {
+		ModPlug_Unload(ModFile);
+	    }
+	    // FIXME: we are inside the SDL callback!
+	    if (CallbackMusic) {
+		cb = gh_symbol2scm("music-stopped");
+		if (!gh_null_p(symbol_boundp(cb, NIL))) {
 		    SCM value;
 
-		    value=symbol_value(cb,NIL);
-		    if( !gh_null_p(value) ) {
-			gh_apply(value,NIL);
+		    value = symbol_value(cb, NIL);
+		    if (!gh_null_p(value)) {
+			gh_apply(value, NIL);
 		    }
 		}
 	    }
@@ -371,6 +245,11 @@ global void StopMusic(void)
 
 #endif
 
+/**
+**	Check cdrom.
+**
+**	Perodic called from the main loop.
+*/
 global void CDRomCheck(void)
 {
 #ifdef USE_SDLCD
@@ -394,8 +273,9 @@ global void CDRomCheck(void)
     } else {
 	DebugLevel0Fn("get track\n");
         CDTrack = cd_current_track() + 1;
-	if (CDTrack > NumCDTracks)
+	if (CDTrack > NumCDTracks) {
 	    CDTrack = 1;
+	}
     }
 #endif
 }
