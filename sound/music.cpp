@@ -207,9 +207,7 @@ global void PlaySectionMusic(PlaySectionType section)
 global int PlayMusic(const char* name)
 {
 	char buffer[PATH_MAX];
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 	Sample* sample;
-#endif
 
 	if (MusicOff) {
 		return 0;
@@ -267,6 +265,14 @@ global int PlayMusic(const char* name)
 			return;
 		}
 */
+		StopMusic();
+		MusicSample = sample;
+		PlayingMusic = 1;
+		return 1;
+	}
+#endif
+#ifdef USE_MIKMOD
+	if ((sample = LoadMikMod(name, PlayAudioStream))) {
 		StopMusic();
 		MusicSample = sample;
 		PlayingMusic = 1;
