@@ -1020,7 +1020,7 @@ global void WaitEventsAndKeepSync(void)
 	}
 
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
-		,(1|morex|VideoInterrupts) ? &tv : NULL);
+		,(morex|VideoInterrupts) ? &tv : NULL);
 
 	DebugLevel3Fn("%d, %d\n",morex|VideoInterrupts,maxfd);
 
