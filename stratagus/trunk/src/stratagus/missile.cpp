@@ -53,7 +53,7 @@
 #include "sound.h"
 #include "ui.h"
 
-#include "etlib/hash.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -421,7 +421,9 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 		DebugLevel3Fn("bloodlust\n");
 	}
 
-	damage = max(basic_damage - goal_stats->Armor, 1) + piercing_damage;
+	damage = (basic_damage - goal_stats->Armor) > 1 ?
+		(basic_damage - goal_stats->Armor) : 1;
+	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);
 

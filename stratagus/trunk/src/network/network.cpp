@@ -220,7 +220,6 @@
 
 #include "stratagus.h"
 
-#include "etlib/dllist.h"
 #include "net_lowlevel.h"
 #include "unit.h"
 #include "map.h"

@@ -60,7 +60,8 @@
 #include "sound.h"
 #include "cdaudio.h"
 #include "script.h"
-#include "etlib/hash.h"
+
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --		Defines
@@ -909,9 +910,9 @@ global int InitSoundServer(void)
 	MapWidth = (TheUI.MapArea.EndX - TheUI.MapArea.X + TileSizeX) / TileSizeX;
 	MapHeight = (TheUI.MapArea.EndY - TheUI.MapArea.Y + TileSizeY) / TileSizeY;
 	//FIXME: Valid only in shared memory context!
-	DistanceSilent = 3 * max(MapWidth, MapHeight);
+	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
 	DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
-	ViewPointOffset = max(MapWidth / 2, MapHeight / 2);
+	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);
 	DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
 
 	return 0;

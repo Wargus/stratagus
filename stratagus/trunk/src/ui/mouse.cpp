@@ -461,7 +461,8 @@ local void HandleMouseOn(int x, int y)
 					return;
 				}
 			} else {
-				i = min(TheUI.NumTrainingButtons, Selected[0]->Data.Train.Count);
+				i = (TheUI.NumTrainingButtons < Selected[0]->Data.Train.Count) ?
+					TheUI.NumTrainingButtons : Selected[0]->Data.Train.Count;
 				for (--i; i >= 0; --i) {
 					if (x >= TheUI.TrainingButtons[i].X &&
 							x < TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&

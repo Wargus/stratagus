@@ -42,7 +42,7 @@
 #include "unit.h"
 #include "sound_server.h"
 
-#include "etlib/hash.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --		Variables

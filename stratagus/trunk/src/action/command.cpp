@@ -756,7 +756,8 @@ global void CommandResourceLoc(Unit* unit, int x, int y, int flush)
 				unit->Player, x, y, &nx, &ny)) {
 			DebugLevel0Fn("FIXME: Give up???\n");
 		}
-		if (max(abs(nx - x), abs(ny - y)) > 1) {
+		// Max Value > 1
+		if ((abs(nx - x) | abs(ny - y)) > 1) {
 			DebugLevel3("Closest tile reachable is at %d,%d.\n" _C_ x _C_ y);
 			if (!FindTerrainType(0, MapFieldForest, 0, 20, unit->Player,
 					nx, ny, &nx, &ny)) {

@@ -558,7 +558,7 @@
 #include "unitsound.h"
 #include "upgrade_structs.h"
 #include "construct.h"
-#include "etlib/hash.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
