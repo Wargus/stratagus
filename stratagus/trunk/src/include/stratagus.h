@@ -37,6 +37,12 @@
 ==		Config definitions
 ============================================================================*/
 
+// Unit On Map cache
+#define UNIT_ON_MAP
+
+// New unit cache
+// #define NEW_UNIT_CACHE
+
 	//
 	//		Default speed for many things, set it higher for faster actions.
 	//

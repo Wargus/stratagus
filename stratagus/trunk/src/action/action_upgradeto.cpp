@@ -77,6 +77,9 @@ global void HandleActionUpgradeTo(Unit* unit)
 		unit->HP += stats->HitPoints - unit->Type->Stats[player->Player].HitPoints;
 		// don't have such unit now
 		player->UnitTypesCount[unit->Type->Type]--;
+
+		DebugCheck(unit->Type->TileWidth != type->TileWidth ||
+				unit->Type->TileHeight != type->TileHeight);
 		unit->Type = type;
 		unit->Stats = (UnitStats*)stats;
 		// and we have new one...
