@@ -221,9 +221,17 @@ local int ChopWood(Unit* unit)
 	    //	Update the map.
 	    //
 	    MapRemoveWood(unit->Orders[0].X,unit->Orders[0].Y);
+#if 0
+	    /*
+	     * This call turned out not to be sufficient because MapRemoveWood()
+	     * may actually remove more that one wood tile (x,y) due to
+	     * "wood fixing" code, see action_harvest.c . So the pathfinder
+	     * callback had to moved directly into MapRemoveWood().
+	     */
 #ifdef HIERARCHIC_PATHFINDER
 	    PfHierMapChangedCallback (unit->Orders[0].X, unit->Orders[0].Y,
 			unit->Orders[0].X, unit->Orders[0].Y);
+#endif
 #endif
 
 	    //
