@@ -59,6 +59,10 @@ typedef struct TextLines {
     struct TextLines* next;	/// pointer to next line
 } TextLines;
 
+typedef struct PlayerRanks {
+    char **Ranks;
+    int *Scores;
+} PlayerRanks;
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -66,6 +70,7 @@ typedef struct TextLines {
 
 global Intro GameIntro;			/// Game intro
 global Credits	GameCredits;		/// Game credits
+local PlayerRanks Ranks[PlayerMax];	/// Ranks
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -864,44 +869,31 @@ local int GameStatsDrawFunc(int frame)
     }
 
     if( dodraw==2 || (draw_all && dodraw>=2) ) {
-	// FIXME: Use ccl
-	char* Rank;
-	char** Ranks;
-	char* HumanRanks[] = {
-	    "Servant", "Peasant", "Squire", "Footman", "Corporal",
-	    "Sergeant", "Lieutenant", "Captain", "Major", "Knight",
-	    "General", "Admiral", "Marshall", "Lord", "Grand Admiral",
-	    "Highlord", "Thundergod", "God", "Designer"
-	};
-	char* OrcRanks[] = {
-	    "Slave", "Peon", "Rogue", "Grunt", "Slasher",
-	    "Marauder", "Commander", "Captain", "Major", "Knight",
-	    "General", "Master", "Marshall", "Chieftain", "Overlord",
-	    "War Chief", "Demigod", "God", "Designer"
-	};
-	int RankScores[] = {
-	    2000, 5000, 8000, 18000, 28000,
-	    40000, 55000, 70000, 85000, 105000,
-	    125000, 145000, 165000, 185000, 205000,
-	    230000, 255000, 280000
-	};
+	char* rank;
+	char** ranks;
+	int* scores;
 
-	if( ThisPlayer->Race==PlayerRaceHuman ) {
-	    Ranks=HumanRanks;
-	} else {
-	    Ranks=OrcRanks;
-	}
-
-	Rank=Ranks[sizeof(RankScores)];
-	for( i=0; i<(int)sizeof(RankScores); i++ ) {
-	    if( ThisPlayer->Score<RankScores[i] ) {
-		Rank=Ranks[i];
+	for( i=0; RaceWcNames[i]; ++i ) {
+	    if( !strcmp(RaceWcNames[i],ThisPlayer->RaceName) ) {
+		ranks=Ranks[i].Ranks;
+		scores=Ranks[ThisPlayer->Player].Scores;
 		break;
 	    }
 	}
+	DebugCheck( !RaceWcNames[i] );
+
+	rank=ranks[0];
+	i=0;
+	while( 1 ) {
+	    if( ThisPlayer->Score<scores[i] || !ranks[i] ) {
+		break;
+	    }
+	    rank=ranks[i];
+	    ++i;
+	}
 
 	VideoDrawTextCentered(x+324,y+top_offset,LargeFont,"Rank");
-	VideoDrawTextCentered(x+324,y+top_offset+21,SmallTitleFont,Rank);
+	VideoDrawTextCentered(x+324,y+top_offset+21,SmallTitleFont,rank);
     }
 
     if( dodraw==3 || (draw_all && dodraw>=3) ) {
@@ -1386,12 +1378,62 @@ local SCM CclRemoveObjective(SCM objective)
 }
 
 /**
+**	Parse the define-ranks ccl function
+*/
+local SCM CclDefineRanks(SCM list)
+{
+    PlayerRanks *rank;
+    const char *race;
+    int i;
+    int len;
+
+    race=get_c_string(gh_car(list));
+    for( i=0; RaceWcNames[i]; ++i ) {
+	if( !strcmp(RaceWcNames[i], race) ) {
+	    rank=&Ranks[i];
+	    break;
+	}
+    }
+    if( !RaceWcNames[i] ) {
+	fprintf(stderr,"define-ranks: Invalid race name: %s\n",race);
+	ExitFatal(-1);
+    }
+
+    if( rank->Ranks ) {
+	for( i=0; rank->Ranks[i]; ++i ) {
+	    free(rank->Ranks[i]);
+	}
+	free(rank->Ranks);
+	free(rank->Scores);
+    }
+
+    list=gh_car(gh_cdr(list));
+    len=gh_length(list)/2;
+
+    rank->Ranks=(char**)malloc((len+1)*sizeof(char*));
+    rank->Ranks[len]=NULL;
+    rank->Scores=(int*)malloc(len*sizeof(int));
+
+    i=0;
+    while( !gh_null_p(list) ) {
+	rank->Scores[i]=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+	rank->Ranks[i]=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+	++i;
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL functions for objectives
 */
 global void ObjectivesCclRegister(void)
 {
     gh_new_procedureN("add-objective",CclAddObjective);
     gh_new_procedure1_0("remove-objective",CclRemoveObjective);
+    gh_new_procedureN("define-ranks",CclDefineRanks);
 }
 
 /**
