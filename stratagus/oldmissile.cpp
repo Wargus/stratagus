@@ -590,7 +590,7 @@ found:
 **	damage is multiplied by random 1 or 2.
 **
 **	NOTE: different targets (big are hit by some missiles better)
-**	NOTE: hiden targets are hit worser.
+**	NOTE: hidden targets are hit worser.
 **	NOTE: targets higher are hit worser.
 **
 **	@param attack_stats	Attacker attributes.
