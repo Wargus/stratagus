@@ -1008,7 +1008,7 @@ global void DrawStatusLine(void)
 	    if( endpos[1]>='0' && endpos[1]<='9' ) {
 		i = endpos[1]-'0';
 		if( TheUI.Resources[i].Icon.Graphic ) {
-		    VideoDrawSubClipClip(TheUI.Resources[i].Icon.Graphic
+		    VideoDrawSubClip(TheUI.Resources[i].Icon.Graphic
 				 ,0,TheUI.Resources[i].IconRow*TheUI.Resources[i].IconH
 				 ,TheUI.Resources[i].IconW,TheUI.Resources[i].IconH
 				 ,x,TheUI.StatusLineY+1);
