@@ -102,7 +102,7 @@ global void CleanModules(void)
 #ifdef HIERARCHIC_PATHFINDER
     PfHierClean ();
 #endif
-    if ( AStarOn ) {
+    if (AStarOn) {
         FreeAStar();
     }
 
