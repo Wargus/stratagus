@@ -585,7 +585,8 @@ global void VideoDrawOnlyFogAlpha(const int tile, int x, int y)
     drect.y = y;
 
     alpha = TheMap.TileGraphic->Surface->format->alpha;
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, 128);
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA,
+	(100 - FogOfWarContrast) * 255 / 100);
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
     SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, alpha);
 }
@@ -627,7 +628,8 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
     drect.y = y;
 
     alpha = TheMap.TileGraphic->Surface->format->alpha;
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, 128);
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA,
+	(100 - FogOfWarContrast) * 255 / 100);
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
     SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, alpha);
 }
@@ -2948,7 +2950,8 @@ global void InitMapFogOfWar(void)
 	SDL_Surface* s;
 	s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
 	    32, RMASK, GMASK, BMASK, AMASK);
-	SDL_FillRect(s, NULL, SDL_MapRGBA(s->format, 0, 0, 0, 128));
+	SDL_FillRect(s, NULL, SDL_MapRGBA(s->format, 0, 0, 0,
+	    (100 - FogOfWarContrast) * 255 / 100));
 	SolidFog = SDL_DisplayFormatAlpha(s);
 	SDL_FreeSurface(s);
     }
