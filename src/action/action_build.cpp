@@ -322,6 +322,8 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 		// FIXME: Should have a BuildRange?
 		unit->Orders[0].Range = unit->Type->RepairRange;
 		unit->SubAction = 40;
+		unit->Direction = DirectionToHeading(x - unit->X, y - unit->Y);
+		UnitUpdateHeading(unit);
 		unit->Data.Build.Cycles = 0;
 		RefsIncrease(build);
 		// Mark the new building seen.
