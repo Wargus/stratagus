@@ -137,6 +137,18 @@ local void DrawPixel16(SysColors color,int x,int y)
 }
 
 /**
+**	Draw pixel unclipped into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+local void DrawPixel24(SysColors color,int x,int y)
+{
+    VideoMemory24[x+y*VideoWidth]=Pixels24[color];
+}
+
+/**
 **	Draw pixel unclipped into 32bit framebuffer.
 **
 **	@param color	Color index.
@@ -178,6 +190,22 @@ local void DrawPixelClip16(SysColors color,int x,int y)
 	return;
     }
     VideoMemory16[x+y*VideoWidth]=Pixels16[color];
+}
+
+/**
+**	Draw pixel clipped to current clip setting into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+*/
+local void DrawPixelClip24(SysColors color,int x,int y)
+{
+    //	Clipping:
+    if( x<ClipX1 || x>=ClipX2 || y<ClipY1 || y>=ClipY2 ) {
+	return;
+    }
+    VideoMemory24[x+y*VideoWidth]=Pixels24[color];
 }
 
 /**
@@ -247,6 +275,31 @@ local void DrawHLine16(SysColors color,int x,int y,unsigned width)
 
     if( p<e+1 ) {
 	*p=f;
+    }
+}
+
+/**
+**	Draw horizontal line unclipped into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param width	width of line.
+*/
+local void DrawHLine24(SysColors color,int x,int y,unsigned width)
+{
+    VMemType24* p;
+    VMemType24* e;
+    int w;
+    VMemType24 f;
+
+    w=VideoWidth;
+    p=VideoMemory24+y*w+x;
+    e=p+width;
+    f=Pixels24[color];
+
+    while( p<e ) {
+	*p++=f;
     }
 }
 
@@ -341,6 +394,38 @@ local void DrawHLineClip16(SysColors color,int x,int y,unsigned width)
     DrawHLine16(color,x,y,width);
 }
 
+/**
+**	Draw horizontal line clipped into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param width	width of line.
+*/
+local void DrawHLineClip24(SysColors color,int x,int y,unsigned width)
+{
+    int f;
+
+    if( y<ClipY1 || y>=ClipY2 ) {	//	Clipping:
+	return;
+    }
+    if( x<ClipX1 ) {
+	f=ClipX1-x;
+	x=ClipX1;
+	if( width<f ) {
+	    return;
+	}
+	width-=f;
+    }
+    if( (x+width)>ClipX2 ) {
+	if( width<ClipX2-x ) {
+	    return;
+	}
+	width=ClipX2-x;
+    }
+
+    DrawHLine24(color,x,y,width);
+}
 
 /**
 **	Draw horizontal line clipped into 32bit framebuffer.
@@ -419,6 +504,31 @@ local void DrawVLine16(SysColors color,int x,int y,unsigned height)
     p=VideoMemory16+y*w+x;
     e=p+height*w;
     f=Pixels16[color];
+    while( p<e ) {			// FIXME: better
+	*p=f;
+	p+=w;
+    }
+}
+
+/**
+**	Draw vertical line unclipped into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param height	height of line.
+*/
+local void DrawVLine24(SysColors color,int x,int y,unsigned height)
+{
+    VMemType24* p;
+    VMemType24* e;
+    int w;
+    VMemType24 f;
+
+    w=VideoWidth;
+    p=VideoMemory24+y*w+x;
+    e=p+height*w;
+    f=Pixels24[color];
     while( p<e ) {			// FIXME: better
 	*p=f;
 	p+=w;
@@ -541,6 +651,53 @@ local void DrawVLineClip16(SysColors color,int x,int y,unsigned height)
 }
 
 /**
+**	Draw vertical line clipped into 24bit framebuffer.
+**
+**	@param color	Color index.
+**	@param x	x coordinate on the screen
+**	@param y	y coordinate on the screen
+**	@param height	height of line.
+*/
+local void DrawVLineClip24(SysColors color,int x,int y,unsigned height)
+{
+    VMemType24* p;
+    VMemType24* e;
+    int w;
+    int t;
+    VMemType24 f;
+
+    //	Clipping:
+    if( x<ClipX1 || x>=ClipX2 ) {
+	return;
+    }
+    if( y<ClipY1 ) {
+	t=ClipY1-y;
+	y=ClipY1;
+	if( height<t ) {
+	    return;
+	}
+	height-=t;
+    }
+    if( (y+height)>ClipY2 ) {
+	if( height<ClipY2-y ) {
+	    return;
+	}
+	height=ClipY2-y;
+    }
+    if( height>640 ) 
+	abort();
+
+    w=VideoWidth;
+    p=VideoMemory24+y*w+x;
+    e=p+height*w;
+    f=Pixels24[color];
+    while( p<e ) {
+	*p=f;
+	p+=w;
+    }
+}
+
+/**
 **	Draw vertical line clipped into 32bit framebuffer.
 **
 **	@param color	Color index.
@@ -651,6 +808,14 @@ global void InitLineDraw(void)
 	    break;
 
 	case 24:
+	    VideoDrawPixel=DrawPixel24;
+	    VideoDrawPixelClip=DrawPixelClip24;
+	    VideoDrawHLine=DrawHLine24;
+	    VideoDrawHLineClip=DrawHLineClip24;
+	    VideoDrawVLine=DrawVLine24;
+	    VideoDrawVLineClip=DrawVLineClip24;
+	    // FIXME: real 24bpp break;
+
 	case 32:
 	    VideoDrawPixel=DrawPixel32;
 	    VideoDrawPixelClip=DrawPixelClip32;
