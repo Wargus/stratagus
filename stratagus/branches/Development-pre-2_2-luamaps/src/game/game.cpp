@@ -164,18 +164,18 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	// MAPTODO Copyright notice in generated file
 	gzprintf(f, "-- File licensed under the GNU GPL version 2.\n\n");
 
-	gzprintf(f, "PresentMap(\"%s\", %d, %d, %d, %d)\n",
-			map->Info.Description, i, map->Info.MapWidth, map->Info.MapHeight,
-			map->Info.MapUID + 1);
-
 	gzprintf(f, "DefinePlayerTypes(");
 	gzprintf(f, "\"%s\"", type[map->Info.PlayerType[0]]);
 	for(i = 1; i < PlayerMax && map->Info.PlayerType[i] != PlayerNobody; ++i) {
 		gzprintf(f, ", \"%s\"", type[map->Info.PlayerType[i]]);
 	}
 	gzprintf(f, ")\n");
-
-	// FIXME : BUG when path is relative (-d option) => mapsetup wrong here.
+	
+	gzprintf(f, "PresentMap(\"%s\", %d, %d, %d, %d)\n",
+			map->Info.Description, i, map->Info.MapWidth, map->Info.MapHeight,
+			map->Info.MapUID + 1);
+			
+	// MAPTODO : BUG when path is relative (-d option) => mapsetup wrong here.
 	gzprintf(f, "DefineMapSetup(\"%s\")", mapsetup);
 	gzclose(f);
 
