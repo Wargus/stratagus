@@ -318,7 +318,7 @@ global int SpellRunesController(Missile *missile)
 */
 global void InitSpells(void)
 {
-    int z = 0;
+    int z;
 
     for( z=0; SpellTypeTable[z].Ident; ++z ) {
 #ifdef WITH_SOUND			// FIXME: no ifdef orgie
