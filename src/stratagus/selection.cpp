@@ -298,9 +298,9 @@ global int SelectUnitsByType(Unit* base)
 	NumSelected = 1;
 	CheckUnitToBeDrawn(base);
 
-	// if unit isn't belonging to the player, or is a static unit
+	// if unit isn't belonging to the player or allied player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (base->Player != ThisPlayer || !type->SelectableByRectangle) {
+	if (!CanSelectMultipleUnits(base->Player) || !type->SelectableByRectangle) {
 		return NumSelected;
 	}
 
@@ -311,7 +311,7 @@ global int SelectUnitsByType(Unit* base)
 	//			  different type... idem for tankers
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer || unit->Type != type) {
+		if (!CanSelectMultipleUnits(unit->Player) || unit->Type != type) {
 			continue;
 		}
 		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
@@ -378,7 +378,7 @@ global int ToggleUnitsByType(Unit* base)
 	}
 	// if unit isn't belonging to the player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (base->Player != ThisPlayer || !type->SelectableByRectangle) {
+	if (!CanSelectMultipleUnits(base->Player) || !type->SelectableByRectangle) {
 		return 0;
 	}
 
@@ -392,7 +392,7 @@ global int ToggleUnitsByType(Unit* base)
 	//		different type... idem for tankers
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer || unit->Type != type) {
+		if (!CanSelectMultipleUnits(unit->Player) || unit->Type != type) {
 			continue;
 		}
 		if (UnitUnusable(unit)) {		// guess SelectUnits doesn't check this
@@ -493,7 +493,7 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
 
 	for (n = i = 0; i < num_units; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
 			continue;
 		}
 		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
@@ -582,7 +582,7 @@ global int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	//		and can be selectable by rectangle.
 	//		In this case, do nothing.
 	if (NumSelected == 1 &&
-			(Selected[0]->Player != ThisPlayer ||
+			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
@@ -661,7 +661,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	//
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer) {
+		if (!CanSelectMultipleUnits(unit->Player)) {
 			continue;
 		}
 		// FIXME: Can we get this?
@@ -745,7 +745,7 @@ global int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 	for (n = i = 0; i < r; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
 			continue;
 		}
 		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
@@ -797,7 +797,7 @@ global int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 	for (n = i = 0; i < r; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(unit->Player) || !unit->Type->SelectableByRectangle) {
 			continue;
 		}
 		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
@@ -848,7 +848,7 @@ global int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	//		and can be selectable by rectangle.
 	//		In this case, do nothing.
 	if (NumSelected == 1 &&
-			(Selected[0]->Player != ThisPlayer ||
+			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
@@ -863,7 +863,8 @@ global int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 	for (n = i = 0; i < r; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(unit->Player) ||
+			!unit->Type->SelectableByRectangle) {
 			continue;
 		}
 		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
@@ -918,7 +919,7 @@ global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	//		and can be selectable by rectangle.
 	//		In this case, do nothing.
 	if (NumSelected == 1 &&
-			(Selected[0]->Player != ThisPlayer ||
+			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
@@ -933,7 +934,8 @@ global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 	for (n = i = 0; i < r; ++i) {
 		unit = table[i];
-		if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(unit->Player) || 
+			!unit->Type->SelectableByRectangle) {
 			continue;
 		}
 		if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this

@@ -213,7 +213,8 @@ global void DrawUnitInfo(const Unit* unit)
 			x, y);
 		UiDrawLifeBar(unit, x, y);
 
-		if (unit->Player == ThisPlayer) {		// Only for own units.
+		if (unit->Player == ThisPlayer ||
+			PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {		// Only for own units.
 			if (unit->HP && unit->HP < 10000) {
 				sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
 				VideoDrawTextCentered(x + (type->Icon.Icon->Width + 7) / 2,
@@ -254,7 +255,8 @@ global void DrawUnitInfo(const Unit* unit)
 	//
 	//		Show How much a resource has left for owner and neutral.
 	//
-	if (unit->Player == ThisPlayer || unit->Player->Player == PlayerNumNeutral) {
+	if (unit->Player == ThisPlayer || unit->Player->Player == PlayerNumNeutral ||
+		PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {
 		if (type->GivesResource) {
 			sprintf(buf, "%s Left:", DefaultResourceNames[type->GivesResource]);
 			VideoDrawText(x + 108 - VideoTextLength(GameFont, buf), y + 8 + 78,
@@ -272,7 +274,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//		Only for owning player.
 	//
 #ifndef DEBUG
-	if (unit->Player != ThisPlayer) {
+	if (unit->Player != ThisPlayer && !PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {
 		return;
 	}
 #endif
@@ -1139,7 +1141,8 @@ global void DrawInfoPanel(void)
 			return;
 		} else {
 			// FIXME: not correct for enemies units
-			if (Selected[0]->Player == ThisPlayer) {
+			if (Selected[0]->Player == ThisPlayer ||
+				PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 				if (Selected[0]->Type->Building &&
 						(Selected[0]->Orders[0].Action == UnitActionBuilded ||
 							Selected[0]->Orders[0].Action == UnitActionResearch ||
