@@ -258,6 +258,9 @@ local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i);
 local void EditorMainLoadOk(void);
 local void EditorMainLoadCancel(void);
 local void EditorMainLoadVSAction(Menuitem *mi, int i);
+local void EditorLoadMap(void);
+local void EditorLoadOk(void);
+local void EditorLoadCancel(void);
 local void EditorMapProperties(void);
 local void EditorPlayerProperties(void);
 local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
@@ -579,10 +582,23 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorMainLoadOk,"editor-main-load-ok");
     HASHADD(EditorMainLoadCancel,"editor-main-load-cancel");
     HASHADD(EditorMainLoadFolder,"editor-main-load-folder");
-    HASHADD(EditorMapProperties,"editor-map-properties");
-    HASHADD(EditorPlayerProperties,"editor-player-properties");
+
+// Editor load map
+    HASHADD(EditorMainLoadInit,"editor-load-init");
+    HASHADD(EditorMainLoadLBInit,"editor-load-lb-init");
+    HASHADD(EditorMainLoadLBExit,"editor-load-lb-exit");
+    HASHADD(EditorMainLoadLBAction,"editor-load-lb-action");
+    HASHADD(EditorMainLoadLBRetrieve,"editor-load-lb-retrieve");
+    HASHADD(EditorMainLoadVSAction,"editor-load-vs-action");
+    HASHADD(EditorLoadOk,"editor-load-ok");
+    HASHADD(EditorLoadCancel,"editor-load-cancel");
+    HASHADD(EditorMainLoadFolder,"editor-load-folder");
 
 // Editor menu
+    HASHADD(EditorSave,"editor-save");
+    HASHADD(EditorLoadMap,"editor-load-map");
+    HASHADD(EditorMapProperties,"editor-map-properties");
+    HASHADD(EditorPlayerProperties,"editor-player-properties");
     HASHADD(EditorQuitMenu,"editor-quit-menu");
 
 // Editor map properties
@@ -605,7 +621,6 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorEditAiPropertiesCancel,"editor-edit-ai-properties-cancel");
 
 // Editor save
-    HASHADD(EditorSave,"editor-save");
     HASHADD(EditorSaveLBInit,"editor-save-lb-init");
     HASHADD(EditorSaveLBExit,"editor-save-lb-exit");
     HASHADD(EditorSaveFolder,"editor-save-folder");
@@ -5271,6 +5286,120 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 	default:
 	    break;
     }
+}
+
+/**
+**	Editor load map menu
+*/
+local void EditorLoadMap(void)
+{
+    char *p;
+    char *s;
+
+    EditorCancelled=0;
+    ProcessMenu("menu-editor-load-map", 1);
+    GetInfoFromSelectPath();
+
+    if (EditorCancelled) {
+	return;
+    }
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
+
+    if (ScenSelectPath[0]) {
+	s = ScenSelectPath + strlen(ScenSelectPath);
+	*s = '/';
+	strcpy(s+1, ScenSelectFileName);	// Final map name with path
+	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
+	strcpy(CurrentMapPath, p);
+	*s = '\0';
+    } else {
+	strcpy(CurrentMapPath, ScenSelectFileName);
+    }
+
+    EditorMapLoaded = 1;
+    EditorRunning = 0;
+    EndMenu();
+}
+
+/**
+**	Editor main load ok button
+*/
+local void EditorLoadOk(void)
+{
+    Menu *menu;
+    Menuitem *mi;
+    FileList *fl;
+    int i;
+
+    menu = FindMenu("menu-editor-load-map");
+    mi = &menu->items[1];
+    i = mi->d.listbox.curopt + mi->d.listbox.startline;
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type == 0) {
+	    strcat(ScenSelectPath, "/");
+	    strcat(ScenSelectPath, fl[i].name);
+	    if (menu->items[5].flags&MenuButtonDisabled) {
+		menu->items[5].flags &= ~MenuButtonDisabled;
+		menu->items[5].d.button.text = ScenSelectDisplayPath;
+	    } else {
+		strcat(ScenSelectDisplayPath, "/");
+	    }
+	    strcat(ScenSelectDisplayPath, fl[i].name);
+	    EditorMainLoadLBInit(mi);
+	    mi->d.listbox.cursel = -1;
+	    mi->d.listbox.startline = 0;
+	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
+	    mi[1].d.hslider.percent = 0;
+	    MustRedraw |= RedrawMenu;
+	} else {
+	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
+	    EndMenu();
+	    menu->items[5].d.button.text = NULL;
+	}
+    }
+}
+
+/**
+**	Editor main load cancel button
+*/
+local void EditorLoadCancel(void)
+{
+    Menu *menu;
+    char *s;
+
+    EditorCancelled=1;
+
+    //
+    //  Use last selected map.
+    //
+    DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+    if (*ScenSelectPath) {
+	strcat(ScenSelectPath, "/");
+    }
+    strcat(ScenSelectPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectPath, '/'))) {
+	strcpy(ScenSelectFileName, s + 1);
+	*s = '\0';
+    }
+    strcpy(ScenSelectDisplayPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectDisplayPath, '/'))) {
+	*s = '\0';
+    } else {
+	*ScenSelectDisplayPath = '\0';
+    }
+
+    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+
+    EditorEndMenu();
+
+    menu = FindMenu("menu-editor-load-map");
+    menu->items[5].d.button.text = NULL;
 }
 
 /**

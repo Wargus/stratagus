@@ -80,6 +80,7 @@ extern struct {
 ----------------------------------------------------------------------------*/
 
 global char EditorRunning;		/// True editor is running
+global char EditorMapLoaded;		/// Map loaded in editor
 
 local enum _editor_state_ {
     EditorSelecting,			/// Select
@@ -1905,70 +1906,74 @@ global void EditorMainLoop(void)
 {
     EventCallback callbacks;
 
-    CreateEditor();
+    do {
+	EditorMapLoaded = 0;
 
-    SetVideoSync();
+	CreateEditor();
 
-    callbacks.ButtonPressed = EditorCallbackButtonDown;
-    callbacks.ButtonReleased = EditorCallbackButtonUp;
-    callbacks.MouseMoved = EditorCallbackMouse;
-    callbacks.MouseExit = EditorCallbackExit;
-    callbacks.KeyPressed = EditorCallbackKeyDown;
-    callbacks.KeyReleased = EditorCallbackKeyUp;
-    callbacks.KeyRepeated = EditorCallbackKey3;
+	SetVideoSync();
 
-    callbacks.NetworkEvent = NetworkEvent;
-    callbacks.SoundReady = WriteSound;
+	callbacks.ButtonPressed = EditorCallbackButtonDown;
+	callbacks.ButtonReleased = EditorCallbackButtonUp;
+	callbacks.MouseMoved = EditorCallbackMouse;
+	callbacks.MouseExit = EditorCallbackExit;
+	callbacks.KeyPressed = EditorCallbackKeyDown;
+	callbacks.KeyReleased = EditorCallbackKeyUp;
+	callbacks.KeyRepeated = EditorCallbackKey3;
 
-    GameCursor = TheUI.Point.Cursor;
-    InterfaceState = IfaceStateNormal;
-    EditorState = EditorSelecting;
-    TheUI.LastClickedVP = 0;
-    TileCursorSize = 1;
+	callbacks.NetworkEvent = NetworkEvent;
+	callbacks.SoundReady = WriteSound;
 
-    EditorRunning = 1;
-    while (EditorRunning) {
-	EditorUpdateDisplay();
+	GameCursor = TheUI.Point.Cursor;
+	InterfaceState = IfaceStateNormal;
+	EditorState = EditorSelecting;
+	TheUI.LastClickedVP = 0;
+	TileCursorSize = 1;
 
-	//
-	//	Map scrolling
-	//
-	if( TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll) ) {
-	    DoScrollArea(MouseScrollState, 0);
-	}
-	if( TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll) ) {
-	    DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
-	    if( CursorOn == CursorOnMap && (MouseButtons&LeftButton)
-		    && (EditorState == EditorEditTile
-			|| EditorState == EditorEditUnit) ) {
-		EditorCallbackButtonDown(0);
+	EditorRunning = 1;
+	while (EditorRunning) {
+	    EditorUpdateDisplay();
+
+	    //
+	    //	Map scrolling
+	    //
+	    if( TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll) ) {
+		DoScrollArea(MouseScrollState, 0);
 	    }
+	    if( TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll) ) {
+		DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
+		if( CursorOn == CursorOnMap && (MouseButtons&LeftButton)
+			&& (EditorState == EditorEditTile
+			    || EditorState == EditorEditUnit) ) {
+		    EditorCallbackButtonDown(0);
+		}
+	    }
+
+	    if( ColorCycleAll>=0 && !(FrameCounter%COLOR_CYCLE_SPEED) ) {
+		ColorCycle();
+	    }
+
+	    WaitEventsOneFrame(&callbacks);
 	}
 
-	if( ColorCycleAll>=0 && !(FrameCounter%COLOR_CYCLE_SPEED) ) {
-	    ColorCycle();
-	}
+	//
+	//	Restore all for menu
+	//
+	CleanModules();
+	CleanFonts();
 
-	WaitEventsOneFrame(&callbacks);
-    }
+	LoadCcl();			// Reload the main config file
 
-    //
-    //	Restore all for menu
-    //
-    CleanModules();
-    CleanFonts();
+	PreMenuSetup();
 
-    LoadCcl();			// Reload the main config file
+	InterfaceState = IfaceStateMenu;
+	GameCursor = TheUI.Point.Cursor;
 
-    PreMenuSetup();
-
-    InterfaceState = IfaceStateMenu;
-    GameCursor = TheUI.Point.Cursor;
-
-    VideoLockScreen();
-    VideoClearScreen();
-    VideoUnlockScreen();
-    Invalidate();
+	VideoLockScreen();
+	VideoClearScreen();
+	VideoUnlockScreen();
+	Invalidate();
+    } while (EditorMapLoaded);
 }
 
 //@}
