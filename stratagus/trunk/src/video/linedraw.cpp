@@ -463,7 +463,7 @@ static unsigned char RGBtoBrightness( unsigned char r,
 **	@param g	Color Green-value.
 **	@param b	Color Blue-value.
 */
-static unsigned char ScaleRGB( unsigned char alpha,
+static void ScaleRGB( unsigned char alpha,
                                unsigned char *r,
                                unsigned char *g,
                                unsigned char *b )
@@ -480,6 +480,7 @@ static unsigned char ScaleRGB( unsigned char alpha,
   *g = f;
   f = (*b * alpha) >> 8;
   *b = f;
+
 }
 
 /**
@@ -1839,15 +1840,15 @@ local void DrawTransHLine24(SysColors color,int x,int y,unsigned width
 	c=*p;
 
         i=c.a;
-        i=((i-spR)*alpha)>>8+spR;
+        i=(((i-spR)*alpha)>>8)+spR;
         c.a=i&0xFF;
 
         i=c.b;
-        i=((i-spG)*alpha)>>8+spG;
+        i=(((i-spG)*alpha)>>8)+spG;
         c.b=i&0xFF;
 
         i=c.c;
-        i=((i-spB)*alpha)>>8+spB;
+        i=(((i-spB)*alpha)>>8)+spB;
         c.c=i&0xFF;
 
 	*p++=c;
