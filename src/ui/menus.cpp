@@ -2252,6 +2252,8 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
     line=5;
 
     p=Tips[CurrentTip];
+    if( !p )
+	return;
 
     l=0;
     s=str=strdup(p);
