@@ -33,7 +33,7 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.16.1pre2-19\""
+VERSION="-DVERSION=\"1.16.1\""
 WIN32=-1
 
 # Choose optimization level

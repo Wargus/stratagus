@@ -17,7 +17,7 @@
 
 all:	$(OBJS)
 
-doc:	$(OBJS:.o=.doc)
+doc:	$(OBJS:.o=.doc) $(HDRS:.h=.doc)
 
 clean::
 	$(RM) $(OBJS) core *.doc
@@ -27,7 +27,8 @@ clobber: clean
 
 depend::
 	@echo -n >.depend
-	@for i in $(OBJS:.o=.c) ; do $(CC) -MM $(GLIB) $(IFLAGS) $$i >>.depend ; done
+	@for i in $(OBJS:.o=.c) ; do\
+	$(CC) -MM $(GLIB) $(IFLAGS) $$i >>.depend ; done
 
 tags::
 	@for i in $(OBJS:.o=.c) ; do\
@@ -37,20 +38,20 @@ tags::
 	done
 
 ci::
-	ci -l $(OBJS:.o=.c) Makefile
+	ci -l $(OBJS:.o=.c) $(HDRS) Makefile
 
 lockver::
-	$(LOCKVER) $(OBJS:.o=.c) Makefile
+	$(LOCKVER) $(OBJS:.o=.c) $(HDRS) Makefile
 
 distlist::
 	@echo >>$(DISTLIST)
-	@for i in `echo $(OBJS:.o=.c)` Makefile $(EXTRA) ; do \
+	@for i in `echo $(OBJS:.o=.c)` $(HDRS) Makefile $(EXTRA) ; do \
 	echo src/$(MODULE)/$$i >>$(DISTLIST) ; done
 
 $(OBJS): $(TOPDIR)/Rules.make
 
 #
-#	include dependency files they exist
+#	include dependency files, if they exist
 #
 ifeq (.depend,$(wildcard .depend))
 include .depend

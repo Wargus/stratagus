@@ -169,7 +169,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #PROFILE=	-pg
 
 # Version
-VERSION=	'-DVERSION="1.16.1pre2"'
+VERSION=	'-DVERSION="1.16.1"'
 
 ############################################################################
 # below this, nothing should be changed!
