@@ -297,7 +297,7 @@ local void SetProtectedCell(int id,SCM obj)
 */
 local int CclNeedProtect(SCM val)
 {
-    return (val != SCM_UNSPECIFIED) && (!gh_null_p(val));
+    return (val != SCM_UNSPECIFIED) && (val != NULL) && (!gh_null_p(val));
 }
 #endif
 
@@ -389,6 +389,10 @@ global void CclGcUnprotect(SCM * obj)
 
 global void CclGcProtectedAssign(SCM* obj, SCM value)
 {
+    if (*obj == value) {
+	return;
+    }
+
 #ifdef GC_PROTECT_VALUE
     CclGcUnprotect(obj);
     (*obj) = value;
@@ -396,7 +400,7 @@ global void CclGcProtectedAssign(SCM* obj, SCM value)
 #else
 #ifdef DEBUG_GC
     int id;
-    
+
     // Check if already protected
     id = FindProtectedCell(obj);
     DebugCheck(id == -1);
@@ -1186,7 +1190,9 @@ global void InitCcl(void)
 #endif
 
 #ifndef SIOD_HEAP_GC
+#ifndef USE_GUILE
     gh_define("*ccl-protect*", NIL);
+#endif
 #endif
 
     print_welcome();
