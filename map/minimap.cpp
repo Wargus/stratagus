@@ -115,7 +115,7 @@ global void UpdateMinimapXY(int tx,int ty)
 	    }
 
 	    tile=TheMap.Fields[x+y].Tile;
-	    ((char*)MinimapGraphic->Frames)[mx+my*MINIMAP_W]=
+	    ((unsigned char*)MinimapGraphic->Frames)[mx+my*MINIMAP_W]=
 		TheMap.Tiles[tile][7+(mx%scale)*8+(6+(my%scale)*8)*TileSizeX];
 	}
     }
@@ -146,7 +146,7 @@ global void UpdateMinimap(void)
 	    int tile;
 
 	    tile=TheMap.Fields[Minimap2MapX[mx]+Minimap2MapY[my]].Tile;
-	    ((char*)MinimapGraphic->Frames)[mx+my*MINIMAP_W]=
+	    ((unsigned char*)MinimapGraphic->Frames)[mx+my*MINIMAP_W]=
 		TheMap.Tiles[tile][7+(mx%scale)*8+(6+(my%scale)*8)*TileSizeX];
 	}
     }
@@ -266,7 +266,7 @@ global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unu
 		mf=TheMap.Fields+Minimap2MapX[mx]+Minimap2MapY[my];
 		if( mf->Visible[p]
 			&& ( (mf->Visible[p]>1) || ((mx&1)==(my&1)) ) ) {
-		    VideoDrawPixel(((char*)MinimapGraphic->Frames)
+		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
 #else
@@ -274,7 +274,7 @@ global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unu
 		if( TheMap.Fields[flags].Flags&MapFieldExplored &&
 			( (TheMap.Visible[0][flags/32]&(1<<(flags%32)))
 			    || ((mx&1)==(my&1)) ) ) {
-		    VideoDrawPixel(((char*)MinimapGraphic->Frames)
+		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
 #endif
