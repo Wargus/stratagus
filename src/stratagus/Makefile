@@ -33,7 +33,7 @@ MODULE  = clone
 SRCS	= clone.c mainloop.c selection.c groups.c \
 	  unit.c unit_draw.c unitcache.c unit_find.c \
 	  construct.c player.c pud.c ccl.c iolib.c \
-	  spells.c ccl_player.c mpq.c
+	  spells.c ccl_player.c mpq.c scm.c
 
 OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
