@@ -213,7 +213,7 @@ global volatile int VideoInterrupts;	/// be happy, were are quicker
 
     /// Loaded system palette. 256-entries long, active system palette.
 #ifdef USE_SDL_SURFACE
-global SDL_Palette GlobalPalette;
+global SDL_Palette* GlobalPalette;
 #else
 global Palette GlobalPalette[256];
 #endif
@@ -620,21 +620,16 @@ global void DisplayPicture(const char* name)
 }
 
 /**
-**	Load palette from resource. Just loads palette, to set it use
-**	VideoCreatePalette, which sets system palette.
-**
-**	@param pal buffer to store palette (256-entries long)
-**	@param name resource file name
-**
-**	@see VideoCreatePalette
+** FIXME
 */
 #ifdef USE_SDL_SURFACE
-global void LoadRGB(SDL_Palette* pal, const char* name)
+global SDL_Palette* LoadRGB(const char* name)
 {
     CLFile* fp;
     int i;
     unsigned char* p;
     unsigned char buffer[256 * 3];
+    SDL_Palette* pal;
 
     if (!(fp = CLopen(name, CL_OPEN_READ)) || CLread(fp, buffer, 256 * 3) != 256 * 3) {
 	fprintf(stderr, "Can't load palette %s\n", name);
@@ -655,8 +650,19 @@ global void LoadRGB(SDL_Palette* pal, const char* name)
     }
 
     CLclose(fp);
+
+    return pal;
 }
 #else
+/**
+**	Load palette from resource. Just loads palette, to set it use
+**	VideoCreatePalette, which sets system palette.
+**
+**	@param pal buffer to store palette (256-entries long)
+**	@param name resource file name
+**
+**	@see VideoCreatePalette
+*/
 global void LoadRGB(Palette* pal, const char* name)
 {
     CLFile* fp;
@@ -1394,17 +1400,7 @@ local void InitSingleCommonPalette8(void)
 **
 **	@see SetPlayersPalette
 */
-#ifdef USE_SDL_SURFACE
-global void VideoSetPalette(const SDL_Palette* palette)
-{
-    if (!GlobalPalette.colors) {
-//    GlobalPalette = (SDL_Palette*)malloc(sizeof(SDL_Palette));
-        GlobalPalette.colors = calloc(256, sizeof(SDL_Color));
-    }
-//    TheScreen->format->palette = (SDL_Palette*)palette;
-    SetPlayersPalette();
-}
-#else
+#ifndef USE_SDL_SURFACE
 global void VideoSetPalette(const VMemType* palette)
 {
     DebugLevel2Fn("Palette %x used\n" _C_ (unsigned)palette);
@@ -1426,15 +1422,7 @@ global void VideoSetPalette(const VMemType* palette)
 **
 **	@param palette	System independ palette structure.
 */
-#ifdef USE_SDL_SURFACE
-global void VideoCreatePalette(const SDL_Palette* palette)
-{
-//    SDL_SetPalette(
-//    SDL_Palette* temp;
-//    temp = VideoCreateNewPalette(palette);
-    VideoSetPalette(palette);
-}
-#else
+#ifndef USE_SDL_SURFACE
 global void VideoCreatePalette(const Palette* palette)
 {
     VMemType* temp;

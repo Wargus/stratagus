@@ -5784,11 +5784,11 @@ local void EditorMapPropertiesOk(void)
 	LoadTileset();
 	ChangeTilesetPud(old, &TheMap);
 #ifdef USE_SDL_SURFACE
-	LoadRGB(&GlobalPalette,
-		s=strdcat3(StratagusLibPath,"/graphics/",
+	GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath,"/graphics/",
 		    TheMap.Tileset->PaletteFile));
 	free(s);
-	VideoCreatePalette(&GlobalPalette);
+	SetPlayersPalette();
+//	VideoCreatePalette(GlobalPalette);
 #else
 	LoadRGB(GlobalPalette,
 		s=strdcat3(StratagusLibPath,"/graphics/",
