@@ -217,6 +217,8 @@ typedef struct _map_field_ {
     unsigned short	Tile;		/// graphic tile number
     unsigned short	SeenTile;	/// last seen tile (FOW)
     unsigned short	Flags;		/// field flags
+    // FIXME: Value can be removed, walls and regeneration can be handled
+    //	      different.
     unsigned char	Value;		/// HP for walls/ Wood Regeneration
 #ifdef NEW_FOW
     unsigned char Visible[PlayerMax];	/// Seen counter 0 unexplored
@@ -235,6 +237,7 @@ typedef struct _map_field_ {
 #endif
 #ifdef HIERARCHIC_PATHFINDER
     unsigned short	RegId;	/// Region to which the field belongs
+    // FIXME: Johns: this values can't be placed in the map field.
     unsigned short	f, g;		/// A* parameters (no need to store h)
     unsigned short	h;		///stored only for BestSoFar computation
 #define HIER_LOW_OPEN	0
@@ -332,12 +335,14 @@ typedef struct _world_map_ {
 
 extern WorldMap TheMap;			/// The current map
 
+#ifndef SPLIT_SCREEN_SUPPORT
 extern unsigned MapX;			/// The map X tile start on display
 extern unsigned MapY;			/// The map Y tile start on display
     /// map width in tiles for current mode (14 for 640x480)
 extern unsigned MapWidth;
     /// map height in tiles for current mode (14 for 640x480)
 extern unsigned MapHeight;
+#endif
 
 extern char MustRedrawRow[MAXMAP_W];		/// Flags must redraw map row
 extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
@@ -346,10 +351,11 @@ extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
 extern void (*VideoDrawTile)(const unsigned char*,int,int);
 
 #ifdef NEW_DECODRAW
+    /// FIXME: docu
 extern void (*MapDrawTile)(int,int,int);
+    /// FIXME: docu
 extern void InitMapDecoration(void);
 #endif
-
 
     /// Use original style fog of war
 extern int OriginalFogOfWar;
@@ -397,7 +403,9 @@ extern int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
     /// Check if any part of an area is visible
 extern int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
 #ifdef SPLIT_SCREEN_SUPPORT
+    /// FIXME: docu
 extern int MapAreaVisibleInViewport (int , int , int , int , int );
+    /// FIXME: docu
 extern int AnyMapAreaVisibleInViewport (int , int , int , int , int );
 #endif /* SPLIT_SCREEN_SUPPORT */
     /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
@@ -425,11 +433,12 @@ extern void MapUpdateFogOfWar(int x,int y);
 extern void UpdateFogOfWarChange(void);
     /// Update visible areas for fog of war
 extern void MapUpdateVisible(void);
-    /// Draw the map fog of war
 
 #ifdef SPLIT_SCREEN_SUPPORT
+    /// Draw the map fog of war
 extern void DrawMapFogOfWar (int , int , int );
 #else /* SPLIT_SCREEN_SUPPORT */
+    /// Draw the map fog of war
 extern void DrawMapFogOfWar(int x,int y);
 #endif /* SPLIT_SCREEN_SUPPORT */
     /// Build tables for fog of war
@@ -513,7 +522,9 @@ extern void MapCenter(int x,int y);
 extern void MapSetViewpoint(int x,int y);
 
 #ifdef SPLIT_SCREEN_SUPPORT
+    /// FIXME: docu
 extern void MapViewportSetViewpoint (int , int , int );
+    /// FIXME: docu
 extern void MapCenterViewport (int , int , int );
 #endif /* SPLIT_SCREEN_SUPPORT */
 
@@ -540,8 +551,11 @@ extern int ForestOnMap(int x,int y);
 extern int RockOnMap(int x,int y);
 
 #ifdef HIERARCHIC_PATHFINDER
+    /// FIXME: docu
 extern inline unsigned short MapFieldGetRegId (int , int );
+    /// FIXME: docu
 extern inline void MapFieldSetRegId (int , int , unsigned short );
+    /// FIXME: docu
 extern inline int MapFieldPassable (int , int , int );
 #endif
 
@@ -596,16 +610,24 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 
 #ifdef UNITS_ON_MAP
 #if 0
+    /// FIXME: docu
 #define BuildingOnMapField(mf)	((mf)->Flags & MapFieldBuilding)
+    /// FIXME: docu
 #define LandUnitOnMapField(mf)	((mf)->Flags & MapFieldLandUnit)
+    /// FIXME: docu
 #define SeaUnitOnMapField(mf)	((mf)->Flags & MapFieldSeaUnit)
+    /// FIXME: docu
 #define AirUnitOnMapField(mf)	((mf)->Flags & MapFieldAirUnit)
 #endif
+    /// FIXME: docu
 #define BuildingOnMapField(mf)	((mf)->Building != 0xffff)
+    /// FIXME: docu
 #define LandUnitOnMapField(mf)	((mf)->LandUnit != 0xffff)
+    /// FIXME: docu
 #define SeaUnitOnMapField(mf)	((mf)->SeaUnit != 0xffff)
+    /// FIXME: docu
 #define AirUnitOnMapField(mf)	((mf)->AirUnit != 0xffff)
-#endif /* UNITS_ON_MAP */
+#endif // UNITS_ON_MAP
 
 //@}
 
