@@ -37,6 +37,7 @@
 #include "unit.h"
 #include "pud.h"
 #include "iolib.h"
+#include "settings.h"
 
 #include "myendian.h"
 
@@ -304,11 +305,11 @@ global PudInfo* GetPudInfo(const char* pud)
     }
     header[4]='\0';
     if( !PudReadHeader(input,header,&length) ) {
-	fprintf(stderr,"%s: invalid pud\n", pud);
+	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
 	exit(-1);
     }
     if( memcmp(header,"TYPE",4) || length!=16 ) {
-	fprintf(stderr,"%s: invalid pud\n", pud);
+	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
 	exit(-1);
     }
     if( CLread(input,buf,16)!=16 ) {	// IGNORE TYPE
@@ -316,7 +317,7 @@ global PudInfo* GetPudInfo(const char* pud)
 	exit(-1);
     }
     if( strcmp(buf,"WAR2 MAP") ) {	// ONLY CHECK STRING
-	fprintf(stderr,"%s: invalid pud\n", pud);
+	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
 	exit(-1);
     }
 
@@ -722,11 +723,11 @@ global void LoadPud(const char* pud,WorldMap* map)
     }
     header[4]='\0';
     if( !PudReadHeader(input,header,&length) ) {
-	fprintf(stderr,"%s: invalid pud\n", pud);
+	fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
 	exit(-1);
     }
     if( memcmp(header,"TYPE",4) || length!=16 ) {
-	fprintf(stderr,"%s: invalid pud\n", pud);
+	fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
 	exit(-1);
     }
     if( CLread(input,buf,16)!=16 ) {	// IGNORE TYPE
@@ -734,7 +735,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	exit(-1);
     }
     if( strcmp(buf,"WAR2 MAP") ) {	// ONLY CHECK STRING
-	fprintf(stderr,"%s: invalid pud\n", pud);
+	fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
 	exit(-1);
     }
 
@@ -942,7 +943,11 @@ global void LoadPud(const char* pud,WorldMap* map)
 			    v=PlayerRaceNeutral;
 			    break;
 		    }
-		    PlayerSetSide(&Players[i],v);
+		    if (GameSettings.Presets[i].Race == SettingsPresetMapDefault) {
+			PlayerSetSide(&Players[i],v);
+		    } else {
+			PlayerSetSide(&Players[i],GameSettings.Presets[i].Race);
+		    }
 		}
 		continue;
 	    } else {
@@ -1113,6 +1118,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    int t;
 	    int o;
 	    int v;
+	    int s;
 	    Unit* unit;
 
 	    while( length>=8 ) {
@@ -1128,6 +1134,15 @@ global void LoadPud(const char* pud,WorldMap* map)
 		    Players[o].X=MapOffsetX+x;
 		    Players[o].Y=MapOffsetY+y;
 		} else {
+		    if ((s = GameSettings.Presets[o].Race) != SettingsPresetMapDefault) {
+			if (s == PlayerRaceHuman && (t & 1) == 1) {
+			    t--;
+			}
+			if (s == PlayerRaceOrc && (t & 1) == 0) {
+			    t++;
+			}
+			// FIXME: This is hard-code WCII ... also: support more races..
+		    }
 		    unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
 			    ,UnitTypeByWcNum(t),&Players[o]);
 		    if( unit->Type->GoldMine || unit->Type->OilPatch ) {

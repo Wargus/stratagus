@@ -25,6 +25,16 @@
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+extern global int ColorCycleAll;
+#ifdef DEBUG
+extern unsigned AllocatedGraphicMemory;
+extern unsigned CompressedGraphicMemory;
+#endif
+
+/*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
 
@@ -32,7 +42,6 @@ typedef unsigned char VMemType8;	///  8 bpp modes pointer
 typedef unsigned short VMemType16;	/// 16 bpp modes pointer
 typedef struct { char a,b,c;} VMemType24;/// 24 bpp modes pointer
 typedef unsigned long VMemType32;	/// 32 bpp modes pointer
-extern global int ColorCycleAll;
 
 /**
 **	General video mode pointer.
