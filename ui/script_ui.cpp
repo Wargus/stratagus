@@ -1124,23 +1124,20 @@ local SCM CclDefineUI(SCM list)
 	}
     }
 
-    temp=gh_car(list);
+    value=gh_car(list);
     list=gh_cdr(list);
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    free(ui->VictoryBackground.File);
-    ui->VictoryBackground.File=str;
-
-    temp=gh_car(list);
+    if( gh_eq_p(value,gh_symbol2scm("victory-background")) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	ui->VictoryBackground.File=gh_scm2newstr(value,NULL);
+    }
+    value=gh_car(list);
     list=gh_cdr(list);
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    free(ui->DefeatBackground.File);
-    ui->DefeatBackground.File=str;
+    if( gh_eq_p(value,gh_symbol2scm("defeat-background")) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	ui->DefeatBackground.File=gh_scm2newstr(value,NULL);
+    }
 
     return SCM_UNSPECIFIED;
 }

@@ -390,8 +390,10 @@ local void SaveUi(FILE* file,const UI* ui)
     }
     fprintf(file,")\n");
 
-    fprintf(file,"\n  (list \"%s\")",ui->VictoryBackground.File);
-    fprintf(file,"\n  (list \"%s\")",ui->DefeatBackground.File);
+    fprintf(file,"\n  'victory-background \"%s\"",
+	    ui->VictoryBackground.File);
+    fprintf(file,"\n  'defeat-background \"%s\"",
+	    ui->DefeatBackground.File);
 
     fprintf(file," )\n\n");
 }
