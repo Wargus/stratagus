@@ -217,9 +217,9 @@ local SCM CclDefineUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     n=gh_vector_length(value);
-    if( n<4 || n>6 ) {
+    if( n<4 || n>MaxCosts ) {
 	fprintf(stderr,"Wrong vector length\n");
-	if( n>6 ) {
+	if( n>MaxCosts ) {
 	    n=MaxCosts;
 	}
     }
@@ -258,6 +258,14 @@ local SCM CclDefineUnitType(SCM list)
     temp=gh_car(gh_cdr(value));
     type->BoxHeight=gh_scm2int(temp);
     DebugLevel3("\tBox: %d,%d\n",type->BoxWidth,type->BoxHeight);
+
+    // Minimal attack range
+
+    list=gh_cdr(list);
+    value=gh_car(list);
+    i=gh_scm2int(value);
+    DebugLevel3("\tMinimal AttackRange: %d\n",i);
+    type->MinAttackRange=i;
 
     // Attack range
 
