@@ -810,25 +810,58 @@ global void VideoDrawCircle(SDL_Color color, int x, int y, int r)
     }
 }
 
+global void VideoDrawTransCircle(SDL_Color color, int x, int y, 
+    int r, unsigned char alpha)
+{
+    int p;
+    int px;
+    int py;
+
+    p = 1 - r;
+    py = r;
+
+    for (px = 0; px <= py + 1; ++px) {
+	VideoDrawTransPixel(color, x + px, y + py, alpha);
+	VideoDrawTransPixel(color, x + px, y - py, alpha);
+	VideoDrawTransPixel(color, x - px, y + py, alpha);
+	VideoDrawTransPixel(color, x - px, y - py, alpha);
+
+	VideoDrawTransPixel(color, x + py, y + px, alpha);
+	VideoDrawTransPixel(color, x + py, y - px, alpha);
+	VideoDrawTransPixel(color, x - py, y + px, alpha);
+	VideoDrawTransPixel(color, x - py, y - px, alpha);
+
+	if (p < 0) {
+	    p += 2 * px + 3;
+	} else {
+	    p += 2 * (px - py) + 5;
+	    py -= 1;
+	}
+    }
+}
+
 global void VideoDrawCircleClip(SDL_Color color, int x, int y, int r)
 {
-    int w;
-    int h;
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
 
-    w = h = r * 2;
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 - 2 * ClipX1;
+    newrect.h = ClipY2 - 2 * ClipY1;
 
-    CLIP_RECTANGLE(x, y, w, h);
+    printf("x y w h    %d %d %d %d\n", newrect.x, newrect.y, newrect.w, newrect.h);
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoDrawCircle(color, x, y, r);
-
-    r = w / 2;
-    h = w / 2;
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void VideoDrawTransCircleClip(SDL_Color color, int x, int y,
     int r, unsigned char alpha)
 {
     // FIXME: clip, trans
-    VideoDrawCircle(color, x, y, r);
+    VideoDrawTransCircle(color, x, y, r, alpha);
 }
 
 global void VideoFillCircle(SDL_Color color, int x, int y, int r)
@@ -857,7 +890,7 @@ global void VideoFillCircle(SDL_Color color, int x, int y, int r)
 	    py -= 1;
 
 	    // Fill up the left/right half of the circle
-	    if (py > px) {
+	    if (py >= px) {
 		VideoDrawVLine(color, x + py + 1, y, px + 1);
 		VideoDrawVLine(color, x + py + 1, y - px, px);
 		VideoDrawVLine(color, x - py - 1, y, px + 1);
@@ -894,7 +927,7 @@ global void VideoFillTransCircle(SDL_Color color, int x, int y,
 	    py -= 1;
 
 	    // Fill up the left/right half of the circle
-	    if (py > px) {
+	    if (py >= px) {
 		VideoDrawTransVLine(color, x + py + 1, y, px + 1, alpha);
 		VideoDrawTransVLine(color, x + py + 1, y - px, px, alpha);
 		VideoDrawTransVLine(color, x - py - 1, y, px + 1, alpha);
