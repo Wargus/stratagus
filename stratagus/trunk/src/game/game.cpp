@@ -21,6 +21,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "freecraft.h"
@@ -171,19 +172,23 @@ global void SaveMap(FILE* file)
 */
 global void CreateGame(char* filename, WorldMap* map)
 {
-    char* PalettePath;
     int i, j;
+    char* s;
 
     if (filename == NULL) {
 	ProcessMenu(MENU_PRG_START, 1);
     } else {
+	s=NULL;
 	if (filename[0] != '/' && filename[0] != '.') {
-	    filename = strdcat3(FreeCraftLibPath, "/", filename);
+	    s= filename = strdcat3(FreeCraftLibPath, "/", filename);
 	}
 	//
 	//	Load the map.
 	//
 	LoadMap(filename, map);
+	if( s ) {
+	    free(s);
+	}
     }
 
     if( FlagRevealMap ) {
@@ -224,35 +229,14 @@ global void CreateGame(char* filename, WorldMap* map)
 	NetworkInSync=1;
     }
 
-    DebugLevel3("Terrain %d\n",TheMap.Terrain);
-
-    // FIXME: must use palette from tileset!!
-    // FIXME: this must be extendable!!
-
-    switch( TheMap.Terrain ) {
-	case TilesetSummer:
-            PalettePath = strdcat(FreeCraftLibPath, "/summer.rgb");
-	    break;
-	case TilesetWinter:
-            PalettePath = strdcat(FreeCraftLibPath, "/winter.rgb");
-	    break;
-	case TilesetWasteland:
-            PalettePath = strdcat(FreeCraftLibPath, "/wasteland.rgb");
-	    break;
-	case TilesetSwamp:
-            PalettePath = strdcat(FreeCraftLibPath, "/swamp.rgb");
-	    break;
-	default:
-	    DebugLevel2("Unknown Terrain %d\n",TheMap.Terrain);
-            PalettePath = strdcat(FreeCraftLibPath, "/summer.rgb");
-	    break;
-    }
-    LoadRGB(GlobalPalette, PalettePath);
-    VideoCreatePalette(GlobalPalette);
-
     //
     //	Graphic part
     //
+    LoadTileset();
+    LoadRGB(GlobalPalette,
+	    s=strdcat3(FreeCraftLibPath,"/",TheMap.Tileset->PaletteFile));
+    free(s);
+    VideoCreatePalette(GlobalPalette);
     LoadIcons();
 
     // FIXME: Race only known in single player game:
@@ -260,7 +244,6 @@ global void CreateGame(char* filename, WorldMap* map)
     LoadImages(ThisPlayer->Race);
     LoadCursors(ThisPlayer->Race);
 
-    LoadTileset();
     InitUnitButtons();
     LoadMissileSprites();
     InitSpells();

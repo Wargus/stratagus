@@ -1349,6 +1349,8 @@ local const unsigned short TileTableWasteland[0x9E0] = {
  0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,
 };
 
+#endif
+
 /**
 **	Count of available Tilesets.
 */
@@ -1365,8 +1367,10 @@ global Tileset Tilesets[TilesetMax] = {
     ,"summer"
 #ifdef NEW_NAMES
     ,"graphic/tilesets/summer/terrain/summer.png"
+    ,"graphic/tilesets/summer/summer.rgb"
 #else
     ,"graphic/tileset/summer.png"
+    ,"summer.rgb"
 #endif
     ,TileTableSummer
     ,NULL
@@ -1384,8 +1388,15 @@ global Tileset Tilesets[TilesetMax] = {
     ,166
 },
 {
-    "tileset-winter",
-    "winter",		"graphic/tileset/winter.png"
+    "tileset-winter"
+    ,"winter"
+#ifdef NEW_NAMES
+    ,"graphic/tilesets/summer/terrain/winter.png"
+    ,"graphic/tilesets/summer/winter.rgb"
+#else
+    ,"graphic/tileset/winter.png"
+    ,"winter.rgb"
+#endif
     ,TileTableWinter
     ,NULL
     ,NULL
@@ -1402,8 +1413,15 @@ global Tileset Tilesets[TilesetMax] = {
     ,161
 },
 {
-    "tileset-wasteland",
-    "wasteland",	"graphic/tileset/wasteland.png"
+    "tileset-wasteland"
+    ,"wasteland"
+#ifdef NEW_NAMES
+    ,"graphic/tilesets/summer/terrain/wasteland.png"
+    ,"graphic/tilesets/summer/wasteland.rgb"
+#else
+    ,"graphic/tileset/wasteland.png"
+    ,"wasteland.rgb"
+#endif
     ,TileTableWasteland
     ,NULL
     ,NULL
@@ -1420,8 +1438,15 @@ global Tileset Tilesets[TilesetMax] = {
     ,163
 },
 {
-    "tileset-swamp",
-    "swamp",		"graphic/tileset/swamp.png"
+    "tileset-swamp"
+    ,"swamp"
+#ifdef NEW_NAMES
+    ,"graphic/tilesets/summer/terrain/swamp.png"
+    ,"graphic/tilesets/summer/swamp.rgb"
+#else
+    ,"graphic/tileset/swamp.png"
+    ,"swamp.rgb"
+#endif
     ,TileTableSwamp
     ,NULL
     ,NULL
@@ -1438,8 +1463,6 @@ global Tileset Tilesets[TilesetMax] = {
     ,160
 },
 };
-
-#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1796,27 +1819,17 @@ global void SaveTileset(FILE* file)
 {
     const unsigned short* table;
     const Tileset* tileset;
-    int i;
 
     tileset=TheMap.Tileset;
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: tileset $Id$\n");
 
     fprintf(file,"(define-tileset\n  '%s",tileset->Ident);
-    i=strlen(tileset->Ident);
-    if( i<5 ) {
-	fputc('\t',file);
-    }
-    if( i<13 ) {
-	fputc('\t',file);
-    }
-    fprintf(file,"\t\"%s\"",tileset->Name);
-    i=strlen(tileset->Name);
-    if( i<7 ) {
-	fputc('\t',file);
-    }
-    fprintf(file,"\t\"%s\"\n",tileset->File);
-    fprintf(file,"  ;; Slots\n  '(( 'special\t\t;; Can't be in pud\n");
+    fprintf(file," 'class \"%s\"",tileset->Name);
+    fprintf(file,"\n  'image \"%s\"",tileset->File);
+    fprintf(file,"\n  'palette \"%s\"",tileset->PaletteFile);
+    fprintf(file,"\n  ;; Slots descriptions");
+    fprintf(file,"\n  'slots '(( 'special\t\t;; Can't be in pud\n");
     fprintf(file,"    'extra-trees #( %d %d %d %d %d %d )\n"
 	,tileset->ExtraTrees[0] ,tileset->ExtraTrees[1]
 	,tileset->ExtraTrees[2] ,tileset->ExtraTrees[3]
@@ -1869,7 +1882,7 @@ global void SaveTileset(FILE* file)
     SaveTilesetMixed(file,table,"orc-wall","dark-ground","'wall",	0x900);
     fprintf(file,"  )\n");
     fprintf(file,"  ;; Animated tiles\n");
-    fprintf(file,"  '( #( ) ))\n");
+    fprintf(file,"  'animations '( #( ) ))\n");
 }
 
 /**

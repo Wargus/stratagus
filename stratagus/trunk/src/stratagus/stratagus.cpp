@@ -236,6 +236,8 @@ global char* strdcat3(const char* l, const char* m, const char* r) {
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
+    char* s;
+
     printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
 #ifdef USE_CCL
     "\n  SIOD Copyright by George J. Carrette."
@@ -338,7 +340,13 @@ Use it at your own risk.\n"
     //
     //  Inital menues require some gfx..
     //
-    LoadRGB(GlobalPalette, strdcat(FreeCraftLibPath, "/summer.rgb"));
+#ifdef NEW_NAMES
+    LoadRGB(GlobalPalette, s=strdcat(FreeCraftLibPath,
+	    "/graphics/tilesets/summer/summer.rgb"));
+#else
+    LoadRGB(GlobalPalette, s=strdcat(FreeCraftLibPath, "/summer.rgb"));
+#endif
+    free(s);
     VideoCreatePalette(GlobalPalette);
     LoadFonts();
 

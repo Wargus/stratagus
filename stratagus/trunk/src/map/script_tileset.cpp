@@ -40,9 +40,10 @@
 **	@param slot	Slot name
 **	@param name	Reference name
 **	@param file	Graphic file
+**	@param palette	Palette file
 **	@param table	Conversion table
 */
-local SCM CclTileset(SCM slot,SCM name,SCM file,SCM table)
+local SCM CclTileset(SCM slot,SCM name,SCM file,SCM palette,SCM table)
 {
     int type;
     int i;
@@ -66,6 +67,7 @@ local SCM CclTileset(SCM slot,SCM name,SCM file,SCM table)
     }
     Tilesets[type].Name=gh_scm2newstr(name,NULL);
     Tilesets[type].File=gh_scm2newstr(file,NULL);
+    Tilesets[type].PaletteFile=gh_scm2newstr(palette,NULL);
 
     // CONVERT TABLE!!
     if( gh_vector_length(table)!=2528 ) {	// 0x9E0
@@ -128,7 +130,7 @@ local SCM CclDefineTileset(SCM list)
 global void TilesetCclRegister(void)
 {
     // FIXME: will be removed
-    gh_new_procedure4_0("tileset",CclTileset);
+    gh_new_procedure5_0("tileset",CclTileset);
 
     gh_new_procedureN("define-tileset-wc-names",CclDefineTilesetWcNames);
     gh_new_procedureN("define-tileset",CclDefineTileset);
