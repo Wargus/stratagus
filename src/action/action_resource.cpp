@@ -221,7 +221,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	if( source->Value<DEFAULT_INCOMES[resource->Cost] ) {
 	    DropOutAll(source);
-	    DestroyUnit(source);
+	    LetUnitDie(source);
 	    source=NULL;
 	}
 

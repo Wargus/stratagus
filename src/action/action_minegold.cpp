@@ -181,7 +181,7 @@ local int MineInGoldmine(Unit* unit)
 	if( mine->Value<DEFAULT_INCOMES[GoldCost] ) {
 	    DebugLevel0Fn("Mine destroyed %d,%d\n",mine->X,mine->Y);
 	    DropOutAll(mine);
-	    DestroyUnit(mine);
+	    LetUnitDie(mine);
 	    mine=NULL;
 	}
 
