@@ -504,13 +504,22 @@ extern void VideoDrawClipX(const Graphic*, unsigned frame, int x, int y);
 
 	/// Translucent Functions
 	///		Draw a graphic object unclipped.
-#define VideoDrawTrans50(o, f, x, y)		VideoDraw((o), (f), (x), (y))
-	///		Draw a graphic object unclipped and flipped in X direction.
-#define VideoDrawXTrans50(o, f, x, y)		VideoDrawX((o), (f), (x), (y))
+extern void VideoDrawTrans(const Graphic*, unsigned, int, int, int);
 	///		Draw a graphic object clipped to the current clipping.
-#define VideoDrawClipTrans50(o, f, x, y)		VideoDrawClip((o), (f), (x), (y))
+extern void VideoDrawClipTrans(const Graphic*, unsigned frame, int x, int y, int);
+	///		Draw a graphic object unclipped and flipped in X direction.
+extern void VideoDrawTransX(const Graphic*, unsigned frame, int x, int y, int alpha);
 	///		Draw a graphic object clipped and flipped in X direction.
-#define VideoDrawClipXTrans50(o, f, x, y)		VideoDrawClipX((o), (f), (x), (y))
+extern void VideoDrawClipTransX(const Graphic*, unsigned frame, int x, int y, int alpha);
+
+	///		Draw a graphic object unclipped.
+#define VideoDrawTrans50(o, f, x, y)		VideoDrawTrans((o), (f), (x), (y), 128)
+	///		Draw a graphic object unclipped and flipped in X direction.
+#define VideoDrawXTrans50(o, f, x, y)		VideoDrawTransX((o), (f), (x), (y), 128)
+	///		Draw a graphic object clipped to the current clipping.
+#define VideoDrawClipTrans50(o, f, x, y)		VideoDrawClipTrans((o), (f), (x), (y), 128)
+	///		Draw a graphic object clipped and flipped in X direction.
+#define VideoDrawClipXTrans50(o, f, x, y)		VideoDrawClipTransX((o), (f), (x), (y), 128)
 
 	///		Draw a shadow graphic object clipped to the current clipping.
 extern void VideoDrawShadowClip(const Graphic*, unsigned frame,
