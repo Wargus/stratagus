@@ -590,6 +590,7 @@ typedef struct __animations__ {
     Animation*	Still;			/// Standing still
     Animation*	Move;			/// Unit moving
     Animation*	Attack;			/// Unit attacking/working
+    Animation*	Repair;			/// Unit repairing
     Animation*	Die;			/// Unit dieing
     Animation**	Extend;			/// For future extensions
 } Animations;
