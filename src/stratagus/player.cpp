@@ -53,18 +53,18 @@
 #include "interface.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global int NumPlayers;						/// How many player slots used
-global Player Players[PlayerMax];		/// All players in play
-global Player* ThisPlayer;				/// Player on this computer
-global PlayerRace PlayerRaces;				/// Player races
+global int NumPlayers;                  /// How many player slots used
+global Player Players[PlayerMax];       /// All players in play
+global Player* ThisPlayer;              /// Player on this computer
+global PlayerRace PlayerRaces;          /// Player races
 
-global int NoRescueCheck;				/// Disable rescue check
+global int NoRescueCheck;               /// Disable rescue check
 
 /**
-**		Colors used for minimap.		FIXME: make this configurable
+**  Colors used for minimap.  FIXME: make this configurable
 */
 local SDL_Color PlayerColorsRGB[PlayerMax][4];
 global Uint32 PlayerColors[PlayerMax][4];
@@ -89,15 +89,15 @@ global char* PlayerColorNames[PlayerMax] = {
 };
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Get race array index by race type
+**  Get race array index by race type
 **
-**		@param race		Race
+**  @param race  Race
 **
-**		@return				Index to race in PlayerRaces
+**  @return      Index to race in PlayerRaces
 */
 global int PlayerRacesIndex(int race)
 {
@@ -114,7 +114,7 @@ global int PlayerRacesIndex(int race)
 }
 
 /**
-**		Init players.
+**  Init players.
 */
 global void InitPlayers(void)
 {
@@ -164,7 +164,7 @@ global void InitPlayers(void)
 }
 
 /**
-**		Clean up players.
+**  Clean up players.
 */
 global void CleanPlayers(void)
 {
@@ -209,46 +209,8 @@ global void SavePlayers(CLFile* file)
 	unsigned char g;
 	unsigned char b;
 
-	CLprintf(file, "\n--- -----------------------------------------\n");
+	CLprintf(file, "\n--------------------------------------------\n");
 	CLprintf(file, "--- MODULE: players $Id$\n\n");
-
-#if 0
-	//
-	//  Dump table wc2 race numbers -> internal symbol.
-	//
-	if (PlayerRaces.Count) {
-		CLprintf(file, "(define-race-names");
-		for (i = 0; i < PlayerRaces.Count; ++i) {
-			CLprintf(file, "\n  'race '(");
-			CLprintf(file, "\n	race %d", PlayerRaces.Race[i]);
-			CLprintf(file, "\n	name %s", PlayerRaces.Name[i]);
-			CLprintf(file, "\n	display \"%s\"", PlayerRaces.Display[i]);
-			if (PlayerRaces.Visible[i]) {
-				CLprintf(file, "\n	visible");
-			}
-			CLprintf(file, ")");
-		}
-		CLprintf(file, ")\n\n");
-	}
-
-	//
-	//  Dump table wc2 race numbers -> internal symbol.
-	//
-	if (PlayerRaces.Count) {
-		CLprintf(file, "(define-race-names");
-		for (i = 0; i < PlayerRaces.Count; ++i) {
-			CLprintf(file, "\n  'race '(");
-			CLprintf(file, "\n	race %d", PlayerRaces.Race[i]);
-			CLprintf(file, "\n	name %s", PlayerRaces.Name[i]);
-			CLprintf(file, "\n	display \"%s\"", PlayerRaces.Display[i]);
-			if (PlayerRaces.Visible[i]) {
-				CLprintf(file, "\n	visible");
-			}
-			CLprintf(file, ")");
-		}
-		CLprintf(file, ")\n\n");
-	}
-#endif
 
 	//
 	//  Dump all players
@@ -393,9 +355,9 @@ global void SavePlayers(CLFile* file)
 }
 
 /**
-**		Create a new player.
+**  Create a new player.
 **
-**		@param type		Player type (Computer,Human,...).
+**  @param type  Player type (Computer,Human,...).
 */
 global void CreatePlayer(int type)
 {
@@ -413,16 +375,16 @@ global void CreatePlayer(int type)
 
 	//  Allocate memory for the "list" of this player's units.
 	//  FIXME: brutal way, as we won't need UnitMax for this player...
-	//		FIXME: ARI: is this needed for 'PlayerNobody' ??
-	//		FIXME:		A: Johns: currently we need no init for the nobody player.
+	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
+	//  FIXME: A: Johns: currently we need no init for the nobody player.
 	if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
 		DebugLevel0("Not enough memory to create player %d.\n" _C_ NumPlayers);
 		return;
 	}
 
 	//
-	//		Take first slot for person on this computer,
-	//		fill other with computer players.
+	//  Take first slot for person on this computer,
+	//  fill other with computer players.
 	//
 	if (type == PlayerPerson && !NetPlayers) {
 		if (!ThisPlayer) {
@@ -446,8 +408,8 @@ global void CreatePlayer(int type)
 	}
 
 	//
-	//		Make simple teams:
-	//				All person players are enemies.
+	//  Make simple teams:
+	//  All person players are enemies.
 	//
 	switch (type) {
 		case PlayerNeutral:
@@ -481,7 +443,7 @@ global void CreatePlayer(int type)
 	player->AiNum = PlayerAiUniversal;
 
 	//
-	//		Calculate enemy/allied mask.
+	//  Calculate enemy/allied mask.
 	//
 	for (i = 0; i < NumPlayers; ++i) {
 		switch (type) {
@@ -533,25 +495,20 @@ global void CreatePlayer(int type)
 	}
 
 	//
-	//		Initial default resources.
+	//  Initial default resources.
 	//
 	for (i = 0; i < MaxCosts; ++i) {
 		player->Resources[i] = DefaultResources[i];
 	}
 
 	//
-	//		Initial default incomes.
+	//  Initial default incomes.
 	//
 	for (i = 0; i < MaxCosts; ++i) {
 		player->Incomes[i] = DefaultIncomes[i];
 	}
 
-	/*
-	for (i = 0; i < UnitTypeMax / 32; ++i) {
-		player->UnitFlags[i] = 0;
-	}
-	*/
-	memset(&(player->UnitTypesCount), 0, sizeof(player->UnitTypesCount));
+	memset(player->UnitTypesCount, 0, sizeof(player->UnitTypesCount));
 
 	player->Supply = 0;
 	player->Demand = 0;
@@ -572,10 +529,10 @@ global void CreatePlayer(int type)
 }
 
 /**
-**		Change player side.
+**  Change player side.
 **
-**		@param player		Pointer to player.
-**		@param side		New side (Race).
+**  @param player  Pointer to player.
+**  @param side    New side (Race).
 */
 global void PlayerSetSide(Player* player, int side)
 {
@@ -587,12 +544,12 @@ global void PlayerSetSide(Player* player, int side)
 }
 
 /**
-**		Change player name.
+**  Change player name.
 **
-**		@param player		Pointer to player.
-**		@param name		New name.
+**  @param player  Pointer to player.
+**  @param name    New name.
 */
-global void PlayerSetName(Player* player, const char *name)
+global void PlayerSetName(Player* player, const char* name)
 {
 	if (player->Name) {
 		free(player->Name);
@@ -601,10 +558,10 @@ global void PlayerSetName(Player* player, const char *name)
 }
 
 /**
-**		Change player ai.
+**  Change player ai.
 **
-**		@param player		Pointer to player.
-**		@param ai		AI type.
+**  @param player  Pointer to player.
+**  @param ai      AI type.
 */
 global void PlayerSetAiNum(Player* player, int ai)
 {
@@ -612,15 +569,15 @@ global void PlayerSetAiNum(Player* player, int ai)
 }
 
 /*----------------------------------------------------------------------------
---		Resource management
+--  Resource management
 ----------------------------------------------------------------------------*/
 
 /**
-**		Change the player resource.
+**  Change the player resource.
 **
-**		@param player		Pointer to player.
-**		@param resource		Resource to change.
-**		@param value		How many of this resource.
+**  @param player    Pointer to player.
+**  @param resource  Resource to change.
+**  @param value     How many of this resource.
 */
 global void PlayerSetResource(Player* player, int resource, int value)
 {
@@ -632,19 +589,19 @@ global void PlayerSetResource(Player* player, int resource, int value)
 }
 
 /**
-**		Check if the unit-type didn't break any unit limits.
+**  Check if the unit-type didn't break any unit limits.
 **
-**		@param player		Pointer to player.
-**		@param type		Type of unit.
+**  @param player  Pointer to player.
+**  @param type    Type of unit.
 **
-**		@return				True if enough, negative on problem.
+**  @return        True if enough, negative on problem.
 **
-**		@note		The return values of the PlayerCheck functions are inconsistent.
+**  @note The return values of the PlayerCheck functions are inconsistent.
 */
 global int PlayerCheckLimits(const Player* player, const UnitType* type)
 {
 	//
-	//		Check game limits.
+	//  Check game limits.
 	//
 	if (NumUnits < UnitMax) {
 		if (type->Building && player->NumBuildings >= player->BuildingLimit) {
@@ -679,13 +636,14 @@ global int PlayerCheckLimits(const Player* player, const UnitType* type)
 }
 
 /**
-**		Check if enough resources for are available.
+**  Check if enough resources for are available.
 **
-**		@param player		Pointer to player.
-**		@param costs		How many costs.
-**		@return				False if all enought, otherwise a bit mask.
+**  @param player  Pointer to player.
+**  @param costs   How many costs.
 **
-**		@note		The return values of the PlayerCheck functions are inconsistent.
+**  @return        False if all enought, otherwise a bit mask.
+**
+**  @note The return values of the PlayerCheck functions are inconsistent.
 */
 global int PlayerCheckCosts(const Player* player, const int* costs)
 {
@@ -710,11 +668,12 @@ global int PlayerCheckCosts(const Player* player, const int* costs)
 }
 
 /**
-**		Check if enough resources for new unit is available.
+**  Check if enough resources for new unit is available.
 **
-**		@param player		Pointer to player, which resources are checked.
-**		@param type		Type of unit.
-**		@return				False if all enought, otherwise a bit mask.
+**  @param player  Pointer to player, which resources are checked.
+**  @param type    Type of unit.
+**
+**  @return        False if all enought, otherwise a bit mask.
 */
 global int PlayerCheckUnitType(const Player* player, const UnitType* type)
 {
@@ -722,10 +681,10 @@ global int PlayerCheckUnitType(const Player* player, const UnitType* type)
 }
 
 /**
-**		Add costs to the resources
+**  Add costs to the resources
 **
-**		@param player		Pointer to player.
-**		@param costs		How many costs.
+**  @param player  Pointer to player.
+**  @param costs   How many costs.
 */
 global void PlayerAddCosts(Player* player, const int* costs)
 {
@@ -740,10 +699,10 @@ global void PlayerAddCosts(Player* player, const int* costs)
 }
 
 /**
-**		Add the costs of an unit type to resources
+**  Add the costs of an unit type to resources
 **
-**		@param player		Pointer of player, to which the resources are added.
-**		@param type		Type of unit.
+**  @param player  Pointer of player, to which the resources are added.
+**  @param type    Type of unit.
 */
 global void PlayerAddUnitType(Player* player, const UnitType* type)
 {
@@ -752,11 +711,11 @@ global void PlayerAddUnitType(Player* player, const UnitType* type)
 }
 
 /**
-**		Add a factor of costs to the resources
+**  Add a factor of costs to the resources
 **
-**		@param player		Pointer to player.
-**		@param costs		How many costs.
-**		@param factor		Factor of the costs to apply.
+**  @param player  Pointer to player.
+**  @param costs   How many costs.
+**  @param factor  Factor of the costs to apply.
 */
 global void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 {
@@ -772,10 +731,10 @@ global void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 }
 
 /**
-**		Substract costs from the resources
+**  Substract costs from the resources
 **
-**		@param player		Pointer to player.
-**		@param costs		How many costs.
+**  @param player  Pointer to player.
+**  @param costs   How many costs.
 */
 global void PlayerSubCosts(Player* player, const int* costs)
 {
@@ -790,10 +749,10 @@ global void PlayerSubCosts(Player* player, const int* costs)
 }
 
 /**
-**		Substract the costs of new unit from resources
+**  Substract the costs of new unit from resources
 **
-**		@param player		Pointer of player, from which the resources are removed.
-**		@param type		Type of unit.
+**  @param player  Pointer of player, from which the resources are removed.
+**  @param type    Type of unit.
 */
 global void PlayerSubUnitType(Player* player, const UnitType* type)
 {
@@ -801,11 +760,11 @@ global void PlayerSubUnitType(Player* player, const UnitType* type)
 }
 
 /**
-**		Substract a factor of costs from the resources
+**  Substract a factor of costs from the resources
 **
-**		@param player		Pointer to player.
-**		@param costs		How many costs.
-**		@param factor		Factor of the costs to apply.
+**  @param player  Pointer to player.
+**  @param costs   How many costs.
+**  @param factor  Factor of the costs to apply.
 */
 global void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 {
@@ -820,11 +779,12 @@ global void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 }
 
 /**
-**		Have unit of type.
+**  Have unit of type.
 **
-**		@param player		Pointer to player.
-**		@param type		Type of unit.
-**		@return				How many exists, false otherwise.
+**  @param player  Pointer to player.
+**  @param type    Type of unit.
+**
+**  @return        How many exists, false otherwise.
 */
 global int HaveUnitTypeByType(const Player* player, const UnitType* type)
 {
@@ -832,13 +792,14 @@ global int HaveUnitTypeByType(const Player* player, const UnitType* type)
 }
 
 /**
-**		Have unit of type.
+**  Have unit of type.
 **
-**		@param player		Pointer to owning player.
-**		@param ident		Identifier of unit-type that should be lookuped.
-**		@return				How many exists, false otherwise.
+**  @param player  Pointer to owning player.
+**  @param ident   Identifier of unit-type that should be lookuped.
 **
-**		@note		This function should not be used during run time.
+**  @return        How many exists, false otherwise.
+**
+**  @note This function should not be used during run time.
 */
 global int HaveUnitTypeByIdent(const Player* player, const char* ident)
 {
@@ -846,7 +807,7 @@ global int HaveUnitTypeByIdent(const Player* player, const char* ident)
 }
 
 /**
-**		Initialize the Ai for all players.
+**  Initialize the Ai for all players.
 */
 global void PlayersInitAi(void)
 {
@@ -860,7 +821,7 @@ global void PlayersInitAi(void)
 }
 
 /**
-**		Handle AI of all players each game cycle.
+**  Handle AI of all players each game cycle.
 */
 global void PlayersEachCycle(void)
 {
@@ -898,12 +859,12 @@ global void PlayersEachSecond(int player)
 }
 
 /**
-**		Change current color set to new player.
+**  Change current color set to new player.
 **
-**		FIXME: use function pointer here.
+**  FIXME: use function pointer here.
 **
-**		@param player		Pointer to player.
-**		@param sprite		The sprite in which the colors should be changed.
+**  @param player  Pointer to player.
+**  @param sprite  The sprite in which the colors should be changed.
 */
 global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 {
@@ -917,11 +878,11 @@ global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 }
 
 /**
-**		Setup the player colors for the current palette.
+**  Setup the player colors for the current palette.
 **
-**		@todo
-**				FIXME: need better colors for the player 8-16.
-**				FIXME: could be called before PixelsXX is setup.
+**  @todo
+**    FIXME: need better colors for the player 8-16.
+**    FIXME: could be called before PixelsXX is setup.
 */
 global void SetPlayersPalette(void)
 {
@@ -938,7 +899,7 @@ global void SetPlayersPalette(void)
 }
 
 /**
-**		Output debug informations for players.
+**  Output debug informations for players.
 */
 global void DebugPlayers(void)
 {
@@ -987,17 +948,17 @@ global void DebugPlayers(void)
 }
 
 /**
-**		Notify player about a problem.
+**  Notify player about a problem.
 **
-**		@param player		Player with it
-**		@param type		Problem type
-**		@param x		Map X tile position
-**		@param y		Map Y tile position
-**		@param fmt		Message format
-**		@param ...		Message varargs
+**  @param player  Player with it
+**  @param type    Problem type
+**  @param x       Map X tile position
+**  @param y       Map Y tile position
+**  @param fmt     Message format
+**  @param ...     Message varargs
 **
-**		@note				The parameter type, isn't yet used.
-**		@todo FIXME:		We must also notfiy allied players.
+**  @note The parameter type, isn't yet used.
+**  @todo FIXME: We must also notfiy allied players.
 */
 global void NotifyPlayer(const Player* player,
 	int type __attribute__((unused)), int x, int y, const char* fmt, ...)
@@ -1015,7 +976,7 @@ global void NotifyPlayer(const Player* player,
 	va_end(va);
 
 	//
-	//		FIXME: show minimap animation for the event.
+	//  FIXME: show minimap animation for the event.
 	//
 	if (player == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);
