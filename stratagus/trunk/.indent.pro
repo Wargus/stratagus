@@ -31,4 +31,5 @@
 --comment-line-length79
 --dont-break-procedure-type
 --break-before-boolean-operator
+--continuation-indentation4
 --ignore-newlines
