@@ -34,9 +34,6 @@
 #include <stdlib.h>
 
 #include "freecraft.h"
-
-#if defined(USE_CCL)	// {
-
 #include "ccl.h"
 #include "map.h"
 #include "minimap.h"
@@ -443,7 +440,5 @@ global void MapCclRegister(void)
 
     gh_new_procedure1_0("forest-regeneration",CclForestRegeneration);
 }
-
-#endif	// } defined(USE_CCL)
 
 //@}

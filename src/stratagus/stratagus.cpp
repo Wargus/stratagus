@@ -133,7 +133,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#if defined(DEBUG) && defined(USE_CCL)
+#ifdef DEBUG
 extern SCM CclUnits(void);
 #endif
 
@@ -323,19 +323,12 @@ local void WaitForInput(int timeout)
 local void PrintHeader(void)
 {
     printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
-#ifdef USE_CCL
     "\n  SIOD Copyright by George J. Carrette."
-#endif
 #ifdef USE_SDL
     "\n  SDL Copyright by Sam Lantinga."
 #endif
     "\nCompile options "
-#ifdef USE_CCL
     "CCL "
-#endif
-#ifdef USE_ONLYCCL
-    "ONLYCCL "
-#endif
 #ifdef USE_THREAD
     "THREAD "
 #endif
@@ -500,7 +493,7 @@ global volatile void Exit(int err)
 		,PfCounterFail,PfCounterNotReachable
 		,PfCounterOk,PfCounterDepth);
     );
-#if defined(DEBUG) && defined(USE_CCL)
+#ifdef DEBUG
     CclUnits();
 #endif
     fprintf(stderr,"Thanks for playing FreeCraft.\n");
@@ -563,9 +556,7 @@ global int main(int argc,char** argv)
 #else
     TitleScreen=strdup("graphic/title.png");
 #endif
-#if defined(USE_CCL)
     CclStartFile="ccl/freecraft.ccl";
-#endif
 
     memset(NetworkName, 0, 16);
     strcpy(NetworkName, "Anonymous");
@@ -577,11 +568,9 @@ global int main(int argc,char** argv)
     //
     for( ;; ) {
 	switch( getopt(argc,argv,"c:d:f:hln:p:P:s:t:v:D:N:FL:S:U:W?") ) {
-#ifdef USE_CCL
 	    case 'c':
 		CclStartFile=optarg;
 		continue;
-#endif
             case 'd':
                 FreeCraftLibPath=optarg;
                 continue;
@@ -678,9 +667,7 @@ global int main(int argc,char** argv)
 	--argc;
     }
 
-#ifdef USE_CCL
     CclInit();				// init CCL and load configurations!
-#endif
 
     main1(argc,argv);
 

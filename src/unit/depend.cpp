@@ -351,8 +351,6 @@ global void CleanDependencies(void)
 --	Ccl part of dependencies
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_CCL
-
 #include "ccl.h"
 
 /**
@@ -447,7 +445,5 @@ global void DependenciesCclRegister(void)
     gh_new_procedure1_0("get-dependency",CclGetDependency);
     gh_new_procedure1_0("check-dependency",CclCheckDependency);
 }
-
-#endif	// defined(USE_CCL)
 
 //@}

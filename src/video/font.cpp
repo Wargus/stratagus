@@ -49,48 +49,8 @@ local ColorFont Fonts[MaxFonts];
 
 /**
 **	Font color table.
-**
-**	FIXME: only yellow, grey and white are correct.
 */
-global unsigned char FontColors[16][8]
-#ifndef USE_CCL
-= {
-    // 0 black
-    {   0, 228, 228, 228, 228, 239,   0 },
-    // 1 red
-    {   0, 208, 209, 210, 211, 239,   0 },
-    // 2 green
-    {   0, 216, 216, 216, 216, 239,   0 },
-    // 3 yellow
-    { 246, 200, 199, 197, 192, 239, 104 },
-    // 4 blue
-    {   0,   1,   1,   1,   1, 239,   0 },
-    // 5 magenta
-    {   0, 220, 220, 220, 220, 239,   0 },
-    // 6 cyan
-    {   0, 224, 224, 224, 224, 239,   0 },
-    // 7 white
-    {   0, 246, 246, 246, 104, 239,   0 },
-    // 8 grey
-    {   0, 111, 110, 109, 104, 239,   0 },
-    // 9 light-red
-    {   0, 208, 208, 208, 208, 239,   0 },
-    // a light-green
-    {   0, 216, 216, 216, 216, 239,   0 },
-    // b light-yellow
-    { 246, 200, 199, 197, 192, 239, 104 },
-    // c light-blue
-    {   0,   1,   1,   1,   1, 239,   0 },
-    // d light-magenta
-    {   0, 220, 220, 220, 220, 239,   0 },
-    // e light-cyan
-    {   0, 224, 224, 224, 224, 239,   0 },
-    // f light grey
-    {   0, 111, 110, 109, 104, 239,   0 },
-};
-#else
-    ;
-#endif
+global unsigned char FontColors[16][8];
 
     /// Current color
 local const unsigned char* TextColor;
@@ -635,8 +595,6 @@ global void LoadFonts(void)
 --	CCL
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_CCL)	// {
-
 #include "ccl.h"
 
 /**
@@ -717,7 +675,5 @@ global void FontsCclRegister(void)
     //gh_new_procedure4_0("draw-number",CclDrawNumber);
     //gh_new_procedure4_0("draw-reverse-number",CclDrawReverseNumber);
 }
-
-#endif	// } USE_CCL
 
 //@}

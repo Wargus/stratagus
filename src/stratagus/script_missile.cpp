@@ -31,13 +31,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-
-#include "freecraft.h"
-
-#if defined(USE_CCL) // {
-
 #include <stdlib.h>
 
+#include "freecraft.h"
 #include "video.h"
 #include "tileset.h"
 #include "unittype.h"
@@ -192,7 +188,5 @@ global void MissileCclRegister(void)
     gh_new_procedureN("define-missile-type",CclDefineMissileType);
     gh_new_procedureN("missile",CclMissile);
 }
-
-#endif	// } USE_CCL
 
 //@}

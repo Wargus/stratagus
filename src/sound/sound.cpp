@@ -67,6 +67,7 @@ global int SoundOff;			/// True quiet, sound turned off
 */
 global GameSound GameSounds
 #ifndef laterUSE_CCL
+// FIXME: Must make this configurable through CCL.
 ={
     { "placement error" },
     { "placement success" },

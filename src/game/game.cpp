@@ -82,7 +82,6 @@ local void LoadFreeCraftMap(const char* filename,WorldMap* map)
 {
     DebugLevel3Fn("%p \n",map);
 
-#if defined(USE_CCL)
     if (lcm_prevent_recurse) {
 	fprintf(stderr,"recursive use of load clone map!\n");
 	exit(-1);
@@ -95,10 +94,6 @@ local void LoadFreeCraftMap(const char* filename,WorldMap* map)
 	exit(-1);
     }
     // FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
-#else
-    fprintf(stderr,"Sorry, you need siod installed to use clone maps!\n");
-    exit(-1);
-#endif
 }
 
 /**

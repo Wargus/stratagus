@@ -31,13 +31,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-
-#include "freecraft.h"
-
-#if defined(USE_CCL) // {
-
 #include <stdlib.h>
 
+#include "freecraft.h"
 #include "video.h"
 #include "tileset.h"
 #include "map.h"
@@ -707,20 +703,6 @@ local SCM CclDefineUnitStats(SCM list)
     return SCM_UNSPECIFIED;
 }
 
-#ifdef DEBUG
-
-/**
-**	Generate C - table for UnitTypes.
-*/
-local SCM CclPrintUnitTypeTable(void)
-{
-    PrintUnitTypeTable();
-
-    return SCM_UNSPECIFIED;
-}
-
-#endif
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -1014,9 +996,6 @@ global void UnitTypeCclRegister(void)
 {
     gh_new_procedureN("define-unit-type",CclDefineUnitType);
     gh_new_procedureN("define-unit-stats",CclDefineUnitStats);
-#ifdef DEBUG
-    gh_new_procedure0_0("print-unit-type-table",CclPrintUnitTypeTable);
-#endif
 
     SiodUnitTypeTag=allocate_user_tc();
     set_print_hooks(SiodUnitTypeTag,CclUnitTypePrin1);
@@ -1039,7 +1018,5 @@ global void UnitTypeCclRegister(void)
 
     InitUnitTypes();
 }
-
-#endif	// } USE_CCL
 
 //@}

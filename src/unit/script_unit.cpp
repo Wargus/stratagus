@@ -31,13 +31,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-
-#include "freecraft.h"
-
-#if defined(USE_CCL) // {
-
 #include <stdlib.h>
 
+#include "freecraft.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -380,7 +376,5 @@ global void UnitCclRegister(void)
     gh_new_procedure2_0("make-unit",CclMakeUnit);
     gh_new_procedure3_0("place-unit",CclPlaceUnit);
 }
-
-#endif	// } USE_CCL
 
 //@}

@@ -495,9 +495,7 @@ global void ParsePudUGRD(const char* ugrd,int length)
     int icon;
     int group;
     int flags;
-#ifdef USE_CCL
     int costs[MaxCosts];
-#endif
 
     DebugLevel3Fn(" Length %d\n",length);
     DebugCheck( length!=780 );
@@ -514,28 +512,13 @@ global void ParsePudUGRD(const char* ugrd,int length)
 		,i,UpgradeWcNames[i]
 		,time,gold,lumber,oil
 		,icon,IconWcNames[icon],group,flags);
-#ifdef USE_CCL
+
 	memset(costs,0,sizeof(costs));
 	costs[TimeCost]=time;
 	costs[GoldCost]=gold;
 	costs[WoodCost]=lumber;
 	costs[OilCost]=oil;
 	AddUpgrade(UpgradeWcNames[i],IconWcNames[icon],costs);
-#else
-	if( UpgradesCount ) {
-	    DebugLevel0Fn("// FIXME: no bock to write this better\n");
-	}
-
-	WcUpgrades[i].Costs[TimeCost]=time;
-	WcUpgrades[i].Costs[GoldCost]=gold;
-	WcUpgrades[i].Costs[WoodCost]=lumber;
-	WcUpgrades[i].Costs[OilCost]=oil;
-	{ int j;
-	for( j=OilCost+1; j<MaxCosts; ++j ) {
-	    WcUpgrades[i].Costs[j]=0;
-	}}
-	WcUpgrades[i].Icon=IconWcNames[icon];
-#endif
 
 	// group+flags are to mystic to be implemented
     }
@@ -692,8 +675,6 @@ global void SaveUpgrades(FILE* file)
 /*----------------------------------------------------------------------------
 --	Ccl part of upgrades
 ----------------------------------------------------------------------------*/
-
-#ifdef USE_CCL
 
 #include "ccl.h"
 
@@ -958,8 +939,6 @@ global void UpgradesCclRegister(void)
 
     gh_new_procedureN("define-upgrade-wc-names",CclDefineUpgradeWcNames);
 }
-
-#endif	// defined(USE_CCL)
 
 
 

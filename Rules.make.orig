@@ -32,13 +32,6 @@
 ############################################################################
 
 #------------------------------------------------------------------------------
-# Comment next for a version without SIOD (scheme interpreter)
-#	C C L	-	Craft Configuration Language
-
-CCL	= -DUSE_CCL
-CCLLIB	= -lm
-
-#------------------------------------------------------------------------------
 # Uncomment next to add threaded sound support
 #	You should have a thread safe X11 (libc6 or glibc)
 #	Any modern linux distribution are thread safe.
@@ -145,12 +138,19 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 		  -I$(TOPDIR)/libpng-1.0.5 -I$(TOPDIR)/zlib-1.1.3
 
 #------------------------------------------------------------------------------
+#	Support for SIOD (scheme interpreter)
+#	C C L	-	Craft Configuration Language
+
+CCL	= -DUSE_CCL
+CCLLIB	= -lm
+
+#------------------------------------------------------------------------------
 
 # Uncomment next to profile
 #PROFILE=	-pg
 
 # Compile Version
-VERSION=	'-DVERSION="1.17pre1-build13"'
+VERSION=	'-DVERSION="1.17pre1-build14"'
 
 ############################################################################
 # below this, nothing should be changed!
