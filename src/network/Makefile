@@ -30,6 +30,9 @@ TOPDIR	= ../..
 include $(TOPDIR)/Rules.make
 
 MODULE	= network
-OBJS	= network.$(OE) lowlevel.$(OE) netconnect.$(OE) commands.$(OE)
+
+SRCS	= network.c lowlevel.c netconnect.c commands.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

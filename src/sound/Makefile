@@ -30,7 +30,10 @@ TOPDIR	= ../..
 include $(TOPDIR)/Rules.make
 
 MODULE	= sound
-OBJS	= sound.$(OE) sound_server.$(OE) ccl_sound.$(OE) sound_id.$(OE) \
-	  unitsound.$(OE)
+
+SRCS	= sound.c sound_server.c ccl_sound.c sound_id.c \
+	  unitsound.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

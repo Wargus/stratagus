@@ -31,7 +31,9 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = unit
 
-OBJS	= unittype.$(OE) ccl_unittype.$(OE) upgrade.$(OE) depend.$(OE) \
-	ccl_unit.$(OE)
+SRCS	= unittype.c ccl_unittype.c upgrade.c depend.c \
+	ccl_unit.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

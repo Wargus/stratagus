@@ -31,13 +31,15 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = action
 
-OBJS	= command.$(OE) actions.$(OE) action_die.$(OE) action_patrol.$(OE) \
-	action_still.$(OE) action_stand.$(OE) action_move.$(OE) \
-	action_follow.$(OE) action_attack.$(OE) action_resource.$(OE) \
-	action_board.$(OE) action_unload.$(OE) action_repair.$(OE) \
-	action_harvest.$(OE) action_minegold.$(OE) \
-	action_returngoods.$(OE) action_research.$(OE) action_demolish.$(OE) \
-	action_build.$(OE) action_train.$(OE) action_upgradeto.$(OE) \
-	action_spellcast.$(OE)
+SRCS	= command.c actions.c action_die.c action_patrol.c \
+	action_still.c action_stand.c action_move.c \
+	action_follow.c action_attack.c action_resource.c \
+	action_board.c action_unload.c action_repair.c \
+	action_harvest.c action_minegold.c \
+	action_returngoods.c action_research.c action_demolish.c \
+	action_build.c action_train.c action_upgradeto.c \
+	action_spellcast.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

@@ -33,7 +33,9 @@ MODULE  = ai
 
 HDRS	= ai_local.h
 
-OBJS	= ai.$(OE) new_ai.$(OE) ccl_ai.$(OE) ai_resource.$(OE) \
-	  ai_building.$(OE) ai_force.$(OE)
+SRCS	= ai.c new_ai.c ccl_ai.c ai_resource.c \
+	  ai_building.c ai_force.c
+
+OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk
