@@ -222,22 +222,35 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
     int l;
     char* s;
     char* str;
+    char* s1;
     TextLines** ptr;
 
     l=0;
     s=str=strdup(text);
     ptr=lines;
 
+    // Convert \r, \r\n, and \n\r to \n
+    s1 = s;
+    while( s1 ) {
+	char* x1;
+	char* x2;
+	if( (s1=strpbrk(s1,"\n\r")) ) {
+	    if( (s1[0]=='\n' && s1[1]=='\r') ||
+		(s1[0]=='\r' && s1[1]=='\n') ) {
+		x1=s1+1;
+		x2=s1+2;
+		while( *x1++ = *x2++ ) {
+		}
+	    }
+	    *s1++='\n';
+	}
+    }
+
     for( ;; ) {
-	char* s1;
 	char* space;
 
-	if( (s1=strpbrk(s,"\n\r")) ) {
-	    if( (s1[0]=='\n' && s1[1]=='\r') ||
-		(s1[0]=='\r' && s1[1]=='\n')) {
-		s1[1]='\0';
-	    }
-	    s1[0]='\0';
+	if( (s1=strchr(s,'\n')) ) {
+	    *s1='\0';
 	}
 	space=NULL;
 	for( ;; ) {
@@ -262,20 +275,11 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 	ptr=&((*ptr)->next);
 
 	l+=strlen(s);
-	if( s1 ) {
-	    ++l;
-	}
 	if( !text[l] ) {
 	    break;
 	}
+	++l;
 	s=str+l;
-	if( !*s ) {
-	    ++s;
-	    ++l;
-	    if( !text[l] ) {
-		break;
-	    }
-	}
     }
 
     free(str);
