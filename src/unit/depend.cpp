@@ -158,7 +158,7 @@ global void AddDependency(const char* target,const char* required,int count
 	node->Rule=temp;
     }
     
-#ifdef DEBUG
+#ifdef neverDEBUG
     printf("New rules are :");
     node=node->Rule;
     while(node){
