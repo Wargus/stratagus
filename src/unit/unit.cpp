@@ -552,8 +552,8 @@ void MapMarkUnitSight(Unit* unit)
 		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
 		MapMarkTileSight, MapMarkTileDetectCloak);
 
-	// Never mark radar, except if the top unit?
-	if (unit == container) {
+	// Never mark radar, except if the top unit, and unit is usable
+	if (unit == container && !UnitUnusable(unit)) {
 		if (unit->Type->RadarRange) {
 			MapMarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Type->RadarRange);
@@ -586,7 +586,7 @@ void MapUnmarkUnitSight(Unit* unit)
 		MapUnmarkTileSight, MapUnmarkTileDetectCloak);
 
 	// Never mark radar, except if the top unit?
-	if (unit == container) {
+	if (unit == container && !UnitUnusable(unit)) {
 		if (unit->Type->RadarRange) {
 			MapUnmarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
 				unit->Type->TileHeight, unit->Type->RadarRange);

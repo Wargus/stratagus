@@ -236,6 +236,9 @@ void HandleActionBuild(Unit* unit)
 		}
 	}
 
+	// Must set action before placing, otherwise it will incorrectly mark radar
+	build->Orders[0].Action = UnitActionBuilded;
+	
 	// Must place after previous for map flags
 	PlaceUnit(build, x, y);
 	if (!type->BuilderOutside) {
@@ -250,7 +253,6 @@ void HandleActionBuild(Unit* unit)
 	build->Wait = 1;
 	// Make sure the bulding doesn't cancel itself out right away.
 	build->Data.Builded.Progress = 100;
-	build->Orders[0].Action = UnitActionBuilded;
 	build->HP = 1;
 	UpdateConstructionFrame(build);
 
