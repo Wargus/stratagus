@@ -75,6 +75,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	    ++destu->Refs;
 	}
 	unit->Orders[0].Action=UnitActionMineGold;
+	unit->Orders[0].Arg1=(void*)-1;
 	NewResetPath(unit);
 	unit->SubAction=65;	// FIXME: hardcoded
 	DebugLevel3("Wait: %d\n",unit->Wait);
