@@ -3647,6 +3647,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file,"'tile '(%d %d) ",unit->X,unit->Y);
 #if 0
     /* latimerius: why is this so complex? */
+    // JOHNS: An unit can be owned by a new player and have still the old stats
     for( i=0; i<PlayerMax; ++i ) {
 	if( &unit->Type->Stats[i]==unit->Stats ) {
 	    fprintf(file,"'stats %d\n  ",i);
@@ -3657,8 +3658,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( i==PlayerMax ) {
 	fprintf(file,"'stats 'S%08X\n  ",(int)unit->Stats);
     }
-#endif
+#else
     fprintf (file, "'stats %d\n  " ,unit->Player->Player);
+#endif
     fprintf(file,"'pixel '(%d %d) ",unit->IX,unit->IY);
     fprintf(file,"'%sframe %d ",
 	    unit->Frame&128 ? "flipped-" : "" ,unit->Frame&127);
