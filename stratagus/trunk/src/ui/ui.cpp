@@ -529,9 +529,6 @@ global void SaveUserInterface(CLFile* file)
     CLprintf(file, "(set-mouse-adjust! %d)\n", TheUI.MouseAdjust);
     CLprintf(file, "(set-mouse-scale! %d)\n\n", TheUI.MouseScale);
 
-    CLprintf(file, "(set-original-resources! %s)\n\n",
-	TheUI.OriginalResources ? "#t" : "#f");
-
     // Save the UIs for all resolutions
     for (i = 0; UI_Table[i]; ++i) {
 	SaveUi(file, UI_Table[i]);

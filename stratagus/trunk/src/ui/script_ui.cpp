@@ -477,22 +477,6 @@ local SCM CclProcessMenu(SCM id)
 }
 
 /**
-**	Enable/disable resource extension, use original resource display.
-**
-**	@param flag	True = turn on, false = off.
-**	@return		The old state of scrolling.
-*/
-local SCM CclSetOriginalResources(SCM flag)
-{
-    int old;
-
-    old = TheUI.OriginalResources;
-    TheUI.OriginalResources = gh_scm2bool(flag);
-
-    return gh_bool2scm(old);
-}
-
-/**
 **	Define a cursor.
 **
 **	FIXME: need some general data structure to make this parsing easier.
@@ -783,8 +767,6 @@ local SCM CclDefineUI(SCM list)
 
     ui->MouseAdjust = TheUI.MouseAdjust;
     ui->MouseScale = TheUI.MouseScale;
-
-    ui->OriginalResources = TheUI.OriginalResources;
 
     ui->Resource.File = NULL;
     ui->ResourceX = -1;
@@ -2966,8 +2948,6 @@ global void UserInterfaceCclRegister(void)
 
     gh_new_procedure1_0("display-picture", CclDisplayPicture);
     gh_new_procedure1_0("process-menu", CclProcessMenu);
-
-    gh_new_procedure1_0("set-original-resources!", CclSetOriginalResources);
 
     gh_new_procedureN("define-cursor", CclDefineCursor);
     gh_new_procedure1_0("set-game-cursor!", CclSetGameCursor);
