@@ -373,8 +373,8 @@ typedef struct _player_race_ {
 enum PlayerRacesOld {
     PlayerRaceHuman	=0,		/// belongs to human
     PlayerRaceOrc	=1,		/// belongs to orc
-    PlayerRaceNeutral	=2,		/// belongs to none
 };
+#define PlayerRaceNeutral (PlayerRaces.Count-1)
 
 /**
 **	Types for the player (must fit to PUD!)

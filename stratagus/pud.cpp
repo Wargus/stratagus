@@ -578,9 +578,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		    v=PudReadByte(input);
 		    buf[0] = v & 0xFF;
 		    info->MapUID += ChksumArea(buf, 1);
-		    if( PlayerRacesIndex(v)==-1 ) {
-			v=PlayerRaces.Race[PlayerRaces.Count-1];
-		    }
+		    v=PlayerRaces.Race[PlayerRacesIndex(v)];
 		    info->PlayerSide[i]=v;
 		}
 		continue;
@@ -1055,9 +1053,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 		for( i=0; i<16; ++i ) {
 		    v=PudReadByte(input);
-		    if( PlayerRacesIndex(v)==-1 ) {
-			v=PlayerRaces.Race[PlayerRaces.Count-1];
-		    }
+		    v=PlayerRaces.Race[PlayerRacesIndex(v)];
 		    if (GameSettings.Presets[i].Race == SettingsPresetMapDefault) {
 			PlayerSetSide(&Players[i],v);
 		    } else {

@@ -127,7 +127,8 @@ global int PlayerRacesIndex(int race)
 	}
     }
     fprintf(stderr,"Invalid race: %d\n", race);
-    return -1;
+    DebugCheck(1);
+    return PlayerRaceNeutral;
 }
 
 /**
@@ -1082,9 +1083,6 @@ global void DebugPlayers(void)
 	    case 7: DebugLevel0("rescue akt.  ");	break;
 	}
 	k=PlayerRacesIndex(Players[i].Race);
-	if( k==-1 ) {
-	    k=PlayerRaces.Race[PlayerRaces.Count-1];
-	}
 	DebugLevel0("%9s" _C_ PlayerRaces.Name[k]);
 	DebugLevel0("%2d " _C_ Players[i].AiNum);
 	switch( Players[i].AiNum ) {
