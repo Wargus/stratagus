@@ -56,6 +56,7 @@
 <a href="#change-units-owner">change-units-owner</a>
 <a href="#create-unit">create-unit</a>
 <a href="#credits">credits</a>
+<a href="#define-burning-building">define-burning-building</a>
 <a href="#define-campaign">define-campaign</a>
 <a href="#define-construction">define-construction</a>
 <a href="#define-construction-wc-names">define-construction-wc-names</a>
@@ -328,6 +329,34 @@ placed in the closest available spot.
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
+
+<a name="define-burning-building"></a>
+<h3>(define-burning-building '(percent p missile m) ...)</h3>
+
+Define the burning building missiles.
+
+
+<dl>
+<dt>p</dt>
+<dd>Hit point percentage.
+</dd>
+<dt>m</dt>
+<dd>Fire missile to display.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (define-burning-building
+      '(percent 0 missile missile-big-fire)
+      '(percent 50 missile missile-small-fire)
+      '(percent 75 ) ; no missile
+    )
+</pre>
+<h4>Used</h4>
+
+<a href="../../data/ccl/missiles.ccl"> $LIBARYPATH/ccl/missiles.ccl </a>
 
 <a name="define-campaign"></a>
 <h3>(define-campaign 'ident 'name "name" 'campaign (list elements))</h3>
