@@ -55,6 +55,9 @@
 #include "trigger.h"
 #include "settings.h"
 #include "editor.h"
+#include "sound.h"
+#include "sound_server.h"
+#include "netconnect.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -118,6 +121,28 @@ local SCM CclSetGameCycle(SCM cycle)
 }
 
 /**
+**	Set the video sync speed
+*/
+local SCM CclSetVideoSyncSpeed(SCM speed)
+{
+    VideoSyncSpeed=gh_scm2int(speed);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the local player name
+*/
+local SCM CclSetLocalPlayerName(SCM name)
+{
+    char *str;
+
+    str = gh_scm2newstr(name,NIL);
+    strncpy(LocalPlayerName,str,sizeof(LocalPlayerName)-1);
+    LocalPlayerName[sizeof(LocalPlayerName)-1]='\0';
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Enable/disable Showing the tips at the start of a level.
 **
 **	@param flag	True = turn on, false = off.
@@ -131,6 +156,25 @@ local SCM CclSetShowTips(SCM flag)
     ShowTips=gh_scm2bool(flag);
 
     return gh_bool2scm(old);
+}
+
+/**
+**	Set the current tip number.
+**
+**	@param tip	Tip number.
+**	@return		The old tip number.
+*/
+local SCM CclSetCurrentTip(SCM tip)
+{
+    int old;
+
+    old=CurrentTip;
+    CurrentTip=gh_scm2int(tip);
+    if (CurrentTip >= MAX_TIPS || Tips[CurrentTip] == NULL) {
+	CurrentTip = 0;
+    }
+
+    return gh_int2scm(old);
 }
 
 /**
@@ -577,8 +621,11 @@ global void InitCcl(void)
     gh_new_procedure0_0("library-path",CclFreeCraftLibraryPath);
     gh_new_procedure0_0("game-cycle",CclGameCycle);
     gh_new_procedure1_0("set-game-cycle!",CclSetGameCycle);
+    gh_new_procedure1_0("set-video-sync-speed!",CclSetVideoSyncSpeed);
+    gh_new_procedure1_0("set-local-player-name!",CclSetLocalPlayerName);
 
     gh_new_procedure1_0("set-show-tips!",CclSetShowTips);
+    gh_new_procedure1_0("set-current-tip!",CclSetCurrentTip);
     gh_new_procedure1_0("add-tip",CclAddTip);
 
     gh_new_procedure1_0("set-speed-mine!",CclSetSpeedMine);
@@ -722,6 +769,146 @@ global void InitCcl(void)
 }
 
 /**
+**	Load user preferences
+*/
+local void LoadPreferences1(void)
+{
+    FILE* fd;
+    char buf[1024];
+
+#ifdef USE_WIN32
+    strcpy(buf,"preferences1.ccl");
+#else
+    sprintf(buf,"%s/%s/preferences1.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+#endif
+
+    fd=fopen(buf,"r");
+    if( fd ) {
+	fclose(fd);
+	vload(buf,0,1);
+    }
+}
+
+/**
+**	Load user preferences
+*/
+local void LoadPreferences2(void)
+{
+    FILE* fd;
+    char buf[1024];
+
+#ifdef USE_WIN32
+    strcpy(buf,"preferences2.ccl");
+#else
+    sprintf(buf,"%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+#endif
+
+    fd=fopen(buf,"r");
+    if( fd ) {
+	fclose(fd);
+	vload(buf,0,1);
+    }
+}
+
+/**
+**	Save user preferences
+*/
+global void SavePreferences(void)
+{
+    FILE* fd;
+    char buf[1024];
+
+    //
+    //	    preferences1.ccl
+    //	    This file is loaded before freecraft.ccl
+    //
+
+#ifdef USE_WIN32
+    strcpy(buf,"preferences1.ccl");
+#else
+    sprintf(buf,"%s/%s/preferences1.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+#endif
+
+    fd=fopen(buf,"w");
+    if( !fd ) {
+	return;
+    }
+
+    fprintf(fd,";;; -----------------------------------------\n");
+    fprintf(fd,";;; $Id$\n");
+
+    fprintf(fd,"(set-video-resolution! %d %d)\n", VideoWidth, VideoHeight);
+    
+    fclose(fd);
+
+
+    //
+    //	    preferences2.ccl
+    //	    This file is loaded after freecraft.ccl
+    //
+
+#ifdef USE_WIN32
+    strcpy(buf,"preferences2.ccl");
+#else
+    sprintf(buf,"%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+#endif
+
+    fd=fopen(buf,"w");
+    if( !fd ) {
+	return;
+    }
+
+    fprintf(fd,";;; -----------------------------------------\n");
+    fprintf(fd,";;; $Id$\n");
+
+    // Global options
+    if( OriginalFogOfWar ) {
+	fprintf(fd,"(original-fog-of-war)\n");
+    } else {
+	fprintf(fd,"(gray-fog-of-war)\n");
+    }
+    fprintf(fd,"(set-video-fullscreen! #%c)\n", VideoFullScreen ? 't' : 'f');
+#if 0
+    // FIXME: Uncomment when this is configurable in the menus
+    fprintf(fd,"(set-contrast! %d)\n", TheUI.Contrast);
+    fprintf(fd,"(set-brightness! %d)\n", TheUI.Brightness);
+    fprintf(fd,"(set-saturation! %d)\n", TheUI.Saturation);
+#endif
+    fprintf(fd,"(set-local-player-name! \"%s\")\n", LocalPlayerName);
+
+    // Game options
+    fprintf(fd,"(set-show-tips! #%c)\n", ShowTips ? 't' : 'f');
+    fprintf(fd,"(set-current-tip! %d)\n", CurrentTip);
+
+    fprintf(fd,"(set-fog-of-war! #%c)\n", !TheMap.NoFogOfWar ? 't' : 'f');
+    fprintf(fd,"(set-show-command-key! #%c)\n", ShowCommandKey ? 't' : 'f');
+
+    // Speeds
+    fprintf(fd,"(set-video-sync-speed! %d)\n", VideoSyncSpeed);
+    fprintf(fd,"(set-mouse-scroll-speed! %d)\n", SpeedMouseScroll);
+    fprintf(fd,"(set-key-scroll-speed! %d)\n", SpeedKeyScroll);
+
+    // Sound options
+    if( !SoundOff ) {
+	fprintf(fd,"(sound-on)\n");
+    } else {
+	fprintf(fd,"(sound-off)\n");
+    }
+    fprintf(fd,"(set-sound-volume! %d)\n", GlobalVolume);
+    if( !MusicOff ) {
+	fprintf(fd,"(music-on)\n");
+    } else {
+	fprintf(fd,"(music-off)\n");
+    }
+    fprintf(fd,"(set-music-volume! %d)\n", MusicVolume);
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+    fprintf(fd,"(set-cd-mode! \"%s\")\n", CDMode);
+#endif
+
+    fclose(fd);
+}
+
+/**
 **	Load freecraft config file.
 */
 global void LoadCcl(void)
@@ -735,6 +922,7 @@ global void LoadCcl(void)
     //	Load and evaluate configuration file
     //
     CclInConfigFile=1;
+    LoadPreferences1();
     file=LibraryFileName(CclStartFile,buf);
     ShowLoadProgress("Script %s\n",file);
     if( (s=strrchr(file,'.')) && s[1]=='C' ) {
@@ -742,6 +930,7 @@ global void LoadCcl(void)
     } else {
 	vload(file,0,1);
     }
+    LoadPreferences2();
     CclInConfigFile=0;
     user_gc(SCM_BOOL_F);		// Cleanup memory after load
 }

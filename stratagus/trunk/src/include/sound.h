@@ -76,6 +76,7 @@ typedef struct _game_sound_ {
     **	really turning it off on the server side.
     */
 extern int SoundOff;
+extern int MusicOff;			/// Music turned off
 
 extern GameSound GameSounds;		/// Game sound configuration
 

@@ -125,6 +125,7 @@ local void SurrenderConfirmMenu(void);
 
 // Global Options
 local void GlobalOptionsInit(Menuitem *mi);
+local void GlobalOptionsExit(Menuitem *mi);
 local void GlobalOptionsResolutionGem(Menuitem *mi);
 local void GlobalOptionsFullscreenGem(Menuitem *mi);
 local void GlobalOptionsFogAlphaGem(Menuitem *mi);
@@ -204,6 +205,7 @@ local void EndScenarioQuitMenu(void);
 
 // Sound options
 local void SoundOptionsInit(Menuitem *mi);
+local void SoundOptionsExit(Menuitem *mi);
 local void MasterVolumeHSAction(Menuitem *mi, int i);
 local void SetMasterPower(Menuitem *mi);
 local void MusicVolumeHSAction(Menuitem *mi, int i);
@@ -215,10 +217,13 @@ local void SetCdModeRandom(Menuitem *mi);
 
 // Preferences
 local void PreferencesInit(Menuitem *mi);
+local void PreferencesExit(Menuitem *mi);
 local void SetFogOfWar(Menuitem *mi);
 local void SetCommandKey(Menuitem *mi);
 
 // Speed options
+local void SpeedOptionsInit(Menuitem *mi);
+local void SpeedOptionsExit(Menuitem *mi);
 local void GameSpeedHSAction(Menuitem *mi, int i);
 local void MouseScrollHSAction(Menuitem *mi, int i);
 local void KeyboardScrollHSAction(Menuitem *mi, int i);
@@ -485,6 +490,7 @@ global void InitMenuFuncHash(void) {
 
 // Global Options
     HASHADD(GlobalOptionsInit,"global-options-init");
+    HASHADD(GlobalOptionsExit,"global-options-exit");
     HASHADD(GlobalOptionsResolutionGem,"global-options-resolution-gem");
     HASHADD(GlobalOptionsFullscreenGem,"global-options-fullscreen-gem");
     HASHADD(GlobalOptionsFogAlphaGem,"global-options-fog-alpha-gem");
@@ -563,6 +569,7 @@ global void InitMenuFuncHash(void) {
 
 // Sound options
     HASHADD(SoundOptionsInit,"sound-options-init");
+    HASHADD(SoundOptionsExit,"sound-options-exit");
     HASHADD(MasterVolumeHSAction,"master-volume-hs-action");
     HASHADD(SetMasterPower,"set-master-power");
     HASHADD(MusicVolumeHSAction,"music-volume-hs-action");
@@ -574,10 +581,13 @@ global void InitMenuFuncHash(void) {
 
 // Preferences
     HASHADD(PreferencesInit,"preferences-init");
+    HASHADD(PreferencesExit,"preferences-exit");
     HASHADD(SetFogOfWar,"set-fog-of-war");
     HASHADD(SetCommandKey,"set-command-key");
 
 // Speed options
+    HASHADD(SpeedOptionsInit,"speed-options-init");
+    HASHADD(SpeedOptionsExit,"speed-options-exit");
     HASHADD(GameSpeedHSAction,"game-speed-hs-action");
     HASHADD(MouseScrollHSAction,"mouse-scroll-hs-action");
     HASHADD(KeyboardScrollHSAction,"keyboard-scroll-hs-action");
@@ -1556,6 +1566,15 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 }
 
 /**
+**	Exit callback for sound options menu
+*/
+local void SoundOptionsExit(Menuitem *mi __attribute__((unused)))
+{
+    // FIXME: Only save if something changed
+    SavePreferences();
+}
+
+/**
 **	Global options menu
 */
 local void GlobalOptionsMenu(void)
@@ -1604,6 +1623,15 @@ local void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
 }
 
 /**
+**	Exit callback for global options menu
+*/
+local void GlobalOptionsExit(Menuitem *mi __attribute__((unused)))
+{
+    // FIXME: Only save if something changed
+    SavePreferences();
+}
+
+/**
 **	Global options resolution gem callback
 */
 local void GlobalOptionsResolutionGem(Menuitem *mi)
@@ -1635,6 +1663,7 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 
 	VideoWidth = res;
 	VideoHeight = res * 3 / 4;
+	SavePreferences();
 	InitVideo();
 	DestroyCursorBackground();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
@@ -1711,9 +1740,11 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 #ifdef WITH_SOUND
     SCM cb;
 
-    if (PlayingMusic == 1) {
+    if (!MusicOff) {
+	MusicOff = 1;
 	StopMusic();
     } else {
+	MusicOff = 0;
 	if (CallbackMusic) {
 	    cb = gh_symbol2scm("music-stopped");
 	    if (!gh_null_p(symbol_boundp(cb, NIL))) {
@@ -1830,11 +1861,19 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 */
 global void SpeedOptionsMenu(void)
 {
+    ProcessMenu("menu-speed-options", 1);
+}
+
+/**
+**	Init callback for speed settings menu
+*/
+global void SpeedOptionsInit(Menuitem *mi __attribute__((unused)))
+{
     Menu *menu;
     int i;
     
     i = 2;
-    menu = FindMenu("menu-speed-options");
+    menu = CurrentMenu;
 
     menu->items[i].d.hslider.percent = ((VideoSyncSpeed - MIN_GAME_SPEED) * 100) / (MAX_GAME_SPEED - MIN_GAME_SPEED);
     if (menu->items[i].d.hslider.percent < 0) {
@@ -1852,8 +1891,15 @@ global void SpeedOptionsMenu(void)
     if (TheUI.KeyScroll == 0) {
 	menu->items[i + 8].d.hslider.percent = 0;
     }
+}
 
-    ProcessMenu("menu-speed-options", 1);
+/**
+**	Exit callback for speed settings menu
+*/
+global void SpeedOptionsExit(Menuitem *mi __attribute__((unused)))
+{
+    // FIXME: Only save if something changed
+    SavePreferences();
 }
 
 /**
@@ -2020,6 +2066,15 @@ local void PreferencesInit(Menuitem *mi __attribute__((unused)))
     } else {
 	menu->items[3].d.gem.state = MI_GSTATE_UNCHECKED;
     }
+}
+
+/**
+**	Preferences menu init callback
+*/
+local void PreferencesExit(Menuitem *mi __attribute__((unused)))
+{
+    // FIXME: Only save if something changed
+    SavePreferences();
 }
 
 /**
@@ -2261,6 +2316,7 @@ local void TipsExit(Menuitem *mi __attribute__((unused)))
 {
     TipsCycleNextTip();
     TipsFreeTips();
+    SavePreferences();
 }
 
 /**
@@ -2890,6 +2946,9 @@ local void MultiPlayerGameMenu(void)
     NameBuf[menu->items[1].d.input.nch] = 0;	// Now finally here is the name
     memset(LocalPlayerName, 0, 16);
     strcpy(LocalPlayerName, NameBuf);
+
+    // FIXME: Only save if player name changed
+    SavePreferences();
 
     GuiGameStarted = 0;
     // Here we really go...

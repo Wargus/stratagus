@@ -1210,8 +1210,11 @@ global int InitSound(void)
 */
 global int InitSoundServer(void)
 {
-    int MapWidth = (TheUI.MapArea.EndX-TheUI.MapArea.X +TileSizeX) / TileSizeX;
-    int MapHeight = (TheUI.MapArea.EndY-TheUI.MapArea.Y +TileSizeY) / TileSizeY;
+    int MapWidth;
+    int MapHeight;
+
+    MapWidth = (TheUI.MapArea.EndX-TheUI.MapArea.X +TileSizeX) / TileSizeX;
+    MapHeight = (TheUI.MapArea.EndY-TheUI.MapArea.Y +TileSizeY) / TileSizeY;
     //FIXME: Valid only in shared memory context!
     DistanceSilent=3*max(MapWidth,MapHeight);
     DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
