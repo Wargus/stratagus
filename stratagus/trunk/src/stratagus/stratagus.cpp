@@ -101,7 +101,15 @@
 **		See page @ref VideoModule for more information upon supported
 **		features and video platforms.
 **
+**		@see video.h @see video.c
+**
 **	@subsection Network Network
+**
+**		Handles the high and low level of the network protocol.
+**		The network protocol is needed for multiplayer games.
+**
+**		See page @ref NetworkModule for more information upon supported
+**		features and API.
 **
 **		@see network.h @see network.c
 **
