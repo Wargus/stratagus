@@ -230,9 +230,11 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     int w;
     int add;
     int depth;
+    int size;
     unsigned char* m;
 
-    points=alloca(TheMap.Width*TheMap.Height);
+    size=TheMap.Width*TheMap.Height;
+    points=alloca(size*sizeof(*points));
     w=TheMap.Width+2;
     mask=UnitMovementMask(unit);
     // Ignore all possible mobile units.
@@ -278,7 +280,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		    *m=n;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-		    if( ++wp>=sizeof(points)/sizeof(*points) ) {// round about
+		    if( ++wp>=size ) {// round about
 			wp=0;
 		    }
 		} else {			// unreachable
@@ -286,7 +288,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		}
 	    }
 
-	    if( ++rp>=sizeof(points)/sizeof(*points) ) {// round about
+	    if( ++rp>=size ) {// round about
 		rp=0;
 	    }
 	}
@@ -607,13 +609,15 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     int depth;
     int add;
     int unreachable;
+    int size;
 
     DebugLevel3Fn("%s(%d) to %d=%d,%d+%d+%d\n"
 	    ,unit->Type->Ident,UnitNumber(unit)
 	    ,unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
 	    ,gx,gy,ox,oy);
 
-    points=alloca(TheMap.Width*TheMap.Height/2);
+    size=TheMap.Width*TheMap.Height/2;
+    points=alloca(size*sizeof(*points));
     w=TheMap.Width+2;
     matrix=CreateMatrix();
     matrix+=w+w+2;
@@ -740,7 +744,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 		points[wp]=x;
 		points[wp+1]=y;
 		wp+=2;
-		if( wp>=sizeof(points)/sizeof(*points) ) {	// round about
+		if( wp>=size ) {	// round about
 		    wp=0;
 		}
 
@@ -767,7 +771,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	    }
 
 	    rp+=2;
-	    if( rp>=sizeof(points)/sizeof(*points) ) {	// round about
+	    if( rp>=size ) {	// round about
 		rp=0;
 	    }
 	}
