@@ -79,6 +79,8 @@ typedef int MenuButtonId;
 #define MBUTTON_VTHIN		48
 #define MBUTTON_FOLDER		51	/* expansion gfx only */
 
+#define MBUTTON_SC_GEM_ROUND	7
+#define MBUTTON_SC_GEM_SQUARE	12
 #define MBUTTON_SC_BUTTON_LEFT	107
 #define MBUTTON_SC_BUTTON	116
 #define MBUTTON_SC_BUTTON_RIGHT	125
