@@ -521,8 +521,8 @@ extern int HaveUnitTypeByIdent(const Player* player,const char* ident);
 extern void PlayersInitAi(void);
     /// Called each game cycle for player handlers (AI)
 extern void PlayersEachCycle(void);
-    /// Called each second for player handlers (AI)
-extern void PlayersEachSecond(void);
+    /// Called each second for a given player handler (AI)
+extern void PlayersEachSecond(int player);
 
     /// Change current color set to new player
 extern void PlayerPixels(const Player* player);

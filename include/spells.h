@@ -96,15 +96,20 @@ struct _spell_action_type_ {
     // FIXME" some time information doesn't work as it should.
     union {
 	struct {
-	    int Damage;					/// Missile damage
-	    int TTL;					/// Missile TTL
-	    int Delay;					/// Missile original delay
-	    SpellActionMissileLocation StartPoint;	/// Start point description
-	    SpellActionMissileLocation EndPoint;	/// Start point description
+	    int Damage;					/// Missile damage.
+	    int TTL;					/// Missile TTL.
+	    int Delay;					/// Missile original delay.
+	    SpellActionMissileLocation StartPoint;	/// Start point description.
+	    SpellActionMissileLocation EndPoint;	/// Start point description.
 	} SpawnMissile;
 
 	struct {
-	    int Fields;			/// The size of the affected square
+	    int Damage;			/// Damage for every unit in range.
+	    int Range;			/// Range of the explosion.
+	} Demolish;
+
+	struct {
+	    int Fields;			/// The size of the affected square.
 	    int Shards;			/// Number of shards thrown.
 	    int Damage;			/// Damage for every shard.
 	    /// The offset of the missile start point to the hit location.
@@ -326,6 +331,7 @@ SpellFunc CastAdjustBuffs;
 SpellFunc CastPolymorph;
 SpellFunc CastAreaBombardment;
 SpellFunc CastSummon;
+SpellFunc CastDemolish;
 SpellFunc CastDeathCoil;
 SpellFunc CastSpawnPortal;
 SpellFunc CastSpawnMissile;

@@ -840,27 +840,26 @@ global void PlayersEachCycle(void)
 }
 
 /**
-**	Handle AI of all players each second.
+**	Handle AI of a player each second.
+** 
+**      @param player 	the player to update AI
 */
-global void PlayersEachSecond(void)
-{
-    int player;
+global void PlayersEachSecond(int player)
+{    
     int res;
 
-    for (player = 0; player < NumPlayers; ++player) {
-	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
-	    for (res = 0; res < MaxCosts; res++) {
-		Players[player].Revenue[res] =
-		    Players[player].Resources[res] -
-		    Players[player].LastResources[res];
-		Players[player].Revenue[res] *= 6;	// estimate per minute
-		Players[player].LastResources[res] =
-		    Players[player].Resources[res];
-	    }
+    if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
+	for (res = 0; res < MaxCosts; res++) {
+	    Players[player].Revenue[res] =
+		Players[player].Resources[res] -
+		Players[player].LastResources[res];
+	    Players[player].Revenue[res] *= 6;	// estimate per minute
+	    Players[player].LastResources[res] =
+		Players[player].Resources[res];
 	}
-	if (Players[player].AiEnabled) {
-	    AiEachSecond(&Players[player]);
-	}
+    }
+    if (Players[player].AiEnabled) {
+	AiEachSecond(&Players[player]);
     }
 }
 

@@ -115,12 +115,13 @@ global void SaveGame(const char* filename)
 
 	CLprintf(file, ";;;  'media\t'");
 	var = gh_symbol2scm("media-version");
-	if (symbol_boundp(var, NIL)) {
-	    var = symbol_value(var, NIL);
-	    lprin1CL(var, file);
-	} else {
+	// FIXME : guile todo
+	//if (symbol_boundp(var, NIL)) {
+	//    var = symbol_value(var, NIL);
+	//    lprin1CL(var, file);
+	//} else {
 	    CLprintf(file, "nil");
-	}
+	//}
     }
     CLprintf(file, "\n;;;  'preview\t\"%s.pam\"\n", filename);
     CLprintf(file, ";;;  )\n");
