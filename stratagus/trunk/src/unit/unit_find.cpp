@@ -287,10 +287,11 @@ global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
 **
 **	@return		true if (x,y) is inside the unit's sprite
 */
-local int InsideUnitSprite (Unit *unit, unsigned x, unsigned y)
+local int InsideUnitSprite (const Unit* unit, unsigned x, unsigned y)
 {
-    int ux, uy;      /* position at which unit's sprite is currently drawn */
-    const UnitType *type;
+    int ux;
+    int uy;		// position at which unit's sprite is currently drawn
+    const UnitType* type;
 
     type=unit->Type;
     ux = TileSizeX*unit->X + unit->IX;
@@ -298,10 +299,12 @@ local int InsideUnitSprite (Unit *unit, unsigned x, unsigned y)
     uy = TileSizeY*unit->Y + unit->IY;
     uy -= (type->BoxHeight - TileSizeY*type->TileHeight)/2;
 
-    if (x < ux || x >= ux+type->BoxWidth || y < uy ||  y >= uy+type->BoxHeight)
+    if (x < ux || x >= ux+type->BoxWidth
+	    || y < uy ||  y >= uy+type->BoxHeight) {
 	return 0;
-    else
+    } else {
 	return 1;
+    }
 }
 
 /**
@@ -312,31 +315,35 @@ local int InsideUnitSprite (Unit *unit, unsigned x, unsigned y)
 **
 **	@return		Returns unit found at this pixel map coordinates
 */
-global Unit *UnitOnScreenMapPosition (unsigned x, unsigned y)
+global Unit* UnitOnScreenMapPosition (unsigned x, unsigned y)
 {
     Unit* table[UnitMax];
     int tx, ty;
     int n;
     int i;
 
+    //	this code runs quite often (e.g. upon each motion notify) so this
+    //	little optimization could be appropriate
+
     tx = x / TileSizeX;
     ty = y / TileSizeY;
-    /* this code runs quite often (e.g. upon each motion notify) so this little
-     * optimization could be appropriate */
 
-    /* fast path, should work most of the time */
+    //	fast path, should work most of the time
     n = SelectUnitsOnTile (tx, ty, table);
     for( i=0; i<n; ++i ) {
-	if( ! table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y))
+	if( !table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y)) {
 	    return table[i];
+	}
     }
-    /* if we got here we have to search for our unit in the neighborhood */
 
-    /* ships and flyers could be 2 fields away */
+    //	if we got here we have to search for our unit in the neighborhood
+
+    //	ships and flyers could be 2 fields away
     n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
     for( i=0; i<n; ++i ) {
-	if( ! table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y))
+	if( !table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y)) {
 	    return table[i];
+	}
     }
 
     return NoUnitP;
@@ -367,8 +374,9 @@ global Unit* RepairableOnScreenMapPosition (unsigned x,unsigned y)
 	// not at max
 	if( (table[i]->Type->Building || table[i]->Type->Transporter)
 		&& table[i]->HP < table[i]->Stats->HitPoints ) {
-	    if (InsideUnitSprite (table[i], x, y))
+	    if (InsideUnitSprite (table[i], x, y)) {
 		return table[i];
+	    }
 	}
     }
     return NoUnitP;
@@ -378,12 +386,13 @@ global Unit* RepairableOnScreenMapPosition (unsigned x,unsigned y)
 **	Choose target at pixel map coordinates.
 **
 **	@param source	Unit which wants to attack.
-**	@param tx	X position on the display map, pixel-based.
-**	@param ty	Y position on the display map, pixel-based.
+**	@param x	X position on the display map, pixel-based.
+**	@param y	Y position on the display map, pixel-based.
 **
 **	@return		Returns ideal target
 */
-global Unit *TargetOnScreenMapPosition (const Unit* source, unsigned x, unsigned y)
+global Unit* TargetOnScreenMapPosition (const Unit* source, unsigned x,
+    unsigned y)
 {
     Unit* table[UnitMax];
     Unit* unit;
@@ -392,12 +401,13 @@ global Unit *TargetOnScreenMapPosition (const Unit* source, unsigned x, unsigned
     int n;
     int i;
 
+    //	this code runs upon right button action only so it can affort being a
+    //	little inefficient.
+
     tx = x / TileSizeX;
     ty = y / TileSizeY;
-    /* this code runs upon right button action only so it can affort being a
-     * little inefficient. */
 
-    /* ships and flyers could be 2 fields away */
+    //	 ships and flyers could be 2 fields away
     n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
     best=NoUnitP;
     for( i=0; i<n; ++i ) {
@@ -411,7 +421,7 @@ global Unit *TargetOnScreenMapPosition (const Unit* source, unsigned x, unsigned
 		|| unit->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
-	if ( ! InsideUnitSprite (table[i], x, y)) {
+	if ( !InsideUnitSprite (table[i], x, y)) {
 	    continue;
 	}
 	if( !CanTarget(source->Type,unit->Type) ) {
