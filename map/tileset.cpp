@@ -313,8 +313,40 @@ global void LoadTileset(void)
     //
     //	FIXME: Build wall replacement tables
     //
-    // WallHumanTable
-}
+    TheMap.Tileset->HumanWallTable[ 0] = 0x090;
+    TheMap.Tileset->HumanWallTable[ 1] = 0x830;
+    TheMap.Tileset->HumanWallTable[ 2] = 0x810;
+    TheMap.Tileset->HumanWallTable[ 3] = 0x850;
+    TheMap.Tileset->HumanWallTable[ 4] = 0x800;
+    TheMap.Tileset->HumanWallTable[ 5] = 0x840;
+    TheMap.Tileset->HumanWallTable[ 6] = 0x820;
+    TheMap.Tileset->HumanWallTable[ 7] = 0x860;
+    TheMap.Tileset->HumanWallTable[ 8] = 0x870;
+    TheMap.Tileset->HumanWallTable[ 9] = 0x8B0;
+    TheMap.Tileset->HumanWallTable[10] = 0x890;
+    TheMap.Tileset->HumanWallTable[11] = 0x8D0;
+    TheMap.Tileset->HumanWallTable[12] = 0x880;
+    TheMap.Tileset->HumanWallTable[13] = 0x8C0;
+    TheMap.Tileset->HumanWallTable[14] = 0x8A0;
+    TheMap.Tileset->HumanWallTable[15] = 0x0B0;
+
+    TheMap.Tileset->OrcWallTable[ 0] = 0x0A0;
+    TheMap.Tileset->OrcWallTable[ 1] = 0x930;
+    TheMap.Tileset->OrcWallTable[ 2] = 0x910;
+    TheMap.Tileset->OrcWallTable[ 3] = 0x950;
+    TheMap.Tileset->OrcWallTable[ 4] = 0x900;
+    TheMap.Tileset->OrcWallTable[ 5] = 0x940;
+    TheMap.Tileset->OrcWallTable[ 6] = 0x920;
+    TheMap.Tileset->OrcWallTable[ 7] = 0x960;
+    TheMap.Tileset->OrcWallTable[ 8] = 0x970;
+    TheMap.Tileset->OrcWallTable[ 9] = 0x9B0;
+    TheMap.Tileset->OrcWallTable[10] = 0x990;
+    TheMap.Tileset->OrcWallTable[11] = 0x9D0;
+    TheMap.Tileset->OrcWallTable[12] = 0x980;
+    TheMap.Tileset->OrcWallTable[13] = 0x9C0;
+    TheMap.Tileset->OrcWallTable[14] = 0x9A0;
+    TheMap.Tileset->OrcWallTable[15] = 0x0C0;
+};
 
 /**
 **	Save flag part of tileset.
