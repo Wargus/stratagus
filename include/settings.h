@@ -10,7 +10,7 @@
 //
 /**@name settings.h	-	The game settings headerfile. */
 //
-//	(c) Copyright 2000-2002 by Andreas Arens
+//	(c) Copyright 2000-2003 by Andreas Arens and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -73,7 +73,7 @@ struct _settings_ {
     int		RevealMap;		/// Reveal map
 };
 
-#define SettingsPresetMapDefault	(~0)	/// Special: Use pud/cm supplied
+#define SettingsPresetMapDefault	(~0U)	/// Special: Use pud/cm supplied
 
 /*
 **	Resource-Preset factor

@@ -73,7 +73,7 @@
 typedef unsigned char VMemType8;	///  8 bpp modes pointer
 typedef unsigned short VMemType16;	/// 16 bpp modes pointer
 typedef struct { char a,b,c;} VMemType24;/// 24 bpp modes pointer
-typedef unsigned long VMemType32;	/// 32 bpp modes pointer
+typedef unsigned int VMemType32;	/// 32 bpp modes pointer
 
 /**
 **	General video mode pointer.
