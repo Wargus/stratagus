@@ -149,8 +149,13 @@ global void LoadConstructions(void)
 	    buf=alloca(strlen(file)+9+1);
 	    file=strcat(strcpy(buf,"graphic/"),file);
 	    ShowLoadProgress("\tConstruction %s\n",file);
+#ifdef NEW_VIDEO
+	    Constructions[i].Sprite=LoadSprite(file
+		    ,Constructions[i].Width,Constructions[i].Height);
+#else
 	    Constructions[i].RleSprite=LoadRleSprite(file
 		    ,Constructions[i].Width,Constructions[i].Height);
+#endif
 	}
     }
 }
@@ -163,12 +168,24 @@ global void LoadConstructions(void)
 **	@param x	X position.
 **	@param y	Y position.
 */
+#ifdef NEW_VIDEO
 global void DrawConstruction(int type,int frame,int x,int y)
 {
+    // FIXME: This should be moved to caller/init...
+    x-=Constructions[type].Width/2;
+    y-=Constructions[type].Height/2;
+
+    VideoDrawClip(Constructions[type].Sprite,frame,x,y);
+}
+#else
+global void DrawConstruction(int type,int frame,int x,int y)
+{
+    // FIXME: This should be moved to caller/init...
     x-=Constructions[type].Width/2;
     y-=Constructions[type].Height/2;
 
     DrawRleSpriteClipped(Constructions[type].RleSprite,frame,x,y);
 }
+#endif
 
 //@}
