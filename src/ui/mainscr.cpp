@@ -9,13 +9,16 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name mainscr.c	-	The main screen. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer and Valery Shchedrin
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer and Valery Shchedrin
+//
+//	$Id$
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +40,16 @@
 #include "ui.h"
 #include "map.h"
 
+/*----------------------------------------------------------------------------
+--	Defines
+----------------------------------------------------------------------------*/
+
+// FIXME: should become global configurable
 #define OriginalTraining	0	/// 1 for the original training display
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --	Icons
@@ -115,7 +127,7 @@ local void DrawStats(int x,int y,int modified,int original)
 **
 **	@param unit	Pointer to unit.
 */
-global void DrawUnitInfo(Unit* unit)
+global void DrawUnitInfo(const Unit* unit)
 {
     char buf[64];
     const UnitType* type;
@@ -128,7 +140,7 @@ global void DrawUnitInfo(Unit* unit)
     stats=unit->Stats;
     IfDebug(
 	if( !type ) {
-	    DebugLevel1(__FUNCTION__": FIXME: free unit selected\n");
+	    DebugLevel1Fn(" FIXME: free unit selected\n");
 	    return;
 	} );
 
@@ -399,16 +411,6 @@ global void DrawResources(void)
 	    ,TheUI.Resource.Graphic->Height
 	    ,TheUI.ResourceX,TheUI.ResourceY);
 
-#if 0
-    for( i=0; i<MaxCosts; ++i ) {
-	ThisPlayer->Resources[i]=999999;
-    }
-
-    ThisPlayer->Score=999999;
-    ThisPlayer->NumFoodUnits=9999;
-    ThisPlayer->Food=9999;
-#endif
-
     if( TheUI.OriginalResources ) {
 	// FIXME: could write a sub function for this
 	VideoDrawSub(TheUI.Resources[GoldCost].Icon.Graphic,0
@@ -474,6 +476,8 @@ global void DrawResources(void)
 --	MESSAGE
 ----------------------------------------------------------------------------*/
 
+// FIXME: move messages to console code.
+
 // FIXME: need messages for chat!
 
 #define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*2 // two seconds
@@ -495,10 +499,8 @@ local int  MessagesEventIndex;
 
 /**
 **	Shift messages array with one.
-**
-**	
 */
-global void ShiftMessages()
+global void ShiftMessages(void)
 {
   int z;
   if ( MessagesCount == 0 ) return;
@@ -516,10 +518,8 @@ global void ShiftMessages()
 
 /**
 **	Shift messages events array with one.
-**
-**	
 */
-global void ShiftMessagesEvent()
+global void ShiftMessagesEvent(void)
 {
   int z;
   if ( MessagesEventCount == 0 ) return;
@@ -560,7 +560,7 @@ global void DrawMessage(void)
 /**
 **	Set message to display.
 **
-**	@param message	To be displayed in text overlay.
+**	@param fmt	To be displayed in text overlay.
 */
 global void SetMessage( char* fmt, ... )
 {
@@ -580,7 +580,9 @@ global void SetMessage( char* fmt, ... )
 /**
 **	Set message to display.
 **
-**	@param message	To be displayed in text overlay.
+**	@param x	Message X map origin.
+**	@param y	Message Y map origin.
+**	@param fmt	To be displayed in text overlay.
 */
 global void SetMessage2( int x, int y, char* fmt, ... )
 {
@@ -653,6 +655,9 @@ global void ClearMessage(void)
     MessageFrameTimeout = FrameCounter;
 }
 
+/**
+**	Goto message origin.
+*/
 global void CenterOnMessage(void)
 {
   if ( MessagesEventIndex >= MessagesEventCount )
@@ -669,7 +674,7 @@ global void CenterOnMessage(void)
 --	STATUS LINE
 ----------------------------------------------------------------------------*/
 
-local char* StatusLine;			// status line/hints
+local char* StatusLine;			/// status line/hints
 
 /**
 **	Draw status line.
@@ -724,15 +729,6 @@ global void DrawCosts(void)
     int i;
     int x;
 
-    DebugLevel3(__FUNCTION__": %d %d %d %d %d %d\n",
-	CostsMana,
-	Costs[GoldCost],Costs[WoodCost],Costs[OilCost],
-	Costs[OreCost],Costs[StoneCost]);
-
-    // CostsMana=1000;
-    // Costs[GoldCost]=Costs[WoodCost]=Costs[OilCost]=
-    // Costs[OreCost]=Costs[StoneCost]=9000;
-
     x=TheUI.StatusLineX+270;
     if( CostsMana ) {
 	// FIXME: hardcoded image!!!
@@ -767,6 +763,9 @@ global void DrawCosts(void)
 
 /**
 **	Set costs in status line.
+**
+**	@param mana	Mana costs.
+**	@param costs	Resource costs, NULL pointer if all are zero.
 */
 global void SetCosts(int mana,const int* costs)
 {
@@ -776,18 +775,22 @@ global void SetCosts(int mana,const int* costs)
 	CostsMana=mana;
 	MustRedraw|=RedrawCosts;
     }
-    for( i=0; i<MaxCosts; ++i ) {
-	if( Costs[i]!=costs[i] ) {
-	    Costs[i]=costs[i];
-	    MustRedraw|=RedrawCosts;
+
+    if( costs ) {
+	for( i=0; i<MaxCosts; ++i ) {
+	    if( Costs[i]!=costs[i] ) {
+		Costs[i]=costs[i];
+		MustRedraw|=RedrawCosts;
+	    }
+	}
+    } else {
+	for( i=0; i<MaxCosts; ++i ) {
+	    if( Costs[i] ) {
+		Costs[i]=0;
+		MustRedraw|=RedrawCosts;
+	    }
 	}
     }
-
-    DebugLevel3(__FUNCTION__": %d %d %d %d %d %d\n",
-	CostsMana,
-	Costs[GoldCost],Costs[WoodCost],Costs[OilCost],
-	Costs[OreCost],Costs[StoneCost]);
-
 }
 
 /**
@@ -807,6 +810,8 @@ global void ClearCosts(void)
 
 /**
 **	Draw info panel background.
+**
+**	@param frame	frame nr. of the info panel background.
 */
 local void DrawInfoPanelBackground(unsigned frame)
 {
