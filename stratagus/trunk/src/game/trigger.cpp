@@ -117,19 +117,91 @@ local const UnitType* TriggerGetUnitType(SCM unit)
 // --------------------------------------------------------------------------
 //	Conditions
 
+local int CompareEq(int a,int b)
+{
+    return a==b;
+}
+local int CompareNEq(int a,int b)
+{
+    return a!=b;
+}
+local int CompareGrEq(int a,int b)
+{
+    return a>=b;
+}
+local int CompareGr(int a,int b)
+{
+    return a>b;
+}
+local int CompareLeEq(int a,int b)
+{
+    return a<=b;
+}
+local int CompareLe(int a,int b)
+{
+    return a<b;
+}
+
+typedef int (*CompareFunction)(int,int);
+
+/**
+**	Returns a function pointer to the comparison function
+**
+**	@param op	The operation
+**
+**	@return		Function pointer to the compare function
+*/
+local CompareFunction GetCompareFunction(const char* op)
+{
+    if( op[0]=='=' ) {
+	if( (op[1]=='=' && op[2]=='\0') || (op[1]=='\0') ) {
+	    return CompareEq;
+	}
+    }
+    else if( op[0]=='>' ) {
+	if( op[1]=='=' && op[2]=='\0' ) {
+	    return CompareGrEq;
+	}
+	else if( op[1]=='\0' ) {
+	    return CompareGr;
+	}
+    }
+    else if( op[0]=='<' ) {
+	if( op[1]=='=' && op[2]=='\0' ) {
+	    return CompareLeEq;
+	}
+	else if( op[1]=='\0' ) {
+	    return CompareLe;
+	}
+    }
+    else if( op[0]=='!' && op[1]=='=' && op[2]=='\0' ) {
+	return CompareNEq;
+    }
+    return NULL;
+}
+
 /**
 **	Player has the quantity of unit-type.
 */
-local SCM CclIfUnit(SCM player,SCM quantity,SCM unit)
+local SCM CclIfUnit(SCM player,SCM operation,SCM quantity,SCM unit)
 {
     int plynr;
     int q;
     int pn;
     const UnitType* unittype;
+    const char* op;
+    CompareFunction Compare;
 
     plynr=TriggerGetPlayer(player);
+    op=get_c_string(operation);
     q=gh_scm2int(quantity);
     unittype=TriggerGetUnitType(unit);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-unit: %s\n",op);
+	Exit(1);
+    }
 
     if( plynr==-1 ) {
 	plynr=0;
@@ -143,33 +215,33 @@ local SCM CclIfUnit(SCM player,SCM quantity,SCM unit)
 	    int j;
 
 	    for( j=0; j<NumUnitTypes; ++j ) {
-		if( Players[plynr].UnitTypesCount[j]==q ) {
+		if( Compare(Players[plynr].UnitTypesCount[j],q) ) {
 		    return SCM_BOOL_T;
 		}
 	    }
 	}
     } else if( unittype==ALL_UNITS ) {
 	for( ; plynr<pn; ++plynr ) {
-	    if( Players[plynr].TotalNumUnits==q ) {
+	    if( Compare(Players[plynr].TotalNumUnits,q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
     } else if( unittype==ALL_FOODUNITS ) {
 	for( ; plynr<pn; ++plynr ) {
-	    if( Players[plynr].NumFoodUnits==q ) {
+	    if( Compare(Players[plynr].NumFoodUnits,q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
     } else if( unittype==ALL_BUILDINGS ) {
 	for( ; plynr<pn; ++plynr ) {
-	    if( Players[plynr].NumBuildings==q ) {
+	    if( Compare(Players[plynr].NumBuildings,q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
     } else {
 	for( ; plynr<pn; ++plynr ) {
 	    DebugLevel3Fn("Player%d, %d == %s\n",plynr,q,unittype->Ident);
-	    if( Players[plynr].UnitTypesCount[unittype->Type]==q ) {
+	    if( Compare(Players[plynr].UnitTypesCount[unittype->Type],q) ) {
 		return SCM_BOOL_T;
 	    }
 	}
@@ -181,7 +253,7 @@ local SCM CclIfUnit(SCM player,SCM quantity,SCM unit)
 /**
 **	Player has the quantity of unit-type near to unit-type.
 */
-local SCM CclIfNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
+local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,SCM near)
 {
     int plynr;
     int q;
@@ -189,12 +261,21 @@ local SCM CclIfNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
     int i;
     const UnitType* unittype;
     const UnitType* ut2;
+    const char* op;
     Unit* table[UnitMax];
+    CompareFunction Compare;
 
     plynr=TriggerGetPlayer(player);
+    op=get_c_string(operation);
     q=gh_scm2int(quantity);
     unittype=TriggerGetUnitType(unit);
     ut2=CclGetUnitType(near);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-near-unit: %s\n",op);
+	Exit(1);
+    }
 
     //
     //	Get all unit types 'near'.
@@ -248,7 +329,7 @@ local SCM CclIfNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
 		}
 	    }
 	}
-	if( s==q ) {
+	if( Compare(s,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -259,7 +340,8 @@ local SCM CclIfNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
 /**
 **	Player has the quantity of rescued unit-type near to unit-type.
 */
-local SCM CclIfRescuedNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
+local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
+                               SCM near)
 {
     int plynr;
     int q;
@@ -267,12 +349,21 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
     int i;
     const UnitType* unittype;
     const UnitType* ut2;
+    const char* op;
     Unit* table[UnitMax];
+    CompareFunction Compare;
 
     plynr=TriggerGetPlayer(player);
+    op=get_c_string(operation);
     q=gh_scm2int(quantity);
     unittype=TriggerGetUnitType(unit);
     ut2=CclGetUnitType(near);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-rescued-near-unit: %s\n",op);
+	Exit(1);
+    }
 
     //
     //	Get all unit types 'near'.
@@ -328,7 +419,7 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
 		}
 	    }
 	}
-	if( s==q ) {
+	if( Compare(s,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -339,15 +430,24 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
 /**
 **	Player has n opponents left.
 */
-local SCM CclIfOpponents(SCM player,SCM quantity)
+local SCM CclIfOpponents(SCM player,SCM operation,SCM quantity)
 {
     int plynr;
     int q;
     int pn;
     int n;
+    const char* op;
+    CompareFunction Compare;
 
     plynr=TriggerGetPlayer(player);
+    op=get_c_string(operation);
     q=gh_scm2int(quantity);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-opponents: %s\n",op);
+	Exit(1);
+    }
 
     if( plynr==-1 ) {
 	plynr=0;
@@ -371,7 +471,7 @@ local SCM CclIfOpponents(SCM player,SCM quantity)
 	    }
 	}
 	DebugLevel3Fn("Opponents of %d = %d\n",plynr,n);
-	if( n==q ) {
+	if( Compare(n,q) ) {
 	    return SCM_BOOL_T;
 	}
     }
@@ -465,10 +565,10 @@ global void TriggerCclRegister(void)
 {
     gh_new_procedure2_0("add-trigger",CclAddTrigger);
     // Conditions
-    gh_new_procedure3_0("if-unit",CclIfUnit);
-    gh_new_procedure4_0("if-near-unit",CclIfNearUnit);
-    gh_new_procedure4_0("if-rescued-near-unit",CclIfRescuedNearUnit);
-    gh_new_procedure2_0("if-opponents",CclIfOpponents);
+    gh_new_procedure4_0("if-unit",CclIfUnit);
+    gh_new_procedure5_0("if-near-unit",CclIfNearUnit);
+    gh_new_procedure5_0("if-rescued-near-unit",CclIfRescuedNearUnit);
+    gh_new_procedure3_0("if-opponents",CclIfOpponents);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);
     gh_new_procedure0_0("action-defeat",CclActionDefeat);
