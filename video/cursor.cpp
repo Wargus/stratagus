@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name cursor.c	-	The cursors. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -144,12 +143,232 @@ global void* OldCursorImage;		/// background saved behind cursor
 	/// Save background behind cursor
 local void (*SaveCursorBackground)(int,int,int,int);
 	/// Load background behind cursor
-local void (*LoadCursorBackground)(void);
+local void (*LoadCursorBackground)(int,int,int,int);
 #endif
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+#ifdef NEW_VIDEO
+
+/**
+**	Restore cursor background for 8bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void LoadCursorBackground8(int x,int y,int w,int h)
+{
+    const VMemType8* sp;
+    VMemType8* dp;
+
+    sp=OldCursorImage;
+    dp=VideoMemory8+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType8));
+	sp+=w;
+	dp+=VideoWidth;
+    }
+}
+
+/**
+**	Restore cursor background for 16bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void LoadCursorBackground16(int x,int y,int w,int h)
+{
+    const VMemType16* sp;
+    VMemType16* dp;
+
+    sp=OldCursorImage;
+    dp=VideoMemory16+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType16));
+	sp+=w;
+	dp+=VideoWidth;
+    }
+}
+
+/**
+**	Restore cursor background for 24bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void LoadCursorBackground24(int x,int y,int w,int h)
+{
+    const VMemType24* sp;
+    VMemType24* dp;
+
+    sp=OldCursorImage;
+    dp=VideoMemory24+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType24));
+	sp+=w;
+	dp+=VideoWidth;
+    }
+}
+
+/**
+**	Restore cursor background for 32bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void LoadCursorBackground32(int x,int y,int w,int h)
+{
+    const VMemType32* sp;
+    VMemType32* dp;
+
+    sp=OldCursorImage;
+    dp=VideoMemory32+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType32));
+	sp+=w;
+	dp+=VideoWidth;
+    }
+}
+
+/**
+**	Save cursor background for 8bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void SaveCursorBackground8(int x,int y,int w,int h)
+{
+    int i;
+    VMemType8* dp;
+    VMemType8* sp;
+
+    i=w*h*sizeof(VMemType8);
+    if( OldCursorSize<i ) {
+	if( OldCursorImage ) {
+	    OldCursorImage=realloc(OldCursorImage,i);
+	} else {
+	    OldCursorImage=malloc(i);
+	}
+	OldCursorSize=i;
+    }
+    dp=OldCursorImage;
+    sp=VideoMemory8+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType8));
+	dp+=w;
+	sp+=VideoWidth;
+    }
+}
+
+/**
+**	Save cursor background for 16bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void SaveCursorBackground16(int x,int y,int w,int h)
+{
+    int i;
+    VMemType16* dp;
+    const VMemType16* sp;
+
+    i=w*h*sizeof(VMemType16);
+    if( OldCursorSize<i ) {
+	if( OldCursorImage ) {
+	    OldCursorImage=realloc(OldCursorImage,i);
+	} else {
+	    OldCursorImage=malloc(i);
+	}
+	OldCursorSize=i;
+    }
+    dp=OldCursorImage;
+    sp=VideoMemory16+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType16));
+	dp+=w;
+	sp+=VideoWidth;
+    }
+}
+
+/**
+**	Save cursor background for 24bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void SaveCursorBackground24(int x,int y,int w,int h)
+{
+    int i;
+    VMemType24* dp;
+    const VMemType24* sp;
+
+    i=w*h*sizeof(VMemType24);
+    if( OldCursorSize<i ) {
+	if( OldCursorImage ) {
+	    OldCursorImage=realloc(OldCursorImage,i);
+	} else {
+	    OldCursorImage=malloc(i);
+	}
+	OldCursorSize=i;
+    }
+    dp=OldCursorImage;
+    sp=VideoMemory24+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType24));
+	dp+=w;
+	sp+=VideoWidth;
+    }
+}
+
+/**
+**	Save cursor background for 32bpp frame buffer.
+**
+**	@param x	Screen X pixels coordinate.
+**	@param y	Screen Y pixels coordinate.
+**	@param w	Width in pixels.
+**	@param h	Height in pixels.
+*/
+local void SaveCursorBackground32(int x,int y,int w,int h)
+{
+    int i;
+    VMemType32* dp;
+    const VMemType32* sp;
+
+    i=w*h*sizeof(VMemType32);
+    if( OldCursorSize<i ) {
+	if( OldCursorImage ) {
+	    OldCursorImage=realloc(OldCursorImage,i);
+	} else {
+	    OldCursorImage=malloc(i);
+	}
+	OldCursorSize=i;
+    }
+    dp=OldCursorImage;
+    sp=VideoMemory32+y*VideoWidth+x;
+    while( h-- ) {
+	memcpy(dp,sp,w*sizeof(VMemType32));
+	dp+=w;
+	sp+=VideoWidth;
+    }
+}
+
+#endif
 
 /**
 **	Load all cursor sprites.
@@ -212,7 +431,11 @@ global void LoadCursors(unsigned int race)
 */
 local void SaveCursor(void)
 {
-    int w,h,i;
+#ifndef NEW_VIDEO
+    int i;
+#endif
+    int w;
+    int h;
     int x;
     int y;
 
@@ -242,6 +465,9 @@ local void SaveCursor(void)
 	return;
     }
 
+#ifdef NEW_VIDEO
+    SaveCursorBackground(x,y,w,h);
+#else
     // FIXME: use function pointer
     switch( VideoDepth ) {
     case 8:
@@ -304,6 +530,7 @@ local void SaveCursor(void)
 	}
 	break; }
     }
+#endif
 }
 
 /**
@@ -311,17 +538,26 @@ local void SaveCursor(void)
 */
 local void RestoreCursor(void)
 {
+#ifndef NEW_VIDEO
     void *dp;
     void *sp;
+#endif
     int w;
     int h;
     int x;
     int y;
 
+#ifdef NEW_VIDEO
+    if( !OldCursorImage ) {		// no cursor saved
+	return;
+    }
+#else
     if( !(sp=OldCursorImage) ) {	// no cursor saved
 	return;
     }
+#endif
 
+    // FIXME: I should better store the correct values on save.
     x=OldCursorX;
     w=OldCursorW;
     if( x<0 ) {
@@ -348,6 +584,9 @@ local void RestoreCursor(void)
 	return;
     }
 
+#ifdef NEW_VIDEO
+    LoadCursorBackground(x,y,w,h);
+#else
     switch( VideoDepth ) {
     case 8:
 	dp=VideoMemory8+y*VideoWidth+x;
@@ -376,6 +615,7 @@ local void RestoreCursor(void)
 	}
 	break;
     }
+#endif
 }
 
 /**
@@ -627,7 +867,7 @@ global int HideAnyCursor(void)
 */
 global void InitCursor(void)
 {
-#ifdef noNEW_VIDEO
+#ifdef NEW_VIDEO
     switch( VideoDepth ) {
 	case 8:
 	    SaveCursorBackground=SaveCursorBackground8;
