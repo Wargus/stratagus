@@ -10,7 +10,7 @@
 //
 /**@name interface.h - The user interface header file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -171,11 +171,12 @@ enum _key_codes_ {
 
 	/// Key modifier
 enum _key_modifiers_ {
-	ModifierShift = 1,    ///< any shift key pressed
-	ModifierControl = 2,  ///< any controll key pressed
-	ModifierAlt = 4,      ///< any alt key pressed
-	ModifierSuper = 8,    ///< super key (reserved for WM)
-	ModifierHyper = 16,   ///< any hyper key pressed
+	ModifierShift = 1,        ///< any shift key pressed
+	ModifierControl = 2,      ///< any control key pressed
+	ModifierAlt = 4,          ///< any alt key pressed
+	ModifierSuper = 8,        ///< super key (reserved for WM)
+	ModifierHyper = 16,       ///< any hyper key pressed
+	ModifierDoublePress = 32, ///< key double pressed
 };
 
 #define MouseDoubleShift 8   ///< shift for double click button
