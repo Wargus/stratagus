@@ -308,26 +308,6 @@ extern void SetMessage( const char* fmt, ... );
     /// Set message to display with event point
 extern void SetMessageEvent( int x, int y, const char* fmt, ... );
     /// Center view-point on last event message
-    /// Called to look for mouse timeout's
-extern void InputMouseTimeout(const EventCallback*,unsigned);
-
-//
-//	Chaos pur.
-//
-    /// Called if right mouse button is pressed
-extern void DoRightButton(int tx,int ty);
-    /// Cancel the building input mode
-extern void CancelBuildingMode(void);
-
-    /// Draw messages as overlay over of the map
-extern void DrawMessage(void);
-    /// Draw the player resource in resource line
-extern void DrawResources(void);
-    /// Set message to display
-extern void SetMessage( const char* fmt, ... );
-    /// Set message to display with event point
-extern void SetMessageEvent( int x, int y, const char* fmt, ... );
-    /// Center view-point on last event message
 extern void CenterOnMessage();
 
     /// Set status line to show this information

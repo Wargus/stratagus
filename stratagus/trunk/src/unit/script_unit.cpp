@@ -278,7 +278,8 @@ local void CclParseOrders(Unit* unit,SCM vector)
 **
 **	@param list	All options of the builded data.
 */
-local void CclParseBuilded(Unit* unit,SCM list)
+local void CclParseBuilded(Unit* unit __attribute__((unused)),
+	SCM list __attribute__((unused)))
 {
     DebugLevel0Fn("FIXME: builded\n");
 }

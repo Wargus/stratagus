@@ -132,8 +132,9 @@ local int SelectionColor(const Unit* unit,const UnitType* type)
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-global void DrawSelectionNone(const Unit* unit,const UnitType* type
-	,int x,int y)
+global void DrawSelectionNone(const Unit* unit __attribute__((unused)),
+	const UnitType* type __attribute__((unused)),
+	int x __attribute__((unused)),int y __attribute__((unused)))
 {
 }
 
