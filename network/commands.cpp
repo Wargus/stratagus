@@ -694,7 +694,9 @@ local int CclReplayLog(lua_State* l)
 	CurrentReplay = replay;
 
 	// Apply CurrentReplay settings.
-	ApplyReplaySettings();
+	if (!SaveGameLoading) {
+		ApplyReplaySettings();
+	}
 
 	return 0;
 }
