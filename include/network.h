@@ -50,6 +50,8 @@
 
 #define MaxNetworkCommands 9  /// Max Commands In A Packet
 
+#define IsNetworkGame() (NetworkFildes != (Socket)-1)
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
