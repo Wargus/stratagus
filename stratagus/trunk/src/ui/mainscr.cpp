@@ -196,15 +196,16 @@ global void DrawUnitInfo(const Unit* unit)
 	    ,x,y);
     UiDrawLifeBar(unit,x,y);
 
-    x=TheUI.InfoPanelX;
-    y=TheUI.InfoPanelY;
-
     if( unit->Player==ThisPlayer ) {	// Only for own units.
 	if( unit->HP && unit->HP<10000 ) {
 	    sprintf(buf,"%d/%d",unit->HP,stats->HitPoints);
-	    VideoDrawTextCentered(x+12+23,y+8+53,SmallFont,buf);
+	    VideoDrawTextCentered(x+(type->Icon.Icon->Width+7)/2
+		    ,y+type->Icon.Icon->Height+7+7+3,SmallFont,buf);
 	}
     }
+
+    x=TheUI.InfoPanelX;
+    y=TheUI.InfoPanelY;
 
     //
     //	Draw unit name centered, if too long split at space.
