@@ -902,7 +902,7 @@ void CleanFonts(void)
 */
 int IsFontLoaded(unsigned font)
 {
-	return GraphicLoaded(Fonts[font].G);
+	return Fonts[font].G && GraphicLoaded(Fonts[font].G);
 }
 
 //@}
