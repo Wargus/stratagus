@@ -286,6 +286,31 @@ local SCM CclPlayer(SCM list)
 }
 
 /**
+**	Change Unit Owner
+**
+**	@param pos1	top left tile
+**	@param pos2	bottom right tile
+**	@param old	old player number
+**	@param new	new player number
+**/
+local SCM CclChangeUnitsOwner(SCM pos1, SCM pos2, SCM old, SCM new)
+{
+    Unit* table[UnitMax];
+    int n;
+    
+    n = SelectUnits(gh_scm2int(gh_car(pos1)), gh_scm2int(gh_cadr(pos1)),
+		gh_scm2int(gh_car(pos2)), gh_scm2int(gh_cadr(pos2)), table);
+    while( n ) {
+        if(table[n-1]->Player->Player == gh_scm2int(old)) {
+	    ChangeUnitOwner(table[n-1],&Players[gh_scm2int(old)],
+			&Players[gh_scm2int(new)]);
+	}
+	n--;
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Get ThisPlayer.
 **
 **	@return		This player number.
@@ -596,6 +621,7 @@ local SCM CclSetPlayerResource(SCM list)
 global void PlayerCclRegister(void)
 {
     gh_new_procedureN("player",CclPlayer);
+    gh_new_procedure4_0("change-units-owner",CclChangeUnitsOwner);
     gh_new_procedure0_0("get-this-player",CclGetThisPlayer);
     gh_new_procedure1_0("set-this-player!",CclSetThisPlayer);
 
