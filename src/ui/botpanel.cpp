@@ -284,7 +284,12 @@ int AddButton(int pos, int level, const char* icon_ident,
 	switch (action) {
 	    case ButtonSpellCast:
 		ba->Value = SpellIdByIdent(value);
-		DebugCheck(ba->Value < 0);
+#ifdef DEBUG
+		if (ba->Value < 0) {
+		    DebugLevel0("Spell %s does not exist?\n" _C_ value);
+		    DebugCheck(ba->Value < 0);
+		}
+#endif
 		break;
 	    case ButtonTrain:
 		ba->Value = UnitTypeIdByIdent(value);
