@@ -178,6 +178,245 @@ local enum mad_flow MAD_error(void *user __attribute__((unused)),
     return MAD_FLOW_BREAK;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#if 0
+
+/**
+**	Type member function to read from the ogg file
+**
+**	@param sample	    Sample reading from
+**	@param buf	    Buffer to write data to
+**	@param len	    Length of the buffer
+**
+**	@return		    Number of bytes read
+*/
+local int Mp3ReadStream(Sample* sample, void* buf, int len)
+{
+    Mp3Data* data;
+    int i;
+    int n;
+    int bitstream;
+
+    data = (Mp3Data*) sample->User;
+
+    // see if we have enough read already
+    if (data->PointerInBuffer + len - sample->Data > sample->Length) {
+	// not enough in buffer, read more
+	n = sample->Length - (data->PointerInBuffer - sample->Data);
+	memcpy(sample->Data, data->PointerInBuffer, n);
+	sample->Length = n;
+	data->PointerInBuffer = sample->Data;
+
+	n = OGG_BUFFER_SIZE - n;
+	for (;;) {
+	    i = ov_read(data->VorbisFile,
+		    data->PointerInBuffer + sample->Length, n, 0, 2, 1,
+		    &bitstream);
+	    if (i <= 0) {
+		break;
+	    }
+	    sample->Length += i;
+	    n -= i;
+	    if (n < 4096) {
+		break;
+	    }
+	}
+	if (sample->Length < len) {
+	    len = sample->Length;
+	}
+    }
+
+    memcpy(buf, data->PointerInBuffer, len);
+    data->PointerInBuffer += len;
+    return len;
+}
+
+/**
+**	Type member function to free an ogg file
+**
+**	@param sample	    Sample to free
+*/
+local void Mp3FreeStream(Sample* sample)
+{
+    Mp3Data* data;
+
+    IfDebug( AllocatedSoundMemory -= sizeof(*sample) + OGG_BUFFER_SIZE);
+
+    data = (Mp3Data*)sample->User;
+    ov_clear(data->VorbisFile);
+    free(data);
+    free(sample);
+}
+
+/**
+**	Mp3 object type structure.
+*/
+local const SampleType Mp3StreamSampleType = {
+    Mp3ReadStream,
+    Mp3FreeStream,
+};
+#endif
+
+/**
+**	Type member function to read from the ogg file
+**
+**	@param sample	    Sample reading from
+**	@param buf	    Buffer to write data to
+**	@param len	    Length of the buffer
+**
+**	@return		    Number of bytes read
+*/
+local int Mp3Read(Sample* sample, void* buf, int len)
+{
+    unsigned pos;
+
+    pos = (unsigned)sample->User;
+    if (pos + len > sample->Length) {		// Not enough data?
+	len = sample->Length - pos;
+    }
+    memcpy(buf, sample->Data + pos, len);
+
+    sample->User = (void*)(pos + len);
+
+    return len;
+}
+
+/**
+**	Type member function to free an ogg file
+**
+**	@param sample	    Sample to free
+*/
+local void Mp3Free(Sample* sample)
+{
+    IfDebug( AllocatedSoundMemory -= sample->Length; );
+
+    free(sample);
+}
+
+/**
+**	Mp3 object type structure.
+*/
+local const SampleType Mp3SampleType = {
+    Mp3Read,
+    Mp3Free,
+};
+
+/**
+**	Test code.
+*/
+static int run_sync(struct mad_decoder *decoder)
+{
+    enum mad_flow (*error_func) (void *, struct mad_stream *,
+	struct mad_frame *);
+    void *error_data;
+    int bad_last_frame = 0;
+    struct mad_stream *stream;
+    struct mad_frame *frame;
+    struct mad_synth *synth;
+    int result = 0;
+
+    error_func = decoder->error_func;
+    error_data = decoder->cb_data;
+
+    stream = &decoder->sync->stream;
+    frame = &decoder->sync->frame;
+    synth = &decoder->sync->synth;
+
+    mad_stream_init(stream);
+    mad_frame_init(frame);
+    mad_synth_init(synth);
+
+    mad_stream_options(stream, decoder->options);
+
+    do {
+	switch (decoder->input_func(decoder->cb_data, stream)) {
+	    case MAD_FLOW_STOP:
+		goto done;
+	    case MAD_FLOW_BREAK:
+		goto fail;
+	    case MAD_FLOW_IGNORE:
+		continue;
+	    case MAD_FLOW_CONTINUE:
+		break;
+	}
+
+	while (1) {
+	    if (decoder->header_func) {
+		if (mad_header_decode(&frame->header, stream) == -1) {
+		    if (!MAD_RECOVERABLE(stream->error))
+			break;
+
+		    switch (error_func(error_data, stream, frame)) {
+			case MAD_FLOW_STOP:
+			    goto done;
+			case MAD_FLOW_BREAK:
+			    goto fail;
+			case MAD_FLOW_IGNORE:
+			case MAD_FLOW_CONTINUE:
+			default:
+			    continue;
+		    }
+		}
+
+		switch (decoder->header_func(decoder->cb_data, &frame->header)) {
+		    case MAD_FLOW_STOP:
+			goto done;
+		    case MAD_FLOW_BREAK:
+			goto fail;
+		    case MAD_FLOW_IGNORE:
+			continue;
+		    case MAD_FLOW_CONTINUE:
+			break;
+		}
+	    }
+
+	    if (mad_frame_decode(frame, stream) == -1) {
+		if (!MAD_RECOVERABLE(stream->error))
+		    break;
+
+		switch (error_func(error_data, stream, frame)) {
+		    case MAD_FLOW_STOP:
+			goto done;
+		    case MAD_FLOW_BREAK:
+			goto fail;
+		    case MAD_FLOW_IGNORE:
+			break;
+		    case MAD_FLOW_CONTINUE:
+		    default:
+			continue;
+		}
+	    } else
+		bad_last_frame = 0;
+
+	    mad_synth_frame(synth, frame);
+
+	    if (decoder->output_func) {
+		switch (decoder->output_func(decoder->cb_data, &frame->header,
+			&synth->pcm)) {
+		    case MAD_FLOW_STOP:
+			goto done;
+		    case MAD_FLOW_BREAK:
+			goto fail;
+		    case MAD_FLOW_IGNORE:
+		    case MAD_FLOW_CONTINUE:
+			break;
+		}
+	    }
+	}
+    } while (stream->error == MAD_ERROR_BUFLEN);
+
+fail:
+    result = -1;
+
+done:
+    mad_synth_finish(synth);
+    mad_frame_finish(frame);
+    mad_stream_finish(stream);
+
+    return result;
+}
+
 /**
 **	Load mp3.
 **
@@ -229,14 +468,30 @@ global Sample *LoadMp3(const char* name, int flags __attribute__((unused)))
 	MAD_error, 0 /* message */);
 
     // start decoding
+    // mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
 
-    mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
+    decoder.sync = malloc(sizeof(*decoder.sync));
+    if (!decoder.sync) {
+	mad_decoder_finish(&decoder);
+	CLclose(f);
+	return NULL;
+    }
+
+    run_sync(&decoder);
+
+    free(decoder.sync);
+    decoder.sync = 0;
 
     // release the decoder
 
     mad_decoder_finish(&decoder);
-
     CLclose(f);
+
+    user.Sample->Type = &Mp3SampleType;
+    user.Sample->User = 0;
+
+    DebugLevel0Fn(" %d\n" _C_ user.Sample->Length);
+    IfDebug( AllocatedSoundMemory += user.Sample->Length; );
 
     return user.Sample;
 }
