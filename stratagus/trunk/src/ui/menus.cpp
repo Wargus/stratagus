@@ -92,6 +92,8 @@ local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
 local void GameOptions(void);
 
+local void SurrenderConfirmMenu(void);
+
 local void HelpMenu(void);
 local void KeystrokeHelpMenu(void);
 local void ShowTipsMenu(void);
@@ -402,6 +404,12 @@ global void InitMenuFuncHash(void) {
     HASHADD(GameShowCredits,"game-show-credits");
     HASHADD(GameMenuExit,"game-menu-exit");
 
+// Confirm menus
+    HASHADD(RestartConfirmMenu,"restart-confirm-menu");
+    HASHADD(SurrenderConfirmMenu,"surrender-confirm-menu");
+    HASHADD(QuitToMenuConfirmMenu,"quit-to-menu-confirm-menu");
+    HASHADD(ExitConfirmMenu,"exit-confirm-menu");
+
 // Global Options
     HASHADD(GlobalOptions,"menu-global-options");
     HASHADD(InitGlobalOptions,"init-global-options");
@@ -474,7 +482,7 @@ global void InitMenuFuncHash(void) {
 // End scenario
     HASHADD(EndScenarioRestart,"end-scenario-restart");
     HASHADD(EndScenarioSurrender,"end-scenario-surrender");
-    HASHADD(EndScenarioQuitMenu,"end-scenario-quit-menu");
+    HASHADD(EndScenarioQuitMenu,"end-scenario-quit-to-menu");
 
 // Sound options
     HASHADD(MasterVolumeHSAction,"master-volume-hs-action");
@@ -1924,6 +1932,47 @@ local void GameGlobalOptionsMenu(void)
 local void GameShowCredits(void)
 {
     ShowCredits(&GameCredits);
+}
+
+/**
+**	Show the Quit To Menu Confirm menu
+*/
+global void RestartConfirmMenu(void)
+{
+    ProcessMenu("menu-restart-confirm", 1);
+    if (!GameRunning && CurrentMenu) {
+	EndMenu();
+    }
+}
+
+/**
+**	Show the Quit To Menu Confirm menu
+*/
+local void SurrenderConfirmMenu(void)
+{
+    ProcessMenu("menu-surrender-confirm", 1);
+    if (!GameRunning && CurrentMenu) {
+	EndMenu();
+    }
+}
+
+/**
+**	Show the Quit To Menu Confirm menu
+*/
+global void QuitToMenuConfirmMenu(void)
+{
+    ProcessMenu("menu-quit-to-menu-confirm", 1);
+    if (!GameRunning && CurrentMenu) {
+	EndMenu();
+    }
+}
+
+/**
+**	Show the Exit Confirm menu
+*/
+global void ExitConfirmMenu(void)
+{
+    ProcessMenu("menu-exit-confirm", 1);
 }
 
 /**
