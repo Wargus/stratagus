@@ -104,11 +104,7 @@ local void InitGameMenu(Menuitem *mi);
 
 local void GlobalOptions(void);
 local void InitGlobalOptions(Menuitem *mi);
-local void SetRes640(Menuitem *mi);
-local void SetRes800(Menuitem *mi);
-local void SetRes1024(Menuitem *mi);
-local void SetRes1280(Menuitem *mi);
-local void SetRes1600(Menuitem *mi);
+local void SetRes(Menuitem *mi);
 local void SetFullscreen(Menuitem *mi);
 local void SetShadowFogAlpha(Menuitem *mi);
 local void SetShadowFogGray(Menuitem *mi);
@@ -372,11 +368,7 @@ global void InitMenuFuncHash(void) {
 // Global Options
     HASHADD(GlobalOptions,"menu-global-options");
     HASHADD(InitGlobalOptions,"init-global-options");
-    HASHADD(SetRes640,"set-res-640");
-    HASHADD(SetRes800,"set-res-800");
-    HASHADD(SetRes1024,"set-res-1024");
-    HASHADD(SetRes1280,"set-res-1280");
-    HASHADD(SetRes1600,"set-res-1600");
+    HASHADD(SetRes,"set-res");
     HASHADD(SetFullscreen,"set-fullscreen");
     HASHADD(SetShadowFogAlpha,"set-shadow-fog-alpha");
     HASHADD(SetShadowFogGray,"set-shadow-fog-gray");
@@ -1492,63 +1484,28 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
     }
 }
 
-local void SetRes640(Menuitem *mi __attribute__((unused)))
+local void SetRes(Menuitem *mi)
 {
-    if (VideoWidth != 640) {
-	VideoWidth=640;
-	VideoHeight=480;
-	InitVideo();
-	DestroyCursorBackground();
-	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-	LoadCcl();
-    }
-    InitGlobalOptions(NULL);
-}
+    Menu *menu;
+    int res;
 
-local void SetRes800(Menuitem *mi __attribute__((unused)))
-{
-    if (VideoWidth != 800) {
-	VideoWidth=800;
-	VideoHeight=600;
-	InitVideo();
-	DestroyCursorBackground();
-	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-	LoadCcl();
-    }
-    InitGlobalOptions(NULL);
-}
+    menu = FindMenu("menu-global-options");
 
-local void SetRes1024(Menuitem *mi __attribute__((unused)))
-{
-    if (VideoWidth != 1024) {
-	VideoWidth=1024;
-	VideoHeight=768;
-	InitVideo();
-	DestroyCursorBackground();
-	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-	LoadCcl();
+    if (mi[+1].d.text.text == menu->items[3].d.text.text) {
+	res=640;
+    } else if (mi[+1].d.text.text == menu->items[5].d.text.text) {
+	res=800;
+    } else if (mi[+1].d.text.text == menu->items[7].d.text.text) {
+	res=1024;
+    } else if (mi[+1].d.text.text == menu->items[9].d.text.text) {
+	res=1280;
+    } else if (mi[+1].d.text.text == menu->items[11].d.text.text) {
+	res=1600;
     }
-    InitGlobalOptions(NULL);
-}
 
-local void SetRes1280(Menuitem *mi __attribute__((unused)))
-{
-    if (VideoWidth != 1280) {
-	VideoWidth=1280;
-	VideoHeight=960;
-	InitVideo();
-	DestroyCursorBackground();
-	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-	LoadCcl();
-    }
-    InitGlobalOptions(NULL);
-}
-
-local void SetRes1600(Menuitem *mi __attribute__((unused)))
-{
-    if (VideoWidth != 1600) {
-	VideoWidth=1600;
-	VideoHeight=1200;
+    if (VideoWidth != res) {
+	VideoWidth=res;
+	VideoHeight=res * 2 / 3;
 	InitVideo();
 	DestroyCursorBackground();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
