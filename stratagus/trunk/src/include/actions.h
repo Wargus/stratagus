@@ -84,6 +84,8 @@ extern void CommandMove(struct _unit_* unit, int x, int y, int flush);
 	/// Prepare command repair
 extern void CommandRepair(struct _unit_* unit, int x, int y,
 	struct _unit_* dest, int flush);
+	/// Send auto repair command
+extern void CommandAutoRepair(struct _unit_* unit, int on);
 	/// Prepare command attack
 extern void CommandAttack(struct _unit_* unit, int x, int y,
 	struct _unit_* dest, int flush);

@@ -284,9 +284,6 @@ void DrawButtonPanel(void)
 				case ButtonAttackGround:
 					action = UnitActionAttackGround;
 					break;
-				case ButtonRepair:
-					action = UnitActionRepair;
-					break;
 				case ButtonPatrol:
 					action = UnitActionPatrol;
 					break;
@@ -328,6 +325,9 @@ void DrawButtonPanel(void)
 						}
 						break;
 					case ButtonSpellCast:
+						// FIXME : and IconSelected ?
+
+						// Autocast
 						for (j = 0; j < NumSelected; ++j) {
 							Assert(Selected[j]->AutoCastSpell);
 							if (Selected[j]->AutoCastSpell[buttons[i].Value] != 1) {
@@ -338,6 +338,27 @@ void DrawButtonPanel(void)
 							v |= IconAutoCast;
 						}
 						break;
+					case ButtonRepair:
+						for (j = 0; j < NumSelected; ++j) {
+							if (Selected[j]->Orders[0].Action != UnitActionRepair) {
+								break;
+							}
+						}
+						if (j == NumSelected) {
+							v |= IconSelected;
+						}
+						// Auto repair
+						for (j = 0; j < NumSelected; ++j) {
+							if (Selected[j]->AutoRepair != 1) {
+								break;
+							}
+						}
+						if (j == NumSelected) {
+							v |= IconAutoCast;
+						}
+						break;
+					break;
+
 
 					// FIXME: must handle more actions
 
@@ -731,15 +752,16 @@ void DoButtonButtonClicked(int button)
 					!(KeyModifiers & ModifierShift));
 				break;
 			}
-		case ButtonMove:
-		case ButtonPatrol:
-		case ButtonHarvest:
-		case ButtonAttack:
-		case ButtonRepair:
-		case ButtonAttackGround:
+			CursorState = CursorStateSelect;
+			GameCursor = TheUI.YellowHair.Cursor;
+			CursorAction = CurrentButtons[button].Action;
+			CursorValue = CurrentButtons[button].Value;
+			CurrentButtonLevel = 9; // level 9 is cancel-only
+			UpdateButtonPanel();
+			SetStatusLine("Select Target");
+			break;
 		case ButtonSpellCast:
-			if (CurrentButtons[button].Action == ButtonSpellCast &&
-					(KeyModifiers & ModifierControl)) {
+			if (KeyModifiers & ModifierControl) {
 				int autocast;
 				int spellId;
 
@@ -765,15 +787,43 @@ void DoButtonButtonClicked(int button)
 							spellId, autocast);
 					}
 				}
-			} else {
-				CursorState = CursorStateSelect;
-				GameCursor = TheUI.YellowHair.Cursor;
-				CursorAction = CurrentButtons[button].Action;
-				CursorValue = CurrentButtons[button].Value;
-				CurrentButtonLevel = 9; // level 9 is cancel-only
-				UpdateButtonPanel();
-				SetStatusLine("Select Target");
+				break;
 			}
+			// Follow Next -> Select target.
+		case ButtonRepair:
+			if (KeyModifiers & ModifierControl) {
+				int autorepair;
+
+				autorepair = 0;
+				// If any selected unit doesn't have autocast on turn it on
+				// for everyone
+				for (i = 0; i < NumSelected; ++i) {
+					if (Selected[i]->AutoRepair == 0) {
+						autorepair = 1;
+						break;
+					}
+				}
+				for (i = 0; i < NumSelected; ++i) {
+					if (Selected[i]->AutoRepair != autorepair) {
+						SendCommandAutoRepair(Selected[i], autorepair);
+					}
+				}
+				break;
+			}
+			// Follow Next -> Select target.
+		case ButtonMove:
+		case ButtonPatrol:
+		case ButtonHarvest:
+		case ButtonAttack:
+		case ButtonAttackGround:
+			// Select target.
+			CursorState = CursorStateSelect;
+			GameCursor = TheUI.YellowHair.Cursor;
+			CursorAction = CurrentButtons[button].Action;
+			CursorValue = CurrentButtons[button].Value;
+			CurrentButtonLevel = 9; // level 9 is cancel-only
+			UpdateButtonPanel();
+			SetStatusLine("Select Target");
 			break;
 		case ButtonReturn:
 			for (i = 0; i < NumSelected; ++i) {

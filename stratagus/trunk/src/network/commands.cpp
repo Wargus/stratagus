@@ -843,6 +843,8 @@ static void DoNextReplay(void)
 		SendCommandMove(UnitSlots[unit], posx, posy, flags);
 	} else if (!strcmp(action, "repair")) {
 		SendCommandRepair(UnitSlots[unit], posx, posy, dunit, flags);
+	} else if (!strcmp(action, "auto-repair")) {
+		SendCommandAutoRepair(UnitSlots[unit], posx);
 	} else if (!strcmp(action, "attack")) {
 		SendCommandAttack(UnitSlots[unit], posx, posy, dunit, flags);
 	} else if (!strcmp(action, "attack-ground")) {
@@ -1069,6 +1071,24 @@ void SendCommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 		CommandRepair(unit, x, y, dest, flush);
 	} else {
 		NetworkSendCommand(MessageCommandRepair, unit, x, y, dest, 0, flush);
+	}
+}
+
+/**
+** Send command: Unit auto repair.
+**
+** @param unit      pointer to unit.
+** @param on        1 for auto repair on, 0 for off.
+*/
+void SendCommandAutoRepair(Unit* unit, int on)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("auto-repair", unit, FlushCommands, on, -1, NoUnitP,
+			NULL, 0);
+		CommandAutoRepair(unit, on);
+	} else {
+		NetworkSendCommand(MessageCommandAutoRepair,
+			unit, on, -1, NoUnitP, NULL, FlushCommands);
 	}
 }
 
