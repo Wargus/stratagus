@@ -154,6 +154,59 @@ global void RevealMap(void)
     }
 }
 
+#ifdef SPLIT_SCREEN_SUPPORT
+
+/**
+**	Change viewpoint of map to x,y
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+*/
+global void MapViewportSetViewpoint (int v, int x,int y)
+{
+    unsigned MapX = TheUI.VP[v].MapX;
+    unsigned MapY = TheUI.VP[v].MapY;
+    unsigned MapWidth = TheUI.VP[v].MapWidth;
+    unsigned MapHeight = TheUI.VP[v].MapHeight;
+
+    if (x==MapX && y==MapY) {
+	return;
+    }
+
+    if( x<0 ) {
+	TheUI.VP[v].MapX=0;
+    } else if( x>TheMap.Width-MapWidth ) {
+	TheUI.VP[v].MapX=TheMap.Width-MapWidth;
+    } else {
+	TheUI.VP[v].MapX=x;
+    }
+    if( y<0 ) {
+	TheUI.VP[v].MapY=0;
+    } else if( y>TheMap.Height-MapHeight ) {
+	TheUI.VP[v].MapY=TheMap.Height-MapHeight;
+    } else {
+	TheUI.VP[v].MapY=y;
+    }
+    MarkDrawEntireMap();
+    MustRedraw|=RedrawMinimap|RedrawMinimapCursor;
+}
+
+/**
+**	Center map viewpoint on x,y.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+*/
+global void MapCenterViewport (int v, int x,int y)
+{
+    unsigned MapWidth = TheUI.VP[v].MapWidth;
+    unsigned MapHeight = TheUI.VP[v].MapHeight;
+
+    MapViewportSetViewpoint(v, x-(MapWidth/2), y-(MapHeight/2));
+}
+
+#endif /* SPLIT_SCREEN_SUPPORT */
+
 /**
 **	Change viewpoint of map to x,y
 **
@@ -581,6 +634,30 @@ global int Map2ScreenY(int y)
 {
     return (TheUI.MapY+((y)-MapY)*TileSizeY);
 }
+
+#ifdef SPLIT_SCREEN_SUPPORT
+
+global int Viewport2MapX (int v, int x)
+{
+    return (((x)-TheUI.VP[v].X)/TileSizeX+TheUI.VP[v].MapX);
+}
+
+global int Viewport2MapY (int v, int y)
+{
+    return (((y)-TheUI.VP[v].Y)/TileSizeY+TheUI.VP[v].MapY);
+}
+
+global int Map2ViewportX (int v, int x)
+{
+    return (TheUI.VP[v].X+((x)-TheUI.VP[v].MapX)*TileSizeX);
+}
+
+global int Map2ViewportY (int v, int y)
+{
+    return (TheUI.VP[v].Y+((y)-TheUI.VP[v].MapY)*TileSizeY);
+}
+
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 /**
 **	Release info about a map.
