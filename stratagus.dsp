@@ -483,6 +483,10 @@ SOURCE=.\src\sound\mad.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\sound\mikmod.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\sound\music.c
 # End Source File
 # Begin Source File
@@ -1103,6 +1107,10 @@ SOURCE=.\lib\libbz2.lib
 # Begin Source File
 
 SOURCE=.\lib\lua.lib
+# End Source File
+# Begin Source File
+
+SOURCE=.\lib\mikmod.lib
 # End Source File
 # End Target
 # End Project
