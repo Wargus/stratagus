@@ -2711,7 +2711,7 @@ local void DeleteFile(void)
 local void LoadAction(void)
 {
     char filename[256];
-    FileList *fl;
+//    FileList *fl;
     char *name="x"; 
     size_t nameLength;
 
@@ -6100,6 +6100,7 @@ global void InitMenus(unsigned int race)
 	InitNetErrorMenuItems();
 	InitConnectingMenuItems();
 	InitCampaignSelectMenuItems();
+	InitCampaignContMenuItems();
 	InitSoundOptionsMenuItems();
 	InitPreferencesMenuItems();
 	InitSpeedSettingsMenuItems();
