@@ -790,7 +790,7 @@ local void CclUnitTypePrin1(SCM ptr,struct gen_printio* f)
 **
 **	@param ident	Identifier for unit type.
 **
-**	@returns	Unit type structure.
+**	@return		Unit type structure.
 */
 local SCM CclUnitType(SCM ident)
 {
@@ -812,7 +812,7 @@ local SCM CclUnitType(SCM ident)
 /**
 **	Get all unit type structures.
 **
-**	@returns	An array of all unit type structures.
+**	@return		An array of all unit type structures.
 */
 local SCM CclUnitTypeArray(void)
 {
@@ -836,7 +836,7 @@ local SCM CclUnitTypeArray(void)
 **
 **	@param ptr	Unit type object.
 **
-**	@returns	The identifier of the unit type.
+**	@return		The identifier of the unit type.
 */
 local SCM CclGetUnitTypeIdent(SCM ptr)
 {
@@ -853,7 +853,7 @@ local SCM CclGetUnitTypeIdent(SCM ptr)
 **
 **	@param ptr	Unit type object.
 **
-**	@returns	The name of the unit type.
+**	@return		The name of the unit type.
 */
 local SCM CclGetUnitTypeName(SCM ptr)
 {
@@ -871,7 +871,7 @@ local SCM CclGetUnitTypeName(SCM ptr)
 **	@param ptr	Unit type object.
 **	@param name	The name to set.
 **
-**	@returns	The name of the unit type.
+**	@return		The name of the unit type.
 */
 local SCM CclSetUnitTypeName(SCM ptr,SCM name)
 {
@@ -891,7 +891,7 @@ local SCM CclSetUnitTypeName(SCM ptr,SCM name)
 **
 **	@param ptr	Unit type object.
 **
-**	@returns	The property of the unit type.
+**	@return		The property of the unit type.
 */
 local SCM CclGetUnitTypeProperty(SCM ptr)
 {
@@ -907,7 +907,7 @@ local SCM CclGetUnitTypeProperty(SCM ptr)
 **	@param ptr	Unit type object.
 **	@param name	The property to set.
 **
-**	@returns	The property of the unit type.
+**	@return		The property of the unit type.
 */
 local SCM CclSetUnitTypeProperty(SCM ptr,SCM property)
 {
