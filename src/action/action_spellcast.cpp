@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_spellcast.c	-	The spell cast action. */
-/*
-**	(c) Copyright 1998-2000 by Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 /*
 ** This is inherited from action_attack.c, actually spell casting will
@@ -162,7 +161,13 @@ global void HandleActionSpellCast(Unit* unit)
 		     unit->SubAction=0;
 		     unit->Wait = 1;
 		     if ( unit->Command.Data.Move.Goal )
+#ifdef REFS_DEBUG
+			DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+#endif
 		        unit->Command.Data.Move.Goal->Refs--;
+#ifdef REFS_DEBUG
+			DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+#endif
 		  }
 		}
 	    break;

@@ -10,7 +10,7 @@
 //
 /**@name action_move.c	-	The move action. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -82,7 +82,9 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	    // FIXME: Can't choose a better target here!
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
+#ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
+#endif
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
@@ -90,9 +92,13 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	    } else if( goal->Removed ||
 		    !goal->HP || goal->Command.Action==UnitActionDie ) {
 		DebugLevel0Fn("killed unit\n");
+#ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
+#endif
 		--goal->Refs;
+#ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
+#endif
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
 	}

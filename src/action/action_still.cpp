@@ -10,7 +10,7 @@
 //
 /**@name action_still.c	-	The stand still action. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -163,7 +163,9 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    if( temp && temp->Destroyed ) {
 		DebugLevel3Fn(" destroyed unit %Zd #%d\n"
 			,UnitNumber(temp),temp->Refs);
+#ifdef REFS_DEBUG
 		DebugCheck( !temp->Refs );
+#endif
 		if( !--temp->Refs ) {
 		    ReleaseUnit(temp);
 		}
@@ -174,9 +176,13 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		if( temp ) {
 		    DebugLevel3Fn(" old unit %Zd #%d\n"
 			    ,UnitNumber(temp),temp->Refs);
+#ifdef REFS_DEBUG
 		    DebugCheck( !temp->Refs );
+#endif
 		    temp->Refs--;
+#ifdef REFS_DEBUG
 		    DebugCheck( !temp->Refs );
+#endif
 		}
 		unit->Command.Data.Move.Goal=goal;
 		goal->Refs++;
@@ -194,9 +200,13 @@ global void ActionStillGeneric(Unit* unit,int ground)
 
     if( unit->SubAction ) {		// was attacking.
 	if( (temp=unit->Command.Data.Move.Goal) ) {
+#ifdef REFS_DEBUG
 	    DebugCheck( !temp->Refs );
+#endif
 	    temp->Refs--;
+#ifdef REFS_DEBUG
 	    DebugCheck( !temp->Refs );
+#endif
 	    unit->Command.Data.Move.Goal=NoUnitP;
 	}
 	unit->SubAction=unit->State=0;

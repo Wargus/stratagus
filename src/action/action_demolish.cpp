@@ -67,7 +67,9 @@ global void HandleActionDemolish(Unit* unit)
 		if( goal ) {
 		    if( goal->Destroyed ) {
 			DebugLevel0Fn("Destroyed unit\n");
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -77,9 +79,13 @@ global void HandleActionDemolish(Unit* unit)
 			return;
 		    } else if( goal->Removed || !goal->HP
 				|| goal->Command.Action==UnitActionDie ) {
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			--goal->Refs;
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			unit->Command.Data.Move.Goal=goal=NoUnitP;
 			// FIXME: perhaps I should choose an alternative
 			unit->Command.Action=UnitActionStill;
@@ -113,9 +119,13 @@ global void HandleActionDemolish(Unit* unit)
 	case 1:
 	    goal=unit->Command.Data.Move.Goal;
 	    if( goal ) {
+#ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
+#endif
 		--goal->Refs;
+#ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
+#endif
 		unit->Command.Data.Move.Goal=NoUnitP;
 	    }
 
