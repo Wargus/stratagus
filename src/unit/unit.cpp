@@ -3143,12 +3143,14 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
 
-    MakeLocalMissile(MissileTypeHit,
+    if( UnitVisibleOnMap(target) ) {
+	MakeLocalMissile(MissileTypeHit,
 	    target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2,
 	    target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2,
 	    target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2+3,
 	    target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2
 		    -MissileTypeHit->Range)->Damage=-damage;
+    }
 
 #if 0
     // FIXME: want to show hits.
