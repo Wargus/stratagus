@@ -31,8 +31,6 @@
 
 //@{
 
-#define noTIMEIT  /// Enable CPU use debugging
-
 //----------------------------------------------------------------------------
 // Documentation
 //----------------------------------------------------------------------------
@@ -152,13 +150,7 @@
 #include "script.h"
 #include "actions.h"
 #include "map.h"
-
 #include "pathfinder.h"
-
-#if defined(DEBUG) && defined(TIMEIT)
-#include "rdtsc.h"
-#endif
-
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------
@@ -1830,13 +1822,6 @@ void AiEachCycle(Player* player __attribute__((unused)))
 */
 void AiEachSecond(Player* player)
 {
-#ifdef TIMEIT
-	u_int64_t sv = rdtsc();
-	u_int64_t ev;
-	static long mv;
-	long sx;
-#endif
-
 	AiPlayer = player->Ai;
 #ifdef DEBUG
 	if (!AiPlayer) {
@@ -1870,13 +1855,6 @@ void AiEachSecond(Player* player)
 	if (GameCycle > AiPlayer->LastExplorationGameCycle + 5 * CYCLES_PER_SECOND) {
 		AiSendExplorers();
 	}
-
-#ifdef TIMEIT
-	ev = rdtsc();
-	sx = (ev - sv);
-	mv = (mv + sx) / 2;
-	DebugPrint("%ld %ld\n" _C_ sx / 1000 _C_ mv / 1000);
-#endif
 }
 
 //@}
