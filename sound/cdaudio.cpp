@@ -56,18 +56,17 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local int CDTrack = 0;                 /// Current cd track
+local int CDTrack = 0;			/// Current cd track
 
-local int NumCDTracks;                 /// Number of tracks on the cd
+local int NumCDTracks;			/// Number of tracks on the cd
 
 #if defined(USE_SDLCD) 
-local SDL_CD *CDRom;                   /// SDL cdrom device
+local SDL_CD *CDRom;			/// SDL cdrom device
 #elif defined(USE_CDDA) 
-local int NumCDTracks;
-global int CDDrive; 
-global struct cdrom_tochdr CDchdr; 
-global struct cdrom_tocentry CDtocentry[64]; 
-global struct cdrom_read_audio CDdata; 
+global int CDDrive;			/// CDRom device
+global struct cdrom_tochdr CDchdr;		/// TOC header struct
+global struct cdrom_tocentry CDtocentry[64];	/// TOC track header struct
+global struct cdrom_read_audio CDdata;		/// struct for reading data
 #endif
 
 global CDModes CDMode;			/// CD mode
@@ -94,7 +93,7 @@ local int InitCD()
 global int PlayCDTrack(int track)
 {
     CDTrack = track;
-    return SDL_CDPlayTracks(CDRom, track, 0, 0, 0);
+    return SDL_CDPlayTracks(CDRom, track-1, 0, 0, 0);
 }
 
 global void ResumeCD()
@@ -302,6 +301,12 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
     return 0;
 }
 
+/*
+**	Play CDRom
+**
+**	@param name	name of play mode, CDModeAll, CDModeRandom, CDModeDefined
+**
+*/
 global int PlayCDRom(int name)
 {
     int i;
