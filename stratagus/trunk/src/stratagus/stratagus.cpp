@@ -254,10 +254,10 @@ global char* CompileOptions;                /// Compile options.
 
 global int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
 global int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
-global int SpeedBuild = SPEED_BUILD;        /// speed factor for building
-global int SpeedTrain = SPEED_TRAIN;        /// speed factor for training
-global int SpeedUpgrade = SPEED_UPGRADE;    /// speed factor for upgrading
-global int SpeedResearch = SPEED_RESEARCH;  /// speed factor for researching
+global int SpeedBuild = 1;        /// speed factor for building
+global int SpeedTrain = 1;        /// speed factor for training
+global int SpeedUpgrade = 1;    /// speed factor for upgrading
+global int SpeedResearch = 1;  /// speed factor for researching
 
 /*============================================================================
 ==  DISPLAY

@@ -114,6 +114,8 @@ typedef struct {
 
 	/// Userdata Constructor. Push userdata on the stack.
 extern void ScriptCreateUserdata(lua_State* l, void* object, ScriptProxyType* type);
+	/// Init ScriptProxyType with all blockers.
+extern void ScriptProxyTypeInitBlock(ScriptProxyType* type);
 	/// Really dumb set function that always goes into an error, with string key
 extern int ScriptGetSetStrBlock(void* object, const char* key, lua_State* l);
 	/// Really dumb set function that always goes into an error, with int index

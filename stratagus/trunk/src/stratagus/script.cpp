@@ -1091,6 +1091,20 @@ extern int ScriptGetSetIntBlock(void* object, int index, lua_State* l)
 }
 
 /**
+**  Initialize a ScriptProxyType with blockers
+**
+**  @param type     ScriptProxyType
+*/
+extern void ScriptProxyTypeInitBlock(ScriptProxyType* type)
+{
+	type->GetStr = ScriptGetSetStrBlock;
+	type->SetStr = ScriptGetSetStrBlock;
+	type->GetInt = ScriptGetSetIntBlock;
+	type->SetInt = ScriptGetSetIntBlock;
+	type->Collect = 0;
+}
+
+/**
 **  Get a value from the big Stratagus struct.
 */
 local int ScriptStratagusGetValue(lua_State* l)

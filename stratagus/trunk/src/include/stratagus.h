@@ -44,7 +44,7 @@
 #define NEW_UNIT_CACHE
 
 // New Lua scripting.
-// #define META_LUA
+//#define META_LUA
 
 // Dynamic loading.
 //#define DYNAMIC_LOAD
