@@ -618,7 +618,7 @@ global void CclCommand(const char* command)
     retval=repl_c_string(msg,0,0,sizeof(msg));
     DebugLevel3("\n%d=%s\n" _C_ retval _C_ msg);
 
-    SetMessage(msg);
+    SetMessage("%s",msg);
 }
 
 /*............................................................................
