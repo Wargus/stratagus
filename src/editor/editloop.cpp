@@ -1748,9 +1748,9 @@ static void EditorCallbackMouse(int x, int y)
 	}
 	if (TheUI.MenuButton.X != -1) {
 		if (x >= TheUI.MenuButton.X &&
-				x <= TheUI.MenuButton.X + TheUI.MenuButton.Width &&
+				x <= TheUI.MenuButton.X + TheUI.MenuButton.Style->Width &&
 				y > TheUI.MenuButton.Y &&
-				y <= TheUI.MenuButton.Y + TheUI.MenuButton.Height) {
+				y <= TheUI.MenuButton.Y + TheUI.MenuButton.Style->Height) {
 			ButtonAreaUnderCursor = ButtonAreaMenu;
 			ButtonUnderCursor = ButtonUnderMenu;
 			CursorOn = CursorOnButton;
