@@ -1085,8 +1085,9 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
 	return 0;
     }
 
-    if( unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
+    if( ThisPlayer != unit->Player &&
+	!(unit->Player->SharedVision&(1<<ThisPlayer->Player) &&
+	ThisPlayer->SharedVision&(1<<unit->Player->Player)) ) {
 	// Invisible by spell
 	if ( unit->Invisible ) {
 	    return 0;
@@ -3832,6 +3833,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
 
     // 'type and 'player must be first, needed to create the unit slot
     fprintf(file,"'type '%s ",unit->Type->Ident);
+    fprintf(file,"'seentype '%s ",unit->Type->Ident);
     fprintf(file,"'player %d\n  ",unit->Player->Player);
 
     if( unit->Name ) {
@@ -3900,6 +3902,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Constructed ) {
 	fprintf(file," 'constructed");
     }
+    if( unit->SeenConstructed ) {
+	fprintf(file," 'seenconstructed");
+    }
+    fprintf(file," 'seenstate %d ",unit->SeenState);
     if( unit->Active ) {
 	fprintf(file," 'active");
     }

@@ -1743,8 +1743,8 @@ local void DrawBuilding(Unit* unit)
     if( visible ) {
 	frame = unit->SeenFrame = unit->Frame;
 	type = unit->SeenType = unit->Type;
-	unit->SeenState = unit->Orders[0].Action==UnitActionBuilded |
-			(unit->Orders[0].Action==UnitActionUpgradeTo << 1);
+	unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
+			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
 	unit->SeenConstructed = unit->Constructed;
 	
     } else {
@@ -1881,7 +1881,9 @@ global void DrawUnits(const void* v)
     for (i = 0; i < NumUnits; ++i) {
 	unit = Units[i];
 	// FIXME: this tries to draw all corps, ohje
-	if (unit->Type->Vanishes || unit->Orders[0].Action == UnitActionDie) {
+	if ((unit->Type->Vanishes && unit->State==unit->Type->CorpseScript) ||
+	    (UnitVisibleInViewport(vp,unit) &&
+		unit->Orders[0].Action == UnitActionDie) ) {
 	    DrawUnit(unit);
 	}
     }
