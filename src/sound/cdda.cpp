@@ -33,12 +33,15 @@
 
 #if defined(USE_CDDA) // {
 
-#include "sound_server.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "sound.h"
+#include "sound_server.h"
+
 
 local struct cdrom_read_audio readdata;
 local void *bufstart;
+static local int pos;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -46,7 +49,6 @@ local void *bufstart;
 
 local int CDRead(Sample *sample, void *buf, int len)
 {
-    static int pos = 0;
     static int count = 0;
     int end = (int)bufstart + 2352 * 28;
 
@@ -57,6 +59,17 @@ local int CDRead(Sample *sample, void *buf, int len)
     ++count;
     pos += len;
 
+    // end of track
+    if (len > 2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - pos) {
+        len = 2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - pos;
+        pos = 0;
+        CDTrack = (CDTrack != NumCDTracks ? CDTrack + 1 : 1);
+        memcpy(buf, sample->User, len);
+	PlayingMusic = 0;
+        return len;
+    }
+
+    // pre-buffer new data
     if (count == (end - (int)bufstart) / len / 2 + 1) {
 	readdata.buf = bufstart;
 	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
@@ -65,6 +78,7 @@ local int CDRead(Sample *sample, void *buf, int len)
 	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
     }
 
+    // copy data into buffer
     if ((int)sample->User + len <= end) {
 	memcpy(buf, sample->User, len);
 	sample->User += len;
@@ -112,6 +126,7 @@ global Sample* LoadCD(const char* name __attribute__((unused)),
     sample->Length = 0;
     
     bufstart = sample->User;
+    pos = 0;
 
     return sample;
 }

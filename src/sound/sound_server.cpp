@@ -256,7 +256,15 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 	}
     }
 #elif defined(USE_CDDA)
-
+    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
+	    && !PlayingMusic) {
+	DebugLevel0Fn("Playing new track\n");
+	if (!strcmp(CDMode, ":all")) {
+	    PlayMusic(":all");
+	} else if (!strcmp(CDMode, ":random")) {
+	    PlayMusic(":random");
+	}
+    }
 #endif
     return 0;
 }
