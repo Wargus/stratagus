@@ -255,7 +255,18 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 	    SetDefaultTextColors(rc,rc);
 	}
     }
-    VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
+    if (rb < MenuButtonGfx.Sprite->NumFrames) {
+	VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
+    } else {
+	if (rb < button) {
+	    VideoDrawRectangleClip(ColorGray,x+1,y+1,w-2,h-2);
+	    VideoDrawRectangleClip(ColorGray,x+2,y+2,w-4,h-4);
+	} else {
+	    // FIXME: Temp-workaround for missing folder button in non-expansion gfx
+	    VideoDrawRectangleClip(ColorYellow,x+1,y+1,w-2,h-2);
+	    VideoDrawRectangleClip(ColorYellow,x+2,y+2,w-4,h-4);
+	}
+    }
     if (text) {
 	if (button != MBUTTON_FOLDER) {
 	    DrawTextCentered(s+x+w/2,s+y+(font == GameFont ? 4 : 7),font,text);
