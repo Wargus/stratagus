@@ -151,7 +151,7 @@ local void (*SaveCursorBackground)(int,int,int,int);
 	/// Function pointer: Load background behind cursor
 local void (*LoadCursorBackground)(int,int,int,int);
 
-/* Function pointer: Save rectangle behind cursor
+/** Function pointer: Save rectangle behind cursor
 **	@param x	Screen X pixels coordinate for left-top corner.
 **	@param y	Screen Y pixels coordinate for left-top corner.
 **	@param w	Width in pixels for rectangle starting at left-top.
@@ -161,7 +161,7 @@ local void (*LoadCursorBackground)(int,int,int,int);
 */
 local void (*SaveCursorRectangle)(int x,int y,int w,int h);
 
-/* Function pointer: Load rectangle behind cursor
+/** Function pointer: Load rectangle behind cursor
 **	@param x	Screen X pixels coordinate.
 **	@param y	Screen Y pixels coordinate.
 **	@param w	Width in pixels.
@@ -179,7 +179,7 @@ local void (*LoadCursorRectangle)(int x,int y,int w,int h);
     sp=OldCursorRectangle; \
     dp=video+y*VideoWidth+x; \
     memcpy(dp,sp,w*sizeof(memtype)); \
-    if ( --h ) { \
+    if ( h ) { \
       sp+=w; \
       dp+=VideoWidth; \
       while( --h ) { \
@@ -212,56 +212,72 @@ local void (*LoadCursorRectangle)(int x,int y,int w,int h);
 **   (See description function pointer LoadCursorRectangle)
 */
 local void LoadCursorRectangle8(int x,int y,int w,int h) {
-  LOADCURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+    if( w && h ) {
+	LOADCURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+    }
 }
 
 /** Restore cursor rectangle for 16bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
 */
 local void LoadCursorRectangle16(int x,int y,int w,int h) {
-  LOADCURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+    if( w && h ) {
+	LOADCURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+    }
 }
 
 /** Restore cursor rectangle for 24bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
 */
 local void LoadCursorRectangle24(int x,int y,int w,int h) {
-  LOADCURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+    if( w && h ) {
+	LOADCURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+    }
 }
 
 /** Restore cursor rectangle for 32bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
 */
 local void LoadCursorRectangle32(int x,int y,int w,int h) {
-  LOADCURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+    if( w && h ) {
+	LOADCURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+    }
 }
 
 /** Save cursor rectangle for 8bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 */
 local void SaveCursorRectangle8(int x,int y,int w,int h) {
-  SAVECURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+    if( w && h ) {
+	SAVECURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+    }
 }
 
 /** Save cursor rectangle for 16bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 */
 local void SaveCursorRectangle16(int x,int y,int w,int h) {
-  SAVECURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+    if( w && h ) {
+	SAVECURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+    }
 }
 
 /** Save cursor rectangle for 24bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 */
 local void SaveCursorRectangle24(int x,int y,int w,int h) {
-  SAVECURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+    if( w && h ) {
+	SAVECURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+    }
 }
 
 /** Save cursor rectangle for 32bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 */
 local void SaveCursorRectangle32(int x,int y,int w,int h) {
-  SAVECURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+    if( w && h ) {
+	SAVECURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+    }
 }
 
 /**
@@ -728,7 +744,7 @@ local void DrawBuildingCursor(void)
 	    break;
 	case UnitTypeFly:
 	default:
-	    DebugLevel1(__FUNCTION__": Were moves this unit?\n");
+	    DebugLevel1Fn("Were moves this unit?\n");
 	    return;
     }
 
@@ -896,7 +912,10 @@ global int HideAnyCursor(void)
 global void InitCursor(void)
 {
     int memsize;
-    free( OldCursorRectangle ); // memory of possible previous video-setting?
+
+    if( OldCursorRectangle ) {	// memory of possible previous video-setting?
+	free( OldCursorRectangle );
+    }
 
     switch( VideoDepth ) {
 	case 8:
@@ -928,7 +947,7 @@ global void InitCursor(void)
 	    LoadCursorRectangle=LoadCursorRectangle32;
 	    break;
 	default:
-	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
     OldCursorRectangle=malloc((2*VideoWidth+2*(VideoHeight-2))*memsize);
