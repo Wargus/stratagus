@@ -311,7 +311,7 @@ struct _player_ {
 	char* Name;      ///< name of non computer
 
 	int   Type;      ///< type of player (human,computer,...)
-	char* RaceName;  ///< name of race
+	const char* RaceName;  ///< name of race : pointer on PlayerRaces.Name[Race]
 	int   Race;      ///< race of player (orc,human,...)
 	char  AiName[128];     ///< AI for computer
 

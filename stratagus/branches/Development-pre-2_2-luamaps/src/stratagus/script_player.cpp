@@ -810,15 +810,19 @@ static int CclSetPlayerData(lua_State* l)
 		p->Name = strdup(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		int i;
+		const char* racename;
 
-		free(p->RaceName);
-		p->RaceName = strdup(LuaToString(l, 3));
+		racename = LuaToString(l, 3);
 		p->Race = PlayerRaceNeutral;
 		for (i = 0; i < PlayerRaces.Count; ++i) {
-			if(!strcmp(p->RaceName, PlayerRaces.Name[i])) {
+			if(!strcmp(racename, PlayerRaces.Name[i])) {
+				p->RaceName = PlayerRaces.Name[i];
 				p->Race = i;
 				break;
 			}
+		}
+		if (i == PlayerRaces.Count)	{
+			LuaError(l, "invalid race name '%s'" _C_ racename);
 		}
 	} else if (!strcmp(data, "Resources")) {
 		const char* res;
