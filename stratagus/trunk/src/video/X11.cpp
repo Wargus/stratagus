@@ -837,6 +837,8 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	pixels=malloc(256*sizeof(VMemType16));
 	break;
     case 24:
+	// pixels=malloc(256*sizeof(VMemType24));
+	// break;
     case 32:
 	pixels=malloc(256*sizeof(VMemType32));
 	break;
@@ -896,7 +898,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	    ((VMemType16*)pixels)[i]=color.pixel;
 	    break;
 	case 24:
-	    //((VMemType32*)pixels)[i]=color.pixel;
+	    //((VMemType24*)pixels)[i]=color.pixel;
 	    //break;
 	    // FIXME: real 24bpp mode.
 	case 32:

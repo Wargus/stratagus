@@ -221,6 +221,61 @@ local void VideoDrawChar16(const Graphic* sprite,
 }
 
 /**
+**	Draw character with current color into 24bit video memory.
+**
+**	@param sprite	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
+*/
+local void VideoDrawChar24(const Graphic* sprite,
+	int gx,int gy,int w,int h,int x,int y)
+{
+    int p;
+    const unsigned char* sp;
+    const unsigned char* lp;
+    const unsigned char* gp;
+    int sa;
+    VMemType24* dp;
+    int da;
+
+    sp=sprite->Frames+gx+gy*sprite->Width-1;
+    gp=sp+sprite->Width*h;
+    sa=sprite->Width-w;
+    dp=VideoMemory24+x+y*VideoWidth-1;
+    da=VideoWidth-w;
+    --w;
+
+    while( sp<gp ) {
+	lp=sp+w;
+	while( sp<lp ) {		// loop with unroll
+	    ++dp;
+	    p=*++sp;
+	    if( p!=255 ) {
+		*dp=Pixels24[TextColor[p]];
+	    }
+	    ++dp;
+	    p=*++sp;
+	    if( p!=255 ) {
+		*dp=Pixels24[TextColor[p]];
+	    }
+	}
+	if( sp<=lp ) {
+	    ++dp;
+	    p=*++sp;
+	    if( p!=255 ) {
+		*dp=Pixels24[TextColor[p]];
+	    }
+	}
+	sp+=sa;
+	dp+=da;
+    }
+}
+
+/**
 **	Draw character with current color into 32bit video memory.
 **
 **	@param sprite	Pointer to object
@@ -553,6 +608,9 @@ global void LoadFonts(void)
 	    break;
 
 	case 24:
+	    VideoDrawChar=VideoDrawChar24;
+	    // FIXME: real 24bpp break;
+
 	case 32:
 	    VideoDrawChar=VideoDrawChar32;
 	    break;
