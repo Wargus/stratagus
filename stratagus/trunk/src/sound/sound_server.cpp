@@ -290,7 +290,8 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
     int length;
     int v;
     int local_volume;
-    unsigned char left,right;
+    unsigned char left;
+    unsigned char right;
 
     local_volume=((int)volume+1)*2*GlobalVolume/MaxVolume;
     length=sample->Length-index;
@@ -368,7 +369,8 @@ typedef struct _sound_channel_ {
     Origin              Source;         // unit playing
     unsigned char       Volume;         // Volume of this channel
     SoundId             Sound;          // The sound currently played
-    float               Stereo;         // stereo value (-1.0 to 1.0)
+    char                Stereo;         // stereo location of sound (
+                                        //-128 left, 0 center, 127 right)
 } SoundChannel;
 
 #define ChannelFree	0		// channel is free
