@@ -1188,6 +1188,77 @@ local char* SCM_PopNewStr(SCM* list)
     return gh_scm2newstr(value, NULL);
 }
 #elif defined(USE_LUA)
+local MenuButtonId scm2buttonid(lua_State* l, const char* value)
+{
+    MenuButtonId id;
+
+    if (!strcmp(value, "main")) {
+        id = MBUTTON_MAIN;
+    } else if (!strcmp(value, "network")) {
+        id = MBUTTON_NETWORK;
+    } else if (!strcmp(value, "gm-half")) {
+        id = MBUTTON_GM_HALF;
+    } else if (!strcmp(value, "132")) {
+        id = MBUTTON_132;
+    } else if (!strcmp(value, "gm-full")) {
+        id = MBUTTON_GM_FULL;
+    } else if (!strcmp(value, "gem-round")) {
+        id = MBUTTON_GEM_ROUND;
+    } else if (!strcmp(value, "gem-square")) {
+        id = MBUTTON_GEM_SQUARE;
+    } else if (!strcmp(value, "up-arrow")) {
+        id = MBUTTON_UP_ARROW;
+    } else if (!strcmp(value, "down-arrow")) {
+        id = MBUTTON_DOWN_ARROW;
+    } else if (!strcmp(value, "left-arrow")) {
+        id = MBUTTON_LEFT_ARROW;
+    } else if (!strcmp(value, "right-arrow")) {
+        id = MBUTTON_RIGHT_ARROW;
+    } else if (!strcmp(value, "s-knob")) {
+        id = MBUTTON_S_KNOB;
+    } else if (!strcmp(value, "s-vcont")) {
+        id = MBUTTON_S_VCONT;
+    } else if (!strcmp(value, "s-hcont")) {
+        id = MBUTTON_S_HCONT;
+    } else if (!strcmp(value, "pulldown")) {
+        id = MBUTTON_PULLDOWN;
+    } else if (!strcmp(value, "vthin")) {
+        id = MBUTTON_VTHIN;
+    } else if (!strcmp(value, "folder")) {
+        id = MBUTTON_FOLDER;
+    } else if (!strcmp(value, "sc-gem-round")) {
+        id = MBUTTON_SC_GEM_ROUND;
+    } else if (!strcmp(value, "sc-gem-square")) {
+        id = MBUTTON_SC_GEM_SQUARE;
+    } else if (!strcmp(value, "sc-up-arrow")) {
+        id = MBUTTON_SC_UP_ARROW;
+    } else if (!strcmp(value, "sc-down-arrow")) {
+        id = MBUTTON_SC_DOWN_ARROW;
+    } else if (!strcmp(value, "sc-left-arrow")) {
+        id = MBUTTON_SC_LEFT_ARROW;
+    } else if (!strcmp(value, "sc-right-arrow")) {
+        id = MBUTTON_SC_RIGHT_ARROW;
+    } else if (!strcmp(value, "sc-s-knob")) {
+        id = MBUTTON_SC_S_KNOB;
+    } else if (!strcmp(value, "sc-s-vcont")) {
+        id = MBUTTON_SC_S_VCONT;
+    } else if (!strcmp(value, "sc-s-hcont")) {
+        id = MBUTTON_SC_S_HCONT;
+    } else if (!strcmp(value, "sc-pulldown")) {
+        id = MBUTTON_SC_PULLDOWN;
+    } else if (!strcmp(value, "sc-button-left")) {
+        id = MBUTTON_SC_BUTTON_LEFT;
+    } else if (!strcmp(value, "sc-button")) {
+        id = MBUTTON_SC_BUTTON;
+    } else if (!strcmp(value, "sc-button-right")) {
+        id = MBUTTON_SC_BUTTON_RIGHT;
+    } else {
+        lua_pushfstring(l, "Unsupported button: %s", value);
+	lua_error(l);
+	id = 0;
+    }
+    return id;
+}
 #endif
 
 /**
@@ -2833,7 +2904,7 @@ local int CclDefineMenu(lua_State* l)
 	    if (func != NULL) {
 		item.NetAction = (void*)*func;
 	    } else {
-		lua_pushfstring(l, "Can't find function: %s\n", value);
+		lua_pushfstring(l, "Can't find function: %s", value);
 		lua_error(l);
 	    }
 	} else {
@@ -2990,6 +3061,50 @@ local int scm2style(SCM value)
     return id;
 }
 #elif defined(USE_LUA)
+local int scm2hotkey(lua_State* l, const char* value)
+{
+    int len;
+    int key;
+    int f;
+
+    key = 0;
+    len = strlen(value);
+
+    if (len == 0) {
+	key = 0;
+    } else if (len == 1) {
+	key = value[0];
+    } else if (!strcmp(value, "esc")) {
+	key = 27;
+    } else if (value[0] == 'f' && len > 1 && len < 4) {
+	f = atoi(value + 1);
+	if (f > 0 && f < 13) {
+	    key = KeyCodeF1 + f - 1; // if key-order in include/interface.h is linear
+	} else {
+	    lua_pushfstring(l, "Unknown key: %s", value);
+	    lua_error(l);
+	}
+    } else {
+	lua_pushfstring(l, "Unknown key %s", value);
+	lua_error(l);
+    }
+    return key;
+}
+
+local int scm2style(lua_State* l, const char* value)
+{
+    int id;
+
+    if (!strcmp(value, "sc-vslider")) {
+        id = MI_STYLE_SC_VSLIDER;
+    } else if (!strcmp(value, "sc-hslider")) {
+        id = MI_STYLE_SC_HSLIDER;
+    } else {
+        lua_pushfstring(l, "Unsupported style: %s", value);
+	lua_error(l);
+    }
+    return id;
+}
 #endif
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
@@ -3620,6 +3735,1152 @@ local SCM CclDefineMenuItem(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineMenuItem(lua_State* l)
+{
+    const char* value;
+    char* s1;
+    char* name;
+    Menuitem *item;
+    Menu** tmp;
+    Menu* menu;
+    void** func;
+    int args;
+    int subargs;
+    int j;
+    int k;
+
+    DebugLevel3Fn("Define menu-item\n");
+
+    name = NULL;
+    item = (Menuitem*)calloc(1, sizeof(Menuitem));
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "pos")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item->xofs = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item->yofs = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "menu")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    name = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "flags")) {
+	} else if (!strcmp(value, "font")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item->font = CclFontByIdentifier(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "init")) {
+	    if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    if (lua_isstring(l, j + 1)) {
+		value = lua_tostring(l, j + 1);
+		func = (void**)hash_find(MenuFuncHash, value);
+		if (func != NULL) {
+		    item->initfunc = (void*)*func;
+		} else {
+		    lua_pushfstring(l, "Can't find function: %s", value);
+		    lua_error(l);
+		}
+	    } else {
+		item->initfunc = NULL;
+	    }
+	} else if (!strcmp(value, "exit")) {
+	    if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    if (lua_isstring(l, j + 1)) {
+		value = lua_tostring(l, j + 1);
+		func = (void**)hash_find(MenuFuncHash, value);
+		if (func != NULL) {
+		    item->exitfunc = (void*)*func;
+		} else {
+		    lua_pushfstring(l, "Can't find function: %s", value);
+		    lua_error(l);
+		}
+	    } else {
+		item->exitfunc = NULL;
+	    }
+/* Menu types */
+	} else if (!item->mitype) {
+	    if (!strcmp(value, "text")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_TEXT;
+		item->d.text.text = NULL;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "align")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			if (!strcmp(value, "left")) {
+			    item->d.text.align = MI_TFLAGS_LALIGN;
+			} else if (!strcmp(value, "right")) {
+			    item->d.text.align = MI_TFLAGS_RALIGN;
+			} else if (!strcmp(value, "center")) {
+			    item->d.text.align = MI_TFLAGS_CENTERED;
+			}
+		    } else if (!strcmp(value, "caption")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    s1 = strdup(lua_tostring(l, -1));
+			    item->d.text.text = s1;
+			} else {
+			    item->d.text.text = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+		    		item->d.text.action = (void*)*func;
+			    } else {
+		    		lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.text.action = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "color-normal")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.text.normalcolor = s1;
+		    } else if (!strcmp(value, "color-reverse")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.text.reversecolor = s1;
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else if (!strcmp(value, "button")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_BUTTON;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+
+		    if (!strcmp(value, "size")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.button.xsize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.button.ysize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "caption")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    s1 = strdup(lua_tostring(l, -1));
+			    item->d.button.text = s1;
+			} else {
+			    item->d.button.text = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "hotkey")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.button.hotkey = scm2hotkey(l, value);
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    //item->d.button.handler = hash_mini_get(MenuHndlrHash, s1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.button.handler = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.button.handler = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.button.button = scm2buttonid(l, value);
+		    } else if (!strcmp(value, "color-normal")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.button.normalcolor = s1;
+		    } else if (!strcmp(value, "color-reverse")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.button.reversecolor = s1;
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else if (!strcmp(value, "pulldown")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_PULLDOWN;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "size")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.pulldown.xsize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.pulldown.ysize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "options")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+
+			if (!lua_isnil(l, -1)) {
+			    int subsubargs;
+			    int subk;
+
+			    subsubargs = luaL_getn(l, -1);
+			    if (item->d.pulldown.options) {
+			    	free(item->d.pulldown.options);
+			    }
+			    item->d.pulldown.options = (unsigned char**)malloc(sizeof(unsigned char*) * subsubargs);
+			    for (subk = 0; subk < subsubargs; ++subk) {
+				lua_rawgeti(l, -1, subk + 1);
+				if (!lua_isstring(l, -1)) {
+				    lua_pushstring(l, "incorrect argument");
+				    lua_error(l);
+				}
+				value = lua_tostring(l, -1);
+				lua_pop(l, 1);
+				item->d.pulldown.options[subk] = s1;
+			    }
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.pulldown.action = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.pulldown.action = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.pulldown.button = scm2buttonid(l, value);
+		    } else if (!strcmp(value, "state")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			if (!strcmp(value, "passive")) {
+			    item->d.pulldown.state = MI_PSTATE_PASSIVE;
+			} else {
+			    lua_pushfstring(l, "Unsupported property: %s", value);
+			    lua_error(l);
+			}
+		    } else if (!strcmp(value, "default")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.pulldown.defopt = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "current")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.pulldown.curopt = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "color-normal")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.pulldown.normalcolor = s1;
+		    } else if (!strcmp(value, "color-reverse")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.pulldown.reversecolor = s1;
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else if (!strcmp(value, "listbox")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_LISTBOX;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "size")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.listbox.xsize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.listbox.ysize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = strdup(lua_tostring(l, -1));
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.listbox.action = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.listbox.action = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "handler")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.listbox.handler = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.listbox.handler = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "retopt")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.listbox.retrieveopt = (void*)(*func);
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.listbox.retrieveopt = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.listbox.button = scm2buttonid(l, value);
+		    } else if (!strcmp(value, "default")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.listbox.defopt = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "startline")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.listbox.startline = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "nlines")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.listbox.nlines = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "current")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.listbox.curopt = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "color-normal")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.listbox.normalcolor = s1;
+		    } else if (!strcmp(value, "color-reverse")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.listbox.reversecolor = s1;
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else if (!strcmp(value, "vslider")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_VSLIDER;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "size")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.vslider.xsize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.vslider.ysize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "flags")) {
+			int subk;
+			int subsubargs;
+
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+
+			subsubargs = luaL_getn(l, -1);
+			for (subk = 0; subk < subsubargs; ++subk) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_isstring(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    value = lua_tostring(l, -1);
+			    lua_pop(l, 1);
+	    
+			    if (!strcmp(value, "up")) {
+				item->d.vslider.cflags |= MI_CFLAGS_UP;
+			    } else if (!strcmp(value, "down")) {
+				item->d.vslider.cflags |= MI_CFLAGS_DOWN;
+			    } else if (!strcmp(value, "left")) {
+				item->d.vslider.cflags |= MI_CFLAGS_LEFT;
+			    } else if (!strcmp(value, "right")) {
+				item->d.vslider.cflags |= MI_CFLAGS_RIGHT;
+			    } else if (!strcmp(value, "knob")) {
+				item->d.vslider.cflags |= MI_CFLAGS_KNOB;
+			    } else if (!strcmp(value, "cont")) {
+				item->d.vslider.cflags |= MI_CFLAGS_CONT;
+			    } else {
+				lua_pushfstring(l, "Unknown flag: %s", value);
+				lua_error(l);
+			    }
+			}
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.vslider.action = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+			    }
+			} else {
+			    item->d.vslider.action = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "handler")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.vslider.handler = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.vslider.handler = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "default")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.vslider.defper = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "current")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.vslider.percent = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.vslider.style = scm2style(l, value);
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else if (!strcmp(value, "drawfunc")) {
+		if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_DRAWFUNC;
+
+		if (lua_isstring(l, j + 1)) {
+		    value = lua_tostring(l, j + 1);
+		    func = (void**)hash_find(MenuFuncHash, value);
+		    if (func != NULL) {
+			item->d.drawfunc.draw = (void*)*func;
+		    } else {
+			lua_pushfstring(l, "Can't find function: %s", value);
+			lua_error(l);
+		    }
+		} else {
+		    item->d.drawfunc.draw = NULL;
+		}
+	    } else if (!strcmp(value, "input")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_INPUT;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "size")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.input.xsize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.input.ysize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.input.action = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+			    }
+			} else {
+			    item->d.input.action = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.input.button = scm2buttonid(l, value);
+		    } else if (!strcmp(value, "maxch")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.input.maxch = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "color-normal")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.input.normalcolor = s1;
+		    } else if (!strcmp(value, "color-reverse")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.input.reversecolor = s1;
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else if (!strcmp(value, "gem")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_GEM;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "size")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.gem.xsize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.gem.ysize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "state")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			if (!strcmp(value, "unchecked")) {
+			    item->d.gem.state = MI_GSTATE_UNCHECKED;
+			} else if (!strcmp(value, "passive")) {
+			    item->d.gem.state = MI_GSTATE_PASSIVE;
+			} else if (!strcmp(value, "invisible")) {
+			    item->d.gem.state = MI_GSTATE_INVISIBLE;
+			} else if (!strcmp(value, "checked")) {
+			    item->d.gem.state = MI_GSTATE_CHECKED;
+			}
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.gem.action = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+			    }
+			} else {
+			    item->d.gem.action = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.gem.button = scm2buttonid(l, value);
+		    } else if (!strcmp(value, "text")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.gem.text = s1;
+		    } else if (!strcmp(value, "color-normal")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.gem.normalcolor = s1;
+		    } else if (!strcmp(value, "color-reverse")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			s1 = strdup(lua_tostring(l, -1));
+			lua_pop(l, 1);
+			item->d.gem.reversecolor = s1;
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else if (!strcmp(value, "hslider")) {
+		if (!lua_istable(l, j + 1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		item->mitype = MI_TYPE_HSLIDER;
+
+		subargs = luaL_getn(l, j + 1);
+		for (k = 0; k < subargs; ++k) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    value = lua_tostring(l, -1);
+		    lua_pop(l, 1);
+		    ++k;
+		    if (!strcmp(value, "size")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			lua_rawgeti(l, -1, 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.hslider.xsize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.hslider.ysize = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "flags")) {
+			int subk;
+			int subsubargs;
+
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_istable(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+
+			subsubargs = luaL_getn(l, -1);
+			for (subk = 0; subk < subsubargs; ++subk) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_isstring(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    value = lua_tostring(l, -1);
+			    lua_pop(l, 1);
+	    
+			    if (!strcmp(value, "up")) {
+				item->d.hslider.cflags |= MI_CFLAGS_UP;
+			    } else if (!strcmp(value, "down")) {
+				item->d.hslider.cflags |= MI_CFLAGS_DOWN;
+			    } else if (!strcmp(value, "left")) {
+				item->d.hslider.cflags |= MI_CFLAGS_LEFT;
+			    } else if (!strcmp(value, "right")) {
+				item->d.hslider.cflags |= MI_CFLAGS_RIGHT;
+			    } else if (!strcmp(value, "knob")) {
+				item->d.hslider.cflags |= MI_CFLAGS_KNOB;
+			    } else if (!strcmp(value, "cont")) {
+				item->d.hslider.cflags |= MI_CFLAGS_CONT;
+			    } else {
+				lua_pushfstring(l, "Unknown flag: %s", value);
+				lua_error(l);
+			    }
+			}
+		    } else if (!strcmp(value, "func")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.hslider.action = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.hslider.action = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "handler")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			if (lua_isstring(l, -1)) {
+			    value = lua_tostring(l, -1);
+			    func = (void**)hash_find(MenuFuncHash, value);
+			    if (func != NULL) {
+				item->d.hslider.handler = (void*)*func;
+			    } else {
+				lua_pushfstring(l, "Can't find function: %s", value);
+				lua_error(l);
+			    }
+			} else {
+			    item->d.hslider.handler = NULL;
+			}
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "default")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.hslider.defper = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "current")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isnumber(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			item->d.hslider.percent = lua_tonumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "style")) {
+			lua_rawgeti(l, j + 1, k + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			item->d.hslider.style = scm2style(l, value);
+		    } else {
+			lua_pushfstring(l, "Unsupported property: %s", value);
+			lua_error(l);
+		    }
+		}
+	    } else {
+		lua_pushfstring(l, "Unsupported tag: %s", value);
+		lua_error(l);
+	    }
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    if ((tmp = (Menu**)hash_find(MenuHash, name))) {
+	menu = *tmp;
+	if (menu->Items) {
+	    menu->Items = (Menuitem*)realloc(menu->Items, sizeof(Menuitem) * (menu->NumItems + 1));
+	} else {
+	    menu->Items = (Menuitem*)malloc(sizeof(Menuitem));
+	}
+	item->menu = menu;
+	memcpy(menu->Items + menu->NumItems, item, sizeof(Menuitem));
+	menu->NumItems++;
+    }
+    free(name);
+    free(item);
+
+
+    return 0;
+}
 #endif
 
 /**
@@ -4719,7 +5980,7 @@ global void UserInterfaceCclRegister(void)
 
 //    lua_register(Lua, "DefineButton", CclDefineButton);
 
-//    lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
+    lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
     lua_register(Lua, "DefineMenu", CclDefineMenu);
     lua_register(Lua, "DefineMenuGraphics", CclDefineMenuGraphics);
 
