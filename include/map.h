@@ -10,7 +10,7 @@
 //
 /**@name map.h		-	The map headerfile. */
 //
-//	(c) Copyright 1998-2001 by Vladi Shabanski and Lutz Sammer
+//	(c) Copyright 1998-2002 by Vladi Shabanski and Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -250,9 +250,6 @@ typedef struct _map_field_ {
 
 #ifndef NEW_FOW
 // 0 Unexplored, 1 Explored, 2 PartialVisible, 3 CompleteVisible
-#ifndef NEW_FOW2
-#define MapFieldVisible		0x0001	/// Field visible
-#endif
 #define MapFieldExplored	0x0002	/// Field explored
 #endif
 
@@ -310,9 +307,7 @@ typedef struct _world_map_ {
     unsigned		Height;		/// the map height
 
     MapField*		Fields;		/// fields on map
-#ifdef NEW_FOW2
     unsigned*		Visible[PlayerMax]; /// visible bit-field
-#endif
 
     unsigned char	NoFogOfWar;	/// fog of war disabled
 
@@ -564,20 +559,10 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define IsMapFieldExplored(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldExplored)
 
-#ifdef NEW_FOW2
-
     /// Check if a field for the user is visibile
 #define IsMapFieldVisible(x,y) \
     (TheMap.Visible[0][((y)*TheMap.Width+(x))/32] \
 	&(1<<(((y)*TheMap.Width+(x))%32)))
-
-#else
-
-    /// Check if a field for the user is visibile
-#define IsMapFieldVisible(x,y) \
-    (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldVisible)
-
-#endif
 
 #endif
 
