@@ -769,6 +769,10 @@ global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
 	command, unit->Slot, x, y, dest ? dest->Slot : -1,
 	type ? type->Ident : "-", status ? "flush" : "append");
 
+    //
+    //	FIXME: look if we can ignore this command.
+    //		Duplicate commands can be ignored.
+    //
     ncq = malloc(sizeof(NetworkCommandQueue));
     dl_insert_first(CommandsIn, ncq->List);
 
