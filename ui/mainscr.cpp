@@ -248,9 +248,11 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Only for owning player.
     //
-    if( unit->Player!=ThisPlayer && !DEBUG ) {
+#ifndef DEBUG
+    if( unit->Player!=ThisPlayer ) {
 	return;
     }
+#endif
 
     //
     //	Draw unit kills and experience.
