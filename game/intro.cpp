@@ -237,8 +237,9 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 		fprintf(stderr, "line too long: \"%s\"\n", s);
 		break;
 	    }
-	    if( space )
+	    if( space ) {
 		*space=' ';
+	    }
 	    space=s1;
 	    *space='\0';
 	}
@@ -304,8 +305,9 @@ local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
     ptr=lines;
 
     for( ; y<endy; ) {
-	if( !ptr )
+	if( !ptr ) {
 	    break;
+	}
 
 	if( y>=miny ) {
 	    VideoDrawTextClip(x,y,LargeFont,ptr->text);
@@ -315,8 +317,9 @@ local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
 	ptr=ptr->next;
     }
 
-    if( y<miny+24 )
+    if( y<miny+24 ) {
 	scrolling=0;
+    }
 
     PopClipping();
 
@@ -399,8 +402,7 @@ global void ShowIntro(const Intro *intro)
     for( i=0; i<MAX_OBJECTIVES; i++) {
 	if( intro->Objectives[i] ) {
 	    SplitTextIntoLines(intro->Objectives[i],260,&ObjectivesText[i]);
-	}
-	else {
+	} else {
 	    ObjectivesText[i]=NULL;
 	}
     }
@@ -461,8 +463,9 @@ global void ShowIntro(const Intro *intro)
 	Invalidate();
 	RealizeVideoMemory();
 
-	if( !IntroNoEvent )
+	if( !IntroNoEvent ) {
 	    break;
+	}
 	WaitEventsOneFrame(&callbacks);
 	if( c==0 ) {
 	    c=1;
@@ -475,8 +478,9 @@ global void ShowIntro(const Intro *intro)
 
     FreeTextLines(&ScrollingText);
     for( i=0; i<MAX_OBJECTIVES; i++ ) {
-	if( ObjectivesText[i] )
+	if( ObjectivesText[i] ) {
 	    FreeTextLines(&ObjectivesText[i]);
+	}
     }
 
     free(text);
@@ -584,16 +588,18 @@ global void ShowCredits(Credits *credits)
 	Invalidate();
 	RealizeVideoMemory();
 
-	if( !IntroNoEvent )
+	if( !IntroNoEvent ) {
 	    break;
+	}
 
 	WaitEventsOneFrame(&callbacks);
 
 	++line;
 
 	// Loop if we're done scrolling
-	if( !scrolling )
+	if( !scrolling ) {
 	    line=0;
+	}
     }
 
     if( ScrollingCredits ) {
@@ -764,11 +770,11 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 /**
 **	Draw a box with the text inside
 */
-local void DrawStatBox(int x,int y,char* text,unsigned color,float percent)
+local void DrawStatBox(int x,int y,char* text,unsigned color,int percent)
 {
     VideoFillRectangleClip(ColorBlack,x,y,80,24);
     VideoDrawRectangleClip(ColorYellow,x+1,y+1,78,22);
-    VideoFillRectangleClip(color,x+3,y+3,(int)(percent*74),18);
+    VideoFillRectangleClip(color,x+3,y+3,percent*74/100,18);
     VideoDrawTextCentered(x+40,y+5,LargeFont,text);
 }
 
@@ -791,22 +797,24 @@ local int GameStatsDrawFunc(int frame)
     int TopOffset;
     int BottomOffset;
     int DescriptionOffset;
-    float percent;
-    float max;
+    int percent;
+    int max;
 
-    percent=1.0;
+    percent=100;
     done=0;
 
-    if( (frame%StatsPause)!=0 )
+    if( (frame%StatsPause)!=0 ) {
 	return done;
+    }
 
     x=TheUI.Offset640X;
     y=TheUI.Offset480Y;
     dodraw=frame/StatsPause;
 
     for( i=0,c=0; i<PlayerMax; i++) {
-	if(Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer)
+	if(Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer) {
 	    c++;
+	}
     }
     if( c<=4 ) {
 	NamesFont=SmallTitleFont;
@@ -829,10 +837,11 @@ local int GameStatsDrawFunc(int frame)
 	char* Outcome;
 
 	VideoDrawTextCentered(x+106,y+TopOffset,LargeFont,"Outcome");
-	if( GameResult==GameVictory )
+	if( GameResult==GameVictory ) {
 	    Outcome="Victory!";
-	else
+	} else {
 	    Outcome="Defeat!";
+	}
 	VideoDrawTextCentered(x+106,y+TopOffset+21,LargeTitleFont,Outcome);
     }
 
@@ -859,10 +868,11 @@ local int GameStatsDrawFunc(int frame)
 	    230000, 255000, 280000, -1
 	};
 
-	if( ThisPlayer->Race==PlayerRaceHuman )
+	if( ThisPlayer->Race==PlayerRaceHuman ) {
 	    Ranks=HumanRanks;
-	else
+	} else {
 	    Ranks=OrcRanks;
+	}
 
 	Rank = NULL;
 	for( i=0; i<sizeof(RankScores); i++ ) {
@@ -871,8 +881,9 @@ local int GameStatsDrawFunc(int frame)
 		break;
 	    }
 	}
-	if( !Rank )
+	if( !Rank ) {
 	    Rank="No Rank";
+	}
 
 	VideoDrawTextCentered(x+324,y+TopOffset,LargeFont,"Rank");
 	VideoDrawTextCentered(x+324,y+TopOffset+21,SmallTitleFont,Rank);
@@ -888,20 +899,23 @@ local int GameStatsDrawFunc(int frame)
 	max=Players[0].TotalUnits;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
-	    if( p->TotalUnits>max )
+	    }
+	    if( p->TotalUnits>max ) {
 		max=p->TotalUnits;
+	    }
 	}
-	if( (int)max==0 )
-	    max=1.0;
+	if( max==0 ) {
+	    max=1;
+	}
 
 	sprintf(buf,"%s - You",ThisPlayer->Name);
 	VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26,
 	                      NamesFont,buf);
 	VideoDrawTextCentered(x+50,y+BottomOffset,LargeFont,"Units");
 	sprintf(buf,"%u",ThisPlayer->TotalUnits);
-	percent=ThisPlayer->TotalUnits/max;
+	percent=ThisPlayer->TotalUnits*100/max;
 	DrawStatBox(x+10,y+BottomOffset+DescriptionOffset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
@@ -918,7 +932,7 @@ local int GameStatsDrawFunc(int frame)
 	    VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26+LineSpacing*c,
 	                          NamesFont,buf);
 	    sprintf(buf,"%u",p->TotalUnits);
-	    percent=p->TotalUnits/max;
+	    percent=p->TotalUnits*100/max;
 	    DrawStatBox(x+10,y+BottomOffset+DescriptionOffset+LineSpacing*c,
 	                buf,p->Color,percent);
 	    c++;
@@ -929,17 +943,20 @@ local int GameStatsDrawFunc(int frame)
 	max=Players[0].TotalBuildings;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
-	    if( p->TotalBuildings>max )
+	    }
+	    if( p->TotalBuildings>max ) {
 		max=p->TotalBuildings;
+	    }
 	}
-	if( (int)max==0 )
-	    max=1.0;
+	if( max==0 ) {
+	    max=1;
+	}
 
 	VideoDrawTextCentered(x+140,y+BottomOffset,LargeFont,"Buildings");
 	sprintf(buf,"%u",ThisPlayer->TotalBuildings);
-	percent=ThisPlayer->TotalBuildings/max;
+	percent=ThisPlayer->TotalBuildings*100/max;
 	DrawStatBox(x+100,y+BottomOffset+DescriptionOffset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
@@ -949,7 +966,7 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalBuildings);
-	    percent=p->TotalBuildings/max;
+	    percent=p->TotalBuildings*100/max;
 	    DrawStatBox(x+100,y+BottomOffset+DescriptionOffset+LineSpacing*c,
 	                buf,p->Color,percent);
 	    c++;
@@ -960,17 +977,20 @@ local int GameStatsDrawFunc(int frame)
 	max=Players[0].TotalResources[GoldCost];
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
-	    if( p->TotalResources[GoldCost]>max )
+	    }
+	    if( p->TotalResources[GoldCost]>max ) {
 		max=p->TotalResources[GoldCost];
+	    }
 	}
-	if( (int)max==0 )
-	    max=1.0;
+	if( max==0 ) {
+	    max=1;
+	}
 
 	VideoDrawTextCentered(x+230,y+BottomOffset,LargeFont,"Gold");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[GoldCost]);
-	percent=ThisPlayer->TotalResources[GoldCost]/max;
+	percent=ThisPlayer->TotalResources[GoldCost]*100/max;
 	DrawStatBox(x+190,y+BottomOffset+DescriptionOffset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
@@ -980,7 +1000,7 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
             sprintf(buf,"%u",p->TotalResources[GoldCost]);
-	    percent=p->TotalResources[GoldCost]/max;
+	    percent=p->TotalResources[GoldCost]*100/max;
 	    DrawStatBox(x+190,y+BottomOffset+DescriptionOffset+LineSpacing*c,
 	                buf,p->Color,percent);
 	    c++;
@@ -991,17 +1011,20 @@ local int GameStatsDrawFunc(int frame)
 	max=Players[0].TotalResources[WoodCost];
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
-	    if( p->TotalResources[WoodCost]>max )
+	    }
+	    if( p->TotalResources[WoodCost]>max ) {
 		max=p->TotalResources[WoodCost];
+	    }
 	}
-	if( (int)max==0 )
-	    max=1.0;
+	if( max==0 ) {
+	    max=1;
+	}
 
 	VideoDrawTextCentered(x+320,y+BottomOffset,LargeFont,"Lumber");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[WoodCost]);
-	percent=ThisPlayer->TotalResources[WoodCost]/max;
+	percent=ThisPlayer->TotalResources[WoodCost]*100/max;
 	DrawStatBox(x+280,y+BottomOffset+DescriptionOffset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
@@ -1011,7 +1034,7 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
             sprintf(buf,"%u",p->TotalResources[WoodCost]);
-	    percent=p->TotalResources[WoodCost]/max;
+	    percent=p->TotalResources[WoodCost]*100/max;
 	    DrawStatBox(x+280,y+BottomOffset+DescriptionOffset+LineSpacing*c,
 	                buf,p->Color,percent);
 	    c++;
@@ -1022,17 +1045,20 @@ local int GameStatsDrawFunc(int frame)
 	max=Players[0].TotalResources[OilCost];
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
-	    if( p->TotalResources[OilCost]>max )
+	    }
+	    if( p->TotalResources[OilCost]>max ) {
 		max=p->TotalResources[OilCost];
+	    }
 	}
-	if( (int)max==0 )
-	    max=1.0;
+	if( max==0 ) {
+	    max=1;
+	}
 
 	VideoDrawTextCentered(x+410,y+BottomOffset,LargeFont,"Oil");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[OilCost]);
-	percent=ThisPlayer->TotalResources[OilCost]/max;
+	percent=ThisPlayer->TotalResources[OilCost]*100/max;
 	DrawStatBox(x+370,y+BottomOffset+DescriptionOffset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
@@ -1042,7 +1068,7 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalResources[OilCost]);
-	    percent=p->TotalResources[OilCost]/max;
+	    percent=p->TotalResources[OilCost]*100/max;
 	    DrawStatBox(x+370,y+BottomOffset+DescriptionOffset+LineSpacing*c,
 	                buf,p->Color,percent);
 	    c++;
@@ -1053,16 +1079,19 @@ local int GameStatsDrawFunc(int frame)
 	max=Players[0].TotalKills;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
-	    if( p->TotalKills>max )
+	    }
+	    if( p->TotalKills>max ) {
 		max=p->TotalKills;
+	    }
 	}
-	if( (int)max==0 )
-	    max=1.0;
+	if( max==0 ) {
+	    max=1;
+	}
 
 	VideoDrawTextCentered(x+500,y+BottomOffset,LargeFont,"Kills");
-	percent=ThisPlayer->TotalKills/max;
+	percent=ThisPlayer->TotalKills*100/max;
 	sprintf(buf,"%u",ThisPlayer->TotalKills);
 	DrawStatBox(x+460,y+BottomOffset+DescriptionOffset,buf,
 	            ThisPlayer->Color,percent);
@@ -1073,7 +1102,7 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalKills);
-	    percent=p->TotalKills/max;
+	    percent=p->TotalKills*100/max;
 	    DrawStatBox(x+460,y+BottomOffset+DescriptionOffset+LineSpacing*c,
 	                buf,p->Color,percent);
 	    c++;
@@ -1084,17 +1113,20 @@ local int GameStatsDrawFunc(int frame)
 	max=Players[0].TotalRazings;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
-	    if( p->TotalRazings>max )
+	    }
+	    if( p->TotalRazings>max ) {
 		max=p->TotalRazings;
+	    }
 	}
-	if( (int)max==0 )
-	    max=1.0;
+	if( max==0 ) {
+	    max=1;
+	}
 
 	VideoDrawTextCentered(x+590,y+BottomOffset,LargeFont,"Razings");
 	sprintf(buf,"%u",ThisPlayer->TotalRazings);
-	percent=ThisPlayer->TotalRazings/max;
+	percent=ThisPlayer->TotalRazings*100/max;
 	DrawStatBox(x+550,y+BottomOffset+DescriptionOffset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
@@ -1104,7 +1136,7 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalRazings);
-	    percent=p->TotalRazings/max;
+	    percent=p->TotalRazings*100/max;
 	    DrawStatBox(x+550,y+BottomOffset+DescriptionOffset+LineSpacing*c,
 	                buf,p->Color,percent);
 	    c++;
@@ -1170,8 +1202,9 @@ global void ShowStats(void)
 	Invalidate();
 	RealizeVideoMemory();
 
-	if( !IntroNoEvent )
+	if( !IntroNoEvent ) {
 	    break;
+	}
 
 	WaitEventsOneFrame(&callbacks);
 	frame++;
