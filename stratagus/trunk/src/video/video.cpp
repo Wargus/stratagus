@@ -126,8 +126,15 @@ extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
 --  Variables
 ----------------------------------------------------------------------------*/
 
+global int VideoWidth;                      /// Window width in pixels
+global int VideoHeight;                     /// Window height in pixels
+
 global char VideoFullScreen;            /// true fullscreen wanted
 global char VideoForceFullScreen;       /// fullscreen set from commandline
+
+global unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
+global unsigned long FrameCounter;          /// Current frame number
+global int SlowFrameCounter;                /// Profile, frames out of sync
 
 global int ColorCycleAll;               /// Flag Color Cycle with all palettes
 
