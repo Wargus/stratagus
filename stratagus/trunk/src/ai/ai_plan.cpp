@@ -244,7 +244,7 @@ local int AiFindTarget(const Unit* unit,unsigned char* matrix,
     unsigned char* m;
 
     size=TheMap.Width*TheMap.Height/2;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 
     x=unit->X;
     y=unit->Y;
@@ -299,6 +299,7 @@ local int AiFindTarget(const Unit* unit,unsigned char* matrix,
 			*dx=x;
 			*dy=y;
 			*ds=state;
+			free(points);
 			return 1;
 		    }
 
@@ -358,6 +359,7 @@ local int AiFindTarget(const Unit* unit,unsigned char* matrix,
 	}
 	ep=wp;
     }
+    free(points);
     return 0;
 }
 
@@ -411,7 +413,7 @@ global int AiFindWall(AiForce* force)
     x=unit->X;
     y=unit->Y;
     size=TheMap.Width*TheMap.Height/4;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 
     destx=-1;
     desty=-1;
@@ -477,6 +479,7 @@ global int AiFindWall(AiForce* force)
 	}
 	ep=wp;
     }
+    free(points);
 
     if( destx!=-1 ) {
 	force->State=0;

@@ -372,7 +372,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
     destx=x=worker->X;
     desty=y=worker->Y;
     size=TheMap.Width*TheMap.Height/4;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 
     //
     //	Make movement matrix. FIXME: can create smaller matrix.
@@ -453,6 +453,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 		    if( j==nunits ) {
 			if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,0) ) {
 			    free(morg);
+			    free(points);
 			    return 1;
 			}
 		    }
@@ -484,6 +485,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
     }
 
     free(morg);
+    free(points);
     return 0;
 }
 
@@ -526,7 +528,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
     x=worker->X;
     y=worker->Y;
     size=TheMap.Width*TheMap.Height/4;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 
     //
     //	Make movement matrix.
@@ -564,6 +566,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 		if ( ForestOnMap(x,y) ) {
 		    if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,0) ) {
 			free(morg);
+			free(points);
 			return 1;
 		    }
 		}
@@ -595,6 +598,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
     }
 
     free(morg);
+    free(points);
     return 0;
 }
 
