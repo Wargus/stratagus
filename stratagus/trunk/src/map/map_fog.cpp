@@ -1403,7 +1403,7 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
     gp=sp+TileSizeY*TileSizeX;
     dp=VideoMemory32+x+y*VideoWidth;
     da=VideoWidth;
-    lasti=0;
+    lastrgb=lasti=0;
 
     while( sp<gp ) {
 #undef FOG_SCALE
@@ -1473,7 +1473,7 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
     dp=VideoMemory32+x+y*VideoWidth;
     gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
-    lasti = 0;
+    lastrgb=lasti=0;
 
     while( dp<gp ) {
 
