@@ -290,6 +290,7 @@
 **
 **	Unit::Data
 **
+**		FIXME: continue documentation
 **
 **	Unit::Goal
 **
@@ -302,6 +303,10 @@
 **		Map tile position of the goal of the current command. only used
 **		for debugging the new orders, will be removed in release 1.18.
 **		The pathfinder must be trigger, if the goal changes.
+**
+**	Unit::Retreating
+**
+**		FIXME: continue documentation
 **
 */
 
@@ -546,11 +551,11 @@ struct _unit_ {
 
 #ifdef HIERARCHIC_PATHFINDER
 
-#define UNIT_CLEAN		0
-#define UNIT_RETREATING		1
-#define UNIT_WINNING		2
-	unsigned	Retreating:2;
-#endif /* HIERARCHIC_PATHFINDER */
+#define UNIT_CLEAN		0	/// FIXME: comment missing
+#define UNIT_RETREATING		1	/// FIXME: comment missing
+#define UNIT_WINNING		2	/// FIXME: comment missing
+    unsigned	Retreating:2;		/// FIXME: comment what is this?
+#endif	// HIERARCHIC_PATHFINDER
 };
 
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
