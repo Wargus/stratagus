@@ -1646,10 +1646,12 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 */
 static void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 {
+#ifndef USE_OPENGL
 	SDL_SetColors(sprite->Surface, unit->Colors->Colors, 208, 4);
 	if (sprite->SurfaceFlip) {
 		SDL_SetColors(sprite->SurfaceFlip, unit->Colors->Colors, 208, 4);
 	}
+#endif
 }
 
 #ifdef USE_OPENGL
@@ -1664,7 +1666,7 @@ static void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 **  @param x         X position.
 **  @param y         Y position.
 */
-static void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
+void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
 	int player, int frame, int x, int y)
 {
 	int f;
