@@ -468,9 +468,11 @@ global void ColorCycle32(void)
 */
 global void VideoSetPalette(const VMemType* palette)
 {
+#if 0	// ARI: FIXME: This ruins menu palettes, when loaded via default.cm (introduce refcnt?)
     if( Pixels ) {
 	free(Pixels);
     }
+#endif
     Pixels=(VMemType*)palette;
     SetPlayersPalette();
 }
