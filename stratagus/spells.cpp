@@ -49,6 +49,7 @@
 
 #include "spells.h"
 #include "sound.h"
+#include "sound_id.h"
 #include "missile.h"
 #include "map.h"
 #include "ui.h"
@@ -476,14 +477,10 @@ global void InitSpells(void)
     int z;
 
     for( z=0; SpellTypeTable[z].Ident; ++z ) {
-#ifdef WITH_SOUND			// FIXME: no ifdef orgie
 	SpellTypeTable[z].Casted.Sound =
 		SoundIdForName(SpellTypeTable[z].Casted.Name);
-#else
-	SpellTypeTable[z].Casted.Sound = NULL;
-#endif
 
-	if (SpellTypeTable[z].Casted.Sound == NULL) {
+	if (!SpellTypeTable[z].Casted.Sound) {
 	    DebugLevel0Fn("cannot get SoundId for `%s'\n" _C_
 			  SpellTypeTable[z].Casted.Name);
 	}
