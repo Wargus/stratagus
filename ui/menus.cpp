@@ -391,8 +391,9 @@ local void MultiMetaServerGameSetupInit(Menuitem *mi); // init callback
 local void MultiMetaServerGameSetupExit(Menuitem *mi); // exit callback
 local void SelectGameServer(Menuitem *mi); // Game Server selection so that client joins the game
 local void AddGameServer(void); //Add Game Server on Meta server
+local void ChangeGameServer(void); //Change Game Parameters on Meta server
 local int MetaServerConnectError(void); // Display error message
-
+local void MultiMetaServerClose(void);
 //others
 local void GameMenuReturn(void);
 local void NetErrorMenu(char *error);
@@ -782,8 +783,9 @@ global void InitMenuFuncHash(void) {
 // Metaserver
     HASHADD(ShowMetaServerList,"metaserver-list");
     HASHADD(MultiMetaServerGameSetupInit,"metaserver-list-init");
-    HASHADD(MultiMetaServerGameSetupExit,"menu-metaserver-exit");
+    HASHADD(MultiMetaServerGameSetupExit,"metaserver-list-exit");
     HASHADD(SelectGameServer,"select-game-server");
+    HASHADD(MultiMetaServerClose,"menu-internet-end-menu");
 }
 
 /*----------------------------------------------------------------------------
@@ -3273,12 +3275,12 @@ local void MultiPlayerLANGame(void)
 */
 local void MultiPlayerInternetGame(void)
 {
-    // Connect to Meta Server
+    //Connect to Meta Server
     if (MetaInit() == -1 ) {
 	MetaServerInUse = 0;
 	MetaServerConnectError();
 	return;
-    }
+	}
     MetaServerInUse = 1;
     ProcessMenu("menu-internet-create-join-menu", 1);
     if (GuiGameStarted) {
@@ -4425,6 +4427,7 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
 	    NetworkServerResyncClients();
 	}
     }
+
 }
 
 /**
@@ -4678,6 +4681,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	// disable start game button
 	menu->Items[3].flags = MenuButtonDisabled;
     }
+
+    if (MetaServerInUse){
+	ChangeGameServer();
+    }
 }
 
 /**
@@ -4800,6 +4807,11 @@ local void MultiGameSetupInit(Menuitem *mi)
     }
     MultiGamePlayerSelectorsUpdate(1);
     DebugLevel3Fn("h = %d, NetPlayers = %d\n" _C_ h _C_ NetPlayers);
+
+    if (MetaServerInUse){
+	ChangeGameServer();
+    }
+
 }
 
 /**
@@ -7267,6 +7279,7 @@ local void MultiGameMasterReport(void)
 */
 local void ShowMetaServerList(void)
 {
+    EndMenu();
     Invalidate();
     VideoLockScreen();
     MenusSetBackground();
@@ -7297,6 +7310,8 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     char* parameter;
     char* reply;
     Menu* menu;
+    char* port;
+	
 
     SendMetaCommand("NumberOfGames","");
     menu = FindMenu("metaserver-list");
@@ -7317,7 +7332,7 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	
     i = 1;
     k = 0;
-    numparams = 4; //TODO: To be changed if more params are sent
+    numparams = 5; //TODO: To be changed if more params are sent
 
     //Retrieve list of online game from the meta server
     for (j = 4; j <= nummenus * (numparams + 1); j += numparams + 1) { // loop over the number of items in the menu
@@ -7326,24 +7341,27 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 
 	SendMetaCommand("GameNumber","%d\n",k + 1); 
 	i=RecvMetaReply(&reply);
-		
-
 	if (i == 0) {
 	    // fill the menus with the right info.
-
-	    menu->Items[j].d.text.text = "Nick"; 
-	    menu->Items[j + 1].d.text.text = "IP";
-	    menu->Items[j + 2].d.text.text = "OS";
-	    menu->Items[j + 3].d.text.text = "Engine Version";
+	    menu->Items[j].d.text.text = NULL; 
+	    menu->Items[j + 1].d.text.text = NULL;
+	    menu->Items[j + 2].d.text.text = NULL;
+	    menu->Items[j + 3].d.text.text = NULL;
 	} else {
-	    GetMetaParameter(reply, 0, &parameter);  ////TODO: use this function.
+	    GetMetaParameter(reply, 0, &parameter);  // Player Name
 	    menu->Items[j].d.text.text = parameter;
-	    GetMetaParameter(reply, 1, &parameter);
+	   
+	    GetMetaParameter(reply, 3, &parameter);   // IP
+	    GetMetaParameter(reply, 4, &port);		  // port	
+	    sprintf(parameter, "%s:%s", parameter, port); // IP:Port
+	    strcat(parameter, "~!_"); // ok
 	    menu->Items[j + 1].d.text.text = parameter;
-	    GetMetaParameter(reply, 2, &parameter);
+	    GetMetaParameter(reply, 6, &parameter);
 	    menu->Items[j + 2].d.text.text = parameter;
-	    GetMetaParameter(reply, 3, &parameter);
+	    GetMetaParameter(reply, 7, &parameter);
 	    menu->Items[j + 3].d.text.text = parameter;
+	    GetMetaParameter(reply, 8, &parameter);
+	    menu->Items[j + 4].d.text.text = parameter;
 	}
 	++k;
     }
@@ -7355,12 +7373,12 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 local void MultiMetaServerGameSetupExit(Menuitem *mi)
 {
 	//TODO: how to free stuff?
-	
+    //EndMenu();	
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
-    EndMenu();
+    //EndMenu();
 }
 
 /**
@@ -7381,7 +7399,7 @@ local void SelectGameServer(Menuitem *mi)
     Invalidate();
     EndMenu();
 
-    strcpy(server_host_buffer,mi->menu->Items[j-3].d.text.text);
+    strcpy(server_host_buffer,mi->menu->Items[j-4].d.text.text);
 
 
     //Launch join directly
@@ -7432,7 +7450,31 @@ local void AddGameServer(void)
     //send message to meta server. meta server will detect IP address.
     //Meta-server will return "BUSY" if the list of online games is busy.
 
-    SendMetaCommand("AddGame","%s\n%s\n%s\n%s\n%s\n%s\n","IP","Port","Name","Map","Players","Free");
+    SendMetaCommand("AddGame","%s\n%d\n%s\n%s\n%s\n%s\n","IP",NetworkPort,"Name","Map","Players","Free");
+
+    // FIXME: Get Reply from Queue
+
+}
+
+/**
+**	Action to add a game server on the meta-server.
+*/
+local void ChangeGameServer(void)
+{
+    //send message to meta server. meta server will detect IP address.
+    //Meta-server will return "ERR" if the list of online games is busy.
+    int i,freespots,players; 
+    freespots=0;
+    players=0;
+    for (i = 0; i < PlayerMax - 1; ++i) {
+	if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
+	    ++players;
+	}
+	if (ServerSetupState.CompOpt[i] == 0) {
+	    ++freespots;
+	}
+    }
+    SendMetaCommand("ChangeGame","%s\n%s\n%d\n%d\n","Name",ScenSelectFileName,players,freespots-1);
 
     // FIXME: Get Reply from Queue
 
@@ -7448,5 +7490,16 @@ local int MetaServerConnectError(void)
     VideoUnlockScreen();
     return 0;
 
+}
+/**
+**  Close MetaServer connection
+*/
+
+local void MultiMetaServerClose(void)
+{
+    
+    MetaClose();
+    MetaServerInUse=0;
+    EndMenu();
 }
 //@}
