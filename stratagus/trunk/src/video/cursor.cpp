@@ -4,13 +4,14 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________			     ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cursor.c	-	The cursors. */
+/**@name cursor.c - The cursors. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer and Nehal Mistry
+//      (c) Copyright 1998,2000-2004 by Lutz Sammer, Nehal Mistry,
+//                                      and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -309,17 +310,19 @@ global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
 	sp = buffer;
 	memcpy(&((unsigned char*)TheScreen->pixels)
 		[x * bpp + y * TheScreen->pitch], sp, w * bpp);
-	sp += w * bpp;
-	memcpy(&((unsigned char*)TheScreen->pixels)
-		[x * bpp + (y + h) * TheScreen->pitch], sp, w * bpp);
-	sp += w * bpp;
-	for (i = 1; i < h; ++i) {
+	if (--h) {
+		sp += w * bpp;
 		memcpy(&((unsigned char*)TheScreen->pixels)
-			[x * bpp + (y + i) * TheScreen->pitch], sp, bpp);
-		memcpy(&((unsigned char*)TheScreen->pixels)
-			[(x + w - 1) * bpp + (y + i) * TheScreen->pitch],
-				sp + bpp, bpp);
-		sp += bpp * 2;
+			[x * bpp + (y + h) * TheScreen->pitch], sp, w * bpp);
+		sp += w * bpp;
+		for (i = 1; i < h; ++i) {
+			memcpy(&((unsigned char*)TheScreen->pixels)
+				[x * bpp + (y + i) * TheScreen->pitch], sp, bpp);
+			memcpy(&((unsigned char*)TheScreen->pixels)
+				[(x + w - 1) * bpp + (y + i) * TheScreen->pitch],
+					sp + bpp, bpp);
+			sp += bpp * 2;
+		}
 	}
 
 	VideoUnlockScreen();
@@ -338,16 +341,18 @@ global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
 	dp = buffer;
 	memcpy(dp, &((unsigned char*)TheScreen->pixels)
 		[x * bpp + y * TheScreen->pitch], w * bpp);
-	dp += w * bpp;
-	memcpy(dp, &((unsigned char*)TheScreen->pixels)
-		[x * bpp + (y + h) * TheScreen->pitch], w * bpp);
-	dp += w * bpp;
-	for (i = 1; i < h; ++i) {
+	if (--h) {
+		dp += w * bpp;
 		memcpy(dp, &((unsigned char*)TheScreen->pixels)
-			[x * bpp + (y + i) * TheScreen->pitch], bpp);
-		memcpy(dp + bpp, &((unsigned char*)TheScreen->pixels)
-			[(x + w - 1) * bpp + (y + i) * TheScreen->pitch], bpp);
-		dp += bpp * 2;
+			[x * bpp + (y + h) * TheScreen->pitch], w * bpp);
+		dp += w * bpp;
+		for (i = 1; i < h; ++i) {
+			memcpy(dp, &((unsigned char*)TheScreen->pixels)
+				[x * bpp + (y + i) * TheScreen->pitch], bpp);
+			memcpy(dp + bpp, &((unsigned char*)TheScreen->pixels)
+				[(x + w - 1) * bpp + (y + i) * TheScreen->pitch], bpp);
+			dp += bpp * 2;
+		}
 	}
 
 	VideoUnlockScreen();
