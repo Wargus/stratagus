@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name missile.h	-	The missile headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __MISSILE_H__
 #define __MISSILE_H__
@@ -58,7 +57,7 @@ struct _missile_type_ {
 //  SoundConfig FiredSound;		/// fired sound (FIXME: must write this)
     SoundConfig	ImpactSound;		/// impact sound for this missile type
 
-    int		Class;			/// missile class 
+    int		Class;			/// missile class
     int		Speed;			/// missile speed
 
     char*	ImpactName;		/// Impact missile type name
@@ -92,16 +91,16 @@ typedef struct _missile_ {
     int		Wait;			/// delay
 
     Unit*	SourceUnit;		/// unit that fires (could be killed)
-    Unit* 	TargetUnit;             /// target unit, used for spells
+    Unit*	TargetUnit;             /// target unit, used for spells
 
-    int 	Damage;                 /// direct damage that missile applies
-    
+    int		Damage;                 /// direct damage that missile applies
+
     int		D;			/// for point to point missiles
     int		Dx;			/// delta x
     int		Dy;			/// delta y
     int		Xstep;			/// X step
     int		Ystep;			/// Y step
-    
+
     int TTL;				/// time to live (ticks) used for spells
     int (*Controller)( void* this_missile );    /// used to controll spells
 } Missile;
@@ -119,7 +118,7 @@ extern MissileType* MissileTypeGreenCross;	/// Green cross missile type
 --	Functions
 ----------------------------------------------------------------------------*/
 
-    /// load the graphics for the missiles 
+    /// load the graphics for the missiles
 extern void LoadMissileSprites(void);
     /// Get missile type by ident.
 extern MissileType* MissileTypeByIdent(const char*);

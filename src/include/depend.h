@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name depend.h	-	The units/upgrade dependencies headerfile. */
-/*
-**	(c) Copyright 2000 by Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 #ifndef __DEPEND_H__
 #define __DEPEND_H__
@@ -47,7 +46,7 @@ struct _depend_rule_ {
     union {
 	UnitType* UnitType;		/// unit type pointer
 	int	  Upgrade;		/// upgrade number
-    } 			Kind;		/// required object
+    }			Kind;		/// required object
     DependRule*		Rule;		/// next and/or rule
 };
 
