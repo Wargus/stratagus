@@ -611,7 +611,7 @@ local QuadTree* PositionCache;		/// My quad tree for lookup
 */
 global void UnitCacheInsert(Unit* unit)
 {
-    DebugLevel3Fn("Insert UNIT %8p %08ZX\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("Insert UNIT %8p %08X\n",unit,UnitNumber(unit));
     QuadTreeInsert(PositionCache,unit);
 }
 
@@ -622,7 +622,7 @@ global void UnitCacheInsert(Unit* unit)
 */
 global void UnitCacheRemove(Unit* unit)
 {
-    DebugLevel3Fn("Remove UNIT %8p %08ZX\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("Remove UNIT %8p %08X\n",unit,UnitNumber(unit));
     QuadTreeDelete(PositionCache,unit);
 }
 
@@ -718,7 +718,7 @@ global Unit* UnitCacheOnXY(int x,int y,int type)
 	IfDebug(
 	    // FIXME: the error isn't here!
 	    if( !leaf->Value->Type ) {
-		DebugLevel0("Error UNIT %8p %08ZX %d,%d\n",leaf->Value
+		DebugLevel0("Error UNIT %8p %08X %d,%d\n",leaf->Value
 			,UnitNumber(leaf->Value),leaf->Value->X,leaf->Value->Y);
 		DebugLevel0("Removed unit in cache %d,%d!!!!\n",x,y);
 		leaf=leaf->Next;
