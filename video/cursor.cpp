@@ -42,7 +42,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef NEW_VIDEO_REAL
+#ifdef NEW_VIDEO
 
 /**
 **	Define cursor-types.
@@ -50,8 +50,19 @@
 **	FIXME: Should move this to ui part.
 */
 global CursorType Cursors[CursorMax] = {
-   { "human",	"cursor-point",	"human gauntlet.png",	3, 2,	28,32 },
-   { "orc",	"cursor-point",	"orcish claw.png",	3, 2,	26,32 },
+#ifdef NEW_NAMES
+    { "human",	"cursor-point",
+	"human/cursors/human gauntlet.png",	 3, 2,	28,32 },
+    { "orc",	"cursor-point",
+	"orc/cursors/orcish claw.png",		 3, 2,	26,32 },
+#else
+    { "human",	"cursor-point",
+	"human gauntlet.png",			 3, 2,	28,32 },
+    { "orc",	"cursor-point",
+	"orcish claw.png",			 3, 2,	26,32 },
+    { "any",	"cursor-glass",
+	"magnifying glass.png",			11,11,	34,35 },
+#endif
 };
 
 #else
@@ -616,7 +627,28 @@ global int HideAnyCursor(void)
 */
 global void InitCursor(void)
 {
-    // FIXME: Must add the depth functions to pointers.
+    switch( VideoDepth ) {
+	case 8:
+	    SaveCursorBackground=SaveCursorBackground8;
+	    LoadCursorBackground=LoadCursorBackground8;
+	    break;
+	case 15:
+	case 16:
+	    SaveCursorBackground=SaveCursorBackground16;
+	    LoadCursorBackground=LoadCursorBackground16;
+	    break;
+	case 24:
+	    SaveCursorBackground=SaveCursorBackground24;
+	    LoadCursorBackground=LoadCursorBackground24;
+	    // FIXME: real 24bpp break;
+	case 32:
+	    SaveCursorBackground=SaveCursorBackground32;
+	    LoadCursorBackground=LoadCursorBackground32;
+	    break;
+	default:
+	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
+	    abort();
+    }
 }
 
 //@}

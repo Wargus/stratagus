@@ -528,8 +528,10 @@ global void DrawMinimapCursor(int vx,int vy)
 	case 16:
 	    i=(w+1+h)*2*sizeof(VMemType16);
 	    break;
-	default:
 	case 24:
+	    i=(w+1+h)*2*sizeof(VMemType24);
+	    // FIXME: real 24bpp
+	default:
 	case 32:
 	    i=(w+1+h)*2*sizeof(VMemType32);
 	    break;
