@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unit_draw.c	-	The draw routines for units. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -59,7 +58,7 @@ global int ShowHealthHorizontal=1;
     /// Flag: health horizontal instead of vertical
 global int ShowManaHorizontal=1;
     /// Flag: show bars and dot energy only for selected
-global int ShowEnergySelectedOnly; 
+global int ShowEnergySelectedOnly;
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
@@ -74,7 +73,7 @@ local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
 	,int x,int y);
 
 /**
-**	Show that units are selection.
+**	Show that units are selected.
 **
 **	@param unit	Pointer to the unit.
 **	@param type	Type of the unit.
@@ -335,7 +334,8 @@ global void LoadDecorations(void)
 		,ManaSprite.Width,ManaSprite.Height);
     ShadowSprite.Sprite=LoadSprite(ShadowSprite.File
 		,ShadowSprite.Width,ShadowSprite.Height);
-    SpellSprites=LoadSprite("graphic/bloodlust,haste,slow,invis.,shield.png",16,16);		
+    // FIXME: make this configurable
+    SpellSprites=LoadSprite("graphic/bloodlust,haste,slow,invis.,shield.png",16,16);
 }
 
 /**
@@ -522,17 +522,22 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     //
     // Draw spells decoration
     //
-    if ( unit->Bloodlust > 0 )
-      VideoDrawClip( SpellSprites, 0, x, y );
-    if ( unit->Haste > 0 ) // same slot as slow
-      VideoDrawClip( SpellSprites, 1, x+16, y );
-    if ( unit->Slow > 0 ) // same slot as haste
-      VideoDrawClip( SpellSprites, 2, x+16, y );
-    if ( unit->Invisible > 0 )
-      VideoDrawClip( SpellSprites, 3, x+16+16, y );
-    if ( unit->UnholyArmor > 0 )
-      VideoDrawClip( SpellSprites, 4, x+16+16+16, y );
-    
+    if ( unit->Bloodlust > 0 ) {
+	VideoDrawClip( SpellSprites, 0, x, y );
+    }
+    if ( unit->Haste > 0 ) { // same slot as slow
+	VideoDrawClip( SpellSprites, 1, x+16, y );
+    }
+    if ( unit->Slow > 0 ) { // same slot as haste
+	VideoDrawClip( SpellSprites, 2, x+16, y );
+    }
+    if ( unit->Invisible > 0 ) {
+	VideoDrawClip( SpellSprites, 3, x+16+16, y );
+    }
+    if ( unit->UnholyArmor > 0 ) {
+	VideoDrawClip( SpellSprites, 4, x+16+16+16, y );
+    }
+
     // FIXME: group number could also be shown
 }
 
@@ -896,7 +901,11 @@ local void DrawBuilding(Unit* unit)
     //
     //	Buildings under construction/upgrade/ready.
     //
+#ifdef NEW_ORDERS
+    if( unit->Orders[0].Action==UnitActionBuilded ) {
+#else
     if( unit->Command.Action==UnitActionBuilded ) {
+#endif
 	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
 	    DrawConstruction(type->OverlapFrame
 		,frame&127
@@ -905,21 +914,31 @@ local void DrawBuilding(Unit* unit)
 	} else {
 	    DrawUnitType(type,frame,x,y);
 	}
+#ifdef NEW_ORDERS
+    // Draw the future unit type, if upgrading to it.
+    } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
+#else
     } else if( unit->Command.Action==UnitActionUpgradeTo ) {
 	DrawUnitType(unit->Command.Data.UpgradeTo.What,(frame&128)+1,x,y);
+#endif
     } else {
 	DrawUnitType(type,frame,x,y);
     }
 
 #if 0
-    // FIXME: johns: ugly check here should be removed!
+    // FIXME: johns: ugly check here, should be removed!
     if( unit->Command.Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
 	DrawSelection(unit,type,x,y);
     }
 #else
-    // FIXME: johns: ugly check here should be removed!
+    // FIXME: johns: ugly check here, should be removed!
+#ifdef NEW_ORDERS
+    if( unit->Orders[0].Action!=UnitActionDie ) {
+#else
     if( unit->Command.Action!=UnitActionDie ) {
+#endif
 	DrawDecoration(unit,type,x,y);
     }
 #endif
@@ -997,8 +1016,12 @@ local void DrawUnit(Unit* unit)
 	ShowOrder(unit);
     }
 
-    // FIXME: johns: ugly check here should be removed!
+    // FIXME: johns: ugly check here, should be removed!
+#ifdef NEW_ORDERS
+    if( unit->Orders[0].Action!=UnitActionDie ) {
+#else
     if( unit->Command.Action!=UnitActionDie ) {
+#endif
 	DrawDecoration(unit,type,x,y);
     }
 }
@@ -1025,7 +1048,11 @@ global void DrawUnits(void)
     for( i=0; i<NumUnits; ++i ) {
 	unit=Units[i];
 	// FIXME: this tries to draw all corps, ohje
+#ifdef NEW_ORDERS
+	if( unit->Type->Vanishes || unit->Orders[0].Action==UnitActionDie ) {
+#else
 	if( unit->Type->Vanishes || unit->Command.Action==UnitActionDie ) {
+#endif
 	    DrawUnit(unit);
 	}
     }
