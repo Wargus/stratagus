@@ -864,15 +864,17 @@ global void SdlUnlockScreen(void)
 
 /**
 **	Toggle grab mouse.
+**
+**	@param mode	Wanted mode, 1 grab, -1 not grab, 0 toggle.
 */
-global void ToggleGrabMouse(void)
+global void ToggleGrabMouse(int mode)
 {
     static int grabbed;
 
-    if( grabbed ) {
+    if( mode<=0 && grabbed ) {
 	SDL_WM_GrabInput(SDL_GRAB_OFF);
 	grabbed=0;
-    } else {
+    } else if( mode>=0 && !grabbed ) {
 	if( SDL_WM_GrabInput(SDL_GRAB_ON)==SDL_GRAB_ON ) {
 	    grabbed=1;
 	}

@@ -63,8 +63,8 @@ global char* CclStartFile;		/// CCL start file
 global int CclInConfigFile;		/// True while config file parsing
 
 global char*	Tips[MAX_TIPS+1];	/// Array of tips
-global int	ShowTips=0;		/// Show tips at start of level
-global int	CurrentTip=0;		/// Current tip to display
+global int	ShowTips;		/// Show tips at start of level
+global int	CurrentTip;		/// Current tip to display
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -234,6 +234,7 @@ local SCM CclDecorationOnTop(void)
     return SCM_UNSPECIFIED;
 }
 
+#if 0
 /**
 **	Show tips at the start of a level.
 */
@@ -246,10 +247,34 @@ local SCM CclShowTips(void)
 
     InitTips=0;
     ShowTips=1;
-    memset(Tips,0,sizeof(Tips));
+    // JOHNS: Done by system: memset(Tips,0,sizeof(Tips));
     return SCM_UNSPECIFIED;
 }
+#endif
 
+/**
+**	Enable/disable Showing the tips at the start of a level.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of tips displayed.
+*/
+local SCM CclSetShowTips(SCM flag)
+{
+    int old;
+
+    old=ShowTips;
+    ShowTips=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
+**	Add a new tip to the list of tips.
+**
+**	@param tip	A new tip to be displayed before level.
+**
+**	@todo	FIXME:	Memory for tips is never freed.
+*/
 local SCM CclAddTip(SCM tip)
 {
     int i;
@@ -584,7 +609,7 @@ global void InitCcl(void)
     init_subr_0("show-no-full",CclShowNoFull);
     init_subr_0("decoration-on-top",CclDecorationOnTop);
 
-    init_subr_0("show-tips",CclShowTips);
+    gh_new_procedure1_0("set-show-tips!",CclSetShowTips);
     gh_new_procedure1_0("add-tip",CclAddTip);
 
     gh_new_procedure1_0("speed-mine",CclSpeedMine);
