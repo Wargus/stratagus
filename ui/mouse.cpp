@@ -186,7 +186,6 @@ global void DoRightButton(int x,int y)
         //      Worker of human or orcs
         //
         if( action==MouseActionHarvest ) {
-            DebugLevel3("Action %x\n",TheMap.ActionMap[x+y*TheMap.Width]);
             if( type==UnitTypeOrcWorkerWithWood
                     || type==UnitTypeHumanWorkerWithWood
                     || type==UnitTypeOrcWorkerWithGold
@@ -279,6 +278,12 @@ global void DoRightButton(int x,int y)
                 }
             }
 
+#ifdef NEW_SHIPS
+	    if( unit->Type->UnitType!=UnitTypeLand ) {
+		x&=~1;
+		y&=~1;			// Ships could only even fields
+	    }
+#endif
             SendCommandMove(unit,x,y,flush);
             continue;
         }
@@ -315,6 +320,13 @@ global void DoRightButton(int x,int y)
                 }
             }
 
+#ifdef NEW_SHIPS
+	    if( unit->Type->UnitType!=UnitTypeLand ) {
+		x&=~1;
+		y&=~1;			// Ships could only even fields
+	    }
+#endif
+
 	    // empty space
 	    if( RightButtonAttacks ) {
 		SendCommandAttack(unit,x,y,NoUnitP,flush);
@@ -330,6 +342,21 @@ global void DoRightButton(int x,int y)
 	// FIXME: attack/follow/board ...
 	if( action==MouseActionMove ) {
 	}
+
+        //
+        //      Ships
+        //
+#ifdef NEW_SHIPS
+	if( action==MouseActionSail ) {
+	    x&=~1;
+	    y&=~1;			// Ships could only even fields
+	}
+	if( unit->Type->UnitType!=UnitTypeLand ) {
+	    x&=~1;
+	    y&=~1;			// Ships could only even fields
+	}
+#endif
+
 
 //	    if( !unit->Type->Building ) {
 	SendCommandMove(unit,x,y,flush);
