@@ -466,6 +466,7 @@ local SCM CclDefineUnitType(SCM list)
     type->CowerMage=0;
     type->Organic=0;
     type->SelectableByRectangle=0;
+    type->Teleporter=0;
 
     while( !gh_null_p(list) ) {
 	list=gh_cdr(list);
@@ -562,6 +563,8 @@ local SCM CclDefineUnitType(SCM list)
 	    type->Organic=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("selectable-by-rectangle")) ) {
 	    type->SelectableByRectangle=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("teleporter")) ) {
+	    type->Teleporter=1;
 
 	} else {
 	    str=gh_scm2newstr(value,NULL);

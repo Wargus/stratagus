@@ -112,8 +112,7 @@ global void HandleActionFollow(Unit* unit)
 	    // FIXME: dark portal teleportation: Goal is used for target circle of power
 	    // FIXME: teleporting of units should use dark portal's mana
 	    if( (goal=unit->Orders[0].Goal) && 
-		strcmp( goal->Type->Ident, "unit-dark-portal" ) == 0 && 
-		goal->Goal &&
+		goal->Type->Teleporter && goal->Goal &&
 		MapDistanceBetweenUnits( unit, goal ) < 4 )
 	      {
 	      unit->X = goal->Goal->X;
@@ -125,7 +124,7 @@ global void HandleActionFollow(Unit* unit)
 	      MakeMissile(MissileTypeByIdent("missile-normal-spell"),
 	        	unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2,
 			unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2 );
-	      }
+	    }
 	
 	    if( !(goal=unit->Orders[0].Goal) ) {// goal has died
 		unit->Wait=1;
