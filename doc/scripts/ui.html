@@ -47,6 +47,7 @@
 <hr>
 <a href="#DefineButton">DefineButton</a>
 <a href="#DefineButtonStyle">DefineButtonStyle</a>
+<a href="#DefineCheckboxStyle">DefineCheckboxStyle</a>
 <a href="#DefineCursor">DefineCursor</a>
 <a href="#DefineFont">DefineFont</a>
 <a href="#DefineFontColors">DefineFontColors</a>
@@ -209,6 +210,12 @@ Define a button style. Possible tags:
 <dt>TextNormalColor = color, TextReverseColor = color</dt>
 <dd>Color to use for the normal and reverse text.
 </dd>
+<dt>TextAlign = align</dt>
+<dd>Align the text.  Possible values are "Left", "Right", and "Center".
+</dd>
+<dt>TextPos = {posx, posy}</dt>
+<dd>Set the position of the text relative to the upper left corner of the image.
+</dd>
 <dt>Default = {tag = value, ...}, Hover = {}, Selected = {}, Clicked = {}, Disabled = {}</dt>
 <dd>Set attributes for when the mouse is over the button (Hover), the button is
 Selected, Clicked, Disabled, or the Default setting. Possible tags:
@@ -223,10 +230,10 @@ Selected, Clicked, Disabled, or the Default setting. Possible tags:
   <dd>Select the frame number from an image (only needed when using an image with multiple frames).
   </dd>
   <dt>TextNormalColor = color, TextReverseColor = color</dt>
-  <dd>Color to use for the normal and reverse text.  Note that this value overrides the main colors.
+  <dd>Color to use for the normal and reverse text (overrides the main colors).
   </dd>
-  <dt>TextOffset = {x, y}</dt>
-  <dd>Display the text with this offset.
+  <dt>TextPos = {x, y}</dt>
+  <dd>Display the text at this position (overrides the main position).
   </dd>
   <dt>Border = { Color = color, Size = size}</dt>
   <dd>Draw a border with the specified color and size.
@@ -242,6 +249,8 @@ DefineButtonStyle("main", {
   Font = "game",
   TextNormalColor = "yellow",
   TextReverseColor = "white",
+  TextAlign = "Center",
+  TextPos = {64, 4},
   Default = {
     File = "ui/buttons_1.png", Size = {300, 144}, Frame = 4,
   },
@@ -256,12 +265,109 @@ DefineButtonStyle("main", {
   Clicked = {
     File = "ui/buttons_1.png", Size = {300, 144}, Frame = 5,
     TextNormalColor = "white",
-    TextOffset = {2, 2},
+    TextPos = {66, 6},
   },
   Disabled = {
     File = "ui/buttons_1.png", Size = {300, 144}, Frame = 3,
     TextNormalColor = "grey",
     TextReverseColor = "grey",
+  },
+})
+</pre>
+
+<a name="DefineCheckboxStyle"></a>
+<h3>DefineCheckboxStyle(style, {tag = value, ...})</h3>
+
+Define a checkbox style. Possible tags:
+
+<dl>
+<dt>Size = {x, y}</dt>
+<dd>Size of the button.
+</dd>
+<dt>Font = font-name</dt>
+<dd>Name of the font to use.
+</dd>
+<dt>TextNormalColor = color, TextReverseColor = color</dt>
+<dd>Color to use for the normal and reverse text.
+</dd>
+<dt>TextAlign = align</dt>
+<dd>Align the text.  Possible values are "Left", "Right", and "Center".
+</dd>
+<dt>TextPos = {posx, posy}</dt>
+<dd>Set the position of the text relative to the upper left corner of the image.
+</dd>
+<dt>Default = {tag = value, ...}, Hover = {}, Selected = {}, Clicked = {}, Disabled = {},
+Checked = {}, CheckedHover = {}, CheckedSelected = {}, CheckedClicked = {}, CheckedDisabled = {}</dt>
+<dd>Set attributes for when the mouse is over the checkbox (Hover), the
+checkbox is Selected, Clicked, Disabled, the Default setting, and for when the
+checkbox is Checked. Possible tags:
+  <dl>
+  <dt>File = file</dt>
+  <dd>The filename.
+  </dd>
+  <dt>Size = size</dt>
+  <dd>The size of the image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>Frame = frame</dt>
+  <dd>Select the frame number from an image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>TextNormalColor = color, TextReverseColor = color</dt>
+  <dd>Color to use for the normal and reverse text (overrides the main colors).
+  </dd>
+  <dt>TextPos = {x, y}</dt>
+  <dd>Display the text at this position (overrides the main position).
+  </dd>
+  <dt>Border = { Color = color, Size = size}</dt>
+  <dd>Draw a border with the specified color and size.
+  </dd>
+  </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+DefineCheckboxStyle("round", {
+  Size = {19, 19},
+  Font = "game",
+  TextNormalColor = "yellow",
+  TextReverseColor = "white",
+  TextAlign = "Left",
+  TextPos = {24, 4},
+  Default = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 19,
+  },
+  Hover = {
+    TextNormalColor = "white",
+  },
+  Selected = {
+    Border = {
+      Color = {252, 252, 0}, Size = 1,
+    },
+  },
+  Disabled = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 18,
+  },
+  Clicked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 20,
+    TextNormalColor = "white",
+  },
+  Checked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 21,
+  },
+  CheckedHover = {
+    TextNormalColor = "white",
+  },
+  CheckedSelected = {
+    Border = {
+      Color = {252, 252, 0}, Size = 1,
+    },
+  },
+  CheckedClicked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 22,
+    TextNormalColor = "white",
+  },
+  CheckedDisabled = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 18,
   },
 })
 </pre>
