@@ -77,7 +77,7 @@ global enum _scroll_state_ MouseScrollState=ScrollNone;
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointUp(int step)
+local void MoveMapViewPointUp(unsigned step)
 {
     if (MapY > step) {
 	MapY -= step;
@@ -91,7 +91,7 @@ local void MoveMapViewPointUp(int step)
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointLeft(int step)
+local void MoveMapViewPointLeft(unsigned step)
 {
     if (MapX > step) {
 	MapX -= step;
@@ -105,7 +105,7 @@ local void MoveMapViewPointLeft(int step)
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointDown(int step)
+local void MoveMapViewPointDown(unsigned step)
 {
     if (MapY < TheMap.Height - MapHeight - step) {
 	MapY += step;
@@ -119,7 +119,7 @@ local void MoveMapViewPointDown(int step)
 **
 **	@param step	How many tiles.
 */
-local void MoveMapViewPointRight(int step)
+local void MoveMapViewPointRight(unsigned step)
 {
     if (MapX < TheMap.Width - MapWidth - step) {
 	MapX += step;
@@ -243,14 +243,14 @@ global void UpdateDisplay(void)
 #ifdef NEW_MAPDRAW
 	    MapUpdateFogOfWar(MapX,MapY);
 #else
-	    int i;
+	    unsigned u;
 
 	    // FIXME: only needed until flags are correct set
-	    for( i=0; i<MapHeight; ++i ) {
-		MustRedrawRow[i]=1;
+	    for( u=0; u<MapHeight; ++u ) {
+		MustRedrawRow[u]=1;
 	    }
-	    for( i=0; i<MapHeight*MapWidth; ++i ) {
-		MustRedrawTile[i]=1;
+	    for( u=0; u<MapHeight*MapWidth; ++u ) {
+		MustRedrawTile[u]=1;
 	    }
 #endif
 
