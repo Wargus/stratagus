@@ -168,6 +168,9 @@
 //#include "etlib/getopt.h"
 extern char* optarg;
 extern int optind;
+#ifndef _WIN32_WCE
+extern int getopt(int argc, char *const*argv, const char *opt);
+#endif
 #endif
 
 #ifdef __MINGW32__
@@ -827,7 +830,7 @@ map is relative to FreeCraftLibPath=datapath, use ./map for relative to cwd\n\
 **	@param	argc	Number of arguments.
 **	@param	argv	Vector of arguments.
 */
-#if defined(__MINGW32__) || defined(__CYGWIN__)
+#if defined(__MINGW32__) || defined(__CYGWIN__) || (defined(_MSC_VER) && !defined(_WIN32_WCE))
 global int mymain(int argc,char** argv)
 #else
 global int main(int argc,char** argv)

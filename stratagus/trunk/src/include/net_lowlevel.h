@@ -47,8 +47,10 @@
 #define USE_WINSOCK
 
 #ifdef NEW_NETMENUS
+#if !defined(_MSC_VER) || defined(_WIN32_WCE)
 #define _WIN32_WINNT 0x0400
 #define WINVER 0x0400
+#endif
 #include <winsock2.h>
 #endif
 
