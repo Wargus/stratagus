@@ -506,7 +506,28 @@ local long GetPaletteChecksum(const Palette* palette)
 **	@return		A palette in hardware  dependend format.
 */
 #ifdef USE_SDL_SURFACE
+global void VideoPaletteListAdd(SDL_Surface* surface)
+{
+    PaletteLink* curlink;
 
+    curlink = malloc(sizeof(PaletteLink));
+
+    curlink->Surface = surface;
+    curlink->Prev = PaletteList;
+
+    PaletteList = curlink;
+}
+
+global void VideoPaletteListClean()
+{
+    PaletteLink* curlink;
+
+    while (PaletteList) {
+	curlink = PaletteList->Prev;
+	free(PaletteList);
+	PaletteList = curlink;
+    }
+}
 #else
 global VMemType* VideoCreateSharedPalette(const Palette* palette)
 {
@@ -703,16 +724,84 @@ global void LoadRGB(Palette* pal, const char* name)
 // 205-207	cycle		(lights on christmas tree)
 // 240-244	cycle		(water around ships, Runestone, Dark Portal)
 
+#ifdef USE_SDL_SURFACE
 /**
-**	Color cycle for 8 bpp video mode.
+**	Color cycle.
 **
 **	FIXME: Also icons and some units use color cycling.
-**	FIXME: must be configured by the tileset or global.
 */
-#ifdef USE_SDL_SURFACE
+// FIXME: cpu intensive to go through the whole PaletteList
 local void ColorCycle(void)
 {
-    // FIXME: todo
+    int i;
+    SDL_Palette* pal;
+    SDL_Color c;
+
+    if (ColorCycleAll) {
+	PaletteLink* curlink;
+
+	curlink = PaletteList;
+	while (curlink != NULL) {
+	    pal = curlink->Surface->format->palette;
+
+	    c = pal->colors[ColorWaterCycleStart];
+	    for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
+		SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		    &pal->colors[i + 1], i, 1);
+	    }
+	    SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		&c, ColorWaterCycleEnd, 1);
+
+	    c = pal->colors[ColorIconCycleStart];
+	    for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {
+		SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		    &pal->colors[i + 1], i, 1);
+	    }
+	    SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		&c, ColorIconCycleEnd, 1);
+
+	    c = pal->colors[ColorBuildingCycleStart];
+	    for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {
+		SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		    &pal->colors[i + 1], i, 1);
+	    }
+	    SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		&c, ColorBuildingCycleEnd, 1);
+
+	    curlink = curlink->Prev;
+	}
+    } else {
+	//
+	//        Color cycle tileset palette
+	//
+	pal = TheMap.TileGraphic->Surface->format->palette;
+
+	c = pal->colors[ColorWaterCycleStart];
+	for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
+	    SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		&pal->colors[i + 1], i, 1);
+	}
+	SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+	    &c, ColorWaterCycleEnd, 1);
+
+	c = pal->colors[ColorIconCycleStart];
+	for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {
+	    SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		&pal->colors[i + 1], i, 1);
+	}
+	SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+	    &c, ColorIconCycleEnd, 1);
+
+	c = pal->colors[ColorBuildingCycleStart];
+	for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {
+	    SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+		&pal->colors[i + 1], i, 1);
+	}
+	SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
+	    &c, ColorBuildingCycleEnd, 1);
+    }
+
+    MapColorCycle();		// FIXME: could be little more informative
     MustRedraw |= RedrawColorCycle;
 }
 #else

@@ -889,6 +889,7 @@ global Graphic* LoadGraphic(const char* name)
 //    graphic->Surface->format->palette = 
 //	VideoCreateSharedPalette(graphic->Surface->format->palette);
     graphic->NumFrames = 1;
+    VideoPaletteListAdd(graphic->Surface);
 #else
     graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
     //free(graphic->Palette);
