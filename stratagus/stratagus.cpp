@@ -287,6 +287,15 @@ local void WaitCallbackKey(unsigned dummy)
 /**
 **	Callback for input.
 */
+local void WaitCallbackKey2(unsigned dummy1,unsigned dummy2)
+{
+    DebugLevel3Fn("Pressed %8x %8x %8x\n",MouseButtons,dummy1,dummy2);
+    WaitNoEvent=0;
+}
+
+/**
+**	Callback for input.
+*/
 local void WaitCallbackMouse(int dummy_x,int dummy_y)
 {
     DebugLevel3Fn("Moved %d,%d\n",dummy_x,dummy_y);
@@ -306,8 +315,8 @@ local void WaitForInput(int timeout)
     callbacks.ButtonPressed=WaitCallbackKey;
     callbacks.ButtonReleased=WaitCallbackKey;
     callbacks.MouseMoved=WaitCallbackMouse;
-    callbacks.KeyPressed=WaitCallbackKey;
-    callbacks.KeyReleased=WaitCallbackKey;
+    callbacks.KeyPressed=WaitCallbackKey2;
+    callbacks.KeyReleased=WaitCallbackKey2;
 
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;

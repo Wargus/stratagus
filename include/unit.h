@@ -400,7 +400,7 @@ enum _directions_ {
 **	Everything belonging to an unit. FIXME: rearrange for less memory.
 */
 struct _unit_ {
-    // int is faster than shorts.
+    // int is faster than shorts
     unsigned	Refs;			/// Reference counter
     unsigned	Slot;			/// Assignd slot number
     Unit**	UnitSlot;		/// slot pointer of Units
@@ -471,7 +471,7 @@ struct _unit_ {
     char	OrderFlush;		/// cancel current order, take next
     Order	Orders[MAX_ORDERS];	/// orders to process
     Order	SavedOrder;		/// order to continue after current
-    Order	NewOrder;		/// order for new trained units.
+    Order	NewOrder;		/// order for new trained units
 
     union _order_data_ {
     struct _order_move_ {
@@ -481,7 +481,7 @@ struct _unit_ {
 	char	Path[MAX_PATH_LENGTH];	/// directions of stored path
     }		Move;			/// ActionMove,...
     struct _order_builded_ {
-	Unit*	Worker;			/// Worker building this unit.
+	Unit*	Worker;			/// Worker building this unit
 	int	Sum;			/// HP for building
 	int	Add;
 	int	Val;			/// Counter
@@ -491,11 +491,6 @@ struct _unit_ {
     struct _order_resource_ {
 	int	Active;			/// how much units are in the resource
     }		Resource;		/// Resource still
-/* FIXME: move and harvest.
-    struct _order_harvest_ {
-	unsigned WoodToHarvest;		/// Ticks for harvest
-    }		Harvest;		/// Harvest action
-*/
     struct _order_research_ {
 	unsigned Ticks;			/// Ticks for research
 	Upgrade* Upgrade;		/// Upgrade researched
@@ -528,7 +523,7 @@ struct _unit_ {
 // FIXME: will be removed, we will get player limits
 #define MAX_UNITS	UnitMax		/// maximal number of units supported
 
-#define MAX_UNIT_SLOTS	65535		/// Maximal number of used slots.
+#define MAX_UNIT_SLOTS	65535		/// Maximal number of used slots
 
 /**
 **	Returns true, if unit is unusable. (for attacking,...)
@@ -597,7 +592,7 @@ extern Unit* Selected[MaxSelectable];	/// currently selected units
 extern void InitUnitsMemory(void);
     /// Free memory used by unit
 extern void FreeUnitMemory(Unit* unit);
-    /// Release an unit.
+    /// Release an unit
 extern void ReleaseUnit(Unit* unit);
     ///	Create a new unit
 extern Unit* MakeUnit(UnitType* type,Player* player);
@@ -610,11 +605,11 @@ extern void UnitLost(const Unit* unit);
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
-    /// Returns true, if unit is visible on the map.
+    /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
-    /// Returns true, if unit is known on the map.
+    /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
-    /// Returns true, if unit is visible on current map view.
+    /// Returns true, if unit is visible on current map view
 extern int UnitVisibleOnScreen(const Unit* unit);
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
@@ -623,13 +618,13 @@ extern void GetUnitMapArea( const Unit* unit,
                             int *sx, int *sy, int *ex, int *ey );
     /// FIXME: more docu
 extern void RemoveUnit(Unit* unit);
-    /// Increment mana of all magic units each second.
+    /// Increment mana of all magic units each second
 extern void UnitIncrementMana(void);
-    /// Increment health of all regenerating units each second.
+    /// Increment health of all regenerating units each second
 extern void UnitIncrementHealth(void);
-    /// Check for rescue each second.
+    /// Check for rescue each second
 extern void RescueUnits(void);
-    /// Change owner of unit.
+    /// Change owner of unit
 extern void ChangeUnitOwner(Unit* unit,Player* old,Player* new);
 
     /// Convert direction (dx,dy) to heading (0-255)
@@ -643,7 +638,7 @@ extern void UnitHeadingFromDeltaXY(Unit* unit,int x,int y);
 extern void DropOutOnSide(Unit* unit,int heading,int addx,int addy);
     /// FIXME: more docu
 extern void DropOutNearest(Unit* unit,int x,int y,int addx,int addy);
-    /// Drop out all units in the unit.
+    /// Drop out all units in the unit
 extern void DropOutAll(const Unit* unit);
 
     /// FIXME: more docu
@@ -677,13 +672,13 @@ extern void DestroyAllInside(Unit* source);
     /// FIXME: more docu
 extern void HitUnit(Unit* unit,int damage);
 
-    /// Returns the map distance between two points.
+    /// Returns the map distance between two points
 extern int MapDistance(int x1,int y1,int x2,int y2);
-    ///	Returns the map distance between two points with unit-type.
+    ///	Returns the map distance between two points with unit-type
 extern int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2);
-    ///	Returns the map distance to unit.
+    ///	Returns the map distance to unit
 extern int MapDistanceToUnit(int x,int y,const Unit* dest);
-    ///	Returns the map distance between two units.
+    ///	Returns the map distance between two units
 extern int MapDistanceBetweenUnits(const Unit* src,const Unit* dst);
 
     /// FIXME: more docu
@@ -695,28 +690,28 @@ extern int ViewPointDistanceToUnit(Unit* dest);
 extern int IsEnemy(const Player* player,const Unit* dest);
     /// Return true, if unit is allied with the player
 extern int IsAllied(const Player* player,const Unit* dest);
-    /// Can this unit-type attack the other (destination).
+    /// Can this unit-type attack the other (destination)
 extern int CanTarget(const UnitType* type,const UnitType* dest);
 
 extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
 extern void SaveUnits(FILE* file);			/// save all units
 
 //	in unitcache.c
-    /// Insert new unit into cache.
+    /// Insert new unit into cache
 extern void UnitCacheInsert(Unit* unit);
-    /// Remove unit from cache.
+    /// Remove unit from cache
 extern void UnitCacheRemove(Unit* unit);
-    /// Change unit position in cache.
+    /// Change unit position in cache
 extern void UnitCacheChange(Unit* unit);
-    /// Select units in range.
+    /// Select units in range
 extern int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table);
-    /// Select units on tile.
+    /// Select units on tile
 extern int UnitCacheOnTile(int x,int y,Unit** table);
-    /// Select unit on X,Y of type naval,fly,land.
+    /// Select unit on X,Y of type naval,fly,land
 extern Unit* UnitCacheOnXY(int x,int y,int type);
-    /// Print unit-cache statistic.
+    /// Print unit-cache statistic
 extern void UnitCacheStatistic(void);
-    /// Initialize unit-cache.
+    /// Initialize unit-cache
 extern void InitUnitCache(void);
 
 //	in map.c	belongs to map or unit??
@@ -740,9 +735,9 @@ extern void LoadDecorations(void);
 extern void DrawUnits(void);
 
 //	in unit_find.c
-    /// Select units in rectangle range.
+    /// Select units in rectangle range
 extern int SelectUnits(int x1,int y1,int x2,int y2,Unit** table);
-    /// Select units on map tile.
+    /// Select units on map tile
 extern int SelectUnitsOnTile(int x,int y,Unit** table);
 
     /// Find all units of this type
@@ -786,16 +781,18 @@ extern Unit* AttackUnitsInReactRange(const Unit* unit);
 extern void InitGroups(void);
 
     // 2 functions to conseal the groups internal data structures...
-    /// Get the number of units in a particular group.
+    /// Get the number of units in a particular group
 extern int GetNumberUnitsOfGroup(int num);
-    /// Get the array of units of a particular group.
+    /// Get the array of units of a particular group
 extern Unit** GetUnitsOfGroup(int num);
 
-    /// Remove all units from a group.
+    /// Remove all units from a group
 extern void ClearGroup(int num);
-    /// Set the contents of a particular group with an array of units.
+    /// Add the array of units to the group
+extern void AddToGroup(Unit **units,int nunits,int num);
+    /// Set the contents of a particular group with an array of units
 extern void SetGroup(Unit **units,int nunits,int num);
-    /// Remove a unit from a group.
+    /// Remove a unit from a group
 extern void RemoveUnitFromGroup(Unit *unit);
 
 //	in selection.c
@@ -813,7 +810,7 @@ extern int SelectUnit(Unit* unit);
 extern void SelectSingleUnit(Unit* unit);
     /// Remove a unit from selection
 extern void UnSelectUnit(Unit* unit);
-    /// Add a unit to selected if not already selected, remove it otherwise.
+    /// Add a unit to selected if not already selected, remove it otherwise
 extern int ToggleSelectUnit(Unit* unit);
     /// Select units from the same type (if selectable by rectangle)
 extern int SelectUnitsByType(Unit* base);

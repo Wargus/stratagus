@@ -54,6 +54,8 @@ local enum _key_state_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
+local int SavedMapPositionX[4];	/// Saved map position X
+local int SavedMapPositionY[4];	/// Saved map position Y
 local char Input[80];		/// line input for messages/long commands
 local int InputIndex;		/// current index into input
 local char InputStatusLine[80];	/// Last input status line
@@ -84,7 +86,7 @@ local void ShowInput(void)
 /**
 **	Begin input.
 */
-local void BeginInput(void)
+local void UiBeginInput(void)
 {
     KeyState=KeyStateInput;
     Input[0]='\0';
@@ -108,15 +110,62 @@ local void UiUnselectAll(void)
 }
 
 /**
+**	Center on group.
+**
+**	@param group	Group number to center on.
+**
+**	@todo	Improve this function, try to show all selected units
+**		or the most possible units.
+*/
+local void UiCenterOnGroup(unsigned group)
+{
+    Unit** units;
+    int n;
+    int x;
+    int y;
+
+    n=GetNumberUnitsOfGroup(group);
+    if( n-- ) {
+	units=GetUnitsOfGroup(group);
+
+	x=units[n]->X;
+	y=units[n]->Y;
+	while( n-- ) {
+	    x+=(units[n]->X-x)/2;
+	    y+=(units[n]->Y-y)/2;
+	}
+	MapCenter(x,y);
+    }
+}
+
+/**
 **	Select group. If already selected center on the group.
 **
 **	@param group	Group number to select.
 */
 local void UiSelectGroup(unsigned group)
 {
+    Unit** units;
+    int n;
+
+    //
+    //	Check if group is already selected.
+    //
+    n=GetNumberUnitsOfGroup(group);
+    if( n && NumSelected==n ) {
+	units=GetUnitsOfGroup(group);
+
+	while( n-- && units[n]==Selected[n] ) {
+	}
+	if( n==-1 ) {
+	    UiCenterOnGroup(group);
+	    return;
+	}
+    }
+
     SelectGroup(group);
     UpdateButtonPanel();
-    MustRedraw|=RedrawCursor|RedrawMap|RedrawPanels;
+    MustRedraw|=RedrawMap|RedrawPanels;
 }
 
 /**
@@ -126,9 +175,20 @@ local void UiSelectGroup(unsigned group)
 */
 local void UiAddGroupToSelection(unsigned group)
 {
-    SelectGroup(group);
+    Unit** units;
+    int n;
+
+    if( !(n=GetNumberUnitsOfGroup(group)) ) {
+        return;
+    }
+
+    units=GetUnitsOfGroup(group);
+    while( n-- ) {
+	SelectUnit(units[n]);
+    }
+
     UpdateButtonPanel();
-    MustRedraw|=RedrawCursor|RedrawMap|RedrawPanels;
+    MustRedraw|=RedrawMap|RedrawPanels;
 }
 
 /**
@@ -148,7 +208,10 @@ local void UiDefineGroup(unsigned group)
 */
 local void UiAddToGroup(unsigned group)
 {
+    AddToGroup(Selected,NumSelected,group);
 }
+
+#if 0
 
 /**
 **	Define an alternate group. The current selected units become a new
@@ -158,7 +221,6 @@ local void UiAddToGroup(unsigned group)
 */
 local void UiDefineAlternateGroup(unsigned group)
 {
-    SetGroup(Selected,NumSelected,group);
 }
 
 /**
@@ -171,6 +233,8 @@ local void UiAddToAlternateGroup(unsigned group)
 {
 }
 
+#endif
+
 /**
 **	Toggle sound on / off.
 */
@@ -180,9 +244,9 @@ local void UiToggleSound(void)
 	SoundOff^=1;
     }
     if( SoundOff ) {
-	SetMessage("Sound is off.");
+	SetStatusLine("Sound is off.");
     } else {
-	SetMessage("Sound is off.");
+	SetStatusLine("Sound is on.");
     }
 }
 
@@ -200,6 +264,97 @@ local void UiTogglePause(void)
 }
 
 /**
+**	Enter menu mode.
+*/
+local void UiEnterMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    ProcessMenu(MENU_GAME, 0);
+}
+
+/**
+**	Increment game speed.
+*/
+local void UiIncrementGameSpeed(void)
+{
+    VideoSyncSpeed+=10;
+    SetVideoSync();
+    SetStatusLine("Faster");
+}
+
+/**
+**	Decrement game speed.
+*/
+local void UiDecrementGameSpeed(void)
+{
+    VideoSyncSpeed-=10;
+    if( VideoSyncSpeed<=0 ) {
+	VideoSyncSpeed=1;
+    }
+    SetVideoSync();
+    SetStatusLine("Slower");
+}
+
+/**
+**	Center on the selected units.
+**
+**	@todo	Improve this function, try to show all selected units
+**		or the most possible units.
+*/
+local void UiCenterOnSelected(void)
+{
+    int x;
+    int y;
+    int n;
+
+    if(	(n=NumSelected) ) {
+	x=Selected[--n]->X;
+	y=Selected[n]->Y;
+	while( n-- ) {
+	    x+=(Selected[n]->X-x)/2;
+	    y+=(Selected[n]->Y-y)/2;
+	}
+	MapCenter(x,y);
+    }
+}
+
+/**
+**	Save current map position.
+**
+**	@param position	Map position slot.
+*/
+local void UiSaveMapPosition(unsigned position)
+{
+    SavedMapPositionX[position]=MapX;
+    SavedMapPositionY[position]=MapY;
+}
+
+/**
+**	Recall map position.
+**
+**	@param position	Map position slot.
+*/
+local void UiRecallMapPosition(unsigned position)
+{
+    MapSetViewpoint(SavedMapPositionX[position],SavedMapPositionY[position]);
+}
+
+/**
+**	Toggle terrain display on/off.
+*/
+local void UiToggleTerrain(void)
+{
+    MinimapWithTerrain^=1;
+    if( MinimapWithTerrain ) {
+	SetStatusLine("Terrain displayed.");
+    } else {
+	SetStatusLine("Terrain hidden.");
+    }
+    MustRedraw|=RedrawMinimap;
+}
+
+/**
 **	Handle keys in command mode.
 **
 **	@param key	Key scancode.
@@ -209,19 +364,21 @@ local int CommandKey(int key)
 {
     switch( key ) {
 	case '\r':			// Return enters chat/input mode.
-	    BeginInput();
+	    UiBeginInput();
 	    return 1;
 
 	case '^':			// Unselect everything
 	    UiUnselectAll();
             break;
+
         case '0': case '1': case '2':	// Group selection
         case '3': case '4': case '5':
         case '6': case '7': case '8':
         case '9':
             if( KeyModifiers&ModifierShift ) {
 		if( KeyModifiers&ModifierAlt ) {
-		    UiAddToAlternateGroup(key-'0');
+		    //UiAddToAlternateGroup(key-'0');
+		    UiCenterOnGroup(key-'0');
 		} else if( KeyModifiers&ModifierControl ) {
 		    UiAddToGroup(key-'0');
 		} else {
@@ -229,7 +386,8 @@ local int CommandKey(int key)
 		}
 	    } else {
 		if( KeyModifiers&ModifierAlt ) {
-		    UiDefineAlternateGroup(key-'0');
+		    // UiDefineAlternateGroup(key-'0');
+		    UiCenterOnGroup(key-'0');
 		} else if( KeyModifiers&ModifierControl ) {
 		    UiDefineGroup(key-'0');
 		} else {
@@ -272,33 +430,28 @@ local int CommandKey(int key)
 	case KeyCodeF2:
 	case KeyCodeF3:
 	case KeyCodeF4:			// Set/Goto place
-	    DebugLevel0("FIXME: not written\n");
+	    if( KeyModifiers&ModifierShift ) {
+		UiSaveMapPosition(key-KeyCodeF1);
+	    } else {
+		UiRecallMapPosition(key-KeyCodeF1);
+	    }
 	    break;
 
 	case 'm':
-	case 'M':			/// ALT+M, F10 Game menu
+	case 'M':			// ALT+M, F10 Game menu
 	    if( !(KeyModifiers&ModifierAlt) ) {
 		break;
 	    }
 	case KeyCodeF10:
-	    GamePaused=1;
-	    SetStatusLine("Game Paused");
-	    ProcessMenu(MENU_GAME, 0);
+	    UiEnterMenu();
 	    break;
 
-	case '+':
-	    VideoSyncSpeed+=10;
-	    SetVideoSync();
-	    SetStatusLine("Faster");
+	case '+':			// + Faster
+	    UiIncrementGameSpeed();
 	    break;
 
-	case '-':
-	    VideoSyncSpeed-=10;
-	    if( VideoSyncSpeed<=0 ) {
-		VideoSyncSpeed=1;
-	    }
-	    SetVideoSync();
-	    SetStatusLine("Slower");
+	case '-':			// - Slower
+	    UiDecrementGameSpeed();
 	    break;
 
 	case 'l':			// ALT l F12 load game menu
@@ -307,7 +460,7 @@ local int CommandKey(int key)
 		break;
 	    }
 	case KeyCodeF12:
-	    SetStatusLine("Slower");
+	    SetStatusLine("Loading not supported");
 	    break;
 
 	case 's'&0x1F:			// Ctrl + S - Turn sound on / off 
@@ -316,6 +469,10 @@ local int CommandKey(int key)
 
 	case 's':			// ALT s F11 save game menu
 	case 'S':
+	    if( KeyModifiers&ModifierControl ) {
+		UiToggleSound();
+		break;
+	    }
 	    if( !(KeyModifiers&ModifierAlt) ) {
 		break;
 	    }
@@ -323,11 +480,9 @@ local int CommandKey(int key)
 	    SaveAll();
 	    break;
 
-	case 'c':			// center on selected units
+	case 'c':			// CTRL+C,ALT+C, C center on units
 	case 'C':
-	    if(	NumSelected==1 ) {
-		MapCenter(Selected[0]->X,Selected[0]->Y);
-	    }
+	    UiCenterOnSelected();
 	    break;
 
 	case 'g'&0x1F:
@@ -365,9 +520,7 @@ local int CommandKey(int key)
 	case '\t':			// TAB toggles minimap.
 					// FIXME: more...
 					// FIXME: shift+TAB
-	    DebugLevel1("TAB\n");
-	    MinimapWithTerrain^=1;
-	    MustRedraw|=RedrawMinimap;
+	    UiToggleTerrain();
 	    break;
 
 	case 'x'&0x1F:
@@ -418,107 +571,107 @@ local int CommandKey(int key)
 */
 local int InputKey(int key)
 {
-    switch( key ) {
+    switch (key) {
 	case '\r':
 #if defined(USE_CCL)
-	    if( Input[0]=='(' ) {
+	    if (Input[0] == '(') {
 		CclCommand(Input);
 	    } else {
 #endif
-                // Handle cheats
+		// Handle cheats
 		// FIXME: disable cheats
-                if (strcmp(Input, "there is no aliens level") == 0) {
-		  // FIXME: no function yet.
-                  SetMessage( "cheat enabled" );
+		if (strcmp(Input, "there is no aliens level") == 0) {
+		    // FIXME: no function yet.
+		    SetMessage("cheat enabled");
 		} else if (strcmp(Input, "hatchet") == 0) {
-                  SpeedChop = 52/2;
-                  SetMessage( "Wow -- I got jigsaw!" );
-                } else if (strcmp(Input, "glittering prizes") == 0) {
-                  ThisPlayer->Resources[GoldCost] += 12000;
-                  ThisPlayer->Resources[WoodCost] +=  5000;
-                  ThisPlayer->Resources[OilCost]  +=  5000;
-                  ThisPlayer->Resources[OreCost]  +=  5000;
-                  ThisPlayer->Resources[StoneCost]+=  5000;
-                  ThisPlayer->Resources[CoalCost] +=  5000;
-		  MustRedraw|=RedrawResources;
-		  SetMessage( "!!! :)" );
+		    SpeedChop = 52 / 2;
+		    SetMessage("Wow -- I got jigsaw!");
+		} else if (strcmp(Input, "glittering prizes") == 0) {
+		    ThisPlayer->Resources[GoldCost] += 12000;
+		    ThisPlayer->Resources[WoodCost] += 5000;
+		    ThisPlayer->Resources[OilCost] += 5000;
+		    ThisPlayer->Resources[OreCost] += 5000;
+		    ThisPlayer->Resources[StoneCost] += 5000;
+		    ThisPlayer->Resources[CoalCost] += 5000;
+		    MustRedraw |= RedrawResources;
+		    SetMessage("!!! :)");
 		} else if (strcmp(Input, "on screen") == 0) {
-                  RevealMap();
+		    RevealMap();
 		} else if (strcmp(Input, "fow on") == 0) {
-                  TheMap.NoFogOfWar = 0;
-                  MapUpdateVisible();
-                  SetMessage( "Fog Of War is now ON" );
+		    TheMap.NoFogOfWar = 0;
+		    MapUpdateVisible();
+		    SetMessage("Fog Of War is now ON");
 		} else if (strcmp(Input, "fow off") == 0) {
-                  TheMap.NoFogOfWar = 1;
-                  MapUpdateVisible();
-                  SetMessage( "Fog Of War is now OFF" );
+		    TheMap.NoFogOfWar = 1;
+		    MapUpdateVisible();
+		    SetMessage("Fog Of War is now OFF");
 		} else if (strcmp(Input, "fast debug") == 0) {
-                  SpeedMine=10;         // speed factor for mine gold
-                  SpeedGold=10;         // speed factor for getting gold
-                  SpeedChop=10;         // speed factor for chop
-                  SpeedWood=10;         // speed factor for getting wood
-                  SpeedHaul=10;         // speed factor for haul oil
-                  SpeedOil=10;          // speed factor for getting oil
-                  SpeedBuild=10;        // speed factor for building
-                  SpeedTrain=10;        // speed factor for training
-                  SpeedUpgrade=10;      // speed factor for upgrading
-                  SpeedResearch=10;     // speed factor for researching
-                  SetMessage( "FAST DEBUG SPEED" );
+		    SpeedMine = 10;	// speed factor for mine gold
+		    SpeedGold = 10;	// speed factor for getting gold
+		    SpeedChop = 10;	// speed factor for chop
+		    SpeedWood = 10;	// speed factor for getting wood
+		    SpeedHaul = 10;	// speed factor for haul oil
+		    SpeedOil = 10;	// speed factor for getting oil
+		    SpeedBuild = 10;	// speed factor for building
+		    SpeedTrain = 10;	// speed factor for training
+		    SpeedUpgrade = 10;	// speed factor for upgrading
+		    SpeedResearch = 10;	// speed factor for researching
+		    SetMessage("FAST DEBUG SPEED");
 		} else if (strcmp(Input, "normal debug") == 0) {
-                  SpeedMine=1;         // speed factor for mine gold
-                  SpeedGold=1;         // speed factor for getting gold
-                  SpeedChop=1;         // speed factor for chop
-                  SpeedWood=1;         // speed factor for getting wood
-                  SpeedHaul=1;         // speed factor for haul oil
-                  SpeedOil=1;          // speed factor for getting oil
-                  SpeedBuild=1;        // speed factor for building
-                  SpeedTrain=1;        // speed factor for training
-                  SpeedUpgrade=1;      // speed factor for upgrading
-                  SpeedResearch=1;     // speed factor for researching
-                  SetMessage( "NORMAL DEBUG SPEED" );
+		    SpeedMine = 1;	// speed factor for mine gold
+		    SpeedGold = 1;	// speed factor for getting gold
+		    SpeedChop = 1;	// speed factor for chop
+		    SpeedWood = 1;	// speed factor for getting wood
+		    SpeedHaul = 1;	// speed factor for haul oil
+		    SpeedOil = 1;	// speed factor for getting oil
+		    SpeedBuild = 1;	// speed factor for building
+		    SpeedTrain = 1;	// speed factor for training
+		    SpeedUpgrade = 1;	// speed factor for upgrading
+		    SpeedResearch = 1;	// speed factor for researching
+		    SetMessage("NORMAL DEBUG SPEED");
 		} else if (strcmp(Input, "make it so") == 0) {
-                  SpeedMine=10;         // speed factor for mine gold
-                  SpeedGold=10;         // speed factor for getting gold
-                  SpeedChop=10;         // speed factor for chop
-                  SpeedWood=10;         // speed factor for getting wood
-                  SpeedHaul=10;         // speed factor for haul oil
-                  SpeedOil=10;          // speed factor for getting oil
-                  SpeedBuild=10;        // speed factor for building
-                  SpeedTrain=10;        // speed factor for training
-                  SpeedUpgrade=10;      // speed factor for upgrading
-                  SpeedResearch=10;     // speed factor for researching
-                  ThisPlayer->Resources[GoldCost] += 32000;
-                  ThisPlayer->Resources[WoodCost] += 32000;
-                  ThisPlayer->Resources[OilCost]  += 32000;
-                  ThisPlayer->Resources[OreCost]  += 32000;
-                  ThisPlayer->Resources[StoneCost]+= 32000;
-                  ThisPlayer->Resources[CoalCost] += 32000;
-		  MustRedraw|=RedrawResources;
-                  SetMessage( "SO!" );
+		    SpeedMine = 10;	// speed factor for mine gold
+		    SpeedGold = 10;	// speed factor for getting gold
+		    SpeedChop = 10;	// speed factor for chop
+		    SpeedWood = 10;	// speed factor for getting wood
+		    SpeedHaul = 10;	// speed factor for haul oil
+		    SpeedOil = 10;	// speed factor for getting oil
+		    SpeedBuild = 10;	// speed factor for building
+		    SpeedTrain = 10;	// speed factor for training
+		    SpeedUpgrade = 10;	// speed factor for upgrading
+		    SpeedResearch = 10;	// speed factor for researching
+		    ThisPlayer->Resources[GoldCost] += 32000;
+		    ThisPlayer->Resources[WoodCost] += 32000;
+		    ThisPlayer->Resources[OilCost] += 32000;
+		    ThisPlayer->Resources[OreCost] += 32000;
+		    ThisPlayer->Resources[StoneCost] += 32000;
+		    ThisPlayer->Resources[CoalCost] += 32000;
+		    MustRedraw |= RedrawResources;
+		    SetMessage("SO!");
 		} else {
-		  // FIXME: only to selected players ...
-		  NetworkChatMessage(Input);
+		    // FIXME: only to selected players ...
 		}
+		NetworkChatMessage(Input);
 #if defined(USE_CCL)
 	    }
 #endif
 	case '\e':
 	    ClearStatusLine();
-	    KeyState=KeyStateCommand;
+	    KeyState = KeyStateCommand;
 	    return 1;
 	case '\b':
 	    DebugLevel3("Key <-\n");
-	    if( InputIndex ) {
-		Input[--InputIndex]='\0';
+	    if (InputIndex) {
+		Input[--InputIndex] = '\0';
 		ShowInput();
 	    }
 	    return 1;
 	default:
-	    if( key>=' ' && key<=256 ) {
-		if( InputIndex<sizeof(Input)-1 ) {
-		    DebugLevel3("Key %c\n",key);
-		    Input[InputIndex++]=key;
-		    Input[InputIndex]='\0';
+	    if (key >= ' ' && key <= 256) {
+		if (InputIndex < sizeof(Input) - 1) {
+		    DebugLevel3("Key %c\n", key);
+		    Input[InputIndex++] = key;
+		    Input[InputIndex] = '\0';
 		    ShowInput();
 		}
 		return 1;
@@ -533,7 +686,7 @@ local int InputKey(int key)
 **
 **	@param key	Key scancode.
 */
-global void HandleKeyDown(unsigned key)
+global void HandleKeyDown(unsigned key,unsigned keychar)
 {
     // Handle Modifier Keys
     switch( key ) {
@@ -559,19 +712,23 @@ global void HandleKeyDown(unsigned key)
     // Handle All other keys
     switch( InterfaceState ) {
 	case IfaceStateNormal:			// Normal Game state
-	    switch( KeyState ) {
-		case KeyStateCommand:
+	    // Command line input: for message or cheat
+	    if( KeyState==KeyStateInput && keychar ) {
+		InputKey(keychar);
+	    } else {
+		// If no modifier look if button bound
+		if( !(KeyModifiers&(ModifierControl|ModifierAlt
+			|ModifierSuper|ModifierHyper)) ) {
 		    if( DoButtonPanelKey(key) ) {
 			return;
 		    }
-		    CommandKey(key);
-		    return;
-		case KeyStateInput:
-		    InputKey(key);
-		    return;
+		}
+		CommandKey(key);
 	    }
+	    return;
+
 	case IfaceStateMenu:			// Menu active
-	    MenuKey(key);
+	    MenuKey(keychar);
 	    return;
     }
 }
@@ -581,7 +738,7 @@ global void HandleKeyDown(unsigned key)
 **
 **	@param key	Key scancode.
 */
-global void HandleKeyUp(unsigned key)
+global void HandleKeyUp(unsigned key,unsigned keychar)
 {
     switch( key ) {
 	case KeyCodeShift:

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name groups.c	-	The units' groups handling. */
-/*
-**	(c) Copyright 1999,2000 by Patrice Fortier
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Patrice Fortier and Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -43,9 +42,9 @@
 **	Defines a group of units.
 */
 typedef struct _unit_group_ {
-    Unit *units[NUM_UNITS_PER_GROUP];	/// Units in the group
-    int num_units;			/// How many units in the group
-} UnitGroup;	/// group of units
+    Unit*	Units[NUM_UNITS_PER_GROUP];	/// Units in the group
+    int		NumUnits;			/// How many units in the group
+} UnitGroup;				/// group of units
 
 global UnitGroup Groups[NUM_GROUPS];	/// Number of groups predefined
 
@@ -61,28 +60,36 @@ global void InitGroups(void)
     int i;
 
     for( i=0; i<NUM_GROUPS; i++ ) {
-        Groups[i].num_units=0;
+        Groups[i].NumUnits=0;
     }
 }
 
 /**
  **	Return the number of units of group #num
+ **
+ **	@param num	Group number.
+ **	@return		Returns the number of units in the group.
  */
 global int GetNumberUnitsOfGroup(int num)
 {
-    return Groups[num].num_units;
+    return Groups[num].NumUnits;
 }
 
 /**
  **	Return the units of group #num
+ **
+ **	@param num	Group number.
+ **	@return		Returns an array of all units in the group.
  */
 global Unit** GetUnitsOfGroup(int num)
 {
-    return Groups[num].units;
+    return Groups[num].Units;
 }
 
 /**
  **	Clear contents of group #num
+ **
+ **	@param num	Group number.
  */
 global void ClearGroup(int num)
 {
@@ -90,35 +97,54 @@ global void ClearGroup(int num)
     int i;
 
     group=&Groups[num];
-    for( i=0; i<group->num_units; i++ ) {
-	group->units[i]->GroupId=-1;
-	group->units[i]=NoUnitP;
+    for( i=0; i<group->NumUnits; i++ ) {
+	group->Units[i]->GroupId=-1;
+	DebugCheck( group->Units[i]->Destroyed );
     }
-    group->num_units=0;
+    group->NumUnits=0;
 }
 
 /**
- **	Set group #num contents to unit array "units"
+ **	Add units to group #num contents from unit array "units"
+ **
+ **	@param units	Array of units to place into group.
+ **	@param nunits	Number of units in array.
+ **	@param num	Group number for storage.
  */
-global void SetGroup(Unit **units,int nunits,int num)
+global void AddToGroup(Unit **units,int nunits,int num)
 {
     UnitGroup *group;
     int i;
 
     DebugCheck(num>NUM_GROUPS);
 
-    ClearGroup(num);
-
     group=&Groups[num];
-    for( i=0; i<nunits; i++ ) {
-        group->units[i]=units[i];
-	group->units[i]->GroupId=num;
+    for( i=0; group->NumUnits<NUM_UNITS_PER_GROUP && i<nunits; i++ ) {
+	
+        group->Units[group->NumUnits++]=units[i];
+	units[i]->GroupId=num;
     }
-    group->num_units=nunits;
+}
+
+/**
+ **	Set group #num contents to unit array "units"
+ **
+ **	@param units	Array of units to place into group.
+ **	@param nunits	Number of units in array.
+ **	@param num	Group number for storage.
+ */
+global void SetGroup(Unit **units,int nunits,int num)
+{
+    DebugCheck(num>NUM_GROUPS || nunits>NUM_UNITS_PER_GROUP);
+
+    ClearGroup(num);
+    AddToGroup(units,nunits,num);
 }
 
 /**
  **	Remove unit from its group
+ **
+ **	@param unit	Unit to remove from group.
  */
 global void RemoveUnitFromGroup(Unit *unit)
 {
@@ -126,24 +152,21 @@ global void RemoveUnitFromGroup(Unit *unit)
     int num;
     int i;
 
-    // unit doesn't belong to a group
-    if( (num=unit->GroupId)==-1 ) {
-        return;
-    }
+    DebugCheck( unit->GroupId==-1 );	// unit doesn't belong to a group
+    num=unit->GroupId;
 
     group=&Groups[num];
-    for( i=0; group->units[i]!=unit; i++ ) {
+    for( i=0; group->Units[i]!=unit; i++ ) {
 	;
     }
 
-    DebugCheck( i>=group->num_units );
+    DebugCheck( i>=group->NumUnits );	// oops not found
 
     // This is a clean way that will allow us to add a unit
     // to a group easily, or make an easy array walk...
-    if( i<--group->num_units ) {
-        group->units[i]=group->units[group->num_units];
+    if( i<--group->NumUnits ) {
+        group->Units[i]=group->Units[group->NumUnits];
     }
-    group->units[group->num_units]=NoUnitP;
 
     unit->GroupId=-1;
 }

@@ -252,9 +252,9 @@ typedef struct _event_callback_ {
     void	(*MouseMoved)(int x,int y);
 
 	/// Callback for key press
-    void	(*KeyPressed)(unsigned key);
+    void	(*KeyPressed)(unsigned keycode,unsigned keychar);
 	/// Callback for key release
-    void	(*KeyReleased)(unsigned key);
+    void	(*KeyReleased)(unsigned keycode,unsigned keychar);
 
 	/// Callback for network event
     void	(*NetworkEvent)(void);

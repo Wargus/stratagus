@@ -601,30 +601,34 @@ local unsigned X112InternalKeycode(const KeySym code)
 **	Handle keyboard! (pressed)
 **
 **	@param callbacks	Call backs that handle the events.
-**	@param code		X11 keysym structure pointer.
+**	@param keycode		X11 key symbol.
+**	@param keychar		Keyboard character
 */
-local void X11HandleKeyPress(const EventCallback* callbacks,const KeySym code)
+local void X11HandleKeyPress(const EventCallback* callbacks,KeySym keycode,
+	unsigned keychar)
 {
     int icode;
 
-    icode=X112InternalKeycode(code);
+    icode=X112InternalKeycode(keycode);
 
-    callbacks->KeyPressed(icode);
+    callbacks->KeyPressed(icode,keychar);
 }
 
 /**
 **	Handle keyboard! (release)
 **
 **	@param callbacks	Call backs that handle the events.
-**	@param code		X11 keysym structure pointer.
+**	@param keycode		X11 key symbol.
+**	@param keychar		Keyboard character
 */
-local void X11HandleKeyRelease(const EventCallback* callbacks,const KeySym code)
+local void X11HandleKeyRelease(const EventCallback* callbacks,KeySym keycode,
+	unsigned keychar)
 {
     int icode;
 
-    icode=X112InternalKeycode(code);
+    icode=X112InternalKeycode(keycode);
 
-    callbacks->KeyReleased(icode);
+    callbacks->KeyReleased(icode,keychar);
 }
 
 /**
@@ -699,22 +703,38 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    char buf[128];
 	    int num;
 	    KeySym keysym;
+	    KeySym key;
 
             X11HandleModifiers((XKeyEvent*)&event);
-	    // FIXME: this didn't handle keypad correct!
 	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
-	    DebugLevel3("\tKey %lx `%s'\n",keysym,buf);
+	    key=XLookupKeysym((XKeyEvent*)&event,0);
+	    DebugLevel3("\tKeyv %lx %lx `%*.*s'\n",key,keysym,num,num,buf);
 	    if( num==1 ) {
-		X11HandleKeyPress(callbacks,*buf);
+		X11HandleKeyPress(callbacks,key,*buf);
 	    } else {
-		X11HandleKeyPress(callbacks,keysym);
+		X11HandleKeyPress(callbacks,key,keysym);
 	    }
 	}
 	    break;
 
 	case KeyRelease:
 	    DebugLevel3("\tKey release\n");
-	    X11HandleKeyRelease(callbacks,XLookupKeysym((XKeyEvent*)&event,0));
+	{
+	    char buf[128];
+	    int num;
+	    KeySym keysym;
+	    KeySym key;
+
+            X11HandleModifiers((XKeyEvent*)&event);
+	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
+	    key=XLookupKeysym((XKeyEvent*)&event,0);
+	    DebugLevel3("\tKey^ %lx %lx `%*.*s'\n",key,keysym,num,num,buf);
+	    if( num==1 ) {
+		X11HandleKeyRelease(callbacks,key,*buf);
+	    } else {
+		X11HandleKeyRelease(callbacks,key,keysym);
+	    }
+	}
 	    break;
 
 	case ConfigureNotify:	// IGNORE, not useful for us yet - 
@@ -917,9 +937,9 @@ global void WaitEventsAndKeepSync(void)
     int morex;
     int connection;
 
-    callbacks.ButtonPressed=(void*)HandleButtonDown;
-    callbacks.ButtonReleased=(void*)HandleButtonUp;
-    callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.ButtonPressed=HandleButtonDown;
+    callbacks.ButtonReleased=HandleButtonUp;
+    callbacks.MouseMoved=HandleMouseMove;
     callbacks.KeyPressed=HandleKeyDown;
     callbacks.KeyReleased=HandleKeyUp;
 
