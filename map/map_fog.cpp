@@ -104,9 +104,7 @@
 ----------------------------------------------------------------------------*/
 
 global int OriginalFogOfWar;				/// Use original style fog of war
-global int FogOfWarContrast = 50;		/// Contrast of fog of war
-global int FogOfWarBrightness = 10;		/// Brightness of fog of war
-global int FogOfWarSaturation = 40;		/// Saturation of fog of war
+global int FogOfWarOpacity;					/// Fog of war Opacity.
 
 #define MapFieldCompletelyVisible   0x0001  /// Field completely visible
 #define MapFieldPartiallyVisible	0x0002  /// Field partially visible
@@ -143,11 +141,6 @@ local void (*VideoDrawFog)(const GraphicData*, int, int);
 */
 local void (*VideoDrawOnlyFog)(const GraphicData*, int x, int y);
 #endif
-
-/**
-**		Precalculated fog of war alpha table.
-*/
-local void* FogOfWarAlphaTable;
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -490,6 +483,7 @@ global void UpdateFogOfWarChange(void)
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_SDL_SURFACE
+
 /**
 **		Fast draw solid fog of war 16x16 tile for 8 bpp video modes.
 **
@@ -497,7 +491,28 @@ global void UpdateFogOfWarChange(void)
 **		@param x		X position into video memory.
 **		@param y		Y position into video memory.
 */
-global void VideoDrawFogSolid(const int tile, int x, int y)
+global void VideoDrawFogSDL(const int tile, int x, int y)
+{
+	int tilepitch;
+	SDL_Rect srect;
+	SDL_Rect drect;
+
+	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+	srect.x = TileSizeX * (tile % tilepitch);
+	srect.y = TileSizeY * (tile / tilepitch);
+	srect.w = TileSizeX;
+	srect.h = TileSizeY;
+
+	drect.x = x;
+	drect.y = y;
+
+	SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
+	SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_RLEACCEL, 0);
+}
+
+global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 {
 	int tilepitch;
 	SDL_Rect srect;
@@ -516,229 +531,13 @@ global void VideoDrawFogSolid(const int tile, int x, int y)
 	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 
-global void VideoDrawOnlyFogSolid(int x, int y)
+global void VideoDrawOnlyFogSDL(int x, int y)
 {
-	// FIXME:
-/*
-	int tilepitch;
-	SDL_Rect srect;
-	SDL_Rect drect;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-
-	srect.x = TileSizeX * (tile % tilepitch);
-	srect.y = TileSizeY * (tile / tilepitch);
-	srect.w = TileSizeX;
-	srect.h = TileSizeY;
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-*/
-}
-
-global void VideoDrawUnexploredSolid(const int tile, int x, int y)
-{
-	int tilepitch;
-	SDL_Rect srect;
-	SDL_Rect drect;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-
-	srect.x = TileSizeX * (tile % tilepitch);
-	srect.y = TileSizeY * (tile / tilepitch);
-	srect.w = TileSizeX;
-	srect.h = TileSizeY;
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-}
-
-// Routines for 16 bit displays .. -------------------------------------------
-
-global void VideoDraw16OnlyFogAlpha(int x, int y)
-{
-	int i;
-	int j;
-	Uint16* p;
-	int ex;
-	int ey;
-
-	ex = x + TileSizeX;
-	ey = y + TileSizeY;
-
-	VideoLockScreen();
-	for (i = y; i < ey; ++i) {
-		p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
-		for (j = x; j < ex; ++j) {
-			*p = ((Uint16*)FogOfWarAlphaTable)[*p];
-			++p;
-		}
-	}
-	VideoUnlockScreen();
-}
-
-global void VideoDraw16FogAlpha(const int tile, int x, int y)
-{
-	int i;
-	int j;
-	Uint16* p;
-	Uint8* ptile;
-	int tilepitch;
-	int sx;
-	int sy;
-	int ex;
-	int ey;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-	sx = TileSizeX * (tile % tilepitch);
-	sy = TileSizeY * (tile / tilepitch);
-
-	ex = x + TileSizeX;
-	ey = y + TileSizeY;
-
-	VideoLockScreen();
-	for (i = y; i < ey; ++i) {
-		p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
-		ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
-			sy + (i - y) * TheMap.TileGraphic->Surface->w + sx];
-		for (j = x; j < ex; ++j) {
-			if (COLOR_FOG_P(*ptile)) {
-				*p = ((Uint16*)FogOfWarAlphaTable)[*p];
-			}
-			++p;
-			++ptile;
-		}
-	}
-	VideoUnlockScreen();
-}
-
-// Routines for 24 bit displays .. -------------------------------------------
-
-// FIXME: not written
-global void VideoDraw24OnlyFogAlpha(int x, int y)
-{
-	int i;
-	int j;
-	Uint16* p;
-	int ex;
-	int ey;
-
-	ex = x + TileSizeX;
-	ey = y + TileSizeY;
-
-	VideoLockScreen();
-	for (i = y; i < ey; ++i) {
-		p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
-		for (j = x; j < ex; ++j) {
-			*p = ((Uint16*)FogOfWarAlphaTable)[*p];
-			++p;
-		}
-	}
-	VideoUnlockScreen();
-}
-
-// FIXME: not written
-global void VideoDraw24FogAlpha(const int tile, int x, int y)
-{
-	int i;
-	int j;
-	Uint16* p;
-	Uint8* ptile;
-	int tilepitch;
-	int sx;
-	int sy;
-	int ex;
-	int ey;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-	sx = TileSizeX * (tile % tilepitch);
-	sy = TileSizeY * (tile / tilepitch);
-
-	ex = x + TileSizeX;
-	ey = y + TileSizeY;
-
-	VideoLockScreen();
-	for (i = y; i < ey; ++i) {
-		p = &((Uint16*)TheScreen->pixels)[x + i * VideoWidth];
-		ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
-			sy + (i - y) * TheMap.TileGraphic->Surface->w + sx];
-		for (j = x; j < ex; ++j) {
-			if (COLOR_FOG_P(*ptile)) {
-				*p = ((Uint16*)FogOfWarAlphaTable)[*p];
-			}
-			++p;
-			++ptile;
-		}
-	}
-	VideoUnlockScreen();
-}
-
-// Routines for 32 bit displays .. -------------------------------------------
-
-global void VideoDraw32OnlyFogAlpha(int x, int y)
-{
-	int i;
-	int j;
-	Uint32* p;
-	int ex;
-	int ey;
-
-	ex = x + TileSizeX;
-	ey = y + TileSizeY;
-
-	VideoLockScreen();
-	for (i = y; i < ey; ++i) {
-		p = &((Uint32*)TheScreen->pixels)[x + i * VideoWidth];
-		for (j = x; j < ex; ++j) {
-			*p = ((Uint32*)FogOfWarAlphaTable)[
-				((*p & 0xf8) >> 3) | ((*p & 0xfc00) >> 5) | ((*p & 0xf80000) >> 8)];
-			++p;
-		}
-	}
-	VideoUnlockScreen();
-}
-
-global void VideoDraw32FogAlpha(const int tile, int x, int y)
-{
-	int i;
-	int j;
-	Uint32* p;
-	Uint8* ptile;
-	int tilepitch;
-	int sx;
-	int sy;
-	int ex;
-	int ey;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-	sx = TileSizeX * (tile % tilepitch);
-	sy = TileSizeY * (tile / tilepitch);
-
-	ex = x + TileSizeX;
-	ey = y + TileSizeY;
-
-	VideoLockScreen();
-	for (i = y; i < ey; ++i) {
-		p = &((Uint32*)TheScreen->pixels)[x + i * VideoWidth];
-		ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
-			sy + (i - y) * TheMap.TileGraphic->Surface->w + sx];
-		for (j = x; j < ex; ++j) {
-			if (COLOR_FOG_P(*ptile)) {
-				*p = ((Uint32*)FogOfWarAlphaTable)[
-					((*p & 0xf8) >> 3) | ((*p & 0xfc00) >> 5) | ((*p & 0xf80000) >> 8)];
-			}
-			++p;
-			++ptile;
-		}
-	}
-	VideoUnlockScreen();
+	VideoFillTransRectangleClip(ColorBlack, x, y, TileSizeX, TileSizeY, 128);
 }
 
 #else
+
 // Routines for 8 bit displays .. --------------------------------------------
 
 /**
@@ -1726,6 +1525,13 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data, int x, int y)
 }
 #endif
 
+
+#ifdef USE_OPENGL
+
+// ------------------------------------------------------------------
+// Routines for OpenGL .. -------------------------------------------
+// ------------------------------------------------------------------
+
 /**
 **		Fast draw solid unexplored tile.
 **
@@ -1733,970 +1539,24 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data, int x, int y)
 **		@param x		X position into video memory
 **		@param y		Y position into video memory
 */
-#ifdef USE_OPENGL
 global void VideoDrawUnexploredSolidOpenGL(
 	const GraphicData* data __attribute__((unused)),
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
 }
-#endif
-
-/*----------------------------------------------------------------------------
---		Draw real fog :-)
-----------------------------------------------------------------------------*/
-
-#ifndef USE_SDL_SURFACE
-// Routines for 8 bit displays .. --------------------------------------------
 
 /**
-**		Fast draw alpha fog of war 16x16 tile for 8 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw8Fog16Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType8* dp;
-	VMemType8 fog;
-	int da;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory8 + x + y * VideoWidth;
-	da = VideoWidth;
-	fog = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (COLOR_FOG_P(sp[x])) {		\
-			if (dp[x] != fog) { \
-				dp[x] = ((VMemType8*)FogOfWarAlphaTable)[dp[x]]; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 16x16 tile for 8 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw8OnlyFog16Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType8* gp;
-	VMemType8* dp;
-	VMemType8 fog;
-	int da;
-
-	dp = VideoMemory8 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	fog = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x] != fog) { \
-			dp[x] = ((VMemType8*)FogOfWarAlphaTable)[dp[x]];		\
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL16(0);
-		dp += da;
-
-		UNROLL16(0);
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw alpha fog of war 32x32 tile for 8 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw8Fog32Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType8* dp;
-	VMemType8 fog;
-	int da;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory8 + x + y * VideoWidth;
-	da = VideoWidth;
-	fog = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (COLOR_FOG_P(sp[x])) {		\
-			if (dp[x] != fog) { \
-				dp[x] = ((VMemType8*)FogOfWarAlphaTable)[dp[x]]; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL32(0);
-		sp += TileSizeX;
-		dp += da;
-
-		UNROLL32(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 32x32 tile for 8 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw8OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType8* gp;
-	VMemType8* dp;
-	VMemType8 fog;
-	int da;
-
-	dp = VideoMemory8 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	fog = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x] != fog) { \
-			dp[x] = ((VMemType8*)FogOfWarAlphaTable)[dp[x]];		\
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL32(0);
-		dp += da;
-
-		UNROLL32(0);
-		dp += da;
-	}
-}
-
-// Routines for 16 bit displays .. -------------------------------------------
-
-/**
-**		Fast draw alpha fog of war 16x16 tile for 16 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw16Fog16Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType16* dp;
-	VMemType16 fog;
-	int da;
-	//int o;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory16 + x + y * VideoWidth;
-	da = VideoWidth;
-	fog = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-		//static int a=1234567;
-		//o=rand();
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x] != fog) { \
-			/* o=a=a*(123456*4+1)+1; */ \
-			if (COLOR_FOG_P(sp[x])) {		\
-				dp[x] = ((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/]; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-		//o=(o>>1)|((o&1)<<31);
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 16x16 tile for 16 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw16OnlyFog16Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType16* gp;
-	VMemType16* dp;
-	VMemType16 fog;
-	int da;
-	//int o;
-
-	dp = VideoMemory16 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	fog = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-		//static int a=1234567;
-		//o=rand();
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x] != fog) { \
-			/* o=a=a*(123456*4+1)+1; */ \
-			dp[x] = ((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/]; \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-		//o=(o>>1)|((o&1)<<31);
-
-		UNROLL16(0);
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw alpha fog of war 32x32 tile for 16 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw16Fog32Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType16* dp;
-	VMemType16 fog;
-	int da;
-	//int o;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory16 + x + y * VideoWidth;
-	da = VideoWidth;
-	fog = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-		//static int a=1234567;
-		//o=rand();
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x] != fog) { \
-			/* o=a=a*(123456*4+1)+1; */ \
-			if (COLOR_FOG_P(sp[x])) {		\
-				dp[x] = ((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/]; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-		//o=(o>>1)|((o&1)<<31);
-
-		UNROLL32(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 32x32 tile for 16 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-**
-**		The random effect is commented out
-*/
-global void VideoDraw16OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType16* gp;
-	VMemType16* dp;
-	VMemType16 fog;
-	int da;
-	//int o;
-
-	dp = VideoMemory16 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	fog = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-		//static int a=1234567;
-		//o=rand();
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x] != fog) { \
-			/* o=a=a*(123456*4+1)+1; */ \
-			dp[x] = ((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/]; \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-		//o=(o>>1)|((o&1)<<31);
-
-		UNROLL32(0);
-		dp += da;
-	}
-}
-
-// Routines for 24 bit displays .. -------------------------------------------
-
-/**
-**		Fast draw alpha fog of war 16x16 tile for 24 bpp video modes.
+**		Fast draw alpha fog of war Opengl.
 **
 **		@param data		pointer to tile graphic data.
 **		@param x		X position into video memory
 **		@param y		Y position into video memory
 */
-global void VideoDraw24Fog16Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType24* dp;
-	VMemType24 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v ;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory24 + x + y * VideoWidth;
-	da = VideoWidth;
-	fog = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness * 25600 * 3) / 30000)
-
-#undef UNROLL1
-#define UNROLL1(x)	  \
-		if (COLOR_FOG_P(sp[x])) { \
-			if (dp[x].a != fog.a || dp[x].b != fog.b || dp[x].c != fog.c) { \
-				r = dp[x].a & 0xff; \
-				g = dp[x].b & 0xff; \
-				b = dp[x].c & 0xff; \
-				v = r + g + b; \
-\
-				r = FOG_SCALE(r); \
-				g = FOG_SCALE(g); \
-				b = FOG_SCALE(b); \
-\
-				r = r < 0 ? 0 : r > 255 ? 255 : r; \
-				g = g < 0 ? 0 : g > 255 ? 255 : g; \
-				b = b < 0 ? 0 : b > 255 ? 255 : b; \
-				dp[x].a = r; \
-				dp[x].b = g; \
-				dp[x].c = b; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 16x16 tile for 24 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-global void VideoDraw24OnlyFog16Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType24* gp;
-	VMemType24* dp;
-	VMemType24 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v;
-
-	dp = VideoMemory24 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	fog = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness * 25600 * 3) / 30000)
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x].a != fog.a || dp[x].b != fog.b || dp[x].c != fog.c) { \
-			r = dp[x].a & 0xff; \
-			g = dp[x].b & 0xff; \
-			b = dp[x].c & 0xff; \
-			v = r + g + b; \
-\
-			r = FOG_SCALE(r); \
-			g = FOG_SCALE(g); \
-			b = FOG_SCALE(b); \
-\
-			r = r < 0 ? 0 : r > 255 ? 255 : r; \
-			g = g < 0 ? 0 : g > 255 ? 255 : g; \
-			b = b < 0 ? 0 : b > 255 ? 255 : b; \
-			dp[x].a = r; \
-			dp[x].b = g; \
-			dp[x].c = b; \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL16(0);
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw alpha fog of war 32x32 tile for 24 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-global void VideoDraw24Fog32Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType24* dp;
-	VMemType24 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory24 + x + y * VideoWidth;
-	da = VideoWidth;
-	fog = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness * 25600 * 3) / 30000)
-
-#undef UNROLL1
-#define UNROLL1(x)	  \
-		if (COLOR_FOG_P(sp[x])) { \
-			if (dp[x].a != fog.a || dp[x].b != fog.b || dp[x].c != fog.c) { \
-				r = dp[x].a & 0xff; \
-				g = dp[x].b & 0xff; \
-				b = dp[x].c & 0xff; \
-				v = r + g + b; \
-\
-				r = FOG_SCALE(r); \
-				g = FOG_SCALE(g); \
-				b = FOG_SCALE(b); \
-\
-				r = r < 0 ? 0 : r > 255 ? 255 : r; \
-				g = g < 0 ? 0 : g > 255 ? 255 : g; \
-				b = b < 0 ? 0 : b > 255 ? 255 : b; \
-				dp[x].a = r; \
-				dp[x].b = g; \
-				dp[x].c = b; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL32(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 32x32 tile for 24 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-global void VideoDraw24OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType24* gp;
-	VMemType24* dp;
-	VMemType24 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v;
-
-	dp = VideoMemory24 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	fog = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness * 25600 * 3) / 30000)
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		if (dp[x].a != fog.a || dp[x].b != fog.b || dp[x].c != fog.c) { \
-			r = dp[x].a & 0xff; \
-			g = dp[x].b & 0xff; \
-			b = dp[x].c & 0xff; \
-			v = r + g + b; \
-\
-			r = FOG_SCALE(r); \
-			g = FOG_SCALE(g); \
-			b = FOG_SCALE(b); \
-\
-			r = r < 0 ? 0 : r > 255 ? 255 : r; \
-			g = g < 0 ? 0 : g > 255 ? 255 : g; \
-			b = b < 0 ? 0 : b > 255 ? 255 : b; \
-			dp[x].a = r; \
-			dp[x].b = g; \
-			dp[x].c = b; \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL32(0);
-		dp += da;
-	}
-}
-
-// Routines for 32 bit displays .. -------------------------------------------
-
-/**
-**		Fast draw alpha fog of war 16x16 tile for 32 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-global void VideoDraw32Fog16Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType32* dp;
-	VMemType32 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v;
-	VMemType32 i;
-	VMemType32 lasti;
-	VMemType32 lastrgb;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory32 + x + y * VideoWidth;
-	da = VideoWidth;
-	lastrgb = lasti = 0;
-	fog = ((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness * 25600 * 3) / 30000)
-
-#undef UNROLL1
-#define UNROLL1(x)	  \
-		if (COLOR_FOG_P(sp[x])) { \
-			i = dp[x]; \
-			if (i != fog) { \
-				if (i == lasti) { \
-					dp[x] = lastrgb; \
-				} else { \
-					lasti = i; \
-					r = i		 & 0xff; \
-					g = (i >> 8 ) & 0xff; \
-					b = (i >> 16) & 0xff; \
-					v = r + g + b; \
- \
-					r = FOG_SCALE(r); \
-					g = FOG_SCALE(g); \
-					b = FOG_SCALE(b); \
- \
-					r = r < 0 ? 0 : r > 255 ? 255 : r; \
-					g = g < 0 ? 0 : g > 255 ? 255 : g; \
-					b = b < 0 ? 0 : b > 255 ? 255 : b; \
-					dp[x] = (r | (g << 8) | (b << 16)); \
-					lastrgb = dp[x]; \
-				} \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL16(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 16x16 tile for 32 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-global void VideoDraw32OnlyFog16Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType32* gp;
-	VMemType32* dp;
-	VMemType32 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v;
-	VMemType32 i;
-	VMemType32 lasti;
-	VMemType32 lastrgb;
-
-	dp = VideoMemory32 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	lastrgb = lasti = 0;
-	fog = ((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness * 25600 * 3) / 30000)
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		i = dp[x]; \
-		if (i != fog) { \
-			if (i == lasti) { \
-				dp[x] = lastrgb; \
-			} else { \
-				lasti = i; \
-				r = i		 & 0xff; \
-				g = (i >> 8 ) & 0xff; \
-				b = (i >> 16) & 0xff; \
-				v = r + g + b; \
- \
-				r = FOG_SCALE(r); \
-				g = FOG_SCALE(g); \
-				b = FOG_SCALE(b); \
- \
-				r = r < 0 ? 0 : r > 255 ? 255 : r; \
-				g = g < 0 ? 0 : g > 255 ? 255 : g; \
-				b = b < 0 ? 0 : b > 255 ? 255 : b; \
-				dp[x] = r | (g << 8) | (b << 16); \
-				lastrgb = dp[x]; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL16(0);
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw alpha fog of war 32x32 tile for 32 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-global void VideoDraw32Fog32Alpha(const GraphicData* data, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* gp;
-	VMemType32* dp;
-	VMemType32 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v;
-	VMemType32 i;
-	VMemType32 lasti;
-	VMemType32 lastrgb;
-
-	sp = data;
-	gp = sp + TileSizeY * TileSizeX;
-	dp = VideoMemory32 + x + y * VideoWidth;
-	da = VideoWidth;
-	lastrgb = lasti = 0;
-	fog = ((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (sp < gp) {
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness * 25600 * 3) / 30000)
-
-#undef UNROLL1
-#define UNROLL1(x)	  \
-		if (COLOR_FOG_P(sp[x])) { \
-			i = dp[x]; \
-			if (i != fog) { \
-				if (i == lasti) { \
-					dp[x] = lastrgb; \
-				} else { \
-					lasti = i; \
-					r = i		 & 0xff; \
-					g = (i >> 8 ) & 0xff; \
-					b = (i >> 16) & 0xff; \
-					v = r + g + b; \
- \
-					r = FOG_SCALE(r); \
-					g = FOG_SCALE(g); \
-					b = FOG_SCALE(b); \
- \
-					r = r < 0 ? 0 : r > 255 ? 255 : r; \
-					g = g < 0 ? 0 : g > 255 ? 255 : g; \
-					b = b < 0 ? 0 : b > 255 ? 255 : b; \
-					dp[x] = (r | (g << 8) | (b << 16)); \
-					lastrgb = dp[x]; \
-				} \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL32(0);
-		sp += TileSizeX;
-		dp += da;
-	}
-}
-
-/**
-**		Fast draw 100% fog of war 32x32 tile for 32 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),
-	int x, int y)
-{
-	const VMemType32* gp;
-	VMemType32* dp;
-	VMemType32 fog;
-	int da;
-	int r;
-	int g;
-	int b;
-	int v;
-	VMemType32 i;
-	VMemType32 lasti;
-	VMemType32 lastrgb;
-
-	dp = VideoMemory32 + x + y * VideoWidth;
-	gp = dp + VideoWidth * TileSizeY;
-	da = VideoWidth;
-	lastrgb = lasti = 0;
-	fog = ((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
-
-	while (dp < gp) {
-
-#undef FOG_SCALE
-#define FOG_SCALE(x) \
-			(((((x * 3 - v) * FogOfWarSaturation + v * 100) * FogOfWarContrast) + \
-				FogOfWarBrightness*25600*3)/30000)
-
-#undef UNROLL1
-#define UNROLL1(x)		\
-		i = dp[x]; \
-		if (i != fog) { \
-			if (i == lasti) { \
-				dp[x] = lastrgb; \
-			} else { \
-				lasti = i; \
-				r = i		 & 0xff; \
-				g = (i >> 8 ) & 0xff; \
-				b = (i >> 16) & 0xff; \
-				v = r + g + b; \
- \
-				r = FOG_SCALE(r); \
-				g = FOG_SCALE(g); \
-				b = FOG_SCALE(b); \
- \
-				r = r < 0 ? 0 : r > 255 ? 255 : r; \
-				g = g < 0 ? 0 : g > 255 ? 255 : g; \
-				b = b < 0 ? 0 : b > 255 ? 255 : b; \
-				dp[x] = r | (g << 8) | (b << 16); \
-				lastrgb = dp[x]; \
-			} \
-		} \
-
-#undef UNROLL2
-#define UNROLL2(x)		\
-		UNROLL1(x + 0);		\
-		UNROLL1(x + 1);		\
-
-		UNROLL32(0);
-		dp += da;
-	}
-}
-#endif
-
-// Routines for OpenGL .. -------------------------------------------
-
-/**
-**		Fast draw alpha fog of war 32x32 tile for 32 bpp video modes.
-**
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-#ifdef USE_OPENGL
 global void VideoDrawFogAlphaOpenGL(
 	const GraphicData* data __attribute__((unused)),
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
 }
-#endif
 
 /**
 **		Fast draw 100% fog of war 32x32 tile for 32 bpp video modes.
@@ -2708,7 +1568,6 @@ global void VideoDrawFogAlphaOpenGL(
 **		@param x		X position into video memory
 **		@param y		Y position into video memory
 */
-#ifdef USE_OPENGL
 global void VideoDrawOnlyFogAlphaOpenGL(
 	const GraphicData* data __attribute__((unused)),
 	int x, int y)
@@ -2977,7 +1836,7 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 						MapDrawTile(UNEXPLORED_TILE, dx, dy);
 #else
 #ifdef USE_SDL_SURFACE
-						VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
+						VideoFillRectangle(ColorBlack, dx, dy, TileSizeX, TileSizeY);
 #else
 						VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
 #endif
@@ -3078,328 +1937,69 @@ global void InitMapFogOfWar(void)
 	VideoDrawOnlyFog = VideoDrawOnlyFogAlphaOpenGL;
 	VideoDrawUnexplored = VideoDrawUnexploredSolidOpenGL;
 #else
-
 #ifdef USE_SDL_SURFACE
-	if (!OriginalFogOfWar) {
-		int i;
-		int n;
-		int v;
-		int r, g, b;
-		int rmask, gmask, bmask;
-		int rshft, gshft, bshft;
-		int rloss, gloss, bloss;
-
-		VideoDrawUnexplored = VideoDrawUnexploredSolid;
-		switch (VideoDepth) {
-			case 8:
-				DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
-				break;
-			case 15:
-				rshft = ( 0);
-				gshft = ( 5);
-				bshft = (10);
-				rmask = (0x1F << rshft);
-				gmask = (0x1F << gshft);
-				bmask = (0x1F << bshft);
-				rloss = ( 3);
-				gloss = ( 3);
-				bloss = ( 3);
-				goto build_table;
-			case 16:
-				rshft = ( 0);
-				gshft = ( 5);
-				bshft = (11);
-				rmask = (0x1F << rshft);
-				gmask = (0x3F << gshft);
-				bmask = (0x1F << bshft);
-				rloss = ( 3);
-				gloss = ( 2);
-				bloss = ( 3);
-build_table:
-				n = 1 << (sizeof(Uint16) * 8);
-				if (!FogOfWarAlphaTable) {
-					FogOfWarAlphaTable = malloc(n * sizeof(Uint16));
-				}
-				for (i = 0; i < n; ++i) {
-					r = (i & rmask) >> rshft << rloss;
-					g = (i & gmask) >> gshft << gloss;
-					b = (i & bmask) >> bshft << bloss;
-					v = r + g + b;
-
-					r = ((((r * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-					g = ((((g * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-					b = ((((b * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-
-					// Boundings
-					r = r < 0 ? 0 : r > 255 ? 255 : r;
-					g = g < 0 ? 0 : g > 255 ? 255 : g;
-					b = b < 0 ? 0 : b > 255 ? 255 : b;
-					((Uint16*)FogOfWarAlphaTable)[i] =
-						((r >> rloss) << rshft) | ((g >> gloss) << gshft) |
-						((b >> bloss) << bshft);
-				}
-				VideoDrawFog = VideoDraw16FogAlpha;
-				VideoDrawOnlyFog = VideoDraw16OnlyFogAlpha;
-				break;
-			case 24:
-				VideoDrawFog = VideoDraw24FogAlpha;
-				VideoDrawOnlyFog = VideoDraw24OnlyFogAlpha;
-				break;
-			case 32:
-				rshft = ( 0);
-				gshft = ( 5);
-				bshft = (11);
-				rmask = (0x1F << rshft);
-				gmask = (0x3F << gshft);
-				bmask = (0x1F << bshft);
-				rloss = ( 3);
-				gloss = ( 2);
-				bloss = ( 3);
-
-				n = 1 << (sizeof(Uint16) * 8);
-				if (!FogOfWarAlphaTable) {
-					FogOfWarAlphaTable = malloc(n * sizeof(Uint32));
-				}
-				for (i = 0; i < n; ++i) {
-					r = (i & rmask) >> rshft << rloss;
-					g = (i & gmask) >> gshft << gloss;
-					b = (i & bmask) >> bshft << bloss;
-					v = r + g + b;
-
-					r = ((((r * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-					g = ((((g * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-					b = ((((b * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-
-					// Boundings
-					r = r < 0 ? 0 : r > 255 ? 255 : r;
-					g = g < 0 ? 0 : g > 255 ? 255 : g;
-					b = b < 0 ? 0 : b > 255 ? 255 : b;
-					((Uint32*)FogOfWarAlphaTable)[i] = (r | (g << 8) | (b << 16));
-				}
-				VideoDrawFog = VideoDraw32FogAlpha;
-				VideoDrawOnlyFog = VideoDraw32OnlyFogAlpha;
-				break;
-			default:
-				DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
-				break;
-		}
-	} else {
-		VideoDrawUnexplored = VideoDrawUnexploredSolid;
-		VideoDrawFog = VideoDrawFogSolid;
-		VideoDrawOnlyFog = VideoDrawOnlyFogSolid;
-#if 0
-		switch (VideoDepth) {
-			case 8:
-				break;
-			case 15:
-			case 16:
-				VideoDrawFog = VideoDrawFogSolid;
-				VideoDrawOnlyFog = VideoDrawOnlyFogSolid;
-				break;
-			case 24:
-				break;
-			case 32:
-				break;
-			default:
-				DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
-				break;
-		}
-#endif
-	}
-
+	VideoDrawUnexplored = VideoDrawUnexploredSDL;
+	VideoDrawFog = VideoDrawFogSDL;
+	VideoDrawOnlyFog = VideoDrawOnlyFogSDL;
 #else
-	if (!OriginalFogOfWar) {
-		int i;
-		int n;
-		int v;
-		int r, g, b;
-		int rmask, gmask, bmask;
-		int rshft, gshft, bshft;
-		int rloss, gloss, bloss;
-
+	if (TileSizeX == 16 && TileSizeY == 16) {
 		switch (VideoDepth) {
-			case 8:
-				n = 1 << (sizeof(VMemType8) * 8);
-				if (!FogOfWarAlphaTable) {
-					FogOfWarAlphaTable = malloc(n * sizeof(VMemType8));
-				}
-				if (lookup25trans8) { // if enabled, make use of it in 8bpp ;)
-					unsigned int trans_color;
-					int j;
-
-					trans_color = ColorBlack.D8;
-					trans_color <<= 8;
-
-					//FIXME: determine which lookup table to use based on
-					//FIXME: FogOfWarSaturation,FogOfWarContrast and
-					//FIXME: FogOfWarBrightness
-					for (j = 0; j < n; ++j) {
-						((VMemType8*)FogOfWarAlphaTable)[j] =
-							lookup50trans8[trans_color | j];
-					}
-				} else {
-					for (i = 0; i < n; ++i) {
-						int j;
-						int l;
-						int d;
-
-						r = TheMap.TileData->Palette[i].r;
-						g = TheMap.TileData->Palette[i].g;
-						b = TheMap.TileData->Palette[i].b;
-						DebugLevel3("%d,%d,%d\n" _C_ r _C_ g _C_ b);
-						v = r + g + b;
-
-						r = ((((r * 3 - v) * FogOfWarSaturation + v * 100) *
-							FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-						g = ((((g * 3 - v) * FogOfWarSaturation + v * 100) *
-							FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-						b = ((((b * 3 - v) * FogOfWarSaturation + v * 100) *
-							FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-
-						// Boundings
-						r = r < 0 ? 0 : r > 255 ? 255 : r;
-						g = g < 0 ? 0 : g > 255 ? 255 : g;
-						b = b < 0 ? 0 : b > 255 ? 255 : b;
-
-						//
-						//		Find the best matching color
-						//
-						l = i;
-						d = 256 * 3 + 256;
-						for (j = 0; j < 256; ++j) {
-							// simple color distance
-							v = (abs(TheMap.TileData->Palette[j].r - r) +
-								abs(TheMap.TileData->Palette[j].g - g) +
-								abs(TheMap.TileData->Palette[j].b - b)) * 3 +
-								// light
-								abs(TheMap.TileData->Palette[j].r +
-									TheMap.TileData->Palette[j].g +
-									TheMap.TileData->Palette[j].b - (r + g + b)) * 1;
-							if (v < d) {
-								d = v;
-								l = j;
-							}
-						}
-						DebugLevel3("%d,%d,%d -> %d,%d,%d\n" _C_ r _C_ g _C_ b _C_
-							TheMap.TileData->Palette[l].r _C_ TheMap.TileData->Palette[l].g _C_
-							TheMap.TileData->Palette[l].b);
-						((VMemType8*)FogOfWarAlphaTable)[i] = l;
-					}
-				}
-
-				if (TileSizeX == 16 && TileSizeY == 16) {
-					VideoDrawFog = VideoDraw8Fog16Alpha;
-					VideoDrawOnlyFog = VideoDraw8OnlyFog16Alpha;
-					VideoDrawUnexplored = VideoDraw8Unexplored16Solid;
-				} else if (TileSizeX == 32 && TileSizeY == 32) {
-					VideoDrawFog = VideoDraw8Fog32Alpha;
-					VideoDrawOnlyFog = VideoDraw8OnlyFog32Alpha;
-					VideoDrawUnexplored = VideoDraw8Unexplored32Solid;
-				} else {
-					printf("Tile size not supported: (%dx%d)\n", TileSizeX, TileSizeY);
-					exit(1);
-				}
+			case  8:						//  8 bpp video depth
+				VideoDrawFog = VideoDraw8Fog16Solid;
+				VideoDrawOnlyFog = VideoDraw8OnlyFog16Solid;
+				VideoDrawUnexplored = VideoDraw8Unexplored16Solid;
 				break;
 
-			case 15:						// 15 bpp 555 video depth
-				rshft = ( 0);
-				gshft = ( 5);
-				bshft = (10);
-				rmask = (0x1F << rshft);
-				gmask = (0x1F << gshft);
-				bmask = (0x1F << bshft);
-				rloss = ( 3);
-				gloss = ( 3);
-				bloss = ( 3);
-				goto build_table;
-
-			case 16:						// 16 bpp 565 video depth
-				rshft = ( 0);
-				gshft = ( 5);
-				bshft = (11);
-				rmask = (0x1F << rshft);
-				gmask = (0x3F << gshft);
-				bmask = (0x1F << bshft);
-				rloss = ( 3);
-				gloss = ( 2);
-				bloss = ( 3);
-
-build_table:
-				n = 1 << (sizeof(VMemType16) * 8);
-				if (!FogOfWarAlphaTable) {
-					FogOfWarAlphaTable = malloc(n * sizeof(VMemType16));
-				}
-				for (i = 0; i < n; ++i) {
-					r = (i & rmask) >> rshft << rloss;
-					g = (i & gmask) >> gshft << gloss;
-					b = (i & bmask) >> bshft << bloss;
-					v = r + g + b;
-
-					r = ((((r * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-					g = ((((g * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-					b = ((((b * 3 - v) * FogOfWarSaturation + v * 100) *
-						FogOfWarContrast) + FogOfWarBrightness * 25600 * 3) / 30000;
-
-					// Boundings
-					r = r < 0 ? 0 : r > 255 ? 255 : r;
-					g = g < 0 ? 0 : g > 255 ? 255 : g;
-					b = b < 0 ? 0 : b > 255 ? 255 : b;
-					((VMemType16*)FogOfWarAlphaTable)[i] =
-						((r >> rloss) << rshft) | ((g >> gloss) << gshft) |
-						((b >> bloss) << bshft);
-				}
-				if (TileSizeX == 16 && TileSizeY == 16) {
-					VideoDrawFog = VideoDraw16Fog16Alpha;
-					VideoDrawOnlyFog = VideoDraw16OnlyFog16Alpha;
-					VideoDrawUnexplored = VideoDraw16Unexplored16Solid;
-				} else if (TileSizeX == 32 && TileSizeY == 32) {
-					VideoDrawFog = VideoDraw16Fog32Alpha;
-					VideoDrawOnlyFog = VideoDraw16OnlyFog32Alpha;
-					VideoDrawUnexplored = VideoDraw16Unexplored32Solid;
-				} else {
-					printf("Tile size not supported: (%dx%d)\n", TileSizeX, TileSizeY);
-					exit(1);
-				}
+			case 15:						// 15 bpp video depth
+			case 16:						// 16 bpp video depth
+				VideoDrawFog = VideoDraw16Fog16Solid;
+				VideoDrawOnlyFog = VideoDraw16OnlyFog16Solid;
+				VideoDrawUnexplored = VideoDraw16Unexplored16Solid;
 				break;
-
-			case 24:
+			case 24:						// 24 bpp video depth
 				if (VideoBpp == 24) {
-					if (TileSizeX == 16 && TileSizeY == 16) {
-						VideoDrawFog = VideoDraw24Fog16Alpha;
-						VideoDrawOnlyFog = VideoDraw24OnlyFog16Alpha;
-						VideoDrawUnexplored = VideoDraw24Unexplored16Solid;
-					} else if (TileSizeX == 32 && TileSizeY == 32) {
-						VideoDrawFog = VideoDraw24Fog32Alpha;
-						VideoDrawOnlyFog = VideoDraw24OnlyFog32Alpha;
-						VideoDrawUnexplored = VideoDraw24Unexplored32Solid;
-					} else {
-						printf("Tile size not supported: (%dx%d)\n", TileSizeX, TileSizeY);
-						exit(1);
-					}
+					VideoDrawFog = VideoDraw24Fog16Solid;
+					VideoDrawOnlyFog = VideoDraw24OnlyFog16Solid;
+					VideoDrawUnexplored = VideoDraw24Unexplored16Solid;
 					break;
 				}
 				// FALL THROUGH
-			case 32:
-				if (TileSizeX == 16 && TileSizeY == 16) {
-					VideoDrawFog = VideoDraw32Fog16Alpha;
-					VideoDrawOnlyFog = VideoDraw32OnlyFog16Alpha;
-					VideoDrawUnexplored = VideoDraw32Unexplored16Solid;
-				} else if (TileSizeX == 32 && TileSizeY == 32) {
-					VideoDrawFog = VideoDraw32Fog32Alpha;
-					VideoDrawOnlyFog = VideoDraw32OnlyFog32Alpha;
-					VideoDrawUnexplored = VideoDraw32Unexplored32Solid;
-				} else {
-					printf("Tile size not supported: (%dx%d)\n", TileSizeX, TileSizeY);
-					exit(1);
+			case 32:						// 32 bpp video depth
+				VideoDrawFog = VideoDraw32Fog16Solid;
+				VideoDrawOnlyFog = VideoDraw32OnlyFog16Solid;
+				VideoDrawUnexplored = VideoDraw32Unexplored16Solid;
+				break;
+
+			default:
+				DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
+				break;
+		}
+	} else if (TileSizeX == 32 && TileSizeY == 32) {
+		switch (VideoDepth) {
+			case  8:						//  8 bpp video depth
+				VideoDrawFog = VideoDraw8Fog32Solid;
+				VideoDrawOnlyFog = VideoDraw8OnlyFog32Solid;
+				VideoDrawUnexplored = VideoDraw8Unexplored32Solid;
+				break;
+
+			case 15:						// 15 bpp video depth
+			case 16:						// 16 bpp video depth
+				VideoDrawFog = VideoDraw16Fog32Solid;
+				VideoDrawOnlyFog = VideoDraw16OnlyFog32Solid;
+				VideoDrawUnexplored = VideoDraw16Unexplored32Solid;
+				break;
+			case 24:						// 24 bpp video depth
+				if (VideoBpp == 24) {
+					VideoDrawFog = VideoDraw24Fog32Solid;
+					VideoDrawOnlyFog = VideoDraw24OnlyFog32Solid;
+					VideoDrawUnexplored = VideoDraw24Unexplored32Solid;
+					break;
 				}
+				// FALL THROUGH
+			case 32:						// 32 bpp video depth
+				VideoDrawFog = VideoDraw32Fog32Solid;
+				VideoDrawOnlyFog = VideoDraw32OnlyFog32Solid;
+				VideoDrawUnexplored = VideoDraw32Unexplored32Solid;
 				break;
 
 			default:
@@ -3407,74 +2007,8 @@ build_table:
 				break;
 		}
 	} else {
-		if (TileSizeX == 16 && TileSizeY == 16) {
-			switch (VideoDepth) {
-				case  8:						//  8 bpp video depth
-					VideoDrawFog = VideoDraw8Fog16Solid;
-					VideoDrawOnlyFog = VideoDraw8OnlyFog16Solid;
-					VideoDrawUnexplored = VideoDraw8Unexplored16Solid;
-					break;
-
-				case 15:						// 15 bpp video depth
-				case 16:						// 16 bpp video depth
-					VideoDrawFog = VideoDraw16Fog16Solid;
-					VideoDrawOnlyFog = VideoDraw16OnlyFog16Solid;
-					VideoDrawUnexplored = VideoDraw16Unexplored16Solid;
-					break;
-				case 24:						// 24 bpp video depth
-					if (VideoBpp == 24) {
-						VideoDrawFog = VideoDraw24Fog16Solid;
-						VideoDrawOnlyFog = VideoDraw24OnlyFog16Solid;
-						VideoDrawUnexplored = VideoDraw24Unexplored16Solid;
-						break;
-					}
-					// FALL THROUGH
-				case 32:						// 32 bpp video depth
-					VideoDrawFog = VideoDraw32Fog16Solid;
-					VideoDrawOnlyFog = VideoDraw32OnlyFog16Solid;
-					VideoDrawUnexplored = VideoDraw32Unexplored16Solid;
-					break;
-
-				default:
-					DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
-					break;
-			}
-		} else if (TileSizeX == 32 && TileSizeY == 32) {
-			switch (VideoDepth) {
-				case  8:						//  8 bpp video depth
-					VideoDrawFog = VideoDraw8Fog32Solid;
-					VideoDrawOnlyFog = VideoDraw8OnlyFog32Solid;
-					VideoDrawUnexplored = VideoDraw8Unexplored32Solid;
-					break;
-
-				case 15:						// 15 bpp video depth
-				case 16:						// 16 bpp video depth
-					VideoDrawFog = VideoDraw16Fog32Solid;
-					VideoDrawOnlyFog = VideoDraw16OnlyFog32Solid;
-					VideoDrawUnexplored = VideoDraw16Unexplored32Solid;
-					break;
-				case 24:						// 24 bpp video depth
-					if (VideoBpp == 24) {
-						VideoDrawFog = VideoDraw24Fog32Solid;
-						VideoDrawOnlyFog = VideoDraw24OnlyFog32Solid;
-						VideoDrawUnexplored = VideoDraw24Unexplored32Solid;
-						break;
-					}
-					// FALL THROUGH
-				case 32:						// 32 bpp video depth
-					VideoDrawFog = VideoDraw32Fog32Solid;
-					VideoDrawOnlyFog = VideoDraw32OnlyFog32Solid;
-					VideoDrawUnexplored = VideoDraw32Unexplored32Solid;
-					break;
-
-				default:
-					DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
-					break;
-			}
-		} else {
-			printf("Tile size not supported: (%dx%d)\n", TileSizeX, TileSizeY);
-			exit(1);
-		}
+		printf("Tile size not supported: (%dx%d)\n", TileSizeX, TileSizeY);
+		exit(1);
 	}
 #endif
 #endif
@@ -3488,11 +2022,6 @@ global void CleanMapFogOfWar(void)
 	if (VisibleTable) {
 		free(VisibleTable);
 		VisibleTable = NULL;
-	}
-
-	if (FogOfWarAlphaTable) {
-		free(FogOfWarAlphaTable);
-		FogOfWarAlphaTable = NULL;
 	}
 }
 

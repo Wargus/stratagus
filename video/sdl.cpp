@@ -899,17 +899,6 @@ global VMemType* VideoCreateNewPalette(const Palette* palette)
 		b = (palette[i].b) & 0xFF;
 		v = r + g + b;
 
-		// Apply global saturation,contrast and brightness
-		r = ((((r * 3 - v) * TheUI.Saturation + v * 100)
-				* TheUI.Contrast)
-			+ TheUI.Brightness * 25600 * 3) / 30000;
-		g = ((((g * 3 - v) * TheUI.Saturation + v * 100)
-				* TheUI.Contrast)
-			+ TheUI.Brightness * 25600 * 3) / 30000;
-		b = ((((b * 3 - v) * TheUI.Saturation + v * 100)
-				* TheUI.Contrast)
-			+ TheUI.Brightness * 25600 * 3) / 30000;
-
 		// Boundings
 		r = r < 0 ? 0 : r > 255 ? 255 : r;
 		g = g < 0 ? 0 : g > 255 ? 255 : g;
