@@ -202,10 +202,10 @@
 #define DebugLevel1(args) do { fprintf(stdout,args); } while(0)
 #define DebugLevel2(args) do { fprintf(stdout,args); } while(0)
 #define DebugLevel3(args) /* TURNED OFF: do { fprintf(stdout,args); } while(0) */
-#define DebugLevel0Fn(args) do { fprintf(stdout,__FUNCTION__ ": " args); } while(0)
-#define DebugLevel1Fn(args) do { fprintf(stdout,__FUNCTION__ ": " args); } while(0)
-#define DebugLevel2Fn(args) do { fprintf(stdout,__FUNCTION__ ": " args); } while(0)
-#define DebugLevel3Fn(args) /* TURNED OFF: do { fprintf(stdout,__FUNCTION__); fprintf(stdout,args); } while(0) */
+#define DebugLevel0Fn(args) do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0)
+#define DebugLevel1Fn(args) do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0)
+#define DebugLevel2Fn(args) do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0)
+#define DebugLevel3Fn(args) /* TURNED OFF: do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0) */
 
 #endif	// } !__GNUC__
 
