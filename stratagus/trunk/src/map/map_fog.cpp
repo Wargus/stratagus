@@ -731,20 +731,22 @@ void DrawMapFogOfWar(Viewport* vp, int x, int y)
 }
 
 /**
-**  Initialise the fog of war.
+**  Initialize the fog of war.
 **  Build tables, setup functions.
 */
 void InitMapFogOfWar(void)
 {
-	LoadGraphic(TheMap.FogGraphic);
-
 #ifndef USE_OPENGL
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 	Uint32 color;
 	SDL_Surface* s;
+#endif
 
+	LoadGraphic(TheMap.FogGraphic);
+
+#ifndef USE_OPENGL
 	//
 	// Generate Only Fog surface.
 	//
@@ -767,9 +769,10 @@ void InitMapFogOfWar(void)
 		AlphaFogSurface = SDL_DisplayFormat(TheMap.FogGraphic->Surface);
 		SDL_SetAlpha(AlphaFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 	} else {
-		int i, j;
+		int i;
+		int j;
 		Uint32 c;
-		unsigned char r, g, b, a;
+		unsigned char a;
 		SDL_PixelFormat* f;
 
 		// Copy the top row to a new surface
