@@ -846,6 +846,7 @@ global int CastHolyVision(Unit *caster, const SpellType *spell, Unit *target,
 //    target->TTL = GameCycle + CYCLES_PER_SECOND + CYCLES_PER_SECOND / 2;
     target->CurrentSightRange = target->Stats->SightRange;
     target->Removed = 1;
+    target->CurrentSightRange = target->Stats->SightRange;
     MapMarkUnitSight(target);
     target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
     CheckUnitToBeDrawn(target);
@@ -1038,21 +1039,31 @@ global int CastSummon(Unit *caster, const SpellType *spell, Unit *target,
     DebugCheck(!spell->SpellAction);
     DebugCheck(!spell->SpellAction->Summon.UnitType);
 
+    DebugLevel0("Summoning\n");
     ttl=spell->SpellAction->Summon.TTL;
     caster->Mana -= spell->ManaCost;
     // FIXME: johns: the unit is placed on the wrong position
     target = MakeUnit(spell->SpellAction->Summon.UnitType, caster->Player);
     target->X = x;
     target->Y = y;
-    DropOutOnSide(target, LookingW, 0, 0);
-
     // set life span
     if (ttl) {
 	target->TTL=GameCycle+ttl;
     } else {
 	target->TTL=GameCycle+target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
     }
-    CheckUnitToBeDrawn(target);
+    //
+    //	Revealers are always removed, since they don't have graphics
+    //
+    if (target->Type->Revealer) {
+	DebugLevel0Fn("new unit is a revealer, removed.\n");
+	target->Removed=1;
+	target->CurrentSightRange = target->Stats->SightRange;
+	MapMarkUnitSight(target);
+    } else {
+	DropOutOnSide(target, LookingW, 0, 0);
+	CheckUnitToBeDrawn(target);
+    }
 
     PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
     MakeMissile(spell->Missile,
@@ -1091,137 +1102,6 @@ global int CastWhirlwind(Unit *caster, const SpellType *spell,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     mis->TTL = spell->SpellAction->Whirlwind.TTL;
     mis->Controller = SpellWhirlwindController;
-    return 0;
-}
-
-// ****************************************************************************
-//	Specific conditions
-// ****************************************************************************
-
-/**
-**	Check for unittype properties of unittype himself
-*/
-global int CheckUnitTypeFlag(const t_Conditions	*condition,
-	const Unit *caster, const Unit *target, int x, int y)
-{
-    DebugCheck(!caster);
-    DebugCheck(!condition);
-
-    if (target == NULL) {
-	return !condition->expectvalue;
-    }
-    // FIXME Modify unit struture for an array of boolean ?
-    switch (condition->u.flag) {
-	case flag_coward:
-	    return target->Type->Coward;
-	case flag_organic:
-	    return target->Type->Organic;
-	case flag_isundead:
-	    return target->Type->IsUndead;
-	case flag_canattack:
-	    return target->Type->CanAttack;
-	case flag_building:
-	    return target->Type->Building;
-	default:
-	    DebugCheck(1);
-	    return !condition->expectvalue;
-    }
-}
-
-/**
-**	Check for alliance status.
-*/
-global int CheckAllied(const t_Conditions *condition, const Unit *caster,
-    const Unit *target, int x, int y)
-{
-    DebugCheck(!caster);
-    return caster->Player == target->Player || IsAllied(caster->Player, target) ? 1 : 0;
-}
-
-/**
-**	Check if target is self
-*/
-global int CheckHimself(const t_Conditions *condition, const Unit *caster,
-    const Unit *target, int x, int y)
-{
-    DebugCheck(!caster);
-    return caster == target;
-}
-
-/**
-**	Check duration effects.
-*/
-global int CheckUnitDurationEffect(const t_Conditions *condition,
-    const Unit *caster, const Unit *target, int x, int y)
-{
-    int ttl;
-
-    DebugCheck(!condition);
-
-    ttl = condition->u.durationeffect.ttl;
-
-    if (target == NULL) {
-	return !condition->expectvalue;
-    }
-
-    switch (condition->u.durationeffect.flag) {
-	case flag_invisibility:
-	    return (target->Invisible >= ttl / CYCLES_PER_SECOND);
-	case flag_bloodlust:
-	    return (target->Bloodlust >= ttl / CYCLES_PER_SECOND);
-	case flag_slow:
-	    return (target->Slow >= ttl / CYCLES_PER_SECOND);
-	case flag_haste:
-	    return (target->Haste >= ttl / CYCLES_PER_SECOND);
-	case flag_unholyarmor:
-	    return (target->UnholyArmor >= ttl / CYCLES_PER_SECOND);
-	case flag_flameshield:
-	    return (target->FlameShield >= ttl);
-	case flag_HP:
-	    return (target->HP >= ttl);
-	case flag_Mana:
-	    return (target->Mana >= ttl);
-	case flag_HP_percent:
-	    return (target->HP * 100 >= ttl * target->Stats->HitPoints); // FIXME
-	case flag_Mana_percent:
-	    return (target->Mana * 100 >= ttl * target->Type->_MaxMana); // FIXME : MaxMana.
-	/// Add here the other cases
-	default:
-	    DebugCheck(1);
-	    return !condition->expectvalue;
-    }
-}
-
-// ****************************************************************************
-//	Specific conditions
-// ****************************************************************************
-
-/**
-**	FIXME: docu
-*/
-global int CheckEnemyPresence(const t_Conditions *condition, const Unit *caster)
-{
-    Unit *table[UnitMax];
-    int i;
-    int n;
-    int range;
-    int	x;
-    int	y;
-
-    DebugCheck(!condition);
-    DebugCheck(!caster);
-
-    range = condition->u.range;
-    x = caster->X;
-    y = caster->Y;
-
-    // FIXME: +1 should be + Caster_tile_Size ?
-    n = SelectUnits(x - range, y - range,x + range + 1, y + range + 1,table);
-    for (i = 0; i < n; ++i) {
-	if (IsEnemy(caster->Player, table[i])) {
-	    return 1;
-	}
-    }
     return 0;
 }
 
@@ -1281,60 +1161,97 @@ local Target *NewTargetPosition(int x, int y)
 //	Main local functions
 // ****************************************************************************
 
-/**
-**	Check all generic conditions.
+/*
+**	Check the condition.
+**
+**	@param caster		Pointer to caster unit.
+**	@param spell 		Pointer to the spell to cast.
+**	@param target		Pointer to target unit, or 0 if it is a position spell.
+**	@param x		X position, or -1 if it is an unit spell.
+**	@param y		Y position, or -1 if it is an unit spell.
+**	@param condition	Pointer to condition info.
+**
+**	@return 1 if passed, 0 otherwise.
 */
-local int PassGenericCondition(const Unit *caster, const SpellType *spell,
-    const t_Conditions *condition)
+local int PassCondition(const Unit* caster,const SpellType* spell,const Unit* target,
+	int x,int y,const ConditionInfo* condition)
 {
-    int ret;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-
-    // FIXME : Move it in spell->Condition_generic ???
-    // mana is a must!
-    if (caster->Mana < spell->ManaCost) {
+    //
+    //	Check caster mana. FIXME: move somewhere else?
+    //
+    if (caster->Mana<spell->ManaCost) {
 	return 0;
     }
-    /*condition = spell->Condition_generic*/
-    for (; condition != NULL; condition = condition->next) {
-	DebugCheck(!condition->f.generic);
-	ret = condition->f.generic(condition, caster);
-	DebugCheck(!(ret == 0 || ret == 1));
-	DebugCheck(!(condition->expectvalue == 0 || condition->expectvalue == 1));
-	if (ret != condition->expectvalue) {
+    //
+    //	Casting an unit spell without a target. 
+    //
+    if (spell->Target==TargetUnit&&!target) {
+	return 0;
+    }
+    if (!condition) {
+	// no condition, pass.
+	return 1;
+    }
+    //
+    //	Now check conditions regarding the target unit.
+    //
+    if (target) {
+	if (condition->Undead!=CONDITION_TRUE) {
+	    if ((condition->Undead==CONDITION_ONLY)^(target->Type->IsUndead)) {
+		return 0;
+	    }
+	}
+	if (condition->Organic!=CONDITION_TRUE) {
+	    if ((condition->Organic==CONDITION_ONLY)^(target->Type->Organic)) {
+		return 0;
+	    }
+	}
+	if (condition->Building!=CONDITION_TRUE) {
+	    if ((condition->Building==CONDITION_ONLY)^(target->Type->Building)) {
+		DebugLevel0("QQQ\n");
+		return 0;
+	    }
+	}
+	if (condition->Hero!=CONDITION_TRUE) {
+	    if ((condition->Hero==CONDITION_ONLY)^(target->Type->Hero)) {
+		return 0;
+	    }
+	}
+	if (condition->Coward!=CONDITION_TRUE) {
+	    if ((condition->Coward==CONDITION_ONLY)^(target->Type->Coward)) {
+		return 0;
+	    }
+	}
+	if (condition->Alliance!=CONDITION_TRUE) {
+	    if ((condition->Alliance==CONDITION_ONLY)^(IsAllied(caster->Player,target))) {
+		return 0;
+	    }
+	}
+	if (condition->TargetSelf!=CONDITION_TRUE) {
+	    if ((condition->TargetSelf==CONDITION_ONLY)^(caster==target)) {
+		return 0;
+	    }
+	}
+	//
+	//	Check vitals now.
+	//
+	if (condition->MinHpPercent*target->Stats->HitPoints>target->HP) {
 	    return 0;
+	}
+	if (condition->MaxHpPercent*target->Stats->HitPoints<target->HP) {
+	    return 0;
+	}
+	if (target->Type->CanCastSpell) {
+	    if (condition->MinManaPercent*target->Type->_MaxMana>target->Mana) {
+		return 0;
+	    }
+	    if (condition->MaxManaPercent*target->Type->_MaxMana<target->Mana) {
+		return 0;
+	    }
 	}
     }
     return 1;
 }
-
-/**
-**	Check all specific conditions.
-**	@return 1 if condition is ok.
-**	@return 0 else.
-*/
-local int PassSpecificCondition(const Unit *caster, const SpellType *spell,
-    const Unit *target, int x, int y, const t_Conditions *condition)
-{
-    int ret;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-
-    for (/*condition = spell->Condition_specific*/; condition != NULL; condition = condition->next) {
-	DebugCheck(!condition->f.specific);
-	ret = condition->f.specific(condition, caster, target, x, y);
-	DebugCheck(!(ret == 0 || ret == 1));
-	DebugCheck(!(condition->expectvalue == 0 || condition->expectvalue == 1));
-	if (ret != condition->expectvalue) {
-	    return 0;
-	}
-    }
-    return 1;
-}
-
 
 /**
 **	Select the target for the autocast.
@@ -1385,8 +1302,7 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
 		caster->X + range + 1, caster->Y + range + 1,table);
 	    // For all Unit, check if it is a possible target
 	    for (i = 0, j = 0; i < nb_units; i++) {
-		if (PassSpecificCondition(caster,spell,table[i],x,y,spell->Condition_specific)
-			&& PassSpecificCondition(caster,spell,table[i],x,y,spell->AutoCast->Condition_specific)) {
+		if (PassCondition(caster,spell,table[i],x,y,spell->Conditions)) {
 			table[j++] = table[i];
 		}
 	    }
@@ -1572,8 +1488,7 @@ global int CanCastSpell(const Unit *caster, const SpellType *spell,
 	return 0;
     }
 
-    return PassGenericCondition(caster, spell, spell->Condition_generic)
-	    && PassSpecificCondition(caster,spell,target,x,y,spell->Condition_specific);
+    return PassCondition(caster,spell,target,x,y,spell->Conditions);
 }
 
 /**
@@ -1596,10 +1511,9 @@ global int AutoCastSpell(Unit *caster, const SpellType *spell)
 
     target = NULL;
 
-    if (!PassGenericCondition(caster, spell, spell->Condition_generic)
-	    || !PassGenericCondition(caster, spell, spell->AutoCast->Condition_generic)) {
+/*    if (PassCondition(caster,spell,target,x,y,spell->Conditions))
 	return 0;
-    }
+    }*/
     target = SelectTargetUnitsOfAutoCast(caster, spell);
     if (target == NULL) {
 	return 0;

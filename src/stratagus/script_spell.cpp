@@ -318,311 +318,114 @@ local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spel
     }
 }
 
-// **************************************************************************
-//		Generic condition parsers for autocast for spell.
-// **************************************************************************
-
 /**
-**	To pushback the condition \p cond to the list \p begin.
-**	@param	begin : begin of the list.
-**	@param	cond : condition to add.
+**	Get a condition value from a scm object.
+**	
+**	@param 	value		scm value to convert.
+**
+**	@return CONDITION_TRUE, CONDITION_FALSE, CONDITION_ONLY or -1 on error.
 */
-local void pushback_condition(t_Conditions **begin, t_Conditions *cond)
+local char Scm2Condition(SCM value)
 {
-    t_Conditions *next;
-
-    DebugCheck(!begin);
-    DebugCheck(!cond);
-
-    if (*begin == NULL) {
-	*begin = cond;
-	return ;
+    if (gh_eq_p(value,gh_symbol2scm("true"))) {
+	return CONDITION_TRUE;
+    } else if (gh_eq_p(value,gh_symbol2scm("false"))) {
+	return CONDITION_FALSE;
+    } else if (gh_eq_p(value,gh_symbol2scm("only"))) {
+	return CONDITION_ONLY;
+    } else {
+	errl("Bad condition result",value);
+	return -1;
     }
-    for(next = *begin; next->next != NULL; next = next->next) {
-	next->next = cond;
-    }
-}
-
-/**
-**	Pointer on function to parse 'condition.
-**	@param	spellName : name of spell modified.
-**	@param	id : last keyword recognized.
-**	@param	list : args for \p id.
-**	@param	generic : list for generic conditions.
-**	@param	specific : list for specific conditions.
-*/
-typedef void f_ccl_condition(const char *spellname, const char *id, SCM list,
-    t_Conditions **generic, t_Conditions **specific);
-
-/**
-**	Parsing true or false.
-**	factorisation of code.
-**	@param	SpellName : Name of spell.
-**	@param	id : last keywork.
-**	@param	expectvalue : OUTPUT <- 1 if true 0 else
-*/
-local int ccl_true(const char *spellname, const char *id, int *expectvalue,
-    SCM value)
-{
-    DebugCheck(!spellname);
-    DebugCheck(!id);
-    DebugCheck(!expectvalue);
-    
-    *expectvalue = 0;
-    if (gh_eq_p(value, gh_symbol2scm("true"))) {
-	*expectvalue = 1;
-	return 1;
-    }
-    if (gh_eq_p(value, gh_symbol2scm("false"))) {
-	return 1;
-    }
-// Warning user : Unknown flag
-    DebugLevel0Fn("In spell-type %s : %s : %s\n"
-	    _C_ spellname _C_ id _C_ "Argument must be true or false");
-    return 0;
 }
 
 /**
 **	Parse the Condition for spell.
-**	list = #t #flagtype
+**	
+**	@param list		SCM object to parse
+**	@param condition	pointer to condition to fill with data.
+**
+**	@notes: conditions must be allocated. All data already in is LOST.
 */
-local void ccl_UnitTypeFlag(const char *spellname, const char *id, SCM list,
-    t_Conditions **generic, t_Conditions **specific)
+local void CclSpellParseCondition(SCM list, ConditionInfo* condition)
 {
     SCM value;
-    t_Conditions *cond;
-    struct {
-	const char *id;
-	int flag;
-    } parser[] = {
-	{"building", flag_building},
-	{"coward", flag_coward},
-	{"canattack", flag_canattack},
-	{"organic", flag_organic},
-	{"undead", flag_isundead},
-	{NULL, 0}
-    };
-    int i;
 
-    DebugCheck(!id);
-    DebugCheck(!spellname);
-    DebugCheck(!generic);
-    DebugCheck(!specific);
+    //
+    //	Initializations:
+    //
 
+    //	Set everything to 0:
+    memset(condition,0,sizeof(ConditionInfo));
+    //	Flags are defaulted to 0(CONDITION_TRUE)
 
-    cond = malloc(sizeof(*cond));
-    memset(cond, 0, sizeof(*cond));
-    value = gh_car(list);
-    if (!ccl_true(spellname, id, &cond->expectvalue, value)) {
-	free(cond);
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    for (i = 0; parser[i].id != NULL; i++) {
-	if (gh_eq_p(value, gh_symbol2scm((char *)parser[i].id))) {
-	    cond->u.flag = parser[i].flag;
-	    break;
-	}
-    }
-    if (parser[i].id == NULL) {
-	DebugLevel0Fn("FIXME : WARNING : unknow flag");
-	free(cond);
-	return ;
-    }
-    cond->f.specific = CheckUnitTypeFlag;
-    pushback_condition(specific, cond);
-}
-
-/**
-**	Parse the Condition for spell.
-**	list = #t #f_flag #n
-*/
-local void ccl_DurationEffect(const char *spellname, const char *id, SCM list,
-    t_Conditions **generic, t_Conditions **specific)
-{
-    SCM value;
-    t_Conditions *cond;
-    struct {
-	const char *id;
-	int flag;
-    } parser[] = {
-	{"bloodlust", flag_bloodlust},
-	{"flameshield", flag_flameshield},
-	{"haste", flag_haste},
-	{"invisibility", flag_invisibility},
-	{"slow", flag_slow},
-	{"unholyarmor", flag_unholyarmor},
-	{"HP", flag_HP},
-	{"mana", flag_Mana},
-	{"HP_percent", flag_HP_percent},
-	{"mana_percent", flag_Mana_percent},
-	{NULL, 0}
-    };
-    int i;
-
-    DebugCheck(!id);
-    DebugCheck(!spellname);
-    DebugCheck(!generic);
-    DebugCheck(!specific);
-
-    cond = malloc(sizeof(*cond));
-    memset(cond, 0, sizeof(*cond));
-    value = gh_car(list);
-    if (!ccl_true(spellname, id, &cond->expectvalue, value)) {
-	free(cond);
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    if (!gh_eq_p(value, gh_symbol2scm("flag"))) {
-	DebugLevel0Fn("FIXME : WARNING : unknow flag");
-	free(cond);
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    for (i = 0; parser[i].id != NULL; i++) {
-	if (gh_eq_p(value, gh_symbol2scm((char *)parser[i].id))) {
-	    cond->u.durationeffect.flag = parser[i].flag;
-	    break;
-	}
-    }
-    if (parser[i].id == NULL) {
-	DebugLevel0Fn("FIXME : WARNING : unknow flag");
-	// FIXME : WARNING.
-	free(cond);
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    if (!gh_eq_p(value, gh_symbol2scm("value"))) {
-	DebugLevel0Fn("FIXME : WARNING : unknow flag");
-	free(cond);
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    cond->u.durationeffect.ttl = gh_scm2int(value);
-    cond->f.specific = CheckUnitDurationEffect;
-    pushback_condition(specific, cond);
-}
-
-/**
-**	For enemy presence
-**	list = #t range #n
-*/
-void ccl_enemy_presence(const char *spellname, const char *id, SCM list,
-    t_Conditions **generic, t_Conditions **specific)
-{
-    SCM value;
-    t_Conditions *cond;
-
-    DebugCheck(!id);
-    DebugCheck(!spellname);
-    DebugCheck(!generic);
-    DebugCheck(!specific);
-
-    cond = malloc(sizeof(*cond));
-    memset(cond, 0, sizeof(*cond));
-    value = gh_car(list);
-    if (!ccl_true(spellname, id, &cond->expectvalue, value)) {
-	free(cond);
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    if (!gh_eq_p(value, gh_symbol2scm("range"))) {
-	DebugLevel0Fn("FIXME : WARNING : unknow flag");
-	free(cond);
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    cond->f.generic = CheckEnemyPresence; // In spell.c
-    cond->u.range = gh_scm2int(value);
-    if (cond->u.range <= 0 && cond->u.range != -1/*no limit*/) {
-	DebugLevel0Fn("FIXME : WARNING : range <= 0");
-	// Warn : range <= 0 have no sens, must be strict positive. or = -1
-	free(cond);
-	return ;
-    }
-    pushback_condition(generic, cond);
-}
-
-/**
-**	For enemy presence
-**	list = #t
-*/
-void ccl_alliance(const char *spellname, const char *id, SCM list,
-    t_Conditions **generic, t_Conditions **specific)
-{
-    SCM value;
-    t_Conditions *cond;
-
-    DebugCheck(!id);
-    DebugCheck(!spellname);
-    DebugCheck(!generic);
-    DebugCheck(!specific);
-
-    cond = malloc(sizeof(*cond));
-    memset(cond, 0, sizeof(*cond));
-    value = /*gh_car(*/list/*)*/;
-    if (!ccl_true(spellname, id, &cond->expectvalue, value)) {//	warn user
-	free(cond);
-	return ;
-    }
-    cond->f.specific = CheckAllied;
-    pushback_condition(specific, cond);
-}
-
-/**
-**	Parse the Condition for spell.
-*/
-local void ccl_spell_all_condition(const char *spellname, const char *id,
-    SCM list, t_Conditions **generic, t_Conditions **specific)
-{
-    int i;
-    struct {
-	const char *id;
-	f_ccl_condition *f;
-    } parser[] = {
-	{"UnitTypeflag", ccl_UnitTypeFlag},
-	{"DurationEffect", ccl_DurationEffect},
-	{"Enemypresence", ccl_enemy_presence},
-	{"Alliance", ccl_alliance},
-	{ NULL, 0}	
-    };
-    SCM value;
-
-    DebugCheck(!id);
-    DebugCheck(!spellname);
-    DebugCheck(!generic);
-    DebugCheck(!specific);
-
-    for (; !gh_null_p(list); list = gh_cdr(list)) {
+    //	Initialize min/max stuff to values with no effect.
+    condition->MinHpPercent=-10;
+    condition->MaxHpPercent=1000;
+    condition->MinManaPercent=-10;
+    condition->MaxManaPercent=1000;
+    //  Buffs too.
+    condition->MaxHasteTicks=0xFFFFFFF;
+    condition->MaxSlowTicks=0xFFFFFFF;
+    condition->MaxBloodlustTicks=0xFFFFFFF;
+    condition->MaxInvisibilityTicks=0xFFFFFFF;
+    condition->MaxInvincibilityTicks=0xFFFFFFF;
+    //  Now parse the list and set values.
+    while (!gh_null_p(list)) {
 	value = gh_car(list);
-	for (i = 0; parser[i].id != NULL; i++) {
-	    if (gh_eq_p(value, gh_symbol2scm((char *) parser[i].id))) {
-		list = gh_cdr(list);
-		parser[i].f(spellname, parser[i].id, gh_car(list), generic, specific);
-		break;
-	    }
+	list = gh_cdr(list);
+	if (gh_eq_p(value,gh_symbol2scm("undead"))) {
+	    condition->Undead=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("organic"))) {
+	    condition->Organic=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("hero"))) {
+	    condition->Hero=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("coward"))) {
+	    condition->Coward=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("alliance"))) {
+	    condition->Alliance=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("building"))) {
+	    condition->Building=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("self"))) {
+	    condition->TargetSelf=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("min-hp-percent"))) {
+	    condition->MaxHpPercent=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("max-hp-percent"))) {
+	    condition->MaxHpPercent=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("min-mana-percent"))) {
+	    condition->MinManaPercent=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("max-mana-percent"))) {
+	    condition->MaxManaPercent=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("max-slow-ticks"))) {
+	    condition->MaxSlowTicks=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("max-haste-ticks"))) {
+	    condition->MaxHasteTicks=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("max-bloodlust-ticks"))) {
+	    condition->MaxBloodlustTicks=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("max-invisibility-ticks"))) {
+	    condition->MaxInvisibilityTicks=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("max-invincibility-ticks"))) {
+	    condition->MaxInvincibilityTicks=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else {
+	    errl("Unsuported condition tag",value);
 	}
-	DebugCheck(!parser[i].id);
     }
-}
-
-/**
-**	Parse the Condition for spell.
-*/
-local void ccl_spell_condition(const char *id, SCM list, SpellType *spell)
-{
-    DebugCheck(!id);
-    DebugCheck(!spell);
-
-    ccl_spell_all_condition(spell->IdentName, id, list,
-	&spell->Condition_generic,&spell->Condition_specific);
 }
 
 /**
@@ -658,8 +461,8 @@ local void ccl_spell_autocast(const char *id, SCM list, SpellType *spell)
     }
     list = gh_cdr(list);
     value = gh_car(list);
-    ccl_spell_all_condition(spell->IdentName, "Autocast conditions", value,
-	    &spell->AutoCast->Condition_generic,&spell->AutoCast->Condition_specific);
+    spell->AutoCast->Condition=(ConditionInfo*)malloc(sizeof(ConditionInfo));
+    CclSpellParseCondition(value,spell->AutoCast->Condition);
 }
 
 /**
@@ -701,7 +504,11 @@ local SCM CclDefineSpell(SCM list)
 	    spell->ManaCost=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("range"))) {
-	    spell->Range=gh_scm2int(gh_car(list));
+	    if (gh_eq_p(gh_car(list),gh_symbol2scm("infinite"))) {
+		spell->Range=INFINITE_RANGE;
+	    } else {
+		spell->Range=gh_scm2int(gh_car(list));
+	    }
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("target"))) {
 	    value=gh_car(list);
@@ -710,7 +517,7 @@ local SCM CclDefineSpell(SCM list)
 	    } else if (gh_eq_p(value,gh_symbol2scm("self"))) {
 		spell->Target=TargetSelf;
 	    } else if (gh_eq_p(value,gh_symbol2scm("unit"))) {
-		spell->Target=TargetSelf;
+		spell->Target=TargetUnit;
 	    } else if (gh_eq_p(value,gh_symbol2scm("position"))) {
 		spell->Target=TargetPosition;
 	    } else {
@@ -722,7 +529,8 @@ local SCM CclDefineSpell(SCM list)
 	    CclParseSpellAction(gh_car(list),spell,spell->SpellAction);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("condition"))) {
-	    ccl_spell_condition("condition",gh_car(list),spell);
+	    spell->Conditions=(ConditionInfo*)malloc(sizeof(ConditionInfo));
+	    CclSpellParseCondition(gh_car(list),spell->Conditions);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("autocast"))) {
 	    ccl_spell_autocast("autocast",gh_car(list),spell);
