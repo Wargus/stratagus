@@ -741,7 +741,7 @@ local Unit* AiFindGoldMine(const Unit* source,const Unit* used_mine)
 {
     Unit** table;
     Unit* unit;
-    Unit* best;
+    const Unit* best;
     int best_d;
     int d;
 
@@ -770,7 +770,7 @@ local Unit* AiFindGoldMine(const Unit* source,const Unit* used_mine)
     }
     DebugLevel3Fn("%d %d,%d\n" _C_ UnitNumber(best) _C_ best->X _C_ best->Y);
 
-    return best;
+    return (Unit*)best;
 }
 
 /**
