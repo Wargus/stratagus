@@ -140,17 +140,19 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
-local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i);
+local void ScenSelectFolder(void);
+local void ScenSelectInit(Menuitem *mi);	// master init
+local void ScenSelectOk(void);
+local void ScenSelectCancel(void);
+
+local void KeystrokeHelpVSAction(Menuitem *mi, int i);
+
 local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i);
 local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i);
 local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i);
 local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i);
 local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i);
 local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i);
-local void ScenSelectFolder(void);
-local void ScenSelectInit(Menuitem *mi);	// master init
-local void ScenSelectOk(void);
-local void ScenSelectCancel(void);
 
 local void GameSetupInit(Menuitem *mi);		// master init
 local void GameDrawFunc(Menuitem *mi);
@@ -1377,7 +1379,7 @@ local Menuitem KeystrokeHelpMenuItems[] = {
 };
 local void InitKeystrokeHelpMenuItems() {
     MenuitemText    i0 = { "Keystroke Help Menu", MI_TFLAGS_CENTERED};
-    MenuitemVslider i1 = { 0, 18, 12*18, ScenSelectVSKeystrokeHelpAction, -1, 0, 0, 0, NULL};
+    MenuitemVslider i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
     MenuitemButton  i2 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
     MenuitemText    i3 = { "Alt-F  - toggle full screen", MI_TFLAGS_LALIGN};
     MenuitemText    i4 = { "Ctrl-S - mute sound", MI_TFLAGS_LALIGN};
@@ -3662,7 +3664,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
+local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
     int j = 3;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
