@@ -62,6 +62,8 @@ extern UnitType* CclGetUnitType(SCM ptr);
     /// Get resource by name
 extern unsigned CclGetResourceByName(SCM ptr);
 #elif defined(USE_LUA)
+    /// Get resource by name
+extern unsigned CclGetResourceByName(lua_State* l);
 #endif
 
 /**
