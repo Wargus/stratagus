@@ -231,12 +231,6 @@ local int MineInGoldmine(Unit* unit)
 	    if( mine ) {
 		DropOutOnSide(unit,LookingW
 			,mine->Type->TileWidth,mine->Type->TileHeight);
-#ifdef NEW_FOW
-	//Worker is back on map, unmark sight
-	    MapUnmarkSight(unit->Player,mine->X+mine->Type->TileWidth/2,
-				mine->Y+mine->Type->TileHeight/2,
-				mine->Stats->SightRange);
-#endif
 	    }
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
@@ -246,12 +240,6 @@ local int MineInGoldmine(Unit* unit)
 		DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
 			,destu->Y+destu->Type->TileHeight/2
 			,mine->Type->TileWidth,mine->Type->TileHeight);
-#ifdef NEW_FOW
-	//Worker is back on map, unmark sight
-	    MapUnmarkSight(unit->Player,mine->X+mine->Type->TileWidth/2,
-				mine->Y+mine->Type->TileHeight/2,
-				mine->Stats->SightRange);
-#endif
 	    }
 	    unit->Orders[0].Goal=destu;
 	    NewResetPath(unit);
