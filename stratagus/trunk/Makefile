@@ -29,9 +29,9 @@ TOPDIR=		.
 RULESFILE ?= Rules.make
 WINRULESFILE = Rules.make.WIN32
 
-CROSSDIR=/usr/local/cross-tools
-
 include $(TOPDIR)/$(RULESFILE)
+
+CROSSDIR=/usr/local/cross-tools
 
 MAKEFLAGS= TOPDIR=$(shell pwd)
 MODULES= src tools
@@ -118,6 +118,10 @@ freecraft.exe:	src etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) \
 		etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) \
 		etlib/$(OBJDIR)hash.$(OE) \
 		-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
+
+strip:
+	@if [ -f freecraft ]; then strip freecraft; fi
+	@if [ -f freecraft.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip freecraft.exe; fi
 
 src/$(OBJDIR)freecraftrc.$(OE): src/freecraft.rc
 	windres --include-dir contrib -osrc/$(OBJDIR)freecraftrc.$(OE) src/freecraft.rc
