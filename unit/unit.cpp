@@ -1091,6 +1091,29 @@ global int CheckUnitToBeDrawn(const Unit * unit)
     return 0;
 }
 
+#ifdef HIERARCHIC_PATHFINDER
+
+/* hack */
+#include "../pathfinder/pf_lowlevel.h"
+
+global int UnitGetNextPathSegment (Unit *unit, int *dx, int *dy)
+{
+    int segment;
+    int shift, neighbor;
+
+    if (unit->Data.Move.Length <= 0)
+	return 0;       /* *dx and *dy returned to the caller are invalid */
+
+    segment = unit->Data.Move.Length - 1;
+    shift = segment%2 ? 4 : 0;
+    neighbor = (unit->Data.Move.Path[segment/2] >> shift) & 0xf;
+    *dx = Neighbor[neighbor].dx;
+    *dy = Neighbor[neighbor].dy;
+    return 1;
+}
+
+#endif /* HIERARCHIC_PATHFINDER */
+
 // FIXME: perhaps I should write a function UnitSelectable?
 
 /**
