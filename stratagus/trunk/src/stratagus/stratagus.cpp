@@ -236,7 +236,7 @@ global char* strdcat3(const char* l, const char* m, const char* r) {
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
-    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
+    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
 #ifdef USE_CCL
     "\n  SIOD Copyright by George J. Carrette."
 #endif
@@ -399,9 +399,72 @@ global volatile void Exit(int err)
 */
 local void Usage(void)
 {
-    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
+    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
 #ifdef USE_CCL
     "\n  SIOD Copyright by George J. Carrette."
+#endif
+#ifdef USE_SDL
+    "\n  SDL Copyright by Sam Lantinga."
+#endif
+    "\nCompile options "
+#ifdef USE_CCL
+    "CCL "
+#endif
+#ifdef USE_ONLYCCL
+    "ONLYCCL "
+#endif
+#ifdef USE_THREAD
+    "THREAD "
+#endif
+#ifdef DEBUG
+    "DEBUG "
+#endif
+#ifdef USE_ZLIB
+    "ZLIB "
+#endif
+#ifdef USE_BZ2LIB
+    "BZ2LIB "
+#endif
+#ifdef USE_SDL
+    "SDL "
+#endif
+#ifdef USE_SDLA
+    "SDL-AUDIO "
+#endif
+#ifdef USE_X11
+    "X11 "
+#endif
+#ifdef WITH_SOUND
+    "SOUND "
+#endif
+    // New features:
+    "\nFeatures "
+#ifdef UNIT_ON_MAP
+    "UNIT-ON-MAP "
+#endif
+#ifdef NEW_ORDERS
+    "NEW-ORDERS "
+#endif
+#ifdef NEW_MAPDRAW
+    "NEW-MAPDRAW "
+#endif
+#ifdef NEW_NAMES
+    "NEW-NAMES "
+#endif
+#ifdef NEW_FOW
+    "NEW-FOW "
+#endif
+#ifdef NEW_AI
+    "NEW-AI "
+#endif
+#ifdef NEW_SHIPS
+    "NEW-SHIPS "
+#endif
+#ifdef SLOW_INPUT
+    "SLOW-INPUT "
+#endif
+#ifdef HAVE_EXPANSION
+    "EXPANSION "
 #endif
 "\n\nUsage: freecraft [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
 \t-d datapath\tpath to freecraft data\n\

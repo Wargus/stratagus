@@ -43,12 +43,13 @@ local char* DefaultTilesetWcNames[] = {
     "tileset-summer",
     "tileset-winter",
     "tileset-wasteland",
-    "tileset-swamp"
+    "tileset-swamp",
+    NULL
 };
 #endif
 
 /**
-**	Mapping of wc numbers to our internal symbols.
+**	Mapping of wc numbers to our internal tileset symbols.
 **	The numbers are used in puds.
 **	0=summer, 1=winter, 2=wasteland, 3=swamp.
 */
@@ -1459,7 +1460,6 @@ global void LoadTileset(void)
     unsigned char* data;
     const unsigned short* table;
 
-    //TheMap.Tileset=&Tilesets[TheMap.Terrain];
     //
     //	Find the tileset.
     //

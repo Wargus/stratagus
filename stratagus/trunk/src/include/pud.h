@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name pud.h		-	The pud headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __PUD_H__
 #define __PUD_H__
@@ -79,6 +78,8 @@
 */
 typedef struct _pud_info_ {
     char*	Description;		/// Map description
+    char*	MapTerrainName;		/// Map terrain name
+    // FIXME: Map Terrain Nr. should be removed.
     int		MapTerrain;		/// Map terrain
     int		MapWidth;		/// Map width
     int		MapHeight;		/// Map height

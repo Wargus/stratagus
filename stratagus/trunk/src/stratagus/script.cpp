@@ -523,61 +523,6 @@ local SCM CclGetFreeCraftLibraryPath(void)
 ............................................................................*/
 
 /**
-**	Parse missile-type.
-**
-**	@param list	List describing missile.
-*/
-local SCM CclMissileType(SCM list)
-{
-    SCM value;
-    int type;
-
-    //	Slot
-    value=gh_car(list);
-    type=gh_scm2int(value);
-    if( type>=MissileTypeMax ) {
-	fprintf(stderr,"Wrong type %d\n",type);
-	return list;
-    }
-    list=gh_cdr(list);
-    DebugLevel3("MissileType: %d\n",type);
-
-    //	Name
-    value=gh_car(list);
-    MissileTypes[type].Ident=gh_scm2newstr(value,NULL);
-    list=gh_cdr(list);
-
-    //	File
-    value=gh_car(list);
-    MissileTypes[type].File=gh_scm2newstr(value,NULL);
-    list=gh_cdr(list);
-
-    // Width,Height
-    value=gh_car(list);
-    MissileTypes[type].Width=gh_scm2int(value);
-    list=gh_cdr(list);
-    value=gh_car(list);
-    MissileTypes[type].Height=gh_scm2int(value);
-    list=gh_cdr(list);
-
-    // Sound impact
-    value=gh_car(list);
-#ifdef WITH_SOUND
-    if (ccl_sound_p(value)) {
-	MissileTypes[type].ImpactSound.Sound=ccl_sound_id(value);
-    } else
-#endif
-    if (!gh_boolean_p(value) || gh_scm2bool(value) ) {
-	fprintf(stderr,"Wrong argument in MissileType\n");
-    }
-    list=gh_cdr(list);
-
-    // FIXME: class, speed not written!!!
-
-    return list;
-}
-
-/**
 **	Load a pud. (Try in library path first)
 **
 **	@param file	filename of pud.
@@ -803,8 +748,7 @@ global void CclInit(void)
     init_subr_1("speed-research",CclSpeedResearch);
     init_subr_1("speeds",CclSpeeds);
 
-    init_lsubr("missile-type",CclMissileType);
-
+    MissileCclRegister();
     TilesetCclRegister();
     MapCclRegister();
     PathfinderCclRegister();
