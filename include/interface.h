@@ -395,10 +395,10 @@ extern int ButtonCheckTrue(const Unit*,const ButtonAction*);
 extern int ButtonCheckFalse(const Unit*,const ButtonAction*);
     /// Check if allowed upgrade is ready
 extern int ButtonCheckUpgrade(const Unit*,const ButtonAction*);
-    /// Check if allowed unit exists
-extern int ButtonCheckUnit(const Unit*,const ButtonAction*);
     /// Check if allowed units exists
-extern int ButtonCheckUnits(const Unit*,const ButtonAction*);
+extern int ButtonCheckUnitsOr(const Unit*,const ButtonAction*);
+    /// Check if allowed units exists
+extern int ButtonCheckUnitsAnd(const Unit*,const ButtonAction*);
     /// Check if have network play
 extern int ButtonCheckNetwork(const Unit*,const ButtonAction*);
     /// Check if unit isn't working (train,upgrade,research)
