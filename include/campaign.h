@@ -50,7 +50,7 @@ typedef enum _game_results_ {
 **	Type of the chapters.
 */
 typedef enum _chapter_types_ {
-    ChapterPlayVideo,			/// Play a video (NOT SUPPORTED)
+    ChapterPlayVideo,			/// Play a video
     ChapterShowPicture,			/// Show a picture
     ChapterPlayLevel,			/// Play a level
     ChapterDefeat,			/// Levels played on defeat
@@ -72,13 +72,17 @@ struct _campaign_chapter_ {
     union {
 	struct {
 	    char* Name;			/// Chapter name
-	} level;
+	} Level;			/// Data for a level
 	struct {
 	    char* Act;			/// Act number
 	    char* Title;		/// Title text
 	    char* Background;		/// Background image
-	} picture;
-    } d;
+	} Picture;			/// Data for a picture
+	struct {
+	    char* PathName;		/// File name of video
+	    int Flags;			/// Playback flags
+	} Movie;			/// Data for a movie
+    } Data;				/// Data of the different chapter types
     GameResults		Result;		/// Result of this chapter
 };
 
