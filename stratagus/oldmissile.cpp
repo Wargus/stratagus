@@ -659,16 +659,101 @@ global void FireMissile(Unit* unit)
     DebugLevel3Fn("\n");
 
     //
+    //	Goal dead?
+    // FIXME: make sure thats the correct unit.
+    //
+#ifdef NEW_ORDERS
+    goal=unit->Orders[0].Goal;
+#else
+    goal=unit->Command.Data.Move.Goal;
+#endif
+    if( goal ) {
+
+	if( goal->Destroyed ) {
+	    DebugLevel0Fn("destroyed unit\n");
+	    return;
+	}
+	if( goal->Removed ) {
+	    DebugLevel3Fn("Missile-none hits removed unit!\n");
+	    return;
+	}
+#ifdef NEW_ORDERS
+	if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
+#else
+	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+#endif
+	    DebugLevel3Fn("Missile-none hits dead unit!\n");
+	    return;
+	}
+
+	// Better let the caller/action handle this.
+
+#if 0
+	// Check if goal is correct unit.
+	if( goal->Destroyed ) {
+	    DebugLevel0Fn("destroyed unit\n");
+	    RefsDebugCheck( !goal->Refs );
+	    if( !--goal->Refs ) {
+		ReleaseUnit(goal);
+	    }
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Goal=NULL;
+	    ResetPath(unit->Orders[0]);
+#else
+	    unit->Command.Data.Move.DX=goal->X;
+	    unit->Command.Data.Move.DY=goal->Y;
+	    unit->Command.Data.Move.Goal=NULL;
+	    ResetPath(unit->Command);
+#endif
+	    return;
+	}
+	if( goal->Removed ) {
+	    DebugLevel3Fn("Missile-none hits removed unit!\n");
+	    RefsDebugCheck( !goal->Refs );
+	    --goal->Refs;
+	    RefsDebugCheck( !goal->Refs );
+#ifdef NEW_ORDERS
+	    goal=unit->Orders[0].Goal=NULL;
+	    ResetPath(unit->Orders[0]);
+#else
+	    unit->Command.Data.Move.Goal=NULL;
+	    ResetPath(unit->Command);
+#endif
+	    return;
+	}
+#ifdef NEW_ORDERS
+	if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
+#else
+	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+#endif
+	    DebugLevel3Fn("Missile-none hits dead unit!\n");
+	    RefsDebugCheck( !goal->Refs );
+	    --goal->Refs;
+	    RefsDebugCheck( !goal->Refs );
+#ifdef NEW_ORDERS
+	    goal=unit->Orders[0].Goal=NULL;
+	    ResetPath(unit->Orders[0]);
+#else
+	    unit->Command.Data.Move.Goal=NULL;
+	    ResetPath(unit->Command);
+#endif
+	    return;
+	}
+#endif
+
+    }
+
+    //
     //	None missile hits immediately!
     //
     if( ((MissileType*)unit->Type->Missile.Missile)->Class==MissileClassNone ) {
 #ifdef NEW_ORDERS
 	// No goal, take target coordinates
-	if( !(goal=unit->Orders[0].Goal) ) {
+	if( !goal ) {
 	    dx=unit->Orders[0].X;
 	    dy=unit->Orders[0].Y;
 #else
-	if( !(goal=unit->Command.Data.Move.Goal) ) {
+	if( !goal ) {
 	    dx=unit->Command.Data.Move.DX;
 	    dy=unit->Command.Data.Move.DY;
 #endif
@@ -689,54 +774,6 @@ global void FireMissile(Unit* unit)
 	    return;
 	}
 
-	// FIXME: make sure thats the correct unit.
-
-	// Check if goal is correct unit.
-	if( goal->Destroyed ) {
-	    DebugLevel0Fn("destroyed unit\n");
-	    RefsDebugCheck( !goal->Refs );
-	    if( !--goal->Refs ) {
-		ReleaseUnit(goal);
-	    }
-#if 0
-	    // FIXME: should I clear this here?
-#ifdef NEW_ORDERS
-	    goal=unit->Orders[0].Goal=NULL;
-#else
-	    unit->Command.Data.Move.Goal=NULL;
-#endif
-#endif
-	    return;
-	}
-	if( goal->Removed ) {
-	    DebugLevel3Fn("Missile-none hits removed unit!\n");
-	    RefsDebugCheck( !goal->Refs );
-	    --goal->Refs;
-	    RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
-	    goal=unit->Orders[0].Goal=NULL;
-#else
-	    unit->Command.Data.Move.Goal=NULL;
-#endif
-	    return;
-	}
-#ifdef NEW_ORDERS
-	if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-#else
-	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-#endif
-	    DebugLevel3Fn("Missile-none hits dead unit!\n");
-	    RefsDebugCheck( !goal->Refs );
-	    --goal->Refs;
-	    RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
-	    goal=unit->Orders[0].Goal=NULL;
-#else
-	    unit->Command.Data.Move.Goal=NULL;
-#endif
-	    return;
-	}
-
 	HitUnit(goal,CalculateDamage(unit->Stats,goal,unit->Bloodlust));
 
 	return;
@@ -746,26 +783,8 @@ global void FireMissile(Unit* unit)
 
     x=unit->X*TileSizeX+TileSizeX/2;	// missile starts in tile middle
     y=unit->Y*TileSizeY+TileSizeY/2;
-#ifdef NEW_ORDERS
-    if( (goal=unit->Orders[0].Goal) ) {
-#else
-    if( (goal=unit->Command.Data.Move.Goal) ) {
-#endif
-	// Check if goal is correct unit.
-	if( goal->Destroyed ) {
-	    DebugLevel0Fn("destroyed unit\n");
-	    RefsDebugCheck( !goal->Refs );
-	    if( !--goal->Refs ) {
-		ReleaseUnit(goal);
-	    }
-	    // FIXME: should I clear this here?
-#ifdef NEW_ORDERS
-	    goal=unit->Orders[0].Goal=NULL;
-#else
-	    unit->Command.Data.Move.Goal=NULL;
-#endif
-	    return;
-	}
+
+    if( goal ) {
 	DebugCheck( !goal->Type );	// Target invalid?
 	// Fire to nearest point of unit!
 	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
@@ -797,6 +816,7 @@ global void FireMissile(Unit* unit)
     //	Damage of missile
     //
     missile->SourceUnit=unit;
+    RefsDebugCheck( !unit->Refs );
     unit->Refs++;
 }
 
