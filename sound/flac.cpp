@@ -207,6 +207,52 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 }
 
 /**
+**	Type member function to read from the flac file
+**
+**	@param sample	    Sample reading from
+**	@param buf	    Buffer to write data to
+**	@param len	    Length of the buffer
+**
+**	@return		    Number of bytes read
+*/
+local int FlacRead(Sample* sample, void* buf, int len)
+{
+    unsigned pos;
+
+    pos = (unsigned)sample->User;
+    if (pos + len > sample->Length) {		// Not enough data?
+	len = sample->Length - pos;
+    }
+    memcpy(buf, sample->Data + pos, len);
+
+    sample->User = (void*)(pos + len);
+
+    return len;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+/**
+**	Type member function to free an flac file
+**
+**	@param sample	    Sample to free
+*/
+local void FlacFree(Sample* sample)
+{
+    IfDebug( AllocatedSoundMemory -= sample->Length; );
+
+    free(sample);
+}
+
+/**
+**	Flac object type structure.
+*/
+local const SampleType FlacSampleType = {
+    FlacRead,
+    FlacFree,
+};
+
+/**
 **	Load flac.
 **
 **	@param name	File name.
@@ -214,7 +260,7 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 **
 **	@return		Returns the loaded sample.
 */
-global Sample* LoadFlac(const char* name, int flags __attribute__((unused)))
+global Sample* LoadFlac(const char* name, int flags)
 {
     MyUser user;
     CLFile* f;
@@ -222,12 +268,12 @@ global Sample* LoadFlac(const char* name, int flags __attribute__((unused)))
     unsigned int magic[1];
     FLAC__StreamDecoder* stream;
 
-    if( !(f=CLopen(name)) ) {
-	fprintf(stderr,"Can't open file `%s'\n",name);
+    if (!(f = CLopen(name))) {
+	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }
-    CLread(f,magic,sizeof(magic));
-    if( AccessLE32(magic)!=0x43614C66 ) {	// "fLaC" in ASCII
+    CLread(f, magic, sizeof(magic));
+    if (AccessLE32(magic) != 0x43614C66) {	// "fLaC" in ASCII
 	CLclose(f);
 	return NULL;
     }
@@ -236,13 +282,13 @@ global Sample* LoadFlac(const char* name, int flags __attribute__((unused)))
 
     // FIXME: ugly way to seek to start of file
     CLclose(f);
-    if( !(f=CLopen(name)) ) {
-	fprintf(stderr,"Can't open file `%s'\n",name);
+    if (!(f = CLopen(name))) {
+	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }
 
-    if( !(stream=FLAC__stream_decoder_new()) ) {
-	fprintf(stderr,"Can't initialize flac decoder\n");
+    if (!(stream = FLAC__stream_decoder_new())) {
+	fprintf(stderr, "Can't initialize flac decoder\n");
 	CLclose(f);
 	return NULL;
     }
@@ -255,18 +301,18 @@ global Sample* LoadFlac(const char* name, int flags __attribute__((unused)))
     FLAC__stream_decoder_init(stream);
 
     //
-    //	Read sample
+    //  Read sample
     //
-    user.File=f;
-    user.Sample=sample=malloc(sizeof(*sample));
-    sample->Channels=0;
-    sample->SampleSize=0;
-    sample->Frequency=0;
-    sample->Length=0;
+    user.File = f;
+    user.Sample = sample = calloc(1, sizeof(*sample));
+    sample->Type = &FlacSampleType;
 
+    if (flags & PlayAudioStream) {
+	DebugLevel0Fn("Streaming not supported\n");
+    }
 #if 0
     FLAC__stream_decoder_process_metadata(stream);
-    if( !sample->Channels || !sample->SampleSize ) {
+    if (!sample->Channels || !sample->SampleSize) {
 	free(sample);
 	FLAC__stream_decoder_finish(stream);
 	FLAC__stream_decoder_delete(stream);
@@ -282,7 +328,8 @@ global Sample* LoadFlac(const char* name, int flags __attribute__((unused)))
     CLclose(f);
 
     DebugLevel3Fn(" %d\n" _C_ user.Sample->Length);
-    IfDebug( AllocatedSoundMemory+=user.Sample->Length; );
+    IfDebug(AllocatedSoundMemory += user.Sample->Length;
+	);
 
     return user.Sample;
 }
