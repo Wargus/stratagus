@@ -747,6 +747,7 @@ global int UnitVisible(const Unit* unit)
 	//
 	//	Check explored and if visible under fog of war.
 	//	Building could always be seen under fog of war.
+	//	FIXME: only known buildings are visible SceenFrame!=-1.
 	//
 	mf=TheMap.Fields+y*TheMap.Width+x;
 	m=1<<ThisPlayer->Player;
@@ -1807,7 +1808,8 @@ global Unit* FindGoldMine(const Unit* source,int x,int y)
 	    continue;
 	}
 	d=MapDistanceToUnit(x,y,unit);
-	if( d<best_d && UnitReachable(source,unit) ) {
+	// FIXME: UnitReachable(source,unit) didn't work unit still in building
+	if( d<best_d /* && UnitReachable(source,unit) */ ) {
 	    best_d=d;
 	    best=unit;
 	}
@@ -1882,7 +1884,8 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	    continue;
 	}
 	d=MapDistanceToUnit(x,y,unit);
-	if( d<best_d && UnitReachable(source,unit) ) {
+	// FIXME: UnitReachable(source,unit) didn't work unit still in building
+	if( d<best_d /* && UnitReachable(source,unit) */ ) {
 	    best_d=d;
 	    best=unit;
 	}
