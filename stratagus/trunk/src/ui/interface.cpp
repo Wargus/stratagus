@@ -905,6 +905,7 @@ global void InputMouseButtonPress(const EventCallback* callbacks,
     //	Button new pressed.
     //
     if( !(MouseButtons&(1<<button)) ) {
+	MouseButtons|=1<<button;
 	//
 	//	Detect double click
 	//
@@ -912,13 +913,11 @@ global void InputMouseButtonPress(const EventCallback* callbacks,
 		&& button==LastMouseButton
 		&& ticks<StartMouseTicks+DoubleClickDelay ) {
 	    MouseButtons|=(1<<button)<<MouseDoubleShift;
-	    MouseButtons|=1<<button;
 	    button|=button<<MouseDoubleShift;
 	} else {
 	    MouseState=InitialMouseState;
 	    StartMouseTicks=ticks;
 	    LastMouseButton=button;
-	    MouseButtons|=1<<button;
 	}
     }
     LastMouseTicks=ticks;

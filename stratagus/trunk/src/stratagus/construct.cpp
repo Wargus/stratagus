@@ -97,11 +97,7 @@ global void LoadConstructions(void)
 	    char* buf;
 
 	    buf=alloca(strlen(file)+9+1);
-#ifdef NEW_NAMES
 	    file=strcat(strcpy(buf,"graphics/"),file);
-#else
-	    file=strcat(strcpy(buf,"graphic/"),file);
-#endif
 	    ShowLoadProgress("\tConstruction %s\n",file);
 	    Constructions[i].Sprite=LoadSprite(file
 		    ,Constructions[i].Width,Constructions[i].Height);

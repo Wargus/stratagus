@@ -35,7 +35,7 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DNEW_NAMES"
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
 ## SLOW_INPUT		If you have problems that events aren't fetched.
 ## BPP8_*               Only for X11 8bpp common palette:
 ##   BPP8_NORMAL          disables default, like other Xbpp (delivers errors)
@@ -45,7 +45,6 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DNEW_NAMES"
 ## There are some still not well tested code parts or branches.
 ## UNIT_ON_MAP:		Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code (value>1 shows update)
-## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_AI:		New better improved AI code
 ## These aren't working yet:
 ## NEW_FOW:		New fog of war code, should work correct

@@ -369,9 +369,6 @@ local void PrintHeader(void)
 #ifdef NEW_MAPDRAW
     "NEW-MAPDRAW "
 #endif
-#ifdef NEW_NAMES
-    "NEW-NAMES "
-#endif
 #ifdef NEW_FOW
     "NEW-FOW "
 #endif
@@ -440,12 +437,8 @@ Use it at your own risk.\n\n");
     //
     //  Inital menues require some gfx..
     //
-#ifdef NEW_NAMES
-    LoadRGB(GlobalPalette, s=strdcat(FreeCraftLibPath,
-		  strdcat("/",Tilesets[TilesetSummer].PaletteFile)));
-#else
-    LoadRGB(GlobalPalette, s=strdcat(FreeCraftLibPath, "/summer.rgb"));
-#endif
+    LoadRGB(GlobalPalette, s=strdcat3(FreeCraftLibPath,
+	    "/",Tilesets[TilesetSummer].PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
     LoadFonts();
@@ -560,11 +553,7 @@ global int main(int argc,char** argv)
     //	Setup some defaults.
     //
     FreeCraftLibPath=FREECRAFT_LIB_PATH;
-#ifdef NEW_NAMES
     TitleScreen=strdup("graphics/ui/title.png");
-#else
-    TitleScreen=strdup("graphic/title.png");
-#endif
     CclStartFile="ccl/freecraft.ccl";
 
     memset(NetworkName, 0, 16);

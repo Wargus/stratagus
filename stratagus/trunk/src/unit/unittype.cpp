@@ -998,11 +998,7 @@ global void LoadUnitTypes(void)
 	    char* buf;
 
 	    buf=alloca(strlen(file)+9+1);
-#ifdef NEW_NAMES
 	    file=strcat(strcpy(buf,"graphics/"),file);
-#else
-	    file=strcat(strcpy(buf,"graphic/"),file);
-#endif
 	    ShowLoadProgress("\tUnit `%s'\n",file);
 	    type->Sprite=LoadSprite(file,type->Width,type->Height);
 	}
