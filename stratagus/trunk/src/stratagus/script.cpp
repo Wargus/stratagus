@@ -434,7 +434,7 @@ global void InitCcl(void)
     sargv[0] = "FreeCraft";
     sargv[1] = "-v1";
     sargv[2] = "-g0";
-    sargv[3] = "-h200000:20";
+    sargv[3] = "-h400000:20";
     buf=malloc(strlen(FreeCraftLibPath)+4);
     sprintf(buf,"-l%s",FreeCraftLibPath);
     sargv[4] = buf;			// never freed
