@@ -98,6 +98,8 @@ struct _viewport_ {
 
 	int MapX;					/// Map tile left corner x coordinate
 	int MapY;					/// Map tile upper corner y coordinate
+	int OffsetX;				/// Map tile offset
+	int OffsetY;				/// Map tile offset
 	int MapWidth;				/// Width in map tiles
 	int MapHeight;				/// Height in map tiles
 
@@ -391,9 +393,9 @@ extern int Map2ViewportX(const Viewport* vp, int x);
 extern int Map2ViewportY(const Viewport* vp, int y);
 
 	/// Set the current map view to x,y(upper,left corner)
-extern void ViewportSetViewpoint(Viewport* vp, int x, int y);
+extern void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety);
 	/// Center map on point in viewport
-extern void ViewportCenterViewpoint(Viewport* vp, int x, int y);
+extern void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety);
 
 //@}
 

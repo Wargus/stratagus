@@ -497,8 +497,8 @@ local void DrawBuildingCursor(void)
 
 	// Align to grid
 	vp = TheUI.MouseViewport;
-	x = CursorX - (CursorX - vp->X) % TileSizeX;
-	y = CursorY - (CursorY - vp->Y) % TileSizeY;
+	x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
+	y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
 	BuildingCursorSX = mx = Viewport2MapX(vp, x);
 	BuildingCursorSY = my = Viewport2MapY(vp, y);
 
@@ -517,7 +517,6 @@ local void DrawBuildingCursor(void)
 	DrawShadow(NULL, CursorBuilding, frame, x, y);
 	GraphicPlayerPixels(ThisPlayer, CursorBuilding->Sprite);
 	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, frame, x, y);
-	PopClipping();
 
 	//
 	//  Draw the allow overlay
@@ -549,10 +548,11 @@ local void DrawBuildingCursor(void)
 			} else {
 				color = ColorRed;
 			}
-			VideoFillTransRectangle(color, x + w * TileSizeX, y + h *
+			VideoFillTransRectangleClip(color, x + w * TileSizeX, y + h *
 				TileSizeY, TileSizeX, TileSizeY, 95);
 		}
 	}
+	PopClipping();
 }
 
 

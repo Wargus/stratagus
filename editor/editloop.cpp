@@ -503,7 +503,7 @@ local void DrawTileIcons(void)
 #endif
 			VideoDrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
-				VideoDrawRectangle(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
+				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
 
 			}
 			if (CursorOn == CursorOnButton && ButtonUnderCursor == i + 100) {
@@ -716,7 +716,7 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 	x += 4;
 	y += 4;
 #ifdef USE_OPENGL
-	MapDrawTile(TheMap.Tileset->Table[tilenum], x, y);
+	VideoDrawTile(TheMap.Tileset->Table[tilenum], x, y);
 #else
 	VideoDrawTile(TheMap.Tileset->Table[tilenum], x, y);
 #endif
@@ -792,6 +792,8 @@ local void DrawMapCursor(void)
 			int i;
 			int j;
 
+			SetClipping(TheUI.MouseViewport->X, TheUI.MouseViewport->Y,
+				TheUI.MouseViewport->EndX, TheUI.MouseViewport->EndY);
 			for (j = 0; j < TileCursorSize; ++j) {
 				int ty;
 
@@ -807,15 +809,13 @@ local void DrawMapCursor(void)
 						break;
 					}
 #ifdef USE_OPENGL
-					MapDrawTile(TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
+					VideoDrawTile(TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
 #else
 					VideoDrawTile(TheMap.Tileset->Table[0x10 +
 						TileCursor * 16], tx, ty);
 #endif
 				}
 			}
-			SetClipping(TheUI.MouseViewport->X, TheUI.MouseViewport->Y,
-				TheUI.MouseViewport->EndX, TheUI.MouseViewport->EndY);
 			VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
 				TileSizeY * TileCursorSize);
 			SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
@@ -1076,7 +1076,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 				ScreenMinimap2MapX(CursorX) -
 					TheUI.SelectedViewport->MapWidth / 2,
 				ScreenMinimap2MapY(CursorY) -
-					TheUI.SelectedViewport->MapHeight / 2);
+					TheUI.SelectedViewport->MapHeight / 2, TileSizeX / 2, TileSizeY / 2);
 		}
 		return;
 	}
@@ -1518,7 +1518,7 @@ local void EditorCallbackMouse(int x, int y)
 		}
 		TheUI.MouseWarpX = CursorStartX;
 		TheUI.MouseWarpY = CursorStartY;
-		ViewportSetViewpoint(TheUI.MouseViewport, xo, yo);
+		ViewportSetViewpoint(TheUI.MouseViewport, xo, yo, TileSizeX / 2, TileSizeY / 2);
 		return;
 	}
 
@@ -1542,21 +1542,22 @@ local void EditorCallbackMouse(int x, int y)
 			if (CursorX <= TheUI.SelectedViewport->X) {
 				ViewportSetViewpoint(TheUI.SelectedViewport,
 					TheUI.SelectedViewport->MapX - 1,
-					TheUI.SelectedViewport->MapY);
+					TheUI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
 			} else if (CursorX >= TheUI.SelectedViewport->EndX) {
 				ViewportSetViewpoint(TheUI.SelectedViewport,
 					TheUI.SelectedViewport->MapX + 1,
-					TheUI.SelectedViewport->MapY);
+					TheUI.SelectedViewport->MapY, TileSizeX / 2, TileSizeY / 2);
 			}
 
 			if (CursorY <= TheUI.SelectedViewport->Y) {
 				ViewportSetViewpoint(TheUI.SelectedViewport,
 					TheUI.SelectedViewport->MapX,
-					TheUI.SelectedViewport->MapY - 1);
+					TheUI.SelectedViewport->MapY - 1, TileSizeX / 2, TileSizeY / 2);
 			} else if (CursorY >= TheUI.SelectedViewport->EndY) {
 				ViewportSetViewpoint(TheUI.SelectedViewport,
 					TheUI.SelectedViewport->MapX,
-					TheUI.SelectedViewport->MapY + 1);
+					TheUI.SelectedViewport->MapY + 1, TileSizeX / 2, TileSizeY / 2);
+
 			}
 		}
 
@@ -1595,7 +1596,7 @@ local void EditorCallbackMouse(int x, int y)
 			ScreenMinimap2MapX(CursorX)
 				- TheUI.SelectedViewport->MapWidth / 2,
 			ScreenMinimap2MapY(CursorY)
-				- TheUI.SelectedViewport->MapHeight / 2);
+				- TheUI.SelectedViewport->MapHeight / 2, 0, 0);
 		return;
 	}
 
@@ -1808,9 +1809,9 @@ local void EditorCallbackMouse(int x, int y)
 		//
 		UnitUnderCursor = UnitOnScreen(NULL,
 			CursorX - TheUI.MouseViewport->X +
-				TheUI.MouseViewport->MapX * TileSizeX,
+				TheUI.MouseViewport->MapX * TileSizeX + TheUI.MouseViewport->OffsetX,
 			CursorY - TheUI.MouseViewport->Y +
-				TheUI.MouseViewport->MapY * TileSizeY);
+				TheUI.MouseViewport->MapY * TileSizeY + TheUI.MouseViewport->OffsetY);
 		if (UnitUnderCursor) {
 			ShowUnitInfo(UnitUnderCursor);
 			return;
