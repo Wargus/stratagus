@@ -31,7 +31,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h>              
 
 #include "freecraft.h"
 #include "map.h"
@@ -137,7 +137,6 @@ global void RevealMap(void)
 	    for (i = 0; i < PlayerMax; ++i) {
 		if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
 		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i]=1;
-		    }
 		}
 	    }
 #else
