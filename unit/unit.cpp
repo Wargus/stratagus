@@ -3454,6 +3454,9 @@ int CanTransport(const Unit* transporter, const Unit* unit)
 	if (!transporter->Type->CanTransport) {
 		return 0;
 	}
+	if (transporter->Orders[0].Action == UnitActionBuilt) { // Under construction
+		return 0;
+	}
 	if (transporter == unit) { // Cannot transporter itself.
 		return 0;
 	}
