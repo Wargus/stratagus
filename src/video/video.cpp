@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 
 //	FIXME: this functions only supports 16 bit displays!!!!

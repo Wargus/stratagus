@@ -1,6 +1,13 @@
-/*
-**	A clone of a famous game.
-*/
+//   ___________		     _________		      _____  __
+//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//	  \/		    \/	   \/	     \/		   \/
+//  ______________________                           ______________________
+//			  T H E   W A R   B E G I N S
+//	   FreeCraft - A free fantasy real time strategy game engine
+//
 /**@name unitcache.c	-	The unit cache.
 **
 **		Cache to find units faster from position.
@@ -10,7 +17,7 @@
 **			Real quad tree.
 **			Priority search tree.
 */
-/*	(c) Copyright 1998,1999 by Lutz Sammer
+/*	(c) Copyright 1998-2000 by Lutz Sammer
 **
 **	$Id$
 */
@@ -21,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"

@@ -21,7 +21,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#include "clone.h"
+#include "freecraft.h"
 
 #ifdef USE_SDL	// {
 

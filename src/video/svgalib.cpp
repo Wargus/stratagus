@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name svgalib.c		-	svgalib support. */
+/**@name svgalib.c	-	svgalib support. */
 /*
 **	(c) Copyright 1999-2000 by Jarek Sobieszek
 **
@@ -31,7 +31,7 @@
 #include <vgamouse.h>
 #include <vgakeyboard.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "tileset.h"
 #include "sound_id.h"

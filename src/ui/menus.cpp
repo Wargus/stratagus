@@ -26,7 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "player.h"
 #include "image.h"

@@ -1,9 +1,16 @@
-/*
-**	A clone of a famous game.
-*/
+//   ___________		     _________		      _____  __
+//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//	  \/		    \/	   \/	     \/		   \/
+//  ______________________                           ______________________
+//			  T H E   W A R   B E G I N S
+//	   FreeCraft - A free fantasy real time strategy game engine
+//
 /**@name action_repair.c	-	The repair action. */
 /*
-**	(c) Copyright 1999 by Vladi Shabanski
+**	(c) Copyright 1999,2000 by Vladi Shabanski
 **
 **	$Id$
 */
@@ -21,7 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
