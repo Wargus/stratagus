@@ -234,7 +234,7 @@ enum _tileset_nr_ {
 
 // FIXME: allow more tilesets
 
-#define TilesetMax		4	/// Biggest supported tilset number
+#define TilesetMax		4	/// Biggest supported tileset number
 
 /*----------------------------------------------------------------------------
 --	Variables
