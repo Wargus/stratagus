@@ -78,7 +78,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 
     switch( HandleActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
-	    DebugCheck( unit->Command.Action!=resource->Action );
+	    unit->Command.Action=resource->Action;
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -145,7 +145,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //	Activate the resource
     //
     goal->Data.Resource.Active++;
-    DebugLevel0Fn("+%d\n",goal->Data.Resource.Active);
+    DebugLevel3Fn("+%d\n",goal->Data.Resource.Active);
 
 #else
 
@@ -207,7 +207,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //	Activate the resource
     //
     goal->Command.Data.Resource.Active++;
-    DebugLevel0Fn("+%d\n",goal->Command.Data.Resource.Active);
+    DebugLevel3Fn("+%d\n",goal->Command.Data.Resource.Active);
 
 #endif
 
@@ -269,13 +269,13 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	goal->Value-=DEFAULT_INCOMES[resource->Cost];
 #ifdef NEW_ORDERS
-	DebugLevel0Fn("-%d\n",goal->Data.Resource.Active);
+	DebugLevel3Fn("-%d\n",goal->Data.Resource.Active);
 	if( !--goal->Data.Resource.Active ) {
 	    goal->Frame=0;
 	    CheckUnitToBeDrawn(goal);
 	}
 #else
-	DebugLevel0Fn("-%d\n",goal->Command.Data.Resource.Active);
+	DebugLevel3Fn("-%d\n",goal->Command.Data.Resource.Active);
 	if( !--goal->Command.Data.Resource.Active ) {
 	    goal->Frame=0;
 	    CheckUnitToBeDrawn(goal);
@@ -394,7 +394,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 **	@param unit	Pointer to unit.
 **	@param resouce	How to handle the resource.
 **
-**	@return		TRUE if ready, otherwise FALSE.
+**	@return		TRUE if reached, otherwise FALSE.
 */
 local int MoveToDepot(Unit* unit,const Resource* resource)
 {
@@ -402,7 +402,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 
     switch( HandleActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
-	    DebugCheck( unit->Command.Action!=resource->Action );
+	    unit->Command.Action=resource->Action;
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -651,7 +651,7 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
 {
     int ret;
 
-    DebugLevel2Fn("%s(%Zd) SubAction %d\n"
+    DebugLevel3Fn("%s(%Zd) SubAction %d\n"
 	,unit->Type->Ident,UnitNumber(unit),unit->SubAction);
 
     switch( unit->SubAction ) {
