@@ -183,6 +183,11 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_error(l);
 			}
 		}
+		// Now, checking value.
+		if (spellaction->Data.SpawnMissile.Missile == NULL) {
+			lua_pushstring(l, "Use a missile for spawn-missile (with missile)");
+			lua_error(l);
+		}
 	} else if (!strcmp(value, "area-adjust-vitals")) {
 		spellaction->CastFunction = CastAreaAdjustVitals;
 		for (; j < args; ++j) {
@@ -242,6 +247,11 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_pushfstring(l, "Unsupported area-bombardment tag: %s", value);
 				lua_error(l);
 			}
+		}
+		// Now, checking value.
+		if (spellaction->Data.AreaBombardment.Missile == NULL) {
+			lua_pushstring(l, "Use a missile for area-bombardment (with missile)");
+			lua_error(l);
 		}
 	} else if (!strcmp(value, "demolish")) {
 		spellaction->CastFunction = CastDemolish;
@@ -328,6 +338,11 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_error(l);
 			}
 		}
+		// Now, checking value.
+		if (spellaction->Data.Summon.UnitType == NULL) {
+			lua_pushstring(l, "Use a unittype for summon (with unit-type)");
+			lua_error(l);
+		}
 	} else if (!strcmp(value, "spawn-portal")) {
 		spellaction->CastFunction = CastSpawnPortal;
 		for (; j < args; ++j) {
@@ -348,6 +363,11 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_pushfstring(l, "Unsupported spawn-portal tag: %s", value);
 				lua_error(l);
 			}
+		}
+		// Now, checking value.
+		if (spellaction->Data.SpawnPortal.PortalType == NULL) {
+			lua_pushstring(l, "Use a unittype for spawn-portal (with portal-type)");
+			lua_error(l);
 		}
 	} else if (!strcmp(value, "polymorph")) {
 		spellaction->CastFunction = CastPolymorph;
@@ -373,6 +393,11 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_pushfstring(l, "Unsupported polymorph tag: %s", value);
 				lua_error(l);
 			}
+		}
+		// Now, checking value.
+		if (spellaction->Data.Polymorph.NewForm == NULL) {
+			lua_pushstring(l, "Use a unittype for polymorph (with new-form)");
+			lua_error(l);
 		}
 	} else if (!strcmp(value, "adjust-vitals")) {
 		spellaction->CastFunction = CastAdjustVitals;
