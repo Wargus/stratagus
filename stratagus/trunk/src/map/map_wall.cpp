@@ -10,7 +10,7 @@
 //
 /**@name map_wall.c	-	The map wall handling. */
 //
-//	(c) Copyright 1999-2001 by Vladi Shabanski
+//	(c) Copyright 1999-2002 by Vladi Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -181,11 +181,7 @@ global void MapFixSeenWallTile(int x, int y)
 #ifdef NEW_FOW
 	if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
 	if ( IsMapFieldVisible(x,y) ) {
-#else
-	if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MarkDrawPosMap(x, y);
@@ -280,11 +276,7 @@ global void MapFixWallTile(int x, int y)
 #ifdef NEW_FOW
 	if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
 	if ( IsMapFieldVisible(x,y) ) {
-#else
-	if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
@@ -336,11 +328,7 @@ global void MapRemoveWall(unsigned x,unsigned y)
 #ifdef NEW_FOW
     if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
     if ( IsMapFieldVisible(x,y) ) {
-#else
-    if( mf->Flags&MapFieldVisible ) {
-#endif
 #endif
 	UpdateMinimapSeenXY(x,y);
 	MapMarkSeenTile(x,y);
@@ -379,11 +367,7 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
 #ifdef NEW_FOW
     if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
     if ( IsMapFieldVisible(x,y) ) {
-#else
-    if( mf->Flags&MapFieldVisible ) {
-#endif
 #endif
 	UpdateMinimapSeenXY(x,y);
 	MapMarkSeenTile(x,y);

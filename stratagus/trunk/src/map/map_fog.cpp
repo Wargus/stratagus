@@ -329,15 +329,11 @@ global void MapMarkSight(int tx,int ty,int range)
 	for( i=x; i<=x+width; ++i ) {
 	    // FIXME: Can use quadrat table!
 	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<=range*range ) {
+		// FIXME: can combine more bits 
 		if( !IsMapFieldVisible(i,y) ) {
-#ifdef NEW_FOW2
 		    TheMap.Fields[i+y*TheMap.Width].Flags |= MapFieldExplored;
 		    TheMap.Visible[0][(i+y*TheMap.Width)/32]
 			    |= 1<<((i+y*TheMap.Width)%32);
-#else
-		    TheMap.Fields[i+y*TheMap.Width].Flags
-			    |=MapFieldVisible|MapFieldExplored;
-#endif
 		    MapMarkSeenTile(i,y);
 		    //MustRedrawRow[y]=NEW_MAPDRAW;
 		    //MustRedrawTile[y*MapWidth+i]=NEW_MAPDRAW;
@@ -481,11 +477,7 @@ global void UpdateFogOfWarChange(void)
 			TheMap.Fields[x+y*w].Visible[p]=2;
 		    }
 #else
-#ifdef NEW_FOW2
 		    TheMap.Visible[0][(x+y*w)/32] |= 1<<((x+y*w)%32);
-#else
-		    TheMap.Fields[x+y*w].Flags|=MapFieldVisible;
-#endif
 #endif
 		    MapMarkSeenTile( x,y );
 		}
@@ -527,25 +519,7 @@ global void MapUpdateVisible(void)
     //
     //	Clear all visible flags.
     //
-#ifdef NEW_FOW2
     memset(TheMap.Visible[0],0,(TheMap.Width*TheMap.Height)/8);
-#else
-    if( 1 ) {
-	int w;
-	MapField* mf;
-	MapField* mfe;
-
-	w=TheMap.Width;
-	mfe=TheMap.Fields+TheMap.Height*w;
-	for( mf=TheMap.Fields; mf<mfe; ++mf ) {
-#ifdef NEW_FOW
-	    mf->Visible[0]=0;
-#else
-	    mf->Flags&=~MapFieldVisible;
-#endif
-	}
-    }
-#endif
 
     DebugLevel0Fn("Ticks Clear %lu\n",GetTicks()-t);
 
@@ -1563,7 +1537,6 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     }
 #endif
 #else
-#ifdef NEW_FOW2
     int w;
     int tile;
     int tile2;
@@ -1666,110 +1639,6 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     } else {
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
     }
-#else
-    int w;
-    int tile;
-    int tile2;
-
-    w=TheMap.Width;
-    tile=tile2=0;
-    //
-    //	Check each field around it
-    //
-    if( sy ) {
-	if( sx!=sy ) {
-	    if( !(TheMap.Fields[sx-w-1].Flags&MapFieldExplored) ) {
-		tile2|=2;
-		tile|=2;
-	    } else if( !(TheMap.Fields[sx-w-1].Flags&MapFieldVisible) ) {
-		tile|=2;
-	    }
-	}
-	if( !(TheMap.Fields[sx-w].Flags&MapFieldExplored) ) {
-	    tile2|=3;
-	    tile|=3;
-	} else if( !(TheMap.Fields[sx-w].Flags&MapFieldVisible) ) {
-	    tile|=3;
-	}
-	if( sx!=sy+w-1 ) {
-	    if( !(TheMap.Fields[sx-w+1].Flags&MapFieldExplored) ) {
-		tile2|=1;
-		tile|=1;
-	    } else if( !(TheMap.Fields[sx-w+1].Flags&MapFieldVisible) ) {
-		tile|=1;
-	    }
-	}
-    }
-
-    if( sx!=sy ) {
-	if( !(TheMap.Fields[sx-1].Flags&MapFieldExplored) ) {
-	    tile2|=10;
-	    tile|=10;
-	} else if( !(TheMap.Fields[sx-1].Flags&MapFieldVisible) ) {
-	    tile|=10;
-	}
-    }
-    if( sx!=sy+w-1 ) {
-	if( !(TheMap.Fields[sx+1].Flags&MapFieldExplored) ) {
-	    tile2|=5;
-	    tile|=5;
-	} else if( !(TheMap.Fields[sx+1].Flags&MapFieldVisible) ) {
-	    tile|=5;
-	}
-    }
-
-    if( sy+w<TheMap.Height*w ) {
-	if( sx!=sy ) {
-	    if( !(TheMap.Fields[sx+w-1].Flags&MapFieldExplored) ) {
-		tile2|=8;
-		tile|=8;
-	    } else if( !(TheMap.Fields[sx+w-1].Flags&MapFieldVisible) ) {
-		tile|=8;
-	    }
-	}
-	if( !(TheMap.Fields[sx+w].Flags&MapFieldExplored) ) {
-	    tile2|=12;
-	    tile|=12;
-	} else if( !(TheMap.Fields[sx+w].Flags&MapFieldVisible) ) {
-	    tile|=12;
-	}
-	if( sx!=sy+w-1 ) {
-	    if( !(TheMap.Fields[sx+w+1].Flags&MapFieldExplored) ) {
-		tile2|=4;
-		tile|=4;
-	    } else if( !(TheMap.Fields[sx+w+1].Flags&MapFieldVisible) ) {
-		tile|=4;
-	    }
-	}
-    }
-
-    //TheMap.Fields[sx].VisibleLastFrame=0;
-    //
-    //	Draw unexplored area
-    //	If only partly or total invisible draw fog of war.
-    //
-    tile=FogTable[tile];
-    tile2=FogTable[tile2];
-    if( tile2) {
-	VideoDrawUnexplored(TheMap.Tiles[tile2],dx,dy);
-	if( tile2==tile ) {		// no same fog over unexplored
-//	    if( tile != 0xf ) {
-//		TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
-//	    }
-	    tile=0;
-	}
-    }
-    if( TheMap.Fields[sx].Flags&MapFieldVisible ) {
-	if( tile ) {
-	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
-//	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
-//	} else {
-//	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldCompletelyVisible;
-	}
-    } else {
-	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
-    }
-#endif
 #endif
 }
 

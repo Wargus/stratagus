@@ -10,7 +10,7 @@
 //
 /**@name map_wood.c	-	The map wood handling. */
 //
-//	(c) Copyright 1999-2001 by Vladi Shabanski and Lutz Sammer
+//	(c) Copyright 1999-2002 by Vladi Shabanski and Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -121,11 +121,7 @@ global void MapFixSeenWoodTile(int x, int y)
 #ifdef NEW_FOW
     if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
     if ( IsMapFieldVisible(x,y) ) {
-#else
-    if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
@@ -196,11 +192,7 @@ global void MapFixWoodTile(int x, int y)
 #ifdef NEW_FOW
 	if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
 	if ( IsMapFieldVisible(x,y) ) {
-#else
-	if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
@@ -246,11 +238,7 @@ global void MapRemoveWood(unsigned x, unsigned y)
 #ifdef NEW_FOW
     if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
     if ( IsMapFieldVisible(x,y) ) {
-#else
-    if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
@@ -311,21 +299,12 @@ global void RegenerateForest(void)
 				MapMarkSeenTile(x, y-1);
 			    }
 #else
-#ifdef NEW_FOW2
 			    if ( IsMapFieldVisible(x,y) ) {
 				MapMarkSeenTile(x, y);
 			    }
 			    if ( IsMapFieldVisible(x,y-1) ) {
 				MapMarkSeenTile(x, y-1);
 			    }
-#else
-			    if (mf->Flags & MapFieldVisible) {
-				MapMarkSeenTile(x, y);
-			    }
-			    if (tmp->Flags & MapFieldVisible) {
-				MapMarkSeenTile(x , y-1);
-			    }
-#endif
 #endif
 			}
 		    }

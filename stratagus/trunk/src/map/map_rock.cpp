@@ -10,7 +10,7 @@
 //
 /**@name map_rock.c	-	The map rock handling. */
 //
-//	(c) Copyright 1999-2001 by Vladi Shabanski and Lutz Sammer
+//	(c) Copyright 1999-2002 by Vladi Shabanski and Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -143,11 +143,7 @@ global void MapFixSeenRockTile(int x, int y)
 #ifdef NEW_FOW
     if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
     if ( IsMapFieldVisible(x,y) ) {
-#else
-    if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
@@ -218,11 +214,7 @@ global void MapFixRockTile(int x, int y)
 #ifdef NEW_FOW
 	if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
 	if ( IsMapFieldVisible(x,y) ) {
-#else
-	if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
@@ -268,11 +260,7 @@ global void MapRemoveRock(unsigned x, unsigned y)
 #ifdef NEW_FOW
     if (mf->Visible[ThisPlayer->Player]>1) {
 #else
-#ifdef NEW_FOW2
     if ( IsMapFieldVisible(x,y) ) {
-#else
-    if (mf->Flags & MapFieldVisible) {
-#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
