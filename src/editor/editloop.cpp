@@ -1367,6 +1367,8 @@ local void EditorCallbackMouse(int x, int y)
     int i;
     int bx;
     int by;
+    static int LastMapX=0;
+    static int LastMapY=0;
     enum _cursor_on_ OldCursorOn;
     char buf[256];
 
@@ -1406,6 +1408,15 @@ local void EditorCallbackMouse(int x, int y)
 	    }
 	}
 
+	//Allow another press, Only if we move tiles
+	if (UnitPlacedThisPress && LastMapX !=
+		Viewport2MapY(TheUI.SelectedViewport, CursorY) &&
+		LastMapY != Viewport2MapY(TheUI.SelectedViewport, CursorY)) {
+	    LastMapX=Viewport2MapX(TheUI.SelectedViewport, CursorX);
+	    LastMapY=Viewport2MapY(TheUI.SelectedViewport, CursorY);
+	    UnitPlacedThisPress = 0;
+	}
+
 	//
 	//	Scroll the map, if cursor moves outside the viewport.
 	//
@@ -1416,12 +1427,14 @@ local void EditorCallbackMouse(int x, int y)
 		Viewport2MapY(TheUI.SelectedViewport, CursorY), TileCursor,
 		TileCursorSize);
 	} else if (EditorState == EditorEditUnit && CursorBuilding) {
-	    if (CanBuildUnitType(NULL, CursorBuilding,
-		    Viewport2MapX(TheUI.SelectedViewport, CursorX),
-		    Viewport2MapY(TheUI.SelectedViewport, CursorY))) {
-		EditUnit(Viewport2MapX(TheUI.SelectedViewport, CursorX),
-		    Viewport2MapY(TheUI.SelectedViewport, CursorY),
-		    CursorBuilding, Players + SelectedPlayer);
+	    if (!UnitPlacedThisPress) {
+		if (CanBuildUnitType(NULL, CursorBuilding,
+			Viewport2MapX(TheUI.SelectedViewport, CursorX),
+			Viewport2MapY(TheUI.SelectedViewport, CursorY))) {
+		    EditUnit(Viewport2MapX(TheUI.SelectedViewport, CursorX),
+			Viewport2MapY(TheUI.SelectedViewport, CursorY),
+			CursorBuilding, Players + SelectedPlayer);
+		}
 	    }
 	}
 
@@ -1727,8 +1740,8 @@ local void CreateEditor(void)
 	for (i = 0; i < TheMap.Width * TheMap.Height; ++i) {
 	    TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
 	    TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile =
-		TheMap.Tileset->Table[16];
-	    TheMap.Fields[i].Flags = TheMap.Tileset->FlagsTable[16];
+		TheMap.Tileset->Table[0x50];
+	    TheMap.Fields[i].Flags = TheMap.Tileset->FlagsTable[0x50];
 	}
 	GameSettings.Resources = SettingsResourcesMapDefault;
 	CreateGame(NULL, &TheMap);
