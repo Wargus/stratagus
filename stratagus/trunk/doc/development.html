@@ -223,9 +223,8 @@ You need a C compiler for Windows. Get <B>one</B> of the following.
     libpng.  Set the active configuration to "libpng - Win32 LIB" then go to 
     Project, Settings, C/C++, Code Generation and set the run-time library to 
     Multithreaded DLL.  You should then be able to build the library.
-    <LI>Download the FreeCraft 
-    <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsp">project</A> and
-    <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsw">workspace</A>.
+    <LI>Extract the VC++ project and workspace files from
+    freecraft\contrib\msvc.zip into the root freecraft directory.
     You will need to modify the paths to libpng, zlib, and SDL.  Change the 
     include paths in Project, Settings, C/C++, Preprocessor.  Remove the 
     libraries SDL.lib, SDLmain.lib, and libpng.lib and add your libraries to
