@@ -192,7 +192,6 @@ global void ShowIntro(const Intro *intro)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(intro->Background);
-    //VideoSetPalette(background->Pixels);
 
     LibraryFileName(intro->TextFile,buf);
     if( !(file=CLopen(buf)) ) {
