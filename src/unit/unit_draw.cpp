@@ -1842,9 +1842,11 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 		const Construction* construction;
 
 		construction = type->Construction;
+#ifdef USE_OPENGL
 		if (!construction->Sprite->PlayerColorTextures[player]) {
 			MakePlayerColorTexture(construction->Sprite, player);
 		}
+#endif
 		x -= construction->Width / 2;
 		y -= construction->Height / 2;
 		if (frame < 0) {
