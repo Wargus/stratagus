@@ -387,6 +387,7 @@ global void ShowIntro(const Intro *intro)
     int old_video_sync;
     int soundfree;
     int soundout;
+    int soundcount;
 
     UseContinueButton=1;
     InitContinueButton(455*VideoWidth/640,440*VideoHeight/480);
@@ -441,6 +442,7 @@ global void ShowIntro(const Intro *intro)
 #endif
     soundfree = -1;
     soundout = -1;
+    soundcount = 0;
     if ( intro->VoiceFile[0] ) {
 	soundfree = NextFreeChannel;
 	soundout = NextSoundRequestOut;
@@ -464,10 +466,16 @@ global void ShowIntro(const Intro *intro)
     while( 1 ) {
 	if( (!Channels[soundfree].Command) && stage<MAX_BRIEFING_VOICES &&
 		(soundout != NextSoundRequestOut) && intro->VoiceFile[stage] ) {
-	    soundfree = NextFreeChannel;
-	    soundout = NextSoundRequestOut;
-	    PlayFile(intro->VoiceFile[stage]);
-	    ++stage;
+	    // FIXME: is there a better way to do this?
+	    if (soundcount == 15) {
+		soundfree = NextFreeChannel;
+		soundout = NextSoundRequestOut;
+	        PlayFile(intro->VoiceFile[stage]);
+	        ++stage;
+		soundcount = 0;
+	    } else {
+		++soundcount;
+	    }
 	}
 	VideoLockScreen();
 	HideAnyCursor();
