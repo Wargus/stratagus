@@ -157,11 +157,13 @@ global void MenusSetBackground(void)
 **	@param font	font number for text
 **	@param text	text to print on button
 */
-global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigned h,unsigned x,unsigned y,
+global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,int y,
 	const int font,const unsigned char *text)
 {
     MenuButtonId rb;
-    int s, nc, rc;
+    int s;
+    int nc;
+    int rc;
 
     GetDefaultTextColors(&nc, &rc);
     if (flags&MenuButtonDisabled) {
@@ -216,13 +218,19 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 **	@param mx	menu X display position (offset)
 **	@param my	menu Y display position (offset)
 */
-local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
+local void DrawPulldown(Menuitem *mi, int mx, int my)
 {
-    int i, nc, rc;
+    int i;
+    int nc;
+    int rc;
     char *text;
     unsigned flags;
     MenuButtonId rb;
-    unsigned w, h, x, y, oh;
+    int w;
+    int h;
+    int x;
+    int y;
+    int oh;
 
     x = mx+mi->xofs;
     y = my+mi->yofs;
@@ -306,13 +314,22 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 **	@param mx	menu X display position (offset)
 **	@param my	menu Y display position (offset)
 */
-local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
+local void DrawListbox(Menuitem *mi, int mx, int my)
 {
-    int i, s, nc, rc;
+    int i;
+    int s;
+    int nc;
+    int rc;
     char *text;
-    MenuButtonId rb = mi->d.listbox.button;
-    unsigned flags = mi->flags;
-    unsigned w, h, x, y;
+    MenuButtonId rb;
+    unsigned flags;
+    int w;
+    int h;
+    int x;
+    int y;
+
+    rb = mi->d.listbox.button;
+    flags = mi->flags;
     w = mi->d.listbox.xsize;
     h = mi->d.listbox.ysize;
     x = mx+mi->xofs;
@@ -362,11 +379,16 @@ local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
 **	@param mx	menu X display position (offset)
 **	@param my	menu Y display position (offset)
 */
-local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
+local void DrawVSlider(Menuitem *mi, int mx, int my)
 {
     int p;
-    unsigned flags = mi->flags;
-    unsigned w, h, x, y;
+    unsigned flags;
+    int w;
+    int h;
+    int x;
+    int y;
+
+    flags = mi->flags;
     w = mi->d.vslider.xsize;
     h = mi->d.vslider.ysize;
     x = mx+mi->xofs;
@@ -417,11 +439,16 @@ local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 **	@param mx	menu X display position (offset)
 **	@param my	menu Y display position (offset)
 */
-local void DrawHSlider(Menuitem *mi, unsigned mx, unsigned my)
+local void DrawHSlider(Menuitem *mi, int mx, int my)
 {
     int p;
-    unsigned flags = mi->flags;
-    unsigned w, h, x, y;
+    unsigned flags;
+    int w;
+    int h;
+    int x;
+    int y;
+
+    flags = mi->flags;
     w = mi->d.hslider.xsize;
     h = mi->d.hslider.ysize;
     x = mx+mi->xofs;
@@ -472,12 +499,15 @@ local void DrawHSlider(Menuitem *mi, unsigned mx, unsigned my)
 **	@param mx	menu X display position (offset)
 **	@param my	menu Y display position (offset)
 */
-local void DrawGem(Menuitem *mi, unsigned mx, unsigned my)
+local void DrawGem(Menuitem *mi, int mx, int my)
 {
-    unsigned flags = mi->flags;
-    MenuButtonId rb = mi->d.gem.button;
-    unsigned x, y;
+    unsigned flags;
+    MenuButtonId rb;
+    int x;
+    int y;
 
+    flags = mi->flags;
+    rb = mi->d.gem.button;
     x = mx+mi->xofs;
     y = my+mi->yofs;
     if ((mi->d.gem.state & MI_GSTATE_INVISIBLE)) {
@@ -504,14 +534,19 @@ local void DrawGem(Menuitem *mi, unsigned mx, unsigned my)
 **	@param mx	menu X display position (offset)
 **	@param my	menu Y display position (offset)
 */
-local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
+local void DrawInput(Menuitem *mi, int mx, int my)
 {
     int nc, rc;
     char *text;
-    unsigned flags = mi->flags;
-    MenuButtonId rb = mi->d.input.button;
-    unsigned w, h, x, y;
+    unsigned flags;
+    MenuButtonId rb;
+    int w;
+    int h;
+    int x;
+    int y;
 
+    flags = mi->flags;
+    rb = mi->d.input.button;
     x = mx+mi->xofs;
     y = my+mi->yofs;
     w = mi->d.input.xsize;
@@ -549,8 +584,11 @@ local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
 */
 global void DrawMenu(Menu *menu)
 {
-    int i, n, l;
-    Menuitem *mi, *mip;
+    int i;
+    int n;
+    int l;
+    Menuitem *mi;
+    Menuitem *mip;
 
     if (menu == NULL) {
 	MustRedraw &= ~RedrawMenu;
@@ -656,6 +694,7 @@ global void DrawMenu(Menu *menu)
     MenuRedrawW = menu->xsize;
     MenuRedrawH = menu->ysize;
 }
+
 /**
 **	Handle keys in menu mode.
 **
@@ -667,7 +706,8 @@ global void DrawMenu(Menu *menu)
 */
 local void MenuHandleKeyDown(unsigned key,unsigned keychar)
 {
-    int i, n;
+    int i;
+    int n;
     Menuitem *mi;
     Menu *menu;
 
@@ -944,7 +984,13 @@ local void MenuHandleKeyRepeat(unsigned key,unsigned keychar)
 */
 local void MenuHandleMouseMove(int x,int y)
 {
-    int h, w, i, j, n, xs, ys;
+    int h;
+    int w;
+    int i;
+    int j;
+    int n;
+    int xs;
+    int ys;
     Menuitem *mi;
     Menu *menu;
     int ox;
@@ -1367,15 +1413,17 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 */
 local void MenuHandleButtonUp(unsigned b)
 {
-    int i, n;
+    int i;
+    int n;
     Menuitem *mi;
     Menu *menu;
-    int redraw_flag = 0;
-
+    int redraw_flag;
+    
     if (CurrentMenu == NULL) {
 	return;
     }
 
+    redraw_flag = 0;
     menu = CurrentMenu;
 
     if ((1<<b) == LeftButton) {
@@ -1501,11 +1549,17 @@ global void EndMenu(void)
 */
 global void ProcessMenu(const char *menu_id, int loop)
 {
-    int i, oldncr;
+    int i;
+    int oldncr;
     Menuitem *mi;
-    Menu *menu, *CurrentMenuSave = NULL;
-    int MenuButtonUnderCursorSave = -1;
-    int MenuButtonCurSelSave = -1;
+    Menu *menu;
+    Menu *CurrentMenuSave;
+    int MenuButtonUnderCursorSave;
+    int MenuButtonCurSelSave;
+
+    CurrentMenuSave = NULL;
+    MenuButtonUnderCursorSave = -1;
+    MenuButtonCurSelSave = -1;
 
     CancelBuildingMode();
 
