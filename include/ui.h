@@ -320,6 +320,8 @@ extern void UIHandleButtonDown(unsigned button);
     /// Called if any mouse button is released up
 extern void UIHandleButtonUp(unsigned button);
 
+    /// Restrict mouse cursor to viewport
+extern void RestrictCursorToViewport(void);
     /// Restrict mouse cursor to minimap
 extern void RestrictCursorToMinimap(void);
 
