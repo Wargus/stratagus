@@ -409,8 +409,8 @@ local void HandleMouseOn(int x, int y)
     for (i = 0; i < TheUI.NumButtonButtons; ++i) {
 	if (x >= TheUI.ButtonButtons[i].X &&
 		x <= TheUI.ButtonButtons[i].X + TheUI.ButtonButtons[i].Width + 7 &&
-		y>TheUI.ButtonButtons[i].Y &&
-		y<=TheUI.ButtonButtons[i].Y + TheUI.ButtonButtons[i].Height + 7) {
+		y > TheUI.ButtonButtons[i].Y &&
+		y <= TheUI.ButtonButtons[i].Y + TheUI.ButtonButtons[i].Height + 7) {
 	    ButtonAreaUnderCursor = ButtonAreaButton;
 	    ButtonUnderCursor = i;
 	    CursorOn = CursorOnButton;
@@ -418,28 +418,77 @@ local void HandleMouseOn(int x, int y)
 	    return;
 	}
     }
-    if (NumSelected == 1 && Selected[0]->Type->Building &&
-	    Selected[0]->Orders[0].Action == UnitActionTrain &&
-	    Selected[0]->Data.Train.Count > 1) {
-	for (i = 0; i < TheUI.NumTrainingButtons; ++i) {
-	    if (x >= TheUI.TrainingButtons[i].X &&
-		    x <= TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
-		    y > TheUI.TrainingButtons[i].Y &&
-		    y <= TheUI.TrainingButtons[i].Y + TheUI.TrainingButtons[i].Height + 7) {
-		ButtonAreaUnderCursor = ButtonAreaTraining;
-		ButtonUnderCursor = i;
+    if (NumSelected == 1 && Selected[0]->Type->Building) {
+	if (Selected[0]->Orders[0].Action == UnitActionTrain) {
+	    if (Selected[0]->Data.Train.Count == 1) {
+		if (TheUI.SingleTrainingButton &&
+			x >= TheUI.SingleTrainingButton->X &&
+			x <= TheUI.SingleTrainingButton->X + TheUI.SingleTrainingButton->Width + 7 &&
+			y > TheUI.SingleTrainingButton->Y &&
+			y <= TheUI.SingleTrainingButton->Y + TheUI.SingleTrainingButton->Height + 7) {
+		    ButtonAreaUnderCursor = ButtonAreaTraining;
+		    ButtonUnderCursor = 0;
+		    CursorOn = CursorOnButton;
+		    MustRedraw |= RedrawButtonPanel;
+		    return;
+		}
+	    } else {
+		for (i = 0; i < TheUI.NumTrainingButtons; ++i) {
+		    if (x >= TheUI.TrainingButtons[i].X &&
+			    x <= TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
+			    y > TheUI.TrainingButtons[i].Y &&
+			    y <= TheUI.TrainingButtons[i].Y + TheUI.TrainingButtons[i].Height + 7) {
+			ButtonAreaUnderCursor = ButtonAreaTraining;
+			ButtonUnderCursor = i;
+			CursorOn = CursorOnButton;
+			MustRedraw |= RedrawButtonPanel;
+			return;
+		    }
+		}
+	    }
+	} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo) {
+	    if (x >= TheUI.UpgradingButton->X &&
+		    x <= TheUI.UpgradingButton->X + TheUI.UpgradingButton->Width + 7 &&
+		    y > TheUI.UpgradingButton->Y &&
+		    y <= TheUI.UpgradingButton->Y + TheUI.UpgradingButton->Height + 7) {
+		ButtonAreaUnderCursor = ButtonAreaUpgrading;
+		ButtonUnderCursor = 0;
+		CursorOn = CursorOnButton;
+		MustRedraw |= RedrawButtonPanel;
+		return;
+	    }
+	} else if (Selected[0]->Orders[0].Action == UnitActionResearch) {
+	    if (x >= TheUI.ResearchingButton->X &&
+		    x <= TheUI.ResearchingButton->X + TheUI.ResearchingButton->Width + 7 &&
+		    y > TheUI.ResearchingButton->Y &&
+		    y <= TheUI.ResearchingButton->Y + TheUI.ResearchingButton->Height + 7) {
+		ButtonAreaUnderCursor = ButtonAreaResearching;
+		ButtonUnderCursor = 0;
 		CursorOn = CursorOnButton;
 		MustRedraw |= RedrawButtonPanel;
 		return;
 	    }
 	}
+    }
+    if (NumSelected == 1) {
+	if (TheUI.SingleSelectedButton &&
+		x >= TheUI.SingleSelectedButton->X &&
+		x <= TheUI.SingleSelectedButton->X + TheUI.SingleSelectedButton->Width + 7 &&
+		y > TheUI.SingleSelectedButton->Y &&
+		y <= TheUI.SingleSelectedButton->Y + TheUI.SingleSelectedButton->Height + 7) {
+	    ButtonAreaUnderCursor = ButtonAreaSelected;
+	    ButtonUnderCursor = 0;
+	    CursorOn = CursorOnButton;
+	    MustRedraw |= RedrawButtonPanel;
+	    return;
+	}
     } else {
-	for (i = 0; i < TheUI.NumInfoButtons; ++i) {
-	    if (x >= TheUI.InfoButtons[i].X &&
-		    x <= TheUI.InfoButtons[i].X + TheUI.InfoButtons[i].Width + 7 &&
-		    y > TheUI.InfoButtons[i].Y &&
-		    y <= TheUI.InfoButtons[i].Y + TheUI.InfoButtons[i].Height + 7) {
-		ButtonAreaUnderCursor = ButtonAreaInfo;
+	for (i = 0; i < TheUI.NumSelectedButtons; ++i) {
+	    if (x >= TheUI.SelectedButtons[i].X &&
+		    x <= TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Width + 7 &&
+		    y > TheUI.SelectedButtons[i].Y &&
+		    y <= TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Height + 7) {
+		ButtonAreaUnderCursor = ButtonAreaSelected;
 		ButtonUnderCursor = i;
 		CursorOn = CursorOnButton;
 		MustRedraw |= RedrawButtonPanel;
@@ -451,7 +500,11 @@ local void HandleMouseOn(int x, int y)
     if (ButtonUnderCursor != -1) {	// remove old display
 	if (ButtonAreaUnderCursor == ButtonAreaMenu) {
 	    MustRedraw |= RedrawMenuButton;
-	} else if (ButtonAreaUnderCursor == ButtonAreaInfo) {
+	} else if (ButtonAreaUnderCursor == ButtonAreaSelected ||
+		ButtonAreaUnderCursor == ButtonAreaTraining ||
+		ButtonAreaUnderCursor == ButtonAreaUpgrading ||
+		ButtonAreaUnderCursor == ButtonAreaResearching ||
+		ButtonAreaUnderCursor == ButtonAreaTransporting) {
 	    MustRedraw |= RedrawInfoPanel;
 	} else {
 	    MustRedraw |= RedrawButtonPanel;
@@ -1410,7 +1463,7 @@ global void UIHandleButtonDown(unsigned button)
 	//
 	//	clicked on info panel - selection shown
 	//
-	if (NumSelected > 1 && ButtonAreaUnderCursor == ButtonAreaInfo) {
+	if (NumSelected > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
 	    if (!GameObserve && !GamePaused) {
 		DoSelectionButtons(ButtonUnderCursor, button);
 	    }
@@ -1432,9 +1485,9 @@ global void UIHandleButtonDown(unsigned button)
 		    MustRedraw |= RedrawMenuButton;
 		}
 	    //
-	    //	clicked on info panel
+	    //	clicked on selected button
 	    //
-	    } else if (ButtonAreaUnderCursor == ButtonAreaInfo) {
+	    } else if (ButtonAreaUnderCursor == ButtonAreaSelected) {
 		//
 		//  clicked on single unit shown
 		//
@@ -1442,26 +1495,6 @@ global void UIHandleButtonDown(unsigned button)
 		    PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 		    ViewportCenterViewpoint(TheUI.SelectedViewport, Selected[0]->X,
 			Selected[0]->Y);
-		//
-		//  for transporter
-		//
-		} else if (ButtonUnderCursor > 2 && ButtonUnderCursor < 9) {
-		    if (NumSelected == 1 && Selected[0]->Type->Transporter) {
-			if (!GameObserve && !GamePaused) {
-			    if (Selected[0]->InsideCount >= ButtonUnderCursor - 3) {
-
-				// FIXME: should check if valid here.
-				// n0b0dy: check WHAT?
-				uins=Selected[0]->UnitInside;
-				for (i = 0; i < ButtonUnderCursor - 3; ++i) {
-				    uins = uins->NextContained;
-				}
-				SendCommandUnload(Selected[0],
-				    Selected[0]->X, Selected[0]->Y, uins,
-				    !(KeyModifiers & ModifierShift));
-			    }
-			}
-		    }
 		}
 	    //
 	    //	clicked on training button
@@ -1478,18 +1511,57 @@ global void UIHandleButtonDown(unsigned button)
 		    }
 		}
 	    //
+	    //	clicked on upgrading button
+	    //
+	    } else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
+		if (!GameObserve && !GamePaused) {
+		    if (ButtonUnderCursor == 0 && NumSelected == 1) {
+			DebugLevel0Fn("Cancel upgrade %s\n" _C_
+			    Selected[0]->Type->Ident);
+			SendCommandCancelUpgradeTo(Selected[0]);
+		    }
+		}
+	    //
+	    //	clicked on researching button
+	    //
+	    } else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
+		if (!GameObserve && !GamePaused) {
+		    if (ButtonUnderCursor == 0 && NumSelected == 1) {
+			DebugLevel0Fn("Cancel research %s\n" _C_
+			    Selected[0]->Type->Ident);
+			SendCommandCancelResearch(Selected[0]);
+		    }
+		}
+	    //
 	    //	clicked on button panel
 	    //
+	    } else if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
+		//
+		//  for transporter
+		//
+		if (!GameObserve && !GamePaused) {
+		    if (Selected[0]->InsideCount >= ButtonUnderCursor) {
+			// FIXME: should check if valid here.
+			// n0b0dy: check WHAT?
+			uins = Selected[0]->UnitInside;
+			for (i = 0; i < ButtonUnderCursor; ++i) {
+			    uins = uins->NextContained;
+			}
+			SendCommandUnload(Selected[0],
+			    Selected[0]->X, Selected[0]->Y, uins,
+			    !(KeyModifiers & ModifierShift));
+		    }
+		}
 	    } else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 		if (!GameObserve && !GamePaused) {
 		    DoButtonButtonClicked(ButtonUnderCursor);
 		}
 	    }
-	} else if ((MouseButtons&MiddleButton)) {
+	} else if ((MouseButtons & MiddleButton)) {
 	    //
 	    //	clicked on info panel - single unit shown
 	    //
-	    if (ButtonAreaUnderCursor == ButtonAreaInfo &&
+	    if (ButtonAreaUnderCursor == ButtonAreaSelected &&
 		    ButtonUnderCursor == 0 && NumSelected == 1) {
 		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 		if (TheUI.SelectedViewport->Unit == Selected[0]) {
@@ -1498,7 +1570,7 @@ global void UIHandleButtonDown(unsigned button)
 		    TheUI.SelectedViewport->Unit = Selected[0];
 		}
 	    }
-	} else if ((MouseButtons&RightButton)) {
+	} else if ((MouseButtons & RightButton)) {
 	}
     }
 }

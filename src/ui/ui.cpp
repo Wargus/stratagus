@@ -154,8 +154,8 @@ global void InitUserInterface(const char* race_name)
 	SetViewportMode(VIEWPORT_SINGLE);
     }
 
-    TheUI.CompleteBarColor = VideoMapRGB(TheUI.CompleteBarColorRGB.D24.a,
-	TheUI.CompleteBarColorRGB.D24.b, TheUI.CompleteBarColorRGB.D24.c);
+    TheUI.CompletedBarColor = VideoMapRGB(TheUI.CompletedBarColorRGB.D24.a,
+	TheUI.CompletedBarColorRGB.D24.b, TheUI.CompletedBarColorRGB.D24.c);
     TheUI.ViewportCursorColor = ColorWhite;
 }
 
@@ -343,23 +343,152 @@ local void SaveUi(CLFile* file, const UI* ui)
     }
     CLprintf(file, ")\n");
 
-    CLprintf(file, "  'info-panel (list \"%s\" %d %d %d %d)\n",
-	ui->InfoPanel.File,
-	ui->InfoPanelX, ui->InfoPanelY,
-	ui->InfoPanelW, ui->InfoPanelH);
+    CLprintf(file, "\n  'info-panel (list");
+    CLprintf(file, "\n    'panel (list");
+    CLprintf(file, "\n      'file \"%s\"", ui->InfoPanel.File);
+    CLprintf(file, "\n      'pos '(%d %d)", ui->InfoPanelX, ui->InfoPanelY);
+    CLprintf(file, "\n      'size '(%d %d))", ui->InfoPanelW, ui->InfoPanelH);
 
-    CLprintf(file, "\n  'completed-bar '(");
-    CLprintf(file, "\n    color (%d %d %d)", ui->CompleteBarColorRGB.D24.a,
-	ui->CompleteBarColorRGB.D24.b, ui->CompleteBarColorRGB.D24.c);
-    CLprintf(file, "\n    pos (%3d %3d)", ui->CompleteBarX, ui->CompleteBarY);
-    CLprintf(file, "\n    size (%d %d)", ui->CompleteBarW, ui->CompleteBarH);
-    CLprintf(file, "\n    text \"%s\"", ui->CompleteBarText);
-    CLprintf(file, "\n    font %s", FontNames[ui->CompleteBarFont]);
-    CLprintf(file, "\n    text-pos (%3d %3d)",
-	ui->CompleteTextX, ui->CompleteTextY);
-    CLprintf(file, ")\n\n");
+    CLprintf(file, "\n    'selected (list");
+    CLprintf(file, "\n      'single (list");
+    if (ui->SingleSelectedText) {
+	CLprintf(file, "\n        'text (list");
+	CLprintf(file, "\n          'text \"%s\"", ui->SingleSelectedText);
+	CLprintf(file, "\n          'font '%s", FontNames[ui->SingleSelectedFont]);
+	CLprintf(file, "\n          'pos '(%d %d))",
+	    ui->SingleSelectedTextX, ui->SingleSelectedTextY);
+    }
+    if (ui->SingleSelectedButton) {
+	CLprintf(file, "\n        'icon (list");
+	CLprintf(file, "\n          'pos '(%d %d) 'size '(%d %d))",
+	    ui->SingleSelectedButton->X, ui->SingleSelectedButton->Y,
+	    ui->SingleSelectedButton->Width, ui->SingleSelectedButton->Height);
+    }
+    CLprintf(file, ")");
+    CLprintf(file, "\n      'multiple (list");
+    if (ui->SelectedText) {
+	CLprintf(file, "\n        'text (list");
+	CLprintf(file, "\n          'text \"%s\"", ui->SelectedText);
+	CLprintf(file, "\n          'font '%s", FontNames[ui->SelectedFont]);
+	CLprintf(file, "\n          'pos '(%d %d))",
+	    ui->SelectedTextX, ui->SelectedTextY);
+    }
+    if (ui->SelectedButtons) {
+	CLprintf(file, "\n        'icons (list");
+	for (i = 0; i < ui->NumSelectedButtons; ++i) {
+	    CLprintf(file, "\n          (list 'pos '(%d %d) 'size '(%d %d))",
+		ui->SelectedButtons[i].X, ui->SelectedButtons[i].Y,
+		ui->SelectedButtons[i].Width, ui->SelectedButtons[i].Height);
+	}
+	CLprintf(file, ")");
+    }
+    CLprintf(file, ")");
+    CLprintf(file, ")");
 
-    CLprintf(file, "  'button-panel (list \"%s\" %d %d)\n",
+    CLprintf(file, "\n    'training (list");
+    CLprintf(file, "\n      'single (list");
+    if (ui->SingleTrainingText) {
+	CLprintf(file, "\n        'text (list");
+	CLprintf(file, "\n          'text \"%s\"", ui->SingleTrainingText);
+	CLprintf(file, "\n          'font '%s", FontNames[ui->SingleTrainingFont]);
+	CLprintf(file, "\n          'pos '(%d %d))",
+	    ui->SingleTrainingTextX, ui->SingleTrainingTextY);
+    }
+    if (ui->SingleTrainingButton) {
+	CLprintf(file, "\n        'icon (list");
+	CLprintf(file, "\n          'pos '(%d %d) 'size '(%d %d))",
+	    ui->SingleTrainingButton->X, ui->SingleTrainingButton->Y,
+	    ui->SingleTrainingButton->Width, ui->SingleTrainingButton->Height);
+    }
+    CLprintf(file, ")");
+    CLprintf(file, "\n      'multiple (list");
+    if (ui->TrainingText) {
+	CLprintf(file, "\n        'text (list");
+	CLprintf(file, "\n          'text \"%s\"", ui->TrainingText);
+	CLprintf(file, "\n          'font '%s", FontNames[ui->TrainingFont]);
+	CLprintf(file, "\n          'pos '(%d %d))",
+	    ui->TrainingTextX, ui->TrainingTextY);
+    }
+    if (ui->TrainingButtons) {
+	CLprintf(file, "\n        'icons (list");
+	for (i = 0; i < ui->NumTrainingButtons; ++i) {
+	    CLprintf(file, "\n          (list 'pos '(%d %d) 'size '(%d %d))",
+		ui->TrainingButtons[i].X, ui->TrainingButtons[i].Y,
+		ui->TrainingButtons[i].Width, ui->TrainingButtons[i].Height);
+	}
+	CLprintf(file, ")");
+    }
+    CLprintf(file, ")");
+    CLprintf(file, ")");
+
+    CLprintf(file, "\n    'upgrading (list");
+    if (ui->UpgradingText) {
+	CLprintf(file, "\n      'text (list");
+	CLprintf(file, "\n        'text \"%s\"", ui->UpgradingText);
+	CLprintf(file, "\n        'font '%s", FontNames[ui->UpgradingFont]);
+	CLprintf(file, "\n        'pos '(%d %d))",
+	    ui->UpgradingTextX, ui->UpgradingTextY);
+    }
+    if (ui->UpgradingButton) {
+	CLprintf(file, "\n      'icon (list");
+	CLprintf(file, "\n        'pos '(%d %d)",
+	    ui->UpgradingButton->X, ui->UpgradingButton->Y);
+	CLprintf(file, "\n        'size '(%d %d))",
+	    ui->UpgradingButton->Width, ui->UpgradingButton->Height);
+    }
+    CLprintf(file, ")");
+
+    CLprintf(file, "\n    'researching (list");
+    if (ui->ResearchingText) {
+	CLprintf(file, "\n      'text (list");
+	CLprintf(file, "\n        'text \"%s\"", ui->ResearchingText);
+	CLprintf(file, "\n        'font '%s", FontNames[ui->ResearchingFont]);
+	CLprintf(file, "\n        'pos '(%d %d))",
+	    ui->ResearchingTextX, ui->ResearchingTextY);
+    }
+    if (ui->ResearchingButton) {
+	CLprintf(file, "\n      'icon (list");
+	CLprintf(file, "\n        'pos '(%d %d)",
+	    ui->ResearchingButton->X, ui->ResearchingButton->Y);
+	CLprintf(file, "\n        'size '(%d %d))",
+	    ui->ResearchingButton->Width, ui->ResearchingButton->Height);
+    }
+    CLprintf(file, ")");
+
+    CLprintf(file, "\n    'transporting (list");
+    if (ui->TransportingText) {
+	CLprintf(file, "\n      'text (list");
+	CLprintf(file, "\n        'text \"%s\"", ui->TransportingText);
+	CLprintf(file, "\n        'font '%s", FontNames[ui->TransportingFont]);
+	CLprintf(file, "\n        'pos '(%d %d))",
+	    ui->TransportingTextX, ui->TransportingTextY);
+    }
+    if (ui->TransportingButtons) {
+	CLprintf(file, "\n      'icons (list");
+	for (i = 0; i < ui->NumTransportingButtons; ++i) {
+	    CLprintf(file, "\n        (list 'pos '(%d %d) 'size '(%d %d))",
+		ui->TransportingButtons[i].X, ui->TransportingButtons[i].Y,
+		ui->TransportingButtons[i].Width, ui->TransportingButtons[i].Height);
+	}
+	CLprintf(file, ")");
+    }
+    CLprintf(file, ")");
+
+    CLprintf(file, "\n    'completed-bar (list");
+    CLprintf(file, "\n      'color '(%d %d %d)", ui->CompletedBarColorRGB.D24.a,
+	ui->CompletedBarColorRGB.D24.b, ui->CompletedBarColorRGB.D24.c);
+    CLprintf(file, "\n      'pos '(%d %d)", ui->CompletedBarX, ui->CompletedBarY);
+    CLprintf(file, "\n      'size '(%d %d)", ui->CompletedBarW, ui->CompletedBarH);
+    CLprintf(file, "\n      'text (list", ui->CompletedBarText);
+    CLprintf(file, "\n        'text \"%s\"", ui->CompletedBarText);
+    CLprintf(file, "\n        'font '%s", FontNames[ui->CompletedBarFont]);
+    CLprintf(file, "\n        'pos '(%d %d))",
+	ui->CompletedBarTextX, ui->CompletedBarTextY);
+    CLprintf(file, ")");
+
+    CLprintf(file, ")\n");    // 'info-panel
+
+    CLprintf(file, "\n  'button-panel (list \"%s\" %d %d)",
 	ui->ButtonPanel.File, ui->ButtonPanelX, ui->ButtonPanelY);
 
     CLprintf(file, "\n  'map-area (list");
@@ -426,22 +555,8 @@ local void SaveUi(CLFile* file, const UI* ui)
 	ui->NetworkDiplomacyButton.Text);
     CLprintf(file, "\n    style %s",
 	MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
-    CLprintf(file, ")");
+    CLprintf(file, ")\n");
 
-    CLprintf(file, "\n\n  'info-buttons '(");
-    for (i = 0; i < ui->NumInfoButtons; ++i) {
-	CLprintf(file, "\n    (pos (%3d %3d) size (%d %d))",
-	    ui->InfoButtons[i].X, ui->InfoButtons[i].Y,
-	    ui->InfoButtons[i].Width, ui->InfoButtons[i].Height);
-    }
-    CLprintf(file, ")");
-    CLprintf(file, "\n  'training-buttons '(");
-    for (i = 0; i < ui->NumTrainingButtons; ++i) {
-	CLprintf(file, "\n    (pos (%3d %3d) size (%d %d))",
-	    ui->TrainingButtons[i].X, ui->TrainingButtons[i].Y,
-	    ui->TrainingButtons[i].Width, ui->TrainingButtons[i].Height);
-    }
-    CLprintf(file, ")");
     CLprintf(file, "\n  'button-buttons '(");
     for (i = 0; i < ui->NumButtonButtons; ++i) {
 	CLprintf(file, "\n    (pos (%3d %3d) size (%d %d))",
@@ -571,9 +686,21 @@ global void CleanUI(UI* ui)
 
     // Info Panel
     free(ui->InfoPanel.File);
-
-    // Completed Bar
-    free(ui->CompleteBarText);
+    free(ui->SingleSelectedButton);
+    free(ui->SingleSelectedText);
+    free(ui->SelectedButtons);
+    free(ui->SelectedText);
+    free(ui->SingleTrainingButton);
+    free(ui->SingleTrainingText);
+    free(ui->TrainingButtons);
+    free(ui->TrainingText);
+    free(ui->UpgradingButton);
+    free(ui->UpgradingText);
+    free(ui->ResearchingButton);
+    free(ui->ResearchingText);
+    free(ui->TransportingButtons);
+    free(ui->TransportingText);
+    free(ui->CompletedBarText);
 
     // Button Panel
     free(ui->ButtonPanel.File);
@@ -591,8 +718,6 @@ global void CleanUI(UI* ui)
     free(ui->MenuButton.Text);
     free(ui->NetworkMenuButton.Text);
     free(ui->NetworkDiplomacyButton.Text);
-    free(ui->InfoButtons);
-    free(ui->TrainingButtons);
     free(ui->ButtonButtons);
 
     // Cursors

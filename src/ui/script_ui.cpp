@@ -55,6 +55,14 @@
 
 global char* ClickMissile;
 global char* DamageMissile;
+
+typedef struct _info_text_ {
+    char* Text;
+    int Font;
+    int X;
+    int Y;
+} InfoText;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -691,6 +699,311 @@ local char* SCM_PopNewStr(SCM* list)
 }
 
 /**
+**	Parse info panel text
+*/
+local void CclParseInfoText(SCM list, InfoText* text)
+{
+    SCM value;
+
+    memset(text, 0, sizeof(*text));
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("text"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    text->Text = gh_scm2newstr(value, NULL);
+	} else if (gh_eq_p(value, gh_symbol2scm("font"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    text->Font = CclFontByIdentifier(value);
+	} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    text->X = gh_scm2int(gh_car(value));
+	    text->Y = gh_scm2int(gh_car(gh_cdr(value)));
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+}
+
+/**
+**	Parse info panel icon
+*/
+local void CclParseInfoIcon(SCM list, Button* icon)
+{
+    SCM value;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    icon->X = gh_scm2int(gh_car(value));
+	    icon->Y = gh_scm2int(gh_car(gh_cdr(value)));
+	} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    icon->Width = gh_scm2int(gh_car(value));
+	    icon->Height = gh_scm2int(gh_car(gh_cdr(value)));
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+}
+
+/**
+**	Parse info panel selected section
+*/
+local void CclParseSelected(SCM list, UI* ui)
+{
+    SCM value;
+    SCM sublist;
+    InfoText text;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("single"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("text"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseInfoText(value, &text);
+		    ui->SingleSelectedText = text.Text;
+		    ui->SingleSelectedFont = text.Font;
+		    ui->SingleSelectedTextX = text.X;
+		    ui->SingleSelectedTextY = text.Y;
+		} else if (gh_eq_p(value, gh_symbol2scm("icon"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->SingleSelectedButton = calloc(1, sizeof(Button));
+		    CclParseInfoIcon(value, ui->SingleSelectedButton);
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("multiple"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("text"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseInfoText(value, &text);
+		    ui->SelectedText = text.Text;
+		    ui->SelectedFont = text.Font;
+		    ui->SelectedTextX = text.X;
+		    ui->SelectedTextY = text.Y;
+		} else if (gh_eq_p(value, gh_symbol2scm("icons"))) {
+		    SCM slist;
+		    int i;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->NumSelectedButtons = gh_length(slist);
+		    ui->SelectedButtons = calloc(ui->NumSelectedButtons,
+			sizeof(Button));
+		    i = 0;
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			CclParseInfoIcon(value, &ui->SelectedButtons[i++]);
+		    }
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+}
+
+/**
+**	Parse info panel training section
+*/
+local void CclParseTraining(SCM list, UI* ui)
+{
+    SCM value;
+    SCM sublist;
+    InfoText text;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("single"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("text"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseInfoText(value, &text);
+		    ui->SingleTrainingText = text.Text;
+		    ui->SingleTrainingFont = text.Font;
+		    ui->SingleTrainingTextX = text.X;
+		    ui->SingleTrainingTextY = text.Y;
+		} else if (gh_eq_p(value, gh_symbol2scm("icon"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->SingleTrainingButton = calloc(1, sizeof(Button));
+		    CclParseInfoIcon(value, ui->SingleTrainingButton);
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("multiple"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("text"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    CclParseInfoText(value, &text);
+		    ui->TrainingText = text.Text;
+		    ui->TrainingFont = text.Font;
+		    ui->TrainingTextX = text.X;
+		    ui->TrainingTextY = text.Y;
+		} else if (gh_eq_p(value, gh_symbol2scm("icons"))) {
+		    SCM slist;
+		    int i;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->NumTrainingButtons = gh_length(slist);
+		    ui->TrainingButtons = calloc(ui->NumTrainingButtons,
+			sizeof(Button));
+		    i = 0;
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			CclParseInfoIcon(value, &ui->TrainingButtons[i++]);
+		    }
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+}
+
+/**
+**	Parse info panel upgrading section
+*/
+local void CclParseUpgrading(SCM list, UI* ui)
+{
+    SCM value;
+    InfoText text;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("text"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    CclParseInfoText(value, &text);
+	    ui->UpgradingText = text.Text;
+	    ui->UpgradingFont = text.Font;
+	    ui->UpgradingTextX = text.X;
+	    ui->UpgradingTextY = text.Y;
+	} else if (gh_eq_p(value, gh_symbol2scm("icon"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    ui->UpgradingButton = calloc(1, sizeof(Button));
+	    CclParseInfoIcon(value, ui->UpgradingButton);
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+}
+
+/**
+**	Parse info panel researching section
+*/
+local void CclParseResearching(SCM list, UI* ui)
+{
+    SCM value;
+    InfoText text;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("text"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    CclParseInfoText(value, &text);
+	    ui->ResearchingText = text.Text;
+	    ui->ResearchingFont = text.Font;
+	    ui->ResearchingTextX = text.X;
+	    ui->ResearchingTextY = text.Y;
+	} else if (gh_eq_p(value, gh_symbol2scm("icon"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    ui->ResearchingButton = calloc(1, sizeof(Button));
+	    CclParseInfoIcon(value, ui->ResearchingButton);
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+}
+
+/**
+**	Parse info panel transporting section
+*/
+local void CclParseTransporting(SCM list, UI* ui)
+{
+    SCM value;
+    InfoText text;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("text"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    CclParseInfoText(value, &text);
+	    ui->TransportingText = text.Text;
+	    ui->TransportingFont = text.Font;
+	    ui->TransportingTextX = text.X;
+	    ui->TransportingTextY = text.Y;
+	} else if (gh_eq_p(value, gh_symbol2scm("icons"))) {
+	    SCM sublist;
+	    int i;
+
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    ui->NumTransportingButtons = gh_length(sublist);
+	    ui->TransportingButtons = calloc(ui->NumTransportingButtons,
+		sizeof(Button));
+	    i = 0;
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		CclParseInfoIcon(value, &ui->TransportingButtons[i++]);
+	    }
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+}
+
+/**
 **	Define the look+feel of the user interface.
 **
 **	FIXME: need some general data structure to make this parsing easier.
@@ -902,46 +1215,93 @@ local SCM CclDefineUI(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("info-panel"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
-	    ui->InfoPanel.File = SCM_PopNewStr(&sublist);
-	    ui->InfoPanelX = SCM_PopInt(&sublist);
-	    ui->InfoPanelY = SCM_PopInt(&sublist);
-	    ui->InfoPanelW = SCM_PopInt(&sublist);
-	    ui->InfoPanelH = SCM_PopInt(&sublist);
-	} else if (gh_eq_p(value, gh_symbol2scm("completed-bar"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
 	    while (!gh_null_p(sublist)) {
 		value = gh_car(sublist);
 		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("color"))) {
+		if (gh_eq_p(value, gh_symbol2scm("panel"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("file"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->InfoPanel.File = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->InfoPanelX = gh_scm2int(gh_car(value));
+			    ui->InfoPanelY = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->InfoPanelW = gh_scm2int(gh_car(value));
+			    ui->InfoPanelH = gh_scm2int(gh_car(gh_cdr(value)));
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("selected"))) {
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    ui->CompleteBarColorRGB.D24.a = gh_scm2int(gh_car(value));
-		    ui->CompleteBarColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(value)));
-		    ui->CompleteBarColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(value))));
-		} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+		    CclParseSelected(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("training"))) {
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    ui->CompleteBarX = gh_scm2int(gh_car(value));
-		    ui->CompleteBarY = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+		    CclParseTraining(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("upgrading"))) {
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    ui->CompleteBarW = gh_scm2int(gh_car(value));
-		    ui->CompleteBarH = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
+		    CclParseUpgrading(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("researching"))) {
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    ui->CompleteBarText = gh_scm2newstr(value, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("font"))) {
+		    CclParseResearching(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("transporting"))) {
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    ui->CompleteBarFont = CclFontByIdentifier(value);
-		} else if (gh_eq_p(value, gh_symbol2scm("text-pos"))) {
-		    value = gh_car(sublist);
+		    CclParseTransporting(value, ui);
+		} else if (gh_eq_p(value, gh_symbol2scm("completed-bar"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
-		    ui->CompleteTextX = gh_scm2int(gh_car(value));
-		    ui->CompleteTextY = gh_scm2int(gh_car(gh_cdr(value)));
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("color"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->CompletedBarColorRGB.D24.a = gh_scm2int(gh_car(value));
+			    ui->CompletedBarColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(value)));
+			    ui->CompletedBarColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(value))));
+			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->CompletedBarX = gh_scm2int(gh_car(value));
+			    ui->CompletedBarY = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->CompletedBarW = gh_scm2int(gh_car(value));
+			    ui->CompletedBarH = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
+			    InfoText text;
+
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    CclParseInfoText(value, &text);
+			    ui->CompletedBarText = text.Text;
+			    ui->CompletedBarFont = text.Font;
+			    ui->CompletedBarTextX = text.X;
+			    ui->CompletedBarTextY = text.Y;
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
 		} else {
 		    errl("Unsupported tag", value);
 		}
@@ -1126,71 +1486,6 @@ local SCM CclDefineUI(SCM list)
 		    ui->NetworkDiplomacyButton.Button = scm2buttonid(value);
 		} else {
 		    errl("Unsupported tag", value);
-		}
-	    }
-	} else if (gh_eq_p(value, gh_symbol2scm("info-buttons"))) {
-	    SCM slist;
-	    SCM sslist;
-	    Button* b;
-
-	    slist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(slist)) {
-		sslist = gh_car(slist);
-		slist = gh_cdr(slist);
-		ui->NumInfoButtons++;
-		ui->InfoButtons = realloc(ui->InfoButtons,
-		    ui->NumInfoButtons*sizeof(*ui->InfoButtons));
-		b = &ui->InfoButtons[ui->NumInfoButtons - 1];
-		while (!gh_null_p(sslist)) {
-		    value = gh_car(sslist);
-		    sslist = gh_cdr(sslist);
-		    if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-			value = gh_car(sslist);
-			sslist = gh_cdr(sslist);
-			b->X = gh_scm2int(gh_car(value));
-			b->Y = gh_scm2int(gh_car(gh_cdr(value)));
-		    } else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-			value = gh_car(sslist);
-			sslist = gh_cdr(sslist);
-			b->Width = gh_scm2int(gh_car(value));
-			b->Height = gh_scm2int(gh_car(gh_cdr(value)));
-		    } else {
-			errl("Unsupported tag", value);
-		    }
-		}
-	    }
-	} else if (gh_eq_p(value, gh_symbol2scm("training-buttons"))) {
-	    SCM slist;
-	    SCM sslist;
-	    Button* b;
-
-	    slist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(slist)) {
-		sslist = gh_car(slist);
-		slist = gh_cdr(slist);
-		ui->NumTrainingButtons++;
-		ui->TrainingButtons=realloc(ui->TrainingButtons,
-		    ui->NumTrainingButtons * sizeof(*ui->TrainingButtons));
-		b=&ui->TrainingButtons[ui->NumTrainingButtons - 1];
-		while (!gh_null_p(sslist)) {
-		    value = gh_car(sslist);
-		    sslist = gh_cdr(sslist);
-		    if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-			value = gh_car(sslist);
-			sslist = gh_cdr(sslist);
-			b->X = gh_scm2int(gh_car(value));
-			b->Y = gh_scm2int(gh_car(gh_cdr(value)));
-		    } else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-			value = gh_car(sslist);
-			sslist = gh_cdr(sslist);
-			b->Width = gh_scm2int(gh_car(value));
-			b->Height = gh_scm2int(gh_car(gh_cdr(value)));
-		    } else {
-			errl("Unsupported tag", value);
-		    }
-
 		}
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("button-buttons"))) {
