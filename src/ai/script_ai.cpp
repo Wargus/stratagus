@@ -772,6 +772,16 @@ local SCM CclAiScript(SCM value)
     return SCM_BOOL_T;
 }
 
+/**
+**	Return the player of the running AI.
+**
+**	@return 	Player number of the AI.
+*/
+local SCM CclAiPlayer(void)
+{
+    return gh_int2scm(AiPlayer->Player->Player);
+}
+
 #else
 
 /**
@@ -818,6 +828,8 @@ global void AiCclRegister(void)
     gh_new_procedure1_0("ai:upgrade-to",CclAiUpgradeTo);
     gh_new_procedure1_0("ai:script",CclAiScript);
     gh_new_procedure0_0("ai:restart",CclAiRestart);
+
+    gh_new_procedure0_0("ai:player",CclAiPlayer);
 #endif
 }
 
