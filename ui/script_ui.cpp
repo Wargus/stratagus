@@ -1072,9 +1072,9 @@ local SCM CclDefineUI(SCM list)
     ui->ButtonPanelX = -1;
     ui->ButtonPanelY = -1;
 
-    ui->MenuButtonGraphic.File = NULL;
-    ui->MenuButtonGraphicX = -1;
-    ui->MenuButtonGraphicY = -1;
+    ui->MenuPanel.File = NULL;
+    ui->MenuPanelX = -1;
+    ui->MenuPanelY = -1;
     
     ui->MinimapPanel.File = NULL;
     ui->MinimapPanelX = -1;
@@ -1350,9 +1350,124 @@ local SCM CclDefineUI(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("menu-panel"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
-	    ui->MenuButtonGraphic.File = SCM_PopNewStr(&sublist);
-	    ui->MenuButtonGraphicX = SCM_PopInt(&sublist);
-	    ui->MenuButtonGraphicY = SCM_PopInt(&sublist);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("panel"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("file"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuPanel.File = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuPanelX = gh_scm2int(gh_car(value));
+			    ui->MenuPanelY = gh_scm2int(gh_car(gh_cdr(value)));
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("menu-button"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.X = gh_scm2int(gh_car(value));
+			    ui->MenuButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.Width = gh_scm2int(gh_car(value));
+			    ui->MenuButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.Text = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->MenuButton.Button = scm2buttonid(value);
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("network-menu-button"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.X = gh_scm2int(gh_car(value));
+			    ui->NetworkMenuButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.Width = gh_scm2int(gh_car(value));
+			    ui->NetworkMenuButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.Text = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkMenuButton.Button = scm2buttonid(value);
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("network-diplomacy-button"))) {
+		    SCM slist;
+
+		    slist = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    while (!gh_null_p(slist)) {
+			value = gh_car(slist);
+			slist = gh_cdr(slist);
+			if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.X = gh_scm2int(gh_car(value));
+			    ui->NetworkDiplomacyButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.Width = gh_scm2int(gh_car(value));
+			    ui->NetworkDiplomacyButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
+			} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.Text = gh_scm2newstr(value, NULL);
+			} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+			    ui->NetworkDiplomacyButton.Button = scm2buttonid(value);
+			} else {
+			    errl("Unsupported tag", value);
+			}
+		    }
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("minimap"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
@@ -1408,90 +1523,6 @@ local SCM CclDefineUI(SCM list)
 		    value = gh_car(sublist);
 		    sublist = gh_cdr(sublist);
 		    ui->StatusLineFont = CclFontByIdentifier(value);
-		} else {
-		    errl("Unsupported tag", value);
-		}
-	    }
-	} else if (gh_eq_p(value, gh_symbol2scm("menu-button"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->MenuButton.X = gh_scm2int(gh_car(value));
-		    ui->MenuButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->MenuButton.Width = gh_scm2int(gh_car(value));
-		    ui->MenuButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->MenuButton.Text = gh_scm2newstr(value, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->MenuButton.Button = scm2buttonid(value);
-		} else {
-		    errl("Unsupported tag", value);
-		}
-	    }
-	} else if (gh_eq_p(value, gh_symbol2scm("network-menu-button"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkMenuButton.X = gh_scm2int(gh_car(value));
-		    ui->NetworkMenuButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkMenuButton.Width = gh_scm2int(gh_car(value));
-		    ui->NetworkMenuButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkMenuButton.Text = gh_scm2newstr(value, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkMenuButton.Button = scm2buttonid(value);
-		} else {
-		    errl("Unsupported tag", value);
-		}
-	    }
-	} else if (gh_eq_p(value, gh_symbol2scm("network-diplomacy-button"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkDiplomacyButton.X = gh_scm2int(gh_car(value));
-		    ui->NetworkDiplomacyButton.Y = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkDiplomacyButton.Width = gh_scm2int(gh_car(value));
-		    ui->NetworkDiplomacyButton.Height = gh_scm2int(gh_car(gh_cdr(value)));
-		} else if (gh_eq_p(value, gh_symbol2scm("caption"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkDiplomacyButton.Text = gh_scm2newstr(value, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("style"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    ui->NetworkDiplomacyButton.Button = scm2buttonid(value);
 		} else {
 		    errl("Unsupported tag", value);
 		}
