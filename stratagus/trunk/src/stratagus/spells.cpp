@@ -586,11 +586,11 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 		} else {
 			caster->Player->TotalKills++;
 		}
-#ifdef USE_HP_FOR_XP
-		caster->XP += target->HP;
-#else
-		caster->XP += target->Type->Points;
-#endif
+		if (UseHPForXp) {
+			caster->XP += target->HP;
+		} else {
+			caster->XP += target->Type->Points;
+		}
 		caster->Kills++;
 	}
 

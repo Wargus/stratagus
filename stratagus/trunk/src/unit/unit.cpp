@@ -3028,29 +3028,27 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	if (target->HP <= damage) {		// unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
-		if (attacker && (target->Player->Enemy & (1 << attacker->Player->Player))) {
+		if (attacker && IsEnemy(target->Player, attacker)) {
 			attacker->Player->Score += target->Type->Points;
 			if (type->Building) {
 				attacker->Player->TotalRazings++;
 			} else {
 				attacker->Player->TotalKills++;
 			}
-#ifdef USE_HP_FOR_XP
-			attacker->XP += target->HP;
-#else
-			attacker->XP += target->Type->Points;
-#endif
+			if (UseHPForXp) {
+				attacker->XP += target->HP;
+			} else {
+				attacker->XP += target->Type->Points;
+			}
 			attacker->Kills++;
 		}
 		LetUnitDie(target);
 		return;
 	}
 	target->HP -= damage;
-#ifdef USE_HP_FOR_XP
-	if (attacker) {
+	if (UseHPForXp && attacker && IsEnemy(target->Player, attacker)) {
 		attacker->XP += damage;
 	}
-#endif
 
 	// FIXME: this is dumb. I made repairers capture. crap.
 	// david: capture enemy buildings
