@@ -1,5 +1,5 @@
-<HTML>
-<HEAD>
+<html>
+<head>
 <!--
 ----	$Id$
 
@@ -14,28 +14,28 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>FreeCraft Installation</TITLE>
-</HEAD>
+    <title>FreeCraft Installation</title>
+</head>
 
-<BODY>
-    <H1>Installation instructions for FreeCraft 1.18</H1><p>
+<body>
+    <h1>Installation instructions for FreeCraft 1.18</h1><p>
 
-<B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
-<A HREF="gpl.html">GNU General Public License</A></B>
+<b>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
+<a href="gpl.html">GNU General Public License</a></b>
 
-<HR>
+<hr>
 
-    <H2>Software Requirements</H2>
-    <UL>
-	<LI><b>A supported operating system:</b> Win32, Linux, Mac OS X, BSD, 
+    <h2>Software Requirements</h2>
+    <ul>
+	<li><b>A supported operating system:</b> Win32, Linux, Mac OS X, BSD, 
 	Possibly any other Unix/POSIX OS.<br>
 	<font color=red>NOTE: some features of Winsock2 (WS2_32.DLL) are used. So even 
 	if you plan to play single player only, 
 	WinNT4.0 users will need Service Pack 3 or higher and Windows 95 users 
 	will need the winsock 2 update from 
-	<A HREF="http://www.microsoft.com/windows95/downloads/contents/WUAdminTools/S_WUNetworkingTools/W95Sockets2/Default.asp">here</A>.</font><p>
+	<a href="http://www.microsoft.com/windows95/downloads/contents/WUAdminTools/S_WUNetworkingTools/W95Sockets2/Default.asp">here</a>.</font><p>
 
-	<LI><b>A supported graphics library:</b> SDL, svgalib, X11/Xlib 
+	<li><b>A supported graphics library:</b> SDL, svgalib, X11/Xlib 
 	(although X11 is supported, SDL is recommended).<br>
 	<font color=red>NOTE: remote displays aren't supported.</font><p>
 
@@ -45,71 +45,71 @@
 	<li><a href="http://sources.redhat.com/bzip2/">libbzip2</a> (optional).<p>
 	<li><a href="http://flac.sourceforge.net/">libFLAC</a> (optional).<p>
 	<li><a href="http://www.underbit.com/products/mad/">libmad</a> (optional).<p>
-	<LI><a href="http://zziplib.sourceforge.net/">zziplib</a> (optional).<p>
+	<li><a href="http://zziplib.sourceforge.net/">zziplib</a> (optional).<p>
 
-	<LI>Either the original or expansion W*rcr*ft 2 CD, or the FcMP data.<br>
+	<li>Either the original or expansion W*rcr*ft 2 CD, or the FcMP data.<br>
 	<font color="red">NOTE: the Battle.net CD edition is not supported</font><p>
-    </UL>
+    </ul>
 
-    <H2>Hardware Requirements</H2>
-    <UL>
-	<LI><b>Processor:</b> A 133 MHz CPU (faster recommended).<br>
+    <h2>Hardware Requirements</h2>
+    <ul>
+	<li><b>Processor:</b> A 133 MHz CPU (faster recommended).<br>
 	<font color="red">NOTE: FreeCraft is believed to be endian and word size safe, so other
 	architectures like (big endian) PPC or (64bit) Alpha should also
 	work at least with Linux.</font><p>
 
-	<LI><b>Memory:</b> 16 MB of RAM (32 MB for mp3/ogg support).<br><p>
+	<li><b>Memory:</b> 16 MB of RAM (32 MB for mp3/ogg support).<br><p>
 
-	<LI><b>Video Card:</b> Any graphics card that can handle 8 bpp 
+	<li><b>Video Card:</b> Any graphics card that can handle 8 bpp 
 	and 640x480 is supported.<p>
 
-	<LI><b>Sound Card:</b> Optional. Windows (for Win32) or SDL 
+	<li><b>Sound Card:</b> Optional. Windows (for Win32) or SDL 
 	(for unix) compatible sound cards are supported.<p>
-    </UL>
+    </ul>
 
-    <H2>Installation</H2>
+    <h2>Installation</h2>
 
     Mac OS X users: Extract the "contrib/macosx.tgz" file to the 
     top-level directory and read "Read Me.rtf"<p>
 
     Binary users may skip to step 3<p>
 
-    <UL>
-	<LI><b>Step 1, Download and Extract:</b><p>
+    <ul>
+	<li><b>Step 1, Download and Extract:</b><p>
 
-	<UL>
-	    <LI>Download the source from 
+	<ul>
+	    <li>Download the source from 
 	    <a href="http://freecraft.sourceforge.net/download.html">here</a>.<br>
 	    <font color="red">NOTE: both the tar.gz and zip files are the same, 
 	    we provide both formats for convenience.</font><p>
 
-	    <LI>Unpack the source freecraft-DATE.tar.gz with 
+	    <li>Unpack the source freecraft-DATE.tar.gz with 
 	    <pre>	tar -zxvf freecraft-DATE.tar.gz</pre>
-	</UL>
+	</ul>
 
-	<LI><b>Step 2, Compile:</b><p>
+	<li><b>Step 2, Compile:</b><p>
 
-	<UL>
-	    <LI><b>GCC/Mingw users:</b> run the 'setup' script and answer 
+	<ul>
+	    <li><b>GCC/Mingw users:</b> run the 'setup' script and answer 
 	    the questions instructions to create the Makefile. 
 	    When complete, type 'make depend && make' to compile, and it 
 	    should compile a working 'freecraft' ('freecraft.exe' for win32) 
 	    binary. To see all options of setup, type 'setup --help'.<p>
 
-	    <LI><b>MSVC users:</b>
-	    <UL>
+	    <li><b>MSVC users:</b>
+	    <ul>
 		<li>Extract the VC++ project and workspace files from freecraft\contrib\msvc.zip 
-		into the root freecraft directory.</LI>
+		into the root freecraft directory.</li>
 
-		<LI><a href="http://freecraft.sourceforge.net/snapshots/msvc-libs.zip">
+		<li><a href="http://freecraft.sourceforge.net/snapshots/msvc-libs.zip">
     		Download</a> the VC++ libraries and extract them into the root
     		freecraft directory.
 
-		<LI>Copy freecraft\contrib\freecraft.ico to freecraft\src.
-		<LI>You should now be able to compile freecraft by opening 
+		<li>Copy freecraft\contrib\freecraft.ico to freecraft\src.
+		<li>You should now be able to compile freecraft by opening 
 		the freecraft.dsw file.<p>
-	    </UL>
-	</UL>
+	    </ul>
+	</ul>
 
 	<li><b>Step 3, Extract data:</b><p>
 
@@ -141,12 +141,12 @@
 	    when you run the freecraft binary, by default the binary 
 	    looks for 'data' in the current directory.</font><p> 
 	</ul>
-    </UL>
+    </ul>
 </ul>
 
-<HR>
+<hr>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS><A HREF="http://freecraft.sourceforge.net">The FreeCraft Project</A>
-</ADDRESS>
-</BODY>
-</HTML>
+<address><a href="http://freecraft.sourceforge.net">The FreeCraft Project</a>
+</address>
+</body>
+</html>
