@@ -1459,6 +1459,8 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	    mi = menu->items + MenuButtonUnderCursor;
 	    switch (mi->mitype) {
 		case MI_TYPE_LISTBOX:
+		    if (mi->d.listbox.curopt < 0)
+			mi->d.listbox.curopt = 0;
 		    if (mi->d.listbox.startline > 0) {
 			mi->d.listbox.startline--;
 			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1)
@@ -1467,7 +1469,10 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			if (mi->d.listbox.curopt != 0) {
 			    mi->d.listbox.curopt--; }
 		    }
-		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
+		    if (mi->d.input.action) {
+			(*mi->d.input.action)(mi, mi->d.listbox.curopt);
+		    }
+		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)
 			/ (mi->d.listbox.noptions - 1);
 		    MustRedraw |= RedrawMenu;
 		    break;
@@ -1482,6 +1487,8 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	    mi = menu->items + MenuButtonUnderCursor;
 	    switch (mi->mitype) {
 		case MI_TYPE_LISTBOX:
+		    if (mi->d.listbox.curopt < 0)
+			mi->d.listbox.curopt = 0;
 		    if (mi->d.listbox.startline < mi->d.listbox.noptions - mi->d.listbox.nlines) {
 			mi->d.listbox.startline++;
 			if (mi->d.listbox.curopt != 0)
@@ -1491,7 +1498,10 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			    mi->d.listbox.curopt != mi->d.listbox.noptions - 1)
 				mi->d.listbox.curopt++;
 		    }
-		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
+		    if (mi->d.input.action) {
+			(*mi->d.input.action)(mi, mi->d.listbox.curopt);
+		    }
+		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)
 			/ (mi->d.listbox.noptions - 1);
 		    MustRedraw |= RedrawMenu;
 		    break;
