@@ -58,6 +58,7 @@
 <A HREF="#define-missile-type">define-missile-type</A>
 <A HREF="#define-missiletype-wc-names">define-missiletype-wc-names</A>
 <A HREF="#define-race-wc-names">define-race-wc-names</A>
+<A HREF="#define-ranks">define-ranks</A>
 <A HREF="#diplomacy">diplomacy</A>
 <A HREF="#freecraft-map">freecraft-map</A>
 <A HREF="#game-cycle">game-cycle</A>
@@ -531,6 +532,46 @@ Adds a tip.  Tips are shown at the start of a level.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-ranks"></A>
+<H3>define-ranks</H3>
+
+<H4>Description</H4>
+
+Define ranks for a race.
+
+<H4>Syntax</H4>
+
+<CODE>(define-ranks race '(score rank [score rank] ...))</CODE>
+
+<DL>
+<DT>race</DT>
+<DD>The race to define the ranks for.
+</DD>
+<DT>score</DT>
+<DD>If the player's score is greater than or equal to this number then the
+rank is displayed.  Scores are expected to be sorted in increasing order.
+</DD>
+<DT>rank</DT>
+<DD>The rank that gets displayed.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-ranks 'alliance '(
+    0 Pathetic
+    3000 "Not Bad"
+    10000 Great
+    ))
+</PRE>
+
+<P>Defines the ranks for the alliance race.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ranks.ccl"> $LIBARYPATH/ccl/ranks.ccl </A>
 
 <A NAME="diplomacy"></A>
 <H3>diplomacy</H3>
