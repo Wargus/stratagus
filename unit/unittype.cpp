@@ -1218,7 +1218,9 @@ global void SaveUnitTypes(CLFile* file)
 	for (i = 0; i < NumUnitTypes; ++i) {
 		CLprintf(file, "\n");
 		for (j = 0; j < PlayerMax; ++j) {
-			SaveUnitStats(&UnitTypes[i]->Stats[j], UnitTypes[i]->Ident, j, file);
+			if (Players[j].Type != PlayerNobody) {
+				SaveUnitStats(&UnitTypes[i]->Stats[j], UnitTypes[i]->Ident, j, file);
+			}
 		}
 	}
 }
