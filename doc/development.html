@@ -240,29 +240,13 @@ You need a C compiler for Windows. Get <B>one</B> of the following.
 <LI>VC++<P>
     In order to compile FreeCraft with VC++ follow these instructions:
     <UL>
-    <LI>You need <A HREF="http://www.libsdl.org">SDL</A> for VC++.  The 
-    development libraries can be downloaded
-    <A HREF="http://www.libsdl.org/release/SDL-devel-1.2.4-VC6.zip">here</A>.
-    <LI>Download the source code for
-    <A HREF="http://www.libpng.org/pub/png/libpng.html">libpng</A> and
-    <A HREF="http://www.zlib.org">zlib</A>.  To compile these libraries, open
-    the MSVC workspace included in the PNG source code.  The workspace assumes 
-    the zlib source code is in a directory called "zlib" at the same level as
-    libpng.  Set the active configuration to "libpng - Win32 LIB" then go to 
-    Project, Settings, C/C++, Code Generation and set the run-time library to 
-    Multithreaded DLL.  You should then be able to build the library.
     <LI>Extract the VC++ project and workspace files from
-    freecraft\contrib\msvc.zip into the root freecraft directory.
-    You will need to modify the paths to libpng, zlib, and SDL.  Change the 
-    include paths in Project, Settings, C/C++, Preprocessor.  Remove the 
-    libraries SDL.lib, SDLmain.lib, and libpng.lib and add your libraries to
-    the project.
-    <LI>You will also need to copy freecraft\contrib\stdint.h to 
-    freecraft\src\include since VC++ 6.0 does not come with this header.  Also
-    copy freecraft\contrib\freecraft.ico to freecraft\src.  You should now be 
-    able to compile FreeCraft.
-    <LI>FreeCraft needs SDL.dll to run.  Copy this from the SDL development
-    libraries to the FreeCraft directory and it should now run.
+	freecraft\contrib\msvc.zip into the root freecraft directory.
+    <LI><a href="http://freecraft.sourceforge.net/snapshots/msvc-libs.zip">
+	Download</a> the VC++ libraries and extract them into the root
+	freecraft directory.
+    <LI>Copy freecraft\contrib\freecraft.ico to freecraft\src.
+    <LI>You should now be able to compile freecraft.
     </UL>
     
 
