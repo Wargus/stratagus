@@ -1455,6 +1455,9 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 	} else if (!strcmp(op1, "rotate")) {
 		anim->Type = NewAnimationRotate;
 		anim->D.Rotate.Rotate = atoi(op2);
+	} else if (!strcmp(op1, "random-rotate")) {
+		anim->Type = NewAnimationRandomRotate;
+		anim->D.Rotate.Rotate = atoi(op2);
 	} else if (!strcmp(op1, "move")) {
 		anim->Type = NewAnimationMove;
 		anim->D.Move.Move = atoi(op2);
