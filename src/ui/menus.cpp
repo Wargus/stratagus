@@ -84,8 +84,6 @@ local void EndMenu(void);
 --	Prototypes for action handlers and helper functions
 ----------------------------------------------------------------------------*/
 
-global void GameMenuSave(void);
-global void GameMenuLoad(void);
 local void GameMenuEnd(void);
 local void GameMenuExit(void);
 local void GameMenuReturn(void);
