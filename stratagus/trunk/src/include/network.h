@@ -32,7 +32,7 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define NetworkLag	30		/// Debuging network lag (# frames)
+#define NetworkMaxLag	30		/// Debuging network lag (# frames)
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -40,6 +40,10 @@
 
 extern int NetworkFildes;		/// Network file descriptor
 extern int NetworkInSync;		/// Network is in sync
+extern int NetworkUpdates;		/// Network update each # frames
+extern int NetworkLag;			/// Network lag (# frames)
+extern char* NetworkArg;		/// Network command line argument
+
 extern int CommandLogEnabled;		/// True if command log is on
 
 /*----------------------------------------------------------------------------
