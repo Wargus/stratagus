@@ -436,7 +436,7 @@ install-freecraft:
 	install -m 755 freecraft $(PREFIX)/lib/games/freecraft
 	cp -R data $(PREFIX)/lib/games/freecraft
 	echo "$(PREFIX)/lib/games/freecraft/freecraft \
-	-d $(PREFIX)/lib/games/freecraft/data | tee /var/lib/games/freecraft.log" \
+	-d $(PREFIX)/lib/games/freecraft/data  "\$$\@" | tee /var/lib/games/freecraft.log" \
 	>$(PREFIX)/bin/freecraft
 	chmod +x $(PREFIX)/bin/freecraft
 	@echo installation of freecraft complete
