@@ -613,6 +613,10 @@ global void NetworkEvent(void)
     int i;
     int n;
 
+    if (NetworkFildes == -1) {
+	NetworkInSync = 1;
+	return;
+    }
     //
     //	Read the packet.
     //
@@ -620,9 +624,15 @@ global void NetworkEvent(void)
 	//
 	//	Server or client gone?
 	//
+#if 0
 	DebugLevel0("Server/Client gone.\n");
 	DebugLevel0Fn("FIXME: No longer the need to exit game here!.\n");
 	Exit(0);
+#else
+	// just hope for an automatic recover right now..
+	NetworkInSync = 0;
+	return;
+#endif
     }
     packet = (NetworkPacket *)buf;
     IfDebug( NetworkReceivedPackets++ );

@@ -729,7 +729,6 @@ local void WaitForInput(int timeout)
     callbacks.KeyPressed=WaitCallbackKey2;
     callbacks.KeyReleased=WaitCallbackKey2;
     callbacks.KeyRepeated=WaitCallbackKey3;
-
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
@@ -1050,8 +1049,8 @@ Use it at your own risk.\n\n");
 
     InitUnitsMemory();		// Units memory management
     PreMenuSetup();		// Load everything needed for menus
-    WaitForInput(20);		// Show game intro
     NetworkSetupArgs();		// Evaluate optional command line parameters
+    WaitForInput(20);		// Show game intro
 
     MenuLoop(MapName,&TheMap);	// Enter the menu loop
 
