@@ -222,6 +222,18 @@ local SCM CclDefineMissileTypeWcNames(SCM list)
 }
 
 /**
+**	Create a missile.
+**
+**	@param list	List of all names.
+*/
+local SCM CclMissile(SCM list)
+{
+    DebugLevel0Fn("FIXME: not written\n");
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for missile-type.
 */
 global void MissileCclRegister(void)
@@ -229,6 +241,7 @@ global void MissileCclRegister(void)
     gh_new_procedureN("define-missiletype-wc-names",
 	    CclDefineMissileTypeWcNames);
     gh_new_procedureN("define-missile-type",CclDefineMissileType);
+    gh_new_procedureN("missile",CclMissile);
 }
 
 #endif	// } USE_CCL
