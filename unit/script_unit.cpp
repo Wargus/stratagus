@@ -943,31 +943,6 @@ static int CclUnit(lua_State* l)
 }
 
 /**
-**  Make a unit.
-**
-**  @param l  Lua state.
-**
-**  @return   Returns the slot number of the made unit.
-*/
-static int CclMakeUnit(lua_State* l)
-{
-	UnitType* unittype;
-	Unit* unit;
-
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
-
-	lua_pushvalue(l, 1);
-	unittype = CclGetUnitType(l);
-	lua_pop(l, 1);
-	unit = MakeUnit(unittype, &Players[(int)LuaToNumber(l, 2)]);
-
-	lua_pushnumber(l, unit->Slot);
-	return 1;
-}
-
-/**
 **  Move a unit on map.
 **
 **  @param l  Lua state.
