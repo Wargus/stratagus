@@ -304,8 +304,12 @@ global void SaveScreenshotPNG(const char* name)
 	png_infop info_ptr;
 	unsigned char* row;
 	int i;
-	int j;
 	int bpp;
+#ifdef USE_OPENGL
+	GLvoid* pixels;
+#else
+	int j;
+#endif
 
 	bpp = TheScreen->format->BytesPerPixel;
 
@@ -349,6 +353,35 @@ global void SaveScreenshotPNG(const char* name)
 
 	png_write_info(png_ptr, info_ptr);
 
+#ifdef USE_OPENGL
+	pixels = malloc(VideoWidth * VideoHeight * 3);
+	if (!pixels) {
+		fprintf(stderr, "Out of memory\n");
+		exit(1);
+	}
+	glReadBuffer(GL_FRONT);
+	glReadPixels(0, 0, VideoWidth, VideoHeight, GL_RGB, GL_UNSIGNED_BYTE,
+		pixels);
+	for (i = 0; i < VideoHeight; ++i) {
+		int j;
+		unsigned char* src;
+		unsigned char* dst;
+
+		src = (unsigned char*)pixels + (VideoHeight - 1 - i) * VideoWidth * 3;
+		dst = row;
+
+		// Convert bgr to rgb
+		for (j = 0; j < VideoWidth; ++j) {
+			dst[0] = src[2];
+			dst[1] = src[1];
+			dst[2] = src[0];
+			dst += 3;
+			src += 3;
+		}
+		png_write_row(png_ptr, row);
+	}
+	free(pixels);
+#else
 	for (i = 0; i < VideoHeight; ++i) {
 		switch (VideoDepth) {
 			case 15: {
@@ -392,6 +425,7 @@ global void SaveScreenshotPNG(const char* name)
 		}
 		png_write_row(png_ptr, row);
 	}
+#endif
 
 	png_write_end(png_ptr, info_ptr);
 
