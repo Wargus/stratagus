@@ -518,6 +518,7 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	} else {
 		filename = pathbuf;
 	}
+	cp = filename;
 	for (i = 0; suf[i]; i++) {
 		char *lcp;
 
