@@ -185,8 +185,6 @@ global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 global void VideoFree(Graphic* graphic)
 {
 #ifdef DEBUG
-	AllocatedGraphicMemory -=
-		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
 	AllocatedGraphicMemory -= sizeof(Graphic);
 #endif
 
@@ -197,8 +195,14 @@ global void VideoFree(Graphic* graphic)
 	}
 #endif
 
-	VideoPaletteListRemove(graphic->Surface);
-	SDL_FreeSurface(graphic->Surface);
+	if (graphic->Surface) {
+#ifdef DEBUG
+		AllocatedGraphicMemory -=
+			graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
+#endif
+		VideoPaletteListRemove(graphic->Surface);
+		SDL_FreeSurface(graphic->Surface);
+	}
 	if (graphic->SurfaceFlip) {
 #ifdef DEBUG
 		AllocatedGraphicMemory -=
@@ -442,7 +446,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 			int z;
 			SDL_Color p;
 
-			c = (h - i - 1) * w * 4 + j * 4;
+			c = i * w * 4 + j * 4;
 			for (z = 0; z < maplen; ++z) {
 				if (*sp == map[z * 2]) {
 					p = TheMap.TileGraphic->Surface->format->palette->colors[map[z * 2 + 1]];
