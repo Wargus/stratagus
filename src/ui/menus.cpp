@@ -476,7 +476,6 @@ local unsigned char *ssmtoptions[] = {
     // "All scenarios (cm+pud)",
     "Freecraft scenario (cm)",
     "Foreign scenario (pud)"
-    // FIXME: what is about levels in zips?
 };
 
 local unsigned char *ssmsoptions[] = {
@@ -2347,7 +2346,7 @@ global void DrawMenu(int menu_id)
     }
 
     menu = Menus + menu_id;
-    switch( menu->image ) {
+    switch (menu->image) {
 	case ImagePanel1:
 	    VideoDrawSub(TheUI.GameMenuePanel.Graphic,0,0,
 		    VideoGraphicWidth(TheUI.GameMenuePanel.Graphic),
@@ -2441,10 +2440,10 @@ global void DrawMenu(int menu_id)
 	DrawPulldown(mip,menu->x,menu->y);
     }
 
-    MenuRedrawX=menu->x;
-    MenuRedrawY=menu->y;
-    MenuRedrawW=menu->xsize;
-    MenuRedrawH=menu->ysize;
+    MenuRedrawX = menu->x;
+    MenuRedrawY = menu->y;
+    MenuRedrawW = menu->xsize;
+    MenuRedrawH = menu->ysize;
 }
 
 /*----------------------------------------------------------------------------
@@ -5149,7 +5148,11 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
 
     if (i > 0 && i < PlayerMax-1) {
 	if (mi->d.pulldown.curopt == o) {
-	    ServerSetupState.CompOpt[i] = o;
+	    if (mi->d.pulldown.noptions == 2) {	// computer slot
+		ServerSetupState.CompOpt[i] = o + 1;
+	    } else {
+		ServerSetupState.CompOpt[i] = o;
+	    }
 	    MultiGamePlayerSelectorsUpdate(3);	// Recalc buttons on server
 	    NetworkServerResyncClients();
 	}
@@ -5172,8 +5175,8 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
 */
 local void NetworkGamePrepareGameSettings(void)
 {
-    int h, i;
-    int num[PlayerMax];
+    int c, h, i;
+    int num[PlayerMax], comp[PlayerMax];
 
     DebugCheck(!ScenSelectPudInfo);
 
@@ -5194,10 +5197,13 @@ local void NetworkGamePrepareGameSettings(void)
 #endif
 
     // Make a list of the available player slots.
-    for (h = i = 0; i < PlayerMax-1; i++) {
+    for (c = h = i = 0; i < PlayerMax; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
 	    DebugLevel3Fn("Player slot %i is available for a person\n" _C_ i);
 	    num[h++] = i;
+	}
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
+	    comp[c++] = i;	// available computer player slots
 	}
     }
     for (i = 0; i < h; i++) {
@@ -5226,6 +5232,12 @@ local void NetworkGamePrepareGameSettings(void)
 		break;
 	}
     }
+    for (i = 0; i < c; i++) {
+	if (ServerSetupState.CompOpt[comp[i]] == 2) {	// closed..
+	    GameSettings.Presets[comp[i]].Type = PlayerNobody;
+	    DebugLevel0Fn("Settings[%d].Type == Closed\n" _C_ comp[i]);
+	}
+    }
 
 #ifdef DEBUG
     for (i = 0; i < NetPlayers; i++) {
@@ -5237,9 +5249,9 @@ local void NetworkGamePrepareGameSettings(void)
 
 /**
 **	Player selectors have changed.
-**	Caution: Called by map change (inital = 1)!
-**	Caution: Called by network events from clients (inital = 2)!
-**	Caution: Called by button action on server (inital = 3)!
+**	Caution: Called by map change (initial = 1)!
+**	Caution: Called by network events from clients (initial = 2)!
+**	Caution: Called by button action on server (initial = 3)!
 */
 local void MultiGamePlayerSelectorsUpdate(int initial)
 {
@@ -5266,6 +5278,9 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     //	Setup the player menu
     for (ready = i = 1; i < PlayerMax-1; i++) {
 	if (initial == 1) {
+	    if (i < h) {
+		ServerSetupState.CompOpt[i] = 0;
+	    }
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = 0;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
 
@@ -5316,7 +5331,16 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 
 
 	if (i >= h) {
-	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = MI_PSTATE_PASSIVE;
+	    // Allow to switch off (close) preset ai-computer slots
+	    // FIXME: evaluate game type...
+	    if (initial == 1 && i < h + c) {
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = 0;
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.noptions = 2;
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.options = mgptsoptions + 1;
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = 0;
+		ServerSetupState.CompOpt[i] = 1;
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i] - 1;
+	    }
 
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = MenuButtonDisabled;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
@@ -5326,6 +5350,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	}
 
 	if (i >= h + c) {
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = MI_PSTATE_PASSIVE;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.defopt = 2;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = 2;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].flags = MenuButtonDisabled;
@@ -5450,8 +5475,6 @@ local void MultiGameCancel(void)
 
 /**
 **	Draw the multi player setup menu.
-**
-**	@note FIXME: the other buttons aren't updated if the player leaves.
 */
 local void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
@@ -5471,7 +5494,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i]
 			.d.gem.state = MI_GSTATE_PASSIVE;
 	    }
-	    if (ServerSetupState.LastFrame[i]+30>FrameCounter) {
+	    if (ServerSetupState.LastFrame[i] + 30 > FrameCounter) {
 		NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags &=
 		    ~MenuButtonDisabled;
 		NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i]
@@ -5498,9 +5521,6 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 	    }
 	}
     }
-    /* FIXME:
-	 further changes to implement client menu...
-    */
 
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
