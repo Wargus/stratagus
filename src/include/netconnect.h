@@ -83,13 +83,13 @@ typedef struct _network_state_ {
 **	Multiplayer game setup menu state
 */
 typedef struct _setup_state_ {
-    unsigned char	ResOpt;		/// Multiplayer Menu: Resources option
-    unsigned char	UnsOpt;		/// Multiplayer Menu: Unit # option
-    unsigned char	FwsOpt;		/// Multiplayer Menu: Fog of war option
-    unsigned char	TssOpt;		/// Multiplayer Menu: Tileset select option
-    unsigned char	CompOpt[8];	/// Multiplayer Menu: Free slot option selection
-    unsigned char	Ready[8];	/// Multiplayer Menu: Client ready state
-    unsigned char	Race[8];	/// Multiplayer Menu: Client race selection
+    unsigned char	ResOpt;			/// Resources option
+    unsigned char	UnsOpt;			/// Unit # option
+    unsigned char	FwsOpt;			/// Fog of war option
+    unsigned char	TssOpt;			/// Tileset select option
+    unsigned char	CompOpt[PlayerMax];	/// Free slot option selection
+    unsigned char	Ready[PlayerMax];	/// Client ready state
+    unsigned char	Race[PlayerMax];	/// Client race selection
     // Fill in here...
 } ServerSetup;
 
