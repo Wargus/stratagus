@@ -10,7 +10,7 @@
 //
 /**@name script_sound.c - The sound ccl functions. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -549,7 +549,7 @@ static int CclSoundOn(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 
-	if (SoundFildes != -1) {
+	if (SoundEnabled()) {
 		lua_pushboolean(l, 1);
 		return 1;
 	}

@@ -233,7 +233,7 @@ static void UiAddToGroup(unsigned group)
 */
 static void UiToggleSound(void)
 {
-	if (SoundFildes != -1) {
+	if (SoundEnabled()) {
 		SoundOff ^= 1;
 	}
 	if (SoundOff) {

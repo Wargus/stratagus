@@ -10,7 +10,7 @@
 //
 /**@name loadgame.c - Load game. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2005 by Lutz Sammer, Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -187,7 +187,7 @@ void LoadModules(void)
 
 	LoadUnitSounds();
 	MapUnitSounds();
-	if (SoundFildes != -1) {
+	if (SoundEnabled()) {
 		if (InitSoundServer()) {
 			SoundOff = 1;
 		} else {

@@ -10,7 +10,7 @@
 //
 /**@name sound.c - The sound. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -304,7 +304,7 @@ void InitSoundClient(void)
 {
 	int i;
 
-	if (SoundFildes == -1) { // No sound enabled
+	if (!SoundEnabled()) { // No sound enabled
 		return;
 	}
 	// let's map game sounds, look if already setup in ccl.

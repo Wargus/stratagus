@@ -72,7 +72,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int SoundFildes = -1;            /// audio file descriptor
+static int SoundInitialized;     /// audio file descriptor
 int PlayingMusic;                /// flag true if playing music
 int CallbackMusic;               /// flag true callback ccl if stops
 
@@ -771,6 +771,9 @@ void MixIntoBuffer(void* buffer, int samples)
 */
 void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int len)
 {
+	if (SoundOff) {
+		return;
+	}
 	len >>= 1;
 	MixIntoBuffer(stream, len);
 }
@@ -789,8 +792,10 @@ int InitSound(void)
 	// Open sound device, 8bit samples, stereo.
 	//
 	if (InitSdlSound(44100, 16)) {
+		SoundInitialized = 0;
 		return 1;
 	}
+	SoundInitialized = 1;
 
 	// ARI: The following must be done here to allow sound to work in
 	// pre-start menus!
@@ -800,6 +805,14 @@ int InitSound(void)
 	}
 
 	return 0;
+}
+
+/**
+**  Check if sound is enabled
+*/
+int SoundEnabled(void)
+{
+	return SoundInitialized;
 }
 
 /**
@@ -825,7 +838,7 @@ int InitSoundServer(void)
 void QuitSound(void)
 {
 	SDL_CloseAudio();
-	SoundFildes = -1;
+	SoundInitialized = 0;
 }
 
 //@}

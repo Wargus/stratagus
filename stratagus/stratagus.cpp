@@ -803,7 +803,6 @@ Use it at your own risk.\n\n");
 	// Setup sound card
 	if (!SoundOff && InitSound()) {
 		SoundOff = 1;
-		SoundFildes = -1;
 	}
 
 #ifndef DEBUG           // For debug it's better not to have:

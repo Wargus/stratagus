@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -42,7 +42,7 @@
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------
--- Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 	/// FIXME: move function to here.
@@ -50,12 +50,12 @@ extern void FillAudio(void* udata __attribute__((unused)), Uint8* stream,
 	int len);
 
 /**
-** Initialize sound card hardware part with SDL.
+**  Initialize sound card hardware part with SDL.
 **
-** @param freq    Sample frequenz (44100,22050,11025 hz).
-** @param size    Sampe size (8bit, 16bit)
+**  @param freq  Sample frequenz (44100,22050,11025 hz).
+**  @param size  Sampe size (8bit, 16bit)
 **
-** @return True if failure, false if everything ok.
+**  @return      True if failure, false if everything ok.
 */
 int InitSdlSound(int freq, int size)
 {
@@ -80,7 +80,6 @@ int InitSdlSound(int freq, int size)
 		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
 		return -1;
 	}
-	SoundFildes = 0;
 	SDL_PauseAudio(0);
 
 	return 0;
