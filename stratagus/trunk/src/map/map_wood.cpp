@@ -168,6 +168,20 @@ global void MapFixSeenWoodNeighbors(int x, int y)
 }
 
 /**
+**	Correct the surrounding real wood fields.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+local void MapFixWoodNeighbors(int x, int y)
+{
+    MapFixWoodTile(x + 1, y);		// side neighbors
+    MapFixWoodTile(x - 1, y);
+    MapFixWoodTile(x, y + 1);
+    MapFixWoodTile(x, y - 1);
+}
+
+/**
 **	Correct the real wood field, depending on the surrounding.
 **
 **	@param x	Map X tile-position.
@@ -234,6 +248,7 @@ global void MapFixWoodTile(int x, int y)
     } else if (mf->Tile != tile) {
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
+	MapFixWoodNeighbors(x, y);
 #ifdef NEW_FOW
 	if (mf->Visible[ThisPlayer->Player]>1) {
 #else
@@ -245,20 +260,6 @@ global void MapFixWoodTile(int x, int y)
 	    MustRedraw |= RedrawMinimap;
 	}
     }
-}
-
-/**
-**	Correct the surrounding real wood fields.
-**
-**	@param x	Map X tile-position.
-**	@param y	Map Y tile-position.
-*/
-local void MapFixWoodNeighbors(int x, int y)
-{
-    MapFixWoodTile(x + 1, y);		// side neighbors
-    MapFixWoodTile(x - 1, y);
-    MapFixWoodTile(x, y + 1);
-    MapFixWoodTile(x, y - 1);
 }
 
 /**
