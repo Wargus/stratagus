@@ -182,6 +182,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	    free(s);
 	}
 	
+#if 0	/* WILL NOW BE DONE BY MENU CODE.. */
 	//
 	//	Network by command line
 	//
@@ -204,6 +205,8 @@ global void CreateGame(char* filename, WorldMap* map)
 		ExitNetwork1();
 	    }
 	}
+#endif
+
     }
 
     if( NetworkFildes!=-1 ) {		// Prepare network play
