@@ -534,54 +534,8 @@ local void HandleMouseOn(int x,int y)
 
     //
     //	Scrolling Region Handling
-    //	FIXME: perhaps I should change the complete scroll handling.
-    //	FIXME: show scrolling cursor only, if scrolling is possible
-    //	FIXME: scrolling with edge resistance
     //
-    if( x<SCROLL_LEFT ) {
-	CursorOn=CursorOnScrollLeft;
-	MouseScrollState = ScrollLeft;
-	GameCursor=TheUI.ArrowW.Cursor;
-	if( y<SCROLL_UP ) {
-	    CursorOn=CursorOnScrollLeftUp;
-	    MouseScrollState = ScrollLeftUp;
-	    GameCursor=TheUI.ArrowNW.Cursor;
-	}
-	if( y>SCROLL_DOWN ) {
-	    CursorOn=CursorOnScrollLeftDown;
-	    MouseScrollState = ScrollLeftDown;
-	    GameCursor=TheUI.ArrowSW.Cursor;
-	}
-	return;
-    }
-    if( x>SCROLL_RIGHT ) {
-	CursorOn=CursorOnScrollRight;
-	MouseScrollState = ScrollRight;
-	GameCursor=TheUI.ArrowE.Cursor;
-	if( y<SCROLL_UP ) {
-	    CursorOn=CursorOnScrollRightUp;
-	    MouseScrollState = ScrollRightUp;
-	    GameCursor=TheUI.ArrowNE.Cursor;
-	}
-	if( y>SCROLL_DOWN ) {
-	    CursorOn=CursorOnScrollRightDown;
-	    MouseScrollState = ScrollRightDown;
-	    GameCursor=TheUI.ArrowSE.Cursor;
-	}
-	return;
-    }
-    if( y<SCROLL_UP ) {
-	CursorOn=CursorOnScrollUp;
-	MouseScrollState = ScrollUp;
-	GameCursor=TheUI.ArrowN.Cursor;
-	return;
-    }
-    if( y>SCROLL_DOWN ) {
-	CursorOn=CursorOnScrollDown;
-	MouseScrollState = ScrollDown;
-	GameCursor=TheUI.ArrowS.Cursor;
-	return;
-    }
+    HandleMouseScrollArea(x,y);
 }
 
 /**
