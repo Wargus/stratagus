@@ -795,7 +795,7 @@ local void ShowOrder(const Unit* unit)
     dest=0;
     switch( unit->Orders[0].Action ) {
 	case UnitActionNone:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionStill:
