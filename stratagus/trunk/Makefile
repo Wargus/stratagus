@@ -133,7 +133,7 @@ DOCS    = README doc/readme.html doc/install.html doc/freecraft.html \
 	  doc/artistic-license.html doc/ccl/unittype.html \
 	  doc/graphic/*.html doc/graphic/*.png
 
-PICS    = contrib/ale-title.png
+PICS    = contrib/freecraft.png
 
 CCLS	= data/ccl/clone.ccl data/ccl/units.ccl data/ccl/missiles.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
@@ -255,7 +255,7 @@ buildit:	tools
 buildclean:
 	rm -rf data/*.rgb data/*.gimp data/puds data/sound data/graphic \
 	data/interface data/campaigns data/text data/health.png data/mana.png \
-	data/default.pud.gz data/ale-title.png
+	data/default.pud.gz data/freecraft.png
 
 release:
 	make distclean
