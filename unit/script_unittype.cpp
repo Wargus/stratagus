@@ -143,6 +143,8 @@ local SCM CclDefineUnitType(SCM list)
 		    type->ShadowWidth=gh_scm2int(gh_car(sublist));
 		} else if( gh_eq_p(value,gh_symbol2scm("height")) ) {
 		    type->ShadowHeight=gh_scm2int(gh_car(sublist));
+		} else if( gh_eq_p(value,gh_symbol2scm("offset")) ) {
+		    type->ShadowOffset=gh_scm2int(gh_car(sublist));
 		} else {
 		    errl("Unsupported shadow tag",value);
 		}
