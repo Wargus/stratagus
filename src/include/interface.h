@@ -246,7 +246,7 @@ extern void DrawConsole(void);
     /// Generate all buttons
 extern void InitButtons(void);
     /// Free memory for buttons
-extern void DoneButtons(void);
+extern void CleanButtons(void);
     /// Make a new button
 extern int AddButton(int pos,int level,const char* IconIdent,
 	enum _button_cmd_ action,const char* value,
