@@ -40,12 +40,15 @@
 #include "mpq.h"
 #include "iocompat.h"
 #include "myendian.h"
+#include "pud.h"
 
 
 /*----------------------------------------------------------------------------
---	Declarations
+--	Definitions
 ----------------------------------------------------------------------------*/
 
+#define SC_IsUnitMineral(x) ((x)==176 || (x)==177 || (x)==178)	/// sc unit mineral
+#define SC_UnitGeyser	    188	    /// sc unit geyser
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -54,6 +57,8 @@
 local char *scm_ptr;
 local char *scm_endptr;
 
+local int MapOffsetX;			/// Offset X for combined maps
+local int MapOffsetY;			/// Offset Y for combined maps
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -73,9 +78,6 @@ local void ScmConvertMTXM(const unsigned short * mtxm,int width,int height,World
     int h;
     int w;
 
-    DebugCheck( UnitTypeOrcWall->_HitPoints>=256
-	    || UnitTypeHumanWall->_HitPoints>=256 );
-
     if( map->Terrain<TilesetMax ) {
 	// FIXME: should use terrain name!!
 	ctab=Tilesets[map->Terrain]->Table;
@@ -92,22 +94,8 @@ local void ScmConvertMTXM(const unsigned short * mtxm,int width,int height,World
 	    int v;
 
 	    v=ConvertLE16(mtxm[h*width+w]);
-	    map->Fields[w+h*TheMap.Width].Tile=ctab[v];
-	    map->Fields[w+h*TheMap.Width].Value=0;
-	    //
-	    //	Walls are handled special (very ugly).
-	    //
-	    if( (v&0xFFF0)==0x00A0
-		    || (v&0xFFF0)==0x00C0
-		    || (v&0xFF00)==0x0900 ) {
-		map->Fields[w+h*TheMap.Width].Value=
-			UnitTypeOrcWall->_HitPoints;
-	    } else if( (v&0x00F0)==0x0090
-		    || (v&0xFFF0)==0x00B0
-		    || (v&0xFF00)==0x0800 ) {
-		map->Fields[w+h*TheMap.Width].Value=
-			UnitTypeHumanWall->_HitPoints;
-	    }
+	    map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Tile=ctab[v];
+	    map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Value=0;
 	}
     }
 }
@@ -128,6 +116,18 @@ local int ScmReadHeader(char* header,long* length)
     scm_ptr += 4;
     *length = ConvertLE32(len);
     return 1;
+}
+
+/**
+**	Read dword
+*/
+local int ScmReadDWord(void)
+{
+    unsigned int temp_int;
+
+    memcpy(&temp_int, scm_ptr, 4);
+    scm_ptr += 4;
+    return ConvertLE32(temp_int);
 }
 
 /**
@@ -339,7 +339,6 @@ global MapInfo* GetScmInfo(const char* scm)
 		// 05 - Desert World
 		// 06 - Arctic World
 		// 07 - Twilight World
-		t=0;	// FIXME: remove when tilesets work
 		info->MapTerrainName=strdup(TilesetWcNames[t]);
 		info->MapTerrain=t;
 		continue;
@@ -792,6 +791,9 @@ global void LoadScm(const char* scm,WorldMap* map)
 		    if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
 			p = GameSettings.Presets[i].Type;
 		    }
+		    if( i==11 ) {
+			p = PlayerNeutral;
+		    }
 		    CreatePlayer(p);
 		    PlayerSetAiNum(&Players[i], 0);
 		}
@@ -960,8 +962,105 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//
 	if( !memcmp(header, "UNIT",4) ) {
 //	    if( length== ) {
-	    if( 1 ) {
-		scm_ptr += length;
+	    if( length%36==0 ) {
+		int x;
+		int y;
+		int t;
+		int f1;
+		int f2;
+		int o;
+		int hpp;
+		int shp;
+		int ep;
+		int res;
+		int nh;
+		int st;
+		int s;
+		Unit* unit;
+		UnitType* type;
+
+		while( length>0 ) {
+		    scm_ptr += 4;	// unknown
+		    x = ScmReadWord();	// x coordinate
+		    y = ScmReadWord();	// y coordinate
+		    t = ScmReadWord();	// unit type
+		    scm_ptr += 2;	// unknown
+		    f1 = ScmReadWord();	// special properties flag
+		    f2 = ScmReadWord();	// valid elements
+		    o = ScmReadByte();	// owner
+		    hpp = ScmReadByte();// hit point %
+		    shp = ScmReadByte();// shield point %
+		    ep = ScmReadByte();	// energy point %
+		    res = ScmReadDWord(); // resource amount
+		    nh = ScmReadWord();	// num units in hanger
+		    st = ScmReadWord();	// state flags
+		    scm_ptr += 8;	// unknown
+
+		    length -= 36;
+
+		    // FIXME: remove
+		    type = UnitTypeByWcNum(t);
+		    x = (x - 32*type->TileWidth/2) / 32;
+		    y = (y - 32*type->TileHeight/2) / 32;
+
+		    if( t==SC_StartLocation ) {
+			Players[o].StartX=MapOffsetX+x;
+			Players[o].StartY=MapOffsetY+y;
+			if (GameSettings.NumUnits == SettingsNumUnits1
+				&& Players[o].Type != PlayerNobody) {
+#if 0
+			    // FIXME: Use the peasant for each race
+			    if () {
+				t = SC_UnitPeasant;
+			    } else {
+				t = SC_UnitPeon;
+			    }
+			    v = 1;
+			    goto pawn;
+#endif
+			}
+		    } else {
+			if ( GameSettings.NumUnits == SettingsNumUnitsMapDefault ||
+			    SC_IsUnitMineral(t) || t == SC_UnitGeyser ) {
+//pawn:
+			    if( !SC_IsUnitMineral(t) && t != SC_UnitGeyser ) {
+				if( (s = GameSettings.Presets[o].Race) != SettingsPresetMapDefault ) {
+#if 0
+				    // FIXME: change races
+				    if( s == PlayerRaceHuman && (t & 1) == 1 ) {
+					t--;
+				    }
+				    if( s == PlayerRaceOrc && (t & 1) == 0 ) {
+					t++;
+				    }
+				    // FIXME: ARI: This is hard-coded WAR2 ... also: support more races?
+#endif
+				}
+			    }
+			    if( Players[o].Type != PlayerNobody ) {
+				unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
+					,UnitTypeByWcNum(t),&Players[o]);
+				if( unit->Type->GoldMine || unit->Type->GivesOil
+					|| unit->Type->OilPatch ) {
+#if 0
+				    DebugCheck( !v );
+				    unit->Value=v;
+#endif
+				} else {	
+				    // active/inactive AI units!!
+				    // Johns: it is better to have active buildings
+				    if( !unit->Type->Building ) {
+#if 0
+					unit->Active=!v;
+#endif
+				    }
+				}
+				UpdateForNewUnit(unit,0);
+			    }
+			}
+		    }
+		}
+
 		continue;
 	    }
 	    DebugLevel1("Wrong UNIT length\n");
@@ -1175,5 +1274,18 @@ global void LoadScm(const char* scm,WorldMap* map)
 	DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
 	scm_ptr += length;
     }
+
+    MapOffsetX+=width;
+    if( MapOffsetX>=map->Width ) {
+	MapOffsetX=0;
+	MapOffsetY+=height;
+    }
 }
 
+/**
+**	Clean scm module.
+*/
+global void CleanScm(void)
+{
+    MapOffsetX=MapOffsetY=0;
+}
