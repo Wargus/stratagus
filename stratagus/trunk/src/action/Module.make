@@ -1,3 +1,39 @@
-SRC += src/action/action_attack.c src/action/action_board.c src/action/action_build.c src/action/action_demolish.c src/action/action_die.c src/action/action_follow.c src/action/action_harvest.c src/action/action_minegold.c src/action/action_move.c src/action/action_patrol.c src/action/action_repair.c src/action/action_research.c src/action/action_resource.c src/action/action_returngoods.c src/action/action_spellcast.c src/action/action_stand.c src/action/action_still.c src/action/action_train.c src/action/action_unload.c src/action/action_upgradeto.c src/action/actions.c src/action/command.c 
-HDRS +=
-OBJ += src/action/$(OBJDIR)/action_attack.o src/action/$(OBJDIR)/action_board.o src/action/$(OBJDIR)/action_build.o src/action/$(OBJDIR)/action_demolish.o src/action/$(OBJDIR)/action_die.o src/action/$(OBJDIR)/action_follow.o src/action/$(OBJDIR)/action_harvest.o src/action/$(OBJDIR)/action_minegold.o src/action/$(OBJDIR)/action_move.o src/action/$(OBJDIR)/action_patrol.o src/action/$(OBJDIR)/action_repair.o src/action/$(OBJDIR)/action_research.o src/action/$(OBJDIR)/action_resource.o src/action/$(OBJDIR)/action_returngoods.o src/action/$(OBJDIR)/action_spellcast.o src/action/$(OBJDIR)/action_stand.o src/action/$(OBJDIR)/action_still.o src/action/$(OBJDIR)/action_train.o src/action/$(OBJDIR)/action_unload.o src/action/$(OBJDIR)/action_upgradeto.o src/action/$(OBJDIR)/actions.o src/action/$(OBJDIR)/command.o 
+##   ___________		     _________		      _____  __
+##   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+##    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+##    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+##    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+##	  \/		    \/	   \/	     \/		   \/
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   FreeCraft - A free fantasy real time strategy game engine
+##
+##	Module.make	-	Module Makefile (included from Makefile).
+##
+##	(c) Copyright 2002 by Nehal Mistry
+##
+##	FreeCraft is free software; you can redistribute it and/or modify
+##	it under the terms of the GNU General Public License as published
+##	by the Free Software Foundation; only version 2 of the License.
+##
+##	FreeCraft is distributed in the hope that it will be useful,
+##	but WITHOUT ANY WARRANTY; without even the implied warranty of
+##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##	GNU General Public License for more details.
+##
+
+MODULE = src/action
+MSRC =	 action_attack.c action_board.c action_build.c action_demolish.c \
+	 action_die.c action_follow.c action_harvest.c action_minegold.c \
+	 action_move.c action_patrol.c action_repair.c action_research.c \
+	 action_resource.c action_returngoods.c action_spellcast.c \
+	 action_stand.c action_still.c action_train.c action_unload.c \
+	 action_upgradeto.c actions.c command.c 
+
+SRC+=	$(addprefix $(MODULE)/,$(MSRC))
+HDRS+=
+
+$(MODULE)/$(OBJDIR)/%.o: $(MODULE)/%.c
+	@if [ ! -d $(shell dirname $@) ]; then mkdir $(shell dirname $@); fi
+	$(CC) -c $(CFLAGS) $< -o $@;
+
