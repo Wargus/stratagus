@@ -35,12 +35,9 @@
 #include "construct.h"
 #include "cursor.h"
 #include "interface.h"
+#include "font.h"
+#include "ui.h"
 #include "ccl.h"
-
-#ifdef REFS_DEBUG
-    #include "font.h"
-    #include "ui.h"
-#endif
 
 #include "etlib/generic.h"
 
