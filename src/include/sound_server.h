@@ -108,7 +108,7 @@ typedef Sound* ServerSoundId;
 **	Origin of a sound
 */
 typedef struct _origin_ {
-    void* Base;		/// pointer on a Unit
+    const void* Base;		/// pointer on a Unit
     unsigned Id;	/// unique identifier (if the pointer has been shared)
 } Origin;
 
