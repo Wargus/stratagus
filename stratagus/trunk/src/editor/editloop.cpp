@@ -320,6 +320,33 @@ local void EditUnit(int x, int y, UnitType* type, Player* player)
 }
 
 /**
+**	Calculate the number of unit icons that can be displayed
+**
+**	@return		Number of unit icons that can be displayed.
+*/
+local int CalculateUnitIcons(void)
+{
+    int i;
+    int x;
+    int count;
+
+    i = 0;
+    count = 0;
+    x = TheUI.ButtonPanelY + 24;
+    while (x < TheUI.ButtonPanelY + TheUI.ButtonPanel.Graphic->Height
+	    - IconHeight) {
+	++i;
+	x += IconHeight + 2;
+    }
+    x = TheUI.ButtonPanelX + 10;
+    while( x < TheUI.ButtonPanelX + 146 ) {
+	count += i;
+	x += IconWidth + 8;
+    }
+    return count;
+}
+
+/**
 **	Recalculate the shown units.
 */
 local void RecalculateShownUnits(void)
@@ -359,7 +386,9 @@ local void RecalculateShownUnits(void)
     MaxShownUnits = n;
 
     if( UnitIndex >= MaxShownUnits ) {
-	UnitIndex = MaxShownUnits / 9 * 9;
+	int count;
+	count = CalculateUnitIcons();
+	UnitIndex = MaxShownUnits / count * count;
     }
     // Quick & dirty make them invalid
     CursorUnitIndex = -1;
@@ -1047,9 +1076,11 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     if (EditorState == EditorEditUnit) {
 	int percent;
 	int j;
+	int count;
 
 	percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
 	j = (percent * (176 - 8 - 54)) / 100;
+	count = CalculateUnitIcons();
 
 	// Unit icons scroll left area
 	if (TheUI.ButtonPanelX + 4 < CursorX
@@ -1057,8 +1088,10 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
 
-	    if (UnitIndex - 9 >= 0) {
-		UnitIndex -= 9;
+	    if (UnitIndex - count >= 0) {
+		UnitIndex -= count;
+	    } else {
+		UnitIndex = 0;
 	    }
 	    return;
 	}
@@ -1068,8 +1101,8 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
 
-	    if (UnitIndex + 9 <= MaxShownUnits) {
-		UnitIndex += 9;
+	    if (UnitIndex + count <= MaxShownUnits) {
+		UnitIndex += count;
 	    }
 	    return;
 	}
