@@ -951,43 +951,6 @@ global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
 */
 global int UnitVisibleOnMap(const Unit* unit)
 {
-#ifdef NEW_FOW
-    int x;
-    int y;
-    int w;
-    int w0;
-    int h;
-
-    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
-    //DebugCheck( unit->Player==ThisPlayer );
-
-    //
-    //	Unit invisible (by spell), removed or submarine.
-    //
-    if ( unit->Invisible || unit->Removed
-	    || !(unit->Visible&(1<<ThisPlayer->Player)) ) {
-	return 0;
-    }
-
-    x = unit->X;
-    y = unit->Y;
-    w = w0 = unit->Type->TileWidth;
-    h = unit->Type->TileHeight;
-
-    //
-    //	Check if visible, not under fog of war.
-    //		FIXME: need only check the boundary, not the complete rectangle.
-    //
-    for( ; h-->0; ) {
-	for( w=w0; w-->0; ) {
-	    if( IsMapFieldVisible(x+w,y+h) ) {
-		return 1;
-	    }
-	}
-    }
-
-    return 0;
-#else
     int x;
     int y;
     int w;
@@ -1022,7 +985,6 @@ global int UnitVisibleOnMap(const Unit* unit)
     }
 
     return 0;
-#endif
 }
 
 /**

@@ -228,7 +228,7 @@ global int IsTileVisible(const Player* player,int x,int y)
 	return 2;
     }
     visiontype=TheMap.Fields[y*TheMap.Width+x].Visible[player->Player];
-    for( i=0; i<PlayerMax; i++ ) {
+    for( i=0; i<PlayerMax && visiontype < 2; i++ ) {
 	if( player->SharedVision&(1<<i) &&
 	    (Players[i].SharedVision&(1<<player->Player)) ) {
             if( visiontype<TheMap.Fields[y*TheMap.Width+x].Visible[i] ) {
@@ -238,6 +238,9 @@ global int IsTileVisible(const Player* player,int x,int y)
 	if( visiontype>1 ) {
 	    return 2;
 	}
+    }
+    if (TheMap.NoFogOfWar == 1 && visiontype != 0) {
+	return 2;
     }
     return visiontype;
 }
@@ -297,10 +300,6 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		switch( v ) {
 		    case 0:		// Unexplored
 		    case 1:		// Unseen
-			if( IsTileVisible(ThisPlayer,i,y) > 1) {
-			    MapMarkSeenTile(i,y);
-			}
-
 			// FIXME: mark for screen update
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
 			break;
@@ -311,6 +310,9 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		    default:		// seen -> seen
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v+1;
 			break;
+		}
+		if( IsTileVisible(ThisPlayer,i,y) > 1) {
+		    MapMarkSeenTile(i,y);
 		}
 	    }
 	}
@@ -375,26 +377,13 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 			TheMap.Fields[i+y*TheMap.Width].Visible[p] =
 			    LookupSight(player,i,y);
 			if (FlagRevealMap == 1 &&
-			    TheMap.Fields[i+y*TheMap.Width].Visible[p] == 0) {
-				TheMap.Fields[i+y*TheMap.Width].Visible[p] = 1;
-			}
-			if (TheMap.NoFogOfWar == 1 &&
-			    TheMap.Fields[i+y*TheMap.Width].Visible[p] < 2) {
-				TheMap.Fields[i+y*TheMap.Width].Visible[p] = 2;
-			}
-			if (FlagRevealMap &&
 			    TheMap.Fields[i+y*TheMap.Width].Visible[p] < 255) {
-				TheMap.Fields[i+y*TheMap.Width].Visible[p] += 1;
+				++TheMap.Fields[i+y*TheMap.Width].Visible[p];
 			}
 		    case 0:		// Unexplored
 		    case 1:
 			//We are at minimum, don't do anything.
 			break;
-		    case 2:
-		        //We don't want to do fow, when we don't want it.
-			if ( TheMap.NoFogOfWar ) {
-			  break;
-			}
 		    default:		// seen -> seen
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v-1;
 			break;
@@ -607,19 +596,8 @@ global void UpdateFogOfWarChange(void)
 	w=TheMap.Width;
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
-#ifdef NEW_FOW
-		if( IsTileVisible(ThisPlayer,x,y) ) {
-		    int p;
-
-		    for( p=0; p<PlayerMax; ++p ) {
-			if(TheMap.Fields[x+y*w].Visible[p]<2 ) {
-			    TheMap.Fields[x+y*w].Visible[p]=2;
-			} else {
-			    TheMap.Fields[x+y*w].Visible[p]++;
-			}
-		    }
-#else
 		if( IsMapFieldExplored(x,y) ) {
+#ifndef NEW_FOW
 		    TheMap.Visible[0][(x+y*w)/32] |= 1<<((x+y*w)%32);
 #endif
 		    MapMarkSeenTile( x,y );
@@ -627,40 +605,6 @@ global void UpdateFogOfWarChange(void)
 	    }
 	}
     }
-#ifdef NEW_FOW
-    else {
-	int p;
-	int numunits;
-	Unit* units[UnitMax];
-
-	for( y=0; y<TheMap.Height; y++ ) {
-	    for( x=0; x<TheMap.Width; ++x ) {
-		for( p=0; p<PlayerMax; ++p ) {
-		    if( TheMap.Fields[x+y*TheMap.Width].Visible[p] ) {
-			TheMap.Fields[x+y*TheMap.Width].Visible[p]=1;
-		    }
-		}
-	    }
-	}
-	for( y=0; y<TheMap.Height; y++ ) {
-	    for( x=0; x<TheMap.Width; ++x ) {
-		// Find and Mark each unit
-		numunits = SelectUnitsOnTile(x,y,units);
-		--numunits;
-		while( numunits>=0 ) {
-		    int tx;
-		    int ty;
-
-		    tx=units[numunits]->X+units[numunits]->Type->TileWidth/2;
-		    ty=units[numunits]->Y+units[numunits]->Type->TileHeight/2;
-		    MapMarkSight(units[numunits]->Player,tx,ty,
-			units[numunits]->Stats->SightRange);
-		    --numunits;
-		}
-	    }
-	}
-    }
-#endif
     MarkDrawEntireMap();
 }
 
@@ -1853,7 +1797,6 @@ global void VideoDrawOnlyFogAlphaOpenGL(
 */
 local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 {
-#ifdef NEW_FOW
     int w;
     int tile;
     int tile2;
@@ -1870,66 +1813,66 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     //
     if( sy ) {
 	if( sx!=sy ) {
-	    if( IsTileVisible(ThisPlayer,x-1,y-1) == 0 ) {
+	    if( !IsMapFieldExplored(x-1,y-1) ) {
 		tile2|=2;
 		tile|=2;
-	    } else if( IsTileVisible(ThisPlayer,x-1,y-1) == 1) {
+	    } else if( !IsMapFieldVisible(x-1,y-1) ) {
 		tile|=2;
 	    }
 	}
-	if( !(IsTileVisible(ThisPlayer,x,y-1)) ) {
+	if( !IsMapFieldExplored(x,y-1) ) {
 	    tile2|=3;
 	    tile|=3;
-	} else if( (IsTileVisible(ThisPlayer,x,y-1)) == 1) {
+	} else if( !IsMapFieldVisible(x,y-1) ) {
 	    tile|=3;
 	}
 	if( sx!=sy+w-1 ) {
-	    if( !(IsTileVisible(ThisPlayer,x+1,y-1)) ) {
+	    if( !IsMapFieldExplored(x+1,y-1) ) {
 		tile2|=1;
 		tile|=1;
-	    } else if( (IsTileVisible(ThisPlayer,x+1,y-1) == 1)) {
+	    } else if( !IsMapFieldVisible(x+1,y-1) ) {
 		tile|=1;
 	    }
 	}
     }
 
     if( sx!=sy ) {
-	if( !(IsTileVisible(ThisPlayer,x-1,y)) ) {
+	if( !IsMapFieldExplored(x-1,y) ) {
 	    tile2|=10;
 	    tile|=10;
-	} else if( (IsTileVisible(ThisPlayer,x-1,y) == 1)) {
+	} else if( !IsMapFieldVisible(x-1,y) ) {
 	    tile|=10;
 	}
     }
     if( sx!=sy+w-1 ) {
-	if( !(IsTileVisible(ThisPlayer,x+1,y)) ) {
+	if( !IsMapFieldExplored(x+1,y) ) {
 	    tile2|=5;
 	    tile|=5;
-	} else if( (IsTileVisible(ThisPlayer,x+1,y) == 1 ) ) {
+	} else if( !IsMapFieldVisible(x+1,y) ) {
 	    tile|=5;
 	}
     }
 
     if( sy+w<TheMap.Height*w ) {
 	if( sx!=sy ) {
-	    if( !(IsTileVisible(ThisPlayer,x-1,y+1)) ) {
+	    if( !IsMapFieldExplored(x-1,y+1) ) {
 		tile2|=8;
 		tile|=8;
-	    } else if( (IsTileVisible(ThisPlayer,x-1,y+1) == 1) ) {
+	    } else if( !IsMapFieldVisible(x-1,y+1) ) {
 		tile|=8;
 	    }
 	}
-	if( !(IsTileVisible(ThisPlayer,x,y+1)) ) {
+	if( !IsMapFieldExplored(x,y+1) ) {
 	    tile2|=12;
 	    tile|=12;
-	} else if( (IsTileVisible(ThisPlayer,x,y+1) == 1) ) {
+	} else if( !IsMapFieldVisible(x,y+1) ) {
 	    tile|=12;
 	}
 	if( sx!=sy+w-1 ) {
-	    if( !(IsTileVisible(ThisPlayer,x+1,y+1)) ) {
+	    if( !IsMapFieldExplored(x+1,y+1) ) {
 		tile2|=4;
 		tile|=4;
-	    } else if( (IsTileVisible(ThisPlayer,x+1,y+1) == 1) ) {
+	    } else if( !IsMapFieldVisible(x+1,y+1) ) {
 		tile|=4;
 	    }
 	}
@@ -1947,7 +1890,7 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	    tile=0;
 	}
     }
-    if( IsTileVisible(ThisPlayer,x,y) > 1 ) {
+    if( IsMapFieldVisible(x,y) ) {
 	if( tile ) {
 	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
 //	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
@@ -1956,112 +1899,7 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	}
     } else {
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
-    }
-    
-#else
-    int w;
-    int tile;
-    int tile2;
-
-    w=TheMap.Width;
-    tile=tile2=0;
-    //
-    //	Check each field around it
-    //
-    if( sy ) {
-	if( sx!=sy ) {
-	    if( !(TheMap.Fields[sx-w-1].Flags&MapFieldExplored) ) {
-		tile2|=2;
-		tile|=2;
-	    } else if( !(TheMap.Visible[0][(sx-w-1)/32]&(1<<((sx-w-1)%32)) ) ) {
-		tile|=2;
-	    }
-	}
-	if( !(TheMap.Fields[sx-w].Flags&MapFieldExplored) ) {
-	    tile2|=3;
-	    tile|=3;
-	} else if( !(TheMap.Visible[0][(sx-w)/32]&(1<<((sx-w)%32)) ) ) {
-	    tile|=3;
-	}
-	if( sx!=sy+w-1 ) {
-	    if( !(TheMap.Fields[sx-w+1].Flags&MapFieldExplored) ) {
-		tile2|=1;
-		tile|=1;
-	    } else if( !(TheMap.Visible[0][(sx-w+1)/32]&(1<<((sx-w+1)%32)) ) ) {
-		tile|=1;
-	    }
-	}
-    }
-
-    if( sx!=sy ) {
-	if( !(TheMap.Fields[sx-1].Flags&MapFieldExplored) ) {
-	    tile2|=10;
-	    tile|=10;
-	} else if( !(TheMap.Visible[0][(sx-1)/32]&(1<<((sx-1)%32)) ) ) {
-	    tile|=10;
-	}
-    }
-    if( sx!=sy+w-1 ) {
-	if( !(TheMap.Fields[sx+1].Flags&MapFieldExplored) ) {
-	    tile2|=5;
-	    tile|=5;
-	} else if( !(TheMap.Visible[0][(sx+1)/32]&(1<<((sx+1)%32)) ) ) {
-	    tile|=5;
-	}
-    }
-
-    if( sy+w<TheMap.Height*w ) {
-	if( sx!=sy ) {
-	    if( !(TheMap.Fields[sx+w-1].Flags&MapFieldExplored) ) {
-		tile2|=8;
-		tile|=8;
-	    } else if( !(TheMap.Visible[0][(sx+w-1)/32]&(1<<((sx+w-1)%32)) ) ) {
-		tile|=8;
-	    }
-	}
-	if( !(TheMap.Fields[sx+w].Flags&MapFieldExplored) ) {
-	    tile2|=12;
-	    tile|=12;
-	} else if( !(TheMap.Visible[0][(sx+w)/32]&(1<<((sx+w)%32)) ) ) {
-	    tile|=12;
-	}
-	if( sx!=sy+w-1 ) {
-	    if( !(TheMap.Fields[sx+w+1].Flags&MapFieldExplored) ) {
-		tile2|=4;
-		tile|=4;
-	    } else if( !(TheMap.Visible[0][(sx+w+1)/32]&(1<<((sx+w+1)%32))) ) {
-		tile|=4;
-	    }
-	}
-    }
-
-    //TheMap.Fields[sx].VisibleLastFrame=0;
-    //
-    //	Draw unexplored area
-    //	If only partly or total invisible draw fog of war.
-    //
-    tile=FogTable[tile];
-    tile2=FogTable[tile2];
-    if( tile2) {
-	VideoDrawUnexplored(TheMap.Tiles[tile2],dx,dy);
-	if( tile2==tile ) {		// no same fog over unexplored
-//	    if( tile != 0xf ) {
-//		TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
-//	    }
-	    tile=0;
-	}
-    }
-    if( TheMap.Visible[0][sx/32]&(1<<(sx%32)) ) {
-	if( tile ) {
-	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
-//	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
-//	} else {
-//	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldCompletelyVisible;
-	}
-    } else {
-	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
-    }
-#endif
+    }   
 }
 
 #ifdef HIERARCHIC_PATHFINDER
