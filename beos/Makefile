@@ -22,4 +22,7 @@ include $(TOPDIR)/Rules.make
 MODULE	= beos
 OBJS	= beos.$(OE)
 
+distlist::
+	@echo src/$(MODULE)/beos.cpp >>$(DISTLIST)
+
 include $(TOPDIR)/Common.mk
