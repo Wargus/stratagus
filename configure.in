@@ -3,26 +3,32 @@ AC_INIT(configure.in)
 AC_PREREQ([2.50])
 dnl AC_CANONICAL_TARGET
 
+EXE=
+OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
+OE=o
+OBJDIR=obj
 if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
     WIN32=1
     EXE=.exe
     OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
     ARCH=win32
-    OE=o
     OBJDIR=winobj
+    PLATFORM="-DUSE_WIN32"
+elif test "`uname -a | grep -is bsd`"; then
+    ARCH=bsd
+    PLATFORM="-DBSD"
+elif test "`uname -a | grep -is beos`"; then
+    ARCH=beos
+    PLATFORM="-DUSE_BEOS"
 else
-    WIN32=0
-    EXE=
-    OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
     ARCH=linux
-    OE=o
-    OBJDIR=obj
 fi
 AC_SUBST(EXE)
 AC_SUBST(OUTFILE)
 AC_SUBST(ARCH)
 AC_SUBST(OE)
 AC_SUBST(OBJDIR)
+AC_SUBST(PLATFORM)
 
 AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))
 AC_CHECK_HEADERS(png.h,, AC_MSG_ERROR(could not find png.h))
