@@ -125,6 +125,9 @@ local SCM	ProtectedCellValues[16384];
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_LUA
+/**
+**  FIXME: docu
+*/
 local void lstop(lua_State *l, lua_Debug *ar)
 {
 	(void)ar;  // unused arg.
@@ -132,6 +135,9 @@ local void lstop(lua_State *l, lua_Debug *ar)
 	luaL_error(l, "interrupted!");
 }
 
+/**
+**  FIXME: docu
+*/
 local void laction(int i)
 {
 	// if another SIGINT happens before lstop,
@@ -140,6 +146,9 @@ local void laction(int i)
 	lua_sethook(Lua, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
+/**
+**  FIXME: docu
+*/
 local void l_message(const char *pname, const char *msg)
 {
 	if (pname) {
@@ -149,6 +158,13 @@ local void l_message(const char *pname, const char *msg)
 	exit(1);
 }
 
+/**
+**  FIXME: docu
+**
+**  @param status  FIXME: docu
+**
+**  @return        FIXME: docu
+*/
 local int report(int status)
 {
 	const char* msg;
@@ -165,30 +181,36 @@ local int report(int status)
 }
 
 /**
-**		Call a lua function
+**  Call a lua function
 **
-**		@param narg		Number of arguments
-**		@param clear		Clear the return value(s)
+**  @param narg   Number of arguments
+**  @param clear  Clear the return value(s)
+**
+**  @return       FIXME: docu
 */
 global int LuaCall(int narg, int clear)
 {
 	int status;
 	int base;
 
-	base = lua_gettop(Lua) - narg;  /* function index */
+	base = lua_gettop(Lua) - narg;      // function index
 	lua_pushliteral(Lua, "_TRACEBACK");
-	lua_rawget(Lua, LUA_GLOBALSINDEX);  /* get traceback function */
-	lua_insert(Lua, base);  /* put it under chunk and args */
+	lua_rawget(Lua, LUA_GLOBALSINDEX);  // get traceback function
+	lua_insert(Lua, base);              // put it under chunk and args
 	signal(SIGINT, laction);
 	status = lua_pcall(Lua, narg, (clear ? 0 : LUA_MULTRET), base);
 	signal(SIGINT, SIG_DFL);
-	lua_remove(Lua, base);  /* remove traceback function */
+	lua_remove(Lua, base);              // remove traceback function
 
 	return report(status);
 }
 
 /**
-**		Load a file and execute it
+**  Load a file and execute it
+**
+**  @param file  File to load and execute
+**
+**  @return      FIXME: docu
 */
 global int LuaLoadFile(const char* file)
 {
@@ -202,6 +224,9 @@ global int LuaLoadFile(const char* file)
 	return status;
 }
 
+/**
+**  FIXME: docu
+*/
 local int CclLoad(lua_State* l)
 {
 	char buf[1024];
@@ -215,18 +240,27 @@ local int CclLoad(lua_State* l)
 	return 0;
 }
 
+/**
+**  FIXME: docu
+*/
 global const char* LuaToString(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TSTRING);
 	return lua_tostring(l, narg);
 }
 
+/**
+**  FIXME: docu
+*/
 global lua_Number LuaToNumber(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TNUMBER);
 	return lua_tonumber(l, narg);
 }
 
+/**
+**  FIXME: docu
+*/
 global int LuaToBoolean(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TBOOLEAN);
