@@ -582,6 +582,28 @@ char* LibraryFileName(const char* file, char* buffer)
 		return buffer;
 	}
 #endif
+
+	// 
+	// Support for graphics in default graphics dir.
+	// They could be anywhere now, but check if they haven't
+	// got full paths.
+	//
+	sprintf(buffer, "%s/graphics/%s", StratagusLibPath, file);
+	if (!access(buffer, R_OK)) {
+		return buffer;
+	}
+#ifdef USE_ZLIB // gzip or bzip2 in global shared directory
+	sprintf(buffer, "%s/graphics/%s.gz", StratagusLibPath, file);
+	if (!access(buffer, R_OK)) {
+		return buffer;
+	}
+#endif
+#ifdef USE_BZ2LIB
+	sprintf(buffer, "%s/graphics/%s.bz2", StratagusLibPath, file);
+	if (!access(buffer, R_OK)) {
+		return buffer;
+	}
+#endif
 	DebugPrint("File `%s' not found\n" _C_ file);
 
 	strcpy(buffer, file);
