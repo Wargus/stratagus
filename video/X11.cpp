@@ -132,8 +132,8 @@ global void SetVideoSync(void)
 	fprintf(stderr,"Can't set itimer\n");
     }
 
-    DebugLevel3("Timer installed %ld,%ld\n",
-	itv.it_interval.tv_sec,itv.it_interval.tv_usec);
+    DebugLevel3("Timer installed %ld,%ld\n" _C_
+	itv.it_interval.tv_sec _C_ itv.it_interval.tv_usec);
 }
 
 #else

@@ -1791,7 +1791,7 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	mv=sx;
     }
 
-    DebugLevel1("%ld %ld %3ld\n",(long)sx,mv,(sx*100)/mv);
+    DebugLevel1("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx*100)/mv);
 #endif
 }
 

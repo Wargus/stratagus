@@ -973,10 +973,10 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		n=3-((f-75)/(25/3))+ 0;
 	    } else if( f>50 ) {
 		n=3-((f-50)/(25/3))+ 4;
-		DebugLevel3("%d - %d\n",f,n);
+		DebugLevel3("%d - %d\n" _C_ f _C_ n);
 	    } else {
 		n=3-(f/(50/3))+ 8;
-		DebugLevel3("%d - %d\n",f,n);
+		DebugLevel3("%d - %d\n" _C_ f _C_ n);
 	    }
 #endif
 	    DebugCheck( n<0 );

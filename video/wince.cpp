@@ -70,7 +70,7 @@
 */
 global void SetVideoSync(void)
 {
-    DebugLevel0Fn("%d\n",(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed);
+    DebugLevel0Fn("%d\n" _C_ (100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed);
 }
 
 /*----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ global void InitVideoSdl(void)
     VideoBpp=16;
     VideoDepth=16;
 
-    DebugLevel3Fn("Video init ready %d %d\n",VideoDepth,VideoBpp);
+    DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 }
 
 /**

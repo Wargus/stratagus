@@ -172,7 +172,7 @@ global void SetVideoSync(void)
 
     FrameTicks = ms / 10;
     FrameRemainder = ms % 10;
-    DebugLevel0Fn("frames %d - %d.%dms\n", SkipFrames, ms / 10, ms % 10);
+    DebugLevel0Fn("frames %d - %d.%dms\n" _C_ SkipFrames _C_ ms / 10 _C_ ms % 10);
 }
 
 #endif
