@@ -530,8 +530,6 @@ extern int ViewPointDistanceToMissile(const Missile*);
 	/// Get the burning building missile based on hp percent
 extern MissileType* MissileBurningBuilding(int percent);
 
-	/// Save missile-types
-extern void SaveMissileTypes(CLFile*);
 	/// Save missiles
 extern void SaveMissiles(CLFile*);
 

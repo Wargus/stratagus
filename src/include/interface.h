@@ -305,9 +305,6 @@ extern int AddButton(int pos, int level, const char* IconIdent,
 		const ButtonCheckFunc func, const void* arg,
 		int key, const char* hint, const char* umask);
 
-	/// Save all buttons
-extern void SaveButtons(CLFile* file);
-
 //
 // in mouse.c
 //

@@ -287,20 +287,9 @@ global void SaveGame(const char* filename)
 	CLprintf(file, "SetGameCycle(%lu)\n", GameCycle);
 
 	SaveCcl(file);
-//	SaveIcons(file);
-//	SaveCursors(file);
 	SaveUserInterface(file);
-//	SaveTilesets(file);
-//	SaveConstructions(file);
-//	SaveDecorations(file);
-//	SaveMissileTypes(file);
-//	SaveFlags(file);
-//	SaveUnitTypeDefs(file);
-//	SaveSpells(file);
 	SaveUnitTypes(file);
 	SaveUpgrades(file);
-//	SaveDependencies(file);
-//	SaveButtons(file);
 	SavePlayers(file);
 	SaveMap(file);
 	SaveUnits(file);

@@ -804,8 +804,6 @@ extern UnitType* UnitTypeByWcNum(unsigned);     /// Get unit-type by wc number
 	/// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
 
-extern void SaveFlags(CLFile* file);            /// Save declaration of user defined flas.
-extern void SaveUnitTypeDefs(CLFile* file);     /// Declare the unit-type table first.
 extern void SaveUnitTypes(CLFile* file);        /// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);        /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
