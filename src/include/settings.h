@@ -89,7 +89,7 @@ struct _settings_ {
 /*
 **	GameType settings
 */
-enum {
+enum _game_types_ {
     SettingsGameTypeMapDefault=SettingsPresetMapDefault,
     SettingsGameTypeMelee=0,
     SettingsGameTypeFreeForAll,
@@ -102,7 +102,7 @@ enum {
     SettingsGameTypeTeamCaptureTheFlag,
     SettingsGameTypeTopVsBottom,
     SettingsGameTypeLeftVsRight,
-} GameTypes;
+};
 
 
 // ----------------------------------------------------------------------------
