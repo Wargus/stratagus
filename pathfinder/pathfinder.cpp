@@ -281,7 +281,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		    *m=n;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-		    if( ++wp>=size ) {// round about
+		    if( ++wp>=size ) {		// round about
 			wp=0;
 		    }
 		} else {			// unreachable
@@ -289,7 +289,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		}
 	    }
 
-	    if( ++rp>=size ) {// round about
+	    if( ++rp>=size ) {			// round about
 		rp=0;
 	    }
 	}
