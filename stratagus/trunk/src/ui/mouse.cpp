@@ -1141,6 +1141,7 @@ global void UIHandleButtonDown(unsigned button)
 	    } else if( ButtonUnderCursor>3 && ButtonUnderCursor<10 ) {
 		if( NumSelected==1 && Selected[0]->Type->Transporter ) {
 		    if( Selected[0]->OnBoard[ButtonUnderCursor-4] ) {
+			// FIXME: should check if valid here.
 			SendCommandUnload(Selected[0]
 				,Selected[0]->X,Selected[0]->Y
 				,Selected[0]->OnBoard[ButtonUnderCursor-4]
