@@ -639,7 +639,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #endif
 
 	    //
-	    //	Not more input and network in syn and time for frame over
+	    //	Not more input and network in sync and time for frame over
 	    //
 	    if( !i && NetworkInSync && VideoInterrupts ) {
 		break;
