@@ -122,6 +122,7 @@ local void EnterServerIPCancel(void);
 
 local void EnterSaveGameAction(Menuitem *mi, int key);
 local void SaveAction(void);
+local void CreateSaveDir(Menuitem *mi);
 
 local void SaveSelectLBExit(Menuitem *mi);
 local void SaveSelectLBInit(Menuitem *mi);
@@ -1433,7 +1434,7 @@ local void InitKeystrokeHelpMenuItems() {
 }
 
 local Menuitem SaveGameMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
     { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveSelectLBInit, SaveSelectLBExit, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
@@ -2319,10 +2320,13 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
     }
 }
 
+local char *SaveDir;
+
 local void SaveAction(void)
 {
     char *filename;
     char *prefix = SaveGameMenuItems[1].d.input.buffer;
+    char name[1024];
     size_t prefixLength;
 
     prefixLength = strlen(prefix);
@@ -2335,12 +2339,28 @@ local void SaveAction(void)
         return;
     }
     memcpy(filename, prefix, prefixLength);
-    SaveGame(filename);
-    SetMessage("Saved game to: %s", filename);
 
-    free(filename);
+    SetMessage("Saved game to: %s", name);
+    strcat(name, SaveDir);
+    strcat(name, "/");
+    strncat(name, prefix, strlen(prefix)-3);
+    SaveGame(name);
+
+    free(name);
 
     EndMenu();
+}
+
+
+
+local void CreateSaveDir(Menuitem *mi)
+{
+#ifdef USE_WIN32
+SaveDir="save";
+#else
+SaveDir="$HOME/.freecraft/save";
+#endif
+mkdir(SaveDir);
 }
 
 local void GameMenuSave(void)
@@ -2378,7 +2398,7 @@ local void SaveSelectLBInit(Menuitem *mi)
     } else {
 	ScenSelectMenuItems[8].flags &= ~MenuButtonDisabled;
     }
-    i = mi->d.listbox.noptions = ReadDataDirectory("data", NULL,
+    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, NULL,
 						     (FileList **)&(mi->d.listbox.options));
     if (i == 0) {
 	ScenSelectMenuItems[3].d.button.text = "OK";
