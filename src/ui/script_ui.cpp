@@ -1475,9 +1475,8 @@ local SCM CclDefineMenu(SCM list)
 **
 **	FIXME: need some general data structure to make this parsing easier.
 **
-**	@param list	List describing the menu item.
+**	@param value	Button type.
 */
-
 local MenuButtonId scm2buttonid(SCM value)
 {
     MenuButtonId id;
