@@ -483,6 +483,152 @@ local SCM CclAiWait(SCM value)
     return SCM_BOOL_T;
 }
 
+/**
+**	Define a force, a groups of units.
+**
+**	@param list	Pairs of unit-types and counts.
+*/
+local SCM CclAiForce(SCM list)
+{
+    AiUnitType** prev;
+    AiUnitType* aiut;
+    UnitType* type;
+    int count;
+    int force;
+
+    printf("Force: ");
+    gh_display(list);
+    gh_newline();
+
+    force=gh_scm2int(gh_car(list));
+    if( force<0 || force>=AI_MAX_FORCES ) {
+	errl("Force out of range",gh_car(list));
+    }
+    list=gh_cdr(list);
+
+    while( !gh_null_p(list) ) {
+	type=CclGetUnitType(gh_car(list));
+	list=gh_cdr(list);
+	count=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+
+	//
+	//	Look if already in force.
+	//
+	for( prev=&AiPlayer->Force[force].UnitTypes; (aiut=*prev);
+		prev=&aiut->Next ) {
+	    if( aiut->Type==type ) {	// found
+		if( count ) {
+		    aiut->Want=count;
+		} else {
+		    *prev=aiut->Next;
+		    free(aiut);
+		}
+		break;
+	    }
+	}
+
+	//
+	//	New type append it.
+	//
+	if( !aiut ) {
+	    *prev=aiut=malloc(sizeof(*aiut));
+	    aiut->Next=NULL;
+	    aiut->Want=count;
+	    aiut->Type=type;
+	}
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Wait for a force ready.
+**
+**	@param value	Force number.
+*/
+local SCM CclAiWaitForce(SCM value)
+{
+    int force;
+
+    printf("Wait-Force: ");
+    gh_display(value);
+    gh_newline();
+
+    force=gh_scm2int(value);
+    if( force<0 || force>=AI_MAX_FORCES ) {
+	errl("Force out of range",value);
+    }
+    if( AiPlayer->Force[force].Completed ) {
+	return SCM_BOOL_F;
+    }
+
+    return SCM_BOOL_T;
+}
+
+/**
+**	Attack with force.
+**
+**	@param value	Force number.
+*/
+local SCM CclAiAttackWithForce(SCM value)
+{
+    printf("Attack: ");
+    gh_display(value);
+    gh_newline();
+    // FIXME: more later!
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Sleep n frames.
+**
+**	@param value	Number of frames to delay.
+*/
+local SCM CclAiSleep(SCM value)
+{
+    static int fc;
+    int i;
+
+    printf("Sleep: ");
+    gh_display(value);
+    printf(" %d %d",fc,FrameCounter);
+    gh_newline();
+
+    i=gh_scm2int(value);
+    if( fc ) {
+	if( fc<FrameCounter ) {
+	    fc=0;
+	    return SCM_BOOL_F;
+	}
+    } else {
+	fc=FrameCounter+i;
+    }
+
+    return SCM_BOOL_T;
+}
+
+/**
+**	Research an upgrade.
+**
+**	@param value	Upgrade as string/symbol/object.
+*/
+local SCM CclAiResearch(SCM value)
+{
+    return SCM_BOOL_F;
+}
+
+/**
+**	Upgrade an unit to an new unit-type.
+**
+**	@param value	Unit-type as string/symbol/object.
+*/
+local SCM CclAiUpgradeTo(SCM value)
+{
+    return SCM_BOOL_F;
+}
+
 #else
 
 /**
@@ -519,6 +665,12 @@ global void AiCclRegister(void)
     gh_new_procedure1_0("ai:need",CclAiNeed);
     gh_new_procedure2_0("ai:set",CclAiSet);
     gh_new_procedure1_0("ai:wait",CclAiWait);
+    gh_new_procedureN("ai:force",CclAiForce);
+    gh_new_procedure1_0("ai:wait-force",CclAiWaitForce);
+    gh_new_procedure1_0("ai:attack-with-force",CclAiAttackWithForce);
+    gh_new_procedure1_0("ai:sleep",CclAiSleep);
+    gh_new_procedure1_0("ai:research",CclAiResearch);
+    gh_new_procedure1_0("ai:upgrade-to",CclAiUpgradeTo);
 #endif
 
 }

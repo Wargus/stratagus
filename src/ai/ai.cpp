@@ -76,7 +76,8 @@ local void AiExecuteScript(void)
 local void AiCheckUnits(void)
 {
     int counter[UnitTypeMax];
-    AiBuildQueue* queue;
+    const AiBuildQueue* queue;
+    const int* unit_types_count;
     int i;
     int n;
     int t;
@@ -91,6 +92,7 @@ local void AiCheckUnits(void)
 	DebugLevel0Fn("Already in build queue: %s %d/%d\n" _C_
 		queue->Type->Ident _C_ queue->Made _C_ queue->Want);
     }
+    unit_types_count=AiPlayer->Player->UnitTypesCount;
 
     //
     //	Look if something is missing.
@@ -99,14 +101,35 @@ local void AiCheckUnits(void)
     for( i=0; i<n; ++i ) {
 	t=AiPlayer->UnitTypeRequests[i].Table[0]->Type;
 	x=AiPlayer->UnitTypeRequests[i].Count;
-	if( x>AiPlayer->Player->UnitTypesCount[t]+counter[t] ) {
-	    DebugLevel0Fn("Need %s\n" _C_
-		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
-	    // Request it.
+	if( x>unit_types_count[t]+counter[t] ) {	// Request it.
+	    DebugLevel0Fn("Need %s *%d\n" _C_
+		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident,x);
 	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
-		    x-AiPlayer->Player->UnitTypesCount[t]-counter[t]);
+		    x-unit_types_count[t]-counter[t]);
+	    counter[t]+=x-unit_types_count[t]-counter[t];
 	}
-	counter[t]+=x;
+	counter[t]-=x;
+    }
+
+    //
+    //	Look through the forces what is missing.
+    //
+    for( i=0; i<AI_MAX_FORCES; ++i ) {
+	const AiUnitType* aiut;
+
+	for( aiut=AiPlayer->Force[i].UnitTypes; aiut; aiut=aiut->Next ) {
+	    t=aiut->Type->Type;
+	    x=aiut->Want;
+	    if( x>unit_types_count[t]+counter[t] ) {	// Request it.
+		DebugLevel0Fn("Force %d need %s * %d\n" _C_ i _C_
+			aiut->Type->Ident,x);
+		AiAddUnitTypeRequest(aiut->Type,
+			x-unit_types_count[t]-counter[t]);
+		counter[t]+=x-unit_types_count[t]-counter[t];
+		AiPlayer->Force[i].Completed=0;
+	    }
+	    counter[t]-=x;
+	}
     }
 }
 
@@ -147,6 +170,60 @@ global void AiInit(Player* player)
 }
 
 /*----------------------------------------------------------------------------
+--	Support functions
+----------------------------------------------------------------------------*/
+
+/**
+**	Remove unit-type from build list.
+**
+**	@param pai	Computer AI player.
+**	@param type	Unit-type which is now available.
+*/
+local void AiRemoveFromBuilded(PlayerAi* pai,const UnitType* type)
+{
+    AiBuildQueue** queue;
+    AiBuildQueue* next;
+
+    //
+    //	Search the unit-type order.
+    //
+    for( queue=&pai->UnitTypeBuilded; (next=*queue); queue=&next->Next ) {
+	DebugCheck( !next->Want );
+	if( type==next->Type && next->Made ) {
+	    if( !--next->Want ) {
+		*queue=next->Next;
+		free(next);
+	    }
+	    --next->Made;
+	    return;
+	}
+    }
+    DebugCheck( 1 );
+}
+
+/**
+**	Reduce made unit-type from build list.
+**
+**	@param pai	Computer AI player.
+**	@param type	Unit-type which is now available.
+*/
+local void AiReduceMadeInBuilded(const PlayerAi* pai,const UnitType* type)
+{
+    AiBuildQueue* queue;
+
+    //
+    //	Search the unit-type order.
+    //
+    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
+	if( type==queue->Type && queue->Made ) {
+	    queue->Made--;
+	    return;
+	}
+    }
+    DebugCheck( 1 );
+}
+
+/*----------------------------------------------------------------------------
 --	Callback Functions
 ----------------------------------------------------------------------------*/
 
@@ -154,11 +231,11 @@ global void AiInit(Player* player)
 **	Called if a Unit is Attacked
 **
 **	@param unit	Pointer to unit that is being attacked.
-**
 */
 global void AiHelpMe(Unit* unit)
 {
-    DebugLevel0Fn("%d %d" _C_ unit->X _C_ unit->Y);
+    DebugLevel0Fn("%d(%s) attacked at %d,%d" _C_
+	    UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 }
 
 /**
@@ -169,30 +246,13 @@ global void AiHelpMe(Unit* unit)
 */
 global void AiWorkComplete(Unit* unit,Unit* what)
 {
-    AiBuildQueue** queue;
-    AiBuildQueue* next;
-    PlayerAi* pai;
-
-    DebugLevel1Fn("AiPlayer %d: %d build %s at %d,%d completed\n" _C_
-	    unit->Player->Player _C_ UnitNumber(unit), what->Type->Ident _C_
-	    unit->X _C_ unit->Y);
+    DebugLevel1Fn("AiPlayer %d: %d(%s) build %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Type->Ident _C_ unit->X _C_ unit->Y);
 
     DebugCheck(unit->Player->Type == PlayerHuman);
 
-    //
-    //	Search the unit-type order.
-    //
-    pai=unit->Player->Ai;
-    for( queue=&pai->UnitTypeBuilded; (next=*queue); queue=&next->Next ) {
-	if( what->Type==next->Type && next->Want && next->Made ) {
-	    if( next->Want==next->Made ) {
-		*queue=next->Next;
-		free(next);
-	    }
-	    return;
-	}
-    }
-    DebugCheck( 1 );
+    AiRemoveFromBuilded(unit->Player->Ai,what->Type);
 }
 
 /**
@@ -203,26 +263,13 @@ global void AiWorkComplete(Unit* unit,Unit* what)
 */
 global void AiCanNotBuild(Unit* unit,const UnitType* what)
 {
-    AiBuildQueue* queue;
-    const PlayerAi* pai;
-
     DebugLevel1Fn("AiPlayer %d: %d Can't build %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit), what->Ident _C_
 	    unit->X _C_ unit->Y);
 
     DebugCheck(unit->Player->Type == PlayerHuman);
 
-    //
-    //	Search the unit-type order.
-    //
-    pai=unit->Player->Ai;
-    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
-	if( what==queue->Type && queue->Made ) {
-	    queue->Made--;
-	    return;
-	}
-    }
-    DebugCheck( 1 );
+    AiReduceMadeInBuilded(unit->Player->Ai,what);
 }
 
 /**
@@ -233,60 +280,33 @@ global void AiCanNotBuild(Unit* unit,const UnitType* what)
 */
 global void AiCanNotReach(Unit* unit,const UnitType* what)
 {
-    AiBuildQueue* queue;
-    const PlayerAi* pai;
-
-    DebugLevel1Fn("AiPlayer %d: %d Can't reach %s at %d,%d\n" _C_
-	    unit->Player->Player _C_ UnitNumber(unit), what->Ident _C_
-	    unit->X _C_ unit->Y);
+    DebugLevel1Fn("AiPlayer %d: %d(%s) Can't reach %s at %d,%d\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Ident _C_ unit->X _C_ unit->Y);
 
     DebugCheck(unit->Player->Type == PlayerHuman);
 
-    //
-    //	Search the unit-type order.
-    //
-    pai=unit->Player->Ai;
-    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
-	if( what==queue->Type && queue->Made ) {
-	    queue->Made--;
-	    return;
-	}
-    }
-    DebugCheck( 1 );
+    AiReduceMadeInBuilded(unit->Player->Ai,what);
 }
 
 /**
 **	Called if training of an unit is completed.
 **
-**	@param unit	Pointer to unit.
-**	@param what	Pointer to type.
+**	@param unit	Pointer to unit making.
+**	@param what	Pointer to new ready trained unit.
 */
 global void AiTrainingComplete(Unit* unit,Unit* what)
 {
-    AiBuildQueue** queue;
-    AiBuildQueue* next;
-    PlayerAi* pai;
-
-    DebugLevel1Fn("AiPlayer %d: %d training %s at %d,%d completed\n" _C_
-	    unit->Player->Player _C_ UnitNumber(unit), what->Type->Ident _C_
-	    unit->X _C_ unit->Y);
+    DebugLevel1Fn("AiPlayer %d: %d(%s) training %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Type->Ident _C_ unit->X _C_ unit->Y);
 
     DebugCheck(unit->Player->Type == PlayerHuman);
 
-    //
-    //	Search the unit-type order.
-    //
-    pai=unit->Player->Ai;
-    for( queue=&pai->UnitTypeBuilded; (next=*queue); queue=&next->Next ) {
-	if( what->Type==next->Type && next->Want && next->Made ) {
-	    if( next->Want==next->Made ) {
-		*queue=next->Next;
-		free(next);
-	    }
-	    return;
-	}
-    }
-    DebugCheck( 1 );
+    AiRemoveFromBuilded(unit->Player->Ai,what->Type);
+
+    AiPlayer=unit->Player->Ai;
+    AiAssignToForce(what);
 }
 
 /**

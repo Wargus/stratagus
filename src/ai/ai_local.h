@@ -130,6 +130,33 @@ typedef struct _ai_unittype_table_ {
 } AiUnitTypeTable;
 
 /**
+**	Ai unit-type typedef.
+*/
+typedef struct _ai_unit_type_ AiUnitType;
+
+/**
+**	Ai unit-type in a force.
+*/
+struct _ai_unit_type_ {
+    AiUnitType*	Next;			/// next unit-type
+    int		Want;			/// number of this unit-type wanted
+    UnitType*	Type;			/// unit-type self
+};
+
+/**
+**	Ai unit typedef.
+*/
+typedef struct _ai_unit_ AiUnit;
+
+/**
+**	Ai unit in a force.
+*/
+struct _ai_unit_ {
+    AiUnit*	Next;			/// next unit
+    Unit*	Unit;			/// unit self
+};
+
+/**
 **	AI force typedef.
 */
 typedef struct _ai_force_ AiForce;
@@ -140,7 +167,10 @@ typedef struct _ai_force_ AiForce;
 **	A force is a group of units belonging together.
 */
 struct _ai_force_ {
-    AiUnitTypeTable	UnitTypeTable;	/// Count and types of unit-type
+    int 		Completed;	/// Flag saying force is complete build
+    int			Attacking;	/// Flag saying force is attacking
+    AiUnitType*		UnitTypes;	/// Count and types of unit-type
+    AiUnit*		Units;		/// Units in the force.
 };
 
 /**
@@ -172,6 +202,10 @@ typedef struct _player_ai_ {
     SCM		Script;			/// Script executed
     int		ScriptDebug;		/// Flag script debuging on/off
 
+    // forces
+#define AI_MAX_FORCES	10		/// How many forces are supported
+    AiForce	Force[AI_MAX_FORCES];	/// Forces controlled by AI.
+
     // resource manager
 
     int		Reserve[MaxCosts];	/// Resources to keep in reserve
@@ -179,10 +213,20 @@ typedef struct _player_ai_ {
     int		Needed[MaxCosts];	/// Needed resources
     int		NeededMask;		/// Mask for needed resources
 
+    int		NeedFood;		/// Flag need food
+
 	/// number of elements in UnitTypeRequests
     int			RequestsCount;
 	/// unit-types to build/train requested and priority list
     AiUnitTypeTable*	UnitTypeRequests;
+	/// number of elements in UpgradeRequests
+    int			UpgradeToRequestsCount;
+	/// Upgrade to unit-type requested and priority list
+    UnitType**		UpgradeToRequests;
+	/// number of elements in ResearchRequests
+    int			ResearchRequestsCount;
+	/// Upgrades requested and priority list
+    Upgrade**		ResearchRequests;
 
 	/// What the resource manager should build
     AiBuildQueue*	UnitTypeBuilded;
@@ -262,6 +306,17 @@ extern void AiAddUnitTypeRequest(UnitType* type,int count);
     /// Periodic called resource manager handler
 extern void AiResourceManager(void);
 
+//
+//	Buildings
+//
+    /// Find nice building place
+extern int AiFindBuildingPlace(const Unit*, const UnitType * , int *, int *);
+
+//
+//	Forces
+//
+    /// Assign a new unit to a force.
+extern void AiAssignToForce(Unit* unit);
 
 //@}
 

@@ -23,6 +23,7 @@ MODULE  = ai
 
 HDRS	= ai_local.h
 
-OBJS	= ai.$(OE) new_ai.$(OE) ccl_ai.$(OE) ai_resource.$(OE)
+OBJS	= ai.$(OE) new_ai.$(OE) ccl_ai.$(OE) ai_resource.$(OE) \
+	  ai_building.$(OE) ai_force.$(OE)
 
 include $(TOPDIR)/Common.mk
