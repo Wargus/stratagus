@@ -498,7 +498,6 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 	int j;
 	unsigned char* data;
 	int x;
-
 	SDL_Color pal[256];
 
 	DebugCheck(g->Surface->format->BytesPerPixel != 1);
@@ -534,6 +533,7 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 
 	g->Width = w;
 	g->Height = h;
+	g->Data = data;
 }
 
 /**
