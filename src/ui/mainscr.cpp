@@ -214,7 +214,9 @@ global void DrawUnitInfo(const Unit* unit)
 		UiDrawLifeBar(unit, x, y);
 
 		if (unit->Player == ThisPlayer ||
-			PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {		// Only for own units.
+			PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
+			PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
+			ReplayRevealMap) {		// Only for own units.
 			if (unit->HP && unit->HP < 10000) {
 				sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
 				VideoDrawTextCentered(x + (type->Icon.Icon->Width + 7) / 2,
@@ -256,7 +258,9 @@ global void DrawUnitInfo(const Unit* unit)
 	//		Show How much a resource has left for owner and neutral.
 	//
 	if (unit->Player == ThisPlayer || unit->Player->Player == PlayerNumNeutral ||
-		PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {
+		PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
+		PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
+		ReplayRevealMap) {
 		if (type->GivesResource) {
 			sprintf(buf, "%s Left:", DefaultResourceNames[type->GivesResource]);
 			VideoDrawText(x + 108 - VideoTextLength(GameFont, buf), y + 8 + 78,
@@ -274,7 +278,8 @@ global void DrawUnitInfo(const Unit* unit)
 	//		Only for owning player.
 	//
 #ifndef DEBUG
-	if (unit->Player != ThisPlayer && !PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {
+	if (unit->Player != ThisPlayer && !PlayersTeamed(ThisPlayer->Player, unit->Player->Player) &&
+		!PlayersAllied(ThisPlayer->Player, unit->Player->Player) && !ReplayRevealMap) {
 		return;
 	}
 #endif
@@ -1142,7 +1147,9 @@ global void DrawInfoPanel(void)
 		} else {
 			// FIXME: not correct for enemies units
 			if (Selected[0]->Player == ThisPlayer ||
-				PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
+				PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player) ||
+				PlayersAllied(ThisPlayer->Player, Selected[0]->Player->Player) ||
+				ReplayRevealMap) {
 				if (Selected[0]->Type->Building &&
 						(Selected[0]->Orders[0].Action == UnitActionBuilded ||
 							Selected[0]->Orders[0].Action == UnitActionResearch ||
