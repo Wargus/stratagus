@@ -55,6 +55,36 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Unit can handle order.
+**
+**  @param unit   Newly trained unit.
+**  @param order  New order for the unit.
+**
+**  @return  1 if the the unit can do it, 0 otherwise.
+*/
+global int CanHandleOrder(Unit* unit, Order* order)
+{
+	if (order->Action == UnitActionResource) {
+		//  Check if new unit can harvest.
+		if (!unit->Type->Harvester) {
+			return 0;
+		}
+		//  Also check if new unit can harvest this specific resource.
+		if (order->Goal && !unit->Type->ResInfo[order->Goal->Type->GivesResource]) {
+			return 0;
+		}
+		return 1;
+	}
+	if (order->Action == UnitActionAttack && !unit->Type->CanAttack) {
+		return 0;
+	}
+	if (order->Action == UnitActionBoard && unit->Type->UnitType != UnitTypeLand) {
+		return 0;
+	}
+	return 1;
+}
+
+/**
 **  Unit trains unit!
 **
 **  @param unit  Unit that trains.
@@ -147,21 +177,12 @@ global void HandleActionTrain(Unit* unit)
 			unit->SubAction = 0;
 		}
 
-		//
-		// FIXME: we must check if the units supports the new order.
-		//
-		if ((unit->NewOrder.Action == UnitActionResource &&
-			!nunit->Type->Harvester) ||
-			(unit->NewOrder.Action == UnitActionAttack &&
-			!nunit->Type->CanAttack) ||
-			(unit->NewOrder.Action == UnitActionBoard &&
-			nunit->Type->UnitType != UnitTypeLand)) {
+		if (!CanHandleOrder(nunit, &unit->NewOrder)) {
 			DebugLevel0Fn("Wrong order for unit\n");
-
 #if 0
 			nunit->Orders[0].Action = UnitActionStandStill;
 #endif
-			// Tell the unit to move instead of trying to harvest
+			// Tell the unit to move instead of trying any funny stuff.
 			nunit->Orders[0] = unit->NewOrder;
 			nunit->Orders[0].Action = UnitActionMove;
 			if (nunit->Orders[0].Goal) {
