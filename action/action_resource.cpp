@@ -223,7 +223,6 @@ local int StartGathering(Unit* unit)
     //	Activate the resource
     goal->Data.Resource.Active++;
 
-    UnitMarkSeen(goal);
     //
     //	Place unit inside the resource
     //
@@ -420,7 +419,6 @@ local int GatherResource(Unit* unit)
 		unit->Value += addload;
 		source->Value -= addload;
 
-		UnitMarkSeen(source);
 		if (IsOnlySelected(source)) {
 		    MustRedraw |= RedrawInfoPanel;
 		}

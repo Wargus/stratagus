@@ -135,6 +135,7 @@ global void RevealMap(void)
     int ix;
     int iy;
 
+    DebugLevel1Fn("\n");
     for (ix = 0; ix < TheMap.Width; ++ix) {
 	for (iy = 0; iy < TheMap.Height; ++iy) {
 	    int i;
@@ -144,7 +145,7 @@ global void RevealMap(void)
 		}
 	    }
 	    MapMarkSeenTile(ix, iy);
-	    UnitsMarkSeen(ix, iy);
+	    //UnitsMarkSeen(ix, iy);
 	}
     }
 }

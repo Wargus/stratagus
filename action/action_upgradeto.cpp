@@ -70,7 +70,6 @@ global void HandleActionUpgradeTo(Unit* unit)
     type = unit->Orders[0].Type;
     stats = &type->Stats[player->Player];
 
-    UnitMarkSeen(unit);
     // FIXME: Should count down here
     unit->Data.UpgradeTo.Ticks += SpeedUpgrade;
     if (unit->Data.UpgradeTo.Ticks >= stats->Costs[TimeCost]) {

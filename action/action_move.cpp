@@ -176,6 +176,11 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	unit->IY = -yd * TileSizeY;
 	unit->Frame = 0;
 	UnitHeadingFromDeltaXY(unit, xd, yd);
+
+	//
+	//	Unit has moved, reference count is screwed.
+	//
+	UnitCountSeen(unit);
     } else {
 	xd = Heading2X[unit->Direction / NextDirection];
 	yd = Heading2Y[unit->Direction / NextDirection];

@@ -1311,7 +1311,7 @@ global void CommandSharedVision(int player, int state, int opponent)
 		for (y = 0; y < TheMap.Height; ++y) {
 		    if (IsMapFieldVisible(ThisPlayer, i, y)) {
 			MapMarkSeenTile(i, y);
-			UnitsMarkSeen(i, y);
+			//UnitsMarkSeen(i, y);
 		    }
 		}
 	    }
@@ -1320,7 +1320,7 @@ global void CommandSharedVision(int player, int state, int opponent)
     // MUST update seen buildings when vision is shared or unshared
     for (i = 0; i < NumUnits; ++i) {
 	unit = Units[i];
-	UnitMarkSeen(unit);
+	UnitCountSeen(unit);
     }
 
 }
