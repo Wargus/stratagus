@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <fcntl.h>
 
 #ifndef _MSC_VER
 #include <signal.h>
