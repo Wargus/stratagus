@@ -1,16 +1,16 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ | 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ai_magic.c	-	AI magic functions. */
+/**@name ai_magic.c - AI magic functions. */
 //
-//      (c) Copyright 2002-2003 by Lutz Sammer, Joris Dauphin
+//      (c) Copyright 2002-2004 by Lutz Sammer, Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,14 +31,13 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "stratagus.h"
-
 #include "unittype.h"
 #include "unit.h"
 #include "spells.h"
@@ -47,46 +46,47 @@
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------
---	Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Check what computer units can do with magic.
-**	In fact, turn on autocast for AI.
+**  Check what computer units can do with magic.
+**  In fact, turn on autocast for AI.
 */
 global void AiCheckMagic(void)
 {
-    int i, j;
-    int n;
-    Unit **units;
-    Unit *unit;
-    const Player *player;
+	int i;
+	int j;
+	int n;
+	Unit** units;
+	Unit* unit;
+	const Player *player;
 #ifdef DEBUG
-    int success;
+	int success;
 #endif
 
-    n = AiPlayer->Player->TotalNumUnits;
-    units = AiPlayer->Player->Units;
-    player = AiPlayer->Player;		/*units[0]->Player */
-    for (i = 0; i < n; ++i) {
-	unit = units[i];
-	//  Check only magic units
-	if (unit->Type->CanCastSpell) {
-	    for (j = 0; j < SpellTypeCount; ++j) {
-		//  Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-		if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
-		    (SpellTypeById(j)->AutoCast || SpellTypeById(j)->AICast)) {
+	n = AiPlayer->Player->TotalNumUnits;
+	units = AiPlayer->Player->Units;
+	player = AiPlayer->Player; /*units[0]->Player */
+	for (i = 0; i < n; ++i) {
+		unit = units[i];
+		// Check only magic units
+		if (unit->Type->CanCastSpell) {
+			for (j = 0; j < SpellTypeCount; ++j) {
+				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
+				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
+					(SpellTypeById(j)->AutoCast || SpellTypeById(j)->AICast)) {
 #ifdef DEBUG
-		    success =		// Follow on next line (AutoCastSpell).
+					success =  // Follow on next line (AutoCastSpell).
 #endif
-			AutoCastSpell(unit, SpellTypeById(j));
-		    DebugLevel3Fn("Mage '%s' cast '%s' : %s\n" _C_
-			unit->Type->Ident _C_
-			SpellTypeById(j)->Ident _C_ success ? "success" : "fail");
+						AutoCastSpell(unit, SpellTypeById(j));
+					DebugLevel3Fn("Mage '%s' cast '%s' : %s\n" _C_
+						unit->Type->Ident _C_
+						SpellTypeById(j)->Ident _C_ success ? "success" : "fail");
+				}
+			}
 		}
-	    }
 	}
-    }
 }
 
 //@}
