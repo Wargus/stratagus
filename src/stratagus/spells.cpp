@@ -97,7 +97,7 @@ global int SpellTypeCount;
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
-	const SpellActionType* action,Unit* target __attribute__((unused)), int x, int y)
+    const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
 {
     int xmin;
     int ymin;
@@ -177,7 +177,7 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused)),
-	const SpellActionType* action,Unit* target __attribute__((unused)), int x, int y)
+    const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
 {
     // FIXME: vladi: cop should be placed only on explored land
     Unit* portal;
@@ -283,7 +283,7 @@ global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastAreaBombardment(Unit* caster, const SpellType* spell,
-	const SpellActionType* action,Unit* target __attribute__((unused)), int x, int y)
+    const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
 {
     int fields;
     int shards;
@@ -308,7 +308,7 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
     offsetx = spell->Action->Data.AreaBombardment.StartOffsetX;
     offsety = spell->Action->Data.AreaBombardment.StartOffsetY;
     while (fields--) {
-    	// FIXME : radius configurable...
+    	// FIXME: radius configurable...
 	do {
 	    // find new destination in the map
 	    dx = x + SyncRand() % 5 - 2;
@@ -349,7 +349,7 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 **	@param resy	pointer to Y coord of the result
 */
 local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
-	Unit* caster,Unit* target, int x, int y,int* resx, int* resy)
+    Unit* caster, Unit* target, int x, int y, int* resx, int* resy)
 {
     if (location->Base==LocBaseCaster) {
 	*resx = caster->X * TileSizeX + TileSizeX / 2;
@@ -365,11 +365,11 @@ local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
     }
     *resx += location->AddX;
     if (location->AddRandX) {
-	*resx += rand()%location->AddRandX;
+	*resx += SyncRand() % location->AddRandX;
     }
     *resy += location->AddY;
     if (location->AddRandY) {
-	*resy += rand()%location->AddRandY;
+	*resy += SyncRand() % location->AddRandY;
     }
 }
 
@@ -385,7 +385,7 @@ local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastSpawnMissile(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+    const SpellActionType* action, Unit* target, int x, int y)
 {
     Missile* missile;
     int sx;
@@ -401,9 +401,9 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
     missile = NULL;
 
     EvaluateMissileLocation(&action->Data.SpawnMissile.StartPoint,
-	    caster,target,x,y,&sx,&sy);
+	caster, target, x, y, &sx, &sy);
     EvaluateMissileLocation(&action->Data.SpawnMissile.EndPoint,
-	    caster,target,x,y,&dx,&dy);
+	caster, target, x, y, &dx, &dy);
 
     missile = MakeMissile(spell->Missile, sx, sy, dx, dy);
     missile->TTL = action->Data.SpawnMissile.TTL;
@@ -427,32 +427,32 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+    const SpellActionType* action, Unit* target, int x, int y)
 {
     DebugCheck(!caster);
     DebugCheck(!spell);
     DebugCheck(!spell->Action);
     DebugCheck(!target);
 
-    if (spell->Action->Data.AdjustBuffs.HasteTicks!=BUFF_NOT_AFFECTED) {
+    if (spell->Action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
 	target->Haste = spell->Action->Data.AdjustBuffs.HasteTicks;
     }
-    if (spell->Action->Data.AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
+    if (spell->Action->Data.AdjustBuffs.SlowTicks != BUFF_NOT_AFFECTED) {
 	target->Slow = spell->Action->Data.AdjustBuffs.SlowTicks;
     }
-    if (spell->Action->Data.AdjustBuffs.BloodlustTicks!=BUFF_NOT_AFFECTED) {
+    if (spell->Action->Data.AdjustBuffs.BloodlustTicks != BUFF_NOT_AFFECTED) {
 	target->Bloodlust = spell->Action->Data.AdjustBuffs.BloodlustTicks;
     }
-    if (spell->Action->Data.AdjustBuffs.InvisibilityTicks!=BUFF_NOT_AFFECTED) {
+    if (spell->Action->Data.AdjustBuffs.InvisibilityTicks != BUFF_NOT_AFFECTED) {
 	target->Invisible = spell->Action->Data.AdjustBuffs.InvisibilityTicks;
     }
-    if (spell->Action->Data.AdjustBuffs.InvincibilityTicks!=BUFF_NOT_AFFECTED) {
+    if (spell->Action->Data.AdjustBuffs.InvincibilityTicks != BUFF_NOT_AFFECTED) {
 	target->UnholyArmor = spell->Action->Data.AdjustBuffs.InvincibilityTicks;
     }
     CheckUnitToBeDrawn(target);
     MakeMissile(spell->Missile,
-	x * TileSizeX+TileSizeX / 2, y * TileSizeY+TileSizeY / 2,
-	x * TileSizeX+TileSizeX / 2, y * TileSizeY+TileSizeY / 2);
+	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     return 0;
 }
 
@@ -468,7 +468,7 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastAdjustVitals(Unit* caster, const SpellType* spell,
-	const SpellActionType* action,Unit* target,int x, int y)
+    const SpellActionType* action, Unit* target, int x, int y)
 {
     int castcount;
     int diffHP;
@@ -559,7 +559,7 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastPolymorph(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target,int x, int y)
+    const SpellActionType* action, Unit* target, int x, int y)
 {
     UnitType* type;
 
@@ -611,7 +611,7 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastSummon(Unit* caster, const SpellType* spell,
-	const SpellActionType* action,Unit* target,int x, int y)
+    const SpellActionType* action, Unit* target, int x, int y)
 {
     int ttl;
     int cansummon;
@@ -1122,14 +1122,14 @@ global int CanAutoCastSpell(const SpellType* spell)
 **	@return		=!0 if spell should/can casted, 0 if not
 */
 global int CanCastSpell(const Unit* caster, const SpellType* spell,
-    const Unit* target, // FIXME : Use a unique struture t_Target ?
+    const Unit* target, // FIXME: Use a unique struture t_Target ?
     int x, int y)
 {
     DebugCheck(!caster);
     DebugCheck(!spell);
 
     // And caster must know the spell
-    // FIXME spell->Ident < MaxSpell
+    // FIXME: spell->Ident < MaxSpell
     DebugCheck(!(caster->Type->CanCastSpell && caster->Type->CanCastSpell[spell->Ident]));
 
     if (!caster->Type->CanCastSpell ||
@@ -1170,7 +1170,7 @@ global int AutoCastSpell(Unit* caster, const SpellType* spell)
 	return 0;
     } else {
 	//	Must move before ?
-	//	FIXME SpellType* of CommandSpellCast must be const.
+	//	FIXME: SpellType* of CommandSpellCast must be const.
 	CommandSpellCast(caster, target->X, target->Y, target->unit,
 	    (SpellType*)spell, FlushCommands);
 	free(target);
@@ -1193,14 +1193,14 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
     int cont;
-
     SpellActionType* act;
+
     DebugCheck(!spell);
     DebugCheck(!spell->Action->CastFunction);
     DebugCheck(!caster);
     DebugCheck(!SpellIsAvailable(caster->Player, spell->Ident));
 
-    caster->Invisible = 0;// unit is invisible until attacks // FIXME Must be configurable
+    caster->Invisible = 0;// unit is invisible until attacks // FIXME: Must be configurable
     if (target) {
 	x = target->X;
 	y = target->Y;
