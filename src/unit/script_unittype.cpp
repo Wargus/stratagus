@@ -1444,22 +1444,21 @@ void DefineVariableField(lua_State* l, int var_index, int lua_index)
 }
 
 /**
-**  Return the index of the variable named VarName.
+**  Return the index of the variable.
 **
-**  @param VarName  Name of the variable.
+**  @param varname  Name of the variable.
 **
-**  @return         Index of the variable.
+**  @return         Index of the variable, -1 if not found.
 */
 int GetVariableIndex(const char* varname)
 {
 	int i;
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		if (!strcmp(varname, UnitTypeVar.VariableName[i])) {
 			return i;
 		}
 	}
-	DebugPrint("Unknown variable \"%s\", use DefineVariables() before." _C_ varname);
 	return -1;
 }
 
