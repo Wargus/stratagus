@@ -108,7 +108,7 @@ static void RepairUnit(Unit* unit, Unit* goal)
 					unit->Orders[0].Goal = NULL;
 					unit->Orders[0].Action = UnitActionStill;
 					unit->State = unit->SubAction = 0;
-					if (unit->Selected) {		// update display for new action
+					if (unit->Selected) { // update display for new action
 						SelectedUnitChanged();
 					}
 				}
@@ -152,9 +152,9 @@ static void RepairUnit(Unit* unit, Unit* goal)
 }
 
 /**
-**	Animate unit repair
+**  Animate unit repair
 **
-**	@param unit		Unit, for that the repair animation is played.
+**  @param unit Unit, for that the repair animation is played.
 */
 static int AnimateActionRepair(Unit* unit)
 {
@@ -225,13 +225,13 @@ void HandleActionRepair(Unit* unit)
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 				} else if (err < 0) {
-					if (goal) {				// release reference
+					if (goal) { // release reference
 						RefsDecrease(goal);
 						unit->Orders[0].Goal = NoUnitP;
 					}
 					unit->Orders[0].Action = UnitActionStill;
 					unit->State = unit->SubAction = 0;
-					if (unit->Selected) {		// update display for new action
+					if (unit->Selected) { // update display for new action
 						SelectedUnitChanged();
 					}
 					return;
@@ -281,13 +281,13 @@ void HandleActionRepair(Unit* unit)
 				// Target is fine, choose new one.
 				//
 				if (!goal || goal->HP >= goal->Stats->HitPoints) {
-					if (goal) {				// release reference
+					if (goal) { // release reference
 						RefsDecrease(goal);
 						unit->Orders[0].Goal = NULL;
 					}
 					unit->Orders[0].Action = UnitActionStill;
 					unit->SubAction = unit->State = 0;
-					if (unit->Selected) {		// update display for new action
+					if (unit->Selected) { // update display for new action
 						SelectedUnitChanged();
 					}
 					return;

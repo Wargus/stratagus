@@ -61,12 +61,12 @@ void HandleActionPatrol(Unit* unit)
 {
 	const Unit* goal;
 
-	if (!unit->SubAction) {			// first entry.
+	if (!unit->SubAction) { // first entry.
 		NewResetPath(unit);
 		unit->SubAction = 1;
 	}
 
-	if (DoActionMove(unit) < 0) {		// reached end-point or stop
+	if (DoActionMove(unit) < 0) { // reached end-point or stop
 		int tmp;
 
 		Assert(unit->Orders[0].Action == UnitActionPatrol);

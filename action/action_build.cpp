@@ -97,14 +97,14 @@ void HandleActionBuild(Unit* unit)
 	const UnitStats* stats;
 	Unit* build;
 
-	if (!unit->SubAction) {				// first entry
+	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
 		NewResetPath(unit);
 	}
 
 	type = unit->Orders[0].Type;
 
-	switch (DoActionMove(unit)) {		// reached end-point?
+	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//
 			// Some tries to reach the goal
@@ -124,7 +124,7 @@ void HandleActionBuild(Unit* unit)
 
 			unit->Orders[0].Action = UnitActionStill;
 			unit->SubAction = 0;
-			if (unit->Selected) {		// update display for new action
+			if (unit->Selected) { // update display for new action
 				SelectedUnitChanged();
 			}
 			return;
@@ -162,7 +162,7 @@ void HandleActionBuild(Unit* unit)
 
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
-		if (unit->Selected) {		// update display for new action
+		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
 		}
 
@@ -191,7 +191,7 @@ void HandleActionBuild(Unit* unit)
 
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
-		if (unit->Selected) {		// update display for new action
+		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
 		}
 		return;
@@ -209,7 +209,7 @@ void HandleActionBuild(Unit* unit)
 
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
-		if (unit->Selected) {		// update display for new action
+		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
 		}
 		return;
@@ -228,8 +228,8 @@ void HandleActionBuild(Unit* unit)
 	if (type->MustBuildOnTop) {
 		Unit* temp;
 		if ((temp = UnitTypeOnMap(x, y, type->MustBuildOnTop))) {
-			build->Value = temp->Value;	// We capture the value of what is beneath.
-			RemoveUnit(temp, NULL);		// Destroy building beneath
+			build->Value = temp->Value; // We capture the value of what is beneath.
+			RemoveUnit(temp, NULL); // Destroy building beneath
 			UnitLost(temp);
 			UnitClearOrders(temp);
 			ReleaseUnit(temp);

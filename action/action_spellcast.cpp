@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
@@ -76,12 +76,12 @@ void AnimateActionSpellCast(Unit* unit)
 
 		flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 
-		if ((flags & AnimationSound)) {		
-			PlayUnitSound(unit, VoiceAttacking);		// FIXME: spell sound?
+		if ((flags & AnimationSound)) {
+			PlayUnitSound(unit, VoiceAttacking); // FIXME: spell sound?
 		}
 
-		if (flags & AnimationMissile) {		// FIXME: should cast spell ?
-			FireMissile(unit);				// we should not get here ?? 
+		if (flags & AnimationMissile) { // FIXME: should cast spell ?
+			FireMissile(unit);          // we should not get here ??
 		}
 	}
 }
@@ -123,7 +123,7 @@ static void SpellMoveToTarget(Unit* unit)
 				goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 				goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 		}
-		unit->SubAction++;				// cast the spell
+		unit->SubAction++; // cast the spell
 		return;
 	} else if (!goal && MapDistanceToUnit(unit->Orders[0].X,
 			unit->Orders[0].Y, unit) <= unit->Orders[0].Range) {
@@ -137,7 +137,7 @@ static void SpellMoveToTarget(Unit* unit)
 				unit->Orders[0].Y +
 					((SpellType*)unit->Orders[0].Arg1)->Range - unit->Y);
 		}
-		unit->SubAction++;		// cast the spell
+		unit->SubAction++; // cast the spell
 		return;
 	} else if (err) {
 		//
@@ -151,11 +151,11 @@ static void SpellMoveToTarget(Unit* unit)
 		} else {
 			//
 			// goal/spot out of range -- give up
-			// 
+			//
 			unit->Orders[0].Action = UnitActionStill;
 			unit->State = unit->SubAction = 0;
 
-			if (unit->Orders[0].Goal) {		// Release references
+			if (unit->Orders[0].Goal) { // Release references
 				RefsDecrease(unit->Orders->Goal);
 				unit->Orders[0].Goal = NoUnitP;
 			}
@@ -210,10 +210,10 @@ void HandleActionSpellCast(Unit* unit)
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 			NewResetPath(unit);
-			unit->Value = 0;		// repeat spell on next pass? (defaults to `no')
+			unit->Value = 0; // repeat spell on next pass? (defaults to `no')
 			unit->SubAction = 1;
 			// FALL THROUGH
-		case 1:							// Move to the target.
+		case 1:                         // Move to the target.
 			if ((spell = unit->Orders[0].Arg1)->Range != INFINITE_RANGE) {
 				SpellMoveToTarget(unit);
 				break;
@@ -221,7 +221,7 @@ void HandleActionSpellCast(Unit* unit)
 				unit->SubAction = 2;
 			}
 			// FALL THROUGH
-		case 2:							// Cast spell on the target.
+		case 2:                         // Cast spell on the target.
 			// FIXME: should use AnimateActionSpellCast here
 			if (unit->Type->Animations && unit->Type->Animations->Attack) {
 				flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
@@ -235,7 +235,7 @@ void HandleActionSpellCast(Unit* unit)
 							unit->Orders[0].X, unit->Orders[0].Y);
 					}
 				}
-				if (!(flags & AnimationReset)) {		// end of animation
+				if (!(flags & AnimationReset)) { // end of animation
 					return;
 				}
 			} else {
@@ -260,7 +260,7 @@ void HandleActionSpellCast(Unit* unit)
 			break;
 
 		default:
-			unit->SubAction = 0;				// Reset path, than move to target
+			unit->SubAction = 0; // Reset path, than move to target
 			break;
 	}
 }

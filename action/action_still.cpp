@@ -66,7 +66,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 	//
 	// If unit is not bunkered and removed, wait
 	//
-	if (unit->Removed && (!unit->Container || 
+	if (unit->Removed && (!unit->Container ||
 			!unit->Container->Type->Transporter ||
 			!unit->Container->Type->AttackFromTransporter ||
 			unit->Type->Missile.Missile->Class == MissileClassNone)) {
@@ -130,14 +130,14 @@ void ActionStillGeneric(Unit* unit, int ground)
 		x = unit->X;
 		y = unit->Y;
 		switch ((SyncRand() >> 12) & 15) {
-			case 0:		x++;				break;
-			case 1:		y++;				break;
-			case 2:		x--;				break;
-			case 3:		y--;				break;
-			case 4:		x++; y++;		break;
-			case 5:		x--; y++;		break;
-			case 6:		y--; x++;		break;
-			case 7:		x--; y--;		break;
+			case 0: x++; break;
+			case 1: y++; break;
+			case 2: x--; break;
+			case 3: y--; break;
+			case 4: x++; y++; break;
+			case 5: x--; y++; break;
+			case 6: y--; x++; break;
+			case 7: x--; y--; break;
 			default:
 				break;
 		}

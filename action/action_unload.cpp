@@ -155,7 +155,7 @@ int UnloadUnit(Unit* unit)
 	}
 	unit->X = x;
 	unit->Y = y;
-	unit->Wait = 1;			// should be correct unit has still action
+	unit->Wait = 1; // should be correct unit has still action
 	unit->Boarded = 0;
 	PlaceUnit(unit, x, y);
 	return 1;
@@ -300,7 +300,7 @@ static int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* 
 */
 static int MoveToDropZone(Unit* unit)
 {
-	switch (DoActionMove(unit)) {		// reached end-point?
+	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			return -1;
 		case PF_REACHED:

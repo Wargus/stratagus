@@ -89,14 +89,14 @@ void HandleActionDie(Unit* unit)
 		unit->CurrentSightRange = unit->Type->Stats[unit->Player->Player].SightRange;
 		MapMarkUnitSight(unit);
 
-		CommandStopUnit(unit);			// This clears all order queues
+		CommandStopUnit(unit); // This clears all order queues
 #ifdef DEBUG
 		if (unit->Orders[0].Action != UnitActionDie) {
 			DebugPrint("Reset to die is really needed\n");
 		}
 #endif
 		unit->Orders[0].Action = UnitActionDie;
-		--unit->OrderCount;			// remove the stop command
+		--unit->OrderCount; // remove the stop command
 		unit->SubAction = 0;
 		unit->Frame = 0;
 		UnitUpdateHeading(unit);
