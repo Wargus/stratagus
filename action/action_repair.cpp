@@ -63,12 +63,9 @@ static void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 {
 	int flags;
 
-	if (!unit->Type->NewAnimations) {
-		flags = UnitShowAnimation(unit, repair);
-
-		if ((flags & AnimationSound)) {
-			PlayUnitSound(unit, VoiceRepairing);
-		}
+	flags = UnitShowAnimation(unit, repair);
+	if ((flags & AnimationSound)) {
+		PlayUnitSound(unit, VoiceRepairing);
 	}
 }
 
@@ -180,7 +177,7 @@ void HandleActionRepair(Unit* unit)
 	Unit* goal;
 	int err;
 
-	switch( unit->SubAction) {
+	switch (unit->SubAction) {
 		case 0:
 			NewResetPath(unit);
 			unit->SubAction = 1;

@@ -96,7 +96,7 @@ static void MoveToLocation(Unit* unit)
 		NewResetPath(unit);
 	}
 
-	if (unit->Wait) {
+	if (unit->Type->NewAnimations && unit->Wait) {
 		unit->Wait--;
 		return;
 	}
@@ -146,7 +146,7 @@ static Unit* CheckCanBuild(Unit* unit)
 	UnitType* type;
 	Unit* ontop;
 
-	if (unit->Wait) {
+	if (unit->Type->NewAnimations && unit->Wait) {
 		unit->Wait--;
 		return NULL;
 	}
