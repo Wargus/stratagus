@@ -148,7 +148,8 @@ while test $# != 0 ; do
       echo
       echo "usage: setup [--static] [--unix] [--beos] [--win32] [--darwin] [--debug] [--profile]"
       echo
-      echo "Setup will create a Rules.make file that Freecraft needs to compile."
+      echo "Setup will create a Rules.make file (or Rules.make.WIN32"
+      echo "if --win32 forced) that Freecraft needs to compile."
       echo "Supported command-line arguments (you may use more than one at a time):"
       echo "  static  : Compile Freecraft using static libraries (default dynamic)"
       echo "  unix    : Force Unix/Linux compile options (default auto check)"
@@ -600,46 +601,41 @@ case $ANSWER in
 	    *)
 		;;
 	esac
+
+	echo
+	echo -n "Would you like to use [n]one or [i]nternal or [S]DL CD Audio support? (n) "
+	read CDMode
+	case $CDMode in
+	    [sS])
+		echo "Using SDL cdrom support"
+		USE_SDLCD=1
+		USE_LIBCDA=0
+		echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
+		if [ "$USESDL" != "1" ]; then
+		    echo "SDLCD	= $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+		    echo "CLONELIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
+		fi
+		echo >> $RULESFILE
+		;;
+	    [iI])
+		echo "Using internal cdrom support"
+		USE_SDLCD=0
+		USE_LIBCDA=1
+		echo "LIBCDA          = -DUSE_LIBCDA" >> $RULESFILE
+		echo >> $RULESFILE
+		;;
+	    *)
+		echo "Using none cdrom support"
+		USE_SDLCD=0
+		USE_LIBCDA=0
+		;;
+	esac
 	
   ;;
 esac
 
 echo >> $RULESFILE
 echo
-
-#------------------------------------------------------------------------------
-#	CDRom options part
-#------------------------------------------------------------------------------
-echo -n "Would you like to use [n]one or [i]nternal or [S]DL CD Audio support? (n) "
-read CDMode
-case $CDMode in
-  [sS])
-    echo "Using SDL cdrom support"
-    echo
-    USE_SDLCD=1
-    USE_LIBCDA=0
-    echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
-    if [ "$USESDL" != "1" ]; then
-    echo "SDLCD	= $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-    echo "CLONELIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
-    fi
-    echo >> $RULESFILE
-    ;;
-  [iI])
-    echo "Using internal cdrom support"
-    echo
-    USE_SDLCD=0
-    USE_LIBCDA=1
-    echo "LIBCDA          = -DUSE_LIBCDA" >> $RULESFILE
-    echo >> $RULESFILE
-    ;;
-  *)
-    echo "Using none cdrom support"
-    echo
-    USE_SDLCD=0
-    USE_LIBCDA=0
-    ;;
-esac
 
 #------------------------------------------------------------------------------
 #	Compression options part
