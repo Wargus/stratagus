@@ -39,6 +39,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "construct.h"
+#include "ccl.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -226,13 +227,28 @@ local Construction Constructions[] = {
   DEFAULT },
 #endif
 	32,32 },
+
+{ }
 };
 
 #endif
 
+/**
+**	Table mapping the original construction numbers in puds to
+**	our internal string.
+*/
+global char** ConstructionWcNames;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Initialize  the constructions.
+*/
+global void InitConstructions(void)
+{
+}
 
 /**
 **	Load the graphics for the constructions.
@@ -245,7 +261,7 @@ global void LoadConstructions(void)
     int i;
     const char* file;
 
-    for( i=0; i<sizeof(Constructions)/sizeof(*Constructions); ++i ) {
+    for( i=0; i<sizeof(Constructions)/sizeof(*Constructions)-1; ++i ) {
 	file=Constructions[i].File[TheMap.Terrain];
 	if( !file ) {			// default one
 	    file=Constructions[i].File[0];
@@ -267,6 +283,78 @@ global void LoadConstructions(void)
 }
 
 /**
+**	Save state of constructions to file.
+**
+**	@param file	Output file.
+*/
+global void SaveConstructions(FILE* file)
+{
+    int i;
+    int j;
+    char** cp;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: constructions $Id$\n\n");
+
+    //
+    //	Dump table wc2 construction numbers -> internal symbol.
+    //
+    if( (cp=ConstructionWcNames) ) {
+	fprintf(file,"(define-construction-wc-names");
+
+	i=90;
+	while( *cp ) {
+	    if( i+strlen(*cp)>79 ) {
+		i=fprintf(file,"\n ");
+	    }
+	    i+=fprintf(file," '%s",*cp++);
+	}
+	fprintf(file,")\n\n");
+    }
+
+    //
+    //	Dump table of all constructions
+    //
+    for( i=0; i<sizeof(Constructions)/sizeof(*Constructions)-1; ++i ) {
+	fprintf(file,"(define-construction '%s\n",Constructions[i].Ident);
+	fprintf(file,"  'files '(");
+	for( j=0; j<TilesetMax; ++j ) {
+	    if( Constructions[i].File[j] ) {
+		if( j ) {
+		    fputs("\n    ",file);
+		}
+		fprintf(file,"%s \"%s\"",Tilesets[j].Name,
+			Constructions[i].File[j]);
+	    }
+	}
+	fprintf(file,")\n");
+	fprintf(file,"  'size '(%d %d))\n\n", Constructions[i].Width,
+		Constructions[i].Height);
+    }
+}
+
+/**
+**	Cleanup the constructions.
+*/
+global void CleanConstructions(void)
+{
+    char** cp;
+
+    DebugLevel0Fn("FIXME: not written\n");
+
+    //
+    //	Mapping original construction numbers in puds to our internal strings
+    //
+    if( (cp=ConstructionWcNames) ) {	// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(ConstructionWcNames);
+	ConstructionWcNames=NULL;
+    }
+}
+
+/**
 **	Draw construction.
 **
 **	@param type	Type number of construction.
@@ -283,4 +371,133 @@ global void DrawConstruction(int type,int frame,int x,int y)
     VideoDrawClip(Constructions[type].Sprite,frame,x,y);
 }
 
+// ----------------------------------------------------------------------------
+
+/**
+**	Define construction mapping from original number to internal symbol
+**
+**	@param list	List of all names.
+*/
+local SCM CclDefineConstructionWcNames(SCM list)
+{
+    int i;
+    char** cp;
+
+    if( (cp=ConstructionWcNames) ) {		// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(ConstructionWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i=gh_length(list);
+    ConstructionWcNames=cp=malloc((i+1)*sizeof(char*));
+    while( i-- ) {
+	*cp++=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+    }
+    *cp=NULL;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Parse the construction.
+**
+**	@param list	List describing the construction.
+*/
+local SCM CclDefineConstruction(SCM list)
+{
+#if 0
+    SCM value;
+    char* str;
+    MissileType* mtype;
+    unsigned i;
+
+    //	Slot identifier
+
+    str=gh_scm2newstr(gh_car(list),NULL);
+    list=gh_cdr(list);
+    IfDebug( i=NoWarningMissileType; NoWarningMissileType=1; );
+    mtype=MissileTypeByIdent(str);
+    IfDebug( NoWarningMissileType=i; );
+    if( mtype ) {
+	DebugLevel0Fn("Redefining missile-type `%s'\n",str);
+	CclFree(str);
+    } else {
+	mtype=NewMissileTypeSlot(str);	// str consumed!
+    }
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+	    CclFree(mtype->File);
+	    mtype->File=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+	    value=gh_car(list);
+	    mtype->Width=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    mtype->Height=gh_scm2int(gh_car(value));
+	} else if( gh_eq_p(value,gh_symbol2scm("frames")) ) {
+	    mtype->Frames=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("fired-sound")) ) {
+	    CclFree(mtype->FiredSound.Name);
+	    mtype->FiredSound.Name=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("impact-sound")) ) {
+	    CclFree(mtype->ImpactSound.Name);
+	    mtype->ImpactSound.Name=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("class")) ) {
+	    value=gh_car(list);
+	    for( i=0; MissileClassNames[i]; ++i ) {
+		if( gh_eq_p(value,
+			    gh_symbol2scm((char*)MissileClassNames[i])) ) {
+		    mtype->Class=i;
+		    break;
+		}
+	    }
+	    if( !MissileClassNames[i] ) {
+		// FIXME: this leaves a half initialized missile-type
+		errl("Unsupported class",value);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("delay")) ) {
+	    mtype->Delay=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("sleep")) ) {
+	    mtype->Sleep=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
+	    mtype->Speed=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("range")) ) {
+	    mtype->Range=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("impact-missile")) ) {
+	    CclFree(mtype->ImpactName);
+	    mtype->ImpactName=gh_scm2newstr(gh_car(list),NULL);
+	} else {
+	    // FIXME: this leaves a half initialized missile-type
+	    errl("Unsupported tag",value);
+	}
+	list=gh_cdr(list);
+    }
+#endif
+
+    return SCM_UNSPECIFIED;
+}
+
+// ----------------------------------------------------------------------------
+
+/**
+**	Register CCL features for construction.
+*/
+global void ConstructionCclRegister(void)
+{
+    gh_new_procedureN("define-construction-wc-names",
+	    CclDefineConstructionWcNames);
+    gh_new_procedureN("define-construction",CclDefineConstruction);
+
+}
 //@}

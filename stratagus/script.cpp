@@ -42,6 +42,7 @@
 #include "missile.h"
 #include "depend.h"
 #include "upgrade.h"
+#include "construct.h"
 #include "unit.h"
 #include "map.h"
 #include "pud.h"
@@ -672,6 +673,7 @@ global void CclInit(void)
     TilesetCclRegister();
     MapCclRegister();
     PathfinderCclRegister();
+    ConstructionCclRegister();
     UnitTypeCclRegister();
     UpgradesCclRegister();
     DependenciesCclRegister();

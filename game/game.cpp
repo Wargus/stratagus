@@ -259,8 +259,9 @@ global void CreateGame(char* filename, WorldMap* map)
 
     InitMissileTypes();
     LoadMissileSprites();
-    LoadUnitTypes();
+    InitConstructions();
     LoadConstructions();
+    LoadUnitTypes();
     LoadDecorations();
 
     IfDebug(

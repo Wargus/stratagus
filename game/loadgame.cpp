@@ -35,6 +35,7 @@
 #include "freecraft.h"
 #include "icons.h"
 #include "cursor.h"
+#include "construct.h"
 #include "unittype.h"
 #include "upgrade.h"
 #include "depend.h"
@@ -64,6 +65,7 @@ global void CleanModules(void)
     CleanCursors();
     CleanUserInterface();
     CleanPlayers();
+    CleanConstructions();
     CleanUnitTypes();
     CleanUnits();
     CleanSelections();
@@ -90,6 +92,7 @@ global void InitModules(void)
     InitPlayers();
     InitMissileTypes();
     InitMissiles();
+    InitConstructions();
     InitUnitTypes();
     InitUnits();
     InitSelections();
@@ -112,6 +115,7 @@ global void LoadModules(void)
     LoadUserInterface();
     // LoadPlayers();
     LoadMissileSprites();
+    LoadConstructions();
     LoadUnitTypes();
 
     LoadTileset();
