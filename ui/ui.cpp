@@ -33,6 +33,8 @@
 
 global int RaceAdd;			// FIXME: debug solution
 
+global char RightButtonAttacks;		/// right button 0 move, 1 attack
+
 /**
 **	The user interface configuration
 */

@@ -789,6 +789,26 @@ local SCM CclShowCommandKey(void)
 }
 
 /**
+**	Fighter right button attacks as default.
+*/
+local SCM CclRightButtonAttacks(void)
+{
+    RightButtonAttacks=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Fighter right button moves as default.
+*/
+local SCM CclRightButtonMoves(void)
+{
+    RightButtonAttacks=0;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
@@ -814,6 +834,8 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("mouse-scroll-speed", CclMouseScrollSpeed);
 
     gh_new_procedure0_0("show-command-key",CclShowCommandKey);
+    gh_new_procedure0_0("right-button-attacks",CclRightButtonAttacks);
+    gh_new_procedure0_0("right-button-moves",CclRightButtonMoves);
  
 }
 
