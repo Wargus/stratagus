@@ -25,22 +25,38 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP -DNEW_SHIPS"
+EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_NETMENUS"
 # This could be used for experimental versions
 ## There are some still not well tested code parts or branches.
 ## UNITS_ON_MAP:	Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
-## This aren't working yet:
+## These aren't working yet:
 ## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
-## NEW_NETMENUS:	Include new network menues.
+## NEW_NETMENUS:	Menu driven network set-up.
 
 # Compile commands
 CC=gcc
 RM="rm -f"
 MAKE=make
+
+# if your system/distribution lacks libpng, you may install the source
+# in the freecraft directory and name that directory here!
+# Default (tested) version is 1.0.5, anything above should also be ok.
+# Adjust as required - ignored if the directory does not exist.
+LOCAL_PNG="libpng-1.0.5"
+
+# Please note that on most systems libpng also requires libz, so
+# you might additionally need to install the following:
+
+# if your system/distribution lacks libz, you may install the source
+# in the freecraft directory and name that directory here!
+# Default (tested) version is 1.1.3, anything above should also be ok.
+# Adjust as required - ONLY USED IF SYSTEM HAS NO ZLIB INSTALLED BY DEFAULT!
+LOCAL_ZLIB="zlib-1.1.3"
+
 
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
@@ -222,6 +238,62 @@ fi
 
 echo
 
+#------------------------------------------------------------------------------
+#       libpng support part
+#------------------------------------------------------------------------------
+
+echo -n "Checking for PNG library..."
+
+# libpng most likely requires libz.a, so check for it first..
+LIBCHECK="-lz"; check_for_libs
+if test "$?" = 0 ; then
+  HAVE_LIBZ=1
+  PNG_EXTRA="-lz"
+else
+  LIBCHECK="-lz -L./$LOCAL_ZLIB"; check_for_libs
+  if test "$?" = 0 ; then
+    HAVE_LIBZ=2
+    PNG_EXTRA="$LIBCHECK"
+  fi
+fi
+
+PNG_PATH=""
+PNG_LOCAL=0
+if test -d $LOCAL_PNG ; then
+    PNG_PATH="-L./\$LOCAL_PNG"
+    PNG_LOCAL=1
+fi
+LIBCHECK="$PNG_PATH -lpng $PNG_EXTRA"; check_for_libs
+if test "$?" = 0 ; then
+  if test "$PNG_LOCAL" = 1 ; then
+    echo " OK (local: $LOCAL_PNG)";
+  else
+    echo " OK";
+  fi
+else
+  echo " NOT FOUND!";
+  echo
+  echo "...You do not appear to have a working PNG library installed!"
+  echo
+  echo "libpng is required for freecraft to compile. Please "
+  echo "refer to the LOCAL_PNG section in the setup script to "
+  echo "find out how to install a local copy to compile freecraft."
+  echo
+  echo "Please also note the the PNG library most likely also"
+  echo "requires the GZIP compression library. If you are sure"
+  echo "to have libpng installed, but this test still fails,"
+  echo "check out for libz. You may refer to the LOCAL_ZLIB"
+  echo "section of this script to find out how to install a local"
+  echo "local copy of the libz."
+  echo
+
+  exit 1
+fi
+
+#------------------------------------------------------------------------------
+#       Compile commands
+#------------------------------------------------------------------------------
+
 echo "# Compile commands" >> $RULESFILE
 echo "CC=$CC" >> $RULESFILE
 echo "RM=$RM" >> $RULESFILE
@@ -252,6 +324,7 @@ echo >> $RULESFILE
 #------------------------------------------------------------------------------
 
 # Check for various libraries
+echo
 echo "Checking for various video libraries..."
 
 # Check for SDL >= 1.x
@@ -424,10 +497,6 @@ echo
 echo "Checking for compression libraries..."
 echo
 
-# libz
-LIBCHECK="-lz"; check_for_libs
-if test "$?" = 0 ; then HAVE_LIBZ=1; fi
-
 # libbz2
 LIBCHECK="-lbz2"; check_for_libs
 if test "$?" = 0 ; then HAVE_LIBBZ2=1; fi
@@ -435,11 +504,11 @@ if test "$WIN32" = 1 ; then HAVE_LIBBZ2=0; fi	# Bzip2 not supported by Cygwin
 
 # Determine default compression option based on what's available
 
-if (test "$HAVE_LIBZ" = 1 && test "$HAVE_LIBBZ2" = 1) ; then
+if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1) ; then
   DEF4=" (default)"; COMPDEF="O"
 elif test "$HAVE_LIBBZ2" = 1 ; then
   DEF3=" (default)"; COMPDEF="B"
-elif test "$HAVE_LIBZ" = 1 ; then
+elif test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 ; then
   DEF2=" (default)"; COMPDEF="G"
 else
   DEF1=" (default)"; COMPDEF="N"
@@ -453,10 +522,13 @@ echo "  N-None"$DEF1
 if test "$HAVE_LIBZ" = 1 ; then
   echo "  G-GZ"$DEF2
 fi
+if test "$HAVE_LIBZ" = 2 ; then
+  echo "  G-GZ"$DEF2 " (local: $LOCAL_ZLIB)"
+fi
 if test "$HAVE_LIBBZ2" = 1 ; then
   echo "  B-Bzip2"$DEF3
 fi
-if (test "$HAVE_LIBZ" = 1 && test "$HAVE_LIBBZ2" = 1) ; then
+if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1) ; then
   echo "  O-Both GZ and Bzip2"$DEF4
 fi
 echo
@@ -499,20 +571,33 @@ echo "" >> $RULESFILE
 ###############################################################################
 # Write required information to the file
 
-# May be required on some distributions for libpng and libz!
+# May be required on some (older) distributions for libpng and libz!
 # extra linker flags and include directory
 # -L/usr/lib
 
-if [ "$DARWIN" != 1 ] ; then
-  echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib \\" >> $RULESFILE
-  echo "		  -L\$(TOPDIR)/libpng-1.0.5 -L\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
-  echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \\" >> $RULESFILE
-  echo "		  -I\$(TOPDIR)/libpng-1.0.5 -I\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
+LOCAL_LDF=""
+LOCAL_IF=""
+if test "$HAVE_LIBZ" = 2 ; then
+  LOCAL_LDF=" -L\$(TOPDIR)/$LOCAL_ZLIB"
+  LOCAL_IF="-I\$(TOPDIR)/$LOCAL_ZLIB"
+  if test "$DARWIN" = 1 ; then
+    LOCAL_IF="-I\$(TOPDIR)/$LOCAL_ZLIB -I/usr/include -I/usr/include/machine"
+  fi
 else
-  echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib" >> $RULESFILE
-  echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \\" >> $RULESFILE
-  echo "                  -I/usr/include -I/usr/include/machine" >> $RULESFILE
+  if test "$DARWIN" = 1 ; then
+    LOCAL_IF="-I/usr/include -I/usr/include/machine " $LOCAL_IF
+  fi
 fi
+
+LDF_PNG_PATH=""
+IF_PNG_PATH=""
+if test "$PNG_LOCAL" = 1 ; then
+    LDF_PNG_PATH="-L\$(TOPDIR)/$LOCAL_PNG "
+    IF_PNG_PATH="-I\$(TOPDIR)/$LOCAL_PNG "
+fi
+
+echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib $LDF_PNG_PATH $LOCAL_LDF" >> $RULESFILE
+echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include $IF_PNG_PATH $LOCAL_IF" >> $RULESFILE
 
 echo >> $RULESFILE
 
