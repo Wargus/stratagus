@@ -2575,7 +2575,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
     destx=x;
     desty=y;
     size=TheMap.Width*TheMap.Height/4;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 
     //
     //	Find the nearest gold depot
@@ -2671,6 +2671,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
 			}
 			*m=22;
 		    } else {			// no goal take the first
+			free(points);
 			return mine;
 		    }
 		}
@@ -2695,6 +2696,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
 	//	Take best of this frame, if any.
 	//
 	if( bestd!=99999 ) {
+	    free(points);
 	    return bestmine;
 	}
 
@@ -2709,6 +2711,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
 
     DebugLevel3Fn("no mine in sight-range\n");
 
+    free(points);
     return NoUnitP;
 }
 
@@ -2959,7 +2962,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     destx=x=unit->X;
     desty=y=unit->Y;
     size=TheMap.Width*TheMap.Height/4;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 	
     //
     //	Find the nearest wood depot
@@ -3055,6 +3058,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		    } else {			// no goal take the first
 			*px=x;
 			*py=y;
+			free(points);
 			return 1;
 		    }
 		}
@@ -3081,6 +3085,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 	if( bestd!=99999 ) {
 	    *px=bestx;
 	    *py=besty;
+	    free(points);
 	    return 1;
 	}
 
@@ -3095,6 +3100,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 
     DebugLevel3Fn("no wood in sight-range\n");
 
+    free(points);
     return 0;
 }
 
