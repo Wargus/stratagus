@@ -35,28 +35,34 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
+
+## These could be used for experimental versions
+## ---------------------------------------------
 ## SLOW_INPUT		If you have problems that events aren't fetched.
 ## BPP8_*               Only for X11 8bpp common palette:
 ##   BPP8_NORMAL          disables default, like other Xbpp (delivers errors)
 ##   BPP8_WINSAFE         Uses a windows safe palette instead.
 ##   BPP8_IRGB            Uses a palette based on 4x4x4 RGB in 4 intensities
-## These could be used for experimental versions
 ## There are some still not well tested code parts or branches.
-## UNIT_ON_MAP:		Faster lookup of units
-## NEW_MAPDRAW:		Stephans new map draw code (value>1 shows update)
+## UNIT_ON_MAP:		Fast lookup of units
+## UNITS_ON_MAP:	Faster lookup of units
 ## NEW_AI:		New better improved AI code
 ## USE_TILECACHE:	Faster tile drawing, costs memory.
 ## USE_SMART_TILECACHE:	Faster tile drawing, slow with hardware video memory.
+## USE_HP_FOR_XP	Use hit-points for XP calculations.
+## NEW_NETMENUS:	Include new menu driven network set-up.
 ## USE_LIBMODPLUG:	Use modplug audio player support.
 ## These aren't working yet:
+## NEW_MAPDRAW:		Stephans new map draw code (value>1 shows update)
 ## USE_FFMPEG		Use ffmpeg video player support.
 ## USE_FLAC:		Use flac audio player support.
 ## USE_OGG:		Use ogg audio player support.
+## USE_MAD:		Use mad mp3 audio player support.
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
-## NEW_NETMENUS:	Menu driven network set-up.
 ## NEW_REGIONS:		Support for new regions code
+## USE_LUA:		Lua scripting support
 
 # Compile commands
 CC=gcc
