@@ -606,31 +606,22 @@ static int CclDefineModifier(lua_State* l)
 		lua_rawgeti(l, j + 1, 1);
 		key = LuaToString(l, -1);
 		lua_pop(l, 1);
+#if 1 // To be removed. must modify lua file.
 		if (!strcmp(key, "attack-range")) {
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Variables[ATTACKRANGE_INDEX].Value = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			key = "AttackRange";
 		} else if (!strcmp(key, "sight-range")) {
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Variables[SIGHTRANGE_INDEX].Value = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			key = "SightRange";
 		} else if (!strcmp(key, "basic-damage")) {
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Variables[BASICDAMAGE_INDEX].Value = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			key = "BasicDamage";
 		} else if (!strcmp(key, "piercing-damage")) {
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Variables[PIERCINGDAMAGE_INDEX].Value = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			key = "PiercingDamage";
 		} else if (!strcmp(key, "armor")) {
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Variables[ARMOR_INDEX].Value = LuaToNumber(l, -1);
-			lua_pop(l, 1);
+			key = "Armor";
 		} else if (!strcmp(key, "hit-points")) {
-			lua_rawgeti(l, j + 1, 2);
-			um->Modifier.Variables[HP_INDEX].Value = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(key, "regeneration-rate")) {
+			key = "HitPoints";
+		}
+#endif
+		if (!strcmp(key, "regeneration-rate")) {
 			lua_rawgeti(l, j + 1, 2);
 			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, -1);
 			lua_pop(l, 1);
@@ -693,7 +684,7 @@ static int CclDefineModifier(lua_State* l)
 			if (index != -1) {
 				lua_rawgeti(l, j + 1, 2);
 				if (lua_istable(l, -1)) {
-					DefineVariableField(l, um->Modifier.Variables + index, -1); // FIXME
+					DefineVariableField(l, um->Modifier.Variables + index, -1);
 				} else if (lua_isnumber(l, -1)) {
 					um->Modifier.Variables[index].Enable = 1;
 					um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
@@ -1095,7 +1086,7 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			}
 
 			varModified = 0;
-			for (j = NVARALREADYDEFINED; j < UnitTypeVar.NumberVariable; j++) {
+			for (j = 0; j < UnitTypeVar.NumberVariable; j++) {
 				varModified |= um->Modifier.Variables[j].Value
 					| um->Modifier.Variables[j].Max
 					| um->Modifier.Variables[j].Increase;
@@ -1138,11 +1129,13 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 					}
 				}
 			}
-
 			UnitTypes[z]->Stats[pn].Level++;
-
+			UnitTypes[z]->Stats[pn].Variables[LEVEL_INDEX].Value++;
+			UnitTypes[z]->Stats[pn].Variables[LEVEL_INDEX].Max++;
 			if (um->ConvertTo) {
 				um->ConvertTo->Stats[pn].Level++;
+				um->ConvertTo->Stats[pn].Variables[LEVEL_INDEX].Value++;
+				um->ConvertTo->Stats[pn].Variables[LEVEL_INDEX].Max++;
 				ConvertUnitTypeTo(player,UnitTypes[z], um->ConvertTo);
 			}
 		}
