@@ -277,10 +277,10 @@ global void DrawSelectionCircleWithTrans(VMemType color, int x1, int y1,
 {
 #ifdef USE_SDL_SURFACE
     VideoFillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-	min((x2 - x1) / 2, (y2 - y1) / 2) - 2, 75);
+	min((x2 - x1) / 2, (y2 - y1) / 2), 95);
 #else
     VideoFill75TransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-	min((x2 - x1) / 2, (y2 - y1) / 2) - 2);
+	min((x2 - x1) / 2, (y2 - y1) / 2));
 #endif
     VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 	min((x2 - x1) / 2, (y2 - y1) / 2));
