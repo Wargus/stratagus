@@ -270,12 +270,12 @@ local int ReturnWithWood(Unit* unit)
 	}
 	unit->Command.Data.Move.Goal=NoUnitP;
 	--destu->Refs;
-    }
 #else
 
     // FIXME: stored target not used!
 
 #endif
+    }
 
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
