@@ -182,6 +182,10 @@ local SCM CclMissile(SCM list)
 
     DebugLevel0Fn("FIXME: not finished\n");
 
+    missile=NULL;
+    type=NULL;
+    x = dx = y = dy = -1;
+
     while (!gh_null_p (list)) {
 	value = gh_car (list);
 	list = gh_cdr (list);
