@@ -1698,18 +1698,19 @@ global void MissileActions(void)
 		}
 		break;
 
-	    case MissileClassFire:
+	    case MissileClassFire: {
+		Unit* unit;
+
+		unit=missile->SourceUnit;
+		if( unit->Destroyed || !unit->HP ) {
+		    FreeMissile(missile);
+		    break;
+		}
 		missile->Wait=missile->Type->Sleep;
 		if( ++missile->Frame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    int f;
-		    Unit* unit;
 
-		    unit=missile->SourceUnit;
-		    if( unit->Destroyed || !unit->HP ) {
-			FreeMissile(missile);
-			break;
-		    }
 		    missile->Frame=0;
 		    f=(100*unit->HP)/unit->Stats->HitPoints;
 		    if( f>75) {
@@ -1734,7 +1735,7 @@ global void MissileActions(void)
 		    }
 		}
 		break;
-
+	    }
 	}
 
 	if (missile->Type!=MissileFree) {
