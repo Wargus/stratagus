@@ -329,7 +329,13 @@ global void UpdateDisplay(void)
 
     // FIXME: this could be written better, less drawing
     if( update_old_cursor && MustRedraw!=-1  ) {
-	InvalidateArea(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
+	// Draw restored area only if not same.
+	if( OldCursorX!=(CursorX-GameCursor->HotX) 
+		|| OldCursorY!=(CursorY-GameCursor->HotY)
+		|| OldCursorW!=(GameCursor->RleSprite->Width)
+		|| OldCursorH!=(GameCursor->RleSprite->Height) ) {
+	    InvalidateArea(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
+	}
     }
 
     if (!MustRedraw) {
