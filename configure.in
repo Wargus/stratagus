@@ -28,6 +28,23 @@ else
     ARCH=linux
 fi
 
+dnl --- CHECK FOR GUILE ---
+AC_ARG_WITH([guile],
+    AC_HELP_STRING([--with-guile], [Enable Guile Support (default: no)]),,
+    with_guile="no")
+
+if test "x$with_guile" = "xyes"; then
+    dnl AC_DEFINE(USE_GUILE,, [Use Guile instead of SIOD])
+
+    AC_CHECK_LIB(guile, main, 
+        [AC_SUBST(GUILE_CFLAGS, "-DUSE_GUILE")
+         AC_SUBST(GUILE_LIBS,   "-lguile")],
+        [ echo "Guile support not available, fallback to SIOD"
+          AC_SUBST(GUILE_CFLAGS, "")
+          AC_SUBST(GUILE_LIBS,   "")])
+fi
+dnl -----------------------
+
 dnl --- CHECK FOR WITH SOUND ---
 AC_ARG_ENABLE(sound,
     [  --enable-sound	  [Use sound (default: yes)]], SOUND="$with_sound")
@@ -241,3 +258,5 @@ else
     AC_CONFIG_FILES(Rules.make)
 fi
 AC_OUTPUT
+
+# EOF #
