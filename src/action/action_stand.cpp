@@ -48,6 +48,8 @@
 */
 global void HandleActionStandGround(Unit* unit)
 {
+    ActionStillGeneric(unit,1);
+#if 0
     const UnitType* type;
     Unit* goal;
 
@@ -149,7 +151,7 @@ global void HandleActionStandGround(Unit* unit)
 	    // FIXME: Why have I written such a chaos? (johns)
 	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
 		if( unit->Command.Data.Move.Goal ) {
-		    unit->Command.Data.Move.Goal--;
+		    unit->Command.Data.Move.Goal.Refs--;
 		}
 		unit->Command.Data.Move.Goal=goal;
 		goal->Refs++;
@@ -209,6 +211,7 @@ global void HandleActionStandGround(Unit* unit)
 	unit->IY=(MyRand()>>15)&1;
 	return;
     }
+#endif
 }
 
 //@}
