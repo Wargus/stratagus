@@ -9,11 +9,11 @@
 //         FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_spellcast.c     -       The spell cast action. */
-/*
-**      (c) Copyright 1998-2000 by Vladi Belperchinov-Shabanski
-**
-**      $Id$
-*/
+//
+//      (c) Copyright 1998-2001 by Vladi Belperchinov-Shabanski
+//
+//      $Id$
+
 /*
 **      And when we cast our final spell
 **      And we meet in our dreams
@@ -56,12 +56,12 @@
 
 /*
   NOTE: vladi:
-  
+
   The point to have variable unosrted list of spell types and
   dynamic id's and in the same time -- SpellAction id's is that
   spell actions are hardcoded and cannot be changed at all.
   On the other hand we can have different spell types as with
-  different range, cost and time to live (possibly and other 
+  different range, cost and time to live (possibly and other
   parameters as extensions)
 */
 
@@ -74,25 +74,25 @@ global SpellType SpellTypeTable[] = {
 { 0, "spell-holy-vision",   1024,  70,  -1, SpellActionHolyVision   , "holy vision",    NULL },
 { 0, "spell-healing",          4,   6,  -1, SpellActionHealing      , "healing",        NULL },
 { 0, "spell-exorcism",        10,   4,  -1, SpellActionExorcism     , "exorcism",       NULL },
-//      ---human mages---                                                ---human mages---          
+//      ---human mages---                                                ---human mages---
 { 0, "spell-fireball",         8, 100,1000, SpellActionFireball     , "fireball",       NULL },
 { 0, "spell-slow",            10,  50,1000, SpellActionSlow         , "slow",           NULL },
 { 0, "spell-flame-shield",     6,  80, 600, SpellActionFlameShield  , "flame shield",   NULL },
 { 0, "spell-invisibility",     6, 200,2000, SpellActionInvisibility , "invisibility",   NULL },
 { 0, "spell-polymorph",       10, 200,  -1, SpellActionPolymorph    , "polymorph",      NULL },
 { 0, "spell-blizzard",        12,   5,  -1, SpellActionBlizzard     , "blizzard",       NULL },
-//      ---orc ogres---                                                  ---orc ogres---            
+//      ---orc ogres---                                                  ---orc ogres---
 { 0, "spell-eye-of-kilrogg",1024,  70,  -1, SpellActionEyeOfKilrogg , "eye of kilrogg", NULL },
 { 0, "spell-bloodlust",        6,  50,1000, SpellActionBloodlust    , "bloodlust",      NULL },
 { 0, "spell-runes",           10,  50,2000, SpellActionRunes        , "runes",          NULL },
-//      ---orc death knights---                                          ---orc death knights-      
+//      ---orc death knights---                                          ---orc death knights-
 { 0, "spell-death-coil",      10, 100,  -1, SpellActionDeathCoil    , "death coil",     NULL },
 { 0, "spell-haste",            6,  50,1000, SpellActionHaste        , "haste",          NULL },
 { 0, "spell-raise-dead",       6,  50,  -1, SpellActionRaiseDead    , "raise dead",     NULL },
 { 0, "spell-whirlwind",       12, 100, 800, SpellActionWhirlwind    , "whirlwind",      NULL },
 { 0, "spell-unholy-armor",     6, 100, 500, SpellActionUnholyArmor  , "unholy armor",   NULL },
 { 0, "spell-death-and-decay", 12,   5,  -1, SpellActionDeathAndDecay, "death and decay",NULL },
-//      ---eot marker---                                                 ---eot marker---          
+//      ---eot marker---                                                 ---eot marker---
 {-1, "",                       1,   1,  -1, SpellActionNone         , "",                      }
 };
 
@@ -103,13 +103,13 @@ MissileType* missile_spell     = NULL;
 MissileType* missile_exorcism  = NULL;
 MissileType* missile_explosion = NULL;
 MissileType* missile_rune      = NULL;
- 
+
 /*----------------------------------------------------------------------------
 --      Functions (Spells Controllers/Callbacks)
 ----------------------------------------------------------------------------*/
 
 /*
-** Missile controllers 
+** Missile controllers
 **
 ** To cancel a missile set it's TTL to 0, it will be handled right after
 ** the controller call and missile will be down.
@@ -124,23 +124,23 @@ global int SpellFireballController( void* missile )
   Unit* table[MAX_UNITS];
   int i;
   int n;
-  
+
   Missile* mis = (Missile*)missile;
-  
+
   //NOTE: vladi: TTL is used as counter for explosions
   // explosions start at target and continue (10 tiles) beyond
   // explosions are on each tile on the way
-    
+
   if ( mis->TTL <= mis->State && mis->TTL % 2 == 0 ) // approx.
     {
     //+TileSize/2 to align gfx to baseline
     int x = mis->X + TileSizeX/2;
     int y = mis->Y + TileSizeY/2;
     MakeMissile( missile_explosion, x, y, x, y );
-    
+
     x = x / TileSizeX;
     y = y / TileSizeY;
-    
+
     //Effect of the explosion on units.
     //NOTE: vladi: this is slightly different than original
     //      now it hits all units in range 1
@@ -148,7 +148,7 @@ global int SpellFireballController( void* missile )
     for( i=0; i<n; ++i )
       HitUnit(table[i],FIREBALL_DAMAGE);
     }
-  
+
   return 0;
 };
 
@@ -160,11 +160,24 @@ global int SpellDeathCoilController( void* missile )
   Unit* table[MAX_UNITS];
   int i;
   int n;
-  
+
   Missile* mis = (Missile*)missile;
-  mis->SourceUnit->Refs--;  
-  if ( mis->TargetUnit )
-    mis->TargetUnit->Refs--;  
+#ifdef REFS_DEBUG
+  DebugCheck( !mis->SourceUnit->Refs );
+#endif
+  mis->SourceUnit->Refs--;
+#ifdef REFS_DEBUG
+  DebugCheck( !mis->SourceUnit->Refs );
+#endif
+  if ( mis->TargetUnit ) {
+#ifdef REFS_DEBUG
+    DebugCheck( !mis->TargetUnit->Refs );
+#endif
+    mis->TargetUnit->Refs--;
+#ifdef REFS_DEBUG
+    DebugCheck( !mis->TargetUnit->Refs );
+#endif
+  }
   if ( mis->X == mis->DX && mis->Y == mis->DY )
     { // missile has reached target unit/spot
     if ( !mis->SourceUnit->Destroyed )
@@ -180,8 +193,8 @@ global int SpellDeathCoilController( void* missile )
 	  DestroyUnit( mis->TargetUnit );
 	  }
 	else
-	  mis->TargetUnit->HP = hp;  
-	if ( mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints )  
+	  mis->TargetUnit->HP = hp;
+	if ( mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints )
 	  mis->SourceUnit->HP = mis->SourceUnit->Stats->HitPoints;
 	}
       else
@@ -194,14 +207,14 @@ global int SpellDeathCoilController( void* missile )
 	  {
 	  // calculate organic enemy count
 	  for( i=0; i<n; ++i )
-	    ec += ( IsEnemy(mis->SourceUnit->Player,table[i]) 
+	    ec += ( IsEnemy(mis->SourceUnit->Player,table[i])
 	            && table[i]->Type->Organic != 0);
 	  if ( ec > 0 )
 	    { // yes organic enemies found
   	    for( i=0; i<n; ++i )
-	      if ( IsEnemy(mis->SourceUnit->Player,table[i]) 
+	      if ( IsEnemy(mis->SourceUnit->Player,table[i])
 	            && table[i]->Type->Organic != 0 )
-	        { 
+	        {
 		// disperse dabage between them
 		int hp = table[i]->HP;
 		hp -= 50/ec; //NOTE: 1 is the minimal damage
@@ -214,14 +227,14 @@ global int SpellDeathCoilController( void* missile )
 		  table[i]->HP = hp;
 		}
   	    mis->SourceUnit->HP += 50;
-	    if ( mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints )  
+	    if ( mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints )
 	      mis->SourceUnit->HP = mis->SourceUnit->Stats->HitPoints;
 	    }
-	  }  
-	}	
+	  }
+	}
       }
     }
-  return 0;	   
+  return 0;
 }
 
 /*
@@ -239,11 +252,11 @@ global int SpellWhirlwindController( void* missile )
   int n;
   int x;
   int y;
-  
+
   Missile* mis = (Missile*)missile;
   x = mis->X / TileSizeX;
   y = mis->Y / TileSizeY;
-  
+
   n = SelectUnitsOnTile( x, y, table);
   for( i=0; i<n; ++i ) {
     HitUnit(table[i],WHIRLWIND_DAMAGE1);
@@ -282,17 +295,17 @@ global int SpellRunesController( void* missile )
   int n;
   int x;
   int y;
-  
+
   Missile* mis = (Missile*)missile;
   x = mis->X / TileSizeX;
   y = mis->Y / TileSizeY;
-  
+
   n = SelectUnitsOnTile( x, y, table);
   for( i=0; i<n; ++i ) {
     if ( table[i]->Type->LandUnit )
       HitUnit(table[i],RUNE_DAMAGE);
   }
-  
+
   if ( mis->TTL % 100 == 0 || mis->TTL == 0 )
     { // show rune every 4 seconds (approx.)
     MakeMissile( missile_rune, mis->X, mis->Y, mis->X, mis->Y );
@@ -326,15 +339,15 @@ global void InitSpells()
       }
     z++;
     }
-  SpellTypeCount = z;  
-  
+  SpellTypeCount = z;
+
   missile_healing   = MissileTypeByIdent( "missile-heal-effect" );
   missile_spell     = MissileTypeByIdent( "missile-normal-spell" );
   missile_exorcism  = MissileTypeByIdent( "missile-exorcism" );
   missile_explosion = MissileTypeByIdent( "missile-explosion" );
   missile_rune      = MissileTypeByIdent( "missile-rune" );
 }
-  
+
 /*
 **      Spells destructor (currently does nothing)
 **
@@ -358,11 +371,11 @@ global int SpellIdByIdent( const char* Ident )
     {
     if ( strcmp( SpellTypeTable[z].Ident, Ident ) == 0 )
       return z;
-    z++;  
-    }  
-  return -1;  
+    z++;
+    }
+  return -1;
 }
-  
+
 /*
 **      Get spell type struct ptr by ident
 **
@@ -375,7 +388,7 @@ global const SpellType* SpellTypeByIdent( const char* Ident )
   int z = SpellIdByIdent( Ident );
   return z != -1 ? &(SpellTypeTable[z]) : NULL;
 }
-  
+
 /*
 **      Get spell type struct ptr by id
 **
@@ -423,11 +436,11 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 {
   int repeat = 0;
   const SpellType* spell = SpellTypeById( SpellId );
-/*  
+/*
   this does not work when no target unit
-  DebugLevel0Fn("Spell cast: %d (%s), %s -> %s (%d,%d)", 
+  DebugLevel0Fn("Spell cast: %d (%s), %s -> %s (%d,%d)",
                  SpellId, spell->Ident, unit->Type->Name, target->Type->Name, x, y );
-  printf("Spell cast: %d (%s), %s -> %s (%d,%d)\n", 
+  printf("Spell cast: %d (%s), %s -> %s (%d,%d)\n",
                  SpellId, spell->Ident, unit->Type->Name, target->Type->Name, x, y );
 */
   // the unit can collect mana during the move to target, so check is here...
@@ -439,8 +452,8 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	                y*TileSizeX+TileSizeX/2,   \
 	                x*TileSizeX+TileSizeX/2,   \
 	                y*TileSizeX+TileSizeX/2 ); \
-	}		
-    
+	}
+
   switch( spell->Action )
     {
     case SpellActionNone:
@@ -459,34 +472,34 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
          break;
     case SpellActionHealing:
 	 // only can heal organic units
-	 if (target && target->Type->Organic) 
+	 if (target && target->Type->Organic)
 	   {
-	   while( target->HP < target->Stats->HitPoints 
+	   while( target->HP < target->Stats->HitPoints
 	          && unit->Mana > spell->ManaCost )
 	      {
 	      unit->Mana -= spell->ManaCost; // get mana cost
 	      target->HP++;
 	      }
-	   PLAY_FIREWORKS(missile_healing);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+	   PLAY_FIREWORKS(missile_healing);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionExorcism:
 	 // exorcism works only on undead units
-	 if ( target && target->Type->IsUndead ) 
+	 if ( target && target->Type->IsUndead )
 	   {
 	   while( target->HP > 0 && unit->Mana > spell->ManaCost )
 	      {
 	      unit->Mana -= spell->ManaCost; // get mana cost
 	      target->HP--;
 	      }
-	   PLAY_FIREWORKS(missile_exorcism);   
+	   PLAY_FIREWORKS(missile_exorcism);
 	   }
 	 else
 	   {
 	   //FIXME: vladi: exorcism effect should be disperced on near units
-	   }  
-         DebugCheck( unit->Mana < 0 );  
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
 //  ---human mages---
     case SpellActionFireball:
@@ -497,87 +510,87 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   int dx = x;
 	   int dy = y;
 	   int dist;
-	   
+
 	   if ( target )
 	     {
 	     dx = target->X;
 	     dy = target->Y;
 	     }
-	   
+
 	   dist = MapDistance( sx, sy, dx, dy );
 	   dx += ((dx - sx)*10)/dist;
 	   dy += ((dy - sy)*10)/dist;
-	   
+
 	   sx = sx*TileSizeX+TileSizeX/2;
 	   sy = sy*TileSizeX+TileSizeX/2;
 	   dx = dx*TileSizeX+TileSizeX/2;
 	   dy = dy*TileSizeX+TileSizeX/2;
-	   
+
 	   unit->Mana -= spell->ManaCost;
 
   	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
-	   mis = MakeMissile( MissileTypeByIdent("missile-fireball"), 
-	                sx, sy, dx, dy ); 
-	   
+	   mis = MakeMissile( MissileTypeByIdent("missile-fireball"),
+	                sx, sy, dx, dy );
+
 	   mis->State = spell->TTL - (dist - 1) * 2;
 	   mis->TTL = spell->TTL;
 	   mis->Controller = SpellFireballController;
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionSlow:
-	 if (target && !target->Type->Building && target->Slow < spell->TTL) 
+	 if (target && !target->Type->Building && target->Slow < spell->TTL)
 	   {
 	   // get mana cost
 	   unit->Mana -= spell->ManaCost;
 	   target->Slow = spell->TTL; // about 25 sec
 	   target->Haste = 0;
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionFlameShield:
-	 if ( target && target->Type->Organic && target->Type->LandUnit  
-	      && target->FlameShield < spell->TTL ) 
+	 if ( target && target->Type->Organic && target->Type->LandUnit
+	      && target->FlameShield < spell->TTL )
 	   {
 	   // get mana cost
 	   unit->Mana -= spell->ManaCost;
 	   target->FlameShield = spell->TTL; // about 15 sec
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionInvisibility:
-	 if (target && target->Type->Organic && target->Invisible < spell->TTL ) 
+	 if (target && target->Type->Organic && target->Invisible < spell->TTL )
 	   {
 	   // get mana cost
 	   unit->Mana -= spell->ManaCost;
 	   target->Invisible = spell->TTL; // about 50 sec
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionPolymorph:
-	 if ( target && target->Type->Organic ) 
+	 if ( target && target->Type->Organic )
 	   {
 	   int x = target->X;
 	   int y = target->Y;
 	   Player* pl = target->Player;
-	   
+
 	   // as said somewhere else -- no corpses :)
 	   RemoveUnit( target );
 	   UnitLost( target );
 	   ReleaseUnit( target );
 	   MakeUnitAndPlace( x, y, UnitTypeByIdent("unit-critter"), pl );
-	   
+
 	   unit->Mana -= spell->ManaCost;
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionBlizzard:
     	 {
@@ -604,20 +617,20 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   while(  dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height );
            sx = dx - 1 - SyncRand() % 4;
 	   sy = dy - 1 - SyncRand() % 4;
- 	 
+
 	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
-	   mis = MakeMissile( MissileTypeByIdent( "missile-blizzard" ), 
-		              sx*TileSizeX+TileSizeX/2,   
-	                      sy*TileSizeX+TileSizeX/2,   
-	                      dx*TileSizeX+TileSizeX/2,   
-	                      dy*TileSizeX+TileSizeX/2 ); 
+	   mis = MakeMissile( MissileTypeByIdent( "missile-blizzard" ),
+		              sx*TileSizeX+TileSizeX/2,
+	                      sy*TileSizeX+TileSizeX/2,
+	                      dx*TileSizeX+TileSizeX/2,
+	                      dy*TileSizeX+TileSizeX/2 );
 	   mis->Damage = BLIZZARD_DAMAGE;
-	   //FIXME: not correct -- blizzard should continue even if mage is 
+	   //FIXME: not correct -- blizzard should continue even if mage is
 	   //       destroyed (though it will be quite short time...)
 	   mis->SourceUnit = unit;
 	   mis->SourceUnit->Refs++;
 	   }
-	   
+
 	 unit->Mana -= spell->ManaCost;
 	 if ( unit->Mana > spell->ManaCost )
 	   repeat = 1;
@@ -625,13 +638,13 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
          break;
 //  ---orc ogres---
     case SpellActionEyeOfKilrogg:
-	 MakeUnitAndPlace( x, y, UnitTypeByIdent("unit-eye-of-kilrogg"), 
+	 MakeUnitAndPlace( x, y, UnitTypeByIdent("unit-eye-of-kilrogg"),
 	                   unit->Player );
-	   
+
 	 unit->Mana -= spell->ManaCost;
-	   
-         PLAY_FIREWORKS(missile_spell);   
-         DebugCheck( unit->Mana < 0 );  
+
+         PLAY_FIREWORKS(missile_spell);
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionBloodlust:
 	 if (target && target->Type->Organic && target->Bloodlust < spell->TTL )
@@ -639,10 +652,10 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   // get mana cost
 	   unit->Mana -= spell->ManaCost;
 	   target->Bloodlust = spell->TTL; // about 25 sec
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionRunes:
 	   {
@@ -651,41 +664,41 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   Missile* mis;
 	   unit->Mana -= spell->ManaCost;
 	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
-	   mis = MakeMissile( MissileTypeByIdent( "missile-custom" ), 
-		              x*TileSizeX+TileSizeX/2,   
-	                      y*TileSizeX+TileSizeX/2,   
-	                      x*TileSizeX+TileSizeX/2,   
+	   mis = MakeMissile( MissileTypeByIdent( "missile-custom" ),
+		              x*TileSizeX+TileSizeX/2,
+	                      y*TileSizeX+TileSizeX/2,
+	                      x*TileSizeX+TileSizeX/2,
 	                      y*TileSizeX+TileSizeX/2 );
 	   mis->TTL = spell->TTL;
 	   mis->Controller = SpellRunesController;
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
 //  ---orc death knights---
     case SpellActionDeathCoil:
-    	 if( (target && target->Type->Organic) || (!target) )  
-	   { 
+    	 if( (target && target->Type->Organic) || (!target) )
+	   {
 	   Missile* mis;
 	   int sx = unit->X;
 	   int sy = unit->Y;
 	   int dx = x;
 	   int dy = y;
-	   
+
 	   if ( target )
 	     {
 	     dx = target->X;
 	     dy = target->Y;
 	     }
-	   
+
 	   unit->Mana -= spell->ManaCost;
 
   	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
-	   mis = MakeMissile( MissileTypeByIdent("missile-death-coil"), 
-	                sx*TileSizeX+TileSizeX/2,   
-	                sy*TileSizeX+TileSizeX/2,   
-	                dx*TileSizeX+TileSizeX/2,   
-	                dy*TileSizeX+TileSizeX/2 ); 
-	   
+	   mis = MakeMissile( MissileTypeByIdent("missile-death-coil"),
+	                sx*TileSizeX+TileSizeX/2,
+	                sy*TileSizeX+TileSizeX/2,
+	                dx*TileSizeX+TileSizeX/2,
+	                dy*TileSizeX+TileSizeX/2 );
+
 	   mis->SourceUnit = unit;
 	   mis->SourceUnit->Refs++;
 	   if (target)
@@ -694,20 +707,20 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
   	     target->Refs++;
 	     }
 	   mis->Controller = SpellDeathCoilController;
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionHaste:
-	 if (target && !target->Type->Building && target->Haste < spell->TTL) 
+	 if (target && !target->Type->Building && target->Haste < spell->TTL)
 	   {
 	   // get mana cost
 	   unit->Mana -= spell->ManaCost;
 	   target->Slow = 0;
 	   target->Haste = spell->TTL; // about 25 sec
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionRaiseDead:
 	   {
@@ -721,16 +734,16 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 		   //RemoveUnit( Units[i] );
 	           //UnitLost( Units[i] );
 	           //ReleaseUnit( Units[i] );
-	           MakeUnitAndPlace( x, y, UnitTypeByIdent("unit-skeleton"), 
+	           MakeUnitAndPlace( x, y, UnitTypeByIdent("unit-skeleton"),
 	                             unit->Player );
   	           unit->Mana -= spell->ManaCost;
 	           break;
 	        }
 	   }
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionWhirlwind:
            {
@@ -738,27 +751,27 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   unit->Mana -= spell->ManaCost;
 
   	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
-	   mis = MakeMissile( MissileTypeByIdent("missile-whirlwind"), 
-	                x*TileSizeX+TileSizeX/2,   
-	                y*TileSizeX+TileSizeX/2,   
-	                x*TileSizeX+TileSizeX/2,   
-	                y*TileSizeX+TileSizeX/2 ); 
-	   
+	   mis = MakeMissile( MissileTypeByIdent("missile-whirlwind"),
+	                x*TileSizeX+TileSizeX/2,
+	                y*TileSizeX+TileSizeX/2,
+	                x*TileSizeX+TileSizeX/2,
+	                y*TileSizeX+TileSizeX/2 );
+
 	   mis->TTL = spell->TTL;
 	   mis->Controller = SpellWhirlwindController;
 	   }
-         DebugCheck( unit->Mana < 0 );  
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionUnholyArmor:
-	 if (target && !target->Type->Building && target->UnholyArmor < spell->TTL) 
+	 if (target && !target->Type->Building && target->UnholyArmor < spell->TTL)
 	   {
 	   // get mana cost
 	   unit->Mana -= spell->ManaCost;
 	   target->UnholyArmor = spell->TTL; // about 13 sec
-	   
-	   PLAY_FIREWORKS(missile_spell);   
-	   }   
-         DebugCheck( unit->Mana < 0 );  
+
+	   PLAY_FIREWORKS(missile_spell);
+	   }
+         DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionDeathAndDecay:
     	 {
@@ -778,20 +791,20 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	     dy = y  +  SyncRand() % 5 - 2;
 	     }
 	   while(  dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height );
- 	 
+
 	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
-	   mis = MakeMissile( MissileTypeByIdent( "missile-death-and-decay" ), 
-		              dx*TileSizeX+TileSizeX/2,   
-	                      dy*TileSizeX+TileSizeX/2,   
-	                      dx*TileSizeX+TileSizeX/2,   
-	                      dy*TileSizeX+TileSizeX/2 ); 
+	   mis = MakeMissile( MissileTypeByIdent( "missile-death-and-decay" ),
+		              dx*TileSizeX+TileSizeX/2,
+	                      dy*TileSizeX+TileSizeX/2,
+	                      dx*TileSizeX+TileSizeX/2,
+	                      dy*TileSizeX+TileSizeX/2 );
 	   mis->Damage = DEATHANDDECAY_DAMAGE;
-	   //FIXME: not correct -- blizzard should continue even if mage is 
+	   //FIXME: not correct -- blizzard should continue even if mage is
 	   //       destroyed (though it will be quite short time...)
-	   mis->SourceUnit = unit; 
+	   mis->SourceUnit = unit;
 	   mis->SourceUnit->Refs++;
 	   }
-	   
+
 	 unit->Mana -= spell->ManaCost;
 	 if ( unit->Mana > spell->ManaCost )
 	   repeat = 1;
@@ -802,10 +815,10 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	 break;
     }
   #undef PLAY_FIREWORKS
-  DebugCheck( unit->Mana < 0 );  
+  DebugCheck( unit->Mana < 0 );
   return repeat;
 }
 
-  
+
 //@}
 
