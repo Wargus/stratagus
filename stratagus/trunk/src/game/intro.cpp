@@ -621,7 +621,7 @@ local void DrawTitle(const char* act,const char* title)
 {
     VideoDrawTextCentered(
 	VideoWidth/2,
-	VideoHeight/2 - VideoTextHeight(LargeTitleFont) - 
+	VideoHeight/2 - VideoTextHeight(LargeTitleFont) -
 	    VideoTextHeight(SmallTitleFont)/2,
 	SmallTitleFont,
 	act);
@@ -906,8 +906,8 @@ local int GameStatsDrawFunc(int frame)
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer || 
-		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer ||
+		    (p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
 		continue;
 	    }
 	    if( ThisPlayer->Enemy&(1<<i) ) {
@@ -1126,7 +1126,6 @@ global void ShowStats(void)
     Graphic* background;
     int frame;
 
-
     OldVideoSyncSpeed=VideoSyncSpeed;
     VideoSyncSpeed=100;
     SetVideoSync();
@@ -1178,6 +1177,7 @@ global void ShowStats(void)
 	frame++;
     }
 
+    VideoFree(background);
     VideoSyncSpeed=OldVideoSyncSpeed;
     SetVideoSync();
 }
@@ -1216,8 +1216,8 @@ local SCM CclCredits(SCM list)
 	    GameCredits.Background=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	}
-	if( gh_eq_p(value,gh_symbol2scm("name")) 
-		|| gh_eq_p(value,gh_symbol2scm("title")) 
+	if( gh_eq_p(value,gh_symbol2scm("name"))
+		|| gh_eq_p(value,gh_symbol2scm("title"))
 		|| gh_eq_p(value,gh_symbol2scm("comment")) ) {
 	    n=get_c_string(gh_car(list));
 	    nlen=strlen(n);
