@@ -66,7 +66,7 @@ global Sample* MusicSample;		/// Music samples
 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" or ":all"
-global int CDTrack;			/// Current cd track
+global int CDTrack = 1;			/// Current cd track
 #endif
 
 #if defined(USE_SDLCD)
@@ -75,6 +75,7 @@ global SDL_CD *CDRom;			/// SDL cdrom device
 global int NumCDTracks;			/// Number of tracks on the cd
 #elif defined(USE_CDDA)
 // FIXME: fill up
+global int NumCDTracks;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -359,6 +360,86 @@ local int PlayCDRom(const char* name)
     // FIXME: no cdrom, must stop it now!
 
     return 0;
+}
+#endif
+
+#ifdef USE_CDDA
+/**
+**	Play music from cdrom.
+**
+**	:all :random :off
+**
+**	@param name	Name starting with ":".
+**
+**	@return		True if name is handled by the cdrom module.
+*/
+local int PlayCDRom(const char* name)
+{
+    cdrom_drive *CddaDrive = NULL;
+    void *buf;
+//    cdrom_paranoia *Cdda;
+
+    if (!strcmp(CDMode, ":off")) {
+	if (!strncmp(name, ":", 1)) {
+	    CddaDrive = cdda_find_a_cdrom(0, NULL);
+	    cdda_open(CddaDrive);
+//	    Cdda = paranoia_init(CddaDrive);
+
+	    NumCDTracks = cdda_tracks(CddaDrive);
+
+	    if (NumCDTracks == -1) {
+		CDMode = ":off";
+		return 1;
+	    }
+	    --CDTrack;
+	}
+    }
+
+    StopMusic();
+
+    if (!strncmp(name, ":", 1)) {
+
+	// if mode is play all tracks
+	if (!strcmp(name, ":all")) {
+	    CDMode = ":all";
+	    
+	    do {
+		if (CDTrack > NumCDTracks)
+		    CDTrack = 1;
+	    } while (cdda_track_audiop(CddaDrive, ++CDTrack) == 0);
+	    
+	    // temporary
+	    fprintf(stderr, "AAAAAAAAAAa %d\n",CDTrack);
+	    CDTrack = 3;
+	    
+	    buf = malloc(512*100);
+	    cdda_read(CddaDrive, buf, cdda_track_firstsector(CddaDrive, CDTrack), 100);
+
+	    free(buf);
+
+	    return 1;
+	}
+	// if mode is play random tracks
+	if (!strcmp(name, ":random")) {
+	    CDMode = ":random";
+
+	    do {
+		CDTrack = MyRand() % NumCDTracks;
+	    } while (cdda_track_audiop(CddaDrive, ++CDTrack) == 0);
+
+	    buf = malloc(512*100);
+	    cdda_read(CddaDrive, buf, cdda_track_firstsector(CddaDrive, CDTrack), 100);
+
+	    free(buf);
+
+	    return 1;
+	}
+	return 1;
+    }
+    // FIXME: no cdrom, must stop it now!
+
+    return 0;
+
 }
 #endif
 

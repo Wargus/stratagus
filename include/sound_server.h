@@ -49,6 +49,7 @@ extern sem_t SoundThreadChannelSemaphore;
 #elif defined(USE_CDDA)
 #include <cdda_interface.h>
 #include <cdda_paranoia.h>
+#include <utils.h>
 #endif
 
 /*----------------------------------------------------------------------------
@@ -240,13 +241,14 @@ extern char *CDMode;
 extern int CDTrack;
 #endif
 
-#if defined(USE_LIBCDA)
+#if defined(USE_SDLCD)
+extern SDL_CD *CDRom;                   /// SDL cdrom device
+#elif defined(USE_LIBCDA)
     /// number of tracks on the cd
 extern int NumCDTracks;
-#elif defined(USE_SDLCD)
-extern SDL_CD *CDRom;                   /// SDL cdrom device
 #elif defined(USE_CDDA)
 // FIXME: fill up
+extern int NumCDTracks;
 #endif
 
 extern Sample* MusicSample;		/// Music samples
