@@ -211,10 +211,6 @@ global void LoadIcons(void)
 				file = strcat(strcpy(buf, "graphics/"), file);
 				ShowLoadProgress("Icons %s", file);
 				icon->File->Sprite = LoadSprite(file, icon->Width, icon->Height);
-#ifdef USE_OPENGL
-				MakeTexture(icon->File->Sprite, icon->File->Sprite->Width,
-					icon->File->Sprite->Height);
-#endif
 			}
 			icon->Sprite = icon->File->Sprite;
 			if (icon->Index >= (unsigned)icon->Sprite->NumFrames) {
