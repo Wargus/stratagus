@@ -10,7 +10,7 @@
 //
 /**@name pud.c		-	The pud. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1398,11 +1398,12 @@ local void PudWriteMTXM(gzFile f,const WorldMap* map)
     tileset=map->Tileset;
     n=map->Width*map->Height;
     PudWriteHeader(f,"MTXM",n*2);
-    mtxm=alloca(n*2);
+    mtxm=malloc(n*2);
 
     PudConvertMTXM(mtxm,map,tileset);
 
     gzwrite(f,mtxm,n*2);
+    free(mtxm);
 }
 
 /**
@@ -1416,9 +1417,10 @@ global void ChangeTilesetPud(int old,WorldMap* map)
     unsigned char* mtxm;
 
     MapOffsetX=MapOffsetY=0;
-    mtxm=alloca(map->Width*map->Height*2);
+    mtxm=malloc(map->Width*map->Height*2);
     PudConvertMTXM(mtxm,map,Tilesets[old]);
     ConvertMTXM((const unsigned short*)mtxm,map->Width,map->Height,map);
+    free(mtxm);
 }
 
 /**
@@ -1435,7 +1437,7 @@ local void PudWriteSQM(gzFile f,const WorldMap* map)
 
     n=map->Width*map->Height;
     PudWriteHeader(f,"SQM ",n*2);
-    sqm=alloca(n*2);
+    sqm=malloc(n*2);
 
     for( i=0; i<n; ++i ) {
 	int v;
@@ -1486,6 +1488,7 @@ local void PudWriteSQM(gzFile f,const WorldMap* map)
 	sqm[i*2+1]=v >> 8;
     }
     gzwrite(f,sqm,n*2);
+    free(sqm);
 }
  
 /**
@@ -1502,7 +1505,7 @@ local void PudWriteREGM(gzFile f,const WorldMap* map)
 
     n=map->Width*map->Height;
     PudWriteHeader(f,"REGM",n*2);
-    regm=alloca(n*2);
+    regm=malloc(n*2);
     for( i=0; i<n; ++i ) {
 	int v;
 	int f;
@@ -1527,6 +1530,7 @@ local void PudWriteREGM(gzFile f,const WorldMap* map)
     }
 
     gzwrite(f,regm,n*2);
+    free(regm);
 }
 
 /**
