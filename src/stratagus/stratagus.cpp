@@ -227,7 +227,10 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "pathfinder.h"
 
 #ifdef DEBUG
+#if defined(USE_GUILE) || defined(USE_SIOD)
 extern SCM CclUnits(void);
+#elif defined(USE_LUA)
+#endif
 #endif
 
 /*----------------------------------------------------------------------------
@@ -1321,9 +1324,14 @@ global volatile void Exit(int err)
 	FrameCounter _C_ SlowFrameCounter _C_
 	(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
     UnitCacheStatistic();
+#if defined(USE_GUILE) || defined(USE_SIOD)
     CclUnits();
+#endif
     CleanModules();
     CleanFonts();
+#ifdef USE_LUA
+    lua_close(Lua);
+#endif
 #endif
 
     CleanMovie();
@@ -1398,8 +1406,13 @@ global int main(int argc, char** argv)
 #ifndef __APPLE__
     StratagusLibPath = STRATAGUS_LIB_PATH;
 #endif
+#ifndef USE_LUA
     CclStartFile = "ccl/stratagus.ccl";
     EditorStartFile = "ccl/editor.ccl";
+#else
+    CclStartFile = "ccl/stratagus.lua";
+    EditorStartFile = "ccl/editor.lua";
+#endif
 
     memset(LocalPlayerName, 0, 16);
     strcpy(LocalPlayerName, "Anonymous");

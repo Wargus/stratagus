@@ -239,6 +239,7 @@ global void RemoveUnitFromGroups(Unit* unit)
 **	@param num	Number of units in group
 **	@param units	Units in group
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclGroup(SCM group, SCM num, SCM units)
 {
     int i;
@@ -258,13 +259,17 @@ local SCM CclGroup(SCM group, SCM num, SCM units)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for groups.
 */
 global void GroupCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure3_0("group", CclGroup);
+#endif
 }
 
 //@}

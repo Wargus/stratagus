@@ -151,7 +151,11 @@ global void PlayCampaign(const char* name)
     if (!CurrentCampaign->Chapters) {
 	char buf[1024];
 	filename = LibraryFileName(CurrentCampaign->File, buf);
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	vload(filename, 0, 1);
+#elif defined(USE_LUA)
+	LuaLoadFile(filename);
+#endif
     }
 
     GameIntro.Objectives[0] = strdup(DefaultObjective);
@@ -175,6 +179,7 @@ global void PlayCampaign(const char* name)
 **	@param chapter	    Chapter.
 **	@param list	    List describing show-picture.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void ParseShowPicture(CampaignChapter* chapter, SCM list)
 {
     SCM value;
@@ -250,6 +255,8 @@ local void ParseShowPicture(CampaignChapter* chapter, SCM list)
 	}
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Free campaign chapters.
@@ -293,6 +300,7 @@ local void FreeChapters(CampaignChapter** chapters)
 **
 **	@note FIXME: play-video, defeat, draw are missing.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineCampaign(SCM list)
 {
     char* ident;
@@ -399,12 +407,15 @@ local SCM CclDefineCampaign(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the current campaign chapter
 **
 **	@param num	Number of current chapter in current campaign.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetCurrentChapter(SCM num)
 {
     int i;
@@ -428,12 +439,15 @@ local SCM CclSetCurrentChapter(SCM num)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the briefing.
 **
 **	@param list	List describing the briefing.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclBriefing(SCM list)
 {
     SCM value;
@@ -502,15 +516,19 @@ local SCM CclBriefing(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for campaigns.
 */
 global void CampaignCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-campaign", CclDefineCampaign);
     gh_new_procedure1_0("set-current-chapter!", CclSetCurrentChapter);
     gh_new_procedureN("briefing", CclBriefing);
+#endif
 }
 
 /**

@@ -52,7 +52,10 @@
 ----------------------------------------------------------------------------*/
 
     /// Get unit-type.
+#if defined(USE_GUILE) || defined(USE_SIOD)
 extern UnitType* CclGetUnitType(SCM ptr);
+#elif defined(USE_LUA)
+#endif
 
 #define MAX_SWITCH	256		/// Maximum number of switches
 
@@ -60,11 +63,17 @@ extern UnitType* CclGetUnitType(SCM ptr);
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM Trigger;			/// Current trigger
+#elif defined(USE_LUA)
+#endif
 global Timer GameTimer;			/// The game timer
 local unsigned long WaitFrame;		/// Frame to wait for
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM WaitScript;			/// Script to run after wait is over
 local SCM WaitTrigger;			/// Old Trigger value during wait
+#elif defined(USE_LUA)
+#endif
 local unsigned char Switch[MAX_SWITCH];	/// Switches
 
 /*----------------------------------------------------------------------------
@@ -78,6 +87,7 @@ local unsigned char Switch[MAX_SWITCH];	/// Switches
 **
 **	@return		The player number, -1 matches any.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global int TriggerGetPlayer(SCM player)
 {
     int ret;
@@ -120,6 +130,8 @@ global const UnitType* TriggerGetUnitType(SCM unit)
 
     return CclGetUnitType(unit);
 }
+#elif defined(USE_LUA)
+#endif
 
 // --------------------------------------------------------------------------
 //	Conditions
@@ -185,6 +197,7 @@ local CompareFunction GetCompareFunction(const char* op)
 /**
 **	Player has the quantity of unit-type.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfUnit(SCM player, SCM operation, SCM quantity, SCM unit)
 {
     int plynr;
@@ -996,12 +1009,15 @@ local void TriggerRemoveTrigger(SCM trig)
     }
     CclGcProtectedAssign(&Trigger, trig);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Check trigger each game cycle.
 */
 global void TriggersEachCycle(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM pair;
     SCM trig;
     SCM value;
@@ -1049,6 +1065,8 @@ global void TriggersEachCycle(void)
     } else {
 	CclGcProtectedAssign(&Trigger, NULL);
     }
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -1056,6 +1074,7 @@ global void TriggersEachCycle(void)
 */
 global void TriggerCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     Trigger = NIL;
     WaitScript = NIL;
     WaitTrigger  = NIL;
@@ -1087,6 +1106,7 @@ global void TriggerCclRegister(void)
     gh_new_procedure2_0("action-set-switch", CclActionSetSwitch);
 
     gh_define("*triggers*", NIL);
+#endif
 }
 
 /**
@@ -1097,6 +1117,7 @@ global void TriggerCclRegister(void)
 **	@param exp	Expression
 **	@param f	File to print to
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void PrintTrigger(SCM exp, CLFile* f)
 {
 #ifdef USE_GUILE
@@ -1179,6 +1200,8 @@ local void PrintTrigger(SCM exp, CLFile* f)
     }
 #endif
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Save the trigger module.
@@ -1187,6 +1210,7 @@ local void PrintTrigger(SCM exp, CLFile* f)
 */
 global void SaveTriggers(CLFile* file)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM list;
     int i;
     int trigger;
@@ -1218,6 +1242,8 @@ global void SaveTriggers(CLFile* file)
 	    CLprintf(file, "(action-start-timer)\n");
 	}
     }
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -1232,10 +1258,13 @@ global void InitTriggers(void)
 
     // FIXME: choose the triggers for game type
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     if (gh_null_p(symbol_value(gh_symbol2scm("*triggers*"), NIL))) {
 	DebugLevel0Fn("Default triggers\n");
 	gh_apply(symbol_value(gh_symbol2scm("single-player-triggers"), NIL), NIL);
     }
+#elif defined(USE_LUA)
+#endif
 
     memset(Switch, 0, sizeof(Switch));
 }
@@ -1245,6 +1274,7 @@ global void InitTriggers(void)
 */
 global void CleanTriggers(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM var;
 
     DebugLevel0Fn("FIXME: Cleaning trigger not written\n");
@@ -1253,6 +1283,8 @@ global void CleanTriggers(void)
     setvar(var, NIL, NIL);
 
     CclGcProtectedAssign(&Trigger, NULL);
+#elif defined(USE_LUA)
+#endif
 
     memset(&GameTimer, 0, sizeof(GameTimer));
 }

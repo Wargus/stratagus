@@ -111,6 +111,7 @@ global void SaveGame(const char* filename)
 	StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
     // Save media type
     {
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	SCM var;
 
 	CLprintf(file, ";;;  'media\t'");
@@ -122,6 +123,8 @@ global void SaveGame(const char* filename)
 	//} else {
 	    CLprintf(file, "nil");
 	//}
+#elif defined(USE_LUA)
+#endif
     }
     CLprintf(file, "\n;;;  'preview\t\"%s.pam\"\n", filename);
     CLprintf(file, ";;;  )\n");

@@ -60,16 +60,20 @@
 **
 **	@return		The player pointer
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local Player* CclGetPlayer(SCM value)
 {
     return &Players[gh_scm2int(value)];
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse the player configuration.
 **
 **	@param list	Tagged list of all informations.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclPlayer(SCM list)
 {
     SCM value;
@@ -287,6 +291,8 @@ local SCM CclPlayer(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Change unit owner
@@ -296,6 +302,7 @@ local SCM CclPlayer(SCM list)
 **	@param oldplayer old player number
 **	@param newplayer new player number
 **/
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclChangeUnitsOwner(SCM pos1, SCM pos2, SCM oldplayer, SCM newplayer)
 {
     Unit* table[UnitMax];
@@ -315,45 +322,157 @@ local SCM CclChangeUnitsOwner(SCM pos1, SCM pos2, SCM oldplayer, SCM newplayer)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclChangeUnitsOwner(lua_State* l)
+{
+    Unit* table[UnitMax];
+    int n;
+    int oldp;
+    int newp;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+
+    if (lua_gettop(l) != 4 || !lua_istable(l, 1) || !lua_istable(l, 2) ||
+	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (luaL_getn(l, 1) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_rawgeti(l, 1, 1);
+    if (!lua_isnumber(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    x1 = lua_tonumber(l, -1);
+    lua_pop(l, 1);
+    lua_rawgeti(l, 1, 1);
+    if (!lua_isnumber(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    y1 = lua_tonumber(l, -1);
+    lua_pop(l, 1);
+
+    if (luaL_getn(l, 2) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_rawgeti(l, 2, 1);
+    if (!lua_isnumber(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    x2 = lua_tonumber(l, -1);
+    lua_pop(l, 1);
+    lua_rawgeti(l, 2, 1);
+    if (!lua_isnumber(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    y2 = lua_tonumber(l, -1);
+    lua_pop(l, 1);
+
+    n = SelectUnits(x1, y1, x2, y2, table);
+    oldp = lua_tonumber(l, 3);
+    newp = lua_tonumber(l, 4);
+    while (n) {
+        if (table[n - 1]->Player->Player == oldp) {
+	    ChangeUnitOwner(table[n - 1], &Players[newp]);
+	}
+	--n;
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Get ThisPlayer.
 **
 **	@return		This player number.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclGetThisPlayer(void)
 {
     return gh_int2scm(ThisPlayer - Players);
 }
+#elif defined(USE_LUA)
+local int CclGetThisPlayer(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushnumber(l, ThisPlayer - Players);
+    return 1;
+}
+#endif
 
 /**
 **	Set ThisPlayer.
 **
 **	@param plynr	This player number.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetThisPlayer(SCM plynr)
 {
     ThisPlayer = &Players[gh_scm2int(plynr)];
 
     return plynr;
 }
+#elif defined(USE_LUA)
+local int CclSetThisPlayer(lua_State* l)
+{
+    int plynr;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    plynr = lua_tonumber(l, 1);
+    ThisPlayer = &Players[plynr];
+
+    lua_pushnumber(l, plynr);
+    return 1;
+}
+#endif
 
 /**
 **	Set MaxSelectable
 **
 **	@param		Max number of selectable units.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMaxSelectable(SCM max)
 {
     MaxSelectable = gh_scm2int(max);
     return max;
 }
+#elif defined(USE_LUA)
+local int CclSetMaxSelectable(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    MaxSelectable = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, MaxSelectable);
+    return 1;
+}
+#endif
 
 /**
 **	Set player unit limit.
 **
 **	@param limit	Unit limit.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetAllPlayersFoodUnitLimit(SCM limit)
 {
     int i;
@@ -364,12 +483,30 @@ local SCM CclSetAllPlayersFoodUnitLimit(SCM limit)
 
     return limit;
 }
+#elif defined(USE_LUA)
+local int CclSetAllPlayersFoodUnitLimit(lua_State* l)
+{
+    int i;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    for (i = 0; i < PlayerMax; ++i) {
+	Players[i].FoodUnitLimit = lua_tonumber(l, 1);
+    }
+
+    lua_pushnumber(l, lua_tonumber(l, 1));
+    return 1;
+}
+#endif
 
 /**
 **	Set player unit limit.
 **
 **	@param limit	Unit limit.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetAllPlayersBuildingLimit(SCM limit)
 {
     int i;
@@ -380,12 +517,30 @@ local SCM CclSetAllPlayersBuildingLimit(SCM limit)
 
     return limit;
 }
+#elif defined(USE_LUA)
+local int CclSetAllPlayersBuildingLimit(lua_State* l)
+{
+    int i;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    for (i = 0; i < PlayerMax; ++i) {
+	Players[i].BuildingLimit = lua_tonumber(l, 1);
+    }
+
+    lua_pushnumber(l, lua_tonumber(l, 1));
+    return 1;
+}
+#endif
 
 /**
 **	Set player unit limit.
 **
 **	@param limit	Unit limit.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetAllPlayersTotalUnitLimit(SCM limit)
 {
     int i;
@@ -396,6 +551,23 @@ local SCM CclSetAllPlayersTotalUnitLimit(SCM limit)
 
     return limit;
 }
+#elif defined(USE_LUA)
+local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
+{
+    int i;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    for (i = 0; i < PlayerMax; ++i) {
+	Players[i].TotalUnitLimit = lua_tonumber(l, 1);
+    }
+
+    lua_pushnumber(l, lua_tonumber(l, 1));
+    return 1;
+}
+#endif
 
 /**
 **	Change the diplomacy from player to another player.
@@ -408,37 +580,14 @@ local SCM CclSetAllPlayersTotalUnitLimit(SCM limit)
 **
 **	@todo FIXME: should return old state.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetDiplomacy(SCM player, SCM state, SCM opponent)
 {
     int plynr;
-
-#if 0
-    Player* base;
-
-    base = CclGetPlayer(player);
-    plynr = gh_scm2int(opponent);
-
-    if (gh_eq_p(state, gh_symbol2scm("allied"))) {
-	base->Enemy &= ~(1 << plynr);
-	base->Allied |= 1 << plynr;
-    } else if (gh_eq_p(state, gh_symbol2scm("neutral"))) {
-	base->Enemy &= ~(1 << plynr);
-	base->Allied &= ~(1 << plynr);
-    } else if (gh_eq_p(state, gh_symbol2scm("crazy"))) {
-	base->Enemy |= 1 << plynr;
-	base->Allied |= 1 << plynr;
-    } else if (gh_eq_p(state, gh_symbol2scm("enemy"))) {
-	base->Enemy |= 1 << plynr;
-	base->Allied &= ~(1 << plynr);
-    }
-
-#else
     int base;
 
     base = gh_scm2int(player);
     plynr = gh_scm2int(opponent);
-
-    // FIXME: must send over network!!
 
     if (gh_eq_p(state, gh_symbol2scm("allied"))) {
 	SendCommandDiplomacy(base, DiplomacyAllied, plynr);
@@ -450,11 +599,38 @@ local SCM CclSetDiplomacy(SCM player, SCM state, SCM opponent)
 	SendCommandDiplomacy(base, DiplomacyEnemy, plynr);
     }
 
-#endif
-
     // FIXME: we can return the old state
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetDiplomacy(lua_State* l)
+{
+    int plynr;
+    int base;
+    const char* state;
+
+    if (lua_gettop(l) != 3 || !lua_isnumber(l, 1) || !lua_isstring(l, 2) ||
+	    !lua_isnumber(l, 3)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    base = lua_tonumber(l, 1);
+    plynr = lua_tonumber(l, 3);
+    state = lua_tostring(l, 2);
+
+    if (!strcmp(state, "allied")) {
+	SendCommandDiplomacy(base, DiplomacyAllied, plynr);
+    } else if (!strcmp(state, "neutral")) {
+	SendCommandDiplomacy(base, DiplomacyNeutral, plynr);
+    } else if (!strcmp(state, "crazy")) {
+	SendCommandDiplomacy(base, DiplomacyCrazy, plynr);
+    } else if (!strcmp(state, "enemy")) {
+	SendCommandDiplomacy(base, DiplomacyEnemy, plynr);
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Change the diplomacy from ThisPlayer to another player.
@@ -462,10 +638,19 @@ local SCM CclSetDiplomacy(SCM player, SCM state, SCM opponent)
 **	@param state	To which state this should be changed.
 **	@param player	Player number to change.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDiplomacy(SCM state, SCM player)
 {
     return CclSetDiplomacy(gh_int2scm(ThisPlayer->Player), state, player);
 }
+#elif defined(USE_LUA)
+local int CclDiplomacy(lua_State* l)
+{
+    lua_pushnumber(l, ThisPlayer->Player);
+    lua_insert(l, 1);
+    return CclSetDiplomacy(l);
+}
+#endif
 
 /**
 **	Change the shared vision from player to another player.
@@ -478,6 +663,7 @@ local SCM CclDiplomacy(SCM state, SCM player)
 **
 **	@todo FIXME: should return old state.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSharedVision(SCM player, SCM state, SCM opponent)
 {
     int plynr;
@@ -493,6 +679,28 @@ local SCM CclSetSharedVision(SCM player, SCM state, SCM opponent)
     // FIXME: we can return the old state
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetSharedVision(lua_State* l)
+{
+    int plynr;
+    int base;
+    int shared;
+
+    if (lua_gettop(l) != 3 || !lua_isnumber(l, 1) || !lua_isboolean(l, 2) ||
+	    !lua_isnumber(l, 3)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    base = lua_tonumber(l, 1);
+    shared = lua_toboolean(l, 2);
+    plynr = lua_tonumber(l, 3);
+
+    SendCommandSharedVision(base, shared, plynr);
+
+    return 0;
+}
+#endif
 
 /**
 **	Change the shared vision from ThisPlayer to another player.
@@ -500,16 +708,26 @@ local SCM CclSetSharedVision(SCM player, SCM state, SCM opponent)
 **	@param state	To which state this should be changed.
 **	@param player	Player number to change.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSharedVision(SCM state, SCM player)
 {
     return CclSetSharedVision(gh_int2scm(ThisPlayer->Player), state, player);
 }
+#elif defined(USE_LUA)
+local int CclSharedVision(lua_State* l)
+{
+    lua_pushnumber(l, ThisPlayer->Player);
+    lua_insert(l, 1);
+    return CclSetSharedVision(l);
+}
+#endif
 
 /**
 **	Define race names
 **
 **	@param list	List of all races.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineRaceNames(SCM list)
 {
     SCM sublist;
@@ -554,16 +772,110 @@ local SCM CclDefineRaceNames(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineRaceNames(lua_State* l)
+{
+    int i;
+    int j;
+    int k;
+    int args;
+    int subargs;
+    const char* value;
+
+    PlayerRaces.Count = 0;
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	if (!strcmp(value, "race")) {
+	    ++j;
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    i = PlayerRaces.Count++;
+	    PlayerRaces.Race[i] = 0;
+	    PlayerRaces.Name[i] = NULL;
+	    PlayerRaces.Display[i] = NULL;
+	    PlayerRaces.Visible[i] = 0;
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		if (!strcmp(value, "race")) {
+		    ++k;
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isnumber(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    PlayerRaces.Race[i] = lua_tonumber(l, -1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "name")) {
+		    ++k;
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    PlayerRaces.Name[i] = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "display")) {
+		    ++k;
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    PlayerRaces.Display[i] = strdup(lua_tostring(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "visible")) {
+		    PlayerRaces.Visible[i] = 1;
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Make new player colors
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclNewPlayerColors(void)
 {
     SetPlayersPalette();
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclNewPlayerColors(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    SetPlayersPalette();
+
+    return 0;
+}
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -575,6 +887,7 @@ local SCM CclNewPlayerColors(void)
 **
 **	@return		Player resource
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclGetPlayerResource(SCM player, SCM resource)
 {
     int i;
@@ -598,12 +911,15 @@ local SCM CclGetPlayerResource(SCM player, SCM resource)
     free(res);
     return ret;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set player resource.
 **
 **	@param list	Resource list
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetPlayerResource(SCM list)
 {
     int i;
@@ -630,6 +946,8 @@ local SCM CclSetPlayerResource(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -638,6 +956,7 @@ local SCM CclSetPlayerResource(SCM list)
 */
 global void PlayerCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("player", CclPlayer);
     gh_new_procedure4_0("change-units-owner", CclChangeUnitsOwner);
     gh_new_procedure0_0("get-this-player", CclGetThisPlayer);
@@ -664,6 +983,34 @@ global void PlayerCclRegister(void)
     // player member access functions
     gh_new_procedure2_0("get-player-resource", CclGetPlayerResource);
     gh_new_procedureN("set-player-resource!", CclSetPlayerResource);
+#elif defined(USE_LUA)
+//    lua_register(Lua, "Player", CclPlayer);
+    lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);
+    lua_register(Lua, "GetThisPlayer", CclGetThisPlayer);
+    lua_register(Lua, "SetThisPlayer", CclSetThisPlayer);
+
+    lua_register(Lua, "SetMaxSelectable", CclSetMaxSelectable);
+
+    lua_register(Lua, "SetAllPlayersFoodUnitLimit",
+	CclSetAllPlayersFoodUnitLimit);
+    lua_register(Lua, "SetAllPlayersBuildingLimit",
+	CclSetAllPlayersBuildingLimit);
+    lua_register(Lua, "SetAllPlayersTotalUnitLimit",
+	CclSetAllPlayersTotalUnitLimit);
+
+    lua_register(Lua, "SetDiplomacy", CclSetDiplomacy);
+    lua_register(Lua, "Diplomacy", CclDiplomacy);
+    lua_register(Lua, "SetSharedVision", CclSetSharedVision);
+    lua_register(Lua, "SharedVision", CclSharedVision);
+
+    lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
+
+    lua_register(Lua, "NewColors", CclNewPlayerColors);
+
+    // player member access functions
+//    lua_register(Lua, "GetPlayerResource", CclGetPlayerResource);
+//    lua_register(Lua, "SetPlayerResource", CclSetPlayerResource);
+#endif
 }
 
 //@}
