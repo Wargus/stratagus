@@ -380,7 +380,7 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
     //
     //	Black border around icon with gray border if active.
     //
-    color = (flags & IconActive) ? ColorGray : ColorBlack;
+    color = (flags & (IconActive | IconClicked)) ? ColorGray : ColorBlack;
 
     width = icon->Width;
     height = icon->Height;
@@ -389,32 +389,32 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 	width + 5, height + 5);
 
     // _|	Shadow
-    VideoDrawVLine(ColorGray, x + width + 4, y + 5, height - 1);
-    VideoDrawVLine(ColorGray, x + width + 5, y + 5, height - 1);
-    VideoDrawHLine(ColorGray, x + 5, y + height + 4, width + 1);
-    VideoDrawHLine(ColorGray, x + 5, y + height + 5, width + 1);
+    VideoDrawVLine(ColorGray, x + width + 3, y + 2, height + 1);
+    VideoDrawVLine(ColorGray, x + width + 4, y + 2, height + 1);
+    VideoDrawHLine(ColorGray, x + 2, y + height + 3, width + 3);
+    VideoDrawHLine(ColorGray, x + 2, y + height + 4, width + 3);
 
     // |~	Light
     color = (flags & IconClicked) ? ColorGray : ColorWhite;
-    VideoDrawHLine(color, x + 5, y + 3, width + 1);
-    VideoDrawHLine(color, x + 5, y + 4, width + 1);
-    VideoDrawVLine(color, x + 3, y + 3, height + 3);
-    VideoDrawVLine(color, x + 4, y + 3, height + 3);
+    VideoDrawHLine(color, x + 4, y + 2, width - 1);
+    VideoDrawHLine(color, x + 4, y + 3, width - 1);
+    VideoDrawVLine(color, x + 2, y + 2, height + 1);
+    VideoDrawVLine(color, x + 3, y + 2, height + 1);
 
     if (flags & IconClicked) {
-	x += 5;
-	y += 5;
-    } else {
 	x += 4;
 	y += 4;
+    } else {
+	x += 3;
+	y += 3;
     }
 
     DrawIcon(player, icon, x, y);
 
     if (flags & IconSelected) {
-	VideoDrawRectangleClip(ColorGreen, x, y, width, height);
+	VideoDrawRectangleClip(ColorGreen, x - 1, y - 1, width + 1, height + 1);
     } else if (flags & IconAutoCast) {
-	VideoDrawRectangleClip(ColorBlue, x, y, width, height);
+	VideoDrawRectangleClip(ColorBlue, x - 1, y - 1, width + 1, height + 1);
     }
 }
 
