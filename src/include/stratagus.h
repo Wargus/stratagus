@@ -40,9 +40,6 @@
 // New unit cache
 #define NEW_UNIT_CACHE
 
-// New Lua scripting.
-//#define META_LUA
-
 // Dynamic loading.
 //#define DYNAMIC_LOAD
 
@@ -338,7 +335,7 @@ enum _must_redraw_flags_ {
 	RedrawMenu          = 1 << 22,      /// Menu
 	RedrawTimer         = 1 << 23,      /// Timer
 
-	// Bits 23-29 are unused.
+	// Bits 24-29 are unused.
 
 	RedrawAll           = 1 << 30,      /// All flag set by RedrawEverything
 	RedrawEverything    = -1,           /// Must redraw everything

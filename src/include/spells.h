@@ -341,11 +341,6 @@ SpellFunc CastDeathCoil;
 SpellFunc CastSpawnPortal;
 SpellFunc CastSpawnMissile;
 
-#ifdef META_LUA
-	/// Initialize Spell scripting.
-extern void ScriptSpellInit(void);
-#endif
-
 //@}
 
 #endif		// !__SPELLS_H__

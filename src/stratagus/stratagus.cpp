@@ -959,9 +959,6 @@ global int main(int argc, char** argv)
 #ifdef USE_OPENGL
 		"OPENGL "
 #endif
-#ifdef META_LUA
-		"META-LUA"
-#endif
 	;
 
 #ifdef USE_BEOS

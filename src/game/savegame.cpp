@@ -121,9 +121,6 @@ local char* SaveGlobal(lua_State *l, int is_root)
 			|| !strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug")
 			|| !strcmp(key, "coroutine")
 		// other string to protected ?
-#ifdef META_LUA
-			|| !strcmp(key, "Stratagus") // do not save stratagus table. or should be ?
-#endif
 		))) {
 			lua_pop(l, 1); // pop the value
 			continue;
