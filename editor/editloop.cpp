@@ -796,7 +796,6 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 		    unit->Value = 100000;
 		}
 	    } else {
-		SetMessage("Unit can't be placed here.");
 		SetStatusLine("Unit can't be placed here.");
 		PlayGameSound(GameSounds.PlacementError.Sound
 			,MaxSampleVolume);
@@ -818,6 +817,17 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
     }
 
     switch (key) {
+	case KeyCodeDelete:	// Delete
+	    if( UnitUnderCursor ) {
+		Unit* unit;
+
+		RemoveUnit(unit = UnitUnderCursor);
+		UnitLost(unit);
+		ReleaseUnit(unit);
+		SetStatusLine("Unit deleted");
+	    }
+	    break;
+
 	case KeyCodeUp:		// Keyboard scrolling
 	case KeyCodeKP8:
 	    KeyScrollState |= ScrollUp;

@@ -130,7 +130,9 @@ enum _key_codes_ {
     KeyCodeAlt,				/// internal keycode: alt modifier
     KeyCodeSuper,			/// internal keycode: super modifier
     KeyCodeHyper,			/// internal keycode: hyper modifier
+
     KeyCodePrint,			/// internal keycode: print screen
+    KeyCodeDelete,			/// internal keycode: delete
 };
 
     /// Key modifier

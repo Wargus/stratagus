@@ -728,6 +728,10 @@ local void KeyboardEvent(int scancode, int press)
 		break;
 	    case SCANCODE_PRINTSCREEN:
 		icode = KeyCodePrint;
+		break;
+	    case SCANCODE_REMOVE:
+		icode = KeyCodeDelete;
+		break;
 
 		// KeyCodePause
 
