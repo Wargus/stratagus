@@ -1371,7 +1371,9 @@ global void LoadUnitTypes(void)
 	    ShowLoadProgress("Unit `%s'", file);
 	    type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
 		type->ShadowHeight);
+#ifdef USE_SDL_SURFACE
 	    FlipGraphic(type->ShadowSprite);
+#endif
 	}
 
 	//  Load empty/loaded graphics
@@ -1383,14 +1385,18 @@ global void LoadUnitTypes(void)
 			ShowLoadProgress("Unit `%s'", file);
 			resinfo->SpriteWhenLoaded = LoadSprite(file, type->Width,
 			    type->Height);
+#ifdef USE_SDL_SURFACE
 			FlipGraphic(resinfo->SpriteWhenLoaded);
+#endif
 		    }
 		    if ((file = resinfo->FileWhenEmpty)) {
 			file = strcat(strcpy(buf, "graphics/"), file);
 			ShowLoadProgress("Unit `%s'", file);
 			resinfo->SpriteWhenEmpty = LoadSprite(file, type->Width,
 			    type->Height);
+#ifdef USE_SDL_SURFACE
 			FlipGraphic(resinfo->SpriteWhenEmpty);
+#endif
 		    }
 		}
 	    }
@@ -1418,7 +1424,9 @@ global void LoadUnitTypes(void)
 	    file = strcat(strcpy(buf, "graphics/"), file);
 	    ShowLoadProgress("Unit `%s'", file);
 	    type->Sprite = LoadSprite(file, type->Width, type->Height);
+#ifdef USE_SDL_SURFACE
 	    FlipGraphic(type->Sprite);
+#endif
 	}
     }
 
