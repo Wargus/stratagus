@@ -349,34 +349,14 @@ global void PrintUnitTypeTable(void)
 	printf("   ,_%sAnimations\t// animations\n",UnitTypeNames[i]);
 	printf("   ,{ \"%s\" }\n",IdentOfIcon(type->Icon.Icon));
 
-//	printf("   ,{ \"%s\" }\t\t// Missile\n"
-//		,MissileTypes[type->MissileWeapon].Ident);
 	printf("   ,{ \"%s\" }\t\t// Missile\n",type->Missile.Name);
 
-#if 0
-//	switch( UnitCorpse[type->Type] ) {
-	switch( type->Corpse ) {
-	    case 0:
-		printf("   ,CorpseNone\n");
-		break;
-	    case 1:
-		printf("   ,CorpseHuman\n");
-		break;
-	    case 2:
-		printf("   ,CorpseOrc\n");
-		break;
-	    case 3:
-		printf("   ,CorpseShip\n");
-		break;
-	    case 4:
-		printf("   ,CorpseLandSite\n");
-		break;
-	    case 5:
-		printf("   ,CorpseWaterSite\n");
-		break;
+	if( type->CorpseName ) {
+	    printf("   ,\"%s\", NULL, %d\n"
+		    ,type->CorpseName,type->CorpseScript);
+	} else {
+	    printf("   ,NULL, NULL, 0\n");
 	}
-#endif
-	printf("   ,\"%s\", NULL, %d\n",type->CorpseName,type->CorpseScript);
 	break;
 
 	printf("\t//Speed\tOvFrame\tSightR\tHitpnt\tMagic\tBTime\tGold\tWood\tOil\n");
@@ -475,14 +455,7 @@ global void PrintUnitTypeTable(void)
 	printf("\t,{ \"%s\" }\n",type->Sound.Ready.Name);
 	printf("\t,{ \"%s\" }\n",type->Sound.Help.Name);
 	printf("\t,{ \"%s\" }\n",type->Sound.Dead.Name);
-#if 0
-	printf("\t { \"%s-selected\" }\n",type->Ident);
-	printf("\t,{ \"%s-acknowledge\" }\n",type->Ident);
-	printf("\t,{ \"%s-ready\" }\n",type->Ident);
-	printf("\t,{ \"%s-help\" }\n",type->Ident);
-	printf("\t,{ \"%s-dead\" }\n",type->Ident);
-	//FIXME: add here autogeneration of attack information (at least sound)
-#endif
+
 	printf("   },");
 	printf("   {");
 	printf("\t { \"%s\" }\n",type->Weapon.Attack.Name);
@@ -526,15 +499,7 @@ global void UpdateStats(void)
     }
 }
 
-#define ReadByte()   (*((unsigned char*)udta)++)
-
-#if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
-#define ReadWord()   bswap_16(*((unsigned short*)udta)++)
-#define ReadLong()   bswap_32(*((unsigned long*)udta)++)
-#else
-#define ReadWord()   (*((unsigned short*)udta)++)
-#define ReadLong()   (*((unsigned long*)udta)++)
-#endif
+#define Fetch8(p)   (*((unsigned char*)(p))++)
 
 /**
 **	Parse UDTA area from puds.
@@ -560,115 +525,115 @@ global void ParsePudUDTA(const char* udta,int length)
 
     for( i=0; i<110; ++i ) {		// overlap frames
 	unittype=UnitTypeByWcNum(i);
-	v=ReadWord();
+	v=FetchLE16(udta);
 	unittype->OverlapFrame=v;
     }
     for( i=0; i<508; ++i ) {		// skip obselete data
-	v=ReadWord();
+	v=FetchLE16(udta);
     }
     for( i=0; i<110; ++i ) {		// sight range
 	unittype=UnitTypeByWcNum(i);
-	v=ReadLong();
+	v=FetchLE32(udta);
 	unittype->_SightRange=v;
     }
     for( i=0; i<110; ++i ) {		// hit points
 	unittype=UnitTypeByWcNum(i);
-	v=ReadWord();
+	v=FetchLE16(udta);
 	unittype->_HitPoints=v;
     }
     for( i=0; i<110; ++i ) {		// Flag if unit is magic
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->Magic=v;
     }
     for( i=0; i<110; ++i ) {		// Build time * 6 = one second FRAMES
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_Costs[TimeCost]=v;
     }
     for( i=0; i<110; ++i ) {		// Gold cost / 10
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_Costs[GoldCost]=v*10;
     }
     for( i=0; i<110; ++i ) {		// Lumber cost / 10
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_Costs[WoodCost]=v*10;
     }
     for( i=0; i<110; ++i ) {		// Oil cost / 10
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_Costs[OilCost]=v*10;
     }
     for( i=0; i<110; ++i ) {		// Unit size in tiles
 	unittype=UnitTypeByWcNum(i);
-	v=ReadWord();
+	v=FetchLE16(udta);
 	unittype->TileWidth=v;
-	v=ReadWord();
+	v=FetchLE16(udta);
 	unittype->TileHeight=v;
     }
     for( i=0; i<110; ++i ) {		// Box size in pixel
 	unittype=UnitTypeByWcNum(i);
-	v=ReadWord();
+	v=FetchLE16(udta);
 	unittype->BoxWidth=v;
-	v=ReadWord();
+	v=FetchLE16(udta);
 	unittype->BoxHeight=v;
     }
 
     for( i=0; i<110; ++i ) {		// Attack range
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_AttackRange=v;
     }
     for( i=0; i<110; ++i ) {		// React range
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->ReactRangeComputer=v;
     }
     for( i=0; i<110; ++i ) {		// React range
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->ReactRangeHuman=v;
     }
     for( i=0; i<110; ++i ) {		// Armor
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_Armor=v;
     }
     for( i=0; i<110; ++i ) {		// Selectable via rectangle
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->SelectableByRectangle=v!=0;
     }
     for( i=0; i<110; ++i ) {		// Priority
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->Priority=v;
     }
     for( i=0; i<110; ++i ) {		// Basic damage
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_BasicDamage=v;
     }
     for( i=0; i<110; ++i ) {		// Piercing damage
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->_PiercingDamage=v;
     }
     for( i=0; i<110; ++i ) {		// Weapons upgradable
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->WeaponsUpgradable=v;
     }
     for( i=0; i<110; ++i ) {		// Armor upgradable
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->ArmorUpgradable=v;
     }
     for( i=0; i<110; ++i ) {		// Missile Weapon
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	//unittype->MissileWeapon=v;
 	unittype->Missile.Name=MissileTypes[v].Ident;
 	if( unittype->Missile.Missile ) abort();
@@ -676,22 +641,22 @@ global void ParsePudUDTA(const char* udta,int length)
     }
     for( i=0; i<110; ++i ) {		// Unit type
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->UnitType=v;
     }
     for( i=0; i<110; ++i ) {		// Decay rate * 6 = secs
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->DecayRate=v;
     }
     for( i=0; i<110; ++i ) {		// Annoy computer factor
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->AnnoyComputerFactor=v;
     }
     for( i=0; i<58; ++i ) {		// 2nd mouse button action
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->MouseAction=v;
     }
     for( ; i<110; ++i ) {		// 2nd mouse button action
@@ -700,18 +665,18 @@ global void ParsePudUDTA(const char* udta,int length)
     }
     for( i=0; i<110; ++i ) {		// Point value for killing unit
 	unittype=UnitTypeByWcNum(i);
-	v=ReadWord();
+	v=FetchLE16(udta);
 	unittype->Points=v;
     }
     for( i=0; i<110; ++i ) {		// Can target (1 land, 2 sea, 4 air)
 	unittype=UnitTypeByWcNum(i);
-	v=ReadByte();
+	v=Fetch8(udta);
 	unittype->CanTarget=v;
     }
 
     for( i=0; i<110; ++i ) {		// Flags
 	unittype=UnitTypeByWcNum(i);
-	v=ReadLong();
+	v=FetchLE32(udta);
 	// unittype->Flags=v;
 #define BIT(b,v)	(((v>>b))&1)
 	unittype->LandUnit=BIT(0,v);
@@ -742,6 +707,7 @@ global void ParsePudUDTA(const char* udta,int length)
 	unittype->Explodes=BIT(25,v);
 	UnitTypes[i].CowerMage=BIT(26,v);
 	UnitTypes[i].Organic=BIT(27,v);
+
 	if( BIT(28,v) )	DebugLevel0("Unused bit 28 used in %d\n",i);
 	if( BIT(29,v) )	DebugLevel0("Unused bit 29 used in %d\n",i);
 	if( BIT(30,v) )	DebugLevel0("Unused bit 30 used in %d\n",i);
@@ -831,33 +797,12 @@ global void SaveUnitType(const UnitType* type,FILE* file)
 	,type->AnnoyComputerFactor
 	,type->Points);
 
-    //fprintf(file,"  \"%s\"\n",MissileTypes[type->MissileWeapon].Ident);
     fprintf(file,"  \"%s\"\n",type->Missile.Name);
-    fprintf(file,"  ");
-#if 0
-    switch( type->Corpse ) {
-	case 0:
-	    fprintf(file,"'corpse-none");
-	    break;
-	case 1:
-	    fprintf(file,"'corpse-human");
-	    break;
-	case 2:
-	    fprintf(file,"'corpse-orc");
-	    break;
-	case 3:
-	    fprintf(file,"'corpse-ship");
-	    break;
-	case 4:
-	    fprintf(file,"'corpse-land-site");
-	    break;
-	case 5:
-	    fprintf(file,"'corpse-water-site");
-	    break;
+    if( type->CorpseName ) {
+	fprintf(file,"  '(\"%s\" %d)\n",type->CorpseName,type->CorpseScript);
+    } else {
+	fprintf(file,"  '()\n");
     }
-    fprintf(file,"\n");
-#endif
-    printf("'%s %d\n",type->CorpseName,type->CorpseScript);
 
     fprintf(file,"  ");
     switch( type->UnitType ) {

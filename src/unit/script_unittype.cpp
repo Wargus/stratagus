@@ -365,10 +365,26 @@ local SCM CclDefineUnitType(SCM list)
     CclFree(type->Missile.Name);
     type->Missile.Name=str;
 
+    // Corpse
+
+    list=gh_cdr(list);
+    temp=gh_car(list);
+
     CclFree(type->CorpseName);
     type->CorpseName=NULL;
     type->CorpseType=NULL;
-    type->CorpseScript=0;		// corpse must be better configured
+    type->CorpseScript=0;
+    if( !gh_null_p(temp) ) {
+	value=gh_car(temp);
+	temp=gh_cdr(temp);
+	str=gh_scm2newstr(value,NULL);
+	DebugLevel1("\tCorpse: %s\n",str);
+	type->CorpseName=str;
+
+	value=gh_car(temp);
+	i=gh_scm2int(value);
+	type->CorpseScript=i;
+    } 
 
     // Flags
     type->UnitType=0;			// reset all
@@ -411,25 +427,7 @@ local SCM CclDefineUnitType(SCM list)
 	    break;
 	}
 
-	// FIXME: slow! any better idea?
-	if( gh_eq_p(value,gh_symbol2scm("corpse-none")) ) {
-	    type->CorpseName=NULL;
-	} else if( gh_eq_p(value,gh_symbol2scm("corpse-human")) ) {
-	    type->CorpseName="unit-dead-body";
-	    type->CorpseScript=0;
-	} else if( gh_eq_p(value,gh_symbol2scm("corpse-orc")) ) {
-	    type->CorpseName="unit-dead-body";
-	    type->CorpseScript=0;
-	} else if( gh_eq_p(value,gh_symbol2scm("corpse-ship")) ) {
-	    type->CorpseName="unit-dead-body";
-	    type->CorpseScript=0;
-	} else if( gh_eq_p(value,gh_symbol2scm("corpse-land-site")) ) {
-	    type->CorpseName="unit-destroyed-1x1-place";
-	    type->CorpseScript=0;
-	} else if( gh_eq_p(value,gh_symbol2scm("corpse-water-site")) ) {
-	    type->CorpseName="unit-destroyed-1x1-place";
-	    type->CorpseScript=0;
-	} else if( gh_eq_p(value,gh_symbol2scm("type-land")) ) {
+	if( gh_eq_p(value,gh_symbol2scm("type-land")) ) {
 	    type->UnitType=UnitTypeLand;
 	} else if( gh_eq_p(value,gh_symbol2scm("type-fly")) ) {
 	    type->UnitType=UnitTypeFly;
@@ -657,11 +655,9 @@ local Animation * GetSingleAnimation(SCM list){
 
 }
 
-global Animation ** UnitCorpse;
-
 /**
- ** Get animation data
- */
+** Get animation data
+*/
 local SCM CclAnimType(SCM list)
 {
   int i;
@@ -724,17 +720,6 @@ local SCM CclAnimType(SCM list)
       free(whole_animation);
       break;
     case 3:
-      UnitCorpse = whole_animation;
-      for( i=0; i<UnitTypeInternalMax; ++i ) {
-	unittype=UnitTypeByWcNum(i);
-	if( !unittype->Animations ) {
-	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
-	}
-	// FIXME: corpse
-      }
-      DebugLevel2("Loading UnitCorpse\n");
-      break;
-    case 4:
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
