@@ -132,21 +132,26 @@ global void MapMarkSeenTile(int x, int y)
 */
 global void RevealMap(void)
 {
-    int ix;
-    int iy;
+    int x;
+    int y;
 
     DebugLevel1Fn("\n");
-    for (ix = 0; ix < TheMap.Width; ++ix) {
-	for (iy = 0; iy < TheMap.Height; ++iy) {
+    for (x = 0; x < TheMap.Width; ++x) {
+	for (y = 0; y < TheMap.Height; ++y) {
 	    int i;
 	    for (i = 0; i < PlayerMax; ++i) {
-		if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
-		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i] = 1;
+		if (!TheMap.Fields[x+y*TheMap.Width].Visible[i]) {
+		    TheMap.Fields[x+y*TheMap.Width].Visible[i] = 1;
 		}
 	    }
-	    MapMarkSeenTile(ix, iy);
-	    //UnitsMarkSeen(ix, iy);
+	    MapMarkSeenTile(x, y);
 	}
+    }
+    //
+    //	Start a global unit seen recount. It's the best way.
+    //
+    for (x = 0; x < NumUnits; ++x) {
+	UnitFillSeenValues(Units[x]);
     }
 }
 

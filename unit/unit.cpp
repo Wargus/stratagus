@@ -1031,11 +1031,11 @@ global int BuildingVisibleOnMap(const Unit* unit)
 
 /**
 ** 	This function fills in the Seen fields of an unit from current fields.
-**	To be called when unit goes out of view.
+**	To be called when unit goes out of view, or when the map is revealed.
 ** 
 ** 	@param unit	The unit to work on
 */
-local void FillSeenValues(Unit* unit)
+global void UnitFillSeenValues(Unit* unit)
 {
     //	Seen values are undefined for visible units.
     unit->SeenIY = unit->IY;
@@ -1102,7 +1102,7 @@ global void UnitsUnmarkSeen(const Player* player, int x, int y)
 	    DebugLevel3Fn("unit %d at %d,%d is now under fog time %lu.\n" _C_
 		unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
 	    if (player == ThisPlayer) {
-		FillSeenValues(unit);
+		UnitFillSeenValues(unit);
 	    }
 	}
 	--n;
@@ -1153,7 +1153,7 @@ global void UnitCountSeen(Unit* unit)
 	    DebugLevel3Fn("unit %d(%s) at %d,%d got out of player %d's sight at cycle %lu.\n" _C_
 		    unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y _C_ p _C_ GameCycle);
 	    if (p == ThisPlayer->Player) {
-		FillSeenValues(unit);
+		UnitFillSeenValues(unit);
 	    }
 	}
 	//  Now set the new visibility count
