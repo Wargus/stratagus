@@ -517,12 +517,17 @@ global void UpdateDisplay(void)
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
 	int v = TheUI.LastClickedVP;
-	DrawMinimap (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
-	DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	// FIXME: We shouldn't allow TheUI.LastClickedVP==-1
+	if( v>=0 ) {
+	    DrawMinimap (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	    DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	}
     } else if (MustRedraw&RedrawMinimapCursor) {
 	int v = TheUI.LastClickedVP;
 	HideMinimapCursor ();
-	DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	if( v>=0 ) {
+	    DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	}
     }
 #else /* SPLIT_SCREEN_SUPPORT */
     if( MustRedraw&RedrawMinimap ) {
