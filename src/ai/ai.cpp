@@ -148,7 +148,6 @@
 #include "player.h"
 #include "unit.h"
 #include "script.h"
-#include "script_helpers.h"
 #include "actions.h"
 #include "map.h"
 
