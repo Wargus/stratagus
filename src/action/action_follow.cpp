@@ -109,6 +109,24 @@ global void HandleActionFollow(Unit* unit)
 	    }
 	    // FALL THROUGH
 	case PF_REACHED:
+	    // FIXME: dark portal teleportation: Goal is used for target circle of power
+	    // FIXME: teleporting of units should use dark portal's mana
+	    if( (goal=unit->Orders[0].Goal) && 
+		strcmp( goal->Type->Ident, "unit-dark-portal" ) == 0 && 
+		goal->Goal &&
+		MapDistanceBetweenUnits( unit, goal ) < 4 )
+	      {
+	      unit->X = goal->Goal->X;
+	      unit->Y = goal->Goal->Y;
+	      DropOutOnSide(unit,unit->Direction,1,1);
+	      //FIXME: SoundIdForName() should be called once
+	      PlayGameSound(SoundIdForName("invisibility"),MaxSampleVolume);
+	      //FIXME: MissileTypeByIdent() should be called once
+	      MakeMissile(MissileTypeByIdent("missile-heal-effect"),
+	        	unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2,
+			unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2 );
+	      }
+	
 	    if( !(goal=unit->Orders[0].Goal) ) {// goal has died
 		unit->Wait=1;
 		unit->SubAction=0;
