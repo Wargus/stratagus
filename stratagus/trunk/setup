@@ -583,7 +583,7 @@ case $ANSWER in
 	case $ANSWER in 
 	    [yY])
 		echo "MAD		= -DUSE_MAD" >> $RULESFILE
-		echo "MADLIB		= -lmad" >> $RULESFILE
+		echo "MP3LIB		= -lmad" >> $RULESFILE
 		;;
 	    *)
 		;;
@@ -771,7 +771,7 @@ if [ "$BEOS" != 1 ] ; then
     # Libraries needed to build freecraft
     echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
-    echo "	\$(FLACLIB) \$(OGGLIB) \$(MADLIB) " >> $RULESFILE
+    echo "	\$(FLACLIB) \$(OGGLIB) \$(MP3LIB) " >> $RULESFILE
   else
     # Libraries needed to build tools
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
