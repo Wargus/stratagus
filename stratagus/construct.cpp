@@ -10,7 +10,7 @@
 //
 /**@name construct.c	-	The constructions. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -51,15 +51,8 @@ global const char ConstructionType[] = "construction";
 
 /**
 **	Constructions.
-**
-**	@todo support more constructions and don't use a fixed size table.
 */
-local Construction Constructions[16];
-
-/**
-**	Number of constuctions.
-*/
-local int NumConstructions=16;
+local Construction** Constructions;
 
 /**
 **	Table mapping the original construction numbers in puds to
@@ -86,34 +79,37 @@ global void InitConstructions(void)
 */
 global void LoadConstructions(void)
 {
-    int i;
     const char* file;
+    Construction** cop;
 
-    for( i=0; i<NumConstructions; ++i ) {
-	if( !Constructions[i].Ident ) {
-	    continue;
-	}
-	file=Constructions[i].File[TheMap.Terrain];
-	if( !file ) {			// default one
-	    file=Constructions[i].File[0];
-	}
-	if( *file ) {
-	    char* buf;
+    if( (cop=Constructions) ) {
+	while( *cop ) {
+	    if( !(*cop)->Ident ) {
+		continue;
+	    }
+	    file=(*cop)->File[TheMap.Terrain];
+	    if( !file ) {			// default one
+		file=(*cop)->File[0];
+	    }
+	    if( *file ) {
+		char* buf;
 
-	    buf=alloca(strlen(file)+9+1);
-	    file=strcat(strcpy(buf,"graphics/"),file);
-	    ShowLoadProgress("\tConstruction %s\n",file);
-	    Constructions[i].Sprite=LoadSprite(file
-		    ,Constructions[i].Width,Constructions[i].Height);
-	}
-	if( (file=Constructions[i].ShadowFile) ) {
-	    char *buf;
+		buf=alloca(strlen(file)+9+1);
+		file=strcat(strcpy(buf,"graphics/"),file);
+		ShowLoadProgress("\tConstruction %s\n",file);
+		(*cop)->Sprite=LoadSprite(file
+			,(*cop)->Width,(*cop)->Height);
+	    }
+	    if( (file=(*cop)->ShadowFile) ) {
+		char *buf;
 
-	    buf=alloca(strlen(file)+9+1);
-	    file=strcat(strcpy(buf,"graphics/"),file);
-	    ShowLoadProgress("\tConstruction %s\n",file);
-	    Constructions[i].ShadowSprite=LoadSprite(file
-		    ,Constructions[i].ShadowWidth,Constructions[i].ShadowHeight);
+		buf=alloca(strlen(file)+9+1);
+		file=strcat(strcpy(buf,"graphics/"),file);
+		ShowLoadProgress("\tConstruction %s\n",file);
+		(*cop)->ShadowSprite=LoadSprite(file
+			,(*cop)->ShadowWidth,(*cop)->ShadowHeight);
+	    }
+	    ++cop;
 	}
     }
 }
@@ -128,6 +124,7 @@ global void SaveConstructions(FILE* file)
     int i;
     int j;
     char** cp;
+    Construction** cop;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: constructions $Id$\n\n");
@@ -151,30 +148,33 @@ global void SaveConstructions(FILE* file)
     //
     //	Dump table of all constructions
     //
-    for( i=0; i<NumConstructions; ++i ) {
-	if( !Constructions[i].Ident ) {
-	    continue;
-	}
-	fprintf(file,"(define-construction '%s\n",Constructions[i].Ident);
-	fprintf(file,"  'files '(");
-	for( j=0; j<TilesetMax; ++j ) {
-	    if( Constructions[i].File[j] ) {
-		if( j ) {
-		    fputs("\n    ",file);
-		}
-		fprintf(file,"%s \"%s\"",Tilesets[j]->Class,
-			Constructions[i].File[j]);
+    if( (cop=Constructions) ) {
+	while( *cop ) {
+	    if( !(*cop)->Ident ) {
+		continue;
 	    }
+	    fprintf(file,"(define-construction '%s\n",(*cop)->Ident);
+	    fprintf(file,"  'files '(");
+	    for( j=0; j<TilesetMax; ++j ) {
+		if( (*cop)->File[j] ) {
+		    if( j ) {
+			fputs("\n    ",file);
+		    }
+		    fprintf(file,"%s \"%s\"",Tilesets[j]->Class,
+			    (*cop)->File[j]);
+		}
+	    }
+	    fprintf(file,")\n");
+	    fprintf(file,"  'size '(%d %d)", (*cop)->Width,
+		    (*cop)->Height);
+	    if( (*cop)->ShadowFile ) {
+		fprintf(file,"\n  'shadow '(file \"%s\" width %d height %d)",
+			(*cop)->ShadowFile, (*cop)->ShadowWidth,
+			(*cop)->ShadowHeight);
+	    }
+	    fprintf(file,")\n\n");
+	    ++cop;
 	}
-	fprintf(file,")\n");
-	fprintf(file,"  'size '(%d %d)", Constructions[i].Width,
-		Constructions[i].Height);
-	if( Constructions[i].ShadowFile ) {
-	    fprintf(file,"\n  'shadow '(file \"%s\" width %d height %d)",
-		    Constructions[i].ShadowFile, Constructions[i].ShadowWidth,
-		    Constructions[i].ShadowHeight);
-	}
-	fprintf(file,")\n\n");
     }
 }
 
@@ -184,8 +184,8 @@ global void SaveConstructions(FILE* file)
 global void CleanConstructions(void)
 {
     char** cp;
-    int i;
     int j;
+    Construction** cop;
 
     //
     //	Mapping original construction numbers in puds to our internal strings
@@ -201,22 +201,27 @@ global void CleanConstructions(void)
     //
     //	Free the construction table.
     //
-    for( i=0; i<NumConstructions; ++i ) {
-	if( Constructions[i].Ident ) {
-	    free(Constructions[i].Ident);
-	}
-	for( j=0; j<TilesetMax; ++j ) {
-	    if( Constructions[i].File[j] ) {
-		free(Constructions[i].File[j]);
+    if( (cop=Constructions) ) {
+	while( *cop ) {
+	    if( (*cop)->Ident ) {
+		free((*cop)->Ident);
 	    }
+	    for( j=0; j<TilesetMax; ++j ) {
+		if( (*cop)->File[j] ) {
+		    free((*cop)->File[j]);
+		}
+	    }
+	    VideoSaveFree((*cop)->Sprite);
+	    if( (*cop)->ShadowFile ) {
+		free((*cop)->ShadowFile);
+	    }
+	    VideoSaveFree((*cop)->ShadowSprite);
+	    free(*cop);
+	    ++cop;
 	}
-	VideoSaveFree(Constructions[i].Sprite);
-	if( Constructions[i].ShadowFile ) {
-	    free(Constructions[i].ShadowFile);
-	}
-	VideoSaveFree(Constructions[i].ShadowSprite);
+	free(Constructions);
+	Constructions=NULL;
     }
-    memset(Constructions,0,sizeof(Constructions));
 }
 
 /**
@@ -246,11 +251,14 @@ global void DrawConstruction(const Construction* construction,int frame,
 */
 global Construction* ConstructionByIdent(const char* ident)
 {
-    int i;
+    Construction** cop;
 
-    for( i=0; i<NumConstructions; ++i ) {
-	if( Constructions[i].Ident && !strcmp(ident,Constructions[i].Ident) ) {
-	    return &Constructions[i];
+    if( (cop=Constructions) ) {
+	while( *cop ) {
+	    if( (*cop)->Ident && !strcmp(ident,(*cop)->Ident) ) {
+		return *cop;
+	    }
+	    ++cop;
 	}
     }
     DebugLevel0Fn("Construction `%s' not found.\n" _C_ ident);
@@ -313,6 +321,7 @@ local SCM CclDefineConstruction(SCM list)
     SCM sublist;
     char* str;
     Construction* construction;
+    Construction** cop;
     int i;
 
     //	Slot identifier
@@ -330,7 +339,20 @@ local SCM CclDefineConstruction(SCM list)
 	free(str);
 	return SCM_UNSPECIFIED;
     }
-    construction=&Constructions[i];
+
+    if( (cop=Constructions)==NULL ) {
+	Constructions=malloc(2*sizeof(Construction*));
+	Constructions[0]=calloc(1,sizeof(Construction));
+	Constructions[1]=NULL;
+	construction=Constructions[0];
+    } else {
+	for( i=0; *cop; ++i,++cop ) {
+	}
+	Constructions=realloc(Constructions,(i+2)*sizeof(Construction*));
+	Constructions[i]=calloc(1,sizeof(Construction));
+	Constructions[i+1]=NULL;
+	construction=Constructions[i];
+    }
     construction->OType=ConstructionType;
     construction->Ident=str;
 
