@@ -80,7 +80,6 @@ local void GameMenuReturn(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
-local void CDRomDisabled(void);
 local void SetCdMode(Menuitem *mi);
 local void Preferences(void);
 local void GameOptions(void);
