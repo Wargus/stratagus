@@ -356,8 +356,9 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 
 	if( unit->Player->Incomes[WoodCost] != DEFAULT_INCOMES[WoodCost] ) {
-		sprintf(buf, "~<+%i~>", unit->Player->Incomes[WoodCost]);
-		DrawText(x+126,y+8+93,GameFont,buf);
+	    sprintf(buf, "~<+%i~>",
+		    unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
+	    DrawText(x+126,y+8+93,GameFont,buf);
 	}
     } else if( type->StoresGold ) {
 	DrawText(x+20,y+8+61,GameFont,"Production");
@@ -365,20 +366,23 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawNumber(x+108,y+8+77,GameFont,DEFAULT_INCOMES[GoldCost]);
 	// Keep/Stronghold, Castle/Fortress
 	if( unit->Player->Incomes[GoldCost] != DEFAULT_INCOMES[GoldCost] ) {
-		sprintf(buf, "~<+%i~>", unit->Player->Incomes[GoldCost]);
+		sprintf(buf, "~<+%i~>",
+		    unit->Player->Incomes[GoldCost]-DEFAULT_INCOMES[GoldCost]);
 		DrawText(x+126,y+8+77,GameFont,buf);
 	}
 	DrawText(x+52,y+8+93,GameFont,"Lumber:");
 	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 	// Lumber mill
 	if( unit->Player->Incomes[WoodCost]!=DEFAULT_INCOMES[WoodCost] ) {
-		sprintf(buf, "~<+%i~>", unit->Player->Incomes[WoodCost]);
-		DrawText(x+126,y+8+93,GameFont,buf);
+	    sprintf(buf, "~<+%i~>",
+		unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
+	    DrawText(x+126,y+8+93,GameFont,buf);
 	}
 	DrawText(x+84,y+8+109,GameFont,"Oil:");
 	DrawNumber(x+108,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
 	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
-		sprintf(buf, "~+<%i~>", unit->Player->Incomes[OilCost]);
+	    sprintf(buf, "~<+%i~>",
+		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
 	    DrawText(x+126,y+8+109,GameFont,buf);
 	}
     } else if( type->Transporter && unit->Value ) {
@@ -461,7 +465,7 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawStats(x+108,y+8+125,stats->Speed,type->_Speed);
 
         // Show how much wood is harvested already in percents! :) //vladi
-        if( unit->Command.Action==UnitActionHarvest && unit->SubAction==1 ) {
+        if( unit->Command.Action==UnitActionHarvest && unit->SubAction==64 ) {
 	    sprintf(buf,"W%%:%d"
 		    ,(100*(CHOP_FOR_WOOD-unit->Value))/CHOP_FOR_WOOD);
 	    DrawText(x+120,y+8+140,GameFont,buf);
