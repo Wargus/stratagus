@@ -2641,6 +2641,13 @@ local void JoinNetGameMenu(void)
     if (NetworkArg) {
 	strncpy(server_host_buffer, NetworkArg, 24);
 	server_host_buffer[24] = 0;
+	if (NetworkPort != NetworkDefaultPort) {
+	    strcat(server_host_buffer, ":");
+	    port = (char*)malloc(10);
+	    sprintf(port, "%d", NetworkPort);
+	    strcat(server_host_buffer, port);
+	    free(port);
+	}
     } else {
 	server_host_buffer[0] = '\0';
     }
