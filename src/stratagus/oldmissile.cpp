@@ -44,68 +44,108 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Missile does nothing
+**	Missile-class this defines how a missile-type reacts.
+**
+**	@todo
+**		Here is something double defined, the whirlwind is
+**		ClassWhirlwind and also handled by controler.
+**
+**	FIXME:	We need no class or no controller.
 */
-#define MissileClassNone			0
-/**
-**	Missile flies from x,y to x1,y1
-*/
-#define MissileClassPointToPoint		1
-/**
-**	Missile flies from x,y to x1,y1 and stays there for a moment
-*/
-#define MissileClassPointToPointWithDelay	2
-/**
-**	Missile don't move, than disappears
-*/
-#define MissileClassStayWithDelay		3
-/**
-**	Missile flies from x,y to x1,y1 than bounces three times.
-*/
-#define MissileClassPointToPoint3Bounces	4
-/**
-**	Missile flies from x,y to x1,y1 than changes into flame shield
-*/
-#define MissileClassFireball			5
-/**
-**	Missile surround x,y
-*/
-#define MissileClassFlameShield			6
-/**
-**	Missile appears at x,y, is blizzard
-*/
-#define MissileClassBlizzard			7
-/**
-**	Missile appears at x,y, is death and decay
-*/
-#define MissileClassDeathDecay			8
-/**
-**	Missile appears at x,y, is whirlwind
-*/
-#define MissileClassWhirlwind			9
-/**
-**	Missile appears at x,y, than cycle through the frames up and down.
-*/
-#define MissileClassCycleOnce			10
-/**
-**	Missile flies from x,y to x1,y1 than shows hit animation.
-*/
-#define MissileClassPointToPointWithHit		11
-/**
-**	Missile don't move, than checks the source unit for HP.
-*/
-#define MissileClassFire			12
-/**
-**	Missile is controlled completely by Controller() function. (custom)
-*/
-#define MissileClassCustom			13
+enum _missile_class_ {
+	/**
+	**	Missile does nothing
+	*/
+    MissileClassNone,
+	/**
+	**	Missile flies from x,y to x1,y1
+	*/
+    MissileClassPointToPoint,
+	/**
+	**	Missile flies from x,y to x1,y1 and stays there for a moment
+	*/
+    MissileClassPointToPointWithDelay,
+	/**
+	**	Missile don't move, than disappears
+	*/
+    MissileClassStayWithDelay,
+	/**
+	**	Missile flies from x,y to x1,y1 than bounces three times.
+	*/
+    MissileClassPointToPoint3Bounces,
+	/**
+	**	Missile flies from x,y to x1,y1 than changes into flame shield
+	*/
+    MissileClassFireball,
+	/**
+	**	Missile surround x,y
+	*/
+    MissileClassFlameShield,
+	/**
+	**	Missile appears at x,y, is blizzard
+	*/
+    MissileClassBlizzard,
+	/**
+	**	Missile appears at x,y, is death and decay
+	*/
+    MissileClassDeathDecay,
+	/**
+	**	Missile appears at x,y, is whirlwind
+	*/
+    MissileClassWhirlwind,
+	/**
+	**	Missile appears at x,y, than cycle through the frames up and
+	**	down.
+	*/
+    MissileClassCycleOnce,
+	/**
+	**	Missile flies from x,y to x1,y1 than shows hit animation.
+	*/
+    MissileClassPointToPointWithHit,
+	/**
+	**	Missile don't move, than checks the source unit for HP.
+	*/
+    MissileClassFire,
+	/**
+	**	Missile is controlled completely by Controller() function.
+	*/
+    MissileClassCustom,
+};
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#if !defined(USE_CCL)
 /**
+**	Missile class names, used to load/save the missiles.
+*/
+global const char* MissileClassNames[] = {
+    "missile-class-none",
+    "missile-class-point-to-point",
+    "missile-class-point-to-point-with-delay",
+    "missile-class-stay-with-delay",
+    "missile-class-point-to-point-3bounces",
+    "missile-class-fireball",
+    "missile-class-flame-shield",
+    "missile-class-blizzard",
+    "missile-class-death-decay",
+    "missile-class-whirlwind",
+    "missile-class-cycle-once",
+    "missile-class-point-to-point-with-hit",
+    "missile-class-fire",
+    "missile-class-custom",
+    NULL
+};
+
+/**
+**	Missile type type definition
+*/
+global const char MissileTypeType[] = "missile-type";
+
+#ifndef USE_CCL
+
+/**
+**	Mapping of missile numbers in original puds to our internal symbols.
 **	Default without CCL support.
 */
 local char* DefaultMissileTypeWcNames[] = {
@@ -141,34 +181,20 @@ local char* DefaultMissileTypeWcNames[] = {
     "missile-none",
     "missile-blizzard-hit",
     "missile-death-coil",
-    "missile-custom",
+    "missile-none",
+    NULL
 };
-#endif
 
 /**
-**	W*rCr*ft number to internal missile-type name.
+**	Define our missile-types.
+**	Default without CCL support.
 */
-global char** MissileTypeWcNames
-#if !defined(USE_CCL)
-    =DefaultMissileTypeWcNames
-#endif
-    ;
-
-/**
-**	Missile type type definition
-*/
-global const char MissileTypeType[] = "missile-type";
-
-#ifndef laterUSE_CCL
-
-/**
-**	Define missile types.
-*/
-global MissileType MissileTypes[MissileTypeMax] = {
+global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-lightning",
     "lightning.png",
     32,32,
+    { NULL },
     { NULL },
     MissileClassPointToPointWithHit,
     1,
@@ -177,6 +203,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-griffon-hammer",
     "gryphon hammer.png",
     32,32,
+    { NULL },
     { "fireball hit" },
     MissileClassPointToPoint3Bounces,
     1,
@@ -186,6 +213,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-dragon-breath",
     "dragon breath.png",
     32,32,
+    { NULL },
     { "fireball hit" },
     MissileClassPointToPoint3Bounces,
     1,
@@ -195,6 +223,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-fireball",
     "fireball.png",
     32,32,
+    { NULL },
     { "fireball hit" },
     MissileClassPointToPoint,
     1,
@@ -204,6 +233,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "flame shield.png",
     32,32,
     { NULL },
+    { NULL },
     MissileClassFlameShield,
     1,
     },
@@ -211,6 +241,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-blizzard",
     "blizzard.png",
     32,32,
+    { NULL },
     { NULL },
     MissileClassBlizzard,
     1,
@@ -221,6 +252,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "death and decay.png",
     32,32,
     { NULL },
+    { NULL },
     MissileClassDeathDecay,
     1,
     },
@@ -228,6 +260,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-big-cannon",
     "big cannon.png",
     16,16,
+    { NULL },
     { "explosion" },
     MissileClassPointToPoint,
     1,
@@ -238,6 +271,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "exorcism.png",
     48,48,
     { NULL },
+    { NULL },
     MissileClassPointToPoint,
     1,
     },
@@ -245,6 +279,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-heal-effect",
     "heal effect.png",
     48,48,
+    { NULL },
     { NULL },
     MissileClassStayWithDelay,
     1,
@@ -254,6 +289,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "touch of death.png",
     32,32,
     { NULL },
+    { NULL },
     MissileClassPointToPointWithHit,
     1,
     },
@@ -261,6 +297,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-rune",
     "rune.png",
     16,16,
+    { NULL },
     { NULL },
     MissileClassStayWithDelay,
     5,
@@ -270,6 +307,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "tornado.png",
     56,56,
     { NULL },
+    { NULL },
     MissileClassWhirlwind,
     1,
     },
@@ -277,6 +315,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-catapult-rock",
     "catapult rock.png",
     32,32,
+    { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
     1,
@@ -286,6 +325,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-ballista-bolt",
     "ballista bolt.png",
     64,64,
+    { NULL },
     { "explosion" },
     MissileClassPointToPoint,
     1,
@@ -295,7 +335,8 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-arrow",
     "arrow.png",
     40,40,
-    { "bow-hit" },
+    { NULL },
+    { "bow hit" },
     MissileClassPointToPoint,
     1,
     },
@@ -303,7 +344,8 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-axe",
     "axe.png",
     32,32,
-    { "bow-hit" },
+    { NULL },
+    { "bow hit" },
     MissileClassPointToPoint,
     1,
     },
@@ -311,6 +353,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-submarine-missile",
     "submarine missile.png",
     40,40,
+    { NULL },
     { "explosion" },
     MissileClassPointToPoint,
     1,
@@ -320,6 +363,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-turtle-missile",
     "turtle missile.png",
     40,40,
+    { NULL },
     { "explosion" },
     MissileClassPointToPoint,
     1,
@@ -330,6 +374,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "small fire.png",
     32,48,
     { NULL },
+    { NULL },
     MissileClassFire,
     8,
     },
@@ -337,6 +382,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-big-fire",
     "big fire.png",
     48,48,
+    { NULL },
     { NULL },
     MissileClassFire,
     8,
@@ -346,6 +392,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "ballista-catapult impact.png",
     48,48,
     { NULL },
+    { NULL },
     MissileClassStayWithDelay,
     1,
     },
@@ -353,6 +400,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-normal-spell",
     "normal spell.png",
     32,32,
+    { NULL },
     { NULL },
     MissileClassStayWithDelay,
     1,
@@ -362,6 +410,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "explosion.png",
     64,64,
     { NULL },
+    { NULL },
     MissileClassStayWithDelay,
     1,
     },
@@ -369,6 +418,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-small-cannon",
     "cannon.png",
     32,32,
+    { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
     1,
@@ -379,6 +429,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "cannon explosion.png",
     32,32,
     { NULL },
+    { NULL },
     MissileClassStayWithDelay,
     1,
     },
@@ -386,6 +437,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-cannon-tower-explosion",
     "cannon-tower explosion.png",
     32,32,
+    { NULL },
     { NULL },
     MissileClassStayWithDelay,
     1,
@@ -395,6 +447,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "daemon fire.png",
     32,32,
     { NULL },
+    { NULL },
     MissileClassPointToPoint,
     1,
     },
@@ -402,6 +455,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-green-cross",
     "green cross.png",
     32,32,
+    { NULL },
     { NULL },
     MissileClassCycleOnce,
     FRAMES_PER_SECOND/30
@@ -411,6 +465,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     NULL,
     32,32,
     { NULL },
+    { NULL },
     MissileClassNone,
     1,
     },
@@ -418,6 +473,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "missile-blizzard-hit",
     "blizzard.png",
     32,32,
+    { NULL },
     { NULL },
     MissileClassStayWithDelay,
     1,
@@ -427,6 +483,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "touch of death.png",
     32,32,
     { NULL },
+    { NULL },
     MissileClassPointToPoint,
     1,
     },
@@ -435,27 +492,41 @@ global MissileType MissileTypes[MissileTypeMax] = {
     NULL,
     32,32,
     { NULL },
+    { NULL },
     MissileClassCustom,
     1,
     },
-{ MissileTypeType,
-    "missile-none",
-    NULL,
-    32,32,
-    { NULL },
-    MissileClassNone,
-    1,
-    },
+{ }
 };
 
 #endif
 
-/*
-**	Next missile types are used hardcoded in the source.
+/**
+**	W*rCr*ft number to internal missile-type name.
 */
-global MissileType* MissileTypeSmallFire;	/// Small fire missile type
-global MissileType* MissileTypeBigFire;		/// Big fire missile type
-global MissileType* MissileTypeGreenCross;	/// Green cross missile type
+global char** MissileTypeWcNames
+#ifndef USE_CCL
+    =DefaultMissileTypeWcNames
+#endif
+    ;
+
+/**
+**	Defined missile-types.
+*/
+global MissileType* MissileTypes
+#ifndef USE_CCL
+    = DefaultMissileTypes
+#endif
+    ;
+
+global int NumMissileTypes;		/// number of missile-types made.
+
+/*
+**	Next missile-types are used hardcoded in the source.
+*/
+global MissileType* MissileTypeSmallFire;	/// Small fire missile-type
+global MissileType* MissileTypeBigFire;		/// Big fire missile-type
+global MissileType* MissileTypeGreenCross;	/// Green cross missile-type
 
 #define MAX_MISSILES	1800		/// maximum number of missiles
 
@@ -463,7 +534,7 @@ local int NumMissiles;			/// currently used missiles
 local Missile Missiles[MAX_MISSILES];	/// all missiles on map
 
     /// lookup table for missile names
-local hashtable(MissileType*,65) MissileHash;
+local hashtable(MissileType*,65) MissileTypeHash;
 
 local int BlizzardMissileHit;		/// Flag for blizzards.
 
@@ -479,7 +550,7 @@ global void LoadMissileSprites(void)
     int i;
     const char* file;
 
-    for( i=0; i<sizeof(MissileTypes)/sizeof(*MissileTypes); ++i ) {
+    for( i=0; MissileTypes[i].OType; ++i ) {
 	if( (file=MissileTypes[i].File) ) {
 	    char* buf;
 
@@ -494,19 +565,28 @@ global void LoadMissileSprites(void)
 		    file,MissileTypes[i].Width,MissileTypes[i].Height);
 	}
     }
+    NumMissileTypes=i;
 
     //
     //	Add missile names to hash table
     //
-    for( i=0; i<sizeof(MissileTypes)/sizeof(*MissileTypes); ++i ) {
-	*(MissileType**)hash_add(MissileHash,MissileTypes[i].Ident)
+    for( i=0; i<NumMissileTypes; ++i ) {
+	*(MissileType**)hash_add(MissileTypeHash,MissileTypes[i].Ident)
 		=&MissileTypes[i];
     }
 
     //
-    //	Resolve impact missiles.
+    //	Resolve impact missiles and sounds.
     //
-    for( i=0; i<sizeof(MissileTypes)/sizeof(*MissileTypes); ++i ) {
+    for( i=0; i<NumMissileTypes; ++i ) {
+	if( MissileTypes[i].FiredSound.Name ) {
+	    MissileTypes[i].FiredSound.Sound
+		    =SoundIdForName(MissileTypes[i].FiredSound.Name);
+	}
+	if( MissileTypes[i].ImpactSound.Name ) {
+	    MissileTypes[i].ImpactSound.Sound
+		    =SoundIdForName(MissileTypes[i].ImpactSound.Name);
+	}
 	if( MissileTypes[i].ImpactName ) {
 	    MissileTypes[i].ImpactMissile
 		    =MissileTypeByIdent(MissileTypes[i].ImpactName);
@@ -531,7 +611,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 {
     MissileType** type;
 
-    type=(MissileType**)hash_find(MissileHash,(char*)ident);
+    type=(MissileType**)hash_find(MissileTypeHash,(char*)ident);
 
     if( type ) {
 	return *type;
@@ -539,6 +619,47 @@ global MissileType* MissileTypeByIdent(const char* ident)
 
     DebugLevel0Fn("Missile %s not found\n",ident);
     return NULL;
+}
+
+/**
+**	Allocate an empty missile-type slot.
+**
+**	@todo	Don't allocate an array of missile-types, allocate an array
+**		of pointers.
+**
+**	@param ident	Identifier to identify the slot (malloced by caller!).
+**
+**	@return		New allocated (zeroed) missile-type pointer.
+*/
+global MissileType* NewMissileTypeSlot(char* ident)
+{
+    MissileType* type;
+    unsigned i;
+
+    //
+    //	Allocate new memory. (+2 for start end empty last entry.)
+    //
+    type=calloc(NumMissileTypes+2,sizeof(MissileType));
+    if( !type ) {
+	fprintf(stderr,"Out of memory\n");
+	exit(-1);
+    }
+    memcpy(type,MissileTypes,sizeof(MissileType)*NumMissileTypes);
+    if( MissileTypes ) {
+	free(MissileTypes);
+    }
+    MissileTypes=type;
+    type=MissileTypes+NumMissileTypes++;
+    type->OType=MissileTypeType;
+    type->Ident=ident;
+    //
+    //	Rehash.
+    //
+    for( i=0; i<NumMissileTypes; ++i ) {
+	*(MissileType**)hash_add(MissileTypeHash,MissileTypes[i].Ident)
+		=&MissileTypes[i];
+    }
+    return type;
 }
 
 /**
@@ -1400,6 +1521,108 @@ global int ViewPointDistanceToMissile(const Missile* missile)
     DebugLevel3Fn("Missile %p at %d %d\n",missile,x,y);
 
     return ViewPointDistance(x,y);
+}
+
+/**
+**	Save the missile-types to file.
+**
+**	@param file	Output file.
+*/
+global void SaveMissileTypes(FILE* file)
+{
+    MissileType* mt;
+    char** sp;
+    int i;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: missile-types $Id$\n\n");
+
+    i=fprintf(file,"(define-missiletype-wc-names");
+    for( sp=MissileTypeWcNames; *sp; ++sp ) {
+	if( i+strlen(*sp)>79 ) {
+	    i=fprintf(file,"\n ");
+	}
+	i+=fprintf(file," '%s",*sp);
+    }
+    fprintf(file,")\n\n");
+
+
+    for( mt=MissileTypes; mt<&MissileTypes[NumMissileTypes]; ++mt ) {
+	fprintf(file,"(define-missile-type '%s\n ",mt->Ident);
+	if( mt->File ) {
+	    fprintf(file," 'file \"%s\"",mt->File);
+	}
+	fprintf(file," 'size '(%d %d)",mt->Width,mt->Height);
+	if( mt->Sprite ) {
+	    fprintf(file," 'frames %d",VideoGraphicFrames(mt->Sprite));
+	}
+	fprintf(file,"\n ");
+	if( mt->FiredSound.Name ) {
+	    fprintf(file," 'fired-sound \"%s\"",mt->FiredSound.Name);
+	}
+	if( mt->ImpactSound.Name ) {
+	    fprintf(file," 'impact-sound \"%s\"",mt->ImpactSound.Name);
+	}
+	if( mt->FiredSound.Name || mt->ImpactSound.Name ) {
+	    fprintf(file,"\n ");
+	}
+	fprintf(file," 'class '%s",MissileClassNames[mt->Class]);
+	fprintf(file," 'speed %d",mt->Speed);
+	if( mt->ImpactMissile ) {
+	    fprintf(file,"\n  'impact-missile '%s",mt->ImpactMissile->Ident);
+	}
+	fprintf(file,")\n");
+    }
+}
+
+/**
+**	Save the state of a missile to file.
+*/
+local void SaveMissile(const Missile* missile,FILE* file)
+{
+    char* s1;
+    extern char* UnitReference(const Unit*);
+
+    fprintf(file,"(missile 'type '%s",
+	missile->Type->Ident);
+    fprintf(file," 'pos (%d %d) 'goal (%d %d)",
+	missile->X,missile->Y,missile->DX,missile->DY);
+    fprintf(file,"\n  'frame %d 'state %d 'wait %d\n ",
+	missile->Frame,missile->State,missile->Wait);
+    if( missile->SourceUnit ) {
+	fprintf(file," 'source %s",s1=UnitReference(missile->SourceUnit));
+	free(s1);
+    }
+    if( missile->TargetUnit ) {
+	fprintf(file," 'target %s",s1=UnitReference(missile->TargetUnit));
+	free(s1);
+    }
+    fprintf(file," 'damage %d",missile->Damage);
+    fprintf(file,"\n  'data (%d %d %d %d %d)",
+	missile->D,missile->Dx,missile->Dy,missile->Xstep,missile->Ystep);
+    // FIXME: need symbolic names for controller
+    fprintf(file," 'ttl %d 'controller %ld",
+	missile->TTL,(long)missile->Controller);
+    fprintf(file,")\n");
+}
+
+/**
+**	Save the state missiles to file.
+**
+**	@param file	Output file.
+*/
+global void SaveMissiles(FILE* file)
+{
+    Missile* missile;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: missiles $Id$\n\n");
+
+    for( missile=Missiles; missile<&Missiles[NumMissiles]; ++missile ) {
+	if( missile->Type!=MissileFree ) {
+	    SaveMissile(missile,file);
+	}
+    }
 }
 
 //@}
