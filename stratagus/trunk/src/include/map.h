@@ -348,6 +348,8 @@ extern int *VisionLookup;
 #ifdef NEW_DECODRAW
     /// FIXME: docu
 extern void InitMapDecoration(void);
+    /// Decoration for the map.
+extern Deco* MapDecoration;
 #endif
 
     /// Use original style fog of war

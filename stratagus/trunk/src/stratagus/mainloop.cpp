@@ -105,8 +105,12 @@ local void MoveMapViewPointUp(int step)
     Viewport* vp;
 
     vp = TheUI.SelectedViewport;
-    if (vp->MapY > step) {
+    if (vp->MapY >= step) {
 	vp->MapY -= step;
+#ifdef NEW_DECODRAW
+	//  Redraw the map deco.
+	DecorationMark(MapDecoration);
+#endif
     } else {
 	vp->MapY = 0;
     }
@@ -122,8 +126,12 @@ local void MoveMapViewPointLeft(int step)
     Viewport* vp;
 
     vp = TheUI.SelectedViewport;
-    if (vp->MapX > step) {
+    if (vp->MapX >= step) {
 	vp->MapX -= step;
+#ifdef NEW_DECODRAW
+	//  Redraw the map deco.
+	DecorationMark(MapDecoration);
+#endif
     } else {
 	vp->MapX = 0;
     }
@@ -140,8 +148,12 @@ local void MoveMapViewPointDown(int step)
 
     vp = TheUI.SelectedViewport;
     if (TheMap.Height > vp->MapHeight &&
-	    vp->MapY < TheMap.Height - vp->MapHeight - step) {
+	    vp->MapY <= TheMap.Height - vp->MapHeight - step) {
 	vp->MapY += step;
+#ifdef NEW_DECODRAW
+	//  Redraw the map deco.
+	DecorationMark(MapDecoration);
+#endif
     } else {
 	vp->MapY = TheMap.Height - vp->MapHeight;
     }
@@ -158,8 +170,12 @@ local void MoveMapViewPointRight(int step)
 
     vp = TheUI.SelectedViewport;
     if (TheMap.Width > vp->MapWidth &&
-	    vp->MapX < TheMap.Width - vp->MapWidth - step) {
+	    vp->MapX <= TheMap.Width - vp->MapWidth - step) {
 	vp->MapX += step;
+#ifdef NEW_DECODRAW
+	//  Redraw the map deco.
+	DecorationMark(MapDecoration);
+#endif
     } else {
 	vp->MapX = TheMap.Width - vp->MapWidth;
     }
@@ -359,6 +375,17 @@ local void DrawMenuButtonArea(void)
 */
 local void DrawMapViewport(Viewport* vp)
 {
+#ifdef NEW_DECODRAW
+    // Experimental new drawing mechanism, which can keep track of what is
+    // overlapping and draw only that what has changed..
+    // Every to-be-drawn item added to this mechanism, can be handed by this
+    // call.
+    if (InterfaceState == IfaceStateNormal) {
+//	DecorationRefreshDisplay();
+	DecorationUpdateDisplay();
+    }
+
+#else
    Unit* table[UnitMax];
    Missile* missiletable[MAX_MISSILES * 9];
    int nunits;
@@ -368,17 +395,6 @@ local void DrawMapViewport(Viewport* vp)
    int x;
    int y;
 
-#ifdef NEW_DECODRAW
-    // Experimental new drawing mechanism, which can keep track of what is
-    // overlapping and draw only that what has changed..
-    // Every to-be-drawn item added to this mechanism, can be handed by this
-    // call.
-    if (InterfaceState == IfaceStateNormal) {
-	// DecorationRefreshDisplay();
-	DecorationUpdateDisplay();
-    }
-
-#else
     if (InterfaceState == IfaceStateNormal) {
 #ifdef NEW_MAPDRAW
 	MapUpdateFogOfWar(vp->MapX, vp->MapY);

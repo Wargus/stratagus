@@ -195,7 +195,7 @@ global void (*MapDrawTile)(int, int, int);
 /**
 **	Decoration as registered for decoration mechanism to draw map tiles
 */
-local Deco *mapdeco = NULL;
+global Deco *MapDecoration = NULL;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -2761,6 +2761,8 @@ local void mapdeco_draw(void* dummy_data)
     int y;
     int w;
     int h;
+    int w2;
+    int x2;
     int nextline;
 
     extern int ClipX1;
@@ -2768,22 +2770,26 @@ local void mapdeco_draw(void* dummy_data)
     extern int ClipX2;
     extern int ClipY2;
 
-//  VideoDrawRectangle(ColorWhite, ClipX1, ClipY1,
-//	ClipX2-ClipX1+1, ClipY2-ClipY1+1);
+   VideoDrawRectangle(ColorWhite, ClipX1, ClipY1,
+	ClipX2-ClipX1+1, ClipY2-ClipY1+1);
     w = (ClipX2 - ClipX1) / TileSizeX + 1;
     h = (ClipY2 - ClipY1) / TileSizeY + 1;
-    x = (ClipX1 - TheUI.MapX) / TileSizeX;
-    y = (ClipY1 - TheUI.MapY) / TileSizeY;
-    src = TheMap.Fields + MapX + x + (MapY + y) * TheMap.Width;
-    x = TheUI.MapX + x * TileSizeX;
-    y = TheUI.MapY + y * TileSizeY;
+    x = (ClipX1 - TheUI.SelectedViewport->X) / TileSizeX;
+    y = (ClipY1 - TheUI.SelectedViewport->Y) / TileSizeY;
+    DebugLevel3Fn("%d %d %d %d\n" _C_ x _C_ y _C_ w _C_ h);
+    src = TheMap.Fields + TheUI.SelectedViewport->MapX + x + (TheUI.SelectedViewport->MapY + y) * TheMap.Width;
+    x = TheUI.SelectedViewport->X + x * TileSizeX;
+    y = TheUI.SelectedViewport->Y + y * TileSizeY;
+    /*x = x * TileSizeX;
+    y = y * TileSizeY;*/
+    DebugLevel3Fn("%d %d %d %d->%d %d\n" _C_ ClipX1 _C_ ClipY1 _C_ ClipX2 _C_ ClipY2 _C_ x _C_ y);
     nextline = TheMap.Width - w;
     do {
-	int w2 = w;
-
+	x2 = x;
+	w2 = w;
 	do {
-	    MapDrawTile(src->SeenTile, x, y);
-	    x += TileSizeX;
+	    MapDrawTile(src->SeenTile, x2, y);
+	    x2 += TileSizeX;
 	    ++src;
 	}
 	while (--w2);
@@ -2816,9 +2822,17 @@ global void InitMap(void)
     // not done here, making the switch(VideoBpp) obsolete..
     MapDrawTile = MapDrawXXTileClip;
     VideoDrawTile = VideoDrawXXTileClip;
-    mapdeco = DecorationAdd(NULL /* no data to pass to */,
-	mapdeco_draw, LevGround, TheUI.MapX, TheUI.MapY,
-	TheUI.MapEndX - TheUI.MapX + 1, TheUI.MapEndY - TheUI.MapY + 1);
+    DebugLevel0Fn("Adding a big deco %d,%d - %d %d\n" _C_
+	TheUI.SelectedViewport->X _C_ TheUI.SelectedViewport->Y _C_
+	(TheUI.SelectedViewport->EndY - 1)* TileSizeX _C_
+	(TheUI.SelectedViewport->EndX - 1) * TileSizeY);
+    MapDecoration = DecorationAdd(NULL /* no data to pass to */,
+	mapdeco_draw, LevGround, TheUI.SelectedViewport->X, TheUI.SelectedViewport->Y,
+	(TheUI.SelectedViewport->EndY - 1) * TileSizeX,
+	(TheUI.SelectedViewport->EndX - 1) * TileSizeY);
+//	TheUI.SelectedViewport->EndX - TheUI.SelectedViewport->X + 1,
+//	TheUI.SelectedViewport->EndY - TheUI.SelectedViewport->Y + 1);
+    DebugCheck(!MapDecoration);
 
 #else
     if (TileSizeX == 16 && TileSizeY == 16) {

@@ -1867,6 +1867,11 @@ global void DrawUnit(const Unit* unit)
 	return;
     }
 
+#ifdef NEW_DECODRAW
+    if (!CurrentViewport) {
+	CurrentViewport = TheUI.SelectedViewport;
+    }
+#endif
     x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX;
     y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY;
 

@@ -44,6 +44,7 @@
 
 #define noUSE_SDL			/// Remove no for sdl support
 #define noUSE_SDLA			/// Remove no for sdl audio support
+#define noNEW_DECODRAW			/// Remove no for advanced decoration support.
 
     /**
     **	Define this to support load of compressed (gzip) pud files
