@@ -34,6 +34,10 @@
 #error WITH_SOUND must be defined to use cd audio
 #endif
 
+#ifndef USE_CDAUDIO
+#define USE_CDAUDIO
+#endif
+
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/

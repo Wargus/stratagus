@@ -920,7 +920,7 @@ global void SavePreferences(void)
 	fprintf(fd,"(music-off)\n");
     }
     fprintf(fd,"(set-music-volume! %d)\n", MusicVolume);
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     buf[0] = '\0';
     switch (CDMode) {
 	case CDModeAll:

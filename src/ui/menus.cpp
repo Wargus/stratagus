@@ -1568,7 +1568,7 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
     } else {
 	menu->items[10].flags = 0;
     }
-#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     if (CDMode != CDModeStopped && CDMode != CDModeOff) {
 	menu->items[7].flags = MenuButtonDisabled;
 	menu->items[10].flags = MenuButtonDisabled;
@@ -1585,7 +1585,7 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
     menu->items[15].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[16].flags = MenuButtonDisabled;		// all tracks button
     menu->items[17].flags = MenuButtonDisabled;		// random tracks button
-#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     menu->items[15].flags = 0;			// cd power
     if (CDMode != CDModeStopped && CDMode != CDModeOff) {
 #if (!defined(USE_WIN32) && defined(USE_LIBCDA)) || defined(USE_CDDA)
@@ -1816,7 +1816,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdPower(Menuitem *mi __attribute__((unused)))
 {
-#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     // Start Playing CD
     if (CDMode == CDModeOff || CDMode == CDModeStopped) {
 	ResumeCD();
@@ -1864,7 +1864,7 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 {
-#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     CDMode = CDModeDefined;
 #endif
     SoundOptionsInit(NULL);
@@ -1875,7 +1875,7 @@ local void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
-#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     CDMode = CDModeRandom;
 #endif
     SoundOptionsInit(NULL);
@@ -3872,7 +3872,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
     }
 }
 
-#if defined(USE_LIBCDA) || defined(USE_CDDA) || defined(USE_SDLCD)
+#ifdef USE_CDAUDIO
 /**
 **	CD volume horizontal slider action callback
 */
