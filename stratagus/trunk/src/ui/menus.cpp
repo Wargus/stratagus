@@ -1456,11 +1456,15 @@ local void GlobalOptions(void)
 local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 {
     Menu *menu;
+#ifdef USE_SDL
+    Uint32 flags;
+    extern SDL_Surface *Screen;
 
+    flags = Screen->flags;
+#endif
     menu = FindMenu("menu-global-options");
-
-    fprintf(stderr, "XXXX\n");
     
+
     if (VideoWidth == 640)
 	menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
     if (VideoWidth == 800)
@@ -1471,6 +1475,11 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
     	menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
     if (VideoWidth == 1600)
     	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
+
+#ifdef USE_SDL	
+    if (flags & SDL_FULLSCREEN)
+	menu->items[12].d.gem.state = MI_GSTATE_CHECKED;
+#endif
 }
 
 local void SetRes640(Menuitem *mi __attribute__((unused)))
