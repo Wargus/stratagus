@@ -76,11 +76,7 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 global char EditorRunning;		/// True editor is running
 global char EditorMapLoaded;		/// Map loaded in editor
 
-local enum _editor_state_ {
-    EditorSelecting,			/// Select
-    EditorEditTile,			/// Edit tiles
-    EditorEditUnit,			/// Edit units
-} EditorState;				/// Current editor state
+global EditorStateType EditorState;	/// Current editor state.
 
 local char TileToolRandom;		/// Tile tool draws random
 local char TileToolDecoration;		/// Tile tool draws with decorations
@@ -791,7 +787,13 @@ local void DrawMapCursor(void)
 		TileSizeY * TileCursorSize);
 	    SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
 	} else {
-	    VideoDrawRectangle(ColorWhite, x, y, TileSizeX, TileSizeY);
+	    //
+	    //  If there is an unit under the cursor, it's selection thing
+	    //  is drawn somewhere else (Check DrawUnitSelection.)
+	    //
+	    if (!UnitUnderCursor) {
+		VideoDrawRectangle(ColorWhite, x, y, TileSizeX, TileSizeY);
+	    }
 	}
     }
 }

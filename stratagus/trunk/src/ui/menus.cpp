@@ -470,7 +470,8 @@ local void InitNetMultiButtonStorage() {
 /**
 **	Initialize the hash table of menu functions
 */
-global void InitMenuFuncHash(void) {
+global void InitMenuFuncHash(void)
+{
     HASHADD(NULL,"null");
 
 // Game menu
