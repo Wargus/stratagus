@@ -561,11 +561,6 @@ extern void VideoDrawClipTransX(const Graphic*, unsigned frame, int x, int y, in
 	/// Draw a graphic object clipped and flipped in X direction.
 #define VideoDrawClipXTrans50(o, f, x, y) VideoDrawClipTransX((o), (f), (x), (y), 128)
 
-	/// Free a graphic object.
-extern void VideoFree(Graphic* o);
-	/// Safely (NULL) frees a graphic object.
-#define VideoSafeFree(o) do { if ((o)) { VideoFree((o)); } } while (0)
-
 	/// Get the width of a single frame of a graphic object
 #define VideoGraphicWidth(o)   ((o)->Width)
 	/// Get the height of a single frame of a graphic object

@@ -820,7 +820,7 @@ static int CclDefineFont(lua_State* l)
 		LuaError(l, "missing argument");
 	}
 	free(Fonts[i].File);
-	VideoSafeFree(Fonts[i].Graphic);
+	FreeGraphic(Fonts[i].Graphic);
 	Fonts[i].Graphic = NULL;
 	Fonts[i].File = file;
 	Fonts[i].Width = w;
