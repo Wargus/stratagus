@@ -126,8 +126,8 @@
 **
 **	Unit::CurrentSightRange
 **
-**		Current Sight Range of a Unit, this changes when a unit enters a transporter,
-**		building or exits one of these.
+**		Current sight range of a unit, this changes when a unit enters
+**		a transporter or building or exits one of these.
 **
 **	Unit::Colors
 **
@@ -592,7 +592,7 @@ struct _unit_ {
 #define UNIT_RETREATING		1	/// FIXME: comment missing
 #define UNIT_WINNING		2	/// FIXME: comment missing
     unsigned	Retreating:2;		/// FIXME: comment what is this?
-	void *PfHierData;
+    void *PfHierData;
 #endif	// HIERARCHIC_PATHFINDER
 
 #ifdef NEW_DECODRAW
