@@ -647,7 +647,7 @@ local void VideoEffect0(int frame)
 	    switch( VideoDepth ) {
 		case 15:
 		    pixel=((unsigned short*)vmem)[xt+yt*VideoWidth];
-		    if( 1 ) {		// Shading
+		    if( xo ) {		// Shading
 			int r,g,b;
 
 			r=(pixel>>0)&0x1F;
@@ -665,7 +665,7 @@ local void VideoEffect0(int frame)
 		    break;
 		case 16:
 		    pixel=((unsigned short*)vmem)[xt+yt*VideoWidth];
-		    if( 1 ) {		// Shading
+		    if( xo ) {		// Shading
 			int r,g,b;
 
 			r=(pixel>>0)&0x1F;
