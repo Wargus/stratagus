@@ -10,7 +10,7 @@
 //
 /**@name script_unittype.c - The unit-type ccl functions. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1620,6 +1620,12 @@ static int CclDefineNewAnimations(lua_State* l)
 			anims->Research = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "EndResearch")) {
 			anims->EndResearch = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "StartUpgrade")) {
+			anims->StartUpgrade = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Upgrade")) {
+			anims->Upgrade = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "EndUpgrade")) {
+			anims->EndUpgrade = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "StartBuild")) {
 			anims->StartBuild = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Build")) {
