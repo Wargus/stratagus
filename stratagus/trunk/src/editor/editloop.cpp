@@ -193,7 +193,59 @@ local void EditorCallbackMouse(int x, int y)
 {
     DebugLevel2Fn("Moved %d,%d\n" _C_ x _C_ y);
 
-    HandleCursorMove(&x,&y);
+    HandleCursorMove(&x, &y);		// Reduce to screen
+
+    MouseScrollState = ScrollNone;
+    GameCursor = TheUI.Point.Cursor;
+
+    //
+    //  Scrolling Region Handling
+    //
+    if (x < SCROLL_LEFT) {
+	CursorOn = CursorOnScrollLeft;
+	MouseScrollState = ScrollLeft;
+	GameCursor = TheUI.ArrowW.Cursor;
+	if (y < SCROLL_UP) {
+	    CursorOn = CursorOnScrollLeftUp;
+	    MouseScrollState = ScrollLeftUp;
+	    GameCursor = TheUI.ArrowNW.Cursor;
+	}
+	if (y > SCROLL_DOWN) {
+	    CursorOn = CursorOnScrollLeftDown;
+	    MouseScrollState = ScrollLeftDown;
+	    GameCursor = TheUI.ArrowSW.Cursor;
+	}
+	return;
+    }
+    if (x > SCROLL_RIGHT) {
+	CursorOn = CursorOnScrollRight;
+	MouseScrollState = ScrollRight;
+	GameCursor = TheUI.ArrowE.Cursor;
+	if (y < SCROLL_UP) {
+	    CursorOn = CursorOnScrollRightUp;
+	    MouseScrollState = ScrollRightUp;
+	    GameCursor = TheUI.ArrowNE.Cursor;
+	}
+	if (y > SCROLL_DOWN) {
+	    CursorOn = CursorOnScrollRightDown;
+	    MouseScrollState = ScrollRightDown;
+	    GameCursor = TheUI.ArrowSE.Cursor;
+	}
+	return;
+    }
+    if (y < SCROLL_UP) {
+	CursorOn = CursorOnScrollUp;
+	MouseScrollState = ScrollUp;
+	GameCursor = TheUI.ArrowN.Cursor;
+	return;
+    }
+    if (y > SCROLL_DOWN) {
+	CursorOn = CursorOnScrollDown;
+	MouseScrollState = ScrollDown;
+	GameCursor = TheUI.ArrowS.Cursor;
+	return;
+    }
+    //  Not reached if cursor is inside the scroll area
 }
 
 /**
