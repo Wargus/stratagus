@@ -1141,7 +1141,6 @@ local void MapDraw8Tile32(int tile,int x,int y)
 */
 local void MapDraw16Tile32(int tile,int x,int y)
 {
-    DebugLevel0Fn("%d %p\n",tile,TileCached[tile]);
     if( TileCached[tile] ) {
 	VideoDraw16Tile32Cached(TileCached[tile],x,y);
     } else {
