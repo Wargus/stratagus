@@ -633,7 +633,7 @@ local const char *ncconstatenames[] = {
     "ccs_connected",		// has received slot info
     "ccs_mapinfo",		// has received matching map-info
     "ccs_badmap",		// has received non-matching map-info
-    "ccs_synced",
+    "ccs_synced",		// client is in sync with server
     "ccs_async",		// server user has changed selection
     "ccs_changed",		// client user has made menu selection
     "ccs_detaching",		// client user wants to detach
@@ -773,9 +773,9 @@ global void NetworkInitServerConnect(void)
 
     NetConnectRunning = 1;
 
-    DebugLevel1Fn("Waiting for %d client(s)\n", NetPlayers - 1);
-
-    for (i = 0; i < NetPlayers; ++i) {
+    DebugLevel3Fn("Waiting for %d client(s)\n", NetPlayers - 1);
+    // Cannot use NetPlayers here, as map change might modify the number!!
+    for (i = 0; i < PlayerMax; ++i) {
 	NetStates[i].State = ccs_unused;
 	Hosts[i].Host = 0;
 	Hosts[i].Port = 0;
@@ -809,6 +809,9 @@ global void NetworkExitServerConnect(void)
 	    }
 	}
     }
+
+    NetworkInitServerConnect();	// Reset Hosts slots
+
     NetConnectRunning = 0;
 }
 
