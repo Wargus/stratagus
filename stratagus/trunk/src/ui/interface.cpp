@@ -1125,7 +1125,9 @@ int HandleKeyModifiersDown(unsigned key, unsigned keychar
 			return 1;
 		case KeyCodePrint:
 			Screenshot();
-			SetMessage("Screenshot made.");
+			if (GameRunning) {
+				SetMessage("Screenshot made.");
+			}
 			return 1;
 		default:
 			break;
