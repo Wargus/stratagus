@@ -223,7 +223,7 @@ global void DoRightButton(int sx, int sy)
 							unit->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
 							dest->Type->CanHarvest &&
 							(dest->Player == unit->Player ||
-								(dest->Player->Player == PlayerMax - 1))) {
+								(dest->Player->Player == PlayerNumNeutral))) {
 						dest->Blink = 4;
 						SendCommandResource(unit, dest, flush);
 						continue;
