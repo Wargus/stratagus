@@ -14,8 +14,7 @@
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; either version 2 of the License,
-##	or (at your option) any later version.
+##	by the Free Software Foundation; only version 2 of the License.
 ##
 ##	FreeCraft is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -172,7 +171,8 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/development.html doc/gpl.txt doc/gpl.html doc/SIOD.txt \
 	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
-	  doc/ccl/research.html doc/graphic/*.html doc/graphic/*.png
+	  doc/ccl/research.html doc/graphic/*.html doc/graphic/*.png \
+	  debian/freecraft.6 
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
@@ -190,6 +190,9 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/tilesets.ccl data/ccl/tilesets/summer.ccl \
 	  data/ccl/tilesets/winter.ccl \
 	  data/ccl/tilesets/wasteland.ccl data/ccl/tilesets/swamp.ccl \
+	  data/ccl/campaigns.ccl \
+	  data/ccl/human/campaign1.ccl data/ccl/human/campaign2.ccl \
+	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
 	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm
 
 CONTRIB	= contrib/cross.png contrib/red\ cross.png contrib/health.png contrib/mana.png \

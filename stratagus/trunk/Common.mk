@@ -38,7 +38,7 @@ clobber: clean
 depend::
 	@echo -n >.depend
 	@for i in $(SRCS) $(CPPSRCS) ; do\
-	$(CC) -MM $(IFLAGS) $(DFLAGS) $$i >>.depend ; done
+	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
 
 tags::
 	@for i in $(SRCS) $(CPPSRCS) ; do\
