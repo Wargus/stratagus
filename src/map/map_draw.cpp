@@ -1313,6 +1313,30 @@ global int AreaVisibleInMap( int sx, int sy, int ex, int ey ) {
 }
 
 /**
+**      Check if a point is visible
+**
+**      @param x,y          point in Map to be checked.
+**
+**      @return             True if point is in the visible map, false otherwise
+*/
+local int PointInMap(int x, int y) {
+    return ((MapX <= x && x < MapX+MapWidth) &&
+	    (MapY <= y && y < MapY+MapHeight));
+}
+
+/**
+**      Check if any part of an area is visible
+**
+**      @param sx,sy,ex,ey  area in Map to be checked.
+**
+**      @return             True if any part of area is visible, false otherwise
+*/
+global int AnyAreaVisibleInMap( int sx, int sy, int ex, int ey ) {
+    return ( PointInMap(sx,sy) || PointInMap(sx,ey)
+	|| PointInMap(ex,sy) || PointInMap(ex,ey) );
+}
+
+/**
 **
 **      Mark overlapping area with screenmap be drawn for next display update.
 **
@@ -1322,19 +1346,19 @@ global int AreaVisibleInMap( int sx, int sy, int ex, int ey ) {
 */
 global int MarkDrawAreaMap( int sx, int sy, int ex, int ey ) {
     if ( (ex-=MapX)>=0 && (ey-=MapY)>=0 &&
-         (sx-=MapX)<MapWidth && (sy-=MapY)<MapHeight ) {
+	 ((sx-=MapX)<MapWidth || sx<0) && ((sy-=MapY)<MapHeight || sy<0) ) {
   #ifdef NEW_MAPDRAW
       char *row, *tile;
 
     // Get area in screenmap
       if ( sx < 0 )
-        sx = 0;
+	sx = 0;
       if ( ex >= MapWidth )
-        ex = MapWidth-1;
+	ex = MapWidth-1;
       if ( sy < 0 )
-        sy = 0;
+	sy = 0;
       if ( ey >= MapHeight )
-        ey = MapHeight-1;
+	ey = MapHeight-1;
 
     // Denote area in screenmap
       row  = MustRedrawRow + sy;
@@ -1344,11 +1368,11 @@ global int MarkDrawAreaMap( int sx, int sy, int ex, int ey ) {
       do
 
       {
-        row[ey]=NEW_MAPDRAW;
-        sx = ex;
-        do tile[sx]=NEW_MAPDRAW;
-        while ( --sx >= 0 );
-        tile += MapWidth;
+	row[ey]=NEW_MAPDRAW;
+	sx = ex;
+	do tile[sx]=NEW_MAPDRAW;
+	while ( --sx >= 0 );
+	tile += MapWidth;
       }
       while ( --ey >= 0 );
   #endif
@@ -1370,10 +1394,10 @@ global void MarkDrawEntireMap(void)
     int i;
 
     for( i=0; i<MapHeight; ++i ) {
-        MustRedrawRow[i]=1;
+	MustRedrawRow[i]=1;
     }
     for( i=0; i<MapHeight*MapWidth; ++i ) {
-        MustRedrawTile[i]=1;
+	MustRedrawTile[i]=1;
     }
     #endif
 
@@ -1446,13 +1470,13 @@ global void DrawMapBackground(int x,int y)
 		    // FIXME: unexplored fields could be drawn faster
 		    MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
 
-                // StephanR: debug-mode denote tiles that are redrawn
-                #if NEW_MAPDRAW > 1
-                  VideoDrawRectangle( redraw_tile[-1] > 1
-                                      ? ColorWhite
-                                      : ColorRed,
-                                      dx, dy, 32, 32 );
-                #endif
+		// StephanR: debug-mode denote tiles that are redrawn
+		#if NEW_MAPDRAW > 1
+		  VideoDrawRectangle( redraw_tile[-1] > 1
+				      ? ColorWhite
+				      : ColorRed,
+				      dx, dy, 32, 32 );
+		#endif
 		}
 		++sx;
 		dx+=TileSizeX;
