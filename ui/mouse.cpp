@@ -823,13 +823,32 @@ local void SendRepair(int sx,int sy)
 local void SendMove(int x,int y)
 {
     int i;
+    int flush;
     Unit* unit;
+    Unit* transporter;
+
+    transporter=TransporterOnScreenMapPosition(x*TileSizeX,y*TileSizeY);
+    flush=!(KeyModifiers&ModifierShift);
 
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
-//		if( !unit->Type->Building ) {
-	SendCommandMove(unit,x,y,!(KeyModifiers&ModifierShift));
-//		}
+	if( transporter ) {
+	    transporter->Blink=4;
+	    DebugLevel3Fn("Board transporter\n");
+	    //	Let the transporter move to passenger
+	    //		It should do nothing and not already on coast.
+	    //		FIXME: perhaps force move if not reachable.
+	    if( transporter->Orders[0].Action==UnitActionStill
+		    && transporter->OrderCount==1
+		    && !CoastOnMap(transporter->X,transporter->Y) ) {
+		SendCommandFollow(transporter,unit,FlushCommands);
+	    }
+	    SendCommandBoard(unit,-1,-1,transporter,flush);
+	} else {
+//	    if( !unit->Type->Building ) {
+		SendCommandMove(unit,x,y,flush);
+//	    }
+	}
     }
 }
 
