@@ -3305,7 +3305,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     } else {
 	fprintf(file,"'not-seen ");
     }
-    fprintf(file,"'direction %d\n  ",(unit->Direction*360)/256);
+    fprintf(file,"'direction %d\n  ",unit->Direction);
     fprintf(file,"'attacked %d\n ",unit->Attacked);
     if( unit->Burning ) {
 	fprintf(file," 'burning");
