@@ -153,7 +153,7 @@ local const SampleType ModSampleType = {
 **			faster, perhaps we can rewrite modplug to support
 **			streaming.
 */
-local Sample* LoadMod(const char* name,int flags __attribute((unused)))
+local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 {
     ModPlug_Settings settings;
     ModPlugFile* modfile;
