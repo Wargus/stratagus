@@ -943,8 +943,8 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	fprintf(stderr,"FIXME: *** round robin ***\n");
     }
 
-#ifndef USE_ITIMER
     ticks=X11GetTicks();
+#ifndef USE_ITIMER
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 	IfDebug(
 	    if (InterfaceState == IfaceStateNormal) {
@@ -957,8 +957,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	);
 	++SlowFrameCounter;
     }
-#else
-    ticks=X11GetTicks();
 #endif
 
     InputMouseTimeout(callbacks,ticks);
