@@ -826,8 +826,6 @@ global void AiInit(Player* player)
 	AiType* ait;
 	char* ainame;
 
-	DebugPrint("%d - %s -" _C_ player->Player _C_ player->Name);
-
 	pai = calloc(1, sizeof (PlayerAi));
 	if (!pai) {
 		fprintf(stderr, "Out of memory.\n");
@@ -837,16 +835,16 @@ global void AiInit(Player* player)
 	ait = AiTypes;
 
 	ainame = AiTypeWcNames[player->AiNum];
-	DebugPrint(" looking for class %s\n" _C_ ainame);
+	DebugPrint("%d - %s - looking for class %s\n" _C_
+		player->Player _C_ player->Name _C_ ainame);
 
 	//
 	//  Search correct AI type.
 	//
 	if (!ait) {
-		DebugPrint
-			("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
-		DebugPrint("AI: Look at the (define-ai) documentation.\n");
-		exit(0);
+		DebugPrint("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
+		DebugPrint("AI: Look at the DefineAi() documentation.\n");
+		Exit(0);
 	}
 	for (;;) {
 		if (ait->Race && strcmp(ait->Race, player->RaceName)) {
