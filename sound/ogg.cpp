@@ -117,8 +117,8 @@ int VorbisProcessData(OggData *data, char *buffer)
 							val = -32768;
 						}
 
-						*(int16_t*)(buffer + len
-						  + (j * 2 * data->vinfo.channels) + i * 2) = (int16_t)val;
+						*(Sint16*)(buffer + len
+						  + (j * 2 * data->vinfo.channels) + i * 2) = (Sint16)val;
 					}
 				}
 				len += j * 2 * data->vinfo.channels;
