@@ -437,7 +437,7 @@ static int CclDefineUnitType(lua_State* l)
 		} else if (!strcmp(value, "HitPoints")) {
 			type->_HitPoints = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RegenerationRate")) {
-			type->_RegenerationRate = LuaToNumber(l, -1);
+			type->Variable[HP_INDEX].Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnPercent")) {
 			type->BurnPercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnDamageRate")) {
@@ -483,8 +483,6 @@ static int CclDefineUnitType(lua_State* l)
 			type->NumDirections = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Revealer")) {
 			type->Revealer = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SightRange")) {
-			type->_SightRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RadarRange")) {
 			type->RadarRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RadarJammerRange")) {
@@ -493,19 +491,13 @@ static int CclDefineUnitType(lua_State* l)
 			type->ReactRangeComputer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PersonReactionRange")) {
 			type->ReactRangePerson = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Armor")) {
-			type->_Armor = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "BasicDamage")) {
-			type->_BasicDamage = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PiercingDamage")) {
-			type->_PiercingDamage = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Missile")) {
 			type->Missile.Name = strdup(LuaToString(l, -1));
 			type->Missile.Missile = NULL;
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxAttackRange")) {
-			type->_AttackRange = LuaToNumber(l, -1);
+			type->Variable[ATTACKRANGE_INDEX].Max = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Priority")) {
 			type->Priority = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "AnnoyComputerFactor")) {
@@ -1123,7 +1115,7 @@ static int CclDefineUnitStats(lua_State* l)
 
 	stats->Mana = stats->Variables[MANA_INDEX].Max;
 	stats->Level = stats->Variables[LEVEL_INDEX].Value;
-	stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Value;
+	stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Max;
 	stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
 	stats->Armor = stats->Variables[ARMOR_INDEX].Value;
 	stats->BasicDamage = stats->Variables[BASICDAMAGE_INDEX].Value;
@@ -1734,6 +1726,8 @@ void UpdateUnitVariables(const Unit* unit)
 {
 	int i;
 	const UnitType* type; // unit->Type.
+	int piercing;         // unit->type->Variable[PIERCINGDAMAGE_INDEX].Value.
+	int basic;            // unit->type->Variable[BASICDAMAGE_INDEX].Value.
 
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
@@ -1826,41 +1820,43 @@ void UpdateUnitVariables(const Unit* unit)
 	unit->Variable[DEMAND_INDEX].Enable = unit->Type->Demand > 0;
 
 	// Armor
-	unit->Variable[ARMOR_INDEX].Value = unit->Type->_Armor;
+	unit->Variable[ARMOR_INDEX].Value = type->Variable[ARMOR_INDEX].Value;
 	unit->Variable[ARMOR_INDEX].Max = unit->Stats->Armor;
 
 	// SightRange
-	unit->Variable[SIGHTRANGE_INDEX].Value = unit->Type->_SightRange;
+	unit->Variable[SIGHTRANGE_INDEX].Value = type->Variable[SIGHTRANGE_INDEX].Value;
 	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->SightRange;
 
 	// AttackRange
-	unit->Variable[ATTACKRANGE_INDEX].Value = unit->Type->_AttackRange;
+	unit->Variable[ATTACKRANGE_INDEX].Value = type->Variable[ATTACKRANGE_INDEX].Max;
 	unit->Variable[ATTACKRANGE_INDEX].Max = unit->Stats->AttackRange;
 
 	// PiercingDamage
-	unit->Variable[PIERCINGDAMAGE_INDEX].Value = unit->Type->_PiercingDamage;
+	piercing = type->Variable[PIERCINGDAMAGE_INDEX].Value;
+	unit->Variable[PIERCINGDAMAGE_INDEX].Value = piercing;
 	unit->Variable[PIERCINGDAMAGE_INDEX].Max = unit->Stats->PiercingDamage;
 
 	// BasicDamage
-	unit->Variable[BASICDAMAGE_INDEX].Value = unit->Type->_BasicDamage;
+	basic = type->Variable[BASICDAMAGE_INDEX].Value;
+	unit->Variable[BASICDAMAGE_INDEX].Value = basic;
 	unit->Variable[BASICDAMAGE_INDEX].Max = unit->Stats->BasicDamage;
 
 	// Damage and extradamage
-	if (unit->Stats->PiercingDamage != unit->Type->_PiercingDamage) {
-		if (unit->Type->_PiercingDamage < 30 && unit->Type->_BasicDamage < 30) {
-			unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_PiercingDamage + 1) / 2;
+	if (unit->Stats->PiercingDamage != piercing) {
+		if (piercing < 30 && basic < 30) {
+			unit->Variable[DAMAGE_INDEX].Value = (piercing + 1) / 2;
 		} else {
-			unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_PiercingDamage + unit->Type->_BasicDamage - 30) / 2;
+			unit->Variable[DAMAGE_INDEX].Value = (piercing + basic - 30) / 2;
 		}
-		unit->Variable[EXTRADAMAGE_INDEX].Value = unit->Stats->BasicDamage - unit->Type->_BasicDamage +
+		unit->Variable[EXTRADAMAGE_INDEX].Value = unit->Stats->BasicDamage - basic +
 							(int)isqrt(unit->XP / 100) * XpDamage;
 		unit->Variable[EXTRADAMAGE_INDEX].Max = unit->Variable[EXTRADAMAGE_INDEX].Value;
-	} else if (unit->Type->_PiercingDamage || unit->Type->_BasicDamage < 30) {
-		unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_PiercingDamage + 1) / 2;
+	} else if (piercing || basic < 30) {
+		unit->Variable[DAMAGE_INDEX].Value = (piercing + 1) / 2;
 	} else {
-		unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_BasicDamage - 30) / 2;
+		unit->Variable[DAMAGE_INDEX].Value = (basic - 30) / 2;
 	}
-	unit->Variable[DAMAGE_INDEX].Max = unit->Type->_BasicDamage + unit->Type->_PiercingDamage;
+	unit->Variable[DAMAGE_INDEX].Max = basic + piercing;
 
 	if (unit->Bloodlust) { // bloodlust do extra damage.
 		unit->Variable[PIERCINGDAMAGE_INDEX].Value <<= 1;

@@ -162,13 +162,6 @@ void UpdateStats(int reset)
 			// LUDO : FIXME : reset loading of player stats !
 			for (player = 0; player < PlayerMax; ++player) {
 				stats = &type->Stats[player];
-				stats->AttackRange = type->_AttackRange;
-				stats->SightRange = type->_SightRange;
-				stats->Armor = type->_Armor;
-				stats->BasicDamage = type->_BasicDamage;
-				stats->PiercingDamage = type->_PiercingDamage;
-				stats->HitPoints = type->_HitPoints;
-				stats->Mana = type->Variable[MANA_INDEX].Max;
 				for (i = 0; i < MaxCosts; ++i) {
 					stats->Costs[i] = type->_Costs[i];
 				}
@@ -183,21 +176,22 @@ void UpdateStats(int reset)
 				} else {
 					stats->Level = 1;
 				}
-				stats->Variables[MANA_INDEX].Max = stats->Mana;
+				stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Max;
+				stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
+				stats->Armor = stats->Variables[ARMOR_INDEX].Value;
+				stats->BasicDamage = stats->Variables[BASICDAMAGE_INDEX].Value;
+				stats->PiercingDamage = stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+				stats->HitPoints = type->_HitPoints;
+				stats->RegenerationRate = stats->Variables[HP_INDEX].Increase;
+				stats->Mana = stats->Variables[MANA_INDEX].Max;
+
 				stats->Variables[LEVEL_INDEX].Value = stats->Level;
 				stats->Variables[LEVEL_INDEX].Max = stats->Level;
-				stats->Variables[ATTACKRANGE_INDEX].Value = stats->AttackRange;
-				stats->Variables[ATTACKRANGE_INDEX].Max = stats->AttackRange;
-				stats->Variables[SIGHTRANGE_INDEX].Value = stats->SightRange;
 				stats->Variables[SIGHTRANGE_INDEX].Max = stats->SightRange;
-				stats->Variables[ARMOR_INDEX].Value = stats->Armor;
 				stats->Variables[ARMOR_INDEX].Max = stats->Armor;
-				stats->Variables[BASICDAMAGE_INDEX].Value = stats->BasicDamage;
 				stats->Variables[BASICDAMAGE_INDEX].Max = stats->BasicDamage;
-				stats->Variables[PIERCINGDAMAGE_INDEX].Value = stats->PiercingDamage;
 				stats->Variables[PIERCINGDAMAGE_INDEX].Max = stats->PiercingDamage;
 				stats->Variables[HP_INDEX].Max = stats->HitPoints;
-				stats->Variables[HP_INDEX].Increase = stats->RegenerationRate;
 			}
 		}
 

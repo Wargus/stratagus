@@ -150,9 +150,6 @@ struct lua_State;
 **
 **    Maximum hit points
 **
-**  UnitType::_MaxMana
-**
-**    Maximum mana points
 **
 **  UnitType::_Costs[::MaxCosts]
 **
@@ -191,11 +188,6 @@ struct lua_State;
 **
 **    Minimal attack range
 **
-**
-**  UnitType::_AttackRange
-**
-**    How far can the unit attack
-**
 **  UnitType::ReactRangeComputer
 **
 **    Reacts on enemy for computer
@@ -204,25 +196,9 @@ struct lua_State;
 **
 **    Reacts on enemy for person player
 **
-**  UnitType::_Armor
-**
-**    Amount of armor this unit has
-**
 **  UnitType::Priority
 **
 **    Priority value / AI Treatment
-**
-**  UnitType::_BasicDamage
-**
-**    Basic damage dealt
-**
-**  UnitType::_PiercingDamage
-**
-**    Piercing damage dealt
-**
-**  UnitType::_RegenerationRate
-**
-**    Regeneration rate in HP per second
 **
 **  UnitType::BurnPercent
 **
@@ -845,7 +821,6 @@ struct _unit_type_ {
 
 	// this is taken from the UDTA section
 	struct _construction_* Construction; ///< What is shown in construction phase
-	int _SightRange;                ///< Sight range
 	int RadarRange;                 ///< Range of radar if any
 	int RadarJammerRange;           ///< Range of radar jamming if any
 	int _HitPoints;                 ///< Maximum hit points
@@ -860,14 +835,9 @@ struct _unit_type_ {
 	int BoxHeight;                  ///< Selected box size height
 	int NumDirections;              ///< Number of directions unit can face
 	int MinAttackRange;             ///< Minimal attack range
-	int _AttackRange;               ///< How far can the unit attack
 	int ReactRangeComputer;         ///< Reacts on enemy for computer
 	int ReactRangePerson;           ///< Reacts on enemy for person player
-	int _Armor;                     ///< Amount of armor this unit has
 	int Priority;                   ///< Priority value / AI Treatment
-	int _BasicDamage;               ///< Basic damage dealt
-	int _PiercingDamage;            ///< Piercing damage dealt
-	int _RegenerationRate;          ///< HP regeneration rate per sec
 	int BurnPercent;                ///< Burning percent.
 	int BurnDamageRate;             ///< HP burn rate per sec
 	int RepairRange;                ///< Units repair range.
