@@ -5152,39 +5152,29 @@ static int PlayerTypesMenuToFc[] = {
 **
 ** @param num Ai number
 */
-static int PlayerAiFcToMenu(int num)
+static int PlayerSetAiToMenu(char *ainame, MenuitemPulldown* menu)
 {
-	if (num == PlayerAiLand) {
-		return 0;
-	} else if (num == PlayerAiPassive) {
-		return 1;
-	} else if (num == PlayerAiSea) {
-		return 2;
-	} else if (num == PlayerAiAir) {
-		return 3;
+	int i;
+	
+	menu->defopt = 0;
+	for (i = 0; i < menu->noptions; ++i) {
+		if(!strcmp(menu->options[i], ainame)) {
+			menu->defopt = i;
+		}
 	}
-	DebugPrint("Invalid Ai number: %d\n" _C_ num);
-	return -1;
+	
+	DebugPrint("Invalid Ai name: %s\n" _C_ ainame);
+	return i;
 }
 
 /**
-** Convert player ai from menu number to internal fc number
+** Get the ai ident from the pulldown menu
 **
 ** @param num Ai number
 */
-static int PlayerAiMenuToFc(int num)
+static char* PlayerGetAiFromMenu(MenuitemPulldown* menu)
 {
-	if (num == 0) {
-		return PlayerAiLand;
-	} else if (num == 1) {
-		return PlayerAiPassive;
-	} else if (num == 2) {
-		return PlayerAiSea;
-	} else if (num == 3) {
-		return PlayerAiAir;
-	}
-	DebugPrint("Invalid Ai number: %d\n" _C_ num);
-	return -1;
+	return menu->options[menu->curopt];
 }
 
 /**
@@ -5210,7 +5200,7 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = TheMap.Info.PlayerSide[i];
 		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info.PlayerType[i]];
-		menu->Items[AI_POSITION + i].D.Pulldown.defopt = PlayerAiFcToMenu(TheMap.Info.PlayerAi[i]);
+		PlayerSetAiToMenu(TheMap.Info.PlayerAi[i], &menu->Items[AI_POSITION + i].D.Pulldown);
 		sprintf(gold[i], "%d~!_", TheMap.Info.PlayerResources[i][GoldCost]);
 		sprintf(lumber[i], "%d~!_", TheMap.Info.PlayerResources[i][WoodCost]);
 		sprintf(oil[i], "%d~!_", TheMap.Info.PlayerResources[i][OilCost]);
@@ -5230,7 +5220,8 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		TheMap.Info.PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
 		TheMap.Info.PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
-		TheMap.Info.PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION + i].D.Pulldown.curopt);
+		strcpy(TheMap.Info.PlayerAi[i], 
+			PlayerGetAiFromMenu(&menu->Items[AI_POSITION + i].D.Pulldown));
 		TheMap.Info.PlayerResources[i][GoldCost] = atoi(gold[i]);
 		TheMap.Info.PlayerResources[i][WoodCost] = atoi(lumber[i]);
 		TheMap.Info.PlayerResources[i][OilCost] = atoi(oil[i]);

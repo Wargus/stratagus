@@ -202,7 +202,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 		gzprintf(f, "SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 				i, PlayerRaces.Name[Players[i].Race]);
 		gzprintf(f, "SetAiType(%d, \"%s\")\n",
-				i, AiTypeWcNames[TheMap.Info.PlayerAi[i]]);
+				i, TheMap.Info.PlayerAi[i]);
 	}
 	gzprintf(f, "\n");
 

@@ -87,10 +87,10 @@
 **    (PUD). This number is mapped with #PlayerRaces to the symbolic
 **    name Player::RaceName.
 **
-**  Player::AiNum
+**  Player::AiName
 **
-**    AI number for computer (See #PlayerAis). This field is setup
-**    from the level (PUD). Used to select the AI for the computer
+**    AI name for computer. This field is setup
+**    from the map. Used to select the AI for the computer
 **    player.
 **
 **  Player::Team
@@ -126,7 +126,7 @@
 **
 **    The tile map coordinates of the player start position. 0,0 is
 **    the upper left on the map. This members are setup from the
-**    level (PUD) and only important for the game start.
+**    map and only important for the game start.
 **    Ignored if game starts with level settings. Used to place
 **    the initial workers if you play with 1 or 3 workers.
 **
@@ -313,7 +313,7 @@ struct _player_ {
 	int   Type;      ///< type of player (human,computer,...)
 	char* RaceName;  ///< name of race
 	int   Race;      ///< race of player (orc,human,...)
-	int   AiNum;     ///< AI for computer
+	char  AiName[128];     ///< AI for computer
 
 	// friend enemy detection
 	int      Team;          ///< team of player
@@ -430,19 +430,6 @@ enum PlayerTypes {
 	PlayerRescueActive = 7,   ///< rescued  active
 };
 
-/**
-**  Ai types for the player (must fit to PUD!)
-**
-**  Mapped with #AiTypeWcNames to internal symbols.
-*/
-enum PlayerAis {
-	PlayerAiLand = 0x00,       ///< attack at land
-	PlayerAiPassive = 0x01,    ///< passive does nothing
-	PlayerAiSea = 0x19,        ///< attack at sea
-	PlayerAiAir = 0x1A,        ///< attack at air
-	PlayerAiUniversal = 0xFF,  ///< attack best possible
-};
-
 #define PlayerNumNeutral (PlayerMax - 1)  ///< this is the neutral player slot
 
 /**
@@ -488,8 +475,6 @@ extern void CreatePlayer(int type);
 extern void PlayerSetSide(struct _player_* player, int side);
 	/// Change player name
 extern void PlayerSetName(struct _player_* player, const char* name);
-	/// Change player AI
-extern void PlayerSetAiNum(struct _player_* player, int ai);
 
 	/// Set a resource of the player
 extern void PlayerSetResource(Player* player, int resource, int value);

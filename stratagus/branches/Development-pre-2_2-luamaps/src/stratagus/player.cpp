@@ -231,7 +231,7 @@ void SavePlayers(CLFile* file)
 			default:                  CLprintf(file, "%d,",Players[i].Type);break;
 		}
 		CLprintf(file, " \"race\", \"%s\",", Players[i].RaceName);
-		CLprintf(file, " \"ai\", %d,\n", Players[i].AiNum);
+		CLprintf(file, " \"ai-name\", \"%s\",\n", Players[i].AiName);
 		CLprintf(file, "  \"team\", %d,", Players[i].Team);
 
 		CLprintf(file, " \"enemy\", \"");
@@ -440,7 +440,7 @@ void CreatePlayer(int type)
 	player->Team = team;
 	player->Enemy = 0;
 	player->Allied = 0;
-	player->AiNum = PlayerAiUniversal;
+	strcpy(player->AiName, "ai-passive");
 
 	//
 	//  Calculate enemy/allied mask.
@@ -548,17 +548,6 @@ void PlayerSetName(Player* player, const char* name)
 		free(player->Name);
 	}
 	player->Name = strdup(name);
-}
-
-/**
-**  Change player ai.
-**
-**  @param player  Pointer to player.
-**  @param ai      AI type.
-*/
-void PlayerSetAiNum(Player* player, int ai)
-{
-	player->AiNum = ai;
 }
 
 /*----------------------------------------------------------------------------
@@ -885,7 +874,6 @@ void DebugPlayers(void)
 		"yellow"
 	};
 	const char* playertype;
-	const char* playerainum;
 
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -- ---\n");
@@ -904,19 +892,12 @@ void DebugPlayers(void)
 			case 7: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
-		switch (Players[i].AiNum) {
-			case PlayerAiLand: playerainum = "(land)"; break;
-			case PlayerAiPassive: playerainum = "(passive)"; break;
-			case PlayerAiAir: playerainum = "(air)"; break;
-			case PlayerAiSea: playerainum = "(sea)"; break;
-			default: playerainum = "?unknown?"; break;
-		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %2d %s\n" _C_ i _C_ colors[i] _C_
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ colors[i] _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name _C_ playertype _C_
 			PlayerRaces.Name[PlayerRacesIndex(Players[i].Race)] _C_
-			Players[i].AiNum _C_ playerainum);
+			Players[i].AiName);
 	}
 #endif
 }
