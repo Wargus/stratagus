@@ -870,10 +870,11 @@ global void DoButtonButtonClicked(int button)
 	switch (CurrentButtons[button].Action) {
 		case ButtonUnload:
 			//
-			//		Unload on coast, transporter standing, unload all units.
+			//		Unload on coast, transporter standing, unload all units right now.
+			//		That or a bunker.
 			//
-			if (NumSelected == 1 && Selected[0]->Orders[0].Action == UnitActionStill &&
-					CoastOnMap(Selected[0]->X, Selected[0]->Y)) {
+			if ((NumSelected == 1 && Selected[0]->Orders[0].Action == UnitActionStill &&
+					CoastOnMap(Selected[0]->X, Selected[0]->Y)) || Selected[0]->Type->Building) {
 				SendCommandUnload(Selected[0],
 					Selected[0]->X, Selected[0]->Y, NoUnitP,
 					!(KeyModifiers & ModifierShift));

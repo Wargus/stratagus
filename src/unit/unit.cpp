@@ -3631,6 +3631,9 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	if (unit->Moving) {
 		CLprintf(file, " \"moving\",");
 	}
+	if (unit->Boarded) {
+		CLprintf(file, " \"boarded\",");
+	}
 	CLprintf(file, " \"rs\", %d,", unit->Rs);
 	CLprintf(file, " \"units-boarded-count\", %d,", unit->BoardCount);
 	CLprintf(file, "\n  \"units-contained\", {");
