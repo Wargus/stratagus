@@ -64,7 +64,13 @@ global void ActionStillGeneric(Unit* unit, int ground)
 
 	DebugLevel3Fn(" %d\n" _C_ UnitNumber(unit));
 
-	if (unit->Removed) { // Removed units, do nothing?
+	//
+	// If unit is not bunkered and removed, wait
+	//
+	if (unit->Removed && (!unit->Container || 
+			!unit->Container->Type->Transporter ||
+			!unit->Container->Type->AttackFromTransporter ||
+			unit->Type->Missile.Missile->Class == MissileClassNone)) {
 		// If peon is in building or unit is in transporter it is removed.
 		unit->Wait = CYCLES_PER_SECOND / 6;
 		return;
@@ -167,8 +173,9 @@ global void ActionStillGeneric(Unit* unit, int ground)
 	if (type->CanAttack && !type->Coward) {
 		//
 		// Normal units react in reaction range.
+		// Removed units can only attack in AttackRange, from bunker
 		//
-		if (unit->Stats->Speed && !ground) {
+		if (unit->Stats->Speed && !unit->Removed && !ground) {
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
