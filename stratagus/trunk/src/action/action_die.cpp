@@ -10,7 +10,7 @@
 //
 /**@name action_die.c	-	The die action. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001,2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -93,7 +93,7 @@ global void HandleActionDie(Unit* unit)
 	UnitShowAnimation(unit,unit->Type->Animations->Die);
 
 	// FIXME: perhaps later or never is better
-	//ChangeUnitOwner(unit,unit->Player,&Players[PlayerNumNeutral]);
+	//ChangeUnitOwner(unit,&Players[PlayerNumNeutral]);
     }
     UnitMarkSeen(unit);
 }
