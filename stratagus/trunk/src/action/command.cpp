@@ -186,7 +186,7 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -241,7 +241,7 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -277,7 +277,7 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -344,7 +344,7 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -412,7 +412,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -458,7 +458,7 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -494,7 +494,7 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	//
 	//	Destination could be killed.
 	//	Should be handled in action, but is not possible!
@@ -540,7 +540,7 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -587,7 +587,7 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -648,7 +648,7 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -682,7 +682,8 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     //
     //	Check if unit is still valid and Goal still alive? (NETWORK!)
     //
-    if( !unit->Removed && !dest->Destroyed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie
+	     && !dest->Destroyed ) {
 	// FIXME: if low-level supports searching, pass NoUnitP down.
 
 	if( unit->Type->Building ) {
@@ -719,7 +720,8 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     //
     //	Check if unit is still valid and Goal still alive? (NETWORK!)
     //
-    if( !unit->Removed && !dest->Destroyed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie
+	     && !dest->Destroyed ) {
 	// FIXME: if low-level supports searching, pass NoUnitP down.
 
 	if( unit->Type->Building ) {
@@ -756,7 +758,7 @@ global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
     //
     //	Check if unit is still valid and Goal still alive? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -909,7 +911,7 @@ global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
     //
     //	Check if unit is still valid and Goal still alive? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	//
 	//	Check if enough resources remains? (NETWORK!)
 	//
@@ -989,7 +991,7 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
     //
     //	Check if unit is still valid and Goal still alive? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	//
 	//	Check if enough resources remains? (NETWORK!)
 	//
@@ -1078,7 +1080,7 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -1151,7 +1153,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
     //
     //	Check if unit is still valid? (NETWORK!)
     //
-    if( !unit->Removed ) {
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	// FIXME: should I check here, if there is still enough mana?
 
 	if( unit->Type->Building ) {
