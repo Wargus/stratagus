@@ -65,10 +65,10 @@ struct movement_type {
 
 static MovementType MovementTypes[] = {
 	/* MOVEMENT_TYPE_TRANSPORTER */
-	{ MapFieldWaterAllowed | MapFieldCoastAllowed, 0, },
+	{ MapFieldWaterAllowed | MapFieldCoastAllowed, 0, 0, NULL },
 	/* MOVEMENT_TYPE_HOVERCRAFT */
 	{ MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed, 
-	  MapFieldForest, }
+	  MapFieldForest, 0, NULL }
 };
 
 local struct region_group_set RegGroupSet;
