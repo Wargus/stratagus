@@ -323,67 +323,45 @@ static int CclShowMapLocation(lua_State* l)
 **  Set the default map.
 **
 **  @param l  Lua state.
-**
-**  @return   The old default map.
 */
 static int CclSetDefaultMap(lua_State* l)
 {
-	char* old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = strdup(DefaultMap);
-	strcpy(DefaultMap, LuaToString(l, 1));
-
-	lua_pushstring(l, old);
-	free(old);
-	return 1;
+	strncpy(DefaultMap, LuaToString(l, 1), sizeof(DefaultMap) - 1);
+	return 0;
 }
 
 /**
 **  Set fog of war on/off.
 **
 **  @param l  Lua state.
-**
-**  @return      The old state of fog of war.
 */
 static int CclSetFogOfWar(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = !TheMap.NoFogOfWar;
 	TheMap.NoFogOfWar = !LuaToBoolean(l, 1);
 	if (!CclInConfigFile) {
 		UpdateFogOfWarChange();
 	}
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Enable display of terrain in minimap.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of the minimap with terrain.
 */
 static int CclSetMinimapTerrain(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = MinimapWithTerrain;
 	MinimapWithTerrain = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -394,7 +372,6 @@ static int CclSetMinimapTerrain(lua_State* l)
 static int CclSetFogOfWarOpacity(lua_State* l)
 {
 	int i;
-	int old;
 
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -405,15 +382,13 @@ static int CclSetFogOfWarOpacity(lua_State* l)
 		fprintf(stdout, "Opacity should be 0 - 256\n");
 		i = 100;
 	}
-	old = FogOfWarOpacity;
 	FogOfWarOpacity = i;
 
 	if (!CclInConfigFile) {
 		InitMapFogOfWar();
 	}
 
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -455,16 +430,15 @@ static int CclSetForestRegeneration(lua_State* l)
 */
 static int CclSetFogOfWarGraphics(lua_State* l)
 {
-	char* FogGraphicFile;
+	const char* FogGraphicFile;
 
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
 
 	FogGraphicFile = LuaToString(l, 1);
-	if(TheMap.FogGraphic) {
+	if (TheMap.FogGraphic) {
 		FreeGraphic(TheMap.FogGraphic);
-		TheMap.FogGraphic = NULL;
 	}
 	TheMap.FogGraphic = NewGraphic(FogGraphicFile, TileSizeX, TileSizeY);
 
