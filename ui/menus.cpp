@@ -6783,19 +6783,24 @@ local void EditorLoadVSAction(Menuitem *mi, int i)
 local void EditorMapProperties(void)
 {
     Menu *menu;
-    char MapDescription[32];
+    char MapDescription[36];
 
     menu = FindMenu(MENU_EDITOR_MAP_PROPERTIES);
     menu->items[2].d.input.buffer = MapDescription;
-    strcpy(MapDescription, "FIXME");
+    strcpy(MapDescription, TheMap.Info->Description);
     strcat(MapDescription, "~!_");
     menu->items[2].d.input.nch = strlen(MapDescription)-3;
-    menu->items[2].d.input.maxch = 32;
+    menu->items[2].d.input.maxch = 31;
     ProcessMenu(MENU_EDITOR_MAP_PROPERTIES, 1);
+    MapDescription[strlen(MapDescription)-3] = '\0';
+    strcpy(TheMap.Info->Description, MapDescription);
 }
 
 local void EditorEnterMapDescriptionAction(Menuitem *mi, int key)
 {
+    if (key == 10 || key == 13) {
+	EditorEndMenu();
+    }
 }
 
 local void EditorPlayerProperties(void)
