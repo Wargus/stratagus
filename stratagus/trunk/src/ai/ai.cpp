@@ -768,7 +768,7 @@ local void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
     fprintf(file,"  'repair-workers '(");
     for( i=0; i<UnitMax; ++i ) {
 	if( ai->TriedRepairWorkers[i] ) {
-	    fprintf(file,"%d %d",i,ai->TriedRepairWorkers[i]);
+	    fprintf(file,"%d %d ",i,ai->TriedRepairWorkers[i]);
 	}
     }
     fprintf(file,")");
