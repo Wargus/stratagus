@@ -1425,13 +1425,14 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 	menu->items[11].d.gem.state = MI_GSTATE_CHECKED;
     }
 
+    menu->items[14].flags = -1;			// cd volume slider
+    menu->items[17].flags = -1;			// cd power
+    menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[19].flags = -1;			// all tracks button
+    menu->items[21].flags = -1;			// random tracks button
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	menu->items[14].flags = -1;		// cd volume slider
-	menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED; // cd power
-	menu->items[19].flags = -1;		// all tracks button
-	menu->items[21].flags = -1;		// random tracks button
-    } else {
+    menu->items[17].flags = 0;			// cd power
+    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
 #ifdef USE_LIBCDA
 	int i = 0;
 
@@ -1440,18 +1441,12 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 #endif
 	if (!strcmp(":all", CDMode)) {
 	    menu->items[19].d.gem.state = MI_GSTATE_CHECKED;
-	}
-	if (!strcmp(":random", CDMode)) {
+	    menu->items[21].d.gem.state = MI_GSTATE_UNCHECKED;
+	} else if (!strcmp(":random", CDMode)) {
+	    menu->items[19].d.gem.state = MI_GSTATE_UNCHECKED;
 	    menu->items[21].d.gem.state = MI_GSTATE_CHECKED;
 	}
-	menu->items[11].flags = -1;
     }
-#else // without cd
-    menu->items[14].flags = -1;			// cd volume slider
-    menu->items[17].flags = -1;			// cd power
-    menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[19].flags = -1;			// all tracks button
-    menu->items[21].flags = -1;			// random tracks button
 #endif // cd
 #endif // with sound
 }
