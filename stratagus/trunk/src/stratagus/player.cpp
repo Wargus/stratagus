@@ -89,7 +89,7 @@ global char* PlayerColorNames[PlayerMax] = {
     "violet",
     "orange",
     "black",
-    "white"
+    "white",
     "yellow",
     "red",
     "blue",
@@ -97,7 +97,7 @@ global char* PlayerColorNames[PlayerMax] = {
     "violet",
     "orange",
     "black",
-    "white"
+    "white",
     "yellow",
 };
 
