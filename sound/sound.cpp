@@ -75,19 +75,19 @@ global GameSound GameSounds
 #ifndef laterUSE_CCL
 // FIXME: Removing this crashes?
 ={
-    { "placement error" , NULL },
-    { "placement success" , NULL },
-    { "click" , NULL },
+    { "placement error", NULL },
+    { "placement success", NULL },
+    { "click", NULL },
     { "tree chopping", NULL },
     { "transport docking", NULL },
     { "building construction", NULL },
-    { "basic human voices work complete" , NULL },
-    { "peasant work complete" , NULL },
-    { "basic orc voices work complete" , NULL },
-    { "repair" , NULL },
-    {	{ "rescue (human) UNUSED" , NULL },
-	{ "rescue (orc) UNUSED" , NULL },
-    }
+    {	{ "basic human voices work complete", NULL },
+	{ "basic orc voices work complete", NULL },
+    },
+    { "repair", NULL },
+    {	{ "rescue (human) UNUSED", NULL },
+	{ "rescue (orc) UNUSED", NULL },
+    },
 }
 #endif
     ;
@@ -180,12 +180,7 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
     case VoiceTreeChopping:
 	return GameSounds.TreeChopping.Sound;
     case VoiceWorkCompleted:
-	// FIXME: make this more configurable
-	if( ThisPlayer->Race==PlayerRaceHuman ) {
-	    return GameSounds.HumanWorkComplete.Sound;
-	} else {
-	    return GameSounds.OrcWorkComplete.Sound;
-	}
+	return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
     case VoiceBuilding:
 	return GameSounds.BuildingConstruction.Sound;
     case VoiceDocking:
@@ -339,17 +334,11 @@ global void InitSoundClient(void)
 	GameSounds.BuildingConstruction.Sound=
 		SoundIdForName(GameSounds.BuildingConstruction.Name);
     }
-    if( !GameSounds.HumanWorkComplete.Sound ) {
-	GameSounds.HumanWorkComplete.Sound=
-		SoundIdForName(GameSounds.HumanWorkComplete.Name);
-    }
-    if( !GameSounds.PeasantWorkComplete.Sound ) {
-	GameSounds.PeasantWorkComplete.Sound=
-		SoundIdForName(GameSounds.PeasantWorkComplete.Name);
-    }
-    if( !GameSounds.OrcWorkComplete.Sound ) {
-	GameSounds.OrcWorkComplete.Sound=
-		SoundIdForName(GameSounds.OrcWorkComplete.Name);
+    for( i=0; i<PlayerRaces.Count; ++i ) {
+	if( !GameSounds.WorkComplete[i].Sound && GameSounds.WorkComplete[i].Name ) {
+	    GameSounds.WorkComplete[i].Sound=
+		    SoundIdForName(GameSounds.WorkComplete[i].Name);
+	}
     }
     if( !GameSounds.Repair.Sound ) {
 	GameSounds.Repair.Sound=

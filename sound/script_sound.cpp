@@ -325,6 +325,27 @@ local SCM CclDefineGameSounds(SCM list)
 		return list;
 	    }
 	    GameSounds.PlacementSuccess.Sound=CCL_SOUND_ID(data);
+	} else if( gh_eq_p(value,gh_symbol2scm("work-complete")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    str=gh_scm2newstr(gh_car(sublist),NULL);
+	    for( i=0; i<PlayerRaces.Count; ++i ) {
+		if( !strcmp(PlayerRaces.Name[i],str) ) {
+		    break;
+		}
+	    }
+	    free(str);
+	    if( i==PlayerRaces.Count ) {
+		fprintf(stderr,"Unknown race: %s\n",str);
+		ExitFatal(1);
+	    }
+	    sublist=gh_cdr(sublist);
+	    data=gh_car(sublist);
+	    if( !CCL_SOUNDP(data) ) {
+		fprintf(stderr,"Sound id expected\n");
+		ExitFatal(1);
+	    }
+	    GameSounds.WorkComplete[i].Sound=CCL_SOUND_ID(data);
 	} else if( gh_eq_p(value,gh_symbol2scm("repair")) ) {
 	    data=gh_car(list);
 	    list=gh_cdr(list);
