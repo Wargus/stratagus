@@ -44,6 +44,20 @@
 --	Map - field
 ----------------------------------------------------------------------------*/
 
+#ifdef UNIT_ON_MAP
+/**
+**	All units on a map field, if more than one.
+**	FIXME: unused
+*/
+typedef struct _unit_array_ {
+    Unit*		Building;	/// Building or corpse.
+    Unit*		SeaUnit;	/// Sea unit.
+    Unit*		LandUnit;	/// Land unit.
+    Unit*		AirUnit;	/// Air unit.
+} UnitArray;
+
+#endif
+
 /**
 **	Describes a field of the map.
 */
@@ -61,10 +75,11 @@ typedef struct _map_field_ {
 #ifdef UNIT_ON_MAP
     union {
 	Unit*		Units;		/// An unit on the map field.
-	Unit**		Array;		/// More units on the map field.
+	UnitArray*	Array;		/// More units on the map field.
     }			Here;		/// What is on the field.
 #endif
 #ifdef UNITS_ON_MAP
+// FIXME: Unused
     UnitRef		Building;	/// Building or corpse.
     UnitRef		AirUnit;	/// Air unit.
     UnitRef		LandUnit;	/// Land unit.
@@ -159,11 +174,11 @@ extern int ForestRegeneration;
 //	in map_draw.c
 //
     /// Fast draw 32x32 tile for 32 bpp video modes.
-extern void VideoDraw32Tile32(const unsigned char* data,int x,int y);
+//extern void VideoDraw32Tile32(const unsigned char* data,int x,int y);
     /// Fast draw 32x32 tile for 16 bpp video modes.
-extern void VideoDraw16Tile32(const unsigned char* data,int x,int y);
+//extern void VideoDraw16Tile32(const unsigned char* data,int x,int y);
     /// Fast draw 32x32 tile for  8 bpp video modes.
-extern void VideoDraw8Tile32(const unsigned char* data,int x,int y);
+//extern void VideoDraw8Tile32(const unsigned char* data,int x,int y);
 
     /// Called when the color cycles
 extern void MapColorCycle(void);
