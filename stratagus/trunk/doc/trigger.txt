@@ -159,8 +159,8 @@ The only actions I support for the start are.
 	The condition player is set to defeat.
 (action-draw)
 	The condition player is set to draw.
-(action-set-timer <# seconds> <increasing>)
-	Set the timer to a number of seconds and 1 for increasing,
+(action-set-timer <# cycles> <increasing>)
+	Set the timer to a number of cycles and 1 for increasing,
 	0 for decreasing.
 (action-start-timer)
 	Start the timer.

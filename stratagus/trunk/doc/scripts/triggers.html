@@ -123,11 +123,11 @@ Set the timer.
 
 <H4>Syntax</H4>
 
-<CODE>(action-set-timer seconds increasing)</CODE>
+<CODE>(action-set-timer cycles increasing)</CODE>
 
 <DL>
-<DT>seconds</DT>
-<DD>The number of seconds.
+<DT>cycles</DT>
+<DD>The number of cycles (default setting is 30 cycles per second).
 </DD>
 <DT>increasing</DT>
 <DD>Set this to 1 if you want the timer to increase, set it to 0 for decreasing.
@@ -137,10 +137,10 @@ Set the timer.
 <H4>Example</H4>
 
 <PRE>
-    (action-set-timer 300 0)
+    (action-set-timer 9000 0)
 </PRE>
 
-<P>Sets the timer to 5 minutes and decreasing.
+<P>Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
 
 <H4>Used</H4>
 
@@ -610,7 +610,7 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
 
 <H4>Syntax</H4>
 
-<CODE>(if-timer op quantity)</CODE>
+<CODE>(if-timer op cycles)</CODE>
 
 <DL>
 <DT>op</DT>
@@ -621,9 +621,9 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
 '&lt;          operator less than
 '&lt;=         operator less than or equal
 </PRE></DD>
-<DT>quantity</DT>
+<DT>cycles</DT>
 <DD><PRE>
-0 ... oo    Number for the quantity
+0 ... oo    Number of cycles
 </PRE></DD>
 </DL>
 
@@ -633,7 +633,7 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
     (if-timer '== 0)
 </PRE>
 
-<P>If the timer is at 0.
+<P>If the timer is at 0 cycles.
 
 <H4>Used</H4>
 
