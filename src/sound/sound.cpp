@@ -51,11 +51,15 @@
 global int SoundOff;			/// True quiet, sound turned off
 
 /**
-**	FIXME: docu
+**	Various sounds used in game.
+**
+**	FIXME: @todo support more races. Must make more configurable
 */
-global GameSound GameSounds={
+global GameSound GameSounds
+#ifndef laterUSE_CCL
+={
     { "placement error" },
-    { "placement sucess" },
+    { "placement success" },
     { "click" },
     { "tree chopping"},
     { "transport docking"},
@@ -65,7 +69,9 @@ global GameSound GameSounds={
     { "basic orc voices work complete" },
     { "rescue (human)" },
     { "rescue (orc)" },
-};
+}
+#endif
+    ;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -229,6 +235,9 @@ global void SetGlobalVolume(int volume) {
 */
 global void InitSoundClient(void)
 {
+    if( SoundFildes==-1 ) {		// No sound enabled
+	return;
+    }
     // let's map game sounds, look if already setup in ccl.
 
     if( !GameSounds.PlacementError.Sound ) {
