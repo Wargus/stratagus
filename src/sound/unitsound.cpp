@@ -62,8 +62,8 @@
 **		sound identifier.
 */
 typedef struct _simple_sound_ {
-    char *Name;				/// name of the sound
-    char *File;				/// corresponding sound file
+    char* Name;				/// name of the sound
+    char* File;				/// corresponding sound file
 } SimpleSound;
 
 /**
@@ -139,8 +139,8 @@ local int NbSoundsInGroup(char* const* const group)
 {
     int i;
 
-    for(i=0;i<MaxSimpleGroups;i++) {
-	if ( !group[i] ) {
+    for (i = 0;i < MaxSimpleGroups; ++i) {
+	if (!group[i]) {
 	    return i;
 	}
     }
@@ -155,9 +155,9 @@ local void LoadSimpleSounds(void)
 {
     int i;
 
-    if( SimpleSounds ) {
-	for(i=0;SimpleSounds[i].Name;i++) {
-	    MakeSound(SimpleSounds[i].Name,&(SimpleSounds[i].File),1);
+    if (SimpleSounds) {
+	for (i = 0; SimpleSounds[i].Name; ++i) {
+	    MakeSound(SimpleSounds[i].Name, &(SimpleSounds[i].File), 1);
 	}
     }
 }
@@ -170,18 +170,18 @@ local void LoadSoundGroups(void)
 {
     int i;
 
-    if( SoundGroups ) {
-	for(i=0;SoundGroups[i].Name;i++) {
-	    MakeSound(SoundGroups[i].Name,SoundGroups[i].Sounds,
-		    NbSoundsInGroup(SoundGroups[i].Sounds));
+    if (SoundGroups) {
+	for (i = 0; SoundGroups[i].Name; ++i) {
+	    MakeSound(SoundGroups[i].Name, SoundGroups[i].Sounds,
+		NbSoundsInGroup(SoundGroups[i].Sounds));
 	}
     }
-    if( SelectionGroups ) {
-	for(i=0;SelectionGroups[i].Name;i++) {
+    if (SelectionGroups) {
+	for (i = 0; SelectionGroups[i].Name; ++i) {
 	    //FIXME: might be more efficient
 	    MakeSoundGroup(SelectionGroups[i].Name,
-		    SoundIdForName(SelectionGroups[i].First),
-		    SoundIdForName(SelectionGroups[i].Second));
+		SoundIdForName(SelectionGroups[i].First),
+		SoundIdForName(SelectionGroups[i].Second));
 	}
     }
 }
@@ -194,11 +194,11 @@ local void RemapSounds(void)
 {
     int i;
 
-    if( SoundRemaps ) {
-	for(i=0;SoundRemaps[i].NewName;i++) {
+    if (SoundRemaps) {
+	for (i = 0; SoundRemaps[i].NewName; ++i) {
 	    //FIXME: should be more efficient
 	    MapSound(SoundRemaps[i].NewName,
-		    SoundIdForName(SoundRemaps[i].BaseName));
+		SoundIdForName(SoundRemaps[i].BaseName));
 	}
     }
 
@@ -206,33 +206,33 @@ local void RemapSounds(void)
     //	Make some general sounds.
     //
     // FIXME: move to config CCL
-    MapSound("gold-mine-help",SoundIdForName("basic orc voices help 1"));
+    MapSound("gold-mine-help", SoundIdForName("basic orc voices help 1"));
 
     // critter mapping FIXME: must support more terrains.
 
-    switch( TheMap.Terrain ) {
-    case TilesetSummer:
-	MakeSoundGroup("critter-selected",
-		       SoundIdForName("sheep selected"),
-		       SoundIdForName("sheep annoyed"));
-	break;
-    case TilesetWinter:
-	MakeSoundGroup("critter-selected",
-		       SoundIdForName("seal selected"),
-		       SoundIdForName("seal annoyed"));
-	break;
-    case TilesetWasteland:
-	MakeSoundGroup("critter-selected",
-		       SoundIdForName("pig selected"),
-		       SoundIdForName("pig annoyed"));
-	break;
-    case TilesetSwamp:
-	MakeSoundGroup("critter-selected",
-		       SoundIdForName("warthog selected"),
-		       SoundIdForName("warthog annoyed"));
-	break;
-    default:
-	DebugLevel2("Unknown Terrain %d\n" _C_ TheMap.Terrain);
+    switch (TheMap.Terrain) {
+	case TilesetSummer:
+	    MakeSoundGroup("critter-selected",
+	       SoundIdForName("sheep selected"),
+	       SoundIdForName("sheep annoyed"));
+	    break;
+	case TilesetWinter:
+	    MakeSoundGroup("critter-selected",
+	       SoundIdForName("seal selected"),
+	       SoundIdForName("seal annoyed"));
+	    break;
+	case TilesetWasteland:
+	    MakeSoundGroup("critter-selected",
+	       SoundIdForName("pig selected"),
+	       SoundIdForName("pig annoyed"));
+	    break;
+	case TilesetSwamp:
+	    MakeSoundGroup("critter-selected",
+	       SoundIdForName("warthog selected"),
+	       SoundIdForName("warthog annoyed"));
+	    break;
+	default:
+	    DebugLevel2("Unknown Terrain %d\n" _C_ TheMap.Terrain);
     }
 }
 
@@ -241,7 +241,7 @@ local void RemapSounds(void)
 */
 global void LoadUnitSounds(void)
 {
-    if( SoundFildes!=-1 ) {
+    if (SoundFildes != -1) {
 	LoadSimpleSounds();
 	LoadSoundGroups();
 	RemapSounds();
@@ -258,49 +258,49 @@ global void MapUnitSounds(void)
     UnitType* type;
     int i;
 
-    if( SoundFildes!=-1 ) {
-	SetSoundRange(SoundIdForName("tree chopping"),32);
+    if (SoundFildes != -1) {
+	SetSoundRange(SoundIdForName("tree chopping"), 32);
 
 	//
 	//	Parse all units sounds.
 	//
-	for( i=0; i<NumUnitTypes; ++i ) {
+	for (i = 0; i < NumUnitTypes; ++i) {
 	    type = UnitTypes[i];
-	    if( type->Sound.Selected.Name ) {
-		type->Sound.Selected.Sound=
-			SoundIdForName(type->Sound.Selected.Name);
+	    if (type->Sound.Selected.Name) {
+		type->Sound.Selected.Sound =
+		    SoundIdForName(type->Sound.Selected.Name);
 	    }
-	    if( type->Sound.Acknowledgement.Name ) {
-		type->Sound.Acknowledgement.Sound=
-			SoundIdForName(type->Sound.Acknowledgement.Name);
+	    if (type->Sound.Acknowledgement.Name) {
+		type->Sound.Acknowledgement.Sound =
+		    SoundIdForName(type->Sound.Acknowledgement.Name);
 		/*
 		// Acknowledge sounds have infinite range
 		SetSoundRange(type->Sound.Acknowledgement.Sound,
-			INFINITE_SOUND_RANGE);
+		    INFINITE_SOUND_RANGE);
 		*/
 	    }
-	    if( type->Sound.Ready.Name ) {
-		type->Sound.Ready.Sound=
+	    if (type->Sound.Ready.Name) {
+		type->Sound.Ready.Sound =
 		    SoundIdForName(type->Sound.Ready.Name);
 		// Ready sounds have infinite range
 		SetSoundRange(type->Sound.Ready.Sound,
-			INFINITE_SOUND_RANGE);
+		    INFINITE_SOUND_RANGE);
 	    }
 	    // FIXME: will be modified, attack sound be moved to missile/weapon
-	    if( type->Weapon.Attack.Name ) {
-		type->Weapon.Attack.Sound=
-			SoundIdForName(type->Weapon.Attack.Name);
+	    if (type->Weapon.Attack.Name) {
+		type->Weapon.Attack.Sound =
+		    SoundIdForName(type->Weapon.Attack.Name);
 	    }
-	    if( type->Sound.Help.Name ) {
-		type->Sound.Help.Sound=
-			SoundIdForName(type->Sound.Help.Name);
+	    if (type->Sound.Help.Name) {
+		type->Sound.Help.Sound =
+		    SoundIdForName(type->Sound.Help.Name);
 		// Help sounds have infinite range
 		SetSoundRange(type->Sound.Help.Sound,
-			INFINITE_SOUND_RANGE);
+		    INFINITE_SOUND_RANGE);
 	    }
-	    if( type->Sound.Dead.Name ) {
-		type->Sound.Dead.Sound=
-			SoundIdForName(type->Sound.Dead.Name);
+	    if (type->Sound.Dead.Name) {
+		type->Sound.Dead.Sound =
+		    SoundIdForName(type->Sound.Dead.Name);
 	    }
 	}
     }

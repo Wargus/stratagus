@@ -66,7 +66,7 @@ typedef struct _wav_data_ {
 --	Functions
 ----------------------------------------------------------------------------*/
 
-local int WavReadStream(Sample *sample, void *buf, int len)
+local int WavReadStream(Sample* sample, void* buf, int len)
 {
     WavData* data;
     char sndbuf[WAV_BUFFER_SIZE];
@@ -78,7 +78,7 @@ local int WavReadStream(Sample *sample, void *buf, int len)
     int samplesize;	// number of bytes per sample
     int divide;
 
-    data = (WavData*) sample->User;
+    data = (WavData*)sample->User;
 
     if (data->PointerInBuffer - sample->Data + len > sample->Length) {
 	// need to read new data
@@ -92,7 +92,7 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 	samplesize = sample->SampleSize / 8;
 	brratio = 4 / (samplesize * sample->Channels);
 	chanratio = 2 / sample->Channels;
-	divide = freqratio*brratio/chanratio;
+	divide = freqratio * brratio / chanratio;
 
 	comp = CLread(data->WavFile, sndbuf, unc/divide);
 
@@ -111,11 +111,13 @@ local int WavReadStream(Sample *sample, void *buf, int len)
     return len;
 }
 
-local void WavFreeStream(Sample *sample)
+local void WavFreeStream(Sample* sample)
 {
     WavData* data;
     
-    IfDebug( AllocatedSoundMemory -= sizeof(*sample) + WAV_BUFFER_SIZE);
+#ifdef DEBUG
+    AllocatedSoundMemory -= sizeof(*sample) + WAV_BUFFER_SIZE;
+#endif
 	
     data = (WavData*)sample->User;
 
@@ -276,12 +278,14 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	CLread(f, &chunk, sizeof(chunk));
 
 	DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + WAV_BUFFER_SIZE);
-	IfDebug( AllocatedSoundMemory += sizeof(*sample) + WAV_BUFFER_SIZE);
+#ifdef DEBUG
+	AllocatedSoundMemory += sizeof(*sample) + WAV_BUFFER_SIZE;
+#endif
     } else {
 	for (;;) {
 	    if ((i = CLread(f, &chunk, sizeof(chunk))) != sizeof(chunk)) {
 		// FIXME: have 1 byte remaining, wrong wav or wrong code?
-		// if( i ) printf("Rest: %d\n",i);
+		// if (i) { printf("Rest: %d\n", i); }
 	        break;
 	    }
 	    chunk.Magic = ConvertLE32(chunk.Magic);
@@ -316,7 +320,9 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 
 	CLclose(f);
 
-	IfDebug( AllocatedSoundMemory += sample->Length; );
+#ifdef DEBUG
+	AllocatedSoundMemory += sample->Length;
+#endif
     }
 
     return sample;

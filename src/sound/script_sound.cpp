@@ -76,6 +76,7 @@ local ccl_smob_type_t SiodSoundTag;
 local SCM sound_id_ccl(SoundId id)
 {
     SCM sound_id;
+
     sound_id = CclMakeSmobObj(SiodSoundTag, id);
     return sound_id;
 }
@@ -91,8 +92,8 @@ local SCM CclSoundForName(SCM name)
     SoundId id;
     char* sound_name;
 
-    sound_name=gh_scm2newstr(name,NULL);
-    id=SoundIdForName(sound_name);
+    sound_name = gh_scm2newstr(name, NULL);
+    id = SoundIdForName(sound_name);
     free(sound_name);
 
     return sound_id_ccl(id);
@@ -156,8 +157,8 @@ local SCM CclMakeSound(SCM name, SCM file)
 	c_name = gh_scm2newstr(name, NULL);
 	DebugLevel3("Making sound `%s'\n" _C_ c_name);
 	nb = gh_length(file);
-	c_files = (char **)malloc(sizeof(char *) * nb);
-	for (i = 0; i < nb; i++) {
+	c_files = (char**)malloc(sizeof(char*) * nb);
+	for (i = 0; i < nb; ++i) {
 	    a_file = gh_car(file);
 	    if (!gh_string_p(name)) {
 		fprintf(stderr, "string expected\n");
@@ -170,7 +171,7 @@ local SCM CclMakeSound(SCM name, SCM file)
 	}
 	//FIXME: check size before casting
 	id = MakeSound(c_name, c_files, (unsigned char)nb);
-	for (i = 0; i < nb; i++) {
+	for (i = 0; i < nb; ++i) {
 	    free(c_files[i]);
 	}
 	free(c_name);
@@ -238,8 +239,8 @@ local SCM CclMapSound(SCM name, SCM sound)
 local SCM CclPlaySound(SCM sound) {
     SoundId id;
 
-    id=CclGetSoundId(sound);
-    PlayGameSound(id,MaxSampleVolume);
+    id = CclGetSoundId(sound);
+    PlayGameSound(id, MaxSampleVolume);
     return SCM_UNSPECIFIED;
 }
 
@@ -289,94 +290,94 @@ local SCM CclDefineGameSounds(SCM list)
     char* str;
     int i;
 
-    while( !gh_null_p(list) ) {
+    while (!gh_null_p(list)) {
 
-	value=gh_car(list);
-	list=gh_cdr(list);
-	if( !gh_symbol_p(value) ) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (!gh_symbol_p(value)) {
 	    PrintFunction();
-	    fprintf(stdout,"Symbol expected\n");
+	    fprintf(stdout, "Symbol expected\n");
 	    return list;
 	}
 	// prepare for next iteration
 
 	// let's handle now the different cases
-	if( gh_eq_p(value,gh_symbol2scm("click")) ) {
-	    data=gh_car(list);
-	    list=gh_cdr(list);
-	    if( !CCL_SOUNDP(data) ) {
-		fprintf(stderr,"Sound id expected\n");
+	if (gh_eq_p(value, gh_symbol2scm("click"))) {
+	    data = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!CCL_SOUNDP(data)) {
+		fprintf(stderr, "Sound id expected\n");
 		return list;
 	    }
-	    GameSounds.Click.Sound=CCL_SOUND_ID(data);
-	} else if( gh_eq_p(value,gh_symbol2scm("placement-error")) ) {
-	    data=gh_car(list);
-	    list=gh_cdr(list);
-	    if( !CCL_SOUNDP(data) ) {
-		fprintf(stderr,"Sound id expected\n");
+	    GameSounds.Click.Sound = CCL_SOUND_ID(data);
+	} else if (gh_eq_p(value, gh_symbol2scm("placement-error"))) {
+	    data = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!CCL_SOUNDP(data)) {
+		fprintf(stderr, "Sound id expected\n");
 		return list;
 	    }
-	    GameSounds.PlacementError.Sound=CCL_SOUND_ID(data);
-	} else if( gh_eq_p(value,gh_symbol2scm("placement-success")) ) {
-	    data=gh_car(list);
-	    list=gh_cdr(list);
-	    if( !CCL_SOUNDP(data) ) {
-		fprintf(stderr,"Sound id expected\n");
+	    GameSounds.PlacementError.Sound = CCL_SOUND_ID(data);
+	} else if (gh_eq_p(value, gh_symbol2scm("placement-success"))) {
+	    data = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!CCL_SOUNDP(data)) {
+		fprintf(stderr, "Sound id expected\n");
 		return list;
 	    }
-	    GameSounds.PlacementSuccess.Sound=CCL_SOUND_ID(data);
-	} else if( gh_eq_p(value,gh_symbol2scm("work-complete")) ) {
-	    sublist=gh_car(list);
-	    list=gh_cdr(list);
-	    str=gh_scm2newstr(gh_car(sublist),NULL);
-	    for( i=0; i<PlayerRaces.Count; ++i ) {
-		if( !strcmp(PlayerRaces.Name[i],str) ) {
+	    GameSounds.PlacementSuccess.Sound = CCL_SOUND_ID(data);
+	} else if (gh_eq_p(value,gh_symbol2scm("work-complete"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    str = gh_scm2newstr(gh_car(sublist), NULL);
+	    for (i = 0; i < PlayerRaces.Count; ++i) {
+		if (!strcmp(PlayerRaces.Name[i], str)) {
 		    break;
 		}
 	    }
 	    free(str);
-	    if( i==PlayerRaces.Count ) {
-		fprintf(stderr,"Unknown race: %s\n",str);
+	    if (i == PlayerRaces.Count) {
+		fprintf(stderr, "Unknown race: %s\n", str);
 		ExitFatal(1);
 	    }
-	    sublist=gh_cdr(sublist);
-	    data=gh_car(sublist);
-	    if( !CCL_SOUNDP(data) ) {
-		fprintf(stderr,"Sound id expected\n");
+	    sublist = gh_cdr(sublist);
+	    data = gh_car(sublist);
+	    if (!CCL_SOUNDP(data)) {
+		fprintf(stderr, "Sound id expected\n");
 		ExitFatal(1);
 	    }
-	    GameSounds.WorkComplete[i].Sound=CCL_SOUND_ID(data);
-	} else if( gh_eq_p(value,gh_symbol2scm("repair")) ) {
-	    data=gh_car(list);
-	    list=gh_cdr(list);
-	    if( !CCL_SOUNDP(data) ) {
-		GameSounds.Repair.Sound=(void*)-1;
+	    GameSounds.WorkComplete[i].Sound = CCL_SOUND_ID(data);
+	} else if (gh_eq_p(value,gh_symbol2scm("repair"))) {
+	    data = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!CCL_SOUNDP(data)) {
+		GameSounds.Repair.Sound = (void*)-1;
 	    } else {
-		GameSounds.Repair.Sound=CCL_SOUND_ID(data);
+		GameSounds.Repair.Sound = CCL_SOUND_ID(data);
 	    }
-	} else if( gh_eq_p(value,gh_symbol2scm("rescue")) ) {
-	    sublist=gh_car(list);
-	    list=gh_cdr(list);
-	    str=gh_scm2newstr(gh_car(sublist),NULL);
-	    for( i=0; i<PlayerRaces.Count; ++i ) {
-		if( !strcmp(PlayerRaces.Name[i],str) ) {
+	} else if (gh_eq_p(value,gh_symbol2scm("rescue"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    str = gh_scm2newstr(gh_car(sublist), NULL);
+	    for (i = 0; i < PlayerRaces.Count; ++i) {
+		if (!strcmp(PlayerRaces.Name[i], str)) {
 		    break;
 		}
 	    }
 	    free(str);
-	    if( i==PlayerRaces.Count ) {
-		fprintf(stderr,"Unknown race: %s\n",str);
+	    if (i == PlayerRaces.Count) {
+		fprintf(stderr, "Unknown race: %s\n", str);
 		ExitFatal(1);
 	    }
-	    sublist=gh_cdr(sublist);
-	    data=gh_car(sublist);
-	    if( !CCL_SOUNDP(data) ) {
-		fprintf(stderr,"Sound id expected\n");
+	    sublist = gh_cdr(sublist);
+	    data = gh_car(sublist);
+	    if (!CCL_SOUNDP(data)) {
+		fprintf(stderr, "Sound id expected\n");
 		ExitFatal(1);
 	    }
-	    GameSounds.Rescue[i].Sound=CCL_SOUND_ID(data);
+	    GameSounds.Rescue[i].Sound = CCL_SOUND_ID(data);
 	} else {
-	    errl("Unsupported tag",value);
+	    errl("Unsupported tag", value);
 	    return list;
 	}
     }
@@ -415,17 +416,17 @@ local SCM CclSetCdMode(SCM mode)
 #ifdef USE_CDAUDIO
     CDModes cdmode;
 
-    if( gh_eq_p(mode,gh_symbol2scm("all")) ) {
-	cdmode=CDModeAll;
-    } else if( gh_eq_p(mode,gh_symbol2scm("random")) ) {
-	cdmode=CDModeRandom;
-    } else if( gh_eq_p(mode,gh_symbol2scm("defined")) ) {
-	cdmode=CDModeDefined;
-    } else if ( gh_eq_p(mode,gh_symbol2scm("off")) ) {
-	cdmode=CDModeOff;
+    if (gh_eq_p(mode, gh_symbol2scm("all"))) {
+	cdmode = CDModeAll;
+    } else if (gh_eq_p(mode, gh_symbol2scm("random"))) {
+	cdmode = CDModeRandom;
+    } else if (gh_eq_p(mode, gh_symbol2scm("defined"))) {
+	cdmode = CDModeDefined;
+    } else if (gh_eq_p(mode, gh_symbol2scm("off"))) {
+	cdmode = CDModeOff;
     } else {
-	cdmode=CDModeOff;
-	errl("Unsupported tag",mode);
+	cdmode = CDModeOff;
+	errl("Unsupported tag", mode);
     }
 
     PlayCDRom(cdmode);
@@ -440,102 +441,102 @@ local SCM CclDefinePlaySections(SCM list)
 {
     SCM value;
     SCM sublist;
-    PlaySection *p;
+    PlaySection* p;
     int i;
 
     ++NumPlaySections;
-    PlaySections=realloc(PlaySections,NumPlaySections*sizeof(PlaySection));
-    p=PlaySections+NumPlaySections-1;
-    memset(p,0,sizeof(PlaySection));
+    PlaySections = realloc(PlaySections, NumPlaySections * sizeof(PlaySection));
+    p = PlaySections + NumPlaySections - 1;
+    memset(p, 0, sizeof(PlaySection));
 
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-	if( gh_eq_p(value,gh_symbol2scm("race")) ) {
-	    value=gh_car(list);
-	    list=gh_cdr(list);
-	    p->Race=gh_scm2newstr(value,NULL);
-	} else if( gh_eq_p(value,gh_symbol2scm("type")) ) {
-	    value=gh_car(list);
-	    list=gh_cdr(list);
-	    if( gh_eq_p(value, gh_symbol2scm("game")) ) {
-		p->Type=PlaySectionGame;
-	    } else if( gh_eq_p(value,gh_symbol2scm("briefing")) ) {
-		p->Type=PlaySectionBriefing;
-	    } else if( gh_eq_p(value,gh_symbol2scm("stats-victory")) ) {
-		p->Type=PlaySectionStatsVictory;
-	    } else if( gh_eq_p(value,gh_symbol2scm("stats-defeat")) ) {
-		p->Type=PlaySectionStatsDefeat;
-	    } else if( gh_eq_p(value,gh_symbol2scm("main-menu")) ) {
-		p->Type=PlaySectionMainMenu;
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("race"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    p->Race = gh_scm2newstr(value, NULL);
+	} else if (gh_eq_p(value, gh_symbol2scm("type"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (gh_eq_p(value, gh_symbol2scm("game"))) {
+		p->Type = PlaySectionGame;
+	    } else if (gh_eq_p(value, gh_symbol2scm("briefing"))) {
+		p->Type = PlaySectionBriefing;
+	    } else if (gh_eq_p(value, gh_symbol2scm("stats-victory"))) {
+		p->Type = PlaySectionStatsVictory;
+	    } else if (gh_eq_p(value, gh_symbol2scm("stats-defeat"))) {
+		p->Type = PlaySectionStatsDefeat;
+	    } else if (gh_eq_p(value, gh_symbol2scm("main-menu"))) {
+		p->Type = PlaySectionMainMenu;
 	    } else {
-		errl("Unsupported tag",value);
+		errl("Unsupported tag", value);
 	    }
-	} else if( gh_eq_p(value,gh_symbol2scm("cd")) ) {
-	    sublist=gh_car(list);
-	    list=gh_cdr(list);
-	    while( !gh_null_p(sublist) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		if( gh_eq_p(value,gh_symbol2scm("order")) ) {
-		    value=gh_car(sublist);
-		    sublist=gh_cdr(sublist);
-		    if( gh_eq_p(value,gh_symbol2scm("all")) ) {
-			p->CDOrder=PlaySectionOrderAll;
-		    } else if( gh_eq_p(value,gh_symbol2scm("random")) ) {
-			p->CDOrder=PlaySectionOrderRandom;
+	} else if (gh_eq_p(value, gh_symbol2scm("cd"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("order"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    if (gh_eq_p(value, gh_symbol2scm("all"))) {
+			p->CDOrder = PlaySectionOrderAll;
+		    } else if (gh_eq_p(value, gh_symbol2scm("random"))) {
+			p->CDOrder = PlaySectionOrderRandom;
 		    } else {
-			errl("Unsupported tag",value);
+			errl("Unsupported tag", value);
 		    }
-		} else if( gh_eq_p(value,gh_symbol2scm("tracks")) ) {
+		} else if (gh_eq_p(value, gh_symbol2scm("tracks"))) {
 		    SCM temp;
 
-		    value=gh_car(sublist);
-		    sublist=gh_cdr(sublist);
-		    for( i=0; i<gh_vector_length(value); ++i ) {
-			temp=gh_vector_ref(value,gh_int2scm(i));
-			p->CDTracks|=(1<<gh_scm2int(temp));
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    for (i = 0; i < gh_vector_length(value); ++i) {
+			temp=gh_vector_ref(value, gh_int2scm(i));
+			p->CDTracks |= (1 << gh_scm2int(temp));
 		    }
 		} else {
-		    errl("Unsupported tag",value);
+		    errl("Unsupported tag", value);
 		}
 	    }
-	} else if( gh_eq_p(value,gh_symbol2scm("no-cd")) ) {
-	    sublist=gh_car(list);
-	    list=gh_cdr(list);
-	    while( !gh_null_p(sublist) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		if( gh_eq_p(value,gh_symbol2scm("order")) ) {
-		    value=gh_car(sublist);
-		    sublist=gh_cdr(sublist);
-		    if( gh_eq_p(value,gh_symbol2scm("all")) ) {
-			p->FileOrder=PlaySectionOrderAll;
-		    } else if( gh_eq_p(value,gh_symbol2scm("random")) ) {
-			p->FileOrder=PlaySectionOrderRandom;
+	} else if (gh_eq_p(value, gh_symbol2scm("no-cd"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("order"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    if (gh_eq_p(value, gh_symbol2scm("all"))) {
+			p->FileOrder = PlaySectionOrderAll;
+		    } else if (gh_eq_p(value, gh_symbol2scm("random"))) {
+			p->FileOrder = PlaySectionOrderRandom;
 		    } else {
-			errl("Unsupported tag",value);
+			errl("Unsupported tag", value);
 		    }
-		} else if( gh_eq_p(value,gh_symbol2scm("files")) ) {
+		} else if (gh_eq_p(value, gh_symbol2scm("files"))) {
 		    SCM sublist2;
 
-		    sublist2=gh_car(sublist);
-		    sublist=gh_cdr(sublist);
-		    i=0;
-		    while( !gh_null_p(sublist2) ) {
-			value=gh_car(sublist2);
-			sublist2=gh_cdr(sublist2);
+		    sublist2 = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    i = 0;
+		    while (!gh_null_p(sublist2)) {
+			value = gh_car(sublist2);
+			sublist2 = gh_cdr(sublist2);
 			++i;
-			p->Files=realloc(p->Files,(i+1)*sizeof(char*));
-			p->Files[i-1]=gh_scm2newstr(value,NULL);
-			p->Files[i]=NULL;
+			p->Files = realloc(p->Files, (i + 1) * sizeof(char*));
+			p->Files[i - 1] = gh_scm2newstr(value, NULL);
+			p->Files[i] = NULL;
 		    }
 		} else {
-		    errl("Unsupported tag",value);
+		    errl("Unsupported tag", value);
 		}
 	    }
 	} else {
-	    errl("Unsupported tag",value);
+	    errl("Unsupported tag", value);
 	}
     }
 
@@ -547,7 +548,7 @@ local SCM CclDefinePlaySections(SCM list)
 */
 local SCM CclSoundOff(void)
 {
-    SoundOff=1;
+    SoundOff = 1;
     return SCM_UNSPECIFIED;
 }
 
@@ -562,7 +563,7 @@ local SCM CclSoundOn(void)
     if (SoundFildes != -1) {
 	return SCM_BOOL_T;
     }
-    SoundOff=0;
+    SoundOff = 0;
     return SCM_BOOL_F;
 }
 
@@ -572,7 +573,7 @@ local SCM CclSoundOn(void)
 local SCM CclMusicOff(void)
 {
     StopMusic();
-    MusicOff=1;
+    MusicOff = 1;
     return SCM_UNSPECIFIED;
 }
 
@@ -584,7 +585,7 @@ local SCM CclMusicOff(void)
 */
 local SCM CclMusicOn(void)
 {
-    MusicOff=0;
+    MusicOff = 0;
     return SCM_UNSPECIFIED;
 }
 
@@ -595,10 +596,11 @@ local SCM CclMusicOn(void)
 */
 local SCM CclSetGlobalSoundRange(SCM distance) {
     int d;
+
     //FIXME check for errors
-    d=gh_scm2int(distance);
-    if (d>0) {
-	DistanceSilent=d;
+    d = gh_scm2int(distance);
+    if (d > 0) {
+	DistanceSilent = d;
     }
     return distance;
 }
@@ -609,7 +611,7 @@ local SCM CclSetGlobalSoundRange(SCM distance) {
 local SCM CclSoundThread(void)
 {
 #ifdef USE_THREAD
-    WithSoundThread=1;
+    WithSoundThread = 1;
 #endif
     return SCM_UNSPECIFIED;
 }
@@ -620,23 +622,23 @@ local SCM CclSoundThread(void)
 **	@param sound	the sound id or name of the sound
 **	@param range	the new range for this sound
 */
-local SCM CclSetSoundRange(SCM sound,SCM range) {
+local SCM CclSetSoundRange(SCM sound, SCM range) {
     //FIXME check for errors
-    unsigned char TheRange;
+    unsigned char theRange;
     int tmp;
     SoundId id;
 
-    tmp=gh_scm2int(range);
-    if(tmp<0) {
-	TheRange=0;
-    } else if (tmp>255) {
-	TheRange=255;
+    tmp = gh_scm2int(range);
+    if (tmp < 0) {
+	theRange = 0;
+    } else if (tmp > 255) {
+	theRange = 255;
     } else {
-	TheRange=(unsigned char)tmp;
+	theRange = (unsigned char)tmp;
     }
     DebugLevel3("Range: %u (%d)\n" _C_ TheRange _C_ tmp);
-    id=CclGetSoundId(sound);
-    SetSoundRange(id,TheRange);
+    id = CclGetSoundId(sound);
+    SetSoundRange(id, theRange);
     return sound;
 }
 
@@ -649,7 +651,7 @@ local SCM CclPlayMusic(SCM name)
 {
     char* music_name;
 
-    music_name=gh_scm2newstr(name,NULL);
+    music_name = gh_scm2newstr(name, NULL);
     PlayMusic(music_name);
     free(music_name);
 
@@ -665,7 +667,7 @@ local SCM CclPlayFile(SCM name)
 {
     char* filename;
 
-    filename=gh_scm2newstr(name,NULL);
+    filename = gh_scm2newstr(name, NULL);
     PlayFile(filename);
     free(filename);
 
@@ -689,30 +691,30 @@ global void SoundCclRegister(void)
 {
     SiodSoundTag = CclMakeSmobType("Sound");
 
-    gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
-    gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);
-    gh_new_procedure1_0("set-cd-mode!",CclSetCdMode);
+    gh_new_procedure1_0("set-sound-volume!", CclSetSoundVolume);
+    gh_new_procedure1_0("set-music-volume!", CclSetMusicVolume);
+    gh_new_procedure1_0("set-cd-mode!", CclSetCdMode);
 
-    gh_new_procedureN("define-play-sections",CclDefinePlaySections);
+    gh_new_procedureN("define-play-sections", CclDefinePlaySections);
 
-    gh_new_procedure0_0("sound-off",CclSoundOff);
-    gh_new_procedure0_0("sound-on",CclSoundOn);
-    gh_new_procedure0_0("music-off",CclMusicOff);
-    gh_new_procedure0_0("music-on",CclMusicOn);
-    gh_new_procedure0_0("sound-thread",CclSoundThread);
-    gh_new_procedure1_0("set-global-sound-range!",CclSetGlobalSoundRange);
-    gh_new_procedureN("define-game-sounds",CclDefineGameSounds);
-    gh_new_procedure0_0("display-sounds",CclDisplaySounds);
-    gh_new_procedure2_0("map-sound",CclMapSound);
-    gh_new_procedure1_0("sound-for-name",CclSoundForName);
-    gh_new_procedure2_0("set-sound-range!",CclSetSoundRange);
-    gh_new_procedure2_0("make-sound",CclMakeSound);
-    gh_new_procedure3_0("make-sound-group",CclMakeSoundGroup);
-    gh_new_procedure1_0("play-sound",CclPlaySound);
+    gh_new_procedure0_0("sound-off", CclSoundOff);
+    gh_new_procedure0_0("sound-on", CclSoundOn);
+    gh_new_procedure0_0("music-off", CclMusicOff);
+    gh_new_procedure0_0("music-on", CclMusicOn);
+    gh_new_procedure0_0("sound-thread", CclSoundThread);
+    gh_new_procedure1_0("set-global-sound-range!", CclSetGlobalSoundRange);
+    gh_new_procedureN("define-game-sounds", CclDefineGameSounds);
+    gh_new_procedure0_0("display-sounds", CclDisplaySounds);
+    gh_new_procedure2_0("map-sound", CclMapSound);
+    gh_new_procedure1_0("sound-for-name", CclSoundForName);
+    gh_new_procedure2_0("set-sound-range!", CclSetSoundRange);
+    gh_new_procedure2_0("make-sound", CclMakeSound);
+    gh_new_procedure3_0("make-sound-group", CclMakeSoundGroup);
+    gh_new_procedure1_0("play-sound", CclPlaySound);
 
-    gh_new_procedure1_0("play-music",CclPlayMusic);
-    gh_new_procedure1_0("play-file",CclPlayFile);
-    gh_new_procedure0_0("stop-music",CclStopMusic);
+    gh_new_procedure1_0("play-music", CclPlayMusic);
+    gh_new_procedure1_0("play-file", CclPlayFile);
+    gh_new_procedure0_0("stop-music", CclStopMusic);
 }
 
 #else	// }{ WITH_SOUND
@@ -803,7 +805,7 @@ local SCM CclSetGlobalSoundRange(SCM distance)
 **	@param sound	the sound id or name of the sound
 **	@param range	the new range for this sound
 */
-local SCM CclSetSoundRange(SCM sound,SCM range __attribute__((unused)))
+local SCM CclSetSoundRange(SCM sound, SCM range __attribute__((unused)))
 {
     return sound;
 }
@@ -852,7 +854,7 @@ local SCM CclDefineGameSounds(SCM list __attribute__((unused)))
 **
 **	@return		the sound object
 */
-local SCM CclMapSound(SCM name __attribute__((unused)),SCM sound)
+local SCM CclMapSound(SCM name __attribute__((unused)), SCM sound)
 {
     return sound;
 }
@@ -882,23 +884,23 @@ local SCM CclPlayFile(SCM name __attribute__((unused)))
 */
 global void SoundCclRegister(void)
 {
-    gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
-    gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);
-    gh_new_procedure1_0("set-cd-mode!",CclSetCdMode);
-    gh_new_procedure0_0("sound-off",CclSoundOff);
-    gh_new_procedure0_0("sound-on",CclSoundOn);
-    gh_new_procedure0_0("music-off",CclMusicOff);
-    gh_new_procedure0_0("music-on",CclMusicOn);
-    gh_new_procedure0_0("sound-thread",CclSoundThread);
-    gh_new_procedure1_0("set-global-sound-range!",CclSetGlobalSoundRange);
-    gh_new_procedureN("define-game-sounds",CclDefineGameSounds);
-    gh_new_procedure0_0("display-sounds",CclDisplaySounds);
-    gh_new_procedure2_0("map-sound",CclMapSound);
-    gh_new_procedure1_0("sound-for-name",CclSoundForName);
-    gh_new_procedure2_0("set-sound-range!",CclSetSoundRange);
+    gh_new_procedure1_0("set-sound-volume!", CclSetSoundVolume);
+    gh_new_procedure1_0("set-music-volume!", CclSetMusicVolume);
+    gh_new_procedure1_0("set-cd-mode!", CclSetCdMode);
+    gh_new_procedure0_0("sound-off", CclSoundOff);
+    gh_new_procedure0_0("sound-on", CclSoundOn);
+    gh_new_procedure0_0("music-off", CclMusicOff);
+    gh_new_procedure0_0("music-on", CclMusicOn);
+    gh_new_procedure0_0("sound-thread", CclSoundThread);
+    gh_new_procedure1_0("set-global-sound-range!", CclSetGlobalSoundRange);
+    gh_new_procedureN("define-game-sounds", CclDefineGameSounds);
+    gh_new_procedure0_0("display-sounds", CclDisplaySounds);
+    gh_new_procedure2_0("map-sound", CclMapSound);
+    gh_new_procedure1_0("sound-for-name", CclSoundForName);
+    gh_new_procedure2_0("set-sound-range!", CclSetSoundRange);
 
-    gh_new_procedure1_0("play-music",CclPlayMusic);
-    gh_new_procedure1_0("play-file",CclPlayFile);
+    gh_new_procedure1_0("play-music", CclPlayMusic);
+    gh_new_procedure1_0("play-file", CclPlayFile);
 }
 
 #endif	// } !WITH_SOUND
