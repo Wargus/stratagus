@@ -10,12 +10,11 @@
 //
 /**@name ccl_unit.c	-	The unit ccl functions. */
 //
-//	(c) Copyright 2001 by Lutz Sammer
+//	(c) Copyright 2001-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,6 +37,7 @@
 #include "player.h"
 #include "unit.h"
 #include "ccl.h"
+#include "spells.h"
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
@@ -62,8 +62,8 @@ local SCM CclSetHitPointRegeneration(SCM flag)
 {
     int old;
 
-    old=HitPointRegeneration;
-    HitPointRegeneration=gh_scm2bool(flag);
+    old = HitPointRegeneration;
+    HitPointRegeneration = gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
@@ -79,29 +79,209 @@ local SCM CclSetTrainingQueue(SCM flag)
 {
     int old;
 
-    old=EnableTrainingQueue;
-    EnableTrainingQueue=gh_scm2bool(flag);
+    old = EnableTrainingQueue;
+    EnableTrainingQueue = gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
 
 /**
- * **  Set capture buildings
- * **
- * **  @param flag Flag enabling or disabling it.
- * **
- * **  @return     The old state of the flag
- * */
+**	Set capture buildings
+**
+**	@param flag	Flag enabling or disabling it.
+**
+**	@return		The old state of the flag
+*/
 local SCM CclSetBuildingCapture(SCM flag)
 {
     int old;
 
-    old=EnableBuildingCapture;
-    EnableBuildingCapture=gh_scm2bool(flag);
+    old = EnableBuildingCapture;
+    EnableBuildingCapture = gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
 
+/**
+**	Get an unit pointer
+**
+**	@param value	Unit slot number.
+**
+**	@return		The unit pointer
+*/
+local Unit* CclGetUnit(SCM value)
+{
+    return UnitSlots[gh_scm2int(value)];
+}
+
+/**
+**	Parse order
+**
+**	@param list	All options of the order.
+*/
+local void CclParseOrder(SCM list,Order* order)
+{
+    SCM value;
+    SCM sublist;
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("action-none")) ) {
+	    order->Action=UnitActionNone;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-still")) ) {
+	    order->Action=UnitActionStill;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-stand-ground")) ) {
+	    order->Action=UnitActionStandGround;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-follow")) ) {
+	    order->Action=UnitActionFollow;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-move")) ) {
+	    order->Action=UnitActionMove;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-attack")) ) {
+	    order->Action=UnitActionAttack;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-attack-ground")) ) {
+	    order->Action=UnitActionAttackGround;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-die")) ) {
+	    order->Action=UnitActionDie;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-spell-cast")) ) {
+	    order->Action=UnitActionSpellCast;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-train")) ) {
+	    order->Action=UnitActionTrain;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-upgrade-to")) ) {
+	    order->Action=UnitActionUpgradeTo;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-research")) ) {
+	    order->Action=UnitActionResearch;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-builded")) ) {
+	    order->Action=UnitActionBuilded;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-board")) ) {
+	    order->Action=UnitActionBoard;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-unload")) ) {
+	    order->Action=UnitActionUnload;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-patrol")) ) {
+	    order->Action=UnitActionPatrol;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-build")) ) {
+	    order->Action=UnitActionBuild;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-repair")) ) {
+	    order->Action=UnitActionRepair;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-harvest")) ) {
+	    order->Action=UnitActionHarvest;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-mine-ore")) ) {
+	    order->Action=UnitActionMineOre;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-mine-coal")) ) {
+	    order->Action=UnitActionMineCoal;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-quarry-stone")) ) {
+	    order->Action=UnitActionQuarryStone;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-return-goods")) ) {
+	    order->Action=UnitActionReturnGoods;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-demolish")) ) {
+	    order->Action=UnitActionDemolish;
+
+	} else if( gh_eq_p(value,gh_symbol2scm("flags")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    order->Flags=gh_scm2int(value);
+
+	} else if( gh_eq_p(value,gh_symbol2scm("range")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    order->RangeX=gh_scm2int(gh_car(sublist));
+	    order->RangeY=gh_scm2int(gh_cadr(sublist));
+
+	} else if( gh_eq_p(value,gh_symbol2scm("goal")) ) {
+	    char* str;
+	    int slot;
+
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    str=gh_scm2newstr(value,NULL);
+
+	    slot=strtol(str+1,NULL,16);
+	    order->Goal=UnitSlots[slot];
+	    if( !UnitSlots[slot] ) {
+		DebugLevel0Fn("FIXME: Forward reference not supported\n");
+	    }
+	    free(str);
+
+	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    order->X=gh_scm2int(gh_car(sublist));
+	    order->Y=gh_scm2int(gh_cadr(sublist));
+
+	} else if( gh_eq_p(value,gh_symbol2scm("type")) ) {
+	    char* str;
+
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    str=gh_scm2newstr(value,NULL);
+	    order->Type=UnitTypeByIdent(str);
+	    free(str);
+
+	} else if( gh_eq_p(value,gh_symbol2scm("patrol")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    order->Arg1=(void*)((gh_scm2int(gh_car(sublist))<<16)|
+		    gh_scm2int(gh_cadr(sublist)));
+
+	} else if( gh_eq_p(value,gh_symbol2scm("spell")) ) {
+	    char* str;
+
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    str=gh_scm2newstr(value,NULL);
+	    order->Arg1=SpellTypeByIdent(str);
+	    free(str);
+
+	} else if( gh_eq_p(value,gh_symbol2scm("upgrade")) ) {
+	    char* str;
+
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    str=gh_scm2newstr(value,NULL);
+	    order->Arg1=UpgradeByIdent(str);
+	    free(str);
+
+	} else if( gh_eq_p(value,gh_symbol2scm("arg1")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    order->Arg1=(void*)gh_scm2int(value);
+
+	} else {
+	   // FIXME: this leaves a half initialized unit
+	   errl("Unsupported tag",value);
+	}
+    }
+}
+
+/**
+**	Parse orders
+**
+**	@param vector	All options of the order.
+*/
+local void CclParseOrders(Unit* unit,SCM vector)
+{
+    int i;
+    int n;
+
+    n=gh_vector_length(vector);
+    DebugCheck( n!=MAX_ORDERS );
+    for( i=0; i<n; ++i ) {
+	CclParseOrder(gh_vector_ref(vector,gh_int2scm(i)),&unit->Orders[i]);
+    }
+}
+
+/**
+**	Parse builded
+**
+**	@param list	All options of the builded data.
+*/
+local void CclParseBuilded(Unit* unit,SCM list)
+{
+    DebugLevel0Fn("FIXME: builded\n");
+}
 
 /**
 **	Parse unit
@@ -308,19 +488,20 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("orders")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: orders\n");
+	    CclParseOrders(unit,sublist);
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: saved order\n");
+	    CclParseOrder(value,&unit->SavedOrder);
 	} else if( gh_eq_p(value,gh_symbol2scm("new-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: new order\n");
+	    CclParseOrder(value,&unit->NewOrder);
+
 	} else if( gh_eq_p(value,gh_symbol2scm("data-builded")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: builded\n");
+	    CclParseBuilded(unit,value);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-research")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -337,6 +518,7 @@ local SCM CclUnit(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    DebugLevel0Fn("FIXME: move\n");
+
 	} else {
 	   // FIXME: this leaves a half initialized unit
 	   errl("Unsupported tag",value);
@@ -393,10 +575,46 @@ local SCM CclMakeUnit(SCM type,SCM player)
 */
 local SCM CclPlaceUnit(SCM unit,SCM x,SCM y)
 {
-    PlaceUnit(UnitSlots[gh_scm2int(unit)],gh_scm2int(x),gh_scm2int(y));
+    PlaceUnit(CclGetUnit(unit),gh_scm2int(x),gh_scm2int(y));
     return unit;
 }
 
+/**
+**	Get the unholy-armor of the unit structure.
+**
+**	@param ptr	Unit object.
+**
+**	@return		The unholy-armor of the unit.
+*/
+local SCM CclGetUnitUnholyArmor(SCM ptr)
+{
+    const Unit* unit;
+    SCM value;
+
+    unit=CclGetUnit(ptr);
+    value=gh_int2scm(unit->UnholyArmor);
+    return value;
+}
+
+/**
+**	Set the unholy-armor of the unit structure.
+**
+**	@param ptr	Unit object.
+**	@param value	The value to set.
+**
+**	@return		The value of the unit.
+*/
+local SCM CclSetUnitUnholyArmor(SCM ptr,SCM value)
+{
+    Unit* unit;
+
+    unit=CclGetUnit(ptr);
+    unit->UnholyArmor=gh_scm2int(value);
+
+    return value;
+}
+
+// FIXME: write the missing access functions
 
 /**
 **	Register CCL features for unit.
@@ -412,6 +630,9 @@ global void UnitCclRegister(void)
 
     gh_new_procedure2_0("make-unit",CclMakeUnit);
     gh_new_procedure3_0("place-unit",CclPlaceUnit);
+
+    gh_new_procedure1_0("get-unit-unholy-armor",CclGetUnitUnholyArmor);
+    gh_new_procedure2_0("set-unit-unholy-armor!",CclSetUnitUnholyArmor);
 }
 
 //@}
