@@ -10,7 +10,7 @@
 //
 /**@name wav.c			-	wav support */
 //
-//	(c) Copyright 2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 2003 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
