@@ -743,7 +743,7 @@ global void NetworkInitClientConnect(void)
 	Hosts[i].PlyNr = 0;
 	memset(Hosts[i].PlyName, 0, 16);
     }
-    HostsCount = 0;
+    // HostsCount = 0;
 }
 
 /**
@@ -783,10 +783,10 @@ global void NetworkInitServerConnect(void)
 	memset(Hosts[i].PlyName, 0, 16);
     }
 
-    HostsCount = 0;
+    // HostsCount = 0;
     // preset the server (always slot 0)
-    memcpy(Hosts[HostsCount].PlyName, NetworkName, 16);
-    HostsCount++;
+    memcpy(Hosts[0].PlyName, NetworkName, 16);
+    // HostsCount++;
 }
 
 /**
@@ -799,7 +799,7 @@ global void NetworkExitServerConnect(void)
 
     message.Type = MessageInitReply;
     message.SubType = ICMServerQuit;
-    for (h = 1; h < HostsCount; ++h) {
+    for (h = 1; h < PlayerMax-1; ++h) {
 	// Spew out 5 and trust in God that they arrive
 	if (Hosts[h].PlyNr) {
 	    for (i = 0; i < 5; i++) {
@@ -823,7 +823,7 @@ global void NetworkServerResyncClients(void)
     int i;
 
     if (NetConnectRunning) {
-	for (i = 1; i < NetPlayers; ++i) {
+	for (i = 1; i < PlayerMax-1; ++i) {
 	    if (Hosts[i].PlyNr && NetStates[i].State == ccs_synced) {
 		NetStates[i].State = ccs_async;
 	    }
@@ -831,6 +831,112 @@ global void NetworkServerResyncClients(void)
     }
 }
 
+/**
+**	Server user has finally hit the start game button
+*/
+global void NetworkServerStartGame(void)
+{
+    int h, i, j;
+    unsigned long u;
+    int num[PlayerMax], avail[PlayerMax];
+
+    DebugCheck(ServerSetupState.CompOpt[0] != 0);
+
+    // Make a list of the available player slots.
+    for (h = i = 0; i < PlayerMax; i++) {
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	    num[h++] = i;
+	    DebugLevel3Fn("Slot %d is available for an interactive player\n", i);
+	    avail[i] = 1;
+	} else { 
+	    avail[i] = 0;
+	}
+    }
+
+    // Compact Host list.. (account for computer/closed slots in the middle..)
+    for (i = 1; i < PlayerMax; i++) {
+	if (Hosts[i].PlyNr == 0) {
+	    for (j = i + 1; j < PlayerMax - 1; j++) {
+		if (Hosts[j].PlyNr) {
+		    Hosts[i] = Hosts[j];
+		    DebugLevel3Fn("Compact: Hosts %d -> Hosts %d\n", j, i);
+		    Hosts[j].PlyNr = 0;
+		    break;
+		}
+	    }
+	    if (j == PlayerMax - 1) {
+		break;
+	    }
+	}
+    }
+    // Randomize the position.
+    for (i = 0; i < NetPlayers; i++) {
+	if (h > 0) {
+	    int chosen = MyRand() % h;
+
+	    DebugLevel3Fn("Assigning player %d to slot %i\n", i, num[chosen]);
+	    Hosts[i].PlyNr = num[chosen];
+	    num[chosen] = num[--h];
+	} else {
+	    DebugCheck(1 == 1);
+#if 0
+	    // ARI: is this code path realy executed? (initially h >= NetPlayers..)
+	    Hosts[i].PlyNr = num[0];
+	    DebugLevel0Fn("Hosts[%d].PlyNr = %i\n", i, num[0]);
+#endif
+	}
+    }
+
+    // Shuffle setup states to match the assigned Host slots.
+    for (i = 0; i < PlayerMax; i++) {
+	num[i] = 0;
+    }
+    for (i = 0; i < NetPlayers; i++) {
+	num[Hosts[i].PlyNr] = 1;
+    }
+    for (i = 0; i < NetPlayers; i++) {
+	h = Hosts[i].PlyNr;
+	if (ServerSetupState.CompOpt[h]) {
+	    for (j = 0; j < PlayerMax; j++) {
+		if (num[j] == 0 && ServerSetupState.CompOpt[j] == 0) {
+		    u = ServerSetupState.CompOpt[h];
+		    ServerSetupState.CompOpt[h] = ServerSetupState.CompOpt[j];
+		    ServerSetupState.CompOpt[j] = u;
+		    u = ServerSetupState.Race[h];
+		    ServerSetupState.Race[h] = ServerSetupState.Race[j];
+		    ServerSetupState.Race[j] = u;
+		    u = ServerSetupState.LastFrame[h];
+		    ServerSetupState.LastFrame[h] = ServerSetupState.LastFrame[j];
+		    ServerSetupState.LastFrame[j] = u;
+		    break;
+		}
+	    }
+	}
+    }
+
+#ifdef DEBUG
+    for (i = 0; i < PlayerMax-1; i++) {
+	printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
+	if (ServerSetupState.CompOpt[i] == 0) {
+	    for (j = 0; j < NetPlayers; j++) {
+		if (Hosts[j].PlyNr == i) {
+		    printf(" %d.%d.%d.%d:%d %s", NIPQUAD(ntohl(Hosts[j].Host)),
+				 ntohs(Hosts[j].Port), Hosts[j].PlyName);
+		    
+		}
+	    }
+	}
+	printf("\n");
+    }
+#endif
+
+    /* NOW we have NetPlayers in Hosts array, with ServerSetupState shuffled up to match it.. */
+
+
+    /** HERE IS WHERE THE ACTION SHOULD START... **/
+    // FIXME: FILL HERE
+
+}
 
 /**
 **	Client Menu Loop: Send out client request messages
@@ -903,7 +1009,6 @@ changed:
 		message.Type = MessageInitHello;
 		message.SubType = ICMState;
 		message.u.State = LocalSetupState;
-		message.HostsCount = (char)(NetLocalHostsSlot & 0xff);
 		message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 		NetworkSendRateLimitedClientMessage(&message, 450);
 	    } else {
@@ -975,7 +1080,7 @@ local void ParseClientDisconnected(const InitMessage* msg)
 */
 local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 {
-    int i, h, n;
+    int i, h, n, k;
     InitMessage message;
 
     if (msg->Type > MessageInitConfig || size != sizeof(*msg)) {
@@ -1055,13 +1160,14 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16); // Name of server player
 			    Hosts[0].Host = NetworkServerIP;
 			    Hosts[0].Port = htons(NetworkServerPort);
-			    HostsCount = msg->HostsCount;
-			    for (i = 1; i < HostsCount; i++) {
+			    for (i = 1; i < PlayerMax; i++) {
 				if (i != NetLocalHostsSlot) {
 				    Hosts[i].Host = msg->u.Hosts[i].Host;
 				    Hosts[i].Port = msg->u.Hosts[i].Port;
-				    Hosts[i].PlyNr = i;
-				    memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+				    Hosts[i].PlyNr = msg->u.Hosts[i].PlyNr;
+				    if (Hosts[i].PlyNr) {
+					memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+				    }
 				} else {
 				    Hosts[i].PlyNr = i;
 				    memcpy(Hosts[i].PlyName, NetworkName, 16);
@@ -1148,16 +1254,17 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		    switch(msg->SubType) {
 
 			case ICMResync:		// Server has resynced with us and sends resync data
-			    HostsCount = msg->HostsCount;
-			    for (i = 1; i < HostsCount; i++) {
+			    for (i = 1; i < PlayerMax-1; i++) {
 				if (i != NetLocalHostsSlot) {
 				    Hosts[i].Host = msg->u.Hosts[i].Host;
 				    Hosts[i].Port = msg->u.Hosts[i].Port;
 				    Hosts[i].PlyNr = msg->u.Hosts[i].PlyNr;
-				    memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
-				    DebugLevel3Fn("Other client %d: %s\n", Hosts[i].PlyNr, Hosts[i].PlyName);
+				    if (Hosts[i].PlyNr) {
+					memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+					DebugLevel3Fn("Other client %d: %s\n", Hosts[i].PlyNr, Hosts[i].PlyName);
+				    }
 				} else {
-				    Hosts[i].PlyNr = i;
+				    Hosts[i].PlyNr = msg->u.Hosts[i].PlyNr;
 				    memcpy(Hosts[i].PlyName, NetworkName, 16);
 				}
 			    }
@@ -1218,31 +1325,35 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	switch(msg->SubType) {
 	    case ICMHello:		// a client has arrived
-		// first look up, if host is already known.
-		for (h = 1; h < HostsCount; ++h) {
+		// first look up, if client host is already known.
+		k = 0;
+		for (h = 1; h < PlayerMax-1; ++h) {	// last Player slot (15) is special - avoid!
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+			k = h;
 			break;
 		    }
 		}
-		if (h == HostsCount) {	// it is a new client
-		    for (i = 1; i < h; i++) {
-			if (Hosts[i].PlyNr == 0) {	// If possible occupy empty (previously freed) slots
-			    h = i;
-			    break;
+		if (k == 0) {	// it is a new client
+		    for (n = i = 1; i < PlayerMax-1; i++) {
+			DebugLevel3Fn("SSS.CO[%d] = %d, Hosts[%d].PlyNr = %d\n", i,
+					 ServerSetupState.CompOpt[i], i, Hosts[i].PlyNr);
+			// occupy first available slot
+			if (ServerSetupState.CompOpt[i] == 0) {
+			    n++;					// n = total available slots
+			    if (k == 0 && Hosts[i].PlyNr == 0) {
+				k = i;
+			    }
 			}
 		    }
-		    if (h < NetPlayers) {
-			Hosts[h].Host = NetLastHost;
-			Hosts[h].Port = NetLastPort;
-			Hosts[h].PlyNr = h;
-			memcpy(Hosts[h].PlyName, msg->u.Hosts[0].PlyName, 16);
+		    if (k) {
+			Hosts[k].Host = NetLastHost;
+			Hosts[k].Port = NetLastPort;
+			Hosts[k].PlyNr = k;
+			memcpy(Hosts[k].PlyName, msg->u.Hosts[0].PlyName, 16);
 			DebugLevel0Fn("New client %d.%d.%d.%d:%d [%s]\n",
-			    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort), Hosts[h].PlyName);
-			NetStates[h].State = ccs_connecting;
-			NetStates[h].MsgCnt = 0;
-			if (h == HostsCount) {
-			    HostsCount++;
-			}
+			    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort), Hosts[k].PlyName);
+			NetStates[k].State = ccs_connecting;
+			NetStates[k].MsgCnt = 0;
 		    } else {
 			message.Type = MessageInitReply;
 			message.SubType = ICMGameFull;	// Game is full - reject connnection
@@ -1256,21 +1367,26 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		// this code path happens until client sends waiting (= has received this message)
 		message.Type = MessageInitReply;
 		message.SubType = ICMWelcome;				// Acknowledge: Client is welcome
-		message.u.Hosts[0].PlyNr = h;				// Host array slot number
+		message.u.Hosts[0].PlyNr = k;				// Host array slot number
 		memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);	// Name of server player
-		message.HostsCount = (char)(HostsCount & 0xff);
 		message.MapUID = 0L;
-		for (i = 1; i < HostsCount; i++) {			// Info about other clients
-		    if (i != h) {
-			message.u.Hosts[i].Host = Hosts[i].Host;
-			message.u.Hosts[i].Port = Hosts[i].Port;
-			message.u.Hosts[i].PlyNr = i;
-			memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+		for (i = 1; i < PlayerMax-1; i++) {			// Info about other clients
+		    if (i != k) {
+			if (Hosts[i].PlyNr) {
+			    message.u.Hosts[i].Host = Hosts[i].Host;
+			    message.u.Hosts[i].Port = Hosts[i].Port;
+			    message.u.Hosts[i].PlyNr = Hosts[i].PlyNr;
+			    memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+			} else {
+			    message.u.Hosts[i].Host = 0;
+			    message.u.Hosts[i].Port = 0;
+			    message.u.Hosts[i].PlyNr = 0;
+			}
 		    }
 		}
 		n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-		DebugLevel0Fn("Sending InitReply Message Welcome: (%d) to %d.%d.%d.%d:%d\n",
-			    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+		DebugLevel0Fn("Sending InitReply Message Welcome: (%d) [PlyNr: %d] to %d.%d.%d.%d:%d\n",
+			    n, k, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 		NetStates[h].MsgCnt++;
 		if (NetStates[h].MsgCnt > 50) {
 		    // FIXME: Client sends hellos, but doesn't receive our welcome acks....
@@ -1281,7 +1397,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	    case ICMResync:
 		// look up the host
-		for (h = 0; h < HostsCount; ++h) {
+		for (h = 0; h < PlayerMax-1; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			switch (NetStates[h].State) {
 			    // client has recvd welcome and is waiting for info
@@ -1294,13 +1410,18 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				// (indicating Resync has completed)
 				message.Type = MessageInitReply;
 				message.SubType = ICMResync;
-				message.HostsCount = (char)(HostsCount & 0xff);
-				for (i = 1; i < HostsCount; i++) {	// Info about other clients
+				for (i = 1; i < PlayerMax-1; i++) {	// Info about other clients
 				    if (i != h) {
-					message.u.Hosts[i].Host = Hosts[i].Host;
-					message.u.Hosts[i].Port = Hosts[i].Port;
-					message.u.Hosts[i].PlyNr = Hosts[i].PlyNr;
-					memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+					if (Hosts[i].PlyNr) {
+					    message.u.Hosts[i].Host = Hosts[i].Host;
+					    message.u.Hosts[i].Port = Hosts[i].Port;
+					    message.u.Hosts[i].PlyNr = Hosts[i].PlyNr;
+					    memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+					} else {
+					    message.u.Hosts[i].Host = 0;
+					    message.u.Hosts[i].Port = 0;
+					    message.u.Hosts[i].PlyNr = 0;
+					}
 				    }
 				}
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -1327,8 +1448,8 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	    case ICMWaiting:
 		// look up the host
-		for (h = 0; h < HostsCount; ++h) {
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+		for (h = 0; h < PlayerMax-1; ++h) {
+		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort && Hosts[h].PlyNr) {
 			ServerSetupState.LastFrame[h] = FrameCounter;
 			NetConnectForceDisplayUpdate();
 
@@ -1344,7 +1465,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				message.SubType = ICMMap;			// Send Map info to the client
 				// FIXME: Transmit (and receive!) relative to FreeCraftLibPath
 				memcpy(message.u.MapPath, ScenSelectFullPath, 256);
-				message.HostsCount = (char)(HostsCount & 0xff);
 				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 				DebugLevel0Fn("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n",
@@ -1358,8 +1478,8 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    case ccs_mapinfo:
 				NetStates[h].State = ccs_synced;
 				NetStates[h].MsgCnt = 0;
-				for (i = 1; i < HostsCount; i++) {
-				    if (i != h) {
+				for (i = 1; i < PlayerMax-1; i++) {
+				    if (i != h && Hosts[i].PlyNr) {
 					// Notify other clients
 					NetStates[i].State = ccs_async;
 				    }
@@ -1379,7 +1499,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				message.Type = MessageInitReply;
 				message.SubType = ICMState;		// Send new state info to the client
 				message.u.State = ServerSetupState;
-				message.HostsCount = (char)(HostsCount & 0xff);
 				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n",
@@ -1403,7 +1522,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	    case ICMMap:
 		// look up the host
-		for (h = 0; h < HostsCount; ++h) {
+		for (h = 0; h < PlayerMax-1; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			switch (NetStates[h].State) {
 			    // client has recvd map info waiting for state info
@@ -1417,7 +1536,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				message.Type = MessageInitReply;
 				message.SubType = ICMState;		// Send State info to the client
 				message.u.State = ServerSetupState;
-				message.HostsCount = (char)(HostsCount & 0xff);
 				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n",
@@ -1440,7 +1558,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	    case ICMState:
 		// look up the host
-		for (h = 0; h < HostsCount; ++h) {
+		for (h = 0; h < PlayerMax-1; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			switch (NetStates[h].State) {
 			    case ccs_mapinfo:
@@ -1465,7 +1583,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				message.Type = MessageInitReply;
 				message.SubType = ICMState;		// Send new state info to the client
 				message.u.State = ServerSetupState;
-				message.HostsCount = (char)(HostsCount & 0xff);
 				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n",
@@ -1488,7 +1605,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	    case ICMGoodBye:
 		// look up the host
-		for (h = 0; h < HostsCount; ++h) {
+		for (h = 0; h < PlayerMax-1; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			switch (NetStates[h].State) {
 			    default:
@@ -1518,7 +1635,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	    case ICMSeeYou:
 		// look up the host
-		for (h = 0; h < HostsCount; ++h) {
+		for (h = 0; h < PlayerMax-1; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			switch (NetStates[h].State) {
 			    case ccs_detaching:
@@ -1531,7 +1648,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				ServerSetupState.Race[h] = 0;
 
 				// Resync other clients
-				for (i = 1; i < HostsCount; i++) {
+				for (i = 1; i < PlayerMax-1; i++) {
 				    if (i != h && Hosts[i].PlyNr) {
 					NetStates[i].State = ccs_async;
 				    }
