@@ -673,6 +673,7 @@ extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
 extern int ShowOrdersCount;		/// Show orders for some time
 extern int HitPointRegeneration;	/// Hit point regeneration for all units
+extern int XpDamage;				/// unit XP adds more damage to attacks
 extern char EnableTrainingQueue;	/// Config: training queues enabled
 extern char EnableBuildingCapture;	/// Config: building capture enabled
 extern char RevealAttacker;		/// Config: reveal attacker enabled

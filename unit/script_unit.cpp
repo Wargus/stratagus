@@ -69,6 +69,23 @@ local SCM CclSetHitPointRegeneration(SCM flag)
 }
 
 /**
+**  Set xp damage
+**
+**  @param flag Flag enabling or disabling it.
+**
+**  @return     The old state of the xp damage
+*/
+local SCM CclSetXpDamage(SCM flag)
+{
+    int old;
+
+    old = XpDamage;
+    XpDamage = gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
 **	Set training queue
 **
 **	@param flag	Flag enabling or disabling it.
@@ -827,6 +844,7 @@ global void UnitCclRegister(void)
 {
     gh_new_procedure1_0("set-hitpoint-regeneration!",
 	    CclSetHitPointRegeneration);
+    gh_new_procedure1_0("set-xp-damage!",CclSetXpDamage);
     gh_new_procedure1_0("set-training-queue!",CclSetTrainingQueue);
     gh_new_procedure1_0("set-building-capture!",CclSetBuildingCapture);
     gh_new_procedure1_0("set-reveal-attacker!",CclSetRevealAttacker);
