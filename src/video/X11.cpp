@@ -1,11 +1,11 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name X11.c		-	XWindows support. */
@@ -207,15 +207,14 @@ global unsigned long X11GetTicks(void)
 
 /**
 **	Converts a hardware independend 256 color palette to a hardware
-**      dependent palette. Letting a system color as index in the result,
-**      correspond with the right RGB value.
+**	dependent palette. Letting a system color as index in the result,
+**	correspond with the right RGB value.
 **
-**	@param palette	   Hardware independent 256 color palette.
-**
-**	@param syspalette  Hardware dependent 256 color palette, to be filled.
-**
-**	@param palette	   Array denoting which entries in above palette are
-**                         defined by this function.
+**	@param palette	Hardware independent 256 color palette.
+**	@param syspalette	Hardware dependent 256 color palette, to be
+**				filled.
+**	@param syspalette_defined	Array denoting which entries in above
+**			palette are defined by this function.
 */
 local void AllocPalette8(Palette * palette, Palette * syspalette,
     unsigned long syspalette_defined[8])
@@ -257,7 +256,7 @@ local void AllocPalette8(Palette * palette, Palette * syspalette,
 	    if (syspalette_defined[j] & bit) {
 		// multiple RGB matches for one sytem color, average RGB values
 		// Note: happens when a palette with duplicate RGB values is
-		//       used, but might also happen for another reason?
+		//	 used, but might also happen for another reason?
 		r += syspalette[color.pixel].r + 1;
 		r >>= 1;
 		g += syspalette[color.pixel].g + 1;
@@ -274,7 +273,7 @@ local void AllocPalette8(Palette * palette, Palette * syspalette,
 	    syspalette[color.pixel].b = b;
 	} else if (!warning_given) {	// Note: this may also happen when
 					// more then 256 colors are tried..
-	    //      Use VideoFreePalette to unallocate..
+	    //	    Use VideoFreePalette to unallocate..
 	    warning_given = 1;
 	    fprintf(stderr,
 		"Cannot allocate 8pp color\n"
@@ -326,7 +325,7 @@ global void GameInitDisplay(void)
 	ExitFatal(-1);
     }
 
-    //  Look for a nice visual
+    //	Look for a nice visual
 
     if( VideoDepth && XMatchVisualInfo(TheDisplay,
 	    TheScreen,VideoDepth,TrueColor,&xvi) ) {
@@ -402,7 +401,7 @@ foundvisual:
 	ExitFatal(-1);
     }
     // Mark segment as deleted as soon as both us and the X server have
-    // attached to it.  The POSIX spec says that a segment marked as deleted
+    // attached to it.	The POSIX spec says that a segment marked as deleted
     // can no longer have addition processes attach to it, but Linux will let
     // them anyway.
 #if defined(linux)
@@ -421,7 +420,7 @@ foundvisual:
 	FocusChangeMask|ButtonPressMask|PointerMotionMask|ButtonReleaseMask;
     i = CWBackPixmap|CWBackingStore|CWSaveUnder|CWEventMask|CWCursor;
 
-    if(xvi.class==PseudoColor)  {
+    if(xvi.class==PseudoColor)	{
 	i|=CWColormap;
 	attributes.colormap =
 		XCreateColormap( TheDisplay, DefaultRootWindow(TheDisplay),
@@ -570,7 +569,7 @@ global void Invalidate(void)
 }
 
 /**
-**      Handle keyboard modifiers
+**	Handle keyboard modifiers
 */
 local void X11HandleModifiers(XKeyEvent* keyevent)
 {
@@ -587,10 +586,10 @@ local void X11HandleModifiers(XKeyEvent* keyevent)
 	    /* Do Nothing */;
     }
     if( mod&ControlMask ) {
-        keyevent->state&=~ControlMask;	// Hack Attack!
+	keyevent->state&=~ControlMask;	// Hack Attack!
     }
     if( mod&Mod1Mask ) {
-        keyevent->state&=~Mod1Mask;	// Hack Attack!
+	keyevent->state&=~Mod1Mask;	// Hack Attack!
     }
 }
 
@@ -839,8 +838,8 @@ local void X11DoEvent(const EventCallback* callbacks)
 
 	case ClientMessage:
 	    DebugLevel3("\tclient message\n");
-            if (event.xclient.format == 32) {
-                if ((Atom)event.xclient.data.l[0] == WmDeleteWindowAtom) {
+	    if (event.xclient.format == 32) {
+		if ((Atom)event.xclient.data.l[0] == WmDeleteWindowAtom) {
 		    Exit(0);
 		}
 	    }
@@ -854,7 +853,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    KeySym keysym;
 	    KeySym key;
 
-            X11HandleModifiers((XKeyEvent*)&event);
+	    X11HandleModifiers((XKeyEvent*)&event);
 	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
 	    key=XLookupKeysym((XKeyEvent*)&event,0);
 	    DebugLevel3("\tKeyv %lx %lx `%*.*s'\n",key,keysym,num,num,buf);
@@ -874,7 +873,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    KeySym keysym;
 	    KeySym key;
 
-            X11HandleModifiers((XKeyEvent*)&event);
+	    X11HandleModifiers((XKeyEvent*)&event);
 	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
 	    key=XLookupKeysym((XKeyEvent*)&event,0);
 	    DebugLevel3("\tKey^ %lx %lx `%*.*s'\n",key,keysym,num,num,buf);
@@ -972,7 +971,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
 #ifndef USE_ITIMER
 	//
-	//      Time of frame over? This makes the CPU happy. :(
+	//	Time of frame over? This makes the CPU happy. :(
 	//
 	ticks=X11GetTicks();
 	if( !VideoInterrupts && ticks+11<NextFrameTicks ) {
@@ -1150,67 +1149,72 @@ global void WaitEventsAndKeepSync(void)
     WaitEventsOneFrame(&callbacks);
 }
 
+#if 0
 /**
 **	Free a hardware dependend palette.
 **
 **	@param palette	Hardware dependend palette.
 **
-**      FIXME: XFreeColors planes can be used to free an entire range
-**             of colors; couldn't get it working though..
+**	@todo FIXME: XFreeColors planes can be used to free an entire range
+**		of colors; couldn't get it working though..
+**		Function not used.
 */
-local void VideoFreePallette(void *pixels)
+local void VideoFreePallette(void* pixels)
 {
-  XWindowAttributes xwa;
-  int i;
-  char *vp;
-  unsigned long oldpal[256];
+    XWindowAttributes xwa;
+    int i;
+    char* vp;
+    unsigned long oldpal[256];
 
-  if ( !TheDisplay || !TheMainWindow )
-    return;
-
-  XGetWindowAttributes( TheDisplay, TheMainWindow, &xwa );
-
-  if ( pixels )
-  {
-    switch( VideoBpp ) {
-    case 8:
-      for (i=0;i<256;i++)
-        oldpal[ i ] = ((VMemType8 *)pixels)[ i ];
-      break;
-    case 15:
-    case 16:
-      for (i=0;i<256;i++)
-        oldpal[ i ] = ((VMemType16 *)pixels)[ i ];
-      break;
-    case 24:
-      for (i=0;i<256;i++)
-      {
-        vp = (char *)(oldpal + i);
-        vp[0]=((VMemType24*)pixels)[i].a;
-        vp[1]=((VMemType24*)pixels)[i].b;
-        vp[2]=((VMemType24*)pixels)[i].c;
-      }
-      break;
-    case 32:
-      for (i=0;i<256;i++)
-        oldpal[ i ] = ((VMemType32 *)pixels)[ i ];
-      break;
-    default:
-      DebugLevel0Fn(": Unknown depth\n");
-      return;
+    if (!TheDisplay || !TheMainWindow) {
+	return;
     }
-    XFreeColors(TheDisplay,xwa.colormap,oldpal,256,0);
-  }
+
+    XGetWindowAttributes(TheDisplay, TheMainWindow, &xwa);
+
+    if (pixels) {
+	switch (VideoBpp) {
+	    case 8:
+		for (i = 0; i < 256; i++) {
+		    oldpal[i] = ((VMemType8 *) pixels)[i];
+		}
+		break;
+	    case 15:
+	    case 16:
+		for (i = 0; i < 256; i++) {
+		    oldpal[i] = ((VMemType16 *) pixels)[i];
+		}
+		break;
+	    case 24:
+		for (i = 0; i < 256; i++) {
+		    vp = (char *)(oldpal + i);
+		    vp[0] = ((VMemType24 *) pixels)[i].a;
+		    vp[1] = ((VMemType24 *) pixels)[i].b;
+		    vp[2] = ((VMemType24 *) pixels)[i].c;
+		}
+		break;
+	    case 32:
+		for (i = 0; i < 256; i++) {
+		    oldpal[i] = ((VMemType32 *) pixels)[i];
+		}
+		break;
+	    default:
+		DebugLevel0Fn(": Unknown depth\n");
+		return;
+	}
+	XFreeColors(TheDisplay, xwa.colormap, oldpal, 256, 0);
+    }
 }
+#endif
 
 /**
-**      Allocate a new hardware dependend palette palette.
+**	Allocate a new hardware dependend palette palette.
 **
-**      @param palette  Hardware independend palette.
+**	@param palette	Hardware independend palette.
 **
-**      @return         A hardware dependend pixel table.
+**	@return		A hardware dependend pixel table.
 **
-**      FIXME: VideoFreePallette should be used to free unused colors
+**	@todo FIXME: VideoFreePallette should be used to free unused colors
 */
 global VMemType* VideoCreateNewPalette(const Palette *palette)
 {
@@ -1225,9 +1229,9 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 
     switch( VideoBpp ) {
     case 8:
-        if ( colorcube8 ) {
-        // Shortcut: get palette from already allocated common palette.
-        // FIXME: shortcut should be placed in video.c, for all video support.
+	if ( colorcube8 ) {
+	// Shortcut: get palette from already allocated common palette.
+	// FIXME: shortcut should be placed in video.c, for all video support.
 	    return (VMemType*)VideoFindNewPalette8( colorcube8, palette );
 	}
 	pixels=malloc(256*sizeof(VMemType8));
@@ -1330,14 +1334,14 @@ global void CheckVideoInterrupts(void)
 {
 #ifdef USE_ITIMER
     if( VideoInterrupts ) {
-        //DebugLevel1("Slow frame\n");
+	//DebugLevel1("Slow frame\n");
 	IfDebug(
 	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	    XClearArea(TheDisplay,TheMainWindow
 		,TheUI.MapX+10,TheUI.MapX+10,13*13,13
 		,False);
 	);
-        ++SlowFrameCounter;
+	++SlowFrameCounter;
     }
 #endif
 }
