@@ -2410,6 +2410,7 @@ local void SaveSelectLBInit(Menuitem *mi)
 	    SaveGameMenuItems[3].flags = MenuButtonDisabled;
 	}
     }
+    mi->d.listbox.curopt = -1;
 }
 
 local unsigned char *SaveSelectLBRetrieve(Menuitem *mi, int i)
