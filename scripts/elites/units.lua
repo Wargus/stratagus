@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	units.ccl	-	Define the used elites unit-types.
+--	units.lua	-	Define the used elites unit-types.
 --
 --	(c) Copyright 2001 - 2004 by Lutz Sammer and Crestez Leonard
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: units.lua,v 1.19 2004/11/02 03:30:09 mr-russ Exp $
+--	$Id$
 
 --=============================================================================
 --	Define unit-types.

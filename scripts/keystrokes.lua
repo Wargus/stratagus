@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	keystrokes.ccl	-	All keystroke helps for the menus.
+--	keystrokes.lua	-	All keystroke helps for the menus.
 --
 --	(c) Copyright 2002 by Jimmy Salmon.
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: keystrokes.lua,v 1.1 2004/01/22 20:51:44 n0body Exp $
+--	$Id$
 
 ResetKeystrokeHelp()
 

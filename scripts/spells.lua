@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	stratagus.ccl	-	The craft configuration language.
+--	stratagus.lua	-	The craft configuration language.
 --
 --	(c) Copyright 1998-2004 by Crestez Leonard
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: spells.lua,v 1.6 2004/10/26 17:59:18 feb Exp $
+--	$Id$
 
 DefineBoolFlags("organic")
 DefineVariables("Speed")

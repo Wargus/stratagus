@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	tips.ccl	-	All tips of the engine.
+--	tips.lua	-	All tips of the engine.
 --
 --	(c) Copyright 2002-2004 by Jimmy Salmon and Crestez Leonard.
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: tips.lua,v 1.2 2004/11/05 12:19:39 feb Exp $
+--	$Id$
 
 AddTip("You can select all of your currently visible units of the same type by holding down the CTRL key and selecting a unit or by \"double clicking\" on a unit.")
 AddTip("The more engineers you have collecting resources, the faster your economy will grow.")

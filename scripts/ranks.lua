@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	ranks.ccl	-	Ranks for all of the races.
+--	ranks.lua	-	Ranks for all of the races.
 --
 --	(c) Copyright 2002 by Jimmy Salmon.
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: ranks.lua,v 1.2 2004/02/10 01:55:23 n0body Exp $
+--	$Id$
 
 DefineRanks("elites", {
 	0, "Rank0",
