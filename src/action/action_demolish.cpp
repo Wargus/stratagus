@@ -136,10 +136,11 @@ global void HandleActionDemolish(Unit* unit)
 	    //	 Effect of the explosion on units.
 	    //
             n=SelectUnits(x-2,y-2, x+2, y+2,table);
-	    // FIXME: Don't hit flying units!
             for( i=0; i<n; ++i ) {
-		if ( table[i]->Type->LandUnit )
-                   HitUnit(table[i],DEMOLISH_DAMAGE);
+		if ( table[i]->Type->LandUnit ) {
+		    // Don't hit flying units!
+		    HitUnit(table[i],DEMOLISH_DAMAGE);
+		}
             }
 
 	    //
