@@ -190,7 +190,7 @@ enum _scroll_state_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-    /// Flag telling if the game is paused.
+    /// Flag telling if the game is paused
 extern char GamePaused;
 
     /// pressed mouse buttons (normal,double,dragged,long)
@@ -215,10 +215,10 @@ extern int GameMenuButtonClicked;
     /// current CursorOn field
 extern enum _cursor_on_ CursorOn;
 
-    /// vladi: used for unit buttons sub-menus etc.
+    /// vladi: used for unit buttons sub-menus etc
 extern int CurrentButtonLevel;
 
-    /// Display the command key in the buttons.
+    /// Display the command key in the buttons
 extern char ShowCommandKey;
 
     /// All buttons in game
@@ -282,34 +282,32 @@ extern void InputMouseTimeout(const EventCallback*,unsigned);
 //
     /// Called if right mouse button is pressed
 extern void DoRightButton(int x,int y);
-    /// cancel the building input mode
+    /// Cancel the building input mode
 extern void CancelBuildingMode(void);
 
-    /// FIXME: more docu
+    /// Draw messages as overlay over of the map
 extern void DrawMessage(void);
-    /// FIXME: more docu
+    /// Draw the player resource in resource line
 extern void DrawResources(void);
-    /// FIXME: more docu
-extern void DrawMessage(void);
-    /// FIXME: more docu
+    /// Set message to display
 extern void SetMessage( char* fmt, ... );
-    /// FIXME: more docu
+    /// Draw status line
 extern void DrawStatusLine(void);
-    /// FIXME: more docu
+    /// Draw costs in status line
 extern void DrawCosts(void);
-    /// FIXME: more docu
-extern void SetCosts(int,const int* costs);	/// set costs to be displayed
-    /// FIXME: more docu
+    /// Set costs to be displayed in status line
+extern void SetCosts(int,const int* costs);
+    /// Clear the costs displayed in status line (undisplay!)
 extern void ClearCosts(void);
-    /// FIXME: more docu
+    /// Draw the unit info panel
 extern void DrawInfoPanel(void);
-    /// FIXME: more docu
+    /// Draw the unit button panel
 extern void DrawButtonPanel(void);
-    /// FIXME: more docu
+    /// Update the content of the unit button panel
 extern void UpdateButtonPanel(void);
-    /// FIXME: more docu
+    /// Handle button click in button panel area
 extern void DoButtonButtonClicked(int button);
-    /// Lookup key for bottom panel buttons.
+    /// Lookup key for bottom panel buttons
 extern int DoButtonPanelKey(int key);
 
 //
