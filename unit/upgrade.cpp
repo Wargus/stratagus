@@ -45,6 +45,7 @@
 #include "interface.h"
 #include "map.h"
 #include "script.h"
+#include "spells.h"
 
 #include "myendian.h"
 
@@ -1253,6 +1254,8 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 			UpdateForNewUnit(unit, 1);
 			if (dst->CanCastSpell) {
 				unit->Mana = MAGIC_FOR_NEW_UNITS;
+				unit->AutoCastSpell = malloc(SpellTypeCount);
+				memset(unit->AutoCastSpell, 0, SpellTypeCount);
 			}
 			if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 					src->TileWidth != dst->TileWidth ||

@@ -600,7 +600,7 @@ struct _unit_ {
 	Order		Orders[MAX_ORDERS];				/// orders to process
 	Order		SavedOrder;						/// order to continue after current
 	Order		NewOrder;						/// order for new trained units
-	struct _spell_type_*	AutoCastSpell;		/// spell to auto cast
+	char		*AutoCastSpell;					/// spells to auto cast
 
 	union _order_data_ {
 	struct _order_move_ {

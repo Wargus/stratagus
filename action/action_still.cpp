@@ -61,6 +61,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 	const UnitType* type;
 	Unit* temp;
 	Unit* goal;
+	int i;
 
 	DebugLevel3Fn(" %d\n" _C_ UnitNumber(unit));
 
@@ -171,10 +172,13 @@ global void ActionStillGeneric(Unit* unit, int ground)
 	//
 	// Auto cast spells
 	//
-	if (unit->AutoCastSpell && AutoCastSpell(unit, unit->AutoCastSpell)) {
-		return;
+	if (unit->AutoCastSpell) {
+		for (i = 0; i < SpellTypeCount; i++) {
+			if (unit->AutoCastSpell[i] && AutoCastSpell(unit, SpellTypeTable[i])) {
+				return;
+			}
+		}
 	}
-
 	//
 	// Cowards don't attack unless instructed.
 	//

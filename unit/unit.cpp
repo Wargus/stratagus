@@ -326,6 +326,8 @@ global void InitUnit(Unit* unit, UnitType* type)
 
 	if (type->CanCastSpell) {
 		unit->Mana = (type->_MaxMana * MAGIC_FOR_NEW_UNITS) / 100;
+		unit->AutoCastSpell = malloc(SpellTypeCount);
+		memset(unit->AutoCastSpell, 0, SpellTypeCount);
 	}
 	unit->Active = 1;
 
@@ -3722,7 +3724,11 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 		CLprintf(file, ",\n  \"goal\", %d", UnitNumber(unit->Goal));
 	}
 	if (unit->AutoCastSpell) {
-		CLprintf(file, ",\n  \"auto-cast\", \"%s\"", unit->AutoCastSpell->Ident);
+		for (i = 0; i < SpellTypeCount; i++) {
+			if (unit->AutoCastSpell[i]) {
+				CLprintf(file, ",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident);
+			}
+		}
 	}
 
 	CLprintf(file, ")\n");
@@ -3829,6 +3835,7 @@ global void CleanUnits(void)
 	//		Free memory for all units in unit table.
 	//
 	for (table = Units; table < &Units[NumUnits]; ++table) {
+		free((*table)->AutoCastSpell);
 		free(*table);
 		*table = NULL;
 	}
