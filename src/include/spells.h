@@ -10,12 +10,11 @@
 //
 /**@name spells.h	-	The Spells. */
 //
-//	(c) Copyright 1999-2001 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2002 by Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,32 +49,34 @@
 **	Different spell actions, defines the behavior of the spells.
 */
 typedef enum _spell_action_type_ {
-    SpellActionNone,			/// FIXME: Comments
+    SpellActionNone,			/// No spell, shouldn't happen
 //	---human paladins---
-    SpellActionHolyVision,		/// FIXME: Comments
-    SpellActionHealing,			/// FIXME: Comments
-    SpellActionExorcism,		/// FIXME: Comments
+    SpellActionHolyVision,		/// Holy vision
+    SpellActionHealing,			/// Healing
+    SpellActionExorcism,		/// Exorcism
 //	---human mages---
-    SpellActionFireball,		/// FIXME: Comments
-    SpellActionSlow,			/// FIXME: Comments
-    SpellActionFlameShield,		/// FIXME: Comments
-    SpellActionInvisibility,		/// FIXME: Comments
-    SpellActionPolymorph,		/// FIXME: Comments
-    SpellActionBlizzard,		/// FIXME: Comments
+    SpellActionFireball,		/// Fireball
+    SpellActionSlow,			/// Slow down
+    SpellActionFlameShield,		/// Flame shield
+    SpellActionInvisibility,		/// Invisibility
+    SpellActionPolymorph,		/// Polymorph
+    SpellActionBlizzard,		/// Blizzard
 //	---orc ogres---
-    SpellActionEyeOfKilrogg,		/// FIXME: Comments
-    SpellActionBloodlust,		/// FIXME: Comments
-    SpellActionRunes,			/// FIXME: Comments
+    SpellActionEyeOfKilrogg,		/// Eye
+    SpellActionBloodlust,		/// Blood lust
+    SpellActionRunes,			/// Runes
 //	---orc death knights---
-    SpellActionDeathCoil,		/// FIXME: Comments
-    SpellActionHaste,			/// FIXME: Comments
-    SpellActionRaiseDead,		/// FIXME: Comments
-    SpellActionWhirlwind,		/// FIXME: Comments
-    SpellActionUnholyArmor,		/// FIXME: Comments
-    SpellActionDeathAndDecay,		/// FIXME: Comments
-    SpellActionCircleOfPower,		/// FIXME: Comments
+    SpellActionDeathCoil,		/// Death coil
+    SpellActionHaste,			/// Haste
+    SpellActionRaiseDead,		/// Raise dead
+    SpellActionWhirlwind,		/// Whirlwind
+    SpellActionUnholyArmor,		/// Unholy armor
+    SpellActionDeathAndDecay,		/// Death and decay
 
-    // Here you can new spell actions
+//	---new spells---
+    SpellActionCircleOfPower,		/// Circle of power
+
+    // Here you can add new spell actions
 
 } SpellActionType;
 
@@ -93,7 +94,7 @@ typedef struct _spell_type_ {
     int  ManaCost;		/// required mana for each cast
     int  TTL;			/// time to live (ticks)
 
-    SpellActionType  Action;	/// SpellAction*
+    SpellActionType  Action;	/// SpellAction...
 
     SoundConfig Casted;		/// sound played if casted
     MissileConfig Missile;	/// missile fired on cast
@@ -117,7 +118,7 @@ extern void DoneSpells(void);
 extern int SpellIdByIdent( const char* Ident );
 
     /// return spell type by ident string
-extern const SpellType* SpellTypeByIdent( const char* Ident );
+extern SpellType* SpellTypeByIdent( const char* Ident );
 
     /// return spell type by spell id
 extern SpellType* SpellTypeById( int Id );
@@ -130,4 +131,4 @@ extern int SpellCast( Unit*, const SpellType* , Unit* , int , int );
 
 //@}
 
-#endif	// !__BUTTON_H__
+#endif	// !__SPELLS_H__
