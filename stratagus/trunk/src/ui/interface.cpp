@@ -807,19 +807,13 @@ local int CommandKey(int key)
 	case 's':			// ALT s F11 save game menu
 	case 'S':
 	    if( KeyModifiers&ModifierControl ) {
-		if( (KeyModifiers&ModifierAlt) ) {
-		    SavePud("freecraft.pud.gz",&TheMap);
-		    SetMessage("Pud saved");
-		    break;
-		}
 		UiToggleSound();
 		break;
 	    }
 	    if( !(KeyModifiers&ModifierAlt) ) {
-		SavePud("freecraft.pud.gz",&TheMap);
-		SetMessage("Pud saved");
 		break;
 	    }
+	    // FALL THROUGH (ALT+S)
 	case KeyCodeF11:
 	    UiEnterSaveGameMenu();
 	    break;
