@@ -449,7 +449,7 @@ global void UpdateDisplay(void)
     }
 
     if( MustRedraw&(RedrawMessage|RedrawMap) ) {
-	DrawMessage();
+	DrawMessages();
     }
 
     if( (MustRedraw&RedrawFiller1) && TheUI.Filler1.Graphic ) {
@@ -661,6 +661,7 @@ global void GameMainLoop(void)
 	    MissileActions();		// handle missiles
 	    PlayersEachCycle();		// handle players
 	    TriggersEachCycle();	// handle triggers
+	    UpdateMessages();		// update messages
 	    UpdateTimer();		// update game timer
 
 	    // FIXME: We don't do redraw if needed, costs to much cpu time

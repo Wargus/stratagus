@@ -342,8 +342,10 @@ extern void DoRightButton(int tx,int ty);
     /// Cancel the building input mode
 extern void CancelBuildingMode(void);
 
+    /// Update messages
+extern void UpdateMessages(void);
     /// Draw messages as overlay over of the map
-extern void DrawMessage(void);
+extern void DrawMessages(void);
     /// Draw the player resource in resource line
 extern void DrawResources(void);
     /// Set message to display
