@@ -962,8 +962,12 @@ local int ParabolicMissile(Missile* missile)
 	    dx = -dx;
 	    xstep = -1;
 	}
-	missile->Angle = (100 * (missile->SourceY - missile->DY)) / 
-	    (missile->SourceX - missile->DX);
+	if (missile->SourceX - missile->DX != 0) {
+	    missile->Angle = (100 * (missile->SourceY - missile->DY)) / 
+		(missile->SourceX - missile->DX);
+	} else {
+	    missile->Angle = 1;
+	}
 	missile->Xl = missile->X * 100;
 
 	MissileNewHeadingFromXY(missile, dx * xstep, dy * ystep);
