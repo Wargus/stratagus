@@ -17,7 +17,7 @@ cat << .. > $RULESFILE
 ..
 ##	setup		-	Configure Rules.make (GNU MAKE rules).
 ##
-##	(c) Copyright 2000,2001 by Dan Hensley
+##	(c) Copyright 2000-2002 by Dan Hensley
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -35,7 +35,7 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_FOW2"
 
 ## These could be used for experimental versions
 ## ---------------------------------------------
