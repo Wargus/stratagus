@@ -31,26 +31,38 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-#define WALL_100HP   40 // FIXME: Vladi: should be fixed!!!
-#define WALL_50HP    20 // FIXME: Vladi: should be fixed!!!
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**	Wall table:
+**	Human wall table:
 **		Depends on surrounding units.
+**
+**	@note
+**		If we support a more complex tileset format, this must be
+**		calculated.
 */
-local int WallTable[16] = {
-//   0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A,  B,  C,  D,  E,  F
-     0,  4,  2,  7,  1,  5,  3,  8,  9, 14, 11, 16, 10, 15, 13, 17
-/*
-    0x90
-    0x92
-    0xA0
-    0x94
+local int WallHumanTable[16] = {
+//     0,    1,    2,    3,    4,    5,    6,    7,
+      0x90,0x830,0x810,0x850,0x800,0x840,0x820,0x860,
+//     8,    9,    A,    B,    C,    D,    E,    F
+     0x870,0x8B0,0x890,0x8D0,0x880,0x8C0,0x8A0, 0xB0
+};
+
+/**
+**	Orc wall table:
+**		Depends on surrounding units.
+**
+**	@note
+**		If we support a more complex tileset format, this must be
+**		calculated.
 */
+local int WallOrcTable[16] = {
+//     0,    1,    2,    3,    4,    5,    6,    7,
+      0xA0,0x930,0x910,0x950,0x900,0x940,0x920,0x960,
+//     8,    9,    A,    B,    C,    D,    E,    F
+     0x970,0x9B0,0x990,0x9D0,0x980,0x9C0,0x9A0, 0xC0
 };
 
 /*----------------------------------------------------------------------------
@@ -66,91 +78,216 @@ local int WallTable[16] = {
   NOTE: this is not the original behaviour of the wall demolishing,
   instead I'm replacing tiles just as the wood fixing, so if part of
   a wall is down side neighbours are fixed just as current tile is
-  empty one ( current is first NoWall tile ). It is still nice... :)
+  empty one. It is still nice... :)
 
   For the connecting new walls -- all's fine.
 */
 
-global int MapWallChk(int x,int y,int walltype) // used by FixWall, walltype==-1 for auto
+/**
+**	Check if the seen tile-type is wall.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+**	@param walltype	Walltype to check. (-1 any kind)
+*/
+global int MapIsSeenTileWall(int x, int y,int walltype)
 {
     int t;
 
-    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	return 1;	// Outside considered wall
-    }
-    t=TheMap.Tileset->TileTypeTable[
-	    TheMap.Fields[(x)+(y)*TheMap.Width].SeenTile];
+    t = TheMap.Tileset->TileTypeTable
+	    [TheMap.Fields[(x) + (y) * TheMap.Width]. SeenTile];
     if (walltype == -1) {
-	return t == TileTypeHumanWall || t == TileTypeOrcWall ;
+	return t == TileTypeHumanWall || t == TileTypeOrcWall;
     }
     return t == walltype;
 }
 
-global int FixWall(int x, int y)	// used by MapRemoveWall and PreprocessMap
+/**
+**	Correct the seen wall field, depending on the surrounding.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+global void MapFixSeenWallTile(int x, int y)
 {
+    int t;
     int tile;
-    int walltype;
     MapField *mf;
 
-    //
-    //    Outside the map
-    //
+    //  Outside of map or no wall.
     if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-	return 0;
+	return;
     }
-    mf = TheMap.Fields + (x) + (y) * TheMap.Width;
-    walltype = TheMap.Tileset->TileTypeTable[mf->SeenTile];
-    if (walltype != TileTypeHumanWall && walltype != TileTypeOrcWall) {
-	return 0;
+    mf = TheMap.Fields + x + y * TheMap.Width;
+    t = TheMap.Tileset->TileTypeTable[mf->SeenTile];
+    if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
+	return;
     }
-#define WALL(xx,yy) (MapWallChk(xx,yy,walltype) != 0)
+
+    //
+    //  Calculate the correct tile. Depends on the surrounding.
+    //
     tile = 0;
-    if (WALL(x, y - 1)) {
+    if ((y - 1) < 0 || MapIsSeenTileWall(x, y - 1, t)) {
 	tile |= 1 << 0;
     }
-    if (WALL(x + 1, y)) {
+    if ((x + 1) >= TheMap.Width || MapIsSeenTileWall(x + 1, y, t)) {
 	tile |= 1 << 1;
     }
-    if (WALL(x, y + 1)) {
+    if ((y + 1) >= TheMap.Height || MapIsSeenTileWall(x, y + 1, t)) {
 	tile |= 1 << 2;
     }
-    if (WALL(x - 1, y)) {
+    if ((x - 1) < 0 || MapIsSeenTileWall(x - 1, y, t)) {
 	tile |= 1 << 3;
     }
 
-    tile = WallTable[tile];
-
-    if (walltype == TileTypeHumanWall) {
-	if (mf->Value < WALL_50HP)
-	    tile += TheMap.Tileset->HumanWall50Tile;
-	else
-	    tile += TheMap.Tileset->HumanWall100Tile;
+    if( t==TileTypeHumanWall ) {
+	tile = WallHumanTable[tile];
+	if( mf->Value<=UnitTypeByIdent("unit-human-wall")->_HitPoints/2 ) {
+	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+		++tile;
+	    }
+	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+		++tile;
+	    }
+	}
     } else {
-	if (mf->Value < WALL_50HP)
-	    tile += TheMap.Tileset->OrcWall50Tile;
-	else
-	    tile += TheMap.Tileset->OrcWall100Tile;
+	tile = WallOrcTable[tile];
+	if( mf->Value<=UnitTypeByIdent("unit-orc-wall")->_HitPoints/2 ) {
+	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+		++tile;
+	    }
+	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+		++tile;
+	    }
+	}
     }
+    tile = TheMap.Tileset->Table[tile];
 
-// FIXME: Johns, Is this correct? Could this function be called under fog of war
-    if (mf->SeenTile == tile) {
-	return 0;
+    if (mf->SeenTile != tile) {		// Already there!
+	mf->SeenTile = tile;
+
+	// FIXME: can this only happen if seen?
+#ifdef NEW_FOW
+	if (mf->Visible & (1 << ThisPlayer->Player)) {
+#else
+	if (mf->Flags & MapFieldVisible) {
+#endif
+	    UpdateMinimapSeenXY(x, y);
+	    MarkDrawPosMap(x, y);
+	    MustRedraw |= RedrawMinimap;
+	}
     }
-    mf->SeenTile = tile;
-
-    UpdateMinimapXY(x, y);
-    return 1;
 }
 
-// this one should be called and from the HitUnit() or similar func,
-// when the HP(Value) goes below 50%
-global void MapFixWall(int x,int y)
+/**
+**	Correct the surrounding seen wall fields.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+global void MapFixSeenWallNeighbors(int x, int y)
 {
-    // side neighbors
-    FixWall( x+1, y   );
-    FixWall( x-1, y   );
-    FixWall( x  , y+1 );
-    FixWall( x  , y-1 );
+    MapFixSeenWallTile(x + 1, y);		// side neighbors
+    MapFixSeenWallTile(x - 1, y);
+    MapFixSeenWallTile(x, y + 1);
+    MapFixSeenWallTile(x, y - 1);
+}
+
+/**
+**	Correct the real wall field, depending on the surrounding.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+global void MapFixWallTile(int x, int y)
+{
+    int tile;
+    MapField *mf;
+    int t;
+
+    //  Outside of map or no wall.
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	return;
+    }
+    mf = TheMap.Fields + x + y * TheMap.Width;
+    if (!(mf->Flags & MapFieldWall)) {
+	return;
+    }
+
+    t=mf->Flags & (MapFieldHuman|MapFieldWall);
+    //
+    //  Calculate the correct tile. Depends on the surrounding.
+    //
+    tile = 0;
+    if ((y - 1) < 0 || (TheMap.Fields[x + (y - 1) * TheMap.Width].
+	    Flags & t) == t) {
+	tile |= 1 << 0;
+    }
+    if ((x + 1) >= TheMap.Width || (TheMap.Fields[x + 1 + y * TheMap.Width].
+	    Flags & t) == t) {
+	tile |= 1 << 1;
+    }
+    if ((y + 1) >= TheMap.Height || (TheMap.Fields[x + (y + 1) * TheMap.Width].
+	    Flags & t) == t) {
+	tile |= 1 << 2;
+    }
+    if ((x - 1) < 0 || (TheMap.Fields[x - 1 + y * TheMap.Width].
+	    Flags & t) == t) {
+	tile |= 1 << 3;
+    }
+
+    if( t&MapFieldHuman ) {
+	tile = WallHumanTable[tile];
+	if( mf->Value<=UnitTypeByIdent("unit-human-wall")->_HitPoints/2 ) {
+	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+		++tile;
+	    }
+	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+		++tile;
+	    }
+	}
+    } else {
+	tile = WallOrcTable[tile];
+	if( mf->Value<=UnitTypeByIdent("unit-orc-wall")->_HitPoints/2 ) {
+	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
+		++tile;
+	    }
+	    while( !TheMap.Tileset->Table[tile] ) {	// Skip separator
+		++tile;
+	    }
+	}
+    }
+    tile = TheMap.Tileset->Table[tile];
+
+    if( mf->Tile != tile ) {
+	mf->Tile = tile;
+	UpdateMinimapXY(x, y);
+#ifdef NEW_FOW
+	if (mf->Visible & (1 << ThisPlayer->Player)) {
+#else
+	if (mf->Flags & MapFieldVisible) {
+#endif
+	    UpdateMinimapSeenXY(x, y);
+	    MapMarkSeenTile(x, y);
+	    MarkDrawPosMap(x, y);
+	    MustRedraw |= RedrawMinimap;
+	}
+    }
+}
+
+/**
+**	Correct the surrounding real wall fields.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+local void MapFixWallNeighbors(int x, int y)
+{
+    MapFixWallTile(x + 1, y);		// side neighbors
+    MapFixWallTile(x - 1, y);
+    MapFixWallTile(x, y + 1);
+    MapFixWallTile(x, y - 1);
 }
 
 /**
@@ -164,22 +301,29 @@ global void MapRemoveWall(unsigned x,unsigned y)
     MapField* mf;
 
     mf=TheMap.Fields+x+y*TheMap.Width;
-
-    mf->Tile=mf->Flags&MapFieldHuman
-	    ? TheMap.Tileset->HumanNoWallTile	// see vladi's FIXME
-	    : TheMap.Tileset->OrcNoWallTile;	// see vladi's FIXME
+    // FIXME: support more walls of different races.
+    if( mf->Flags&MapFieldHuman ) {
+	// FIXME: must search the correct tile
+	mf->Tile=TheMap.Tileset->Table[WallHumanTable[0]+4];
+    } else {
+	// FIXME: must search the correct tile
+	mf->Tile=TheMap.Tileset->Table[WallOrcTable[0]+4];
+    }
     mf->Flags &= ~(MapFieldHuman|MapFieldWall|MapFieldUnpassable);
 
     UpdateMinimapXY(x,y);
+    MapFixWallTile(x, y);
+    MapFixWallNeighbors(x, y);
 
 #ifdef NEW_FOW
     if( mf->Visible&(1<<ThisPlayer->Player) ) {
 #else
     if( mf->Flags&MapFieldVisible ) {
 #endif
+	UpdateMinimapSeenXY(x,y);
+	MapMarkSeenTile(x,y);
         MarkDrawPosMap(x,y);
 	MustRedraw|=RedrawMinimap;
-	MapMarkSeenTile(x,y);
     }
 }
 
@@ -195,49 +339,51 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
 
     mf=TheMap.Fields+x+y*TheMap.Width;
 
-    mf->Tile   = humanwall
-			?TheMap.Tileset->HumanWall100Tile
-			:TheMap.Tileset->OrcWall100Tile;
-    mf->Flags |= humanwall?MapFieldHuman:0;
-    mf->Flags |= MapFieldWall|MapFieldUnpassable;
-    // FIXME: Vladi: this HP should be taken from the unit type stats!!!
-    mf->Value = 40;
+    // FIXME: support more walls of different races.
+    if( humanwall ) {
+	mf->Tile=TheMap.Tileset->Table[WallHumanTable[0]];
+	mf->Flags|=MapFieldWall|MapFieldUnpassable|MapFieldHuman;
+	mf->Value=UnitTypeByIdent("unit-human-wall")->_HitPoints;
+    } else {
+	mf->Tile=TheMap.Tileset->Table[WallOrcTable[0]];
+	mf->Flags|=MapFieldWall|MapFieldUnpassable;
+	mf->Value=UnitTypeByIdent("unit-orc-wall")->_HitPoints;
+    }
 
     UpdateMinimapXY(x,y);
-
+    MapFixWallTile(x, y);
+    MapFixWallNeighbors(x, y);
 
 #ifdef NEW_FOW
     if( mf->Visible&(1<<ThisPlayer->Player) ) {
 #else
     if( mf->Flags&MapFieldVisible ) {
 #endif
+	UpdateMinimapSeenXY(x,y);
+	MapMarkSeenTile(x,y);
         MarkDrawPosMap(x,y);
 	MustRedraw|=RedrawMinimap;
-	MapMarkSeenTile(x,y);
     }
 }
 
 /**
 **	Wall is hit with damage.
 **
-**	@param x	Map X position of wall.
-**	@param y	Map Y position of wall.
+**	@param x	Map X tile-position of wall.
+**	@param y	Map Y tile-position of wall.
 **	@param damage	Damage done to wall.
 */
 global void HitWall(unsigned x,unsigned y,unsigned damage)
 {
     unsigned v;
 
-    DebugLevel3("Missile on wall!\n");
     v=TheMap.Fields[x+y*TheMap.Width].Value;
     if( v<damage ) {
 	MapRemoveWall(x,y);
     } else {
 	TheMap.Fields[x+y*TheMap.Width].Value=v-damage;
-	FixWall(x,y);
+	MapFixWallTile(x,y);
     }
-    DebugLevel3("Missile on wall %d!\n"
-	    ,TheMap.Fields[x+y*TheMap.Width].Value);
 }
 
 //@}

@@ -10,7 +10,7 @@
 //
 /**@name map.c		-	The map. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer and Vladi Shabanski
 //
 //	$Id$
 
@@ -42,8 +42,8 @@ global WorldMap TheMap;			/// The current map
 
 global unsigned MapX;			/// Map tile X start on display
 global unsigned MapY;			/// Map tile Y start on display
-global unsigned MapWidth;		/// map width in tiles
-global unsigned MapHeight;		/// map height in tiles
+global unsigned MapWidth;		/// Map width in tiles
+global unsigned MapHeight;		/// Map height in tiles
 
 global int FlagRevealMap;		/// Flag must reveal the map
 
@@ -54,22 +54,23 @@ global int FlagRevealMap;		/// Flag must reveal the map
 /**
 **      Marks seen tile -- used mainly for the Fog Of War
 **
-**	@param x	Map X position.
-**	@param y	Map Y position.
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
 */
 global void MapMarkSeenTile( int x, int y )
 {
-    int t, st; // tile, seentile
+    int tile;
+    int seentile;
     MapField* mf;
 
     mf=TheMap.Fields+x+y*TheMap.Width;
-    t  = mf->Tile;
-    st = mf->SeenTile;
-    if ( st == t ) {			// Nothing changed.
+    //
+    // Nothing changed? Seeing already the correct tile.
+    //
+    if ((tile  = mf->Tile) == (seentile = mf->SeenTile)) {
 	return;
     }
-
-    mf->SeenTile=t;
+    mf->SeenTile=tile;
 
     // FIXME: this is needed, because tileset is loaded after this function
     //		is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
@@ -77,32 +78,41 @@ global void MapMarkSeenTile( int x, int y )
 	return;
     }
 
-    // handle WOODs
+    //
+    //	Handle wood changes. FIXME: check if for growing wood correct?
+    //
+    if ( seentile != TheMap.Tileset->RemovedTree
+	    && tile == TheMap.Tileset->RemovedTree ) {
+	MapFixSeenWoodNeighbors( x, y );
+    } else if ( seentile == TheMap.Tileset->RemovedTree
+	    && tile != TheMap.Tileset->RemovedTree ) {
+	MapFixSeenWoodTile( x, y );
+    } else if ( ForestOnMap( x, y ) ) {
+	MapFixSeenWoodTile( x, y );
+	MapFixSeenWoodNeighbors( x, y );
 
-    if ( st != TheMap.Tileset->RemovedTree
-	    && t == TheMap.Tileset->RemovedTree ) {
-	MapFixWood( x, y );
-    } else if ( st == TheMap.Tileset->RemovedTree
-	    && t != TheMap.Tileset->RemovedTree ) {
-	FixWood( x, y );
-    } else if ( MapWoodChk( x, y ) ) {
-	FixWood( x, y );
-	MapFixWood( x, y );
-    }
+    //
+    //	Handle rock changes.
+    //
+    } else if ( seentile != TheMap.Tileset->RemovedRock
+	    && tile == TheMap.Tileset->RemovedRock ) {
+	MapFixSeenRockNeighbors( x, y );
+    } else if ( seentile == TheMap.Tileset->RemovedRock
+	    && tile != TheMap.Tileset->RemovedRock ) {
+	MapFixSeenRockTile( x, y );
+    } else if ( RockOnMap( x, y ) ) {
+	MapFixSeenRockTile( x, y );
+	MapFixSeenRockNeighbors( x, y );
 
-    // handle WALLs
-
-#define ISTILEWALL(tile) \
-    (TheMap.Tileset->TileTypeTable[(tile)] == TileTypeHumanWall	\
-	|| TheMap.Tileset->TileTypeTable[(tile)] == TileTypeOrcWall)
-
-    if ( ISTILEWALL(st) && !ISTILEWALL(t) )
-	MapFixWall( x, y );
-    else if ( !ISTILEWALL(st) && ISTILEWALL(t) )
-	FixWall( x, y );
-    else if ( MapWallChk( x, y, -1 ) ) {
-	FixWall( x, y );
-	MapFixWall( x, y );
+    //
+    //	Handle Walls changes.
+    //
+    } else if ( TheMap.Tileset->TileTypeTable[tile] == TileTypeHumanWall
+	    || TheMap.Tileset->TileTypeTable[tile] == TileTypeOrcWall
+	    || TheMap.Tileset->TileTypeTable[seentile] == TileTypeHumanWall
+	    || TheMap.Tileset->TileTypeTable[seentile] == TileTypeOrcWall ) {
+	MapFixSeenWallTile( x, y );
+	MapFixSeenWallNeighbors( x, y );
     }
 }
 
@@ -142,8 +152,9 @@ global void RevealMap(void)
 */
 global void MapSetViewpoint(int x,int y)
 {
-    if (x==MapX && y==MapY)
-      return;
+    if (x==MapX && y==MapY) {
+	return;
+    }
 
     if( x<0 ) {
 	MapX=0;
@@ -440,8 +451,12 @@ global void PreprocessMap(void)
     // it is required for fixing the wood that all tiles are marked as seen!
     for ( ix = 0; ix < TheMap.Width; ix++ ) {
 	for ( iy = 0; iy < TheMap.Height; iy++ ) {
-	    FixWood( ix, iy );
-	    FixWall( ix, iy );
+	    MapFixWoodTile( ix, iy );
+	    MapFixSeenWoodTile( ix, iy );
+	    MapFixRockTile( ix, iy );
+	    MapFixSeenRockTile( ix, iy );
+	    MapFixWallTile( ix, iy );
+	    MapFixSeenWallTile( ix, iy );
 	}
     }
 }
