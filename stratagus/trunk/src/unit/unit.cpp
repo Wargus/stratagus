@@ -1263,6 +1263,7 @@ global int UnitVisibleOnMinimap(const Unit* unit)
 			return 0;
 		}
 		return ((unit->Seen.ByPlayer & (1 << ThisPlayer->Player)) && 
+				(unit->Seen.State != 3) &&
 				(!(unit->Seen.Destroyed & (1 << ThisPlayer->Player))) );
 	}
 }

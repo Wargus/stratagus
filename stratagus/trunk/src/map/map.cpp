@@ -127,6 +127,8 @@ global void MapMarkSeenTile(int x, int y)
 		MapFixSeenWallTile(x, y);
 		MapFixSeenWallNeighbors(x, y);
 	}
+
+	UpdateMinimapXY(x, y);
 }
 
 /**
