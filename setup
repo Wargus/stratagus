@@ -737,15 +737,22 @@ echo >> $RULESFILE
 echo "%.o: %.c" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
 echo "	@ar cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
-
 if [ "$DARWIN" = "1" ] ; then
   echo "	ranlib \$(TOPDIR)/src/libclone.a" >> $RULESFILE
 fi
+echo >> $RULESFILE
+
+echo "%.o: %.cpp" >> $RULESFILE
+echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
+echo "	@ar cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
+if [ "$DARWIN" = "1" ] ; then
+  echo "	ranlib \$(TOPDIR)/src/libclone.a" >> $RULESFILE
+fi
+echo >> $RULESFILE
 
 #
 # Source code documentation
 
-echo >> $RULESFILE
 echo "# Source code documentation" >> $RULESFILE
 
 echo "DOXYGEN=	doxygen" >> $RULESFILE
