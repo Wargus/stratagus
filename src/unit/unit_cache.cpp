@@ -976,6 +976,17 @@ global void InitUnitCache(void)
 #include "unit.h"
 #include "map.h"
 
+#define STATISTICS
+
+#ifdef STATISTICS
+struct unit_cache_stats {
+    int Inserts;
+    int Removals;
+    int Selects[16];
+};
+
+static struct unit_cache_stats UnitCacheStats;
+#endif /* STATISTICS */
 
 /**
 **	Insert new unit into cache.
@@ -987,30 +998,33 @@ global void UnitCacheInsert(Unit* unit)
     MapField* mf;
     int x, y;
 
+#ifdef STATISTICS
+    UnitCacheStats.Inserts++;
+#endif
     mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
     for (y=0; y<unit->Type->TileHeight; y++) {
 	for (x=0; x<unit->Type->TileWidth; x++) {
 	    switch (unit->Type->UnitType) {
 	    case UnitTypeLand:
 		if (unit->Type->Building) {
-		    DebugCheck (mf->Building);
+		    DebugCheck (mf->Building != 0xffff);
 		    mf->Building = UnitNumber (unit);
 		} else {
-		    DebugCheck (mf->LandUnit);
+		    DebugCheck (mf->LandUnit != 0xffff);
 		    mf->LandUnit = UnitNumber (unit);
 		}
 		break;
 	    case UnitTypeNaval:
 		if (unit->Type->Building) {
-		    DebugCheck (mf->Building);
+		    DebugCheck (mf->Building != 0xffff);
 		    mf->Building = UnitNumber (unit);
 		} else {
-		    DebugCheck (mf->SeaUnit);
+		    DebugCheck (mf->SeaUnit != 0xffff);
 		    mf->SeaUnit = UnitNumber (unit);
 		}
 		break;
 	    case UnitTypeFly:
-		DebugCheck (mf->AirUnit);
+		DebugCheck (mf->AirUnit != 0xffff);
 		mf->AirUnit = UnitNumber (unit);
 		break;
 	    default:
@@ -1032,6 +1046,9 @@ global void UnitCacheRemove(Unit* unit)
     MapField *mf;
     int x, y;
 
+#ifdef STATISTICS
+    UnitCacheStats.Removals++;
+#endif
     mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
     for (y=0; y < unit->Type->TileHeight; y++) {
 	for (x=0; x < unit->Type->TileWidth; x++) {
@@ -1039,24 +1056,24 @@ global void UnitCacheRemove(Unit* unit)
 	    case UnitTypeLand:
 		if (unit->Type->Building) {
 		    DebugCheck ( !(mf->Building == UnitNumber (unit)));
-		    mf->Building = 0;
+		    mf->Building = 0xffff;
 		} else {
 		    DebugCheck ( !(mf->LandUnit == UnitNumber (unit)));
-		    mf->LandUnit = 0;
+		    mf->LandUnit = 0xffff;
 		}
 		break;
 	    case UnitTypeNaval:
 		if (unit->Type->Building) {
 		    DebugCheck ( !(mf->Building == UnitNumber (unit)));
-		    mf->Building = 0;
+		    mf->Building = 0xffff;
 		} else {
 		    DebugCheck ( !(mf->SeaUnit == UnitNumber (unit)));
-		    mf->SeaUnit = 0;
+		    mf->SeaUnit = 0xffff;
 		}
 		break;
 	    case UnitTypeFly:
 		DebugCheck ( !(mf->AirUnit == UnitNumber (unit)));
-		mf->AirUnit = 0;
+		mf->AirUnit = 0xffff;
 		break;
 	    default:
 		break;
@@ -1093,16 +1110,16 @@ local int CheckLeft (const MapField *mf, int type)
 
     switch (type) {
     case MapFieldBuilding:
-	return (left->Flags&MapFieldBuilding && mf->Building==left->Building);
+	return (BuildingOnMapField (left) && mf->Building==left->Building);
 	break;
     case MapFieldLandUnit:
-	return (left->Flags&MapFieldLandUnit && mf->LandUnit==left->LandUnit);
+	return (LandUnitOnMapField (left) && mf->LandUnit==left->LandUnit);
 	break;
     case MapFieldSeaUnit:
-	return (left->Flags&MapFieldSeaUnit && mf->SeaUnit==left->SeaUnit);
+	return (SeaUnitOnMapField (left) && mf->SeaUnit==left->SeaUnit);
 	break;
     case MapFieldAirUnit:
-	return (left->Flags&MapFieldAirUnit && mf->AirUnit==left->AirUnit);
+	return (AirUnitOnMapField (left) && mf->AirUnit==left->AirUnit);
 	break;
     default:
 	break;
@@ -1125,16 +1142,16 @@ local int CheckUpper (const MapField *mf, int type)
 
     switch (type) {
     case MapFieldBuilding:
-	return (top->Flags&MapFieldBuilding && mf->Building==top->Building);
+	return (BuildingOnMapField (top) && mf->Building==top->Building);
 	break;
     case MapFieldLandUnit:
-	return (top->Flags&MapFieldLandUnit && mf->LandUnit==top->LandUnit);
+	return (LandUnitOnMapField (top) && mf->LandUnit==top->LandUnit);
 	break;
     case MapFieldSeaUnit:
-	return (top->Flags&MapFieldSeaUnit && mf->SeaUnit==top->SeaUnit);
+	return (SeaUnitOnMapField (top) && mf->SeaUnit==top->SeaUnit);
 	break;
     case MapFieldAirUnit:
-	return (top->Flags&MapFieldAirUnit && mf->AirUnit==top->AirUnit);
+	return (AirUnitOnMapField (top) && mf->AirUnit==top->AirUnit);
 	break;
     default:
 	break;
@@ -1217,6 +1234,14 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
     const MapField *mfptr;
 //  int ts0=rdtsc(), ts1;
 
+#ifdef STATISTICS
+    int i, fields_searched=(x2-x1)*(y2-y1);
+    for (i=1; i<=16; i++)
+	if ( (fields_searched >> i) == 0)
+	    break;
+    UnitCacheStats.Selects[i-1]++;
+#endif /* STATISTICS */
+
     if (x1<0) x1=0;
     if (y1<0) y1=0;
     if( x2>TheMap.Width ) {
@@ -1237,19 +1262,19 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 	else
 	    checktype=CHECK_LEFT;
 
-	if (mfptr->Flags & MapFieldBuilding)
+	if (BuildingOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldBuilding, checktype)) {
 		table[n++]=UnitSlots[mfptr->Building];
 	    }
-	if (mfptr->Flags & MapFieldLandUnit)
+	if (LandUnitOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldLandUnit, checktype)) {
 		table[n++]=UnitSlots[mfptr->LandUnit];
 	    }
-	if (mfptr->Flags & MapFieldSeaUnit)
+	if (SeaUnitOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldSeaUnit, checktype)) {
 		table[n++]=UnitSlots[mfptr->SeaUnit];
 	    }
-	if (mfptr->Flags & MapFieldAirUnit)
+	if (AirUnitOnMapField (mfptr))
 	    if (NeighborCheck (mfptr, MapFieldAirUnit, checktype)) {
 		table[n++]=UnitSlots[mfptr->AirUnit];
 	    }
@@ -1265,19 +1290,19 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 	    else
 		checktype=CHECK_BOTH;
 
-	    if (mfptr->Flags & MapFieldBuilding)
+	    if (BuildingOnMapField (mfptr))
 		if (NeighborCheck (mfptr, MapFieldBuilding, checktype)) {
 		    table[n++]=UnitSlots[mfptr->Building];
 		}
-	    if (mfptr->Flags & MapFieldLandUnit)
+	    if (LandUnitOnMapField (mfptr))
 		if (NeighborCheck (mfptr, MapFieldLandUnit, checktype)) {
 		    table[n++]=UnitSlots[mfptr->LandUnit];
 		}
-	    if (mfptr->Flags & MapFieldSeaUnit)
+	    if (SeaUnitOnMapField (mfptr))
 		if (NeighborCheck (mfptr, MapFieldSeaUnit, checktype)) {
 		    table[n++]=UnitSlots[mfptr->SeaUnit];
 		}
-	    if (mfptr->Flags & MapFieldAirUnit)
+	    if (AirUnitOnMapField (mfptr))
 		 if (NeighborCheck (mfptr, MapFieldAirUnit, checktype)) {
 		    table[n++]=UnitSlots[mfptr->AirUnit];
 		}
@@ -1306,7 +1331,24 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 */
 global int UnitCacheOnTile(int x,int y,Unit** table)
 {
+#if 0
     return UnitCacheSelect(x,y,x+1,y+1,table);
+#endif
+
+//  optimized version:
+    int n=0;
+    const MapField *mf = TheMap.Fields + y*TheMap.Width + x;
+
+    if (BuildingOnMapField (mf))
+	table[n++]=UnitSlots[mf->Building];
+    if (LandUnitOnMapField (mf))
+	table[n++]=UnitSlots[mf->LandUnit];
+    if (SeaUnitOnMapField (mf))
+	table[n++]=UnitSlots[mf->SeaUnit];
+    if (AirUnitOnMapField (mf))
+	table[n++]=UnitSlots[mf->AirUnit];
+
+    return n;
 }
 
 /**
@@ -1324,21 +1366,21 @@ global Unit* UnitCacheOnXY(int x,int y,int type)
 
     switch (type) {
     case UnitTypeLand:
-	if (mf->Flags & MapFieldLandUnit) {
+	if (LandUnitOnMapField (mf)) {
 	    return Units[mf->LandUnit];
 	} else {
 	    return NULL;
 	}
 	break;
     case UnitTypeFly:
-	if (mf->Flags & MapFieldAirUnit) {
+	if (AirUnitOnMapField (mf)) {
 	    return Units[mf->AirUnit];
 	} else {
 	    return NULL;
 	}
 	break;
     case UnitTypeNaval:
-	if (mf->Flags & MapFieldSeaUnit) {
+	if (SeaUnitOnMapField (mf)) {
 	    return Units[mf->SeaUnit];
 	} else {
 	    return NULL;
@@ -1351,17 +1393,38 @@ global Unit* UnitCacheOnXY(int x,int y,int type)
 }
 
 /**
-**	Print unit-cache statistic.
+**	Print unit-cache statistics.
 */
-global void UnitCacheStatistic(void)
+global void UnitCacheStatistic (void)
 {
+#ifdef STATISTICS
+    int i;
+
+    printf ("UNITS_ON_MAP Statistics:\n");
+    printf ("  Inserts: %d\n", UnitCacheStats.Inserts);
+    printf ("  Removals: %d\n", UnitCacheStats.Removals);
+    for (i=0; i<16; i++)
+	printf ("  Selects <%d: %d\n", 1 << (i+1), UnitCacheStats.Selects[i]);
+#endif /* STATISTICS */
 }
 
 /**
 **	Initialize unit-cache.
+**
+**	Initializes attributes of all map fields so that they are occupied by
+**	no unit.
 */
 global void InitUnitCache(void)
 {
+    int m;
+
+    for (m=0; m < TheMap.Width * TheMap.Height; m++) {
+	// 0xffff is an invalid UnitRef
+	TheMap.Fields[m].Building = 0xffff;
+	TheMap.Fields[m].AirUnit = 0xffff;
+	TheMap.Fields[m].LandUnit = 0xffff;
+	TheMap.Fields[m].SeaUnit = 0xffff;
+    }
 }
 
 #endif  // UNITS_ON_MAP
