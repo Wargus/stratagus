@@ -1036,11 +1036,15 @@ global void UnitsMarkSeen(int x, int y)
 	    unit->SeenIY = unit->IY;
 	    unit->SeenIX = unit->IX;
 	    unit->SeenFrame = unit->Frame;
-	    unit->SeenType = unit->Type;
 	    unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
 		((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 	    if (unit->Orders[0].Action == UnitActionDie) {
 		unit->SeenState = 3;
+	    }
+	    if (unit->SeenState == 2) {
+		unit->SeenType = unit->Orders[0].Type;
+	    } else {
+		unit->SeenType = unit->Type;
 	    }
 	    unit->SeenConstructed = unit->Constructed;
 	    unit->SeenDestroyed = unit->Destroyed;
@@ -1074,11 +1078,15 @@ global void UnitMarkSeen(Unit* unit)
 			unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
 		}
 		unit->SeenFrame = unit->Frame;
-		unit->SeenType = unit->Type;
 		unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
 		    ((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 		if (unit->Orders[0].Action == UnitActionDie) {
 		    unit->SeenState = 3;
+		}
+		if (unit->SeenState == 2) {
+		    unit->SeenType = unit->Orders[0].Type;
+		} else {
+		    unit->SeenType = unit->Type;
 		}
 		unit->SeenConstructed = unit->Constructed;
 		unit->SeenDestroyed = unit->Destroyed;

@@ -1829,10 +1829,10 @@ global void DrawBuilding(const Unit* unit)
     //
     } else if (state == 2) {
 	// FIXME: this frame is hardcoded!!!
-	GraphicUnitPixels(unit, unit->Orders[0].Type->Sprite);
-	DrawUnitType(unit->Orders[0].Type, frame < 0 ? -1 : 1, x, y);
+	GraphicUnitPixels(unit, type->Sprite);
+	DrawUnitType(type, frame < 0 ? -1 : 1, x, y);
 #ifdef USE_OPENGL
-	DrawUnitPlayerColor(unit->Orders[0].Type, unit->Player->Player,
+	DrawUnitPlayerColor(type, unit->Player->Player,
 	    frame < 0 ? -1 : 1, x, y);
 #endif
     } else {
