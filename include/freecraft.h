@@ -86,7 +86,7 @@
 
 #if __GNUC__==2 && __GNUC_MINOR__==96
 
-#error "GCC 2.96 can't compile FreeCraft, downgrade to GCC 2.95"
+/* #error "GCC 2.96 can't compile FreeCraft, downgrade to GCC 2.95" */
 
 #endif
 
@@ -302,7 +302,7 @@
 #define FREECRAFT_HOME_PATH ".freecraft"/// Data files in user home dir
 #endif
 
-#define MAGIC_FOR_NEW_UNITS	85	/// Magic value, new units start with
+#define MAGIC_FOR_NEW_UNITS	33	/// How many percent of max mana for new units
 #define DEMOLISH_DAMAGE		400	/// Damage for demolish attack
 
 /*----------------------------------------------------------------------------
