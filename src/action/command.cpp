@@ -202,11 +202,19 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 	return;
     }
 
+    if ( !(dest=RepairableOnMapTile(x,y)) ) {
+	// FIXME: don't work for automatic repairs.
+	command->Action=UnitActionStill;
+        return;
+    }
+
     command->Action=UnitActionRepair;
     command->Data.Move.Fast=1;
-    command->Data.Move.Goal=RepairableOnMapTile(x,y);
+    command->Data.Move.Goal=dest;
 #ifdef NEW_UNIT
-    command->Data.Move.Goal->Refs++;
+    if( dest ) {
+	dest->Refs++;
+    }
 #endif
     command->Data.Move.Range=REPAIR_RANGE;
     command->Data.Move.SX=unit->X;
