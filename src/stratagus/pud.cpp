@@ -1328,13 +1328,13 @@ local void PudWriteMTXM(gzFile f,WorldMap* map)
 {
     int i;
     int n;
-    unsigned short* mtxm;
+    unsigned char* mtxm;
     Tileset* tileset;
 
     tileset=map->Tileset;
     n=map->Width*map->Height;
     PudWriteHeader(f,"MTXM",n*2);
-    mtxm=alloca(n*sizeof(unsigned short));
+    mtxm=alloca(n*2);
 
     for( i=0; i<n; ++i ) {
 	int tile;
@@ -1347,10 +1347,111 @@ local void PudWriteMTXM(gzFile f,WorldMap* map)
 		break;
 	    }
 	}
-	mtxm[i]=j;
+	mtxm[i*2+0]=j >> 0;
+	mtxm[i*2+1]=j >> 8;
     }
 
     gzwrite(f,mtxm,n*2);
+}
+
+/**
+**	Save the SQM section
+**
+**	@param f	File handle
+**	@param map	Map to save.
+*/
+local void PudWriteSQM(gzFile f,WorldMap* map)
+{
+    int i;
+    int n;
+    unsigned char* sqm;
+
+    n=map->Width*map->Height;
+    PudWriteHeader(f,"SQM ",n*2);
+    sqm=alloca(n*2);
+
+    for( i=0; i<n; ++i ) {
+	int v;
+	int f;
+
+	f=map->Fields[i].Flags;
+	v=0;
+	if( f&MapFieldLandAllowed ) {
+	    v|=MapMoveOnlyLand;
+	}
+	if( f&MapFieldCoastAllowed ) {
+	    v|=MapMoveCoast;
+	}
+	if( (f&(MapFieldWall|MapMoveHuman))==MapFieldWall ) {
+	    v|=MapMoveWallO;
+	}
+	if( (f&(MapFieldWall|MapMoveHuman))==(MapFieldWall|MapMoveHuman) ) {
+	    v|=MapMoveWallH;
+	}
+	if( f&MapFieldNoBuilding ) {
+	    v|=MapMoveDirt;
+	}
+	if( f&MapFieldWaterAllowed) {
+	    v|=MapMoveOnlyWater ;
+	}
+	if( f&MapFieldUnpassable ) {
+	    v|=MapMoveUnpassable;
+	}
+	if( f&MapFieldLandUnit ) {
+	    v|=MapMoveLandUnit;
+	}
+	if( f&MapFieldAirUnit ) {
+	    v|=MapMoveAirUnit;
+	}
+	if( f&MapFieldSeaUnit ) {
+	    v|=MapMoveSeaUnit;
+	}
+	if( f&MapFieldBuilding ) {
+	    v|=MapMoveBuildingUnit;
+	}
+	sqm[i*2+0]=v >> 0;
+	sqm[i*2+1]=v >> 8;
+    }
+    gzwrite(f,sqm,n*2);
+}
+ 
+/**
+**	Save the REGM section
+**
+**	@param f	File handle
+**	@param map	Map to save.
+*/
+local void PudWriteREGM(gzFile f,WorldMap* map)
+{
+    int i;
+    int n;
+    unsigned char* regm;
+
+    n=map->Width*map->Height;
+    PudWriteHeader(f,"REGM",n*2);
+    regm=alloca(n*2);
+    for( i=0; i<n; ++i ) {
+	int v;
+	int f;
+
+	f=map->Fields[i].Flags;
+	v=-1;
+	if( f&MapFieldForest ) {
+	    v=MapActionForest;
+	} else if( f&MapFieldRocks ) {
+	    v=MapActionRocks;
+	} else if( f&MapFieldWall ) {
+	    v=MapActionWall;
+	} else if( f&0 ) {		// FIXME: not supported
+	    v=MapActionIsland;
+	} else if( f&MapFieldWaterAllowed ) {
+	    v=MapActionWater;
+	} else if( f&MapFieldLandAllowed ) {
+	    v=MapActionLand;
+	}
+    }
+
+    gzwrite(f,regm,n*2);
 }
 
 /**
@@ -1410,19 +1511,25 @@ global void SavePud(const char* pud,WorldMap* map)
     buf[3]=map->Height >> 8;
     gzwrite(f,buf,4);
 
-#if 0
     PudWriteHeader(f,"UDTA",5950);
+    buf[0]=1;
+    buf[1]=0;
+    memset(buf+2,0,5950-2);
+    // FIXME:
     gzwrite(f,buf,5950);
-    // FIXME:
 
+#if 0
     PudWriteHeader(f,"ALOW",384);
-    gzwrite(f,buf,384);
     // FIXME:
+    gzwrite(f,buf,384);
+#endif
 
     PudWriteHeader(f,"UGRD",782);
-    gzwrite(f,buf,782);
+    buf[0]=1;
+    buf[1]=0;
+    memset(buf+2,0,782-2);
     // FIXME:
-#endif
+    gzwrite(f,buf,782);
 
     PudWriteHeader(f,"SIDE",16);
     for( i=0; i<16; ++i ) {
@@ -1458,31 +1565,22 @@ global void SavePud(const char* pud,WorldMap* map)
     gzwrite(f,buf,16);
 
     PudWriteMTXM(f,map);
-
-#if 0
-    PudWriteHeader(f,"SQM ",map->Width*map->Height*2);
-    gzwrite(f,buf,map->Width*map->Height*2);
-    // FIXME:
- 
+    PudWriteSQM(f,map);
 #if 0
     PudWriteHeader(f,"OILM",map->Width*map->Height*1);
     gzwrite(f,buf,map->Width*map->Height*1);
     // FIXME:
 #endif
-
-    PudWriteHeader(f,"REGM",map->Width*map->Height*2);
-    gzwrite(f,buf,map->Width*map->Height*2);
-    // FIXME:
-#endif
+    PudWriteREGM(f,map);
 
     PudWriteHeader(f,"UNIT",8*NumUnits);
     for( i=0; i<NumUnits; ++i ) {
 	int j;
 
-	buf[i*8+0]=Units[i]->X >> 0;
-	buf[i*8+1]=Units[i]->X >> 8;
-	buf[i*8+2]=Units[i]->Y >> 0;
-	buf[i*8+3]=Units[i]->Y >> 8;
+	buf[0]=Units[i]->X >> 0;
+	buf[1]=Units[i]->X >> 8;
+	buf[2]=Units[i]->Y >> 0;
+	buf[3]=Units[i]->Y >> 8;
 
 	// Convert our name to pud number
 	for( j=0; UnitTypeWcNames[j]; ++j ) {
@@ -1490,19 +1588,19 @@ global void SavePud(const char* pud,WorldMap* map)
 		break;
 	    }
 	}
-	buf[i*8+4]=j;
-	buf[i*8+5]=Units[i]->Player->Player;
+	buf[4]=j;
+	buf[5]=Units[i]->Player->Player;
 	if( Units[i]->Type->GoldMine
 		|| Units[i]->Type->OilPatch
 		|| Units[i]->Type->GivesOil ) {
-	    buf[i*8+6]=(Units[i]->Value/2500) >> 0;
-	    buf[i*8+7]=(Units[i]->Value/2500) >> 8;
+	    buf[6]=(Units[i]->Value/2500) >> 0;
+	    buf[7]=(Units[i]->Value/2500) >> 8;
 	} else {
-	    buf[i*8+6]=!Units[i]->Active;
-	    buf[i*8+7]=0;
+	    buf[6]=!Units[i]->Active;
+	    buf[7]=0;
 	}
+	gzwrite(f,buf,8);
     }
-    gzwrite(f,buf,8*NumUnits);
 
     gzclose(f);
 }
