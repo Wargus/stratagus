@@ -204,8 +204,8 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		    case 0:		// Unexplored
 		    case 1:		// Unseen
 			if( player==ThisPlayer ||
-			    ( (ThisPlayer->SharedVision&(1<<player)) &&
-			      (Players[player]->SharedVision&(1<<ThisPlayer->Player)) ) ) {
+			    ( (ThisPlayer->SharedVision&(1<<p)) &&
+			      (player->SharedVision&(1<<ThisPlayer->Player)) ) ) {
 			    MapMarkSeenTile(i,y);
 			}
 			// FIXME: mark for screen update
