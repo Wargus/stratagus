@@ -507,8 +507,10 @@ local void HandleMouseOn(int x, int y)
 	    return;
 	}
     } else {
-	for (i = NumSelected - 1; i >= 0; --i) {
-	    if (x >= TheUI.SelectedButtons[i].X &&
+	    i = NumSelected > TheUI.NumSelectedButtons ? 
+		TheUI.NumSelectedButtons - 1 : NumSelected - 1;
+	    for (; i >= 0; --i) {
+		if (x >= TheUI.SelectedButtons[i].X &&
 		    x < TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Width + 7 &&
 		    y >= TheUI.SelectedButtons[i].Y &&
 		    y < TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Height + 7) {
