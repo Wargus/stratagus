@@ -367,6 +367,14 @@ global void CreateGame(char* filename, WorldMap* map)
     PfHierInitialize ();
 #endif /* HIERARCHIC_PATHFINDER */
 
+    //
+    //	FIXME: The palette is loaded after the units are created.
+    //	FIXME: This loops fixes the colors of the units.
+    //
+    for( i=0; i<NumUnits; ++i ) {
+	Units[i]->Colors=Units[i]->Player->UnitColors;
+    }
+
     GameResult=GameNoResult;
 }
 
