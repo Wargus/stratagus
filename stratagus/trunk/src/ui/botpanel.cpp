@@ -964,8 +964,7 @@ global void DoButtonButtonClicked(int button)
 	case ButtonCancelBuild:
 	    // FIXME: johns is this not sure, only building should have this?
 	    if (NumSelected == 1 && Selected[0]->Type->Building) {
-		SendCommandCancelBuilding(Selected[0],
-		    Selected[0]->Data.Builded.Worker);
+		SendCommandDismiss(Selected[0]);
 	    }
 	    ClearStatusLine();
 	    ClearCosts();

@@ -46,6 +46,7 @@
 #include "map.h"
 #include "ui.h"
 #include "commands.h"
+#include "network.h"
 
 #include "ccl.h"
 
@@ -104,7 +105,7 @@ local void HandleSuicideClick(Unit* unit)
 
     // FIXME: make this configurable
     if (unit->Value == unit->Type->ClicksToExplode) {
-	LetUnitDie(unit);
+	SendCommandDismiss(unit);
 	unit->Value = 0;
     }
 }
