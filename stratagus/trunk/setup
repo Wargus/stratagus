@@ -61,7 +61,7 @@ LOCAL_ZLIB="zlib-1.1.3"
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build12\""
+VERSION="-DVERSION=\"1.17pre1-build13\""
 UNIX=0
 BEOS=0
 WIN32=0
