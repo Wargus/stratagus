@@ -38,10 +38,13 @@ extern int CommandLogDisabled;		/// True, if command log is off
 --	Functions
 ----------------------------------------------------------------------------*/
 
+    /// Log commands into file
+global void CommandLog(const char*,const Unit*,int,unsigned,unsigned,
+		       const Unit*,const char*,int);
     /// Replay user commands from log each cycle
 extern void ReplayEachCycle(void);
     /// Load replay
-extern int LoadReplay(char* name);
+extern int LoadReplay(char*);
     /// End logging
 extern void EndReplayLog(void);
 

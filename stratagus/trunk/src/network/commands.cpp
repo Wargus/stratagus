@@ -87,7 +87,7 @@ local int NextLogCycle;			/// Next log cycle number
 **	@param value	optional command argument (unit-type,...).
 **	@param num	optional number argument
 */
-local void CommandLog(const char* name,const Unit* unit,int flag,
+global void CommandLog(const char* name,const Unit* unit,int flag,
 	unsigned x,unsigned y,const Unit* dest,const char* value,int num)
 {
     if( CommandLogDisabled ) {		// No log wanted
@@ -181,7 +181,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     //	Value given.
     //
     if( value ) {
-	fprintf(LogFile," 'value '%s",value);
+	fprintf(LogFile," 'value \"%s\"",value);
     }
     //
     //	Number given.
@@ -339,6 +339,7 @@ global int LoadReplay(char* name)
 */
 global void EndReplayLog(void)
 {
+    ReplayLog=NIL;
     if( LogFile ) {
 	fclose(LogFile);
 	LogFile=NULL;
@@ -491,6 +492,12 @@ local void DoNextReplay(void)
 	    state=-1;
 	}
 	SendCommandDiplomacy(posx,state,posy);
+    } else if( !strcmp(name,"input") ) {
+	if (val[0]=='(') {
+	    CclCommand(val);
+	} else {
+	    HandleCheats(val);
+	}
     } else {
 	DebugLevel0Fn("Invalid name: %s" _C_ name);
     }

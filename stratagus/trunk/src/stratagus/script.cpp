@@ -405,7 +405,7 @@ local SCM CclDefineMap(SCM width,SCM height)
 **
 **	@param command	Zero terminated command string.
 */
-global void CclCommand(char* command)
+global void CclCommand(const char* command)
 {
     char msg[80];
     int retval;
