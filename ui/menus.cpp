@@ -4195,8 +4195,6 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 	    menu->Items[12].d.pulldown.curopt = 0;
 	}
     }
-    // Initials to Number of Tilesets + 1 for default option.
-    menu->Items[14].d.pulldown.noptions = NumTilesets + 1;
 }
 
 /**
@@ -7142,9 +7140,9 @@ local void InitPlayerRaces(Menuitem *mi)
     ++n;
     //  Reallocate pulldown options.
     if (mi->d.pulldown.options) {
-	free (mi->d.pulldown.options);
+	free(mi->d.pulldown.options);
     }
-    mi->d.pulldown.options = (unsigned char **)malloc(n * sizeof(unsigned char *));
+    mi->d.pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
     for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
 	if (PlayerRaces.Visible[i]) {
 	    mi->d.pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
@@ -7153,6 +7151,31 @@ local void InitPlayerRaces(Menuitem *mi)
     mi->d.pulldown.options[n++] = strdup("Map Default");
     mi->d.pulldown.noptions = n;
     mi->d.pulldown.defopt = n - 1;
+}
+
+/**
+**	Initialize tilesets for a menu item
+*/
+local void InitTilesets(Menuitem *mi, int mapdefault)
+{
+    int i;
+    int n;
+
+    //  Reallocate pulldown options.
+    if (mi->d.pulldown.options) {
+	free(mi->d.pulldown.options);
+    }
+    n = NumTilesets + (mapdefault ? 1 : 0);
+    mi->d.pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
+    n = 0;
+    if (mapdefault) {
+	mi->d.pulldown.options[n++] = strdup("Map Default");
+    }
+    for (i = 0; i < NumTilesets; ++i) {
+	mi->d.pulldown.options[n++] = strdup(Tilesets[i]->Name);
+    }
+    mi->d.pulldown.noptions = n;
+    mi->d.pulldown.defopt = 0;
 }
 
 /**
@@ -7166,10 +7189,17 @@ global void InitMenuData(void)
 
     menu = FindMenu("menu-custom-game");
     InitPlayerRaces(&menu->Items[6]);
+    InitTilesets(&menu->Items[14], 1);
     menu = FindMenu("menu-multi-setup");
     InitPlayerRaces(&menu->Items[21]);
+    InitTilesets(&menu->Items[29], 1);
     menu = FindMenu("menu-net-multi-client");
     InitPlayerRaces(&menu->Items[21]);
+    InitTilesets(&menu->Items[29], 1);
+    menu = FindMenu("menu-editor-new");
+    InitTilesets(&menu->Items[7], 0);
+    menu = FindMenu("menu-editor-map-properties");
+    InitTilesets(&menu->Items[6], 0);
 }
 
 /**
