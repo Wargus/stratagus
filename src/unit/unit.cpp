@@ -84,6 +84,10 @@ global char EnableTrainingQueue;	/// Config: training queues enabled
 global char EnableBuildingCapture;	/// Config: capture buildings enabled
 global char RevealAttacker;		/// Config: reveal attacker enabled
 
+local unsigned long HelpMeLastCycle;	/// Last cycle HelpMe sound played
+local int HelpMeLastX;			/// Last X coordinate HelpMe sound played
+local int HelpMeLastY;			/// Last Y coordinate HelpMe sound played
+
 /*----------------------------------------------------------------------------
   --	Functions
   ----------------------------------------------------------------------------*/
@@ -2951,22 +2955,22 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
     if (!target->Attacked) {
 	// NOTE: perhaps this should also be moved into the notify?
 	if (target->Player == ThisPlayer) {
-	    // FIXME: Problem with load+save and restart.
-	    static unsigned long LastCycle;
-	    static int LastX;
-	    static int LastY;
+	    // FIXME: Problem with load+save.
 
 	    //
 	    //	One help cry each 2 second is enough
 	    //	If on same area ignore it for 2 minutes.
 	    //
-	    if (LastCycle < GameCycle) {
-		if (LastCycle + CYCLES_PER_SECOND * 120 < GameCycle ||
-			target->X < LastX - 14 || target->X > LastX + 14 ||
-			target->Y < LastY - 14 || target->Y > LastY + 14) {
-		    LastCycle = GameCycle + CYCLES_PER_SECOND * 2;
-		    LastX = target->X;
-		    LastY = target->Y;
+	    if (HelpMeLastCycle < GameCycle) {
+		if (!HelpMeLastCycle ||
+			HelpMeLastCycle + CYCLES_PER_SECOND * 120 < GameCycle ||
+			target->X < HelpMeLastX - 14 ||
+			target->X > HelpMeLastX + 14 ||
+			target->Y < HelpMeLastY - 14 ||
+			target->Y > HelpMeLastY + 14) {
+		    HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
+		    HelpMeLastX = target->X;
+		    HelpMeLastY = target->Y;
 		    PlayUnitSound(target, VoiceHelpMe);
 		}
 	    }
@@ -3835,6 +3839,7 @@ global void CleanUnits(void)
 
     XpDamage = 0;
     FancyBuildings = 0;
+    HelpMeLastCycle = 0;
 }
 
 //@}
