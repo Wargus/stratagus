@@ -43,19 +43,10 @@
 #include <string.h>
 
 #include "stratagus.h"
-
-#ifdef UNIT_ON_MAP
-
-/*----------------------------------------------------------------------------
---		Includes
-----------------------------------------------------------------------------*/
-
 #include "unit.h"
 #include "map.h"
 
-//*****************************************************************************
-//		Convert calls to internal
-//****************************************************************************/
+#ifdef UNIT_ON_MAP
 
 /**
 **		Insert new unit into cache.
@@ -236,3 +227,220 @@ global void InitUnitCache(void)
 }
 
 #endif		// } UNIT_ON_MAP
+
+#ifdef NEW_UNIT_CACHE
+
+/**
+**		Insert new unit into cache.
+**
+**		@param unit		Unit pointer to place in cache.
+*/
+global void UnitCacheInsert(Unit* unit)
+{
+	int i;
+	int j;
+	MapField* mf;
+	UnitListItem* listitem;
+
+	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
+	for (i = 0; i < unit->Type->TileHeight; ++i) {
+		for (j = 0; j < unit->Type->TileWidth; ++j) {
+			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
+			listitem = unit->CacheLinks + i * unit->Type->TileWidth + j;
+
+			//	Always add at the start of the list.
+			listitem->Next = mf->UnitCache;
+			listitem->Prev = 0;
+			//  update Prev link if cache on tile is no empty
+			if (mf->UnitCache) {
+				mf->UnitCache->Prev = listitem;
+			}
+			mf->UnitCache = listitem;
+		}
+	}
+}
+
+/**
+**		Remove unit from cache.
+**
+**		@param unit		Unit pointer to remove from cache.
+*/
+global void UnitCacheRemove(Unit* unit)
+{
+	int i;
+	int j;
+	MapField* mf;
+	UnitListItem* listitem;
+
+	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
+	for (i = 0; i < unit->Type->TileHeight; ++i) {
+		for (j = 0; j < unit->Type->TileWidth; ++j) {
+			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
+			listitem = unit->CacheLinks + i * unit->Type->TileWidth + j;
+
+			if (listitem->Next) {
+				listitem->Next->Prev = listitem->Prev;
+			}
+			if (listitem->Prev) {
+				listitem->Prev->Next = listitem->Next;
+			} else {
+				if (mf->UnitCache != listitem) {
+					DebugLevel0Fn("Try to remove unit not in cache. It's ok, mostly.\n");
+				}
+				// item is head of the list.
+				mf->UnitCache = listitem->Next;
+				DebugCheck(mf->UnitCache && mf->UnitCache->Prev);
+			}
+
+			listitem->Next = listitem->Prev = 0;
+		}
+	}
+}
+
+/**
+**		Change unit in cache.
+**		FIXME: optimize, add destination to parameters
+**
+**		@param unit		Unit pointer to change in cache.
+*/
+global void UnitCacheChange(Unit* unit)
+{
+	UnitCacheRemove(unit);
+	UnitCacheInsert(unit);
+}
+
+/**
+**		Select units in rectangle range.
+**
+**		@param x1		Left column of selection rectangle
+**		@param y1		Top row of selection rectangle
+**		@param x2		Right column of selection rectangle
+**		@param y2		Bottom row of selection rectangle
+**		@param table	All units in the selection rectangle
+**
+**		@return				Returns the number of units found
+*/
+global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
+{
+	int i;
+	int j;
+	int n;
+	UnitListItem* listitem;
+
+	//
+	//		Reduce to map limits. FIXME: should the caller check?
+	//
+	if (x1 < 0) {
+		x1 = 0;
+	}
+	if (y1 < 0) {
+		y1 = 0;
+	}
+	if (x2 > TheMap.Width) {
+		x2 = TheMap.Width;
+	}
+	if (y2 > TheMap.Height) {
+		y2 = TheMap.Height;
+	}
+	DebugLevel3Fn("%d,%d %d,%d\n" _C_ x1 _C_ y1 _C_ x2 _C_ y2);
+
+	n = 0;
+	for (i = y1; i < y2; ++i) {
+		for (j = x1; j < x2; ++j) {
+			listitem = TheMap.Fields[i * TheMap.Width + j].UnitCache;
+			for (; listitem; listitem = listitem->Next) {
+				//
+				//	To avoid getting an unit in multiple times we use a cache lock.
+				//	It should only be used in here, unless you somehow want the unit
+				//	to be out of cache.
+				//
+				if (!listitem->Unit->CacheLock) {
+					listitem->Unit->CacheLock = 1;
+					table[n++] = listitem->Unit;
+				}
+			}
+		}
+	}
+
+	//
+	//	Clean the cache locks, restore to original situation.
+	//
+	for (i = 0; i < n; ++i) {
+		table[i]->CacheLock = 0;
+	}
+
+	return n;
+}
+
+/**
+**		Select units on map tile.
+**
+**		@param x		Map X tile position
+**		@param y		Map Y tile position
+**		@param table		All units in the selection rectangle
+**
+**		@return				Returns the number of units found
+*/
+global int UnitCacheOnTile(int x, int y, Unit** table)
+{
+	UnitListItem* listitem;
+	int n;
+
+	//
+	//	Unlike in UnitCacheSelect, there's no way an unit can show up twice,
+	//	so there is no need for Cache Locks.
+	//
+	n = 0;
+	listitem = TheMap.Fields[y * TheMap.Width + x].UnitCache;
+	for (; listitem; listitem = listitem->Next) {
+		if (!listitem->Unit->CacheLock) {
+			table[n++] = listitem->Unit;
+		}
+	}
+
+	return n;
+}
+
+/**
+**		Select unit on X,Y of type naval,fly,land.
+**
+**		@param x		Map X tile position.
+**		@param y		Map Y tile position.
+**		@param type		UnitType::UnitType, naval,fly,land.
+**
+**		@return				Unit, if an unit of correct type is on the field.
+*/
+global Unit* UnitCacheOnXY(int x, int y, unsigned type)
+{
+	Unit* table[UnitMax];
+	int n;
+
+	n = UnitCacheOnTile(x, y, table);
+	while (n--) {
+		if ((unsigned)table[n]->Type->UnitType == type) {
+			break;
+		}
+	}
+	if (n > -1) {
+		return table[n];
+	} else {
+		return NoUnitP;
+	}
+}
+
+/**
+**		Print unit-cache statistic.
+*/
+global void UnitCacheStatistic(void)
+{
+	// FIXME: stats about query sizes.. you can get the rest by profiling.
+}
+
+/**
+**		Initialize unit-cache.
+*/
+global void InitUnitCache(void)
+{
+}
+
+#endif 		// } NEW_UNIT_CACHE

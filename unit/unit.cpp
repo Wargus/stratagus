@@ -280,6 +280,12 @@ local Unit *AllocUnit(void)
 */
 global void InitUnit(Unit* unit, UnitType* type)
 {
+#ifdef NEW_UNIT_CACHE
+	int i;
+#endif
+
+	DebugCheck(!type);
+
 	// Refs need to be *increased* by 1, not *set* to 1, because if InitUnit()
 	// is called from game loading code, Refs can already have a nonzero
 	// value (thanks to forward references in the save file).  Incrementing
@@ -300,6 +306,14 @@ global void InitUnit(Unit* unit, UnitType* type)
 	//  Initialise unit structure (must be zero filled!)
 	//
 	unit->Type = type;
+#ifdef NEW_UNIT_CACHE
+	unit->CacheLinks = (UnitListItem *)malloc(type->TileWidth * type->TileHeight * sizeof(UnitListItem));
+	for (i = 0; i < type->TileWidth * type->TileHeight; ++i) {
+		unit->CacheLinks[i].Prev = unit->CacheLinks[i].Next = 0;
+		unit->CacheLinks[i].Unit = unit;
+	}
+#endif
+
 	unit->Seen.Frame = UnitNotSeen;				// Unit isn't yet seen
 
 	unit->Frame = unit->Type->Animations->Still[0].Frame +
@@ -2843,6 +2857,8 @@ global void LetUnitDie(Unit* unit)
 
 		if (type->CorpseType) {
 			unit->State = unit->Type->CorpseScript;
+			DebugCheck(type->TileWidth != type->CorpseType->TileWidth ||
+					type->TileHeight != type->CorpseType->TileHeight);
 			type = unit->Type = type->CorpseType;
 
 			unit->IX = (type->Width - VideoGraphicWidth(type->Sprite)) / 2;

@@ -80,6 +80,9 @@ global void HandleActionDie(Unit* unit)
 		MapUnmarkUnitSight(unit);
 
 		unit->State = unit->Type->CorpseScript;
+
+		DebugCheck(unit->Type->TileWidth != unit->Type->CorpseType->TileWidth ||
+				unit->Type->TileHeight != unit->Type->CorpseType->TileHeight);
 		unit->Type = unit->Type->CorpseType;
 
 		CommandStopUnit(unit);			// This clears all order queues
