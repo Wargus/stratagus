@@ -438,12 +438,14 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 		RefsDebugCheck( !attack->Refs );
 		attack->Refs++;
 		order->RangeX=order->RangeY=unit->Stats->AttackRange;
+		order->MinRange=unit->Type->MinAttackRange;
 	    }
 	} else if( WallOnMap(x,y) ) {
 	    // FIXME: look into action_attack.c about this ugly problem
 	    order->X=x;
 	    order->Y=y;
 	    order->RangeX=order->RangeY=unit->Stats->AttackRange;
+	    order->MinRange=unit->Type->MinAttackRange;
 	    order->Goal=NoUnitP;
 	} else {
 	    order->X=x;
@@ -493,6 +495,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 	order->X=x;
 	order->Y=y;
 	order->RangeX=order->RangeY=unit->Stats->AttackRange;
+	order->MinRange=unit->Type->MinAttackRange;
 	order->Goal=NoUnitP;
 	order->Type=NULL;
 	order->Arg1=NULL;

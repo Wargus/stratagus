@@ -517,9 +517,7 @@ global void CreateGame(char* filename, WorldMap* map)
     //	Various hacks wich must be done after the map is loaded.
     //
     //FIXME: must be done after map is loaded
-    if(AStarOn) {
-	InitAStar();
-    }
+    InitAStar();
 #ifdef HIERARCHIC_PATHFINDER
     PfHierInitialize();
 #endif // HIERARCHIC_PATHFINDER

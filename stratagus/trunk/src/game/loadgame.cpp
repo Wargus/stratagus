@@ -108,9 +108,7 @@ global void CleanModules(void)
 #ifdef HIERARCHIC_PATHFINDER
     PfHierClean ();
 #endif
-    if (AStarOn) {
-        FreeAStar();
-    }
+    FreeAStar();
 
     //
     //	Free our protected objects, AI scripts, unit-type properties.
