@@ -69,6 +69,7 @@
 #include "network.h"
 #include "cdaudio.h"
 #include "spells.h"
+#include "actions.h"
 
 
 /*----------------------------------------------------------------------------
@@ -252,21 +253,24 @@ local int CclSaveGame(lua_State* l)
 		value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "SaveFile")) {
-			value = LuaToString(l, -1);
-			strcpy(CurrentMapPath, value);
+			strcpy(CurrentMapPath, LuaToString(l, -1));
 			// If .pud, we don't need to load anything from it
-			if (!strcasestr(value, ".pud")) {
-				LibraryFileName(value, buf);
+			if (!strcasestr(LuaToString(l, -1), ".pud")) {
+				LibraryFileName(LuaToString(l, -1), buf);
 				if (LuaLoadFile(buf) == -1) {
 					DebugLevel0Fn("Load failed: %s" _C_ value);
 				}
 			}
-			lua_pop(l, 1);
+		} else if (!strcmp(value, "SyncHash")) {
+			SyncHash = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "SyncRandSeed")) {
+			SyncRandSeed = LuaToNumber(l, -1);
 		} else {
 			lua_pushfstring(l, "Unsupported tag: %s", value);
 			lua_error(l);
 			DebugCheck(1);
 		}
+		lua_pop(l, 1);
 	}
 
 	return 0;
