@@ -200,8 +200,7 @@ local SCM CclIfUnit(SCM player,SCM operation,SCM quantity,SCM unit)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-unit: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-unit", operation);
     }
 
     if( plynr==-1 ) {
@@ -275,8 +274,7 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-near-unit: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-near-unit", operation);
     }
 
     //
@@ -363,8 +361,7 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-rescued-near-unit: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-rescued-near-unit", operation);
     }
 
     //
@@ -447,8 +444,7 @@ local SCM CclIfOpponents(SCM player,SCM operation,SCM quantity)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-opponents: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-opponents", operation);
     }
 
     if( plynr==-1 ) {
@@ -500,8 +496,7 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-resource: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-resource", operation);
     }
 
     if( plynr==-1 ) {
@@ -593,8 +588,7 @@ local SCM CclIfKills(SCM player,SCM operation,SCM quantity)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-kills: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-kills", operation);
     }
 
     if( plynr==-1 ) {
@@ -631,8 +625,7 @@ local SCM CclIfScore(SCM player,SCM operation,SCM quantity)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-score: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-score", operation);
     }
 
     if( plynr==-1 ) {
@@ -665,8 +658,7 @@ local SCM CclIfElapsed(SCM operation,SCM quantity)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-elapsed: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-elapsed", operation);
     }
 
     if( Compare(GameCycle,q) ) {
@@ -694,8 +686,7 @@ local SCM CclIfTimer(SCM operation,SCM quantity)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-timer: %s\n",op);
-	Exit(1);
+	errl("Illegal comparison operation in if-timer", operation);
     }
 
     if( Compare(GameTimer.Cycles/CYCLES_PER_SECOND,q) ) {
