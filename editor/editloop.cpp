@@ -1211,7 +1211,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	case 's':			// ALT s F11 save pud menu
 	case 'S':
 	case KeyCodeF11:
-	    if (EditorSave() != -1) {
+	    if (EditorSaveMenu() != -1) {
 		SetStatusLine("Pud saved");
 	    }
 	    InterfaceState = IfaceStateNormal;
