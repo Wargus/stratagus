@@ -283,16 +283,6 @@ extern int HoldClickDelay;
 ----------------------------------------------------------------------------*/
 
 //
-// in console.c
-//
-	/// Console clear
-extern void ConsoleClear(void);
-	/// Console printf
-extern void ConsolePrintf(const char*, ...);
-	/// Redraw the console
-extern void DrawConsole(void);
-
-//
 // in botpanel.c
 //
 	/// Generate all buttons

@@ -26,7 +26,7 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/ui
-MSRC =   botpanel.c button_checks.c script_ui.c console.c icons.c interface.c \
+MSRC =   botpanel.c button_checks.c script_ui.c icons.c interface.c \
          mainscr.c menu_proc.c menus.c mouse.c ui.c
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

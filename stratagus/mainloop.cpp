@@ -493,7 +493,6 @@ local void DrawMapViewport(Viewport* vp)
 				ShowOrder(Selected[i]);
 			}
 		}
-		DrawConsole();
 		SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
 	}
 
