@@ -60,25 +60,45 @@ local int AiMakeUnit(UnitType* type);
 **	@param costs	Costs for something.
 **
 **	@return		A bit field of the missing costs.
-**
-**	@bug		AiPlayer->Used isn't used yet, this should store
-**			already allocated resources, fe. for buildings, while
-**			the builder is on the way.
 */
 local int AiCheckCosts(const int* costs)
 {
     int i;
+    int j;
+    int k;
     int err;
     const int* resources;
     const int* reserve;
-    const int* used;
+    int* used;
+    int nunits;
+    Unit** units;
+    const int* building_costs;
+
+
+    used=AiPlayer->Used;
+    for( j=1; j<MaxCosts; ++j ) {
+	used[j]=0;
+    }
+
+    nunits=AiPlayer->Player->TotalNumUnits;
+    units=AiPlayer->Player->Units;
+    for( i=0; i<nunits; ++i ) {
+	for( k=0; k<units[i]->OrderCount; ++k ) {
+	    if( units[i]->Orders[k].Action==UnitActionBuild ) {
+		building_costs=units[i]->Orders[k].Type->Stats[AiPlayer->Player->Player].Costs;
+		for( j=1; j<MaxCosts; ++j ) {
+		    used[j]+=building_costs[j];
+		}
+	    }
+	}
+    }
+
 
     err=0;
     resources=AiPlayer->Player->Resources;
     reserve=AiPlayer->Reserve;
-    used=AiPlayer->Used;
     for( i=1; i<MaxCosts; ++i ) {
-	if( resources[i]<costs[i]-reserve[i]-used[i] ) {
+	if( resources[i]-used[i]<costs[i]-reserve[i] ) {
 	    err|=1<<i;
 	}
     }
@@ -632,9 +652,12 @@ local void AiCheckingWork(void)
 	    AiPlayer->Player->Resources[2] _C_
 	    AiPlayer->Player->Resources[3]);
 
-    if( AiPlayer->NeedFood ) {		// Food has the highest priority
-	AiPlayer->NeedFood=0;
-	AiRequestFarms();
+    // Food has the highest priority
+    if( AiPlayer->NeedFood ) {
+	if( !(AiPlayer->UnitTypeBuilded && AiPlayer->UnitTypeBuilded->Type->Supply) ) {
+	    AiPlayer->NeedFood=0;
+	    AiRequestFarms();
+	}
     }
 
     //
