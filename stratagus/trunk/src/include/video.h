@@ -482,8 +482,8 @@ extern void VideoDrawShadowClipX(const Graphic*, unsigned frame,
 
 	///		Free a graphic object.
 extern void VideoFree(Graphic* o);
-	///		Save (NULL) free a graphic object.
-#define VideoSaveFree(o) do { if ((o)) VideoFree((o)); } while(0)
+	///		Safely (NULL) frees a graphic object.
+#define VideoSafeFree(o) do { if ((o)) { VideoFree((o)); } } while (0)
 
 	/// Get the width of a single frame of a graphic object
 #define VideoGraphicWidth(o)		((o)->Width)
