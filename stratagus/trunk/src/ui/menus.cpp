@@ -125,6 +125,12 @@ local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
 /**
+**	Offsets from top and left, used for different resolutions
+*/
+local int OffsetX = 0;
+local int OffsetY = 0;
+
+/**
 **	Items for the Game Menu
 */
 local Menuitem GameMenuItems[] = {
@@ -878,8 +884,9 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     int nc, rc;
 
     GetDefaultTextColors(&nc, &rc);
+    StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
-    DrawTextCentered(640/2, 440, GameFont, NameLine);
+    DrawTextCentered(VideoWidth/2, OffsetY + 440, GameFont, NameLine);
     SetDefaultTextColors(nc, rc);
 }
 
@@ -1394,14 +1401,14 @@ local void GameDrawFunc(Menuitem *mi)
     GetDefaultTextColors(&nc, &rc);
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
-    DrawText(16, 360, GameFont, "Scenario:");
-    DrawText(16, 360+24 , GameFont, ScenSelectFileName);
+    DrawText(OffsetX + 16, OffsetY + 360, GameFont, "Scenario:");
+    DrawText(OffsetX + 16, OffsetY + 360+24 , GameFont, ScenSelectFileName);
     if (ScenSelectPudInfo) {
 	if (ScenSelectPudInfo->Description) {
-	    DrawText(16, 360+24+24, GameFont, ScenSelectPudInfo->Description);
+	    DrawText(OffsetX + 16, OffsetY + 360+24+24, GameFont, ScenSelectPudInfo->Description);
 	}
 	sprintf(buffer, "%d x %d", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
-	DrawText(16, 360+24+24+24, GameFont, buffer);
+	DrawText(OffsetX + 16, OffsetY + 360+24+24+24, GameFont, buffer);
     }
 #if 0
     for (n = j = 0; j < 16; j++) {
@@ -2105,6 +2112,22 @@ global void ProcessMenu(int MenuId, int Loop)
     }
 }
 
+/**
+**	Move buttons so they're centered on different resolutions
+*/
+local void MoveButtons()
+{
+    int menus = sizeof(Menus) / sizeof(Menu);
+    int i;
+
+    OffsetX = (VideoWidth - 640) / 2;
+    OffsetY = (VideoHeight - 480) / 2;
+
+    for (i=0; i<menus; i++) {
+	Menus[i].x += OffsetX;
+	Menus[i].y += OffsetY;
+    }
+}
 
 /**
 **	Init Menus for a specific race
@@ -2116,6 +2139,10 @@ global void InitMenus(unsigned int race)
     static int last_race = -1;
     const char* file;
     char *buf;
+
+    if (last_race == -1 && VideoWidth != 640) {
+	MoveButtons();
+    }
 
     if (race == last_race)	// same race? already loaded!
 	return;
