@@ -159,7 +159,8 @@ global void HandleActionBuild(Unit* unit)
         DebugLevel0("Remove oil-patch\n");
 	temp=OilPatchOnMap(x,y);
 	DebugCheck( !temp );
-	temp->Removed=1;
+	unit->Value=temp->Value;	// Let peon hold value while building
+	DestroyUnit(temp);		// Destroy oil patch - oil patch should NOT make sound
     }
 
     RemoveUnit(unit);
@@ -180,7 +181,7 @@ global void HandleActionBuild(Unit* unit)
 */
 global void HandleActionBuilded(Unit* unit)
 {
-    Unit* temp;
+    //Unit* temp;
     Unit* peon;
     UnitType* type;
 
@@ -248,13 +249,11 @@ global void HandleActionBuilded(Unit* unit)
 	//
 	if( type->GivesOil ) {
 	    CommandHaulOil(peon,unit,0);	// Let the unit haul oil
-	    DebugLevel0("Update oil-patch\n");
-	    temp=OilPatchOnMap(unit->X,unit->Y);
-	    DebugCheck( !temp );
+	    DebugLevel0("Update oil-platform\n");
 	    DebugLevel0(__FUNCTION__": =%d\n"
 		    ,unit->Command.Data.OilWell.Active);
 	    unit->Command.Data.OilWell.Active=0;
-	    unit->Value=temp->Value;
+	    unit->Value=peon->Value;		// peon was holding value while building
 	}
 
 	// FIXME: General message system
