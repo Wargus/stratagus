@@ -125,8 +125,6 @@ local MissileType* MissileTypeExorcism;
 local MissileType* MissileTypeFireball;
     /// missile-type for generic spell missile
 local MissileType* MissileTypeSpell;
-    /// missile-type for the explosion missile
-local MissileType* MissileTypeExplosion;
     /// missile-type for the rune missile
 local MissileType* MissileTypeRune;
     /// missile-type for the whirlwind missile
@@ -415,7 +413,6 @@ global void InitSpells(void)
     MissileTypeFireball = MissileTypeByIdent("missile-fireball");
     MissileTypeSpell = MissileTypeByIdent("missile-normal-spell");
     MissileTypeExorcism = MissileTypeByIdent("missile-exorcism");
-    MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
     MissileTypeRune = MissileTypeByIdent("missile-rune");
     MissileTypeWhirlwind = MissileTypeByIdent("missile-whirlwind");
     MissileTypeBlizzard = MissileTypeByIdent("missile-blizzard");
@@ -861,7 +858,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    UnitLost(target);
 	    ReleaseUnit(target);
 	    type=UnitTypeCritter;
-	    if( CanMoveToMask(x,y,TypeMovementMask(type)) ) {
+	    if( UnitTypeCanMoveTo(x,y,type) ) {
 		MakeUnitAndPlace(x, y, type, Players+PlayerNumNeutral);
 	    }
 
