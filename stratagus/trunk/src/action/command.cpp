@@ -1294,4 +1294,34 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
     ClearSavedAction(unit);
 }
 
+/**
+**	Diplomacy changed.
+**
+**	@param player	Player which changes his state.
+**	@param state	New diplomacy state.
+**	@param opponent	Opponent.
+*/
+global void CommandDiplomacy(int player,int state,int opponent)
+{
+    switch( state ) {
+	case DiplomacyNeutral:
+	    Players[player].Enemy&=~(1<<opponent);
+	    Players[player].Allied&=~(1<<opponent);
+	    break;
+	case DiplomacyAllied:
+	    Players[player].Enemy&=~(1<<opponent);
+	    Players[player].Allied|=1<<opponent;
+	    break;
+	case DiplomacyEnemy:
+	    Players[player].Enemy|=1<<opponent;
+	    Players[player].Allied&=~(1<<opponent);
+	    break;
+	case DiplomacyCrazy:
+	    Players[player].Enemy|=1<<opponent;
+	    Players[player].Allied|=1<<opponent;
+	    break;
+    }
+    // FIXME: Should we display a message?
+}
+
 //@}

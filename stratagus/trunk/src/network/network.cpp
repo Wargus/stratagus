@@ -196,6 +196,8 @@
 **
 **	::NetworkSendCommand()
 **
+**	::NetworkSendExtendedCommand()
+**
 **	::NetworkEvent()
 **
 **	::NetworkQuit()
@@ -552,6 +554,49 @@ global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
 }
 
 /**
+**	Prepare send of extended command message.
+**
+**	Convert arguments into network format and place it into output queue.
+**
+**	@param command	Command (Move,Attack,...).
+**	@param arg1	optional argument #1
+**	@param arg2	optional argument #2
+**	@param arg3	optional argument #3
+**	@param arg4	optional argument #4
+**	@param status	Append command or flush old commands.
+*/
+global void NetworkSendExtendedCommand(int command,int arg1,int arg2,int arg3,
+	int arg4,int status)
+{
+    NetworkCommandQueue *ncq;
+    NetworkExtendedCommand* nec;
+
+    DebugLevel3Fn("%d,%d,(%d,%d),%d,%s,%s\n",
+	command, unit->Slot, x, y, dest ? dest->Slot : -1,
+	type ? type->Ident : "-", status ? "flush" : "append");
+
+    //
+    //	FIXME: look if we can ignore this command.
+    //		Duplicate commands can be ignored.
+    //
+    ncq = malloc(sizeof(NetworkCommandQueue));
+    dl_insert_first(CommandsIn, ncq->List);
+
+    ncq->Time = GameCycle;
+    nec=(NetworkExtendedCommand*)&ncq->Data;
+
+    nec->Type = MessageExtendedCommand;
+    if (status) {
+	nec->Type |= 0x80;
+    }
+    nec->ExtendedType = command;
+    nec->Arg1 = arg1;
+    nec->Arg2 = htons(arg2);
+    nec->Arg3 = htons(arg3);
+    nec->Arg4 = htons(arg4);
+}
+
+/**
 **	Called if message for the network is ready.
 **	(by WaitEventsOneFrame)
 **
@@ -563,7 +608,9 @@ global void NetworkEvent(void)
 {
     char buf[1024];
     NetworkPacket* packet;
-    int player, i, n;
+    int player;
+    int i;
+    int n;
 
     //
     //	Read the packet.
@@ -573,15 +620,20 @@ global void NetworkEvent(void)
 	//	Server or client gone?
 	//
 	DebugLevel0("Server/Client gone.\n");
+	DebugLevel0Fn("FIXME: No longer the need to exit game here!.\n");
 	Exit(0);
     }
     packet = (NetworkPacket *)buf;
     IfDebug( NetworkReceivedPackets++ );
 
+    //
+    //	Setup messages
+    //
     if (packet->Commands[0].Type <= MessageInitConfig) {
 	NetworkParseSetupEvent(buf, n);
 	return;
     }
+
     //
     //	Minimal checks for good/correct packet.
     //
@@ -613,6 +665,7 @@ global void NetworkEvent(void)
 	//
 	if (nc->Type == MessageQuit) {
 	    DebugLevel0("Got quit from network.\n");
+	    DebugLevel0Fn("FIXME: No longer need to quit here!\n");
 	    Exit(0);
 	}
 
@@ -707,7 +760,7 @@ global void NetworkEvent(void)
     }
 
     //
-    //	Waiting for this
+    //	Waiting for this time slot
     //
     if (!NetworkInSync) {
 	NetworkInSync = 1;
@@ -779,9 +832,8 @@ global void NetworkChatMessage(const char *msg)
 local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 {
     int ply;
-    const NetworkChat *ncm;
 
-    switch (ncq->Data.Type) {
+    switch (ncq->Data.Type&0x7F) {
 	case MessageSync:
 	    ply = ntohs(ncq->Data.X) << 16;
 	    ply |= ntohs(ncq->Data.Y);
@@ -792,7 +844,9 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	    }
 	    return;
 	case MessageChat:
-	case MessageChatTerm:
+	case MessageChatTerm: {
+	    const NetworkChat *ncm;
+
 	    ncm = (NetworkChat *)(&ncq->Data);
 	    ply = ncm->Player;
 	    if (NetMsgBufLen[ply] + sizeof(ncm->Text) < 128) {
@@ -804,6 +858,16 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 		NetMsgBuf[127][ply] = '\0';
 		SetMessage(NetMsgBuf[ply]);
 		NetMsgBufLen[ply] = 0;
+	    }
+	    }
+	    break;
+	case MessageExtendedCommand: {
+	    const NetworkExtendedCommand *nec;
+
+	    nec = (NetworkExtendedCommand *)(&ncq->Data);
+	    ParseExtendedCommand(nec->ExtendedType,(nec->Type&0x80)>>7,
+		nec->Arg1, ntohs(nec->Arg2), ntohs(nec->Arg3),
+		ntohs(nec->Arg4));
 	    }
 	    break;
 	default:
@@ -880,7 +944,9 @@ local void NetworkSendCommands(void)
 	// ncq = BASE_OF(NetworkCommandQueue,List[0], CommandsIn->first);
 
 	IfDebug(
-	if (ncq->Data.Type != MessageChat && ncq->Data.Type != MessageChatTerm) {
+	if (ncq->Data.Type != MessageChat
+		&& ncq->Data.Type != MessageChatTerm
+		&& ncq->Data.Type != MessageExtendedCommand) {
 	    // FIXME: we can send destoyed units over network :(
 	    if (UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed) {
 		DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n",
