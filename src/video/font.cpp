@@ -612,24 +612,21 @@ local void FontMeasureWidths(ColorFont* fp)
 	const unsigned char* lp;
 	const unsigned char* gp;
 
-	for (y = 1; y < 207; ++y) {
-		fp->CharWidth[y] = 0;
-	}
-
+	memset(fp->CharWidth, 0, sizeof(fp->CharWidth));
 	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
 
 	SDL_LockSurface(fp->Graphic->Surface);
 	for (y = 1; y < 207; ++y) {
 		sp = (const unsigned char *)fp->Graphic->Surface->pixels +
-			y * fp->Height * fp->Graphic->Width - 1;
-		gp = sp + fp->Graphic->Width * fp->Height;
+			y * fp->Height * fp->Graphic->Surface->pitch - 1;
+		gp = sp + fp->Graphic->Surface->pitch * fp->Height;
 		// Bail out if no letters left
 		if (gp >= ((const unsigned char *)fp->Graphic->Surface->pixels +
-				fp->Graphic->Width * fp->Graphic->Height)) {
+				fp->Graphic->Surface->pitch * fp->Graphic->Height)) {
 			break;
 		}
 		while (sp < gp) {
-			lp = sp + fp->Graphic->Width - 1;
+			lp = sp + fp->Width - 1;
 			for (; sp < lp; --lp) {
 				if (*lp != 255) {
 					if (lp - sp > fp->CharWidth[y]) {  // max width
@@ -637,7 +634,7 @@ local void FontMeasureWidths(ColorFont* fp)
 					}
 				}
 			}
-			sp += fp->Graphic->Width;
+			sp += fp->Graphic->Surface->pitch;
 		}
 
 	}

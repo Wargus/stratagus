@@ -49,7 +49,6 @@ typedef struct _graphic_ {
 	int Width;
 	int Height;
 	int NumFrames;
-	void* Data;
 #ifdef USE_OPENGL
 	int GraphicWidth;       /// Original graphic width
 	int GraphicHeight;      /// Original graphic height
@@ -221,7 +220,7 @@ extern void SetVideoSync(void);
 extern void VideoClearScreen(void);
 
 	/// Make graphic
-extern Graphic* MakeGraphic(unsigned, int, int, void*, unsigned);
+extern Graphic* MakeGraphic(SDL_Surface* surface);
 
 	/// Load a picture and display it on the screen (full screen),
 	/// changing the colormap and so on..

@@ -417,7 +417,9 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 		fprintf(stderr, "Can't load the graphic `%s'\n", name);
 		ExitFatal(-1);
 	}
-	VideoPaletteListAdd(g->Surface);
+	if (g->Surface->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(g->Surface);
+	}
 
 	if (!width) {
 		width = g->Width;

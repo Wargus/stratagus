@@ -218,7 +218,9 @@ global void VideoFree(Graphic* graphic)
 		AllocatedGraphicMemory -=
 			graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
 #endif
-		VideoPaletteListRemove(graphic->Surface);
+		if (graphic->Surface->format->BytesPerPixel == 1) {
+			VideoPaletteListRemove(graphic->Surface);
+		}
 		SDL_FreeSurface(graphic->Surface);
 	}
 	if (graphic->SurfaceFlip) {
@@ -226,10 +228,11 @@ global void VideoFree(Graphic* graphic)
 		AllocatedGraphicMemory -=
 			graphic->Width * graphic->Height * graphic->SurfaceFlip->format->BytesPerPixel;
 #endif
-		VideoPaletteListRemove(graphic->SurfaceFlip);
+		if (graphic->SurfaceFlip->format->BytesPerPixel == 1) {
+			VideoPaletteListRemove(graphic->SurfaceFlip);
+		}
 		SDL_FreeSurface(graphic->SurfaceFlip);
 	}
-	free(graphic->Data);
 	free(graphic);
 }
 
@@ -248,34 +251,23 @@ global void VideoFree(Graphic* graphic)
 **
 **  @return        New graphic object (malloced).
 */
-global Graphic* MakeGraphic(unsigned depth, int width, int height,
-	void* data, unsigned size)
+global Graphic* MakeGraphic(SDL_Surface* surface)
 {
 	Graphic* graphic;
 
-	graphic = malloc(sizeof(Graphic));
-#ifdef DEBUG
-	AllocatedGraphicMemory += sizeof(Graphic);
-#endif
-
+	graphic = calloc(1, sizeof(Graphic));
 	if (!graphic) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	graphic->Width = width;
-	graphic->Height = height;
-	graphic->Data = data;
-
-	// FIXME: endian
-
-	graphic->Surface = SDL_CreateRGBSurfaceFrom(data, width, height, depth, width * depth / 8,
-		0, 0, 0, 0);
-	graphic->SurfaceFlip = NULL;
-	graphic->NumFrames = 0;
-
-#ifdef USE_OPENGL
-	graphic->NumTextureNames = 0;
+#ifdef DEBUG
+	AllocatedGraphicMemory += sizeof(Graphic);
 #endif
+
+	graphic->Surface = surface;
+	graphic->Width = surface->w;
+	graphic->Height = surface->h;
+	graphic->NumFrames = 1;
 
 	return graphic;
 }
@@ -496,7 +488,11 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	int x;
 	SDL_Color pal[256];
 
-	DebugCheck(g->Surface->format->BytesPerPixel != 1);
+	// FIXME: Support more formats
+	if (g->Surface->format->BytesPerPixel != 1) {
+		return;
+	}
+
 	if (g->Width == w && g->Height == h) {
 		return;
 	}
@@ -529,8 +525,6 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 
 	g->Width = w;
 	g->Height = h;
-	free(g->Data);
-	g->Data = data;
 
 #ifdef USE_OPENGL
 	glDeleteTextures(g->NumTextureNames, g->TextureNames);
