@@ -10,7 +10,7 @@
 //
 /**@name menus.c - The menu function code. */
 //
-//      (c) Copyright 1999-2004 by Andreas Arens, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2005 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1542,28 +1542,35 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 	}
 
 	if (VideoWidth != res) {
-		Menu* menu;
-		int i;
+		if (VideoValidResolution(res, res * 3 / 4)) {
+			Menu* menu;
+			int i;
 
-		VideoWidth = res;
-		VideoHeight = res * 3 / 4;
-		SavePreferences();
-		ExitMenus();
-		InitVideo();
-		// Force Update Background Size
-		SetClipping(0,0,VideoWidth - 1,VideoHeight - 1);
-		CleanModules();
-		LoadCcl();
-		PreMenuSetup();
-		GameCursor = TheUI.Point.Cursor;
-		menu = FindMenu("menu-program-start");
-		for (i = 0; i < menu->NumItems; ++i) {
-			if (menu->Items[i].InitFunc) {
-				(*menu->Items[i].InitFunc)(menu->Items + i);
+			VideoWidth = res;
+			VideoHeight = res * 3 / 4;
+			SavePreferences();
+			ExitMenus();
+			InitVideo();
+			// Force Update Background Size
+			SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
+			CleanModules();
+			LoadCcl();
+			PreMenuSetup();
+			GameCursor = TheUI.Point.Cursor;
+			menu = FindMenu("menu-program-start");
+			for (i = 0; i < menu->NumItems; ++i) {
+				if (menu->Items[i].InitFunc) {
+					(*menu->Items[i].InitFunc)(menu->Items + i);
+				}
 			}
+			if (menu->BackgroundG) {
+				ResizeGraphic(menu->BackgroundG, VideoWidth, VideoHeight);
+			}
+			DrawMenu(menu);
+			CurrentMenu = FindMenu("menu-global-options");
+		} else {
+			ErrorMenu("Invalid resolution");
 		}
-		DrawMenu(menu);
-		CurrentMenu = FindMenu("menu-global-options");
 	}
 	GlobalOptionsInit(NULL);
 }

@@ -10,7 +10,7 @@
 //
 /**@name video.h - The video headerfile. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer and Nehal Mistry
+//      (c) Copyright 1999-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -215,6 +215,9 @@ extern SDL_Surface* TheScreen;
 
 	/// initialize the video part
 extern void InitVideo(void);
+
+	/// Check if a resolution is valid
+extern int VideoValidResolution(int w, int h);
 
 	/// Resize a graphic
 extern void ResizeGraphic(Graphic* g, int w, int h);
