@@ -163,6 +163,8 @@ local void EnterTransporter(Unit* unit)
 **	The unit boards a transporter.
 **
 **	@todo FIXME: the transporter must drive to the meating point.
+**		While waiting for the transporter the units must defend
+**		themselfs.
 **
 **	@param unit	Pointer to unit.
 */
