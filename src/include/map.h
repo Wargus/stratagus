@@ -53,9 +53,9 @@ typedef struct _map_field_ {
     unsigned short	Flags;		/// field flags
     unsigned char	Value;		/// HP for walls/ Wood Regeneration
 #ifdef NEW_FOW
-    unsigned char	VisibileMask:4;	/// Visibile mask
+    unsigned char	VisibleMask:4;	/// Visible mask
     unsigned char	ExploredMask:4;	/// Explored mask
-    unsigned short	Visibile;	/// Visibile flags for all players.
+    unsigned short	Visible;	/// Visible flags for all players.
     unsigned short	Explored;	/// Explored flags for all players.
 #endif
 #ifdef UNIT_ON_MAP
@@ -260,6 +260,15 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define CanMoveToMask(x,y,mask) \
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
+#ifdef NEW_FOW
+    /// Check if a field for the user is explored
+#define IsMapFieldExplored(x,y) \
+    (TheMap.Fields[(y)*TheMap.Width+(x)].Explored&(1<<ThisPlayer->Player))
+
+    /// Check if a field for the user is visibile
+#define IsMapFieldVisible(x,y) \
+    (TheMap.Fields[(y)*TheMap.Width+(x)].Visible&(1<<ThisPlayer->Player))
+#else
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldExplored)
@@ -267,6 +276,7 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
     /// Check if a field for the user is visibile
 #define IsMapFieldVisible(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldVisible)
+#endif
 
 #define UNEXPLORED_TILE 0
 
