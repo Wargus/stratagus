@@ -373,7 +373,9 @@ global char* strcasestr(char* a, const char* b)
 ==	MAIN
 ============================================================================*/
 
-local int WaitNoEvent;			/// Flag got an event.
+local int WaitNoEvent;			/// Flag got an event
+local int WaitMouseX;			/// Mouse X position
+local int WaitMouseY;			/// Mouse Y position
 
 /**
 **	Callback for input.
@@ -401,6 +403,8 @@ local void WaitCallbackMouse(int dummy_x __attribute__((unused)),
 	int dummy_y __attribute__((unused)))
 {
     DebugLevel3Fn("Moved %d,%d\n",dummy_x,dummy_y);
+    WaitMouseX=dummy_x;
+    WaitMouseY=dummy_y;
 }
 
 /**
@@ -415,12 +419,26 @@ local void WaitCallbackExit(void)
 
 /**
 **	Test some video effects.
+**
+**	@param frame	Current frame.
 */
-local void VideoEffect0(void)
+local void VideoEffect0(int frame)
 {
     int i;
     static Graphic* Logo;
 
+    //
+    //	Cleanup
+    //
+    if( frame==-1 ) {
+	VideoFree(Logo);
+	Logo=NULL;
+	return;
+    }
+
+    //
+    //	Inititialize
+    //
     if( !Logo ) {
 	Logo=LoadSprite("freecraft.png",628,141);
     }
@@ -448,6 +466,157 @@ local void VideoEffect0(void)
 }
 
 #endif
+
+/**
+**	Test some video effects.
+**
+**	@param frame	Current frame.
+*/
+local void VideoEffect0(int frame)
+{
+    static int* buf1;
+    static int* buf2;
+    //static Graphic* logo;
+    static void* vmem;
+    int* tmp;
+    int x;
+    int y;
+
+    //
+    //	Cleanup
+    //
+    if( frame==-1 ) {
+	free(buf1);
+	free(buf2);
+	free(vmem);
+	buf1=buf2=NULL;
+	//VideoFree(logo);
+	//logo=NULL;
+	return;
+    }
+
+    //
+    //	Inititialize
+    //
+    if( !buf1 ) {
+	buf1=calloc(VideoWidth*VideoHeight,sizeof(int));
+	buf2=calloc(VideoWidth*VideoHeight,sizeof(int));
+	VideoLockScreen();
+	vmem=malloc(VideoWidth*VideoHeight*2);
+	memcpy(vmem,VideoMemory,VideoWidth*VideoHeight*2);
+	VideoUnlockScreen();
+
+	if( 1 ) {
+	    for( y=1; y<VideoHeight-1; y+=16 ) {
+		for( x=1; x<VideoWidth-1; x+=16 ) {
+		    buf1[y*VideoWidth+x] = (rand()%10)*20;
+		}
+	    }
+	}
+	if( 0 ) {
+	    for( x=1; x<VideoWidth-1; ++x ) {
+		buf2[(VideoHeight-1)*VideoWidth+x] = !(x%20)*-100;
+	    }
+	}
+    }
+    //if( !logo ) {
+//	logo=LoadGraphic(TitleScreen);
+    //}
+
+    //
+    //	Generate waves
+    //
+    for( y=1; y<VideoHeight-1; ++y ) {
+	for( x=1; x<VideoWidth-1; ++x ) {
+	    int i;
+
+	    i = ((buf1[y*VideoWidth+x-1]+
+		buf1[y*VideoWidth+x+1]+
+		buf1[y*VideoWidth-VideoWidth+x]+
+		buf1[y*VideoWidth+VideoWidth+x])>>1) - buf2[y*VideoWidth+x];
+	    buf2[y*VideoWidth+x] = i - (i >> 5);
+	    if( 0 ) {
+		i=rand();
+		if( !(i&15) ) {
+		    buf2[y*VideoWidth+x] += (i>>4)&1;
+		}
+	    }
+	}
+    }
+
+    if( WaitMouseY && WaitMouseX
+	    && WaitMouseX!=VideoWidth-1 && WaitMouseY!=VideoHeight-1 ) {
+	buf2[WaitMouseY*VideoWidth+WaitMouseX]-=100;
+    }
+
+    //
+    //	Draw it
+    //
+    VideoLockScreen();
+    for( y=0; y<VideoHeight; ++y ) {
+	for( x=0; x<VideoWidth; ++x ) {
+	    int xo;
+	    int yo;
+	    int xt;
+	    int yt;
+	    unsigned pixel;
+
+	    xo=buf2[y*VideoWidth+x-1] - buf2[y*VideoWidth+x+1];
+	    yo=buf2[y*VideoWidth-VideoWidth+x] -
+		    buf2[y*VideoWidth+VideoWidth+x];
+
+	    xt=x+xo;
+	    if( xt<0 ) {
+		xt=0;
+	    } else if( xt>=VideoWidth ) {
+		xt=VideoWidth-1;
+	    }
+	    yt=y+yo;
+	    if( yt<0 ) {
+		yt=0;
+	    } else if( yt>=VideoHeight ) {
+		yt=VideoHeight-1;
+	    }
+
+	    //pixel=((unsigned char*)logo->Frames)[xt+yt*logo->Width];
+	    //pixel=((VMemType16*)logo->Pixels)[pixel];
+
+	    switch( VideoDepth ) {
+		case 15:
+		case 16:
+		    pixel=((unsigned short*)vmem)[xt+yt*VideoWidth];
+		    if( 1 ) {
+			int r,g,b;
+
+			r=(pixel>>0)&0x1F;
+			g=(pixel>>5)&0x3F;
+			b=(pixel>>11)&0x1F;
+			r+=xo;
+			g+=xo*2;
+			b+=xo;
+			r= r<0 ? 0 : r>0x1F ? 0x1F : r;
+			g= g<0 ? 0 : g>0x3F ? 0x3F : g;
+			b= b<0 ? 0 : b>0x1F ? 0x1F : b;
+			pixel=r|(g<<5)|(b<<11);
+		    }
+
+		    VideoMemory16[x+VideoWidth*y]=pixel;
+		    break;
+	    }
+	}
+    }
+    VideoUnlockScreen();
+
+    Invalidate();
+    RealizeVideoMemory();
+
+    //
+    //	Swap buffers
+    //
+    tmp=buf1;
+    buf1=buf2;
+    buf2=tmp;
+}
 
 /**
 **	Wait for any input.
@@ -492,11 +661,10 @@ local void WaitForInput(int timeout)
     WaitNoEvent=1;
     timeout*=CYCLES_PER_SECOND;
     while( timeout-- && WaitNoEvent ) {
-	if( timeout&1 ) {
-	    // VideoEffect0();
-	}
+	VideoEffect0(timeout);
 	WaitEventsOneFrame(&callbacks);
     }
+    VideoEffect0(-1);
 
     VideoLockScreen();
     VideoDrawTextCentered(VideoWidth/2,5,LargeFont,
@@ -787,7 +955,7 @@ Use it at your own risk.\n\n");
 
     InitUnitsMemory();		// Units memory management
     PreMenuSetup();		// Load everything needed for menus
-    WaitForInput(15);		// Show game intro
+    WaitForInput(20);		// Show game intro
     NetworkSetupArgs();		// Evaluate optional command line parameters
 
     MenuLoop(MapName,&TheMap);	// Enter the menu loop
