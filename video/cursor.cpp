@@ -42,7 +42,7 @@
 /**
 **	Cursor-type type definition
 */
-global const char CursorTypeType[] = "unit-type";
+global const char CursorTypeType[] = "cursor-type";
 
 #ifndef USE_CCL
 
@@ -52,9 +52,9 @@ global const char CursorTypeType[] = "unit-type";
 global CursorType DefaultCursors[] = {
 #ifdef NEW_NAMES
     { CursorTypeType,	"cursor-point",		"human",
-	"human/cursors/human gauntlet.png",	 3, 2,	28,32 },
+	"ui/human/cursors/human gauntlet.png",	 3, 2,	28,32 },
     { CursorTypeType,	"cursor-point",		"orc",
-	"orc/cursors/orcish claw.png",		 3, 2,	26,32 },
+	"ui/orc/cursors/orcish claw.png",	 3, 2,	26,32 },
     { NULL }
 #else
     { CursorTypeType,	"cursor-point",		"human",
@@ -104,7 +104,7 @@ global CursorType DefaultCursors[] = {
 /**
 **	Define cursor-types.
 **
-**	FIXME: Should this be move to ui part?
+**	@todo FIXME: Should this be move to ui part?
 */
 global CursorType* Cursors
 #ifndef USE_CCL
@@ -117,7 +117,7 @@ global int CursorAction;		/// action for selection
 global int CursorValue;			/// value for CursorAction (spell type f.e.)
 global UnitType* CursorBuilding;	/// building cursor
 
-global CursorType* GameCursor;		/// current shown cursor type
+global CursorType* GameCursor;		/// current shown cursor-type
 global int CursorX;			/// cursor position on screen X
 global int CursorY;			/// cursor position on screen Y
 global int CursorStartX;		/// rectangle started on screen X
@@ -134,7 +134,7 @@ global int OldCursorRectangleX;		/// saved cursor position on screen X
 global int OldCursorRectangleY;		/// saved cursor position on screen Y
 global int OldCursorRectangleW;		/// saved cursor width in pixel
 global int OldCursorRectangleH;		/// saved cursor height in pixel
-global void* OldCursorRectangle=NULL;	/// background saved behind rectangle
+global void* OldCursorRectangle;	/// background saved behind rectangle
 
 	/// Function pointer: Save background behind cursor
 local void (*SaveCursorBackground)(int,int,int,int);
@@ -167,6 +167,10 @@ local void (*LoadCursorRectangle)(int x,int y,int w,int h);
 /**
 **	Load all cursor sprites.
 **
+**	@todo
+**		The races names (4 supported here) are compiled (hardcoded)
+**		also into this source.
+**
 **	@param race	Cursor graphics of this race to load.
 */
 global void LoadCursors(unsigned int race)
@@ -182,7 +186,7 @@ global void LoadCursors(unsigned int race)
     }
 
     if (last_race != -1) {	// free previous sprites for different race
-	for( i=0; Cursors[i].Type; ++i ) {
+	for( i=0; Cursors[i].OType; ++i ) {
 	    VideoSaveFree(Cursors[i].Sprite);
 	    Cursors[i].Sprite = NULL;
 	}
@@ -192,7 +196,7 @@ global void LoadCursors(unsigned int race)
     //
     //	Load the graphics
     //
-    for( i=0; Cursors[i].Type; ++i ) {
+    for( i=0; Cursors[i].OType; ++i ) {
 	//
 	//	Only load cursors of this race or universal cursors.
 	//
@@ -230,7 +234,7 @@ global CursorType* CursorTypeByIdent(const char* ident)
 {
     CursorType* cursortype;
 
-    for( cursortype=Cursors; cursortype->Type; ++cursortype ) {
+    for( cursortype=Cursors; cursortype->OType; ++cursortype ) {
 	if( strcmp(cursortype->Ident,ident) ) {
 	    continue;
 	}
@@ -963,7 +967,9 @@ global int HideAnyCursor(void)
 
 /**
 **	Setup the cursor part.
-**FIXME: Now max possible memory for OldCursorRectangle, to be limited to Map?
+**
+**	@todo	FIXME: Now max possible memory for OldCursorRectangle,
+**		to be limited to Map?
 */
 global void InitCursor(void)
 {
