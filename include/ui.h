@@ -225,12 +225,10 @@ typedef struct _ui_ {
 	int  NumFillers;                    ///< Number of fillers
 
 	struct {
-		GraphicConfig Icon;             ///< icon image
+		Graphic* G;                     ///< icon graphic
 		int IconFrame;                  ///< icon frame
 		int IconX;                      ///< icon X position
 		int IconY;                      ///< icon Y position
-		int IconW;                      ///< icon W position
-		int IconH;                      ///< icon H position
 		int TextX;                      ///< text X position
 		int TextY;                      ///< text Y position
 	} Resources[MaxCosts + 2];          ///< Icon+Text of all resources

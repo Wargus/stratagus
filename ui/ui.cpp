@@ -83,12 +83,6 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
 */
 static void CleanUIGraphics(UI* ui)
 {
-	int i;
-
-	for (i = 0; i < MaxCosts + 2; ++i) {
-		FreeGraphic(ui->Resources[i].Icon.Graphic);
-	}
-
 	FreeGraphic(ui->InfoPanel.Graphic);
 	FreeGraphic(ui->ButtonPanel.Graphic);
 	FreeGraphic(ui->PieMenuBackground.Graphic);
@@ -193,11 +187,8 @@ void LoadUserInterface(void)
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
-		if (TheUI.Resources[i].Icon.File) {
-			TheUI.Resources[i].Icon.Graphic =
-				NewGraphic(TheUI.Resources[i].Icon.File,
-					TheUI.Resources[i].IconW, TheUI.Resources[i].IconH);
-			LoadGraphic(TheUI.Resources[i].Icon.Graphic);
+		if (TheUI.Resources[i].G) {
+			LoadGraphic(TheUI.Resources[i].G);
 		}
 	}
 
@@ -295,8 +286,7 @@ void CleanUI(UI* ui)
 
 	// Resource Icons
 	for (i = 0; i < MaxCosts + 2; ++i) {
-		free(ui->Resources[i].Icon.File);
-		free(ui->Resources[i].Icon.Graphic);
+		FreeGraphic(ui->Resources[i].G);
 	}
 
 	// Info Panel

@@ -645,8 +645,8 @@ void DrawResources(void)
 	int v;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		if (TheUI.Resources[i].Icon.Graphic) {
-			VideoDrawClip(TheUI.Resources[i].Icon.Graphic,
+		if (TheUI.Resources[i].G) {
+			VideoDrawClip(TheUI.Resources[i].G,
 				TheUI.Resources[i].IconFrame,
 				TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
 		}
@@ -657,8 +657,8 @@ void DrawResources(void)
 				v > 99999 ? SmallFont : GameFont, v);
 		}
 	}
-	if (TheUI.Resources[FoodCost].Icon.Graphic) {
-		VideoDrawClip(TheUI.Resources[FoodCost].Icon.Graphic,
+	if (TheUI.Resources[FoodCost].G) {
+		VideoDrawClip(TheUI.Resources[FoodCost].G,
 			TheUI.Resources[FoodCost].IconFrame,
 			TheUI.Resources[FoodCost].IconX, TheUI.Resources[FoodCost].IconY);
 	}
@@ -673,8 +673,8 @@ void DrawResources(void)
 		}
 	}
 
-	if (TheUI.Resources[ScoreCost].Icon.Graphic) {
-		VideoDrawClip(TheUI.Resources[ScoreCost].Icon.Graphic,
+	if (TheUI.Resources[ScoreCost].G) {
+		VideoDrawClip(TheUI.Resources[ScoreCost].G,
 			TheUI.Resources[ScoreCost].IconFrame,
 			TheUI.Resources[ScoreCost].IconX, TheUI.Resources[ScoreCost].IconY);
 	}
@@ -1041,7 +1041,7 @@ void DrawCosts(void)
 	x = TheUI.StatusLineTextX + 268;
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
-		VideoDrawClip(TheUI.Resources[GoldCost].Icon.Graphic,
+		VideoDrawClip(TheUI.Resources[GoldCost].G,
 			3,
 			x, TheUI.StatusLineTextY);
 
@@ -1051,8 +1051,8 @@ void DrawCosts(void)
 
 	for (i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
-			if (TheUI.Resources[i].Icon.Graphic) {
-				VideoDrawClip(TheUI.Resources[i].Icon.Graphic,
+			if (TheUI.Resources[i].G) {
+				VideoDrawClip(TheUI.Resources[i].G,
 					TheUI.Resources[i].IconFrame,
 					x, TheUI.StatusLineTextY);
 			}
@@ -1066,7 +1066,7 @@ void DrawCosts(void)
 
 	if (CostsFood) {
 		// FIXME: hardcoded image!!!
-		VideoDrawClip(TheUI.Resources[FoodCost].Icon.Graphic,
+		VideoDrawClip(TheUI.Resources[FoodCost].G,
 			TheUI.Resources[FoodCost].IconFrame,
 			x, TheUI.StatusLineTextY);
 		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsFood);
