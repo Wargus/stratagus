@@ -10,12 +10,11 @@
 //
 /**@name construct.h	-	The constructions headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,9 +27,6 @@
 #define __CONSTRUCT_H__
 
 //@{
-
-// FIXME: constructions must be configurable, referenced by indenifiers...
-// FIXME: need support for more races.
 
 /*----------------------------------------------------------------------------
 --	Documentation
@@ -46,42 +42,49 @@
 **		Each building perhaps also units can have its own construction
 **		frames. This construction frames are currently not animated,
 **		this is planned for the future. What construction frames a
-**		building has, is currently done by numbers see
-**		UnitType::Construction. This will be soon changed to
-**		identifiers.
+**		building has, is handled by UnitType::Construction.
 **
 **	The construction structure members:
 **
+**	Construction::OType
+**
+**		Object type (future extensions).
+**
 **	Construction::Ident
 **
-**		FIXME: write the documentation
+**		Unique identifier of the construction, used to reference it in
+**		the config files and during startup. As convention they start
+**		with "construction-" fe. "construction-land".
+**		@note Don't use this member in game, use instead the pointer
+**		to this structure. See ConstructionByIdent().
 **
-**	Construction::File[]
+**	Construction::File[::TilesetMax]
 **
-**		FIXME: write the documentation
+**		Path file name of sprite files for the different tilesets.
+**		@note It is planned to change this to support more and
+**		better tilesets.
 **
 **	Construction::Nr
 **
 **		Slot number of the construction, used for saving. This should
 **		be removed, if we use symbol identifiers.
+**		@todo can now be removed
 **
-**	Construction::Width
+**	Construction::Width Construction::Height
 **
-**		FIXME: write the documentation
-**
-**	Construction::Height
-**
-**		FIXME: write the documentation
+**		Size of a sprite frame in pixels. All frames of a sprite have
+**		the same size. Also all sprites (tilesets) must have the same
+**		size.
 **
 **	Construction::Sprite
 **
-**		FIXME: write the documentation
+**		Sprite image.
 **
-**	@todo	
-**		Need ::ConstructionByName, ::TilesetByName, ...
+**	@todo
+**		Need ::TilesetByName, ...
 **		Only fixed number of constructions supported, more than
-**		a single construction is not supported, animated constructions
-**		aren't supported.
+**		a single construction frame is not supported, animated
+**		constructions aren't supported.
 */
 
 /*----------------------------------------------------------------------------
@@ -97,12 +100,12 @@
 
     /// Construction shown during construction of a building
 typedef struct _construction_ {
-    //const void* OType;		/// Object type (future extensions)
+    const void* OType;			/// Object type (future extensions)
 
     char*	Ident;			/// construction identifier
     char*	File[TilesetMax];	/// sprite file
 
-    int		Nr;			/// Number for save
+    int		Nr;			/// FIXME: remove Number for save
 
     int		Width;			/// sprite width
     int		Height;			/// sprite height
@@ -115,6 +118,12 @@ typedef struct _construction_ {
 /*----------------------------------------------------------------------------
 --	Macros
 ----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+extern const char ConstructionType[];	/// Construction type
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -132,6 +141,8 @@ extern void CleanConstructions(void);
 extern void DrawConstruction(const Construction*,int image,int x,int y);
     /// Get construction by wc number
 extern Construction* ConstructionByWcNum(int num);
+    /// Get construction by identifier
+extern Construction* ConstructionByIdent(const char* ident);
 
     /// Register ccl features
 extern void ConstructionCclRegister(void);
