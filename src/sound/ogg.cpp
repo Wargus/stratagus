@@ -297,7 +297,7 @@ global Sample* LoadOgg(const char* name,int flags)
 	return NULL;
     }
 
-    DebugLevel2Fn("Have ogg file %s\n" _C_ name);
+    DebugLevel2Fn("Loading ogg file: %s\n" _C_ name);
 
     if (ov_open_callbacks(f, vf, (char*)&magic, sizeof(magic), vc)) {
 	fprintf(stderr, "Can't initialize ogg decoder\n");
