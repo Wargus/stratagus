@@ -372,6 +372,7 @@ local SCM CclDefineUI(SCM list)
     //
     //	Some value defaults
     //
+#if 1
     ui->Contrast=TheUI.Contrast;
     ui->Brightness=TheUI.Brightness;
     ui->Saturation=TheUI.Saturation;
@@ -386,6 +387,22 @@ local SCM CclDefineUI(SCM list)
     ui->MouseScale=TheUI.MouseScale;
 
     ui->OriginalResources=TheUI.OriginalResources;
+#else
+    ui->Contrast=100;
+    ui->Brightness=0;
+    ui->Saturation=100;
+
+    ui->MouseScroll=1;
+    ui->ReverseMouseMove=0;
+
+    ui->WarpX=-1;
+    ui->WarpY=-1;
+
+    ui->MouseAdjust=MOUSEADJUST;
+    ui->MouseScale=MOUSESCALE;
+
+    ui->OriginalResources=0;
+#endif
 
     //
     //	Now the real values.
@@ -726,8 +743,8 @@ local SCM CclDefineUI(SCM list)
     //StephanR: note that the bottom-right point is one pixel off
     ui->MapEndX=x - 1;
     ui->MapEndY=y - 1;
-    if ( ui->MapEndX < 0 || ui->MapEndY < 0 ||
-         ui->MapEndX < ui->MapX || ui->MapEndY < ui->MapY ) {
+    if ( x < 1 || y < 1 ||
+	    ui->MapEndX < ui->MapX || ui->MapEndY < ui->MapY ) {
 	fprintf(stderr,"map bottom-right point expected\n");
 	return SCM_UNSPECIFIED;
     }

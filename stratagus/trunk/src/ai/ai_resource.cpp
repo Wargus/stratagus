@@ -582,7 +582,8 @@ local void AiCheckingWork(void)
 **		Or we could do a flood fill search starting from x.y. The
 **		first found gold mine is it.
 */
-global Unit* AiFindGoldMine(const Unit* source,int x,int y)
+global Unit* AiFindGoldMine(const Unit* source,
+	int x __attribute__((unused)),int y __attribute__((unused)))
 {
     Unit** table;
     Unit* unit;

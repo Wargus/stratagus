@@ -50,6 +50,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "spells.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --	Functions

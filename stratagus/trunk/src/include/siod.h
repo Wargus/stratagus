@@ -328,8 +328,6 @@ char *safe_strcat(char *s1,size_t size1,const char *s2);
 
 size_t safe_strlen(const char *s,size_t size);
 LISP memq(LISP x,LISP il);
-LISP lstrbreakup(LISP,LISP);
-LISP lstrbreakup(LISP,LISP);
 LISP nth(LISP,LISP);
 LISP butlast(LISP);
 LISP last(LISP);

@@ -630,9 +630,9 @@ global void UnitLost(const Unit* unit)
 
     player->UnitTypesCount[type->Type]--;
 
-    DebugCheck( player->NumFoodUnits < 0 );
-    DebugCheck( player->NumBuildings < 0 );
-    DebugCheck( player->UnitTypesCount[type->Type] < 0 );
+    DebugCheck( player->NumFoodUnits > UnitMax);
+    DebugCheck( player->NumBuildings > UnitMax);
+    DebugCheck( player->UnitTypesCount[type->Type] > UnitMax);
 }
 
 /**
@@ -1968,7 +1968,8 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 **
 **	@return		Pointer to the nearest gold mine.
 */
-global Unit* FindGoldMine(const Unit* source,int x,int y)
+global Unit* FindGoldMine(const Unit* source __attribute__((unused)),
+	int x,int y)
 {
     Unit** table;
     Unit* unit;

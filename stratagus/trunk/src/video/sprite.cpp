@@ -49,11 +49,6 @@ extern int ClipY1;			/// current clipping top left
 extern int ClipX2;			/// current clipping bottom right
 extern int ClipY2;			/// current clipping bottom right
 
-#ifdef DEBUG
-extern unsigned AllocatedGraphicMemory;
-extern unsigned CompressedGraphicMemory;
-#endif
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/

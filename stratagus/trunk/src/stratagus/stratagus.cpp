@@ -244,7 +244,7 @@ local int WaitNoEvent;			/// Flag got an event.
 /**
 **	Callback for input.
 */
-local void WaitCallbackKey(unsigned dummy)
+local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 {
     DebugLevel3Fn("Pressed %8x %8x\n",MouseButtons,dummy);
     WaitNoEvent=0;
@@ -253,7 +253,8 @@ local void WaitCallbackKey(unsigned dummy)
 /**
 **	Callback for input.
 */
-local void WaitCallbackKey2(unsigned dummy1,unsigned dummy2)
+local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
+	unsigned dummy2 __attribute__((unused)))
 {
     DebugLevel3Fn("Pressed %8x %8x %8x\n",MouseButtons,dummy1,dummy2);
     WaitNoEvent=0;
@@ -262,7 +263,8 @@ local void WaitCallbackKey2(unsigned dummy1,unsigned dummy2)
 /**
 **	Callback for input.
 */
-local void WaitCallbackMouse(int dummy_x,int dummy_y)
+local void WaitCallbackMouse(int dummy_x __attribute__((unused)),
+	int dummy_y __attribute__((unused)))
 {
     DebugLevel3Fn("Moved %d,%d\n",dummy_x,dummy_y);
 }
@@ -324,7 +326,8 @@ local void WaitForInput(int timeout)
 */
 local void PrintHeader(void)
 {
-    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
+    // vvv---- looks wired, but is needed for GNU brain damage
+    fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
     "\n  SIOD Copyright by George J. Carrette."
 #ifdef USE_SDL
     "\n  SDL Copyright by Sam Lantinga."
@@ -491,13 +494,13 @@ global volatile void Exit(int err)
 
     ExitNetwork1();
     IfDebug(
-	DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
-	    ,FrameCounter,SlowFrameCounter
-	    ,(SlowFrameCounter*100)/(FrameCounter ? : 1));
+	DebugLevel0( "Frames %d, Slow frames %d = %d%%\n"
+	    _C_ FrameCounter _C_ SlowFrameCounter
+	    _C_ (SlowFrameCounter*100)/(FrameCounter ? : 1) );
 	UnitCacheStatistic();
 	DebugLevel0("Path: Error: %u Unreachable: %u OK: %u Depth: %u\n"
-		,PfCounterFail,PfCounterNotReachable
-		,PfCounterOk,PfCounterDepth);
+		_C_ PfCounterFail _C_ PfCounterNotReachable
+		_C_ PfCounterOk _C_ PfCounterDepth);
     );
 #ifdef DEBUG
     CclUnits();

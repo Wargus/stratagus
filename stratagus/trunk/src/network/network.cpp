@@ -51,7 +51,7 @@
 #include "network.h"
 #include "netconnect.h"
 #include "commands.h"
-
+#include "interface.h"
 
 #define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
 

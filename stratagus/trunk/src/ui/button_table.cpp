@@ -33,6 +33,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "freecraft.h"
@@ -65,7 +66,7 @@
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckTrue(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckTrue(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
 {
     return 1;
 }
@@ -78,7 +79,7 @@ global int ButtonCheckTrue(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckFalse(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckFalse(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
 {
     return 0;
 }
@@ -141,7 +142,7 @@ global int ButtonCheckUnits(const Unit* unit,const ButtonAction* button)
 **
 **	NOTE: this check could also be moved into intialisation.
 */
-global int ButtonCheckNetwork(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
 {
     return NetworkFildes!=-1;
 }
@@ -154,7 +155,7 @@ global int ButtonCheckNetwork(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button __attribute__((unused)))
 {
     return unit->Type->Building
 	    && unit->Orders[0].Action != UnitActionTrain
@@ -169,7 +170,7 @@ global int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button __attribute__((unused)))
 {
     return unit->Type->Building
 	    && unit->Orders[0].Action != UnitActionUpgradeTo
@@ -199,7 +200,7 @@ global int ButtonCheckUpgradeTo(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckAttack(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckAttack(const Unit* unit,const ButtonAction* button __attribute__((unused)))
 {
     return unit->Type->CanAttack;
 }

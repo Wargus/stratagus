@@ -144,7 +144,9 @@ local struct {
 #else
     { "interface/buttons 1.png" ,"interface/buttons 2.png" },
 #endif
-    300, 7632
+    300, 7632,
+
+    NULL
 };
 
 /**
@@ -1982,7 +1984,7 @@ local void MultiGameSetupInit(Menuitem *mi)
     NetworkInitServerConnect();
 }
 
-local void MultiGameSetupExit(Menuitem *mi)
+local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))
 {
     // FIXME : Not called yet
     NetworkExitServerConnect();
@@ -2019,7 +2021,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 }
 
 
-local void MultiGameClientInit(Menuitem *mi)
+local void MultiGameClientInit(Menuitem *mi __attribute__((unused)))
 {
     // GameSetupInit(mi);
     MultiGameClientUpdate(1);
@@ -2509,7 +2511,7 @@ global void MenuHandleMouseMove(int x,int y)
 **
 **	@param b	button code
 */
-global void MenuHandleButtonDown(int b)
+global void MenuHandleButtonDown(int b __attribute__((unused)))
 {
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;

@@ -647,12 +647,13 @@ global int CheckRepeatMessage( const char* msg )
 **
 **	@param fmt	To be displayed in text overlay.
 */
-global void SetMessage( char* fmt, ... )
+global void SetMessage( const char* fmt, ... )
 {
     char temp[128];
     va_list va;
+
     va_start( va, fmt );
-    vsprintf( temp, fmt, va );
+    vsprintf( temp, fmt, va );		// BUG ALERT: buffer overrun
     va_end( va );
     if ( CheckRepeatMessage( temp ) )
       return;
@@ -670,7 +671,7 @@ global void SetMessage( char* fmt, ... )
 **	@param y	Message Y map origin.
 **	@param fmt	To be displayed in text overlay.
 */
-global void SetMessage2( int x, int y, char* fmt, ... )
+global void SetMessage2( int x, int y, const char* fmt, ... )
 {
     //FIXME: vladi: I know this can be just separated func w/o msg but
     //       it is handy to stick all in one call, someone?
@@ -709,23 +710,6 @@ global void SetMessageDup(const char* message)
 {
     // We need a extra buffer here for the cat.
     strncpy(MessageBuffer,message,sizeof(MessageBuffer));
-    MessageBuffer[sizeof(MessageBuffer)-1]='\0';
-
-    SetMessage(MessageBuffer);
-}
-
-/**
-**	Append message to display.
-**
-**	@param message	To be displayed in text overlay.
-*/
-global void SetMessageDupCat(const char* message)
-{
-    //FIXME: is this function correct now?
-    //       it was, before multi-messages support done
-    //	JOHNS: this is wrong it should append to the last message.
-
-    strncat(MessageBuffer,message,sizeof(MessageBuffer)-strlen(MessageBuffer));
     MessageBuffer[sizeof(MessageBuffer)-1]='\0';
 
     SetMessage(MessageBuffer);
