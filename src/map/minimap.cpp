@@ -330,17 +330,10 @@ global void UpdateMinimap(void)
 
 	if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
 		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
-	    //
-	    //	FIXME: We should force unittypes to have a certain color on the minimap.
-	    //
 	    if( (*table)->Player->Player == PlayerNumNeutral ) {
-		if (type->ClicksToExplode) {
-		    color = ColorNPC;
-		} else if (type->GivesResource == OilCost) {
-		    color = ColorBlack;
-		} else {
-		    color = ColorYellow;
-		}
+		color = VideoMapRGB((*table)->Type->NeutralMinimapColorRGB.D24.a,
+		        (*table)->Type->NeutralMinimapColorRGB.D24.b,
+			(*table)->Type->NeutralMinimapColorRGB.D24.c);
 	    } else {
 		color = (*table)->Player->Color;
 	    }
@@ -391,14 +384,9 @@ global void UpdateMinimap(void)
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
 	//
 	if (unit->Player->Player == PlayerNumNeutral) {
-	    if (type->ClicksToExplode) {
-		color = ColorNPC;
-	    } else if (type->GivesResource == OilCost) {
-		// FIXME: move to ccl (OilCost)
-		color = ColorBlack;
-	    } else {
-		color = ColorYellow;
-	    }
+	    color = VideoMapRGB((*table)->Type->NeutralMinimapColorRGB.D24.a,
+		(*table)->Type->NeutralMinimapColorRGB.D24.b,
+		(*table)->Type->NeutralMinimapColorRGB.D24.c);
 	} else if (unit->Player == ThisPlayer) {
 	    if (unit->Attacked && red_phase) {
 		color = ColorRed;
