@@ -51,6 +51,7 @@
 #include "player.h"
 #include "ai.h"
 #include "campaign.h"
+#include "trigger.h"
 
 #include "ccl.h"
 
@@ -105,6 +106,7 @@ global void SaveGame(const char* filename)
     SaveGroups(file);
     SaveMissiles(file);
     SaveAi(file);
+    SaveTriggers(file);
     SaveCampaign(file);
 
     // FIXME: find all state information which must be saved.
