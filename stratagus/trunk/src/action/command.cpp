@@ -1314,7 +1314,9 @@ global void CommandSharedVision(int player, int state, int opponent)
 	//	Do a real hardcore seen recount. First we unmark EVERYTHING.
 	//
 	for (i = 0; i < NumUnits; ++i) {
-		MapUnmarkUnitSight(Units[i]);
+		if (!Units[i]->Destroyed) {
+			MapUnmarkUnitSight(Units[i]);
+		}
 	}
 
 	//
@@ -1355,7 +1357,9 @@ global void CommandSharedVision(int player, int state, int opponent)
 	//	Do a real hardcore seen recount. Now we remark EVERYTHING
 	//
 	for (i = 0; i < NumUnits; ++i) {
-		MapMarkUnitSight(Units[i]);
+		if (!Units[i]->Destroyed) {
+			MapMarkUnitSight(Units[i]);
+		}
 	}
 }
 
