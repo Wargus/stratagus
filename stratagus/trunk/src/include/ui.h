@@ -337,6 +337,7 @@ extern UI TheUI;						/// The user interface
 extern UI** UI_Table;						/// All available user interfaces
 
 extern char RightButtonAttacks;				/// right button 0 move, 1 attack.
+extern ButtonAction* CurrentButtons;  /// Current Selected Buttons
 extern char FancyBuildings;				/// Mirror buildings 1 yes, 0 now.
 
 extern int SpeedKeyScroll;				/// Keyboard Scrolling Speed, in Frames

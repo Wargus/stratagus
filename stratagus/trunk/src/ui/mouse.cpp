@@ -423,10 +423,12 @@ local void HandleMouseOn(int x, int y)
 				y >= TheUI.ButtonButtons[i].Y &&
 				y < TheUI.ButtonButtons[i].Y + TheUI.ButtonButtons[i].Height + 7) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
-			ButtonUnderCursor = i;
-			CursorOn = CursorOnButton;
-			MustRedraw |= RedrawButtonPanel;
-			return;
+			if (CurrentButtons[i].Pos != -1) {
+				ButtonUnderCursor = i;
+				CursorOn = CursorOnButton;
+				MustRedraw |= RedrawButtonPanel;
+				return;
+			}
 		}
 	}
 	if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->InsideCount) {
