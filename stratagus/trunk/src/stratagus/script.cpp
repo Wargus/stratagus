@@ -1729,6 +1729,7 @@ global void InitCcl(void)
     luaopen_table(Lua);
     luaopen_string(Lua);
     luaopen_math(Lua);
+    luaopen_debug(Lua);
     lua_settop(Lua, 0);	    // discard any results
 #endif
 
