@@ -56,9 +56,9 @@ help:
 	@-echo "make small-dist			create small distribution"
 	@-echo "make buildit			create data files from original data"
 	@-echo "make buildclean			cleanup build data files"
-	@-echo "make win32new			start new win32"
-	@-echo "make win32			build the win32 version"
-	@-echo "make win32distclean		clean all files of win32"
+	@-echo "make win32new			(CROSS-COMPILER ONLY) start new win32"
+	@-echo "make win32			(CROSS-COMPILER ONLY) build the win32 version"
+	@-echo "make win32distclean		(CROSS-COMPILER ONLY) clean all files of win32"
 	@-echo "make release			release it"
 
 cycle::
