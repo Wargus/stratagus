@@ -436,7 +436,6 @@ global void ShowIntro(const Intro *intro)
     CLclose(file);
 
     CallbackMusicOff();
-    StopMusic();
 #ifdef WITH_SOUND
     PlaySectionMusic(PlaySectionBriefing);
 #endif
@@ -557,15 +556,7 @@ global void ShowIntro(const Intro *intro)
     SetVideoSync();
 
     CallbackMusicOn();
-    StopMusic();
-    // FIXME: should this be GameMusic?
-#ifdef WITH_SOUND
-    if (CDMode == CDModeOff || CDMode == CDModeStopped) {
-	PlayMusic(MenuMusic);
-    } else {
-	CDRomCheck(NULL);
-    }
-#endif
+    FreeOneChannel(soundfree);
 }
 
 /**

@@ -307,6 +307,9 @@ extern SoundId RegisterTwoGroups(const SoundId first,const SoundId second);
     /// Modify the range of a given sound.
 extern void SetSoundRange(SoundId sound,unsigned char range);
 
+    /// Free a channel and unregister its source
+extern void FreeOneChannel(int channel);
+
     /// Initialize the sound card.
 extern int InitSound(void);
     /// Initialize the oss compatible sound card.
