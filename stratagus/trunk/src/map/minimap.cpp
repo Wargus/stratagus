@@ -62,7 +62,8 @@ local int Map2MinimapY[MaxMapHeight];	/// fast conversion table
 //	MinimapScale:
 //	32x32 64x64 96x96 128x128 256x256 512x512 ...
 //	  *4    *2    *4/3   *1	     *1/2    *1/4
-global int MinimapScale;		/// Minimap scale to fit into window
+local int MinimapScaleX;		/// Minimap scale to fit into window
+local int MinimapScaleY;		/// Minimap scale to fit into window
 global int MinimapX;			/// Minimap drawing position x offset
 global int MinimapY;			/// Minimap drawing position y offset
 
@@ -99,11 +100,16 @@ global void UpdateMinimapXY(int tx, int ty)
     int my;
     int x;
     int y;
-    int scale;
+    int scalex;
+    int scaley;
 
-    scale = MinimapScale / MINIMAP_FAC;
-    if (scale == 0) {
-	scale = 1;
+    scalex = MinimapScaleX / MINIMAP_FAC;
+    if (scalex == 0) {
+	scalex = 1;
+    }
+    scaley = MinimapScaleY / MINIMAP_FAC;
+    if (scaley == 0) {
+	scaley = 1;
     }
     //
     //	Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -131,7 +137,7 @@ global void UpdateMinimapXY(int tx, int ty)
 
 	    tile = TheMap.Fields[x + y].Tile;
 	    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW] =
-		TheMap.Tiles[tile][7 + (mx % scale) * 8 + (6 + (my % scale) * 8) * TileSizeX];
+		TheMap.Tiles[tile][7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
 	}
     }
 }
@@ -147,10 +153,14 @@ global void UpdateMinimapTerrain(void)
 {
     int mx;
     int my;
-    int scale;
+    int scalex;
+    int scaley;
 
-    if (!(scale = (MinimapScale / MINIMAP_FAC))) {
-	scale = 1;
+    if (!(scalex = (MinimapScaleX / MINIMAP_FAC))) {
+	scalex = 1;
+    }
+    if (!(scaley = (MinimapScaleY / MINIMAP_FAC))) {
+	scaley = 1;
     }
 
     //
@@ -162,7 +172,7 @@ global void UpdateMinimapTerrain(void)
 
 	    tile = TheMap.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
 	    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW] =
-		TheMap.Tiles[tile][7 + (mx % scale) * 8 + (6 + (my % scale) * 8) * TileSizeX];
+		TheMap.Tiles[tile][7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
 	}
     }
 }
@@ -183,15 +193,18 @@ global void CreateMinimap(void)
     } else {
 	n = TheMap.Height;
     }
-    MinimapScale = (TheUI.MinimapW * MINIMAP_FAC) / n;
+    MinimapScaleX = (TheUI.MinimapW * MINIMAP_FAC + n - 1) / n;
+    MinimapScaleY = (TheUI.MinimapH * MINIMAP_FAC + n - 1) / n;
 
-    MinimapX = ((TheUI.MinimapW * MINIMAP_FAC) / MinimapScale - TheMap.Width) / 2;
-    MinimapY = ((TheUI.MinimapH * MINIMAP_FAC) / MinimapScale - TheMap.Height) / 2;
-    MinimapX = (TheUI.MinimapW - (TheMap.Width * MinimapScale) / MINIMAP_FAC) / 2;
-    MinimapY = (TheUI.MinimapH - (TheMap.Height * MinimapScale) / MINIMAP_FAC) / 2;
+    MinimapX = ((TheUI.MinimapW * MINIMAP_FAC) / MinimapScaleX - TheMap.Width) / 2;
+    MinimapY = ((TheUI.MinimapH * MINIMAP_FAC) / MinimapScaleY - TheMap.Height) / 2;
+    MinimapX = (TheUI.MinimapW - (TheMap.Width * MinimapScaleX) / MINIMAP_FAC) / 2;
+    MinimapY = (TheUI.MinimapH - (TheMap.Height * MinimapScaleY) / MINIMAP_FAC) / 2;
 
-    DebugLevel0Fn("MinimapScale %d(%d), X off %d, Y off %d\n" _C_
-	MinimapScale / MINIMAP_FAC _C_ MinimapScale _C_ MinimapX _C_ MinimapY);
+    DebugLevel0Fn("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
+	MinimapScaleX / MINIMAP_FAC _C_ MinimapScaleY / MINIMAP_FAC _C_
+	MinimapScaleX _C_ MinimapScaleY _C_
+	MinimapX _C_ MinimapY);
 
     //
     //	Calculate minimap fast lookup tables.
@@ -201,16 +214,16 @@ global void CreateMinimap(void)
     Minimap2MapX = calloc(sizeof(int), TheUI.MinimapW * TheUI.MinimapH);
     Minimap2MapY = calloc(sizeof(int), TheUI.MinimapW * TheUI.MinimapH);
     for (n = MinimapX; n < TheUI.MinimapW - MinimapX; ++n) {
-	Minimap2MapX[n] = ((n - MinimapX) * MINIMAP_FAC) / MinimapScale;
+	Minimap2MapX[n] = ((n - MinimapX) * MINIMAP_FAC) / MinimapScaleX;
     }
     for (n = MinimapY; n < TheUI.MinimapH - MinimapY; ++n) {
-	Minimap2MapY[n] = (((n - MinimapY) * MINIMAP_FAC) / MinimapScale) * TheMap.Width;
+	Minimap2MapY[n] = (((n - MinimapY) * MINIMAP_FAC) / MinimapScaleY) * TheMap.Width;
     }
     for (n = 0; n < TheMap.Width; ++n) {
-	Map2MinimapX[n] = (n * MinimapScale) / MINIMAP_FAC;
+	Map2MinimapX[n] = (n * MinimapScaleX) / MINIMAP_FAC;
     }
     for (n = 0; n < TheMap.Height; ++n) {
-	Map2MinimapY[n] = (n * MinimapScale) / MINIMAP_FAC;
+	Map2MinimapY[n] = (n * MinimapScaleY) / MINIMAP_FAC;
     }
 
     MinimapTerrainGraphic = NewGraphic(8, TheUI.MinimapW, TheUI.MinimapH);
@@ -465,13 +478,13 @@ global void DrawMinimapCursor(int vx, int vy)
 
     // Determine and save region below minimap cursor
     OldMinimapCursorX = x =
-	TheUI.MinimapPosX + MinimapX + (vx * MinimapScale) / MINIMAP_FAC;
+	TheUI.MinimapPosX + MinimapX + (vx * MinimapScaleX) / MINIMAP_FAC;
     OldMinimapCursorY = y =
-	TheUI.MinimapPosY + MinimapY + (vy * MinimapScale) / MINIMAP_FAC;
+	TheUI.MinimapPosY + MinimapY + (vy * MinimapScaleY) / MINIMAP_FAC;
     OldMinimapCursorW = w =
-	(TheUI.SelectedViewport->MapWidth * MinimapScale) / MINIMAP_FAC;
+	(TheUI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
     OldMinimapCursorH = h =
-	(TheUI.SelectedViewport->MapHeight * MinimapScale) / MINIMAP_FAC;
+	(TheUI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
     i = (w + 1 + h) * 2 * VideoTypeSize;
     if (OldMinimapCursorSize < i) {
 	if (OldMinimapCursorImage) {
@@ -498,7 +511,7 @@ global int ScreenMinimap2MapX(int x)
 {
     int tx;
 
-    tx = (((x - TheUI.MinimapPosX - MinimapX) * MINIMAP_FAC) / MinimapScale);
+    tx = (((x - TheUI.MinimapPosX - MinimapX) * MINIMAP_FAC) / MinimapScaleX);
     if (tx < 0) {
 	return 0;
     }
@@ -515,7 +528,7 @@ global int ScreenMinimap2MapY(int y)
 {
     int ty;
 
-    ty = (((y - TheUI.MinimapPosY - MinimapY) * MINIMAP_FAC) / MinimapScale);
+    ty = (((y - TheUI.MinimapPosY - MinimapY) * MINIMAP_FAC) / MinimapScaleY);
     if (ty < 0) {
 	return 0;
     }
