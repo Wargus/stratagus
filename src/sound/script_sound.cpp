@@ -410,6 +410,28 @@ local SCM CclSoundOn(void)
 }
 
 /**
+**	Turn Off Music (client side)
+*/
+local SCM CclMusicOff(void)
+{
+    StopMusic();
+    MusicOff=1;
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Turn On Music (client side)
+**
+**	@return true if and only if the sound is REALLY turned on
+**		(uses SoundFildes)
+*/
+local SCM CclMusicOn(void)
+{
+    MusicOff=0;
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Set the cut off distance.
 **
 **	@param distance new cut off distance for sounds
@@ -516,6 +538,8 @@ global void SoundCclRegister(void)
 
     init_subr_0("sound-off",CclSoundOff);
     init_subr_0("sound-on",CclSoundOn);
+    init_subr_0("music-off",CclMusicOff);
+    init_subr_0("music-on",CclMusicOn);
     init_subr_0("sound-thread",CclSoundThread);
     init_subr_1("set-global-sound-range!",CclSetGlobalSoundRange);
     init_lsubr("define-game-sounds",CclDefineGameSounds);
@@ -583,6 +607,25 @@ local SCM CclSoundOff(void)
 local SCM CclSoundOn(void)
 {
     return SCM_BOOL_T;
+}
+
+/**
+**	Turn Off Music (client side)
+*/
+local SCM CclMusicOff(void)
+{
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Turn On Music (client side)
+**
+**	@return true if and only if the sound is REALLY turned on
+**		(uses SoundFildes)
+*/
+local SCM CclMusicOn(void)
+{
+    return SCM_UNSPECIFIED;
 }
 
 /**
@@ -685,6 +728,8 @@ global void SoundCclRegister(void)
     gh_new_procedure1_0("set-cd-mode!",CclSetCdMode);
     gh_new_procedure0_0("sound-off",CclSoundOff);
     gh_new_procedure0_0("sound-on",CclSoundOn);
+    gh_new_procedure0_0("music-off",CclMusicOff);
+    gh_new_procedure0_0("music-on",CclMusicOn);
     gh_new_procedure0_0("sound-thread",CclSoundThread);
     gh_new_procedure1_0("set-global-sound-range!",CclSetGlobalSoundRange);
     gh_new_procedureN("define-game-sounds",CclDefineGameSounds);

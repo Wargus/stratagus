@@ -193,6 +193,39 @@ local SCM CclSetSaturation(SCM saturation)
 }
 
 /**
+**	Set the video resolution.
+**
+**	@param width	Resolution width.
+**	@param height	Resolution height.
+*/
+local SCM CclSetVideoResolution(SCM width,SCM height)
+{
+    if( CclInConfigFile ) {
+	VideoWidth=gh_scm2int(width);
+	VideoHeight=gh_scm2int(height);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the video fullscreen mode.
+**
+**	@param fullscreen	True for fullscreen, false for window.
+**
+**	@return			Old fullscreen mode
+*/
+local SCM CclSetVideoFullscreen(SCM fullscreen)
+{
+    SCM old;
+
+    old=gh_int2scm(VideoFullScreen);
+    if( CclInConfigFile ) {
+	VideoFullScreen=gh_scm2bool(fullscreen);
+    }
+    return old;
+}
+
+/**
 **	Default title-screen.
 **
 **	@param title	SCM title. (nil reports only)
@@ -3337,6 +3370,9 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-contrast!",CclSetContrast);
     gh_new_procedure1_0("set-brightness!",CclSetBrightness);
     gh_new_procedure1_0("set-saturation!",CclSetSaturation);
+
+    gh_new_procedure2_0("set-video-resolution!",CclSetVideoResolution);
+    gh_new_procedure1_0("set-video-fullscreen!",CclSetVideoFullscreen);
 
     gh_new_procedure1_0("set-title-screen!",CclSetTitleScreen);
     gh_new_procedure1_0("set-menu-background!",CclSetMenuBackground);
