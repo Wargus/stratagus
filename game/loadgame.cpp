@@ -200,11 +200,19 @@ global void LoadModules(void)
     }
 #endif
 
+#ifdef USE_SDL_SURFACE
+    LoadRGB(&GlobalPalette,
+	    s = strdcat3(StratagusLibPath, "/graphics/",
+		TheMap.Tileset->PaletteFile));
+    free(s);
+    VideoCreatePalette(&GlobalPalette);
+#else
     LoadRGB(GlobalPalette,
 	    s = strdcat3(StratagusLibPath, "/graphics/",
 		TheMap.Tileset->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
+#endif
     CreateMinimap();
 
     SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);

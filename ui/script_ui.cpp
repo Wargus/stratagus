@@ -297,7 +297,11 @@ local SCM CclSetContrast(SCM contrast)
 	i = 100;
     }
     TheUI.Contrast = i;
+#ifdef USE_SDL_SURFACE
+    VideoCreatePalette(&GlobalPalette);	// rebuild palette
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     return old;
@@ -347,7 +351,11 @@ local SCM CclSetBrightness(SCM brightness)
 	i = 0;
     }
     TheUI.Brightness = i;
+#ifdef USE_SDL_SURFACE
+    VideoCreatePalette(&GlobalPalette);	// rebuild palette
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     return old;
@@ -397,7 +405,11 @@ local SCM CclSetSaturation(SCM saturation)
 	i = 0;
     }
     TheUI.Saturation = i;
+#ifdef USE_SDL_SURFACE
+    VideoCreatePalette(&GlobalPalette);	// rebuild palette
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     return old;
@@ -2389,9 +2401,15 @@ local SCM CclDefineUI(SCM list)
 			if (gh_eq_p(value, gh_symbol2scm("color"))) {
 			    value = gh_car(slist);
 			    slist = gh_cdr(slist);
+#ifdef USE_SDL_SURFACE
+			    ui->CompletedBarColorRGB.r = gh_scm2int(gh_car(value));
+			    ui->CompletedBarColorRGB.g = gh_scm2int(gh_car(gh_cdr(value)));
+			    ui->CompletedBarColorRGB.b = gh_scm2int(gh_car(gh_cdr(gh_cdr(value))));
+#else
 			    ui->CompletedBarColorRGB.D24.a = gh_scm2int(gh_car(value));
 			    ui->CompletedBarColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(value)));
 			    ui->CompletedBarColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(value))));
+#endif
 			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
 			    value = gh_car(slist);
 			    slist = gh_cdr(slist);

@@ -876,7 +876,11 @@ global void ShowPicture(CampaignChapter* chapter)
 /**
 **	Draw a box with the text inside
 */
+#ifdef USE_SDL_SURFACE
+local void DrawStatBox(int x, int y, char* text, SDL_Color color, int percent)
+#else
 local void DrawStatBox(int x, int y, char* text, VMemType color, int percent)
+#endif
 {
     VideoFillRectangleClip(ColorBlack, x, y, 80, 24);
     VideoDrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);

@@ -10,7 +10,7 @@
 //
 /**@name menus.c	-	The menu function code. */
 //
-//	(c) Copyright 1999-2003 by Andreas Arens and Jimmy Salmon
+//	(c) Copyright 1999-2003 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -5694,11 +5694,19 @@ local void EditorMapPropertiesOk(void)
 
 	LoadTileset();
 	ChangeTilesetPud(old, &TheMap);
+#ifdef USE_SDL_SURFACE
+	LoadRGB(&GlobalPalette,
+		s=strdcat3(StratagusLibPath,"/graphics/",
+		    TheMap.Tileset->PaletteFile));
+	free(s);
+	VideoCreatePalette(&GlobalPalette);
+#else
 	LoadRGB(GlobalPalette,
 		s=strdcat3(StratagusLibPath,"/graphics/",
 		    TheMap.Tileset->PaletteFile));
 	free(s);
 	VideoCreatePalette(GlobalPalette);
+#endif
 	PreprocessMap();
 	LoadConstructions();
 	LoadUnitTypes();

@@ -80,7 +80,14 @@ local void CL_png_readfn(png_structp png_ptr, png_bytep data, png_size_t length)
 global Graphic* LoadGraphicPNG(const char* name)
 {
     Graphic* graphic;
+#ifdef USE_SDL_SURFACE
+//    SDL_Palette* palette;
+    SDL_Color* palettecolors;
+int ckey;
+    ckey = -1;
+#else
     Palette* palette;
+#endif
     CLFile* fp;
     png_structp png_ptr;
     png_infop info_ptr;
@@ -126,13 +133,53 @@ global Graphic* LoadGraphicPNG(const char* name)
 	info_ptr->width * info_ptr->height);
     DebugLevel3("%s: %s" _C_ name _C_
 	png_get_valid(png_ptr, info_ptr, PNG_INFO_PLTE) ? "palette" : "");
+#ifdef USE_SDL_SURFACE
+
+    // FIXME: need to get the correct color
+    /*
+    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
+	Exit(-1);
+	Uint8 *trans;
+	int num_trans;
+
+	int t = -1;
+	png_color_16 *transv;
+	png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, &transv);
+	printf("num_trans = %d\n", num_trans);
+	    for (i = 0; i < num_trans; ++i) {
+		if(trans[i] == 0) {
+		    if (t >= 0) {
+			break;
+		    }
+		    t = i;
+		} else if (trans[i] != 255) {
+		    break;
+		}
+	    }
+	    if (i == num_trans) {
+		// exactly one transparent index
+		ckey = t;
+	    } else {
+		// more than one transparent index, or translucency
+		png_set_expand(png_ptr);
+	    }
+
+    }
+*/
+#else
     DebugLevel3(" %s" _C_
 	png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ? "transparent" : "");
+#endif
+
     DebugLevel3(" depth %d\n" _C_ info_ptr->bit_depth);
 
     //	Setup translators:
 
+#ifdef USE_SDL_SURFACE
+    palettecolors = (SDL_Color*)calloc(256, sizeof(SDL_Color));
+#else
     palette = (Palette*)calloc(256, sizeof(Palette));
+#endif
 
     if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE) {
 	DebugLevel3("Color palette\n");
@@ -142,12 +189,22 @@ global Graphic* LoadGraphicPNG(const char* name)
 		abort();
 	    }
 	    for (i = 0; i < info_ptr->num_palette; ++i) {
+#ifdef USE_SDL_SURFACE
+		palettecolors[i].r = info_ptr->palette[i].red;
+		palettecolors[i].g = info_ptr->palette[i].green;
+		palettecolors[i].b = info_ptr->palette[i].blue;
+#else
 		palette[i].r = info_ptr->palette[i].red;
 		palette[i].g = info_ptr->palette[i].green;
 		palette[i].b = info_ptr->palette[i].blue;
+#endif
 	    }
 	    for(; i < 256; ++i) {
+#ifdef USE_SDL_SURFACE
+		palettecolors[i].r = palettecolors[i].g = palettecolors[i].b = 0;
+#else
 		palette[i].r = palette[i].g = palette[i].b = 0;
+#endif
 	    }
 	}
     }
@@ -211,7 +268,20 @@ global Graphic* LoadGraphicPNG(const char* name)
     CLclose(fp);
 
     graphic = MakeGraphic(8, w, h, data, w * h);	// data freed by make graphic
+#ifdef USE_SDL_SURFACE
+    SDL_SetPalette(graphic->Surface, SDL_LOGPAL|SDL_PHYSPAL, palettecolors, 0, 256);
+//    SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, ckey);
+
+    // FIXME: need to find correct color
+    SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, 
+	SDL_MapRGB(graphic->Surface->format, 255, 255, 255));
+
+//	SDL_MapRGB(graphic->Surface->format, 255, 255, 255));
+//    SDL_SetPalette(graphic->Surface, 0, palettecolors, 0, 256);
+//    SDL_SetPalette(TheScreen, SDL_LOGPAL|SDL_PHYSPAL, palettecolors, 0, 256);
+#else
     graphic->Palette = palette;  //FIXME: should this be part of MakeGraphic
+#endif
 
     return graphic;
 }
@@ -223,6 +293,8 @@ global Graphic* LoadGraphicPNG(const char* name)
 */
 global void SaveScreenshotPNG(const char* name)
 {
+#ifdef USE_SDL_SURFACE
+#else
     FILE* fp;
     png_structp png_ptr;
     png_infop info_ptr;
@@ -322,6 +394,7 @@ global void SaveScreenshotPNG(const char* name)
     free(row);
 
     fclose(fp);
+#endif
 }
 
 //@}

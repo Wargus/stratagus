@@ -10,7 +10,8 @@
 //
 /**@name sprite.c	-	The general sprite functions. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer, Stephan Rasenberg
+//	(c) Copyright 2000-2002 by Lutz Sammer, Stephan Rasenberg, 
+//	Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -54,8 +55,13 @@
 local GraphicType GraphicSprite8Type;	/// sprite type 8bit palette
 local GraphicType GraphicSprite16Type;	/// sprite type 16bit palette
 
+#ifdef USE_SDL_SURFACE
+global void VideoDrawRawClip(SDL_Surface *surface,
+    int x, int y, int w, int h);
+#else
 global void (*VideoDrawRawClip)(VMemType *pixels, const unsigned char *data,
     int x, int y, int w, int h);
+#endif
 
 /*----------------------------------------------------------------------------
 --	Local functions
@@ -65,6 +71,23 @@ global void (*VideoDrawRawClip)(VMemType *pixels, const unsigned char *data,
 --	RLE Sprites
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_SDL_SURFACE
+local void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
+    srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+    srect.w = sprite->Width;
+    srect.h = sprite->Height;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+}
+#else
 //
 //	The current implementation uses RLE encoded sprites.
 //	If you know something better, write it.
@@ -183,6 +206,7 @@ local void VideoDraw8to32(const Graphic* sprite, unsigned frame, int x, int y)
 {
     RLE_BLIT(32, sprite, frame, x, y);
 }
+#endif
 
 /**
 **	Draw graphic object unclipped.
@@ -219,6 +243,21 @@ local void VideoDrawOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
 }
 #endif
 
+#ifdef USE_SDL_SURFACE
+local void VideoDrawXFlip(const Graphic* sprite, unsigned frame, int x, int y)
+{
+
+    int sbpp;
+    int dbpp;
+
+    sbpp = sprite->Surface->format->BytesPerPixel;
+    dbpp = TheScreen->format->BytesPerPixel;
+
+
+    // FIXME: todo
+//    SDL_BlitSurface(, &srect, temp, &drect);
+}
+#else
 /**
 **	Draw 8bit graphic object unclipped and flipped in X direction
 **	into 8 bit framebuffer.
@@ -393,6 +432,7 @@ local void VideoDraw8to32X(const Graphic* sprite, unsigned frame, int x, int y)
 	dp += da;
     } while (dp < ep);			// all lines
 }
+#endif
 
 /**
 **	Draw graphic object unclipped and flipped in X direction.
@@ -429,6 +469,36 @@ local void VideoDrawXOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
 }
 #endif
 
+#ifdef USE_SDL_SURFACE
+global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
+    srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+    srect.w = sprite->Width;
+    srect.h = sprite->Height;
+
+    if (x + srect.w > ClipX2) {
+	drect.w = ClipX2 - x;
+    }
+    if (y + srect.h > ClipY2) {
+	drect.h = ClipY2 - y;
+    }
+    if (x < ClipX1) {
+	x = ClipX1;
+    }
+    if (y < ClipY1) {
+	y = ClipY1;
+    }
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+}
+#else
 /**
 **	Draw 8bit graphic object clipped into 8 bit framebuffer.
 **
@@ -973,6 +1043,7 @@ right_trans:
 
     }
 }
+#endif
 
 /**
 **	Draw graphic object clipped.
@@ -1027,6 +1098,9 @@ local void VideoDrawClipOpenGL(const Graphic* sprite, unsigned frame, int x, int
 }
 #endif
 
+#ifdef USE_SDL_SURFACE
+
+#else
 /**
 **	Draw 8bit graphic object clipped and flipped in X direction
 **	into 8 bit framebuffer.
@@ -1578,6 +1652,7 @@ right_trans:
 	}
     }
 }
+#endif
 
 /**
 **	Draw graphic object clipped and flipped in X direction.
@@ -1640,6 +1715,9 @@ local void VideoDrawClipXOpenGL(const Graphic* sprite, unsigned frame,
 }
 #endif
 
+#ifdef USE_SDL_SURFACE
+
+#else
 /**
 **	Draw 8bit shadow graphic object clipped into 8 bit framebuffer.
 **
@@ -2248,7 +2326,11 @@ right_trans:
 
     }
 }
+#endif
 
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+#else
 /**
 **	Draw 8bit shadow graphic object clipped and flipped in X direction
 **	into 8bit framebuffer.
@@ -2911,7 +2993,11 @@ global void VideoDrawRawXXClip(char *pixels, const unsigned char *data,
 	dest += nextline;
     } while (--h > 0);
 }
+#endif
 
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+#else
 /**
 **	Draw 8bit raw graphic data clipped, using given pixel pallette
 **	into 8bit framebuffer.
@@ -2979,7 +3065,21 @@ local void VideoDrawRaw32Clip(VMemType *pixels, const unsigned char *data,
 {
     VideoDrawRawXXClip((char*)pixels, data, x, y, w, h, sizeof(VMemType32));
 }
+#endif
 
+#ifdef USE_SDL_SURFACE
+local void FreeSprite(Graphic* graphic)
+{
+    int i;
+#ifdef DEBUG_TODO
+    AllocatedGraphicMemory -= graphic->Size;
+    AllocatedGraphicMemory -= sizeof(Graphic);
+#endif
+    for (i = 0; i < graphic->NumFrames; ++i) {
+	SDL_FreeSurface(&graphic->Surface[i]);
+    }
+}
+#else
 /**
 **	Free graphic object.
 */
@@ -3000,6 +3100,7 @@ local void FreeSprite8(Graphic* graphic)
     free(graphic->Frames);
     free(graphic);
 }
+#endif
 
 // FIXME: need 16 bit palette version
 // FIXME: need alpha blending version
@@ -3024,6 +3125,20 @@ local void FreeSprite8(Graphic* graphic)
 */
 global Graphic* LoadSprite(const char* name, int width, int height)
 {
+#ifdef USE_SDL_SURFACE
+    Graphic * g;
+    int nframes;
+
+    g = LoadGraphic(name);
+
+    nframes = g->Width / width * g->Height / height;
+
+    g->NumFrames = nframes;
+    g->Width = width;
+    g->Height = height;
+
+    return g;
+#else
     Graphic* graphic;
 #ifndef USE_OPENGL
     Graphic* sprite;
@@ -3106,6 +3221,7 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 	fprintf(stderr, "Unsported image depth\n");
 	ExitFatal(-1);
     }
+
     sprite->Width = width;
     sprite->Height = height;
 
@@ -3116,7 +3232,6 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 
     sprite->Size = 0;
     sprite->Frames = NULL;
-
 
     // Worst case is alternating opaque and transparent pixels
     data = malloc(n * sizeof(unsigned char*) + 
@@ -3197,6 +3312,7 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 
     return sprite;
 #endif
+#endif
 }
 
 /**
@@ -3204,6 +3320,10 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 */
 global void InitSprite(void)
 {
+#ifdef USE_SDL_SURFACE
+
+#else
+
 #ifdef USE_OPENGL
     GraphicSprite8Type.Draw = VideoDrawOpenGL;
     GraphicSprite8Type.DrawClip = VideoDrawClipOpenGL;
@@ -3213,6 +3333,7 @@ global void InitSprite(void)
     GraphicSprite8Type.DrawShadowClipX = VideoDraw8to32ShadowClipX;
     VideoDrawRawClip = VideoDrawRaw32Clip;
 #else
+
     switch (VideoBpp) {
 	case 8:
 	    GraphicSprite8Type.Draw = VideoDraw8to8;
@@ -3262,6 +3383,7 @@ global void InitSprite(void)
 #endif
 
     GraphicSprite8Type.Free = FreeSprite8;
+#endif
 }
 
 //@}

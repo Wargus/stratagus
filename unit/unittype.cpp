@@ -781,9 +781,15 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	CLprintf(file, "  'not-selectable\n");
     }
 
+#ifdef USE_SDL_SURFACE
+    CLprintf(file, "  'neutral-minimap-color '(%d %d %d)\n",
+	type->NeutralMinimapColorRGB.r,type->NeutralMinimapColorRGB.g,
+	type->NeutralMinimapColorRGB.b);
+#else
     CLprintf(file, "  'neutral-minimap-color '(%d %d %d)\n",
 	type->NeutralMinimapColorRGB.D24.a,type->NeutralMinimapColorRGB.D24.b,
 	type->NeutralMinimapColorRGB.D24.c);
+#endif
 
     CLprintf(file, "  'sight-range %d", type->_SightRange);
     if (all || type->ReactRangeComputer) {
