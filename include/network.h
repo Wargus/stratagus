@@ -40,7 +40,7 @@
 #define NetworkProtocolVersion 2	/// Network protocol version
 
 /*----------------------------------------------------------------------------
---	Declaration
+--	Declarations
 ----------------------------------------------------------------------------*/
 
 /**
@@ -114,6 +114,7 @@ extern void NetworkCommands(void);	/// get all network commands
 extern void NetworkChatMessage(const char*msg);	/// send chat message
 extern void NetworkSendCommand(int command,const Unit* unit,int x,int y
 	,const Unit* dest,const UnitType* type,int status);
+
 //@}
 
 #endif	// !__NETWORK_H__
