@@ -621,7 +621,90 @@ local SCM CclDefineUnitType(SCM list)
     CclFree(type->Weapon.Attack.Name);
     type->Weapon.Attack.Name=str;
 
-    return list;
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Parse unit-stats.
+**
+**	@param list	List describing the unit-stats.
+*/
+local SCM CclDefineUnitStats(SCM list)
+{
+    SCM value;
+    //SCM data;
+    SCM sublist;
+    UnitType* type;
+    UnitStats* stats;
+    int i;
+    char* str;
+
+    type=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
+    free(str);
+    list=gh_cdr(list);
+    i=gh_scm2int(gh_car(list));
+    list=gh_cdr(list);
+    stats=&type->Stats[i];
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("level")) ) {
+	    stats->Level=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
+	    stats->Speed=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("attack-range")) ) {
+	    stats->AttackRange=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("sight-range")) ) {
+	    stats->SightRange=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("armor")) ) {
+	    stats->Armor=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("basic-damage")) ) {
+	    stats->BasicDamage=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("piercing-damage")) ) {
+	    stats->PiercingDamage=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("hit-points")) ) {
+	    stats->HitPoints=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("costs")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		for( i=0; i<MaxCosts; ++i ) {
+		    if( gh_eq_p(value,gh_symbol2scm(DEFAULT_NAMES[i])) ) {
+			stats->Costs[i]=gh_scm2int(gh_car(sublist));
+			break;
+		    }
+		}
+		if( i==MaxCosts ) {
+		   // FIXME: this leaves half initialized stats
+		   errl("Unsupported tag",value);
+		}
+		sublist=gh_cdr(sublist);
+	    }
+	} else {
+	   // FIXME: this leaves a half initialized unit
+	   errl("Unsupported tag",value);
+	}
+    }
+
+    return SCM_UNSPECIFIED;
 }
 
 #ifdef DEBUG
@@ -930,6 +1013,7 @@ local SCM CclDefineAnimations(SCM list)
 global void UnitTypeCclRegister(void)
 {
     gh_new_procedureN("define-unit-type",CclDefineUnitType);
+    gh_new_procedureN("define-unit-stats",CclDefineUnitStats);
 #ifdef DEBUG
     gh_new_procedure0_0("print-unit-type-table",CclPrintUnitTypeTable);
 #endif
