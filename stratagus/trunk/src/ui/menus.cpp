@@ -131,6 +131,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
+local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i);
 local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i);
 local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i);
 local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i);
@@ -1015,7 +1016,7 @@ local Menuitem KeystrokeHelpMenuItems[] = {
     { MI_TYPE_TEXT, 16, 40, 0, SmallFont, NULL, NULL,
 	{ text:{ "TEST", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_VSLIDER, 256 - 18 - 16, 40, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 10*18, NULL, -1, 0, 0, 0, NULL} } },
+	{ vslider:{ 0, 18, 10*18, ScenSelectVSKeystrokeHelpAction, -1, 0, 0, 0, NULL} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
@@ -2887,6 +2888,79 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 }
 
 local void ScenSelectVSAction(Menuitem *mi, int i)
+{
+    int op, d1, d2;
+
+    mi--;
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
+		    mi->d.listbox.curopt++;
+		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+			mi->d.listbox.curopt--;
+			mi->d.listbox.startline++;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    mi->d.listbox.curopt--;
+		    if (mi->d.listbox.curopt < 0) {
+			mi->d.listbox.curopt++;
+			mi->d.listbox.startline--;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    }
+	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    if (i == 2) {
+		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
+			op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
+			d2 = op - mi[1].d.vslider.curper;
+			if (d2 < d1) {
+			    mi->d.listbox.curopt++;
+			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				mi->d.listbox.curopt--;
+				mi->d.listbox.startline++;
+			    }
+			}
+		    }
+		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+			op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
+			d2 = mi[1].d.vslider.curper - op;
+			if (d2 < d1) {
+			    mi->d.listbox.curopt--;
+			    if (mi->d.listbox.curopt < 0) {
+				mi->d.listbox.curopt++;
+				mi->d.listbox.startline--;
+			    }
+			}
+		    }
+		}
+		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		mi[1].d.vslider.percent = mi[1].d.vslider.curper;
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
+}
+
+local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 {
     int op, d1, d2;
 
