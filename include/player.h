@@ -87,9 +87,12 @@ struct _player_ {
 	struct __4pixel16__ {
 	    VMemType16	Pixels[4];	/// palette colors #0 ... #3
 	}	Depth16;		/// player colors for 16bpp
+	struct __4pixel24__ {
+	    VMemType24	Pixels[4];	/// palette colors #0 ... #3
+	}	Depth24;		/// player colors for 24bpp
 	struct __4pixel32__ {
 	    VMemType32	Pixels[4];	/// palette colors #0 ... #3
-	}	Depth32;		/// player colors for 24/32bpp
+	}	Depth32;		/// player colors for 32bpp
     }		UnitColors;		/// Unit colors for faster setup
 
     // FIXME: this should be removed, use UnitColors insteed
