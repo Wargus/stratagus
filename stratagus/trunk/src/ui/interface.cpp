@@ -871,12 +871,6 @@ local int CommandKey(int key)
 	    break;
 
 #ifdef SPLIT_SCREEN_SUPPORT
-	case 'v':
-	    if (KeyModifiers & ModifierControl)
-		CycleViewportMode (-1);
-	    else
-		CycleViewportMode (1);
-	    break;
 #endif /* SPLIT_SCREEN_SUPPORT */
 
 	case KeyCodeUp:
