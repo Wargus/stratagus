@@ -24,20 +24,117 @@
 ##	$Id$
 ##
 
-TOPDIR=		.
+TOPDIR=	.
 
 RULESFILE ?= Rules.make
 WINRULESFILE = Rules.make.WIN32
 
 include $(TOPDIR)/$(RULESFILE)
+
 OBJDIR ?= .
 
-CROSSDIR=/usr/local/cross-tools
+CROSSDIR = /usr/local/cross-tools
 
-MAKEFLAGS= TOPDIR=$(shell pwd)
-MODULES= src tools
+MODULES = src/action src/ai src/beos src/clone src/editor src/freecraft src/game src/libmodplug src/map \
+          src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
+          src/video src/include src/movie/vp31/include
 
-all:	src freecraft$(EXE) tools
+MODULES2 = etlib
+
+MODULES_TOOLS = tools
+
+MODULES_ALL = $(MODULES) $(MODULES2) $(MODULES_TOOLS) src
+
+HDRS :=
+MISC :=
+
+SRC := 
+include $(patsubst %, %/Module.make, $(MODULES))
+OBJ := $(patsubst %.c, %.o, $(SRC))
+OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
+
+SRC2 := 
+include $(patsubst %, %/Module.make, $(MODULES2))
+OBJ2 := $(patsubst %.c, %.o, $(SRC2))
+OBJ2 := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ2))),$(notdir $(OBJ2)))
+
+SRC_TOOLS := 
+include $(patsubst %, %/Module.make, $(MODULES_TOOLS))
+OBJ_TOOLS := $(patsubst %.c, %.o, $(SRC_TOOLS))
+OBJ_TOOLS := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ_TOOLS))),$(notdir $(OBJ_TOOLS)))
+
+SRC_ALL = $(SRC) $(SRC2) $(SRC_TOOLS)
+OBJ_ALL = $(OBJ) $(OBJ2) $(OBJ_TOOLS)
+
+.SUFFIXES: .c .o
+
+MAKERULE = @if [ ! -d $(shell dirname $@) ]; then mkdir $(shell dirname $@); fi ;
+MAKERULE += echo $(CC) -c \$(CFLAGS) $< -o $@ ; $(CC) -c \$(CFLAGS) $< -o $@ ;
+
+src/action/$(OBJDIR)/%.o: src/action/%.c
+	$(MAKERULE)
+
+src/ai/$(OBJDIR)/%.o: src/ai/%.c
+	$(MAKERULE)
+
+src/beos/$(OBJDIR)/%.o: src/beos/%.c
+	$(MAKERULE)
+
+src/clone/$(OBJDIR)/%.o: src/clone/%.c
+	$(MAKERULE)
+
+src/editor/$(OBJDIR)/%.o: src/editor/%.c
+	$(MAKERULE)
+
+src/freecraft/$(OBJDIR)/%.o: src/freecraft/%.c
+	$(MAKERULE)
+
+src/game/$(OBJDIR)/%.o: src/game/%.c
+	$(MAKERULE)
+
+src/libmodplug/$(OBJDIR)/%.o: src/libmodplug/%.c
+	$(MAKERULE)
+
+src/map/$(OBJDIR)/%.o: src/map/%.c
+	$(MAKERULE)
+
+src/missile/$(OBJDIR)/%.o: src/missile/%.c
+	$(MAKERULE)
+
+src/movie/$(OBJDIR)/%.o: src/movie/%.c
+	$(MAKERULE)
+
+src/movie/vp31/$(OBJDIR)/%.o: src/movie/vp31/%.c
+	$(MAKERULE)
+
+src/network/$(OBJDIR)/%.o: src/network/%.c
+	$(MAKERULE)
+
+src/pathfinder/$(OBJDIR)/%.o: src/pathfinder/%.c
+	$(MAKERULE)
+
+src/siod/$(OBJDIR)/%.o: src/siod/%.c
+	$(MAKERULE)
+
+src/sound/$(OBJDIR)/%.o: src/sound/%.c
+	$(MAKERULE)
+
+src/ui/$(OBJDIR)/%.o: src/ui/%.c
+	$(MAKERULE)
+
+src/unit/$(OBJDIR)/%.o: src/unit/%.c
+	$(MAKERULE)
+
+src/video/$(OBJDIR)/%.o: src/video/%.c
+	$(MAKERULE)
+
+etlib/$(OBJDIR)/%.o: etlib/%.c
+	$(MAKERULE)
+
+src/$(OBJDIR)/%.o: src/%.c
+	$(MAKERULE)
+
+all:	all-src freecraft$(EXE) tools
 
 help:
 	@-echo "make cycle			clean,depend,tags,all"
@@ -46,9 +143,7 @@ help:
 	@-echo "make run			create and run"
 	@-echo "make runp			create and run with profiler"
 	@-echo "make clean			cleanup keep only executables"
-	@-echo "make clobber			clean all files"
 	@-echo "make distclean			clean all files"
-	@-echo "make ci				check in RS"
 	@-echo "make doc			make source documention with doxygen"
 	@-echo "make doc++			make source documention with doc++"
 	@-echo "make lockver NAME="version"	label current version with symbolic name"
@@ -86,87 +181,61 @@ doc++::
 	@if [ ! -d srcdoc ]; then mkdir srcdoc; fi
 	@$(DOCPP) -v -H -A -a -b -c -j -d srcdoc `find . -name "*.doc" -print`
 
-src::
-	@$(MAKE) -C src RULESFILE=$(RULESFILE) OBJDIR=$(OBJDIR) all
-
-etlib/$(OBJDIR)/hash.$(OE): etlib/hash.c
-	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
-	$(CC) -c $(CFLAGS) $< -o $@
-
-etlib/$(OBJDIR)/getopt.$(OE): etlib/getopt.c
-	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
-	$(CC) -c $(CFLAGS) $< -o $@
-
-etlib/$(OBJDIR)/prgname.$(OE): etlib/prgname.c
-	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
-	$(CC) -c $(CFLAGS) $< -o $@
-
-src/$(OBJDIR)/main.$(OE): src/main.c
-	@if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
-	$(CC) -c $(CFLAGS) $< -o $@
-
-src/$(OBJDIR)/libclone.a: ;
+all-src: $(OBJ) $(OBJ2)
 
 # UNIX-TARGET
-freecraft:	src etlib/$(OBJDIR)/hash.$(OE) src/$(OBJDIR)/libclone.a
-	$(CCLD) -o freecraft src/$(OBJDIR)/libclone.a etlib/$(OBJDIR)/hash.$(OE) $(CLONELIBS) -I. $(CFLAGS)
+freecraft:	$(OBJ) $(OBJ2)
+	$(CCLD) -o freecraft $^ $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	src etlib/$(OBJDIR)/prgname.$(OE) etlib/$(OBJDIR)/getopt.$(OE) \
-		etlib/$(OBJDIR)/hash.$(OE) src/$(OBJDIR)/freecraftrc.$(OE) \
-		src/$(OBJDIR)/libclone.a src/$(OBJDIR)/main.$(OE)
-	$(CCLD) -o freecraft$(EXE) src/$(OBJDIR)/main.$(OE) \
-		src/$(OBJDIR)/libclone.a src/$(OBJDIR)/freecraftrc.$(OE) \
-		etlib/$(OBJDIR)/prgname.$(OE) etlib/$(OBJDIR)/getopt.$(OE) \
-		etlib/$(OBJDIR)/hash.$(OE) \
-		-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
+freecraft.exe:	$(OBJ) $(OBJ2) src/$(OBJDIR)/freecraftrc.$(OE) src/$(OBJDIR)/main.$(OE)
+	$(CCLD) -o freecraft$(EXE) $^ -lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 strip:
 	@if [ -f freecraft ]; then strip freecraft; fi
 	@if [ -f freecraft.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip freecraft.exe; fi
 
 src/$(OBJDIR)/freecraftrc.$(OE): src/freecraft.rc
-	windres --include-dir contrib -osrc/$(OBJDIR)/freecraftrc.$(OE) src/freecraft.rc
-
-# -L. -lefence
-# -Lccmalloc-0.2.3/src -lccmalloc -ldl
+	windres --include-dir contrib -o src/$(OBJDIR)/freecraftrc.$(OE) src/freecraft.rc
 
 echo::
 	@-echo CFLAGS: $(CFLAGS)
 	@-echo LIBS: $(CLONELIBS)
 
-tools::
-	@$(MAKE) -C tools RULESFILE=$(RULESFILE) all
+tools: tools/aledoc$(EXE) tools/wartool$(EXE) tools/startool$(EXE)
+
+tools/aledoc$(EXE): tools/aledoc.c
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
+
+tools/wartool$(EXE): tools/wartool.c
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
+
+tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
 
 clean::
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clean ; done
+	@for i in $(MODULES) ; do \
+	$(RM) -rf $$i/$(OBJDIR) $$i/*.doc; done
 	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)/*.$(OE) .#*
-
-clobber:	clean
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clobber ; done
-	$(RM) freecraft$(EXE) gmon.sum *~ stderr.txt stdout.txt
-	$(RM) -r srcdoc/*
-	@$(MAKE) -C tools RULESFILE=$(RULESFILE) clobber
-
-distclean:	clobber
 	@echo
 
-ci::
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) ci ; done
-	ci -l Makefile Common.mk $(RULESFILE) .indent.pro \
+distclean:	clean
+	$(RM) freecraft$(EXE) gmon.sum *~ stderr.txt stdout.txt
+	$(RM) $$i/.depend $$i/.#* $$i/*~
+	$(RM) -r srcdoc/*
+	@echo
+
+lockver:
+	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
 	contrib/doxygen-freecraft.cfg \
-	$(CCLS) $(DOCS)
+	$(CCLS) $(DOCS) $(SRC_ALL) src/beos/beos.cpp $(HDRS) Makefile
+	for i in $(MODULES_ALL); do $(LOCKVER) Module.make; done
 
-lockver::
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) lockver ; done
-	$(LOCKVER) Makefile Common.mk $(RULESFILE) .indent.pro \
-	contrib/doxygen-freecraft.cfg \
-	$(CCLS) $(DOCS)
+tags:
+	for i in $(SRC) $(SRC2) $(SRC_TOOLS); do \
+	ctags --c-types=defmpstuvx -a -f tags `pwd`/$$i ; done
 
-tags::
-	@$(MAKE) -C src RULESFILE=$(RULESFILE) tags
-
-depend::
+depend:
 	@$(MAKE) -C src RULESFILE=$(RULESFILE) depend
 
 ##############################################################################
@@ -216,7 +285,7 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/FreeCraft-beos.proj \
 	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h
 
-MISC    = Makefile Common.mk Rules.make.orig setup \
+MISC    += Makefile Rules.make.orig setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
 	  make/README tools/udta.c tools/ugrd.c $(CONTRIB) \
@@ -225,9 +294,12 @@ MISC    = Makefile Common.mk Rules.make.orig setup \
 mydate	= $(shell date +%y%m%d)
 distdir	= freecraft-$(mydate)
 
-dist::
-	$(RM) $(DISTLIST)
-	@set -e; for i in $(MODULES); do $(MAKE) -C $$i RULESFILE=$(RULESFILE) distlist ; done
+distlist:
+	@echo $(SRC_ALL) $(HDRS) src/beos/beos.cpp > $(DISTLIST)
+	for i in $(MODULES_ALL); do echo $$i/Module.make >> $(DISTLIST); done
+#	@echo src/include >> $(DISTLIST)
+
+dist: distlist
 	echo >>$(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
 	echo $(PUDS) >>$(DISTLIST)
@@ -240,7 +312,7 @@ dist::
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
-	tar chzf $(distdir).tar.gz $(distdir)
+	tar czhf $(distdir).tar.gz $(distdir)
 	tar cjhf $(distdir).tar.bz2 $(distdir)
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir).zip $(distdir)
@@ -248,10 +320,7 @@ dist::
 	$(RM) -r $(distdir)
 	du -h $(distdir).tar.gz $(distdir).tar.bz2 $(distdir).zip
 
-small-dist::
-	@$(RM) $(DISTLIST)
-	$(MAKE) -C src RULESFILE=$(RULESFILE) distlist
-	$(MAKE) -C tools RULESFILE=$(RULESFILE) distlist
+small-dist: distlist
 	echo $(MISC) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
@@ -261,7 +330,7 @@ small-dist::
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
-	tar chzf $(distdir)-small.tar.gz $(distdir)
+	tar czhf $(distdir)-small.tar.gz $(distdir)
 	tar cjhf $(distdir)-small.tar.bz2 $(distdir)
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir)-small.zip $(distdir)
@@ -269,7 +338,7 @@ small-dist::
 	$(RM) -r $(distdir)
 	du -h $(distdir)-small.tar.gz $(distdir)-small.tar.bz2 $(distdir)-small.zip
 
-bin-dist:: all
+bin-dist: all
 	$(RM) $(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
 	echo $(PUDS) >>$(DISTLIST)
@@ -287,14 +356,14 @@ bin-dist:: all
 	chmod -R a+rX $(distdir)
 	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	tar chzf freecraft-$(mydate)-bin.tar.gz $(distdir)
+	tar czhf freecraft-$(mydate)-bin.tar.gz $(distdir)
 	tar cjhf freecraft-$(mydate)-bin.tar.bz2 $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
 #----------------------------------------------------------------------------
 
-win32-bin-dist2:: win32
+win32-bin-dist2: win32
 	@$(RM) $(DISTLIST)
 	@echo $(PICS) >>$(DISTLIST)
 	@echo $(PUDS) >>$(DISTLIST)
