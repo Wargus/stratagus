@@ -501,6 +501,8 @@ local void SaveViewports(FILE* file,const UI* ui)
 */
 global void SaveUserInterface(FILE* file)
 {
+    int i;
+
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: ui $Id$\n\n");
 
@@ -522,8 +524,14 @@ global void SaveUserInterface(FILE* file)
     fprintf(file,"(set-original-resources! %s)\n\n",
 	    TheUI.OriginalResources ? "#t" : "#f");
 
-    // Save the current UI
-    SaveUi(file,&TheUI);
+    // Save the UIs for all resolutions
+    for( i=0; UI_Table[i]; ++i ) {
+	SaveUi(file,UI_Table[i]);
+    }
+
+    // FIXME: maxy: strange things could happen to the saved viewports
+    // when loading them on a different resolution
+
     SaveViewports(file,&TheUI);
 }
 
