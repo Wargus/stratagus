@@ -460,13 +460,17 @@ static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 	//    i.e. if button action is ButtonTrain for example check if
 	// required unit is not restricted etc...
 	switch (buttonaction->Action) {
-		case ButtonMove:
 		case ButtonStop:
-		case ButtonRepair:
-		case ButtonButton:
-		case ButtonPatrol:
 		case ButtonStandGround:
+		case ButtonButton:
 			res = 1;
+			break;
+		case ButtonRepair:
+			res = unit->Type->RepairRange > 0;
+			break;
+		case ButtonMove:
+		case ButtonPatrol:
+			res = CanMove(unit);
 			break;
 		case ButtonHarvest:
 			if (!unit->CurrentResource ||
@@ -488,7 +492,7 @@ static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 			res = ButtonCheckAttack(unit, buttonaction);
 			break;
 		case ButtonAttackGround:
-			if (Selected[0]->Type->GroundAttack) {
+			if (unit->Type->GroundAttack) {
 				res = 1;
 			}
 			break;
@@ -508,8 +512,7 @@ static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 			}
 			break;
 		case ButtonSpellCast:
-			res = CheckDependByIdent(player,buttonaction->ValueStr) &&
-				UpgradeIdentAllowed(player, buttonaction->ValueStr) == 'R';
+			res = SpellIsAvailable(player, buttonaction->Value);
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport && Selected[0]->BoardCount);
@@ -582,7 +585,8 @@ static ButtonAction* UpdateButtonPanelMultipleUnits(void)
 		Assert(UnitButtonTable[z]->Pos <= TheUI.NumButtonButtons);
 
 		// is button allowed after all?
-		if (allow && res[UnitButtonTable[z]->Pos - 1].Pos == -1) {
+		if (allow) {
+			// OverWrite, So take last valid button.
 			res[UnitButtonTable[z]->Pos - 1] = *UnitButtonTable[z];
 		}
 	}
@@ -651,7 +655,8 @@ static ButtonAction* UpdateButtonPanelSingleUnit(const Unit* unit)
 		pos = buttonaction->Pos;
 
 		// is button allowed after all?
-		if (allow && res[pos - 1].Pos == -1) {
+		if (allow) {
+			// OverWrite, So take last valid button.
 			res[pos - 1] = *buttonaction;
 		}
 	}
