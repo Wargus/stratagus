@@ -1200,6 +1200,7 @@ local SCM CclDefineUI(SCM list)
     SCM value;
     SCM sublist;
     char* str;
+    char *s1;
     int	x;
     int	y;
     int i;
@@ -1787,6 +1788,19 @@ local SCM CclDefineUI(SCM list)
 		sublist=gh_cdr(sublist);
 		(*menupanel)->Panel.File=gh_scm2newstr(value,NULL);
 	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("victory-background")) ) {
+	    //	Backgrounds
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->VictoryBackground.File=gh_scm2newstr(value,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("defeat-background")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->DefeatBackground.File=gh_scm2newstr(value,NULL);
+	} else {
+	    s1=gh_scm2newstr(value,NULL);
+	    fprintf(stderr,"Unsupported tag %s\n",s1);
+	    free(s1);
 	}
     }
 
