@@ -227,7 +227,7 @@ global int SelectUnitsByType(Unit* base)
     int i;
     const Viewport* vp;
 
-    DebugCheck( TheUI.MouseViewport );
+    DebugCheck( !TheUI.MouseViewport );
     DebugLevel3Fn(" %s\n" _C_ base->Type->Ident);
 
     type=base->Type;
