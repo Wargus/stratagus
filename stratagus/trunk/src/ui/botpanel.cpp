@@ -746,9 +746,7 @@ global void UpdateButtonPanel(void)
 		allow = 1;
 		break;
 	    case ButtonAttack:
-		if( Selected[0]->Type->CanAttack ) {
-		    allow = 1;
-		}
+		allow=ButtonCheckAttack(unit,buttonaction);
 		break;
 	    case ButtonAttackGround:
 		if( Selected[0]->Type->GroundAttack ) {
@@ -784,9 +782,14 @@ global void UpdateButtonPanel(void)
 		break;
 
 	    case ButtonCancelUpgrade:
+		allow = unit->Orders[0].Action==UnitActionUpgradeTo
+			|| unit->Orders[0].Action==UnitActionResearch;
+		break;
 	    case ButtonCancelTrain:
+		allow = unit->Orders[0].Action==UnitActionTrain;
+		break;
 	    case ButtonCancelBuild:
-		allow = 1;
+		allow = unit->Orders[0].Action==UnitActionBuilded;
 		break;
 
 	    default:
