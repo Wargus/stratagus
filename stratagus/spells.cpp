@@ -56,10 +56,10 @@
 /*
   NOTE: vladi:
 
-  The point to have variable unsorted list of spell types and
+  The point to have variable unsorted list of spell-types and
   dynamic id's and in the same time -- SpellAction id's is that
   spell actions are hardcoded and cannot be changed at all.
-  On the other hand we can have different spell types as with
+  On the other hand we can have different spell-types as with
   different range, cost and time to live (possibly and other
   parameters as extensions)
 
@@ -102,30 +102,30 @@ global SpellType SpellTypeTable[] = {
 { NULL }
 };
 
-    /// How many spell types are available
+    /// How many spell-types are available
 local int SpellTypeCount;
 
-    /// missile-type for the custom missile.
+    /// missile-type for the custom missile
 local MissileType* MissileTypeCustom;
-    /// missile-type for the heal effect missile.
+    /// missile-type for the heal effect missile
 local MissileType* MissileTypeHealing;
-    /// missile-type for the exorcism effect missile.
+    /// missile-type for the exorcism effect missile
 local MissileType* MissileTypeExorcism;
-    /// missile-type for the fire ball missile.
+    /// missile-type for the fire ball missile
 local MissileType* MissileTypeFireball;
-    /// missile-type for generic spell missile.
+    /// missile-type for generic spell missile
 local MissileType* MissileTypeSpell;
-    /// missile-type for the explosion missile.
+    /// missile-type for the explosion missile
 local MissileType* MissileTypeExplosion;
-    /// missile-type for the rune missile.
+    /// missile-type for the rune missile
 local MissileType* MissileTypeRune;
-    /// missile-type for the whirlwind missile.
+    /// missile-type for the whirlwind missile
 local MissileType* MissileTypeWhirlwind;
-    /// missile-type for the blizzard missile.
+    /// missile-type for the blizzard missile
 local MissileType* MissileTypeBlizzard;
-    /// missile-type for the death decay missile.
+    /// missile-type for the death decay missile
 local MissileType* MissileTypeDeathDecay;
-    /// missile-type for the death coil missile.
+    /// missile-type for the death coil missile
 local MissileType* MissileTypeDeathCoil;
 
 /*----------------------------------------------------------------------------
@@ -143,9 +143,9 @@ local MissileType* MissileTypeDeathCoil;
 /**
 **	Fireball controller
 **
-**	@param missile	Controlled missile.
+**	@param missile	Controlled missile
 **
-**	@todo	Move this code into the missile code.
+**	@todo	Move this code into the missile code
 */
 local void SpellFireballController(Missile *missile)
 {
@@ -159,7 +159,7 @@ local void SpellFireballController(Missile *missile)
     // explosions start at target and continue (10 tiles) beyond
     // explosions are on each tile on the way
 
-    // approx.
+    // approx
     if (missile->TTL <= missile->State && missile->TTL % 2 == 0) {
 	//+TileSize/2 to align gfx to baseline
 	x = missile->X + TileSizeX / 2;
@@ -170,8 +170,8 @@ local void SpellFireballController(Missile *missile)
 	x = x / TileSizeX;
 	y = y / TileSizeY;
 
-	//Effect of the explosion on units.
-	//NOTE: vladi: this is slightly different than original
+	// Effect of the explosion on units
+	// NOTE: vladi: this is slightly different than original
 	//      now it hits all units in range 1
 	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 	for (i = 0; i < n; ++i) {
@@ -185,9 +185,9 @@ local void SpellFireballController(Missile *missile)
 /**
 **	Death-Coil controller
 **
-**	@param missile	Controlled missile.
+**	@param missile	Controlled missile
 **
-**	@todo	Move this code into the missile code.
+**	@todo	Move this code into the missile code
 */
 local void SpellDeathCoilController(Missile * missile)
 {
@@ -267,9 +267,9 @@ local void SpellDeathCoilController(Missile * missile)
 /**
 **	Whirlwind controller
 **
-**	@param missile	Controlled missile.
+**	@param missile	Controlled missile
 **
-**	@todo	Move this code into the missile code.
+**	@todo	Move this code into the missile code
 */
 local void SpellWhirlwindController(Missile *missile)
 {
@@ -287,7 +287,7 @@ local void SpellWhirlwindController(Missile *missile)
 
 
     //
-    //	Every 4 cycles 4 points damage in tornado center.
+    //	Every 4 cycles 4 points damage in tornado center
     //
     if (!(missile->TTL % 4)) {
 	n = SelectUnitsOnTile(x, y, table);
@@ -335,9 +335,9 @@ local void SpellWhirlwindController(Missile *missile)
 /**
 **	Runes controller
 **
-**	@param missile	Controlled missile.
+**	@param missile	Controlled missile
 **
-**	@todo	Move this code into the missile code.
+**	@todo	Move this code into the missile code
 */
 local void SpellRunesController(Missile * missile)
 {
@@ -358,7 +358,7 @@ local void SpellRunesController(Missile * missile)
 	    MakeMissile(MissileTypeExplosion,missile->X, missile->Y,
 		missile->X, missile->Y);
 	    HitUnit(missile->SourceUnit,table[i], RUNE_DAMAGE);
-	    missile->TTL=0;		// Rune can only hit once.
+	    missile->TTL=0;		// Rune can only hit once
 	}
     }
 
@@ -426,9 +426,9 @@ global void DoneSpells()
 /**
 **	Get spell id by ident
 **
-**	@param Id  Spell ident.
+**	@param Id  Spell ident
 **
-**	@return spell id (index in spell type table)
+**	@return spell id (index in spell-type table)
 */
 global int SpellIdByIdent(const char *Ident)
 {
@@ -444,11 +444,11 @@ global int SpellIdByIdent(const char *Ident)
 }
 
 /**
-**	Get spell type struct ptr by ident
+**	Get spell-type struct ptr by ident
 **
-**	@param Id  Spell ident.
+**	@param Id  Spell ident
 **
-**	@return spell type struct ptr
+**	@return spell-type struct ptr
 */
 global const SpellType *SpellTypeByIdent(const char *Ident)
 {
@@ -463,11 +463,11 @@ global const SpellType *SpellTypeByIdent(const char *Ident)
 }
 
 /*
-**	Get spell type struct ptr by id
+**	Get spell-type struct ptr by id
 **
-**	@param id  Spell id (index in the spell type table).
+**	@param id  Spell id (index in the spell-type table)
 **
-**	@return spell type struct ptr
+**	@return spell-type struct ptr
 */
 global SpellType *SpellTypeById(int id)
 {
@@ -476,39 +476,156 @@ global SpellType *SpellTypeById(int id)
     return &SpellTypeTable[id];
 }
 
-/*
-**	Check if unit can cast spell
+/**
+**	Check if unit can cast the spell.
 **
-**	@param unit	Unit that has to be checked.
-**	@param SpellId	Spell id (index in the spell type table).
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param X	X coord of target spot when/if target does not exist
+**	@param Y	Y coord of target spot when/if target does not exist
 **
-**	@return 0 if unit cannot or 1 (=!0) if unit can cast this spell type
-global int CanCastSpell( Unit* unit, int SpellId )
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+global int CanCastSpell(const Unit* unit, const SpellType* spell,
+    const Unit* target, int x, int y)
 {
-    const SpellType* spell;
+    DebugCheck(spell == NULL);
+    DebugCheck(!unit->Type->CanCastSpell);	// NOTE: this must not happen
 
-    spell = SpellTypeById( SpellId );
-    DebugCheck( spell == NULL );
-    DebugCheck( !unit->Type->CanCastSpell ); // NOTE: this must not happen
-    if ( unit->Mana < spell->ManaCost ) {
+    if (unit->Mana < spell->ManaCost) {		// mana is a must!
 	return 0;
     }
+
+    switch (spell->Action) {
+	case SpellActionNone:
+	    DebugLevel0Fn("No spell action\n");
+	    return 0;
+
+//  ---human paladins---
+	case SpellActionHolyVision:
+	    return 1;
+
+	case SpellActionHealing:
+	    // only can heal organic units, with injury.
+	    if (target && target->Type->Organic
+		    && target->HP<target->Stats->HitPoints ) {
+		return 1;
+	    }
+	    // FIXME: johns: should we support healing near own units?
+	    return 0;
+
+	case SpellActionExorcism:
+	    // FIXME: johns: target is random selected within range of 6 fields
+	    // exorcism works only on undead units
+	    if (target && target->Type->IsUndead && target->HP ) {
+		return 1;
+	    }
+	    return 0;
+
+//  ---human mages---
+	case SpellActionFireball:
+	    return 1;
+
+	case SpellActionSlow:
+	    // slow didn't work on buildings
+	    if (target && !target->Type->Building
+		    && target->Slow < spell->TTL / FRAMES_PER_SECOND) {
+		return 1;
+	    }
+	    return 0;
+
+	case SpellActionFlameShield:
+	    // flame shield only on organic land units?
+	    if (target && target->Type->Organic && target->Type->LandUnit
+		    && target->FlameShield < spell->TTL / FRAMES_PER_SECOND) {
+		return 1;
+	    }
+	    return 0;
+
+	case SpellActionInvisibility:
+	    // invisible didn't work on buildings
+	    if (target && !target->Type->Building
+		    && target->Invisible < spell->TTL / FRAMES_PER_SECOND) {
+		return 1;
+	    }
+	    return 0;
+
+	case SpellActionPolymorph:
+	    // only can polymorph organic units
+	    if (target && target->Type->Organic) {
+		return 1;
+	    }
+	    return 0;
+
+	case SpellActionBlizzard:
+	    return 1;
+
+//  ---orc ogres---
+	case SpellActionEyeOfKilrogg:
+	    return 1;
+
+	case SpellActionBloodlust:
+	    if (target && target->Type->Organic
+		    && target->Bloodlust < spell->TTL / FRAMES_PER_SECOND) {
+		return 1;
+	    }
+	    // FIXME: should we support making bloodlust in range?
+	    return 0;
+
+	case SpellActionRunes:
+	    return 1;
+
+//  ---orc death knights---
+	case SpellActionDeathCoil:
+	    if ((target && target->Type->Organic) || (!target)) {
+		return 1;
+	    }
+	    return 0;
+
+	case SpellActionHaste:
+	    if (target && !target->Type->Building
+		    && target->Haste < spell->TTL / FRAMES_PER_SECOND) {
+		return 1;
+	    }
+	    return 0;
+
+	case SpellActionRaiseDead:
+	    return 1;
+
+	case SpellActionWhirlwind:
+	    return 1;
+
+	case SpellActionUnholyArmor:
+	    if (target && !target->Type->Building
+		    && target->UnholyArmor < spell->TTL / FRAMES_PER_SECOND) {
+		return 1;
+	    }
+	    return 0;
+
+	case SpellActionDeathAndDecay:
+	    return 1;
+
+	default:
+	    DebugLevel0Fn("Unknown spell action `%d'\n" _C_ spell->Action);
+	    return 0;
+    }
+
     return 1;
 }
-*/
 
 /**
 **	Spell cast!
 **
-**	@param spell	Spell type pointer
-**	@param unit	Unit that casts the spell.
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
 **	@param target	Target unit that spell is addressed to
 **	@param X	X coord of target spot when/if target does not exist
 **	@param Y	Y coord of target spot when/if target does not exist
 **
 **	@return		0 if spell should/can continue or =! 0 to stop
 */
-global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
+global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	int x, int y)
 {
     int repeat;
@@ -530,7 +647,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
     switch (spell->Action) {
     case SpellActionNone:
-	DebugLevel0Fn("No spell action");
+	DebugLevel0Fn("No spell action\n");
 	break;
 
 //  ---human paladins---
@@ -550,7 +667,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
     case SpellActionHealing:
 	// only can heal organic units
 	if (target && target->Type->Organic) {
-	    // FIXME: johns this can be calculated.
+	    // FIXME: johns this can be calculated
 	    while (target->HP < target->Stats->HitPoints
 		   && unit->Mana > spell->ManaCost) {
 		unit->Mana -= spell->ManaCost;	// get mana cost
@@ -569,7 +686,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	// FIXME: johns: the target is random selected within range of 6 fields
 	// exorcism works only on undead units
 	if (target && target->Type->IsUndead) {
-	    // FIXME: johns this can be calculated.
+	    // FIXME: johns this can be calculated
 	    while (target->HP && unit->Mana > spell->ManaCost) {
 		unit->Mana -= spell->ManaCost;	// get mana cost
 		target->HP--;
@@ -1050,7 +1167,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	break;
 
     default:
-	DebugLevel0Fn("Unknown spell action");
+	DebugLevel0Fn("Unknown spell action `%d'\n" _C_ spell->Action);
 	break;
     }
 
