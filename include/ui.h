@@ -233,6 +233,7 @@ typedef struct _ui_ {
 	// Completed bar
 	SDL_Color		CompletedBarColorRGB;		/// color for completed bar
 	Uint32		CompletedBarColor;		/// color for completed bar
+	int         CompletedBarShadow;     /// should complete bar have shadow
 	int				CompletedBarX;				/// completed bar X position
 	int				CompletedBarY;				/// completed bar Y position
 	int				CompletedBarW;				/// completed bar width

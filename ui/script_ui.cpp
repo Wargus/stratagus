@@ -1555,6 +1555,9 @@ local int CclDefineUI(lua_State* l)
 							ui->CompletedBarFont = text.Font;
 							ui->CompletedBarTextX = text.X;
 							ui->CompletedBarTextY = text.Y;
+						} else if (!strcmp(value, "has-shadow")) {
+							ui->CompletedBarShadow = 1;
+							--subk;
 						} else {
 							lua_pushfstring(l, "Unsupported tag: %s", value);
 							lua_error(l);
