@@ -760,6 +760,9 @@ local void DrawBuildingCursor(void)
 		| MapFieldNoBuilding;
 	    break;
 	case UnitTypeFly:
+	    mask=MapFieldAirUnit;	// already occuppied
+	    break;
+
 	default:
 	    DebugLevel1Fn("Were moves this unit?\n");
 	    return;
