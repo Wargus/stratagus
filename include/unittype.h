@@ -238,6 +238,7 @@ extern UnitType*UnitTypeOrcFarm;	/// Orc farm
 extern UnitType*UnitTypeHumanWall;	/// Human wall
 extern UnitType*UnitTypeOrcWall;	/// Orc wall
 extern UnitType*UnitTypeCritter;	/// Critter unit-type pointer
+extern UnitType*UnitTypeBerserker;	/// Berserker for berserker regeneration
 
 extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
 
