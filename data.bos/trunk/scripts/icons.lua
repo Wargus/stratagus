@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	icons.ccl	-	Define the icons.
+--	icons.lua	-	Define the icons.
 --
 --	(c) Copyright 2003-2004 by Jimmy Salmon and Crestez Leonard.
 --
@@ -110,19 +110,6 @@ DefineIcon({
 	Frame = 0,
 	File = "elites/build/development_yard_i.png"})
 
-DefineIcon({
-	Name = "icon-gturret",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/build/gturret_i.png"})
-
-DefineIcon({
-	Name = "icon-gturret_b",
-	Size = {46, 38},
-	Frame = 10,
-	File = "elites/units/engineer_icons.png"})
-	
-	
 DefineIcon({
 	Name = "icon-dev_b",
 	Size = {46, 38},
