@@ -56,7 +56,11 @@
 **
 **	Tileset::Name
 **
+**		FIXME: continue docu.
+**
 **	Tileset::File
+**
+**		FIXME: continue docu.
 **
 **	Tileset::PaletteFile
 **
@@ -88,6 +92,8 @@
 **
 **	Tileset::RemovedRock
 **
+**		FIXME: continue docu.
+**
 */
 
 /*----------------------------------------------------------------------------
@@ -100,10 +106,12 @@
 #define MaxTilesInTileset	3072	/// Current limit of tiles in tileset
 
 /**
-**   These are used for lookup tiles types
-**   mainly used for the FOW implementation of the seen woods/rocks
+**	These are used for lookup tiles types
+**	mainly used for the FOW implementation of the seen woods/rocks
+**
+**	@todo FIXME: I think this can be removed.
 */
-enum _tile_type_ {
+typedef enum _tile_type_ {
     TileTypeUnknown,			/// unknown tile type
     TileTypeNoWood,			/// UNUSED: no wood tile
     TileTypeWood,			/// any wood tile
@@ -115,7 +123,7 @@ enum _tile_type_ {
     TileTypeOrcWall,			/// any orc wall tile
     TileTypeNoWall,			/// UNUSED: no wall tile
     TileTypeWater,			/// any water tile
-};
+} TileType;
 
     ///	Tileset definition.
 typedef struct _tileset_ {
@@ -145,10 +153,12 @@ typedef struct _tileset_ {
 
 // FIXME: this #define's should be removed
 
-#define TilesetSummer		0	/// Reference number
-#define TilesetWinter		1	/// Reference number
-#define TilesetWasteland	2	/// Reference number
-#define TilesetSwamp		3	/// Reference number
+enum _tileset_nr_ {
+    TilesetSummer,			/// Reference number for summer
+    TilesetWinter,			/// Reference number for winter
+    TilesetWasteland,			/// Reference number for wasteland
+    TilesetSwamp,			/// Reference number for swamp
+};
 
 // FIXME: allow more tilesets
 
@@ -177,8 +187,8 @@ extern void TilesetCclRegister(void);	/// Register CCL features for tileset
 --	Predicates
 ----------------------------------------------------------------------------*/
 
-    /// True if this is the fog color. FIXME: fgp compatibility hack!
-#define COLOR_FOG_P(x) ((x) == 239 || (x) == 228)
+    /// True if this is the fog color
+#define COLOR_FOG_P(x) ((x) == 239)
     /// Solid fog color number in global palette
 #define COLOR_FOG (0)
 
