@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+----	$Id$
+
+----	(c) Copyright 2002-2004 by Nehal Mistry.
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Stratagus Installation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<h1>Installation instructions for Stratagus 2.1</h1><p>
+<hr>
+
+    <h2>Software Requirements</h2>
+    <ul>
+	<li><b>A supported operating system:</b> Win32, Linux, Mac OS X, BSD, 
+	Possibly any other Unix/POSIX OS.<br>
+	<font color=red>NOTE: some features of Winsock2 (WS2_32.DLL) are used. So even 
+	if you plan to play single player only, 
+	WinNT4.0 users will need Service Pack 3 or higher and Windows 95 users 
+	will need the winsock 2 
+	<a href="http://www.microsoft.com/windows95/downloads/contents/WUAdminTools/S_WUNetworkingTools/W95Sockets2/Default.asp">update</a>.</font><p>
+
+	<li><a href="http://www.libsdl.org/index.php">SDL</a> (required).<p>
+	<li><a href="http://www.libpng.org/pub/png/">libpng</a> (required).<p>
+	<li><a href="http://www.gzip.org/zlib/">zlib</a> (required).<p>
+	<li><a href="http://www.lua.org/">Lua</a> (required).<p>
+	<li><a href="http://www.xiph.org/ogg/vorbis/">libogg/libvorbis</a> (recommended).<p>
+	<li><a href="http://mikmod.raphnet.net/">libmikmod</a> (recommended).<p>
+	<li><a href="http://sources.redhat.com/bzip2/">libbzip2</a> (optional).<p>
+	<li><a href="http://flac.sourceforge.net/">libFLAC</a> (optional).<p>
+	<li><a href="http://www.underbit.com/products/mad/">libmad</a> (optional).<p>
+
+	<li>Either the original or expansion wc2 CD, or another 
+	<a href="http://stratagus.sourceforge.net/games.shtml">game</a>.<br>
+	<font color="red">NOTE: the Battle.net CD edition is not supported.</font><p>
+    </ul>
+
+    <h2>Hardware Requirements</h2>
+    <ul>
+	<li><b>Processor:</b> A 300 MHz CPU (faster recommended).<br>
+	<font color="red">NOTE: Stratagus is believed to be endian and word size safe, so other
+	architectures like (big endian) PPC or (64bit) Alpha should also
+	work at least with Linux.</font><p>
+
+	<li><b>Memory:</b> 32 MB of RAM (64 MB for mp3/ogg support).<br><p>
+
+	<li><b>Video Card:</b> Any graphics card that can handle 16 bpp 
+	and 640x480 is supported. (OpenGL is supported, and requires a 32Meg Card)<p>
+
+	<li><b>Sound Card:</b> Optional. Windows (for Win32) or SDL 
+	(for unix or Mac OS X) compatible sound cards are supported.<p>
+    </ul>
+
+    <h2>Installation</h2>
+
+    Mac OS X users: Extract the "contrib/macosx.tgz" file to the 
+    top-level directory and read "Read Me.rtf".<p>
+
+    <ul>
+	<li><b>Step 1, Download and Extract:</b><p>
+
+	<ul>
+	    <li><a href="http://sourceforge.net/project/showfiles.php?group_id=84903">
+		Download</a> the source code.<br>
+	    <font color="red">NOTE: both the tar.gz and zip files are the same, 
+	    we provide both formats for convenience.</font><p>
+
+	    <li>Extract the source stratagus-DATE.tar.gz with 
+	    'tar -zxvf stratagus-DATE.tar.gz'
+	</ul>
+
+	<br>
+	<li><b>Step 2, Compile:</b><p>
+
+	<ul>
+	    <li><b>GCC/Mingw users:</b>
+		<ul>
+		<li>Run 'autoconf' then './configure' to create the Makefile.
+		<li>When complete, type 'make depend &amp;&amp; make' to compile, and 
+		it should compile a working 'stratagus' (or 'stratagus.exe' for win32) 
+	    binary.<p>
+		</ul>
+
+	    <li><b>MSVC users:</b>
+	    <ul>
+		<li><a href="http://stratagus.sourceforge.net/msvc-libs.zip">
+		Download</a> the VC++ libraries and extract them into the root
+    	stratagus directory.
+		<li>Open the workspace file stratagus.dsw and compile.
+	    </ul>
+	</ul>
+
+	<br>
+	<li><b>Step 3, Run:</b><p>
+
+	You may now go into the toplevel stratagus directory and run the binary.
+	Remember, you have to obtain some gamedata to start the engine. stratagus
+	looks in './data', if your data is in a different location you will need 
+	to run stratagus with the '-d' option. Games can be found 
+	<a href="http://stratagus.sourceforge.net/datasets.shtml">here</a><p>
+    </ul>
+
+<hr>
+(C) Copyright 1998-2004 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
+under the <a href="gpl.html">GNU General Public License</a>.<br>
+All trademarks and copyrights on this page are owned by their respective owners.<br>
+</body>
+</html>
