@@ -37,18 +37,22 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
-// FIXME: should combine stand ground and still.
-
-
 /**
-**	Unit stands still!
+**	Unit stands still or stand ground.
+**
+**	@param unit	Unit pointer for action.
 */
-global void HandleActionStill(Unit* unit)
+global void ActionStillGeneric(Unit* unit,int ground)
 {
     const UnitType* type;
+    Unit* temp;
     Unit* goal;
 
-    DebugLevel3(__FUNCTION__": %Zd\n",UnitNumber(unit));
+    DebugLevel3Fn(" %Zd\n",UnitNumber(unit));
+
+    //
+    //	Animations
+    //
 
     type=unit->Type;
 
@@ -82,59 +86,41 @@ global void HandleActionStill(Unit* unit)
 	return;
     }
 
-#if 1  // a unit with type->Vanishes is _dying_.
-    //
-    //	Corpse:		vanishes
-    //
-    if( type->Vanishes ) {
-	//UnitCacheRemove(unit);
-	ReleaseUnit(unit);
-	return;
-    }
-#endif
-
     //
     //	Critters:	are moving random around.
     //
     // FIXME: critters: skeleton and daemon are also critters??????
-    if( type->Critter ) {
-	static const UnitType* critter;
-
-	if( !critter ) {
-	    // FIXME: remove or move the by ident, it is to slow!
-	    critter=UnitTypeByIdent("unit-critter");
+    if( type->Critter && type==UnitTypeCritter ) {
+	int x;
+	int y;
+    
+	x=unit->X;
+	y=unit->Y;
+	switch( (SyncRand()>>12)&15 ) {
+	    case 0:	x++;		break;
+	    case 1:	y++;		break;
+	    case 2:	x--;		break;
+	    case 3:	y--;		break;
+	    case 4:	x++; y++;	break;
+	    case 5:	x--; y++;	break;
+	    case 6:	y--; x++;	break;
+	    case 7:	x--; y--;	break;
+	    default:
+		    break;
 	}
-	if( type==critter ) {
-	    int x;
-	    int y;
-	
-	    x=unit->X;
-	    y=unit->Y;
-	    switch( (SyncRand()>>12)&15 ) {
-		case 0:	x++;		break;
-		case 1:	y++;		break;
-		case 2:	x--;		break;
-		case 3:	y--;		break;
-		case 4:	x++; y++;	break;
-		case 5:	x--; y++;	break;
-		case 6:	y--; x++;	break;
-		case 7:	x--; y--;	break;
-		default:
-			break;
-	    }
-	    if( x<0 ) {
-		x=0;
-	    } else if( x>=TheMap.Width ) {
-		x=TheMap.Width-1;
-	    } 
-	    if( y<0 ) {
-		y=0;
-	    } else if( y>=TheMap.Height ) {
-		y=TheMap.Height-1;
-	    }
-	    if( x!=unit->X || y!=unit->Y ) {
+	if( x<0 ) {
+	    x=0;
+	} else if( x>=TheMap.Width ) {
+	    x=TheMap.Width-1;
+	} 
+	if( y<0 ) {
+	    y=0;
+	} else if( y>=TheMap.Height ) {
+	    y=TheMap.Height-1;
+	}
+	if( x!=unit->X || y!=unit->Y ) {
+	    if( CheckedCanMoveToMask(x,y,TypeMovementMask(type)) ) {
 		// FIXME: Don't use pathfinder for this.
-		// FIXME: atleast prove the field is free.
 		unit->Command.Action=UnitActionMove;
 		ResetPath(unit->Command);
 		unit->Command.Data.Move.Goal=NoUnitP;
@@ -143,10 +129,10 @@ global void HandleActionStill(Unit* unit)
 		unit->Command.Data.Move.SY=unit->Y;
 		unit->Command.Data.Move.DX=x;
 		unit->Command.Data.Move.DY=y;
-		return;
 	    }
-
 	}
+	// NOTE: critter couldn't attack automatic through the return
+	return;
     }
 
     //
@@ -154,56 +140,59 @@ global void HandleActionStill(Unit* unit)
     //
     if( type->CanAttack && !type->CowerWorker && !type->CowerMage ) {
 	//
-	// JOHNS: removed Human controlled units attacks in attacking range.
-	// JOHNS: use stand ground for old behavior.
-	//	Computer controlled units react in reaction range.
+	//	Normal units react in reaction range.
 	//
-	if( /*unit->Player->Type!=PlayerHuman &&*/ !type->Tower ) {
+	if( !type->Tower ) {
 	    if( (goal=AttackUnitsInReactRange(unit)) ) {
 		// Weak goal, can choose other unit, come back after attack
 		// FIXME: should rewrite command handling
 		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
 		unit->SavedCommand=unit->NextCommand[0];
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
-		DebugLevel3(__FUNCTION__": %Zd Attacking in range %d\n"
+		DebugLevel3Fn(" %Zd Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
 		unit->SubAction|=2;
 		unit->SavedCommand.Action=UnitActionAttack;
 	    }
 	} else if( (goal=AttackUnitsInRange(unit)) ) {
-	    // FIXME: Johns should rewrite this
-	    // FIXME: Applies now only for towers
+	    DebugLevel3Fn(" %Zd #%d\n",UnitNumber(goal),goal->Refs);
+	    //
+	    //	Old goal destroyed.
+	    //
+	    temp=unit->Command.Data.Move.Goal;
+	    if( temp && temp->Destroyed ) {
+		DebugLevel3Fn(" destroyed unit %Zd #%d\n"
+			,UnitNumber(temp),temp->Refs);
+		DebugCheck( !temp->Refs );
+		if( !--temp->Refs ) {
+		    ReleaseUnit(temp);
+		}
+		unit->Command.Data.Move.Goal=NoUnitP;
+	    }
 	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
 		// New target.
-		if( unit->Command.Data.Move.Goal ) {
-		    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-		    unit->Command.Data.Move.Goal->Refs--;
-		    if( unit->Command.Data.Move.Goal ->Destroyed ) {
-			DebugLevel0Fn("destroyed unit\n");
-			if( !unit->Command.Data.Move.Goal->Refs ) {
-			    ReleaseUnit(unit->Command.Data.Move.Goal);
-			}
-		    } else {
-			DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-		    }
+		if( (temp=unit->Command.Data.Move.Goal) ) {
+		    DebugLevel3Fn(" old unit %Zd #%d\n"
+			    ,UnitNumber(temp),temp->Refs);
+		    DebugCheck( !temp->Refs );
+		    temp->Refs--;
+		    DebugCheck( !temp->Refs );
 		}
 		unit->Command.Data.Move.Goal=goal;
 		goal->Refs++;
 		unit->State=0;
 		unit->SubAction=1;
-		// Turn to target
-		if( !type->Tower ) {
-		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
-		    AnimateActionAttack(unit);
-		}
 	    }
 	    return;
 	}
     }
 
     if( unit->SubAction ) {		// was attacking.
-	if( unit->Command.Data.Move.Goal ) {
-	    unit->Command.Data.Move.Goal--;
+	if( (temp=unit->Command.Data.Move.Goal) ) {
+	    DebugCheck( !temp->Refs );
+	    temp->Refs--;
+	    DebugCheck( !temp->Refs );
+	    unit->Command.Data.Move.Goal=NoUnitP;
 	}
 	unit->SubAction=unit->State=0;
     }
@@ -248,6 +237,17 @@ global void HandleActionStill(Unit* unit)
 	unit->IY=(MyRand()>>15)&1;
 	return;
     }
+}
+
+
+/**
+**	Unit stands still!
+**
+**	@param unit	Unit pointer for still action.
+*/
+global void HandleActionStill(Unit* unit)
+{
+    ActionStillGeneric(unit,1);
 }
 
 //@}
