@@ -1059,15 +1059,17 @@ local void AiCollectResources(void)
     int n;
     Unit** units;
     Unit* unit;
-    int p[MaxCosts] = { 0, 50, 50, 0 };
-    int pt = 100;
+    int p[MaxCosts];
+    int pt;
 
     //
     //	Collect statistics about the current assignment
     //
+    pt = 100;
     for( i=0; i<MaxCosts; i++ ) {
 	rn[i]=0;
 	an[i]=0;
+	p[i]=AiPlayer->Collect[i];
 	if( (AiPlayer->NeededMask&(1<<i)) ) {	// Double percent if needed
 	    pt+=p[i];
 	    p[i]<<=1;
@@ -1134,7 +1136,7 @@ local void AiCollectResources(void)
 	    for( j=0; j<tn; ++j ) {
 		if( unit->Type==types[j] ) {
 		    if (unit->Orders[0].Action == UnitActionStill
-			    && unit->OrderCount==1 ) {
+			    && unit->OrderCount==1 && !unit->Removed ) {
 			unassigned[un++]=unit;
 			break;
 		    }
@@ -1163,7 +1165,7 @@ local void AiCollectResources(void)
 	unit=unassigned[i];
 
 	for( o=c=0; c<MaxCosts; ++c ) {
-	    DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*p[c],p[c],total*pt);
+	    DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*pt,p[c],total*p[c]);
 	    if( (an[c]+rn[c])*pt<total*p[c] ) {
 		o=c;
 		break;
@@ -1194,18 +1196,21 @@ local void AiCollectResources(void)
 		    switch( c ) {
 			case GoldCost:
 			    if( AiMineGold(unit) ) {
+				DebugLevel0Fn("Assigned\n");
 				assigned[an[c]++][c]=unit;
 				++total;
 			    }
 			    break;
 			case WoodCost:
 			    if( AiHarvest(unit) ) {
+				DebugLevel3Fn("Assigned\n");
 				assigned[an[c]++][c]=unit;
 				++total;
 			    }
 			    break;
 			case OilCost:
 			    if( AiHaulOil(unit) ) {
+				DebugLevel0Fn("Assigned\n");
 				assigned[an[c]++][c]=unit;
 				++total;
 			    }
@@ -1217,6 +1222,28 @@ local void AiCollectResources(void)
 	    }
 	}
     }
+
+    //
+    //	Now look if too much workers are assigned to a resource 
+    //	FIXME: If one resource can't be collected this is bad
+    //
+#if 0
+    for( c=0; c<MaxCosts; ++c ) {
+	DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*pt,p[c],total*p[c]);
+	if( (an[c]+rn[c]-1)*pt>total*p[c] ) {
+	    for( i=0; i<an[c]; ++i ) {
+		unit=assigned[i][c];
+		if( unit->SubAction<64 ) {
+		    DebugLevel3Fn("Must deassign %d\n",c);
+		    CommandStopUnit(unit);
+		    break;
+		}
+	    }
+	    break;
+	}
+    }
+#endif
+
 #else
     int c;
     int i;

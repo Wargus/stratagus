@@ -227,6 +227,7 @@ typedef struct _player_ai_ {
     int		Reserve[MaxCosts];	/// Resources to keep in reserve
     int		Used[MaxCosts];		/// Used resources
     int		Needed[MaxCosts];	/// Needed resources
+    int		Collect[MaxCosts];	/// Collect % of resources
     int		NeededMask;		/// Mask for needed resources
 
     int		NeedFood;		/// Flag need food
