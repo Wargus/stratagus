@@ -560,10 +560,9 @@ global void UIHandleMouseMove(int x,int y)
     }
 
     //NOTE: vladi: if unit is invisible, no cursor hint should be allowed
-    if ( UnitUnderCursor && !UnitVisible( UnitUnderCursor ) )
-      {
-      UnitUnderCursor = NULL;
-      }
+    if ( UnitUnderCursor && !UnitVisible( UnitUnderCursor ) ) {
+	UnitUnderCursor = NULL;
+    }
 
     //
     //	Selecting target.
