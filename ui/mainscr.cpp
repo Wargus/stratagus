@@ -254,7 +254,7 @@ global void DrawUnitInfo(const Unit* unit)
 		VideoDrawTextCentered(x + 114, y + 8 + 33, GameFont, buf);
 	}
 
-#ifdef DEBUG
+#ifdef DEBUG_UNITNUMBER
 	// Draw Unit Number for debug Purposes
 	VideoDrawNumber(x + 10, y + 8 + 150, GameFont, unit->Slot);
 #endif
