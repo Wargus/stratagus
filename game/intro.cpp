@@ -1600,6 +1600,63 @@ local SCM CclAddObjective(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclAddObjective(lua_State* l)
+{
+    int i;
+    const char* obj;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    if (args != 1 && args != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    obj = LuaToString(l, j + 1);
+    ++j;
+
+    if (j != args) {
+	// Optional location number given
+	int num;
+
+	num = LuaToNumber(l, j + 1);
+	if (num < 0) {
+	    num = 0;
+	}
+
+	i = 0;
+	while (i != MAX_OBJECTIVES && GameIntro.Objectives[i]) {
+	    ++i;
+	}
+	if (i == MAX_OBJECTIVES) {
+	    lua_pushfstring(l, "Too many objectives: %s", obj);
+	    lua_error(l);
+	}
+	if (num > i) {
+	    num = i;
+	}
+	for (; i > num; --i) {
+	    GameIntro.Objectives[i] = GameIntro.Objectives[i - 1];
+	}
+	GameIntro.Objectives[num] = strdup(obj);
+    } else {
+	// Add objective to the end of the list
+	i = 0;
+	while (i != MAX_OBJECTIVES && GameIntro.Objectives[i]) {
+	    ++i;
+	}
+	if (i == MAX_OBJECTIVES) {
+	    lua_pushfstring(l, "Too many objectives: %s", obj);
+	    lua_error(l);
+	}
+	GameIntro.Objectives[i] = strdup(obj);
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1632,6 +1689,36 @@ local SCM CclRemoveObjective(SCM objective)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclRemoveObjective(lua_State* l)
+{
+    int num;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    num = LuaToNumber(l, 1);
+    if (num < 0 || num >= MAX_OBJECTIVES) {
+	lua_pushfstring(l, "remove-objective: Invalid number: %d", num);
+	lua_error(l);
+    }
+    if (!GameIntro.Objectives[num]) {
+	lua_pushfstring(l, "remove-objective: No objective at location: %d", num);
+	lua_error(l);
+    }
+
+    free(GameIntro.Objectives[num]);
+
+    if (num == MAX_OBJECTIVES - 1) {
+	GameIntro.Objectives[num] = NULL;
+    }
+    for (; num < MAX_OBJECTIVES - 1 && GameIntro.Objectives[num]; ++num) {
+	GameIntro.Objectives[num] = GameIntro.Objectives[num + 1];
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1658,6 +1745,25 @@ local SCM CclSetObjectives(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSetObjectives(lua_State* l)
+{
+    int i;
+    int args;
+    int j;
+
+    // Clean old objectives
+    for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
+	free(GameIntro.Objectives[i]);
+	GameIntro.Objectives[i] = NULL;
+    }
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	GameIntro.Objectives[j] = strdup(LuaToString(l, j + 1));
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1779,9 +1885,9 @@ global void ObjectivesCclRegister(void)
     gh_new_procedureN("set-objectives!", CclSetObjectives);
     gh_new_procedureN("define-ranks", CclDefineRanks);
 #elif defined(USE_LUA)
-//    lua_register(Lua, "AddObjective", CclAddObjective);
-//    lua_register(Lua, "RemoveObjective", CclRemoveObjective);
-//    lua_register(Lua, "SetObjectives", CclSetObjectives);
+    lua_register(Lua, "AddObjective", CclAddObjective);
+    lua_register(Lua, "RemoveObjective", CclRemoveObjective);
+    lua_register(Lua, "SetObjectives", CclSetObjectives);
     lua_register(Lua, "DefineRanks", CclDefineRanks);
 #endif
 }
