@@ -59,6 +59,11 @@
 #include "sound_server.h"
 #endif
 
+#ifdef USE_SDLCD
+#include <SDL.h>
+#include <SDL_thread.h>
+#endif
+
 //----------------------------------------------------------------------------
 //	Variables
 //----------------------------------------------------------------------------
@@ -494,6 +499,8 @@ local void EnableDrawRefresh(void)
 */
 global void GameMainLoop(void)
 {
+    char *data;
+    
     EventCallback callbacks;
     int showtip;
 
@@ -579,14 +586,17 @@ global void GameMainLoop(void)
 	    //		Check cd-rom (every 2nd second)
 	    //
 	    switch( GameCycle% ((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
-		case 1:				// Check cd-rom
-		    if ( !(GameCycle%3) ) {	// every 2nd second
-			CDRomCheck();
-			fprintf(stderr,"TEST\n");
-		    }
-		    break;
+		case 0:				// Check cd-rom
+#ifdef USE_SDLCD
+		    if ( !(GameCycle%2) )	// every 2nd second
+			SDL_CreateThread(CDRomCheck, NULL);
 #endif
+
+#ifdef USE_LIBCDA
+		    CDRomCheck();
+
+#endif
+		    break;
 	    }
 
 	}
