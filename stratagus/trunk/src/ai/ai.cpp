@@ -306,8 +306,9 @@ local void AiExecuteScripts(void)
 			lua_pushstring(Lua, AiScript->Script);
 			lua_rawget(Lua, 1);
 			LuaCall(0, 1);
+			lua_pop(Lua, 1);
 
-			if (/*gh_null_p(AiScript->Script)*/0 && AiScript->OwnForce) {
+			if (!AiScript->Script && AiScript->OwnForce) {
 				AiEraseForce(AiScript->OwnForce);
 			}
 		}
