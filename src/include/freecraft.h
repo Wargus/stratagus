@@ -34,7 +34,7 @@
 ============================================================================*/
 
 #define noDEBUG				/// Define to include debug code
-#define noFLAG_DEBUG		/// ARI: Define to include map flag debug
+#define noFLAG_DEBUG			/// Define to include map flag debug
 
 #define noUSE_THREAD			/// Remove no for version with thread
 
@@ -42,6 +42,7 @@
 #define noUSE_SDLA			/// Remove no for sdl audio support
 #define noUSE_X11			/// Remove no for x11 support
 #define noUSE_SVGALIB			/// Remove no for svgalib support
+#define noUSE_WINCE			/// Remove no for win-ce video support
 
 /**
 **	Define this to support load of compressed (gzip) pud files
@@ -55,6 +56,12 @@
 **	and other data files. (If defined you need libbz2)
 */
 #define noUSE_BZ2LIB
+
+/**
+**	Define this to support data files stored in a single zip archive or
+**	multiple archives. (If defined you need libzziplib)
+*/
+#define noUSE_ZZIPLIB
 
 //
 //	Default speed for many things, set it higher for faster actions.
@@ -244,7 +251,7 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION	"1.17pre1"		/// Engine version shown.
+#define VERSION	"1.17pre1"		/// Engine version shown
 #endif
 
 #ifndef FreeCraftMajorVerion
