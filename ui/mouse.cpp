@@ -439,7 +439,7 @@ global void DoRightButton (int sx,int sy)
 	SendCommandMove(unit,x,y,flush);
 //	    }
     }
-    ShowOrdersCount=2;
+    ShowOrdersCount=GameCycle+ShowOrders*CYCLES_PER_SECOND;
 }
 
 /**
