@@ -1792,7 +1792,6 @@ local void CreateEditor(void)
 	GameSettings.Resources = SettingsResourcesMapDefault;
 	CreateGame(NULL, &TheMap);
     } else {
-	LoadTileset();
 	CreateGame(CurrentMapPath, &TheMap);
 	if (strcasestr(CurrentMapPath,".scm") ||
 	    strcasestr(CurrentMapPath,".chk")) {
