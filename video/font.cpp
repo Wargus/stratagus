@@ -38,13 +38,17 @@
 local ColorFont Fonts[MaxFonts]
 #ifndef USE_CCL
 #ifdef NEW_NAMES
-    ={ { "graphics/ui/fonts/game.png",	13,14 },
-    { "graphics/ui/fonts/small.png",	 7, 6 },
-    { "graphics/ui/fonts/large.png",	17,17 }, }
+    ={ { "graphics/ui/fonts/small.png",			 7, 6 },
+    { "graphics/ui/fonts/game.png",			13,14 },
+    { "graphics/ui/fonts/large.png",			17,17 },
+    { "graphics/ui/fonts/small episode titles.png",	32,35 },
+    { "graphics/ui/fonts/large episode titles.png",	52,50 }, }
 #else
-    ={ { "graphic/small font.png",	13,14 },
-    { "graphic/game font.png",		 7, 6 },
-    { "graphic/large font.png",		17,17 }, }
+    ={ { "graphic/game font.png",			 7, 6 },
+    { "graphic/small font.png",				13,14 },
+    { "graphic/large font.png",				17,17 },
+    { "graphic/small font episode titles.png",		32,35 },
+    { "graphic/large font episode titles.png",		52,50 }, }
 #endif
 #endif
     ;
@@ -632,17 +636,26 @@ global void LoadFonts(void)
 
 /**
 **	Define the used fonts.
+**
+**	@param type	Type of the font (game,small,...)
+**	@param file	File name of the graphic file
+**	@param width	Font width in pixels
+**	@param height	Font height in pixels
 */
 local SCM CclDefineFont(SCM type,SCM file,SCM width,SCM height)
 {
     int i;
 
     if( gh_eq_p(type,gh_symbol2scm("game")) ) {
-	i=0;
+	i=GameFont;
     } else if( gh_eq_p(type,gh_symbol2scm("small")) ) {
-	i=1;
+	i=SmallFont;
     } else if( gh_eq_p(type,gh_symbol2scm("large")) ) {
-	i=2;
+	i=LargeFont;
+    } else if( gh_eq_p(type,gh_symbol2scm("small-title")) ) {
+	i=SmallTitleFont;
+    } else if( gh_eq_p(type,gh_symbol2scm("large-title")) ) {
+	i=LargeTitleFont;
     } else {
 	fprintf(stderr,"unsupported font type\n");
 	return SCM_UNSPECIFIED;

@@ -20,12 +20,47 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Definitions
+--	Documentation
 ----------------------------------------------------------------------------*/
 
 /**
-**	Color font definition
+**	@struct _color_font_ font.h
+**
+**	\#include "font.h"
+**
+**	typedef struct _color_font_ ColorFont;
+**
+**		Defines the fonts used in the FreeCraft engine. We support
+**		proportional multicolor fonts of 7 colors. The eighth color is
+**		transparent. (Currently the fonts aren't packed)
+**
+**	ColorFont::File
+**
+**		File containing the graphics for the font.
+**
+**	ColorFont::Width
+**
+**		Maximal width of a character in pixels.
+**
+**	ColorFont::Height
+**
+**		Height of all characters in pixels.
+**
+**	ColorFont::CharWidth[]
+**
+**		The width of each font glyph in pixels. The index 0 is the
+**		width of the SPACE (' ', 0x20).
+**
+**	ColorFont::Graphic
+**
+**              Contains the graphics of the font, loaded from ColorFont::File.
 */
+
+/*----------------------------------------------------------------------------
+--	Definitions
+----------------------------------------------------------------------------*/
+
+    ///	Color font definition
 typedef struct _color_font_ {
     char*	File;			/// file containing font data
 
@@ -43,12 +78,13 @@ typedef struct _color_font_ {
 **	Font selector for the font functions.
 */
 enum _game_font_ {
-    GameFont,				/// Font used in game
-    SmallFont,				/// Small font used in stats
-    LargeFont,				/// Large font used in menus
-
-    // ... more to come
-    MaxFonts,				/// Number of fonts supported.
+    SmallFont,				/// small font used in stats
+    GameFont,				/// normal font used in game
+    LargeFont,				/// large font used in menus
+    SmallTitleFont,			/// small font used in episoden titles
+    LargeTitleFont,			/// large font used in episoden titles
+    // ... more to come or not
+    MaxFonts,				/// number of fonts supported
 };
 
 /**
@@ -82,26 +118,26 @@ enum _font_color {
 --	Functions
 ----------------------------------------------------------------------------*/
 
-    /// Set the default text colors for normal and reverse text.
+    /// Set the default text colors for normal and reverse text
 extern void SetDefaultTextColors(int normal,int reverse);
-    /// Get the default text colors for normal and reverse text.
+    /// Get the default text colors for normal and reverse text
 extern void GetDefaultTextColors(int *normalp,int *reversep);
-    /// Returns the pixel length of a text.
+    /// Returns the pixel length of a text
 extern int TextLength(unsigned font,const unsigned char* text);
-    /// Draw text unclipped.
+    /// Draw text unclipped
 extern int DrawText(int x,int y,unsigned font,const unsigned char* text);
-    /// Draw reverse text unclipped.
+    /// Draw reverse text unclipped
 extern int DrawReverseText(int x,int y,unsigned font,const unsigned char* text);
-    /// Draw text centered and unclipped.
+    /// Draw text centered and unclipped
 extern int DrawTextCentered(int x,int y,unsigned font,const unsigned char* text);
-    /// Draw number unclipped.
+    /// Draw number unclipped
 extern int DrawNumber(int x,int y,unsigned font,int number);
-    /// Draw reverse number unclipped.
+    /// Draw reverse number unclipped
 extern int DrawReverseNumber(int x,int y,unsigned font,int number);
 
-    /// load and initialize the fonts
+    /// Load and initialize the fonts
 extern void LoadFonts(void);
-    /// register ccl features
+    /// Register ccl features
 extern void FontsCclRegister(void);
 
 //@}
