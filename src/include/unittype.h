@@ -618,6 +618,9 @@ typedef struct _new_animations_ {
 	NewAnimation* StartTrain;
 	NewAnimation* Train;
 	NewAnimation* EndTrain;
+	NewAnimation* StartResearch;
+	NewAnimation* Research;
+	NewAnimation* EndResearch;
 	NewAnimation* StartBuild;
 	NewAnimation* Build;
 	NewAnimation* EndBuild;
