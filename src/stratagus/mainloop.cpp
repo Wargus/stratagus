@@ -93,11 +93,21 @@ global jmp_buf main_loop;
 */
 local void MoveMapViewPointUp(unsigned step)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+
+    if (v->MapY > step) {
+	v->MapY -= step;
+    } else {
+	v->MapY = 0;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if (MapY > step) {
 	MapY -= step;
     } else {
 	MapY = 0;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -107,11 +117,21 @@ local void MoveMapViewPointUp(unsigned step)
 */
 local void MoveMapViewPointLeft(unsigned step)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+
+    if (v->MapX > step) {
+	v->MapX -= step;
+    } else {
+	v->MapX = 0;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if (MapX > step) {
 	MapX -= step;
     } else {
 	MapX = 0;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -121,11 +141,21 @@ local void MoveMapViewPointLeft(unsigned step)
 */
 local void MoveMapViewPointDown(unsigned step)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+
+    if (v->MapY < TheMap.Height - v->MapHeight - step) {
+	v->MapY += step;
+    } else {
+	v->MapY = TheMap.Height - v->MapHeight;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if (MapY < TheMap.Height - MapHeight - step) {
 	MapY += step;
     } else {
 	MapY = TheMap.Height - MapHeight;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -135,11 +165,21 @@ local void MoveMapViewPointDown(unsigned step)
 */
 local void MoveMapViewPointRight(unsigned step)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+
+    if (v->MapX < TheMap.Width - v->MapWidth - step) {
+	v->MapX += step;
+    } else {
+	v->MapX = TheMap.Width - v->MapWidth;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if (MapX < TheMap.Width - MapWidth - step) {
 	MapX += step;
     } else {
 	MapX = TheMap.Width - MapWidth;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -296,6 +336,93 @@ local void DrawMenuButtonArea(void)
 #endif
 }
 
+#ifdef SPLIT_SCREEN_SUPPORT
+
+local void DrawMapViewport (int v)
+{
+#ifdef NEW_DECODRAW
+    // Experimental new drawing mechanism, which can keep track of what is
+    // overlapping and draw only that what has changed..
+    // Every to-be-drawn item added to this mechanism, can be handed by this
+    // call.
+    if (InterfaceState == IfaceStateNormal) {
+      // DecorationRefreshDisplay();
+      DecorationUpdateDisplay();
+    }
+
+#else
+    if (InterfaceState == IfaceStateNormal) {
+#ifdef NEW_MAPDRAW
+	MapUpdateFogOfWar(TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+#else
+	unsigned u;
+
+	// FIXME: only needed until flags are correct set
+	for( u=0; u < TheUI.VP[v].MapHeight; ++u ) {
+	    MustRedrawRow[u]=1;
+	}
+	for (u=0; u<TheUI.VP[v].MapHeight*TheUI.VP[v].MapWidth; ++u ) {
+	    MustRedrawTile[u]=1;
+	}
+#endif
+
+	SetClipping (TheUI.VP[v].X, TheUI.VP[v].Y,
+		TheUI.VP[v].EndX, TheUI.VP[v].EndY);
+
+	DrawMapBackgroundInViewport (v, TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	DrawUnits(v);
+	DrawMapFogOfWar(v, TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	DrawMissiles(v);
+	DrawConsole();
+	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+    }
+
+    // Resources over map!
+    // FIXME: trick17! must find a better solution
+    // FIXME: must take resource end into account
+    if (TheUI.MapArea.X<=TheUI.ResourceX && TheUI.MapArea.EndX>=TheUI.ResourceX
+	    && TheUI.MapArea.Y<=TheUI.ResourceY
+	    && TheUI.MapArea.EndY>=TheUI.ResourceY) {
+	MustRedraw|=RedrawResources;
+    }
+#endif
+}
+
+/**
+**	Draw map area
+*/
+local void DrawMapArea(void)
+{
+    int i;
+    for (i=0; i < TheUI.NumViewports; i++) {
+	DrawMapViewport (i);
+    }
+
+    /* if we a single viewport, no need to denote the "last clicked" one */
+    if (TheUI.NumViewports==1)
+	return;
+
+    for (i=0; i < TheUI.NumViewports; i++) {
+	enum _sys_colors_ color;
+
+	if (i==TheUI.LastClickedVP)
+	    color = ColorOrange;
+	else
+	    color = ColorBlack;
+
+	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].Y,
+			TheUI.VP[i].X, TheUI.VP[i].EndY);
+	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].Y,
+			TheUI.VP[i].EndX, TheUI.VP[i].Y);
+	VideoDrawLineClip (color, TheUI.VP[i].EndX, TheUI.VP[i].Y,
+			TheUI.VP[i].EndX, TheUI.VP[i].EndY);
+	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].EndY,
+			TheUI.VP[i].EndX, TheUI.VP[i].EndY);
+    }
+}
+
+#else /* SPLIT_SCREEN_SUPPORT */
+
 /**
 **	Draw map area
 */
@@ -347,6 +474,8 @@ local void DrawMapArea(void)
 #endif
 }
 
+#endif /* SPLIT_SCREEN_SUPPORT */
+
 /**
 **	Display update.
 */
@@ -383,6 +512,19 @@ global void UpdateDisplay(void)
 
     PlayerPixels(Players);		// Reset to default colors
 
+#ifdef SPLIT_SCREEN_SUPPORT
+    if( MustRedraw&RedrawMinimap ) {
+	// FIXME: redraw only 1* per second!
+	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
+	int v = TheUI.LastClickedVP;
+	DrawMinimap (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+    } else if (MustRedraw&RedrawMinimapCursor) {
+	int v = TheUI.LastClickedVP;
+	HideMinimapCursor ();
+	DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     if( MustRedraw&RedrawMinimap ) {
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
@@ -392,6 +534,7 @@ global void UpdateDisplay(void)
 	HideMinimapCursor();
 	DrawMinimapCursor(MapX,MapY);
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     if( MustRedraw&RedrawInfoPanel ) {
 	DrawInfoPanel();
@@ -430,8 +573,14 @@ global void UpdateDisplay(void)
 	if( MustRedraw&RedrawMap ) {
 	    // FIXME: split into small parts see RedrawTile and RedrawRow
 	    InvalidateAreaAndCheckCursor(
+#ifdef SPLIT_SCREEN_SUPPORT
+		     TheUI.MapArea.X,TheUI.MapArea.Y
+		    ,TheUI.MapArea.EndX-TheUI.MapArea.X+1
+		    ,TheUI.MapArea.EndY-TheUI.MapArea.Y+1);
+#else /* SPLIT_SCREEN_SUPPORT */
 		     TheUI.MapX,TheUI.MapY
 		    ,TheUI.MapEndX-TheUI.MapX+1,TheUI.MapEndY-TheUI.MapY+1);
+#endif /* SPLIT_SCREEN_SUPPORT */
 	}
 	if( (MustRedraw&RedrawFiller1) && TheUI.Filler1.Graphic ) {
 	    InvalidateAreaAndCheckCursor(
