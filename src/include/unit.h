@@ -119,6 +119,15 @@
 **		unit.  (Unit::Stats::SightRange, Unit::Stats::Armor,
 **		Unit::Stats::HitPoints, ...)
 **
+**	Unit::Colors
+**
+**		Player colors of the unit. Contains the hardware dependent
+**		pixel values for the player colors (palette index #208-#211).
+**		Setup from the global palette.
+**		@note Index #208-#211 are various SHADES of the team color
+**		(#208 is brightest shade, #211 is darkest shade) .... these
+**		numbers are NOT red=#208, blue=#209, etc
+**
 **	Unit::IX Unit::IY
 **
 **		Coordinate displacement in pixels or coordinates inside a tile.
@@ -460,6 +469,7 @@ struct _unit_ {
     UnitStats*	Stats;			/// current unit stats
 
 //	DISPLAY:
+    UnitColors	Colors;			/// Player colors
     char	IX;			/// X image displacement to map position
     char	IY;			/// Y image displacement to map position
     unsigned	Frame : 8;		/// Image frame: high bit used for flip

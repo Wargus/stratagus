@@ -74,13 +74,15 @@ local int PlayerColors[PlayerMax] = {
     228,	// black
     255,	// white
     2,		// yellow
-    251,	// yellow
-    251,	// yellow
-    251,	// yellow
-    251,	// yellow
-    251,	// yellow
-    251,	// yellow
-    251,	// yellow
+
+    208,	// red
+    1,		// blue
+    216,	// green
+    220,	// violett
+    224,	// orange
+    228,	// black
+    255,	// white
+
     251,	// yellow
 };
 
