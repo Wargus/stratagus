@@ -118,6 +118,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
+local void ScenSelectHSAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
@@ -813,8 +814,8 @@ local Menuitem SpeedSettingsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_VSLIDER, 128, 40, 0, 0, NULL, NULL,
-            { vslider:{ 0, 6, 6*18, ScenSelectVSAction, 1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_HSLIDER, 108, 80, 0, 0, NULL, NULL,
+            { hslider:{ 0, 6*18, 18, ScenSelectVSAction, 1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
@@ -1327,6 +1328,59 @@ local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 }
 
 /**
+**	Draw hslider 'button' on menu mx, my
+**
+**	@param mi	menuitem pointer
+**	@param mx	menu X display position (offset)
+**	@param my	menu Y display position (offset)
+*/
+local void DrawHSlider(Menuitem *mi, unsigned mx, unsigned my)
+{
+    int p;
+    unsigned flags = mi->flags;
+    unsigned w, h, x, y;
+    w = mi->d.hslider.xsize;
+    h = mi->d.hslider.ysize;
+    x = mx+mi->xofs;
+    y = my+mi->yofs;
+
+    if (flags&MenuButtonDisabled) {
+	PushClipping();
+	SetClipping(0,0,VideoHeight-1,x + w - 20);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
+	PopClipping();
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW - 1, x - 2, y);
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
+    } else {
+	PushClipping();
+	SetClipping(0,0,VideoHeight-1,x + w - 20);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+	PopClipping();
+	if (mi->d.hslider.cflags&MI_CFLAGS_LEFT) {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
+	} else {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
+	}
+	if (mi->d.hslider.cflags&MI_CFLAGS_RIGHT) {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + w - 20, y);
+	} else {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + w - 20, y);
+	}
+	p = (mi->d.hslider.percent * (w - 54)) / 100;
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + p, y + 1);
+    }
+
+    if (flags&MenuButtonSelected) {
+	if (flags&MenuButtonDisabled) {
+	    VideoDrawRectangleClip(ColorGray,x-2,y,w+2,h);
+	} else {
+	    VideoDrawRectangleClip(ColorYellow,x-2,y,w+2,h);
+	}
+    }
+
+}
+
+/**
 **	Draw gem 'button' on menu mx, my
 **
 **	@param mi	menuitem pointer
@@ -1487,6 +1541,9 @@ global void DrawMenu(int menu_id)
 		break;
 	    case MI_TYPE_VSLIDER:
 		DrawVSlider(mi,menu->x,menu->y);
+		break;
+	    case MI_TYPE_HSLIDER:
+		DrawHSlider(mi,menu->x,menu->y);
 		break;
 	    case MI_TYPE_DRAWFUNC:
 		if (mi->d.drawfunc.draw) {
@@ -2128,6 +2185,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
     }
 }
@@ -2311,6 +2369,7 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
     mi->d.listbox.startline = 0;
     mi->d.listbox.curopt = 0;
     mi[1].d.vslider.percent = 0;
+    mi[1].d.hslider.percent = 0;
     MustRedraw |= RedrawMenu;
 }
 
@@ -2387,6 +2446,79 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
     }
 }
 
+local void ScenSelectHSAction(Menuitem *mi, int i)
+{
+    int op, d1, d2;
+
+    mi--;
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
+		    mi->d.listbox.curopt++;
+		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+			mi->d.listbox.curopt--;
+			mi->d.listbox.startline++;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    mi->d.listbox.curopt--;
+		    if (mi->d.listbox.curopt < 0) {
+			mi->d.listbox.curopt++;
+			mi->d.listbox.startline--;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    }
+	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    if (i == 2) {
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
+			op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			d1 = mi[1].d.hslider.curper - mi[1].d.hslider.percent;
+			d2 = op - mi[1].d.hslider.curper;
+			if (d2 < d1) {
+			    mi->d.listbox.curopt++;
+			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				mi->d.listbox.curopt--;
+				mi->d.listbox.startline++;
+			    }
+			}
+		    }
+		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+			op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			d1 = mi[1].d.hslider.percent - mi[1].d.hslider.curper;
+			d2 = mi[1].d.hslider.curper - op;
+			if (d2 < d1) {
+			    mi->d.listbox.curopt--;
+			    if (mi->d.listbox.curopt < 0) {
+				mi->d.listbox.curopt++;
+				mi->d.listbox.startline--;
+			    }
+			}
+		    }
+		}
+		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
+}
+
 local void ScenSelectFolder(void)
 {
     char *cp;
@@ -2409,6 +2541,7 @@ local void ScenSelectFolder(void)
 	    mi->d.listbox.startline = 0;
 	    mi->d.listbox.curopt = 0;
 	    mi[1].d.vslider.percent = 0;
+	    mi[1].d.hslider.percent = 0;
 	    MustRedraw |= RedrawMenu;
 	}
     }
@@ -2441,6 +2574,7 @@ local void ScenSelectOk(void)
 	    mi->d.listbox.startline = 0;
 	    mi->d.listbox.curopt = 0;
 	    mi[1].d.vslider.percent = 0;
+	    mi[1].d.hslider.percent = 0;
 	    MustRedraw |= RedrawMenu;
 	} else {
 	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
@@ -3198,7 +3332,7 @@ normkey:
 */
 global void MenuHandleMouseMove(int x,int y)
 {
-    int h, i, j, n, xs, ys;
+    int h, w, i, j, n, xs, ys;
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
     int RedrawFlag = 0;
@@ -3349,6 +3483,46 @@ global void MenuHandleMouseMove(int x,int y)
 			    (*mi->d.vslider.action)(mi, 1);		// 1 indicates move
 			}
 			break;
+		    case MI_TYPE_HSLIDER:
+			xs = menu->x + mi->xofs;
+			ys = menu->y + mi->yofs;
+			if (x < xs || x > xs + mi->d.hslider.xsize || y < ys || y > ys + mi->d.hslider.ysize) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
+				    RedrawFlag = 1;
+				    mi->flags &= ~MenuButtonActive;
+				}
+			    }
+			    mi->d.hslider.cursel = 0;
+			    continue;
+			}
+			j = x - xs;
+			if (j < 20) {
+			    mi->d.hslider.cursel |= MI_CFLAGS_LEFT;
+			} else if (j > mi->d.hslider.xsize - 20) {
+			    mi->d.hslider.cursel |= MI_CFLAGS_RIGHT;
+			} else {
+			    mi->d.hslider.cursel &= ~(MI_CFLAGS_LEFT|MI_CFLAGS_RIGHT);
+			    w = (mi->d.hslider.percent * (mi->d.hslider.xsize - 54)) / 100 + 18;
+			    mi->d.hslider.curper = ((j - 20) * 100) / (mi->d.hslider.xsize - 54);
+			    if (mi->d.hslider.curper > 100) {
+				mi->d.hslider.curper = 100;
+			    }
+			    if (j > w && j < w + 18) {
+				mi->d.hslider.cursel |= MI_CFLAGS_KNOB;
+			    } else {
+				mi->d.hslider.cursel |= MI_CFLAGS_CONT;
+				if (j <= w) {
+				    mi->d.hslider.cursel |= MI_CFLAGS_LEFT;
+				} else {
+				    mi->d.hslider.cursel |= MI_CFLAGS_RIGHT;
+				}
+			    }
+			}
+			if (mi->d.hslider.action) {
+			    (*mi->d.hslider.action)(mi, 1);		// 1 indicates move
+			}
+			break;
 		    default:
 			continue;
 			// break;
@@ -3363,6 +3537,7 @@ global void MenuHandleMouseMove(int x,int y)
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
 		    case MI_TYPE_VSLIDER:
+		    case MI_TYPE_HSLIDER:
 		    case MI_TYPE_INPUT:
 			if (!(mi->flags&MenuButtonActive)) {
 			    RedrawFlag = 1;
@@ -3586,6 +3761,7 @@ global void ProcessMenu(int menu_id, int loop)
 	    case MI_TYPE_PULLDOWN:
 	    case MI_TYPE_LISTBOX:
 	    case MI_TYPE_VSLIDER:
+	    case MI_TYPE_HSLIDER:
 	    case MI_TYPE_INPUT:
 		mi->flags &= ~(MenuButtonClicked|MenuButtonActive
 				|MenuButtonSelected);
@@ -3611,6 +3787,11 @@ global void ProcessMenu(int menu_id, int loop)
 		mi->d.vslider.cflags = 0;
 		if (mi->d.vslider.defper != -1)
 		    mi->d.vslider.percent = mi->d.vslider.defper;
+		break;
+	    case MI_TYPE_HSLIDER:
+		mi->d.hslider.cflags = 0;
+		if (mi->d.hslider.defper != -1)
+		    mi->d.hslider.percent = mi->d.hslider.defper;
 		break;
 	    default:
 		break;
