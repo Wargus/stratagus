@@ -87,7 +87,15 @@ void HandleActionResearch(Unit* unit)
 		upgrade = unit->Data.Research.Upgrade;
 	}
 
-	unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] += SpeedResearch;
+	if (unit->Type->NewAnimations) {
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Research);
+		if (unit->Wait) {
+			unit->Wait--;
+			return;
+		}
+	}
+
+	unit->Player->UpgradeTimers.Upgrades[upgrade - Upgrades] += SpeedResearch;
 	if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] >=
 			upgrade->Costs[TimeCost]) {
 
