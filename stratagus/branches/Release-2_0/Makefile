@@ -67,7 +67,7 @@ OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
 
 .PHONY:	make-objdir all-src
 
-all:	all-src stratagus$(EXE) tools
+all:	all-src stratagus$(EXE)
 
 make-objdir:
 	@for i in $(MODULES); do \
@@ -158,7 +158,7 @@ distclean:	clean
 
 configure:
 	autoconf
-	./configure
+	./configure --enable-static
 
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
