@@ -194,7 +194,7 @@ static FullReplay* StartReplay(void)
 	}
 
 	replay->Date = strdup(s);
-	replay->Map = strdup(TheMap.Description);
+	replay->Map = strdup(TheMap.Info.Description);
 	replay->MapId = (signed int)TheMap.Info.MapUID;
 	replay->MapPath = strdup(CurrentMapPath);
 	replay->Resource = GameSettings.Resources;
