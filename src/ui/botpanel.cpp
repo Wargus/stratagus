@@ -38,7 +38,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
-#include "network.h"
+#include "commands.h"
 #include "depend.h"
 #include "interface.h"
 #include "ui.h"

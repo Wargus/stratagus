@@ -76,6 +76,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "sound_server.h"
 #include "sound.h"
 #include "network.h"
+#include "commands.h"
 #include "settings.h"
 
 /*----------------------------------------------------------------------------
