@@ -1,7 +1,19 @@
+<HTML><HEAD>
 <!--
 ----	$Id$
+
+----	(c) Copyright 2001 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
 -->
-<HTML><HEAD>
     <TITLE>Development for FreeCraft Version 1.17</TITLE>
 </HEAD>
 <BODY>
@@ -18,14 +30,45 @@
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
 <P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
-<A HREF="artistic-license.html">"Artistic License"</A></B>
+<A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
-This file should give you some information to help too develop FreeCraft.<P>
+This file should give you some information to help to develop FreeCraft.<P>
+If you make bigger changes please always extend the copyright with your name.<P>
+
+<H2>Mailing list</H2>
+
+If you want to develop for FreeCraft you should join the development mailing
+list.<P>
+
+<A HREF="http://www.geocrawler.com/redir-sf.php3?list=freecraft-hackers">FreeCraft development Archives</A><P>
+<A HREF="http://lists.sourceforge.net/mailman/listinfo/freecraft-hackers">Subscribe FreeCraft development</A><P>
+
+<H2>Bugs and tasks</H2>
+
+You find the known bugs here:<P>
+
+<A HREF="http://sourceforge.net/tracker/?group_id=1965&atid=101965">FreeCraft real-time strategy game engine - Tracker - Bugs</A><P>
+
+And the planned tasks here:<P>
+
+<A HREF="http://sourceforge.net/pm/task.php?group_project_id=1539&group_id=1965&func=browse">FreeCraft real-time strategy game engine - Tasks</A><P>
+
+Before you starting doing some work, please ask on the mailing list, if not
+already somebody is doing the same thing and write what you plan todo, that 
+nobody starts the same work.
 
 <H2>Make and makefiles</H2>
 
 Type 'make help' to get an overview what all could be made.<P>
+
+'make depend'<P>
+
+and than<P>
+
+'make'<P>
+
+is all you need, most times.<P>
 
 <H2>C code documentation</H2>
 
@@ -35,7 +78,6 @@ I have prepared some extra documentations:<P>
 
 <UL>
 <LI><A HREF="datadir.html">FreeCraft data file description.</A>
-<LI><A HREF="unit.html">C "Unit" type description.</A>
 </UL>
 
 <H2>Source code documentation</H2>
@@ -71,9 +113,9 @@ Multi line source code documentation.<P>
 /// ... <P>
 Single line source code documentation.<P>
 //@{ or /*@{*/<P>
-Grouping.<P>
+Start grouping.<P>
 //@} or /*@}*/<P>
-Grouping.<P>
+End grouping.<P>
 
 <UL>
 <LI>@name
@@ -104,6 +146,16 @@ Please read the documentation of the programs.
 /**@name {filename}.c	-	{One line description of this file} */
 //
 //      (c) Copyright 2001 by {insert your name here}
+//
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
 //
 //      $Id$
 
@@ -145,6 +197,7 @@ If you fix in other modules, please imitate the coding style of the old coder.
 <LI>Write ANSI C.
 <LI>Use 8 spaces tabulators.
 <LI>Use 4 spaces indentation levels.
+<LI>No line should be longer than 78 characters.
 <LI>Use C++ comments for to end of line comments.
 <LI>Use { } also for one statement blocks.
 </UL>

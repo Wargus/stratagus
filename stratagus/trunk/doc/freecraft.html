@@ -1,7 +1,19 @@
+<HTML><HEAD>
 <!--
 ----	$Id$
+
+----	(c) Copyright 2001 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
 -->
-<HTML><HEAD>
     <TITLE>The FreeCraft (fka ALE Clone) Version 1.17</TITLE>
 </HEAD>
 <BODY>
@@ -18,25 +30,25 @@
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
 <P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
-<A HREF="artistic-license.html">"Artistic License"</A></B>
+<A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
 <A HREF="#contents">Contents</A>
 
     <H2><A NAME="copyright">Copyrights</A></H2>
 
-    Please refer to the <A HREF="artistic-license.html">LICENSE</A>
+    Please refer to the <A HREF="gpl.html">GNU General Public License</A>
     document provided with this distribution. To proceed beyond this point,
     is to agree with the license agreement.
 
     <P>The self extracting archive contains ZIP code, read the
     <A HREF="ZIP-LICENSE">ZIP-LICENSE</A>.
     <P>The binaries could contain SDL code, read the 
-    <A HREF="../README-SDL.txt">README-SDL.txt</A> and the
+    <A HREF="README-SDL.txt">README-SDL.txt</A> and the
     <A HREF="http://www.gnu.org/copyleft/lesser.html"> GNU LGPL license.</A>
     <P>The source and binaries contains SIOD code, read 
-    <A HREF="../src/siod/siod.html"> siod.html</A> for copyright and
-    informations.
+    <A HREF="SIOD.txt"> and <A HREF="../src/siod/siod.html"> siod.html</A> for
+    copyright and informations.
 
     <H2><A NAME="disclaimer">DISCLAIMER</A></H2>
 
@@ -83,15 +95,19 @@
     <H2><A NAME="faq">Problems</A></H2>
 
     Read this, if you have problems compiling, installing or playing FreeCraft
-    <A HREF="faq.html">faq.html</A>
+    <A HREF="faq.html">faq.html</A> or use the
+    <A HREF="http://sourceforge.net/forum/forum.php?forum_id=5634">
+    help forum</A> for questions.
+
 
     <H2><A NAME="features">Features</A></H2>
 
 <UL>
-<LI>Health and mana could be shown on the map.
+<LI>Health and mana and orders could be shown on the map.
 <LI>Better path finder routines.
-<LI>Loading of compressed (gzip) puds.
+<LI>Loading of compressed (gzip or bzip2) puds.
 <LI>Configuration language.
+<LI>Scripting language.
 <LI>Easy replace of unit graphics and sounds.
 <LI>64 times greater maps.
 <LI>Training queues.
@@ -99,7 +115,6 @@
 <LI>Correct fog of war (terrain changes are not shown).
 <LI>Nice looking fog of war (alpha-gray-scale)
 <LI>More resolutions 640x480, 800x600, 1024x768 and 1600x1200.
-<LI>Scripting language.
 <LI>Support for up to 6 resources.
 <LI>Internet play.
 </UL>
@@ -170,6 +185,8 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 	is the port number on the local computer, <VAR>port</VAR> is the 
 	port on the game server. The default ports are 6660. If you have a
 	firewall please let the port 6660/UDP through.
+    <LI>-N name<BR>
+	Name of the player, for network play.
     <LI>-s frames<BR>
 	The AI sleeps 'frames' before it starts working.
     <LI>-t factor<BR>
@@ -177,6 +194,10 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     <LI>-D<BR>
 	Video depth = pixel pro point. Only useful if not automatic
 	detected.
+    <LI>-S speed<BR>
+	Want to play slower? Use for 50 to play with half speed. Want to play
+	faster? Use 200 to play at double speed. (default is 100% which are
+	30 frames/second)
     <LI>-F<BR>
 	Full-screen video-mode.
     <LI>-W<BR>
@@ -269,11 +290,17 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 
 <UL>
 <LI>Single click with left mouse button<BR>
+    Select unit.
 <LI>SHIFT Single click with left mouse button<BR>
+    Add or remove unit from selection.
 <LI>CTRL Single click with left mouse button<BR>
+    Select all units of the same unit-type.
 <LI>ALT Single click with left mouse button<BR>
+    Select all units of the previous group.
 <LI>Double click with left mouse button<BR>
+    Select all units of the same unit-type.
 <LI>Click & Hold with left mouse button<BR>
+    Not supported.
 </UL>
 
     <H2><A NAME="ccl">CCL: FreeCraft Configuration Language</A></H2>
