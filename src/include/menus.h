@@ -130,22 +130,22 @@ typedef struct _menuitem_ {
 	} listbox;
 	struct {
 	    unsigned cflags;
-	    unsigned int xsize;
-	    unsigned int ysize;
+	    unsigned int xsize;	// x-size of slider, not including buttons
+	    unsigned int ysize;	// y-size of slider, not including buttons
 	    void (*action)(struct _menuitem_ *, int);
 	    int defper;
-	    int percent;
+	    int percent;	// percent of the way to bottom (0 to 100)
 	    int curper;		/* used in mouse-move state */
 	    int cursel;		/* used in mouse-over state */
 	    void (*handler)(void);	/* for return key */
 	} vslider;
 	struct {
 	    unsigned cflags;
-	    unsigned int xsize;
-	    unsigned int ysize;
+	    unsigned int xsize; // x-size of slider, not including buttons
+	    unsigned int ysize; // y-size of slider, not including buttons
 	    void (*action)(struct _menuitem_ *, int);
 	    int defper;
-	    int percent;
+	    int percent;	// percent of the way to right (0 to 100)
 	    int curper;		/* used in mouse-move state */
 	    int cursel;		/* used in mouse-over state */
 	    void (*handler)(void);	/* for return key */
