@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -515,11 +514,10 @@ global void CclCommand(char* command)
 /**
 **	Initialize ccl and load the config file(s).
 */
-global void CclInit(void)
+global void InitCcl(void)
 {
     char* sargv[5];
     char buf[1024];
-    char* file;
 
     sargv[0] = "FreeCraft";
     sargv[1] = "-v1";
@@ -663,6 +661,15 @@ global void CclInit(void)
 #endif
 
     print_welcome();
+}
+
+/**
+**	Load freecraft config file.
+*/
+global void LoadCcl(void)
+{
+    char* file;
+    char buf[1024];
 
     //
     //	Load and evaluate configuration file
@@ -671,6 +678,7 @@ global void CclInit(void)
     file=LibraryFileName(CclStartFile,buf);
     vload(file,0,1);
     CclInConfigFile=0;
+    // FIXME: user_gc(SCM_BOOL_F);
 }
 
 //@}
