@@ -909,7 +909,7 @@ local void WaitForInput(int timeout)
 /**
 **	Show load progress.
 **
-**	@parm fmt	printf format string.
+**	@param fmt	printf format string.
 */
 global void ShowLoadProgress(const char* fmt,...)
 {
