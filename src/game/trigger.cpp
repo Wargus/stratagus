@@ -65,6 +65,10 @@ static int WaitTrigger;
 static unsigned char Switch[MAX_SWITCH]; /// Switches
 static int* ActiveTriggers;
 
+/// Some data accessible for script during the game.
+TriggerDataType TriggerData;
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

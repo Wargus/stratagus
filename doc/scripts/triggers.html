@@ -74,11 +74,58 @@ Each cycles in the game, if the condition of the active triggers is true,
 then the associated actions are executed.
 There are used for condition's victory
 and could be usefull to add special actions when an event occurs.
+<br>
+Some functions use generic data which can be compute during the game like
+dynamic attacker characteristic. So following present some generic terms
+and how to use it.
+
+<dl>
+  <dt><h4>NumberDesc</h4></dt>
+  <dd>Represent a number. it could be
+  <dl>
+	<dt>number</dt>
+	<dd>direct value. Or value which are not recompute during the game.</dd>
+	<dt>Add(NumberDesc, NumberDesc)</dt>
+	<dd>the sum of two numbers.<br>
+	Note: prefer do (5 + 9) if you can.
+	      But you have to use it for Add(Defender("Armor"), 5)
+          because the left size must be recompute.
+	</dd>
+	<dt>Sub(NumberDesc, NumberDesc)</dt>
+	<dd>It is the difference between the two numbers.</dd>
+	<dt>Mul(NumberDesc, NumberDesc)</dt>
+	<dd>It is the product between the two numbers.</dd>
+	<dt>Div(NumberDesc, NumberDesc)</dt>
+	<dd>It is the division between the two numbers. If the second number is null, return 0 value.</dd>
+	<dt>Min(NumberDesc, NumberDesc)</dt>
+	<dd>It is the minimum between the two numbers.</dd>
+	<dt>Max(NumberDesc, NumberDesc)</dt>
+	<dd>It is the maximum between the two numbers.</dd>
+	<dt>Rand(NumberDesc)</dt>
+	<dd>It is a random value in [0..Number - 1].</dd>
+	<dt>Attacker("Variable" [, Component])</dt>
+	<dd>It is the the value of the component of the variable for the attacker unit (if any, else 0).
+	Note that Variable is defined with SetVariables(). And component is one of the following, default is "Value" :
+	<dl>
+	  <dt>"Enable"</dt>
+	  <dd>1 if enable, 0 else.</dd>
+	  <dt>"Value"</dt>
+	  <dd>Value of the variable.</dd>
+	  <dt>"Max"</dt>
+	  <dd>value of max of the variable.</dd>
+	  <dt>"Increase"</dt>
+	  <dd>Increase value of the variable.</dd>
+	</dl></dd>
+	<dt>Defender("Variable" [, Component])</dt>
+	<dd>Like of  Attacker but for the Defender unit.</dd>
+  </dl></dd>
+</dl>
+
 <h2>Functions</h2>
 
 <a name="ActionDefeat"></a>
 <h3>ActionDefeat()</h3>
- 
+
 The player lose the game.
 
 

@@ -45,6 +45,7 @@
 #include "upgrade_structs.h"
 #include "cursor.h"
 #include "interface.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -215,31 +216,6 @@ typedef struct {
 struct _content_type_;
 struct _unit_;
 typedef void FDrawData(const struct _unit_* unit, struct _content_type_* content, int defaultfont);
-
-/**
-**  Enumeration to know which variable to be selected.
-*/
-typedef enum {
-	VariableValue = 0,  ///< Value of the variable.
-	VariableMax,        ///< Max of the variable.
-	VariableIncrease,   ///< Increase value of the variable.
-	VariableDiff,       ///< (Max - Value)
-	VariablePercent,    ///< (100 * Value / Max)
-	VariableName        ///< Name of the variable.
-} EnumVariable;
-
-/**
-**  Enumeration of unit
-*/
-
-typedef enum {
-	UnitRefItSelf = 0,      ///< unit.
-	UnitRefInside,          ///< unit->Inside.
-	UnitRefContainer,       ///< Unit->Container.
-	UnitRefWorker,          ///< unit->Data.Builded.Worker
-	UnitRefGoal,            ///< unit->Goal
-} EnumUnit;
-
 
 /**
 **  Infos to display the contents of panel.

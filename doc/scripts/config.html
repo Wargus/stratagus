@@ -79,6 +79,7 @@
 <a href="#SetColorWaterCycleStart">SetColorWaterCycleStart</a>
 <a href="#SetCurrentChapter">SetCurrentChapter</a>
 <a href="#SetCurrentTip">SetCurrentTip</a>
+<a href="#SetDamageFormula">SetDamageFormula</a>
 <a href="#SetDamageMissile">SetDamageMissile</a>
 <a href="#SetDoubleClickDelay">SetDoubleClickDelay</a>
 <a href="#SetEditorSelectIcon">SetEditorSelectIcon</a>
@@ -350,7 +351,7 @@ Defines the default amount of starting resources when you begin a game by select
 </pre>
 
 
-<a name="DefineSprites">
+<a name="DefineSprites"></a>
 <h3>DefineSprite({tag = value}, ...)</h3>
 
 Define sprite to be shown for variables.
@@ -360,13 +361,13 @@ from full (left) to empty (right of th image).
 
 <dl>
   Tag could be :
-  <dt>Name = "sprite-name"<dt>
+  <dt>Name = "sprite-name"</dt>
   <dd>name of the sprite</dd>
-  <dt>File = "filename"<dt>
+  <dt>File = "filename"</dt>
   <dd>filename containing the sprite</dd>
-  <dt>Offset = {x, y}<dt>
+  <dt>Offset = {x, y}</dt>
   <dd>offset when drawing the sprite</dd>
-  <dt>Size = {width, height}<dt>
+  <dt>Size = {width, height}</dt>
   <dd>Size of the sprite (!= of size of image)</dd>
 </dl>
 
@@ -518,7 +519,7 @@ Define how to show variables.
       <dt>"bar", {tag, value}</dt>
       <dd>Show like a rectangular bar.</dd>
       <dl>
-        <dt>Orientation = "vertical" or "horizontal"<dt>
+        <dt>Orientation = "vertical" or "horizontal"</dt>
         <dd>orientation of the bar, default is horizontal</dd>
         <dt>SEToNW = boolean</dt>
         <dd>
@@ -878,6 +879,28 @@ are defined, it defaults to Tip 0.
     SetCurrentTip(10)
 </pre>
 
+<a name="SetDamageFormula"></a>
+<h3>SetDamageFormula(NumberDesc)</h3>
+
+Sets the formula to compute damage for missile that the unit fire on goal.
+
+<dl>
+  <dt>NumberDesc</dt>
+  <dd>Number description. See Trigger for a explanation.</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+--
+--  Damage is random between 51-100% of
+--  Max(0, Attacker->BasicDamage - Defender->Armor) + Attacker->PiercingDamage.
+--
+  SetDamageFormula(Div(Mul(Add(51, Rand(50)),
+				  Add(Max(0, Sub( Attacker("BasicDamage"), Defender("Armor"))),
+					  Attacker("PiercingDamage"))), 100))
+</pre>
+
+
 <a name="SetDamageMissile"></a>
 <h3>SetDamageMissile("missile-type")</h3>
 
@@ -1073,7 +1096,7 @@ This is when the mouse cursor hits the border.
 Sets the speed of the mouse scrolling while control is pressed.
 
 <dl>
-<dt>speed<dt>
+<dt>speed</dt>
 <dd>Set the number of pixels to scroll per mouse move of 1 pixel. negative = reversed</dd>
 <dt><i>RETURNS</i></dt>
 <dd>The old speed that was set</dd>
