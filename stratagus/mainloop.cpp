@@ -111,8 +111,9 @@ local void MoveMapViewPointUp(int step)
 */
 local void MoveMapViewPointLeft(int step)
 {
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    Viewport* v;
 
+    v = &TheUI.VP[TheUI.LastClickedVP];
     if (v->MapX > step) {
 	v->MapX -= step;
     } else {
@@ -127,8 +128,9 @@ local void MoveMapViewPointLeft(int step)
 */
 local void MoveMapViewPointDown(int step)
 {
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    Viewport* v;
 
+    v = &TheUI.VP[TheUI.LastClickedVP];
     if (TheMap.Height > v->MapHeight
 	    && v->MapY < TheMap.Height - v->MapHeight - step) {
 	v->MapY += step;
@@ -144,8 +146,9 @@ local void MoveMapViewPointDown(int step)
 */
 local void MoveMapViewPointRight(int step)
 {
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    Viewport* v;
 
+    v = &TheUI.VP[TheUI.LastClickedVP];
     if (TheMap.Width > v->MapWidth
 	    && v->MapX < TheMap.Width - v->MapWidth - step) {
 	v->MapX += step;
@@ -211,7 +214,7 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	default:
 	    return;			// skip marking map
     }
-    HandleMouseMove(CursorX, CursorY);
+    HandleMouseMove(CursorX, CursorY);	// This recalulates some values
     MarkDrawEntireMap();
     MustRedraw |= RedrawMinimap | RedrawCursors;
 }
@@ -352,7 +355,7 @@ local void DrawMapViewport(int v)
 		TheUI.VP[v].Unit->Orders[0].Action == UnitActionDie) {
 		TheUI.VP[v].Unit = NoUnitP;
 	    } else {
-		MapCenterViewport(v, TheUI.VP[v].Unit->X, TheUI.VP[v].Unit->Y);
+		MapViewportCenter(v, TheUI.VP[v].Unit->X, TheUI.VP[v].Unit->Y);
 	    }
 	}
 
