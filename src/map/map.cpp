@@ -649,6 +649,8 @@ global void CleanMap(void)
     memset(&TheMap, 0, sizeof(TheMap));
     FlagRevealMap = 0;
 
+    DestroyMinimap();
+
     CleanMapFogOfWar();
 
     CleanPud();
