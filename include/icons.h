@@ -141,6 +141,7 @@
 
 struct _graphic_;
 struct _player_;
+struct _button_style_;
 
 /**
 **  A structure describing an icon file, which could contain one or more
