@@ -1499,20 +1499,20 @@ local void GameOptions(void)
 local void SetCdMode(Menuitem *mi)
 {
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
+
+    /// Start Playing CD
     if (!strcmp(":off", CDMode)) {
-//	CDMode = ":random";
 	PlayMusic(":random");
     } else {
+    /// Stop Playing CD
 #ifdef USE_SDLCD 
         SDL_CDStop(CDRom);
-        SDL_CDClose(CDRom);
 #endif 
 	
 #ifdef USE_LIBCDA 
         cd_stop();
-        cd_close();
-        cd_exit();
 #endif
+
 	CDMode = ":off";
     }
 #endif
