@@ -561,7 +561,7 @@ local void Usage(void)
 \t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
 \t-L lag\t\tNetwork lag in # frames (default 5 = 165ms)\n\
 \t-U update\tNetwork update frequence in # frames (default 5 = 6x pro s)\n\
-\t-N name\tName of the player\n\
+\t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
