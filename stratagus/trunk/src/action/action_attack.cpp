@@ -166,6 +166,8 @@ local void MoveToTarget(Unit* unit)
 	    //
 	    //	Could be handled here better. (not in GenericMove)
 	    //
+	    //	If we have a saved order, continue with it.
+	    //
 	    if( goal->Destroyed ) {
 		unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
 		unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
@@ -175,6 +177,12 @@ local void MoveToTarget(Unit* unit)
 		    ReleaseUnit(goal);
 		}
 		unit->Orders[0].Goal=goal=NoUnitP;
+		if( unit->SavedOrder.Action!=UnitActionStill ) {
+		    unit->Orders[0]=unit->SavedOrder;
+		    unit->SavedOrder.Action=UnitActionStill;
+		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		    // This is not supported
+		}
 		NewResetPath(unit);
 	    } else if( !goal->HP
 		    || goal->Orders[0].Action==UnitActionDie
@@ -185,6 +193,12 @@ local void MoveToTarget(Unit* unit)
 		unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
 		unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
 		unit->Orders[0].Goal=goal=NoUnitP;
+		if( unit->SavedOrder.Action!=UnitActionStill ) {
+		    unit->Orders[0]=unit->SavedOrder;
+		    unit->SavedOrder.Action=UnitActionStill;
+		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		    // This is not supported
+		}
 		NewResetPath(unit);
 	    }
 	}
@@ -230,12 +244,12 @@ local void MoveToTarget(Unit* unit)
 		&& unit->Orders[0].Action!=UnitActionAttackGround ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
-		RefsDebugCheck( goal->Destroyed || !goal->Refs );
-		goal->Refs++;
 		if( unit->SavedOrder.Action==UnitActionStill ) {
 		    // Save current command to come back.
 		    unit->SavedOrder=unit->Orders[0];
 		}
+		RefsDebugCheck( goal->Destroyed || !goal->Refs );
+		goal->Refs++;
 		unit->Orders[0].Goal=goal;
 		unit->Orders[0].X=-1;
 		unit->Orders[0].Y=-1;
@@ -345,6 +359,7 @@ local void MoveToTarget(Unit* unit)
 		NewResetPath(unit);
 		// Must finish, if saved command finishes
 		unit->SavedOrder.Action=UnitActionStill;
+		DebugCheck( !unit->SavedOrder.Goal );
 	    }
 #else
 	    if( unit->Command.Action==UnitActionStill ) {
@@ -358,7 +373,8 @@ local void MoveToTarget(Unit* unit)
 	}
 	DebugCheck( unit->Type->Vanishes || unit->Destroyed || unit->Removed );
 #ifdef NEW_ORDERS
-	unit->Orders[0].Action=UnitActionAttack;
+	DebugCheck( unit->Orders[0].Action!=UnitActionAttack 
+		&& unit->Orders[0].Action!=UnitActionAttackGround );
 #else
 	unit->Command.Action=UnitActionAttack;
 #endif
@@ -410,6 +426,12 @@ local void AttackTarget(Unit* unit)
 		    ReleaseUnit(goal);
 		}
 		unit->Orders[0].Goal=goal=NoUnitP;
+		if( unit->SavedOrder.Action!=UnitActionStill ) {
+		    unit->Orders[0]=unit->SavedOrder;
+		    unit->SavedOrder.Action=UnitActionStill;
+		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		    // This is not supported
+		}
 		NewResetPath(unit);
 	    } else if( !goal->HP || goal->Orders[0].Action==UnitActionDie
 		    || goal->Removed ) {
@@ -419,6 +441,12 @@ local void AttackTarget(Unit* unit)
 		unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
 		unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
 		unit->Orders[0].Goal=goal=NoUnitP;
+		if( unit->SavedOrder.Action!=UnitActionStill ) {
+		    unit->Orders[0]=unit->SavedOrder;
+		    unit->SavedOrder.Action=UnitActionStill;
+		    DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
+		    // This is not supported
+		}
 		NewResetPath(unit);
 	    }
 #else
@@ -458,11 +486,12 @@ local void AttackTarget(Unit* unit)
 		unit->SubAction=4;
 		// Return to old task!
 		if( unit->SavedOrder.Action!=UnitActionStill ) {
-		    unit->Orders[0]=unit->SavedOrder;
 		    unit->SubAction=0;
+		    unit->Orders[0]=unit->SavedOrder;
+		    NewResetPath(unit);
 		    // Must finish, if saved command finishes
 		    unit->SavedOrder.Action=UnitActionStill;
-		    NewResetPath(unit);
+		    DebugCheck( !unit->SavedOrder.Goal );
 		}
 		return;
 	    }
@@ -487,7 +516,7 @@ local void AttackTarget(Unit* unit)
 #endif
 	    RefsDebugCheck( goal->Destroyed || !goal->Refs );
 	    goal->Refs++;
-	    DebugLevel2Fn("%Zd Unit in react range %Zd\n"
+	    DebugLevel3Fn("%Zd Unit in react range %Zd\n"
 		    ,UnitNumber(unit),UnitNumber(goal));
 #ifdef NEW_ORDERS
 	    unit->Orders[0].Goal=goal;

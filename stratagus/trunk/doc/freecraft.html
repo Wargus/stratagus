@@ -96,7 +96,6 @@
 <LI>Write a map editor. (with support of greater maps)
 <LI>Write a AI editor.
 <LI>Write front end to FreeCraft. (Scenarios, puds, videos...)
-<LI>Or extend the guile-gtk support.
 <LI>Write a video player. (fli or own format)
 <LI>Create own tilesets and unit graphics.
 <LI>Create own sounds, voices, videos and campains.
@@ -167,8 +166,6 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     "<VAR>libarypath/</VAR>default.cm".
 <LI>map.cm<BR>
     Load the freecraft map "map.cm" insteed of the default.
-    <P>If you have compile FreeCraft with guile-gtk support you can use this
-    to get a file requester. "freecraft contrib/req.cm"<P>
 <LI>map.cm.gz<BR>
     Load the compressed freecraft map "map.cm.gz" insteed of the default.
 <LI><BR>
@@ -221,7 +218,7 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 
     <H2><A NAME="ccl">CCL: FreeCraft Configuration Language</A></H2>
 
-    The CCL is scheme. I use libguile as a quick hack or SIOD
+    The CCL is scheme. I use SIOD for this.
     (The most recent release is available from
     <a href="http://people.delphi.com/gjc/siod.html">this web page</a>)
     .<P> You can also enter CCL commands at the message prompt. Each
@@ -230,7 +227,6 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 <H3>Files</H3>
 
 <UL>
-<LI><VAR>libarypath</VAR>/ccl/clone.ccl is loaded before any initialisation.
 <LI><VAR>libarypath</VAR>/ccl/freecraft.ccl is loaded before any initialisation.
 Contains general configuration.
 <LI><VAR>libarypath</VAR>/ccl/missile.ccl is loaded from freecraft.ccl.
@@ -521,7 +517,7 @@ Without any order:
     Turn sound on.
 
 <LI><VAR>sound-for-name</VAR><BR>
-    Return a guile sound id to be used in other functions.<P>
+    Return a siod sound id to be used in other functions.<P>
     (sound-for-name name)<p>
     <UL>
     <LI>name<BR>
@@ -549,7 +545,7 @@ Without any order:
     (set-sound-range sound ratio)<p>
     <UL>
     <LI>sound<BR>
-    The sound either described by its name (a string) or by its guile sound
+    The sound either described by its name (a string) or by its siod sound
     id. 
     <LI>ratio<BR>
     This value (between 0 and 255) allows to compute the range of the

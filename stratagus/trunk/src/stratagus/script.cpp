@@ -10,7 +10,7 @@
 //
 /**@name ccl.c		-	The craft configuration language. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -21,56 +21,16 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+
+#include "freecraft.h"
+
+#ifdef USE_CCL	// {
+
+#include <string.h>
 #include <stdlib.h>
 #include <limits.h>
 
-#include "freecraft.h"
 #include "iolib.h"
-
-#ifdef USE_CCL
-
-#include "video.h"
-#include "tileset.h"
-#include "sound_id.h"
-#include "icons.h"
-#include "button.h"
-#include "unitsound.h"
-#include "unittype.h"
-#include "player.h"
-#include "upgrade.h"
-#include "depend.h"
-#include "unit.h"
-#include "map.h"
-#include "minimap.h"
-#include "ccl.h"
-#include "pud.h"
-#include "missile.h"
-#include "ccl_sound.h"
-#include "ccl.h"
-#include "font.h"
-#include "pathfinder.h"
-
-#include <guile/gh.h>			// I use guile for a quick hack
-
-#ifdef USE_SVGALIB
-#undef GUILE_GTK
-#endif
-
-#ifdef GUILE_GTK			// experimental guile-gtk support
-
-#include <guile-gtk.h>
-
-extern void sgtk_init_gtk_gtk_glue();
-extern void sgtk_init_gtk_gdk_glue();
-
-#endif	// GUILE_GTK
-
-#endif	// USE_CCL
-
-#ifdef USE_CCL2
-
-#include <string.h>
-
 #include "ccl.h"
 #include "missile.h"
 #include "depend.h"
@@ -83,10 +43,6 @@ extern void sgtk_init_gtk_gdk_glue();
 #include "font.h"
 #include "pathfinder.h"
 #include "ai.h"
-
-#endif // USE_CCL2
-
-#if defined(USE_CCL) || defined(USE_CCL2)
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -158,13 +114,21 @@ local SCM CclTitleScreen(SCM title)
     return title;
 }
 
-local SCM CclColorCycleAll(void){
+/**
+**	FIXME: docu.
+*/
+local SCM CclColorCycleAll(void)
+{
   ColorCycleAll = 1;
 
   return SCM_UNSPECIFIED;
 }
 
-local SCM CclNoColorCycleAll(void){
+/**
+**	FIXME: docu.
+*/
+local SCM CclNoColorCycleAll(void)
+{
   ColorCycleAll = 0;
 
   return SCM_UNSPECIFIED;
@@ -755,21 +719,6 @@ local SCM CclFreeCraftMap(SCM list)
 ..	Commands
 ............................................................................*/
 
-#ifdef USE_CCL
-
-/**
-**	Send command to ccl.
-*/
-global void CclCommand(char* command)
-{
-    gh_display(gh_eval_str_with_standard_handler(command));
-    gh_newline();
-}
-
-#endif
-
-#ifdef USE_CCL2
-
 /**
 **	Send command to ccl.
 **
@@ -789,133 +738,10 @@ global void CclCommand(char* command)
     SetMessageDup(msg);
 }
 
-#endif
-
-#endif
-
-#ifdef USE_CCL
-
-/**
-**	Callback to c-main1.
-*/
-local SCM CclMain1(void)
-{
-    main1(0,NULL);
-
-    DebugLevel0("Shouldn't be reached\n");
-
-    return SCM_UNSPECIFIED;
-}
-
-
 /*............................................................................
 ..	Setup
 ............................................................................*/
 
-/**
-**	Define a vararg scheme procedure.
-*/
-global SCM gh_new_procedureN(char* proc_name, SCM (*fn) ())
-{
-    return gh_new_procedure(proc_name,fn,0,0,1);
-}
-
-/**
-**	Called from scheme.
-*/
-local void gh_main_prog(int argc,char* argv[])
-{
-    gh_new_procedure0_0("library-path",CclFreeCraftLibraryPath);
-    gh_new_procedure1_0("title-screen",CclTitleScreen);
-    gh_new_procedure0_0("color-cycle-all",CclColorCycleAll);
-    gh_new_procedure0_0("no-color-cycle-all",CclNoColorCycleAll);
-
-    gh_new_procedure5_0("mana-sprite",CclManaSprite);
-    gh_new_procedure5_0("health-sprite",CclHealthSprite);
-    gh_new_procedure0_0("show-health-bar",CclShowHealthBar);
-    gh_new_procedure0_0("show-health-dot",CclShowHealthDot);
-    gh_new_procedure0_0("show-mana-bar",CclShowManaBar);
-    gh_new_procedure0_0("show-mana-dot",CclShowManaDot);
-    gh_new_procedure0_0("show-full",CclShowFull);
-    gh_new_procedure0_0("show-no-full",CclShowNoFull);
-    gh_new_procedure0_0("decoration-on-top",CclDecorationOnTop);
-    gh_new_procedure0_0("show-sight-range",CclShowSightRange);
-    gh_new_procedure0_0("show-react-range",CclShowReactRange);
-    gh_new_procedure0_0("show-attack-range",CclShowAttackRange);
-    gh_new_procedure0_0("show-orders",CclShowOrders);
-
-    gh_new_procedure1_0("speed-mine",CclSpeedMine);
-    gh_new_procedure1_0("speed-gold",CclSpeedGold);
-    gh_new_procedure1_0("speed-chop",CclSpeedChop);
-    gh_new_procedure1_0("speed-wood",CclSpeedWood);
-    gh_new_procedure1_0("speed-haul",CclSpeedHaul);
-    gh_new_procedure1_0("speed-oil",CclSpeedOil);
-    gh_new_procedure1_0("speed-build",CclSpeedBuild);
-    gh_new_procedure1_0("speed-train",CclSpeedTrain);
-    gh_new_procedure1_0("speed-upgrade",CclSpeedUpgrade);
-    gh_new_procedure1_0("speed-research",CclSpeedResearch);
-    gh_new_procedure1_0("speeds",CclSpeeds);
-
-    gh_new_procedureN("missile-type",CclMissileType);
-
-    TilesetCclRegister();
-    MapCclRegister();
-    PathfinderCclRegister();
-    UnitButtonCclRegister();
-    UnitTypeCclRegister();
-    SoundCclRegister();
-    UserInterfaceCclRegister();
-
-    gh_new_procedure1_0("load-pud",CclLoadPud);
-    gh_new_procedure2_0("define-map",CclDefineMap);
-
-    gh_new_procedureN("freecraft-map",CclFreeCraftMap);
-
-    gh_new_procedure1_0("contrast",Contrast);
-    gh_new_procedure1_0("brightness",Brightness);
-    gh_new_procedure1_0("saturation",Saturation);
-
-    gh_new_procedure0_0("c-main1",CclMain1);
-
-#ifdef GUILE_GTK
-    SGTK_REGISTER_GLUE(sgtk_init_gtk_gtk_glue);
-    SGTK_REGISTER_GLUE(sgtk_init_gtk_gdk_glue);
-    // ALL Stupid
-    {
-    int argc;
-    char** argv;
-    static char* args[2] = { "FreeCraft", NULL };
-
-    argc=1;
-    argv=args;
-    sgtk_init_with_args(&argc,&argv);
-    }
-    //sgtk_init_with_args(NULL,NULL);
-#endif
-
-    //
-    //	Load and evaluate configuration file
-    //
-    CclInConfigFile=1;
-    gh_eval_file(CclStartFile);
-    CclInConfigFile=0;
-
-    // FIXME: guile didn't cleanup, all memory is lost!
-
-    main1(argc,argv);			// continue with setup
-}
-
-/**
-**	Initialize ccl.
-*/
-global void CclInit(void)
-{
-    gh_enter(0,0,gh_main_prog);		// guile didn't return!
-}
-
-#endif
-
-#ifdef USE_CCL2
 /**
 **	Initialize ccl.
 */
@@ -1010,12 +836,11 @@ global void CclInit(void)
     //	Load and evaluate configuration file
     //
     CclInConfigFile=1;
-    //file=LibraryFileName("freecraft.ccl",buf);
-    file=LibraryFileName("ccl/freecraft.ccl",buf);
+    file=LibraryFileName(CclStartFile,buf);
     vload(file,0,1);
     CclInConfigFile=0;
 }
 
-#endif	// defined(USE_CCL) || defined(USE_CCL2)
+#endif	// } defined(USE_CCL)
 
 //@}

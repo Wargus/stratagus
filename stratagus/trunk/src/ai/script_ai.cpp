@@ -24,7 +24,7 @@
 
 #include "freecraft.h"
 
-#if defined(USE_CCL) || defined(USE_CCL2) // {
+#if defined(USE_CCL) // {
 
 #include <stdlib.h>
 
@@ -272,6 +272,6 @@ global void AiCclRegister(void)
     gh_new_procedureN("define-ai",CclDefineAi);
 }
 
-#endif	// } USE_CCL && USE_CCL2
+#endif	// } USE_CCL
 
 //@}

@@ -19,13 +19,13 @@
 
 //@{
 
-#if defined(USE_CCL) && defined(WITH_SOUND)	// {
-
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#include <guile/gh.h>			// for SCM
+#if defined(USE_CCL) && defined(WITH_SOUND)	// {
+
+#include "ccl.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -37,32 +37,16 @@ extern SoundId ccl_sound_id(SCM sound);	/// scheme -> sound id
 
 extern void SoundCclRegister(void);	/// register ccl features
 
-#endif	// } !defined(USE_CCL) && defined(WITH_SOUND)
-
-#if defined(USE_CCL2) && defined(WITH_SOUND)	// {
-
-#include "siod.h"			// for SCM
-#define SCM	LISP
-
-/*----------------------------------------------------------------------------
---	Functions
-----------------------------------------------------------------------------*/
-
-extern int ccl_sound_p(SCM sound);	/// is it a ccl sound?
-
-extern SoundId ccl_sound_id(SCM sound);	/// scheme -> sound id
-
-extern void SoundCclRegister(void);	/// register ccl features
-
-#endif	// { defined(USE_CCL2) && defined(WITH_SOUND)
+#endif	// } defined(USE_CCL) && defined(WITH_SOUND)
 
 //-----------------------------------------------------------------------------
 
-#if !defined(USE_CCL) && !defined(USE_CCL2) || !defined(WITH_SOUND) // {
+#if defined(USE_CCL) && !defined(WITH_SOUND) // {
 
 extern void SoundCclRegister(void);	/// register ccl features
 
-#endif	// } !defined(USE_CCL) && !defined(USE_CCL2) || !defined(WITH_SOUND)
+#endif	// } defined(USE_CCL) && !defined(WITH_SOUND)
+
 //@}
 
 #endif	// !__CCL_SOUND_H__

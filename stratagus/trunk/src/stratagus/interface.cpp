@@ -265,7 +265,7 @@ local int InputKey(int key)
 {
     switch( key ) {
 	case '\r':
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
 	    if( Input[0]=='(' ) {
 		CclCommand(Input);
 	    } else {
@@ -344,7 +344,7 @@ local int InputKey(int key)
 		  // FIXME: only to selected players ...
 		  NetworkChatMessage(Input);
 		}
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
 	    }
 #endif
 	case '\e':

@@ -8,7 +8,7 @@
 ##			  T H E   W A R   B E G I N S
 ##	   FreeCraft - A free fantasy real time strategy game engine
 ##
-##	Rules.make	-	Make RULES (GNU MAKE).
+##	Rules.make	-	Make RULES (GNU MAKE) (included from Makefile).
 ##
 ##	(c) Copyright 1998-2001 by Lutz Sammer
 ##
@@ -21,67 +21,28 @@
 #			version.  Minimal is now the default.
 ############################################################################
 
-# Uncomment next to get guile with gtk (and choose your gtklib version)
-# NO LONGER SUPPORTED
-
-#GUILEGTK	= -DGUILE_GTK $(shell gtk-config --cflags)
-#GUILEGTK	= -DGUILE_GTK -I/usr/X11R6/include -I/usr/lib/glib/include
-#GUILEGTKLIB	= -lguilegtk-1.2 $(shell gtk-config --libs)
-
-#------------------------------------------------------------------------------
-
-# Uncomment next for a version with guile (GNU scheme interpreter)
-#	(and choose your guile version)
-# NO LONGER SUPPORTED
-
-# guile 1.3	latest version
-#	-lreadline -lncurses are needed with the distribution SuSe 5.3
-#GUILE_CFLAGS	= $(shell guile-config compile)
-#GUILE		= -DUSE_CCL $(GUILEGTK) $(GUILE_CFLAGS)
-#GUILELIB	= $(GUILEGTKLIB) $(shell guile-config link) -lreadline -lncurses
-#GUILELIB	= $(GUILEGTKLIB) $(shell guile-config link)
-
-# guile
-#CCL	= $(GUILE)
-#CCLLIB	= $(GUILELIB)
-
 #------------------------------------------------------------------------------
 # Comment next for a version without SIOD (scheme interpreter)
-#
+#	C C L	-	Craft Configuration Language
 
-# Try to use siod (currently default)
-CCL	= -DUSE_CCL2
+CCL	= -DUSE_CCL
 CCLLIB	= -lm
 
 #------------------------------------------------------------------------------
-
 # Uncomment next to add threaded sound support
 #	You should have a thread safe X11 (libc6 or glibc)
+#	Any modern linux distribution are thread safe.
 
 #THREAD		= -D_REENTRANT -DUSE_THREAD
 #THREADLIB	= -lpthread
 
 #------------------------------------------------------------------------------
-
-# Choose correct version of glib (needed for gtk)
-
-# Should work with >= 1.2
-#GLIB_CFLAGS	=	$(shell glib-config glib --cflags)
-#GLIBLIB	=	$(shell glib-config glib --libs)
-#GLIB		=	-DUSE_GLIB $(GLIB_CFLAGS)
-
-#------------------------------------------------------------------------------
 #	Video driver part
 #------------------------------------------------------------------------------
 
-# Uncomment the next for the normal X11 support.
+#------------------------------------------------------------------------------
+# SDL - Simple DirectMedia Layer configuration (any >=1.0.0)
 
-VIDEO		= -DUSE_X11
-VIDEOLIB	= -lXext -lX11 -ldl
-
-# Uncomment the next to get the support for SDL.
-
-# New SDL >=1.0.0
 SDL_CFLAGS	= $(shell sdl-config --cflags)
 SDLLIB		= $(shell sdl-config --static-libs)
 #SDLLIB		= $(shell sdl-config --libs)
@@ -91,15 +52,30 @@ SDLLIB		= $(shell sdl-config --static-libs)
 # With SDL Sound
 SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
 
-# Uncomment the next for the SDL X11/SVGALIB support.
+#------------------------------------------------------------------------------
+# Uncomment the next for the normal X11 support.
 
-VIDEO		= $(SDL)
-VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm -lslang -lgpm
+VIDEO		= -DUSE_X11
+VIDEOLIB	= -lXext -lX11 -ldl
 
-# Choose next to get svgalib support.
+#------------------------------------------------------------------------------
+# Uncomment th next to get svgalib support.
 
 #VIDEO		= -DUSE_SVGALIB
 #VIDEOLIB	= -lvga -lm -ldl
+
+#------------------------------------------------------------------------------
+# Uncomment one of the next for the SDL support.
+
+# Uncomment the next for the generic SDL support.
+
+#VIDEO		= $(SDL)
+#VIDEOLIB	= $(SDLLIB)
+
+# Uncomment the next for the SDL X11/SVGALIB support.
+
+#VIDEO		= $(SDL)
+#VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm -lslang -lgpm
 
 # Uncomment the next for the win32/cygwin support. (not working?)
 
@@ -111,14 +87,23 @@ VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd 
 #VIDEO		= -DUSE_WIN32 $(SDL)
 #VIDEOLIB	= $(SDLLIB) -lwsock32 -Wl,--stack,33554432
 
+# Uncomment the next for the BeOS SDL support.
+
+#VIDEO		= -DUSE_BEOS $(SDL)
+#VIDEOLIB	= $(SDLLIB)
+
 #------------------------------------------------------------------------------
 #	Sound driver part
 #------------------------------------------------------------------------------
+
+# See above the USE_SDLA option.
 
 # Comment next if you want to remove sound support.
 
 DSOUND		= -DWITH_SOUND
 
+#------------------------------------------------------------------------------
+#	File I/O part
 #------------------------------------------------------------------------------
 
 # Choose which compress you like
@@ -151,9 +136,9 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #------------------------------------------------------------------------------
 
 # Uncomment next to profile
-PROFILE=	-pg
+#PROFILE=	-pg
 
-# Version
+# Compile Version
 VERSION=	'-DVERSION="1.17pre1-build11"'
 
 ############################################################################
@@ -164,7 +149,7 @@ TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm $(THREADLIB)
 
 # Libraries needed to build freecraft
 CLONELIBS=$(XLDFLAGS) -lpng -lz -lm \
-	$(THREADLIB) $(CCLLIB) $(GLIBLIB) $(VIDEOLIB) $(ZLIBS)
+	$(THREADLIB) $(CCLLIB) $(VIDEOLIB) $(ZLIBS)
 
 DISTLIST=$(TOPDIR)/distlist
 TAGS=$(TOPDIR)/src/tags
@@ -197,8 +182,8 @@ DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
-DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_ORDERS #-DNEW_MAPDRAW=1 -DNEW_NAMES -DNEW_FOW -DNEW_AI
+DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_ORDERS #-DNEW_MAPDRAW=1 -DNEW_NAMES -DNEW_FOW -DNEW_AI
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
@@ -216,8 +201,8 @@ RM=rm -f
 MAKE=make
 
 ## JOHNS: my ctags didn't support
-#CTAGSFLAGS=-i defmpstuvFS -a -f
-CTAGSFLAGS=-i defptvS -a -f
+CTAGSFLAGS=-i defmpstuvFS -a -f
+#CTAGSFLAGS=-i defptvS -a -f
 
 #
 #	Locks versions with symbolic name

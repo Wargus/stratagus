@@ -13,7 +13,7 @@ cat << .. > $RULESFILE
 ##  ______________________                           ______________________
 ##			  T H E   W A R   B E G I N S
 ##	   FreeCraft - A free fantasy real time strategy game engine
-##	
+##
 ..
 ##	setup		-	Configure Rules.make (GNU MAKE rules).
 ##
@@ -98,11 +98,11 @@ while test $# != 0 ; do
       echo
       exit
       ;;
-      
+
     "--static")
       STATIC=-static
       ;;
-      
+
     "--unix")
       UNIX=1
       BEOS=0
@@ -134,18 +134,18 @@ while test $# != 0 ; do
     "--profile")
       PROFILE=-pg
       ;;
-       
+
     "--debug")
       CFLAGS=$DEBUG_CFLAGS
       DEBUG=1
       ;;
-     
+
     *)
       echo "Unknown command-line option '$1'"
       exit
-      
+
   esac
-  
+
   shift
 done
 
@@ -211,7 +211,7 @@ if [ "$UNIX" = "0" ] ; then
 	echo "Use --beos or --win32 or --darwin to override"
       fi
     fi
-  fi  
+  fi
 fi
 
 fi
@@ -234,14 +234,14 @@ echo >> $RULESFILE
 echo "# Use SIOD support" >> $RULESFILE
 if [ "$BEOS" != "1" ] ; then
   if [ "$DARWIN" != "1" ] ; then
-    echo "CCL		= -DUSE_CCL2" >> $RULESFILE
+    echo "CCL		= -DUSE_CCL" >> $RULESFILE
     echo "CCLLIB		= -lm" >> $RULESFILE
   else
-    echo "CCL             = -DUSE_CCL2" >> $RULESFILE
+    echo "CCL             = -DUSE_CCL" >> $RULESFILE
     echo "CCLLIB		= -dl" >> $RULESFILE
   fi
 else
-  echo "CCL             = -DUSE_CCL2 -DUSE_BEOS" >> $RULESFILE
+  echo "CCL             = -DUSE_CCL -DUSE_BEOS" >> $RULESFILE
   echo "CCLLIB		=" >> $RULESFILE
 fi
 echo >> $RULESFILE
@@ -319,7 +319,7 @@ case $VIDSEL in
         if test "$STATIC x" != " x" ; then
 	  SDLLIB="$SDLLIB -lesd"
 	fi
-	
+
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
@@ -331,13 +331,13 @@ fi
 
 	echo
 	;;
-	
+
   [vV])
 	echo "Using SVGALIB"
 	echo "VIDEO		= -DUSE_SVGALIB" >> $RULESFILE
 	echo "VIDEOLIB	= -lvga" >> $RULESFILE
 	;;
-	
+
   [bB])
 	echo -n "Using SDL/SVGALIB"
   	USESDL=1
@@ -348,21 +348,20 @@ fi
         if test "$STATIC x" != " x" ; then
 	  SDLLIB="$SDLLIB -lesd"
 	fi
-	
+
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
 	echo "VIDEOLIB	= \$(SDLLIB) -lvga -lvgagl -ldl" >> $RULESFILE
 	echo
 	;;
-	
-	
-  *)	
+
+  *)
 	echo "Using X11"
 	echo "VIDEO		= -DUSE_X11" >> $RULESFILE
 	echo "VIDEOLIB	= -lXext -lX11 -ldl" >> $RULESFILE
 	;;
-	
+
 esac
 echo "" >> $RULESFILE
 
@@ -395,9 +394,9 @@ case $ANSWER in
 	echo "# Sound support" >> $RULESFILE
 	echo "DSOUND		= -DWITH_SOUND" >> $RULESFILE
 	if ! test "$USESDL" = 1 ; then
-	
+
 	  # Check for libpthread
-	
+
 	  LIBCHECK="-lpthread"
 	  check_for_libs
 	  if test "$?" = 0 ; then
@@ -412,7 +411,7 @@ case $ANSWER in
 	  fi
 	fi
 esac
-	
+
 echo >> $RULESFILE
 echo
 
@@ -473,25 +472,25 @@ case $COMPOPT in
 	echo "ZDEFS		=" >> $RULESFILE
 	echo "ZLIBS		=" >> $RULESFILE
 	;;
-	
+
   [bB])
 	echo "Using Bzip2 compression"
 	echo "ZDEFS		= -DUSE_BZ2LIB" >> $RULESFILE
 	echo "ZLIBS		= -lbz2" >> $RULESFILE
 	;;
-	
+
   [oO])
 	echo "Using GZ and Bzip2 compression"
 	echo "ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB" >> $RULESFILE
 	echo "ZLIBS		= -lz -lbz2" >> $RULESFILE
 	;;
-	
-  *)	
+
+  *)
 	echo "Using GZ compression"
 	echo "ZDEFS		= -DUSE_ZLIB" >> $RULESFILE
 	echo "ZLIBS		= -lz" >> $RULESFILE
 	;;
-	
+
 esac
 echo "" >> $RULESFILE
 
@@ -501,7 +500,7 @@ echo "" >> $RULESFILE
 
 # May be required on some distributions for libpng and libz!
 # extra linker flags and include directory
-# -L/usr/lib 
+# -L/usr/lib
 
 if [ "$DARWIN" != 1 ] ; then
   echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib \\" >> $RULESFILE
@@ -591,7 +590,7 @@ fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
 echo -n "	\$(DEBUG)" >> $RULESFILE
-  
+
 echo
 echo -n "Are you using the WarCraft 2 Expansion CD? (n): "
 read YESORNO
@@ -604,7 +603,7 @@ echo "" >> $RULESFILE
 echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS" >> $RULESFILE
 
 ## JOHNS: my ctags didn't support
-#CTAGSFLAGS=-i defmpstuvFS -a -f 
+#CTAGSFLAGS=-i defmpstuvFS -a -f
 
 echo "CTAGSFLAGS=-i defptvS -a -f " >> $RULESFILE
 echo >> $RULESFILE
@@ -664,5 +663,5 @@ case $ANSWER in
 	make depend
 	make
 	;;
-	
+
 esac

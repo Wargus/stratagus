@@ -21,11 +21,12 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "freecraft.h"
 
-#if defined(USE_CCL) || defined(USE_CCL2) // {
+#if defined(USE_CCL) // {
+
+#include <stdlib.h>
 
 #include "video.h"
 #include "tileset.h"
@@ -37,11 +38,15 @@
 #include "missile.h"
 #include "ccl.h"
 
-#ifdef USE_CCL2
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
 
 local long SiodUnitTypeTag;		/// siod unit type object
 
-#endif
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Parse unit-type.
@@ -613,57 +618,58 @@ local SCM CclPrintUnitTypeTable(void)
 
 #endif
 
-#ifdef USE_CCL2
-
 /**
- ** Get a single animation sequence.
- */
-local Animation * GetSingleAnimation(SCM list){
-  SCM partlist;
-  Animation * finallist;
-  size_t length;
-  int current_location = 0;
+**	Get a single animation sequence.
+*/
+local Animation *GetSingleAnimation(SCM list)
+{
+    SCM partlist;
+    Animation *finallist;
+    size_t length;
+    int current_location;
 
-  if(!gh_list_p(list))
-    return NULL;
+    if (!gh_list_p(list)) {
+	return NULL;
+    }
 
-  //printf("list %p %d",list,gh_list_p(list));
-  length = gh_length(list);
+    //printf("list %p %d",list,gh_list_p(list));
+    length = gh_length(list);
 
-  finallist = (Animation *)calloc(length,sizeof(Animation));
-  while(list){
-    SCM value;
-    Animation anim;
-    int Flags,Pixel,Sleep,Frame;
-    partlist = gh_car(list);
-    //printf("lenpart %ld, lenlist %ld\n",gh_length(partlist),gh_length(list));
-    list = gh_cdr(list);
-    value = gh_car(partlist);
+    current_location = 0;
+    finallist = (Animation *) calloc(length, sizeof(Animation));
+    while (list) {
+	SCM value;
+	Animation anim;
+	int Flags, Pixel, Sleep, Frame;
 
-    Flags = gh_scm2int(value);
-    partlist = gh_cdr(partlist);
-    value = gh_car(partlist);
+	partlist = gh_car(list);
+	//printf("lenpart %ld, lenlist %ld\n",gh_length(partlist),gh_length(list));
+	list = gh_cdr(list);
+	value = gh_car(partlist);
 
-    Pixel = gh_scm2int(value);
-    partlist = gh_cdr(partlist);
-    value = gh_car(partlist);
+	Flags = gh_scm2int(value);
+	partlist = gh_cdr(partlist);
+	value = gh_car(partlist);
 
-    Sleep = gh_scm2int(value);
-    partlist = gh_cdr(partlist);
-    value = gh_car(partlist);
+	Pixel = gh_scm2int(value);
+	partlist = gh_cdr(partlist);
+	value = gh_car(partlist);
 
-    Frame = gh_scm2int(value);
-    //printf("(F%d,P%d,S%d,F%d)",Flags,Pixel,Sleep,Frame);
-    anim.Flags = Flags;
-    anim.Pixel = Pixel;
-    anim.Sleep = Sleep;
-    anim.Frame = Frame;
-    finallist[current_location++] = anim;
-  }
-  //printf("\n");
+	Sleep = gh_scm2int(value);
+	partlist = gh_cdr(partlist);
+	value = gh_car(partlist);
 
-  return finallist;
+	Frame = gh_scm2int(value);
+	//printf("(F%d,P%d,S%d,F%d)",Flags,Pixel,Sleep,Frame);
+	anim.Flags = Flags;
+	anim.Pixel = Pixel;
+	anim.Sleep = Sleep;
+	anim.Frame = Frame;
+	finallist[current_location++] = anim;
+    }
+    //printf("\n");
 
+    return finallist;
 }
 
 /**
@@ -926,8 +932,6 @@ local SCM CclSetUnitTypeProperty(SCM ptr,SCM property)
     return property;
 }
 
-#endif
-
 /**
 **	Register CCL features for unit-type.
 */
@@ -938,7 +942,6 @@ global void UnitTypeCclRegister(void)
     gh_new_procedure0_0("print-unit-type-table",CclPrintUnitTypeTable);
 #endif
 
-#ifdef USE_CCL2
     SiodUnitTypeTag=allocate_user_tc();
     set_print_hooks(SiodUnitTypeTag,CclUnitTypePrin1);
 
@@ -955,10 +958,10 @@ global void UnitTypeCclRegister(void)
     gh_new_procedure2_0("set-unit-type-property!",CclSetUnitTypeProperty);
 
     gh_new_procedureN("anim-type",CclAnimType);
-#endif
+
     InitUnitTypes();
 }
 
-#endif	// } USE_CCL && USE_CCL2
+#endif	// } USE_CCL
 
 //@}

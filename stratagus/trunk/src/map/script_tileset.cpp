@@ -25,7 +25,7 @@
 
 #include "freecraft.h"
 
-#if defined(USE_CCL) || defined(USE_CCL2)	// {
+#if defined(USE_CCL)	// {
 
 #include "ccl.h"
 #include "tileset.h"
@@ -133,6 +133,6 @@ global void TilesetCclRegister(void)
     gh_new_procedureN("define-tileset",CclDefineTileset);
 }
 
-#endif	// } defined(USE_CCL) || defined(USE_CCL2)
+#endif	// } defined(USE_CCL)
 
 //@}

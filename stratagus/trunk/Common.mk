@@ -28,7 +28,7 @@ clobber: clean
 depend::
 	@echo -n >.depend
 	@for i in $(OBJS:.o=.c) ; do\
-	$(CC) -MM $(GLIB) $(IFLAGS) $(DFLAGS) $$i >>.depend ; done
+	$(CC) -MM $(IFLAGS) $(DFLAGS) $$i >>.depend ; done
 
 tags::
 	@for i in $(OBJS:.o=.c) ; do\
