@@ -1822,7 +1822,7 @@ local void DrawBuilding(Unit* unit)
     }
 
     // FIXME: johns: ugly check here, should be removed!
-    if( visible ) {
+    if( visible || ReplayRevealMap ) {
 	DrawInformations(unit,type,x,y);
     }
 }
