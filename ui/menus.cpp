@@ -261,6 +261,8 @@ global int CurrentMenu = -1;
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
+local int GameLoaded;
+
 /**
 **	Offsets from top and left, used for different resolutions
 */
@@ -2983,13 +2985,18 @@ local void LoadAction(void)
 
     LoadGame(filename);
     SetMessage("Loaded game: %s", filename);
+    GameLoaded=1;
     EndMenu();
 }
 
 global void GameMenuLoad(void)
 {
+    GameLoaded=0;
     LoadGameMenuItems[3].flags = MenuButtonDisabled;	/* Load button! */
     ProcessMenu(MENU_LOAD_GAME, 1);
+    if( GameLoaded ) {
+	EndMenu();
+    }
 }
 
 global void SoundOptions(void)
