@@ -1266,6 +1266,17 @@ pawn:
 	if( !memcmp(header, "STR ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
+#if 0
+		int i;
+		short s;
+
+		for( i=0; i<1024; ++i ) {
+		    s = ((short*)chk_ptr)[i+1];
+		    if( s!=2050 ) {
+			printf("STR %d - %s\n", i, chk_ptr+s);
+		    }
+		}
+#endif
 		strcpy(map->Description, chk_ptr+2051);
 		chk_ptr += length;
 		continue;
