@@ -770,6 +770,11 @@ local void CclParseSelected(SCM list, UI* ui)
 			slist = gh_cdr(slist);
 			CclParseIcon(value, &ui->SelectedButtons[i++]);
 		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("max-text-pos"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->MaxSelectedTextX = gh_scm2int(gh_car(value));
+		    ui->MaxSelectedTextY = gh_scm2int(gh_car(gh_cdr(value)));
 		} else {
 		    errl("Unsupported tag", value);
 		}
