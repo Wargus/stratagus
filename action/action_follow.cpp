@@ -64,22 +64,22 @@ global void HandleActionFollow(Unit* unit)
     //
     //	Reached target
     //
-    if( unit->SubAction==128 ) {
-	goal=unit->Orders[0].Goal;
-	if( !goal || goal->Destroyed || !goal->HP
-		|| goal->Orders[0].Action==UnitActionDie ) {
+    if (unit->SubAction == 128) {
+	goal = unit->Orders[0].Goal;
+	if (!goal || goal->Destroyed || !goal->HP ||
+		goal->Orders[0].Action == UnitActionDie) {
 	    DebugLevel0Fn("Goal dead\n");
-	    if( goal ) {
-		RefsDebugCheck( !goal->Refs );
-		if( !--goal->Refs && goal->Destroyed ) {
+	    if (goal) {
+		RefsDebugCheck(!goal->Refs);
+		if (!--goal->Refs && goal->Destroyed) {
 		    ReleaseUnit(goal);
 		}
 	    }
-	    unit->Orders[0].Goal=NoUnitP;
-	    unit->Wait=1;
-	    unit->SubAction=0;
-	    unit->Orders[0].Action=UnitActionStill;
-	    if( IsOnlySelected(unit) ) { // update display for new action
+	    unit->Orders[0].Goal = NoUnitP;
+	    unit->Wait = 1;
+	    unit->SubAction = 0;
+	    unit->Orders[0].Action = UnitActionStill;
+	    if (IsOnlySelected(unit)) { // update display for new action
 		SelectedUnitChanged();
 	    }
 	    return;
@@ -88,44 +88,44 @@ global void HandleActionFollow(Unit* unit)
 	// Two posibilities, both broken. maybe we should change the animation system?
 	// FIXME: Unit doesn't decrease range
 #if 0
-	if( (goal->X==unit->Orders[0].X && goal->Y==unit->Orders[0].Y)||unit->State ) {
-	    UnitShowAnimation(unit,unit->Type->Animations->Still);
+	if ((goal->X == unit->Orders[0].X && goal->Y == unit->Orders[0].Y) || unit->State) {
+	    UnitShowAnimation(unit, unit->Type->Animations->Still);
 	    //
 	    //	Sea and air units are floating up/down.
 	    //	
-	    if( unit->Type->SeaUnit||unit->Type->AirUnit ) {
-		unit->IY=(MyRand()>>15)&1;
+	    if (unit->Type->SeaUnit || unit->Type->AirUnit) {
+		unit->IY = (MyRand() >> 15) & 1;
 	    }
 	    return;
 	}
 #else
 	// FIXME:Unit doesn't animate.
-	if( (goal->X==unit->Orders[0].X && goal->Y==unit->Orders[0].Y) ) {
-	    unit->Reset=1;
-	    unit->Wait=10;
-	    if ((unit->Orders[0].RangeX>1)||(unit->Orders[0].RangeY>1)) {
-	        unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-		unit->SubAction=0;
+	if ((goal->X == unit->Orders[0].X && goal->Y == unit->Orders[0].Y)) {
+	    unit->Reset = 1;
+	    unit->Wait = 10;
+	    if ((unit->Orders[0].RangeX > 1) || (unit->Orders[0].RangeY > 1)) {
+	        unit->Orders[0].RangeX = unit->Orders[0].RangeY = 1;
+		unit->SubAction = 0;
 	    }
 	    return;
 	}
 #endif
-	unit->SubAction=0;
+	unit->SubAction = 0;
     }
 
-    if( !unit->SubAction ) {		// first entry
-	unit->SubAction=1;
+    if (!unit->SubAction) {		// first entry
+	unit->SubAction = 1;
 	NewResetPath(unit);
-	DebugCheck( unit->State!=0 );
+	DebugCheck(unit->State != 0);
     }
 
-    switch( DoActionMove(unit) ) {	// reached end-point?
+    switch (DoActionMove(unit)) {	// reached end-point?
 	case PF_UNREACHABLE:
 	    //
 	    //	Some tries to reach the goal
 	    //
-	    if( unit->Orders[0].RangeX <= TheMap.Width
-	        || unit->Orders[0].RangeX <= TheMap.Height) {
+	    if (unit->Orders[0].RangeX <= TheMap.Width ||
+		    unit->Orders[0].RangeX <= TheMap.Height) {
 		unit->Orders[0].RangeX++;
 		unit->Orders[0].RangeY++;
 		break;
@@ -134,72 +134,72 @@ global void HandleActionFollow(Unit* unit)
 	case PF_REACHED:
 	    // FIXME: dark portal teleportation: Goal is used for target circle of power
 	    // FIXME: teleporting of units should use dark portal's mana
-	    if( (goal=unit->Orders[0].Goal) && 
+	    if ((goal = unit->Orders[0].Goal) && 
 		    goal->Type->Teleporter && goal->Goal &&
-		    MapDistanceBetweenUnits(unit,goal)<4 ) {
+		    MapDistanceBetweenUnits(unit, goal) < 4) {
 		Unit* table[UnitMax];
 		Unit* dest;
 		int n;
 		int i;
 
-		RemoveUnit(unit,NULL);
+		RemoveUnit(unit, NULL);
 		unit->X = goal->Goal->X;
 		unit->Y = goal->Goal->Y;
-		DropOutOnSide(unit,unit->Direction,1,1);
+		DropOutOnSide(unit, unit->Direction, 1, 1);
 		//FIXME: SoundIdForName() should be called once
-		PlayGameSound(SoundIdForName("invisibility"),MaxSampleVolume);
+		PlayGameSound(SoundIdForName("invisibility"), MaxSampleVolume);
 		//FIXME: MissileTypeByIdent() should be called once
 		MakeMissile(MissileTypeByIdent("missile-normal-spell"),
-			unit->X*TileSizeX+TileSizeX/2,
-			unit->Y*TileSizeY+TileSizeY/2,
-			unit->X*TileSizeX+TileSizeX/2,
-			unit->Y*TileSizeY+TileSizeY/2 );
+		    unit->X * TileSizeX + TileSizeX / 2,
+		    unit->Y * TileSizeY + TileSizeY / 2,
+		    unit->X * TileSizeX + TileSizeX / 2,
+		    unit->Y * TileSizeY + TileSizeY / 2);
 
-		unit->Wait=1;
-		unit->SubAction=0;
-		unit->Orders[0].Action=UnitActionStill;
+		unit->Wait = 1;
+		unit->SubAction = 0;
+		unit->Orders[0].Action = UnitActionStill;
 
 		//
 		//	FIXME: we must check if the units supports the new order.
 		//
-		dest=NoUnitP;
-		n=SelectUnitsOnTile(goal->Goal->X,goal->Goal->Y,table);
-		for( i=0; i<n; ++i ) {
-		    if( table[i]->Type==UnitTypeByIdent("unit-circle-of-power") ) {
-			dest=table[i];
+		dest = NoUnitP;
+		n = SelectUnitsOnTile(goal->Goal->X, goal->Goal->Y, table);
+		for (i = 0; i < n; ++i) {
+		    if (table[i]->Type == UnitTypeByIdent("unit-circle-of-power")) {
+			dest = table[i];
 		    }
 		}
 
-		if( dest ) {
-		    if( (dest->NewOrder.Action==UnitActionResource
-				&& !unit->Type->Harvester  )
-			    || (dest->NewOrder.Action==UnitActionAttack
-				&& !unit->Type->CanAttack)
-			    || (dest->NewOrder.Action==UnitActionBoard
-				&& unit->Type->UnitType!=UnitTypeLand) ) {
+		if (dest) {
+		    if ((dest->NewOrder.Action == UnitActionResource &&
+				!unit->Type->Harvester) ||
+			    (dest->NewOrder.Action == UnitActionAttack &&
+				!unit->Type->CanAttack) ||
+			    (dest->NewOrder.Action == UnitActionBoard &&
+				unit->Type->UnitType != UnitTypeLand)) {
 			DebugLevel0Fn("Wrong order for unit\n");
-			unit->Orders[0].Action=UnitActionStill;
+			unit->Orders[0].Action = UnitActionStill;
 		    } else {
-			if( dest->NewOrder.Goal ) {
-			    if( dest->NewOrder.Goal->Destroyed ) {
+			if (dest->NewOrder.Goal) {
+			    if (dest->NewOrder.Goal->Destroyed) {
 				// FIXME: perhaps we should use another dest?
 				DebugLevel0Fn("Destroyed unit in teleport unit\n");
-				RefsDebugCheck( !dest->NewOrder.Goal->Refs );
-				if( !--dest->NewOrder.Goal->Refs ) {
+				RefsDebugCheck(!dest->NewOrder.Goal->Refs);
+				if (!--dest->NewOrder.Goal->Refs) {
 				    ReleaseUnit(dest->NewOrder.Goal);
 				}
-				dest->NewOrder.Goal=NoUnitP;
-				dest->NewOrder.Action=UnitActionStill;
+				dest->NewOrder.Goal = NoUnitP;
+				dest->NewOrder.Action = UnitActionStill;
 			    }
 			}
 
-			unit->Orders[0]=dest->NewOrder;
+			unit->Orders[0] = dest->NewOrder;
 
 			//
 			// FIXME: Pending command uses any references?
 			//
-			if( unit->Orders[0].Goal ) {
-			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+			if (unit->Orders[0].Goal) {
+			    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
 			    unit->Orders[0].Goal->Refs++;
 			}
 		    }
@@ -207,18 +207,18 @@ global void HandleActionFollow(Unit* unit)
 		return;
 	    }
 
-	    if( !(goal=unit->Orders[0].Goal) ) {// goal has died
-		unit->Wait=1;
-		unit->SubAction=0;
-		unit->Orders[0].Action=UnitActionStill;
-		if( IsOnlySelected(unit) ) { // update display for new action
+	    if (!(goal = unit->Orders[0].Goal)) {// goal has died
+		unit->Wait = 1;
+		unit->SubAction = 0;
+		unit->Orders[0].Action = UnitActionStill;
+		if (IsOnlySelected(unit)) { // update display for new action
 		    SelectedUnitChanged();
 		}
 		return;
 	    }
-	    unit->Orders[0].X=goal->X;
-	    unit->Orders[0].Y=goal->Y;
-	    unit->SubAction=128;
+	    unit->Orders[0].X = goal->X;
+	    unit->Orders[0].Y = goal->Y;
+	    unit->SubAction = 128;
 
 	    // FALL THROUGH
 	default:
@@ -228,55 +228,55 @@ global void HandleActionFollow(Unit* unit)
     //
     //	Target destroyed?
     //
-    if( (goal=unit->Orders[0].Goal) && goal->Destroyed ) {
+    if ((goal = unit->Orders[0].Goal) && goal->Destroyed) {
 	DebugLevel0Fn("Goal dead\n");
-	unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
-	unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
-	unit->Orders[0].Goal=NoUnitP;
-	RefsDebugCheck( !goal->Refs );
-	if( !--goal->Refs ) {
+	unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
+	unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
+	unit->Orders[0].Goal = NoUnitP;
+	RefsDebugCheck(!goal->Refs);
+	if (!--goal->Refs) {
 	    ReleaseUnit(goal);
 	}
-	goal=NoUnitP;
+	goal = NoUnitP;
 	NewResetPath(unit);
     }
     //
     //	Target removed?
     //
-    if( unit->Type->Transporter && goal && goal->Removed ) {
+    if (unit->Type->Transporter && goal && goal->Removed) {
 	DebugLevel0Fn("Goal removed\n");
-	unit->Orders[0].X=goal->X+goal->Type->TileWidth/2;
-	unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
-	unit->Orders[0].Goal=NoUnitP;
-	RefsDebugCheck( !goal->Refs );
-	if( !--goal->Refs ) {
+	unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
+	unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
+	unit->Orders[0].Goal = NoUnitP;
+	RefsDebugCheck(!goal->Refs);
+	if (!--goal->Refs) {
 	    ReleaseUnit(goal);
 	}
-	goal=NoUnitP;
+	goal = NoUnitP;
 	NewResetPath(unit);
     }
 
-    if( unit->Reset ) {
+    if (unit->Reset) {
 	//
 	//	If our leader is dead or stops or attacks:
 	//	Attack any enemy in reaction range.
 	//		If don't set the goal, the unit can than choose a
 	//		better goal if moving nearer to enemy.
 	//
-	if( unit->Type->CanAttack && unit->Stats->Speed
-		&& (!goal || goal->Orders[0].Action==UnitActionAttack
-		    || goal->Orders[0].Action==UnitActionStill) ) {
-	    goal=AttackUnitsInReactRange(unit);
-	    if( goal ) {
+	if (unit->Type->CanAttack && unit->Stats->Speed &&
+		(!goal || goal->Orders[0].Action == UnitActionAttack ||
+		    goal->Orders[0].Action == UnitActionStill)) {
+	    goal = AttackUnitsInReactRange(unit);
+	    if (goal) {
 		DebugLevel2Fn("Follow attack %d\n" _C_ UnitNumber(goal));
-		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
+		CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 		// Save current command to come back.
-		unit->SavedOrder=unit->Orders[0];
+		unit->SavedOrder = unit->Orders[0];
 		// This stops the follow command and the attack is executed
-		unit->Orders[0].Action=UnitActionStill;
-		unit->Orders[0].Goal=NoUnitP;
-		unit->SubAction=0;
-		unit->Wait=1;
+		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0].Goal = NoUnitP;
+		unit->SubAction = 0;
+		unit->Wait = 1;
 	    }
 	}
     }
