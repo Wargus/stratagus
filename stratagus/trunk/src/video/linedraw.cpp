@@ -718,7 +718,7 @@ global void VideoDrawRectangle(SDL_Color color, int x, int y,
 global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
-    CLIP_RECTANGLE(x, y, w, h);
+//    CLIP_RECTANGLE(x, y, w, h);
     VideoDrawRectangle(color, x, y, w, h);
 }
 
