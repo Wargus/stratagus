@@ -205,7 +205,10 @@ global void ReleaseUnit(Unit* unit)
     );
 }
 
-local Unit *AllocUnit ()
+/**
+**	FIXME: Docu
+*/
+local Unit *AllocUnit (void)
 {
     Unit* unit;
     Unit** slot;
@@ -246,6 +249,9 @@ local Unit *AllocUnit ()
     return unit;
 }
 
+/**
+**	FIXME: Docu
+*/
 global void InitUnit (Unit *unit, UnitType *type, Player *player)
 {
     unit->Refs=1;
@@ -3829,7 +3835,7 @@ global void SaveUnits(FILE* file)
 
 #else
 #define SlotUsed(slot)	( SlotUsage[(slot)/8] & (1 << ((slot)%8)) )
-    InRun = 0;
+    RunStart = InRun = 0;
     for (i=0; i<MAX_UNIT_SLOTS; i++) {
 	if ( !InRun && SlotUsed (i) ) {
 	    InRun = 1;
