@@ -523,6 +523,8 @@ local int CclDefineUnitType(lua_State* l)
 			type->DetectCloak = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Transporter")) {
 			type->Transporter = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "AttackFromTransporter")) {
+			type->AttackFromTransporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coward")) {
 			type->Coward = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanGatherResources")) {
