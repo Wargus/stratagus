@@ -385,6 +385,8 @@ local void UiEnterPreferencesOptionsMenu(void)
 
 /**
 **	Toggle big map mode.
+**
+**	@todo FIXME: We should try to keep the same view, if possible
 */
 local void UiToggleBigMap(void)
 {
