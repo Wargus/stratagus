@@ -56,10 +56,13 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
 local char EditorRunning;		/// True editor is running
 
-enum _editor_state_ {
+local enum _editor_state_ {
     EditorSelecting,			/// Select
     EditorEditTile,			/// Edit tiles
 } EditorState;				/// Current editor state
+
+// FIXME: support for bigger tools 2x2, 3x3, 4x4.
+local int TileCursor;			/// TileCursor 
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -82,15 +85,22 @@ local void DrawTileIcons(void)
     tiles=TheMap.Tiles;
 
     y=TheUI.ButtonPanelY+4;
-    i=0x10;
+    i=0;
 
     while( y<TheUI.ButtonPanelY+100 ) {
 	x=TheUI.ButtonPanelX+4;
 	while( x<TheUI.ButtonPanelX+144 ) {
-	    VideoDrawTile(tiles[TheMap.Tileset->Table[i]],x,y);
-	    VideoDrawRectangle(ColorWhite,x,y,32,32);
+	    VideoDrawTile(tiles[TheMap.Tileset->Table[0x10+i*16]],x,y);
+	    VideoDrawRectangle(ColorGray,x,y,32,32);
+	    if( TileCursor == i ) {
+		VideoDrawRectangle(ColorGreen,x+1,y+1,30,30);
+
+	    }
+	    if( CursorOn == CursorOnButton && ButtonUnderCursor == i + 100 ) {
+		VideoDrawRectangle(ColorWhite,x-1,y-1,34,34);
+	    }
 	    x+=34;
-	    i+=0x10;
+	    i++;
 	}
 	y+=34;
     }
@@ -98,6 +108,8 @@ local void DrawTileIcons(void)
 
 /**
 **	Draw special cursor on map.
+**
+**	@todo support for bigger cursors (2x2, 3x3 ...)
 */
 local void DrawMapCursor(void)
 {
@@ -106,15 +118,20 @@ local void DrawMapCursor(void)
     int y;
 
     //
-    //	Draw map cursor
+    //  Draw map cursor
     //
 
     v = TheUI.LastClickedVP;
-    if( v != -1 ) {
+    if (v != -1) {
 	x = Viewport2MapX(v, CursorX);
 	y = Viewport2MapY(v, CursorY);
-	VideoDrawRectangle(ColorWhite,Map2ViewportX(v,x),Map2ViewportY(v,y),
-		32,32);
+	x = Map2ViewportX(v, x);
+	y = Map2ViewportY(v, y);
+	if (EditorState == EditorEditTile) {
+	    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 +
+			TileCursor * 16]], x, y);
+	}
+	VideoDrawRectangle(ColorWhite, x, y, 32, 32);
     }
 }
 
@@ -242,6 +259,15 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	EditorRunning=0;
 	return;
     }
+
+    //
+    //	Click on tile area
+    //
+    if( CursorOn == CursorOnButton && ButtonUnderCursor >= 100 ) {
+	EditorState = EditorEditTile;
+	TileCursor = ButtonUnderCursor - 100;
+	return;
+    }
 }
 
 /**
@@ -344,6 +370,8 @@ local void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
 local void EditorCallbackMouse(int x, int y)
 {
     int i;
+    int bx;
+    int by;
 
     DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
@@ -352,6 +380,26 @@ local void EditorCallbackMouse(int x, int y)
     MouseScrollState = ScrollNone;
     GameCursor = TheUI.Point.Cursor;
     CursorOn = -1;
+
+    //
+    //  Handle tile area
+    //
+    i = 0;
+    by = TheUI.ButtonPanelY + 4;
+    while (by < TheUI.ButtonPanelY + 100) {
+	bx = TheUI.ButtonPanelX + 4;
+	while (bx < TheUI.ButtonPanelX + 144) {
+	    if (bx < x && x < bx + 32 && by < y && y < by + 32) {
+		DebugLevel3Fn("Button %d\n" _C_ i);
+		ButtonUnderCursor = i + 100;
+		CursorOn = CursorOnButton;
+		return;
+	    }
+	    bx += 34;
+	    i++;
+	}
+	by += 34;
+    }
 
     //
     //  Handle buttons
@@ -364,7 +412,7 @@ local void EditorCallbackMouse(int x, int y)
 		|| y > TheUI.Buttons[i].Y + TheUI.Buttons[i].Height) {
 	    continue;
 	}
-	DebugLevel2("On button %d\n" _C_ i);
+	DebugLevel3("On button %d\n" _C_ i);
 	ButtonUnderCursor = i;
 	CursorOn = CursorOnButton;
 	return;
