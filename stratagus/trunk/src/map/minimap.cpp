@@ -218,7 +218,8 @@ global void DestroyMinimap(void)
 */
 global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unused)))
 {
-    static int RedPhase;
+    static int red_phase;
+    int new_phase;
     int mx;
     int my;
     int x;
@@ -236,7 +237,10 @@ global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unu
     int flags;
 #endif
 
-    RedPhase^=1;
+    x=(FrameCounter/FRAMES_PER_SECOND)&1;
+    if( (new_phase=red_phase-x) ) {
+	red_phase=x;
+    }
 
     x=TheUI.MinimapX+24;
     y=TheUI.MinimapY+2;
@@ -328,10 +332,12 @@ global void DrawMinimap(int vx __attribute__((unused)),int vy __attribute__((unu
 		color=ColorYellow;
 	    }
 	} else if( unit->Player==ThisPlayer ) {
-	    if( unit->Attacked && RedPhase ) {
+	    if( unit->Attacked && red_phase ) {
 		color=ColorRed;
 		// better to clear to fast, than to clear never :?)
-		unit->Attacked--;
+		if( new_phase ) {
+		    unit->Attacked--;
+		}
 	    } else if( MinimapShowSelected && unit->Selected ) {
 		color=ColorWhite;
 	    } else {
