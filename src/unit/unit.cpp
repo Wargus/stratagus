@@ -2798,6 +2798,16 @@ global void LetUnitDie(Unit* unit)
 	}
 
 	//
+	// Handle Teleporter Destination Removal
+	if (type->Teleporter && unit->Goal) {
+		RemoveUnit(unit->Goal, NULL);
+		UnitLost(unit->Goal);
+		UnitClearOrders(unit->Goal);
+		ReleaseUnit(unit->Goal);
+		unit->Goal = NULL;
+	}
+
+	//
 	//		Building,...
 	//
 	if (type->Building) {
