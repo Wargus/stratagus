@@ -566,4 +566,38 @@ global void DrawMinimapCursor(int vx,int vy)
     }
 }
 
+/**
+**	Convert minimap cursor X position to tile map coordinate.
+**
+**	@param x	Screen X pixel coordinate.
+**	@return		Tile X coordinate.
+*/
+global int ScreenMinimap2MapX(int x)
+{
+    int tx;
+
+    tx=((((x)-TheUI.MinimapX-24-MinimapX)*MINIMAP_FAC)/MinimapScale);
+    if( tx<0 ) {
+	return 0;
+    }
+    return tx<TheMap.Width ? tx : TheMap.Width-1;
+}
+
+/**
+**	Convert minimap cursor Y position to tile map coordinate.
+**
+**	@param y	Screen Y pixel coordinate.
+**	@return		Tile Y coordinate.
+*/
+global int ScreenMinimap2MapY(int y)
+{
+    int ty;
+
+    ty=((((y)-TheUI.MinimapY-2-MinimapY)*MINIMAP_FAC)/MinimapScale);
+    if( ty<0 ) {
+	return 0;
+    }
+    return ty<TheMap.Height ? ty : TheMap.Height-1;
+}
+
 //@}
