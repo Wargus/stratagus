@@ -230,7 +230,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 ## HIERARCHIC_PATHFINDER	Use hierarchic pathfinder
 ## USE_LUA		Lua scripting support
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
+	-DUNIT_ON_MAP -DNEW_AI -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
 	-DUSE_HP_FOR_XP -DNEW_FOW # -DNEW_MAPDRAW=1 -DNEW_SHIPS
 
 ## choose optimise level
