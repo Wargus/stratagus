@@ -413,6 +413,7 @@ global int LoadReplay(char* name)
     vload(name, 0, 1);
 
     ReplayLog = symbol_value(gh_symbol2scm("*replay_log*"), NIL);
+    CclGcProtect(&ReplayLog);
     NextLogCycle = ~0UL;
     if (!CommandLogDisabled) {
 	CommandLogDisabled = 1;
@@ -439,6 +440,7 @@ global void EndReplayLog(void)
 	fclose(LogFile);
 	LogFile = NULL;
     }
+    CclGcUnprotect(&ReplayLog);
 }
 
 /**
