@@ -57,7 +57,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-_AnimationsHash AnimationsHash;      /// Animations hash table
 _NewAnimationsHash NewAnimationsHash;/// NewAnimations hash table
 
 struct _UnitTypeVar_ UnitTypeVar;    /// Variables for UnitType and unit.
@@ -382,8 +381,6 @@ static int CclDefineUnitType(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Animations")) {
-			type->Animations = AnimationsByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "NewAnimations")) {
 			type->NewAnimations = NewAnimationsByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
@@ -965,13 +962,6 @@ static int CclDefineUnitType(lua_State* l)
 					lua_rawgeti(l, -1, k + 1);
 					type->Sound.Dead.Name = strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "attack")) {
-					if (redefine) {
-						free(type->Weapon.Attack.Name);
-					}
-					lua_rawgeti(l, -1, k + 1);
-					type->Weapon.Attack.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
 				}
@@ -1301,112 +1291,6 @@ static int CclDefineUnitTypeWcNames(lua_State* l)
 }
 
 // ----------------------------------------------------------------------------
-
-/**
-**  Define an unit-type animations set.
-**
-**  @param l  Lua state.
-*/
-static int CclDefineAnimations(lua_State* l)
-{
-	const char* str;
-	const char* id;
-	const char* resource;
-	Animations* anims;
-	Animation* anim;
-	Animation* t;
-	int i;
-	int frame;
-	int args;
-	int j;
-	int subargs;
-	int k;
-
-	args = lua_gettop(l);
-	j = 0;
-
-	resource = NULL;
-	str = LuaToString(l, j + 1);
-	++j;
-	anims = calloc(1, sizeof(Animations));
-
-	for (; j < args; ++j) {
-		id = LuaToString(l, j + 1);
-		++j;
-		if (!strcmp(id, "harvest")) {
-			resource = LuaToString(l, j + 1);
-			++j;
-		}
-
-		if (!lua_istable(l, j + 1)) {
-			LuaError(l, "incorrect argument");
-		}
-		subargs = luaL_getn(l, j + 1);
-		t = anim = malloc(subargs * sizeof(Animation));
-		frame = 0;
-		for (k = 0; k < subargs; ++k) {
-			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 4) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			t->Flags = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			t->Pixel = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			t->Sleep = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 4);
-			i = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			t->Frame = i - frame;
-			frame = i;
-			if (t->Flags & AnimationRestart) {
-				frame = 0;
-			}
-			++t;
-			lua_pop(l, 1);
-		}
-		t[-1].Flags |= 0x80; // Marks end of list
-
-		if (!strcmp(id, "still")) {
-			free(anims->Still);
-			anims->Still = anim;
-		} else if (!strcmp(id, "move")) {
-			free(anims->Move);
-			anims->Move = anim;
-		} else if (!strcmp(id, "attack")) {
-			free(anims->Attack);
-			anims->Attack = anim;
-		} else if (!strcmp(id, "repair")) {
-			free(anims->Repair);
-			anims->Repair = anim;
-		} else if (!strcmp(id, "harvest")) {
-			int res;
-
-			for (res = 0; res < MaxCosts; ++res) {
-				if (!strcmp(resource, DefaultResourceNames[res])) {
-					break;
-				}
-			}
-			if (res == MaxCosts) {
-				LuaError(l, "Resource not found: %s" _C_ resource);
-			}
-			free(anims->Harvest[res]);
-			anims->Harvest[res] = anim;
-		} else if (!strcmp(id, "die")) {
-			free(anims->Die);
-			anims->Die = anim;
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ id);
-		}
-	}
-
-	*(Animations**)hash_add(AnimationsHash, str) = anims;
-	return 0;
-}
 
 /**
 **  Add a label
@@ -2220,7 +2104,6 @@ void UnitTypeCclRegister(void)
 
 	lua_register(Lua, "DefineUnitTypeWcNames", CclDefineUnitTypeWcNames);
 
-	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
 	lua_register(Lua, "DefineNewAnimations", CclDefineNewAnimations);
 }
 

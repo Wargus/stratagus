@@ -269,12 +269,8 @@ static void DrawBuildingCursor(void)
 		LoadUnitTypeSprite(CursorBuilding);
 	}
 #endif
-	if (CursorBuilding->Animations) {
-		frame = CursorBuilding->Animations->Still[0].Frame + CursorBuilding->NumDirections / 2;
-	} else {
-		// FIXME: wrong frame
-		frame = CursorBuilding->NumDirections / 2;
-	}
+	// FIXME: wrong frame
+	frame = CursorBuilding->NumDirections / 2;
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 	DrawShadow(NULL, CursorBuilding, frame, x, y);
