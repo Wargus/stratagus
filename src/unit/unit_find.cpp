@@ -158,7 +158,7 @@ global int FindPlayerUnitsByType(const Player* player,const UnitType* type
 **
 **	@return		Returns first found unit on tile.
 */
-global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
+global Unit* UnitOnMapTile(int tx,int ty)
 {
     Unit* table[UnitMax];
     int n;
@@ -185,7 +185,7 @@ global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
 **
 **	@return		Returns repairable unit found on tile.
 */
-global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
+global Unit* RepairableOnMapTile(int tx,int ty)
 {
     Unit* table[UnitMax];
     int n;
@@ -213,7 +213,7 @@ global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
 **
 **	@return		Returns ideal target on map tile.
 */
-global Unit* TargetOnMapTile(const Unit* source,unsigned tx,unsigned ty)
+global Unit* TargetOnMapTile(const Unit* source,int tx,int ty)
 {
     Unit* table[UnitMax];
     Unit* unit;
@@ -262,7 +262,7 @@ global Unit* TargetOnMapTile(const Unit* source,unsigned tx,unsigned ty)
 **
 **	@return		Returns transporter unit found on tile.
 */
-global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
+global Unit* TransporterOnMapTile(int tx,int ty)
 {
     Unit* table[UnitMax];
     int n;
@@ -287,7 +287,7 @@ global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
 **
 **	@return		true if (x,y) is inside the unit's sprite
 */
-local int InsideUnitSprite (const Unit* unit, unsigned x, unsigned y)
+local int InsideUnitSprite(const Unit* unit,int x,int y)
 {
     int ux;
     int uy;		// position at which unit's sprite is currently drawn
@@ -315,10 +315,11 @@ local int InsideUnitSprite (const Unit* unit, unsigned x, unsigned y)
 **
 **	@return		Returns unit found at this pixel map coordinates
 */
-global Unit* UnitOnScreenMapPosition (unsigned x, unsigned y)
+global Unit* UnitOnScreenMapPosition(int x,int y)
 {
     Unit* table[UnitMax];
-    int tx, ty;
+    int tx;
+    int ty;
     int n;
     int i;
 
@@ -329,9 +330,9 @@ global Unit* UnitOnScreenMapPosition (unsigned x, unsigned y)
     ty = y / TileSizeY;
 
     //	fast path, should work most of the time
-    n = SelectUnitsOnTile (tx, ty, table);
+    n = SelectUnitsOnTile(tx, ty, table);
     for( i=0; i<n; ++i ) {
-	if( !table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y)) {
+	if( !table[i]->Type->Vanishes && InsideUnitSprite(table[i], x, y)) {
 	    return table[i];
 	}
     }
@@ -339,9 +340,9 @@ global Unit* UnitOnScreenMapPosition (unsigned x, unsigned y)
     //	if we got here we have to search for our unit in the neighborhood
 
     //	ships and flyers could be 2 fields away
-    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    n = UnitCacheSelect(tx-2,ty-2, tx+2, ty+2, table);
     for( i=0; i<n; ++i ) {
-	if( !table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y)) {
+	if( !table[i]->Type->Vanishes && InsideUnitSprite(table[i], x, y)) {
 	    return table[i];
 	}
     }
@@ -357,24 +358,25 @@ global Unit* UnitOnScreenMapPosition (unsigned x, unsigned y)
 **
 **	@return		Returns repairable unit found on screen map position.
 */
-global Unit* RepairableOnScreenMapPosition (unsigned x,unsigned y)
+global Unit* RepairableOnScreenMapPosition(int x,int y)
 {
     Unit* table[UnitMax];
-    int tx, ty;
+    int tx;
+    int ty;
     int n;
     int i;
 
     tx = x / TileSizeX;
     ty = y / TileSizeY;
 
-    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    n = UnitCacheSelect(tx-2,ty-2, tx+2, ty+2, table);
     for( i=0; i<n; ++i ) {
 	// FIXME: could use more or less for repair? Repair of ships/catapults.
 	// Only repairable if target is a building or tansporter and it's HP is
 	// not at max
 	if( (table[i]->Type->Building || table[i]->Type->Transporter)
 		&& table[i]->HP < table[i]->Stats->HitPoints ) {
-	    if (InsideUnitSprite (table[i], x, y)) {
+	    if (InsideUnitSprite(table[i], x, y)) {
 		return table[i];
 	    }
 	}
@@ -391,13 +393,13 @@ global Unit* RepairableOnScreenMapPosition (unsigned x,unsigned y)
 **
 **	@return		Returns ideal target
 */
-global Unit* TargetOnScreenMapPosition (const Unit* source, unsigned x,
-    unsigned y)
+global Unit* TargetOnScreenMapPosition(const Unit* source,int x,int y)
 {
     Unit* table[UnitMax];
     Unit* unit;
     Unit* best;
-    int tx, ty;
+    int tx;
+    int ty;
     int n;
     int i;
 
@@ -408,7 +410,7 @@ global Unit* TargetOnScreenMapPosition (const Unit* source, unsigned x,
     ty = y / TileSizeY;
 
     //	 ships and flyers could be 2 fields away
-    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    n = UnitCacheSelect(tx-2,ty-2, tx+2, ty+2, table);
     best=NoUnitP;
     for( i=0; i<n; ++i ) {
 	unit=table[i];
@@ -421,7 +423,7 @@ global Unit* TargetOnScreenMapPosition (const Unit* source, unsigned x,
 		|| unit->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
-	if ( !InsideUnitSprite (table[i], x, y)) {
+	if ( !InsideUnitSprite(table[i], x, y)) {
 	    continue;
 	}
 	if( !CanTarget(source->Type,unit->Type) ) {
@@ -445,10 +447,11 @@ global Unit* TargetOnScreenMapPosition (const Unit* source, unsigned x,
 **
 **	@return		Returns transporter unit found on tile.
 */
-global Unit* TransporterOnScreenMapPosition (unsigned x,unsigned y)
+global Unit* TransporterOnScreenMapPosition(int x,int y)
 {
     Unit* table[UnitMax];
-    int tx, ty;
+    int tx;
+    int ty;
     int n;
     int i;
 
@@ -456,9 +459,9 @@ global Unit* TransporterOnScreenMapPosition (unsigned x,unsigned y)
     ty = y / TileSizeY;
 
 //  n=SelectUnitsOnTile(tx,ty,table);
-    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    n = UnitCacheSelect(tx-2,ty-2, tx+2, ty+2, table);
     for( i=0; i<n; ++i ) {
-	if( table[i]->Type->Transporter && InsideUnitSprite (table[i], x, y)) {
+	if( table[i]->Type->Transporter && InsideUnitSprite(table[i], x, y)) {
 	    return table[i];
 	}
     }
@@ -639,17 +642,17 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 **
 **	@note	This could be improved, for better performance.
 */
-global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
+global Unit* AttackUnitsInDistance(const Unit* unit,int range)
 {
     const Unit* dest;
     const UnitType* type;
     const UnitType* dtype;
     Unit* table[UnitMax];
-    unsigned x;
-    unsigned y;
-    unsigned n;
-    unsigned i;
-    unsigned d;
+    int x;
+    int y;
+    int n;
+    int i;
+    int d;
     int attackrange;
     int cost;
     const Player* player;

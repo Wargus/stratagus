@@ -88,7 +88,7 @@ extern int ClipY2;			/// current clipping bottom right
 **			(return value of width and height can be made smaller)
 */
 #define CLIP_RECTANGLE(x,y,width,height) { \
-  unsigned int f;			   \
+  int f;			   \
   if( x<ClipX1 ) {			   \
     f=ClipX1-x;				   \
     if( width<=f ) {			   \
@@ -131,13 +131,13 @@ extern int ClipY2;			/// current clipping bottom right
 **	@param x	int X screen position
 **	@param y	int Y screen position
 **			(return value of X and Y can be made larger)
-**	@param width	unsigned int width to display
-**	@param height	unsigned int height to display
+**	@param width	int width to display
+**	@param height	int height to display
 **			(return value of width and height can be made smaller)
 **  returns:
-**	@param ofsx	unsigned int offset X from start of sprite data
-**	@param ofsy	unsigned int offset Y from start of sprite data
-**	@param endx	unsigned int offset to skip the remaining data at the
+**	@param ofsx	int offset X from start of sprite data
+**	@param ofsy	int offset Y from start of sprite data
+**	@param endx	int offset to skip the remaining data at the
 **			end of each horizontal line of the sprite.
 **
 **	@note there was no need for 'endy', as it isn't used to draw sprites..

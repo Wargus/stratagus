@@ -93,7 +93,7 @@ global void InitButtons(void)
 */
 global void SaveButtons(FILE* file)
 {
-    unsigned i;
+    int i;
     int n;
     char* cp;
 

@@ -59,7 +59,7 @@
 **
 **	@return		Returns ideal target on map tile.
 */
-global Unit* EnemyOnMapTile(const Unit* source,unsigned tx,unsigned ty)
+local Unit* EnemyOnMapTile(const Unit* source,int tx,int ty)
 {
     Unit* table[UnitMax];
     Unit* unit;

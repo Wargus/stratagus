@@ -158,7 +158,7 @@ local void AddIcon(const char *ident, const char *tileset,
 */
 global void InitIcons(void)
 {
-    unsigned i;
+    int i;
 
     //
     //  Add icons of the current tileset, with shortcut to hash.
@@ -189,7 +189,7 @@ global void InitIcons(void)
 */
 global void LoadIcons(void)
 {
-    unsigned i;
+    int i;
 
     //
     //  Load all icon files.

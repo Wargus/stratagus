@@ -313,7 +313,7 @@ local SCM CclDefineConstruction(SCM list)
     SCM sublist;
     char* str;
     Construction* construction;
-    unsigned i;
+    int i;
 
     //	Slot identifier
 
