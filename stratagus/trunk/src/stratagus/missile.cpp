@@ -1007,6 +1007,7 @@ global void MissileHit(Missile* missile)
     Unit* table[UnitMax];
     int n;
     int i;
+    int splash;
 
     DebugCheck(missile == NULL);
     DebugCheck(missile->Type == NULL);
@@ -1084,14 +1085,13 @@ global void MissileHit(Missile* missile)
 	//	NOTE: perhaps this should be come a property of the missile.
 	//
 	if (CanTarget(missile->SourceUnit->Type, goal->Type)) {
-	    // We are attacking the nearest field of the unit
-	    if (x < goal->X || y < goal->Y ||
-		    x >= goal->X + goal->Type->TileWidth ||
-		    y >= goal->Y + goal->Type->TileHeight) {
-		MissileHitsGoal(missile, goal, 2);
+	    splash = MapDistanceToUnit(x, y, goal);
+	    if (splash) {
+		splash *= missile->Type->SplashFactor;
 	    } else {
-		MissileHitsGoal(missile, goal, 1);
+		splash = 1;
 	    }
+	    MissileHitsGoal(missile, goal, splash);
 	}
     }
     //
@@ -1106,7 +1106,8 @@ global void MissileHit(Missile* missile)
 		if (i == 0 && n == 0) {
 		    MissileHitsWall(missile, x + i, y + n, 1);
 		} else {
-		    MissileHitsWall(missile, x + i, y + n, 2);
+		    MissileHitsWall(missile, x + i, y + n, 
+			MapDistance(x, y, i, n) * missile->Type->SplashFactor);
 		}
 	    }
 	}
@@ -1384,6 +1385,7 @@ global void SaveMissileTypes(CLFile* file)
 	CLprintf(file, " 'sleep %d", mtype->Sleep);
 	CLprintf(file, " 'speed %d", mtype->Speed);
 	CLprintf(file, " 'range %d", mtype->Range);
+	CLprintf(file, " 'splash-factor", mtype->SplashFactor);
 	if (mtype->ImpactMissile) {
 	    CLprintf(file, "\n  'impact-missile '%s", mtype->ImpactMissile->Ident);
 	}
@@ -1391,8 +1393,12 @@ global void SaveMissileTypes(CLFile* file)
 	    CLprintf(file, "\n  'smoke-missile '%s", mtype->SmokeMissile->Ident);
 	}
 	CLprintf(file, "\n ");
-	CLprintf(file, " 'can-hit-owner #%c", mtype->CanHitOwner ? 't' : 'f');
-	CLprintf(file, " 'friendly-fire #%c", mtype->FriendlyFire ? 't' : 'f');
+	if (mtype->CanHitOwner) {
+	    CLprintf(file, " 'can-hit-owner ");
+	}
+	if (mtype->FriendlyFire) {
+	    CLprintf(file, " 'friendly-fire");
+	}
 	CLprintf(file, ")\n");
     }
 }
