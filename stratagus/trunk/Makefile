@@ -210,53 +210,19 @@ DOCS    = README doc/index.html doc/install.html \
 	  doc/development.html doc/gpl.html \
 	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
-	  doc/ccl/research.html doc/graphic/* \
+	  doc/ccl/research.html doc/graphics/* \
 	  doc/trigger.txt doc/vp32_opensource_license_9-6-01.txt \
-	  debian/stratagus.6 doc/ccl/ccl-index.html doc/ccl/game.html \
-	  doc/ccl/icon.html doc/ccl/sound.html doc/ccl/triggers.html \
+	  doc/ccl/ccl-index.html doc/ccl/game.html \
+	  doc/ccl/sound.html doc/ccl/triggers.html \
 	  doc/ccl/ui.html
 
-PICS    = contrib/stratagus.png contrib/stratagus.ico
+PICS    = contrib/stratagus.ico
 
-PUDS	= contrib/puds/single/*.txt contrib/puds/single/*.pud.gz \
-	  contrib/puds/multi/*.txt contrib/puds/multi/*.pud.gz
-
-CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
-	  data/ccl/constructions.ccl data/ccl/human/constructions.ccl \
-	  data/ccl/orc/constructions.ccl \
-	  data/ccl/missiles.ccl data/ccl/icons.ccl \
-	  data/ccl/sound.ccl data/ccl/stratagus.ccl \
-	  data/ccl/ui.ccl data/ccl/human/ui.ccl data/ccl/orc/ui.ccl \
-	  data/ccl/upgrade.ccl data/ccl/human/upgrade.ccl \
-	  data/ccl/orc/upgrade.ccl \
-	  data/ccl/buttons.ccl data/ccl/human/buttons.ccl \
-	  data/ccl/orc/buttons.ccl \
-	  data/ccl/fonts.ccl data/ccl/ai.ccl \
-	  data/ccl/tilesets.ccl data/ccl/tilesets/summer.ccl \
-	  data/ccl/tilesets/winter.ccl \
-	  data/ccl/tilesets/wasteland.ccl data/ccl/tilesets/swamp.ccl \
-	  data/ccl/campaigns.ccl data/ccl/credits.ccl \
-	  data/ccl/human/campaign1.ccl data/ccl/human/campaign2.ccl \
-	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
-	  data/ccl/anim.ccl data/ccl/wc2.ccl data/ccl/ranks.ccl \
-	  data/ccl/tips.ccl data/ccl/menus.ccl data/ccl/keystrokes.ccl \
-	  data/ccl/spells.ccl \
-	  data/ccl/editor.ccl # data/campaigns/*/*.cm
-
-CONTRIB	= contrib/cross.png contrib/red_cross.png \
-	  contrib/health.png contrib/mana.png \
-	  contrib/health2.png contrib/mana2.png \
-	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
-	  contrib/music/toccata.mod.gz \
-	  contrib/Stratagus-beos.proj.gz \
-	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h \
-	  contrib/campaigns/*/*.cm
+CONTRIB	= contrib/macosx.tgz
 
 MISC    += Makefile Rules.make.orig setup \
 	  contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  .indent.pro Rules.make.in configure.in configure \
-	  $(CONTRIB) \
-	  \
 	  src/stratagus.rc data/default.cm
 
 mydate	= $(shell date +%y%m%d)
@@ -271,10 +237,10 @@ distlist:
 dist: distlist
 	echo >>$(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
-	echo $(PUDS) >>$(DISTLIST)
 	echo $(MISC) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
+	echo $(CONTRIB) >>$(DISTLIST)
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
@@ -289,9 +255,6 @@ dist: distlist
 
 bin-dist: all
 	$(RM) $(DISTLIST)
-	echo $(PICS) >>$(DISTLIST)
-	echo $(PUDS) >>$(DISTLIST)
-	echo $(CONTRIB) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	echo stratagus$(EXE) >>$(DISTLIST)
@@ -309,12 +272,8 @@ bin-dist: all
 
 win32-bin-dist2: win32
 	@$(RM) $(DISTLIST)
-	@echo $(PICS) >>$(DISTLIST)
-	@echo $(PUDS) >>$(DISTLIST)
-	@echo $(CONTRIB) >>$(DISTLIST)
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
-	@echo doc/README-SDL.txt >>$(DISTLIST)
 	@echo stratagus$(EXE) >>$(DISTLIST)
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
