@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -614,7 +613,7 @@ global Unit* AiFindGoldMine(const Unit* source,
 	    best=unit;
 	}
     }
-    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n" _C_ UnitNumber(best) _C_ best->X _C_ best->Y);
 
     return best;
 }
@@ -627,20 +626,21 @@ global Unit* AiFindGoldMine(const Unit* source,
 **
 **	@note	I can cache the gold-mine.
 */
-local int AiMineGold(Unit * unit)
+local int AiMineGold(Unit* unit)
 {
-    Unit *dest;
+    Unit* dest;
 
-    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     dest = AiFindGoldMine(unit, unit->X, unit->Y);
     if (!dest) {
-	DebugLevel0Fn("goldmine not reachable\n");
+	DebugLevel0Fn("goldmine not reachable by %s(%d,%d)\n"
+		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 	return 0;
     }
-    DebugCheck(unit->Type!=UnitTypeHumanWorker
-	    && unit->Type!=UnitTypeOrcWorker);
+    DebugCheck(unit->Type != UnitTypeHumanWorker
+	    && unit->Type != UnitTypeOrcWorker);
 
-    CommandMineGold(unit, dest,FlushCommands);
+    CommandMineGold(unit, dest, FlushCommands);
 
     return 1;
 }
@@ -657,7 +657,7 @@ local int AiHarvest(Unit * unit)
     int x, y, addx, addy, i, n, r, wx, wy, bestx, besty, cost;
     Unit *dest;
 
-    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     x = unit->X;
     y = unit->Y;
     addx = unit->Type->TileWidth;
@@ -670,7 +670,7 @@ local int AiHarvest(Unit * unit)
     //  This is correct, but can this be written faster???
     if ((dest = FindWoodDeposit(unit->Player, x, y))) {
 	NearestOfUnit(dest, x, y, &wx, &wy);
-	DebugLevel3("To %d,%d\n", wx, wy);
+	DebugLevel3("To %d,%d\n" _C_ wx _C_ wy);
     } else {
 	wx = unit->X;
 	wy = unit->Y;
@@ -684,7 +684,7 @@ local int AiHarvest(Unit * unit)
 	for (i = addy; i--; y++) {	// go down
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
@@ -696,7 +696,7 @@ local int AiHarvest(Unit * unit)
 	for (i = addx; i--; x++) {	// go right
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
@@ -708,7 +708,7 @@ local int AiHarvest(Unit * unit)
 	for (i = addy; i--; y--) {	// go up
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
@@ -720,7 +720,7 @@ local int AiHarvest(Unit * unit)
 	for (i = addx; i--; x--) {	// go left
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
@@ -729,7 +729,7 @@ local int AiHarvest(Unit * unit)
 	    }
 	}
 	if (cost != 99999) {
-	    DebugLevel3Fn("wood on %d,%d\n", x, y);
+	    DebugLevel3Fn("wood on %d,%d\n" _C_ x _C_ y);
 	    DebugCheck(unit->Type!=UnitTypeHumanWorker && unit->Type!=UnitTypeOrcWorker);
 	    CommandHarvest(unit, bestx, besty,FlushCommands);
 	    return 1;
@@ -737,7 +737,8 @@ local int AiHarvest(Unit * unit)
 	++addy;
     }
 
-    DebugLevel0Fn("no wood reachable\n");
+    DebugLevel0Fn("no wood reachable by %s(%d,%d)\n");
+	    _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
     return 0;
 }
 
@@ -876,7 +877,8 @@ local int AiHarvest(Unit * unit)
 	ep=wp;
     }
 
-    DebugLevel0Fn("no wood in range\n");
+    DebugLevel0Fn("no wood in range by %s(%d,%d)\n"
+	    _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 
     return 0;
 }
@@ -890,10 +892,11 @@ local int AiHaulOil(Unit * unit)
 {
     Unit *dest;
 
-    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     dest = FindOilPlatform(unit->Player, unit->X, unit->Y);
     if (!dest) {
-	DebugLevel0Fn("oil platform not reachable\n");
+	DebugLevel0Fn("oil platform not reachable by %s(%d,%d)\n"
+		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 	return 0;
     }
     DebugCheck(unit->Type!=UnitTypeHumanTanker
@@ -1076,7 +1079,7 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     int k;
     int num;
 
-    DebugLevel2Fn("%s can repair %s\n" _C_ type->Ident _C_
+    DebugLevel3Fn("%s can repair %s\n" _C_ type->Ident _C_
 	    building->Type->Ident);
 
     IfDebug( unit=NoUnitP; );
@@ -1254,6 +1257,8 @@ local void AiCheckRepair(void)
 **
 **	@param type	Unit type requested.
 **	@param count	How many units.
+**
+**	@todo FIXME: should store the end of list and not search it.
 */
 global void AiAddUnitTypeRequest(UnitType* type,int count)
 {
@@ -1283,6 +1288,14 @@ global void AiResourceManager(void)
     //	Check if something needs to be build / trained.
     //
     AiCheckingWork();
+    //
+    //	Look if we can build a farm in advance.
+    //
+    if( !AiPlayer->NeedFood
+	    && AiPlayer->Player->NumFoodUnits==AiPlayer->Player->Food ) {
+	DebugLevel1Fn("Farm in advance request\n");
+	AiRequestFarms();
+    }
     //
     //	Collect resources.
     //
