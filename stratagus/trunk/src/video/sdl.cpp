@@ -376,6 +376,7 @@ local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
 	    icode = KeyCodeKPMinus;
 	    break;
 	case SDLK_SYSREQ:
+	case SDLK_PRINT:
 	    icode = KeyCodePrint;
 	    break;
 
