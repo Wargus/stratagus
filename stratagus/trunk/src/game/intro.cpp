@@ -910,7 +910,11 @@ local int GameStatsDrawFunc(int frame)
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
 		continue;
 	    }
-	    sprintf(buf,"%s - Enemy",p->Name);
+	    if( ThisPlayer->Enemy&(1<<i) ) {
+		sprintf(buf,"%s - Enemy",p->Name);
+	    } else {
+		sprintf(buf,"%s - Ally",p->Name);
+	    }
 	    VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26+LineSpacing*c,
 	                          NamesFont,buf);
 	    sprintf(buf,"%u",p->TotalUnits);
