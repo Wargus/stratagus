@@ -64,6 +64,7 @@ typedef struct _info_text_ {
 } InfoText;                      ///< FIXME:docu
 
 _ButtonStyleHash ButtonStyleHash;
+_CheckboxStyleHash CheckboxStyleHash;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -573,11 +574,7 @@ static MenuButtonId scm2buttonid(lua_State* l, const char* value)
 {
 	MenuButtonId id;
 
-	if (!strcmp(value, "gem-round")) {
-		id = MBUTTON_GEM_ROUND;
-	} else if (!strcmp(value, "gem-square")) {
-		id = MBUTTON_GEM_SQUARE;
-	} else if (!strcmp(value, "up-arrow")) {
+	if (!strcmp(value, "up-arrow")) {
 		id = MBUTTON_UP_ARROW;
 	} else if (!strcmp(value, "down-arrow")) {
 		id = MBUTTON_DOWN_ARROW;
@@ -2331,6 +2328,25 @@ ButtonStyle* FindButtonStyle(const char* style)
 }
 
 /**
+**  Find a checkbox style
+**
+**  @param style  Name of the style to find.
+**
+**  @return       Checkbox style, NULL if not found.
+*/
+CheckboxStyle* FindCheckboxStyle(const char* style)
+{
+	CheckboxStyle** s;
+
+	s = (CheckboxStyle**)hash_find(CheckboxStyleHash, style);
+	if (!s) {
+		return NULL;
+	} else {
+		return *s;
+	}
+}
+
+/**
 **  Parse button style properties
 **
 **  @param l  Lua state.
@@ -2554,6 +2570,179 @@ static int CclDefineButtonStyle(lua_State* l)
 }
 
 /**
+**  Define a checkbox style
+**
+**  @param l  Lua state.
+*/
+static int CclDefineCheckboxStyle(lua_State* l)
+{
+	const char* style;
+	const char* value;
+	CheckboxStyle* c;
+	CheckboxStyle** cp;
+
+	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	style = LuaToString(l, 1);
+	cp = (CheckboxStyle**)hash_find(CheckboxStyleHash, (char*)style);
+	if (!cp) {
+		c = calloc(1, sizeof(*c));
+		*(CheckboxStyle**)hash_add(CheckboxStyleHash, style) = c;
+		// Set to bogus value to see if it was set later
+		c->Default.TextX = c->Hover.TextX = c->Selected.TextX =
+			c->Clicked.TextX = c->Disabled.TextX =
+			c->Checked.TextX = c->CheckedHover.TextX = c->CheckedSelected.TextX =
+			c->CheckedClicked.TextX = c->CheckedDisabled.TextX = 0xFFFFFF;
+	} else {
+		c = *cp;
+	}
+
+	lua_pushnil(l);
+	while (lua_next(l, 2)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			c->Width = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			c->Height = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "Font")) {
+			c->Font = FontByIdent(LuaToString(l, -1));
+		} else if (!strcmp(value, "TextNormalColor")) {
+			free(c->TextNormalColor);
+			c->TextNormalColor = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "TextReverseColor")) {
+			free(c->TextReverseColor);
+			c->TextReverseColor = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "TextPos")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			c->TextX = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			c->TextY = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "TextAlign")) {
+			value = LuaToString(l, -1);
+			if (!strcmp(value, "Center")) {
+				c->TextAlign = TextAlignCenter;
+			} else if (!strcmp(value, "Right")) {
+				c->TextAlign = TextAlignRight;
+			} else if (!strcmp(value, "Left")) {
+				c->TextAlign = TextAlignLeft;
+			} else {
+				LuaError(l, "Invalid text alignment: %s" _C_ value);
+			}
+		} else if (!strcmp(value, "Default")) {
+			ParseButtonStyleProperties(l, &c->Default);
+		} else if (!strcmp(value, "Hover")) {
+			ParseButtonStyleProperties(l, &c->Hover);
+		} else if (!strcmp(value, "Selected")) {
+			ParseButtonStyleProperties(l, &c->Selected);
+		} else if (!strcmp(value, "Clicked")) {
+			ParseButtonStyleProperties(l, &c->Clicked);
+		} else if (!strcmp(value, "Disabled")) {
+			ParseButtonStyleProperties(l, &c->Disabled);
+		} else if (!strcmp(value, "Checked")) {
+			ParseButtonStyleProperties(l, &c->Checked);
+		} else if (!strcmp(value, "CheckedHover")) {
+			ParseButtonStyleProperties(l, &c->CheckedHover);
+		} else if (!strcmp(value, "CheckedSelected")) {
+			ParseButtonStyleProperties(l, &c->CheckedSelected);
+		} else if (!strcmp(value, "CheckedClicked")) {
+			ParseButtonStyleProperties(l, &c->CheckedClicked);
+		} else if (!strcmp(value, "CheckedDisabled")) {
+			ParseButtonStyleProperties(l, &c->CheckedDisabled);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+	}
+
+	if (c->Default.TextX == 0xFFFFFF) {
+		c->Default.TextX = c->TextX;
+		c->Default.TextY = c->TextY;
+	}
+	if (c->Hover.TextX == 0xFFFFFF) {
+		c->Hover.TextX = c->TextX;
+		c->Hover.TextY = c->TextY;
+	}
+	if (c->Selected.TextX == 0xFFFFFF) {
+		c->Selected.TextX = c->TextX;
+		c->Selected.TextY = c->TextY;
+	}
+	if (c->Clicked.TextX == 0xFFFFFF) {
+		c->Clicked.TextX = c->TextX;
+		c->Clicked.TextY = c->TextY;
+	}
+	if (c->Disabled.TextX == 0xFFFFFF) {
+		c->Disabled.TextX = c->TextX;
+		c->Disabled.TextY = c->TextY;
+	}
+	if (c->Checked.TextX == 0xFFFFFF) {
+		c->Checked.TextX = c->TextX;
+		c->Checked.TextY = c->TextY;
+	}
+	if (c->CheckedHover.TextX == 0xFFFFFF) {
+		c->CheckedHover.TextX = c->TextX;
+		c->CheckedHover.TextY = c->TextY;
+	}
+	if (c->CheckedSelected.TextX == 0xFFFFFF) {
+		c->CheckedSelected.TextX = c->TextX;
+		c->CheckedSelected.TextY = c->TextY;
+	}
+	if (c->CheckedClicked.TextX == 0xFFFFFF) {
+		c->CheckedClicked.TextX = c->TextX;
+		c->CheckedClicked.TextY = c->TextY;
+	}
+	if (c->CheckedDisabled.TextX == 0xFFFFFF) {
+		c->CheckedDisabled.TextX = c->TextX;
+		c->CheckedDisabled.TextY = c->TextY;
+	}
+
+	if (c->Default.TextAlign == TextAlignUndefined) {
+		c->Default.TextAlign = c->TextAlign;
+	}
+	if (c->Hover.TextAlign == TextAlignUndefined) {
+		c->Hover.TextAlign = c->TextAlign;
+	}
+	if (c->Selected.TextAlign == TextAlignUndefined) {
+		c->Selected.TextAlign = c->TextAlign;
+	}
+	if (c->Clicked.TextAlign == TextAlignUndefined) {
+		c->Clicked.TextAlign = c->TextAlign;
+	}
+	if (c->Disabled.TextAlign == TextAlignUndefined) {
+		c->Disabled.TextAlign = c->TextAlign;
+	}
+	if (c->Checked.TextAlign == TextAlignUndefined) {
+		c->Checked.TextAlign = c->TextAlign;
+	}
+	if (c->CheckedHover.TextAlign == TextAlignUndefined) {
+		c->CheckedHover.TextAlign = c->TextAlign;
+	}
+	if (c->CheckedSelected.TextAlign == TextAlignUndefined) {
+		c->CheckedSelected.TextAlign = c->TextAlign;
+	}
+	if (c->CheckedClicked.TextAlign == TextAlignUndefined) {
+		c->CheckedClicked.TextAlign = c->TextAlign;
+	}
+	if (c->CheckedDisabled.TextAlign == TextAlignUndefined) {
+		c->CheckedDisabled.TextAlign = c->TextAlign;
+	}
+
+	return 0;
+}
+
+/**
 **  Define a menu
 **
 **  @param l  Lua state.
@@ -2662,7 +2851,7 @@ static int CclDefineMenu(lua_State* l)
 					free(menu->Items[i].d.pulldown.options);
 				} else if (mitype == MI_TYPE_LISTBOX) {
 				} else if (mitype == MI_TYPE_INPUT) {
-				} else if (mitype == MI_TYPE_GEM) {
+				} else if (mitype == MI_TYPE_CHECKBOX) {
 				}
 			}
 			free(menu->Items);
@@ -2782,9 +2971,6 @@ static int CclDefineMenuItem(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "menu")) {
 			name = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "transparent")) {
-			item->transparent = 1;
-			--j;
 		} else if (!strcmp(value, "flags")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -3384,11 +3570,11 @@ static int CclDefineMenuItem(lua_State* l)
 						LuaError(l, "Unsupported property: %s" _C_ value);
 					}
 				}
-			} else if (!strcmp(value, "gem")) {
+			} else if (!strcmp(value, "checkbox")) {
 				if (!lua_istable(l, j + 1)) {
 					LuaError(l, "incorrect argument");
 				}
-				item->mitype = MI_TYPE_GEM;
+				item->mitype = MI_TYPE_CHECKBOX;
 
 				subargs = luaL_getn(l, j + 1);
 				for (k = 0; k < subargs; ++k) {
@@ -3396,30 +3582,18 @@ static int CclDefineMenuItem(lua_State* l)
 					value = LuaToString(l, -1);
 					lua_pop(l, 1);
 					++k;
-					if (!strcmp(value, "size")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-							LuaError(l, "incorrect argument");
-						}
-						lua_rawgeti(l, -1, 1);
-						item->d.gem.xsize = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						lua_rawgeti(l, -1, 2);
-						item->d.gem.ysize = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "state")) {
+					if (!strcmp(value, "state")) {
 						lua_rawgeti(l, j + 1, k + 1);
 						value = LuaToString(l, -1);
 						lua_pop(l, 1);
 						if (!strcmp(value, "unchecked")) {
-							item->d.gem.state = MI_GSTATE_UNCHECKED;
+							item->d.checkbox.state = MI_CSTATE_UNCHECKED;
 						} else if (!strcmp(value, "passive")) {
-							item->d.gem.state = MI_GSTATE_PASSIVE;
+							item->d.checkbox.state = MI_CSTATE_PASSIVE;
 						} else if (!strcmp(value, "invisible")) {
-							item->d.gem.state = MI_GSTATE_INVISIBLE;
+							item->d.checkbox.state = MI_CSTATE_INVISIBLE;
 						} else if (!strcmp(value, "checked")) {
-							item->d.gem.state = MI_GSTATE_CHECKED;
+							item->d.checkbox.state = MI_CSTATE_CHECKED;
 						}
 					} else if (!strcmp(value, "func")) {
 						lua_rawgeti(l, j + 1, k + 1);
@@ -3430,7 +3604,7 @@ static int CclDefineMenuItem(lua_State* l)
 							value = lua_tostring(l, -1);
 							func = (void**)hash_find(MenuFuncHash, value);
 							if (func != NULL) {
-								item->d.gem.action = (void*)*func;
+								item->d.checkbox.action = (void*)*func;
 							} else {
 								lua_pushfstring(l, "Can't find function: %s", value);
 							}
@@ -3438,29 +3612,22 @@ static int CclDefineMenuItem(lua_State* l)
 							lua_pushnumber(l, 0);
 							lua_rawseti(l, j + 1, k + 1);
 							subargs = luaL_getn(l, j + 1);
-							item->d.gem.action = NULL;
+							item->d.checkbox.action = NULL;
 						}
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "style")) {
 						lua_rawgeti(l, j + 1, k + 1);
 						value = LuaToString(l, -1);
 						lua_pop(l, 1);
-						item->d.gem.button = scm2buttonid(l, value);
+						item->d.checkbox.style = FindCheckboxStyle(value);
+						if (!item->d.checkbox.style) {
+							LuaError(l, "Invalid button style: %s" _C_ value);
+						}
 					} else if (!strcmp(value, "text")) {
 						lua_rawgeti(l, j + 1, k + 1);
 						s1 = strdup(LuaToString(l, -1));
 						lua_pop(l, 1);
-						item->d.gem.text = s1;
-					} else if (!strcmp(value, "color-normal")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.gem.normalcolor = s1;
-					} else if (!strcmp(value, "color-reverse")) {
-						lua_rawgeti(l, j + 1, k + 1);
-						s1 = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-						item->d.gem.reversecolor = s1;
+						item->d.checkbox.text = s1;
 					} else {
 						LuaError(l, "Unsupported property: %s" _C_ value);
 					}
@@ -4321,6 +4488,7 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "DefineButton", CclDefineButton);
 
 	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
+	lua_register(Lua, "DefineCheckboxStyle", CclDefineCheckboxStyle);
 
 	lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
 	lua_register(Lua, "DefineMenu", CclDefineMenu);

@@ -79,7 +79,7 @@ void DrawMenuButtonArea(void)
 			DrawMenuButton(TheUI.MenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
-				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
+				(GameMenuButtonClicked ? MenuButtonClicked : 0),
 				TheUI.MenuButton.X, TheUI.MenuButton.Y,
 				TheUI.MenuButton.Text);
 		}
@@ -89,7 +89,7 @@ void DrawMenuButtonArea(void)
 			DrawMenuButton(TheUI.NetworkMenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
-				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
+				(GameMenuButtonClicked ? MenuButtonClicked : 0),
 				TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
 				TheUI.NetworkMenuButton.Text);
 		}
@@ -98,7 +98,7 @@ void DrawMenuButtonArea(void)
 			DrawMenuButton(TheUI.NetworkDiplomacyButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
-				(GameDiplomacyButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
+				(GameDiplomacyButtonClicked ? MenuButtonClicked : 0),
 				TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
 				TheUI.NetworkDiplomacyButton.Text);
 		}

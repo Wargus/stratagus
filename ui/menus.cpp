@@ -137,13 +137,13 @@ static void SurrenderConfirmMenu(void);
 // Global Options
 static void GlobalOptionsInit(Menuitem *mi);
 static void GlobalOptionsExit(Menuitem *mi);
-static void GlobalOptionsResolutionGem(Menuitem *mi);
-static void GlobalOptionsFullscreenGem(Menuitem *mi);
+static void GlobalOptionsResolutionCheckbox(Menuitem *mi);
+static void GlobalOptionsFullscreenCheckbox(Menuitem *mi);
 
 // Tips
 static void TipsInit(Menuitem *mi);
 static void TipsExit(Menuitem *mi);
-static void TipsShowTipsGem(Menuitem *mi);
+static void TipsShowTipsCheckbox(Menuitem *mi);
 static void TipsShowTipsText(Menuitem *mi);
 static void TipsNextTip(void);
 static void TipsPreviousTip(void);
@@ -196,7 +196,7 @@ static void MultiClientReady(void);
 static void MultiClientNotReady(void);
 static void MultiClientCancel(void);
 static void MultiClientRCSAction(Menuitem *mi, int i);
-static void MultiClientGemAction(Menuitem *mi);
+static void MultiClientCheckboxAction(Menuitem *mi);
 static void MultiClientUpdate(int initial);
 
 // Net connecting
@@ -344,7 +344,7 @@ static void EditorEditResourceOk(void);
 static void EditorEditResourceCancel(void);
 
 // Editor edit ai properties
-static void EditorEditAiPropertiesGem(Menuitem *mi);
+static void EditorEditAiPropertiesCheckbox(Menuitem *mi);
 static void EditorEditAiPropertiesOk(void);
 static void EditorEditAiPropertiesCancel(void);
 
@@ -446,8 +446,8 @@ static unsigned char *mgptsoptions[] = {
 ** Help-items for the Net Multiplayer Setup and Client Menus
 */
 static Menuitem NetMultiButtonStorage[] = {
-		{ MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, 0, NULL, NULL, NULL, {{NULL,0}} },
-		{ MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, 0, NULL, NULL, NULL, {{NULL,0}} },
+		{ MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+		{ MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
 static void InitNetMultiButtonStorage(void) {
 	MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
@@ -524,13 +524,13 @@ void InitMenuFuncHash(void)
 // Global Options
 	HASHADD(GlobalOptionsInit,"global-options-init");
 	HASHADD(GlobalOptionsExit,"global-options-exit");
-	HASHADD(GlobalOptionsResolutionGem,"global-options-resolution-gem");
-	HASHADD(GlobalOptionsFullscreenGem,"global-options-fullscreen-gem");
+	HASHADD(GlobalOptionsResolutionCheckbox,"global-options-resolution-checkbox");
+	HASHADD(GlobalOptionsFullscreenCheckbox,"global-options-fullscreen-checkbox");
 
 // Tips
 	HASHADD(TipsInit,"tips-init");
 	HASHADD(TipsExit,"tips-exit");
-	HASHADD(TipsShowTipsGem,"tips-show-tips-gem");
+	HASHADD(TipsShowTipsCheckbox,"tips-show-tips-checkbox");
 	HASHADD(TipsShowTipsText,"tips-show-tips-text");
 	HASHADD(TipsNextTip,"tips-next-tip");
 	HASHADD(TipsPreviousTip,"tips-previous-tip");
@@ -583,7 +583,7 @@ void InitMenuFuncHash(void)
 	HASHADD(MultiClientNotReady,"multi-client-not-ready");
 	HASHADD(MultiClientCancel,"multi-client-cancel");
 	HASHADD(MultiClientRCSAction,"multi-client-rcs-action");
-	HASHADD(MultiClientGemAction,"multi-client-gem-action");
+	HASHADD(MultiClientCheckboxAction,"multi-client-checkbox-action");
 
 // Net connecting
 	HASHADD(NetConnectingInit,"net-connecting-init");
@@ -741,7 +741,7 @@ void InitMenuFuncHash(void)
 	HASHADD(EditorEditResourceCancel,"editor-edit-resource-cancel");
 
 // Editor edit ai properties
-	HASHADD(EditorEditAiPropertiesGem,"editor-edit-ai-properties-gem");
+	HASHADD(EditorEditAiPropertiesCheckbox,"editor-edit-ai-properties-checkbox");
 	HASHADD(EditorEditAiPropertiesOk,"editor-edit-ai-properties-ok");
 	HASHADD(EditorEditAiPropertiesCancel,"editor-edit-ai-properties-cancel");
 
@@ -1394,9 +1394,9 @@ static void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 
 	// master power
 	if (SoundFildes == -1) {
-		menu->Items[5].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[5].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	} else {
-		menu->Items[5].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[5].d.checkbox.state = MI_CSTATE_CHECKED;
 	}
 
 	// music volume slider
@@ -1420,14 +1420,14 @@ static void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 	}
 #endif
 	if (PlayingMusic != 1 || SoundFildes == -1) {
-		menu->Items[10].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[10].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	} else {
-		menu->Items[10].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[10].d.checkbox.state = MI_CSTATE_CHECKED;
 	}
 
 	menu->Items[12].flags = MenuButtonDisabled; // cd volume slider
 	menu->Items[15].flags = MenuButtonDisabled; // cd power
-	menu->Items[15].d.gem.state = MI_GSTATE_UNCHECKED;
+	menu->Items[15].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	menu->Items[16].flags = MenuButtonDisabled; // all tracks button
 	menu->Items[17].flags = MenuButtonDisabled; // random tracks button
 #ifdef USE_CDAUDIO
@@ -1440,16 +1440,16 @@ static void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 		menu->Items[12].flags = 0;
 		menu->Items[12].d.hslider.percent = (i * 100) / 255;
 #endif
-		menu->Items[15].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[15].d.checkbox.state = MI_CSTATE_CHECKED;
 		menu->Items[16].flags = 0;
 		menu->Items[17].flags = 0;
 
 		if (CDMode == CDModeDefined) {
-			menu->Items[16].d.gem.state = MI_GSTATE_CHECKED;
-			menu->Items[17].d.gem.state = MI_GSTATE_UNCHECKED;
+			menu->Items[16].d.checkbox.state = MI_CSTATE_CHECKED;
+			menu->Items[17].d.checkbox.state = MI_CSTATE_UNCHECKED;
 		} else if (CDMode == CDModeRandom) {
-			menu->Items[16].d.gem.state = MI_GSTATE_UNCHECKED;
-			menu->Items[17].d.gem.state = MI_GSTATE_CHECKED;
+			menu->Items[16].d.checkbox.state = MI_CSTATE_UNCHECKED;
+			menu->Items[17].d.checkbox.state = MI_CSTATE_CHECKED;
 		}
 	}
 #endif // cd
@@ -1481,27 +1481,27 @@ static void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
 
 	menu = CurrentMenu;
 
-	menu->Items[2].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->Items[3].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->Items[4].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->Items[5].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->Items[6].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->Items[7].d.gem.state = MI_GSTATE_UNCHECKED;
+	menu->Items[2].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	menu->Items[3].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	menu->Items[4].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	menu->Items[5].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	menu->Items[6].d.checkbox.state = MI_CSTATE_UNCHECKED;
+	menu->Items[7].d.checkbox.state = MI_CSTATE_UNCHECKED;
 
 	if (VideoWidth == 640) {
-		menu->Items[2].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[2].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 800) {
-		menu->Items[3].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[3].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 1024) {
-		menu->Items[4].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[4].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 1280) {
-		menu->Items[5].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[5].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else if (VideoWidth == 1600) {
-		menu->Items[6].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[6].d.checkbox.state = MI_CSTATE_CHECKED;
 	}
 
 	if (VideoFullScreen) {
-		menu->Items[7].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[7].d.checkbox.state = MI_CSTATE_CHECKED;
 	}
 }
 
@@ -1517,7 +1517,7 @@ static void GlobalOptionsExit(Menuitem *mi __attribute__((unused)))
 /**
 ** Global options resolution gem callback
 */
-static void GlobalOptionsResolutionGem(Menuitem *mi)
+static void GlobalOptionsResolutionCheckbox(Menuitem *mi)
 {
 	int res;
 
@@ -1570,7 +1570,7 @@ static void GlobalOptionsResolutionGem(Menuitem *mi)
 /**
 ** Global options fullscreen gem callback
 */
-static void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
+static void GlobalOptionsFullscreenCheckbox(Menuitem *mi __attribute__((unused)))
 {
 	ToggleFullScreen();
 	GlobalOptionsInit(NULL);
@@ -1760,29 +1760,29 @@ static void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 			menu->Items[4*j+4].d.text.text = Players[i].Name;
 			if (ThisPlayer->Allied&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 5].d.gem.state = MI_GSTATE_CHECKED;
+				menu->Items[4 * j + 5].d.checkbox.state = MI_CSTATE_CHECKED;
 			} else {
-				menu->Items[4 * j + 5].d.gem.state = MI_GSTATE_UNCHECKED;
+				menu->Items[4 * j + 5].d.checkbox.state = MI_CSTATE_UNCHECKED;
 			}
 			if (ThisPlayer->Enemy&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 6].d.gem.state = MI_GSTATE_CHECKED;
+				menu->Items[4 * j + 6].d.checkbox.state = MI_CSTATE_CHECKED;
 			} else {
-				menu->Items[4 * j + 6].d.gem.state = MI_GSTATE_UNCHECKED;
+				menu->Items[4 * j + 6].d.checkbox.state = MI_CSTATE_UNCHECKED;
 			}
 			if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 7].d.gem.state = MI_GSTATE_CHECKED;
+				menu->Items[4 * j + 7].d.checkbox.state = MI_CSTATE_CHECKED;
 			} else {
-				menu->Items[4 * j + 7].d.gem.state = MI_GSTATE_UNCHECKED;
+				menu->Items[4 * j + 7].d.checkbox.state = MI_CSTATE_UNCHECKED;
 			}
 
 			if (ReplayGameType != ReplayNone || ThisPlayer->Team == Players[i].Team) {
-				menu->Items[4 * j + 5].d.gem.state |= MI_GSTATE_PASSIVE;
-				menu->Items[4 * j + 6].d.gem.state |= MI_GSTATE_PASSIVE;
-				menu->Items[4 * j + 7].d.gem.state |= MI_GSTATE_PASSIVE;
+				menu->Items[4 * j + 5].d.checkbox.state |= MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 6].d.checkbox.state |= MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 7].d.checkbox.state |= MI_CSTATE_PASSIVE;
 			} else {
-				menu->Items[4 * j + 5].d.gem.state &= ~MI_GSTATE_PASSIVE;
-				menu->Items[4 * j + 6].d.gem.state &= ~MI_GSTATE_PASSIVE;
-				menu->Items[4 * j + 7].d.gem.state &= ~MI_GSTATE_PASSIVE;
+				menu->Items[4 * j + 5].d.checkbox.state &= ~MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 6].d.checkbox.state &= ~MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 7].d.checkbox.state &= ~MI_CSTATE_PASSIVE;
 			}
 
 			++j;
@@ -1790,9 +1790,9 @@ static void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
 	}
 	for (; j<=PlayerMax - 3; ++j ) {
 		menu->Items[4 * j + 4].d.text.text = NULL;
-		menu->Items[4 * j + 5].d.gem.state = MI_GSTATE_INVISIBLE;
-		menu->Items[4 * j + 6].d.gem.state = MI_GSTATE_INVISIBLE;
-		menu->Items[4 * j + 7].d.gem.state = MI_GSTATE_INVISIBLE;
+		menu->Items[4 * j + 5].d.checkbox.state = MI_CSTATE_INVISIBLE;
+		menu->Items[4 * j + 6].d.checkbox.state = MI_CSTATE_INVISIBLE;
+		menu->Items[4 * j + 7].d.checkbox.state = MI_CSTATE_INVISIBLE;
 	}
 }
 
@@ -1824,11 +1824,11 @@ static void DiplomacyWait(Menuitem *mi)
 
 	// Don't allow allies and enemies at the same time
 	if (item == 4 * player + 5) {
-		mi->menu->Items[4 * player + 5].d.gem.state |= MI_GSTATE_CHECKED;
-		mi->menu->Items[4 * player + 6].d.gem.state &= ~MI_GSTATE_CHECKED;
+		mi->menu->Items[4 * player + 5].d.checkbox.state |= MI_CSTATE_CHECKED;
+		mi->menu->Items[4 * player + 6].d.checkbox.state &= ~MI_CSTATE_CHECKED;
 	} else if (item == 4 * player + 6) {
-		mi->menu->Items[4 * player + 5].d.gem.state &= ~MI_GSTATE_CHECKED;
-		mi->menu->Items[4 * player + 6].d.gem.state |= MI_GSTATE_CHECKED;
+		mi->menu->Items[4 * player + 5].d.checkbox.state &= ~MI_CSTATE_CHECKED;
+		mi->menu->Items[4 * player + 6].d.checkbox.state |= MI_CSTATE_CHECKED;
 	}
 
 	// Don't set diplomacy until clicking ok
@@ -1849,8 +1849,8 @@ static void DiplomacyOk(void)
 	for (i=0; i<=PlayerMax - 2; ++i) {
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 			// Menu says to ally
-			if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_CHECKED &&
-				menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_UNCHECKED) {
+			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_CHECKED &&
+				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_UNCHECKED) {
 				// Are they allied?
 				if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
 					!(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
@@ -1859,8 +1859,8 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Menu says to be enemies
-			if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_UNCHECKED &&
-				menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_CHECKED) {
+			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_UNCHECKED &&
+				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_CHECKED) {
 				// Are they enemies?
 				if( !(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
 					ThisPlayer->Enemy&(1<<Players[i].Player))) {
@@ -1869,8 +1869,8 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Menu says to be neutral
-			if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_UNCHECKED &&
-				menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_UNCHECKED) {
+			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_UNCHECKED &&
+				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_UNCHECKED) {
 				// Are they neutral?
 				if (!(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
 					!(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
@@ -1879,8 +1879,8 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Menu says to be crazy
-			if (menu->Items[4 * j + 5].d.gem.state == MI_GSTATE_CHECKED &&
-				menu->Items[4 * j + 6].d.gem.state == MI_GSTATE_CHECKED) {
+			if (menu->Items[4 * j + 5].d.checkbox.state == MI_CSTATE_CHECKED &&
+				menu->Items[4 * j + 6].d.checkbox.state == MI_CSTATE_CHECKED) {
 				// Are they crazy?
 				if (!(ThisPlayer->Allied&(1<<Players[i].Player) &&
 					ThisPlayer->Enemy&(1<<Players[i].Player))) {
@@ -1889,7 +1889,7 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Shared vision
-			if (menu->Items[4 * j + 7].d.gem.state == MI_GSTATE_CHECKED) {
+			if (menu->Items[4 * j + 7].d.checkbox.state == MI_CSTATE_CHECKED) {
 				if (!(ThisPlayer->SharedVision&(1<<Players[i].Player))) {
 					SendCommandSharedVision(ThisPlayer->Player,1,
 						Players[i].Player);
@@ -1926,9 +1926,9 @@ static void PreferencesInit(Menuitem* mi __attribute__((unused)))
 
 	menu = CurrentMenu;
 	if (!TheMap.NoFogOfWar) {
-		menu->Items[1].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else {
-		menu->Items[1].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	}
 
 	// Not available in net games or replays
@@ -1939,9 +1939,9 @@ static void PreferencesInit(Menuitem* mi __attribute__((unused)))
 	}
 
 	if (ShowCommandKey) {
-		menu->Items[2].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[2].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else {
-		menu->Items[2].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[2].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	}
 }
 
@@ -2250,9 +2250,9 @@ static void TipsInit(Menuitem *mi __attribute__((unused)))
 	menu = CurrentMenu;
 
 	if(ShowTips) {
-		menu->Items[1].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else {
-		menu->Items[1].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	}
 
 	TipsFreeTips();
@@ -2340,9 +2340,9 @@ static void TipsExit(Menuitem *mi __attribute__((unused)))
 /**
 ** Show tips at startup gem callback
 */
-static void TipsShowTipsGem(Menuitem *mi)
+static void TipsShowTipsCheckbox(Menuitem *mi)
 {
-	if (mi->menu->Items[1].d.gem.state == MI_GSTATE_CHECKED) {
+	if (mi->menu->Items[1].d.checkbox.state == MI_CSTATE_CHECKED) {
 		ShowTips = 1;
 	} else {
 		ShowTips = 0;
@@ -2354,12 +2354,12 @@ static void TipsShowTipsGem(Menuitem *mi)
 */
 static void TipsShowTipsText(Menuitem *mi)
 {
-	if (mi->menu->Items[1].d.gem.state == MI_GSTATE_UNCHECKED) {
+	if (mi->menu->Items[1].d.checkbox.state == MI_CSTATE_UNCHECKED) {
 		ShowTips = 1;
-		mi->menu->Items[1].d.gem.state = MI_GSTATE_CHECKED;
+		mi->menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
 	} else {
 		ShowTips = 0;
-		mi->menu->Items[1].d.gem.state = MI_GSTATE_UNCHECKED;
+		mi->menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	}
 }
 
@@ -3917,10 +3917,10 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 				ServerSetupState.CompOpt[i] = 0;
 			}
 			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
 
 			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
 
 			// FIXME: don't forget to throw out additional players
 			//   without available slots here!
@@ -3930,15 +3930,15 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
 
 			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
 			++plyrs;
 			if (ServerSetupState.Ready[i]) {
-				menu->Items[SERVER_PLAYER_READY - 1 + i].d.gem.state |= MI_GSTATE_CHECKED;
+				menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state |= MI_CSTATE_CHECKED;
 				++ready;
 			}
 
 			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = 0;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_PASSIVE;
 		} else {
 			// don't allow network and button events to intercept server player's action on pulldown buttons!
 			if (!(menu->Items[SERVER_PLAYER_STATE + i].flags & MenuButtonClicked)) {
@@ -3954,10 +3954,10 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			}
 
 			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
 
 			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
 		}
 
 		menu->Items[SERVER_PLAYER_STATE + i].yofs = 32 + (i & 7) * 22;
@@ -3979,10 +3979,10 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			}
 
 			menu->Items[SERVER_PLAYER_READY - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
 
 			menu->Items[SERVER_PLAYER_LAG - 1 + i].flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].d.checkbox.state = MI_CSTATE_INVISIBLE;
 		}
 
 		if (i >= h + c) {
@@ -4061,10 +4061,10 @@ static void MultiClientUpdate(int initial)
 		if (Hosts[i].PlyNr || i == NetLocalHostsSlot) {
 			menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
 			if (i == NetLocalHostsSlot) {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].d.gem.state = 0;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state = 0;
 			} else {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
-					MI_GSTATE_PASSIVE;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state =
+					MI_CSTATE_PASSIVE;
 			}
 		} else {
 			menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[0];
@@ -4072,8 +4072,8 @@ static void MultiClientUpdate(int initial)
 				MI_PSTATE_PASSIVE;
 			menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt =
 				ServerSetupState.CompOpt[i];
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
-				MI_GSTATE_INVISIBLE;
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state =
+				MI_CSTATE_INVISIBLE;
 		}
 		menu->Items[CLIENT_PLAYER_STATE + i].yofs = 32 + (i & 7) * 22;
 		if (i > 7) {
@@ -4082,11 +4082,11 @@ static void MultiClientUpdate(int initial)
 		menu->Items[CLIENT_PLAYER_READY - 1 + i].flags = 0;
 
 		if (ServerSetupState.Ready[i]) {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.gem.state |=
-				MI_GSTATE_CHECKED;
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state |=
+				MI_CSTATE_CHECKED;
 		} else {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.gem.state &=
-				~MI_GSTATE_CHECKED;
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state &=
+				~MI_CSTATE_CHECKED;
 		}
 
 #if 0
@@ -4101,8 +4101,8 @@ static void MultiClientUpdate(int initial)
 		if (i >= h + c) {
 			menu->Items[CLIENT_PLAYER_READY - 1 + i].flags =
 				MenuButtonDisabled;
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
-				MI_GSTATE_INVISIBLE;
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].d.checkbox.state =
+				MI_CSTATE_INVISIBLE;
 			menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.defopt =
 				menu->Items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt = 2;
 			menu->Items[CLIENT_PLAYER_STATE + i].flags = MenuButtonDisabled;
@@ -4196,21 +4196,21 @@ static void NetMultiPlayerDrawFunc(Menuitem *mi)
 			// for kicked out clients!!
 			if (ServerSetupState.Ready[i]) {
 				menu->Items[SERVER_PLAYER_READY - 1 + i]
-						.d.gem.state = MI_GSTATE_PASSIVE|MI_GSTATE_CHECKED;
+						.d.checkbox.state = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
 			} else {
 				menu->Items[SERVER_PLAYER_READY - 1 + i]
-						.d.gem.state = MI_GSTATE_PASSIVE;
+						.d.checkbox.state = MI_CSTATE_PASSIVE;
 			}
 			if (ServerSetupState.LastFrame[i] + 30 > FrameCounter) {
 				menu->Items[SERVER_PLAYER_LAG - 1 + i].flags &=
 					~MenuButtonDisabled;
 				menu->Items[SERVER_PLAYER_LAG - 1 + i]
-						.d.gem.state = MI_GSTATE_PASSIVE|MI_GSTATE_CHECKED;
+						.d.checkbox.state = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
 			} else {
 				menu->Items[SERVER_PLAYER_LAG - 1 + i].flags |=
 					MenuButtonDisabled;
 				menu->Items[SERVER_PLAYER_LAG - 1 + i]
-						.d.gem.state = MI_GSTATE_PASSIVE;
+						.d.checkbox.state = MI_CSTATE_PASSIVE;
 			}
 
 		}
@@ -4222,10 +4222,10 @@ static void NetMultiPlayerDrawFunc(Menuitem *mi)
 				~MenuButtonDisabled;
 			if (i == NetLocalHostsSlot) {
 				menu->Items[CLIENT_PLAYER_READY - 1 + i].
-						d.gem.state &= ~MI_GSTATE_PASSIVE;
+						d.checkbox.state &= ~MI_CSTATE_PASSIVE;
 			} else {
 				menu->Items[CLIENT_PLAYER_READY - 1 + i].
-						d.gem.state |= MI_GSTATE_PASSIVE;
+						d.checkbox.state |= MI_CSTATE_PASSIVE;
 			}
 		}
 	}
@@ -4281,7 +4281,7 @@ static void MultiGameClientExit(Menuitem *mi)
 /**
 ** Multiplayer client gem action. Toggles ready flag.
 */
-static void MultiClientGemAction(Menuitem *mi)
+static void MultiClientCheckboxAction(Menuitem *mi)
 {
 	int i;
 
@@ -5359,11 +5359,11 @@ void EditorEditAiProperties(void)
 
 	menu = FindMenu("menu-editor-edit-ai-properties");
 	if (UnitUnderCursor->Active) {
-		menu->Items[1].d.gem.state = MI_GSTATE_CHECKED;
-		menu->Items[3].d.gem.state = MI_GSTATE_UNCHECKED;
+		menu->Items[1].d.checkbox.state = MI_CSTATE_CHECKED;
+		menu->Items[3].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	} else {
-		menu->Items[1].d.gem.state = MI_GSTATE_UNCHECKED;
-		menu->Items[3].d.gem.state = MI_GSTATE_CHECKED;
+		menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
+		menu->Items[3].d.checkbox.state = MI_CSTATE_CHECKED;
 	}
 
 	ProcessMenu("menu-editor-edit-ai-properties", 1);
@@ -5372,14 +5372,14 @@ void EditorEditAiProperties(void)
 /**
 ** Active or Passive gem clicked in menu-editor-edit-ai-properties
 */
-static void EditorEditAiPropertiesGem(Menuitem *mi)
+static void EditorEditAiPropertiesCheckbox(Menuitem *mi)
 {
 	if (&mi->menu->Items[1] == mi) {
-		mi->d.gem.state = MI_GSTATE_CHECKED;
-		mi->menu->Items[3].d.gem.state = MI_GSTATE_UNCHECKED;
+		mi->d.checkbox.state = MI_CSTATE_CHECKED;
+		mi->menu->Items[3].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	} else {
-		mi->d.gem.state = MI_GSTATE_CHECKED;
-		mi->menu->Items[1].d.gem.state = MI_GSTATE_UNCHECKED;
+		mi->d.checkbox.state = MI_CSTATE_CHECKED;
+		mi->menu->Items[1].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	}
 }
 
@@ -5391,7 +5391,7 @@ static void EditorEditAiPropertiesOk(void)
 	Menu *menu;
 
 	menu = CurrentMenu;
-	if (menu->Items[1].d.gem.state == MI_GSTATE_CHECKED) {
+	if (menu->Items[1].d.checkbox.state == MI_CSTATE_CHECKED) {
 		UnitUnderCursor->Active = 1;
 	} else {
 		UnitUnderCursor->Active = 0;
@@ -5800,7 +5800,7 @@ static void ReplayGameInit(Menuitem *mi)
 	mi->menu->Items[5].flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	mi->menu->Items[5].d.button.text = ScenSelectDisplayPath;
-	mi->menu->Items[6].d.gem.state = MI_GSTATE_UNCHECKED;
+	mi->menu->Items[6].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
@@ -6036,7 +6036,7 @@ static void ReplayGameOk(void)
 			EndMenu();
 			menu->Items[5].d.button.text = NULL;
 
-			if (menu->Items[6].d.gem.state == MI_GSTATE_CHECKED) {
+			if (menu->Items[6].d.checkbox.state == MI_CSTATE_CHECKED) {
 				ReplayRevealMap = 1;
 			} else {
 				ReplayRevealMap = 0;
@@ -6293,7 +6293,7 @@ static void MultiMetaServerGameSetupInit(Menuitem* mi)
 			menu->Items[j + 2].d.text.text = NULL;
 			menu->Items[j + 3].d.text.text = NULL;
 			menu->Items[j + 4].d.text.text = NULL;
-			menu->Items[j + 5].d.gem.state = MI_GSTATE_INVISIBLE;
+			menu->Items[j + 5].d.checkbox.state = MI_CSTATE_INVISIBLE;
 		} else {
 			GetMetaParameter(reply, 0, &parameter);       // Player Name
 			menu->Items[j].d.text.text = parameter;
@@ -6307,7 +6307,7 @@ static void MultiMetaServerGameSetupInit(Menuitem* mi)
 			menu->Items[j + 3].d.text.text = parameter;
 			GetMetaParameter(reply, 8, &parameter);
 			menu->Items[j + 4].d.text.text = parameter;
-			menu->Items[j + 5].d.gem.state = MI_GSTATE_UNCHECKED;
+			menu->Items[j + 5].d.checkbox.state = MI_CSTATE_UNCHECKED;
 		}
 		++k;
 	}
@@ -6322,7 +6322,7 @@ static void MultiMetaServerGameSetupInit(Menuitem* mi)
 		menu->Items[j + 2].d.text.text = NULL;
 		menu->Items[j + 3].d.text.text = NULL;
 		menu->Items[j + 4].d.text.text = NULL;
-		menu->Items[j + 5].d.gem.state = MI_GSTATE_INVISIBLE;
+		menu->Items[j + 5].d.checkbox.state = MI_CSTATE_INVISIBLE;
 	}
 }
 
@@ -6346,7 +6346,7 @@ static void SelectGameServer(Menuitem *mi)
 	int j;
 
 	j = mi - mi->menu->Items;
-	mi->menu->Items[j].d.gem.state = MI_GSTATE_UNCHECKED;
+	mi->menu->Items[j].d.checkbox.state = MI_CSTATE_UNCHECKED;
 	EndMenu();
 
 	strcpy(server_host_buffer, mi->menu->Items[j - 4].d.text.text);
