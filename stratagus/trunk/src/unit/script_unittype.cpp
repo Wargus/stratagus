@@ -270,6 +270,12 @@ local SCM CclDefineUnitType(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("regeneration-rate"))) {
 	    type->_RegenerationRate = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("burn-percent"))) {
+	    type->BurnPercent = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("burn-damage-rate"))) {
+	    type->BurnDamageRate = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("max-mana"))) {
 	    type->_MaxMana = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);

@@ -53,9 +53,6 @@
 ----------------------------------------------------------------------------*/
 
 global unsigned SyncHash;	    /// Hash calculated to find sync failures
-global int BurnBuildingPercent;	    /// Max percent to burn buildings
-global int BurnBuildingDamageRate;  /// HP per second to damage buildings
-global int BurnBuildingWait;	    /// Cycles to Wait for each burn
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -265,43 +262,64 @@ local void (*HandleActionTable[256])(Unit*) = {
 **	Increment a unit's health
 **
 **	@param	unit	the unit to operate on
+**	@param	amount  the amount of time to make up for.(in cycles) 
 */
-local void IncrementUnitHealth(Unit* unit)
+local void HandleRegenerations(Unit* unit)
 {
-    // Unit may not have stats assigned to it
-    if (unit->Stats) {
+    int f;
+    //	Mana
+    if (unit->Type->CanCastSpell && unit->Mana!=unit->Type->_MaxMana) {
+	unit->Mana++;
+
+	if (unit->Mana > unit->Type->_MaxMana) {
+	    unit->Mana = unit->Type->_MaxMana;
+	}
+	if (unit->Selected) {
+	    MustRedraw |= RedrawInfoPanel;
+	}
+    }
+
+    f = 0;
+    //  Burn
+    if (!unit->Removed && !unit->Destroyed && unit->Stats->HitPoints
+	    && unit->Orders[0].Action!=UnitActionBuilded ) {
+	f = (100 * unit->HP) / unit->Stats->HitPoints;
+	if (f <= unit->Type->BurnPercent) {
+	    HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);
+	    f = 1;
+	} else {
+	    f = 0;
+	}
+    } 
+
+    //  Health doesn't regenerate while burning.
+    if ((!f) && unit->Stats) {
+	//  Unit may not have stats assigned to it
 	if (unit->Stats->RegenerationRate && unit->HP<unit->Stats->HitPoints) {
 	    unit->HP += unit->Stats->RegenerationRate;
 	    if (unit->HP > unit->Stats->HitPoints) {
 		unit->HP = unit->Stats->HitPoints;
 	    }
-
 	    if (unit->Selected) {
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	}
     }
+
+    // Shields and stuff?
 }
 
 /**
 **	Handle things about the unit that decay over time
 **
 **	@param	unit	the unit that the decay is handled for
+**	@param	amount  the amount of time to make up for.(in cycles) 
 **
-**	@return	1 for dead unit, 0 otherwise
 */
-local int HandleDecay(Unit* unit)
+local void HandleBuffs(Unit* unit, int amount)
 {
     int deadunit;
     int flag;
-
-    if (unit->Type->CanCastSpell && unit->Mana!=unit->Type->_MaxMana) {
-	unit->Mana++;
-
-	if (unit->Selected) {
-	    MustRedraw|=RedrawInfoPanel;
-	}
-    }
 
     deadunit = 0;
     //
@@ -309,10 +327,7 @@ local int HandleDecay(Unit* unit)
     //
     if (unit->TTL && unit->TTL < (GameCycle - unit->HP)) {
 	DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL _C_ GameCycle);
-	if (--unit->HP < 0) {
-	    LetUnitDie(unit);
-	    deadunit |= 1;
-	}
+	HitUnit(0, unit, amount);	// * type->LossPerCycle or somthing?
 	if (unit->Selected) {
 	    MustRedraw |= RedrawInfoPanel;
 	}
@@ -323,61 +338,55 @@ local int HandleDecay(Unit* unit)
     //
     // decrease spells effects time, if end redraw unit.
     //
+    
+    //	Bloodlust
     if (unit->Bloodlust) {
-	unit->Bloodlust--;
-	if (!flag && !unit->Bloodlust) {
-	    flag = CheckUnitToBeDrawn(unit);
+	unit->Bloodlust -= amount;
+	if (unit->Bloodlust < 0) {
+	    unit->Bloodlust = 0 ;
+	    if (!flag) {
+		flag = CheckUnitToBeDrawn(unit);
+	    }
 	}
     }
+    //	Haste
     if (unit->Haste) {
-	unit->Haste--;
-	if (!flag && !unit->Haste) {
-	    flag = CheckUnitToBeDrawn(unit);
+	unit->Haste -= amount;
+	if (unit->Haste < 0) {
+	    unit->Haste = 0;
+	    if (!flag) {
+		flag = CheckUnitToBeDrawn(unit);
+	    }
 	}
     }
+    //	Slow
     if (unit->Slow) {
-	unit->Slow--;
-	if (!flag && !unit->Slow) {
-	    flag = CheckUnitToBeDrawn(unit);
+	unit->Slow -= amount;
+	if (unit->Slow < 0) {
+	    unit->Slow = 0;
+	    if (!flag) {
+		flag = CheckUnitToBeDrawn(unit);
+	    }
 	}
     }
+    //	Invisible
     if (unit->Invisible) {
-	unit->Invisible--;
-	if (!flag && !unit->Invisible) {
-	    flag = CheckUnitToBeDrawn(unit);
+	unit->Invisible -= amount;
+	if (unit->Invisible < 0) {
+	    unit->Invisible = 0;
+	    if (!flag) {
+		flag = CheckUnitToBeDrawn(unit);
+	    }
 	}
     }
+    //	Unholy armor
     if (unit->UnholyArmor) {
-	unit->UnholyArmor--;
-	if (!flag && !unit->UnholyArmor) {
-	    flag = CheckUnitToBeDrawn(unit);
-	}
-    }
-    DebugLevel3Fn("%d:%d,%d,%d,%d,%d\n" _C_ UnitNumber(unit) _C_
-	unit->Bloodlust _C_ unit->Haste _C_ unit->Slow _C_
-	unit->Invisible _C_ unit->UnholyArmor);
-
-    return deadunit;
-}
-
-/**
-**	Handle burning buildings
-**
-**	@param	unit	unit to burn
-*/
-local void BurnBuilding(Unit* unit)
-{
-    int f;
-
-    if (!unit->Type->Building || unit->Removed || unit->Destroyed) {
-	return;
-    }
-
-    // don't burn buildings under construction
-    if (unit->Stats->HitPoints && unit->Orders[0].Action!=UnitActionBuilded) {
-	f = (100 * unit->HP) / unit->Stats->HitPoints;
-	if (f <= BurnBuildingPercent) {
-	    HitUnit(NoUnitP, unit, BurnBuildingDamageRate);
+	unit->UnholyArmor -= amount;
+	if (unit->UnholyArmor < 0) {
+	    unit->UnholyArmor = 0;
+	    if (!flag) {
+		flag = CheckUnitToBeDrawn(unit);
+	    }
 	}
     }
 }
@@ -457,8 +466,6 @@ local void HandleUnitAction(Unit* unit)
 	}
     }
 
-    // FIXME: fire handling should be moved to here.
-
     //
     //	Select action. FIXME: should us function pointers in unit structure.
     //
@@ -476,19 +483,12 @@ global void UnitActions(void)
     Unit** tpos;
     Unit** tend;
     Unit* unit;
-    int burnthiscycle;
-    int healthiscycle;
-    int manathiscycle;
     int blinkthiscycle;
+    int buffsthiscycle;
+    int regenthiscycle;
 
-    if (BurnBuildingPercent) {
-	burnthiscycle = !(GameCycle % BurnBuildingWait);
-    } else {
-	burnthiscycle = 0;
-    }
-    // FIXME: Make configurable from CCL;
-    healthiscycle = !(GameCycle % CYCLES_PER_SECOND);
-    manathiscycle = !(GameCycle % CYCLES_PER_SECOND);
+    buffsthiscycle = !(GameCycle % CYCLES_PER_SECOND);
+    regenthiscycle = !(GameCycle % CYCLES_PER_SECOND);
     blinkthiscycle = !(GameCycle % CYCLES_PER_SECOND);
 
     //
@@ -498,10 +498,60 @@ global void UnitActions(void)
     memcpy(table, Units, sizeof(Unit*) * NumUnits);
 
     //
+    //	Check for dead/destroyed units in table...
+    //
+    for (tpos = table; tpos < tend; ++tpos) {
+	unit = *tpos;
+    	if (unit->Destroyed) {		// Ignore destroyed units
+	    DebugLevel0Fn("Destroyed unit %d in table, should be ok\n" _C_
+		UnitNumber(unit));
+	    unit = 0;
+	    continue;
+	}
+    }
+
+    //
+    //	Check for things that only happen every few cycles
+    //	(faster in their own loops.)
+    //
+
+    //	1) Blink flag.
+    if (blinkthiscycle) {
+	for (tpos = table; tpos < tend; ++tpos) {
+	    if ((unit = *tpos)) {
+		if (unit->Blink) {
+		    --unit->Blink;
+		}
+	    }
+	}
+    }
+
+    //  2) Buffs...
+    if (buffsthiscycle) {
+	for (tpos = table; tpos < tend; ++tpos) {
+	    if ((unit = *tpos)) {
+		HandleBuffs(unit, CYCLES_PER_SECOND);
+	    }
+	}
+    }
+
+    //	3) Increase health mana, burn and stuff
+    if (regenthiscycle) {
+	for (tpos = table; tpos < tend; ++tpos) {
+	    if ((unit = *tpos)) {
+		HandleRegenerations(unit);
+	    }
+	}
+    }
+
+    //
     //	Do all actions
     //
     for (tpos = table; tpos < tend; ++tpos) {
 	unit = *tpos;
+	if (!tpos) {
+	    continue;
+	}
 
 #if defined(UNIT_ON_MAP) && 0		// debug unit store
 	 { const Unit* list;
@@ -533,30 +583,7 @@ global void UnitActions(void)
 	    list = list->Next;
 	} }
 #endif
-	if (unit->Destroyed) {		// Ignore destroyed units
-	    DebugLevel0Fn("Destroyed unit %d in table, should be ok\n" _C_
-		UnitNumber(unit));
-	    continue;
-	}
 
-	if (blinkthiscycle && unit->Blink) {	// clear blink flag
-	    --unit->Blink;
-	}
-
-	if (manathiscycle) {
-	    if (HandleDecay(unit)) {
-		// Unit Died
-		continue;
-	    }
-	}
-
-	if (healthiscycle) {
-	    IncrementUnitHealth(unit);
-	}
-	if (burnthiscycle) {
-	    BurnBuilding(unit);
-	}
-	
 	if (--unit->Wait) {		// Wait until counter reached
 	    continue;
 	}

@@ -61,7 +61,6 @@
 <a href="#set-all-players-total-unit-limit!">set-all-players-total-unit-limit!</a>
 <a href="#set-brightness!">set-brightness!</a>
 <a href="#set-building-capture!">set-building-capture!</a>
-<a href="#set-burn-buildings!">set-burn-buildings!</a>
 <a href="#set-click-missile!">set-click-missile!</a>
 <a href="#set-color-cycle-all!">set-color-cycle-all!</a>
 <a href="#set-contrast!">set-contrast!</a>
@@ -75,7 +74,6 @@
 <a href="#set-fog-of-war-contrast!">set-fog-of-war-contrast!</a>
 <a href="#set-fog-of-war-saturation!">set-fog-of-war-saturation!</a>
 <a href="#set-forest-regeneration!">set-forest-regeneration!</a>
-<a href="#set-goldmine-depleted!">set-goldmine-depleted!</a>
 <a href="#set-grab-mouse!">set-grab-mouse!</a>
 <a href="#set-hold-click-delay!">set-hold-click-delay!</a>
 <a href="#set-key-scroll!">set-key-scroll!</a>
@@ -415,33 +413,6 @@ Enable or disable building capture.
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
-<a name="set-burn-buildings!"></a>
-<h3>(set-burn-buildings! percent rate wait)</h3>
-
-.
-
-
-<dl>
-<dt>percent</dt>
-<dd>percentage to start burning at.
-<dt>rate</dt>
-<dd>HP per wait period to lose
-</dd>
-<dt>wait</dt>
-<dd>Number of cycles to wait before running each burn
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-burn-buildings! 25 2 6)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBRARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-click-missile!"></a>
 <h3>(set-click-missile! missile)</h3>
 
@@ -722,30 +693,6 @@ Sets the missile to use for displaying the damage done to units
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-goldmine-depleted!"></a>
-<h3>(set-goldmine-depleted! percent)</h3>
-
-Set the option to use depleted goldmines.
-
-
-<dl>
-<dt>percent</dt>
-<dd>Players mining a depleted mine receive this percent of the default amount
-of gold.  Use 0 to disable using depleted mines.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; The first example disables using depleted mines.  The second example lets
-    ;; players mine depleted mines and gives them 20% of the default amount of gold.
-    (set-goldmine-depleted! 0)
-    (set-goldmine-depleted! 20)
-</pre>
-
-<h4>Not Used</h4>
 
 <a name="set-grab-mouse!"></a>
 <h3>(set-grab-mouse! grab)</h3>

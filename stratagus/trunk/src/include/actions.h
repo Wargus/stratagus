@@ -58,9 +58,6 @@ enum _diplomacy_ {
 ----------------------------------------------------------------------------*/
 
 extern unsigned	SyncHash;	    /// Hash calculated to find sync failures
-extern int BurnBuildingPercent;	    /// Max percent to burn buildings
-extern int BurnBuildingDamageRate;  /// HP per second to damage buildings
-extern int BurnBuildingWait;	    /// Number of cycles to wait for burning
 
 /*----------------------------------------------------------------------------
 --	Functions

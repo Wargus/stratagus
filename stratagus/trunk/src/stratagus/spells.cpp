@@ -776,16 +776,6 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
     //	Now check conditions regarding the target unit.
     //
     if (target) {
-//	if (condition->Undead != CONDITION_TRUE) {
-//	    if ((condition->Undead == CONDITION_ONLY) ^ (target->Type->IsUndead)) {
-//		return 0;
-//	    }
-//	}
-//	if (condition->Organic != CONDITION_TRUE) {
-//	    if ((condition->Organic == CONDITION_ONLY) ^ (target->Type->Organic)) {
-//		return 0;
-//	    }
-//	}
 	if (condition->Volatile != CONDITION_TRUE) {
 	    if ((condition->Volatile == CONDITION_ONLY) ^ (target->Type->Volatile)) {
 		return 0;
@@ -796,11 +786,6 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 		return 0;
 	    }
 	}
-//	if (condition->Hero != CONDITION_TRUE) {
-//	    if ((condition->Hero == CONDITION_ONLY) ^ (target->Type->Hero)) {
-//		return 0;
-//	    }
-//	}
 	if (condition->Coward != CONDITION_TRUE) {
 	    if ((condition->Coward == CONDITION_ONLY) ^ (target->Type->Coward)) {
 		return 0;
@@ -1221,7 +1206,8 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	//
 	//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 	//
-	if (act->CastFunction!=CastAdjustVitals) {
+	if (act->CastFunction!=CastAdjustVitals &&
+		act->CastFunction!=CastSummon) {
 	    caster->Mana -= spell->ManaCost;
 	}
 	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
