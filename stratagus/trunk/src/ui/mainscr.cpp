@@ -27,7 +27,6 @@
 
 #include "freecraft.h"
 #include "video.h"
-#include "image.h"
 #include "font.h"
 #include "sound_id.h"
 #include "unitsound.h"

@@ -41,7 +41,7 @@
 /**
 **	Constant graphics
 **
-**	FIXME: must support more races, this must be configurable from CCL.
+** @todo FIXME: must support more races, this must be configurable from CCL.
 */
 struct _images_ {
     char*	File[PlayerMaxRaces];	/// one file for each race
@@ -88,26 +88,26 @@ struct _images_ {
 /**
 **	Draw image on screen.
 **
-**	@param image	Image number (=index).
+**	@param image	Image number (=index)
 **	@param row	Image row
 **	@param frame	Image frame
-**	@param X	X position.
-**	@param Y	Y position.
+**	@param X	X position
+**	@param Y	Y position
 */
 global void DrawImage(int image,int row,int frame,int x,int y)
 {
     DebugCheck( image<0 );
 
-    if( image>=0 ) {			// FIXME: trick 17! better solution
-	VideoDrawSub(Images[image].Image
-	    ,frame*Images[image].Width,row*Images[image].Height
-	    ,Images[image].Width,Images[image].Height
-	    ,x,y);
-    }
+    VideoDrawSub(Images[image].Image
+	,frame*Images[image].Width,row*Images[image].Height
+	,Images[image].Width,Images[image].Height
+	,x,y);
 }
 
 /**
 **	Load all images.
+**
+**	@param race	Race number of images to load.
 */
 global void LoadImages(unsigned int race)
 {
