@@ -41,6 +41,7 @@
 **	Unit stands still or stand ground.
 **
 **	@param unit	Unit pointer for action.
+**	@param ground	Flag: true if unit is standing ground.
 */
 global void ActionStillGeneric(Unit* unit,int ground)
 {
@@ -49,6 +50,12 @@ global void ActionStillGeneric(Unit* unit,int ground)
     Unit* goal;
 
     DebugLevel3Fn(" %Zd\n",UnitNumber(unit));
+
+    if( unit->Removed ) {		// Removed units, do nothing?
+	// If peon is in building or unit is in transporter it is removed.
+	unit->Wait=4;
+	return;
+    }
 
     //
     //	Animations
