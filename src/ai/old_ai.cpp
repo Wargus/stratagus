@@ -25,6 +25,8 @@
 
 //@{
 
+#include "freecraft.h"
+
 #ifndef NEW_AI				// {
 
 /*----------------------------------------------------------------------------
@@ -35,7 +37,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "freecraft.h"
 #include "video.h"
 #include "sound_id.h"
 
