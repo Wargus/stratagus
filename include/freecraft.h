@@ -395,6 +395,8 @@ enum _must_redraw_flags_ {
 #define RedrawCursors		(RedrawMinimapCursor|RedrawCursor)
     /// Must redraw all panels
 #define RedrawPanels		(RedrawInfoPanel|RedrawButtonPanel)
+    /// Must redraw after color cycle
+#define RedrawColorCycle	(RedrawMap | RedrawInfoPanel | RedrawButtonPanel | RedrawResources)
 
     /// Mainscreen pitch (default VideoWidth)
 extern int VideoPitch;
