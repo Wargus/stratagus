@@ -2111,6 +2111,7 @@ static int CclDefineViewports(lua_State* l)
 	int i;
 	int args;
 	int j;
+	int slot;
 
 	i = 0;
 	ui = &TheUI;
@@ -2121,7 +2122,7 @@ static int CclDefineViewports(lua_State* l)
 		if (!strcmp(value, "mode")) {
 			ui->ViewportMode = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "viewport")) {
-			if (!lua_istable(l, j + 1) && luaL_getn(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) && luaL_getn(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
@@ -2129,6 +2130,12 @@ static int CclDefineViewports(lua_State* l)
 			lua_pop(l, 1);
 			lua_rawgeti(l, j + 1, 2);
 			ui->Viewports[i].MapY = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 3);
+			slot = (int)LuaToNumber(l, -1);
+			if (slot != -1) {
+				ui->Viewports[i].Unit = UnitSlots[slot];
+			}
 			lua_pop(l, 1);
 			++i;
 		} else {
