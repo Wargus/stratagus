@@ -2046,6 +2046,9 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 #ifdef USE_SDLCD
     // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
+#ifdef USE_WIN32
+	SDL_CDResume(CDRom);
+#endif
 	PlayMusic(":random");
     } else {
     // Stop Playing CD
