@@ -517,7 +517,7 @@ struct _unit_ {
 #define FlushCommands	1		/// Flush commands in queue
 
 // FIXME: will be removed, we will get player limits
-#define MAX_UNITS	1800		/// maximal number of units supported
+#define MAX_UNITS	UnitMax		/// maximal number of units supported
 
 #define MAX_UNIT_SLOTS	65535		/// Maximal number of used slots.
 

@@ -715,7 +715,7 @@ local SCM CclAnimType(SCM list)
 
     switch( type ){
     case 0:
-      for( i=0; i<UnitTypeInternalMax; ++i ) {
+      for( i=0; i<UnitTypeMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
 	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
@@ -728,7 +728,7 @@ local SCM CclAnimType(SCM list)
       free(whole_animation);
       break;
     case 1:
-      for( i=0; i<UnitTypeInternalMax; ++i ) {
+      for( i=0; i<UnitTypeMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
 	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
@@ -740,7 +740,7 @@ local SCM CclAnimType(SCM list)
       free(whole_animation);
       break;
     case 2:
-      for( i=0; i<UnitTypeInternalMax; ++i ) {
+      for( i=0; i<UnitTypeMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
 	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
@@ -752,7 +752,7 @@ local SCM CclAnimType(SCM list)
       free(whole_animation);
       break;
     case 3:
-      for( i=0; i<UnitTypeInternalMax; ++i ) {
+      for( i=0; i<UnitTypeMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
 	    unittype->Animations=calloc(1,sizeof(*unittype->Animations));
@@ -845,9 +845,9 @@ local SCM CclUnitTypeArray(void)
     SCM value;
     int i;
 
-    array=cons_array(flocons(UnitTypeInternalMax),NIL);
+    array=cons_array(flocons(UnitTypeMax),NIL);
 
-    for( i=0; i<UnitTypeInternalMax; ++i ) {
+    for( i=0; i<UnitTypeMax; ++i ) {
 	value=cons(NIL,NIL);
 	value->type=SiodUnitTypeTag;
 	CAR(value)=(SCM)&UnitTypes[i];

@@ -180,7 +180,7 @@ typedef struct _player_ai_
     AiGoal *GoalNil1;			/// dummy end of double linked list
     AiGoal *GoalTail;			/// end of double linked list
 
-    unsigned Build[(UnitTypeInternalMax + BitsOf(unsigned) - 1)
+    unsigned Build[(UnitTypeMax + BitsOf(unsigned) - 1)
 		   / BitsOf(unsigned)];	/// flags what units are currently build
 
     Unit *MainHall;			/// home point
@@ -290,7 +290,7 @@ local int AiFindHalls(Unit ** table)
 /**
 **      Numbers of all units of current AI player counted.
 */
-local int UnitTypesCount[UnitTypeInternalMax];
+local int UnitTypesCount[UnitTypeMax];
 
 /**
 **      Count the units of the current Ai player.
@@ -1561,7 +1561,7 @@ global void AiInit(Player * player)
     player->Ai = aip = &Ais[player->Player];
     aip->Player = player;
 
-    for (i = 0; i < UnitTypeInternalMax / (sizeof(int) * 8); ++i) {
+    for (i = 0; i < UnitTypeMax / (sizeof(int) * 8); ++i) {
 	aip->Build[i] = 0;
     }
     aip->GoalHead = (AiGoal *) & aip->GoalNil1;
