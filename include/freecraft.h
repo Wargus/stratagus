@@ -132,6 +132,7 @@
 #define snprintf _snprintf		/// Unix -> dumm
 #include <string.h>
 #define strdup _strdup
+#define strncasecmp strnicmp
 #endif
 
 

@@ -1083,7 +1083,7 @@ local int InputKey(int key)
 {
     char ChatMessage[sizeof(Input)+40];
     int i;
-    char *namestart = NULL;
+    char *namestart;
 
     switch (key) {
 	case '\r':
@@ -1130,7 +1130,7 @@ local int InputKey(int key)
 		if (Players[i].Type != PlayerPerson) {
 		    continue;
 		}
-		if (!strncmp(namestart, Players[i].Name, strlen(namestart))) {
+		if (!strncasecmp(namestart, Players[i].Name, strlen(namestart))) {
 		    InputIndex += strlen(Players[i].Name) - strlen(namestart);
 		    strcpy(namestart, Players[i].Name);
 		    if (namestart == Input) {
