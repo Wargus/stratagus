@@ -137,8 +137,6 @@ global void RevealMap(void)
 	    for (i = 0; i < PlayerMax; ++i) {
 		if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
 		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i]=1;
-		    if (IsMapFieldVisible(&Players[i],ix,iy)) {
-			UnitsMarkSeen(ix,iy);
 		    }
 		}
 	    }
@@ -151,6 +149,7 @@ global void RevealMap(void)
 	    }
 #endif
 	    MapMarkSeenTile(ix, iy);
+	    UnitsMarkSeen(ix, iy);
 	}
     }
 }
