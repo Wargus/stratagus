@@ -1113,6 +1113,7 @@ global int HandleCheats(const char* input)
 #elif defined(USE_LUA)
     int ret;
 
+#ifdef DEBUG
     if (!strcmp(input, "ai me")) {
 	if (ThisPlayer->AiEnabled) {
 	    ThisPlayer->AiEnabled = 0;
@@ -1126,21 +1127,21 @@ global int HandleCheats(const char* input)
 	    }
 	    SetMessage("I'm the BORG, resistance is futile!");
 	}
-	ret = 1;
+	return 1;
+    }
+#endif
+    lua_pushstring(Lua, "HandleCheats");
+    lua_gettable(Lua, LUA_GLOBALSINDEX);
+    lua_pushstring(Lua, input);
+    LuaCall(1, 0);
+    ret = lua_gettop(Lua);
+    if (lua_gettop(Lua) == 1) {
+	ret = LuaToBoolean(Lua, 1);
+	lua_pop(Lua, 1);
     } else {
-	lua_pushstring(Lua, "HandleCheats");
-	lua_gettable(Lua, LUA_GLOBALSINDEX);
-	lua_pushstring(Lua, input);
-	LuaCall(1, 0);
-	ret = lua_gettop(Lua);
-	if (lua_gettop(Lua) == 1) {
-	    ret = LuaToBoolean(Lua, 1);
-	    lua_pop(Lua, 1);
-	} else {
-	    lua_pushstring(Lua, "HandleCheats must return a boolean");
-	    lua_error(Lua);
-	    ret = 0;
-	}
+	lua_pushstring(Lua, "HandleCheats must return a boolean");
+	lua_error(Lua);
+	ret = 0;
     }
     return ret;
 #endif
