@@ -321,16 +321,30 @@ global const char* IdentOfIcon(const Icon* icon)
 }
 
 /**
+**	Draw icon on x,y.
+**
+**	@param player	Player pointer used for icon colors
+**	@param icon	Icon identifier
+**	@param x	X display pixel position
+**	@param y	Y display pixel position
+*/
+global void DrawIcon(const Player* player,Icon* icon,int x,int y)
+{
+    GraphicPlayerPixels(player,icon->Graphic);
+    VideoDrawSub(icon->Graphic,icon->X,icon->Y,icon->Width,icon->Height,x,y);
+}
+
+/**
 **	Draw unit icon 'icon' with border on x,y
 **
 **	@param player	Player pointer used for icon colors
 **	@param icon	Icon identifier
 **	@param flags	State of icon (clicked, mouse over...)
-**	@param x	X display position
-**	@param y	Y display position
+**	@param x	X display pixel position
+**	@param y	Y display pixel position
 */
 global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
-	,unsigned x,unsigned y)
+	,int x,int y)
 {
     int color;
 
@@ -358,8 +372,7 @@ global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
 
     x+=4;
     y+=4;
-    GraphicPlayerPixels(player,icon->Graphic);
-    VideoDrawSub(icon->Graphic,icon->X,icon->Y,icon->Width,icon->Height,x,y);
+    DrawIcon(player,icon,x,y);
 
     if( flags&IconSelected ) {
 	VideoDrawRectangleClip(ColorGreen,x,y,ICON_WIDTH,ICON_HEIGHT);
