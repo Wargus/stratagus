@@ -310,6 +310,8 @@ local void FlacStreamFree(Sample* sample)
 
     data = (FlacData*)sample->User;
     CLclose(data->FlacFile);
+    FLAC__stream_decoder_finish(data->Stream);
+    FLAC__stream_decoder_delete(data->Stream);
     free(data);
     free(sample);
 }
