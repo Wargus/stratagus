@@ -1363,7 +1363,7 @@ local int AddUpgradeModifier( int uid,
 
     memset( um->ChangeUnits,    '?', sizeof(um->ChangeUnits)   );
     memset( um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
-    memset( um->ApplyTo,     '?', sizeof(um->ApplyTo)    );
+    memset( um->ApplyTo,        '?', sizeof(um->ApplyTo)       );
 
     //
     // get allow/forbid's for units
@@ -1412,7 +1412,7 @@ local int AddUpgradeModifier( int uid,
 	if ( id == -1 ) {
 	    break;		// cade: should we cancel all and return error?!
 	}
-	um->ApplyTo[id] = 'X'; // something other than '?'
+	um->ApplyTo[id] = 'X';	// something other than '?'
     }
     free(s1);
 
@@ -1538,14 +1538,6 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 
     pn = player->Player;		// player number
     for (z = 0; z < UpgradeMax; z++) {
-	// allow/forbid unit types for player
-	if (um->ChangeUnits[z] == 'A') {
-	    player->Allow.Units[z] = 'A';
-	}
-	if (um->ChangeUnits[z] == 'F') {
-	    player->Allow.Units[z] = 'F';
-	}
-
 	// allow/forbid upgrades for player.  only if upgrade is not acquired
 	if (player->Allow.Upgrades[z] != 'R') {
 	    if (um->ChangeUpgrades[z] == 'A') {
@@ -1558,6 +1550,16 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 	    if (um->ChangeUpgrades[z] == 'R') {
 		player->Allow.Upgrades[z] = 'R';
 	    }
+	}
+    }
+
+    for (z = 0; z < UnitTypeMax; z++) {
+	// allow/forbid unit types for player
+	if (um->ChangeUnits[z] == 'A') {
+	    player->Allow.Units[z] = 'A';
+	}
+	if (um->ChangeUnits[z] == 'F') {
+	    player->Allow.Units[z] = 'F';
 	}
 
 	DebugCheck(!(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X'));
