@@ -316,9 +316,9 @@ win32new:
 
 win32configure:
 	autoconf
-	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
+	export PATH=$(CROSSDIR)/bin:$(CROSSDIR)/i386-mingw32msvc/bin:$$PATH; \
 	./configure --enable-win32 --host=i386-mingw32msvc --build=i386-linux \
-	--with-lua=/usr/local/cross
+	--with-lua=/usr/local/cross --enable-static
 
 win32_2:
 	$(MAKE) $(WIN32) all
