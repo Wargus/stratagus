@@ -776,7 +776,7 @@ local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
 	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
@@ -1521,21 +1521,26 @@ local void GameOptions(void)
 
 local void SetCdMode(Menuitem *mi)
 {
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
-
+#ifdef USE_SDLCD
     /// Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
+	if (SDL_CDStatus(CDRom) <= 1)
+	    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
-#ifdef USE_SDLCD 
         SDL_CDStop(CDRom);
-#endif 
-	
-#ifdef USE_LIBCDA 
+	CDMode = ":stopped";
+    }
+#elif defined(USE_LIBCDA)
+    /// Start Playing CD
+    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
+	PlayMusic(":random");
+	if (!cd_current_track())
+	    GameOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    } else {
+    /// Stop Playing CD
         cd_stop();
-#endif
-
 	CDMode = ":stopped";
     }
 #else

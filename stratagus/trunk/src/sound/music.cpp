@@ -180,10 +180,11 @@ local int PlayCDRom(const char* name)
     // Old mode off, starting cdrom play.
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
-	    StopMusic();		// stop music before new music
 	    SDL_Init(SDL_INIT_CDROM);
 	    CDRom = SDL_CDOpen(0);
-	    SDL_CDStatus(CDRom);
+	    if (SDL_CDStatus(CDRom) == 0)
+		return 1;
+	    StopMusic();		// stop music before new music
 	}
     }
     // CDPlayer command?
@@ -229,7 +230,8 @@ local int PlayCDRom(const char* name)
 		fprintf(stderr, "Error initialising libcda \n");
 		return 1;
 	    }
-	    cd_get_tracks(&CDTrack, &NumCDTracks);
+	    if (cd_get_tracks(&CDTrack, &NumCDTracks) == -1)
+		return 1;
 	    if (NumCDTracks == 0) {
 		return 1;
 	    }
@@ -239,6 +241,9 @@ local int PlayCDRom(const char* name)
 
     if (!strncmp(name, ":", 1)) {
 
+	if (cd_get_tracks(NULL, NULL) == -1)
+	    return 1;
+	    
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
 	    CDMode = ":all";
