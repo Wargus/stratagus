@@ -51,8 +51,10 @@ local Node *AStarMatrix;
 /// a list of close nodes, helps to speed up the matrix cleaning
 local int *CloseSet;
 local int Threshold;
+local int OpenSetMaxSize;
+local int AStarMatrixSize;
 #define MAX_CLOSE_SET_RATIO 4 
-#define MAX_OPEN_SET_RATIO 64 
+#define MAX_OPEN_SET_RATIO 16 
 
 /// see pathfinder.h
 global int AStarFixedUnitCrossingCost=MaxMapWidth*MaxMapHeight;
@@ -77,13 +79,12 @@ global void InitAStar(void)
 {
     if(AStarOn) {
 	if(!AStarMatrix) {
-	    AStarMatrix
-		=(Node *)malloc(sizeof(Node)*TheMap.Width*TheMap.Height);
-	    CloseSet
-		=(int *)malloc(sizeof(int)*TheMap.Width*TheMap.Height/MAX_CLOSE_SET_RATIO);
+	    AStarMatrixSize=sizeof(Node)*TheMap.Width*TheMap.Height;
+	    AStarMatrix=(Node *)malloc(AStarMatrixSize);
 	    Threshold=TheMap.Width*TheMap.Height/MAX_CLOSE_SET_RATIO;
-	    OpenSet
-		=(Open *)malloc(sizeof(int)*TheMap.Width*TheMap.Height/MAX_OPEN_SET_RATIO);
+	    CloseSet=(int *)malloc(sizeof(int)*Threshold);
+	    OpenSetMaxSize=TheMap.Width*TheMap.Height/MAX_OPEN_SET_RATIO;
+	    OpenSet=(Open *)malloc(sizeof(Open)*OpenSetMaxSize);
 	}
     }
 }
@@ -106,7 +107,7 @@ global void FreeAStar(void)
 */
 local void AStarPrepare(void)
 {
-    memset(AStarMatrix,0,sizeof(AStarMatrix));
+    memset(AStarMatrix,0,AStarMatrixSize);
 }
 
 /**
@@ -115,12 +116,12 @@ local void AStarPrepare(void)
 local void AStarCleanUp(int num_in_close)
 {
     int i;
-    if(num_in_close>Threshold) {
+    if(num_in_close>=Threshold) {
 	AStarPrepare();
     } else {
 	for(i=0;i<num_in_close;i++) {
-	    AStarMatrix[CloseSet[i]].CostFromStart=0;
-	    AStarMatrix[CloseSet[i]].InGoal=0;
+	  AStarMatrix[CloseSet[i]].CostFromStart=0;
+	  AStarMatrix[CloseSet[i]].InGoal=0;
 	}
     }
 }
@@ -173,6 +174,12 @@ local void AStarAddNode(int x,int y,int o,int costs)
     int i=OpenSetSize;
     int j;
     Open swap;
+
+    if(OpenSetSize>=OpenSetMaxSize) {
+	fprintf(stderr, "A* internal error: raise Open Set Max Size "
+		"(current value %d)\n",OpenSetMaxSize);
+	Exit(-1);
+    }
     OpenSet[i].X=x;
     OpenSet[i].Y=y;
     OpenSet[i].O=o;
@@ -337,8 +344,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 		eo=dx*TheMap.Width+dy;
 		AStarMatrix[eo].InGoal=1;
 		if(num_in_close<Threshold) {
-		    CloseSet[num_in_close]=eo;
-		    num_in_close++;
+		    CloseSet[num_in_close++]=eo;
 		}
 		i=1;
 	    }
@@ -353,8 +359,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	// place start point in open
 	AStarAddNode(x,y,eo,AStarMatrix[eo].CostFromStart+1);
 	if(num_in_close<Threshold) {
-	    CloseSet[num_in_close]=OpenSet[0].O;
-	    num_in_close++;
+	    CloseSet[num_in_close++]=OpenSet[0].O;
 	}
 	b_c=1;
 	b_d=AStarMatrix[eo].CostToGoal;
@@ -364,7 +369,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	AStarCleanUp(num_in_close);
 	return -2;
     }
-    counter=MaxMapWidth*MaxMapHeight;	// how many tries
+    counter=TheMap.Width*TheMap.Height;	// how many tries
 
     for( ;; ) {
 	//
@@ -409,7 +414,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    b_x=x;
 	    b_y=y;
 	}
-	DebugLevel3("Cost from start: %d %d %d\n",x,y,new_cost);
+	DebugLevel3("Best point in Open Set: %d %d (%d)\n",x,y,OpenSetSize);
 	for( i=0; i<8; ++i ) {
 	    ex=x+xoffset[i];
 	    ey=y+yoffset[i];
