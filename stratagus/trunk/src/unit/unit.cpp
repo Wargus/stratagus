@@ -2956,8 +2956,9 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 
 	DebugCheck(damage == 0 || target->HP == 0 || target->Type->Vanishes);
 
-	if (target->UnholyArmor > 0) {
+	if (target->UnholyArmor > 0 || target->Type->Decoration) {
 		// vladi: units with active UnholyArmour are invulnerable
+		// mr-russ: as are decorations
 		return;
 	}
 

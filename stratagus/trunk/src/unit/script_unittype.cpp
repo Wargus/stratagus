@@ -134,7 +134,6 @@ local int CclDefineUnitType(lua_State* l)
 		redefine = 0;
 		//Set some default values
 		type->_RegenerationRate = 0;
-		type->Selectable = 1;
 	}
 	type->BoolFlag = realloc(type->BoolFlag, NumberBoolFlag * sizeof (*type->BoolFlag));
 	memset(type->BoolFlag, 0, NumberBoolFlag * sizeof (*type->BoolFlag));
@@ -338,8 +337,8 @@ local int CclDefineUnitType(lua_State* l)
 				DebugCheck(1);
 			}
 			type->MustBuildOnTop = auxtype;
-		} else if (!strcmp(value, "Selectable")) {
-			type->Selectable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Decoration")) {
+			type->Decoration = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
 				lua_pushstring(l, "incorrect argument");
