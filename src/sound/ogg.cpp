@@ -144,6 +144,12 @@ local int OggReadStream(Sample* sample, void* buf, int len)
     int n;
     int bitstream;
 
+    int freqratio;
+    int chanratio;
+    int brratio;
+    int divide;
+    char sndbuf[OGG_BUFFER_SIZE];
+
     data = (OggData*) sample->User;
 
     // see if we have enough read already
@@ -154,19 +160,29 @@ local int OggReadStream(Sample* sample, void* buf, int len)
 	data->PointerInBuffer = sample->Data;
 
 	n = OGG_BUFFER_SIZE - sample->Length;
+
+	freqratio = 44100 / sample->Frequency;
+	brratio = 4 / ((sample->SampleSize/8) * sample->Channels);
+	chanratio = 2 / sample->Channels;
+	divide = freqratio * brratio / chanratio;
+
 	for (;;) {
-		#ifdef WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 	    i = ov_read(data->VorbisFile,
-		    data->PointerInBuffer + sample->Length, n, 1, 2, 1,
+		    sndbuf, n/divide, 1, 2, 1,
 		    &bitstream);
-		#else
+#else
 	    i = ov_read(data->VorbisFile,
-		    data->PointerInBuffer + sample->Length, n, 0, 2, 1,
+		    sndbuf, n/divide, 0, 2, 1,
 		    &bitstream);
-		#endif
+#endif
 	    if (i <= 0) {
 		break;
 	    }
+
+	    i = ConvertToStereo32(sndbuf, &data->PointerInBuffer[sample->Length],
+		sample->Frequency, sample->SampleSize / 8, sample->Channels, i);
+
 	    sample->Length += i;
 	    n -= i;
 	    if (n < 4096) {

@@ -350,8 +350,7 @@ global void PlayMusic(const char* name)
 #ifdef USE_OGG
     if ((sample = LoadOgg(name, PlayAudioStream))) {
 	if ((sample->Channels != 1 && sample->Channels != 2)
-		|| sample->SampleSize != 16
-		|| sample->Frequency != SoundFrequency) {
+		|| sample->SampleSize != 16) {
 	    DebugLevel0Fn("Not supported music format\n");
 	    SoundFree(sample);
 	    return;
