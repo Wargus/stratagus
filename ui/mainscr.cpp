@@ -501,37 +501,36 @@ global void DrawResources(void)
 
 // FIXME: move messages to console code.
 
-// FIXME: need messages for chat!
+#define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*5	/// Message timeout 5 seconds
 
-#define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*5 // 5 seconds
+local char  MessageBuffer[40];			/// message buffer
+local int   MessageFrameTimeout;		/// frame to expire message
 
-local char  MessageBuffer[40];		// message buffer
-local int   MessageFrameTimeout;	// frame to expire message
+#define MESSAGES_MAX  10			/// FIXME: docu
 
-#define MESSAGES_MAX  10
+local char Messages[ MESSAGES_MAX ][64];	/// FIXME: docu
+local int  MessagesCount;			/// FIXME: docu
+local int  SameMessageCount;			/// FIXME: docu
 
-local char Messages[ MESSAGES_MAX ][64];
-local int  MessagesCount = 0;
-local int  SameMessageCount = 0;
-
-local char MessagesEvent[ MESSAGES_MAX ][64];
-local int  MessagesEventX[ MESSAGES_MAX ];
-local int  MessagesEventY[ MESSAGES_MAX ];
-local int  MessagesEventCount = 0;
-local int  MessagesEventIndex = 0;
+local char MessagesEvent[ MESSAGES_MAX ][64];	/// FIXME: docu
+local int  MessagesEventX[ MESSAGES_MAX ];	/// FIXME: docu
+local int  MessagesEventY[ MESSAGES_MAX ];	/// FIXME: docu
+local int  MessagesEventCount;			/// FIXME: docu
+local int  MessagesEventIndex;			/// FIXME: docu
 
 /**
 **	Shift messages array with one.
 */
 global void ShiftMessages(void)
 {
-  int z;
-  if ( MessagesCount == 0 ) return;
-  for ( z = 0; z < MessagesCount - 1; z++ )
-      {
-      strcpy( Messages[z], Messages[z+1] );
-      }
-  MessagesCount--;
+    int z;
+
+    if (MessagesCount) {
+	MessagesCount--;
+	for (z = 0; z < MessagesCount; z++) {
+	    strcpy(Messages[z], Messages[z + 1]);
+	}
+    }
 }
 
 /**
@@ -539,15 +538,16 @@ global void ShiftMessages(void)
 */
 global void ShiftMessagesEvent(void)
 {
-  int z;
-  if ( MessagesEventCount == 0 ) return;
-  for ( z = 0; z < MessagesEventCount - 1; z++ )
-	{
-	MessagesEventX[z] = MessagesEventX[z+1];
-	MessagesEventY[z] = MessagesEventY[z+1];
-	strcpy( MessagesEvent[z], MessagesEvent[z+1] );
+    int z;
+
+    if (MessagesEventCount ) {
+	MessagesEventCount--;
+	for (z = 0; z < MessagesEventCount; z++) {
+	    MessagesEventX[z] = MessagesEventX[z + 1];
+	    MessagesEventY[z] = MessagesEventY[z + 1];
+	    strcpy(MessagesEvent[z], MessagesEvent[z + 1]);
 	}
-  MessagesCount--;
+    }
 }
 
 /**
