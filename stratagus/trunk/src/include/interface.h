@@ -310,7 +310,9 @@ extern void SetMessage( const char* fmt, ... );
     /// Set message to display with event point
 extern void SetMessageEvent( int x, int y, const char* fmt, ... );
     /// Center view-point on last event message
-extern void CenterOnMessage();
+extern void CenterOnMessage(void);
+    ///	Cleanup all messages
+extern void CleanMessages(void);
 
     /// Set status line to show this information
 extern void SetStatusLine(char* status);

@@ -65,6 +65,8 @@ global void CleanModules(void)
 {
     SCM var;
 
+    CleanMessages();
+
     CleanIcons();
     CleanCursors();
     CleanUserInterface();
