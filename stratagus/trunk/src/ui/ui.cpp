@@ -66,6 +66,10 @@ global UI** UI_Table;
 --	Functions
 ----------------------------------------------------------------------------*/
 
+local void ClipViewport(Viewport* vp, int ClipX, int ClipY);
+local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
+
+
 /**
 **	Initialize the user interface.
 **
@@ -79,6 +83,9 @@ global void InitUserInterface(const char *race_name)
 {
     int i;
     int best;
+    int num_vps;
+    int vp_mode;
+    Viewport vps[MAX_NUM_VIEWPORTS];
 
     // select the correct slot
     best=0;
@@ -103,29 +110,45 @@ global void InitUserInterface(const char *race_name)
 	}
     }
 
+    num_vps=TheUI.NumViewports;
+    vp_mode=TheUI.ViewportMode;
+    for( i=0; i<num_vps; ++i ) {
+	vps[i].MapX=TheUI.Viewports[i].MapX;
+	vps[i].MapY=TheUI.Viewports[i].MapY;
+    }
+
     // FIXME: overwrites already set slots?
     // ARI: Yes, it does :(((
     TheUI=*UI_Table[best];
 
-    TheUI.Offset640X = (VideoWidth - 640) / 2;
-    TheUI.Offset480Y = (VideoHeight - 480) / 2;
+    TheUI.Offset640X=(VideoWidth-640)/2;
+    TheUI.Offset480Y=(VideoHeight-480)/2;
 
     //
     //	Calculations
     //
-    TheUI.SelectedViewport = TheUI.Viewports;
+    TheUI.SelectedViewport=TheUI.Viewports;
 
-    SetViewportMode(VIEWPORT_SINGLE);
+    if( num_vps ) {
+	SetViewportMode(vp_mode);
+	for( i=0; i<num_vps; ++i ) {
+	    TheUI.Viewports[i].MapX=vps[i].MapX;
+	    TheUI.Viewports[i].MapY=vps[i].MapY;
+	}
+	FinishViewportModeConfiguration(TheUI.Viewports,num_vps);
+    } else {
+	SetViewportMode(VIEWPORT_SINGLE);
+    }
 
     // FIXME: Can be removed after new config is working
     if( !strcmp(race_name,"human") || !strcmp(race_name,"alliance") ) {
-	TheUI.NormalFontColor = FontWhite;
-	TheUI.ReverseFontColor = FontYellow;
+	TheUI.NormalFontColor=FontWhite;
+	TheUI.ReverseFontColor=FontYellow;
     } else {
-	TheUI.NormalFontColor = FontYellow;
-	TheUI.ReverseFontColor = FontWhite;
+	TheUI.NormalFontColor=FontYellow;
+	TheUI.ReverseFontColor=FontWhite;
     }
-    TheUI.ViewportCursorColor = ColorWhite;
+    TheUI.ViewportCursorColor=ColorWhite;
 }
 
 /**
@@ -493,6 +516,25 @@ local void NewSaveUi(FILE * file, const UI * ui)
 }
 
 /**
+**	Save the viewports.
+**
+**	@param file	Save file handle
+**	@param ui	User interface to save
+*/
+local void SaveViewports(FILE* file,const UI* ui)
+{
+    int i;
+    const Viewport* vp;
+
+    fprintf(file, "(define-viewports 'mode %d",ui->ViewportMode);
+    for (i = 0; i < ui->NumViewports; ++i) {
+	vp = &ui->Viewports[i];
+	fprintf(file, "\n  'viewport '(%d %d)",vp->MapX,vp->MapY);
+    }
+    fprintf(file, ")\n\n");
+}
+
+/**
 **	Save the user interface module.
 **
 **	@param file	Save file handle
@@ -523,6 +565,7 @@ global void SaveUserInterface(FILE* file)
     // Save the current UI
     OldSaveUi(file,&TheUI);
     // NewSaveUi(file,&TheUI);
+    SaveViewports(file,&TheUI);
 }
 
 /**
