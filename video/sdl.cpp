@@ -218,8 +218,8 @@ global void InitVideoSdl(void)
 #endif
 
 	TheScreen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth, flags);
-	if (TheScreen && (TheScreen->format->BitsPerPixel == 8 ||
-			TheScreen->format->BitsPerPixel == 24)) {
+	if (TheScreen && (TheScreen->format->BitsPerPixel != 16 &&
+			TheScreen->format->BitsPerPixel != 32)) {
 		// Only support 16 and 32 bpp, default to 16
 		TheScreen = SDL_SetVideoMode(VideoWidth, VideoHeight, 16, flags);
 	}
