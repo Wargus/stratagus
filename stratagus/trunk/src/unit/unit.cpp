@@ -31,8 +31,8 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
-----------------------------------------------------------------------------*/
+  --	Includes
+  ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,8 +62,8 @@
 #include "editor.h"
 
 /*----------------------------------------------------------------------------
---	Variables
-----------------------------------------------------------------------------*/
+  --	Variables
+  ----------------------------------------------------------------------------*/
 
 #ifndef LimitSearch
 #define LimitSearch 1			/// Limit the search
@@ -86,12 +86,12 @@ global char EnableBuildingCapture;	/// Config: capture buildings enabled
 global char RevealAttacker;		/// Config: reveal attacker enabled
 
 /*----------------------------------------------------------------------------
---	Functions
-----------------------------------------------------------------------------*/
+  --	Functions
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Initial memory allocation for units.
-*/
+ **	Initial memory allocation for units.
+ */
 global void InitUnitsMemory(void)
 {
     Unit** slot;
@@ -114,11 +114,11 @@ global void InitUnitsMemory(void)
 
 #if 0
 /**
-**	Free the memory for an unit slot. Update the global slot table.
-**	The memory should only be freed, if all references are dropped.
-**
-**	@param unit	Pointer to unit.
-*/
+ **	Free the memory for an unit slot. Update the global slot table.
+ **	The memory should only be freed, if all references are dropped.
+ **
+ **	@param unit	Pointer to unit.
+ */
 global void FreeUnitMemory(Unit* unit)
 {
     Unit** slot;
@@ -135,12 +135,12 @@ global void FreeUnitMemory(Unit* unit)
 #endif
 
 /**
-**	Release an unit.
-**
-**	The unit is only released, if all references are dropped.
-**
-**	@param unit	Pointer to unit.
-*/
+ **	Release an unit.
+ **
+ **	The unit is only released, if all references are dropped.
+ **
+ **	@param unit	Pointer to unit.
+ */
 global void ReleaseUnit(Unit* unit)
 {
     DebugLevel2Fn("%lu:Unit %p %d `%s'\n" _C_ GameCycle _C_
@@ -170,7 +170,7 @@ global void ReleaseUnit(Unit* unit)
 	unit->Destroyed=1;		// mark as destroyed
 
 	// Mark building as can't be destroyed, since it's still seen
-        if( unit->Type->Building ) {
+	if( unit->Type->Building ) {
 	    int i;
 	    int x;
 	    int y;
@@ -188,8 +188,8 @@ global void ReleaseUnit(Unit* unit)
 		for( ; h-->0; ) {
 		    for( w=w0; w-->0; ) {
 			if( !IsMapFieldVisible(&Players[i],x+w,y+h)
-			    && IsMapFieldExplored(&Players[i],x+w,y+h)
-			    && Players[i].Type == PlayerPerson ) {
+				&& IsMapFieldExplored(&Players[i],x+w,y+h)
+				&& Players[i].Type == PlayerPerson ) {
 			    unit->Visible |= (1 << i);
 			}
 		    }
@@ -238,15 +238,15 @@ global void ReleaseUnit(Unit* unit)
     ReleasedTail=&unit->Next;
     unit->Refs=GameCycle+NetworkMaxLag;	// could be reuse after this time
     IfDebug(
-	DebugLevel2Fn("%lu:No more references %d\n" _C_
+	    DebugLevel2Fn("%lu:No more references %d\n" _C_
 		GameCycle _C_ UnitNumber(unit));
-	// unit->Type=NULL;			// for debugging.
-    );
+	    // unit->Type=NULL;			// for debugging.
+	   );
 }
 
 /**
-**	FIXME: Docu
-*/
+ **	FIXME: Docu
+ */
 local Unit *AllocUnit(void)
 {
     Unit* unit;
@@ -289,11 +289,11 @@ local Unit *AllocUnit(void)
 }
 
 /**
-**	Initialize the unit slot with default values.
-**
-**	@param unit	Unit pointer (allocated zero filled)
-**	@param type	Unit-type
-*/
+ **	Initialize the unit slot with default values.
+ **
+ **	@param unit	Unit pointer (allocated zero filled)
+ **	@param type	Unit-type
+ */
 global void InitUnit(Unit* unit, UnitType* type)
 {
     // Refs need to be *increased* by 1, not *set* to 1, because if InitUnit()
@@ -368,12 +368,12 @@ global void InitUnit(Unit* unit, UnitType* type)
 }
 
 /**
-**	FIXME: Docu
-*/
+ **	FIXME: Docu
+ */
 global void AssignUnitToPlayer(Unit *unit, Player *player)
 {
     UnitType* type;
- 
+
     type=unit->Type;
 
     //
@@ -397,7 +397,7 @@ global void AssignUnitToPlayer(Unit *unit, Player *player)
     }
 
     if( type->Demand ) {
-        player->NumFoodUnits+=type->Demand;	// food needed
+	player->NumFoodUnits+=type->Demand;	// food needed
 	if( player==ThisPlayer ) {
 	    MustRedraw|=RedrawResources;	// update food
 	}
@@ -415,13 +415,13 @@ global void AssignUnitToPlayer(Unit *unit, Player *player)
 }
 
 /**
-**	Create a new unit.
-**
-**	@param type	Pointer to unit-type.
-**	@param player	Pointer to owning player.
-**
-**	@return		Pointer to created unit.
-*/
+ **	Create a new unit.
+ **
+ **	@param type	Pointer to unit-type.
+ **	@param player	Pointer to owning player.
+ **
+ **	@return		Pointer to created unit.
+ */
 global Unit* MakeUnit(UnitType* type, Player* player)
 {
     Unit* unit;
@@ -442,12 +442,12 @@ global Unit* MakeUnit(UnitType* type, Player* player)
 }
 
 /**
-**	Place unit on map.
-**
-**	@param unit	Unit to be placed.
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
-*/
+ **	Place unit on map.
+ **
+ **	@param unit	Unit to be placed.
+ **	@param x	X map tile position.
+ **	@param y	Y map tile position.
+ */
 global void PlaceUnit(Unit* unit,int x,int y)
 {
     const UnitType* type;
@@ -488,14 +488,14 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	    for( h=type->TileHeight; h--; ) {
 		for( w=type->TileWidth; w--; ) {
 		    TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags
-			    |=MapFieldBuilding;
+			|=MapFieldBuilding;
 		}
 	    }
 	} else if( !type->OilPatch ) {
 	    for( h=type->TileHeight; h--; ) {
 		for( w=type->TileWidth; w--; ) {
 		    TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags
-			    |=MapFieldNoBuilding;
+			|=MapFieldNoBuilding;
 		}
 	    }
 	}
@@ -527,7 +527,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
     //
     if( type->Building ) {
 	PfHierMapChangedCallback(x, y,
-	    x + type->TileWidth - 1, y + type->TileHeight - 1);
+		x + type->TileWidth - 1, y + type->TileHeight - 1);
     }
 #endif
 
@@ -545,8 +545,8 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//
 	if( unit->Container && unit->Removed ) {
 	    MapUnmarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
-				,unit->Container->Y+unit->Container->Type->TileHeight/2
-				,unit->CurrentSightRange);
+		    ,unit->Container->Y+unit->Container->Type->TileHeight/2
+		    ,unit->CurrentSightRange);
 	}
 	if (unit->Container) {
 	    RemoveUnitFromContainer(unit);
@@ -556,22 +556,6 @@ global void PlaceUnit(Unit* unit,int x,int y)
 
 	if( type->CanSeeSubmarine ) {
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
-	}
-    }
-    
-    //
-    //	Building oil-platform, must remove oil-patch.
-    //
-    if( type->GivesOil ) {
-	Unit* temp;
-
-	if( (temp=OilPatchOnMap(x,y)) ) {
-	    DebugCheck( !temp );
-	    unit->Value=temp->Value;
-	    // oil patch should NOT make sound, handled by let unit die
-	    LetUnitDie(temp);		// Destroy oil patch
-	} else {
-	    DebugLevel0Fn("No oil-patch to remove.\n");
 	}
     }
 
@@ -584,15 +568,15 @@ global void PlaceUnit(Unit* unit,int x,int y)
 }
 
 /**
-**	Create new unit and place on map.
-**
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
-**	@param type	Pointer to unit-type.
-**	@param player	Pointer to owning player.
-**
-**	@return		Pointer to created unit.
-*/
+ **	Create new unit and place on map.
+ **
+ **	@param x	X map tile position.
+ **	@param y	Y map tile position.
+ **	@param type	Pointer to unit-type.
+ **	@param player	Pointer to owning player.
+ **
+ **	@return		Pointer to created unit.
+ */
 global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 {
     Unit* unit;
@@ -614,11 +598,11 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 }
 
 /*
-** 	Add unit to a container. It only updates linked list stuff
-**
-**	@param unit	Pointer to unit.
-**	@param host	Pointer to container.
-*/
+ ** 	Add unit to a container. It only updates linked list stuff
+ **
+ **	@param unit	Pointer to unit.
+ *	@param host	Pointer to container.
+ */
 global void AddUnitInContainer(Unit* unit, Unit* host)
 {
     if (unit->Container) {
@@ -627,7 +611,7 @@ global void AddUnitInContainer(Unit* unit, Unit* host)
     }
     unit->Container=host;
     if (host->InsideCount==0) {
-    	unit->NextContained=unit->PrevContained=unit;
+	unit->NextContained=unit->PrevContained=unit;
     } else {
 	unit->NextContained=host->UnitInside;
 	unit->PrevContained=host->UnitInside->PrevContained;
@@ -639,10 +623,10 @@ global void AddUnitInContainer(Unit* unit, Unit* host)
 }
 
 /*
-** 	Remove unit from a container. It only updates linked list stuff
-**
-**	@param unit	Pointer to unit.
-*/
+ ** 	Remove unit from a container. It only updates linked list stuff
+ **
+ **	@param unit	Pointer to unit.
+ */
 global void RemoveUnitFromContainer(Unit* unit)
 {
     Unit* host;
@@ -668,15 +652,15 @@ global void RemoveUnitFromContainer(Unit* unit)
 }
 
 /*
-**	Remove unit from map.
-**
-**	Update selection.
-**	Update panels.
-**	Update map.
-**
-**	@param unit	Pointer to unit.
-**	@param host	Pointer to housing unit.
-*/
+ **	Remove unit from map.
+ **
+ **	Update selection.
+ **	Update panels.
+ **	Update map.
+ **
+ **	@param unit	Pointer to unit.
+ **	@param host	Pointer to housing unit.
+ */
 global void RemoveUnit(Unit* unit, Unit* host)
 {
     int h;
@@ -686,19 +670,19 @@ global void RemoveUnit(Unit* unit, Unit* host)
 
     if( unit->Removed && unit->Container ) {
 	MapUnmarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
-				,unit->Container->Y+unit->Container->Type->TileHeight/2
-				,unit->CurrentSightRange);
+		,unit->Container->Y+unit->Container->Type->TileHeight/2
+		,unit->CurrentSightRange);
     } else {
 	MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-				,unit->Y+unit->Type->TileHeight/2
-				,unit->CurrentSightRange);
+		,unit->Y+unit->Type->TileHeight/2
+		,unit->CurrentSightRange);
     }
     if( host ) {
 	unit->CurrentSightRange=host->CurrentSightRange;
 	MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
-			host->Y+host->Type->TileWidth/2,
-			unit->CurrentSightRange);
-    	AddUnitInContainer(unit,host);
+		host->Y+host->Type->TileWidth/2,
+		unit->CurrentSightRange);
+	AddUnitInContainer(unit,host);
     }
 
     if( unit->Removed ) {		// could happen!
@@ -708,7 +692,7 @@ global void RemoveUnit(Unit* unit, Unit* host)
     unit->Removed=1;
     //  Remove unit from the current selection
     if( unit->Selected ) {
-        if( NumSelected==1 ) {		//  Remove building cursor
+	if( NumSelected==1 ) {		//  Remove building cursor
 	    CancelBuildingMode();
 	}
 	UnSelectUnit(unit);
@@ -740,14 +724,14 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	    for( h=type->TileHeight; h--; ) {
 		for( w=type->TileWidth; w--; ) {
 		    TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags
-			    &=~MapFieldBuilding;
+			&=~MapFieldBuilding;
 		}
 	    }
 	} else if( !type->OilPatch ) {
 	    for( h=type->TileHeight; h--; ) {
 		for( w=type->TileWidth; w--; ) {
 		    TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags
-			    &=~MapFieldNoBuilding;
+			&=~MapFieldNoBuilding;
 		}
 	    }
 	}
@@ -756,8 +740,8 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	//	Update hierarchic pathfinder structures.
 	//
 	PfHierMapChangedCallback (unit->X, unit->Y,
-		    unit->X + unit->Type->TileWidth - 1,
-		    unit->Y + unit->Type->TileHeight - 1);
+		unit->X + unit->Type->TileWidth - 1,
+		unit->Y + unit->Type->TileHeight - 1);
 #endif
     } else {
 	unsigned flags;
@@ -786,7 +770,7 @@ global void RemoveUnit(Unit* unit, Unit* host)
     //
     if( type->Building ) {
 	PfHierMapChangedCallback(unit->X, unit->Y,
-	    unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
+		unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
     }
 #endif
 
@@ -796,18 +780,18 @@ global void RemoveUnit(Unit* unit, Unit* host)
     UnitCacheRemove(unit);
     // UnitCache uses Next, need to set next again
     unit->Next=host;
-     
+
     MustRedraw|=RedrawMinimap;
     CheckUnitToBeDrawn(unit);
 }
 
 /**
-**	Update informations for lost units.
-**
-**	@param unit	Pointer to unit.
-**
-**	@note Also called by ChangeUnitOwner
-*/
+ **	Update informations for lost units.
+ **
+ **	@param unit	Pointer to unit.
+ **
+ **	@note Also called by ChangeUnitOwner
+ */
 global void UnitLost(Unit* unit)
 {
     Unit* temp;
@@ -831,7 +815,7 @@ global void UnitLost(Unit* unit)
     //  Remove unit from its groups
     //
     if( unit->GroupId ) {
-        RemoveUnitFromGroups(unit);
+	RemoveUnitFromGroups(unit);
     }
 
     //
@@ -910,18 +894,14 @@ global void UnitLost(Unit* unit)
     //
     if( unit->Orders[0].Action == UnitActionResearch ) {
 	unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade
-		-Upgrades]=0;
+	    -Upgrades]=0;
     }
 
     DebugLevel3Fn("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
 
-    //
-    //	Destroy oil-platform, must re-make oil patch.
-    //
-    if( type->GivesOil && unit->Value>0 ) {
-	// NOTE: I wasn't sure the best UnitType/Player
-	// NOTE: This should really NOT be hardcoded?!
-	temp=MakeUnitAndPlace(unit->X,unit->Y,UnitTypeOilPatch,&Players[15]);
+    //	Destroy resource-platform, must re-make resource patch.
+    if( type->MustBuildOnTop && unit->Value>0 ) {
+	temp=MakeUnitAndPlace(unit->X,unit->Y,type->MustBuildOnTop,&Players[15]);
 	temp->Value=unit->Value;
     }
     DebugCheck( player->NumFoodUnits > UnitMax);
@@ -931,8 +911,8 @@ global void UnitLost(Unit* unit)
 }
 
 /**
-**	FIXME: Docu
-*/
+ **	FIXME: Docu
+ */
 global void UnitClearOrders(Unit *unit)
 {
     int i;
@@ -971,11 +951,11 @@ global void UnitClearOrders(Unit *unit)
 }
 
 /**
-**	Update for new unit. Food and income ...
-**
-**	@param unit	New unit pointer.
-**	@param upgrade	True unit was upgraded.
-*/
+ **	Update for new unit. Food and income ...
+ **
+ **	@param unit	New unit pointer.
+ **	@param upgrade	True unit was upgraded.
+ */
 global void UpdateForNewUnit(const Unit* unit,int upgrade)
 {
     const UnitType* type;
@@ -1010,14 +990,14 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
 }
 
 /**
-**	Find nearest point of unit.
-**
-**	@param unit	Pointer to unit.
-**	@param tx	X tile map postion.
-**	@param ty	Y tile map postion.
-**	@param dx	Out: nearest point X tile map postion to (tx,ty).
-**	@param dy	Out: nearest point Y tile map postion to (tx,ty).
-*/
+ **	Find nearest point of unit.
+ **
+ **	@param unit	Pointer to unit.
+ **	@param tx	X tile map postion.
+ **	@param ty	Y tile map postion.
+ **	@param dx	Out: nearest point X tile map postion to (tx,ty).
+ **	@param dy	Out: nearest point Y tile map postion to (tx,ty).
+ */
 global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 {
     int x;
@@ -1046,16 +1026,16 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 }
 
 /**
-**	Mark submarine seen by a submarine detector.
-**
-**	@param player	Player pointer that can see the submarine
-**	@param x	X map tile center position
-**	@param y	Y map tile center position
-**	@param r	Range around center
-**
-**	@note
-**		All units are marked as visible, not only submarines.
-*/
+ **	Mark submarine seen by a submarine detector.
+ **
+ **	@param player	Player pointer that can see the submarine
+ **	@param x	X map tile center position
+ **	@param y	Y map tile center position
+ **	@param r	Range around center
+ **
+ **	@note
+ **		All units are marked as visible, not only submarines.
+ */
 global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
 {
     Unit* table[UnitMax];
@@ -1071,14 +1051,14 @@ global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
 }
 
 /**
-**	Returns true, if unit is visible for this player on the map.
-**	An unit is visible, if any field could be seen.
-**
-**	@warning	This is only true for ::ThisPlayer.
-**
-**	@param unit	Unit to be checked.
-**	@return		True if visible, false otherwise.
-*/
+ **	Returns true, if unit is visible for this player on the map.
+ **	An unit is visible, if any field could be seen.
+ **
+ **	@warning	This is only true for ::ThisPlayer.
+ **
+ **	@param unit	Unit to be checked.
+ **	@return		True if visible, false otherwise.
+ */
 global int UnitVisibleOnMap(const Unit* unit)
 {
     int x;
@@ -1118,14 +1098,14 @@ global int UnitVisibleOnMap(const Unit* unit)
 }
 
 /**
-**	Returns true, if unit is visible for this player on the map.
-**	An unit is visible, if any field could be seen.
-**
-**	@warning	This is only true for ::ThisPlayer.
-**
-**	@param unit	Unit to be checked.
-**	@return		True if visible, false otherwise.
-*/
+ **	Returns true, if unit is visible for this player on the map.
+ **	An unit is visible, if any field could be seen.
+ **
+ **	@warning	This is only true for ::ThisPlayer.
+ **
+ **	@param unit	Unit to be checked.
+ **	@return		True if visible, false otherwise.
+ */
 global int BuildingVisibleOnMap(const Unit* unit)
 {
     int x;
@@ -1157,11 +1137,11 @@ global int BuildingVisibleOnMap(const Unit* unit)
 }
 
 /**
-**	FIXME: docu
-**
-**	@param x	x location to check if building is on, and mark as seen
-**	@param y	y location to check if building is on, and mark as seen
-*/
+ **	FIXME: docu
+ **
+ **	@param x	x location to check if building is on, and mark as seen
+ **	@param y	y location to check if building is on, and mark as seen
+ */
 global void UnitsMarkSeen(int x,int y)
 {
     int n;
@@ -1176,9 +1156,9 @@ global void UnitsMarkSeen(int x,int y)
 	    units[n-1]->SeenFrame = units[n-1]->Frame;
 	    units[n-1]->SeenType = units[n-1]->Type;
 	    units[n-1]->SeenState = (units[n-1]->Orders[0].Action==UnitActionBuilded) |
-		    ((units[n-1]->Orders[0].Action==UnitActionUpgradeTo) << 1);
+		((units[n-1]->Orders[0].Action==UnitActionUpgradeTo) << 1);
 	    if( units[n-1]->Orders[0].Action==UnitActionDie ) {
-		    units[n-1]->SeenState = 3;
+		units[n-1]->SeenState = 3;
 	    }
 	    units[n-1]->SeenConstructed = units[n-1]->Constructed;
 	    units[n-1]->SeenDestroyed = units[n-1]->Destroyed;
@@ -1188,10 +1168,10 @@ global void UnitsMarkSeen(int x,int y)
 }
 
 /**
-**	FIXME: docu
-**
-**	@param unit	pointer to the unit to check if seen
-*/
+ **	FIXME: docu
+ **
+ **	@param unit	pointer to the unit to check if seen
+ */
 global void UnitMarkSeen(Unit* unit)
 {
     int x;
@@ -1210,7 +1190,7 @@ global void UnitMarkSeen(Unit* unit)
 		unit->SeenFrame = unit->Frame;
 		unit->SeenType = unit->Type;
 		unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
-			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
+		    ((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
 		if( unit->Orders[0].Action==UnitActionDie ) {
 		    unit->SeenState = 3;
 		}
@@ -1224,11 +1204,11 @@ global void UnitMarkSeen(Unit* unit)
 }
 
 /**
-**	Returns true, if unit is known on the map. Special case for buildings.
-**
-**	@param unit	Unit to be checked.
-**	@return		True if known, false otherwise.
-*/
+ **	Returns true, if unit is known on the map. Special case for buildings.
+ **
+ **	@param unit	Unit to be checked.
+ **	@return		True if known, false otherwise.
+ */
 global int UnitKnownOnMap(const Unit* unit)
 {
     int x;
@@ -1279,12 +1259,12 @@ global int UnitKnownOnMap(const Unit* unit)
 }
 
 /**
-**	Returns true, if unit is visible in viewport.
-**
-**	@param vp	Viewport number.
-**	@param unit	Unit to be checked.
-**	@return		True if visible, false otherwise.
-*/
+ **	Returns true, if unit is visible in viewport.
+ **
+ **	@param vp	Viewport number.
+ **	@param unit	Unit to be checked.
+ **	@return		True if visible, false otherwise.
+ */
 global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
 {
     int x;
@@ -1305,8 +1285,8 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
     // FIXME: Need to be able to see enemy submarines seen by my shared vision
     //		partners
     if( ThisPlayer != unit->Player &&
-	!(unit->Player->SharedVision&(1<<ThisPlayer->Player) &&
-	ThisPlayer->SharedVision&(1<<unit->Player->Player)) ) {
+	    !(unit->Player->SharedVision&(1<<ThisPlayer->Player) &&
+		ThisPlayer->SharedVision&(1<<unit->Player->Player)) ) {
 	// Invisible by spell
 	if ( unit->Invisible ) {
 	    return 0;
@@ -1350,11 +1330,11 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
 }
 
 /**
-**	Returns true, if unit is visible on current map view (any viewport).
-**
-**	@param unit	Unit to be checked.
-**	@return		True if visible, false otherwise.
-*/
+ **	Returns true, if unit is visible on current map view (any viewport).
+ **
+ **	@param unit	Unit to be checked.
+ **	@return		True if visible, false otherwise.
+ */
 global int UnitVisibleOnScreen(const Unit* unit)
 {
     const Viewport* vp;
@@ -1369,16 +1349,16 @@ global int UnitVisibleOnScreen(const Unit* unit)
 }
 
 /**
-**      Get area of map tiles covered by unit, including its displacement.
-**
-**      @param unit     Unit to be checked and set.
-**	@param sx	Out: Top left X tile map postion.
-**	@param sy	Out: Top left Y tile map postion.
-**	@param ex	Out: Bottom right X tile map postion.
-**	@param ey	Out: Bottom right Y tile map postion.
-**
-**      @return		sx,sy,ex,ey defining area in Map
-*/
+ **      Get area of map tiles covered by unit, including its displacement.
+ **
+ **      @param unit     Unit to be checked and set.
+ **	@param sx	Out: Top left X tile map postion.
+ **	@param sy	Out: Top left Y tile map postion.
+ **	@param ex	Out: Bottom right X tile map postion.
+ **	@param ey	Out: Bottom right Y tile map postion.
+ **
+ **      @return		sx,sy,ex,ey defining area in Map
+ */
 global void GetUnitMapArea(const Unit* unit, int *sx, int *sy, int *ex, int *ey)
 {
     *sx = unit->X - (unit->IX < 0);
@@ -1389,11 +1369,11 @@ global void GetUnitMapArea(const Unit* unit, int *sx, int *sy, int *ex, int *ey)
 
 #ifdef NEW_DECODRAW
 /**
-**	Decoration redraw function that will redraw an unit (no building) for
-**	set clip rectangle by decoration mechanism.
-**
-**	@param data	Unit pointer to be drawn
-*/
+ **	Decoration redraw function that will redraw an unit (no building) for
+ **	set clip rectangle by decoration mechanism.
+ **
+ **	@param data	Unit pointer to be drawn
+ */
 local void DecoUnitDraw(void* data)
 {
     Unit* unit;
@@ -1406,11 +1386,11 @@ local void DecoUnitDraw(void* data)
 }
 
 /**
-**	Decoration redraw function that will redraw a building for
-**	set clip rectangle by decoration mechanism.
-**
-**	@param data	Unit pointer to be drawn
-*/
+ **	Decoration redraw function that will redraw a building for
+ **	set clip rectangle by decoration mechanism.
+ **
+ **	@param data	Unit pointer to be drawn
+ */
 local void DecoBuildingDraw(void* data)
 {
     Unit *unit;
@@ -1423,14 +1403,14 @@ local void DecoBuildingDraw(void* data)
 }
 
 /**
-**	Create decoration for any unit-type
-**
-**	@param u	an unit which is visible on screen
-**      @param x	x pixel position on screen of left-top
-**      @param y	y pixel position on screen of left-top
-**      @param w	width in pixels of area to be drawn from (x,y)
-**      @param h	height in pixels of area to be drawn from (x,y)
-*/
+ **	Create decoration for any unit-type
+ **
+ **	@param u	an unit which is visible on screen
+ **      @param x	x pixel position on screen of left-top
+ **      @param y	y pixel position on screen of left-top
+ **      @param w	width in pixels of area to be drawn from (x,y)
+ **      @param h	height in pixels of area to be drawn from (x,y)
+ */
 local void AddUnitDeco(Unit* u, int x, int y, int w, int h)
 {
     if (u->Type->Building) {
@@ -1444,11 +1424,11 @@ local void AddUnitDeco(Unit* u, int x, int y, int w, int h)
 #endif
 
 /**
-**      Check and sets if unit must be drawn on screen-map
-**
-**      @param unit     Unit to be checked.
-**      @return         True if map marked to be drawn, false otherwise.
-*/
+ **      Check and sets if unit must be drawn on screen-map
+ **
+ **      @param unit     Unit to be checked.
+ **      @return         True if map marked to be drawn, false otherwise.
+ */
 global int CheckUnitToBeDrawn(const Unit* unit)
 {
 #ifdef NEW_MAPDRAW
@@ -1505,7 +1485,7 @@ global int CheckUnitToBeDrawn(const Unit* unit)
 		DecorationMark(unit->deco);
 	    }
 	}
-        else {
+	else {
 	    AddUnitDeco((Unit *)unit, x, y, w, h);
 	}
 
@@ -1532,8 +1512,8 @@ global int CheckUnitToBeDrawn(const Unit* unit)
 #include "../pathfinder/pf_lowlevel.h"
 
 /**
-**	FIXME: Docu
-*/
+ **	FIXME: Docu
+ */
 global int UnitGetNextPathSegment(const Unit* unit, int *dx, int *dy)
 {
     int segment;
@@ -1556,8 +1536,8 @@ global int UnitGetNextPathSegment(const Unit* unit, int *dx, int *dy)
 #endif // } HIERARCHIC_PATHFINDER
 
 /**
-**	Do the runestone work each second.
-*/
+ **	Do the runestone work each second.
+ */
 global void DoRunestones(void)
 {
     Unit* units[UnitMax];
@@ -1573,10 +1553,10 @@ global void DoRunestones(void)
     for (i = 0; i < nstones; ++i) {
 	// Get all the units around the runestone
 	nunits = SelectUnits(stones[i]->X - stones[i]->Stats->SightRange,
-			     stones[i]->Y - stones[i]->Stats->SightRange,
-			     stones[i]->X + stones[i]->Stats->SightRange+1,
-			     stones[i]->Y + stones[i]->Stats->SightRange+1,
-			     units);
+		stones[i]->Y - stones[i]->Stats->SightRange,
+		stones[i]->X + stones[i]->Stats->SightRange+1,
+		stones[i]->Y + stones[i]->Stats->SightRange+1,
+		units);
 	// Runestone Mana and HP on units, 2 every time
 	for (j = 0; j < nunits; ++j) {
 	    if (units[j] == stones[i]) {
@@ -1585,7 +1565,7 @@ global void DoRunestones(void)
 
 	    // Restore HP in everything but buildings (even in other player's units)
 	    if (!units[j]->Type->Building && units[j]->Type->Organic && 
-			units[j]->HP != units[j]->Stats->HitPoints ) {
+		    units[j]->HP != units[j]->Stats->HitPoints ) {
 		tmp = units[j]->Stats->HitPoints - units[j]->HP;
 		if (tmp > 2) {
 		    tmp = 2;
@@ -1608,14 +1588,14 @@ global void DoRunestones(void)
 // FIXME: perhaps I should write a function UnitSelectable?
 
 /**
-**	Increment mana of all magic units. Called each second.
-**	Also clears the blink flag and handles submarines.
-**
-**	@note	we could build a table of all magic units reducing cpu use.
-**
-**	@todo FIXME: Split this into more functions, to make the use clearer
-**		or rename the function.
-*/
+ **	Increment mana of all magic units. Called each second.
+ **	Also clears the blink flag and handles submarines.
+ **
+ **	@note	we could build a table of all magic units reducing cpu use.
+ **
+ **	@todo FIXME: Split this into more functions, to make the use clearer
+ **		or rename the function.
+ */
 //FIXME: vladi: the doc says incrementing mana is done by 1 per second
 //       the spells effect can be decremented at the same time and this
 //       will reduse calls to this function to one time per second only!
@@ -1638,7 +1618,7 @@ global void UnitIncrementMana(void)
 
 	    // some frames delayed done my color cycling
 	    if( 0 ) {
-                CheckUnitToBeDrawn(unit);
+		CheckUnitToBeDrawn(unit);
 	    }
 	    if( unit->Selected ) {
 		MustRedraw|=RedrawInfoPanel;
@@ -1652,7 +1632,7 @@ global void UnitIncrementMana(void)
 	    DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL
 		    _C_ GameCycle);
 	    //if( !--unit->HP ) { FIXME: must reduce hp the last seconds of life
-		LetUnitDie(unit);
+	    LetUnitDie(unit);
 	    //}
 	    // FIXME: this can modify my table, some units are than skipped!
 	    continue;
@@ -1666,31 +1646,31 @@ global void UnitIncrementMana(void)
 	if ( unit->Bloodlust ) {
 	    unit->Bloodlust--;
 	    if( !flag && !unit->Bloodlust ) {
-                flag=CheckUnitToBeDrawn(unit);
+		flag=CheckUnitToBeDrawn(unit);
 	    }
 	}
 	if ( unit->Haste ) {
 	    unit->Haste--;
 	    if( !flag && !unit->Haste ) {
-                flag=CheckUnitToBeDrawn(unit);
+		flag=CheckUnitToBeDrawn(unit);
 	    }
 	}
 	if ( unit->Slow ) {
 	    unit->Slow--;
 	    if( !flag && !unit->Slow ) {
-                flag=CheckUnitToBeDrawn(unit);
+		flag=CheckUnitToBeDrawn(unit);
 	    }
 	}
 	if ( unit->Invisible ) {
 	    unit->Invisible--;
 	    if( !flag && !unit->Invisible ) {
-                flag=CheckUnitToBeDrawn(unit);
+		flag=CheckUnitToBeDrawn(unit);
 	    }
 	}
 	if ( unit->UnholyArmor ) {
 	    unit->UnholyArmor--;
 	    if( !flag && !unit->UnholyArmor ) {
-                flag=CheckUnitToBeDrawn(unit);
+		flag=CheckUnitToBeDrawn(unit);
 	    }
 	}
 	DebugLevel3Fn("%d:%d,%d,%d,%d,%d\n" _C_ UnitNumber(unit) _C_
@@ -1699,7 +1679,7 @@ global void UnitIncrementMana(void)
 
 	if (  unit->Type->Submarine ) {
 	    if( !flag && (unit->Visible&(1<<ThisPlayer->Player)) ) {
-                flag=CheckUnitToBeDrawn(unit);
+		flag=CheckUnitToBeDrawn(unit);
 	    }
 	    unit->Visible=0;
 	}
@@ -1715,19 +1695,19 @@ global void UnitIncrementMana(void)
 	if( unit->Type->CanSeeSubmarine && !unit->Removed &&
 		unit->Orders[0].Action!=UnitActionBuilded ) {
 	    MarkSubmarineSeen(unit->Player,unit->X+unit->Type->TileWidth/2,
-		unit->Y+unit->Type->TileHeight/2,unit->Stats->SightRange);
+		    unit->Y+unit->Type->TileHeight/2,unit->Stats->SightRange);
 	}
     }
 }
 
 /**
-**	Increment health of all regenerating units. Called each second.
-**
-**	@note:	We could build a table of all regenerating units reducing cpu
-**		use.
-**		Any idea how to handle this more general? It whould be nice
-**		to have more units that could regenerate.
-*/
+ **	Increment health of all regenerating units. Called each second.
+ **
+ **	@note:	We could build a table of all regenerating units reducing cpu
+ **		use.
+ **		Any idea how to handle this more general? It whould be nice
+ **		to have more units that could regenerate.
+ */
 global void UnitIncrementHealth(void)
 {
     Unit** table;
@@ -1756,7 +1736,7 @@ global void UnitIncrementHealth(void)
 
 	    // some frames delayed done my color cycling
 	    if( 0 ) {
-                CheckUnitToBeDrawn(unit);
+		CheckUnitToBeDrawn(unit);
 	    }
 	    if( unit->Selected ) {
 		MustRedraw|=RedrawInfoPanel;
@@ -1766,15 +1746,15 @@ global void UnitIncrementHealth(void)
 }
 
 /**
-**	Change the unit's owner
-**
-**	@param unit		Unit which should be consigned.
-**	@param newplayer	New owning player.
-**
-**	@todo	FIXME: I think here are some failures, if building is build
-**		what is with the unit inside? or a main hall with workers
-**		inside?
-*/
+ **	Change the unit's owner
+ **
+ **	@param unit		Unit which should be consigned.
+ **	@param newplayer	New owning player.
+ **
+ **	@todo	FIXME: I think here are some failures, if building is build
+ **		what is with the unit inside? or a main hall with workers
+ **		inside?
+ */
 global void ChangeUnitOwner(Unit* unit,Player* newplayer)
 {
     int i;
@@ -1782,21 +1762,16 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
     Player* oldplayer;
 
     oldplayer=unit->Player;
-   
+
     // This shouldn't happen
     if (oldplayer==newplayer) {
-        DebugLevel0Fn("Change the unit owner to the same player???\n");
-        return;
+	DebugLevel0Fn("Change the unit owner to the same player???\n");
+	return;
     }
-  
-    //
-    // Rescue all units in buildings/transporters.
-    //
-    printf("Rescue of a %s at 0x%X\n",unit->Type->Name,(unsigned)unit);
 
+    // Rescue all units in buildings/transporters.
     uins=unit->UnitInside;
     for( i=unit->InsideCount; i; --i,uins=uins->NextContained) {
-        printf("Chain rescue of a %s\n at 0x%X",Units[i]->Type->Name,(unsigned)Units[i]);
 	ChangeUnitOwner(uins,newplayer);
     }
 
@@ -1809,19 +1784,19 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
     //  Mainly to protect peasants who are building.
     //  FIXME: What's the point in this code? It just causes a crash when
     //  FIXME: an unit is moving (the unit stops when between map cells.)
-    
+
     /*for( i=0; i < MAX_ORDERS; i++) {
-        if (unit->Orders[i].Action==UnitActionAttack ||
-            unit->Orders[i].Action==UnitActionAttackGround) {
-               //Now see if it's an enemy..
-               //FIXME:Just Stops attacking at the moment
-               printf("Stopped attack for a/an %s,\n",unit->Type->Name);
-               unit->Orders[i].Action=UnitActionStill;
-               unit->SubAction=unit->State=0;
-               break;
-        }
+      if (unit->Orders[i].Action==UnitActionAttack ||
+      unit->Orders[i].Action==UnitActionAttackGround) {
+    //Now see if it's an enemy..
+    //FIXME:Just Stops attacking at the moment
+    printf("Stopped attack for a/an %s,\n",unit->Type->Name);
+    unit->Orders[i].Action=UnitActionStill;
+    unit->SubAction=unit->State=0;
+    break;
+    }
     }*/
-    
+
     //
     //	Now the new side!
     //
@@ -1840,29 +1815,29 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
     *unit->PlayerSlot=unit;
 
     unit->Player=newplayer;
-    
+
     if ( unit->Removed && unit->Container ) {
-        MapUnmarkSight(oldplayer,unit->Container->X+unit->Container->Type->TileWidth/2
-            ,unit->Container->Y+unit->Container->Type->TileHeight/2
-	    ,unit->CurrentSightRange);
-        MapMarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
-	    ,unit->Container->Y+unit->Container->Type->TileHeight/2
-            ,unit->CurrentSightRange);
+	MapUnmarkSight(oldplayer,unit->Container->X+unit->Container->Type->TileWidth/2
+		,unit->Container->Y+unit->Container->Type->TileHeight/2
+		,unit->CurrentSightRange);
+	MapMarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
+		,unit->Container->Y+unit->Container->Type->TileHeight/2
+		,unit->CurrentSightRange);
     } else {
-        MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
-            ,unit->Y+unit->Type->TileHeight/2
-	    ,unit->CurrentSightRange);
-        MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-	    ,unit->Y+unit->Type->TileHeight/2
-            ,unit->CurrentSightRange);
+	MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
+		,unit->Y+unit->Type->TileHeight/2
+		,unit->CurrentSightRange);
+	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+		,unit->Y+unit->Type->TileHeight/2
+		,unit->CurrentSightRange);
     }
 
     unit->Stats=&unit->Type->Stats[newplayer->Player];
     //
     //	Must change food/gold and other.
     //
-    if( unit->Type->GivesOil ) {
-	DebugLevel0Fn("oil platform transfer unsupported\n");
+    if( unit->Type->GivesResource ) {
+	DebugLevel0Fn("Resource transfer not supported\n");
     }
     if( !unit->Type->Building ) {
 	newplayer->NumFoodUnits+=unit->Type->Demand;
@@ -1878,11 +1853,11 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
 }
 
 /**
-**	Change the owner of all units of a player.
-**
-**	@param oldplayer	Old owning player.
-**	@param newplayer	New owning player.
-*/
+ **	Change the owner of all units of a player.
+ **
+ **	@param oldplayer	Old owning player.
+ **	@param newplayer	New owning player.
+ */
 local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
 {
     Unit* table[UnitMax];
@@ -1895,10 +1870,10 @@ local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
     memcpy(table,oldplayer->Units,n*sizeof(Unit*));
     for( i=0; i<n; i++ ) {
 	unit=table[i];
-        // Don't save the unit again(can happen when inside a town hall)
-        if (unit->Player==newplayer) {
-            continue;
-        }
+	// Don't save the unit again(can happen when inside a town hall)
+	if (unit->Player==newplayer) {
+	    continue;
+	}
 	ChangeUnitOwner(unit,newplayer);
 	unit->Blink=5;
 	unit->RescuedFrom=oldplayer;
@@ -1906,10 +1881,10 @@ local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
 }
 
 /**
-**	Rescue units.
-**
-**	Look through all rescueable players, if they could be rescued.
-*/
+ **	Rescue units.
+ **
+ **	Look through all rescueable players, if they could be rescued.
+ */
 global void RescueUnits(void)
 {
     Player* p;
@@ -1940,11 +1915,11 @@ global void RescueUnits(void)
 	    memcpy(table,p->Units,l*sizeof(Unit*));
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
-                // Do not rescue removed units. Units inside something are
-                // rescued by ChangeUnitOwner
-                if (unit->Removed) {
-                    continue;
-                }
+		// Do not rescue removed units. Units inside something are
+		// rescued by ChangeUnitOwner
+		if (unit->Removed) {
+		    continue;
+		}
 		DebugLevel3("Checking %d(%s)" _C_ UnitNumber(unit) _C_
 			unit->Type->Ident);
 #ifdef UNIT_ON_MAP
@@ -1955,35 +1930,31 @@ global void RescueUnits(void)
 		// NOTE: +1 right,bottom isn't inclusive :(
 		if( unit->Type->UnitType==UnitTypeLand ) {
 		    n=SelectUnits(
-			unit->X-1,unit->Y-1,
-			unit->X+unit->Type->TileWidth+1,
-			unit->Y+unit->Type->TileHeight+1,around);
+			    unit->X-1,unit->Y-1,
+			    unit->X+unit->Type->TileWidth+1,
+			    unit->Y+unit->Type->TileHeight+1,around);
 		} else {
 		    n=SelectUnits(
-			unit->X-2,unit->Y-2,
-			unit->X+unit->Type->TileWidth+2,
-			unit->Y+unit->Type->TileHeight+2,around);
+			    unit->X-2,unit->Y-2,
+			    unit->X+unit->Type->TileWidth+2,
+			    unit->Y+unit->Type->TileHeight+2,around);
 		}
 		DebugLevel3(" = %d\n" _C_ n);
 		//
 		//	Look if ally near the unit.
 		//
 		for( i=0; i<n; ++i ) {
-#if 0
-		    if( around[i]->Type->CanAttack &&
-			    around[i]->Player->Type==PlayerPerson ) {
-#endif
 		    if( around[i]->Type->CanAttack &&
 			    IsAllied(unit->Player,around[i]) ) {
-        		//
+			//
 			//	City center converts complete race
 			//	NOTE: I use a trick here, centers could
 			//		store gold. FIXME!!!
 			if( unit->Type->CanStore[GoldCost] ) {
 			    ChangePlayerOwner(p,around[i]->Player);
-                            break;
+			    break;
 			}
-                        unit->RescuedFrom=unit->Player;
+			unit->RescuedFrom=unit->Player;
 			ChangeUnitOwner(unit,around[i]->Player);
 			unit->Blink=5;
 			PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound
@@ -1997,16 +1968,16 @@ global void RescueUnits(void)
 }
 
 /*----------------------------------------------------------------------------
---	Unit headings
-----------------------------------------------------------------------------*/
+  --	Unit headings
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Fast arc tangent function.
-**
-**	@param val	atan argument
-**
-**	@return		atan(val)
-*/
+ **	Fast arc tangent function.
+ **
+ **	@param val	atan argument
+ **
+ **	@return		atan(val)
+ */
 local int myatan(int val)
 {
     static int init;
@@ -2026,13 +1997,13 @@ local int myatan(int val)
 }
 
 /**
-**	Convert direction to heading.
-**
-**	@param delta_x	Delta X.
-**	@param delta_y	Delta Y.
-**
-**	@return		Angle (0..255)
-*/
+ **	Convert direction to heading.
+ **
+ **	@param delta_x	Delta X.
+ **	@param delta_y	Delta Y.
+ **
+ **	@return		Angle (0..255)
+ */
 global int DirectionToHeading(int delta_x,int delta_y)
 {
     //
@@ -2042,7 +2013,7 @@ global int DirectionToHeading(int delta_x,int delta_y)
 	if( delta_y<0 ) {	// Quadrant 1?
 	    return myatan((delta_x*64)/-delta_y);
 	}
-				// Quadrant 2?
+	// Quadrant 2?
 	return myatan((delta_y*64)/delta_x)+64;
     }
     if( delta_y>0 ) {		// Quadrant 3?
@@ -2055,8 +2026,8 @@ global int DirectionToHeading(int delta_x,int delta_y)
 }
 
 /**
-**	Update sprite frame for new heading.
-*/
+ **	Update sprite frame for new heading.
+ */
 global void UnitUpdateHeading(Unit* unit)
 {
     int dir;
@@ -2080,12 +2051,12 @@ global void UnitUpdateHeading(Unit* unit)
 }
 
 /**
-**	Change unit heading/frame from delta direction x,y.
-*
-**	@param unit	Unit for new direction looking.
-**	@param dx	X map tile delta direction.
-**	@param dy	Y map tile delta direction.
-*/
+ **	Change unit heading/frame from delta direction x,y.
+ *
+ **	@param unit	Unit for new direction looking.
+ **	@param dx	X map tile delta direction.
+ **	@param dy	Y map tile delta direction.
+ */
 global void UnitHeadingFromDeltaXY(Unit* unit,int dx,int dy)
 {
     unit->Direction=DirectionToHeading(dx,dy);
@@ -2093,17 +2064,17 @@ global void UnitHeadingFromDeltaXY(Unit* unit,int dx,int dy)
 }
 
 /*----------------------------------------------------------------------------
---	Drop out units
-----------------------------------------------------------------------------*/
+  --	Drop out units
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Reappear unit on map.
-**
-**	@param unit	Unit to drop out.
-**	@param heading	Direction in which the unit should appear.
-**	@param addx	Tile size in x.
-**	@param addy	Tile size in y.
-*/
+ **	Reappear unit on map.
+ **
+ **	@param unit	Unit to drop out.
+ **	@param heading	Direction in which the unit should appear.
+ **	@param addx	Tile size in x.
+ **	@param addy	Tile size in y.
+ */
 global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
 {
     int x;
@@ -2203,14 +2174,14 @@ found:
 }
 
 /**
-**	Reappear unit on map nearest to x,y.
-**
-**	@param unit	Unit to drop out.
-**	@param gx	Goal X map tile position.
-**	@param gy	Goal Y map tile position.
-**	@param addx	Tile size in x.
-**	@param addy	Tile size in y.
-*/
+ **	Reappear unit on map nearest to x,y.
+ **
+ **	@param unit	Unit to drop out.
+ **	@param gx	Goal X map tile position.
+ **	@param gy	Goal Y map tile position.
+ **	@param addx	Tile size in x.
+ **	@param addy	Tile size in y.
+ */
 global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 {
     int x;
@@ -2301,10 +2272,10 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 }
 
 /**
-**	Drop out all units inside unit.
-**
-**	@param source	All units inside source are dropped out.
-*/
+ **	Drop out all units inside unit.
+ **
+ **	@param source	All units inside source are dropped out.
+ */
 global void DropOutAll(const Unit* source)
 {
     Unit* unit;
@@ -2323,19 +2294,19 @@ global void DropOutAll(const Unit* source)
 }
 
 /*----------------------------------------------------------------------------
---	Building units
-----------------------------------------------------------------------------*/
+  --	Building units
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Can build unit here.
-**		Hall to near to goldmine.
-**		Refinery or shipyard to near to oil patch.
-**
-**	@param type	unit-type to be checked.
-**	@param x	Map X position.
-**	@param y	Map Y position.
-**	@return		True if could build here, otherwise false.
-*/
+ **		Can build unit here.
+ **		Hall to near to goldmine.
+ **		Refinery or shipyard to near to oil patch.
+ **
+ **	@param type	unit-type to be checked.
+ **	@param x	Map X position.
+ **	@param y	Map Y position.
+ **	@return		True if could build here, otherwise false.
+ */
 global int CanBuildHere(const UnitType* type,int x,int y)
 {
     Unit* table[UnitMax];
@@ -2344,6 +2315,10 @@ global int CanBuildHere(const UnitType* type,int x,int y)
     Unit* unit;
     int dx;
     int dy;
+    int w;
+    int h;
+    int resource;
+    int found;
 
     //
     //	Can't build outside the map
@@ -2356,18 +2331,15 @@ global int CanBuildHere(const UnitType* type,int x,int y)
     }
 
     if( EditorRunning ) {
-	if( type->OilPatch || type->GivesOil ) {
+	if( type->GivesResource==OilCost ) {
 	    // Oil patches and platforms can only be placed on even tiles
 	    if( !(x&1 && y&1) ) {
 		return 0;
 	    }
-	    // Don't allow oil patches on oil patches
-	    if( type->OilPatch ) {
-		n=UnitCacheSelect(x,y,x+type->TileWidth,y+type->TileHeight,table);
-		for( i=0; i<n; ++i ) {
-		    if( table[i]->Type->OilPatch ) {
-			return 0;
-		    }
+	    n=UnitCacheSelect(x,y,x+type->TileWidth,y+type->TileHeight,table);
+	    for( i=0; i<n; ++i ) {
+		if( table[i]->Type->GivesResource==OilCost ) {
+		    return 0;
 		}
 	    }
 	} else if( type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval ) {
@@ -2378,17 +2350,33 @@ global int CanBuildHere(const UnitType* type,int x,int y)
 	}
     }
 
-    if( type->CanStore[GoldCost] ) {
-	//
-	//	Gold deposit can't be build too near to gold-mine.
-	//
-	// FIXME: use unit-cache here.
-        int i;
+    // Must be checked before oil!
+    if( type->ShoreBuilding ) {
+	found=0;
 
-	for( i=0; i<NumUnits; i++ ) {
-	    unit=Units[i];
-	    if( unit->Type->GoldMine ) {
-		DebugLevel3("Check goldmine %d,%d\n" _C_ unit->X _C_ unit->Y);
+	DebugLevel3("Shore building\n");
+	// Need atleast one coast tile
+	for( h=type->TileHeight; h--; ) {
+	    for( w=type->TileWidth; w--; ) {
+		if( TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags
+			&MapFieldCoastAllowed ) {
+		    h=w=0;
+		    found=1;
+		}
+	    }
+	}
+	if ( !found ) {
+	    return 0;
+	}
+    }
+    
+    //	resource deposit can't be build too near to resource
+    // FIXME: use unit-cache here.
+    for( i=0; i<NumUnits; i++ ) {
+	unit=Units[i];
+	for (resource=1;resource<MaxCosts;resource++) {
+	    if (( type->CanStore[resource] && unit->Type->GivesResource==resource )||
+		    ( unit->Type->CanStore[resource] && type->GivesResource==resource )) {
 		if( unit->X<x ) {
 		    dx=x-unit->X-unit->Type->TileWidth;
 		} else {
@@ -2400,71 +2388,21 @@ global int CanBuildHere(const UnitType* type,int x,int y)
 		    dy=unit->Y-y-type->TileHeight;
 		}
 		DebugLevel3("Distance %d,%d\n" _C_ dx _C_ dy);
-		if( dx<GOLDMINE_DISTANCE && dy<GOLDMINE_DISTANCE ) {
+		if( dx<RESOURCE_DISTANCE && dy<RESOURCE_DISTANCE ) {
 		    return 0;
 		}
 	    }
 	}
-	return 1;
     }
 
-    // Must be checked before oil!
-    if( type->ShoreBuilding ) {
-	int h;
-	int w;
-
-	DebugLevel3("Shore building\n");
-	// Need atleast one coast tile
-	for( h=type->TileHeight; h--; ) {
-	    for( w=type->TileWidth; w--; ) {
-		if( TheMap.Fields[x+w+(y+h)*TheMap.Width].Flags
-			    &MapFieldCoastAllowed ) {
-		    goto next;
-		}
-	    }
-	}
-	return 0;
-    }
-
-next:
-    if( type->CanStore[OilCost] ) {
-	//
-	//	Oil deposit can't be build too near to oil-patch or platform.
-	//
-	// FIXME: use unit-cache here.
-	int i;
-
-	for( i=0; i<NumUnits; i++ ) {
-	    unit=Units[i];
-	    if( unit->Type->OilPatch || unit->Type->GivesOil ) {
-	      DebugLevel3("Check oilpatch %d,%d\n"
-			  _C_ unit->X _C_ unit->Y);
-	      if( unit->X<x ) {
-		dx=x-unit->X-unit->Type->TileWidth;
-	      } else {
-		dx=unit->X-x-type->TileWidth;
-	      }
-	      if( unit->Y<y ) {
-		dy=y-unit->Y-unit->Type->TileHeight;
-	      } else {
-		dy=unit->Y-y-type->TileHeight;
-	      }
-	      DebugLevel3("Distance %d,%d\n" _C_ dx _C_ dy);
-	      if( dx<OILPATCH_DISTANCE && dy<OILPATCH_DISTANCE ) {
-		return 0;
-	      }
-	    }
-	}
-    }
-
-    if( type->GivesOil ) {
-	//
-	//	Oil platform could only be build on oil-patch.
-	//
-	// FIXME: Can I use here OilPatchOnMap?
+    if( type->MustBuildOnTop ) {
+	// Resource platform could only be build on resource patch.
 	n=UnitCacheSelect(x,y,x+1,y+1,table);
 	for( i=0; i<n; ++i ) {
-	    if( !table[i]->Type->OilPatch ) {
+	    if( table[i]->Type!=type->MustBuildOnTop ) {
+		continue;
+	    }
+	    if( table[i]->Orders[0].Action==UnitActionBuilded ) {
 		continue;
 	    }
 	    if( table[i]->X==x && table[i]->Y==y ) {
@@ -2479,8 +2417,8 @@ next:
 }
 
 /**
-**	Can build on this point.
-*/
+ **	Can build on this point.
+ */
 global int CanBuildOn(int x,int y,int mask)
 {
     if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
@@ -2490,22 +2428,27 @@ global int CanBuildOn(int x,int y,int mask)
 }
 
 /**
-**	Can build unit-type on this point.
-**
-**	@param unit	Worker that want to build the building or NULL.
-**	@param type	Building unit-type.
-**	@param x	X tile map position.
-**	@param y	Y tile map position.
-**	@return		True if the building could be build..
-**
-**	@todo can't handle building units !1x1, needs a rewrite.
-*/
+ **	Can build unit-type on this point.
+ **
+ **	@param unit	Worker that want to build the building or NULL.
+ **	@param type	Building unit-type.
+ **	@param x	X tile map position.
+ **	@param y	Y tile map position.
+ **	@return		True if the building could be build..
+ **
+ **	@todo can't handle building units !1x1, needs a rewrite.
+ */
 global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 {
     int w;
     int h;
     int j;
     int mask;
+
+    // Terrain Flags don't matter.
+    if ( type->MustBuildOnTop ) {
+	return CanBuildHere(type,x,y);
+    }
 
     //
     //	Remove unit that is building!
@@ -2522,44 +2465,44 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
     // FIXME: Should be moved into unittype structure, and allow more types.
     if( type->ShoreBuilding ) {
 	mask=MapFieldLandUnit
-		| MapFieldSeaUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldWall
-		| MapFieldRocks
-		| MapFieldForest	// wall,rock,forest not 100% clear?
-		| MapFieldLandAllowed	// can't build on this
-		//| MapFieldUnpassable	// FIXME: I think shouldn't be used
-		| MapFieldNoBuilding;
+	    | MapFieldSeaUnit
+	    | MapFieldBuilding	// already occuppied
+	    | MapFieldWall
+	    | MapFieldRocks
+	    | MapFieldForest	// wall,rock,forest not 100% clear?
+	    | MapFieldLandAllowed	// can't build on this
+	    //| MapFieldUnpassable	// FIXME: I think shouldn't be used
+	    | MapFieldNoBuilding;
     } else if( type->Building ) {
 	switch( type->UnitType ) {
-	case UnitTypeLand:
-	    mask=MapFieldLandUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldWall
-		| MapFieldRocks
-		| MapFieldForest	// wall,rock,forest not 100% clear?
-		| MapFieldCoastAllowed
-		| MapFieldWaterAllowed	// can't build on this
-		| MapFieldUnpassable	// FIXME: I think shouldn't be used
-		| MapFieldNoBuilding;
-	    break;
-	case UnitTypeNaval:
-	    mask=MapFieldSeaUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldCoastAllowed
-		| MapFieldLandAllowed	// can't build on this
-		| MapFieldUnpassable	// FIXME: I think shouldn't be used
-		| MapFieldNoBuilding;
-	    break;
-	case UnitTypeFly:
-	    mask=MapFieldAirUnit;	// already occuppied
-	    break;
-	default:
-	    DebugLevel1Fn("Were moves this unit?\n");
-	    if( unit ) {
-		TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
-	    }
-	    return 0;
+	    case UnitTypeLand:
+		mask=MapFieldLandUnit
+		    | MapFieldBuilding	// already occuppied
+		    | MapFieldWall
+		    | MapFieldRocks
+		    | MapFieldForest	// wall,rock,forest not 100% clear?
+		    | MapFieldCoastAllowed
+		    | MapFieldWaterAllowed	// can't build on this
+		    | MapFieldUnpassable	// FIXME: I think shouldn't be used
+		    | MapFieldNoBuilding;
+		break;
+	    case UnitTypeNaval:
+		mask=MapFieldSeaUnit
+		    | MapFieldBuilding	// already occuppied
+		    | MapFieldCoastAllowed
+		    | MapFieldLandAllowed	// can't build on this
+		    | MapFieldUnpassable	// FIXME: I think shouldn't be used
+		    | MapFieldNoBuilding;
+		break;
+	    case UnitTypeFly:
+		mask=MapFieldAirUnit;	// already occuppied
+		break;
+	    default:
+		DebugLevel1Fn("Were moves this unit?\n");
+		if( unit ) {
+		    TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+		}
+		return 0;
 	}
     } else switch( type->UnitType ) {
 	case UnitTypeLand:
@@ -2616,18 +2559,18 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 }
 
 /*----------------------------------------------------------------------------
---	Finding units
-----------------------------------------------------------------------------*/
+  --	Finding units
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Find the nearest gold mine for unit from x,y.
-**
-**	@param unit	Pointer for source unit.
-**	@param x	X tile position to start.
-**	@param y	Y tile position to start.
-**
-**	@return		Pointer to the nearest gold mine.
-*/
+ **	Find the nearest gold mine for unit from x,y.
+ **
+ **	@param unit	Pointer for source unit.
+ **	@param x	X tile position to start.
+ **	@param y	Y tile position to start.
+ **
+ **	@return		Pointer to the nearest gold mine.
+ */
 global Unit* FindGoldMine(const Unit* unit,int x,int y)
 {
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
@@ -2802,14 +2745,14 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
 
 #if 0
 /**
-**	Find wood in sight range.
-**
-**	@param unit	Unit that needs wood.
-**	@param px	OUT: Map X position of wood.
-**	@param py	OUT: Map Y position of wood.
-**
-**	@return		True if wood was found.
-*/
+ **	Find wood in sight range.
+ **
+ **	@param unit	Unit that needs wood.
+ **	@param px	OUT: Map X position of wood.
+ **	@param py	OUT: Map Y position of wood.
+ **
+ **	@return		True if wood was found.
+ */
 global int FindWoodInSight(Unit* unit,int* px,int* py)
 {
     int x;
@@ -2913,14 +2856,14 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 #else
 
 /**
-**	Find wood in sight range.
-**
-**	@param unit	Unit that needs wood.
-**	@param px	OUT: Map X position of wood.
-**	@param py	OUT: Map Y position of wood.
-**
-**	@return		True if wood was found.
-*/
+ **	Find wood in sight range.
+ **
+ **	@param unit	Unit that needs wood.
+ **	@param px	OUT: Map X position of wood.
+ **	@param py	OUT: Map Y position of wood.
+ **
+ **	@return		True if wood was found.
+ */
 global int FindWoodInSight(const Unit* unit,int* px,int* py)
 {
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
@@ -2954,7 +2897,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     desty=y=unit->Y;
     size=TheMap.Width*TheMap.Height/4;
     points=malloc(size*sizeof(*points));
-	
+
     //
     //	Find the nearest wood depot
     //
@@ -3098,14 +3041,14 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 #endif
 
 /**
-**	Find oil platform.
-**
-**	@param player	A deposit owning this player
-**	@param x	Nearest to X position.
-**	@param y	Nearest to Y position.
-**
-**	@return		NoUnitP or oil platform unit
-*/
+ **	Find oil platform.
+ **
+ **	@param player	A deposit owning this player
+ **	@param x	Nearest to X position.
+ **	@param y	Nearest to Y position.
+ **
+ **	@return		NoUnitP or oil platform unit
+ */
 global Unit* FindOilPlatform(const Player* player,int x,int y)
 {
     Unit* unit;
@@ -3131,7 +3074,7 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 	    continue;
 	}
 	// Want platform
-	if( unit->Type->GivesOil ) {
+	if( unit->Type->GivesResource==OilCost ) {
 	    d=MapDistanceToUnit(x,y,unit);
 	    if( d<best_d ) {
 		best_d=d;
@@ -3141,25 +3084,25 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
     }
 
     DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
-                               best?best->X:-1 _C_ best?best->Y:-1);
+	    best?best->X:-1 _C_ best?best->Y:-1);
     /*	Oil platforms are our own, they should be known
-    if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
+	if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
 	return NoUnitP;
-    }
-    */
+	}
+	*/
     return best;
 }
 
 /**
-**	Find deposit. This will find a deposit for a resource 
-**
-**	@param player   The player the deposit must belong to.
-**	@param x	Nearest to X position.
-**	@param y	Nearest to Y position.
-**	@param resource The resource oyu need the deposit to hold.
-**
-**	@return		NoUnitP or oil deposit unit
-*/
+ **	Find deposit. This will find a deposit for a resource 
+ **
+ **	@param player   The player the deposit must belong to.
+ **	@param x	Nearest to X position.
+ **	@param y	Nearest to Y position.
+ **	@param resource The resource oyu need the deposit to hold.
+ **
+ **	@return		NoUnitP or oil deposit unit
+ */
 global Unit* FindDeposit(const Player* player,int x,int y,int resource)
 {
     Unit* unit;
@@ -3196,18 +3139,18 @@ global Unit* FindDeposit(const Player* player,int x,int y,int resource)
     }
 
     DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
-                               best?best->X:-1 _C_ best?best->Y:-1);
+	    best?best->X:-1 _C_ best?best->Y:-1);
     return best;
 }
 
 /**
-**	Find the next idle worker
-**
-**	@param player	Player's units to search through
-**	@param last	Previous idle worker selected
-**
-**	@return		NoUnitP or next idle worker
-*/
+ **	Find the next idle worker
+ **
+ **	@param player	Player's units to search through
+ **	@param last	Previous idle worker selected
+ **
+ **	@return		NoUnitP or next idle worker
+ */
 global Unit* FindIdleWorker(const Player* player,const Unit* last)
 {
     Unit* unit;
@@ -3249,26 +3192,26 @@ global Unit* FindIdleWorker(const Player* player,const Unit* last)
 }
 
 /*----------------------------------------------------------------------------
---	Select units
-----------------------------------------------------------------------------*/
+  --	Select units
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Unit on map screen.
-**
-**	Select units on screen. (x,y are in pixels relative to map 0,0).
-**
-**	More units on same position.
-**		Cycle through units. ounit is the old one.
-**		First take highest unit.
-**
-**	FIXME: If no unit, we could select near units?
-**
-**	@param ounit	Old selected unit.
-**	@param x	X pixel position.
-**	@param y	Y pixel position.
-**
-**	@return		An unit on X,Y position.
-*/
+ **	Unit on map screen.
+ **
+ **	Select units on screen. (x,y are in pixels relative to map 0,0).
+ **
+ **	More units on same position.
+ **		Cycle through units. ounit is the old one.
+ **		First take highest unit.
+ **
+ **	FIXME: If no unit, we could select near units?
+ **
+ **	@param ounit	Old selected unit.
+ **	@param x	X pixel position.
+ **	@param y	Y pixel position.
+ **
+ **	@return		An unit on X,Y position.
+ */
 global Unit* UnitOnScreen(Unit* ounit,int x,int y)
 {
     Unit** table;
@@ -3335,10 +3278,10 @@ global Unit* UnitOnScreen(Unit* ounit,int x,int y)
 }
 
 /**
-**	Let an unit die.
-**
-**	@param unit	Unit to be destroyed.
-*/
+ **	Let an unit die.
+ **
+ **	@param unit	Unit to be destroyed.
+ */
 global void LetUnitDie(Unit* unit)
 {
     const UnitType* type;
@@ -3349,10 +3292,8 @@ global void LetUnitDie(Unit* unit)
 
     type=unit->Type;
 
-    //
-    //	Oil patch or removed units,  just remove.
-    //
-    if( type->OilPatch || unit->Removed ) {
+    //	removed units,  just remove.
+    if( unit->Removed ) {
 	RemoveUnit(unit,NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
@@ -3368,9 +3309,9 @@ global void LetUnitDie(Unit* unit)
     if( type->ExplodeWhenKilled ) {
 	// FIXME: make it configurable?
 	MakeMissile(MissileTypeExplosion
-	    ,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
-	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
-	    ,0,0);
+		,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
+		,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
+		,0,0);
 	RemoveUnit(unit,NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
@@ -3383,20 +3324,20 @@ global void LetUnitDie(Unit* unit)
     //
     if( type->Building ) {
 	MakeMissile(MissileTypeByIdent("missile-explosion")
-	    ,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
-	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
-	    ,0,0);
+		,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
+		,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
+		,0,0);
 
 	//
 	//	Building with units inside?
 	//
 	//
-	//	During oil platform build, the worker holds the oil value,
+	//	During resource build, the worker holds the resource amount,
 	//	but if canceling building the platform, the worker is already
 	//	outside.
-	if( type->GivesOil
-		    && unit->Orders[0].Action==UnitActionBuilded
-		    && unit->Data.Builded.Worker ) {
+	if( type->GivesResource
+		&& unit->Orders[0].Action==UnitActionBuilded
+		&& unit->Data.Builded.Worker ) {
 	    // Restore value for oil-patch
 	    unit->Value=unit->Data.Builded.Worker->Value;
 	}
@@ -3445,7 +3386,7 @@ global void LetUnitDie(Unit* unit)
 
     // FIXME: units in transporters should die without corpes...
     if( unit->Type->Transporter ) { // Transporters loose their units
-        //FIXME: vladi: it could be usefull if transport is near land
+	//FIXME: vladi: it could be usefull if transport is near land
 	//       to unload instead of destroying all units in it... ?
 	DestroyAllInside(unit);
     }
@@ -3485,36 +3426,36 @@ global void LetUnitDie(Unit* unit)
 }
 
 /**
-**	Destroy all units inside unit.
-*/
+ **	Destroy all units inside unit.
+ */
 global void DestroyAllInside(Unit* source)
 {
     Unit* unit;
     int i;
 
-    // FIXME: n0b0dy: No corpses, is that corrent behaviour?
+    // FIXME: n0b0dy: No corpses, is that correct behaviour?
     unit=source->UnitInside;
     for( i=source->InsideCount; i; --i,unit=unit->NextContained ) {
-    	RemoveUnit(unit,NULL);
-    	UnitLost(unit);
+	RemoveUnit(unit,NULL);
+	UnitLost(unit);
 	UnitClearOrders(unit);
 	ReleaseUnit(unit);
     }
-    
+
 }
 
 
 /*----------------------------------------------------------------------------
---	Unit AI
-----------------------------------------------------------------------------*/
+  --	Unit AI
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Unit is hit by missile or other damage.
-**
-**	@param attacker	Unit that attacks.
-**	@param target	Unit that is hit.
-**	@param damage	How many damage to take.
-*/
+ **	Unit is hit by missile or other damage.
+ **
+ **	@param attacker	Unit that attacks.
+ **	@param target	Unit that is hit.
+ **	@param damage	How many damage to take.
+ */
 global void HitUnit(Unit* attacker,Unit* target,int damage)
 {
     UnitType* type;
@@ -3562,7 +3503,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    if( LastCycle<GameCycle ) {
 		if( LastCycle+CYCLES_PER_SECOND*120<GameCycle ||
 			target->X<LastX-14 || target->X>LastX+14
-			    || target->Y<LastY-14 || target->Y>LastY+14  ) {
+			|| target->Y<LastY-14 || target->Y>LastY+14  ) {
 		    LastCycle=GameCycle+CYCLES_PER_SECOND*2;
 		    LastX=target->X;
 		    LastY=target->Y;
@@ -3617,11 +3558,11 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 
     if( UnitVisibleOnMap(target) || ReplayRevealMap ) {
 	MakeLocalMissile(MissileTypeHit,
-	    target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2,
-	    target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2,
-	    target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2+3,
-	    target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2
-		    -MissileTypeHit->Range)->Damage=-damage;
+		target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2,
+		target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2,
+		target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2+3,
+		target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2
+		-MissileTypeHit->Range)->Damage=-damage;
     }
 
 #if 0
@@ -3650,7 +3591,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    missile=MakeMissile(MissileTypeSmallFire
 		    ,target->X*TileSizeX+(type->TileWidth*TileSizeX)/2
 		    ,target->Y*TileSizeY+(type->TileHeight*TileSizeY)/2
-			    -TileSizeY
+		    -TileSizeY
 		    ,0,0);
 	    missile->SourceUnit=target;
 	    target->Burning=1;
@@ -3659,7 +3600,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    missile=MakeMissile(MissileTypeBigFire
 		    ,target->X*TileSizeX+(type->TileWidth*TileSizeX)/2
 		    ,target->Y*TileSizeY+(type->TileHeight*TileSizeY)/2
-			    -TileSizeY
+		    -TileSizeY
 		    ,0,0);
 	    missile->SourceUnit=target;
 	    target->Burning=1;
@@ -3706,35 +3647,35 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 }
 
 /*----------------------------------------------------------------------------
---	Conflicts
-----------------------------------------------------------------------------*/
+  --	Conflicts
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Returns the map distance between two points.
-**
-**	@param x1	X map tile position.
-**	@param y1	Y map tile position.
-**	@param x2	X map tile position.
-**	@param y2	Y map tile position.
-**
-**	@return		The distance between in tiles.
-*/
+ **	Returns the map distance between two points.
+ **
+ **	@param x1	X map tile position.
+ **	@param y1	Y map tile position.
+ **	@param x2	X map tile position.
+ **	@param y2	Y map tile position.
+ **
+ **	@return		The distance between in tiles.
+ */
 global int MapDistance(int x1,int y1,int x2,int y2)
 {
     return max(abs(x1-x2),abs(y1-y2));
 }
 
 /**
-**	Returns the map distance between two points with unit type.
-**
-**	@param x1	X map tile position.
-**	@param y1	Y map tile position.
-**	@param type	Unit type to take into account.
-**	@param x2	X map tile position.
-**	@param y2	Y map tile position.
-**
-**	@return		The distance between in tiles.
-*/
+ **	Returns the map distance between two points with unit type.
+ **
+ **	@param x1	X map tile position.
+ **	@param y1	Y map tile position.
+ **	@param type	Unit type to take into account.
+ **	@param x2	X map tile position.
+ **	@param y2	Y map tile position.
+ **
+ **	@return		The distance between in tiles.
+ */
 global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
 {
     int dx;
@@ -3765,27 +3706,27 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
 }
 
 /**
-**	Returns the map distance to unit.
-**
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
-**	@param dest	Distance to this unit.
-**
-**	@return		The distance between in tiles.
-*/
+ **	Returns the map distance to unit.
+ **
+ **	@param x	X map tile position.
+ **	@param y	Y map tile position.
+ **	@param dest	Distance to this unit.
+ **
+ **	@return		The distance between in tiles.
+ */
 global int MapDistanceToUnit(int x,int y,const Unit* dest)
 {
     return MapDistanceToType(x,y,dest->Type,dest->X,dest->Y);
 }
 
 /**
-**	Returns the map distance between two units.
-**
-**	@param src	Distance from this unit.
-**	@param dst	Distance  to  this unit.
-**
-**	@return		The distance between in tiles.
-*/
+ **	Returns the map distance between two units.
+ **
+ **	@param src	Distance from this unit.
+ **	@param dst	Distance  to  this unit.
+ **
+ **	@return		The distance between in tiles.
+ */
 global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 {
     int dx;
@@ -3825,14 +3766,14 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 }
 
 /**
-**	Compute the distance from the view point to a given point.
-**
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
-**
-**	@todo
-**		FIXME: is it the correct place to put this function in?
-*/
+ **	Compute the distance from the view point to a given point.
+ **
+ **	@param x	X map tile position.
+ **	@param y	Y map tile position.
+ **
+ **	@todo
+ **		FIXME: is it the correct place to put this function in?
+ */
 global int ViewPointDistance(int x, int y)
 {
     const Viewport *vp;
@@ -3842,17 +3783,17 @@ global int ViewPointDistance(int x, int y)
 
     // then use MapDistance
     return MapDistance(vp->MapX + vp->MapWidth / 2,
-	vp->MapY + vp->MapHeight / 2, x, y);
+	    vp->MapY + vp->MapHeight / 2, x, y);
 }
 
 /**
-**	Compute the distance from the view point to a given unit.
-**
-**	@param dest	Distance to this unit.
-**
-**	@todo
-**		FIXME: is it the correct place to put this function in?
-*/
+ **	Compute the distance from the view point to a given unit.
+ **
+ **	@param dest	Distance to this unit.
+ **
+ **	@todo
+ **		FIXME: is it the correct place to put this function in?
+ */
 global int ViewPointDistanceToUnit(const Unit* dest)
 {
     const Viewport* vp;
@@ -3865,52 +3806,52 @@ global int ViewPointDistanceToUnit(const Unit* dest)
 }
 
 /**
-**	Check if unit is an enemy.
-**
-**	@param player	The source player.
-**	@param dest	The destination unit.
-**
-**	@return		Returns true, if the destination unit is an enemy.
-*/
+ **	Check if unit is an enemy.
+ **
+ **	@param player	The source player.
+ **	@param dest	The destination unit.
+ **
+ **	@return		Returns true, if the destination unit is an enemy.
+ */
 global int IsEnemy(const Player* player,const Unit* dest)
 {
     return player->Enemy&(1<<dest->Player->Player);
 }
 
 /**
-**	Check if unit is allied.
-**
-**	@param player	The source player.
-**	@param dest	The destination unit.
-**
-**	@return		Returns true, if the destination unit is allied.
-*/
+ **	Check if unit is allied.
+ **
+ **	@param player	The source player.
+ **	@param dest	The destination unit.
+ **
+ **	@return		Returns true, if the destination unit is allied.
+ */
 global int IsAllied(const Player* player,const Unit* dest)
 {
     return player->Allied&(1<<dest->Player->Player);
 }
 
 /**
-**	Check if unit is shared vision.
-**
-**	@param player	The source player.
-**	@param dest	The destination unit.
-**
-**	@return		Returns true, if the destination unit is shared
-**			vision.
-*/
+ **	Check if unit is shared vision.
+ **
+ **	@param player	The source player.
+ **	@param dest	The destination unit.
+ **
+ **	@return		Returns true, if the destination unit is shared
+ **			vision.
+ */
 global int IsSharedVision(const Player* player,const Unit* dest)
 {
     return (player->SharedVision&(1<<dest->Player->Player)) &&
-	   (dest->Player->SharedVision&(1<<player->Player));
+	(dest->Player->SharedVision&(1<<player->Player));
 }
 
 /**
-**	Can the source unit attack the destination unit.
-**
-**	@param source	Unit type pointer of the attacker.
-**	@param dest	Unit type pointer of the target.
-*/
+ **	Can the source unit attack the destination unit.
+ **
+ **	@param source	Unit type pointer of the attacker.
+ **	@param dest	Unit type pointer of the target.
+ */
 global int CanTarget(const UnitType* source,const UnitType* dest)
 {
     if( dest->UnitType==UnitTypeLand ) {
@@ -3929,12 +3870,12 @@ global int CanTarget(const UnitType* source,const UnitType* dest)
 }
 
 /*----------------------------------------------------------------------------
---	SAVE/LOAD
-----------------------------------------------------------------------------*/
+  --	SAVE/LOAD
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Generate a unit reference, a printable unique string for unit.
-*/
+ **	Generate a unit reference, a printable unique string for unit.
+ */
 global char* UnitReference(const Unit* unit)
 {
     char* ref;
@@ -3945,11 +3886,11 @@ global char* UnitReference(const Unit* unit)
 }
 
 /**
-**	Save an order.
-**
-**	@param order	Order who should be saved.
-**	@param file	Output file.
-*/
+ **	Save an order.
+ **
+ **	@param order	Order who should be saved.
+ **	@param file	Output file.
+ */
 local void SaveOrder(const Order* order,FILE* file)
 {
     char* ref;
@@ -4085,11 +4026,11 @@ local void SaveOrder(const Order* order,FILE* file)
 }
 
 /**
-**	Save the state of an unit to file.
-**
-**	@param unit	Unit pointer to be saved.
-**	@param file	Output file.
-*/
+ **	Save the state of an unit to file.
+ **
+ **	@param unit	Unit pointer to be saved.
+ **	@param file	Output file.
+ */
 global void SaveUnit(const Unit* unit,FILE* file)
 {
     char* ref;
@@ -4103,7 +4044,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->SeenType ) {
 	fprintf(file,"'seen-type '%s ",unit->SeenType->Ident);
     }
-    
+
     fprintf(file,"'player %d\n  ",unit->Player->Player);
 
     if( unit->Name ) {
@@ -4243,34 +4184,34 @@ global void SaveUnit(const Unit* unit,FILE* file)
     switch( unit->Orders[0].Action ) {
 	case UnitActionStill:
 	    // FIXME: support other resource types
-	    if( unit->Type->GoldMine || unit->Type->GivesOil ) {
+	    if( unit->Type->GivesResource ) {
 		fprintf(file," 'resource-active %d",unit->Data.Resource.Active);
 	    }
 	    break;
 	case UnitActionBuilded:
-	{
-	    ConstructionFrame* cframe;
-	    int frame;
+	    {
+		ConstructionFrame* cframe;
+		int frame;
 
-	    cframe=unit->Type->Construction->Frames;
-	    frame=0;
-	    while( cframe!=unit->Data.Builded.Frame ) {
-		cframe=cframe->Next;
-		++frame;
+		cframe=unit->Type->Construction->Frames;
+		frame=0;
+		while( cframe!=unit->Data.Builded.Frame ) {
+		    cframe=cframe->Next;
+		    ++frame;
+		}
+		fprintf(file,"\n  'data-builded '(worker %s",
+			ref=UnitReference(unit->Data.Builded.Worker));
+		free(ref);
+		fprintf(file," sum %d add %d val %d sub %d frame %d",
+			unit->Data.Builded.Sum,unit->Data.Builded.Add,
+			unit->Data.Builded.Val,unit->Data.Builded.Sub,
+			frame);
+		if( unit->Data.Builded.Cancel ) {
+		    fprintf(file," cancel");
+		}
+		fprintf(file,")");
+		break;
 	    }
-	    fprintf(file,"\n  'data-builded '(worker %s",
-		    ref=UnitReference(unit->Data.Builded.Worker));
-	    free(ref);
-	    fprintf(file," sum %d add %d val %d sub %d frame %d",
-		    unit->Data.Builded.Sum,unit->Data.Builded.Add,
-		    unit->Data.Builded.Val,unit->Data.Builded.Sub,
-		    frame);
-	    if( unit->Data.Builded.Cancel ) {
-		fprintf(file," cancel");
-	    }
-	    fprintf(file,")");
-	    break;
-	}
 	case UnitActionResearch:
 	    fprintf(file,"\n  'data-research '(");
 	    fprintf(file,"ident %s", unit->Data.Research.Upgrade->Ident);
@@ -4323,10 +4264,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
 }
 
 /**
-**	Save state of units to file.
-**
-**	@param file	Output file.
-*/
+ **	Save state of units to file.
+ **
+ **	@param file	Output file.
+ */
 global void SaveUnits(FILE* file)
 {
     Unit** table;
@@ -4392,19 +4333,19 @@ global void SaveUnits(FILE* file)
 }
 
 /*----------------------------------------------------------------------------
---	Initialize/Cleanup
-----------------------------------------------------------------------------*/
+  --	Initialize/Cleanup
+  ----------------------------------------------------------------------------*/
 
 /**
-**	Initialize unit module.
-*/
+ **	Initialize unit module.
+ */
 global void InitUnits(void)
 {
 }
 
 /**
-**	Cleanup unit module.
-*/
+ **	Cleanup unit module.
+ */
 global void CleanUnits(void)
 {
     Unit** table;

@@ -1213,8 +1213,7 @@ pawn:
 			    if( Players[o].Type != PlayerNobody ) {
 				unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
 					,UnitTypeByWcNum(t),&Players[o]);
-				if( unit->Type->GoldMine || unit->Type->GivesOil
-					|| unit->Type->OilPatch ) {
+				if( unit->Type->GivesResource ) {
 #if 0
 				    DebugCheck( !v );
 				    unit->Value=v;

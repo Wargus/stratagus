@@ -613,7 +613,7 @@ global void SaveUpgrades(FILE* file)
 	for( j=0; j<UnitTypeMax; ++j ) {	// allow/forbid units
 	    if( UpgradeModifiers[i]->ChangeUnits[j]!='?' ) {
 		fprintf(file,"\n  '(allow %s %d)",
-			UnitTypes[j].Ident,
+			UnitTypes[j]->Ident,
 			UpgradeModifiers[i]->ChangeUnits[j]);
 	    }
 	}
@@ -627,7 +627,7 @@ global void SaveUpgrades(FILE* file)
 
 	for( j=0; j<UnitTypeMax; ++j ) {	// apply to units
 	    if( UpgradeModifiers[i]->ApplyTo[j]!='?' ) {
-		fprintf(file,"\n  '(apply-to %s)",UnitTypes[j].Ident);
+		fprintf(file,"\n  '(apply-to %s)",UnitTypes[j]->Ident);
 	    }
 	}
 
@@ -642,13 +642,13 @@ global void SaveUpgrades(FILE* file)
     //
     //	Save the allow
     //
-    for( i=0; UnitTypes[i].OType; ++i ) {
-	fprintf(file,"(define-allow '%s\t",UnitTypes[i].Ident);
-	if( strlen(UnitTypes[i].Ident)<9 ) {
+    for( i=0; i<NumUnitTypes; ++i ) {
+	fprintf(file,"(define-allow '%s\t",UnitTypes[i]->Ident);
+	if( strlen(UnitTypes[i]->Ident)<9 ) {
 	    fprintf(file,"\t\t\t\"");
-	} else if( strlen(UnitTypes[i].Ident)<17 ) {
+	} else if( strlen(UnitTypes[i]->Ident)<17 ) {
 	    fprintf(file,"\t\t\"");
-	} else if( strlen(UnitTypes[i].Ident)<25 ) {
+	} else if( strlen(UnitTypes[i]->Ident)<25 ) {
 	    fprintf(file,"\t\"");
 	} else {
 	    fprintf(file,"\"");
@@ -1388,50 +1388,50 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 
 	    DebugLevel3Fn(" applied to %d\n" _C_ z);
 	    // upgrade stats     
-	    UnitTypes[z].Stats[pn].AttackRange += um->Modifier.AttackRange;
-	    UnitTypes[z].Stats[pn].SightRange += um->Modifier.SightRange;
+	    UnitTypes[z]->Stats[pn].AttackRange += um->Modifier.AttackRange;
+	    UnitTypes[z]->Stats[pn].SightRange += um->Modifier.SightRange;
 	    //If Sight range is upgraded, we need to change EVERY unit
 	    //to the new range, otherwise the counters get confused.
 	    if (um->Modifier.SightRange) {
 		int numunits;
 		Unit* sightupgrade[UnitMax];
 		
-		numunits = FindUnitsByType(&UnitTypes[z],sightupgrade);
+		numunits = FindUnitsByType(UnitTypes[z],sightupgrade);
 		numunits--; // Change to 0 Start not 1 start
 		while (numunits >= 0) {
 		    if (sightupgrade[numunits]->Player->Player == player->Player &&
 		    	!sightupgrade[numunits]->Removed) {
 			/// Marking First is faster
 			MapMarkSight(player,
-					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
-					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
-					UnitTypes[z].Stats[pn].SightRange);
+					sightupgrade[numunits]->X+UnitTypes[z]->TileWidth/2,
+					sightupgrade[numunits]->Y+UnitTypes[z]->TileHeight/2,
+					UnitTypes[z]->Stats[pn].SightRange);
 			MapUnmarkSight(player,
-					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
-					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
+					sightupgrade[numunits]->X+UnitTypes[z]->TileWidth/2,
+					sightupgrade[numunits]->Y+UnitTypes[z]->TileHeight/2,
 					sightupgrade[numunits]->CurrentSightRange);
-			sightupgrade[numunits]->CurrentSightRange=UnitTypes[z].Stats[pn].SightRange;
+			sightupgrade[numunits]->CurrentSightRange=UnitTypes[z]->Stats[pn].SightRange;
 		    }                                   
 		    numunits--;
 		}
 	    }
-	    UnitTypes[z].Stats[pn].BasicDamage += um->Modifier.BasicDamage;
-	    UnitTypes[z].Stats[pn].PiercingDamage
+	    UnitTypes[z]->Stats[pn].BasicDamage += um->Modifier.BasicDamage;
+	    UnitTypes[z]->Stats[pn].PiercingDamage
 		    += um->Modifier.PiercingDamage;
-	    UnitTypes[z].Stats[pn].Armor += um->Modifier.Armor;
-	    UnitTypes[z].Stats[pn].Speed += um->Modifier.Speed;
-	    UnitTypes[z].Stats[pn].HitPoints += um->Modifier.HitPoints;
+	    UnitTypes[z]->Stats[pn].Armor += um->Modifier.Armor;
+	    UnitTypes[z]->Stats[pn].Speed += um->Modifier.Speed;
+	    UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.HitPoints;
 
 	    // upgrade costs :)
 	    for (j = 0; j < MaxCosts; ++j) {
-		UnitTypes[z].Stats[pn].Costs[j] += um->Modifier.Costs[j];
+		UnitTypes[z]->Stats[pn].Costs[j] += um->Modifier.Costs[j];
 	    }
 
-	    UnitTypes[z].Stats[pn].Level++;
+	    UnitTypes[z]->Stats[pn].Level++;
 
 	    if( um->ConvertTo ) {
 		((UnitType*)um->ConvertTo)->Stats[pn].Level++;
-		ConvertUnitTypeTo(player,&UnitTypes[z],um->ConvertTo);
+		ConvertUnitTypeTo(player,UnitTypes[z],um->ConvertTo);
 	    }
 	}
     }

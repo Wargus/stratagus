@@ -448,7 +448,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 			}
 			// Town hall may not be near but we may be using it, check
 			// for 2 buildings near it and assume it's been used
-			if( units[j]->Type->Building && !units[j]->Type->GoldMine ) {
+			if( units[j]->Type->Building && !units[j]->Type->GivesResource==GoldCost ) {
 			    ++buildings;
 			    if( buildings==2 ) {
 				break;
@@ -640,7 +640,7 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
     //
     //	Platforms can only be build on oil patches
     //
-    if( !type->GivesOil && AiFindBuildingPlace2(worker,type,worker->X,worker->Y,dx,dy,1) ) {
+    if( !type->GivesResource==OilCost && AiFindBuildingPlace2(worker,type,worker->X,worker->Y,dx,dy,1) ) {
 	return 1;
     }
 

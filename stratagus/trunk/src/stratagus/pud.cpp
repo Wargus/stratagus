@@ -1291,8 +1291,7 @@ pawn:
 			if (Players[o].Type != PlayerNobody) {
 			    unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
 				    ,UnitTypeByWcNum(t),&Players[o]);
-			    if( unit->Type->GoldMine || unit->Type->GivesOil
-				    || unit->Type->OilPatch ) {
+			    if( unit->Type->GivesResource ) {
 				DebugCheck( !v );
 				unit->Value=v*2500;
 			    } else {	
@@ -1550,9 +1549,7 @@ local void PudSaveUnits(gzFile f)
 	}
 	buf[4]=j;
 	buf[5]=Units[i]->Player->Player;
-	if( Units[i]->Type->GoldMine
-		|| Units[i]->Type->OilPatch
-		|| Units[i]->Type->GivesOil ) {
+	if( Units[i]->Type->GivesResource ) {
 	    buf[6]=(Units[i]->Value/2500) >> 0;
 	    buf[7]=(Units[i]->Value/2500) >> 8;
 	} else {

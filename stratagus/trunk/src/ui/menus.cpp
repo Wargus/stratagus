@@ -6012,14 +6012,12 @@ global void EditorEditResource(void)
 {
     Menu *menu;
     char buf[13];
+    char buf2[32];
 
     menu = FindMenu("menu-editor-edit-resource");
 
-    if (UnitUnderCursor->Type->GoldMine) {
-	menu->Items[0].d.text.text = "Amount of gold:";
-    } else if (UnitUnderCursor->Type->OilPatch || UnitUnderCursor->Type->GivesOil) {
-	menu->Items[0].d.text.text = "Amount of oil:";
-    }
+    sprintf(buf2,"Amount of %s:",DefaultResourceNames[UnitUnderCursor->Type->GivesResource]);
+    menu->Items[0].d.text.text = buf2;
     sprintf(buf, "%d~!_", UnitUnderCursor->Value);
     menu->Items[1].d.input.buffer = buf;
     menu->Items[1].d.input.nch = strlen(buf) - 3;

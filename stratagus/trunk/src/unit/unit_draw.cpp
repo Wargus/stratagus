@@ -992,7 +992,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    // s0m3body: mana bar should display mana proportionally
 	    //		to unit's max mana (unit->Type->_MaxMana)
 	    DrawManaBar(x,y,type,unit->Type->_MaxMana,unit->Mana);
-	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
+	} else if( type->GivesResource ) {
 	    DrawManaBar(x,y,type,655350,unit->Value);
 	}
 	//
@@ -1060,7 +1060,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	if( type->CanCastSpell
 		&& !(ShowNoFull && unit->Mana==unit->Type->_MaxMana) ) {
 	    DrawManaSprite(x,y,type,unit->Type->_MaxMana,unit->Mana);
-	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
+	} else if( type->GivesResource ) {
 	    DrawManaSprite(x,y,type,655350,unit->Value);
 	}
 	//

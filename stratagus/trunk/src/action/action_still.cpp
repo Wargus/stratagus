@@ -95,10 +95,10 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	//		UnitShowAnimation resets frame.
 	//	FIXME: the frames are hardcoded they should be configurable
 	//
-	if( unit->State==1 && type->GoldMine ) {
+	if( unit->State==1 && type->GivesResource==GoldCost ) {
 	    unit->Frame=!!unit->Data.Resource.Active;
 	}
-	if( unit->State==1 && type->GivesOil ) {
+	if( unit->State==1 && type->GivesResource==OilCost ) {
 	    unit->Frame=unit->Data.Resource.Active ? 2 : 0;
 	}
 	UnitMarkSeen(unit);
