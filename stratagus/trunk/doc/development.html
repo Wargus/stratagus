@@ -115,21 +115,14 @@ ahead to step 2.
 Valery Shchedrin has introduced tagged source 
 documentation for FreeCraft.<p>
 
-<h3>These programs are required</h3>
-
-You need one these programs to generate source code documentation.
+You need either 
+<a href="http://www.doxygen.org">DoxyGen</a> or 
+<a href="http://www.zib.de/Visual/software/doc++/index.html">DOC++</a> 
+to generate source code documentation. You may then 
+use the following commands to produce the documentation:
 <ul>
-    <li><a href="http://www.doxygen.org">DoxyGen</a>
-    <li><a href="http://www.zib.de/Visual/software/doc++/index.html">DOC++</a>
-</ul>
-
-<h3>Generate documentation from source code</h3>
-
-Please compile and install one of the above programs.
-Use the following commands to produce the documentation:
-<ul>
-    <li><em>make doc</em> If you use DoxyGen.
-    <li><em>make doc++</em> If you use DOC++.
+    <li>If you use DoxyGen: <b>make doc</b>
+    <li>If you use DOC++: <b>make doc++</b>
 </ul>
 
 <h3>Tags used in source code</h3>
