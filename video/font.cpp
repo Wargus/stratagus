@@ -71,6 +71,16 @@ local int DefaultReverseColorIndex;
     /// Draw character with current video depth.
 local void (*VideoDrawChar)(const Graphic*,int,int,int,int,int,int);
 
+#ifdef USE_OPENGL
+#define NumFontColors 7
+    /// Font bitmaps
+local GLubyte *FontBitmaps[MaxFonts][NumFontColors];
+    /// Font bitmap widths
+local int FontBitmapWidths[MaxFonts];
+    /// Current font
+local int CurrentFont;
+#endif
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -312,30 +322,29 @@ local void VideoDrawChar32(const Graphic* sprite,
 local void VideoDrawCharOpenGL(const Graphic* sprite,
 	int gx,int gy,int w,int h,int x,int y)
 {
-    GLfloat sx,ex,sy,ey;
-    GLfloat stx,etx,sty,ety;
+    GLfloat sx,sy;
+    GLfloat r,g,b;
+    Palette c;
+    int i;
 
     sx=(GLfloat)x/VideoWidth;
-    ex=sx+(GLfloat)w/VideoWidth;
-    ey=1.0f-(GLfloat)y/VideoHeight;
-    sy=ey-(GLfloat)h/VideoHeight;
+    sy=1.0f-(GLfloat)y/VideoHeight-(GLfloat)h/VideoHeight;
 
-    stx=(GLfloat)gx/sprite->Width*sprite->TextureWidth;
-    etx=(GLfloat)(gx+w)/sprite->Width*sprite->TextureWidth;
-    sty=(GLfloat)gy/sprite->Height*sprite->TextureHeight;
-    ety=(GLfloat)(gy+h)/sprite->Height*sprite->TextureHeight;
+    glDisable(GL_TEXTURE_2D);
 
-    glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[0]);
-    glBegin(GL_QUADS);
-    glTexCoord2f(stx, 1.0f-ety);
-    glVertex3f(sx, sy, 0.0f);
-    glTexCoord2f(stx, 1.0f-sty);
-    glVertex3f(sx, ey, 0.0f);
-    glTexCoord2f(etx, 1.0f-sty);
-    glVertex3f(ex, ey, 0.0f);
-    glTexCoord2f(etx, 1.0f-ety);
-    glVertex3f(ex, sy, 0.0f);
-    glEnd();
+    for( i=0; i<NumFontColors; ++i ) {
+	c=GlobalPalette[TextColor[i]];
+	r=c.r/255.0f;
+	g=c.g/255.0f;
+	b=c.b/255.0f;
+	glColor3f(r,g,b);
+	glRasterPos2f(sx,sy);
+	glBitmap(FontBitmapWidths[CurrentFont]*8,h,
+	    0.0f,0.0f,0.0f,0.0f,
+	    FontBitmaps[CurrentFont][i]+(gy+Fonts[CurrentFont].Height-h)*FontBitmapWidths[CurrentFont]);
+    }
+
+    glEnable(GL_TEXTURE_2D);
 }
 #endif
 
@@ -453,6 +462,10 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
     const unsigned char* rev;
     void (*DrawChar)(const Graphic*,int,int,int,int,int,int);
 
+#ifdef USE_OPENGL
+    CurrentFont=font;
+#endif
+
     if( clip ) {
 	DrawChar=VideoDrawCharClip;
     } else {
@@ -505,10 +518,6 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 
 	DebugCheck( *text<32 );
 
-#ifdef USE_OPENGL
-	w=fp->CharWidth[*text-32];
-	DrawChar(fp->Graphic,((*text-32)%23)*fp->Width,(*text-32)/23*height,w,height,x+widths,y);
-#else
 	if( *text-32>=0 && height*(*text-32)<fp->Graphic->Height ) {
 	    w=fp->CharWidth[*text-32];
 	    DrawChar(fp->Graphic,0,height*(*text-32),w,height,x+widths,y);
@@ -516,7 +525,6 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 	    w=fp->CharWidth[0];
 	    DrawChar(fp->Graphic,0,height*0,w,height,x+widths,y);
 	}
-#endif
 	widths+=w+1;
 	if( rev ) {
 	    TextColor=rev;
@@ -717,37 +725,53 @@ local void FontMeasureWidths(ColorFont * fp)
 }
 
 /**
-**	Resize the font graphic.
-**
-**	The default font graphic format is 1 character wide and 207
-**	characters high.  This function resizes the image so it's 23
-**	characters wide and 9 characters high.
+**	Make font bitmap.
 */
 #ifdef USE_OPENGL
-local void ResizeFontGraphic(ColorFont *font)
+local void MakeFontBitmap(Graphic *g,int font)
 {
-    Graphic *g;
-    unsigned char *data;
     int i;
     int j;
     int k;
+    GLubyte *c;
+    GLubyte x;
+    const unsigned char *sp;
+    int numfonts;
+    int n;
 
-    g = font->Graphic;
+    FontBitmapWidths[font] = (g->Width+7)/8;
 
-    data=(unsigned char*)malloc(23*g->Width*9*font->Height);
-    for( i=0; i<9; ++i ) {
-	for( j=0; j<23; ++j ) {
-	    for( k=0; k<font->Height; ++k ) {
-		memcpy(data + i*font->Height*(23*g->Width) + j*g->Width + k*(23*g->Width),
-		    (unsigned char*)g->Frames + (i*23+j)*g->Width*font->Height + k*g->Width,
-		    g->Width);
+    for( n=0; n<NumFontColors; ++n ) {
+	if( FontBitmaps[font][n] ) {
+	    free(FontBitmaps[font][n]);
+	}
+	FontBitmaps[font][n] = (GLubyte*)malloc(FontBitmapWidths[font]*g->Height);
+
+	sp = (const unsigned char*)g->Frames;
+	x = 0;
+	numfonts=g->Height/Fonts[font].Height;
+	for( k=0; k<numfonts; ++k ) {
+	    for( i=0; i<Fonts[font].Height; ++i ) {
+		c = FontBitmaps[font][n] + k*Fonts[font].Height*FontBitmapWidths[font] + (Fonts[font].Height-1-i)*FontBitmapWidths[font];
+		for( j=0; j<g->Width; ++j ) {
+		    if( *sp == n ) {
+			x |= 0x1;
+		    }
+		    ++sp;
+		    if( (j & 0x7) == 0x7 ) {
+			*c++ = x;
+			x = 0;
+		    } else if( j == g->Width - 1 ) {
+			x <<= 0x7 - (j & 0x7);
+			*c++ = x;
+			x = 0;
+		    } else {
+			x <<= 1;
+		    }
+		}
 	    }
 	}
     }
-    free(g->Frames);
-    g->Frames = data;
-    g->Width *= 23;
-    g->Height /= 23;
 }
 #endif
 
@@ -791,8 +815,7 @@ global void LoadFonts(void)
 	    Fonts[i].Graphic=LoadGraphic(Fonts[i].File);
 	    FontMeasureWidths(Fonts+i);
 #ifdef USE_OPENGL
-	    ResizeFontGraphic(Fonts+i);
-	    MakeTexture(Fonts[i].Graphic,Fonts[i].Graphic->Width,Fonts[i].Graphic->Height);
+	    MakeFontBitmap(Fonts[i].Graphic,i);
 #endif
 	}
     }
