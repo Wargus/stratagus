@@ -62,19 +62,18 @@ void UnitCacheInsert(Unit* unit)
 	Assert(!unit->Removed);
 
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
+		mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + unit->X;
+		listitem = unit->CacheLinks + i * unit->Type->TileWidth;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
-			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
-			listitem = unit->CacheLinks + i * unit->Type->TileWidth + j;
 			Assert(!listitem->Next && !listitem->Prev);
 
-			// Always add at the start of the list.
 			listitem->Next = mf->UnitCache;
-			listitem->Prev = 0;
-			// update Prev link if cache on tile is no empty
 			if (mf->UnitCache) {
 				mf->UnitCache->Prev = listitem;
 			}
 			mf->UnitCache = listitem;
+			++mf;
+			++listitem;
 		}
 	}
 }
@@ -92,40 +91,25 @@ void UnitCacheRemove(Unit* unit)
 	UnitListItem* listitem;
 
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
+		listitem = unit->CacheLinks + i * unit->Type->TileWidth;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
-			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
-			listitem = unit->CacheLinks + i * unit->Type->TileWidth + j;
-
 			if (listitem->Next) {
 				listitem->Next->Prev = listitem->Prev;
 			}
 			if (listitem->Prev) {
 				listitem->Prev->Next = listitem->Next;
 			} else {
-				if (mf->UnitCache != listitem) {
-					DebugPrint("Try to remove unit not in cache. (%d)\n" _C_ unit->Slot);
-				} else {
-					// item is head of the list.
-					mf->UnitCache = listitem->Next;
-					Assert(!mf->UnitCache || !mf->UnitCache->Prev);
-				}
+				// item is head of the list.
+				mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
+				Assert(mf->UnitCache == listitem);
+				mf->UnitCache = listitem->Next;
+				Assert(!mf->UnitCache || !mf->UnitCache->Prev);
 			}
 
-			listitem->Next = listitem->Prev = 0;
+			listitem->Next = listitem->Prev = NULL;
+			++listitem;
 		}
 	}
-}
-
-/**
-**  Change unit in cache.
-**  FIXME: optimize, add destination to parameters
-**
-**  @param unit  Unit pointer to change in cache.
-*/
-void UnitCacheChange(Unit* unit)
-{
-	UnitCacheRemove(unit);
-	UnitCacheInsert(unit);
 }
 
 /**
@@ -173,7 +157,7 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 			listitem = TheMap.Fields[i * TheMap.Width + j].UnitCache;
 			for (; listitem; listitem = listitem->Next) {
 				//
-				// To avoid getting an unit in multiple times we use a cache lock.
+				// To avoid getting a unit in multiple times we use a cache lock.
 				// It should only be used in here, unless you somehow want the unit
 				// to be out of cache.
 				//

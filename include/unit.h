@@ -908,8 +908,6 @@ extern void CleanUnits(void);
 extern void UnitCacheInsert(Unit* unit);
 	/// Remove unit from cache
 extern void UnitCacheRemove(Unit* unit);
-	/// Change unit position in cache
-extern void UnitCacheChange(Unit* unit);
 	/// Select units in range
 extern int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table);
 	/// Select units on tile
