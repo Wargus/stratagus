@@ -146,9 +146,9 @@ local void LoadVSAction(Menuitem *mi, int i);
 local void LoadOk(void);
 local int SaveRDFilter(char *pathbuf, FileList *fl);
 
-local void DeleteMenu(void);
-local void DeleteInit(Menuitem *mi __attribute__((unused)));
-local void DeleteFile(void);
+local void FcDeleteMenu(void);
+local void FcDeleteInit(Menuitem *mi __attribute__((unused)));
+local void FcDeleteFile(void);
 
 //local void ConfirmSaveMenu(void);
 local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)));
@@ -1510,7 +1510,7 @@ local void InitSaveGameMenuItems() {
 			   (void *)SaveLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, SaveVSAction, -1, 0, 0, 0, SaveOk};
     MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
-    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteMenu, 'd'};
+    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, FcDeleteMenu, 'd'};
     MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     SaveGameMenuItems[0].d.text    = i0;
     SaveGameMenuItems[1].d.input   = i1;
@@ -1563,7 +1563,7 @@ local void InitConfirmSaveMenuItems() {
 }
 
 local Menuitem ConfirmDeleteMenuItems[] = {
-    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, DeleteInit, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, FcDeleteInit, NULL, {{NULL, 0}} },
     { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
     { MI_TYPE_TEXT, 16, 11+20*2.5, 0, GameFont, NULL, NULL, {{NULL, 0}} },
     { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
@@ -1573,7 +1573,7 @@ local void InitConfirmDeleteMenuItems() {
     MenuitemText    i0 = { "Delete File", MI_TFLAGS_CENTERED};
     MenuitemText    i1 = { "Are you sure you want to delete", MI_TFLAGS_LALIGN};
     MenuitemText    i2 = { NULL, MI_TFLAGS_LALIGN};
-    MenuitemButton  i3 = { "~!Ok", 106, 27, MBUTTON_GM_HALF, DeleteFile, 'o'};
+    MenuitemButton  i3 = { "~!Ok", 106, 27, MBUTTON_GM_HALF, FcDeleteFile, 'o'};
     MenuitemButton  i4 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     ConfirmDeleteMenuItems[0].d.text = i0;
     ConfirmDeleteMenuItems[1].d.text = i1;
@@ -3109,13 +3109,13 @@ local void ConfirmSaveFile(void)
     EndMenu();
 }
 
-local void DeleteMenu(void)
+local void FcDeleteMenu(void)
 {
     EndMenu();
     ProcessMenu(MENU_CONFIRM_DELETE, 1);
 }
 
-local void DeleteInit(Menuitem *mi __attribute__((unused)))
+local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
 {
     static char name[128];
     strcpy(name, "the file: ");
@@ -3123,7 +3123,7 @@ local void DeleteInit(Menuitem *mi __attribute__((unused)))
     ConfirmDeleteMenuItems[2].d.text.text = name;
 }
 
-local void DeleteFile(void)
+local void FcDeleteFile(void)
 {
     char name[256];
     strcpy(name, SaveDir);
