@@ -450,7 +450,7 @@ global void ShowIntro(const Intro* intro)
 	if (intro->VoiceFile[0]) {
 		soundfree = NextFreeChannel;
 		soundout = NextSoundRequestOut;
-		PlayFile(intro->VoiceFile[0]);
+		PlaySoundFile(intro->VoiceFile[0]);
 	}
 #endif
 
@@ -478,7 +478,7 @@ global void ShowIntro(const Intro* intro)
 			if (soundcount == 15) {
 				soundfree = NextFreeChannel;
 				soundout = NextSoundRequestOut;
-				PlayFile(intro->VoiceFile[stage]);
+				PlaySoundFile(intro->VoiceFile[stage]);
 				++stage;
 				soundcount = 0;
 			} else {

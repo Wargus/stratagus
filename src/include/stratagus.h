@@ -440,10 +440,10 @@ extern char* strdcat(const char* l, const char* r);
 	/// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char *m, const char* r);
 
-#if !defined(BSD) || defined(__APPLE__)
+#if !defined(BSD)
 	/// case insensitive strstr
 extern char* strcasestr(const char* str, const char* substr);
-#endif // !BSD || APPLE
+#endif // !BSD
 
 	/// Compute a square root using ints
 extern long isqrt(long num);

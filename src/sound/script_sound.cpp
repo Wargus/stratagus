@@ -734,7 +734,7 @@ local int CclPlayFile(lua_State* l)
 		lua_error(l);
 	}
 
-	PlayFile(LuaToString(l, 1));
+	PlaySoundFile(LuaToString(l, 1));
 
 	return 0;
 }
