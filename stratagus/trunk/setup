@@ -592,27 +592,14 @@ case $ANSWER in
 	  check_for_libs
 	  if test "$?" = 0 ; then
 	    echo
-	    echo "Assuming you have a thread-safe X11 (libc6 or glibc),"
-	    echo -n "do you want to compile with threaded sound? (n) "
-	    read $N ANSWER2
-	    echo
-	    case $ANSWER2 in 
-	      [yY])
-	        echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
-		  if [ "`uname -a | grep -is bsd x` " != " x" ] ; then
-		    echo "THREADLIB   = -pthread" >> $RULESFILE
-		  else
-		    echo "THREADLIB   = -lpthread" >> $RULESFILE
-		  fi
-		echo "-> Compiling with thread support"
-		;;
-	      *)
-	        echo "-> No thread support"
-		;;
-	    esac
+	    echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
+	    if [ "`uname -a | grep -is bsd x` " != " x" ] ; then
+		echo "THREADLIB   = -pthread" >> $RULESFILE
+	    else
+		echo "THREADLIB   = -lpthread" >> $RULESFILE
+	    fi
 	  fi
 	fi
-	echo
 
 	LIBCHECK="-lFLAC -lm"; check_for_libs
 	if test "$?" = 0 ; then 
