@@ -130,20 +130,21 @@ local void DrawMouseCoordsOnMap(int x,int y)
 /**
 **	Called when right button is pressed
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
-**
-**	@todo	FIXME: Should rewrote not to use tile coordinates.
+**	@param sx	X screen map position.
+**	@param sy	Y screen map position.
 */
-global void DoRightButton(int x,int y)
+global void DoRightButton (int sx,int sy)
 {
-    int i;
+    int i, x, y;
     Unit* dest;
     Unit* unit;
     UnitType* type;
     int action;
     int acknowledged;
     int flush;
+
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
 
     //
     // No unit selected
@@ -185,7 +186,7 @@ global void DoRightButton(int x,int y)
 	//
 	if( KeyModifiers&ModifierControl ) {
 	    // FIXME: what todo if more than one unit on that tile?
-	    dest=UnitOnMapTile(x,y);
+	    dest=UnitOnScreenMapPosition (sx,sy);
             if( dest ) {
                 if( dest!=unit ) {
 		    dest->Blink=3;
@@ -198,7 +199,7 @@ global void DoRightButton(int x,int y)
         //
         //      Enter transporters?
 	//
-        dest=TransporterOnMapTile(x,y);
+        dest=TransporterOnScreenMapPosition (sx,sy);
         if( dest && dest->Type->Transporter
                 && dest->Player==ThisPlayer
                 && unit->Type->UnitType==UnitTypeLand ) {
@@ -255,7 +256,7 @@ global void DoRightButton(int x,int y)
                 }
             }
 
-            dest=TargetOnMapTile(unit,x,y);
+            dest=TargetOnScreenMapPosition (unit,sx,sy);
             if( dest ) {
                 if( IsEnemy(ThisPlayer,dest) ) {
 		    dest->Blink=3;
@@ -265,13 +266,13 @@ global void DoRightButton(int x,int y)
             }
 
 	    // cade: this is default repair action
-	    dest=RepairableOnMapTile(x,y);
+	    dest=RepairableOnScreenMapPosition (sx, sy);
 	    if( dest && dest->Type && dest->Player==ThisPlayer ) {
 	        SendCommandRepair(unit,x,y,dest,flush);
 		continue;
 	    }
 
-	    dest=UnitOnMapTile(x,y);
+	    dest=UnitOnScreenMapPosition (sx,sy);
             if( dest ) {
                 if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
@@ -309,7 +310,7 @@ global void DoRightButton(int x,int y)
                 }
             }
 
-	    dest=UnitOnMapTile(x,y);
+	    dest=UnitOnScreenMapPosition (sx,sy);
             if( dest ) {
                 if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
@@ -335,7 +336,8 @@ global void DoRightButton(int x,int y)
         if( action==MouseActionAttack ) {
             // FIXME: more units on same tile
 	    // FIXME: should use enemy first, than other functions!
-            dest=TargetOnMapTile(unit,x,y);
+
+            dest=TargetOnScreenMapPosition (unit, sx, sy);
             if( dest ) {
                 if( IsEnemy(ThisPlayer,dest) ) {
 		    dest->Blink=3;
@@ -358,7 +360,7 @@ global void DoRightButton(int x,int y)
                 }
             }
 
-	    dest=UnitOnMapTile(x,y);
+	    dest=UnitOnScreenMapPosition (sx,sy);
             if( dest ) {
                 if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
@@ -400,7 +402,7 @@ global void DoRightButton(int x,int y)
 
 	// FIXME: attack/follow/board ...
 	if( action==MouseActionMove || action==MouseActionSail ) {
-	    dest=UnitOnMapTile(x,y);
+	    dest=UnitOnScreenMapPosition (sx,sy);
             if( dest ) {
 		// Follow allied units, but not self.
                 if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
@@ -636,7 +638,7 @@ global void UIHandleMouseMove(int x,int y)
 	mx=ScreenMinimap2MapX(x);
 	my=ScreenMinimap2MapY(y);
 	if( IsMapFieldVisible(mx,my) ) {
-	    UnitUnderCursor=UnitOnMapTile(mx,my);
+	    UnitUnderCursor=UnitOnMapTile(x,y);
 	}
     }
 
@@ -1161,6 +1163,8 @@ global void UIHandleButtonDown(unsigned button)
 	if( MouseButtons&LeftButton ) {	// enter select mode
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
+	    CursorStartScrMapX = CursorStartX -TheUI.MapX + TileSizeX * MapX;
+	    CursorStartScrMapY = CursorStartY -TheUI.MapY + TileSizeY * MapY;
 	    GameCursor=TheUI.Cross.Cursor;
 	    CursorState=CursorStateRectangle;
 	    MustRedraw|=RedrawCursor;
@@ -1172,8 +1176,10 @@ global void UIHandleButtonDown(unsigned button)
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
             Unit* unit;
+	    int x = CursorX - TheUI.MapX + MapX*TileSizeX;
+	    int y = CursorY - TheUI.MapY + MapY*TileSizeY;
 
-            unit = UnitOnMapTile(Screen2MapX(CursorX),Screen2MapY(CursorY));
+            unit = UnitOnScreenMapPosition (x, y);
             if ( unit ) { // if right click on building -- blink
               unit->Blink=3;
 	    } else { // if not not click on building -- green cross
@@ -1181,7 +1187,7 @@ global void UIHandleButtonDown(unsigned button)
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
 	    }
-	    DoRightButton(Screen2MapX(CursorX),Screen2MapY(CursorY));
+	    DoRightButton (x, y);
 	}
     //
     //	Cursor is on the minimap area
@@ -1194,7 +1200,8 @@ global void UIHandleButtonDown(unsigned button)
 	    MakeMissile(MissileTypeGreenCross
 		    ,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 		    ,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
-	    DoRightButton(ScreenMinimap2MapX(CursorX),ScreenMinimap2MapY(CursorY));
+	    // DoRightButton() takes screen map coordinates
+	    DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX, 						ScreenMinimap2MapY(CursorY) * TileSizeY);
 	}
     //
     //	Cursor is on the buttons: group or command
@@ -1267,6 +1274,7 @@ global void UIHandleButtonUp(unsigned button)
 	//
 	if( CursorStartX<CursorX-1 || CursorStartX>CursorX+1
 		|| CursorStartY<CursorY-1 || CursorStartY>CursorY+1 ) {
+#if 0
 	    //
 	    //	Select rectangle
 	    //
@@ -1292,6 +1300,26 @@ global void UIHandleButtonUp(unsigned button)
                 num=AddSelectedUnitsInRectangle(x,y,w,h);
             } else {
                 num=SelectUnitsInRectangle(x,y,w,h);
+            }
+#endif
+	    int x0 = CursorStartScrMapX;
+	    int y0 = CursorStartScrMapY;
+	    int x1 = CursorX - TheUI.MapX + MapX*TileSizeX;
+	    int y1 = CursorY - TheUI.MapY + MapY*TileSizeY;
+	    if (x0>x1) {
+		int swap=x0;	// this is faster and more readable than xor's
+		x0 = x1;
+		x1 = swap;
+	    }
+	    if (y0>y1) {
+		int swap=y0;
+		y0 = y1;
+		y1 = swap;
+	    }
+            if ( KeyModifiers & ModifierShift ) {
+                num=AddSelectedUnitsInRectangle (x0 ,y0, x1, y1);
+            } else {
+                num=SelectUnitsInRectangle (x0, y0, x1, y1);
             }
 	} else {
 	    //

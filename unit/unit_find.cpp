@@ -276,6 +276,184 @@ global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
     return NoUnitP;
 }
 
+/**
+**	Returns true if screen map position (x,y) is inside of
+**	the rectangle where the unit's sprite is drawn.
+**
+**	@param unit	Pointer to unit whose sprite is to be tested
+**	@param x	X position on screen map, pixel-based
+**	@param y	Y position on screen map, pixel-based
+**
+**	@return		true if (x,y) is inside the unit's sprite
+*/
+local int InsideUnitSprite (Unit *unit, unsigned x, unsigned y)
+{
+    int ux, uy;      /* position at which unit's sprite is currently drawn */
+    UnitType *type=unit->Type;
+
+    ux = TileSizeX*unit->X + unit->IX;
+    ux -= (type->BoxWidth - TileSizeX*type->TileWidth)/2;
+    uy = TileSizeY*unit->Y + unit->IY;
+    uy -= (type->BoxHeight - TileSizeY*type->TileHeight)/2;
+
+    if (x < ux || x >= ux+type->BoxWidth || y < uy ||  y >= uy+type->BoxHeight)
+	return 0;
+    else
+	return 1;
+}
+
+/**
+**	Searches for unit whose sprite is drawn at (x,y) pixel map position.
+**
+**	@param x	X position on screen map, pixel-based.
+**	@param y	Y position on screen map, pixel-based.
+**
+**	@return		Returns unit found at this pixel map coordinates
+*/
+global Unit *UnitOnScreenMapPosition (unsigned x, unsigned y)
+{
+    Unit* table[UnitMax];
+    int tx, ty;
+    int n;
+    int i;
+
+    tx = x / TileSizeX;
+    ty = y / TileSizeY;
+    /* this code runs quite often (e.g. upon each motion notify) so this little
+     * optimization could be appropriate */
+
+    /* fast path, should work most of the time */
+    n = SelectUnitsOnTile (tx, ty, table);
+    for( i=0; i<n; ++i ) {
+	if( ! table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y))
+	    return table[i];
+    }
+    /* if we got here we have to search for our unit in the neighborhood */
+
+    /* ships and flyers could be 2 fields away */
+    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    for( i=0; i<n; ++i ) {
+	if( ! table[i]->Type->Vanishes && InsideUnitSprite (table[i], x, y))
+	    return table[i];
+    }
+
+    return NoUnitP;
+}
+
+/**
+**	Repairable unit on screen map position.
+**
+**	@param x	X position on screen map, pixel-based.
+**	@param y	Y position on screen map, pixel-based.
+**
+**	@return		Returns repairable unit found on screen map position.
+*/
+global Unit* RepairableOnScreenMapPosition (unsigned x,unsigned y)
+{
+    Unit* table[UnitMax];
+    int tx, ty;
+    int n;
+    int i;
+
+    tx = x / TileSizeX;
+    ty = y / TileSizeY;
+
+    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    for( i=0; i<n; ++i ) {
+	// FIXME: could use more or less for repair? Repair of ships/catapults.
+	// Only repairable if target is a building or tansporter and it's HP is
+	// not at max
+	if( (table[i]->Type->Building || table[i]->Type->Transporter)
+		&& table[i]->HP < table[i]->Stats->HitPoints ) {
+	    if (InsideUnitSprite (table[i], x, y))
+		return table[i];
+	}
+    }
+    return NoUnitP;
+}
+
+/**
+**	Choose target at pixel map coordinates.
+**
+**	@param source	Unit which wants to attack.
+**	@param tx	X position on the display map, pixel-based.
+**	@param ty	Y position on the display map, pixel-based.
+**
+**	@return		Returns ideal target
+*/
+global Unit *TargetOnScreenMapPosition (Unit* source, unsigned x, unsigned y)
+{
+    Unit* table[UnitMax];
+    Unit* unit;
+    Unit* best;
+    UnitType* type;
+    int tx, ty;
+    int n;
+    int i;
+
+    tx = x / TileSizeX;
+    ty = y / TileSizeY;
+    /* this code runs upon right button action only so it can affort being a
+     * little inefficient. */
+
+    /* ships and flyers could be 2 fields away */
+    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    best=NoUnitP;
+    for( i=0; i<n; ++i ) {
+	unit=table[i];
+	// unusable unit ?
+	// if( UnitUnusable(unit) ) can't attack constructions
+	// FIXME: did SelectUnitsOnTile already filter this?
+	// Invisible and not Visible
+	if( unit->Removed || unit->Invisible
+		|| !(unit->Visible&(1<<source->Player->Player))
+		|| unit->Orders[0].Action==UnitActionDie ) {
+	    continue;
+	}
+	if ( ! InsideUnitSprite (table[i], x, y)) {
+	    continue;
+	}
+	if( !CanTarget(source->Type,unit->Type) ) {
+	    continue;
+	}
+	//
+	//	Choose the best target.
+	//
+	if( !best || best->Type->Priority < unit->Type->Priority ) {
+	    best=unit;
+	}
+    }
+    return best;
+}
+
+/**
+**	Transporter unit on screen map position.
+**
+**	@param x	X position on screen map, pixel-based.
+**	@param y	Y position on screen map, pixel-based.
+**
+**	@return		Returns transporter unit found on tile.
+*/
+global Unit* TransporterOnScreenMapPosition (unsigned x,unsigned y)
+{
+    Unit* table[UnitMax];
+    int tx, ty;
+    int n;
+    int i;
+
+    tx = x / TileSizeX;
+    ty = y / TileSizeY;
+
+//  n=SelectUnitsOnTile(tx,ty,table);
+    n = UnitCacheSelect (tx-2,ty-2, tx+2, ty+2, table);
+    for( i=0; i<n; ++i ) {
+	if( table[i]->Type->Transporter && InsideUnitSprite (table[i], x, y)) {
+	    return table[i];
+	}
+    }
+    return NoUnitP;
+}
+
 /*----------------------------------------------------------------------------
 --	Finding special units
 ----------------------------------------------------------------------------*/

@@ -79,6 +79,11 @@ global int CursorY;		/// cursor position on screen Y
 global int CursorStartX;	/// rectangle started on screen X
 global int CursorStartY;	/// rectangle started on screen Y
 
+// coords of starting point of selection rectangle, expressed in screen map
+// coordinate system
+global int CursorStartScrMapX;
+global int CursorStartScrMapY;
+
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
 local int BuildingCursor=0;		/// Flag (0/1): last cursor was building
