@@ -83,7 +83,7 @@ global void SetVideoSync(void)
     if( SDL_SetTimer(
 		(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
 		VideoSyncHandler) ) {
-	fprintf(stderr,"Can't set itimer\n");
+	fprintf(stderr,"Can't set timer\n");
     }
 
     // DebugLevel1("Timer installed\n");
