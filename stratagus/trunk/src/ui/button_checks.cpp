@@ -95,15 +95,27 @@ global int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button)
 }
 
 /**
-**	Check for button enabled, if unit is available.
+**	Check for button enabled, if any unit is available.
 **
 **	@param unit	Pointer to unit for button.
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckUnit(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckUnitsOr(const Unit* unit,const ButtonAction* button)
 {
-    return HaveUnitTypeByIdent(unit->Player,button->AllowStr);
+    char* buf;
+    const char* s;
+    Player* player;
+
+    player=unit->Player;
+    buf=alloca(strlen(button->AllowStr)+1);
+    strcpy(buf,button->AllowStr);
+    for( s=strtok(buf,","); s; s=strtok(NULL,",") ) {
+	if( HaveUnitTypeByIdent(player,s) ) {
+	    return 1;
+	}
+    }
+    return 0;
 }
 
 /**
@@ -113,7 +125,7 @@ global int ButtonCheckUnit(const Unit* unit,const ButtonAction* button)
 **	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
-global int ButtonCheckUnits(const Unit* unit,const ButtonAction* button)
+global int ButtonCheckUnitsAnd(const Unit* unit,const ButtonAction* button)
 {
     char* buf;
     const char* s;

@@ -167,10 +167,10 @@ global void SaveButtons(FILE* file)
 		fprintf(file,"'check-false");
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUpgrade ) {
 		fprintf(file,"'check-upgrade");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnit ) {
-		fprintf(file,"'check-unit");
-	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnits ) {
-		fprintf(file,"'check-units");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnitsOr ) {
+		fprintf(file,"'check-units-or");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnitsAnd ) {
+		fprintf(file,"'check-units-and");
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNetwork ) {
 		fprintf(file,"'check-network");
 	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoWork ) {

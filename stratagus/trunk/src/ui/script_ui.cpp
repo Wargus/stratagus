@@ -2994,10 +2994,10 @@ local SCM CclDefineButton(SCM list)
 		ba.Allowed=ButtonCheckFalse;
 	    } else if( gh_eq_p(value,gh_symbol2scm("check-upgrade")) ) {
 		ba.Allowed=ButtonCheckUpgrade;
-	    } else if( gh_eq_p(value,gh_symbol2scm("check-unit")) ) {
-		ba.Allowed=ButtonCheckUnit;
-	    } else if( gh_eq_p(value,gh_symbol2scm("check-units")) ) {
-		ba.Allowed=ButtonCheckUnits;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-units-or")) ) {
+		ba.Allowed=ButtonCheckUnitsOr;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-units-and")) ) {
+		ba.Allowed=ButtonCheckUnitsAnd;
 	    } else if( gh_eq_p(value,gh_symbol2scm("check-network")) ) {
 		ba.Allowed=ButtonCheckNetwork;
 	    } else if( gh_eq_p(value,gh_symbol2scm("check-no-work")) ) {
