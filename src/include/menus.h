@@ -92,12 +92,14 @@ typedef struct _menus_ {
     int	image;				/// panel image
     enum MustRedraw_e area;		/// invalidate area for redraws
     int nitems;				/// number of items to follow
-    Menuitem items[0];			/// buttons, etc
+    Menuitem *items;			/// buttons, etc
 } Menu;
 
 
 #define MENU_GAME 0
-#define MENU_MAX  0			/// highest available menu id (for ccl)
+#define MENU_VICTORY 1
+#define MENU_LOST 2
+#define MENU_MAX  2			/// highest available menu id (for ccl)
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
