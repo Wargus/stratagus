@@ -695,11 +695,10 @@ local void EditorRandomizeUnit( const char *unit_type, int count, int value )
 */
 local void EditorDestroyAllUnits(void)
 {
-    int i;
     Unit* unit;
 
-    for( i = 0; i < NumUnits; i++) {
-	unit=Units[i];
+    while( NumUnits != 0 ) {
+	unit=Units[0];
 	RemoveUnit( unit ); 
 	UnitLost( unit ); 
 	UnitClearOrders( unit );
@@ -708,9 +707,7 @@ local void EditorDestroyAllUnits(void)
 }
 
 /**
-**	FIXME: docu
-**
-**	FIXME: If called more than once the old mines should be removed
+**	Create a random map
 */
 global void EditorCreateRandomMap(void)
 {
