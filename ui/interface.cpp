@@ -54,6 +54,7 @@
 #include "video.h"
 #include "iolib.h"
 #include "pud.h"
+#include "commands.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -927,6 +928,102 @@ local int CommandKey(int key)
 }
 
 /**
+**	Handle cheats
+**
+**	@return	    1 if a cheat was handle, 0 otherwise
+*/
+global int HandleCheats(const char* Input)
+{
+    int ret;
+    ret=1;
+
+    // FIXME: disable cheats
+    if (strcmp(Input, "there is no aliens level") == 0) {
+	// FIXME: no function yet.
+	SetMessage("cheat enabled");
+    } else if (strcmp(Input, "hatchet") == 0) {
+	SpeedChop = 52 / 2;
+	SetMessage("Wow -- I got jigsaw!");
+    } else if (strcmp(Input, "glittering prizes") == 0) {
+	ThisPlayer->Resources[GoldCost] += 12000;
+	ThisPlayer->Resources[WoodCost] += 5000;
+	ThisPlayer->Resources[OilCost] += 5000;
+	ThisPlayer->Resources[OreCost] += 5000;
+	ThisPlayer->Resources[StoneCost] += 5000;
+	ThisPlayer->Resources[CoalCost] += 5000;
+	MustRedraw |= RedrawResources;
+	SetMessage("!!! :)");
+    } else if (strcmp(Input, "on screen") == 0) {
+	RevealMap();
+    } else if (!strcmp(Input, "showpath")) {
+	RevealMap();
+    } else if (strcmp(Input, "fow on") == 0) {
+	TheMap.NoFogOfWar = 0;
+	UpdateFogOfWarChange();
+	MapUpdateVisible();
+	SetMessage("Fog Of War is now ON");
+    } else if (strcmp(Input, "fow off") == 0) {
+	TheMap.NoFogOfWar = 1;
+	UpdateFogOfWarChange();
+	MapUpdateVisible();
+	SetMessage("Fog Of War is now OFF");
+    } else if (strcmp(Input, "fast debug") == 0) {
+	SpeedMine = 10;	// speed factor for mine gold
+	SpeedGold = 10;	// speed factor for getting gold
+	SpeedChop = 10;	// speed factor for chop
+	SpeedWood = 10;	// speed factor for getting wood
+	SpeedHaul = 10;	// speed factor for haul oil
+	SpeedOil = 10;	// speed factor for getting oil
+	SpeedBuild = 10;	// speed factor for building
+	SpeedTrain = 10;	// speed factor for training
+	SpeedUpgrade = 10;	// speed factor for upgrading
+	SpeedResearch = 10;	// speed factor for researching
+	SetMessage("FAST DEBUG SPEED");
+    } else if (strcmp(Input, "normal debug") == 0) {
+	SpeedMine = 1;	// speed factor for mine gold
+	SpeedGold = 1;	// speed factor for getting gold
+	SpeedChop = 1;	// speed factor for chop
+	SpeedWood = 1;	// speed factor for getting wood
+	SpeedHaul = 1;	// speed factor for haul oil
+	SpeedOil = 1;	// speed factor for getting oil
+	SpeedBuild = 1;	// speed factor for building
+	SpeedTrain = 1;	// speed factor for training
+	SpeedUpgrade = 1;	// speed factor for upgrading
+	SpeedResearch = 1;	// speed factor for researching
+	SetMessage("NORMAL DEBUG SPEED");
+    } else if (strcmp(Input, "make it so") == 0) {
+	SpeedMine = 10;	// speed factor for mine gold
+	SpeedGold = 10;	// speed factor for getting gold
+	SpeedChop = 10;	// speed factor for chop
+	SpeedWood = 10;	// speed factor for getting wood
+	SpeedHaul = 10;	// speed factor for haul oil
+	SpeedOil = 10;	// speed factor for getting oil
+	SpeedBuild = 10;	// speed factor for building
+	SpeedTrain = 10;	// speed factor for training
+	SpeedUpgrade = 10;	// speed factor for upgrading
+	SpeedResearch = 10;	// speed factor for researching
+	ThisPlayer->Resources[GoldCost] += 32000;
+	ThisPlayer->Resources[WoodCost] += 32000;
+	ThisPlayer->Resources[OilCost] += 32000;
+	ThisPlayer->Resources[OreCost] += 32000;
+	ThisPlayer->Resources[StoneCost] += 32000;
+	ThisPlayer->Resources[CoalCost] += 32000;
+	MustRedraw |= RedrawResources;
+	SetMessage("SO!");
+    } else if (!strcmp(Input, "unite the clans") ) {
+	GameRunning=0;
+	GameResult=GameVictory;
+    } else if (!strcmp(Input, "you pitiful worm") ) {
+	GameRunning=0;
+	GameResult=GameDefeat;
+    } else {
+	ret=0;
+    }
+
+    return ret;
+}
+
+/**
 **	Handle keys in input mode.
 **
 **	@param key	Key scancode.
@@ -939,92 +1036,20 @@ local int InputKey(int key)
     switch (key) {
 	case '\r':
 	    if (Input[0] == '(') {
-		CclCommand(Input);
-	    } else if( NetworkFildes==-1 ) {
-		// Handle cheats
-		// FIXME: disable cheats
-		if (strcmp(Input, "there is no aliens level") == 0) {
-		    // FIXME: no function yet.
-		    SetMessage("cheat enabled");
-		} else if (strcmp(Input, "hatchet") == 0) {
-		    SpeedChop = 52 / 2;
-		    SetMessage("Wow -- I got jigsaw!");
-		} else if (strcmp(Input, "glittering prizes") == 0) {
-		    ThisPlayer->Resources[GoldCost] += 12000;
-		    ThisPlayer->Resources[WoodCost] += 5000;
-		    ThisPlayer->Resources[OilCost] += 5000;
-		    ThisPlayer->Resources[OreCost] += 5000;
-		    ThisPlayer->Resources[StoneCost] += 5000;
-		    ThisPlayer->Resources[CoalCost] += 5000;
-		    MustRedraw |= RedrawResources;
-		    SetMessage("!!! :)");
-		} else if (strcmp(Input, "on screen") == 0) {
-		    RevealMap();
-		} else if (!strcmp(Input, "showpath")) {
-		    RevealMap();
-		} else if (strcmp(Input, "fow on") == 0) {
-		    TheMap.NoFogOfWar = 0;
-		    UpdateFogOfWarChange();
-		    MapUpdateVisible();
-		    SetMessage("Fog Of War is now ON");
-		} else if (strcmp(Input, "fow off") == 0) {
-		    TheMap.NoFogOfWar = 1;
-		    UpdateFogOfWarChange();
-		    MapUpdateVisible();
-		    SetMessage("Fog Of War is now OFF");
-		} else if (strcmp(Input, "fast debug") == 0) {
-		    SpeedMine = 10;	// speed factor for mine gold
-		    SpeedGold = 10;	// speed factor for getting gold
-		    SpeedChop = 10;	// speed factor for chop
-		    SpeedWood = 10;	// speed factor for getting wood
-		    SpeedHaul = 10;	// speed factor for haul oil
-		    SpeedOil = 10;	// speed factor for getting oil
-		    SpeedBuild = 10;	// speed factor for building
-		    SpeedTrain = 10;	// speed factor for training
-		    SpeedUpgrade = 10;	// speed factor for upgrading
-		    SpeedResearch = 10;	// speed factor for researching
-		    SetMessage("FAST DEBUG SPEED");
-		} else if (strcmp(Input, "normal debug") == 0) {
-		    SpeedMine = 1;	// speed factor for mine gold
-		    SpeedGold = 1;	// speed factor for getting gold
-		    SpeedChop = 1;	// speed factor for chop
-		    SpeedWood = 1;	// speed factor for getting wood
-		    SpeedHaul = 1;	// speed factor for haul oil
-		    SpeedOil = 1;	// speed factor for getting oil
-		    SpeedBuild = 1;	// speed factor for building
-		    SpeedTrain = 1;	// speed factor for training
-		    SpeedUpgrade = 1;	// speed factor for upgrading
-		    SpeedResearch = 1;	// speed factor for researching
-		    SetMessage("NORMAL DEBUG SPEED");
-		} else if (strcmp(Input, "make it so") == 0) {
-		    SpeedMine = 10;	// speed factor for mine gold
-		    SpeedGold = 10;	// speed factor for getting gold
-		    SpeedChop = 10;	// speed factor for chop
-		    SpeedWood = 10;	// speed factor for getting wood
-		    SpeedHaul = 10;	// speed factor for haul oil
-		    SpeedOil = 10;	// speed factor for getting oil
-		    SpeedBuild = 10;	// speed factor for building
-		    SpeedTrain = 10;	// speed factor for training
-		    SpeedUpgrade = 10;	// speed factor for upgrading
-		    SpeedResearch = 10;	// speed factor for researching
-		    ThisPlayer->Resources[GoldCost] += 32000;
-		    ThisPlayer->Resources[WoodCost] += 32000;
-		    ThisPlayer->Resources[OilCost] += 32000;
-		    ThisPlayer->Resources[OreCost] += 32000;
-		    ThisPlayer->Resources[StoneCost] += 32000;
-		    ThisPlayer->Resources[CoalCost] += 32000;
-		    MustRedraw |= RedrawResources;
-		    SetMessage("SO!");
-		} else if (!strcmp(Input, "unite the clans") ) {
-		    GameRunning=0;
-		    GameResult=GameVictory;
-		} else if (!strcmp(Input, "you pitiful worm") ) {
-		    GameRunning=0;
-		    GameResult=GameDefeat;
-		} else {
-		    // FIXME: only to selected players ...
+		if (!GameObserve) {
+		    CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
+		    CclCommand(Input);
+		}
+	    } else if (NetworkFildes==-1) {
+		if (!GameObserve) {
+		    int ret;
+		    ret = HandleCheats(Input);
+		    if (ret) {
+			CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
+		    }
 		}
 	    }
+	    // FIXME: only to selected players ...
 	    sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
 	    NetworkChatMessage(ChatMessage);
 
