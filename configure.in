@@ -114,9 +114,6 @@ if test "$WIN32" = "1"; then
 	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
     fi
 fi
-if test "$ARCH" = "bsd"; then
-    VIDEO_LIBS="$VIDEO_LIBS -lpthread -lc"
-fi
 AC_SUBST(VIDEO_CFLAGS)
 AC_SUBST(VIDEO_LIBS)
 AC_SUBST(THREAD_LIBS)
