@@ -88,6 +88,88 @@ typedef unsigned MenuButtonId;
 /**
 **	Menuitem definition.
 */
+struct _menuitem_;
+typedef struct _menuitem_text_ {
+    unsigned char *text;
+    unsigned int tflags;
+} MenuitemText;
+typedef struct _menuitem_button_ {
+    unsigned char *text;
+    unsigned int xsize;
+    unsigned int ysize;
+    MenuButtonId button;
+    void (*handler)(void);
+    int hotkey;
+} MenuitemButton;
+typedef struct _menuitem_pulldown_ {
+    unsigned char **options;
+    unsigned int xsize;
+    unsigned int ysize;
+    MenuButtonId button;
+    void (*action)(struct _menuitem_ *, int);
+    int noptions;
+    int defopt;
+    int curopt;
+    int cursel;		/* used in popup state */
+    unsigned int state;
+} MenuitemPulldown;
+typedef struct _menuitem_listbox_ {
+    void *options;
+    unsigned int xsize;
+    unsigned int ysize;
+    MenuButtonId button;
+    void (*action)(struct _menuitem_ *, int);
+    int noptions;
+    int defopt;
+    int curopt;
+    int cursel;		/* used in mouse-over state */
+    int nlines;
+    int startline;
+    void *(*retrieveopt)(struct _menuitem_ *, int);
+    void (*handler)(void);	/* for return key */
+} MenuitemListbox;
+typedef struct _menuitem_vslider_ {
+    unsigned cflags;
+    unsigned int xsize;	// x-size of slider, not including buttons
+    unsigned int ysize;	// y-size of slider, not including buttons
+    void (*action)(struct _menuitem_ *, int);
+    int defper;
+    int percent;	// percent of the way to bottom (0 to 100)
+    int curper;		/* used in mouse-move state */
+    int cursel;		/* used in mouse-over state */
+    void (*handler)(void);	/* for return key */
+} MenuitemVslider;
+typedef struct _menuitem_hslider_ {
+    unsigned cflags;
+    unsigned int xsize; // x-size of slider, not including buttons
+    unsigned int ysize; // y-size of slider, not including buttons
+    void (*action)(struct _menuitem_ *, int);
+    int defper;
+    int percent;	// percent of the way to right (0 to 100)
+    int curper;		/* used in mouse-move state */
+    int cursel;		/* used in mouse-over state */
+    void (*handler)(void);	/* for return key */
+} MenuitemHslider;
+typedef struct _menuitem_drawfunc_ {
+    void (*draw)(struct _menuitem_ *);
+} MenuitemDrawfunc;
+typedef struct _menuitem_input_ {
+    unsigned char *buffer;
+    unsigned int xsize;
+    unsigned int ysize;
+    MenuButtonId button;
+    void (*action)(struct _menuitem_ *, int);	/* for key */
+    int nch;
+    int maxch;
+} MenuitemInput;
+typedef struct _menuitem_gem_ {
+    unsigned int state;
+    unsigned int xsize;
+    unsigned int ysize;
+    MenuButtonId button;
+    void (*action)(struct _menuitem_ *);
+} MenuitemGem;
+
 typedef struct _menuitem_ {
     int mitype;					/// FIXME: write docu
     int xofs;
@@ -97,86 +179,15 @@ typedef struct _menuitem_ {
     void (*initfunc)(struct _menuitem_ *);	/// constructor
     void (*exitfunc)(struct _menuitem_ *);	/// destructor
     union {
-	struct {
-	    unsigned char *text;
-	    unsigned int tflags;
-	} text;
-	struct {
-	    unsigned char *text;
-	    unsigned int xsize;
-	    unsigned int ysize;
-	    MenuButtonId button;
-	    void (*handler)(void);
-	    int hotkey;
-	} button;
-	struct {
-	    unsigned char **options;
-	    unsigned int xsize;
-	    unsigned int ysize;
-	    MenuButtonId button;
-	    void (*action)(struct _menuitem_ *, int);
-	    int noptions;
-	    int defopt;
-	    int curopt;
-	    int cursel;		/* used in popup state */
-	    unsigned int state;
-	} pulldown;
-	struct {
-	    void *options;
-	    unsigned int xsize;
-	    unsigned int ysize;
-	    MenuButtonId button;
-	    void (*action)(struct _menuitem_ *, int);
-	    int noptions;
-	    int defopt;
-	    int curopt;
-	    int cursel;		/* used in mouse-over state */
-	    int nlines;
-	    int startline;
-	    void *(*retrieveopt)(struct _menuitem_ *, int);
-	    void (*handler)(void);	/* for return key */
-	} listbox;
-	struct {
-	    unsigned cflags;
-	    unsigned int xsize;	// x-size of slider, not including buttons
-	    unsigned int ysize;	// y-size of slider, not including buttons
-	    void (*action)(struct _menuitem_ *, int);
-	    int defper;
-	    int percent;	// percent of the way to bottom (0 to 100)
-	    int curper;		/* used in mouse-move state */
-	    int cursel;		/* used in mouse-over state */
-	    void (*handler)(void);	/* for return key */
-	} vslider;
-	struct {
-	    unsigned cflags;
-	    unsigned int xsize; // x-size of slider, not including buttons
-	    unsigned int ysize; // y-size of slider, not including buttons
-	    void (*action)(struct _menuitem_ *, int);
-	    int defper;
-	    int percent;	// percent of the way to right (0 to 100)
-	    int curper;		/* used in mouse-move state */
-	    int cursel;		/* used in mouse-over state */
-	    void (*handler)(void);	/* for return key */
-	} hslider;
-	struct {
-	    void (*draw)(struct _menuitem_ *);
-	} drawfunc;
-	struct {
-	    unsigned char *buffer;
-	    unsigned int xsize;
-	    unsigned int ysize;
-	    MenuButtonId button;
-	    void (*action)(struct _menuitem_ *, int);	/* for key */
-	    int nch;
-	    int maxch;
-	} input;
-	struct {
-	    unsigned int state;
-	    unsigned int xsize;
-	    unsigned int ysize;
-	    MenuButtonId button;
-	    void (*action)(struct _menuitem_ *);
-	} gem;
+	MenuitemText text;
+	MenuitemButton button;
+	MenuitemPulldown pulldown;
+	MenuitemListbox listbox;
+	MenuitemVslider vslider;
+	MenuitemHslider hslider;
+	MenuitemDrawfunc drawfunc;
+	MenuitemInput input;
+	MenuitemGem gem;
 	/// ... add here ...
 
     } d;

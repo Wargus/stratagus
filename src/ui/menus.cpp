@@ -97,7 +97,7 @@ local void ShowTipsMenu(void);
 local void InitTips(Menuitem *mi);
 local void TipsMenuEnd(void);
 local void SetTips(Menuitem *mi);
-local void ShowNextTip();
+local void ShowNextTip(void);
 
 local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
@@ -261,144 +261,169 @@ local Graphic* Menusbgnd;
 **	@todo FIXME: Configure with CCL.
 */
 local Menuitem GameMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Game Menu", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11} } },
-    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, GameOptions, KeyCodeF5} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, HelpMenu, KeyCodeF1} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, GameMenuObjectives, 'o'} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEndScenario, 'e'} } },
-    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitGameMenuItems() {
+    MenuitemText   i0 = { "Game Menu", MI_TFLAGS_CENTERED};
+    MenuitemButton i1 = { "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11};
+    MenuitemButton i2 = { "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12};
+    MenuitemButton i3 = { "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, GameOptions, KeyCodeF5};
+    MenuitemButton i4 = { "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, HelpMenu, KeyCodeF1};
+    MenuitemButton i5 = { "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, GameMenuObjectives, 'o'};
+    MenuitemButton i6 = { "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEndScenario, 'e'};
+    MenuitemButton i7 = { "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'};
+    GameMenuItems[0].d.text   = i0;
+    GameMenuItems[1].d.button = i1;
+    GameMenuItems[2].d.button = i2;
+    GameMenuItems[3].d.button = i3;
+    GameMenuItems[4].d.button = i4;
+    GameMenuItems[5].d.button = i5;
+    GameMenuItems[6].d.button = i6;
+    GameMenuItems[7].d.button = i7;
+}
 
 /**
 **	Items for the Victory Menu
 **	@todo FIXME: Configure with CCL.
 */
 local Menuitem VictoryMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Congratulations!", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
-	{ text:{ "You are victorious!", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
-    { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF11} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
 };
+local void InitVictoryMenuItems() {
+    MenuitemText   i0 = { "Congratulations!", MI_TFLAGS_CENTERED};
+    MenuitemText   i1 = { "You are victorious!", MI_TFLAGS_CENTERED};
+    MenuitemButton i2 = { "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'};
+    MenuitemButton i3 = { "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF11};
+    VictoryMenuItems[0].d.text   = i0;
+    VictoryMenuItems[1].d.text   = i1;
+    VictoryMenuItems[2].d.button = i2;
+    VictoryMenuItems[3].d.button = i3;
+}
 
 /**
 **	Items for the Lost Menu
 **	@todo FIXME: Configure with CCL.
 */
 local Menuitem LostMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "You failed to", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
-	{ text:{ "achieve victory!", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitLostMenuItems() {
+    MenuitemText   i0 = { "You failed to", MI_TFLAGS_CENTERED};
+    MenuitemText   i1 = { "achieve victory!", MI_TFLAGS_CENTERED};
+    MenuitemButton i2 = { "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'};
+    LostMenuItems[0].d.text   = i0;
+    LostMenuItems[1].d.text   = i1;
+    LostMenuItems[2].d.button = i2;
+}
 
 local Menuitem TipsMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, InitTips, NULL,
-	{ text:{ "Freecraft Tips", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 14, 256-75, 0, GameFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_CHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetTips} } },
-    { MI_TYPE_TEXT, 14+22, 256-75+4, 0, GameFont, NULL, NULL,
-	{ text:{ "Show tips at startup", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_BUTTON, 14, 256-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!Next Tip", 106, 27, MBUTTON_GM_HALF, ShowNextTip, 'n'} } },
-    { MI_TYPE_BUTTON, 168, 256-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!Close", 106, 27, MBUTTON_GM_HALF, TipsMenuEnd, 'c'} } },
-    { MI_TYPE_TEXT, 14, 35+16*0, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 14, 35+16*1, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 14, 35+16*2, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 14, 35+16*3, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 14, 35+16*4, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 14, 35+16*5, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 14, 35+16*6, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 14, 35+16*7, 0, GameFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_LALIGN} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, InitTips, NULL, NULL },
+    { MI_TYPE_GEM, 14, 256-75, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14+22, 256-75+4, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 14, 256-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 168, 256-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*0, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*1, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*4, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*6, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 35+16*7, 0, GameFont, NULL, NULL, NULL },
 };
+local void InitTipsMenuItems() {
+    MenuitemText   i0  = { "Freecraft Tips", MI_TFLAGS_CENTERED};
+    MenuitemGem    i1  = { MI_GSTATE_CHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetTips};
+    MenuitemText   i2  = { "Show tips at startup", MI_TFLAGS_LALIGN};
+    MenuitemButton i3  = { "~!Next Tip", 106, 27, MBUTTON_GM_HALF, ShowNextTip, 'n'};
+    MenuitemButton i4  = { "~!Close", 106, 27, MBUTTON_GM_HALF, TipsMenuEnd, 'c'};
+    MenuitemText   i5  = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText   i6  = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText   i7  = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText   i8  = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText   i9  = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText   i10 = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText   i11 = { NULL, MI_TFLAGS_LALIGN};
+    MenuitemText   i12 = { NULL, MI_TFLAGS_LALIGN};
+    TipsMenuItems[0].d.text   = i0;
+    TipsMenuItems[1].d.gem    = i1;
+    TipsMenuItems[2].d.text   = i2;
+    TipsMenuItems[3].d.button = i3;
+    TipsMenuItems[4].d.button = i4;
+    TipsMenuItems[5].d.text   = i5;
+    TipsMenuItems[6].d.text   = i6;
+    TipsMenuItems[7].d.text   = i7;
+    TipsMenuItems[8].d.text   = i8;
+    TipsMenuItems[9].d.text   = i9;
+    TipsMenuItems[10].d.text  = i10;
+    TipsMenuItems[11].d.text  = i11;
+    TipsMenuItems[12].d.text  = i12;
+}
 
 local Menuitem ObjectivesMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Objectives", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 14, 38+21*0, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*1, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*2, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*3, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*4, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*5, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*6, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*7, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_TEXT, 14, 38+21*8, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, 0} } },
-    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*0, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*4, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*6, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*7, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 14, 38+21*8, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitObjectivesMenuItems() {
+    MenuitemText   i0  = { "Objectives", MI_TFLAGS_CENTERED};
+    MenuitemText   i1  = { NULL, 0};
+    MenuitemButton i10 = { "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'};
+    ObjectivesMenuItems[0].d.text    = i0;
+    ObjectivesMenuItems[1].d.text    = i1;
+    ObjectivesMenuItems[2].d.text    = i1;
+    ObjectivesMenuItems[3].d.text    = i1;
+    ObjectivesMenuItems[4].d.text    = i1;
+    ObjectivesMenuItems[5].d.text    = i1;
+    ObjectivesMenuItems[6].d.text    = i1;
+    ObjectivesMenuItems[7].d.text    = i1;
+    ObjectivesMenuItems[8].d.text    = i1;
+    ObjectivesMenuItems[9].d.text    = i1;
+    ObjectivesMenuItems[10].d.button = i10;
+}
 
 local Menuitem EndScenarioMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "End Scenario", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Restart Scenario", 224, 27, MBUTTON_GM_FULL, EndScenarioRestart, 'r'} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Surrender", 224, 27, MBUTTON_GM_FULL, EndScenarioSurrender, 's'} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*2, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Quit to Menu", 224, 27, MBUTTON_GM_FULL, EndScenarioQuitMenu, 'q'} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*3, 0, LargeFont, NULL, NULL,
-	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
-    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitEndScenarioMenuItems() {
+    MenuitemText   i0 = { "End Scenario", MI_TFLAGS_CENTERED};
+    MenuitemButton i1 = { "~!Restart Scenario", 224, 27, MBUTTON_GM_FULL, EndScenarioRestart, 'r'};
+    MenuitemButton i2 = { "~!Surrender", 224, 27, MBUTTON_GM_FULL, EndScenarioSurrender, 's'};
+    MenuitemButton i3 = { "~!Quit to Menu", 224, 27, MBUTTON_GM_FULL, EndScenarioQuitMenu, 'q'};
+    MenuitemButton i4 = { "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'};
+    MenuitemButton i5 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
+    EndScenarioMenuItems[0].d.text  = i0;
+    EndScenarioMenuItems[1].d.button = i1;
+    EndScenarioMenuItems[2].d.button = i2;
+    EndScenarioMenuItems[3].d.button = i3;
+    EndScenarioMenuItems[4].d.button = i4;
+    EndScenarioMenuItems[5].d.button = i5;
+}
 
 /**
 **	Items for the SelectScen Menu
@@ -437,68 +462,78 @@ global MapInfo *ScenSelectPudInfo;		/// Selected pud info
 **	@todo FIXME: Configure with CCL.
 */
 local Menuitem ScenSelectMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL,
-	{ text:{ "Select scenario", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL, NULL },
 
-    { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit,
-	{ listbox:{ NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0,
-		    (void *)ScenSelectLBRetrieve, ScenSelectOk} } },
-    { MI_TYPE_VSLIDER, 312, 140, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit, NULL },
+    { MI_TYPE_VSLIDER, 312, 140, 0, 0, NULL, NULL, NULL },
 
-    { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "OK", 106, 27, MBUTTON_GM_HALF, ScenSelectOk, 0} } },
-    { MI_TYPE_BUTTON, 198, 318, 0, LargeFont, NULL, NULL,
-	{ button:{ "Cancel", 106, 27, MBUTTON_GM_HALF, ScenSelectCancel, 0} } },
+    { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 198, 318, 0, LargeFont, NULL, NULL, NULL },
 
-    { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL,
-	{ text:{ "Type:", MI_TFLAGS_RALIGN} } },
-    { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 2, 1, 1, 0, 0} } },
-    { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
-	{ text:{ "Map size:", MI_TFLAGS_RALIGN} } },
-    { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 8, 0, 0, 0, 0} } },
-    { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL,
-	{ button:{ NULL, 36, 24, MBUTTON_FOLDER, ScenSelectFolder, 0} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL, NULL },
 };
+local void InitScenSelectMenuItems() {
+    MenuitemText    i0 = { "Select scenario", MI_TFLAGS_CENTERED};
+
+    MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0,
+			    (void *)ScenSelectLBRetrieve, ScenSelectOk};
+    MenuitemVslider  i2 = { 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
+
+    MenuitemButton   i3 = { "OK", 106, 27, MBUTTON_GM_HALF, ScenSelectOk, 0};
+    MenuitemButton   i4 = { "Cancel", 106, 27, MBUTTON_GM_HALF, ScenSelectCancel, 0};
+
+    MenuitemText     i5 = { "Type:", MI_TFLAGS_RALIGN};
+    MenuitemPulldown i6 = { ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 2, 1, 1, 0, 0};
+    MenuitemText     i7 = { "Map size:", MI_TFLAGS_RALIGN};
+    MenuitemPulldown i8 = { ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 8, 0, 0, 0, 0};
+    MenuitemButton   i9 = { NULL, 36, 24, MBUTTON_FOLDER, ScenSelectFolder, 0};
+    ScenSelectMenuItems[0].d.text     = i0;
+    ScenSelectMenuItems[1].d.listbox  = i1;
+    ScenSelectMenuItems[2].d.vslider  = i2;
+    ScenSelectMenuItems[3].d.button   = i3;
+    ScenSelectMenuItems[4].d.button   = i4;
+    ScenSelectMenuItems[5].d.text     = i5;
+    ScenSelectMenuItems[6].d.pulldown = i6;
+    ScenSelectMenuItems[7].d.text     = i7;
+    ScenSelectMenuItems[8].d.pulldown = i8;
+    ScenSelectMenuItems[9].d.button   = i9;
+}
 
 /**
 **	Items for the Program Start Menu
 */
 local Menuitem PrgStartMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
-	{ drawfunc:{ NameLineDrawFunc } } },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 0, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Single Player Game", 224, 27,
-	    MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 1, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Multi Player Game", 224, 27,
-	    MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 2, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Campaign Game", 224, 27,
-	    MBUTTON_GM_FULL, CampaignGameMenu, 'c'} } },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 3, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "~!Load Game", 224, 27,
-	    MBUTTON_GM_FULL, GameMenuLoad, 'l'} } },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "~!Options", 224, 27,
-	    MBUTTON_GM_FULL, GameGlobalOptionsMenu, 'o'} } },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 5, 0, LargeFont, NULL, NULL,
-	{ button:{ "S~!how Credits", 224, 27,
-	    MBUTTON_GM_FULL, GameShowCredits, 'h'} } },
-    { MI_TYPE_BUTTON, 208, 180 + 36 * 6, 0, LargeFont, NULL, NULL,
-	{ button:{ "E~!xit Program", 224, 27,
-	    MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 0, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 3, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 6, 0, LargeFont, NULL, NULL, NULL },
 };
+local void InitPrgStartMenuItems() {
+    MenuitemDrawfunc i0 = { NameLineDrawFunc };
+    MenuitemButton   i1 = { "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'};
+    MenuitemButton   i2 = { "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'};
+    MenuitemButton   i3 = { "~!Campaign Game", 224, 27, MBUTTON_GM_FULL, CampaignGameMenu, 'c'};
+    MenuitemButton   i4 = { "~!Load Game", 224, 27, MBUTTON_GM_FULL, GameMenuLoad, 'l'};
+    MenuitemButton   i5 = { "~!Options", 224, 27, MBUTTON_GM_FULL, GameGlobalOptionsMenu, 'o'};
+    MenuitemButton   i6 = { "S~!how Credits", 224, 27, MBUTTON_GM_FULL, GameShowCredits, 'h'};
+    MenuitemButton   i7 = { "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'};
+    PrgStartMenuItems[0].d.drawfunc = i0;
+    PrgStartMenuItems[1].d.button   = i1;
+    PrgStartMenuItems[2].d.button   = i2;
+    PrgStartMenuItems[3].d.button   = i3;
+    PrgStartMenuItems[4].d.button   = i4;
+    PrgStartMenuItems[5].d.button   = i5;
+    PrgStartMenuItems[6].d.button   = i6;
+    PrgStartMenuItems[7].d.button   = i7;
+}
 
 /**
 **	Items for the Custom Game Setup Menu
@@ -560,683 +595,828 @@ local unsigned char *mgptsoptions[] = {
 **	Single player custom game menu.
 */
 local Menuitem CustomGameMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, GameSetupInit, NULL,
-	{ drawfunc:{ GameDrawFunc } } },
-    { MI_TYPE_TEXT, 640/2+12, 192, 0, LargeFont, NULL, NULL,
-	{ text:{ "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
-	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'} } },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, GameCancel, 'c'} } },
-    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Your Race:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0} } },
-    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Resources:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, 0} } },
-    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Units:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, 0} } },
-    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Opponents:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgopsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameOPSAction, 8, 0, 0, 0, 0} } },
-    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Map Tileset:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, GameSetupInit, NULL, NULL },
+    { MI_TYPE_TEXT, 640/2+12, 192, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, NULL },
 };
+local void InitCustomGameMenuItems() {
+    MenuitemDrawfunc i0  = { GameDrawFunc };
+    MenuitemText     i1  = { "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED};
+    MenuitemButton   i2  = { "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'};
+    MenuitemButton   i3  = { "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'};
+    MenuitemButton   i4  = { "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, GameCancel, 'c'};
+    MenuitemText     i5  = { "~<Your Race:~>", 0};
+    MenuitemPulldown i6  = { rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0};
+    MenuitemText     i7  = { "~<Resources:~>", 0};
+    MenuitemPulldown i8  = { resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, 0};
+    MenuitemText     i9  = { "~<Units:~>", 0};
+    MenuitemPulldown i10 = { unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, 0};
+    MenuitemText     i11 = { "~<Opponents:~>", 0};
+    MenuitemPulldown i12 = { cgopsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameOPSAction, 8, 0, 0, 0, 0};
+    MenuitemText     i13 = { "~<Map Tileset:~>", 0};
+    MenuitemPulldown i14 = { tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0};
+    CustomGameMenuItems[0].d.drawfunc  = i0;
+    CustomGameMenuItems[1].d.text      = i1;
+    CustomGameMenuItems[2].d.button    = i2;
+    CustomGameMenuItems[3].d.button    = i3;
+    CustomGameMenuItems[4].d.button    = i4;
+    CustomGameMenuItems[5].d.text      = i5;
+    CustomGameMenuItems[6].d.pulldown  = i6;
+    CustomGameMenuItems[7].d.text      = i7;
+    CustomGameMenuItems[8].d.pulldown  = i8;
+    CustomGameMenuItems[9].d.text      = i9;
+    CustomGameMenuItems[10].d.pulldown = i10;
+    CustomGameMenuItems[11].d.text     = i11;
+    CustomGameMenuItems[12].d.pulldown = i12;
+    CustomGameMenuItems[13].d.text     = i13;
+    CustomGameMenuItems[14].d.pulldown = i14;
+}
 
 /**
 **	Items for the Enter Name Menu
 */
 local Menuitem EnterNameMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL,
-	{ text:{ "Enter your name:", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL,
-	{ input:{ NULL, 212, 20, MBUTTON_PULLDOWN, EnterNameAction, 0, 0} } },
-    { MI_TYPE_BUTTON, 24, 80, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
-    { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterNameCancel, 'c'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 24, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL, NULL },
 };
+local void InitEnterNameMenuItems() {
+    MenuitemText   i0 = { "Enter your name:", MI_TFLAGS_CENTERED};
+    MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterNameAction, 0, 0};
+    MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
+    MenuitemButton i3 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterNameCancel, 'c'};
+    EnterNameMenuItems[0].d.text   = i0;
+    EnterNameMenuItems[1].d.input  = i1;
+    EnterNameMenuItems[2].d.button = i2;
+    EnterNameMenuItems[3].d.button = i3;
+}
 
 /**
 **	Items for the Enter Server Menu
 */
 local Menuitem EnterServerIPMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL,
-	{ text:{ "Enter server IP-address:", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL,
-	{ input:{ NULL, 212, 20, MBUTTON_PULLDOWN, EnterServerIPAction, 0, 0} } },
-    { MI_TYPE_BUTTON, 24, 80, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
-    { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterServerIPCancel, 'c'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 24, 80, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitEnterServerIPMenuItems() {
+    MenuitemText   i0 = { "Enter server IP-address:", MI_TFLAGS_CENTERED};
+    MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterServerIPAction, 0, 0};
+    MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
+    MenuitemButton i3 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterServerIPCancel, 'c'};
+    EnterServerIPMenuItems[0].d.text   = i0;
+    EnterServerIPMenuItems[1].d.input  = i1;
+    EnterServerIPMenuItems[2].d.button = i2;
+    EnterServerIPMenuItems[3].d.button = i3;
+}
 
 /**
 **	Items for the Net Create Join Menu
 */
 local Menuitem NetCreateJoinMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL/*StartMenusSetBackground*/, NULL,
-	{ button:{ "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'} } },
-    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'} } },
-    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL/*StartMenusSetBackground*/, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL, NULL },
 };
+local void InitNetCreateJoinMenuItems() {
+    MenuitemButton i0 = { "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'};
+    MenuitemButton i1 = { "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'};
+    MenuitemButton i2 = { "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'};
+    NetCreateJoinMenuItems[0].d.button = i0;
+    NetCreateJoinMenuItems[1].d.button = i1;
+    NetCreateJoinMenuItems[2].d.button = i2;
+}
 
 
 /**
 **	Items for the Net Multiplayer Setup Menu
 */
 local Menuitem NetMultiButtonStorage[] = {
-#ifdef __GNUC__
-    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN,
-	    MultiGamePTSAction, 3, -1, 0, 0, 0} } },
-    { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL,
-	{ drawfunc:{ NetMultiPlayerDrawFunc } } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL, NULL },
 };
+local void InitNetMultiButtonStorage() {
+    MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
+    MenuitemDrawfunc i1 = { NetMultiPlayerDrawFunc };
+    NetMultiButtonStorage[0].d.pulldown = i0;
+    NetMultiButtonStorage[1].d.drawfunc = i1;
+}
 
 /**
 **	Multi player custom game menu (server side).
 */
 local Menuitem NetMultiSetupMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameSetupInit, NULL,
-	{ drawfunc:{ MultiGameDrawFunc } } },
-    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL,
-	{ text:{ "~<Multi Player Setup~>", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
-	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, MultiScenSelectMenu, 'e'} } },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, MultiGameStart, 's'} } },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiGameCancel, 'c'} } },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameSetupInit, NULL, NULL },
+    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, NULL },
 
     // 8+7 player slots (content here is overwritten!)
 #define SERVER_PLAYER_STATE	5
-    { MI_TYPE_PULLDOWN, 40, 32+22*0, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*1, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*0, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*1, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:
-	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*0, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*1, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*0, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*1, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL, NULL },
 
-    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Your Race:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction,
-	3, 2, 2, 0, 0} } },
-    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Resources:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction,
-	4, 0, 0, 0, 0} } },
-    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Units:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction,
-	2, 0, 0, 0, 0} } },
-    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Fog of War:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN,
-	MultiGameFWSAction, 2, 0, 0, 0, 0} } },
-    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Map Tileset:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction,
-	5, 0, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, NULL },
 
     // 7+7 player ready buttons
 #define SERVER_PLAYER_READY	30
-    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL, NULL },
 
-    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL, NULL },
     // FIXME: Slot 15 is reserved for neutral computer
     //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL,
     //	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
 
     // 7+7 player lag buttons
 #define SERVER_PLAYER_LAG	44
-    { MI_TYPE_GEM, 218, 32+22*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 218, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 218, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 218, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 218, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 218, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 218, 32+22*7, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 218, 32+22*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 218, 32+22*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 218, 32+22*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 218, 32+22*4, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 218, 32+22*5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 218, 32+22*6, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 218, 32+22*7, 0, LargeFont, NULL, NULL, NULL },
 
-    { MI_TYPE_GEM, 538, 32+22*0, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 538, 32+22*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 538, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 538, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 538, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 538, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-    { MI_TYPE_GEM, 538, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 538, 32+22*0, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 538, 32+22*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 538, 32+22*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 538, 32+22*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 538, 32+22*4, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 538, 32+22*5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 538, 32+22*6, 0, LargeFont, NULL, NULL, NULL },
     // FIXME: Slot 15 is reserved for neutral computer
     //{ MI_TYPE_GEM, 538, 32+22*7, 0, LargeFont, NULL, NULL,
     //	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
-#else
-#define SERVER_PLAYER_STATE	5
-#define SERVER_PLAYER_READY	30
-#define SERVER_PLAYER_LAG	44
-    { 0 }
-#endif
 };
+local void InitNetMultiSetupMenuItems() {
+    MenuitemDrawfunc i0  = { MultiGameDrawFunc };
+    MenuitemText     i1  = { "~<Multi Player Setup~>", MI_TFLAGS_CENTERED};
+    MenuitemButton   i2  = { "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, MultiScenSelectMenu, 'e'};
+    MenuitemButton   i3  = { "~!Start Game", 224, 27, MBUTTON_GM_FULL, MultiGameStart, 's'};
+    MenuitemButton   i4  = { "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiGameCancel, 'c'};
+
+    MenuitemPulldown i5  = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i6  = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i7  = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i8  = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i9  = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i10 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i11 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i12 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i13 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i14 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i15 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i16 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i17 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i18 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i19 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+
+    MenuitemText     i20 = { "~<Your Race:~>", 0};
+    MenuitemPulldown i21 = { rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0};
+    MenuitemText     i22 = { "~<Resources:~>", 0};
+    MenuitemPulldown i23 = { resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, 0};
+    MenuitemText     i24 = { "~<Units:~>", 0};
+    MenuitemPulldown i25 = { unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, 0};
+    MenuitemText     i26 = { "~<Fog of War:~>", 0};
+    MenuitemPulldown i27 = { mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0, 0};
+    MenuitemText     i28 = { "~<Map Tileset:~>", 0};
+    MenuitemPulldown i29 = { tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0};
+
+    MenuitemGem      i30 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i31 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i32 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i33 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i34 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i35 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i36 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+
+    MenuitemGem      i37 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i38 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i39 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i40 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i41 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i42 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+    MenuitemGem      i43 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL};
+
+    MenuitemGem      i44 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i45 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i46 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i47 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i48 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i49 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i50 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+
+    MenuitemGem      i51 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i52 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i53 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i54 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i55 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i56 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+    MenuitemGem      i57 = { MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL};
+
+    NetMultiSetupMenuItems[0].d.drawfunc  = i0;
+    NetMultiSetupMenuItems[1].d.text      = i1;
+    NetMultiSetupMenuItems[2].d.button    = i2;
+    NetMultiSetupMenuItems[3].d.button    = i3;
+    NetMultiSetupMenuItems[4].d.button    = i4;
+    NetMultiSetupMenuItems[5].d.pulldown  = i5;
+    NetMultiSetupMenuItems[6].d.pulldown  = i6;
+    NetMultiSetupMenuItems[7].d.pulldown  = i7;
+    NetMultiSetupMenuItems[8].d.pulldown  = i8;
+    NetMultiSetupMenuItems[9].d.pulldown  = i9;
+    NetMultiSetupMenuItems[10].d.pulldown = i10;
+    NetMultiSetupMenuItems[11].d.pulldown = i11;
+    NetMultiSetupMenuItems[12].d.pulldown = i12;
+    NetMultiSetupMenuItems[13].d.pulldown = i13;
+    NetMultiSetupMenuItems[14].d.pulldown = i14;
+    NetMultiSetupMenuItems[15].d.pulldown = i15;
+    NetMultiSetupMenuItems[16].d.pulldown = i16;
+    NetMultiSetupMenuItems[17].d.pulldown = i17;
+    NetMultiSetupMenuItems[18].d.pulldown = i18;
+    NetMultiSetupMenuItems[19].d.pulldown = i19;
+    NetMultiSetupMenuItems[20].d.text     = i20;
+    NetMultiSetupMenuItems[21].d.pulldown = i21;
+    NetMultiSetupMenuItems[22].d.text     = i22;
+    NetMultiSetupMenuItems[23].d.pulldown = i23;
+    NetMultiSetupMenuItems[24].d.text     = i24;
+    NetMultiSetupMenuItems[25].d.pulldown = i25;
+    NetMultiSetupMenuItems[26].d.text     = i26;
+    NetMultiSetupMenuItems[27].d.pulldown = i27;
+    NetMultiSetupMenuItems[28].d.text     = i28;
+    NetMultiSetupMenuItems[29].d.pulldown = i29;
+    NetMultiSetupMenuItems[30].d.gem      = i30;
+    NetMultiSetupMenuItems[31].d.gem      = i31;
+    NetMultiSetupMenuItems[32].d.gem      = i32;
+    NetMultiSetupMenuItems[33].d.gem      = i33;
+    NetMultiSetupMenuItems[34].d.gem      = i34;
+    NetMultiSetupMenuItems[35].d.gem      = i35;
+    NetMultiSetupMenuItems[36].d.gem      = i36;
+    NetMultiSetupMenuItems[37].d.gem      = i37;
+    NetMultiSetupMenuItems[38].d.gem      = i38;
+    NetMultiSetupMenuItems[39].d.gem      = i39;
+    NetMultiSetupMenuItems[40].d.gem      = i40;
+    NetMultiSetupMenuItems[41].d.gem      = i41;
+    NetMultiSetupMenuItems[42].d.gem      = i42;
+    NetMultiSetupMenuItems[43].d.gem      = i43;
+    NetMultiSetupMenuItems[44].d.gem      = i44;
+    NetMultiSetupMenuItems[45].d.gem      = i45;
+    NetMultiSetupMenuItems[46].d.gem      = i46;
+    NetMultiSetupMenuItems[47].d.gem      = i47;
+    NetMultiSetupMenuItems[48].d.gem      = i48;
+    NetMultiSetupMenuItems[49].d.gem      = i49;
+    NetMultiSetupMenuItems[50].d.gem      = i50;
+    NetMultiSetupMenuItems[51].d.gem      = i51;
+    NetMultiSetupMenuItems[52].d.gem      = i52;
+    NetMultiSetupMenuItems[53].d.gem      = i53;
+    NetMultiSetupMenuItems[54].d.gem      = i54;
+    NetMultiSetupMenuItems[55].d.gem      = i55;
+    NetMultiSetupMenuItems[56].d.gem      = i56;
+    NetMultiSetupMenuItems[57].d.gem      = i57;
+}
 
 /**
 **	Multi player client game menu.
 */
 local Menuitem NetMultiClientMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameClientInit, NULL,
-	{ drawfunc:{ MultiGameClientDrawFunc } } },
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameClientInit, NULL, NULL },
 
-    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL,
-	{ text:{ "~<Multi Player Game~>", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL, NULL },
 
-    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Ready", 224, 27, MBUTTON_GM_FULL, MultiClientReady, 'r'} } },
-    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Not Ready", 224, 27, MBUTTON_GM_FULL, MultiClientNotReady, 'n'} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL, NULL },
 
-    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiClientCancel, 'c'} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, NULL },
 
     // 8+7 player slots
 #define CLIENT_PLAYER_STATE	5
-    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:{
-	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL, NULL },
 
-    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Your Race:~>", 0} } },
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, NULL },
 #define CLIENT_RACE	21
-    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN,
-	    MultiClientRCSAction, 3, 2, 2, 0, 0} } },
-    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Resources:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, NULL },
 #define CLIENT_RESOURCE	23
-    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN,
-	    GameRESAction, 4, 0, 0, 0, MI_PSTATE_PASSIVE} } },
-    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Units:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, NULL },
 #define CLIENT_UNITS	25
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN,
-	    GameUNSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
-    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Fog of War:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, NULL },
 #define CLIENT_FOG_OF_WAR	27
-    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN,
-	    MultiGameFWSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
-    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
-	{ text:{ "~<Map Tileset:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, NULL },
 #define CLIENT_TILESET	29
-    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN,
-	    GameTSSAction, 5, 0, 0, 0, MI_PSTATE_PASSIVE} } },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, NULL },
 
     // 7+7 player state buttons
 #define CLIENT_PLAYER_READY	30
-    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL, NULL },
     //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL,
     //	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-#else
-#define CLIENT_PLAYER_STATE	5
-#define CLIENT_RACE	21
-#define CLIENT_RESOURCE	23
-#define CLIENT_UNITS	25
-#define CLIENT_FOG_OF_WAR	27
-#define CLIENT_TILESET	29
-#define CLIENT_PLAYER_READY	30
-    { 0 }
-#endif
 };
+local void InitNetMultiClientMenuItems() {
+    MenuitemDrawfunc i0 = { MultiGameClientDrawFunc };
+
+    MenuitemText     i1 = { "~<Multi Player Game~>", MI_TFLAGS_CENTERED};
+
+    MenuitemButton   i2 = { "~!Ready", 224, 27, MBUTTON_GM_FULL, MultiClientReady, 'r'};
+    MenuitemButton   i3 = { "~!Not Ready", 224, 27, MBUTTON_GM_FULL, MultiClientNotReady, 'n'};
+
+    MenuitemButton   i4 = { "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiClientCancel, 'c'};
+
+    MenuitemPulldown i5 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i6 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i7 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i8 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i9 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i10 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i11 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i12 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i13 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i14 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i15 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i16 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i17 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i18 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+    MenuitemPulldown i19 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0};
+
+    MenuitemText     i20 = { "~<Your Race:~>", 0};
+    MenuitemPulldown i21 = { rcsoptions, 152, 20, MBUTTON_PULLDOWN, MultiClientRCSAction, 3, 2, 2, 0, 0};
+    MenuitemText     i22 = { "~<Resources:~>", 0};
+    MenuitemPulldown i23 = { resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, MI_PSTATE_PASSIVE};
+    MenuitemText     i24 = { "~<Units:~>", 0};
+    MenuitemPulldown i25 = { unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE};
+    MenuitemText     i26 = { "~<Fog of War:~>", 0};
+    MenuitemPulldown i27 = { mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE};
+    MenuitemText     i28 = { "~<Map Tileset:~>", 0};
+    MenuitemPulldown i29 = { tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, MI_PSTATE_PASSIVE};
+
+    MenuitemGem      i30 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i31 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i32 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i33 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i34 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i35 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i36 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i37 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i38 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i39 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i40 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i41 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i42 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+    MenuitemGem      i43 = { 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction};
+
+    NetMultiClientMenuItems[0].d.drawfunc  = i0;
+    NetMultiClientMenuItems[1].d.text      = i1;
+    NetMultiClientMenuItems[2].d.button    = i2;
+    NetMultiClientMenuItems[3].d.button    = i3;
+    NetMultiClientMenuItems[4].d.button    = i4;
+    NetMultiClientMenuItems[5].d.pulldown  = i5;
+    NetMultiClientMenuItems[6].d.pulldown  = i6;
+    NetMultiClientMenuItems[7].d.pulldown  = i7;
+    NetMultiClientMenuItems[8].d.pulldown  = i8;
+    NetMultiClientMenuItems[9].d.pulldown  = i9;
+    NetMultiClientMenuItems[10].d.pulldown = i10;
+    NetMultiClientMenuItems[11].d.pulldown = i11;
+    NetMultiClientMenuItems[12].d.pulldown = i12;
+    NetMultiClientMenuItems[13].d.pulldown = i13;
+    NetMultiClientMenuItems[14].d.pulldown = i14;
+    NetMultiClientMenuItems[15].d.pulldown = i15;
+    NetMultiClientMenuItems[16].d.pulldown = i16;
+    NetMultiClientMenuItems[17].d.pulldown = i17;
+    NetMultiClientMenuItems[18].d.pulldown = i18;
+    NetMultiClientMenuItems[19].d.pulldown = i19;
+    NetMultiClientMenuItems[20].d.text     = i20;
+    NetMultiClientMenuItems[21].d.pulldown = i21;
+    NetMultiClientMenuItems[22].d.text     = i22;
+    NetMultiClientMenuItems[23].d.pulldown = i23;
+    NetMultiClientMenuItems[24].d.text     = i24;
+    NetMultiClientMenuItems[25].d.pulldown = i25;
+    NetMultiClientMenuItems[26].d.text     = i26;
+    NetMultiClientMenuItems[27].d.pulldown = i27;
+    NetMultiClientMenuItems[28].d.text     = i28;
+    NetMultiClientMenuItems[29].d.pulldown = i29;
+    NetMultiClientMenuItems[30].d.gem      = i30;
+    NetMultiClientMenuItems[31].d.gem      = i31;
+    NetMultiClientMenuItems[32].d.gem      = i32;
+    NetMultiClientMenuItems[33].d.gem      = i33;
+    NetMultiClientMenuItems[34].d.gem      = i34;
+    NetMultiClientMenuItems[35].d.gem      = i35;
+    NetMultiClientMenuItems[36].d.gem      = i36;
+    NetMultiClientMenuItems[37].d.gem      = i37;
+    NetMultiClientMenuItems[38].d.gem      = i38;
+    NetMultiClientMenuItems[39].d.gem      = i39;
+    NetMultiClientMenuItems[40].d.gem      = i40;
+    NetMultiClientMenuItems[41].d.gem      = i41;
+    NetMultiClientMenuItems[42].d.gem      = i42;
+    NetMultiClientMenuItems[43].d.gem      = i43;
+}
 
 local Menuitem NetErrorMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Error:", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 38, 0, LargeFont, NULL, NULL,
-	{ text:{ NULL, MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 92, 80, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 144, 38, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 92, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitNetErrorMenuItems() {
+    MenuitemText   i0 = { "Error:", MI_TFLAGS_CENTERED};
+    MenuitemText   i1 = { NULL, MI_TFLAGS_CENTERED};
+    MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
+    NetErrorMenuItems[0].d.text   = i0;
+    NetErrorMenuItems[1].d.text   = i1;
+    NetErrorMenuItems[2].d.button = i2;
+}
 
 /**
 **	Items for the Connecting Network Menu
 */
 local Menuitem ConnectingMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Connecting to server", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
-	{ text:{ NetworkServerText, MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 53, 0, LargeFont, NULL, NULL,
-	{ text:{ NetworkTriesText , MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel", 224, 27, MBUTTON_GM_FULL, NetConnectingCancel, 'c'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 144, 53, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitConnectingMenuItems() {
+    MenuitemText   i0 = { "Connecting to server", MI_TFLAGS_CENTERED};
+    MenuitemText   i1 = { NetworkServerText, MI_TFLAGS_CENTERED};
+    MenuitemText   i2 = { NetworkTriesText , MI_TFLAGS_CENTERED};
+    MenuitemButton i3 = { "~!Cancel", 224, 27, MBUTTON_GM_FULL, NetConnectingCancel, 'c'};
+    ConnectingMenuItems[0].d.text   = i0;
+    ConnectingMenuItems[1].d.text   = i1;
+    ConnectingMenuItems[2].d.text   = i2;
+    ConnectingMenuItems[3].d.button = i3;
+}
 
 /**
 **	Items for the Campaign Select Menu
 */
 local Menuitem CampaignSelectMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL,
-	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu1, 'a'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL,
-	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu2, 'm'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL,
-	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu3, 'l'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL,
-	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu4, 'y'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL,
-	NULL, { button:{ "~!Select Campaign", 224, 27, MBUTTON_GM_FULL,
-		SelectCampaignMenu, 's'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL, NULL },
 };
+local void InitCampaignSelectMenuItems() {
+    MenuitemButton i0 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu1, 'a'};
+    MenuitemButton i1 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu2, 'm'};
+    MenuitemButton i2 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu3, 'l'};
+    MenuitemButton i3 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu4, 'y'};
+    MenuitemButton i4 = { "~!Select Campaign", 224, 27, MBUTTON_GM_FULL, SelectCampaignMenu, 's'};
+    MenuitemButton i5 = { "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'};
+    CampaignSelectMenuItems[0].d.button = i0;
+    CampaignSelectMenuItems[1].d.button = i1;
+    CampaignSelectMenuItems[2].d.button = i2;
+    CampaignSelectMenuItems[3].d.button = i3;
+    CampaignSelectMenuItems[4].d.button = i4;
+    CampaignSelectMenuItems[5].d.button = i5;
+}
 
 /**
 **	Items for the Campaign Continue Menu
 */
 local Menuitem CampaignContMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_BUTTON, 508, 320 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Continue", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_BUTTON, 508, 320 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL },
 };
+local void InitCampaignContMenuItems() {
+    MenuitemButton i0 = { "~!Continue", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
+    CampaignContMenuItems[0].d.button = i0;
+}
 
 local Menuitem SoundOptionsMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 176, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Sound Options", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 176, 11, 0, LargeFont, NULL, NULL, NULL },
 
-    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL,
-	{ text:{ "Master Volume", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSMasterVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "min", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "max", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 240, 36*1.5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMasterPower} } },
-    { MI_TYPE_TEXT, 266, 36*1.5 + 2, 0, GameFont, NULL, NULL,
-	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 240, 36*1.5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 266, 36*1.5 + 2, 0, GameFont, NULL, NULL, NULL },
 
-    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL,
-	{ text:{ "Music Volume", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSMusicVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "min", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "max", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 240, 36*3.5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMusicPower} } },
-    { MI_TYPE_TEXT, 266, 36*3.5 + 2, 0, GameFont, NULL, NULL,
-	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 240, 36*3.5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 266, 36*3.5 + 2, 0, GameFont, NULL, NULL, NULL },
 
-    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL,
-	{ text:{ "CD Volume", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "min", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "max", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 240, 36*5.5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower} } },
-    { MI_TYPE_TEXT, 266, 36*5.5 + 2, 0, GameFont, NULL, NULL,
-	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_GEM, 32, 36*6.5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_ROUND, SetCdModeAll} } },
-    { MI_TYPE_TEXT, 58, 36*6.5 + 2, 0, GameFont, NULL, NULL,
-	{ text:{ "All Tracks", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_GEM, 154, 36*6.5, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_ROUND, SetCdModeRandom} } },
-    { MI_TYPE_TEXT, 180, 36*6.5 + 2, 0, GameFont, NULL, NULL,
-	{ text:{ "Random Tracks", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_BUTTON, 176 - (106 / 2), 352 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 240, 36*5.5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 266, 36*5.5 + 2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 32, 36*6.5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 58, 36*6.5 + 2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_GEM, 154, 36*6.5, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 180, 36*6.5 + 2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 176 - (106 / 2), 352 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitSoundOptionsMenuItems() {
+    MenuitemText    i0  = { "Sound Options", MI_TFLAGS_CENTERED};
+
+    MenuitemText    i1  = { "Master Volume", MI_TFLAGS_LALIGN};
+    MenuitemHslider i2  = { 0, 11*18, 18, ScenSelectHSMasterVolumeAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemText    i3  = { "min", MI_TFLAGS_CENTERED};
+    MenuitemText    i4  = { "max", MI_TFLAGS_CENTERED};
+    MenuitemGem     i5  = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMasterPower};
+    MenuitemText    i6  = { "Enabled", MI_TFLAGS_LALIGN};
+
+    MenuitemText    i7  = { "Music Volume", MI_TFLAGS_LALIGN};
+    MenuitemHslider i8  = { 0, 11*18, 18, ScenSelectHSMusicVolumeAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemText    i9  = { "min", MI_TFLAGS_CENTERED};
+    MenuitemText    i10 = { "max", MI_TFLAGS_CENTERED};
+    MenuitemGem     i11 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMusicPower};
+    MenuitemText    i12 = { "Enabled", MI_TFLAGS_LALIGN};
+
+    MenuitemText    i13 = { "CD Volume", MI_TFLAGS_LALIGN};
+    MenuitemHslider i14 = { 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemText    i15 = { "min", MI_TFLAGS_CENTERED};
+    MenuitemText    i16 = { "max", MI_TFLAGS_CENTERED};
+    MenuitemGem     i17 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower};
+    MenuitemText    i18 = { "Enabled", MI_TFLAGS_LALIGN};
+    MenuitemGem     i19 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_ROUND, SetCdModeAll};
+    MenuitemText    i20 = { "All Tracks", MI_TFLAGS_LALIGN};
+    MenuitemGem     i21 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_ROUND, SetCdModeRandom};
+    MenuitemText    i22 = { "Random Tracks", MI_TFLAGS_LALIGN};
+    MenuitemButton  i23 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
+
+    SoundOptionsMenuItems[0].d.text     = i0;
+    SoundOptionsMenuItems[1].d.text     = i1;
+    SoundOptionsMenuItems[2].d.hslider  = i2;
+    SoundOptionsMenuItems[3].d.text     = i3;
+    SoundOptionsMenuItems[4].d.text     = i4;
+    SoundOptionsMenuItems[5].d.gem      = i5;
+    SoundOptionsMenuItems[6].d.text     = i6;
+    SoundOptionsMenuItems[7].d.text     = i7;
+    SoundOptionsMenuItems[8].d.hslider  = i8;
+    SoundOptionsMenuItems[9].d.text     = i9;
+    SoundOptionsMenuItems[10].d.text    = i10;
+    SoundOptionsMenuItems[11].d.gem     = i11;
+    SoundOptionsMenuItems[12].d.text    = i12;
+    SoundOptionsMenuItems[13].d.text    = i13;
+    SoundOptionsMenuItems[14].d.hslider = i14;
+    SoundOptionsMenuItems[15].d.text    = i15;
+    SoundOptionsMenuItems[16].d.text    = i16;
+    SoundOptionsMenuItems[17].d.gem     = i17;
+    SoundOptionsMenuItems[18].d.text    = i18;
+    SoundOptionsMenuItems[19].d.gem     = i19;
+    SoundOptionsMenuItems[20].d.text    = i20;
+    SoundOptionsMenuItems[21].d.gem     = i21;
+    SoundOptionsMenuItems[22].d.text    = i22;
+    SoundOptionsMenuItems[23].d.button  = i23;
+}
 
 local Menuitem PreferencesMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Preferences", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL },
 
-    { MI_TYPE_GEM, 16, 36*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar} } },
-    { MI_TYPE_TEXT, 46, 36*1 + 2, 0, GameFont, NULL, NULL,
-	{ text:{ "Fog of War Enabled", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_GEM, 16, 36*1, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 46, 36*1 + 2, 0, GameFont, NULL, NULL, NULL },
 
-    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitPreferencesMenuItems() {
+    MenuitemText   i0 = { "Preferences", MI_TFLAGS_CENTERED};
+    MenuitemGem    i1 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar};
+    MenuitemText   i2 = { "Fog of War Enabled", MI_TFLAGS_LALIGN};
+    MenuitemButton i3 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
+    PreferencesMenuItems[0].d.text   = i0;
+    PreferencesMenuItems[1].d.gem    = i1;
+    PreferencesMenuItems[2].d.text   = i2;
+    PreferencesMenuItems[3].d.button = i3;
+}
 
 local Menuitem SpeedSettingsMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL,
-	{ text:{ "Game Speed", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 34, 36*2 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "slow", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 230, 36*2 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "fast", MI_TFLAGS_RALIGN} } },
-    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL,
-	{ text:{ "Mouse Scroll", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSMouseScrollAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 34, 36*4 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "off", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 230, 36*4 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "fast", MI_TFLAGS_RALIGN} } },
-    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL,
-	{ text:{ "Keyboard Scroll", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
-        { hslider:{ 0, 11*18, 18, ScenSelectHSKeyboardScrollAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 34, 36*6 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "off", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 230, 36*6 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "fast", MI_TFLAGS_RALIGN} } },
-    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 34, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 230, 36*2 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 36*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 34, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 230, 36*4 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 36*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 34, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 230, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitSpeedSettingsMenuItems() {
+    MenuitemText    i0  = { "Speed Settings", MI_TFLAGS_CENTERED};
+    MenuitemText    i1  = { "Game Speed", MI_TFLAGS_LALIGN};
+    MenuitemHslider i2  = { 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemText    i3  = { "slow", MI_TFLAGS_LALIGN};
+    MenuitemText    i4  = { "fast", MI_TFLAGS_RALIGN};
+    MenuitemText    i5  = { "Mouse Scroll", MI_TFLAGS_LALIGN};
+    MenuitemHslider i6  = { 0, 11*18, 18, ScenSelectHSMouseScrollAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemText    i7  = { "off", MI_TFLAGS_LALIGN};
+    MenuitemText    i8  = { "fast", MI_TFLAGS_RALIGN};
+    MenuitemText    i9  = { "Keyboard Scroll", MI_TFLAGS_LALIGN};
+    MenuitemHslider i10 = { 0, 11*18, 18, ScenSelectHSKeyboardScrollAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemText    i11 = { "off", MI_TFLAGS_LALIGN};
+    MenuitemText    i12 = { "fast", MI_TFLAGS_RALIGN};
+    MenuitemButton  i13 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
+    SpeedSettingsMenuItems[0].d.text     = i0;
+    SpeedSettingsMenuItems[1].d.text     = i1;
+    SpeedSettingsMenuItems[2].d.hslider  = i2;
+    SpeedSettingsMenuItems[3].d.text     = i3;
+    SpeedSettingsMenuItems[4].d.text     = i4;
+    SpeedSettingsMenuItems[5].d.text     = i5;
+    SpeedSettingsMenuItems[6].d.hslider  = i6;
+    SpeedSettingsMenuItems[7].d.text     = i7;
+    SpeedSettingsMenuItems[8].d.text     = i8;
+    SpeedSettingsMenuItems[9].d.text     = i9;
+    SpeedSettingsMenuItems[10].d.hslider = i10;
+    SpeedSettingsMenuItems[11].d.text    = i11;
+    SpeedSettingsMenuItems[12].d.text    = i12;
+    SpeedSettingsMenuItems[13].d.button  = i13;
+}
 
 local Menuitem GameOptionsMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Game Options", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL },
 #ifdef WITH_SOUND
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 #else
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonDisabled, LargeFont, NULL, NULL, NULL },
 #endif
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Speeds (~!F~!8)", 224, 27, MBUTTON_GM_FULL, SpeedSettings, KeyCodeF8} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Preferences (~!F~!9)", 224, 27, MBUTTON_GM_FULL, Preferences, KeyCodeF9} } },
-    { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitGameOptionsMenuItems() {
+    MenuitemText   i0 = { "Game Options", MI_TFLAGS_CENTERED};
+#ifdef WITH_SOUND
+    MenuitemButton i1 = { "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7};
+#else
+    MenuitemButton i1 = { "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7};
+#endif
+    MenuitemButton i2 = { "Speeds (~!F~!8)", 224, 27, MBUTTON_GM_FULL, SpeedSettings, KeyCodeF8};
+    MenuitemButton i3 = { "Preferences (~!F~!9)", 224, 27, MBUTTON_GM_FULL, Preferences, KeyCodeF9};
+    MenuitemButton i4 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
+    GameOptionsMenuItems[0].d.text   = i0;
+    GameOptionsMenuItems[1].d.button = i1;
+    GameOptionsMenuItems[2].d.button = i2;
+    GameOptionsMenuItems[3].d.button = i3;
+    GameOptionsMenuItems[4].d.button = i4;
+}
 
 local Menuitem HelpMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Help Menu", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, KeystrokeHelpMenu, 'h'} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Freecraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowTipsMenu, 't'} } },
-    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
 };
+local void InitHelpMenuItems() {
+    MenuitemText   i0 = { "Help Menu", MI_TFLAGS_CENTERED};
+    MenuitemButton i1 = { "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, KeystrokeHelpMenu, 'h'};
+    MenuitemButton i2 = { "Freecraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowTipsMenu, 't'};
+    MenuitemButton i3 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
+    HelpMenuItems[0].d.text   = i0;
+    HelpMenuItems[1].d.button = i1;
+    HelpMenuItems[2].d.button = i2;
+    HelpMenuItems[3].d.button = i3;
+}
 
 local Menuitem KeystrokeHelpMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Keystroke Help Menu", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 12*18, ScenSelectVSKeystrokeHelpAction, -1, 0, 0, 0, NULL} } },
-    { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
-    { MI_TYPE_TEXT, 16, 40+20, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-F  - toggle full screen", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*2, 0, GameFont, NULL, NULL,
-	{ text:{ "Ctrl-S - mute sound", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*3, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-Q  - quit to main menu", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*4, 0, GameFont, NULL, NULL,
-	{ text:{ "+      - increase game speed", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*5, 0, GameFont, NULL, NULL,
-	{ text:{ "-      - decrease game speed", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*6, 0, GameFont, NULL, NULL,
-	{ text:{ "Ctrl-P - pause game", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*7, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-G  - toggle grab mouse", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*8, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-X  - quit game", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*9, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-B  - toggle expand map", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*10, 0, GameFont, NULL, NULL,
-	{ text:{ "ENTER  - write a message", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*11, 0, GameFont, NULL, NULL,
-	{ text:{ "TAB    - hide/unhide terrain", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*12, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-I  - find idle peon", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*13, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-V  - next view port", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*14, 0, GameFont, NULL, NULL,
-	{ text:{ "Ctrl-V - previous view port", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*15, 0, GameFont, NULL, NULL,
-	{ text:{ "F10    - game menu", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*16, 0, GameFont, NULL, NULL,
-	{ text:{ "F5     - game options", MI_TFLAGS_LALIGN} } },
-
-
-#else
-    { 0 }
-#endif
+    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*2, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*3, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*4, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*5, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*6, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*7, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*8, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*9, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*10, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*11, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*12, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*13, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*14, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*15, 0, GameFont, NULL, NULL, NULL },
+    { MI_TYPE_TEXT, 16, 40+20*16, 0, GameFont, NULL, NULL, NULL },
 };
+local void InitKeystrokeHelpMenuItems() {
+    MenuitemText    i0 = { "Keystroke Help Menu", MI_TFLAGS_CENTERED};
+    MenuitemVslider i1 = { 0, 18, 12*18, ScenSelectVSKeystrokeHelpAction, -1, 0, 0, 0, NULL};
+    MenuitemButton  i2 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
+    MenuitemText    i3 = { "Alt-F  - toggle full screen", MI_TFLAGS_LALIGN};
+    MenuitemText    i4 = { "Ctrl-S - mute sound", MI_TFLAGS_LALIGN};
+    MenuitemText    i5 = { "Alt-Q  - quit to main menu", MI_TFLAGS_LALIGN};
+    MenuitemText    i6 = { "+      - increase game speed", MI_TFLAGS_LALIGN};
+    MenuitemText    i7 = { "-      - decrease game speed", MI_TFLAGS_LALIGN};
+    MenuitemText    i8 = { "Ctrl-P - pause game", MI_TFLAGS_LALIGN};
+    MenuitemText    i9 = { "Alt-G  - toggle grab mouse", MI_TFLAGS_LALIGN};
+    MenuitemText    i10 = { "Alt-X  - quit game", MI_TFLAGS_LALIGN};
+    MenuitemText    i11 = { "Alt-B  - toggle expand map", MI_TFLAGS_LALIGN};
+    MenuitemText    i12 = { "ENTER  - write a message", MI_TFLAGS_LALIGN};
+    MenuitemText    i13 = { "TAB    - hide/unhide terrain", MI_TFLAGS_LALIGN};
+    MenuitemText    i14 = { "Alt-I  - find idle peon", MI_TFLAGS_LALIGN};
+    MenuitemText    i15 = { "Alt-V  - next view port", MI_TFLAGS_LALIGN};
+    MenuitemText    i16 = { "Ctrl-V - previous view port", MI_TFLAGS_LALIGN};
+    MenuitemText    i17 = { "F10    - game menu", MI_TFLAGS_LALIGN};
+    MenuitemText    i18 = { "F5     - game options", MI_TFLAGS_LALIGN};
+    KeystrokeHelpMenuItems[0].d.text    = i0;
+    KeystrokeHelpMenuItems[1].d.vslider = i1;
+    KeystrokeHelpMenuItems[2].d.button  = i2;
+    KeystrokeHelpMenuItems[3].d.text    = i3;
+    KeystrokeHelpMenuItems[4].d.text    = i4;
+    KeystrokeHelpMenuItems[5].d.text    = i5;
+    KeystrokeHelpMenuItems[6].d.text    = i6;
+    KeystrokeHelpMenuItems[7].d.text    = i7;
+    KeystrokeHelpMenuItems[8].d.text    = i8;
+    KeystrokeHelpMenuItems[9].d.text    = i9;
+    KeystrokeHelpMenuItems[10].d.text   = i10;
+    KeystrokeHelpMenuItems[11].d.text   = i11;
+    KeystrokeHelpMenuItems[12].d.text   = i12;
+    KeystrokeHelpMenuItems[13].d.text   = i13;
+    KeystrokeHelpMenuItems[14].d.text   = i14;
+    KeystrokeHelpMenuItems[15].d.text   = i15;
+    KeystrokeHelpMenuItems[16].d.text   = i16;
+    KeystrokeHelpMenuItems[17].d.text   = i17;
+    KeystrokeHelpMenuItems[18].d.text   = i18;
+}
 
 local Menuitem SaveGameMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Save Game", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL, NULL },
 /*
     { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL,
 	{ input:{ "test123", 384-16-16, 16, MI_TFLAGS_CENTERED, NULL, 7, 33} } },
@@ -1248,29 +1428,35 @@ local Menuitem SaveGameMenuItems[] = {
     NOTE: Input type Item was not designed to overlay listbox!! This will need adjustments
     to basic menu code.. I'll check when done with NET...
 */
-    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL,
-	{ input:{ NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0} } },
+    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL, NULL },
 
 /* ARI->NEHAL: THIS IS WRONG: "ScenSelect" stands for ScenarioSelection, that is what the
    functions do. You need to provide your own Init, Exit, LBAction, LBRetrieve,
    VSAction, and OK functions to fill the listbox with data!!!! */
-    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit,
-	{ listbox:{ NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 7, 0,
-		    (void *)ScenSelectLBRetrieve, ScenSelectOk} } },
-    { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 7*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit, NULL },
+    { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, NULL },
 
-    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Save", 106, 27, MBUTTON_GM_HALF, EndMenu, 's'} } },
-    { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Delete", 106, 27, MBUTTON_GM_HALF, EndMenu, 'd'} } },
-    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'} } },
-
-#else
-    { 0 }
-#endif
+    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL },
+    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL },
 };
+local void InitSaveGameMenuItems() {
+    MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
+    MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
+    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 7, 0,
+			   (void *)ScenSelectLBRetrieve, ScenSelectOk};
+    MenuitemVslider i3 = { 0, 18, 7*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, EndMenu, 's'};
+    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, EndMenu, 'd'};
+    MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
+    SaveGameMenuItems[0].d.text    = i0;
+    SaveGameMenuItems[1].d.input   = i1;
+    SaveGameMenuItems[2].d.listbox = i2;
+    SaveGameMenuItems[3].d.vslider = i3;
+    SaveGameMenuItems[4].d.button  = i4;
+    SaveGameMenuItems[5].d.button  = i5;
+    SaveGameMenuItems[6].d.button  = i6;
+}
 
 /**
 **	FIXME: Ari please look, this is now in TheUI.
@@ -2570,7 +2756,7 @@ local void NextTip(void)
 /**
 **	Cycle through the tips
 */
-local void ShowNextTip()
+local void ShowNextTip(void)
 {
     NextTip();
     InitTips(NULL);
@@ -2750,7 +2936,7 @@ local void CampaignGameMenu(void)
     VideoUnlockScreen();
     Invalidate();
 
-    DebugLevel0Fn("%d campaigns available\n",NumCampaigns);
+    DebugLevel0Fn("%d campaigns available\n" _C_ NumCampaigns);
     IfDebug(
 	for( i=0; i<NumCampaigns; ++i ) {
 	    DebugLevel0Fn("Campaign %d: %16.16s: %s\n",i,
@@ -3047,7 +3233,7 @@ local void TerminateNetConnect(void)
 	    break;
     }
 
-    DebugLevel1Fn("NetLocalState %d\n", NetLocalState);
+    DebugLevel1Fn("NetLocalState %d\n" _C_ NetLocalState);
     NetConnectRunning = 2;
     DestroyCursorBackground();
     GuiGameStarted = 0;
@@ -3125,7 +3311,7 @@ local void MultiPlayerGameMenu(void)
     // Here we really go...
     ProcessMenu(MENU_NET_CREATE_JOIN, 1);
 
-    DebugLevel0Fn("GuiGameStarted: %d\n", GuiGameStarted);
+    DebugLevel0Fn("GuiGameStarted: %d\n" _C_ GuiGameStarted);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -3152,7 +3338,7 @@ local void ScenSelectInit(Menuitem * mi __attribute__ ((unused)))
     ScenSelectMenuItems[9].flags =
 	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
     ScenSelectMenuItems[9].d.button.text = ScenSelectDisplayPath;
-    DebugLevel0Fn("Start path: %s\n", ScenSelectPath);
+    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 local void ScenSelectLBAction(Menuitem *mi, int i)
@@ -3279,7 +3465,7 @@ usezzf:
 		if (strcasestr(pathbuf, ".pud")) {
 		    info = GetPudInfo(pathbuf);
 		    if (info) {
-			DebugLevel3Fn("GetPudInfo(%s) : %p\n", pathbuf, info);
+			DebugLevel3Fn("GetPudInfo(%s) : %p\n" _C_ pathbuf _C_ info);
 			sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
 			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
 			    fl->type = 1;
@@ -3295,7 +3481,7 @@ usezzf:
 		if (strstr(pathbuf, ".cm")) {
 		    // info = GetCmInfo(pathbuf);
 		    info = NULL;
-		    DebugLevel3Fn("GetCmInfo(%s) : %p\n", pathbuf, info);
+		    DebugLevel3Fn("GetCmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
 		    fl->type = 1;
 		    fl->name = strdup(np);
 		    fl->xdata = info;
@@ -3537,12 +3723,12 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing game speed by 10%s\n", "%");
+		DebugLevel0Fn("Increasing game speed by 10%s\n" _C_ "%");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing game speed by 10%s\n", "%");
+		DebugLevel0Fn("Decreasing game speed by 10%s\n" _C_ "%");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
@@ -3864,7 +4050,7 @@ local void ScenSelectCancel(void)
     //
     //  Use last selected map.
     //
-    DebugLevel0Fn("Map   path: %s\n", CurrentMapPath);
+    DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
     strcpy(ScenSelectPath, FreeCraftLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
@@ -3881,7 +4067,7 @@ local void ScenSelectCancel(void)
 	*ScenSelectDisplayPath = '\0';
     }
 
-    DebugLevel0Fn("Start path: %s\n", ScenSelectPath);
+    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
     EndMenu();
 }
@@ -3947,7 +4133,7 @@ local void GameSetupInit(Menuitem * mi __attribute__ ((unused)))
 
     }
 
-    DebugLevel0Fn("Map   path: %s\n", CurrentMapPath);
+    DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
     strcpy(ScenSelectPath, FreeCraftLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
@@ -3963,7 +4149,7 @@ local void GameSetupInit(Menuitem * mi __attribute__ ((unused)))
     } else {
 	*ScenSelectDisplayPath = '\0';
     }
-    DebugLevel0Fn("Start path: %s\n", ScenSelectPath);
+    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
     GetInfoFromSelectPath();
 }
@@ -4120,7 +4306,7 @@ local void NetworkGamePrepareGameSettings(void)
 
     DebugCheck(!ScenSelectPudInfo);
 
-    DebugLevel0Fn("NetPlayers = %d\n", NetPlayers);
+    DebugLevel0Fn("NetPlayers = %d\n" _C_ NetPlayers);
 
 #ifdef DEBUG
     for (i = 0; i < PlayerMax-1; i++) {
@@ -4139,7 +4325,7 @@ local void NetworkGamePrepareGameSettings(void)
     // Make a list of the available player slots.
     for (h = i = 0; i < PlayerMax-1; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
-	    DebugLevel3Fn("Player slot %i is available for a person\n", i);
+	    DebugLevel3Fn("Player slot %i is available for a person\n" _C_ i);
 	    num[h++] = i;
 	}
     }
@@ -4147,7 +4333,7 @@ local void NetworkGamePrepareGameSettings(void)
 	switch(ServerSetupState.CompOpt[num[i]]) {
 	    case 0:
 		GameSettings.Presets[num[i]].Type = PlayerPerson;
-		DebugLevel3Fn("Settings[%d].Type == Person\n", num[i]);
+		DebugLevel3Fn("Settings[%d].Type == Person\n" _C_ num[i]);
 		switch (ServerSetupState.Race[num[i]]) {
 		    case 1:
 			GameSettings.Presets[num[i]].Race = PlayerRaceOrc;
@@ -4160,11 +4346,11 @@ local void NetworkGamePrepareGameSettings(void)
 		break;
 	    case 1:
 		GameSettings.Presets[num[i]].Type = PlayerComputer;
-		DebugLevel3Fn("Settings[%d].Type == Computer\n", num[i]);
+		DebugLevel3Fn("Settings[%d].Type == Computer\n" _C_ num[i]);
 		break;
 	    case 2:
 		GameSettings.Presets[num[i]].Type = PlayerNobody;
-		DebugLevel3Fn("Settings[%d].Type == Closed\n", num[i]);
+		DebugLevel3Fn("Settings[%d].Type == Closed\n" _C_ num[i]);
 	    default:
 		break;
 	}
@@ -4193,7 +4379,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     //	Use lag gem as KICK button
     //  Notify clients about MAP change: (initial = 1...)
 
-    DebugLevel3Fn("initial = %d\n", initial);
+    DebugLevel3Fn("initial = %d\n" _C_ initial);
 
     //	Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
@@ -4275,7 +4461,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     //	Tell connect state machines how many interactive players we can have
     NetPlayers = avail;
     //	Check if all players are ready.
-    DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d\n", avail, ready);
+    DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d\n" _C_ avail _C_ ready);
     if (ready == avail) {
 	NetMultiSetupMenuItems[3].flags = 0;	// enable start game button
     } else {
@@ -4366,7 +4552,7 @@ local void MultiGameSetupInit(Menuitem *mi)
 	ServerSetupState.CompOpt[i] = 1;
     }
     MultiGamePlayerSelectorsUpdate(1);
-    DebugLevel3Fn("h = %d, NetPlayers = %d\n", h, NetPlayers);
+    DebugLevel3Fn("h = %d, NetPlayers = %d\n" _C_ h _C_ NetPlayers);
 }
 
 local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))
@@ -4440,7 +4626,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
-    DebugLevel3Fn("Hosts[%d].PlyName = %s\n", i, Hosts[i].PlyName);
+    DebugLevel3Fn("Hosts[%d].PlyName = %s\n" _C_ i _C_ Hosts[i].PlyName);
     VideoDrawText(OffsetX+mi->xofs, OffsetY+mi->yofs, GameFont, Hosts[i].PlyName);
 
     SetDefaultTextColors(nc, rc);
@@ -4476,7 +4662,7 @@ local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
     int i;
 
     i = mi - NetMultiClientMenuItems - CLIENT_PLAYER_READY + 1;
-    DebugLevel3Fn("i = %d, NetLocalHostsSlot = %d\n", i, NetLocalHostsSlot);
+    DebugLevel3Fn("i = %d, NetLocalHostsSlot = %d\n" _C_ i _C_ NetLocalHostsSlot);
     if (i == NetLocalHostsSlot) {
 	LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
 	if (LocalSetupState.Ready[i]) {
@@ -4831,7 +5017,7 @@ normkey:
 		}
 		mi++;
 	    }
-	    DebugLevel3("Key %d\n",key);
+	    DebugLevel3("Key %d\n" _C_ key);
 	    return;
     }
     return;
@@ -5381,7 +5567,7 @@ global void ProcessMenu(int menu_id, int loop)
 
     if (loop) {
 	while (CurrentMenu != -1) {
-	    DebugLevel3("MustRedraw: 0x%08x\n",MustRedraw);
+	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
 		UpdateDisplay();
 	    }
@@ -5456,6 +5642,34 @@ global void InitMenus(unsigned int race)
     static int last_race = -1;
     const char* file;
     char *buf;
+
+    if (last_race == -1) {
+	InitGameMenuItems();
+	InitVictoryMenuItems();
+	InitLostMenuItems();
+	InitTipsMenuItems();
+	InitObjectivesMenuItems();
+	InitEndScenarioMenuItems();
+	InitScenSelectMenuItems();
+	InitPrgStartMenuItems();
+	InitCustomGameMenuItems();
+	InitEnterNameMenuItems();
+	InitEnterServerIPMenuItems();
+	InitNetCreateJoinMenuItems();
+	InitNetMultiButtonStorage();
+	InitNetMultiSetupMenuItems();
+	InitNetMultiClientMenuItems();
+	InitNetErrorMenuItems();
+	InitConnectingMenuItems();
+	InitCampaignSelectMenuItems();
+	InitSoundOptionsMenuItems();
+	InitPreferencesMenuItems();
+	InitSpeedSettingsMenuItems();
+	InitGameOptionsMenuItems();
+	InitHelpMenuItems();
+	InitKeystrokeHelpMenuItems();
+	InitSaveGameMenuItems();
+    }
 
     if (last_race == -1 && VideoWidth != 640) {
 	MoveButtons();
