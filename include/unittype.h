@@ -422,11 +422,6 @@
 **		Only valid for buildings without the BuilderOutside flag.
 **		The worker is lost when the building is completed.
 **
-**	UnitType::Tower
-**
-**		FIXME:  find a way to remove it.
-**		Used for towers(attacknig buildings.)
-**
 **	UnitType::Hero
 **
 **		FIXME:	Unit is a hero. Where is this used?
@@ -776,7 +771,6 @@ struct _unit_type_ {
     unsigned BuilderLost : 1;		/// The builder is lost after the build.
     // FIXME: n0body: AutoBuildRate not implemented.
     unsigned AutoBuildRate;		/// The rate at which the building builds itself
-    unsigned Tower : 1;			/// Unit can attack, but not move.
     unsigned Hero : 1;			/// Is hero only used for triggers .
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
     unsigned Organic : 1;		/// Organic can be healed.
