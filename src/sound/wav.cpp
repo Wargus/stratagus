@@ -166,7 +166,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	return NULL;
     }
 
-    DebugLevel2Fn("Loading wav file: %s\n" _C_ name);
+    DebugLevel3Fn("Loading wav file: %s\n" _C_ name);
 
     CLread(f, &t, sizeof(t));
     t = ConvertLE32(t);
@@ -245,7 +245,8 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	CLclose(f);
 	ExitFatal(-1);
     }
-    // FIXME: should check it more. Sample frequence
+    DebugCheck(wavfmt.Frequency != 44100 || wavfmt.Frequency != 22050 ||
+	wavfmt.Frequency != 11025);
 
     //
     //  Read sample
