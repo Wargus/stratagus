@@ -165,7 +165,7 @@ void VideoDoDrawClip(const Graphic* sprite, GLuint* textures,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void VideoDrawPlayerColorClip(const Graphic* sprite, int player,
+void VideoDrawPlayerColorClip(Graphic* sprite, int player,
 	unsigned frame, int x, int y)
 {
 #ifndef USE_OPENGL
@@ -175,7 +175,7 @@ void VideoDrawPlayerColorClip(const Graphic* sprite, int player,
 	if (!sprite->PlayerColorTextures[player]) {
 		MakePlayerColorTexture(sprite, player);
 	}
-	VideoDoDrawClip(sprite, sprite->PlayerColorTextures[player], frame, x, y)
+	VideoDoDrawClip(sprite, sprite->PlayerColorTextures[player], frame, x, y);
 #endif
 }
 
@@ -188,7 +188,7 @@ void VideoDrawPlayerColorClip(const Graphic* sprite, int player,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void VideoDrawPlayerColorClipX(const Graphic* sprite, int player,
+void VideoDrawPlayerColorClipX(Graphic* sprite, int player,
 	unsigned frame, int x, int y)
 {
 #ifndef USE_OPENGL
@@ -198,7 +198,7 @@ void VideoDrawPlayerColorClipX(const Graphic* sprite, int player,
 	if (!sprite->PlayerColorTextures[player]) {
 		MakePlayerColorTexture(sprite, player);
 	}
-	VideoDoDrawClipX(sprite, sprite->PlayerColorTextures[player], frame, x, y)
+	VideoDoDrawClipX(sprite, sprite->PlayerColorTextures[player], frame, x, y);
 #endif
 }
 
