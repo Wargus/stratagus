@@ -90,7 +90,7 @@ global SpellType SpellTypeTable[] = {
 //	---orc ogres---							 ---orc ogres---
 { "spell-eye-of-kilrogg",	"eye of kilrogg",	0x7F,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg" } },
 { "spell-bloodlust",		"bloodlust",		   6,  50,1000, SpellActionBloodlust	, { "bloodlust" }      },
-{ "spell-runes",		"runes",		  10,  50,2000, SpellActionRunes	, { "runes" }	       },
+{ "spell-runes",		"runes",		  10, 200,2000, SpellActionRunes	, { "runes" }	       },
 //	---orc death knights---						 ---orc death knights-
 { "spell-death-coil",		"death coil",		  10, 100,  -1, SpellActionDeathCoil	, { "death coil" }     },
 { "spell-haste",		"haste",		   6,  50,1000, SpellActionHaste	, { "haste" }	       },
@@ -350,6 +350,10 @@ local void SpellRunesController(Missile * missile)
     n = SelectUnitsOnTile(x, y, table);
     for (i = 0; i < n; ++i) {
 	if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
+	    // FIXME: don't use ident!!!
+	    PlayMissileSound(missile,SoundIdForName("explosion"));
+	    MakeMissile(MissileTypeExplosion,missile->X, missile->Y,
+		missile->X, missile->Y);
 	    HitUnit(table[i], RUNE_DAMAGE);
 	    missile->TTL=0;		// Rune can only hit once.
 	}
@@ -537,7 +541,8 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	target->X = x;
 	target->Y = y;
 	target->TTL=FrameCounter+FRAMES_PER_SECOND+FRAMES_PER_SECOND/2;
-	//temp->TTL=FrameCounter+target->Type->DecayRate*6*FRAMES_PER_SECOND;
+	//target->TTL=FrameCounter+target->Type->DecayRate*6*FRAMES_PER_SECOND;
+	CheckUnitToBeDrawn(target);
 	break;
 
     case SpellActionHealing:
@@ -610,11 +615,13 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	break;
 
     case SpellActionSlow:
-	if (target && !target->Type->Building && target->Slow < spell->TTL) {
+	if (target && !target->Type->Building
+		&& target->Slow < spell->TTL/FRAMES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->Slow = spell->TTL;	// about 25 sec
+	    target->Slow = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
 	    target->Haste = 0;
+	    CheckUnitToBeDrawn(target);
 
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
@@ -691,10 +698,11 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
     case SpellActionInvisibility:
 	if (target && !target->Type->Building
-		    && target->Invisible < spell->TTL) {
+		    && target->Invisible < spell->TTL/FRAMES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->Invisible = spell->TTL;	// about 50 sec
+	    target->Invisible = spell->TTL/FRAMES_PER_SECOND;	// about 50 sec
+	    CheckUnitToBeDrawn(target);
 
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
@@ -773,32 +781,31 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
 //  ---orc ogres---
     case SpellActionEyeOfKilrogg:
-    {
-	Unit* temp;
+	unit->Mana -= spell->ManaCost;
 
 	// FIXME: johns: the unit is placed on the wrong position
-	temp=MakeUnit(UnitTypeByIdent("unit-eye-of-kilrogg"),unit->Player);
-	temp->X=x;
-	temp->Y=y;
-	DropOutOnSide(temp,LookingW,0,0);
+	target=MakeUnit(UnitTypeByIdent("unit-eye-of-kilrogg"),unit->Player);
+	target->X=x;
+	target->Y=y;
+	DropOutOnSide(target,LookingW,0,0);
 
 	// set life span
-	temp->TTL=FrameCounter+temp->Type->DecayRate*6*FRAMES_PER_SECOND;
-
-	unit->Mana -= spell->ManaCost;
+	target->TTL=FrameCounter+target->Type->DecayRate*6*FRAMES_PER_SECOND;
+	CheckUnitToBeDrawn(target);
 
 	PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	MakeMissile(MissileTypeSpell,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
 	break;
-    }
 
     case SpellActionBloodlust:
-	if (target && target->Type->Organic && target->Bloodlust < spell->TTL) {
+	if (target && target->Type->Organic
+		&& target->Bloodlust < spell->TTL/FRAMES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->Bloodlust = spell->TTL;	// about 25 sec
+	    target->Bloodlust = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
+	    CheckUnitToBeDrawn(target);
 
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
@@ -886,11 +893,13 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	break;
 
     case SpellActionHaste:
-	if (target && !target->Type->Building && target->Haste < spell->TTL) {
+	if (target && !target->Type->Building
+		&& target->Haste < spell->TTL/FRAMES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    target->Slow = 0;
-	    target->Haste = spell->TTL;	// about 25 sec
+	    target->Haste = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
+	    CheckUnitToBeDrawn(target);
 
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
@@ -910,21 +919,24 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		    && Units[i]->Orders[0].Action == UnitActionDie)
 		    && Units[i]->X >= x-1 && Units[i]->X <= x+1
 		    && Units[i]->Y >= y-1 && Units[i]->Y <= y+1) {
-		Unit* temp;
 
 		// FIXME: did they count on food?
 		// Can there be more than 1 skeleton created on the same tile?
-		temp=MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-skeleton"),
+		target=MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-skeleton"),
 			unit->Player);
 		// set life span
-		temp->TTL=FrameCounter+
-			temp->Type->DecayRate*6*FRAMES_PER_SECOND;
+		target->TTL=FrameCounter+
+			target->Type->DecayRate*6*FRAMES_PER_SECOND;
+		CheckUnitToBeDrawn(target);
+
+		ReleaseUnit( Units[i] );
+		 // Ugly hack again, release changes Units[i] !
+		--i;
+
 		unit->Mana -= spell->ManaCost;
 		if( unit->Mana < spell->ManaCost ) {
 		    break;
 		}
-		ReleaseUnit( Units[i] ); // Ugly hack again, release changes!
-		--i;
 	    }
 	}
 
@@ -953,10 +965,11 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
     case SpellActionUnholyArmor:
 	if (target && !target->Type->Building
-		&& target->UnholyArmor < spell->TTL) {
+		&& target->UnholyArmor < spell->TTL/FRAMES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->UnholyArmor = spell->TTL;	// about 13 sec
+	    target->UnholyArmor = spell->TTL/FRAMES_PER_SECOND;	// about 13 sec
+	    CheckUnitToBeDrawn(target);
 
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
