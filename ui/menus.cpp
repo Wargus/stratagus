@@ -2545,6 +2545,8 @@ local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+	    if (mi[1].d.hslider.percent == 0)
+		TheUI.MouseScroll = 0;
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
@@ -2592,6 +2594,8 @@ local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+	    if (mi[1].d.hslider.percent == 0)
+		TheUI.KeyScroll = 0;
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
