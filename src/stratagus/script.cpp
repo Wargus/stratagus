@@ -923,7 +923,7 @@ global void InitCcl(void)
 #else
     // Stop & copy GC : scan only allocated cells
     sargv[2] = "-g1";
-    sargv[3] = "-h800000";
+    sargv[3] = "-h4000000";
 #endif
     buf = malloc(strlen(StratagusLibPath) + 4);
     sprintf(buf, "-l%s", StratagusLibPath);
