@@ -33,6 +33,7 @@
 #include "upgrade.h"
 #include "pathfinder.h"
 #include "spells.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -635,16 +636,25 @@ global void CommandCancelBuilding(Unit* unit,Unit* worker)
 #ifdef NEW_ORDERS
     DebugLevel0Fn("FIXME: not written\n");
 #else
-    unit->NextCount=1;
-    unit->NextFlush=1;
+#if 0
+    if( unit->Command.Action==UnitActionBuilded ) {
+	unit->NextCount=1;
+	unit->NextFlush=1;
 
-    unit->NextCommand[0].Action=UnitActionBuilded;
-    unit->NextCommand[0].Data.Builded.Cancel=1;
-    unit->NextCommand[0].Data.Builded.Worker=worker;
+	unit->NextCommand[0].Action=UnitActionBuilded;
+	unit->NextCommand[0].Data.Builded.Cancel=1;
+	unit->NextCommand[0].Data.Builded.Worker=worker;
 
-    unit->Wait=1;
-    unit->Reset=1;
-
+	unit->Wait=1;
+	unit->Reset=1;
+    }
+#endif
+    //
+    //	Check if building is still under construction? (NETWORK!)
+    //
+    if( unit->Command.Action==UnitActionBuilded ) {
+	unit->Command.Data.Builded.Cancel=1;
+    }
 #endif
     ClearSavedAction(unit);
 }
@@ -789,7 +799,7 @@ global void CommandReturnGoods(Unit* unit,int flush)
 }
 
 /**
-**	Building starts train.
+**	Building starts training an unit.
 **
 **	@param unit	pointer to unit.
 **	@param what	unit type to train.
@@ -799,56 +809,61 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 {
 #ifdef NEW_ORDERS
     DebugLevel0Fn("FIXME: not written\n");
+
 #else
-#if 0
-    unit->NextCount=1;
-    unit->NextFlush=1;
 
+    //
+    //	Not already training?
+    //
     if( unit->Command.Action!=UnitActionTrain ) {
-	unit->Command.Action=UnitActionTrain;
-	unit->Command.Data.Train.Count=0;
-	unit->Command.Data.Train.Ticks=0;
-    }
+	Command* command;
 
-    if( unit->Command.Data.Train.Count==MAX_UNIT_TRAIN ) {
-	// FIXME: johns: wrong place for an error message.
-	// FIXME: johns: should be checked by AI or user interface
-	SetMessage( "Unit queue is full" );
-	return;
-    }
+	DebugCheck( unit->Wait>6 );
 
-    unit->Command.Data.Train.What[unit->Command.Data.Train.Count++]=what;
+	command=unit->NextCommand;
 
-    unit->Wait=1;			// FIXME: correct this
-    unit->Reset=1;
-#endif
+	unit->NextCount=unit->NextFlush=1;
 
-    if( unit->Command.Action!=UnitActionTrain ) {
-	unit->NextCommand[0].Action=UnitActionTrain;
-	unit->NextCommand[0].Data.Train.What[0]=what;
-	unit->NextCommand[0].Data.Train.Ticks=0;
-	unit->NextCommand[0].Data.Train.Count=1;
-	unit->NextCount=1;
-	unit->NextFlush=1;
+	if( command->Action!=UnitActionTrain ) {
+	    command->Action=UnitActionTrain;
+	    command->Data.Train.Ticks=command->Data.Train.Count=0;
+	}
+
+	//
+	//	Training slots are all already full. (NETWORK!)
+	//
+	if( command->Data.Train.Count>=MAX_UNIT_TRAIN ) {
+	    DebugLevel0Fn("Unit queue full!\n");
+	    PlayerAddUnitType(unit->Player,what);
+	    return;
+	}
+	command->Data.Train.What[command->Data.Train.Count++]=what;
+
     } else {
-	if( unit->Command.Data.Train.Count==MAX_UNIT_TRAIN ) {
-	    // FIXME: johns: wrong place for an error message.
-	    // FIXME: johns: should be checked by AI or user interface
-	    SetMessage( "Unit queue is full" );
+	//
+	//	Training slots are all already full. (NETWORK!)
+	//
+	if( unit->Command.Data.Train.Count>=MAX_UNIT_TRAIN ) {
+	    DebugLevel0Fn("Unit queue full!\n");
+	    PlayerAddUnitType(unit->Player,what);
 	    return;
 	}
 	unit->Command.Data.Train.What[unit->Command.Data.Train.Count++]=what;
-    }
 
-    unit->Wait=1;			// FIXME: correct this
-    unit->Reset=1;
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    MustRedraw|=RedrawInfoPanel;
+	}
+    }
 
 #endif
     ClearSavedAction(unit);
 }
 
 /**
-**	Cancel the training an unit.
+**	Cancel the training of an unit.
 **
 **	@param unit	pointer to unit.
 **	@param slot	slot number to cancel.
@@ -859,21 +874,44 @@ global void CommandCancelTraining(Unit* unit,int slot)
     DebugLevel0Fn("FIXME: not written\n");
 #else
     int i;
+    int n;
 
-    DebugCheck( slot );
+    // FIXME: over network we could cancel the wrong slot.
 
-    if ( --unit->Command.Data.Train.Count ) {
-	for( i = 0; i < MAX_UNIT_TRAIN-1; i++ ) {
-	    unit->Command.Data.Train.What[i] =
-	    unit->Command.Data.Train.What[i+1];
+    //
+    //	Check if unit is still training 'slot'? (NETWORK!)
+    //
+    n=unit->Command.Data.Train.Count;
+    if( unit->Command.Action==UnitActionTrain && slot<n ) {
+
+	DebugLevel0Fn("Cancel %d of %d - ",slot,n);
+	PlayerAddUnitType(unit->Player,unit->Command.Data.Train.What[slot]);
+	DebugLevel0Fn("%d,%d,%d\n",unit->Player->Resources[GoldCost],
+	    unit->Player->Resources[WoodCost],unit->Player->Resources[OilCost]);
+
+	if ( --n ) {
+	    for( i = slot; i < n; i++ ) {
+		unit->Command.Data.Train.What[i] =
+			unit->Command.Data.Train.What[i+1];
+	    }
+	    if( !slot ) {
+		unit->Command.Data.Train.Ticks=0;
+	    }
+	    unit->Command.Data.Train.Count=n;
+	} else {
+	    unit->Command.Action=UnitActionStill;
 	}
-	unit->Command.Data.Train.Ticks=0;
-    } else {
-	unit->Command.Action=UnitActionStill;
-    }
 
-    unit->Wait=1;
-    unit->Reset=1;
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawPanels;
+	}
+
+	unit->Wait=unit->Reset=1;	// immediately start next training
+    }
 
 #endif
     ClearSavedAction(unit);
@@ -934,11 +972,28 @@ global void CommandCancelUpgradeTo(Unit* unit)
     order->Goal=NoUnitP;
     order->Type=NULL;
     order->Arg1=NULL;
+    DebugLevel0Fn("FIXME:\n");
 #else
-    unit->Command.Action=UnitActionStill;
+    //
+    //	Check if unit is still upgrading? (NETWORK!)
+    //
+    if( unit->Command.Action == UnitActionUpgradeTo ) {
+		    
+	PlayerAddCostsFactor(unit->Player,
+		unit->Command.Data.UpgradeTo.What->Stats->Costs,75);
 
-    unit->Wait=1;			// FIXME: correct this
-    unit->Reset=1;
+	unit->Command.Action=UnitActionStill;
+
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawPanels;
+	}
+
+	unit->Wait=unit->Reset=1;	// immediately start next command.
+    }
 
 #endif
     ClearSavedAction(unit);
@@ -1000,13 +1055,29 @@ global void CommandCancelResearch(Unit* unit)
     order->Goal=NoUnitP;
     order->Type=NULL;
     order->Arg1=NULL;
+    DebugLevel0Fn("FIXME:\n");
 #else
-    unit->Command.Action=UnitActionStill;
+    //
+    //	Check if unit is still researching? (NETWORK!)
+    //
+    if( unit->Command.Action == UnitActionResearch ) {
+	PlayerAddCostsFactor(unit->Player
+		,unit->Command.Data.Research.What->Costs,75);
 
-    unit->Wait=1;			// FIXME: correct this
-    unit->Reset=1;
+	unit->Command.Action=UnitActionStill;
 
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawPanels;
+	}
+
+	unit->Wait=unit->Reset=1;	// immediately start next command.
+    }
 #endif
+
     ClearSavedAction(unit);
 }
 

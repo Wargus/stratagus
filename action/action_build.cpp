@@ -204,8 +204,12 @@ global void HandleActionBuilded(Unit* unit)
 	peon->Command.Action=UnitActionStill;
 	unit->Command.Data.Builded.Worker=NoUnitP;
 #endif
+
 	unit->Value=peon->Value;	// peon holding value while building
 	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
+
+	// Player gets back 75% of the original cost for a building.
+	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,75);
 	// Cancel building
 	DestroyUnit(unit);
 	return;
