@@ -85,10 +85,6 @@ enum _scroll_state_ KeyScrollState = ScrollNone;
 	/// variable set when we are scrolling via mouse
 enum _scroll_state_ MouseScrollState = ScrollNone;
 
-#if defined(DEBUG)
-jmp_buf MainLoopJmpBuf; /// Hierarchic pathfinder error exit.
-#endif
-
 EventCallback* Callbacks;    /// Current callbacks
 EventCallback GameCallbacks; /// Game callbacks
 EventCallback MenuCallbacks; /// Menu callbacks
@@ -307,12 +303,6 @@ void UpdateDisplay(void)
 			}
 			DrawMenuButtonArea();
 
-#if 0  // FIXME: make a border configurable
-			VideoDrawRectangle(TheUI.CompletedBarColor,
-				TheUI.MinimapPosX - 1, TheUI.MinimapPosY - 1,
-				TheUI.MinimapW + 2, TheUI.MinimapH + 2);
-#endif
-
 			DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
 			DrawMinimapCursor(TheUI.SelectedViewport->MapX,
 				TheUI.SelectedViewport->MapY);
@@ -386,13 +376,7 @@ void GameMainLoop(void)
 	while (GameRunning) {
 
 		// Can't find a better place.
-		// TODO: rewrite this mainloop junk. And menu system. MY BRAIN HURTS!!!
 		SaveGameLoading = 0;
-#if defined(DEBUG)
-		if (setjmp(MainLoopJmpBuf)) {
-			GamePaused = 1;
-		}
-#endif
 		//
 		// Game logic part
 		//
