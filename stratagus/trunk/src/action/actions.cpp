@@ -94,15 +94,92 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 */
 local void HandleUnitAction(Unit* unit)
 {
-    if ( unit->Revealer )
-    {
-    unit->Command.Action = UnitActionDie;
+    // FIXME: Johns: What should this do?
+    if ( unit->Revealer ) {
+#ifdef NEW_ORDERS
+	unit->Orders[0].Action = UnitActionDie;
+#else
+	unit->Command.Action = UnitActionDie;
+#endif
     }
     //
     //	If current action is breakable proceed with next one.
     //
     if( unit->Reset ) {
 	unit->Reset=0;
+
+#ifdef NEW_ORDERS
+
+	//
+	//	o Look if we have a new order and old finished.
+	//	o Or the order queue should be flushed.
+	//
+	if( unit->OrderCount>1
+		&& (unit->Orders[0].Action==UnitActionStill || unit->OrderFlush)
+		) {
+	    int z;
+
+	    if( unit->Removed ) {	// FIXME: johns I see this as an error
+		DebugLevel0Fn("Flushing removed unit\n");
+	    }
+
+	    //
+	    //	Release pending references.
+	    //
+	    if( unit->Orders[0].Goal ) {
+#ifdef REFS_DEBUG
+		DebugCheck( !unit->Orders[0].Goal->Refs );
+#endif
+		if( !--unit->Orders[0].Goal->Refs ) {
+		    ReleaseUnit(unit->Orders[0].Goal);
+		}
+		IfDebug( unit->Orders[0].Goal=NoUnitP; )
+	    }
+
+	    //
+	    //	Old order has a saved order
+	    //
+	    if( unit->SavedOrder.Action!=UnitActionStill ) {
+		//
+		//	Release pending references.
+		//
+		if( unit->SavedOrder.Goal ) {
+#ifdef REFS_DEBUG
+		    DebugCheck( !unit->SavedOrder.Goal->Refs );
+#endif
+		    if( !--unit->SavedOrder.Goal->Refs ) {
+			ReleaseUnit(unit->SavedOrder.Goal);
+		    }
+		}
+		unit->SavedOrder.Action=UnitActionStill;
+		unit->SavedOrder.Goal=NoUnitP;
+	    }
+
+	    //
+	    //	Shift queue with structure assignment
+	    //
+	    unit->OrderCount--;
+	    unit->OrderFlush=0;
+	    for ( z = 0; z < unit->OrderCount; z++ ) {
+		unit->Orders[z] = unit->Orders[z+1];
+	    }
+
+	    //
+	    //	Must reset the new order.
+	    //
+	    // FIXME: ResetPath(&unit->Orders[0]);
+
+	    unit->SubAction=0;
+	    unit->State=0;
+	    unit->Wait=1;
+
+	    if( IsSelected(unit) ) {	// update display for new action
+		UpdateButtonPanel();
+		MustRedraw|=RedrawButtonPanel;
+	    }
+	}
+
+#else
 
 	//
 	//	New command and forced or old ready (= still)
@@ -140,9 +217,10 @@ local void HandleUnitAction(Unit* unit)
 	    }
 
 	    unit->NextFlush=0;
+
+	    // Reset for new order
 	    unit->SubAction=0;
 	    unit->State=0;
-
 	    unit->Wait=1;
 
 	    if( IsSelected(unit) ) {	// update display for new action
@@ -150,6 +228,7 @@ local void HandleUnitAction(Unit* unit)
 		MustRedraw|=RedrawButtonPanel;
 	    }
 	}
+#endif
     }
 
     // FIXME: fire handling should be moved to here.
@@ -157,7 +236,11 @@ local void HandleUnitAction(Unit* unit)
     //
     //	Select action.
     //
+#ifdef NEW_ORDERS
+    switch( unit->Orders[0].Action ) {
+#else
     switch( unit->Command.Action ) {
+#endif
 	case UnitActionNone:
 	    DebugLevel1Fn("FIXME: Should not happen!\n");
 	    break;
@@ -248,7 +331,11 @@ local void HandleUnitAction(Unit* unit)
 	    break;
 
 	default:
+#ifdef NEW_ORDERS
+	    DebugLevel1Fn("Unknown action %d\n",unit->Orders[0].Action);
+#else
 	    DebugLevel1Fn("Unknown action %d\n",unit->Command.Action);
+#endif
 	    break;
     }
 }
