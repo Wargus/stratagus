@@ -86,6 +86,7 @@ local void GameMenuEndScenario(void);
 local void GameOptions(void);
 
 local void HelpMenu(void);
+local void ShowTipsMenu(void);
 local void InitTips(Menuitem *mi);
 local void TipsMenuEnd(void);
 local void SetTips(Menuitem *mi);
@@ -998,8 +999,8 @@ local Menuitem HelpMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, NULL, 'h'} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Warcraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowNextTip, 't'} } },
-    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, ShowNextTip, NULL,
+	{ button:{ "Warcraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowTipsMenu, 't'} } },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
     { 0 }
@@ -2121,6 +2122,11 @@ local void GameMenuEnd(void)
 local void HelpMenu(void)
 {
     ProcessMenu(MENU_HELP, 1);
+}
+
+local void ShowTipsMenu(void)
+{
+    ProcessMenu(MENU_TIPS, 1);
 }
 
 /**
