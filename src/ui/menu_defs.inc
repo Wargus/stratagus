@@ -2038,25 +2038,33 @@ global void SaveMenus(FILE* file)
 			 exitfunc);
 	    switch (menu->items[j].mitype) {
 		case MI_TYPE_TEXT:
-		    fprintf(file,"    'text '(\"%s\" %s)\n",
-			    menu->items[j].d.text.text ? (char*)menu->items[j].d.text.text : "null",
+		    if (menu->items[j].d.text.text) {
+			fprintf(file,"    'text '(\"%s\" %s)\n",
+			    (char*)menu->items[j].d.text.text
 			    text_flags[menu->items[j].d.text.tflags]);
+		    } else {
+			fprintf(file,"    'text '(() %s)\n",
+			    text_flags[menu->items[j].d.text.tflags]);
+		    }
 		    break;
 		case MI_TYPE_BUTTON:
 		    sprintf(func,"%p",menu->items[j].d.button.handler);
 		    // FIXME: Johns "null" is not good, use nil or ()
 		    //		or use no style item.
 		    fprintf(file,"    'button '(size (%d %d)\n"
-			         "            caption \"%s\"\n"
+			         "            caption %c%s%c\n"
 				 "            hotkey \"%s\"\n"
 				 "            func %s\n"
 				 "            style %s)\n",
 				 menu->items[j].d.button.xsize,
 				 menu->items[j].d.button.ysize,
-				 menu->items[j].d.button.text ?
-					menu->items[j].d.button.text
-					: (unsigned char*)"null",
-				 hotkey2str(menu->items[j].d.button.hotkey,hotkey),
+				 menu->items[j].d.button.text ? '"' : '('
+				 menu->items[j].d.button.text
+				    ?  menu->items[j].d.button.text
+				    : (unsigned char*)NULL,
+				 menu->items[j].d.button.text ? '"' : ')'
+				 hotkey2str(menu->items[j].d.button.hotkey,
+					hotkey),
 				 (char*)hash_find(MenuFuncHash2,func),
 				 button_style(menu->items[j].d.button.button));
 		    break;
