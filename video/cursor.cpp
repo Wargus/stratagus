@@ -123,7 +123,7 @@ void LoadCursors(const char* race)
 	//  Free old cursor sprites.
 	//
 	for (i = 0; Cursors[i].OType; ++i) {
-		VideoSafeFree(Cursors[i].Sprite);
+		FreeGraphic(Cursors[i].Sprite);
 		Cursors[i].Sprite = NULL;
 	}
 
@@ -141,8 +141,9 @@ void LoadCursors(const char* race)
 		if (Cursors[i].File) {
 			ShowLoadProgress("Cursor %s", Cursors[i].File);
 			if (!Cursors[i].Sprite) {
-				Cursors[i].Sprite = LoadSprite(Cursors[i].File,
+				Cursors[i].Sprite = NewGraphic(Cursors[i].File,
 					Cursors[i].Width, Cursors[i].Height);
+				LoadGraphic(Cursors[i].Sprite);
 			}
 		}
 	}

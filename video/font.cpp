@@ -698,7 +698,8 @@ void LoadFonts(void)
 		if (Fonts[i].File && !Fonts[i].Graphic) {
 			ShowLoadProgress("Fonts %s", Fonts[i].File);
 			DebugPrint("Font %s\n" _C_ Fonts[i].File);
-			Fonts[i].Graphic = LoadSprite(Fonts[i].File, 0, 0);
+			Fonts[i].Graphic = NewGraphic(Fonts[i].File, 0, 0);
+			LoadGraphic(Fonts[i].Graphic);
 			FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
 			MakeFontBitmap(Fonts[i].Graphic, i);
@@ -911,7 +912,7 @@ void CleanFonts(void)
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 		free(Fonts[i].File);
-		VideoSafeFree(Fonts[i].Graphic);
+		FreeGraphic(Fonts[i].Graphic);
 		Fonts[i].File = NULL;
 		Fonts[i].Graphic = NULL;
 	}

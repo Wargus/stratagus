@@ -270,7 +270,7 @@ Graphic* NewGraphic(const char* file, int w, int h)
 	} else {
 		graphic = *g;
 		++graphic->Refs;
-		Assert(graphic->Width == w && graphic->Height == h);
+		Assert((w == 0 || graphic->Width == w) && (graphic->Height == h || h == 0));
 	}
 
 	return graphic;

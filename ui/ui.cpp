@@ -87,20 +87,20 @@ static void CleanUIGraphics(UI* ui)
 	int i;
 
 	for (i = 0; i < ui->NumFillers; ++i) {
-		VideoSafeFree(ui->Filler[i].Graphic);
+		FreeGraphic(ui->Filler[i].Graphic);
 	}
 
 	for (i = 0; i < MaxCosts + 2; ++i) {
-		VideoSafeFree(ui->Resources[i].Icon.Graphic);
+		FreeGraphic(ui->Resources[i].Icon.Graphic);
 	}
 
-	VideoSafeFree(ui->InfoPanel.Graphic);
-	VideoSafeFree(ui->ButtonPanel.Graphic);
-	VideoSafeFree(ui->PieMenuBackground.Graphic);
+	FreeGraphic(ui->InfoPanel.Graphic);
+	FreeGraphic(ui->ButtonPanel.Graphic);
+	FreeGraphic(ui->PieMenuBackground.Graphic);
 
 	menupanel = ui->MenuPanels;
 	while (menupanel) {
-		VideoSafeFree(menupanel->Panel.Graphic);
+		FreeGraphic(menupanel->Panel.Graphic);
 		menupanel = menupanel->Next;
 	}
 }
@@ -202,27 +202,32 @@ void LoadUserInterface(void)
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
 		if (TheUI.Filler[i].File) {
-			TheUI.Filler[i].Graphic = LoadSprite(TheUI.Filler[i].File, 0, 0);
+			TheUI.Filler[i].Graphic = NewGraphic(TheUI.Filler[i].File, 0, 0);
+			LoadGraphic(TheUI.Filler[i].Graphic);
 		}
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
 		if (TheUI.Resources[i].Icon.File) {
 			TheUI.Resources[i].Icon.Graphic =
-				LoadSprite(TheUI.Resources[i].Icon.File,
+				NewGraphic(TheUI.Resources[i].Icon.File,
 					TheUI.Resources[i].IconW, TheUI.Resources[i].IconH);
+			LoadGraphic(TheUI.Resources[i].Icon.Graphic);
 		}
 	}
 
 	if (TheUI.InfoPanel.File) {
-		TheUI.InfoPanel.Graphic = LoadSprite(TheUI.InfoPanel.File, 0, 0);
+		TheUI.InfoPanel.Graphic = NewGraphic(TheUI.InfoPanel.File, 0, 0);
+		LoadGraphic(TheUI.InfoPanel.Graphic);
 	}
 	if (TheUI.ButtonPanel.File) {
-		TheUI.ButtonPanel.Graphic = LoadSprite(TheUI.ButtonPanel.File, 0, 0);
+		TheUI.ButtonPanel.Graphic = NewGraphic(TheUI.ButtonPanel.File, 0, 0);
+		LoadGraphic(TheUI.ButtonPanel.Graphic);
 	}
 	if (TheUI.PieMenuBackground.File) {
 		TheUI.PieMenuBackground.Graphic =
-			LoadSprite(TheUI.PieMenuBackground.File, 0, 0);
+			NewGraphic(TheUI.PieMenuBackground.File, 0, 0);
+		LoadGraphic(TheUI.PieMenuBackground.Graphic);
 	}
 
 	//
@@ -248,7 +253,8 @@ void LoadUserInterface(void)
 	menupanel = TheUI.MenuPanels;
 	while (menupanel) {
 		if (menupanel->Panel.File) {
-			menupanel->Panel.Graphic = LoadSprite(menupanel->Panel.File, 0, 0);
+			menupanel->Panel.Graphic = NewGraphic(menupanel->Panel.File, 0, 0);
+			LoadGraphic(menupanel->Panel.Graphic);
 		}
 		menupanel = menupanel->Next;
 	}
