@@ -33,7 +33,6 @@ typedef struct _node_ {
     short	Direction;	/// Direction for trace back
     short       InGoal;         /// is this point in the goal
     int		CostFromStart;	/// Real costs to reach this point
-    int		CostToGoal;	/// Aproximated costs until goal
 } Node;
 
 typedef struct _open_ {
@@ -291,11 +290,12 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     int ey;
     int dx,dy;
     int eo,gx,gy,cx,cy,sx;
-    int b_x,b_y,b_d,b_c;
+    int best_x,best_y,best_cost_to_goal,best_cost_from_start;
     int r;
     int shortest;
     int counter;
     int new_cost;
+    int cost_to_goal;
     //int last_dir;
     int path_length;
     int num_in_close=0;
@@ -356,19 +356,18 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     }
     if(i) {
 	eo=x*TheMap.Width+y;
-	AStarMatrix[eo].CostToGoal=AStarCosts(x,y,gx,gy);
 	// it is quite important to start from 1 rather than 0, because we use
 	// 0 as a way to represent nodes that we have not visited yet.
 	AStarMatrix[eo].CostFromStart=1;
+	best_cost_from_start=1;
+	best_cost_to_goal=AStarCosts(x,y,gx,gy);
+	best_x=x;
+	best_y=y;
 	// place start point in open
-	AStarAddNode(x,y,eo,AStarMatrix[eo].CostFromStart+1);
+	AStarAddNode(x,y,eo,best_cost_to_goal+1);
 	if(num_in_close<Threshold) {
 	    CloseSet[num_in_close++]=OpenSet[0].O;
 	}
-	b_c=1;
-	b_d=AStarMatrix[eo].CostToGoal;
-	b_x=x;
-	b_y=y;
     } else {
 	AStarCleanUp(num_in_close);
 	return -2;
@@ -383,6 +382,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	x=OpenSet[shortest].X;
 	y=OpenSet[shortest].Y;
 	o=OpenSet[shortest].O;
+	cost_to_goal=OpenSet[shortest].Costs-AStarMatrix[o].CostFromStart;
 	
 	AStarRemoveMinimum(shortest);
 
@@ -403,22 +403,23 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    //	Select a "good" point from the open set.
 	    //		Nearest point to goal.
 	    DebugLevel0(__FUNCTION__": %Zd way too long\n",UnitNumber(unit));
-	    ex=b_x;
-	    ey=b_y;
+	    ex=best_x;
+	    ey=best_y;
 	}
 
+	// update best point so far
+	if(cost_to_goal<best_cost_to_goal
+	   || (cost_to_goal==best_cost_to_goal
+	       && AStarMatrix[o].CostFromStart<best_cost_from_start)) {
+	    best_cost_to_goal=cost_to_goal;
+	    best_cost_from_start=AStarMatrix[o].CostFromStart;
+	    best_x=x;
+	    best_y=y;
+	}
+	DebugLevel3("Best point in Open Set: %d %d (%d)\n",x,y,OpenSetSize);
 	//
 	//	Generate successors of this node.
 	//
-	if(AStarMatrix[o].CostToGoal<b_d 
-	   || (AStarMatrix[o].CostToGoal==b_d 
-	       && AStarMatrix[o].CostFromStart<b_c)) {
-	    b_d=AStarMatrix[o].CostToGoal;
-	    b_c=AStarMatrix[o].CostFromStart;
-	    b_x=x;
-	    b_y=y;
-	}
-	DebugLevel3("Best point in Open Set: %d %d (%d)\n",x,y,OpenSetSize);
 	for( i=0; i<8; ++i ) {
 	    ex=x+xoffset[i];
 	    ey=y+yoffset[i];
@@ -445,11 +446,9 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    if(AStarMatrix[eo].CostFromStart==0) {
 		// we are sure the current node has not been already visited
 		AStarMatrix[eo].CostFromStart=new_cost;
-		AStarMatrix[eo].CostToGoal=AStarCosts(ex,ey,gx,gy);
 		AStarMatrix[eo].Direction=i;
 		AStarAddNode(ex,ey,eo,
-			     AStarMatrix[eo].CostFromStart+
-			     AStarMatrix[eo].CostToGoal);
+			     AStarMatrix[eo].CostFromStart+AStarCosts(ex,ey,gx,gy));
 		// we add the point to the close set
 		if(num_in_close<Threshold) {
 		    CloseSet[num_in_close++]=eo;		
@@ -458,27 +457,24 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 		// Already visited node, but we have here a better path
 		// I know, it's redundant (but simpler like this)
 		AStarMatrix[eo].CostFromStart=new_cost;
-		// CostToGoal has not to be updated has it depends only on the
-		// position, not on the path
-		// AStarMatrix[eo].CostToGoal=AStarCosts(ex,ey,gx,gy);
 		AStarMatrix[eo].Direction=i;
 		// this point might be already in the OpenSet
 		j=AStarFindNode(eo);
 		if(j==-1) {
 		    AStarAddNode(ex,ey,eo,
 				 AStarMatrix[eo].CostFromStart+
-				 AStarMatrix[eo].CostToGoal);
+				 AStarCosts(ex,ey,gx,gy));
 		} else {
 		    AStarReplaceNode(j,AStarMatrix[eo].CostFromStart+
-				     AStarMatrix[eo].CostToGoal);
+				     AStarCosts(ex,ey,gx,gy));
 		}
 		// we don't have to add this point to the close set
 	    }
 	}
 	if( OpenSetSize<=0 ) {		// no new nodes generated
 	    // we go to the best node
-	    ex=b_x;
-	    ey=b_y;
+	    ex=best_x;
+	    ey=best_y;
 	    if(ex==x && ey==y) {
 		DebugLevel3(__FUNCTION__": %Zd unreachable\n",UnitNumber(unit));
 		AStarCleanUp(num_in_close);
