@@ -755,9 +755,7 @@ global void TriggersEachCycle(void)
 		    setcar(trig,NIL);
 		    setcdr(trig,NIL);
 		}
-		setvar(gh_symbol2scm("*triggers*"),trigger_start,NIL);
 	    }
-	    fflush(stdout);
 	}
     } else {
 	Trigger=NULL;
