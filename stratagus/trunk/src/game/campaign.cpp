@@ -10,7 +10,7 @@
 //
 /**@name campaign.c	-	The campaign control. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -513,22 +513,6 @@ global void CampaignCclRegister(void)
     gh_new_procedure1_0("set-current-chapter!",CclSetCurrentChapter);
     gh_new_procedureN("briefing",CclBriefing);
 }
-
-/**
-**	FIXME: should use the names of the real fonts.
-*/
-local char *FontNames[] = {
-    "small",
-    "game",
-    "large",
-    "small-title",
-    "large-title",
-    "user1",
-    "user2",
-    "user3",
-    "user4",
-    "user5",
-};
 
 /**
 **	Save the campaign module.
