@@ -774,17 +774,17 @@ local SCM CclAiAttackWithForce(SCM value)
 */
 local SCM CclAiSleep(SCM value)
 {
-    static int fc;
     int i;
 
-    i=gh_scm2int(value);
-    if( fc ) {
-	if( fc<FrameCounter ) {
-	    fc=0;
+    DebugLevel0Fn("%d %d\n",FrameCounter,AiPlayer->SleepFrames);
+    if( AiPlayer->SleepFrames ) {
+	if( AiPlayer->SleepFrames<FrameCounter ) {
+	    AiPlayer->SleepFrames=0;
 	    return SCM_BOOL_F;
 	}
     } else {
-	fc=FrameCounter+i;
+	i=gh_scm2int(value);
+	AiPlayer->SleepFrames=FrameCounter+i;
     }
 
     return SCM_BOOL_T;
