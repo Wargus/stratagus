@@ -10,7 +10,7 @@
 //
 /**@name commands.c	-	Global command handler - network support. */
 //
-//	(c) Copyright 2000,2002 by Lutz Sammer and Andreas Arens.
+//	(c) Copyright 2000-2003 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -94,7 +94,7 @@ global void CommandLog(const char* name,const Unit* unit,int flag,
 	int x,int y,const Unit* dest,const char* value,int num)
 {
     if( CommandLogDisabled ) {		// No log wanted
-	return;
+//	return;
     }
 
     //
@@ -565,7 +565,7 @@ local void DoNextReplay(void)
     } else if( !strcmp(name,"spell-cast") ) {
 	SendCommandSpellCast(UnitSlots[unit],posx,posy,dunit,num,flags);
     } else if( !strcmp(name,"auto-spell-cast") ) {
-	SendCommandAutoSpellCast(UnitSlots[unit],num,flags);
+	SendCommandAutoSpellCast(UnitSlots[unit],num,posx);
     } else if( !strcmp(name,"diplomacy") ) {
 	int state;
 	if( !strcmp(val,"neutral") ) {
@@ -1392,7 +1392,7 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 		CommandLog("spell-cast",unit,status,x,y,dest,NULL,id);
 		CommandSpellCast(unit,x,y,dest,SpellTypeById(id),status);
 	    } else {
-		CommandLog("auto-spell-cast",unit,status,x,y,NoUnitP,NULL,id);
+		CommandLog("auto-spell-cast",unit,status,x,-1,NoUnitP,NULL,id);
 		CommandAutoSpellCast(unit,x?SpellTypeById(id):NULL);
 	    }
 	    break;
