@@ -5,11 +5,7 @@
  * the error return for 'argument required' is a ':' not a '?'.
  * This makes it easier to differentiate between an 'illegal option' and
  * an 'argument required' error.
- *
- * Another extension: the external variable prgname is set from argv[0].
  */
-
-#include "prgname.h"
 
 #define NULL	0
 #define EOF	(-1)
@@ -56,8 +52,6 @@ char	**argv, *opts;
     static int sp = 1;
     register int c;
     register char *cp;
-
-    setprgname(argv[0]);
 
     optarg = NULL;
 
