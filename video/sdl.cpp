@@ -29,6 +29,11 @@
 #include <sys/time.h>
 #include <SDL/SDL.h>
 
+#ifdef USE_WIN32
+#include <winsock.h>
+#undef DrawText
+#endif
+
 #include "video.h"
 #include "font.h"
 #include "map.h"
@@ -480,12 +485,14 @@ local void DoEvent(SDL_Event* event)
 */
 global void WaitEventsAndKeepSync(void)
 {
-#ifndef USE_WIN32
+#if !defined( USE_WIN32 ) || defined ( NEW_NETWORK )
     struct timeval tv;
     fd_set rfds;
     fd_set wfds;
     int maxfd;
     int i;
+#endif
+#ifndef USE_SDLA
 #endif
     SDL_Event event[1];
 
@@ -496,7 +503,7 @@ global void WaitEventsAndKeepSync(void)
 	    // Handle SDL event
 	    DoEvent(event);
 	}
-#ifndef USE_WIN32
+#if !defined( USE_WIN32 ) || defined ( NEW_NETWORK )
 	//
 	//	Prepare select
 	//
@@ -514,8 +521,12 @@ global void WaitEventsAndKeepSync(void)
 		maxfd=NetworkFildes;
 	    }
 	    FD_SET(NetworkFildes,&rfds);
+	    if( !NetworkInSync ) {
+		NetworkRecover();	// recover network
+	    }
 	}
 
+#ifndef USE_WIN32
 	//
 	//	Sound
 	//
@@ -525,9 +536,16 @@ global void WaitEventsAndKeepSync(void)
 	    }
 	    FD_SET(SoundFildes,&wfds);
 	}
+#endif
 
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
 		,(i=SDL_PollEvent(event)) ? &tv : NULL);
+
+#if 0
+	if( NetworkFildes!=-1 ) {
+	    DebugLevel0("%d net %d\n",maxfd,FD_ISSET(NetworkFildes,&rfds));
+	}
+#endif
 
 	if ( i ) {
 	    // Handle SDL event
@@ -535,6 +553,7 @@ global void WaitEventsAndKeepSync(void)
 	}
 
 	if( maxfd>0 ) {
+#ifndef USE_WIN32
 	    //
 	    //	Sound
 	    //
@@ -542,6 +561,7 @@ global void WaitEventsAndKeepSync(void)
 			&& FD_ISSET(SoundFildes,&wfds) ) {
 		WriteSound();
 	    }
+#endif
 
 	    //
 	    //	Network in sync and time for frame over: return
@@ -562,7 +582,7 @@ global void WaitEventsAndKeepSync(void)
 	//
 	//	Network in sync and time for frame over: return
 	//
-	if(NetworkInSync && VideoInterrupts) {
+	if( NetworkInSync && VideoInterrupts ) {
 	    return;
 	}
     }
