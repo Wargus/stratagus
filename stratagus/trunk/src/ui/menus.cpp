@@ -97,7 +97,7 @@ local void ShowNextTip(void);
 
 local void InitGameMenu(Menuitem *mi);
 
-local void GlobalOptions(Menuitem *mi);
+local void GlobalOptions(void);
 local void InitGlobalOptions(Menuitem *mi);
 local void SetRes640(Menuitem *mi);
 local void SetRes800(Menuitem *mi);
@@ -3279,7 +3279,7 @@ global void SoundOptions(void)
 #endif // with sound
 }
 
-local void GlobalOptions(Menuitem *mi)
+local void GlobalOptions(void)
 {
     ProcessMenu("menu-global-options", 1);
 }
@@ -6591,7 +6591,6 @@ global void InitMenuFunctions(void)
     //
 #endif
 
-#ifdef OLD_MENU
 #ifdef SAVE_MENU_CCL
     {
 	FILE *fd=fopen("menus.ccl","w");
@@ -6599,10 +6598,8 @@ global void InitMenuFunctions(void)
 	fclose(fd);
     }
 #endif
-#endif
 }
 
-#ifdef OLD_MENU
 #ifdef SAVE_MENU_CCL
 char *menu_names[] = {
     "menu-game",
@@ -6779,7 +6776,7 @@ global void SaveMenus(FILE* file)
 	} else {
 	    netaction[0] = '\0';
 	}
-	fprintf(file,"(define-menu 'name \"%s\" 'geometry '(%d %d %d %d)\n"
+	fprintf(file,"(define-menu 'name '%s 'geometry '(%d %d %d %d)\n"
 		     "    'image '%s 'default '%d%s)\n",
 		     menu_names[i],
 		     menu->x - OffsetX, menu->y - OffsetY,
@@ -6822,7 +6819,7 @@ global void SaveMenus(FILE* file)
 				 "            style %s)\n",
 				 menu->items[j].d.button.xsize,
 				 menu->items[j].d.button.ysize,
-				 menu->items[j].d.button.text,
+				 menu->items[j].d.button.text ? menu->items[j].d.button.text : "null",
 				 hotkey2str(menu->items[j].d.button.hotkey,hotkey),
 				 (char*)hash_find(MenuFuncHash2,func),
 				 button_style(menu->items[j].d.button.button));
@@ -6917,12 +6914,11 @@ global void SaveMenus(FILE* file)
 		default:
 		    abort();
 	    }
-	    fprintf(file,"    'menu \"%s\")\n",menu_names[i]);
+	    fprintf(file,"    'menu '%s)\n",menu_names[i]);
 	}
 	fprintf(file,"\n\n");
     }
 }
 #endif /// SAVE_MENU_CCL
-#endif
 
 //@}
