@@ -254,7 +254,7 @@ MISC    += Makefile Rules.make.orig setup \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
 	  make/README tools/udta.c tools/ugrd.c $(CONTRIB) \
 	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h \
-	  src/freecraft.rc
+	  src/freecraft.rc data/default.cm
 
 mydate	= $(shell date +%y%m%d)
 distdir	= freecraft-$(mydate)
