@@ -37,137 +37,65 @@ For any questions not mentioned here, please visit
 
 <DL>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: I am getting the error "gzseek already defined or
-    undefined!" ?</FONT>
-<DD>A: You have an old version of libpng, install the libpng1.0.X or later.
-    You get it here:
-    <A HREF="http://www.libpng.org/pub/png/libpng.html">http://www.libpng.org/pub/png/libpng.html</A>
+<tr>
+    <td>
+    <b>Q: gzseek already defined or undefined.</b><br>
+    A: You have an incompatible libpng version, install the latest version.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Does FreeCraft work with ALSA?</FONT>
-<DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA)
-    Driver if you compile FreeCraft using SDL and SDL was compiled to support
-    ALSA (--enable-alsa). It has been tested with versions 0.3.2 to 0.9.0.
-    <P>
-    More informationcan be found here:
-    <A HREF="http://www.alsa-project.org">http://www.alsa-project.org</A>
+    <b>Q: The software cursor is too slow.</b><br>
+    A: This should be fixed in the latest stable release, if it still happens, 
+    compile in SDL video mode or add -DSLOW_INPUT to DFLAGS in Rules.make.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Can I use the original CD without expansion?</FONT>
-<DD>A: Yes. Only difference is there are more graphics and sounds in the
-    expansion CD version. It works without problems with the german version. If
-    you are still not sure, just try it. It should work without problems.
+    <b>Q: Does FreeCraft work with ALSA.</b><br>
+    A: Yes, if you compiled SDL with alsa support and you compiled freecraft
+    using SDL video mode.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Why does the cursor react after several seconds
-    when i move it?</FONT>
-<DD>A: We didn't find the real problem. Currently use the threaded sound
-    support and enable it (in data/ccl/sound.ccl) or add to the line
-    <P>
-    "-DSLOW_INPUT" to:
-    <P>
-    "DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG)"
-    in Rules.make
+    <b>Q: Does FreeCraft work with the W*rcr*ft 2 Expansion CD?</b><br>
+    A: Yes.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: I want to play without having the CD in the drive, 
-    can i copy files from CD to hdd ?</FONT>
-<DD>A: After running 'build.bat' (WINDOWS) or 'build.sh' (UNIX) the CD is no
-    longer needed. This script converts the data on CD into our own format.
-    <BR>
-    A: You don't need to copy, the installation did it for you.
+    <b>Q: Does FreeCraft work with the W*rcr*ft 2 BNE version?</b><br>
+    A: No. The file format of this version is currently not supported.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Why does the game become very slow under X11?
-    </FONT>
-<DD>A: Give your X11 server a higher priority than the clients.
-    <P>
-    renice -5 &lt;pid-of-your-x11-server&gt;
-    <P>
-    newer linux distributions (debian) does this automatically, 
-    or start freecraft with<P>
-    nice -n 5 ./freecraft
+    <b>Q: Can I use FreeCraft to join in a W*rcr*ft 2 network game?</b><br>
+    A: Sorry, FreeCraft use its own network protocol. 
+    The protocol needs the exact same code executed on all machines, 
+    and it is not possible to have this with the original WC2, 
+    therefore you can only connect to a FreeCraft server.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Can I use FreeCraft to join a W*rcr*ft 2 network
-    game?</FONT>
-<DD>A: Sorry, FreeCraft use its own network protocol. You can only join 
-    FreeCraft network games.
+    <b>Q: What about other RTS games?</b><br>
+    A: St*rcr*ft and W*rcr*ft 1 support is in development. T*ber*an Sun 
+    may be added in the distant future. For the old C&C games, you can 
+    use freecnc.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Is it planned to support joining a W*rcr*ft 2
-    network game?</FONT>
-<DD>A: Both network protocols are in such a way, that this would be impossible.
+    <b>Q: What ports does the FreeCraft network protocol use?</b><br>
+    A: 6660 by default, you may start freecraft with '-Pxxxx' flag to 
+    use port xxxx instead.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: I only have the original BNE version, can I use
-    it?</FONT>
-<DD>A: No. Nobody has written a converter for this, if you want to
-    write it, please contact us. It is only a question of time and you
-    must understand writing C.
+    <b>Q: Does freecraft support internet/metaserver play?</b><br>
+    A: Not yet, but this is a planned feature and may be added for 1.19<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Why do I get only a black window after I installed
-    it on windows?</FONT>
-<DD>A: Try installing FreeCraft to C: drive.
+    <b>Q: I get only a black window after I have installed it on windows.
+    What have I done wrong?</b><br>
+    A: Install FreeCraft to the C: drive. This has solved the problem for
+    everybody who has had this bug.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with VC++?</FONT>
-<DD>A: Yes. Follow the instructions in <A HREF="development.html">
-    development.html</A>.
+    <b>Q: I have installed the windows version, when I start FreeCraft I get
+    only the splash screen and the game stops, but consumes 100% CPU. What
+    have I done wrong?</b><br>
+    A: Please wait for a couple of minutes for the game to start. There are
+    some machines (Win98 and Win2000) that will still not start after some
+    time.  On all machines I have tested it, it works.  I have no idea where
+    the problem is, any help is welcome.<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with Borland C++?</FONT>
-<DD>A: This C compiler isn't supported yet, you can build a project, 
-    write the instrutions and than mail it to us.<P>
-    <P>
-    Information on how to use MingGW and libSDL for cross development and
-    native development:<P>
-    <A HREF="http://www.libsdl.org/Xmingw32/">
-    http://www.libsdl.org/Xmingw32/</A><P>
-    Compiler package for windows built by Sam Lantinga:<P>
-    <A HREF="http://www.libsdl.org/Xmingw32/mingw32.zip">
-    http://www.libsdl.org/Xmingw32/mingw32.zip</A>
-    <P>
-    Based on the above this is our build. It contains SDL 1.2.4, libpng, zlib
-    and zziplib. Install this and download the newest FreeCraft source and
-    start FreeCraft development with windows:
-    <P>
-    <A HREF="http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip">
-    http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip</A>
+    <b>Q: My question isn't answered here.</b><br>
+    A: Send an e-mail to our hard working
+    <a href="mailto:nehal@canada.com">support</a> team. :)<p>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: What port or ports did FreeCraft use for network
-    play?</FONT>
-<DD>A: As default the only port used is 6660 UDP for both the client and
-    server side.
+    </td>
+</tr>
 
-<P>
-<DT><FONT COLOR="#FF0000">Q: Why are there some grayed out fields in the
-    FreeCraft menus?</FONT>
-<DD>A: The grayed out menu entries are planned features which aren't finished
-    yet. You are welcome to write them.
-
-<P>
-<DT><FONT COLOR="#FF0000">Q: Why do I get the following compiler failure:<BR>
-    network.c:282: initializer element is not constant<BR>
-    network.c:282: (near initialization for `CommandsIn[0].first')</FONT>
-<DD>A: This is a bug in the GNU C Compiler 2.96, downgrade to GCC 2.95.x or
-    upgrade to GCC 3.xx (expect many wrong warnings). If you are using the
-    Redhat distribution 7.2, you can change CC=gcc to CC=kgcc in Rules.make.
-
-<P>
-<DT><FONT COLOR="#FF0000">Q: Can I play FreeCraft in fullscreen?</FONT>
-<DD>A: Yes fullscreen is supported with SDL. Click on the Options button
-    from the main program menu. In addition, in game use ALT-F or CTRL-F to
-    switch between fullscreen and windowed mode. You can also use the
-    commandline option -F to start the game in fullscreen mode.
-
-</DL>
-
-<HR>
 Last changed: $Id$<BR>
 All trademarks and copyrights on this page are owned by their respective owners.
 <ADDRESS><A HREF="http://freecraft.org">The FreeCraft Project</A>
 </ADDRESS></BODY></HTML>
+</tr>
