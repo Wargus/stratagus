@@ -347,7 +347,7 @@ global const char* IdentOfIcon(const Icon* icon)
 global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
 	GraphicPlayerPixels(player, icon->Sprite);
-	VideoDraw(icon->Sprite, icon->Index, x, y);
+	VideoDrawClip(icon->Sprite, icon->Index, x, y);
 }
 
 /**

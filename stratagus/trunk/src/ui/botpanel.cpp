@@ -220,7 +220,6 @@ global void DrawButtonPanel(void)
 	int i;
 	int v;
 	Player* player;
-	const UnitStats* stats;
 	const ButtonAction* buttons;
 	char buf[8];
 
@@ -351,29 +350,7 @@ global void DrawButtonPanel(void)
 			//
 			if (ButtonAreaUnderCursor == ButtonAreaButton &&
 					ButtonUnderCursor == i && KeyState != KeyStateInput) {
-				SetStatusLine(buttons[i].Hint);
-				// FIXME: Draw costs
-				v = buttons[i].Value;
-				switch (buttons[i].Action) {
-					case ButtonBuild:
-					case ButtonTrain:
-					case ButtonUpgradeTo:
-						// FIXME: store pointer in button table!
-						stats = &UnitTypes[v]->Stats[player->Player];
-
-						SetCosts(0, UnitTypes[v]->Demand, stats->Costs);
-						break;
-					case ButtonResearch:
-						SetCosts(0, 0, Upgrades[v].Costs);
-						break;
-					case ButtonSpellCast:
-						SetCosts(SpellTypeTable[v]->ManaCost, 0, NULL);
-						break;
-
-					default:
-						ClearCosts();
-						break;
-				}
+				UpdateStatusLineForButton(&buttons[i]);
 			}
 
 			//
@@ -400,6 +377,39 @@ global void DrawButtonPanel(void)
 				}
 			}
 		}
+	}
+}
+
+/**
+**  Update the status line with hints from the button
+**
+**  @param button  Button
+*/
+global void UpdateStatusLineForButton(const ButtonAction* button)
+{
+	int v;
+	const UnitStats* stats;
+
+	SetStatusLine(button->Hint);
+	// FIXME: Draw costs
+	v = button->Value;
+	switch (button->Action) {
+		case ButtonBuild:
+		case ButtonTrain:
+		case ButtonUpgradeTo:
+			// FIXME: store pointer in button table!
+			stats = &UnitTypes[v]->Stats[ThisPlayer->Player];
+			SetCosts(0, UnitTypes[v]->Demand, stats->Costs);
+			break;
+		case ButtonResearch:
+			SetCosts(0, 0, Upgrades[v].Costs);
+			break;
+		case ButtonSpellCast:
+			SetCosts(SpellTypeTable[v]->ManaCost, 0, NULL);
+			break;
+		default:
+			ClearCosts();
+			break;
 	}
 }
 

@@ -166,6 +166,7 @@ typedef enum _cursor_states_ {
 	CursorStatePoint,      ///< Normal cursor
 	CursorStateSelect,     ///< Select position
 	CursorStateRectangle,  ///< Rectangle selecting
+	CursorStatePieMenu,    ///< Displaying Pie Menu
 } CursorStates;
 
 /*----------------------------------------------------------------------------
