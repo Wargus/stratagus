@@ -440,17 +440,6 @@ global void PlayMusic(const char* name)
     Sample* sample;
 #endif
 
-/*
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
-    if (PlayCDRom(name)) {
-	return;
-    }
-    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")) {
-	return;
-    }
-#endif
-*/
-
     if (MusicOff) {
 	return;
     }
