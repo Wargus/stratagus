@@ -247,7 +247,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     //
     unit->Type=type;
 
-    unit->SeenFrame=-1;
+    unit->SeenFrame=0xFF;
     if( !type->Building ) {
         unit->Direction=(MyRand()>>8)&0xFF;// random heading
         player->NumFoodUnits++;		// food needed

@@ -43,6 +43,8 @@ global int AiCostFactor = 100;		/// Adjust the AI costs
 global AiType* AiTypes;			/// List of all AI types.
 global AiHelper AiHelpers;		/// AI helper variables
 
+global PlayerAi* AiPlayer;		/// Current AI player
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -54,6 +56,20 @@ global AiHelper AiHelpers;		/// AI helper variables
 */
 global void AiInit(Player* player)
 {
+    PlayerAi* pai;
+
+    DebugLevel0Fn("%d - %s\n" _C_ player->Player _C_ player->Name);
+
+    pai=calloc(1,sizeof(PlayerAi));
+    if( !pai ) {
+	fprintf(stderr,"Out of memory.\n");
+	exit(0);
+    }
+    pai->Player=player;
+    pai->AiType=AiTypes;
+    pai->Script=AiTypes->Script;
+
+    player->Ai=pai;
 }
 
 /*----------------------------------------------------------------------------
@@ -68,7 +84,7 @@ global void AiInit(Player* player)
 */
 global void AiHelpMe(Unit* unit)
 {
-    DebugLevel0Fn("%d %d",unit->X,unit->Y);
+    DebugLevel0Fn("%d %d" _C_ unit->X _C_ unit->Y);
 }
 
 /**
@@ -127,7 +143,25 @@ global void AiEachFrame(Player* player)
 */
 global void AiEachSecond(Player* player)
 {
-    // FIXME: Not needed, will be removed.
+    SCM value;
+    PlayerAi* pai;
+
+    DebugLevel0Fn("%d:\n" _C_ player->Player);
+
+    AiPlayer=pai=player->Ai;
+    //
+    //	Advance script
+    //
+    if( !gh_null_p(pai->Script) ) {
+	if( pai->ScriptDebug ) {		// display executed command
+	    gh_display(gh_car(pai->Script));
+	    gh_newline();
+	}
+	value=leval(gh_car(pai->Script),NIL);
+	if( !gh_eq_p(value,SCM_BOOL_T) ) {
+	    pai->Script=gh_cdr(pai->Script);
+	}
+    }
 }
 
 //@}
