@@ -189,10 +189,10 @@ global void HandleActionRepair(Unit* unit)
 				goal->Orders[0].Action==UnitActionDie ) {
 			unit->Orders[0].X=goal->X;
 			unit->Orders[0].Y=goal->Y;
-			unit->Orders[0].Goal=goal=NULL;
 			RefsDebugCheck( !goal->Refs );
 			--goal->Refs;
 			RefsDebugCheck( !goal->Refs );
+			unit->Orders[0].Goal=goal=NULL;
 			// FIXME: should I clear this here?
 			NewResetPath(unit);
 		    }
