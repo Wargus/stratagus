@@ -1385,6 +1385,9 @@ local SCM CclDefineMenu(SCM list)
 
     DebugLevel3Fn("Define menu\n");
 
+    TheUI.Offset640X = (VideoWidth - 640) / 2;
+    TheUI.Offset480Y = (VideoHeight - 480) / 2;
+
     //
     //	Parse the arguments, already the new tagged format.
     //
@@ -1472,8 +1475,8 @@ local SCM CclDefineMenu(SCM list)
 		}
 	    } else {
 		//printf("VideoWidth = %d\n", VideoWidth);
-		menu->x += (VideoWidth - 640) / 2;
-		menu->y += (VideoHeight - 480) / 2;
+		menu->x += TheUI.Offset640X;
+		menu->y += TheUI.Offset480Y;
 	    }
 	}
 	//printf("Me:%s\n", name);
