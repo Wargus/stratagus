@@ -538,6 +538,7 @@ case $ANSWER in
 	  LIBCHECK="-lpthread"
 	  check_for_libs
 	  if test "$?" = 0 ; then
+	    echo
 	    echo "Assuming you have a thread-safe X11 (libc6 or glibc),"
 	    echo -n "do you want to compile with threaded sound? (n) "
 	    read ANSWER2
@@ -891,6 +892,7 @@ echo "	@\$(TOPDIR)/tools/aledoc \$< | \$(DOCIFY) > \$*-h.doc 2>/dev/null" >> $RU
 
 echo
 echo "Done generating $RULESFILE."
+echo
 echo -n "Would you like to compile it now? (y) "
 read ANSWER
 
@@ -898,6 +900,7 @@ case $ANSWER in
  [nN])
  	echo
  	echo "Done generating $RULESFILE.  Type '$MAKE$CROSS' to compile!"
+	echo
 	;;
  *)
 	$MAKE depend
