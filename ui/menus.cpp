@@ -5349,7 +5349,7 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 /**
 **	Editor load map menu
 */
-local void EditorLoadMenu(void)
+global void EditorLoadMenu(void)
 {
     char *p;
     char *s;
