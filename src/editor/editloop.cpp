@@ -1741,6 +1741,8 @@ local void CreateEditor(void)
 	user_gc(SCM_BOOL_F);		// Cleanup memory after load
     }
 
+    ThisPlayer = &Players[0];
+
     FlagRevealMap = 1;			// editor without fog and all visible
     TheMap.NoFogOfWar = 1;
     if (!*CurrentMapPath) {		// new map!
