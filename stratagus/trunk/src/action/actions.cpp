@@ -548,7 +548,7 @@ void UnitActions(void)
 					VERSION "\n");
 			time(&now);
 			fprintf(logf, ";;;\tDate: %s", ctime(&now));
-			fprintf(logf, ";;;\tMap: %s\n\n", TheMap.Description);
+			fprintf(logf, ";;;\tMap: %s\n\n", TheMap.Info.Description);
 		}
 
 		fprintf(logf, "%lu: ", GameCycle);
