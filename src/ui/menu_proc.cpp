@@ -46,7 +46,10 @@
 #include "sound.h"
 #include "ccl.h"
 
-#ifdef WIN32
+#ifdef USE_WIN32
+#ifdef _MSC_VER
+#undef NOUSER
+#endif
 #define DrawIcon WinDrawIcon
 #define EndMenu WinEndMenu
 #include <windows.h>
@@ -58,7 +61,7 @@
 #include <X11/Xlib.h>
 #elif defined(USE_SDL)
 #include <SDL.h>
-#include <SDL/SDL_syswm.h>
+#include <SDL_syswm.h>
 #endif
 
 /*----------------------------------------------------------------------------
@@ -1307,10 +1310,10 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
     Menuitem *mi;
     Menu *menu;
-#if defined(WIN32) || defined(_XLIB_H_)
+#if defined(USE_WIN32) || defined(_XLIB_H_)
     int i;
     char *clipboard;
-#ifdef WIN32
+#ifdef USE_WIN32
     HGLOBAL handle;
 #elif defined(_XLIB_H_)
     Display *display;
@@ -1392,31 +1395,34 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	    if (!(mi->flags&MenuButtonClicked)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_INPUT:
-#if defined(WIN32) || defined(_XLIB_H_)
-#ifdef WIN32
-			if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL))
-			    break; 
+#if defined(USE_WIN32) || defined(_XLIB_H_)
+#ifdef USE_WIN32
+			if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
+			    break;
+			}
 			handle = GetClipboardData(CF_TEXT);
-			if (!handle)
+			if (!handle) {
+			    CloseClipboard();
 			    break;
+			}
 			clipboard = GlobalLock(handle);
-			if (!clipboard)
+			if (!clipboard) {
+			    CloseClipboard();
 			    break;
+			}
 #elif defined(_XLIB_H_)
 			display = XOpenDisplay(NULL);
 			clipboard = XFetchBytes(display, &i);
 			XCloseDisplay(display);
 #endif
-			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i)
-			{
-			    if (clipboard[i] != '\r' && clipboard[i] != '\n')
-			    {
+			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
+			    if (clipboard[i] != '\r' && clipboard[i] != '\n') {
 				mi->d.input.buffer[mi->d.input.nch] = clipboard[i];
 				++mi->d.input.nch;
 			    }
 			}
 			strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
-#ifdef WIN32
+#ifdef USE_WIN32
 			GlobalUnlock(handle);
 			CloseClipboard();
 #endif
@@ -1426,8 +1432,9 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    default:
 			break;
 		}
-		if (mi->d.input.action)
+		if (mi->d.input.action) {
 		    (*mi->d.input.action)(mi, 'x');
+		}
 	    }
 	}
     }
