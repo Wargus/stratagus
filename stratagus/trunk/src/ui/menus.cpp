@@ -2785,14 +2785,11 @@ local void LoadLBAction(Menuitem *mi, int i)
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
 	if (fl[i].type) {
-	    strcpy(SaveGameMenuItems[1].d.input.buffer, fl[i].name);
-	    SaveGameMenuItems[1].d.input.nch = strlen(fl[i].name);
-	    SaveGameMenuItems[4].flags = MenuButtonSelected;
+	    LoadGameMenuItems[3].flags = MenuButtonSelected;
 	} else {
-	    SaveGameMenuItems[4].flags = MenuButtonDisabled;
+	    LoadGameMenuItems[3].flags = MenuButtonDisabled;
 	}
     }
-    TypedFileName = 0;
 }
 
 local void LoadVSAction(Menuitem *mi, int i)
@@ -2971,16 +2968,14 @@ local void DeleteFile(void)
 local void LoadAction(void)
 {
     char filename[256];
-//    FileList *fl;
-    char *name="x"; 
+    FileList *fl;
+    char *name; 
     size_t nameLength;
 
-//    fl = LoadGameMenuItems[1].d.listbox.options;
+    fl = LoadGameMenuItems[1].d.listbox.options;
     
-//    name = fl[LoadGameMenuItems[1].d.listbox.curopt].name;
+    name = fl[LoadGameMenuItems[1].d.listbox.curopt].name;
     nameLength = strlen(name);
-//    if (TypedFileName)
-//	nameLength -= 3;
 
     strcpy(filename, SaveDir);
     strcat(filename, "/");
@@ -2988,11 +2983,12 @@ local void LoadAction(void)
 
     LoadGame(filename);
     SetMessage("Loaded game: %s", filename);
+    EndMenu();
 }
 
 global void GameMenuLoad(void)
 {
-    LoadGameMenuItems[4].flags = MenuButtonDisabled;	/* Save button! */
+    LoadGameMenuItems[3].flags = MenuButtonDisabled;	/* Load button! */
     ProcessMenu(MENU_LOAD_GAME, 1);
 }
 
