@@ -96,6 +96,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	if( unit->State==1 && type->GivesOil ) {
 	    unit->Frame=unit->Data.Resource.Active ? 2 : 0;
 	}
+	UnitMarkSeen(unit);
     }
 
     if( !unit->Reset ) {		// animation can't be aborted here

@@ -749,6 +749,10 @@ extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if building is known on the map
 extern int BuildingVisibleOnMap(Unit* unit);
 #endif
+    /// Updates seen data
+extern void UnitsMarkSeen(int x,int y);
+    /// Checks and updates if a Unit's seen information
+extern void UnitMarkSeen(Unit* unit);
     /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
 
