@@ -536,9 +536,14 @@ static char* strchrlen(char* s, char c, int maxlen, int font)
 	if (!maxlen) {
 		return res;
 	}
-	if (font == -1 && s + maxlen < res) {
-		res = strrchr(s + maxlen, ' ');
-		if (!res || res < s) {
+	if (font == -1 &&
+			(s + maxlen < res || (!res && strlen(s) >= (unsigned)maxlen))) {
+		c = s[maxlen];
+		s[maxlen] = '\0';
+		res = strrchr(s, ' ');
+		s[maxlen] = c;
+		if (!res) {
+			fprintf(stderr, "line too long: \"%s\"\n", s);
 			res = s + maxlen;
 		}
 	} else if (font != -1) {
@@ -580,7 +585,7 @@ char* GetLineFont(int line, char* s, int maxlen, int font)
 {
 	int i;
 	char* res;
-	char *tmp;
+	char* tmp;
 
 	Assert(0 < line);
 	Assert(s);
@@ -588,19 +593,21 @@ char* GetLineFont(int line, char* s, int maxlen, int font)
 	Assert(font == -1 || 0 <= font);
 
 	res = s;
-        for (i = 1; i < line && res; ++i) {
-		res = strchrlen(s, '\n', maxlen, font);
-		s = res + 1;
-	}
-	if ((s - 1)) {
-		res = strdup(s);
-		tmp = strchrlen(res, '\n', maxlen, font);
-		if (tmp) {
-			*tmp = '\0';
+	for (i = 1; i < line; ++i) {
+		res = strchrlen(res, '\n', maxlen, font);
+		if (!res) {
+			return NULL;
 		}
-		return res;
+		while (*res == '\n' || *res == ' ') {
+			++res;
+		}
 	}
-	return NULL;
+	res = strdup(res);
+	tmp = strchrlen(res, '\n', maxlen, font);
+	if (tmp) {
+		*tmp = '\0';
+	}
+	return res;
 }
 
 /**
