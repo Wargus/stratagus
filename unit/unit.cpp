@@ -584,12 +584,12 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
 				,unit->Y+unit->Type->TileHeight/2
 				,unit->CurrentSightRange);
-	if( host ) {
-	    unit->CurrentSightRange=host->CurrentSightRange;
-	    MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
+	    if( host ) {
+		unit->CurrentSightRange=host->CurrentSightRange;
+		MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
 				host->Y+host->Type->TileWidth/2,
 				unit->CurrentSightRange);
-	}
+	    }
     }
 #endif
 
@@ -3455,7 +3455,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 */
 global int MapDistance(int x1,int y1,int x2,int y2)
 {
-    return max(abs(x1-x2),abs(y1-y2));
+    return isqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
 }
 
 /**
@@ -3555,7 +3555,7 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 	}
     }
 
-    return (dy<dx) ? dx : dy;
+    return isqrt(dx*dx+dy*dy);
 }
 
 /**
