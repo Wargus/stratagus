@@ -39,6 +39,7 @@
 #include "sound_server.h"
 #include "avi.h"
 #include "movie.h"
+#include "iocompat.h"
 
 #include "vfw_PB_Interface.h"
 #include "pbdll.h"
