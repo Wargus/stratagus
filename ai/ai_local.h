@@ -371,6 +371,12 @@ extern void AiForceManager(void);
     /// Plan the an attack
 extern int AiPlanAttack(AiForce* force);
 
+//
+//	Magic
+//
+    /// Check for magic
+extern void AiCheckMagic(void);
+
 //@}
 
 #endif	// NEW_AI
