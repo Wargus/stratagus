@@ -10,7 +10,7 @@
 //
 /**@name action_returngoods.c -	The return goods action. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -46,92 +46,133 @@
 */
 global void HandleActionReturnGoods(Unit* unit)
 {
-    UnitType* type;
+    const UnitType* type;
     Unit* destu;
 
+    type=unit->Type;
     //
     //	Select target to return goods.
     //
-    type=unit->Type;
     if( type==UnitTypeHumanWorkerWithGold || type==UnitTypeOrcWorkerWithGold ) {
+#ifdef NEW_ORDERS
 	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
+	    // No deposit -> can't return
+	    unit->Orders[0].Action=UnitActionStill;
+	    return;
+	}
+	ResetPath(unit->Orders[0]);
+	unit->Orders[0].Goal=destu;
+	RefsDebugCheck( !destu->Refs );
+	++destu->Refs;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	unit->Orders[0].X=-1;
+	unit->Orders[0].Y=-1;
+	unit->Orders[0].Action=UnitActionMineGold;
+#else
+	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
+	    // No deposit -> can't return
 	    unit->Command.Action=UnitActionStill;
 	    return;
 	}
 	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
+	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Command.Data.Move.Range=1;
-#if 1
-	NearestOfUnit(destu,unit->X,unit->Y
-		,&unit->Command.Data.Move.DX
-		,&unit->Command.Data.Move.DY);
-#else
-	unit->Command.Data.Move.DX=destu->X;
-	unit->Command.Data.Move.DY=destu->Y;
-#endif
+	unit->Command.Data.Move.DX=-1;
+	unit->Command.Data.Move.DY=-1;
 	unit->Command.Action=UnitActionMineGold;
-	unit->SubAction=65;
+#endif
+	unit->SubAction=65;	// FIXME: hardcoded
 	DebugLevel3("Wait: %d\n",unit->Wait);
 	unit->Wait=1;
 	return;
     }
 
     if( type==UnitTypeHumanWorkerWithWood || type==UnitTypeOrcWorkerWithWood ) {
+#ifdef NEW_ORDERS
 	if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
+	    // No deposit -> can't return
+	    unit->Orders[0].Action=UnitActionStill;
+	    return;
+	}
+	ResetPath(unit->Orders[0]);
+	unit->Orders[0].Goal=destu;
+	RefsDebugCheck( !destu->Refs );
+	++destu->Refs;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	unit->Orders[0].X=-1;
+	unit->Orders[0].Y=-1;
+	DebugLevel3("Return to %Zd=%d,%d\n"
+	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
+	unit->Orders[0].Action=UnitActionHarvest;
+#else
+	if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
+	    // No deposit -> can't return
 	    unit->Command.Action=UnitActionStill;
 	    return;
 	}
 	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
+	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Command.Data.Move.Range=1;
-#if 1
-	NearestOfUnit(destu,unit->X,unit->Y
-		,&unit->Command.Data.Move.DX
-		,&unit->Command.Data.Move.DY);
-#else
-	unit->Command.Data.Move.DX=destu->X;
-	unit->Command.Data.Move.DY=destu->Y;
-#endif
+	unit->Command.Data.Move.DX=-1;
+	unit->Command.Data.Move.DY=-1;
 	DebugLevel3("Return to %Zd=%d,%d\n"
 	    ,UnitNumber(destu)
-	    ,unit->Command.Data.Move.DX
-	    ,unit->Command.Data.Move.DY);
+	    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY);
 	unit->Command.Action=UnitActionHarvest;
-	unit->SubAction=2;
+#endif
+	unit->SubAction=2;		// FIXME: Hardcoded
 	DebugLevel3("Wait: %d\n",unit->Wait);
 	unit->Wait=1;
 	return;
     }
 
     if( type==UnitTypeHumanTankerFull || type==UnitTypeOrcTankerFull ) {
+#ifdef NEW_ORDERS
 	if( !(destu=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
+	    // No deposit -> can't return
+	    unit->Orders[0].Action=UnitActionStill;
+	    return;
+	}
+	ResetPath(unit->Orders[0]);
+	unit->Orders[0].Goal=destu;
+	RefsDebugCheck( !destu->Refs );
+	++destu->Refs;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	unit->Orders[0].X=-1;
+	unit->Orders[0].Y=-1;
+	DebugLevel3("Return to %Zd=%d,%d\n"
+	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
+	unit->Orders[0].Action=UnitActionHaulOil;
+#else
+	if( !(destu=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
+	    // No deposit -> can't return
 	    unit->Command.Action=UnitActionStill;
 	    return;
 	}
 	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
+	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Command.Data.Move.Range=1;
-#if 1
-	NearestOfUnit(destu,unit->X,unit->Y
-		,&unit->Command.Data.Move.DX
-		,&unit->Command.Data.Move.DY);
-#else
-	unit->Command.Data.Move.DX=destu->X;
-	unit->Command.Data.Move.DY=destu->Y;
-#endif
+	unit->Command.Data.Move.DX=-1;
+	unit->Command.Data.Move.DY=-1;
 	DebugLevel3("Return to %Zd=%d,%d\n"
 	    ,UnitNumber(destu)
-	    ,unit->Command.Data.Move.DX
-	    ,unit->Command.Data.Move.DY);
+	    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY);
 	unit->Command.Action=UnitActionHaulOil;
-	unit->SubAction=2;
+#endif
+	unit->SubAction=65;		// FIXME: Hardcoded
 	DebugLevel3("Wait: %d\n",unit->Wait);
 	unit->Wait=1;
 	return;
     }
+
+    // FIXME: return of more resources.
+    // FIXME: some general method for this?
 }
 
 //@}
