@@ -111,6 +111,49 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 
     SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
+
+local void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    DebugCheck(!sprite->SurfaceFlip);
+
+    srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w / 
+	    sprite->Width)) * sprite->Width) - sprite->Width;
+    srect.y = (frame / (sprite->SurfaceFlip->w / sprite->Width)) * sprite->Height;
+    srect.w = sprite->Width;
+    srect.h = sprite->Height;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
+}
+
+local void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+    int oldx;
+    int oldy;
+
+    srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
+    srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+    srect.w = sprite->Width;
+    srect.h = sprite->Height;
+
+    oldx = x;
+    oldy = y;
+    CLIP_RECTANGLE(x, y, srect.w, srect.h);
+    srect.x += x - oldx;
+    srect.y += y - oldy;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
+}
 #else
 //
 //	The current implementation uses RLE encoded sprites.
@@ -267,32 +310,7 @@ local void VideoDrawOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
 }
 #endif
 
-#ifdef USE_SDL_SURFACE
-local void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
-{
-    SDL_Rect srect;
-    SDL_Rect drect;
-
-    DebugCheck(!sprite->SurfaceFlip);
-
-    srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w / 
-	    sprite->Width)) * sprite->Width) - sprite->Width;
-    srect.y = (frame / (sprite->SurfaceFlip->w / sprite->Width)) * sprite->Height;
-    srect.w = sprite->Width;
-    srect.h = sprite->Height;
-
-    drect.x = x;
-    drect.y = y;
-
-    SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
-}
-
-local void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
-{
-    // FIXME?
-    VideoDrawX(sprite, frame, x, y);
-}
-#else
+#ifndef USE_SDL_SURFACE
 /**
 **	Draw 8bit graphic object unclipped and flipped in X direction
 **	into 8 bit framebuffer.
