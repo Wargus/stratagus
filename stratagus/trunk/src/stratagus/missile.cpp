@@ -1261,7 +1261,7 @@ local void MissileAction(Missile* missile)
 		    FreeMissile(missile);
 		    missile=NULL;
 		}
-		if( neg ) {
+		if( neg && missile ) {
 		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 	    }
@@ -1306,7 +1306,7 @@ local void MissileAction(Missile* missile)
 		    FreeMissile(missile);
 		    missile=NULL;
 		}
-		if( neg ) {
+		if( neg && missile ) {
 		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 	    }
@@ -1327,7 +1327,7 @@ local void MissileAction(Missile* missile)
 		FreeMissile(missile);
 		missile=NULL;
 	    }
-	    if( neg ) {
+	    if( neg && missile ) {
 		missile->SpriteFrame=-missile->SpriteFrame;
 	    }
 	    break;
@@ -1363,7 +1363,7 @@ local void MissileAction(Missile* missile)
 		missile=NULL;
 		// FIXME: should MissileHitAndFree();
 	    }
-	    if( neg ) {
+	    if( neg && missile ) {
 		missile->SpriteFrame=-missile->SpriteFrame;
 	    }
 	    break;
@@ -1395,7 +1395,7 @@ local void MissileAction(Missile* missile)
 		    }
 		    break;
 	    }
-	    if( neg ) {
+	    if( neg && missile ) {
 		missile->SpriteFrame=-missile->SpriteFrame;
 	    }
 	    break;
@@ -1443,7 +1443,7 @@ local void MissileAction(Missile* missile)
 		    }
 		}
 	    }
-	    if( neg ) {
+	    if( neg && missile ) {
 		missile->SpriteFrame=-missile->SpriteFrame;
 	    }
 	    break;
