@@ -232,7 +232,7 @@ global void PlayMusic(const char* name)
 		if (CDTrack > NumCDTracks)
 		    CDTrack = 1;
 	    } while (cd_is_audio(++CDTrack) < 1);
-		cd_play(CDTrack);
+	    cd_play(CDTrack);
 	    return;
 	}
 	
@@ -370,7 +370,7 @@ global void StopMusic(void)
 
 #endif
 
-global void CDRomCheck() 
+global void CDRomCheck(void)
 {
 #ifdef USE_SDLCD
     if (strcmp(CDMode, ":off") && SDL_CDStatus(CDRom) == 1) {
@@ -384,12 +384,14 @@ global void CDRomCheck()
 
 #ifdef USE_LIBCDA
     if (strcmp(CDMode, ":off") && !cd_current_track()) {
+	DebugLevel0Fn("Playing new track\n");
 	if (!strcmp(CDMode, ":all")) {
 	    PlayMusic(":all");
 	} else if (!strcmp(CDMode, ":random")) {
 	    PlayMusic(":random");
 	}
     } else {
+	DebugLevel0Fn("get track\n");
         CDTrack = cd_current_track() + 1;
 	if (CDTrack > NumCDTracks)
 	    CDTrack = 1;
