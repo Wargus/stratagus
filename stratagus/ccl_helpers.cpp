@@ -47,12 +47,12 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 
 global int IOLoadingMode;
 global unsigned int IOTabLevel;
 global CLFile *IOOutFile;
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
 /**
 **	Output tabs when saving a ccl value
 */
