@@ -12,6 +12,7 @@
 ##	setup		-	Configure Rules.make (GNU MAKE rules).
 ##
 ##	(c) Copyright 2000-2002 by Dan Hensley, Nehal Mistry.
+##	Optimization section by Patrick McFarland.
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -133,6 +134,8 @@ DARWIN=0
 DEBUG_CFLAGS="-g -O1 -fsigned-char -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
 #-- Production (default)
 CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS)"
+#-- High Optimization
+HIGHOPT="-O3 -pipe -fsigned-char -fomit-frame-pointer -foptimize-sibling-calls -ffast-math -fstrength-reduce -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop -frerun-loop-opt -fgcse -fgcse-lm -fgcse-sm -fdelete-null-pointer-checks -fexpensive-optimizations -fschedule-insns2 -funroll-loops -frename-registers -fno-cprop-registers \$(IFLAGS) \$(DFLAGS)"
 
 #------------------------------------------------------------------------------
 # Function declarations
@@ -275,6 +278,8 @@ if [ "$DARWIN" = "0" ] ; then
     CC=cc
     CCLD=c++
    CFLAGS="-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS) -traditional-cpp"
+   HIGHOPT="$HIGHOPT -traditional-cpp"
+   DEBUG_CLAGS="$HIGHOPT -traditional-cpp"
     echo "It appears that you are in a Darwin environment..."
     echo "Use --beos, --win32 or --unix to override"
   fi
@@ -828,6 +833,183 @@ case $COMPOPT in
 esac
 echo "" >> $RULESFILE
 
+#------------------------------------------------------------------------------
+#	Optimization Section
+#------------------------------------------------------------------------------
+
+if [ "$DEBUG" != 1 ] ; then
+    echo
+    echo "Debug Support allows you to debug Freecraft more easily, but disables a lot of"
+    echo "optimization support, which may cause Freecraft to run much slower."
+    echo
+    echo -n "Would you like debug support? (n): "
+    read $N DEBUGASK
+    case $DEBUGASK in
+	[yY])
+	    echo
+	    echo "-> Debug support enabled"
+	    CFLAGS=$DEBUG_CFLAGS
+	    DEBUG=1
+	    ;;
+	[nN])
+	    echo
+	    echo "-> Debug support disabled."
+	    ;;
+    esac
+fi
+
+
+CCVERS=`$CC -dumpversion`
+CCMAJOR=`echo $CCVERS | cut -d. -f 1`
+CCMINOR=`echo $CCVERS | cut -d. -f 2`
+CCREALLYMINOR=`echo $CCVERS | cut -d. -f 3`
+
+echo
+echo "OPTIMIZATION OPTIONS"
+if [ $CCMAJOR -gt 3 -o $CCMAJOR -eq 3 -a $CCMINOR -ge 2 ] ; then
+if [ "$DEBUG" != 1 ] ; then
+    echo
+    echo Compiler is $CC $CCMAJOR.$CCMINOR.$CCREALLYMINOR
+    echo
+    echo "This autoconfiguring program allows you to tell GCC to use different"
+    echo "optimizations, based on how stable you want Freecraft. The higher the"
+    echo "optimization, the more unstable Freecraft is. High Optimization also"
+    echo "may cause Freecraft to fail to compile, but usually doesnt. High"
+    echo "Optimization will also increase compile times."
+    echo
+    echo "Which Optimization Mode do you wish to use?"
+    echo
+    echo " N - Normal Optimization, used in Production Binaries."
+    echo " H - High Optimization, not recommended."
+    echo
+    echo -n "Please enter selection (n): "
+    read $N OPTASK
+    case $OPTASK in
+	[hH])
+	    echo
+	    echo "-> Using high optimization."
+	    CFLAGS="$HIGHOPT"
+	    ;;
+	*)
+	    echo
+	    echo "-> Using normal optimization."
+	    ;;
+    esac
+    case $OPTASK in
+	[hH])
+	    echo
+	    echo "Specific Processor Optimization:"
+	    echo
+	    echo "You can additionally optimize Freecraft, depending on what architecture" 
+	    echo "(target machine) you run. If you dont know, or your target"
+	    echo "machine isnt listed, simply press enter."
+	    echo
+	    echo "  I - Pentium, Pentium MMX, Pentium Pro Pentium 2, Pentium 3, Pentium 4,"
+	    echo "	Celeron"
+	    echo "  A - AMD K6, K6-2, K6-3, Athlon, Ahtlon Thunderbird, Athlon 4,"
+	    echo "	Athlon XP, Athlon MP, Duron"
+	    echo
+	    echo -n "Please enter selection: "
+	    read $N TYPEASK
+	    echo
+	    case $TYPEASK in
+		[iI])
+		    CFLAGS="$CFLAGS -fno-branch-count-reg"
+		    echo
+		    echo "Choose one:"
+		    echo
+		    echo "  A - Pentium"
+		    echo "  B - Pentium MMX"
+		    echo "  C - Pentium Pro"
+		    echo "  D - Pentium 2 or Celeron/Celeron A"
+		    echo "  E - Pentium 3 or Celeron with Coppermine Core"
+		    echo "  F - Pentium 4"
+		    echo
+		    echo -n "To choose none, press enter: "
+		    read $N PROCASK
+		    case $PROCASK in
+			[aA])
+			    CFLAGS="$CFLAGS -march=pentium -malign-double -mpreferred-stack-boundary=3"
+			    ;;
+			[bB])
+			    CFLAGS="$CFLAGS -march=pentium-mmx -malign-double -mmmx -mpreferred-stack-boundary=3"
+			    ;;
+			[cC])
+			    CFLAGS="$CFLAGS -march=pentiumpro -malign-double -mpreferred-stack-boundary=3"
+			    ;;
+			[dD])
+			    CFLAGS="$CFLAGS -march=pentium2 -mmmx"
+			    ;;
+			[eE])
+			    CFLAGS="$CFLAGS -march=pentium3 -mmmx -msse -mpreferred-stack-boundary=4 -mfpmath=sse,387"
+			    ;;
+			[fF])
+			    CFLAGS="$CFLAGS -march=pentium4 -mmmx -msse -msse2 -mpreferred-stack-boundary=4 -mfpmath=sse,387"
+			    ;;
+		    esac
+		    echo
+		    ;;
+		[aA])
+		    CFLAGS="$CFLAGS -fno-branch-count-reg"
+		    echo
+		    echo "Choose one:"
+		    echo
+		    echo "  A - K6"
+		    echo "  B - K6-2"
+		    echo "  C - K6-3"
+		    echo "  D - Athlon or Duron (Choose this one if you dont know)"
+		    echo "  E - Athlon or Duron /w Thunderbird Core"
+		    echo "  F - Athlon 4"
+		    echo "  G - Athlon XP"
+		    echo "  H - Athlon MP"
+		    echo
+		    echo "To choose none, just press enter."
+		    echo -n "Please enter selection: "
+		    read $N PROCASK
+		    case $PROCASK in
+			[aA])
+			    CFLAGS="$CFLAGS -march=k6 -malign-double"
+			    ;;
+			[bB])
+			    CFLAGS="$CFLAGS -march=k6-2 -m3dnow -mmmx -malign-double"
+			    ;;
+			[cC])
+			    CFLAGS="$CFLAGS -march=k6-3 -m3dnow -mmmx -malign-double"
+			    ;;
+			[dD])
+			    CFLAGS="$CFLAGS -march=athlon -m3dnow -mmmx -malign-double"
+			    ;;
+			[eE])
+			    CFLAGS="$CFLAGS -march=athlon-tbird -m3dnow -mmmx -malign-double"
+			    ;;
+			[fF])
+			    CFLAGS="$CFLAGS -march=athlon-4 -m3dnow -mmmx -msse -malign-double -mfpmath=sse,387 -mpreferred-stack-boundary=4"
+			    ;;
+			[gG])
+			    CFLAGS="$CFLAGS -march=athlon-xp -m3dnow -mmmx -msse -malign-double -mfpmath=sse,387 -mpreferred-stack-boundary=4"
+			    ;;
+			[hH])
+			    CFLAGS="$CFLAGS -march=athlon-mp -m3dnow -mmmx -msse -malign-double -mfpmath=sse,387 -mpreferred-stack-boundary=4"
+			    ;;
+		    esac
+		    ;;
+	    esac
+	    ;;
+    esac
+fi
+fi
+if [ $CCMAJOR -ne 3 -o $CCMAJOR -eq 3 -a $CCMINOR -ne 2 ] ; then
+    if [ "$DEBUG" != 1 ] ; then
+	echo
+	echo Compiler is $CC $CCMAJOR.$CCMINOR.$CCREALLYMINOR
+	echo
+	echo "Optimization Menu Disabled: Not running GCC 3.2.x"
+ 	echo "-> Using Normal Optimization"
+    fi
+fi
+#------------------------------------------------------------------------------
+# End Optimization Setion
+#------------------------------------------------------------------------------
 
 ###############################################################################
 # Write required information to the file
