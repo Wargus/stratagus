@@ -430,6 +430,8 @@ global void DrawButtonPanel(void)
 		case ButtonPatrol:
 		    action=UnitActionPatrol;
 		    break;
+		default:
+		    break;
 	    }
 	    if( action!=UnitActionNone ) {
 		for( j=0; j<NumSelected; ++j ) {
