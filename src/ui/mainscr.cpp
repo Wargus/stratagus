@@ -604,6 +604,7 @@ global void SetMessage2( int x, int y, char* fmt, ... )
     strcpy( MessagesEvent[ MessagesEventCount ], temp );
     MessagesEventX[ MessagesEventCount ] = x;
     MessagesEventY[ MessagesEventCount ] = y;
+    MessagesEventIndex = MessagesEventCount;
     MessagesEventCount++;
  
     MustRedraw|=RedrawMessage|RedrawMap;
