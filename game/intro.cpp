@@ -627,8 +627,6 @@ void ShowCredits(Credits* credits)
 		DrawContinueButton();
 		DrawAnyCursor();
 
-		// FIXME: update only the changed area!!!!
-
 		Invalidate();
 		RealizeVideoMemory();
 
