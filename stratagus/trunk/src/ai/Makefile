@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 1998,2000 by Lutz Sammer
+##	(c) Copyright 1998,2000-2002 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -34,7 +34,7 @@ MODULE  = ai
 HDRS	= ai_local.h
 
 SRCS	= ai.c new_ai.c ccl_ai.c ai_resource.c \
-	  ai_building.c ai_force.c
+	  ai_building.c ai_force.c ai_plan.c
 
 OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 

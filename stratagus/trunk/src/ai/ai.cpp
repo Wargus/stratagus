@@ -252,7 +252,7 @@ local void AiCheckUnits(void)
 	    t=aiut->Type->Type;
 	    x=aiut->Want;
 	    if( x>unit_types_count[t]+counter[t] ) {	// Request it.
-		DebugLevel3Fn("Force %d need %s * %d\n" _C_ i _C_
+		DebugLevel2Fn("Force %d need %s * %d\n" _C_ i _C_
 			aiut->Type->Ident,x);
 		AiAddUnitTypeRequest(aiut->Type,
 			x-unit_types_count[t]-counter[t]);
