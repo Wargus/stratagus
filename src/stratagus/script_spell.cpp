@@ -1042,8 +1042,8 @@ local int ScriptCreateSpell(lua_State* l)
 		lua_error(l);
 		return 0;
 	} else {
-		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType));
-		spell = &SpellTypeTable[SpellTypeCount++];
+		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
+		spell = SpellTypeTable[SpellTypeCount++] = malloc(sizeof(SpellType));
 		memset(spell, 0, sizeof(SpellType));
 		spell->Ident = SpellTypeCount - 1;
 		spell->IdentName = strdup(name);
@@ -1066,7 +1066,7 @@ local int ScriptSpellGetValue(lua_State* l)
 	spell = *((SpellType**)lua_touserdata(l, -2));
 	key = lua_tostring(l, -1);
 	DebugCheck((!spell) || (!key));
-	DebugLevel0Fn("%p->(%s)\n" _C_ spell _C_ key);
+	DebugLevel3Fn("%p->(%s)\n" _C_ spell _C_ key);
 
 	META_GET_STRING("DisplayName", spell->Name);
 	META_GET_STRING("Ident", spell->IdentName);
@@ -1110,10 +1110,9 @@ local int ScriptSpellSetValue(lua_State* l)
 	spell = *((SpellType**)lua_touserdata(l, -3));
 	key = LuaToString(l, -2);
 	DebugCheck((!spell) || (!key));
-	DebugLevel0Fn("%p->(%s)\n" _C_ spell _C_ key);
+	DebugLevel3Fn("%p->(%s)\n" _C_ spell _C_ key);
 
 	META_SET_STRING("DisplayName", spell->Name);
-	META_SET_STRING("Ident", spell->IdentName);
 	META_SET_INT("ManaCost", spell->ManaCost);
 	META_SET_INT("Range", spell->Range);
 	META_SET_BOOL("RepeatCast", spell->RepeatCast);
@@ -1150,16 +1149,18 @@ local int ScriptSpellSetValue(lua_State* l)
 global int ScriptSpellGCollect(lua_State* l)
 {
 	SpellType* spell;
+	char s[20];
 
 	spell = *((SpellType**)lua_touserdata(l, -1));
-	DebugLevel0Fn("Collecting ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ spell->ScriptData);
-/*	lua_pushstring(l, "StratagusReferences");
+	DebugLevel3Fn("Collecting ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ spell->ScriptData);
+	lua_pushstring(l, "StratagusReferences");
 	lua_gettable(l, LUA_REGISTRYINDEX);
-	lua_pushfstring(l, "%p", spell->ScriptData); //  FIXME: 64-bit?
+	sprintf(s, "%p", spell->ScriptData); // FIXME: 64-bit.
+	lua_pushstring(l, s);
 	lua_pushnil(l);
 	lua_settable(l, -3);
 	lua_settop(l, -2);
-	spell->ScriptData = 0;*/
+	spell->ScriptData = 0;
 	return 0;
 }
 
@@ -1172,7 +1173,6 @@ global int ScriptSpellGCollect(lua_State* l)
 global void ScriptSpellCreateUserdata(lua_State* l, SpellType* spell)
 {
 	char s[20];
-	int z = lua_gettop(l);
 	SpellType** sp;
 
 	if (spell->ScriptData) {
@@ -1182,7 +1182,7 @@ global void ScriptSpellCreateUserdata(lua_State* l, SpellType* spell)
 		lua_pushstring(l, s);
 		lua_gettable(l, -2);
 		lua_remove(l, -2);
-		DebugLevel0Fn("Reusing ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
+		DebugLevel3Fn("Reusing ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
 	} else {
 		// Create userdata.
 		sp = (SpellType**)lua_newuserdata(l, sizeof(SpellType));
@@ -1208,18 +1208,8 @@ global void ScriptSpellCreateUserdata(lua_State* l, SpellType* spell)
 		lua_pushvalue(l, -3);
 		lua_settable(l, -3);
 		lua_remove(l, -1);
-		DebugLevel0Fn("Creating ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
+		DebugLevel3Fn("Creating ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
 	}
-	DebugLevel0Fn("%d -> %d\n" _C_ z _C_ lua_gettop(l));
-}
-
-/**
-**	Create a lua table for the spell array
-**
-**  @param l     The lua state
-*/
-global void ScriptSpellTableCreateUserdata(lua_State* l)
-{
 }
 
 /**
@@ -1242,7 +1232,7 @@ local int ScriptSpellNamespaceGetValue(lua_State* l)
 			lua_error(l);
 			return 0;
 		}
-		ScriptSpellCreateUserdata(l, SpellTypeTable + i);
+		ScriptSpellCreateUserdata(l, SpellTypeTable[i]);
 		return 1;
 	}
 
@@ -1263,8 +1253,6 @@ local int ScriptSpellNamespaceGetValue(lua_State* l)
 	lua_error(l);
 	return 0;
 }
-
-
 
 /**
 **	Initialize spell scripting. The main table is at -1
