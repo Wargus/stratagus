@@ -4406,30 +4406,27 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
 			break;
 		}
 	    }
+	    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 	    switch (mi->mitype) {
 		case MI_TYPE_VSLIDER:
-		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		    mi->d.vslider.cflags = mi->d.vslider.cursel;
 		    if (mi->d.vslider.action) {
 			(*mi->d.vslider.action)(mi, 0);		// 0 indicates down
 		    }
 		    break;
 		case MI_TYPE_HSLIDER:
-		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		    mi->d.hslider.cflags = mi->d.hslider.cursel;
 		    if (mi->d.hslider.action) {
 			(*mi->d.hslider.action)(mi, 0);		// 0 indicates down
 		    }
 		    break;
 		case MI_TYPE_PULLDOWN:
-		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		    if (mi->d.pulldown.curopt >= 0 &&
 					    mi->d.pulldown.curopt < mi->d.pulldown.noptions) {
 			mi->d.pulldown.cursel = mi->d.pulldown.curopt;
 		    }
 		    break;
 		case MI_TYPE_LISTBOX:
-		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		    if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
 			mi->d.listbox.curopt = mi->d.listbox.cursel;
 			if (mi->d.listbox.action) {
@@ -4441,7 +4438,6 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
 		    }
 		    break;
 		default:
-		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		    break;
 	    }
 	}
