@@ -124,6 +124,14 @@ global void HandleActionDemolish(Unit* unit)
             DestroyUnit(unit);
 	    // FIXME: Must play explosion sound
 
+	    // 	FIXME: Currently we take the X fields, the original only the O
+	    //		XXXXX ..O..
+	    //		XXXXX .OOO.
+	    //		XX.XX OO.OO
+	    //		XXXXX .OOO.
+	    //		XXXXX ..O..
+	    //
+
 	    //
 	    //	 Effect of the explosion on units.
 	    //
