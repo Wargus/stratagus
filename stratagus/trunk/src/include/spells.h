@@ -73,6 +73,7 @@ typedef enum _spell_action_type_ {
     SpellActionWhirlwind,		/// FIXME: Comments
     SpellActionUnholyArmor,		/// FIXME: Comments
     SpellActionDeathAndDecay,		/// FIXME: Comments
+    SpellActionCircleOfPower,		/// FIXME: Comments
 
     // Here you can new spell actions
 
