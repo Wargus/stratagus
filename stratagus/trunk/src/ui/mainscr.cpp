@@ -480,7 +480,7 @@ global void DrawResources(void)
 
 // FIXME: need messages for chat!
 
-#define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*2 // two seconds
+#define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*5 // 5 seconds
 
 local char  MessageBuffer[40];		// message buffer
 local char* Message;			// message in map window
@@ -490,6 +490,7 @@ local int   MessageFrameTimeout;	// frame to expire message
 
 local char Messages[ MESSAGES_MAX ][64];
 local int  MessagesCount;
+local int  SameMessageCount;
 
 local char MessagesEvent[ MESSAGES_MAX ][64];
 local int  MessagesEventX[ MESSAGES_MAX ];
@@ -550,11 +551,51 @@ global void DrawMessage(void)
     }
   for ( z = 0; z < MessagesCount; z++ )
     {
-     if ( Messages[z][0] == '*' )
-       DrawText(TheUI.MapX+8,TheUI.MapY+8 + z*16,GameFont,Messages[z]+1);
-     else
-       DrawReverseText(TheUI.MapX+8,TheUI.MapY+8 + z*16,GameFont,Messages[z]);
+    DrawText(TheUI.MapX+8,TheUI.MapY+8 + z*16,GameFont,Messages[z] );
     }
+  if ( MessagesCount < 1 )
+    SameMessageCount = 0;  
+}
+
+/*
+**	Adds message to the stack
+**
+**	@param msg	Message to add.
+*/
+global void AddMessage( const char* msg )
+{
+    if ( MessagesCount == MESSAGES_MAX )
+      ShiftMessages();
+    strcpy( Messages[ MessagesCount ], msg );
+    MessagesCount++;
+}
+
+/*
+**	Check if this message repeats
+**
+**	@param msg	Message to check.
+**	@return non-zero to skip this message
+*/
+global int CheckRepeatMessage( const char* msg )
+{
+    if ( MessagesCount < 1 )
+      return 0;
+    if ( strcmp( msg, Messages[ MessagesCount-1 ] ) == 0 )
+      {
+      SameMessageCount++;
+      return 1;
+      }
+    else
+    if ( SameMessageCount > 0 )
+      {
+      char temp[128];
+      int n = SameMessageCount;
+      SameMessageCount = 0;
+      // NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
+      sprintf( temp, "Last message repeated ~<%d~> times", n+1 );
+      AddMessage( temp );
+      }  
+    return 0;  
 }
 
 /**
@@ -569,10 +610,9 @@ global void SetMessage( char* fmt, ... )
     va_start( va, fmt );
     vsprintf( temp, fmt, va );
     va_end( va );
-    if ( MessagesCount == MESSAGES_MAX )
-      ShiftMessages();
-    strcpy( Messages[ MessagesCount ], temp );
-    MessagesCount++;
+    if ( CheckRepeatMessage( temp ) )
+      return;
+    AddMessage( temp );
     MustRedraw|=RedrawMessage|RedrawMap;
     MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
 }
@@ -594,10 +634,10 @@ global void SetMessage2( int x, int y, char* fmt, ... )
     va_start( va, fmt );
     vsprintf( temp, fmt, va );
     va_end( va );
-    if ( MessagesCount == MESSAGES_MAX )
-      ShiftMessages();
-    strcpy( Messages[ MessagesCount ], temp );
-    MessagesCount++;
+    if ( CheckRepeatMessage( temp ) == 0 )
+      {
+      AddMessage( temp );
+      }
  
     if ( MessagesEventCount == MESSAGES_MAX )
       ShiftMessagesEvent();
@@ -667,7 +707,7 @@ global void CenterOnMessage(void)
     return;
   MapCenter( MessagesEventX[ MessagesEventIndex ],
              MessagesEventY[ MessagesEventIndex ] );
-  SetMessage( "*Event: %s", MessagesEvent[ MessagesEventIndex ] );
+  SetMessage( "~<Event: %s~>", MessagesEvent[ MessagesEventIndex ] );
   MessagesEventIndex++;
 }
 
