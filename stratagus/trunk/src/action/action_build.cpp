@@ -296,7 +296,7 @@ global void HandleActionBuild(Unit* unit)
 	unit->Orders[0].Action=UnitActionRepair;
 	unit->Orders[0].Goal=build;
 	unit->Orders[0].X=unit->Orders[0].Y=-1;
-	unit->Orders[0].RangeX=unit->Orders[0].RangeY=REPAIR_RANGE;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=unit->Type->RepairRange;
 	unit->SubAction=0;
 	unit->Wait=1;
 	RefsDebugCheck( !build->Refs );

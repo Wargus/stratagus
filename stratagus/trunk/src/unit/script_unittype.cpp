@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -375,9 +375,9 @@ local SCM CclDefineUnitType(SCM list)
 	    type->GroundAttack=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-attack")) ) {
 	    type->CanAttack=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("can-repair")) ) {
-	    type->CanRepair=1;
-
+	} else if( gh_eq_p(value,gh_symbol2scm("repair-range")) ) {
+	    type->RepairRange=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("can-target-land")) ) {
 	    type->CanTarget|=CanTargetLand;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-target-sea")) ) {
@@ -548,6 +548,7 @@ local SCM CclDefineUnitType(SCM list)
 	} else {
 	   // FIXME: this leaves a half initialized unit-type
 	   printf("\n%s\n",type->Name);
+	   DebugCheck( 1 );
 	   errl("Unsupported tag",value);
 	}
     }

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -373,13 +373,13 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 		order->Goal=dest;
 		RefsDebugCheck( !dest->Refs );
 		dest->Refs++;
-		order->RangeX=order->RangeY=REPAIR_RANGE;
+		order->RangeX=order->RangeY=unit->Type->RepairRange;
 	    }
 	} else {
 	    order->X=x;
 	    order->Y=y;
 	    order->Goal=NoUnitP;
-	    order->RangeX=order->RangeY=REPAIR_RANGE;
+	    order->RangeX=order->RangeY=unit->Type->RepairRange;
 	}
 	order->Type=NULL;
 	order->Arg1=NULL;
@@ -670,8 +670,8 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 	order->X=x;
 	order->Y=y;
 	if(what->BuilderOutside) {
-	    order->RangeX=REPAIR_RANGE;
-	    order->RangeY=REPAIR_RANGE;
+	    order->RangeX=unit->Type->RepairRange;
+	    order->RangeY=unit->Type->RepairRange;
 	} else {
 	    // If building inside, but be next to stop
 	    order->RangeX=1;

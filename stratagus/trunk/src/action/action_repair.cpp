@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -285,7 +285,7 @@ global void HandleActionRepair(Unit* unit)
 		//
 		//	Have reached target? FIXME: could use return value
 		//
-		if(goal&&MapDistanceToUnit(unit->X,unit->Y,goal)<=REPAIR_RANGE
+		if(goal&&MapDistanceToUnit(unit->X,unit->Y,goal)<=unit->Type->RepairRange
 			&&goal->HP<goal->Type->Stats->HitPoints) {
 		    unit->State=0;
 		    unit->SubAction=2;
