@@ -47,7 +47,7 @@ enum _button_cmd_ {
     B_AttackGround,			/// order attack ground
     B_Return,				/// order return goods
     B_Demolish,				/// order demolish/explode
-    B_Magic,				/// order cast spell
+    B_SpellCast,			/// order cast spell
     B_Research,				/// order reseach
     B_UpgradeTo,			/// order upgrade
     B_Unload,				/// order unload unit

@@ -82,6 +82,7 @@ extern CursorType Cursors[CursorMax];	/// cursor types description
 
 extern enum CursorState_e CursorState;	/// cursor state
 extern int CursorAction;		/// action for selection
+extern int CursorValue;			/// value for CursorAction (spell type f.e.)
 extern UnitType* CursorBuilding;	/// building cursor
 
 extern CursorType* GameCursor;		/// cursor type

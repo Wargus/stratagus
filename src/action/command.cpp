@@ -33,6 +33,7 @@
 #include "map.h"
 #include "upgrade.h"
 #include "pathfinder.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -826,6 +827,68 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
 
+    unit->SavedCommand.Action=UnitActionStill;	// clear saved action
+}
+
+/**
+**	Demolish at position
+**
+**	@param unit	pointer to unit.
+**	@param x	X map position to spell cast on.
+**	@param y	Y map position to spell cast on.
+**	@param dest	Spell cast on unit (if exist).
+**	@param spellid  Spell type id.
+**	@param flush	if true, flush command queue.
+*/
+global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush)
+{
+    Command* command;
+    const SpellType* spell;
+    
+    IfDebug(
+	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	    DebugLevel0("Internal movement error\n");
+	    return;
+	}
+	if( unit->Type->Vanishes ) {
+	    DebugLevel0("Internal error\n");
+	    abort();
+	}
+    );
+
+    DebugLevel3(__FUNCTION__": %Zd spell-casts on %Zd\n"
+	,UnitNumber(unit),dest ? UnitNumber(dest) : 0);
+
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
+	return;
+    }
+
+    spell = SpellTypeById( spellid );
+
+    command->Action=UnitActionSpellCast;
+    ResetPath(*command);
+    
+    if (dest)
+      dest->Refs++;
+    
+    command->Data.Move.Goal=dest;
+    command->Data.Move.Range=spell->Range;
+    command->Data.Move.SX=unit->X;
+    command->Data.Move.SY=unit->Y;
+    command->Data.Move.DX=x;
+    command->Data.Move.DY=y;
+    command->Data.Move.SpellId = spellid;
+    
+    /*
+    command->Data.Spell.Goal=dest;
+    command->Data.Spell.Range=spell->Range;
+    command->Data.Spell.DX=x;
+    command->Data.Spell.DY=y;
+    */
+    
     unit->SavedCommand.Action=UnitActionStill;	// clear saved action
 }
 

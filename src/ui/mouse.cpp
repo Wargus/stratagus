@@ -772,6 +772,43 @@ local void SendUnload(int x,int y)
 }
 
 /**
+**	Send the current selected group for spell cast.
+**
+**	To empty field:
+**	To unit:
+**		Spell cast on unit or on map spot.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**
+**	@see Selected, @see NumSelected
+*/
+local void SendSpellCast(int x,int y)
+{
+    int i;
+    Unit* unit;
+    Unit* dest;
+    
+    dest=UnitOnMapTile(x,y);
+    DebugLevel3Fn("SpellCast on: %p (%d,%d)\n", dest, x, y);
+    /*	NOTE: Vladi:
+        This is a high-level function, it sends target spot and unit
+	(if exists). All checks are performed at spell cast handle 
+	function which will cancel function if cannot be executed
+    */
+    for( i=0; i<NumSelected; i++ ) {
+        unit=Selected[i];
+	if( !unit->Type->CanCastSpell ) 
+	  continue; // this unit cannot cast spell
+	if( dest && unit == dest ) 
+	  continue; // no unit can cast spell on himself
+	// CursorValue here holds the spell type id  
+	SendCommandSpellCast(unit,x,y,dest,CursorValue,!(KeyModifiers&ModifierShift));
+    }
+}
+
+
+/**
 **	Send a command to selected units.
 **
 **	@param x	X map tile position.
@@ -807,6 +844,9 @@ local void SendCommand(int x,int y)
 	    break;
 	case B_Demolish:
 	    SendDemolish(x,y);
+	    break;
+        case B_SpellCast:    
+	    SendSpellCast(x,y);
 	    break;
 	default:
 	    DebugLevel1("Unsupported send action %d\n",CursorAction);

@@ -318,7 +318,27 @@ local int InputKey(int key)
                   SpeedResearch=1;     /// speed factor for researching
                   SetMessage( "NORMAL DEBUG SPEED" );
                   }
-
+                if (strcmp(Input, "make it so") == 0)
+                  {
+                  SpeedMine=10;         /// speed factor for mine gold
+                  SpeedGold=10;         /// speed factor for getting gold
+                  SpeedChop=10;         /// speed factor for chop
+                  SpeedWood=10;         /// speed factor for getting wood
+                  SpeedHaul=10;         /// speed factor for haul oil
+                  SpeedOil=10;          /// speed factor for getting oil
+                  SpeedBuild=10;        /// speed factor for building
+                  SpeedTrain=10;        /// speed factor for training
+                  SpeedUpgrade=10;      /// speed factor for upgrading
+                  SpeedResearch=10;     /// speed factor for researching
+                  ThisPlayer->Resources[GoldCost] += 32000;
+                  ThisPlayer->Resources[WoodCost] += 32000;
+                  ThisPlayer->Resources[OilCost]  += 32000;
+                  ThisPlayer->Resources[OreCost]  += 32000;
+                  ThisPlayer->Resources[StoneCost]+= 32000;
+                  ThisPlayer->Resources[CoalCost] += 32000;
+		  MustRedraw|=RedrawResources;
+                  SetMessage( "SO!" );
+                  } else
 		// FIXME: only to selected players
 		NetworkChatMessage(Input);
 #if defined(USE_CCL) || defined(USE_CCL2)
