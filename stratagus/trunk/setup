@@ -46,6 +46,8 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
 ## UNIT_ON_MAP:		Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code (value>1 shows update)
 ## NEW_AI:		New better improved AI code
+## USE_TILECACHE:	Faster tile drawing, costs memory.
+## USE_SMART_TILECACHE:	Faster tile drawing, slow with hardware video memory.
 ## These aren't working yet:
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
