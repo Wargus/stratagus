@@ -164,7 +164,13 @@ local int report(int status)
     return status;
 }
 
-local int lcall(int narg, int clear)
+/**
+**	Call a lua function
+**
+**	@param narg	Number of arguments
+**	@param clear	Clear the return value(s)
+*/
+global int LuaCall(int narg, int clear)
 {
     int status;
     int base;
@@ -177,20 +183,23 @@ local int lcall(int narg, int clear)
     status = lua_pcall(Lua, narg, (clear ? 0 : LUA_MULTRET), base);
     signal(SIGINT, SIG_DFL);
     lua_remove(Lua, base);  /* remove traceback function */
-    return status;
-}
 
-local int docall(int status)
-{
-    if (status == 0) {
-	status = lcall(0, 1);
-    }
     return report(status);
 }
 
+/**
+**	Load a file and execute it
+*/
 global int LuaLoadFile(const char* file)
 {
-    return docall(luaL_loadfile(Lua, file));
+    int status;
+
+    if (!(status = luaL_loadfile(Lua, file))) {
+	LuaCall(0, 1);
+    } else {
+	report(status);
+    }
+    return status;
 }
 
 local int CclLoad(lua_State* l)
