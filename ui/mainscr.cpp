@@ -1164,13 +1164,13 @@ global void DrawInfoPanel(void)
 		}
 
 		
-		VideoDrawNumber(x+20,y,GameFont,i);
+		VideoDrawNumber(x+15,y,GameFont,i);
 		
 		VideoDrawRectangle(ColorWhite,x, y, 12, 12);
 		VideoFillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
 
-		VideoDrawText(x+40,y,GameFont,Players[i].Name);
-		VideoDrawNumber(x+130,y,GameFont,Players[i].Score);
+		VideoDrawText(x+27,y,GameFont,Players[i].Name);
+		VideoDrawNumber(x+117,y,GameFont,Players[i].Score);
 		y+=14;
 	    }
 	}
