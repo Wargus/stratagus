@@ -48,9 +48,6 @@
 #define MenuButtonSelected	4	/// selected button
 #define MenuButtonDisabled	8	/// button cannot be depressed
 
-#define MENUBUTTONHEIGHT 144		/// Height of button in the graphic
-#define MENUBUTTONWIDTH 300		/// Width of button in the graphic
-
 /**
 **	Menu button referencing
 **	Each button is 300 x 144  =>	50 buttons (53 for Expansion GFX)
@@ -81,6 +78,13 @@ typedef int MenuButtonId;
 
 #define MBUTTON_SC_GEM_ROUND	7
 #define MBUTTON_SC_GEM_SQUARE	12
+#define MBUTTON_SC_UP_ARROW	17
+#define MBUTTON_SC_DOWN_ARROW	20
+#define MBUTTON_SC_LEFT_ARROW	23
+#define MBUTTON_SC_RIGHT_ARROW	26
+#define MBUTTON_SC_S_KNOB	28
+#define MBUTTON_SC_S_VCONT	30
+#define MBUTTON_SC_S_HCONT	33
 #define MBUTTON_SC_BUTTON_LEFT	107
 #define MBUTTON_SC_BUTTON	116
 #define MBUTTON_SC_BUTTON_RIGHT	125
@@ -146,6 +150,7 @@ typedef struct _menuitem_vslider_ {
     int percent;	// percent of the way to bottom (0 to 100)
     int curper;		/* used in mouse-move state */
     int cursel;		/* used in mouse-over state */
+    int style;
     void (*handler)(void);	/* for return key */
 } MenuitemVslider;
 typedef struct _menuitem_hslider_ {
@@ -157,6 +162,7 @@ typedef struct _menuitem_hslider_ {
     int percent;	// percent of the way to right (0 to 100)
     int curper;		/* used in mouse-move state */
     int cursel;		/* used in mouse-over state */
+    int style;
     void (*handler)(void);	/* for return key */
 } MenuitemHslider;
 typedef struct _menuitem_drawfunc_ {
@@ -235,6 +241,9 @@ typedef struct _menuitem_ {
 #define MI_GSTATE_PASSIVE 1		/// Gem is passive (grey) drawn
 #define MI_GSTATE_INVISIBLE 2		/// Gem is not drawn
 #define MI_GSTATE_CHECKED 4		/// Gem is with check mark drawn
+
+#define MI_STYLE_SC_VSLIDER 1
+#define MI_STYLE_SC_HSLIDER 2
 
 /**
 **	Menu definition.
