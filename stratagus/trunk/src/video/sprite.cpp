@@ -72,7 +72,7 @@ global void (*VideoDrawRawClip)(VMemType *pixels, const unsigned char *data,
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_SDL_SURFACE
-local void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
+global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 {
     SDL_Rect srect;
     SDL_Rect drect;
@@ -112,7 +112,7 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
     SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
 
-local void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
+global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 {
     SDL_Rect srect;
     SDL_Rect drect;
@@ -129,7 +129,7 @@ local void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
     SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
 
-local void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
+global void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
 {
     SDL_Rect srect;
     SDL_Rect drect;
@@ -154,7 +154,7 @@ local void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
     SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
 
-local void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
+global void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
     int x, int y)
 {
     SDL_Rect srect;
@@ -183,7 +183,7 @@ local void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
     SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
 }
 
-local void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
+global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
     int x, int y)
 {
     SDL_Rect srect;
