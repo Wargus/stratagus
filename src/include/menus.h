@@ -297,14 +297,16 @@ typedef struct _menuitem_ {
 */
 typedef struct _menus_ {
 	/// @todo char* Name; ///< menu name
-	int       X;         ///< menu area x pos
-	int       Y;         ///< menu area y pos
-	int       Width;     ///< menu area width
-	int       Height;    ///< menu area height
-	char*     Panel;     ///< optional background panel
-	int       DefSel;    ///< initial selected item number (or -1)
-	int       NumItems;  ///< number of items to follow
-	Menuitem* Items;     ///< buttons, etc
+	int       X;          ///< menu area x pos
+	int       Y;          ///< menu area y pos
+	int       Width;      ///< menu area width
+	int       Height;     ///< menu area height
+	char*     Panel;      ///< optional background panel
+	char*     Background; ///< optional background image behind the menu panel
+	Graphic*  BackgroundG;///< optional background image behind the menu panel
+	int       DefSel;     ///< initial selected item number (or -1)
+	int       NumItems;   ///< number of items to follow
+	Menuitem* Items;      ///< buttons, etc
 	void (*NetAction)(void);   ///< network action callback
 } Menu;
 
