@@ -71,8 +71,6 @@ enum _move_return_ {
 
     /// Path matrix
 extern unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];
-    /// are we using A* or the old path finder
-extern int AStarOn;
     /// cost associated to move on a tile occupied by a fixed unit
 extern int AStarFixedUnitCrossingCost;
     /// cost associated to move on a tile occupied by a moving unit
@@ -117,7 +115,7 @@ extern void InitAStar(void);
 extern void FreeAStar(void);
 
     /// Find and a* path for a unit
-extern int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int range, char* path);
+extern int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path);
 //
 //	in ccl_pathfinder.c
 //
