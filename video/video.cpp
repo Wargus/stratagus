@@ -191,56 +191,6 @@ Uint32 ColorYellow;
 ----------------------------------------------------------------------------*/
 
 /**
-**  Clip Rectangle to another rectangle
-**
-**  @param left    Left X original rectangle coordinate.
-**  @param top     Top Y original rectangle coordinate.
-**  @param right   Right X original rectangle coordinate.
-**  @param bottom  Bottom Y original rectangle coordinate.
-**  @param x1      Left X bounding rectangle coordinate.
-**  @param y1      Top Y bounding rectangle coordinate.
-**  @param x2      Right X bounding rectangle coordinate.
-**  @param y2      Bottom Y bounding rectangle coordinate.
-**/
-void ClipRectToRect(int* left, int* top, int* right,int* bottom,
-		int x1, int y1, int x2, int y2)
-{
-	// Swap the coordinates, if the order is wrong
-	if (*left > *right) {
-		*left ^= *right;
-		*right ^= *left;
-		*left ^= *right;
-	}
-	if (*top > *bottom) {
-		*top ^= *bottom;
-		*bottom ^= *top;
-		*top ^= *bottom;
-	}
-
-	// Limit to bounding rectangle
-	if (*left < x1) {
-		*left = x1;
-	} else if (*left >= x2) {
-		*left = x2 - 1;
-	}
-	if (*top < y1) {
-		*top = y1;
-	} else if (*top >= y2) {
-		*top = y2 - 1;
-	}
-	if (*right < x1) {
-		*right = x1;
-	} else if (*right >= x2) {
-		*right = x2 - 1;
-	}
-	if (*bottom < y1) {
-		*bottom = y1;
-	} else if (*bottom >= y2) {
-		*bottom = y2 - 1;
-	}
-}
-
-/**
 **  Set clipping for graphic routines.
 **
 **  @param left    Left X screen coordinate.
@@ -250,35 +200,9 @@ void ClipRectToRect(int* left, int* top, int* right,int* bottom,
 */
 void SetClipping(int left, int top, int right, int bottom)
 {
-#ifdef DEBUG
-	if (left > right || top > bottom || left < 0 || left >= VideoWidth ||
-			top < 0 || top >= VideoHeight || right < 0 ||
-			right >= VideoWidth || bottom < 0 || bottom >= VideoHeight) {
-		DebugPrint("Wrong clipping %d->%d %d->%d, write cleaner code.\n" _C_
-			left _C_ right _C_ top _C_ bottom);
-// Assert(0);
-	}
-#endif
-	ClipRectToRect(&left, &top, &right, &bottom, 0, 0, VideoWidth, VideoHeight);
-
-	ClipX1 = left;
-	ClipY1 = top;
-	ClipX2 = right;
-	ClipY2 = bottom;
-}
-
-/**
-**  Set clipping for graphic routines. This clips against the current clipping.
-**
-**  @param left    Left X screen coordinate.
-**  @param top     Top Y screen coordinate.
-**  @param right   Right X screen coordinate.
-**  @param bottom  Bottom Y screen coordinate.
-*/
-void SetClipToClip(int left, int top, int right, int bottom)
-{
-	// No warnings... exceeding is expected.
-	ClipRectToRect(&left, &top, &right, &bottom, ClipX1, ClipY1, ClipX2, ClipY2);
+	Assert(left <= right && top <= bottom && left >= 0 && left < VideoWidth &&
+		top >= 0 && top < VideoHeight && right >= 0 &&
+		right < VideoWidth && bottom >= 0 && bottom < VideoHeight);
 
 	ClipX1 = left;
 	ClipY1 = top;
