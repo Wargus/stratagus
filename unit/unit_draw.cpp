@@ -525,6 +525,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    int y1;
 	    int n;
 
+	    n=VideoGraphicFrames(HealthSprite.Sprite)-1;
+	    n-=(n*unit->HP)/stats->HitPoints;
+#if 0
 	    f=(100*unit->HP)/stats->HitPoints;
 	    if( f>75) {
 		n=3-((f-75)/(25/3))+ 0;
@@ -535,6 +538,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		n=3-(f/(50/3))+ 8;
 		DebugLevel3("%d - %d\n",f,n);
 	    }
+#endif
 	    DebugCheck( n<0 );
 	    if( HealthSprite.HotX<0 ) {
 		x1=x+HealthSprite.HotX
@@ -616,6 +620,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    int y1;
 	    int n;
 
+	    n=VideoGraphicFrames(ManaSprite.Sprite)-1;
+	    n-=(n*unit->Mana)/255;
+#if 0
 	    f=(100*unit->Mana)/255;
 	    if( f>75) {
 		n=0;
@@ -630,6 +637,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    } else {
 		n=4;
 	    }
+#endif
 	    if( ManaSprite.HotX<0 ) {
 		x1=x+ManaSprite.HotX
 			+(type->TileWidth*TileSizeX
