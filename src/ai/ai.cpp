@@ -233,19 +233,14 @@ local void AiCheckUnits(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Save state of AI to file.
+**	Save the mapping of pud numbers of the AI to internal symbols.
 **
 **	@param file	Output file.
 */
-global void SaveAi(FILE* file)
+global void SaveAiTypesWcName(FILE* file)
 {
     char** cp;
     int i;
-
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: AI $Id$\n\n");
-
-    DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
 
     //
     //	Dump table wc2 race numbers -> internal symbol.
@@ -262,6 +257,245 @@ global void SaveAi(FILE* file)
 	}
 	fprintf(file,")\n\n");
     }
+}
+
+/**
+**	Save AI helper sub table.
+**
+**	@param file	Output file.
+**	@param name	Table action name.
+**	@param upgrade	True if is an upgrade.
+**	@param n	Number of elements in table
+**	@param table	unit-type table.
+*/
+local void SaveAiHelperTable(FILE* file,const char* name,int upgrade,int n,
+	AiUnitTypeTable*const * table)
+{
+    int t;
+    int i;
+    int j;
+    int f;
+
+    for( t=0; t<(upgrade ? UpgradeMax : NumUnitTypes); ++t ) {
+	// Look if that unit-type can build something
+	for( f=i=0; i<n; ++i ) {
+	    if( table[i] ) {
+		for( j=0; j<table[i]->Count; ++j ) {
+		    if( table[i]->Table[j]->Type==t ) {
+			if( !f ) {
+			    fprintf(file,"\n  (list '%s '%s\n    ",name,
+				    UnitTypes[t].Ident);
+			    f=4;
+			}
+			if( upgrade ) {
+			    if( f+strlen(Upgrades[i].Ident)>78 ) {
+				f=fprintf(file,"\n    ");
+			    }
+			    f+=fprintf(file,"'%s ",Upgrades[i].Ident);
+			} else {
+			    if( f+strlen(UnitTypes[i].Ident)>78 ) {
+				f=fprintf(file,"\n    ");
+			    }
+			    f+=fprintf(file,"'%s ",UnitTypes[i].Ident);
+			}
+		    }
+		}
+	    }
+	}
+	if( f ) {
+	    fprintf(file,")");
+	}
+    }
+}
+
+/**
+**	Save AI helper sub table.
+**
+**	@param file	Output file.
+**	@param name	Table action name.
+**	@param n	Number of elements in table
+**	@param table	unit-type table.
+*/
+local void SaveAiEquivTable(FILE* file,const char* name,int n,
+	AiUnitTypeTable*const * table)
+{
+    int i;
+    int j;
+    int f;
+
+    for( i=0; i<n; ++i ) {
+	if( table[i] ) {
+	    fprintf(file,"\n  (list '%s '%s\n    ",name,
+		    UnitTypes[i].Ident);
+	    f=4;
+	    for( j=0; j<table[i]->Count; ++j ) {
+		if( f+strlen(table[i]->Table[j]->Ident)>78 ) {
+		    f=fprintf(file,"\n    ");
+		}
+		f+=fprintf(file,"'%s ",table[i]->Table[j]->Ident);
+	    }
+	    fprintf(file,")");
+	}
+    }
+}
+
+/**
+**	Save AI helper sub table.
+**
+**	@param file	Output file.
+**	@param name	Table action name.
+**	@param n	Number of elements in table
+**	@param table	unit-type table.
+*/
+local void SaveAiCostTable(FILE* file,const char* name,int n,
+	AiUnitTypeTable*const * table)
+{
+    int t;
+    int i;
+    int j;
+    int f;
+
+    for( t=0; t<NumUnitTypes; ++t ) {
+	// Look if that unit-type can build something
+	for( f=i=0; i<n; ++i ) {
+	    if( table[i] ) {
+		for( j=0; j<table[i]->Count; ++j ) {
+		    if( table[i]->Table[j]->Type==t ) {
+			if( !f ) {
+			    fprintf(file,"\n  (list '%s '%s\n    ",name,
+				    UnitTypes[t].Ident);
+			    f=4;
+			}
+			if( f+strlen(DEFAULT_NAMES[i])>78 ) {
+			    f=fprintf(file,"\n    ");
+			}
+			f+=fprintf(file,"'%s ",DEFAULT_NAMES[i]);
+		    }
+		}
+	    }
+	}
+	if( f ) {
+	    fprintf(file,")");
+	}
+    }
+}
+
+/**
+**	Save AI helper sub table.
+**
+**	@param file	Output file.
+**	@param name	Table action name.
+**	@param n	Number of elements in table
+**	@param table	unit-type table.
+*/
+local void SaveAiUnitLimitTable(FILE* file,const char* name,int n,
+	AiUnitTypeTable*const * table)
+{
+    int t;
+    int i;
+    int j;
+    int f;
+
+    for( t=0; t<NumUnitTypes; ++t ) {
+	// Look if that unit-type can build something
+	for( f=i=0; i<n; ++i ) {
+	    if( table[i] ) {
+		for( j=0; j<table[i]->Count; ++j ) {
+		    if( table[i]->Table[j]->Type==t ) {
+			if( !f ) {
+			    fprintf(file,"\n  (list '%s '%s\n    ",name,
+				    UnitTypes[t].Ident);
+			    f=4;
+			}
+			if( f+strlen("food")>78 ) {
+			    f=fprintf(file,"\n    ");
+			}
+			f+=fprintf(file,"'%s ","food");
+		    }
+		}
+	    }
+	}
+	if( f ) {
+	    fprintf(file,")");
+	}
+    }
+}
+/**
+**	Save AI helper table.
+**
+**	@param file	Output file.
+*/
+local void SaveAiHelper(FILE* file)
+{
+    fprintf(file,"(define-ai-helper");
+    //
+    //	Save build table
+    //
+    SaveAiHelperTable(file,"build",0,AiHelpers.BuildCount,AiHelpers.Build);
+
+    //
+    //	Save train table
+    //
+    SaveAiHelperTable(file,"train",0,AiHelpers.TrainCount,AiHelpers.Train);
+
+    //
+    //	Save upgrade table
+    //
+    SaveAiHelperTable(file,"upgrade",0,AiHelpers.UpgradeCount,
+	    AiHelpers.Upgrade);
+
+    //
+    //	Save research table
+    //
+    SaveAiHelperTable(file,"research",1,AiHelpers.ResearchCount,
+	    AiHelpers.Research);
+
+    //
+    //	Save repair table
+    //
+    SaveAiHelperTable(file,"repair",0,AiHelpers.RepairCount,
+	    AiHelpers.Repair);
+
+    //
+    //	Save collect table
+    //
+    SaveAiCostTable(file,"collect",AiHelpers.CollectCount,AiHelpers.Collect);
+
+    //
+    //	Save resource table
+    //
+    SaveAiCostTable(file,"with-goods",AiHelpers.WithGoodsCount,
+	    AiHelpers.WithGoods);
+
+    //
+    //	Save limits table
+    //
+    SaveAiUnitLimitTable(file,"unit-limit",AiHelpers.UnitLimitCount,
+	    AiHelpers.UnitLimit);
+
+    //
+    //	Save equivalence table
+    //
+    SaveAiEquivTable(file,"unit-equiv",AiHelpers.EquivCount,
+	    AiHelpers.Equiv);
+
+    fprintf(file," )\n");
+}
+
+/**
+**	Save state of AI to file.
+**
+**	@param file	Output file.
+*/
+global void SaveAi(FILE* file)
+{
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: AI $Id$\n\n");
+
+    DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
+
+    SaveAiTypesWcName(file);
+    SaveAiHelper(file);
 }
 
 /**
