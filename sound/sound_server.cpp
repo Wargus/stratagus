@@ -101,6 +101,8 @@
 ----------------------------------------------------------------------------*/
 
 global int SoundFildes = -1;		/// audio file descriptor
+global int PlayingMusic;		/// flag true if playing music
+global int CallbackMusic;		/// flag true callback ccl if stops
 
 #ifdef DEBUG
 global unsigned AllocatedSoundMemory;	/// memory used by sound
@@ -130,7 +132,6 @@ global int SoundThreadRunning;		/// FIXME: docu
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_LIBMODPLUG
-local int PlayingMusic;			/// Flag true if playing music
 local ModPlugFile* ModFile;		/// Mod file loaded into memory
 
 /**
@@ -250,13 +251,15 @@ local void MixMusicToStereo32(int* buffer,int size)
 		ModPlug_Unload(ModFile);
 	    }
 
-	    cb=gh_symbol2scm("music-stopped");
-	    if( !gh_null_p(symbol_boundp(cb,NIL)) ) {
-		SCM value;
+	    if( CallbackMusic ) {
+		cb=gh_symbol2scm("music-stopped");
+		if( !gh_null_p(symbol_boundp(cb,NIL)) ) {
+		    SCM value;
 
-		value=symbol_value(cb,NIL);
-		if( !gh_null_p(value) ) {
-		    gh_apply(value,NIL);
+		    value=symbol_value(cb,NIL);
+		    if( !gh_null_p(value) ) {
+			gh_apply(value,NIL);
+		    }
 		}
 	    }
 	}
