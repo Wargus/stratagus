@@ -200,8 +200,8 @@ local SCM CclDefineUnitType(SCM list)
 		i = 0;
 		if (strcmp(str, "default")) {
 		    for (; i < NumTilesets; ++i) {
-			if (!strcmp(str,Tilesets[i]->Ident) ||
-				!strcmp(str,Tilesets[i]->Class)) {
+			if (!strcmp(str, Tilesets[i]->Ident) ||
+				!strcmp(str, Tilesets[i]->Class)) {
 			    break;
 			}
 		    }
@@ -723,6 +723,8 @@ local int CclDefineUnitType(lua_State* l)
     int redefine;
     int args;
     int j;
+    int subargs;
+    int k;
 
     args = lua_gettop(l);
     j = 0;
@@ -793,38 +795,47 @@ local int CclDefineUnitType(lua_State* l)
 	    }
 	    type->SameSprite = strdup(lua_tostring(l, j + 1));
 	} else if (!strcmp(value, "files")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		char* str;
-
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
 
 		// FIXME: use a general get tileset function here!
-		str = gh_scm2newstr(value, NULL);
 		i = 0;
-		if (strcmp(str, "default")) {
+		if (strcmp(value, "default")) {
 		    for (; i < NumTilesets; ++i) {
-			if (!strcmp(str,Tilesets[i]->Ident) ||
-				!strcmp(str,Tilesets[i]->Class)) {
+			if (!strcmp(value, Tilesets[i]->Ident) ||
+				!strcmp(value, Tilesets[i]->Class)) {
 			    break;
 			}
 		    }
 		    if (i == NumTilesets) {
 		       // FIXME: this leaves half initialized unit-type
-		       errl("Unsupported tileset tag", value);
+		       lua_pushfstring(l, "Unsupported tileset tag", value);
+		       lua_error(l);
 		    }
 		}
-		free(str);
 		if (redefine) {
 		    free(type->File[i]);
 		}
-		type->File[i] = gh_scm2newstr(gh_car(sublist), NULL);
-		sublist = gh_cdr(sublist);
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		type->File[i] = strdup(lua_tostring(l, -1));
+		lua_pop(l, 1);
 	    }
-#endif
 	} else if (!strcmp(value, "shadow")) {
 #if 0
 	    sublist = gh_car(list);
@@ -852,12 +863,24 @@ local int CclDefineUnitType(lua_State* l)
 	    }
 #endif
 	} else if (!strcmp(value, "size")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    type->Width = gh_scm2int(gh_car(sublist));
-	    type->Height = gh_scm2int(gh_cadr(sublist));
-#endif
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    type->Width = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    type->Height = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
 	} else if (!strcmp(value, "animations")) {
 	    if (!lua_isstring(l, j + 1)) {
 		lua_pushstring(l, "incorrect argument");
@@ -953,12 +976,24 @@ local int CclDefineUnitType(lua_State* l)
 	    }
 	    type->_MaxMana = lua_tonumber(l, j + 1);
 	} else if (!strcmp(value, "tile-size")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    type->TileWidth = gh_scm2int(gh_car(sublist));
-	    type->TileHeight = gh_scm2int(gh_cadr(sublist));
-#endif
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    type->TileWidth = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    type->TileHeight = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
 	} else if (!strcmp(value, "must-build-on-top")) {
 	    if (!lua_isstring(l, j + 1)) {
 		lua_pushstring(l, "incorrect argument");
@@ -989,12 +1024,24 @@ local int CclDefineUnitType(lua_State* l)
 #endif
 #endif
 	} else if (!strcmp(value, "box-size")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    type->BoxWidth = gh_scm2int(gh_car(sublist));
-	    type->BoxHeight = gh_scm2int(gh_cadr(sublist));
-#endif
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    type->BoxWidth = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    type->BoxHeight = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
 	} else if (!strcmp(value, "num-directions")) {
 	    if (!lua_isnumber(l, j + 1)) {
 		lua_pushstring(l, "incorrect argument");
