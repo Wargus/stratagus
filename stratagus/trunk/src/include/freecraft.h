@@ -293,9 +293,9 @@ extern char* strdcat3(const char* l, const char *m, const char* r);
 #define BitsOf(n)	(sizeof(n)*8)
 
     /// How long stay in a gold-mine
-#define MINE_FOR_GOLD	(UnitTypes[UnitGoldMine]._Costs[TimeCost]/SpeedMine)
+#define MINE_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedMine)
     /// How long stay in a gold-deposit
-#define WAIT_FOR_GOLD	(UnitTypes[UnitGoldMine]._Costs[TimeCost]/SpeedGold)
+#define WAIT_FOR_GOLD	(UnitTypeGoldMine->_Costs[TimeCost]/SpeedGold)
     /// How much I must chop for 1 wood
 #define CHOP_FOR_WOOD	(52/SpeedChop)
     /// How long stay in a wood-deposit

@@ -483,7 +483,7 @@ global int AiNearHall(Unit* hall,Unit* worker,UnitType* type,int* dx,int *dy)
 	return 99998;
     }
 
-    num_goldmine=FindUnitsByType(UnitGoldMine,goldmines);
+    num_goldmine=FindUnitsByType(UnitTypeGoldMine,goldmines);
     DebugLevel3("\tGoldmines %d\n",num_goldmine);
     wx=worker->X;    wy=worker->Y;
     x=hall->X;       y=hall->Y;
@@ -534,7 +534,7 @@ global int AiNearHall(Unit* hall,Unit* worker,UnitType* type,int* dx,int *dy)
 	    // Check if too near to goldmine
 	    for(g=0; g<num_goldmine; ++g)
                 {
-		if(MapDistanceToType(x,y,&UnitTypes[UnitGoldMine]
+		if(MapDistanceToType(x,y,UnitTypeGoldMine
 		   ,goldmines[g]->X,goldmines[g]->Y)<4) {break;}
 	        }
 	    if(g!=num_goldmine) {continue;}  //too near goldmine
@@ -578,7 +578,7 @@ local int AiBuildHall(int type)
     if(!num_worker) {return -1;}  // QUESTION: only not working ??
 
     //  Find all goldmines.
-    num_goldmine=FindUnitsByType(UnitGoldMine,goldmines);
+    num_goldmine=FindUnitsByType(UnitTypeGoldMine,goldmines);
     DebugLevel3("\tGoldmines %d\n",num_goldmine);
     if(!num_goldmine ) {return -1;}
 
@@ -736,11 +736,12 @@ local void AiMineGold(Unit* unit)
     {
     Unit* dest;
     DebugLevel3(__FUNCTION__": %d\n",UnitNumber(unit));
-    dest=FindGoldMine(unit->X,unit->Y);
+    dest=FindGoldMine(unit,unit->X,unit->Y);
     if(!dest)
         {
-	DebugLevel0(__FUNCTION__": no goldmine\n");
-	AiPlayer->NoGold=1;
+	// FIXME: now not really, no goldmine.
+	DebugLevel0(__FUNCTION__": goldmine not reachable\n");
+	//AiPlayer->NoGold=1;
 	return;
         }
     CommandMineGold(unit,dest,1);
