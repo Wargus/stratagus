@@ -462,13 +462,24 @@ local int PlayCDRom(const char* name)
 }
 #endif
 
+/**
+**	FIXME: docu
+*/
 global void PlaySectionMusic(PlaySectionType section)
 {
-    int track, newtrack = 0;
+    int track;
+    int newtrack;
     int i;
-    int j = 0;
-    int found, numfiles;
+    int j;
+    int found;
+    int numfiles;
 
+    if (NumPlaySections == 0) {
+	return;
+    }
+
+    newtrack = 0;
+    j = 0;
     track = cd_current_track();
 
     for (i = 0; i < NumPlaySections; ++i) {
