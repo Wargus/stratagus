@@ -1250,7 +1250,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		    Players[o].StartX=MapOffsetX+x;
 		    Players[o].StartY=MapOffsetY+y;
 		    if (GameSettings.NumUnits == SettingsNumUnits1
-			    && Players[o].Type != PlayerNobody) {
+			    && Players[o].Type != PlayerNobody ) {
 			if (t == WC_StartLocationHuman) {
 			    t = WC_UnitPeasant;
 			} else {
@@ -1261,7 +1261,9 @@ global void LoadPud(const char* pud,WorldMap* map)
 		    }
 		} else {
 		    if (GameSettings.NumUnits == SettingsNumUnitsMapDefault ||
-			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {
+			t == WC_UnitGoldMine || t == WC_UnitOilPatch || 
+			(Players[o].Type != PlayerPerson &&
+				 Players[o].Type != PlayerComputer) ) {
 pawn:
 			if (t != WC_UnitGoldMine && t != WC_UnitOilPatch) {
 			    if (NetworkFildes == -1
