@@ -1565,8 +1565,8 @@ local int CastExorcism(Unit* unit, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-local int CastFireball(Unit* unit, const SpellType* spell, Unit* target,
-    int x, int y)
+local int CastFireball(Unit* unit, const SpellType* spell,
+    Unit* target __attribute__((unused)), int x, int y)
 {
     Missile *missile;
     int sx;
@@ -1643,7 +1643,7 @@ local int CastSlow(Unit* unit, const SpellType* spell, Unit* target,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 local int CastFlameShield(Unit* unit, const SpellType* spell, Unit* target,
-    int x, int y)
+    int x __attribute__((unused)), int y __attribute__((unused)))
 {
     if (target && !target->Type->Building
 	    && (target->Type->UnitType == UnitTypeLand
@@ -1797,8 +1797,8 @@ local int CastPolymorph(Unit* unit, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-local int CastBlizzard(Unit* unit, const SpellType* spell, Unit* target,
-    int x, int y)
+local int CastBlizzard(Unit* unit, const SpellType* spell,
+    Unit* target __attribute__((unused)), int x, int y)
 {
     int fields;
     int shards;
@@ -1931,8 +1931,8 @@ local int CastBloodlust(Unit* unit, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-local int CastRunes(Unit* unit, const SpellType* spell, Unit* target,
-    int x, int y)
+local int CastRunes(Unit* unit, const SpellType* spell,
+    Unit* target __attribute__((unused)), int x, int y)
 {
     Missile *mis;
 
@@ -2137,8 +2137,8 @@ local int CastRaiseDead(Unit* unit, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-local int CastWhirlwind(Unit* unit, const SpellType* spell, Unit* target,
-    int x, int y)
+local int CastWhirlwind(Unit* unit, const SpellType* spell,
+    Unit* target __attribute__((unused)), int x, int y)
 {
     Missile *mis;
 
@@ -2207,8 +2207,8 @@ local int CastUnholyArmor(Unit* unit, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-local int CastDeathAndDecay(Unit* unit, const SpellType* spell, Unit* target,
-    int x, int y)
+local int CastDeathAndDecay(Unit* unit, const SpellType* spell,
+    Unit* target __attribute__((unused)), int x, int y)
 {
     int fields;			// blizzard thing, yep :)
     int shards;
@@ -2266,8 +2266,8 @@ local int CastDeathAndDecay(Unit* unit, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-local int CastCircleOfPower(Unit* unit, const SpellType* spell, Unit* target,
-    int x, int y)
+local int CastCircleOfPower(Unit* unit, const SpellType* spell __attribute__((unused)),
+    Unit* target __attribute__((unused)), int x, int y)
 {
     // FIXME: vladi: cop should be placed only on explored land
     // FIXME: Don't use UnitTypeByIdent during runtime.
