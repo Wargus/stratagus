@@ -158,6 +158,10 @@
 **
 **		Selected box size height
 **
+**	UnitType::NumDirections
+**
+**		Number of directions the unit can face
+**
 **	UnitType::MinAttackRange
 **
 **		Minimal attack range
@@ -425,7 +429,7 @@ typedef struct _animation_ {
     unsigned char	Flags;		/// Flags for actions
     signed char		Pixel;		/// Change the position in pixels
     unsigned char	Sleep;		/// Wait for next animation
-    unsigned char	Frame;		/// Sprite-frame to display
+    int			Frame;		/// Sprite-frame to display
 } Animation;
 
 #define AnimationRestart	1	/// Restart animation
@@ -497,6 +501,7 @@ struct _unit_type_ {
     int		TileHeight;		/// Tile size on map height
     int		BoxWidth;		/// Selected box size width
     int		BoxHeight;		/// Selected box size height
+    int		NumDirections;		/// Number of directions unit can face
     int		MinAttackRange;		/// Minimal attack range
     int		_AttackRange;		/// How far can the unit attack
     int		ReactRangeComputer;	/// Reacts on enemy for computer
@@ -636,7 +641,7 @@ extern Animations* AnimationsByIdent(const char* ident);
 extern void SaveUnitTypes(FILE* file);	/// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);/// Allocate an empty unit-type slot
     /// Draw the sprite frame of unit-type
-extern void DrawUnitType(const UnitType* type,unsigned frame,int x,int y);
+extern void DrawUnitType(const UnitType* type,int frame,int x,int y);
 
 extern void InitUnitTypes(void);	/// Init unit-type table
 extern void LoadUnitTypes(void);	/// Load the unit-type data

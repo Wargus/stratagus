@@ -84,11 +84,12 @@ local SCM CclDefineUnitType(SCM list)
     if( type ) {
 	DebugLevel0Fn("Redefining unit-type `%s'\n" _C_ str);
 	free(str);
-	// FIXME: loose memory, old content isn't freed.
+	// FIXME: lose memory, old content isn't freed.
     } else {
 	type=NewUnitTypeSlot(str);
     }
 
+    type->NumDirections=8;
     //
     //	Parse the list:	(still everything could be changed!)
     //
@@ -189,6 +190,9 @@ local SCM CclDefineUnitType(SCM list)
 	    list=gh_cdr(list);
 	    type->BoxWidth=gh_scm2int(gh_car(sublist));
 	    type->BoxHeight=gh_scm2int(gh_cadr(sublist));
+	} else if( gh_eq_p(value,gh_symbol2scm("num-directions")) ) {
+	    type->NumDirections=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("sight-range")) ) {
 	    type->_SightRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);

@@ -1070,15 +1070,15 @@ global UnitType* NewUnitTypeSlot(char* ident)
 **	@todo	Do screen position caculation in high level.
 **		Better way to handle in x mirrored sprites.
 */
-global void DrawUnitType(const UnitType* type,unsigned frame,int x,int y)
+global void DrawUnitType(const UnitType* type,int frame,int x,int y)
 {
     // FIXME: move this calculation to high level.
     x-=(type->Width-type->TileWidth*TileSizeX)/2;
     y-=(type->Height-type->TileHeight*TileSizeY)/2;
 
     // FIXME: This is a hack for mirrored sprites
-    if( frame&128 ) {
-	VideoDrawClipX(type->Sprite,frame&127,x,y);
+    if( frame<0 ) {
+	VideoDrawClipX(type->Sprite,-frame,x,y);
     } else {
 	VideoDrawClip(type->Sprite,frame,x,y);
     }

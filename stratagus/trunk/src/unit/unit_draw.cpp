@@ -1646,7 +1646,7 @@ local void DrawBuilding(Unit* unit)
 	frame = unit->SeenFrame = unit->Frame;
     } else {
 	frame = unit->SeenFrame;
-	DebugCheck( frame==-1 || frame==0xFF );
+	DebugCheck( frame==UnitNotSeen );
     }
 
     type=unit->Type;
@@ -1678,7 +1678,7 @@ local void DrawBuilding(Unit* unit)
     } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
 	// FIXME: this frame is hardcoded!!!
 	GraphicUnitPixels(unit,unit->Orders[0].Type->Sprite);
-	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
+	DrawUnitType(unit->Orders[0].Type,frame<0?-1:1,x,y);
     } else {
 	GraphicUnitPixels(unit,type->Sprite);
 	DrawUnitType(type,frame,x,y);
