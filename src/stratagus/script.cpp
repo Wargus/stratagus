@@ -1168,12 +1168,6 @@ global void SavePreferences(void)
 	fprintf(fd, "--- -----------------------------------------\n");
 	fprintf(fd, "--- $Id$\n");
 
-	// Global options
-	if (OriginalFogOfWar) {
-		fprintf(fd, "OriginalFogOfWar()\n");
-	} else {
-		fprintf(fd, "AlphaFogOfWar()\n");
-	}
 	fprintf(fd, "SetVideoFullScreen(%s)\n", VideoFullScreen ? "true" : "false");
 	fprintf(fd, "SetLocalPlayerName(\"%s\")\n", LocalPlayerName);
 
