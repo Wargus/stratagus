@@ -117,20 +117,16 @@ Menu* FindMenu(const char* menu_id)
 }
 
 /**
-** Draw menu button 'button' on x,y
+**  Draw menu button 'button' on x,y
 **
-** @param button         Button identifier
-** @param flags          State of Button (clicked, mouse over...)
-** @param transparent    State of button transparency: 0=No, 1=Yes
-** @param x              X display position
-** @param y              Y display position
-** @param font           font number for text
-** @param text           text to print on button
-** @param normalcolor    FIXME : docu
-** @param reversecolor   FIXME : docu
+**  @param style  Button style
+**  @param flags  State of Button (clicked, mouse over...)
+**  @param x      X display position
+**  @param y      Y display position
+**  @param text   text to print on button
 */
-void DrawMenuButton(ButtonStyle* style, unsigned flags, int transparent,
-	int x, int y, const unsigned char* text)
+void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
+	const unsigned char* text)
 {
 	char* nc;
 	char* rc;
@@ -254,54 +250,6 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int transparent,
 			}
 		}
 	} else {
-		if (flags & MenuButtonDisabled) {
-			rb = button - 1;
-			s = 0;
-			SetDefaultTextColors(FontGrey, FontGrey);
-		} else if (flags & MenuButtonClicked) {
-			rb = button + 1;
-			s = 2;
-			SetDefaultTextColors(rc, rc);
-		} else {
-			rb = button;
-			s = 0;
-			if (flags & MenuButtonActive) {
-				SetDefaultTextColors(rc, rc);
-			}
-		}
-		if (rb < MenuButtonGfx.Sprite->NumFrames) {
-			if (transparent) {
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x, y);
-			} else {
-				VideoDrawClip(MenuButtonGfx.Sprite, rb, x, y);
-			}
-
-		} else {
-			if (rb < button) {
-				VideoDrawRectangleClip(ColorGray, x + 1, y + 1, w - 2, h - 2);
-				VideoDrawRectangleClip(ColorGray, x + 2, y + 2, w - 4, h - 4);
-			} else {
-				// FIXME: Temp-workaround for missing folder button in non-expansion gfx
-				VideoDrawRectangleClip(ColorYellow, x + 1, y + 1, w - 2, h - 2);
-				VideoDrawRectangleClip(ColorYellow, x + 2, y + 2, w - 4, h - 4);
-			}
-		}
-		if (text) {
-			if (button != MBUTTON_FOLDER) {
-				VideoDrawTextCentered(s + x + w / 2,
-					s + y + (h - VideoTextHeight(font)) / 2 + 2, font, text);
-			} else {
-				SetDefaultTextColors(nc, rc);
-				VideoDrawText(x + 44, y + 6, font, text);
-			}
-		}
-		if (flags & MenuButtonSelected) {
-			if (flags & MenuButtonDisabled) {
-				VideoDrawRectangleClip(ColorGray, x, y, w - 1, h);
-			} else {
-				VideoDrawRectangleClip(ColorYellow, x, y, w - 1, h);
-			}
-		}
 	}
 #endif
 }
@@ -489,11 +437,11 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 			while (i--) {
 				PushClipping();
 				SetClipping(0, 0, x + w, VideoHeight - 1);
-				if (mi->transparent) {
-					VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + oh * i);
-				} else {
+//				if (mi->transparent) {
+//					VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + oh * i);
+//				} else {
 					VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + oh * i);
-				}
+//				}
 				PopClipping();
 				text = mi->d.pulldown.options[i];
 				if (text) {
@@ -525,11 +473,11 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 			} else {
 				SetClipping(0, 0, x + w - 1, VideoHeight - 1);
 			}
-			if (mi->transparent) {
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
-			} else {
+//			if (mi->transparent) {
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+//			} else {
 				VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
-			}
+//			}
 			PopClipping();
 			if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN,
@@ -593,11 +541,11 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 	while (i--) {
 		PushClipping();
 		SetClipping(0, 0, x + w, VideoHeight - 1);
-		if (mi->transparent) {
-			VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + 18 * i);
-		} else {
+//		if (mi->transparent) {
+//			VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + 18 * i);
+//		} else {
 			VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + 18 * i);
-		}
+//		}
 		PopClipping();
 		if (!(flags & MenuButtonDisabled)) {
 			if (i < mi->d.listbox.noptions) {
@@ -688,26 +636,26 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 		if (flags & MenuButtonDisabled) {
 			PushClipping();
 			SetClipping(0, 0, VideoWidth - 1, y + h - 20);
-			if (mi->transparent) {
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h / 2);
-			} else {
+//			if (mi->transparent) {
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h / 2);
+//			} else {
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h / 2);
-			}
+//			}
 			PopClipping();
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW - 1, x, y - 2);
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
 		} else {
 			PushClipping();
 			SetClipping(0, 0, VideoWidth - 1, y + h - 20);
-			if (mi->transparent) {
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h / 2);
-			} else {
+//			if (mi->transparent) {
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h / 2);
+//			} else {
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h / 2);
-			}
+//			}
 			PopClipping();
 			if (mi->d.vslider.cflags & MI_CFLAGS_UP) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW + 1, x, y - 2);
@@ -791,26 +739,26 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 		if (flags & MenuButtonDisabled) {
 			PushClipping();
 			SetClipping(0, 0, x + w - 20, VideoHeight - 1);
-			if (mi->transparent) {
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w / 2, y);
-			} else {
+//			if (mi->transparent) {
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w / 2, y);
+//			} else {
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w / 2, y);
-			}
+//			}
 			PopClipping();
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW - 1, x - 2, y);
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
 		} else {
 			PushClipping();
 			SetClipping(0, 0, x + w - 20, VideoHeight - 1);
-			if (mi->transparent) {
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
-				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
-			} else {
+//			if (mi->transparent) {
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+//				VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
+//			} else {
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
-			}
+//			}
 			PopClipping();
 			if (mi->d.hslider.cflags & MI_CFLAGS_LEFT) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
@@ -837,60 +785,129 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 }
 
 /**
-** Draw gem 'button' on menu mx, my
+**  Draw checkbox on menu x, y
 **
-** @param mi    menuitem pointer
-** @param mx    menu X display position (offset)
-** @param my    menu Y display position (offset)
+**  @param style  Checkbox style
+**  @param flags  State of Button (clicked, mouse over...)
+**  @param x      X display position
+**  @param y      Y display position
+**  @param text   text to print on button
 */
-static void DrawGem(Menuitem* mi, int mx, int my)
+static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
+	int x, int y, const unsigned char* text)
 {
-	unsigned flags;
-	MenuButtonId rb;
-	int x;
-	int y;
 	char* nc;
 	char* rc;
 	char* oldnc;
 	char* oldrc;
+	int i;
+	ButtonStyleProperties* p;
+	ButtonStyleProperties* pimage;
+	int checked;
 
-	flags = mi->flags;
-	rb = mi->d.gem.button;
-	x = mx+mi->xofs;
-	y = my+mi->yofs;
-	if ((mi->d.gem.state & MI_GSTATE_INVISIBLE)) {
-		return;
-	}
+	checked = state & MI_CSTATE_CHECKED;
 	if (flags & MenuButtonDisabled) {
-		rb--;
+		p = checked ? &style->CheckedDisabled : &style->Disabled;
+	} else if (flags & MenuButtonClicked) {
+		p = checked ? &style->CheckedClicked : &style->Clicked;
+	} else if (flags & MenuButtonActive) {
+		p = checked ? &style->CheckedHover : &style->Hover;
+	} else if (flags & MenuButtonSelected) {
+		p = checked ? &style->CheckedSelected : &style->Selected;
+	} else {
+		p = checked ? &style->Checked : &style->Default;
 	}
-	else {
-		if (flags & MenuButtonClicked) {
-			++rb;
-		}
-		if ((mi->d.gem.state & MI_GSTATE_CHECKED)) {
-			rb += 2;
-		}
-	}
-	VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
 
-	if (mi->d.gem.text) {
-		GetDefaultTextColors(&oldnc,&oldrc);
-		if (mi->d.gem.normalcolor || mi->d.gem.reversecolor) {
-			nc = mi->d.gem.normalcolor ? mi->d.gem.normalcolor : oldnc;
-			rc = mi->d.gem.reversecolor ? mi->d.gem.reversecolor : oldrc;
-			SetDefaultTextColors(nc,rc);
+	//
+	//  Image
+	//
+	pimage = p;
+	if (!p->Sprite && !p->File) {
+		// No image
+		if ((flags & MenuButtonDisabled)) {
+			// Try unchecked disabled
+			if (checked && (style->Disabled.Sprite || style->Disabled.File)) {
+				pimage = &style->Disabled;
+			}
 		} else {
-			nc = oldnc;
-			rc = oldrc;
+			// Try hover, selected, then default
+			if (checked) {
+				if ((flags & MenuButtonActive) && (style->CheckedHover.Sprite || style->CheckedHover.File)) {
+					pimage = &style->CheckedHover;
+				} else if ((flags & MenuButtonSelected) && (style->CheckedSelected.Sprite || style->CheckedSelected.File)) {
+					pimage = &style->CheckedSelected;
+				} else if (style->Checked.Sprite || style->Checked.File) {
+					pimage = &style->Checked;
+				}
+			} else {
+				if ((flags & MenuButtonActive) && (style->Hover.Sprite || style->Hover.File)) {
+					pimage = &style->Hover;
+				} else if ((flags & MenuButtonSelected) && (style->Selected.Sprite || style->Selected.File)) {
+					pimage = &style->Selected;
+				} else if (style->Default.Sprite || style->Default.File) {
+					pimage = &style->Default;
+				}
+			}
 		}
-		VideoDrawText(x + 24, y + 4, GameFont, mi->d.gem.text);
-		if (mi->flags & MenuButtonActive) {
-			SetDefaultTextColors(rc, rc);
-			VideoDrawRectangleClip(ColorGray, mx + mi->xofs - 4, my + mi->yofs - 4,
-				VideoTextLength(GameFont, mi->d.gem.text) + 30, VideoTextHeight(GameFont) + 12);
+	}
+	if (!pimage->Sprite && pimage->File) {
+		char* buf;
+
+		buf = alloca(strlen(pimage->File) + 9 + 1);
+		strcat(strcpy(buf, "graphics/"), pimage->File);
+		pimage->Sprite = LoadSprite(buf, pimage->Width, pimage->Height);
+	}
+	if (pimage->Sprite) {
+		VideoDraw(pimage->Sprite, pimage->Frame, x, y);
+	}
+
+	//
+	//  Text
+	//
+	if (text) {
+		GetDefaultTextColors(&oldnc, &oldrc);
+		nc = p->TextNormalColor ? p->TextNormalColor :
+			style->TextNormalColor ? style->TextNormalColor : oldnc;
+		rc = p->TextReverseColor ? p->TextReverseColor :
+			style->TextReverseColor ? style->TextReverseColor : oldrc;
+		SetDefaultTextColors(nc, rc);
+
+		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
+			VideoDrawTextCentered(x + p->TextX, y + p->TextY,
+				style->Font, text);
+		} else if (p->TextAlign == TextAlignLeft) {
+			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
+		} else {
+			VideoDrawText(x + p->TextX - VideoTextLength(style->Font, text), y + p->TextY,
+				style->Font, text);
 		}
+
 		SetDefaultTextColors(oldnc, oldrc);
+	}
+
+	//
+	//  Border
+	//
+	if (!p->BorderSize) {
+		// No border, check if there's a Selected border
+		if ((flags & MenuButtonSelected)) {
+			if (checked && style->CheckedSelected.BorderSize) {
+				p = &style->CheckedSelected;
+			}
+			if (!checked && style->Selected.BorderSize) {
+				p = &style->Selected;
+			}
+		}
+	}
+	if (!p->BorderColor) {
+		p->BorderColor = VideoMapRGB(TheScreen->format,
+			p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
+	}
+	if (p->BorderSize) {
+		for (i = 0; i < p->BorderSize; ++i) {
+			VideoDrawRectangleClip(p->BorderColor, x - i, y - i,
+				style->Width + 2 * i, style->Height + 2 * i);
+		}
 	}
 }
 
@@ -955,11 +972,11 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 
 		PushClipping();
 		SetClipping(0, 0, x + w, VideoHeight - 1);
-		if (mi->transparent) {
-			VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
-		} else {
+//		if (mi->transparent) {
+//			VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+//		} else {
 			VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
-		}
+//		}
 		PopClipping();
 		text = mi->d.input.buffer;
 		if (text) {
@@ -1086,7 +1103,7 @@ void DrawMenu(Menu* menu)
 				SetDefaultTextColors(oldnc, oldrc);
 				break;
 			case MI_TYPE_BUTTON:
-				DrawMenuButton(mi->d.button.style, mi->flags, mi->transparent,
+				DrawMenuButton(mi->d.button.style, mi->flags,
 					menu->X + mi->xofs, menu->Y + mi->yofs,
 					mi->d.button.text);
 				break;
@@ -1114,8 +1131,10 @@ void DrawMenu(Menu* menu)
 			case MI_TYPE_INPUT:
 				DrawInput(mi, menu->X, menu->Y);
 				break;
-			case MI_TYPE_GEM:
-				DrawGem(mi, menu->X, menu->Y);
+			case MI_TYPE_CHECKBOX:
+				DrawCheckbox(mi->d.checkbox.style, mi->flags, mi->d.checkbox.state,
+					menu->X + mi->xofs, menu->Y + mi->yofs,
+					mi->d.checkbox.text);
 				break;
 			default:
 				break;
@@ -1342,6 +1361,11 @@ normkey:
 							(*mi->d.hslider.handler)();
 						}
 						return;
+					case MI_TYPE_CHECKBOX:
+						if (mi->d.checkbox.action) {
+							(*mi->d.checkbox.action)(mi);
+						}
+						return;
 					default:
 						break;
 				}
@@ -1475,11 +1499,12 @@ normkey:
 						case MI_TYPE_VSLIDER:
 						case MI_TYPE_HSLIDER:
 						case MI_TYPE_INPUT:
+						case MI_TYPE_CHECKBOX:
 							if (mi->flags & MenuButtonDisabled) {
 								break;
 							}
-							mi->flags |= MenuButtonSelected;
 							menu->Items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
+							mi->flags |= MenuButtonSelected;
 							MenuButtonCurSel = mi - menu->Items;
 							return;
 						default:
@@ -1695,14 +1720,14 @@ static void MenuHandleMouseMove(int x, int y)
 							continue;
 						}
 						break;
-					case MI_TYPE_GEM:
+					case MI_TYPE_CHECKBOX:
 						xs = menu->X + mi->xofs;
 						ys = menu->Y + mi->yofs;
-						if ((!mi->d.gem.text || x < xs - 1 || x > xs +
-								VideoTextLength(GameFont, mi->d.gem.text) + 28 ||
+						if ((!mi->d.checkbox.text || x < xs - 1 || x > xs +
+								VideoTextLength(GameFont, mi->d.checkbox.text) + 28 ||
 								y < ys - 2 ||  y > ys + VideoTextHeight(GameFont) + 9) &&
-								(x < xs ||  x > xs + mi->d.gem.xsize || y < ys ||
-								y > ys + mi->d.gem.ysize)) {
+								(x < xs ||  x > xs + mi->d.checkbox.style->Width || y < ys ||
+								y > ys + mi->d.checkbox.style->Height)) {
 							if (!(mi->flags & MenuButtonClicked)) {
 								if (mi->flags & MenuButtonActive) {
 									mi->flags &= ~MenuButtonActive;
@@ -1928,8 +1953,8 @@ static void MenuHandleMouseMove(int x, int y)
 						// break;
 				}
 				switch (mi->mitype) {
-					case MI_TYPE_GEM:
-						if ((mi->d.gem.state & (MI_GSTATE_PASSIVE | MI_GSTATE_INVISIBLE))) {
+					case MI_TYPE_CHECKBOX:
+						if ((mi->d.checkbox.state & (MI_CSTATE_PASSIVE | MI_CSTATE_INVISIBLE))) {
 							break;
 						}
 						/* FALL THROUGH */
@@ -2005,7 +2030,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			mi = menu->Items + MenuButtonUnderCursor;
 			if (!(mi->flags & MenuButtonClicked)) {
 				switch (mi->mitype) {
-					case MI_TYPE_GEM:
+					case MI_TYPE_CHECKBOX:
 					case MI_TYPE_BUTTON:
 					case MI_TYPE_PULLDOWN:
 					case MI_TYPE_LISTBOX:
@@ -2233,19 +2258,19 @@ static void MenuHandleButtonUp(unsigned b)
 		for (i = 0; i < n; ++i) {
 			mi = menu->Items + i;
 			switch (mi->mitype) {
-				case MI_TYPE_GEM:
+				case MI_TYPE_CHECKBOX:
 					if (mi->flags & MenuButtonClicked) {
 						redraw_flag = 1;
 						mi->flags &= ~MenuButtonClicked;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
-							if ((mi->d.gem.state & MI_GSTATE_CHECKED)) {
-								mi->d.gem.state &= ~MI_GSTATE_CHECKED;
+							if ((mi->d.checkbox.state & MI_CSTATE_CHECKED)) {
+								mi->d.checkbox.state &= ~MI_CSTATE_CHECKED;
 							} else {
-								mi->d.gem.state |= MI_GSTATE_CHECKED;
+								mi->d.checkbox.state |= MI_CSTATE_CHECKED;
 							}
-							if (mi->d.gem.action) {
-								(*mi->d.gem.action)(mi);
+							if (mi->d.checkbox.action) {
+								(*mi->d.checkbox.action)(mi);
 							}
 						}
 					}

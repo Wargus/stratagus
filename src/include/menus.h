@@ -63,8 +63,6 @@ typedef int MenuButtonId;
 
 /// @todo FILL IN THIS TABLE!!!!
 
-#define MBUTTON_GEM_ROUND   19
-#define MBUTTON_GEM_SQUARE  24
 #define MBUTTON_UP_ARROW    29
 #define MBUTTON_DOWN_ARROW  32
 #define MBUTTON_LEFT_ARROW  35
@@ -205,19 +203,15 @@ typedef struct _menuitem_input_ {
 	void (*action)(struct _menuitem_*, int);  ///< for key
 	int nch;
 	int maxch;
-	char *normalcolor;
-	char *reversecolor;
+	char* normalcolor;
+	char* reversecolor;
 } MenuitemInput;
-typedef struct _menuitem_gem_ {
-	unsigned char *text;
+typedef struct _menuitem_checkbox_ {
+	unsigned char* text;
 	unsigned int state;
-	int xsize;
-	int ysize;
-	MenuButtonId button;
+	struct _checkbox_style_* style;
 	void (*action)(struct _menuitem_*);
-	char *normalcolor;
-	char *reversecolor;
-} MenuitemGem;
+} MenuitemCheckbox;
 
 struct _menus_;
 typedef struct _menuitem_ {
@@ -226,7 +220,6 @@ typedef struct _menuitem_ {
 	int yofs;
 	unsigned flags;
 	int font;
-	int transparent;  ///< Add the transparent flag to draw a translucide menu
 	void (*initfunc)(struct _menuitem_*);  ///< constructor
 	void (*exitfunc)(struct _menuitem_*);  ///< destructor
 	struct _menus_ *menu;  ///< backpointer for speedups
@@ -239,7 +232,7 @@ typedef struct _menuitem_ {
 		MenuitemHslider hslider;
 		MenuitemDrawfunc drawfunc;
 		MenuitemInput input;
-		MenuitemGem gem;
+		MenuitemCheckbox checkbox;
 		// ... add here ...
 	} d;
 } Menuitem;
@@ -251,7 +244,7 @@ typedef struct _menuitem_ {
 #define MI_TYPE_VSLIDER  5
 #define MI_TYPE_DRAWFUNC 6
 #define MI_TYPE_INPUT    7
-#define MI_TYPE_GEM      8
+#define MI_TYPE_CHECKBOX 8
 #define MI_TYPE_HSLIDER  9
 
 	/// for MI_TYPE_TEXT
@@ -270,11 +263,11 @@ typedef struct _menuitem_ {
 	/// for MI_TYPE_PULLDOWN
 #define MI_PSTATE_PASSIVE 1  ///< Pulldown is passive (grey) drawn
 
-	/// for MI_TYPE_GEM
-#define MI_GSTATE_UNCHECKED 0 ///< Gem has no check mark
-#define MI_GSTATE_PASSIVE   1 ///< Gem is passive (grey) drawn
-#define MI_GSTATE_INVISIBLE 2 ///< Gem is not drawn
-#define MI_GSTATE_CHECKED   4 ///< Gem is with check mark drawn
+	/// for MI_TYPE_CHECKBOX
+#define MI_CSTATE_UNCHECKED 0 ///< Checkbox has no check mark
+#define MI_CSTATE_PASSIVE   1 ///< Checkbox is passive (grey) drawn
+#define MI_CSTATE_INVISIBLE 2 ///< Checkbox is not drawn
+#define MI_CSTATE_CHECKED   4 ///< Checkbox is with check mark drawn
 
 #define MI_STYLE_SC_VSLIDER 1
 #define MI_STYLE_SC_HSLIDER 2
@@ -350,7 +343,7 @@ extern void InitMenus(int race);
 	/// Draw menu
 extern void DrawMenu(Menu* menu);
 	/// Draw menu button
-extern void DrawMenuButton(struct _button_style_* style, unsigned flags, int transparent,
+extern void DrawMenuButton(struct _button_style_* style, unsigned flags,
 	int x, int y, const unsigned char* text);
 	/// Set menu backgound and draw it
 extern void MenusSetBackground(void);
