@@ -157,10 +157,15 @@ global int GetMetaParameter(char* reply, int pos, char** value)
 {
     char* endline;
 
-    *value = reply;
+    // Take Care for OK/ERR
+    *value = strchr(reply, '\n');
+    (*value)++;
 
     while (pos-- && *value) {
-	*value = strstr(*value,"\n");
+	(*value) = strchr((*value), '\n');
+	if (*value) {
+	    (*value)++;
+	}
     }
 
     if (!*value) {
@@ -168,7 +173,11 @@ global int GetMetaParameter(char* reply, int pos, char** value)
 	return -1;
     }
 
-    endline = strstr(*value,"\n");
+    if (*value[0] == '\n') {
+	(*value)++;
+    }
+
+    endline = strchr(*value, '\n');
 
     if (!endline) {
 	return -1;
