@@ -76,24 +76,10 @@
 
 local EventCallback callbacks;
 
-    /// Struct which specifies the buttons gfx
-global struct {
-	/// resource filename one for each race
-    const char*	File[PlayerMaxRaces];
-	/// Width of button
-    int		Width, Height;
-	/// sprite : FILLED
-    Graphic*	Sprite;
-} MenuButtonGfx
-#ifndef laterUSE_CCL
-= {
-    { "ui/buttons 1.png" ,"ui/buttons 2.png" },
-    300, 7632,
-
-    NULL
-}
-#endif
-    ;
+/**
+**	Menu button graphics
+*/
+global MenuGraphics MenuButtonGfx;
 
 /**
 **	The currently processed menu
@@ -1925,6 +1911,8 @@ global void InitMenus(int race)
     static int last_race = -1;
     const char *file;
     char *buf;
+    int width;
+    int height;
 
     InitMenuData();
 
@@ -1950,7 +1938,9 @@ global void InitMenus(int race)
     file = MenuButtonGfx.File[race];
     buf = alloca(strlen(file) + 9 + 1);
     file = strcat(strcpy(buf, "graphics/"), file);
-    MenuButtonGfx.Sprite = LoadSprite(file, 300, 144);	// 50/53 images!
+    width = MenuButtonGfx.Width[race];
+    height = MenuButtonGfx.Height[race];
+    MenuButtonGfx.Sprite = LoadSprite(file, width, height);
 
     InitMenuFunctions();
     CurrentMenu = NULL;

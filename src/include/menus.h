@@ -248,12 +248,23 @@ typedef struct _menus_ {
     void (*netaction)(void);		/// network action callback
 } Menu;
 
+/**
+**	Struct which specifies the buttons gfx
+*/
+typedef struct _menu_graphics_ {
+    char* File[PlayerMaxRaces];		/// resource filename one for each race
+    int	Width[PlayerMaxRaces];		/// Width of button
+    int	Height[PlayerMaxRaces];		/// Height of button
+    Graphic* Sprite;			/// sprite : FILLED
+} MenuGraphics;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
 extern int GuiGameStarted;		/// Game Started?
 extern Menu *CurrentMenu;		/// Currently processed menu
+extern MenuGraphics MenuButtonGfx;	/// Menu button graphics
 
 extern MapInfo *MenuMapInfo;		/// MapInfo of map used in gui menus
 extern char MenuMapFullPath[1024];	/// Full path to currently selected map

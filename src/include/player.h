@@ -369,7 +369,7 @@ enum PlayerRaces {
     PlayerRaceOrc	=1,		/// belongs to orc
     PlayerRaceNeutral	=2,		/// belongs to none
 
-    PlayerMaxRaces	=2		/// maximal races supported
+    PlayerMaxRaces	=3		/// maximal races supported
 };
 
 /**
