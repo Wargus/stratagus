@@ -848,7 +848,7 @@ global void DoButtonButtonClicked(int button)
 **
 **	@param key	Internal key symbol for pressed key.
 **
-**	@returns	True, if button is handled (consumed).
+**	@return		True, if button is handled (consumed).
 */
 global int DoButtonPanelKey(int key)
 {
