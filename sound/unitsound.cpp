@@ -4,13 +4,13 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________      ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//        Stratagus - A free fantasy real time strategy game engine
 //
 /**@name unitsound.c - The unit sounds. */
 //
-// (c) Copyright 1999-2001,2003 by Fabrice Rossi and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Fabrice Rossi and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
--- Include
+--  Include
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -51,13 +51,13 @@
 #include "map.h"
 
 /*----------------------------------------------------------------------------
--- Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-** Simple sound definition:
-** There is only one sound/voice that could be used for this
-** sound identifier.
+**  Simple sound definition:
+**  There is only one sound/voice that could be used for this
+**  sound identifier.
 */
 typedef struct _simple_sound_ {
 	char* Name; ///< name of the sound
@@ -65,7 +65,7 @@ typedef struct _simple_sound_ {
 } SimpleSound;
 
 /**
-** Structure for remaping a sound to a new name.
+**  Structure for remaping a sound to a new name.
 */
 typedef struct _sound_remap_ {
 	char* NewName;  ///< Name in unit-type definition
@@ -75,9 +75,9 @@ typedef struct _sound_remap_ {
 #define MaxSimpleGroups 7 ///< maximal number of sounds pro group
 
 /**
-** Sound group definition:
-** There is a collection of sounds/voices that could be randomly
-** be used fot this sound identifier.
+**  Sound group definition:
+**  There is a collection of sounds/voices that could be randomly
+**  be used fot this sound identifier.
 */
 typedef struct _sound_group_ {
 	char* Name;                     ///< name of the group
@@ -85,11 +85,11 @@ typedef struct _sound_group_ {
 } SoundGroup;
 
 /**
-** Selection structure:
+**  Selection structure:
 **
-** Special sound structure currently used for the selection of an unit.
-** For a special number of the uses the first group is used, after this
-** the second groups is played.
+**  Special sound structure currently used for the selection of an unit.
+**  For a special number of the uses the first group is used, after this
+**  the second groups is played.
 */
 typedef struct _selection_group_ {
 	char* Name;    ///< name of the selection sound
@@ -103,35 +103,35 @@ typedef struct _selection_group_ {
 
 
 /**
-** Simple sounds currently available.
+**  Simple sounds currently available.
 */
 static SimpleSound* SimpleSounds;
 
 /**
-** Sound remaping currently available.
+**  Sound remaping currently available.
 */
 static SoundRemap* SoundRemaps;
 
 /**
-** Sound-groups currently available
+**  Sound-groups currently available
 */
 static SoundGroup* SoundGroups;
 
 /**
-** Selection-groups currently available
+**  Selection-groups currently available
 */
 static SelectionGroup* SelectionGroups;
 
 /*----------------------------------------------------------------------------
--- Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-** Computes the number of sounds in a sound group
+**  Computes the number of sounds in a sound group
 **
-** @param group list of file names
+**  @param group list of file names
 **
-** @return number of sounds in group
+**  @return number of sounds in group
 */
 static int NbSoundsInGroup(char* const* const group)
 {
@@ -147,7 +147,7 @@ static int NbSoundsInGroup(char* const* const group)
 
 
 /**
-** Loads all simple sounds (listed in the SimpleSounds array).
+**  Loads all simple sounds (listed in the SimpleSounds array).
 */
 static void LoadSimpleSounds(void)
 {
@@ -161,8 +161,8 @@ static void LoadSimpleSounds(void)
 }
 
 /**
-** Loads all sound groups.
-** Special groups are created.
+**  Loads all sound groups.
+**  Special groups are created.
 */
 static void LoadSoundGroups(void)
 {
@@ -185,8 +185,8 @@ static void LoadSoundGroups(void)
 }
 
 /**
-** Performs remaping listed in the Remaps array. Maps also critter
-** sounds to their correct values.
+**  Performs remaping listed in the Remaps array. Maps also critter
+**  sounds to their correct values.
 */
 static void RemapSounds(void)
 {
@@ -235,7 +235,7 @@ static void RemapSounds(void)
 }
 
 /**
-** Load all sounds for units.
+**  Load all sounds for units.
 */
 void LoadUnitSounds(void)
 {
@@ -247,9 +247,67 @@ void LoadUnitSounds(void)
 }
 
 /**
-** Map the sounds of all unit-types to the correct sound id.
-** And overwrite the sound ranges. @todo the sound ranges should be
-** configurable by user with CCL.
+**  Map animation sounds
+*/
+static void MapAnimSounds2(NewAnimation* anim)
+{
+	int i;
+
+	while (anim) {
+		if (anim->Type == NewAnimationSound) {
+			anim->D.Sound.Sound = SoundIdForName(anim->D.Sound.Name);
+		} else if (anim->Type == NewAnimationRandomSound) {
+			for (i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
+				anim->D.RandomSound.Sound[i] = SoundIdForName(anim->D.RandomSound.Name[i]);
+			}
+		}
+		anim = anim->Next;
+	}
+}
+
+/**
+**  Map animation sounds for a unit type
+*/
+static void MapAnimSounds(UnitType* type)
+{
+	int i;
+
+	if (!type->NewAnimations) {
+		return;
+	}
+
+	MapAnimSounds2(type->NewAnimations->Start);
+	MapAnimSounds2(type->NewAnimations->Still);
+	MapAnimSounds2(type->NewAnimations->Death);
+	MapAnimSounds2(type->NewAnimations->StartAttack);
+	MapAnimSounds2(type->NewAnimations->Attack);
+	MapAnimSounds2(type->NewAnimations->EndAttack);
+	MapAnimSounds2(type->NewAnimations->StartMove);
+	MapAnimSounds2(type->NewAnimations->Move);
+	MapAnimSounds2(type->NewAnimations->EndMove);
+	MapAnimSounds2(type->NewAnimations->StartRepair);
+	MapAnimSounds2(type->NewAnimations->Repair);
+	MapAnimSounds2(type->NewAnimations->EndRepair);
+	MapAnimSounds2(type->NewAnimations->StartTrain);
+	MapAnimSounds2(type->NewAnimations->Train);
+	MapAnimSounds2(type->NewAnimations->EndTrain);
+	MapAnimSounds2(type->NewAnimations->StartResearch);
+	MapAnimSounds2(type->NewAnimations->Research);
+	MapAnimSounds2(type->NewAnimations->EndResearch);
+	MapAnimSounds2(type->NewAnimations->StartBuild);
+	MapAnimSounds2(type->NewAnimations->Build);
+	MapAnimSounds2(type->NewAnimations->EndBuild);
+	for (i = 0; i < MaxCosts; ++i) {
+		MapAnimSounds2(type->NewAnimations->StartHarvest[i]);
+		MapAnimSounds2(type->NewAnimations->Harvest[i]);
+		MapAnimSounds2(type->NewAnimations->EndHarvest[i]);
+	}
+}
+
+/**
+**  Map the sounds of all unit-types to the correct sound id.
+**  And overwrite the sound ranges. @todo the sound ranges should be
+**  configurable by user with CCL.
 */
 void MapUnitSounds(void)
 {
@@ -265,6 +323,9 @@ void MapUnitSounds(void)
 		//
 		for (i = 0; i < NumUnitTypes; ++i) {
 			type = UnitTypes[i];
+
+			MapAnimSounds(type);
+
 			if (type->Sound.Selected.Name) {
 				type->Sound.Selected.Sound =
 					SoundIdForName(type->Sound.Selected.Name);

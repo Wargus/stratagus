@@ -566,6 +566,7 @@ typedef enum _new_animation_type_ {
 	NewAnimationRandomSound,
 	NewAnimationAttack,
 	NewAnimationRotate,
+	NewAnimationRandomRotate,
 	NewAnimationMove,
 	NewAnimationUnbreakable,
 } NewAnimationType;
@@ -584,14 +585,20 @@ typedef struct _new_animation_ {
 			int MaxWait;
 		} RandomWait;
 		struct {
-			char* Sound;
+			char* Name;
+			SoundId Sound;
 		} Sound;
 		struct {
-			char* Sound;
+			char** Name;
+			SoundId* Sound;
+			int NumSounds;
 		} RandomSound;
 		struct {
 			int Rotate;
 		} Rotate;
+		struct {
+			int Rotate;
+		} RandomRotate;
 		struct {
 			int Move;
 		} Move;
