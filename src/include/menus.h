@@ -38,7 +38,6 @@
 ----------------------------------------------------------------------------*/
 
 #include "util.h"
-#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Defines/Declarations
@@ -291,23 +290,14 @@ typedef struct _menu_ {
 	void (*NetAction)(void);   ///< network action callback
 } Menu;
 
-/**
-**  Struct which specifies the buttons gfx
-*/
-typedef struct _menu_graphics_ {
-	char* File[MAX_RACES];    ///< resource filename one for each race
-	int   Width[MAX_RACES];   ///< Width of button
-	int   Height[MAX_RACES];  ///< Height of button
-	struct _graphic_* Sprite; ///< sprite : FILLED
-} MenuGraphics;
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int GuiGameStarted;          ///< Game Started?
-extern Menu* CurrentMenu;           ///< Currently processed menu
-extern MenuGraphics MenuButtonGfx;  ///< Menu button graphics
+extern int GuiGameStarted;                    ///< Game Started?
+extern Menu* CurrentMenu;                     ///< Current menu
+extern struct _graphic_* MenuButtonGraphics[];///< Menu button graphics
+extern struct _graphic_* MenuButtonG;         ///< Current menu button graphics
 
 extern struct _map_info_* MenuMapInfo;        ///< MapInfo of map used in gui menus
 extern char MenuMapFullPath[1024];  ///< Full path to currently selected map
