@@ -370,14 +370,18 @@ global void AssignUnitToPlayer(Unit* unit, Player* player)
 	//
 	if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
 		unit->PlayerSlot = player->Units + player->TotalNumUnits++;
-		if (type->_HitPoints != 0) {
-			if (type->Building) {
-				// FIXME: support more races
-				if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-					player->TotalBuildings++;
+		if (!SaveGameLoading) {
+			if (type->_HitPoints != 0) {
+				// If unit is dieing, it's already been lost by all players
+				// don't count again
+				if (type->Building && unit->Orders[0].Action != UnitActionDie) {
+					// FIXME: support more races
+					if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
+						player->TotalBuildings++;
+					}
+				} else if (unit->Orders[0].Action != UnitActionDie) {
+					player->TotalUnits++;
 				}
-			} else {
-				player->TotalUnits++;
 			}
 		}
 		*unit->PlayerSlot = unit;
@@ -391,7 +395,8 @@ global void AssignUnitToPlayer(Unit* unit, Player* player)
 			MustRedraw |= RedrawResources;		// update food
 		}
 	}
-	if (type->Building) {
+	// Don't Add the building if it's dieing, used to load a save game
+	if (type->Building && unit->Orders[0].Action != UnitActionDie) {
 		// FIXME: support more races
 		if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
 			player->NumBuildings++;
