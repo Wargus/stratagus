@@ -490,30 +490,30 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 
     }
-	if (type->CanCastSpell) {
-	    if (0) {
-		VideoDrawText(x + 59, y + 8 + 140 + 1, GameFont, "Magic:");
-		VideoDrawRectangleClip(ColorGray, x + 108, y + 8 + 140, 61, 14);
-		VideoDrawRectangleClip(ColorBlack, x + 108 + 1, y + 8 + 140 + 1, 61 - 2, 14 - 2);
-		i = (100 * unit->Mana) / unit->Type->_MaxMana;
-		i = (i * (61 - 4)) / 100;
-		VideoFillRectangleClip(ColorBlue, x + 108 + 2, y + 8 + 140 + 2, i, 14 - 4);
+    if (type->CanCastSpell) {
+	if (0) {
+	    VideoDrawText(x + 59, y + 8 + 140 + 1, GameFont, "Magic:");
+	    VideoDrawRectangleClip(ColorGray, x + 108, y + 8 + 140, 61, 14);
+	    VideoDrawRectangleClip(ColorBlack, x + 108 + 1, y + 8 + 140 + 1, 61 - 2, 14 - 2);
+	    i = (100 * unit->Mana) / unit->Type->_MaxMana;
+	    i = (i * (61 - 4)) / 100;
+	    VideoFillRectangleClip(ColorBlue, x + 108 + 2, y + 8 + 140 + 2, i, 14 - 4);
 
-		VideoDrawNumber(x + 128, y + 8 + 140 + 1, GameFont, unit->Mana);
-	    } else {
-		int w;
-		w = 140;
-		/* fix to display mana bar properly for any maxmana value */
-		/* max mana can vary for the unit */
-		i = (100 * unit->Mana) / unit->Type->_MaxMana;
-		i = (i * w) / 100;
-		VideoDrawRectangleClip(ColorGray, x + 16,     y + 8 + 140,     w + 4, 16    );
-		VideoDrawRectangleClip(ColorBlack,x + 16 + 1, y + 8 + 140 + 1, w + 2, 16 - 2);
-		VideoFillRectangleClip(ColorBlue, x + 16 + 2, y + 8 + 140 + 2, i,     16 - 4);
+	    VideoDrawNumber(x + 128, y + 8 + 140 + 1, GameFont, unit->Mana);
+	} else {
+	    int w;
+	    w = 140;
+	    /* fix to display mana bar properly for any maxmana value */
+	    /* max mana can vary for the unit */
+	    i = (100 * unit->Mana) / unit->Type->_MaxMana;
+	    i = (i * w) / 100;
+	    VideoDrawRectangleClip(ColorGray, x + 16,     y + 8 + 140,     w + 4, 16    );
+	    VideoDrawRectangleClip(ColorBlack,x + 16 + 1, y + 8 + 140 + 1, w + 2, 16 - 2);
+	    VideoFillRectangleClip(ColorBlue, x + 16 + 2, y + 8 + 140 + 2, i,     16 - 4);
 
-		VideoDrawNumber(x + 16 + w / 2, y + 8 + 140 + 1, GameFont, unit->Mana);
-	    }
+	    VideoDrawNumber(x + 16 + w / 2, y + 8 + 140 + 1, GameFont, unit->Mana);
 	}
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -536,73 +536,48 @@ global void DrawResources(void)
 	    TheUI.ResourceX,TheUI.ResourceY);
     }
 
-    if (TheUI.OriginalResources) {
-	// FIXME: could write a sub function for this
-	VideoDrawSubClip(TheUI.Resources[GoldCost].Icon.Graphic, 0,
-	    TheUI.Resources[GoldCost].IconRow * TheUI.Resources[GoldCost].IconH,
-	    TheUI.Resources[GoldCost].IconW,
-	    TheUI.Resources[GoldCost].IconH,
-	    TheUI.ResourceX + 90, TheUI.ResourceY);
-	VideoDrawNumber(TheUI.ResourceX + 107, TheUI.ResourceY + 1,
-	    GameFont, ThisPlayer->Resources[GoldCost]);
-	VideoDrawSubClip(TheUI.Resources[WoodCost].Icon.Graphic, 0,
-	    TheUI.Resources[WoodCost].IconRow * TheUI.Resources[WoodCost].IconH,
-	    TheUI.Resources[WoodCost].IconW,
-	    TheUI.Resources[WoodCost].IconH,
-	    TheUI.ResourceX + 178, TheUI.ResourceY);
-	VideoDrawNumber(TheUI.ResourceX + 195, TheUI.ResourceY + 1,
-	    GameFont, ThisPlayer->Resources[WoodCost]);
-	VideoDrawSubClip(TheUI.Resources[OilCost].Icon.Graphic, 0,
-	    TheUI.Resources[OilCost].IconRow * TheUI.Resources[OilCost].IconH,
-	    TheUI.Resources[OilCost].IconW,
-	    TheUI.Resources[OilCost].IconH,
-	    TheUI.ResourceX + 266, TheUI.ResourceY);
-	VideoDrawNumber(TheUI.ResourceX + 283, TheUI.ResourceY + 1,
-	    GameFont, ThisPlayer->Resources[OilCost]);
-    } else {
-	for (i = 0; i < MaxCosts; ++i) {
-	    if (TheUI.Resources[i].Icon.Graphic) {
-		VideoDrawSubClip(TheUI.Resources[i].Icon.Graphic, 0,
-		    TheUI.Resources[i].IconRow * TheUI.Resources[i].IconH,
-		    TheUI.Resources[i].IconW, TheUI.Resources[i].IconH,
-		    TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
-	    }
-	    if (TheUI.Resources[i].TextX != -1) {
-		v = ThisPlayer->Resources[i];
-		VideoDrawNumber(TheUI.Resources[i].TextX,
-		    TheUI.Resources[i].TextY + (v > 99999) * 3,
-		    v > 99999 ? SmallFont : GameFont, v);
-	    }
+    for (i = 0; i < MaxCosts; ++i) {
+	if (TheUI.Resources[i].Icon.Graphic) {
+	    VideoDrawSubClip(TheUI.Resources[i].Icon.Graphic, 0,
+		TheUI.Resources[i].IconRow * TheUI.Resources[i].IconH,
+		TheUI.Resources[i].IconW, TheUI.Resources[i].IconH,
+		TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
 	}
-	if (TheUI.Resources[FoodCost].Icon.Graphic) {
-	    VideoDrawSubClip(TheUI.Resources[FoodCost].Icon.Graphic, 0,
-		TheUI.Resources[FoodCost].IconRow * TheUI.Resources[FoodCost].IconH,
-		TheUI.Resources[FoodCost].IconW, TheUI.Resources[FoodCost].IconH,
-		TheUI.Resources[FoodCost].IconX, TheUI.Resources[FoodCost].IconY);
-	}
-	if (TheUI.Resources[FoodCost].TextX != -1) {
-	    sprintf(tmp, "%d/%d", ThisPlayer->NumFoodUnits, ThisPlayer->Food);
-	    if (ThisPlayer->Food < ThisPlayer->NumFoodUnits) {
-		VideoDrawReverseText(TheUI.Resources[FoodCost].TextX,
-		    TheUI.Resources[FoodCost].TextY, GameFont, tmp);
-	    } else {
-		VideoDrawText(TheUI.Resources[FoodCost].TextX,
-		    TheUI.Resources[FoodCost].TextY, GameFont, tmp);
-	    }
-	}
-
-	if (TheUI.Resources[ScoreCost].Icon.Graphic) {
-	    VideoDrawSubClip(TheUI.Resources[ScoreCost].Icon.Graphic, 0,
-		TheUI.Resources[ScoreCost].IconRow * TheUI.Resources[ScoreCost].IconH,
-		TheUI.Resources[ScoreCost].IconW, TheUI.Resources[ScoreCost].IconH,
-		TheUI.Resources[ScoreCost].IconX, TheUI.Resources[ScoreCost].IconY);
-	}
-	if (TheUI.Resources[ScoreCost].TextX != -1) {
-	    v = ThisPlayer->Score;
-	    VideoDrawNumber(TheUI.Resources[ScoreCost].TextX,
-		TheUI.Resources[ScoreCost].TextY + (v > 99999) * 3,
+	if (TheUI.Resources[i].TextX != -1) {
+	    v = ThisPlayer->Resources[i];
+	    VideoDrawNumber(TheUI.Resources[i].TextX,
+		TheUI.Resources[i].TextY + (v > 99999) * 3,
 		v > 99999 ? SmallFont : GameFont, v);
 	}
+    }
+    if (TheUI.Resources[FoodCost].Icon.Graphic) {
+	VideoDrawSubClip(TheUI.Resources[FoodCost].Icon.Graphic, 0,
+	    TheUI.Resources[FoodCost].IconRow * TheUI.Resources[FoodCost].IconH,
+	    TheUI.Resources[FoodCost].IconW, TheUI.Resources[FoodCost].IconH,
+	    TheUI.Resources[FoodCost].IconX, TheUI.Resources[FoodCost].IconY);
+    }
+    if (TheUI.Resources[FoodCost].TextX != -1) {
+	sprintf(tmp, "%d/%d", ThisPlayer->NumFoodUnits, ThisPlayer->Food);
+	if (ThisPlayer->Food < ThisPlayer->NumFoodUnits) {
+	    VideoDrawReverseText(TheUI.Resources[FoodCost].TextX,
+		TheUI.Resources[FoodCost].TextY, GameFont, tmp);
+	} else {
+	    VideoDrawText(TheUI.Resources[FoodCost].TextX,
+		TheUI.Resources[FoodCost].TextY, GameFont, tmp);
+	}
+    }
+
+    if (TheUI.Resources[ScoreCost].Icon.Graphic) {
+	VideoDrawSubClip(TheUI.Resources[ScoreCost].Icon.Graphic, 0,
+	    TheUI.Resources[ScoreCost].IconRow * TheUI.Resources[ScoreCost].IconH,
+	    TheUI.Resources[ScoreCost].IconW, TheUI.Resources[ScoreCost].IconH,
+	    TheUI.Resources[ScoreCost].IconX, TheUI.Resources[ScoreCost].IconY);
+    }
+    if (TheUI.Resources[ScoreCost].TextX != -1) {
+	v = ThisPlayer->Score;
+	VideoDrawNumber(TheUI.Resources[ScoreCost].TextX,
+	    TheUI.Resources[ScoreCost].TextY + (v > 99999) * 3,
+	    v > 99999 ? SmallFont : GameFont, v);
     }
 }
 
