@@ -344,12 +344,15 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_rawgeti(l, -1, j + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
-				spellaction->Data.Summon.UnitType = UnitTypeByIdent(value);
-				if (!spellaction->Data.Summon.UnitType) {
-					spellaction->Data.Summon.UnitType = 0;
+				spellaction->Data.Polymorph.NewForm = UnitTypeByIdent(value);
+				if (!spellaction->Data.Polymorph.NewForm) {
+					spellaction->Data.Polymorph.NewForm= 0;
 					DebugLevel0("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
 				}
 				// FIXME: temp polymorphs? hard to do.
+			} else if (!strcmp(value, "player-neutral")) {
+				spellaction->Data.Polymorph.PlayerNeutral = 1;
+				--j;
 			} else {
 				lua_pushfstring(l, "Unsupported polymorph tag: %s", value);
 				lua_error(l);
