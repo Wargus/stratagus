@@ -174,11 +174,11 @@ global int AiFindAvailableUnitTypeEquiv(const UnitType * unittype,int * usableTy
 	    }
 	}
     }
-    DebugLevel0Fn("prefered order for %s is " _C_ unittype->Ident);
+    DebugLevel3Fn("prefered order for %s is " _C_ unittype->Ident);
     for (i = 0; i < usableTypesCount; i++) {
-	DebugLevel0(" %s" _C_ UnitTypes[usableTypes[i]]->Ident);
+	DebugLevel3(" %s" _C_ UnitTypes[usableTypes[i]]->Ident);
     }
-    DebugLevel0("\n");
+    DebugLevel3("\n");
     
     return usableTypesCount;
 }
@@ -340,7 +340,7 @@ global void AiCleanForce(int force)
 	prev = (&AiPlayer->Force[force].Units);
 	while ((aiunit = (*prev))) {
 	    if (counter[aiunit->Unit->Type->Type] > 0) {
-		DebugLevel0Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
+		DebugLevel3Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
 		counter[aiunit->Unit->Type->Type]--;
 		RefsDebugCheck(!aiunit->Unit->Refs);
 		--aiunit->Unit->Refs;

@@ -245,7 +245,9 @@ local void AiExecuteScripts(void)
     pai = AiPlayer;
 
     // Debugging
-    debugForces();
+    if (pai->ScriptDebug) {
+	debugForces();
+    }
 
     for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; i++) {
 	AiScript = pai->Scripts + i;
