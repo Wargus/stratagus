@@ -1344,7 +1344,7 @@ global void UIHandleButtonDown(unsigned button)
 	TheUI.LastClickedVP = GetViewport (CursorX, CursorY);
 	DebugLevel0Fn ("last clicked viewport changed to %d.\n" _C_
 		TheUI.LastClickedVP);
-	MustRedraw = RedrawMinimapCursor | RedrawMap;
+	MustRedraw |= RedrawMinimapCursor | RedrawMap;
 	/* to redraw the cursor immediately (and avoid up to 1 sec delay */
 #endif /* SPLIT_SCREEN_SUPPORT */
 	if( CursorBuilding ) {
