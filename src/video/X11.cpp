@@ -294,6 +294,38 @@ local void AllocPalette8(Palette* palette, Palette* syspalette,
     }
 }
 
+/*
+**	Create empty cursor to work around X11 brain-damage
+**	(can't hide the cursor)
+**
+**	@param display	X11 display
+**	@param root	Window?
+**
+**	@notes: 'stolen' from quake1 source
+*/
+Cursor CreateNullCursor(Display *display, Window root)
+{
+    Pixmap cursormask; 
+    XGCValues xgc;
+    GC gc;
+    XColor dummycolour;
+    Cursor cursor;
+
+    cursormask = XCreatePixmap(display, root, 1, 1, 1/*depth*/);
+    xgc.function = GXclear;
+    gc =  XCreateGC(display, cursormask, GCFunction, &xgc);
+    XFillRectangle(display, cursormask, gc, 0, 0, 1, 1);
+    dummycolour.pixel = 0;
+    dummycolour.red = 0;
+    dummycolour.flags = 04;
+    cursor = XCreatePixmapCursor(display, cursormask, cursormask,
+          &dummycolour,&dummycolour, 0,0);
+    XFreePixmap(display,cursormask);
+    XFreeGC(display,gc);
+    return cursor;
+}
+
+
 /**
 **	X11 initialize.
 */
@@ -419,7 +451,11 @@ foundvisual:
     TheMainDrawable = attributes.background_pixmap =
 	XShmCreatePixmap(TheDisplay,DefaultRootWindow(TheDisplay),
 	    shminfo.shmaddr,&shminfo,VideoWidth, VideoHeight, xvi. depth);
+#if 1
     attributes.cursor = XCreateFontCursor(TheDisplay, XC_tcross - 1);
+#else
+    attributes.cursor = CreateNullCursor(TheDisplay,TheMainDrawable);
+#endif
     attributes.backing_store = NotUseful;
     attributes.save_under = False;
     attributes.event_mask = KeyPressMask | KeyReleaseMask | /*ExposureMask|*/
@@ -1210,7 +1246,7 @@ local void VideoFreePallette(void* pixels)
 **
 **	@return		A hardware dependent pixel.
 */
-global unsigned long VideoMapRGB(int r, int g, int b)
+global VMemType VideoMapRGB(int r, int g, int b)
 {
     XColor color;
     XWindowAttributes xwa;
@@ -1229,7 +1265,7 @@ global unsigned long VideoMapRGB(int r, int g, int b)
 	//ExitFatal(-1);
     }
 
-    return color.pixel;
+    return (VMemType)(VMemType32)color.pixel;
 }
 
 /**

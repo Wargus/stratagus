@@ -269,6 +269,74 @@ local void AnimateActionHarvest(Unit* unit)
     }
 }
 
+/*
+**	Find something else to do when the resource is exhausted.
+**	This is called from GatherResorce when the resource is empty.
+**
+**	@param unit	pointer to harvester unit.
+**	@param source	pointer to resource unit.
+*/
+local void LoseResource(Unit* unit,const Unit* source)
+{
+    Unit* depot;
+    ResourceInfo* resinfo;
+    resinfo = unit->Type->ResInfo[unit->CurrentResource];
+
+    if (unit->Container) {
+	DebugCheck(resinfo->HarvestFromOutside);
+    }
+
+    //
+    //  If we are loaded first search for a depot.
+    // 
+    if (unit->Value && (depot = FindDeposit(unit, unit->X, unit->Y,
+	    1000, unit->CurrentResource))) {
+	if (unit->Container) {
+	    DropOutNearest(unit, depot->X + depot->Type->TileWidth / 2,
+		depot->Y + depot->Type->TileHeight / 2,
+		source->Type->TileWidth, source->Type->TileHeight);
+	}
+	//
+	//  Remember were it mined, so it can look around for another resource.
+	//  
+	unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
+	unit->Orders[0].Goal = depot;
+	RefsDebugCheck(!depot->Refs);
+	++depot->Refs;
+	NewResetPath(unit);
+	unit->SubAction = SUB_MOVE_TO_DEPOT;
+	unit->Wait = unit->Reset = 1;
+	unit->State = 0;
+	DebugLevel0Fn("Sent unit %d to depot\n" _C_ unit->Slot);
+	return;
+    }
+    //
+    //	No depot found, or harvester empty
+    //	Dump the unit outside and look for something to do.
+    //
+    if (unit->Container) {
+	DebugCheck(resinfo->HarvestFromOutside);
+	DropOutOnSide(unit, LookingW, source->Type->TileWidth,
+	    source->Type->TileHeight);
+    }
+    unit->Orders[0].X = unit->Orders[0].Y = -1;
+    if ((unit->Orders[0].Goal = FindResource(unit, unit->X, unit->Y,
+	    10, unit->CurrentResource))) {
+	DebugLevel0Fn("Unit %d found another resource.\n" _C_ unit->Slot);
+	unit->SubAction = SUB_START_RESOURCE;
+	unit->Wait = unit->Reset = 1;
+	unit->State = 0;
+	RefsDebugCheck(!uins->Orders[0].Goal->Refs);
+	++unit->Orders[0].Goal->Refs;
+    } else {
+	DebugLevel0Fn("Unit %d just sits around confused.\n" _C_ unit->Slot);
+	unit->Orders[0].Action = UnitActionStill;
+	unit->SubAction = 0;
+	unit->Wait = unit->Reset = 1;
+	unit->State = 0;
+    }
+}
+
 /**
 **	Wait in resource, for collecting the resource.
 **
@@ -279,7 +347,6 @@ local void AnimateActionHarvest(Unit* unit)
 local int GatherResource(Unit* unit)
 {
     Unit* source;
-    Unit* depot;
     Unit* uins;
     ResourceInfo* resinfo;
     int i;
@@ -376,45 +443,14 @@ local int GatherResource(Unit* unit)
 	    //
 	    if (source->Destroyed || source->Removed || !source->HP ||
 		    source->Orders[0].Action == UnitActionDie || source->Value == 0) {
-		DebugLevel0Fn("Resource is destroyed\n");
+		DebugLevel0Fn("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 		uins = source->UnitInside;
 		//
 		// Improved version of DropOutAll that makes workers go to the depot.
-		// FIXME: empty harvesters should find another resource.
 		// 
+		LoseResource(unit,source);
 		for (i = source->InsideCount; i; --i, uins = uins->NextContained) {
-		    if (uins->Value && (depot = FindDeposit(uins, uins->X, uins->Y,
-			    1000, unit->CurrentResource))) {
-			DropOutNearest(uins, depot->X + depot->Type->TileWidth / 2,
-			    depot->Y + depot->Type->TileHeight / 2,
-			    source->Type->TileWidth, source->Type->TileHeight);
-			//  Remember were it mined, so it can look around for another resource.
-			uins->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
-			uins->Orders[0].Goal = depot;
-			RefsDebugCheck(!depot->Refs);
-			++depot->Refs;
-			NewResetPath(uins);
-			uins->SubAction = SUB_MOVE_TO_DEPOT;
-			uins->Wait = 1;
-			DebugLevel0Fn("Sent unit %d to depot\n" _C_ uins->Slot);
-			continue;
-		    }
-		    DropOutOnSide(uins, LookingW, source->Type->TileWidth,
-			source->Type->TileHeight);
-		    uins->Orders[0].X = uins->Orders[0].Y = -1;
-		    if ((uins->Orders[0].Goal = FindResource(uins, uins->X, uins->Y,
-			    10, unit->CurrentResource))) {
-			DebugLevel0Fn("Unit %d found another resource.\n" _C_ uins->Slot);
-			uins->SubAction = SUB_START_RESOURCE;
-			uins->Wait = 1;
-			RefsDebugCheck(!uins->Orders[0].Goal->Refs);
-			++uins->Orders[0].Goal->Refs;
-		    } else {
-			DebugLevel0Fn("Unit %d just sits around confused.\n" _C_ uins->Slot);
-			uins->Orders[0].Action = UnitActionStill;
-			uins->SubAction = 0;
-			uins->Wait = unit->Reset = 1;
-		    }
+		    LoseResource(uins,source);
 		}
 
 		//  Don't destroy the resource twice.
@@ -424,6 +460,7 @@ local int GatherResource(Unit* unit)
 		    // FIXME: make the workers inside look for a new resource.
 		}
 		source = NULL;
+		return 0;
 	    }
 	}
 	if (resinfo->TerrainHarvester) {
@@ -484,9 +521,9 @@ local int StopGathering(Unit* unit)
     unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
  
     if (!unit->Value) {
-	DebugLevel0Fn("Unit is empty???\n");
+	DebugLevel0Fn("Unit %d is empty???\n" _C_ unit->Slot);
     } else {
-	DebugLevel3Fn("Unit is fine, search for a depot.\n");
+	DebugLevel3Fn("Unit %d is fine, search for a depot.\n" _C_ unit->Slot);
     }
     // Find and send to resource deposit.
     if (!(depot = FindDeposit(unit, unit->X, unit->Y, 1000, unit->CurrentResource)) ||
@@ -496,7 +533,7 @@ local int StopGathering(Unit* unit)
 	    DropOutOnSide(unit, LookingW, source->Type->TileWidth,
 		source->Type->TileHeight);
 	}
-	DebugLevel0Fn("Can't find a resource deposit.\n");
+	DebugLevel0Fn("Can't find a resource deposit for unit %d.\n" _C_ unit->Slot);
 	unit->Orders[0].Action = UnitActionStill;
 	unit->SubAction = 0;
 	// should return 0, done below!
