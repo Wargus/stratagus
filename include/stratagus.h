@@ -330,7 +330,6 @@ typedef struct _title_screen_ {
 
 extern TitleScreen** TitleScreens;          ///< File for title screen
 extern char* GameName;                      ///< Name of the game
-extern char* MenuBackground;                ///< File for menu background
 extern char* MenuMusic;                     ///< File for menu music
 extern char* ClickMissile;                  ///< Missile to show when you click
 extern char* DamageMissile;                 ///< Missile to show damage caused

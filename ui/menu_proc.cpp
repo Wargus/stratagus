@@ -162,21 +162,6 @@ global Menu* FindMenu(const char* menu_id)
 }
 
 /**
-**		Set menu backgound and draw it.
-*/
-global void MenusSetBackground(void)
-{
-	if (!Menusbgnd) {
-		Menusbgnd = LoadGraphic(MenuBackground);
-		ResizeGraphic(Menusbgnd, VideoWidth, VideoHeight);
-	}
-
-	VideoDrawSubClip(Menusbgnd, 0, 0,
-		Menusbgnd->Width, Menusbgnd->Height,
-		(VideoWidth - Menusbgnd->Width) / 2, (VideoHeight - Menusbgnd->Height) / 2);
-}
-
-/**
 **		Draw menu button 'button' on x,y
 **
 **		@param button		Button identifier
