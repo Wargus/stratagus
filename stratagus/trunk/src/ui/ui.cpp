@@ -689,10 +689,6 @@ global void SaveUserInterface(CLFile* file)
 	CLprintf(file, "\n;;; -----------------------------------------\n");
 	CLprintf(file, ";;; MODULE: ui $Id$\n\n");
 
-	// Contrast, Brightness, Saturation
-	CLprintf(file, "(set-contrast! %d)\n", TheUI.Contrast);
-	CLprintf(file, "(set-brightness! %d)\n", TheUI.Brightness);
-	CLprintf(file, "(set-saturation! %d)\n\n", TheUI.Saturation);
 	// Scrolling
 	CLprintf(file, "(set-mouse-scroll! %s)\n", TheUI.MouseScroll ? "#t" : "#f");
 	CLprintf(file, "(set-mouse-scroll-speed! %d)\n", SpeedMouseScroll);

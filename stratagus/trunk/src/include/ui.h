@@ -140,10 +140,6 @@ typedef struct _ui_ {
 	int				Width;						/// useable for this width
 	int				Height;						/// useable for this height
 
-	int				Contrast;				/// General Contrast
-	int				Brightness;				/// General Brightness
-	int				Saturation;				/// General Saturation
-
 	int				MouseScroll;				/// Enable mouse scrolling
 	int				KeyScroll;				/// Enable keyboard scrolling
 		/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)

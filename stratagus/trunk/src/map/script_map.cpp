@@ -437,38 +437,9 @@ local int CclAlphaFogOfWar(lua_State* l)
 }
 
 /**
-**		Gray style fog of war contrast.
-*/
-local int CclSetFogOfWarContrast(lua_State* l)
-{
-	int i;
-	int old;
-
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	i = LuaToNumber(l, 1);
-	if (i < 0 || i > 400) {
-		PrintFunction();
-		fprintf(stdout, "Contrast should be 0 - 400\n");
-		i = 100;
-	}
-	old = FogOfWarContrast;
-	FogOfWarContrast = i;
-
-	if (!CclInConfigFile) {
-		InitMapFogOfWar();
-	}
-
-	lua_pushnumber(l, old);
-	return 1;
-}
-
-/**
 **		Gray style fog of war brightness.
 */
-local int CclSetFogOfWarBrightness(lua_State* l)
+local int CclSetFogOfWarOpacity(lua_State* l)
 {
 	int i;
 	int old;
@@ -478,42 +449,13 @@ local int CclSetFogOfWarBrightness(lua_State* l)
 		lua_error(l);
 	}
 	i = LuaToNumber(l, 1);
-	if (i < -100 || i > 100) {
+	if (i < 0 || i > 255) {
 		PrintFunction();
-		fprintf(stdout, "Brightness should be -100 - 100\n");
+		fprintf(stdout, "Opacity should be 0 - 256\n");
 		i = 100;
 	}
-	old = FogOfWarBrightness;
-	FogOfWarBrightness = i;
-
-	if (!CclInConfigFile) {
-		InitMapFogOfWar();
-	}
-
-	lua_pushnumber(l, old);
-	return 1;
-}
-
-/**
-**		Gray style fog of war saturation.
-*/
-local int CclSetFogOfWarSaturation(lua_State* l)
-{
-	int i;
-	int old;
-
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	i = LuaToNumber(l, 1);
-	if (i < -100 || i > 200) {
-		PrintFunction();
-		fprintf(stdout, "Saturation should be -100 - 200\n");
-		i = 100;
-	}
-	old = FogOfWarSaturation;
-	FogOfWarSaturation = i;
+	old = FogOfWarOpacity;
+	FogOfWarOpacity = i;
 
 	if (!CclInConfigFile) {
 		InitMapFogOfWar();
@@ -573,9 +515,7 @@ global void MapCclRegister(void)
 	lua_register(Lua, "OriginalFogOfWar", CclOriginalFogOfWar);
 	lua_register(Lua, "AlphaFogOfWar", CclAlphaFogOfWar);
 
-	lua_register(Lua, "SetFogOfWarContrast", CclSetFogOfWarContrast);
-	lua_register(Lua, "SetFogOfWarBrightness", CclSetFogOfWarBrightness);
-	lua_register(Lua, "SetFogOfWarSaturation", CclSetFogOfWarSaturation);
+	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 }

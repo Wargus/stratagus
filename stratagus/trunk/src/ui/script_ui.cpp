@@ -202,90 +202,6 @@ local int CclSetDamageMissile(lua_State* l)
 }
 
 /**
-**		Game contrast.
-**
-**		@param contrast		New contrast 0 - 400.
-**		@return				Old contrast.
-*/
-local int CclSetContrast(lua_State* l)
-{
-	int i;
-	lua_Number old;
-
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	old = TheUI.Contrast;
-	i = LuaToNumber(l, 1);
-	if (i < 0 || i > 400) {
-		lua_pushstring(l, "Contrast should be 0 - 400");
-		lua_error(l);
-	}
-	TheUI.Contrast = i;
-	MustRedraw = RedrawEverything;
-
-	lua_pushnumber(l, old);
-	return 1;
-}
-
-/**
-**		Game brightness.
-**
-**		@param brightness		New brightness -100 - 100.
-**		@return						Old brightness.
-*/
-local int CclSetBrightness(lua_State* l)
-{
-	int i;
-	lua_Number old;
-
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	old = TheUI.Brightness;
-	i = LuaToNumber(l, 1);
-	if (i < -100 || i > 100) {
-		lua_pushstring(l, "Brightness should be -100 - 100");
-		lua_error(l);
-	}
-	TheUI.Brightness = i;
-	MustRedraw = RedrawEverything;
-
-	lua_pushnumber(l, old);
-	return 1;
-}
-
-/**
-**		Game saturation.
-**
-**		@param saturation		New saturation -100 - 200.
-**		@return						Old saturation.
-*/
-local int CclSetSaturation(lua_State* l)
-{
-	int i;
-	lua_Number old;
-
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	old = TheUI.Saturation;
-	i = LuaToNumber(l, 1);
-	if (i < -100 || i > 200) {
-		lua_pushstring(l, "Saturation should be -100 - 200");
-		lua_error(l);
-	}
-	TheUI.Saturation = i;
-	MustRedraw = RedrawEverything;
-
-	lua_pushnumber(l, old);
-	return 1;
-}
-
-/**
 **		Set the video resolution.
 **
 **		@param width		Resolution width.
@@ -1332,10 +1248,6 @@ local int CclDefineUI(lua_State* l)
 	//
 
 	// This save the setup values FIXME: They are set by CCL.
-
-	ui->Contrast = TheUI.Contrast;
-	ui->Brightness = TheUI.Brightness;
-	ui->Saturation = TheUI.Saturation;
 
 	ui->MouseScroll = TheUI.MouseScroll;
 	ui->KeyScroll = TheUI.KeyScroll;
@@ -4382,10 +4294,6 @@ global void UserInterfaceCclRegister(void)
 
 	lua_register(Lua, "SetClickMissile", CclSetClickMissile);
 	lua_register(Lua, "SetDamageMissile", CclSetDamageMissile);
-
-	lua_register(Lua, "SetContrast", CclSetContrast);
-	lua_register(Lua, "SetBrightness", CclSetBrightness);
-	lua_register(Lua, "SetSaturation", CclSetSaturation);
 
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);

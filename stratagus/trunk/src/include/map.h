@@ -365,11 +365,7 @@ extern Deco* MapDecoration;
 	/// Use original style fog of war
 extern int OriginalFogOfWar;
 	/// Contrast of fog of war
-extern int FogOfWarContrast;
-	/// Brightness of fog of war
-extern int FogOfWarBrightness;
-	/// Saturation of fog of war
-extern int FogOfWarSaturation;
+extern int FogOfWarOpacity;
 	/// Forest regeneration
 extern int ForestRegeneration;
 	/// Flag must reveal the map
