@@ -678,7 +678,7 @@ global void CircularFillerDone(CircularFiller * filler)
 **	@param filler	the filler
 **	@return 	1 if one point marked, 0 else
 */
-local int CircularFillerStep(CircularFiller * filler)
+global int CircularFillerStep(CircularFiller * filler)
 {
     int fillx,filly;
     int adjx,adjy;
