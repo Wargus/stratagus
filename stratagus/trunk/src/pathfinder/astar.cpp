@@ -88,10 +88,10 @@ local int AStarMatrixSize;
 
 /// see pathfinder.h
 global int AStarFixedUnitCrossingCost=MaxMapWidth*MaxMapHeight;
-global int AStarMovingUnitCrossingCost=2;
-global int AStarOn=0;
+global int AStarMovingUnitCrossingCost=5;
+global int AStarOn=1;
 global int AStarKnowUnknown=0;
-global int AStarUnknownTerrainCost=100;
+global int AStarUnknownTerrainCost=2;
 
 /**
 **	The Open set is handled by a Heap stored in a table
