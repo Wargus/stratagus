@@ -935,7 +935,8 @@ global void EditorUpdateDisplay(void)
     //  Menu button
     //
     DrawMenuButton(TheUI.MenuButton.Button,
-	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
+	    (ButtonAreaUnderCursor == ButtonAreaMenu
+		&& ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
 	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
 	    TheUI.MenuButton.Width, TheUI.MenuButton.Height,
 	    TheUI.MenuButton.X,TheUI.MenuButton.Y,
@@ -998,7 +999,8 @@ local void EditorCallbackButtonUp(unsigned button)
 
     if ((1<<button) == LeftButton && GameMenuButtonClicked == 1) {
 	GameMenuButtonClicked = 0;
-	if (ButtonUnderCursor == 0) {
+	if (ButtonAreaUnderCursor == ButtonAreaMenu
+		&& ButtonUnderCursor == ButtonUnderMenu) {
 	    ProcessMenu("menu-editor", 1);
 	}
     }
@@ -1019,7 +1021,8 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     //
     //  Click on menu button
     //
-    if (CursorOn == CursorOnButton && ButtonUnderCursor == 0
+    if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu
+	    && ButtonUnderCursor == ButtonUnderMenu
 	    && (MouseButtons & LeftButton) && !GameMenuButtonClicked) {
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 	GameMenuButtonClicked = 1;
@@ -1564,6 +1567,7 @@ local void EditorCallbackMouse(int x, int y)
     CursorOn = -1;
     CursorPlayer = -1;
     CursorUnitIndex = -1;
+    ButtonAreaUnderCursor = -1;
     ButtonUnderCursor = -1;
 
     //
@@ -1705,21 +1709,18 @@ local void EditorCallbackMouse(int x, int y)
 	SetStatusLine("Tile mode");
 	return;
     }
-#if 0
-    for (i = 0; i < (int)(sizeof(TheUI.Buttons)/sizeof(*TheUI.Buttons)); ++i) {
-	if (x < TheUI.Buttons[i].X
-		|| x > TheUI.Buttons[i].X + TheUI.Buttons[i].Width
-		|| y < TheUI.Buttons[i].Y
-		|| y > TheUI.Buttons[i].Y + TheUI.Buttons[i].Height) {
-	    continue;
+    if( TheUI.MenuButton.X!=-1 ) {
+	if( x>=TheUI.MenuButton.X
+		&& x<=TheUI.MenuButton.X+TheUI.MenuButton.Width
+		&& y>TheUI.MenuButton.Y
+		&& y<=TheUI.MenuButton.Y+TheUI.MenuButton.Height ) {
+	    ButtonAreaUnderCursor=ButtonAreaMenu;
+	    ButtonUnderCursor=ButtonUnderMenu;
+	    CursorOn=CursorOnButton;
+	    MustRedraw|=RedrawMenuButton;
+	    return;
 	}
-	DebugLevel3("On button %d\n" _C_ i);
-	ButtonUnderCursor = i;
-	CursorOn = CursorOnButton;
-	ClearStatusLine();
-	return;
     }
-#endif
 
     //
     //  Minimap
