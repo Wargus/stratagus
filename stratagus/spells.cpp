@@ -776,11 +776,6 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
     //	Now check conditions regarding the target unit.
     //
     if (target) {
-	if (condition->Volatile != CONDITION_TRUE) {
-	    if ((condition->Volatile == CONDITION_ONLY) ^ (target->Type->Volatile)) {
-		return 0;
-	    }
-	}
 	if (condition->Building != CONDITION_TRUE) {
 	    if ((condition->Building == CONDITION_ONLY) ^ (target->Type->Building)) {
 		return 0;

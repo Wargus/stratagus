@@ -366,10 +366,7 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
     while (!gh_null_p(list)) {
 	value = gh_car(list);
 	list = gh_cdr(list);
-	if (gh_eq_p(value, gh_symbol2scm("volatile"))) {
-	    condition->Volatile = Scm2Condition(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("coward"))) {
+	if (gh_eq_p(value, gh_symbol2scm("coward"))) {
 	    condition->Coward = Scm2Condition(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("alliance"))) {
@@ -725,9 +722,6 @@ local void SaveSpellCondition(CLFile *file, ConditionInfo* condition)
     //	First save data related to flags.
     //	NOTE: (int) is there to keep compilers happy.
     //
-    if (condition->Volatile != CONDITION_TRUE) {
-	CLprintf(file, "volatile %s ", condstrings[(int)condition->Volatile]);
-    }
     if (condition->Coward != CONDITION_TRUE) {
 	CLprintf(file, "coward %s ", condstrings[(int)condition->Coward]);
     }
