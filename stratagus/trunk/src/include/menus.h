@@ -64,11 +64,6 @@ typedef int MenuButtonId;
 
 /// @todo FILL IN THIS TABLE!!!!
 
-#define MBUTTON_MAIN         4 /// @todo write docu
-#define MBUTTON_NETWORK      7
-#define MBUTTON_GM_HALF     10
-#define MBUTTON_132         13
-#define MBUTTON_GM_FULL     16
 #define MBUTTON_GEM_ROUND   19
 #define MBUTTON_GEM_SQUARE  24
 #define MBUTTON_UP_ARROW    29
@@ -80,7 +75,6 @@ typedef int MenuButtonId;
 #define MBUTTON_S_HCONT     44
 #define MBUTTON_PULLDOWN    46
 #define MBUTTON_VTHIN       48
-#define MBUTTON_FOLDER      51  /* expansion gfx only */
 
 #define MBUTTON_SC_GEM_ROUND                 7
 #define MBUTTON_SC_GEM_SQUARE               12
@@ -123,6 +117,8 @@ typedef int MenuButtonId;
 #define MIN_GAME_SPEED 50
 #define MAX_GAME_SPEED 250
 
+typedef struct _button_style_ ButtonStyle;
+
 /*----------------------------------------------------------------------------
 --  Menus
 ----------------------------------------------------------------------------*/
@@ -142,11 +138,7 @@ typedef struct _menuitem_text_ {
 } MenuitemText;
 typedef struct _menuitem_button_ {
 	unsigned char* text;
-	int xsize;
-	int ysize;
-	MenuButtonId button;
-	char* normalcolor;
-	char* reversecolor;
+	ButtonStyle* style;
 	void (*handler)(void);
 	unsigned hotkey;
 } MenuitemButton;
@@ -161,8 +153,6 @@ typedef struct _menuitem_pulldown_ {
 	int curopt;
 	int cursel;  /* used in popup state */
 	unsigned int state;
-	char *normalcolor;
-	char *reversecolor;
 } MenuitemPulldown;
 typedef struct _menuitem_listbox_ {
 	void *options;
@@ -177,8 +167,6 @@ typedef struct _menuitem_listbox_ {
 	int nlines;
 	int startline;
 	int dohandler;
-	char *normalcolor;
-	char *reversecolor;
 	void *(*retrieveopt)(struct _menuitem_ *, int);
 	void (*handler)(void);  /* for return key */
 } MenuitemListbox;
@@ -353,9 +341,6 @@ extern _MenuFuncHash MenuFuncHash;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-	/// Menu button style to char*
-extern char *MenuButtonStyle(int style);
-
 	/// Initialize the hash tables for the menus
 extern void InitMenuFuncHash(void);
 
@@ -365,8 +350,8 @@ extern void InitMenus(int race);
 	/// Draw menu
 extern void DrawMenu(Menu* menu);
 	/// Draw menu button
-extern void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w, int h,
-	int x, int y, const int font, const unsigned char* text, char* normalcolor, char* reversecolor);
+extern void DrawMenuButton(ButtonStyle* style, unsigned flags, int transparent,
+	int x, int y, const unsigned char* text);
 	/// Set menu backgound and draw it
 extern void MenusSetBackground(void);
 	/// Draw and process a menu

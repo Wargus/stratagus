@@ -938,14 +938,13 @@ void EditorUpdateDisplay(void)
 			TheUI.MenuPanel.Graphic->Height,
 			TheUI.MenuPanelX, TheUI.MenuPanelY);
 	}
-		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
-	DrawMenuButton(TheUI.MenuButton.Button,
+	// FIXME: Transparent flag, 3rd param, has been hardcoded.
+	DrawMenuButton(TheUI.MenuButton.Style,
 		(ButtonAreaUnderCursor == ButtonAreaMenu
 			&& ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
 		(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
-		TheUI.MenuButton.Width, TheUI.MenuButton.Height,
 		TheUI.MenuButton.X,TheUI.MenuButton.Y,
-		GameFont,TheUI.MenuButton.Text, NULL, NULL);
+		TheUI.MenuButton.Text);
 
 	//
 	// Minimap border
