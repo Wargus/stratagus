@@ -1461,15 +1461,15 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		case MI_TYPE_LISTBOX:
 		    if (mi->d.listbox.startline > 0) {
 			mi->d.listbox.startline--;
-			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1) {
+			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1)
 			    mi->d.listbox.curopt++;
-			}
-			else {
-			    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
-				/ (mi->d.listbox.noptions - 1);
-			}
-			MustRedraw |= RedrawMenu;
+		    } else {
+			if (mi->d.listbox.curopt != 0) {
+			    mi->d.listbox.curopt--; }
 		    }
+		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
+			/ (mi->d.listbox.noptions - 1);
+		    MustRedraw |= RedrawMenu;
 		    break;
 		default:
 		    break;
@@ -1484,15 +1484,15 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		case MI_TYPE_LISTBOX:
 		    if (mi->d.listbox.startline < mi->d.listbox.noptions - mi->d.listbox.nlines) {
 			mi->d.listbox.startline++;
-			if (mi->d.listbox.curopt != 0) {
+			if (mi->d.listbox.curopt != 0)
 			    mi->d.listbox.curopt--;
-			}
-			else {
-			    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
-				/ (mi->d.listbox.noptions - 1);
-			}
-			MustRedraw |= RedrawMenu;
+		    } else {
+			if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1)
+			    mi->d.listbox.curopt++;
 		    }
+		    mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)\
+			/ (mi->d.listbox.noptions - 1);
+		    MustRedraw |= RedrawMenu;
 		    break;
 		default:
 		    break;
