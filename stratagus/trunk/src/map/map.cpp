@@ -298,7 +298,7 @@ global int RockOnMap(int tx,int ty)
 	}
     );
 
-    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldRock;
+    return TheMap.Fields[tx+ty*TheMap.Width].Flags&MapFieldRocks;
 }
 
 /**
