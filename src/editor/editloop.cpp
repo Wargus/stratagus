@@ -637,11 +637,11 @@ local void DrawUnitIcons(void)
 
 			VideoDrawRectangleClip(ColorGray, x, y, icon->Width, icon->Height);
 			if (i == SelectedUnitIndex) {
-				VideoDrawRectangle(ColorGreen, x + 1, y + 1,
+				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1,
 					icon->Width - 2, icon->Height - 2);
 			}
 			if (i == CursorUnitIndex) {
-				VideoDrawRectangle(ColorWhite,x - 1, y - 1,
+				VideoDrawRectangleClip(ColorWhite,x - 1, y - 1,
 					icon->Width + 2, icon->Height + 2);
 			}
 

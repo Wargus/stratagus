@@ -284,10 +284,11 @@ global void UnitCacheRemove(Unit* unit)
 			} else {
 				if (mf->UnitCache != listitem) {
 					DebugLevel0Fn("Try to remove unit not in cache. (%d)\n" _C_ unit->Slot);
+				} else {
+					// item is head of the list.
+					mf->UnitCache = listitem->Next;
+					DebugCheck(mf->UnitCache && mf->UnitCache->Prev);
 				}
-				// item is head of the list.
-				mf->UnitCache = listitem->Next;
-				DebugCheck(mf->UnitCache && mf->UnitCache->Prev);
 			}
 
 			listitem->Next = listitem->Prev = 0;
