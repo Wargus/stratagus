@@ -156,7 +156,7 @@ local void EnterTransporter(Unit* unit)
     //
     //	Find free slot in transporter.
     //
-    for( i=0; i<sizeof(unit->OnBoard)/sizeof(*unit->OnBoard); ++i ) {
+    for( i=0; i<(int)(sizeof(unit->OnBoard)/sizeof(*unit->OnBoard)); ++i ) {
 	if( transporter->OnBoard[i]==NoUnitP ) {
 	    transporter->OnBoard[i]=unit;
 	    // FIXME: reference counts?
