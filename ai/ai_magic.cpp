@@ -93,69 +93,96 @@ local void AiInitMagic(void)
 }
 
 /**
-**	Do magic for ogre-mage.
+**	Check if the unit should cast the "bloodlust" spell.
+**
+**	If the spell is available and the unit has enough mana, the surrounding
+**	of the unit is checked if any enemy units are in sight. If enemy units
+**	are in sight the spell is casted on own units in range. 
+**
+**	@param unit	Magic unit.
+**
+**	@return		True, if a spell is casted.
+**
+**	@note This function can also be used for auto bloodlust.
 */
-local void AiDoOgreMage(Unit* unit)
+local int AiBloodlustSpell(Unit* unit)
 {
+    Unit* best;
+    Unit* table[UnitMax];
     int r;
+    int i;
+    int n;
 
-    if( UpgradeIdentAvailable(AiPlayer->Player,"upgrade-bloodlust") ) {
-	if( unit->Mana>AiBloodlust->ManaCost ) {
-	    Unit* table[UnitMax];
-	    int n;
-	    int i;
+    if (UpgradeIdentAvailable(AiPlayer->Player, "upgrade-bloodlust")
+	    && unit->Mana > AiBloodlust->ManaCost) {
 
-	    r=unit->Type->ReactRangeComputer;
-	    n=SelectUnits(unit->X-r,unit->Y-r,unit->X+r+1,unit->Y+r+1,table);
-	    if( n ) {
-		for( i=0; i<n; ++i ) {
-		    Unit* best;
+	r = unit->Type->ReactRangeComputer;
+	n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	    unit->Y + r + 1, table);
 
-		    // a friend or neutral
-		    if( !IsEnemy(unit->Player,table[i]) ) {
-			continue;
-		    }
-		    if( !table[i]->Type->CanAttack ) {
-			continue;
-		    }
-		    //
-		    //	We have an enemy in range.
-		    //
-		    best=NoUnitP;
-		    for( i=0; i<n; ++i ) {
-			if( table[i]==unit 
-				|| table[i]->Bloodlust
-				|| !table[i]->Type->CanAttack ) {
-			    continue;
-			}
-			// Allied unit
-			// FIXME: should ally to self
-			if( unit->Player!=table[i]->Player && 
-				!IsAllied(unit->Player,table[i]) ) {
-			    continue;
-			}
-			r=MapDistanceBetweenUnits(unit,table[i]);
-			DebugLevel0Fn("Distance %d\n",r);
-			if( r<=1 ) {
-			    DebugLevel0Fn("`%s' cast bloodlust\n"
-				_C_ unit->Type->Ident);
-			    CommandSpellCast(unit,0,0,table[i],
-				AiBloodlust,FlushCommands);
-			    break;
-			}
-			if( r==2 ) {
-			    best=table[i];
-			}
-		    }
-		    if( best ) {
-			CommandSpellCast(unit,0,0,best,
-			    AiBloodlust,FlushCommands);
-		    }
-		    break;
+	for (i = 0; i < n; ++i) {
+
+	    // an enemy which can attack
+	    if (!IsEnemy(unit->Player, table[i])
+		    || (!table[i]->Type->CanAttack)) {
+		continue;
+	    }
+	    //
+	    //      We have an enemy in range.
+	    //
+	    best = NoUnitP;
+	    for (i = 0; i < n; ++i) {
+		// not self, not already bloodlust and can attack
+		if (table[i] == unit || table[i]->Bloodlust
+			|| !table[i]->Type->CanAttack) {
+		    continue;
+		}
+		// Allied unit
+		// FIXME: should ally to self
+		if (unit->Player != table[i]->Player
+			&& !IsAllied(unit->Player, table[i])) {
+		    continue;
+		}
+		r = MapDistanceBetweenUnits(unit, table[i]);
+		DebugLevel0Fn("Distance %d\n", r);
+		if (r <= 1) {
+		    DebugLevel0Fn("`%s' cast bloodlust\n" _C_ unit->Type->
+			Ident);
+		    CommandSpellCast(unit, 0, 0, table[i], AiBloodlust,
+			FlushCommands);
+		    return 1;
+		}
+		if (r == 2) {
+		    best = table[i];
 		}
 	    }
+	    if (best) {
+		CommandSpellCast(unit, 0, 0, best, AiBloodlust,
+		    FlushCommands);
+		return 1;
+	    }
+	    break;
 	}
     }
+    return 0;
+}
+
+/**
+**	Check if the unit should cast the "eye of vision" spell.
+**
+**	If the unit has nothing to do and the spell is available and the unit
+**	has full mana cast with a change of 1/32 the spell. The spells does
+**	nothing, because the AI cheats and already knows the surroundings.
+**
+**	@param unit	Magic unit.
+**
+**	@return		True, if a spell is casted.
+**
+**	@note This function can also be used for auto eye of vision.
+*/
+local int AiEyeOfVisionSpell(Unit* unit)
+{
+    int r;
 
     if( unit->Orders[0].Action==UnitActionStill ) {
 	if( UpgradeIdentAvailable(AiPlayer->Player,"upgrade-eye-of-kilrogg")
@@ -169,16 +196,41 @@ local void AiDoOgreMage(Unit* unit)
 
 		    CommandSpellCast(unit,unit->X,unit->Y,NoUnitP,
 			AiEyeOfVision,FlushCommands);
+		    return 1;
 		}
 	    }
 	}
     }
+    return 0;
 }
 
 /**
-**	Do magic for paladin.
+**	Do magic for ogre-mage.
 */
-local void AiDoPaladin(Unit* unit)
+local void AiDoOgreMage(Unit* unit)
+{
+    if( AiBloodlustSpell(unit) ) {
+	return;
+    }
+    if( AiEyeOfVisionSpell(unit) ) {
+	return;
+    }
+}
+
+/**
+**	Check if the unit should cast the "holy vision" spell.
+**
+**	If the unit has nothing to do and the spell is available and the unit
+**	has full mana cast with a change of 1/32 the spell. The spells does
+**	nothing, because the AI cheats and already knows the surroundings.
+**
+**	@param unit	Magic unit.
+**
+**	@return		True, if a spell is casted.
+**
+**	@note This function can also be used for auto holy vision.
+*/
+local int AiHolyVisionSpell(Unit* unit)
 {
     int r;
 
@@ -200,9 +252,21 @@ local void AiDoPaladin(Unit* unit)
 		    y=SyncRand()%TheMap.Height;
 		    CommandSpellCast(unit,x,y,NoUnitP,
 			AiHolyVision,FlushCommands);
+		    return 1;
 		}
 	    }
 	}
+    }
+    return 0;
+}
+
+/**
+**	Do magic for paladin.
+*/
+local void AiDoPaladin(Unit* unit)
+{
+    if( AiHolyVisionSpell(unit) ) {
+	return;
     }
 }
 
