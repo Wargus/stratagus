@@ -324,7 +324,6 @@ void CreateGame(const char* filename, WorldMap* map)
 {
 	int i;
 	int j;
-	char* s;
 
 	if (SaveGameLoading) {
 		SaveGameLoading = 0;
@@ -336,7 +335,6 @@ void CreateGame(const char* filename, WorldMap* map)
 	InitPlayers();
 
 	if (filename) {
-		s = NULL;
 		// FIXME: LibraryFile here?
 		if (CurrentMapPath != filename) {
 			//  strcpy is not safe if parameters overlap.
@@ -349,10 +347,6 @@ void CreateGame(const char* filename, WorldMap* map)
 		//
 		InitUnitTypes(1);
 		LoadMap(filename, map);
-
-		if (s) {
-			free(s);
-		}
 	}
 
 	GameCycle = 0;
