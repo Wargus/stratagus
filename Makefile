@@ -359,7 +359,7 @@ buildclean:
 release:
 	$(MAKE) distclean
 	$(MAKE) depend
-	$(MAKE) bin-dist "ZDEFS=-DUSE_ZLIB -DUSE_BZ2LIB" "ZLIBS=-lz -lbz2"
+	$(MAKE) bin-dist
 	$(MAKE) win32new
 	$(MAKE) win32-bin-dist
 	$(MAKE) win32-exe-dist
@@ -373,8 +373,8 @@ release:
 #-lws2_32 -Wl,--stack,63550000  -Wl,--stack,16777216
 WIN32=	\
     EXE='.exe' \
-    ZDEFS='-DUSE_ZLIB' \
-    ZLIBS='-lz' \
+    XLDFLAGS='' \
+    XIFLAGS='' \
     VIDEO='-DUSE_WIN32 $(SDL)'	\
     VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32'
 
