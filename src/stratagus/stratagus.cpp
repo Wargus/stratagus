@@ -336,7 +336,7 @@ global char* strdcat3(const char* l, const char* m, const char* r)
     return res;
 }
 
-#ifndef BSD
+#if !defined(BSD) || defined(__APPLE__)
 /**
 **	Case insensitive version of strstr
 **

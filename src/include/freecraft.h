@@ -528,7 +528,8 @@ extern void ShowLoadProgress(const char* fmt,...);
 extern char* strdcat(const char* l, const char* r);
     /// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char *m, const char* r);
-#ifndef BSD
+
+#if !defined(BSD) || defined(__APPLE__)
     /// case insensitive strstr
 extern char* strcasestr(char* str, const char* substr);
 #endif // BSD
