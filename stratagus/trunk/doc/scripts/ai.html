@@ -110,12 +110,11 @@ time the next statement is executed. No statement should use more than 3 ms.
 <h4>Example</h4>
 
 <pre>
+    ;; Defines the passive computer AI, which does nothing.
 (define-ai "wc2-passive" "*" "passive"
   '((ai:sleep	10000)
   (ai:restart) ))
 </pre>
-
-<p>Defines the passive computer AI, which does nothing.
 
 <h4>Used</h4>
 
@@ -278,18 +277,18 @@ Define an AI player. (NOT SUPPORTED)
 <h4>Example</h4>
 
 <pre>
+    ;; FIXME:
 FIXME:
     (define-ai-player (list ...))
 </pre>
 
-<p>FIXME:
-
 <h4>Not Used</h4>
 
 <a name="define-ai-wc-names"></a>
-<h3>(define-ai-wc-names (list ...))</h3>
+<h3>(define-ai-wc-names 'land-attack 'passive ... )</h3>
 
 Define AI mapping from original number to internal symbol.
+
 
 
 <dl>
@@ -301,11 +300,16 @@ Define AI mapping from original number to internal symbol.
 <h4>Example</h4>
 
 <pre>
-FIXME:
-    (define-ai-wc-names (list ...))
+    (define-ai-wc-names
+      'land-attack 'passive 'orc-03 'hum-04 'orc-04 'hum-05 'orc-05
+      'hum-06 'orc-06 'hum-07 'orc-07 'hum-08 'orc-08 'hum-09 'orc-09
+      'hum-10 'orc-10 'hum-11 'orc-11 'hum-12 'orc-12 'hum-13 'orc-13
+      'hum-14-orange 'orc-14-blue 'sea-attack 'air-attack 'hum-14-red
+      'hum-14-white 'hum-14-black 'orc-14-green 'orc-14-white 'orc-exp-04
+      'orc-exp-05 'orc-exp-07a 'orc-exp-09 'orc-exp-10 'orc-exp-12 'orc-exp-06a
+      'orc-exp-06b 'orc-exp-11a 'orc-exp-11b 'hum-exp-02a-red 'hum-exp-02b-black
+      ...
 </pre>
-
-<p>FIXME:
 
 <h4>Not Used</h4>
 
@@ -330,13 +334,12 @@ slower units will attack.</i>
 <h4>Example</h4>
 
 <pre>
+    ;; Force 0 is built with one footman. The script continues processing, if the
+    ;; footman is ready trained. Now attack the opponent with force 0.
     (ai:force 0 'unit-footman 1)
     (ai:wait-force 0)
     (ai:attack-with-force 0)
 </pre>
-
-<p>Force 0 is built with one footman. The script continues processing, if the
-footman is ready trained. Now attack the opponent with force 0.
 
 <h4>Used</h4>
 
@@ -358,12 +361,11 @@ supported.
 <h4>Example</h4>
 
 <pre>
+    ;; Force 0 is build with one footman. When the force is ready, sleep for
+    ;; 500 frames.
     (ai:force 0 'unit-footman 1)
     (if (ai:check-force 0) (ai:sleep 500))
 </pre>
-
-<p>Force 0 is build with one footman. When the force is ready, sleep for
-500 frames.
 
 <h4>Not Used</h4>
 
@@ -382,10 +384,9 @@ Enable or disable the debug output of the AI script execution.
 <h4>Example</h4>
 
 <pre>
+    ;; Prints now the commands of this computer player.
     (ai:debug #t)
 </pre>
-
-<p>Prints now the commands of this computer player.
 
 <h4>Used</h4>
 
@@ -400,10 +401,9 @@ Dump some AI debug information.
 <h4>Example</h4>
 
 <pre>
+    ;; Prints out some debug information.
     (ai:dump)
 </pre>
-
-<p>Prints out some debug information.
 
 <h4>Not Used</h4>
 
@@ -445,12 +445,11 @@ each unit-type one after the other?</i>
 <h4>Example</h4>
 
 <pre>
+    ;; First the force 0 is filled up with 4 footmans and 5 bowmans, after this
+    ;; force 1 is filled with 3 footmans and 2 bowmans.
     (ai:force 0 'unit-footman 4 'unit-bowman 5)
     (ai:force 1 'unit-footman 3 'unit-bowman 2)
 </pre>
-
-<p>First the force 0 is filled up with 4 footmans and 5 bowmans, after this
-force 1 is filled with 3 footmans and 2 bowmans.
 
 <h4>Used</h4>
 
@@ -475,10 +474,9 @@ supported.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets the role of force 0 to attack.
     (ai:force-role 0 'attack)
 </pre>
-
-<p>Sets the role of force 0 to attack.
 
 <h4>Used</h4>
 
@@ -493,10 +491,9 @@ Get the race of the current AI player.
 <h4>Example</h4>
 
 <pre>
+    ;; Returns the race name of the current AI player.
     (ai:get-race)
 </pre>
-
-<p>Returns the race name of the current AI player.
 
 <h4>Used</h4>
 
@@ -511,10 +508,9 @@ Get the number of cycles to sleep.
 <h4>Example</h4>
 
 <pre>
+    ;; Returns the number of cycles to sleep.
     (ai:get-sleep-cycles)
 </pre>
-
-<p>Returns the number of cycles to sleep.
 
 <h4>Not Used</h4>
 
@@ -538,11 +534,10 @@ additional could be requested.
 <h4>Example</h4>
 
 <pre>
+    ;; The great hall must be build before a barrack.
   (ai:need (unit-type 'unit-great-hall))
   (ai:need (unit-type 'unit-barrack))
 </pre>
-
-<p>The great hall must be build before a barrack.
 
 <h4>Used</h4>
 
@@ -557,10 +552,9 @@ Return the player of the running AI.
 <h4>Example</h4>
 
 <pre>
+    ;; Returns the player of the running AI.
     (ai:player)
 </pre>
-
-<p>Returns the player of the running AI.
 
 <h4>Not Used</h4>
 
@@ -582,10 +576,9 @@ AI could hang up.
 <h4>Example</h4>
 
 <pre>
+    ;; Research a better armor for land units.
     (ai:research 'upgrade-shield1)
 </pre>
-
-<p>Research a better armor for land units.
 
 <h4>Used</h4>
 
@@ -601,12 +594,11 @@ scripts.
 <h4>Example</h4>
 
 <pre>
+    ;; A endless script doing nothing.
 (define-ai "passive" "*" "passive"
   '( (ai:sleep   10000)
      (ai:restart) ))
 </pre>
-
-<p>A endless script doing nothing.
 
 <h4>Used</h4>
 
@@ -628,14 +620,13 @@ handled by the user.
 <h4>Example</h4>
 
 <pre>
+    ;; An example with a for ever loop. Wait for force 1 ready (all units trained),
+    ;; than attack with the force 1. This is done endless.
 (define attack-endloop
   '((ai:with-force 1)
     (ai:attack-with-force 1)
     (ai:script attack-endloop) ))
 </pre>
-
-<p>An example with a for ever loop. Wait for force 1 ready (all units trained),
-than attack with the force 1. This is done endless.
 
 <h4>Used</h4>
 
@@ -666,10 +657,9 @@ modifies the last request to the new number.
 <h4>Example</h4>
 
 <pre>
+    ;; Request two peons.
     (ai:set 'unit-peon 2)
 </pre>
-
-<p>Request two peons.
 
 <h4>Used</h4>
 
@@ -708,10 +698,9 @@ Set AI player resource collect percent.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the collect percent to 50% gold and 50% wood.
     (ai:set-collect! #(0  50 50 0  0 0 0))
 </pre>
-
-<p>Set the collect percent to 50% gold and 50% wood.
 
 <h4>Not Used</h4>
 
@@ -748,10 +737,9 @@ Set AI player resource reserve.
 <h4>Example</h4>
 
 <pre>
+    ;; Set all of the reserves to 0.
     (ai:set-reserve! #( 0  0 0 0  0 0 0))
 </pre>
-
-<p>Set all of the reserves to 0.
 
 <h4>Not Used</h4>
 
@@ -770,10 +758,9 @@ Wait some frames, to let the opponent (you) recover.
 <h4>Example</h4>
 
 <pre>
+    ;; Wait 500 frames ~16s.
     (ai:sleep 500)
 </pre>
-
-<p>Wait 500 frames ~16s.
 
 <h4>Used</h4>
 
@@ -796,10 +783,9 @@ upgrades.
 <h4>Example</h4>
 
 <pre>
+    ;; Upgrade a town-hall to keep.
     (ai:upgrade-to 'unit-keep)
 </pre>
-
-<p>Upgrade a town-hall to keep.
 
 <h4>Used</h4>
 
@@ -821,11 +807,10 @@ Don't forget to request an unit-type, before you wait on it.
 <h4>Example</h4>
 
 <pre>
+    ;; Proceed only if a peasant is ready.
     (ai:need 'unit-peasant)
     (ai:wait 'unit-peasant)
 </pre>
-
-<p>Proceed only if a peasant is ready.
 
 <h4>Used</h4>
 
@@ -848,12 +833,11 @@ supported.
 <h4>Example</h4>
 
 <pre>
+    ;; Force 0 is build with one footman. The script continues processing, if the
+    ;; footman is ready trained.
     (ai:force 0 'unit-footman 1)
     (ai:wait-force 0)
 </pre>
-
-<p>Force 0 is build with one footman. The script continues processing, if the
-footman is ready trained.
 
 <h4>Used</h4>
 

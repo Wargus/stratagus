@@ -136,8 +136,7 @@ Now it is possible to get the icon "skeleton" also with the name
 <a name="define-icon-wc-names"></a>
 <h3>(define-icon-wc-names icon-0 icon-1 ... icon-195)</h3>
 
-    Define the mapping of the icon numbers in puds, to the icon names.
-
+Define icon mapping from original number to internal symbol.
 
 <dl>
 <dt>icon-0</dt>
@@ -155,11 +154,10 @@ number are icons defined.
 <h4>Example</h4>
 
 <pre>
+    ;; This is the default icon mapping.
     (define-icon-wc-names 
       'icon-peasant 'icon-peon 'icon-footman ... )
 </pre>
-
-<p>This is the default icon mapping.
 
 <h4>Used</h4>
 
@@ -183,10 +181,9 @@ number are icons defined.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets the icon size to 46x38.
     (set-icon-size! 46 38)
 </pre>
-
-<p>Sets the icon size to 46x38.
 
 <h4>Used</h4>
 
@@ -207,10 +204,9 @@ number are icons defined.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets the number of icons per row to 5.
     (set-icons-per-row! 5)
 </pre>
-
-<p>Sets the number of icons per row to 5.
 
 <h4>Used</h4>
 

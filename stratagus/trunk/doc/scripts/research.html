@@ -77,9 +77,6 @@ NOT WRITTEN YET.
 <pre>
     (check-dependency)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
@@ -91,7 +88,6 @@ NOT WRITTEN YET.
 
 Define what unit-types and upgrades are enabled for each player during
 a level.
-
 
 <dl>
 <dt>name</dt>
@@ -115,10 +111,10 @@ a level.
 <h4>Example</h4>
 
 <pre>
-    (define-allow 'unit-catapult                    "AAAAAAAAAAAAAAAA")
+    ;; Allow the catapult for all 16 players.
+    (define-allow 'unit-catapult  "AAAAAAAAAAAAAAAA")
+    ;;                             ^- player 0    ^- player 15
 </pre>
-
-<p>Allow the catapult for all 16 players.
 
 <h4>Used</h4>
 
@@ -164,17 +160,12 @@ must be full filled before an unit or research can be used.
 <h4>Example</h4>
 
 <pre>
+    ;; The second sword upgrade is only possible, if the first sword upgrade is
+    ;; researched.
     (define-dependency 'upgrade-sword2 '(upgrade-sword1))
-</pre>
-
-<p>The second sword upgrade is only possible, if the first sword upgrade is
-   researched.
-
-<pre>
+    ;; The ranger upgrade is only available if a keep or castle is available.
     (define-dependency 'upgrade-ranger '(unit-keep) 'or '(unit-castle))
 </pre>
-
-<p>The ranger upgrade is only available if a keep or castle is available.
 
 <h4>Used</h4>
 
@@ -183,7 +174,7 @@ must be full filled before an unit or research can be used.
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
 <a name="define-modifier"></a>
-<h3>(define-modifier name '(effect1 effect1-arg) ...)</h3>
+<h3>(define-modifier upgrade-name '(effect1 effect1-arg) ...)</h3>
 
 Define the effects (modifier) of an upgrade. An upgrade can have multiple 
 modifiers. It can activate, enable or disable other upgrades and allows
@@ -191,10 +182,9 @@ complex reactions.
 
 
 <dl>
-<dt>name</dt>
-<dd>Name of the upgrade, which has this effects. See
-<a href="#define-modifier">(define-modifier)</a>. All effects change all old
-units and any new unit of a player.
+<dt>upgrade-name</dt>
+<dd>Name of the upgrade, which has this effects. All effects change
+all old units and any new unit of a player.
 </dd>
 <dt>'(effectN effectN-arg)</dt>
 <dd>A list of effects of the upgrade. Here are all possible effects:
@@ -283,15 +273,14 @@ units and any new unit of a player.
 <h4>Example</h4>
 
 <pre>
-  (define-modifier 'upgrade-sword1
-    '(piercing-damage 2)
-    '(apply-to unit-footman) '(apply-to unit-knight) '(apply-to unit-paladin)
-    '(apply-to unit-dwarves) '(apply-to unit-d_____) '(apply-to unit-l_____)
-    '(apply-to unit-u____-l___________) '(apply-to unit-t_______))
+    ;; This is the default effect of the first sword upgrade. The piercing damage
+    ;; of the listed units is increased.
+    (define-modifier 'upgrade-sword1
+      '(piercing-damage 2)
+      '(apply-to unit-footman) '(apply-to unit-knight) '(apply-to unit-paladin)
+      '(apply-to unit-dwarves) '(apply-to unit-d_____) '(apply-to unit-l_____)
+      '(apply-to unit-u____-l___________) '(apply-to unit-t_______))
 </pre>
-
-<p>This is the default effect of the first sword upgrade. The piercing damage
-of the listed units is increased.
 
 <h4>Used</h4>
 
@@ -324,13 +313,12 @@ be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
 <h4>Example</h4>
 
 <pre>
+    ;; This is the default definition of the first sword upgrade. The icon
+    ;; "icon-sword2" is shown in buttons and during the upgrade. The upgrade costs
+    ;; 200 frame cycles to research and 800 gold from the store.
     (define-upgrade 'upgrade-sword1 'icon 'icon-sword2
       'costs #(   200   800     0     0     0     0     0))
 </pre>
-
-<p>This is the default definition of the first sword upgrade. The icon
-"icon-sword2" is shown in buttons and during the upgrade. The upgrade costs
-200 frame cycles to research and 800 gold from the store.
 
 <h4>Used</h4>
 
@@ -341,8 +329,7 @@ be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
 <a name="define-upgrade-wc-names"></a>
 <h3>(define-upgrade-wc-names sword1 sword2 ...)</h3>
 
-.
-
+Define upgrade mapping from original number to internal symbol
 
 <dl>
 <dt>.</dt>
@@ -355,9 +342,6 @@ be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
 <pre>
     (define-upgrade-wc-names 'upgrade-sword1 'upgrade-sword2 ...)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
@@ -381,9 +365,6 @@ NOT WRITTEN YET.
 <pre>
     (get-dependency)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,

@@ -92,6 +92,7 @@ Specify some global sounds.
 <h4>Example</h4>
 
 <pre>
+    ;; Defines some game sounds.
     (define-game-sounds
       'placement-error (make-sound "placement error" "ui/placement error.wav")
       'placement-success (make-sound "placement success" "ui/placement success.wav")
@@ -99,8 +100,6 @@ Specify some global sounds.
       'human-rescue (make-sound "human rescue" "human/rescue.wav")
       'orc-rescue (make-sound "orc rescue" "orc/rescue.wav") )))
 </pre>
-
-<p>Defines some game sounds.
 
 <h4>Used</h4>
 
@@ -116,10 +115,9 @@ between sound names and sound id.
 <h4>Example</h4>
 
 <pre>
+    ;; Displays the mapping between sound names and sound id.
     (display-sounds)
 </pre>
-
-<p>Displays the mapping between sound names and sound id.
 
 <h4>Not Used</h4>
 
@@ -142,6 +140,7 @@ associated list of files (the list can be replaced by only one file).
 <h4>Example</h4>
 
 <pre>
+    ;; Makes the sounds "lightning" and "basic human voices acknowledge".
     (make-sound "lightning" "spells/lightning.wav")
     (make-sound "basic human voices acknowledge"
       (list "human/basic_voices/acknowledgement/1.wav"
@@ -149,8 +148,6 @@ associated list of files (the list can be replaced by only one file).
             "human/basic_voices/acknowledgement/3.wav"
             "human/basic_voices/acknowledgement/4.wav"))
 </pre>
-
-<p>Makes the sounds "lightning" and "basic human voices acknowledge".
 
 <h4>Used</h4>
 
@@ -177,9 +174,6 @@ Asks the sound system to build a special sound group.
     (make-sound-group "footman-selected"
       "basic human voices selected" "basic human voices annoyed")
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/sound.ccl"> $LIBARYPATH/ccl/sound.ccl </a>
@@ -202,10 +196,9 @@ Ask the sound system to remap a sound id to a given name.
 <h4>Example</h4>
 
 <pre>
+    ;; Maps the name "footman-acknowledge" to "basic human voices acknowledge".
     (map-sound "footman-acknowledge" "basic human voices acknowledge")
 </pre>
-
-<p>Maps the name "footman-acknowledge" to "basic human voices acknowledge".
 
 <h4>Used</h4>
 
@@ -226,10 +219,9 @@ Play a sound file.
 <h4>Example</h4>
 
 <pre>
+    ;; Play the file "spells/lightning.wav".
     (play-file "spells/lightning.wav")
 </pre>
-
-<p>Play the file "spells/lightning.wav".
 
 <h4>Used</h4>
 
@@ -250,10 +242,9 @@ Name of the music file to play.
 <h4>Example</h4>
 
 <pre>
+    ;; Plays the music file "music/default.mod".
     (play-music "music/default.mod")
 </pre>
-
-<p>Plays the music file "music/default.mod".
 
 <h4>Used</h4>
 
@@ -274,10 +265,9 @@ Ask the sound system to play the specified sound.
 <h4>Example</h4>
 
 <pre>
+    ;; Play the sound "basic human voices ready".
     (play-sound "basic human voices ready")
 </pre>
-
-<p>Play the sound "basic human voices ready".
 
 <h4>Used</h4>
 
@@ -298,10 +288,9 @@ Set the cd mode.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the cd mode to play songs in a random order.
     (set-cd-mode! ":random")
 </pre>
-
-<p>Set the cd mode to play songs in a random order.
 
 <h4>Used</h4>
 
@@ -322,10 +311,9 @@ Set the cut off distance.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the sound range to 40.
     (set-global-sound-range! 40)
 </pre>
-
-<p>Set the sound range to 40.
 
 <h4>Not Used</h4>
 
@@ -344,10 +332,9 @@ Set the default menu music.
 <h4>Example</h4>
 
 <pre>
+    ;; This is the default song played.
     (set-menu-music! "music/default.mod")
 </pre>
-
-<p>This is the default song played.
 
 <h4>Used</h4>
 
@@ -368,10 +355,9 @@ Set the default menu music.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the music volume to 128.
     (set-music-volume! 128)
 </pre>
-
-<p>Set the music volume to 128.
 
 <h4>Used</h4>
 
@@ -395,10 +381,9 @@ Set the range of a given sound.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the range of the sound "basic human voices ready" to 20.
     (set-sound-range! "basic human voices ready" 20)
 </pre>
-
-<p>Set the range of the sound "basic human voices ready" to 20.
 
 <h4>Not Used</h4>
 
@@ -417,10 +402,9 @@ Global volume support.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the sound volume to 128.
     (set-sound-volume! 128)
 </pre>
-
-<p>Set the sound volume to 128.
 
 <h4>Used</h4>
 
@@ -441,10 +425,9 @@ Change the default title music.
 <h4>Example</h4>
 
 <pre>
+    ;; This is the default song played.
     (set-title-music! "music/default.mod")
 </pre>
-
-<p>This is the default song played.
 
 <h4>Used</h4>
 
@@ -467,9 +450,6 @@ Ask the sound system to associate a sound id to a sound name.
 <pre>
     (sound-for-name "peasant attack")
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="sound-off"></a>
@@ -481,10 +461,9 @@ Turn off sound.
 <h4>Example</h4>
 
 <pre>
+    ;; Turns off sound.
     (sound-off)
 </pre>
-
-<p>Turns off sound.
 
 <h4>Not Used</h4>
 
@@ -497,10 +476,9 @@ Turn on sound.
 <h4>Example</h4>
 
 <pre>
+    ;; Turns on sound.
     (sound-on)
 </pre>
-
-<p>Turns on sound.
 
 <h4>Not Used</h4>
 
@@ -515,9 +493,6 @@ Ask clone to use a sound thread.
 <pre>
     (sound-thread)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="stop-music"></a>
@@ -529,10 +504,9 @@ Stop playing music.
 <h4>Example</h4>
 
 <pre>
+    ;; Stop playing music.
     (stop-music)
 </pre>
-
-<p>Stop playing music.
 
 <h4>Not Used</h4>
 
@@ -545,10 +519,9 @@ Returns true if compiled with sound, false otherwise.
 <h4>Example</h4>
 
 <pre>
+    ;; Returns true if compiled with sound, false otherwise.
     (with-sound)
 </pre>
-
-<p>Returns true if compiled with sound, false otherwise.
 
 <h4>Used</h4>
 
