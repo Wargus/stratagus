@@ -31,11 +31,12 @@ include $(TOPDIR)/$(RULESFILE)
 
 MODULE	= video
 
-HDRS	= _clip_rectangle intern_video.h
+HDRS	= _clip_rectangle intern_video.h sweepline.h
 
 SRCS	= video.c cursor.c sprite.c \
 	  graphic.c linedraw.c font.c png.c \
-	  sdl.c new_X11.c X11.c svgalib.c wince.c
+	  sdl.c new_X11.c X11.c svgalib.c wince.c \
+          sweepline.c deco.c
 
 OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 

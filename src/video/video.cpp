@@ -26,6 +26,76 @@
 
 //@{
 
+/**
+**      @page VideoModule Module - Video
+**
+**		There are lots of video functions available, therefore this
+**		page tries to summarize these separately.
+**
+**		@note care must be taken what to use, how to use it and where
+**		put new source-code. So please read the following sections
+**		first.
+**
+**
+**      @subsection VideoMain Video main initialization
+**		
+**              The general setup of platform dependent video and basic video
+**		functionalities is done with function @see InitVideo
+**
+**		We support (depending on the platform) resolutions:
+**		640x480, 800x600, 1024x768, 1600x1200
+**		with colors 8,15,16,24,32 bit
+**
+**		@see video.h @see video.c
+**
+**
+**      @subsection Deco Decorations
+**
+**		A mechanism beteen the Freecraft engine and draw routines
+**		to make a screen refresh/update faster and accurate.
+**		It will 'know' about overlapping screen decorations and draw
+**		them all (partly) when one is to be updated.
+**
+**		See page @ref Decorations for a detailed description.
+**
+**              @see deco.h @see deco.c
+**
+**
+**      @subsection VideoModuleHigh High Level - video dependent functions
+**
+**		These are the video platforms that are supported, any platform
+**		dependent settings/functionailty are located within each
+**		separate files:
+**
+**		X11 		: Xwindows for Linux and other Unix machines
+**
+**		SVGALIB		: (Super) Vga routines for Linux only
+**				  (visit http://www.svgalib.org)
+**
+**		SDL		: Simple Direct Media for Linux,
+**				  Win32 (Windows 95/98/2000), BeOs, MacOS
+**				  (visit http://www.libsdl.org)
+**
+**		WINDOWS CE	: just what it says..
+**
+**		@see X11.c
+**		@see svgalib.c
+**		@see sdl.c
+**		@see wince.c
+**
+**
+**      @subsection VideoModuleLow  Low Level - draw functions
+**
+**		All direct drawing functions
+**
+**		@note you might need to use Decorations (see above), to prevent
+**		drawing directly to screen in conflict with the video update.
+**
+**              @see linedraw.c
+**              @see sprite.c
+*/
+
+
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/

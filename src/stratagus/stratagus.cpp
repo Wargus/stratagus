@@ -96,12 +96,11 @@
 **
 **	@subsection Video Video
 **
-**		Handles the high and low level of the graphics. This also
-**		contains the sprite and line drawing routines.
-**		Following low level backends are supported: X11, SVGAlib and
-**		SDL.
+**		Handles the high and low level of the graphics.
+**		This also contains the sprite and linedrawing routines.
 **
-**		@see video.h @see video.c
+**		See page @ref VideoModule for more information upon supported
+**		features and video platforms.
 **
 **	@subsection Network Network
 **
@@ -125,6 +124,7 @@
 **		@see icons.h @see icons.c
 **
 */
+
 
 /*----------------------------------------------------------------------------
 --	Includes
