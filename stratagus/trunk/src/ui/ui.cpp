@@ -55,9 +55,9 @@ global char RightButtonAttacks;		/// right button 0 move, 1 attack
 global char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
 
     /// keyboard scroll speed
-global int SpeedKeyScroll=KEY_SCROLL_SPEED;
+global int SpeedKeyScroll = KEY_SCROLL_SPEED;
     /// mouse scroll speed
-global int SpeedMouseScroll=MOUSE_SCROLL_SPEED;
+global int SpeedMouseScroll = MOUSE_SCROLL_SPEED;
 
 /**
 **	The user interface configuration
@@ -86,7 +86,7 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
 **
 **	@param race_name	The race identifier, to select the interface.
 */
-global void InitUserInterface(const char *race_name)
+global void InitUserInterface(const char* race_name)
 {
     int i;
     int best;
@@ -95,66 +95,66 @@ global void InitUserInterface(const char *race_name)
     Viewport vps[MAX_NUM_VIEWPORTS];
 
     // select the correct slot
-    best=0;
-    for( i=0; UI_Table[i]; ++i ) {
-	if( !strcmp(race_name,UI_Table[i]->Name) ) {
+    best = 0;
+    for (i = 0; UI_Table[i]; ++i) {
+	if (!strcmp(race_name, UI_Table[i]->Name)) {
 	    // perfect
-	    if( VideoWidth==UI_Table[i]->Width
-		    && VideoHeight==UI_Table[i]->Height  ) {
-		best=i;
+	    if (VideoWidth == UI_Table[i]->Width &&
+		    VideoHeight == UI_Table[i]->Height) {
+		best = i;
 		break;
 	    }
 	    // too big
-	    if( VideoWidth<UI_Table[i]->Width
-		    || VideoHeight<UI_Table[i]->Height  ) {
+	    if (VideoWidth < UI_Table[i]->Width ||
+		    VideoHeight < UI_Table[i]->Height) {
 		continue;
 	    }
 	    // best smaller
-	    if( UI_Table[i]->Width*UI_Table[i]->Height>=
-		    UI_Table[best]->Width*UI_Table[best]->Height  ) {
-		best=i;
+	    if (UI_Table[i]->Width * UI_Table[i]->Height >=
+		    UI_Table[best]->Width * UI_Table[best]->Height) {
+		best = i;
 	    }
 	}
     }
 
-    num_vps=TheUI.NumViewports;
-    vp_mode=TheUI.ViewportMode;
-    for( i=0; i<num_vps; ++i ) {
-	vps[i].MapX=TheUI.Viewports[i].MapX;
-	vps[i].MapY=TheUI.Viewports[i].MapY;
+    num_vps = TheUI.NumViewports;
+    vp_mode = TheUI.ViewportMode;
+    for (i = 0; i < num_vps; ++i) {
+	vps[i].MapX = TheUI.Viewports[i].MapX;
+	vps[i].MapY = TheUI.Viewports[i].MapY;
     }
 
     // FIXME: overwrites already set slots?
     // ARI: Yes, it does :(((
-    TheUI=*UI_Table[best];
+    TheUI = *UI_Table[best];
 
-    TheUI.Offset640X=(VideoWidth-640)/2;
-    TheUI.Offset480Y=(VideoHeight-480)/2;
+    TheUI.Offset640X = (VideoWidth - 640) / 2;
+    TheUI.Offset480Y = (VideoHeight - 480) / 2;
 
     //
     //	Calculations
     //
-    if( TheUI.MapArea.EndX > TheMap.Width*TileSizeX-1 ) {
-	TheUI.MapArea.EndX = TheMap.Width*TileSizeX-1;
+    if (TheUI.MapArea.EndX > TheMap.Width * TileSizeX - 1) {
+	TheUI.MapArea.EndX = TheMap.Width * TileSizeX - 1;
     }
-    if( TheUI.MapArea.EndY > TheMap.Height*TileSizeY-1 ) {
-	TheUI.MapArea.EndY = TheMap.Height*TileSizeY-1;
+    if (TheUI.MapArea.EndY > TheMap.Height * TileSizeY - 1) {
+	TheUI.MapArea.EndY = TheMap.Height * TileSizeY - 1;
     }
 
-    TheUI.SelectedViewport=TheUI.Viewports;
+    TheUI.SelectedViewport = TheUI.Viewports;
 
-    if( num_vps ) {
+    if (num_vps) {
 	SetViewportMode(vp_mode);
-	for( i=0; i<num_vps; ++i ) {
-	    TheUI.Viewports[i].MapX=vps[i].MapX;
-	    TheUI.Viewports[i].MapY=vps[i].MapY;
+	for (i = 0; i < num_vps; ++i) {
+	    TheUI.Viewports[i].MapX = vps[i].MapX;
+	    TheUI.Viewports[i].MapY = vps[i].MapY;
 	}
-	FinishViewportModeConfiguration(TheUI.Viewports,num_vps);
+	FinishViewportModeConfiguration(TheUI.Viewports, num_vps);
     } else {
 	SetViewportMode(VIEWPORT_SINGLE);
     }
 
-    TheUI.ViewportCursorColor=ColorWhite;
+    TheUI.ViewportCursorColor = ColorWhite;
 }
 
 /**
@@ -172,125 +172,127 @@ global void LoadUserInterface(void)
     //
     //	Load graphics
     //
-    for( i=0; i<TheUI.NumFillers; ++i ) {
-	if( TheUI.Filler[i].File ) {
-	    TheUI.Filler[i].Graphic=LoadGraphic(TheUI.Filler[i].File);
+    for (i = 0; i < TheUI.NumFillers; ++i) {
+	if (TheUI.Filler[i].File) {
+	    TheUI.Filler[i].Graphic = LoadGraphic(TheUI.Filler[i].File);
 #ifdef USE_OPENGL
-	    MakeTexture(TheUI.Filler[i].Graphic,TheUI.Filler[i].Graphic->Width,
-		    TheUI.Filler[i].Graphic->Height);
+	    MakeTexture(TheUI.Filler[i].Graphic, TheUI.Filler[i].Graphic->Width,
+		TheUI.Filler[i].Graphic->Height);
 #endif
 	}
     }
-    if( TheUI.Resource.File ) {
-	TheUI.Resource.Graphic=LoadGraphic(TheUI.Resource.File);
+    if (TheUI.Resource.File) {
+	TheUI.Resource.Graphic = LoadGraphic(TheUI.Resource.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Resource.Graphic,TheUI.Resource.Graphic->Width,
-		TheUI.Resource.Graphic->Height);
+	MakeTexture(TheUI.Resource.Graphic, TheUI.Resource.Graphic->Width,
+	    TheUI.Resource.Graphic->Height);
 #endif
     }
 
-    for( i=0; i<MaxCosts; ++i ) {
+    for (i = 0; i < MaxCosts; ++i) {
 	// FIXME: reuse same graphics?
-	if( TheUI.Resources[i].Icon.File ) {
-	    TheUI.Resources[i].Icon.Graphic
-		    =LoadGraphic(TheUI.Resources[i].Icon.File);
+	if (TheUI.Resources[i].Icon.File) {
+	    TheUI.Resources[i].Icon.Graphic =
+		LoadGraphic(TheUI.Resources[i].Icon.File);
 #ifdef USE_OPENGL
 	    MakeTexture(TheUI.Resources[i].Icon.Graphic,
-		    TheUI.Resources[i].Icon.Graphic->Width,
-		    TheUI.Resources[i].Icon.Graphic->Height);
+		TheUI.Resources[i].Icon.Graphic->Width,
+		TheUI.Resources[i].Icon.Graphic->Height);
 #endif
 	}
     }
 
     // FIXME: reuse same graphics?
-    if( TheUI.Resources[FoodCost].Icon.File ) {
-	TheUI.Resources[FoodCost].Icon.Graphic=LoadGraphic(TheUI.Resources[FoodCost].Icon.File);
+    if (TheUI.Resources[FoodCost].Icon.File) {
+	TheUI.Resources[FoodCost].Icon.Graphic = LoadGraphic(TheUI.Resources[FoodCost].Icon.File);
 #ifdef USE_OPENGL
 	MakeTexture(TheUI.Resources[FoodCost].Icon.Graphic,
-		TheUI.Resources[FoodCost].Icon.Graphic->Width,
-		TheUI.Resources[FoodCost].Icon.Graphic->Height);
+	    TheUI.Resources[FoodCost].Icon.Graphic->Width,
+	    TheUI.Resources[FoodCost].Icon.Graphic->Height);
 #endif
     }
     // FIXME: reuse same graphics?
-    if( TheUI.Resources[ScoreCost].Icon.File ) {
-	TheUI.Resources[ScoreCost].Icon.Graphic=LoadGraphic(TheUI.Resources[ScoreCost].Icon.File);
+    if (TheUI.Resources[ScoreCost].Icon.File) {
+	TheUI.Resources[ScoreCost].Icon.Graphic = LoadGraphic(TheUI.Resources[ScoreCost].Icon.File);
 #ifdef USE_OPENGL
 	MakeTexture(TheUI.Resources[ScoreCost].Icon.Graphic,
-		TheUI.Resources[ScoreCost].Icon.Graphic->Width,
-		TheUI.Resources[ScoreCost].Icon.Graphic->Height);
+	    TheUI.Resources[ScoreCost].Icon.Graphic->Width,
+	    TheUI.Resources[ScoreCost].Icon.Graphic->Height);
 #endif
     }
 
-    if( TheUI.InfoPanel.File ) {
-	TheUI.InfoPanel.Graphic=LoadGraphic(TheUI.InfoPanel.File);
+    if (TheUI.InfoPanel.File) {
+	TheUI.InfoPanel.Graphic = LoadGraphic(TheUI.InfoPanel.File);
 #ifdef USE_OPENGL
 	MakeTexture(TheUI.InfoPanel.Graphic,
-		TheUI.InfoPanel.Graphic->Width,
-		TheUI.InfoPanel.Graphic->Height);
+	    TheUI.InfoPanel.Graphic->Width,
+	    TheUI.InfoPanel.Graphic->Height);
 #endif
     }
-    if( TheUI.ButtonPanel.File ) {
-	TheUI.ButtonPanel.Graphic=LoadGraphic(TheUI.ButtonPanel.File);
+    if (TheUI.ButtonPanel.File) {
+	TheUI.ButtonPanel.Graphic = LoadGraphic(TheUI.ButtonPanel.File);
 #ifdef USE_OPENGL
 	MakeTexture(TheUI.ButtonPanel.Graphic,
-		TheUI.ButtonPanel.Graphic->Width,
-		TheUI.ButtonPanel.Graphic->Height);
+	    TheUI.ButtonPanel.Graphic->Width,
+	    TheUI.ButtonPanel.Graphic->Height);
 #endif
     }
-    if( TheUI.MenuButtonGraphic.File ) {
-	TheUI.MenuButtonGraphic.Graphic=LoadGraphic(TheUI.MenuButtonGraphic.File);
+    if (TheUI.MenuButtonGraphic.File) {
+	TheUI.MenuButtonGraphic.Graphic = LoadGraphic(TheUI.MenuButtonGraphic.File);
 #ifdef USE_OPENGL
 	MakeTexture(TheUI.MenuButtonGraphic.Graphic,
-		TheUI.MenuButtonGraphic.Graphic->Width,
-		TheUI.MenuButtonGraphic.Graphic->Height);
+	    TheUI.MenuButtonGraphic.Graphic->Width,
+	    TheUI.MenuButtonGraphic.Graphic->Height);
 #endif
     }
-    if( TheUI.MinimapPanel.File ) {
-	TheUI.MinimapPanel.Graphic=LoadGraphic(TheUI.MinimapPanel.File);
+    if (TheUI.MinimapPanel.File) {
+	TheUI.MinimapPanel.Graphic = LoadGraphic(TheUI.MinimapPanel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.MinimapPanel.Graphic,TheUI.MinimapPanel.Graphic->Width,
-		TheUI.MinimapPanel.Graphic->Height);
+	MakeTexture(TheUI.MinimapPanel.Graphic,
+	    TheUI.MinimapPanel.Graphic->Width,
+	    TheUI.MinimapPanel.Graphic->Height);
 #endif
     }
-    if( TheUI.StatusLine.File ) {
-	TheUI.StatusLine.Graphic=LoadGraphic(TheUI.StatusLine.File);
+    if (TheUI.StatusLine.File) {
+	TheUI.StatusLine.Graphic = LoadGraphic(TheUI.StatusLine.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.StatusLine.Graphic,TheUI.StatusLine.Graphic->Width,
-		TheUI.StatusLine.Graphic->Height);
+	MakeTexture(TheUI.StatusLine.Graphic,
+	    TheUI.StatusLine.Graphic->Width,
+	    TheUI.StatusLine.Graphic->Height);
 #endif
     }
 
     //
     //	Resolve cursors
     //
-    TheUI.Point.Cursor=CursorTypeByIdent(TheUI.Point.Name);
-    TheUI.Glass.Cursor=CursorTypeByIdent(TheUI.Glass.Name);
-    TheUI.Cross.Cursor=CursorTypeByIdent(TheUI.Cross.Name);
-    TheUI.YellowHair.Cursor=CursorTypeByIdent(TheUI.YellowHair.Name);
-    TheUI.GreenHair.Cursor=CursorTypeByIdent(TheUI.GreenHair.Name);
-    TheUI.RedHair.Cursor=CursorTypeByIdent(TheUI.RedHair.Name);
-    TheUI.Scroll.Cursor=CursorTypeByIdent(TheUI.Scroll.Name);
+    TheUI.Point.Cursor = CursorTypeByIdent(TheUI.Point.Name);
+    TheUI.Glass.Cursor = CursorTypeByIdent(TheUI.Glass.Name);
+    TheUI.Cross.Cursor = CursorTypeByIdent(TheUI.Cross.Name);
+    TheUI.YellowHair.Cursor = CursorTypeByIdent(TheUI.YellowHair.Name);
+    TheUI.GreenHair.Cursor = CursorTypeByIdent(TheUI.GreenHair.Name);
+    TheUI.RedHair.Cursor = CursorTypeByIdent(TheUI.RedHair.Name);
+    TheUI.Scroll.Cursor = CursorTypeByIdent(TheUI.Scroll.Name);
 
-    TheUI.ArrowE.Cursor=CursorTypeByIdent(TheUI.ArrowE.Name);
-    TheUI.ArrowNE.Cursor=CursorTypeByIdent(TheUI.ArrowNE.Name);
-    TheUI.ArrowN.Cursor=CursorTypeByIdent(TheUI.ArrowN.Name);
-    TheUI.ArrowNW.Cursor=CursorTypeByIdent(TheUI.ArrowNW.Name);
-    TheUI.ArrowW.Cursor=CursorTypeByIdent(TheUI.ArrowW.Name);
-    TheUI.ArrowSW.Cursor=CursorTypeByIdent(TheUI.ArrowSW.Name);
-    TheUI.ArrowS.Cursor=CursorTypeByIdent(TheUI.ArrowS.Name);
-    TheUI.ArrowSE.Cursor=CursorTypeByIdent(TheUI.ArrowSE.Name);
+    TheUI.ArrowE.Cursor = CursorTypeByIdent(TheUI.ArrowE.Name);
+    TheUI.ArrowNE.Cursor = CursorTypeByIdent(TheUI.ArrowNE.Name);
+    TheUI.ArrowN.Cursor = CursorTypeByIdent(TheUI.ArrowN.Name);
+    TheUI.ArrowNW.Cursor = CursorTypeByIdent(TheUI.ArrowNW.Name);
+    TheUI.ArrowW.Cursor = CursorTypeByIdent(TheUI.ArrowW.Name);
+    TheUI.ArrowSW.Cursor = CursorTypeByIdent(TheUI.ArrowSW.Name);
+    TheUI.ArrowS.Cursor = CursorTypeByIdent(TheUI.ArrowS.Name);
+    TheUI.ArrowSE.Cursor = CursorTypeByIdent(TheUI.ArrowSE.Name);
 
-    menupanel=TheUI.MenuPanels;
-    while( menupanel ) {
-	if( menupanel->Panel.File ) {
-	    menupanel->Panel.Graphic=LoadGraphic(menupanel->Panel.File);
+    menupanel = TheUI.MenuPanels;
+    while (menupanel) {
+	if (menupanel->Panel.File) {
+	    menupanel->Panel.Graphic = LoadGraphic(menupanel->Panel.File);
 #ifdef USE_OPENGL
 	    MakeTexture(menupanel->Panel.Graphic,
-		    menupanel->Panel.Graphic->Width,
-		    menupanel->Panel.Graphic->Height);
+		menupanel->Panel.Graphic->Width,
+		menupanel->Panel.Graphic->Height);
 #endif
 	}
-	menupanel=menupanel->Next;
+	menupanel = menupanel->Next;
     }
 }
 
@@ -300,180 +302,180 @@ global void LoadUserInterface(void)
 **	@param file	Save file handle
 **	@param ui	User interface to save
 */
-local void SaveUi(CLFile* file,const UI* ui)
+local void SaveUi(CLFile* file, const UI* ui)
 {
     int i;
     MenuPanel* menupanel;
 
-    CLprintf(file,"(define-ui '%s %d %d\t; Selector",
-	    ui->Name,ui->Width,ui->Height);
+    CLprintf(file, "(define-ui '%s %d %d\t; Selector",
+	ui->Name,ui->Width,ui->Height);
 
-    CLprintf(file,"\n  'normal-font-color '%s"
-                 "\n  'reverse-font-color '%s",
-	    ui->NormalFontColor, ui->ReverseFontColor);
-    CLprintf(file,"\n");
+    CLprintf(file, "\n  'normal-font-color '%s"
+	"\n  'reverse-font-color '%s",
+	ui->NormalFontColor, ui->ReverseFontColor);
+    CLprintf(file, "\n");
 
-    CLprintf(file,"\n  'filler (list");
-    CLprintf(file,"\n    'file \"%s\"",ui->Filler[0].File);
-    CLprintf(file,"\n    'pos '(%3d %3d)",ui->FillerX[0],ui->FillerY[0]);
-    CLprintf(file,")\n");
+    CLprintf(file, "\n  'filler (list");
+    CLprintf(file, "\n    'file \"%s\"", ui->Filler[0].File);
+    CLprintf(file, "\n    'pos '(%3d %3d)", ui->FillerX[0], ui->FillerY[0]);
+    CLprintf(file, ")\n");
 
-    CLprintf(file,"\n  ; Resource line");
-    CLprintf(file,"\n  'resource-line (list \"%s\" %d %d)",
-	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
+    CLprintf(file, "\n  ; Resource line");
+    CLprintf(file, "\n  'resource-line (list \"%s\" %d %d)",
+	ui->Resource.File, ui->ResourceX, ui->ResourceY);
 
-    CLprintf(file,"\n  'resources (list");
-    for( i=1; i<MaxCosts+2; ++i ) {
-	if( !ui->Resources[i].Icon.File ) {
+    CLprintf(file, "\n  'resources (list");
+    for (i = 1; i < MaxCosts + 2; ++i) {
+	if (!ui->Resources[i].Icon.File) {
 	    continue;
 	}
-	CLprintf(file,"\n    '%s",
-		i<MaxCosts ? DefaultResourceNames[i] :
-		    i==FoodCost ? "food" : "score");
-	CLprintf(file," (list 'file \"%s\" 'row %d\n"
-	             "      'pos '(%d %d) 'size '(%d %d) 'text-pos '(%d %d))",
-		ui->Resources[i].Icon.File,ui->Resources[i].IconRow,
-		ui->Resources[i].IconX,ui->Resources[i].IconY,
-		ui->Resources[i].IconW,ui->Resources[i].IconH,
-		ui->Resources[i].TextX,ui->Resources[i].TextY);
+	CLprintf(file, "\n    '%s",
+	    i < MaxCosts ? DefaultResourceNames[i] :
+		i == FoodCost ? "food" : "score");
+	CLprintf(file, " (list 'file \"%s\" 'row %d\n"
+	    "      'pos '(%d %d) 'size '(%d %d) 'text-pos '(%d %d))",
+	    ui->Resources[i].Icon.File, ui->Resources[i].IconRow,
+	    ui->Resources[i].IconX, ui->Resources[i].IconY,
+	    ui->Resources[i].IconW, ui->Resources[i].IconH,
+	    ui->Resources[i].TextX, ui->Resources[i].TextY);
     }
-    CLprintf(file,")\n");
+    CLprintf(file, ")\n");
 
-    CLprintf(file,"  'info-panel (list \"%s\" %d %d %d %d)\n",
-	    ui->InfoPanel.File,
-	    ui->InfoPanelX,ui->InfoPanelY,
-	    ui->InfoPanelW,ui->InfoPanelH);
+    CLprintf(file, "  'info-panel (list \"%s\" %d %d %d %d)\n",
+	ui->InfoPanel.File,
+	ui->InfoPanelX, ui->InfoPanelY,
+	ui->InfoPanelW, ui->InfoPanelH);
 
-    CLprintf(file,"\n  'completed-bar '(");
-    CLprintf(file,"\n    color %d",ui->CompleteBarColor);
-    CLprintf(file,"\n    pos (%3d %3d)",ui->CompleteBarX,ui->CompleteBarY);
-    CLprintf(file,"\n    size (%d %d)",ui->CompleteBarW,ui->CompleteBarH);
-    CLprintf(file,"\n    text \"%s\"",ui->CompleteBarText);
-    CLprintf(file,"\n    font %s",FontNames[ui->CompleteBarFont]);
-    CLprintf(file,"\n    text-pos (%3d %3d)",
-	    ui->CompleteTextX,ui->CompleteTextY);
-    CLprintf(file,")\n\n");
+    CLprintf(file, "\n  'completed-bar '(");
+    CLprintf(file, "\n    color %d", ui->CompleteBarColor);
+    CLprintf(file, "\n    pos (%3d %3d)", ui->CompleteBarX, ui->CompleteBarY);
+    CLprintf(file, "\n    size (%d %d)", ui->CompleteBarW, ui->CompleteBarH);
+    CLprintf(file, "\n    text \"%s\"", ui->CompleteBarText);
+    CLprintf(file, "\n    font %s", FontNames[ui->CompleteBarFont]);
+    CLprintf(file, "\n    text-pos (%3d %3d)",
+	ui->CompleteTextX, ui->CompleteTextY);
+    CLprintf(file, ")\n\n");
 
-    CLprintf(file,"  'button-panel (list \"%s\" %d %d)\n",
-	    ui->ButtonPanel.File,ui->ButtonPanelX,ui->ButtonPanelY);
+    CLprintf(file, "  'button-panel (list \"%s\" %d %d)\n",
+	ui->ButtonPanel.File, ui->ButtonPanelX, ui->ButtonPanelY);
 
-    CLprintf(file,"\n  'map-area (list");
-    CLprintf(file,"\n    'pos '(%3d %3d)",
-	    ui->MapArea.X, ui->MapArea.Y);
-    CLprintf(file,"\n    'size '(%d %d)",
-	    ui->MapArea.EndX-ui->MapArea.X+1,
-	    ui->MapArea.EndY-ui->MapArea.Y+1);
-    CLprintf(file,")\n\n");
+    CLprintf(file, "\n  'map-area (list");
+    CLprintf(file, "\n    'pos '(%3d %3d)",
+	ui->MapArea.X, ui->MapArea.Y);
+    CLprintf(file, "\n    'size '(%d %d)",
+	ui->MapArea.EndX - ui->MapArea.X + 1,
+	ui->MapArea.EndY - ui->MapArea.Y + 1);
+    CLprintf(file, ")\n\n");
 
-    CLprintf(file,"  ; Menu button background\n");
-    CLprintf(file,"  'menu-panel (list \"%s\" %d %d)\n",
-	    ui->MenuButtonGraphic.File,ui->MenuButtonGraphicX,
-	    ui->MenuButtonGraphicY);
+    CLprintf(file, "  ; Menu button background\n");
+    CLprintf(file, "  'menu-panel (list \"%s\" %d %d)\n",
+	ui->MenuButtonGraphic.File, ui->MenuButtonGraphicX,
+	ui->MenuButtonGraphicY);
 
-    CLprintf(file,"  ; Minimap background\n");
-    CLprintf(file,"  'minimap-panel (list \"%s\" %d %d)\n",
-	    ui->MinimapPanel.File,ui->MinimapPanelX,ui->MinimapPanelY);
-    CLprintf(file,"  ; Minimap position\n");
-    CLprintf(file,"  'minimap-pos (list %d %d)\n",
-	    ui->MinimapPosX,ui->MinimapPosY);
+    CLprintf(file, "  ; Minimap background\n");
+    CLprintf(file, "  'minimap-panel (list \"%s\" %d %d)\n",
+	ui->MinimapPanel.File, ui->MinimapPanelX, ui->MinimapPanelY);
+    CLprintf(file, "  ; Minimap position\n");
+    CLprintf(file, "  'minimap-pos (list %d %d)\n",
+	ui->MinimapPosX, ui->MinimapPosY);
 
-    CLprintf(file,"\n  'status-line '(");
-    CLprintf(file,"\n    file \"%s\"",ui->StatusLine.File);
-    CLprintf(file,"\n    pos (%d %d)",ui->StatusLineX,ui->StatusLineY);
-    CLprintf(file,"\n    text-pos (%d %d)",
-	    ui->StatusLineTextX,ui->StatusLineTextY);
-    CLprintf(file,"\n    font %s",FontNames[ui->StatusLineFont]);
-    CLprintf(file,")\n");
+    CLprintf(file, "\n  'status-line '(");
+    CLprintf(file, "\n    file \"%s\"",ui->StatusLine.File);
+    CLprintf(file, "\n    pos (%d %d)",ui->StatusLineX,ui->StatusLineY);
+    CLprintf(file, "\n    text-pos (%d %d)",
+	ui->StatusLineTextX, ui->StatusLineTextY);
+    CLprintf(file, "\n    font %s",FontNames[ui->StatusLineFont]);
+    CLprintf(file, ")\n");
 
-    CLprintf(file,"\n  'menu-button '(");
-    CLprintf(file,"\n    pos (%d %d)",
-	    ui->MenuButton.X,ui->MenuButton.Y);
-    CLprintf(file,"\n    size (%d %d)",
-	    ui->MenuButton.Width,ui->MenuButton.Height);
-    CLprintf(file,"\n    caption \"%s\"",
-	    ui->MenuButton.Text);
-    CLprintf(file,"\n    style %s",
-	    MenuButtonStyle(ui->MenuButton.Button));
-    CLprintf(file,")");
+    CLprintf(file, "\n  'menu-button '(");
+    CLprintf(file, "\n    pos (%d %d)",
+	ui->MenuButton.X, ui->MenuButton.Y);
+    CLprintf(file, "\n    size (%d %d)",
+	ui->MenuButton.Width, ui->MenuButton.Height);
+    CLprintf(file, "\n    caption \"%s\"",
+	ui->MenuButton.Text);
+    CLprintf(file, "\n    style %s",
+	MenuButtonStyle(ui->MenuButton.Button));
+    CLprintf(file, ")");
 
-    CLprintf(file,"\n  'network-menu-button '(");
-    CLprintf(file,"\n    pos (%d %d)",
-	    ui->NetworkMenuButton.X,ui->NetworkMenuButton.Y);
-    CLprintf(file,"\n    size (%d %d)",
-	    ui->NetworkMenuButton.Width,ui->NetworkMenuButton.Height);
-    CLprintf(file,"\n    caption \"%s\"",
-	    ui->NetworkMenuButton.Text);
-    CLprintf(file,"\n    style %s",
-	    MenuButtonStyle(ui->NetworkMenuButton.Button));
-    CLprintf(file,")");
+    CLprintf(file, "\n  'network-menu-button '(");
+    CLprintf(file, "\n    pos (%d %d)",
+	ui->NetworkMenuButton.X, ui->NetworkMenuButton.Y);
+    CLprintf(file, "\n    size (%d %d)",
+	ui->NetworkMenuButton.Width, ui->NetworkMenuButton.Height);
+    CLprintf(file, "\n    caption \"%s\"",
+	ui->NetworkMenuButton.Text);
+    CLprintf(file, "\n    style %s",
+	MenuButtonStyle(ui->NetworkMenuButton.Button));
+    CLprintf(file, ")");
 
-    CLprintf(file,"\n  'network-diplomacy-button '(");
-    CLprintf(file,"\n    pos (%d %d)",
-	    ui->NetworkDiplomacyButton.X,ui->NetworkDiplomacyButton.Y);
-    CLprintf(file,"\n    size (%d %d)",
-	    ui->NetworkDiplomacyButton.Width,ui->NetworkDiplomacyButton.Height);
-    CLprintf(file,"\n    caption \"%s\"",
-	    ui->NetworkDiplomacyButton.Text);
-    CLprintf(file,"\n    style %s",
-	    MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
-    CLprintf(file,")");
+    CLprintf(file, "\n  'network-diplomacy-button '(");
+    CLprintf(file, "\n    pos (%d %d)",
+	ui->NetworkDiplomacyButton.X, ui->NetworkDiplomacyButton.Y);
+    CLprintf(file, "\n    size (%d %d)",
+	ui->NetworkDiplomacyButton.Width, ui->NetworkDiplomacyButton.Height);
+    CLprintf(file, "\n    caption \"%s\"",
+	ui->NetworkDiplomacyButton.Text);
+    CLprintf(file, "\n    style %s",
+	MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
+    CLprintf(file, ")");
 
-    CLprintf(file,"\n\n  'info-buttons '(");
-    for( i=0; i<ui->NumInfoButtons; ++i ) {
-	CLprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
-		ui->InfoButtons[i].X,ui->InfoButtons[i].Y,
-		ui->InfoButtons[i].Width,ui->InfoButtons[i].Height);
+    CLprintf(file, "\n\n  'info-buttons '(");
+    for (i = 0; i < ui->NumInfoButtons; ++i) {
+	CLprintf(file, "\n    (pos (%3d %3d) size (%d %d))",
+	    ui->InfoButtons[i].X, ui->InfoButtons[i].Y,
+	    ui->InfoButtons[i].Width, ui->InfoButtons[i].Height);
     }
-    CLprintf(file,")");
-    CLprintf(file,"\n  'training-buttons '(");
-    for( i=0; i<ui->NumTrainingButtons; ++i ) {
-	CLprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
-		ui->TrainingButtons[i].X,ui->TrainingButtons[i].Y,
-		ui->TrainingButtons[i].Width,ui->TrainingButtons[i].Height);
+    CLprintf(file, ")");
+    CLprintf(file, "\n  'training-buttons '(");
+    for (i = 0; i < ui->NumTrainingButtons; ++i) {
+	CLprintf(file, "\n    (pos (%3d %3d) size (%d %d))",
+	    ui->TrainingButtons[i].X, ui->TrainingButtons[i].Y,
+	    ui->TrainingButtons[i].Width, ui->TrainingButtons[i].Height);
     }
-    CLprintf(file,")");
-    CLprintf(file,"\n  'button-buttons '(");
-    for( i=0; i<ui->NumButtonButtons; ++i ) {
-	CLprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
-		ui->ButtonButtons[i].X,ui->ButtonButtons[i].Y,
-		ui->ButtonButtons[i].Width,ui->ButtonButtons[i].Height);
+    CLprintf(file, ")");
+    CLprintf(file, "\n  'button-buttons '(");
+    for (i = 0; i < ui->NumButtonButtons; ++i) {
+	CLprintf(file, "\n    (pos (%3d %3d) size (%d %d))",
+	    ui->ButtonButtons[i].X, ui->ButtonButtons[i].Y,
+	    ui->ButtonButtons[i].Width, ui->ButtonButtons[i].Height);
     }
-    CLprintf(file,")");
+    CLprintf(file, ")");
 
-    CLprintf(file,"\n\n  'cursors '(");
-    CLprintf(file,"\n    point %s", ui->Point.Name);
-    CLprintf(file,"\n    glass %s", ui->Glass.Name);
-    CLprintf(file,"\n    cross %s", ui->Cross.Name);
-    CLprintf(file,"\n    yellow %s", ui->YellowHair.Name);
-    CLprintf(file,"\n    green %s", ui->GreenHair.Name);
-    CLprintf(file,"\n    red %s", ui->RedHair.Name);
-    CLprintf(file,"\n    scroll %s", ui->Scroll.Name);
+    CLprintf(file, "\n\n  'cursors '(");
+    CLprintf(file, "\n    point %s", ui->Point.Name);
+    CLprintf(file, "\n    glass %s", ui->Glass.Name);
+    CLprintf(file, "\n    cross %s", ui->Cross.Name);
+    CLprintf(file, "\n    yellow %s", ui->YellowHair.Name);
+    CLprintf(file, "\n    green %s", ui->GreenHair.Name);
+    CLprintf(file, "\n    red %s", ui->RedHair.Name);
+    CLprintf(file, "\n    scroll %s", ui->Scroll.Name);
 
-    CLprintf(file,"\n    arrow-e %s", ui->ArrowE.Name);
-    CLprintf(file,"\n    arrow-ne %s", ui->ArrowNE.Name);
-    CLprintf(file,"\n    arrow-n %s", ui->ArrowN.Name);
-    CLprintf(file,"\n    arrow-nw %s", ui->ArrowNW.Name);
-    CLprintf(file,"\n    arrow-w %s", ui->ArrowW.Name);
-    CLprintf(file,"\n    arrow-sw %s", ui->ArrowSW.Name);
-    CLprintf(file,"\n    arrow-s %s", ui->ArrowS.Name);
-    CLprintf(file,"\n    arrow-se %s", ui->ArrowSE.Name);
-    CLprintf(file,")\n");
+    CLprintf(file, "\n    arrow-e %s", ui->ArrowE.Name);
+    CLprintf(file, "\n    arrow-ne %s", ui->ArrowNE.Name);
+    CLprintf(file, "\n    arrow-n %s", ui->ArrowN.Name);
+    CLprintf(file, "\n    arrow-nw %s", ui->ArrowNW.Name);
+    CLprintf(file, "\n    arrow-w %s", ui->ArrowW.Name);
+    CLprintf(file, "\n    arrow-sw %s", ui->ArrowSW.Name);
+    CLprintf(file, "\n    arrow-s %s", ui->ArrowS.Name);
+    CLprintf(file, "\n    arrow-se %s", ui->ArrowSE.Name);
+    CLprintf(file, ")\n");
 
-    CLprintf(file,"\n  'menu-panels '(");
-    menupanel=ui->MenuPanels;
-    while( menupanel ) {
-	CLprintf(file,"\n    %s \"%s\"",
-		menupanel->Ident,menupanel->Panel.File);
-	menupanel=menupanel->Next;
+    CLprintf(file, "\n  'menu-panels '(");
+    menupanel = ui->MenuPanels;
+    while (menupanel) {
+	CLprintf(file, "\n    %s \"%s\"",
+	    menupanel->Ident, menupanel->Panel.File);
+	menupanel = menupanel->Next;
     }
-    CLprintf(file,")\n");
+    CLprintf(file, ")\n");
 
-    CLprintf(file,"\n  'victory-background \"%s\"",
-	    ui->VictoryBackground.File);
-    CLprintf(file,"\n  'defeat-background \"%s\"",
-	    ui->DefeatBackground.File);
+    CLprintf(file, "\n  'victory-background \"%s\"",
+	ui->VictoryBackground.File);
+    CLprintf(file, "\n  'defeat-background \"%s\"",
+	ui->DefeatBackground.File);
 
-    CLprintf(file," )\n\n");
+    CLprintf(file, " )\n\n");
 }
 
 /**
@@ -487,10 +489,10 @@ local void SaveViewports(CLFile* file,const UI* ui)
     int i;
     const Viewport* vp;
 
-    CLprintf(file, "(define-viewports 'mode %d",ui->ViewportMode);
+    CLprintf(file, "(define-viewports 'mode %d", ui->ViewportMode);
     for (i = 0; i < ui->NumViewports; ++i) {
 	vp = &ui->Viewports[i];
-	CLprintf(file, "\n  'viewport '(%d %d)",vp->MapX,vp->MapY);
+	CLprintf(file, "\n  'viewport '(%d %d)", vp->MapX, vp->MapY);
     }
     CLprintf(file, ")\n\n");
 }
@@ -504,33 +506,33 @@ global void SaveUserInterface(CLFile* file)
 {
     int i;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: ui $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: ui $Id$\n\n");
 
     // Contrast, Brightness, Saturation
-    CLprintf(file,"(set-contrast! %d)\n",TheUI.Contrast);
-    CLprintf(file,"(set-brightness! %d)\n",TheUI.Brightness);
-    CLprintf(file,"(set-saturation! %d)\n\n",TheUI.Saturation);
+    CLprintf(file, "(set-contrast! %d)\n", TheUI.Contrast);
+    CLprintf(file, "(set-brightness! %d)\n", TheUI.Brightness);
+    CLprintf(file, "(set-saturation! %d)\n\n", TheUI.Saturation);
     // Scrolling
-    CLprintf(file,"(set-mouse-scroll! %s)\n",TheUI.MouseScroll ? "#t" : "#f");
-    CLprintf(file,"(set-mouse-scroll-speed! %d)\n",SpeedMouseScroll);
-    CLprintf(file,"(set-key-scroll! %s)\n",TheUI.KeyScroll ? "#t" : "#f");
-    CLprintf(file,"(set-key-scroll-speed! %d)\n",SpeedKeyScroll);
-    CLprintf(file,"(set-mouse-scroll-speed-default! %d)\n",TheUI.MouseScrollSpeedDefault);
-    CLprintf(file,"(set-mouse-scroll-speed-control! %d)\n",TheUI.MouseScrollSpeedControl);
+    CLprintf(file, "(set-mouse-scroll! %s)\n", TheUI.MouseScroll ? "#t" : "#f");
+    CLprintf(file, "(set-mouse-scroll-speed! %d)\n", SpeedMouseScroll);
+    CLprintf(file, "(set-key-scroll! %s)\n", TheUI.KeyScroll ? "#t" : "#f");
+    CLprintf(file, "(set-key-scroll-speed! %d)\n", SpeedKeyScroll);
+    CLprintf(file, "(set-mouse-scroll-speed-default! %d)\n", TheUI.MouseScrollSpeedDefault);
+    CLprintf(file, "(set-mouse-scroll-speed-control! %d)\n", TheUI.MouseScrollSpeedControl);
 
-    CLprintf(file,"(set-mouse-adjust! %d)\n",TheUI.MouseAdjust);
-    CLprintf(file,"(set-mouse-scale! %d)\n\n",TheUI.MouseScale);
+    CLprintf(file, "(set-mouse-adjust! %d)\n", TheUI.MouseAdjust);
+    CLprintf(file, "(set-mouse-scale! %d)\n\n", TheUI.MouseScale);
 
-    CLprintf(file,"(set-original-resources! %s)\n\n",
-	    TheUI.OriginalResources ? "#t" : "#f");
+    CLprintf(file, "(set-original-resources! %s)\n\n",
+	TheUI.OriginalResources ? "#t" : "#f");
 
     // Save the UIs for all resolutions
-    for( i=0; UI_Table[i]; ++i ) {
-	SaveUi(file,UI_Table[i]);
+    for (i = 0; UI_Table[i]; ++i) {
+	SaveUi(file, UI_Table[i]);
     }
 
-    SaveViewports(file,&TheUI);
+    SaveViewports(file, &TheUI);
 }
 
 /**
@@ -547,7 +549,7 @@ global void CleanUI(UI* ui)
     free(ui->ReverseFontColor);
 
     // Filler
-    for( i=0; i<ui->NumFillers; ++i ) {
+    for (i = 0; i < ui->NumFillers; ++i) {
 	free(ui->Filler[i].File);
     }
     free(ui->FillerX);
@@ -558,7 +560,7 @@ global void CleanUI(UI* ui)
     free(ui->Resource.File);
 
     // Resource Icons
-    for( i=0; i<MaxCosts+2; ++i ) {
+    for (i = 0; i < MaxCosts + 2; ++i) {
 	free(ui->Resources[i].Icon.File);
     }
 
@@ -606,10 +608,10 @@ global void CleanUI(UI* ui)
     free(ui->ArrowSE.Name);
 
     // Menu Panels
-    menupanel=ui->MenuPanels;
-    while( menupanel ) {
-	tmp=menupanel;
-	menupanel=menupanel->Next;
+    menupanel = ui->MenuPanels;
+    while (menupanel) {
+	tmp = menupanel;
+	menupanel = menupanel->Next;
 	free(tmp->Panel.File);
 	free(tmp->Ident);
 	free(tmp);
@@ -633,12 +635,12 @@ global void CleanUserInterface(void)
     //
     //	Free the graphics. FIXME: if they are shared this will crash.
     //
-    for( i=0; i<TheUI.NumFillers; ++i ) {
+    for (i = 0; i < TheUI.NumFillers; ++i) {
 	VideoSaveFree(TheUI.Filler[i].Graphic);
     }
     VideoSaveFree(TheUI.Resource.Graphic);
 
-    for( i=0; i<MaxCosts+2; ++i ) {
+    for (i = 0; i < MaxCosts + 2; ++i) {
 	VideoSaveFree(TheUI.Resources[i].Icon.Graphic);
     }
 
@@ -648,27 +650,27 @@ global void CleanUserInterface(void)
     VideoSaveFree(TheUI.MinimapPanel.Graphic);
     VideoSaveFree(TheUI.StatusLine.Graphic);
 
-    menupanel=TheUI.MenuPanels;
-    while( menupanel ) {
+    menupanel = TheUI.MenuPanels;
+    while (menupanel) {
 	VideoSaveFree(menupanel->Panel.Graphic);
-	menupanel=menupanel->Next;
+	menupanel = menupanel->Next;
     }
 
     //
     //	Free the available user interfaces.
     //
-    if( UI_Table ) {
-	for( i=0; UI_Table[i]; ++i ) {
+    if (UI_Table) {
+	for (i = 0; UI_Table[i]; ++i) {
 	    CleanUI(UI_Table[i]);
 	}
 	free(UI_Table);
-	UI_Table=NULL;
+	UI_Table = NULL;
     }
 
     // FIXME: Johns: Implement this correctly or we will lose memory!
     DebugLevel0Fn("FIXME: not completely written\n");
 
-    memset(&TheUI,0,sizeof(TheUI));
+    memset(&TheUI, 0, sizeof(TheUI));
 }
 
 /**
@@ -688,8 +690,7 @@ global Viewport* GetViewport(int x, int y)
 {
     Viewport* vp;
 
-    for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports;
-	    vp++) {
+    for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports; ++vp) {
 	if (x >= vp->X && x <= vp->EndX && y >= vp->Y && y <= vp->EndY) {
 	    return vp;
 	}
@@ -716,10 +717,9 @@ global Viewport* MapTileGetViewport(int tx, int ty)
 {
     Viewport* vp;
 
-    for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports;
-		vp++) {
-	if (tx >= vp->MapX && tx < vp->MapX + vp->MapWidth
-		&& ty >= vp->MapY && ty < vp->MapY + vp->MapHeight) {
+    for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports; ++vp) {
+	if (tx >= vp->MapX && tx < vp->MapX + vp->MapWidth &&
+		ty >= vp->MapY && ty < vp->MapY + vp->MapHeight) {
 	    return vp;
 	}
     }
@@ -746,7 +746,7 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
     // geometry information in the TheUI.Viewports field because we use the old
     // geometry information for map origin computation.
     if (TheUI.NumViewports < num_vps) {
-	for (i = 0; i < num_vps; i++) {
+	for (i = 0; i < num_vps; ++i) {
 	    const Viewport* vp;
 
 	    vp = GetViewport(new_vps[i].X, new_vps[i].Y);
@@ -760,7 +760,7 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 	}
     }
 
-    for (i = 0; i < num_vps; i++) {
+    for (i = 0; i < num_vps; ++i) {
 	TheUI.Viewports[i].X = new_vps[i].X;
 	TheUI.Viewports[i].EndX = new_vps[i].EndX;
 	TheUI.Viewports[i].Y = new_vps[i].Y;
@@ -838,17 +838,17 @@ local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSingle (void)
+local void SetViewportModeSingle(void)
 {
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-    DebugLevel0 ("Single viewport set\n");
+    DebugLevel0("Single viewport set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].Y = TheUI.MapArea.Y;
-    ClipViewport (new_vps, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+    ClipViewport(new_vps, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    FinishViewportModeConfiguration (new_vps, 1);
+    FinishViewportModeConfiguration(new_vps, 1);
 }
 
 /**
@@ -861,22 +861,22 @@ local void SetViewportModeSingle (void)
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSplitHoriz (void)
+local void SetViewportModeSplitHoriz(void)
 {
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-    DebugLevel0 ("Two horizontal viewports set\n");
+    DebugLevel0("Two horizontal viewports set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].Y = TheUI.MapArea.Y;
-    ClipViewport (new_vps, TheUI.MapArea.EndX,
-		    TheUI.MapArea.Y+(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
+    ClipViewport(new_vps, TheUI.MapArea.EndX,
+	TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
 
     new_vps[1].X = TheUI.MapArea.X;
     new_vps[1].Y = new_vps[0].EndY + 1;
-    ClipViewport (new_vps+1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+    ClipViewport(new_vps + 1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    FinishViewportModeConfiguration (new_vps, 2);
+    FinishViewportModeConfiguration(new_vps, 2);
 }
 
 /**
@@ -890,28 +890,28 @@ local void SetViewportModeSplitHoriz (void)
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSplitHoriz3 (void)
+local void SetViewportModeSplitHoriz3(void)
 {
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-    DebugLevel0 ("Horizontal 3-way viewport division set\n");
+    DebugLevel0("Horizontal 3-way viewport division set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].Y = TheUI.MapArea.Y;
-    ClipViewport (new_vps, TheUI.MapArea.EndX,
-		    TheUI.MapArea.Y+(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
+    ClipViewport(new_vps, TheUI.MapArea.EndX,
+	TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
 
     new_vps[1].X = TheUI.MapArea.X;
     new_vps[1].Y = new_vps[0].EndY + 1;
-    ClipViewport (new_vps+1,
-		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
-		TheUI.MapArea.EndY);
+    ClipViewport(new_vps + 1,
+	TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
+	TheUI.MapArea.EndY);
 
     new_vps[2].X = new_vps[1].EndX + 1;
     new_vps[2].Y = new_vps[0].EndY + 1;
-    ClipViewport (new_vps+2, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+    ClipViewport(new_vps + 2, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    FinishViewportModeConfiguration (new_vps, 3);
+    FinishViewportModeConfiguration(new_vps, 3);
 }
 
 /**
@@ -924,23 +924,23 @@ local void SetViewportModeSplitHoriz3 (void)
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSplitVert (void)
+local void SetViewportModeSplitVert(void)
 {
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-    DebugLevel0 ("Two vertical viewports set\n");
+    DebugLevel0("Two vertical viewports set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].Y = TheUI.MapArea.Y;
-    ClipViewport (new_vps,
-		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
-		TheUI.MapArea.EndY);
+    ClipViewport(new_vps,
+	TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
+	TheUI.MapArea.EndY);
 
     new_vps[1].X = new_vps[0].EndX + 1;
     new_vps[1].Y = TheUI.MapArea.Y;
-    ClipViewport (new_vps+1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+    ClipViewport(new_vps + 1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    FinishViewportModeConfiguration (new_vps, 2);
+    FinishViewportModeConfiguration(new_vps, 2);
 }
 
 /**
@@ -953,35 +953,35 @@ local void SetViewportModeSplitVert (void)
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeQuad (void)
+local void SetViewportModeQuad(void)
 {
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-    DebugLevel0 ("Four viewports set\n");
+    DebugLevel0("Four viewports set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].Y = TheUI.MapArea.Y;
-    ClipViewport (new_vps,
-		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
-		TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
+    ClipViewport(new_vps,
+	TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
+	TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
 
     new_vps[1].X = new_vps[0].EndX + 1;
     new_vps[1].Y = TheUI.MapArea.Y;
-    ClipViewport (new_vps+1,
-		TheUI.MapArea.EndX,
-		TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
+    ClipViewport(new_vps + 1,
+	TheUI.MapArea.EndX,
+	TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
 
     new_vps[2].X = TheUI.MapArea.X;
     new_vps[2].Y = new_vps[0].EndY + 1;
-    ClipViewport (new_vps+2,
-		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
-		TheUI.MapArea.EndY);
+    ClipViewport(new_vps + 2,
+	TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
+	TheUI.MapArea.EndY);
 
     new_vps[3].X = new_vps[1].X;
     new_vps[3].Y = new_vps[2].Y;
-    ClipViewport (new_vps+3, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+    ClipViewport(new_vps + 3, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    FinishViewportModeConfiguration (new_vps, 4);
+    FinishViewportModeConfiguration(new_vps, 4);
 }
 
 /**
