@@ -66,6 +66,14 @@ local Player* CclGetPlayer(SCM value)
     return &Players[gh_scm2int(value)];
 }
 #elif defined(USE_LUA)
+local Player* CclGetPlayer(lua_State* l)
+{
+    if (!lua_isnumber(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    return &Players[(int)lua_tonumber(l, -1)];
+}
 #endif
 
 /**
@@ -917,6 +925,34 @@ local SCM CclGetPlayerResource(SCM player, SCM resource)
     return ret;
 }
 #elif defined(USE_LUA)
+local int CclGetPlayerResource(lua_State* l)
+{
+    int i;
+    Player* plyr;
+    const char* res;
+
+    if (lua_gettop(l) != 2 || !lua_isstring(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushvalue(l, 1);
+    plyr = CclGetPlayer(l);
+    lua_pop(l, 1);
+    res = lua_tostring(l, 2);
+
+    for (i = 0; i < MaxCosts; ++i) {
+	if (!strcmp(res, DefaultResourceNames[i])) {
+	    break;
+	}
+    }
+    if (i == MaxCosts) {
+       // FIXME: this leaves a half initialized player
+       lua_pushfstring(l, "Invalid resource", res);
+       lua_error(l);
+    }
+    lua_pushnumber(l, plyr->Resources[i]);
+    return 1;
+}
 #endif
 
 /**
@@ -937,7 +973,7 @@ local SCM CclSetPlayerResource(SCM list)
 	value = gh_car(list);
 	list = gh_cdr(list);
 	for (i = 0; i < MaxCosts; ++i) {
-	    if (gh_eq_p(value, gh_symbol2scm((char*)DefaultResourceNames[i]))) {
+	    if (gh_eq_p(value, gh_symbol2scm(DefaultResourceNames[i]))) {
 		break;
 	    }
 	}
@@ -952,6 +988,43 @@ local SCM CclSetPlayerResource(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSetPlayerResource(lua_State* l)
+{
+    int i;
+    Player* player;
+    const char* value;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    lua_pushvalue(l, 1);
+    player = CclGetPlayer(l);
+    lua_pop(l, 1);
+    for (j = 1; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	for (i = 0; i < MaxCosts; ++i) {
+	    if (!strcmp(value, DefaultResourceNames[i])) {
+		break;
+	    }
+	}
+	if (i == MaxCosts) {
+	   // FIXME: this leaves a half initialized player
+	   lua_pushfstring(l, "Unsupported tag: %s", value);
+	   lua_error(l);
+	}
+	if (!lua_isnumber(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	player->Resources[i] = lua_tonumber(l, j + 1);
+    }
+    return 0;
+}
 #endif
 
 // ----------------------------------------------------------------------------
@@ -1013,8 +1086,8 @@ global void PlayerCclRegister(void)
     lua_register(Lua, "NewColors", CclNewPlayerColors);
 
     // player member access functions
-//    lua_register(Lua, "GetPlayerResource", CclGetPlayerResource);
-//    lua_register(Lua, "SetPlayerResource", CclSetPlayerResource);
+    lua_register(Lua, "GetPlayerResource", CclGetPlayerResource);
+    lua_register(Lua, "SetPlayerResource", CclSetPlayerResource);
 #endif
 }
 
