@@ -359,7 +359,7 @@ global PudInfo* GetPudInfo(const char* pud)
 	}
 
 	//
-	//	Player definitons.
+	//	Player definitions.
 	//
 	if( !memcmp(header,"OWNR",4) ) {
 	    if( length==16 ) {
@@ -776,7 +776,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	}
 
 	//
-	//	Player definitons.
+	//	Player definitions.
 	//
 	if( !memcmp(header,"OWNR",4) ) {
 	    if( length==16 ) {
@@ -1137,24 +1137,39 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 		    Players[o].X=MapOffsetX+x;
 		    Players[o].Y=MapOffsetY+y;
+		    if (GameSettings.NumUnits == SettingsNumUnits1) {
+			if (t == WC_StartLocationHuman) {
+			    t = WC_UnitPeasant;
+			} else {
+			    t = WC_UnitPeon;
+			}
+			v = 1;
+			goto pawn;
+		    } 
 		} else {
-		    if ((s = GameSettings.Presets[o].Race) != SettingsPresetMapDefault) {
-			if (s == PlayerRaceHuman && (t & 1) == 1) {
-			    t--;
+		    if (GameSettings.NumUnits == SettingsNumUnitsMapDefault ||
+			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {
+pawn:
+			if (t != WC_UnitGoldMine && t != WC_UnitOilPatch) {
+			    if ((s = GameSettings.Presets[o].Race) != SettingsPresetMapDefault) {
+				if (s == PlayerRaceHuman && (t & 1) == 1) {
+				    t--;
+				}
+				if (s == PlayerRaceOrc && (t & 1) == 0) {
+				    t++;
+				}
+				// FIXME: This is hard-coded WAR2 ... also: support more races?
+			    }
 			}
-			if (s == PlayerRaceOrc && (t & 1) == 0) {
-			    t++;
+			unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
+				,UnitTypeByWcNum(t),&Players[o]);
+			if( unit->Type->GoldMine || unit->Type->OilPatch ) {
+			    unit->Value=v*2500;
+			} else {
+			    // FIXME: active/inactive AI units!!
 			}
-			// FIXME: This is hard-code WCII ... also: support more races..
+			UpdateForNewUnit(unit,0);
 		    }
-		    unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
-			    ,UnitTypeByWcNum(t),&Players[o]);
-		    if( unit->Type->GoldMine || unit->Type->OilPatch ) {
-			unit->Value=v*2500;
-		    } else {
-			// FIXME: active/inactive AI units!!
-		    }
-		    UpdateForNewUnit(unit,0);
 		}
 
 		length-=8;
