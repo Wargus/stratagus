@@ -42,6 +42,7 @@
 #include "stratagus.h"
 #include "video.h"
 #include "iolib.h"
+#include "iocompat.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -98,14 +99,20 @@ int LoadGraphicPNG(Graphic* graphic)
 	int i;
 	volatile int ckey;
 	png_color_16* transv;
-	const char* name;
+	char name[PATH_MAX];
+	char buf[PATH_MAX];
 
-	name = graphic->File;
 	ckey = -1;
 
+	if (!graphic->File) {
+		return -1;
+	}
+	strcat(strcpy(buf, "graphics/"), graphic->File);
+	LibraryFileName(buf, name);
 	if (!name) {
 		return -1;
 	}
+
 	if (!(fp = CLopen(name, CL_OPEN_READ))) {
 		perror("Can't open file");
 		return -1;

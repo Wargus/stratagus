@@ -250,8 +250,6 @@ Graphic* NewGraphic(const char* file, int w, int h)
 {
 	Graphic* graphic;
 	Graphic** g;
-	char name[PATH_MAX];
-	char buf[PATH_MAX];
 
 	g = (Graphic**)hash_find(GraphicHash, file);
 	if (!g || !*g) {
@@ -260,15 +258,15 @@ Graphic* NewGraphic(const char* file, int w, int h)
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
-		strcat(strcpy(name, "graphics/"), file);
-		LibraryFileName(name, buf);
-		graphic->File = strdup(buf);
+		graphic->File = strdup(file);
 		graphic->Width = w;
 		graphic->Height = h;
 		graphic->NumFrames = 1;
+		graphic->Refs = 1;
 		*(Graphic**)hash_add(GraphicHash, file) = graphic;
 	} else {
 		graphic = *g;
+		++graphic->Refs;
 		Assert(graphic->Width == w && graphic->Height == h);
 	}
 
@@ -317,6 +315,63 @@ void LoadGraphic(Graphic* g)
 #ifdef USE_OPENGL
 	MakeTexture(g);
 #endif
+}
+
+/**
+**  Free a graphic
+**
+**  @param g  Pointer to the graphic
+*/
+void FreeGraphic(Graphic* g)
+{
+
+#ifdef USE_OPENGL
+	int i;
+#endif
+
+	if (!g) {
+		return;
+	}
+
+	Assert(g->Refs);
+	
+	--g->Refs;
+	if (!g->Refs) {
+		// No more uses of this graphic
+#ifdef USE_OPENGL
+		if (g->Textures) {
+			glDeleteTextures(g->NumFrames, g->Textures);
+			free(g->Textures);
+		}
+		for (i = 0; i < PlayerMax; ++i) {
+			if (g->PlayerColorTextures[i]) {
+				glDeleteTextures(g->NumFrames, g->PlayerColorTextures[i]);
+			}
+		}
+#endif
+
+		if (g->Surface) {
+			if (g->Surface->format->BytesPerPixel == 1) {
+				VideoPaletteListRemove(g->Surface);
+			}
+			SDL_FreeSurface(g->Surface);
+		}
+#ifndef USE_OPENGL
+		if (g->SurfaceFlip) {
+			if (g->SurfaceFlip->format->BytesPerPixel == 1) {
+				VideoPaletteListRemove(g->SurfaceFlip);
+			}
+			SDL_FreeSurface(g->SurfaceFlip);
+		}
+#endif
+		Assert(g->File);
+
+		hash_del(GraphicHash, g->File);
+		free(g->File);
+		free(g);
+	}
+
+	return;
 }
 
 /**

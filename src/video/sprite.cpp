@@ -406,15 +406,13 @@ void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, in
 Graphic* LoadSprite(const char* name, int width, int height)
 {
 	Graphic* g;
-	char buf[PATH_MAX];
 
 	g = calloc(1, sizeof(Graphic));
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	LibraryFileName(name, buf);
-	g->File = buf;
+	g->File = (char*)name;
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(g) == -1) {

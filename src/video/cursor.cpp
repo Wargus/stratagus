@@ -118,7 +118,6 @@ CursorType* GameCursor;             ///< current shown cursor-type
 void LoadCursors(const char* race)
 {
 	int i;
-	const char* file;
 
 	//
 	//  Free old cursor sprites.
@@ -139,15 +138,10 @@ void LoadCursors(const char* race)
 			continue;
 		}
 
-		file = Cursors[i].File;
-		if (file) {
-			char* buf;
-
-			buf = alloca(strlen(file) + 9 + 1);
-			file = strcat(strcpy(buf,"graphics/"), file);
-			ShowLoadProgress("Cursor %s", file);
+		if (Cursors[i].File) {
+			ShowLoadProgress("Cursor %s", Cursors[i].File);
 			if (!Cursors[i].Sprite) {
-				Cursors[i].Sprite = LoadSprite(file,
+				Cursors[i].Sprite = LoadSprite(Cursors[i].File,
 					Cursors[i].Width, Cursors[i].Height);
 			}
 		}
