@@ -110,8 +110,7 @@ global void InitUserInterface(const char *race_name)
 #ifdef SPLIT_SCREEN_SUPPORT
     TheUI.LastClickedVP = 0;
 
-    TheUI.ViewportMode = VIEWPORT_SINGLE;
-    SetViewportMode ();
+    SetViewportMode (VIEWPORT_SINGLE);
 #else /* SPLIT_SCREEN_SUPPORT */
     MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
     MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
@@ -695,15 +694,14 @@ local void SetViewportModeQuad (void)
 }
 
 /**
-**	Sets (calls geometry setup routines) for a new viewport mode.
-**	The new mode's mode number has to be already stored in
-**	TheUI.ViewportMode.
+**	Sets up (calls geometry setup routines for) a new viewport mode.
 **
-**	FIXME: it would probably make more sense to pass the new vp mode's
-**	number as an argument to SetViewportMode().
+**	@param new_mode		New mode's number.
 */
-global void SetViewportMode (void)
+global void SetViewportMode (ViewportMode new_mode)
 {
+    TheUI.ViewportMode = new_mode;
+
     switch (TheUI.ViewportMode) {
     case VIEWPORT_SINGLE:
 	SetViewportModeSingle ();
@@ -741,12 +739,13 @@ global void SetViewportMode (void)
 */
 global void CycleViewportMode (int step)
 {
-    TheUI.ViewportMode += step;
-    if ((int )TheUI.ViewportMode >= NUM_VIEWPORT_MODES)
-	TheUI.ViewportMode = 0;
-    if ((int )TheUI.ViewportMode < 0)
-	TheUI.ViewportMode = NUM_VIEWPORT_MODES - 1;
-    SetViewportMode ();
+    int new_mode = (int )TheUI.ViewportMode + step;
+
+    if (new_mode >= NUM_VIEWPORT_MODES)
+	new_mode = 0;
+    if (new_mode < 0)
+	new_mode = NUM_VIEWPORT_MODES - 1;
+    SetViewportMode (new_mode);
 }
 
 #endif /* SPLIT_SCREEN_SUPPORT */
