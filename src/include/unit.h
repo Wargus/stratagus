@@ -841,6 +841,8 @@ extern void DrawSelectionCorners(const Unit* unit,const UnitType* type
 
     /// Load the decorations (health,mana) of units
 extern void LoadDecorations(void);
+    /// Clean the decorations (health,mana) of units
+extern void CleanDecorations(void);
     /// Draw all units visible on map
 extern void DrawUnits(void);
 
