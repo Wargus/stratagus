@@ -423,7 +423,11 @@ global int NetSocketReady(int sockfd,int timeout)
 
 	// Data available?
 	retval = select(sockfd+1, &mask, NULL, NULL, &tv);
+#ifdef _MSC_VER
+    } while ( 0 );	    // FIXME: better way?
+#else
     } while ( retval==-1 && errno == EINTR );
+#endif
 
 #if defined(linux) && defined(USE_X11)
     sigemptyset(&sigmask);
