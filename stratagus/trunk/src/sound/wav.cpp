@@ -148,8 +148,6 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     int i;
     Sample* sample;
 
-    DebugLevel3("Loading `%s'\n" _C_ name);
-
     if (!(f = CLopen(name))) {
 	printf("Can't open file `%s'\n", name);
 	return NULL;
@@ -164,10 +162,11 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     DebugLevel3("Magic: $%x\n" _C_ chunk.Magic);
     DebugLevel3("Length: %d\n" _C_ chunk.Length);
     if (chunk.Magic != RIFF) {
-	printf("Wrong magic %x (not %x)\n", chunk.Magic, RIFF);
 	CLclose(f);
 	return NULL;
     }
+
+    DebugLevel2Fn("Loading wav file: %s\n" _C_ name);
 
     CLread(f, &t, sizeof(t));
     t = ConvertLE32(t);
