@@ -87,7 +87,7 @@ global unsigned PfCounterNotReachable;
 /**
 **	Initialize a matrix
 **
-**	@NOTE	Double border for ships/flyers.
+**	@note	Double border for ships/flyers.
 **
 **		98 98 98 98 98
 **		98 98 98 98 98
@@ -855,7 +855,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 **	The destination could be an unit or a field.
 **	Range gives how far we must reach the goal.
 **
-**	@NOTE	The destination could become negative coordinates!
+**	@note	The destination could become negative coordinates!
 **
 **	@param unit	Path for this unit.
 **	@param xdp	Pointer for x direction return.
