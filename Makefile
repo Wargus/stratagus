@@ -129,7 +129,7 @@ depend::
 
 DOCS    = README doc/readme.html doc/install.html doc/clone.html doc/faq.html \
 	  doc/ChangeLog.html doc/todo.html doc/clone.lsm doc/development.html \
-	  doc/LICENSE doc/OPL doc/opl.html \
+	  doc/LICENSE doc/OPL doc/opl.html doc/artistic-license.html \
 	  doc/ccl/unittype.html \
 	  doc/graphic/*.html doc/graphic/*.png
 
