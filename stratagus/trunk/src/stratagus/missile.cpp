@@ -104,11 +104,6 @@ static FuncController *MissileClassFunctions[] = {
 */
 const char MissileTypeType[] = "missile-type";
 
-/**
-**  W*rCr*ft number to internal missile-type name.
-*/
-char** MissileTypeWcNames;
-
 MissileType** MissileTypes;              /// Missile types.
 int NumMissileTypes;                     /// number of missile-types made.
 
@@ -1407,14 +1402,6 @@ void CleanMissiles(void)
 		*missiles = NULL;
 	}
 	NumLocalMissiles = 0;
-
-	if (MissileTypeWcNames) {
-		for (sp = MissileTypeWcNames; *sp; ++sp) {
-			free(*sp);
-		}
-		free(MissileTypeWcNames);
-		MissileTypeWcNames = NULL;
-	}
 }
 
 /*----------------------------------------------------------------------------

@@ -481,7 +481,6 @@ typedef struct _burning_building_frame_ {
 extern MissileType** MissileTypes;  ///< All missile-types
 extern int NumMissileTypes;        ///< Number of missile-types
 
-extern char** MissileTypeWcNames;  ///< Mapping wc-number 2 symbol
 extern const char* MissileClassNames[];  ///< Missile class names
 
 extern BurningBuildingFrame* BurningBuildingFrames;  ///< Burning building frames
