@@ -187,6 +187,8 @@ extern CursorType* CursorTypeByIdent(const char* ident);
 extern void DrawAnyCursor(void);
     /// Hide any cursor
 extern void HideAnyCursor(void);
+    /// Animate the cursor
+extern void CursorAnimate(unsigned ticks);
 
     /// Save/load rectangle region from/to screen
     /// Note: this is made extern for minimap only
