@@ -30,7 +30,7 @@ void RegidBitmapInflate (RegidSpace *space)
 
 void RegidBitmapShrink (RegidSpace *space)
 {
-	int size_needed;
+	unsigned int size_needed;
 
 	size_needed = space->RegidHigh/8;
 	if (space->RegidHigh%8)
@@ -42,13 +42,13 @@ void RegidBitmapShrink (RegidSpace *space)
 	}
 }
 
-int RegidInUse (RegidSpace *space, int regid)
+int RegidInUse (RegidSpace *space, unsigned int regid)
 {
 	--regid;		/* regions are numbered starting at 1, not 0 */
 	return space->Bitmap[regid/8] & (1 << regid%8);
 }
 
-void RegidMarkUnused (RegidSpace *space, int regid)
+void RegidMarkUnused (RegidSpace *space, unsigned int regid)
 {
 	space->Bitmap[(regid-1)/8] &= ~(1 << (regid-1)%8);
 	if (regid == space->RegidHigh) {
@@ -58,7 +58,7 @@ void RegidMarkUnused (RegidSpace *space, int regid)
 	}
 }
 
-void RegidMarkUsed (RegidSpace *space, int regid)
+void RegidMarkUsed (RegidSpace *space, unsigned int regid)
 {
 	space->Bitmap[(regid-1)/8] |= 1 << (regid-1)%8;
 	if (regid > space->RegidHigh)
@@ -67,7 +67,8 @@ void RegidMarkUsed (RegidSpace *space, int regid)
 
 int RegidFind (RegidSpace *space, enum regid_dir dir, enum regid_usage used)
 {
-	int byte, increment;
+	unsigned int byte;
+	int increment;
 
 	if (dir==REGID_LOWEST) {
 		increment = 1;

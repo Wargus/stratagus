@@ -2,6 +2,8 @@
 /* $Id$ */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "freecraft.h"
 #include "unittype.h"
@@ -10,6 +12,8 @@
 #include "region_set.h"
 #include "regid.h"
 #include "avl_tree.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 static struct region_set {
 	RegidSpace RegidSpace;
@@ -189,3 +193,5 @@ void RegionSetCreateNeighborLists (int x0, int y0, int x1, int y1)
 			}
 		}
 }
+
+#endif	// } HIERARCHIC_PATHFINDER
