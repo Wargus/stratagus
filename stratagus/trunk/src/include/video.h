@@ -198,7 +198,7 @@ extern Graphic* LoadGraphicPNG(const char* name);
 extern void MakeTexture(Graphic* graphic, int width, int height);
 	/// Make an OpenGL texture of the player color pixels only.
 extern void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
-	unsigned char* map, int maplen);
+	UnitColors* colors);
 #endif
 
 	/// Load graphic

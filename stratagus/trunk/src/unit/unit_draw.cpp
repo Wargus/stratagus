@@ -1651,23 +1651,8 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 							type->NumDirections - -frame % (type->NumDirections / 2 + 1) :
 						(frame / (type->NumDirections / 2 + 1)) * type->NumDirections +
 							frame % (type->NumDirections / 2 + 1))]) {
-		unsigned char mapping[4 * 2];
-		int i;
-
-		if (player == 7 || player == 15) {
-			for (i = 0; i < 4; ++i) {
-				mapping[i * 2 + 0] = 208 + i;
-				mapping[i * 2 + 1] = player * 4 + 12 + i;
-			}
-		} else {
-			for (i = 0; i < 4; ++i) {
-				mapping[i * 2 + 0] = 208 + i;
-				mapping[i * 2 + 1] = player * 4 + 208 + i;
-			}
-		}
-		fprintf(stderr,"%s (%d)\n", type->Ident, player);
 		MakePlayerColorTexture(&((UnitType*)type)->PlayerColorSprite[player],
-			type->Sprite, frame < 0 ? -frame - 1 : frame, mapping, 4);
+			type->Sprite, frame < 0 ? -frame - 1 : frame, &Players[player].UnitColors);
 	}
 
 	// FIXME: move this calculation to high level.
