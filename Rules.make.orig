@@ -237,11 +237,11 @@ LOCKVER=	rcs -q -n$(NAME)
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
-	@ar cru $(TOPDIR)/src/libclone.a $@
+	@$(AR) cru $(TOPDIR)/src/libclone.a $@
 
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $< -o $@
-	@ar cru $(TOPDIR)/src/libclone.a $@
+	@$(AR) cru $(TOPDIR)/src/libclone.a $@
 
 #------------
 #	Source code documentation

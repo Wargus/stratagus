@@ -740,7 +740,7 @@ echo >> $RULESFILE
 
 echo "%.o: %.c" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
-echo "	@ar cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
+echo "	@\$(AR) cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
 if [ "$DARWIN" = "1" ] ; then
   echo "	ranlib \$(TOPDIR)/src/libclone.a" >> $RULESFILE
 fi
@@ -748,7 +748,7 @@ echo >> $RULESFILE
 
 echo "%.o: %.cpp" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
-echo "	@ar cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
+echo "	@\$(AR) cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
 if [ "$DARWIN" = "1" ] ; then
   echo "	ranlib \$(TOPDIR)/src/libclone.a" >> $RULESFILE
 fi
