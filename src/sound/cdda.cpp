@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
@@ -46,120 +46,120 @@
 #include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
---	Declarations
+--		Declarations
 ----------------------------------------------------------------------------*/
 
 typedef struct _cdda_data {
-    int PosInCd;			// Offset on CD to read from
-    struct cdrom_read_audio Readdata;	// Structure for IOCTL
-    char* PointerInBuffer;		// Position in buffer
-    char* Buffer;			// Buffer start
+	int PosInCd;						// Offset on CD to read from
+	struct cdrom_read_audio Readdata;		// Structure for IOCTL
+	char* PointerInBuffer;				// Position in buffer
+	char* Buffer;						// Buffer start
 } CddaData;
 
 #define FRAME_SIZE 2352
 #define CDDA_BUFFER_SIZE (12 * FRAME_SIZE)
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Type member function to read from the cd
+**		Type member function to read from the cd
 **
-**	@param sample	    Sample reading from
-**	@param buf	    Buffer to write data to
-**	@param len	    Length of the buffer
+**		@param sample			Sample reading from
+**		@param buf			Buffer to write data to
+**		@param len			Length of the buffer
 **
-**	@return		    Number of bytes read
+**		@return					Number of bytes read
 */
 local int CDRead(Sample* sample, void* buf, int len)
 {
-    CddaData* data;
-    int n;
+	CddaData* data;
+	int n;
 
-    data = (CddaData*)sample->User;
+	data = (CddaData*)sample->User;
 
-    data->Readdata.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + data->PosInCd / FRAME_SIZE;
-    data->Readdata.addr_format = CDROM_LBA;
+	data->Readdata.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + data->PosInCd / FRAME_SIZE;
+	data->Readdata.addr_format = CDROM_LBA;
 
-    // end of track
-    if (FRAME_SIZE * (CDtocentry[CDTrack + 1].cdte_addr.lba - 
-	    CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd < len) {
-	len = FRAME_SIZE * (CDtocentry[CDTrack+1].cdte_addr.lba -
-	    CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd;
-	data->PosInCd = 0;
-    }
+	// end of track
+	if (FRAME_SIZE * (CDtocentry[CDTrack + 1].cdte_addr.lba -
+			CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd < len) {
+		len = FRAME_SIZE * (CDtocentry[CDTrack+1].cdte_addr.lba -
+			CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd;
+		data->PosInCd = 0;
+	}
 
-    if (sample->Length - (data->PointerInBuffer - data->Buffer) < len) {
-	// need to read more data
-	sample->Length -= data->PointerInBuffer - data->Buffer;
-	memcpy(data->Buffer, data->PointerInBuffer, sample->Length);
-	data->PointerInBuffer = data->Buffer;
+	if (sample->Length - (data->PointerInBuffer - data->Buffer) < len) {
+		// need to read more data
+		sample->Length -= data->PointerInBuffer - data->Buffer;
+		memcpy(data->Buffer, data->PointerInBuffer, sample->Length);
+		data->PointerInBuffer = data->Buffer;
 
-	n = CDDA_BUFFER_SIZE - sample->Length;
+		n = CDDA_BUFFER_SIZE - sample->Length;
 
-	data->Readdata.nframes = n / FRAME_SIZE;
-	data->Readdata.buf = data->PointerInBuffer + sample->Length;
-	ioctl(CDDrive, CDROMREADAUDIO, &data->Readdata);
+		data->Readdata.nframes = n / FRAME_SIZE;
+		data->Readdata.buf = data->PointerInBuffer + sample->Length;
+		ioctl(CDDrive, CDROMREADAUDIO, &data->Readdata);
 
-	sample->Length += data->Readdata.nframes * FRAME_SIZE;
-	data->PosInCd += data->Readdata.nframes * FRAME_SIZE;
-    }
+		sample->Length += data->Readdata.nframes * FRAME_SIZE;
+		data->PosInCd += data->Readdata.nframes * FRAME_SIZE;
+	}
 
-    memcpy(buf, data->PointerInBuffer, len);
-    data->PointerInBuffer += len;
-    return len;
+	memcpy(buf, data->PointerInBuffer, len);
+	data->PointerInBuffer += len;
+	return len;
 }
 
 /**
-**	Type member function to free CDDA sample
+**		Type member function to free CDDA sample
 **
-**	@param sample	    Sample to free
+**		@param sample			Sample to free
 */
 local void CDFree(Sample* sample)
 {
-    free(sample);
+	free(sample);
 }
 
 /**
-**	CDDA object type structure.
+**		CDDA object type structure.
 */
 local const SampleType CDStreamSampleType = {
-    CDRead,
-    CDFree,
+	CDRead,
+	CDFree,
 };
 
 /**
-**	Load CD.
+**		Load CD.
 **
-**	@param name	Unused.
-**	@param flags	Unused.
+**		@param name		Unused.
+**		@param flags		Unused.
 **
-**	@return		Returns the loaded sample.
+**		@return				Returns the loaded sample.
 **
 */
 global Sample* LoadCD(const char* name __attribute__((unused)),
-	int flags __attribute__((unused)))
+		int flags __attribute__((unused)))
 {
-    Sample* sample;
-    CddaData* data;
+	Sample* sample;
+	CddaData* data;
 
-    sample = malloc(sizeof(*sample));
-    sample->Channels = 2;
-    sample->SampleSize = 16;
-    sample->Frequency = 44100;
-    sample->Type = &CDStreamSampleType;
-    sample->Length = 0;
+	sample = malloc(sizeof(*sample));
+	sample->Channels = 2;
+	sample->SampleSize = 16;
+	sample->Frequency = 44100;
+	sample->Type = &CDStreamSampleType;
+	sample->Length = 0;
 
-    data = malloc(sizeof(CddaData));
-    data->PosInCd = 0;
-    data->Buffer = malloc(CDDA_BUFFER_SIZE);
-    data->PointerInBuffer = data->Buffer;
-    sample->User = data;
+	data = malloc(sizeof(CddaData));
+	data->PosInCd = 0;
+	data->Buffer = malloc(CDDA_BUFFER_SIZE);
+	data->PointerInBuffer = data->Buffer;
+	sample->User = data;
 
-    return sample;
+	return sample;
 }
 
-#endif	// } USE_CDDA
+#endif		// } USE_CDDA
 
 //@}

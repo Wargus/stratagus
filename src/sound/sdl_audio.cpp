@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -31,67 +31,67 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include "stratagus.h"
 
-#ifdef WITH_SOUND	// {
+#ifdef WITH_SOUND		// {
 #ifdef USE_SDLA
 
 #include "SDL.h"
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
-    /// FIXME: move function to here.
+	/// FIXME: move function to here.
 extern void FillAudio(void* udata __attribute__((unused)), Uint8* stream,
-    int len);
+	int len);
 
 /**
-**	Initialize sound card hardware part with SDL.
+**		Initialize sound card hardware part with SDL.
 **
-**	@param dev	Device name ("/dev/dsp").
-**	@param freq	Sample frequenz (44100,22050,11025 hz).
-**	@param size	Sampe size (8bit, 16bit)
-**	@param wait	Flag, if true wait for sound device to open.
+**		@param dev		Device name ("/dev/dsp").
+**		@param freq		Sample frequenz (44100,22050,11025 hz).
+**		@param size		Sampe size (8bit, 16bit)
+**		@param wait		Flag, if true wait for sound device to open.
 **
-**	@return		True if failure, false if everything ok.
+**		@return				True if failure, false if everything ok.
 */
 global int InitSdlSound(const char* dev __attribute__((unused)), int freq,
-    int size, int wait __attribute__((unused)))
+	int size, int wait __attribute__((unused)))
 {
-    SDL_AudioSpec wanted;
+	SDL_AudioSpec wanted;
 
-    wanted.freq = freq;
-    if (size == 8) {
-	wanted.format = AUDIO_U8;
-    } else if (size == 16) {
-	wanted.format = AUDIO_S16SYS;
-    } else {
-	DebugLevel0Fn("Unexpected sample size %d\n" _C_ size);
-	wanted.format = AUDIO_S16SYS;
-    }
-    wanted.channels = 2;
-    wanted.samples = 2048;
-    wanted.callback = FillAudio;
-    wanted.userdata = NULL;
+	wanted.freq = freq;
+	if (size == 8) {
+		wanted.format = AUDIO_U8;
+	} else if (size == 16) {
+		wanted.format = AUDIO_S16SYS;
+	} else {
+		DebugLevel0Fn("Unexpected sample size %d\n" _C_ size);
+		wanted.format = AUDIO_S16SYS;
+	}
+	wanted.channels = 2;
+	wanted.samples = 2048;
+	wanted.callback = FillAudio;
+	wanted.userdata = NULL;
 
-    //  Open the audio device, forcing the desired format
-    if (SDL_OpenAudio(&wanted, NULL) < 0) {
-	fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-	return -1;
-    }
-    SoundFildes = 0;
-    SDL_PauseAudio(0);
+	//  Open the audio device, forcing the desired format
+	if (SDL_OpenAudio(&wanted, NULL) < 0) {
+		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+		return -1;
+	}
+	SoundFildes = 0;
+	SDL_PauseAudio(0);
 
-    return 0;
+	return 0;
 }
 
 #endif
-#endif	// } WITH_SOUND
+#endif		// } WITH_SOUND
 
 //@}
