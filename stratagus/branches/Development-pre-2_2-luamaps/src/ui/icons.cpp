@@ -53,11 +53,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/**
-**  Maps the original icon numbers in puds to our internal strings.
-*/
-char** IconWcNames;
-
 static Icon** Icons;                         ///< Table of all icons.
 static int NumIcons;                         ///< Number of icons in Icons.
 
@@ -171,19 +166,7 @@ void LoadIcons(void)
 */
 void CleanIcons(void)
 {
-	char** ptr;
 	int i;
-
-	//
-	//  Mapping the original icon numbers in puds to our internal strings
-	//
-	if ((ptr = IconWcNames)) {  // Free all old names
-		while (*ptr) {
-			free(*ptr++);
-		}
-		free(IconWcNames);
-		IconWcNames = NULL;
-	}
 
 	//
 	//  Icons
@@ -338,47 +321,11 @@ static int CclDefineIcon(lua_State* l)
 }
 
 /**
-**  Define icon mapping from original number to internal symbol
-*/
-static int CclDefineIconWcNames(lua_State* l)
-{
-	int i;
-	int j;
-	char** cp;
-
-	if ((cp = IconWcNames)) {  // Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(IconWcNames);
-	}
-
-	//
-	//  Get new table.
-	//
-	i = lua_gettop(l);
-	IconWcNames = cp = malloc((i + 1) * sizeof(char*));
-	if (!cp) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-
-	for (j = 0; j < i; ++j) {
-		*cp++ = strdup(LuaToString(l, j + 1));
-	}
-	*cp = NULL;
-
-	return 0;
-}
-
-
-/**
 **  Register CCL features for icons.
 */
 void IconCclRegister(void)
 {
 	lua_register(Lua, "DefineIcon", CclDefineIcon);
-	lua_register(Lua, "DefineIconWcNames", CclDefineIconWcNames);
 }
 
 //@}
