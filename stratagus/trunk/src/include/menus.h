@@ -314,12 +314,18 @@ extern void InitMenuFuncHash(void);
     /// Set-up menus for a specific race
 extern void InitMenus(unsigned int race);
 
-      /// draw menu
+    /// Draw menu
 extern void DrawMenu(const char *MenuId);
-      /// draw menu button
+    /// Draw menu button
 extern void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigned h,unsigned x,unsigned y,const int font,const unsigned char *text);
-      /// Draw and process a menu
+    /// Set menu backgound and draw it
+global void MenusSetBackground(void);
+    /// Draw and process a menu
 extern void ProcessMenu(const char *MenuId, int Loop);
+    /// End the current menu
+global void EndMenu(void);
+    /// Find a menu by id
+global Menu *FindMenu(const char *MenuId);
 
     /// The scenario path received from server, Update the client menu.
 extern int NetClientSelectScenario(void);
@@ -341,6 +347,11 @@ extern void Preferences(void);
 extern void GameMenuSave(void);
     /// Load game menu
 extern void GameMenuLoad(void);
+
+    /// Initialize the (ccl-loaded) menus data
+extern void InitMenuData(void);
+    /// Post-Initialize the (ccl-loaded) menus
+extern void InitMenuFunctions(void);
 
 //@}
 

@@ -38,7 +38,7 @@ include $(TOPDIR)/$(RULESFILE)
 MODULE	= ui
 
 SRCS	= mouse.c button_checks.c botpanel.c mainscr.c \
-	  icons.c ui.c ccl_ui.c menus.c console.c \
+	  icons.c ui.c ccl_ui.c menus.c menu_proc.c console.c \
 	  interface.c
 
 OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
