@@ -67,7 +67,7 @@ global int NumCampaigns;		/// Number of campaigns
 local Campaign* CurrentCampaign;	/// Playing this campaign
 local CampaignChapter* CurrentChapter;	/// Playing this chapter of campaign
 local int SkipCurrentChapter = 1;	/// Skip the current chapter when
-                                        /// looking for the next one
+					/// looking for the next one
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -203,7 +203,7 @@ local void ParseShowPicture(CampaignChapter* chapter, SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("display-time"))) {
 	    chapter->Data.Picture.DisplayTime = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value,gh_symbol2scm("text"))) {
+	} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
 	    ChapterPictureText** text;
 
 	    sublist = gh_car(list);
@@ -237,7 +237,7 @@ local void ParseShowPicture(CampaignChapter* chapter, SCM list)
 		} else if (gh_eq_p(value, gh_symbol2scm("align"))) {
 		    char* str;
 		    str = gh_scm2newstr(gh_car(sublist), 0);
-		    if (!strcmp(str,"left")) {
+		    if (!strcmp(str, "left")) {
 			(*text)->Align = PictureTextAlignLeft;
 		    } else if (!strcmp(str, "center")) {
 			(*text)->Align = PictureTextAlignCenter;
@@ -247,7 +247,7 @@ local void ParseShowPicture(CampaignChapter* chapter, SCM list)
 		    }
 		    free(str);
 		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value,gh_symbol2scm("text"))) {
+		} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
 		    (*text)->Text = gh_scm2newstr(gh_car(sublist), 0);
 		    sublist = gh_cdr(sublist);
 		}
@@ -256,6 +256,107 @@ local void ParseShowPicture(CampaignChapter* chapter, SCM list)
     }
 }
 #elif defined(USE_LUA)
+local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
+{
+    const char* value;
+    int args;
+    int j;
+
+    chapter->Type = ChapterShowPicture;
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	value = LuaToString(l, -1);
+	lua_pop(l, 1);
+	++j;
+
+	if (!strcmp(value, "image")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    chapter->Data.Picture.Image = strdup(LuaToString(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "fade-in")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    chapter->Data.Picture.FadeIn = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "fade-out")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    chapter->Data.Picture.FadeOut = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "display-time")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    chapter->Data.Picture.DisplayTime = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "text")) {
+	    ChapterPictureText** text;
+	    int subargs;
+	    int k;
+
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_istable(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+
+	    text = &chapter->Data.Picture.Text;
+	    while (*text) {
+		text = &((*text)->Next);
+	    }
+	    *text = calloc(sizeof(ChapterPictureText), 1);
+
+	    subargs = luaL_getn(l, -1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, -1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+
+		if (!strcmp(value, "font")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    (*text)->Font = CclFontByIdentifier(LuaToString(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "x")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    (*text)->X = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "y")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    (*text)->Y = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "width")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    (*text)->Width = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "height")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    (*text)->Height = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "align")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    value = LuaToString(l, -1);
+		    if (!strcmp(value, "left")) {
+			(*text)->Align = PictureTextAlignLeft;
+		    } else if (!strcmp(value, "center")) {
+			(*text)->Align = PictureTextAlignCenter;
+		    } else {
+			lua_pushfstring(l, "Invalid chapter picture text align value: %s",
+			    value);
+			lua_error(l);
+		    }
+		} else if (!strcmp(value, "text")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    (*text)->Text = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
+		}
+	    }
+	    lua_pop(l, 1);
+	}
+    }
+}
 #endif
 
 /**
@@ -378,7 +479,7 @@ local SCM CclDefineCampaign(SCM list)
 		value = gh_car(sublist);
 		sublist = gh_cdr(sublist);
 
-		chapter = calloc(sizeof(CampaignChapter),1);
+		chapter = calloc(sizeof(CampaignChapter), 1);
 		chapter->Next = *tail;
 		*tail = chapter;
 		tail = &chapter->Next;
@@ -408,6 +509,118 @@ local SCM CclDefineCampaign(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineCampaign(lua_State* l)
+{
+    char* ident;
+    const char* value;
+    Campaign* campaign;
+    CampaignChapter* chapter;
+    CampaignChapter** tail;
+    int i;
+    int args;
+    int j;
+    int subargs;
+    int k;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    //
+    //	Campaign name
+    //
+    ident = strdup(LuaToString(l, j + 1));
+    ++j;
+    campaign = NULL;
+
+    if (Campaigns) {
+	for (i = 0; i < NumCampaigns; ++i) {
+	    if (!strcmp(Campaigns[i].Ident, ident)) {
+		if (!strcmp(ident, "current") && Campaigns[i].Chapters) {
+		    FreeChapters(&Campaigns[i].Chapters);
+		} else if (Campaigns[i].Chapters) {
+		    // Redefining campaigns causes problems if a campaign is
+		    // playing.
+		    return 0;
+		}
+		campaign = Campaigns + i;
+		free(campaign->Ident);
+		free(campaign->Name);
+		free(campaign->File);
+		break;
+	    }
+	}
+	if (i == NumCampaigns) {
+	    Campaigns = realloc(Campaigns, sizeof(Campaign) * (NumCampaigns + 1));
+	    campaign = Campaigns + NumCampaigns;
+	    ++NumCampaigns;
+	}
+    } else {
+	campaign = Campaigns = malloc(sizeof(Campaign));
+	++NumCampaigns;
+    }
+
+    memset(campaign, 0, sizeof(Campaign));
+    campaign->Ident = ident;
+    campaign->Players = 1;
+    tail = &campaign->Chapters;
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    for (; j < args; ++j) {
+	value = LuaToString(l, j + 1);
+	++j;
+
+	if (!strcmp(value, "name")) {
+	    campaign->Name = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "file")) {
+	    campaign->File = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "players")) {
+	    campaign->Players = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "campaign")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    //
+	    //	Parse the list
+	    //
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+
+		chapter = calloc(sizeof(CampaignChapter), 1);
+		chapter->Next = *tail;
+		*tail = chapter;
+		tail = &chapter->Next;
+
+		if (!strcmp(value, "show-picture")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+//		    ParseShowPicture(l, chapter);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "play-movie")) {
+		    DebugLevel0Fn("FIXME: not supported\n");
+		} else if (!strcmp(value, "play-level")) {
+		    chapter->Type = ChapterPlayLevel;
+		    lua_rawgeti(l, j + 1, k + 1);
+		    chapter->Data.Level.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
+		} else {
+		   lua_pushfstring(l, "Unsupported tag: %s", value);
+		   lua_error(l);
+		}
+	    }
+	} else {
+	   lua_pushfstring(l, "Unsupported tag: %s", value);
+	   lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -440,6 +653,34 @@ local SCM CclSetCurrentChapter(SCM num)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSetCurrentChapter(lua_State* l)
+{
+    int i;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    for (i = 0; i < NumCampaigns; ++i) {
+	if (!strcmp(Campaigns[i].Ident, "current")) {
+	    CurrentCampaign = Campaigns + i;
+	    break;
+	}
+    }
+    if (!CurrentCampaign) {
+	return 0;
+    }
+
+    i = LuaToNumber(l, 1);
+    CurrentChapter = CurrentCampaign->Chapters;
+    while (i && CurrentChapter) {
+	--i;
+	CurrentChapter = CurrentChapter->Next;
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -528,6 +769,10 @@ global void CampaignCclRegister(void)
     gh_new_procedureN("define-campaign", CclDefineCampaign);
     gh_new_procedure1_0("set-current-chapter!", CclSetCurrentChapter);
     gh_new_procedureN("briefing", CclBriefing);
+#elif defined(USE_LUA)
+    lua_register(Lua, "DefineCampaign", CclDefineCampaign);
+    lua_register(Lua, "SetCurrentChapter", CclSetCurrentChapter);
+//    lua_register(Lua, "Briefing", CclBriefing);
 #endif
 }
 
