@@ -3419,6 +3419,7 @@ global void LetUnitDie(Unit* unit)
 
     unit->HP=0;
     unit->Moving=0;
+    unit->TTL=0;
 
     type=unit->Type;
 
