@@ -258,7 +258,7 @@ global void AiAttackWithForce(int force)
 	AiPlayer->Force[force].Attacking=1;
 
 	enemy=NoUnitP;
-	while( aiunit ) {		// Use an unit that can attack
+	while( aiunit && !enemy ) {	// Use an unit that can attack
 	    if( aiunit->Unit->Type->CanAttack ) {
 		enemy = AttackUnitsInDistance(aiunit->Unit, 1000);
 	    }
@@ -306,7 +306,8 @@ global void AiForceManager(void)
 	    //
 	    aiunit=AiPlayer->Force[force].Units;
 	    while( aiunit ) {
-		if( AttackUnitsInReactRange(aiunit->Unit) ) {
+		if( aiunit->Unit->Type->CanAttack &&
+			AttackUnitsInReactRange(aiunit->Unit) ) {
 		    break;
 		}
 		aiunit=aiunit->Next;
