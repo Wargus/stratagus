@@ -43,7 +43,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "construct.h"
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --		Variables

@@ -43,8 +43,8 @@
 #include "tileset.h"
 #include "unittype.h"
 #include "missile.h"
-#include "ccl_sound.h"
-#include "ccl.h"
+#include "script_sound.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

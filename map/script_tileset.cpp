@@ -39,7 +39,7 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "ccl.h"
+#include "script.h"
 #include "tileset.h"
 #include "map.h"
 

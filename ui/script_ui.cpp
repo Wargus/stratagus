@@ -39,7 +39,7 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "ccl.h"
+#include "script.h"
 #include "interface.h"
 #include "ui.h"
 #include "video.h"

@@ -43,7 +43,7 @@
 
 #include <stdlib.h>
 
-#include "ccl.h"
+#include "script.h"
 #include "sound_id.h"
 #include "sound.h"
 #include "sound_server.h"
@@ -787,7 +787,7 @@ global void SoundCclRegister(void)
 
 #else		// }{ WITH_SOUND
 
-#include "ccl.h"
+#include "script.h"
 
 /**
 **		Global volume support

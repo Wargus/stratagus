@@ -45,7 +45,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "missile.h"
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --		Definitons

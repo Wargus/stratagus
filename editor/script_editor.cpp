@@ -40,7 +40,7 @@
 
 #include "stratagus.h"
 #include "editor.h"
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

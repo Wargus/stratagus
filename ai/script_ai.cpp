@@ -41,11 +41,11 @@
 
 #include "stratagus.h"
 #include "unittype.h"
-#include "ccl.h"
+#include "script.h"
 #include "ai.h"
 #include "pathfinder.h"
 #include "ai_local.h"
-#include "ccl_helpers.h"
+#include "script_helpers.h"
 
 
 /**

@@ -80,7 +80,7 @@
 #include "sound_server.h"
 #include "sound.h"
 #include "cdaudio.h"
-#include "ccl.h"
+#include "script.h"
 
 #ifdef USE_LIBMODPLUG
 #include "../libmodplug/modplug.h"

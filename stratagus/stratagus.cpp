@@ -142,7 +142,7 @@
 **				CCL is Craft Configuration Language, which is used to
 **				configure and customize Stratagus.
 **
-**				@see ccl.h @see ccl.c
+**				@see script.h @see script.c
 **
 **		@subsection Icon Icon
 **
@@ -215,7 +215,7 @@ extern int getopt(int argc, char* const* argv, const char* opt);
 #include "sound_server.h"
 #include "sound.h"
 #include "settings.h"
-#include "ccl.h"
+#include "script.h"
 #include "network.h"
 #include "netconnect.h"
 #include "ai.h"

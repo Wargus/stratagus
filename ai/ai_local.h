@@ -37,7 +37,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "ccl.h"
+#include "script.h"
 #include "player.h"
 #include "unittype.h"
 #include "upgrade.h"

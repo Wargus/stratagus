@@ -41,7 +41,7 @@
 #include "stratagus.h"
 #include "video.h"
 #include "font.h"
-#include "ccl.h"
+#include "script.h"
 
 #include "intern_video.h"
 

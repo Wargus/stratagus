@@ -58,7 +58,7 @@
 #include "pathfinder.h"
 #include "network.h"
 #include "ui.h"
-#include "ccl.h"
+#include "script.h"
 #include "editor.h"
 
 /*----------------------------------------------------------------------------
