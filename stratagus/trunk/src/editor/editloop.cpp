@@ -2077,7 +2077,6 @@ global void EditorMainLoop(void)
 		// Restore all for menu
 		//
 		CleanModules();
-		CleanFonts();
 
 		LoadCcl(); // Reload the main config file
 

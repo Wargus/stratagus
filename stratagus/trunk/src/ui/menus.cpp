@@ -1765,7 +1765,6 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 		DestroyCursorBackground();
 		SetClipping(0,0,VideoWidth - 1,VideoHeight - 1);
 		CleanModules();
-		CleanFonts();
 		LoadCcl();
 		PreMenuSetup();
 		GameCursor = TheUI.Point.Cursor;
