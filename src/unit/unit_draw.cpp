@@ -1830,7 +1830,10 @@ local void DrawUnit(const Unit* unit)
 
 /**
 **	Draw all units on visible map.
-**	FIXME: Must use the redraw tile flags in this function
+**
+**	@param v	Viewport to be drawn.
+**
+**	@todo FIXME: Must use the redraw tile flags in this function
 */
 global void DrawUnits (int v)
 {
