@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -183,7 +183,7 @@ typedef struct _upgrade_modifier_ {
   // `?' -- leave as is, `F' -- forbid, `A' -- allow
   // FIXME: see below allow more semantics?
   // FIXME: pointers or ids would be faster and less memory use
-  char	ChangeUnits[UnitTypeMax];	/// allow/forbid units
+  int	ChangeUnits[UnitTypeMax];	/// add/remove allowed units
   char	ChangeUpgrades[UpgradeMax];	/// allow/forbid upgrades
   char	ApplyTo[UnitTypeMax];		/// which unit types are affected
 
@@ -206,7 +206,7 @@ typedef struct _upgrade_modifier_ {
 ***		@li `X' -- fixed, acquired can't be disabled
 */
 typedef struct _allow_ {
-    char	Units[UnitTypeMax];	/// units allowed/disallowed
+    int		Units[UnitTypeMax];	/// maximum amount of units allowed
     char	Upgrades[UpgradeMax];	/// upgrades allowed/disallowed
 } Allow;
 

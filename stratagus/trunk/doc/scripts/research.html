@@ -83,19 +83,46 @@ NOT WRITTEN YET.
 <a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
 <a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
 
-<a name="define-allow"></a>
-<h3>(define-allow name str16)</h3>
 
-Define what unit-types and upgrades are enabled for each player during
+<a name="define-unit-allow"></a>
+<h3>(define-unit-allow name N N N N N N N N N N N N N N N N)</h3>
+
+Define how many units of each type a players can have during
 a level.
 
 <dl>
 <dt>name</dt>
-<dd>Name of an unit-type or an upgrade to be defined.
+<dd>Name of an unit-type to be defined.
+</dd>
+<dt>N</dt>
+<dd>
+  The initial quantity of units per type at level start.
+  Each player has his quatinty, the first is for player 0 and the last
+  is for player 15.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    ;; Allow the catapult for the 2nd player.
+    (define-unit-allow 'unit-catapult  0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+</pre>
+
+
+<a name="define-allow"></a>
+<h3>(define-allow name str16)</h3>
+
+Define what upgrades are enabled for each player during
+a level.
+
+<dl>
+<dt>name</dt>
+<dd>Name of an upgrade to be defined.
 </dd>
 <dt>str16</dt>
 <dd>
-  The initial allow state for the unit-type or upgrade at level start:
+  The initial allow state for the upgrade at level start:
   <ul>
   <li>A - Allowed
   <li>E - Enabled, allowed by level but currently forbidden
@@ -111,8 +138,8 @@ a level.
 <h4>Example</h4>
 
 <pre>
-    ;; Allow the catapult for all 16 players.
-    (define-allow 'unit-catapult  "AAAAAAAAAAAAAAAA")
+    ;; Allow the metal upgrade for all 16 players.
+    (define-allow 'upgrade-metal  "AAAAAAAAAAAAAAAA")
     ;;                             ^- player 0    ^- player 15
 </pre>
 
@@ -225,8 +252,13 @@ all old units and any new unit of a player.
   <dd>Change the costs for the resource type of all unit-types
   or upgrade-ids given with '(apply-to ...).
   </dd>
-  <dt>'(allow unit-type-id N) or '(allow upgrade-id N)</dt>
-  <dd>Change the state of an unit-type or upgrade. N can be
+  <dt>'(allow-unit unit-type-id N)</dt>
+  <dd>
+      Change the state of an upgrade. N is the maximum quantity
+      of this unit per player.
+  </dd>
+  <dt>'(allow upgrade-id N)</dt>
+  <dd>Change the state of an upgrade. N can be
       <ul>
       <li>A - Allowed
       <li>E - Enabled, allowed by level but currently forbidden

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -200,7 +200,7 @@ global int CheckDependByIdent(const Player* player, const char* target)
     if (!strncmp(target, "unit-", 5)) {
 	// target string refers to unit-XXX
 	rule.Kind.UnitType = UnitTypeByIdent(target);
-	if (UnitIdAllowed(player, rule.Kind.UnitType->Type) != 'A') {
+	if (UnitIdAllowed(player, rule.Kind.UnitType->Type) == 0) {  
 	    return 0;
 	}
 	rule.Type = DependRuleUnitType;
