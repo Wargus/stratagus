@@ -145,18 +145,21 @@ void DoRightButton(int sx, int sy)
 		dest = NULL;
 	}
 
-	// Don't allow stopping enemy transporters!
-	if (dest && dest->Type->Transporter && !dest->Type->Building &&
-			PlayersTeamed(ThisPlayer->Player, dest->Player->Player)) {
-		// n0b0dy: So we are clicking on a transporter. We have to:
-		// 1) Flush the transporters orders.
-		// 2) Tell the transporter to follow the units. We have to queue all
-		//    these follow orders, so the transport will go and pick the up
-		// 3) Tell all selected land units to go board the transporter.
-		//
-		// Here we flush the order queue
-		SendCommandStopUnit(dest);
-		desttransporter = dest;
+	if (dest && dest->Type->CanTransport) {
+		for (i = 0; i < NumSelected; i++) {
+			if (CanTransport(dest, Selected[i])) {
+				// We are clicking on a transporter. We have to:
+				// 1) Flush the transporters orders.
+				// 2) Tell the transporter to follow the units. We have to queue all
+				//    these follow orders, so the transport will go and pick them up
+				// 3) Tell all selected land units to go board the transporter.
+
+				// Here we flush the order queue
+				SendCommandStopUnit(dest);
+				desttransporter = dest;
+				break;
+			}
+		}
 	}
 
 	// FIXME: the next should be rewritten, must select the units with
@@ -190,8 +193,7 @@ void DoRightButton(int sx, int sy)
 		//
 		//  Enter transporters?
 		//
-		if (dest && dest->Type->Transporter && dest->Player == unit->Player &&
-				unit->Type->UnitType == UnitTypeLand) {
+		if (dest && CanTransport(dest, unit)) {
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			// Let the transporter move to the unit. And QUEUE!!!
@@ -427,7 +429,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->BoardCount &&
+	if (NumSelected == 1 && Selected[0]->Type->CanTransport && Selected[0]->BoardCount &&
 			!BigMapMode) {
 		for (i = Selected[0]->BoardCount - 1; i >= 0; --i) {
 			if (x >= TheUI.TransportingButtons[i].X &&
@@ -868,13 +870,18 @@ static int SendMove(int sx, int sy)
 	int ret;
 
 	ret = 0;
-	//  Move to a transporter.
-	if ((transporter = UnitUnderCursor) &&
-			transporter->Type->Transporter &&
-			(transporter->Player == ThisPlayer ||
-				PlayersTeamed(ThisPlayer->Player, transporter->Player->Player))) {
-		SendCommandStopUnit(transporter);
-		ret = 1;
+	// Move to a transporter.
+	if ((transporter = UnitUnderCursor) && transporter->Type->CanTransport) {
+		for (i = 0; i < NumSelected; ++i) {
+			if (CanTransport(transporter, Selected[i])) {
+				SendCommandStopUnit(transporter);
+				ret = 1;
+				break;
+			}
+		}
+		if (i == NumSelected) {
+			transporter = NULL;
+		}
 	} else {
 		transporter = NULL;
 	}
@@ -883,7 +890,7 @@ static int SendMove(int sx, int sy)
 
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
-		if (transporter && unit->Type->UnitType == UnitTypeLand) {
+		if (transporter && CanTransport(transporter, unit)) {
 			transporter->Blink = 4;
 			SendCommandFollow(transporter, unit, 0);
 			SendCommandBoard(unit, -1, -1, transporter, flush);

@@ -497,8 +497,42 @@ static int CclDefineUnitType(lua_State* l)
 			type->PermanentCloak = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DetectCloak")) {
 			type->DetectCloak = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Transporter")) {
-			type->Transporter = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "CanTransport")) {
+			//
+			//	Warning: CanTransport should only be used AFTER all bool flags
+			//	have been defined.
+			//
+			if (!lua_istable(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			if (type->MaxOnBoard == 0) { // set default value.
+				type->MaxOnBoard = 1;
+			}
+			if (!type->CanTransport) {
+				type->CanTransport = calloc(NumberBoolFlag, sizeof(*type->CanTransport));
+			}
+			// FIXME : add flag for kill/unload units inside.
+			subargs = luaL_getn(l, -1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+				for (i = 0; i < NumberBoolFlag; ++i) {
+					if (!strcmp(value, BoolFlagName[i])) {
+						lua_rawgeti(l, -1, k + 1);
+						value = LuaToString(l, -1);
+						lua_pop(l, 1);
+						type->CanTransport[i] = Ccl2Condition(l, value);
+						break;
+					}
+				}
+				if (i != NumberBoolFlag) {
+					continue;
+				}
+				LuaError(l, "Unsupported flag tag for CanTransport: %s" _C_ value);
+			}
 		} else if (!strcmp(value, "AttackFromTransporter")) {
 			type->AttackFromTransporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coward")) {
@@ -682,7 +716,6 @@ static int CclDefineUnitType(lua_State* l)
 				if (i != NumberBoolFlag) {
 					continue;
 				}
-				printf("\n%s\n", type->Name);
 				LuaError(l, "Unsupported flag tag for can-target-flag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "SelectableByRectangle")) {

@@ -652,7 +652,7 @@ void UpdateButtonPanel(void)
 						UpgradeIdentAllowed(player, buttonaction->ValueStr) == 'R';
 					break;
 				case ButtonUnload:
-					allow = (Selected[0]->Type->Transporter && Selected[0]->BoardCount);
+					allow = (Selected[0]->Type->CanTransport && Selected[0]->BoardCount);
 					break;
 				case ButtonCancel:
 					allow = 1;

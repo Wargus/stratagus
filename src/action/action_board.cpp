@@ -92,7 +92,7 @@ static int WaitForTransporter(Unit* unit)
 
 	trans = unit->Orders[0].Goal;
 
-	if (!trans || !trans->Type->Transporter) {
+	if (!trans || !CanTransport(trans, unit)) {
 		// FIXME: destination destroyed??
 		return 0;
 	}
