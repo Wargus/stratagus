@@ -100,6 +100,7 @@ enum _mode_buttons_ {
 global char** EditorUnitTypes;		/// Sorted editor unit-type table
 
 local int UnitIndex;			/// Unit icon draw index
+global int MaxUnitIndex;		/// Max unit icon draw index
 local int CursorUnitIndex;		/// Unit icon under cursor
 local int SelectedUnitIndex;		/// Unit type to draw
 
@@ -956,8 +957,8 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
 
-	    for (i = 9; i-- && UnitIndex;) {
-		--UnitIndex;
+	    if (UnitIndex - 9 >= 0) {
+		UnitIndex -= 9;
 	    }
 	    return;
 	}
@@ -966,8 +967,8 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
 
-	    for (i = 9; i-- && EditorUnitTypes[UnitIndex + 1];) {
-		++UnitIndex;
+	    if (UnitIndex + 9 <= MaxUnitIndex) {
+		UnitIndex += 9;
 	    }
 	    return;
 	}
@@ -1552,6 +1553,7 @@ local void CreateEditor(void)
 	for (i = 0; i < n; ++i) {
 	    EditorUnitTypes[i] = UnitTypeWcNames[i];
 	}
+	MaxUnitIndex = n-1;
     }
 
     if( 1 ) {

@@ -70,6 +70,7 @@ local SCM CclDefineEditorUnitTypes(SCM list)
     //
     i=gh_length(list);
     EditorUnitTypes=cp=malloc((i+1)*sizeof(char*));
+    MaxUnitIndex = i;
     while( i-- ) {
 	*cp++=gh_scm2newstr(gh_car(list),NULL);
 	list=gh_cdr(list);
