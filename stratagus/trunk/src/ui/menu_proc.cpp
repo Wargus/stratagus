@@ -53,6 +53,14 @@
 #undef EndMenu
 #undef DrawIcon
 #endif
+
+#ifdef USE_X11
+#include <X11/Xlib.h>
+#elif defined(USE_SDL)
+#include <SDL.h>
+#include <SDL/SDL_syswm.h>
+#endif
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -1299,10 +1307,14 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
     Menuitem *mi;
     Menu *menu;
-#ifdef WIN32
+#if defined(WIN32) || defined(_XLIB_H_)
     int i;
-    HGLOBAL handle;
     char *clipboard;
+#ifdef WIN32
+    HGLOBAL handle;
+#elif defined(_XLIB_H_)
+    Display *display;
+#endif
 #endif
 
     if (CurrentMenu == NULL) {
@@ -1380,6 +1392,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	    if (!(mi->flags&MenuButtonClicked)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_INPUT:
+#if defined(WIN32) || defined(_XLIB_H_)
 #ifdef WIN32
 			if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL))
 			    break; 
@@ -1389,6 +1402,11 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			clipboard = GlobalLock(handle);
 			if (!clipboard)
 			    break;
+#elif defined(_XLIB_H_)
+			display = XOpenDisplay(NULL);
+			clipboard = XFetchBytes(display, &i);
+			XCloseDisplay(display);
+#endif
 			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i)
 			{
 			    if (clipboard[i] != '\r' && clipboard[i] != '\n')
@@ -1398,8 +1416,10 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			    }
 			}
 			strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
+#ifdef WIN32
 			GlobalUnlock(handle);
 			CloseClipboard();
+#endif
 			MustRedraw |= RedrawMenu;
 #endif
 			break;
