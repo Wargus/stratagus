@@ -730,8 +730,6 @@ local SCM CclDefineModifier(SCM list)
 	    attack_range=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(temp,gh_symbol2scm("sight-range")) ) {
 	    sight_range=gh_scm2int(gh_cadr(value));
-	} else if( gh_eq_p(temp,gh_symbol2scm("attack-range")) ) {
-	    attack_range=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(temp,gh_symbol2scm("basic-damage")) ) {
 	    basic_damage=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(temp,gh_symbol2scm("piercing-damage")) ) {
@@ -1302,6 +1300,9 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
     pn = player->Player;		// player number
     for (z = 0; z < UpgradeMax; z++) {
 	// allow/forbid upgrades for player.  only if upgrade is not acquired
+
+	// FIXME: check if modify is allowed
+
 	if (player->Allow.Upgrades[z] != 'R') {
 	    if (um->ChangeUpgrades[z] == 'A') {
 		player->Allow.Upgrades[z] = 'A';
@@ -1318,6 +1319,9 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 
     for (z = 0; z < UnitTypeMax; z++) {
 	// allow/forbid unit types for player
+
+	// FIXME: check if modify is allowed
+
 	if (um->ChangeUnits[z] == 'A') {
 	    player->Allow.Units[z] = 'A';
 	}
