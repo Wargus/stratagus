@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_research.c -	The research action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -39,7 +38,7 @@ global void HandleActionResearch(Unit* unit)
 {
     Upgrade* upgrade;
 
-    DebugLevel3("Research %d\n",unit);
+    DebugLevel3("Research %Zd\n",UnitNumber(unit));
     upgrade=unit->Command.Data.Research.What;
     unit->Command.Data.Research.Ticks+=SpeedResearch;
     if( unit->Command.Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
