@@ -85,25 +85,25 @@ typedef struct ChapterTextLines {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global Intro GameIntro;              /// Game intro
-global Credits GameCredits;          /// Game credits
-local PlayerRanks Ranks[PlayerMax];  /// Ranks
+Intro GameIntro;              /// Game intro
+Credits GameCredits;          /// Game credits
+static PlayerRanks Ranks[PlayerMax];  /// Ranks
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-local int IntroNoEvent;         /// Flag got an event
-local int IntroButtonPressed;   /// Button pressed
-local int UseContinueButton;    /// Handle continue button
-local int ContinueButtonX;      /// Continue button position X
-local int ContinueButtonY;      /// Continue button position Y
-local int ContinueButtonFlags;  /// Flags for continue button
+static int IntroNoEvent;         /// Flag got an event
+static int IntroButtonPressed;   /// Button pressed
+static int UseContinueButton;    /// Handle continue button
+static int ContinueButtonX;      /// Continue button position X
+static int ContinueButtonY;      /// Continue button position Y
+static int ContinueButtonFlags;  /// Flags for continue button
 
 /**
 **  Callback for input.
 */
-local void IntroCallbackButton1(unsigned button)
+static void IntroCallbackButton1(unsigned button)
 {
 	if (UseContinueButton) {
 		if ((1 << button) == LeftButton && ContinueButtonX <= CursorX &&
@@ -121,7 +121,7 @@ local void IntroCallbackButton1(unsigned button)
 /**
 **  Callback for input.
 */
-local void IntroCallbackButton2(unsigned button)
+static void IntroCallbackButton2(unsigned button)
 {
 	if (UseContinueButton) {
 		if ((1 << button) == LeftButton && ContinueButtonX <= CursorX &&
@@ -138,7 +138,7 @@ local void IntroCallbackButton2(unsigned button)
 /**
 **  Callback for input.
 */
-local void IntroCallbackKey1(unsigned key, unsigned keychar)
+static void IntroCallbackKey1(unsigned key, unsigned keychar)
 {
 	HandleKeyModifiersDown(key,keychar);
 
@@ -155,7 +155,7 @@ local void IntroCallbackKey1(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-local void IntroCallbackKey2(unsigned key, unsigned keychar)
+static void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
 	HandleKeyModifiersDown(key, keychar);
 
@@ -171,7 +171,7 @@ local void IntroCallbackKey2(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-local void IntroCallbackKey3(unsigned key __attribute__((unused)),
+static void IntroCallbackKey3(unsigned key __attribute__((unused)),
 	unsigned keychar __attribute__((unused)))
 {
 }
@@ -179,7 +179,7 @@ local void IntroCallbackKey3(unsigned key __attribute__((unused)),
 /**
 **  Callback for input.
 */
-local void IntroCallbackMouse(int x, int y)
+static void IntroCallbackMouse(int x, int y)
 {
 	CursorX = x;
 	CursorY = y;
@@ -198,14 +198,14 @@ local void IntroCallbackMouse(int x, int y)
 /**
 **  Callback for exit.
 */
-local void IntroCallbackExit(void)
+static void IntroCallbackExit(void)
 {
 }
 
 /**
 **  Draws a continue button at x,y
 */
-local void DrawContinueButton(void)
+static void DrawContinueButton(void)
 {
 	DrawMenuButton(MBUTTON_GM_HALF, ContinueButtonFlags, 0,
 		106, 27,
@@ -219,7 +219,7 @@ local void DrawContinueButton(void)
 **  @param x  X screen pixel position of continue button.
 **  @param y  Y screen pixel position of continue button.
 */
-local void InitContinueButton(int x, int y)
+static void InitContinueButton(int x, int y)
 {
 	ContinueButtonX = x;
 	ContinueButtonY = y;
@@ -233,7 +233,7 @@ local void InitContinueButton(int x, int y)
 **  @param w      Maximum width of a line.
 **  @param lines  Pointer to linked list structure.
 */
-local void SplitTextIntoLines(const char* text, int w, TextLines** lines)
+static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 {
 	int l;
 	char* s;
@@ -307,7 +307,7 @@ local void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 **
 **  @param lines  Address of the pointer to free
 */
-local void FreeTextLines(TextLines** lines)
+static void FreeTextLines(TextLines** lines)
 {
 	TextLines* ptr;
 
@@ -331,7 +331,7 @@ local void FreeTextLines(TextLines** lines)
 **
 **  @return       1 if there is more to scroll, 0 if it is done
 */
-local int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
+static int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
 {
 	int miny;
 	int endy;
@@ -375,7 +375,7 @@ local int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
 **
 **  @param intro  Intro struct
 */
-global void ShowIntro(const Intro* intro)
+void ShowIntro(const Intro* intro)
 {
 	EventCallback callbacks;
 	Graphic* background;
@@ -558,7 +558,7 @@ global void ShowIntro(const Intro* intro)
 **
 **  @param credits  Credits structure
 */
-global void ShowCredits(Credits* credits)
+void ShowCredits(Credits* credits)
 {
 	EventCallback callbacks;
 	Graphic* background;
@@ -669,7 +669,7 @@ global void ShowCredits(Credits* credits)
 /**
 **  Draw text
 */
-local void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
+static void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 {
 	ChapterPictureText* text;
 	TextLines* lines;
@@ -702,7 +702,7 @@ local void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 **
 **  @param chapter  Pointer to CampaignChapter to show
 */
-global void ShowPicture(CampaignChapter* chapter)
+void ShowPicture(CampaignChapter* chapter)
 {
 	EventCallback callbacks;
 	Graphic* background;
@@ -824,7 +824,7 @@ global void ShowPicture(CampaignChapter* chapter)
 /**
 **  Draw a box with the text inside
 */
-local void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
+static void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
 {
 	VideoFillRectangleClip(ColorBlack, x, y, 80, 24);
 	VideoDrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);
@@ -835,7 +835,7 @@ local void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
 /**
 **  Draw the game stats
 */
-local int GameStatsDrawFunc(int frame)
+static int GameStatsDrawFunc(int frame)
 {
 	int x;
 	int y;
@@ -1186,7 +1186,7 @@ local int GameStatsDrawFunc(int frame)
 /**
 **  Show the game stats
 */
-global void ShowStats(void)
+void ShowStats(void)
 {
 	EventCallback callbacks;
 	Graphic* background;
@@ -1260,7 +1260,7 @@ global void ShowStats(void)
 /**
 **  Free Ccl Credits Memory
 */
-global void CleanCclCredits(void)
+void CleanCclCredits(void)
 {
 	if (GameCredits.Background) {
 		free(GameCredits.Background);
@@ -1279,7 +1279,7 @@ global void CleanCclCredits(void)
 **
 **  @todo  'comment and 'title are only parsed, but not used.
 */
-local int CclCredits(lua_State* l)
+static int CclCredits(lua_State* l)
 {
 	const char* value;
 	const char* n;
@@ -1325,7 +1325,7 @@ local int CclCredits(lua_State* l)
 /**
 **  Register CCL features for credits.
 */
-global void CreditsCclRegister(void)
+void CreditsCclRegister(void)
 {
 	GameCredits.Background = NULL;
 	GameCredits.Names = NULL;
@@ -1339,7 +1339,7 @@ global void CreditsCclRegister(void)
 **  specifying where in the list it should be added.  If no number is
 **  given it is added at the end.
 */
-local int CclAddObjective(lua_State* l)
+static int CclAddObjective(lua_State* l)
 {
 	int i;
 	const char* obj;
@@ -1397,7 +1397,7 @@ local int CclAddObjective(lua_State* l)
 /**
 **  Parse the remove objective ccl function
 */
-local int CclRemoveObjective(lua_State* l)
+static int CclRemoveObjective(lua_State* l)
 {
 	int num;
 
@@ -1428,7 +1428,7 @@ local int CclRemoveObjective(lua_State* l)
 /**
 **  Set the objectives
 */
-local int CclSetObjectives(lua_State* l)
+static int CclSetObjectives(lua_State* l)
 {
 	int i;
 	int args;
@@ -1451,7 +1451,7 @@ local int CclSetObjectives(lua_State* l)
 /**
 **  Parse the define-ranks ccl function
 */
-local int CclDefineRanks(lua_State* l)
+static int CclDefineRanks(lua_State* l)
 {
 	PlayerRanks* rank;
 	const char* race;
@@ -1508,7 +1508,7 @@ local int CclDefineRanks(lua_State* l)
 /**
 **  Register CCL functions for objectives
 */
-global void ObjectivesCclRegister(void)
+void ObjectivesCclRegister(void)
 {
 	lua_register(Lua, "AddObjective", CclAddObjective);
 	lua_register(Lua, "RemoveObjective", CclRemoveObjective);
@@ -1521,7 +1521,7 @@ global void ObjectivesCclRegister(void)
 **
 **  @param file  Output file.
 */
-global void SaveObjectives(CLFile* file)
+void SaveObjectives(CLFile* file)
 {
 	int i;
 

@@ -67,8 +67,8 @@ extern SDL_Surface* TheScreen;	    /// internal screen
 --  Variables
 ----------------------------------------------------------------------------*/
 
-local char MovieKeyPressed;         /// Flag key is pressed to stop
-local int MovieInitialized;         /// Movie module initialized
+static char MovieKeyPressed;         /// Flag key is pressed to stop
+static int MovieInitialized;         /// Movie module initialized
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -81,7 +81,7 @@ local int MovieInitialized;         /// Movie module initialized
 **
 **  @return      Avi file handle on success.
 */
-global AviFile* MovieOpen(const char* name)
+AviFile* MovieOpen(const char* name)
 {
 	AviFile* avi;
 	char buffer[PATH_MAX];
@@ -99,7 +99,7 @@ global AviFile* MovieOpen(const char* name)
 **
 **  @param avi  Avi file handle.
 */
-global void MovieClose(AviFile* avi)
+void MovieClose(AviFile* avi)
 {
 	AviClose(avi);
 }
@@ -114,7 +114,7 @@ global void MovieClose(AviFile* avi)
 **
 **  @return         True if eof.
 */
-global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
+int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
 	SDL_Overlay* overlay, SDL_Rect rect)
 {
 	unsigned char* frame;
@@ -159,7 +159,7 @@ global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
 /**
 **  Callback for input.
 */
-local void MovieCallbackKey(unsigned dummy __attribute__((unused)))
+static void MovieCallbackKey(unsigned dummy __attribute__((unused)))
 {
 	MovieKeyPressed = 0;
 }
@@ -167,14 +167,14 @@ local void MovieCallbackKey(unsigned dummy __attribute__((unused)))
 /**
 **  Callback for input.
 */
-local void MovieCallbackKey1(unsigned dummy __attribute__((unused)))
+static void MovieCallbackKey1(unsigned dummy __attribute__((unused)))
 {
 }
 
 /**
 **  Callback for input.
 */
-local void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
+static void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
 	MovieKeyPressed = 0;
@@ -183,7 +183,7 @@ local void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
 /**
 **  Callback for input.
 */
-local void MovieCallbackKey3(unsigned dummy1 __attribute__((unused)),
+static void MovieCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
 }
@@ -191,7 +191,7 @@ local void MovieCallbackKey3(unsigned dummy1 __attribute__((unused)),
 /**
 **  Callback for input.
 */
-local void MovieCallbackKey4(unsigned dummy1 __attribute__((unused)),
+static void MovieCallbackKey4(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
 	MovieKeyPressed = 0;
@@ -200,7 +200,7 @@ local void MovieCallbackKey4(unsigned dummy1 __attribute__((unused)),
 /**
 **  Callback for input.
 */
-local void MovieCallbackMouse(int dummy_x __attribute__((unused)),
+static void MovieCallbackMouse(int dummy_x __attribute__((unused)),
 	int dummy_y __attribute__((unused)))
 {
 }
@@ -208,7 +208,7 @@ local void MovieCallbackMouse(int dummy_x __attribute__((unused)),
 /**
 **		Callback for exit.
 */
-local void MovieCallbackExit(void)
+static void MovieCallbackExit(void)
 {
 }
 
@@ -222,7 +222,7 @@ local void MovieCallbackExit(void)
 **
 **  @todo Support full screen and resolution changes.
 */
-global int PlayMovie(const char* name, int flags)
+int PlayMovie(const char* name, int flags)
 {
 	AviFile* avi;
 	SDL_Overlay* overlay;
@@ -341,7 +341,7 @@ global int PlayMovie(const char* name, int flags)
 /**
 **  Initialize the movie module.
 */
-global void InitMovie(void)
+void InitMovie(void)
 {
 	if (!MovieInitialized) {
 		VPInitLibrary();
@@ -352,7 +352,7 @@ global void InitMovie(void)
 /**
 **  Cleanup the movie module.
 */
-global void CleanMovie(void)
+void CleanMovie(void)
 {
 	if (MovieInitialized) {
 		VPDeInitLibrary();
@@ -372,7 +372,7 @@ global void CleanMovie(void)
 **
 **  @todo Support full screen and resolution changes.
 */
-global int PlayMovie(const char* file, int flags)
+int PlayMovie(const char* file, int flags)
 {
 	printf("FIXME: PlayMovie(\"%s\",%x) not supported.\n", file, flags);
 
@@ -385,14 +385,14 @@ global int PlayMovie(const char* file, int flags)
 /**
 **  Initialize the movie module.
 */
-global void InitMovie(void)
+void InitMovie(void)
 {
 }
 
 /**
 **  Cleanup the movie module.
 */
-global void CleanMovie(void)
+void CleanMovie(void)
 {
 }
 

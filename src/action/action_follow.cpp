@@ -57,7 +57,7 @@
 **
 **  @param unit  Pointer to unit.
 */
-global void HandleActionFollow(Unit* unit)
+void HandleActionFollow(Unit* unit)
 {
 	Unit* goal;
 

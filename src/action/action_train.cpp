@@ -62,7 +62,7 @@
 **
 **  @return  1 if the the unit can do it, 0 otherwise.
 */
-global int CanHandleOrder(Unit* unit, Order* order)
+int CanHandleOrder(Unit* unit, Order* order)
 {
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
@@ -89,7 +89,7 @@ global int CanHandleOrder(Unit* unit, Order* order)
 **
 **  @param unit  Unit that trains.
 */
-global void HandleActionTrain(Unit* unit)
+void HandleActionTrain(Unit* unit)
 {
 	Unit* nunit;
 	const UnitType* type;

@@ -56,7 +56,7 @@
 **
 **		@param m		pointer to a ZoneSet structure
 */
-global void ZoneSetClear(ZoneSet* m)
+void ZoneSetClear(ZoneSet* m)
 {
 	int i;
 
@@ -80,7 +80,7 @@ global void ZoneSetClear(ZoneSet* m)
 **		@param zone		zone to add
 **		@return 		1 if the zone is new in the set
 */
-global int ZoneSetAddZone(ZoneSet * m, int zone)
+int ZoneSetAddZone(ZoneSet * m, int zone)
 {
 	if (m->Marks[zone] == m->Id) {
 		return 0;
@@ -96,7 +96,7 @@ global int ZoneSetAddZone(ZoneSet * m, int zone)
 **		@param dst		ZoneSet which will be modifier
 **		@param src		ZoneSet which will be added into dst
 */
-global void ZoneSetAddSet(ZoneSet* dst, ZoneSet* src)
+void ZoneSetAddSet(ZoneSet* dst, ZoneSet* src)
 {
 	int i;
 
@@ -112,7 +112,7 @@ global void ZoneSetAddSet(ZoneSet* dst, ZoneSet* src)
 **		@param src		pointer to a ZoneSet structure
 **		@return				1 if a common zone was found, 0 else
 */
-global int ZoneSetHasIntersect(ZoneSet* dst, ZoneSet* src)
+int ZoneSetHasIntersect(ZoneSet* dst, ZoneSet* src)
 {
 	int i;
 	for (i = 0; i < dst->ZoneCount; i++) {
@@ -129,7 +129,7 @@ global int ZoneSetHasIntersect(ZoneSet* dst, ZoneSet* src)
 **		@param dst		pointer to the ZoneSet which will hold the result
 **		@param src		other ZoneSet in the operation
 */
-global void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src)
+void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src)
 {
 	int i;
 	int newzonecount;
@@ -160,7 +160,7 @@ global void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src)
 **		@param x		X coord of the map cell
 **		@param y		Y coord of the map cell
 */
-global void ZoneSetAddCell(ZoneSet * zs,int x,int y)
+void ZoneSetAddCell(ZoneSet * zs,int x,int y)
 {
 	RegionId region;
 
@@ -180,7 +180,7 @@ global void ZoneSetAddCell(ZoneSet * zs,int x,int y)
 **		@param zone		the zone
 **		@return 		1 if zs contains the zone, 0 else
 */
-global int ZoneSetContains(ZoneSet * zs,int zone)
+int ZoneSetContains(ZoneSet * zs,int zone)
 {
 	return zs->Marks[zone] == zs->Id;
 }
@@ -196,7 +196,7 @@ global int ZoneSetContains(ZoneSet * zs,int zone)
 **		@param range		Range around the rectangle
 **		@param mask		Mask to check cell for
 */
-local void ZoneSetAddPassableRange(ZoneSet * zs,int x0,int y0,int x1,int y1,int range,int mask)
+static void ZoneSetAddPassableRange(ZoneSet * zs,int x0,int y0,int x1,int y1,int range,int mask)
 {
 	static int turn[5][2]={{1,0},{0,1},{-1,0},{0,-1}};
 	int x,y;
@@ -229,7 +229,7 @@ local void ZoneSetAddPassableRange(ZoneSet * zs,int x0,int y0,int x1,int y1,int 
 **		@param source		pointer to a ZoneSet
 **		@param src		pointer to an unit
 */
-global void ZoneSetAddUnitZones(ZoneSet * source,Unit * src)
+void ZoneSetAddUnitZones(ZoneSet * source,Unit * src)
 {
 	int unitmask;
 	int start_x0, start_y0, start_x1, start_y1;
@@ -268,7 +268,7 @@ global void ZoneSetAddUnitZones(ZoneSet * source,Unit * src)
 **		@param minrange		minrange to the goal
 **		@param maxrange		maxrange to the goal
 */
-global void ZoneSetAddGoalZones(ZoneSet* dest,Unit* src, int goal_x, int goal_y,int w,int h,int minrange,int maxrange)
+void ZoneSetAddGoalZones(ZoneSet* dest,Unit* src, int goal_x, int goal_y,int w,int h,int minrange,int maxrange)
 {
 	int goal_x0, goal_y0, goal_x1, goal_y1;
 	int unitmask;
@@ -315,7 +315,7 @@ global void ZoneSetAddGoalZones(ZoneSet* dest,Unit* src, int goal_x, int goal_y,
 **		@param dst		pointer to a ZoneSet
 **		@param zone		the zone which adjacent are searched
 */
-local void ZoneSetAddZoneAdjacents(ZoneSet * dst, int zone)
+static void ZoneSetAddZoneAdjacents(ZoneSet * dst, int zone)
 {
 	int i, j;
 	int adj;
@@ -340,7 +340,7 @@ local void ZoneSetAddZoneAdjacents(ZoneSet * dst, int zone)
 **		@param dst		ZoneSet to add zones to
 **		@param src		Zones for which connected zones are searched
 */
-global void ZoneSetAddConnected(ZoneSet* dst, ZoneSet * src)
+void ZoneSetAddConnected(ZoneSet* dst, ZoneSet * src)
 {
 	int i;
 	for (i = 0; i < src->ZoneCount; i++) {
@@ -356,7 +356,7 @@ global void ZoneSetAddConnected(ZoneSet* dst, ZoneSet * src)
 **		@param path		will hold the zones
 **		@param pathlen		will hold the path length
 */
-global int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen)
+int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen)
 {
 	static ZoneSet current={0};
 	static ZoneSet newzones={0};

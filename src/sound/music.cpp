@@ -63,13 +63,13 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global Sample* MusicSample;			 /// Music samples
+Sample* MusicSample;			 /// Music samples
 
-global char* CurrentMusicFile;
+char* CurrentMusicFile;
 
-global PlaySection* PlaySections;				// Play Sections
-global int NumPlaySections;						// Number of Play Sections
-global PlaySectionType CurrentPlaySection;		// Current Play Section
+PlaySection* PlaySections;				// Play Sections
+int NumPlaySections;						// Number of Play Sections
+PlaySectionType CurrentPlaySection;		// Current Play Section
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -80,7 +80,7 @@ global PlaySectionType CurrentPlaySection;		// Current Play Section
 **
 **		@todo 		FIXME: Stop the CD-PLAYER.
 */
-global void StopMusic(void)
+void StopMusic(void)
 {
 	if (PlayingMusic) {
 		PlayingMusic = 0;				// Callback!
@@ -101,7 +101,7 @@ global void StopMusic(void)
 /**
 **		FIXME: docu
 */
-global void PlaySectionMusic(PlaySectionType section)
+void PlaySectionMusic(PlaySectionType section)
 {
 #ifdef USE_CDAUDIO
 	int track;
@@ -200,7 +200,7 @@ global void PlaySectionMusic(PlaySectionType section)
 **
 **		@return				1 if music is playing, 0 if not.
 */
-global int PlayMusic(const char* name)
+int PlayMusic(const char* name)
 {
 	char buffer[PATH_MAX];
 	Sample* sample;
@@ -287,7 +287,7 @@ global int PlayMusic(const char* name)
 **
 **		@param name		Name of sound file
 */
-global void PlaySoundFile(const char* name)
+void PlaySoundFile(const char* name)
 {
 	SoundId id;
 	if (SoundIdForName("dynamic-sound")) {

@@ -76,19 +76,19 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global lua_State* Lua;
+lua_State* Lua;
 
-global char* CclStartFile;              /// CCL start file
-global char* GameName;                  /// Game Preferences
-global int CclInConfigFile;             /// True while config file parsing
-global int SaveGameLoading;             /// If a Saved Game is Loading
+char* CclStartFile;              /// CCL start file
+char* GameName;                  /// Game Preferences
+int CclInConfigFile;             /// True while config file parsing
+int SaveGameLoading;             /// If a Saved Game is Loading
 
-global char* Tips[MAX_TIPS + 1];        /// Array of tips
-global int ShowTips;                    /// Show tips at start of level
-global int CurrentTip;                  /// Current tip to display
-global int NoRandomPlacementMultiplayer = 0;///Disable the random placement of players in muliplayer mode
+char* Tips[MAX_TIPS + 1];        /// Array of tips
+int ShowTips;                    /// Show tips at start of level
+int CurrentTip;                  /// Current tip to display
+int NoRandomPlacementMultiplayer = 0;///Disable the random placement of players in muliplayer mode
 
-global char UseHPForXp = 0;             /// true if gain XP by dealing damage, false if by killing.
+char UseHPForXp = 0;             /// true if gain XP by dealing damage, false if by killing.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -97,7 +97,7 @@ global char UseHPForXp = 0;             /// true if gain XP by dealing damage, f
 /**
 **  FIXME: docu
 */
-local void lstop(lua_State *l, lua_Debug *ar)
+static void lstop(lua_State *l, lua_Debug *ar)
 {
 	(void)ar;  // unused arg.
 	lua_sethook(l, NULL, 0, 0);
@@ -107,7 +107,7 @@ local void lstop(lua_State *l, lua_Debug *ar)
 /**
 **  FIXME: docu
 */
-local void laction(int i)
+static void laction(int i)
 {
 	// if another SIGINT happens before lstop,
 	// terminate process (default action)
@@ -118,7 +118,7 @@ local void laction(int i)
 /**
 **  FIXME: docu
 */
-local void l_message(const char *pname, const char *msg)
+static void l_message(const char *pname, const char *msg)
 {
 	if (pname) {
 		fprintf(stderr, "%s: ", pname);
@@ -134,7 +134,7 @@ local void l_message(const char *pname, const char *msg)
 **
 **  @return        FIXME: docu
 */
-local int report(int status)
+static int report(int status)
 {
 	const char* msg;
 
@@ -157,7 +157,7 @@ local int report(int status)
 **
 **  @return       FIXME: docu
 */
-global int LuaCall(int narg, int clear)
+int LuaCall(int narg, int clear)
 {
 	int status;
 	int base;
@@ -181,7 +181,7 @@ global int LuaCall(int narg, int clear)
 **
 **  @return      FIXME: docu
 */
-global int LuaLoadFile(const char* file)
+int LuaLoadFile(const char* file)
 {
 	int status;
 	int size;
@@ -223,7 +223,7 @@ global int LuaLoadFile(const char* file)
 **
 **  @param l  Lua state.
 */
-local int CclLoad(lua_State* l)
+static int CclLoad(lua_State* l)
 {
 	char buf[1024];
 
@@ -242,7 +242,7 @@ local int CclLoad(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSaveGame(lua_State* l)
+static int CclSaveGame(lua_State* l)
 {
 	const char* value;
 	char buf[1024];
@@ -285,7 +285,7 @@ local int CclSaveGame(lua_State* l)
 **  @param l     Lua state.
 **  @param narg  Argument number.
 */
-global const char* LuaToString(lua_State* l, int narg)
+const char* LuaToString(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TSTRING);
 	return lua_tostring(l, narg);
@@ -297,7 +297,7 @@ global const char* LuaToString(lua_State* l, int narg)
 **  @param l     Lua state.
 **  @param narg  Argument number.
 */
-global lua_Number LuaToNumber(lua_State* l, int narg)
+lua_Number LuaToNumber(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TNUMBER);
 	return lua_tonumber(l, narg);
@@ -309,7 +309,7 @@ global lua_Number LuaToNumber(lua_State* l, int narg)
 **  @param l     Lua state.
 **  @param narg  Argument number.
 */
-global int LuaToBoolean(lua_State* l, int narg)
+int LuaToBoolean(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TBOOLEAN);
 	return lua_toboolean(l, narg);
@@ -320,7 +320,7 @@ global int LuaToBoolean(lua_State* l, int narg)
 **
 **  @param fast  set this flag to disable slow GC (during game)
 */
-global void CclGarbageCollect(int fast)
+void CclGarbageCollect(int fast)
 {
 	DebugPrint("Garbage collect (before): %d/%d\n" _C_
 		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
@@ -342,7 +342,7 @@ global void CclGarbageCollect(int fast)
 **
 **  @return   Current libray path.
 */
-local int CclStratagusLibraryPath(lua_State* l)
+static int CclStratagusLibraryPath(lua_State* l)
 {
 	lua_pushstring(l, StratagusLibPath);
 	return 1;
@@ -355,7 +355,7 @@ local int CclStratagusLibraryPath(lua_State* l)
 **
 **  @return   Current game cycle.
 */
-local int CclGameCycle(lua_State* l)
+static int CclGameCycle(lua_State* l)
 {
 	lua_pushnumber(l, GameCycle);
 	return 1;
@@ -368,7 +368,7 @@ local int CclGameCycle(lua_State* l)
 **
 **  @return   Old game name.
 */
-local int CclSetGameName(lua_State* l)
+static int CclSetGameName(lua_State* l)
 {
 	char* old;
 	int args;
@@ -400,7 +400,7 @@ local int CclSetGameName(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetGameCycle(lua_State* l)
+static int CclSetGameCycle(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -414,7 +414,7 @@ local int CclSetGameCycle(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetGamePaused(lua_State* l)
+static int CclSetGamePaused(lua_State* l)
 {
 	if (lua_gettop(l) != 1 || (!lua_isnumber(l, 1) && !lua_isboolean(l, 1))) {
 		LuaError(l, "incorrect argument");
@@ -432,7 +432,7 @@ local int CclSetGamePaused(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetVideoSyncSpeed(lua_State* l)
+static int CclSetVideoSyncSpeed(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -446,7 +446,7 @@ local int CclSetVideoSyncSpeed(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetLocalPlayerName(lua_State* l)
+static int CclSetLocalPlayerName(lua_State* l)
 {
 	const char* str;
 
@@ -467,7 +467,7 @@ local int CclSetLocalPlayerName(lua_State* l)
 **
 **	@return 0.
 */
-local int ScriptSetUseHPForXp(lua_State* l)
+static int ScriptSetUseHPForXp(lua_State* l)
 {
 	if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -482,7 +482,7 @@ local int ScriptSetUseHPForXp(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclNoRandomPlacementMultiplayer(lua_State* l)
+static int CclNoRandomPlacementMultiplayer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -500,7 +500,7 @@ local int CclNoRandomPlacementMultiplayer(lua_State* l)
 **
 **  @return   The old mode.
 */
-local int CclSetGodMode(lua_State* l)
+static int CclSetGodMode(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -517,7 +517,7 @@ local int CclSetGodMode(lua_State* l)
 **
 **  @return      The old state of tips displayed.
 */
-local int CclSetShowTips(lua_State* l)
+static int CclSetShowTips(lua_State* l)
 {
 	int old;
 
@@ -538,7 +538,7 @@ local int CclSetShowTips(lua_State* l)
 **
 **  @return     The old tip number.
 */
-local int CclSetCurrentTip(lua_State* l)
+static int CclSetCurrentTip(lua_State* l)
 {
 	lua_Number old;
 
@@ -563,7 +563,7 @@ local int CclSetCurrentTip(lua_State* l)
 **  @todo  FIXME: Memory for tips is never freed.
 **         FIXME: Make Tips dynamic.
 */
-local int CclAddTip(lua_State* l)
+static int CclAddTip(lua_State* l)
 {
 	int i;
 	const char* str;
@@ -591,7 +591,7 @@ local int CclAddTip(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSpeedResourcesHarvest(lua_State* l)
+static int CclSetSpeedResourcesHarvest(lua_State* l)
 {
 	int i;
 	const char* resource;
@@ -616,7 +616,7 @@ local int CclSetSpeedResourcesHarvest(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSpeedResourcesReturn(lua_State* l)
+static int CclSetSpeedResourcesReturn(lua_State* l)
 {
 	int i;
 	const char* resource;
@@ -641,7 +641,7 @@ local int CclSetSpeedResourcesReturn(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSpeedBuild(lua_State* l)
+static int CclSetSpeedBuild(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -657,7 +657,7 @@ local int CclSetSpeedBuild(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSpeedTrain(lua_State* l)
+static int CclSetSpeedTrain(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -673,7 +673,7 @@ local int CclSetSpeedTrain(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSpeedUpgrade(lua_State* l)
+static int CclSetSpeedUpgrade(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -689,7 +689,7 @@ local int CclSetSpeedUpgrade(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSpeedResearch(lua_State* l)
+static int CclSetSpeedResearch(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -705,7 +705,7 @@ local int CclSetSpeedResearch(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSpeeds(lua_State* l)
+static int CclSetSpeeds(lua_State* l)
 {
 	int i;
 	lua_Number s;
@@ -729,7 +729,7 @@ local int CclSetSpeeds(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDefaultResources(lua_State* l)
+static int CclDefineDefaultResources(lua_State* l)
 {
 	int i;
 	int args;
@@ -746,7 +746,7 @@ local int CclDefineDefaultResources(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDefaultResourcesLow(lua_State* l)
+static int CclDefineDefaultResourcesLow(lua_State* l)
 {
 	int i;
 	int args;
@@ -763,7 +763,7 @@ local int CclDefineDefaultResourcesLow(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDefaultResourcesMedium(lua_State* l)
+static int CclDefineDefaultResourcesMedium(lua_State* l)
 {
 	int i;
 	int args;
@@ -778,7 +778,7 @@ local int CclDefineDefaultResourcesMedium(lua_State* l)
 /**
 **  Define default resources for a new player with high resources.
 */
-local int CclDefineDefaultResourcesHigh(lua_State* l)
+static int CclDefineDefaultResourcesHigh(lua_State* l)
 {
 	int i;
 	int args;
@@ -795,7 +795,7 @@ local int CclDefineDefaultResourcesHigh(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDefaultIncomes(lua_State* l)
+static int CclDefineDefaultIncomes(lua_State* l)
 {
 	int i;
 	int args;
@@ -812,7 +812,7 @@ local int CclDefineDefaultIncomes(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDefaultActions(lua_State* l)
+static int CclDefineDefaultActions(lua_State* l)
 {
 	int i;
 	int args;
@@ -833,7 +833,7 @@ local int CclDefineDefaultActions(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDefaultResourceNames(lua_State* l)
+static int CclDefineDefaultResourceNames(lua_State* l)
 {
 	int i;
 	int args;
@@ -854,7 +854,7 @@ local int CclDefineDefaultResourceNames(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineDefaultResourceAmounts(lua_State* l)
+static int CclDefineDefaultResourceAmounts(lua_State* l)
 {
 	int i;
 	int j;
@@ -886,7 +886,7 @@ local int CclDefineDefaultResourceAmounts(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclUnits(lua_State* l)
+int CclUnits(lua_State* l)
 {
 	Unit** slot;
 	int freeslots;
@@ -936,7 +936,7 @@ local int CclUnits(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclGetCompileFeature(lua_State* l)
+static int CclGetCompileFeature(lua_State* l)
 {
 	const char* str;
 
@@ -961,7 +961,7 @@ local int CclGetCompileFeature(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclGetStratagusHomePath(lua_State* l)
+static int CclGetStratagusHomePath(lua_State* l)
 {
 	const char* cp;
 	char* buf;
@@ -983,7 +983,7 @@ local int CclGetStratagusHomePath(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclGetStratagusLibraryPath(lua_State* l)
+static int CclGetStratagusLibraryPath(lua_State* l)
 {
 	lua_pushstring(l, STRATAGUS_LIB_PATH);
 	return 1;
@@ -994,7 +994,7 @@ local int CclGetStratagusLibraryPath(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSyncRand(lua_State* l)
+static int CclSyncRand(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -1013,7 +1013,7 @@ local int CclSyncRand(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclLoadPud(lua_State* l)
+static int CclLoadPud(lua_State* l)
 {
 	const char* name;
 
@@ -1036,7 +1036,7 @@ local int CclLoadPud(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclLoadMap(lua_State* l)
+static int CclLoadMap(lua_State* l)
 {
 	const char* name;
 
@@ -1061,7 +1061,7 @@ local int CclLoadMap(lua_State* l)
 **
 **  @param command  Zero terminated command string.
 */
-global int CclCommand(const char* command)
+int CclCommand(const char* command)
 {
 	int status;
 
@@ -1080,7 +1080,7 @@ global int CclCommand(const char* command)
 /**
 **  Initialize ccl and load the config file(s).
 */
-global void InitCcl(void)
+void InitCcl(void)
 {
 	Lua = lua_open();
 	luaopen_base(Lua);
@@ -1168,7 +1168,7 @@ global void InitCcl(void)
 /**
 **  Save user preferences
 */
-global void SavePreferences(void)
+void SavePreferences(void)
 {
 	FILE* fd;
 	char buf[PATH_MAX];
@@ -1293,7 +1293,7 @@ global void SavePreferences(void)
 /**
 **  Load stratagus config file.
 */
-global void LoadCcl(void)
+void LoadCcl(void)
 {
 	char* file;
 	char buf[PATH_MAX];
@@ -1319,7 +1319,7 @@ global void LoadCcl(void)
 **
 **  @param file  Save file.
 */
-global void SaveCcl(CLFile* file)
+void SaveCcl(CLFile* file)
 {
 }
 

@@ -62,7 +62,7 @@
 **
 **  @return        Returns ideal target on map tile.
 */
-local Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
+static Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -113,7 +113,7 @@ local Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 **
 **  @note only works for water transporters!
 */
-local void AiMarkWaterTransporter(const Unit * unit, unsigned char *matrix)
+static void AiMarkWaterTransporter(const Unit * unit, unsigned char *matrix)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -216,7 +216,7 @@ local void AiMarkWaterTransporter(const Unit * unit, unsigned char *matrix)
 **
 **  @return        True if target found.
 */
-local int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy,
+static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy,
 	int* ds)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
@@ -366,7 +366,7 @@ local int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy
 **
 **  @return       True if wall found.
 */
-global int AiFindWall(AiForce* force)
+int AiFindWall(AiForce* force)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -504,7 +504,7 @@ global int AiFindWall(AiForce* force)
 **  @todo         Perfect planning.
 **                Only works for water transporter!
 */
-global int AiPlanAttack(AiForce* force)
+int AiPlanAttack(AiForce* force)
 {
 	char* watermatrix;
 	const AiUnit* aiunit;

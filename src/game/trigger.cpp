@@ -57,12 +57,12 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global Timer GameTimer; /// The game timer
-local unsigned long WaitFrame; /// Frame to wait for
-local int Trigger;
-local int WaitTrigger;
-local unsigned char Switch[MAX_SWITCH]; /// Switches
-local int* ActiveTriggers;
+Timer GameTimer; /// The game timer
+static unsigned long WaitFrame; /// Frame to wait for
+static int Trigger;
+static int WaitTrigger;
+static unsigned char Switch[MAX_SWITCH]; /// Switches
+static int* ActiveTriggers;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -75,7 +75,7 @@ local int* ActiveTriggers;
 **
 **  @return   The player number, -1 matches any.
 */
-global int TriggerGetPlayer(lua_State* l)
+int TriggerGetPlayer(lua_State* l)
 {
 	const char* player;
 	int ret;
@@ -105,7 +105,7 @@ global int TriggerGetPlayer(lua_State* l)
 **
 **  @return   The unit-type pointer.
 */
-global const UnitType* TriggerGetUnitType(lua_State* l)
+const UnitType* TriggerGetUnitType(lua_State* l)
 {
 	const char* unit;
 
@@ -126,27 +126,27 @@ global const UnitType* TriggerGetUnitType(lua_State* l)
 /*--------------------------------------------------------------------------
 --  Conditions
 --------------------------------------------------------------------------*/
-local int CompareEq(int a, int b)
+static int CompareEq(int a, int b)
 {
 	return a == b;
 }
-local int CompareNEq(int a, int b)
+static int CompareNEq(int a, int b)
 {
 	return a != b;
 }
-local int CompareGrEq(int a, int b)
+static int CompareGrEq(int a, int b)
 {
 	return a >= b;
 }
-local int CompareGr(int a, int b)
+static int CompareGr(int a, int b)
 {
 	return a > b;
 }
-local int CompareLeEq(int a, int b)
+static int CompareLeEq(int a, int b)
 {
 	return a <= b;
 }
-local int CompareLe(int a, int b)
+static int CompareLe(int a, int b)
 {
 	return a < b;
 }
@@ -160,7 +160,7 @@ typedef int (*CompareFunction)(int, int);
 **
 **  @return    Function pointer to the compare function
 */
-local CompareFunction GetCompareFunction(const char* op)
+static CompareFunction GetCompareFunction(const char* op)
 {
 	if (op[0] == '=') {
 		if ((op[1] == '=' && op[2] == '\0') || (op[1] == '\0')) {
@@ -187,7 +187,7 @@ local CompareFunction GetCompareFunction(const char* op)
 /**
 **  Player has the quantity of unit-type.
 */
-local int CclIfUnit(lua_State* l)
+static int CclIfUnit(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -269,7 +269,7 @@ local int CclIfUnit(lua_State* l)
 **
 **  (if-unit-at {player} {op} {quantity} {unit} {location} {location})
 */
-local int CclIfUnitAt(lua_State* l)
+static int CclIfUnitAt(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -361,7 +361,7 @@ local int CclIfUnitAt(lua_State* l)
 /**
 **  Player has the quantity of unit-type near to unit-type.
 */
-local int CclIfNearUnit(lua_State* l)
+static int CclIfNearUnit(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -457,7 +457,7 @@ local int CclIfNearUnit(lua_State* l)
 /**
 ** Player has the quantity of rescued unit-type near to unit-type.
 */
-local int CclIfRescuedNearUnit(lua_State* l)
+static int CclIfRescuedNearUnit(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -555,7 +555,7 @@ local int CclIfRescuedNearUnit(lua_State* l)
 /**
 **  Player has n opponents left.
 */
-local int CclIfOpponents(lua_State* l)
+static int CclIfOpponents(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -613,7 +613,7 @@ local int CclIfOpponents(lua_State* l)
 /**
 **  Player has the quantity of resource.
 */
-local int CclIfResource(lua_State* l)
+static int CclIfResource(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -692,7 +692,7 @@ local int CclIfResource(lua_State* l)
 /**
 **  Player has quantity kills
 */
-local int CclIfKills(lua_State* l)
+static int CclIfKills(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -737,7 +737,7 @@ local int CclIfKills(lua_State* l)
 /**
 **  Player has a certain score
 */
-local int CclIfScore(lua_State* l)
+static int CclIfScore(lua_State* l)
 {
 	int plynr;
 	int q;
@@ -782,7 +782,7 @@ local int CclIfScore(lua_State* l)
 /**
 **  Number of game cycles elapsed
 */
-local int CclIfElapsed(lua_State* l)
+static int CclIfElapsed(lua_State* l)
 {
 	int q;
 	const char* op;
@@ -812,7 +812,7 @@ local int CclIfElapsed(lua_State* l)
 /**
 **  Check the timer value
 */
-local int CclIfTimer(lua_State* l)
+static int CclIfTimer(lua_State* l)
 {
 	int q;
 	const char* op;
@@ -847,7 +847,7 @@ local int CclIfTimer(lua_State* l)
 /**
 **  Check the switch value
 */
-local int CclIfSwitch(lua_State* l)
+static int CclIfSwitch(lua_State* l)
 {
 	int i;
 	unsigned char s;
@@ -884,7 +884,7 @@ local int CclIfSwitch(lua_State* l)
 /**
 **  Action condition player wins.
 */
-local int CclActionVictory(lua_State* l)
+static int CclActionVictory(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -899,7 +899,7 @@ local int CclActionVictory(lua_State* l)
 /**
 **  Action condition player lose.
 */
-local int CclActionDefeat(lua_State* l)
+static int CclActionDefeat(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -914,7 +914,7 @@ local int CclActionDefeat(lua_State* l)
 /**
 **  Action condition player draw.
 */
-local int CclActionDraw(lua_State* l)
+static int CclActionDraw(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -929,7 +929,7 @@ local int CclActionDraw(lua_State* l)
 /**
 **  Action set timer
 */
-local int CclActionSetTimer(lua_State* l)
+static int CclActionSetTimer(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
 		LuaError(l, "incorrect argument");
@@ -946,7 +946,7 @@ local int CclActionSetTimer(lua_State* l)
 /**
 **  Action start timer
 */
-local int CclActionStartTimer(lua_State* l)
+static int CclActionStartTimer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -960,7 +960,7 @@ local int CclActionStartTimer(lua_State* l)
 /**
 **  Action stop timer
 */
-local int CclActionStopTimer(lua_State* l)
+static int CclActionStopTimer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -973,7 +973,7 @@ local int CclActionStopTimer(lua_State* l)
 /**
 **  Action wait
 */
-local int CclActionWait(lua_State* l)
+static int CclActionWait(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -987,7 +987,7 @@ local int CclActionWait(lua_State* l)
 /**
 **  Action stop timer
 */
-local int CclActionSetSwitch(lua_State* l)
+static int CclActionSetSwitch(lua_State* l)
 {
 	int i;
 	unsigned char s;
@@ -1018,7 +1018,7 @@ local int CclActionSetSwitch(lua_State* l)
 /**
 **  Add a trigger.
 */
-local int CclAddTrigger(lua_State* l)
+static int CclAddTrigger(lua_State* l)
 {
 	int i;
 
@@ -1066,7 +1066,7 @@ local int CclAddTrigger(lua_State* l)
 /**
 **  Set the trigger values
 */
-local int CclSetTriggers(lua_State* l)
+static int CclSetTriggers(lua_State* l)
 {
 	if (lua_gettop(l) != 3) {
 		LuaError(l, "incorrect argument");
@@ -1081,7 +1081,7 @@ local int CclSetTriggers(lua_State* l)
 /**
 **  Set the active triggers
 */
-local int CclSetActiveTriggers(lua_State* l)
+static int CclSetActiveTriggers(lua_State* l)
 {
 	int args;
 	int j;
@@ -1102,7 +1102,7 @@ local int CclSetActiveTriggers(lua_State* l)
 **
 **  @return        1 if the trigger should be removed
 */
-local int TriggerExecuteAction(int script)
+static int TriggerExecuteAction(int script)
 {
 	int ret;
 	int args;
@@ -1137,7 +1137,7 @@ local int TriggerExecuteAction(int script)
 **
 **  @param trig  Current trigger
 */
-local void TriggerRemoveTrigger(int trig)
+static void TriggerRemoveTrigger(int trig)
 {
 	lua_pushnumber(Lua, -1);
 	lua_rawseti(Lua, -2, trig);
@@ -1148,7 +1148,7 @@ local void TriggerRemoveTrigger(int trig)
 /**
 **  Check trigger each game cycle.
 */
-global void TriggersEachCycle(void)
+void TriggersEachCycle(void)
 {
 	int triggers;
 
@@ -1206,7 +1206,7 @@ global void TriggersEachCycle(void)
 /**
 **  Register CCL features for triggers.
 */
-global void TriggerCclRegister(void)
+void TriggerCclRegister(void)
 {
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
 	lua_register(Lua, "SetTriggers", CclSetTriggers);
@@ -1239,7 +1239,7 @@ global void TriggerCclRegister(void)
 **
 **  @param file  Open file to print to
 */
-global void SaveTriggers(CLFile* file)
+void SaveTriggers(CLFile* file)
 {
 	int i;
 	int triggers;
@@ -1277,7 +1277,7 @@ global void SaveTriggers(CLFile* file)
 /**
 **  Initialize the trigger module.
 */
-global void InitTriggers(void)
+void InitTriggers(void)
 {
 	//
 	// Setup default triggers
@@ -1301,7 +1301,7 @@ global void InitTriggers(void)
 /**
 **  Clean up the trigger module.
 */
-global void CleanTriggers(void)
+void CleanTriggers(void)
 {
 	lua_pushstring(Lua, "_triggers_");
 	lua_pushnil(Lua);

@@ -58,10 +58,10 @@
 extern int NoWarningUnitType;               /// quiet ident lookup.
 #endif
 
-global _AnimationsHash AnimationsHash;      /// Animations hash table
+_AnimationsHash AnimationsHash;      /// Animations hash table
 
-global char** BoolFlagName;                 /// Name of user defined flag
-global int NumberBoolFlag;                  /// Number of defined flags.
+char** BoolFlagName;                 /// Name of user defined flag
+int NumberBoolFlag;                  /// Number of defined flags.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -74,7 +74,7 @@ global int NumberBoolFlag;                  /// Number of defined flags.
 **
 **  @return   the resource id
 */
-global unsigned CclGetResourceByName(lua_State* l)
+unsigned CclGetResourceByName(lua_State* l)
 {
 	int i;
 	const char* value;
@@ -94,7 +94,7 @@ global unsigned CclGetResourceByName(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineUnitType(lua_State* l)
+static int CclDefineUnitType(lua_State* l)
 {
 	const char* value;
 	UnitType* type;
@@ -803,7 +803,7 @@ local int CclDefineUnitType(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineUnitStats(lua_State* l)
+static int CclDefineUnitStats(lua_State* l)
 {
 	const char* value;
 	UnitType* type;
@@ -895,7 +895,7 @@ local int CclDefineUnitStats(lua_State* l)
 **
 **  @param l  Lua state.
 */
-global UnitType* CclGetUnitType(lua_State* l)
+UnitType* CclGetUnitType(lua_State* l)
 {
 	const char* str;
 
@@ -921,7 +921,7 @@ global UnitType* CclGetUnitType(lua_State* l)
 **
 **  @return   Unit-type structure.
 */
-local int CclUnitType(lua_State* l)
+static int CclUnitType(lua_State* l)
 {
 	const char* str;
 	UnitType* type;
@@ -946,7 +946,7 @@ local int CclUnitType(lua_State* l)
 **
 **  @return   An array of all unit-type structures.
 */
-local int CclUnitTypeArray(lua_State* l)
+static int CclUnitTypeArray(lua_State* l)
 {
 	int i;
 	LuaUserData* data;
@@ -973,7 +973,7 @@ local int CclUnitTypeArray(lua_State* l)
 **
 **  @return   The identifier of the unit-type.
 */
-local int CclGetUnitTypeIdent(lua_State* l)
+static int CclGetUnitTypeIdent(lua_State* l)
 {
 	const UnitType* type;
 
@@ -993,7 +993,7 @@ local int CclGetUnitTypeIdent(lua_State* l)
 **
 **  @return   The name of the unit-type.
 */
-local int CclGetUnitTypeName(lua_State* l)
+static int CclGetUnitTypeName(lua_State* l)
 {
 	const UnitType* type;
 
@@ -1013,7 +1013,7 @@ local int CclGetUnitTypeName(lua_State* l)
 **
 **  @return   The name of the unit-type.
 */
-local int CclSetUnitTypeName(lua_State* l)
+static int CclSetUnitTypeName(lua_State* l)
 {
 	UnitType* type;
 
@@ -1036,7 +1036,7 @@ local int CclSetUnitTypeName(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineUnitTypeWcNames(lua_State* l)
+static int CclDefineUnitTypeWcNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -1074,7 +1074,7 @@ local int CclDefineUnitTypeWcNames(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineAnimations(lua_State* l)
+static int CclDefineAnimations(lua_State* l)
 {
 	const char* str;
 	const char* id;
@@ -1192,7 +1192,7 @@ local int CclDefineAnimations(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineBoolFlags(lua_State* l)
+static int CclDefineBoolFlags(lua_State* l)
 {
 	const char* str;
 	int i;
@@ -1237,7 +1237,7 @@ local int CclDefineBoolFlags(lua_State* l)
 /**
 **  Register CCL features for unit-type.
 */
-global void UnitTypeCclRegister(void)
+void UnitTypeCclRegister(void)
 {
 	lua_register(Lua, "DefineUnitType", CclDefineUnitType);
 	lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);

@@ -85,7 +85,7 @@ typedef struct _ogg_data_ {
 **
 **  @return       The number of elements loaded.
 */
-local size_t OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
+static size_t OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 {
 	return CLread(user, ptr, size * nmemb) / size;
 }
@@ -99,7 +99,7 @@ local size_t OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 **
 **  @return        Seek position, -1 if non-seeking.
 */
-local int OGG_seek(void* user, int64_t offset, int whence)
+static int OGG_seek(void* user, int64_t offset, int whence)
 {
 	return CLseek(user, offset, whence);
 }
@@ -111,7 +111,7 @@ local int OGG_seek(void* user, int64_t offset, int whence)
 **
 **  @return      Success status.
 */
-local int OGG_close(void* user)
+static int OGG_close(void* user)
 {
 	return CLclose(user);
 }
@@ -130,7 +130,7 @@ static long OGG_tell(void* user)
 **
 **  @return        Number of bytes read
 */
-local int OggStreamRead(Sample* sample, void* buf, int len)
+static int OggStreamRead(Sample* sample, void* buf, int len)
 {
 	OggData* data;
 	int i;
@@ -181,7 +181,7 @@ local int OggStreamRead(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void OggStreamFree(Sample* sample)
+static void OggStreamFree(Sample* sample)
 {
 	OggData* data;
 
@@ -196,7 +196,7 @@ local void OggStreamFree(Sample* sample)
 /**
 **		Ogg stream type structure.
 */
-local const SampleType OggStreamSampleType = {
+static const SampleType OggStreamSampleType = {
 	OggStreamRead,
 	OggStreamFree,
 };
@@ -210,7 +210,7 @@ local const SampleType OggStreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-local int OggRead(Sample* sample, void* buf, int len)
+static int OggRead(Sample* sample, void* buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -228,7 +228,7 @@ local int OggRead(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void OggFree(Sample* sample)
+static void OggFree(Sample* sample)
 {
 	free(sample->User);
 	free(sample->Buffer);
@@ -238,7 +238,7 @@ local void OggFree(Sample* sample)
 /**
 **  Ogg object type structure.
 */
-local const SampleType OggSampleType = {
+static const SampleType OggSampleType = {
 	OggRead,
 	OggFree,
 };
@@ -251,7 +251,7 @@ local const SampleType OggSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-global Sample* LoadOgg(const char* name,int flags)
+Sample* LoadOgg(const char* name,int flags)
 {
 	Sample* sample;
 	OggData *data;
@@ -351,7 +351,7 @@ global Sample* LoadOgg(const char* name,int flags)
 **
 **  @return       The number of elements loaded.
 */
-local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
+static size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 {
 	AviFile* avi;
 	size_t length;
@@ -390,7 +390,7 @@ local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 **
 **		@return						Success status.
 */
-local int AVI_OGG_close(void* user __attribute__((unused)))
+static int AVI_OGG_close(void* user __attribute__((unused)))
 {
 	return 0;
 }
@@ -400,7 +400,7 @@ local int AVI_OGG_close(void* user __attribute__((unused)))
 **
 **		@param avi		Avi file handle
 */
-global void PlayAviOgg(AviFile* avi)
+void PlayAviOgg(AviFile* avi)
 {
 	Sample* sample;
 	OggData* data;

@@ -55,7 +55,7 @@
 **		@param def		the RegionDefinition structure
 **		@param seg		the segment to remove
 */
-global void RegionDelSegment(RegionDefinition* def, RegionSegment* seg)
+void RegionDelSegment(RegionDefinition* def, RegionSegment* seg)
 {
 	if (seg->Next) {
 		seg->Next->Prev = seg->Prev;
@@ -78,7 +78,7 @@ global void RegionDelSegment(RegionDefinition* def, RegionSegment* seg)
 **		@param def		the RegionDefinition structure
 **		@param seg		the segment to add
 */
-global void RegionAddSegment(RegionDefinition * def,int x0,int x1,int y)
+void RegionAddSegment(RegionDefinition * def,int x0,int x1,int y)
 {
 	RegionSegment* seg;
 	seg = (RegionSegment*) malloc(sizeof(RegionSegment));
@@ -106,7 +106,7 @@ global void RegionAddSegment(RegionDefinition * def,int x0,int x1,int y)
 **		@param x0		Maximum x of the segment
 **		@param y		Y coord of the segment
 */
-global void RegionAppendSegment(RegionDefinition * def,int x0,int x1,int y)
+void RegionAppendSegment(RegionDefinition * def,int x0,int x1,int y)
 {
 	RegionSegment* seg;
 	seg = def->FirstSegment;
@@ -131,7 +131,7 @@ global void RegionAppendSegment(RegionDefinition * def,int x0,int x1,int y)
 **		@param x		X coord of a cell
 **		@param y		Y coord of a cell
 */
-global void RegionUpdateMinMax(RegionDefinition* adef,int x,int y)
+void RegionUpdateMinMax(RegionDefinition* adef,int x,int y)
 {
 	if (adef->TileCount == 0){
 		adef->MinX = x;
@@ -163,7 +163,7 @@ global void RegionUpdateMinMax(RegionDefinition* adef,int x,int y)
 **		@param vx		X result value
 **		@param vy		Y result value
 */
-global void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy)
+void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy)
 {
 	RegionSegment *cur;
 	int bestx, besty, bestxdelta, bestydelta;
@@ -216,7 +216,7 @@ global void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy)
 **		@param vx		X result value
 **		@param vy		Y result value
 */
-global void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy)
+void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy)
 {
 	RegionSegment *cur;
 	int bestx, besty, bestxdelta, bestydelta;
@@ -264,7 +264,7 @@ global void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy)
 /**
 **		Allocate the temp storage area
 */
-global void RegionTempStorageAllocate(void)
+void RegionTempStorageAllocate(void)
 {
 	RegionTempStorage = (int*) malloc(TheMap.Width * TheMap.Height * sizeof(int));
 }
@@ -272,7 +272,7 @@ global void RegionTempStorageAllocate(void)
 /**
 **		Free the temp storage area
 */
-global void RegionTempStorageFree(void)
+void RegionTempStorageFree(void)
 {
 	free(RegionTempStorage);
 }
@@ -283,7 +283,7 @@ global void RegionTempStorageFree(void)
 **		@param adef		the region definition
 **		@param value		value to fill with
 */
-global void RegionTempStorageFillRegion(RegionDefinition* adef,int value)
+void RegionTempStorageFillRegion(RegionDefinition* adef,int value)
 {
 	RegionSegment* cur;
 	int * segstart;
@@ -309,7 +309,7 @@ global void RegionTempStorageFillRegion(RegionDefinition* adef,int value)
 **		@param regid		the regiond ID
 **		@param markvalue cells with value == markvalue will become 0
 */
-global void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue)
+void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue)
 {
 	RegionDefinition * adef;
 	RegionSegment * seg;
@@ -342,7 +342,7 @@ global void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue)
 **		@param markvalu		points get marked with this value
 **		@return				The number of points marked
 */
-local int RegionTempStorageMarkPoints(RegionId regid, MapPoint * points, int nbpoints, int maxmark,int markvalue)
+static int RegionTempStorageMarkPoints(RegionId regid, MapPoint * points, int nbpoints, int maxmark,int markvalue)
 {
 	int id;
 	int rslt;
@@ -380,7 +380,7 @@ local int RegionTempStorageMarkPoints(RegionId regid, MapPoint * points, int nbp
 **		@param maxmak		Maximum number of point to mark
 **		@param markvalu		points get marked with this value
 */
-global int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
+int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 {
 	RegionDefinition * adef;
 	RegionSegment * seg;
@@ -479,7 +479,7 @@ global int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markval
 **		@param maxmak		Maximum number of point to mark
 **		@param markvalu		points marked with this value will be "grown"
 */
-global int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
+int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
 {
 	int markednb;
 	RegionDefinition * adef;
@@ -541,7 +541,7 @@ global int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markv
 **		@param regb		Other region in the connection
 **		@param value		The new connection count between the two regions
 */
-global void RegionSetConnection(RegionId rega, RegionId regb, int value)
+void RegionSetConnection(RegionId rega, RegionId regb, int value)
 {
 	RegionDefinition * adef;
 	int j;
@@ -588,7 +588,7 @@ global void RegionSetConnection(RegionId rega, RegionId regb, int value)
 **		@param regb		Other region in the connection
 **		@param value		The value to add to the connection count between the two regions
 */
-global void RegionAddConnection(RegionId rega, RegionId regb,int value)
+void RegionAddConnection(RegionId rega, RegionId regb,int value)
 {
 	int j;
 	RegionDefinition * adef;
@@ -633,7 +633,7 @@ global void RegionAddConnection(RegionId rega, RegionId regb,int value)
 **		@param regb		Other region in the connection
 **		@param value		The value to add to the connection count between the two regions
 */
-global void RegionAddBidirConnection(RegionId rega, RegionId regb,int value)
+void RegionAddBidirConnection(RegionId rega, RegionId regb,int value)
 {
 	RegionAddConnection(rega, regb, value);
 	RegionAddConnection(regb, rega, value);
@@ -648,7 +648,7 @@ global void RegionAddBidirConnection(RegionId rega, RegionId regb,int value)
 **		@param starty		start point y coord
 **		@param value		value it will fill with
 */
-global void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int starty, int value)
+void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int starty, int value)
 {
 	filler->NextOne = 0;
 	filler->LastOne = 0;
@@ -667,7 +667,7 @@ global void CircularFillerInit(CircularFiller* filler, RegionId region, int star
 **
 **		@param filler		the filler to free
 */
-global void CircularFillerDone(CircularFiller * filler)
+void CircularFillerDone(CircularFiller * filler)
 {
 	free(filler->Points);
 }
@@ -678,7 +678,7 @@ global void CircularFillerDone(CircularFiller * filler)
 **		@param filler		the filler
 **		@return 		1 if one point marked, 0 else
 */
-global int CircularFillerStep(CircularFiller * filler)
+int CircularFillerStep(CircularFiller * filler)
 {
 	int fillx,filly;
 	int adjx,adjy;
@@ -729,7 +729,7 @@ global int CircularFillerStep(CircularFiller * filler)
 **
 **		@param regid		the region to scan
 */
-global void RegionRescanAdjacents(RegionId regid)
+void RegionRescanAdjacents(RegionId regid)
 {
 	static int Connected[MaxRegionNumber];
 	static int LastId=0;
@@ -819,7 +819,7 @@ global void RegionRescanAdjacents(RegionId regid)
 **		@param add		1 if cell is added to the region, 0 else
 **		@param bidir		Operate in both directions
 */
-global void RegionUpdateConnection(RegionId reg,int x,int y,int add,int bidir)
+void RegionUpdateConnection(RegionId reg,int x,int y,int add,int bidir)
 {
 	int adj;
 	int ax, ay;

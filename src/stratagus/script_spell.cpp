@@ -60,7 +60,7 @@
 **  @note This is only here to avoid code duplication. You don't have
 **        any reason to USE this:)
 */
-local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* location)
+static void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* location)
 {
 	const char* value;
 	int args;
@@ -119,7 +119,7 @@ local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* loc
 **  @param l            Lua state.
 **  @param spellaction  Pointer to spellaction.
 */
-local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
+static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 {
 	const char* value;
 	int args;
@@ -420,7 +420,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 **  @note This is a helper function to make CclSpellCondition shorter
 **        and easier to understand.
 */
-global char Ccl2Condition(lua_State* l, const char* value)
+char Ccl2Condition(lua_State* l, const char* value)
 {
 	if (!strcmp(value, "true")) {
 		return CONDITION_TRUE;
@@ -442,7 +442,7 @@ global char Ccl2Condition(lua_State* l, const char* value)
 **
 **  @note Conditions must be allocated. All data already in is LOST.
 */
-local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
+static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 {
 	const char* value;
 	int i;
@@ -559,7 +559,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 **
 **		@notes: autocast must be allocated. All data already in is LOST.
 */
-local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
+static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 {
 	const char* value;
 	int args;
@@ -600,7 +600,7 @@ local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 **
 **  @param l  Lua state.
 */
-local int CclDefineSpell(lua_State* l)
+static int CclDefineSpell(lua_State* l)
 {
 	const char* identname;
 	SpellType* spell;
@@ -745,7 +745,7 @@ local int CclDefineSpell(lua_State* l)
 /**
 **		Register CCL features for Spell.
 */
-global void SpellCclRegister(void)
+void SpellCclRegister(void)
 {
 	lua_register(Lua, "DefineSpell", CclDefineSpell);
 }
@@ -758,7 +758,7 @@ global void SpellCclRegister(void)
 ** 		@param file		File pointer to save to
 **		@param action		Pointer to action to save.
 */
-local void SaveSpellAction(CLFile* file, SpellActionType* action)
+static void SaveSpellAction(CLFile* file, SpellActionType* action)
 {
 	SpellActionMissileLocation* loc;
 
@@ -865,7 +865,7 @@ local void SaveSpellAction(CLFile* file, SpellActionType* action)
 **  @param file       File pointer to save to
 **  @param condition  Pointer to condition to save.
 */
-local void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
+static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 {
 	char condstrings[3][10] = {
 		"true",						/// CONDITION_TRUE

@@ -127,85 +127,85 @@ extern int				ZoneNeedRefresh;
 // Region handling
 
 /// Allocate a new region
-global RegionId NewRegion(int iswater);
-global void RegionFree(RegionId regid);
+RegionId NewRegion(int iswater);
+void RegionFree(RegionId regid);
 
 /// Split a region (when it is too big, malformed)
-global void RegionSplit(RegionId regid, int updateConnections);
+void RegionSplit(RegionId regid, int updateConnections);
 /// Check that a region is connex and split it if necessary
-global void RegionCheckConnex(RegionId regid);
+void RegionCheckConnex(RegionId regid);
 
 // Region geometry handling
 
 /// Add a segment to a region
-global void RegionAppendSegment(RegionDefinition * def,int x0,int x1,int y);
+void RegionAppendSegment(RegionDefinition * def,int x0,int x1,int y);
 /// Add an existing segment to a region
-global void RegionAddSegment(RegionDefinition * def,int x0,int x1,int y);
+void RegionAddSegment(RegionDefinition * def,int x0,int x1,int y);
 /// Remove a segment from a region
-global void RegionDelSegment(RegionDefinition* def, RegionSegment* seg);
+void RegionDelSegment(RegionDefinition* def, RegionSegment* seg);
 /// Update Minx & Maxx values
-global void RegionUpdateMinMax(RegionDefinition* adef,int x,int y);
+void RegionUpdateMinMax(RegionDefinition* adef,int x,int y);
 /// Assign a tile to a region
-global void RegionAssignTile(RegionId region,int x,int y);
+void RegionAssignTile(RegionId region,int x,int y);
 /// Unassign a tile from a region
-global void RegionUnassignTile(RegionId region,int x,int y);
+void RegionUnassignTile(RegionId region,int x,int y);
 /// Find the closest point on a region with shortest horizontal distance to x
-global void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy);
+void RegionFindPointOnX(RegionDefinition * def,int x,int * vx,int * vy);
 /// Find the closest point on a region with shortest vertical distance to y
-global void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy);
+void RegionFindPointOnY(RegionDefinition * def,int y,int * vx,int * vy);
 
 // Region geometry operations
 
 /// Allocate the space for geometric operations
-global void RegionTempStorageAllocate(void);
+void RegionTempStorageAllocate(void);
 /// Free the space for geometric operations
-global void RegionTempStorageFree(void);
+void RegionTempStorageFree(void);
 /// Fill a region with a value ( in the TempStorage area )
-global void RegionTempStorageFillRegion(RegionDefinition* adef,int value);
+void RegionTempStorageFillRegion(RegionDefinition* adef,int value);
 /// Mark region limits
-global int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue);
+int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue);
 /// Make marked points bigger
-global int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue);
+int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue);
 /// Unassigned adjacent cell of markvalue are assigned to markvalue+1
-global int RegionTempStorageGrow(RegionId regid, int maxmark,int markvalue);
+int RegionTempStorageGrow(RegionId regid, int maxmark,int markvalue);
 /// Clear all points in the region with the given value
-global void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue);
+void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue);
 /// Split a region according to values in the tempstorage
-global void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections);
+void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections);
 
 /// Initialise a "circularfiller"
-global void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int starty, int value);
+void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int starty, int value);
 /// Free a "circularfiller"
-global void CircularFillerDone(CircularFiller * filler);
+void CircularFillerDone(CircularFiller * filler);
 /// One step of filling
-global int CircularFillerStep(CircularFiller * filler);
+int CircularFillerStep(CircularFiller * filler);
 
 // Region connections handling
 
 /// Set The connection count in rega for regb to value
-global void RegionSetConnection(RegionId rega, RegionId regb, int value);
+void RegionSetConnection(RegionId rega, RegionId regb, int value);
 /// Add to the connection count between two regions
-global void RegionAddConnection(RegionId rega, RegionId regb,int value);
+void RegionAddConnection(RegionId rega, RegionId regb,int value);
 /// Add to the connection count between two regions (symetrical)
-global void RegionAddBidirConnection(RegionId rega, RegionId regb,int value);
+void RegionAddBidirConnection(RegionId rega, RegionId regb,int value);
 /// Reduce connection for a region, when the region was reduced
-global void RegionRescanAdjacents(RegionId regid);
+void RegionRescanAdjacents(RegionId regid);
 /// Adjust connection for a region, when the given cell changed
-global void RegionUpdateConnection(RegionId reg,int x,int y,int add,int bidir);
+void RegionUpdateConnection(RegionId reg,int x,int y,int add,int bidir);
 /// Compute all connection ( reset )
-global void UpdateConnections(void);
+void UpdateConnections(void);
 
 /// Ask for a zone recalculation
-global void ClearZoneNeedRefresh(void);
+void ClearZoneNeedRefresh(void);
 
 // Debugging
 
 /// Output tons of debugging
-global void MapSplitterDebug(void);
+void MapSplitterDebug(void);
 /// Verify connexions
-global void RegionDebugAllConnexions(void);
+void RegionDebugAllConnexions(void);
 /// Check coherence between regions and map
-global void RegionDebugWater(void);
+void RegionDebugWater(void);
 
 
 #endif // __SPLITTER_LOCAL_H__

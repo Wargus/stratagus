@@ -67,7 +67,7 @@
 **
 **  @param unit  Unit, for that spell cast/attack animation is played.
 */
-global void AnimateActionSpellCast(Unit* unit)
+void AnimateActionSpellCast(Unit* unit)
 {
 	int flags;
 
@@ -93,7 +93,7 @@ global void AnimateActionSpellCast(Unit* unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-local void SpellMoveToTarget(Unit* unit)
+static void SpellMoveToTarget(Unit* unit)
 {
 	SpellType* spell;
 	Unit* goal;
@@ -169,7 +169,7 @@ local void SpellMoveToTarget(Unit* unit)
 **
 **  @param unit  Unit, for that the spell cast is handled.
 */
-global void HandleActionSpellCast(Unit* unit)
+void HandleActionSpellCast(Unit* unit)
 {
 	int flags;
 	const SpellType* spell;

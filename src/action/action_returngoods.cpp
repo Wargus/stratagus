@@ -58,7 +58,7 @@
 **
 **  @todo  FIXME: move this into action_resource?
 */
-global void HandleActionReturnGoods(Unit* unit)
+void HandleActionReturnGoods(Unit* unit)
 {
 	const UnitType* type;
 	Unit* destu;

@@ -66,7 +66,7 @@
 **
 **  @note          Can be faster written.
 */
-local int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, int y, int flag)
+static int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, int y, int flag)
 {
 	static int dirs[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
 	int surrounding[1024]; // Max criconference for building
@@ -148,7 +148,7 @@ local int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, 
 **
 **  @return        True if place found, false if no found.
 */
-local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
+static int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	int ox, int oy, int *dx, int *dy, int flag)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
@@ -289,7 +289,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 **  @todo          FIXME: This is slow really slow, using
 **                 two flood fills, is not a perfect solution.
 */
-local int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, int *dy)
+static int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, int *dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -456,7 +456,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, i
 **  @todo          FIXME: This is slow really slow, using two flood
 **                 fills, is not a perfect solution.
 */
-local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type, int *dx,
+static int AiFindLumberMillPlace(const Unit * worker, const UnitType * type, int *dx,
 	int *dy)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
@@ -569,7 +569,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type, int 
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-global int AiFindBuildingPlace(const Unit* worker, const UnitType* type, int* dx, int* dy)
+int AiFindBuildingPlace(const Unit* worker, const UnitType* type, int* dx, int* dy)
 {
 
 	//

@@ -83,7 +83,7 @@
 **  @param y     Y position into video memory
 **
 */
-global void VideoDrawTile(const int tile, int x, int y)
+void VideoDrawTile(const int tile, int x, int y)
 {
 	int tilepitch;
 	int oldx;
@@ -112,7 +112,7 @@ global void VideoDrawTile(const int tile, int x, int y)
 		TheScreen, &drect);
 }
 #else
-global void VideoDrawTile(const int tile, int x, int y)
+void VideoDrawTile(const int tile, int x, int y)
 {
 	int tilepitch;
 	int gx;
@@ -174,7 +174,7 @@ global void VideoDrawTile(const int tile, int x, int y)
 **  @param x     X position into video memory
 **  @param y     Y position into video memory
 */
-global void MapDrawTile(int tile, int x, int y)
+void MapDrawTile(int tile, int x, int y)
 {
 	VideoDrawTile(tile, x, y);
 }
@@ -194,7 +194,7 @@ global void MapDrawTile(int tile, int x, int y)
 **
 **  @return    True if overlapping, false otherwise.
 */
-global int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
+int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 	int ex, int ey)
 {
 	return sx >= vp->MapX && sy >= vp->MapY &&
@@ -210,7 +210,7 @@ global int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 **
 **  @return    True if point is in the visible map, false otherwise
 */
-local inline int PointInViewport(const Viewport* vp, int x, int y)
+static inline int PointInViewport(const Viewport* vp, int x, int y)
 {
 	return vp->MapX <= x && x < vp->MapX + vp->MapWidth &&
 		vp->MapY <= y && y < vp->MapY + vp->MapHeight;
@@ -230,7 +230,7 @@ local inline int PointInViewport(const Viewport* vp, int x, int y)
 **  @todo Doesn't work if all points lay outside and the area covers
 **        the complete viewport.
 */
-global int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
+int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 	int ex, int ey)
 {
 	// FIXME: Can be written faster
@@ -267,7 +267,7 @@ global int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 ** (in pixels)
 ** </PRE>
 */
-global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
+void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 {
 	int sx;
 	int sy;
@@ -322,7 +322,7 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
-global void InitMap(void)
+void InitMap(void)
 {
 }
 

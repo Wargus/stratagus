@@ -69,22 +69,22 @@
 #define LimitSearch 1						/// Limit the search
 #endif
 
-global Unit* UnitSlots[MAX_UNIT_SLOTS];		/// All possible units
-global Unit** UnitSlotFree;				/// First free unit slot
-global Unit* ReleasedHead;				/// List of released units.
-global Unit* ReleasedTail;				/// List tail of released units.
+Unit* UnitSlots[MAX_UNIT_SLOTS];		/// All possible units
+Unit** UnitSlotFree;				/// First free unit slot
+Unit* ReleasedHead;				/// List of released units.
+Unit* ReleasedTail;				/// List tail of released units.
 
-global Unit* Units[MAX_UNIT_SLOTS];		/// Array of used slots
-global int NumUnits;						/// Number of slots used
+Unit* Units[MAX_UNIT_SLOTS];		/// Array of used slots
+int NumUnits;						/// Number of slots used
 
-global int XpDamage;						/// Hit point regeneration for all units
-global char EnableTrainingQueue;		/// Config: training queues enabled
-global char EnableBuildingCapture;		/// Config: capture buildings enabled
-global char RevealAttacker;				/// Config: reveal attacker enabled
+int XpDamage;						/// Hit point regeneration for all units
+char EnableTrainingQueue;		/// Config: training queues enabled
+char EnableBuildingCapture;		/// Config: capture buildings enabled
+char RevealAttacker;				/// Config: reveal attacker enabled
 
-local unsigned long HelpMeLastCycle;		/// Last cycle HelpMe sound played
-local int HelpMeLastX;						/// Last X coordinate HelpMe sound played
-local int HelpMeLastY;						/// Last Y coordinate HelpMe sound played
+static unsigned long HelpMeLastCycle;		/// Last cycle HelpMe sound played
+static int HelpMeLastX;						/// Last X coordinate HelpMe sound played
+static int HelpMeLastY;						/// Last Y coordinate HelpMe sound played
 
 /*----------------------------------------------------------------------------
   --		Functions
@@ -93,7 +93,7 @@ local int HelpMeLastY;						/// Last Y coordinate HelpMe sound played
 /**
 **		Initial memory allocation for units.
 */
-global void InitUnitsMemory(void)
+void InitUnitsMemory(void)
 {
 	Unit** slot;
 
@@ -118,7 +118,7 @@ global void InitUnitsMemory(void)
 **
 **		@param unit		Pointer to unit.
 */
-global void FreeUnitMemory(Unit* unit)
+void FreeUnitMemory(Unit* unit)
 {
 	Unit** slot;
 
@@ -138,7 +138,7 @@ global void FreeUnitMemory(Unit* unit)
 **
 **		@param unit		The unit
 */
-global void RefsIncrease(Unit* unit)
+void RefsIncrease(Unit* unit)
 {
 	RefsAssert(unit->Refs && !unit->Destroyed);
 	if (!SaveGameLoading) {
@@ -151,7 +151,7 @@ global void RefsIncrease(Unit* unit)
 **
 **		@param unit		The unit
 */
-global void RefsDecrease(Unit* unit)
+void RefsDecrease(Unit* unit)
 {
 	RefsAssert(unit->Refs);
 	if (!SaveGameLoading) {
@@ -173,7 +173,7 @@ global void RefsDecrease(Unit* unit)
 **
 **		@param unit		Pointer to unit.
 */
-global void ReleaseUnit(Unit* unit)
+void ReleaseUnit(Unit* unit)
 {
 	Unit* temp;
 
@@ -230,7 +230,7 @@ global void ReleaseUnit(Unit* unit)
 /**
 **		FIXME: Docu
 */
-local Unit *AllocUnit(void)
+static Unit *AllocUnit(void)
 {
 	Unit* unit;
 	Unit** slot;
@@ -278,7 +278,7 @@ local Unit *AllocUnit(void)
 **		@param unit		Unit pointer (allocated zero filled)
 **		@param type		Unit-type
 */
-global void InitUnit(Unit* unit, UnitType* type)
+void InitUnit(Unit* unit, UnitType* type)
 {
 	int i;
 
@@ -349,7 +349,7 @@ global void InitUnit(Unit* unit, UnitType* type)
 /**
 **		FIXME: Docu
 */
-global void AssignUnitToPlayer(Unit* unit, Player* player)
+void AssignUnitToPlayer(Unit* unit, Player* player)
 {
 	UnitType* type;
 
@@ -404,7 +404,7 @@ global void AssignUnitToPlayer(Unit* unit, Player* player)
 **
 **		@return				Pointer to created unit.
 */
-global Unit* MakeUnit(UnitType* type, Player* player)
+Unit* MakeUnit(UnitType* type, Player* player)
 {
 	Unit* unit;
 
@@ -438,7 +438,7 @@ global Unit* MakeUnit(UnitType* type, Player* player)
 **		@param x		X map tile position.
 **		@param y		Y map tile position.
 */
-global void PlaceUnit(Unit* unit, int x, int y)
+void PlaceUnit(Unit* unit, int x, int y)
 {
 	const UnitType* type;
 	int h;
@@ -512,7 +512,7 @@ global void PlaceUnit(Unit* unit, int x, int y)
 **
 **		@return				Pointer to created unit.
 */
-global Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
+Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 {
 	Unit* unit;
 
@@ -528,7 +528,7 @@ global Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 **		@param unit		Pointer to unit.
 **		@param host		Pointer to container.
 */
-global void AddUnitInContainer(Unit* unit, Unit* host)
+void AddUnitInContainer(Unit* unit, Unit* host)
 {
 	if (unit->Container) {
 		DebugPrint("Unit is already contained.\n");
@@ -552,7 +552,7 @@ global void AddUnitInContainer(Unit* unit, Unit* host)
 **
 **		@param unit		Pointer to unit.
 */
-global void RemoveUnitFromContainer(Unit* unit)
+void RemoveUnitFromContainer(Unit* unit)
 {
 	Unit* host;
 	host = unit->Container;
@@ -587,7 +587,7 @@ global void RemoveUnitFromContainer(Unit* unit)
 **		@param unit		Pointer to unit.
 **		@param host		Pointer to housing unit.
 */
-global void RemoveUnit(Unit* unit, Unit* host)
+void RemoveUnit(Unit* unit, Unit* host)
 {
 	int h;
 	int w;
@@ -668,7 +668,7 @@ global void RemoveUnit(Unit* unit, Unit* host)
 **
 **  @note Also called by ChangeUnitOwner
 */
-global void UnitLost(Unit* unit)
+void UnitLost(Unit* unit)
 {
 	Unit* temp;
 	const UnitType* type;
@@ -778,7 +778,7 @@ global void UnitLost(Unit* unit)
 **
 **  @param unit  FIXME: docu
 */
-global void UnitClearOrders(Unit *unit)
+void UnitClearOrders(Unit *unit)
 {
 	int i;
 
@@ -810,7 +810,7 @@ global void UnitClearOrders(Unit *unit)
 **		@param unit		New unit pointer.
 **		@param upgrade		True unit was upgraded.
 */
-global void UpdateForNewUnit(const Unit* unit, int upgrade)
+void UpdateForNewUnit(const Unit* unit, int upgrade)
 {
 	const UnitType* type;
 	Player* player;
@@ -846,7 +846,7 @@ global void UpdateForNewUnit(const Unit* unit, int upgrade)
 **		@param dx		Out: nearest point X tile map postion to (tx,ty).
 **		@param dy		Out: nearest point Y tile map postion to (tx,ty).
 */
-global void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
+void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 {
 	int x;
 	int y;
@@ -876,7 +876,7 @@ global void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 **
 **      @param unit		The unit to work on
 */
-local void UnitFillSeenValues(Unit* unit)
+static void UnitFillSeenValues(Unit* unit)
 {
 	//	Seen values are undefined for visible units.
 	unit->Seen.IY = unit->IY;
@@ -898,7 +898,7 @@ local void UnitFillSeenValues(Unit* unit)
 **  @param unit    The unit that goes under fog.
 **  @param player  The player the unit goes out of fog for.
 */
-global void UnitGoesUnderFog(Unit* unit, const Player* player)
+void UnitGoesUnderFog(Unit* unit, const Player* player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (player->Type == PlayerPerson && !unit->Destroyed) {
@@ -939,7 +939,7 @@ global void UnitGoesUnderFog(Unit* unit, const Player* player)
 **	not get an decrease the first time it's seen, so we have to
 **	keep track of what player saw what units, with SeenByPlayer.
 */
-global void UnitGoesOutOfFog(Unit* unit, const Player* player)
+void UnitGoesOutOfFog(Unit* unit, const Player* player)
 {
 	if (unit->Type->VisibleUnderFog) {
 		if (unit->Seen.ByPlayer & (1 << (player->Player))) {
@@ -961,7 +961,7 @@ global void UnitGoesOutOfFog(Unit* unit, const Player* player)
 **  @param y       y location to check
 **  @param cloak   If we mark cloaked units too.
 */
-global void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
+void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 {
 	int p;
 	int n;
@@ -998,7 +998,7 @@ global void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 **	@param y        y location to check if building is on, and mark as seen
 **	@param cloak	If this is for cloaked units.
 */
-global void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
+void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 {
 	int p;
 	int n;
@@ -1045,7 +1045,7 @@ global void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 **
 **	@param unit	pointer to the unit to check if seen
 */
-global void UnitCountSeen(Unit* unit)
+void UnitCountSeen(Unit* unit)
 {
 	int x;
 	int y;
@@ -1117,7 +1117,7 @@ global void UnitCountSeen(Unit* unit)
 **		@param unit				The unit to check.
 **		@param player			The player to check.
 */
-global int UnitVisible(const Unit* unit, const Player* player)
+int UnitVisible(const Unit* unit, const Player* player)
 {
 	int p;
 	int cp;
@@ -1144,7 +1144,7 @@ global int UnitVisible(const Unit* unit, const Player* player)
 **		@param player	Player to check for.
 **		@return			True if visible, false otherwise.
 */
-global int UnitVisibleAsGoal(const Unit* unit, const Player* player)
+int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 {
 	//
 	//	Invisibility
@@ -1172,7 +1172,7 @@ global int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 **		@param player	Player to check for.
 **		@return			True if visible, false otherwise.
 */
-global int UnitVisibleOnMap(const Unit* unit, const Player* player)
+int UnitVisibleOnMap(const Unit* unit, const Player* player)
 {
 	//
 	//	Invisible units.
@@ -1198,7 +1198,7 @@ global int UnitVisibleOnMap(const Unit* unit, const Player* player)
 **		@param unit		Unit to be checked.
 **		@return			True if wisible, false otherwise.
 */
-global int UnitVisibleOnMinimap(const Unit* unit)
+int UnitVisibleOnMinimap(const Unit* unit)
 {
 	//
 	//	Invisible units.
@@ -1229,7 +1229,7 @@ global int UnitVisibleOnMinimap(const Unit* unit)
 **		@param unit			Unit to be checked.
 **		@return				True if visible, false otherwise.
 */
-global int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
+int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 {
 	//
 	//	Check if it's at least inside the damn viewport.
@@ -1274,7 +1274,7 @@ global int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 **		@param unit		Unit to be checked.
 **		@return				True if visible, false otherwise.
 */
-global int UnitVisibleOnScreen(const Unit* unit)
+int UnitVisibleOnScreen(const Unit* unit)
 {
 	const Viewport* vp;
 
@@ -1297,7 +1297,7 @@ global int UnitVisibleOnScreen(const Unit* unit)
 **
 **	  @return				sx,sy,ex,ey defining area in Map
 */
-global void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
+void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 {
 	*sx = unit->X - (unit->IX < 0);
 	*ex = *sx + unit->Type->TileWidth - !unit->IX;
@@ -1313,7 +1313,7 @@ global void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 **
 **				inside?
 */
-global void ChangeUnitOwner(Unit* unit, Player* newplayer)
+void ChangeUnitOwner(Unit* unit, Player* newplayer)
 {
 	int i;
 	Unit* uins;
@@ -1388,7 +1388,7 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
 **		@param oldplayer		Old owning player.
 **		@param newplayer		New owning player.
 */
-local void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
+static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -1415,7 +1415,7 @@ local void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 **
 **		Look through all rescueable players, if they could be rescued.
 */
-global void RescueUnits(void)
+void RescueUnits(void)
 {
 	Player* p;
 	Unit* unit;
@@ -1502,7 +1502,7 @@ global void RescueUnits(void)
 **
 **		@return				atan(val)
 */
-local int myatan(int val)
+static int myatan(int val)
 {
 	static int init;
 	static unsigned char atan_table[2608];
@@ -1528,7 +1528,7 @@ local int myatan(int val)
 **
 **		@return				Angle (0..255)
 */
-global int DirectionToHeading(int delta_x, int delta_y)
+int DirectionToHeading(int delta_x, int delta_y)
 {
 	//
 	//		Check which quadrant.
@@ -1552,7 +1552,7 @@ global int DirectionToHeading(int delta_x, int delta_y)
 /**
 **		Update sprite frame for new heading.
 */
-global void UnitUpdateHeading(Unit* unit)
+void UnitUpdateHeading(Unit* unit)
 {
 	int dir;
 	int nextdir;
@@ -1588,7 +1588,7 @@ global void UnitUpdateHeading(Unit* unit)
 **		@param dx		X map tile delta direction.
 **		@param dy		Y map tile delta direction.
 */
-global void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
+void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
 {
 	unit->Direction = DirectionToHeading(dx, dy);
 	UnitUpdateHeading(unit);
@@ -1606,7 +1606,7 @@ global void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
 **		@param addx		Tile size in x.
 **		@param addy		Tile size in y.
 */
-global void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
+void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
 {
 	int x;
 	int y;
@@ -1689,7 +1689,7 @@ found:
 **		@param addx		Tile size in x.
 **		@param addy		Tile size in y.
 */
-global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
+void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 {
 	int x;
 	int y;
@@ -1779,7 +1779,7 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 **
 **		@param source		All units inside source are dropped out.
 */
-global void DropOutAll(const Unit* source)
+void DropOutAll(const Unit* source)
 {
 	Unit* unit;
 	int i;
@@ -1812,7 +1812,7 @@ global void DropOutAll(const Unit* source)
 **
 **  @return      True if could build here, otherwise false.
 */
-global int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
+int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 {
 	Unit* table[UnitMax];
 	int n;
@@ -1895,7 +1895,7 @@ global int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 /**
 **  Can build on this point.
 */
-global int CanBuildOn(int x, int y, int mask)
+int CanBuildOn(int x, int y, int mask)
 {
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 		return 0;
@@ -1916,7 +1916,7 @@ global int CanBuildOn(int x, int y, int mask)
 **
 **  @todo can't handle building units !1x1, needs a rewrite.
 */
-global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int real)
+int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int real)
 {
 	int w;
 	int h;
@@ -1985,7 +1985,7 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
 **		@param x		OUT: Map X position of tile.
 **		@param y		OUT: Map Y position of tile.
 */
-global int FindWoodInSight(const Unit* unit, int* x, int* y)
+int FindWoodInSight(const Unit* unit, int* x, int* y)
 {
 	return FindTerrainType(UnitMovementMask(unit), 0, MapFieldForest, 9999,
 		unit->Player, unit->X, unit->Y, x, y);
@@ -2014,7 +2014,7 @@ global int FindWoodInSight(const Unit* unit, int* x, int* y)
 **
 **		@return				True if wood was found.
 */
-global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
+int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	const Player* player, int x, int y, int* px, int* py)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
@@ -2125,7 +2125,7 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 **
 **		@return				NoUnitP or resource unit
 */
-global Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
+Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2269,7 +2269,7 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
 **
 **		@return				NoUnitP or deposit unit
 */
-global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
+Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2386,7 +2386,7 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 **
 **		@return				NoUnitP or next idle worker
 */
-global Unit* FindIdleWorker(const Player* player, const Unit* last)
+Unit* FindIdleWorker(const Player* player, const Unit* last)
 {
 	Unit* unit;
 	Unit** units;
@@ -2451,7 +2451,7 @@ global Unit* FindIdleWorker(const Player* player, const Unit* last)
 **
 **  @return       An unit on x, y position.
 */
-global Unit* UnitOnScreen(Unit* ounit, int x, int y)
+Unit* UnitOnScreen(Unit* ounit, int x, int y)
 {
 	Unit** table;
 	Unit* unit;
@@ -2519,7 +2519,7 @@ global Unit* UnitOnScreen(Unit* ounit, int x, int y)
 **
 **		@param unit		Unit to be destroyed.
 */
-global void LetUnitDie(Unit* unit)
+void LetUnitDie(Unit* unit)
 {
 	UnitType* type;
 
@@ -2654,7 +2654,7 @@ global void LetUnitDie(Unit* unit)
 /**
 **		Destroy all units inside unit.
 */
-global void DestroyAllInside(Unit* source)
+void DestroyAllInside(Unit* source)
 {
 	Unit* unit;
 	int i;
@@ -2681,7 +2681,7 @@ global void DestroyAllInside(Unit* source)
 **		@param target		Unit that is hit.
 **		@param damage		How many damage to take.
 */
-global void HitUnit(Unit* attacker, Unit* target, int damage)
+void HitUnit(Unit* attacker, Unit* target, int damage)
 {
 	UnitType* type;
 	Unit* goal;
@@ -2897,7 +2897,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 **
 **  @return    The distance between in tiles.
 */
-global int MapDistance(int x1, int y1, int x2, int y2)
+int MapDistance(int x1, int y1, int x2, int y2)
 {
 	return isqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
@@ -2913,7 +2913,7 @@ global int MapDistance(int x1, int y1, int x2, int y2)
 **
 **  @return      The distance between in tiles.
 */
-global int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y2)
+int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y2)
 {
 	int dx;
 	int dy;
@@ -2948,7 +2948,7 @@ global int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y
 **
 **  @return      The distance between in tiles.
 */
-global int MapDistanceToUnit(int x, int y, const Unit* dest)
+int MapDistanceToUnit(int x, int y, const Unit* dest)
 {
 	return MapDistanceToType(x, y, dest->Type, dest->X, dest->Y);
 }
@@ -2961,7 +2961,7 @@ global int MapDistanceToUnit(int x, int y, const Unit* dest)
 **
 **  @return     The distance between in tiles.
 */
-global int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
+int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 {
 	int dx;
 	int dy;
@@ -3007,7 +3007,7 @@ global int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
-global int ViewPointDistance(int x, int y)
+int ViewPointDistance(int x, int y)
 {
 	const Viewport *vp;
 
@@ -3026,7 +3026,7 @@ global int ViewPointDistance(int x, int y)
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
-global int ViewPointDistanceToUnit(const Unit* dest)
+int ViewPointDistanceToUnit(const Unit* dest)
 {
 	const Viewport* vp;
 
@@ -3043,7 +3043,7 @@ global int ViewPointDistanceToUnit(const Unit* dest)
 **  @param source  Unit type pointer of the attacker.
 **  @param dest    Unit type pointer of the target.
 */
-global int CanTarget(const UnitType* source, const UnitType* dest)
+int CanTarget(const UnitType* source, const UnitType* dest)
 {
 	int i;
 
@@ -3076,7 +3076,7 @@ global int CanTarget(const UnitType* source, const UnitType* dest)
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
-global char* UnitReference(const Unit* unit)
+char* UnitReference(const Unit* unit)
 {
 	char* ref;
 
@@ -3091,7 +3091,7 @@ global char* UnitReference(const Unit* unit)
 **  @param order  Order who should be saved.
 **  @param file   Output file.
 */
-global void SaveOrder(const Order* order, CLFile* file)
+void SaveOrder(const Order* order, CLFile* file)
 {
 	char* ref;
 
@@ -3211,7 +3211,7 @@ global void SaveOrder(const Order* order, CLFile* file)
 **  @param unit  Unit pointer to be saved.
 **  @param file  Output file.
 */
-global void SaveUnit(const Unit* unit, CLFile* file)
+void SaveUnit(const Unit* unit, CLFile* file)
 {
 	char* ref;
 	Unit* uins;
@@ -3471,7 +3471,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 **
 **  @param file  Output file.
 */
-global void SaveUnits(CLFile* file)
+void SaveUnits(CLFile* file)
 {
 	Unit** table;
 	Unit* unit;
@@ -3561,14 +3561,14 @@ global void SaveUnits(CLFile* file)
 /**
 **  Initialize unit module.
 */
-global void InitUnits(void)
+void InitUnits(void)
 {
 }
 
 /**
 **  Clean up unit module.
 */
-global void CleanUnits(void)
+void CleanUnits(void)
 {
 	Unit** table;
 	Unit* unit;

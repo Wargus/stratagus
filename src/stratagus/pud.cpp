@@ -77,8 +77,8 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-local int MapOffsetX;						/// Offset X for combined maps
-local int MapOffsetY;						/// Offset Y for combined maps
+static int MapOffsetX;						/// Offset X for combined maps
+static int MapOffsetY;						/// Offset Y for combined maps
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -93,7 +93,7 @@ local int MapOffsetY;						/// Offset Y for combined maps
 **		@param adr		Address of data
 **		@param length		length of area
 */
-local unsigned int ChksumArea(const unsigned char* adr,int length)
+static unsigned int ChksumArea(const unsigned char* adr,int length)
 {
 	unsigned int res;
 	unsigned int rem;
@@ -120,7 +120,7 @@ local unsigned int ChksumArea(const unsigned char* adr,int length)
 **		@param height		Section height
 **		@param map		Map to store into
 */
-local void ConvertMTXM(const unsigned short* mtxm,int width,int height
+static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			,WorldMap* map)
 {
 	const unsigned short* ctab;
@@ -175,7 +175,7 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
 **		@param height		Section height
 **		@param map		Map to store into
 */
-local void ConvertSQM(const unsigned short* sqm,int width,int height
+static void ConvertSQM(const unsigned short* sqm,int width,int height
 		,WorldMap* map)
 {
 	int h;
@@ -242,7 +242,7 @@ local void ConvertSQM(const unsigned short* sqm,int width,int height
 **		@param height		Section height
 **		@param map		Map to store into
 */
-local void ConvertREGM(const unsigned short* regm,int width,int height
+static void ConvertREGM(const unsigned short* regm,int width,int height
 		,WorldMap* map)
 {
 	int h;
@@ -299,7 +299,7 @@ local void ConvertREGM(const unsigned short* regm,int width,int height
 **				4 bytes header tag (TYPE )...
 **				uint32_t length
 */
-local int PudReadHeader(CLFile* input,char* header,uint32_t* length)
+static int PudReadHeader(CLFile* input,char* header,uint32_t* length)
 {
 	uint32_t len;
 
@@ -320,7 +320,7 @@ local int PudReadHeader(CLFile* input,char* header,uint32_t* length)
 **
 **		@param input		Input file
 */
-local int PudReadWord(CLFile* input)
+static int PudReadWord(CLFile* input)
 {
 	unsigned short temp_short;
 
@@ -337,7 +337,7 @@ local int PudReadWord(CLFile* input)
 **
 **		@param input		Input file
 */
-local int PudReadByte(CLFile* input)
+static int PudReadByte(CLFile* input)
 {
 	unsigned char temp_char;
 
@@ -352,7 +352,7 @@ local int PudReadByte(CLFile* input)
 /**
 **		Get the info for a pud.
 */
-global MapInfo* GetPudInfo(const char* pud)
+MapInfo* GetPudInfo(const char* pud)
 {
 	CLFile* input;
 	uint32_t length;
@@ -797,7 +797,7 @@ global MapInfo* GetPudInfo(const char* pud)
 **		@param pud		File name.
 **		@param map		Map filled in.
 */
-global void LoadPud(const char* pud,WorldMap* map)
+void LoadPud(const char* pud,WorldMap* map)
 {
 	CLFile* input;
 	uint32_t length;
@@ -1327,7 +1327,7 @@ pawn:
 **		@param map		Map to convert
 **		@param tileset		Tileset used to convert
 */
-local void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
+static void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
 			Tileset* tileset)
 {
 	int i;
@@ -1359,7 +1359,7 @@ local void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
 **		@param type		4 byte header
 **		@param length		section length
 */
-local void PudWriteHeader(gzFile f,char* type,int length)
+static void PudWriteHeader(gzFile f,char* type,int length)
 {
 	unsigned char buf[4];
 
@@ -1384,7 +1384,7 @@ local void PudWriteHeader(gzFile f,char* type,int length)
 **		@param f		File handle
 **		@param map		Map to save.
 */
-local void PudWriteMTXM(gzFile f,const WorldMap* map)
+static void PudWriteMTXM(gzFile f,const WorldMap* map)
 {
 	int n;
 	unsigned char* mtxm;
@@ -1407,7 +1407,7 @@ local void PudWriteMTXM(gzFile f,const WorldMap* map)
 **		@param f		File handle
 **		@param map		Map to save.
 */
-local void PudWriteSQM(gzFile f,const WorldMap* map)
+static void PudWriteSQM(gzFile f,const WorldMap* map)
 {
 	int i;
 	int n;
@@ -1475,7 +1475,7 @@ local void PudWriteSQM(gzFile f,const WorldMap* map)
 **		@param f		File handle
 **		@param map		Map to save.
 */
-local void PudWriteREGM(gzFile f,const WorldMap* map)
+static void PudWriteREGM(gzFile f,const WorldMap* map)
 {
 	int i;
 	int n;
@@ -1516,7 +1516,7 @@ local void PudWriteREGM(gzFile f,const WorldMap* map)
 **
 **		@param f		File handle
 */
-local void PudSaveUnits(gzFile f)
+static void PudSaveUnits(gzFile f)
 {
 	char buf[256];
 	int i;
@@ -1555,7 +1555,7 @@ local void PudSaveUnits(gzFile f)
 **		@param pud		File name.
 **		@param map		Map to save.
 */
-global int SavePud(const char* pud,const WorldMap* map)
+int SavePud(const char* pud,const WorldMap* map)
 {
 	gzFile f;
 	int i;
@@ -1683,7 +1683,7 @@ global int SavePud(const char* pud,const WorldMap* map)
 **		@param pud		File name.
 **		@param map		Map to save.
 */
-global int SavePud(const char* pud __attribute__((unused)),
+int SavePud(const char* pud __attribute__((unused)),
 		const WorldMap* map __attribute__((unused)))
 {
 	DebugPrint("Only supported with ZLIB\n");
@@ -1697,7 +1697,7 @@ global int SavePud(const char* pud __attribute__((unused)),
 **		@param old			Number of old tileset
 **		@param map			Map to change
 */
-global void ChangeTilesetPud(int old,WorldMap* map)
+void ChangeTilesetPud(int old,WorldMap* map)
 {
 	unsigned char* mtxm;
 
@@ -1711,7 +1711,7 @@ global void ChangeTilesetPud(int old,WorldMap* map)
 /**
 **		Clean pud module.
 */
-global void CleanPud(void)
+void CleanPud(void)
 {
 	MapOffsetX=MapOffsetY=0;
 }

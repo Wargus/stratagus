@@ -58,7 +58,7 @@
 **
 **  @param unit  The building under construction.
 */
-local void UpdateConstructionFrame(Unit* unit)
+static void UpdateConstructionFrame(Unit* unit)
 {
 	ConstructionFrame* cframe;
 	ConstructionFrame* tmp;
@@ -89,7 +89,7 @@ local void UpdateConstructionFrame(Unit* unit)
 **
 **  @param unit  Unit that builds a building.
 */
-global void HandleActionBuild(Unit* unit)
+void HandleActionBuild(Unit* unit)
 {
 	int x;
 	int y;
@@ -282,7 +282,7 @@ global void HandleActionBuild(Unit* unit)
 **
 **  @param unit  Unit that is builded.
 */
-global void HandleActionBuilded(Unit* unit)
+void HandleActionBuilded(Unit* unit)
 {
 	Unit* worker;
 	UnitType* type;

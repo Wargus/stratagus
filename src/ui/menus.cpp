@@ -81,321 +81,321 @@
 --		Prototypes for local functions
 ----------------------------------------------------------------------------*/
 
-local void EditorEndMenu(void);
+static void EditorEndMenu(void);
 
 /*----------------------------------------------------------------------------
 --		Prototypes for action handlers and helper functions
 ----------------------------------------------------------------------------*/
 
 // Game menu
-local void GameMenuInit(Menuitem *mi);
-local void GameOptionsMenu(void);
-local void HelpMenu(void);
-local void ObjectivesMenu(void);
-local void EndScenarioMenu(void);
+static void GameMenuInit(Menuitem *mi);
+static void GameOptionsMenu(void);
+static void HelpMenu(void);
+static void ObjectivesMenu(void);
+static void EndScenarioMenu(void);
 
 // Objectives
-local void ObjectivesInit(Menuitem *mi);
-local void ObjectivesExit(Menuitem *mi);
+static void ObjectivesInit(Menuitem *mi);
+static void ObjectivesExit(Menuitem *mi);
 
 // Victory, lost
-local void GameMenuEnd(void);
-local void VictoryInit(Menuitem *mi);
-local void DefeatedInit(Menuitem *mi);
-local void SaveReplay(void);
-local void SaveReplayEnterAction(Menuitem *mi, int key);
-local void SaveReplayOk(void);
+static void GameMenuEnd(void);
+static void VictoryInit(Menuitem *mi);
+static void DefeatedInit(Menuitem *mi);
+static void SaveReplay(void);
+static void SaveReplayEnterAction(Menuitem *mi, int key);
+static void SaveReplayOk(void);
 
 // Scenario select
-local void ScenSelectLBExit(Menuitem *mi);
-local void ScenSelectLBInit(Menuitem *mi);
-local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
-local void ScenSelectLBAction(Menuitem *mi, int i);
-local void ScenSelectTPMSAction(Menuitem *mi, int i);
-local void ScenSelectVSAction(Menuitem *mi, int i);
-local void ScenSelectFolder(void);
-local void ScenSelectInit(Menuitem *mi);
-local void ScenSelectOk(void);
-local void ScenSelectCancel(void);
-local int ScenSelectRDFilter(char *pathbuf, FileList *fl);
+static void ScenSelectLBExit(Menuitem *mi);
+static void ScenSelectLBInit(Menuitem *mi);
+static unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
+static void ScenSelectLBAction(Menuitem *mi, int i);
+static void ScenSelectTPMSAction(Menuitem *mi, int i);
+static void ScenSelectVSAction(Menuitem *mi, int i);
+static void ScenSelectFolder(void);
+static void ScenSelectInit(Menuitem *mi);
+static void ScenSelectOk(void);
+static void ScenSelectCancel(void);
+static int ScenSelectRDFilter(char *pathbuf, FileList *fl);
 
 // Program start
-local void PrgStartInit(Menuitem *mi);
-local void NameLineDrawFunc(Menuitem *mi);
-local void SinglePlayerGameMenu(void);
-local void MultiPlayerGameMenu(void);
-local void CampaignGameMenu(void);
-local void ReplayGameMenu(void);
-local void GlobalOptionsMenu(void);
-local void StartEditor(void);
-local void GameShowCredits(void);
-local void GameMenuExit(void);
+static void PrgStartInit(Menuitem *mi);
+static void NameLineDrawFunc(Menuitem *mi);
+static void SinglePlayerGameMenu(void);
+static void MultiPlayerGameMenu(void);
+static void CampaignGameMenu(void);
+static void ReplayGameMenu(void);
+static void GlobalOptionsMenu(void);
+static void StartEditor(void);
+static void GameShowCredits(void);
+static void GameMenuExit(void);
 
 // Confirm menus
-local void SurrenderConfirmMenu(void);
+static void SurrenderConfirmMenu(void);
 
 // Global Options
-local void GlobalOptionsInit(Menuitem *mi);
-local void GlobalOptionsExit(Menuitem *mi);
-local void GlobalOptionsResolutionGem(Menuitem *mi);
-local void GlobalOptionsFullscreenGem(Menuitem *mi);
+static void GlobalOptionsInit(Menuitem *mi);
+static void GlobalOptionsExit(Menuitem *mi);
+static void GlobalOptionsResolutionGem(Menuitem *mi);
+static void GlobalOptionsFullscreenGem(Menuitem *mi);
 
 // Tips
-local void TipsInit(Menuitem *mi);
-local void TipsExit(Menuitem *mi);
-local void TipsShowTipsGem(Menuitem *mi);
-local void TipsShowTipsText(Menuitem *mi);
-local void TipsNextTip(void);
-local void TipsPreviousTip(void);
+static void TipsInit(Menuitem *mi);
+static void TipsExit(Menuitem *mi);
+static void TipsShowTipsGem(Menuitem *mi);
+static void TipsShowTipsText(Menuitem *mi);
+static void TipsNextTip(void);
+static void TipsPreviousTip(void);
 
 // Custom game setup
-local void GameSetupInit(Menuitem *mi);
-local void ScenSelectMenu(void);
-local void CustomGameStart(void);
-local void GameCancel(void);
-local void GameDrawFunc(Menuitem *mi);
-local void GameRCSAction(Menuitem *mi, int i);
-local void GameRESAction(Menuitem *mi, int i);
-local void GameUNSAction(Menuitem *mi, int i);
-local void GameTSSAction(Menuitem *mi, int i);
-local void GameGATAction(Menuitem *mi, int i);
-local void CustomGameOPSAction(Menuitem *mi, int i);
+static void GameSetupInit(Menuitem *mi);
+static void ScenSelectMenu(void);
+static void CustomGameStart(void);
+static void GameCancel(void);
+static void GameDrawFunc(Menuitem *mi);
+static void GameRCSAction(Menuitem *mi, int i);
+static void GameRESAction(Menuitem *mi, int i);
+static void GameUNSAction(Menuitem *mi, int i);
+static void GameTSSAction(Menuitem *mi, int i);
+static void GameGATAction(Menuitem *mi, int i);
+static void CustomGameOPSAction(Menuitem *mi, int i);
 
 // Enter name
-local void EnterNameAction(Menuitem *mi, int key);
-local void EnterNameCancel(void);
+static void EnterNameAction(Menuitem *mi, int key);
+static void EnterNameCancel(void);
 
 // Net create join
-local void JoinNetGameMenu(void);
-local void CreateNetGameMenu(void);
-local void CreateInternetGameMenu(void);
+static void JoinNetGameMenu(void);
+static void CreateNetGameMenu(void);
+static void CreateInternetGameMenu(void);
 
 // Multi net type
-local void MultiPlayerLANGame(void);
-local void MultiPlayerInternetGame(void);
+static void MultiPlayerLANGame(void);
+static void MultiPlayerInternetGame(void);
 
 // Net multi setup
-local void MultiGameSetupInit(Menuitem *mi);
-local void MultiGameSetupExit(Menuitem *mi);
-local void MultiGameDrawFunc(Menuitem *mi);
-local void MultiScenSelectMenu(void);
-local void MultiGameStart(void);
-local void MultiGameCancel(void);
-local void MultiGameFWSAction(Menuitem *mi, int i);
+static void MultiGameSetupInit(Menuitem *mi);
+static void MultiGameSetupExit(Menuitem *mi);
+static void MultiGameDrawFunc(Menuitem *mi);
+static void MultiScenSelectMenu(void);
+static void MultiGameStart(void);
+static void MultiGameCancel(void);
+static void MultiGameFWSAction(Menuitem *mi, int i);
 
 // Enter server ip
-local void EnterServerIPAction(Menuitem *mi, int key);
-local void EnterServerIPCancel(void);
+static void EnterServerIPAction(Menuitem *mi, int key);
+static void EnterServerIPCancel(void);
 
 // Net multi client
-local void TerminateNetConnect(void);
-local void MultiGameClientInit(Menuitem *mi);
-local void MultiGameClientExit(Menuitem *mi);
-local void MultiGameClientDrawFunc(Menuitem *mi);
-local void MultiClientReady(void);
-local void MultiClientNotReady(void);
-local void MultiClientCancel(void);
-local void MultiClientRCSAction(Menuitem *mi, int i);
-local void MultiClientGemAction(Menuitem *mi);
-local void MultiClientUpdate(int initial);
+static void TerminateNetConnect(void);
+static void MultiGameClientInit(Menuitem *mi);
+static void MultiGameClientExit(Menuitem *mi);
+static void MultiGameClientDrawFunc(Menuitem *mi);
+static void MultiClientReady(void);
+static void MultiClientNotReady(void);
+static void MultiClientCancel(void);
+static void MultiClientRCSAction(Menuitem *mi, int i);
+static void MultiClientGemAction(Menuitem *mi);
+static void MultiClientUpdate(int initial);
 
 // Net connecting
-local void NetConnectingInit(Menuitem *mi);
-local void NetConnectingExit(Menuitem *mi);
-local void NetConnectingCancel(void);
+static void NetConnectingInit(Menuitem *mi);
+static void NetConnectingExit(Menuitem *mi);
+static void NetConnectingCancel(void);
 
 // Campaign select
-local void CampaignMenu1(void);
-local void CampaignMenu2(void);
-local void CampaignMenu3(void);
-local void CampaignMenu4(void);
-local void SelectCampaignMenu(void);
+static void CampaignMenu1(void);
+static void CampaignMenu2(void);
+static void CampaignMenu3(void);
+static void CampaignMenu4(void);
+static void SelectCampaignMenu(void);
 
 // End scenario
-local void EndScenarioRestart(void);
-local void EndScenarioSurrender(void);
-local void EndScenarioQuitMenu(void);
+static void EndScenarioRestart(void);
+static void EndScenarioSurrender(void);
+static void EndScenarioQuitMenu(void);
 
 // Sound options
-local void SoundOptionsInit(Menuitem *mi);
-local void SoundOptionsExit(Menuitem *mi);
-local void MasterVolumeHSAction(Menuitem *mi);
-local void SetMasterPower(Menuitem *mi);
-local void MusicVolumeHSAction(Menuitem *mi);
-local void SetMusicPower(Menuitem *mi);
-local void CdVolumeHSAction(Menuitem *mi);
-local void SetCdPower(Menuitem *mi);
-local void SetCdModeDefined(Menuitem *mi);
-local void SetCdModeRandom(Menuitem *mi);
+static void SoundOptionsInit(Menuitem *mi);
+static void SoundOptionsExit(Menuitem *mi);
+static void MasterVolumeHSAction(Menuitem *mi);
+static void SetMasterPower(Menuitem *mi);
+static void MusicVolumeHSAction(Menuitem *mi);
+static void SetMusicPower(Menuitem *mi);
+static void CdVolumeHSAction(Menuitem *mi);
+static void SetCdPower(Menuitem *mi);
+static void SetCdModeDefined(Menuitem *mi);
+static void SetCdModeRandom(Menuitem *mi);
 
 // Preferences
-local void PreferencesInit(Menuitem *mi);
-local void PreferencesExit(Menuitem *mi);
-local void SetFogOfWar(Menuitem *mi);
-local void SetCommandKey(Menuitem *mi);
+static void PreferencesInit(Menuitem *mi);
+static void PreferencesExit(Menuitem *mi);
+static void SetFogOfWar(Menuitem *mi);
+static void SetCommandKey(Menuitem *mi);
 
 // Speed options
-local void SpeedOptionsInit(Menuitem *mi);
-local void SpeedOptionsExit(Menuitem *mi);
-local void GameSpeedHSAction(Menuitem *mi);
-local void MouseScrollHSAction(Menuitem *mi);
-local void KeyboardScrollHSAction(Menuitem *mi);
+static void SpeedOptionsInit(Menuitem *mi);
+static void SpeedOptionsExit(Menuitem *mi);
+static void GameSpeedHSAction(Menuitem *mi);
+static void MouseScrollHSAction(Menuitem *mi);
+static void KeyboardScrollHSAction(Menuitem *mi);
 
 // Game options
 
 // Diplomacy options
-local void DiplomacyInit(Menuitem *mi);
-local void DiplomacyExit(Menuitem *mi);
-local void DiplomacyWait(Menuitem *mi);
-local void DiplomacyOk(void);
+static void DiplomacyInit(Menuitem *mi);
+static void DiplomacyExit(Menuitem *mi);
+static void DiplomacyWait(Menuitem *mi);
+static void DiplomacyOk(void);
 
 // Help
-local void KeystrokeHelpMenu(void);
-local void TipsMenu(void);
+static void KeystrokeHelpMenu(void);
+static void TipsMenu(void);
 
 // Keystroke help
-local void KeystrokeHelpVSAction(Menuitem *mi, int i);
-local void KeystrokeHelpDrawFunc(Menuitem *mi);
+static void KeystrokeHelpVSAction(Menuitem *mi, int i);
+static void KeystrokeHelpDrawFunc(Menuitem *mi);
 
 // Save
-local void SaveGameInit(Menuitem *mi);
-local void SaveGameExit(Menuitem *mi);
-local void SaveGameLBInit(Menuitem *mi);
-local void SaveGameLBExit(Menuitem *mi);
-local void SaveGameEnterAction(Menuitem *mi, int key);
-local void SaveGameLBAction(Menuitem *mi, int i);
-local unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i);
-local void SaveGameVSAction(Menuitem *mi, int i);
-local void SaveGameOk(void);
-local void DeleteConfirmMenu(void);
-local int SaveGameRDFilter(char *pathbuf, FileList *fl);
-local void CreateSaveDir(void);
+static void SaveGameInit(Menuitem *mi);
+static void SaveGameExit(Menuitem *mi);
+static void SaveGameLBInit(Menuitem *mi);
+static void SaveGameLBExit(Menuitem *mi);
+static void SaveGameEnterAction(Menuitem *mi, int key);
+static void SaveGameLBAction(Menuitem *mi, int i);
+static unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i);
+static void SaveGameVSAction(Menuitem *mi, int i);
+static void SaveGameOk(void);
+static void DeleteConfirmMenu(void);
+static int SaveGameRDFilter(char *pathbuf, FileList *fl);
+static void CreateSaveDir(void);
 
 // Load
-local void LoadGameInit(Menuitem *mi);
-local void LoadGameExit(Menuitem *mi);
-local void LoadGameLBInit(Menuitem *mi);
-local void LoadGameLBExit(Menuitem *mi);
-local void LoadGameLBAction(Menuitem *mi, int i);
-local unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i);
-local void LoadGameVSAction(Menuitem *mi, int i);
-local void LoadGameOk(void);
+static void LoadGameInit(Menuitem *mi);
+static void LoadGameExit(Menuitem *mi);
+static void LoadGameLBInit(Menuitem *mi);
+static void LoadGameLBExit(Menuitem *mi);
+static void LoadGameLBAction(Menuitem *mi, int i);
+static unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i);
+static void LoadGameVSAction(Menuitem *mi, int i);
+static void LoadGameOk(void);
 
 // Confirm save
-local void SaveConfirmInit(Menuitem *mi);
-local void SaveConfirmExit(Menuitem *mi);
-local void SaveConfirmOk(void);
-local void SaveConfirmCancel(void);
+static void SaveConfirmInit(Menuitem *mi);
+static void SaveConfirmExit(Menuitem *mi);
+static void SaveConfirmOk(void);
+static void SaveConfirmCancel(void);
 
 // Confirm delete
-local void DeleteConfirmInit(Menuitem *mi);
-local void DeleteConfirmExit(Menuitem *mi);
-local void DeleteConfirmOk(void);
-local void DeleteConfirmCancel(void);
+static void DeleteConfirmInit(Menuitem *mi);
+static void DeleteConfirmExit(Menuitem *mi);
+static void DeleteConfirmOk(void);
+static void DeleteConfirmCancel(void);
 
 // Save replay
-local void SaveReplayInit(Menuitem *mi);
-local void SaveReplayExit(Menuitem *mi);
+static void SaveReplayInit(Menuitem *mi);
+static void SaveReplayExit(Menuitem *mi);
 
 // Editor select
-local void EditorNewMap(void);
-local void EditorMainLoadMap(void);
-local void EditorSelectCancel(void);
+static void EditorNewMap(void);
+static void EditorMainLoadMap(void);
+static void EditorSelectCancel(void);
 
 // Editor new
-local void EditorNewDrawFunc(Menuitem *mi);
-local void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
-local void EditorNewMapSizeEnterAction(Menuitem *mi, int key);
-local void EditorNewOk(void);
-local void EditorNewCancel(void);
+static void EditorNewDrawFunc(Menuitem *mi);
+static void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
+static void EditorNewMapSizeEnterAction(Menuitem *mi, int key);
+static void EditorNewOk(void);
+static void EditorNewCancel(void);
 
 // Editor main load map
-local void EditorMainLoadInit(Menuitem *mi);
-local void EditorMainLoadLBInit(Menuitem *mi);
-local void EditorMainLoadLBExit(Menuitem *mi);
-local void EditorMainLoadLBAction(Menuitem *mi, int i);
-local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i);
-local void EditorMainLoadVSAction(Menuitem *mi, int i);
-local void EditorMainLoadOk(void);
-local void EditorMainLoadCancel(void);
-local void EditorMainLoadFolder(void);
-local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
+static void EditorMainLoadInit(Menuitem *mi);
+static void EditorMainLoadLBInit(Menuitem *mi);
+static void EditorMainLoadLBExit(Menuitem *mi);
+static void EditorMainLoadLBAction(Menuitem *mi, int i);
+static unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i);
+static void EditorMainLoadVSAction(Menuitem *mi, int i);
+static void EditorMainLoadOk(void);
+static void EditorMainLoadCancel(void);
+static void EditorMainLoadFolder(void);
+static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
 
 // Editor load map
-local void EditorLoadOk(void);
-local void EditorLoadCancel(void);
+static void EditorLoadOk(void);
+static void EditorLoadCancel(void);
 
 // Editor menu
-local void EditorMapPropertiesMenu(void);
-local void EditorPlayerPropertiesMenu(void);
-local void EditorQuitToMenu(void);
+static void EditorMapPropertiesMenu(void);
+static void EditorPlayerPropertiesMenu(void);
+static void EditorQuitToMenu(void);
 
 // Editor map properties
-local void EditorMapPropertiesEnterAction(Menuitem *mi, int key);
-local void EditorMapPropertiesOk(void);
+static void EditorMapPropertiesEnterAction(Menuitem *mi, int key);
+static void EditorMapPropertiesOk(void);
 
 // Editor player properties
-local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
-local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
+static void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
+static void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
 
 // Editor edit resource
-local void EditorEditResourceEnterAction(Menuitem *mi,int key);
-local void EditorEditResourceOk(void);
-local void EditorEditResourceCancel(void);
+static void EditorEditResourceEnterAction(Menuitem *mi,int key);
+static void EditorEditResourceOk(void);
+static void EditorEditResourceCancel(void);
 
 // Editor edit ai properties
-local void EditorEditAiPropertiesGem(Menuitem *mi);
-local void EditorEditAiPropertiesOk(void);
-local void EditorEditAiPropertiesCancel(void);
+static void EditorEditAiPropertiesGem(Menuitem *mi);
+static void EditorEditAiPropertiesOk(void);
+static void EditorEditAiPropertiesCancel(void);
 
 // Editor save
-local void EditorSaveLBInit(Menuitem *mi);
-local void EditorSaveLBExit(Menuitem *mi);
-local void EditorSaveFolder(void);
-local void EditorSaveLBAction(Menuitem *mi, int i);
-local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i);
-local void EditorSaveVSAction(Menuitem *mi, int i);
-local void EditorSaveEnterAction(Menuitem *mi, int key);
-local void EditorSaveOk(void);
-local void EditorSaveCancel(void);
-local int EditorSaveRDFilter(char *pathbuf, FileList *fl);
+static void EditorSaveLBInit(Menuitem *mi);
+static void EditorSaveLBExit(Menuitem *mi);
+static void EditorSaveFolder(void);
+static void EditorSaveLBAction(Menuitem *mi, int i);
+static unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i);
+static void EditorSaveVSAction(Menuitem *mi, int i);
+static void EditorSaveEnterAction(Menuitem *mi, int key);
+static void EditorSaveOk(void);
+static void EditorSaveCancel(void);
+static int EditorSaveRDFilter(char *pathbuf, FileList *fl);
 
 // Editor save confirm
-local void EditorSaveConfirmInit(Menuitem *mi);
-local void EditorSaveConfirmOk(void);
-local void EditorSaveConfirmCancel(void);
+static void EditorSaveConfirmInit(Menuitem *mi);
+static void EditorSaveConfirmOk(void);
+static void EditorSaveConfirmCancel(void);
 
 // Replay game
-local void ReplayGameInit(Menuitem *mi);
-local void ReplayGameLBInit(Menuitem *mi);
-local void ReplayGameLBExit(Menuitem *mi);
-local void ReplayGameLBAction(Menuitem *mi, int i);
-local unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i);
-local void ReplayGameVSAction(Menuitem *mi, int i);
-local void ReplayGameFolder(void);
-local void ReplayGameDisableFog(Menuitem *mi);
-local void ReplayGameOk(void);
-local void ReplayGameCancel(void);
-local int ReplayGameRDFilter(char *pathbuf, FileList *fl);
+static void ReplayGameInit(Menuitem *mi);
+static void ReplayGameLBInit(Menuitem *mi);
+static void ReplayGameLBExit(Menuitem *mi);
+static void ReplayGameLBAction(Menuitem *mi, int i);
+static unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i);
+static void ReplayGameVSAction(Menuitem *mi, int i);
+static void ReplayGameFolder(void);
+static void ReplayGameDisableFog(Menuitem *mi);
+static void ReplayGameOk(void);
+static void ReplayGameCancel(void);
+static int ReplayGameRDFilter(char *pathbuf, FileList *fl);
 
 // Metaserver
-local void MultiGameMasterReport(void);
-local void EnterMasterAction(Menuitem *mi, int key);
-local void ShowMetaServerList(void); // Addition for Magnant
-local void MultiMetaServerGameSetupInit(Menuitem *mi); // init callback
-local void MultiMetaServerGameSetupExit(Menuitem *mi); // exit callback
-local void SelectGameServer(Menuitem *mi); // Game Server selection so that client joins the game
-local void AddGameServer(void); //Add Game Server on Meta server
-local void ChangeGameServer(void); //Change Game Parameters on Meta server
-local int MetaServerConnectError(void); // Display error message
-local void MultiMetaServerClose(void); //Close Master Server connection
+//static void MultiGameMasterReport(void);
+//static void EnterMasterAction(Menuitem *mi, int key);
+static void ShowMetaServerList(void); // Addition for Magnant
+static void MultiMetaServerGameSetupInit(Menuitem *mi); // init callback
+static void MultiMetaServerGameSetupExit(Menuitem *mi); // exit callback
+static void SelectGameServer(Menuitem *mi); // Game Server selection so that client joins the game
+static void AddGameServer(void); //Add Game Server on Meta server
+static void ChangeGameServer(void); //Change Game Parameters on Meta server
+static int MetaServerConnectError(void); // Display error message
+static void MultiMetaServerClose(void); //Close Master Server connection
 //others
-local void GameMenuReturn(void);
-local void NetErrorMenu(char *error);
-local void NetworkGamePrepareGameSettings(void);
-local void MultiGamePTSAction(Menuitem *mi, int o);
-local void NetMultiPlayerDrawFunc(Menuitem *mi);
-local void MultiGamePlayerSelectorsUpdate(int initial);
+static void GameMenuReturn(void);
+static void NetErrorMenu(char *error);
+static void NetworkGamePrepareGameSettings(void);
+static void MultiGamePTSAction(Menuitem *mi, int o);
+static void NetMultiPlayerDrawFunc(Menuitem *mi);
+static void MultiGamePlayerSelectorsUpdate(int initial);
 
 
 /*----------------------------------------------------------------------------
@@ -403,40 +403,40 @@ local void MultiGamePlayerSelectorsUpdate(int initial);
 ----------------------------------------------------------------------------*/
 
 	/// Hash table of all the menus
-global _MenuHash MenuHash;
+_MenuHash MenuHash;
 	/// Hash table of all the menu functions
-global _MenuFuncHash MenuFuncHash;
+_MenuFuncHash MenuFuncHash;
 
 #define HASHADD(x,y) { \
 	*(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
 }
 
 	/// Game started
-global int GuiGameStarted;
+int GuiGameStarted;
 	/// Editor cancel button pressed
-local int EditorCancelled;
+static int EditorCancelled;
 
 /**
 **		Other client and server selection state for Multiplayer clients
 */
-global ServerSetup ServerSetupState;
-global ServerSetup LocalSetupState;
+ServerSetup ServerSetupState;
+ServerSetup LocalSetupState;
 
-local char ScenSelectPath[1024];				/// Scenario selector path
-local char ScenSelectDisplayPath[1024];				/// Displayed selector path
-local char ScenSelectFileName[128];				/// Scenario selector name
+static char ScenSelectPath[1024];				/// Scenario selector path
+static char ScenSelectDisplayPath[1024];				/// Displayed selector path
+static char ScenSelectFileName[128];				/// Scenario selector name
 
-global MapInfo *MenuMapInfo;						/// Selected map info
-global char MenuMapFullPath[1024];				/// Selected map path+name
+MapInfo *MenuMapInfo;						/// Selected map info
+char MenuMapFullPath[1024];				/// Selected map path+name
 
-local char *SaveDir;								/// Save game directory
-local char TempPathBuf[PATH_MAX];				/// Temporary buffer for paths
+static char *SaveDir;								/// Save game directory
+static char TempPathBuf[PATH_MAX];				/// Temporary buffer for paths
 
-global int nKeyStrokeHelps;						/// Number of keystroke help lines
-global char **KeyStrokeHelps;						/// Array of keystroke help lines
+int nKeyStrokeHelps;						/// Number of keystroke help lines
+char **KeyStrokeHelps;						/// Array of keystroke help lines
 
 /// FIXME: -> ccl...
-local unsigned char *mgptsoptions[] = {
+static unsigned char *mgptsoptions[] = {
 	"Available",
 	"Computer",
 	"Closed",
@@ -445,11 +445,11 @@ local unsigned char *mgptsoptions[] = {
 /**
 **		Help-items for the Net Multiplayer Setup and Client Menus
 */
-local Menuitem NetMultiButtonStorage[] = {
+static Menuitem NetMultiButtonStorage[] = {
 		{ MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, 0, NULL, NULL, NULL, {{NULL,0}} },
 		{ MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, 0, NULL, NULL, NULL, {{NULL,0}} },
 };
-local void InitNetMultiButtonStorage(void) {
+static void InitNetMultiButtonStorage(void) {
 	MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
 	MenuitemDrawfunc i1 = { NetMultiPlayerDrawFunc };
 	NetMultiButtonStorage[0].d.pulldown = i0;
@@ -463,7 +463,7 @@ local void InitNetMultiButtonStorage(void) {
 /**
 **		Initialize the hash table of menu functions
 */
-global void InitMenuFuncHash(void)
+void InitMenuFuncHash(void)
 {
 	HASHADD(NULL,"null");
 
@@ -788,7 +788,7 @@ global void InitMenuFuncHash(void)
 /**
 **  Draw the version, copyright, and license at bottom of the screen.
 */
-local void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
+static void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
 {
 	char* nc;
 	char* rc;
@@ -811,7 +811,7 @@ local void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
 **
 **		@param mi		The menu.
 */
-local void PrgStartInit(Menuitem *mi)
+static void PrgStartInit(Menuitem *mi)
 {
 	if (NetworkNumInterfaces == 0) {
 		mi[2].flags = MenuButtonDisabled;
@@ -823,7 +823,7 @@ local void PrgStartInit(Menuitem *mi)
 /**
 **		Leave menus and return to game mode
 */
-local void GameMenuReturn(void)
+static void GameMenuReturn(void)
 {
 	while (CurrentMenu) {
 		EndMenu();
@@ -836,7 +836,7 @@ local void GameMenuReturn(void)
 /**
 **		Init callback for save game menu
 */
-local void SaveGameInit(Menuitem *mi __attribute__ ((unused)))
+static void SaveGameInit(Menuitem *mi __attribute__ ((unused)))
 {
 	Menu *menu;
 	char *buf;
@@ -857,7 +857,7 @@ local void SaveGameInit(Menuitem *mi __attribute__ ((unused)))
 /**
 **		Exit callback for save game menu
 */
-local void SaveGameExit(Menuitem *mi)
+static void SaveGameExit(Menuitem *mi)
 {
 	free(mi->menu->Items[1].d.input.buffer);
 	mi->menu->Items[1].d.input.buffer = NULL;
@@ -866,7 +866,7 @@ local void SaveGameExit(Menuitem *mi)
 /**
 **		Save game input box callback
 */
-local void SaveGameEnterAction(Menuitem *mi, int key)
+static void SaveGameEnterAction(Menuitem *mi, int key)
 {
 	if (mi->d.input.nch == 0) {
 		mi[3].flags = MenuButtonDisabled;		/* mi[i]: Save button! */
@@ -883,7 +883,7 @@ local void SaveGameEnterAction(Menuitem *mi, int key)
 /**
 **		Save game
 */
-local void SaveGameOk(void)
+static void SaveGameOk(void)
 {
 	char *name;
 	Menu *menu;
@@ -924,7 +924,7 @@ local void SaveGameOk(void)
 /**
 **		Create the save directory
 */
-local void CreateSaveDir(void)
+static void CreateSaveDir(void)
 {
 	if (SaveDir) {
 		free(SaveDir);
@@ -953,7 +953,7 @@ local void CreateSaveDir(void)
 /**
 **		Save game menu
 */
-global void SaveGameMenu(void)
+void SaveGameMenu(void)
 {
 	ProcessMenu("menu-save-game", 0);
 }
@@ -961,7 +961,7 @@ global void SaveGameMenu(void)
 /**
 **		Exit callback for listbox in save game menu
 */
-local void SaveGameLBExit(Menuitem *mi)
+static void SaveGameLBExit(Menuitem *mi)
 {
 	FileList *fl;
 
@@ -977,7 +977,7 @@ local void SaveGameLBExit(Menuitem *mi)
 /**
 **		Init callback for listbox in save game menu
 */
-local void SaveGameLBInit(Menuitem *mi)
+static void SaveGameLBInit(Menuitem *mi)
 {
 	int i;
 
@@ -998,7 +998,7 @@ local void SaveGameLBInit(Menuitem *mi)
 /**
 **		Save game listbox retrieve callback
 */
-local unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i)
 {
 	FileList *fl;
 	static char buffer[1024];
@@ -1019,7 +1019,7 @@ local unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i)
 /**
 **		Save game listbox action callback
 */
-local void SaveGameLBAction(Menuitem *mi, int i)
+static void SaveGameLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
@@ -1045,7 +1045,7 @@ local void SaveGameLBAction(Menuitem *mi, int i)
 /**
 **		Save game vertical slider callback
 */
-local void SaveGameVSAction(Menuitem *mi, int i)
+static void SaveGameVSAction(Menuitem *mi, int i)
 {
 	int op;
 	int d1;
@@ -1139,7 +1139,7 @@ local void SaveGameVSAction(Menuitem *mi, int i)
 /**
 **		Save game read directory filter
 */
-local int SaveGameRDFilter(char *pathbuf, FileList *fl)
+static int SaveGameRDFilter(char *pathbuf, FileList *fl)
 {
 	char *suf;
 	char *cp;
@@ -1189,7 +1189,7 @@ local int SaveGameRDFilter(char *pathbuf, FileList *fl)
 /**
 **		Load game init callback
 */
-local void LoadGameInit(Menuitem *mi)
+static void LoadGameInit(Menuitem *mi)
 {
 	mi->menu->Items[3].flags = MI_DISABLED;
 	CreateSaveDir();
@@ -1198,14 +1198,14 @@ local void LoadGameInit(Menuitem *mi)
 /**
 **		Load game exit callback
 */
-local void LoadGameExit(Menuitem *mi __attribute__ ((unused)))
+static void LoadGameExit(Menuitem *mi __attribute__ ((unused)))
 {
 }
 
 /**
 **		Exit callback for listbox in load game menu
 */
-local void LoadGameLBExit(Menuitem *mi)
+static void LoadGameLBExit(Menuitem *mi)
 {
 	FileList *fl;
 
@@ -1221,7 +1221,7 @@ local void LoadGameLBExit(Menuitem *mi)
 /**
 **		Init callback for listbox in load game menu
 */
-local void LoadGameLBInit(Menuitem *mi)
+static void LoadGameLBInit(Menuitem *mi)
 {
 	int i;
 
@@ -1242,7 +1242,7 @@ local void LoadGameLBInit(Menuitem *mi)
 /**
 **		Load game listbox retrieve callback
 */
-local unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i)
 {
 	FileList *fl;
 	static char buffer[1024];
@@ -1263,7 +1263,7 @@ local unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i)
 /**
 **		Load game listbox action callback
 */
-local void LoadGameLBAction(Menuitem *mi, int i)
+static void LoadGameLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
@@ -1287,7 +1287,7 @@ local void LoadGameLBAction(Menuitem *mi, int i)
 /**
 **		Load game vertical slider callback
 */
-local void LoadGameVSAction(Menuitem *mi, int i)
+static void LoadGameVSAction(Menuitem *mi, int i)
 {
 	int op;
 	int d1;
@@ -1381,7 +1381,7 @@ local void LoadGameVSAction(Menuitem *mi, int i)
 /**
 **		Load game ok button callback
 */
-local void LoadGameOk(void)
+static void LoadGameOk(void)
 {
 	FileList *fl;
 	Menuitem *mi;
@@ -1406,7 +1406,7 @@ local void LoadGameOk(void)
 /**
 **		Save confirm init callback
 */
-local void SaveConfirmInit(Menuitem *mi)
+static void SaveConfirmInit(Menuitem *mi)
 {
 	static char name[PATH_MAX];				// FIXME: much memory wasted
 	int fileLength;
@@ -1426,7 +1426,7 @@ local void SaveConfirmInit(Menuitem *mi)
 /**
 **		Save confirm exit callback
 */
-local void SaveConfirmExit(Menuitem *mi)
+static void SaveConfirmExit(Menuitem *mi)
 {
 	mi->menu->Items[2].d.text.text = NULL;
 }
@@ -1434,7 +1434,7 @@ local void SaveConfirmExit(Menuitem *mi)
 /**
 **		Save confirm ok button
 */
-local void SaveConfirmOk(void)
+static void SaveConfirmOk(void)
 {
 	int fileLength;
 	Menu *menu;
@@ -1456,7 +1456,7 @@ local void SaveConfirmOk(void)
 /**
 **		Save confirm cancel button
 */
-local void SaveConfirmCancel(void)
+static void SaveConfirmCancel(void)
 {
 	EndMenu();
 }
@@ -1464,7 +1464,7 @@ local void SaveConfirmCancel(void)
 /**
 **		Delete menu
 */
-local void DeleteConfirmMenu(void)
+static void DeleteConfirmMenu(void)
 {
 	ProcessMenu("menu-delete-confirm", 0);
 }
@@ -1472,7 +1472,7 @@ local void DeleteConfirmMenu(void)
 /**
 **		Init callback for delete confirm menu
 */
-local void DeleteConfirmInit(Menuitem *mi)
+static void DeleteConfirmInit(Menuitem *mi)
 {
 	Menu *menu;
 	static char name[PATH_MAX];				// FIXME: much memory wasted
@@ -1487,7 +1487,7 @@ local void DeleteConfirmInit(Menuitem *mi)
 /**
 **		Exit callback for delete confirm menu
 */
-local void DeleteConfirmExit(Menuitem *mi)
+static void DeleteConfirmExit(Menuitem *mi)
 {
 	mi->menu->Items[2].d.text.text = NULL;
 }
@@ -1495,7 +1495,7 @@ local void DeleteConfirmExit(Menuitem *mi)
 /**
 **		Delete confirm ok button
 */
-local void DeleteConfirmOk(void)
+static void DeleteConfirmOk(void)
 {
 	Menu *menu;
 
@@ -1516,7 +1516,7 @@ local void DeleteConfirmOk(void)
 /**
 **		Delete confirm cancel button
 */
-local void DeleteConfirmCancel(void)
+static void DeleteConfirmCancel(void)
 {
 	EndMenu();
 }
@@ -1524,7 +1524,7 @@ local void DeleteConfirmCancel(void)
 /**
 **		Load game menu
 */
-global void LoadGameMenu(void)
+void LoadGameMenu(void)
 {
 	ProcessMenu("menu-load-game", 0);
 }
@@ -1532,7 +1532,7 @@ global void LoadGameMenu(void)
 /**
 **		Init callback for game menu
 */
-local void GameMenuInit(Menuitem *mi __attribute__((unused)))
+static void GameMenuInit(Menuitem *mi __attribute__((unused)))
 {
 	// Disable save menu in multiplayer and replays
 	if (IsNetworkGame() || ReplayGameType != ReplayNone) {
@@ -1552,7 +1552,7 @@ local void GameMenuInit(Menuitem *mi __attribute__((unused)))
 /**
 **		Sound options menu
 */
-global void SoundOptionsMenu(void)
+void SoundOptionsMenu(void)
 {
 	ProcessMenu("menu-sound-options", 0);
 }
@@ -1560,7 +1560,7 @@ global void SoundOptionsMenu(void)
 /**
 **		Init callback for sound options menu
 */
-local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
+static void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 {
 	Menu *menu;
 
@@ -1640,7 +1640,7 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 /**
 **		Exit callback for sound options menu
 */
-local void SoundOptionsExit(Menuitem *mi __attribute__((unused)))
+static void SoundOptionsExit(Menuitem *mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1649,7 +1649,7 @@ local void SoundOptionsExit(Menuitem *mi __attribute__((unused)))
 /**
 **		Global options menu
 */
-local void GlobalOptionsMenu(void)
+static void GlobalOptionsMenu(void)
 {
 	ProcessMenu("menu-global-options", 1);
 }
@@ -1657,7 +1657,7 @@ local void GlobalOptionsMenu(void)
 /**
 **		Init callback for global options menu
 */
-local void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
+static void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
 {
 	Menu *menu;
 
@@ -1690,7 +1690,7 @@ local void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
 /**
 **		Exit callback for global options menu
 */
-local void GlobalOptionsExit(Menuitem *mi __attribute__((unused)))
+static void GlobalOptionsExit(Menuitem *mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1699,7 +1699,7 @@ local void GlobalOptionsExit(Menuitem *mi __attribute__((unused)))
 /**
 **		Global options resolution gem callback
 */
-local void GlobalOptionsResolutionGem(Menuitem *mi)
+static void GlobalOptionsResolutionGem(Menuitem *mi)
 {
 	int res;
 
@@ -1752,7 +1752,7 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 /**
 **		Global options fullscreen gem callback
 */
-local void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
+static void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
 {
 	ToggleFullScreen();
 	GlobalOptionsInit(NULL);
@@ -1761,7 +1761,7 @@ local void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
 /**
 **		Master volume gem callback
 */
-local void SetMasterPower(Menuitem *mi __attribute__((unused)))
+static void SetMasterPower(Menuitem *mi __attribute__((unused)))
 {
 	if (SoundFildes != -1) {
 		QuitSound();
@@ -1786,7 +1786,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 /**
 **		Music volume gem callback
 */
-local void SetMusicPower(Menuitem *mi __attribute__((unused)))
+static void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
 	if (PlayingMusic) {
 		MusicOff = 1;
@@ -1806,7 +1806,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 /**
 **		CD volume gem callback
 */
-local void SetCdPower(Menuitem *mi __attribute__((unused)))
+static void SetCdPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef USE_CDAUDIO
 	// Start Playing CD
@@ -1826,7 +1826,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 **
 **		@param mi		Menu item (not used).
 */
-local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
+static void SetFogOfWar(Menuitem *mi __attribute__((unused)))
 {
 	if (!TheMap.NoFogOfWar) {
 		TheMap.NoFogOfWar = 1;
@@ -1846,7 +1846,7 @@ local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
 **
 **		@param mi		Menu item (not used).
 */
-local void SetCommandKey(Menuitem *mi __attribute__((unused)))
+static void SetCommandKey(Menuitem *mi __attribute__((unused)))
 {
 	ShowCommandKey ^= 1;
 }
@@ -1854,7 +1854,7 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
 /**
 **		CD play all tracks gem callback
 */
-local void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
+static void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 {
 #ifdef USE_CDAUDIO
 	CDMode = CDModeDefined;
@@ -1865,7 +1865,7 @@ local void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 /**
 **		CD play random tracks gem callback
 */
-local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
+static void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
 #ifdef USE_CDAUDIO
 	CDMode = CDModeRandom;
@@ -1876,7 +1876,7 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 /**
 **		Speed settings menu
 */
-global void SpeedOptionsMenu(void)
+void SpeedOptionsMenu(void)
 {
 	ProcessMenu("menu-speed-options", 0);
 }
@@ -1884,7 +1884,7 @@ global void SpeedOptionsMenu(void)
 /**
 **		Init callback for speed settings menu
 */
-global void SpeedOptionsInit(Menuitem *mi __attribute__((unused)))
+void SpeedOptionsInit(Menuitem *mi __attribute__((unused)))
 {
 	Menu *menu;
 	int i;
@@ -1913,7 +1913,7 @@ global void SpeedOptionsInit(Menuitem *mi __attribute__((unused)))
 /**
 **		Exit callback for speed settings menu
 */
-global void SpeedOptionsExit(Menuitem *mi __attribute__((unused)))
+void SpeedOptionsExit(Menuitem *mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1922,7 +1922,7 @@ global void SpeedOptionsExit(Menuitem *mi __attribute__((unused)))
 /**
 **		Diplomacy options menu
 */
-global void DiplomacyMenu(void)
+void DiplomacyMenu(void)
 {
 	ProcessMenu("menu-diplomacy", 0);
 }
@@ -1930,7 +1930,7 @@ global void DiplomacyMenu(void)
 /**
 **		Diplomacy init callback
 */
-local void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
+static void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
 {
 	Menu *menu;
 	int i;
@@ -1982,7 +1982,7 @@ local void DiplomacyInit(Menuitem *mi __attribute__ ((unused)))
 /**
 **		Diplomacy exit callback
 */
-local void DiplomacyExit(Menuitem *mi __attribute__ ((unused)))
+static void DiplomacyExit(Menuitem *mi __attribute__ ((unused)))
 {
 	Menu* menu;
 	int i;
@@ -1997,7 +1997,7 @@ local void DiplomacyExit(Menuitem *mi __attribute__ ((unused)))
 /**
 **		Diplomacy gem callback
 */
-local void DiplomacyWait(Menuitem *mi)
+static void DiplomacyWait(Menuitem *mi)
 {
 	int player;
 	int item;
@@ -2020,7 +2020,7 @@ local void DiplomacyWait(Menuitem *mi)
 /**
 **		Diplomacy Ok button callback
 */
-local void DiplomacyOk(void)
+static void DiplomacyOk(void)
 {
 	Menu *menu;
 	int i;
@@ -2095,7 +2095,7 @@ local void DiplomacyOk(void)
 **		Enter the preferences menu.
 **		Setup if the options are enabled / disabled.
 */
-global void PreferencesMenu(void)
+void PreferencesMenu(void)
 {
 	ProcessMenu("menu-preferences", 0);
 }
@@ -2103,7 +2103,7 @@ global void PreferencesMenu(void)
 /**
 **  Preferences menu init callback
 */
-local void PreferencesInit(Menuitem* mi __attribute__((unused)))
+static void PreferencesInit(Menuitem* mi __attribute__((unused)))
 {
 	Menu* menu;
 
@@ -2131,7 +2131,7 @@ local void PreferencesInit(Menuitem* mi __attribute__((unused)))
 /**
 **  Preferences menu init callback
 */
-local void PreferencesExit(Menuitem* mi __attribute__((unused)))
+static void PreferencesExit(Menuitem* mi __attribute__((unused)))
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -2140,7 +2140,7 @@ local void PreferencesExit(Menuitem* mi __attribute__((unused)))
 /**
 **  Show the game options.
 */
-local void GameOptionsMenu(void)
+static void GameOptionsMenu(void)
 {
 	ProcessMenu("menu-game-options", 0);
 }
@@ -2148,7 +2148,7 @@ local void GameOptionsMenu(void)
 /**
 **  Show the game credits.
 */
-local void GameShowCredits(void)
+static void GameShowCredits(void)
 {
 	ShowCredits(&GameCredits);
 }
@@ -2156,7 +2156,7 @@ local void GameShowCredits(void)
 /**
 **  Show the Restart Confirm menu
 */
-global void RestartConfirmMenu(void)
+void RestartConfirmMenu(void)
 {
 	ProcessMenu("menu-restart-confirm", 0);
 }
@@ -2164,7 +2164,7 @@ global void RestartConfirmMenu(void)
 /**
 **  Show the Surrender Confirm menu
 */
-local void SurrenderConfirmMenu(void)
+static void SurrenderConfirmMenu(void)
 {
 	ProcessMenu("menu-surrender-confirm", 0);
 }
@@ -2172,7 +2172,7 @@ local void SurrenderConfirmMenu(void)
 /**
 **  Show the Quit To Menu Confirm menu
 */
-global void QuitToMenuConfirmMenu(void)
+void QuitToMenuConfirmMenu(void)
 {
 	ProcessMenu("menu-quit-to-menu-confirm", 0);
 }
@@ -2180,7 +2180,7 @@ global void QuitToMenuConfirmMenu(void)
 /**
 **  Show the Exit Confirm menu
 */
-global void ExitConfirmMenu(void)
+void ExitConfirmMenu(void)
 {
 	ProcessMenu("menu-exit-confirm", 0);
 }
@@ -2188,7 +2188,7 @@ global void ExitConfirmMenu(void)
 /**
 **  Show the End Scenario menu
 */
-local void EndScenarioMenu(void)
+static void EndScenarioMenu(void)
 {
 	Menu* menu;
 
@@ -2205,7 +2205,7 @@ local void EndScenarioMenu(void)
 /**
 **  Restart the scenario
 */
-local void EndScenarioRestart(void)
+static void EndScenarioRestart(void)
 {
 	RestartScenario = 1;
 	GameRunning = 0;
@@ -2215,7 +2215,7 @@ local void EndScenarioRestart(void)
 /**
 **  End the game in defeat
 */
-local void EndScenarioSurrender(void)
+static void EndScenarioSurrender(void)
 {
 	GameResult = GameDefeat;
 	GameRunning = 0;
@@ -2225,7 +2225,7 @@ local void EndScenarioSurrender(void)
 /**
 **  End the game and return to the menu
 */
-local void EndScenarioQuitMenu(void)
+static void EndScenarioQuitMenu(void)
 {
 	QuitToMenu = 1;
 	GameRunning = 0;
@@ -2235,7 +2235,7 @@ local void EndScenarioQuitMenu(void)
 /**
 **  End the running game from menu.
 */
-local void GameMenuEnd(void)
+static void GameMenuEnd(void)
 {
 	InterfaceState = IfaceStateNormal;
 	GameRunning = 0;
@@ -2246,7 +2246,7 @@ local void GameMenuEnd(void)
 /**
 **  Victory menu init callback
 */
-local void VictoryInit(Menuitem* mi __attribute__((unused)))
+static void VictoryInit(Menuitem* mi __attribute__((unused)))
 {
 	Menu* menu;
 
@@ -2259,7 +2259,7 @@ local void VictoryInit(Menuitem* mi __attribute__((unused)))
 /**
 **  Defeated menu init callback
 */
-local void DefeatedInit(Menuitem* mi __attribute__((unused)))
+static void DefeatedInit(Menuitem* mi __attribute__((unused)))
 {
 	Menu* menu;
 
@@ -2272,7 +2272,7 @@ local void DefeatedInit(Menuitem* mi __attribute__((unused)))
 /**
 **  Save replay of completed game.
 */
-local void SaveReplay(void)
+static void SaveReplay(void)
 {
 	ProcessMenu("menu-save-replay", 0);
 }
@@ -2280,7 +2280,7 @@ local void SaveReplay(void)
 /**
 **  Save replay menu init callback
 */
-local void SaveReplayInit(Menuitem* mi __attribute__((unused)))
+static void SaveReplayInit(Menuitem* mi __attribute__((unused)))
 {
 	Menu* menu;
 	char* buf;
@@ -2297,7 +2297,7 @@ local void SaveReplayInit(Menuitem* mi __attribute__((unused)))
 /**
 **  Save replay menu exit callback
 */
-local void SaveReplayExit(Menuitem* mi)
+static void SaveReplayExit(Menuitem* mi)
 {
 	free(mi->menu->Items[1].d.input.buffer);
 	mi->menu->Items[1].d.input.buffer = NULL;
@@ -2306,7 +2306,7 @@ local void SaveReplayExit(Menuitem* mi)
 /**
 **  Input field action of save replay menu.
 */
-local void SaveReplayEnterAction(Menuitem* mi, int key)
+static void SaveReplayEnterAction(Menuitem* mi, int key)
 {
 	if (mi->d.input.nch == 0) {
 		mi[1].flags = MenuButtonDisabled;
@@ -2321,7 +2321,7 @@ local void SaveReplayEnterAction(Menuitem* mi, int key)
 /**
 **		Save replay Ok button.
 */
-local void SaveReplayOk(void)
+static void SaveReplayOk(void)
 {
 	FILE *fd;
 	Menu *menu;
@@ -2377,7 +2377,7 @@ local void SaveReplayOk(void)
 /**
 **		Keystroke help menu
 */
-local void KeystrokeHelpMenu(void)
+static void KeystrokeHelpMenu(void)
 {
 	ProcessMenu("menu-keystroke-help", 0);
 }
@@ -2385,7 +2385,7 @@ local void KeystrokeHelpMenu(void)
 /**
 **		Help menu
 */
-local void HelpMenu(void)
+static void HelpMenu(void)
 {
 	ProcessMenu("menu-help", 0);
 }
@@ -2393,7 +2393,7 @@ local void HelpMenu(void)
 /**
 **		Tips menu
 */
-local void TipsMenu(void)
+static void TipsMenu(void)
 {
 	ProcessMenu("menu-tips", 0);
 }
@@ -2401,7 +2401,7 @@ local void TipsMenu(void)
 /**
 **		Free the tips from the menu
 */
-local void TipsFreeTips(void)
+static void TipsFreeTips(void)
 {
 	int i;
 	Menu *menu;
@@ -2418,7 +2418,7 @@ local void TipsFreeTips(void)
 /**
 **		Initialize the tips menu
 */
-local void TipsInit(Menuitem *mi __attribute__((unused)))
+static void TipsInit(Menuitem *mi __attribute__((unused)))
 {
 	int i;
 	int line;
@@ -2488,7 +2488,7 @@ local void TipsInit(Menuitem *mi __attribute__((unused)))
 /**
 **		Cycle to the next tip
 */
-local void TipsCycleNextTip(void)
+static void TipsCycleNextTip(void)
 {
 	++CurrentTip;
 	if (Tips[CurrentTip] == NULL) {
@@ -2499,7 +2499,7 @@ local void TipsCycleNextTip(void)
 /**
 **		Cycle to the previous tip
 */
-local void TipsCyclePreviousTip(void)
+static void TipsCyclePreviousTip(void)
 {
 	if (CurrentTip != 0) {
 		--CurrentTip;
@@ -2513,7 +2513,7 @@ local void TipsCyclePreviousTip(void)
 /**
 **		Tips menu exit callback
 */
-local void TipsExit(Menuitem *mi __attribute__((unused)))
+static void TipsExit(Menuitem *mi __attribute__((unused)))
 {
 	TipsCycleNextTip();
 	TipsFreeTips();
@@ -2523,7 +2523,7 @@ local void TipsExit(Menuitem *mi __attribute__((unused)))
 /**
 **		Show tips at startup gem callback
 */
-local void TipsShowTipsGem(Menuitem *mi)
+static void TipsShowTipsGem(Menuitem *mi)
 {
 	if (mi->menu->Items[1].d.gem.state == MI_GSTATE_CHECKED) {
 		ShowTips = 1;
@@ -2535,7 +2535,7 @@ local void TipsShowTipsGem(Menuitem *mi)
 /**
 **		Show tips at startup text callback
 */
-local void TipsShowTipsText(Menuitem *mi)
+static void TipsShowTipsText(Menuitem *mi)
 {
 	if (mi->menu->Items[1].d.gem.state == MI_GSTATE_UNCHECKED) {
 		ShowTips = 1;
@@ -2549,7 +2549,7 @@ local void TipsShowTipsText(Menuitem *mi)
 /**
 **		Tips menu next tip button callback
 */
-local void TipsNextTip(void)
+static void TipsNextTip(void)
 {
 	TipsCycleNextTip();
 	TipsInit(NULL);
@@ -2558,7 +2558,7 @@ local void TipsNextTip(void)
 /**
 **		Tips menu previous tip button callback
 */
-local void TipsPreviousTip(void)
+static void TipsPreviousTip(void)
 {
 	TipsCyclePreviousTip();
 	TipsInit(NULL);
@@ -2567,7 +2567,7 @@ local void TipsPreviousTip(void)
 /**
 **		Exit the game from menu.
 */
-local void GameMenuExit(void)
+static void GameMenuExit(void)
 {
 	ExitMenus();
 	Exit(0);
@@ -2576,7 +2576,7 @@ local void GameMenuExit(void)
 /**
 **		Initialize the game objectives menu
 */
-local void ObjectivesInit(Menuitem *mi __attribute__((unused)))
+static void ObjectivesInit(Menuitem *mi __attribute__((unused)))
 {
 	int i;
 	int line;
@@ -2637,7 +2637,7 @@ local void ObjectivesInit(Menuitem *mi __attribute__((unused)))
 /**
 **		Free the game objectives menu memory
 */
-local void ObjectivesExit(Menuitem *mi)
+static void ObjectivesExit(Menuitem *mi)
 {
 	int i;
 	Menu *menu;
@@ -2654,7 +2654,7 @@ local void ObjectivesExit(Menuitem *mi)
 /**
 **		Game objectives menu
 */
-local void ObjectivesMenu(void)
+static void ObjectivesMenu(void)
 {
 	ProcessMenu("menu-objectives", 0);
 }
@@ -2662,7 +2662,7 @@ local void ObjectivesMenu(void)
 /**
 **		Get map info from select path+name
 */
-local void GetInfoFromSelectPath(void)
+static void GetInfoFromSelectPath(void)
 {
 	int i;
 
@@ -2688,7 +2688,7 @@ local void GetInfoFromSelectPath(void)
 /**
 **		Enter select scenario menu.
 */
-local void ScenSelectMenu(void)
+static void ScenSelectMenu(void)
 {
 	Menu *menu;
 	int n;
@@ -2721,7 +2721,7 @@ local void ScenSelectMenu(void)
 /**
 **		Enter multiplayer select scenario menu.
 */
-local void MultiScenSelectMenu(void)
+static void MultiScenSelectMenu(void)
 {
 	Menu *menu;
 	unsigned flags;
@@ -2740,7 +2740,7 @@ local void MultiScenSelectMenu(void)
 /**
 **		Enter single player menu.
 */
-local void SinglePlayerGameMenu(void)
+static void SinglePlayerGameMenu(void)
 {
 	GuiGameStarted = 0;
 	ProcessMenu("menu-custom-game", 1);
@@ -2754,7 +2754,7 @@ local void SinglePlayerGameMenu(void)
 **
 **  Look which campaigns are available and how they are called.
 */
-local void CampaignGameMenu(void)
+static void CampaignGameMenu(void)
 {
 	int i;
 	Menu* menu;
@@ -2803,7 +2803,7 @@ local void CampaignGameMenu(void)
 **
 **		@param number		Number of the compaign.
 */
-local void StartCampaignFromMenu(int number)
+static void StartCampaignFromMenu(int number)
 {
 #if 0
 	// JOHNS: this is currently not needed:
@@ -2827,7 +2827,7 @@ local void StartCampaignFromMenu(int number)
 **
 **		@note FIXME: Isn't it possible to have an argument in the menu?
 */
-local void CampaignMenu1(void)
+static void CampaignMenu1(void)
 {
 	StartCampaignFromMenu(0);
 }
@@ -2837,7 +2837,7 @@ local void CampaignMenu1(void)
 **
 **		@note FIXME: Isn't it possible to have an argument in the menu?
 */
-local void CampaignMenu2(void)
+static void CampaignMenu2(void)
 {
 	StartCampaignFromMenu(1);
 }
@@ -2847,7 +2847,7 @@ local void CampaignMenu2(void)
 **
 **		@note FIXME: Isn't it possible to have an argument in the menu?
 */
-local void CampaignMenu3(void)
+static void CampaignMenu3(void)
 {
 	StartCampaignFromMenu(2);
 }
@@ -2857,7 +2857,7 @@ local void CampaignMenu3(void)
 **
 **		@note FIXME: Isn't it possible to have an argument in the menu?
 */
-local void CampaignMenu4(void)
+static void CampaignMenu4(void)
 {
 	StartCampaignFromMenu(3);
 }
@@ -2865,7 +2865,7 @@ local void CampaignMenu4(void)
 /**
 **		Call back for select entry of campaign menu.
 */
-local void SelectCampaignMenu(void)
+static void SelectCampaignMenu(void)
 {
 	// FIXME: not written
 }
@@ -2873,7 +2873,7 @@ local void SelectCampaignMenu(void)
 /**
 **		Cancel button of player name menu pressed.
 */
-local void EnterNameCancel(void)
+static void EnterNameCancel(void)
 {
 	Menu *menu;
 
@@ -2885,7 +2885,7 @@ local void EnterNameCancel(void)
 /**
 **		Input field action of player name menu.
 */
-local void EnterNameAction(Menuitem *mi, int key)
+static void EnterNameAction(Menuitem *mi, int key)
 {
 	if (mi->d.input.nch == 0) {
 		mi[1].flags = MenuButtonDisabled;
@@ -2900,7 +2900,7 @@ local void EnterNameAction(Menuitem *mi, int key)
 /**
 **		Cancel button of enter server ip/name menu pressed.
 */
-local void EnterServerIPCancel(void)
+static void EnterServerIPCancel(void)
 {
 	CurrentMenu->Items[1].d.input.nch = 0;
 	EndMenu();
@@ -2909,7 +2909,7 @@ local void EnterServerIPCancel(void)
 /**
 **		Input field action of server ip/name.
 */
-local void EnterServerIPAction(Menuitem *mi, int key)
+static void EnterServerIPAction(Menuitem *mi, int key)
 {
 	if (mi->d.input.nch == 0) {
 		mi[1].flags = MenuButtonDisabled;
@@ -2924,7 +2924,7 @@ local void EnterServerIPAction(Menuitem *mi, int key)
 /**
 **		Start processing join a network game menu.
 */
-local void JoinNetGameMenu(void)
+static void JoinNetGameMenu(void)
 {
 	char server_host_buffer[64];
 	char *port;
@@ -2996,7 +2996,7 @@ local void JoinNetGameMenu(void)
 /**
 **		Network connect menu init.
 */
-local void NetConnectingInit(Menuitem *mi)
+static void NetConnectingInit(Menuitem *mi)
 {
 	mi->menu->Items[1].d.text.text = NetServerText;
 	mi->menu->Items[2].d.text.text = NetTriesText;
@@ -3005,7 +3005,7 @@ local void NetConnectingInit(Menuitem *mi)
 /**
 **		Network connect menu exit.
 */
-local void NetConnectingExit(Menuitem *mi)
+static void NetConnectingExit(Menuitem *mi)
 {
 	mi->menu->Items[1].d.text.text = NULL;
 	mi->menu->Items[2].d.text.text = NULL;
@@ -3014,7 +3014,7 @@ local void NetConnectingExit(Menuitem *mi)
 /**
 **		Cancel button of network connect menu pressed.
 */
-local void NetConnectingCancel(void)
+static void NetConnectingCancel(void)
 {
 	NetworkExitClientConnect();
 	// Trigger TerminateNetConnect() to call us again and end the menu
@@ -3025,7 +3025,7 @@ local void NetConnectingCancel(void)
 /**
 **		Call back from menu loop, if network state has changed.
 */
-local void TerminateNetConnect(void)
+static void TerminateNetConnect(void)
 {
 	switch (NetLocalState) {
 		case ccs_unreachable:
@@ -3077,7 +3077,7 @@ local void TerminateNetConnect(void)
 /**
 **		Start processing network game setup menu (server).
 */
-local void CreateNetGameMenu(void)
+static void CreateNetGameMenu(void)
 {
 	GuiGameStarted = 0;
 	ProcessMenu("menu-multi-setup", 1);
@@ -3090,7 +3090,7 @@ local void CreateNetGameMenu(void)
 **		Start process network game setup menu (server).
 **		Internet game, register with meta server
 */
-local void CreateInternetGameMenu(void)
+static void CreateInternetGameMenu(void)
 {
 	GuiGameStarted = 0;
 	AddGameServer();
@@ -3104,7 +3104,7 @@ local void CreateInternetGameMenu(void)
 /**
 **		Multiplayer game start game button pressed.
 */
-local void MultiGameStart(void)
+static void MultiGameStart(void)
 {
 	if (MetaServerInUse) {
 		SendMetaCommand("StartGame", "");
@@ -3121,7 +3121,7 @@ local void MultiGameStart(void)
 /**
 **		Enter multiplayer game menu.
 */
-local void MultiPlayerGameMenu(void)
+static void MultiPlayerGameMenu(void)
 {
 	char NameBuf[32];
 	Menu* menu;
@@ -3162,7 +3162,7 @@ local void MultiPlayerGameMenu(void)
 /**
 **		Process LAN/P2P game menu
 */
-local void MultiPlayerLANGame(void)
+static void MultiPlayerLANGame(void)
 {
 	ProcessMenu("menu-create-join-menu", 1);
 	MetaServerInUse = 0;
@@ -3174,7 +3174,7 @@ local void MultiPlayerLANGame(void)
 /**
 **		Process Internet game menu
 */
-local void MultiPlayerInternetGame(void)
+static void MultiPlayerInternetGame(void)
 {
 	//Connect to Meta Server
 	if (MetaInit() == -1 ) {
@@ -3192,7 +3192,7 @@ local void MultiPlayerInternetGame(void)
 /**
 **		Free map info data
 */
-local void FreeMapInfos(FileList *fl, int n)
+static void FreeMapInfos(FileList *fl, int n)
 {
 	int i;
 
@@ -3208,7 +3208,7 @@ local void FreeMapInfos(FileList *fl, int n)
 /**
 **		Initialize the scenario selector menu.
 */
-local void ScenSelectInit(Menuitem *mi)
+static void ScenSelectInit(Menuitem *mi)
 {
 	Assert(*ScenSelectPath);
 	mi->menu->Items[9].flags =
@@ -3220,7 +3220,7 @@ local void ScenSelectInit(Menuitem *mi)
 /**
 **		Scenario select listbox action callback
 */
-local void ScenSelectLBAction(Menuitem *mi, int i)
+static void ScenSelectLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
@@ -3243,7 +3243,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 /**
 **		Scenario select listbox exit callback
 */
-local void ScenSelectLBExit(Menuitem *mi)
+static void ScenSelectLBExit(Menuitem *mi)
 {
 	FileList *fl;
 
@@ -3260,7 +3260,7 @@ local void ScenSelectLBExit(Menuitem *mi)
 /**
 **		Scenario select read directory filter
 */
-local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
+static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
 	MapInfo *info;
 	char *suf[3];
@@ -3354,7 +3354,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 /**
 **		Scenario select listbox init callback
 */
-local void ScenSelectLBInit(Menuitem *mi)
+static void ScenSelectLBInit(Menuitem *mi)
 {
 	int i;
 
@@ -3382,7 +3382,7 @@ local void ScenSelectLBInit(Menuitem *mi)
 /**
 **		Scenario select listbox retrieve callback
 */
-local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
+static unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 {
 	FileList *fl;
 	MapInfo *info;
@@ -3426,7 +3426,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 /**
 **		Scenario select map type action callback
 */
-local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
+static void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
 	mi = mi->menu->Items + 1;
 	ScenSelectLBInit(mi);
@@ -3440,7 +3440,7 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 /**
 **		Scenario select vertical slider action callback
 */
-local void ScenSelectVSAction(Menuitem *mi, int i)
+static void ScenSelectVSAction(Menuitem *mi, int i)
 {
 	int op;
 	int d1;
@@ -3527,7 +3527,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 /**
 **		Keystroke help vertical slider action callback
 */
-local void KeystrokeHelpVSAction(Menuitem *mi, int i)
+static void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
 	int j;
 
@@ -3559,7 +3559,7 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 /**
 **		Draw the Keystroke Help texts
 */
-local void KeystrokeHelpDrawFunc(Menuitem *mi)
+static void KeystrokeHelpDrawFunc(Menuitem *mi)
 {
 	int i;
 	int j;
@@ -3577,7 +3577,7 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
 /**
 **		Game speed horizontal slider action callback
 */
-local void GameSpeedHSAction(Menuitem *mi)
+static void GameSpeedHSAction(Menuitem *mi)
 {
 	VideoSyncSpeed = (mi->d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 	SetVideoSync();
@@ -3586,7 +3586,7 @@ local void GameSpeedHSAction(Menuitem *mi)
 /**
 **		Mouse scroll horizontal slider action callback
 */
-local void MouseScrollHSAction(Menuitem *mi)
+static void MouseScrollHSAction(Menuitem *mi)
 {
 	TheUI.MouseScroll = 1;
 	SpeedMouseScroll = 10 - (mi->d.hslider.percent * 9) / 100;
@@ -3598,7 +3598,7 @@ local void MouseScrollHSAction(Menuitem *mi)
 /**
 **		Keyboard scroll horizontal slider action callback
 */
-local void KeyboardScrollHSAction(Menuitem *mi)
+static void KeyboardScrollHSAction(Menuitem *mi)
 {
 	TheUI.KeyScroll = 1;
 	SpeedKeyScroll = 10 - (mi->d.hslider.percent * 9) / 100;
@@ -3610,7 +3610,7 @@ local void KeyboardScrollHSAction(Menuitem *mi)
 /**
 **		Master volume horizontal slider action callback
 */
-local void MasterVolumeHSAction(Menuitem *mi)
+static void MasterVolumeHSAction(Menuitem *mi)
 {
 	SetGlobalVolume((mi->d.hslider.percent * 255) / 100);
 }
@@ -3618,7 +3618,7 @@ local void MasterVolumeHSAction(Menuitem *mi)
 /**
 **		Music volume horizontal slider action callback
 */
-local void MusicVolumeHSAction(Menuitem *mi)
+static void MusicVolumeHSAction(Menuitem *mi)
 {
 	SetMusicVolume((mi->d.hslider.percent * 255) / 100);
 }
@@ -3627,7 +3627,7 @@ local void MusicVolumeHSAction(Menuitem *mi)
 /**
 **		CD volume horizontal slider action callback
 */
-local void CdVolumeHSAction(Menuitem *mi)
+static void CdVolumeHSAction(Menuitem *mi)
 {
 	SetCDVolume((mi->d.hslider.percent * 255) / 100);
 }
@@ -3635,7 +3635,7 @@ local void CdVolumeHSAction(Menuitem *mi)
 /**
 **		CD volume horizontal slider action callback
 */
-local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)))
+static void CdVolumeHSAction(Menuitem *mi __attribute__((unused)))
 {
 }
 #endif
@@ -3643,7 +3643,7 @@ local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)))
 /**
 **		Scenario select folder button
 */
-local void ScenSelectFolder(void)
+static void ScenSelectFolder(void)
 {
 	char *cp;
 	Menu *menu;
@@ -3676,7 +3676,7 @@ local void ScenSelectFolder(void)
 /**
 **		Scenario select ok button
 */
-local void ScenSelectOk(void)
+static void ScenSelectOk(void)
 {
 	FileList *fl;
 	Menu *menu;
@@ -3715,7 +3715,7 @@ local void ScenSelectOk(void)
 /**
 **		Scenario select cancel button.
 */
-local void ScenSelectCancel(void)
+static void ScenSelectCancel(void)
 {
 	// FIXME: why is all this below needed?
 /*
@@ -3751,7 +3751,7 @@ local void ScenSelectCancel(void)
 /**
 **		Custom game cancel button callback
 */
-local void GameCancel(void)
+static void GameCancel(void)
 {
 	FreeMapInfo(MenuMapInfo);
 	MenuMapInfo = NULL;
@@ -3761,7 +3761,7 @@ local void GameCancel(void)
 /**
 **		Custom game start game button pressed.
 */
-local void CustomGameStart(void)
+static void CustomGameStart(void)
 {
 	int i;
 	char *p;
@@ -3794,7 +3794,7 @@ local void CustomGameStart(void)
 /**
 **		Single player custom game menu entered.
 */
-local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
+static void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 {
 	Menu *menu;
 	int n;
@@ -3851,7 +3851,7 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 /**
 **		FIXME: docu
 */
-local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
+static void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 {
 	char* nc;
 	char* rc;
@@ -3891,7 +3891,7 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 **
 **		@note FIXME: Todo support more and other races.
 */
-local void GameRCSAction(Menuitem *mi, int i)
+static void GameRCSAction(Menuitem *mi, int i)
 {
 	int n;
 	int x;
@@ -3918,7 +3918,7 @@ local void GameRCSAction(Menuitem *mi, int i)
 /**
 **		Game resources action callback
 */
-local void GameRESAction(Menuitem *mi, int i)
+static void GameRESAction(Menuitem *mi, int i)
 {
 	int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
 				SettingsResourcesMedium, SettingsResourcesHigh };
@@ -3935,7 +3935,7 @@ local void GameRESAction(Menuitem *mi, int i)
 /**
 **		Game units action callback
 */
-local void GameUNSAction(Menuitem *mi, int i)
+static void GameUNSAction(Menuitem *mi, int i)
 {
 	if (!mi || mi->d.pulldown.curopt == i) {
 		GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
@@ -3949,7 +3949,7 @@ local void GameUNSAction(Menuitem *mi, int i)
 /**
 **		Game tilesets action callback
 */
-local void GameTSSAction(Menuitem *mi, int i)
+static void GameTSSAction(Menuitem *mi, int i)
 {
 	if (!mi || mi->d.pulldown.curopt == i) {
 		// Subtract 1 for default option.
@@ -3964,7 +3964,7 @@ local void GameTSSAction(Menuitem *mi, int i)
 /**
 **		Called if the pulldown menu of the game type is changed.
 */
-local void GameGATAction(Menuitem *mi, int i)
+static void GameGATAction(Menuitem *mi, int i)
 {
 	if (!mi || mi->d.pulldown.curopt == i) {
 		GameSettings.GameType = i ? SettingsGameTypeMelee + i - 1 : SettingsGameTypeMapDefault;
@@ -3978,7 +3978,7 @@ local void GameGATAction(Menuitem *mi, int i)
 /**
 **		Game opponents action callback
 */
-local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
+static void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 {
 	GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
@@ -3986,7 +3986,7 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 /**
 **		Menu setup fog-of-war pulldown action.
 */
-local void MultiGameFWSAction(Menuitem *mi, int i)
+static void MultiGameFWSAction(Menuitem *mi, int i)
 {
 	if (!mi || mi->d.pulldown.curopt == i) {
 		DebugPrint("Update fow %d\n" _C_ i);
@@ -4026,7 +4026,7 @@ local void MultiGameFWSAction(Menuitem *mi, int i)
 /**
 **		Multiplayer menu player server states.
 */
-local void MultiGamePTSAction(Menuitem *mi, int o)
+static void MultiGamePTSAction(Menuitem *mi, int o)
 {
 	Menu *menu;
 	int i;
@@ -4054,7 +4054,7 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
 /**
 **		Multiplayer server draw func
 */
-local void MultiGameDrawFunc(Menuitem *mi)
+static void MultiGameDrawFunc(Menuitem *mi)
 {
 	GameDrawFunc(mi);
 }
@@ -4062,7 +4062,7 @@ local void MultiGameDrawFunc(Menuitem *mi)
 /**
 **		Multiplayer client draw func
 */
-local void MultiGameClientDrawFunc(Menuitem *mi)
+static void MultiGameClientDrawFunc(Menuitem *mi)
 {
 	// FIXME: do something better
 	GameDrawFunc(mi);
@@ -4071,7 +4071,7 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
 /**
 **		Multiplayer network game final race an player type setup.
 */
-local void NetworkGamePrepareGameSettings(void)
+static void NetworkGamePrepareGameSettings(void)
 {
 	int c;
 	int h;
@@ -4163,7 +4163,7 @@ local void NetworkGamePrepareGameSettings(void)
 **		Caution: Called by network events from clients (initial = 2)!
 **		Caution: Called by button action on server (initial = 3)!
 */
-local void MultiGamePlayerSelectorsUpdate(int initial)
+static void MultiGamePlayerSelectorsUpdate(int initial)
 {
 	Menu *menu;
 	int i;
@@ -4307,7 +4307,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 /**
 **		Update client network menu.
 */
-local void MultiClientUpdate(int initial)
+static void MultiClientUpdate(int initial)
 {
 	Menu *menu;
 	int i;
@@ -4394,7 +4394,7 @@ local void MultiClientUpdate(int initial)
 /**
 **		Multiplayer server menu init callback
 */
-local void MultiGameSetupInit(Menuitem *mi)
+static void MultiGameSetupInit(Menuitem *mi)
 {
 	int i;
 	int h;
@@ -4431,7 +4431,7 @@ local void MultiGameSetupInit(Menuitem *mi)
 /**
 **		Multiplayer server menu exit callback
 */
-local void MultiGameSetupExit(Menuitem *mi)
+static void MultiGameSetupExit(Menuitem *mi)
 {
 	int i;
 
@@ -4445,7 +4445,7 @@ local void MultiGameSetupExit(Menuitem *mi)
 /**
 **		Cancel button of server multi player menu pressed.
 */
-local void MultiGameCancel(void)
+static void MultiGameCancel(void)
 {
 	NetworkExitServerConnect();
 
@@ -4460,7 +4460,7 @@ local void MultiGameCancel(void)
 /**
 **		Draw the multi player setup menu.
 */
-local void NetMultiPlayerDrawFunc(Menuitem *mi)
+static void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
 	Menu *menu;
 	int i;
@@ -4521,7 +4521,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 /**
 **		Cancel button of multiplayer client menu pressed.
 */
-local void MultiClientCancel(void)
+static void MultiClientCancel(void)
 {
 	NetworkDetachFromServer();
 	// GameCancel();
@@ -4530,7 +4530,7 @@ local void MultiClientCancel(void)
 /**
 **		Multiplayer client menu init callback
 */
-local void MultiGameClientInit(Menuitem *mi)
+static void MultiGameClientInit(Menuitem *mi)
 {
 	// GameSetupInit(mi);
 	MultiClientUpdate(1);
@@ -4548,7 +4548,7 @@ local void MultiGameClientInit(Menuitem *mi)
 /**
 **		Multiplayer client menu exit callback
 */
-local void MultiGameClientExit(Menuitem *mi)
+static void MultiGameClientExit(Menuitem *mi)
 {
 	int i;
 
@@ -4562,7 +4562,7 @@ local void MultiGameClientExit(Menuitem *mi)
 /**
 **		Multiplayer client gem action. Toggles ready flag.
 */
-local void MultiClientGemAction(Menuitem *mi)
+static void MultiClientGemAction(Menuitem *mi)
 {
 	int i;
 
@@ -4585,7 +4585,7 @@ local void MultiClientGemAction(Menuitem *mi)
 /**
 **		Multiplayer client races action callback
 */
-local void MultiClientRCSAction(Menuitem *mi, int i)
+static void MultiClientRCSAction(Menuitem *mi, int i)
 {
 	if (mi->d.pulldown.curopt == i) {
 		LocalSetupState.Race[NetLocalHostsSlot] = mi->d.pulldown.noptions - 1 - i;
@@ -4596,7 +4596,7 @@ local void MultiClientRCSAction(Menuitem *mi, int i)
 /**
 **		Multiplayer client ready button
 */
-local void MultiClientReady(void)
+static void MultiClientReady(void)
 {
 	Menu *menu;
 
@@ -4611,7 +4611,7 @@ local void MultiClientReady(void)
 /**
 **		Multiplayer client not ready button
 */
-local void MultiClientNotReady(void)
+static void MultiClientNotReady(void)
 {
 	Menu *menu;
 
@@ -4628,7 +4628,7 @@ local void MultiClientNotReady(void)
 **		Compare local state with server's information
 **		and force update when changes have occured.
 */
-global void NetClientCheckLocalState(void)
+void NetClientCheckLocalState(void)
 {
 	if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
 		NetLocalState = ccs_changed;
@@ -4644,7 +4644,7 @@ global void NetClientCheckLocalState(void)
 /**
 **		FIXME: docu
 */
-global int NetClientSelectScenario(void)
+int NetClientSelectScenario(void)
 {
 	char *cp;
 
@@ -4673,7 +4673,7 @@ global int NetClientSelectScenario(void)
 /**
 **		FIXME: docu
 */
-global void NetConnectForceDisplayUpdate(void)
+void NetConnectForceDisplayUpdate(void)
 {
 	MultiGamePlayerSelectorsUpdate(2);
 }
@@ -4681,7 +4681,7 @@ global void NetConnectForceDisplayUpdate(void)
 /**
 **		Update client menu to follow server menu.
 */
-global void NetClientUpdateState(void)
+void NetClientUpdateState(void)
 {
 	Menu *menu;
 
@@ -4714,7 +4714,7 @@ global void NetClientUpdateState(void)
 /**
 **		Start editor.
 */
-local void StartEditor(void)
+static void StartEditor(void)
 {
 	SetupEditor();
 
@@ -4725,7 +4725,7 @@ local void StartEditor(void)
 /**
 **		Setup Editor Paths
 */
-global void SetupEditor(void)
+void SetupEditor(void)
 {
 	char *s;
 	//
@@ -4760,7 +4760,7 @@ global void SetupEditor(void)
 /**
 **		Editor select cancel button callback
 */
-local void EditorSelectCancel(void)
+static void EditorSelectCancel(void)
 {
 	QuitToMenu = 1;
 	EditorRunning = 0;
@@ -4770,7 +4770,7 @@ local void EditorSelectCancel(void)
 /**
 **		Called from menu, for new editor map.
 */
-local void EditorNewMap(void)
+static void EditorNewMap(void)
 {
 	Menu *menu;
 	char width[10];
@@ -4817,14 +4817,14 @@ local void EditorNewMap(void)
 /**
 **		Editor new map draw func
 */
-local void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
+static void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
 {
 }
 
 /**
 **		Editor new map, map description input box callback
 */
-local void EditorNewMapDescriptionEnterAction(
+static void EditorNewMapDescriptionEnterAction(
 		Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
 {
 }
@@ -4832,7 +4832,7 @@ local void EditorNewMapDescriptionEnterAction(
 /**
 **		Editor new map, size input box callback
 */
-local void EditorNewMapSizeEnterAction(Menuitem * mi,
+static void EditorNewMapSizeEnterAction(Menuitem * mi,
 		int key __attribute__((unused)))
 {
 	if (mi->d.input.nch > 0
@@ -4844,7 +4844,7 @@ local void EditorNewMapSizeEnterAction(Menuitem * mi,
 /**
 **		Editor new map ok button
 */
-local void EditorNewOk(void)
+static void EditorNewOk(void)
 {
 	Menu *menu;
 	unsigned value1;
@@ -4893,7 +4893,7 @@ local void EditorNewOk(void)
 /**
 **		Editor new map cancel button
 */
-local void EditorNewCancel(void)
+static void EditorNewCancel(void)
 {
 	EditorCancelled = 1;
 	EndMenu();
@@ -4902,7 +4902,7 @@ local void EditorNewCancel(void)
 /**
 **		Editor main load map menu
 */
-local void EditorMainLoadMap(void)
+static void EditorMainLoadMap(void)
 {
 	char *p;
 	char *s;
@@ -4935,7 +4935,7 @@ local void EditorMainLoadMap(void)
 /**
 **		Editor main load init callback
 */
-local void EditorMainLoadInit(Menuitem *mi)
+static void EditorMainLoadInit(Menuitem *mi)
 {
 	Assert(*ScenSelectPath);
 	mi->menu->Items[5].flags =
@@ -4947,7 +4947,7 @@ local void EditorMainLoadInit(Menuitem *mi)
 /**
 **		Editor main load listbox init callback
 */
-local void EditorMainLoadLBInit(Menuitem *mi)
+static void EditorMainLoadLBInit(Menuitem *mi)
 {
 	int i;
 
@@ -4971,7 +4971,7 @@ local void EditorMainLoadLBInit(Menuitem *mi)
 /**
 **		Editor main load listbox exit callback
 */
-local void EditorMainLoadLBExit(Menuitem *mi)
+static void EditorMainLoadLBExit(Menuitem *mi)
 {
 	FileList *fl;
 
@@ -4988,7 +4988,7 @@ local void EditorMainLoadLBExit(Menuitem *mi)
 /**
 **		Editor main load read directory filter
 */
-local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
+static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
 	MapInfo *info;
 	char *suf[4];
@@ -5056,7 +5056,7 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 /**
 **		Editor main load folder button
 */
-local void EditorMainLoadFolder(void)
+static void EditorMainLoadFolder(void)
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -5090,7 +5090,7 @@ local void EditorMainLoadFolder(void)
 /**
 **		Editor main load ok button
 */
-local void EditorMainLoadOk(void)
+static void EditorMainLoadOk(void)
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -5129,7 +5129,7 @@ local void EditorMainLoadOk(void)
 /**
 **		Editor main load cancel button
 */
-local void EditorMainLoadCancel(void)
+static void EditorMainLoadCancel(void)
 {
 	char *s;
 
@@ -5165,7 +5165,7 @@ local void EditorMainLoadCancel(void)
 /**
 **		Editor main load listbox retrieve callback
 */
-local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
+static unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 {
 	FileList *fl;
 	MapInfo *info;
@@ -5209,7 +5209,7 @@ local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 /**
 **		Editor main load listbox action callback
 */
-local void EditorMainLoadLBAction(Menuitem *mi, int i)
+static void EditorMainLoadLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
@@ -5232,7 +5232,7 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
 /**
 **		Editor main load vertical slider action callback
 */
-local void EditorMainLoadVSAction(Menuitem *mi, int i)
+static void EditorMainLoadVSAction(Menuitem *mi, int i)
 {
 	int op;
 	int d1;
@@ -5322,7 +5322,7 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 /**
 **		Editor load map menu
 */
-global void EditorLoadMenu(void)
+void EditorLoadMenu(void)
 {
 	char *p;
 	char *s;
@@ -5356,7 +5356,7 @@ global void EditorLoadMenu(void)
 /**
 **		Editor main load ok button
 */
-local void EditorLoadOk(void)
+static void EditorLoadOk(void)
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -5395,7 +5395,7 @@ local void EditorLoadOk(void)
 /**
 **		Editor main load cancel button
 */
-local void EditorLoadCancel(void)
+static void EditorLoadCancel(void)
 {
 	char *s;
 
@@ -5431,7 +5431,7 @@ local void EditorLoadCancel(void)
 /**
 **		Editor map properties menu
 */
-local void EditorMapPropertiesMenu(void)
+static void EditorMapPropertiesMenu(void)
 {
 	Menu *menu;
 	char description[36];
@@ -5462,7 +5462,7 @@ local void EditorMapPropertiesMenu(void)
 /**
 **		Editor map properties input box callback
 */
-local void EditorMapPropertiesEnterAction(
+static void EditorMapPropertiesEnterAction(
 		Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
 {
 }
@@ -5470,7 +5470,7 @@ local void EditorMapPropertiesEnterAction(
 /**
 **		Editor map properties ok button
 */
-local void EditorMapPropertiesOk(void)
+static void EditorMapPropertiesOk(void)
 {
 	Menu *menu;
 	char *description;
@@ -5512,14 +5512,14 @@ local void EditorMapPropertiesOk(void)
 /**
 **		Editor player properties draw func
 */
-local void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
+static void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
 {
 }
 
 /**
 **		Editor player properties input box callback
 */
-local void EditorPlayerPropertiesEnterAction(Menuitem *mi,
+static void EditorPlayerPropertiesEnterAction(Menuitem *mi,
 		int key __attribute__((unused)))
 {
 	if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
@@ -5528,7 +5528,7 @@ local void EditorPlayerPropertiesEnterAction(Menuitem *mi,
 }
 
 	/// Player type conversion from internal fc to menu number
-local int PlayerTypesFcToMenu[] = {
+static int PlayerTypesFcToMenu[] = {
 	0,
 	0,
 	4,
@@ -5540,7 +5540,7 @@ local int PlayerTypesFcToMenu[] = {
 };
 
 	/// Player type conversion from menu to internal fc number
-local int PlayerTypesMenuToFc[] = {
+static int PlayerTypesMenuToFc[] = {
 	PlayerPerson,
 	PlayerComputer,
 	PlayerRescuePassive,
@@ -5554,7 +5554,7 @@ local int PlayerTypesMenuToFc[] = {
 **
 **		@param num		Ai number
 */
-local int PlayerAiFcToMenu(int num)
+static int PlayerAiFcToMenu(int num)
 {
 	if (num == PlayerAiLand) {
 		return 0;
@@ -5574,7 +5574,7 @@ local int PlayerAiFcToMenu(int num)
 **
 **		@param num		Ai number
 */
-local int PlayerAiMenuToFc(int num)
+static int PlayerAiMenuToFc(int num)
 {
 	if (num == 0) {
 		return PlayerAiLand;
@@ -5592,7 +5592,7 @@ local int PlayerAiMenuToFc(int num)
 /**
 **		Edit player properties menu
 */
-local void EditorPlayerPropertiesMenu(void)
+static void EditorPlayerPropertiesMenu(void)
 {
 	Menu *menu;
 	char gold[PlayerMax][15];
@@ -5642,7 +5642,7 @@ local void EditorPlayerPropertiesMenu(void)
 /**
 **		Edit resource properties
 */
-global void EditorEditResource(void)
+void EditorEditResource(void)
 {
 	Menu *menu;
 	char buf[13];
@@ -5663,7 +5663,7 @@ global void EditorEditResource(void)
 /**
 **		Key pressed in menu-editor-edit-resource
 */
-local void EditorEditResourceEnterAction(Menuitem *mi,int key)
+static void EditorEditResourceEnterAction(Menuitem *mi,int key)
 {
 	if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
 		strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
@@ -5675,7 +5675,7 @@ local void EditorEditResourceEnterAction(Menuitem *mi,int key)
 /**
 **		Ok button from menu-editor-edit-resource
 */
-local void EditorEditResourceOk(void)
+static void EditorEditResourceOk(void)
 {
 	Menu *menu;
 	unsigned value;
@@ -5713,7 +5713,7 @@ local void EditorEditResourceOk(void)
 /**
 **		Cancel button from menu-editor-edit-resource
 */
-local void EditorEditResourceCancel(void)
+static void EditorEditResourceCancel(void)
 {
 	GameMenuReturn();
 }
@@ -5721,7 +5721,7 @@ local void EditorEditResourceCancel(void)
 /**
 **		Edit ai properties
 */
-global void EditorEditAiProperties(void)
+void EditorEditAiProperties(void)
 {
 	Menu *menu;
 
@@ -5740,7 +5740,7 @@ global void EditorEditAiProperties(void)
 /**
 **		Active or Passive gem clicked in menu-editor-edit-ai-properties
 */
-local void EditorEditAiPropertiesGem(Menuitem *mi)
+static void EditorEditAiPropertiesGem(Menuitem *mi)
 {
 	if (&mi->menu->Items[1] == mi) {
 		mi->d.gem.state = MI_GSTATE_CHECKED;
@@ -5754,7 +5754,7 @@ local void EditorEditAiPropertiesGem(Menuitem *mi)
 /**
 **		Ok button from menu-editor-edit-ai-properties
 */
-local void EditorEditAiPropertiesOk(void)
+static void EditorEditAiPropertiesOk(void)
 {
 	Menu *menu;
 
@@ -5770,7 +5770,7 @@ local void EditorEditAiPropertiesOk(void)
 /**
 **		Cancel button from menu-editor-edit-ai-properties
 */
-local void EditorEditAiPropertiesCancel(void)
+static void EditorEditAiPropertiesCancel(void)
 {
 	GameMenuReturn();
 }
@@ -5780,7 +5780,7 @@ local void EditorEditAiPropertiesCancel(void)
 **
 **		@return				0 for success, -1 for error
 */
-global int EditorSaveMenu(void)
+int EditorSaveMenu(void)
 {
 	Menu *menu;
 	char path[PATH_MAX];
@@ -5821,7 +5821,7 @@ global int EditorSaveMenu(void)
 /**
 **		Editor save listbox init callback
 */
-local void EditorSaveLBInit(Menuitem *mi)
+static void EditorSaveLBInit(Menuitem *mi)
 {
 	int i;
 
@@ -5847,7 +5847,7 @@ local void EditorSaveLBInit(Menuitem *mi)
 /**
 **		Editor save listbox exit callback
 */
-local void EditorSaveLBExit(Menuitem *mi)
+static void EditorSaveLBExit(Menuitem *mi)
 {
 	FileList *fl;
 
@@ -5863,7 +5863,7 @@ local void EditorSaveLBExit(Menuitem *mi)
 /**
 **		Editor save read directory filter
 */
-local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
+static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 {
 	char *suf;
 	char *np;
@@ -5910,7 +5910,7 @@ local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 /**
 **		Editor save folder button
 */
-local void EditorSaveFolder(void)
+static void EditorSaveFolder(void)
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -5943,7 +5943,7 @@ local void EditorSaveFolder(void)
 /**
 **		Editor save ok button
 */
-local void EditorSaveOk(void)
+static void EditorSaveOk(void)
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -5993,7 +5993,7 @@ local void EditorSaveOk(void)
 /**
 **		Editor save cancel button
 */
-local void EditorSaveCancel(void)
+static void EditorSaveCancel(void)
 {
 	Menu *menu;
 
@@ -6007,7 +6007,7 @@ local void EditorSaveCancel(void)
 /**
 **		Editor save listbox retrieve callback
 */
-local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
+static unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
 {
 	FileList *fl;
 	static char buffer[1024];
@@ -6028,7 +6028,7 @@ local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
 /**
 **		Editor save listbox action callback
 */
-local void EditorSaveLBAction(Menuitem *mi, int i)
+static void EditorSaveLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
@@ -6055,7 +6055,7 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
 /**
 **		Editor save vertical slider action callback
 */
-local void EditorSaveVSAction(Menuitem *mi, int i)
+static void EditorSaveVSAction(Menuitem *mi, int i)
 {
 	int op;
 	int d1;
@@ -6142,7 +6142,7 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 /**
 **		Editor save input callback
 */
-local void EditorSaveEnterAction(Menuitem *mi, int key)
+static void EditorSaveEnterAction(Menuitem *mi, int key)
 {
 	if (mi->d.input.nch == 0) {
 		mi->menu->Items[4].flags = MenuButtonDisabled;
@@ -6161,7 +6161,7 @@ local void EditorSaveEnterAction(Menuitem *mi, int key)
 /**
 **		Editor save confirm init callback
 */
-local void EditorSaveConfirmInit(Menuitem *mi)
+static void EditorSaveConfirmInit(Menuitem *mi)
 {
 	mi->menu->Items[2].d.text.text = ScenSelectFileName;
 }
@@ -6169,7 +6169,7 @@ local void EditorSaveConfirmInit(Menuitem *mi)
 /**
 **		Editor save confirm ok button
 */
-local void EditorSaveConfirmOk(void)
+static void EditorSaveConfirmOk(void)
 {
 	CurrentMenu->Items[2].d.text.text = NULL;
 	EditorEndMenu();
@@ -6178,7 +6178,7 @@ local void EditorSaveConfirmOk(void)
 /**
 **		Editor save confirm cancel button
 */
-local void EditorSaveConfirmCancel(void)
+static void EditorSaveConfirmCancel(void)
 {
 	CurrentMenu->Items[2].d.text.text = NULL;
 	EditorCancelled = 1;
@@ -6190,7 +6190,7 @@ local void EditorSaveConfirmCancel(void)
 **
 **		@todo Should check if modified file should be saved.
 */
-local void EditorQuitToMenu(void)
+static void EditorQuitToMenu(void)
 {
 	QuitToMenu = 1;
 	EditorRunning = 0;
@@ -6200,7 +6200,7 @@ local void EditorQuitToMenu(void)
 /**
 **		End menus state of the editor.
 */
-local void EditorEndMenu(void)
+static void EditorEndMenu(void)
 {
 	CursorOn = CursorOnUnknown;
 	CurrentMenu = NULL;
@@ -6213,7 +6213,7 @@ local void EditorEndMenu(void)
 /**
 **		Replay game menu
 */
-local void ReplayGameMenu(void)
+static void ReplayGameMenu(void)
 {
 #ifdef USE_WIN32
 	strcpy(TempPathBuf, GameName);
@@ -6245,7 +6245,7 @@ local void ReplayGameMenu(void)
 /**
 **		Replay game menu init callback
 */
-local void ReplayGameInit(Menuitem *mi)
+static void ReplayGameInit(Menuitem *mi)
 {
 	Assert(*ScenSelectPath);
 	mi->menu->Items[5].flags =
@@ -6258,7 +6258,7 @@ local void ReplayGameInit(Menuitem *mi)
 /**
 **		Replay game listbox init callback
 */
-local void ReplayGameLBInit(Menuitem *mi)
+static void ReplayGameLBInit(Menuitem *mi)
 {
 	int i;
 
@@ -6284,7 +6284,7 @@ local void ReplayGameLBInit(Menuitem *mi)
 /**
 **		Replay game listbox exit callback
 */
-local void ReplayGameLBExit(Menuitem *mi)
+static void ReplayGameLBExit(Menuitem *mi)
 {
 	FileList *fl;
 
@@ -6300,7 +6300,7 @@ local void ReplayGameLBExit(Menuitem *mi)
 /**
 **		Replay game read directory filter
 */
-local int ReplayGameRDFilter(char *pathbuf, FileList *fl)
+static int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 {
 	char *suf;
 	char *np;
@@ -6347,7 +6347,7 @@ local int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 /**
 **		Replay game listbox action
 */
-local void ReplayGameLBAction(Menuitem *mi, int i)
+static void ReplayGameLBAction(Menuitem *mi, int i)
 {
 	FileList *fl;
 
@@ -6370,7 +6370,7 @@ local void ReplayGameLBAction(Menuitem *mi, int i)
 /**
 **		Replay game listbox retrieve
 */
-local unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i)
 {
 	FileList *fl;
 	static char buffer[1024];
@@ -6391,7 +6391,7 @@ local unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i)
 /**
 **		Replay game vertical slider action
 */
-local void ReplayGameVSAction(Menuitem *mi, int i)
+static void ReplayGameVSAction(Menuitem *mi, int i)
 {
 	int op;
 	int d1;
@@ -6482,7 +6482,7 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
 /**
 **		Replay game folder button callback
 */
-local void ReplayGameFolder(void)
+static void ReplayGameFolder(void)
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -6516,14 +6516,14 @@ local void ReplayGameFolder(void)
 /**
 **		Replay game disable fog gem callback
 */
-local void ReplayGameDisableFog(Menuitem *mi __attribute__((unused)))
+static void ReplayGameDisableFog(Menuitem *mi __attribute__((unused)))
 {
 }
 
 /**
 **		Replay game ok button callback
 */
-local void ReplayGameOk(void)
+static void ReplayGameOk(void)
 {
 	Menu *menu;
 	Menuitem *mi;
@@ -6587,7 +6587,7 @@ local void ReplayGameOk(void)
 /**
 **		Replay game cancel button callback
 */
-local void ReplayGameCancel(void)
+static void ReplayGameCancel(void)
 {
 	char *s;
 
@@ -6623,7 +6623,7 @@ local void ReplayGameCancel(void)
 **
 **		@param error			Error message
 */
-local void NetErrorMenu(char *error)
+static void NetErrorMenu(char *error)
 {
 	Menu *menu;
 
@@ -6638,7 +6638,7 @@ local void NetErrorMenu(char *error)
 **
 **		@param error			Error message
 */
-global void ErrorMenu(char *error)
+void ErrorMenu(char *error)
 {
 	Menu *menu;
 	int oldx;
@@ -6663,7 +6663,7 @@ global void ErrorMenu(char *error)
 /**
 **  Initialize player races for a menu item
 */
-local void InitPlayerRaces(Menuitem* mi)
+static void InitPlayerRaces(Menuitem* mi)
 {
 	int i;
 	int n;
@@ -6692,7 +6692,7 @@ local void InitPlayerRaces(Menuitem* mi)
 /**
 **  Initialize tilesets for a menu item
 */
-local void InitTilesets(Menuitem* mi, int mapdefault)
+static void InitTilesets(Menuitem* mi, int mapdefault)
 {
 	int i;
 	int n;
@@ -6717,7 +6717,7 @@ local void InitTilesets(Menuitem* mi, int mapdefault)
 /**
 **  Initialize the loaded menu data
 */
-global void InitMenuData(void)
+void InitMenuData(void)
 {
 	Menu *menu;
 
@@ -6738,10 +6738,11 @@ global void InitMenuData(void)
 	InitTilesets(&menu->Items[6], 0);
 }
 
+#if 0
 /**
 **  FIXME: docu
 */
-local void MultiGameMasterReport(void)
+static void MultiGameMasterReport(void)
 {
 //	EndMenu();
 
@@ -6751,11 +6752,12 @@ local void MultiGameMasterReport(void)
 	}
 
 }
+#endif
 
 /**
 **  Menu for Mater Server Game list.
 */
-local void ShowMetaServerList(void)
+static void ShowMetaServerList(void)
 {
 	EndMenu();
 
@@ -6773,7 +6775,7 @@ local void ShowMetaServerList(void)
 **            n commands, one for each online game.
 **  TODO: well, redo this :)
 */
-local void MultiMetaServerGameSetupInit(Menuitem* mi)
+static void MultiMetaServerGameSetupInit(Menuitem* mi)
 {
 	int i;
 	int j;
@@ -6866,7 +6868,7 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 /**
 **  Multiplayer server menu exit callback
 */
-local void MultiMetaServerGameSetupExit(Menuitem *mi)
+static void MultiMetaServerGameSetupExit(Menuitem *mi)
 {
 	// TODO: how to free stuff?
 //	EndMenu();
@@ -6876,7 +6878,7 @@ local void MultiMetaServerGameSetupExit(Menuitem *mi)
 /**
 **  Action taken when a player select an online game
 */
-local void SelectGameServer(Menuitem *mi)
+static void SelectGameServer(Menuitem *mi)
 {
 	char server_host_buffer[64];
 	char *port;
@@ -6923,7 +6925,7 @@ local void SelectGameServer(Menuitem *mi)
 /**
 **  Action to add a game server on the meta-server.
 */
-local void AddGameServer(void)
+static void AddGameServer(void)
 {
 	// send message to meta server. meta server will detect IP address.
 	// Meta-server will return "BUSY" if the list of online games is busy.
@@ -6937,7 +6939,7 @@ local void AddGameServer(void)
 /**
 **  Action to add a game server on the meta-server.
 */
-local void ChangeGameServer(void)
+static void ChangeGameServer(void)
 {
 	int i;
 	int freespots;
@@ -6965,7 +6967,7 @@ local void ChangeGameServer(void)
 /**
 **  FIXME: docu
 */
-local int MetaServerConnectError(void)
+static int MetaServerConnectError(void)
 {
 	Invalidate();
 	NetErrorMenu("Cannot Connect to Meta-Server");
@@ -6975,7 +6977,7 @@ local int MetaServerConnectError(void)
 /**
 **  Close MetaServer connection
 */
-local void MultiMetaServerClose(void)
+static void MultiMetaServerClose(void)
 {
 	MetaClose();
 	MetaServerInUse = 0;

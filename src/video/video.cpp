@@ -126,25 +126,25 @@ extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global int VideoWidth;                      /// Window width in pixels
-global int VideoHeight;                     /// Window height in pixels
+int VideoWidth;                      /// Window width in pixels
+int VideoHeight;                     /// Window height in pixels
 
-global char VideoFullScreen;            /// true fullscreen wanted
-global char VideoForceFullScreen;       /// fullscreen set from commandline
+char VideoFullScreen;            /// true fullscreen wanted
+char VideoForceFullScreen;       /// fullscreen set from commandline
 
-global unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
-global unsigned long FrameCounter;          /// Current frame number
-global int SlowFrameCounter;                /// Profile, frames out of sync
+unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
+unsigned long FrameCounter;          /// Current frame number
+int SlowFrameCounter;                /// Profile, frames out of sync
 
-global int ColorCycleAll;               /// Flag Color Cycle with all palettes
+int ColorCycleAll;               /// Flag Color Cycle with all palettes
 
-global int ClipX1;                      /// current clipping top left
-global int ClipY1;                      /// current clipping top left
-global int ClipX2;                      /// current clipping bottom right
-global int ClipY2;                      /// current clipping bottom right
+int ClipX1;                      /// current clipping top left
+int ClipY1;                      /// current clipping top left
+int ClipX2;                      /// current clipping bottom right
+int ClipY2;                      /// current clipping bottom right
 
-local Clip* Clips;                      /// stack of all clips
-local Clip* ClipsGarbage;               /// garbage-list of available clips
+static Clip* Clips;                      /// stack of all clips
+static Clip* ClipsGarbage;               /// garbage-list of available clips
 
 	/**
 	**  Architecture-dependant video depth. Set by InitVideoXXX, if 0.
@@ -152,7 +152,7 @@ local Clip* ClipsGarbage;               /// garbage-list of available clips
 	**  @see InitVideo @see InitVideoSdl
 	**  @see main
 	*/
-global int VideoDepth;
+int VideoDepth;
 
 	/**
 	**  Architecture-dependant videomemory. Set by InitVideoXXX.
@@ -160,20 +160,20 @@ global int VideoDepth;
 	**  @see InitVideo @see InitVideoSdl
 	**  @see VMemType
 	*/
-global SDL_Surface* TheScreen;
+SDL_Surface* TheScreen;
 
-global int VideoSyncSpeed = 100;            /// 0 disable interrupts
-global int SkipFrames;						/// Skip this frames
+int VideoSyncSpeed = 100;            /// 0 disable interrupts
+int SkipFrames;						/// Skip this frames
 
-global int ColorWaterCycleStart;
-global int ColorWaterCycleEnd;
-global int ColorIconCycleStart;
-global int ColorIconCycleEnd;
-global int ColorBuildingCycleStart;
-global int ColorBuildingCycleEnd;
+int ColorWaterCycleStart;
+int ColorWaterCycleEnd;
+int ColorIconCycleStart;
+int ColorIconCycleEnd;
+int ColorBuildingCycleStart;
+int ColorBuildingCycleEnd;
 
 	/// Does ColorCycling..
-global void ColorCycle(void);
+void ColorCycle(void);
 
 Uint32 ColorBlack;
 Uint32 ColorDarkGreen;
@@ -202,7 +202,7 @@ Uint32 ColorYellow;
 **  @param x2      Right X bounding rectangle coordinate.
 **  @param y2      Bottom Y bounding rectangle coordinate.
 **/
-global void ClipRectToRect(int* left, int* top, int* right,int* bottom,
+void ClipRectToRect(int* left, int* top, int* right,int* bottom,
 		int x1, int y1, int x2, int y2)
 {
 	// Swap the coordinates, if the order is wrong
@@ -248,7 +248,7 @@ global void ClipRectToRect(int* left, int* top, int* right,int* bottom,
 **  @param right   Right X screen coordinate.
 **  @param bottom  Bottom Y screen coordinate.
 */
-global void SetClipping(int left, int top, int right, int bottom)
+void SetClipping(int left, int top, int right, int bottom)
 {
 #ifdef DEBUG
 	if (left > right || top > bottom || left < 0 || left >= VideoWidth ||
@@ -275,7 +275,7 @@ global void SetClipping(int left, int top, int right, int bottom)
 **  @param right   Right X screen coordinate.
 **  @param bottom  Bottom Y screen coordinate.
 */
-global void SetClipToClip(int left, int top, int right, int bottom)
+void SetClipToClip(int left, int top, int right, int bottom)
 {
 	// No warnings... exceeding is expected.
 	ClipRectToRect(&left, &top, &right, &bottom, ClipX1, ClipY1, ClipX2, ClipY2);
@@ -289,7 +289,7 @@ global void SetClipToClip(int left, int top, int right, int bottom)
 /**
 **  Push current clipping.
 */
-global void PushClipping(void)
+void PushClipping(void)
 {
 	Clip* clip;
 
@@ -310,7 +310,7 @@ global void PushClipping(void)
 /**
 **  Pop current clipping.
 */
-global void PopClipping(void)
+void PopClipping(void)
 {
 	Clip* clip;
 
@@ -335,7 +335,7 @@ global void PopClipping(void)
 /**
 **  FIXME: docu
 */
-global void VideoPaletteListAdd(SDL_Surface* surface)
+void VideoPaletteListAdd(SDL_Surface* surface)
 {
 	PaletteLink* curlink;
 
@@ -350,7 +350,7 @@ global void VideoPaletteListAdd(SDL_Surface* surface)
 /**
 **  FIXME: docu
 */
-global void VideoPaletteListRemove(SDL_Surface* surface)
+void VideoPaletteListRemove(SDL_Surface* surface)
 {
 	PaletteLink** curlink;
 	PaletteLink* tmp;
@@ -380,7 +380,7 @@ global void VideoPaletteListRemove(SDL_Surface* surface)
 **
 **  @param name  Name of the picture (file) to display.
 */
-global void DisplayPicture(const char* name)
+void DisplayPicture(const char* name)
 {
 	Graphic* g;
 
@@ -400,7 +400,7 @@ global void DisplayPicture(const char* name)
 **  Color cycle.
 */
 // FIXME: cpu intensive to go through the whole PaletteList
-global void ColorCycle(void)
+void ColorCycle(void)
 {
 	SDL_Color* palcolors;
 	SDL_Color colors[256];
@@ -469,7 +469,7 @@ global void ColorCycle(void)
 /**
 **  Lock the screen for write access.
 */
-global void VideoLockScreen(void)
+void VideoLockScreen(void)
 {
 #ifdef USE_SDL
 	SdlLockScreen();
@@ -479,7 +479,7 @@ global void VideoLockScreen(void)
 /**
 **  Unlock the screen for write access.
 */
-global void VideoUnlockScreen(void)
+void VideoUnlockScreen(void)
 {
 #ifdef USE_SDL
 	SdlUnlockScreen();
@@ -489,7 +489,7 @@ global void VideoUnlockScreen(void)
 /**
 **  Clear the video screen.
 */
-global void VideoClearScreen(void)
+void VideoClearScreen(void)
 {
 	VideoFillRectangle(ColorBlack, 0, 0, VideoWidth, VideoHeight);
 }
@@ -497,7 +497,7 @@ global void VideoClearScreen(void)
 /**
 **  Return ticks in ms since start.
 */
-global unsigned long GetTicks(void)
+unsigned long GetTicks(void)
 {
 #ifdef USE_SDL
 	return SDL_GetTicks();
@@ -507,7 +507,7 @@ global unsigned long GetTicks(void)
 /**
 **  Video initialize.
 */
-global void InitVideo(void)
+void InitVideo(void)
 {
 #ifdef USE_SDL
 	InitVideoSdl();

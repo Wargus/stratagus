@@ -81,27 +81,27 @@ static inline max(int a, int b) { return a > b ? a : b; }
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global int ShowHealthBar;				/// Flag: show health bar
-global int ShowHealthDot;				/// Flag: show health dot
-global int ShowManaBar;						/// Flag: show mana bar
-global int ShowManaDot;						/// Flag: show mana dot
-global int ShowNoFull;						/// Flag: show no full health or mana
-global int DecorationOnTop;				/// Flag: show health and mana on top
-global int ShowSightRange;				/// Flag: show right range
-global int ShowReactionRange;				/// Flag: show reaction range
-global int ShowAttackRange;				/// Flag: show attack range
-global int ShowOrders;						/// Flag: show orders of unit on map
-global unsigned long ShowOrdersCount;		/// Show orders for some time
+int ShowHealthBar;				/// Flag: show health bar
+int ShowHealthDot;				/// Flag: show health dot
+int ShowManaBar;						/// Flag: show mana bar
+int ShowManaDot;						/// Flag: show mana dot
+int ShowNoFull;						/// Flag: show no full health or mana
+int DecorationOnTop;				/// Flag: show health and mana on top
+int ShowSightRange;				/// Flag: show right range
+int ShowReactionRange;				/// Flag: show reaction range
+int ShowAttackRange;				/// Flag: show attack range
+int ShowOrders;						/// Flag: show orders of unit on map
+unsigned long ShowOrdersCount;		/// Show orders for some time
 	/// Flag: health horizontal instead of vertical
-global int ShowHealthHorizontal;
+int ShowHealthHorizontal;
 	/// Flag: health horizontal instead of vertical
-global int ShowManaHorizontal;
+int ShowManaHorizontal;
 	/// Flag: show bars and dot energy only for selected
-global int ShowEnergySelectedOnly;
+int ShowEnergySelectedOnly;
 	/// Flag: show the health background long
-global int ShowHealthBackgroundLong;
+int ShowHealthBackgroundLong;
 	/// Flag: show the mana background long
-global int ShowManaBackgroundLong;
+int ShowManaBackgroundLong;
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?
@@ -113,7 +113,7 @@ global int ShowManaBackgroundLong;
 **		@param x1,y1		Coordinates of the top left corner.
 **		@param x2,y2		Coordinates of the bottom right corner.
 */
-global void (*DrawSelection)(Uint32 color, int x1, int y1,
+void (*DrawSelection)(Uint32 color, int x1, int y1,
 	int x2, int y2) = DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
@@ -123,7 +123,7 @@ global void (*DrawSelection)(Uint32 color, int x1, int y1,
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
-global const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
+const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -132,7 +132,7 @@ global const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
 **
 **		@param unit		Pointer to unit.
 */
-global void DrawUnitSelection(const Unit* unit)
+void DrawUnitSelection(const Unit* unit)
 {
 	int x;
 	int y;
@@ -194,7 +194,7 @@ global void DrawUnitSelection(const Unit* unit)
 **		@param x1,y1		Coordinates of the top left corner.
 **		@param x2,y2		Coordinates of the bottom right corner.
 */
-global void DrawSelectionNone(Uint32 color, int x1, int y1,
+void DrawSelectionNone(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 }
@@ -206,7 +206,7 @@ global void DrawSelectionNone(Uint32 color, int x1, int y1,
 **		@param x1,y1		Coordinates of the top left corner.
 **		@param x2,y2		Coordinates of the bottom right corner.
 */
-global void DrawSelectionCircle(Uint32 color, int x1, int x2,
+void DrawSelectionCircle(Uint32 color, int x1, int x2,
 	int y1, int y2)
 {
 	VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
@@ -222,7 +222,7 @@ global void DrawSelectionCircle(Uint32 color, int x1, int x2,
 **		@param x1,y1		Coordinates of the top left corner.
 **		@param x2,y2		Coordinates of the bottom right corner.
 */
-global void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
+void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 	VideoFillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
@@ -238,7 +238,7 @@ global void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 **		@param x1,y1		Coordinates of the top left corner.
 **		@param x2,y2		Coordinates of the bottom right corner.
 */
-global void DrawSelectionRectangle(Uint32 color, int x1, int y1,
+void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 	VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
@@ -251,7 +251,7 @@ global void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 **		@param x1,y1		Coordinates of the top left corner.
 **		@param x2,y2		Coordinates of the bottom right corner.
 */
-global void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
+void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 	VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
@@ -266,7 +266,7 @@ global void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 **		@param x1,y1		Coordinates of the top left corner.
 **		@param x2,y2		Coordinates of the bottom right corner.
 */
-global void DrawSelectionCorners(Uint32 color, int x1, int y1,
+void DrawSelectionCorners(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
 #define CORNER_PIXELS 6
@@ -301,31 +301,31 @@ typedef struct _decoration_ {
 /**
 **  Sprite to display the mana.
 */
-global Decoration ManaSprite;
+Decoration ManaSprite;
 
 /**
 **  Sprite to display the health.
 */
-global Decoration HealthSprite;
+Decoration HealthSprite;
 
 /**
 **  Sprite to display as the shadow of flying units.
 **
 **  @todo  Made this configurable with CCL.
 */
-global Decoration ShadowSprite;
+Decoration ShadowSprite;
 
 /**
 **  Sprite to display the active spells on an unit.
 */
-global Decoration SpellSprite;
+Decoration SpellSprite;
 
 /**
 **  Define mana sprite.
 **
 **  @param l  Lua state
 */
-local int CclManaSprite(lua_State* l)
+static int CclManaSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
 		LuaError(l, "incorrect argument");
@@ -346,7 +346,7 @@ local int CclManaSprite(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclHealthSprite(lua_State* l)
+static int CclHealthSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
 		LuaError(l, "incorrect argument");
@@ -367,7 +367,7 @@ local int CclHealthSprite(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShadowSprite(lua_State* l)
+static int CclShadowSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
 		LuaError(l, "incorrect argument");
@@ -388,7 +388,7 @@ local int CclShadowSprite(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclSpellSprite(lua_State* l)
+static int CclSpellSprite(lua_State* l)
 {
 	if (lua_gettop(l) != 5) {
 		LuaError(l, "incorrect argument");
@@ -409,7 +409,7 @@ local int CclSpellSprite(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowHealthBar(lua_State* l)
+static int CclShowHealthBar(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -425,7 +425,7 @@ local int CclShowHealthBar(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowHealthDot(lua_State* l)
+static int CclShowHealthDot(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -441,7 +441,7 @@ local int CclShowHealthDot(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowHealthHorizontal(lua_State* l)
+static int CclShowHealthHorizontal(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -458,7 +458,7 @@ local int CclShowHealthHorizontal(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowHealthVertical(lua_State* l)
+static int CclShowHealthVertical(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -475,7 +475,7 @@ local int CclShowHealthVertical(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowManaBar(lua_State* l)
+static int CclShowManaBar(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -491,7 +491,7 @@ local int CclShowManaBar(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowManaDot(lua_State* l)
+static int CclShowManaDot(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -507,7 +507,7 @@ local int CclShowManaDot(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowEnergySelected(lua_State* l)
+static int CclShowEnergySelected(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -522,7 +522,7 @@ local int CclShowEnergySelected(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowFull(lua_State* l)
+static int CclShowFull(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -537,7 +537,7 @@ local int CclShowFull(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowManaHorizontal(lua_State* l)
+static int CclShowManaHorizontal(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -554,7 +554,7 @@ local int CclShowManaHorizontal(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowManaVertical(lua_State* l)
+static int CclShowManaVertical(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -571,7 +571,7 @@ local int CclShowManaVertical(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclShowNoFull(lua_State* l)
+static int CclShowNoFull(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -586,7 +586,7 @@ local int CclShowNoFull(lua_State* l)
 **
 **  @param l  Lua state
 */
-local int CclDecorationOnTop(lua_State* l)
+static int CclDecorationOnTop(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -599,7 +599,7 @@ local int CclDecorationOnTop(lua_State* l)
 /**
 **  Register CCL features for decorations.
 */
-global void DecorationCclRegister(void)
+void DecorationCclRegister(void)
 {
 	lua_register(Lua, "ManaSprite", CclManaSprite);
 	lua_register(Lua, "HealthSprite", CclHealthSprite);
@@ -626,7 +626,7 @@ global void DecorationCclRegister(void)
 /**
 **  Load decoration.
 */
-global void LoadDecorations(void)
+void LoadDecorations(void)
 {
 	if (HealthSprite.File) {
 		ShowLoadProgress("Decorations `%s'", HealthSprite.File);
@@ -654,7 +654,7 @@ global void LoadDecorations(void)
 /**
 **  Clean decorations.
 */
-global void CleanDecorations(void)
+void CleanDecorations(void)
 {
 	if (HealthSprite.File) {
 		free(HealthSprite.File);
@@ -694,7 +694,7 @@ global void CleanDecorations(void)
 **  @param full   Full value
 **  @param ready  Ready value
 */
-local void DrawManaSprite(int x, int y, const UnitType* type, int full, int ready)
+static void DrawManaSprite(int x, int y, const UnitType* type, int full, int ready)
 {
 	int n;
 
@@ -735,7 +735,7 @@ local void DrawManaSprite(int x, int y, const UnitType* type, int full, int read
 **  @param full   Full value
 **  @param ready  Ready value
 */
-local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
+static void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 {
 	int f;
 	int w;
@@ -786,7 +786,7 @@ local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 **  @param x     Screen X position of the unit.
 **  @param y     Screen Y position of the unit.
 */
-local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
+static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 {
 	int f;
 	Uint32 color;
@@ -1136,7 +1136,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
+void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 	int x, int y)
 {
 	if (!type) {
@@ -1241,7 +1241,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 **  FIXME: should be extend to show waypoints, which order (repair...)
 **  FIXME: remove or reduce the Map2ViewportX and Map2ViewportY.
 */
-global void DrawPath(const Unit* unit)
+void DrawPath(const Unit* unit)
 {
 	int x1;
 	int y1;
@@ -1371,7 +1371,7 @@ global void DrawPath(const Unit* unit)
 **  @param x      Resulting screen X cordinate.
 **  @param y      Resulting screen Y cordinate.
 */
-local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y)
+static void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y)
 {
 	Unit* goal;
 
@@ -1410,7 +1410,7 @@ local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y
 **  @param y1     Y pixel coordinate.
 **  @param order  Order to display.
 */
-local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
+static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 {
 	int x2;
 	int y2;
@@ -1541,7 +1541,7 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 **
 **  @param unit  Pointer to the unit.
 */
-global void ShowOrder(const Unit* unit)
+void ShowOrder(const Unit* unit)
 {
 	int x1;
 	int y1;
@@ -1578,7 +1578,7 @@ global void ShowOrder(const Unit* unit)
 **
 **  @todo FIXME: The different styles should become a function call.
 */
-local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y)
+static void DrawInformations(const Unit* unit, const UnitType* type, int x, int y)
 {
 	const UnitStats* stats;
 	int r;
@@ -1649,7 +1649,7 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 **  @param unit    Pointer to unit.
 **  @param sprite  Change the palette entries 208-211 in this sprite.
 */
-local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
+static void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 {
 	SDL_SetColors(sprite->Surface, unit->Colors->Colors, 208, 4);
 	if (sprite->SurfaceFlip) {
@@ -1669,7 +1669,7 @@ local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 **  @param x         X position.
 **  @param y         Y position.
 */
-local void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
+static void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
 	int player, int frame, int x, int y)
 {
 	int f;
@@ -1727,7 +1727,7 @@ local void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** 
 **  @param x      X position.
 **  @param y      Y position.
 */
-local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
+static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 {
 	ConstructionFrame* cframe;
 
@@ -1796,7 +1796,7 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 **  @param x       X position.
 **  @param y       Y position.
 */
-local void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
+static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 	const UnitType* type, int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
@@ -1832,7 +1832,7 @@ local void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 **
 **  @param unit  Pointer to the unit.
 */
-global void DrawUnit(const Unit* unit)
+void DrawUnit(const Unit* unit)
 {
 	int x;
 	int y;
@@ -1969,7 +1969,7 @@ global void DrawUnit(const Unit* unit)
 /**
 **  FIXME: docu
 */
-local int DrawLevelCompare(const void* v1, const void* v2) {
+static int DrawLevelCompare(const void* v1, const void* v2) {
 
 	const Unit* c1;
 	const Unit* c2;
@@ -2009,7 +2009,7 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 **
 **  @todo FIXME: Must use the redraw tile flags in this function
 */
-global int FindAndSortUnits(const Viewport* vp, Unit** table)
+int FindAndSortUnits(const Viewport* vp, Unit** table)
 {
 	int n;
 

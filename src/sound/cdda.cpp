@@ -72,7 +72,7 @@ typedef struct _cdda_data {
 **
 **		@return					Number of bytes read
 */
-local int CDRead(Sample* sample, void* buf, int len)
+static int CDRead(Sample* sample, void* buf, int len)
 {
 	CddaData* data;
 	int n;
@@ -116,7 +116,7 @@ local int CDRead(Sample* sample, void* buf, int len)
 **
 **		@param sample			Sample to free
 */
-local void CDFree(Sample* sample)
+static void CDFree(Sample* sample)
 {
 	free(sample);
 }
@@ -124,7 +124,7 @@ local void CDFree(Sample* sample)
 /**
 **		CDDA object type structure.
 */
-local const SampleType CDStreamSampleType = {
+static const SampleType CDStreamSampleType = {
 	CDRead,
 	CDFree,
 };
@@ -138,7 +138,7 @@ local const SampleType CDStreamSampleType = {
 **		@return				Returns the loaded sample.
 **
 */
-global Sample* LoadCD(const char* name __attribute__((unused)),
+Sample* LoadCD(const char* name __attribute__((unused)),
 		int flags __attribute__((unused)))
 {
 	Sample* sample;

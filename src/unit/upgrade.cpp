@@ -51,13 +51,15 @@
 
 #include "util.h"
 
-local int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
+static int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
 	int*, const int[UnitTypeMax], const char*, const char*, UnitType*);
-local int AddUpgradeModifier(int, int, int, int, int, int, int, int,
+#if 0
+static int AddUpgradeModifier(int, int, int, int, int, int, int, int,
 	int*, const int[UnitTypeMax], const char*, const char*);
+#endif
 
-local void AllowUnitId(Player* player, int id, int units);
-local void AllowUpgradeId(Player* player, int id, char af);
+static void AllowUnitId(Player* player, int id, int units);
+static void AllowUpgradeId(Player* player, int id, char af);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -66,29 +68,29 @@ local void AllowUpgradeId(Player* player, int id, char af);
 /**
 **  upgrade type definition
 */
-global const char UpgradeType[] = "upgrade";
+const char UpgradeType[] = "upgrade";
 
-global Upgrade Upgrades[UpgradeMax];        /// The main user useable upgrades
-local int NumUpgrades;                      /// Number of upgrades used
+Upgrade Upgrades[UpgradeMax];        /// The main user useable upgrades
+static int NumUpgrades;                      /// Number of upgrades used
 
 	/// How many upgrades modifiers supported
 #define UPGRADE_MODIFIERS_MAX		(UpgradeMax * 4)
 	/// Upgrades modifiers
-local UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+static UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 	/// Number of upgrades modifiers used
-local int NumUpgradeModifiers;
+static int NumUpgradeModifiers;
 
 #ifdef DOXYGEN  // no real code, only for documentation
-local Upgrade* UpgradeHash[61];             /// lookup table for upgrade names
+static Upgrade* UpgradeHash[61];             /// lookup table for upgrade names
 #else
-local hashtable(Upgrade*, 61) UpgradeHash;  /// lookup table for upgrade names
+static hashtable(Upgrade*, 61) UpgradeHash;  /// lookup table for upgrade names
 #endif
 
 /**
 **  Mapping of W*rCr*ft number to our internal upgrade symbol.
 **  The numbers are used in puds.
 */
-local char** UpgradeWcNames;
+static char** UpgradeWcNames;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -105,7 +107,7 @@ local char** UpgradeWcNames;
 **
 **  @return       upgrade id or -1 for error
 */
-local Upgrade* AddUpgrade(const char* ident, const char* icon,
+static Upgrade* AddUpgrade(const char* ident, const char* icon,
 	const int* costs)
 {
 	Upgrade* upgrade;
@@ -152,7 +154,7 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 **  @param ident  The upgrade identifier.
 **  @return       Upgrade pointer or NULL if not found.
 */
-global Upgrade* UpgradeByIdent(const char* ident)
+Upgrade* UpgradeByIdent(const char* ident)
 {
 	Upgrade** upgrade;
 
@@ -171,7 +173,7 @@ global Upgrade* UpgradeByIdent(const char* ident)
 **  @param num  The upgrade number used in f.e. puds.
 **  @return     Upgrade pointer.
 */
-local Upgrade* UpgradeByWcNum(unsigned num)
+static Upgrade* UpgradeByWcNum(unsigned num)
 {
 	return UpgradeByIdent(UpgradeWcNames[num]);
 }
@@ -180,7 +182,7 @@ local Upgrade* UpgradeByWcNum(unsigned num)
 /**
 **  Init upgrade/allow structures
 */
-global void InitUpgrades(void)
+void InitUpgrades(void)
 {
 	int i;
 
@@ -195,7 +197,7 @@ global void InitUpgrades(void)
 /**
 **  Cleanup the upgrade module.
 */
-global void CleanUpgrades(void)
+void CleanUpgrades(void)
 {
 	int i;
 	char** cp;
@@ -239,7 +241,7 @@ global void CleanUpgrades(void)
 **		@note		Only included for compatibility, for new levels use
 **				CCL (define-allow)
 */
-global void ParsePudALOW(const char* alow, int length __attribute__((unused)))
+void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 {
 	// units allow bits -> wc2num -> internal names.
 	static char unit_for_bit[64] = {
@@ -498,7 +500,7 @@ global void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 **		@param ugrd		Pointer to ugrd area.
 **		@param length		length of ugrd area.
 */
-global void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
+void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 {
 	int i;
 	int time;
@@ -537,7 +539,7 @@ global void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 **
 **  @param file  Output file.
 */
-global void SaveUpgrades(CLFile* file)
+void SaveUpgrades(CLFile* file)
 {
 	int i;
 	int p;
@@ -581,7 +583,7 @@ global void SaveUpgrades(CLFile* file)
 **
 **  @param l  List of modifiers.
 */
-local int CclDefineModifier(lua_State* l)
+static int CclDefineModifier(lua_State* l)
 {
 	const char* temp;
 	const char* value;
@@ -731,7 +733,7 @@ local int CclDefineModifier(lua_State* l)
 **
 **  @param l  List defining the upgrade.
 */
-local int CclDefineUpgrade(lua_State* l)
+static int CclDefineUpgrade(lua_State* l)
 {
 	const char* value;
 	const char* icon;
@@ -788,7 +790,7 @@ local int CclDefineUpgrade(lua_State* l)
 /**
 **  Define which units are allowed and how much.
 */
-local int CclDefineUnitAllow(lua_State* l)
+static int CclDefineUnitAllow(lua_State* l)
 {
 	const char* ident;
 	int i;
@@ -819,7 +821,7 @@ local int CclDefineUnitAllow(lua_State* l)
 /**
 **  Define which units/upgrades are allowed.
 */
-local int CclDefineAllow(lua_State* l)
+static int CclDefineAllow(lua_State* l)
 {
 	const char* ident;
 	const char* ids;
@@ -868,7 +870,7 @@ local int CclDefineAllow(lua_State* l)
 **
 **  @param l  List of all names.
 */
-local int CclDefineUpgradeWcNames(lua_State* l)
+static int CclDefineUpgradeWcNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -902,7 +904,7 @@ local int CclDefineUpgradeWcNames(lua_State* l)
 /**
 **  Register CCL features for upgrades.
 */
-global void UpgradesCclRegister(void)
+void UpgradesCclRegister(void)
 {
 	lua_register(Lua, "DefineModifier", CclDefineModifier);
 	lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
@@ -938,7 +940,7 @@ global void UpgradesCclRegister(void)
 **  @return                 upgrade modifier id or -1 for error
 **                          (actually this id is useless, just error checking)
 */
-local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
+static int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 	int basic_damage, int piercing_damage, int armor, int speed,
 	int hit_points, int regeneration_rate, int* costs,
 	const int units[UnitTypeMax],
@@ -979,11 +981,12 @@ local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 	return NumUpgradeModifiers++;
 }
 
+#if 0
 /**
 **		returns upgrade modifier id or -1 for error (actually this id is
 **		useless, just error checking)
 */
-local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
+static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	int basic_damage, int piercing_damage, int armor, int speed,
 	int hit_points, int* costs,
 	const int units[UnitTypeMax],
@@ -1063,6 +1066,7 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 
 	return NumUpgradeModifiers - 1;
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --		General/Map functions
@@ -1077,7 +1081,7 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 **  @param ident  The unit-type identifier.
 **  @return       Unit-type ID (int) or -1 if not found.
 */
-global int UnitTypeIdByIdent(const char* ident)
+int UnitTypeIdByIdent(const char* ident)
 {
 	UnitType* type;
 
@@ -1094,7 +1098,7 @@ global int UnitTypeIdByIdent(const char* ident)
 **  @param ident  The upgrade identifier.
 **  @return       Upgrade ID (int) or -1 if not found.
 */
-global int UpgradeIdByIdent(const char* ident)
+int UpgradeIdByIdent(const char* ident)
 {
 	Upgrade* upgrade;
 
@@ -1117,7 +1121,7 @@ global int UpgradeIdByIdent(const char* ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
+static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 {
 	Unit* unit;
 	int i;
@@ -1187,7 +1191,7 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
+static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 {
 	int z;
 	int j;
@@ -1275,7 +1279,7 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 **  @param player   Player researching the upgrade.
 **  @param upgrade  Upgrade ready researched.
 */
-global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
+void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 {
 	int z;
 	int id;
@@ -1304,7 +1308,7 @@ global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 **  (lumber mill? stronghold?)
 **  this function will apply all modifiers in reverse way
 */
-global void UpgradeLost(Player* player, int id)
+void UpgradeLost(Player* player, int id)
 {
 	return; // FIXME: remove this if implemented below
 
@@ -1326,7 +1330,7 @@ global void UpgradeLost(Player* player, int id)
 **  @param id      unit type id
 **  @param units   maximum amount of units allowed
 */
-local void AllowUnitId(Player* player, int id, int units)
+static void AllowUnitId(Player* player, int id, int units)
 {
 	player->Allow.Units[id] = units;
 }
@@ -1338,7 +1342,7 @@ local void AllowUnitId(Player* player, int id, int units)
 **  @param id      upgrade id
 **  @param af      `A'llow/`F'orbid/`R'eseached
 */
-local void AllowUpgradeId(Player* player, int id, char af)
+static void AllowUpgradeId(Player* player, int id, char af)
 {
 	Assert(af == 'A' || af == 'F' || af == 'R');
 	player->Allow.Upgrades[id] = af;
@@ -1347,7 +1351,7 @@ local void AllowUpgradeId(Player* player, int id, char af)
 /**
 **  FIXME: docu
 */
-global int UnitIdAllowed(const Player* player, int id)
+int UnitIdAllowed(const Player* player, int id)
 {
 	// JOHNS: Don't be kind, the people should code correct!
 	Assert(id >= 0 && id < UnitTypeMax);
@@ -1360,7 +1364,7 @@ global int UnitIdAllowed(const Player* player, int id)
 /**
 **  FIXME: docu
 */
-global char UpgradeIdAllowed(const Player* player, int id)
+char UpgradeIdAllowed(const Player* player, int id)
 {
 	// JOHNS: Don't be kind, the people should code correct!
 	Assert(id >= 0 && id < UpgradeMax);
@@ -1377,7 +1381,7 @@ global char UpgradeIdAllowed(const Player* player, int id)
 **
 **  @note This function shouldn't be used during runtime, it is only for setup.
 */
-global char UpgradeIdentAllowed(const Player* player, const char* ident)
+char UpgradeIdentAllowed(const Player* player, const char* ident)
 {
 	int id;
 
@@ -1398,7 +1402,7 @@ global char UpgradeIdentAllowed(const Player* player, const char* ident)
 **  @param player  Player pointer.
 **  @param ident   Upgrade ident.
 */
-global int UpgradeIdentAvailable(const Player* player, const char* ident)
+int UpgradeIdentAvailable(const Player* player, const char* ident)
 {
 	int allow;
 

@@ -57,7 +57,7 @@
 **
 **  @param unit  Patroling unit pointer.
 */
-global void HandleActionPatrol(Unit* unit)
+void HandleActionPatrol(Unit* unit)
 {
 	const Unit* goal;
 

@@ -68,7 +68,7 @@
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global int MapIsSeenTileRock(int x, int y)
+int MapIsSeenTileRock(int x, int y)
 {
 	return TheMap.Tileset->TileTypeTable[
 			TheMap.Fields[(x)+(y)*TheMap.Width].SeenTile
@@ -81,7 +81,7 @@ global int MapIsSeenTileRock(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixSeenRockTile(int x, int y)
+void MapFixSeenRockTile(int x, int y)
 {
 	int tile;
 	int ttup;
@@ -188,7 +188,7 @@ global void MapFixSeenRockTile(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixSeenRockNeighbors(int x, int y)
+void MapFixSeenRockNeighbors(int x, int y)
 {
 	MapFixSeenRockTile(x + 1, y);				// side neighbors
 	MapFixSeenRockTile(x - 1, y);
@@ -206,7 +206,7 @@ global void MapFixSeenRockNeighbors(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-local void MapFixRockNeighbors(int x, int y)
+static void MapFixRockNeighbors(int x, int y)
 {
 	MapFixRockTile(x + 1, y);				// side neighbors
 	MapFixRockTile(x - 1, y);
@@ -224,7 +224,7 @@ local void MapFixRockNeighbors(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixRockTile(int x, int y)
+void MapFixRockTile(int x, int y)
 {
 	int tile;
 	int ttup;
@@ -328,7 +328,7 @@ global void MapFixRockTile(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapRemoveRock(unsigned x, unsigned y)
+void MapRemoveRock(unsigned x, unsigned y)
 {
 	MapField* mf;
 

@@ -62,7 +62,7 @@
 **
 **  @param l  Lua state.
 */
-local int CclSoundForName(lua_State* l)
+static int CclSoundForName(lua_State* l)
 {
 	SoundId id;
 	const char* sound_name;
@@ -84,7 +84,7 @@ local int CclSoundForName(lua_State* l)
 **
 **  @return   The C sound id.
 */
-local SoundId CclGetSoundId(lua_State* l)
+static SoundId CclGetSoundId(lua_State* l)
 {
 	LuaUserData* data;
 
@@ -112,7 +112,7 @@ local SoundId CclGetSoundId(lua_State* l)
 **
 **  @return   the sound id of the created sound
 */
-local int CclMakeSound(lua_State* l)
+static int CclMakeSound(lua_State* l)
 {
 	SoundId id;
 	const char* c_name;
@@ -164,7 +164,7 @@ local int CclMakeSound(lua_State* l)
 **
 **  @return   The sound id of the created sound
 */
-local int CclMakeSoundGroup(lua_State* l)
+static int CclMakeSoundGroup(lua_State* l)
 {
 	SoundId id;
 	const char* c_name;
@@ -197,7 +197,7 @@ local int CclMakeSoundGroup(lua_State* l)
 **
 **  @return   the sound object
 */
-local int CclMapSound(lua_State* l)
+static int CclMapSound(lua_State* l)
 {
 	const char* sound_name;
 
@@ -215,7 +215,7 @@ local int CclMapSound(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclPlaySound(lua_State* l)
+static int CclPlaySound(lua_State* l)
 {
 	SoundId id;
 
@@ -234,7 +234,7 @@ local int CclPlaySound(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDisplaySounds(lua_State* l)
+static int CclDisplaySounds(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -250,7 +250,7 @@ local int CclDisplaySounds(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineGameSounds(lua_State* l)
+static int CclDefineGameSounds(lua_State* l)
 {
 	//FIXME: should allow to define ALL the game sounds
 	const char* value;
@@ -340,7 +340,7 @@ local int CclDefineGameSounds(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSoundVolume(lua_State* l)
+static int CclSetSoundVolume(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -356,7 +356,7 @@ local int CclSetSoundVolume(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetMusicVolume(lua_State* l)
+static int CclSetMusicVolume(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -372,7 +372,7 @@ local int CclSetMusicVolume(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetCdMode(lua_State* l)
+static int CclSetCdMode(lua_State* l)
 {
 #ifdef USE_CDAUDIO
 	CDModes cdmode;
@@ -407,7 +407,7 @@ local int CclSetCdMode(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefinePlaySections(lua_State* l)
+static int CclDefinePlaySections(lua_State* l)
 {
 	const char* value;
 	PlaySection* p;
@@ -536,7 +536,7 @@ local int CclDefinePlaySections(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSoundOff(lua_State* l)
+static int CclSoundOff(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -553,7 +553,7 @@ local int CclSoundOff(lua_State* l)
 **
 **  @return   true if and only if the sound is REALLY turned on
 */
-local int CclSoundOn(lua_State* l)
+static int CclSoundOn(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -573,7 +573,7 @@ local int CclSoundOn(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclMusicOff(lua_State* l)
+static int CclMusicOff(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -591,7 +591,7 @@ local int CclMusicOff(lua_State* l)
 **
 **  @return   true if and only if the sound is REALLY turned on
 */
-local int CclMusicOn(lua_State* l)
+static int CclMusicOn(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -606,7 +606,7 @@ local int CclMusicOn(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetGlobalSoundRange(lua_State* l)
+static int CclSetGlobalSoundRange(lua_State* l)
 {
 	int d;
 
@@ -628,7 +628,7 @@ local int CclSetGlobalSoundRange(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSoundThread(lua_State* l)
+static int CclSoundThread(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -642,7 +642,7 @@ local int CclSoundThread(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetSoundRange(lua_State* l) {
+static int CclSetSoundRange(lua_State* l) {
 	unsigned char theRange;
 	int tmp;
 	SoundId id;
@@ -670,7 +670,7 @@ local int CclSetSoundRange(lua_State* l) {
 **
 **  @param l  Lua state.
 */
-local int CclPlayMusic(lua_State* l)
+static int CclPlayMusic(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -686,7 +686,7 @@ local int CclPlayMusic(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclPlayFile(lua_State* l)
+static int CclPlayFile(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -702,7 +702,7 @@ local int CclPlayFile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclStopMusic(lua_State* l)
+static int CclStopMusic(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -716,7 +716,7 @@ local int CclStopMusic(lua_State* l)
 /**
 **  Register CCL features for sound.
 */
-global void SoundCclRegister(void)
+void SoundCclRegister(void)
 {
 	lua_register(Lua, "SetSoundVolume", CclSetSoundVolume);
 	lua_register(Lua, "SetMusicVolume", CclSetMusicVolume);

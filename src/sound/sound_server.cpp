@@ -78,28 +78,28 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global int SoundFildes = -1;				/// audio file descriptor
-global int PlayingMusic;				/// flag true if playing music
-global int CallbackMusic;				/// flag true callback ccl if stops
-global int WaitForSoundDevice;				/// Block until sound device available
+int SoundFildes = -1;				/// audio file descriptor
+int PlayingMusic;				/// flag true if playing music
+int CallbackMusic;				/// flag true callback ccl if stops
+int WaitForSoundDevice;				/// Block until sound device available
 
 #ifdef DEBUG
-global unsigned AllocatedSoundMemory;		/// memory used by sound
+unsigned AllocatedSoundMemory;		/// memory used by sound
 #endif
 
-global int GlobalVolume = 128;				/// global sound volume
-global int MusicVolume = 128;				/// music volume
+int GlobalVolume = 128;				/// global sound volume
+int MusicVolume = 128;				/// music volume
 
-global int DistanceSilent;				/// silent distance
+int DistanceSilent;				/// silent distance
 
 // the sound FIFO
-global SoundRequest SoundRequests[MAX_SOUND_REQUESTS];
-global int NextSoundRequestIn;
-global int NextSoundRequestOut;
+SoundRequest SoundRequests[MAX_SOUND_REQUESTS];
+int NextSoundRequestIn;
+int NextSoundRequestOut;
 
-global int SoundThreadRunning;				/// FIXME: docu
+int SoundThreadRunning;				/// FIXME: docu
 
-local int MusicTerminated;
+static int MusicTerminated;
 
 SDL_mutex * MusicTerminatedMutex;
 
@@ -111,7 +111,7 @@ SDL_mutex * MusicTerminatedMutex;
 **		Check if the playlist need to be advanced,
 **		and invoque music-stopped if necessary
 */
-global void PlayListAdvance(void)
+void PlayListAdvance(void)
 {
 	int proceed;
 
@@ -136,7 +136,7 @@ global void PlayListAdvance(void)
 **  @todo this functions can be called from inside the SDL audio callback,
 **  which is bad, the buffer should be precalculated.
 */
-local void MixMusicToStereo32(int* buffer, int size)
+static void MixMusicToStereo32(int* buffer, int size)
 {
 	int i;
 	int n;
@@ -202,7 +202,7 @@ local void MixMusicToStereo32(int* buffer, int size)
 **
 **  @todo          Can mix faster if signed 8 bit buffers are used.
 */
-local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
+static int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	char stereo, int* buffer, int size)
 {
 	int local_volume;
@@ -264,7 +264,7 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 **
 **  @return           Number of bytes written in 'dest'
 */
-global int ConvertToStereo32(const char* src, char* dest, int frequency,
+int ConvertToStereo32(const char* src, char* dest, int frequency,
 	int chansize, int channels, int bytes)
 {
 	SDL_AudioCVT acvt;
@@ -287,8 +287,8 @@ global int ConvertToStereo32(const char* src, char* dest, int frequency,
 	return acvt.len_mult * bytes;
 }
 
-global SoundChannel Channels[MaxChannels];
-global int NextFreeChannel;
+SoundChannel Channels[MaxChannels];
+int NextFreeChannel;
 
 /*
 ** Selection handling
@@ -311,12 +311,12 @@ SelectionHandling SelectionHandler;
 /**
 **		Distance to Volume Mapping
 */
-local int ViewPointOffset;
+static int ViewPointOffset;
 
 /**
 ** Number of free channels
 */
-local int HowManyFree(void)
+static int HowManyFree(void)
 {
 	int channel;
 	int nb;
@@ -333,7 +333,7 @@ local int HowManyFree(void)
 /**
 ** Check whether to discard or not a sound request
 */
-local int KeepRequest(SoundRequest* sr) {
+static int KeepRequest(SoundRequest* sr) {
 	//FIXME: take fight flag into account
 	int channel;
 	const SoundChannel* theChannel;
@@ -361,7 +361,7 @@ local int KeepRequest(SoundRequest* sr) {
 /*
 ** Register the source of a request in the selection handling hash table.
 */
-local void RegisterSource(SoundRequest* sr, int channel)
+static void RegisterSource(SoundRequest* sr, int channel)
 {
 	// always keep the last registered channel
 	// use channel+1 to avoid inserting null values
@@ -377,7 +377,7 @@ local void RegisterSource(SoundRequest* sr, int channel)
 /*
 ** Remove the source of a channel from the selection handling hash table.
 */
-local void UnRegisterSource(int channel) {
+static void UnRegisterSource(int channel) {
 	int i;
 
 	i = channel;
@@ -392,7 +392,7 @@ local void UnRegisterSource(int channel) {
 **
 **		@return				volume for given distance (0..??)
 */
-local unsigned char VolumeForDistance(unsigned short d, unsigned char range) {
+static unsigned char VolumeForDistance(unsigned short d, unsigned char range) {
 	int d_tmp;
 	int range_tmp;
 
@@ -419,7 +419,7 @@ local unsigned char VolumeForDistance(unsigned short d, unsigned char range) {
 ** Compute the volume associated with a request, either by clipping the Range
 ** parameter of this request, or by mapping this range to a volume.
 */
-local unsigned char ComputeVolume(SoundRequest* sr) {
+static unsigned char ComputeVolume(SoundRequest* sr) {
 	if (sr->IsVolume) {
 		if (sr->Power > MaxVolume) {
 			return MaxVolume;
@@ -435,7 +435,7 @@ local unsigned char ComputeVolume(SoundRequest* sr) {
 /*
 ** "Randomly" choose a sample from a sound group.
 */
-local Sample* SimpleChooseSample(ServerSoundId sound) {
+static Sample* SimpleChooseSample(ServerSoundId sound) {
 	if (sound->Number == ONE_SOUND) {
 		return sound->Sound.OneSound;
 	} else {
@@ -449,7 +449,7 @@ local Sample* SimpleChooseSample(ServerSoundId sound) {
 ** Choose a sample from a SoundRequest. Take into account selection and sound
 ** groups.
 */
-local Sample* ChooseSample(SoundRequest* sr)
+static Sample* ChooseSample(SoundRequest* sr)
 {
 	ServerSoundId theSound;
 	Sample* result;
@@ -505,7 +505,7 @@ local Sample* ChooseSample(SoundRequest* sr)
 /*
 ** Free a channel and unregister its source
 */
-global void FreeOneChannel(int channel)
+void FreeOneChannel(int channel)
 {
 	Channels[channel].Command = ChannelFree;
 	Channels[channel].Point = NextFreeChannel;
@@ -520,7 +520,7 @@ global void FreeOneChannel(int channel)
 ** Put a sound request in the next free channel. While doing this, the
 ** function computes the volume of the source and chooses a sample.
 */
-local int FillOneChannel(SoundRequest* sr)
+static int FillOneChannel(SoundRequest* sr)
 {
 	int next_free;
 	int old_free;
@@ -548,7 +548,7 @@ local int FillOneChannel(SoundRequest* sr)
 ** care of registering sound sources.
 //FIXME: is this the correct place to do this?
 */
-local void FillChannels(int free_channels,int* discarded,int* started)
+static void FillChannels(int free_channels,int* discarded,int* started)
 {
 	int channel;
 	SoundRequest* sr;
@@ -588,7 +588,7 @@ local void FillChannels(int free_channels,int* discarded,int* started)
 **
 **		@return				How many channels become free after mixing them.
 */
-local int MixChannelsToStereo32(int* buffer,int size)
+static int MixChannelsToStereo32(int* buffer,int size)
 {
 	int channel;
 	int i;
@@ -624,7 +624,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
 **		@param size		number of samples in input.
 **		@param output		clipped 8 unsigned bit output buffer.
 */
-local void ClipMixToStereo8(const int* mix, int size, unsigned char* output)
+static void ClipMixToStereo8(const int* mix, int size, unsigned char* output)
 {
 	int s;
 
@@ -649,7 +649,7 @@ local void ClipMixToStereo8(const int* mix, int size, unsigned char* output)
 **		@param size		number of samples in input.
 **		@param output		clipped 16 signed bit output buffer.
 */
-local void ClipMixToStereo16(const int* mix, int size, short* output)
+static void ClipMixToStereo16(const int* mix, int size, short* output)
 {
 	int s;
 	const int* end;
@@ -681,7 +681,7 @@ local void ClipMixToStereo16(const int* mix, int size, short* output)
 **
 **		@todo 				Add streaming, cashing support.
 */
-local Sample* LoadSample(const char* name)
+static Sample* LoadSample(const char* name)
 {
 	Sample* sample;
 	char* buf;
@@ -742,7 +742,7 @@ local Sample* LoadSample(const char* name)
 **		@todo		FIXME: Must handle the errors better.
 **				FIXME: Support for more sample files (ogg/flac/mp3).
 */
-global SoundId RegisterSound(const char* files[], unsigned number)
+SoundId RegisterSound(const char* files[], unsigned number)
 {
 	unsigned i;
 	ServerSoundId id;
@@ -779,7 +779,7 @@ global SoundId RegisterSound(const char* files[], unsigned number)
 **
 **		@return				the special sound unique identifier
 */
-global SoundId RegisterTwoGroups(SoundId first, SoundId second)
+SoundId RegisterTwoGroups(SoundId first, SoundId second)
 {
 	ServerSoundId id;
 
@@ -802,7 +802,7 @@ global SoundId RegisterTwoGroups(SoundId first, SoundId second)
 **		@param sound		the id of the sound to modify.
 **		@param range		the new range for this sound.
 */
-global void SetSoundRange(SoundId sound, unsigned char range)
+void SetSoundRange(SoundId sound, unsigned char range)
 {
 	if (sound != NO_SOUND) {
 		((ServerSoundId) sound)->Range = range;
@@ -816,7 +816,7 @@ global void SetSoundRange(SoundId sound, unsigned char range)
 **						enough.
 **		@param samples		Number of samples.
 */
-global void MixIntoBuffer(void* buffer, int samples)
+void MixIntoBuffer(void* buffer, int samples)
 {
 	int* mixer_buffer;
 	int free_channels;
@@ -853,7 +853,7 @@ global void MixIntoBuffer(void* buffer, int samples)
 **		@param stream		pointer to buffer you want to fill with information.
 **		@param len		is length of audio buffer in bytes.
 */
-global void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int len)
+void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int len)
 {
 #if SoundSampleSize == 16
 	len >>= 1;
@@ -864,7 +864,7 @@ global void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int le
 /**
 **		Initialize sound card.
 */
-global int InitSound(void)
+int InitSound(void)
 {
 	int dummy;
 
@@ -896,7 +896,7 @@ global int InitSound(void)
 /**
 **		Initialize sound server structures (and thread)
 */
-global int InitSoundServer(void)
+int InitSoundServer(void)
 {
 	int MapWidth;
 	int MapHeight;
@@ -913,7 +913,7 @@ global int InitSoundServer(void)
 /**
 **		Cleanup sound server.
 */
-global void QuitSound(void)
+void QuitSound(void)
 {
 	SDL_CloseAudio();
 	SoundFildes = -1;

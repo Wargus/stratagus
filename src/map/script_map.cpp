@@ -55,7 +55,7 @@
 **
 **  @param l  Lua state.
 */
-local int CclStratagusMap(lua_State* l)
+static int CclStratagusMap(lua_State* l)
 {
 	const char* value;
 	int args;
@@ -257,7 +257,7 @@ local int CclStratagusMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclRevealMap(lua_State* l)
+static int CclRevealMap(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -276,7 +276,7 @@ local int CclRevealMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclCenterMap(lua_State* l)
+static int CclCenterMap(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
 		LuaError(l, "incorrect argument");
@@ -292,7 +292,7 @@ local int CclCenterMap(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclShowMapLocation(lua_State* l)
+static int CclShowMapLocation(lua_State* l)
 {
 	Unit* target;
 	const char* unitname;
@@ -322,7 +322,7 @@ local int CclShowMapLocation(lua_State* l)
 **
 **  @return   The old default map.
 */
-local int CclSetDefaultMap(lua_State* l)
+static int CclSetDefaultMap(lua_State* l)
 {
 	char* old;
 
@@ -344,7 +344,7 @@ local int CclSetDefaultMap(lua_State* l)
 **
 **  @return      The old state of fog of war.
 */
-local int CclSetFogOfWar(lua_State* l)
+static int CclSetFogOfWar(lua_State* l)
 {
 	int old;
 
@@ -368,7 +368,7 @@ local int CclSetFogOfWar(lua_State* l)
 **
 **  @return   The old state of the minimap with terrain.
 */
-local int CclSetMinimapTerrain(lua_State* l)
+static int CclSetMinimapTerrain(lua_State* l)
 {
 	int old;
 
@@ -387,7 +387,7 @@ local int CclSetMinimapTerrain(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetFogOfWarOpacity(lua_State* l)
+static int CclSetFogOfWarOpacity(lua_State* l)
 {
 	int i;
 	int old;
@@ -419,7 +419,7 @@ local int CclSetFogOfWarOpacity(lua_State* l)
 **
 **  @return   Old speed
 */
-local int CclSetForestRegeneration(lua_State* l)
+static int CclSetForestRegeneration(lua_State* l)
 {
 	int i;
 	int old;
@@ -447,7 +447,7 @@ local int CclSetForestRegeneration(lua_State* l)
 /**
 **  Register CCL features for map.
 */
-global void MapCclRegister(void)
+void MapCclRegister(void)
 {
 	lua_register(Lua, "StratagusMap", CclStratagusMap);
 	lua_register(Lua, "RevealMap", CclRevealMap);

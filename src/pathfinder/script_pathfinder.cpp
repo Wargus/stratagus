@@ -59,7 +59,7 @@
 **
 **  @param l  Lua state.
 */
-local int CclAStar(lua_State* l)
+static int CclAStar(lua_State* l)
 {
 	const char* value;
 	int i;
@@ -109,9 +109,9 @@ local int CclAStar(lua_State* l)
 }
 
 #ifdef MAP_REGIONS
-global void MapSplitterDebug(void);
+void MapSplitterDebug(void);
 
-local int CclDebugRegions(lua_State* l)
+static int CclDebugRegions(lua_State* l)
 {
 	MapSplitterDebug();
 	return 0;
@@ -121,7 +121,7 @@ local int CclDebugRegions(lua_State* l)
 /**
 **  Register CCL features for pathfinder.
 */
-global void PathfinderCclRegister(void)
+void PathfinderCclRegister(void)
 {
 	lua_register(Lua, "AStar", CclAStar);
 #ifdef MAP_REGIONS

@@ -51,7 +51,7 @@
 **
 **  @param unit  Unit pointer to place in cache.
 */
-global void UnitCacheInsert(Unit* unit)
+void UnitCacheInsert(Unit* unit)
 {
 	int i;
 	int j;
@@ -81,7 +81,7 @@ global void UnitCacheInsert(Unit* unit)
 **
 **  @param unit  Unit pointer to remove from cache.
 */
-global void UnitCacheRemove(Unit* unit)
+void UnitCacheRemove(Unit* unit)
 {
 	int i;
 	int j;
@@ -119,7 +119,7 @@ global void UnitCacheRemove(Unit* unit)
 **
 **  @param unit  Unit pointer to change in cache.
 */
-global void UnitCacheChange(Unit* unit)
+void UnitCacheChange(Unit* unit)
 {
 	UnitCacheRemove(unit);
 	UnitCacheInsert(unit);
@@ -136,7 +136,7 @@ global void UnitCacheChange(Unit* unit)
 **
 **  @return       Returns the number of units found
 */
-global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
+int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 {
 	int i;
 	int j;
@@ -201,7 +201,7 @@ global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 **
 **  @return       Returns the number of units found
 */
-global int UnitCacheOnTile(int x, int y, Unit** table)
+int UnitCacheOnTile(int x, int y, Unit** table)
 {
 	UnitListItem* listitem;
 	int n;
@@ -224,6 +224,6 @@ global int UnitCacheOnTile(int x, int y, Unit** table)
 /**
 **  Initialize unit-cache.
 */
-global void InitUnitCache(void)
+void InitUnitCache(void)
 {
 }

@@ -53,29 +53,29 @@
 **		The numbers are used in puds.
 **		0=summer, 1=winter, 2=wasteland, 3=swamp.
 */
-global char** TilesetWcNames;
+char** TilesetWcNames;
 
 /**
 **		Number of available Tilesets.
 */
-global int NumTilesets;
+int NumTilesets;
 
 /**
 **		Tileset information.
 **
 **		@see TilesetMax, @see NumTilesets
 */
-global Tileset** Tilesets;
+Tileset** Tilesets;
 
 /**
 **		Size of a tile in X
 */
-global int TileSizeX = 32;
+int TileSizeX = 32;
 
 /**
 **		Size of a tile in Y
 */
-global int TileSizeY = 32;
+int TileSizeY = 32;
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -86,7 +86,7 @@ global int TileSizeY = 32;
 **
 **		@see TheMap @see Tilesets.
 */
-global void LoadTileset(void)
+void LoadTileset(void)
 {
 	int i;
 	int n;
@@ -495,7 +495,7 @@ global void LoadTileset(void)
 **
 **		@note		this didn't frees the configuration memory.
 */
-global void CleanTilesets(void)
+void CleanTilesets(void)
 {
 	int i;
 	int j;

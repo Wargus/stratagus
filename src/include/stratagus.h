@@ -159,18 +159,6 @@ typedef struct _missile_type_ MissileType;
 #endif  // } !REFS_DEBUG
 
 /*============================================================================
-==  Storage types
-============================================================================*/
-
-#define global                          ///< Defines global visible names
-
-#ifdef DEBUG
-#define local                           ///< Defines local visible names
-#else
-#define local static
-#endif
-
-/*============================================================================
 ==  Definitions
 ============================================================================*/
 

@@ -57,7 +57,7 @@
 **  @return      >0 remaining path length, 0 wait for path, -1
 **               reached goal, -2 can't reach the goal.
 */
-local int MoveToTransporter(Unit* unit)
+static int MoveToTransporter(Unit* unit)
 {
 	int i;
 	int x;
@@ -83,7 +83,7 @@ local int MoveToTransporter(Unit* unit)
 **
 **  @return      True if ship arrived/present, False otherwise.
 */
-local int WaitForTransporter(Unit* unit)
+static int WaitForTransporter(Unit* unit)
 {
 	Unit* trans;
 
@@ -131,7 +131,7 @@ local int WaitForTransporter(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-local void EnterTransporter(Unit* unit)
+static void EnterTransporter(Unit* unit)
 {
 	Unit* transporter;
 
@@ -180,7 +180,7 @@ local void EnterTransporter(Unit* unit)
 **
 **  @param unit  Pointer to unit.
 */
-global void HandleActionBoard(Unit* unit)
+void HandleActionBoard(Unit* unit)
 {
 	int i;
 	Unit* goal;

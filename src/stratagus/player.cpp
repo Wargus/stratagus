@@ -56,20 +56,20 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global int NumPlayers;                  /// How many player slots used
-global Player Players[PlayerMax];       /// All players in play
-global Player* ThisPlayer;              /// Player on this computer
-global PlayerRace PlayerRaces;          /// Player races
+int NumPlayers;                  /// How many player slots used
+Player Players[PlayerMax];       /// All players in play
+Player* ThisPlayer;              /// Player on this computer
+PlayerRace PlayerRaces;          /// Player races
 
-global int NoRescueCheck;               /// Disable rescue check
+int NoRescueCheck;               /// Disable rescue check
 
 /**
 **  Colors used for minimap.  FIXME: make this configurable
 */
-local SDL_Color PlayerColorsRGB[PlayerMax][4];
-global Uint32 PlayerColors[PlayerMax][4];
+static SDL_Color PlayerColorsRGB[PlayerMax][4];
+Uint32 PlayerColors[PlayerMax][4];
 
-global char* PlayerColorNames[PlayerMax] = {
+char* PlayerColorNames[PlayerMax] = {
 	"red",
 	"blue",
 	"green",
@@ -99,7 +99,7 @@ global char* PlayerColorNames[PlayerMax] = {
 **
 **  @return      Index to race in PlayerRaces
 */
-global int PlayerRacesIndex(int race)
+int PlayerRacesIndex(int race)
 {
 	int i;
 
@@ -116,7 +116,7 @@ global int PlayerRacesIndex(int race)
 /**
 **  Init players.
 */
-global void InitPlayers(void)
+void InitPlayers(void)
 {
 	int p;
 	int x;
@@ -166,7 +166,7 @@ global void InitPlayers(void)
 /**
 **  Clean up players.
 */
-global void CleanPlayers(void)
+void CleanPlayers(void)
 {
 	int p;
 
@@ -201,7 +201,7 @@ global void CleanPlayers(void)
 **
 **  @note FIXME: Not completely saved.
 */
-global void SavePlayers(CLFile* file)
+void SavePlayers(CLFile* file)
 {
 	int i;
 	int j;
@@ -359,7 +359,7 @@ global void SavePlayers(CLFile* file)
 **
 **  @param type  Player type (Computer,Human,...).
 */
-global void CreatePlayer(int type)
+void CreatePlayer(int type)
 {
 	int team;
 	int i;
@@ -532,7 +532,7 @@ global void CreatePlayer(int type)
 **  @param player  Pointer to player.
 **  @param side    New side (Race).
 */
-global void PlayerSetSide(Player* player, int side)
+void PlayerSetSide(Player* player, int side)
 {
 	Assert(side >= 0 && side < PlayerRaces.Count);
 	Assert(PlayerRaces.Name[side]);
@@ -547,7 +547,7 @@ global void PlayerSetSide(Player* player, int side)
 **  @param player  Pointer to player.
 **  @param name    New name.
 */
-global void PlayerSetName(Player* player, const char* name)
+void PlayerSetName(Player* player, const char* name)
 {
 	if (player->Name) {
 		free(player->Name);
@@ -561,7 +561,7 @@ global void PlayerSetName(Player* player, const char* name)
 **  @param player  Pointer to player.
 **  @param ai      AI type.
 */
-global void PlayerSetAiNum(Player* player, int ai)
+void PlayerSetAiNum(Player* player, int ai)
 {
 	player->AiNum = ai;
 }
@@ -577,7 +577,7 @@ global void PlayerSetAiNum(Player* player, int ai)
 **  @param resource  Resource to change.
 **  @param value     How many of this resource.
 */
-global void PlayerSetResource(Player* player, int resource, int value)
+void PlayerSetResource(Player* player, int resource, int value)
 {
 	player->Resources[resource] = value;
 }
@@ -592,7 +592,7 @@ global void PlayerSetResource(Player* player, int resource, int value)
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-global int PlayerCheckLimits(const Player* player, const UnitType* type)
+int PlayerCheckLimits(const Player* player, const UnitType* type)
 {
 	//
 	//  Check game limits.
@@ -639,7 +639,7 @@ global int PlayerCheckLimits(const Player* player, const UnitType* type)
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-global int PlayerCheckCosts(const Player* player, const int* costs)
+int PlayerCheckCosts(const Player* player, const int* costs)
 {
 	int i;
 	int err;
@@ -665,7 +665,7 @@ global int PlayerCheckCosts(const Player* player, const int* costs)
 **
 **  @return        False if all enought, otherwise a bit mask.
 */
-global int PlayerCheckUnitType(const Player* player, const UnitType* type)
+int PlayerCheckUnitType(const Player* player, const UnitType* type)
 {
 	return PlayerCheckCosts(player, type->Stats[player->Player].Costs);
 }
@@ -676,7 +676,7 @@ global int PlayerCheckUnitType(const Player* player, const UnitType* type)
 **  @param player  Pointer to player.
 **  @param costs   How many costs.
 */
-global void PlayerAddCosts(Player* player, const int* costs)
+void PlayerAddCosts(Player* player, const int* costs)
 {
 	int i;
 
@@ -691,7 +691,7 @@ global void PlayerAddCosts(Player* player, const int* costs)
 **  @param player  Pointer of player, to which the resources are added.
 **  @param type    Type of unit.
 */
-global void PlayerAddUnitType(Player* player, const UnitType* type)
+void PlayerAddUnitType(Player* player, const UnitType* type)
 {
 	// FIXME: a player could make money by upgrading and than cancel
 	PlayerAddCosts(player, type->Stats[player->Player].Costs);
@@ -704,7 +704,7 @@ global void PlayerAddUnitType(Player* player, const UnitType* type)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-global void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
+void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 {
 	int i;
 
@@ -719,7 +719,7 @@ global void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 **  @param player  Pointer to player.
 **  @param costs   How many costs.
 */
-global void PlayerSubCosts(Player* player, const int* costs)
+void PlayerSubCosts(Player* player, const int* costs)
 {
 	int i;
 
@@ -734,7 +734,7 @@ global void PlayerSubCosts(Player* player, const int* costs)
 **  @param player  Pointer of player, from which the resources are removed.
 **  @param type    Type of unit.
 */
-global void PlayerSubUnitType(Player* player, const UnitType* type)
+void PlayerSubUnitType(Player* player, const UnitType* type)
 {
 	PlayerSubCosts(player, type->Stats[player->Player].Costs);
 }
@@ -746,7 +746,7 @@ global void PlayerSubUnitType(Player* player, const UnitType* type)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-global void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
+void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 {
 	int i;
 
@@ -763,7 +763,7 @@ global void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 **
 **  @return        How many exists, false otherwise.
 */
-global int HaveUnitTypeByType(const Player* player, const UnitType* type)
+int HaveUnitTypeByType(const Player* player, const UnitType* type)
 {
 	return player->UnitTypesCount[type->Slot];
 }
@@ -778,7 +778,7 @@ global int HaveUnitTypeByType(const Player* player, const UnitType* type)
 **
 **  @note This function should not be used during run time.
 */
-global int HaveUnitTypeByIdent(const Player* player, const char* ident)
+int HaveUnitTypeByIdent(const Player* player, const char* ident)
 {
 	return player->UnitTypesCount[UnitTypeByIdent(ident)->Slot];
 }
@@ -786,7 +786,7 @@ global int HaveUnitTypeByIdent(const Player* player, const char* ident)
 /**
 **  Initialize the Ai for all players.
 */
-global void PlayersInitAi(void)
+void PlayersInitAi(void)
 {
 	int player;
 
@@ -800,7 +800,7 @@ global void PlayersInitAi(void)
 /**
 **  Handle AI of all players each game cycle.
 */
-global void PlayersEachCycle(void)
+void PlayersEachCycle(void)
 {
 	int player;
 
@@ -816,7 +816,7 @@ global void PlayersEachCycle(void)
 **
 **  @param player  the player to update AI
 */
-global void PlayersEachSecond(int player)
+void PlayersEachSecond(int player)
 {
 	int res;
 
@@ -843,7 +843,7 @@ global void PlayersEachSecond(int player)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
+void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 {
 	SDL_LockSurface(sprite->Surface);
 	SDL_SetColors(sprite->Surface, ((Player*)player)->UnitColors.Colors, 208, 4);
@@ -861,7 +861,7 @@ global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 **    FIXME: need better colors for the player 8-16.
 **    FIXME: could be called before PixelsXX is setup.
 */
-global void SetPlayersPalette(void)
+void SetPlayersPalette(void)
 {
 	int i;
 	int o;
@@ -878,7 +878,7 @@ global void SetPlayersPalette(void)
 /**
 **  Output debug informations for players.
 */
-global void DebugPlayers(void)
+void DebugPlayers(void)
 {
 #ifdef DEBUG
 	int i;
@@ -937,7 +937,7 @@ global void DebugPlayers(void)
 **  @note The parameter type, isn't yet used.
 **  @todo FIXME: We must also notfiy allied players.
 */
-global void NotifyPlayer(const Player* player,
+void NotifyPlayer(const Player* player,
 	int type __attribute__((unused)), int x, int y, const char* fmt, ...)
 {
 	char temp[128];

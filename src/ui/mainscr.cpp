@@ -65,7 +65,7 @@
 /**
 **  Draw menu button area.
 */
-global void DrawMenuButtonArea(void)
+void DrawMenuButtonArea(void)
 {
 	if (TheUI.MenuPanel.Graphic) {
 		VideoDrawSub(TheUI.MenuPanel.Graphic, 0, 0,
@@ -120,7 +120,7 @@ global void DrawMenuButtonArea(void)
 **  @param x     Screen X postion of icon
 **  @param y     Screen Y postion of icon
 */
-local void UiDrawLifeBar(const Unit* unit, int x, int y)
+static void UiDrawLifeBar(const Unit* unit, int x, int y)
 {
 	int f;
 	Uint32 color;
@@ -152,7 +152,7 @@ local void UiDrawLifeBar(const Unit* unit, int x, int y)
 **  @param x     Screen X postion of icon
 **  @param y     Screen Y postion of icon
 */
-local void UiDrawManaBar(const Unit* unit, int x, int y)
+static void UiDrawManaBar(const Unit* unit, int x, int y)
 {
 	int f;
 
@@ -174,7 +174,7 @@ local void UiDrawManaBar(const Unit* unit, int x, int y)
 **  @param full   the 100% value
 **  @param ready  how much till now completed
 */
-local void UiDrawCompletedBar(int full, int ready)
+static void UiDrawCompletedBar(int full, int ready)
 {
 	int f;
 
@@ -210,7 +210,7 @@ local void UiDrawCompletedBar(int full, int ready)
 **  @param modified  The modified stat value
 **  @param original  The original stat value
 */
-local void DrawStats(int x, int y, int modified, int original)
+static void DrawStats(int x, int y, int modified, int original)
 {
 	char buf[64];
 
@@ -227,7 +227,7 @@ local void DrawStats(int x, int y, int modified, int original)
 **
 **  @param unit  Pointer to unit.
 */
-local void DrawUnitInfo(const Unit* unit)
+static void DrawUnitInfo(const Unit* unit)
 {
 	char buf[64];
 	const UnitType* type;
@@ -635,7 +635,7 @@ local void DrawUnitInfo(const Unit* unit)
 /**
 **  Draw the player resource in top line.
 */
-global void DrawResources(void)
+void DrawResources(void)
 {
 	char tmp[128];
 	int i;
@@ -696,27 +696,27 @@ global void DrawResources(void)
 
 #define MESSAGES_TIMEOUT (FRAMES_PER_SECOND * 5)/// Message timeout 5 seconds
 
-local unsigned long MessagesFrameTimeout;       /// Frame to expire message
+static unsigned long MessagesFrameTimeout;       /// Frame to expire message
 
 
 #define MESSAGES_MAX  10                        /// How many can be displayed
 
-local char Messages[MESSAGES_MAX][128];         /// Array of messages
-local int  MessagesCount;                       /// Number of messages
-local int  MessagesSameCount;                   /// Counts same message repeats
-local int  MessagesScrollY;                     /// Used for smooth scrolling
+static char Messages[MESSAGES_MAX][128];         /// Array of messages
+static int  MessagesCount;                       /// Number of messages
+static int  MessagesSameCount;                   /// Counts same message repeats
+static int  MessagesScrollY;                     /// Used for smooth scrolling
 
-local char MessagesEvent[MESSAGES_MAX][64];     /// Array of event messages
-local int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
-local int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
-local int  MessagesEventCount;                  /// Number of event messages
-local int  MessagesEventIndex;                  /// FIXME: docu
+static char MessagesEvent[MESSAGES_MAX][64];     /// Array of event messages
+static int  MessagesEventX[MESSAGES_MAX];        /// X coordinate of event
+static int  MessagesEventY[MESSAGES_MAX];        /// Y coordinate of event
+static int  MessagesEventCount;                  /// Number of event messages
+static int  MessagesEventIndex;                  /// FIXME: docu
 
 
 /**
 **  Shift messages array by one.
 */
-local void ShiftMessages(void)
+static void ShiftMessages(void)
 {
 	int z;
 
@@ -731,7 +731,7 @@ local void ShiftMessages(void)
 /**
 **  Shift messages events array by one.
 */
-local void ShiftMessagesEvent(void)
+static void ShiftMessagesEvent(void)
 {
 	int z;
 
@@ -750,7 +750,7 @@ local void ShiftMessagesEvent(void)
 **
 **  @todo FIXME: make scroll speed configurable.
 */
-global void UpdateMessages(void)
+void UpdateMessages(void)
 {
 	if (!MessagesCount) {
 		return;
@@ -772,7 +772,7 @@ global void UpdateMessages(void)
 **
 **  @todo FIXME: make message font configurable.
 */
-global void DrawMessages(void)
+void DrawMessages(void)
 {
 	int z;
 
@@ -800,7 +800,7 @@ global void DrawMessages(void)
 **
 **  @param msg  Message to add.
 */
-local void AddMessage(const char* msg)
+static void AddMessage(const char* msg)
 {
 	char* ptr;
 	char* message;
@@ -877,7 +877,7 @@ local void AddMessage(const char* msg)
 **
 **  @return     non-zero to skip this message
 */
-local int CheckRepeatMessage(const char* msg)
+static int CheckRepeatMessage(const char* msg)
 {
 	if (MessagesCount < 1) {
 		return 0;
@@ -904,7 +904,7 @@ local int CheckRepeatMessage(const char* msg)
 **
 **  @param fmt  To be displayed in text overlay.
 */
-global void SetMessage(const char* fmt, ...)
+void SetMessage(const char* fmt, ...)
 {
 	char temp[512];
 	va_list va;
@@ -928,7 +928,7 @@ global void SetMessage(const char* fmt, ...)
 **  @note FIXME: vladi: I know this can be just separated func w/o msg but
 **               it is handy to stick all in one call, someone?
 */
-global void SetMessageEvent(int x, int y, const char* fmt, ...)
+void SetMessageEvent(int x, int y, const char* fmt, ...)
 {
 	char temp[128];
 	va_list va;
@@ -954,7 +954,7 @@ global void SetMessageEvent(int x, int y, const char* fmt, ...)
 /**
 **  Goto message origin.
 */
-global void CenterOnMessage(void)
+void CenterOnMessage(void)
 {
 	if (MessagesEventIndex >= MessagesEventCount) {
 		MessagesEventIndex = 0;
@@ -972,7 +972,7 @@ global void CenterOnMessage(void)
 /**
 **  Cleanup messages.
 */
-global void CleanMessages(void)
+void CleanMessages(void)
 {
 	MessagesCount = 0;
 	MessagesSameCount = 0;
@@ -985,12 +985,12 @@ global void CleanMessages(void)
 --  STATUS LINE
 ----------------------------------------------------------------------------*/
 
-local char StatusLine[256];                                /// status line/hints
+static char StatusLine[256];                                /// status line/hints
 
 /**
 **  Draw status line.
 */
-global void DrawStatusLine(void)
+void DrawStatusLine(void)
 {
 	if (TheUI.StatusLine.Graphic) {
 		VideoDrawSubClip(TheUI.StatusLine.Graphic, 0, 0,
@@ -1018,7 +1018,7 @@ global void DrawStatusLine(void)
 **
 **  @param status  New status line information.
 */
-global void SetStatusLine(char* status)
+void SetStatusLine(char* status)
 {
 	if (KeyState != KeyStateInput && strcmp(StatusLine, status)) {
 		strncpy(StatusLine, status, sizeof(StatusLine) - 1);
@@ -1029,7 +1029,7 @@ global void SetStatusLine(char* status)
 /**
 **  Clear status line.
 */
-global void ClearStatusLine(void)
+void ClearStatusLine(void)
 {
 	if (KeyState != KeyStateInput) {
 		SetStatusLine("");
@@ -1040,14 +1040,14 @@ global void ClearStatusLine(void)
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-local int CostsFood;                        /// mana cost to display in status line
-local int CostsMana;						/// mana cost to display in status line
-local int Costs[MaxCosts];                  /// costs to display in status line
+static int CostsFood;                        /// mana cost to display in status line
+static int CostsMana;						/// mana cost to display in status line
+static int Costs[MaxCosts];                  /// costs to display in status line
 
 /**
 **  Draw costs in status line.
 */
-global void DrawCosts(void)
+void DrawCosts(void)
 {
 	int i;
 	int x;
@@ -1095,7 +1095,7 @@ global void DrawCosts(void)
 **  @param food   Food costs.
 **  @param costs  Resource costs, NULL pointer if all are zero.
 */
-global void SetCosts(int mana, int food, const int* costs)
+void SetCosts(int mana, int food, const int* costs)
 {
 	int i;
 
@@ -1125,7 +1125,7 @@ global void SetCosts(int mana, int food, const int* costs)
 /**
 **  Clear costs in status line.
 */
-global void ClearCosts(void)
+void ClearCosts(void)
 {
 	SetCosts(0, 0, NULL);
 }
@@ -1139,7 +1139,7 @@ global void ClearCosts(void)
 **
 **  @param frame  frame nr. of the info panel background.
 */
-local void DrawInfoPanelBackground(unsigned frame)
+static void DrawInfoPanelBackground(unsigned frame)
 {
 	if (TheUI.InfoPanel.Graphic) {
 		VideoDrawSubClip(TheUI.InfoPanel.Graphic, 0,
@@ -1158,7 +1158,7 @@ local void DrawInfoPanelBackground(unsigned frame)
 **    magic unit   - magic units
 **    construction - under construction
 */
-global void DrawInfoPanel(void)
+void DrawInfoPanel(void)
 {
 	int i;
 
@@ -1277,7 +1277,7 @@ global void DrawInfoPanel(void)
 /**
 **  Draw the timer
 */
-global void DrawTimer(void)
+void DrawTimer(void)
 {
 	char buf[30];
 	int hour;
@@ -1306,7 +1306,7 @@ global void DrawTimer(void)
 /**
 **  Update the timer
 */
-global void UpdateTimer(void)
+void UpdateTimer(void)
 {
 	if (GameTimer.Running) {
 		if (GameTimer.Increasing) {

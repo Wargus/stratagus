@@ -45,7 +45,7 @@
 #include "ai_local.h"
 #include "actions.h"
 
-local int AiMakeUnit(UnitType* type);
+static int AiMakeUnit(UnitType* type);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -64,7 +64,7 @@ local int AiMakeUnit(UnitType* type);
 **
 **  @return       A bit field of the missing costs.
 */
-local int AiCheckCosts(const int* costs)
+static int AiCheckCosts(const int* costs)
 {
 	int i;
 	int j;
@@ -124,7 +124,7 @@ local int AiCheckCosts(const int* costs)
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-local int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
+static int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 {
 	int remaining;
 	const AiBuildQueue* queue;
@@ -168,7 +168,7 @@ local int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 **
 **  @return      A bit field of the missing costs.
 */
-local int AiCheckUnitTypeCosts(const UnitType* type)
+static int AiCheckUnitTypeCosts(const UnitType* type)
 {
 	return AiCheckCosts(type->Stats[AiPlayer->Player->Player].Costs);
 }
@@ -181,7 +181,7 @@ local int AiCheckUnitTypeCosts(const UnitType* type)
 **
 **  @return      Number of enemy units.
 */
-global int EnemyUnitsInDistance(const Unit* unit, unsigned range)
+int EnemyUnitsInDistance(const Unit* unit, unsigned range)
 {
 	const Unit* dest;
 	const UnitType* type;
@@ -240,7 +240,7 @@ global int EnemyUnitsInDistance(const Unit* unit, unsigned range)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-local int AiBuildBuilding(const UnitType* type, UnitType* building)
+static int AiBuildBuilding(const UnitType* type, UnitType* building)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -292,7 +292,7 @@ local int AiBuildBuilding(const UnitType* type, UnitType* building)
 /**
 **  Build new units to reduce the food shortage.
 */
-local void AiRequestSupply(void)
+static void AiRequestSupply(void)
 {
 	int i;
 	int n;
@@ -350,7 +350,7 @@ local void AiRequestSupply(void)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-local int AiTrainUnit(const UnitType* type, UnitType* what)
+static int AiTrainUnit(const UnitType* type, UnitType* what)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -389,7 +389,7 @@ local int AiTrainUnit(const UnitType* type, UnitType* what)
 **
 **  @param type  The unittype we wan't to build
 */
-global int AiCountUnitBuilders(UnitType* type)
+int AiCountUnitBuilders(UnitType* type)
 {
 	int result;
 	int i;
@@ -443,7 +443,7 @@ global int AiCountUnitBuilders(UnitType* type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-local int AiMakeUnit(UnitType* type)
+static int AiMakeUnit(UnitType* type)
 {
 	int i;
 	int n;
@@ -515,7 +515,7 @@ local int AiMakeUnit(UnitType* type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-local int AiResearchUpgrade(const UnitType* type, Upgrade* what)
+static int AiResearchUpgrade(const UnitType* type, Upgrade* what)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -552,7 +552,7 @@ local int AiResearchUpgrade(const UnitType* type, Upgrade* what)
 **
 **  @param upgrade  Upgrade to research
 */
-global void AiAddResearchRequest(Upgrade* upgrade)
+void AiAddResearchRequest(Upgrade* upgrade)
 {
 	int i;
 	int n;
@@ -609,7 +609,7 @@ global void AiAddResearchRequest(Upgrade* upgrade)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-local int AiUpgradeTo(const UnitType* type, UnitType* what)
+static int AiUpgradeTo(const UnitType* type, UnitType* what)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -646,7 +646,7 @@ local int AiUpgradeTo(const UnitType* type, UnitType* what)
 **
 **  @param type  FIXME: docu
 */
-global void AiAddUpgradeToRequest(UnitType* type)
+void AiAddUpgradeToRequest(UnitType* type)
 {
 	int i;
 	int n;
@@ -696,7 +696,7 @@ global void AiAddUpgradeToRequest(UnitType* type)
 /**
 **  Check what must be builded / trained.
 */
-local void AiCheckingWork(void)
+static void AiCheckingWork(void)
 {
 	int c;
 	UnitType *type;
@@ -763,7 +763,7 @@ local void AiCheckingWork(void)
 **
 **  @return          1 if the worker was assigned, 0 otherwise.
 */
-local int AiAssignHarvester(Unit* unit, int resource)
+static int AiAssignHarvester(Unit* unit, int resource)
 {
 	ResourceInfo* resinfo;
 	// These will hold the coordinates of the forest.
@@ -832,7 +832,7 @@ local int AiAssignHarvester(Unit* unit, int resource)
 **  If we have a shortage of a resource, let many workers collecting this.
 **  If no shortage, split workers to all resources.
 */
-local void AiCollectResources(void)
+static void AiCollectResources(void)
 {
 	Unit* units_with_resource[UnitMax][MaxCosts]; // Worker with resource
 	Unit* units_assigned[UnitMax][MaxCosts]; // Worker assigned to resource
@@ -1070,7 +1070,7 @@ local void AiCollectResources(void)
 **
 **  @return          True if can repair, false if can't repair..
 */
-local int AiRepairBuilding(const UnitType* type, Unit* building)
+static int AiRepairBuilding(const UnitType* type, Unit* building)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -1170,7 +1170,7 @@ local int AiRepairBuilding(const UnitType* type, Unit* building)
 **
 **  @return      True if made, false if can't be made.
 */
-local int AiRepairUnit(Unit* unit)
+static int AiRepairUnit(Unit* unit)
 {
 	int i;
 	int n;
@@ -1211,7 +1211,7 @@ local int AiRepairUnit(Unit* unit)
 /**
 **  Look through the units, if an unit must be repaired.
 */
-local void AiCheckRepair(void)
+static void AiCheckRepair(void)
 {
 	int i;
 	int j;
@@ -1280,7 +1280,7 @@ local void AiCheckRepair(void)
 **
 **  @todo         FIXME: should store the end of list and not search it.
 */
-global void AiAddUnitTypeRequest(UnitType* type, int count)
+void AiAddUnitTypeRequest(UnitType* type, int count)
 {
 	AiBuildQueue** queue;
 
@@ -1304,7 +1304,7 @@ global void AiAddUnitTypeRequest(UnitType* type, int count)
 **  @param y     Y pos of the zone
 **  @param mask  Mask to explore ( land/sea/air )
 */
-global void AiExplore(int x, int y, int mask)
+void AiExplore(int x, int y, int mask)
 {
 	AiExplorationRequest* req;
 
@@ -1323,7 +1323,7 @@ global void AiExplore(int x, int y, int mask)
 /**
 **  Entry point of resource manager, periodically called.
 */
-global void AiResourceManager(void)
+void AiResourceManager(void)
 {
 	//
 	// Check if something needs to be build / trained.

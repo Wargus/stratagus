@@ -74,7 +74,7 @@
 **
 **  Call each module to clean up.
 */
-global void CleanModules(void)
+void CleanModules(void)
 {
 	EndReplayLog();
 	CleanMessages();
@@ -118,7 +118,7 @@ global void CleanModules(void)
 **
 **  Call each module to initialize.
 */
-global void InitModules(void)
+void InitModules(void)
 {
 	GameCycle = 0;
 	FastForwardCycle = 0;
@@ -162,7 +162,7 @@ global void InitModules(void)
 **
 **  Call each module to load additional files (graphics,sounds).
 */
-global void LoadModules(void)
+void LoadModules(void)
 {
 	LoadFonts();
 	LoadIcons();
@@ -207,7 +207,7 @@ global void LoadModules(void)
 **
 **  @note  Later we want to store in a more compact binary format.
 */
-global void LoadGame(char* filename)
+void LoadGame(char* filename)
 {
 	unsigned long game_cycle;
 	unsigned syncrand;
@@ -250,7 +250,7 @@ global void LoadGame(char* filename)
 **
 **  Test function for the later load/save functions.
 */
-global void LoadAll(void)
+void LoadAll(void)
 {
 #if 1
 	SaveGame("save_file_stratagus0.sav");

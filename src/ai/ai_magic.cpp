@@ -53,7 +53,7 @@
 **  Check what computer units can do with magic.
 **  In fact, turn on autocast for AI.
 */
-global void AiCheckMagic(void)
+void AiCheckMagic(void)
 {
 	int i;
 	int j;

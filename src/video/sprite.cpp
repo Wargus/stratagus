@@ -59,7 +59,7 @@
 **  @param y       y coordinate on the screen
 */
 #ifndef USE_OPENGL
-global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	VideoDrawSub(sprite,
 		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
@@ -67,7 +67,7 @@ global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 		sprite->Width, sprite->Height, x, y);
 }
 #else
-global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	GLint sx;
 	GLint ex;
@@ -102,7 +102,7 @@ global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 **  @param y       y coordinate on the screen
 */
 #ifndef USE_OPENGL
-global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	VideoDrawSubClip(sprite,
 		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
@@ -110,7 +110,7 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 		sprite->Width, sprite->Height, x, y);
 }
 #else
-global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	GLint svx;
 	GLint evx;
@@ -163,7 +163,7 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 **  @param y       y coordinate on the screen
 */
 #ifndef USE_OPENGL
-global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
 	SDL_Rect drect;
@@ -180,7 +180,7 @@ global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
 #else
-global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	GLint sx;
 	GLint ex;
@@ -215,7 +215,7 @@ global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 **  @param y       y coordinate on the screen
 */
 #ifndef USE_OPENGL
-global void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
+void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
 {
 	SDL_Rect srect;
 	SDL_Rect drect;
@@ -240,7 +240,7 @@ global void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
 	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
 #else
-global void VideoDrawClipX(const Graphic* sprite, unsigned frame,
+void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 	int x, int y)
 {
 	GLint svx;
@@ -293,7 +293,7 @@ global void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 #endif
 
 #ifndef USE_OPENGL
-global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	VideoDrawSubTrans(sprite,
 		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
@@ -301,7 +301,7 @@ global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, 
 		sprite->Width, sprite->Height, x, y, alpha);
 }
 
-global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	VideoDrawSubClipTrans(sprite,
 		(frame % (sprite->Surface->w / sprite->Width)) * sprite->Width,
@@ -309,7 +309,7 @@ global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int
 		sprite->Width, sprite->Height, x, y, alpha);
 }
 
-global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	SDL_Rect srect;
 	SDL_Rect drect;
@@ -330,7 +330,7 @@ global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y,
 	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
 }
 
-global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	SDL_Rect srect;
 	SDL_Rect drect;
@@ -359,28 +359,28 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
 }
 #else
-global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
 	VideoDraw(sprite, frame, x, y);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
-global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
 	VideoDrawClip(sprite, frame, x, y);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
-global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
 	VideoDrawX(sprite, frame, x, y);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
-global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
+void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
@@ -404,7 +404,7 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 **
 **  @see LoadGraphic
 */
-global Graphic* LoadSprite(const char* name, int width, int height)
+Graphic* LoadSprite(const char* name, int width, int height)
 {
 	Graphic* g;
 	char buf[PATH_MAX];
@@ -455,7 +455,7 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 **
 **  @todo FIXME: 32bpp
 */
-global void MakeShadowSprite(Graphic* g)
+void MakeShadowSprite(Graphic* g)
 {
 	SDL_Color colors[256];
 #ifdef USE_OPENGL
