@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name spells.c - The spell cast action. */
 //
-// (c) Copyright 1998-2003 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//                            Jimmy Salmon and Joris DAUPHIN
+//      (c) Copyright 1998-2004 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 Jimmy Salmon and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (action->Data.Demolish.Damage) {
-		n = UnitCacheSelect(xmin, ymin, xmax, ymax, table);
+		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP &&
 					MapDistanceToUnit(x, y, table[i]) <= action->Data.Demolish.Range) {

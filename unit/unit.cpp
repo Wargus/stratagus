@@ -2109,24 +2109,24 @@ Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 				// Run Distance Checking
 				if (b->RestrictType == RestrictDistance) {
 					if (b->Data.Distance.DistanceType == LessThanEqual ||
-						b->Data.Distance.DistanceType == GreaterThan ||
-						b->Data.Distance.DistanceType == Equal ||
-						b->Data.Distance.DistanceType == NotEqual) {
+							b->Data.Distance.DistanceType == GreaterThan ||
+							b->Data.Distance.DistanceType == Equal ||
+							b->Data.Distance.DistanceType == NotEqual) {
 						x1 = x - b->Data.Distance.Distance > 0 ? x - b->Data.Distance.Distance : 0;
 						y1 = y - b->Data.Distance.Distance > 0 ? y - b->Data.Distance.Distance : 0;
 						x2 = x + type->TileWidth + b->Data.Distance.Distance < TheMap.Width ?
-							x + type->TileWidth + b->Data.Distance.Distance : TheMap.Width - 1;
+							x + type->TileWidth + b->Data.Distance.Distance : TheMap.Width;
 						y2 = y + type->TileHeight + b->Data.Distance.Distance < TheMap.Height ?
-							y + type->TileHeight + b->Data.Distance.Distance : TheMap.Height - 1;
+							y + type->TileHeight + b->Data.Distance.Distance : TheMap.Height;
 						distance = b->Data.Distance.Distance;
 					} else if (b->Data.Distance.DistanceType == LessThan ||
-						b->Data.Distance.DistanceType == GreaterThanEqual) {
+							b->Data.Distance.DistanceType == GreaterThanEqual) {
 						x1 = x - b->Data.Distance.Distance - 1 > 0 ? x - b->Data.Distance.Distance - 1 : 0;
 						y1 = y - b->Data.Distance.Distance - 1 > 0 ? y - b->Data.Distance.Distance - 1 : 0;
 						x2 = x + type->TileWidth + b->Data.Distance.Distance + 1 < TheMap.Width ?
-							x + type->TileWidth + b->Data.Distance.Distance + 1 : TheMap.Width - 1;
+							x + type->TileWidth + b->Data.Distance.Distance + 1 : TheMap.Width;
 						y2 = y + type->TileHeight + b->Data.Distance.Distance + 1 < TheMap.Height ?
-							y + type->TileHeight + b->Data.Distance.Distance + 1 : TheMap.Height - 1;
+							y + type->TileHeight + b->Data.Distance.Distance + 1 : TheMap.Height;
 						distance = b->Data.Distance.Distance - 1;
 					}
 					n = UnitCacheSelect(x1, y1, x2, y2, table);

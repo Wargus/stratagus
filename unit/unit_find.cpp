@@ -765,8 +765,8 @@ Unit* AttackUnitsInDistance(Unit* unit, int range)
 	x = unit->X;
 	y = unit->Y;
 	type = unit->Type;
-	n = UnitCacheSelect(x - range, y - range, x + range + type->TileWidth - 1,
-		y + range + type->TileHeight - 1, table);
+	n = UnitCacheSelect(x - range, y - range, x + range + type->TileWidth,
+		y + range + type->TileHeight, table);
 
 	best_unit = NoUnitP;
 	best_cost = INT_MAX;
