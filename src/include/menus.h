@@ -252,8 +252,9 @@ typedef struct _menus_ {
 
 extern int GuiGameStarted;		/// Game Started?
 extern Menu *CurrentMenu;		/// Currently processed menu
-extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
-extern MapInfo *ScenSelectMapInfo;	/// MapInfo of currently selected map
+
+extern MapInfo *MenuMapInfo;		/// MapInfo of map used in gui menus
+extern char MenuMapFullPath[1024];	/// Full path to currently selected map
 
 extern int nKeyStrokeHelps;		/// Number of loaded keystroke helps
 extern char **KeyStrokeHelps;		/// Keystroke help pairs
