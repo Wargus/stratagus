@@ -268,7 +268,7 @@ foundvisual:
 	fprintf(stderr,"XShmAttach failed.\n");
 	exit(-1);
     }
-    // Mark segment as deleted as soon as both clone and the X server have
+    // Mark segment as deleted as soon as both us and the X server have
     // attached to it.  The POSIX spec says that a segment marked as deleted
     // can no longer have addition processes attach to it, but Linux will let
     // them anyway.
@@ -848,6 +848,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
 	DebugLevel3Fn("%d, %d\n",morex|VideoInterrupts,maxfd);
 
+#if 0
+	if( maxfd>0 && NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
+	    callbacks->NetworkEvent();
+	}
+#endif
+
 	//
 	//	X11
 	//
@@ -885,17 +891,17 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    }
 
 	    //
-	    //	Not more input and time for frame over: return
-	    //
-	    if( !morex && VideoInterrupts ) {
-		break;
-	    }
-
-	    //
 	    //	Network
 	    //
 	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
 		callbacks->NetworkEvent();
+	    }
+
+	    //
+	    //	No more input and time for frame over: return
+	    //
+	    if( !morex && VideoInterrupts ) {
+		break;
 	    }
 	}
 
@@ -1062,18 +1068,23 @@ global void WaitEventsAndKeepSync(void)
 	    }
 
 	    //
+	    //	Network
+	    //
+	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
+		callbacks.NetworkEvent();
+	    }
+
+	    //	ARI: ORDER IS IMPORTANT HERE - THIS HAS TO BE LAST,
+	    //	or Network/Sound events wont be handled without X activity
+	    //	which would break for example network menu code
+
+	    //
 	    //	Network in sync and time for frame over: return
 	    //
 	    if( !morex && NetworkInSync && VideoInterrupts ) {
 		break;
 	    }
 
-	    //
-	    //	Network
-	    //
-	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
-		callbacks.NetworkEvent();
-	    }
 	}
 
 	//
