@@ -105,10 +105,10 @@
 **
 **		Called if an unit owned by the AI is killed.
 **
-**	::AiNeedMoreFarms()
+**	::AiNeedMoreSupply()
 **
 **		Called if an trained unit is ready, but not enough food is
-**		available.
+**		available for it.
 **
 **	::AiWorkComplete()
 **
@@ -1158,7 +1158,6 @@ local void AiRemoveFromBuilded(PlayerAi * pai, const UnitType * type)
 local int AiReduceMadeInBuilded2(const PlayerAi * pai, const UnitType * type)
 {
     AiBuildQueue *queue;
-
     //
     //  Search the unit-type order.
     //
@@ -1197,7 +1196,7 @@ local void AiReduceMadeInBuilded(const PlayerAi * pai, const UnitType * type)
 	}
     }
 
-    //DebugCheck(1);
+    DebugCheck(1);
 }
 
 /*----------------------------------------------------------------------------
@@ -1405,8 +1404,8 @@ local void AiMoveUnitInTheWay(Unit* unit)
 
 	bx0 = blocker->X;
 	by0 = blocker->Y;
-	bx1 = bx0;
-	by1 = by0;
+	bx1 = bx0 + blocker->Type->TileWidth - 1;
+	by1 = by0 + blocker->Type->TileHeight - 1;;
 
 	// Check for collision
 #define int_min(a,b)  ((a)<(b)?(a):(b))
@@ -1725,7 +1724,7 @@ local void HandleTransportRequests(AiTransportRequest * aitr)
 **	@param unit	Point to unit.
 **      @param what     Pointer to unit-type.
 */
-global void AiNeedMoreFarms(Unit * unit, const UnitType * what __attribute__ ((unused)))
+global void AiNeedMoreSupply(Unit * unit, const UnitType * what __attribute__ ((unused)))
 {
     DebugLevel3Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_

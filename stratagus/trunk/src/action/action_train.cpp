@@ -97,7 +97,7 @@ global void HandleActionTrain(Unit* unit)
 	food = PlayerCheckLimits(player, unit->Data.Train.What[0]);
 	if (food < 0) {
 	    if (food == -3 && unit->Player->AiEnabled) {
-		AiNeedMoreFarms(unit, unit->Orders[0].Type);
+		AiNeedMoreSupply(unit, unit->Orders[0].Type);
 	    }
 
 	    unit->Data.Train.Ticks = 
