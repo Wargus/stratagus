@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -215,11 +215,6 @@
 **		this.
 **		@note that all limits are always checked.
 **
-**	Player::LastRepairResource
-**
-**		Last resource used for repair cycles. Was introduced to
-**		reduce the repair speed.  @see RepairUnit.
-**
 **	Player::Score
 **
 **		Total number of points. You can get points for killing units,
@@ -342,7 +337,6 @@ struct _player_ {
     int		FoodUnitLimit;		/// # food units allowed
     int		BuildingLimit;		/// # buildings allowed
     int		TotalUnitLimit;		/// # total unit number allowed
-    int		LastRepairResource;	/// last resource for repair cycles
 
     int		Score;			/// Points for killing ...
     int		TotalUnits;

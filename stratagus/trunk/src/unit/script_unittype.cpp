@@ -378,6 +378,18 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("repair-range")) ) {
 	    type->RepairRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("repair-hp")) ) {
+	    type->RepairHP=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("repair-costs")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		type->_RepairCosts[CclGetResourceByName(value)]=gh_scm2int(gh_car(sublist));
+		sublist=gh_cdr(sublist);
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("can-target-land")) ) {
 	    type->CanTarget|=CanTargetLand;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-target-sea")) ) {
@@ -387,6 +399,8 @@ local SCM CclDefineUnitType(SCM list)
 
 	} else if( gh_eq_p(value,gh_symbol2scm("building")) ) {
 	    type->Building=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("wall")) ) {
+	    type->Wall=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("builder-outside")) ) {
 	    type->BuilderOutside=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("builder-lost")) ) {

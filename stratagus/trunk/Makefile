@@ -371,9 +371,9 @@ release:
 	$(MAKE) distclean
 	$(MAKE) depend
 	$(MAKE) bin-dist
-	$(MAKE) win32new
-	$(MAKE) win32-bin-dist
-	$(MAKE) win32distclean
+#	$(MAKE) win32new
+#	$(MAKE) win32-bin-dist
+#	$(MAKE) win32distclean
 	$(MAKE) dist
 
 ##############################################################################

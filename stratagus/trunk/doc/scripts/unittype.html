@@ -255,14 +255,26 @@ F.E.: '( time 200 gold 2000 wood 1000 oil 200 ).<p>
 </dd>
 <dt>improve_production</dt>
 <dd>Define the production increase from defaults that this unit adds. It is an array of '(
-rosource-name amount) pairs. 
+resource-name amount) pairs.
 Gold is the amount it increase the default gold by. All other defined resources are
 treated the same way.
 F.E.: 'improve-production '( gold 20 wood 5 ).<p>
 </dd>
+<dt>repair_hp</dt>
+<dd>Defines the amount of hp a unit gain for each repair animation.  Units can only be
+repaired if this value is non-zero.
+F.E.: 'repair-hp 4.<p>
+</dd>
+<dt>repair_costs</dt>
+<dd>Define the costs to repair this unit. It is an array of '(
+resource-name amount) pairs.
+Gold is the amount required to repair repair_hp above.
+Wood and Oil are the same.
+F.E.: '( gold 2 wood 1 oil 1 ).<p>
+</dd>
 <dt>tile_size</dt>
 <dd>Define the unit-type size in tiles. NOTE: currently only buildings could
-be bigger than one tile. A list of X (width) and Y (height) sizes. 
+be bigger than one tile. A list of X (width) and Y (height) sizes.
 F.E. '( 1 1 ), '( 2 2 ).
 </dd>
 <dt>box_size</dt>

@@ -235,7 +235,7 @@ global void DoRightButton(int sx,int sy)
 	    }
 	    //  Go and repair
 	    if ( (unit->Type->RepairRange) && dest &&
-		    (dest->Type->Building || dest->Type->Transporter) &&
+		    (dest->Type->RepairHP) &&
 		    dest->HP < dest->Stats->HitPoints  &&
 		    (dest->Player==unit->Player || IsAllied(dest->Player,dest)) ) {
 		dest->Blink=4;
@@ -773,7 +773,7 @@ local void SendRepair(int sx,int sy)
 
     // Check if the dest is repairable!
     if( (dest=UnitUnderCursor) && (dest->HP<dest->Stats->HitPoints) &&
-	    (dest->Type->Building || dest->Type->Transporter) &&
+	    (dest->Type->RepairHP) &&
 	    (dest->Player==ThisPlayer||IsAllied(ThisPlayer,dest))) {
 	for( i=0; i<NumSelected; ++i ) {
 	    unit=Selected[i];

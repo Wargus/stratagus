@@ -82,22 +82,16 @@ local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
 local void RepairUnit(Unit* unit, Unit* goal)
 {
     Player* player;
-    int costs[MaxCosts];
     int i;
     int animlength;
     Animation* anim;
     int hp;
-    int lrr;
     char buf[100];
-
-#define GIVES_HP	4
-#define COSTS		1
 
     //
     //  Calculate the repair points
     //          original per 100 hit points only 25 gold 25 wood
     //
-    hp = GIVES_HP;
 
     player = unit->Player;
 
@@ -107,37 +101,12 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	//
 	DebugCheck(!goal->Stats->HitPoints);
 
-	for (i = 1; i < MaxCosts; ++i) {
-	    if (goal->Stats->Costs[i]) {
-		costs[i] = COSTS;
-	    } else {			// Prepare for repair cycles
-		costs[i] = 0;
-	    }
-	}
-	lrr = player->LastRepairResource;
-	for (i = player->LastRepairResource; i < MaxCosts; ++i) {
-	    if (costs[i] && lrr == player->LastRepairResource) {
-		lrr = i;
-	    }				// Find next higher resource or...
-	}
-	if (lrr == player->LastRepairResource) {
-	    for (i = player->LastRepairResource; i > 0; --i) {
-		if (costs[i]) {
-		    lrr = i;
-		}
-	    }				// ...go through the beginning
-	}
-	player->LastRepairResource = lrr;
-	// Thanx for the help, costs, you are reset!
-	for (i = 1; i < MaxCosts; ++i) {
-	    costs[i] = 0;
-	}
-	costs[player->LastRepairResource] = COSTS;	// The one we need
+
 	//
 	//  Check if enough resources are available
 	//
 	for (i = 1; i < MaxCosts; ++i) {
-	    if (player->Resources[i] < costs[i]) {
+	    if (player->Resources[i] < goal->Type->_RepairCosts[i]) {
 		snprintf(buf,100,"We need more %s for repair!",DefaultResourceNames[i]);
 		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,buf);
 		if( player->Ai ) {
@@ -160,9 +129,9 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	//
 	//  Subtract the resources
 	//
-	PlayerSubCosts(player, costs);
+	PlayerSubCosts(player, goal->Type->_RepairCosts);
     }
-    
+
     //
     //  Repair the unit
     //
@@ -177,7 +146,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	for (anim=unit->Type->Animations->Attack;!(anim->Flags&AnimationReset);anim++) {
 	    animlength+=anim->Sleep;
 	}
-	
+
 	DebugLevel3("Repair animation is %d cycles long\n" _C_ animlength);
 	// FIXME: implement this below:
 	//unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
@@ -190,7 +159,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	}
 	//  HandleActionBuilded will deal with most stuff.
     } else {
-	goal->HP += hp;
+	goal->HP += goal->Type->RepairHP;
 	if (goal->HP > goal->Stats->HitPoints) {
 	    goal->HP = goal->Stats->HitPoints;
 	}
