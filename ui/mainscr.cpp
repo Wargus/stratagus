@@ -598,9 +598,8 @@ global void DrawResources(void)
 
 	for (i = 0; i < MaxCosts; ++i) {
 		if (TheUI.Resources[i].Icon.Graphic) {
-			VideoDrawSubClip(TheUI.Resources[i].Icon.Graphic, 0,
-				TheUI.Resources[i].IconRow * TheUI.Resources[i].IconH,
-				TheUI.Resources[i].IconW, TheUI.Resources[i].IconH,
+			VideoDrawClip(TheUI.Resources[i].Icon.Graphic,
+				TheUI.Resources[i].IconFrame,
 				TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
 		}
 		if (TheUI.Resources[i].TextX != -1) {
@@ -611,9 +610,8 @@ global void DrawResources(void)
 		}
 	}
 	if (TheUI.Resources[FoodCost].Icon.Graphic) {
-		VideoDrawSubClip(TheUI.Resources[FoodCost].Icon.Graphic, 0,
-			TheUI.Resources[FoodCost].IconRow * TheUI.Resources[FoodCost].IconH,
-			TheUI.Resources[FoodCost].IconW, TheUI.Resources[FoodCost].IconH,
+		VideoDrawClip(TheUI.Resources[FoodCost].Icon.Graphic,
+			TheUI.Resources[FoodCost].IconFrame,
 			TheUI.Resources[FoodCost].IconX, TheUI.Resources[FoodCost].IconY);
 	}
 	if (TheUI.Resources[FoodCost].TextX != -1) {
@@ -628,9 +626,8 @@ global void DrawResources(void)
 	}
 
 	if (TheUI.Resources[ScoreCost].Icon.Graphic) {
-		VideoDrawSubClip(TheUI.Resources[ScoreCost].Icon.Graphic, 0,
-			TheUI.Resources[ScoreCost].IconRow * TheUI.Resources[ScoreCost].IconH,
-			TheUI.Resources[ScoreCost].IconW, TheUI.Resources[ScoreCost].IconH,
+		VideoDrawClip(TheUI.Resources[ScoreCost].Icon.Graphic,
+			TheUI.Resources[ScoreCost].IconFrame,
 			TheUI.Resources[ScoreCost].IconX, TheUI.Resources[ScoreCost].IconY);
 	}
 	if (TheUI.Resources[ScoreCost].TextX != -1) {
@@ -1019,11 +1016,8 @@ global void DrawCosts(void)
 	x = TheUI.StatusLineX + 270;
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
-		VideoDrawSubClip(TheUI.Resources[GoldCost].Icon.Graphic,
-			/* 0, TheUI.Resources[GoldCost].IconRow *
-			   TheUI.Resources[GoldCost].IconH */
-			0, 3 * TheUI.Resources[GoldCost].IconH,
-			TheUI.Resources[GoldCost].IconW, TheUI.Resources[GoldCost].IconH,
+		VideoDrawClip(TheUI.Resources[GoldCost].Icon.Graphic,
+			3,
 			x, TheUI.StatusLineTextY);
 
 		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsMana);
@@ -1033,9 +1027,8 @@ global void DrawCosts(void)
 	for (i = 1; i < MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (TheUI.Resources[i].Icon.Graphic) {
-				VideoDrawSubClip(TheUI.Resources[i].Icon.Graphic, 0,
-					TheUI.Resources[i].IconRow * TheUI.Resources[i].IconH,
-					TheUI.Resources[i].IconW, TheUI.Resources[i].IconH,
+				VideoDrawClip(TheUI.Resources[i].Icon.Graphic,
+					TheUI.Resources[i].IconFrame,
 					x, TheUI.StatusLineTextY);
 			}
 			VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont,Costs[i]);
@@ -1048,9 +1041,8 @@ global void DrawCosts(void)
 
 	if (CostsFood) {
 		// FIXME: hardcoded image!!!
-		VideoDrawSubClip(TheUI.Resources[FoodCost].Icon.Graphic, 0,
-			TheUI.Resources[FoodCost].IconRow * TheUI.Resources[FoodCost].IconH,
-			TheUI.Resources[FoodCost].IconW, TheUI.Resources[FoodCost].IconH,
+		VideoDrawClip(TheUI.Resources[FoodCost].Icon.Graphic,
+			TheUI.Resources[FoodCost].IconFrame,
 			x, TheUI.StatusLineTextY);
 		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsFood);
 		x += 45;
