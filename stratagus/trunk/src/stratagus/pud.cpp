@@ -849,6 +849,8 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 		for( i=0; i<16; ++i ) {
 		    p=PudReadByte(input);
+		    // Single player games only:
+		    // ARI: FIXME: convert to a preset array to share with network game code
 		    if (GameSettings.Opponents != SettingsPresetMapDefault) {
 			if (p == PlayerComputer) {
 			    if (aiopps < GameSettings.Opponents) {
@@ -857,6 +859,10 @@ global void LoadPud(const char* pud,WorldMap* map)
 				p = PlayerNobody;
 			    }
 			}
+		    }
+		    // Network games only:
+		    if (GameSettings.Presets[i].Type != SettingsPresetMapDefault) {
+			p = GameSettings.Presets[i].Type;
 		    }
 		    CreatePlayer(p);
 		}
