@@ -688,6 +688,7 @@ global void GameMainLoop(void)
 	    switch( GameCycle%CYCLES_PER_SECOND ) {
 		case 0:
 		    UnitIncrementMana();	// magic units
+		    DoRunestones();		// runestones
 		    break;
 		case 1:
 		    UnitIncrementHealth();	// berserker healing

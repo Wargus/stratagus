@@ -768,6 +768,8 @@ extern int UnitGetNextPathSegment (Unit * , int * , int * );
 #endif
     /// Increment mana of all magic units each second
 extern void UnitIncrementMana(void);
+    /// Do the runestone's work each second 
+extern void DoRunestones(void);
     /// Increment health of all regenerating units each second
 extern void UnitIncrementHealth(void);
     /// Check for rescue each second
