@@ -25,8 +25,6 @@
 #include "freecraft.h"
 #include "video.h"
 
-#ifdef NEW_VIDEO
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -42,7 +40,5 @@ global void DrawConsole(void)
 {
     DebugLevel3(__FUNCTION__"\n");
 }
-
-#endif
 
 //@}

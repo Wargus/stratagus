@@ -108,11 +108,7 @@ typedef struct _decoration_ {
     int		Height;			/// height of the decoration
 
 // --- FILLED UP ---
-#ifdef NEW_VIDEO
     Graphic*	Sprite;			/// loaded sprite images
-#else
-    RleSprite*	RleSprite;		/// loaded sprite images
-#endif
 } Decoration;
 
 /**
@@ -187,21 +183,12 @@ global SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 */
 global void LoadDecorations(void)
 {
-#ifdef NEW_VIDEO
     HealthSprite.Sprite=LoadSprite(HealthSprite.File
 		,HealthSprite.Width,HealthSprite.Height);
     ManaSprite.Sprite=LoadSprite(ManaSprite.File
 		,ManaSprite.Width,ManaSprite.Height);
     ShadowSprite.Sprite=LoadSprite(ShadowSprite.File
 		,ShadowSprite.Width,ShadowSprite.Height);
-#else
-    HealthSprite.RleSprite=LoadRleSprite(HealthSprite.File
-		,HealthSprite.Width,HealthSprite.Height);
-    ManaSprite.RleSprite=LoadRleSprite(ManaSprite.File
-		,ManaSprite.Width,ManaSprite.Height);
-    ShadowSprite.RleSprite=LoadRleSprite(ShadowSprite.File
-		,ShadowSprite.Width,ShadowSprite.Height);
-#endif
 }
 
 /**
@@ -281,11 +268,7 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 			+(type->TileHeight*TileSizeY
 			-type->BoxHeight+1)/2;
 	    }
-#ifdef NEW_VIDEO
 	    VideoDrawClip(HealthSprite.Sprite,n,x1,y1);
-#else
-	    DrawRleSpriteClipped(HealthSprite.RleSprite,n,x1,y1);
-#endif
 	}
     }
 
@@ -323,12 +306,8 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	    } else if( f>25 ) {
 		n=2;
 			// FIXME: v--- compatibility hack
-#ifdef NEW_VIDEO
 	    } else if( f
 		&& ManaSprite.Width*4<VideoGraphicWidth(ManaSprite.Sprite) ) {
-#else
-	    } else if( f && ManaSprite.Width*4<ManaSprite.RleSprite->Width ) {
-#endif
 		n=3;
 	    } else {
 		n=4;
@@ -351,11 +330,7 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 			+(type->TileHeight*TileSizeY
 			-type->BoxHeight+1)/2;
 	    }
-#ifdef NEW_VIDEO
 	    VideoDrawClip(ManaSprite.Sprite,n,x1,y1);
-#else
-	    DrawRleSpriteClipped(ManaSprite.RleSprite,n,x1,y1);
-#endif
 	}
     }
 
@@ -386,13 +361,8 @@ local void DrawShadow(Unit* unit,UnitType* type,int x,int y)
     }
     DebugLevel3("Box-height %d\n",type->BoxHeight);
 
-#ifdef NEW_VIDEO
     VideoDrawClip(ShadowSprite.Sprite,i
 	    ,x+ShadowSprite.HotX,y+ShadowSprite.HotY);
-#else
-    DrawRleSpriteClipped(ShadowSprite.RleSprite,i
-	    ,x+ShadowSprite.HotX,y+ShadowSprite.HotY);
-#endif
 }
 
 /**
@@ -584,11 +554,7 @@ local void DrawBuilding(Unit* unit)
     }
 #endif
 
-#ifdef NEW_VIDEO
     GraphicPlayerPixels(unit->Player,unit->Type->Sprite);
-#else
-    RLEPlayerPixels(unit->Player,unit->Type->RleSprite);
-#endif
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
@@ -596,11 +562,7 @@ local void DrawBuilding(Unit* unit)
     //	Buildings under construction/upgrade/ready.
     //
     if( unit->Command.Action==UnitActionBuilded ) {
-#ifdef NEW_VIDEO
 	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
-#else
-	if( unit->Constructed || type->RleSprite->NumFrames<=1 ) {
-#endif
 	    DrawConstruction(type->OverlapFrame
 		,frame&127
 		,x+(type->TileWidth*TileSizeX)/2
@@ -645,11 +607,7 @@ local void DrawUnit(Unit* unit)
 
     DrawSelectionRectangle(unit,type,x,y);
 
-#ifdef NEW_VIDEO
     GraphicPlayerPixels(unit->Player,unit->Type->Sprite);
-#else
-    RLEPlayerPixels(unit->Player,unit->Type->RleSprite);
-#endif
     DrawUnitType(type,unit->Frame,x,y);
 
     stats=unit->Stats;

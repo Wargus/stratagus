@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name new_X11.c		-	XWindows support. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer and Valery Shchedrin
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer and Valery Shchedrin
+//
+//	$Id$
 
 //@{
 
@@ -25,7 +24,10 @@
 
 #ifdef USE_X11	// {
 
+// FIXME: move the cleanup X11 source to here!
+
 #include "video.h"
+
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -44,9 +46,8 @@
 */
 global void InitVideoX11(void)
 {
-#ifdef NEW_VIDEO
     extern void GameInitDisplay(void);
-#endif
+
     GameInitDisplay();			// Fall back to old function
 }
 

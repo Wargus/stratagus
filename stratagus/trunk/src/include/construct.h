@@ -9,39 +9,57 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name construct.h	-	The constructions headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __CONSTRUCT_H__
 #define __CONSTRUCT_H__
 
 //@{
 
+// FIXME: constructions must be configurable, referenced by indenifiers...
+
 /*----------------------------------------------------------------------------
---	CONSTRUCTION
+--	Includes
 ----------------------------------------------------------------------------*/
 
-typedef struct _construction_ {
-    char*	File[TilesetMax];	// sprite file
+#include "tileset.h"
+#include "video.h"
 
-    int		Width;			// " width
-    int		Height;			// " height
+/*----------------------------------------------------------------------------
+--	Declarations
+----------------------------------------------------------------------------*/
+
+/**
+**	Constructions: shown during construction of a building. 
+*/
+typedef struct _construction_ {
+    char*	Ident;			/// construction identifier
+    char*	File[TilesetMax];	/// sprite file
+
+    int		Width;			/// " width
+    int		Height;			/// " height
 
 // --- FILLED UP ---
 
-#ifdef NEW_VIDEO
     Graphic*	Sprite;			/// construction sprite image
-#else
-    RleSprite*	RleSprite;		/// construction sprite image
-#endif
 } Construction;
 
-#define ConstructionWall	15
+/*----------------------------------------------------------------------------
+--	Macros
+----------------------------------------------------------------------------*/
 
+#define ConstructionWall	15	/// ident nr for wall under construction
+
+/*----------------------------------------------------------------------------
+--	Fucntions
+----------------------------------------------------------------------------*/
+
+    ///	Load the graphics for constructions
 extern void LoadConstructions(void);
+    ///	Draw a construction
 extern void DrawConstruction(int type,int image,int x,int y);
 
 //@}

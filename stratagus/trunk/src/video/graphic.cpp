@@ -509,11 +509,8 @@ global Graphic* LoadGraphic(const char* name)
     }
     //Palette Not found
     if(current_link == NULL){
-#ifdef NEW_VIDEO
       pixels = VideoCreateNewPalette(graphic->Palette);
-#else
-      pixels = (void*)VideoCreateNewPalette(graphic->Palette);
-#endif
+
       DebugLevel0("loading new palette with %s\n",name);
       if(prev_link == NULL){
 	palette_list = (PaletteLink *)malloc(sizeof(PaletteLink));

@@ -20,6 +20,11 @@
 #ifdef USE_X11
 
 // FIXME: move this and clean up to new_X11.
+// FIXME: move this and clean up to new_X11.
+// FIXME: move this and clean up to new_X11.
+// FIXME: move this and clean up to new_X11.
+// FIXME: move this and clean up to new_X11.
+// FIXME: move this and clean up to new_X11.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,28 +65,6 @@
 #include "ui.h"
 #include "new_video.h"
 
-#ifndef NEW_VIDEO
-
-/**
-**	Architecture-dependant video memory. Set by InitVideoXXX.
-**
-**	@see InitVideo
-*/
-global void* VideoMemory;
-
-/**
-**	Architecture-dependant video depth. Set by InitVideoXXX.
-**
-**	@see InitVideo
-*/
-global int VideoDepth;
-
-global VMemType8 * Pixels8;
-global VMemType16 * Pixels16;
-global VMemType32 * Pixels32;
-
-#endif
-
 local Display* TheDisplay;		/// My X11 display
 local int TheScreen;			/// My X11 screen
 local Window TheMainWindow;		/// My X11 window
@@ -93,11 +76,6 @@ local Atom WmDeleteWindowAtom;		/// Atom for WM_DELETE_WINDOW
 /*----------------------------------------------------------------------------
 --	Sync
 ----------------------------------------------------------------------------*/
-
-#ifndef NEW_VIDEO
-global int VideoSyncSpeed=100;		// 0 disable interrupts
-volatile int VideoInterrupts;		// be happy, were are quicker
-#endif
 
 /**
 **	Called from SIGALRM.
@@ -839,11 +817,7 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@returns	A hardware dependend pixel table.
 */
-#ifdef NEW_VIDEO
 global VMemType* VideoCreateNewPalette(const Palette *palette)
-#else
-global GraphicData * VideoCreateNewPalette(const Palette *palette)
-#endif
 {
     XColor color;
     XWindowAttributes xwa;
@@ -934,118 +908,6 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
     return pixels;
 }
 
-#ifndef NEW_VIDEO
-
-/**
-**	Color cycle.
-*/
-global void ColorCycle(void)
-{
-    int i;
-    int x;
-
-    // FIXME: this isn't 100% correct
-    // Color cycling info - forest:
-    // 3	flash red/green	(attacked building on minimap)
-    // 38-47	cycle		(water)
-    // 48-56	cycle		(water-coast boundary)
-    // 202	pulsates red	(Circle of Power)
-    // 240-244	cycle		(water around ships, Runestone, Dark Portal)
-    // Color cycling info - swamp:
-    // 3	flash red/green	(attacked building on minimap)
-    // 4	pulsates red	(Circle of Power)
-    // 5-9	cycle		(Runestone, Dark Portal)
-    // 38-47	cycle		(water)
-    // 88-95	cycle		(waterholes in coast and ground)
-    // 240-244	cycle		(water around ships)
-    // Color cycling info - wasteland:
-    // 3	flash red/green	(attacked building on minimap)
-    // 38-47	cycle		(water)
-    // 64-70	cycle		(coast)
-    // 202	pulsates red	(Circle of Power)
-    // 240-244	cycle		(water around ships, Runestone, Dark Portal)
-    // Color cycling info - winter:
-    // 3	flash red/green	(attacked building on minimap)
-    // 40-47	cycle		(water)
-    // 48-54	cycle		(half-sunken ice-floe)
-    // 202	pulsates red	(Circle of Power)
-    // 205-207	cycle		(lights on christmas tree)
-    // 240-244	cycle		(water around ships, Runestone, Dark Portal)
-
-    // FIXME: function pointer
-    switch( VideoDepth ) {
-    case 8:
-      x = ((VMemType8*)TheMap.TileData->Pixels)[38];
-      for(i = 38; i < 47; ++i){
-	((VMemType8*)TheMap.TileData->Pixels)[i] = 
-	  ((VMemType8*)TheMap.TileData->Pixels)[i+1];
-      }
-      ((VMemType8*)TheMap.TileData->Pixels)[47] = x;
-
-	x=Pixels8[38];
-	for( i=38; i<47; ++i ) {	// tileset color cycle
-	    Pixels8[i]=Pixels8[i+1];
-	}
-	Pixels8[47]=x;
-
-	x=Pixels8[240];
-	for( i=240; i<244; ++i ) {	// units/icons color cycle
-	    Pixels8[i]=Pixels8[i+1];
-	}
-	Pixels8[244]=x;
-	break;
-    case 15:
-    case 16:
-      x = ((VMemType16*)TheMap.TileData->Pixels)[38];
-      for(i = 38; i < 47; ++i){
-	((VMemType16*)TheMap.TileData->Pixels)[i] = 
-	  ((VMemType16*)TheMap.TileData->Pixels)[i+1];
-      }
-      ((VMemType16*)TheMap.TileData->Pixels)[47] = x;
-
-	x=Pixels16[38];
-	for( i=38; i<47; ++i ) {	// tileset color cycle
-	    Pixels16[i]=Pixels16[i+1];
-	}
-	Pixels16[47]=x;
-
-	x=Pixels16[240];
-	for( i=240; i<244; ++i ) {	// units/icons color cycle
-	    Pixels16[i]=Pixels16[i+1];
-	}
-	Pixels16[244]=x;
-	break;
-    case 24:
-    case 32:
-      x = ((VMemType32*)TheMap.TileData->Pixels)[38];
-      for(i = 38; i < 47; ++i){
-	((VMemType32*)TheMap.TileData->Pixels)[i] = 
-	  ((VMemType32*)TheMap.TileData->Pixels)[i+1];
-      }
-      ((VMemType32*)TheMap.TileData->Pixels)[47] = x;
-
-
-
-	x=Pixels32[38];
-	for( i=38; i<47; ++i ) {	// tileset color cycle
-	    Pixels32[i]=Pixels32[i+1];
-	}
-	Pixels32[47]=x;
-
-	x=Pixels32[240];
-	for( i=240; i<244; ++i ) {	// units/icons color cycle
-	    Pixels32[i]=Pixels32[i+1];
-	}
-	Pixels32[244]=x;
-	break;
-    }
-
-    MapColorCycle();		// FIXME: could be little more informativer
-    MustRedraw|=RedrawMap|RedrawInfoPanel;
-}
-
-#endif
-
 /**
 **	Check video interrupt.
 **
@@ -1062,13 +924,6 @@ global void CheckVideoInterrupts(void)
 		,False);
 	);
         ++SlowFrameCounter;
-#if 0
-    } else {
-        struct itimerval itv;
-
-        getitimer(ITIMER_REAL,&itv);
-        DebugLevel1("Remain %d\n",itv.it_value.tv_usec);
-#endif
     }
 }
 

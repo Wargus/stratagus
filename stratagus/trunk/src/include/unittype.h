@@ -195,11 +195,7 @@ struct _unit_type_ {
 
     void*	Property;		/// CCL property storage
 
-#ifdef NEW_VIDEO
     Graphic*	Sprite;			/// sprite images
-#else
-    RleSprite*	RleSprite;		/// sprite images
-#endif
 };
 
     /// Who many unit types are currently supported.

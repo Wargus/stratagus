@@ -1105,13 +1105,8 @@ global void LoadUnitSprites(void)
 	    buf=alloca(strlen(file)+9+1);
 	    file=strcat(strcpy(buf,"graphic/"),file);
 	    ShowLoadProgress("\tUnit `%s'\n",file);
-#ifdef NEW_VIDEO
 	    UnitTypes[type].Sprite=LoadSprite(file
 		    ,UnitTypes[type].Width,UnitTypes[type].Height);
-#else
-	    UnitTypes[type].RleSprite=LoadRleSprite(file
-		    ,UnitTypes[type].Width,UnitTypes[type].Height);
-#endif
 	}
     }
 
@@ -1126,11 +1121,7 @@ global void LoadUnitSprites(void)
 			,UnitTypes[type].SameSprite);
 		exit(-1);
 	    }
-#ifdef NEW_VIDEO
 	    UnitTypes[type].Sprite=unittype->Sprite;
-#else
-	    UnitTypes[type].RleSprite=unittype->RleSprite;
-#endif
 	}
 
 	//
@@ -1172,19 +1163,11 @@ global void DrawUnitType(const UnitType* type,unsigned frame,int x,int y)
     y-=(type->Height-type->TileHeight*TileSizeY)/2;
 
     // FIXME: This is a hack for mirrored sprites
-#ifdef NEW_VIDEO
     if( frame&128 ) {
 	VideoDrawClipX(type->Sprite,frame&127,x,y);
     } else {
 	VideoDrawClip(type->Sprite,frame,x,y);
     }
-#else
-    if( frame&128 ) {
-	DrawRleSpriteClippedX(type->RleSprite,frame&127,x,y);
-    } else {
-	DrawRleSpriteClipped(type->RleSprite,frame,x,y);
-    }
-#endif
 }
 
 //@}
