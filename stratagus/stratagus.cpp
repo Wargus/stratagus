@@ -339,7 +339,7 @@ global char* FreeCraftLibPath;		/// Path for data
 global int FlagRevealMap;		/// Flag must reveal the map
 
 
-local const char* MapName;		/// Filename for the map to load
+local char* MapName;			/// Filename of the map to load
 
     /// Name, Version, Copyright
 local char NameLine[] =

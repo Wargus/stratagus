@@ -21,6 +21,9 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -270,7 +273,7 @@ global int CLseek(CLFile *file, long offset, int whence)
 **
 **	Try current directory, user home directory, global directory.
 **
-**	FIXME: I want also support files stored into tar/zip archives.
+**	FIXME: I also want to support files stored in tar/zip archives.
 **
 **	@param file	Filename to open.
 **	@param buffer	Allocated buffer for generated filename.
@@ -350,6 +353,123 @@ global char* LibraryFileName(const char* file,char* buffer)
 
     strcpy(buffer,file);
     return buffer;
+}
+
+/**
+**	Generate a list of files within a specified directory
+**
+**	@param dirname	Directory to read.
+**	@param suffix	Optional suffix to check for.
+**
+**	@return		Pointer to FileList struct describing Files found.
+*/
+
+local int flqcmp(const void *v1, const void *v2)
+{
+    const FileList *c1 = v1, *c2 = v2;
+
+    if (c1->type == c2->type)
+	return strcmp(c2->name, c1->name);
+    else
+	return c2->type - c1->type;
+}
+
+global int ReadDataDirectory(const char* dirname,char* suffix, FileList **flp)
+{
+    DIR *dirp;
+    struct dirent *dp;
+    struct stat st;
+    FileList *nfl, *fl = NULL;
+    int n = 0;
+    char *cp, *lcp, *np;
+    char buffer[1024];
+
+    strcpy(buffer, dirname);
+    cp = strrchr(buffer, '/');
+    if (!cp || cp[1]) {
+	strcat(buffer, "/");
+    }
+    np = strrchr(buffer, '/') + 1;
+    dirp = opendir(dirname);
+    if (dirp) {
+	while ((dp = readdir(dirp)) != NULL) {
+	    if (strcmp(dp->d_name, ".") == 0)
+		continue;
+	    if (strcmp(dp->d_name, "..") == 0)
+		continue;
+	    
+	    strcpy(np, dp->d_name);
+	    if (stat(buffer, &st) == 0) {
+		if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode)) {
+		    if (n) {
+			nfl = realloc(fl, sizeof(FileList) * (n + 1));
+			if (nfl) {
+			    fl = nfl;
+			    nfl = fl + n;
+			}
+		    } else {
+			fl = nfl = malloc(sizeof(FileList));
+		    }
+		    if (nfl) {
+			if (S_ISDIR(st.st_mode)) {
+			    nfl->name = strdup(np);
+			    nfl->type = 0;
+			} else {
+			    if (suffix == NULL) {
+				nfl->name = strdup(np);
+				nfl->type = 1;
+			    } else {
+				cp = np;
+				cp--;
+				nfl->type = -1;
+				do {
+				    lcp = cp++;
+				    cp = strstr(cp, suffix);
+				} while (cp != NULL);
+				if (lcp >= np) {
+				    cp = lcp + strlen(suffix);
+#ifdef USE_ZLIB
+				    if (strcmp(cp, ".gz") == 0) {
+					*cp = 0;
+				    }
+#endif
+#ifdef USE_BZ2LIB
+				    if (strcmp(cp, ".bz2") == 0) {
+					*cp = 0;
+				    }
+#endif
+				    if (*cp == 0) {
+					nfl->type = 1;
+				    }
+				}
+				if (nfl->type > 0) {
+				    nfl->name = strdup(np);
+				} else {
+				    if (n == 0) {
+					free(fl);
+					fl = NULL;
+				    } else {
+					fl = realloc(fl, sizeof(FileList) * n);
+				    }
+				    continue;
+				}
+			    }
+			}
+		    }
+		    nfl->xdata = NULL;
+		    n++;
+		}
+	    }
+	}
+	closedir(dirp);
+    }
+    if (n == 0) {
+	fl = NULL;
+    } else {
+	qsort((char *)fl, n, sizeof(FileList), flqcmp);
+    }
+    *flp = fl;
+    return n;
 }
 
 //@}

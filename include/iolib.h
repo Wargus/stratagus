@@ -38,6 +38,15 @@
 --	Definitons
 ----------------------------------------------------------------------------*/
 
+/**
+**	FileList struct used by directory access routine
+*/
+typedef struct _filelist_ {
+    char *name;
+    int type;
+    void *xdata;
+} FileList;
+
 
 #if !defined(USE_ZLIB) && !defined(USE_BZ2LIB) 
 
@@ -84,6 +93,9 @@ extern int CLseek(CLFile *file, long offset, int whence); ///  Library file seek
 
     /// Build libary path name
 extern char* LibraryFileName(const char* file,char* buffer);
+
+    /// Read the contents of a directory
+extern int ReadDataDirectory(const char* dirname,char* suffix, FileList **flp);
 
 //@}
 
