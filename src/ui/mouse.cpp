@@ -932,7 +932,7 @@ local void DoSelectionButtons(unsigned num,unsigned button)
     unit=Selected[num];
 
     if( (KeyModifiers&ModifierControl)
-	    || ((MouseButtons&LeftButton)<<MouseDoubleShift)) {
+	    || (MouseButtons&(LeftButton<<MouseDoubleShift)) ) {
 	SelectUnitsByType(unit);
     } else if( KeyModifiers&ModifierAlt ) {
 	SelectGroupFromUnit(unit);
