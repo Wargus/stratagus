@@ -41,9 +41,7 @@ MODULES = src/action src/ai src/beos src/stratagus src/editor src/game src/libmo
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/sound src/ui src/unit \
           src/video etlib
 
-MODULES_TOOLS = tools
-
-MODULES_ALL = $(MODULES) $(MODULES_TOOLS)
+MODULES_ALL = $(MODULES)
 
 MISC :=
 
@@ -55,19 +53,14 @@ include $(patsubst %, %/Module.make, $(MODULES))
 OBJ := $(patsubst %.c, %.o, $(SRC))
 OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 
-SRC_TOOLS := 
-include $(patsubst %, %/Module.make, $(MODULES_TOOLS))
-OBJ_TOOLS := $(patsubst %.c, %.o, $(SRC_TOOLS))
-OBJ_TOOLS := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ_TOOLS))),$(notdir $(OBJ_TOOLS)))
-
-SRC_ALL = $(SRC) $(SRC_TOOLS)
-OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
+SRC_ALL = $(SRC)
+OBJ_ALL = $(OBJ)
 
 .SUFFIXES: .c .o
 
 .PHONY:	make-objdir all-src
 
-all:	all-src stratagus$(EXE) tools
+all:	all-src stratagus$(EXE)
 
 make-objdir:
 	@for i in $(MODULES); do \
@@ -167,7 +160,7 @@ lockver:
 	for i in $(MODULES_ALL); do $(LOCKVER) Module.make; done
 
 tags:
-	for i in $(SRC) $(SRC_TOOLS); do \
+	for i in $(SRC); do \
 	ctags --c-types=defmpstuvx -a -f tags `pwd`/$$i ; done
 
 depend:
@@ -191,15 +184,6 @@ include .depend
 endif
 
 ##############################################################################
-#	TOOLS
-##############################################################################
-
-tools: tools/aledoc$(EXE)
-
-tools/aledoc$(EXE): tools/aledoc.c
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
-
-##############################################################################
 #	Distributions
 ##############################################################################
 
@@ -215,8 +199,7 @@ MISC    += Makefile Rules.make.orig \
 	  Rules.make.in configure.in configure \
 	  src/stratagus.rc stratagus.dsw stratagus.dsp \
 	  $(patsubst %, %/Module.make, $(MODULES)) \
-	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS)) \
-	  $(patsubst %, %/Module.make, $(MODULES_TOOLS))
+	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
 mydate	= $(shell date +%y%m%d)
 distdir	= stratagus-$(mydate)
@@ -289,7 +272,6 @@ diff:
 	@$(RM) $(difffile)
 	@$(RM) $(DISTLIST)
 	$(MAKE) -C src RULESFILE=$(RULESFILE) distlist
-	$(MAKE) -C tools RULESFILE=$(RULESFILE) distlist
 	echo $(MISC) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	rcsdiff -u `cat $(DISTLIST)` > $(difffile)
@@ -342,7 +324,7 @@ win32distclean:
 #	INSTALL/UNINSTALL
 ##############################################################################
 
-install:	all install-stratagus install-tools
+install:	all install-stratagus
 
 install-stratagus:
 	install -m 755 stratagus $(PREFIX)/bin
