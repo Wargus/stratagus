@@ -2583,7 +2583,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
 #ifdef NEW_FOW
 		if ( (mine=GoldMineOnMap(x,y)) && IsMapFieldExplored(unit->Player,x,y) ) {
 #else
-		if ( mine=GoldMineOnMap(x,y) ) {
+		if ( (mine=GoldMineOnMap(x,y)) ) {
 #endif
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
