@@ -96,8 +96,8 @@ extern void CommandBoard(Unit* unit,Unit* dest,int flush);
 extern void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush);
     /// Prepare command build
 extern void CommandBuildBuilding(Unit*,int,int,UnitType*,int);
-    /// Prepare command cancel build
-extern void CommandCancelBuilding(Unit* unit,Unit* worker);
+    /// Prepare command dismiss
+extern void CommandDismiss(Unit* unit);
     /// Prepare command resource location
 extern void CommandResourceLoc(Unit* unit,int x,int y,int flush);
     /// Prepare command resource
