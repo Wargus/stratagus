@@ -284,6 +284,7 @@ local int OffsetY = 0;
 global ServerSetup ServerSetupState, LocalSetupState;
 
 
+#ifdef OLD_MENU
 /**
 **	Items for the Game Menu
 */
@@ -297,7 +298,6 @@ local Menuitem GameMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitGameMenuItems() {
     MenuitemText   i0 = { "Game Menu", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11};
@@ -318,6 +318,7 @@ local void InitGameMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Victory Menu
 */
@@ -327,8 +328,6 @@ local Menuitem VictoryMenuItems[] = {
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-
-#ifdef OLD_MENU
 local void InitVictoryMenuItems() {
     MenuitemText   i0 = { "Congratulations!", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { "You are victorious!", MI_TFLAGS_CENTERED};
@@ -341,6 +340,7 @@ local void InitVictoryMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Lost Menu
 */
@@ -349,7 +349,6 @@ local Menuitem LostMenuItems[] = {
     { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitLostMenuItems() {
     MenuitemText   i0 = { "You failed to", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { "achieve victory!", MI_TFLAGS_CENTERED};
@@ -360,6 +359,7 @@ local void InitLostMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem TipsMenuItems[] = {
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, InitTips, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_GEM, 14, 256-75, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
@@ -375,7 +375,6 @@ local Menuitem TipsMenuItems[] = {
     { MI_TYPE_TEXT, 14, 35+16*6, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 14, 35+16*7, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitTipsMenuItems() {
     MenuitemText   i0  = { "Freecraft Tips", MI_TFLAGS_CENTERED};
     MenuitemGem    i1  = { MI_GSTATE_CHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetTips};
@@ -406,6 +405,7 @@ local void InitTipsMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem ObjectivesMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 14, 38+21*0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
@@ -419,7 +419,6 @@ local Menuitem ObjectivesMenuItems[] = {
     { MI_TYPE_TEXT, 14, 38+21*8, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitObjectivesMenuItems() {
     MenuitemText   i0  = { "Objectives", MI_TFLAGS_CENTERED};
     MenuitemText   i1  = { NULL, 0};
@@ -438,6 +437,7 @@ local void InitObjectivesMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem EndScenarioMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36*0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
@@ -446,7 +446,6 @@ local Menuitem EndScenarioMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36*3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitEndScenarioMenuItems() {
     MenuitemText   i0 = { "End Scenario", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "~!Restart Scenario", 224, 27, MBUTTON_GM_FULL, EndScenarioRestart, 'r'};
@@ -463,6 +462,17 @@ local void InitEndScenarioMenuItems() {
 }
 #endif
 
+
+local int GuiGameStarted;
+
+local char ScenSelectPath[1024];		/// Scenario selector path
+local char ScenSelectDisplayPath[1024];		/// Displayed selector path
+local char ScenSelectFileName[128];		/// Scenario selector name
+global char ScenSelectFullPath[1024];		/// Scenario selector path+name
+
+global MapInfo *ScenSelectPudInfo;		/// Selected pud info
+
+#ifdef OLD_MENU
 /**
 **	Items for the SelectScen Menu
 */
@@ -483,16 +493,6 @@ local unsigned char *ssmsoptions[] = {
     "1024 x 1024",
     // FIXME: We support bigger sizes
 };
-
-local int GuiGameStarted;
-
-local char ScenSelectPath[1024];		/// Scenario selector path
-local char ScenSelectDisplayPath[1024];		/// Displayed selector path
-local char ScenSelectFileName[128];		/// Scenario selector name
-global char ScenSelectFullPath[1024];		/// Scenario selector path+name
-
-global MapInfo *ScenSelectPudInfo;		/// Selected pud info
-
 /**
 **	Scenario selection menu.
 */
@@ -511,7 +511,6 @@ local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitScenSelectMenuItems() {
     MenuitemText    i0 = { "Select scenario", MI_TFLAGS_CENTERED};
 
@@ -540,6 +539,7 @@ local void InitScenSelectMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Program Start Menu
 */
@@ -554,7 +554,6 @@ local Menuitem PrgStartMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 145 + 36 * 6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 7, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitPrgStartMenuItems() {
     MenuitemDrawfunc i0 = { NameLineDrawFunc };
     MenuitemButton   i1 = { "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'};
@@ -577,6 +576,13 @@ local void InitPrgStartMenuItems() {
 }
 #endif
 
+local unsigned char *mgptsoptions[] = {
+    "Available",
+    "Computer",
+    "Closed",
+};
+
+#ifdef OLD_MENU
 /**
 **	Items for the Custom Game Setup Menu
 */
@@ -648,12 +654,6 @@ local unsigned char *mgfwsoptions[] = {
     "Off",
 };
 
-local unsigned char *mgptsoptions[] = {
-    "Available",
-    "Computer",
-    "Closed",
-};
-
 /**
 **	Single player custom game menu.
 */
@@ -678,7 +678,6 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_TEXT, 640-224-16, 10+300-20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_PULLDOWN, 640-224-16, 10+300, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitCustomGameMenuItems() {
     MenuitemDrawfunc i0  = { GameDrawFunc };
     MenuitemText     i1  = { "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED};
@@ -717,6 +716,7 @@ local void InitCustomGameMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Enter Name Menu
 */
@@ -726,7 +726,6 @@ local Menuitem EnterNameMenuItems[] = {
     { MI_TYPE_BUTTON, 24, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitEnterNameMenuItems() {
     MenuitemText   i0 = { "Enter your name:", MI_TFLAGS_CENTERED};
     MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterNameAction, 0, 0};
@@ -739,6 +738,7 @@ local void InitEnterNameMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Enter Server Menu
 */
@@ -748,7 +748,6 @@ local Menuitem EnterServerIPMenuItems[] = {
     { MI_TYPE_BUTTON, 24, 80, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitEnterServerIPMenuItems() {
     MenuitemText   i0 = { "Enter server IP-address:", MI_TFLAGS_CENTERED};
     MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterServerIPAction, 0, 0};
@@ -761,6 +760,7 @@ local void InitEnterServerIPMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Net Create Join Menu
 */
@@ -769,7 +769,6 @@ local Menuitem NetCreateJoinMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitNetCreateJoinMenuItems() {
     MenuitemButton i0 = { "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'};
     MenuitemButton i1 = { "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'};
@@ -788,14 +787,12 @@ local Menuitem NetMultiButtonStorage[] = {
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-//#ifdef OLD_MENU
 local void InitNetMultiButtonStorage() {
     MenuitemPulldown i0 = { mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, -1, 0, 0, 0};
     MenuitemDrawfunc i1 = { NetMultiPlayerDrawFunc };
     NetMultiButtonStorage[0].d.pulldown = i0;
     NetMultiButtonStorage[1].d.drawfunc = i1;
 }
-//#endif
 
 /**
 **	Multi player custom game menu (server side).
@@ -1172,12 +1169,12 @@ local void InitNetMultiClientMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem NetErrorMenuItems[] = {
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 144, 38, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 92, 80, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitNetErrorMenuItems() {
     MenuitemText   i0 = { "Error:", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { NULL, MI_TFLAGS_CENTERED};
@@ -1188,6 +1185,7 @@ local void InitNetErrorMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Connecting Network Menu
 */
@@ -1197,7 +1195,6 @@ local Menuitem ConnectingMenuItems[] = {
     { MI_TYPE_TEXT, 144, 53, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitConnectingMenuItems() {
     MenuitemText   i0 = { "Connecting to server", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { NetServerText, MI_TFLAGS_CENTERED};
@@ -1210,6 +1207,7 @@ local void InitConnectingMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Campaign Select Menu
 */
@@ -1221,7 +1219,6 @@ local Menuitem CampaignSelectMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitCampaignSelectMenuItems() {
     MenuitemButton i0 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu1, 'a'};
     MenuitemButton i1 = { NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu2, 'm'};
@@ -1238,19 +1235,20 @@ local void InitCampaignSelectMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the Campaign Continue Menu
 */
 local Menuitem CampaignContMenuItems[] = {
     { MI_TYPE_BUTTON, 508, 320 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitCampaignContMenuItems() {
     MenuitemButton i0 = { "~!Continue", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     CampaignContMenuItems[0].d.button = i0;
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem SoundOptionsMenuItems[] = {
     { MI_TYPE_TEXT, 176, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
@@ -1280,7 +1278,6 @@ local Menuitem SoundOptionsMenuItems[] = {
     { MI_TYPE_TEXT, 180, 36*6.5 + 2, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 176 - (106 / 2), 352 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitSoundOptionsMenuItems() {
     MenuitemText    i0  = { "Sound Options", MI_TFLAGS_CENTERED};
 
@@ -1337,6 +1334,7 @@ local void InitSoundOptionsMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem PreferencesMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 
@@ -1348,7 +1346,6 @@ local Menuitem PreferencesMenuItems[] = {
 
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitPreferencesMenuItems() {
     MenuitemText   i0 = { "Preferences", MI_TFLAGS_CENTERED};
     MenuitemGem    i1 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar};
@@ -1365,6 +1362,7 @@ local void InitPreferencesMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem SpeedSettingsMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 16, 36*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
@@ -1381,7 +1379,6 @@ local Menuitem SpeedSettingsMenuItems[] = {
     { MI_TYPE_TEXT, 230, 36*6 + 6, 0, SmallFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitSpeedSettingsMenuItems() {
     MenuitemText    i0  = { "Speed Settings", MI_TFLAGS_CENTERED};
     MenuitemText    i1  = { "Game Speed", MI_TFLAGS_LALIGN};
@@ -1414,6 +1411,7 @@ local void InitSpeedSettingsMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 #ifdef WITH_SOUND
@@ -1425,7 +1423,6 @@ local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitGameOptionsMenuItems() {
     MenuitemText   i0 = { "Game Options", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7};
@@ -1440,13 +1437,13 @@ local void InitGameOptionsMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem HelpMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitHelpMenuItems() {
     MenuitemText   i0 = { "Help Menu", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, KeystrokeHelpMenu, 'h'};
@@ -1459,12 +1456,6 @@ local void InitHelpMenuItems() {
 }
 #endif
 
-local Menuitem KeystrokeHelpMenuItems[] = {
-    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
-};
 // FIXME: ccl these...
 // FIXME: add newer helps
 local unsigned char *keystrokekeystexts[] = {
@@ -1549,6 +1540,12 @@ local unsigned char *keystrokehintstexts[] = {
 };
 
 #ifdef OLD_MENU
+local Menuitem KeystrokeHelpMenuItems[] = {
+    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+};
 local void InitKeystrokeHelpMenuItems() {
     MenuitemText     i0 = { "Keystroke Help Menu", MI_TFLAGS_CENTERED};
     MenuitemVslider  i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
@@ -1561,6 +1558,7 @@ local void InitKeystrokeHelpMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem SaveGameMenuItems[] = {
     { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitSaveGameMenu, NULL, NULL, {{NULL, 0}} },
     { MI_TYPE_INPUT, 16, 11+36*1, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
@@ -1570,7 +1568,6 @@ local Menuitem SaveGameMenuItems[] = {
     { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitSaveGameMenuItems() {
     MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
     MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
@@ -1590,6 +1587,7 @@ local void InitSaveGameMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem LoadGameMenuItems[] = {
     { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitLoadGameMenu, NULL, NULL, {{NULL, 0}} },
     { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, LoadLBInit, LoadLBExit, NULL, {{NULL,0}} },
@@ -1597,7 +1595,6 @@ local Menuitem LoadGameMenuItems[] = {
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitLoadGameMenuItems() {
     MenuitemText    i0 = { "Load Game", MI_TFLAGS_CENTERED};
     MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, LoadLBAction, 0, 0, 0, 0, 7, 0, 0,
@@ -1613,6 +1610,7 @@ local void InitLoadGameMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem ConfirmSaveMenuItems[] = {
     { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, ConfirmSaveInit, NULL, NULL, {{NULL, 0}} },
     { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, NULL, {{NULL, 0}} },
@@ -1620,7 +1618,6 @@ local Menuitem ConfirmSaveMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitConfirmSaveMenuItems() {
     MenuitemText    i0 = { "Overwrite File", MI_TFLAGS_CENTERED};
     MenuitemText    i1 = { "Are you sure you want to overwrite", MI_TFLAGS_LALIGN};
@@ -1635,6 +1632,7 @@ local void InitConfirmSaveMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem ConfirmDeleteMenuItems[] = {
     { MI_TYPE_TEXT, 288/2, 11, 0, LargeFont, FcDeleteInit, NULL, NULL, {{NULL, 0}} },
     { MI_TYPE_TEXT, 16, 11+20*1.5, 0, GameFont, NULL, NULL, NULL, {{NULL, 0}} },
@@ -1642,7 +1640,6 @@ local Menuitem ConfirmDeleteMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 288-16-106, 128-27*1.5, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitConfirmDeleteMenuItems() {
     MenuitemText    i0 = { "Delete File", MI_TFLAGS_CENTERED};
     MenuitemText    i1 = { "Are you sure you want to delete", MI_TFLAGS_LALIGN};
@@ -1657,12 +1654,12 @@ local void InitConfirmDeleteMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem EditorSelectMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 320 + 36 * 0, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 320 + 36 * 1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 320 + 36 * 2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitEditorSelectMenuItems() {
     MenuitemButton i0 = { "~!New Map", 224, 27, MBUTTON_GM_FULL, EditorNewMap, 'n'};
     MenuitemButton i1 = { "~!Load Map", 224, 27, MBUTTON_GM_FULL, EditorLoadMap, 'l'};
@@ -1673,6 +1670,7 @@ local void InitEditorSelectMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem EditorLoadMapMenuItems[] = {
     { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, EditorLoadInit, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_LISTBOX, (352-18-288)/2, 11+98, 0, GameFont, EditorLoadLBInit, EditorLoadLBExit, NULL, {{NULL,0}} },
@@ -1682,7 +1680,6 @@ local Menuitem EditorLoadMapMenuItems[] = {
     { MI_TYPE_BUTTON, (352-18-288)/2-2, 11+98-28, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 
 };
-#ifdef OLD_MENU
 local void InitEditorLoadMapMenuItems() {
     MenuitemText    i0 = { "Select map", MI_TFLAGS_CENTERED};
 
@@ -1702,6 +1699,7 @@ local void InitEditorLoadMapMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 /**
 **	Items for the main Editor Menu
 */
@@ -1715,7 +1713,6 @@ local Menuitem EditorMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 288-40-36, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitEditorMenuItems() {
     MenuitemText   i0 = { "Editor Menu", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11};
@@ -1736,6 +1733,7 @@ local void InitEditorMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local unsigned char *mptssoptions[] = {
     "Forest",
     "Winter",
@@ -1762,7 +1760,6 @@ local Menuitem EditorMapPropertiesMenuItems[] = {
     { MI_TYPE_BUTTON, (288-106*2)/4, 256 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 288-(288-106*2)/4 - 106, 256 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitEditorMapPropertiesMenuItems() {
     MenuitemText     i0  = { "Map Properties", MI_TFLAGS_CENTERED};
     MenuitemText     i1  = { "Map Description:", MI_TFLAGS_LALIGN};
@@ -1789,10 +1786,10 @@ local void InitEditorMapPropertiesMenuItems() {
 }
 #endif
 
+#ifdef OLD_MENU
 local Menuitem EditorPlayerPropertiesMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
 };
-#ifdef OLD_MENU
 local void InitEditorPlayerPropertiesMenuItems() {
     MenuitemText   i0 = { "Player Properties", MI_TFLAGS_CENTERED};
     EditorPlayerPropertiesMenuItems[0].d.text   = i0;
@@ -6421,6 +6418,7 @@ local void EditorMapPropertiesCancel(void)
 
 local void EditorPlayerProperties(void)
 {
+    StartMenusSetBackground(NULL);
     ProcessMenu("menu-editor-player-properties", 1);
 }
 
@@ -6593,7 +6591,7 @@ global void InitMenuFunctions(void)
 
 #ifdef SAVE_MENU_CCL
     {
-	FILE *fd=fopen("menus.ccl","w");
+	FILE *fd=fopen("menus.ccl","wb");
 	SaveMenus(fd);
 	fclose(fd);
     }
@@ -6607,6 +6605,7 @@ char *menu_names[] = {
     "menu-defeated",
     "menu-select-scenario",
     "menu-program-start",
+    "menu-global-options",
     "menu-custom-game",
     "menu-enter-name",
     "menu-create-join-menu",
@@ -6798,7 +6797,7 @@ global void SaveMenus(FILE* file)
 		exitfunc[0] = '\0';
 	    }
 
-	    fprintf(file,"(define-menu-item 'pos '(%d %d) 'font '%s %s%s%s\n",
+	    fprintf(file,"(define-menu-item 'pos (list %d %d) 'font '%s %s%s%s\n",
 			 menu->items[j].xofs, menu->items[j].yofs,
 			 font_names[menu->items[j].font],
 			 menu_flags[menu->items[j].flags],
