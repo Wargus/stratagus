@@ -35,8 +35,13 @@ DefineNewAnimations("animations-cam", {
         "frame 9", "wait 2", "frame 10", "wait 2", "frame 11", "wait 2", 
         "frame 12", "wait 2", "frame 13", "wait 2", "frame 14", "wait 2", 
         "frame 15", "wait 2", },
-    Death = {"unbreakable begin", "frame 0", "wait 10", 
-        "frame 1", "wait 150", "frame 1", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 1", },
+    })
+
+
+DefineNewAnimations("animations-dead_cam", {
+    Death = {"unbreakable begin", "frame 0", "wait 2000",
+        "frame 1", "unbreakable end", "wait 200", },
     })
 
 DefineIcon({
@@ -87,7 +92,7 @@ DefineUnitType("unit-cam", {
 DefineUnitType("camera_destroyed", {
         Name = "CameraCrater",
         Files = {"tileset-desert", "elites/build/camera_c.png"}, Size = {32, 64},
-        NewAnimations = "animations-cam", Icon = "icon-cancel",
+        NewAnimations = "animations-dead_cam", Icon = "icon-cancel",
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
         BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
