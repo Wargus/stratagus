@@ -4446,15 +4446,13 @@ local void EndMenu(void)
 {
     CursorOn = CursorOnUnknown;
     CurrentMenu = -1;
-    MustRedraw |= RedrawMenu|RedrawCursor;
 
+    MustRedraw = RedrawEverything;
     InterfaceState = IfaceStateNormal;
     HideAnyCursor();
-    DrawMapArea();
+    UpdateDisplay();
     InterfaceState = IfaceStateMenu;
-    MustRedraw=RedrawEverything;
 }
-
 
 /**
 **	Process a menu.
