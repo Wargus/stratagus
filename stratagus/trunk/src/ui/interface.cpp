@@ -1156,8 +1156,11 @@ global void HandleKeyUp(unsigned key,unsigned keychar)
 **	@param keychar	Character code.
 */
 global void HandleKeyRepeat(unsigned key __attribute__((unused)),
-			    unsigned keychar __attribute__((unused)))
+			    unsigned keychar)
 {
+    if( KeyState==KeyStateInput && keychar ) {
+	InputKey(keychar);
+    }
 }
 
 /**
@@ -1385,7 +1388,9 @@ global void InputKeyButtonPress(const EventCallback* callbacks,
 global void InputKeyButtonRelease(const EventCallback* callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
-    LastIKey=0;
+    if( ikey==LastIKey ) {
+	LastIKey=0;
+    }
     callbacks->KeyReleased(ikey, ikeychar);
 }
 
