@@ -43,7 +43,7 @@ global void HandleActionResearch(Unit* unit)
     unit->Command.Data.Research.Ticks+=SpeedResearch;
     if( unit->Command.Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
 
-	// FIXME: should als speak and tell ai
+	// FIXME: should als speak and tell ai. generic notify/message.
 	if( unit->Player==ThisPlayer ) {
 	  SetMessage2( unit->X, unit->Y, "%s: Upgrade complete", unit->Type->Name );
 	}
