@@ -1415,6 +1415,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				DebugLevel3Fn("Server: ICMState: Client[%d]: Ready: %d Race: %d\n",
 						 h, ServerSetupState.Ready[h], ServerSetupState.Race[h]);
 				/// Add additional info usage here!
+				NetConnectForceDisplayUpdate();
 				/* Fall through */
 			    case ccs_async:
 				/// this code path happens until client acknoledges the state change reply
