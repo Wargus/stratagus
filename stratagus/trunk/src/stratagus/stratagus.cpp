@@ -750,7 +750,7 @@ void MenuLoop(const char* filename, WorldMap* map)
 		PreMenuSetup();
 
 		filename = NextChapter();
-		if (filename) {
+		if (filename && filename != CurrentMapPath) {
 			sprintf(CurrentMapPath, "%s/%s", StratagusLibPath, filename);
 			filename = CurrentMapPath;
 			DebugPrint("Next chapter %s\n" _C_ CurrentMapPath);
