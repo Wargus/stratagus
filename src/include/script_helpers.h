@@ -39,90 +39,90 @@
 --	Structures
 ----------------------------------------------------------------------------*/
 
-typedef struct _ccl_flag_def_ CclFlagDef;
-struct _ccl_flag_def_
-{
-    char *ident;
-    int value;
-};
+// FIXME: (mr-russ) document
 
-typedef struct _ccl_field_def_ CclFieldDef;
-struct _ccl_field_def_
+typedef struct _ccl_flag_def_
 {
-    char *name;
-    void ( *convertfunc ) ( SCM scmfrom, void *binaryform, void *para );
-    void *offset;
-    void *para;
-};
+    char*	ident;
+    int		value;
+} CclFlagDef;
 
-typedef struct _IOStruct_def_ CclStructDef;
-struct _IOStruct_def_
+typedef struct _ccl_field_def_
 {
-    char *name;
-    int size;
-    int array_size;
-    CclFieldDef defs[];
-};
+    char*	name;
+    void 	(*convertfunc)(SCM scmfrom, void *binaryform, void *para);
+    void*	offset;
+    void*	para;
+} CclFieldDef;
+
+typedef struct _IOStruct_def_
+{
+    char*	name;
+    int		size;
+    int		array_size;
+    CclFieldDef	defs[];
+} CclStructDef;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 extern int IOLoadingMode;
 extern unsigned int IOTabLevel;
-extern CLFile *IOOutFile;
+extern CLFile* IOOutFile;
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-/// Print "IOTabLevel" tabs on the ccl output
+    /// Print "IOTabLevel" tabs on the ccl output
 extern void IOPrintTabs();
-/// Handle saving/loading of structure
-extern void IOStruct( SCM scmform, void *binaryform, void *para );
-/// Handle saving/loading a pointer to a structure.
-extern void IOStructPtr( SCM scmform, void *binaryform, void *para );
-/// Handle loading a fixed size array of structure.
-extern void IOStructArray( SCM from, void *binaryform, void *para );
-/// Handle saving/loading linked list.
-extern void IOLinkedList( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading tables.
-extern void IOTable( SCM scmfrom, void *binaryform, void *para );
-/// Handle the case of saving/loading pointers which are null
-extern int IOHandleNullPtr( SCM scmfrom, void *binaryform );
-/// Handle saving/loading of int
-extern void IOInt( SCM scmform, void *binaryform, void *para );
-/// Handle saving/loading of bool stored as int 
-extern void IOBool( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading of bool stored as char
-extern void IOCharBool( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading of string
-extern void IOString( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading of SCM
-extern void IOCcl( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading of flag stored in char
-extern void IOCharFlag( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading a fixed length string
-extern void IOStrBuffer( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading a dynamic array of int
-extern void IOIntArrayPtr( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading an already allocated array of int
-extern void IOIntArray( SCM scmfrom, void *binaryform, void *para );
+    /// Handle saving/loading of structure
+extern void IOStruct(SCM scmform, void *binaryform, void *para);
+    /// Handle saving/loading a pointer to a structure.
+extern void IOStructPtr(SCM scmform, void *binaryform, void *para);
+    /// Handle loading a fixed size array of structure.
+extern void IOStructArray( SCM from, void *binaryform, void *para);
+    /// Handle saving/loading linked list.
+extern void IOLinkedList(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading tables.
+extern void IOTable(SCM scmfrom, void *binaryform, void *para);
+    /// Handle the case of saving/loading pointers which are null
+extern int IOHandleNullPtr(SCM scmfrom, void *binaryform);
+    /// Handle saving/loading of int
+extern void IOInt(SCM scmform, void *binaryform, void *para);
+    /// Handle saving/loading of bool stored as int 
+extern void IOBool(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading of bool stored as char
+extern void IOCharBool(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading of string
+extern void IOString(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading of SCM
+extern void IOCcl(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading of flag stored in char
+extern void IOCharFlag(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading a fixed length string
+extern void IOStrBuffer(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading a dynamic array of int
+extern void IOIntArrayPtr(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading an already allocated array of int
+extern void IOIntArray(SCM scmfrom, void *binaryform, void *para);
 
-/// Handle saving/loading an unittype pointer (UnitType*)
-extern void IOUnitTypePtr( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading a reference to an unit (Unit*)
-extern void IOUnitPtr( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading a reference to an upgrade (Upgrade*)
-extern void IOUpgradePtr( SCM scmfrom, void *binaryform, void *para );
-/// Handle saving/loading a reference to a player (Player*)
-extern void IOPlayerPtr( SCM scmfrom, void *binaryform, void *para );
+    /// Handle saving/loading an unittype pointer (UnitType*)
+extern void IOUnitTypePtr(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading a reference to an unit (Unit*)
+extern void IOUnitPtr(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading a reference to an upgrade (Upgrade*)
+extern void IOUpgradePtr(SCM scmfrom, void *binaryform, void *para);
+    /// Handle saving/loading a reference to a player (Player*)
+extern void IOPlayerPtr(SCM scmfrom, void *binaryform, void *para);
 
 
-/// Handle saving/loading a reference to an aitype. (AiType*)
-/*extern void IOAiTypePtr(SCM from,void * binaryform,void * para)*/
-/// Handle saving/loading a reference to an AiScriptAction. (AiScriptAction**)
-/*extern void IOAiScriptActionPtr(SCM scmfrom,void * binaryform,void * para);*/
-
+#if 0
+    /// Handle saving/loading a reference to an aitype. (AiType*)
+extern void IOAiTypePtr(SCM from,void * binaryform,void * para);
+    /// Handle saving/loading a reference to an AiScriptAction. (AiScriptAction**)
+extern void IOAiScriptActionPtr(SCM scmfrom,void * binaryform,void * para);
+#endif
 //@}
 
 #endif				// !__CCL_H__
