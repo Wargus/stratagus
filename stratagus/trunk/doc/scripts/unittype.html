@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
-<!-- 
+<!--
 ----	(c) Copyright 2002-2004 by Lutz Sammer, Russell Smith
 
 ----    This program is free software; you can redistribute it and/or modify
@@ -189,8 +189,6 @@ The predefined values are :
   <dd>How many the unit demand to the player. Max is the total demand for the player.</dd>
   <dt>Armor</dt>
   <dd>Armor of the unit.</dd>
-  <dt>Speed</dt>
-  <dd>Speed of the unit.</dd>
   <dt>SightRange</dt>
   <dd>Sight range of the unit.</dd>
   <dt>AttackRange</dt>
@@ -237,10 +235,6 @@ player have the same stats, affected by upgrades.
 <dd>The level of the unit. It is equal to the number of upgrades of a
 certain unit and is purely cosmetic. It doesn't affect the game in any way.
 </dd>
-<dt>speed</dt>
-<dd>The speed of the unit. This is not used, just shown. Unit speed is
-controlled by animation length, see define-animation.
-</dd>
 <dt>attack-range</dt>
 <dd>The unit's attack range(circular). Use 1 for melee units.
 </dd>
@@ -273,7 +267,7 @@ A special 'resource' is time, the time to train the unit in cycles.
 
 <pre>
     DefineUnitStats("unit-archer", 14,
-      "level", 1, "speed", 10, "attack-range", 4, "sight-range", 5,
+      "level", 1, "attack-range", 4, "sight-range", 5,
       "armor", 0, "basic-damage", 3, "piercing-damage", 6, "hit-points", 40,
       "costs", {"time", 0, "titanium", 0, "crystal", 0, "gas", 0, "ore", 0,
                 "stone", 0, "coal", 0})
@@ -370,10 +364,6 @@ files are not declared here. Please see the documentation on <a href="sound.html
 <a href="#DefineUnitStats">DefineUnitStats</a>
 </dt>
 -->
-<dt>Speed = number</dt>
-<dd>The speed shown for this unit-type in game. (NOTE: this is
-only shown and *not* used).
-</dd>
 <dt>MaxAttackRange = number</dt>
 <dd>Attack range (in tiles) of this unit. Use 1 for melee units.
 </dd>
@@ -706,7 +696,7 @@ DefineUnitType("unit-footman", { Name = "Footman",
   Size = {72, 72},
   Animations = "animations-footman", Icon = "icon-footman",
   Costs = {"time", 60, "gold", 600},
-  Speed = 10,
+  Speed = 10, -- Variable Defined
   HitPoints = 60,
   DrawLevel = 40,
   TileSize = {1, 1}, BoxSize = {31, 31},
