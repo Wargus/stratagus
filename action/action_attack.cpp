@@ -170,6 +170,89 @@ local Unit* CheckForDeadGoal(Unit* unit)
 }
 
 /**
+**	Check for target in range.
+**
+**	@return		True if command is over.
+*/
+local int CheckForTargetInRange(Unit* unit)
+{
+    Unit* goal;
+    Unit* temp;
+    int wall;
+
+    //
+    //	Target is dead?
+    //
+    goal=CheckForDeadGoal(unit);
+    // Fall back to last order, only works if this wasn't attack
+    if( unit->Orders[0].Action!=UnitActionAttackGround
+	    && unit->Orders[0].Action!=UnitActionAttack ) {
+	unit->State=unit->SubAction=0;
+	return 1;
+    }
+
+    //
+    //	No goal: if meeting enemy attack it.
+    //
+    wall=0;
+    if( !goal && !(wall=WallOnMap(unit->Orders[0].X,unit->Orders[0].Y))
+	    && unit->Orders[0].Action!=UnitActionAttackGround ) {
+	goal=AttackUnitsInReactRange(unit);
+	if( goal ) {
+	    if( unit->SavedOrder.Action==UnitActionStill ) {
+		// Save current command to continue it later.
+		DebugCheck( unit->Orders[0].Goal );
+		unit->SavedOrder=unit->Orders[0];
+	    }
+	    RefsDebugCheck( goal->Destroyed || !goal->Refs );
+	    goal->Refs++;
+	    unit->Orders[0].Goal=goal;
+	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=
+		    unit->Stats->AttackRange;
+	    unit->Orders[0].X=unit->Orders[0].Y=-1;
+	    unit->SubAction|=WEAK_TARGET;		// weak target
+	    NewResetPath(unit);
+	    DebugLevel3Fn("%d in react range %d\n"
+		    ,UnitNumber(unit),UnitNumber(goal));
+	}
+
+    //
+    //	Have a weak target, try a better target.
+    //
+    } else if( goal && (unit->SubAction&WEAK_TARGET) ) {
+	temp=AttackUnitsInReactRange(unit);
+	if( temp && temp->Type->Priority>goal->Type->Priority ) {
+	    RefsDebugCheck( !goal->Refs );
+	    goal->Refs--;
+	    RefsDebugCheck( !goal->Refs );
+	    RefsDebugCheck( temp->Destroyed || !temp->Refs );
+	    temp->Refs++;
+	    if( unit->SavedOrder.Action==UnitActionStill ) {
+		// Save current command to come back.
+		unit->SavedOrder=unit->Orders[0];
+		if( (goal=unit->SavedOrder.Goal) ) {
+		    DebugLevel0Fn("Have goal to come back %d\n",
+			    UnitNumber(goal));
+		    unit->SavedOrder.X=goal->X+goal->Type->TileWidth/2;
+		    unit->SavedOrder.Y=goal->Y+goal->Type->TileHeight/2;
+		    unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
+		    unit->SavedOrder.Goal=NoUnitP;
+		}
+	    }
+	    unit->Orders[0].Goal=goal=temp;
+	    unit->Orders[0].X=unit->Orders[0].Y=-1;
+	    NewResetPath(unit);
+	}
+    }
+
+    DebugCheck( unit->Type->Vanishes || unit->Destroyed || unit->Removed );
+    DebugCheck( unit->Orders[0].Action!=UnitActionAttack 
+	    && unit->Orders[0].Action!=UnitActionAttackGround );
+
+    return 0;
+}
+
+/**
 **	Handle moving to the target.
 **
 **	@param unit	Unit, for that the attack is handled.
@@ -177,8 +260,6 @@ local Unit* CheckForDeadGoal(Unit* unit)
 local void MoveToTarget(Unit* unit)
 {
     Unit* goal;
-    Unit* temp;
-    int wall;
     int err;
 
     if( !unit->Orders[0].Goal ) {
@@ -222,69 +303,12 @@ local void MoveToTarget(Unit* unit)
 
     if( unit->Reset ) {
 	//
-	//	Target is dead?
+	//	Look if we have reached the target.
 	//
-	goal=CheckForDeadGoal(unit);
-	// Fall back to last order.
-	if( unit->Orders[0].Action!=UnitActionAttackGround
-		&& unit->Orders[0].Action!=UnitActionAttack ) {
-	    unit->State=unit->SubAction=0;
+	if( CheckForTargetInRange(unit) ) {
 	    return;
 	}
-
-	//
-	//	No goal: if meeting enemy attack it.
-	//
-	wall=0;
-	if( !goal && !(wall=WallOnMap(unit->Orders[0].X,unit->Orders[0].Y))
-		&& unit->Orders[0].Action!=UnitActionAttackGround ) {
-	    goal=AttackUnitsInReactRange(unit);
-	    if( goal ) {
-		if( unit->SavedOrder.Action==UnitActionStill ) {
-		    // Save current command to continue it later.
-		    DebugCheck( unit->Orders[0].Goal );
-		    unit->SavedOrder=unit->Orders[0];
-		}
-		RefsDebugCheck( goal->Destroyed || !goal->Refs );
-		goal->Refs++;
-		unit->Orders[0].Goal=goal;
-		unit->Orders[0].RangeX=unit->Orders[0].RangeY=
-			unit->Stats->AttackRange;
-		unit->Orders[0].X=unit->Orders[0].Y=-1;
-		unit->SubAction|=WEAK_TARGET;		// weak target
-		NewResetPath(unit);
-		DebugLevel3Fn("%d in react range %d\n"
-			,UnitNumber(unit),UnitNumber(goal));
-	    }
-
-	//
-	//	Have a weak target, try a better target.
-	//
-	} else if( goal && (unit->SubAction&WEAK_TARGET) ) {
-	    temp=AttackUnitsInReactRange(unit);
-	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
-		RefsDebugCheck( !goal->Refs );
-		goal->Refs--;
-		RefsDebugCheck( !goal->Refs );
-		RefsDebugCheck( temp->Destroyed || !temp->Refs );
-		temp->Refs++;
-		if( unit->SavedOrder.Action==UnitActionStill ) {
-		    // Save current command to come back.
-		    unit->SavedOrder=unit->Orders[0];
-		    if( (goal=unit->SavedOrder.Goal) ) {
-			DebugLevel0Fn("Have goal to come back %d\n",
-				UnitNumber(goal));
-			unit->SavedOrder.X=goal->X+goal->Type->TileWidth/2;
-			unit->SavedOrder.Y=goal->Y+goal->Type->TileHeight/2;
-			unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
-			unit->SavedOrder.Goal=NoUnitP;
-		    }
-		}
-		unit->Orders[0].Goal=goal=temp;
-		unit->Orders[0].X=unit->Orders[0].Y=-1;
-		NewResetPath(unit);
-	    }
-	}
+	goal=unit->Orders[0].Goal;
 
 	//
 	//	Have reached target? FIXME: could use the new return code?
@@ -298,7 +322,8 @@ local void MoveToTarget(Unit* unit)
 		CheckUnitToBeDrawn(unit);
 	    }
 	    unit->SubAction++;
-	} else if( (wall || unit->Orders[0].Action==UnitActionAttackGround)
+	} else if( (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
+		    || unit->Orders[0].Action==UnitActionAttackGround)
 		&& MapDistance(unit->X,unit->Y
 		    ,unit->Orders[0].X,unit->Orders[0].Y)
 			<=unit->Stats->AttackRange ) {
@@ -439,6 +464,7 @@ local void AttackTarget(Unit* unit)
 
 	//
 	//	Have a weak target, try a better target.
+	//	FIXME: if out of range also try another target quick
 	//
 	} else if( goal && (unit->SubAction&WEAK_TARGET) ) {
 	    temp=AttackUnitsInReactRange(unit);
@@ -531,6 +557,15 @@ global void HandleActionAttack(Unit* unit)
 	    //	FIXME: should use a reachable place to reduce pathfinder time.
 	    //
 	    DebugCheck( unit->State!=0 );
+	    //
+	    //	Look for target, if already in range.
+	    //
+	    if( CheckForTargetInRange(unit) ) {
+		return;
+	    }
+	    HandleActionAttack(unit);
+	    break;
+
 
 	    // FALL THROUGH
 	//
