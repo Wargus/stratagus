@@ -111,8 +111,8 @@ global void CreatePlayer(char* name,int type)
     }
 
     //
-    //	Make simple teams.
-    //	FIXME: this and IsEnemey ... must be completly rewritten.
+    //	Make simple teams:
+    //		All human players are enemies.
     //
     switch( type ) {
 	case PlayerNeutral:
@@ -147,6 +147,8 @@ global void CreatePlayer(char* name,int type)
     player->Type=type;
     player->Race=PlayerRaceHuman;
     player->Team=team;
+    player->Enemy=0;
+    player->Allied=0;
     player->AiNum=PlayerAiUniversal;
     
     //
@@ -171,7 +173,7 @@ global void CreatePlayer(char* name,int type)
     memset( &(player->UnitTypesCount), 0, sizeof(player->UnitTypesCount));
 
     player->Food=0;
-    player->NumUnits=0;
+    player->NumFoodUnits=0;
     player->NumBuildings=0;
     player->Score=0;
 
@@ -239,12 +241,12 @@ global int PlayerCheckFood(const Player* player,const UnitType* type)
 {
     // FIXME: currently all units costs 1 food
 
-    if( player->Food<=player->NumUnits ) {
+    if( player->Food<=player->NumFoodUnits ) {
 	// FIXME: need a general notify function
 	if( player==ThisPlayer ) {
 	    SetMessage("Not enough food...build more farms.");
 	} else {
-	    // FIXME: message to AI
+	    // FIXME: message to AI, called too much
 	    DebugLevel3("Ai: Not enough food...build more farms.\n");
 	}
 	return 0;
@@ -459,28 +461,37 @@ global void PlayersEachSecond(void)
 /**
 **	Change current color set to new player.
 **
+**	FIXME: use function pointer here.
+**
 **	@param player	Pointer to player.
 */
-global void RLEPlayerPixels(const Player* player, const RleSprite * sprite){
+global void RLEPlayerPixels(const Player* player, const RleSprite * sprite)
+{
   switch(VideoDepth){
   case 8:
-    ((VMemType8*)sprite->Pixels)[208]=player->UnitColor1;
-    ((VMemType8*)sprite->Pixels)[209]=player->UnitColor2;
-    ((VMemType8*)sprite->Pixels)[210]=player->UnitColor3;
-    ((VMemType8*)sprite->Pixels)[211]=player->UnitColor4;
+    //((VMemType8*)sprite->Pixels)[208]=player->UnitColor1;
+    //((VMemType8*)sprite->Pixels)[209]=player->UnitColor2;
+    //((VMemType8*)sprite->Pixels)[210]=player->UnitColor3;
+    //((VMemType8*)sprite->Pixels)[211]=player->UnitColor4;
+    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels)+208))
+	    =player->UnitColors.Depth8;
     break;
   case 15:
   case 16:
-    ((VMemType16*)sprite->Pixels)[208]=player->UnitColor1;
-    ((VMemType16*)sprite->Pixels)[209]=player->UnitColor2;
-    ((VMemType16*)sprite->Pixels)[210]=player->UnitColor3;
-    ((VMemType16*)sprite->Pixels)[211]=player->UnitColor4;
+    //((VMemType16*)sprite->Pixels)[208]=player->UnitColor1;
+    //((VMemType16*)sprite->Pixels)[209]=player->UnitColor2;
+    //((VMemType16*)sprite->Pixels)[210]=player->UnitColor3;
+    //((VMemType16*)sprite->Pixels)[211]=player->UnitColor4;
+    *((struct __4pixel16__*)(((VMemType16*)sprite->Pixels)+208))
+	    =player->UnitColors.Depth16;
     break;
   case 32:
-    ((VMemType32*)sprite->Pixels)[208]=player->UnitColor1;
-    ((VMemType32*)sprite->Pixels)[209]=player->UnitColor2;
-    ((VMemType32*)sprite->Pixels)[210]=player->UnitColor3;
-    ((VMemType32*)sprite->Pixels)[211]=player->UnitColor4;
+    //((VMemType32*)sprite->Pixels)[208]=player->UnitColor1;
+    //((VMemType32*)sprite->Pixels)[209]=player->UnitColor2;
+    //((VMemType32*)sprite->Pixels)[210]=player->UnitColor3;
+    //((VMemType32*)sprite->Pixels)[211]=player->UnitColor4;
+    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
+	    =player->UnitColors.Depth32;
     break;
   }
 }
@@ -495,29 +506,34 @@ global void PlayerPixels(const Player* player)
     // FIXME: use function pointer
     switch( VideoDepth ) {
     case 8:
-	Pixels8[208]=player->UnitColor1;
-	Pixels8[209]=player->UnitColor2;
-	Pixels8[210]=player->UnitColor3;
-	Pixels8[211]=player->UnitColor4;
+	//Pixels8[208]=player->UnitColor1;
+	//Pixels8[209]=player->UnitColor2;
+	//Pixels8[210]=player->UnitColor3;
+	//Pixels8[211]=player->UnitColor4;
+	*((struct __4pixel8__*)Pixels8+208)=player->UnitColors.Depth8;
 	break;
     case 15:
     case 16:
-	Pixels16[208]=player->UnitColor1;
-	Pixels16[209]=player->UnitColor2;
-	Pixels16[210]=player->UnitColor3;
-	Pixels16[211]=player->UnitColor4;
+	//Pixels16[208]=player->UnitColor1;
+	//Pixels16[209]=player->UnitColor2;
+	//Pixels16[210]=player->UnitColor3;
+	//Pixels16[211]=player->UnitColor4;
+	*((struct __4pixel16__*)Pixels16+208)=player->UnitColors.Depth16;
 	break;
     case 32:
-	Pixels32[208]=player->UnitColor1;
-	Pixels32[209]=player->UnitColor2;
-	Pixels32[210]=player->UnitColor3;
-	Pixels32[211]=player->UnitColor4;
+	//Pixels32[208]=player->UnitColor1;
+	//Pixels32[209]=player->UnitColor2;
+	//Pixels32[210]=player->UnitColor3;
+	//Pixels32[211]=player->UnitColor4;
+	*((struct __4pixel32__*)Pixels32+208)=player->UnitColors.Depth32;
 	break;
     }
 }
 
 /**
 **	Setup the player colors for the current palette.
+**
+**	FIXME: need better colors for the player 8-16.
 */
 global void SetPlayersPalette(void)
 {
@@ -525,6 +541,7 @@ global void SetPlayersPalette(void)
 
     switch( VideoDepth ) {
     case 8:
+#if 0
 	for( i=0; i<7; ++i ) {
 	    Players[i].UnitColor1=Pixels8[i*4+208];
 	    Players[i].UnitColor2=Pixels8[i*4+209];
@@ -547,9 +564,36 @@ global void SetPlayersPalette(void)
 	Players[i].UnitColor2=Pixels8[13];
 	Players[i].UnitColor3=Pixels8[14];
 	Players[i].UnitColor4=Pixels8[15];
+#endif
+
+	// New player colors setup
+
+	for( i=0; i<7; ++i ) {
+	    Players[i].UnitColors.Depth8.Pixels[0]=Pixels8[i*4+208];
+	    Players[i].UnitColors.Depth8.Pixels[1]=Pixels8[i*4+209];
+	    Players[i].UnitColors.Depth8.Pixels[2]=Pixels8[i*4+210];
+	    Players[i].UnitColors.Depth8.Pixels[3]=Pixels8[i*4+211];
+
+	    Players[i+8].UnitColors.Depth8.Pixels[0]=Pixels8[i*4+208];
+	    Players[i+8].UnitColors.Depth8.Pixels[1]=Pixels8[i*4+209];
+	    Players[i+8].UnitColors.Depth8.Pixels[2]=Pixels8[i*4+210];
+	    Players[i+8].UnitColors.Depth8.Pixels[3]=Pixels8[i*4+211];
+	}
+
+	Players[i].UnitColors.Depth8.Pixels[0]=Pixels8[12];
+	Players[i].UnitColors.Depth8.Pixels[1]=Pixels8[13];
+	Players[i].UnitColors.Depth8.Pixels[2]=Pixels8[14];
+	Players[i].UnitColors.Depth8.Pixels[3]=Pixels8[15];
+	Players[i+8].UnitColors.Depth8.Pixels[0]=Pixels8[12];
+	Players[i+8].UnitColors.Depth8.Pixels[1]=Pixels8[13];
+	Players[i+8].UnitColors.Depth8.Pixels[2]=Pixels8[14];
+	Players[i+8].UnitColors.Depth8.Pixels[3]=Pixels8[15];
+
 	break;
+
     case 15:
     case 16:
+#if 0
 	for( i=0; i<7; ++i ) {
 	    Players[i].UnitColor1=Pixels16[i*4+208];
 	    Players[i].UnitColor2=Pixels16[i*4+209];
@@ -572,8 +616,34 @@ global void SetPlayersPalette(void)
 	Players[i].UnitColor2=Pixels16[13];
 	Players[i].UnitColor3=Pixels16[14];
 	Players[i].UnitColor4=Pixels16[15];
+#endif
+
+	// New player colors setup
+
+	for( i=0; i<7; ++i ) {
+	    Players[i].UnitColors.Depth16.Pixels[0]=Pixels16[i*4+208];
+	    Players[i].UnitColors.Depth16.Pixels[1]=Pixels16[i*4+209];
+	    Players[i].UnitColors.Depth16.Pixels[2]=Pixels16[i*4+210];
+	    Players[i].UnitColors.Depth16.Pixels[3]=Pixels16[i*4+211];
+
+	    Players[i+8].UnitColors.Depth16.Pixels[0]=Pixels16[i*4+208];
+	    Players[i+8].UnitColors.Depth16.Pixels[1]=Pixels16[i*4+209];
+	    Players[i+8].UnitColors.Depth16.Pixels[2]=Pixels16[i*4+210];
+	    Players[i+8].UnitColors.Depth16.Pixels[3]=Pixels16[i*4+211];
+	}
+
+	Players[i].UnitColors.Depth16.Pixels[0]=Pixels16[12];
+	Players[i].UnitColors.Depth16.Pixels[1]=Pixels16[13];
+	Players[i].UnitColors.Depth16.Pixels[2]=Pixels16[14];
+	Players[i].UnitColors.Depth16.Pixels[3]=Pixels16[15];
+	Players[i+8].UnitColors.Depth16.Pixels[0]=Pixels16[12];
+	Players[i+8].UnitColors.Depth16.Pixels[1]=Pixels16[13];
+	Players[i+8].UnitColors.Depth16.Pixels[2]=Pixels16[14];
+	Players[i+8].UnitColors.Depth16.Pixels[3]=Pixels16[15];
+
 	break;
     case 32:
+#if 0
 	for( i=0; i<7; ++i ) {
 	    Players[i].UnitColor1=Pixels32[i*4+208];
 	    Players[i].UnitColor2=Pixels32[i*4+209];
@@ -596,6 +666,31 @@ global void SetPlayersPalette(void)
 	Players[i].UnitColor2=Pixels32[13];
 	Players[i].UnitColor3=Pixels32[14];
 	Players[i].UnitColor4=Pixels32[15];
+#endif
+
+	// New player colors setup
+
+	for( i=0; i<7; ++i ) {
+	    Players[i].UnitColors.Depth32.Pixels[0]=Pixels32[i*4+208];
+	    Players[i].UnitColors.Depth32.Pixels[1]=Pixels32[i*4+209];
+	    Players[i].UnitColors.Depth32.Pixels[2]=Pixels32[i*4+210];
+	    Players[i].UnitColors.Depth32.Pixels[3]=Pixels32[i*4+211];
+
+	    Players[i+8].UnitColors.Depth32.Pixels[0]=Pixels32[i*4+208];
+	    Players[i+8].UnitColors.Depth32.Pixels[1]=Pixels32[i*4+209];
+	    Players[i+8].UnitColors.Depth32.Pixels[2]=Pixels32[i*4+210];
+	    Players[i+8].UnitColors.Depth32.Pixels[3]=Pixels32[i*4+211];
+	}
+
+	Players[i].UnitColors.Depth32.Pixels[0]=Pixels32[12];
+	Players[i].UnitColors.Depth32.Pixels[1]=Pixels32[13];
+	Players[i].UnitColors.Depth32.Pixels[2]=Pixels32[14];
+	Players[i].UnitColors.Depth32.Pixels[3]=Pixels32[15];
+	Players[i+8].UnitColors.Depth32.Pixels[0]=Pixels32[12];
+	Players[i+8].UnitColors.Depth32.Pixels[1]=Pixels32[13];
+	Players[i+8].UnitColors.Depth32.Pixels[2]=Pixels32[14];
+	Players[i+8].UnitColors.Depth32.Pixels[3]=Pixels32[15];
+
 	break;
     }
 }
