@@ -273,12 +273,42 @@ local void AiExecuteScripts(void)
 		CclGcProtectedAssign(&AiScript->Script, gh_cdr(AiScript->Script));
 	    }
 
-	    if ((gh_null_p(AiScript->Script)) && (AiScript->ownForce)) {
+	    if (gh_null_p(AiScript->Script) && AiScript->ownForce) {
 		AiEraseForce(AiScript->ownForce);
 	    }
 	}
     }
 #elif defined(USE_LUA)
+    int i;
+    PlayerAi* pai;
+
+    pai = AiPlayer;
+
+    // Debugging
+    if (pai->ScriptDebug) {
+	debugForces();
+    }
+
+    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
+	AiScript = pai->Scripts + i;
+	if (AiScript->Script) {
+	    /*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_
+		pai->Player->Player _C_ i _C_ AiScript->ident _C_
+		AiScript->HotSpotX _C_ AiScript->HotSpotY);
+	    gh_display(AiScript->Script);
+	    gh_newline();*/
+
+	    lua_pushstring(Lua, "_ai_scripts_");
+	    lua_gettable(Lua, LUA_GLOBALSINDEX);
+	    lua_pushstring(Lua, AiScript->Script);
+	    lua_rawget(Lua, 1);
+	    LuaCall(0, 1);
+
+	    if (/*gh_null_p(AiScript->Script)*/0 && AiScript->ownForce) {
+		AiEraseForce(AiScript->ownForce);
+	    }
+	}
+    }
 #endif
 }
 
@@ -831,6 +861,7 @@ global void AiInit(Player* player)
 	pai->Scripts[i].Script = NIL;
 	CclGcProtect(&pai->Scripts[i].Script);
 #elif defined(USE_LUA)
+	pai->Scripts[i].Script = NULL;
 #endif
 	snprintf(pai->Scripts[i].ident, 10, "Empty");
     }
@@ -901,6 +932,7 @@ global void AiInit(Player* player)
 #if defined(USE_GUILE) || defined(USE_SIOD)
     CclGcProtectedAssign(&pai->Scripts[0].Script, ait->Script);
 #elif defined(USE_LUA)
+    pai->Scripts[0].Script = ait->Script;
 #endif
 
     pai->Collect[TimeCost] = 0;
@@ -1012,6 +1044,7 @@ global void CleanAi(void)
 #if defined(USE_GUILE) || defined(USE_SIOD)
 	CclGcUnprotect(&aitype->Script);
 #elif defined(USE_LUA)
+	free(aitype->Script);
 #endif
 
 	temp = aitype->Next;
