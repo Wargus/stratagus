@@ -455,8 +455,13 @@ global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 	    }
 	}
 
-	w=fp->CharWidth[*text-32];
-	VideoDrawChar(fp->Graphic,0,height*(*text-32),w,height,x+widths,y);
+	if( height*(*text-32)<fp->Graphic->Height ) {
+	    w=fp->CharWidth[*text-32];
+	    VideoDrawChar(fp->Graphic,0,height*(*text-32),w,height,x+widths,y);
+	} else {
+	    w=fp->CharWidth[0];
+	    VideoDrawChar(fp->Graphic,0,height*0,w,height,x+widths,y);
+	}
 	widths+=w+1;
 	if( rev ) {
 	    TextColor=rev;
