@@ -992,31 +992,31 @@ global void UnitCacheInsert(Unit* unit)
     mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
     for (y=0; y<unit->Type->TileHeight; y++) {
 	for (x=0; x<unit->Type->TileWidth; x++) {
-	    // FIXME: better use switch case
-	    if (unit->Type->UnitType == UnitTypeLand) {
+	    switch (unit->Type->UnitType) {
+	    case UnitTypeLand:
 		if (unit->Type->Building) {
 		    DebugCheck (mf->Building);
 		    mf->Building = UnitNumber (unit);
-		    // mf->Flags |= MapFieldBuilding;
 		} else {
 		    DebugCheck (mf->LandUnit);
 		    mf->LandUnit = UnitNumber (unit);
-		    // mf->Flags |= MapFieldLandUnit;
 		}
-	    } else if (unit->Type->UnitType == UnitTypeNaval) {
+		break;
+	    case UnitTypeNaval:
 		if (unit->Type->Building) {
 		    DebugCheck (mf->Building);
 		    mf->Building = UnitNumber (unit);
-		    // mf->Flags |= MapFieldBuilding;
 		} else {
 		    DebugCheck (mf->SeaUnit);
 		    mf->SeaUnit = UnitNumber (unit);
-		    // mf->Flags |= MapFieldSeaUnit;
 		}
-	    } else if (unit->Type->UnitType == UnitTypeFly) {
+		break;
+	    case UnitTypeFly:
 		DebugCheck (mf->AirUnit);
 		mf->AirUnit = UnitNumber (unit);
-		// mf->Flags |= MapFieldAirUnit;
+		break;
+	    default:
+		break;
 	    }
 	    ++mf;
 	}
@@ -1037,30 +1037,31 @@ global void UnitCacheRemove(Unit* unit)
     mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
     for (y=0; y < unit->Type->TileHeight; y++) {
 	for (x=0; x < unit->Type->TileWidth; x++) {
-	    if (unit->Type->UnitType == UnitTypeLand) {
+	    switch (unit->Type->UnitType) {
+	    case UnitTypeLand:
 		if (unit->Type->Building) {
 		    DebugCheck ( !(mf->Building == UnitNumber (unit)));
 		    mf->Building = 0;
-		    // mf->Flags &= ~MapFieldBuilding;
 		} else {
 		    DebugCheck ( !(mf->LandUnit == UnitNumber (unit)));
 		    mf->LandUnit = 0;
-		    // mf->Flags &= ~MapFieldLandUnit;
 		}
-	    } else if (unit->Type->UnitType == UnitTypeNaval) {
+		break;
+	    case UnitTypeNaval:
 		if (unit->Type->Building) {
 		    DebugCheck ( !(mf->Building == UnitNumber (unit)));
 		    mf->Building = 0;
-		    // mf->Flags &= ~MapFieldBuilding;
 		} else {
 		    DebugCheck ( !(mf->SeaUnit == UnitNumber (unit)));
 		    mf->SeaUnit = 0;
-		    // mf->Flags &= ~MapFieldSeaUnit;
 		}
-	    } else if (unit->Type->UnitType == UnitTypeFly) {
+		break;
+	    case UnitTypeFly:
 		DebugCheck ( !(mf->AirUnit == UnitNumber (unit)));
 		mf->AirUnit = 0;
-		// mf->Flags &= ~MapFieldAirUnit;
+		break;
+	    default:
+		break;
 	    }
 	    ++mf;
 	}
@@ -1080,37 +1081,67 @@ global void UnitCacheChange(Unit* unit)
 }
 
 /**
-**	FIXME: docu.
+**	Checks whether the map field to the left of *mf is occupied by the
+**      same Building, LandUnit, SeaUnit or AirUnit as *mf itself.
+**
+**	@param mf	Pointer to map field
+**	@param type	Type of unit to be checked
+**
+**	@return		True if both fields are occupied by the same unit
 */
 local int CheckLeft (const MapField *mf, int type)
 {
     const MapField *left=mf-1;		// left neighbor of mf
 
-    if (type==MapFieldBuilding)
+    switch (type) {
+    case MapFieldBuilding:
 	return (left->Flags&MapFieldBuilding && mf->Building==left->Building);
-    else if (type==MapFieldLandUnit)
+	break;
+    case MapFieldLandUnit:
 	return (left->Flags&MapFieldLandUnit && mf->LandUnit==left->LandUnit);
-    else if (type==MapFieldSeaUnit)
+	break;
+    case MapFieldSeaUnit:
 	return (left->Flags&MapFieldSeaUnit && mf->SeaUnit==left->SeaUnit);
-    else // if (type==MapFieldAirUnit)
+	break;
+    case MapFieldAirUnit:
 	return (left->Flags&MapFieldAirUnit && mf->AirUnit==left->AirUnit);
+	break;
+    default:
+	break;
+    }
+    return 0;
 }
 
 /**
-**	FIXME: docu.
+**	Checks whether the upper neighbor of *mf is occupied by the
+**      same Building, LandUnit, SeaUnit or AirUnit as *mf itself.
+**
+**	@param mf	Pointer to map field
+**	@param type	Type of unit to be checked
+**
+**	@return		True if both fields are occupied by the same unit
 */
 local int CheckUpper (const MapField *mf, int type)
 {
     const MapField *top=mf-TheMap.Width;	// top neighbor of mf
 
-    if (type==MapFieldBuilding)
+    switch (type) {
+    case MapFieldBuilding:
 	return (top->Flags&MapFieldBuilding && mf->Building==top->Building);
-    else if (type==MapFieldLandUnit)
+	break;
+    case MapFieldLandUnit:
 	return (top->Flags&MapFieldLandUnit && mf->LandUnit==top->LandUnit);
-    else if (type==MapFieldSeaUnit)
+	break;
+    case MapFieldSeaUnit:
 	return (top->Flags&MapFieldSeaUnit && mf->SeaUnit==top->SeaUnit);
-    else // if (type==MapFieldAirUnit)
+	break;
+    case MapFieldAirUnit:
 	return (top->Flags&MapFieldAirUnit && mf->AirUnit==top->AirUnit);
+	break;
+    default:
+	break;
+    }
+    return 0;
 }
 
 #if 0
@@ -1141,7 +1172,15 @@ local int CheckUpper (const MapField *mf, int type)
 #define CHECK_BOTH	3
 
 /**
-**	FIXME: docu.
+**	Checks whether neighbors of *mf are occupied by the same unit.
+**
+**	@param mf		Pointer to the map field in question
+**	@param unittype		Determines which type of unit to search for
+**	@param checktype	Controls which neighbors of *mf are to be
+**				checked
+**
+**	@return			Returns true if all of the fields requested
+**				by checktype are occupied by the same unit
 */
 local int NeighborCheck (const MapField *mf, int unittype, int checktype)
 {
@@ -1191,7 +1230,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 
     mf = TheMap.Fields + y1*TheMap.Width + x1;
 
-    // first row
+    // the first row
     for (x=x1, n=0, mfptr=mf; x<x2; x++, mfptr++) {
 	int checktype;
 
@@ -1285,26 +1324,32 @@ global Unit* UnitCacheOnXY(int x,int y,int type)
 {
     const MapField *mf = TheMap.Fields + y*TheMap.Width + x;
 
-    if (type==UnitTypeLand) {
+    switch (type) {
+    case UnitTypeLand:
 	if (mf->Flags & MapFieldLandUnit) {
 	    return Units[mf->LandUnit];
 	} else {
 	    return NULL;
 	}
-    } else if (type==UnitTypeFly) {
+	break;
+    case UnitTypeFly:
 	if (mf->Flags & MapFieldAirUnit) {
 	    return Units[mf->AirUnit];
 	} else {
 	    return NULL;
 	}
-    } else if (type==UnitTypeNaval) {
+	break;
+    case UnitTypeNaval:
 	if (mf->Flags & MapFieldSeaUnit) {
 	    return Units[mf->SeaUnit];
 	} else {
 	    return NULL;
 	}
+	break;
+    default:
+	return NULL;
+	break;
     }
-    return NULL;
 }
 
 /**
