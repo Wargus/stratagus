@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_ui.c	-	The ui ccl functions. */
+/**@name ccl_ui.c - The ui ccl functions. */
 //
-//	(c) Copyright 1999-2004 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      (c) Copyright 1999-2004 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -69,10 +69,11 @@ typedef struct _info_text_ {
 
 
 /**
-**		Enable/disable the global color cycling.
+**  Enable/disable the global color cycling.
 **
-**		@param flag		True = turn on, false = off.
-**		@return				The old state of color cylce all.
+**  @param flag  True = turn on, false = off.
+**
+**  @return      The old state of color cylce all.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorCycleAll(SCM flag)
@@ -110,10 +111,11 @@ local int CclSetColorCycleAll(lua_State* l)
 #endif
 
 /**
-**		Set speed of middle-mouse scroll
+**  Set speed of middle-mouse scroll
 **
-**		@param speed		number of screen pixels per mouse pixel
-**		@return				The old value.
+**  @param speed  number of screen pixels per mouse pixel
+**
+**  @return       The old value.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMouseScrollSpeedDefault(SCM speed)
@@ -143,10 +145,11 @@ local int CclSetMouseScrollSpeedDefault(lua_State* l)
 #endif
 
 /**
-**		Set speed of ctrl-middle-mouse scroll
+**  Set speed of ctrl-middle-mouse scroll
 **
-**		@param speed		number of screen pixels per mouse pixel
-**		@return				The old value.
+**  @param speed  number of screen pixels per mouse pixel
+**
+**  @return       The old value.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMouseScrollSpeedControl(SCM speed)
@@ -176,10 +179,11 @@ local int CclSetMouseScrollSpeedControl(lua_State* l)
 #endif
 
 /**
-**		Set which missile is used for right click
+**  Set which missile is used for right click
 **
-**		@param missile		missile name to use
-**		@return				old value
+**  @param missile  missile name to use
+**
+**  @return         old value
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetClickMissile(SCM missile)
@@ -525,11 +529,11 @@ local int CclSetVideoFullScreen(lua_State* l)
 #endif
 
 /**
-**		Default title-screen.
+**  Default title screens.
 **
-**		@param title		SCM title. (nil reports only)
+**  @param list  FIXME: docu
 **
-**		@return				None
+**  @return      None
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetTitleScreens(SCM list)
@@ -550,7 +554,7 @@ local SCM CclSetTitleScreens(SCM list)
 			if (TitleScreens[i]->Labels) {
 				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
 					free(TitleScreens[i]->Labels[j]->Text);
-					free (TitleScreens[i]->Labels[j]);
+					free(TitleScreens[i]->Labels[j]);
 				}
 				free(TitleScreens[i]->Labels);
 			}
@@ -643,13 +647,12 @@ local SCM CclSetTitleScreens(SCM list)
 #elif defined(USE_LUA)
 local int CclSetTitleScreens(lua_State* l)
 {
+	const char* value;
 	int i;
-	int j;
-	int k;
-	int tables;
 	int args;
+	int j;
 	int subargs;
-	int narg;
+	int k;
 
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
@@ -658,7 +661,7 @@ local int CclSetTitleScreens(lua_State* l)
 			if (TitleScreens[i]->Labels) {
 				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
 					free(TitleScreens[i]->Labels[j]->Text);
-					free (TitleScreens[i]->Labels[j]);
+					free(TitleScreens[i]->Labels[j]);
 				}
 				free(TitleScreens[i]->Labels);
 			}
@@ -668,89 +671,91 @@ local int CclSetTitleScreens(lua_State* l)
 		TitleScreens = NULL;
 	}
 
-	tables = lua_gettop(l);
-	TitleScreens = calloc(tables + 1, sizeof(*TitleScreens));
+	args = lua_gettop(l);
+	TitleScreens = calloc(args + 1, sizeof(*TitleScreens));
 
-	for (i = 0; i < tables; ++i) {
-		if (!lua_istable(l, i + 1)) {
+	for (j = 0; j < args; ++j) {
+		if (!lua_istable(l, j + 1)) {
 			lua_pushstring(l, "incorrect argument");
 			lua_error(l);
 		}
-		TitleScreens[i] = calloc(1, sizeof(**TitleScreens));
-		lua_pushstring(l, "Image");
-		lua_gettable(l, i + 1);
-		TitleScreens[i]->File = strdup(LuaToString(l, -1));
-		lua_pop(l, 1);
-		lua_pushstring(l, "Music");
-		lua_gettable(l, i + 1);
-		if (!lua_isnil(l, -1)) {
-			TitleScreens[i]->Music = strdup(LuaToString(l, -1));
-		}
-		lua_pop(l, 1);
-		lua_pushstring(l, "Timeout");
-		lua_gettable(l, i + 1);
-		if (!lua_isnil(l, -1)) {
-			TitleScreens[i]->Timeout = LuaToNumber(l, -1);
-		} else {
-			TitleScreens[i]->Timeout = 20;
-		}
-		lua_pop(l,1);
-		lua_pushstring(l, "Label");
-		lua_gettable(l, i + 1);
-		if (!lua_isnil(l, -1)) {
-			if (!lua_istable(l, tables + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
-			}
-			args = luaL_getn(l, tables + 1);
-			lua_pushnil(l);
-			TitleScreens[i]->Labels = calloc(args + 1, sizeof(*TitleScreens[i]->Labels));
-			j = 0;
-			while (lua_next(l, tables + 1)) {
-				k = lua_gettop(l);
-				TitleScreens[i]->Labels[j] = calloc(1, sizeof(**TitleScreens[i]->Labels));
-				lua_pushstring(l, "Text");
-				lua_gettable(l, k);
-				TitleScreens[i]->Labels[j]->Text = strdup(LuaToString(l, -1));
-			lua_pop(l, 1);
-				lua_pushstring(l, "Pos");
-				lua_gettable(l, k);
-				if (!lua_istable(l, k + 1)) {
+		TitleScreens[j] = calloc(1, sizeof(**TitleScreens));
+		TitleScreens[j]->Timeout = 20;
+		lua_pushnil(l);
+		while (lua_next(l, j + 1)) {
+			value = LuaToString(l, -2);
+			if (!strcmp(value, "Image")) {
+				TitleScreens[j]->File = strdup(LuaToString(l, -1));
+			} else if (!strcmp(value, "Music")) {
+				TitleScreens[j]->Music = strdup(LuaToString(l, -1));
+			} else if (!strcmp(value, "Timeout")) {
+				TitleScreens[j]->Timeout = LuaToNumber(l, -1);
+			} else if (!strcmp(value, "Labels")) {
+				if (!lua_istable(l, -1)) {
 					lua_pushstring(l, "incorrect argument");
 					lua_error(l);
-		}
-				if (luaL_getn(l, k + 1) != 2) {
-					lua_pushstring(l, "you need two args to give a position");
-					lua_error(l);
 				}
-				lua_rawgeti(l, k + 1, 1);
-				TitleScreens[i]->Labels[j]->xofs = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				lua_rawgeti(l, k + 1, 2);
-				TitleScreens[i]->Labels[j]->yofs = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				lua_pop(l, 1);
-				lua_pushstring(l, "Flags");
-				lua_gettable(l, k);
-				if (!lua_isnil(l, -1)) {
-					subargs = luaL_getn(l, k + 1);
-					for (narg = 1; narg <= subargs; ++narg) {
-						lua_rawgeti(l, k + 1, narg);
-						if (!strcmp (LuaToString(l, -1), "center")) {
-							TitleScreens[i]->Labels[j]->flags |= TitleFlagCenter;
+				subargs = luaL_getn(l, -1);
+				TitleScreens[j]->Labels = calloc(subargs + 1, sizeof(*TitleScreens[j]->Labels));
+				for (k = 0; k < subargs; ++k) {
+					lua_rawgeti(l, -1, k + 1);
+					if (!lua_istable(l, -1)) {
+						lua_pushstring(l, "incorrect argument");
+						lua_error(l);
+					}
+					TitleScreens[j]->Labels[k] = calloc(1, sizeof(**TitleScreens[j]->Labels));
+					lua_pushnil(l);
+					while (lua_next(l, -2)) {
+						value = LuaToString(l, -2);
+						if (!strcmp(value, "Text")) {
+							TitleScreens[j]->Labels[k]->Text = strdup(LuaToString(l, -1));
+						} else if (!strcmp(value, "Font")) {
+							TitleScreens[j]->Labels[k]->Font = CclFontByIdentifier(LuaToString(l, -1));
+						} else if (!strcmp(value, "Pos")) {
+							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+								lua_pushstring(l, "incorrect argument");
+								lua_error(l);
+							}
+							lua_rawgeti(l, -1, 1);
+							TitleScreens[j]->Labels[k]->Xofs = LuaToNumber(l, -1);
+							lua_pop(l, 1);
+							lua_rawgeti(l, -1, 2);
+							TitleScreens[j]->Labels[k]->Yofs = LuaToNumber(l, -1);
+							lua_pop(l, 1);
+						} else if (!strcmp(value, "Flags")) {
+							int subsubargs;
+							int subk;
+
+							if (!lua_istable(l, -1)) {
+								lua_pushstring(l, "incorrect argument");
+								lua_error(l);
+							}
+							subsubargs = luaL_getn(l, -1);
+							for (subk = 0; subk < subsubargs; ++subk) {
+								lua_rawgeti(l, -1, subk + 1);
+								value = LuaToString(l, -1);
+								lua_pop(l, 1);
+								if (!strcmp(value, "center")) {
+									TitleScreens[j]->Labels[k]->Flags |= TitleFlagCenter;
+								} else {
+									lua_pushstring(l, "incorrect flag");
+									lua_error(l);
+								}
+							}
 						} else {
-							lua_pushstring(l, "incorrect flag");
+							lua_pushfstring(l, "Unsupported key: %s", value);
 							lua_error(l);
 						}
 						lua_pop(l, 1);
 					}
+					lua_pop(l, 1);
 				}
-				lua_pop(l, 1);
-				lua_pop(l, 1);
-				++j;
+			} else {
+				lua_pushfstring(l, "Unsupported key: %s", value);
+				lua_error(l);
 			}
+			lua_pop(l, 1);
 		}
-		lua_pop(l, 1);
 	}
 
 	return 0;
