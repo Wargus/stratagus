@@ -955,6 +955,7 @@ global void SetPlayersPalette(void)
 */
 global void DebugPlayers(void)
 {
+#ifdef DEBUG
     int i;
     const char* colors[16] = {
 	"red", "blue", "green", "violett", "orange", "black", "white", "yellow",
@@ -998,6 +999,7 @@ global void DebugPlayers(void)
 	}
 	DebugLevel0("\n");
     }
+#endif
 }
 
 /**
