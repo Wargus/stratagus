@@ -137,6 +137,11 @@ global char* DefaultActions[MaxCosts];
 */
 global char* DefaultResourceNames[MaxCosts];
 
+/**
+**	Default amounts for the resources.
+*/
+global int DefaultResourceAmounts[MaxCosts];
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
