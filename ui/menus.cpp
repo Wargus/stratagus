@@ -814,12 +814,14 @@ local Menuitem SpeedSettingsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_HSLIDER, 108, 80, 0, 0, NULL, NULL,
-            { hslider:{ 0, 8*18, 18, ScenSelectHSSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_VSLIDER, 10, 100, 0, 0, NULL, NULL,
-            { vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
-	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 64, 11 + 36*1, 0, LargeFont, NULL, NULL,
+	{ text:{ "Game Speed", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_HSLIDER, 32, 11 + 36*1.5, 0, 0, NULL, NULL,
+            { hslider:{ 0, 11*18, 18, ScenSelectHSSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_TEXT, 44, 11 + 36*2 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 218, 11 + 36*2 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
@@ -833,7 +835,7 @@ local Menuitem GameOptionsMenuItems[] = {
 	{ text:{ "Game Options", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonDisabled, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Speeds (~!F~!8)", 224, 27, MBUTTON_GM_FULL, SpeedSettings, KeyCodeF8} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Preferences (~!F~!9)", 224, 27, MBUTTON_GM_FULL, Preferences, KeyCodeF9} } },
@@ -1056,7 +1058,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	5, 5,
+	6, 6,
 	SpeedSettingsMenuItems,
 	NULL,
     },
@@ -1696,11 +1698,12 @@ local void SetCdMode(Menuitem *mi)
 
 local void SpeedSettings(void)
 {
-    SpeedSettingsMenuItems[1].d.hslider.percent = VideoSyncSpeed - 50;
-    if (SpeedSettingsMenuItems[1].d.hslider.percent < 0)
-	SpeedSettingsMenuItems[1].d.hslider.percent = 0;
-    if (SpeedSettingsMenuItems[1].d.hslider.percent > 100)
-	SpeedSettingsMenuItems[1].d.hslider.percent = 100;
+    int i = 2;
+    SpeedSettingsMenuItems[i].d.hslider.percent = VideoSyncSpeed - 50;
+    if (SpeedSettingsMenuItems[i].d.hslider.percent < 0)
+	SpeedSettingsMenuItems[i].d.hslider.percent = 0;
+    if (SpeedSettingsMenuItems[i].d.hslider.percent > 100)
+	SpeedSettingsMenuItems[i].d.hslider.percent = 100;
     ProcessMenu(MENU_SPEED_SETTINGS, 1);
 }
 
