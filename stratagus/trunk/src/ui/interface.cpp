@@ -153,11 +153,7 @@ local void UiCenterOnGroup(unsigned group)
 	    x+=(units[n]->X-x)/2;
 	    y+=(units[n]->Y-y)/2;
 	}
-#ifdef SPLIT_SCREEN_SUPPORT
-	MapCenterViewport (TheUI.LastClickedVP, x,y);
-#else /* SPLIT_SCREEN_SUPPORT */
-	MapCenter(x,y);
-#endif /* SPLIT_SCREEN_SUPPORT */
+	MapCenterViewport(TheUI.LastClickedVP, x,y);
     }
 }
 
@@ -446,64 +442,37 @@ local void UiToggleBigMap(void)
     static int mapex;
     static int mapey;
 
-    BigMapMode^=1;
-    if(BigMapMode) {
-#ifdef SPLIT_SCREEN_SUPPORT
-	mapx=TheUI.MapArea.X;
-	mapy=TheUI.MapArea.Y;
-	mapex=TheUI.MapArea.EndX;
-	mapey=TheUI.MapArea.EndY;
+    BigMapMode ^= 1;
+    if (BigMapMode) {
+	mapx = TheUI.MapArea.X;
+	mapy = TheUI.MapArea.Y;
+	mapex = TheUI.MapArea.EndX;
+	mapey = TheUI.MapArea.EndY;
 
-	TheUI.MapArea.X=0;
-	TheUI.MapArea.Y=0;
-	TheUI.MapArea.EndX=((VideoWidth/TileSizeX)*TileSizeX)-1;
-	TheUI.MapArea.EndY=((VideoHeight/TileSizeY)*TileSizeY)-1;
+	TheUI.MapArea.X = 0;
+	TheUI.MapArea.Y = 0;
+	TheUI.MapArea.EndX = ((VideoWidth / TileSizeX) * TileSizeX) - 1;
+	TheUI.MapArea.EndY = ((VideoHeight / TileSizeY) * TileSizeY) - 1;
 
-	SetViewportMode (TheUI.ViewportMode);
-#else /* SPLIT_SCREEN_SUPPORT */
-	mapx=TheUI.MapX;
-	mapy=TheUI.MapY;
-	mapex=TheUI.MapEndX;
-	mapey=TheUI.MapEndY;
+	SetViewportMode(TheUI.ViewportMode);
 
-	TheUI.MapX=0;
-	TheUI.MapY=0;
-	TheUI.MapEndX=((VideoWidth/TileSizeX)*TileSizeX)-1;
-	TheUI.MapEndY=((VideoHeight/TileSizeY)*TileSizeY)-1;
-
-	MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
-	MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
-	MapSetViewpoint(MapX,MapY);
-#endif /* SPLIT_SCREEN_SUPPORT */
-
-	EnableRedraw^=RedrawEverything;
-	EnableRedraw|=RedrawMap|RedrawAll;
-	MustRedraw|=RedrawEverything;
+	EnableRedraw ^= RedrawEverything;
+	EnableRedraw |= RedrawMap | RedrawAll;
+	MustRedraw |= RedrawEverything;
 	SetStatusLine("Big map enabled");
 	VideoLockScreen();
 	VideoClearScreen();
 	VideoUnlockScreen();
     } else {
-#ifdef SPLIT_SCREEN_SUPPORT
-	TheUI.MapArea.X=mapx;
-	TheUI.MapArea.Y=mapy;
-	TheUI.MapArea.EndX=mapex;
-	TheUI.MapArea.EndY=mapey;
+	TheUI.MapArea.X = mapx;
+	TheUI.MapArea.Y = mapy;
+	TheUI.MapArea.EndX = mapex;
+	TheUI.MapArea.EndY = mapey;
 
-	SetViewportMode (TheUI.ViewportMode);
-#else /* SPLIT_SCREEN_SUPPORT */
-	TheUI.MapX=mapx;
-	TheUI.MapY=mapy;
-	TheUI.MapEndX=mapex;
-	TheUI.MapEndY=mapey;
+	SetViewportMode(TheUI.ViewportMode);
 
-	MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
-	MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
-	MapSetViewpoint(MapX,MapY);
-#endif /* SPLIT_SCREEN_SUPPORT */
-
-	EnableRedraw=RedrawEverything;
-	MustRedraw=RedrawEverything;
+	EnableRedraw = RedrawEverything;
+	MustRedraw = RedrawEverything;
 	SetStatusLine("Returning to old map");
 	VideoLockScreen();
 	VideoClearScreen();
@@ -556,11 +525,7 @@ local void UiCenterOnSelected(void)
 	    x+=(Selected[n]->X-x)/2;
 	    y+=(Selected[n]->Y-y)/2;
 	}
-#ifdef SPLIT_SCREEN_SUPPORT
-	MapCenterViewport (TheUI.LastClickedVP, x,y);
-#else /* SPLIT_SCREEN_SUPPORT */
-	MapCenter(x,y);
-#endif /* SPLIT_SCREEN_SUPPORT */
+	MapCenterViewport(TheUI.LastClickedVP, x,y);
     }
 }
 
@@ -571,14 +536,11 @@ local void UiCenterOnSelected(void)
 */
 local void UiSaveMapPosition(unsigned position)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *vp = &TheUI.VP[TheUI.LastClickedVP];
+    const Viewport *vp;
+
+    vp = &TheUI.VP[TheUI.LastClickedVP];
     SavedMapPositionX[position] = vp->MapX;
     SavedMapPositionY[position] = vp->MapY;
-#else /* SPLIT_SCREEN_SUPPORT */
-    SavedMapPositionX[position]=MapX;
-    SavedMapPositionY[position]=MapY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -588,13 +550,9 @@ local void UiSaveMapPosition(unsigned position)
 */
 local void UiRecallMapPosition(unsigned position)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
-    MapViewportSetViewpoint (TheUI.LastClickedVP,
+    MapViewportSetViewpoint(TheUI.LastClickedVP,
 		SavedMapPositionX[position],
 		SavedMapPositionY[position]);
-#else /* SPLIT_SCREEN_SUPPORT */
-    MapSetViewpoint(SavedMapPositionX[position],SavedMapPositionY[position]);
-#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -617,6 +575,7 @@ local void UiToggleTerrain(void)
 local void UiFindIdleWorker(void)
 {
     Unit* unit;
+    // FIXME: static variable, is not needed.
     static Unit* LastIdleWorker=NoUnitP;
 
     unit=FindIdleWorker(ThisPlayer,LastIdleWorker);
@@ -628,11 +587,7 @@ local void UiFindIdleWorker(void)
 	CurrentButtonLevel=0;
 	UpdateButtonPanel();
 	PlayUnitSound(Selected[0],VoiceSelected);
-#ifdef SPLIT_SCREEN_SUPPORT
-	MapCenterViewport (TheUI.LastClickedVP,  unit->X, unit->Y);
-#else /* SPLIT_SCREEN_SUPPORT */
-	MapCenter(unit->X,unit->Y);
-#endif /* SPLIT_SCREEN_SUPPORT */
+	MapCenterViewport(TheUI.LastClickedVP,  unit->X, unit->Y);
     }
 }
 
@@ -644,6 +599,18 @@ local void UiToggleGrabMouse(void)
     DebugLevel0Fn("%x\n" _C_ KeyModifiers);
     ToggleGrabMouse(0);
     SetStatusLine("Grab mouse toggled.");
+}
+
+/**
+**	Track unit, the viewport follows the unit.
+*/
+local void UiTrackUnit(void)
+{
+    if( TheUI.VP[TheUI.LastClickedVP].Unit == Selected[0] ) {
+	TheUI.VP[TheUI.LastClickedVP].Unit = NULL;
+    } else {
+	TheUI.VP[TheUI.LastClickedVP].Unit = Selected[0];
+    }
 }
 
 /**
@@ -825,6 +792,15 @@ local int CommandKey(int key)
 	    UiEnterSaveGameMenu();
 	    break;
 
+	case 't'&0x1F:
+	case 't':
+	case 'T':			// ALT-T, CTRL-T Track unit
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    UiTrackUnit();
+	    break;
+
 	case 'b'&0x1F:
 	case 'b':
 	case 'B':			// ALT+B, CTRL+B Toggle big map
@@ -916,7 +892,6 @@ local int CommandKey(int key)
 	    UiFindIdleWorker();
 	    break;
 
-#ifdef SPLIT_SCREEN_SUPPORT
 	case 'v':			// ALT+v CTRL+V: Viewport
 	    if (KeyModifiers & ModifierControl) {
 		CycleViewportMode(-1);
@@ -924,7 +899,6 @@ local int CommandKey(int key)
 		CycleViewportMode(1);
 	    }
 	    break;
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 	case KeyCodeUp:
 	case KeyCodeKP8:
