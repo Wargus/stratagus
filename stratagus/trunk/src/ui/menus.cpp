@@ -2589,8 +2589,18 @@ local void ScenSelectMenu(void)
 */
 local void MultiScenSelectMenu(void)
 {
+    Menu *menu;
+    unsigned flags;
+
+    // FIXME: remove when cm works with multiplayer
+    menu = FindMenu("menu-select-scenario");
+    flags = menu->items[6].flags;
+    menu->items[6].flags = MenuButtonDisabled;
+
     ScenSelectMenu();
     MultiGamePlayerSelectorsUpdate(1);
+
+    menu->items[6].flags = MI_DISABLED;
 }
 
 /**
