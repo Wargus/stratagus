@@ -499,11 +499,7 @@ static void DrawTileIcons(void)
 				y = TheUI.ButtonPanelY + 100;
 				break;
 			}
-#ifdef USE_OPENGL
-			MapDrawTile(TheMap.Tileset->Table[0x10 + i * 16], x, y);
-#else
-			VideoDrawTile(TheMap.Tileset->Table[0x10 + i * 16], x, y);
-#endif
+			VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset->Table[0x10 + i * 16], x, y);
 			VideoDrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
 				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
@@ -718,11 +714,7 @@ static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 
 	x += 4;
 	y += 4;
-#ifdef USE_OPENGL
-	VideoDrawTile(TheMap.Tileset->Table[tilenum], x, y);
-#else
-	VideoDrawTile(TheMap.Tileset->Table[tilenum], x, y);
-#endif
+	VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset->Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
 		VideoDrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
@@ -813,12 +805,8 @@ static void DrawMapCursor(void)
 					if (tx >= TheUI.MouseViewport->EndX) {
 						break;
 					}
-#ifdef USE_OPENGL
-					VideoDrawTile(TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
-#else
-					VideoDrawTile(TheMap.Tileset->Table[0x10 +
-						TileCursor * 16], tx, ty);
-#endif
+					VideoDrawClip(TheMap.TileGraphic, 
+						TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
 				}
 			}
 			VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,

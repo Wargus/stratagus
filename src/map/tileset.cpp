@@ -95,7 +95,6 @@ void LoadTileset(void)
 	int tiles_per_row;
 	int solid;
 	int mixed;
-	unsigned char* data;
 	const unsigned short* table;
 
 	//
@@ -122,31 +121,23 @@ void LoadTileset(void)
 	//
 	//  Load and prepare the tileset
 	//
-	ShowLoadProgress("Tileset `%s'", Tilesets[i]->ImageFile);
-	TheMap.TileGraphic = NewGraphic(Tilesets[i]->ImageFile, 0, 0);
-	LoadGraphic(TheMap.TileGraphic);
-
 	TileSizeX = Tilesets[i]->TileSizeX;
 	TileSizeY = Tilesets[i]->TileSizeY;
+
+	ShowLoadProgress("Tileset `%s'", Tilesets[i]->ImageFile);
+	//TheMap.TileGraphic = NewGraphic(Tilesets[i]->ImageFile, 0, 0);
+	TheMap.TileGraphic = NewGraphic(Tilesets[i]->ImageFile, TileSizeX, TileSizeY);
+	LoadGraphic(TheMap.TileGraphic);
 
 	//
 	//  Calculate number of tiles in graphic tile
 	//
-	tiles_per_row = TheMap.TileGraphic->Width / TileSizeX;
-
-	TheMap.TileCount = n =
-		tiles_per_row * (TheMap.TileGraphic->Height / TileSizeY);
 
 	if (n > MaxTilesInTileset) {
 		fprintf(stderr,
 			"Too many tiles in tileset. Increase MaxTilesInTileset and recompile.\n");
 		ExitFatal(-1);
 	}
-
-	//
-	//  Precalculate the graphic starts of the tiles
-	//
-	data = malloc(n * TileSizeX * TileSizeY);
 
 	//
 	//  Build the TileTypeTable
