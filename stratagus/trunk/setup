@@ -2,8 +2,10 @@
 
 if [ "`echo $* | grep \"\-\-win32\"`" = "" ]; then
   RULESFILE=Rules.make
+  DEPEND=depend
 else
   RULESFILE=Rules.make.WIN32
+  depend=win32new
   CROSS=" win32"
 fi
 
@@ -917,7 +919,7 @@ case $ANSWER in
 	;;
  *)
 	echo
-	$MAKE depend
+	$MAKE $DEPEND
 	$MAKE$CROSS
 	;;
 
