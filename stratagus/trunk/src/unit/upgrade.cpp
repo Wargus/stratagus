@@ -305,7 +305,7 @@ local const char* UpgradeWcNames[] = {
 **			NULL for generated name (icon-<ident>).
 **	@param costs	costs to upgrade.
 **
-**	@returns upgrade id or -1 for error
+**	@return		upgrade id or -1 for error
 */
 local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
 {
