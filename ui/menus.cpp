@@ -150,7 +150,7 @@ local void DeleteMenu(void);
 local void DeleteInit(Menuitem *mi __attribute__((unused)));
 local void DeleteFile(void);
 
-local void ConfirmSaveMenu(void);
+//local void ConfirmSaveMenu(void);
 local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)));
 local void ConfirmSaveFile(void);
 
@@ -199,6 +199,7 @@ local void GameRCSAction(Menuitem *mi, int i);
 local void GameRESAction(Menuitem *mi, int i);
 local void GameUNSAction(Menuitem *mi, int i);
 local void GameTSSAction(Menuitem *mi, int i);
+local void GameGATAction(Menuitem *mi, int i);
 
 local void GameCancel(void);
 
@@ -600,6 +601,27 @@ local unsigned char *tssoptions[] = {
 			// FIXME: Some time later _all_ tilesets should be a dynamic (ccl-defineable) resource..
 };
 
+/**
+**	Game type options.
+**
+**	@todo Needs to be configurable from CCL.
+*/
+local unsigned char* gatoptions[] = {
+    "Use map settings",
+    "Melee",
+    "Free for all",
+    "One on one",
+    "Capture the flag",
+    "Greed",
+    "Slaughter",
+    "Sudden death",
+    "Team melee",
+    "Team free for all",
+    "Team capture the flag",
+    "Top vs bottom",
+    "Left vs right",
+};
+
 local unsigned char *cgopsoptions[] = {
     "Map Default",
     "1 Opponent",
@@ -634,14 +656,18 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
+
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
+
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 640-224-16, 10+300-20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitCustomGameMenuItems() {
     MenuitemDrawfunc i0  = { GameDrawFunc };
@@ -659,6 +685,8 @@ local void InitCustomGameMenuItems() {
     MenuitemPulldown i12 = { cgopsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameOPSAction, 8, 0, 0, 0, 0};
     MenuitemText     i13 = { "~<Map Tileset:~>", 0};
     MenuitemPulldown i14 = { tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0};
+    MenuitemText     i15 = { "~<Game Type:~>", 0};
+    MenuitemPulldown i16 = { gatoptions, 190, 20, MBUTTON_PULLDOWN, GameGATAction, 13, 0, 0, 0, 0};
     CustomGameMenuItems[0].d.drawfunc  = i0;
     CustomGameMenuItems[1].d.text      = i1;
     CustomGameMenuItems[2].d.button    = i2;
@@ -674,6 +702,8 @@ local void InitCustomGameMenuItems() {
     CustomGameMenuItems[12].d.pulldown = i12;
     CustomGameMenuItems[13].d.text     = i13;
     CustomGameMenuItems[14].d.pulldown = i14;
+    CustomGameMenuItems[15].d.text     = i15;
+    CustomGameMenuItems[16].d.pulldown = i16;
 }
 
 /**
@@ -1611,7 +1641,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	3, 15,
+	3, 17,
 	CustomGameMenuItems,
 	NULL,
     },
@@ -3036,11 +3066,13 @@ local void LoadOk(void)
     }
 }
 
+#if 0
 local void SaveMenu(void)
 {
     EndMenu();
     ProcessMenu(MENU_CONFIRM_SAVE, 1);
 }
+#endif
 
 local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)))
 {
@@ -5030,6 +5062,21 @@ local void GameTSSAction(Menuitem *mi, int i)
     if (!mi || mi->d.pulldown.curopt == i) {
 	GameSettings.Terrain = v[i];
 	ServerSetupState.TssOpt = i;
+	if (mi) {
+	    NetworkServerResyncClients();
+	}
+    }
+}
+
+/**
+**	Called if the pulldown menu of the game type is changed.
+*/
+local void GameGATAction(Menuitem *mi, int i)
+{
+    if (!mi || mi->d.pulldown.curopt == i) {
+	// FIXME: not supported
+	// GameSettings.GameType = i-1;
+	// ServerSetupState.GaTOpt = i;
 	if (mi) {
 	    NetworkServerResyncClients();
 	}
