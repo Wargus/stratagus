@@ -545,24 +545,26 @@ global void SaveUpgrades(CLFile* file)
 {
 	int i;
 	int p;
-#if 0
 	int j;
 
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: upgrades $Id$\n\n");
+	CLprintf(file, "\n-- -----------------------------------------\n");
+	CLprintf(file, "-- MODULE: upgrades $Id$\n\n");
 
 	//
 	//  Save all upgrades
 	//
 	for (i = 0; i < NumUpgrades; ++i) {
-		CLprintf(file, "(define-upgrade '%s 'icon '%s\n",
+		CLprintf(file, "DefineUpgrade(\"%s\", \"icon\", \"%s\"\n",
 			Upgrades[i].Ident, Upgrades[i].Icon.Name);
-		CLprintf(file, "  'costs #(");
+		CLprintf(file, "  ,\"costs\", {");
 		for (j = 0; j < MaxCosts; ++j) {
+			if (j != 0) {
+				CLprintf(file, ", ");
+			}
 			CLprintf(file, " %5d", Upgrades[i].Costs[j]);
 		}
 
-		CLprintf(file, "))\n");
+		CLprintf(file, "})\n");
 	}
 	CLprintf(file, "\n");
 
@@ -570,52 +572,52 @@ global void SaveUpgrades(CLFile* file)
 	//  Save all upgrade modifiers.
 	//
 	for (i = 0; i < NumUpgradeModifiers; ++i) {
-		CLprintf(file, "(define-modifier '%s",
+		CLprintf(file, "DefineModifier(\"%s\"",
 			Upgrades[UpgradeModifiers[i]->UpgradeId].Ident);
 
 		if (UpgradeModifiers[i]->Modifier.AttackRange) {
-			CLprintf(file, "\n  '(attack-range %d)",
+			CLprintf(file, ",\n  {\"attack-range\", %d}",
 				UpgradeModifiers[i]->Modifier.AttackRange);
 		}
 		if (UpgradeModifiers[i]->Modifier.SightRange) {
-			CLprintf(file, "\n  '(sight-range %d)",
+			CLprintf(file, ",\n  {\"sight-range\", %d}",
 				UpgradeModifiers[i]->Modifier.SightRange);
 		}
 		if (UpgradeModifiers[i]->Modifier.BasicDamage) {
-			CLprintf(file, "\n  '(basic-damage %d)",
+			CLprintf(file, ",\n  {\"basic-damage\", %d}",
 				UpgradeModifiers[i]->Modifier.BasicDamage);
 		}
 		if (UpgradeModifiers[i]->Modifier.PiercingDamage) {
-			CLprintf(file, "\n  '(piercing-damage %d)",
+			CLprintf(file, ",\n  {\"piercing-damage\", %d}",
 				UpgradeModifiers[i]->Modifier.PiercingDamage);
 		}
 		if (UpgradeModifiers[i]->Modifier.Armor) {
-			CLprintf(file, "\n  '(armor %d)",
+			CLprintf(file, ",\n  {\"armor\", %d}",
 				UpgradeModifiers[i]->Modifier.Armor);
 		}
 		if (UpgradeModifiers[i]->Modifier.Speed) {
-			CLprintf(file, "\n  '(speed %d)",
+			CLprintf(file, ",\n  {\"speed\", %d}",
 				UpgradeModifiers[i]->Modifier.Speed);
 		}
 		if (UpgradeModifiers[i]->Modifier.HitPoints) {
-			CLprintf(file, "\n  '(hit-points %d)",
+			CLprintf(file, ",\n  {\"hit-points\", %d}",
 				UpgradeModifiers[i]->Modifier.HitPoints);
 		}
 		if (UpgradeModifiers[i]->Modifier.RegenerationRate) {
-			CLprintf(file, "\n  '(regeneration-rate %d)",
+			CLprintf(file, ",\n  {\"regeneration-rate\", %d}",
 				UpgradeModifiers[i]->Modifier.RegenerationRate);
 		}
 
 		for (j = 0; j < MaxCosts; ++j) {
 			if (UpgradeModifiers[i]->Modifier.Costs[j]) {
-				CLprintf(file, "\n  '(%s-cost %d)",
+				CLprintf(file, ",\n  {\"%s-cost\", %d}",
 					DefaultResourceNames[j],UpgradeModifiers[i]->Modifier.Costs[j]);
 			}
 		}
 
 		for (j = 0; j < UnitTypeMax; ++j) {		// allow/forbid units
 			if (UpgradeModifiers[i]->ChangeUnits[j] != 0) {
-				CLprintf(file, "\n  '(allow-unit %s %d)",
+				CLprintf(file, ",\n  {\"allow-unit\", \"%s\", %d}",
 					UnitTypes[j]->Ident,
 					UpgradeModifiers[i]->ChangeUnits[j]);
 			}
@@ -623,25 +625,25 @@ global void SaveUpgrades(CLFile* file)
 
 		for (j = 0; j < UpgradeMax; ++j) {				// allow/forbid upgrades
 			if (UpgradeModifiers[i]->ChangeUpgrades[j] != '?') {
-				CLprintf(file, "\n  '(allow %s %c)",Upgrades[j].Ident,
+				CLprintf(file, ",\n  {\"allow\", \"%s\", %c}",Upgrades[j].Ident,
 					UpgradeModifiers[i]->ChangeUpgrades[j]);
 			}
 		}
 
 		for (j = 0; j < UnitTypeMax; ++j) {		// apply to units
 			if (UpgradeModifiers[i]->ApplyTo[j] != '?') {
-				CLprintf(file, "\n  '(apply-to %s)", UnitTypes[j]->Ident);
+				CLprintf(file, ",\n  {\"apply-to\", \"%s\"}", UnitTypes[j]->Ident);
 			}
 		}
 
 		if (UpgradeModifiers[i]->ConvertTo) {
-			CLprintf(file, "\n  '(convert-to %s)",
+			CLprintf(file, ",\n  {\"convert-to\", \"%s\"}",
 				((UnitType*)UpgradeModifiers[i]->ConvertTo)->Ident);
 		}
 
 		CLprintf(file, ")\n\n");
 	}
-#endif
+
 	//
 	//  Save the allow
 	//
