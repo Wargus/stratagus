@@ -823,6 +823,10 @@ local Sample* LoadSample(const char* name)
     char* buf;
 
     buf = strdcat3(FreeCraftLibPath, "/sounds/", name);
+    if ((sample = LoadWav(buf, PlayAudioLoadInMemory))) {
+	free(buf);
+	return sample;
+    }
 #ifdef USE_OGG
     if ((sample = LoadOgg(buf, PlayAudioLoadInMemory))) {
 	free(buf);
@@ -841,10 +845,10 @@ local Sample* LoadSample(const char* name)
 	return sample;
     }
 #endif
-    if (!(sample = LoadWav(buf, PlayAudioLoadInMemory))) {
-	fprintf(stderr, "Can't load the sound `%s'\n", name);
-    }
-    // FIXME: should support more sample formats, mp3.
+
+    fprintf(stderr, "Can't load the sound `%s'\n", name);
+
+    // FIXME: should support more sample formats.
     free(buf);
     return sample;
 }
