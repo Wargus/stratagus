@@ -3033,7 +3033,7 @@ local int CclDefineMenuItem(lua_State* l)
 							lua_error(l);
 						}
 						if (lua_isstring(l, -1)) {
-							value = strdup(lua_tostring(l, -1));
+							value = lua_tostring(l, -1);
 							func = (void**)hash_find(MenuFuncHash, value);
 							if (func != NULL) {
 								item->d.listbox.action = (void*)*func;

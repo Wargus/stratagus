@@ -421,7 +421,7 @@ local int CclDefineConstruction(lua_State* l)
 					value = LuaToString(l, -2);
 
 					if (!strcmp(value, "Tileset")) {
-						value = strdup(LuaToString(l, -1));
+						value = LuaToString(l, -1);
 
 						// FIXME: use a general get tileset function here!
 						i = 0;
