@@ -240,7 +240,7 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 	}
     }
 #elif defined(USE_LIBCDA)
-    if (CDMode != CDModeRandom && CDMode != CDModeStopped
+    if (CDMode != CDModeOff && CDMode != CDModeStopped
 	    && !cd_current_track() && CDMode != CDModeDefined) {
 	DebugLevel0Fn("Playing new track\n");
 	PlayCDRom(CDMode);
