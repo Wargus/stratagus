@@ -37,7 +37,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "map.h"
 #include "util.h"
 
 /*----------------------------------------------------------------------------
@@ -118,6 +117,8 @@ typedef int MenuButtonId;
 #define MAX_GAME_SPEED 250
 
 struct _button_style_;
+struct _map_info_;
+struct _world_map_;
 
 /*----------------------------------------------------------------------------
 --  Menus
@@ -314,7 +315,7 @@ extern int GuiGameStarted;          ///< Game Started?
 extern Menu* CurrentMenu;           ///< Currently processed menu
 extern MenuGraphics MenuButtonGfx;  ///< Menu button graphics
 
-extern MapInfo* MenuMapInfo;        ///< MapInfo of map used in gui menus
+extern struct _map_info_* MenuMapInfo;        ///< MapInfo of map used in gui menus
 extern char MenuMapFullPath[1024];  ///< Full path to currently selected map
 
 extern int nKeyStrokeHelps;    ///< Number of loaded keystroke helps
@@ -409,7 +410,7 @@ extern void SetupEditor(void);
 extern void ErrorMenu(char*);
 
 	/// Menu Loop
-extern void MenuLoop(char* filename, WorldMap* map);
+extern void MenuLoop(char* filename, struct _world_map_* map);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);
