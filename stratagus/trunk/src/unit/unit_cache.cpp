@@ -942,7 +942,7 @@ global Unit* UnitCacheOnXY(int x,int y,unsigned type)
 
     unit=TheMap.Fields[y*TheMap.Width+x].Here.Units;
     while( unit ) {
-	if( unit->Type->UnitType==type ) {
+	if( (unsigned)unit->Type->UnitType==type ) {
 	    break;
 	}
 	unit=unit->Next;
