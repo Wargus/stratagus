@@ -331,6 +331,9 @@
 **
 **				Maximum units on board (for transporters), and resources
 **
+**  UnitType::StartingResources
+**    Amount of Resources a unit has when It's Built
+**
 **		UnitType::GivesResource
 **
 **				This equals to the resource Id of the resource given
@@ -691,6 +694,7 @@ struct _unit_type_ {
 	int RandomMovementProbability;  /// Probability to move randomly.
 	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard;                 /// Number of Transporter slots.
+	int StartingResources;			/// Amount of Resources on build
 	// FIXME: original only visual effect, we do more with this!
 	enum {
 		UnitTypeLand,               /// Unit lives on land

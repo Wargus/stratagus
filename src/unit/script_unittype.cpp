@@ -305,6 +305,8 @@ local int CclDefineUnitType(lua_State* l)
 			type->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {
 			type->MaxOnBoard = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "StartingResources")) {
+			type->StartingResources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "HitPoints")) {
 			type->_HitPoints = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RegenerationRate")) {
