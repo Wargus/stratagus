@@ -159,11 +159,13 @@ typedef struct _ui_ {
 
     int		MouseScroll;		/// Enable mouse scrolling
     int		KeyScroll;		/// Enable keyboard scrolling
-	/// Middle mouse button map move with reversed directions
-    char	ReverseMouseMove;
+	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
+    int 	MouseScrollSpeedDefault;
+	/// Middle-Mouse Scroll Speed with Control pressed
+    int 	MouseScrollSpeedControl;
 
-    int		WarpX;			/// Cursor warp X position
-    int		WarpY;			/// Cursor warp Y position
+    int		MouseWarpX;			/// Cursor warp X position
+    int		MouseWarpY;			/// Cursor warp Y position
 
     int		MouseAdjust;		/// Mouse speed adjust
     int		MouseScale;		/// Mouse speed scale

@@ -582,8 +582,8 @@ global void RestrictCursorToViewport(void)
 	CursorStartY = CursorY;
     }
 
-    TheUI.WarpX = CursorX = CursorStartX;
-    TheUI.WarpY = CursorY = CursorStartY;
+    TheUI.MouseWarpX = CursorX = CursorStartX;
+    TheUI.MouseWarpY = CursorY = CursorStartY;
     CursorOn = CursorOnMap;
 }
 
@@ -608,8 +608,8 @@ global void RestrictCursorToMinimap(void)
 	CursorStartY = CursorY;
     }
 
-    CursorX = TheUI.WarpX = CursorStartX;
-    CursorY = TheUI.WarpY = CursorStartY;
+    CursorX = TheUI.MouseWarpX = CursorStartX;
+    CursorY = TheUI.MouseWarpY = CursorStartY;
     CursorOn = CursorOnMinimap;
 }
 
@@ -639,36 +639,27 @@ global void UIHandleMouseMove(int x,int y)
     if( GameCursor==TheUI.Scroll.Cursor ) {
 	int xo;
 	int yo;
-	int scroll;
+	int speed;
 
 	if( KeyModifiers&ModifierControl ) {
-	    scroll=2;
+	    speed=TheUI.MouseScrollSpeedControl;
 	} else {
-	    scroll=1;
+	    speed=TheUI.MouseScrollSpeedDefault;
 	}
 
 	xo = TheUI.MouseViewport->MapX;
 	yo = TheUI.MouseViewport->MapY;
-	if( TheUI.ReverseMouseMove ) {
-	    if (x < CursorStartX) {
-    		xo+=scroll;
-	    } else if (x > CursorStartX) {
-		xo-=scroll;
-	    }
-	} else {
-	    if (x < CursorStartX) {
-    		xo-=scroll;
-	    } else if (x > CursorStartX) {
-        	xo+=scroll;
-	    }
-	    if (y < CursorStartY) {
-		yo-=scroll;
-	    } else if (y > CursorStartY) {
-    		yo+=scroll;
-	    }
-	}
-	TheUI.WarpX=CursorStartX;
-	TheUI.WarpY=CursorStartY;
+	SubScrollX += speed * (x-CursorStartX);
+	SubScrollY += speed * (y-CursorStartY);
+
+	// only tile based scrolling is supported
+	xo        += SubScrollX / TileSizeX;
+	SubScrollX = SubScrollX % TileSizeX;
+	yo        += SubScrollY / TileSizeY;
+	SubScrollY = SubScrollY % TileSizeY;
+
+	TheUI.MouseWarpX=CursorStartX;
+	TheUI.MouseWarpY=CursorStartY;
 	ViewportSetViewpoint(TheUI.MouseViewport, xo, yo);
 	return;
     }
@@ -1462,6 +1453,8 @@ global void UIHandleButtonDown(unsigned button)
 	} else if( MouseButtons&MiddleButton ) {// enter move map mode
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
+	    SubScrollX=0;
+	    SubScrollY=0;
 	    GameCursor=TheUI.Scroll.Cursor;
 	    DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
 	    MustRedraw|=RedrawCursor;

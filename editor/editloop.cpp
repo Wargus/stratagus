@@ -1460,9 +1460,10 @@ local void EditorCallbackMouse(int x, int y)
 	int yo;
 
 	// FIXME: Support with CTRL for faster scrolling.
+	// FIXME: code duplication, see ../ui/mouse.c
 	xo = TheUI.MouseViewport->MapX;
 	yo = TheUI.MouseViewport->MapY;
-	if (TheUI.ReverseMouseMove) {
+	if (TheUI.MouseScrollSpeedDefault < 0) {
 	    if (x < CursorStartX) {
 		xo++;
 	    } else if (x > CursorStartX) {
@@ -1485,8 +1486,8 @@ local void EditorCallbackMouse(int x, int y)
 		yo++;
 	    }
 	}
-	TheUI.WarpX = CursorStartX;
-	TheUI.WarpY = CursorStartY;
+	TheUI.MouseWarpX = CursorStartX;
+	TheUI.MouseWarpY = CursorStartY;
 	ViewportSetViewpoint(TheUI.MouseViewport, xo, yo);
 	return;
     }
