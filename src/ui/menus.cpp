@@ -1547,6 +1547,7 @@ local void SetRes(Menuitem *mi)
 {
     Menu *menu;
     int res;
+    int i;
 
     menu = FindMenu("menu-global-options");
 
@@ -1570,6 +1571,12 @@ local void SetRes(Menuitem *mi)
 	DestroyCursorBackground();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
 	LoadCcl();
+	menu = FindMenu("menu-program-start");
+	for (i=0; i<menu->nitems; ++i) {
+	    if (menu->items[i].initfunc) {
+		(*menu->items[i].initfunc)(menu->items + i);
+	    }
+	}
     }
     InitGlobalOptions(NULL);
 }
