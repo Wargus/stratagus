@@ -964,7 +964,7 @@ global void InitSelections(void)
 {
     int i;
 
-    Selected = malloc(NumUnitsPerGroup * sizeof(Unit*));
+    Selected = malloc(MaxSelectable * sizeof(Unit*));
 
     if ((i = NumSelected)) {		// Cleanup after load
 	while (i--) {
