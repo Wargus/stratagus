@@ -796,6 +796,7 @@ local SCM CclUnit(SCM list)
 
     if (!unit->Player) {
 	AssignUnitToPlayer (unit, player);
+	UpdateForNewUnit(unit,0);
 	unit->HP = unit->Type->_HitPoints;
     }
     //

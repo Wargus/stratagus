@@ -72,6 +72,7 @@ local SCM CclDefineUnitType(SCM list)
     UnitType* type;
     char* str;
     int i;
+    int redefine;
 
     //	Slot identifier
 
@@ -84,9 +85,10 @@ local SCM CclDefineUnitType(SCM list)
     if( type ) {
 	DebugLevel0Fn("Redefining unit-type `%s'\n" _C_ str);
 	free(str);
-	// FIXME: lose memory, old content isn't freed.
+	redefine = 1;
     } else {
 	type=NewUnitTypeSlot(str);
+	redefine = 0;
     }
 
     type->NumDirections=8;
@@ -99,9 +101,15 @@ local SCM CclDefineUnitType(SCM list)
 	list=gh_cdr(list);
 
 	if( gh_eq_p(value,gh_symbol2scm("name")) ) {
+	    if( redefine ) {
+		free(type->Name);
+	    }
 	    type->Name=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("use")) ) {
+	    if( redefine ) {
+		free(type->SameSprite);
+	    }
 	    type->SameSprite=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("files")) ) {
@@ -129,6 +137,9 @@ local SCM CclDefineUnitType(SCM list)
 		    }
 		}
 		free(str);
+		if( redefine ) {
+		    free(type->File[i]);
+		}
 		type->File[i]=gh_scm2newstr(gh_car(sublist),NULL);
 		sublist=gh_cdr(sublist);
 	    }
@@ -140,6 +151,9 @@ local SCM CclDefineUnitType(SCM list)
 		sublist=gh_cdr(sublist);
 
 		if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		    if( redefine ) {
+			free(type->ShadowFile);
+		    }
 		    type->ShadowFile=gh_scm2newstr(gh_car(sublist),NULL);
 		} else if( gh_eq_p(value,gh_symbol2scm("width")) ) {
 		    type->ShadowWidth=gh_scm2int(gh_car(sublist));
@@ -163,6 +177,9 @@ local SCM CclDefineUnitType(SCM list)
 	    free(str);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
+	    if( redefine ) {
+		free(type->Icon.Name);
+	    }
 	    type->Icon.Name=gh_scm2newstr(gh_car(list),NULL);
 	    type->Icon.Icon=NULL;
 	    list=gh_cdr(list);
@@ -194,6 +211,12 @@ local SCM CclDefineUnitType(SCM list)
 	    free(str);
 	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
 	    type->_Speed=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("draw-level")) ) {
+	    type->DrawLevel=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("max-on-board")) ) {
+	    // FIXME: need to write code to use this
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("hit-points")) ) {
 	    type->_HitPoints=gh_scm2int(gh_car(list));
@@ -276,6 +299,9 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("corpse")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
+	    if( redefine ) {
+		free(type->CorpseName);
+	    }
 	    type->CorpseName=gh_scm2newstr(gh_car(sublist),NULL);
 	    type->CorpseType=NULL;
 	    type->CorpseScript=gh_scm2int(gh_cadr(sublist));
@@ -380,26 +406,44 @@ local SCM CclDefineUnitType(SCM list)
 		sublist=gh_cdr(sublist);
 
 		if( gh_eq_p(value,gh_symbol2scm("selected")) ) {
+		    if( redefine ) {
+			free(type->Sound.Selected.Name);
+		    }
 		    type->Sound.Selected.Name=gh_scm2newstr(
 			gh_car(sublist),NULL);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("acknowledge")) ) {
+		    if( redefine ) {
+			free(type->Sound.Acknowledgement.Name);
+		    }
 		    type->Sound.Acknowledgement.Name=gh_scm2newstr(
 			gh_car(sublist),NULL);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("ready")) ) {
+		    if( redefine ) {
+			free(type->Sound.Ready.Name);
+		    }
 		    type->Sound.Ready.Name=gh_scm2newstr(
 			gh_car(sublist),NULL);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("help")) ) {
+		    if( redefine ) {
+			free(type->Sound.Help.Name);
+		    }
 		    type->Sound.Help.Name=gh_scm2newstr(
 			gh_car(sublist),NULL);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("dead")) ) {
+		    if( redefine ) {
+			free(type->Sound.Dead.Name);
+		    }
 		    type->Sound.Dead.Name=gh_scm2newstr(
 			gh_car(sublist),NULL);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("attack")) ) {
+		    if( redefine ) {
+			free(type->Weapon.Attack.Name);
+		    }
 		    type->Weapon.Attack.Name=gh_scm2newstr(
 			gh_car(sublist),NULL);
 		    sublist=gh_cdr(sublist);
