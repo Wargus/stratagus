@@ -10,12 +10,11 @@
 //
 /**@name botpanel.c	-	The bottom panel. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2002 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -815,9 +814,9 @@ global void DoButtonButtonClicked(int button)
     switch( CurrentButtons[button].Action ) {
 	case ButtonUnload:
 	    //
-	    //	Unload on coast, unload all units.
+	    //	Unload on coast, transporter standing, unload all units.
 	    //
-	    if( NumSelected==1
+	    if( NumSelected==1 && Selected[0]->Orders[0].Action==UnitActionStill
 		    && CoastOnMap(Selected[0]->X,Selected[0]->Y) ) {
 		SendCommandUnload(Selected[0]
 			,Selected[0]->X,Selected[0]->Y,NoUnitP
