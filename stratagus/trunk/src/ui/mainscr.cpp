@@ -11,7 +11,7 @@
 /**@name mainscr.c - The main screen. */
 //
 //      (c) Copyright 1998-2004 by Lutz Sammer, Valery Shchedrin,
-//                             and Jimmy Salmon
+//                              and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -118,9 +118,9 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 	Uint32 color;
 
 	// FIXME: add icon borders
-	y += unit->Type->Icon.Icon->Height;
+	y += unit->Type->Icon.Icon->Sprite->Height;
 	VideoFillRectangleClip(ColorBlack, x, y,
-		unit->Type->Icon.Icon->Width, 7);
+		unit->Type->Icon.Icon->Sprite->Width, 7);
 	if (unit->HP) {
 		f = (100 * unit->HP) / unit->Stats->HitPoints;
 		if (f > 75) {
@@ -132,7 +132,7 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 		} else {
 			color = ColorRed;
 		}
-		f = (f * (unit->Type->Icon.Icon->Width)) / 100;
+		f = (f * (unit->Type->Icon.Icon->Sprite->Width)) / 100;
 		VideoFillRectangleClip(color, x + 1, y + 1, f, 5);
 	}
 }
@@ -150,14 +150,14 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 	int f;
 
 	// FIXME: add icon borders
-	y += unit->Type->Icon.Icon->Height;
+	y += unit->Type->Icon.Icon->Sprite->Height;
 	VideoFillRectangleClip(ColorBlack, x, y + 3,
-		unit->Type->Icon.Icon->Width, 4);
+		unit->Type->Icon.Icon->Sprite->Width, 4);
 	if (unit->HP) {
 		// s0m3body: mana bar should represent proportional value of Mana
 		// with respect to MaxMana (unit->Type->_MaxMana) for the unit
 		f = (100 * unit->Mana) / unit->Type->_MaxMana;
-		f = (f * (unit->Type->Icon.Icon->Width)) / 100;
+		f = (f * (unit->Type->Icon.Icon->Sprite->Width)) / 100;
 		VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }
@@ -265,8 +265,8 @@ static void DrawUnitInfo(const Unit* unit)
 				ReplayRevealMap) {  // Only for own units.
 			if (unit->HP && unit->HP < 10000) {
 				sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
-				VideoDrawTextCentered(x + (type->Icon.Icon->Width) / 2,
-					y + type->Icon.Icon->Height + 7 + 3, SmallFont, buf);
+				VideoDrawTextCentered(x + (type->Icon.Icon->Sprite->Width) / 2,
+					y + type->Icon.Icon->Sprite->Height + 7 + 3, SmallFont, buf);
 			}
 		}
 	}

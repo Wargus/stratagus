@@ -46,7 +46,6 @@
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#DefineIcon">DefineIcon</a>
-<a href="#DefineIconAlias">DefineIconAlias</a>
 <hr>
 <h2>Intro - Introduction to icon functions and variables</h2>
 
@@ -68,8 +67,8 @@ Everything around the C icon structure.
 <dt>Size = {width, height}</dt>
 <dd>Size of the icon in pixel.
 </dd>
-<dt>Index = number</dt>
-<dd>The index into the graphic file.
+<dt>Frame = number</dt>
+<dd>The frame number in the graphic file.
 </dd>
 <dt>File = filename</dt>
 <dd>The filename of the graphic file containing the graphics.
@@ -80,37 +79,12 @@ Everything around the C icon structure.
 
 <pre>
 DefineIcon({Name = "icon-peasant", Tileset= "tileset-summer",
-  Size = {46, 38}, Index = 0, File = "tilesets/summer/icons.png"})
+  Size = {46, 38}, Frame = 0, File = "tilesets/summer/icons.png"})
 </pre>
 
 Define the peasant icon referenced with icon-peasant for the summer tileset.
 It is a normal static icon with a sizeof 46x38 pixel.  The graphic is loaded
 from the file "tilesets/summer/icons.png" and is the first icon in this file.
-
-<a name="DefineIconAlias"></a>
-<h3>DefineIconAlias("alias", icon-name)</h3>
-
-    Define an icon alias for an icon.<p>
-    This is an alternative name for the icon.
-
-
-<dl>
-<dt>alias</dt>
-<dd>The new alias name.
-</dd>
-<dt>icon</dt>
-<dd>An already existing icon name.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-DefineIconAlias("icon-raise-dead", "icon-skeleton")
-</pre>
-
-Now it is possible to get the icon "skeleton" also with the name
-"icon-raise-dead".
 
 <hr>
 Last changed: $Id$<br>
