@@ -459,7 +459,7 @@ global void DrawButtonPanel(void)
 		switch (buttons[i].Action) {
 		    case ButtonMove:
 			for (j = 0; j < NumSelected; ++j) {
-			    if (Selected[j]->Orders[0].Action!=UnitActionMove &&
+			    if (Selected[j]->Orders[0].Action != UnitActionMove &&
 				    Selected[j]->Orders[0].Action != UnitActionBuild &&
 				    Selected[j]->Orders[0].Action != UnitActionFollow) {
 				break;
@@ -524,9 +524,7 @@ global void DrawButtonPanel(void)
 			    stats->Costs[WoodCost]);
 
 			SetCosts(0, UnitTypes[v]->Demand, stats->Costs);
-
 			break;
-		    //case ButtonUpgrade:
 		    case ButtonResearch:
 			SetCosts(0, 0, Upgrades[v].Costs);
 			break;
@@ -845,8 +843,10 @@ global void UpdateButtonPanel(void)
     MustRedraw |= RedrawButtonPanel;
 }
 
-/*
+/**
 **	Handle bottom button clicked.
+**
+**	@param button	Button that was clicked.
 */
 global void DoButtonButtonClicked(int button)
 {

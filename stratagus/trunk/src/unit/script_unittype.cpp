@@ -955,7 +955,7 @@ local SCM CclDefineAnimations(SCM list)
 	    i = gh_scm2int(gh_vector_ref(gh_car(value), gh_int2scm(3)));
 	    t->Frame = i - frame;
 	    frame = i;
-	    if (t->Flags&AnimationRestart) {
+	    if (t->Flags & AnimationRestart) {
 		frame = 0;
 	    }
 	    ++t;
