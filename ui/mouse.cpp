@@ -33,7 +33,7 @@
 #include "player.h"
 #include "unit.h"
 #include "missile.h"
-#include "network.h"
+#include "commands.h"
 #include "minimap.h"
 #include "font.h"
 #include "image.h"

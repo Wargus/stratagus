@@ -34,6 +34,60 @@
 
 #define NetworkMaxLag	30		/// Debuging network lag (# frames)
 
+#define NetworkPort	6660		/// Default port for communication
+#define NetworkDups	4		/// Repeat old commands
+
+#define NetworkProtocolVersion 2	/// Network protocol version
+
+/*----------------------------------------------------------------------------
+--	Declaration
+----------------------------------------------------------------------------*/
+
+/**
+**	Network message types.
+*/
+enum _message_type_ {
+    MessageInitHello,			/// start connection
+    MessageInitReply,			/// connection reply
+    MessageInitConfig,			/// setup message configure clients
+
+    MessageSync,			/// heart beat
+    MessageQuit,			/// quit game
+    MessageQuitAck,			/// quit reply - UNUSED YET	Protocol Version 2 - Reserved for menus
+    MessageResend,			/// resend message
+
+    MessageChat,			/// chat message
+    MessageChatCont,			/// chat message continue
+    MessageChatTerm,			/// chat message termination -  Protocol Version 2
+
+    MessageCommandStop,			/// unit command stop
+    MessageCommandStand,		/// unit command stand ground
+    MessageCommandFollow,		/// unit command follow
+    MessageCommandMove,			/// unit command move
+    MessageCommandRepair,		/// unit command repair
+    MessageCommandAttack,		/// unit command attack
+    MessageCommandGround,		/// unit command attack ground
+    MessageCommandPatrol,		/// unit command patrol
+    MessageCommandBoard,		/// unit command borad
+    MessageCommandUnload,		/// unit command unload
+    MessageCommandBuild,		/// unit command build building
+    MessageCommandCancelBuild,		/// unit command cancel building
+    MessageCommandHarvest,		/// unit command harvest
+    MessageCommandMine,			/// unit command mine gold
+    MessageCommandHaul,			/// unit command haul oil
+    MessageCommandReturn,		/// unit command return goods
+    MessageCommandTrain,		/// unit command train
+    MessageCommandCancelTrain,		/// unit command cancel training
+    MessageCommandUpgrade,		/// unit command upgrade
+    MessageCommandCancelUpgrade,	/// unit command cancel upgrade
+    MessageCommandResearch,		/// unit command research
+    MessageCommandCancelResearch,	/// unit command cancel research
+    MessageCommandDemolish,		/// unit command demolish
+
+    // ATTN: __MUST__ be last due to spellid encoding!!!
+    MessageCommandSpellCast		/// unit command spell cast
+};
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -44,8 +98,6 @@ extern int NetworkInSync;		/// Network is in sync
 extern int NetworkUpdates;		/// Network update each # frames
 extern int NetworkLag;			/// Network lag (# frames)
 extern char* NetworkArg;		/// Network command line argument
-
-extern int CommandLogEnabled;		/// True if command log is on
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -60,55 +112,8 @@ extern void NetworkQuit(void);		/// quit game
 extern void NetworkRecover(void);	/// Recover network
 extern void NetworkCommands(void);	/// get all network commands
 extern void NetworkChatMessage(const char*msg);	/// send chat message
-
-    /// Send stop command
-extern void SendCommandStopUnit(Unit* unit);
-    /// Send stand ground command
-extern void SendCommandStandGround(Unit* unit,int flush);
-    /// Send follow command
-extern void SendCommandFollow(Unit* unit,Unit* dest,int flush);
-    /// Send move command
-extern void SendCommandMove(Unit* unit,int x,int y,int flush);
-    /// Send repair command
-extern void SendCommandRepair(Unit* unit,int x,int y,Unit* dest,int flush);
-    /// Send attack command
-extern void SendCommandAttack(Unit* unit,int x,int y,Unit* dest,int flush);
-    /// Send attack ground command
-extern void SendCommandAttackGround(Unit* unit,int x,int y,int flush);
-    /// Send patrol command
-extern void SendCommandPatrol(Unit* unit,int x,int y,int flush);
-    /// Send board command
-extern void SendCommandBoard(Unit* unit,int x,int y,Unit* dest,int flush);
-    /// Send unload command
-extern void SendCommandUnload(Unit* unit,int x,int y,Unit* what,int flush);
-    /// Send build building command
-extern void SendCommandBuildBuilding(Unit*,int,int,UnitType*,int);
-    /// Send cancel building command
-extern void SendCommandCancelBuilding(Unit* unit,Unit* peon);
-    /// Send harvest command
-extern void SendCommandHarvest(Unit* unit,int x,int y,int flush);
-    /// Send mine gold command
-extern void SendCommandMineGold(Unit* unit,Unit* dest,int flush);
-    /// Send haul oil command
-extern void SendCommandHaulOil(Unit* unit,Unit* dest,int flush);
-    /// Send return goods command
-extern void SendCommandReturnGoods(Unit* unit,int flush);
-    /// Send train command
-extern void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush);
-    /// Send cancel training command
-extern void SendCommandCancelTraining(Unit* unit,int slot);
-    /// Send upgrade to command
-extern void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush);
-    /// Send cancel upgrade to command
-extern void SendCommandCancelUpgradeTo(Unit* unit);
-    /// Send research command
-extern void SendCommandResearch(Unit* unit,Upgrade* what,int flush);
-    /// Send cancel research command
-extern void SendCommandCancelResearch(Unit* unit);
-    /// Send demolish command
-extern void SendCommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
-    /// Send spell cast command
-extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush);
+extern void NetworkSendCommand(int command,const Unit* unit,int x,int y
+	,const Unit* dest,const UnitType* type,int status);
 //@}
 
 #endif	// !__NETWORK_H__
