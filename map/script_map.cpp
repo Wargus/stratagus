@@ -152,7 +152,9 @@ local int CclStratagusMap(lua_State* l)
 					TheMap.NoFogOfWar = 1;
 					--k;
 				} else if (!strcmp(value, "filename")) {
-					TheMap.Info->Filename = strdup(LuaToString(l, k + 1));
+					 lua_rawgeti(l, j + 1, k + 1);
+					TheMap.Info->Filename = strdup(LuaToString(l, -1));
+					lua_pop(l, 1);
 				} else if (!strcmp(value, "map-fields")) {
 					int i;
 					int subsubargs;
