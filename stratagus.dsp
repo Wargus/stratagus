@@ -695,6 +695,10 @@ SOURCE=.\src\video\video.c
 # End Source File
 # End Group
 # End Group
+# Begin Source File
+
+SOURCE=.\src\stratagus\util.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
