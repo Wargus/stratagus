@@ -68,7 +68,16 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
 CC=gcc
 CCLD=g++
 RM="rm -f"
-MAKE=make
+if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
+  MAKE=gmake
+else
+  MAKE=make
+fi
+if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
+  DL=
+else
+  DL=-ldl
+fi
 
 # if your system/distribution lacks libpng, you may install the source
 # in the freecraft directory and name that directory here!
@@ -286,7 +295,7 @@ else
   fi
 fi
 
-PNG_PATH=""
+PNG_PATH="-L/usr/local/lib"
 PNG_LOCAL=0
 if test -d $LOCAL_PNG ; then
     PNG_PATH="-L./\$LOCAL_PNG"
@@ -358,7 +367,12 @@ echo
 echo "Checking for various video libraries..."
 
 # Check for SDL >= 1.x
-if test "$(sdl-config --version 2>/dev/null)" = "1.*" ; then
+if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
+  SDL_CONFIG=sdl11-config
+else
+  SDL_CONFIG=sdl-config
+fi
+if test "$($SDL_CONFIG --version 2>/dev/null)" = "1.*" ; then
   echo "...You do not appear to have SDL installed"
 else
   HAVESDL=1
@@ -416,9 +430,9 @@ case $VIDSEL in
   [sS])
 	echo -n "Using SDL"
   	USESDL=1
-	SDLLIB="\$(shell sdl-config --libs)"
+	SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	echo "SDL_CFLAGS	= \$(shell sdl-config --cflags)" >> $RULESFILE
+	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
         if test "$STATIC x" != " x" ; then
 	  SDLLIB="$SDLLIB -lesd"
@@ -429,7 +443,7 @@ case $VIDSEL in
 if [ "$WIN32" != "1" ] ; then
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
     if [ "$BEOS" != "1" ] ; then
-	    echo "VIDEOLIB	= \$(SDLLIB) -ldl" >> $RULESFILE
+	    echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
     else
 	    echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
     fi
@@ -441,15 +455,15 @@ fi
   [vV])
 	echo "Using SVGALIB"
 	echo "VIDEO		= -DUSE_SVGALIB" >> $RULESFILE
-	echo "VIDEOLIB	= -lvga -ldl" >> $RULESFILE
+	echo "VIDEOLIB	= -lvga $DL" >> $RULESFILE
 	;;
 
   [bB])
 	echo -n "Using SDL/SVGALIB"
   	USESDL=1
-	SDLLIB="\$(shell sdl-config --libs)"
+	SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	echo "SDL_CFLAGS	= \$(shell sdl-config --cflags)" >> $RULESFILE
+	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
         if test "$STATIC x" != " x" ; then
 	  SDLLIB="$SDLLIB -lesd"
@@ -458,14 +472,14 @@ fi
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
-	echo "VIDEOLIB	= \$(SDLLIB) -lvga -lvgagl -ldl" >> $RULESFILE
+	echo "VIDEOLIB	= \$(SDLLIB) -lvga -lvgagl $DL" >> $RULESFILE
 	echo
 	;;
 
   *)
 	echo "Using X11"
 	echo "VIDEO		= -DUSE_X11" >> $RULESFILE
-	echo "VIDEOLIB	= -lXext -lX11 -ldl" >> $RULESFILE
+	echo "VIDEOLIB	= -lXext -lX11 $DL" >> $RULESFILE
 	;;
 
 esac
@@ -511,7 +525,11 @@ case $ANSWER in
 	    read ANSWER2
 	    case $ANSWER2 in [yY])
 	      echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
-	      echo "THREADLIB	= -lpthread" >> $RULESFILE
+		if [ "`uname -a | grep -is bsd x` " != " x" ] ; then
+		  echo "THREADLIB   = -pthread" >> $RULESFILE
+		else
+		  echo "THREADLIB   = -lpthread" >> $RULESFILE
+		fi
 	      ;;
 	    esac
 	  fi
@@ -795,11 +813,11 @@ read ANSWER
 case $ANSWER in
  [nN])
  	echo
- 	echo "Done generating Rules.make.  Type 'make' to compile!"
+ 	echo "Done generating Rules.make.  Type '$MAKE' to compile!"
 	;;
  *)
-	make depend
-	make
+	$MAKE depend
+	$MAKE
 	;;
 
 esac

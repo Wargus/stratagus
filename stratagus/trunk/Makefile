@@ -31,7 +31,7 @@ WINRULESFILE = Rules.make.WIN32
 
 include $(TOPDIR)/$(RULESFILE)
 
-MAKE=	make TOPDIR=`pwd`
+MAKEFLAGS= TOPDIR=$(shell pwd)
 MODULES= src tools
 
 all:	src freecraft$(EXE) tools
@@ -321,7 +321,7 @@ FCGP1=	../fcgp-*.tar.bz2
 FCSP1=	../fcsp-general-*.tar.bz2
 FCSP2=	../fcsp-mythical-*.tar.bz2
 FCSP3=	../fcsp-alliance-*.tar.bz2
-FCMP=	../fcmp_20020217_full.tar.gz
+FCMP=	../fcmp-020312.tar.gz
 
 linux-complete:
 	mkdir freecraft-complete
