@@ -713,9 +713,9 @@ void SaveSpellAutoCast(CLFile *file,AutoCastInfo* autocast)
 	"only"			/// CONDITION_ONLY
     };
     
-    CLprintf(file,"( range %d",autocast->Range);
+    CLprintf(file,"( range %d ",autocast->Range);
     if (autocast->Combat!=CONDITION_TRUE) {
-	CLprintf(file,"undead %s ",condstrings[(int)autocast->Combat]);
+	CLprintf(file,"combat %s ",condstrings[(int)autocast->Combat]);
     }
     if (autocast->Condition) {
 	CLprintf(file," condition ");
