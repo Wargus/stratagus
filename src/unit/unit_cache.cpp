@@ -254,7 +254,7 @@ local void QuadTreeNodeFree(QuadTreeNode* node)
 **	Insert a new value into the quad-tree.
 **	Generate branches if needed.
 */
-local void QuadTreeInsert(QuadTree* tree,QuadTreeValue* value)
+local void QuadTreeInsert(QuadTree* tree, QuadTreeValue* value)
 {
     QuadTreeLeaf* leaf;
     QuadTreeNode** nodep;
@@ -263,33 +263,33 @@ local void QuadTreeInsert(QuadTree* tree,QuadTreeValue* value)
 
     StatisticInsert(tree);
 
-    nodep=&tree->Root;
+    nodep = &tree->Root;
     //
     //	Generate branches.
     //
-    for( level=tree->Levels-1; level>=0; level-- ) {
-	if( !*nodep ) {
+    for (level = tree->Levels - 1; level >= 0; --level) {
+	if (!*nodep) {
 	    StatisticNewNode(tree);
-	    *nodep=NewQuadTreeNode();
+	    *nodep = NewQuadTreeNode();
 	}
-	branch=((QuadTreeValueXOf(value) >> level)&1)
-	    | (((QuadTreeValueYOf(value) >> level)&1)<<1);
-	nodep=&(*nodep)->Next[branch];
+	branch = ((QuadTreeValueXOf(value) >> level) & 1) |
+	    (((QuadTreeValueYOf(value) >> level) & 1) << 1);
+	nodep = &(*nodep)->Next[branch];
     }
 
     //
     //	Insert at leaf.
     //
     StatisticNewLeaf(tree);
-    leaf=NewQuadTreeLeaf(value,(QuadTreeLeaf*)(*nodep));
-    IfDebug(
-	if( leaf->Next ) {
-	    DebugLevel3("More...\n");
-	    DebugLevel3("Leaf: %p %p," _C_ leaf _C_ leaf->Value);
-	    DebugLevel3("Leaf: %p %p\n" _C_ leaf->Next _C_ leaf->Next->Value);
-	}
-    );
-    *nodep=(QuadTreeNode*)leaf;
+    leaf = NewQuadTreeLeaf(value, (QuadTreeLeaf*)(*nodep));
+#ifdef DEBUG
+    if (leaf->Next) {
+	DebugLevel3("More...\n");
+	DebugLevel3("Leaf: %p %p," _C_ leaf _C_ leaf->Value);
+	DebugLevel3("Leaf: %p %p\n" _C_ leaf->Next _C_ leaf->Next->Value);
+    }
+#endif
+    *nodep = (QuadTreeNode*)leaf;
 }
 
 /**
@@ -603,7 +603,11 @@ local void PrintQuadTree(QuadTree* tree)
 */
 local void QuadTreePrintStatistic(QuadTree* tree)
 {
-    IfDebug(if (!tree) return;)
+#ifdef DEBUG
+    if (!tree) {
+	return;
+    }
+#endif
     DebugLevel0("Quad-Tree: %p Levels %d\n" _C_ tree _C_ tree->Levels);
     DebugLevel0("\tInserts %d, deletes %d\n"
 	_C_ tree->Inserts _C_ tree->Deletes);
@@ -724,26 +728,26 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **
 **	@return		Unit, if an unit of correct type is on the field.
 */
-global Unit* UnitCacheOnXY(int x,int y,unsigned type)
+global Unit* UnitCacheOnXY(int x, int y, unsigned type)
 {
     QuadTreeLeaf* leaf;
 
-    leaf=QuadTreeSearch(PositionCache,x,y);
-    while( leaf ) {
-	IfDebug(
-	    // FIXME: the error isn't here!
-	    if( !leaf->Value->Type ) {
-		DebugLevel0("Error UNIT %8p %08X %d,%d\n" _C_ leaf->Value
-			_C_ UnitNumber(leaf->Value) _C_ leaf->Value->X _C_ leaf->Value->Y);
-		DebugLevel0("Removed unit in cache %d,%d!!!!\n" _C_ x _C_ y);
-		leaf=leaf->Next;
-		continue;
-	    }
-	);
-	if( leaf->Value->Type->UnitType==type ) {
+    leaf = QuadTreeSearch(PositionCache, x, y);
+    while (leaf) {
+#ifdef DEBUG
+	// FIXME: the error isn't here!
+	if (!leaf->Value->Type) {
+	    DebugLevel0("Error UNIT %8p %08X %d,%d\n" _C_ leaf->Value _C_
+		UnitNumber(leaf->Value) _C_ leaf->Value->X _C_ leaf->Value->Y);
+	    DebugLevel0("Removed unit in cache %d,%d!!!!\n" _C_ x _C_ y);
+	    leaf = leaf->Next;
+	    continue;
+	}
+#endif
+	if (leaf->Value->Type->UnitType == type) {
 	    return leaf->Value;
 	}
-	leaf=leaf->Next;
+	leaf = leaf->Next;
     }
     return NoUnitP;
 }
@@ -896,7 +900,7 @@ global void UnitCacheChange(Unit* unit)
 **	@return		Returns the number of units found
 */
 //#include "rdtsc.h"
-global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
+global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 {
     int x;
     int y;
@@ -904,53 +908,58 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
     int i;
     Unit* unit;
     MapField* mf;
-
-//  int ts0=rdtsc(), ts1;
+//  int ts0 = rdtsc(), ts1;
 
     DebugLevel3Fn("%d,%d %d,%d\n" _C_ x1 _C_ y1 _C_ x2 _C_ y2);
     //
     //	Units are inserted by origin position
     //
-    x=x1-4; if( x<0 ) x=0;		// Only for current unit-cache !!
-    y=y1-4; if( y<0 ) y=0;
+    x = x1 - 4;
+    if (x < 0) {
+	x = 0;		// Only for current unit-cache !!
+    }
+    y = y1 - 4;
+    if (y < 0) {
+	y = 0;
+    }
 
     //
     //	Reduce to map limits. FIXME: should the caller check?
     //
-    if( x2>TheMap.Width ) {
-	x2=TheMap.Width;
+    if (x2 > TheMap.Width) {
+	x2 = TheMap.Width;
     }
-    if( y2>TheMap.Height ) {
-	y2=TheMap.Height;
+    if (y2 > TheMap.Height) {
+	y2 = TheMap.Height;
     }
 
-    for( n=0; y<y2; ++y ) {
-	mf=TheMap.Fields+y*TheMap.Width+x;
-	for( i=x; i<x2; ++i ) {
+    for (n = 0; y < y2; ++y) {
+	mf = TheMap.Fields + y * TheMap.Width + x;
+	for (i = x; i < x2; ++i) {
 
-	    for( unit=mf->Here.Units; unit; unit=unit->Next ) {
-		IfDebug(
-		    if( !unit->Type ) {
-			DebugLevel0Fn("%d,%d: %d, %d,%d\n"
-			    _C_ i _C_ y _C_ UnitNumber(unit) _C_ unit->X _C_ unit->Y);
-			fflush(stdout);
-		    }
-		);
+	    for (unit = mf->Here.Units; unit; unit = unit->Next) {
+#ifdef DEBUG
+		if (!unit->Type) {
+		    DebugLevel0Fn("%d,%d: %d, %d,%d\n" _C_ i _C_ y _C_
+			UnitNumber(unit) _C_ unit->X _C_ unit->Y);
+		    fflush(stdout);
+		}
+#endif
 		//
 		//	Remove units, outside range.
 		//
-		if( unit->X+unit->Type->TileWidth<=x1 || unit->X>x2
-			|| unit->Y+unit->Type->TileHeight<=y1 || unit->Y>y2 ) {
+		if (unit->X + unit->Type->TileWidth <= x1 || unit->X > x2 ||
+			unit->Y + unit->Type->TileHeight <= y1 || unit->Y > y2) {
 		    continue;
 		}
-		table[n++]=unit;
+		table[n++] = unit;
 	    }
 	    ++mf;
 	}
     }
 
-//  ts1 = rdtsc ();
-//  printf ("UnitCacheSelect on %dx%d took %d cycles\n", x2-x1, y2-y1, ts1-ts0);
+//  ts1 = rdtsc();
+//  printf("UnitCacheSelect on %dx%d took %d cycles\n", x2 - x1, y2 - y1, ts1 - ts0);
 
     return n;
 }
@@ -964,9 +973,9 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 **
 **	@return		Returns the number of units found
 */
-global int UnitCacheOnTile(int x,int y,Unit** table)
+global int UnitCacheOnTile(int x, int y, Unit** table)
 {
-    return UnitCacheSelect(x,y,x+1,y+1,table);
+    return UnitCacheSelect(x, y, x + 1, y + 1, table);
 }
 
 /**
@@ -978,18 +987,18 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **
 **	@return		Unit, if an unit of correct type is on the field.
 */
-global Unit* UnitCacheOnXY(int x,int y,unsigned type)
+global Unit* UnitCacheOnXY(int x, int y, unsigned type)
 {
     Unit* table[UnitMax];
     int n;
 
-    n = UnitCacheOnTile(x,y,table);
-    while( n-- ) {
-	if( (unsigned)table[n]->Type->UnitType==type ) {
+    n = UnitCacheOnTile(x, y, table);
+    while (n--) {
+	if ((unsigned)table[n]->Type->UnitType == type) {
 	    break;
 	}
     }
-    if( n > -1 ) {
+    if (n > -1) {
 	return table[n];
     } else {
 	return NoUnitP;
