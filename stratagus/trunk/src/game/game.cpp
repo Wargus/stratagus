@@ -407,6 +407,9 @@ global void CreateGame(char* filename, WorldMap* map)
 	LoadCursors(ThisPlayer->RaceName);
 
 	InitMissileTypes();
+#ifndef DYNAMIC_LOAD
+	LoadMissileSprites();
+#endif
 	InitConstructions();
 	LoadConstructions();
 	LoadUnitTypes();
