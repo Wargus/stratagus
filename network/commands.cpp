@@ -524,6 +524,7 @@ global void ReplayEachCycle(void)
 
     if( gh_null_p(ReplayLog) ) {
 	SetMessage("End of replay");
+	GameObserve=0;
     }
 }
 
