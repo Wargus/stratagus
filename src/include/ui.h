@@ -228,8 +228,9 @@ typedef struct _content_type_ {
 
 	union {
 		struct {
-			char* Text;                  ///< Text to display
+			StringDesc* Text;            ///< Text to display.
 			int Font;                    ///< Font to use.
+			char Centered;               ///< if true, center the display.
 			int Index;                   ///< Index of the variable to show, -1 if not.
 			EnumVariable Component;      ///< Component of the variable.
 			char ShowName;               ///< If true, Show name's unit.

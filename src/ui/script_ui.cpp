@@ -1901,14 +1901,18 @@ static int CclDefinePanelContents(lua_State* l)
 								content->Data.SimpleText.Index = -1;
 								content->Data.SimpleText.Font = -1;
 								if (lua_isstring(l, -1)) {
-									content->Data.SimpleText.Text = strdup(LuaToString(l, -1));
+									content->Data.SimpleText.Text = CclParseStringDesc(l);
+									lua_pushnil(l); // ParseStringDesc eat token
 								} else {
 									for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 										key = LuaToString(l, -2);
 										if (!strcmp(key, "Text")) {
-											content->Data.SimpleText.Text = strdup(LuaToString(l, -1));
+											content->Data.SimpleText.Text = CclParseStringDesc(l);
+											lua_pushnil(l); // ParseStringDesc eat token
 										} else if (!strcmp(key, "Font")) {
 											content->Data.SimpleText.Font = FontByIdent(LuaToString(l, -1));
+										} else if (!strcmp(key, "Centered")) {
+											content->Data.SimpleText.Centered = LuaToBoolean(l, -1);
 										} else if (!strcmp(key, "Variable")) {
 											content->Data.SimpleText.Index = GetVariableIndex(LuaToString(l, -1));
 											if (content->Data.SimpleText.Index == -1) {

@@ -80,8 +80,8 @@ dynamic attacker characteristic. So following present some generic terms
 and how to use it.
 
 <dl>
-  <dt><h4>NumberDesc</h4></dt>
-  <dd>Represent a number. it could be
+  <dt><b>NumberDesc</b></dt>
+  <dd>Represent a number. it could be :
   <dl>
 	<dt>number</dt>
 	<dd>direct value. Or value which are not recompute during the game.</dd>
@@ -101,10 +101,24 @@ and how to use it.
 	<dd>It is the minimum between the two numbers.</dd>
 	<dt>Max(NumberDesc, NumberDesc)</dt>
 	<dd>It is the maximum between the two numbers.</dd>
+
+	<dt>GreaterThan(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &gt; NumberDesc2 else 0.</dd>
+	<dt>LessThan(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &lt; NumberDesc2 else 0.</dd>
+	<dt>GreaterThanOrEq(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &gt;= NumberDesc2 else 0.</dd>
+	<dt>LessThanOrEq(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &lt;= NumberDesc2 else 0.</dd>
+	<dt>Equal(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 == NumberDesc2 else 0.</dd>
+	<dt>NotEqual(NumberDesc1, NumberDesc2)</dt>
+	<dd>It is 1 if NumberDesc1 &lt;&gt; NumberDesc2 else 0.</dd>
+
 	<dt>Rand(NumberDesc)</dt>
 	<dd>It is a random value in [0..Number - 1].</dd>
-	<dt>Attacker("Variable" [, Component])</dt>
-	<dd>It is the the value of the component of the variable for the attacker unit (if any, else 0).
+	<dt>AttackerVar("Variable" [, Component])</dt>
+	<dd>It is the the value of the component of the variable for the attacker (See UnitDesc) unit (if any, else 0).
 	Note that Variable is defined with SetVariables(). And component is one of the following, default is "Value" :
 	<dl>
 	  <dt>"Enable"</dt>
@@ -116,9 +130,36 @@ and how to use it.
 	  <dt>"Increase"</dt>
 	  <dd>Increase value of the variable.</dd>
 	</dl></dd>
-	<dt>Defender("Variable" [, Component])</dt>
+	<dt>DefenderVar("Variable" [, Component])</dt>
 	<dd>Like of  Attacker but for the Defender unit.</dd>
+	<dt>ActiveUnitVar("Variable" [, Component])</dt>
+	<dd>Like of  Attacker but for the Active unit.</dd>
   </dl></dd>
+  <dt><b>StringDesc</b></dt>
+  <dd>Represent a number. it could be :
+  <dl>
+	<dt>"string"</dt>
+	<dd>direct value. Or value which are not recompute during the game.</dd>
+	<dt>Concat(StringDesc, StringDesc[, StringDesc, ...])</dt>
+	<dd>Concatenation of several strings.</dd>
+	<dt>String(NumberDesc)</dt>
+	<dd>Convert a number to string.</dd>
+	<dt>InverseVideo(StringDesc)</dt>
+	<dd>Set string in InverseVideo mode.</dd>
+	<dt>UnitName(UnitDesc)</dt>
+	<dd>Name of the Unit</dd>
+  </dl></dd>
+  <dt><b>UnitDesc</b></dt>
+  <dd>Represent a unit. It could be :
+  <dl>
+	<dt>"Attacker"</dt>
+	<dd>Unit which attack.</dd>
+	<dt>"Defender"</dt>
+	<dd>Unit which is attacked.</dd>
+	<dt>"Active"</dt>
+	<dd>First unit selected or unit under cursor.</dd>
+  </dl></dd>
+
 </dl>
 
 <h2>Functions</h2>

@@ -896,8 +896,8 @@ Sets the formula to compute damage for missile that the unit fire on goal.
 --  Max(0, Attacker->BasicDamage - Defender->Armor) + Attacker->PiercingDamage.
 --
   SetDamageFormula(Div(Mul(Add(51, Rand(50)),
-				  Add(Max(0, Sub( Attacker("BasicDamage"), Defender("Armor"))),
-					  Attacker("PiercingDamage"))), 100))
+				  Add(Max(0, Sub( AttackerVar("BasicDamage"), DefenderVar("Armor"))),
+					  AttackerVar("PiercingDamage"))), 100))
 </pre>
 
 

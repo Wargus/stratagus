@@ -399,6 +399,8 @@ static Unit** Str2UnitRef(lua_State* l, const char *s)
 		res = &TriggerData.Attacker;
 	} else if (!strcmp(s, "Defender")) {
 		res = &TriggerData.Defender;
+	} else if (!strcmp(s, "Active")) {
+		res = &TriggerData.Active;
 	} else {
 		LuaError(l, "Invalid unit reference '%s'\n" _C_ s);
 	}
@@ -476,6 +478,24 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 		} else if (!strcmp(key, "Rand")) {
 			res->e = ENumber_Rand;
 			res->D.N = CclParseNumberDesc(l);
+		} else if (!strcmp(key, "GreaterThan")) {
+			res->e = ENumber_Gt;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "GreaterThanOrEq")) {
+			res->e = ENumber_GtEq;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "LessThan")) {
+			res->e = ENumber_Lt;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "LessThanOrEq")) {
+			res->e = ENumber_LtEq;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "Equal")) {
+			res->e = ENumber_Eq;
+			ParseBinOp(l, &res->D.BinOp);
+		} else if (!strcmp(key, "NotEqual")) {
+			res->e = ENumber_NEq;
+			ParseBinOp(l, &res->D.BinOp);
 		} else if (!strcmp(key, "UnitVar")) {
 			Assert(lua_istable(l, -1));
 
@@ -495,8 +515,6 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key);
 				}
-
-
 			}
 			lua_pop(l, 1); // pop the table.
 		} else {
@@ -510,6 +528,79 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 	return res;
 }
 
+/**
+**  Return String description.
+**
+**  @param l    lua state.
+**
+**  @return     String description.
+*/
+StringDesc* CclParseStringDesc(lua_State* l)
+{
+	StringDesc* res;      // Result.
+	int nargs;            // Size of table.
+	const char* key;      // Key.
+
+	res = calloc(1, sizeof (*res));
+	if (lua_isstring(l, -1)) {
+		res->e = EString_Dir;
+		res->D.Val = strdup(LuaToString(l, -1));
+	} else if (lua_istable(l, -1)) {
+		nargs = luaL_getn(l, -1);
+		if (nargs != 2) {
+			LuaError(l, "Bad number of args in parse String table\n");
+		}
+		lua_rawgeti(l, -1, 1); // key
+		key = LuaToString(l, -1);
+		lua_pop(l, 1);
+		lua_rawgeti(l, -1, 2); // table
+		if (!strcmp(key, "Concat")){
+			int i; // iterator.
+
+			res->e = EString_Concat;
+			res->D.Concat.n = luaL_getn(l, -1);
+			if (res->D.Concat.n < 1) {
+				LuaError(l, "Bad number of args in Concat\n");
+			}
+			res->D.Concat.Strings = calloc(res->D.Concat.n, sizeof (*res->D.Concat.Strings));
+			for (i = 0; i < res->D.Concat.n; i++) {
+				lua_rawgeti(l, -1, 1 + i);
+				res->D.Concat.Strings[i] = CclParseStringDesc(l);
+			}
+			lua_pop(l, 1); // table.
+		} else if (!strcmp(key, "String")) {
+			res->e = EString_String;
+			res->D.Number = CclParseNumberDesc(l);
+		} else if (!strcmp(key, "InverseVideo")) {
+			res->e = EString_InverseVideo;
+			res->D.String = CclParseStringDesc(l);
+		} else if (!strcmp(key, "UnitName")) {
+			res->e = EString_UnitName;
+			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "If")) {
+			res->e = EString_If;
+			if (luaL_getn(l, -1) != 2 && luaL_getn(l, -1) != 3) {
+				LuaError(l, "Bad number of args in If\n");
+			}
+			lua_rawgeti(l, -1, 1); // Condition.
+			res->D.If.Cond = CclParseNumberDesc(l);
+			lua_rawgeti(l, -1, 2); // Then.
+			res->D.If.True = CclParseStringDesc(l);
+			if (luaL_getn(l, -1) == 3) {
+				lua_rawgeti(l, -1, 3); // Else.
+				res->D.If.False = CclParseStringDesc(l);
+			}
+			lua_pop(l, 1); // table.
+		} else {
+			lua_pop(l, 1);
+			LuaError(l, "unknow condition '%s'"_C_ key);
+		}
+	} else {
+		LuaError(l, "Parse Error in ParseString");
+	}
+	lua_pop(l, 1);
+	return res;
+}
 
 /**
 **  compute the Unit expression
@@ -520,6 +611,13 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 */
 Unit* EvalUnit(const UnitDesc* unitdesc)
 {
+	Assert(unitdesc);
+
+	if (NumSelected > 0) {
+		TriggerData.Active = Selected[0];
+	} else {
+		TriggerData.Active = UnitUnderCursor;
+	}
 	switch (unitdesc->e) {
 		case EUnit_Ref :
 			return *unitdesc->D.AUnit;
@@ -544,6 +642,7 @@ int EvalNumber(const NumberDesc* number)
 	int a;
 	int b;
 
+	Assert(number);
 	switch (number->e) {
 		case ENumber_Dir :     // directly a number.
 			return number->D.Val;
@@ -568,12 +667,109 @@ int EvalNumber(const NumberDesc* number)
 			a = EvalNumber(number->D.BinOp.Left);
 			b = EvalNumber(number->D.BinOp.Right);
 			return (a >= b ? a : b);
+		case ENumber_Gt  :     // a > b  ? 1 : 0
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a > b ? 1 : 0);
+		case ENumber_GtEq :    // a >= b ? 1 : 0
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a >= b ? 1 : 0);
+		case ENumber_Lt  :     // a < b  ? 1 : 0
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a < b ? 1 : 0);
+		case ENumber_LtEq :    // a <= b ? 1 : 0
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a <= b ? 1 : 0);
+		case ENumber_Eq  :     // a == b ? 1 : 0
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a == b ? 1 : 0);
+		case ENumber_NEq  :    // a != b ? 1 : 0
+			a = EvalNumber(number->D.BinOp.Left);
+			b = EvalNumber(number->D.BinOp.Right);
+			return (a != b ? 1 : 0);
+
 		case ENumber_Rand :    // random(a) [0..a-1]
 			a = EvalNumber(number->D.N);
 			return SyncRand() % a;
 		case ENumber_UnitStat : // property of unit.
 			unit = EvalUnit(number->D.UnitStat.Unit);
-			return GetComponent(unit, number->D.UnitStat.Index, number->D.UnitStat.Component).i;
+			if (unit != NULL) {
+				return GetComponent(unit, number->D.UnitStat.Index, number->D.UnitStat.Component).i;
+			} else { // ERROR.
+				return 0;
+			}
+		default :
+			abort();
+			return 0;
+	}
+}
+
+/**
+**  compute the string expression
+**
+**  @param number  struct with definition of the calculation.
+**
+**  @return the result string.
+**
+**  @todo Manage better the error.
+*/
+char* EvalString(const StringDesc* s)
+{
+	char* res;   // Result string.
+	int i;       // Iterator.
+	char* tmp1;  // Temporary string.
+	char* tmp2;  // Temporary string.
+	const Unit* unit;  // Temporary unit
+
+	Assert(s);
+	switch (s->e) {
+		case EString_Dir :     // directly a string.
+			return strdup(s->D.Val);
+		case EString_Concat :     // a + b -> "ab"
+			tmp1 = EvalString(s->D.Concat.Strings[0]);
+			if (!tmp1) {
+				tmp1 = strdup("");
+			}
+			res = tmp1;
+			for (i = 1; i < s->D.Concat.n; i++) {
+				tmp2 = EvalString(s->D.Concat.Strings[i]);
+				if (tmp2) {
+					res = strdcat(tmp1, tmp2);
+					free(tmp1);
+					free(tmp2);
+					tmp1 = res;
+				}
+			}
+			return res;
+		case EString_String :     // 42 -> "42".
+			res = malloc(10); // Should be enought ?
+			sprintf(res, "%d", EvalNumber(s->D.Number));
+			return res;
+		case EString_InverseVideo : // "a" -> "~<a~>"
+			tmp1 = EvalString(s->D.String);
+			// FIXME replace existing "~<" by "~>" in tmp1.
+			res = strdcat3("~<", tmp1, "~>");
+			free(tmp1);
+			return res;
+		case EString_UnitName : // name of the UnitType
+			unit = EvalUnit(s->D.Unit);
+			if (unit != NULL) {
+				return strdup(unit->Type->Name);
+			} else { // ERROR.
+				return NULL;
+			}
+		case EString_If : // cond ? True : False;
+			if (EvalNumber(s->D.If.Cond)) {
+				return EvalString(s->D.If.True);
+			} else if (s->D.If.False) {
+				return EvalString(s->D.If.False);
+			} else {
+				return strdup("");
+			}
 		default :
 			abort();
 			return 0;
@@ -616,6 +812,12 @@ void FreeNumberDesc(NumberDesc* number)
 		case ENumber_Div :     // a / b.
 		case ENumber_Min :     // a <= b ? a : b
 		case ENumber_Max :     // a >= b ? a : b
+		case ENumber_Gt  :     // a > b  ? 1 : 0
+		case ENumber_GtEq :    // a >= b ? 1 : 0
+		case ENumber_Lt  :     // a < b  ? 1 : 0
+		case ENumber_LtEq :    // a <= b ? 1 : 0
+		case ENumber_NEq  :    // a <> b ? 1 : 0
+		case ENumber_Eq  :     // a == b ? 1 : 0
 			FreeNumberDesc(number->D.BinOp.Left);
 			FreeNumberDesc(number->D.BinOp.Right);
 			free(number->D.BinOp.Left);
@@ -628,6 +830,62 @@ void FreeNumberDesc(NumberDesc* number)
 		case ENumber_UnitStat : // property of unit.
 			FreeUnitDesc(number->D.UnitStat.Unit);
 			break;
+		default :
+			abort();
+	}
+}
+
+/**
+**  free the String expression content. (not the pointer itself).
+**
+**  @param s  struct to free
+**
+*/
+void FreeStringDesc(StringDesc* s)
+{
+	int i; // iterator.
+
+	if (s == 0) {
+		return;
+	}
+	switch (s->e) {
+		case EString_Dir :     // directly a string.
+			free(s->D.Val);
+			break;
+		case EString_Concat :  // "a" + "b" -> "ab"
+			for (i = 0; i < s->D.Concat.n; i++) {
+				FreeStringDesc(s->D.Concat.Strings[i]);
+				free(s->D.Concat.Strings[i]);
+			}
+			free(s->D.Concat.Strings);
+
+			break;
+		case EString_String : // 42 -> "42"
+			FreeNumberDesc(s->D.Number);
+			free(s->D.Number);
+			break;
+		case EString_InverseVideo : // "a" -> "~<a~>"
+			FreeStringDesc(s->D.String);
+			free(s->D.String);
+			break;
+		case EString_UnitName : // Name of the UnitType
+			FreeUnitDesc(s->D.Unit);
+			free(s->D.Unit);
+			break;
+		case EString_If : // cond ? True : False;
+			FreeNumberDesc(s->D.If.Cond);
+			free(s->D.If.Cond);
+			FreeStringDesc(s->D.If.True);
+			free(s->D.If.True);
+			FreeStringDesc(s->D.If.False);
+			free(s->D.If.False);
+			break;
+#if 0
+		case EString_Extract :
+			FreeStringDesc(s->D.Extract.s);
+			free(s->D.Extract.s);
+			break;
+#endif
 		default :
 			abort();
 	}
@@ -647,7 +905,10 @@ void FreeNumberDesc(NumberDesc* number)
 */
 static int AliasUnitVar(lua_State* l, const char* s)
 {
+	int nargs; // number of args in lua.
+
 	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 2);
+	nargs = lua_gettop(l);
 	lua_newtable (l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, "UnitVar");
@@ -662,7 +923,7 @@ static int AliasUnitVar(lua_State* l, const char* s)
 	lua_pushvalue(l, 1);
 	lua_rawset(l, -3);
 	lua_pushstring(l, "Component");
-	if (lua_gettop(l) == 2) {
+	if (nargs == 2) {
 		lua_pushvalue(l, 2);
 	} else {
 		lua_pushstring(l, "Value");
@@ -681,10 +942,10 @@ static int AliasUnitVar(lua_State* l, const char* s)
 **
 **  @return   equivalent lua table.
 */
-static int CclUnitAttacker(lua_State* l)
+static int CclUnitAttackerVar(lua_State* l)
 {
 	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
-		LuaError(l, "Bad number of arg for Attacker()\n");
+		LuaError(l, "Bad number of arg for AttackerVar()\n");
 	}
 	return AliasUnitVar(l, "Attacker");
 }
@@ -697,13 +958,30 @@ static int CclUnitAttacker(lua_State* l)
 **
 **  @return   equivalent lua table.
 */
-static int CclUnitDefender(lua_State* l)
+static int CclUnitDefenderVar(lua_State* l)
 {
 	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
-		LuaError(l, "Bad number of arg for Defender()\n");
+		LuaError(l, "Bad number of arg for DefenderVar()\n");
 	}
 	return AliasUnitVar(l, "Defender");
 }
+
+/**
+**  Return equivalent lua table for .
+**  {"Unit", {Unit = "Active", Variable = arg1, Component = "Value" or arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclActiveUnitVar(lua_State* l)
+{
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
+		LuaError(l, "Bad number of arg for ActiveUnitVar()\n");
+	}
+	return AliasUnitVar(l, "Active");
+}
+
 
 /**
 **  Make alias for some function.
@@ -845,10 +1123,179 @@ static int CclRand(lua_State* l)
 	}
 	return Alias(l, "Rand");
 }
+/**
+**  Return equivalent lua table for GreaterThan.
+**  {"GreaterThan", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclGreaterThan(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for GreaterThan()\n");
+	}
+	return Alias(l, "GreaterThan");
+}
+/**
+**  Return equivalent lua table for GreaterThanOrEq.
+**  {"GreaterThanOrEq", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclGreaterThanOrEq(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for GreaterThanOrEq()\n");
+	}
+	return Alias(l, "GreaterThanOrEq");
+}
+/**
+**  Return equivalent lua table for LessThan.
+**  {"LessThan", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclLessThan(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for LessThan()\n");
+	}
+	return Alias(l, "LessThan");
+}
+/**
+**  Return equivalent lua table for LessThanOrEq.
+**  {"LessThanOrEq", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclLessThanOrEq(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for LessThanOrEq()\n");
+	}
+	return Alias(l, "LessThanOrEq");
+}
+/**
+**  Return equivalent lua table for Equal.
+**  {"Equal", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclEqual(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for Equal()\n");
+	}
+	return Alias(l, "Equal");
+}
+/**
+**  Return equivalent lua table for NotEqual.
+**  {"NotEqual", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclNotEqual(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for NotEqual()\n");
+	}
+	return Alias(l, "NotEqual");
+}
 
+
+
+/**
+**  Return equivalent lua table for Concat.
+**  {"Concat", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclConcat(lua_State* l)
+{
+	if (lua_gettop(l) < 1) { // FIXME do extra job for 1.
+		LuaError(l, "Bad number of arg for Concat()\n");
+	}
+	return Alias(l, "Concat");
+}
+
+/**
+**  Return equivalent lua table for String.
+**  {"String", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclString(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "Bad number of arg for String()\n");
+	}
+	return Alias(l, "String");
+}
+/**
+**  Return equivalent lua table for InverseVideo.
+**  {"InverseVideo", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclInverseVideo(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "Bad number of arg for InverseVideo()\n");
+	}
+	return Alias(l, "InverseVideo");
+}
+/**
+**  Return equivalent lua table for UnitName.
+**  {"UnitName", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitName(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "Bad number of arg for UnitName()\n");
+	}
+	return Alias(l, "UnitName");
+}
+/**
+**  Return equivalent lua table for If.
+**  {"If", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclIf(lua_State* l)
+{
+	if (lua_gettop(l) != 2 && lua_gettop(l) != 3) {
+		LuaError(l, "Bad number of arg for If()\n");
+	}
+	return Alias(l, "If");
+}
 
 static void AliasRegister()
 {
+	// Number.
 	lua_register(Lua, "Add", CclAdd);
 	lua_register(Lua, "Sub", CclSub);
 	lua_register(Lua, "Mul", CclMul);
@@ -857,8 +1304,27 @@ static void AliasRegister()
 	lua_register(Lua, "Max", CclMax);
 	lua_register(Lua, "Rand", CclRand);
 
-	lua_register(Lua, "Attacker", CclUnitAttacker);
-	lua_register(Lua, "Defender", CclUnitDefender);
+	lua_register(Lua, "GreaterThan", CclGreaterThan);
+	lua_register(Lua, "LessThan", CclLessThan);
+	lua_register(Lua, "Equal", CclEqual);
+	lua_register(Lua, "GreaterThanOrEq", CclGreaterThanOrEq);
+	lua_register(Lua, "LessThanOrEq", CclLessThanOrEq);
+	lua_register(Lua, "NotEqual", CclNotEqual);
+
+	// Unit
+	lua_register(Lua, "AttackerVar", CclUnitAttackerVar);
+	lua_register(Lua, "DefenderVar", CclUnitDefenderVar);
+	lua_register(Lua, "ActiveUnitVar", CclActiveUnitVar);
+
+
+	// String.
+	lua_register(Lua, "Concat", CclConcat);
+	lua_register(Lua, "String", CclString);
+	lua_register(Lua, "InverseVideo", CclInverseVideo);
+	lua_register(Lua, "UnitName", CclUnitName);
+
+
+	lua_register(Lua, "If", CclIf);
 }
 
 /*............................................................................
