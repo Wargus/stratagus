@@ -1549,37 +1549,37 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 
     // music volume slider
     if (PlayingMusic != 1 || SoundFildes == -1) {
-	menu->items[8].flags = MenuButtonDisabled;
+	menu->items[7].flags = MenuButtonDisabled;
     } else {
-	menu->items[8].flags = 0;
-	menu->items[8].d.hslider.percent = (MusicVolume * 100) / 255;
+	menu->items[7].flags = 0;
+	menu->items[7].d.hslider.percent = (MusicVolume * 100) / 255;
     }
 
     // music power
     if (SoundFildes == -1) {
-	menu->items[11].flags = MenuButtonDisabled;
+	menu->items[10].flags = MenuButtonDisabled;
     } else {
-	menu->items[11].flags = 0;
+	menu->items[10].flags = 0;
     }
 #if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     if (CDMode != CDModeStopped && CDMode != CDModeOff) {
-	menu->items[8].flags = MenuButtonDisabled;
-	menu->items[11].flags = MenuButtonDisabled;
+	menu->items[7].flags = MenuButtonDisabled;
+	menu->items[10].flags = MenuButtonDisabled;
     }
 #endif
     if (PlayingMusic != 1 || SoundFildes == -1) {
-	menu->items[11].d.gem.state = MI_GSTATE_UNCHECKED;
+	menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
-	menu->items[11].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
     }
 
-    menu->items[14].flags = MenuButtonDisabled;		// cd volume slider
-    menu->items[17].flags = MenuButtonDisabled;		// cd power
-    menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[19].flags = MenuButtonDisabled;		// all tracks button
-    menu->items[21].flags = MenuButtonDisabled;		// random tracks button
+    menu->items[12].flags = MenuButtonDisabled;		// cd volume slider
+    menu->items[15].flags = MenuButtonDisabled;		// cd power
+    menu->items[15].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[16].flags = MenuButtonDisabled;		// all tracks button
+    menu->items[17].flags = MenuButtonDisabled;		// random tracks button
 #if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
-    menu->items[17].flags = 0;			// cd power
+    menu->items[15].flags = 0;			// cd power
     if (CDMode != CDModeStopped && CDMode != CDModeOff) {
 #if (!defined(USE_WIN32) && defined(USE_LIBCDA)) || defined(USE_CDDA)
 	int i = 0;
@@ -1588,19 +1588,19 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 #else
 	i = MusicVolume;
 #endif
-	menu->items[14].flags = 0;
-	menu->items[14].d.hslider.percent = (i * 100) / 255;
+	menu->items[12].flags = 0;
+	menu->items[12].d.hslider.percent = (i * 100) / 255;
 #endif
-	menu->items[17].d.gem.state = MI_GSTATE_CHECKED;
-	menu->items[19].flags = 0;
-	menu->items[21].flags = 0;
+	menu->items[15].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[16].flags = 0;
+	menu->items[17].flags = 0;
 
 	if (CDMode == CDModeAll) {
-	    menu->items[19].d.gem.state = MI_GSTATE_CHECKED;
-	    menu->items[21].d.gem.state = MI_GSTATE_UNCHECKED;
+	    menu->items[16].d.gem.state = MI_GSTATE_CHECKED;
+	    menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
 	} else if (CDMode == CDModeRandom) {
-	    menu->items[19].d.gem.state = MI_GSTATE_UNCHECKED;
-	    menu->items[21].d.gem.state = MI_GSTATE_CHECKED;
+	    menu->items[16].d.gem.state = MI_GSTATE_UNCHECKED;
+	    menu->items[17].d.gem.state = MI_GSTATE_CHECKED;
 	}
     }
 #endif // cd
