@@ -1100,7 +1100,7 @@ global void UnitIncrementMana(void)
 	if( unit->TTL && unit->TTL<FrameCounter ) {
 	    DebugLevel0Fn("Unit must die %d %d!\n",unit->TTL,FrameCounter);
 	    //if( !--unit->HP ) { FIXME: must reduce hp the last seconds of life
-		DestroyUnit(unit);
+		LetUnitDie(unit);
 	    //}
 	    // FIXME: this can modify my table, some units are than skipped!
 	    continue;
@@ -2371,16 +2371,12 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
     return nunit;
 }
 
-/*----------------------------------------------------------------------------
---	Unit AI
-----------------------------------------------------------------------------*/
-
 /**
 **	Destroy an unit.
 **
 **	@param unit	Unit to be destroyed.
 */
-global void DestroyUnit(Unit* unit)
+global void LetUnitDie(Unit* unit)
 {
     UnitType* type;
     int i;
@@ -2531,7 +2527,7 @@ global void DestroyAllInside(Unit* source)
 	    // FIXME: check if valid pointer
 	    if( (unit=source->OnBoard[i]) ) {
 		// FIXME: no corpse!
-	        // DestroyUnit(unit);
+	        // LetUnitDie(unit);
 		RemoveUnit(unit);
 		UnitLost(unit);
 		ReleaseUnit(unit);
@@ -2545,7 +2541,7 @@ global void DestroyAllInside(Unit* source)
     //
     if( source->Orders[0].Action==UnitActionBuilded
 	    && source->Data.Builded.Worker ) {
-	DestroyUnit(source->Data.Builded.Worker);
+	LetUnitDie(source->Data.Builded.Worker);
 	return;
     }
 
@@ -2560,10 +2556,14 @@ global void DestroyAllInside(Unit* source)
 	    continue;
 	}
 	if( unit->X==source->X && unit->Y==source->Y ) {
-	    DestroyUnit(unit);
+	    LetUnitDie(unit);
 	}
     }
 }
+
+/*----------------------------------------------------------------------------
+--	Unit AI
+----------------------------------------------------------------------------*/
 
 /**
 **	Unit is hit by missile or other damage.
@@ -2572,10 +2572,15 @@ global void DestroyAllInside(Unit* source)
 **	@param target	Unit that is hit.
 **	@param damage	How many damage to take.
 */
-global void HitUnit(const Unit* attacker,Unit* target,int damage)
+global void HitUnit(Unit* attacker,Unit* target,int damage)
 {
     UnitType* type;
     Unit* goal;
+
+    if( damage==0 ) {			// Can now happen by splash damage
+	DebugLevel0Fn("Warning no damage\n"); 
+	return;
+    }
 
     DebugCheck( damage==0 || target->HP==0 || target->Type->Vanishes );
 
@@ -2607,11 +2612,14 @@ global void HitUnit(const Unit* attacker,Unit* target,int damage)
     if( target->HP<=damage ) {	// unit is killed or destroyed
 	if( attacker ) {
 	    attacker->Player->Score+=target->Type->Points;
+	    attacker->XP+=target->Type->Points;
+	    ++attacker->Kills;
 	}
-	DestroyUnit(target);
+	LetUnitDie(target);
 	return;
     }
     target->HP-=damage;		// UNSIGNED!
+    DebugLevel0Fn("%d\n",target->HP);
 
 #if 0
     // FIXME: want to show hits.
@@ -3110,7 +3118,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file," 'active");
     }
     fprintf(file," 'mana %d",unit->Mana);
-    fprintf(file," 'hp %d\n  ",unit->HP);
+    fprintf(file," 'hp %d",unit->HP);
+    fprintf(file," 'xp %d",unit->XP);
+    fprintf(file," 'kills %d\n  ",unit->Kills);
 
     fprintf(file,"'ttl %d ",unit->TTL);
     fprintf(file,"'bloodlust %d ",unit->Bloodlust);
