@@ -30,6 +30,7 @@ global unsigned AllocatedGraphicMemory;
 global unsigned CompressedGraphicMemory;
 #endif
 
+#ifndef NEW_VIDEO	// { should be removed with new video code final
 
 /*----------------------------------------------------------------------------
 --	Clipping
@@ -1622,13 +1623,15 @@ global void LoadRGB(Palette *pal, const char *name)
 /**
 **	Create palette.
 */
-global void VideoCreatePalette(const struct Palette* palette)
+global void VideoCreatePalette(const Palette* palette)
 {
-  GraphicData * temp = VideoCreateNewPalette(palette);
+  GraphicData * temp;
+
+  temp = VideoCreateNewPalette(palette);
   // -> Video
   switch( VideoDepth ) {
   case 8:
-    Pixels8  = (VMemType8 *)temp;
+    Pixels8 =(VMemType8  *)temp;
     break;
   case 15:
   case 16:
@@ -1645,5 +1648,7 @@ global void VideoCreatePalette(const struct Palette* palette)
 
   SetPlayersPalette();
 }
+
+#endif	// } !NEW_VIDEO
 
 //@}
