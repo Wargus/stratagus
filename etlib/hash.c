@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "etlib/generic.h"
-#include "etlib/xmalloc.h"
 #include "etlib/hash.h"
 
 /*
