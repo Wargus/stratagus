@@ -51,7 +51,6 @@
 ----------------------------------------------------------------------------*/
 
 global int ForestRegeneration;		/// Forest regeneration
-global int WoodTable[16];		/// Table for wood removable
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -108,7 +107,7 @@ global void MapFixSeenWoodTile(int x, int y)
     if( tile==15 ) {
 	return;
     }
-    tile = WoodTable[tile];
+    tile = TheMap.Tileset->WoodTable[tile];
 
     mf = TheMap.Fields + x + y * TheMap.Width;
     if (tile == -1) {			// No valid wood remove it.
@@ -185,7 +184,7 @@ global void MapFixWoodTile(int x, int y)
 	    Flags & MapFieldForest)) {
 	tile |= 1 << 3;
     }
-    tile = WoodTable[tile];
+    tile = TheMap.Tileset->WoodTable[tile];
 
     if (tile == -1) {			// No valid wood remove it.
 	MapRemoveWood(x, y);
