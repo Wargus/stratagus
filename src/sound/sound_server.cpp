@@ -111,8 +111,7 @@ SDL_mutex * MusicTerminatedMutex;
 --		Functions
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_CDDA)
-
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_MIKMOD)
 
 /**
 **		Check if the playlist need to be advanced,
@@ -161,7 +160,7 @@ local void MixMusicToStereo32(int* buffer, int size)
 
 			for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 				// Add to our samples
-				buffer[i] += (buf[i] * MusicVolume) / 256;
+				buffer[i] += (buf[i] * MusicVolume) / 255;
 			}
 		} else {
 			len = size * sizeof(*buf) / 2;
@@ -170,12 +169,12 @@ local void MixMusicToStereo32(int* buffer, int size)
 
 			for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 				// Add to our samples
-				buffer[i * 2 + 0] += (buf[i] * MusicVolume) / 256;
-				buffer[i * 2 + 1] += (buf[i] * MusicVolume) / 256;
+				buffer[i * 2 + 0] += (buf[i] * MusicVolume) / 255;
+				buffer[i * 2 + 1] += (buf[i] * MusicVolume) / 255;
 			}
 		}
 
-		if (n != len) {						// End reached
+		if (n < len) {					// End reached
 			PlayingMusic = 0;
 			SoundFree(MusicSample);
 			MusicSample = NULL;
@@ -321,23 +320,24 @@ global int ConvertToStereo32(const char* src, char* dest, int frequency,
 	int chansize, int channels, int bytes)
 {
 	SDL_AudioCVT acvt;
-	SDL_AudioSpec obtained;
 	int format;
 
-	if (channels == 1) {
+	if (chansize == 1) {
 		format = AUDIO_U8;
 	} else {
-		format = AUDIO_U16;
+		format = AUDIO_S16;
 	}
-	SDL_BuildAudioCVT(&acvt, format, channels, frequency, obtained.format,
-		obtained.channels, obtained.freq);
+	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16,
+		2, 44100);
 
 	acvt.buf = dest;
+	memcpy(dest, src, bytes);
 	acvt.len = bytes;
 
 	SDL_ConvertAudio(&acvt);
 
 	return acvt.len_mult * bytes;
+//	return acvt.len_ratio * bytes;
 }
 
 global SoundChannel Channels[MaxChannels];
@@ -945,10 +945,6 @@ global void MixIntoBuffer(void* buffer, int samples)
 #if SoundSampleSize==16
 	ClipMixToStereo16(mixer_buffer, samples, buffer);
 #endif
-}
-
-global void WriteSound(void)
-{
 }
 
 /**
