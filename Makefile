@@ -409,7 +409,6 @@ release:
 
 #-lws2_32 -Wl,--stack,63550000  -Wl,--stack,16777216
 WIN32=	\
-    OBJDIR='' \
     EXE='.exe' \
     XLDFLAGS='' \
     XIFLAGS='' \
@@ -420,10 +419,10 @@ WIN32=	\
 win32new:
 	@$(MAKE) RULESFILE=$(WINRULESFILE) distclean
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
-	$(WIN32) $(MAKE) depend
+	$(MAKE) $(WIN32) depend
 
 win32_2:
-	$(WIN32) $(MAKE) all
+	$(MAKE) $(WIN32) all
 
 win32:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
@@ -431,7 +430,7 @@ win32:
 
 win32distclean:
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
-	$(WIN32) $(MAKE) distclean
+	$(MAKE) $(WIN32) distclean
 
 ##############################################################################
 #	INSTALL/UNINSTALL
