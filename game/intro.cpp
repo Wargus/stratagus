@@ -904,8 +904,8 @@ local int GameStatsDrawFunc(int frame)
 	dodraw=frame/stats_pause;
     }
 
-    for( i=0,c=0; i<PlayerMax; ++i) {
-	if(Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer) {
+    for( i=0,c=0; i<PlayerMax-1; ++i) {
+	if( Players[i].Type!=PlayerNobody ) {
 	    ++c;
 	}
     }
@@ -978,9 +978,9 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==4 || (draw_all && dodraw>=4) ) {
 	max=Players[0].TotalUnits;
-	for( i=1; i<PlayerMax; ++i ) {
+	for( i=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
+	    if( p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( p->TotalUnits>max ) {
@@ -999,16 +999,17 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalUnits*100/max;
 	DrawStatBox(x+10,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; ++i ) {
+	for( i=0,c=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer ||
-		    (p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( ThisPlayer->Enemy&(1<<i) ) {
 		sprintf(buf,"%s - Enemy",p->Name);
-	    } else {
+	    } else if( ThisPlayer->Allied&(1<<i) ) {
 		sprintf(buf,"%s - Ally",p->Name);
+	    } else {
+		sprintf(buf,"%s - Neutral",p->Name);
 	    }
 	    VideoDrawTextCentered(x+320,y+bottom_offset+description_offset+26+line_spacing*c,
 	                          names_font,buf);
@@ -1022,9 +1023,9 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==5 || (draw_all && dodraw>=5) ) {
 	max=Players[0].TotalBuildings;
-	for( i=1; i<PlayerMax; ++i ) {
+	for( i=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
+	    if( p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( p->TotalBuildings>max ) {
@@ -1040,10 +1041,9 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalBuildings*100/max;
 	DrawStatBox(x+100,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; ++i ) {
+	for( i=0,c=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer ||
-		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalBuildings);
@@ -1056,9 +1056,9 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==6 || (draw_all && dodraw>=6) ) {
 	max=Players[0].TotalResources[GoldCost];
-	for( i=1; i<PlayerMax; ++i ) {
+	for( i=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
+	    if( p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( p->TotalResources[GoldCost]>max ) {
@@ -1074,10 +1074,9 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalResources[GoldCost]*100/max;
 	DrawStatBox(x+190,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; ++i ) {
+	for( i=0,c=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer ||
-		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
 		continue;
 	    }
             sprintf(buf,"%u",p->TotalResources[GoldCost]);
@@ -1090,9 +1089,9 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==7 || (draw_all && dodraw>=7) ) {
 	max=Players[0].TotalResources[WoodCost];
-	for( i=1; i<PlayerMax; ++i ) {
+	for( i=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
+	    if( p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( p->TotalResources[WoodCost]>max ) {
@@ -1108,10 +1107,9 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalResources[WoodCost]*100/max;
 	DrawStatBox(x+280,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; ++i ) {
+	for( i=0,c=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer ||
-		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
 		continue;
 	    }
             sprintf(buf,"%u",p->TotalResources[WoodCost]);
@@ -1124,9 +1122,9 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==8 || (draw_all && dodraw>=8) ) {
 	max=Players[0].TotalResources[OilCost];
-	for( i=1; i<PlayerMax; ++i ) {
+	for( i=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
+	    if( p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( p->TotalResources[OilCost]>max ) {
@@ -1142,10 +1140,9 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalResources[OilCost]*100/max;
 	DrawStatBox(x+370,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; ++i ) {
+	for( i=0,c=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer ||
-		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalResources[OilCost]);
@@ -1158,9 +1155,9 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==9 || (draw_all && dodraw>=9) ) {
 	max=Players[0].TotalKills;
-	for( i=1; i<PlayerMax; ++i ) {
+	for( i=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
+	    if( p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( p->TotalKills>max ) {
@@ -1176,10 +1173,9 @@ local int GameStatsDrawFunc(int frame)
 	sprintf(buf,"%u",ThisPlayer->TotalKills);
 	DrawStatBox(x+460,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; ++i ) {
+	for( i=0,c=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer ||
-		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalKills);
@@ -1192,9 +1188,9 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==10 || (draw_all && dodraw>=10) ) {
 	max=Players[0].TotalRazings;
-	for( i=1; i<PlayerMax; ++i ) {
+	for( i=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
+	    if( p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    if( p->TotalRazings>max ) {
@@ -1210,10 +1206,9 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalRazings*100/max;
 	DrawStatBox(x+550,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; ++i ) {
+	for( i=0,c=1; i<PlayerMax-1; ++i ) {
 	    p=&Players[i];
-	    if( p==ThisPlayer ||
-		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
+	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalRazings);
