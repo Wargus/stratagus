@@ -92,8 +92,11 @@ struct _button_action_ {
 
     /// Button area under cursor
 enum _button_area_ {
-    ButtonAreaInfo,			/// Info panel button
+    ButtonAreaSelected,			/// Selected button
     ButtonAreaTraining,			/// Training button
+    ButtonAreaUpgrading,		/// Upgrading button
+    ButtonAreaResearching,		/// Researching button
+    ButtonAreaTransporting,		/// Transporting button
     ButtonAreaButton,			/// Button panel button
     ButtonAreaMenu,			/// Menu button
 };   

@@ -185,16 +185,6 @@ typedef struct _ui_ {
     int		ResourceY;		/// Resource Y position
 
     struct {
-#if 0
-	int	IconX;			/// Icon X position
-	int	IconY;			/// Icon Y position
-	IconConfig	Icon;		/// Icon for resource
-	int	TextX;			/// Text X position
-	int	TextX;			/// Text Y position
-	char*	Text;			/// Text for resource
-	int	AmountX;		/// Amount X position
-	int	AmountY;		/// Amount Y position
-#endif
 	GraphicConfig Icon;		/// icon image
 	int	IconRow;		/// icon image row (frame)
 	int	IconX;			/// icon X position
@@ -213,17 +203,60 @@ typedef struct _ui_ {
     int		InfoPanelW;		/// Info panel width
     int		InfoPanelH;		/// Info panel height
 
-    // Complete bar
-    VMemType	CompleteBarColorRGB;	/// color for complete bar
-    VMemType	CompleteBarColor;	/// color for complete bar
-    int		CompleteBarX;		/// complete bar X position
-    int		CompleteBarY;		/// complete bar Y position
-    int		CompleteBarW;		/// complete bar width
-    int		CompleteBarH;		/// complete bar height
-    char*	CompleteBarText;	/// complete bar text
-    unsigned	CompleteBarFont;	/// complete bar font
-    int		CompleteTextX;		/// complete text X position
-    int		CompleteTextY;		/// complete text Y position
+    Button*	SingleSelectedButton;
+    char*	SingleSelectedText;
+    int		SingleSelectedFont;
+    int		SingleSelectedTextX;
+    int		SingleSelectedTextY;
+    Button*	SelectedButtons;	/// Selected buttons
+    int		NumSelectedButtons;	/// Number of selected buttons
+    char*	SelectedText;
+    int		SelectedFont;
+    int		SelectedTextX;
+    int		SelectedTextY;
+
+    Button*	SingleTrainingButton;
+    char*	SingleTrainingText;
+    int		SingleTrainingFont;
+    int		SingleTrainingTextX;
+    int		SingleTrainingTextY;
+    Button*	TrainingButtons;	/// Training buttons
+    int		NumTrainingButtons;	/// Number of training buttons
+    char*	TrainingText;
+    int		TrainingFont;
+    int		TrainingTextX;
+    int		TrainingTextY;
+
+    Button*	UpgradingButton;
+    char*	UpgradingText;
+    int		UpgradingFont;
+    int		UpgradingTextX;
+    int		UpgradingTextY;
+
+    Button*	ResearchingButton;
+    char*	ResearchingText;
+    int		ResearchingFont;
+    int		ResearchingTextX;
+    int		ResearchingTextY;
+
+    Button*	TransportingButtons;
+    int		NumTransportingButtons;	/// Number of transporting buttons
+    char*	TransportingText;
+    int		TransportingFont;
+    int		TransportingTextX;
+    int		TransportingTextY;
+
+    // Completed bar
+    VMemType	CompletedBarColorRGB;	/// color for completed bar
+    VMemType	CompletedBarColor;	/// color for completed bar
+    int		CompletedBarX;		/// completed bar X position
+    int		CompletedBarY;		/// completed bar Y position
+    int		CompletedBarW;		/// completed bar width
+    int		CompletedBarH;		/// completed bar height
+    char*	CompletedBarText;	/// completed bar text
+    int		CompletedBarFont;	/// completed bar font
+    int		CompletedBarTextX;	/// completed bar text X position
+    int		CompletedBarTextY;	/// completed bar text Y position
 
     // Button panel
     GraphicConfig ButtonPanel;		/// Button panel background
@@ -273,12 +306,8 @@ typedef struct _ui_ {
     int		StatusLineY;		/// status line screen Y position
     int		StatusLineTextX;	/// status line screen text X position
     int		StatusLineTextY;	/// status line screen text Y position
-    unsigned	StatusLineFont;		/// Status line font
+    int		StatusLineFont;		/// Status line font
 
-    Button*	InfoButtons;		/// Info buttons
-    int		NumInfoButtons;		/// Number of info buttons
-    Button*	TrainingButtons;	/// Training buttons
-    int		NumTrainingButtons;	/// Number of training buttons
     Button*	ButtonButtons;		/// Button panel buttons
     int		NumButtonButtons;	/// Number of button panel buttons
 
