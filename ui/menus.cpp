@@ -757,7 +757,7 @@ local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 10, 42, 0, LargeFont, NULL, NULL,
-	{ gem:{ 4, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
 	{ text:{ "CD Audio Enabled", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
@@ -1483,6 +1483,8 @@ local void GameMenuLoad(void)
 local void GameOptions(void)
 {
     // TODO
+    if (strcmp(":off", CDMode))
+	GameOptionsMenuItems[1].d.gem.state = 4;
     ProcessMenu(MENU_GAME_OPTIONS, 1);
 }
 
