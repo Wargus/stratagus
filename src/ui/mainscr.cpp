@@ -55,6 +55,58 @@
 #include "ui.h"
 #include "map.h"
 #include "trigger.h"
+#include "network.h"
+#include "menus.h"
+
+/*----------------------------------------------------------------------------
+--  MENU BUTTON
+----------------------------------------------------------------------------*/
+
+/**
+**  Draw menu button area.
+*/
+global void DrawMenuButtonArea(void)
+{
+	if (TheUI.MenuPanel.Graphic) {
+		VideoDrawSub(TheUI.MenuPanel.Graphic, 0, 0,
+			TheUI.MenuPanel.Graphic->Width,
+			TheUI.MenuPanel.Graphic->Height,
+			TheUI.MenuPanelX, TheUI.MenuPanelY);
+	}
+	if (!IsNetworkGame()) {
+		if (TheUI.MenuButton.X != -1) {
+			// FIXME: Transparent flag, 3rd param, has been hardcoded.
+			DrawMenuButton(TheUI.MenuButton.Button,
+				(ButtonAreaUnderCursor == ButtonAreaMenu &&
+					ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
+				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
+				TheUI.MenuButton.Width, TheUI.MenuButton.Height,
+				TheUI.MenuButton.X, TheUI.MenuButton.Y,
+				TheUI.MenuButton.Font, TheUI.MenuButton.Text, NULL, NULL);
+		}
+	} else {
+		if (TheUI.NetworkMenuButton.X != -1) {
+			// FIXME: Transparent flag, 3rd param, has been hardcoded.
+			DrawMenuButton(TheUI.NetworkMenuButton.Button,
+				(ButtonAreaUnderCursor == ButtonAreaMenu &&
+					ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
+				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
+				TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
+				TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
+				TheUI.NetworkMenuButton.Font, TheUI.NetworkMenuButton.Text, NULL, NULL);
+		}
+		if (TheUI.NetworkDiplomacyButton.X != -1) {
+			// FIXME: Transparent flag, 3rd param, has been hardcoded.
+			DrawMenuButton(TheUI.NetworkDiplomacyButton.Button,
+				(ButtonAreaUnderCursor == ButtonAreaMenu &&
+					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
+				(GameDiplomacyButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
+				TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
+				TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
+				TheUI.NetworkDiplomacyButton.Font, TheUI.NetworkDiplomacyButton.Text, NULL, NULL);
+		}
+	}
+}
 
 /*----------------------------------------------------------------------------
 --  Icons
@@ -175,7 +227,7 @@ local void DrawStats(int x, int y, int modified, int original)
 **
 **  @param unit  Pointer to unit.
 */
-global void DrawUnitInfo(const Unit* unit)
+local void DrawUnitInfo(const Unit* unit)
 {
 	char buf[64];
 	const UnitType* type;
