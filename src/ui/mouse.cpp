@@ -1218,6 +1218,7 @@ global void UIHandleButtonUp(unsigned button)
 	    //
 	    int x,y,w,h;
 
+#if 0
 	    x=CursorStartX;
 	    if( x>CursorX ) {
 		x=CursorX;
@@ -1233,12 +1234,29 @@ global void UIHandleButtonUp(unsigned button)
 	    } else {
 		h=CursorY-y;
 	    }
-	    x=Screen2MapX(x);
-	    y=Screen2MapY(y);
+#endif
+	    x = Screen2MapX (CursorStartX);
+	    y = Screen2MapY (CursorStartY);
+	    w = Screen2MapX (CursorX);
+	    h = Screen2MapY (CursorY);
+	    if (x>w) {
+		int swap = x;
+		x = w;
+		w = swap;
+	    }
+	    if (y>h) {
+		int swap = y;
+		y = h;
+		h = swap;
+	    }
+	    w -= x;
+	    h -= y;
             if( KeyModifiers&ModifierShift ) {
-                num=AddSelectedUnitsInRectangle(x,y,w/TileSizeX,h/TileSizeY);
+//              num=AddSelectedUnitsInRectangle(x,y,w/TileSizeX,h/TileSizeY);
+                num=AddSelectedUnitsInRectangle(x,y,w,h);
             } else {
-                num=SelectUnitsInRectangle(x,y,w/TileSizeX,h/TileSizeY);
+//              num=SelectUnitsInRectangle(x,y,w/TileSizeX,h/TileSizeY);
+                num=SelectUnitsInRectangle(x,y,w,h);
             }
 	} else {
 	    //
