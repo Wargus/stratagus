@@ -172,7 +172,7 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
 	  doc/ccl/research.html doc/graphic/*.html doc/graphic/*.png \
-	  doc/trigger.txt debian/freecraft.6 
+	  doc/trigger.txt debian/freecraft.6
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
@@ -193,9 +193,11 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/campaigns.ccl \
 	  data/ccl/human/campaign1.ccl data/ccl/human/campaign2.ccl \
 	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
-	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm
+	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm \
+	  data/campaigns/*/*.cm
 
-CONTRIB	= contrib/cross.png contrib/red\ cross.png contrib/health.png contrib/mana.png \
+CONTRIB	= contrib/cross.png contrib/red_cross.png \
+	  contrib/health.png contrib/mana.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz
@@ -319,21 +321,22 @@ FCGP1=	../fcgp-*.tar.bz2
 FCSP1=	../fcsp-general-*.tar.bz2
 FCSP2=	../fcsp-mythical-*.tar.bz2
 FCSP3=	../fcsp-alliance-*.tar.bz2
+FCMP=	../fcmp_20020217_full.tar.gz
 
 linux-complete:
 	mkdir freecraft-complete
-	tar xjf $(FCGP1)
+	#tar xjf $(FCGP1)
 	tar xjf $(PCRAFT)
 	tar xjf $(LCRAFT)
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
-	cp -a fcgp-*/* freecraft-complete
-	tar xjCf freecraft-complete $(FCSP1)
-	tar xjCf freecraft-complete $(FCSP2)
-	tar xjCf freecraft-complete $(FCSP3)
-	cp ../sound.ccl freecraft-complete/data/ccl/
+	#cp -a fcgp-*/* freecraft-complete
+	#tar xjCf freecraft-complete $(FCSP1)
+	#tar xjCf freecraft-complete $(FCSP2)
+	tar xzCf freecraft-complete $(FCMP)
+	#cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
-	rm -rf fcgp-*
+	#rm -rf fcgp-*
 	chmod 777 freecraft-complete
 	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
@@ -343,18 +346,19 @@ linux-complete:
 
 win32-complete:
 	mkdir freecraft-complete
-	tar xjf $(FCGP1)
+	#tar xjf $(FCGP1)
 	tar xjf $(PCRAFT)
 	unzip -oq $(WCRAFT)
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
-	cp -a fcgp-*/* freecraft-complete
-	tar xjCf freecraft-complete $(FCSP1)
-	tar xjCf freecraft-complete $(FCSP2)
-	tar xjCf freecraft-complete $(FCSP3)
-	cp ../sound.ccl freecraft-complete/data/ccl/
+	#cp -a fcgp-*/* freecraft-complete
+	#tar xjCf freecraft-complete $(FCSP1)
+	#tar xjCf freecraft-complete $(FCSP2)
+	#tar xjCf freecraft-complete $(FCSP3)
+	tar xzCf freecraft-complete $(FCMP)
+	#cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
-	rm -rf fcgp-*
+	#rm -rf fcgp-*
 	chmod 777 freecraft-complete
 	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
@@ -385,7 +389,7 @@ buildclean:
 	rm -rf data/*.rgb data/*.gimp data/puds data/sound data/graphic \
 	data/interface data/campaigns data/text data/health.png data/mana.png \
 	data/default.pud.gz data/freecraft.png
-	rm -rf data/graphics data/sounds data/texts data/music
+	rm -rf data/graphics data/sounds data/texts data/music data/videos
 
 release:
 	$(MAKE) distclean
