@@ -156,6 +156,7 @@ local int CclStratagusMap(lua_State* l)
 					int subsubargs;
 					int subk;
 
+					i = 0;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						lua_pushstring(l, "incorrect argument");
@@ -166,7 +167,6 @@ local int CclStratagusMap(lua_State* l)
 					if (subsubargs != TheMap.Width * TheMap.Height) {
 						fprintf(stderr, "Wrong tile table length %d\n", i);
 					}
-					i = 0;
 					for (subk = 0; subk < subsubargs; ++subk) {
 						int args2;
 						int j2;
