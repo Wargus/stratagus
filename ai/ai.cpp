@@ -701,6 +701,7 @@ global void AiEachSecond(Player* player)
     DebugLevel3Fn("%d:\n" _C_ player->Player);
 
     AiPlayer=player->Ai;
+    IfDebug( if( !AiPlayer ) return; );	// For debug only!
     //
     //	Advance script
     //
