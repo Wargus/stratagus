@@ -463,24 +463,18 @@ global void InitLineDraw()
 
 global void VideoDrawPixel(SDL_Color color, int x, int y)
 {
-    int bpp;
-    int ofs;
-    unsigned int c;
+    SDL_Rect drect;
 
-    c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
-    bpp = TheScreen->format->BytesPerPixel;
-    ofs = TheScreen->pitch * y + x * bpp;
+    drect.x = x;
+    drect.y = y;
 
-    SDL_LockSurface(TheScreen);
-    memcpy((char*)TheScreen->pixels + ofs, &c, bpp);
-    SDL_UnlockSurface(TheScreen);
+    SDL_FillRect(PixelSurface, NULL, SDL_MapRGB(PixelSurface->format, 
+	color.r, color.g, color.b));
+    SDL_BlitSurface(PixelSurface, NULL, TheScreen, &drect);
 }
 
 global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alpha)
 {
-//    int bpp;
-//    int ofs;
-//    unsigned int c;
     SDL_Rect drect;
 
     drect.x = x;
@@ -489,25 +483,13 @@ global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alp
     SDL_FillRect(PixelSurface, NULL, SDL_MapRGBA(PixelSurface->format, 
 	color.r, color.g, color.b, alpha));
     SDL_BlitSurface(PixelSurface, NULL, TheScreen, &drect);
-/*
-    c = SDL_MapRGBA(TheScreen->format, color.r, color.g, color.b, alpha);
-    bpp = TheScreen->format->BytesPerPixel;
-    ofs = TheScreen->pitch * y + x * bpp;
-
-    SDL_LockSurface(TheScreen);
-    memcpy((char*)TheScreen->pixels + ofs, &c, bpp);
-    SDL_UnlockSurface(TheScreen);
-*/
 }
 
 global void VideoDrawPixelClip(SDL_Color color, int x, int y)
 {
-    int w;
-    int h;
-
-    w = h = 1;
-    CLIP_RECTANGLE(x, y, w, h);
-    VideoDrawPixel(color, x, y);
+    if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipX2) {
+	VideoDrawPixel(color, x, y);
+    }
 }
 
 global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
@@ -665,37 +647,18 @@ global void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy)
 
 global void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy)
 {
-    int w;
-    int h;
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
 
-    // FIXME: messy
-    if (dx >= sx && dy >= sy) {
-	w = dx - sx;
-	h = dy - sy;
-	CLIP_RECTANGLE(sx, sy, w, h);
-	dx = sx + w;
-	dy = sy + h;
-    } else if (dx >= sx && dy < sy) {
-	w = dx - sx;
-	h = sy - dy;
-	CLIP_RECTANGLE(sx, dy, w, h);
-	dx = sx + w;
-	sy = dy + h;
-    } else if (dx < sx && dy >= sy) {
-	w = sx - dx;
-	h = dy - sy;
-	CLIP_RECTANGLE(dx, sy, w, h);
-	sx = dx + w;
-	dy = sy + h;
-    } else if (dx < sx && dy < sy) {
-	w = sx - dx;
-	h = sy - dy;
-	CLIP_RECTANGLE(dx, dy, w, h);
-	sx = dx + w;
-	sy = dy + h;
-    }
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
 
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoDrawLine(color, sx, sy, dx, dy);
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
@@ -718,8 +681,18 @@ global void VideoDrawRectangle(SDL_Color color, int x, int y,
 global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
-//    CLIP_RECTANGLE(x, y, w, h);
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
+
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
+
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoDrawRectangle(color, x, y, w, h);
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
@@ -749,8 +722,18 @@ global void VideoFillRectangle(SDL_Color color, int x, int y,
 global void VideoFillRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
-    CLIP_RECTANGLE(x, y, w, h);
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
+
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
+
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoFillRectangle(color, x, y, w, h);
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void VideoFillTransRectangle(SDL_Color color, int x, int y,
@@ -777,8 +760,18 @@ global void VideoFillTransRectangle(SDL_Color color, int x, int y,
 global void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
-    CLIP_RECTANGLE(x, y, w, h);
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
+
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
+
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoFillTransRectangle(color, x, y, w, h, alpha);
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void VideoDrawCircle(SDL_Color color, int x, int y, int r)
@@ -848,10 +841,9 @@ global void VideoDrawCircleClip(SDL_Color color, int x, int y, int r)
     SDL_GetClipRect(TheScreen, &oldrect);
     newrect.x = ClipX1;
     newrect.y = ClipY1;
-    newrect.w = ClipX2 - 2 * ClipX1;
-    newrect.h = ClipY2 - 2 * ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
 
-    printf("x y w h    %d %d %d %d\n", newrect.x, newrect.y, newrect.w, newrect.h);
     SDL_SetClipRect(TheScreen, &newrect);
     VideoDrawCircle(color, x, y, r);
     SDL_SetClipRect(TheScreen, &oldrect);
@@ -860,8 +852,18 @@ global void VideoDrawCircleClip(SDL_Color color, int x, int y, int r)
 global void VideoDrawTransCircleClip(SDL_Color color, int x, int y,
     int r, unsigned char alpha)
 {
-    // FIXME: clip, trans
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
+
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
+
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoDrawTransCircle(color, x, y, r, alpha);
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void VideoFillCircle(SDL_Color color, int x, int y, int r)
@@ -939,27 +941,35 @@ global void VideoFillTransCircle(SDL_Color color, int x, int y,
 
 global void VideoFillCircleClip(SDL_Color color, int x, int y, int r)
 {
-    int w;
-    int h;
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
 
-    w = h = r * 2;
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
 
-    CLIP_RECTANGLE(x, y, w, h);
-    r = w / 2;
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoFillCircle(color, x, y, r);
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void VideoFillTransCircleClip(SDL_Color color, int x, int y,
     int r, unsigned char alpha)
 {
-    int w;
-    int h;
+    SDL_Rect oldrect;
+    SDL_Rect newrect;
 
-    w = h = r * 2;
+    SDL_GetClipRect(TheScreen, &oldrect);
+    newrect.x = ClipX1;
+    newrect.y = ClipY1;
+    newrect.w = ClipX2 + 1 - ClipX1;
+    newrect.h = ClipY2 + 1 - ClipY1;
 
-    CLIP_RECTANGLE(x, y, w, h);
-    r = w / 2;
+    SDL_SetClipRect(TheScreen, &newrect);
     VideoFillTransCircle(color, x, y, r, alpha);
+    SDL_SetClipRect(TheScreen, &oldrect);
 }
 
 global void DebugTestDisplayLines(void)
