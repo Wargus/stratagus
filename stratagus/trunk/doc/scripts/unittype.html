@@ -100,9 +100,10 @@ Define animations.
 	</ul>
 	<li>Pixel is the number of pixels to move (if this is a moving animation)
 	    the sum of a walking animation should be 16 (the tile size in pixels)
-	<li>Sleep is the number of game cycles to wait unit the next animation frame.
-	this is the way unit speed is controlled, unit-speed in unit type is
-	only used for showing. This should be fixed sometime in the future.
+	<li>Sleep is the number of game cycles to wait until the next animation frame.
+	Sleep is limited to maximum 255 cycles.
+	The sleep value controls the unit motion speed. The speed variable in 
+        a unit type definition is only used for display. This will be fixed sometime in the future.
 	<li>Frame is the tile position on the image. Usually 5*tilerows
 	  (also if the unit actually has more than five possible headings).
 	  The engine will calculate the appropriate sprite number for the heading.
