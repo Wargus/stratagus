@@ -143,7 +143,8 @@ PICS    = contrib/freecraft.png contrib/freecraft.ico
 
 CCLS	= data/ccl/units.ccl data/ccl/missiles.ccl data/ccl/icons.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
-	  data/ccl/ui.ccl data/ccl/fonts.ccl data/ccl/ai.ccl \
+	  data/ccl/ui.ccl data/ccl/human/ui.ccl data/ccl/orc/ui.ccl \
+	  data/ccl/fonts.ccl data/ccl/ai.ccl \
 	  data/ccl/summer.ccl data/ccl/winter.ccl data/ccl/wasteland.ccl \
 	  data/ccl/swamp.ccl data/ccl/anim.ccl data/ccl/upgrade.ccl \
 	  data/ccl/buttons.ccl data/ccl/human/buttons.ccl \
