@@ -10,7 +10,7 @@
 //
 /**@name depend.c	-	The units/upgrade dependencies */
 //
-//	(c) Copyright 2000,2001 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 2000,2001 by Vladi Belperchinov-Shabanski and Lutz Sammer
 //
 //	$Id$
 
@@ -469,6 +469,46 @@ global void SaveDependencies(FILE* file)
 
 	    node=node->Next;
 	}
+    }
+}
+
+/**
+**	Clean up unit and upgrade dependencies.
+*/
+global void CleanDependencies(void)
+{
+    int i;
+    DependRule* node;
+    DependRule* rule;
+    DependRule* temp;
+    DependRule* next;
+
+    // Free all dependencies
+
+    for( i=0; i<sizeof(DependHash)/sizeof(*DependHash); ++i ) {
+	node=DependHash[i];
+	while( node ) {			// all hash links
+	    // All or cases
+
+	    rule=node->Rule;
+	    while( rule ) {
+		if( rule ) {
+		    temp=rule->Rule;
+		    while( temp ) {
+			next=temp;
+			temp=temp->Rule;
+			free(next);
+		    }
+		}
+		temp=rule;
+		rule=rule->Next;
+		free(temp);
+	    }
+	    temp=node;
+	    node=node->Next;
+	    free(temp);
+	}
+	DependHash[i]=NULL;
     }
 }
 
