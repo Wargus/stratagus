@@ -299,6 +299,12 @@ local int CostMoveTo(Unit* unit, int ex,int ey,int mask,int current_cost) {
     Unit* goal;
 
     cost=0;
+
+    // Doesn't cost anything to move to ourselves :)
+    // Used when marking goals mainly.  Could cause speed problems
+    if( unit->X == ex && unit->Y == ey ) {
+	return 0;
+    }
     j=TheMap.Fields[ex+ey*TheMap.Width].Flags&mask;
     if( j && (AStarKnowUnknown
 	    || IsMapFieldExplored(unit->Player,ex,ey)) ) {
