@@ -305,7 +305,7 @@ extern void QuitCD(void);
 extern int WaitForSoundDevice;		/// Block until sound device available
 
     /// Check the cdrom status
-extern void CDRomCheck(void);
+extern int CDRomCheck(void *);
 
 //@}
 
