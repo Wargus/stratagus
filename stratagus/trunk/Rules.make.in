@@ -11,7 +11,7 @@
 
 # Compile commands
 CC=gcc
-CCLD=gcc
+CCLD=$(CC)
 RM=rm -f
 MAKE=make
 
