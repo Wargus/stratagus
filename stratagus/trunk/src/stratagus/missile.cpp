@@ -161,7 +161,10 @@ global void LoadMissileSprites(void)
 	    file = strcat(strcpy(buf, "graphics/"), file);
 	    ShowLoadProgress("Missile %s", file);
 	    MissileTypes[i].Sprite = LoadSprite(
-		    file, MissileTypes[i].Width, MissileTypes[i].Height);
+		file, MissileTypes[i].Width, MissileTypes[i].Height);
+#ifdef USE_SDL_SURFACE
+	    FlipGraphic(MissileTypes[i].Sprite);
+#endif
 
 	    // Correct the number of frames in graphic
 	    DebugCheck(MissileTypes[i].Sprite->NumFrames < MissileTypes[i].SpriteFrames);
@@ -609,6 +612,7 @@ global void FireMissile(Unit* unit)
 local void GetMissileMapArea(const Missile* missile, int* sx, int* sy,
     int* ex, int* ey)
 {
+#define Bound(x, y) (x) < 0 ? 0 : ((x) > (y) ? (y) : (x))
     DebugCheck(missile == NULL);
     DebugCheck(sx == NULL);
     DebugCheck(sy == NULL);
@@ -617,10 +621,11 @@ local void GetMissileMapArea(const Missile* missile, int* sx, int* sy,
     DebugCheck(TileSizeX <= 0);
     DebugCheck(TileSizeY <= 0);
     DebugCheck(missile->Type == NULL);
-    *sx = missile->X / TileSizeX;
-    *sy = missile->Y / TileSizeY;
-    *ex = (missile->X + missile->Type->Width) / TileSizeX;
-    *ey = (missile->Y + missile->Type->Height) / TileSizeY;
+    *sx = Bound(missile->X / TileSizeX, TheMap.Width - 1);
+    *sy = Bound(missile->Y / TileSizeY, TheMap.Height - 1);
+    *ex = Bound((missile->X + missile->Type->Width) / TileSizeX, TheMap.Width - 1);
+    *ey = Bound((missile->Y + missile->Type->Height) / TileSizeY, TheMap.Height - 1);
+#undef Bound
 }
 
 /**
@@ -637,6 +642,8 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
     int max_x;
     int min_y;
     int max_y;
+    int x;
+    int y;
 
     DebugCheck(vp == NULL);
     DebugCheck(missile == NULL);
@@ -646,11 +653,15 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_ min_x _C_ max_x _C_
 	min_y _C_ max_y);
-    if (!IsMapFieldVisible(ThisPlayer, (missile->X - TileSizeX / 2) / TileSizeX,
-	    (missile->Y - TileSizeY / 2) / TileSizeY) && !ReplayRevealMap) {
-	return 0;
+
+    for (x = min_x; x <= max_x; ++x) {
+	for ( y = min_y; y <= max_y; ++y) {
+	    if (ReplayRevealMap || IsMapFieldVisible(ThisPlayer, x, y)) {
+		return 1;
+	    }
+	}
     }
-    return 1;
+    return 0;
 }
 
 /**
@@ -683,19 +694,11 @@ global void DrawMissile(const MissileType* mtype, int frame, int x, int y)
 {
     DebugCheck(mtype == NULL);
     // FIXME: This is a hack for mirrored sprites
-	if (mtype->Transparency==50) {
-		if (frame < 0) {
-			VideoDrawClipXTrans50(mtype->Sprite, -frame, x, y);
-		} else {
-			VideoDrawClipTrans50(mtype->Sprite, frame, x, y);
-		}
-	} else {
-		if (frame < 0) {
-			VideoDrawClipX(mtype->Sprite, -frame, x, y);
-		} else {
-			VideoDrawClip(mtype->Sprite, frame, x, y);
-		}
-	}
+    if (frame < 0) {
+	VideoDrawClipX(mtype->Sprite, -frame, x, y);
+    } else {
+	VideoDrawClip(mtype->Sprite, frame, x, y);
+    }
 }
 
 /**
@@ -1007,6 +1010,7 @@ global void MissileHit(Missile* missile)
     Unit* table[UnitMax];
     int n;
     int i;
+    int splash;
 
     DebugCheck(missile == NULL);
     DebugCheck(missile->Type == NULL);
@@ -1084,14 +1088,13 @@ global void MissileHit(Missile* missile)
 	//	NOTE: perhaps this should be come a property of the missile.
 	//
 	if (CanTarget(missile->SourceUnit->Type, goal->Type)) {
-	    // We are attacking the nearest field of the unit
-	    if (x < goal->X || y < goal->Y ||
-		    x >= goal->X + goal->Type->TileWidth ||
-		    y >= goal->Y + goal->Type->TileHeight) {
-		MissileHitsGoal(missile, goal, 2);
+	    splash = MapDistanceToUnit(x, y, goal);
+	    if (splash) {
+		splash *= missile->Type->SplashFactor;
 	    } else {
-		MissileHitsGoal(missile, goal, 1);
+		splash = 1;
 	    }
+	    MissileHitsGoal(missile, goal, splash);
 	}
     }
     //
@@ -1106,7 +1109,8 @@ global void MissileHit(Missile* missile)
 		if (i == 0 && n == 0) {
 		    MissileHitsWall(missile, x + i, y + n, 1);
 		} else {
-		    MissileHitsWall(missile, x + i, y + n, 2);
+		    MissileHitsWall(missile, x + i, y + n, 
+			MapDistance(x, y, i, n) * missile->Type->SplashFactor);
 		}
 	    }
 	}
@@ -1384,18 +1388,20 @@ global void SaveMissileTypes(CLFile* file)
 	CLprintf(file, " 'sleep %d", mtype->Sleep);
 	CLprintf(file, " 'speed %d", mtype->Speed);
 	CLprintf(file, " 'range %d", mtype->Range);
+	CLprintf(file, " 'splash-factor", mtype->SplashFactor);
 	if (mtype->ImpactMissile) {
 	    CLprintf(file, "\n  'impact-missile '%s", mtype->ImpactMissile->Ident);
 	}
 	if (mtype->SmokeMissile) {
 	    CLprintf(file, "\n  'smoke-missile '%s", mtype->SmokeMissile->Ident);
 	}
-	if (mtype->Transparency) {
-	CLprintf(file, "\n 'transparency %d", mtype->Transparency);
-	}
 	CLprintf(file, "\n ");
-	CLprintf(file, " 'can-hit-owner #%c", mtype->CanHitOwner ? 't' : 'f');
-	CLprintf(file, " 'friendly-fire #%c", mtype->FriendlyFire ? 't' : 'f');
+	if (mtype->CanHitOwner) {
+	    CLprintf(file, " 'can-hit-owner ");
+	}
+	if (mtype->FriendlyFire) {
+	    CLprintf(file, " 'friendly-fire");
+	}
 	CLprintf(file, ")\n");
     }
 }
@@ -1416,7 +1422,7 @@ local void SaveMissile(const Missile* missile,CLFile* file)
     CLprintf(file, " '%s", missile->Local ? "local" : "global");
     CLprintf(file, "\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
 	missile->SpriteFrame, missile->State, missile->Wait, missile->Delay);
-	
+
     if (missile->SourceUnit) {
 	CLprintf(file, " 'source '%s", s1 = UnitReference(missile->SourceUnit));
 	free(s1);
