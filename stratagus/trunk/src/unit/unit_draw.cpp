@@ -832,14 +832,14 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	char buf[2];
 	int num;
 
-	// FIXME: ugly hack!
+	// FIXME: shows the smallest group number, is this what we want?
 	for( num=0; !(unit->GroupId & (1<<num)); num++) ;
 	buf[0]=num+'0';
 	buf[1]='\0';
 	f=VideoTextLength(GameFont,buf);
 	x+=(type->TileWidth*TileSizeX+type->BoxWidth)/2-f;
-	// FIXME: should use the font height!
-	y+=(type->TileHeight*TileSizeY+type->BoxHeight)/2-14;
+	f=VideoTextHeight(GameFont);
+	y+=(type->TileHeight*TileSizeY+type->BoxHeight)/2-f;
 	VideoDrawNumberClip(x,y,GameFont,num);
     }
 }
