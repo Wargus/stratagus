@@ -4229,23 +4229,23 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	    break;
 	case UnitActionUpgradeTo:
 	    fprintf(file,"\n  'data-upgrade-to '(");
-	    fprintf(file,"ticks %d", unit->Data.UpgradeTo.Ticks);
+	    fprintf(file,"ticks %d",unit->Data.UpgradeTo.Ticks);
 	    fprintf(file,")");
 	    break;
 	case UnitActionTrain:
 	    fprintf(file,"\n  'data-train '(");
-	    fprintf (file, "ticks %d ", unit->Data.Train.Ticks);
-	    fprintf (file, "count %d ", unit->Data.Train.Count);
-	    fprintf (file, "queue #(");
+	    fprintf(file,"ticks %d ",unit->Data.Train.Ticks);
+	    fprintf(file,"count %d ",unit->Data.Train.Count);
+	    fprintf(file,"queue #(");
 	    for (i=0; i<MAX_UNIT_TRAIN; i++) {
-		if (i < unit->Data.Train.Count) {
-		    fprintf (file, "%s ", unit->Data.Train.What[i]->Ident);
+		if (i<unit->Data.Train.Count) {
+		    fprintf(file,"%s ",unit->Data.Train.What[i]->Ident);
 		} else {
 		    /* this slot is currently unused */
-		    fprintf (file, "unit-none ");
+		    fprintf(file,"unit-none ");
 		}
 	    }
-	    fprintf (file, "))");
+	    fprintf(file, "))");
 	    break;
 	default:
 	    fprintf(file,"\n  'data-move '(");
@@ -4261,6 +4261,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	    }
 	    fprintf(file,")");
 	    break;
+    }
+
+    if( unit->Goal ) {
+	fprintf(file,"\n  'goal %d",UnitNumber(unit->Goal));
     }
 
     fprintf(file,")\n");

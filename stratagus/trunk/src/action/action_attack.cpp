@@ -275,23 +275,11 @@ local void MoveToTarget(Unit* unit)
 	unit->Orders[0].Y-=unit->Orders[0].RangeY;
 	unit->Orders[0].RangeX*=2;
 	unit->Orders[0].RangeY*=2;
-#ifdef DEBUG
-	// This fixes the bug: if wall is gone, debug code fails.
-	unit->Goal=unit->Orders[0].Goal;
-	unit->GoalX=unit->Orders[0].X;
-	unit->GoalY=unit->Orders[0].Y;
-#endif
 	err=DoActionMove(unit);
 	unit->Orders[0].RangeX/=2;
 	unit->Orders[0].RangeY/=2;
 	unit->Orders[0].X+=unit->Orders[0].RangeX;
 	unit->Orders[0].Y+=unit->Orders[0].RangeY;
-#ifdef DEBUG
-	// This fixes the bug: if wall is gone, debug code fails.
-	unit->Goal=unit->Orders[0].Goal;
-	unit->GoalX=unit->Orders[0].X;
-	unit->GoalY=unit->Orders[0].Y;
-#endif
     } else {
 	err=DoActionMove(unit);
     }

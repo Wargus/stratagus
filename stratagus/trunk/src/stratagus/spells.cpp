@@ -1301,8 +1301,9 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
     {
 	// FIXME: vladi: cop should be placed only on explored land
 	// FIXME: Don't use UnitTypeByIdent during runtime.
-	Unit *cop = (Unit *) (unit->Goal);
+	Unit *cop;
 
+	cop = unit->Goal;
 	if (cop) {
 	    // FIXME: if cop is already defined --> move it, but it doesn't work?
 	    RemoveUnit(cop, NULL);
@@ -1316,12 +1317,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    y * TileSizeY + TileSizeY / 2, x * TileSizeX + TileSizeX / 2,
 	    y * TileSizeY + TileSizeY / 2);
 
-	// Goal is used to link destination circle of power and back:
-	// the circle of power owner (source DP)
+	// Next is used to link to destination circle of power
 	unit->Goal = cop;
-	cop->Goal = unit;
-	RefsDebugCheck(!unit->Refs || unit->Destroyed);
-	unit->Refs++;
 	RefsDebugCheck(!cop->Refs || cop->Destroyed);
 	cop->Refs++;
 	//FIXME: setting destination circle of power should use mana

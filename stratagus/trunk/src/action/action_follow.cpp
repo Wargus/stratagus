@@ -113,7 +113,7 @@ global void HandleActionFollow(Unit* unit)
 	    // FIXME: teleporting of units should use dark portal's mana
 	    if( (goal=unit->Orders[0].Goal) && 
 		    goal->Type->Teleporter && goal->Goal &&
-		    MapDistanceBetweenUnits( unit, goal ) < 4 ) {
+		    MapDistanceBetweenUnits(unit,goal)<4 ) {
 		Unit* table[UnitMax];
 		Unit* dest;
 		int n;
