@@ -95,20 +95,18 @@ global int VideoFullScreen;		/// true fullscreen wanted
 */
 global void DisplayPicture(const char *name)
 {
-    //Palette palette[256];
     Graphic* title;
-    //unsigned char PalettePNG[256*3];
 
     title=LoadGraphic(name);
-    //GetCurrentImagePalette(palette);
-    //SetPalette(palette);
-    // FIXME: use palette from image
     memcpy(GlobalPalette,title->Palette,sizeof(GlobalPalette));
     VideoCreatePalette(GlobalPalette);
+    // FIXME: Make some function? SetPalette(palette);
 
 #ifdef USE_SDL
     { extern SDL_Surface *Screen;		/// internal screen
     SDL_LockSurface(Screen);
+
+    DebugCheck( VideoMemory==Screen->pixels );
 #endif
 
     // FIXME: bigger window ?
