@@ -188,9 +188,15 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int transparent,
 			style->TextReverseColor ? style->TextReverseColor : oldrc;
 		SetDefaultTextColors(nc, rc);
 
-		VideoDrawTextCentered(p->TextOffsetX + x + style->Width / 2,
-			p->TextOffsetY + y + (style->Height - VideoTextHeight(style->Font)) / 2 + 2,
-			style->Font, text);
+		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
+			VideoDrawTextCentered(x + p->TextX, y + p->TextY,
+				style->Font, text);
+		} else if (p->TextAlign == TextAlignLeft) {
+			VideoDrawText(x + p->TextX, y + p->TextY, style->Font, text);
+		} else {
+			VideoDrawText(x + p->TextX - VideoTextLength(style->Font, text), y + p->TextY,
+				style->Font, text);
+		}
 
 		SetDefaultTextColors(oldnc, oldrc);
 	}

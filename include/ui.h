@@ -49,6 +49,13 @@
 --  Definitions
 ----------------------------------------------------------------------------*/
 
+typedef enum _text_alignment_ {
+	TextAlignUndefined,
+	TextAlignCenter,
+	TextAlignLeft,
+	TextAlignRight,
+} TextAlignment;
+
 typedef struct _button_style_properties_ {
 	char* File;
 	Graphic* Sprite;
@@ -58,8 +65,9 @@ typedef struct _button_style_properties_ {
 	SDL_Color BorderColorRGB;
 	Uint32 BorderColor;
 	int BorderSize;
-	int TextOffsetX;
-	int TextOffsetY;
+	TextAlignment TextAlign;        ///< Text alignment
+	int TextX;                      ///< Text X location
+	int TextY;                      ///< Text Y location
 	char* TextNormalColor;          ///< Normal text color
 	char* TextReverseColor;         ///< Reverse text color
 } ButtonStyleProperties;
@@ -70,6 +78,9 @@ typedef struct _button_style_ {
 	int Font;                       ///< Font
 	char* TextNormalColor;          ///< Normal text color
 	char* TextReverseColor;         ///< Reverse text color
+	TextAlignment TextAlign;        ///< Text alignment
+	int TextX;                      ///< Text X location
+	int TextY;                      ///< Text Y location
 	ButtonStyleProperties Default;  ///< Default button properties
 	ButtonStyleProperties Hover;    ///< Hover button properties
 	ButtonStyleProperties Selected; ///< Selected button properties

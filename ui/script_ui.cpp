@@ -2393,16 +2393,27 @@ static void ParseButtonStyleProperties(lua_State* l, ButtonStyleProperties* p)
 				}
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "TextOffset")) {
+		} else if (!strcmp(value, "TextPos")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			p->TextOffsetX = LuaToNumber(l, -1);
+			p->TextX = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			p->TextOffsetY = LuaToNumber(l, -1);
+			p->TextY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "TextAlign")) {
+			value = LuaToString(l, -1);
+			if (!strcmp(value, "Center")) {
+				p->TextAlign = TextAlignCenter;
+			} else if (!strcmp(value, "Right")) {
+				p->TextAlign = TextAlignRight;
+			} else if (!strcmp(value, "Left")) {
+				p->TextAlign = TextAlignLeft;
+			} else {
+				LuaError(l, "Invalid text alignment: %s" _C_ value);
+			}
 		} else if (!strcmp(value, "TextNormalColor")) {
 			free(p->TextNormalColor);
 			p->TextNormalColor = strdup(LuaToString(l, -1));
@@ -2437,6 +2448,9 @@ static int CclDefineButtonStyle(lua_State* l)
 	if (!bp) {
 		b = calloc(1, sizeof(*b));
 		*(ButtonStyle**)hash_add(ButtonStyleHash, style) = b;
+		// Set to bogus value to see if it was set later
+		b->Default.TextX = b->Hover.TextX = b->Selected.TextX =
+			b->Clicked.TextX = b->Disabled.TextX = 0xFFFFFF;
 	} else {
 		b = *bp;
 	}
@@ -2462,6 +2476,27 @@ static int CclDefineButtonStyle(lua_State* l)
 		} else if (!strcmp(value, "TextReverseColor")) {
 			free(b->TextReverseColor);
 			b->TextReverseColor = strdup(LuaToString(l, -1));
+		} else if (!strcmp(value, "TextPos")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			b->TextX = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			b->TextY = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "TextAlign")) {
+			value = LuaToString(l, -1);
+			if (!strcmp(value, "Center")) {
+				b->TextAlign = TextAlignCenter;
+			} else if (!strcmp(value, "Right")) {
+				b->TextAlign = TextAlignRight;
+			} else if (!strcmp(value, "Left")) {
+				b->TextAlign = TextAlignLeft;
+			} else {
+				LuaError(l, "Invalid text alignment: %s" _C_ value);
+			}
 		} else if (!strcmp(value, "Default")) {
 			ParseButtonStyleProperties(l, &b->Default);
 		} else if (!strcmp(value, "Hover")) {
@@ -2476,6 +2511,43 @@ static int CclDefineButtonStyle(lua_State* l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
+	}
+
+	if (b->Default.TextX == 0xFFFFFF) {
+		b->Default.TextX = b->TextX;
+		b->Default.TextY = b->TextY;
+	}
+	if (b->Hover.TextX == 0xFFFFFF) {
+		b->Hover.TextX = b->TextX;
+		b->Hover.TextY = b->TextY;
+	}
+	if (b->Selected.TextX == 0xFFFFFF) {
+		b->Selected.TextX = b->TextX;
+		b->Selected.TextY = b->TextY;
+	}
+	if (b->Clicked.TextX == 0xFFFFFF) {
+		b->Clicked.TextX = b->TextX;
+		b->Clicked.TextY = b->TextY;
+	}
+	if (b->Disabled.TextX == 0xFFFFFF) {
+		b->Disabled.TextX = b->TextX;
+		b->Disabled.TextY = b->TextY;
+	}
+
+	if (b->Default.TextAlign == TextAlignUndefined) {
+		b->Default.TextAlign = b->TextAlign;
+	}
+	if (b->Hover.TextAlign == TextAlignUndefined) {
+		b->Hover.TextAlign = b->TextAlign;
+	}
+	if (b->Selected.TextAlign == TextAlignUndefined) {
+		b->Selected.TextAlign = b->TextAlign;
+	}
+	if (b->Clicked.TextAlign == TextAlignUndefined) {
+		b->Clicked.TextAlign = b->TextAlign;
+	}
+	if (b->Disabled.TextAlign == TextAlignUndefined) {
+		b->Disabled.TextAlign = b->TextAlign;
 	}
 
 	return 0;
