@@ -13,7 +13,7 @@
 **	@todo FIXME: Johns: More to come: zooming, scaling, 64x64 tiles...
 */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer
+//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -204,15 +204,32 @@ local Deco *mapdeco = NULL;
 #endif
 
 /**
-**	Do unroll 8x
+**	Do unroll 4x
 **
 **	@param x	Index passed to UNROLL2 incremented by 2.
 */
-#define UNROLL8(x)	\
+#define UNROLL4(x)	\
     UNROLL2((x)+0);	\
-    UNROLL2((x)+2);	\
-    UNROLL2((x)+4);	\
-    UNROLL2((x)+6)
+    UNROLL2((x)+2);
+
+/**
+**	Do unroll 8x
+**
+**	@param x	Index passed to UNROLL4 incremented by 4.
+*/
+#define UNROLL8(x)	\
+    UNROLL4((x)+0);	\
+    UNROLL4((x)+4);
+
+/**
+**	Do unroll 8x
+**
+**	@param x	Index passed to UNROLL4 incremented by 4.
+*/
+#define UNROLL12(x)	\
+    UNROLL4((x)+0);	\
+    UNROLL4((x)+4);	\
+    UNROLL4((x)+8);
 
 /**
 **	Do unroll 16x
@@ -247,6 +264,207 @@ local Deco *mapdeco = NULL;
 /*----------------------------------------------------------------------------
 --	Draw tile
 ----------------------------------------------------------------------------*/
+
+/**
+**	Fast draw 16x16 tile for 8 bpp video modes.
+**
+**	@param data	pointer to tile graphic data
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**	(50% cpu time was needed for this, now only 32%)
+**
+**	@see GRID
+*/
+global void VideoDraw8Tile16(const unsigned char* data,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    VMemType8* dp;
+    int da;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    da=VideoWidth;
+    dp=VideoMemory8+x+y*VideoWidth;
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]]; \
+	dp[x+1]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	dp[15]=((VMemType8*)TheMap.TileData->Pixels)[0];
+#endif
+	sp+=TileSizeX;
+	dp+=da;
+    }
+
+#if GRID==1
+    for( da=TileSizeX; da--; ) {	// with grid no need to be fast
+	dp[da]=((VMemType8*)TheMap.TileData->Pixels)[0];
+    }
+#endif
+}
+
+/**
+**	Fast draw 16x16 tile for 16 bpp video modes.
+**
+**	@param data	pointer to tile graphic data
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**	(50% cpu time was needed for this, now only 32%)
+**
+**	@see GRID
+*/
+global void VideoDraw16Tile16(const unsigned char* data,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    VMemType16* dp;
+    int da;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    da=VideoWidth;
+    dp=VideoMemory16+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)sp)&1 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*(unsigned int*)(dp+x+0)=PixelsLow[sp[x+0]]|PixelsHigh[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	dp[15]=Pixels16[0];
+#endif
+	sp+=TileSizeX;
+	dp+=da;
+    }
+
+#if GRID==1
+    for( da=TileSizeX; da--; ) {	// with grid no need to be fast
+	dp[da]=Pixels16[0];
+    }
+#endif
+}
+
+/**
+**	Fast draw 16x16 tile for 24 bpp video modes.
+**
+**	@param data	pointer to tile graphic data
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**	(50% cpu time was needed for this, now only 32%)
+**
+**	@see GRID
+*/
+global void VideoDraw24Tile16(const unsigned char* data,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    VMemType24* dp;
+    int da;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    da=VideoWidth;
+    dp=VideoMemory24+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)sp)&1 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	dp[x+0]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	dp[x+1]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	dp[15]=Pixels24[0];
+#endif
+	sp+=TileSizeX;
+	dp+=da;
+    }
+
+#if GRID==1
+    for( da=TileSizeX; da--; ) {	// with grid no need to be fast
+	dp[da]=Pixels24[0];
+    }
+#endif
+}
+
+/**
+**	Fast draw 16x16 tile for 32 bpp video modes.
+**
+**	@param data	pointer to tile graphic data
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**	(50% cpu time was needed for this, now only 32%)
+**
+**	@see GRID
+*/
+global void VideoDraw32Tile16(const unsigned char* data,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    VMemType32* dp;
+    int da;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    da=VideoWidth;
+    dp=VideoMemory32+x+y*VideoWidth;
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	dp[x+0]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	dp[x+1]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	dp[15]=((VMemType32*)TheMap.TileData->Pixels)[0];
+#endif
+	sp+=TileSizeX;
+	dp+=da;
+    }
+
+#if GRID==1
+    for( da=TileSizeX; da--; ) {	// with grid no need to be fast
+	dp[da]=((VMemType32*)TheMap.TileData->Pixels)[0];
+    }
+#endif
+}
 
 /**
 **	Fast draw 32x32 tile for 8 bpp video modes.
@@ -462,8 +680,8 @@ global void VideoDraw32Tile32(const unsigned char* data,int x,int y)
 */
 local void VideoDrawXXTileClip(const unsigned char* data,int x,int y)
 {
-  VideoDrawRawClip( (VMemType*) TheMap.TileData->Pixels,
-                    data, x, y, TileSizeX, TileSizeY );
+    VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
+	data,x,y,TileSizeX,TileSizeY );
 }
 
 /**
@@ -491,6 +709,254 @@ local void MapDrawXXTileClip(int tile,int x,int y)
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_TILECACHE	// {
+
+/**
+**	Draw 16x16 tile for 8 bpp video modes into cache and video memory.
+**
+**	@param graphic	Graphic structure for the tile
+**	@param cache	Cache to fill with tile
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**
+**	@see GRID
+*/
+local void FillCache8AndDraw16(const unsigned char* data,VMemType8* cache
+	,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    int va;
+    VMemType8* dp;
+    VMemType8* vp;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    dp=cache;
+    va=VideoWidth;
+    vp=VideoMemory8+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)sp)&1 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)vp)&3 ) {
+	    DebugLevel0("Not aligned video memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)	\
+	vp[x+0]=dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]]; \
+	vp[x+0]=dp[x+1]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	vp[15]=dp[15]=((VMemType8*)TheMap.TileData->Pixels)[0];
+#endif
+	vp+=va;
+	sp+=TileSizeX;
+	dp+=TileSizeX;
+    }
+
+#if GRID==1
+    for( va=TileSizeX; va--; ) {	// no need to be fast with grid
+	vp[va]=dp[va]=((VMemType8*)TheMap.TileData->Pixels)[0];
+    }
+#endif
+}
+
+/**
+**	Draw 16x16 tile for 16 bpp video modes into cache and video memory.
+**
+**	@param graphic	Graphic structure for the tile
+**	@param cache	Cache to fill with tile
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**
+**	@see GRID
+*/
+local void FillCache16AndDraw16(const unsigned char* data,VMemType16* cache
+	,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    int va;
+    VMemType16* dp;
+    VMemType16* vp;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    dp=cache;
+    va=VideoWidth;
+    vp=VideoMemory16+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)sp)&1 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)vp)&3 ) {
+	    DebugLevel0("Not aligned video memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)	\
+	*(unsigned int*)(vp+x+0)=*(unsigned int*)(dp+x+0)	\
+		=PixelsLow[sp[x+0]]|PixelsHigh[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	vp[15]=dp[15]=Pixels[0];
+#endif
+	vp+=va;
+	sp+=TileSizeX;
+	dp+=TileSizeX;
+    }
+
+#if GRID==1
+    for( va=TileSizeX; va--; ) {	// no need to be fast with grid
+	vp[va]=dp[va]=Pixels[0];
+    }
+#endif
+}
+
+/**
+**	Draw 16x16 tile for 24 bpp video modes into cache and video memory.
+**
+**	@param graphic	Graphic structure for the tile
+**	@param cache	Cache to fill with tile
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**
+**	@see GRID
+*/
+local void FillCache24AndDraw16(const unsigned char* data,VMemType24* cache
+	,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    int va;
+    VMemType24* dp;
+    VMemType24* vp;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    dp=cache;
+    va=VideoWidth;
+    vp=VideoMemory24+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)sp)&1 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)vp)&3 ) {
+	    DebugLevel0("Not aligned video memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)	\
+	vp[x+0]=dp[x+0]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+0]]; \
+	vp[x+0]=dp[x+1]=((VMemType24*)TheMap.TileData->Pixels)[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	vp[15]=dp[15]=((VMemType24*)TheMap.TileData->Pixels)[0];
+#endif
+	vp+=va;
+	sp+=TileSizeX;
+	dp+=TileSizeX;
+    }
+
+#if GRID==1
+    for( va=TileSizeX; va--; ) {	// no need to be fast with grid
+	vp[va]=dp[va]=((VMemType24*)TheMap.TileData->Pixels)[0];
+    }
+#endif
+}
+
+/**
+**	Draw 16x16 tile for 32 bpp video modes into cache and video memory.
+**
+**	@param graphic	Graphic structure for the tile
+**	@param cache	Cache to fill with tile
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**
+**	@see GRID
+*/
+local void FillCache32AndDraw16(const unsigned char* data,VMemType32* cache
+	,int x,int y)
+{
+    const unsigned char* sp;
+    const unsigned char* ep;
+    int va;
+    VMemType32* dp;
+    VMemType32* vp;
+
+    sp=data;
+    ep=sp+TileSizeY*TileSizeX-GRID_SUB;
+    dp=cache;
+    va=VideoWidth;
+    vp=VideoMemory32+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)sp)&1 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)vp)&3 ) {
+	    DebugLevel0("Not aligned video memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)	\
+	vp[x+0]=dp[x+0]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+0]]; \
+	vp[x+0]=dp[x+1]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+1]]
+
+	UNROLL16(0);
+#if GRID==1
+	vp[15]=dp[15]=((VMemType32*)TheMap.TileData->Pixels)[0];
+#endif
+	vp+=va;
+	sp+=TileSizeX;
+	dp+=TileSizeX;
+    }
+
+#if GRID==1
+    for( va=TileSizeX; va--; ) {	// no need to be fast with grid
+	vp[va]=dp[va]=((VMemType32*)TheMap.TileData->Pixels)[0];
+    }
+#endif
+}
 
 /**
 **	Draw 32x32 tile for 8 bpp video modes into cache and video memory.
@@ -743,6 +1209,176 @@ local void FillCache32AndDraw32(const unsigned char* data,VMemType32* cache
 // ---------------------------------------------------------------------------
 
 /**
+**	Fast draw 16x16 tile from cache for 8bpp.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw8Tile16FromCache(const VMemType8* graphic,int x,int y)
+{
+    const VMemType8* sp;
+    const VMemType8* ep;
+    VMemType8* dp;
+    int da;
+
+    sp=graphic;
+    ep=sp+TileSizeY*TileSizeX;
+    da=VideoWidth;
+    dp=VideoMemory8+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)sp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*(unsigned long*)(dp+x)=*(unsigned long*)(sp+x)
+
+	UNROLL8(0);
+	sp+=TileSizeX;
+	dp+=da;
+    }
+}
+
+/**
+**	Fast draw 16x16 tile from cache for 16bpp.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw16Tile16FromCache(const VMemType16* graphic,int x,int y)
+{
+    const VMemType16* sp;
+    const VMemType16* ep;
+    VMemType16* dp;
+    int da;
+
+    sp=graphic;
+    ep=sp+TileSizeY*TileSizeX;
+    da=VideoWidth;
+    dp=VideoMemory16+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)sp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*(unsigned long*)(dp+x)=*(unsigned long*)(sp+x)
+
+	UNROLL16(0);
+	sp+=TileSizeX;
+	dp+=da;
+    }
+}
+
+/**
+**	Fast draw 16x16 tile from cache for 24bpp.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw24Tile16FromCache(const VMemType24* graphic,int x,int y)
+{
+    const VMemType24* sp;
+    const VMemType24* ep;
+    VMemType24* dp;
+    int da;
+
+    sp=graphic;
+    ep=sp+TileSizeY*TileSizeX;
+    da=VideoWidth;
+    dp=VideoMemory24+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)sp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*(unsigned long*)(dp+x*2+0)=*(unsigned long*)(sp+x*2+0);	\
+	*(unsigned long*)(dp+x*2+1)=*(unsigned long*)(sp+x*2+1)
+
+	UNROLL12(0);
+	sp+=TileSizeX;
+	dp+=da;
+    }
+}
+
+/**
+**	Fast draw 16x16 tile from cache.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw32Tile16FromCache(const VMemType32* graphic,int x,int y)
+{
+    const VMemType32* sp;
+    const VMemType32* ep;
+    VMemType32* dp;
+    int da;
+
+    sp=graphic;
+    ep=sp+TileSizeY*TileSizeX;
+    da=VideoWidth;
+    dp=VideoMemory32+x+y*VideoWidth;
+
+    IfDebug(
+	if( ((long)dp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+	if( ((long)sp)&3 ) {
+	    DebugLevel0("Not aligned memory\n");
+	}
+    );
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*(unsigned long*)(dp+x*2+0)=*(unsigned long*)(sp+x*2+0);	\
+	*(unsigned long*)(dp+x*2+1)=*(unsigned long*)(sp+x*2+1)
+
+	UNROLL16(0);
+	sp+=TileSizeX;
+	dp+=da;
+    }
+}
+
+/**
 **	Fast draw 32x32 tile from cache for 8bpp.
 **
 **	@param graphic	Pointer to cached tile graphic
@@ -915,6 +1551,158 @@ local void VideoDraw32Tile32FromCache(const VMemType32* graphic,int x,int y)
 // ---------------------------------------------------------------------------
 
 /**
+**	Draw 16x16 tile for 8 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw8Tile16(int tile,int x,int y)
+{
+    TileCache* cache;
+
+    if( !(cache=TileCached[tile]) ) {
+	//
+	//	Not cached
+	//
+	if( TileCacheSize ) {		// enough cache buffers?
+	    --TileCacheSize;
+	    cache=malloc(
+		    sizeof(TileCache)-sizeof(unsigned char)+
+		    TileSizeX*TileSizeY*sizeof(VMemType16));
+	} else {
+	    cache=(void*)TileCacheLRU->last;
+	    if( cache->Tile ) {
+		TileCached[cache->Tile]=NULL;	// now not cached
+	    }
+	    dl_remove_last(TileCacheLRU);
+	    DebugLevel3("EMPTY CACHE\n");
+	}
+	TileCached[tile]=cache;
+	cache->Tile=tile;
+	dl_insert_first(TileCacheLRU,&cache->DlNode);
+
+	FillCache8AndDraw16(TheMap.Tiles[tile],(void*)&cache->Buffer,x,y);
+    } else {
+	VideoDraw8Tile16FromCache((void*)&cache->Buffer,x,y);
+    }
+}
+
+/**
+**	Draw 16x16 tile for 16 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw16Tile16(int tile,int x,int y)
+{
+    TileCache* cache;
+
+    if( !(cache=TileCached[tile]) ) {
+	//
+	//	Not cached
+	//
+	if( TileCacheSize ) {		// enough cache buffers?
+	    --TileCacheSize;
+	    cache=malloc(
+		    sizeof(TileCache)-sizeof(unsigned char)+
+		    TileSizeX*TileSizeY*sizeof(VMemType16));
+	} else {
+	    cache=(void*)TileCacheLRU->last;
+	    if( cache->Tile ) {
+		TileCached[cache->Tile]=NULL;	// now not cached
+	    }
+	    dl_remove_last(TileCacheLRU);
+	    DebugLevel3("EMPTY CACHE\n");
+	}
+	TileCached[tile]=cache;
+	cache->Tile=tile;
+	dl_insert_first(TileCacheLRU,&cache->DlNode);
+
+	FillCache16AndDraw16(TheMap.Tiles[tile],(void*)&cache->Buffer,x,y);
+    } else {
+	VideoDraw16Tile16FromCache((void*)&cache->Buffer,x,y);
+    }
+}
+
+/**
+**	Draw 16x16 tile for 24 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw24Tile16(int tile,int x,int y)
+{
+    TileCache* cache;
+
+    if( !(cache=TileCached[tile]) ) {
+	//
+	//	Not cached
+	//
+	if( TileCacheSize ) {		// enough cache buffers?
+	    --TileCacheSize;
+	    cache=malloc(
+		    sizeof(TileCache)-sizeof(unsigned char)+
+		    TileSizeX*TileSizeY*sizeof(VMemType24));
+	} else {
+	    cache=(void*)TileCacheLRU->last;
+	    if( cache->Tile ) {
+		TileCached[cache->Tile]=NULL;	// now not cached
+	    }
+	    dl_remove_last(TileCacheLRU);
+	    DebugLevel3("EMPTY CACHE\n");
+	}
+	TileCached[tile]=cache;
+	cache->Tile=tile;
+	dl_insert_first(TileCacheLRU,&cache->DlNode);
+
+	FillCache24AndDraw16(TheMap.Tiles[tile],(void*)&cache->Buffer,x,y);
+    } else {
+	VideoDraw24Tile16FromCache((void*)&cache->Buffer,x,y);
+    }
+}
+
+/**
+**	Draw 16x16 tile for 32 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw32Tile16(int tile,int x,int y)
+{
+    TileCache* cache;
+
+    if( !(cache=TileCached[tile]) ) {
+	//
+	//	Not cached
+	//
+	if( TileCacheSize ) {		// enough cache buffers?
+	    --TileCacheSize;
+	    cache=malloc(
+		    sizeof(TileCache)-sizeof(unsigned char)+
+		    TileSizeX*TileSizeY*sizeof(VMemType32));
+	} else {
+	    cache=(void*)TileCacheLRU->last;
+	    if( cache->Tile ) {
+		TileCached[cache->Tile]=NULL;	// now not cached
+	    }
+	    dl_remove_last(TileCacheLRU);
+	    DebugLevel3("EMPTY CACHE\n");
+	}
+	TileCached[tile]=cache;
+	cache->Tile=tile;
+	dl_insert_first(TileCacheLRU,&cache->DlNode);
+
+	FillCache32AndDraw16(TheMap.Tiles[tile],(void*)&cache->Buffer,x,y);
+    } else {
+	VideoDraw32Tile16FromCache((void*)&cache->Buffer,x,y);
+    }
+}
+
+/**
 **	Draw 32x32 tile for 8 bpp video modes with cache support.
 **
 **	@param tile	Tile number to draw.
@@ -1075,6 +1863,157 @@ local void MapDraw32Tile32(int tile,int x,int y)
 #ifdef USE_SMART_TILECACHE	// {
 
 /**
+**	Fast draw 16x16 tile for 8 bpp from cache.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw8Tile16Cached(const VMemType8* graphic,int x,int y)
+{
+    const VMemType8* sp;
+    const VMemType8* ep;
+    VMemType8* dp;
+    int da;
+
+    sp=graphic;
+    da=VideoWidth;
+    ep=sp+TileSizeX+TileSizeY*da;
+    dp=VideoMemory8+x+y*da;
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	((unsigned long*)dp)[x+0]=((unsigned long*)sp)[x+0]; \
+	((unsigned long*)dp)[x+1]=((unsigned long*)sp)[x+1]
+
+	UNROLL4(0);
+	sp+=da;
+	dp+=da;
+
+	UNROLL4(0);
+	sp+=da;
+	dp+=da;
+    }
+}
+
+/**
+**	Fast draw 16x16 tile for 16 bpp from cache.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw16Tile16Cached(const VMemType16* graphic,int x,int y)
+{
+    const VMemType16* sp;
+    const VMemType16* ep;
+    VMemType16* dp;
+    int da;
+
+    sp=graphic;
+    da=VideoWidth;
+    ep=sp+TileSizeY*da;
+    dp=VideoMemory16+x+y*da;
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*(unsigned long*)(dp+x)=*(unsigned long*)(sp+x)
+
+	UNROLL16(0);
+	sp+=da;
+	dp+=da;
+
+	UNROLL16(0);
+	sp+=da;
+	dp+=da;
+    }
+}
+
+/**
+**	Fast draw 16x16 tile for 24 bpp from cache.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw24Tile16Cached(const VMemType24* graphic,int x,int y)
+{
+    const VMemType24* sp;
+    const VMemType24* ep;
+    VMemType24* dp;
+    int da;
+
+    sp=graphic;
+    da=VideoWidth;
+    ep=sp+TileSizeX+TileSizeY*da;
+    dp=VideoMemory24+x+y*da;
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*((unsigned long*)dp+x+0)=*((unsigned long*)sp+x+0);	\
+	*((unsigned long*)dp+x+1)=*((unsigned long*)sp+x+1)
+
+	UNROLL12(0);
+	sp+=da;
+	dp+=da;
+
+	UNROLL12(0);
+	sp+=da;
+	dp+=da;
+    }
+}
+
+/**
+**	Fast draw 16x16 tile for 32 bpp from cache.
+**
+**	@param graphic	Pointer to cached tile graphic
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@see GRID
+*/
+local void VideoDraw32Tile16Cached(const VMemType32* graphic,int x,int y)
+{
+    const VMemType32* sp;
+    const VMemType32* ep;
+    VMemType32* dp;
+    int da;
+
+    sp=graphic;
+    da=VideoWidth;
+    ep=sp+TileSizeX+TileSizeY*da;
+    dp=VideoMemory32+x+y*da;
+
+    while( sp<ep ) {			// loop unrolled
+#undef UNROLL2
+	/// basic unroll code
+#define UNROLL2(x)		\
+	*(dp+x*2+0)=*(sp+x*2+0);	\
+	*(dp+x*2+1)=*(sp+x*2+1)
+
+	UNROLL16(0);
+	sp+=da;
+	dp+=da;
+
+	UNROLL16(0);
+	sp+=da;
+	dp+=da;
+    }
+}
+
+/**
 **	Fast draw 32x32 tile for 8 bpp from cache.
 **
 **	@param graphic	Pointer to cached tile graphic
@@ -1228,6 +2167,75 @@ local void VideoDraw32Tile32Cached(const VMemType32* graphic,int x,int y)
 // ---------------------------------------------------------------------------
 
 /**
+**	Draw 16x16 tile for 8 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw8Tile16(int tile,int x,int y)
+{
+    if( TileCached[tile] ) {
+	VideoDraw8Tile16Cached(TileCached[tile],x,y);
+    } else {
+	VideoDraw8Tile16(TheMap.Tiles[tile],x,y);
+	TileCached[tile]=VideoMemory8+x+y*VideoWidth;
+    }
+}
+
+/**
+**	Draw 16x16 tile for 16 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw16Tile16(int tile,int x,int y)
+{
+    if( TileCached[tile] ) {
+	VideoDraw16Tile16Cached(TileCached[tile],x,y);
+    } else {
+	VideoDraw16Tile16(TheMap.Tiles[tile],x,y);
+	TileCached[tile]=VideoMemory16+x+y*VideoWidth;
+    }
+}
+
+/**
+**	Draw 16x16 tile for 24 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw24Tile16(int tile,int x,int y)
+{
+    if( TileCached[tile] ) {
+	VideoDraw24Tile16Cached(TileCached[tile],x,y);
+    } else {
+	VideoDraw24Tile16(TheMap.Tiles[tile],x,y);
+	TileCached[tile]=VideoMemory24+x+y*VideoWidth;
+    }
+}
+
+/**
+**	Draw 16x16 tile for 32 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw32Tile16(int tile,int x,int y)
+{
+    // FIXME: (johns) Why turned off?
+    if( 0 && TileCached[tile] ) {
+	VideoDraw32Tile32Cached(TileCached[tile],x,y);
+    } else {
+	VideoDraw32Tile32(TheMap.Tiles[tile],x,y);
+	TileCached[tile]=VideoMemory32+x+y*VideoWidth;
+    }
+}
+
+/**
 **	Draw 32x32 tile for 8 bpp video modes with cache support.
 **
 **	@param tile	Tile number to draw.
@@ -1345,6 +2353,54 @@ local void MapDrawTileOpenGL(int tile,int x,int y)
 ----------------------------------------------------------------------------*/
 
 #if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)	// {
+
+/**
+**	Draw 16x16 tile for 8 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw8Tile16(int tile,int x,int y)
+{
+    VideoDraw8Tile16(TheMap.Tiles[tile],x,y);
+}
+
+/**
+**	Draw 16x16 tile for 16 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw16Tile16(int tile,int x,int y)
+{
+    VideoDraw16Tile16(TheMap.Tiles[tile],x,y);
+}
+
+/**
+**	Draw 16x16 tile for 24 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw24Tile16(int tile,int x,int y)
+{
+    VideoDraw24Tile16(TheMap.Tiles[tile],x,y);
+}
+
+/**
+**	Draw 16x16 tile for 32 bpp video modes with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDraw32Tile16(int tile,int x,int y)
+{
+    VideoDraw32Tile16(TheMap.Tiles[tile],x,y);
+}
 
 /**
 **	Draw 32x32 tile for 8 bpp video modes with cache support.
@@ -1741,70 +2797,98 @@ local void mapdeco_draw(void *dummy_data)
 **
 **	@see VideoBpp
 */
-void InitMap(void)
+global void InitMap(void)
 {
 #ifdef USE_OPENGL
     MapDrawTile=MapDrawTileOpenGL;
 #else
 
 #ifdef NEW_DECODRAW
-// StephanR: Using the decoration mechanism we need to support drawing tiles
-// clipped, as by only updating a small part of the tile, we don't have to
-// redraw items overlapping the remaining part of the tile.. it might need
-// some performance increase though, but atleast the video dependent depth is
-// not done here, making the switch(VideoBpp) obsolete..
-  MapDrawTile=MapDrawXXTileClip;
-  VideoDrawTile=VideoDrawXXTileClip;
-  mapdeco = DecorationAdd( NULL /* no data to pass to */,
-                           mapdeco_draw, LevGround,
-                           TheUI.MapX, TheUI.MapY,
-                           TheUI.MapEndX-TheUI.MapX+1,
-                           TheUI.MapEndY-TheUI.MapY+1 );
+    // StephanR: Using the decoration mechanism we need to support drawing tiles
+    // clipped, as by only updating a small part of the tile, we don't have to
+    // redraw items overlapping the remaining part of the tile.. it might need
+    // some performance increase though, but atleast the video dependent depth is
+    // not done here, making the switch(VideoBpp) obsolete..
+    MapDrawTile=MapDrawXXTileClip;
+    VideoDrawTile=VideoDrawXXTileClip;
+    mapdeco = DecorationAdd( NULL /* no data to pass to */,
+	mapdeco_draw, LevGround,TheUI.MapX, TheUI.MapY,
+	TheUI.MapEndX-TheUI.MapX+1,TheUI.MapEndY-TheUI.MapY+1 );
 
 #else
-    switch( VideoBpp ) {
-	case  8:
-	    VideoDrawTile=VideoDraw8Tile32;
-#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
-	    MapDrawTile=MapDraw8Tile32;
-#else
-	    MapDrawTile=MapDraw8Tile32;
-#endif
-	    break;
-	case 15:
-	case 16:
-	    VideoDrawTile=VideoDraw16Tile32;
-#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
-	    MapDrawTile=MapDraw16Tile32;
-#else
-	    MapDrawTile=MapDraw16Tile32;
-#endif
-	    break;
-	case 24:
-	    VideoDrawTile=VideoDraw24Tile32;
-#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
-	    MapDrawTile=MapDraw24Tile32;
-#else
-	    MapDrawTile=MapDraw24Tile32;
-#endif
-	    break;
+    if( TileSizeX==16 && TileSizeY==16 ) {
+	switch( VideoBpp ) {
+	    case  8:
+		VideoDrawTile=VideoDraw8Tile16;
+		MapDrawTile=MapDraw8Tile16;
+		break;
+	    case 15:
+	    case 16:
+		VideoDrawTile=VideoDraw16Tile16;
+		MapDrawTile=MapDraw16Tile16;
+		break;
+	    case 24:
+		VideoDrawTile=VideoDraw24Tile16;
+		MapDrawTile=MapDraw24Tile16;
+		break;
 
-	case 32:
-	    VideoDrawTile=VideoDraw32Tile32;
-#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
-	    MapDrawTile=MapDraw32Tile32;
-#else
-	    MapDrawTile=MapDraw32Tile32;
-#endif
-	    break;
+	    case 32:
+		VideoDrawTile=VideoDraw32Tile16;
+		MapDrawTile=MapDraw32Tile16;
+		break;
 
-	default:
-	    DebugLevel0Fn("Depth unsupported\n");
-	    break;
+	    default:
+		DebugLevel0Fn("Depth unsupported\n");
+		break;
+	}
+    } else if( TileSizeX==32 && TileSizeY==32 ) {
+	switch( VideoBpp ) {
+	    case  8:
+		VideoDrawTile=VideoDraw8Tile32;
+#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
+		MapDrawTile=MapDraw8Tile32;
+#else
+		MapDrawTile=MapDraw8Tile32;
+#endif
+		break;
+	    case 15:
+	    case 16:
+		VideoDrawTile=VideoDraw16Tile32;
+#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
+		MapDrawTile=MapDraw16Tile32;
+#else
+		MapDrawTile=MapDraw16Tile32;
+#endif
+		break;
+	    case 24:
+		VideoDrawTile=VideoDraw24Tile32;
+#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
+		MapDrawTile=MapDraw24Tile32;
+#else
+		MapDrawTile=MapDraw24Tile32;
+#endif
+		break;
+
+	    case 32:
+		VideoDrawTile=VideoDraw32Tile32;
+#if !defined(USE_TILECACHE) && !defined(USE_SMART_TILECACHE)
+		MapDrawTile=MapDraw32Tile32;
+#else
+		MapDrawTile=MapDraw32Tile32;
+#endif
+		break;
+
+	    default:
+		DebugLevel0Fn("Depth unsupported\n");
+		break;
+	}
+    } else {
+	printf("Tile size not supported: (%dx%d)\n",TileSizeX,TileSizeY);
+	exit(1);
     }
-#endif
+#endif // NEW_DECODRAW
 
-#endif
+#endif // USE_OPENGL
 }
 
 //@}
