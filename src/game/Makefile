@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 2000 by Lutz Sammer
+##	(c) Copyright 2000,2001 by Lutz Sammer
 ##
 ##	$Id$
 ##
@@ -21,6 +21,6 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = game
 
-OBJS	= game.$(OE)
+OBJS	= game.$(OE) savegame.$(OE) loadgame.$(OE)
 
 include $(TOPDIR)/Common.mk

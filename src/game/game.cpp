@@ -64,12 +64,12 @@ global int lcm_prevent_recurse = 0;	/// prevent recursion through LoadGameMap
 ----------------------------------------------------------------------------*/
 
 /**
-**	Load a clone map.
+**	Load a FreeCraft map.
 **
 **	@param filename	map filename
 **	@param map	map loaded
 */
-local void LoadCloneMap(const char* filename,WorldMap* map)
+local void LoadFreeCraftMap(const char* filename,WorldMap* map)
 {
     DebugLevel3Fn("%p \n",map);
 
@@ -124,7 +124,7 @@ global void LoadMap(const char* filename,WorldMap* map)
 		|| !strcmp(tmp,".cm.bz2")
 #endif
 	) {
-	    LoadCloneMap(filename,map);
+	    LoadFreeCraftMap(filename,map);
 	    return;
 	}
     }

@@ -53,6 +53,7 @@ local void EndMenu(void);
 ----------------------------------------------------------------------------*/
 
 local void GameMenuSave(void);
+local void GameMenuLoad(void);
 local void GameMenuEnd(void);
 local void GameMenuReturn(void);
 
@@ -148,7 +149,7 @@ local Menuitem GameMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11} } },
     { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, NULL, KeyCodeF12} } },
+	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12} } },
     { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF5} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
@@ -937,6 +938,11 @@ local void GameMenuReturn(void)
 local void GameMenuSave(void)
 {
     SaveAll();	// FIXME: Sample code
+}
+
+local void GameMenuLoad(void)
+{
+    LoadAll();	// FIXME: Sample code
 }
 
 local void GameMenuEnd(void)

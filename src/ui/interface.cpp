@@ -460,10 +460,10 @@ local int CommandKey(int key)
 		break;
 	    }
 	case KeyCodeF12:
-	    SetStatusLine("Loading not supported");
+	    LoadAll();
 	    break;
 
-	case 's'&0x1F:			// Ctrl + S - Turn sound on / off 
+	case 's'&0x1F:			// Ctrl + S - Turn sound on / off
 	    UiToggleSound();
 	    break;
 
@@ -860,16 +860,16 @@ global int HoldClickDelay=1000;		/// Time to detect hold clicks.
 local enum {
     InitialMouseState,			/// start state
     ClickedMouseState,			/// button is clicked
-} 	MouseState;			/// Current state of mouse
+}	MouseState;			/// Current state of mouse
 
 local int LastMouseButton;		/// last mouse button handled
 local int StartMouseTicks;		/// Ticks of first click
-local int LastMouseTicks;		/// Ticks of last mouse event 
+local int LastMouseTicks;		/// Ticks of last mouse event
 
 /**
 **	Called if any mouse button is pressed down
 **
-**	Handles event conversion to double click, dragging, hold. 
+**	Handles event conversion to double click, dragging, hold.
 **
 **	FIXME: dragging is not supported.
 **
@@ -878,7 +878,7 @@ local int LastMouseTicks;		/// Ticks of last mouse event
 */
 global void InputMouseButtonPress(const EventCallback* callbacks,
 	unsigned ticks,unsigned button)
-{ 
+{
     //
     //	Button new pressed.
     //
