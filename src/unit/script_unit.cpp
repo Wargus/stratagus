@@ -1028,15 +1028,22 @@ local int CclCreateUnit(lua_State* l)
 	int ix;
 	int iy;
 
-	if (lua_gettop(l) != 4) {
+	if (lua_gettop(l) != 3) {
 		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
 	unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
-	ix = LuaToNumber(l, 3);
-	iy = LuaToNumber(l, 4);
+	if (!lua_istable(l, 3) || luaL_getn(l, 3) != 2) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_rawgeti(l, 3, 1);
+	ix = LuaToNumber(l, -1);
+	lua_pop(l, 1);
+	lua_rawgeti(l, 3, 2);
+	iy = LuaToNumber(l, -1);
+	lua_pop(l, 1);
 
 	heading = SyncRand() % 256;
 	lua_pushvalue(l, 2);
