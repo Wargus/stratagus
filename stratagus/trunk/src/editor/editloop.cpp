@@ -62,10 +62,111 @@ local enum _editor_state_ {
 } EditorState;				/// Current editor state
 
 // FIXME: support for bigger tools 2x2, 3x3, 4x4.
-local int TileCursor;			/// TileCursor 
+local int TileCursor;			/// Tile type number
 
 /*----------------------------------------------------------------------------
 --	Functions
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+--	Edit
+----------------------------------------------------------------------------*/
+
+/**
+**	Change tile.
+**
+**	@param x	X map tile coordinate.
+**	@param y	Y map tile coordinate.
+**	@param tile	Tile type to edit.
+*/
+local void ChangeTile(int x, int y, int tile)
+{
+    DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
+    DebugCheck(tile < 0 || tile >= TheMap.Tileset->NumTiles);
+
+    TheMap.Fields[y * TheMap.Width + x].Tile =
+	TheMap.Fields[y * TheMap.Width + x].SeenTile = 
+	    TheMap.Tileset->Table[tile];
+}
+
+/**
+**	Edit tile.
+**
+**	@param x	X map tile coordinate.
+**	@param y	Y map tile coordinate.
+**	@param tile	Tile type to edit.
+**
+**	@todo	FIXME: The flags are currently used hardcoded and not from
+**		config file.
+*/
+local void EditTile(int x, int y, int tile)
+{
+    DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
+
+    ChangeTile(x, y, 16 + tile * 16);
+
+    //
+    //  Change the flags
+    //
+    TheMap.Fields[y * TheMap.Width + x].Flags &=
+	~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+	MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
+	MapFieldWall | MapFieldRocks | MapFieldForest);
+
+    switch (tile) {
+	case 0:			// LIGHT_WATER
+	case 1:			// DARK_WATER
+	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldWaterAllowed;
+	    break;
+	case 2:			// LIGHT_COAST
+	case 3:			// DARK_COAST
+	    TheMap.Fields[y * TheMap.Width + x].Flags |=
+		MapFieldNoBuilding | MapFieldLandAllowed;
+	    break;
+	case 4:			// LIGHT_GRASS
+	case 5:			// DARK_GRASS
+	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldLandAllowed;
+	    break;
+	case 6:			// FOREST
+	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldForest;
+	    break;
+	case 7:			// ROCKS
+	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldRocks;
+	    break;
+	case 8:			// HUMAN_CLOSED_WALL
+	case 10:		// HUMAN_OPEN_WALL
+	    TheMap.Fields[y * TheMap.Width + x].Flags |=
+		MapFieldHuman | MapFieldWall;
+	    break;
+	case 9:			// ORC_CLOSED_WALL
+	case 11:		// ORC_OPEN_WALL
+	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldWall;
+	    break;
+	case 12:		// BRIDGE
+	    TheMap.Fields[y * TheMap.Width + x].Flags |=
+		MapFieldLandAllowed | MapFieldWaterAllowed |
+		MapFieldNoBuilding;
+	    break;
+	case 13:		// ROAD
+	    TheMap.Fields[y * TheMap.Width + x].Flags |=
+		MapFieldLandAllowed | MapFieldNoBuilding;
+	    break;
+	case 14:		// FORD
+	    TheMap.Fields[y * TheMap.Width + x].Flags |=
+		MapFieldLandAllowed | MapFieldCoastAllowed |
+		MapFieldWaterAllowed | MapFieldNoBuilding;
+	    break;
+	case 15:		// ... free ...
+	    TheMap.Fields[y * TheMap.Width + x].Flags |=
+		MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable
+		| MapFieldWall | MapFieldRocks | MapFieldForest;
+	    break;
+    }
+}
+
+/*----------------------------------------------------------------------------
+--	Display
 ----------------------------------------------------------------------------*/
 
 /**
@@ -133,6 +234,51 @@ local void DrawMapCursor(void)
 	}
 	VideoDrawRectangle(ColorWhite, x, y, 32, 32);
     }
+}
+
+/**
+**	Draw editor info.
+*/
+local void DrawEditorInfo(void)
+{
+    int v;
+    int x;
+    int y;
+    unsigned flags;
+    char buf[1024];
+
+    v = TheUI.LastClickedVP;
+    x = y = 0;
+    if( v != -1 ) {
+	x = Viewport2MapX(v, CursorX);
+	y = Viewport2MapY(v, CursorY);
+    }
+
+    sprintf(buf,"Editor: (%d %d)",x, y);
+    flags=TheMap.Fields[x+y*TheMap.Width].Flags;
+
+    x=TheUI.ResourceX+2;
+    y=TheUI.ResourceY+2;
+
+    VideoDrawText(x,y,GameFont,buf);
+
+    sprintf(buf,"%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	    TheMap.Fields[x+y*TheMap.Width].Value,
+	    flags,
+	    flags&MapFieldUnpassable	?'u':'-',
+	    flags&MapFieldNoBuilding	?'n':'-',
+	    flags&MapFieldHuman		?'h':'-',
+	    flags&MapFieldWall		?'w':'-',
+	    flags&MapFieldRocks		?'r':'-',
+	    flags&MapFieldForest	?'f':'-',
+	    flags&MapFieldLandAllowed	?'L':'-',
+	    flags&MapFieldCoastAllowed	?'C':'-',
+	    flags&MapFieldWaterAllowed	?'W':'-',
+	    flags&MapFieldLandUnit	?'l':'-',
+	    flags&MapFieldAirUnit	?'a':'-',
+	    flags&MapFieldSeaUnit	?'s':'-',
+	    flags&MapFieldBuilding	?'b':'-' );
+    VideoDrawText(x+150,y,GameFont,buf);
 }
 
 /**
@@ -208,6 +354,8 @@ local void EditorUpdateDisplay(void)
 	    TheUI.Resource.Graphic->Width, TheUI.Resource.Graphic->Height,
 	    TheUI.ResourceX, TheUI.ResourceY);
     }
+    DrawEditorInfo();
+
     //
     //  Filler
     //
@@ -293,6 +441,16 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	EditorState = EditorEditTile;
 	TileCursor = ButtonUnderCursor - 100;
 	return;
+    }
+
+    //
+    //	Click on map area
+    //
+    if( CursorOn == CursorOnMap ) {
+	if( EditorState == EditorEditTile ) {
+	    EditTile(Viewport2MapX(TheUI.ActiveViewport, CursorX),
+		    Viewport2MapY(TheUI.ActiveViewport, CursorY),TileCursor);
+	}
     }
 }
 
@@ -399,10 +557,26 @@ local void EditorCallbackMouse(int x, int y)
     int bx;
     int by;
     enum _cursor_on_ OldCursorOn;
+    int viewport;
+
 
     DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
     HandleCursorMove(&x, &y);		// Reduce to screen
+
+    //
+    //	Drawing tiles on map.
+    //
+    if( CursorOn == CursorOnMap && EditorState == EditorEditTile
+	    && (MouseButtons&LeftButton) ) {
+	// FIXME: should scroll the map!
+	viewport = GetViewport(x, y);
+	if (viewport >= 0 && viewport == TheUI.ActiveViewport) {
+	    EditTile(Viewport2MapX(TheUI.ActiveViewport, CursorX),
+		Viewport2MapY(TheUI.ActiveViewport, CursorY),TileCursor);
+	}
+	return;
+    }
 
     OldCursorOn=CursorOn;
 
@@ -475,27 +649,26 @@ local void EditorCallbackMouse(int x, int y)
     }
 
     //
-    //	Map
+    //  Minimap
     //
-#ifdef SPLIT_SCREEN_SUPPORT
-    if (x>=TheUI.MapArea.X && x<=TheUI.MapArea.EndX
-	    && y>=TheUI.MapArea.Y && y<=TheUI.MapArea.EndY) {
+    if (x >= TheUI.MinimapX + 24 && x < TheUI.MinimapX + 24 + MINIMAP_W
+	    && y >= TheUI.MinimapY + 2 && y < TheUI.MinimapY + 2 + MINIMAP_H) {
+	CursorOn = CursorOnMinimap;
+	return;
+    }
+    //
+    //  Map
+    //
+    if (x >= TheUI.MapArea.X && x <= TheUI.MapArea.EndX && y >= TheUI.MapArea.Y
+	    && y <= TheUI.MapArea.EndY) {
+	viewport = GetViewport(x, y);
+	if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
+	    TheUI.ActiveViewport = viewport;
+	    DebugLevel0Fn("active viewport changed to %d.\n" _C_ viewport);
+	}
 	CursorOn = CursorOnMap;
+	return;
     }
-{
-    int viewport = GetViewport (x, y);
-    if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
-	TheUI.ActiveViewport = viewport;
-	DebugLevel0Fn ("active viewport changed to %d.\n" _C_ viewport);
-    }
-}
-#else /* SPLIT_SCREEN_SUPPORT */
-    if( x>=TheUI.MapX && x<=TheUI.MapEndX
-	    && y>=TheUI.MapY && y<=TheUI.MapEndY ) {
-	CursorOn=CursorOnMap;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
-
     //
     //  Scrolling Region Handling
     //
@@ -524,6 +697,10 @@ local void CreateEditor(void)
     CreateGame(CurrentMapPath,&TheMap);
     FlagRevealMap=0;
 }
+
+/*----------------------------------------------------------------------------
+--	Editor main loop
+----------------------------------------------------------------------------*/
 
 /**
 **	Editor main event loop.
