@@ -89,7 +89,7 @@ local int MoveToWood(Unit* unit)
 
     // FIXME: don't chop the same wood!
     // turn to wood
-    UnitNewHeadingFromXY(unit,dx,dy);
+    UnitHeadingFromDeltaXY(unit,dx,dy);
     if(unit -> WoodToHarvest != CHOP_FOR_WOOD) {
 	unit -> Value = unit -> WoodToHarvest;
     } else {
@@ -299,10 +299,10 @@ local int ReturnWithWood(Unit* unit)
 	    ,unit->Type->Type);
     }
 
-    if( WAIT_FOR_WOOD<UNIT_MAX_WAIT ) {
+    if( WAIT_FOR_WOOD<MAX_UNIT_WAIT ) {
 	unit->Wait=WAIT_FOR_WOOD;
     } else {
-	unit->Wait=UNIT_MAX_WAIT;
+	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value=WAIT_FOR_WOOD-unit->Wait;
     
@@ -347,10 +347,10 @@ local int WaitInWoodDeposit(Unit* unit)
 	return 1;
     }
 
-    if( unit->Value<UNIT_MAX_WAIT ) {
+    if( unit->Value<MAX_UNIT_WAIT ) {
 	unit->Wait=unit->Value;
     } else {
-	unit->Wait=UNIT_MAX_WAIT;
+	unit->Wait=MAX_UNIT_WAIT;
     }
     unit->Value-=unit->Wait;
 

@@ -123,6 +123,7 @@ local void MoveToTarget(Unit* unit)
 		}
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		--goal->Refs;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
 	}
@@ -187,7 +188,7 @@ local void MoveToTarget(Unit* unit)
 		<=unit->Stats->AttackRange ) {
 	    unit->State=0;
 	    if( !unit->Type->Tower ) {
-		UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+		UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 	    }
 	    unit->SubAction++;
 	} else if( wall && MapDistance(unit->X,unit->Y
@@ -196,7 +197,7 @@ local void MoveToTarget(Unit* unit)
 	    DebugLevel3("Attacking wall\n");
 	    unit->State=0;
 	    if( !unit->Type->Tower ) {
-		UnitNewHeadingFromXY(unit,unit->Command.Data.Move.DX-unit->X
+		UnitHeadingFromDeltaXY(unit,unit->Command.Data.Move.DX-unit->X
 		    ,unit->Command.Data.Move.DY-unit->Y);
 	    }
 	    unit->SubAction=1;
@@ -248,6 +249,7 @@ local void AttackTarget(Unit* unit)
 		}
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		--goal->Refs;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
 	}
@@ -279,7 +281,7 @@ local void AttackTarget(Unit* unit)
 	    unit->Command.Data.Move.DY=goal->Y;
 	    unit->SubAction|=2;
 	    if( !unit->Type->Tower ) {
-		UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+		UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 	    }
 	} else
 #else
@@ -297,7 +299,7 @@ local void AttackTarget(Unit* unit)
 	    unit->Command.Data.Move.DX=goal->X;
 	    unit->Command.Data.Move.DY=goal->Y;
 	    if( !unit->Type->Tower ) {
-		UnitNewHeadingFromXY(unit
+		UnitHeadingFromDeltaXY(unit
 		    ,goal->X-unit->X,goal->Y-unit->Y);
 	    }
 	} else
@@ -323,7 +325,7 @@ local void AttackTarget(Unit* unit)
 		unit->Command.Data.Move.DX=goal->X;
 		unit->Command.Data.Move.DY=goal->Y;
 		if( !unit->Type->Tower ) {
-		    UnitNewHeadingFromXY(unit,goal->X-unit->X,goal->Y-unit->Y);
+		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 		}
 	    }
 	}

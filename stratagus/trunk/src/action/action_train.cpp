@@ -97,7 +97,11 @@ global void HandleActionTrain(Unit* unit)
 	nunit->X=unit->X;
 	nunit->Y=unit->Y;
 	type=unit->Type;
+#ifdef NEW_HEADING
+	DropOutOnSide(nunit,LookingW,type->TileWidth,type->TileHeight);
+#else
 	DropOutOnSide(nunit,HeadingW,type->TileWidth,type->TileHeight);
+#endif
 
 	// FIXME: GameMessage
 	if( player==ThisPlayer ) {

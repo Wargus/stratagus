@@ -156,7 +156,7 @@ extern void DrawMissiles(void);
     /// handle all missiles
 extern void MissileActions(void);
     /// distance from view point to missile
-extern int ViewPointDistanceToMissile(Missile* dest);
+extern int ViewPointDistanceToMissile(const Missile* dest);
 
 //@}
 
