@@ -88,11 +88,11 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define SoundSampleSize	8		/// sample size of dsp in bit
-//#define SoundSampleSize	16		// sample size of dsp in bit
-//#define SoundFrequency	44100		// sample rate of dsp
+//#define SoundSampleSize	8		/// sample size of dsp in bit
+#define SoundSampleSize	16		// sample size of dsp in bit
+#define SoundFrequency	44100		// sample rate of dsp
 //#define SoundFrequency	22050		// sample rate of dsp
-#define SoundFrequency	11025		/// sample rate of dsp
+//#define SoundFrequency	11025		/// sample rate of dsp
 #define SoundDeviceName	"/dev/dsp"	/// dsp device
 
 /*----------------------------------------------------------------------------
@@ -106,7 +106,8 @@ global unsigned AllocatedSoundMemory;	/// memory used by sound
 global unsigned CompressedSoundMemory;	/// compressed memory used by sound
 #endif
 
-global int GlobalVolume;		/// global sound volumne
+global int GlobalVolume;		/// global sound volume
+global int MusicVolume;			/// music volume
 
 global int DistanceSilent;		/// silent distance
 
@@ -152,7 +153,7 @@ global void PlayMusic(const char* name)
     ModPlug_SetSettings(&settings);
 
     size=0;
-    buffer=malloc(1024);
+    buffer=malloc(8192);
 
     if( PlayingMusic ) {
 	ModPlug_Unload();
@@ -167,9 +168,9 @@ global void PlayMusic(const char* name)
 	printf("Can't open file `%s'\n",name);
 	return;
     }
-    while( (i=CLread(f,buffer+size,1024))==1024 ) {
-	size+=1024;
-	buffer=realloc(buffer,size+1024);
+    while( (i=CLread(f,buffer+size,8192))==8192 ) {
+	size+=8192;
+	buffer=realloc(buffer,size+8192);
     }
     size+=i;
     buffer=realloc(buffer,size);
@@ -200,7 +201,7 @@ local void MixMusicToStereo32(int* buffer,int size)
 	n=ModPlug_Read(buf,size*2);
 
 	for( i=0; i<n/2; ++i ) {	// Add to our samples
-	    buffer[i]+=buf[i];
+	    buffer[i]+=(buf[i]*MusicVolume)/256;
 	}
 
 	if( n!=size*2 ) {		// End reached
@@ -525,7 +526,7 @@ SelectionHandling SelectionHandler={{NULL,0},NULL,0};
 #ifdef USE_GLIB
 local GHashTable* UnitToChannel;
 #else
-local hashtable(int,61) UnitToChannel;
+//local hashtable(int,61) UnitToChannel;
 #endif
 
 
@@ -868,10 +869,14 @@ local int MixChannelsToStereo32(int* buffer,int size)
     return new_free_channels;
 }
 
-/*
-**	Clip mix to output stereo 8 bit.
+/**
+**	Clip mix to output stereo 8 unsigned bit.
+**
+**	@param mix	signed 32 bit input.
+**	@param size	number of samples in input.
+**	@param output	clipped 8 unsigned bit output buffer.
 */
-local void ClipMixToStereo8(int* mix,int size,char* output)
+local void ClipMixToStereo8(const int* mix,int size,unsigned char* output)
 {
     int s;
 
@@ -887,13 +892,17 @@ local void ClipMixToStereo8(int* mix,int size,char* output)
     }
 }
 
-/*
-**	Clip mix to output stereo 16 bit.
+/**
+**	Clip mix to output stereo 16 signed bit.
+**
+**	@param mix	signed 32 bit input.
+**	@param size	number of samples in input.
+**	@param output	clipped 16 signed bit output buffer.
 */
-local void ClipMixToStereo16(int* mix,int size,short* output)
+local void ClipMixToStereo16(const int* mix,int size,short* output)
 {
     int s;
-    int* end;
+    const int* end;
 
     end=mix+size;
     while( mix<end ) {
@@ -1053,7 +1062,7 @@ global void WriteSound(void)
 }
 #endif
 
-#ifdef USE_SDLA
+#ifdef USE_SDLA	// {
 
 global void WriteSound(void)
 {
@@ -1061,18 +1070,29 @@ global void WriteSound(void)
 
 /**
 **	Fill buffer for the sound card.
+**
+**	@see SDL_OpenAudio
+**
+**	@param udata	the pointer stored in userdata field of SDL_AudioSpec.
+**	@param stream	pointer to buffer you want to fill with information.
+**	@param len	is length of audio buffer in bytes.
 */
 local void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
 {
-    int mixer_buffer[len];
+    int* mixer_buffer;
     int dummy1,dummy2;
 
+#if SoundSampleSize==16
+    len/=2;
+#endif
+
+    mixer_buffer=alloca(len*sizeof(*mixer_buffer));
     DebugLevel3Fn("%d\n",len);
 
     FillChannels(HowManyFree(),&dummy1,&dummy2);
 
-    memset(mixer_buffer,0,sizeof(mixer_buffer));
-
+    // FIXME: can save the memset here, if one channel sets the values
+    memset(mixer_buffer,0,sizeof(*mixer_buffer)*len);
     MixChannelsToStereo32(mixer_buffer,len);
     MixMusicToStereo32(mixer_buffer,len);
 
@@ -1080,13 +1100,17 @@ local void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
     ClipMixToStereo8(mixer_buffer,len,stream);
 #endif
 #if SoundSampleSize==16
-    ClipMixToStereo16(mixer_buffer,len,stream);
+    ClipMixToStereo16(mixer_buffer,len,(short*)stream);
 #endif
 
 }
-#endif
+#endif	// } USE_SDLA
 
-#ifdef USE_THREAD
+#ifdef USE_THREAD	// {
+
+/**
+**	FIXME: docu
+*/
 global void WriteSoundThreaded(void)
 {
     int mixer_buffer[1024];
@@ -1157,7 +1181,8 @@ global void WriteSoundThreaded(void)
       }
     }
 }
-#endif
+
+#endif	// } USE_THREAD
 
 /**
 **	Initialize sound card.
@@ -1260,6 +1285,7 @@ global int InitSound(void)
 
     // initialize volume (neutral point)
     GlobalVolume=128;
+    MusicVolume=256;
 
     // initialize unit to channel hash table
     // WARNING: creation is only valid for a hash table using pointers as key
