@@ -474,6 +474,16 @@ local SCM CclSetSoundVolume(SCM volume)
 }
 
 /**
+**	Music volume support
+**
+**	@param volume	new global music volume
+*/
+local SCM CclSetMusicVolume(SCM volume)
+{
+    return volume;
+}
+
+/**
 **	Turn Off Sound (client side)
 */
 local SCM CclSoundOff(void)
