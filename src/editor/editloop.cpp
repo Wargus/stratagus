@@ -773,6 +773,11 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
     //	Click on map area
     //
     if( CursorOn == CursorOnMap ) {
+	TheUI.LastClickedVP = GetViewport (CursorX, CursorY);
+	DebugLevel0Fn ("last clicked viewport changed to %d.\n" _C_
+		TheUI.LastClickedVP);
+	MustRedraw = RedrawMinimapCursor | RedrawMap;
+
 	if( EditorState == EditorEditTile ) {
 	    EditTile(Viewport2MapX(TheUI.ActiveViewport, CursorX),
 		    Viewport2MapY(TheUI.ActiveViewport, CursorY),TileCursor);
@@ -817,6 +822,14 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
     }
 
     switch (key) {
+	case 'v':		// 'v' Viewport
+	    if (KeyModifiers & ModifierControl) {
+		CycleViewportMode(-1);
+	    } else {
+		CycleViewportMode(1);
+	    }
+	    break;
+
 	case KeyCodeDelete:	// Delete
 	    if( UnitUnderCursor ) {
 		Unit* unit;
