@@ -1396,7 +1396,7 @@ global void SaveMissileTypes(CLFile* file)
 		CLprintf(file, " 'sleep %d", mtype->Sleep);
 		CLprintf(file, " 'speed %d", mtype->Speed);
 		CLprintf(file, " 'range %d", mtype->Range);
-		CLprintf(file, " 'splash-factor", mtype->SplashFactor);
+		CLprintf(file, " 'splash-factor %d", mtype->SplashFactor);
 		if (mtype->ImpactMissile) {
 			CLprintf(file, "\n  'impact-missile '%s", mtype->ImpactMissile->Ident);
 		}
