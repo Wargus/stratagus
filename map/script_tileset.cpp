@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_tileset.c	-	The tileset ccl functions. */
+/**@name ccl_tileset.c - The tileset ccl functions. */
 //
-//	(c) Copyright 2000-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2000-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <string.h>
@@ -44,13 +44,13 @@
 #include "map.h"
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Define tileset mapping from original number to internal symbol
+**  Define tileset mapping from original number to internal symbol
 **
-**		@param list		List of all names.
+**  @param list		List of all names.
 */
 local int CclDefineTilesetWcNames(lua_State* l)
 {
@@ -58,7 +58,8 @@ local int CclDefineTilesetWcNames(lua_State* l)
 	int j;
 	char** cp;
 
-	if ((cp = TilesetWcNames)) {		// Free all old names
+	// Free all old names
+	if ((cp = TilesetWcNames)) {
 		while (*cp) {
 			free(*cp++);
 		}
@@ -66,7 +67,7 @@ local int CclDefineTilesetWcNames(lua_State* l)
 	}
 
 	//
-	//		Get new table.
+	//  Get new table.
 	//
 	i = lua_gettop(l);
 	TilesetWcNames = cp = malloc((i + 1) * sizeof(char*));
@@ -84,10 +85,10 @@ local int CclDefineTilesetWcNames(lua_State* l)
 }
 
 /**
-**		Extend tables of the tileset.
+**  Extend tables of the tileset.
 **
-**		@param tileset		Tileset to be extended.
-**		@param tiles		Number of tiles.
+**  @param tileset  Tileset to be extended.
+**  @param tiles    Number of tiles.
 */
 local void ExtendTilesetTables(Tileset* tileset, int tiles)
 {
@@ -111,10 +112,10 @@ local void ExtendTilesetTables(Tileset* tileset, int tiles)
 }
 
 /**
-**		Parse the name field in tileset definition.
+**  Parse the name field in tileset definition.
 **
-**		@param tileset		Tileset currently parsed.
-**		@param list		List with name.
+**  @param tileset  Tileset currently parsed.
+**  @param list     List with name.
 */
 local int TilesetParseName(lua_State* l, Tileset* tileset)
 {
@@ -129,7 +130,7 @@ local int TilesetParseName(lua_State* l, Tileset* tileset)
 		}
 	}
 
-	//  Can't find it, then we add another solid terrain type.
+	// Can't find it, then we add another solid terrain type.
 	tileset->SolidTerrainTypes = realloc(tileset->SolidTerrainTypes,
 		++tileset->NumTerrainTypes * sizeof(*tileset->SolidTerrainTypes));
 	tileset->SolidTerrainTypes[i].TerrainName = ident;
@@ -138,12 +139,12 @@ local int TilesetParseName(lua_State* l, Tileset* tileset)
 }
 
 /**
-**		Parse the flag section of a tile definition.
+**  Parse the flag section of a tile definition.
 **
-**		@param list		list of flags.
-**		@param back		pointer for the flags (return).
+**  @param list  list of flags.
+**  @param back  pointer for the flags (return).
 **
-**		@return				remaining list
+**  @return      remaining list
 */
 local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 {
@@ -165,7 +166,7 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 		lua_pop(l, 1);
 
 		//
-		//	  Flags are only needed for the editor
+		//  Flags are only needed for the editor
 		//
 		if (!strcmp(value, "water")) {
 			flags |= MapFieldWaterAllowed;
@@ -202,10 +203,10 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 }
 
 /**
-**		Parse the special slot part of a tileset definition
+**  Parse the special slot part of a tileset definition
 **
-**		@param tileset		Tileset to be filled.
-**		@param list		Tagged list defining a special slot.
+**  @param tileset  Tileset to be filled.
+**  @param list     Tagged list defining a special slot.
 */
 local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 {
@@ -221,7 +222,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 	args = luaL_getn(l, -1);
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	//  Parse the list: (still everything could be changed!)
 	//
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
@@ -229,7 +230,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 		lua_pop(l, 1);
 
 		//
-		//		top-one-tree, mid-one-tree, bot-one-tree
+		//  top-one-tree, mid-one-tree, bot-one-tree
 		//
 		if (!strcmp(value, "top-one-tree")) {
 			++j;
@@ -247,7 +248,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 			tileset->BotOneTree = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		//
-		//		removed-tree
+		//  removed-tree
 		//
 		} else if (!strcmp(value, "removed-tree")) {
 			++j;
@@ -255,7 +256,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 			tileset->RemovedTree = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		//
-		//		growing-tree
+		//  growing-tree
 		//
 		} else if (!strcmp(value, "growing-tree")) {
 			++j;
@@ -276,7 +277,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 			lua_pop(l, 1);
 
 		//
-		//		top-one-rock, mid-one-rock, bot-one-rock
+		//  top-one-rock, mid-one-rock, bot-one-rock
 		//
 		} else if (!strcmp(value, "top-one-rock")) {
 			++j;
@@ -294,7 +295,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 			tileset->BotOneRock = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		//
-		//		removed-rock
+		//  removed-rock
 		//
 		} else if (!strcmp(value, "removed-rock")) {
 			++j;
@@ -309,11 +310,11 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 }
 
 /**
-**		Parse the solid slot part of a tileset definition
+**  Parse the solid slot part of a tileset definition
 **
-**		@param tileset		Tileset to be filled.
-**		@param index		Current table index.
-**		@param list		Tagged list defining a solid slot.
+**  @param tileset  Tileset to be filled.
+**  @param index    Current table index.
+**  @param list     Tagged list defining a solid slot.
 */
 local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 {
@@ -321,7 +322,7 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	int f;
 	int len;
 	int basic_name;
-	SolidTerrainInfo* tt;// short for terrain type.
+	SolidTerrainInfo* tt; // short for terrain type.
 	int j;
 
 	ExtendTilesetTables(tileset, index + 16);
@@ -333,14 +334,14 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	j = 0;
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	basic_name = TilesetParseName(l, tileset);		// base name
+	basic_name = TilesetParseName(l, tileset);
 	lua_pop(l, 1);
 	tt = tileset->SolidTerrainTypes + basic_name;
 
 	ParseTilesetTileFlags(l, &f, &j);
 
 	//
-	//		Vector: the tiles.
+	//  Vector: the tiles.
 	//
 	lua_rawgeti(l, -1, j + 1);
 	if (!lua_istable(l, -1)) {
@@ -379,11 +380,11 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 }
 
 /**
-**		Parse the mixed slot part of a tileset definition
+**  Parse the mixed slot part of a tileset definition
 **
-**		@param tileset		Tileset to be filled.
-**		@param index		Current table index.
-**		@param list		Tagged list defining a mixed slot.
+**  @param tileset  Tileset to be filled.
+**  @param index    Current table index.
+**  @param list     Tagged list defining a mixed slot.
 */
 local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 {
@@ -407,11 +408,11 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 	args = luaL_getn(l, -1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	basic_name = TilesetParseName(l, tileset);		// base name
+	basic_name = TilesetParseName(l, tileset);
 	lua_pop(l, 1);
 	lua_rawgeti(l, -1, j + 1);
 	++j;
-	mixed_name = TilesetParseName(l, tileset);		// mixed name
+	mixed_name = TilesetParseName(l, tileset);
 	lua_pop(l, 1);
 
 	ParseTilesetTileFlags(l, &f, &j);
@@ -423,7 +424,7 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 			lua_error(l);
 		}
 		//
-		//		Vector: the tiles.
+		//  Vector: the tiles.
 		//
 		len = luaL_getn(l, -1);
 		for (i = 0; i < len; ++i) {
@@ -434,7 +435,8 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 			tileset->Tiles[index + i].MixTerrain = mixed_name;
 			lua_pop(l, 1);
 		}
-		while (i < 16) {						// Fill missing slots
+		// Fill missing slots
+		while (i < 16) {
 			tileset->Table[index + i] = 0;
 			tileset->FlagsTable[index + i] = 0;
 			tileset->Tiles[index + i].BaseTerrain = 0;
@@ -457,10 +459,10 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 }
 
 /**
-**		Parse the slot part of a tileset definition
+**  Parse the slot part of a tileset definition
 **
-**		@param tileset		Tileset to be filled.
-**		@param list		Tagged list defining a slot.
+**  @param tileset  Tileset to be filled.
+**  @param list     Tagged list defining a slot.
 */
 local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 {
@@ -495,7 +497,7 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 	tileset->NumTerrainTypes = 1;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	//  Parse the list: (still everything could be changed!)
 	//
 	args = luaL_getn(l, t);
 	for (j = 0; j < args; ++j) {
@@ -505,21 +507,21 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 		++j;
 
 		//
-		//		special part
+		//  special part
 		//
 		if (!strcmp(value, "special")) {
 			lua_rawgeti(l, t, j + 1);
 			DefineTilesetParseSpecial(l, tileset);
 			lua_pop(l, 1);
 		//
-		//		solid part
+		//  solid part
 		//
 		} else if (!strcmp(value, "solid")) {
 			lua_rawgeti(l, t, j + 1);
 			index = DefineTilesetParseSolid(l, tileset, index);
 			lua_pop(l, 1);
 		//
-		//		mixed part
+		//  mixed part
 		//
 		} else if (!strcmp(value, "mixed")) {
 			lua_rawgeti(l, t, j + 1);
@@ -534,10 +536,10 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 }
 
 /**
-**		Parse the item mapping part of a tileset definition
+**  Parse the item mapping part of a tileset definition
 **
-**		@param tileset		Tileset to be filled.
-**		@param list		List defining item mapping.
+**  @param tileset  Tileset to be filled.
+**  @param list     List defining item mapping.
 */
 local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 {
@@ -566,9 +568,9 @@ local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 }
 
 /**
-**		Define tileset
+**  Define tileset
 **
-**		@param list		Tagged list defining a tileset.
+**  @param list  Tagged list defining a tileset.
 */
 local int CclDefineTileset(lua_State* l)
 {
@@ -582,7 +584,7 @@ local int CclDefineTileset(lua_State* l)
 	ident = strdup(LuaToString(l, 1));
 
 	//
-	//		Find the tile set.
+	//  Find the tile set.
 	//
 	if (Tilesets) {
 		for (type = 0; type < NumTilesets; ++type) {
@@ -622,7 +624,7 @@ local int CclDefineTileset(lua_State* l)
 	Tilesets[type]->TileSizeY = 32;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	//  Parse the list: (still everything could be changed!)
 	//
 	args = lua_gettop(l);
 	for (j = 1; j < args; ++j) {
@@ -673,7 +675,7 @@ local int CclDefineTileset(lua_State* l)
 }
 
 /**
-**		Register CCL features for tileset.
+**  Register CCL features for tileset.
 */
 global void TilesetCclRegister(void)
 {
