@@ -200,7 +200,7 @@ global void LoadAll(void)
     SaveGame("save_file_of_freecraft2.ccl");
     LoadGame("save_file_of_freecraft2.ccl");
 #endif
-    LoadGame ("save_file_of_freecraft.ccl");
+    //LoadGame ("save_file_of_freecraft.ccl");
 }
 
 //@}
