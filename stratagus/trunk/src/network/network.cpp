@@ -88,8 +88,8 @@ local int NetworkDelay;			/// Delay counter for recover.
 local int NetworkSyncSeeds[256];	/// Network sync seeds.
 local int NetworkSyncHashs[256];	/// Network sync hashs.
 local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network packet input queue
-local struct dl_head CommandsIn[1];	/// Network command input queue
-local struct dl_head CommandsOut[1];	/// Network command output queue
+local DL_LIST(CommandsIn);		/// Network command input queue
+local DL_LIST(CommandsOut);		/// Network command output queue
 
 #ifdef DEBUG
 local int NetworkReceivedPackets;	/// Packets received packets
