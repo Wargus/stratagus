@@ -230,13 +230,13 @@ global void StopMusic(void)
 global int CDRomCheck(void *unused __attribute__ ((unused)))
 {
 #if defined(USE_SDLCD)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped)
+    if (CDMode != CDModeOff && CDMode != CDModeStopped
 	    && SDL_CDStatus(CDRom) == 1) {
 	DebugLevel0Fn("Playing new track\n");
 	if (CDMode == CDModeAll) {
-	    PlayCDRom(":all");
+	    PlayCDRom(CDModeAll);
 	} else if (CDMode == CDModeRandom) {
-	    PlayCDRom(":random");
+	    PlayCDRom(CDModeRandom);
 	}
     }
 #elif defined(USE_LIBCDA)
