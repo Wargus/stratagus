@@ -536,7 +536,7 @@ global void FireMissile(Unit* unit)
 	if( goal->Destroyed ) {
 	    DebugLevel0(__FUNCTION__": destroyed unit\n");
 	    if( !--goal->Refs ) {
-		FreeUnitMemory(goal);
+		ReleaseUnit(goal);
 	    }
 	    // FIXME: should I clear this here?
 	    unit->Command.Data.Move.Goal=NULL;

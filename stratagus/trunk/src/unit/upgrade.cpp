@@ -1241,7 +1241,7 @@ void UpgradeIncTime( Player* player, int id, int amount )
     if ( player->UTimers.upgrades[id] >= Upgrades[id].Costs[TimeCost] )
     {
 	player->UTimers.upgrades[id] = Upgrades[id].Costs[TimeCost];
-	UpgradeAcquire( player, id );
+	UpgradeAcquire( player, &Upgrades[id] );
     }
 }
 
@@ -1298,11 +1298,13 @@ void ApplyUpgradeModifier( Player* player, UpgradeModifier* um )
 }
 
  // called by UpgradeIncTime() when timer reached
-global void UpgradeAcquire( Player* player, int id )
+global void UpgradeAcquire( Player* player, Upgrade* upgrade )
 {
     int z;
+    int id;
 
-    player->UTimers.upgrades[id] = Upgrades[id].Costs[TimeCost];
+    id=upgrade-Upgrades;
+    player->UTimers.upgrades[id] = upgrade->Costs[TimeCost];
     AllowUpgradeId( player, id, 'R' );		// research done
 
     for ( z = 0; z < UpgradeModifiersCount; z++ ) {
@@ -1371,8 +1373,6 @@ global char UpgradeIdAllowed(const Player* player,  int id )
 // ***************by sid's
 void UpgradeIncTime2( Player* player, char* sid, int amount ) // by ident string
   { UpgradeIncTime( player, UpgradeIdByIdent(sid), amount ); }
-void UpgradeAcquire2( Player* player, char* sid ) // by ident string
-  { UpgradeAcquire( player, UpgradeIdByIdent(sid) ); }
 void UpgradeLost2( Player* player, char* sid ) // by ident string
   { UpgradeLost( player, UpgradeIdByIdent(sid) ); }
 

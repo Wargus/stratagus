@@ -147,6 +147,10 @@ local void HandleUnitAction(Unit* unit)
 	    HandleActionStandGround(unit);
 	    break;
 
+	case UnitActionFollow:		// FIXME: not written
+	    //HandleActionFollow(unit);
+	    //break;
+
 	case UnitActionMove:		// THE HARD ONE
 	    HandleActionMove(unit);
 	    break;

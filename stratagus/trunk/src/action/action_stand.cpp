@@ -169,7 +169,7 @@ global void HandleActionStandGround(Unit* unit)
 
     //
     //	Workers and mage didn't attack automatic
-    //	removed with standground && !type->CowerPeon && !type->CowerMage 
+    //	removed with standground && !type->CowerWorker && !type->CowerMage 
     if( type->CanAttack ) {
 	//
 	//	Units attacks in attacking range.

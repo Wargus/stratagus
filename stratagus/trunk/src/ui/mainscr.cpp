@@ -218,11 +218,11 @@ global void DrawUnitInfo(Unit* unit)
 	}
 	if( unit->Command.Action==UnitActionResearch ) {
 	    DrawText(16,y+8+78,GameFont,"Researching:");
-	    DrawUnitIcon(Upgrades[unit->Command.Data.Research.What].Icon
+	    DrawUnitIcon(unit->Command.Data.Research.What->Icon
 		    ,0,x+107,y+8+70);
 
 	    DrawCompleted(
-		    Upgrades[unit->Command.Data.Research.What].Costs[TimeCost]
+		    unit->Command.Data.Research.What->Costs[TimeCost]
 		    ,unit->Command.Data.Research.Ticks);
 	    return;
 	}

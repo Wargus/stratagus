@@ -580,10 +580,14 @@ global void DoButtonButtonClicked(int button)
     //
     switch( CurrentButtons[button].Action ) {
 	case B_Unload:
+	    //
+	    //	Unload on coast, unload all units.
+	    //
 	    if( NumSelected==1
 		    && CoastOnMap(Selected[0]->X,Selected[0]->Y) ) {
 		SendCommandUnload(Selected[0]
-			,Selected[0]->X,Selected[0]->Y,NoUnitP);
+			,Selected[0]->X,Selected[0]->Y,NoUnitP
+			,!(KeyModifiers&ModifierShift));
 		break;
 	    }
 	case B_Move:
@@ -603,7 +607,8 @@ global void DoButtonButtonClicked(int button)
 	    break;
 	case B_Return:
 	    for( i=0; i<NumSelected; ++i ) {
-	        SendCommandReturnGoods(Selected[i]);
+	        SendCommandReturnGoods(Selected[i]
+			,!(KeyModifiers&ModifierShift));
 	    }
 	    break;
 	case B_Stop:
@@ -613,7 +618,8 @@ global void DoButtonButtonClicked(int button)
 	    break;
 	case B_StandGround:
 	    for( i=0; i<NumSelected; ++i ) {
-	        SendCommandStandGround(Selected[i]);
+	        SendCommandStandGround(Selected[i]
+			,!(KeyModifiers&ModifierShift));
 	    }
 	    break;
 	case B_Button:
@@ -629,8 +635,9 @@ global void DoButtonButtonClicked(int button)
 		    PlayerAddCostsFactor(ThisPlayer,stats->Costs,75);
 		    SendCommandCancelUpgradeTo(Selected[0]);
 		} else if( Selected[0]->Command.Action == UnitActionResearch ) {
-		    i=Selected[0]->Command.Data.Research.What;
-		    PlayerAddCostsFactor(ThisPlayer,Upgrades[i].Costs,75);
+		    PlayerAddCostsFactor(ThisPlayer
+			    ,Selected[0]->Command.Data.Research.What->Costs
+			    ,75);
 		    SendCommandCancelResearch(Selected[0]);
 		}
 	    }
@@ -649,12 +656,21 @@ global void DoButtonButtonClicked(int button)
 	case B_CancelTrain:
 	    // FIXME: This didn't work in the network
 	    DebugCheck( !Selected[0]->Command.Data.Train.Count );
+#if 0
+	    // FIXME: didn't support cancel of the last slot :(
 	    PlayerAddUnitType(ThisPlayer
 		,Selected[0]->Command.Data.Train.What[
 		    Selected[0]->Command.Data.Train.Count-1]);
 	    ClearStatusLine();
 	    ClearCosts();
-	    SendCommandCancelTraining(Selected[0]);
+	    SendCommandCancelTraining(Selected[0]
+		    ,Selected[0]->Command.Data.Train.Count-1);
+#endif
+	    PlayerAddUnitType(ThisPlayer
+		    ,Selected[0]->Command.Data.Train.What[0]);
+	    ClearStatusLine();
+	    ClearCosts();
+	    SendCommandCancelTraining(Selected[0],0);
 	    UpdateButtonPanel();
 	    break;
 	case B_CancelBuild:
@@ -664,7 +680,7 @@ global void DoButtonButtonClicked(int button)
 		// Player gets back 75% of the original cost for a building.
 		PlayerAddCostsFactor(ThisPlayer,stats->Costs,75);
 		SendCommandCancelBuilding(Selected[0],
-		        Selected[0]->Command.Data.Builded.Peon);
+		        Selected[0]->Command.Data.Builded.Worker);
 	    }
 	    break;
 
@@ -682,10 +698,13 @@ global void DoButtonButtonClicked(int button)
 	    break;
 	case B_Train:
 	    type=&UnitTypes[CurrentButtons[button].Value];
+	    // FIXME: Johns: I want to place commands in que, even if not
+	    // FIXME: enought resources are available
 	    if( PlayerCheckFood(ThisPlayer,type)
 			&& !PlayerCheckUnitType(ThisPlayer,type) ) {
 		PlayerSubUnitType(ThisPlayer,type);
-		SendCommandTrainUnit(Selected[0],type);
+		SendCommandTrainUnit(Selected[0],type
+			,!(KeyModifiers&ModifierShift));
 		ClearStatusLine();
 		ClearCosts();
 		UpdateButtonPanel();
@@ -700,7 +719,8 @@ global void DoButtonButtonClicked(int button)
 			,type->_Costs[GoldCost]
 			,type->_Costs[WoodCost]);
 		PlayerSubUnitType(ThisPlayer,type);
-		SendCommandUpgradeTo(Selected[0],type);
+		SendCommandUpgradeTo(Selected[0],type
+			,!(KeyModifiers&ModifierShift));
 		ClearStatusLine();
 		ClearCosts();
 		UpdateButtonPanel();
@@ -711,7 +731,8 @@ global void DoButtonButtonClicked(int button)
 	    i=CurrentButtons[button].Value;
 	    if( !PlayerCheckCosts(ThisPlayer,Upgrades[i].Costs) ) {
 		PlayerSubCosts(ThisPlayer,Upgrades[i].Costs);
-		SendCommandResearch(Selected[0],i);
+		SendCommandResearch(Selected[0],&Upgrades[i]
+			,!(KeyModifiers&ModifierShift));
 		ClearStatusLine();
 		ClearCosts();
 //		FIXME: ? Johns CurrentButtons=CancelUpgradeButtons;

@@ -162,10 +162,10 @@ local int MineInGoldmine(Unit* unit)
 	    unit->Command.Action=UnitActionMineGold;
 	}
 
-	if( unit->Type->Type==UnitPeon ) {
-	    unit->Type=&UnitTypes[UnitPeonWithGold];
-	} else if( unit->Type->Type==UnitPeasant ) {
-	    unit->Type=&UnitTypes[UnitPeasantWithGold];
+	if( unit->Type==UnitTypeOrcWorker ) {
+	    unit->Type=UnitTypeOrcWorkerWithGold;
+	} else if( unit->Type==UnitTypeHumanWorker ) {
+	    unit->Type=UnitTypeHumanWorkerWithGold;
 	} else {
 	    DebugLevel0("Wrong unit (%d,%d) for mining gold %d (%s)\n"
 		,unit->X,unit->Y
@@ -280,10 +280,10 @@ global void HandleActionMineGold(Unit* unit)
 	        MustRedraw|=RedrawResources;
 	    }
 	    
-	    if( unit->Type->Type==UnitPeonWithGold ) {
-		unit->Type=&UnitTypes[UnitPeon];
-	    } else if( unit->Type->Type==UnitPeasantWithGold ) {
-		unit->Type=&UnitTypes[UnitPeasant];
+	    if( unit->Type==UnitTypeOrcWorkerWithGold ) {
+		unit->Type=UnitTypeOrcWorker;
+	    } else if( unit->Type==UnitTypeHumanWorkerWithGold ) {
+		unit->Type=UnitTypeHumanWorker;
 	    } else {
 		DebugLevel0("Wrong unit (%d,%d) for returning gold %d (%s)\n"
 		    ,unit->X,unit->Y

@@ -168,7 +168,7 @@ local SoundId ChooseUnitVoiceSoundId(Unit *unit,UnitVoiceGroup voice) {
 global void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME: fabrice please look\n");
+    DebugLevel3("FIXME: fabrice please look\n");
     InsertSoundRequest(unit,
 		       unit->Slot,
 		       ViewPointDistanceToUnit(unit),

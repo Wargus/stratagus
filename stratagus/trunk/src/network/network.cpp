@@ -40,6 +40,9 @@
 #endif
 
 #include "freecraft.h"
+
+#ifndef NEW_NETWORK	// {
+
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
@@ -49,13 +52,6 @@
 #include "actions.h"
 #include "network.h"
 #include "map.h"
-
-// FIXME: cade: this is a hack, not the right place
-#include "interface.h"
-extern global enum KeyModifiers_e KeyModifiers;/// current keyboard modifiers
-
-#define flush \
-	(unit->Player==ThisPlayer && !(KeyModifiers&ModifierShift))
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -108,6 +104,7 @@ enum __message_type__ {
 
     MessageCommandStop,			/// unit command stop
     MessageCommandStand,		/// unit command stand ground
+    MessageCommandFollow,		/// unit command follow
     MessageCommandMove,			/// unit command move
     MessageCommandRepair,		/// unit command repair
     MessageCommandAttack,		/// unit command attack
@@ -130,6 +127,7 @@ enum __message_type__ {
     MessageCommandDemolish,		/// unit command demolish
 };
 
+    /// Send command over the network
 extern void NetworkSendCommand(int command,Unit* unit,int x,int y
 	,Unit* dest,UnitType* type,int flags);
 
@@ -389,8 +387,12 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     fprintf(logf,"(log %d 'U%Zd '%s '%s",
 	    FrameCounter,UnitNumber(unit),name,
 	    flag ? "flush" : "append");
-    if( position ) {
-	fprintf(logf," (%d %d)",x,y);
+    switch( position ) {
+	case 1:
+	    fprintf(logf," (%d %d)",x,y);
+	    break;
+	case 2:
+	    fprintf(logf," %d",x);
     }
     if( dest ) {
 	fprintf(logf," 'U%Zd",UnitNumber(unit));
@@ -418,11 +420,11 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
 */
 global void SendCommandStopUnit(Unit* unit)
 {
-    CommandLog("stop",unit,flush,0,0,0,NULL,NULL);
+    CommandLog("stop",unit,1,0,0,0,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
-	CommandStopUnit(unit,flush);
+	CommandStopUnit(unit);
     } else {
-	NetworkSendCommand(MessageCommandStop,unit,0,0,NoUnitP,0,flush);
+	NetworkSendCommand(MessageCommandStop,unit,0,0,NoUnitP,0,1);
     }
 }
 
@@ -430,10 +432,11 @@ global void SendCommandStopUnit(Unit* unit)
 **	Send command: Unit stand ground.
 **
 **	@param unit	pointer to unit.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandStandGround(Unit* unit)
+global void SendCommandStandGround(Unit* unit,int flush)
 {
-    CommandLog("stand-ground",unit,flush,0,0,0,NULL,NULL);
+    CommandLog("stand-ground",unit,flush,0,0,0,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
 	CommandStandGround(unit,flush);
     } else {
@@ -442,17 +445,36 @@ global void SendCommandStandGround(Unit* unit)
 }
 
 /**
-**	Send command: Unit move to position.
+**	Send command: Follow unit to position.
 **
 **	@param unit	pointer to unit.
 **	@param x	X map tile position to move to.
 **	@param y	Y map tile position to move to.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandMoveUnit(Unit* unit,int x,int y)
+global void SendCommandFollow(Unit* unit,Unit* dest,int flush)
 {
-    CommandLog("move",unit,flush,1,x,y,NULL,NULL);
+    CommandLog("move",unit,flush,0,0,0,dest,NULL);
     if( NetworkFildes==-1 ) {
-	CommandMoveUnit(unit,x,y,flush);
+	CommandFollow(unit,dest,flush);
+    } else {
+	NetworkSendCommand(MessageCommandFollow,unit,0,0,dest,0,flush);
+    }
+}
+
+/**
+**	Send command: Move unit to position.
+**
+**	@param unit	pointer to unit.
+**	@param x	X map tile position to move to.
+**	@param y	Y map tile position to move to.
+**	@param flush	Flag flush all pending commands.
+*/
+global void SendCommandMove(Unit* unit,int x,int y,int flush)
+{
+    CommandLog("move",unit,flush,1,x,y,NoUnitP,NULL);
+    if( NetworkFildes==-1 ) {
+	CommandMove(unit,x,y,flush);
     } else {
 	NetworkSendCommand(MessageCommandMove,unit,x,y,NoUnitP,0,flush);
     }
@@ -464,14 +486,15 @@ global void SendCommandMoveUnit(Unit* unit,int x,int y)
 **	@param unit	pointer to unit.
 **	@param x	X map tile position to repair.
 **	@param y	Y map tile position to repair.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandRepair(Unit* unit,int x,int y)
+global void SendCommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 {
-    CommandLog("repair",unit,flush,1,x,y,NULL,NULL);
+    CommandLog("repair",unit,flush,1,x,y,dest,NULL);
     if( NetworkFildes==-1 ) {
-	CommandRepair(unit,x,y,flush);
+	CommandRepair(unit,x,y,dest,flush);
     } else {
-	NetworkSendCommand(MessageCommandRepair,unit,x,y,NoUnitP,0,flush);
+	NetworkSendCommand(MessageCommandRepair,unit,x,y,dest,0,flush);
     }
 }
 
@@ -482,8 +505,9 @@ global void SendCommandRepair(Unit* unit,int x,int y)
 **	@param x	X map tile position to attack.
 **	@param y	Y map tile position to attack.
 **	@param attack	or !=NoUnitP unit to be attacked.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandAttack(Unit* unit,int x,int y,Unit* attack)
+global void SendCommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 {
     CommandLog("attack",unit,flush,1,x,y,attack,NULL);
     if( NetworkFildes==-1 ) {
@@ -499,10 +523,11 @@ global void SendCommandAttack(Unit* unit,int x,int y,Unit* attack)
 **	@param unit	pointer to unit.
 **	@param x	X map tile position to fire on.
 **	@param y	Y map tile position to fire on.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandAttackGround(Unit* unit,int x,int y)
+global void SendCommandAttackGround(Unit* unit,int x,int y,int flush)
 {
-    CommandLog("attack-ground",unit,flush,1,x,y,NULL,NULL);
+    CommandLog("attack-ground",unit,flush,1,x,y,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
 	CommandAttackGround(unit,x,y,flush);
     } else {
@@ -516,10 +541,11 @@ global void SendCommandAttackGround(Unit* unit,int x,int y)
 **	@param unit	pointer to unit.
 **	@param x	X map tile position to patrol between.
 **	@param y	Y map tile position to patrol between.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandPatrolUnit(Unit* unit,int x,int y)
+global void SendCommandPatrol(Unit* unit,int x,int y,int flush)
 {
-    CommandLog("patrol",unit,flush,1,x,y,NULL,NULL);
+    CommandLog("patrol",unit,flush,1,x,y,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
 	CommandPatrolUnit(unit,x,y,flush);
     } else {
@@ -532,14 +558,15 @@ global void SendCommandPatrolUnit(Unit* unit,int x,int y)
 **
 **	@param unit	pointer to unit.
 **	@param dest	Destination to be boarded.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandBoard(Unit* unit,Unit* dest)
+global void SendCommandBoard(Unit* unit,int x,int y,Unit* dest,int flush)
 {
-    CommandLog("board",unit,flush,0,0,0,dest,NULL);
+    CommandLog("board",unit,flush,1,x,y,dest,NULL);
     if( NetworkFildes==-1 ) {
 	CommandBoard(unit,dest,flush);
     } else {
-	NetworkSendCommand(MessageCommandBoard,unit,0,0,dest,0,flush);
+	NetworkSendCommand(MessageCommandBoard,unit,x,y,dest,0,flush);
     }
 }
 
@@ -550,8 +577,9 @@ global void SendCommandBoard(Unit* unit,Unit* dest)
 **	@param x	X map tile position of unload.
 **	@param y	Y map tile position of unload.
 **	@param what	Passagier to be unloaded.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandUnload(Unit* unit,int x,int y,Unit* what)
+global void SendCommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 {
     CommandLog("unload",unit,flush,1,x,y,what,NULL);
     if( NetworkFildes==-1 ) {
@@ -568,8 +596,10 @@ global void SendCommandUnload(Unit* unit,int x,int y,Unit* what)
 **	@param x	X map tile position of construction.
 **	@param y	Y map tile position of construction.
 **	@param what	pointer to unit-type of the building.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandBuildBuilding(Unit* unit,int x,int y,UnitType* what)
+global void SendCommandBuildBuilding(Unit* unit,int x,int y
+	,UnitType* what,int flush)
 {
     CommandLog("build",unit,flush,1,x,y,NULL,what->Ident);
     if( NetworkFildes==-1 ) {
@@ -584,14 +614,14 @@ global void SendCommandBuildBuilding(Unit* unit,int x,int y,UnitType* what)
 **
 **	@param unit	pointer to unit.
 */
-global void SendCommandCancelBuilding(Unit* unit,Unit* peon)
+global void SendCommandCancelBuilding(Unit* unit,Unit* worker)
 {
-    // FIXME: currently unit and peon are same?
-    CommandLog("cancel-build",unit,flush,0,0,0,peon,NULL);
+    // FIXME: currently unit and worker are same?
+    CommandLog("cancel-build",unit,1,0,0,0,worker,NULL);
     if( NetworkFildes==-1 ) {
-	CommandCancelBuilding(unit,peon);
+	CommandCancelBuilding(unit,worker);
     } else {
-	NetworkSendCommand(MessageCommandCancelBuild,unit,0,0,peon,0,0);
+	NetworkSendCommand(MessageCommandCancelBuild,unit,0,0,worker,0,1);
     }
 }
 
@@ -601,10 +631,11 @@ global void SendCommandCancelBuilding(Unit* unit,Unit* peon)
 **	@param unit	pointer to unit.
 **	@param x	X map tile position where to harvest.
 **	@param y	Y map tile position where to harvest.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandHarvest(Unit* unit,int x,int y)
+global void SendCommandHarvest(Unit* unit,int x,int y,int flush)
 {
-    CommandLog("harvest",unit,flush,1,x,y,NULL,NULL);
+    CommandLog("harvest",unit,flush,1,x,y,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
 	CommandHarvest(unit,x,y,flush);
     } else {
@@ -617,8 +648,9 @@ global void SendCommandHarvest(Unit* unit,int x,int y)
 **
 **	@param unit	pointer to unit.
 **	@param dest	pointer to destination (gold-mine).
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandMineGold(Unit* unit,Unit* dest)
+global void SendCommandMineGold(Unit* unit,Unit* dest,int flush)
 {
     CommandLog("mine",unit,flush,0,0,0,dest,NULL);
     if( NetworkFildes==-1 ) {
@@ -633,8 +665,9 @@ global void SendCommandMineGold(Unit* unit,Unit* dest)
 **
 **	@param unit	pointer to unit.
 **	@param dest	pointer to destination (oil-platform).
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandHaulOil(Unit* unit,Unit* dest)
+global void SendCommandHaulOil(Unit* unit,Unit* dest,int flush)
 {
     CommandLog("haul",unit,flush,0,0,0,dest,NULL);
     if( NetworkFildes==-1 ) {
@@ -648,10 +681,11 @@ global void SendCommandHaulOil(Unit* unit,Unit* dest)
 **	Send command: Unit return goods.
 **
 **	@param unit	pointer to unit.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandReturnGoods(Unit* unit)
+global void SendCommandReturnGoods(Unit* unit,int flush)
 {
-    CommandLog("return",unit,flush,0,0,0,NULL,NULL);
+    CommandLog("return",unit,flush,0,0,0,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
 	CommandReturnGoods(unit,flush);
     } else {
@@ -664,8 +698,9 @@ global void SendCommandReturnGoods(Unit* unit)
 **
 **	@param unit	pointer to unit.
 **	@param what	pointer to unit-type of the unit to be trained.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandTrainUnit(Unit* unit,UnitType* what)
+global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
 {
     CommandLog("train",unit,flush,0,0,0,NULL,what->Ident);
     if( NetworkFildes==-1 ) {
@@ -680,13 +715,13 @@ global void SendCommandTrainUnit(Unit* unit,UnitType* what)
 **
 **	@param unit	pointer to unit.
 */
-global void SendCommandCancelTraining(Unit* unit)
+global void SendCommandCancelTraining(Unit* unit,int slot)
 {
-    CommandLog("cancel-train",unit,flush,0,0,0,NULL,NULL);
+    CommandLog("cancel-train",unit,1,2,slot,0,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
-	CommandCancelTraining(unit);
+	CommandCancelTraining(unit,slot);
     } else {
-	NetworkSendCommand(MessageCommandCancelTrain,unit,0,0,NoUnitP,0,0);
+	NetworkSendCommand(MessageCommandCancelTrain,unit,slot,0,NoUnitP,0,1);
     }
 }
 
@@ -695,8 +730,9 @@ global void SendCommandCancelTraining(Unit* unit)
 **
 **	@param unit	pointer to unit.
 **	@param what	pointer to unit-type of the unit upgrade.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandUpgradeTo(Unit* unit,UnitType* what)
+global void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 {
     CommandLog("upgrade-to",unit,flush,0,0,0,NULL,what->Ident);
     if( NetworkFildes==-1 ) {
@@ -713,12 +749,12 @@ global void SendCommandUpgradeTo(Unit* unit,UnitType* what)
 */
 global void SendCommandCancelUpgradeTo(Unit* unit)
 {
-    CommandLog("cancel-upgrade-to",unit,flush,0,0,0,NULL,NULL);
+    CommandLog("cancel-upgrade-to",unit,1,0,0,0,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
-	CommandCancelUpgradeTo(unit,flush);
+	CommandCancelUpgradeTo(unit);
     } else {
 	NetworkSendCommand(MessageCommandCancelUpgrade,unit
-		,0,0,NoUnitP,NULL,flush);
+		,0,0,NoUnitP,NULL,1);
     }
 }
 
@@ -727,14 +763,16 @@ global void SendCommandCancelUpgradeTo(Unit* unit)
 **
 **	@param unit	pointer to unit.
 **	@param what	research-type of the research.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandResearch(Unit* unit,int what)
+global void SendCommandResearch(Unit* unit,Upgrade* what,int flush)
 {
-    CommandLog("research",unit,flush,0,0,0,NULL,Upgrades[what].Ident);
+    CommandLog("research",unit,flush,0,0,0,NULL,what->Ident);
     if( NetworkFildes==-1 ) {
 	CommandResearch(unit,what,flush);
     } else {
-	NetworkSendCommand(MessageCommandResearch,unit,what,0,NoUnitP,0,flush);
+	NetworkSendCommand(MessageCommandResearch,unit
+		,what-Upgrades,0,NoUnitP,0,flush);
     }
 }
 
@@ -745,12 +783,12 @@ global void SendCommandResearch(Unit* unit,int what)
 */
 global void SendCommandCancelResearch(Unit* unit)
 {
-    CommandLog("cancel-research",unit,flush,0,0,0,NULL,NULL);
+    CommandLog("cancel-research",unit,1,0,0,0,NoUnitP,NULL);
     if( NetworkFildes==-1 ) {
-	CommandCancelResearch(unit,flush);
+	CommandCancelResearch(unit);
     } else {
 	NetworkSendCommand(MessageCommandCancelResearch,unit
-		,0,0,NoUnitP,0,flush);
+		,0,0,NoUnitP,0,1);
     }
 }
 
@@ -761,8 +799,9 @@ global void SendCommandCancelResearch(Unit* unit)
 **	@param x	X map tile position where to demolish.
 **	@param y	Y map tile position where to demolish.
 **	@param attack	or !=NoUnitP unit to be demolished.
+**	@param flush	Flag flush all pending commands.
 */
-global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack)
+global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
 {
     CommandLog("demolish",unit,flush,1,x,y,attack,NULL);
     if( NetworkFildes==-1 ) {
@@ -959,7 +998,7 @@ local Unit* NetworkValidUnit(int nr,int id)
 /**
 **	Parse network commands.
 **
-**	@param messge	Client unit command message.
+**	@param message	Client unit command message.
 **
 **	We must validate, if the command is still possible!
 */
@@ -972,20 +1011,20 @@ local void ParseNetworkCommand(Message* message)
     unit=NetworkValidUnit(message->Data.Command.UnitNr
 	     ,message->Data.Command.UnitId);
     if( !unit ) {
-	return;
+	return;				// not a valid unit, drop command
     }
 	    
     status = ntohl(message->Status);		// FIXME: little much memory
 
     switch( ntohl(message->Command) ) {
 	case MessageCommandStop:
-	    CommandStopUnit(unit,status);
+	    CommandStopUnit(unit);
 	    break;
 	case MessageCommandStand:
 	    CommandStandGround(unit,status);
 	    break;
 	case MessageCommandMove:
-	    CommandMoveUnit(unit
+	    CommandMove(unit
 		    ,ntohl(message->Data.Command.X)
 		    ,ntohl(message->Data.Command.Y)
 		    ,status
@@ -1056,7 +1095,7 @@ local void ParseNetworkCommand(Message* message)
 		);
 	    break;
 	case MessageCommandCancelBuild:
-	    // dest is the peon building the unit...
+	    // dest is the worker building the unit...
 	    dest=NoUnitP;
 	    if( message->Data.Command.DestNr!=htonl(-1) ) {
 		dest=NetworkValidUnit(message->Data.Command.DestNr
@@ -1106,19 +1145,17 @@ local void ParseNetworkCommand(Message* message)
 		);
 	    break;
 	case MessageCommandCancelTrain:
-	    CommandCancelTraining(unit);
+	    // FIXME: cancel slot?
+	    CommandCancelTraining(unit,0);
 	    break;
  	case MessageCommandUpgrade:
 	    CommandUpgradeTo(
 		    unit,UnitTypes+ntohl(message->Data.Command.TypeNr)
-		    ,status
-		);
+		    ,status);
 	    break;
  	case MessageCommandResearch:
 	    CommandResearch(
-		    unit,ntohl(message->Data.Command.X)
-		    ,status
-		);
+		    unit,&Upgrades[ntohl(message->Data.Command.X)],status);
 	    break;
 	case MessageCommandDemolish:
 	    dest=NoUnitP;
@@ -1329,5 +1366,16 @@ global void NetworkSendCommand(int command,Unit* unit,int x,int y
 
     ChannelWrite(NetworkServer,&message,sizeof(message));
 }
+
+/**
+**	Get all network commands.
+*/
+global void NetworkCommands(void)
+{
+    // FIXME: noop now
+    // FIXME: NetworkEvent should place the commands in a loop
+}
+
+#endif	// } !NEW_NETWORK
 
 //@}
