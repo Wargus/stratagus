@@ -2994,7 +2994,7 @@ global void GameMenuLoad(void)
     LoadGameMenuItems[3].flags = MenuButtonDisabled;	/* Load button! */
     ProcessMenu(MENU_LOAD_GAME, 1);
     if( GameLoaded ) {
-	EndMenu();
+	GameMenuReturn();
     }
 }
 
