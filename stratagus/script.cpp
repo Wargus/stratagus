@@ -898,6 +898,7 @@ global void SavePreferences(void)
     } else {
 	fprintf(fd,"(sound-off)\n");
     }
+#ifdef WITH_SOUND
     fprintf(fd,"(set-sound-volume! %d)\n", GlobalVolume);
     if( !MusicOff ) {
 	fprintf(fd,"(music-on)\n");
@@ -907,6 +908,7 @@ global void SavePreferences(void)
     fprintf(fd,"(set-music-volume! %d)\n", MusicVolume);
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     fprintf(fd,"(set-cd-mode! \"%s\")\n", CDMode);
+#endif
 #endif
 
     fclose(fd);
