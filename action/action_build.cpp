@@ -197,7 +197,7 @@ global void HandleActionBuild(Unit* unit)
 	DebugCheck( !temp );
 	unit->Value=temp->Value;	// Let peon hold value while building
 	// oil patch should NOT make sound, handled by destroy unit
-	DestroyUnit(temp);		// Destroy oil patch
+	LetUnitDie(temp);		// Destroy oil patch
     }
 
     RemoveUnit(unit);	/* automaticly: CheckUnitToBeDrawn(unit) */
@@ -241,7 +241,7 @@ global void HandleActionBuilded(Unit* unit)
 	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
 		CancelBuildingCostsFactor);
 	// Cancel building
-	DestroyUnit(unit);
+	LetUnitDie(unit);
 	return;
     }
 
