@@ -409,11 +409,11 @@ int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	missile->Damage = action->Data.SpawnMissile.Damage;
 	if (missile->Damage != 0) {
 		missile->SourceUnit = caster;
+		RefsIncrease(caster);
 	}
 	if ((missile->TargetUnit = target)) {
 		RefsIncrease(target);
 	}
-	RefsIncrease(caster);
 	return 1;
 }
 
@@ -1149,8 +1149,9 @@ int AutoCastSpell(Unit* caster, const SpellType* spell)
 int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	int x, int y)
 {
-	int cont;
-	SpellActionType* act;
+	int cont;             // Should we recast the spell.
+	SpellActionType* act; // action to do.
+	int mustSubtractMana; // false if action which have their own calculation is present.
 
 	caster->Invisible = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
@@ -1170,19 +1171,23 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	if (CanCastSpell(caster, spell, target, x, y)) {
 		act = spell->Action;
 		cont = 1;
+		mustSubtractMana = 1;
 		//
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
-		if (act->CastFunction != CastAdjustVitals &&
-				act->CastFunction != CastPolymorph &&
-				act->CastFunction != CastSummon) {
-			caster->Mana -= spell->ManaCost;
-		}
 		PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 		while (act) {
 			Assert(act->CastFunction);
+			if (act->CastFunction == CastAdjustVitals ||
+					act->CastFunction == CastPolymorph ||
+					act->CastFunction == CastSummon) {
+				mustSubtractMana = 0;
+			}
 			cont = cont & act->CastFunction(caster, spell, act, target, x, y);
 			act = act->Next;
+		}
+		if (mustSubtractMana) {
+			caster->Mana -= spell->ManaCost;
 		}
 		//
 		// Spells like blizzard are casted again.
