@@ -54,73 +54,12 @@
 */
 global const char CursorTypeType[] = "cursor-type";
 
-#ifndef USE_CCL
-
-/**
-**	Define default cursor-types.
-*/
-global CursorType DefaultCursors[] = {
-#ifdef NEW_NAMES
-    { CursorTypeType,	"cursor-point",		"human",
-	"ui/human/cursors/human gauntlet.png",	 3, 2,	28,32 },
-    { CursorTypeType,	"cursor-point",		"orc",
-	"ui/orc/cursors/orcish claw.png",	 3, 2,	26,32 },
-    { NULL }
-#else
-    { CursorTypeType,	"cursor-point",		"human",
-	"human gauntlet.png",			 3, 2,	28,32 },
-    { CursorTypeType,	"cursor-point",		"orc",
-	"orcish claw.png",			 3, 2,	26,32 },
-    { CursorTypeType,	"cursor-glass",		NULL,
-	"magnifying glass.png",			11,11,	34,35 },
-    { CursorTypeType,	"cursor-cross",		NULL,
-	"small green cross.png",		 8, 8,	18,18 },
-    { CursorTypeType,	"cursor-yellow-hair",	"human",
-	"yellow eagle.png",			15,15,	32,32 },
-    { CursorTypeType,	"cursor-yellow-hair",	"orc",
-	"yellow crosshairs.png",		15,15,	32,32 },
-    { CursorTypeType,	"cursor-green-hair",	"human",
-	"green eagle.png",			15,15,	32,32 },
-    { CursorTypeType,	"cursor-green-hair",	"orc",
-	"green crosshairs.png",			15,15,	32,32 },
-    { CursorTypeType,	"cursor-red-hair",	"human",
-	"red eagle.png",			15,15,	32,32 },
-    { CursorTypeType,	"cursor-red-hair",	"orc",
-	"red crosshairs.png",			15,15,	32,32 },
-    { CursorTypeType,	"cursor-scroll",	NULL,
-	"cross.png",				15,15,	32,32 },
-    { CursorTypeType,	"cursor-arrow-e",	NULL,
-	"arrow E.png",				22,10,	32,24 },
-    { CursorTypeType,	"cursor-arrow-ne",	NULL,
-	"arrow NE.png",				20, 2,	32,24 },
-    { CursorTypeType,	"cursor-arrow-n",	NULL,
-	"arrow N.png",				12, 2,	32,24 },
-    { CursorTypeType,	"cursor-arrow-nw",	NULL,
-	"arrow NW.png",				 2, 2,	32,24 },
-    { CursorTypeType,	"cursor-arrow-w",	NULL,
-	"arrow W.png",				 4,10,	32,24 },
-    { CursorTypeType,	"cursor-arrow-s",	NULL,
-	"arrow S.png",				12,22,	32,24 },
-    { CursorTypeType,	"cursor-arrow-sw",	NULL,
-	"arrow SW.png",				 2,18,	32,24 },
-    { CursorTypeType,	"cursor-arrow-se",	NULL,
-	"arrow SE.png",				20,18,	32,24 },
-    { NULL }
-#endif
-};
-
-#endif
-
 /**
 **	Define cursor-types.
 **
 **	@todo FIXME: Should this be move to ui part?
 */
-global CursorType* Cursors
-#ifndef USE_CCL
-    = DefaultCursors
-#endif
-    ;
+global CursorType* Cursors;
 
 global CursorStates CursorState;/// current cursor state (point,...)
 global int CursorAction;	/// action for selection
@@ -171,7 +110,7 @@ local void (*SaveCursorRectangle)(int x,int y,int w,int h);
 **	@param x	Screen X pixels coordinate.
 **	@param y	Screen Y pixels coordinate.
 **	@param w	Width in pixels.
-** 	@param h	Height in pixels.
+**	@param h	Height in pixels.
 **
 **	@note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
 */
@@ -206,7 +145,6 @@ global void LoadCursors(const char* race)
 	//
 	//	Only load cursors of this race or universal cursors.
 	//
-	DebugLevel0Fn("%s , %s\n",Cursors[i].Race,race);
 	if( Cursors[i].Race && strcmp(Cursors[i].Race,race) ) {
 	    continue;
 	}
