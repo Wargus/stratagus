@@ -26,6 +26,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include "freecraft.h"
 
@@ -69,7 +73,6 @@
 
 #include "sound_server.h"
 #include "sound.h"
-#include "wav.h"
 #include "ccl.h"
 
 #ifdef USE_LIBMODPLUG
@@ -86,11 +89,14 @@
 #include "etlib/hash.h"
 #endif
 
-#include "myendian.h"
-
 #ifdef USE_SDLCD
 #include <SDL.h>
 #endif
+
+extern Sample* LoadFlac(const char* name);	/// Load a flac file
+extern Sample* LoadWav(const char* name);	/// Load a wav file
+extern Sample* LoadOgg(const char* name);	/// Load a ogg file
+extern Sample* LoadMp3(const char* name);	/// Load a mp3 file
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -250,15 +256,6 @@ global void PlayMusic(const char* name)
     }
 #endif
 
-
-    if( PlayingMusic ) {
-	if( ModFile ) {
-	    ModPlug_Unload(ModFile);
-	    ModFile=NULL;
-	}
-	PlayingMusic=0;
-    }
-
     buffer=malloc(8192);
     name=LibraryFileName(name,buffer);
 
@@ -277,6 +274,8 @@ global void PlayMusic(const char* name)
     size+=i;
     buffer=realloc(buffer,size);
     DebugLevel0Fn("%d\n",size);
+
+    StopMusic();			// stop music before new music
 
     ModFile=ModPlug_Load(buffer,size);
 
@@ -401,178 +400,9 @@ global void CDRomCheck(void)
 #endif
 }
 
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**	Load wav.
-**
-**	@param name	File name.
-**
-**	@return		Returns the loaded sample.
-*/
-global Sample* LoadWav(const char* name)
-{
-    CLFile* f;
-    WavChunk chunk;
-    WavFMT wavfmt;
-    unsigned long t;
-    int i;
-    Sample* sample;
-
-    DebugLevel3("Loading `%s'\n",name);
-
-    if( !(f=CLopen(name)) ) {
-	printf("Can't open file `%s'\n",name);
-	return NULL;
-    }
-    CLread(f,&chunk,sizeof(chunk));
-
-    // Convert to native format
-
-    chunk.Magic = ConvertLE32(chunk.Magic);
-    chunk.Length = ConvertLE32(chunk.Length);
-
-    DebugLevel3("Magic: $%x\n",chunk.Magic);
-    DebugLevel3("Length: %d\n",chunk.Length);
-    if( chunk.Magic!=RIFF ) {
-	printf("Wrong magic %x (not %x)\n",chunk.Magic,RIFF);
-	CLclose(f);
-	return NULL;
-    }
-
-    CLread(f,&t,sizeof(t));
-    t = ConvertLE32(t);
-    DebugLevel3("Magic: $%lx\n",t);
-    if( t!=WAVE ) {
-	printf("Wrong magic %lx (not %x)\n",t,WAVE);
-	CLclose(f);
-	exit(-1);
-    }
-
-    CLread(f,&wavfmt,sizeof(wavfmt));
-
-    // Convert to native format
-
-    wavfmt.FMTchunk	= ConvertLE32(wavfmt.FMTchunk);
-    wavfmt.FMTlength	= ConvertLE32(wavfmt.FMTlength);
-    wavfmt.Encoding	= ConvertLE16(wavfmt.Encoding);
-    wavfmt.Channels	= ConvertLE16(wavfmt.Channels);
-    wavfmt.Frequency	= ConvertLE32(wavfmt.Frequency);
-    wavfmt.ByteRate	= ConvertLE32(wavfmt.ByteRate);
-    wavfmt.SampleSize	= ConvertLE16(wavfmt.SampleSize);
-    wavfmt.BitsPerSample= ConvertLE16(wavfmt.BitsPerSample);
-
-    DebugLevel3("Magic: $%x\n",wavfmt.FMTchunk);
-    DebugLevel3("Length: %d\n",wavfmt.FMTlength);
-    if( wavfmt.FMTchunk!=FMT ) {
-	printf("Wrong magic %x (not %x)\n",wavfmt.FMTchunk,FMT);
-	CLclose(f);
-	exit(-1);
-    }
-    if( wavfmt.FMTlength!=16 && wavfmt.FMTlength!=18 ) {
-	DebugLevel2("Encoding\t%d\t",wavfmt.Encoding);
-	DebugLevel2("Channels\t%d\t",wavfmt.Channels);
-	DebugLevel2("Frequency\t%d\n",wavfmt.Frequency);
-	DebugLevel2("Byterate\t%d\t",wavfmt.ByteRate);
-	DebugLevel2("SampleSize\t%d\t",wavfmt.SampleSize);
-	DebugLevel2("BitsPerSample\t%d\n",wavfmt.BitsPerSample);
-
-	printf("Wrong length %d (not %d)\n",wavfmt.FMTlength,16);
-	CLclose(f);
-	exit(-1);
-    }
-
-    if( wavfmt.FMTlength==18 ) {
-	if( CLread(f,&chunk,2)!=2 ) {
-	    abort();
-	}
-    }
-    DebugLevel3("Encoding\t%d\t",wavfmt.Encoding);
-    DebugLevel3("Channels\t%d\t",wavfmt.Channels);
-    DebugLevel3("Frequency\t%d\n",wavfmt.Frequency);
-    DebugLevel3("Byterate\t%d\t",wavfmt.ByteRate);
-    DebugLevel3("SampleSize\t%d\t",wavfmt.SampleSize);
-    DebugLevel3("BitsPerSample\t%d\n",wavfmt.BitsPerSample);
-
-    //
-    //	Check if supported
-    //
-    if( wavfmt.Encoding!=WAV_PCM_CODE ) {
-	printf("Unsupported encoding %d\n",wavfmt.Encoding);
-	CLclose(f);
-	exit(-1);
-    }
-    if( wavfmt.Channels!=WAV_MONO && wavfmt.Channels!=WAV_STEREO ) {
-	printf("Unsupported channels %d\n",wavfmt.Channels);
-	CLclose(f);
-	exit(-1);
-    }
-    if( wavfmt.SampleSize!=1 && wavfmt.SampleSize!=2 ) {
-	printf("Unsupported sample size %d\n",wavfmt.SampleSize);
-	CLclose(f);
-	exit(-1);
-    }
-    if( wavfmt.BitsPerSample!=8 && wavfmt.BitsPerSample!=16 ) {
-	printf("Unsupported bits per sample %d\n",wavfmt.BitsPerSample);
-	CLclose(f);
-	exit(-1);
-    }
-
-    // FIXME: should check it more. Sample frequence
-
-    //
-    //	Read sample
-    //
-    sample=malloc(sizeof(*sample));
-    sample->Channels=wavfmt.Channels;
-    sample->SampleSize=wavfmt.SampleSize*8;
-    sample->Frequency=wavfmt.Frequency;
-    sample->Length=0;
-    for( ;; ) {
-	if( (i=CLread(f,&chunk,sizeof(chunk)))!=sizeof(chunk) ) {
-	    // FIXME: have 1 byte remaining, wrong wav or wrong code?
-	    // if( i ) printf("Rest: %d\n",i);
-	    break;
-	}
-	chunk.Magic = ConvertLE32(chunk.Magic);
-	chunk.Length = ConvertLE32(chunk.Length);
-
-	DebugLevel3("Magic: $%x\n",chunk.Magic);
-	DebugLevel3("Length: %d\n",chunk.Length);
-	if( chunk.Magic!=DATA ) {
-	    // FIXME: cleanup the wav files, remove this junk, and don't support
-	    // FIXME: this!!
-	    DebugLevel3("Wrong magic %x (not %x)\n",chunk.Magic,DATA);
-	    DebugLevel3("Junk at end of file\n");
-	    break;
-	}
-
-	i=chunk.Length;
-	sample=realloc(sample,sizeof(*sample)+sample->Length+i);
-	if( !sample ) {
-	    printf("Out of memory!\n");
-	    CLclose(f);
-	    exit(-1);
-	}
-
-	if( CLread(f,sample->Data+sample->Length,i)!=i ) {
-	    printf("Unexpected end of file!\n");
-	    CLclose(f);
-	    free(sample);
-	    exit(-1);
-	}
-	sample->Length+=i;
-    }
-
-    CLclose(f);
-
-    IfDebug( AllocatedSoundMemory+=sample->Length; );
-
-    return sample;
-}
 
 /**
 **	Mix sample to buffer.
@@ -587,6 +417,8 @@ global Sample* LoadWav(const char* name)
 **	@param size	Size of the output buffer to be filled
 **	
 **	@return		the number of bytes used to fill buffer
+**
+**	@todo		Can mix faster if signed 8 bit buffers are used.
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 			      int* buffer,int size)
@@ -694,7 +526,7 @@ SelectionHandling SelectionHandler={{NULL,0},NULL,0};
 #ifdef USE_GLIB
 local GHashTable* UnitToChannel;
 #else
-//local hashtable(int,61) UnitToChannel;
+local hashtable(int,61) UnitToChannel;
 #endif
 
 
@@ -740,12 +572,14 @@ local int KeepRequest(SoundRequest* sr) {
     }
 #else
     {
-	SoundChannel *theChannel=Channels;
+	const SoundChannel *theChannel;
+
 	// slow but working solution: we look for the source in the channels
+	theChannel=Channels;
 	for(channel=0;channel<MaxChannels;channel++) {
 	    if ((*theChannel).Command == ChannelPlay
-		&& (*theChannel).Source.Base==sr->Source.Base
-		&& (*theChannel).Source.Id==sr->Source.Id) {
+		    && (*theChannel).Source.Base==sr->Source.Base
+		    && (*theChannel).Source.Id==sr->Source.Id) {
 		//FIXME: decision should take into account the sound
 		return 0;
 	    }
@@ -965,7 +799,8 @@ local int FillOneChannel(SoundRequest* sr)
 ** care of registering sound sources.
 //FIXME: is this the correct place to do this?
 */
-local void FillChannels(int free_channels,int* discarded,int* started) {
+local void FillChannels(int free_channels,int* discarded,int* started)
+{
     int channel;
     SoundRequest* sr;
 
@@ -994,8 +829,9 @@ local void FillChannels(int free_channels,int* discarded,int* started) {
 	  NextSoundRequestOut++;
 	  (*discarded)++;
 	}
-	if(NextSoundRequestOut>=MAX_SOUND_REQUESTS)
+	if(NextSoundRequestOut>=MAX_SOUND_REQUESTS) {
 	    NextSoundRequestOut=0;
+	}
 	sr=SoundRequests+NextSoundRequestOut;
     }
 }
@@ -1102,6 +938,11 @@ local Sample* LoadSample(const char* name)
     char* buf;
 
     buf = strdcat3(FreeCraftLibPath, "/sounds/", name);
+#ifdef USE_FLAC
+    if( (sample=LoadFlac(buf)) ) {
+	return sample;
+    }
+#endif
     if( !(sample=LoadWav(buf)) ) {
 	fprintf(stderr,"Can't load the sound `%s'\n",name);
     }
@@ -1121,10 +962,11 @@ local Sample* LoadSample(const char* name)
 **	@return		the sound unique identifier
 **
 **	@todo	FIXME: Must handle the errors better.
+**		FIXME: Support for more sample files (ogg/flac/mp3).
 */
-global SoundId RegisterSound(char *files[], unsigned char number)
+global SoundId RegisterSound(char *files[], unsigned number)
 {
-    int i;
+    unsigned i;
     ServerSoundId id;
 
     id = malloc(sizeof(*id));
@@ -1133,7 +975,7 @@ global SoundId RegisterSound(char *files[], unsigned char number)
 	for (i = 0; i < number; i++) {
 	    DebugLevel3("Registering `%s'\n", files[i]);
 	    id->Sound.OneGroup[i] = LoadSample(files[i]);
-	    if ( !id->Sound.OneGroup[i] ) {
+	    if (!id->Sound.OneGroup[i]) {
 		free(id->Sound.OneGroup);
 		free(id);
 		return NO_SOUND;
@@ -1143,7 +985,7 @@ global SoundId RegisterSound(char *files[], unsigned char number)
     } else {				// load an unique sound
 	DebugLevel3("Registering `%s'\n", files[0]);
 	id->Sound.OneSound = LoadSample(files[0]);
-	if ( !id->Sound.OneSound ) {
+	if (!id->Sound.OneSound) {
 	    free(id);
 	    return NO_SOUND;
 	}
@@ -1153,22 +995,28 @@ global SoundId RegisterSound(char *files[], unsigned char number)
     return (SoundId) id;
 }
 
-/*
-** Create a special sound group with two sounds
+/**
+** 	Ask the sound server to put together two sounds to form a special sound.
+**
+**	@param first	first part of the group
+**	@param second	second part of the group
+**
+**	@return		the special sound unique identifier
 */
-global SoundId RegisterTwoGroups(SoundId first,SoundId second) {
+global SoundId RegisterTwoGroups(SoundId first, SoundId second)
+{
     ServerSoundId id;
 
-    if(first == NO_SOUND || second == NO_SOUND) {
+    if (first == NO_SOUND || second == NO_SOUND) {
 	return NO_SOUND;
     }
-    id=(ServerSoundId)malloc(sizeof(*id));
-    id->Number=TWO_GROUPS;
-    id->Sound.TwoGroups=(TwoGroups*)malloc(sizeof(TwoGroups));
-    id->Sound.TwoGroups->First=first;
-    id->Sound.TwoGroups->Second=second;
-    id->Range=MAX_SOUND_RANGE;
-    return (SoundId)id;
+    id = (ServerSoundId) malloc(sizeof(*id));
+    id->Number = TWO_GROUPS;
+    id->Sound.TwoGroups = (TwoGroups *) malloc(sizeof(TwoGroups));
+    id->Sound.TwoGroups->First = first;
+    id->Sound.TwoGroups->Second = second;
+    id->Range = MAX_SOUND_RANGE;
+    return (SoundId) id;
 }
 
 /*
@@ -1181,23 +1029,57 @@ global void SetSoundRange(SoundId sound,unsigned char range) {
     }
 }
 
+/**
+**	Mix into buffer.
+**
+**	@param buffer	Buffer to be filled with samples. Buffer must be big
+**			enough.
+**	@param samples	Number of samples.
+*/
+global void MixIntoBuffer(void* buffer,int samples)
+{
+    int* mixer_buffer;
+    int free_channels;
+    int dummy1;
+    int dummy2;
+
+    free_channels=HowManyFree();
+    FillChannels(free_channels,&dummy1,&dummy2);
+
+    // Create empty mixer buffer
+    mixer_buffer=alloca(samples*sizeof(*mixer_buffer));
+    // FIXME: can save the memset here, if first channel sets the values
+    memset(mixer_buffer,0,samples*sizeof(*mixer_buffer));
+
+    // Add channels to mixer buffer
+    MixChannelsToStereo32(mixer_buffer,samples);
+    // Add music to mixer buffer
+    MixMusicToStereo32(mixer_buffer,samples);
+
+#if SoundSampleSize==8
+    ClipMixToStereo8(mixer_buffer,samples,buffer);
+#endif
+#if SoundSampleSize==16
+    ClipMixToStereo16(mixer_buffer,samples,buffer);
+#endif
+}
+
 #ifndef USE_SDLA
 /**
 **	Write buffer to sound card.
 */
 global void WriteSound(void)
 {
-    int mixer_buffer[1024];
 #if SoundSampleSize==8
     char buffer[1024];
 #endif
 #if SoundSampleSize==16
     short buffer[1024];
 #endif
-    int free_channels,dummy1,dummy2;
 
     // ARI: If DSP open had failed: No soundcard, other user, etc..
     if (SoundFildes == -1) {
+	DebugLevel0Fn("Shouldn't be reached\n");
 	return;
     }
 
@@ -1207,23 +1089,13 @@ global void WriteSound(void)
 	audio_buf_info info;
 
 	ioctl(SoundFildes,SNDCTL_DSP_GETOSPACE,&info);
-	DebugLevel0("Free bytes %d\n",info.bytes);
+	DebugLevel0("%d Free bytes %d\n",FrameCounter,info.bytes);
+	if( info.bytes<sizeof(buffer) ) {
+	    return;
+	}
     }
 
-    free_channels=HowManyFree();
-    FillChannels(free_channels,&dummy1,&dummy2);
-
-    memset(mixer_buffer,0,sizeof(mixer_buffer));
-
-    MixChannelsToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
-    MixMusicToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
-
-#if SoundSampleSize==8
-    ClipMixToStereo8(mixer_buffer,sizeof(mixer_buffer)/sizeof(int),buffer);
-#endif
-#if SoundSampleSize==16
-    ClipMixToStereo16(mixer_buffer,sizeof(mixer_buffer)/sizeof(int),buffer);
-#endif
+    MixIntoBuffer(buffer,sizeof(buffer)/sizeof(*buffer));
 
     while( write(SoundFildes,buffer,sizeof(buffer))==-1 ) {
 	switch( errno ) {
@@ -1252,32 +1124,14 @@ global void WriteSound(void)
 **	@param stream	pointer to buffer you want to fill with information.
 **	@param len	is length of audio buffer in bytes.
 */
-local void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
+global void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
 {
-    int* mixer_buffer;
-    int dummy1,dummy2;
-
 #if SoundSampleSize==16
     len>>=1;
 #endif
-
-    mixer_buffer=alloca(len*sizeof(*mixer_buffer));
     DebugLevel3Fn("%d\n",len);
 
-    FillChannels(HowManyFree(),&dummy1,&dummy2);
-
-    // FIXME: can save the memset here, if one channel sets the values
-    memset(mixer_buffer,0,sizeof(*mixer_buffer)*len);
-    MixChannelsToStereo32(mixer_buffer,len);
-    MixMusicToStereo32(mixer_buffer,len);
-
-#if SoundSampleSize==8
-    ClipMixToStereo8(mixer_buffer,len,stream);
-#endif
-#if SoundSampleSize==16
-    ClipMixToStereo16(mixer_buffer,len,(short*)stream);
-#endif
-
+    MixIntoBuffer(stream,len);
 }
 #endif	// } USE_SDLA
 
@@ -1303,57 +1157,63 @@ global void WriteSoundThreaded(void)
 
     DebugLevel3Fn("\n");
 
-    free_channels=MaxChannels;
-    how_many_playing=0;
+    free_channels = MaxChannels;
+    how_many_playing = 0;
     // wait for the first sound to come
     sem_wait(&SoundThreadChannelSemaphore);
-    for(;;) {
-      if( 0 ) {
-	audio_buf_info info;
+    for (;;) {
+	if (0) {
+	    audio_buf_info info;
 
-	ioctl(SoundFildes,SNDCTL_DSP_GETOSPACE,&info);
-	DebugLevel0("Free bytes %d\n",info.bytes);
-      }
-      FillChannels(free_channels,&discarded_request,&started_request);
-      how_many_playing+=started_request;
-      new_free_channels=0;
-      if ( how_many_playing ) {
+	    ioctl(SoundFildes, SNDCTL_DSP_GETOSPACE, &info);
+	    DebugLevel0("Free bytes %d\n", info.bytes);
+	}
+	FillChannels(free_channels, &discarded_request, &started_request);
+	how_many_playing += started_request;
+	new_free_channels = 0;
+	if (how_many_playing || PlayingMusic) {
 
-	memset(mixer_buffer,0,sizeof(mixer_buffer));
+	    memset(mixer_buffer, 0, sizeof(mixer_buffer));
 
-	new_free_channels=MixChannelsToStereo32(mixer_buffer,
-		sizeof(mixer_buffer)/sizeof(int));
-	MixMusicToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
+	    if (how_many_playing) {
+		new_free_channels = MixChannelsToStereo32(mixer_buffer,
+			sizeof(mixer_buffer) / sizeof(int));
+	    }
+	    MixMusicToStereo32(mixer_buffer,
+		sizeof(mixer_buffer) / sizeof(int));
 
 #if SoundSampleSize==8
-	ClipMixToStereo8(mixer_buffer,sizeof(mixer_buffer)/sizeof(int),buffer);
+	    ClipMixToStereo8(mixer_buffer, sizeof(mixer_buffer) / sizeof(int),
+		buffer);
 #endif
 #if SoundSampleSize==16
-	ClipMixToStereo16(mixer_buffer,sizeof(mixer_buffer)/sizeof(int),buffer);
+	    ClipMixToStereo16(mixer_buffer, sizeof(mixer_buffer) / sizeof(int),
+		buffer);
 #endif
 
-	while( write(SoundFildes,buffer,sizeof(buffer))==-1 ) {
-	    switch( errno ) {
-	    case EAGAIN:
-	    case EINTR:
-		continue;
+	    while (write(SoundFildes, buffer, sizeof(buffer)) == -1) {
+		switch (errno) {
+		    case EAGAIN:
+		    case EINTR:
+			continue;
+		}
+		perror("write");
+		break;
 	    }
-	    perror("write");
-	    break;
+	    how_many_playing -= new_free_channels;
 	}
-	how_many_playing-=new_free_channels;
-      }
-      free_channels=MaxChannels-how_many_playing;
-      DebugLevel3("Channels: %d %d %d\n",free_channels,how_many_playing,new_free_channels);
-      new_free_channels+=discarded_request;
-      // decrement semaphore by the number of stopped channels
-      for(;new_free_channels>0;new_free_channels--) {
-	  //	    sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
-	  //	    DebugLevel3("SoundSemaphore: %d\n",tmp);
-	  sem_wait(&SoundThreadChannelSemaphore);
-	  //	    sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
-	  //	    DebugLevel3("SoundSemaphore: %d\n",tmp);
-      }
+	free_channels = MaxChannels - how_many_playing;
+	DebugLevel3("Channels: %d %d %d\n", free_channels, how_many_playing,
+	    new_free_channels);
+	new_free_channels += discarded_request;
+	// decrement semaphore by the number of stopped channels
+	for (; new_free_channels > 0; new_free_channels--) {
+	    //        sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
+	    //        DebugLevel3("SoundSemaphore: %d\n",tmp);
+	    sem_wait(&SoundThreadChannelSemaphore);
+	    //        sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
+	    //        DebugLevel3("SoundSemaphore: %d\n",tmp);
+	}
     }
 }
 
@@ -1367,97 +1227,25 @@ global int InitSound(void)
     int dummy;
 
 #ifdef USE_SDLA
-    {
-    SDL_AudioSpec wanted;
-
-    wanted.freq=SoundFrequency;
-    if( SoundSampleSize==8 ) {
-	wanted.format=AUDIO_U8;
-    } else if( SoundSampleSize==16 ) {
-	wanted.format=AUDIO_S16;
-    }
-    wanted.channels=2;
-#if SoundSampleSize==8
-    wanted.samples=2048;
-#endif
-#if SoundSampleSize==16
-    wanted.samples=2048;
-#endif
-    wanted.callback=FillAudio;
-    wanted.userdata=NULL;
-    //	Open the audio device, forcing the desired format
-    if ( SDL_OpenAudio(&wanted, NULL) < 0 ) {
-	fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-	return -1;
-    }
-    SoundFildes=0;
-    SDL_PauseAudio(0);
+    //
+    //	Open sound device, 8bit samples, stereo.
+    //
+    if( InitSdlSound(SoundDeviceName,SoundFrequency,SoundSampleSize,
+	    WaitForSoundDevice) ) {
+	return 1;
     }
 #else
     //
     //	Open dsp device, 8bit samples, stereo.
     //
-    //SoundFildes=open(SoundDeviceName,O_WRONLY|O_NDELAY);
-    SoundFildes=open(SoundDeviceName,O_WRONLY);
-    if( SoundFildes==-1 ) {
-	printf("Can't open audio device `%s'\n",SoundDeviceName);
+    if( InitOssSound(SoundDeviceName,SoundFrequency,SoundSampleSize,
+	    WaitForSoundDevice) ) {
 	return 1;
     }
-    dummy=SoundSampleSize;
-    if( ioctl(SoundFildes,SNDCTL_DSP_SAMPLESIZE,&dummy)==-1 ) {
-	perror(__FUNCTION__);
-	close(SoundFildes);
-	SoundFildes=-1;
-	return 1;
-    }
-    dummy=1;
-    if( ioctl(SoundFildes,SNDCTL_DSP_STEREO,&dummy)==-1 ) {
-	perror(__FUNCTION__);
-	close(SoundFildes);
-	SoundFildes=-1;
-	return 1;
-    }
-    dummy=SoundFrequency;
-    if( ioctl(SoundFildes,SNDCTL_DSP_SPEED,&dummy)==-1 ) {
-	perror(__FUNCTION__);
-	close(SoundFildes);
-	SoundFildes=-1;
-	return 1;
-    }
-#if SoundSampleSize==8
-    dummy=((8<<16) | 10);	/* 8 Buffers a 1024 Bytes */
-#endif
-#if SoundSampleSize==16
-    dummy=((8<<16) | 11);	/* 8 Buffers a 2048 Bytes */
-#endif
-    // FIXME: higher speed more buffers!!
-    if( ioctl(SoundFildes,SNDCTL_DSP_SETFRAGMENT,&dummy)==-1 ) {
-	perror(__FUNCTION__);
-	close(SoundFildes);
-	SoundFildes=-1;
-	return 1;
-    }
-#if 0
-    dummy=4;
-    if( ioctl(SoundFildes,SNDCTL_DSP_SUBDIVIDE,&dummy)==-1 ) {
-	perror(__FUNCTION__);
-	close(SoundFildes);
-	SoundFildes=-1;
-	return;
-    }
-#endif
-    if( ioctl(SoundFildes,SNDCTL_DSP_GETBLKSIZE,&dummy)==-1 ) {
-	perror(__FUNCTION__);
-	close(SoundFildes);
-	SoundFildes=-1;
-	return 1;
-    }
-
-    DebugLevel3("DSP block size %d\n",dummy);
-    DebugLevel3("DSP sample speed %d\n",SoundFrequency);
 #endif	// USE_SDLA
 
-    // ARI: the following must be done here to allow sound to work in pre-start menus!
+    //	ARI:	The following must be done here to allow sound to work in
+    //		pre-start menus!
     // initialize channels
     for(dummy=0;dummy<MaxChannels; ++dummy) {
 	Channels[dummy].Point=dummy+1;
@@ -1479,7 +1267,7 @@ global int InitSound(void)
 /**
 **	Initialize sound server structures (and thread)
 */
-global int InitSoundServer()
+global int InitSoundServer(void)
 {
     //FIXME: Valid only in shared memory context!
     DistanceSilent=3*max(MapWidth,MapHeight);
@@ -1545,5 +1333,7 @@ global void QuitSound(void)
 }
 
 #endif	// } WITH_SOUND
+
+global int WaitForSoundDevice;		/// Block until sound device available
 
 //@}
