@@ -598,6 +598,8 @@ local void DoNextReplay(void)
 	} else {
 	    HandleCheats(val);
 	}
+    } else if( !strcmp(name,"quit") ) {
+	CommandQuit(posx);
     } else {
 	DebugLevel0Fn("Invalid name: %s" _C_ name);
     }

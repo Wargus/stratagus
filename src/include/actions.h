@@ -69,6 +69,8 @@ extern int BurnBuildingDamageRate;  /// HP per second to damage buildings
 **	by the user the function with Send prefix should be used.
 */
 
+    /// Prepare command quit
+extern void CommandQuit(int player);
     /// Prepare command stop
 extern void CommandStopUnit(Unit* unit);
     /// Prepare command stand ground
