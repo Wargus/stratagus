@@ -65,13 +65,24 @@ unsigned SyncHash; ///< Hash calculated to find sync failures
 ----------------------------------------------------------------------------*/
 
 /**
+**  Rotate a unit
+**
+**  @param unit    Unit to rotate
+**  @param rotate  Number of frames to rotate (>0 clockwise, <0 counterclockwise)
+*/
+static void UnitRotate(Unit* unit, int rotate)
+{
+	unit->Direction += rotate * 256 / unit->Type->NumDirections;
+	UnitUpdateHeading(unit);
+}
+
+/**
 **  Show unit animation.
-**  Returns animation flags.
 **
-**  @param unit       Unit of the animation.
-**  @param animation  Animation script to handle.
+**  @param unit  Unit of the animation.
+**  @param anim  Animation script to handle.
 **
-**  @return           The flags of the current script step.
+**  @return      The flags of the current script step.
 */
 int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 {
@@ -101,7 +112,6 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 	while (!unit->Anim.Wait) {
 		switch (unit->Anim.Anim->Type) {
 			case NewAnimationFrame:
-				// FIXME: plus offset
 				unit->Frame = unit->Anim.Anim->D.Frame.Frame;
 				UnitUpdateHeading(unit);
 				break;
@@ -142,8 +152,14 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				break;
 
 			case NewAnimationRotate:
+				UnitRotate(unit, unit->Anim.Anim->D.Rotate.Rotate);
 				break;
 			case NewAnimationRandomRotate:
+				if ((SyncRand() >> 8) & 1) {
+					UnitRotate(unit, -unit->Anim.Anim->D.Rotate.Rotate);
+				} else {
+					UnitRotate(unit, unit->Anim.Anim->D.Rotate.Rotate);
+				}
 				break;
 
 			case NewAnimationMove:
