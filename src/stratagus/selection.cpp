@@ -1005,7 +1005,6 @@ global void CleanSelections(void)
     NumSelected = 0;
     DebugCheck(NoUnitP);		// Code fails if none zero
     free(Selected);
-    memset(Selected, 0, sizeof(Selected));
 }
 
 // ----------------------------------------------------------------------------
