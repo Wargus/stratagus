@@ -70,6 +70,7 @@
 <a href="#get-stratagus-library-path">get-stratagus-library-path</a>
 <a href="#get-player-resource">get-player-resource</a>
 <a href="#get-this-player">get-this-player</a>
+<a href="#get-unit-mana">get-unit-mana</a>
 <a href="#get-unit-unholy-armor">get-unit-unholy-armor</a>
 <a href="#group">group</a>
 <a href="#kill-unit">kill-unit</a>
@@ -97,6 +98,7 @@
 <a href="#set-player-resource!">set-player-resource!</a>
 <a href="#set-shared-vision!">set-shared-vision!</a>
 <a href="#set-this-player!">set-this-player!</a>
+<a href="#set-unit-mana!">set-unit-mana!</a>
 <a href="#set-unit-unholy-armor!">set-unit-unholy-armor!</a>
 <a href="#show-map-location">show-map-location</a>
 <a href="#shared-vision">shared-vision</a>
@@ -714,6 +716,25 @@ Get the amount of a resource for a certain player.
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
+
+<a name="get-unit-mana"></a>
+<h3>(get-unit-mana unit)</h3>
+
+Get a unit's mana.
+
+
+<dl>
+<dt>unit</dt>
+<dd>Unit to get mana for.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (get-unit-mana unit)
+</pre>
+<h4>Not Used</h4>
 
 <a name="get-unit-unholy-armor"></a>
 <h3>(get-unit-unholy-armor)</h3>
@@ -1340,6 +1361,28 @@ Sets shared vision.
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
+
+<a name="set-unit-mana!"></a>
+<h3>(set-unit-mana! unit amount)</h3>
+
+Set the amount of mana for a unit.
+
+
+<dl>
+<dt>unit</dt>
+<dd>Unit to set the mana for.
+</dd>
+<dt>amount</dt>
+<dd>New amount of mana for the unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (set-unit-mana! unit 255)
+</pre>
+<h4>Not Used</h4>
 
 <a name="set-unit-unholy-armor!"></a>
 <h3>(set-unit-unholy-armor!)</h3>
