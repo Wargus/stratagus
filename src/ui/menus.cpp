@@ -262,6 +262,7 @@ local unsigned char *unsoptions[] = {
     "One Peasant Only",
 };
 
+// FIXME: Must load this from some place.
 local unsigned char *tssoptions[] = {
     "Map Default",
     "Forest",

@@ -104,46 +104,22 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#if !defined(USE_CCL)
+/**
+**	Default without CCL support.
+*/
+local char* DefaultMissileTypeWcNames[] = {
+};
+#endif
+
 /**
 **	W*rCr*ft number to internal missile-type name.
-**
-**	FIXME: Should be made configurable.
 */
-local const char* MissileTypeWcNames[] = {
-    "missile-lightning",
-    "missile-griffon-hammer",
-    "missile-dragon-breath",
-    "missile-fireball",
-    "missile-flame-shield",
-    "missile-blizzard",
-    "missile-death-and-decay",
-    "missile-big-cannon",
-    "missile-exorcism",
-    "missile-heal-effect",
-    "missile-touch-of-death",
-    "missile-rune",
-    "missile-whirlwind",
-    "missile-catapult-rock",
-    "missile-ballista-bolt",
-    "missile-arrow",
-    "missile-axe",
-    "missile-submarine-missile",
-    "missile-turtle-missile",
-    "missile-small-fire",
-    "missile-big-fire",
-    "missile-impact",
-    "missile-normal-spell",
-    "missile-explosion",
-    "missile-small-cannon",
-    "missile-cannon-explosion",
-    "missile-cannon-tower-explosion",
-    "missile-daemon-fire",
-    "missile-green-cross",
-    "missile-blizzard-hit",
-    "missile-death-coil",
-    "missile-custom",
-    "missile-none",
-};
+global char** MissileTypeWcNames
+#if !defined(USE_CCL)
+    =DefaultMissileTypeWcNames
+#endif
+    ;
 
 /**
 **	Missile type type definition

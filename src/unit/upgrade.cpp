@@ -235,10 +235,11 @@ local struct _wc_upgrades_ {
   "" },
 };
 
+#if !defined(USE_CCL)
 /**
-**	W*rCr*ft number to internal upgrade name.
+**	Default without CCL support.
 */
-local const char* UpgradeWcNames[] = {
+local char* DefaultUpgradeWcNames[] = {
     "upgrade-sword1",
     "upgrade-sword2",
     "upgrade-battle-axe1",
@@ -292,6 +293,16 @@ local const char* UpgradeWcNames[] = {
     "upgrade-runes",
     "upgrade-death-and-decay",
 };
+#endif
+
+/**
+**	W*rCr*ft number to internal upgrade name.
+*/
+local char** UpgradeWcNames
+#if !defined(USE_CCL)
+    =DefaultUpgradeWcNames
+#endif
+    ;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -981,6 +992,37 @@ local SCM CclDefineAllow(SCM list)
 }
 
 /**
+**	Define upgrade mapping from original number to internal symbol
+**
+**	@param list	List of all names.
+*/
+local SCM CclDefineUpgradeWcNames(SCM list)
+{
+    int i;
+    char** cp;
+
+    if( (cp=UpgradeWcNames) ) {		// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(UpgradeWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i=gh_length(list);
+    UpgradeWcNames=cp=malloc((i+1)*sizeof(char*));
+    while( i-- ) {
+	*cp++=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+    }
+    *cp=NULL;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for upgrades.
 */
 global void UpgradesCclRegister(void)
@@ -988,6 +1030,8 @@ global void UpgradesCclRegister(void)
     gh_new_procedureN("define-modifier",CclDefineModifier);
     gh_new_procedureN("define-upgrade",CclDefineUpgrade);
     gh_new_procedureN("define-allow",CclDefineAllow);
+
+    gh_new_procedureN("define-upgrade-wc-names",CclDefineUpgradeWcNames);
 }
 
 #endif	// defined(USE_CCL)

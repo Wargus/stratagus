@@ -120,9 +120,14 @@ extern MissileType* MissileTypeSmallFire;	/// Small fire missile type
 extern MissileType* MissileTypeBigFire;		/// Big fire missile type
 extern MissileType* MissileTypeGreenCross;	/// Green cross missile type
 
+extern char** MissileTypeWcNames;	/// Mapping wc-number 2 symbol
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+    /// register ccl features
+extern void MissileCclRegister(void);
 
     /// load the graphics for the missiles
 extern void LoadMissileSprites(void);

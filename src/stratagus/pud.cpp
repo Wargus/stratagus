@@ -401,6 +401,7 @@ global PudInfo* GetPudInfo(const char* pud)
 			t=TilesetSummer;
 			break;
 		}
+		info->MapTerrainName=TilesetWcNames[t];
 		info->MapTerrain=t;
 		continue;
 	    } else {
@@ -832,6 +833,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		} else {
 		    t = GameSettings.Terrain;
 		}
+		map->TerrainName=TilesetWcNames[t];
 		map->Terrain=t;
 		continue;
 	    } else {
