@@ -892,10 +892,14 @@ if [ "$DEBUG" != 1 ] ; then
 fi
 
 
-if [ "x`gcc -v 2>&1 | grep -is 3\.2`" != x ] ; then
+CCVERS=`$CC --version`
+CCMAJOR=`echo $CCVERS | cut -d. -f 1`
+CCMINOR=`echo $CCVERS | cut -d. -f 2`
+if [ $CCMAJOR -gt 3 -o $CCMAJOR -eq 3 -a $CCMINOR -ge 2 ] ; then
 if [ "$DEBUG" != 1 ] ; then
     echo
     echo
+    echo Compiler is $CC $CCMAJOR.$CCMINOR
     echo
     echo "This autoconfiguring program allows you to tell GCC to use different"
     echo "optimizations, based on how stable you want Freecraft. The higher the"
