@@ -179,7 +179,7 @@ global void InitVideoSdl(void)
     SDL_ShowCursor(0);
 
     SDL_LockSurface(Screen);
-    VideoMemory=Screen->pixels;		// Hope this is constant
+    VideoMemory=Screen->pixels;		// This isn't constant!
     SDL_UnlockSurface(Screen);
 
     //
