@@ -53,7 +53,7 @@
 ----------------------------------------------------------------------------*/
 
 local Graphic* MinimapTerrainGraphic;	/// generated minimap terrain
-local Graphic* MinimapGraphic;		/// generated minimap
+local VMemType* MinimapGraphic;		/// generated minimap
 local int* Minimap2MapX;		/// fast conversion table
 local int* Minimap2MapY;		/// fast conversion table
 local int Map2MinimapX[MaxMapWidth];	/// fast conversion table
@@ -228,23 +228,26 @@ global void CreateMinimap(void)
 
     MinimapTerrainGraphic = NewGraphic(8, TheUI.MinimapW, TheUI.MinimapH);
     memset(MinimapTerrainGraphic->Frames, 0, TheUI.MinimapW * TheUI.MinimapH);
-    MinimapGraphic = NewGraphic(8, TheUI.MinimapW, TheUI.MinimapH);
-    MinimapGraphic->Pixels = VideoCreateNewPalette(GlobalPalette);
+    MinimapGraphic = calloc(TheUI.MinimapW * TheUI.MinimapH, sizeof(VMemType));
 
     // FIXME: looks too complicated
     for (y = 0; y < TheUI.MinimapH; ++y) {
 	for (x = 0; x < TheUI.MinimapW; ++x) {
+	    Palette p;
 	    // this only copies the panel background... honest.
-	    ((unsigned char*)MinimapGraphic->Frames)[x + y * TheUI.MinimapW] = 
-		((unsigned char*)TheUI.MinimapPanel.Graphic->Frames)[x+(TheUI.MinimapPosX-TheUI.MinimapPanelX) + (y+TheUI.MinimapPosY-TheUI.MinimapPanelY) * TheUI.MinimapPanel.Graphic->Width];
+	    p = GlobalPalette[
+		((unsigned char*)TheUI.MinimapPanel.Graphic->Frames)[
+		    x + (TheUI.MinimapPosX - TheUI.MinimapPanelX) +
+		    (y + TheUI.MinimapPosY - TheUI.MinimapPanelY) *
+		    TheUI.MinimapPanel.Graphic->Width]];
+	    MinimapGraphic[x + y * TheUI.MinimapW] = VideoMapRGB(p.r, p.g, p.b);
 	}
     }
     if (!TheUI.MinimapTransparent) {
 	// make only the inner part which is going to be used black
 	for (y = MinimapY; y < TheUI.MinimapH - MinimapY; ++y) {
 	    for (x = MinimapX; x < TheUI.MinimapW - MinimapX; ++x) {
-		((unsigned char*)MinimapGraphic->Frames)[x + y * TheUI.MinimapW] =
-		    ColorBlack;
+		MinimapGraphic[x + y * TheUI.MinimapW] = ColorBlack;
 	    }
 	}
     }
@@ -260,11 +263,9 @@ global void DestroyMinimap(void)
     VideoSaveFree(MinimapTerrainGraphic);
     MinimapTerrainGraphic = NULL;
     if (MinimapGraphic) {
-	free(MinimapGraphic->Pixels);
-	MinimapGraphic->Pixels = NULL;
+	free(MinimapGraphic);
+	MinimapGraphic = NULL;
     }
-    VideoSaveFree(MinimapGraphic);
-    MinimapGraphic = NULL;
     free(Minimap2MapX);
     Minimap2MapX = NULL;
     free(Minimap2MapY);
@@ -305,11 +306,12 @@ global void UpdateMinimap(void)
 		visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Width);
 	    }
 	    if (MinimapWithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {
-		((unsigned char*)MinimapGraphic->Frames)[mx + my * TheUI.MinimapW] =
-		    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW];
+		Palette p;
+		p = GlobalPalette[
+		    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW]];
+		MinimapGraphic[mx + my * TheUI.MinimapW] = VideoMapRGB(p.r, p.g, p.b);
 	    } else if (visiontype > 0) {
-		((unsigned char*)MinimapGraphic->Frames)[mx + my * TheUI.MinimapW] =
-		    ColorBlack;
+		MinimapGraphic[mx + my * TheUI.MinimapW] = ColorBlack;
 	    }
 	}
     }
@@ -324,7 +326,7 @@ global void UpdateMinimap(void)
     //	Draw Destroyed Buildings On Map
     table = &DestroyedBuildings;
     while (*table) {
-	SysColors color;
+	VMemType color;
 
 	if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
 		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
@@ -356,8 +358,7 @@ global void UpdateMinimap(void)
 	    while (w-- >= 0) {
 		h = h0;
 		while (h-- >= 0) {
-		    ((unsigned char*)MinimapGraphic->Frames)[
-			mx + w + (my + h) * TheUI.MinimapW] = color;
+		    MinimapGraphic[mx + w + (my + h) * TheUI.MinimapW] = color;
 		}
 	    }
 	}
@@ -365,7 +366,7 @@ global void UpdateMinimap(void)
     }
 
     for (table = Units; table < Units + NumUnits; ++table) {
-	SysColors color;
+	VMemType color;
 
 	unit = *table;
 
@@ -423,8 +424,7 @@ global void UpdateMinimap(void)
 	while (w-- >= 0) {
 	    h = h0;
 	    while (h-- >= 0) {
-		((unsigned char*)MinimapGraphic->Frames)[
-		    mx + w + (my + h) * TheUI.MinimapW] = color;
+		MinimapGraphic[mx + w + (my + h) * TheUI.MinimapW] = color;
 	    }
 	}
 
@@ -444,9 +444,60 @@ global void UpdateMinimap(void)
 global void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))
 {
-    VideoDrawSubClip(MinimapGraphic, 0, 0,
-	MinimapGraphic->Width, MinimapGraphic->Height,
-	TheUI.MinimapPosX, TheUI.MinimapPosY);
+    int i;
+    int j;
+
+    switch (VideoBpp) {
+	case 8: {
+	    VMemType8* v;
+
+	    v = VideoMemory8 + TheUI.MinimapPosY * VideoWidth + TheUI.MinimapPosX;
+	    for (i = 0; i < TheUI.MinimapH; ++i) {
+		for (j = 0; j < TheUI.MinimapW; ++j) {
+		    v[j] = MinimapGraphic[i * TheUI.MinimapW + j].D8;
+		}
+		v += VideoWidth;
+	    }
+	    break;
+	}
+	case 15:
+	case 16: {
+	    VMemType16* v;
+
+	    v = VideoMemory16 + TheUI.MinimapPosY * VideoWidth + TheUI.MinimapPosX;
+	    for (i = 0; i < TheUI.MinimapH; ++i) {
+		for (j = 0; j < TheUI.MinimapW; ++j) {
+		    v[j] = MinimapGraphic[i * TheUI.MinimapW + j].D16;
+		}
+		v += VideoWidth;
+	    }
+	    break;
+	}
+	case 24: {
+	    VMemType24* v;
+
+	    v = VideoMemory24 + TheUI.MinimapPosY * VideoWidth + TheUI.MinimapPosX;
+	    for (i = 0; i < TheUI.MinimapH; ++i) {
+		for (j = 0; j < TheUI.MinimapW; ++j) {
+		    v[j] = MinimapGraphic[i * TheUI.MinimapW + j].D24;
+		}
+		v += VideoWidth;
+	    }
+	    break;
+	}
+	case 32: {
+	    VMemType32* v;
+
+	    v = VideoMemory32 + TheUI.MinimapPosY * VideoWidth + TheUI.MinimapPosX;
+	    for (i = 0; i < TheUI.MinimapH; ++i) {
+		for (j = 0; j < TheUI.MinimapW; ++j) {
+		    v[j] = MinimapGraphic[i * TheUI.MinimapW + j].D32;
+		}
+		v += VideoWidth;
+	    }
+	    break;
+	}
+    }
 }
 
 /**

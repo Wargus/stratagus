@@ -1701,15 +1701,15 @@ local void VideoDraw8to8ShadowClip(const Graphic* sprite, unsigned frame, int x,
 		dp += *sp++;		// transparent
 		pp = dp - 1 + *sp++;		// opaque
 		while (dp < pp) {	// unroll
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] >> 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 >> 8) | *dp];
 		    ++dp;
 		    ++sp;
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] >> 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 >> 8) | *dp];
 		    ++dp;
 		    ++sp;
 		}
 		if (dp <= pp) {
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] >> 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 >> 8) | *dp];
 		    ++dp;
 		    ++sp;
 		}
@@ -1754,14 +1754,14 @@ middle_trans:
 middle_pixel:
 		if (pp < lp) {
 		    while (dp < pp) {
-			*dp = lookup50trans8[(Pixels8[ColorBlack] >> 8) | *dp];
+			*dp = lookup50trans8[(ColorBlack.D8 >> 8) | *dp];
 			++dp;
 			++sp;
 		    }
 		    continue;
 		}
 		while (dp < lp) {
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] >> 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 >> 8) | *dp];
 		    ++dp;
 		    ++sp;
 		}
@@ -2311,15 +2311,15 @@ local void VideoDraw8to8ShadowClipX(const Graphic* sprite, unsigned frame,
 		dp -= *sp++;		// transparent
 		pp = dp + 1 - *sp++;		// opaque
 		while (dp > pp) {
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] << 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 << 8) | *dp];
 		    --dp;
 		    ++sp;
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] << 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 << 8) | *dp];
 		    --dp;
 		    ++sp;
 		}
 		if (dp >= pp) {
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] << 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 << 8) | *dp];
 		    --dp;
 		    ++sp;
 		}
@@ -2364,14 +2364,14 @@ middle_trans:
 middle_pixel:
 		if (pp > lp) {
 		    while (dp > pp) {
-			*dp = lookup50trans8[(Pixels8[ColorBlack] << 8) | *dp];
+			*dp = lookup50trans8[(ColorBlack.D8 << 8) | *dp];
 			--dp;
 			++sp;
 		    }
 		    continue;
 		}
 		while (dp > lp) {
-		    *dp = lookup50trans8[(Pixels8[ColorBlack] << 8) | *dp];
+		    *dp = lookup50trans8[(ColorBlack.D8 << 8) | *dp];
 		    --dp;
 		    ++sp;
 		}

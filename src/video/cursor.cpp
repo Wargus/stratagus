@@ -701,7 +701,7 @@ local void DrawBuildingCursor(void)
     int y1;
     int mx;
     int my;
-    int color;
+    VMemType color;
     int f;
     int w;
     int w0;

@@ -10,7 +10,7 @@
 //
 /**@name linedraw.c	-	The general linedraw functions. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer, Stephan Rasenberg.
+//	(c) Copyright 2000-2003 by Lutz Sammer, Stephan Rasenberg, Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -65,38 +65,38 @@ typedef enum {
 /**
 **	Draw pixel unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void (*VideoDrawPixel)(SysColors color, int x, int y);
+global void (*VideoDrawPixel)(VMemType color, int x, int y);
 
 /**
 **	Draw 25% translucent pixel (Alpha = 64) unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void (*VideoDraw25TransPixel)(SysColors color, int x, int y);
+global void (*VideoDraw25TransPixel)(VMemType color, int x, int y);
 
 /**
 **	Draw 50% translucent pixel (Alpha = 128) unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void (*VideoDraw50TransPixel)(SysColors color, int x, int y);
+global void (*VideoDraw50TransPixel)(VMemType color, int x, int y);
 
 /**
 **	Draw 75% translucent pixel (Alpha = 192) unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void (*VideoDraw75TransPixel)(SysColors color, int x, int y);
+global void (*VideoDraw75TransPixel)(VMemType color, int x, int y);
 
 /**
 **	Draw translucent pixel unclipped.
@@ -108,307 +108,307 @@ global void (*VideoDraw75TransPixel)(SysColors color, int x, int y);
 **         not be calculate in an unsigned char (can deliver overflow):
 **         newcolor = (oldcolor*alpha+color*(255 - alpha)+127)/255
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param alpha	alpha value of pixel.
 */
-global void (*VideoDrawTransPixel)(SysColors color, int x, int y,
+global void (*VideoDrawTransPixel)(VMemType color, int x, int y,
     unsigned char alpha);
 
 /**
 **	Draw pixel clipped to current clip setting.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void (*VideoDrawPixelClip)(SysColors color, int x, int y);
+global void (*VideoDrawPixelClip)(VMemType color, int x, int y);
 
 /**
 **	Draw vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line.
 */
-global void (*VideoDrawVLine)(SysColors color, int x, int y, int height);
+global void (*VideoDrawVLine)(VMemType color, int x, int y, int height);
 
 /**
 **	Draw 25% translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line.
 */
-global void (*VideoDraw25TransVLine)(SysColors color, int x, int y, int height);
+global void (*VideoDraw25TransVLine)(VMemType color, int x, int y, int height);
 
 /**
 **	Draw 50% translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line.
 */
-global void (*VideoDraw50TransVLine)(SysColors color, int x, int y, int height);
+global void (*VideoDraw50TransVLine)(VMemType color, int x, int y, int height);
 
 /**
 **	Draw 75% translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line.
 */
-global void (*VideoDraw75TransVLine)(SysColors color, int x, int y, int height);
+global void (*VideoDraw75TransVLine)(VMemType color, int x, int y, int height);
 
 /**
 **	Draw translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line.
 **	@param alpha	alpha value of pixel.
 */
-global void (*VideoDrawTransVLine)(SysColors color, int x, int y,
-    int height,unsigned char alpha);
+global void (*VideoDrawTransVLine)(VMemType color, int x, int y,
+    int height, unsigned char alpha);
 
 /**
 **	Draw horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line.
 */
-global void (*VideoDrawHLine)(SysColors color, int x, int y, int width);
+global void (*VideoDrawHLine)(VMemType color, int x, int y, int width);
 
 /**
 **	Draw 25% translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line.
 */
-global void (*VideoDraw25TransHLine)(SysColors color, int x, int y, int width);
+global void (*VideoDraw25TransHLine)(VMemType color, int x, int y, int width);
 
 /**
 **	Draw 50% translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line.
 */
-global void (*VideoDraw50TransHLine)(SysColors color, int x, int y, int width);
+global void (*VideoDraw50TransHLine)(VMemType color, int x, int y, int width);
 
 /**
 **	Draw 75% translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line.
 */
-global void (*VideoDraw75TransHLine)(SysColors color, int x, int y, int width);
+global void (*VideoDraw75TransHLine)(VMemType color, int x, int y, int width);
 
 /**
 **	Draw translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line.
 **	@param alpha	alpha value of pixel.
 */
-global void (*VideoDrawTransHLine)(SysColors color, int x, int y,
-    int width,unsigned char alpha);
+global void (*VideoDrawTransHLine)(VMemType color, int x, int y,
+    int width, unsigned char alpha);
 
 /**
 **	Draw line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param sx	Source x coordinate on the screen
 **	@param sy	Source y coordinate on the screen
 **	@param dx	Destination x coordinate on the screen
 **	@param dy	Destination y coordinate on the screen
 */
-global void (*VideoDrawLine)(SysColors color, int sx, int sy, int dx, int dy);
+global void (*VideoDrawLine)(VMemType color, int sx, int sy, int dx, int dy);
 
 /**
 **	Draw 25% translucent line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param sx	Source x coordinate on the screen
 **	@param sy	Source y coordinate on the screen
 **	@param dx	Destination x coordinate on the screen
 **	@param dy	Destination y coordinate on the screen
 */
-global void (*VideoDraw25TransLine)(SysColors color, int sx, int sy,
+global void (*VideoDraw25TransLine)(VMemType color, int sx, int sy,
     int dx, int dy);
 
 /**
 **	Draw 50% translucent line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param sx	Source x coordinate on the screen
 **	@param sy	Source y coordinate on the screen
 **	@param dx	Destination x coordinate on the screen
 **	@param dy	Destination y coordinate on the screen
 */
-global void (*VideoDraw50TransLine)(SysColors color, int sx, int sy,
+global void (*VideoDraw50TransLine)(VMemType color, int sx, int sy,
     int dx, int dy);
 
 /**
 **	Draw 75% translucent line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param sx	Source x coordinate on the screen
 **	@param sy	Source y coordinate on the screen
 **	@param dx	Destination x coordinate on the screen
 **	@param dy	Destination y coordinate on the screen
 */
-global void (*VideoDraw75TransLine)(SysColors color, int sx, int sy,
+global void (*VideoDraw75TransLine)(VMemType color, int sx, int sy,
     int dx, int dy);
 
 /**
 **	Draw translucent line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param sx	Source x coordinate on the screen
 **	@param sy	Source y coordinate on the screen
 **	@param dx	Destination x coordinate on the screen
 **	@param dy	Destination y coordinate on the screen
 **	@param alpha	alpha value of pixel.
 */
-global void (*VideoDrawTransLine)(SysColors color, int sx, int sy,
+global void (*VideoDrawTransLine)(VMemType color, int sx, int sy,
     int dx, int dy, unsigned char alpha);
 
 /**
 **	Draw rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoDrawRectangle)(SysColors color, int x, int y,
+global void (*VideoDrawRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw 25% translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoDraw25TransRectangle)(SysColors color, int x, int y,
+global void (*VideoDraw25TransRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw 50% translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoDraw50TransRectangle)(SysColors color, int x, int y,
+global void (*VideoDraw50TransRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw 75% translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoDraw75TransRectangle)(SysColors color, int x, int y,
+global void (*VideoDraw75TransRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 **	@param alpha	alpha value of pixel.
 */
-global void (*VideoDrawTransRectangle)(SysColors color, int x, int y,
-    int w, int h,unsigned char alpha);
+global void (*VideoDrawTransRectangle)(VMemType color, int x, int y,
+    int w, int h, unsigned char alpha);
 
 /**
 **	Fill rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoFillRectangle)(SysColors color, int x, int y,
+global void (*VideoFillRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw 25% translucent filled rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoFill25TransRectangle)(SysColors color, int x, int y,
+global void (*VideoFill25TransRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw 50% translucent filled rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoFill50TransRectangle)(SysColors color, int x, int y,
+global void (*VideoFill50TransRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw 75% translucent filled rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void (*VideoFill75TransRectangle)(SysColors color, int x, int y,
+global void (*VideoFill75TransRectangle)(VMemType color, int x, int y,
     int w, int h);
 
 /**
 **	Draw translucent filled rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 **	@param alpha	alpha value of pixel.
 */
-global void (*VideoFillTransRectangle)(SysColors color, int x, int y,
+global void (*VideoFillTransRectangle)(VMemType color, int x, int y,
     int w, int h, unsigned char alpha);
 
 
@@ -419,67 +419,67 @@ global void (*VideoFillTransRectangle)(SysColors color, int x, int y,
 /**
 **	Draw pixel unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixel8(SysColors color, int x, int y)
+local void DrawPixel8(VMemType color, int x, int y)
 {
-    VideoMemory8[x + y * VideoWidth] = Pixels8[color];
+    VideoMemory8[x + y * VideoWidth] = color.D8;
 }
 
 /**
 **	Draw pixel unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixel16(SysColors color, int x, int y)
+local void DrawPixel16(VMemType color, int x, int y)
 {
-    VideoMemory16[x + y * VideoWidth] = Pixels16[color];
+    VideoMemory16[x + y * VideoWidth] = color.D16;
 }
 
 /**
 **	Draw pixel unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixel24(SysColors color, int x, int y)
+local void DrawPixel24(VMemType color, int x, int y)
 {
-    VideoMemory24[x + y * VideoWidth] = Pixels24[color];
+    VideoMemory24[x + y * VideoWidth] = color.D24;
 }
 
 /**
 **	Draw pixel unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixel32(SysColors color, int x, int y)
+local void DrawPixel32(VMemType color, int x, int y)
 {
-    VideoMemory32[x + y * VideoWidth] = Pixels32[color];
+    VideoMemory32[x + y * VideoWidth] = color.D32;
 }
 
 /**
 **	Draw pixel unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
 #ifdef USE_OPENGL
-local void DrawPixelOpenGL(SysColors color, int x, int y)
+local void DrawPixelOpenGL(VMemType color, int x, int y)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -495,33 +495,33 @@ local void DrawPixelOpenGL(SysColors color, int x, int y)
 /**
 **	Draw 25% translucent pixel unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw25TransPixel8(SysColors color, int x, int y)
+local void Draw25TransPixel8(VMemType color, int x, int y)
 {
     VMemType8* p;
 
     p = VideoMemory8 + x + y * VideoWidth;
-    *p = lookup25trans8[(Pixels8[color] << 8) | *p];
+    *p = lookup25trans8[(color.D8 << 8) | *p];
 }
 
 /**
 **	Draw 25% translucent pixel unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw25TransPixel15(SysColors color, int x, int y)
+local void Draw25TransPixel15(VMemType color, int x, int y)
 {
     VMemType16* p;
     unsigned long sp;
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x03E07C1F) * 3;
     dp = *p;
@@ -533,18 +533,18 @@ local void Draw25TransPixel15(SysColors color, int x, int y)
 /**
 **	Draw 25% translucent pixel unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw25TransPixel16(SysColors color, int x, int y)
+local void Draw25TransPixel16(VMemType color, int x, int y)
 {
     VMemType16* p;
     unsigned long sp;
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x07E0F81F) * 3;
     dp = *p;
@@ -556,24 +556,24 @@ local void Draw25TransPixel16(SysColors color, int x, int y)
 /**
 **	Draw 25% translucent pixel unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw25TransPixel24(SysColors color, int x, int y)
+local void Draw25TransPixel24(VMemType color, int x, int y)
 {
 //FIXME: does 24bpp represents R|G|B?
-    VideoMemory24[x + y * VideoWidth] = Pixels24[color];
+    VideoMemory24[x + y * VideoWidth] = color.D24;
 }
 
 /**
 **	Draw 25% translucent pixel unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw25TransPixel32(SysColors color, int x, int y)
+local void Draw25TransPixel32(VMemType color, int x, int y)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -581,7 +581,7 @@ local void Draw25TransPixel32(SysColors color, int x, int y)
     unsigned long dp1;
     unsigned long dp2;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = ((sp1 & 0xFF00FF00) >> 8) * 3;
     sp1 = (sp1 & 0x00FF00FF) * 3;
@@ -599,19 +599,19 @@ local void Draw25TransPixel32(SysColors color, int x, int y)
 /**
 **	Draw 25% translucent pixel unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
 #ifdef USE_OPENGL
-local void Draw25TransPixelOpenGL(SysColors color, int x, int y)
+local void Draw25TransPixelOpenGL(VMemType color, int x, int y)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -627,33 +627,33 @@ local void Draw25TransPixelOpenGL(SysColors color, int x, int y)
 /**
 **	Draw 50% translucent pixel unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw50TransPixel8(SysColors color, int x, int y)
+local void Draw50TransPixel8(VMemType color, int x, int y)
 {
     VMemType8* p;
 
     p = VideoMemory8 + x + y * VideoWidth;
-    *p = lookup50trans8[(Pixels8[color] << 8) | *p];
+    *p = lookup50trans8[(color.D8 << 8) | *p];
 }
 
 /**
 **	Draw 50% translucent pixel unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw50TransPixel15(SysColors color, int x, int y)
+local void Draw50TransPixel15(VMemType color, int x, int y)
 {
     VMemType16* p;
     unsigned long sp;
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     dp = *p;
     dp = ((dp << 16) | dp) & 0x03E07C1F;
@@ -664,18 +664,18 @@ local void Draw50TransPixel15(SysColors color, int x, int y)
 /**
 **	Draw 50% translucent pixel unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw50TransPixel16(SysColors color, int x, int y)
+local void Draw50TransPixel16(VMemType color, int x, int y)
 {
     VMemType16* p;
     unsigned long sp;
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     dp = *p;
     dp = ((dp << 16) | dp) & 0x07E0F81F;
@@ -686,24 +686,24 @@ local void Draw50TransPixel16(SysColors color, int x, int y)
 /**
 **	Draw 50% translucent pixel unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw50TransPixel24(SysColors color, int x, int y)
+local void Draw50TransPixel24(VMemType color, int x, int y)
 {
 //FIXME: does 24bpp represents R|G|B?
-    VideoMemory24[x + y * VideoWidth] = Pixels24[color];
+    VideoMemory24[x + y * VideoWidth] = color.D24;
 }
 
 /**
 **	Draw 50% translucent pixel unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw50TransPixel32(SysColors color, int x, int y)
+local void Draw50TransPixel32(VMemType color, int x, int y)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -711,7 +711,7 @@ local void Draw50TransPixel32(SysColors color, int x, int y)
     unsigned long dp1;
     unsigned long dp2;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -728,19 +728,19 @@ local void Draw50TransPixel32(SysColors color, int x, int y)
 /**
 **	Draw 50% translucent pixel unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
 #ifdef USE_OPENGL
-local void Draw50TransPixelOpenGL(SysColors color, int x, int y)
+local void Draw50TransPixelOpenGL(VMemType color, int x, int y)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -756,33 +756,33 @@ local void Draw50TransPixelOpenGL(SysColors color, int x, int y)
 /**
 **	Draw 75% translucent pixel unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw75TransPixel8(SysColors color, int x, int y)
+local void Draw75TransPixel8(VMemType color, int x, int y)
 {
     VMemType8* p;
 
     p = VideoMemory8 + x + y * VideoWidth;
-    *p = lookup25trans8[(*p << 8) | Pixels8[color]];
+    *p = lookup25trans8[(*p << 8) | color.D8];
 }
 
 /**
 **	Draw 75% translucent pixel unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw75TransPixel15(SysColors color, int x, int y)
+local void Draw75TransPixel15(VMemType color, int x, int y)
 {
     VMemType16* p;
     unsigned long sp;
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     dp = *p;
     dp = ((dp << 16) | dp) & 0x03E07C1F;
@@ -793,18 +793,18 @@ local void Draw75TransPixel15(SysColors color, int x, int y)
 /**
 **	Draw 75% translucent pixel unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw75TransPixel16(SysColors color, int x, int y)
+local void Draw75TransPixel16(VMemType color, int x, int y)
 {
     VMemType16* p;
     unsigned long sp;
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     dp = *p;
     dp = ((dp << 16) | dp) & 0x07E0F81F;
@@ -815,24 +815,24 @@ local void Draw75TransPixel16(SysColors color, int x, int y)
 /**
 **	Draw 75% translucent pixel unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw75TransPixel24(SysColors color, int x, int y)
+local void Draw75TransPixel24(VMemType color, int x, int y)
 {
 //FIXME: does 24bpp represents R|G|B?
-    VideoMemory24[x + y * VideoWidth] = Pixels24[color];
+    VideoMemory24[x + y * VideoWidth] = color.D24;
 }
 
 /**
 **	Draw 75% translucent pixel unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void Draw75TransPixel32(SysColors color, int x, int y)
+local void Draw75TransPixel32(VMemType color, int x, int y)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -840,7 +840,7 @@ local void Draw75TransPixel32(SysColors color, int x, int y)
     unsigned long dp1;
     unsigned long dp2;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -857,19 +857,19 @@ local void Draw75TransPixel32(SysColors color, int x, int y)
 /**
 **	Draw 75% translucent pixel unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
 #ifdef USE_OPENGL
-local void Draw75TransPixelOpenGL(SysColors color, int x, int y)
+local void Draw75TransPixelOpenGL(VMemType color, int x, int y)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -885,12 +885,12 @@ local void Draw75TransPixelOpenGL(SysColors color, int x, int y)
 /**
 **	Draw translucent pixel unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixel.
 */
-local void DrawTransPixel8(SysColors color, int x, int y,
+local void DrawTransPixel8(VMemType color, int x, int y,
     unsigned char alpha)
 {
     VMemType8* p;
@@ -898,16 +898,16 @@ local void DrawTransPixel8(SysColors color, int x, int y,
     p = VideoMemory8 + x + y * VideoWidth;
     switch (((unsigned int)alpha * 4) / 255) {
 	case 0:
-	    *p = Pixels8[color];
+	    *p = color.D8;
 	    break;
 	case 1:
-	    *p = lookup25trans8[(Pixels8[color] << 8) | *p];
+	    *p = lookup25trans8[(color.D8 << 8) | *p];
 	    break;
 	case 2:
-	    *p = lookup50trans8[(*p << 8) | Pixels8[color]];
+	    *p = lookup50trans8[(*p << 8) | color.D8];
 	    break;
 	case 3:
-	    *p = lookup25trans8[(*p << 8) | Pixels8[color]];
+	    *p = lookup25trans8[(*p << 8) | color.D8];
 	    break;
 	default:
 	    break;
@@ -917,12 +917,12 @@ local void DrawTransPixel8(SysColors color, int x, int y,
 /**
 **	Draw pixel unclipped into 8bit framebuffer (ignoring alpha).
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixel.
 */
-local void DrawNoTransPixel8(SysColors color, int x, int y,
+local void DrawNoTransPixel8(VMemType color, int x, int y,
     unsigned char alpha __attribute__((unused)))
 {
     DrawPixel8(color, x, y);
@@ -931,7 +931,7 @@ local void DrawNoTransPixel8(SysColors color, int x, int y,
 /**
 **	Draw translucent pixel unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixel.
@@ -945,7 +945,7 @@ local void DrawNoTransPixel8(SysColors color, int x, int y,
 **  * alpha = |-GGGGGGGGGGSRRRRRRRRR-SBBBBBBBBB|
 ** newcolor = |------GGGGG-----RRRRR------BBBBB|
 */
-local void DrawTransPixel15(SysColors color, int x, int y,
+local void DrawTransPixel15(VMemType color, int x, int y,
     unsigned char alpha)
 {
     VMemType16* p;
@@ -953,7 +953,7 @@ local void DrawTransPixel15(SysColors color, int x, int y,
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     alpha >>= 3; //FIXME: only 5bits available between colors
     dp = *p;
@@ -965,7 +965,7 @@ local void DrawTransPixel15(SysColors color, int x, int y,
 /**
 **	Draw translucent pixel unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixel.
@@ -980,7 +980,7 @@ local void DrawTransPixel15(SysColors color, int x, int y,
 **  * alpha = |SGGGGGGGGGGSRRRRRRRRRSBBBBBBBBBB|
 ** newcolor = |-----GGGGGG-----RRRRR------BBBBB|
 */
-local void DrawTransPixel16(SysColors color, int x, int y,
+local void DrawTransPixel16(VMemType color, int x, int y,
     unsigned char alpha)
 {
     VMemType16* p;
@@ -988,7 +988,7 @@ local void DrawTransPixel16(SysColors color, int x, int y,
     unsigned long dp;
 
     p = VideoMemory16 + x + y * VideoWidth;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     alpha >>= 3; //FIXME: only 5bits available between colors
     dp = *p;
@@ -1000,22 +1000,22 @@ local void DrawTransPixel16(SysColors color, int x, int y,
 /**
 **	Draw translucent pixel unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixel.
 */
-local void DrawTransPixel24(SysColors color, int x, int y,
+local void DrawTransPixel24(VMemType color, int x, int y,
     unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
-    VideoMemory24[x + y * VideoWidth] = Pixels24[color];
+    VideoMemory24[x + y * VideoWidth] = color.D24;
 }
 
 /**
 **	Draw translucent pixel unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixel.
@@ -1036,7 +1036,7 @@ local void DrawTransPixel24(SysColors color, int x, int y,
 **
 ** FIXME: alpha blending the A-value of 32bit may not be needed.. always 0
 */
-local void DrawTransPixel32(SysColors color, int x, int y,
+local void DrawTransPixel32(VMemType color, int x, int y,
     unsigned char alpha)
 {
     VMemType32* p;
@@ -1045,7 +1045,7 @@ local void DrawTransPixel32(SysColors color, int x, int y,
     unsigned long dp1;
     unsigned long dp2;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -1063,13 +1063,13 @@ local void DrawTransPixel32(SysColors color, int x, int y,
 /**
 **	Draw translucent pixel unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixel.
 */
 #ifdef USE_OPENGL
-local void DrawTransPixelOpenGL(SysColors color, int x, int y,
+local void DrawTransPixelOpenGL(VMemType color, int x, int y,
     unsigned char alpha)
 {
     VMemType32 c;
@@ -1077,7 +1077,7 @@ local void DrawTransPixelOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -1093,76 +1093,76 @@ local void DrawTransPixelOpenGL(SysColors color, int x, int y,
 /**
 **	Draw pixel clipped to current clip setting into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixelClip8(SysColors color, int x, int y)
+local void DrawPixelClip8(VMemType color, int x, int y)
 {
     //	Clipping:
     if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
 	return;
     }
-    VideoMemory8[x + y * VideoWidth] = Pixels8[color];
+    VideoMemory8[x + y * VideoWidth] = color.D8;
 }
 
 /**
 **	Draw pixel clipped to current clip setting into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixelClip16(SysColors color, int x, int y)
+local void DrawPixelClip16(VMemType color, int x, int y)
 {
     //	Clipping:
     if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
 	return;
     }
-    VideoMemory16[x + y * VideoWidth] = Pixels16[color];
+    VideoMemory16[x + y * VideoWidth] = color.D16;
 }
 
 /**
 **	Draw pixel clipped to current clip setting into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixelClip24(SysColors color, int x, int y)
+local void DrawPixelClip24(VMemType color, int x, int y)
 {
     //	Clipping:
     if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
 	return;
     }
-    VideoMemory24[x + y * VideoWidth] = Pixels24[color];
+    VideoMemory24[x + y * VideoWidth] = color.D24;
 }
 
 /**
 **	Draw pixel clipped to current clip setting into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-local void DrawPixelClip32(SysColors color, int x, int y)
+local void DrawPixelClip32(VMemType color, int x, int y)
 {
     //	Clipping:
     if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
 	return;
     }
-    VideoMemory32[x + y * VideoWidth] = Pixels32[color];
+    VideoMemory32[x + y * VideoWidth] = color.D32;
 }
 
 /**
 **	Draw pixel clipped to current clip setting.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
 #ifdef USE_OPENGL
-local void DrawPixelClipOpenGL(SysColors color, int x, int y)
+local void DrawPixelClipOpenGL(VMemType color, int x, int y)
 {
     VMemType32 c;
     GLubyte r;
@@ -1174,7 +1174,7 @@ local void DrawPixelClipOpenGL(SysColors color, int x, int y)
 	return;
     }
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -1190,11 +1190,11 @@ local void DrawPixelClipOpenGL(SysColors color, int x, int y)
 /**
 **	Draw 25% translucent pixel clipped to current clip setting.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw25TransPixelClip(SysColors color, int x, int y)
+global void VideoDraw25TransPixelClip(VMemType color, int x, int y)
 {
     //	Clipping:
     if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
@@ -1206,11 +1206,11 @@ global void VideoDraw25TransPixelClip(SysColors color, int x, int y)
 /**
 **	Draw 50% translucent pixel clipped to current clip setting.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw50TransPixelClip(SysColors color, int x, int y)
+global void VideoDraw50TransPixelClip(VMemType color, int x, int y)
 {
     //	Clipping:
     if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
@@ -1222,11 +1222,11 @@ global void VideoDraw50TransPixelClip(SysColors color, int x, int y)
 /**
 **	Draw 75% translucent pixel clipped to current clip setting.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 */
-global void VideoDraw75TransPixelClip(SysColors color, int x, int y)
+global void VideoDraw75TransPixelClip(VMemType color, int x, int y)
 {
     //	Clipping:
     if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
@@ -1238,12 +1238,12 @@ global void VideoDraw75TransPixelClip(SysColors color, int x, int y)
 /**
 **	Draw translucent pixel clipped to current clip setting.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **      @param alpha    alpha value of pixels.
 */
-global void VideoDrawTransPixelClip(SysColors color, int x, int y,
+global void VideoDrawTransPixelClip(VMemType color, int x, int y,
     unsigned char alpha)
 {
     //	Clipping:
@@ -1260,12 +1260,12 @@ global void VideoDrawTransPixelClip(SysColors color, int x, int y,
 /**
 **	Draw horizontal line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line.
 */
-local void DrawHLine8(SysColors color, int x, int y, int width)
+local void DrawHLine8(VMemType color, int x, int y, int width)
 {
     VMemType8* p;
     VMemType8* e;
@@ -1275,7 +1275,7 @@ local void DrawHLine8(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory8 + y * w + x;
     e = p + width;
-    f = Pixels8[color];
+    f = color.D8;
 
     while (p < e) {			// FIXME: better!
 	*p++ = f;
@@ -1285,12 +1285,12 @@ local void DrawHLine8(SysColors color, int x, int y, int width)
 /**
 **	Draw horizontal line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void DrawHLine16(SysColors color, int x, int y, int width)
+local void DrawHLine16(VMemType color, int x, int y, int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1300,7 +1300,7 @@ local void DrawHLine16(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + width-1;
-    f = ((unsigned long)Pixels16[color] << 16) | Pixels16[color];
+    f = ((unsigned long)color.D16 << 16) | color.D16;
 
     while (p < e) {			// draw 2 pixels
 	*((unsigned long*)p)++ = f;
@@ -1314,12 +1314,12 @@ local void DrawHLine16(SysColors color, int x, int y, int width)
 /**
 **	Draw horizontal line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void DrawHLine24(SysColors color, int x, int y, int width)
+local void DrawHLine24(VMemType color, int x, int y, int width)
 {
     VMemType24* p;
     VMemType24* e;
@@ -1329,7 +1329,7 @@ local void DrawHLine24(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory24 + y * w + x;
     e = p + width;
-    f = Pixels24[color];
+    f = color.D24;
 
     while (p < e) {
 	*p++ = f;
@@ -1339,12 +1339,12 @@ local void DrawHLine24(SysColors color, int x, int y, int width)
 /**
 **	Draw horizontal line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void DrawHLine32(SysColors color, int x, int y, int width)
+local void DrawHLine32(VMemType color, int x, int y, int width)
 {
     VMemType32* p;
     VMemType32* e;
@@ -1354,7 +1354,7 @@ local void DrawHLine32(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
     e = p + width;
-    f = Pixels32[color];
+    f = color.D32;
 
     while (p < e) {
 	*p++ = f;
@@ -1364,20 +1364,20 @@ local void DrawHLine32(SysColors color, int x, int y, int width)
 /**
 **	Draw horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void DrawHLineOpenGL(SysColors color, int x, int y, int width)
+local void DrawHLineOpenGL(VMemType color, int x, int y, int width)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -1394,12 +1394,12 @@ local void DrawHLineOpenGL(SysColors color, int x, int y, int width)
 /**
 **	Draw 25% translucent horizontal line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine8(SysColors color, int x, int y, int width)
+local void Draw25TransHLine8(VMemType color, int x, int y, int width)
 {
     VMemType8* p;
     VMemType8* e;
@@ -1407,7 +1407,7 @@ local void Draw25TransHLine8(SysColors color, int x, int y, int width)
 
     p = VideoMemory8 + x + y * VideoWidth;
     e = p + width;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
 
     while (p < e) {
 	*p = lookup25trans8[c | *p];
@@ -1418,12 +1418,12 @@ local void Draw25TransHLine8(SysColors color, int x, int y, int width)
 /**
 **	Draw 25% translucent horizontal line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine15(SysColors color, int x, int y, int width)
+local void Draw25TransHLine15(VMemType color, int x, int y, int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1433,7 +1433,7 @@ local void Draw25TransHLine15(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x03E07C1F) * 3;
 
@@ -1450,12 +1450,12 @@ local void Draw25TransHLine15(SysColors color, int x, int y, int width)
 /**
 **	Draw 25% translucent horizontal line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine16(SysColors color, int x, int y, int width)
+local void Draw25TransHLine16(VMemType color, int x, int y, int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1465,7 +1465,7 @@ local void Draw25TransHLine16(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x07E0F81F) * 3;
 
@@ -1482,12 +1482,12 @@ local void Draw25TransHLine16(SysColors color, int x, int y, int width)
 /**
 **	Draw 25% translucent horizontal line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine24(SysColors color, int x, int y, int width)
+local void Draw25TransHLine24(VMemType color, int x, int y, int width)
 {
 // FIXME: does 24bpp holds R|G|B ?
     DrawHLine24(color, x, y, width); // no trans functionaility for the moment :(
@@ -1496,12 +1496,12 @@ local void Draw25TransHLine24(SysColors color, int x, int y, int width)
 /**
 **	Draw 25% translucent horizontal line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw25TransHLine32(SysColors color, int x, int y, int width)
+local void Draw25TransHLine32(VMemType color, int x, int y, int width)
 {
     VMemType32* p;
     VMemType32* e;
@@ -1512,7 +1512,7 @@ local void Draw25TransHLine32(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
     e = p + width;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = ((sp1 & 0xFF00FF00) >> 8) * 3;
     sp1 = (sp1 & 0x00FF00FF) * 3;
@@ -1534,20 +1534,20 @@ local void Draw25TransHLine32(SysColors color, int x, int y, int width)
 /**
 **	Draw 25% translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw25TransHLineOpenGL(SysColors color, int x, int y, int width)
+local void Draw25TransHLineOpenGL(VMemType color, int x, int y, int width)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -1564,12 +1564,12 @@ local void Draw25TransHLineOpenGL(SysColors color, int x, int y, int width)
 /**
 **	Draw 50% translucent horizontal line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine8(SysColors color, int x, int y, int width)
+local void Draw50TransHLine8(VMemType color, int x, int y, int width)
 {
     VMemType8* p;
     VMemType8* e;
@@ -1577,7 +1577,7 @@ local void Draw50TransHLine8(SysColors color, int x, int y, int width)
 
     p = VideoMemory8 + x + y * VideoWidth;
     e = p + width;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
 
     while (p < e) {
 	*p = lookup50trans8[c | *p];
@@ -1588,12 +1588,12 @@ local void Draw50TransHLine8(SysColors color, int x, int y, int width)
 /**
 **	Draw 50% translucent horizontal line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine15(SysColors color, int x, int y, int width)
+local void Draw50TransHLine15(VMemType color, int x, int y, int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1603,7 +1603,7 @@ local void Draw50TransHLine15(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
 
     while (p < e) {
@@ -1619,12 +1619,12 @@ local void Draw50TransHLine15(SysColors color, int x, int y, int width)
 /**
 **	Draw 50% translucent horizontal line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine16(SysColors color, int x, int y, int width)
+local void Draw50TransHLine16(VMemType color, int x, int y, int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1634,7 +1634,7 @@ local void Draw50TransHLine16(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
 
     while (p < e) {
@@ -1650,12 +1650,12 @@ local void Draw50TransHLine16(SysColors color, int x, int y, int width)
 /**
 **	Draw 50% translucent horizontal line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine24(SysColors color, int x, int y, int width)
+local void Draw50TransHLine24(VMemType color, int x, int y, int width)
 {
 // FIXME: does 24bpp holds R|G|B ?
     DrawHLine24(color, x, y, width); // no trans functionaility for the moment :(
@@ -1664,12 +1664,12 @@ local void Draw50TransHLine24(SysColors color, int x, int y, int width)
 /**
 **	Draw 50% translucent horizontal line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw50TransHLine32(SysColors color, int x, int y, int width)
+local void Draw50TransHLine32(VMemType color, int x, int y, int width)
 {
     VMemType32* p, *e;
     unsigned long sp1, sp2;
@@ -1678,7 +1678,7 @@ local void Draw50TransHLine32(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
     e = p + width;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -1698,20 +1698,20 @@ local void Draw50TransHLine32(SysColors color, int x, int y, int width)
 /**
 **	Draw 50% translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw50TransHLineOpenGL(SysColors color, int x, int y, int width)
+local void Draw50TransHLineOpenGL(VMemType color, int x, int y, int width)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -1728,12 +1728,12 @@ local void Draw50TransHLineOpenGL(SysColors color, int x, int y, int width)
 /**
 **	Draw 75% translucent horizontal line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine8(SysColors color, int x, int y, int width)
+local void Draw75TransHLine8(VMemType color, int x, int y, int width)
 {
     VMemType8* p;
     VMemType8* e;
@@ -1741,7 +1741,7 @@ local void Draw75TransHLine8(SysColors color, int x, int y, int width)
 
     p = VideoMemory8 + x + y * VideoWidth;
     e = p + width;
-    c = Pixels8[color];
+    c = color.D8;
 
     while (p < e) {
       *p = lookup25trans8[(*p << 8) | c];
@@ -1752,12 +1752,12 @@ local void Draw75TransHLine8(SysColors color, int x, int y, int width)
 /**
 **	Draw 75% translucent horizontal line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine15(SysColors color, int x, int y, int width)
+local void Draw75TransHLine15(VMemType color, int x, int y, int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1767,7 +1767,7 @@ local void Draw75TransHLine15(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
 
     while (p < e) {
@@ -1783,12 +1783,12 @@ local void Draw75TransHLine15(SysColors color, int x, int y, int width)
 /**
 **	Draw 75% translucent horizontal line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine16(SysColors color, int x, int y, int width)
+local void Draw75TransHLine16(VMemType color, int x, int y, int width)
 {
     VMemType16* p;
     VMemType16* e;
@@ -1798,7 +1798,7 @@ local void Draw75TransHLine16(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
 
     while (p < e) {
@@ -1814,12 +1814,12 @@ local void Draw75TransHLine16(SysColors color, int x, int y, int width)
 /**
 **	Draw 75% translucent horizontal line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine24(SysColors color, int x, int y, int width)
+local void Draw75TransHLine24(VMemType color, int x, int y, int width)
 {
 // FIXME: does 24bpp holds R|G|B ?
     DrawHLine24(color, x, y, width); // no trans functionaility for the moment :(
@@ -1828,12 +1828,12 @@ local void Draw75TransHLine24(SysColors color, int x, int y, int width)
 /**
 **	Draw 75% translucent horizontal line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-local void Draw75TransHLine32(SysColors color, int x, int y, int width)
+local void Draw75TransHLine32(VMemType color, int x, int y, int width)
 {
     VMemType32* p;
     VMemType32* e;
@@ -1844,7 +1844,7 @@ local void Draw75TransHLine32(SysColors color, int x, int y, int width)
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
     e = p + width;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -1865,20 +1865,20 @@ local void Draw75TransHLine32(SysColors color, int x, int y, int width)
 /**
 **	Draw 75% translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw75TransHLineOpenGL(SysColors color, int x, int y, int width)
+local void Draw75TransHLineOpenGL(VMemType color, int x, int y, int width)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -1895,13 +1895,13 @@ local void Draw75TransHLineOpenGL(SysColors color, int x, int y, int width)
 /**
 **	Draw translucent horizontal line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine8(SysColors color, int x, int y, int width,
+local void DrawTransHLine8(VMemType color, int x, int y, int width,
     unsigned char alpha)
 {
     VMemType8* p;
@@ -1910,7 +1910,7 @@ local void DrawTransHLine8(SysColors color, int x, int y, int width,
 
     p = VideoMemory8 + x + y * VideoWidth;
     e = p + width;
-    c = Pixels8[color];
+    c = color.D8;
 
     switch (((unsigned int)alpha * 4) / 255) {
 	case 0:
@@ -1952,7 +1952,7 @@ local void DrawTransHLine8(SysColors color, int x, int y, int width,
 **	@param width	Line width in pixel
 **      @param alpha    alpha value of pixel
 */
-local void DrawNoTransHLine8(SysColors color, int x, int y, int width,
+local void DrawNoTransHLine8(VMemType color, int x, int y, int width,
     unsigned char alpha __attribute__((unused)))
 {
     DrawHLine8(color, x, y, width);
@@ -1961,13 +1961,13 @@ local void DrawNoTransHLine8(SysColors color, int x, int y, int width,
 /**
 **	Draw translucent horizontal line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine15(SysColors color, int x, int y, int width,
+local void DrawTransHLine15(VMemType color, int x, int y, int width,
     unsigned char alpha)
 {
     VMemType16* p;
@@ -1976,7 +1976,7 @@ local void DrawTransHLine15(SysColors color, int x, int y, int width,
 
     p = VideoMemory16 + y * VideoWidth + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     alpha >>= 3;				// FIXME: only 5bits
@@ -1994,13 +1994,13 @@ local void DrawTransHLine15(SysColors color, int x, int y, int width,
 /**
 **	Draw translucent horizontal line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine16(SysColors color, int x, int y, int width,
+local void DrawTransHLine16(VMemType color, int x, int y, int width,
     unsigned char alpha)
 {
     VMemType16* p;
@@ -2009,7 +2009,7 @@ local void DrawTransHLine16(SysColors color, int x, int y, int width,
 
     p = VideoMemory16 + y * VideoWidth + x;
     e = p + width;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     alpha >>= 3;				// FIXME: only 5bits
@@ -2027,13 +2027,13 @@ local void DrawTransHLine16(SysColors color, int x, int y, int width,
 /**
 **	Draw translucent horizontal line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine24(SysColors color, int x, int y, int width,
+local void DrawTransHLine24(VMemType color, int x, int y, int width,
     unsigned char alpha)
 {
     VMemType24 c;
@@ -2045,7 +2045,7 @@ local void DrawTransHLine24(SysColors color, int x, int y, int width,
 
     p = VideoMemory24 + y * VideoWidth + x;
     e = p + width;
-    c = Pixels24[color];
+    c = color.D24;
     spR = c.a;
     spG = c.b;
     spB = c.c;
@@ -2076,13 +2076,13 @@ local void DrawTransHLine24(SysColors color, int x, int y, int width,
 /**
 **	Draw translucent horizontal line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransHLine32(SysColors color, int x, int y, int width,
+local void DrawTransHLine32(VMemType color, int x, int y, int width,
     unsigned char alpha)
 {
     VMemType32* p;
@@ -2092,7 +2092,7 @@ local void DrawTransHLine32(SysColors color, int x, int y, int width,
 
     p = VideoMemory32 + y * VideoWidth + x;
     e = p + width;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -2137,14 +2137,14 @@ local void DrawTransHLine32(SysColors color, int x, int y, int width,
 /**
 **	Draw translucent horizontal line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
 #ifdef USE_OPENGL
-local void DrawTransHLineOpenGL(SysColors color, int x, int y, int width,
+local void DrawTransHLineOpenGL(VMemType color, int x, int y, int width,
     unsigned char alpha)
 {
     VMemType32 c;
@@ -2152,7 +2152,7 @@ local void DrawTransHLineOpenGL(SysColors color, int x, int y, int width,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -2168,12 +2168,12 @@ local void DrawTransHLineOpenGL(SysColors color, int x, int y, int width,
 /**
 **	Draw horizontal line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDrawHLineClip(SysColors color, int x, int y, int width)
+global void VideoDrawHLineClip(VMemType color, int x, int y, int width)
 {
     CLIP_HLINE(x, y, width);
     VideoDrawHLine(color, x, y, width);
@@ -2182,12 +2182,12 @@ global void VideoDrawHLineClip(SysColors color, int x, int y, int width)
 /**
 **	Draw 25% translucent horizontal line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDraw25TransHLineClip(SysColors color, int x, int y, int width)
+global void VideoDraw25TransHLineClip(VMemType color, int x, int y, int width)
 {
     CLIP_HLINE(x, y, width);
     VideoDraw25TransHLine(color, x, y, width);
@@ -2196,12 +2196,12 @@ global void VideoDraw25TransHLineClip(SysColors color, int x, int y, int width)
 /**
 **	Draw 50% translucent horizontal line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDraw50TransHLineClip(SysColors color, int x, int y, int width)
+global void VideoDraw50TransHLineClip(VMemType color, int x, int y, int width)
 {
     CLIP_HLINE(x, y, width);
     VideoDraw50TransHLine(color, x, y, width);
@@ -2210,12 +2210,12 @@ global void VideoDraw50TransHLineClip(SysColors color, int x, int y, int width)
 /**
 **	Draw 75% translucent horizontal line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param width	width of line (0=don't draw).
 */
-global void VideoDraw75TransHLineClip(SysColors color, int x, int y, int width)
+global void VideoDraw75TransHLineClip(VMemType color, int x, int y, int width)
 {
     CLIP_HLINE(x, y, width);
     VideoDraw75TransHLine(color, x, y, width);
@@ -2230,7 +2230,7 @@ global void VideoDraw75TransHLineClip(SysColors color, int x, int y, int width)
 **	@param width	Width of line (0=don't draw)
 **	@param alpha	Alpha value of pixels
 */
-global void VideoDrawTransHLineClip(SysColors color, int x, int y, int width,
+global void VideoDrawTransHLineClip(VMemType color, int x, int y, int width,
     unsigned char alpha)
 {
     CLIP_HLINE(x, y, width);
@@ -2244,12 +2244,12 @@ global void VideoDrawTransHLineClip(SysColors color, int x, int y, int width,
 /**
 **	Draw vertical line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine8(SysColors color, int x, int y, int height)
+local void DrawVLine8(VMemType color, int x, int y, int height)
 {
     VMemType8* p;
     VMemType8* e;
@@ -2259,7 +2259,7 @@ local void DrawVLine8(SysColors color, int x, int y, int height)
     w = VideoWidth;
     p = VideoMemory8 + y * w + x;
     e = p + height * w;
-    f = Pixels8[color];
+    f = color.D8;
     while (p < e) {			// FIXME: better
 	*p = f;
 	p += w;
@@ -2269,12 +2269,12 @@ local void DrawVLine8(SysColors color, int x, int y, int height)
 /**
 **	Draw vertical line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine16(SysColors color, int x, int y, int height)
+local void DrawVLine16(VMemType color, int x, int y, int height)
 {
     VMemType16* p;
     VMemType16* e;
@@ -2284,7 +2284,7 @@ local void DrawVLine16(SysColors color, int x, int y, int height)
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
     e = p + height * w;
-    f = Pixels16[color];
+    f = color.D16;
     while (p < e) {			// FIXME: better
 	*p = f;
 	p += w;
@@ -2294,12 +2294,12 @@ local void DrawVLine16(SysColors color, int x, int y, int height)
 /**
 **	Draw vertical line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine24(SysColors color, int x, int y, int height)
+local void DrawVLine24(VMemType color, int x, int y, int height)
 {
     VMemType24* p;
     VMemType24* e;
@@ -2309,7 +2309,7 @@ local void DrawVLine24(SysColors color, int x, int y, int height)
     w = VideoWidth;
     p = VideoMemory24 + y * w + x;
     e = p + height * w;
-    f = Pixels24[color];
+    f = color.D24;
     while (p < e) {			// FIXME: better
 	*p = f;
 	p += w;
@@ -2319,12 +2319,12 @@ local void DrawVLine24(SysColors color, int x, int y, int height)
 /**
 **	Draw vertical line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void DrawVLine32(SysColors color, int x, int y, int height)
+local void DrawVLine32(VMemType color, int x, int y, int height)
 {
     VMemType32* p;
     VMemType32* e;
@@ -2334,7 +2334,7 @@ local void DrawVLine32(SysColors color, int x, int y, int height)
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
     e = p + height * w;
-    f = Pixels32[color];
+    f = color.D32;
     while (p < e) {			// FIXME: better
 	*p = f;
 	p += w;
@@ -2344,20 +2344,20 @@ local void DrawVLine32(SysColors color, int x, int y, int height)
 /**
 **	Draw vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void DrawVLineOpenGL(SysColors color, int x, int y, int height)
+local void DrawVLineOpenGL(VMemType color, int x, int y, int height)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -2374,12 +2374,12 @@ local void DrawVLineOpenGL(SysColors color, int x, int y, int height)
 /**
 **	Draw 25% translucent vertical line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine8(SysColors color, int x, int y, int height)
+local void Draw25TransVLine8(VMemType color, int x, int y, int height)
 {
     VMemType8* p;
     unsigned int c;
@@ -2387,7 +2387,7 @@ local void Draw25TransVLine8(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory8 + x + y * w;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
     while (height--) {
         *p = lookup25trans8[c | *p];
         p += w;
@@ -2397,12 +2397,12 @@ local void Draw25TransVLine8(SysColors color, int x, int y, int height)
 /**
 **	Draw 25% translucent vertical line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine15(SysColors color, int x, int y, int height)
+local void Draw25TransVLine15(VMemType color, int x, int y, int height)
 {
     VMemType16* p;
     unsigned long sp;
@@ -2410,7 +2410,7 @@ local void Draw25TransVLine15(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x03E07C1F) * 3;
 
@@ -2428,12 +2428,12 @@ local void Draw25TransVLine15(SysColors color, int x, int y, int height)
 /**
 **	Draw 25% translucent vertical line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine16(SysColors color, int x, int y, int height)
+local void Draw25TransVLine16(VMemType color, int x, int y, int height)
 {
     VMemType16* p;
     unsigned long sp;
@@ -2441,7 +2441,7 @@ local void Draw25TransVLine16(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x07E0F81F) * 3;
 
@@ -2459,12 +2459,12 @@ local void Draw25TransVLine16(SysColors color, int x, int y, int height)
 /**
 **	Draw 25% translucent vertical line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine24(SysColors color, int x, int y, int height)
+local void Draw25TransVLine24(VMemType color, int x, int y, int height)
 {
     // FIXME: does 24bpp holds R|G|B ?
     DrawVLine24(color, x, y, height); // no trans functionaility for the moment :(
@@ -2473,12 +2473,12 @@ local void Draw25TransVLine24(SysColors color, int x, int y, int height)
 /**
 **	Draw 25% translucent vertical line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw25TransVLine32(SysColors color, int x, int y, int height)
+local void Draw25TransVLine32(VMemType color, int x, int y, int height)
 {
     VMemType32* p;
     unsigned long sp1,sp2;
@@ -2486,7 +2486,7 @@ local void Draw25TransVLine32(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = ((sp1 & 0xFF00FF00) >> 8) * 3;
     sp1 = (sp1 & 0x00FF00FF) * 3;
@@ -2509,18 +2509,18 @@ local void Draw25TransVLine32(SysColors color, int x, int y, int height)
 /**
 **	Draw 25% translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw25TransVLineOpenGL(SysColors color, int x, int y, int height)
+local void Draw25TransVLineOpenGL(VMemType color, int x, int y, int height)
 {
     VMemType32 c;
     GLubyte r,g,b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -2537,12 +2537,12 @@ local void Draw25TransVLineOpenGL(SysColors color, int x, int y, int height)
 /**
 **	Draw 50% translucent vertical line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine8(SysColors color, int x, int y, int height)
+local void Draw50TransVLine8(VMemType color, int x, int y, int height)
 {
     VMemType8* p;
     unsigned int c;
@@ -2550,7 +2550,7 @@ local void Draw50TransVLine8(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory8 + x + y * w;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
     while (height--) {
         *p = lookup50trans8[c | *p];
         p += w;
@@ -2560,12 +2560,12 @@ local void Draw50TransVLine8(SysColors color, int x, int y, int height)
 /**
 **	Draw 50% translucent vertical line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine15(SysColors color, int x, int y, int height)
+local void Draw50TransVLine15(VMemType color, int x, int y, int height)
 {
     VMemType16* p;
     unsigned long sp;
@@ -2573,7 +2573,7 @@ local void Draw50TransVLine15(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
 
     while (height--) {
@@ -2590,12 +2590,12 @@ local void Draw50TransVLine15(SysColors color, int x, int y, int height)
 /**
 **	Draw 50% translucent vertical line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine16(SysColors color, int x, int y, int height)
+local void Draw50TransVLine16(VMemType color, int x, int y, int height)
 {
     VMemType16* p;
     unsigned long sp;
@@ -2603,7 +2603,7 @@ local void Draw50TransVLine16(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = ((sp << 16) | sp) & 0x07E0F81F;
 
@@ -2621,12 +2621,12 @@ local void Draw50TransVLine16(SysColors color, int x, int y, int height)
 /**
 **	Draw 50% translucent vertical line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine24(SysColors color, int x, int y, int height)
+local void Draw50TransVLine24(VMemType color, int x, int y, int height)
 {
     // FIXME: does 24bpp holds R|G|B ?
     DrawVLine24(color, x, y, height); // no trans functionaility for the moment :(
@@ -2635,12 +2635,12 @@ local void Draw50TransVLine24(SysColors color, int x, int y, int height)
 /**
 **	Draw 50% translucent vertical line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw50TransVLine32(SysColors color, int x, int y, int height)
+local void Draw50TransVLine32(VMemType color, int x, int y, int height)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -2649,7 +2649,7 @@ local void Draw50TransVLine32(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -2672,20 +2672,20 @@ local void Draw50TransVLine32(SysColors color, int x, int y, int height)
 /**
 **	Draw 50% translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw50TransVLineOpenGL(SysColors color, int x, int y, int height)
+local void Draw50TransVLineOpenGL(VMemType color, int x, int y, int height)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -2702,12 +2702,12 @@ local void Draw50TransVLineOpenGL(SysColors color, int x, int y, int height)
 /**
 **	Draw 75% translucent vertical line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine8(SysColors color, int x, int y, int height)
+local void Draw75TransVLine8(VMemType color, int x, int y, int height)
 {
     VMemType8* p;
     unsigned int c;
@@ -2715,7 +2715,7 @@ local void Draw75TransVLine8(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory8 + x + y * w;
-    c = Pixels8[color];
+    c = color.D8;
     while (height--) {
         *p = lookup25trans8[(*p << 8) | c];
         p += w;
@@ -2725,12 +2725,12 @@ local void Draw75TransVLine8(SysColors color, int x, int y, int height)
 /**
 **	Draw 75% translucent vertical line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine15(SysColors color, int x, int y, int height)
+local void Draw75TransVLine15(VMemType color, int x, int y, int height)
 {
     VMemType16* p;
     unsigned long sp;
@@ -2738,7 +2738,7 @@ local void Draw75TransVLine15(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = ((sp << 16) | sp) & 0x03E07C1F;
 
@@ -2756,12 +2756,12 @@ local void Draw75TransVLine15(SysColors color, int x, int y, int height)
 /**
 **	Draw 75% translucent vertical line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine16(SysColors color, int x, int y, int height)
+local void Draw75TransVLine16(VMemType color, int x, int y, int height)
 {
     VMemType16* p;
     unsigned long sp;
@@ -2769,7 +2769,7 @@ local void Draw75TransVLine16(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = ((sp << 16) | sp) & 0x07E0F81F;
 
@@ -2787,12 +2787,12 @@ local void Draw75TransVLine16(SysColors color, int x, int y, int height)
 /**
 **	Draw 75% translucent vertical line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine24(SysColors color, int x, int y, int height)
+local void Draw75TransVLine24(VMemType color, int x, int y, int height)
 {
     // FIXME: does 24bpp holds R|G|B ?
     DrawVLine24(color, x, y, height); // no trans functionaility for the moment :(
@@ -2801,12 +2801,12 @@ local void Draw75TransVLine24(SysColors color, int x, int y, int height)
 /**
 **	Draw 75% translucent vertical line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-local void Draw75TransVLine32(SysColors color, int x, int y, int height)
+local void Draw75TransVLine32(VMemType color, int x, int y, int height)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -2815,7 +2815,7 @@ local void Draw75TransVLine32(SysColors color, int x, int y, int height)
 
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -2838,20 +2838,20 @@ local void Draw75TransVLine32(SysColors color, int x, int y, int height)
 /**
 **	Draw 75% translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw75TransVLineOpenGL(SysColors color, int x, int y, int height)
+local void Draw75TransVLineOpenGL(VMemType color, int x, int y, int height)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -2868,13 +2868,13 @@ local void Draw75TransVLineOpenGL(SysColors color, int x, int y, int height)
 /**
 **	Draw translucent vertical line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine8(SysColors color, int x, int y, int height,
+local void DrawTransVLine8(VMemType color, int x, int y, int height,
     unsigned char alpha)
 {
     VMemType8* p;
@@ -2883,7 +2883,7 @@ local void DrawTransVLine8(SysColors color, int x, int y, int height,
 
     w = VideoWidth;
     p = VideoMemory8 + x + y * w;
-    c = Pixels8[color];
+    c = color.D8;
 
     switch (((unsigned int)alpha * 4) / 255) {
 	case 0:
@@ -2920,13 +2920,13 @@ local void DrawTransVLine8(SysColors color, int x, int y, int height,
 /**
 **	Draw vertical line unclipped into 8bit framebuffer (ignoring alpha).
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	Height = length of the line.
 **      @param alpha    alpha value of pixel.
 */
-local void DrawNoTransVLine8(SysColors color, int x, int y, int height,
+local void DrawNoTransVLine8(VMemType color, int x, int y, int height,
     unsigned char alpha __attribute__((unused)))
 {
     DrawVLine8(color, x, y, height);
@@ -2935,13 +2935,13 @@ local void DrawNoTransVLine8(SysColors color, int x, int y, int height,
 /**
 **	Draw translucent vertical line unclipped into 15bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine15(SysColors color, int x, int y, int height,
+local void DrawTransVLine15(VMemType color, int x, int y, int height,
     unsigned char alpha)
 {
     VMemType16* p;
@@ -2950,7 +2950,7 @@ local void DrawTransVLine15(SysColors color, int x, int y, int height,
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     alpha >>= 3;				// FIXME: only 5bits
@@ -2969,13 +2969,13 @@ local void DrawTransVLine15(SysColors color, int x, int y, int height,
 /**
 **	Draw translucent vertical line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine16(SysColors color, int x, int y, int height,
+local void DrawTransVLine16(VMemType color, int x, int y, int height,
     unsigned char alpha)
 {
     VMemType16* p;
@@ -2984,7 +2984,7 @@ local void DrawTransVLine16(SysColors color, int x, int y, int height,
 
     w = VideoWidth;
     p = VideoMemory16 + y * w + x;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     alpha >>= 3;				// FIXME: only 5bits
@@ -3003,13 +3003,13 @@ local void DrawTransVLine16(SysColors color, int x, int y, int height,
 /**
 **	Draw translucent vertical line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine24(SysColors color, int x, int y, int height,
+local void DrawTransVLine24(VMemType color, int x, int y, int height,
     unsigned char alpha __attribute__((unused)))
 {
     // FIXME: does 24bpp holds R|G|B ?
@@ -3019,13 +3019,13 @@ local void DrawTransVLine24(SysColors color, int x, int y, int height,
 /**
 **	Draw translucent vertical line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-local void DrawTransVLine32(SysColors color, int x, int y, int height,
+local void DrawTransVLine32(VMemType color, int x, int y, int height,
     unsigned char alpha)
 {
     VMemType32* p;
@@ -3035,7 +3035,7 @@ local void DrawTransVLine32(SysColors color, int x, int y, int height,
 
     w = VideoWidth;
     p = VideoMemory32 + y * w + x;
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -3079,14 +3079,14 @@ local void DrawTransVLine32(SysColors color, int x, int y, int height,
 /**
 **	Draw translucent vertical line unclipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
 #ifdef USE_OPENGL
-local void DrawTransVLineOpenGL(SysColors color, int x, int y, int height,
+local void DrawTransVLineOpenGL(VMemType color, int x, int y, int height,
     unsigned char alpha)
 {
     VMemType32 c;
@@ -3094,7 +3094,7 @@ local void DrawTransVLineOpenGL(SysColors color, int x, int y, int height,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -3111,12 +3111,12 @@ local void DrawTransVLineOpenGL(SysColors color, int x, int y, int height,
 /**
 **	Draw vertical line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-global void VideoDrawVLineClip(SysColors color, int x, int y, int height)
+global void VideoDrawVLineClip(VMemType color, int x, int y, int height)
 {
     CLIP_VLINE(x, y, height);
     VideoDrawVLine(color, x, y, height);
@@ -3125,12 +3125,12 @@ global void VideoDrawVLineClip(SysColors color, int x, int y, int height)
 /**
 **	Draw 25% translucent vertical line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-global void VideoDraw25TransVLineClip(SysColors color, int x, int y,
+global void VideoDraw25TransVLineClip(VMemType color, int x, int y,
     int height)
 {
     CLIP_VLINE(x, y, height);
@@ -3140,12 +3140,12 @@ global void VideoDraw25TransVLineClip(SysColors color, int x, int y,
 /**
 **	Draw 50% translucent vertical line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-global void VideoDraw50TransVLineClip(SysColors color, int x, int y,
+global void VideoDraw50TransVLineClip(VMemType color, int x, int y,
     int height)
 {
     CLIP_VLINE(x, y, height);
@@ -3155,12 +3155,12 @@ global void VideoDraw50TransVLineClip(SysColors color, int x, int y,
 /**
 **	Draw 75% translucent vertical line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 */
-global void VideoDraw75TransVLineClip(SysColors color, int x, int y,
+global void VideoDraw75TransVLineClip(VMemType color, int x, int y,
     int height)
 {
     CLIP_VLINE(x, y, height);
@@ -3170,14 +3170,14 @@ global void VideoDraw75TransVLineClip(SysColors color, int x, int y,
 /**
 **	Draw translucent vertical line clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param height	height of line (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-global void VideoDrawTransVLineClip(SysColors color, int x, int y,
-    int height,unsigned char alpha)
+global void VideoDrawTransVLineClip(VMemType color, int x, int y,
+    int height, unsigned char alpha)
 {
     CLIP_VLINE(x, y, height);
     VideoDrawTransVLine(color, x, y, height, alpha);
@@ -3190,13 +3190,13 @@ global void VideoDrawTransVLineClip(SysColors color, int x, int y,
 /**
 **	Draw line unclipped into 8bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x1	Source x coordinate on the screen
 **	@param y1	Source y coordinate on the screen
 **	@param x2	Destination x coordinate on the screen
 **	@param y2	Destination y coordinate on the screen
 */
-local void DrawLine8(SysColors color, int x1, int y1, int x2, int y2)
+local void DrawLine8(VMemType color, int x1, int y1, int x2, int y2)
 {
     int d;
     int dx;
@@ -3226,7 +3226,7 @@ local void DrawLine8(SysColors color, int x1, int y1, int x2, int y2)
     // initialize
 
     w = VideoWidth;
-    f = Pixels8[color];
+    f = color.D8;
 
     if (y1 > y2) {		// exchange coordinates
 	x1 ^= x2; x2 ^= x1; x1 ^= x2;
@@ -3290,13 +3290,13 @@ local void DrawLine8(SysColors color, int x1, int y1, int x2, int y2)
 /**
 **	Draw line unclipped into 16bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x1	Source x coordinate on the screen
 **	@param y1	Source y coordinate on the screen
 **	@param x2	Destination x coordinate on the screen
 **	@param y2	Destination y coordinate on the screen
 */
-local void DrawLine16(SysColors color, int x1, int y1, int x2, int y2)
+local void DrawLine16(VMemType color, int x1, int y1, int x2, int y2)
 {
     int d;
     int dx;
@@ -3326,7 +3326,7 @@ local void DrawLine16(SysColors color, int x1, int y1, int x2, int y2)
     // initialize
 
     w = VideoWidth;
-    f = Pixels16[color];
+    f = color.D16;
 
     if (y1 > y2) {		// exchange coordinates
 	x1 ^= x2; x2 ^= x1; x1 ^= x2;
@@ -3390,13 +3390,13 @@ local void DrawLine16(SysColors color, int x1, int y1, int x2, int y2)
 /**
 **	Draw line unclipped into 24bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x1	Source x coordinate on the screen
 **	@param y1	Source y coordinate on the screen
 **	@param x2	Destination x coordinate on the screen
 **	@param y2	Destination y coordinate on the screen
 */
-local void DrawLine24(SysColors color, int x1, int y1, int x2, int y2)
+local void DrawLine24(VMemType color, int x1, int y1, int x2, int y2)
 {
     int d;
     int dx;
@@ -3426,7 +3426,7 @@ local void DrawLine24(SysColors color, int x1, int y1, int x2, int y2)
     // initialize
 
     w = VideoWidth;
-    f = Pixels24[color];
+    f = color.D24;
 
     if (y1 > y2) {		// exchange coordinates
 	x1 ^= x2; x2 ^= x1; x1 ^= x2;
@@ -3490,13 +3490,13 @@ local void DrawLine24(SysColors color, int x1, int y1, int x2, int y2)
 /**
 **	Draw line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x1	Source x coordinate on the screen
 **	@param y1	Source y coordinate on the screen
 **	@param x2	Destination x coordinate on the screen
 **	@param y2	Destination y coordinate on the screen
 */
-local void DrawLine32(SysColors color, int x1, int y1, int x2, int y2)
+local void DrawLine32(VMemType color, int x1, int y1, int x2, int y2)
 {
     int d;
     int dx;
@@ -3526,7 +3526,7 @@ local void DrawLine32(SysColors color, int x1, int y1, int x2, int y2)
     // initialize
 
     w = VideoWidth;
-    f = Pixels32[color];
+    f = color.D32;
 
     if (y1 > y2) {		// exchange coordinates
 	x1 ^= x2; x2 ^= x1; x1 ^= x2;
@@ -3590,21 +3590,21 @@ local void DrawLine32(SysColors color, int x1, int y1, int x2, int y2)
 /**
 **	Draw line unclipped into 32bit framebuffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x1	Source x coordinate on the screen
 **	@param y1	Source y coordinate on the screen
 **	@param x2	Destination x coordinate on the screen
 **	@param y2	Destination y coordinate on the screen
 */
 #ifdef USE_OPENGL
-local void DrawLineOpenGL(SysColors color, int x1, int y1, int x2, int y2)
+local void DrawLineOpenGL(VMemType color, int x1, int y1, int x2, int y2)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -3676,13 +3676,13 @@ static ClipCode LineIsUnclipped(int code1, int code2)
 **      (Replaces Liang/Barksy clipping algorithm in CVS version 1.18, which
 **       might be faster, but that one contained some BUGs)
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x1	Source x coordinate on the screen
 **	@param y1	Source y coordinate on the screen
 **	@param x2	Destination x coordinate on the screen
 **	@param y2	Destination y coordinate on the screen
 */
-global void VideoDrawLineClip(SysColors color, int x1, int y1, int x2, int y2)
+global void VideoDrawLineClip(VMemType color, int x1, int y1, int x2, int y2)
 /* Based on Sutherland-Cohen clipping technique */
 {
     ClipCode code1;
@@ -3738,20 +3738,20 @@ global void VideoDrawLineClip(SysColors color, int x1, int y1, int x2, int y2)
 /**
 **	Draw rectangle into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawRectangle8(SysColors color, int x, int y, int w, int h)
+local void DrawRectangle8(VMemType color, int x, int y, int w, int h)
 {
     VMemType8* p;
     VMemType8 f;
     int swidth;
     int ofs;
 
-    f = Pixels8[color];
+    f = color.D8;
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
     if (h && (ofs = w)) {
@@ -3775,20 +3775,20 @@ local void DrawRectangle8(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw rectangle into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawRectangle16(SysColors color, int x, int y, int w, int h)
+local void DrawRectangle16(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     VMemType16 f;
     int swidth;
     int ofs;
 
-    f = Pixels16[color];
+    f = color.D16;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     if (h && (ofs = w)) {
@@ -3812,13 +3812,13 @@ local void DrawRectangle16(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw rectangle into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawRectangle24(SysColors color, int x, int y
+local void DrawRectangle24(VMemType color, int x, int y
 	, int w, int h)
 {
     VMemType24* p;
@@ -3826,7 +3826,7 @@ local void DrawRectangle24(SysColors color, int x, int y
     int swidth;
     int ofs;
 
-    f = Pixels24[color];
+    f = color.D24;
     swidth = VideoWidth;
     p = VideoMemory24 + y * swidth + x;
     if (h && (ofs = w)) {
@@ -3850,13 +3850,13 @@ local void DrawRectangle24(SysColors color, int x, int y
 /**
 **	Draw rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawRectangle32(SysColors color, int x, int y
+local void DrawRectangle32(VMemType color, int x, int y
 	, int w, int h)
 {
     VMemType32* p;
@@ -3864,7 +3864,7 @@ local void DrawRectangle32(SysColors color, int x, int y
     int swidth;
     int ofs;
 
-    f = Pixels32[color];
+    f = color.D32;
     swidth = VideoWidth;
     p = VideoMemory32 + y * swidth + x;
     if (h && (ofs = w)) {
@@ -3888,21 +3888,21 @@ local void DrawRectangle32(SysColors color, int x, int y
 /**
 **	Draw rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void DrawRectangleOpenGL(SysColors color, int x, int y, int w, int h)
+local void DrawRectangleOpenGL(VMemType color, int x, int y, int w, int h)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -3921,13 +3921,13 @@ local void DrawRectangleOpenGL(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 25% translucent rectangle into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw25TransRectangle8(SysColors color, int x, int y, int w, int h)
+local void Draw25TransRectangle8(VMemType color, int x, int y, int w, int h)
 {
     VMemType8* p;
     int swidth;
@@ -3936,7 +3936,7 @@ local void Draw25TransRectangle8(SysColors color, int x, int y, int w, int h)
 
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
     if (h && (ofs = w)) {
 	do { // Draw top horizontal line
 	    *p = lookup25trans8[c | *p];
@@ -3969,13 +3969,13 @@ local void Draw25TransRectangle8(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 25% translucent rectangle into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw25TransRectangle15(SysColors color, int x, int y, int w, int h)
+local void Draw25TransRectangle15(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     unsigned long sp;
@@ -3983,7 +3983,7 @@ local void Draw25TransRectangle15(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x03E07C1F) * 3;
     swidth = VideoWidth;
@@ -4035,13 +4035,13 @@ local void Draw25TransRectangle15(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 25% translucent rectangle into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw25TransRectangle16(SysColors color, int x, int y, int w, int h)
+local void Draw25TransRectangle16(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     unsigned long sp;
@@ -4049,7 +4049,7 @@ local void Draw25TransRectangle16(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x07E0F81F) * 3;
     swidth = VideoWidth;
@@ -4101,13 +4101,13 @@ local void Draw25TransRectangle16(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 25% translucent rectangle into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw25TransRectangle24(SysColors color, int x, int y, int w, int h)
+local void Draw25TransRectangle24(VMemType color, int x, int y, int w, int h)
 {
 //FIXME: does 24bpp represents R|G|B?
     DrawRectangle24(color, x, y, w, h); // no trans functionaility for the moment :(
@@ -4116,13 +4116,13 @@ local void Draw25TransRectangle24(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 25% translucent rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw25TransRectangle32(SysColors color, int x, int y, int w, int h)
+local void Draw25TransRectangle32(VMemType color, int x, int y, int w, int h)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -4132,7 +4132,7 @@ local void Draw25TransRectangle32(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = ((sp1 & 0xFF00FF00) >> 8) * 3;
     sp1 = (sp1 & 0x00FF00FF) * 3;
@@ -4196,14 +4196,14 @@ local void Draw25TransRectangle32(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 25% translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw25TransRectangleOpenGL(SysColors color, int x, int y,
+local void Draw25TransRectangleOpenGL(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32 c;
@@ -4211,7 +4211,7 @@ local void Draw25TransRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -4230,13 +4230,13 @@ local void Draw25TransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Draw 50% translucent rectangle into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw50TransRectangle8(SysColors color, int x, int y, int w, int h)
+local void Draw50TransRectangle8(VMemType color, int x, int y, int w, int h)
 {
     VMemType8* p;
     int swidth;
@@ -4245,7 +4245,7 @@ local void Draw50TransRectangle8(SysColors color, int x, int y, int w, int h)
 
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
     if (h && (ofs = w)) {
 	do { // Draw top horizontal line
 	    *p = lookup50trans8[c | *p];
@@ -4278,13 +4278,13 @@ local void Draw50TransRectangle8(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 50% translucent rectangle into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw50TransRectangle15(SysColors color, int x, int y, int w, int h)
+local void Draw50TransRectangle15(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     unsigned long sp;
@@ -4292,7 +4292,7 @@ local void Draw50TransRectangle15(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
@@ -4343,13 +4343,13 @@ local void Draw50TransRectangle15(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 50% translucent rectangle into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw50TransRectangle16(SysColors color, int x, int y, int w, int h)
+local void Draw50TransRectangle16(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     unsigned long sp;
@@ -4357,7 +4357,7 @@ local void Draw50TransRectangle16(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
@@ -4408,13 +4408,13 @@ local void Draw50TransRectangle16(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 50% translucent rectangle into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw50TransRectangle24(SysColors color, int x, int y, int w, int h)
+local void Draw50TransRectangle24(VMemType color, int x, int y, int w, int h)
 {
 //FIXME: does 24bpp represents R|G|B?
     DrawRectangle24(color, x, y, w, h); // no trans functionaility for the moment :(
@@ -4423,13 +4423,13 @@ local void Draw50TransRectangle24(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 50% translucent rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw50TransRectangle32(SysColors color, int x, int y, int w, int h)
+local void Draw50TransRectangle32(VMemType color, int x, int y, int w, int h)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -4439,7 +4439,7 @@ local void Draw50TransRectangle32(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
@@ -4503,14 +4503,14 @@ local void Draw50TransRectangle32(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 50% translucent rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw50TransRectangleOpenGL(SysColors color, int x, int y,
+local void Draw50TransRectangleOpenGL(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32 c;
@@ -4518,7 +4518,7 @@ local void Draw50TransRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -4537,13 +4537,13 @@ local void Draw50TransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Draw 75% translucent rectangle into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw75TransRectangle8(SysColors color, int x, int y, int w, int h)
+local void Draw75TransRectangle8(VMemType color, int x, int y, int w, int h)
 {
     VMemType8* p;
     int swidth;
@@ -4552,7 +4552,7 @@ local void Draw75TransRectangle8(SysColors color, int x, int y, int w, int h)
 
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
-    c = Pixels8[color];
+    c = color.D8;
     if (h && (ofs = w)) {
 	do { // Draw top horizontal line
 	    *p = lookup25trans8[(*p << 8) | c];
@@ -4585,13 +4585,13 @@ local void Draw75TransRectangle8(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 75% translucent rectangle into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw75TransRectangle15(SysColors color, int x, int y, int w, int h)
+local void Draw75TransRectangle15(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     unsigned long sp;
@@ -4599,7 +4599,7 @@ local void Draw75TransRectangle15(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
@@ -4650,13 +4650,13 @@ local void Draw75TransRectangle15(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 75% translucent rectangle into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw75TransRectangle16(SysColors color, int x, int y, int w, int h)
+local void Draw75TransRectangle16(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     unsigned long sp;
@@ -4664,7 +4664,7 @@ local void Draw75TransRectangle16(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
@@ -4715,13 +4715,13 @@ local void Draw75TransRectangle16(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 75% translucent rectangle into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw75TransRectangle24(SysColors color, int x, int y, int w, int h)
+local void Draw75TransRectangle24(VMemType color, int x, int y, int w, int h)
 {
 //FIXME: does 24bpp represents R|G|B?
     DrawRectangle24(color, x, y, w, h); // no trans functionaility for the moment :(
@@ -4730,13 +4730,13 @@ local void Draw75TransRectangle24(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 75% translucent rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void Draw75TransRectangle32(SysColors color, int x, int y, int w, int h)
+local void Draw75TransRectangle32(VMemType color, int x, int y, int w, int h)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -4746,7 +4746,7 @@ local void Draw75TransRectangle32(SysColors color, int x, int y, int w, int h)
     int swidth;
     int ofs;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
@@ -4810,14 +4810,14 @@ local void Draw75TransRectangle32(SysColors color, int x, int y, int w, int h)
 /**
 **	Draw 75% translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void Draw75TransRectangleOpenGL(SysColors color, int x, int y,
+local void Draw75TransRectangleOpenGL(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32 c;
@@ -4825,7 +4825,7 @@ local void Draw75TransRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -4844,14 +4844,14 @@ local void Draw75TransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawTransRectangle8(SysColors color, int x, int y,
+local void DrawTransRectangle8(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     switch (((unsigned int)alpha * 4) / 255) {
@@ -4882,7 +4882,7 @@ local void DrawTransRectangle8(SysColors color, int x, int y,
 **	@param h	Height in pixel of the rectangle
 **      @param alpha    Alpha value of pixel
 */
-local void DrawNoTransRectangle8(SysColors color, int x, int y,
+local void DrawNoTransRectangle8(VMemType color, int x, int y,
     int w, int h, unsigned char alpha __attribute__((unused)))
 {
     DrawRectangle8(color, x, y, w, h);
@@ -4891,14 +4891,14 @@ local void DrawNoTransRectangle8(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawTransRectangle15(SysColors color, int x, int y,
+local void DrawTransRectangle15(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     VMemType16* p;
@@ -4907,7 +4907,7 @@ local void DrawTransRectangle15(SysColors color, int x, int y,
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
@@ -4960,14 +4960,14 @@ local void DrawTransRectangle15(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawTransRectangle16(SysColors color, int x, int y,
+local void DrawTransRectangle16(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     VMemType16* p;
@@ -4976,7 +4976,7 @@ local void DrawTransRectangle16(SysColors color, int x, int y,
     int swidth;
     int ofs;
 
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
@@ -5029,14 +5029,14 @@ local void DrawTransRectangle16(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawTransRectangle24(SysColors color, int x, int y,
+local void DrawTransRectangle24(VMemType color, int x, int y,
     int w, int h, unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
@@ -5046,14 +5046,14 @@ local void DrawTransRectangle24(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawTransRectangle32(SysColors color, int x, int y,
+local void DrawTransRectangle32(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     VMemType32* p;
@@ -5064,7 +5064,7 @@ local void DrawTransRectangle32(SysColors color, int x, int y,
     int swidth;
     int ofs;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
@@ -5128,7 +5128,7 @@ local void DrawTransRectangle32(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
@@ -5136,7 +5136,7 @@ local void DrawTransRectangle32(SysColors color, int x, int y,
 **      @param alpha    alpha value of pixel.
 */
 #ifdef USE_OPENGL
-local void DrawTransRectangleOpenGL(SysColors color, int x, int y,
+local void DrawTransRectangleOpenGL(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     VMemType32 c;
@@ -5144,7 +5144,7 @@ local void DrawTransRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -5163,13 +5163,13 @@ local void DrawTransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Draw rectangle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoDrawRectangleClip(SysColors color, int x, int y,
+global void VideoDrawRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     #define _x              x
@@ -5192,13 +5192,13 @@ global void VideoDrawRectangleClip(SysColors color, int x, int y,
 /**
 **	Draw 25% translucent rectangle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoDraw25TransRectangleClip(SysColors color, int x, int y,
+global void VideoDraw25TransRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     #define _x              x
@@ -5221,13 +5221,13 @@ global void VideoDraw25TransRectangleClip(SysColors color, int x, int y,
 /**
 **	Draw 50% translucent rectangle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoDraw50TransRectangleClip(SysColors color, int x, int y,
+global void VideoDraw50TransRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     #define _x              x
@@ -5250,13 +5250,13 @@ global void VideoDraw50TransRectangleClip(SysColors color, int x, int y,
 /**
 **	Draw 75% translucent rectangle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoDraw75TransRectangleClip(SysColors color, int x, int y,
+global void VideoDraw75TransRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     #define _x              x
@@ -5279,15 +5279,15 @@ global void VideoDraw75TransRectangleClip(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-global void VideoDrawTransRectangleClip(SysColors color, int x, int y,
-    int w, int h,unsigned char alpha)
+global void VideoDrawTransRectangleClip(VMemType color, int x, int y,
+    int w, int h, unsigned char alpha)
 {
     #define _x              x
     #define _y              y
@@ -5315,12 +5315,12 @@ global void VideoDrawTransRectangleClip(SysColors color, int x, int y,
 /**
 **	Draw circle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	Center x coordinate on the screen
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoDrawCircle(SysColors color, int x, int y, int r)
+global void VideoDrawCircle(VMemType color, int x, int y, int r)
 {
     int cx;
     int cy;
@@ -5374,12 +5374,12 @@ global void VideoDrawCircle(SysColors color, int x, int y, int r)
 /**
 **	Draw circle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	Center x coordinate on the screen
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoDrawCircleClip(SysColors color, int x, int y, int r)
+global void VideoDrawCircleClip(VMemType color, int x, int y, int r)
 {
     int cx;
     int cy;
@@ -5437,20 +5437,20 @@ global void VideoDrawCircleClip(SysColors color, int x, int y, int r)
 /**
 **	Fill rectangle into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFillRectangle8(SysColors color, int x, int y, int w, int h)
+local void DrawFillRectangle8(VMemType color, int x, int y, int w, int h)
 {
     VMemType8* p;
     VMemType8 f;
     int swidth;
     int i;
 
-    f = Pixels8[color];
+    f = color.D8;
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
     swidth -= w;
@@ -5468,20 +5468,20 @@ local void DrawFillRectangle8(SysColors color, int x, int y, int w, int h)
 /**
 **	Fill rectangle into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFillRectangle16(SysColors color, int x, int y, int w, int h)
+local void DrawFillRectangle16(VMemType color, int x, int y, int w, int h)
 {
     VMemType16* p;
     VMemType16 f;
     int swidth;
     int i;
 
-    f = Pixels16[color];
+    f = color.D16;
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
@@ -5499,20 +5499,20 @@ local void DrawFillRectangle16(SysColors color, int x, int y, int w, int h)
 /**
 **	Fill rectangle into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFillRectangle24(SysColors color, int x, int y, int w, int h)
+local void DrawFillRectangle24(VMemType color, int x, int y, int w, int h)
 {
     VMemType24* p;
     VMemType24 f;
     int swidth;
     int i;
 
-    f = Pixels24[color];
+    f = color.D24;
     swidth = VideoWidth;
     p = VideoMemory24 + y * swidth + x;
     swidth -= w;
@@ -5530,20 +5530,20 @@ local void DrawFillRectangle24(SysColors color, int x, int y, int w, int h)
 /**
 **	Fill rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFillRectangle32(SysColors color, int x, int y, int w, int h)
+local void DrawFillRectangle32(VMemType color, int x, int y, int w, int h)
 {
     VMemType32* p;
     VMemType32 f;
     int swidth;
     int i;
 
-    f = Pixels32[color];
+    f = color.D32;
     swidth = VideoWidth;
     p = VideoMemory32 + y * swidth + x;
     swidth -= w;
@@ -5561,14 +5561,14 @@ local void DrawFillRectangle32(SysColors color, int x, int y, int w, int h)
 /**
 **	Fill rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void DrawFillRectangleOpenGL(SysColors color, int x, int y,
+local void DrawFillRectangleOpenGL(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32 c;
@@ -5576,7 +5576,7 @@ local void DrawFillRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -5595,13 +5595,13 @@ local void DrawFillRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Fill rectangle 25% translucent clipped into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill25TransRectangle8(SysColors color, int x, int y,
+local void DrawFill25TransRectangle8(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType8* p;
@@ -5612,7 +5612,7 @@ local void DrawFill25TransRectangle8(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
     swidth -= w;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
 
     if (w) {
 	while (h--) {
@@ -5629,13 +5629,13 @@ local void DrawFill25TransRectangle8(SysColors color, int x, int y,
 /**
 **	Fill rectangle 25% translucent clipped into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill25TransRectangle15(SysColors color, int x, int y,
+local void DrawFill25TransRectangle15(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType16* p;
@@ -5646,7 +5646,7 @@ local void DrawFill25TransRectangle15(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x03E07C1F) * 3;
 
@@ -5668,13 +5668,13 @@ local void DrawFill25TransRectangle15(SysColors color, int x, int y,
 /**
 **	Fill rectangle 25% translucent clipped into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill25TransRectangle16(SysColors color, int x, int y,
+local void DrawFill25TransRectangle16(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType16* p;
@@ -5685,7 +5685,7 @@ local void DrawFill25TransRectangle16(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     // FIXME: pre multiply?
     sp = (((sp << 16) | sp) & 0x07E0F81F) * 3;
 
@@ -5707,13 +5707,13 @@ local void DrawFill25TransRectangle16(SysColors color, int x, int y,
 /**
 **	Fill rectangle 25% translucent clipped into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill25TransRectangle24(SysColors color, int x, int y,
+local void DrawFill25TransRectangle24(VMemType color, int x, int y,
     int w, int h)
 {
 // FIXME: does 24bpp holds R|G|B ?
@@ -5723,13 +5723,13 @@ local void DrawFill25TransRectangle24(SysColors color, int x, int y,
 /**
 **	Fill rectangle 25% translucent clipped into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill25TransRectangle32(SysColors color, int x, int y,
+local void DrawFill25TransRectangle32(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32* p;
@@ -5742,7 +5742,7 @@ local void DrawFill25TransRectangle32(SysColors color, int x, int y,
     p = VideoMemory32 + y * swidth + x;
     swidth -= w;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     // FIXME: pre multiply?
     sp2 = ((sp1 & 0xFF00FF00) >> 8) * 3;
     sp1 = (sp1 & 0x00FF00FF) * 3;
@@ -5770,14 +5770,14 @@ local void DrawFill25TransRectangle32(SysColors color, int x, int y,
 /**
 **	Fill rectangle 25% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void DrawFill25TransRectangleOpenGL(SysColors color, int x, int y,
+local void DrawFill25TransRectangleOpenGL(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32 c;
@@ -5785,7 +5785,7 @@ local void DrawFill25TransRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -5804,13 +5804,13 @@ local void DrawFill25TransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Fill rectangle 50% translucent clipped into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill50TransRectangle8(SysColors color, int x, int y,
+local void DrawFill50TransRectangle8(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType8* p;
@@ -5821,7 +5821,7 @@ local void DrawFill50TransRectangle8(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
     swidth -= w;
-    c = Pixels8[color] << 8;
+    c = color.D8 << 8;
 
     if (w) {
 	while (h--) {
@@ -5838,13 +5838,13 @@ local void DrawFill50TransRectangle8(SysColors color, int x, int y,
 /**
 **	Fill rectangle 50% translucent clipped into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill50TransRectangle15(SysColors color, int x, int y,
+local void DrawFill50TransRectangle15(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType16* p;
@@ -5855,7 +5855,7 @@ local void DrawFill50TransRectangle15(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
 
     if (w) {
@@ -5876,13 +5876,13 @@ local void DrawFill50TransRectangle15(SysColors color, int x, int y,
 /**
 **	Fill rectangle 50% translucent clipped into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill50TransRectangle16(SysColors color, int x, int y,
+local void DrawFill50TransRectangle16(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType16* p;
@@ -5893,7 +5893,7 @@ local void DrawFill50TransRectangle16(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
 
     if (w) {
@@ -5914,13 +5914,13 @@ local void DrawFill50TransRectangle16(SysColors color, int x, int y,
 /**
 **	Fill rectangle 50% translucent clipped into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill50TransRectangle24(SysColors color, int x, int y,
+local void DrawFill50TransRectangle24(VMemType color, int x, int y,
     int w, int h)
 {
 // FIXME: how does 24bpp represents RGB ?
@@ -5930,13 +5930,13 @@ local void DrawFill50TransRectangle24(SysColors color, int x, int y,
 /**
 **	Fill rectangle 50% translucent clipped into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill50TransRectangle32(SysColors color, int x, int y,
+local void DrawFill50TransRectangle32(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32* p;
@@ -5949,7 +5949,7 @@ local void DrawFill50TransRectangle32(SysColors color, int x, int y,
     p = VideoMemory32 + y * swidth + x;
     swidth -= w;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -5976,14 +5976,14 @@ local void DrawFill50TransRectangle32(SysColors color, int x, int y,
 /**
 **	Fill rectangle 50% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void DrawFill50TransRectangleOpenGL(SysColors color, int x, int y,
+local void DrawFill50TransRectangleOpenGL(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32 c;
@@ -5991,7 +5991,7 @@ local void DrawFill50TransRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -6010,13 +6010,13 @@ local void DrawFill50TransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Fill rectangle 75% translucent clipped into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill75TransRectangle8(SysColors color, int x, int y,
+local void DrawFill75TransRectangle8(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType8* p;
@@ -6027,7 +6027,7 @@ local void DrawFill75TransRectangle8(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
     swidth -= w;
-    c = Pixels8[color];
+    c = color.D8;
 
     if (w) {
 	while (h--) {
@@ -6044,13 +6044,13 @@ local void DrawFill75TransRectangle8(SysColors color, int x, int y,
 /**
 **	Fill rectangle 75% translucent clipped into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill75TransRectangle15(SysColors color, int x, int y,
+local void DrawFill75TransRectangle15(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType16* p;
@@ -6061,7 +6061,7 @@ local void DrawFill75TransRectangle15(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x03E07C1F;
 
     if (w) {
@@ -6082,13 +6082,13 @@ local void DrawFill75TransRectangle15(SysColors color, int x, int y,
 /**
 **	Fill rectangle 75% translucent clipped into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill75TransRectangle16(SysColors color, int x, int y,
+local void DrawFill75TransRectangle16(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType16* p;
@@ -6099,7 +6099,7 @@ local void DrawFill75TransRectangle16(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
 
     if (w) {
@@ -6120,13 +6120,13 @@ local void DrawFill75TransRectangle16(SysColors color, int x, int y,
 /**
 **	Fill rectangle 75% translucent clipped into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill75TransRectangle24(SysColors color, int x, int y,
+local void DrawFill75TransRectangle24(VMemType color, int x, int y,
     int w, int h)
 {
 // FIXME: does 24bpp holds R|G|B ?
@@ -6136,13 +6136,13 @@ local void DrawFill75TransRectangle24(SysColors color, int x, int y,
 /**
 **	Fill rectangle 75% translucent clipped into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-local void DrawFill75TransRectangle32(SysColors color, int x, int y,
+local void DrawFill75TransRectangle32(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32* p;
@@ -6155,7 +6155,7 @@ local void DrawFill75TransRectangle32(SysColors color, int x, int y,
     p = VideoMemory32 + y * swidth + x;
     swidth -= w;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -6182,14 +6182,14 @@ local void DrawFill75TransRectangle32(SysColors color, int x, int y,
 /**
 **	Fill rectangle 75% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
 #ifdef USE_OPENGL
-local void DrawFill75TransRectangleOpenGL(SysColors color, int x, int y,
+local void DrawFill75TransRectangleOpenGL(VMemType color, int x, int y,
     int w, int h)
 {
     VMemType32 c;
@@ -6197,7 +6197,7 @@ local void DrawFill75TransRectangleOpenGL(SysColors color, int x, int y,
     GLubyte g;
     Glubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -6216,14 +6216,14 @@ local void DrawFill75TransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 8bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawFillTransRectangle8(SysColors color, int x, int y,
+local void DrawFillTransRectangle8(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     VMemType8* p;
@@ -6234,7 +6234,7 @@ local void DrawFillTransRectangle8(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory8 + y * swidth + x;
     swidth -= w;
-    c = Pixels8[color];
+    c = color.D8;
 
     if (w) {
 	switch (((unsigned int)alpha * 4) / 255) {
@@ -6289,14 +6289,14 @@ local void DrawFillTransRectangle8(SysColors color, int x, int y,
 /**
 **	Draw rectangle into 8bpp frame buffer (ignoring alpha).
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawFillNoTransRectangle8(SysColors color, int x, int y,
+local void DrawFillNoTransRectangle8(VMemType color, int x, int y,
     int w, int h, unsigned char alpha __attribute__((unused)))
 {
     DrawFillRectangle8(color, x, y, w, h);
@@ -6305,14 +6305,14 @@ local void DrawFillNoTransRectangle8(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 15bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawFillTransRectangle15(SysColors color, int x, int y,
+local void DrawFillTransRectangle15(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     VMemType16* p;
@@ -6323,7 +6323,7 @@ local void DrawFillTransRectangle15(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     alpha >>= 3;                          //FIXME: only 5bits
 
@@ -6345,15 +6345,15 @@ local void DrawFillTransRectangle15(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 16bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawFillTransRectangle16(SysColors color, int x, int y,
-    int w, int h,unsigned char alpha)
+local void DrawFillTransRectangle16(VMemType color, int x, int y,
+    int w, int h, unsigned char alpha)
 {
     VMemType16* p;
     unsigned long sp;
@@ -6363,7 +6363,7 @@ local void DrawFillTransRectangle16(SysColors color, int x, int y,
     swidth = VideoWidth;
     p = VideoMemory16 + y * swidth + x;
     swidth -= w;
-    sp = Pixels16[color];
+    sp = color.D16;
     sp = ((sp << 16) | sp) & 0x07E0F81F;
     alpha >>= 3;                          //FIXME: only 5bits
 
@@ -6385,15 +6385,15 @@ local void DrawFillTransRectangle16(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 24bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawFillTransRectangle24(SysColors color, int x, int y,
-    int w, int h,unsigned char alpha __attribute__((unused)))
+local void DrawFillTransRectangle24(VMemType color, int x, int y,
+    int w, int h, unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
     DrawFillRectangle24(color, x, y, w, h); // no trans functionaility :(
@@ -6402,15 +6402,15 @@ local void DrawFillTransRectangle24(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle into 32bpp frame buffer.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **      @param alpha    alpha value of pixel.
 */
-local void DrawFillTransRectangle32(SysColors color, int x, int y,
-    int w, int h,unsigned char alpha)
+local void DrawFillTransRectangle32(VMemType color, int x, int y,
+    int w, int h, unsigned char alpha)
 {
     VMemType32* p;
     unsigned long sp1;
@@ -6422,7 +6422,7 @@ local void DrawFillTransRectangle32(SysColors color, int x, int y,
     p = VideoMemory32 + y * swidth + x;
     swidth -= w;
 
-    sp1 = Pixels32[color];
+    sp1 = color.D32;
     sp2 = (sp1 & 0xFF00FF00) >> 8;
     sp1 &= 0x00FF00FF;
 
@@ -6450,7 +6450,7 @@ local void DrawFillTransRectangle32(SysColors color, int x, int y,
 /**
 **	Draw translucent rectangle.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
@@ -6458,15 +6458,15 @@ local void DrawFillTransRectangle32(SysColors color, int x, int y,
 **      @param alpha    alpha value of pixel.
 */
 #ifdef USE_OPENGL
-local void DrawFillTransRectangleOpenGL(SysColors color, int x, int y,
-    int w, int h,unsigned char alpha)
+local void DrawFillTransRectangleOpenGL(VMemType color, int x, int y,
+    int w, int h, unsigned char alpha)
 {
     VMemType32 c;
     GLubyte r;
     GLubyte g;
     GLubyte b;
 
-    c = Pixels32[color];
+    c = color.D32;
     r = (c >> 16) & 0xff;
     g = (c >> 8) & 0xff;
     b = (c >> 0) & 0xff;
@@ -6485,13 +6485,13 @@ local void DrawFillTransRectangleOpenGL(SysColors color, int x, int y,
 /**
 **	Fill rectangle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoFillRectangleClip(SysColors color, int x, int y,
+global void VideoFillRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     CLIP_RECTANGLE(x, y, w, h);
@@ -6501,13 +6501,13 @@ global void VideoFillRectangleClip(SysColors color, int x, int y,
 /**
 **	Fill rectangle 25% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoFill25TransRectangleClip(SysColors color, int x, int y,
+global void VideoFill25TransRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     CLIP_RECTANGLE(x, y, w, h);
@@ -6517,13 +6517,13 @@ global void VideoFill25TransRectangleClip(SysColors color, int x, int y,
 /**
 **	Fill rectangle 50% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoFill50TransRectangleClip(SysColors color, int x, int y,
+global void VideoFill50TransRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     CLIP_RECTANGLE(x, y, w, h);
@@ -6533,13 +6533,13 @@ global void VideoFill50TransRectangleClip(SysColors color, int x, int y,
 /**
 **	Fill rectangle 75% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 */
-global void VideoFill75TransRectangleClip(SysColors color, int x, int y,
+global void VideoFill75TransRectangleClip(VMemType color, int x, int y,
     int w, int h)
 {
     CLIP_RECTANGLE(x, y, w, h);
@@ -6549,14 +6549,14 @@ global void VideoFill75TransRectangleClip(SysColors color, int x, int y,
 /**
 **	Fill rectangle translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	x coordinate on the screen
 **	@param y	y coordinate on the screen
 **	@param h	height of rectangle (0=don't draw).
 **	@param w	width of rectangle (0=don't draw).
 **	@param alpha	alpha value of pixels.
 */
-global void VideoFillTransRectangleClip(SysColors color, int x, int y,
+global void VideoFillTransRectangleClip(VMemType color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     CLIP_RECTANGLE(x, y, w, h);
@@ -6570,12 +6570,12 @@ global void VideoFillTransRectangleClip(SysColors color, int x, int y,
 /**
 **	Fill circle clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	Center x coordinate on the screen
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFillCircleClip(SysColors color, int x, int y, int r)
+global void VideoFillCircleClip(VMemType color, int x, int y, int r)
 {
     int cx;
     int cy;
@@ -6616,12 +6616,12 @@ global void VideoFillCircleClip(SysColors color, int x, int y, int r)
 /**
 **	Fill circle 25% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	Center x coordinate on the screen
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFill25TransCircleClip(SysColors color, int x, int y, int r)
+global void VideoFill25TransCircleClip(VMemType color, int x, int y, int r)
 {
     int cx;
     int cy;
@@ -6662,12 +6662,12 @@ global void VideoFill25TransCircleClip(SysColors color, int x, int y, int r)
 /**
 **	Fill circle 50% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	Center x coordinate on the screen
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFill50TransCircleClip(SysColors color, int x, int y, int r)
+global void VideoFill50TransCircleClip(VMemType color, int x, int y, int r)
 {
     int cx;
     int cy;
@@ -6708,12 +6708,12 @@ global void VideoFill50TransCircleClip(SysColors color, int x, int y, int r)
 /**
 **	Fill circle 75% translucent clipped.
 **
-**	@param color	Color index.
+**	@param color	color
 **	@param x	Center x coordinate on the screen
 **	@param y	Center y coordinate on the screen
 **	@param r	radius of circle
 */
-global void VideoFill75TransCircleClip(SysColors color, int x, int y, int r)
+global void VideoFill75TransCircleClip(VMemType color, int x, int y, int r)
 {
     int cx;
     int cy;

@@ -876,7 +876,7 @@ global void ShowPicture(CampaignChapter* chapter)
 /**
 **	Draw a box with the text inside
 */
-local void DrawStatBox(int x, int y, char* text, unsigned color, int percent)
+local void DrawStatBox(int x, int y, char* text, VMemType color, int percent)
 {
     VideoFillRectangleClip(ColorBlack, x, y, 80, 24);
     VideoDrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);

@@ -301,6 +301,18 @@ global int ColorBuildingCycleEnd;
     /// Does ColorCycling..
 global void (*ColorCycle)(void);
 
+VMemType ColorBlack;
+VMemType ColorDarkGreen;
+VMemType ColorBlue;
+VMemType ColorOrange;
+VMemType ColorWhite;
+VMemType ColorNPC;
+VMemType ColorGray;
+VMemType ColorRed;
+VMemType ColorGreen;
+VMemType ColorYellow;
+
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/

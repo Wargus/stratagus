@@ -154,6 +154,8 @@ global void InitUserInterface(const char* race_name)
 	SetViewportMode(VIEWPORT_SINGLE);
     }
 
+    TheUI.CompleteBarColor = VideoMapRGB(TheUI.CompleteBarColorRGB.D24.a,
+	TheUI.CompleteBarColorRGB.D24.b, TheUI.CompleteBarColorRGB.D24.c);
     TheUI.ViewportCursorColor = ColorWhite;
 }
 

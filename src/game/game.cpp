@@ -283,7 +283,8 @@ global void CreateGame(char* filename, WorldMap* map)
     }
 
     InitVisionTable();			// build vision table for fog of war
-    
+    InitPlayers();
+
     if (filename) {
 	s = NULL;
 	// FIXME: LibraryFile here?

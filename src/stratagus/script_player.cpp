@@ -78,19 +78,19 @@ local SCM CclPlayer(SCM list)
     int i;
     char* str;
 
-    i=gh_scm2int(gh_car(list));
-    player=&Players[i];
-    if( NumPlayers<=i ) {
-	NumPlayers=i+1;
+    i = gh_scm2int(gh_car(list));
+    player = &Players[i];
+    if (NumPlayers <= i) {
+	NumPlayers = i + 1;
     }
     player->Player = i;
-    player->Color=PlayerColors[i];
-    if( !(player->Units=(Unit**)calloc(UnitMax,sizeof(Unit*))) ) {
+    player->Color = PlayerColors[i];
+    if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
 	DebugLevel0("Not enough memory to create player %d.\n" _C_ i);
 
 	return SCM_UNSPECIFIED;
     }
-    list=gh_cdr(list);
+    list = gh_cdr(list);
 
     //
     //	Parse the list:	(still everything could be changed!)

@@ -496,7 +496,7 @@ global void VideoDraw8Fog16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -577,7 +577,7 @@ global void VideoDraw8Unexplored16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -619,7 +619,7 @@ global void VideoDraw8Fog32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -700,7 +700,7 @@ global void VideoDraw8Unexplored32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -744,7 +744,7 @@ global void VideoDraw16Fog16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -825,7 +825,7 @@ global void VideoDraw16Unexplored16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -866,7 +866,7 @@ global void VideoDraw16Fog32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -947,7 +947,7 @@ global void VideoDraw16Unexplored32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -990,7 +990,7 @@ global void VideoDraw24Fog16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {	\
+	if (COLOR_FOG_P(sp[x])) {	\
 	    dp[x] = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -1071,7 +1071,7 @@ global void VideoDraw24Unexplored16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -1112,7 +1112,7 @@ global void VideoDraw24Fog32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {	\
+	if (COLOR_FOG_P(sp[x])) {	\
 	    dp[x] = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -1193,7 +1193,7 @@ global void VideoDraw24Unexplored32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -1236,7 +1236,7 @@ global void VideoDraw32Fog16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {	\
+	if (COLOR_FOG_P(sp[x])) {	\
 	    dp[x] = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -1317,7 +1317,7 @@ global void VideoDraw32Unexplored16Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -1358,7 +1358,7 @@ global void VideoDraw32Fog32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {	\
+	if (COLOR_FOG_P(sp[x])) {	\
 	    dp[x] = ((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -1439,7 +1439,7 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data, int x, int y)
     while (sp < gp) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	if(COLOR_FOG_P(sp[x])) {		\
+	if (COLOR_FOG_P(sp[x])) {		\
 	    dp[x] = ((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
@@ -2779,7 +2779,7 @@ global void InitMapFogOfWar(void)
 		    unsigned int trans_color;
 		    int j;
 
-		    trans_color = Pixels8[ColorBlack];
+		    trans_color = ColorBlack.D8;
 		    trans_color <<= 8;
 
 		    //FIXME: determine which lookup table to use based on
