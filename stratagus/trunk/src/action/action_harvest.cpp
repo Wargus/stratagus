@@ -58,6 +58,20 @@ local int MoveToWood(Unit* unit)
 	return 0;
     }
 
+#ifdef NEW_ORDERS
+    // FIXME: JOHNS: rewrite this complete sh*t (I have written it :)
+
+    //
+    //	reached nearly? and is there wood?
+    //		FIXME: use return value of pathfinder.
+    //
+    if( unit->Orders[0].RangeX ) {
+	++unit->Orders[0].X;
+	++unit->Orders[0].Y;
+    }
+    x=unit->Orders[0].X;
+    y=unit->Orders[0].Y;
+#else
     //
     //	reached nearly? and is there wood?
     //		FIXME: use return value of pathfinder.
@@ -69,10 +83,29 @@ local int MoveToWood(Unit* unit)
     }
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
+#endif
+
     dx=x-unit->X;
     dy=y-unit->Y;
     DebugLevel3Fn("Why %d,%d = %d\n",dx,dy,ForestOnMap(x,y));
     if( dx<-1 || dx>1 || dy<-1 || dy>1 || !ForestOnMap(x,y) ) {
+#ifdef NEW_ORDERS
+	if( FindWoodInSight(unit,&unit->Orders[0].X,&unit->Orders[0].Y) ) {
+
+	    // Move to new wood position
+	    ResetPath(unit->Orders[0]);
+	    unit->Orders[0].Goal=NoUnitP;
+	    unit->Orders[0].RangeX=2;
+	    unit->Orders[0].RangeY=2;
+	    unit->Orders[0].Action=UnitActionHarvest;
+	    if( unit->Orders[0].X ) {
+		unit->Orders[0].X--;
+	    }
+	    if( unit->Orders[0].Y ) {
+		unit->Orders[0].Y--;
+	    }
+	}
+#else
 	if( FindWoodInSight(unit
 		,&unit->Command.Data.Move.DX
 		,&unit->Command.Data.Move.DY) ) {
@@ -89,18 +122,24 @@ local int MoveToWood(Unit* unit)
 		unit->Command.Data.Move.DY--;
 	    }
 	}
+#endif
 	return 0;
     }
     unit->Command.Action=UnitActionHarvest;
 
-    // FIXME: don't chop the same wood!
     // turn to wood
     UnitHeadingFromDeltaXY(unit,dx,dy);
-    if(unit -> WoodToHarvest != CHOP_FOR_WOOD) {
-	unit -> Value = unit -> WoodToHarvest;
+    // FIXME: don't chop the same wood!
+#ifdef NEW_ORDERS
+    unit->Value=unit->Data.Harvest.WoodToHarvest;
+#else
+    // FIXME: looks wired wrong
+    if( unit->WoodToHarvest != CHOP_FOR_WOOD ) {
+	unit->Value=unit->WoodToHarvest;
     } else {
-	unit -> Value=CHOP_FOR_WOOD;
+	unit->Value=CHOP_FOR_WOOD;
     }
+#endif
 
     DebugCheck( unit->Wait!=1 );
 
@@ -169,7 +208,11 @@ local int ChopWood(Unit* unit)
 	//
 	//	Ready chopping wood?
 	//
+#ifdef NEW_ORDERS
+	if( !(unit->Data.Harvest.WoodToHarvest = --unit->Value) ) {
+#else
 	if( !(unit->WoodToHarvest = --unit->Value) ) {
+#endif
 
 	    // Have wood
 	    if( unit->Type==UnitTypeOrcWorker ) {
@@ -349,6 +392,24 @@ local int WaitInWoodDeposit(Unit* unit)
 	//	Drop out unit at nearest point to target.
 	//
 	destu=WoodDepositOnMap(unit->X,unit->Y);
+#ifdef NEW_ORDERS
+	DropOutNearest(unit
+		,unit->Orders[0].X,unit->Orders[0].Y
+		,destu->Type->TileWidth,destu->Type->TileHeight);
+
+	//
+	//	Return to chop point.
+	//
+	unit->Orders[0].Action=UnitActionHarvest;
+	ResetPath(unit->Orders[0]);
+	unit->Orders[0].Goal=NoUnitP;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
+	// FIXME: works this? where store I the return point?
+
+        CheckUnitToBeDrawn(unit);
+	unit->Wait=1;
+	unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
+#else
 	DropOutNearest(unit
 		,unit->Command.Data.Move.SX
 		,unit->Command.Data.Move.SY
@@ -368,6 +429,7 @@ local int WaitInWoodDeposit(Unit* unit)
         CheckUnitToBeDrawn(unit);
 	unit->Wait=1;
 	unit->WoodToHarvest=CHOP_FOR_WOOD;
+#endif
 	return 1;
     }
 

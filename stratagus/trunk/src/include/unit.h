@@ -313,6 +313,9 @@ struct _unit_ {
     struct _order_resource_ {
 	int	Active;			/// how much units are in the resource
     }		Resource;		/// Resource still
+    struct _order_harvest_ {
+	unsigned WoodToHarvest;		/// Ticks for harvest
+    }		Harvest;		/// Harvest action
     }		Data;			/// Storage room for different commands
 
 #else			//---------------------------------------------
