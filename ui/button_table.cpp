@@ -358,7 +358,7 @@ global ButtonAction AllButtons[] = {
     ",unit-gnomish-submarine,unit-battleship,unit-elven-destroyer"
 },
 {   6, 0, { "icon-human-attack-ground" },
-    ButtonAttack,	0, NULL,
+    ButtonAttackGround,	0, NULL,
     NULL,		NULL,
     'g', "ATTACK ~!GROUND",
     "unit-ballista,unit-battleship" ",human-group"
@@ -1085,7 +1085,7 @@ global ButtonAction AllButtons[] = {
     ",orc-group"
 },
 {   6, 0, { "icon-orc-attack-ground" },
-    ButtonAttack,	0, NULL,
+    ButtonAttackGround,	0, NULL,
     NULL,		NULL,
     'g', "ATTACK ~!GROUND",
     "unit-catapult,unit-ogre-juggernaught" ",orc-group"
