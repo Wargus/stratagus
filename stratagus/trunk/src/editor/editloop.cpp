@@ -787,6 +787,7 @@ static void DrawMapCursor(void)
 			int i;
 			int j;
 
+			PushClipping();
 			SetClipping(TheUI.MouseViewport->X, TheUI.MouseViewport->Y,
 				TheUI.MouseViewport->EndX, TheUI.MouseViewport->EndY);
 			for (j = 0; j < TileCursorSize; ++j) {
@@ -809,14 +810,18 @@ static void DrawMapCursor(void)
 			}
 			VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
 				TileSizeY * TileCursorSize);
-			SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
+			PopClipping();
 		} else {
 			//
 			// If there is an unit under the cursor, it's selection thing
 			//  is drawn somewhere else (Check DrawUnitSelection.)
 			//
 			if (!UnitUnderCursor) {
-				VideoDrawRectangle(ColorWhite, x, y, TileSizeX, TileSizeY);
+				PushClipping();
+				SetClipping(TheUI.MouseViewport->X, TheUI.MouseViewport->Y,
+					TheUI.MouseViewport->EndX, TheUI.MouseViewport->EndY);
+				VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX, TileSizeY);
+				PopClipping();
 			}
 		}
 	}
