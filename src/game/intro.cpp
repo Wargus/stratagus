@@ -345,9 +345,9 @@ global void ShowIntro(const Intro *intro)
     CLFile* file;
     char buf[1024];
     int stage;
-    TextLines* ScrollingText;
-    TextLines* ObjectivesText[MAX_OBJECTIVES];
-    int OldVideoSyncSpeed;
+    TextLines* scrolling_text;
+    TextLines* objectives_text[MAX_OBJECTIVES];
+    int old_video_sync;
 
     UseContinueButton=1;
     InitContinueButton(TheUI.Offset640X+455,TheUI.Offset480Y+440);
@@ -359,7 +359,7 @@ global void ShowIntro(const Intro *intro)
     VideoUnlockScreen();
     // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
-    OldVideoSyncSpeed=VideoSyncSpeed;
+    old_video_sync=VideoSyncSpeed;
     VideoSyncSpeed=100;
     SetVideoSync();
 
@@ -401,12 +401,12 @@ global void ShowIntro(const Intro *intro)
 	PlayFile(intro->VoiceFile[0]);
     }
 
-    SplitTextIntoLines(text,320,&ScrollingText);
+    SplitTextIntoLines(text,320,&scrolling_text);
     for( i=0; i<MAX_OBJECTIVES; i++) {
 	if( intro->Objectives[i] ) {
-	    SplitTextIntoLines(intro->Objectives[i],260,&ObjectivesText[i]);
+	    SplitTextIntoLines(intro->Objectives[i],260,&objectives_text[i]);
 	} else {
-	    ObjectivesText[i]=NULL;
+	    objectives_text[i]=NULL;
 	}
     }
 
@@ -438,17 +438,17 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw scrolling text
 	//
-	ScrollText(x+70,y+80,320,170,line,ScrollingText);
+	ScrollText(x+70,y+80,320,170,line,scrolling_text);
 
 	//
 	//	Draw objectives
 	//
 	VideoDrawText(x+372,y+306,LargeFont,"Objectives:");
 	y+=330;
-	for( i=0; i<MAX_OBJECTIVES && ObjectivesText[i]; ++i ) {
+	for( i=0; i<MAX_OBJECTIVES && objectives_text[i]; ++i ) {
 	    TextLines* ptr;
 
-	    ptr=ObjectivesText[i];
+	    ptr=objectives_text[i];
 	    while( ptr ) {
 		VideoDrawText(x+372,y,LargeFont,ptr->text);
 		y+=22;
@@ -479,10 +479,10 @@ global void ShowIntro(const Intro *intro)
 	}
     }
 
-    FreeTextLines(&ScrollingText);
+    FreeTextLines(&scrolling_text);
     for( i=0; i<MAX_OBJECTIVES; i++ ) {
-	if( ObjectivesText[i] ) {
-	    FreeTextLines(&ObjectivesText[i]);
+	if( objectives_text[i] ) {
+	    FreeTextLines(&objectives_text[i]);
 	}
     }
 
@@ -493,7 +493,7 @@ global void ShowIntro(const Intro *intro)
     VideoClearScreen();
     VideoUnlockScreen();
 
-    VideoSyncSpeed=OldVideoSyncSpeed;
+    VideoSyncSpeed=old_video_sync;
     SetVideoSync();
 
     CallbackMusicOn();
@@ -515,14 +515,14 @@ global void ShowCredits(Credits *credits)
     int x;
     int y;
     int scrolling;
-    TextLines* ScrollingCredits;
-    int OldVideoSyncSpeed;
+    TextLines* scrolling_credits;
+    int old_video_sync;
 
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
 
-    OldVideoSyncSpeed=VideoSyncSpeed;
+    old_video_sync=VideoSyncSpeed;
     VideoSyncSpeed=100;
     SetVideoSync();
 
@@ -547,9 +547,9 @@ global void ShowCredits(Credits *credits)
 
     // play different music?
 
-    ScrollingCredits=NULL;
+    scrolling_credits=NULL;
     if( credits->Names ) {
-	SplitTextIntoLines(credits->Names,320,&ScrollingCredits);
+	SplitTextIntoLines(credits->Names,320,&scrolling_credits);
     }
 
     UseContinueButton=1;
@@ -580,8 +580,8 @@ global void ShowCredits(Credits *credits)
 	//
 	//	Draw scrolling text
 	//
-	if( ScrollingCredits ) {
-	    scrolling=ScrollText(x+140,y+80,320,275,line,ScrollingCredits);
+	if( scrolling_credits ) {
+	    scrolling=ScrollText(x+140,y+80,320,275,line,scrolling_credits);
 	}
 
 	DrawContinueButton();
@@ -608,8 +608,8 @@ global void ShowCredits(Credits *credits)
 	}
     }
 
-    if( ScrollingCredits ) {
-	FreeTextLines(&ScrollingCredits);
+    if( scrolling_credits ) {
+	FreeTextLines(&scrolling_credits);
     }
 
     if( background ) {
@@ -621,7 +621,7 @@ global void ShowCredits(Credits *credits)
     VideoUnlockScreen();
     DestroyCursorBackground();
 
-    VideoSyncSpeed=OldVideoSyncSpeed;
+    VideoSyncSpeed=old_video_sync;
     SetVideoSync();
 
     // CallbackMusicOn();
@@ -655,14 +655,14 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 {
     EventCallback callbacks;
     Graphic* background;
-    int OldVideoSyncSpeed;
-    int DoFadeOut;
+    int old_video_sync;
+    int do_fade_out;
     int maxi;
     int i;
 
     UseContinueButton=0;
 
-    OldVideoSyncSpeed=VideoSyncSpeed;
+    old_video_sync=VideoSyncSpeed;
     VideoSyncSpeed=100;
     SetVideoSync();
     // JOHNS: NO VideoCreatePalette(GlobalPalette);
@@ -682,7 +682,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 #ifdef USE_OPENGL
     MakeTexture(background,background->Width,background->Height);
 #endif
-    DoFadeOut=1;
+    do_fade_out=1;
 
     //
     // Show title then fade in background
@@ -702,7 +702,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 	i++;
     }
     if( !IntroNoEvent ) {
-	DoFadeOut=0;
+	do_fade_out=0;
     }
 
     i=0;
@@ -745,7 +745,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     }
 
     // Fade out background and title
-    if( DoFadeOut ) {
+    if( do_fade_out ) {
 	while( i>=0 ) {
 	    VideoLockScreen();
 	    VideoDrawSubClipFaded(background,0,0,
@@ -771,7 +771,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     VideoClearScreen();
     VideoUnlockScreen();
 
-    VideoSyncSpeed=OldVideoSyncSpeed;
+    VideoSyncSpeed=old_video_sync;
     SetVideoSync();
 }
 
@@ -796,29 +796,36 @@ local int GameStatsDrawFunc(int frame)
     int y;
     int dodraw;
     int done;
-    const int StatsPause=30;  // Wait one second between each stat
+    const int stats_pause=30;  // Wait one second between each stat
     Player *p;
     int i;
     int c;
     char buf[50];
-    int LineSpacing;
-    int NamesFont;
-    int TopOffset;
-    int BottomOffset;
-    int DescriptionOffset;
+    int line_spacing;
+    int names_font;
+    int top_offset;
+    int bottom_offset;
+    int description_offset;
     int percent;
     int max;
+    int draw_all;
+
+#ifdef USE_OPENGL
+    draw_all=1;
+#else
+    draw_all=0;
+#endif
 
     percent=100;
     done=0;
 
-    if( (frame%StatsPause)!=0 ) {
+    if( !draw_all && (frame%stats_pause)!=0 ) {
 	return done;
     }
 
     x=TheUI.Offset640X;
     y=TheUI.Offset480Y;
-    dodraw=frame/StatsPause;
+    dodraw=frame/stats_pause;
 
     for( i=0,c=0; i<PlayerMax; i++) {
 	if(Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer) {
@@ -826,35 +833,37 @@ local int GameStatsDrawFunc(int frame)
 	}
     }
     if( c<=4 ) {
-	NamesFont=SmallTitleFont;
-	TopOffset=57;
-	BottomOffset=178;
-	DescriptionOffset=30;
+	names_font=SmallTitleFont;
+	top_offset=57;
+	bottom_offset=178;
+	description_offset=30;
     }
     else {
-	NamesFont=LargeFont;
-	TopOffset=6;
-	BottomOffset=90;
-	DescriptionOffset=20;
+	names_font=LargeFont;
+	top_offset=6;
+	bottom_offset=90;
+	description_offset=20;
     }
-    LineSpacing=(432-BottomOffset-DescriptionOffset)/c;
+    line_spacing=(432-bottom_offset-description_offset)/c;
 
-    PlayGameSound(SoundIdForName("fist"),MaxSampleVolume);
+    if( !draw_all || (dodraw<=10 && (frame%stats_pause)==0) ) {
+	PlayGameSound(SoundIdForName("fist"),MaxSampleVolume);
+    }
 
 
-    if( dodraw==1 ) {
+    if( dodraw==1 || (draw_all && dodraw>=1) ) {
 	char* Outcome;
 
-	VideoDrawTextCentered(x+106,y+TopOffset,LargeFont,"Outcome");
+	VideoDrawTextCentered(x+106,y+top_offset,LargeFont,"Outcome");
 	if( GameResult==GameVictory ) {
 	    Outcome="Victory!";
 	} else {
 	    Outcome="Defeat!";
 	}
-	VideoDrawTextCentered(x+106,y+TopOffset+21,LargeTitleFont,Outcome);
+	VideoDrawTextCentered(x+106,y+top_offset+21,LargeTitleFont,Outcome);
     }
 
-    else if( dodraw==2 ) {
+    if( dodraw==2 || (draw_all && dodraw>=2) ) {
 	// FIXME: Use ccl
 	char* Rank;
 	char** Ranks;
@@ -891,17 +900,17 @@ local int GameStatsDrawFunc(int frame)
 	    }
 	}
 
-	VideoDrawTextCentered(x+324,y+TopOffset,LargeFont,"Rank");
-	VideoDrawTextCentered(x+324,y+TopOffset+21,SmallTitleFont,Rank);
+	VideoDrawTextCentered(x+324,y+top_offset,LargeFont,"Rank");
+	VideoDrawTextCentered(x+324,y+top_offset+21,SmallTitleFont,Rank);
     }
 
-    else if( dodraw==3 ) {
-	VideoDrawTextCentered(x+540,y+TopOffset,LargeFont,"Score");
+    if( dodraw==3 || (draw_all && dodraw>=3) ) {
+	VideoDrawTextCentered(x+540,y+top_offset,LargeFont,"Score");
 	sprintf(buf,"%u",ThisPlayer->Score);
-	VideoDrawTextCentered(x+540,y+TopOffset+21,SmallTitleFont,buf);
+	VideoDrawTextCentered(x+540,y+top_offset+21,SmallTitleFont,buf);
     }
 
-    else if( dodraw==4 ) {
+    if( dodraw==4 || (draw_all && dodraw>=4) ) {
 	max=Players[0].TotalUnits;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -917,12 +926,12 @@ local int GameStatsDrawFunc(int frame)
 	}
 
 	sprintf(buf,"%s - You",ThisPlayer->Name);
-	VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26,
-	                      NamesFont,buf);
-	VideoDrawTextCentered(x+50,y+BottomOffset,LargeFont,"Units");
+	VideoDrawTextCentered(x+320,y+bottom_offset+description_offset+26,
+	                      names_font,buf);
+	VideoDrawTextCentered(x+50,y+bottom_offset,LargeFont,"Units");
 	sprintf(buf,"%u",ThisPlayer->TotalUnits);
 	percent=ThisPlayer->TotalUnits*100/max;
-	DrawStatBox(x+10,y+BottomOffset+DescriptionOffset,buf,
+	DrawStatBox(x+10,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -935,17 +944,17 @@ local int GameStatsDrawFunc(int frame)
 	    } else {
 		sprintf(buf,"%s - Ally",p->Name);
 	    }
-	    VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26+LineSpacing*c,
-	                          NamesFont,buf);
+	    VideoDrawTextCentered(x+320,y+bottom_offset+description_offset+26+line_spacing*c,
+	                          names_font,buf);
 	    sprintf(buf,"%u",p->TotalUnits);
 	    percent=p->TotalUnits*100/max;
-	    DrawStatBox(x+10,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	    DrawStatBox(x+10,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
-    else if( dodraw==5 ) {
+    if( dodraw==5 || (draw_all && dodraw>=5) ) {
 	max=Players[0].TotalBuildings;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -960,10 +969,10 @@ local int GameStatsDrawFunc(int frame)
 	    max=1;
 	}
 
-	VideoDrawTextCentered(x+140,y+BottomOffset,LargeFont,"Buildings");
+	VideoDrawTextCentered(x+140,y+bottom_offset,LargeFont,"Buildings");
 	sprintf(buf,"%u",ThisPlayer->TotalBuildings);
 	percent=ThisPlayer->TotalBuildings*100/max;
-	DrawStatBox(x+100,y+BottomOffset+DescriptionOffset,buf,
+	DrawStatBox(x+100,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -973,13 +982,13 @@ local int GameStatsDrawFunc(int frame)
 	    }
 	    sprintf(buf,"%u",p->TotalBuildings);
 	    percent=p->TotalBuildings*100/max;
-	    DrawStatBox(x+100,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	    DrawStatBox(x+100,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
-    else if( dodraw==6 ) {
+    if( dodraw==6 || (draw_all && dodraw>=6) ) {
 	max=Players[0].TotalResources[GoldCost];
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -994,10 +1003,10 @@ local int GameStatsDrawFunc(int frame)
 	    max=1;
 	}
 
-	VideoDrawTextCentered(x+230,y+BottomOffset,LargeFont,"Gold");
+	VideoDrawTextCentered(x+230,y+bottom_offset,LargeFont,"Gold");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[GoldCost]);
 	percent=ThisPlayer->TotalResources[GoldCost]*100/max;
-	DrawStatBox(x+190,y+BottomOffset+DescriptionOffset,buf,
+	DrawStatBox(x+190,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1007,13 +1016,13 @@ local int GameStatsDrawFunc(int frame)
 	    }
             sprintf(buf,"%u",p->TotalResources[GoldCost]);
 	    percent=p->TotalResources[GoldCost]*100/max;
-	    DrawStatBox(x+190,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	    DrawStatBox(x+190,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
-    else if( dodraw==7 ) {
+    if( dodraw==7 || (draw_all && dodraw>=7) ) {
 	max=Players[0].TotalResources[WoodCost];
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1028,10 +1037,10 @@ local int GameStatsDrawFunc(int frame)
 	    max=1;
 	}
 
-	VideoDrawTextCentered(x+320,y+BottomOffset,LargeFont,"Lumber");
+	VideoDrawTextCentered(x+320,y+bottom_offset,LargeFont,"Lumber");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[WoodCost]);
 	percent=ThisPlayer->TotalResources[WoodCost]*100/max;
-	DrawStatBox(x+280,y+BottomOffset+DescriptionOffset,buf,
+	DrawStatBox(x+280,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1041,13 +1050,13 @@ local int GameStatsDrawFunc(int frame)
 	    }
             sprintf(buf,"%u",p->TotalResources[WoodCost]);
 	    percent=p->TotalResources[WoodCost]*100/max;
-	    DrawStatBox(x+280,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	    DrawStatBox(x+280,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
-    else if( dodraw==8 ) {
+    if( dodraw==8 || (draw_all && dodraw>=8) ) {
 	max=Players[0].TotalResources[OilCost];
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1062,10 +1071,10 @@ local int GameStatsDrawFunc(int frame)
 	    max=1;
 	}
 
-	VideoDrawTextCentered(x+410,y+BottomOffset,LargeFont,"Oil");
+	VideoDrawTextCentered(x+410,y+bottom_offset,LargeFont,"Oil");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[OilCost]);
 	percent=ThisPlayer->TotalResources[OilCost]*100/max;
-	DrawStatBox(x+370,y+BottomOffset+DescriptionOffset,buf,
+	DrawStatBox(x+370,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1075,13 +1084,13 @@ local int GameStatsDrawFunc(int frame)
 	    }
 	    sprintf(buf,"%u",p->TotalResources[OilCost]);
 	    percent=p->TotalResources[OilCost]*100/max;
-	    DrawStatBox(x+370,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	    DrawStatBox(x+370,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
-    else if( dodraw==9 ) {
+    if( dodraw==9 || (draw_all && dodraw>=9) ) {
 	max=Players[0].TotalKills;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1096,10 +1105,10 @@ local int GameStatsDrawFunc(int frame)
 	    max=1;
 	}
 
-	VideoDrawTextCentered(x+500,y+BottomOffset,LargeFont,"Kills");
+	VideoDrawTextCentered(x+500,y+bottom_offset,LargeFont,"Kills");
 	percent=ThisPlayer->TotalKills*100/max;
 	sprintf(buf,"%u",ThisPlayer->TotalKills);
-	DrawStatBox(x+460,y+BottomOffset+DescriptionOffset,buf,
+	DrawStatBox(x+460,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1109,13 +1118,13 @@ local int GameStatsDrawFunc(int frame)
 	    }
 	    sprintf(buf,"%u",p->TotalKills);
 	    percent=p->TotalKills*100/max;
-	    DrawStatBox(x+460,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	    DrawStatBox(x+460,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
-    else if( dodraw==10 ) {
+    if( dodraw==10 || (draw_all && dodraw>=10) ) {
 	max=Players[0].TotalRazings;
 	for( i=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1130,10 +1139,10 @@ local int GameStatsDrawFunc(int frame)
 	    max=1;
 	}
 
-	VideoDrawTextCentered(x+590,y+BottomOffset,LargeFont,"Razings");
+	VideoDrawTextCentered(x+590,y+bottom_offset,LargeFont,"Razings");
 	sprintf(buf,"%u",ThisPlayer->TotalRazings);
 	percent=ThisPlayer->TotalRazings*100/max;
-	DrawStatBox(x+550,y+BottomOffset+DescriptionOffset,buf,
+	DrawStatBox(x+550,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
@@ -1143,7 +1152,7 @@ local int GameStatsDrawFunc(int frame)
 	    }
 	    sprintf(buf,"%u",p->TotalRazings);
 	    percent=p->TotalRazings*100/max;
-	    DrawStatBox(x+550,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	    DrawStatBox(x+550,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
 	    c++;
 	}
@@ -1160,11 +1169,11 @@ global void ShowStats(void)
 {
     EventCallback callbacks;
     int done;
-    int OldVideoSyncSpeed;
+    int old_video_sync;
     Graphic* background;
     int frame;
 
-    OldVideoSyncSpeed=VideoSyncSpeed;
+    old_video_sync=VideoSyncSpeed;
     VideoSyncSpeed=100;
     SetVideoSync();
 
@@ -1201,9 +1210,15 @@ global void ShowStats(void)
     while( 1 ) {
 	VideoLockScreen();
 	HideAnyCursor();
+#ifdef USE_OPENGL
+	VideoDrawSubClip(background,0,0,background->Width,background->Height,
+	    (VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+	GameStatsDrawFunc(frame);
+#else
 	if( !done ) {
 	    done=GameStatsDrawFunc(frame);
 	}
+#endif
 	DrawContinueButton();
 	DrawAnyCursor();
 	VideoUnlockScreen();
@@ -1220,7 +1235,7 @@ global void ShowStats(void)
     }
 
     VideoFree(background);
-    VideoSyncSpeed=OldVideoSyncSpeed;
+    VideoSyncSpeed=old_video_sync;
     SetVideoSync();
 }
 
