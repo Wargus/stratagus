@@ -101,15 +101,9 @@ local void ExtendTilesetTables(Tileset * tileset, int tiles)
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
-    tileset->BasicNameTable = realloc(tileset->BasicNameTable,
-	tiles * sizeof(*tileset->BasicNameTable));
-    if (!tileset->BasicNameTable) {
-	fprintf(stderr, "out of memory.\n");
-	ExitFatal(-1);
-    }
-    tileset->MixedNameTable = realloc(tileset->MixedNameTable,
-	tiles * sizeof(*tileset->MixedNameTable));
-    if (!tileset->MixedNameTable) {
+    tileset->Tiles = realloc(tileset->Tiles,
+	tiles * sizeof(*tileset->Tiles));
+    if (!tileset->Tiles) {
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
@@ -127,15 +121,17 @@ local int TilesetParseName(Tileset* tileset, SCM list)
     int i;
 
     ident = gh_scm2newstr(gh_car(list), NULL);
-    for (i = 0; i < tileset->NumNames; ++i) {
-	if (!strcmp(ident, tileset->TileNames[i])) {
+    for (i = 0; i < tileset->NumTerrainTypes; ++i) {
+	if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
 	    free(ident);
 	    return i;
 	}
     }
-    tileset->TileNames = realloc(tileset->TileNames,
-	++tileset->NumNames * sizeof(*tileset->TileNames));
-    tileset->TileNames[i] = ident;
+
+    //  Can't find it, then we add another solid terrain type.
+    tileset->SolidTerrainTypes = realloc(tileset->SolidTerrainTypes,
+	++tileset->NumTerrainTypes * sizeof(*tileset->SolidTerrainTypes));
+    tileset->SolidTerrainTypes[i].TerrainName = ident;
 
     return i;
 }
@@ -225,20 +221,9 @@ local void DefineTilesetParseSpecial(Tileset* tileset,SCM list)
 	list=gh_cdr(list);
 
 	//
-	//	Extra-trees
-	//
-	if( gh_eq_p(value,gh_symbol2scm("extra-trees")) ) {
-	    if( gh_vector_length(data)!=6 ) {
-		errl("extra-trees: Wrong vector length",data);
-	    }
-	    for( i=0; i<6; ++i ) {
-		value=gh_vector_ref(data,gh_int2scm(i));
-		tileset->ExtraTrees[i]=gh_scm2int(value);
-	    }
-	//
 	//	top-one-tree, mid-one-tree, bot-one-tree
 	//
-	} else if( gh_eq_p(value,gh_symbol2scm("top-one-tree")) ) {
+	if( gh_eq_p(value,gh_symbol2scm("top-one-tree")) ) {
 	    tileset->TopOneTree=gh_scm2int(data);
 	} else if( gh_eq_p(value,gh_symbol2scm("mid-one-tree")) ) {
 	    tileset->MidOneTree=gh_scm2int(data);
@@ -261,17 +246,6 @@ local void DefineTilesetParseSpecial(Tileset* tileset,SCM list)
 		tileset->GrowingTree[i]=gh_scm2int(value);
 	    }
 
-	//
-	//	extra-rocks
-	//
-	} else if( gh_eq_p(value,gh_symbol2scm("extra-rocks")) ) {
-	    if( gh_vector_length(data)!=6 ) {
-		errl("extra-rocks: Wrong vector length",data);
-	    }
-	    for( i=0; i<6; ++i ) {
-		value=gh_vector_ref(data,gh_int2scm(i));
-		tileset->ExtraRocks[i]=gh_scm2int(value);
-	    }
 	//
 	//	top-one-rock, mid-one-rock, bot-one-rock
 	//
@@ -307,10 +281,12 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
     int f;
     int l;
     int basic_name;
+    SolidTerrainInfo* tt;// short for terrain type.
 
     ExtendTilesetTables(tileset,index+16);
 
     basic_name=TilesetParseName(tileset,list);	// base name
+    tt=tileset->SolidTerrainTypes+basic_name;
     list=gh_cdr(list);
 
     list=ParseTilesetTileFlags(list,&f);
@@ -319,7 +295,7 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
     //	Vector: the tiles.
     //
     value = gh_car(list);
-    l=gh_vector_length(value);
+    tt->NumSolidTiles=l=gh_vector_length(value);
 
     // hack for sc tilesets, remove when fixed
     if( l>16 ) {
@@ -328,25 +304,24 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
 
     for( i=0; i<l; ++i ) {
 	data=gh_vector_ref(value,gh_int2scm(i));
+//	tt->SolidTiles[i]=tileset->Table[index+i]=gh_scm2int(data);
 	tileset->Table[index+i]=gh_scm2int(data);
 	tileset->FlagsTable[index+i]=f;
-	tileset->BasicNameTable[index+i]=basic_name;
-	tileset->MixedNameTable[index+i]=0;
+	tileset->Tiles[index+i].BaseTerrain=basic_name;
+	tileset->Tiles[index+i].MixTerrain=0;
     }
     while( i<16 ) {
 	tileset->Table[index+i]=0;
 	tileset->FlagsTable[index+i]=0;
-	tileset->BasicNameTable[index+i]=0;
-	tileset->MixedNameTable[index+i]=0;
+	tileset->Tiles[index+i].BaseTerrain=0;
+	tileset->Tiles[index+i].MixTerrain=0;
 	++i;
     }
 
-    // hack for sc tilesets, remove when fixed
-    if( l<16 ) {
+    if (l<16) {
 	return index+16;
     }
     return index+l;
-//    return index+16;
 }
 
 /**
@@ -393,14 +368,14 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
 	    data=gh_vector_ref(value,gh_int2scm(i));
 	    tileset->Table[index+i]=gh_scm2int(data);
 	    tileset->FlagsTable[index+i]=f;
-	    tileset->BasicNameTable[index+i]=basic_name;
-	    tileset->MixedNameTable[index+i]=mixed_name;
+	    tileset->Tiles[index+i].BaseTerrain=basic_name;
+	    tileset->Tiles[index+i].MixTerrain=mixed_name;
 	}
 	while( i<16 ) {			// Fill missing slots
 	    tileset->Table[index+i]=0;
 	    tileset->FlagsTable[index+i]=0;
-	    tileset->BasicNameTable[index+i]=0;
-	    tileset->MixedNameTable[index+i]=0;
+	    tileset->Tiles[index+i].BaseTerrain=0;
+	    tileset->Tiles[index+i].MixTerrain=0;
 	    ++i;
 	}
 	index+=16;
@@ -409,8 +384,8 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
     while( index<new_index ) {
 	tileset->Table[index]=0;
 	tileset->FlagsTable[index]=0;
-	tileset->BasicNameTable[index]=0;
-	tileset->MixedNameTable[index]=0;
+	tileset->Tiles[index].BaseTerrain=0;
+	tileset->Tiles[index].MixTerrain=0;
 	++index;
     }
 
@@ -441,23 +416,18 @@ local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
-    tileset->BasicNameTable = malloc(16 * sizeof(*tileset->BasicNameTable));
-    if (!tileset->BasicNameTable) {
+    tileset->Tiles = malloc(16 * sizeof(TileInfo));
+    if (!tileset->Tiles) {
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
-    tileset->MixedNameTable = malloc(16 * sizeof(*tileset->MixedNameTable));
-    if (!tileset->MixedNameTable) {
+    tileset->SolidTerrainTypes = malloc(sizeof(SolidTerrainInfo));
+    if (!tileset->SolidTerrainTypes) {
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
-    tileset->TileNames = malloc(sizeof(char*));
-    if (!tileset->TileNames) {
-	fprintf(stderr, "out of memory.\n");
-	ExitFatal(-1);
-    }
-    tileset->TileNames[0] = strdup("unused");
-    tileset->NumNames = 1;
+    tileset->SolidTerrainTypes[0].TerrainName = strdup("unused");
+    tileset->NumTerrainTypes = 1;
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -553,6 +523,7 @@ local SCM CclDefineTileset(SCM list)
 		free(Tilesets[type]->ImageFile);
 		free(Tilesets[type]->PaletteFile);
 		free(Tilesets[type]->Table);
+		free(Tilesets[type]->Tiles);
 		free(Tilesets[type]->TileTypeTable);
 		free(Tilesets[type]->AnimationTable);
 		free(Tilesets[type]);

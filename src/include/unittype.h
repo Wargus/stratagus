@@ -302,10 +302,16 @@
 **		When the unit is idle this is the probability that it will
 **		take a step in a random direction, in percents.
 **
-**	UnitType::ClickToExplode
+**	UnitType::ClicksToExplode
 **
 **		If this is non-zero, then after that many clicks the unit will
 **		commit suicide. Doesn't work with resource workers/resources.
+**
+**	UnitType::Sniper
+**
+**		This unit can only hit organic units.
+**		TODO: have a table of armor types and damage types with damage
+**		modifiers.
 **
 **	UnitType::Wall
 **
@@ -749,6 +755,7 @@ struct _unit_type_ {
     unsigned Critter : 1;		/// Unit is controlled by nobody
     unsigned int RandomMovementProbability;/// Probability to move randomly.
     unsigned int ClicksToExplode;	/// Number of consecutive clicks until unit suicides.
+    unsigned Sniper : 1;		/// The unit can only hit organic units.
     unsigned Wall : 1;			/// Wall
     unsigned Building : 1;		/// Building
     unsigned PermanentCloak : 1;	/// Is only visible by CloakDetectors.

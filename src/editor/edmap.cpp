@@ -91,7 +91,7 @@ local unsigned QuadFromTile(int x, int y)
 {
     int tile;
     int i;
-    unsigned quad;
+    unsigned base;
     unsigned mix;
 
     //
@@ -105,51 +105,51 @@ local unsigned QuadFromTile(int x, int y)
     }
     DebugCheck(i == TheMap.Tileset->NumTiles);
 
-    quad = TheMap.Tileset->BasicNameTable[i];
-    mix = TheMap.Tileset->MixedNameTable[i];
+    base = TheMap.Tileset->Tiles[i].BaseTerrain;
+    mix = TheMap.Tileset->Tiles[i].MixTerrain;
 
     DebugLevel3Fn("Tile %d:%04x %d,%d\n" _C_ tile _C_ i _C_ quad _C_ mix);
 
     if (!mix) {				// a solid tile
-	return quad | (quad << 8) | (quad << 16) | (quad << 24);
+	return base | (base << 8) | (base << 16) | (base << 24);
     }
     //
     //  Mixed tiles, mix together
     //
     switch ((i & 0x00F0) >> 4) {
 	case 0:
-	    return (quad << 24) | (mix << 16) | (mix << 8) | mix;
+	    return (base << 24) | (mix << 16) | (mix << 8) | mix;
 	case 1:
-	    return (mix << 24) | (quad << 16) | (mix << 8) | mix;
+	    return (mix << 24) | (base << 16) | (mix << 8) | mix;
 	case 2:
-	    return (quad << 24) | (quad << 16) | (mix << 8) | mix;
+	    return (base << 24) | (base << 16) | (mix << 8) | mix;
 	case 3:
-	    return (mix << 24) | (mix << 16) | (quad << 8) | mix;
+	    return (mix << 24) | (mix << 16) | (base << 8) | mix;
 	case 4:
-	    return (quad << 24) | (mix << 16) | (quad << 8) | mix;
+	    return (base << 24) | (mix << 16) | (base << 8) | mix;
 	case 5:
-	    return (quad << 24) | (quad << 16) | (quad << 8) | mix;
+	    return (base << 24) | (base << 16) | (base << 8) | mix;
 	case 6:
-	    return (quad << 24) | (quad << 16) | (quad << 8) | mix;
+	    return (base << 24) | (base << 16) | (base << 8) | mix;
 	case 7:
-	    return (mix << 24) | (mix << 16) | (mix << 8) | quad;
+	    return (mix << 24) | (mix << 16) | (mix << 8) | base;
 	case 8:
-	    return (quad << 24) | (mix << 16) | (mix << 8) | quad;
+	    return (base << 24) | (mix << 16) | (mix << 8) | base;
 	case 9:
-	    return (mix << 24) | (quad << 16) | (mix << 8) | quad;
+	    return (mix << 24) | (base << 16) | (mix << 8) | base;
 	case 10:
-	    return (quad << 24) | (quad << 16) | (mix << 8) | quad;
+	    return (base << 24) | (base << 16) | (mix << 8) | base;
 	case 11:
-	    return (mix << 24) | (mix << 16) | (quad << 8) | quad;
+	    return (mix << 24) | (mix << 16) | (base << 8) | base;
 	case 12:
-	    return (quad << 24) | (mix << 16) | (quad << 8) | quad;
+	    return (base << 24) | (mix << 16) | (base << 8) | base;
 	case 13:
-	    return (mix << 24) | (quad << 16) | (quad << 8) | quad;
+	    return (mix << 24) | (base << 16) | (base << 8) | base;
     }
 
     DebugCheck( 1 );
 
-    return quad | (quad << 8) | (quad << 16) | (quad << 24);
+    return base | (base << 8) | (base << 16) | (base << 24);
 }
 
 /**
@@ -174,22 +174,22 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
     l = INT_MAX;
     for (i = 0; i < TheMap.Tileset->NumTiles;) {
 	// goal found.
-	if (base == TheMap.Tileset->BasicNameTable[i]
-		&& goal == TheMap.Tileset->MixedNameTable[i]) {
+	if (base == TheMap.Tileset->Tiles[i].BaseTerrain
+		&& goal == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    *tile = i;
 	    return length;
 	}
 	// goal found.
-	if (goal == TheMap.Tileset->BasicNameTable[i]
-		&& base == TheMap.Tileset->MixedNameTable[i]) {
+	if (goal == TheMap.Tileset->Tiles[i].BaseTerrain
+		&& base == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    *tile = i;
 	    return length;
 	}
 
 	// possible path found
-	if (base == TheMap.Tileset->BasicNameTable[i]
-		&& TheMap.Tileset->MixedNameTable[i]) {
-	    j = TheMap.Tileset->MixedNameTable[i];
+	if (base == TheMap.Tileset->Tiles[i].BaseTerrain
+		&& TheMap.Tileset->Tiles[i].MixTerrain) {
+	    j = TheMap.Tileset->Tiles[i].MixTerrain;
 	    if (!marks[j]) {
 		marks[j] = j;
 		n = FindTilePath(j, goal, length + 1, marks, &n);
@@ -200,9 +200,9 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 		}
 	    }
 	// possible path found
-	} else if (TheMap.Tileset->BasicNameTable[i]
-		&& base == TheMap.Tileset->MixedNameTable[i]) {
-	    j = TheMap.Tileset->BasicNameTable[i];
+	} else if (TheMap.Tileset->Tiles[i].BaseTerrain
+		&& base == TheMap.Tileset->Tiles[i].MixTerrain) {
+	    j = TheMap.Tileset->Tiles[i].BaseTerrain;
 	    if (!marks[j]) {
 		marks[j] = j;
 		n = FindTilePath(j, goal, length + 1, marks, &n);
@@ -214,7 +214,7 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 	    }
 	}
 	// Advance solid or mixed.
-	if (!TheMap.Tileset->MixedNameTable[i]) {
+	if (!TheMap.Tileset->Tiles[i].MixTerrain) {
 	    i += 16;
 	} else {
 	    i += 256;
@@ -269,12 +269,12 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	    //  Find the solid tile
 	    //
 	    for (i = 0; i < TheMap.Tileset->NumTiles;) {
-		if (type1 == TheMap.Tileset->BasicNameTable[i]
-			&& !TheMap.Tileset->MixedNameTable[i]) {
+		if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain
+			&& !TheMap.Tileset->Tiles[i].MixTerrain) {
 		    break;
 		}
 		// Advance solid or mixed.
-		if (!TheMap.Tileset->MixedNameTable[i]) {
+		if (!TheMap.Tileset->Tiles[i].MixTerrain) {
 		    i += 16;
 		} else {
 		    i += 256;
@@ -286,8 +286,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
     } else {
 	char *marks;
 
-	marks = alloca(TheMap.Tileset->NumNames);
-	memset(marks, 0, TheMap.Tileset->NumNames);
+	marks = alloca(TheMap.Tileset->NumTerrainTypes);
+	memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
 	marks[type1] = type1;
 	marks[type2] = type2;
 
@@ -343,12 +343,12 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
     //  Need a mixed tile
     //
     for (i = 0; i < TheMap.Tileset->NumTiles;) {
-	if (type1 == TheMap.Tileset->BasicNameTable[i]
-		&& type2 == TheMap.Tileset->MixedNameTable[i]) {
+	if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain
+		&& type2 == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    break;
 	}
-	if (type2 == TheMap.Tileset->BasicNameTable[i]
-		&& type1 == TheMap.Tileset->MixedNameTable[i]) {
+	if (type2 == TheMap.Tileset->Tiles[i].BaseTerrain
+		&& type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    // Other mixed
 	    type1 ^= type2;
 	    type2 ^= type1;
@@ -356,7 +356,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	    break;
 	}
 	// Advance solid or mixed.
-	if (!TheMap.Tileset->MixedNameTable[i]) {
+	if (!TheMap.Tileset->Tiles[i].MixTerrain) {
 	    i += 16;
 	} else {
 	    i += 256;
@@ -370,14 +370,14 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	//
 	//      Find the best tile path.
 	//
-	marks = alloca(TheMap.Tileset->NumNames);
-	memset(marks, 0, TheMap.Tileset->NumNames);
+	marks = alloca(TheMap.Tileset->NumTerrainTypes);
+	memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
 	marks[type1] = type1;
 	if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
 	    DebugLevel0Fn("Huch, no mix found!!!!!!!!!!!\n");
 	    goto find_solid;
 	}
-	if (type1 == TheMap.Tileset->MixedNameTable[i]) {
+	if (type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
 	    // Other mixed
 	    type1 ^= type2;
 	    type2 ^= type1;

@@ -848,7 +848,7 @@ global void UnitCacheInsert(Unit* unit)
     mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
     unit->Next=mf->Here.Units;
     mf->Here.Units=unit;
-    DebugLevel3Fn("%p %p\n" _C_ unit _C_ unit->Next);
+    DebugLevel3Fn("%d,%d %p %p\n" _C_ unit->X _C_ unit->Y _C_ unit _C_ unit->Next);
 }
 
 /**
@@ -907,6 +907,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 
 //  int ts0=rdtsc(), ts1;
 
+    DebugLevel3Fn("%d,%d %d,%d\n" _C_ x1 _C_ y1 _C_ x2 _C_ y2);
     //
     //	Units are inserted by origin position
     //
