@@ -483,6 +483,32 @@ local void SaveAiHelper(FILE* file)
 }
 
 /**
+**	Save the AI types.
+**
+**	@param file	Output file.
+*/
+global void SaveAiTypes(FILE* file)
+{
+    const AiType* aitype;
+
+    //
+    //	Save AiTypes.
+    //
+    for( aitype=AiTypes; aitype; aitype=aitype->Next ) {
+	DebugLevel3Fn("%s,%s,%s\n",aitype->Name,aitype->Race,aitype->Class);
+	fprintf(file,"(define-ai '%s '%s \"%s\"\n",
+		aitype->Class,aitype->Race ? aitype->Race : "*",aitype->Name);
+
+	fprintf(file,"  '");
+	lprin1f(aitype->Script,file);
+	fprintf(file,")\n");
+
+	// FIXME: Must save references to other scripts - scheme functions
+	// Perhaps we should dump the complete scheme state
+    }
+}
+
+/**
 **	Save state of AI to file.
 **
 **	@param file	Output file.
@@ -496,6 +522,7 @@ global void SaveAi(FILE* file)
 
     SaveAiTypesWcName(file);
     SaveAiHelper(file);
+    SaveAiTypes(file);
 }
 
 /**
@@ -630,6 +657,8 @@ global void CleanAi(void)
 	free(aitype->Name);
 	free(aitype->Race);
 	free(aitype->Class);
+
+	// ai-type->Script freed by ccl
 
 	temp=aitype->Next;
 	free(aitype);
