@@ -47,7 +47,8 @@
 /*
 **	Names for the unit-type table slots as used in puds.
 **
-**	NOTE: Would be soon global removed.
+**	@todo: Would be soon global removed.
+**	FIXME: This will soon be broken, @see UnitTypes.
 */
 #define	UnitFootman		0x00
 #define UnitBallista		0x04
@@ -205,6 +206,7 @@ local PlayerAi Ais[PlayerMax];		/// storage for all players
 
 /**
 **  Chooses which Race the building/unit needs to be.
+**	FIXME: this is soon broken, must find better way!!!!
 */
 local int AiChooseRace(int type)
 {
@@ -852,12 +854,14 @@ local int AiHarvest(Unit * unit)
     }
     cost = 99999;
     IfDebug(bestx = besty = 0; );	// keep the compiler happy
+    AiPlayer->NoWood = 1;
 
     // FIXME: if we reach the map borders we can go fast up, left, ...
     --x;
     while (addx <= r && addy <= r) {
 	for (i = addy; i--; y++) {	// go down
 	    if (CheckedForestOnMap(x, y)) {
+		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
@@ -870,6 +874,7 @@ local int AiHarvest(Unit * unit)
 	++addx;
 	for (i = addx; i--; x++) {	// go right
 	    if (CheckedForestOnMap(x, y)) {
+		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
@@ -882,6 +887,7 @@ local int AiHarvest(Unit * unit)
 	++addy;
 	for (i = addy; i--; y--) {	// go up
 	    if (CheckedForestOnMap(x, y)) {
+		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
@@ -894,6 +900,7 @@ local int AiHarvest(Unit * unit)
 	++addx;
 	for (i = addx; i--; x--) {	// go left
 	    if (CheckedForestOnMap(x, y)) {
+		AiPlayer->NoWood = 0;
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
 		if (n < cost && PlaceReachable(unit, x, y, 1)) {
@@ -911,7 +918,6 @@ local int AiHarvest(Unit * unit)
 	++addy;
     }
     DebugLevel0Fn("no wood on map\n");
-    AiPlayer->NoWood = 1;
     return 0;
 }
 
