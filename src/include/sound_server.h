@@ -42,16 +42,6 @@ extern sem_t SoundThreadChannelSemaphore;
 
 #include "sound_id.h"
 
-#if defined(USE_SDLCD)
-#include "SDL.h"
-#elif defined(USE_LIBCDA)
-#include "libcda.h"
-#elif defined(USE_CDDA)
-#include <linux/cdrom.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#endif
-
 /*----------------------------------------------------------------------------
 --	Definitons
 ----------------------------------------------------------------------------*/
@@ -257,27 +247,6 @@ extern unsigned AllocatedSoundMemory;
 extern unsigned CompressedSoundMemory;
 #endif
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
-    /// FIXME: docu
-extern int CDTrack;
-
-extern int PlayCDRom(int name);
-#endif
-
-#if defined(USE_SDLCD)
-extern SDL_CD *CDRom;                   /// SDL cdrom device
-#elif defined(USE_LIBCDA)
-    /// number of tracks on the cd
-extern int NumCDTracks;
-#elif defined(USE_CDDA)
-// FIXME: fill up
-extern int NumCDTracks;
-extern int CDDrive;
-extern struct cdrom_tochdr CDchdr;
-extern struct cdrom_tocentry CDtocentry[64];
-extern struct cdrom_read_audio CDdata;
-#endif
-
 extern Sample* MusicSample;		/// Music samples
 
 /*----------------------------------------------------------------------------
@@ -288,9 +257,6 @@ extern Sample* LoadFlac(const char* name,int flags);	/// Load a flac file
 extern Sample* LoadWav(const char* name,int flags);	/// Load a wav file
 extern Sample* LoadOgg(const char* name,int flags);	/// Load an ogg file
 extern Sample* LoadMp3(const char* name,int flags);	/// Load a mp3 file
-#ifdef USE_CDDA
-extern Sample* LoadCD(const char* name,int flags);	/// Load a cd track
-#endif
 
     ///	Register a sound (can be a simple sound or a group)
 extern SoundId RegisterSound(char* file[],unsigned number);
@@ -336,9 +302,6 @@ extern void WriteSound(void);
     ///	Cleanup sound.
 extern void QuitSound(void);
 
-    /// Close CD
-extern void QuitCD(void);
-
 #else	// }{ WITH_SOUND
 
 /*----------------------------------------------------------------------------
@@ -351,15 +314,10 @@ extern void QuitCD(void);
 #define InitSound()	0		/// Dummy macro for without sound
 #define WriteSound	NULL		/// Dummy macro for without sound
 #define QuitSound()			/// Dummy macro for without sound
-#define QuitCD()			/// Dummy macro for without sound
-
 
 #endif	// } WITH_SOUND
 
 extern int WaitForSoundDevice;		/// Block until sound device available
-
-    /// Check the cdrom status
-extern int CDRomCheck(void *);
 
 //@}
 

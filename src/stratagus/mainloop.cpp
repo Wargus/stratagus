@@ -59,10 +59,7 @@
 #include "sound_server.h"
 #include "settings.h"
 #include "commands.h"
-
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
-#include "sound_server.h"
-#endif
+#include "cdaudio.h"
 
 #ifdef USE_SDLCD
 #include "SDL.h"
@@ -791,8 +788,6 @@ global void GameMainLoop(void)
 	    //		Check cd-rom (every 2nd second)
 	    // FIXME: Not called while pause or in the user interface.
 	    //
-#if defined(WITH_SOUND) && \
-    (defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA))
 	    switch( GameCycle%((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
 		case 0:				// Check cd-rom
 #if defined(USE_SDLCD)
@@ -809,7 +804,6 @@ global void GameMainLoop(void)
 		    }
 		    break;
 	    }
-#endif
 	}
 
 	TriggersEachCycle();		// handle triggers

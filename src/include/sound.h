@@ -90,14 +90,6 @@ typedef struct _play_section_ {
     PlaySectionOrder FileOrder;		/// File order
 } PlaySection;
 
-typedef enum _cd_modes_ {
-    CDModeStopped = -1,			/// Stopped
-    CDModeOff,				/// Off
-    CDModeAll,				/// All
-    CDModeRandom,			/// Random
-    CDModeDefined,			/// Defined
-} CDModes;
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -117,8 +109,6 @@ extern int CallbackMusic;		/// flag true callback ccl if stops
 extern PlaySection *PlaySections;	/// Play sections
 extern int NumPlaySections;		/// Number of play sections
 extern PlaySectionType CurrentPlaySection;  /// Current play section type
-
-extern CDModes CDMode;			/// CD mode
 
 extern char* CurrentMusicFile;
 

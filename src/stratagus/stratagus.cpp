@@ -220,6 +220,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "campaign.h"
 #include "editor.h"
 #include "movie.h"
+#include "cdaudio.h"
 
 #ifdef DEBUG
 extern SCM CclUnits(void);
