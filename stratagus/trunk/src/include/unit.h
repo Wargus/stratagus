@@ -608,6 +608,8 @@ extern void InitUnitsMemory(void);
 extern void ReleaseUnit(Unit* unit);
     ///	Create a new unit
 extern Unit* MakeUnit(UnitType* type,Player* player);
+    /// Place an unit on map
+extern void PlaceUnit(Unit* unit,int x,int y);
     ///	Create a new unit and place on map
 extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
     /// FIXME: more docu
@@ -618,7 +620,7 @@ extern void UnitLost(const Unit* unit);
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
-    /// Mark submarine as seen.
+    /// Mark submarine as seen
 extern void MarkSubmarineSeen(const Player* player,int x,int y,int range);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
@@ -682,7 +684,7 @@ extern Unit* UnitOnScreen(Unit* unit,unsigned x,unsigned y);
 extern void DestroyUnit(Unit* unit);
     /// FIXME: more docu
 extern void DestroyAllInside(Unit* source);
-    /// Hit unit with damage, if destroyed give attacker the points.
+    /// Hit unit with damage, if destroyed give attacker the points
 extern void HitUnit(const Unit* attacker,Unit* target,int damage);
 
     /// Returns the map distance between two points
@@ -694,10 +696,10 @@ extern int MapDistanceToUnit(int x,int y,const Unit* dest);
     ///	Returns the map distance between two units
 extern int MapDistanceBetweenUnits(const Unit* src,const Unit* dst);
 
-    /// FIXME: more docu
+    /// Calculate the distance from current view point to coordinate
 extern int ViewPointDistance(int x,int y);
-    /// FIXME: more docu
-extern int ViewPointDistanceToUnit(Unit* dest);
+    /// Calculate the distance from current view point to unit
+extern int ViewPointDistanceToUnit(const Unit* dest);
 
     /// Return true, if unit is an enemy of the player
 extern int IsEnemy(const Player* player,const Unit* dest);
@@ -706,8 +708,12 @@ extern int IsAllied(const Player* player,const Unit* dest);
     /// Can this unit-type attack the other (destination)
 extern int CanTarget(const UnitType* type,const UnitType* dest);
 
-extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
-extern void SaveUnits(FILE* file);			/// save all units
+    /// Generate a unit reference, a printable unique string for unit
+extern char* UnitReference(const Unit*);
+    /// save unit-structure
+extern void SaveUnit(const Unit* unit,FILE* file);
+    /// save all units
+extern void SaveUnits(FILE* file);
 
     /// Initialize unit module
 extern void InitUnits(void);
@@ -797,6 +803,10 @@ extern Unit* AttackUnitsInReactRange(const Unit* unit);
 
     /// Initialize data structures for groups
 extern void InitGroups(void);
+    /// Save groups
+extern void SaveGroups(FILE* file);
+    /// Cleanup groups
+extern void CleanGroups(void);
 
     // 2 functions to conseal the groups internal data structures...
     /// Get the number of units in a particular group
@@ -840,6 +850,13 @@ extern int SelectGroupFromUnit(Unit *unit);
 extern int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h);
     /// Select the units in the selection rectangle
 extern int SelectUnitsInRectangle(int tx,int ty,int w,int h);
+
+    /// Init selections
+extern void InitSelections(void);
+    /// Save current selection state
+extern void SaveSelections(FILE* file);
+    /// Clean up selections
+extern void CleanSelections(void);
 
 //	in ccl_unit.c
 
