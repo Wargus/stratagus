@@ -852,8 +852,10 @@ global void DoButtonButtonClicked(int button)
 	}
 	//
 	//		Button not available.
+	// or Not Teamed
 	//
-	if (CurrentButtons[button].Pos == -1) {
+	if (CurrentButtons[button].Pos == -1 ||
+		!PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 		return;
 	}
 
