@@ -338,7 +338,6 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	graphic->TextureHeight = (float)height / h;
 	tex = (unsigned char*)malloc(w * h * 4);
 
-	// FIXME: only works for 8bit images
 	for (x = 0; x < n; ++x) {
 		glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[x]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -380,8 +379,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 		SDL_UnlockSurface(graphic->Surface);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
-		i = glGetError();
-		if (i) {
+		if ((i = glGetError())) {
 			DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
 		}
 #endif
@@ -392,10 +390,14 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 /**
 **  Make an OpenGL texture of the player color pixels only.
 **
-**  FIXME: docu
+**  @param g        FIXME: docu
+**  @param graphic  FIXME: docu
+**  @param frame    FIXME: docu
+**  @param map      FIXME: docu
+**  @param maplen   FIXME: docu
 */
 global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
-		unsigned char* map, int maplen)
+	UnitColors* colors)
 {
 	int i;
 	int j;
@@ -405,6 +407,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	unsigned char* tex;
 	const unsigned char* sp;
 	int fl;
+	int bpp;
 
 	if (!*g) {
 		*g = calloc(1, sizeof(Graphic));
@@ -424,6 +427,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	}
 
 	fl = graphic->GraphicWidth / graphic->Width;
+	bpp = graphic->Surface->format->BytesPerPixel;
 	glGenTextures(1, &(*g)->TextureNames[frame]);
 
 	for (i = 1; i < graphic->Width; i <<= 1) {
@@ -442,28 +446,33 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	SDL_LockSurface(graphic->Surface);
 	for (i = 0; i < graphic->Height; ++i) {
-		sp = (const unsigned char*)graphic->Surface->pixels + (frame % fl) * graphic->Width +
-			((frame / fl) * graphic->Height + i) * graphic->GraphicWidth;
+		sp = (const unsigned char*)graphic->Surface->pixels + (frame % fl) * graphic->Width * bpp +
+			((frame / fl) * graphic->Height + i) * graphic->Surface->pitch;
 		for (j = 0; j < graphic->Width; ++j) {
 			int c;
 			int z;
 			SDL_Color p;
 
 			c = i * w * 4 + j * 4;
-			for (z = 0; z < maplen; ++z) {
-				if (*sp == map[z * 2]) {
-					p = TheMap.TileGraphic->Surface->format->palette->colors[map[z * 2 + 1]];
-					tex[c + 0] = p.r;
-					tex[c + 1] = p.g;
-					tex[c + 2] = p.b;
-					tex[c + 3] = 0xff;
-					break;
+			if (bpp == 1) {
+				for (z = 0; z < 4; ++z) {
+					if (*sp == 208 + z) {
+						p = colors->Colors[z];
+						tex[c + 0] = p.r;
+						tex[c + 1] = p.g;
+						tex[c + 2] = p.b;
+						tex[c + 3] = 0xff;
+						break;
+					}
 				}
+				if (z == 4) {
+					tex[c + 3] = 0;
+				}
+				++sp;
+			} else {
+				// FIXME: not done
+				sp += bpp;
 			}
-			if (z == maplen) {
-				tex[c + 3] = 0;
-			}
-			++sp;
 		}
 	}
 	SDL_UnlockSurface(graphic->Surface);
