@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -45,22 +45,7 @@
 #include "intern_video.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---		Variables
-----------------------------------------------------------------------------*/
-
-global void VideoDrawRawClip(SDL_Surface *surface,
-	int x, int y, int w, int h);
-
-/*----------------------------------------------------------------------------
---		Local functions
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---		RLE Sprites
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -115,12 +100,12 @@ global void VideoDraw(const Graphic* sprite, unsigned frame, int x, int y)
 #endif
 
 /**
-**		Draw graphic object clipped.
+**  Draw graphic object clipped.
 **
-**		@param sprite		pointer to object
-**		@param frame		number of frame (object index)
-**		@param x		x coordinate on the screen
-**		@param y		y coordinate on the screen
+**  @param sprite  pointer to object
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
 */
 #ifndef USE_OPENGL
 global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
@@ -192,12 +177,12 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
 #endif
 
 /**
-**		Draw graphic object unclipped and flipped in X direction.
+**  Draw graphic object unclipped and flipped in X direction.
 **
-**		@param sprite		pointer to object
-**		@param frame		number of frame (object index)
-**		@param x		x coordinate on the screen
-**		@param y		y coordinate on the screen
+**  @param sprite  pointer to object
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
 */
 #ifndef USE_OPENGL
 global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
@@ -244,12 +229,12 @@ global void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y)
 #endif
 
 /**
-**		Draw graphic object clipped and flipped in X direction.
+**  Draw graphic object clipped and flipped in X direction.
 **
-**		@param sprite		pointer to object
-**		@param frame		number of frame (object index)
-**		@param x		x coordinate on the screen
-**		@param y		y coordinate on the screen
+**  @param sprite  pointer to object
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
 */
 #ifndef USE_OPENGL
 global void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
@@ -445,6 +430,7 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 local void FreeSprite(Graphic* graphic)
 {
 	int i;
+
 #ifdef DEBUG_TODO
 	AllocatedGraphicMemory -= graphic->Size;
 	AllocatedGraphicMemory -= sizeof(Graphic);
@@ -460,75 +446,58 @@ local void FreeSprite(Graphic* graphic)
 	}
 }
 
-// FIXME: need 16 bit palette version
-// FIXME: need alpha blending version
-// FIXME: need zooming version
-
 /*----------------------------------------------------------------------------
---		Global functions
+--  Global functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Load sprite from file.
+**  Load sprite from file.
 **
-**		Compress the file as RLE (run-length-encoded) sprite.
+**  @param name    File name of sprite to load.
+**  @param width   Width of a single frame.
+**  @param height  Height of a single frame.
 **
-**		@param		name		File name of sprite to load.
-**		@param		width		Width of a single frame.
-**		@param		height		Height of a single frame.
+**  @return        A graphic object for the loaded sprite.
 **
-**		@return				A graphic object for the loaded sprite.
-**
-**		@see		LoadGraphic
+**  @see LoadGraphic
 */
 global Graphic* LoadSprite(const char* name, int width, int height)
 {
-#ifndef USE_OPENGL
 	Graphic* g;
-	int nframes;
 
 	g = LoadGraphic(name);
 
-	nframes = g->Width / width * g->Height / height;
+	if (!width) {
+		width = g->Width;
+	}
+	if (!height) {
+		height = g->Height;
+	}
 
-	g->NumFrames = nframes;
+	DebugCheck(width > g->Width || height > g->Height);
+
+	if (!width || !height || (g->Width / width) * width != g->Width ||
+			(g->Height / height) * height != g->Height) {
+		fprintf(stderr, "Invalid graphic (width, height) %s\n", name);
+		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
+			width, height, g->Width, g->Height);
+	}
+
+	// Check if width and height fits.
+	DebugCheck((g->Width / width) * width != g->Width ||
+		(g->Height / height) * height != g->Height);
+
+#ifdef USE_OPENGL
+	MakeTexture(g, width, height);
+	g->GraphicWidth = g->Width;
+	g->GraphicHeight = g->Height;
+#endif
+
+	g->NumFrames = g->Width / width * g->Height / height;;
 	g->Width = width;
 	g->Height = height;
 
 	return g;
-#else
-	Graphic* graphic;
-
-	graphic = LoadGraphic(name);
-	if (!width) {
-		width = graphic->Width;
-	}
-	if (!height) {
-		height = graphic->Height;
-	}
-
-	DebugCheck(width > graphic->Width || height > graphic->Height);
-
-	if ((!width) || (!height) || ((graphic->Width / width) * width != graphic->Width) ||
-			((graphic->Height / height) * height != graphic->Height)) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", name);
-		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
-			width, height, graphic->Width, graphic->Height);
-	}
-
-	// Check if width and height fits.
-	DebugCheck(((graphic->Width / width) * width != graphic->Width) ||
-		((graphic->Height / height) * height != graphic->Height));
-
-	MakeTexture(graphic, width, height);
-	graphic->NumFrames = (graphic->Width / width) * (graphic->Height / height);
-	graphic->GraphicWidth = graphic->Width;
-	graphic->GraphicHeight = graphic->Height;
-	graphic->Width = width;
-	graphic->Height = height;
-
-	return graphic;
-#endif
 }
 
 /**
