@@ -2200,7 +2200,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(GameMenuExit,"game-menu-exit");
 
 // Global Options
-    HASHADD(GlobalOptions,"game-global-options");
+    HASHADD(GlobalOptions,"menu-global-options");
     HASHADD(InitGlobalOptions,"init-global options");
     HASHADD(SetRes640,"set-res-640");
     HASHADD(SetRes800,"set-res-800");
@@ -3281,6 +3281,7 @@ global void SoundOptions(void)
 
 local void GlobalOptions(Menuitem *mi)
 {
+    ProcessMenu("menu-global-options", 1);
 }
 
 local void InitGlobalOptions(Menuitem *mi)
