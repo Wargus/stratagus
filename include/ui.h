@@ -198,6 +198,133 @@ typedef struct _menu_panel_ {
 } MenuPanel;
 
 /**
+**  Condition to show panel content.
+*/
+typedef struct {
+	char ShowOnlySelected;      ///< if true, show only for selected unit.
+
+	char HideNeutral;           ///< if true, don't show for neutral unit.
+	char HideAllied;            ///< if true, don't show for allied unit. (but show own units)
+	char ShowOpponent;          ///< if true, show for opponent unit.
+
+	char* BoolFlags;            ///< array of condition about user flags.
+	char* Variables;            ///< array of variable to verify (enable and max > 0)
+} ConditionPanel;
+
+
+struct _content_type_;
+struct _unit_;
+typedef void FDrawData(const struct _unit_* unit, struct _content_type_* content, int defaultfont);
+
+/**
+**  Enumeration to know which variable to be selected.
+*/
+typedef enum {
+	VariableValue = 0,  ///< Value of the variable.
+	VariableMax,        ///< Max of the variable.
+	VariableIncrease,   ///< Increase value of the variable.
+	VariableDiff,       ///< (Max - Value)
+	VariablePercent,    ///< (100 * Value / Max)
+	VariableName        ///< Name of the variable.
+} EnumVariable;
+
+/**
+**  Enumeration of unit
+*/
+
+typedef enum {
+	UnitRefItSelf = 0,      ///< unit.
+	UnitRefInside,          ///< unit->Inside.
+	UnitRefContainer,       ///< Unit->Container.
+	UnitRefWorker,          ///< unit->Data.Builded.Worker
+	UnitRefGoal,            ///< unit->Goal
+} EnumUnit;
+
+
+/**
+**  Infos to display the contents of panel.
+*/
+typedef struct _content_type_ {
+	int PosX;             ///< X coordinate where to display.
+	int PosY;             ///< Y coordinate where to display.
+
+	FDrawData* DrawData;  ///< Tell how show the variable Index.
+
+	union {
+		struct {
+			char* Text;                  ///< Text to display
+			int Font;                    ///< Font to use.
+			int Index;                   ///< Index of the variable to show, -1 if not.
+			EnumVariable Component;      ///< Component of the variable.
+			char ShowName;               ///< If true, Show name's unit.
+			char Stat;                   ///< true to special display.(value or value + diff)
+		} SimpleText;   ///< Show simple text followed by variable value.
+		struct {
+			char* Format;                ///< Text to display
+			int Font;                    ///< Font to use.
+			int Index;                   ///< Index of the variable to show.
+			EnumVariable Component;      ///< Component of the variable.
+			char Centered;               ///< if true, center the display.
+		} FormatedText;   ///< Show formated text with variable value.
+		struct {
+			char* Format;                ///< Text to display
+			int Font;                    ///< Font to use.
+			int Index1;                  ///< Index of the variable1 to show.
+			EnumVariable Component1;     ///< Component of the variable1.
+			int Index2;                  ///< Index of the variable to show.
+			EnumVariable Component2;     ///< Component of the variable.
+			char Centered;               ///< if true, center the display.
+		} FormatedText2;   ///< Show formated text with 2 variable value.
+		struct {
+			EnumUnit UnitRef;           ///< Which unit icon to display.(itself, container, ...)
+		} Icon;         ///< Show icon of the unit
+		struct {
+			int Index;           ///< Index of the variable to show, -1 if not.
+			int Width;           ///< Width of the bar.
+			int Height;          ///< Height of the bar.
+#if 0 // FIXME : something for color and value parametrisation (not implemented)
+			Color* colors;       ///< array of color to show (depend of value)
+			int* values;         ///< list of percentage to change color.
+#endif
+		} LifeBar;      ///< Show bar which change color depend of value.
+		struct {
+			int Index;           ///< Index of the variable to show, -1 if not.
+			int Width;           ///< Width of the bar.
+			int Height;          ///< Height of the bar.
+			char Border;         ///< True for additional border.
+#if 0 // FIXME : something for color parametrisations (not implemented)
+// take TheUI.CompletedBar color for the moment.
+			Color colors;        ///< Color to show (depend of value)
+#endif
+		} CompleteBar;  ///< Show bar.
+	} Data;
+
+// FIXME : Complete this.
+
+	ConditionPanel* Condition; ///< Condition to show the content; if NULL, no condition.
+} ContentType;
+
+/**
+**  Info for the panel.
+*/
+typedef struct {
+	char* Name;            ///< Ident of the panel.
+	int PosX;              ///< X coordinate of the panel.
+	int PosY;              ///< Y coordinate of the panel.
+	int DefaultFont;       ///< Default font for content.
+
+	ContentType* Contents; ///< Array of contents to display.
+	int NContents;         ///< Number of content.
+
+	ConditionPanel* Condition; ///< Condition to show the panel; if NULL, no condition.
+
+} InfoPanel;
+
+extern int NbAllPanels;       ///< Number of panel
+extern InfoPanel* AllPanels;  ///< Array of panels.
+
+
+/**
 **  Defines the user interface.
 */
 typedef struct _ui_ {
@@ -239,17 +366,13 @@ typedef struct _ui_ {
 	int InfoPanelX;                     ///< Info panel screen X position
 	int InfoPanelY;                     ///< Info panel screen Y position
 
+	char*   PanelIndex;                 ///< Index of the InfoPanel.
+	char    NumberPanel;                ///< Number of Panel.
+
 	Button* SingleSelectedButton;       ///< FIXME: docu
-	char*   SingleSelectedText;         ///< FIXME: docu
-	int     SingleSelectedFont;         ///< FIXME: docu
-	int     SingleSelectedTextX;        ///< FIXME: docu
-	int     SingleSelectedTextY;        ///< FIXME: docu
+
 	Button* SelectedButtons;            ///< Selected buttons
 	int     NumSelectedButtons;         ///< Number of selected buttons
-	char*   SelectedText;               ///< FIXME: docu
-	int     SelectedFont;               ///< FIXME: docu
-	int     SelectedTextX;              ///< FIXME: docu
-	int     SelectedTextY;              ///< FIXME: docu
 	int     MaxSelectedFont;            ///< FIXME: docu
 	int     MaxSelectedTextX;           ///< position to place '+#' text
 	int     MaxSelectedTextY;           ///< if > maximum units selected
@@ -259,6 +382,7 @@ typedef struct _ui_ {
 	int     SingleTrainingFont;         ///< FIXME: docu
 	int     SingleTrainingTextX;        ///< FIXME: docu
 	int     SingleTrainingTextY;        ///< FIXME: docu
+
 	Button* TrainingButtons;            ///< Training buttons
 	int     NumTrainingButtons;         ///< Number of training buttons
 	char*   TrainingText;               ///< FIXME: docu
@@ -267,36 +391,16 @@ typedef struct _ui_ {
 	int     TrainingTextY;              ///< FIXME: docu
 
 	Button* UpgradingButton;            ///< FIXME: docu
-	char*   UpgradingText;              ///< FIXME: docu
-	int     UpgradingFont;              ///< FIXME: docu
-	int     UpgradingTextX;             ///< FIXME: docu
-	int     UpgradingTextY;             ///< FIXME: docu
 
 	Button* ResearchingButton;          ///< FIXME: docu
-	char*   ResearchingText;            ///< FIXME: docu
-	int     ResearchingFont;            ///< FIXME: docu
-	int     ResearchingTextX;           ///< FIXME: docu
-	int     ResearchingTextY;           ///< FIXME: docu
 
 	Button* TransportingButtons;        ///< FIXME: docu
 	int     NumTransportingButtons;     ///< Number of transporting buttons
-	char*   TransportingText;           ///< FIXME: docu
-	int     TransportingFont;           ///< FIXME: docu
-	int     TransportingTextX;          ///< FIXME: docu
-	int     TransportingTextY;          ///< FIXME: docu
 
 	// Completed bar
 	SDL_Color CompletedBarColorRGB;     ///< color for completed bar
 	Uint32    CompletedBarColor;        ///< color for completed bar
 	int       CompletedBarShadow;       ///< should complete bar have shadow
-	int       CompletedBarX;            ///< completed bar X position
-	int       CompletedBarY;            ///< completed bar Y position
-	int       CompletedBarW;            ///< completed bar width
-	int       CompletedBarH;            ///< completed bar height
-	char*     CompletedBarText;         ///< completed bar text
-	int       CompletedBarFont;         ///< completed bar font
-	int       CompletedBarTextX;        ///< completed bar text X position
-	int       CompletedBarTextY;        ///< completed bar text Y position
 
 	// Button panel
 	Graphic*      ButtonPanelG;         ///< Button panel background
@@ -413,6 +517,8 @@ extern void InitUserInterface(const char* race_name);
 extern void LoadUserInterface(void);
 	/// Save the ui state
 extern void SaveUserInterface(struct _CL_File_* file);
+	/// Clean up the Panel.
+extern void CleanPanel(InfoPanel* panel);
 	/// Clean up a ui
 extern void CleanUI(UI* ui);
 	/// Clean up the ui module
@@ -459,6 +565,15 @@ extern int Map2ViewportY(const Viewport* vp, int y);
 extern void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety);
 	/// Center map on point in viewport
 extern void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety);
+
+extern FDrawData DrawSimpleText;
+extern FDrawData DrawFormatedText;
+extern FDrawData DrawFormatedText2;
+extern FDrawData DrawPanelIcon;
+extern FDrawData DrawLifeBar;
+extern FDrawData DrawCompleteBar;
+
+
 
 //@}
 

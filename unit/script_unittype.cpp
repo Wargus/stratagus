@@ -50,6 +50,8 @@
 #include "construct.h"
 #include "spells.h"
 #include "font.h"
+#include "unit.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1693,14 +1695,156 @@ static int CclDefineDecorations(lua_State* l)
 
 // ----------------------------------------------------------------------------
 
+
+/**
+**  Update unit variables which are not user defined.
+*/
+void UpdateUnitVariables(const Unit* unit)
+{
+	int i;
+
+	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
+		unit->Variable[i].Value = 0;
+		unit->Variable[i].Max = 0;
+		unit->Variable[i].Enable = 1;
+	}
+
+	// HP (do also building under construction :) ).
+	unit->Variable[HP_INDEX].Value = unit->HP;
+	unit->Variable[HP_INDEX].Max = unit->Stats->HitPoints;
+
+	// Build
+	if (unit->Orders[0].Action == UnitActionBuilded) {
+		unit->Variable[BUILD_INDEX].Value = unit->Data.Builded.Progress;
+		unit->Variable[BUILD_INDEX].Max = unit->Type->Stats[unit->Player->Player].Costs[TimeCost] * 600;
+	}
+
+	// Mana.
+	unit->Variable[MANA_INDEX].Value = unit->Mana;
+	unit->Variable[MANA_INDEX].Max = unit->Type->_MaxMana;
+
+	// Transport
+	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;
+	unit->Variable[TRANSPORT_INDEX].Max = unit->Type->MaxOnBoard;
+
+	// Research.
+	if (unit->Orders[0].Action == UnitActionResearch) {
+		unit->Variable[RESEARCH_INDEX].Value =
+			unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades];
+		unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
+	}
+
+	// Training
+	if (unit->Orders[0].Action == UnitActionTrain) {
+		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
+		unit->Variable[TRAINING_INDEX].Max =
+			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
+	}
+
+	// UpgradeTo
+	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
+		unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
+		unit->Variable[UPGRADINGTO_INDEX].Max =
+			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
+	}
+
+	// Resources.
+	if (unit->Type->GivesResource) {
+		unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
+		unit->Variable[GIVERESOURCE_INDEX].Max = 655350; // FIXME use better value ?
+	}
+	if (unit->Type->Harvester && unit->CurrentResource) {
+		unit->Variable[CARRYRESOURCE_INDEX].Value = unit->ResourcesHeld;
+		unit->Variable[CARRYRESOURCE_INDEX].Max = unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity;
+	}
+
+
+	// level
+	unit->Variable[LEVEL_INDEX].Value = unit->Stats->Level;
+	unit->Variable[LEVEL_INDEX].Max = unit->Stats->Level;
+
+	// XP
+	unit->Variable[XP_INDEX].Value = unit->XP;
+	unit->Variable[XP_INDEX].Max = unit->XP;
+
+	// Kill
+	unit->Variable[KILL_INDEX].Value = unit->Kills;
+	unit->Variable[KILL_INDEX].Max = unit->Kills;
+
+	// Supply
+	unit->Variable[SUPPLY_INDEX].Value = unit->Type->Supply;
+	unit->Variable[SUPPLY_INDEX].Max = unit->Player->Supply;
+	unit->Variable[SUPPLY_INDEX].Enable = unit->Type->Supply > 0;
+
+	// Demand
+	unit->Variable[DEMAND_INDEX].Value = unit->Type->Demand;
+	unit->Variable[DEMAND_INDEX].Max = unit->Player->Demand;
+	unit->Variable[DEMAND_INDEX].Enable = unit->Type->Demand > 0;
+
+	// Armor
+	unit->Variable[ARMOR_INDEX].Value = unit->Type->_Armor;
+	unit->Variable[ARMOR_INDEX].Max = unit->Stats->Armor;
+
+	// Speed
+	unit->Variable[SPEED_INDEX].Value = unit->Type->_Speed;
+	unit->Variable[SPEED_INDEX].Max = unit->Stats->Speed;
+
+	// SightRange
+	unit->Variable[SIGHTRANGE_INDEX].Value = unit->Type->_SightRange;
+	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->SightRange;
+
+	// AttackRange
+	unit->Variable[ATTACKRANGE_INDEX].Value = unit->Type->_AttackRange;
+	unit->Variable[ATTACKRANGE_INDEX].Max = unit->Stats->AttackRange;
+
+	// PiercingDamage
+	unit->Variable[PIERCINGDAMAGE_INDEX].Value = unit->Type->_PiercingDamage;
+	unit->Variable[PIERCINGDAMAGE_INDEX].Max = unit->Stats->PiercingDamage;
+
+	// BasicDamage
+	unit->Variable[BASICDAMAGE_INDEX].Value = unit->Type->_BasicDamage;
+	unit->Variable[BASICDAMAGE_INDEX].Max = unit->Stats->BasicDamage;
+
+	// Damage and extradamage
+	if (unit->Stats->PiercingDamage != unit->Type->_PiercingDamage) {
+		if (unit->Stats->PiercingDamage < 30 && unit->Stats->BasicDamage < 30) {
+			unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->PiercingDamage + 1) / 2;
+		} else {
+			unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->PiercingDamage + unit->Stats->BasicDamage - 30) / 2;
+		}
+		unit->Variable[EXTRADAMAGE_INDEX].Value = unit->Stats->BasicDamage - unit->Type->_BasicDamage +
+							(int)isqrt(unit->XP / 100) * XpDamage;
+		unit->Variable[EXTRADAMAGE_INDEX].Max = unit->Variable[EXTRADAMAGE_INDEX].Value;
+	} else if (unit->Stats->PiercingDamage || unit->Stats->BasicDamage < 30) {
+		unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->PiercingDamage + 1) / 2;
+	} else {
+		unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->BasicDamage - 30) / 2;
+	}
+	unit->Variable[DAMAGE_INDEX].Max = unit->Type->_BasicDamage + unit->Type->_PiercingDamage;
+
+	// SlotNumber
+#ifdef DEBUG
+	// Could Draw unit number for debug purposes
+	unit->Variable[SLOT_INDEX].Value = unit->Slot;
+	unit->Variable[SLOT_INDEX].Max = unit->Slot;
+#endif
+
+	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
+		unit->Variable[i].Enable &= unit->Variable[i].Max > 0;
+		Assert(unit->Variable[i].Value <= unit->Variable[i].Max);
+	}
+}
+
 /**
 **  Define already variables, usefull for drawing now.
 */
 void InitDefinedVariables()
 {
-#define NVARALREADYDEFINED 7 // Hardcoded variables
-	const char* var[NVARALREADYDEFINED] = {"HitPoints", "Mana", "Transport",
-		"Research", "Training", "UpgradeTo", "Resource"}; // names of the variable.
+	const char* var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
+		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
+		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "Speed", "SightRange",
+		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage", "Slot"
+		}; // names of the variable.
 	int i;
 
 	UnitTypeVar.VariableName = calloc(NVARALREADYDEFINED, sizeof(*UnitTypeVar.VariableName));
@@ -1709,7 +1853,6 @@ void InitDefinedVariables()
 	}
 	UnitTypeVar.Variable = calloc(i, sizeof(*UnitTypeVar.Variable));
 	UnitTypeVar.NumberVariable = i;
-#undef NVARALREADYDEFINED
 }
 
 /**

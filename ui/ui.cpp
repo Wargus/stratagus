@@ -249,6 +249,61 @@ void SaveUserInterface(CLFile* file)
 }
 
 /**
+**  Clean Condition Panel.
+**
+**  @param condition condition panel to free.
+*/
+static void CleanConditionPanel(ConditionPanel* condition)
+{
+	if (!condition) {
+		return;
+	}
+	free(condition->BoolFlags);
+	free(condition->Variables);
+	free(condition);
+}
+
+/**
+**  Clean Condition Panel.
+**
+**  @param condition condition panel to free.
+*/
+static void CleanContent(ContentType* content)
+{
+	if (!content) {
+		return;
+	}
+	CleanConditionPanel(content->Condition);
+	if (content->DrawData == DrawSimpleText) {
+		free(content->Data.SimpleText.Text);
+	} else if (content->DrawData == DrawFormatedText) {
+		free(content->Data.FormatedText.Format);
+	} else if (content->DrawData == DrawFormatedText2) {
+		free(content->Data.FormatedText2.Format);
+	}
+}
+
+/**
+**  Clean Panel.
+**
+**  @param panel panel to free.
+*/
+void CleanPanel(InfoPanel* panel)
+{
+	int i; // iterator.
+
+	if (!panel) {
+		return;
+	}
+	free(panel->Name);
+	CleanConditionPanel(panel->Condition);
+	for (i = 0; i < panel->NContents; i++) {
+		CleanContent(&panel->Contents[i]);
+	}
+	free(panel->Contents);
+}
+
+/**
 **  Clean up a user interface.
 */
 void CleanUI(UI* ui)
@@ -276,21 +331,14 @@ void CleanUI(UI* ui)
 
 	// Info Panel
 	FreeGraphic(ui->InfoPanelG);
+	free(ui->PanelIndex);
 	free(ui->SingleSelectedButton);
-	free(ui->SingleSelectedText);
 	free(ui->SelectedButtons);
-	free(ui->SelectedText);
 	free(ui->SingleTrainingButton);
-	free(ui->SingleTrainingText);
 	free(ui->TrainingButtons);
-	free(ui->TrainingText);
 	free(ui->UpgradingButton);
-	free(ui->UpgradingText);
 	free(ui->ResearchingButton);
-	free(ui->ResearchingText);
 	free(ui->TransportingButtons);
-	free(ui->TransportingText);
-	free(ui->CompletedBarText);
 
 	// Button Panel
 	FreeGraphic(ui->ButtonPanelG);
@@ -356,6 +404,13 @@ void CleanUserInterface(void)
 		free(UI_Table);
 		UI_Table = NULL;
 	}
+
+	for (i = 0; i < NbAllPanels; i++) {
+		CleanPanel(&AllPanels[i]);
+	}
+	free(AllPanels);
+	AllPanels = NULL;
+	NbAllPanels = 0;
 
 	// Free Title screen.
 	if (TitleScreens) {
