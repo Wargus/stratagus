@@ -85,7 +85,7 @@ local void SpellMoveToTarget(Unit * unit)
     }
 
     // when reached DoActionMove changes unit action
-#ifdef NEW_ORDERS
+    // FIXME: use return codes from pathfinder
     goal = unit->Orders[0].Goal;
     if (goal && MapDistanceToUnit(unit->X, unit->Y, goal)
 	    <= unit->Orders[0].RangeX) {
@@ -96,7 +96,7 @@ local void SpellMoveToTarget(Unit * unit)
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (!goal && MapDistance(unit->X, unit->Y, unit->Orders[0].X,
-	unit->Orders[0].Y) <= unit->Orders[0].RangeX) {
+	    unit->Orders[0].Y) <= unit->Orders[0].RangeX) {
 	// there is no goal and target spot is in range
 	unit->State = 0;
 	UnitHeadingFromDeltaXY(unit,
@@ -107,33 +107,8 @@ local void SpellMoveToTarget(Unit * unit)
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (err) {
-	DebugCheck( unit->Orders[0].Action!=UnitActionStill );
-#else
-    unit->Command.Action = UnitActionSpellCast;
-
-    goal = unit->Command.Data.Move.Goal;
-    if (goal && MapDistanceToUnit(unit->X, unit->Y, goal)
-	    <= unit->Command.Data.Move.Range) {
-
-	// there is goal and it is in range
-	unit->State = 0;
-	UnitHeadingFromDeltaXY(unit, goal->X - unit->X, goal->Y - unit->Y);
-	unit->SubAction++;		// cast the spell
-	return;
-    } else if (!goal
-	       && MapDistance(unit->X, unit->Y, unit->Command.Data.Move.DX,
-			      unit->Command.Data.Move.DY)
-	       <= unit->Command.Data.Move.Range) {
-	// there is no goal and target spot is in range
-	unit->State = 0;
-	UnitHeadingFromDeltaXY(unit, unit->Command.Data.Move.DX - unit->X,
-			       unit->Command.Data.Move.DY - unit->Y);
-	unit->SubAction++;		// cast the spell
-	return;
-    } else if (err) {
-#endif
 	// goal/spot out of range -- move to target
-	// FIXME: Should handle new return codes (err) here (for Fabrice)
+	unit->Orders[0].Action=UnitActionStill;
 	unit->State = 0;
 	unit->SubAction = 0;
     }
@@ -152,14 +127,14 @@ global void HandleActionSpellCast(Unit * unit)
 
     repeat = 0;			// repeat spell on next pass? (defaults to `no')
 
-    DebugLevel3Fn("SpellCast %Zd\n", UnitNumber(unit));
+    DebugLevel3Fn("%Zd %d,%d+%d+%d\n",
+	UnitNumber(unit),unit->Orders[0].X,unit->Orders[0].Y,
+	unit->Orders[0].RangeX,unit->Orders[0].RangeY);
 
     switch (unit->SubAction) {
 
     case 0:				// first entry.
-#ifdef NEW_ORDERS
 	NewResetPath(unit);
-#endif
 	unit->SubAction=1;
 	// FALL THROUGH
     case 1:				// Move to the target.
@@ -167,11 +142,7 @@ global void HandleActionSpellCast(Unit * unit)
 	break;
 
     case 2:				// Cast spell on the target.
-#ifdef NEW_ORDERS
 	spell = unit->Orders[0].Arg1;
-#else
-	spell = unit->Command.Data.Move.Spell;
-#endif
 	// FIXME: Use the general unified message system.
 	if (unit->Mana < spell->ManaCost) {
 	    if (unit->Player == ThisPlayer) {
@@ -185,7 +156,6 @@ global void HandleActionSpellCast(Unit * unit)
 		return;
 	    }
 	    // FIXME: what todo, if unit/goal is removed?
-#ifdef NEW_ORDERS
 	    if (unit->Orders[0].Goal && unit->Orders[0].Goal->Destroyed) {
 		repeat = 0;
 	    } else {
@@ -204,27 +174,6 @@ global void HandleActionSpellCast(Unit * unit)
 		unit->Orders[0].Goal=NoUnitP;
 	    }
 	}
-#else
-	    if (unit->Command.Data.Move.Goal
-		    && unit->Command.Data.Move.Goal->Destroyed) {
-		repeat = 0;
-	    } else {
-		repeat = SpellCast(spell, unit,
-		   unit->Command.Data.Move.Goal,
-		   unit->Command.Data.Move.DX,unit->Command.Data.Move.DY);
-	    }
-	}
-	if (!repeat) {
-	    unit->Command.Action = UnitActionStill;
-	    unit->SubAction = 0;
-	    unit->Wait = 1;
-	    if (unit->Command.Data.Move.Goal) {
-		RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
-		unit->Command.Data.Move.Goal->Refs--;
-		RefsDebugCheck(!unit->Command.Data.Move.Goal->Refs);
-	    }
-	}
-#endif
 	break;
 
     default:
