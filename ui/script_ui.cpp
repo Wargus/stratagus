@@ -1343,6 +1343,7 @@ local SCM CclDefineUI(SCM list)
 		    sublist = gh_cdr(sublist);
 		    w = gh_scm2int(gh_car(value));
 		    h = gh_scm2int(gh_car(gh_cdr(value)));
+		    DebugLevel3Fn("Map are size is %d %d\n" _C_ w _C_ h);
 		} else {
 		    errl("Unsupported tag", value);
 		}

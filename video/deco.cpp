@@ -347,8 +347,8 @@ extern void DecorationInit(void);
 extern Deco *DecorationAdd( void *data,
 			    void (*drawclip)(void *data),
 			    DecorationLevel l, 
-			    unsigned x, unsigned y,
-			    unsigned w, unsigned h );
+			    int x, int y,
+			    int w, int h );
 extern void DecorationRemove( Deco *d );
 extern void DecorationRemoveLevels( DecorationLevel min, DecorationLevel max );
 
@@ -384,7 +384,7 @@ extern void DecorationUpdateDisplay(void);
 **      dirtyscreen_size	= the total size in bytes of the array
 **/
 static unsigned char *dirtyscreen = NULL;
-static unsigned dirtyscreen_xtiles, dirtyscreen_ytiles, dirtyscreen_size,
+static int dirtyscreen_xtiles, dirtyscreen_ytiles, dirtyscreen_size,
                 dirtyscreen_xbitmaps, dirtyscreen_ybitmaps;
 
 /**
@@ -635,8 +635,8 @@ void DecorationInit(void)
   // means detailed smaller tiles, but also costs more memory.
   dirtyscreen_xtiles = (VideoWidth >> DIRTYSCREEN_BITDETAIL);
   dirtyscreen_ytiles = (VideoHeight >> DIRTYSCREEN_BITDETAIL);
-  DebugCheck( (dirtyscreen_xtiles<<DIRTYSCREEN_BITDETAIL)!=VideoWidth ||
-              (dirtyscreen_ytiles<<DIRTYSCREEN_BITDETAIL)!=VideoHeight );
+//  DebugCheck( (dirtyscreen_xtiles<<DIRTYSCREEN_BITDETAIL)!=VideoWidth ||
+//              (dirtyscreen_ytiles<<DIRTYSCREEN_BITDETAIL)!=VideoHeight );
 
   // Get memory for array dirtyscreen as 4x4bit matrixes each denoting 16
   // tiles. So (dirtyscreen_xtiles*dirtyscreen_ytiles)/16 matrixes of 2 bytes
@@ -674,7 +674,7 @@ void DecorationInit(void)
 global void debugdirtyscreen(void)
 {
   char *p;
-  unsigned int x, y, xbit, ybit, mask;
+  int x, y, xbit, ybit, mask;
 
   printf( "   " ); 
   for ( x=y=0; x<dirtyscreen_xtiles; y++ )
@@ -710,7 +710,7 @@ global void debugdirtyscreen(void)
 **	pre : given (x,y) should be inside screen resolution as given through
 **	      DecorationInit
 **/
-static void MarkPos( unsigned x, unsigned y )
+/*static void MarkPos( unsigned x, unsigned y )
 {
   char *p;
   unsigned bits;
@@ -740,7 +740,7 @@ static void MarkPos( unsigned x, unsigned y )
   bits |= ( 1 << ((x & 0x000F) + ((y & 0x000F)<<2)) );
   p[0] = bits & 0x00FF;
   p[1] = (bits >> 8);
-}
+}*/
 
 /**
 **      Marks given area on screen as 'dirty',  which can later be checked
@@ -990,7 +990,7 @@ static void CheckRedraw( Deco *d, DecorationSingle *t )
 **	FOR DEBUG PURPOSE ONLY
 **	Will print the given 16bit as 4x4 tiles.
 */
-global debugdecobits( unsigned int bits )
+global void debugdecobits( unsigned int bits )
 {
   int y;
   printf( "16bits as 4x4: 3210\n" );
@@ -1046,7 +1046,7 @@ local unsigned long convert8x8to8x4(
 **	FOR DEBUG PURPOSE ONLY
 **	Will print the given t as separate bitvalues.
 */
-global debugsinglebits( DecorationSingle *t )
+global void debugsinglebits( DecorationSingle *t )
 {
   char *p;
   unsigned long topleftscreen, toprightscreen, bottomleftscreen, 
@@ -1184,14 +1184,15 @@ void DecorationMark( Deco *d )
 **	@param w	= width in pixels of area to be drawn from (x,y)
 **	@param h	= height in pixels of area to be drawn from (x,y)
 **/
-static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
-                                              unsigned w, unsigned h )
+static DecorationSingle *DecorationSingleNew( int x, int y, int w, int h )
 {
   DecorationSingle *t;
-  unsigned bitindex, xmaskhead, xmasktail, ymaskhead, ymasktail;
+  int bitindex, xmaskhead, xmasktail, ymaskhead, ymasktail;
+
+  DebugLevel3Fn("%d %d %d %d\n" _C_ x _C_ y _C_ w _C_ h);
 
   DebugCheck( x < 0 || y < 0 || w <= 0 || h <= 0 ||
-              (x+w) >= VideoWidth || (y+h) >= VideoHeight );
+              (x+w) > VideoWidth || (y+h) > VideoHeight );
 
   // Fill in this new Decoration so it can be used
   t = DecorationSingleAllocate();
@@ -1285,12 +1286,12 @@ static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
 Deco *DecorationAdd( void *data,
                      void (*drawclip)(void *data),
                      DecorationLevel l, 
-                     unsigned x, unsigned y,
-                     unsigned w, unsigned h )
+                     int x, int y, int w, int h )
 {
   DecorationSingle **prevt;
   Deco *list, *d, *prv, **pprv;
 
+  DebugLevel3Fn("%d %d %d %d\n" _C_ x _C_ y _C_ w _C_ h);
   // Allocate and fill in this new DecorationType so it can be used
   d = DecorationAllocate();
   d->drawclip  = drawclip;
@@ -1396,7 +1397,7 @@ Deco *DecorationAdd( void *data,
 **	(note that not the minimum area, but a somehwat bigger area can be
 **	 invalidated for efficiency reasons).
 **/
-static void InvalidateDirtyscreen(void)
+/*static void InvalidateDirtyscreen(void)
 {
   char *p;
   unsigned bits, pixelx, pixely, pixelstep, dirtylinesize, xcount, ycount;
@@ -1443,7 +1444,7 @@ static void InvalidateDirtyscreen(void)
 
 // Invalidate remaining rectangles, which have their shadow beyond VideoHeight
   SweeplineInvalidateAll();
-}
+}*/
 
 /**
 **	Draw all decorations, independently if they cover dirty pixels or not.
@@ -1455,24 +1456,26 @@ static void InvalidateDirtyscreen(void)
 **/
 void DecorationRefreshDisplay(void)
 {
-  Deco *d;
-  int i;
+    Deco *d;
+    int i;
 
-// save clip rectangle
-  PushClipping();
+    // save clip rectangle
+    PushClipping();
 
-// Handle each decoration (not the singles)
-  for ( i = 0; i < LevCount; i++ )
-    for ( d = dhead[i]; d; d = d->nxt )
-      DrawArea( d->x, d->y, d->w, d->h, d->data, d->drawclip );
+    // Handle each decoration (not the singles)
+    for (i = 0; i < LevCount; i++) {
+	for (d = dhead[i]; d; d = d->nxt) {
+	    DrawArea(d->x, d->y, d->w, d->h, d->data, d->drawclip);
+	}
+    }
 
-  Invalidate();
+    Invalidate();
 
-// reset dirty array, to remember new updates for next refresh
-  ClearDirtyscreen();
+    // reset dirty array, to remember new updates for next refresh
+    ClearDirtyscreen();
 
-// restore clip rectangle
-  PopClipping();
+    // restore clip rectangle
+    PopClipping();
 }
 
 /**
