@@ -117,7 +117,7 @@ global void StopMusic(void)
 **
 **      @return         Number of bytes filled.
 */
-local int ModRead(Sample* o, void* buf, unsigned int len)
+local int ModRead(Sample* o, void* buf, int len)
 {
     return ModPlug_Read(o->User, buf, len);
 }
