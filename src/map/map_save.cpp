@@ -10,7 +10,7 @@
 //
 /**@name map_save.c	-	Saving the map. */
 //
-//	(c) Copyright 2001 by Lutz Sammer
+//	(c) Copyright 2001,2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -94,15 +94,9 @@ global void SaveMap(FILE* file)
 #ifdef NEW_FOW
 	    DebugLevel0Fn("FIXME:\n");
 #else
-#ifdef NEW_FOW2
 	    if( IsMapFieldVisible(h,w) ) {
 		fprintf(file," visible");
 	    }
-#else
-	    if( mf->Flags&MapFieldVisible ) {
-		fprintf(file," visible");
-	    }
-#endif
 	    if( mf->Flags&MapFieldExplored ) {
 		fprintf(file," explored");
 	    }
