@@ -76,9 +76,18 @@ local int MoveToGoldMine(Unit* unit)
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
-	unit->Orders[0].Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Orders[0].Action=UnitActionStill;
+	if( (destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
+	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
+	    ++destu->Refs;
+	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	    unit->Orders[0].X=-1;
+	    unit->Orders[0].Y=-1;
+	    unit->Orders[0].Action=UnitActionMineGold;
+	} else {
+	    unit->Orders[0].Goal=NoUnitP;
+	    unit->Orders[0].Action=UnitActionStill;
+	}
 	unit->SubAction=0;
 	return 0;
     } else if( destu->Removed || !destu->HP
@@ -86,9 +95,18 @@ local int MoveToGoldMine(Unit* unit)
 	RefsDebugCheck( !destu->Refs );
 	--destu->Refs;
 	RefsDebugCheck( !destu->Refs );
-	unit->Orders[0].Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Orders[0].Action=UnitActionStill;
+	if( (destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
+	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( destu->Destroyed || !destu->Refs );
+	    ++destu->Refs;
+	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+	    unit->Orders[0].X=-1;
+	    unit->Orders[0].Y=-1;
+	    unit->Orders[0].Action=UnitActionMineGold;
+	} else {
+	    unit->Orders[0].Goal=NoUnitP;
+	    unit->Orders[0].Action=UnitActionStill;
+	}
 	unit->SubAction=0;
 	return 0;
     }
@@ -194,7 +212,7 @@ local int MineInGoldmine(Unit* unit)
 	//
 	//	Update gold mine.
 	//
-	if ( OptionUseDepletedMines
+	if( OptionUseDepletedMines
 		&& mine->Value < DefaultIncomes[GoldCost] ) {
 	    mine->Value = 0;
 	    unit->Rs = OptionUseDepletedMines;
@@ -215,10 +233,40 @@ local int MineInGoldmine(Unit* unit)
 	//	End of gold: destroy gold-mine.
 	//
 	if( !OptionUseDepletedMines && mine->Value<DefaultIncomes[GoldCost] ) {
+	    Unit* table[UnitMax];
+	    Unit* u;
+	    Unit* destu;
+	    int i;
+	    int count;
+
 	    DebugLevel0Fn("Mine destroyed %d,%d\n" _C_ mine->X _C_ mine->Y);
+
+	    count=0;
+	    for( i=0; i<NumUnits; ++i ) {
+		u=Units[i];
+		if( u!=unit && u->Removed && u->X==mine->X && u->Y==mine->Y ) {
+		    table[count++]=u;
+		}
+	    }
+
 	    DropOutAll(mine);
 	    LetUnitDie(mine);
 	    mine=NULL;
+
+	    u=table[0];
+	    if( count && (destu=FindGoldMine(u,u->X,u->Y)) ) {
+		for( i=0; i<count; ++i ) {
+		    u=table[i];
+		    u->Orders[0].Goal=destu;
+		    RefsDebugCheck( destu->Destroyed || !destu->Refs );
+		    ++destu->Refs;
+		    u->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+		    u->Orders[0].X=-1;
+		    u->Orders[0].Y=-1;
+		    u->Orders[0].Action=UnitActionMineGold;
+		    CheckUnitToBeDrawn(u);
+		}
+	    }
 	}
 
 	//	Store gold mine position
@@ -367,7 +415,7 @@ local int MoveToGoldDeposit(Unit* unit)
     //
     //	Update gold.
     //
-    if ( OptionUseDepletedMines && (int)unit->Rs == OptionUseDepletedMines ) {
+    if( OptionUseDepletedMines && (int)unit->Rs == OptionUseDepletedMines ) {
 	unit->Player->Resources[GoldCost]+=
 	    (unit->Player->Incomes[GoldCost] * OptionUseDepletedMines) / 100;
 	unit->Player->TotalResources[GoldCost]+=
