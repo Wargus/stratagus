@@ -2,6 +2,9 @@ Rules.make
 freecraft
 gmon.out
 save_file_of_freecraft.ccl
+.cvsignore
+Rules.make
+core
 srcdoc
 .depend
 .gdbinit
