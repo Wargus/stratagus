@@ -1669,23 +1669,11 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 	//
 	if (NumSelected == 1 && unit->Selected) {
 		if (ShowSightRange) {
-			if (ShowSightRange == 1) {
-				VideoFillTransCircleClip(ColorGreen,
-					x + type->TileWidth * TileSizeX / 2,
-					y + type->TileHeight * TileSizeY / 2,
-					((stats->SightRange + (type->TileWidth - 1)) * TileSizeX), 75);
-			} else if (ShowSightRange == 2) {
-				VideoFillTransCircleClip(ColorGreen,
-					x + type->TileWidth * TileSizeX / 2,
-					y + type->TileHeight * TileSizeY / 2,
-					min((stats->SightRange + (type->TileWidth - 1) / 2) * TileSizeX,
-					(stats->SightRange + (type->TileHeight - 1) / 2) * TileSizeY), 75);
-			} else {
-				VideoDrawCircleClip(ColorGreen,
-					x + type->TileWidth * TileSizeX / 2,
-					y + type->TileHeight * TileSizeY / 2,
-					((stats->SightRange + (type->TileWidth - 1)) * TileSizeX));
-			}
+			// Radius -1 so you can see all ranges
+			VideoDrawCircleClip(ColorGreen,
+				x + type->TileWidth * TileSizeX / 2,
+				y + type->TileHeight * TileSizeY / 2,
+				((stats->SightRange + (type->TileWidth - 1)) * TileSizeX) - 1);
 		}
 		if (type->CanAttack) {
 			if (ShowReactionRange) {
@@ -1699,10 +1687,11 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 				}
 			}
 			if (ShowAttackRange && stats->AttackRange) {
+				// Radius + 1 so you can see all ranges
 				VideoDrawCircleClip(ColorRed,
 					x + type->TileWidth * TileSizeX / 2,
 					y + type->TileHeight * TileSizeY / 2,
-					(stats->AttackRange + (type->TileWidth - 1)) * TileSizeX);
+					(stats->AttackRange + (type->TileWidth - 1)) * TileSizeX + 1);
 			}
 		}
 	}
