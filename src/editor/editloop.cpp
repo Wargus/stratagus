@@ -746,16 +746,18 @@ static void DrawEditorPanel(void)
 	//
 	icon = IconByIdent(EditorSelectIcon);
 	Assert(icon);
-	DrawUnitIcon(Players, icon,
+	// FIXME: wrong button style
+	DrawUnitIcon(Players, TheUI.SingleSelectedButton->Style, icon,
 		(ButtonUnderCursor == SelectButton ? IconActive : 0) |
 			(EditorState == EditorSelecting ? IconSelected : 0),
-		x, y);
+		x, y, NULL);
 	icon = IconByIdent(EditorUnitsIcon);
 	Assert(icon);
-	DrawUnitIcon(Players, icon,
+	// FIXME: wrong button style
+	DrawUnitIcon(Players, TheUI.SingleSelectedButton->Style, icon,
 		(ButtonUnderCursor == UnitButton ? IconActive : 0) |
 			(EditorState == EditorEditUnit ? IconSelected : 0),
-		x + UNIT_ICON_X, y + UNIT_ICON_Y);
+		x + UNIT_ICON_X, y + UNIT_ICON_Y, NULL);
 
 	DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
 		(ButtonUnderCursor == TileButton ? IconActive : 0) |

@@ -122,8 +122,6 @@ typedef struct _checkbox_style_ {
 typedef struct _button_ {
 	int X;                          ///< x coordinate on the screen
 	int Y;                          ///< y coordinate on the screen
-	int Width;                      ///< width of the button on the screen
-	int Height;                     ///< height of the button on the screen
 	char* Text;                     ///< button text
 	ButtonStyle* Style;             ///< button style
 } Button;

@@ -123,9 +123,10 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 	int f;
 	Uint32 color;
 
-	y += unit->Type->Icon.Icon->Height + 7;
+	// FIXME: add icon borders
+	y += unit->Type->Icon.Icon->Height;
 	VideoFillRectangleClip(ColorBlack, x, y,
-		unit->Type->Icon.Icon->Width + 7, 7);
+		unit->Type->Icon.Icon->Width, 7);
 	if (unit->HP) {
 		f = (100 * unit->HP) / unit->Stats->HitPoints;
 		if (f > 75) {
@@ -137,7 +138,7 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 		} else {
 			color = ColorRed;
 		}
-		f = (f * (unit->Type->Icon.Icon->Width + 5)) / 100;
+		f = (f * (unit->Type->Icon.Icon->Width)) / 100;
 		VideoFillRectangleClip(color, x + 1, y + 1, f, 5);
 	}
 }
@@ -154,14 +155,15 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 {
 	int f;
 
-	y += unit->Type->Icon.Icon->Height + 7;
+	// FIXME: add icon borders
+	y += unit->Type->Icon.Icon->Height;
 	VideoFillRectangleClip(ColorBlack, x, y + 3,
-		unit->Type->Icon.Icon->Width + 7, 4);
+		unit->Type->Icon.Icon->Width, 4);
 	if (unit->HP) {
 		// s0m3body: mana bar should represent proportional value of Mana
 		// with respect to MaxMana (unit->Type->_MaxMana) for the unit
 		f = (100 * unit->Mana) / unit->Type->_MaxMana;
-		f = (f * (unit->Type->Icon.Icon->Width + 5)) / 100;
+		f = (f * (unit->Type->Icon.Icon->Width)) / 100;
 		VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }
@@ -257,10 +259,10 @@ static void DrawUnitInfo(const Unit* unit)
 	if (TheUI.SingleSelectedButton) {
 		x = TheUI.SingleSelectedButton->X;
 		y = TheUI.SingleSelectedButton->Y;
-		DrawUnitIcon(unit->Player, type->Icon.Icon,
+		DrawUnitIcon(unit->Player, TheUI.SingleSelectedButton->Style, type->Icon.Icon,
 			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 				(IconActive | (MouseButtons & LeftButton)) : 0,
-			x, y);
+			x, y, NULL);
 		UiDrawLifeBar(unit, x, y);
 
 		if (unit->Player == ThisPlayer ||
@@ -269,8 +271,8 @@ static void DrawUnitInfo(const Unit* unit)
 				ReplayRevealMap) {  // Only for own units.
 			if (unit->HP && unit->HP < 10000) {
 				sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
-				VideoDrawTextCentered(x + (type->Icon.Icon->Width + 7) / 2,
-					y + type->Icon.Icon->Height + 7 + 7 + 3, SmallFont, buf);
+				VideoDrawTextCentered(x + (type->Icon.Icon->Width) / 2,
+					y + type->Icon.Icon->Height + 7 + 3, SmallFont, buf);
 			}
 		}
 	}
@@ -360,9 +362,11 @@ static void DrawUnitInfo(const Unit* unit)
 		if (unit->Orders[0].Action == UnitActionBuilded) {
 			if (unit->Data.Builded.Worker) {
 				// FIXME: Position must be configured!
+				// FIXME: Wrong button style
 				DrawUnitIcon(unit->Data.Builded.Worker->Player,
+					TheUI.SingleSelectedButton->Style,
 					unit->Data.Builded.Worker->Type->Icon.Icon,
-					0, x + 107, y + 8 + 70);
+					0, x + 107, y + 8 + 70, NULL);
 			}
 			// FIXME: not correct must use build time!!
 			UiDrawCompletedBar(stats->HitPoints, unit->HP);
@@ -379,11 +383,12 @@ static void DrawUnitInfo(const Unit* unit)
 						TheUI.SingleTrainingFont, TheUI.SingleTrainingText);
 				}
 				if (TheUI.SingleTrainingButton) {
-					DrawUnitIcon(unit->Player, unit->Orders[0].Type->Icon.Icon,
+					DrawUnitIcon(unit->Player, TheUI.SingleTrainingButton->Style,
+						unit->Orders[0].Type->Icon.Icon,
 						(ButtonAreaUnderCursor == ButtonAreaTraining &&
 							ButtonUnderCursor == 0) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0,
-						TheUI.SingleTrainingButton->X, TheUI.SingleTrainingButton->Y);
+						TheUI.SingleTrainingButton->X, TheUI.SingleTrainingButton->Y, NULL);
 				}
 
 				UiDrawCompletedBar(unit->Orders[0].Type->Stats[
@@ -398,11 +403,12 @@ static void DrawUnitInfo(const Unit* unit)
 					for (i = 0; i < unit->OrderCount &&
 							i < TheUI.NumTrainingButtons; ++i) {
 						if (unit->Orders[i].Action == UnitActionTrain) {
-							DrawUnitIcon(unit->Player, unit->Orders[i].Type->Icon.Icon,
+							DrawUnitIcon(unit->Player, TheUI.TrainingButtons[i].Style,
+								unit->Orders[i].Type->Icon.Icon,
 								(ButtonAreaUnderCursor == ButtonAreaTraining &&
 									ButtonUnderCursor == i) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0,
-								TheUI.TrainingButtons[i].X, TheUI.TrainingButtons[i].Y);
+								TheUI.TrainingButtons[i].X, TheUI.TrainingButtons[i].Y, NULL);
 						}
 					}
 				}
@@ -423,11 +429,12 @@ static void DrawUnitInfo(const Unit* unit)
 					TheUI.UpgradingFont, TheUI.UpgradingText);
 			}
 			if (TheUI.UpgradingButton) {
-				DrawUnitIcon(unit->Player, unit->Orders[0].Type->Icon.Icon,
+				DrawUnitIcon(unit->Player, TheUI.UpgradingButton->Style,
+					unit->Orders[0].Type->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.UpgradingButton->X, TheUI.UpgradingButton->Y);
+					TheUI.UpgradingButton->X, TheUI.UpgradingButton->Y, NULL);
 			}
 
 			UiDrawCompletedBar(unit->Orders[0].Type->Stats[
@@ -445,11 +452,12 @@ static void DrawUnitInfo(const Unit* unit)
 					TheUI.ResearchingFont, TheUI.ResearchingText);
 			}
 			if (TheUI.ResearchingButton) {
-				DrawUnitIcon(unit->Player, unit->Data.Research.Upgrade->Icon.Icon,
+				DrawUnitIcon(unit->Player, TheUI.ResearchingButton->Style,
+					unit->Data.Research.Upgrade->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaResearching &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.ResearchingButton->X, TheUI.ResearchingButton->Y);
+					TheUI.ResearchingButton->X, TheUI.ResearchingButton->Y, NULL);
 			}
 
 			UiDrawCompletedBar(unit->Data.Research.Upgrade->Costs[TimeCost],
@@ -472,10 +480,11 @@ static void DrawUnitInfo(const Unit* unit)
 		uins = unit->UnitInside;
 		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
 			if (uins->Boarded && j < TheUI.NumTransportingButtons) {
-				DrawUnitIcon(unit->Player,uins->Type->Icon.Icon,
+				DrawUnitIcon(unit->Player, TheUI.TransportingButtons[j].Style,
+					uins->Type->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
+					TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y, NULL);
 				UiDrawLifeBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
 				if (uins->Type->CanCastSpell && unit->Type->_MaxMana) {
 					UiDrawManaBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
@@ -1171,11 +1180,11 @@ void DrawInfoPanel(void)
 			DrawInfoPanelBackground(0);
 			for (i = 0; i < (NumSelected > TheUI.NumSelectedButtons ?
 					TheUI.NumSelectedButtons : NumSelected); ++i) {
-				DrawUnitIcon(ThisPlayer,
+				DrawUnitIcon(ThisPlayer, TheUI.SelectedButtons[i].Style,
 					Selected[i]->Type->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.SelectedButtons[i].X, TheUI.SelectedButtons[i].Y);
+					TheUI.SelectedButtons[i].X, TheUI.SelectedButtons[i].Y, NULL);
 				UiDrawLifeBar(Selected[i],
 					TheUI.SelectedButtons[i].X, TheUI.SelectedButtons[i].Y);
 

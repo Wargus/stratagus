@@ -213,8 +213,9 @@ extern const char* IdentOfIcon(const Icon* icon);
 	/// Draw icon
 extern void DrawIcon(const struct _player_* player, Icon* icon, int x, int y);
 	/// Draw icon of an unit
-extern void DrawUnitIcon(const struct _player_* player, Icon* icon,
-	unsigned flags, int x, int y);
+extern void DrawUnitIcon(const struct _player_* player,
+	struct _button_style_* style, Icon* icon, unsigned flags, int x, int y,
+	const char* text);
 
 	/// Register CCL features
 extern void IconCclRegister(void);
