@@ -143,32 +143,27 @@ global BurningBuildingFrame* BurningBuildingFrames; /// Burning building frames
 ----------------------------------------------------------------------------*/
 
 /**
-**  Load the graphics for the missiles.
+**  Load the graphics for a missile type
+**
+**  @param missile  Type of missile to Load
 */
-global void LoadMissileSprites(void)
+global void LoadMissileSprite(MissileType* mtype)
 {
-	int i;
 	const char* file;
 
-	if (!MissileTypes) {
-		return;
-	}
-	for (i = 0; MissileTypes[i].OType; ++i) {
-		if ((file = MissileTypes[i].File)) {
-			char* buf;
+	if ((file = mtype->File)) {
+		char* buf;
 
-			buf = alloca(strlen(file) + 9 + 1);
-			file = strcat(strcpy(buf, "graphics/"), file);
-			ShowLoadProgress("Missile %s", file);
-			MissileTypes[i].Sprite = LoadSprite(
-				file, MissileTypes[i].Width, MissileTypes[i].Height);
-			FlipGraphic(MissileTypes[i].Sprite);
+		buf = alloca(strlen(file) + 9 + 1);
+		file = strcat(strcpy(buf, "graphics/"), file);
+		mtype->Sprite = LoadSprite(
+			file, mtype->Width, mtype->Height);
+		FlipGraphic(mtype->Sprite);
 
-			// Correct the number of frames in graphic
-			DebugCheck(MissileTypes[i].Sprite->NumFrames < MissileTypes[i].SpriteFrames);
-			MissileTypes[i].Sprite->NumFrames = MissileTypes[i].SpriteFrames;
-			// FIXME: Don't use NumFrames as number of frames.
-		}
+		// Correct the number of frames in graphic
+		DebugCheck(mtype->Sprite->NumFrames < mtype->SpriteFrames);
+		mtype->Sprite->NumFrames = mtype->SpriteFrames;
+		// FIXME: Don't use NumFrames as number of frames.
 	}
 }
 
@@ -659,8 +654,12 @@ global int CheckMissileToBeDrawn(const Missile* missile)
 **  @param x      Screen pixel X position
 **  @param y      Screen pixel Y position
 */
-global void DrawMissile(const MissileType* mtype, int frame, int x, int y)
+global void DrawMissile(MissileType* mtype, int frame, int x, int y)
 {
+	if (!mtype->Sprite) {
+		LoadMissileSprite(mtype);
+	}
+
 	if (mtype->Flip) {
 		if (frame < 0) {
 			if (mtype->Transparency == 50) {
@@ -1122,7 +1121,7 @@ local int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 
 		totalx = MapDistance(missile->DX, missile->DY, missile->SourceX, missile->SourceY);
 		dx = MapDistance(missile->X, missile->Y, missile->SourceX, missile->SourceY);
-		totalf = VideoGraphicFrames(missile->Type->Sprite) / NumDirections;
+		totalf = missile->Type->SpriteFrames / NumDirections;
 		df = missile->SpriteFrame / NumDirections;
 		if ((sign == 1 && dx * totalf <= df * totalx) ||
 				(sign == -1 && dx * totalf > df * totalx)) {
@@ -1131,13 +1130,13 @@ local int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 	}
 	missile->SpriteFrame += sign * NumDirections;
 	if (sign > 0) {
-		if (missile->SpriteFrame >= VideoGraphicFrames(missile->Type->Sprite)) {
-			missile->SpriteFrame -= VideoGraphicFrames(missile->Type->Sprite);
+		if (missile->SpriteFrame >= missile->Type->SpriteFrames) {
+			missile->SpriteFrame -= missile->Type->SpriteFrames;
 			AnimationIsFinished = 1;
 		}
 	} else {
 		if (missile->SpriteFrame < 0) {
-			missile->SpriteFrame += VideoGraphicFrames(missile->Type->Sprite);
+			missile->SpriteFrame += missile->Type->SpriteFrames;
 			AnimationIsFinished = 1;
 		}
 	}
@@ -1145,7 +1144,7 @@ local int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 		missile->SpriteFrame = -missile->SpriteFrame;
 	}
 	DebugLevel3Fn("Frame %d of %d\n" _C_
-		missile->SpriteFrame _C_ VideoGraphicFrames(missile->Type->Sprite));
+		missile->SpriteFrame _C_ missile->Type->SpriteFrames);
 	return AnimationIsFinished;
 }
 
@@ -1171,7 +1170,7 @@ local void NextMissileFrameCycle(Missile* missile)
 	}
 	totalx = abs(missile->DX - missile->SourceX);
 	dx = abs(missile->X - missile->SourceX);
-	f = VideoGraphicFrames(missile->Type->Sprite) / missile->Type->NumDirections;
+	f = missile->Type->SpriteFrames / missile->Type->NumDirections;
 	f = 2 * f - 1;
 	for (i = 1, j = 1; i <= f; ++i) {
 		if (dx * f / i < totalx) {

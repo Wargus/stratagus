@@ -2800,7 +2800,7 @@ global Unit* UnitOnScreen(Unit* ounit, int x, int y)
 */
 global void LetUnitDie(Unit* unit)
 {
-	const UnitType* type;
+	UnitType* type;
 
 	unit->HP = 0;
 	unit->Moving = 0;
@@ -2861,6 +2861,9 @@ global void LetUnitDie(Unit* unit)
 					type->TileHeight != type->CorpseType->TileHeight);
 			type = unit->Type = type->CorpseType;
 
+			if (!type->Sprite) {
+				LoadUnitTypeSprite(type);
+			}
 			unit->IX = (type->Width - VideoGraphicWidth(type->Sprite)) / 2;
 			unit->IY = (type->Height - VideoGraphicHeight(type->Sprite)) / 2;
 

@@ -176,7 +176,6 @@ global void LoadModules(void)
 #if 0
 	LoadPlayers();
 #endif
-	LoadMissileSprites();
 	LoadConstructions();
 	LoadDecorations();
 	LoadUnitTypes();
