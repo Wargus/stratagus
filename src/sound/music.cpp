@@ -84,6 +84,8 @@ global struct cdrom_tocentry CDtocentry[64];
 global struct cdrom_read_audio CDdata;
 #endif
 
+global PlaySectionType CurrentPlaySection;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -447,8 +449,14 @@ global void PlaySectionMusic(PlaySectionType section)
     int found;
     int numfiles;
 
+    printf("in playsecmu\n");
+
     if (NumPlaySections == 0) {
 	return;
+    }
+
+    if (section == PlaySectionUnknown) {
+	section = CurrentPlaySection;
     }
 
     if (section == PlaySectionStats) {
@@ -465,6 +473,7 @@ global void PlaySectionMusic(PlaySectionType section)
 	    break;
 	}
     }
+    CurrentPlaySection = PlaySections[i].Type;
 
 #ifdef USE_LIBCDA
     if (CDMode == CDModeDefined) {
@@ -473,11 +482,16 @@ global void PlaySectionMusic(PlaySectionType section)
 	if ( (1 << track) & PlaySections[i].CDTracks ) {
 	    newtrack = 0;
 	} else {
+	    if ( !((1 << CDTrack) & PlaySections[i].CDTracks) ) {
+		CDTrack = 0;
+	    }
 	    if (PlaySections[i].CDOrder == PlaySectionOrderAll) {
-		for (j = 1; j < 32; ++j) {
+		for (j = CDTrack + 1; j != CDTrack; ++j) {
 		    if ( (1 << j) & PlaySections[i].CDTracks ) {
 			newtrack = j;
 			break;
+		    } else if (j == 31) {
+			j = 0;
 		    }
 		}
 	    } else if (PlaySections[i].CDOrder == PlaySectionOrderRandom) {
@@ -489,6 +503,7 @@ global void PlaySectionMusic(PlaySectionType section)
 	}
 	if (newtrack) {
 	    cd_play(newtrack);
+	    CDTrack = newtrack;
 	}
     } else if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
 #else
