@@ -1489,7 +1489,7 @@ global void RescueUnits(void)
 	    memcpy(table,p->Units,l*sizeof(Unit*));
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
-		DebugLevel2("Checking %d(%s)",UnitNumber(unit),
+		DebugLevel3("Checking %d(%s)",UnitNumber(unit),
 			unit->Type->Ident);
 #ifdef UNIT_ON_MAP
 		// FIXME: could be done faster?
@@ -1508,7 +1508,7 @@ global void RescueUnits(void)
 			unit->X+unit->Type->TileWidth+2,
 			unit->Y+unit->Type->TileHeight+2,around);
 		}
-		DebugLevel2(" = %d\n",n);
+		DebugLevel3(" = %d\n",n);
 		//
 		//	Look if human near the unit.
 		//

@@ -54,6 +54,7 @@
 #include "missile.h"
 #include "settings.h"
 #include "campaign.h"
+#include "trigger.h"
 
 #include "ccl.h"
 
@@ -62,7 +63,7 @@
 ----------------------------------------------------------------------------*/
 
 global Settings GameSettings;		/// Game Settings
-global int lcm_prevent_recurse = 0;	/// prevent recursion through LoadGameMap
+global int lcm_prevent_recurse;		/// prevent recursion through LoadGameMap
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -322,6 +323,11 @@ global void CreateGame(char* filename, WorldMap* map)
     //  Buttons (botpanel)
     //
     InitButtons();
+
+    //
+    //	Triggers
+    //
+    InitTriggers();
 
 #ifdef WITH_SOUND
     if (SoundFildes!=-1) {
