@@ -1587,12 +1587,18 @@ global void InitMenus(unsigned int race)
     const char *file;
     char *buf;
 
+#ifndef OLD_MENU
+    InitMenuData();
+#endif
+
     if (race == last_race) {	// same race? already loaded!
 	return;
     }
 
     if (last_race == -1) {
+#ifdef OLD_MENU
 	InitMenuData();
+#endif
 
 	callbacks.ButtonPressed = &MenuHandleButtonDown;
 	callbacks.ButtonReleased = &MenuHandleButtonUp;
