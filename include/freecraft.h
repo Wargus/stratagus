@@ -306,6 +306,9 @@
 #define FreeCraftFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
 #endif
 
+    /// Text string: Name, Version, Copyright
+extern char NameLine[];
+
 #ifndef FREECRAFT_LIB_PATH
 #define FREECRAFT_LIB_PATH "data"	/// Where to find the data files
 #endif
