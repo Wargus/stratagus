@@ -1252,8 +1252,12 @@ local int CclDefineUnitType(lua_State* l)
 		type->CanCastSpell = malloc(SpellTypeCount);
 		memset(type->CanCastSpell, 0, SpellTypeCount);
 	    }
-	    type->Magic = 0;
 	    subargs = luaL_getn(l, j + 1);
+	    if (subargs == 0) {
+		free(type->CanCastSpell);
+		type->CanCastSpell = NULL;
+
+	    }
 	    for (k = 0; k < subargs; ++k) {
 		int id;
 
@@ -1267,7 +1271,6 @@ local int CclDefineUnitType(lua_State* l)
 		    lua_error(l);
 		}
 		type->CanCastSpell[id] = 1;
-		type->Magic = 1;
 	    }
 	} else if (!strcmp(value, "can-target-flag")) {
 	    //
