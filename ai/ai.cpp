@@ -569,12 +569,12 @@ global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
 	const AiUnitType* aut;
 
 	fprintf(file,"  'force '(%d %s %s %s\n",i,
-		AiPlayer->Force[i].Completed ? "complete" : "recruit",
-		AiPlayer->Force[i].Attacking ? "attack" : "",
-		AiPlayer->Force[i].Defending ? "defend" : "");
+		ai->Force[i].Completed ? "complete" : "recruit",
+		ai->Force[i].Attacking ? "attack" : "",
+		ai->Force[i].Defending ? "defend" : "");
 
 	fprintf(file,"    units ( ");
-	for( aut=AiPlayer->Force[i].UnitTypes; aut; aut=aut->Next ) {
+	for( aut=ai->Force[i].UnitTypes; aut; aut=aut->Next ) {
 	    fprintf(file,"%d %s ",aut->Want,aut->Type->Ident);
 	}
 	fprintf(file,"))\n");
@@ -620,20 +620,20 @@ global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
     //	Requests
     //
     fprintf(file,"  'unit-type '(");
-    for( i=0; i<AiPlayer->UnitTypeRequestsCount; ++i ) {
+    for( i=0; i<ai->UnitTypeRequestsCount; ++i ) {
 	fprintf(file,"%s ",ai->UnitTypeRequests[i].Table[0]->Ident);
 	fprintf(file,"%d ",ai->UnitTypeRequests[i].Count);
     }
     fprintf(file,")\n");
 
     fprintf(file,"  'upgrade '(");
-    for( i=0; i<AiPlayer->UpgradeToRequestsCount; ++i ) {
+    for( i=0; i<ai->UpgradeToRequestsCount; ++i ) {
 	fprintf(file,"%s ",ai->UpgradeToRequests[i]->Ident);
     }
     fprintf(file,")\n");
 
     fprintf(file,"  'research '(");
-    for( i=0; i<AiPlayer->ResearchRequestsCount; ++i ) {
+    for( i=0; i<ai->ResearchRequestsCount; ++i ) {
 	fprintf(file,"%s ",ai->ResearchRequests[i]->Ident);
     }
     fprintf(file,")\n");
