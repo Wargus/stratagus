@@ -1088,7 +1088,6 @@ static int CclDefineUI(lua_State* l)
 	ui->InfoPanelX = -1;
 	ui->InfoPanelY = -1;
 
-	ui->ButtonPanel.File = NULL;
 	ui->ButtonPanelX = -1;
 	ui->ButtonPanelY = -1;
 
@@ -1402,7 +1401,7 @@ static int CclDefineUI(lua_State* l)
 						++subk;
 						if (!strcmp(value, "file")) {
 							lua_rawgeti(l, -1, subk + 1);
-							ui->ButtonPanel.File = strdup(LuaToString(l, -1));
+							ui->ButtonPanelG = NewGraphic(LuaToString(l, -1), 0, 0);
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "pos")) {
 							lua_rawgeti(l, -1, subk + 1);
