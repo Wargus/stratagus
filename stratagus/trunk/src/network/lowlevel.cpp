@@ -102,7 +102,6 @@ global int NetInit(void)
     // some day this needs to be rewritten using wsock32.dll's WsControl(),
     // so that we can support Windows 95 with only winsock 1.1..
     // For now winsock2.dll has to do..
-    // FIXME: must link to ws2_32.lib with MSC - how is this called with mingw???
     if ( WSAStartup(MAKEWORD(2,2), &wsaData) ) {
 	fprintf(stderr,"Couldn't initialize Winsock 2\n");
 	return -1;
