@@ -127,11 +127,8 @@ void ChangeSelectedUnits(Unit** units,int count)
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
 		!units[0]->Type->Decoration) {
 		HandleSuicideClick(units[0]);
-		if (units[0]->Orders[0].Action == UnitActionDie) {
-			NetworkSendSelection(units, count);
-			return ;
-		}
 	}
+
 	UnSelectAll();
 	NetworkSendSelection(units, count);
 	for (n = i = 0; i < count; ++i) {
@@ -346,14 +343,14 @@ int SelectUnitsByType(Unit* base)
 	r = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
-	if (base->Type->ClicksToExplode) {
-		HandleSuicideClick(base);
-	}
-
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
 	if (base->Removed || base->Orders[0].Action == UnitActionDie) {
 		return 0;
+	}
+
+	if (base->Type->ClicksToExplode) {
+		HandleSuicideClick(base);
 	}
 
 	if (base->Type->Decoration && GameRunning) {

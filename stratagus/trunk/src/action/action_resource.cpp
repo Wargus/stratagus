@@ -229,6 +229,8 @@ static int StartGathering(Unit* unit)
 		unit->Orders[0].Goal = NoUnitP;
 
 		RemoveUnit(unit, goal);
+		unit->X = goal->X;
+		unit->Y = goal->Y;
 	}
 
 	unit->Data.ResWorker.TimeToHarvest = resinfo->WaitAtResource /
@@ -596,6 +598,8 @@ static int MoveToDepot(Unit* unit)
 	// Place unit inside the depot
 	//
 	RemoveUnit(unit, goal);
+	unit->X = goal->X;
+	unit->Y = goal->Y;
 
 	//
 	// Update resource.

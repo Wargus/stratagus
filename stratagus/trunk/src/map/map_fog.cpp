@@ -212,8 +212,6 @@ void MapMarkTileSight(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	Assert(0 <= x && x < TheMap.Width);
-	Assert(0 <= y && y < TheMap.Height);
 	v = TheMap.Fields[x + y * TheMap.Width].Visible[player->Player];
 	switch (v) {
 		case 0:  // Unexplored
@@ -249,8 +247,6 @@ void MapUnmarkTileSight(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	Assert(0 <= x && x < TheMap.Width);
-	Assert(0 <= y && y < TheMap.Height);
 	v = TheMap.Fields[x + y * TheMap.Width].Visible[player->Player];
 	switch (v) {
 		case 255:

@@ -74,12 +74,14 @@
 */
 static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 {
-	int xd;     // X movement in tile.
-	int yd;     // Y movement in tile.
+	int xd;
+	int yd;
 	int state;
 	int d;
-	int x;      // Unit->X
-	int y;      // Unit->Y
+	int i;
+	int x;
+	int y;
+	Unit* uninside;
 
 	// FIXME: state 0?, should be wrong, should be Reset.
 	// FIXME: Reset flag is cleared by HandleUnitAction.

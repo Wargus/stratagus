@@ -58,8 +58,6 @@ void UnitCacheInsert(Unit* unit)
 	MapField* mf;
 	UnitListItem* listitem;
 
-	Assert(!unit->Removed);
-
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
@@ -176,9 +174,8 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 				// It should only be used in here, unless you somehow want the unit
 				// to be out of cache.
 				//
-				if (!listitem->Unit->CacheLock && !listitem->Unit->Type->Revealer) {
+				if (!listitem->Unit->CacheLock) {
 					listitem->Unit->CacheLock = 1;
-					Assert(!listitem->Unit->Removed);
 					table[n++] = listitem->Unit;
 				}
 			}
@@ -217,7 +214,6 @@ int UnitCacheOnTile(int x, int y, Unit** table)
 	listitem = TheMap.Fields[y * TheMap.Width + x].UnitCache;
 	for (; listitem; listitem = listitem->Next) {
 		if (!listitem->Unit->CacheLock) {
-			Assert(!listitem->Unit->Removed);
 			table[n++] = listitem->Unit;
 		}
 	}
