@@ -213,7 +213,9 @@ CONTRIB	= contrib/macosx.tgz
 MISC    += Makefile Rules.make.orig \
 	  contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  Rules.make.in configure.in configure \
-	  src/stratagus.rc
+	  src/stratagus.rc $(patsubst %, %/Module.make, $(MODULES)) \
+	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS)) \
+	  $(patsubst %, %/Module.make, $(MODULES_TOOLS))
 
 mydate	= $(shell date +%y%m%d)
 distdir	= stratagus-$(mydate)
