@@ -807,15 +807,23 @@ global void CommandReturnGoods(Unit* unit,int flush)
 **	Building starts training an unit.
 **
 **	@param unit	pointer to unit.
-**	@param what	unit type to train.
+**	@param type	unit type to train.
 **	@param flush	if true, flush command queue.
 */
-global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
+global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
 {
 #ifdef NEW_ORDERS
     DebugLevel0Fn("FIXME: not written\n");
 
 #else
+    //
+    //	Check if enough resources remains? (NETWORK!)
+    //
+    if( !PlayerCheckFood(unit->Player,type)
+	    || PlayerCheckUnitType(unit->Player,type) ) {
+	return;
+    }
+    PlayerSubUnitType(unit->Player,type);
 
     //
     //	Not already training?
@@ -839,10 +847,10 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 	//
 	if( command->Data.Train.Count>=MAX_UNIT_TRAIN ) {
 	    DebugLevel0Fn("Unit queue full!\n");
-	    PlayerAddUnitType(unit->Player,what);
+	    //PlayerAddUnitType(unit->Player,type);
 	    return;
 	}
-	command->Data.Train.What[command->Data.Train.Count++]=what;
+	command->Data.Train.What[command->Data.Train.Count++]=type;
 
     } else {
 	//
@@ -850,10 +858,10 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 	//
 	if( unit->Command.Data.Train.Count>=MAX_UNIT_TRAIN ) {
 	    DebugLevel0Fn("Unit queue full!\n");
-	    PlayerAddUnitType(unit->Player,what);
+	    PlayerAddUnitType(unit->Player,type);
 	    return;
 	}
-	unit->Command.Data.Train.What[unit->Command.Data.Train.Count++]=what;
+	unit->Command.Data.Train.What[unit->Command.Data.Train.Count++]=type;
 
 	//
 	//	Update interface.
@@ -923,10 +931,10 @@ global void CommandCancelTraining(Unit* unit,int slot)
 **	Building starts upgrading to.
 **
 **	@param unit	pointer to unit.
-**	@param what	upgrade to what
+**	@param type	upgrade to type
 **	@param flush	if true, flush command queue.
 */
-global void CommandUpgradeTo(Unit* unit,UnitType* what,int flush)
+global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
 {
 #ifdef NEW_ORDERS
     Order* order;
@@ -939,14 +947,22 @@ global void CommandUpgradeTo(Unit* unit,UnitType* what,int flush)
     order->Y=-1;
     order->Goal=NoUnitP;
     order->Type=NULL;
-    order->Arg1=what;
+    order->Arg1=type;
 #else
+    //
+    //	Check if enough resources remains? (NETWORK!)
+    //
+    if( PlayerCheckUnitType(unit->Player,type) ) {
+	return;
+    }
+    PlayerSubUnitType(unit->Player,type);
+
     unit->NextCount=1;
     unit->NextFlush=1;
 
     unit->NextCommand[0].Action=UnitActionUpgradeTo;
     unit->NextCommand[0].Data.UpgradeTo.Ticks=0;
-    unit->NextCommand[0].Data.UpgradeTo.What=what;
+    unit->NextCommand[0].Data.UpgradeTo.What=type;
 
     unit->Wait=1;			// FIXME: correct this
     unit->Reset=1;
@@ -1023,6 +1039,14 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
     order->Type=NULL;
     order->Arg1=what;
 #else
+    //
+    //	Check if enough resources remains? (NETWORK!)
+    //
+    if( PlayerCheckCosts(unit->Player,what->Costs) ) {
+	return;
+    }
+    PlayerSubCosts(unit->Player,what->Costs);
+
     unit->NextCount=1;
     unit->NextFlush=1;
 
