@@ -439,7 +439,7 @@ global void HideMinimapCursor(void)
     w=OldMinimapCursorW;
     h=OldMinimapCursorH;
 
-    // FIXME: Attension 8/16/32 bpp!
+    // FIXME: Attention 8/16/32 bpp!
     switch( VideoDepth ) {
     case 8:
 	{ VMemType8* sp;
@@ -471,6 +471,19 @@ global void HideMinimapCursor(void)
 	memcpy(dp,sp,(w+1)*sizeof(VMemType16)); }
 	break;
     case 24:
+	{ VMemType24* sp;
+	  VMemType24* dp;
+	sp=OldMinimapCursorImage;
+	dp=VideoMemory24+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
+	memcpy(dp,sp,w*sizeof(VMemType24));
+	sp+=w;
+	for( i=0; i<h; ++i ) {
+	    *dp=*sp++;
+	    dp[w]=*sp++;
+	    dp+=VideoWidth;
+	}
+	memcpy(dp,sp,(w+1)*sizeof(VMemType24)); }
+	// FIXME: real 24bpp break;
     case 32:
 	{ VMemType32* sp;
 	  VMemType32* dp;
@@ -562,6 +575,20 @@ global void DrawMinimapCursor(int vx,int vy)
 	memcpy(dp,sp,(w+1)*sizeof(VMemType16));
 	break; }
     case 24:
+	{ VMemType24* sp;
+	VMemType24* dp;
+	dp=OldMinimapCursorImage;
+	sp=VideoMemory24+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
+	memcpy(dp,sp,w*sizeof(VMemType24));
+	dp+=w;
+	for( i=0; i<h; ++i ) {
+	    *dp++=*sp;
+	    *dp++=sp[w];
+	    sp+=VideoWidth;
+	}
+	memcpy(dp,sp,(w+1)*sizeof(VMemType24));
+	// FIXME: real 24bpp break;
+	}
     case 32:
 	{ VMemType32* sp;
 	VMemType32* dp;

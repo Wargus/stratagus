@@ -52,6 +52,8 @@
 #include "ui.h"
 #include "new_video.h"
 
+#ifndef NEW_VIDEO
+
 /**
 **	Architecture-dependant videomemory. Set by GameInitDisplay.
 */
@@ -67,14 +69,17 @@ global int VideoDepth;
 global VMemType8 * Pixels8;		/// 8 bpp palette FIXME: remove pointer
 global VMemType16 * Pixels16;		/// 16 bpp palette
 global VMemType32 * Pixels32;		/// 32 bpp palette
-global Palette GlobalPalette[256];
 
-local int old_button;
-local int mouse_x;
-local int mouse_y;
+#endif
 
-local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int drz);
-local void KeyboardEvent(int scancode, int press);
+local int old_button;			/// FIXME: docu?
+local int mouse_x;			/// FIXME: docu?
+local int mouse_y;			/// FIXME: docu?
+
+    /// FIXME: docu?
+local void MouseEvent(int button,int dx,int dy,int dz,int drx,int dry,int drz);
+    /// FIXME: docu?
+local void KeyboardEvent(int scancode,int press);
 
 /*----------------------------------------------------------------------------
 --	Sync
@@ -95,7 +100,7 @@ local void VideoSyncHandler(int unused)
 /**
 **	Initialise video sync.
 */
-global void InitVideoSync(void)
+global void SetVideoSync(void)
 {
     struct sigaction sa;
     struct itimerval itv;
@@ -959,7 +964,11 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@returns	A hardware dependend pixel table.
 */
+#ifdef NEW_VIDEO
+global VMemType* VideoCreateNewPalette(const Palette *palette)
+#else
 global GraphicData * VideoCreateNewPalette(const Palette *palette)
+#endif
 {
     int i;
     void* pixels;
@@ -1041,6 +1050,7 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
     return pixels;
 }
 
+#ifndef NEW_VIDEO
 
 /**
 **	Color cycle.
@@ -1126,6 +1136,8 @@ global void ColorCycle(void)
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
 }
+
+#endif
 
 /**
 **	Check video interrupt.

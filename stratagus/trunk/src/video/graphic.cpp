@@ -43,7 +43,7 @@ typedef struct __lnode__ PaletteLink;
 */
 struct __lnode__ {
     PaletteLink*	Next;		/// Next palette
-    GraphicData*	Palette;	/// Palette in hardware format
+    VMemType*		Palette;	/// Palette in hardware format
     long		Checksum;	/// Checksum for quick lookup
 };
 
@@ -574,7 +574,7 @@ local long GetPaletteChecksum(const Palette* palette)
 global Graphic* LoadGraphic(const char* name)
 {
     PaletteLink * current_link = palette_list, * prev_link = NULL;
-    GraphicData * Pixels;
+    VMemType * pixels;
     Graphic* graphic;
     long checksum;
     char buf[1024];
@@ -595,23 +595,27 @@ global Graphic* LoadGraphic(const char* name)
     }
     //Palette Not found
     if(current_link == NULL){
-      Pixels = VideoCreateNewPalette(graphic->Palette);
+#ifdef NEW_VIDEO
+      pixels = VideoCreateNewPalette(graphic->Palette);
+#else
+      pixels = (void*)VideoCreateNewPalette(graphic->Palette);
+#endif
       DebugLevel0("loading new palette with %s\n",name);
       if(prev_link == NULL){
 	palette_list = (PaletteLink *)malloc(sizeof(PaletteLink));
 	palette_list->Checksum = checksum;
 	palette_list->Next = NULL;
-	palette_list->Palette = Pixels;
+	palette_list->Palette = pixels;
       } else {
 	prev_link->Next = (PaletteLink *)malloc(sizeof(PaletteLink));
 	prev_link->Next->Checksum = checksum;
 	prev_link->Next->Next = NULL;
-	prev_link->Next->Palette = Pixels;
+	prev_link->Next->Palette = pixels;
       }
     } else {
-      Pixels = current_link->Palette;
+      pixels = current_link->Palette;
     }
-    graphic->Pixels = Pixels;
+    graphic->Pixels = pixels;
     free(graphic->Palette);
     graphic->Palette=NULL;		// JOHNS: why should we free this?
 

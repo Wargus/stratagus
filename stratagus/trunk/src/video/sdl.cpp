@@ -52,6 +52,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#ifndef NEW_VIDEO
+
 /**
 **	Architecture-dependant videomemory. Set by GameInitDisplay.
 */
@@ -67,7 +69,8 @@ global int VideoDepth;
 global VMemType8 * Pixels8;		/// 8 bpp palette FIXME: remove pointer
 global VMemType16 * Pixels16;		/// 16 bpp palette
 global VMemType32 * Pixels32;		/// 32 bpp palette
-global Palette GlobalPalette[256];
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -95,7 +98,7 @@ local Uint32 VideoSyncHandler(Uint32 unused)
 /**
 **	Initialise video sync.
 */
-global void InitVideoSync(void)
+global void SetVideoSync(void)
 {
     if( !VideoSyncSpeed ) {
 	return;
@@ -594,13 +597,17 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@returns	A hardware dependend pixel table.
 */
-global GraphicData * VideoCreateNewPalette(const Palette *palette)
+#ifdef NEW_VIDEO
+global VMemType* VideoCreateNewPalette(const Palette *palette)
+#else
+global GraphicData* VideoCreateNewPalette(const Palette *palette)
+#endif
 {
     int i;
     void* pixels;
 
     if( !Screen ) {			// no init
-      return NULL;
+	return NULL;
     }
 
     switch( VideoDepth ) {
@@ -668,6 +675,8 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
 
     return pixels;
 }
+
+#ifndef NEW_VIDEO
 
 /**
 **	Color cycle.
@@ -771,6 +780,8 @@ global void ColorCycle(void)
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
 }
+
+#endif
 
 /**
 **	Check video interrupt.

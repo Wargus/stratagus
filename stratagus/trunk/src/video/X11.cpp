@@ -19,6 +19,8 @@
 
 #ifdef USE_X11
 
+// FIXME: move this and clean up to new_X11.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,6 +60,8 @@
 #include "ui.h"
 #include "new_video.h"
 
+#ifndef NEW_VIDEO
+
 /**
 **	Architecture-dependant video memory. Set by InitVideoXXX.
 **
@@ -75,17 +79,16 @@ global int VideoDepth;
 global VMemType8 * Pixels8;
 global VMemType16 * Pixels16;
 global VMemType32 * Pixels32;
-global Palette GlobalPalette[256];
 
-local Display* TheDisplay;
-local int TheScreen;
-local Pixmap TheMainDrawable;
-local Window TheMainWindow;
-local GC GcLine;
+#endif
 
-    /// Atom for WM_DELETE_WINDOW
-local Atom WmDeleteWindowAtom;
+local Display* TheDisplay;		/// My X11 display
+local int TheScreen;			/// My X11 screen
+local Window TheMainWindow;		/// My X11 window
+local Pixmap TheMainDrawable;		/// My X11 drawlable
+local GC GcLine;			/// My drawing context
 
+local Atom WmDeleteWindowAtom;		/// Atom for WM_DELETE_WINDOW
 
 /*----------------------------------------------------------------------------
 --	Sync
@@ -106,7 +109,7 @@ local void VideoSyncHandler(int unused)
 /**
 **	Initialise video sync.
 */
-global void InitVideoSync(void)
+global void SetVideoSync(void)
 {
     struct sigaction sa;
     struct itimerval itv;
@@ -232,7 +235,7 @@ foundvisual:
 	fprintf(stderr,"shmget failed.\n");
 	exit(-1);
     }
-    VideoMemory=shminfo.shmaddr=shmat(shminfo.shmid,0,0);
+    VideoMemory=(void*)shminfo.shmaddr=shmat(shminfo.shmid,0,0);
     if( shminfo.shmaddr==(void*)-1 ) {
 	shmctl(shminfo.shmid,IPC_RMID,0);
 	fprintf(stderr,"shmat failed.\n");
@@ -834,7 +837,11 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@returns	A hardware dependend pixel table.
 */
+#ifdef NEW_VIDEO
+global VMemType* VideoCreateNewPalette(const Palette *palette)
+#else
 global GraphicData * VideoCreateNewPalette(const Palette *palette)
+#endif
 {
     XColor color;
     XWindowAttributes xwa;
@@ -913,6 +920,9 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
 	    ((VMemType16*)pixels)[i]=color.pixel;
 	    break;
 	case 24:
+	    //((VMemType32*)pixels)[i]=color.pixel;
+	    //break;
+	    // FIXME: real 24bpp mode.
 	case 32:
 	    ((VMemType32*)pixels)[i]=color.pixel;
 	    break;
@@ -921,6 +931,8 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
 
     return pixels;
 }
+
+#ifndef NEW_VIDEO
 
 /**
 **	Color cycle.
@@ -1029,6 +1041,8 @@ global void ColorCycle(void)
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
 }
+
+#endif
 
 /**
 **	Check video interrupt.
