@@ -78,10 +78,10 @@
 //----------------------------------------------------------------------------
 
     /// variable set when we are scrolling via keyboard
-global enum _scroll_state_ KeyScrollState=ScrollNone;
+global enum _scroll_state_ KeyScrollState = ScrollNone;
 
     /// variable set when we are scrolling via mouse
-global enum _scroll_state_ MouseScrollState=ScrollNone;
+global enum _scroll_state_ MouseScrollState = ScrollNone;
 
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
 global jmp_buf MainLoopJmpBuf;		/// Hierarchic pathfinder error exit.
@@ -104,11 +104,11 @@ local void MoveMapViewPointUp(int step)
 {
     Viewport* vp;
 
-    vp=TheUI.SelectedViewport;
-    if( vp->MapY>step ) {
-	vp->MapY-=step;
+    vp = TheUI.SelectedViewport;
+    if (vp->MapY > step) {
+	vp->MapY -= step;
     } else {
-	vp->MapY=0;
+	vp->MapY = 0;
     }
 }
 
@@ -121,11 +121,11 @@ local void MoveMapViewPointLeft(int step)
 {
     Viewport* vp;
 
-    vp=TheUI.SelectedViewport;
-    if( vp->MapX>step ) {
-	vp->MapX-=step;
+    vp = TheUI.SelectedViewport;
+    if (vp->MapX > step) {
+	vp->MapX -= step;
     } else {
-	vp->MapX=0;
+	vp->MapX = 0;
     }
 }
 
@@ -138,12 +138,12 @@ local void MoveMapViewPointDown(int step)
 {
     Viewport* vp;
 
-    vp=TheUI.SelectedViewport;
-    if( TheMap.Height>vp->MapHeight
-	    && vp->MapY<TheMap.Height-vp->MapHeight-step ) {
-	vp->MapY+=step;
+    vp = TheUI.SelectedViewport;
+    if (TheMap.Height > vp->MapHeight &&
+	    vp->MapY < TheMap.Height - vp->MapHeight - step) {
+	vp->MapY += step;
     } else {
-	vp->MapY=TheMap.Height-vp->MapHeight;
+	vp->MapY = TheMap.Height - vp->MapHeight;
     }
 }
 
@@ -156,12 +156,12 @@ local void MoveMapViewPointRight(int step)
 {
     Viewport* vp;
 
-    vp=TheUI.SelectedViewport;
-    if( TheMap.Width>vp->MapWidth
-	    && vp->MapX<TheMap.Width-vp->MapWidth-step) {
-	vp->MapX+=step;
+    vp = TheUI.SelectedViewport;
+    if (TheMap.Width > vp->MapWidth &&
+	    vp->MapX < TheMap.Width - vp->MapWidth - step) {
+	vp->MapX += step;
     } else {
-	vp->MapX=TheMap.Width-vp->MapWidth;
+	vp->MapX = TheMap.Width - vp->MapWidth;
     }
 }
 
@@ -184,14 +184,14 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
     int stepx;
     int stepy;
 
-    if( fast ) {
-	stepx=TheUI.SelectedViewport->MapWidth/2;
-	stepy=TheUI.SelectedViewport->MapHeight/2;
+    if (fast) {
+	stepx = TheUI.SelectedViewport->MapWidth / 2;
+	stepy = TheUI.SelectedViewport->MapHeight / 2;
     } else {		// dynamic: let these variables increase upto fast..
-	stepx=stepy=1;
+	stepx = stepy = 1;
     }
 
-    switch( state ) {
+    switch (state) {
 	case ScrollUp:
 	    MoveMapViewPointUp(stepy);
 	    break;
@@ -223,9 +223,9 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	default:
 	    return;			// skip marking map
     }
-    HandleMouseMove(CursorX,CursorY);	// This recalulates some values
+    HandleMouseMove(CursorX, CursorY);	// This recalulates some values
     MarkDrawEntireMap();
-    MustRedraw|=RedrawMinimap|RedrawCursors;
+    MustRedraw |= RedrawMinimap | RedrawCursors;
 }
 
 #ifdef DEBUG	// {
@@ -238,13 +238,13 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 */
 global void DebugTestDisplay(void)
 {
-    static int a=0;
+    static int a = 0;
     extern void DebugTestDisplayLines(void);
 
-    if( a ) {
+    if (a) {
 	return;
     }
-    a=1;
+    a = 1;
 
     //Enable one function-call as type of test to show one time
     DebugTestDisplayLines();
@@ -252,7 +252,7 @@ global void DebugTestDisplay(void)
     //DebugTestDisplayColorCube();
 
     // put it all on screen (when it is not already there ;)
-    InvalidateArea(0,0,VideoWidth,VideoHeight);
+    InvalidateArea(0, 0, VideoWidth, VideoHeight);
 }
 
 #endif	// } DEBUG
@@ -267,39 +267,39 @@ global void DebugTestDisplay(void)
 local void DrawMenuButtonArea(void)
 {
     if (TheUI.MenuButtonGraphic.Graphic) {
-	VideoDrawSub(TheUI.MenuButtonGraphic.Graphic,0,0,
-		TheUI.MenuButtonGraphic.Graphic->Width,
-		TheUI.MenuButtonGraphic.Graphic->Height,
-		TheUI.MenuButtonGraphicX, TheUI.MenuButtonGraphicY);
+	VideoDrawSub(TheUI.MenuButtonGraphic.Graphic, 0, 0,
+	    TheUI.MenuButtonGraphic.Graphic->Width,
+	    TheUI.MenuButtonGraphic.Graphic->Height,
+	    TheUI.MenuButtonGraphicX, TheUI.MenuButtonGraphicY);
     }
-    if( NetworkFildes==(Socket)-1 ) {
-	if( TheUI.MenuButton.X!=-1 ) {
+    if (NetworkFildes == (Socket)-1) {
+	if (TheUI.MenuButton.X != -1) {
 	    DrawMenuButton(TheUI.MenuButton.Button,
-		    (ButtonAreaUnderCursor==ButtonAreaMenu
-			&& ButtonUnderCursor==ButtonUnderMenu ? MenuButtonActive : 0) |
-		    (GameMenuButtonClicked ? MenuButtonClicked : 0),
-		    TheUI.MenuButton.Width, TheUI.MenuButton.Height,
-		    TheUI.MenuButton.X,TheUI.MenuButton.Y,
-		    GameFont,TheUI.MenuButton.Text,NULL,NULL);
+		(ButtonAreaUnderCursor == ButtonAreaMenu
+		    && ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
+		(GameMenuButtonClicked ? MenuButtonClicked : 0),
+		TheUI.MenuButton.Width, TheUI.MenuButton.Height,
+		TheUI.MenuButton.X, TheUI.MenuButton.Y,
+		GameFont, TheUI.MenuButton.Text, NULL, NULL);
 	}
     } else {
-	if( TheUI.NetworkMenuButton.X!=-1 ) {
+	if (TheUI.NetworkMenuButton.X != -1) {
 	    DrawMenuButton(TheUI.NetworkMenuButton.Button,
-		    (ButtonAreaUnderCursor==ButtonAreaMenu
-			&& ButtonUnderCursor==ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
-		    (GameMenuButtonClicked ? MenuButtonClicked : 0),
-		    TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
-		    TheUI.NetworkMenuButton.X,TheUI.NetworkMenuButton.Y,
-		    GameFont,TheUI.NetworkMenuButton.Text,NULL,NULL);
+		(ButtonAreaUnderCursor == ButtonAreaMenu
+		    && ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
+		(GameMenuButtonClicked ? MenuButtonClicked : 0),
+		TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
+		TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
+		GameFont, TheUI.NetworkMenuButton.Text, NULL, NULL);
 	}
-	if( TheUI.NetworkDiplomacyButton.X!=-1 ) {
+	if (TheUI.NetworkDiplomacyButton.X != -1) {
 	    DrawMenuButton(TheUI.NetworkDiplomacyButton.Button,
-		    (ButtonAreaUnderCursor==ButtonAreaMenu
-			&& ButtonUnderCursor==ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
-		    (GameDiplomacyButtonClicked ? MenuButtonClicked : 0),
-		    TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
-		    TheUI.NetworkDiplomacyButton.X,TheUI.NetworkDiplomacyButton.Y,
-		    GameFont,TheUI.NetworkDiplomacyButton.Text,NULL,NULL);
+		(ButtonAreaUnderCursor == ButtonAreaMenu
+		    && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
+		(GameDiplomacyButtonClicked ? MenuButtonClicked : 0),
+		TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
+		TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
+		GameFont, TheUI.NetworkDiplomacyButton.Text, NULL, NULL);
 	}
     }
 
@@ -309,18 +309,18 @@ local void DrawMenuButtonArea(void)
     //
     { int f;
 
-    f=168*(NextFrameTicks-GetTicks());
-    if( VideoSyncSpeed ) {
-	f/=(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed;
+    f = 168 * (NextFrameTicks - GetTicks());
+    if (VideoSyncSpeed) {
+	f /= (100 * 1000 / CYCLES_PER_SECOND) / VideoSyncSpeed;
     }
-    if( f<0 || f>168 ) {
-	f=168;
+    if (f < 0 || f > 168) {
+	f = 168;
     }
-    if( f ) {
-	VideoDrawHLine(ColorGreen,TheUI.MenuButtonX,TheUI.MenuButtonY,f);
+    if (f) {
+	VideoDrawHLine(ColorGreen, TheUI.MenuButtonX, TheUI.MenuButtonY, f);
     }
-    if( 168-f ) {
-	VideoDrawHLine(ColorRed,TheUI.MenuButtonX+f,TheUI.MenuButtonY,168-f);
+    if (168 - f) {
+	VideoDrawHLine(ColorRed, TheUI.MenuButtonX + f, TheUI.MenuButtonY, 168 - f);
     }
     }
     //
@@ -330,19 +330,19 @@ local void DrawMenuButtonArea(void)
     int i;
     int f;
 
-    if( NetworkLag ) {
-	for( i=0; i<PlayerMax; ++i ) {
-	    f=16-(16*(NetworkStatus[i]-GameCycle))/(NetworkLag*2);
-	    if( f<0 || f>16 ) {
-		f=16;
+    if (NetworkLag) {
+	for (i = 0; i < PlayerMax; ++i) {
+	    f = 16 - (16 * (NetworkStatus[i] - GameCycle)) / (NetworkLag * 2);
+	    if (f < 0 || f > 16) {
+		f = 16;
 	    }
-	    if( f ) {
+	    if (f) {
 		VideoDrawHLine(ColorRed,
-		    TheUI.MenuButtonX,TheUI.MenuButtonY+1+i,f);
+		    TheUI.MenuButtonX, TheUI.MenuButtonY + 1 + i, f);
 	    }
-	    if( 16-f ) {
+	    if (16 - f) {
 		VideoDrawHLine(ColorGreen,
-			TheUI.MenuButtonX+f,TheUI.MenuButtonY+1+i,16-f);
+		    TheUI.MenuButtonX + f, TheUI.MenuButtonY + 1 + i, 16 - f);
 	    }
 	}
     }
@@ -360,7 +360,7 @@ local void DrawMenuButtonArea(void)
 local void DrawMapViewport(Viewport* vp)
 {
    Unit* table[UnitMax];
-   Missile* missiletable[MAX_MISSILES*9];
+   Missile* missiletable[MAX_MISSILES * 9];
    int nunits;
    int nmissiles;
    int i;
@@ -373,13 +373,13 @@ local void DrawMapViewport(Viewport* vp)
     // overlapping and draw only that what has changed..
     // Every to-be-drawn item added to this mechanism, can be handed by this
     // call.
-    if( InterfaceState==IfaceStateNormal ) {
+    if (InterfaceState == IfaceStateNormal) {
 	// DecorationRefreshDisplay();
 	DecorationUpdateDisplay();
     }
 
 #else
-    if( InterfaceState==IfaceStateNormal ) {
+    if (InterfaceState == IfaceStateNormal) {
 #ifdef NEW_MAPDRAW
 	MapUpdateFogOfWar(vp->MapX, vp->MapY);
 #else
@@ -387,90 +387,92 @@ local void DrawMapViewport(Viewport* vp)
 
 	// FIXME: Johns: this didn't work correct with viewports!
 	// FIXME: only needed until flags are correct set
-	for( u=0; u < vp->MapHeight; ++u ) {
-	    MustRedrawRow[u]=1;
+	for (u = 0; u < vp->MapHeight; ++u) {
+	    MustRedrawRow[u] = 1;
 	}
-	for (u=0; u<vp->MapHeight*vp->MapWidth; ++u ) {
-	    MustRedrawTile[u]=1;
+	for (u = 0; u < vp->MapHeight * vp->MapWidth; ++u) {
+	    MustRedrawTile[u] = 1;
 	}
 #endif
 	//
 	//	An unit is tracked, center viewport on this unit.
 	//
-	if( vp->Unit ) {
-	    if( vp->Unit->Destroyed ||
-		    vp->Unit->Orders[0].Action==UnitActionDie ) {
-		vp->Unit=NoUnitP;
+	if (vp->Unit) {
+	    if (vp->Unit->Destroyed ||
+		    vp->Unit->Orders[0].Action == UnitActionDie) {
+		vp->Unit = NoUnitP;
 	    } else {
-		ViewportCenterViewpoint(vp,vp->Unit->X,vp->Unit->Y);
+		ViewportCenterViewpoint(vp, vp->Unit->X, vp->Unit->Y);
 	    }
 	}
 
-	SetClipping(vp->X,vp->Y,vp->EndX,vp->EndY);
+	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
-	DrawMapBackgroundInViewport(vp,vp->MapX,vp->MapY);
+	DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
 	
 	//
 	//	We find and sort units after draw level.
 	//
-	nunits=FindAndSortUnits(vp,table);
-	nmissiles=FindAndSortMissiles(vp,missiletable);
+	nunits = FindAndSortUnits(vp, table);
+	nmissiles = FindAndSortMissiles(vp, missiletable);
 
-	i=0;
-	j=0;
-	CurrentViewport=vp;
-	while( i<nunits && j<nmissiles ) {
-	    if( table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel ) {
-		if( UnitVisibleInViewport(vp,table[i]) ) {
-		    if( table[i]->Type->Building ) {
+	i = 0;
+	j = 0;
+	CurrentViewport = vp;
+	while (i < nunits && j < nmissiles) {
+	    if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
+		if (UnitVisibleInViewport(vp, table[i])) {
+		    if (table[i]->Type->Building) {
 			DrawBuilding(table[i]);
 		    } else {
 			DrawUnit(table[i]);
 		    }
 		}
-		i++;
+		++i;
 	    } else {
 		x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X;
 		y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
 		// FIXME: I should copy SourcePlayer for second level missiles.
-		if( missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player ) {
+		if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
 		    GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
 		    	missiletable[j]->Type->Sprite);
 		}
-		switch( missiletable[j]->Type->Class ) {
+		switch (missiletable[j]->Type->Class) {
 		    case MissileClassHit:
-			VideoDrawNumberClip(x,y,GameFont,missiletable[j]->Damage);
+			VideoDrawNumberClip(x, y, GameFont, missiletable[j]->Damage);
 			break;
 		    default:
-			DrawMissile(missiletable[j]->Type,missiletable[j]->SpriteFrame,x,y);
+			DrawMissile(missiletable[j]->Type, missiletable[j]->SpriteFrame,
+			    x, y);
 			break;
 		}
-		j++;
+		++j;
 	    }
 	}
-	for( ; i<nunits; ++i ) {
-	    if ( UnitVisibleInViewport(vp, table[i]) ) {
-		if( table[i]->Type->Building ) {
+	for (; i < nunits; ++i) {
+	    if (UnitVisibleInViewport(vp, table[i])) {
+		if (table[i]->Type->Building) {
 		    DrawBuilding(table[i]);
 		} else {
 		    DrawUnit(table[i]);
 		}
 	    }
 	}
-	for( ; j<nmissiles; ++j ) {
+	for (; j < nmissiles; ++j) {
 	    x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X;
 	    y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
 	    // FIXME: I should copy SourcePlayer for second level missiles.
-	    if( missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player ) {
+	    if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
 		GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
 		    missiletable[j]->Type->Sprite);
 	    }
-	    switch( missiletable[j]->Type->Class ) {
+	    switch (missiletable[j]->Type->Class) {
 		case MissileClassHit:
-		    VideoDrawNumberClip(x,y,GameFont,missiletable[j]->Damage);
+		    VideoDrawNumberClip(x, y, GameFont, missiletable[j]->Damage);
 		    break;
 		default:
-		    DrawMissile(missiletable[j]->Type,missiletable[j]->SpriteFrame,x,y);
+		    DrawMissile(missiletable[j]->Type, missiletable[j]->SpriteFrame,
+			x, y);
 		    break;
 	    }
 	}
@@ -479,19 +481,19 @@ local void DrawMapViewport(Viewport* vp)
 	//	Draw orders of selected units.
 	//	Drawn here so that they are shown even when the unit is out of the screen.
 	//
-	if( ShowOrders==SHOW_ORDERS_ALWAYS ||
-		((ShowOrdersCount>=GameCycle ||(KeyModifiers&ModifierShift))) ) {
-	    for (i=0;i<NumSelected;i++) {
+	if (ShowOrders == SHOW_ORDERS_ALWAYS ||
+		((ShowOrdersCount >= GameCycle || (KeyModifiers & ModifierShift)))) {
+	    for (i = 0; i < NumSelected; ++i) {
 		ShowOrder(Selected[i]);
 	    }
 	}
 	DrawConsole();
-	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
     }
 
     // Resources over map
-    if (TheUI.ResourceX==-1 || TheUI.ResourceY==-1) {
-	MustRedraw|=RedrawResources;
+    if (TheUI.ResourceX == -1 || TheUI.ResourceY == -1) {
+	MustRedraw |= RedrawResources;
     }
 #endif
 }
@@ -508,7 +510,7 @@ global void DrawMapArea(void)
     const Viewport* evp;
 
     // Draw all map viewports
-    evp = TheUI.Viewports+TheUI.NumViewports;
+    evp = TheUI.Viewports + TheUI.NumViewports;
     for (vp = TheUI.Viewports; vp < evp; ++vp) {
 	DrawMapViewport(vp);
     }
@@ -549,77 +551,78 @@ global void DrawMapArea(void)
 */
 global void UpdateDisplay(void)
 {
-    MustRedraw&=EnableRedraw;		// Don't redraw disabled parts
+    MustRedraw &= EnableRedraw;		// Don't redraw disabled parts
 
     VideoLockScreen();			// prepare video write
 
     HideAnyCursor();			// remove cursor (when available)
 
-    if( MustRedraw&RedrawMap ) {
+    if (MustRedraw & RedrawMap) {
 	DrawMapArea();
     }
 
-    if( MustRedraw&(RedrawMessage|RedrawMap) ) {
+    if (MustRedraw & (RedrawMessage | RedrawMap)) {
 	DrawMessages();
     }
 
-    if( MustRedraw&RedrawFillers ) {
+    if (MustRedraw & RedrawFillers) {
 	int i;
 
-	for( i=0; i<TheUI.NumFillers; ++i ) {
-	    VideoDrawSubClip(TheUI.Filler[i].Graphic,0,0
-		    ,TheUI.Filler[i].Graphic->Width
-		    ,TheUI.Filler[i].Graphic->Height
-		    ,TheUI.FillerX[i],TheUI.FillerY[i]);
+	for (i = 0; i < TheUI.NumFillers; ++i) {
+	    VideoDrawSubClip(TheUI.Filler[i].Graphic, 0, 0,
+		TheUI.Filler[i].Graphic->Width,
+		TheUI.Filler[i].Graphic->Height,
+		TheUI.FillerX[i], TheUI.FillerY[i]);
 	}
     }
 
-    if( MustRedraw&RedrawMenuButton ) {
+    if (MustRedraw & RedrawMenuButton) {
 	DrawMenuButtonArea();
     }
-    if( MustRedraw&RedrawMinimapBorder ) {
-	VideoDrawSubClip(TheUI.MinimapPanel.Graphic,0,0
-		,TheUI.MinimapPanel.Graphic->Width,TheUI.MinimapPanel.Graphic->Height
-		,TheUI.MinimapPanelX,TheUI.MinimapPanelY);
+    if (MustRedraw & RedrawMinimapBorder) {
+	VideoDrawSubClip(TheUI.MinimapPanel.Graphic, 0, 0,
+	    TheUI.MinimapPanel.Graphic->Width,
+	    TheUI.MinimapPanel.Graphic->Height,
+	    TheUI.MinimapPanelX, TheUI.MinimapPanelY);
     }
 
     PlayerPixels(Players);		// Reset to default colors
 
-    if( MustRedraw&RedrawMinimap ) {
+    if (MustRedraw & RedrawMinimap) {
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
 	DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
 	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
-		TheUI.SelectedViewport->MapY);
-    } else if( MustRedraw&RedrawMinimapCursor ) {
+	    TheUI.SelectedViewport->MapY);
+    } else if (MustRedraw & RedrawMinimapCursor) {
 	HideMinimapCursor();
 	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
-		TheUI.SelectedViewport->MapY);
+	    TheUI.SelectedViewport->MapY);
     }
 
-    if( MustRedraw&RedrawInfoPanel ) {
+    if (MustRedraw & RedrawInfoPanel) {
 	DrawInfoPanel();
 	PlayerPixels(Players);		// Reset to default colors
     }
-    if( MustRedraw&RedrawButtonPanel ) {
+    if (MustRedraw & RedrawButtonPanel) {
 	DrawButtonPanel();
 	PlayerPixels(Players);		// Reset to default colors
     }
-    if( MustRedraw&RedrawResources ) {
+    if (MustRedraw & RedrawResources) {
 	DrawResources();
     }
-    if( MustRedraw&RedrawStatusLine ) {
+    if (MustRedraw & RedrawStatusLine) {
 	DrawStatusLine();
-	MustRedraw|=RedrawCosts;
+	MustRedraw |= RedrawCosts;
     }
-    if( MustRedraw&RedrawCosts ) {
+    if (MustRedraw & RedrawCosts) {
 	DrawCosts();
     }
-    if( MustRedraw&RedrawTimer ) {
+    if (MustRedraw & RedrawTimer) {
 	DrawTimer();
     }
 
-    if( MustRedraw&RedrawMenu ) {
+    if (MustRedraw & RedrawMenu) {
 	DrawMenu(CurrentMenu);
     }
 
@@ -630,90 +633,92 @@ global void UpdateDisplay(void)
     //
     //	Update changes to display.
     //
-    if( MustRedraw&RedrawAll ) {
+    if (MustRedraw & RedrawAll) {
 	// refresh entire screen, so no further invalidate needed
-	InvalidateAreaAndCheckCursor(0,0,VideoWidth,VideoHeight);
+	InvalidateAreaAndCheckCursor(0, 0, VideoWidth, VideoHeight);
     } else {
-	if( MustRedraw&RedrawMap ) {
+	if (MustRedraw & RedrawMap) {
 	    // FIXME: split into small parts see RedrawTile and RedrawRow
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.MapArea.X,TheUI.MapArea.Y
-		    ,TheUI.MapArea.EndX-TheUI.MapArea.X+1
-		    ,TheUI.MapArea.EndY-TheUI.MapArea.Y+1);
+		 TheUI.MapArea.X, TheUI.MapArea.Y,
+		 TheUI.MapArea.EndX - TheUI.MapArea.X + 1,
+		 TheUI.MapArea.EndY - TheUI.MapArea.Y + 1);
 	}
-	if( MustRedraw&RedrawFillers ) {
+	if (MustRedraw & RedrawFillers) {
 	    int i;
 
-	    for( i=0; i<TheUI.NumFillers; ++i ) {
+	    for (i = 0; i < TheUI.NumFillers; ++i) {
 		InvalidateAreaAndCheckCursor(
-			 TheUI.FillerX[i],TheUI.FillerY[i]
-			,TheUI.Filler[i].Graphic->Width
-			,TheUI.Filler[i].Graphic->Height);
+		     TheUI.FillerX[i], TheUI.FillerY[i],
+		     TheUI.Filler[i].Graphic->Width,
+		     TheUI.Filler[i].Graphic->Height);
 	    }
 	}
-	if(MustRedraw&RedrawMenuButton ) {
-	    if( NetworkFildes==(Socket)-1 ) {
-		if( TheUI.MenuButton.X!=-1 ) {
+	if(MustRedraw & RedrawMenuButton) {
+	    if (NetworkFildes == (Socket)-1) {
+		if (TheUI.MenuButton.X != -1) {
 		    InvalidateAreaAndCheckCursor(
-			    TheUI.MenuButton.X,TheUI.MenuButton.Y,
-			    TheUI.MenuButton.Width,
-			    TheUI.MenuButton.Height);
+			TheUI.MenuButton.X, TheUI.MenuButton.Y,
+			TheUI.MenuButton.Width,
+			TheUI.MenuButton.Height);
 		}
 	    } else {
-		if( TheUI.NetworkMenuButton.X!=-1 ) {
+		if (TheUI.NetworkMenuButton.X != -1) {
 		    InvalidateAreaAndCheckCursor(
-			    TheUI.NetworkMenuButton.X,
-			    TheUI.NetworkMenuButton.Y,
-			    TheUI.NetworkMenuButton.Width,
-			    TheUI.NetworkMenuButton.Height);
+			TheUI.NetworkMenuButton.X,
+			TheUI.NetworkMenuButton.Y,
+			TheUI.NetworkMenuButton.Width,
+			TheUI.NetworkMenuButton.Height);
 		}
-		if( TheUI.NetworkDiplomacyButton.X!=-1 ) {
+		if (TheUI.NetworkDiplomacyButton.X != -1) {
 		    InvalidateAreaAndCheckCursor(
-			    TheUI.NetworkDiplomacyButton.X,
-			    TheUI.NetworkDiplomacyButton.Y,
-			    TheUI.NetworkDiplomacyButton.Width,
-			    TheUI.NetworkDiplomacyButton.Height);
+			TheUI.NetworkDiplomacyButton.X,
+			TheUI.NetworkDiplomacyButton.Y,
+			TheUI.NetworkDiplomacyButton.Width,
+			TheUI.NetworkDiplomacyButton.Height);
 		}
 	    }
 	}
-	if( MustRedraw&RedrawMinimapBorder ) {
+	if (MustRedraw & RedrawMinimapBorder) {
 	    InvalidateAreaAndCheckCursor(
-		 TheUI.MinimapPanelX,TheUI.MinimapPanelY
-		,TheUI.MinimapPanel.Graphic->Width,TheUI.MinimapPanel.Graphic->Height);
-	} else if( (MustRedraw&RedrawMinimap)
-		|| (MustRedraw&RedrawMinimapCursor) ) {
+		TheUI.MinimapPanelX, TheUI.MinimapPanelY,
+		TheUI.MinimapPanel.Graphic->Width,
+		TheUI.MinimapPanel.Graphic->Height);
+	} else if ((MustRedraw & RedrawMinimap) ||
+		(MustRedraw & RedrawMinimapCursor)) {
 	    // FIXME: Redraws too much of the minimap
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.MinimapPosX,TheUI.MinimapPosY
-		    ,TheUI.MinimapW,TheUI.MinimapH);
+		TheUI.MinimapPosX, TheUI.MinimapPosY,
+		TheUI.MinimapW, TheUI.MinimapH);
 	}
-	if( MustRedraw&RedrawInfoPanel ) {
+	if (MustRedraw & RedrawInfoPanel) {
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.InfoPanelX,TheUI.InfoPanelY
-		    ,TheUI.InfoPanelW,TheUI.InfoPanelH);
+		TheUI.InfoPanelX, TheUI.InfoPanelY,
+		TheUI.InfoPanelW, TheUI.InfoPanelH);
 	}
-	if( MustRedraw&RedrawButtonPanel && TheUI.ButtonPanel.Graphic ) {
+	if ((MustRedraw & RedrawButtonPanel) && TheUI.ButtonPanel.Graphic) {
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.ButtonPanelX,TheUI.ButtonPanelY
-		    ,TheUI.ButtonPanel.Graphic->Width
-		    ,TheUI.ButtonPanel.Graphic->Height);
+		TheUI.ButtonPanelX, TheUI.ButtonPanelY,
+		TheUI.ButtonPanel.Graphic->Width,
+		TheUI.ButtonPanel.Graphic->Height);
 	}
-	if( MustRedraw&RedrawResources && TheUI.Resource.Graphic) {
+	if (MustRedraw&RedrawResources && TheUI.Resource.Graphic) {
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.ResourceX,TheUI.ResourceY
-		    ,TheUI.Resource.Graphic->Width
-		    ,TheUI.Resource.Graphic->Height);
+		TheUI.ResourceX, TheUI.ResourceY,
+		TheUI.Resource.Graphic->Width,
+		TheUI.Resource.Graphic->Height);
 	}
-	if( (MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts) && TheUI.StatusLine.Graphic ) {
+	if (((MustRedraw & RedrawStatusLine) || MustRedraw&RedrawCosts) &&
+		TheUI.StatusLine.Graphic) {
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.StatusLineX,TheUI.StatusLineY
-		    ,TheUI.StatusLine.Graphic->Width
-		    ,TheUI.StatusLine.Graphic->Height);
+		TheUI.StatusLineX, TheUI.StatusLineY,
+		TheUI.StatusLine.Graphic->Width,
+		TheUI.StatusLine.Graphic->Height);
 	}
-	if( MustRedraw&RedrawTimer ) {
+	if (MustRedraw & RedrawTimer) {
 	    // FIXME: Invalidate timer area
 	}
-	if( MustRedraw&RedrawMenu ) {
+	if (MustRedraw & RedrawMenu) {
 	    InvalidateMenuAreas();
 	}
 
@@ -728,7 +733,7 @@ global void UpdateDisplay(void)
 */
 local void EnableDrawRefresh(void)
 {
-    MustRedraw=RedrawEverything;
+    MustRedraw = RedrawEverything;
     MarkDrawEntireMap();
 }
 
@@ -751,52 +756,45 @@ global void GameMainLoop(void)
 #endif
     int RealVideoSyncSpeed;
     
-    GameCallbacks.ButtonPressed=(void*)HandleButtonDown;
-    GameCallbacks.ButtonReleased=(void*)HandleButtonUp;
-    GameCallbacks.MouseMoved=(void*)HandleMouseMove;
-    GameCallbacks.MouseExit=(void*)HandleMouseExit;
-    GameCallbacks.KeyPressed=HandleKeyDown;
-    GameCallbacks.KeyReleased=HandleKeyUp;
-    GameCallbacks.KeyRepeated=HandleKeyRepeat;
-    GameCallbacks.NetworkEvent=NetworkEvent;
-    GameCallbacks.SoundReady=WriteSound;
+    GameCallbacks.ButtonPressed = HandleButtonDown;
+    GameCallbacks.ButtonReleased = HandleButtonUp;
+    GameCallbacks.MouseMoved = HandleMouseMove;
+    GameCallbacks.MouseExit = HandleMouseExit;
+    GameCallbacks.KeyPressed = HandleKeyDown;
+    GameCallbacks.KeyReleased = HandleKeyUp;
+    GameCallbacks.KeyRepeated = HandleKeyRepeat;
+    GameCallbacks.NetworkEvent = NetworkEvent;
+    GameCallbacks.SoundReady = WriteSound;
 
-    Callbacks=&GameCallbacks;
+    Callbacks = &GameCallbacks;
 
     SetVideoSync();
     EnableDrawRefresh();
-    GameCursor=TheUI.Point.Cursor;
-    GameRunning=1;
+    GameCursor = TheUI.Point.Cursor;
+    GameRunning = 1;
 
-    showtip=0;
+    showtip = 0;
     RealVideoSyncSpeed = VideoSyncSpeed;
-    if( NetworkFildes==(Socket)-1 ) {		// Don't show them for net play
-	showtip=ShowTips;
+    if (NetworkFildes == (Socket)-1) {		// Don't show them for net play
+	showtip = ShowTips;
     }
 
     MultiPlayerReplayEachCycle();
 
     PlaySectionMusic(PlaySectionGame);
 
-    while( GameRunning ) {
+    while (GameRunning) {
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
-	if( setjmp(MainLoopJmpBuf) ) {
+	if (setjmp(MainLoopJmpBuf)) {
 	    GamePaused = 1;
 	}
 #endif
 	//
 	//	Game logic part
 	//
-	if( !GamePaused && NetworkInSync && !SkipGameCycle ) {
+	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
 	    SinglePlayerReplayEachCycle();
-	    if( !++GameCycle ) {
-		// FIXME: tests with game cycle counter now fails :(
-		// FIXME: Should happen in 68 years :)
-		fprintf(stderr,"FIXME: *** round robin ***\n");
-		fprintf(stderr,"FIXME: *** round robin ***\n");
-		fprintf(stderr,"FIXME: *** round robin ***\n");
-		fprintf(stderr,"FIXME: *** round robin ***\n");
-	    }
+	    ++GameCycle;
 	    MultiPlayerReplayEachCycle();
 	    NetworkCommands();		// Get network commands
 	    UnitActions();		// handle units
@@ -814,7 +812,7 @@ global void GameMainLoop(void)
 	    //		Check game goals.
 	    //		Check rescue of units.
 	    //
-	    switch( GameCycle%CYCLES_PER_SECOND ) {
+	    switch (GameCycle % CYCLES_PER_SECOND) {
 		case 0:
 		    HandleCloak();
 		    break;
@@ -822,7 +820,7 @@ global void GameMainLoop(void)
 		    break;
 		case 2:				// minimap update
 		    UpdateMinimap();
-		    MustRedraw|=RedrawMinimap;
+		    MustRedraw |= RedrawMinimap;
 		    break;
 		case 3:				// computer players
 		    PlayersEachSecond();
@@ -842,10 +840,10 @@ global void GameMainLoop(void)
 	    //		Check cd-rom (every 2nd second)
 	    // FIXME: Not called while pause or in the user interface.
 	    //
-	    switch( GameCycle%((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
+	    switch (GameCycle % ((CYCLES_PER_SECOND * VideoSyncSpeed / 100) + 1)) {
 		case 0:				// Check cd-rom
 #if defined(USE_SDLCD)
-		    if ( !(GameCycle%4) ) {	// every 2nd second
+		    if (!(GameCycle % 4)) {	// every 2nd second
 			SDL_CreateThread(CDRomCheck, NULL);
 		    }
 #elif defined(USE_LIBCDA) || defined(USE_CDDA)
@@ -853,7 +851,7 @@ global void GameMainLoop(void)
 #endif
 		    break;
 		case 10:
-		    if ( !(GameCycle%2) ) {
+		    if (!(GameCycle % 2)) {
 			PlaySectionMusic(PlaySectionUnknown);
 		    }
 		    break;
@@ -866,41 +864,41 @@ global void GameMainLoop(void)
 	//
 	//	Map scrolling
 	//
-	if( TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll) ) {
+	if (TheUI.MouseScroll && !(FrameCounter % SpeedMouseScroll)) {
 	    DoScrollArea(MouseScrollState, 0);
 	}
-	if( TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll) ) {
+	if (TheUI.KeyScroll && !(FrameCounter % SpeedKeyScroll)) {
 	    DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
 	}
 
-	if( !(FrameCounter%COLOR_CYCLE_SPEED) ) {
-	    if( ColorCycleAll>=0 ) {
+	if (!(FrameCounter % COLOR_CYCLE_SPEED)) {
+	    if (ColorCycleAll >= 0) {
 		ColorCycle();
 	    } else {
 		// FIXME: should only update when needed
-		MustRedraw|=RedrawInfoPanel;
+		MustRedraw |= RedrawInfoPanel;
 	    }
 	}
 
 #if defined(DEBUG) && !defined(FLAG_DEBUG)
-	MustRedraw|=RedrawMenuButton;
+	MustRedraw |= RedrawMenuButton;
 #endif
-        if( FastForwardCycle > GameCycle
-		&& RealVideoSyncSpeed != VideoSyncSpeed ) {
+        if (FastForwardCycle > GameCycle &&
+		RealVideoSyncSpeed != VideoSyncSpeed) {
 	    RealVideoSyncSpeed = VideoSyncSpeed;
 	    VideoSyncSpeed = 3000;
 	}
-	if( FastForwardCycle >= GameCycle ) {
+	if (FastForwardCycle >= GameCycle) {
 	    MustRedraw = RedrawEverything;
 	}
-	if( MustRedraw /* && !VideoInterrupts */
-		&& (FastForwardCycle <= GameCycle || GameCycle <= 10
-		    || !(GameCycle & 0x3f)) ) {
-	    if( Callbacks==&MenuCallbacks ) {
-		MustRedraw|=RedrawMenu;
+	if (MustRedraw /* && !VideoInterrupts */ &&
+		(FastForwardCycle <= GameCycle || GameCycle <= 10 ||
+		    !(GameCycle & 0x3f))) {
+	    if (Callbacks == &MenuCallbacks) {
+		MustRedraw |= RedrawMenu;
 	    }
-	    if( CurrentMenu && CurrentMenu->Panel
-		    && !strcmp(CurrentMenu->Panel, ScPanel) ) {
+	    if (CurrentMenu && CurrentMenu->Panel &&
+		    !strcmp(CurrentMenu->Panel, ScPanel)) {
 		MustRedraw = RedrawEverything;
 	    }
 
@@ -919,31 +917,31 @@ global void GameMainLoop(void)
 	    //
 	    RealizeVideoMemory();
 #ifndef USE_OPENGL
-	    MustRedraw=0;
+	    MustRedraw = 0;
 #endif
 	}
 
 	CheckVideoInterrupts();		// look if already an interrupt
 
-	if( FastForwardCycle == GameCycle ) {
+	if (FastForwardCycle == GameCycle) {
 	    VideoSyncSpeed = RealVideoSyncSpeed;
 	}
-	if( FastForwardCycle <= GameCycle || !(GameCycle & 0x3f) ) {
+	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
 	    WaitEventsOneFrame(Callbacks);
 	}
-	if( !NetworkInSync ) {
+	if (!NetworkInSync) {
 	    NetworkRecover();		// recover network
 	}
 
-	if( showtip ) {
-	    ProcessMenu("menu-tips",1);
+	if (showtip) {
+	    ProcessMenu("menu-tips", 1);
 	    InterfaceState = IfaceStateNormal;
-	    showtip=0;
+	    showtip = 0;
 	}
     }
 
-    if( Callbacks==&MenuCallbacks ) {
-	while( CurrentMenu ) {
+    if (Callbacks == &MenuCallbacks) {
+	while (CurrentMenu) {
 	    EndMenu();
 	}
     }
@@ -951,31 +949,31 @@ global void GameMainLoop(void)
     //
     //	Game over
     //
-    if( FastForwardCycle > GameCycle ) {
+    if (FastForwardCycle > GameCycle) {
 	VideoSyncSpeed = RealVideoSyncSpeed;
     }
     NetworkQuit();
     EndReplayLog();
-    if( GameResult==GameDefeat ) {
-	fprintf(stderr,"You have lost!\n");
+    if (GameResult == GameDefeat) {
+	fprintf(stderr, "You have lost!\n");
 	SetStatusLine("You have lost!");
 	ProcessMenu("menu-defeated", 1);
     }
-    else if( GameResult==GameVictory ) {
-	fprintf(stderr,"You have won!\n");
+    else if (GameResult == GameVictory) {
+	fprintf(stderr, "You have won!\n");
 	SetStatusLine("You have won!");
 	ProcessMenu("menu-victory", 1);
     }
 
-    if( GameResult==GameVictory || GameResult==GameDefeat ) {
+    if (GameResult == GameVictory || GameResult == GameDefeat) {
 	PlaySectionMusic(PlaySectionStats);
 	ShowStats();
     }
 
-    FlagRevealMap=0;
-    ReplayRevealMap=0;
-    GamePaused=0;
-    GodMode=0;
+    FlagRevealMap = 0;
+    ReplayRevealMap = 0;
+    GamePaused = 0;
+    GodMode = 0;
 }
 
 //@}

@@ -430,13 +430,13 @@ global void CreatePlayer(int type)
 	    break;
     }
 
-    player->Type=type;
-    player->Race=PlayerRaces.Race[0];
-    player->RaceName=PlayerRaces.Name[0];
-    player->Team=team;
-    player->Enemy=0;
-    player->Allied=0;
-    player->AiNum=PlayerAiUniversal;
+    player->Type = type;
+    player->Race = PlayerRaces.Race[0];
+    player->RaceName = PlayerRaces.Name[0];
+    player->Team = team;
+    player->Enemy = 0;
+    player->Allied = 0;
+    player->AiNum = PlayerAiUniversal;
 
     //
     //	Calculate enemy/allied mask.
@@ -1081,7 +1081,7 @@ global void DebugPlayers(void)
 	    continue;
 	}
 	DebugLevel0("%2d: %8.8s %c %-8.8s " _C_ i _C_ colors[i] _C_
-	    ThisPlayer==&Players[i] ? '*' :
+	    ThisPlayer == &Players[i] ? '*' :
 		Players[i].AiEnabled ? '+' : ' ' _C_
 	    Players[i].Name);
 	switch (Players[i].Type) {
