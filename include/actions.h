@@ -41,6 +41,13 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+enum _diplomacy_ {
+    DiplomacyAllied,		/// Alley with opponent
+    DiplomacyNeutral,		/// Don't attack be neutral
+    DiplomacyEnemy,		/// Attack opponent
+    DiplomacyCrazy,		/// Alley and attack opponent
+};				/// Diplomacy states for CommandDiplomacy
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -111,6 +118,8 @@ extern void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Prepare command spellcast
 extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 	,SpellType* spell, int flush);
+    /// Prepare diplomacy command
+extern void CommandDiplomacy(int player,int state,int opponent);
 
 /*----------------------------------------------------------------------------
 --	Actions:	in action_<name>.c
