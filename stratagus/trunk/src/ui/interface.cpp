@@ -192,7 +192,18 @@ local void UiAddGroupToSelection(unsigned group)
         return;
     }
 
+    //
+    //	Don't allow to mix units and buildings
+    //
+    if( NumUnits && Selected[0]->Type->Building ) {
+	return;
+    }
+
     units=GetUnitsOfGroup(group);
+    if( units[0]->Type->Building ) {
+	return;
+    }
+
     while( n-- ) {
 	SelectUnit(units[n]);
     }
