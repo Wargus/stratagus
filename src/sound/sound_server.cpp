@@ -156,6 +156,7 @@ global void PlayMusic(const char* name)
     settings.mBits=16;
 #endif
 
+    settings.mLoopCount=0;		// Disable looping
     ModPlug_SetSettings(&settings);
 
     size=0;
@@ -164,7 +165,7 @@ global void PlayMusic(const char* name)
     if( PlayingMusic ) {
 	if( ModFile ) {
 	    ModPlug_Unload(ModFile);
-	    ModFile=0;
+	    ModFile=NULL;
 	}
 	PlayingMusic=0;
     }
@@ -189,7 +190,10 @@ global void PlayMusic(const char* name)
 
     free(buffer);
 
-    PlayingMusic=1;
+    if( ModFile ) {
+	DebugLevel0Fn("Started\n");
+	PlayingMusic=1;
+    }
 }
 
 /**
@@ -1317,6 +1321,7 @@ global int InitSound(void)
     DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
 
+    // FIXME: should make it configurable
     PlayMusic("music/default.mod");
 
     return 0;
