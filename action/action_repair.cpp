@@ -74,100 +74,103 @@ local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
 /**
 **	Repair an unit.
 */
-local void RepairUnit(Unit* unit,Unit* goal)
+local void RepairUnit(Unit* unit, Unit* goal)
 {
     Player* player;
     int costs[MaxCosts];
     int i;
     int hp;
     int lrr;
+
 #define GIVES_HP	4
 #define COSTS		1
 
-    player=unit->Player;
+    player = unit->Player;
 
     //
-    //	Calculate the repair points
-    //		original per 100 hit points only 25 gold 25 wood
+    //  Calculate the repair points
+    //          original per 100 hit points only 25 gold 25 wood
     //
-    hp=GIVES_HP;
-    DebugLevel2Fn("hitpoints %d\n" _C_ hp);
+    hp = GIVES_HP;
 
     //
-    //	Calculate the repair costs.
+    //  Calculate the repair costs.
     //
-    DebugCheck( !goal->Stats->HitPoints );
+    DebugCheck(!goal->Stats->HitPoints);
 
-    for( i=1; i<MaxCosts; ++i ) {
-	if ( goal->Stats->Costs[i] ) {
-	    costs[i]=COSTS;
-	} else {		// Prepare for repair cycles
-	    costs[i]=0;
+    for (i = 1; i < MaxCosts; ++i) {
+	if (goal->Stats->Costs[i]) {
+	    costs[i] = COSTS;
+	} else {			// Prepare for repair cycles
+	    costs[i] = 0;
 	}
     }
-    lrr=player->LastRepairResource;
-    for( i=player->LastRepairResource; i<MaxCosts; ++i ) {
-	if ( costs[i] && lrr==player->LastRepairResource ) {
-	    lrr=i;
-	}	// Find next higher resource or...
-    }
-    if ( lrr == player->LastRepairResource ) {
-	for ( i=player->LastRepairResource; i>0; --i ) {
-	    if ( costs[i] ) {
-		lrr=i;
-	    }
-	}	// ...go through the beginning
-    }
-    player->LastRepairResource=lrr;
-    for( i=1; i<MaxCosts; ++i ) {
-	costs[i]=0;
-    }		// Thanx for the help, costs, you are reset!
-    costs[player->LastRepairResource]=1;
-		// The one we need
 
     //
-    //	Check if enough resources are available
+    //  Check if enough resources are available
     //
-    for( i=1; i<MaxCosts; ++i ) {
-	if( player->Resources[i]<costs[i] ) {
-	    // FIXME: general notify system
+    for (i = 1; i < MaxCosts; ++i) {
+	if (player->Resources[i] < costs[i]) {
 	    // FIXME: we should say what resource
-	    if( player==ThisPlayer ) {
-		SetMessage("We need resources for repair!");
-	    } else {
-		RefsDebugCheck( !goal->Refs );
-		if( !--goal->Refs ) {
+	    NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,
+		    "We need resources for repair!");
+	    if( player->Ai ) {
+		// FIXME: call back to AI?
+
+		RefsDebugCheck(!goal->Refs);
+		if (!--goal->Refs) {
 		    ReleaseUnit(goal);
 		}
-		unit->Orders[0].Goal=NULL;
-		unit->Orders[0].Action=UnitActionStill;
-		unit->State=unit->SubAction=0;
-		if( unit->Selected ) {	// update display for new action
+		unit->Orders[0].Goal = NULL;
+		unit->Orders[0].Action = UnitActionStill;
+		unit->State = unit->SubAction = 0;
+		if (unit->Selected) {	// update display for new action
 		    UpdateButtonPanel();
 		}
 	    }
-	    // FIXME: call back to AI?
 	    // FIXME: We shouldn't animate if no resources are available.
 	    return;
 	}
     }
+
+    lrr = player->LastRepairResource;
+    for (i = player->LastRepairResource; i < MaxCosts; ++i) {
+	if (costs[i] && lrr == player->LastRepairResource) {
+	    lrr = i;
+	}				// Find next higher resource or...
+    }
+    if (lrr == player->LastRepairResource) {
+	for (i = player->LastRepairResource; i > 0; --i) {
+	    if (costs[i]) {
+		lrr = i;
+	    }
+	}				// ...go through the beginning
+    }
+    player->LastRepairResource = lrr;
+
+    // Thanx for the help, costs, you are reset!
+    for (i = 1; i < MaxCosts; ++i) {
+	costs[i] = 0;
+    }
+    costs[player->LastRepairResource] = COSTS;	// The one we need
+
     //
-    //	Repair the unit
+    //  Repair the unit
     //
-    goal->HP+=hp;
-    if ( goal->HP > goal->Stats->HitPoints ) {
+    goal->HP += hp;
+    if (goal->HP > goal->Stats->HitPoints) {
 	goal->HP = goal->Stats->HitPoints;
     }
     //
-    //	Subtract the resources
+    //  Subtract the resources
     //
-    PlayerSubCosts(player,costs);
+    PlayerSubCosts(player, costs);
 
-    if ( CheckUnitToBeDrawn(goal) ) {
-	MustRedraw|=RedrawMinimap;
+    if (CheckUnitToBeDrawn(goal)) {
+	MustRedraw |= RedrawMinimap;
     }
-    if( IsOnlySelected(goal) ) {	// Update panel if unit is selected
-	MustRedraw|=RedrawInfoPanel;
+    if (IsOnlySelected(goal)) {		// Update panel if unit is selected
+	MustRedraw |= RedrawInfoPanel;
     }
 }
 
@@ -196,8 +199,6 @@ global void HandleActionRepair(Unit* unit)
 {
     Unit* goal;
     int err;
-
-    DebugLevel3("Repair %d\n" _C_ UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	case 0:
