@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name upgrade.c	-	The upgrade/allow functions. */
 //
-//	(c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -39,12 +39,12 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "upgrade_structs.h"
 #include "upgrade.h"
 #include "player.h"
 #include "depend.h"
 #include "interface.h"
 #include "map.h"
+#include "script.h"
 
 #include "myendian.h"
 
@@ -55,17 +55,20 @@ local int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
 local int AddUpgradeModifier(int, int, int, int, int, int, int, int,
 	int*, const int[UnitTypeMax], const char*, const char*);
 
+local void AllowUnitId(Player* player, int id, int units);
+local void AllowUpgradeId(Player* player, int id, char af);
+
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		upgrade type definition
+**  upgrade type definition
 */
 global const char UpgradeType[] = "upgrade";
 
-global Upgrade Upgrades[UpgradeMax];		/// The main user useable upgrades
-local int NumUpgrades;						/// Number of upgrades used
+global Upgrade Upgrades[UpgradeMax];        /// The main user useable upgrades
+local int NumUpgrades;                      /// Number of upgrades used
 
 	/// How many upgrades modifiers supported
 #define UPGRADE_MODIFIERS_MAX		(UpgradeMax * 4)
@@ -74,32 +77,32 @@ local UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 	/// Number of upgrades modifiers used
 local int NumUpgradeModifiers;
 
-#ifdef DOXYGEN								// no real code, only for document
-local Upgrade* UpgradeHash[61];				/// lookup table for upgrade names
+#ifdef DOXYGEN  // no real code, only for documentation
+local Upgrade* UpgradeHash[61];             /// lookup table for upgrade names
 #else
-local hashtable(Upgrade*, 61) UpgradeHash;/// lookup table for upgrade names
+local hashtable(Upgrade*, 61) UpgradeHash;  /// lookup table for upgrade names
 #endif
 
 /**
-**		Mapping of W*rCr*ft number to our internal upgrade symbol.
-**		The numbers are used in puds.
+**  Mapping of W*rCr*ft number to our internal upgrade symbol.
+**  The numbers are used in puds.
 */
 local char** UpgradeWcNames;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Add an upgrade. If the ident didn't exist a new upgrade is created,
-**		if the ident is alreay used, the old value is overwritten.
+**  Add an upgrade. If the ident didn't exist a new upgrade is created,
+**  if the ident is alreay used, the old value is overwritten.
 **
-**		@param ident		upgrade identifier.
-**		@param icon		icon displayed for this upgrade,
-**						NULL for generated name (icon-<em>ident</em>).
-**		@param costs		costs to upgrade.
+**  @param ident  upgrade identifier.
+**  @param icon   icon displayed for this upgrade,
+**                NULL for generated name (icon-<em>ident</em>).
+**  @param costs  costs to upgrade.
 **
-**		@return				upgrade id or -1 for error
+**  @return       upgrade id or -1 for error
 */
 local Upgrade* AddUpgrade(const char* ident, const char* icon,
 	const int* costs)
@@ -108,13 +111,13 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 	Upgrade** tmp;
 	int i;
 
-	//  Check for free slot.
+	// Check for free slot.
 
 	if (NumUpgrades == UpgradeMax) {
 		DebugLevel0Fn("Upgrades limit reached.\n");
 		return NULL;
 	}
-	//  Fill upgrade structure
+	// Fill upgrade structure
 
 	if ((tmp = (Upgrade**)hash_find(UpgradeHash, (char*)ident)) && *tmp) {
 		DebugLevel0Fn("Already defined upgrade `%s'\n" _C_ ident);
@@ -129,7 +132,7 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 
 	if (icon) {
 		upgrade->Icon.Name = strdup(icon);
-	} else {								// automatic generated icon-name
+	} else {  // automatically generated icon-name
 		upgrade->Icon.Name = malloc(strlen(ident) + 5 - 8 + 1);
 		strcpy(upgrade->Icon.Name, "icon-");
 		strcpy(upgrade->Icon.Name + 5, ident + 8);
@@ -143,10 +146,10 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 }
 
 /**
-**		Upgrade by identifier.
+**  Upgrade by identifier.
 **
-**		@param ident		The upgrade identifier.
-**		@return				Upgrade pointer or NULL if not found.
+**  @param ident  The upgrade identifier.
+**  @return       Upgrade pointer or NULL if not found.
 */
 global Upgrade* UpgradeByIdent(const char* ident)
 {
@@ -162,10 +165,10 @@ global Upgrade* UpgradeByIdent(const char* ident)
 }
 
 /**
-**		Find upgrade by wc number.
+**  Find upgrade by wc number.
 **
-**		@param num		The upgrade number used in f.e. puds.
-**		@return				Upgrade pointer.
+**  @param num  The upgrade number used in f.e. puds.
+**  @return     Upgrade pointer.
 */
 local Upgrade* UpgradeByWcNum(unsigned num)
 {
@@ -174,14 +177,14 @@ local Upgrade* UpgradeByWcNum(unsigned num)
 
 
 /**
-**		Init upgrade/allow structures
+**  Init upgrade/allow structures
 */
 global void InitUpgrades(void)
 {
 	int i;
 
 	//
-	//		Resolve the icons.
+	//  Resolve the icons.
 	//
 	for (i = 0; i < NumUpgrades; ++i) {
 		Upgrades[i].Icon.Icon = IconByIdent(Upgrades[i].Icon.Name);
@@ -189,7 +192,7 @@ global void InitUpgrades(void)
 }
 
 /**
-**		Cleanup the upgrade module.
+**  Cleanup the upgrade module.
 */
 global void CleanUpgrades(void)
 {
@@ -548,14 +551,14 @@ global void SaveUpgrades(CLFile* file)
 	CLprintf(file, ";;; MODULE: upgrades $Id$\n\n");
 
 	//
-	//		Save all upgrades
+	//  Save all upgrades
 	//
 	for (i = 0; i < NumUpgrades; ++i) {
 		CLprintf(file, "(define-upgrade '%s 'icon '%s\n",
 			Upgrades[i].Ident, Upgrades[i].Icon.Name);
 		CLprintf(file, "  'costs #(");
 		for (j = 0; j < MaxCosts; ++j) {
-			CLprintf(file, " %5d",Upgrades[i].Costs[j]);
+			CLprintf(file, " %5d", Upgrades[i].Costs[j]);
 		}
 
 		CLprintf(file, "))\n");
@@ -563,7 +566,7 @@ global void SaveUpgrades(CLFile* file)
 	CLprintf(file, "\n");
 
 	//
-	//		Save all upgrade modifiers.
+	//  Save all upgrade modifiers.
 	//
 	for (i = 0; i < NumUpgradeModifiers; ++i) {
 		CLprintf(file, "(define-modifier '%s",
@@ -666,15 +669,13 @@ global void SaveUpgrades(CLFile* file)
 }
 
 /*----------------------------------------------------------------------------
---		Ccl part of upgrades
+--  Ccl part of upgrades
 ----------------------------------------------------------------------------*/
 
-#include "script.h"
-
 /**
-**		Define a new upgrade modifier.
+**  Define a new upgrade modifier.
 **
-**		@param list		List of modifiers.
+**  @param list  List of modifiers.
 */
 local int CclDefineModifier(lua_State* l)
 {
@@ -830,9 +831,9 @@ local int CclDefineModifier(lua_State* l)
 }
 
 /**
-**		Define a new upgrade.
+**  Define a new upgrade.
 **
-**		@param list		List defining the upgrade.
+**  @param list  List defining the upgrade.
 */
 local int CclDefineUpgrade(lua_State* l)
 {
@@ -848,8 +849,7 @@ local int CclDefineUpgrade(lua_State* l)
 	args = lua_gettop(l);
 	k = 0;
 
-	//		Identifier
-
+	// Identifier
 	ident = LuaToString(l, k + 1);
 	++k;
 
@@ -860,10 +860,10 @@ local int CclDefineUpgrade(lua_State* l)
 		value = LuaToString(l, k + 1);
 		++k;
 		if (!strcmp(value, "icon")) {
-			//		Icon
+			// Icon
 			icon = LuaToString(l, k + 1);
 		} else if (!strcmp(value, "costs")) {
-			//		Costs
+			// Costs
 			if (!lua_istable(l, k + 1)) {
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
@@ -893,7 +893,7 @@ local int CclDefineUpgrade(lua_State* l)
 }
 
 /**
-**		Define which units are allowed and how much.
+**  Define which units are allowed and how much.
 */
 local int CclDefineUnitAllow(lua_State* l)
 {
@@ -901,6 +901,7 @@ local int CclDefineUnitAllow(lua_State* l)
 	int i;
 	int args;
 	int j;
+	int id;
 
 	args = lua_gettop(l);
 	j = 0;
@@ -911,10 +912,11 @@ local int CclDefineUnitAllow(lua_State* l)
 		DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
 		return 0;
 	}
+	id = UnitTypeIdByIdent(ident);
 
 	i = 0;
-	for (; j < args && i < 16; ++j) {
-		AllowUnitByIdent(&Players[i], ident, LuaToNumber(l, j + 1));
+	for (; j < args && i < PlayerMax; ++j) {
+		AllowUnitId(&Players[i], id, LuaToNumber(l, j + 1));
 		++i;
 	}
 
@@ -922,7 +924,7 @@ local int CclDefineUnitAllow(lua_State* l)
 }
 
 /**
-**		Define which units/upgrades are allowed.
+**  Define which units/upgrades are allowed.
 */
 local int CclDefineAllow(lua_State* l)
 {
@@ -932,6 +934,7 @@ local int CclDefineAllow(lua_State* l)
 	int n;
 	int args;
 	int j;
+	int id;
 
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
@@ -940,22 +943,24 @@ local int CclDefineAllow(lua_State* l)
 		ids = LuaToString(l, j + 1);
 
 		n = strlen(ids);
-		if (n > 16) {
+		if (n > PlayerMax) {
 			fprintf(stderr, "%s: Allow string too long %d\n", ident, n);
-			n = 16;
+			n = PlayerMax;
 		}
 
 		if (!strncmp(ident, "unit-", 5)) {
+			id = UnitTypeIdByIdent(ident);
 			for (i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
-					AllowUnitByIdent(&Players[i], ident, UnitMax);
+					AllowUnitId(&Players[i], id, UnitMax);
 				} else if (ids[i] == 'F') {
-					AllowUnitByIdent(&Players[i], ident, 0);
+					AllowUnitId(&Players[i], id, 0);
 				}
 			}
 		} else if (!strncmp(ident, "upgrade-", 8)) {
+			id = UpgradeIdByIdent(ident);
 			for (i = 0; i < n; ++i) {
-				AllowUpgradeByIdent(&Players[i], ident, ids[i]);
+				AllowUpgradeId(&Players[i], id, ids[i]);
 			}
 		} else {
 			DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
@@ -966,9 +971,9 @@ local int CclDefineAllow(lua_State* l)
 }
 
 /**
-**		Define upgrade mapping from original number to internal symbol
+**  Define upgrade mapping from original number to internal symbol
 **
-**		@param list		List of all names.
+**  @param list  List of all names.
 */
 local int CclDefineUpgradeWcNames(lua_State* l)
 {
@@ -976,7 +981,7 @@ local int CclDefineUpgradeWcNames(lua_State* l)
 	int j;
 	char** cp;
 
-	if ((cp = UpgradeWcNames)) {		// Free all old names
+	if ((cp = UpgradeWcNames)) {  // Free all old names
 		while (*cp) {
 			free(*cp++);
 		}
@@ -984,7 +989,7 @@ local int CclDefineUpgradeWcNames(lua_State* l)
 	}
 
 	//
-	//		Get new table.
+	//  Get new table.
 	//
 	i = lua_gettop(l);
 	UpgradeWcNames = cp = malloc((i + 1) * sizeof(char*));
@@ -1002,7 +1007,7 @@ local int CclDefineUpgradeWcNames(lua_State* l)
 }
 
 /**
-**		Register CCL features for upgrades.
+**  Register CCL features for upgrades.
 */
 global void UpgradesCclRegister(void)
 {
@@ -1015,32 +1020,29 @@ global void UpgradesCclRegister(void)
 }
 
 
-
-
-
 /*----------------------------------------------------------------------------
---		Init/Done/Add functions
+--  Init/Done/Add functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Add a upgrade modifier.
+**  Add a upgrade modifier.
 **
-**		@param uid				Upgrade identifier of the modifier.
-**		@param attack_range		Attack range modification.
-**		@param sight_range		Sight range modification.
-**		@param basic_damage		Basic damage modification.
-**		@param piercing_damage		Piercing damage modification.
-**		@param armor				Armor modification.
-**		@param speed				Speed modification (Currently not possible).
-**		@param hit_points		Hitpoint modification.
-**		@param costs				Costs modification.
-**		@param units[UnitTypeMax]		Changes in allowed units.
-**		@param af_upgrades		Changes in allow upgrades.
-**		@param apply_to				Applies to this units.
-**		@param convert_to		Converts units to this unit-type.
+**  @param uid              Upgrade identifier of the modifier.
+**  @param attack_range     Attack range modification.
+**  @param sight_range      Sight range modification.
+**  @param basic_damage     Basic damage modification.
+**  @param piercing_damage  Piercing damage modification.
+**  @param armor            Armor modification.
+**  @param speed            Speed modification (Currently not possible).
+**  @param hit_points       Hitpoint modification.
+**  @param costs            Costs modification.
+**  @param units            Changes in allowed units.
+**  @param af_upgrades      Changes in allow upgrades.
+**  @param apply_to         Applies to this units.
+**  @param convert_to       Converts units to this unit-type.
 **
-**		@return						upgrade modifier id or -1 for error
-**						(actually this id is useless, just error checking)
+**  @return                 upgrade modifier id or -1 for error
+**                          (actually this id is useless, just error checking)
 */
 local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 	int basic_damage, int piercing_damage, int armor, int speed,
@@ -1059,17 +1061,17 @@ local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 	um->UpgradeId = uid;
 
 	// get/save stats modifiers
-	um->Modifier.AttackRange		= attack_range;
-	um->Modifier.SightRange		= sight_range;
-	um->Modifier.BasicDamage		= basic_damage;
-	um->Modifier.PiercingDamage		= piercing_damage;
-	um->Modifier.Armor				= armor;
-	um->Modifier.Speed				= speed;
-	um->Modifier.HitPoints		= hit_points;
+	um->Modifier.AttackRange      = attack_range;
+	um->Modifier.SightRange       = sight_range;
+	um->Modifier.BasicDamage      = basic_damage;
+	um->Modifier.PiercingDamage   = piercing_damage;
+	um->Modifier.Armor            = armor;
+	um->Modifier.Speed            = speed;
+	um->Modifier.HitPoints        = hit_points;
 	um->Modifier.RegenerationRate = regeneration_rate;
 
 	for (i = 0; i < MaxCosts; ++i) {
-		um->Modifier.Costs[i]		= costs[i];
+		um->Modifier.Costs[i] = costs[i];
 	}
 
 	memcpy(um->ChangeUnits, units, sizeof(um->ChangeUnits));
@@ -1109,13 +1111,13 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	um->UpgradeId = uid;
 
 	// get/save stats modifiers
-	um->Modifier.AttackRange		= attack_range;
-	um->Modifier.SightRange		= sight_range;
-	um->Modifier.BasicDamage		= basic_damage;
-	um->Modifier.PiercingDamage		= piercing_damage;
-	um->Modifier.Armor				= armor;
-	um->Modifier.Speed				= speed;
-	um->Modifier.HitPoints		= hit_points;
+	um->Modifier.AttackRange    = attack_range;
+	um->Modifier.SightRange     = sight_range;
+	um->Modifier.BasicDamage    = basic_damage;
+	um->Modifier.PiercingDamage = piercing_damage;
+	um->Modifier.Armor          = armor;
+	um->Modifier.Speed          = speed;
+	um->Modifier.HitPoints      = hit_points;
 
 	for (i = 0; i < MaxCosts; ++i) {
 		um->Modifier.Costs[i] = costs[i];
@@ -1169,36 +1171,6 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	return NumUpgradeModifiers - 1;
 }
 
-/**
-**		this function is used for define `simple' upgrades
-**		with only one modifier
-*/
-global void AddSimpleUpgrade(const char* ident, const char* icon,
-	// upgrade costs
-	int* costs,
-	// upgrade modifiers
-	int attack_range, int sight_range, int basic_damage, int piercing_damage,
-	int armor, int speed, int hit_points,
-	int* mcosts,
-	const char* apply_to				// "unit-peon,unit-peasant"
-	)
-{
-	Upgrade* up;
-	int units[UnitTypeMax];
-
-	memset(units,0,sizeof(UnitTypeMax));
-
-	up = AddUpgrade(ident, icon, costs);
-	if (!up)  {
-		return;
-	}
-	AddUpgradeModifier(up-Upgrades, attack_range, sight_range, basic_damage,
-		piercing_damage, armor, speed, hit_points,
-		mcosts,
-		units, "", // no allow/forbid maps
-		apply_to);
-}
-
 /*----------------------------------------------------------------------------
 --		General/Map functions
 ----------------------------------------------------------------------------*/
@@ -1207,10 +1179,10 @@ global void AddSimpleUpgrade(const char* ident, const char* icon,
 // load/saved with the player struct
 
 /**
-**		UnitType ID by identifier.
+**  UnitType ID by identifier.
 **
-**		@param ident		The unit-type identifier.
-**		@return				Unit-type ID (int) or -1 if not found.
+**  @param ident  The unit-type identifier.
+**  @return       Unit-type ID (int) or -1 if not found.
 */
 global int UnitTypeIdByIdent(const char* ident)
 {
@@ -1224,10 +1196,10 @@ global int UnitTypeIdByIdent(const char* ident)
 }
 
 /**
-**		Upgrade ID by identifier.
+**  Upgrade ID by identifier.
 **
-**		@param ident		The upgrade identifier.
-**		@return				Upgrade ID (int) or -1 if not found.
+**  @param ident  The upgrade identifier.
+**  @return       Upgrade ID (int) or -1 if not found.
 */
 global int UpgradeIdByIdent(const char* ident)
 {
@@ -1235,7 +1207,7 @@ global int UpgradeIdByIdent(const char* ident)
 
 	upgrade = UpgradeByIdent(ident);
 	if (upgrade) {
-		return upgrade-Upgrades;
+		return upgrade - Upgrades;
 	}
 	DebugLevel0Fn(" fix this %s\n" _C_ ident);
 	return -1;
@@ -1246,31 +1218,11 @@ global int UpgradeIdByIdent(const char* ident)
 ----------------------------------------------------------------------------*/
 
 /**
-**		Increment the counter of an upgrade.
+**  Convert unit-type to.
 **
-**		Amount==-1 to cancel upgrade, could happen when building destroyed
-**		during upgrade. Using this we could have one upgrade research in two
-**		buildings, so we can have this upgrade faster.
-**
-**		@param player		Player pointer of the incremented upgrade.
-**		@param id		Upgrade id number.
-**		@param amount		Value to add to timer. -1 to cancel upgrade
-*/
-global void UpgradeIncTime(Player* player, int id, int amount)
-{
-	player->UpgradeTimers.Upgrades[id] += amount;
-	if (player->UpgradeTimers.Upgrades[id] >= Upgrades[id].Costs[TimeCost]) {
-		player->UpgradeTimers.Upgrades[id] = Upgrades[id].Costs[TimeCost];
-		UpgradeAcquire(player, &Upgrades[id]);
-	}
-}
-
-/**
-**		Convert unit-type to.
-**
-**		@param player		For this player.
-**		@param src		From this unit-type.
-**		@param dst		To this unit-type.
+**  @param player  For this player.
+**  @param src     From this unit-type.
+**  @param dst     To this unit-type.
 */
 local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 {
@@ -1281,7 +1233,7 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 	for (i = 0; i < player->TotalNumUnits; ++i) {
 		unit = player->Units[i];
 		//
-		//		Convert already existing units to this type.
+		//  Convert already existing units to this type.
 		//
 		if (unit->Type == src) {
 			unit->HP += dst->Stats[player->Player].HitPoints -
@@ -1311,8 +1263,8 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 
 			CheckUnitToBeDrawn(unit);
 		//
-		//		Convert trained units to this type.
-		//		FIXME: what about buildings?
+		//  Convert trained units to this type.
+		//  FIXME: what about buildings?
 		//
 		} else {
 			if (unit->Orders[0].Action == UnitActionTrain) {
@@ -1336,13 +1288,13 @@ local void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
 }
 
 /**
-**		Apply the modifiers of an upgrade.
+**  Apply the modifiers of an upgrade.
 **
-**		This function will mark upgrade done and do all required modifications
-**		to unit types and will modify allow/forbid maps
+**  This function will mark upgrade done and do all required modifications
+**  to unit types and will modify allow/forbid maps
 **
-**		@param player		Player that get all the upgrades.
-**		@param um		Upgrade modifier that do the effects
+**  @param player  Player that get all the upgrades.
+**  @param um      Upgrade modifier that do the effects
 */
 local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 {
@@ -1350,7 +1302,7 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 	int j;
 	int pn;
 
-	pn = player->Player;				// player number
+	pn = player->Player;  // player number
 	for (z = 0; z < UpgradeMax; ++z) {
 		// allow/forbid upgrades for player.  only if upgrade is not acquired
 
@@ -1386,8 +1338,8 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			// upgrade stats
 			UnitTypes[z]->Stats[pn].AttackRange += um->Modifier.AttackRange;
 			UnitTypes[z]->Stats[pn].SightRange += um->Modifier.SightRange;
-			//If Sight range is upgraded, we need to change EVERY unit
-			//to the new range, otherwise the counters get confused.
+			// If Sight range is upgraded, we need to change EVERY unit
+			// to the new range, otherwise the counters get confused.
 			if (um->Modifier.SightRange) {
 				int numunits;
 				Unit* sightupgrade[UnitMax];
@@ -1428,11 +1380,10 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 }
 
 /**
-**		Handle that an upgrade was acquired.
-**		Called by UpgradeIncTime() when timer reached
+**  Handle that an upgrade was acquired.
 **
-**		@param player		Player researching the upgrade.
-**		@param upgrade		Upgrade ready researched.
+**  @param player   Player researching the upgrade.
+**  @param upgrade  Upgrade ready researched.
 */
 global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 {
@@ -1441,7 +1392,7 @@ global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 
 	id = upgrade-Upgrades;
 	player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
-	AllowUpgradeId(player, id, 'R');				// research done
+	AllowUpgradeId(player, id, 'R');  // research done
 
 	for (z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
@@ -1450,7 +1401,7 @@ global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 	}
 
 	//
-	//		Upgrades could change the buttons displayed.
+	//  Upgrades could change the buttons displayed.
 	//
 	if (player == ThisPlayer) {
 		SelectedUnitChanged();
@@ -1459,14 +1410,14 @@ global void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 }
 
 /**
-**		for now it will be empty?
-**		perhaps acquired upgrade can be lost if (for example) a building is lost
-**		(lumber mill? stronghold?)
-**		this function will apply all modifiers in reverse way
+**  for now it will be empty?
+**  perhaps acquired upgrade can be lost if (for example) a building is lost
+**  (lumber mill? stronghold?)
+**  this function will apply all modifiers in reverse way
 */
 global void UpgradeLost(Player* player, int id)
 {
-	return; //FIXME: remove this if implemented below
+	return; // FIXME: remove this if implemented below
 
 	player->UpgradeTimers.Upgrades[id] = 0;
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
@@ -1474,38 +1425,38 @@ global void UpgradeLost(Player* player, int id)
 }
 
 /*----------------------------------------------------------------------------
---		Allow(s)
+--  Allow(s)
 ----------------------------------------------------------------------------*/
 
 // all the following functions are just map handlers, no specific notes
 
 /**
-**		Change allow for an unit-type.
+**  Change allow for an unit-type.
 **
-**		@param player		Player to change
-**		@param id		unit type id
-**		@param units		maximum amount of units allowed
+**  @param player  Player to change
+**  @param id      unit type id
+**  @param units   maximum amount of units allowed
 */
-global void AllowUnitId(Player* player, int id, int units)
+local void AllowUnitId(Player* player, int id, int units)
 {
 	player->Allow.Units[id] = units;
 }
 
 /**
-**		Change allow for an upgrade.
+**  Change allow for an upgrade.
 **
-**		@param player		Player to change
-**		@param id		upgrade id
-**		@param af		`A'llow/`F'orbid/`R'eseached
+**  @param player  Player to change
+**  @param id      upgrade id
+**  @param af      `A'llow/`F'orbid/`R'eseached
 */
-global void AllowUpgradeId(Player* player, int id, char af)
+local void AllowUpgradeId(Player* player, int id, char af)
 {
 	DebugCheck(!(af == 'A' || af == 'F' || af == 'R'));
 	player->Allow.Upgrades[id] = af;
 }
 
 /**
-**		FIXME: docu
+**  FIXME: docu
 */
 global int UnitIdAllowed(const Player* player, int id)
 {
@@ -1518,76 +1469,24 @@ global int UnitIdAllowed(const Player* player, int id)
 }
 
 /**
-**		FIXME: docu
+**  FIXME: docu
 */
 global char UpgradeIdAllowed(const Player* player, int id)
 {
 	// JOHNS: Don't be kind, the people should code correct!
 	DebugCheck(id < 0 || id >= UpgradeMax);
-
 	return player->Allow.Upgrades[id];
 }
 
 // ***************by string identifiers's
 
 /**
-**		FIXME: docu
-*/
-global void UpgradeIncTime2(Player* player, char* ident, int amount)		// by ident string
-{
-	UpgradeIncTime(player, UpgradeIdByIdent(ident), amount);
-}
-
-/**
-**		FIXME: docu
-*/
-global void UpgradeLost2(Player* player, char* ident)		// by ident string
-{
-	UpgradeLost(player, UpgradeIdByIdent(ident));
-}
-
-/**
-**		FIXME: docu
-*/
-global void AllowUnitByIdent(Player* player, const char* ident, int units)
-{
-	AllowUnitId(player, UnitTypeIdByIdent(ident), units);
-}
-
-/**
-**		FIXME: docu
-*/
-global void AllowUpgradeByIdent(Player* player, const char* ident, char af)
-{
-	AllowUpgradeId(player, UpgradeIdByIdent(ident), af);
-}
-
-/**
-**		Return the allow state of an unit-type.
+**  Return the allow state of an upgrade.
 **
-**		@param player		Check state for this player.
-**		@param ident		Unit-type identifier.
+**  @param player  Check state for this player.
+**  @param ident   Upgrade identifier.
 **
-**		@note		This function shouldn't be used during runtime, it is only
-**				for setup.
-**
-**		@see Allow
-*/
-global int UnitIdentAllowed(const Player* player, const char* ident)
-{
-	return UnitIdAllowed(player, UnitTypeIdByIdent(ident));
-}
-
-/**
-**		Return the allow state of an upgrade.
-**
-**		@param player		Check state for this player.
-**		@param ident		Upgrade identifier.
-**
-**		@note		This function shouldn't be used during runtime, it is only
-**				for setup.
-**
-**		@see Allow
+**  @note This function shouldn't be used during runtime, it is only for setup.
 */
 global char UpgradeIdentAllowed(const Player* player, const char* ident)
 {
@@ -1601,14 +1500,14 @@ global char UpgradeIdentAllowed(const Player* player, const char* ident)
 }
 
 /*----------------------------------------------------------------------------
---		Check availablity
+--  Check availablity
 ----------------------------------------------------------------------------*/
 
 /**
-**		Check if upgrade (also spells) available for the player.
+**  Check if upgrade (also spells) available for the player.
 **
-**		@param player		Player pointer.
-**		@param ident		Upgrade ident.
+**  @param player  Player pointer.
+**  @param ident   Upgrade ident.
 */
 global int UpgradeIdentAvailable(const Player* player, const char* ident)
 {
@@ -1616,14 +1515,14 @@ global int UpgradeIdentAvailable(const Player* player, const char* ident)
 
 #if 0
 	//
-	//		Check dependencies
+	//  Check dependencies
 	//
 	if (!CheckDependByIdent(player, ident)) {
 		return 0;
 	}
 #endif
 	//
-	//		Allowed by level
+	//  Allowed by level
 	//
 	allow = UpgradeIdentAllowed(player, ident);
 	return allow == 'R' || allow == 'X';
