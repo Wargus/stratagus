@@ -600,7 +600,7 @@ found:
 **	@return			damage produces on goal.
 */
 local int CalculateDamageStats( const UnitStats* attacker_stats,
-                                const UnitStats* goal_stats,
+				const UnitStats* goal_stats,
 				int bloodlust )
 {
     int damage;
@@ -636,8 +636,8 @@ local int CalculateDamageStats( const UnitStats* attacker_stats,
 **	@return			damage produces on goal.
 */
 local int CalculateDamage( const UnitStats* attacker_stats,
-                           const Unit* goal,
-                           int bloodlust )
+			   const Unit* goal,
+			   int bloodlust )
 {
     return CalculateDamageStats(attacker_stats,goal->Stats,bloodlust);
 }
@@ -827,7 +827,7 @@ global void FireMissile(Unit* unit)
 **      @return         sx,sy,ex,ey defining area in Map
 */
 local void GetMissileMapArea( const Missile* missile,
-                              int *sx, int *sy, int *ex, int *ey )
+			      int *sx, int *sy, int *ex, int *ey )
 {
     *sx=missile->X/TileSizeX;
     *sy=missile->Y/TileSizeY;
@@ -849,8 +849,8 @@ local int MissileVisible(const Missile* missile)
     int tileMinY;
     int tileMaxY;
     GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
-    if ( !AreaVisibleInMap(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
-        return 0;
+    if ( !AnyAreaVisibleInMap(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
+	return 0;
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
 		tileMinX,tileMaxX,tileMinY,tileMaxY,
@@ -989,7 +989,7 @@ local int PointToPointMissile(Missile* missile)
 	    missile->D=dy-1;
 	    dx+=dx;
 	    dy+=dy;
-        } else if( dx>dy ) {	// step in horizontal direction
+	} else if( dx>dy ) {	// step in horizontal direction
 	    missile->D=dx-1;
 	    dx+=dx;
 	    dy+=dy;
@@ -1121,14 +1121,14 @@ global void MissileHit(const Missile* missile)
 	    DebugLevel3Fn("Missile on wall?\n");
 	    // FIXME: don't use UnitTypeByIdent here, this is slow!
 	    if( HumanWallOnMap(x,y) ) {
-                if ( missile->Damage ) {	// direct damage, spells mostly
+		if ( missile->Damage ) {	// direct damage, spells mostly
 		    HitWall(x,y,missile->Damage);
 		} else {
 		    HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
 			UnitTypeByIdent("unit-human-wall")->Stats,0));
 		}
 	    } else {
-                if ( missile->Damage ) {	// direct damage, spells mostly
+		if ( missile->Damage ) {	// direct damage, spells mostly
 		    HitWall(x,y,missile->Damage);
 		} else {
 		    HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
@@ -1315,9 +1315,9 @@ global void MissileActions(void)
 		missile->Frame++;
 		if ( missile->Frame > 3 )
 		  missile->Frame = 0;
-	        //NOTE: vladi: whirlwind moves slowly, i.e. it stays
-	        //      5 ticks at the same pixels...
-	        if ( missile->TTL < 1 || missile->TTL % 10 == 0 )
+		//NOTE: vladi: whirlwind moves slowly, i.e. it stays
+		//      5 ticks at the same pixels...
+		if ( missile->TTL < 1 || missile->TTL % 10 == 0 )
 		  PointToPointMissile(missile);
 		break;
 
