@@ -732,20 +732,7 @@ global volatile void Exit(int err)
 
 global volatile void ExitFatal(int err)
 {
-#ifdef USE_SDLCD 
-    if (strcmp(CDMode,":off")) {
-        SDL_CDStop(CDRom);
-        SDL_CDClose(CDRom);
-    }
-#endif 
-		
-#ifdef USE_LIBCDA 
-    if (strcmp(CDMode,":off")) {
-        cd_stop();
-        cd_close();
-        cd_exit();
-    }
-#endif 
+    QuitCD();
     exit(err);
 }
 
