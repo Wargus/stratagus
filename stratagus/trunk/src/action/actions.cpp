@@ -68,6 +68,7 @@ global unsigned SyncHash;	    /// Hash calculated to find sync failures
 */
 global int GoalGone(const Unit* unit, const Unit* goal)
 {
+    int p;
     //
     //  Check for dead/removed goals.
     //
@@ -81,6 +82,7 @@ global int GoalGone(const Unit* unit, const Unit* goal)
 	    goal->Removed) {
 	return 1;
     }
+    p = unit->Player->Player;
     //
     //	Check if we have an unit for this goal.
     //
@@ -89,31 +91,23 @@ global int GoalGone(const Unit* unit, const Unit* goal)
 	if (IsSharedVision(unit->Player, goal) || unit->Player==goal->Player) {
 	    return 0;
 	} else {
-	    int x;
-	    int y;
 	    //  Goal is invisible (by spell)
 	    if (goal->Invisible) {
 		return 1;
 	    }
 	    //  Goal is cloaked for this player
-	    if (!(goal->Visible & (1 << unit->Player->Player))) {
+	    if (!(goal->Visible & (1 << p))) {
 		return 1;
 	    }
 	    //
 	    //	Check if under fog of war.
 	    //	Don't bother for goals visible under fog.
 	    //
-	    if (goal->Type->VisibleUnderFog) {
-		return 0;
+	    if (!goal->Type->VisibleUnderFog &&
+		    !goal->VisCount[p]) {
+		return 1;
 	    }
-	    for (x = goal->X; x < goal->X + goal->Type->TileWidth; x++) {
-		for (y = goal->Y; y < goal->Y + goal->Type->TileHeight; y++) {
-		    if (IsMapFieldVisible(unit->Player, x, y)) {
-			return 0;
-		    }
-		}
-	    }
-	    return 1;
+	    return 0;
 	}
     } else {
 	return 0;

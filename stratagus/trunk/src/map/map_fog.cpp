@@ -249,6 +249,7 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 	case 1:		// Unseen
 	// FIXME: mark for screen update
 	    v = 2;
+	    UnitsMarkSeen(player, x, y);
 	    if (player->Type == PlayerPerson) {
 		corpses = &DestroyedBuildings;
 		while (*corpses) {
@@ -259,7 +260,7 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 			if (x >= unit->X && y >= unit->Y &&
 				x < unit->X+w && y < unit->Y+h) {
 			    unit->Visible &= ~(1 << player->Player);
-			    UnitMarkSeen(unit);
+//			    UnitMarkSeen(unit);
 			}
 		    }
 		    remove = unit;
@@ -273,7 +274,6 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 	    TheMap.Fields[x + y * TheMap.Width].Visible[player->Player] = v;
 	    if (IsTileVisible(ThisPlayer, x, y) > 1) {
 		MapMarkSeenTile(x, y);
-		UnitsMarkSeen(x, y);
 	    }
 
 	    return;
@@ -313,10 +313,11 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 	    DebugCheck(1);
 	    break;
 	case 2:
+	    UnitsUnmarkSeen(player, x, y);
 	    // Check visible Tile, then deduct...
 	    if (IsTileVisible(ThisPlayer, x, y) > 1) {
 		MapMarkSeenTile(x, y);
-		UnitsMarkSeen(x, y);
+		//UnitsMarkSeen(x, y);
 	    }
 	default:		// seen -> seen
 	    v--;
@@ -468,7 +469,7 @@ global void UpdateFogOfWarChange(void)
 	    for (x = 0; x < TheMap.Width; ++x) {
 		if (IsMapFieldExplored(ThisPlayer, x, y)) {
 		    MapMarkSeenTile(x, y);
-		    UnitsMarkSeen(x, y);
+		    //UnitsMarkSeen(x, y);
 		}
 	    }
 	}
