@@ -95,15 +95,30 @@ global void MapFixSeenRockTile(int x, int y)
     //  Find out what each tile has with respect to wood, or grass.
     //
     tile = 0;
-    ttup = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x + (y - 1) * TheMap.Width].SeenTile];
-    ttright = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x + 1 + y  * TheMap.Width].SeenTile];
-    ttdown = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x + (y + 1) * TheMap.Width].SeenTile];
-    ttleft = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x -1 + y * TheMap.Width].SeenTile];
-
+    if (y - 1 < 0) {
+	ttup = 15; //Assign trees in all directions
+    } else {
+	ttup = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x + (y - 1) * TheMap.Width].SeenTile];
+    }
+    if (x + 1 >= TheMap.Width) {
+	ttright = 15; //Assign trees in all directions
+    } else {
+	ttright = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x + 1 + y  * TheMap.Width].SeenTile];
+    }
+    if (y + 1 >= TheMap.Height) {
+	ttdown = 15; //Assign trees in all directions
+    } else {
+	ttdown = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x + (y + 1) * TheMap.Width].SeenTile];
+    }
+    if (x - 1 < 0) {
+	ttleft = 15; //Assign trees in all directions
+    } else {
+	ttleft = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x -1 + y * TheMap.Width].SeenTile];
+    }
     //
     //  Check each of the corners to ensure it has both connecting
     //  ?**?
@@ -228,15 +243,30 @@ global void MapFixRockTile(int x, int y)
     //  Find out what each tile has with respect to wood, or grass.
     //
     tile = 0;
-    ttup = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x + (y - 1) * TheMap.Width].Tile];
-    ttright = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x + 1 + y  * TheMap.Width].Tile];
-    ttdown = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x + (y + 1) * TheMap.Width].Tile];
-    ttleft = TheMap.Tileset->MixedLookupTable[
-	TheMap.Fields[x -1 + y * TheMap.Width].Tile];
-
+    if (y - 1 < 0) {
+	ttup = 15; //Assign trees in all directions
+    } else {
+	ttup = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x + (y - 1) * TheMap.Width].Tile];
+    }
+    if (x + 1 >= TheMap.Width) {
+	ttright = 15; //Assign trees in all directions
+    } else {
+	ttright = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x + 1 + y  * TheMap.Width].Tile];
+    }
+    if (y + 1 >= TheMap.Height) {
+	ttdown = 15; //Assign trees in all directions
+    } else {
+	ttdown = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x + (y + 1) * TheMap.Width].Tile];
+    }
+    if (x - 1 < 0) {
+	ttleft = 15; //Assign trees in all directions
+    } else {
+	ttleft = TheMap.Tileset->MixedLookupTable[
+	    TheMap.Fields[x -1 + y * TheMap.Width].Tile];
+    }
     //
     //  Check each of the corners to ensure it has both connecting
     //  ?**?
