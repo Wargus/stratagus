@@ -1485,6 +1485,7 @@ local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
     
     result = 0;
     *bestunit = 0;
+    bestunitdst = -1;
     unitdst = -1;
     
     // Travel through all units
@@ -1521,6 +1522,7 @@ local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
 	    unit->OrderCount + (unit->OrderFlush?1:0) >= 2 &&
 	    unit->OrderCount < MAX_ORDERS - 1 &&
 	    unit->Orders[unit->OrderFlush ? 1 : 0].Action == UnitActionFollow &&
+	    unit->Orders[unit->OrderFlush ? 1 : 0].Goal &&
 	    unit->Orders[unit->OrderCount - 1].Action == UnitActionUnload &&
 	    unit->InsideCount + unit->OrderCount - (unit->OrderFlush ? 1 : 0) <= unit->Type->MaxOnBoard) {
 		
