@@ -47,9 +47,9 @@
 <a href="pud.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#define-missile-type">define-missile-type</a>
-<a href="#define-spell">define-spell</a>
-<a href="pud.html#define-missiletype-wc-names">define-missiletype-wc-names</a>
+<a href="#DefineMissileType">DefineMissileType</a>
+<a href="#DefineSpell">DefineSpell</a>
+<a href="pud.html#DefineMissileTypeWcNames">DefineMissileTypeWcNames</a>
 <!-- <a href="#missile">missile</a> -->
 <hr>
 <h2>Intro - Introduction to spells and missiles.</h2>
@@ -57,7 +57,7 @@ This containts everything around spells and missiles. Though it might not be
 obvious at start missiles are also suited for complex behaviour and included here.
 
 <h2>Functions</h2>
-<a name="define-missile-type"></a>
+<a name="DefineMissileType"></a>
 
 
 <h3>DefineMissileType( "missile-name", { tag = value, ...} )</h3>
@@ -77,7 +77,6 @@ Possible tags:
 <dd>This if followed by a list of X and Y sizes of the missile sprite.
 F.E. 'size '(32 32)
 </dd>
-<a name="frames-define-missile-type"></a>
 <dt>Frames = number</dt>
 <dd>This is the number of frames in the file. Missiles lack complicated
 animation scripts and just have a bunch of frames with equal duration.
@@ -152,7 +151,6 @@ supported missile classes:<p>
     </dd>
 </dl>
 </dd>
-<a name="delay-define-missile-type"></a>
 <dt>Delay = number</dt>
 <dd>Delay in game cycles after the missile generation, until the missile
 animation and effects starts. Delay denotes the number of display cycles to
@@ -209,10 +207,8 @@ DefineMissileType("missile-fireball",
   Sleep = 1, Speed = 16, Range = 1,
   ImpactMissile = "missile-explosion" } )
 </pre>
-<h4>Used</h4>
-<a href="../../data/scripts/missiles.lua"> $LIBARYPATH/scripts/missiles.lua </a>
 
-<a name="define-spell"></a>
+<a name="DefineSpell"></a>
 <h3>DefineSpell( "spell-ident", tag, value, ... )</h3>
 This is the function to define a spell, including it's effects and targetting
 conditions. Be very carefull, defining random flags will probably make the game crash.
@@ -281,7 +277,7 @@ Here are the supported parameters:<p>
     </dd>
     <dt>bool-flags, "true" or "false" or "only"</dt>
     <dd>There is no parameter called bool-flags. You can however use flags defined
-    by <a href="unittype.html#define-bool-flags">DefineBoolFlags()</a> just like a
+    by <a href="unittype.html#DefineBoolFlags">DefineBoolFlags()</a> just like a
     bool parameter. For instance "organic", "only" will make a spell work only on
     units marked with the "organic" flag.
     </dd>
@@ -447,7 +443,7 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	</dd>
 	How to do a reveal-map spell: define a special unit, give it the 
 	revealer flag, and set the spell's range to "infinite". Please see
-	<a href="unittype.html#define-unit-type">DefineUnitType()</a>
+	<a href="unittype.html#DefineUnitType">DefineUnitType()</a>
 	</dd>
     </dl>
     <dt>"polymorph", tag, ...</dt>
@@ -519,8 +515,6 @@ DefineSpell("spell-healing",
 	"autocast", {"range", 6, "condition", {"alliance", "only", "max-hp-percent", 100}}
 )
 </pre>
-<h4>Used</h4>
-<a href="../../data/scripts/spells.lua"> $LIBARYPATH/scripts/spells.lua </a>
 
 <!-- Useful to explain save format ?
 
@@ -599,9 +593,6 @@ controlling function. No parameters.
     (missile 'type-fireball 'pos '(10 10) 'goal '(10 50)
       'global 'state 0 'wait 5 'damage 5000 'source 45 'ttl -1)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 -->
 

@@ -47,20 +47,20 @@
 <a href="research.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#define-ai-wc-names">define-ai-wc-names</a>
-<a href="#define-construction-wc-names">define-construction-wc-names</a>
-<a href="#define-icon-wc-names">define-icon-wc-names</a>
-<a href="#define-missiletype-wc-names">define-missiletype-wc-names</a>
-<a href="#define-tileset-wc-names">define-tileset-wc-names</a>
-<a href="#define-upgrade-wc-names">define-upgrade-wc-names</a>
-<a href="#define-unittype-wc-names">define-unittype-wc-names</a>
+<a href="#DefineAiWcNames">DefineAiWcNames</a>
+<a href="#DefineConstructionWcNames">DefineConstructionWcNames</a>
+<a href="#DefineIconWcNames">DefineIconWcNames</a>
+<a href="#DefineMissileTypeWcNames">DefineMissileTypeWcNames</a>
+<a href="#DefineTilesetWcNames">DefineTilesetWcNames</a>
+<a href="#DefineUpgradeWcNames">DefineUpgradeWcNames</a>
+<a href="#DefineUnittypeWcNames">DefineUnittypeWcNames</a>
 <hr>
 <h2>Intro - Introduction to function for pud converting</h2>
 This contains everything about converting from wc2.
 <h2>Functions</h2>
 
-<a name="define-ai-wc-names"></a>
-<h3>(define-ai-wc-names 'ai-0 'ai-1 ... )</h3>
+<a name="DefineAiWcNames"></a>
+<h3>DefineAiWcNames( "ai-0", "ai-1", ... )</h3>
 
 Define AI mapping from original number to internal symbol.
 The parameters are simply a list of ai names. The first name coresponds to pud ai number
@@ -69,21 +69,18 @@ The parameters are simply a list of ai names. The first name coresponds to pud a
 <h4>Example</h4>
 
 <pre>
-    (define-ai-wc-names
-      'land-attack 'passive 'orc-03 'hum-04 'orc-04 'hum-05 'orc-05
-      'hum-06 'orc-06 'hum-07 'orc-07 'hum-08 'orc-08 'hum-09 'orc-09
-      'hum-10 'orc-10 'hum-11 'orc-11 'hum-12 'orc-12 'hum-13 'orc-13
-      'hum-14-orange 'orc-14-blue 'sea-attack 'air-attack 'hum-14-red
-      'hum-14-white 'hum-14-black 'orc-14-green 'orc-14-white 'orc-exp-04
-      'orc-exp-05 'orc-exp-07a 'orc-exp-09 'orc-exp-10 'orc-exp-12 'orc-exp-06a
-      'orc-exp-06b 'orc-exp-11a 'orc-exp-11b 'hum-exp-02a-red 'hum-exp-02b-black
-      ...
+    DefineAiWcNames(
+     "land-attack", "passive", "orc-03", "hum-04", "orc-04", "hum-05", "orc-05",
+     "hum-06", "orc-06", "hum-07", "orc-07", "hum-08", "orc-08", "hum-09", "orc-09",
+     "hum-10", "orc-10", "hum-11", "orc-11", "hum-12", "orc-12", "hum-13", "orc-13",
+     "hum-14-orange", "orc-14-blue", "sea-attack", "air-attack", "hum-14-red",
+     "hum-14-white", "hum-14-black", "orc-14-green", "orc-14-white", "orc-exp-04",
+     "orc-exp-05", "orc-exp-07a", "orc-exp-09", "orc-exp-10", "orc-exp-12", "orc-exp-06a",
+     "orc-exp-06b", "orc-exp-11a", "orc-exp-11b", "hum-exp-02a-red", "hum-exp-02b-black")
 </pre>
 
-<h4>Not Used</h4>
-
-<a name="define-construction-wc-names"></a>
-<h3>(define-construction-wc-names 'construction-0 'construction-1 ... )</h3>
+<a name="DefineConstructionWcNames"></a>
+<h3>DefineConstructionWcNames( "construction-0", "construction-1", ... )</h3>
 
 Define construction mapping from original number to internal symbol.
 The parameters are simply a list of construction names. The first name coresponds
@@ -92,12 +89,11 @@ to wc2 construction 0, the second name coresponds to construction 1, and so on.
 <h4>Example</h4>
 
 <pre>
-    (define-construction-wc-names human-shipyard orc-shipyard ... )
+    DefineConstructionWcNames("human-shipyard", "orc-shipyard")
 </pre>
-<h4>Used</h4>
 
-<a name="define-icon-wc-names"></a>
-<h3>(define-icon-wc-names icon-0 icon-1 ... )</h3>
+<a name="DefineIconWcNames"></a>
+<h3>DefineIconWcNames("icon-0", "icon-1", ... )</h3>
 
 Define icon mapping from original number to internal symbol.
 The parameters are simply a list of icon names. The first name coresponds
@@ -108,19 +104,11 @@ to wc2 icon 0, the second name coresponds to icon 1, and so on.<p>
 
 <pre>
     ;; This is the default icon mapping.
-    (define-icon-wc-names 
-      'icon-peasant 'icon-peon 'icon-footman ... )
+    DefineIconWcNames("icon-peasant", "icon-peon", "icon-footman")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
-<a name="define-missiletype-wc-names"></a>
-<h3>(define-missiletype-wc-names)</h3>
+<a name="DefineMissileTypeWcNames"></a>
+<h3>DefineMissileTypeWcNames("missile1", "missile2", ... )</h3>
 
 Define missiletype mapping from original number to internal symbol.
 The parameters are simply a list of missile names. The first name coresponds
@@ -129,14 +117,11 @@ to wc2 missile 0, the second name coresponds to missile 1, and so on.
 <h4>Example</h4>
 
 <pre>
-    (define-missiletype-wc-names lightning griffon-hammer ... )
+    DefineMissileTypeWcNames("missile-lightning", "missile-griffon-hammer")
 </pre>
-<h4>Used</h4>
 
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
-<a name="define-tileset-wc-names"></a>
-<h3>(define-tileset-wc-names tileset-0 tileset-1 ... )</h3>
+<a name="DefineTilesetWcNames"></a>
+<h3>DefineTilesetWcNames("tileset-0", "tileset-1", ... )</h3>
 
     Define tileset mapping from original number to internal symbol.
     This is FIXED to 4 tileset, bad.
@@ -159,17 +144,12 @@ to wc2 missile 0, the second name coresponds to missile 1, and so on.
 <h4>Example</h4>
 
 <pre>
-    ;; This is the default tileset mapping.
-    (define-tileset-wc-names 
-      'tileset-summer 'tileset-winter 'tileset-wasteland 'tileset-swamp )
+    -- This is the default tileset mapping.
+    DefineTilesetWcNames("tileset-summer", "tileset-winter", "tileset-wasteland", "tileset-swamp")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
-
-<a name="define-upgrade-wc-names"></a>
-<h3>(define-upgrade-wc-names upgrade-0 upgrade-1 ... )</h3>
+<a name="DefineUpgradeWcNames"></a>
+<h3>DefineUpgradeWcNames("upgrade-0", "upgrade-1", ... )</h3>
 
 Define upgrade mapping from original number to internal symbol.
 The parameters are simply a list of upgrade names. The first name coresponds
@@ -178,16 +158,11 @@ to wc2 upgrade 0, the second name coresponds to upgrade 1, and so on.
 <h4>Example</h4>
 
 <pre>
-    (define-upgrade-wc-names 'upgrade-sword1 'upgrade-sword2 ...)
+    DefineUpgradeWcNames("upgrade-sword1", "upgrade-sword2")
 </pre>
-<h4>Used</h4>
 
-<a href="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</a> ,
-<a href="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</a> ,
-<a href="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</a>
-
-<a name="define-unittype-wc-names"></a>
-<h3>(define-unittype-wc-names unit-0 unit-1 ... )</h3>
+<a name="DefineUnitTypeWcNames"></a>
+<h3>DefineUnitTypeWcNames("unit-0", "unit-1", ... )</h3>
 
 Define unit-type mapping from original number to internal symbol.
 The parameters are simply a list of upgrade names. The first name coresponds
@@ -196,11 +171,8 @@ to wc2 unit 0, the second name coresponds to wc2 unit 1, and so on.
 <h4>Example</h4>
 
 <pre>
-    (define-unittype-wc-names unit-footman unit-grunt ... )
+    DefineUnitTypeWcNames("unit-footman", "unit-grunt")
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/wc2.ccl"> $LIBRARYPATH/ccl/wc2.ccl </a>
 
 <hr>
 Last changed: $Id$<br>
