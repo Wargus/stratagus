@@ -1514,7 +1514,7 @@ global void UIHandleButtonUp(unsigned button)
 	    // FIXME: Not if, in input mode.
 	    GamePaused=1;
 	    SetStatusLine("Game Paused");
-	    ProcessMenu(MENU_GAME, 1);
+	    ProcessMenu("menu-game", 1);
 	    return;
 	}
     }

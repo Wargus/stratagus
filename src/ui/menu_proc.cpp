@@ -107,14 +107,14 @@ local int MenuButtonCurSel = -1;
 **
 **	@param menu_id	Unique identifier for the menu.
 **
-**	@return		Pointer to the menu.
+**	@return		Pointer to the menu, NULL if menu is not found.
 */
-global Menu *FindMenu(const char *MenuId)
+global Menu* FindMenu(const char* menu_id)
 {
     Menu **menu;
 
-    menu = (Menu **) hash_find(MenuHash, (char *)MenuId);
-    if (menu == NULL) {
+    if (!(menu = (Menu **) hash_find(MenuHash, (char *)menu_id))) {
+	DebugLevel0Fn("Menu `%s' not found, probably a bug.\n" _C_ menu_id);
 	return NULL;
     } else {
 	return *menu;

@@ -46,6 +46,7 @@
 #include "campaign.h"
 #include "menus.h"
 #include "sound.h"
+#include "pud.h"
 
 #include "ccl.h"
 
@@ -692,7 +693,7 @@ local void EditorCallbackButtonUp(unsigned button)
     if( (1<<button) == LeftButton && GameMenuButtonClicked==1 ) {
 	GameMenuButtonClicked=0;
 	if( ButtonUnderCursor==0 ) {
-	    ProcessMenu(MENU_EDITOR,1);
+	    ProcessMenu("menu-editor",1);
 	}
     }
 }
@@ -846,6 +847,14 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
     }
 
     switch (key) {
+	case 's':			// ALT s F11 save pud menu
+	case 'S':
+	case KeyCodeF11:
+	    //UiEnterSaveGameMenu();
+	    SavePud("freecraft.pud.gz",&TheMap);
+	    SetStatusLine("Pud saved");
+	    break;
+
 	case 'v':		// 'v' Viewport
 	    if (KeyModifiers & ModifierControl) {
 		CycleViewportMode(-1);
@@ -866,7 +875,7 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	    break;
 
 	case KeyCodeF10:
-	    ProcessMenu(MENU_EDITOR,1);
+	    ProcessMenu("menu-editor",1);
 	    break;
 
 	case KeyCodeUp:		// Keyboard scrolling
