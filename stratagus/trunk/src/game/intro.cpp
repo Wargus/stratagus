@@ -837,21 +837,23 @@ local int GameStatsDrawFunc(int frame)
     draw_all=0;
 #endif
 
+#ifndef USE_OPENGL
     // If a button was pressed draw everything
     if( IntroButtonPressed ) {
 	draw_all=1;
-	dodraw=99;
     }
+#endif
 
-    percent=100;
     done=0;
 
     if( !draw_all && (frame%stats_pause)!=0 ) {
 	return done;
     }
 
+    percent=100;
     x=TheUI.Offset640X;
     y=TheUI.Offset480Y;
+    dodraw=99;
     if( !IntroButtonPressed ) {
 	dodraw=frame/stats_pause;
     }
