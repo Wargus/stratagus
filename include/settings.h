@@ -10,7 +10,7 @@
 //
 /**@name settings.h - The game settings headerfile. */
 //
-//      (c) Copyright 2000-2004 by Andreas Arens and Jimmy Salmon
+//      (c) Copyright 2000-2005 by Andreas Arens and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ typedef struct _settings_ {
 #define SettingsSinglePlayerGame  1
 #define SettingsMultiPlayerGame   2
 
-/*
+/**
 **  Resource-Preset factor
 */
 #define SettingsResourcesMapDefault  SettingsPresetMapDefault
@@ -91,13 +91,13 @@ typedef struct _settings_ {
 #define SettingsResourcesMedium  1
 #define SettingsResourcesHigh    2
 
-/*
+/**
 **  NumUnits start settings
 */
 #define SettingsNumUnitsMapDefault  SettingsPresetMapDefault
 #define SettingsNumUnits1    0
 
-/*
+/**
 **  GameType settings
 */
 enum _game_types_ {
