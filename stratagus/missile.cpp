@@ -1395,7 +1395,7 @@ local void SaveMissile(const Missile* missile, CLFile* file)
 	CLprintf(file, " \"step\", {%d, %d},",
 		missile->CurrentStep, missile->TotalStep);
 
-	CLprintf(file, " \"%s\",", missile->Local ? "local" : "global");
+	CLprintf(file, " \"%s\"", missile->Local ? "local" : "global");
 	// MissileSlot filled in during init
 
 	CLprintf(file, ")\n");
