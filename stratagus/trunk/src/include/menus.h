@@ -86,31 +86,32 @@ typedef struct _menuitem_ {
     union {
 	struct {
 	    unsigned char *text;
-	    unsigned tflags;
+	    unsigned int tflags;
 	} text;
 	struct {
 	    unsigned char *text;
-	    unsigned xsize;
-	    unsigned ysize;
+	    unsigned int xsize;
+	    unsigned int ysize;
 	    MenuButtonId button;
 	    void (*handler)(void);
 	    int hotkey;
 	} button;
 	struct {
 	    unsigned char **options;
-	    unsigned xsize;
-	    unsigned ysize;
+	    unsigned int xsize;
+	    unsigned int ysize;
 	    MenuButtonId button;
 	    void (*action)(struct _menuitem_ *, int);
 	    int noptions;
 	    int defopt;
 	    int curopt;
 	    int cursel;		/* used in popup state */
+	    unsigned int state;
 	} pulldown;
 	struct {
 	    void *options;
-	    unsigned xsize;
-	    unsigned ysize;
+	    unsigned int xsize;
+	    unsigned int ysize;
 	    MenuButtonId button;
 	    void (*action)(struct _menuitem_ *, int);
 	    int noptions;
@@ -124,8 +125,8 @@ typedef struct _menuitem_ {
 	} listbox;
 	struct {
 	    unsigned cflags;
-	    unsigned xsize;
-	    unsigned ysize;
+	    unsigned int xsize;
+	    unsigned int ysize;
 	    void (*action)(struct _menuitem_ *, int);
 	    int defper;
 	    int percent;
@@ -138,17 +139,17 @@ typedef struct _menuitem_ {
 	} drawfunc;
 	struct {
 	    unsigned char *buffer;
-	    unsigned xsize;
-	    unsigned ysize;
+	    unsigned int xsize;
+	    unsigned int ysize;
 	    MenuButtonId button;
 	    void (*action)(struct _menuitem_ *, int);	/* for key */
 	    int nch;
 	    int maxch;
 	} input;
 	struct {
-	    unsigned state;
-	    unsigned xsize;
-	    unsigned ysize;
+	    unsigned int state;
+	    unsigned int xsize;
+	    unsigned int ysize;
 	    MenuButtonId button;
 	    void (*action)(struct _menuitem_ *);
 	} gem;
@@ -178,19 +179,22 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_KNOB 4
 #define MI_CFLAGS_CONT 8
 
+    /// for MI_TYPE_PULLDOWN
+#define MI_PSTATE_PASSIVE 1
+
     /// for MI_TYPE_GEM
-#define MI_GSTATE_CHECKED 1
+#define MI_GSTATE_PASSIVE 1
 #define MI_GSTATE_INVISIBLE 2
-#define MI_GSTATE_PASSIVE 4
+#define MI_GSTATE_CHECKED 4
 
 /**
 **	Menu definition.
 */
 typedef struct _menus_ {
-    unsigned x;				/// menu area x pos
-    unsigned y;				/// menu area y pos
-    unsigned xsize;			/// menu area x size
-    unsigned ysize;			/// menu area y size
+    unsigned int x;			/// menu area x pos
+    unsigned int y;			/// menu area y pos
+    unsigned int xsize;			/// menu area x size
+    unsigned int ysize;			/// menu area y size
     int	image;				/// optional background panel image #
     int defsel;				/// initial selected item number (or -1)
     int nitems;				/// number of items to follow
@@ -211,7 +215,7 @@ typedef struct _menus_ {
 #define MENU_NET_ENTER_SERVER_IP 9
 #define MENU_NET_MULTI_CLIENT 10
 #define MENU_NET_CONNECTING 11
-#define MENU_MAX 10			/// highest available menu id (for ccl)
+#define MENU_MAX 11			/// highest available menu id (for ccl)
 
 /// FIXME: FILL IN THIS TABLE!!!!
 

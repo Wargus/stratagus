@@ -720,7 +720,6 @@ global void NetworkInitServerConnect(void)
 	Hosts[i].PlyNr = 0;		/// slotnr until final cfg msg
 	memset(Hosts[i].PlyName, 0, 16);
     }
-    NetLocalState = scs_waiting;
 
     HostsCount = 0;
     /// preset the server (always slot 0)
@@ -736,9 +735,25 @@ global void NetworkExitServerConnect(void)
     NetConnectRunning = 0;
 }
 
+/**
+**	Notify state change by menu user to connected clients
+*/
+global void NetworkServerResyncClients(void)
+{
+    int i;
+
+    if (NetConnectRunning) {
+	for (i = 1; i < NetPlayers; ++i) {
+	    if (Hosts[i].PlyNr && NetStates[i].State == ccs_synced) {
+		NetStates[i].State = ccs_async;
+	    }
+	}
+    }
+}
+
 
 /**
-**	Menu Loop: Send out client request messages
+**	Client Menu Loop: Send out client request messages
 */
 global void NetworkProcessClientRequest(void)
 {
@@ -771,6 +786,16 @@ global void NetworkProcessClientRequest(void)
 	    message.Type = MessageInitHello;
 	    message.SubType = ICMWaiting;
 	    NetworkSendRateLimitedClientMessage(&message, 850);
+	    break;
+	case ccs_async:
+	    if (NetStateMsgCnt < 20) {						/// 20 retries 
+		message.Type = MessageInitHello;
+		message.SubType = ICMResync;
+		NetworkSendRateLimitedClientMessage(&message, 450);
+	    } else {
+		NetLocalState = ccs_unreachable;			
+		NetConnectRunning = 0;	/// End the menu..
+	    }
 	    break;
 	case ccs_mapinfo:
 	    if (NetStateMsgCnt < 20 && ScenSelectPudInfo != NULL) {		/// 20 retries 
@@ -936,6 +961,34 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		    break;
 
 		case ccs_synced:
+		    switch(msg->SubType) {
+
+			case ICMState:		/// Server has sent us new state info
+			    DebugLevel3Fn("ccs_synced: New State subtype %d received - resynching\n",msg->SubType);
+			    ServerSetupState = msg->u.State;
+			    NetClientUpdateState();
+			    NetLocalState = ccs_async;
+			    break;
+
+			default:
+			    DebugLevel0Fn("ccs_synced: Unhandled subtype %d\n",msg->SubType);
+			    break;
+		    }
+		    break;
+
+		case ccs_async:
+		    switch(msg->SubType) {
+
+			case ICMResync:		/// Server has resynced with us
+			    NetLocalState = ccs_synced;
+			    break;
+
+			default:
+			    DebugLevel0Fn("ccs_async: Unhandled subtype %d\n",msg->SubType);
+			    break;
+		    }
+		    break;
+
 		default:
 		    DebugLevel0Fn("Client: Unhandled state %d\n", NetLocalState);
 		    break;
@@ -1035,6 +1088,44 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		NetConnectForceDisplayUpdate();
 		return;
 
+	    case ICMResync:
+		// look up the host
+		for (h = 0; h < HostsCount; ++h) {
+		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+			switch (NetStates[h].State) {
+			    /// client has recvd welcome and is waiting for info
+			    case ccs_async:
+				NetStates[h].State = ccs_synced;
+				NetStates[h].MsgCnt = 0;
+				/* Fall through */
+			    case ccs_synced:
+				/// this code path happens until client falls back to ICMWaiting
+				/// (indicating Resync has completed)
+				message.Type = MessageInitReply;
+				message.SubType = ICMResync;
+				message.HostsCount = (char)(HostsCount & 0xff);
+				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+				DebugLevel0Fn("Sending InitReply Message Resync: (%d) to %d.%d.%d.%d:%d\n",
+					    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+				NetStates[h].MsgCnt++;
+				if (NetStates[h].MsgCnt > 50) {
+				    // FIXME: Client sends resync, but doesn't receive our resync ack....
+				    ;
+				}
+				break;
+
+			    default:
+				DebugLevel0Fn("Server: ICMResync: Unhandled state %d Host %d\n",
+								 NetStates[h].State, h);
+				break;
+			}
+			break;
+		    }
+		}
+		break;
+		DebugLevel0Fn("Server: Unhandled subtype %d\n",msg->SubType);
+		break;
+
 	    case ICMWaiting:
 		// look up the host
 		for (h = 0; h < HostsCount; ++h) {
@@ -1056,7 +1147,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 				DebugLevel0Fn("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n",
-					    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+					    n, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 				NetStates[h].MsgCnt++;
 				if (NetStates[h].MsgCnt > 50) {
 				    // FIXME: Client sends waiting, but doesn't receive our map....
@@ -1069,6 +1160,27 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				/* Fall through */
 			    case ccs_synced:
 				/// the wanted state - do nothing.. until start...
+				NetStates[h].MsgCnt = 0;
+				break;
+
+			    case ccs_async:
+				/// Server User has changed menu selection. This state is set by MENU code
+				
+				/// this code path happens until client acknoledges the state change
+				/// by sending ICMResync
+				message.Type = MessageInitReply;
+				message.SubType = ICMState;		/// Send new state info to the client
+				message.u.State = ServerSetupState;
+				message.HostsCount = (char)(HostsCount & 0xff);
+				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n",
+					    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+				NetStates[h].MsgCnt++;
+				if (NetStates[h].MsgCnt > 50) {
+				    // FIXME: Client sends waiting, but doesn't receive our state info....
+				    ;
+				}
 				break;
 
 			    default:
