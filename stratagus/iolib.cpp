@@ -369,7 +369,7 @@ local int flqcmp(const void *v1, const void *v2)
     const FileList *c1 = v1, *c2 = v2;
 
     if (c1->type == c2->type)
-	return strcmp(c2->name, c1->name);
+	return strcmp(c1->name, c2->name);
     else
 	return c2->type - c1->type;
 }
