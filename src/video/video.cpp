@@ -445,7 +445,7 @@ global VMemType* VideoCreateSharedPalette(const Palette* palette)
 /**
 **	Free a shared hardware palette.
 **
-**	@param pixel	palette in hardware dependend format
+**	@param pixels	palette in hardware dependend format
 */
 global void VideoFreeSharedPalette(VMemType* pixels)
 {
