@@ -175,7 +175,7 @@ MissileType* MissileTypeByIdent(const char* ident)
 	MissileType* const* mtype;
 
 	mtype = (MissileType**)hash_find(MissileTypeHash, (char*)ident);
-	return mtype ? *mtype : 0;
+	return mtype ? *mtype : NULL;
 }
 
 /**
@@ -190,9 +190,8 @@ MissileType* NewMissileTypeSlot(char* ident)
 	MissileType* mtype;
 	int i;
 
-	MissileTypes = realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType *));
-	mtype = MissileTypes[NumMissileTypes++] = (MissileType *)malloc(sizeof(MissileType));
-	memset(mtype, 0, sizeof(MissileType));
+	MissileTypes = realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType*));
+	mtype = MissileTypes[NumMissileTypes++] = (MissileType*)calloc(1, sizeof(MissileType));
 	mtype->Ident = ident;
 
 	// Rehash.
@@ -220,7 +219,6 @@ static Missile* NewGlobalMissile(void)
 	}
 
 	missile = calloc(1, sizeof(Missile));
-	memset(missile, 0, sizeof (*missile));
 	missile->MissileSlot = GlobalMissiles + NumGlobalMissiles;
 	GlobalMissiles[NumGlobalMissiles++] = missile;
 
@@ -244,7 +242,6 @@ static Missile* NewLocalMissile(void)
 	}
 
 	missile = calloc(1, sizeof(Missile));
-	memset(missile, 0, sizeof(*missile));
 	missile->MissileSlot = LocalMissiles + NumLocalMissiles;
 	LocalMissiles[NumLocalMissiles++] = missile;
 	missile->Local = 1;
@@ -398,8 +395,8 @@ static int CalculateDamageStats(const UnitStats* attacker_stats,
 	int basic_damage;
 	int piercing_damage;
 
-	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value
-					+ isqrt(xp / 100) * XpDamage;
+	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value +
+		isqrt(xp / 100) * XpDamage;
 	piercing_damage = attacker_stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 	if (bloodlust) {
 		basic_damage *= 2;
@@ -418,16 +415,16 @@ static int CalculateDamageStats(const UnitStats* attacker_stats,
 /**
 **  Calculate damage.
 **
-**  @param attacker        Attacker.
-**  @param goal            Goal unit.
-**  @param bloodlust       If attacker has bloodlust
-**  @param xp              Experience of attack.
+**  @param attacker   Attacker.
+**  @param goal       Goal unit.
+**  @param bloodlust  If attacker has bloodlust
+**  @param xp         Experience of attack.
 **
-**  @return                damage produces on goal.
+**  @return           damage produces on goal.
 */
 static int CalculateDamage(const Unit* attacker, const Unit* goal)
 {
-	int res;  // result.
+	int res;
 
 	Assert(attacker);
 	Assert(goal);
@@ -438,10 +435,10 @@ static int CalculateDamage(const Unit* attacker, const Unit* goal)
 	}
 	Assert(Damage);
 
-	UpdateUnitVariables((Unit *) attacker);
-	UpdateUnitVariables((Unit *) goal);
-	TriggerData.Attacker = (Unit *) attacker;
-	TriggerData.Defender = (Unit *) goal;
+	UpdateUnitVariables((Unit*)attacker);
+	UpdateUnitVariables((Unit*)goal);
+	TriggerData.Attacker = (Unit*)attacker;
+	TriggerData.Defender = (Unit*)goal;
 	res = EvalNumber(Damage);
 	TriggerData.Attacker = NULL;
 	TriggerData.Defender = NULL;
@@ -1160,7 +1157,8 @@ static void MissilesActionLoop(Missile** missiles)
 	// NOTE: missiles[??] could be modified!!! Yes (freed)
 	//
 	while ((missile = *missiles)) {
-		if (missile->Delay && missile->Delay--) {
+		if (missile->Delay) {
+			missile->Delay--;
 			++missiles;
 			continue;  // delay start of missile
 		}
