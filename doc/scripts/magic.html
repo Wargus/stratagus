@@ -98,25 +98,59 @@ value to determine the draw order.
 <dt>class</dt>
 <dd>Various missiles can have wierd behaviours. This tag is followed by an 
 identifier that specifies some of that behaviour. Here is a list of currently
-supported missile classes:
-<ul>
-    <li>missile-class-none 
-    <li>missile-class-point-to-point 
-    <li>missile-class-point-to-point-with-delay 
-    <li>missile-class-stay-with-delay 
-    <li>missile-class-point-to-point-3bounces 
-    <li>missile-class-fireball 
-    <li>missile-class-flame-shield 
-    <li>missile-class-blizzard 
-    <li>missile-class-death-decay 
-    <li>missile-class-whirlwind 
-    <li>missile-class-cycle-once 
-    <li>missile-class-point-to-point-with-hit 
-    <li>missile-class-fire 
-    <li>missile-class-custom 
-    <li>missile-class-hit 
-</ul>
-FIXME: add documentation for each missile behaviour
+supported missile classes:<p>
+<dl>
+    <dt>missile-class-none</dt>
+    <dd>Missile does nothing. Shouldn't really be used.
+    </dd>
+    <dt>missile-class-point-to-point </dt>
+    <dd>Missile flies straight to destination animating on the way
+    </dd>
+    <dt>missile-class-point-to-point-with-hit </dt>
+    <dd>Missile flies straight to destination keeping the first frame and
+    the finishes the animation when hitting
+    </dd>
+    <dt>missile-class-point-to-point-cycle-once </dt>
+    <dd>Missile flies straight to destination and animates ONCE from first
+    to last and back again. To be used for catapult and the like to make a
+    projectile bigger mid-way to the target
+    </dd>
+    <dt>missile-class-point-to-point-bounce</dt>
+    <dl>Missile flies straight to destination, and the "bounces" by hitting
+	every other tile on the path onward. This will also add one aditional flag:
+	<dt>num-bounces</dt>
+	<dd>This if folowed by an integer, representing the number of bounces(hits)</dd>
+    </dl>
+    <dt>missile-class-stay</dt>
+    <dd>Missile will just go through it's animation once and vanish. booooring.
+    </dd>
+    <dt>missile-class-cycle-once </dt>
+    <dd>Missile will just go through it's animation from start to and and back
+    again, then vanish.
+    </dd>
+    <dt>missile-class-fire </dt>
+    <dd>Missile is used for fire. More documentation?
+    </dd>
+    <dt>missile-class-parabolic</dt>
+    <dd>Missile flies to destination with a parabolic path. It used the same
+    animation as cycle-once
+    </dd>
+    <dt>missile-class-land-mine</dt>
+    <dd>Missile is a landmine, it will sit quietly and wait for someone to step
+    on it. You can use time-to-live as a timeout.<b>FIXME more configurable</b>
+    </dd>
+    <dt>missile-class-whirlwind </dt>
+    <dd>Missile for the whirlwind effect <b>FIXME more configurable</b>
+    </dd>
+    <dt>missile-class-flame-shield </dt>
+    <dd>Missile rotates around target unit and damages everything it touches
+    <b>FIXME more configurable</b>
+    </dd>
+    <dt>missile-class-death-coil</dt>
+    <dd>Missile is death coil, will drain health from target or enemy units
+    in the area and feed it to the caster.<b>FIXME more configurable</b>
+    </dd>
+</dl>
 </dd>
 <a name="delay-define-missile-type"></a>
 <dt>delay</dt>

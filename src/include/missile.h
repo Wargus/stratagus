@@ -119,8 +119,12 @@
 **		Class of the missile-type, defines the basic effects of the
 **		missile. Look at the different class identifiers for more
 **		informations (::_missile_class_, ::MissileClassNone, ...).
-**		This isn't used if the missile is handled by
-**		Missile::Controller.
+**
+**	MissileType::NumBounces
+**
+**		This is the number of bounces, and it is only valid with
+**		MissileClassBounce. The missile will hit this many times in
+**		a row.
 **
 **	MissileType::StartDelay
 **
@@ -144,7 +148,7 @@
 **		move, 1 is the slowest speed and 32 s the fastest supported
 **		speed. This is how many pixels the missiles moves with each
 **		animation step.  The real use of this member depends on the
-**		MissileType::Class or Missile::Controller.
+**		MissileType::Class
 **		@note This is currently only used by the point-to-point
 **		missiles (::MissileClassPointToPoint, ...).  Perhaps we should
 **		later allow animation scripts for more complex animations.
@@ -207,7 +211,7 @@
 **		Missile destination on the map in pixels.  If
 **		Missile::X==Missile::DX and Missile::Y==Missile::DY the missile
 **		stays at its position.  But the movement also depends on
-**		the Missile::Controller or MissileType::Class.
+**		MissileType::Class.
 **
 **	Missile::Type
 **
@@ -220,14 +224,18 @@
 **		to MissileType::SpriteFrames-1.  The topmost bit (128) is
 **		used as flag to mirror the sprites in X direction.
 **		Animation scripts aren't currently supported for missiles,
-**		everything is handled by the MissileType::Class or
-**		Missile::Controller.
+**		everything is handled by MissileType::Class
 **		@note If wanted, we can add animation scripts support to the
 **		engine.
 **
 **	Missile::State
 **
 **		Current state of the missile.  Used for a simple state machine.
+**
+**	Missile::AnimWait
+**
+**		Animation wait. Used internally by missile actions, to run the
+**		animation in paralel with the rest.
 **
 **	Missile::Wait
 **
@@ -240,8 +248,8 @@
 **		Number of game cycles the missile isn't shown on the map.
 **		This counts down from MissileType::StartDelay to 0, before this
 **		happens the missile isn't shown and has no effects.
-**		@note This can also be used by MissileType::Class or
-**		Missile::Controller for temporary removement of the missile.
+**		@note This can also be used by MissileType::Class
+**		for temporary removement of the missile.
 **
 **	Missile::SourceUnit
 **
@@ -265,7 +273,7 @@
 **		Time to live in game cycles of the missile, if it reaches zero
 **		the missile is automatic removed from the map. If -1 the
 **		missile lives for ever and the lifetime is handled by
-**		Missile::Type:MissileType::Class or Missile::Controller.
+**		Missile::Type:MissileType::Class
 **
 **	Missile::Controller
 **
@@ -342,75 +350,34 @@ typedef int MissileClass;
 **      FIXME:  We need no class or no controller.
 */
 enum _missile_class_ {
-	/**
-	**      Missile does nothing
-	*/
+	//      Missile does nothing
 	MissileClassNone,
-	/**
-	**      Missile flies from x,y to x1,y1
-	*/
+	//      Missile flies from x,y to x1,y1
 	MissileClassPointToPoint,
-	/**
-	**      Missile flies from x,y to x1,y1 and stays there for a moment
-	*/
-	MissileClassPointToPointWithDelay,
-	/**
-	**      Missile don't move, than disappears
-	*/
-	MissileClassStayWithDelay,
-	/**
-	**      Missile flies from x,y to x1,y1 than bounces three times.
-	*/
-	MissileClassPointToPoint3Bounces,
-	/**
-	**      Missile flies from x,y to x1,y1 than changes into flame shield
-	*/
-	MissileClassFireball,
-	/**
-	**      Missile surround x,y
-	*/
-	MissileClassFlameShield,
-	/**
-	**      Missile appears at x,y, is blizzard
-	*/
-	MissileClassBlizzard,
-	/**
-	**      Missile appears at x,y, is death and decay
-	*/
-	MissileClassDeathDecay,
-	/**
-	**      Missile appears at x,y, is whirlwind
-	*/
-	MissileClassWhirlwind,
-	/**
-	**      Missile appears at x,y, than cycle through the frames up and
-	**      down.
-	*/
-	MissileClassCycleOnce,
-	/**
-	**      Missile flies from x,y to x1,y1 than shows hit animation.
-	*/
+	//      Missile flies from x,y to x1,y1 than shows hit animation.
 	MissileClassPointToPointWithHit,
-	/**
-	**      Missile don't move, than checks the source unit for HP.
-	*/
+	//      Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
+	MissileClassPointToPointCycleOnce,
+	//      Missile flies from x,y to x1,y1 than bounces three times.
+	MissileClassPointToPointBounce,
+	//      Missile appears at x,y, does it's anim and vanishes.
+	MissileClassStay,
+	//      Missile appears at x,y, then cycle through the frames once.
+	MissileClassCycleOnce,
+	//      Missile doesn't move, than checks the source unit for HP.
 	MissileClassFire,
-	/**
-	**      Missile is controlled completely by Controller() function.
-	*/
-	MissileClassCustom,
-	/**
-	**      Missile shows the hit points.
-	*/
+	//      Missile shows the hit points.
 	MissileClassHit,
-	/**
-	**	Missile flies from x,y to x1,y1 using a parabolic path
-	*/
+	//	Missile flies from x,y to x1,y1 using a parabolic path
 	MissileClassParabolic,
-	/**
-	**	Missile wait on x,1 until a non-air unit comes by, the explodes.
-	*/
+	//	Missile wait on x,y until a non-air unit comes by, the explodes.
 	MissileClassLandMine,
+	//      Missile appears at x,y, is whirlwind
+	MissileClassWhirlwind,
+	//      Missile surround x,y
+	MissileClassFlameShield,
+	//      Missile is death coil. 
+	MissileClassDeathCoil
 };
 
     ///		Base structure of missile-types
@@ -434,6 +401,7 @@ struct _missile_type_ {
     unsigned	FriendlyFire : 1;	/// missile can't hit own units
 
     MissileClass	Class;		/// missile class
+    int		NumBounces;		/// number of bounces
     int		StartDelay;		/// missile start delay
     int		Sleep;			/// missile sleep
     int		Speed;			/// missile speed
@@ -465,6 +433,7 @@ struct _missile_ {
     MissileType*Type;			/// missile-type pointer
     int		SpriteFrame;		/// sprite frame counter
     int		State;			/// state
+    int		AnimWait;		/// Animation wait.
     int		Wait;			/// delay between frames
     int		Delay;			/// delay to showup
 
@@ -474,7 +443,6 @@ struct _missile_ {
     int		Damage;			/// direct damage that missile applies
 
     int		TTL;			/// time to live (ticks) used for spells
-    FuncController *Controller;		/// used to controll spells
 
 // Internal use:
     int		D;			/// for point to point missiles
@@ -562,23 +530,20 @@ extern void InitMissiles(void);
     /// Clean missiles
 extern void CleanMissiles(void);
 
-FuncController SpellDeathCoilController;
-FuncController SpellFireballController;
-FuncController SpellFlameShieldController;
-FuncController SpellRunesController;
-FuncController SpellWhirlwindController;
-
 FuncController MissileActionNone;
 FuncController MissileActionPointToPoint;
-FuncController MissileActionPointToPointWithDelay;
-FuncController MissileActionStayWithDelay;
-FuncController MissileActionPointToPoint3Bounces;
-FuncController MissileActionCycleOnce;
 FuncController MissileActionPointToPointWithHit;
+FuncController MissileActionPointToPointCycleOnce;
+FuncController MissileActionPointToPointBounce;
+FuncController MissileActionStay;
+FuncController MissileActionCycleOnce;
 FuncController MissileActionFire;
 FuncController MissileActionHit;
 FuncController MissileActionParabolic;
 FuncController MissileActionLandMine;
+FuncController MissileActionWhirlwind;
+FuncController MissileActionFlameShield;
+FuncController MissileActionDeathCoil;
 
 //@}
 
