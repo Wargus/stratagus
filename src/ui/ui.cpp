@@ -451,6 +451,96 @@ global int MapTileGetViewport (int tx, int ty)
 }
 
 /**
+**	Takes an array of new Viewports which are supposed to have their
+**	pixel geometry (Viewport::[XY] and Viewport::End[XY]) already
+**	computed. Using this information as well as old viewport's
+**	parameters fills in new viewports' Viewport::Map* parameters.
+**	Then it replaces the old viewports with the new ones and finishes
+**	the set-up of the new mode.
+**
+**	@param new_vps	The array of the new viewports
+**	@param num_vps	The number of elements in the new_vps[] array.
+*/
+local void FinishViewportModeConfiguration (Viewport new_vps[], int num_vps)
+{
+    int i, active;
+
+    /* If the number of viewports increases we need to compute what to display
+     * in the newly created ones.  We need to do this before we store new
+     * geometry information in the TheUI.VP field because we use the old
+     * geometry information for map origin computation.
+     */
+    if (TheUI.NumViewports < num_vps) {
+	for (i=0; i < num_vps; i++) {
+	    int v = GetViewport (new_vps[i].X, new_vps[i].Y);
+
+	    TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
+	    TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
+	}
+    }
+
+    for (i=0; i < num_vps; i++) {
+	TheUI.VP[i].X = new_vps[i].X;
+	TheUI.VP[i].EndX = new_vps[i].EndX;
+	TheUI.VP[i].Y = new_vps[i].Y;
+	TheUI.VP[i].EndY = new_vps[i].EndY;
+	TheUI.VP[i].MapWidth = (new_vps[i].EndX - new_vps[i].X + TileSizeX) /
+		TileSizeX;
+	TheUI.VP[i].MapHeight = (new_vps[i].EndY - new_vps[i].Y + TileSizeY) /
+		TileSizeY;
+
+	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width)
+	    TheUI.VP[i].MapX -= (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) -
+					TheMap.Width;
+	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height)
+	    TheUI.VP[i].MapY -= (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) -
+					TheMap.Height;
+    }
+    TheUI.NumViewports = num_vps;
+    active = GetViewport (CursorX, CursorY);
+    if (active != -1)
+	TheUI.ActiveViewport = active;
+    if (TheUI.LastClickedVP >= TheUI.NumViewports)
+	TheUI.LastClickedVP = TheUI.NumViewports - 1;
+}
+
+/**
+**	Takes a viewport which is supposed to have its Viewport::[XY]
+**	correctly filled-in and computes Viewport::End[XY] attributes
+**	according to clipping information passed in other two arguments.
+**
+**	@param v	The viewport.
+**	@param ClipX	Maximum x-coordinate of the viewport's right side
+**			as dictated by current UI's geometry and ViewportMode.
+**	@param ClipY	Maximum y-coordinate of the viewport's bottom side
+**			as dictated by current UI's geometry and ViewportMode.
+**
+**	@note		It is supposed that values passed in Clip[XY] will
+**			never be greater than TheUI::MapArea::End[XY].
+**			However, they can be smaller according to the place
+**			the viewport v takes in context of current ViewportMode.
+*/
+local void ClipViewport (Viewport *v, int ClipX, int ClipY)
+{
+    // begin with maximum possible viewport size
+    v->EndX = v->X + TheMap.Width * TileSizeX - 1;
+    v->EndY = v->Y + TheMap.Height * TileSizeY - 1;
+
+    // first clip it to MapArea size if necessary
+    if (v->EndX > ClipX) {
+	v->EndX = ClipX;
+    }
+    // then clip it to the nearest lower TileSize boundary if necessary
+    v->EndX -= (v->EndX - v->X + 1) % TileSizeX;
+
+    // the same for y
+    if (v->EndY > ClipY) {
+	v->EndY = ClipY;
+    }
+    v->EndY -= (v->EndY - v->Y + 1) % TileSizeY;
+}
+
+/**
 **	Compute viewport parameters for single viewport mode.
 **
 **	The parameters 	include viewport's width and height expressed
@@ -460,42 +550,15 @@ global int MapTileGetViewport (int tx, int ty)
 */
 local void SetViewportModeSingle (void)
 {
+    Viewport new_vps[MAX_NUM_VIEWPORTS];
+
     DebugLevel0 ("Single viewport set\n");
 
-    TheUI.NumViewports = 1;
+    new_vps[0].X = TheUI.MapArea.X;
+    new_vps[0].Y = TheUI.MapArea.Y;
+    ClipViewport (new_vps, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    TheUI.VP[0].X = TheUI.MapArea.X;
-    TheUI.VP[0].EndX = TheUI.MapArea.X + TheMap.Width * TileSizeX - 1;
-    if( TheUI.VP[0].EndX > TheUI.MapArea.EndX ) {       // Map fits
-	TheUI.VP[0].EndX = TheUI.MapArea.EndX;
-    }
-    TheUI.VP[0].Y = TheUI.MapArea.Y;
-    TheUI.VP[0].EndY = TheUI.MapArea.Y + TheMap.Height * TileSizeY - 1;
-    if( TheUI.VP[0].EndY > TheUI.MapArea.EndY ) {	// Map fits
-	TheUI.VP[0].EndY = TheUI.MapArea.EndY;
-    }
-
-    TheUI.VP[0].MapWidth = (TheUI.VP[0].EndX - TheUI.VP[0].X + TileSizeX) /
-		TileSizeX;
-    TheUI.VP[0].MapHeight = (TheUI.VP[0].EndY - TheUI.VP[0].Y + TileSizeY) /
-		TileSizeY;
-
-    //
-    //	Check if the viewport goes outside of the map
-    //	Needed for big viewports and small maps
-    //
-
-    if( TheUI.VP[0].MapX+TheUI.VP[0].MapWidth>TheMap.Width ) {
-	TheUI.VP[0].MapX -= TheUI.VP[0].MapWidth + TheUI.VP[0].MapX -
-		TheMap.Width;
-    }
-
-    if( TheUI.VP[0].MapY+TheUI.VP[0].MapHeight>=TheMap.Height ) {
-	TheUI.VP[0].MapY -= TheUI.VP[0].MapHeight + TheUI.VP[0].MapY -
-		TheMap.Height;
-    }
-
-    TheUI.LastClickedVP = TheUI.ActiveViewport = 0;
+    FinishViewportModeConfiguration (new_vps, 1);
 }
 
 /**
@@ -510,56 +573,20 @@ local void SetViewportModeSingle (void)
 */
 local void SetViewportModeSplitHoriz (void)
 {
-    int i, active;
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
     DebugLevel0 ("Two horizontal viewports set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
-    new_vps[0].EndX = TheUI.MapArea.EndX;
     new_vps[0].Y = TheUI.MapArea.Y;
-    new_vps[0].EndY = TheUI.MapArea.Y+(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2;
-    new_vps[0].EndY -= (new_vps[0].EndY - new_vps[0].Y) % TileSizeY + 1;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps, TheUI.MapArea.EndX,
+		    TheUI.MapArea.Y+(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
 
     new_vps[1].X = TheUI.MapArea.X;
-    new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = new_vps[0].EndY + 1;
-    new_vps[1].EndY = TheUI.MapArea.EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps+1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    if (TheUI.NumViewports < 2) {
-	for (i=0; i < 2; i++) {
-	    int v = GetViewport (new_vps[i].X, new_vps[i].Y);
-
-	    TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
-	    TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
-	}
-    }
-
-    for (i=0; i < 2; i++) {
-	TheUI.VP[i].X = new_vps[i].X;
-	TheUI.VP[i].EndX = new_vps[i].EndX;
-	TheUI.VP[i].Y = new_vps[i].Y;
-	TheUI.VP[i].EndY = new_vps[i].EndY;
-	TheUI.VP[i].MapWidth = (new_vps[i].EndX - new_vps[i].X + TileSizeX) /
-		TileSizeX;
-	TheUI.VP[i].MapHeight = (new_vps[i].EndY - new_vps[i].Y + TileSizeY) /
-		TileSizeY;
-
-	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width-1)
-	    TheUI.VP[i].MapX -= (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) -
-					(TheMap.Width-1);
-	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height-1)
-	    TheUI.VP[i].MapY -= (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) -
-					(TheMap.Height-1);
-    }
-    TheUI.NumViewports = 2;
-    active = GetViewport (CursorX, CursorY);
-    if (active != -1)
-	TheUI.ActiveViewport = active;
-    if (TheUI.LastClickedVP >= TheUI.NumViewports)
-	TheUI.LastClickedVP = TheUI.NumViewports - 1;
+    FinishViewportModeConfiguration (new_vps, 2);
 }
 
 /**
@@ -575,67 +602,26 @@ local void SetViewportModeSplitHoriz (void)
 */
 local void SetViewportModeSplitHoriz3 (void)
 {
-    int i, active;
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
     DebugLevel0 ("Horizontal 3-way viewport division set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
-    new_vps[0].EndX = TheUI.MapArea.EndX;
     new_vps[0].Y = TheUI.MapArea.Y;
-    new_vps[0].EndY = TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2;
-    new_vps[0].EndY -= (new_vps[0].EndY - new_vps[0].Y) % TileSizeY + 1;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps, TheUI.MapArea.EndX,
+		    TheUI.MapArea.Y+(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
 
     new_vps[1].X = TheUI.MapArea.X;
-    new_vps[1].EndX = TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2;
-    // I don't know why I need to add 1 but if I don't do it the routines in
-    // map_draw.c complain about unaligned memory.
-    // JOHNS:	map_draw.c draws two pixels at the same time, the pixel must
-    //		start at an even pixel.
-    new_vps[1].EndX -= (new_vps[1].EndX - new_vps[1].X) % TileSizeX + 1;
     new_vps[1].Y = new_vps[0].EndY + 1;
-    new_vps[1].EndY = TheUI.MapArea.EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps+1,
+		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
+		TheUI.MapArea.EndY);
 
     new_vps[2].X = new_vps[1].EndX + 1;
-    new_vps[2].EndX = TheUI.MapArea.EndX;
     new_vps[2].Y = new_vps[0].EndY + 1;
-    new_vps[2].EndY = TheUI.MapArea.EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps+2, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    if (TheUI.NumViewports < 3) {
-	for (i=0; i < 3; i++) {
-	    int v = GetViewport (new_vps[i].X, new_vps[i].Y);
-
-	    TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
-	    TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
-	}
-    }
-
-    for (i=0; i < 3; i++) {
-	TheUI.VP[i].X = new_vps[i].X;
-	TheUI.VP[i].EndX = new_vps[i].EndX;
-	TheUI.VP[i].Y = new_vps[i].Y;
-	TheUI.VP[i].EndY = new_vps[i].EndY;
-	TheUI.VP[i].MapWidth = (new_vps[i].EndX - new_vps[i].X + TileSizeX) /
-		TileSizeX;
-	TheUI.VP[i].MapHeight = (new_vps[i].EndY - new_vps[i].Y + TileSizeY) /
-		TileSizeY;
-
-	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width-1)
-	    TheUI.VP[i].MapX -= (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) -
-					(TheMap.Width-1);
-	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height-1)
-	    TheUI.VP[i].MapY -= (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) -
-					(TheMap.Height-1);
-    }
-    TheUI.NumViewports = 3;
-    active = GetViewport (CursorX, CursorY);
-    if (active != -1)
-	TheUI.ActiveViewport = active;
-    if (TheUI.LastClickedVP >= TheUI.NumViewports)
-	TheUI.LastClickedVP = TheUI.NumViewports - 1;
+    FinishViewportModeConfiguration (new_vps, 3);
 }
 
 /**
@@ -650,66 +636,21 @@ local void SetViewportModeSplitHoriz3 (void)
 */
 local void SetViewportModeSplitVert (void)
 {
-    int i, active;
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
     DebugLevel0 ("Two vertical viewports set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
-    new_vps[0].EndX = TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2;
-    new_vps[0].EndX -= (new_vps[0].EndX - new_vps[0].X) % TileSizeX + 1;
     new_vps[0].Y = TheUI.MapArea.Y;
-    new_vps[0].EndY = TheUI.MapArea.EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps,
+		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
+		TheUI.MapArea.EndY);
 
     new_vps[1].X = new_vps[0].EndX + 1;
-    new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = TheUI.MapArea.Y;
-    new_vps[1].EndY = TheUI.MapArea.EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps+1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    /* If the number of viewports increases we need to compute what to display
-     * in the newly created ones.  We need to do this before we store new
-     * geometry information in the TheUI.VP field because we use the old
-     * geometry information for map origin computation.
-     */
-    /* FIXME: much of the following code is the same for all the viewport
-     * configurations -> find a way how to share it. */
-    if (TheUI.NumViewports < 2) {
-	for (i=0; i < 2; i++) {
-	    int v = GetViewport (new_vps[i].X, new_vps[i].Y);
-
-	    TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
-	    TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
-	}
-    }
-
-    for (i=0; i < 2; i++) {
-	TheUI.VP[i].X = new_vps[i].X;
-	TheUI.VP[i].EndX = new_vps[i].EndX;
-	TheUI.VP[i].Y = new_vps[i].Y;
-	TheUI.VP[i].EndY = new_vps[i].EndY;
-	TheUI.VP[i].MapWidth = (new_vps[i].EndX - new_vps[i].X + TileSizeX) /
-		TileSizeX;
-	TheUI.VP[i].MapHeight = (new_vps[i].EndY - new_vps[i].Y + TileSizeY) /
-		TileSizeY;
-
-	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width-1)
-	    TheUI.VP[i].MapX -= (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) -
-					(TheMap.Width-1);
-	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height-1)
-	    TheUI.VP[i].MapY -= (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) -
-					(TheMap.Height-1);
-    }
-
-    //memcpy (TheUI.VP, new_vps, sizeof (TheUI.VP));
-
-    TheUI.NumViewports = 2;
-    active = GetViewport (CursorX, CursorY);
-    if (active != -1)
-	TheUI.ActiveViewport = active;
-    if (TheUI.LastClickedVP >= TheUI.NumViewports)
-	TheUI.LastClickedVP = TheUI.NumViewports - 1;
+    FinishViewportModeConfiguration (new_vps, 2);
 }
 
 /**
@@ -724,70 +665,33 @@ local void SetViewportModeSplitVert (void)
 */
 local void SetViewportModeQuad (void)
 {
-    int i, active;
     Viewport new_vps[MAX_NUM_VIEWPORTS];
 
     DebugLevel0 ("Four viewports set\n");
 
     new_vps[0].X = TheUI.MapArea.X;
-    new_vps[0].EndX = TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2;
-    new_vps[0].EndX -= (new_vps[0].EndX - new_vps[0].X) % TileSizeX + 1;
     new_vps[0].Y = TheUI.MapArea.Y;
-    new_vps[0].EndY = TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2;
-    new_vps[0].EndY -= (new_vps[0].EndY - new_vps[0].Y) % TileSizeY + 1;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps,
+		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
+		TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
 
     new_vps[1].X = new_vps[0].EndX + 1;
-    new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = TheUI.MapArea.Y;
-    new_vps[1].EndY = new_vps[0].EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps+1,
+		TheUI.MapArea.EndX,
+		TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2);
 
     new_vps[2].X = TheUI.MapArea.X;
-    new_vps[2].EndX = new_vps[0].EndX;
     new_vps[2].Y = new_vps[0].EndY + 1;
-    new_vps[2].EndY = TheUI.MapArea.EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps+2,
+		TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2,
+		TheUI.MapArea.EndY);
 
     new_vps[3].X = new_vps[1].X;
-    new_vps[3].EndX = TheUI.MapArea.EndX;
     new_vps[3].Y = new_vps[2].Y;
-    new_vps[3].EndY = TheUI.MapArea.EndY;
-    // FIXME: Use SetViewportModeSingle map size check
+    ClipViewport (new_vps+3, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
 
-    if (TheUI.NumViewports < 4) {
-	for (i=0; i < 4; i++) {
-	    int v = GetViewport (new_vps[i].X, new_vps[i].Y);
-
-	    TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
-	    TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
-	}
-    }
-
-    for (i=0; i < 4; i++) {
-	TheUI.VP[i].X = new_vps[i].X;
-	TheUI.VP[i].EndX = new_vps[i].EndX;
-	TheUI.VP[i].Y = new_vps[i].Y;
-	TheUI.VP[i].EndY = new_vps[i].EndY;
-	TheUI.VP[i].MapWidth = (new_vps[i].EndX - new_vps[i].X + TileSizeX) /
-		TileSizeX;
-	TheUI.VP[i].MapHeight = (new_vps[i].EndY - new_vps[i].Y + TileSizeY) /
-		TileSizeY;
-
-	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width-1)
-	    TheUI.VP[i].MapX -= (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) -
-					(TheMap.Width-1);
-	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height-1)
-	    TheUI.VP[i].MapY -= (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) -
-					(TheMap.Height-1);
-    }
-
-    TheUI.NumViewports = 4;
-    active = GetViewport (CursorX, CursorY);
-    if (active != -1)
-	TheUI.ActiveViewport = active;
-    if (TheUI.LastClickedVP >= TheUI.NumViewports)
-	TheUI.LastClickedVP = TheUI.NumViewports - 1;
+    FinishViewportModeConfiguration (new_vps, 4);
 }
 
 /**
@@ -820,6 +724,11 @@ global void SetViewportMode (void)
 	DebugLevel0Fn ("trying to set an unknown mode!!\n");
 	break;
     }
+    VideoLockScreen ();
+    VideoFillRectangleClip (ColorBlack, TheUI.MapArea.X, TheUI.MapArea.Y,
+		TheUI.MapArea.EndX - TheUI.MapArea.X + 1,
+		TheUI.MapArea.EndY - TheUI.MapArea.Y + 1);
+    VideoUnlockScreen ();
 }
 
 /**
