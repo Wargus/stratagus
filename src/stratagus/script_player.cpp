@@ -236,6 +236,34 @@ local SCM CclPlayer(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("score")) ) {
 	    player->Score=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("total-units")) ) {
+	    player->TotalUnits=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("total-buildings")) ) {
+	    player->TotalBuildings=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("total-razings")) ) {
+	    player->TotalRazings=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("total-kills")) ) {
+	    player->TotalKills=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("total-resources")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    i=gh_length(sublist);
+	    if( i!=MaxCosts ) {
+		fprintf(stderr,"Wrong number of total-resources %d\n",i);
+	    }
+	    i=0;
+	    while( !gh_null_p(sublist) ) {
+		if( i<MaxCosts ) {
+		    player->TotalResources[i]=gh_scm2int(gh_car(sublist));
+		}
+		sublist=gh_cdr(sublist);
+		++i;
+	    }
+	    player->TotalUnits=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("timers")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
