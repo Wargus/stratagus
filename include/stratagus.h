@@ -199,7 +199,9 @@ extern char NameLine[];
 #ifdef __APPLE__
 #define STRATAGUS_HOME_PATH "Library/Stratagus"
 #else
-#define STRATAGUS_HOME_PATH  ".stratagus"///< Data files in user home dir
+ #define _VERSION_STRING1(m,n,p) m "-" #n "." #p
+ #define _VERSION_STRING(m,n,p) _VERSION_STRING1(m,n,p)
+ #define STRATAGUS_HOME_PATH _VERSION_STRING(".stratagus",StratagusMajorVersion,StratagusMinorVersion)
 #endif
 #endif
 
