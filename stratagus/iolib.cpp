@@ -560,7 +560,8 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     // ATTENTION: valid until end of file!
     #define readdir zzip_readdir
     #define closedir zzip_closedir
-    int i, entvalid;
+    int i;
+    int entvalid;
     char zzbasepath[PATH_MAX];
     struct stat st;
     char *cp;
@@ -575,8 +576,10 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     struct _finddata_t fileinfo;
     long hFile;
 #endif
-    FileList *nfl, *fl = NULL;
-    int n, isdir = 0; // silence gcc..
+    FileList *nfl;
+    FileList *fl = NULL;
+    int n;
+    int isdir = 0; // silence gcc..
     char *np;
     char buffer[PATH_MAX];
     char *filename;
@@ -715,14 +718,15 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		}
 	    } else if (dirp) {
 		if (zzbasepath[0]) {
-		    i = strlen(zzbasepath);
+		    size_t len;
+		    len = strlen(zzbasepath);
 		    isdir = 0;
-		    if (strlen(dirname) > i) {
-			cp = (char *)dirname + i + 1;
-			i = strlen(cp);
-			if (strlen(filename) >= i && memcmp(filename, cp, i) == 0 &&
-				    filename[i] == '/' && filename[i + 1]) {
-			    strcpy(np, filename + i + 1);
+		    if (strlen(dirname) > len) {
+			cp = (char *)dirname + len + 1;
+			len = strlen(cp);
+			if (strlen(filename) >= len && memcmp(filename, cp, len) == 0 &&
+				    filename[len] == '/' && filename[len + 1]) {
+			    strcpy(np, filename + len + 1);
 			    goto zzentry;
 			}
 		    } else {
