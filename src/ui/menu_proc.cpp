@@ -1326,8 +1326,12 @@ normkey:
 			switch (mi->MiType) {
 				case MI_TYPE_BUTTON:
 					if (key == mi->D.Button.HotKey) {
-						if (!(mi->Flags & MenuButtonDisabled) && mi->D.Button.Handler) {
-							(*mi->D.Button.Handler)();
+						if (!(mi->Flags & MenuButtonDisabled)) {
+							if (mi->D.Button.Handler) {
+								(*mi->D.Button.Handler)();
+							} else if (mi->D.Button.LuaHandle) {
+								CallHandler(mi->D.Button.LuaHandle);
+							}
 						}
 						return;
 					}
@@ -1345,6 +1349,8 @@ normkey:
 					case MI_TYPE_BUTTON:
 						if (mi->D.Button.Handler) {
 							(*mi->D.Button.Handler)();
+						} else if (mi->D.Button.LuaHandle) {
+							CallHandler(mi->D.Button.LuaHandle);
 						}
 						return;
 					case MI_TYPE_LISTBOX:
@@ -2296,6 +2302,8 @@ static void MenuHandleButtonUp(unsigned b)
 							MenuButtonUnderCursor = -1;
 							if (mi->D.Button.Handler) {
 								(*mi->D.Button.Handler)();
+							} else if (mi->D.Button.LuaHandle) {
+								CallHandler(mi->D.Button.LuaHandle);
 							}
 						}
 					}

@@ -71,6 +71,8 @@ _CheckboxStyleHash CheckboxStyleHash;
 int NbAllPanels = 0; /// Number of panel
 InfoPanel* AllPanels = 0; /// Array of panels.
 
+static int HandleCount = 1;     /// Lua handler count
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -3034,6 +3036,41 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 }
 
 /**
+**  Add a Lua handler
+**  FIXME: when should these be freed?
+*/
+int AddHandler(lua_State* l)
+{
+	lua_pushstring(l, "_handlers_");
+	lua_gettable(l, LUA_GLOBALSINDEX);
+	if (lua_isnil(l, -1)) {
+		lua_pop(l, 1);
+		lua_pushstring(l, "_handlers_");
+		lua_newtable(l);
+		lua_settable(l, LUA_GLOBALSINDEX);
+		lua_pushstring(l, "_handlers_");
+		lua_gettable(l, LUA_GLOBALSINDEX);
+	}
+	lua_pushvalue(l, -2);
+	lua_rawseti(l, -2, HandleCount);
+	lua_pop(l, 1);
+
+	return HandleCount++;
+}
+
+/**
+**  Call a Lua handler
+*/
+void CallHandler(unsigned int handle)
+{
+	lua_pushstring(Lua, "_handlers_");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	lua_rawgeti(Lua, -1, handle);
+	LuaCall(0, 1);
+	lua_pop(Lua, 1);
+}
+
+/**
 **  Parse menu item button
 */
 static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
@@ -3078,7 +3115,7 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 			item->D.Button.HotKey = scm2hotkey(l, value);
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			if (!lua_isstring(l, -1) && !lua_isfunction(l, -1) && !lua_isnil(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
@@ -3090,6 +3127,8 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
+			} else if (lua_isfunction(l, -1)) {
+				item->D.Button.LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);

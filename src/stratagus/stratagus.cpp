@@ -843,6 +843,7 @@ void Exit(int err)
 	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
+	lua_settop(Lua, 0);
 	CclUnits(Lua);
 	CleanModules();
 	lua_close(Lua);
