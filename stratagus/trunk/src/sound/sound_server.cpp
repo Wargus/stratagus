@@ -233,36 +233,19 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
     if (CDMode != CDModeOff && CDMode != CDModeStopped
 	    && SDL_CDStatus(CDRom) == 1) {
 	DebugLevel0Fn("Playing new track\n");
-	if (CDMode == CDModeAll) {
-	    PlayCDRom(CDModeAll);
-	} else if (CDMode == CDModeRandom) {
-	    PlayCDRom(CDModeRandom);
-	}
+	PlayCDRom(CDMode);
     }
 #elif defined(USE_LIBCDA)
     if (CDMode != CDModeOff && CDMode != CDModeStopped
 	    && !cd_current_track() && CDMode != CDModeDefined) {
 	DebugLevel0Fn("Playing new track\n");
 	PlayCDRom(CDMode);
-    } else if (CDMode != CDModeOff && CDMode != CDModeStopped) {
-	if (CDMode == CDModeDefined) {
-	    PlayCDRom(CDMode);
-	}
-	DebugLevel0Fn("get track\n");
-	CDTrack = cd_current_track() + 1;
-	if (CDTrack > NumCDTracks) {
-	    CDTrack = 1;
-	}
     }
 #elif defined(USE_CDDA)
     if (CDMode != CDModeOff && CDMode != CDModeStopped
 	    && !PlayingMusic) {
 	DebugLevel0Fn("Playing new track\n");
-	if (CDMode == CDModeAll) {
-	    PlayCDRom(CDModeAll);
-	} else if (CDMode == CDModeRandom) {
-	    PlayCDRom(CDModeRandom);
-	}
+        PlayCDRom(CDMode);
     }
 #endif
     return 0;

@@ -68,6 +68,7 @@ typedef struct _game_sound_ {
 } GameSound;
 
 typedef enum _play_section_type_ {
+    PlaySectionUnknown = -1,		/// Unknown
     PlaySectionGame,			/// Game
     PlaySectionBriefing,		/// Briefing
     PlaySectionStats,			/// Stats
