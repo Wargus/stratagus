@@ -204,6 +204,9 @@ local int ChopWood(Unit* unit)
 		unit->Command.Data.Move.Fast=1;
 		unit->Command.Data.Move.Range=1;
 		unit->Command.Data.Move.Goal=destu;
+#ifdef NEW_UNIT
+		destu->Refs++;
+#endif
 #if 1
 		// Fast movement need this??
 		NearestOfUnit(destu,unit->X,unit->Y
@@ -226,7 +229,7 @@ local int ChopWood(Unit* unit)
     return 0;
 }
 
-/*
+/**
 **	Return with the wood.
 **	Return TRUE if reached, otherwise FALSE.
 */
@@ -234,8 +237,6 @@ local int ReturnWithWood(Unit* unit)
 {
     int x;
     int y;
-    //int dx;
-    //int dy;
     Unit* destu;
 
     if( !HandleActionMove(unit) ) {	// reached end-point
@@ -244,29 +245,38 @@ local int ReturnWithWood(Unit* unit)
 
     DebugCheck( unit->Wait!=1 );
 
-#if 0
-    // reached nearly? and is there an wood deposit?
-
-    x=unit->Command.Data.Move.DX;
-    y=unit->Command.Data.Move.DY;
-    dx=unit->X-x;
-    dy=unit->Y-y;
-    destu=WoodDepositOnMap(x,y);
-
-    DebugLevel3("Near unit %d,%d =%Zd\n",x,y,UnitNumber(destu));
-
-    if( !destu || dx<-1 || dx>destu->Type->TileWidth
-	    || dy<-1 || dy>destu->Type->TileHeight ) {
-      	DebugLevel2("WOOD-DEPOSIT NOT REACHED %d=%d,%Zd\n"
-		    ,UnitNumber(destu),dx,dy);
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
+    destu=unit->Command.Data.Move.Goal;
+    //
+    //	Target is dead, stop harvest
+    //
+    if( destu ) {
+	if( destu->Destroyed ) {
+	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    if( !--destu->Refs ) {
+		ReleaseUnit(destu);
+	    }
+	    unit->Command.Data.Move.Goal=NoUnitP;
+	    // FIXME: perhaps I should choose an alternative
+	    unit->Command.Action=UnitActionStill;
+	    return 0;
+	} else if( destu->Removed || !destu->HP
+		    || destu->Command.Action==UnitActionDie ) {
+	    --destu->Refs;
+	    unit->Command.Data.Move.Goal=NoUnitP;
+	    // FIXME: perhaps I should choose an alternative
+	    unit->Command.Action=UnitActionStill;
+	    return 0;
+	}
+	unit->Command.Data.Move.Goal=NoUnitP;
+	--destu->Refs;
     }
-#endif
+
+    // FIXME: stored target not used!
+
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
     destu=WoodDepositOnMap(x,y);
+
     if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
       DebugLevel2("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
 		  ,UnitNumber(destu),x,y

@@ -43,6 +43,7 @@ local int MoveToCoast(Unit* unit)
     int i;
 
     DebugLevel3("%p\n",unit->Command.Data.Move.Goal);
+
     if( !(i=HandleActionMove(unit)) ) {	// reached end-point
 	return 0;
     }
@@ -69,6 +70,16 @@ local void LeaveTransporter(Unit* unit)
     goal=unit->Command.Data.Move.Goal;
     DebugLevel3("Goal %p\n",goal);
     if( goal ) {
+#ifdef NEW_UNIT
+	if( goal->Destroyed ) {
+	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    if( !--goal->Refs ) {
+		ReleaseUnit(goal);
+	    }
+	    return;
+	}
+	--goal->Refs;
+#endif
 	for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
 	    if( goal==unit->OnBoard[i] ) {
 		goal->X=unit->X;

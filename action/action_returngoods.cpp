@@ -52,11 +52,14 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	unit->Command.Data.Move.Fast=1;
 	unit->Command.Data.Move.Goal=destu;
+#ifdef NEW_UNITS
+	++destu->Refs;
+#endif
 	unit->Command.Data.Move.Range=1;
 #if 1
 	NearestOfUnit(destu,unit->X,unit->Y
-	    ,&unit->Command.Data.Move.DX
-	    ,&unit->Command.Data.Move.DY);
+		,&unit->Command.Data.Move.DX
+		,&unit->Command.Data.Move.DY);
 #else
 	unit->Command.Data.Move.DX=destu->X;
 	unit->Command.Data.Move.DY=destu->Y;
@@ -75,6 +78,9 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	unit->Command.Data.Move.Fast=1;
 	unit->Command.Data.Move.Goal=destu;
+#ifdef NEW_UNITS
+	++destu->Refs;
+#endif
 	unit->Command.Data.Move.Range=1;
 #if 1
 	NearestOfUnit(destu,unit->X,unit->Y
@@ -102,6 +108,9 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	unit->Command.Data.Move.Fast=1;
 	unit->Command.Data.Move.Goal=destu;
+#ifdef NEW_UNITS
+	++destu->Refs;
+#endif
 	unit->Command.Data.Move.Range=1;
 #if 1
 	NearestOfUnit(destu,unit->X,unit->Y
