@@ -1136,6 +1136,9 @@ global void LoadPud(const char* pud,WorldMap* map)
 	    int s;
 	    Unit* unit;
 
+	    //
+	    //	FIXME: should split this into parts.
+	    //
 	    while( length>=8 ) {
 		x=PudReadWord(input);
 		y=PudReadWord(input);
@@ -1157,7 +1160,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			v = 1;
 			goto pawn;
 		    }
-	    } else {
+		} else {
 		    if (GameSettings.NumUnits == SettingsNumUnitsMapDefault ||
 			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {
 pawn:
@@ -1175,7 +1178,8 @@ pawn:
 			if (Players[o].Type != PlayerNobody) {
 			    unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
 				    ,UnitTypeByWcNum(t),&Players[o]);
-			    if( unit->Type->GoldMine || unit->Type->OilPatch ) {
+			    if( unit->Type->GoldMine || unit->Type->GivesOil
+				    || unit->Type->OilPatch ) {
 				unit->Value=v*2500;
 			    } else {
 				// FIXME: active/inactive AI units!!
