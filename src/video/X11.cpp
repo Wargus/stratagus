@@ -504,7 +504,7 @@ foundvisual:
     classhint.res_class="FreeCraft";
 
     XSetStandardProperties(TheDisplay,window
-	,"FreeCraft (formerly known as ALE Clone)"
+	,"FreeCraft"
 	,"FreeCraft",None,(char**)0,0,&hints);
     XSetClassHint(TheDisplay,window,&classhint);
     XSetWMHints(TheDisplay,window,&wmhints);
