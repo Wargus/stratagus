@@ -284,7 +284,6 @@ static int CclSetTitleScreens(lua_State* l)
 			LuaError(l, "incorrect argument");
 		}
 		TitleScreens[j] = calloc(1, sizeof(**TitleScreens));
-		TitleScreens[j]->Timeout = 20;
 		lua_pushnil(l);
 		while (lua_next(l, j + 1)) {
 			value = LuaToString(l, -2);
@@ -1934,6 +1933,10 @@ static int CclDefineUI(lua_State* l)
 					lua_rawgeti(l, -1, 2);
 					ui->StatusLineTextY = LuaToNumber(l, -1);
 					lua_pop(l, 1);
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "width")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					ui->StatusLineW = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "font")) {
 					lua_rawgeti(l, j + 1, k + 1);
