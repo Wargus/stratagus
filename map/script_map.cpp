@@ -270,6 +270,31 @@ local SCM CclCenterMap(SCM x,SCM y)
 }
 
 /**
+**	Show Map Location
+**
+**	@param		X tile location.
+**	@param		Y tile location.
+**	@param		radius of view.
+**	@param		cycles show vision for.
+*/
+local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle)
+{
+    Unit* target;
+    //Put a revealer unit on the map, at this location
+    //time to cycle, and radius to mark.
+    // FIXME: Don't use UnitTypeByIdent during runtime.
+    target = MakeUnit(UnitTypeByIdent("unit-revealer"), ThisPlayer);
+    target->Revealer = 1;
+    target->Orders[0].Action = UnitActionStill;
+    target->HP = 0;
+    target->X = gh_scm2int(x);
+    target->Y = gh_scm2int(y);
+    target->TTL=GameCycle+gh_scm2int(cycle);
+    target->CurrentSightRange=gh_scm2int(radius);
+    MapMarkSight(target->Player,gh_scm2int(x),gh_scm2int(y),target->CurrentSightRange);
+    return SCM_UNSPECIFIED;
+}
+/**
 **	Set the default map.
 **
 **	@param map	Path to the default map.
@@ -510,6 +535,7 @@ global void MapCclRegister(void)
     gh_new_procedureN("freecraft-map",CclFreeCraftMap);
     gh_new_procedure0_0("reveal-map",CclRevealMap);
     gh_new_procedure2_0("center-map",CclCenterMap);
+    gh_new_procedure4_0("show-map-location",CclShowMapLocation);
 
     gh_new_procedure1_0("set-default-map!",CclSetDefaultMap);
     gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);
