@@ -202,7 +202,7 @@
 #define TileSizeY	32		/// Size of a tile in Y
 
 // This is only used for tile cache size
-#define MaxTilesInTileset	3072	/// Current limit of tiles in tileset
+#define MaxTilesInTileset	5056	/// Current limit of tiles in tileset
 
 /**
 **	These are used for lookup tiles types
