@@ -1181,28 +1181,67 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 **	Draw flying units shadow.
 **
 **	@param unit	Pointer to the unit.
-**	@param type	Type of the unit.
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 **
 **	@todo FIXME: later units should have its own shadows with animation.
 */
-local void DrawShadow(const Unit* unit __attribute__ ((unused)),
-	const UnitType* type, int x, int y)
+local void DrawShadow(const Unit* unit, int x, int y)
 {
-    int i;
-
-    // Shadow size depends on box-size
-    if (type->BoxHeight > 63) {
-	i = 2;
-    } else if (type->BoxHeight > 32) {
-	i = 1;
+    if( unit->Type->Building ) {
+	if( unit->Orders[0].Action==UnitActionBuilded &&
+	    (unit->Constructed || VideoGraphicFrames(unit->Type->Sprite)<=1) ) {
+	    if( unit->Type->Construction->ShadowSprite ) {
+		x-=(unit->Type->Construction->ShadowWidth-unit->Type->TileWidth*TileSizeX)/2;
+		y-=(unit->Type->Construction->ShadowHeight-unit->Type->TileHeight*TileSizeY)/2;
+		if( unit->Frame<0 ) {
+		    VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
+			-unit->Frame, x, y);
+		} else {
+		    VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
+			unit->Frame, x, y);
+		}
+	    }
+	    return;
+	}
+	if( unit->Type->ShadowSprite ) {
+	    x-=(unit->Type->ShadowWidth-unit->Type->TileWidth*TileSizeX)/2;
+	    y-=(unit->Type->ShadowHeight-unit->Type->TileHeight*TileSizeY)/2;
+	    if( unit->Frame<0 ) {
+		VideoDrawShadowClipX(unit->Type->ShadowSprite, -unit->Frame, x, y);
+	    } else {
+		VideoDrawShadowClip(unit->Type->ShadowSprite, unit->Frame, x, y);
+	    }
+	}
     } else {
-	i = 0;
-    }
+	if( unit->Type->ShadowSprite ) {
+	    x-=(unit->Type->ShadowWidth-unit->Type->TileWidth*TileSizeX)/2;
+	    y-=(unit->Type->ShadowHeight-unit->Type->TileHeight*TileSizeY)/2;
+	    if( unit->Type->AirUnit ) {
+		y+=TileSizeY;
+	    }
 
-    VideoDrawClip(ShadowSprite.Sprite, i, x + ShadowSprite.HotX,
-	y + ShadowSprite.HotY);
+	    if( unit->Frame<0 ) {
+		VideoDrawShadowClipX(unit->Type->ShadowSprite, -unit->Frame, x, y);
+	    } else {
+		VideoDrawShadowClip(unit->Type->ShadowSprite, unit->Frame, x, y);
+	    }
+	} else {
+	    int i;
+
+	    // Shadow size depends on box-size
+	    if (unit->Type->BoxHeight > 63) {
+		i = 2;
+	    } else if (unit->Type->BoxHeight > 32) {
+		i = 1;
+	    } else {
+		i = 0;
+	    }
+
+	    VideoDrawClip(ShadowSprite.Sprite, i, x + ShadowSprite.HotX,
+		y + ShadowSprite.HotY);
+	}
+    }
 }
 
 /**
@@ -1653,6 +1692,8 @@ local void DrawBuilding(Unit* unit)
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
+    DrawShadow(unit,x,y);
+
     //
     //	Show that the unit is selected
     //
@@ -1714,8 +1755,8 @@ local void DrawUnit(const Unit* unit)
     y=Map2ScreenY(unit->Y)+unit->IY;
 
     type=unit->Type;
-    if( type->UnitType==UnitTypeFly ) {
-	DrawShadow(unit,type,x,y);
+    if( type->UnitType==UnitTypeFly || type->ShadowSprite ) {
+	DrawShadow(unit,x,y);
     }
 
     //

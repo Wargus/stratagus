@@ -623,6 +623,10 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
 	fputs(")",file);
     }
     fprintf(file,"\n  'size '(%d %d)\n",type->Width,type->Height);
+    if( type->ShadowFile ) {
+	fprintf(file,"  'shadow '(file \"%s\" width %d height %d)\n",
+		type->ShadowFile, type->ShadowWidth, type->ShadowHeight);
+    }
 
     //
     //	Animations are shared, find first use of the unit-type animation.
@@ -1170,6 +1174,14 @@ global void LoadUnitTypes(void)
     const char* file;
 
     for( type=UnitTypes; type->OType; ++type ) {
+	if( (file=type->ShadowFile) ) {
+	    char *buf;
+	    buf=alloca(strlen(file)+9+1);
+	    file=strcat(strcpy(buf,"graphics/"),file);
+	    ShowLoadProgress("\tUnit `%s'\n",file);
+	    type->ShadowSprite=LoadSprite(file,type->ShadowWidth,type->ShadowHeight);
+	}
+
 	//
 	//	Unit-type uses the same sprite as an other.
 	//
