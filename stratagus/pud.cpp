@@ -714,6 +714,7 @@ global void LoadPud(const char* pud,WorldMap* map)
     char buf[1024];
     int width;
     int height;
+    int aiopps;
 
     if( !(input=CLopen(pud)) ) {
 	fprintf(stderr,"Try ./path/name\n");
@@ -739,7 +740,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	exit(-1);
     }
 
-    width=height=0;
+    aiopps=width=height=0;
 
     //
     //	Parse all sections.
@@ -785,6 +786,15 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 		for( i=0; i<16; ++i ) {
 		    p=PudReadByte(input);
+		    if (GameSettings.Opponents != SettingsPresetMapDefault) {
+			if (p == PlayerComputer) {
+			    if (aiopps < GameSettings.Opponents) {
+				aiopps++;
+			    } else {
+				p = PlayerNobody;
+			    }
+			}
+		    }
 		    CreatePlayer("Computer",p);
 		}
 		continue;
@@ -1137,7 +1147,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 		    Players[o].X=MapOffsetX+x;
 		    Players[o].Y=MapOffsetY+y;
-		    if (GameSettings.NumUnits == SettingsNumUnits1) {
+		    if (GameSettings.NumUnits == SettingsNumUnits1 && Players[o].Type != PlayerNobody) {
 			if (t == WC_StartLocationHuman) {
 			    t = WC_UnitPeasant;
 			} else {
@@ -1146,7 +1156,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			v = 1;
 			goto pawn;
 		    } 
-		} else {
+	    } else {
 		    if (GameSettings.NumUnits == SettingsNumUnitsMapDefault ||
 			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {
 pawn:
@@ -1158,17 +1168,19 @@ pawn:
 				if (s == PlayerRaceOrc && (t & 1) == 0) {
 				    t++;
 				}
-				// FIXME: This is hard-coded WAR2 ... also: support more races?
+				// FIXME: ARI: This is hard-coded WAR2 ... also: support more races?
 			    }
 			}
-			unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
-				,UnitTypeByWcNum(t),&Players[o]);
-			if( unit->Type->GoldMine || unit->Type->OilPatch ) {
-			    unit->Value=v*2500;
-			} else {
-			    // FIXME: active/inactive AI units!!
+			if (Players[o].Type != PlayerNobody) {
+			    unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
+				    ,UnitTypeByWcNum(t),&Players[o]);
+			    if( unit->Type->GoldMine || unit->Type->OilPatch ) {
+				unit->Value=v*2500;
+			    } else {
+				// FIXME: active/inactive AI units!!
+			    }
+			    UpdateForNewUnit(unit,0);
 			}
-			UpdateForNewUnit(unit,0);
 		    }
 		}
 
