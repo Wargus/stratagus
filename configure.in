@@ -55,7 +55,7 @@ AC_SUBST(PROFILE_CFLAGS)
 
 AC_ARG_ENABLE(debug,
     [  --enable-debug	  [Enable debug, implies --disable-optimization (default: no)]])
-if test "$enable_debug" != "yes" -o "$enable_profile" != "yes"; then
+if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
     DEBUG_CFLAGS=""
 else
     DEBUG_CFLAGS="-g -O1 -fsigned-char -Wall -Werror -DDEBUG"
