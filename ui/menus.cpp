@@ -6607,7 +6607,7 @@ local void EditorEndMenu(void)
 local void ReplayGameMenu(void)
 {
 #ifdef USE_WIN32
-    strcpy(TempPathBuf,"%s",GameName);
+    strcpy(TempPathBuf,GameName);
     mkdir(TempPathBuf);
     strcat(TempPathBuf,"/logs");
     mkdir(TempPathBuf);
