@@ -182,8 +182,8 @@ depend:
 	@echo
 	@for i in $(SRC) ; do\
 	echo -e "\rMaking dependencies for $$i";\
-	echo -n `dirname $$i`/$(OBJDIR)/ >> .depend;\
-	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
+	$(CC) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.c/\.o/g'`\
+	-MM $(CFLAGS) $$i >>.depend; done
 	@echo
 
 ##############################################################################
