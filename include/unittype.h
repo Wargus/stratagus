@@ -799,8 +799,8 @@ extern int NumberBoolFlag;                  /// Number of user defined bool flag
 --  Functions
 ----------------------------------------------------------------------------*/
 
-typedef struct lua_State lua_State;
-extern UnitType* CclGetUnitType(lua_State* l);  /// Access unit-type object
+struct lua_State;
+extern UnitType* CclGetUnitType(struct lua_State* l);  /// Access unit-type object
 extern void UnitTypeCclRegister(void);          /// Register ccl features
 
 extern void UpdateStats(int reset_to_default);  /// Update unit stats
