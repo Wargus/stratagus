@@ -4272,6 +4272,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Goal ) {
 	fprintf(file,"\n  'goal %d",UnitNumber(unit->Goal));
     }
+    if( unit->AutoCastSpell ) {
+	fprintf(file,"\n  'auto-cast '%s",unit->AutoCastSpell->Ident);
+    }
 
     fprintf(file,")\n");
 }
