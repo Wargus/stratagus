@@ -971,6 +971,13 @@ global void ColorCycle(void)
     // FIXME: function pointer
     switch( VideoDepth ) {
     case 8:
+      x = ((VMemType8*)TheMap.TileData->Pixels)[38];
+      for(i = 38; i < 47; ++i){
+	((VMemType8*)TheMap.TileData->Pixels)[i] = 
+	  ((VMemType8*)TheMap.TileData->Pixels)[i+1];
+      }
+      ((VMemType8*)TheMap.TileData->Pixels)[47] = x;
+
 	x=Pixels8[38];
 	for( i=38; i<47; ++i ) {	// tileset color cycle
 	    Pixels8[i]=Pixels8[i+1];
@@ -985,6 +992,13 @@ global void ColorCycle(void)
 	break;
     case 15:
     case 16:
+      x = ((VMemType16*)TheMap.TileData->Pixels)[38];
+      for(i = 38; i < 47; ++i){
+	((VMemType16*)TheMap.TileData->Pixels)[i] = 
+	  ((VMemType16*)TheMap.TileData->Pixels)[i+1];
+      }
+      ((VMemType16*)TheMap.TileData->Pixels)[47] = x;
+
 	x=Pixels16[38];
 	for( i=38; i<47; ++i ) {	// tileset color cycle
 	    Pixels16[i]=Pixels16[i+1];
@@ -999,6 +1013,15 @@ global void ColorCycle(void)
 	break;
     case 24:
     case 32:
+      x = ((VMemType32*)TheMap.TileData->Pixels)[38];
+      for(i = 38; i < 47; ++i){
+	((VMemType32*)TheMap.TileData->Pixels)[i] = 
+	  ((VMemType32*)TheMap.TileData->Pixels)[i+1];
+      }
+      ((VMemType32*)TheMap.TileData->Pixels)[47] = x;
+
+
+
 	x=Pixels32[38];
 	for( i=38; i<47; ++i ) {	// tileset color cycle
 	    Pixels32[i]=Pixels32[i+1];
