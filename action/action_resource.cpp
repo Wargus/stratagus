@@ -125,7 +125,7 @@ local int MoveToResource(Unit* unit)
 		break;
 	    default:
 		// Goal gone or something.
-		if (!unit->Reset || GoalGone(unit, goal)) {
+		if (!unit->Reset || !GoalGone(unit, goal)) {
 		    return 0;
 		}
 		break;
@@ -753,6 +753,7 @@ global void HandleActionResource(Unit* unit)
 	DebugLevel3Fn("Started mining. reset path.\n");
 	unit->SubAction = SUB_MOVE_TO_RESOURCE;
     }
+    DebugCheck(!unit->CurrentResource);
 
     //  Move to the resource location.
     if (unit->SubAction >= SUB_MOVE_TO_RESOURCE &&
