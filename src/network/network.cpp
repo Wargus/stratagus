@@ -203,17 +203,19 @@ local void NetworkSendPacket(NetworkCommandQueue *ncq)
     NetworkPacket packet;
     int i;
 
+    DebugLevel0Fn("In frame %d sending: ",FrameCounter);
+
     //
     //	Build packet of 4 messages.
     //
     for (i = 0; i < NetworkDups; ++i) {
+	DebugLevel2("%d %d,",ncq->Data.Type,ncq->Time);
 	packet.Commands[i] = ncq->Data;
-	DebugLevel3Fn("%p %p %d\n",
-		ncq, ncq->List->next, ncq->Data.Type);
 	if (ncq->List->next->next) {
 	    ncq = (NetworkCommandQueue *)(ncq->List->next);
 	}
     }
+    DebugLevel0("\n");
 
     // if (0 || !(rand() & 15))
 	 NetworkBroadcast(&packet, sizeof(packet));
@@ -230,6 +232,8 @@ local void NetworkSendPacket(NetworkCommandQueue *ncq)
 local void NetworkServerSetup(void)
 {
     int i, j, n;
+    char buf[1024];
+    InitMessage* msg;
     InitMessage message;
     Acknowledge acknowledge;
     int num[PlayerMax];
@@ -237,56 +241,58 @@ local void NetworkServerSetup(void)
     //
     //	Wait for all clients to connect.
     //
+    DebugLevel1Fn("Waiting for %d clients\n",NetPlayers);
     acknowledge.Type=MessageInitReply;
+    msg=(InitMessage*)buf;
     for (i = 1; i < NetPlayers;) {
-	DebugLevel1Fn("waiting for clients\n");
-
-	if (!NetRecvUDP(NetworkFildes, &message, sizeof(message))) {
+	if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
 	    exit(-1);
 	}
-	DebugLevel0Fn("receive hello %d.%d.%d.%d:%d\n",
-		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
-	if (message.Type != MessageInitHello) {
-	    DebugLevel0Fn("wrong message\n");
+	DebugLevel0Fn("Receive hello? %d(%d) from %d.%d.%d.%d:%d\n",
+		msg->Type,n,NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+
+	if (msg->Type != MessageInitHello || n!=sizeof(*msg)) {
+	    DebugLevel0Fn("Wrong message\n");
 	    continue;
 	}
 
-	if( ntohl(message.FreeCraft)!=FreeCraftVersion ) {
+	if( ntohl(msg->FreeCraft)!=FreeCraftVersion ) {
 	    fprintf(stderr,"Incompatible FreeCraft version "
 			FreeCraftFormatString " <-> "
 			FreeCraftFormatString "\n"
-		    ,FreeCraftFormatArgs((int)ntohl(message.FreeCraft))
+		    ,FreeCraftFormatArgs((int)ntohl(msg->FreeCraft))
 		    ,FreeCraftFormatArgs(FreeCraftVersion));
 	    exit(-1);
 	}
 
-	if( ntohl(message.Version)!=NetworkProtocolVersion ) {
+	if( ntohl(msg->Version)!=NetworkProtocolVersion ) {
 	    fprintf(stderr,"Incompatible network protocol version "
 			NetworkProtocolFormatString " <-> "
 			NetworkProtocolFormatString "\n"
-		    ,NetworkProtocolFormatArgs((int)ntohl(message.Version))
+		    ,NetworkProtocolFormatArgs((int)ntohl(msg->Version))
 		    ,NetworkProtocolFormatArgs(NetworkProtocolVersion));
 	    exit(-1);
 	}
-	DebugLevel0Fn("Version=" NetworkProtocolFormatString
+
+	DebugLevel0Fn("Version=" FreeCraftFormatString
+		    ", Network=" NetworkProtocolFormatString
 		    ", Lag=%ld, Updates=%ld\n"
-		,NetworkProtocolFormatArgs((int)ntohl(message.Version))
-		,(long)ntohl(message.Lag),(long)ntohl(message.Updates));
+	    ,FreeCraftFormatArgs((int)ntohl(msg->FreeCraft))
+	    ,NetworkProtocolFormatArgs((int)ntohl(msg->Version))
+	    ,(long)ntohl(msg->Lag),(long)ntohl(msg->Updates));
 
 	//
-	//	FIXME: Server should control it!
+	//	Warning: Server should control it!
 	//
-	if (ntohl(message.Lag) != NetworkLag) {
+	if (ntohl(msg->Lag) != NetworkLag) {
 	    fprintf(stderr, "Incompatible network lag %ld-%d\n",
-		    (long)ntohl(message.Lag), NetworkLag);
-	    exit(-1);
+		    (long)ntohl(msg->Lag), NetworkLag);
 	}
 
-	if (ntohl(message.Updates) != NetworkUpdates) {
+	if (ntohl(msg->Updates) != NetworkUpdates) {
 	    fprintf(stderr, "Incompatible network updates %ld-%d\n",
-		(long)ntohl(message.Updates), NetworkUpdates);
-	    exit(-1);
+		(long)ntohl(msg->Updates), NetworkUpdates);
 	}
 
 	// Lookup, if host is already known.
@@ -308,7 +314,7 @@ local void NetworkServerSetup(void)
 	// Acknowledge the packet.
 	n = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
 		sizeof(acknowledge));
-	DebugLevel0Fn("Sending reply %d\n", n);
+	DebugLevel0Fn("Sending reply for hello (%d)\n", n);
     }
 
     //
@@ -317,7 +323,7 @@ local void NetworkServerSetup(void)
     for (n = i = 0; i < NumPlayers && n < NetPlayers; ++i) {
 	if (Players[i].Type == PlayerHuman) {
 	    NetPlyNr[n] = num[n] = i;
-	    DebugLevel0Fn("Assigning %d -> %d\n", i, n);
+	    DebugLevel3Fn("Assigning %d -> %d\n", i, n);
 	    n++;
 	}
     }
@@ -349,18 +355,19 @@ local void NetworkServerSetup(void)
     }
     message.Hosts[i].Host = message.Hosts[i].Port = 0;	// marks the server
     message.Num[i] = num[i];
-    DebugLevel0Fn("player here %d\n", num[i]);
+
+    DebugLevel3Fn("Player here %d\n", num[i]);
     ThisPlayer = &Players[num[i]];
 
+    DebugLevel1Fn("Ready, assigning to %d hosts\n",HostsCount);
     //
     //	Send all clients host:ports to all clients.
     //
     for (j = HostsCount; j;) {
-	DebugLevel1Fn("ready, assigning\n");
 
 	// Send to all clients.
 	for (i = 0; i < HostsCount; ++i) {
-	    if (num[i] != -1) {
+	    if (num[i] != -1) {		// already acknowledged
 		unsigned long host;
 		int port;
 
@@ -369,7 +376,7 @@ local void NetworkServerSetup(void)
 		message.Hosts[i].Host = message.Hosts[i].Port = 0;
 		n = NetSendUDP(NetworkFildes, host, port, &message,
 			sizeof(message));
-		DebugLevel0Fn("Sending config %d to %d.%d.%d.%d:%d\n"
+		DebugLevel0Fn("Sending config (%d) to %d.%d.%d.%d:%d\n"
 			,n,NIPQUAD(ntohl(host)),ntohs(port));
 		message.Hosts[i].Host = host;
 		message.Hosts[i].Port = port;
@@ -378,30 +385,36 @@ local void NetworkServerSetup(void)
 
 	// Wait for acknowledge
 	while (NetSocketReady(NetworkFildes,1000)) {
-	    InitMessage msg;
+	    if( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
+		continue;
+	    }
 
-	    NetRecvUDP(NetworkFildes, &msg, sizeof(msg));
-	    DebugLevel0Fn("receive ack %d %d.%d.%d.%d:%d\n",
-		    msg.Type, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+	    DebugLevel0Fn("Receive ack %d(%d) from %d.%d.%d.%d:%d\n",
+		    msg->Type,n,
+		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
-	    if (msg.Type == MessageInitHello) {
-		DebugLevel0Fn("Acknowledge lost\n");
+	    if (msg->Type == MessageInitHello && n==sizeof(*msg)) {
+		DebugLevel0Fn("Acknowledge for hello was lost\n");
 
-		// Acknowledge the packets.
+		// Acknowledge the hello packets.
 		acknowledge.Type = MessageInitReply;
-		NetSendUDP(NetworkFildes,NetLastHost,NetLastPort,&acknowledge,
+		n=NetSendUDP(NetworkFildes,NetLastHost,NetLastPort,&acknowledge,
 			sizeof(acknowledge));
+		DebugLevel0Fn("Sending reply for hello (%d)\n", n);
 	    } else {
-		DebugLevel0Fn("Acknowledge for config\n");
+		DebugLevel0Fn("Acknowledge for config got?\n");
 
 		for (i = 0; i < HostsCount; ++i) {
 		    if (NetLastHost == Hosts[i].Host
 			    && NetLastPort == Hosts[i].Port
-			    && msg.Type == MessageInitReply) {
+			    && msg->Type == MessageInitReply
+			    && n==1 ) {
 			if (num[i] != -1) {
 			    DebugLevel0Fn("Removing host\n");
 			    num[i] = -1;
 			    j--;
+			} else {
+			    DebugLevel0Fn("Already removed host\n");
 			}
 			break;
 		    }
@@ -416,12 +429,15 @@ local void NetworkServerSetup(void)
 */
 local void NetworkClientSetup(void)
 {
+    char buf[1024];
+    InitMessage* msg;
     InitMessage message;
     Acknowledge acknowledge;
     unsigned long host;
     int port;
     char *cp;
     int i;
+    int n;
 
     // Parse server address.
     cp = strchr(NetworkArg, ':');
@@ -444,89 +460,115 @@ local void NetworkClientSetup(void)
     //
     //	Connecting to server
     //
+    message.Type = MessageInitHello;
+    message.FreeCraft = htonl(FreeCraftVersion);
+    message.Version = htonl(NetworkProtocolVersion);
+    message.Lag = htonl(NetworkLag);
+    message.Updates = htonl(NetworkUpdates);
+    msg=(InitMessage*)buf;
     for (;;) {
-	message.Type = MessageInitHello;
-	message.FreeCraft = htonl(FreeCraftVersion);
-	message.Version = htonl(NetworkProtocolVersion);
-	message.Lag = htonl(NetworkLag);
-	message.Updates = htonl(NetworkUpdates);
-
-	i = NetSendUDP(NetworkFildes, host, port, &message, sizeof(message));
-	DebugLevel0Fn("Sending hello %d\n", i);
+	n = NetSendUDP(NetworkFildes, host, port, &message, sizeof(message));
+	DebugLevel0Fn("Sending hello (%d)\n", n);
 
 	// Wait on answer (timeout 1/2s)
 	if (NetSocketReady(NetworkFildes, 500)) {
-	    if (!NetRecvUDP(NetworkFildes, &message, sizeof(message))) {
+	    if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
 		exit(-1);
 	    }
-	    DebugLevel0Fn("receive reply %d.%d.%d.%d:%d\n",
+	    DebugLevel0Fn("Receive reply? %d(%d) %d.%d.%d.%d:%d\n",
+		    msg->Type,n,
 		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+
 	    IfDebug(
 		if(NetLastHost == MyHost && NetLastPort == MyPort) {
 		    fprintf(stderr, "talking to myself\n");
 		    exit(-1);
 		}
 	    );
+
 	    if (NetLastHost == host && NetLastPort == port
-		    && message.Type == MessageInitReply) {
+		    && msg->Type == MessageInitReply && n==1 ) {
 		break;
 	    }
-	    DebugLevel0Fn("received wrong packet\n");
+
+	    DebugLevel0Fn("Received wrong packet\n");
 	}
     }
 
     //
     //	Wait for addresses of other clients.
     //
+    DebugLevel0Fn("Waiting for clients config\n");
+    acknowledge.Type = MessageInitReply;
     for (;;) {
-	DebugLevel0Fn("waiting for clients\n");
-	NetRecvUDP(NetworkFildes, &message, sizeof(message));
+	if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
+	    exit(-1);
+	}
+
+	DebugLevel0Fn("Receive config? %d(%d) %d.%d.%d.%d:%d\n",
+		msg->Type,n,
+		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+
 	if (NetLastHost != host || NetLastPort != port 
-		|| message.Type != MessageInitConfig) {
-	    DebugLevel0Fn("received wrong packet\n");
+		|| msg->Type != MessageInitConfig || n!=sizeof(InitMessage)) {
+	    DebugLevel0Fn("Received wrong packet\n");
 	    continue;
 	}
-	DebugLevel0Fn("received clients\n");
 
-	for (i = 0; i < message.HostsCount - 1; ++i) {
-	    if (message.Hosts[i].Host || message.Hosts[i].Port) {
-		NetPlyNr[HostsCount] = message.Num[i];
-		Hosts[HostsCount].Host = message.Hosts[i].Host;
-		Hosts[HostsCount++].Port = message.Hosts[i].Port;
+	DebugLevel0Fn("Received clients\n");
+
+	NetworkLag=ntohl(msg->Lag);
+	NetworkUpdates=ntohl(msg->Updates);
+
+	for (i = 0; i < msg->HostsCount - 1; ++i) {
+	    if (msg->Hosts[i].Host || msg->Hosts[i].Port) {
+		NetPlyNr[HostsCount] = msg->Num[i];
+		Hosts[HostsCount].Host = msg->Hosts[i].Host;
+		Hosts[HostsCount++].Port = msg->Hosts[i].Port;
 	    } else {			// Own client
-		DebugLevel0Fn("SELF %d\n", message.Num[i]);
-		ThisPlayer = &Players[(int)message.Num[i]];
+		DebugLevel0Fn("SELF %d\n", msg->Num[i]);
+		ThisPlayer = &Players[(int)msg->Num[i]];
 	    }
-	    DebugLevel0Fn("Client %d %d.%d.%d.%d:%d\n",
-		    message.Num[i],
-		    NIPQUAD(ntohl(message.Hosts[i].Host)),
-		    ntohs(message.Hosts[i].Port));
+	    DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d\n",
+		    msg->Num[i],NIPQUAD(ntohl(msg->Hosts[i].Host)),
+		    ntohs(msg->Hosts[i].Port));
 	}
-	NetPlyNr[HostsCount] = message.Num[i];
-	//Hosts[HostsCount].Host = NetLastHost;
-	//Hosts[HostsCount++].Port = NetLastPort;
+	NetPlyNr[HostsCount] = msg->Num[i];
 	Hosts[HostsCount].Host = host;
 	Hosts[HostsCount++].Port = port;
 
 	// Acknowledge the packets.
-	acknowledge.Type = MessageInitReply;
-	NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
+	n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
 		sizeof(acknowledge));
+	DebugLevel0Fn("Sending config ack (%d)\n", n);
 	break;
     }
 
-    // Acknowledge lost (timeout 3s)
+    //
+    //	Wait for acknowledge lost (timeout 3s)
+    //
     while (NetSocketReady(NetworkFildes, 3000)) {
-	DebugLevel0Fn("Acknowledge lost?\n");
-	NetRecvUDP(NetworkFildes, &message, sizeof(message));
-	if (message.Type == MessageInitConfig) {
-	    DebugLevel0Fn("Init config\n");
-	    // Acknowledge the packets.
-	    acknowledge.Type = MessageInitReply;
-	    NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
-		    sizeof(acknowledge));
+	if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
+	    exit(-1);
 	}
-	if (message.Type > MessageInitConfig) {
+
+	DebugLevel0Fn("Receive config? %d(%d) %d.%d.%d.%d:%d\n",
+		msg->Type,n,
+		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+
+	if (NetLastHost == host && NetLastPort == port 
+		&& msg->Type == MessageInitConfig && n==sizeof(InitMessage)) {
+
+	    DebugLevel0Fn("Received late clients\n");
+
+	    // Acknowledge the packets.
+	    n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
+		    sizeof(acknowledge));
+	    DebugLevel0Fn("Sending config ack (%d)\n", n);
+	    continue;
+	}
+
+	if (msg->Type > MessageInitConfig && n==sizeof(NetworkPacket)) {
 	    DebugLevel0Fn("Already a game message\n");
 	    break;
 	}
@@ -585,7 +627,8 @@ global void InitNetwork1(void)
     if (NetworkFildes == -1) {
 	NetworkFildes = NetOpenUDP(port + 1);
 	if (NetworkFildes == -1) {
-	    fprintf(stderr, "NETWORK: No free ports %d-%d available, aborting\n", port, port + 1);
+	    fprintf(stderr,"NETWORK: No free ports %d-%d available, aborting\n"
+		    , port, port + 1);
 	    return;
 	}
     }
@@ -611,7 +654,8 @@ global void InitNetwork1(void)
 	DebugLevel0Fn("%s\n", buf);
 	MyHost = NetResolveHost(buf);
 	MyPort = NetLastPort;
-	DebugLevel0Fn("My host:port %d.%d.%d.%d:%d\n", NIPQUAD(ntohl(MyHost)), ntohs(MyPort));
+	DebugLevel0Fn("My host:port %d.%d.%d.%d:%d\n",
+		NIPQUAD(ntohl(MyHost)), ntohs(MyPort));
     });
 
     dl_init(CommandsIn);
@@ -720,22 +764,55 @@ global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
 */
 global void NetworkEvent(void)
 {
-    NetworkPacket packet;
+    char buf[1024];
+    NetworkPacket* packet;
     int player, i, n;
 
     //
     //	Read the packet.
     //
-    if( !NetRecvUDP(NetworkFildes, &packet, sizeof(packet)) ) {
+    if( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
 	//
 	//	Server gone?
 	//
 	DebugLevel0("Server gone.\n");
 	Exit(0);
     }
+    packet=(NetworkPacket*)buf;
 
-    if (packet.Commands[0].Type == MessageInitReply) {
-	DebugLevel0Fn("late init reply\n");
+
+    //
+    //	Minimal checks for good/correct packet.
+    //
+    if ( packet->Commands[0].Type <= MessageInitConfig
+	    || n!=sizeof(NetworkPacket)) {
+	if ( packet->Commands[0].Type == MessageInitConfig
+		&& n==sizeof(InitMessage)) {
+	    Acknowledge acknowledge;
+
+	    DebugLevel0Fn("Received late clients\n");
+
+	    // Acknowledge the packets.
+	    acknowledge.Type = MessageInitReply;
+	    n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
+		    sizeof(acknowledge));
+	    DebugLevel0Fn("Sending config ack (%d)\n", n);
+	    return;
+	}
+	if (packet->Commands[0].Type == MessageInitReply) {
+	    DebugLevel0Fn("late init reply\n");
+	    return;
+	}
+	DebugLevel0Fn("Bad packet\n");
+	return;
+    }
+    for (i = 0; i < HostsCount; ++i) {
+	if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort) {
+	    break;
+	}
+    }
+    if( i==HostsCount ) {
+	DebugLevel0Fn("Not a host in play\n");
 	return;
     }
 
@@ -745,7 +822,7 @@ global void NetworkEvent(void)
     for (i = 0; i < NetworkDups; ++i) {
 	NetworkCommand *nc;
 
-	nc = &packet.Commands[i];
+	nc = &packet->Commands[i];
 
 	//
 	//	Handle some messages.
@@ -765,7 +842,7 @@ global void NetworkEvent(void)
 		n -= 0x100;
 	    }
 
-	    DebugLevel3Fn("resend for %d\n",n);
+	    DebugLevel2Fn("Resend for %d got\n",n);
 	    //
 	    //	Find the commands to resend
 	    //
@@ -782,7 +859,7 @@ global void NetworkEvent(void)
 		ncq = (NetworkCommandQueue *)(ncq->List->prev);
 	    }
 	    if (!ncq->List->prev) {
-		DebugLevel3Fn("no packets for resend\n");
+		DebugLevel2Fn("no packets for resend\n");
 	    }
 #else
 	    ncq = (NetworkCommandQueue *)(CommandsOut->first);
@@ -804,6 +881,7 @@ global void NetworkEvent(void)
 
 	// need player number. This could also be calculated from the
 	//	sender ip, port.
+	// FIXME: see above now known!
 	if (nc->Type == MessageChat || nc->Type == MessageChatTerm) {
 	    player = ((NetworkChat *)nc)->Player;
 	} else if (nc->Type == MessageSync) {
@@ -819,7 +897,10 @@ global void NetworkEvent(void)
 	    n -= 0x100;
 	}
 
-	DebugLevel3Fn("command %d for %d %x\n", nc->Type, n, nc->Frame);
+	if( NetworkIn[nc->Frame][player].Time != n ) {
+	    DebugLevel2Fn("Command %3d for %8d(%02X) got\n",
+		    nc->Type, n, nc->Frame);
+	}
 
 	// Place in network in
 	NetworkIn[nc->Frame][player].Time = n;
@@ -839,7 +920,7 @@ global void NetworkEvent(void)
 		break;
 	    }
 	}
-	DebugLevel2("%d in sync %d\n", FrameCounter, NetworkInSync);
+	DebugLevel3("%d in sync %d\n", FrameCounter, NetworkInSync);
     }
 }
 
@@ -947,20 +1028,20 @@ local void NetworkResendCommands(void)
     packet.Commands[0].Frame =
 	    (FrameCounter / NetworkUpdates) * NetworkUpdates + NetworkUpdates;
 
-    DebugLevel0Fn("In frame %d for frame %d(%x)\n",FrameCounter,
+    DebugLevel2Fn("In frame %d for frame %d(%x):",FrameCounter,
 	    (FrameCounter / NetworkUpdates) * NetworkUpdates + NetworkUpdates,
 	    packet.Commands[0].Frame);
 
     ncq = (NetworkCommandQueue *)(CommandsOut->last);
 
     for (i = 1; i < NetworkDups; ++i) {
+	DebugLevel2("%d %d,", ncq->Data.Type, ncq->Time);
 	packet.Commands[i] = ncq->Data;
-	DebugLevel3Fn("%p %p %d %d\n",
-		ncq, ncq->List->prev, ncq->Data.Type, ncq->Time);
 	if (ncq->List->prev->prev) {
 	    ncq = (NetworkCommandQueue *)(ncq->List->prev);
 	}
     }
+    DebugLevel2("<%d %d\n", ncq->Data.Type, ncq->Time);
 
     // if(0 || !(rand() & 15))
 	NetworkBroadcast(&packet, sizeof(packet));
@@ -1020,7 +1101,7 @@ local void NetworkExecCommands(void)
 		// FIXME: how many packets must be kept exactly?
 		// if (ncq->Time + NetworkLag + NetworkUpdates >= FrameCounter)
 		// THIS is too much if (ncq->Time >= FrameCounter) 
-		if (ncq->Time + NetworkLag >= FrameCounter) {
+		if (ncq->Time + NetworkLag > FrameCounter) {
 		    break;
 		}
 		DebugLevel3Fn("remove %d,%d\n", FrameCounter, ncq->Time);
