@@ -567,6 +567,8 @@ global void RLEPlayerPixels(const Player* player, const RleSprite * sprite)
 	    break;
 	case 24:
 	    // FIXME: support for real 24 bpp mode
+	    //*((struct __4pixel24__*)(((VMemType24*)sprite->Pixels)+208))
+	    //	    =player->UnitColors.Depth24;
 	case 32:
 	    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
 		    =player->UnitColors.Depth32;
@@ -585,25 +587,15 @@ global void PlayerPixels(const Player* player)
     // FIXME: use function pointer
     switch( VideoDepth ) {
     case 8:
-	//Pixels8[208]=player->UnitColor1;
-	//Pixels8[209]=player->UnitColor2;
-	//Pixels8[210]=player->UnitColor3;
-	//Pixels8[211]=player->UnitColor4;
 	*((struct __4pixel8__*)(Pixels8+208))=player->UnitColors.Depth8;
 	break;
     case 15:
     case 16:
-	//Pixels16[208]=player->UnitColor1;
-	//Pixels16[209]=player->UnitColor2;
-	//Pixels16[210]=player->UnitColor3;
-	//Pixels16[211]=player->UnitColor4;
 	*((struct __4pixel16__*)(Pixels16+208))=player->UnitColors.Depth16;
 	break;
+    case 24:
+	// FIXME: support for real 24 bpp mode
     case 32:
-	//Pixels32[208]=player->UnitColor1;
-	//Pixels32[209]=player->UnitColor2;
-	//Pixels32[210]=player->UnitColor3;
-	//Pixels32[211]=player->UnitColor4;
 	*((struct __4pixel32__*)(Pixels32+208))=player->UnitColors.Depth32;
 	break;
     }
