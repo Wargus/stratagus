@@ -95,6 +95,11 @@ enum _game_types_ {
     SettingsGameTypeMapDefault=SettingsPresetMapDefault,
     SettingsGameTypeMelee=0,
     SettingsGameTypeFreeForAll,
+    SettingsGameTypeTopVsBottom,
+    SettingsGameTypeLeftVsRight,
+
+    // Future game type ideas
+#if 0
     SettingsGameTypeOneOnOne,
     SettingsGameTypeCaptureTheFlag,
     SettingsGameTypeGreed,
@@ -102,8 +107,7 @@ enum _game_types_ {
     SettingsGameTypeSuddenDeath,
     SettingsGameTypeTeamMelee,
     SettingsGameTypeTeamCaptureTheFlag,
-    SettingsGameTypeTopVsBottom,
-    SettingsGameTypeLeftVsRight,
+#endif
 };
 
 
