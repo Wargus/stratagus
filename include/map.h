@@ -560,11 +560,11 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(player,x,y) \
-    (IsTileVisible(player,x,y))
+    (IsTileVisible((player),(x),(y)))
 
     /// Check if a field for the user is visibile
 #define IsMapFieldVisible(player,x,y) \
-    (IsTileVisible(player,x,y)>1)
+    (IsTileVisible((player),(x),(y))>1)
 
 #else
 
