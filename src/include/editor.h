@@ -42,6 +42,9 @@ extern char** EditorUnitTypes;		/// Sorted editor unit-type table
 
 extern int MaxUnitIndex;		/// Max unit icon draw index
 
+extern char* EditorSelectIcon;		/// Editor's select icon
+extern char* EditorUnitsIcon;		/// Editor's units icon
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
