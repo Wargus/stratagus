@@ -7177,9 +7177,11 @@ local void EnterMasterAction(Menuitem *mi, int key)
 {
     Menu *menu;
 
-    menu = FindMenu("menu-multi-setup");
-    PublicMasterAnnounce = 0;
-    menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
+    if (key == '\b' || (key >= ' ' && key <= 256)) {
+	menu = FindMenu("menu-multi-setup");
+	PublicMasterAnnounce = 0;
+	menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
+    }
 }
 
 //@}
