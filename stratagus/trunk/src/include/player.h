@@ -437,6 +437,7 @@ enum _notify_type_ {
 extern int NumPlayers;			/// How many player slots used
 extern Player Players[PlayerMax];	/// All players
 extern Player* ThisPlayer;		/// Player on local computer
+extern int NoRescueCheck;		/// Disable rescue check
 
 extern char** RaceWcNames;		/// pud original -> internal
 

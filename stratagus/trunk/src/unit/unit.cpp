@@ -1456,6 +1456,8 @@ local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
 
 /**
 **	Rescue units.
+**
+**	Look through all rescueable players, if they could be rescued.
 */
 global void RescueUnits(void)
 {
@@ -1467,12 +1469,11 @@ global void RescueUnits(void)
     int i;
     int j;
     int l;
-    static int norescue;
 
-    if( norescue ) {			// all possible units are rescued
+    if( NoRescueCheck ) {		// all possible units are rescued
 	return;
     }
-    norescue=1;
+    NoRescueCheck=1;
 
     //
     //	Look if player could be rescued.
@@ -1482,13 +1483,14 @@ global void RescueUnits(void)
 	    continue;
 	}
 	if( p->TotalNumUnits ) {
-	    norescue=0;
+	    NoRescueCheck=0;
 	    // NOTE: table is changed.
 	    l=p->TotalNumUnits;
 	    memcpy(table,p->Units,l*sizeof(Unit*));
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
-		DebugLevel3("Checking %d\n",UnitNumber(unit));
+		DebugLevel2("Checking %d(%s)",UnitNumber(unit),
+			unit->Type->Ident);
 #ifdef UNIT_ON_MAP
 		// FIXME: could be done faster?
 #endif
@@ -1506,6 +1508,7 @@ global void RescueUnits(void)
 			unit->X+unit->Type->TileWidth+2,
 			unit->Y+unit->Type->TileHeight+2,around);
 		}
+		DebugLevel2(" = %d\n",n);
 		//
 		//	Look if human near the unit.
 		//
