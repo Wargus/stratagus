@@ -1960,8 +1960,6 @@ local void mapdeco_draw(void* dummy_data)
 /**
 **		Initialize the fog of war.
 **		Build tables, setup functions.
-**
-**		@see VideoBpp
 */
 global void InitMap(void)
 {
@@ -1969,8 +1967,8 @@ global void InitMap(void)
 	// StephanR: Using the decoration mechanism we need to support drawing tiles
 	// clipped, as by only updating a small part of the tile, we don't have to
 	// redraw items overlapping the remaining part of the tile.. it might need
-	// some performance increase though, but atleast the video dependent depth is
-	// not done here, making the switch(VideoBpp) obsolete..
+	// some performance increase though, but at least the video dependent depth is
+	// not done here..
 	MapDrawTile = MapDrawXXTileClip;
 	VideoDrawTile = VideoDrawXXTileClip;
 	DebugLevel0Fn("Adding a big deco %d,%d - %d %d\n" _C_
