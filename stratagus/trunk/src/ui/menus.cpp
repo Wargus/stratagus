@@ -2361,7 +2361,6 @@ local void SaveSelectLBExit(Menuitem *mi)
 
     if (mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
-//	FreeMapInfos(fl, mi->d.listbox.noptions);
 	free(fl);
 	mi->d.listbox.options = NULL;
 	mi->d.listbox.noptions = 0;
@@ -2446,9 +2445,13 @@ local void SaveSelectLBAction(Menuitem *mi, int i)
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
-	strcpy(SaveGameMenuItems[1].d.input.buffer, fl[i].name);
-	SaveGameMenuItems[1].d.input.nch = strlen(fl[i].name);
-	SaveGameMenuItems[4].flags = MenuButtonSelected;
+	if (fl[i].type) {
+	    strcpy(SaveGameMenuItems[1].d.input.buffer, fl[i].name);
+	    SaveGameMenuItems[1].d.input.nch = strlen(fl[i].name);
+	    SaveGameMenuItems[4].flags = MenuButtonSelected;
+	} else {
+	    SaveGameMenuItems[4].flags = MenuButtonDisabled;
+	}
     }
 
 }
