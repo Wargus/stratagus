@@ -1082,6 +1082,13 @@ global int HandleCheats(const char* Input)
 	} else {
 	    SetMessage("God Mode OFF");
 	}
+    } else if (!strcmp(Input, "fill mana")) {
+	for (i = 0; i < ThisPlayer->TotalNumUnits; ++i) {
+	    if (ThisPlayer->Units[i]->Type->_MaxMana) {
+		ThisPlayer->Units[i]->Mana = ThisPlayer->Units[i]->Type->_MaxMana;
+	    }
+	}
+	SetMessage("All magic at your command");
 #ifdef DEBUG
     } else if (!strcmp(Input, "ai me")) {
 	if (ThisPlayer->AiEnabled) {
