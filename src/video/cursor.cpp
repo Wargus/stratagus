@@ -817,8 +817,12 @@ global void DrawAnyCursor(void)
     //
     //	Last, Normal cursor.
     //  This will also save (part of) drawn rectangle cursor, but that's ok.
+    //  Cursor May not Exist if we are loading a game or something. Only
+    //	draw it if it exists
     //
-    DrawCursor(GameCursor,CursorX,CursorY,GameCursor->SpriteFrame);
+    if( GameCursor ) {
+	DrawCursor(GameCursor,CursorX,CursorY,GameCursor->SpriteFrame);
+    }
 }
 
 /**
