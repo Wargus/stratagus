@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+// T H E   W A R   B E G I N S
+// Stratagus - A free fantasy real time strategy game engine
 //
 /**@name movie.c - Movie playback functions. */
 //
-//	(c) Copyright 2002-2004 by Lutz Sammer
+// (c) Copyright 2002-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -57,7 +57,7 @@ extern void VPDeInitLibrary(void);
 
 #if defined(USE_SDL) && !defined(USE_OPENGL)  /// Only supported with SDL for now
 
-extern SDL_Surface* TheScreen;	    /// internal screen
+extern SDL_Surface* TheScreen; ///< internal screen
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -206,7 +206,7 @@ static void MovieCallbackMouse(int dummy_x __attribute__((unused)),
 }
 
 /**
-**		Callback for exit.
+** Callback for exit.
 */
 static void MovieCallbackExit(void)
 {
