@@ -1647,6 +1647,7 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 }
 
 #ifdef HIERARCHIC_PATHFINDER
+#include "pathfinder.h"
 // hack
 #include "../pathfinder/region_set.h"
 #endif	// HIERARCHIC_PATHFINDER
@@ -1725,15 +1726,23 @@ global void DrawMapFogOfWar(int x,int y)
 			int regid;
 extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 #define GameFont 1
-			regid =
-			    MapFieldGetRegId ((dx-TheUI.MapX)/TileSizeX + MapX,
+
+			if (PfHierShowRegIds || PfHierShowGroupIds) {
+			    regid =
+				MapFieldGetRegId (
+					    (dx-TheUI.MapX)/TileSizeX + MapX,
 					    (dy-TheUI.MapY)/TileSizeY + MapY);
-			if (regid) {
-			    Region *r = RegionSetFind (regid);
-			    snprintf (regidstr, 8, "%d", regid);
-			    VideoDrawText (dx, dy, GameFont, regidstr);
-			    snprintf (groupstr, 8, "%d", r->GroupId);
-			    VideoDrawText (dx, dy+19, GameFont, groupstr);
+			    if (regid) {
+				Region *r = RegionSetFind (regid);
+				if (PfHierShowRegIds) {
+				    snprintf (regidstr, 8, "%d", regid);
+				    VideoDrawText (dx, dy, GameFont, regidstr);
+				}
+				if (PfHierShowGroupIds) {
+				    snprintf (groupstr, 8, "%d", r->GroupId);
+				    VideoDrawText (dx, dy+19, GameFont, groupstr);
+				}
+			    }
 			}
 		    }
 #endif	// HIERARCHIC_PATHFINDER
