@@ -471,7 +471,7 @@ struct _unit_type_ {
     char*	Ident;			/// Identifier
     char*	Name;			/// Pretty name shown from the engine
     char*	SameSprite;		/// Unit-type shared sprites
-    char*	File[4/*TilesetMax*/];	/// Sprite files
+    char*	File[TilesetMax];	/// Sprite files
 
     int		Width;			/// Sprite width
     int		Height;			/// Sprite height
