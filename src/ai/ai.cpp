@@ -238,9 +238,11 @@ global void AiHelpMe(Unit* unit)
 
     DebugLevel0Fn("%d(%s) attacked at %d,%d\n" _C_
 	    UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
-
+    //
+    //	Send force 0 defending
+    //
     pai=unit->Player->Ai;
-    if( !pai->Force[0].Attacking ) {	// Send force 0 defending
+    if( !pai->Force[0].Attacking && unit->Type->Building ) {
 	AiAttackWithForceAt(0,unit->X,unit->Y);
 	pai->Force[0].Defending=1;
     }
