@@ -1110,10 +1110,8 @@ local void ServerParseHello(const InitMessage* msg)
 
 /**
 **	FIXME: docu
-**
-**	@param msg	message received
 */
-local void ServerParseResync(const InitMessage* msg)
+local void ServerParseResync(void)
 {
     int h, i, n;
     InitMessage message;
@@ -1170,10 +1168,8 @@ local void ServerParseResync(const InitMessage* msg)
 
 /**
 **	FIXME: docu
-**
-**	@param msg	message received
 */
-local void ServerParseWaiting(const InitMessage* msg)
+local void ServerParseWaiting(void)
 {
     int h, i, n;
     InitMessage message;
@@ -1254,10 +1250,8 @@ local void ServerParseWaiting(const InitMessage* msg)
 
 /**
 **	FIXME: docu
-**
-**	@param msg	message received
 */
-local void ServerParseMap(const InitMessage* msg)
+local void ServerParseMap(void)
 {
     int h, n;
     InitMessage message;
@@ -1355,10 +1349,8 @@ local void ServerParseState(const InitMessage* msg)
 
 /**
 **	FIXME: docu
-**
-**	@param msg	message received
 */
-local void ServerParseGoodBye(const InitMessage* msg)
+local void ServerParseGoodBye(void)
 {
     int h, n;
     InitMessage message;
@@ -1394,10 +1386,8 @@ local void ServerParseGoodBye(const InitMessage* msg)
 
 /**
 **	FIXME: docu
-**
-**	@param msg	message received
 */
-local void ServerParseSeeYou(const InitMessage* msg)
+local void ServerParseSeeYou(void)
 {
     int h, i;
 
@@ -1560,15 +1550,15 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		break;
 
 	    case ICMResync:
-		ServerParseResync(msg);
+		ServerParseResync();
 		break;
 
 	    case ICMWaiting:
-		ServerParseWaiting(msg);
+		ServerParseWaiting();
 		break;
 
 	    case ICMMap:
-		ServerParseMap(msg);
+		ServerParseMap();
 		break;
 
 	    case ICMState:
@@ -1576,11 +1566,11 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		break;
 
 	    case ICMGoodBye:
-		ServerParseGoodBye(msg);
+		ServerParseGoodBye();
 		break;
 
 	    case ICMSeeYou:
-		ServerParseSeeYou(msg);
+		ServerParseSeeYou();
 		break;
 
 	    default:
