@@ -599,30 +599,30 @@ found:
 **
 **	@return			damage produces on goal.
 */
-local int CalculateDamageStats( const UnitStats* attacker_stats,
-				const UnitStats* goal_stats,
-				int bloodlust )
+local int CalculateDamageStats(const UnitStats * attacker_stats,
+	const UnitStats * goal_stats, int bloodlust)
 {
     int damage;
-    int basic_damage = attacker_stats->BasicDamage;
-    int piercing_damage = attacker_stats->PiercingDamage;
+    int basic_damage;
+    int piercing_damage;
 
-    if (bloodlust)
-      {
-      basic_damage *= 2;
-      piercing_damage *= 2;
-      printf("bloodlust\n");
-      }
-
-    damage=-goal_stats->Armor;
-    damage+= basic_damage;
-    if( damage<0 ) {
-	damage=0;
+    basic_damage = attacker_stats->BasicDamage;
+    piercing_damage = attacker_stats->PiercingDamage;
+    if (bloodlust) {
+	basic_damage *= 2;
+	piercing_damage *= 2;
+	DebugLevel0Fn("bloodlust\n");
     }
-    damage+=piercing_damage+1;	// round up
-    damage/=2;
-    damage*=((SyncRand()>>15)&1)+1;
-    DebugLevel3Fn("Damage done %d\n",damage);
+
+    damage = -goal_stats->Armor;
+    damage += basic_damage;
+    if (damage < 0) {
+	damage = 0;
+    }
+    damage += piercing_damage + 1;	// round up
+    damage /= 2;
+    damage *= ((SyncRand() >> 15) & 1) + 1;
+    DebugLevel3Fn("Damage done %d\n", damage);
 
     return damage;
 }
@@ -635,9 +635,8 @@ local int CalculateDamageStats( const UnitStats* attacker_stats,
 **	@param bloodlust	If attacker has bloodlust
 **	@return			damage produces on goal.
 */
-local int CalculateDamage( const UnitStats* attacker_stats,
-			   const Unit* goal,
-			   int bloodlust )
+local int CalculateDamage(const UnitStats* attacker_stats,
+    const Unit* goal,int bloodlust)
 {
     return CalculateDamageStats(attacker_stats,goal->Stats,bloodlust);
 }
@@ -848,6 +847,7 @@ local int MissileVisible(const Missile* missile)
     int tileMaxX;
     int tileMinY;
     int tileMaxY;
+
     GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
     if ( !AnyAreaVisibleInMap(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
 	return 0;
