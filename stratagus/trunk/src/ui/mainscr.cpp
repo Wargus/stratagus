@@ -1161,7 +1161,7 @@ global void DrawTimer(void)
     v=&TheUI.VP[TheUI.LastClickedVP];
 
     // FIXME: make this configurable
-    VideoDrawText(v->EndX-70,v->MapY+15,GameFont,buf);
+    VideoDrawText(v->EndX-70,v->Y+15,GameFont,buf);
 }
 
 /**
