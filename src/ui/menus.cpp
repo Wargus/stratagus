@@ -125,12 +125,19 @@ local void EnterSaveGameAction(Menuitem *mi, int key);
 local void SaveAction(void);
 local void CreateSaveDir(Menuitem *mi);
 
-local void SaveSelectLBExit(Menuitem *mi);
-local void SaveSelectLBInit(Menuitem *mi);
-local unsigned char *SaveSelectLBRetrieve(Menuitem *mi, int i);
-local void SaveSelectLBAction(Menuitem *mi, int i);
-local void SaveSelectVSAction(Menuitem *mi, int i);
-local void SaveSelectOk(void);
+local void SaveLBExit(Menuitem *mi);
+local void SaveLBInit(Menuitem *mi);
+local unsigned char *SaveLBRetrieve(Menuitem *mi, int i);
+local void SaveLBAction(Menuitem *mi, int i);
+local void SaveVSAction(Menuitem *mi, int i);
+local void SaveOk(void);
+
+local void LoadLBExit(Menuitem *mi);
+local void LoadLBInit(Menuitem *mi);
+local unsigned char *LoadLBRetrieve(Menuitem *mi, int i);
+local void LoadLBAction(Menuitem *mi, int i);
+local void LoadVSAction(Menuitem *mi, int i);
+local void LoadOk(void);
 
 local void DeleteMenu(void);
 local void DeleteInit(Menuitem *mi __attribute__((unused)));
@@ -1438,7 +1445,7 @@ local void InitKeystrokeHelpMenuItems() {
 local Menuitem SaveGameMenuItems[] = {
     { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
     { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveSelectLBInit, SaveSelectLBExit, {{NULL,0}} },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveLBInit, SaveLBExit, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
@@ -1447,9 +1454,9 @@ local Menuitem SaveGameMenuItems[] = {
 local void InitSaveGameMenuItems() {
     MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
     MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
-    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveSelectLBAction, 0, 0, 0, 0, 7, 0,
-			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
-    MenuitemVslider i3 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveLBAction, 0, 0, 0, 0, 7, 0,
+			   (void *)SaveLBRetrieve, ScenSelectOk};
+    MenuitemVslider i3 = { 0, 18, 7*18, SaveVSAction, -1, 0, 0, 0, SaveOk};
     MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
     MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteMenu, 'd'};
     MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
@@ -1463,17 +1470,17 @@ local void InitSaveGameMenuItems() {
 }
 
 local Menuitem LoadGameMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL, {{NULL, 0}} },
-    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, LoadLBInit, LoadLBExit, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitLoadGameMenuItems() {
-    MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
-    MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveSelectLBAction, 0, 0, 0, 0, 7, 0,
-			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
-    MenuitemVslider i2 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemText    i0 = { "Load Game", MI_TFLAGS_CENTERED};
+    MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, LoadLBAction, 0, 0, 0, 0, 7, 0,
+			   (void *)LoadLBRetrieve, ScenSelectOk};
+    MenuitemVslider i2 = { 0, 18, 7*18, LoadVSAction, -1, 0, 0, 0, LoadOk};
     MenuitemButton  i3 = { "~!Load", 108, 27, MBUTTON_GM_HALF, LoadAction, 'l'};
     MenuitemButton  i4 = { "~!Cancel", 108, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     LoadGameMenuItems[0].d.text    = i0;
@@ -2473,7 +2480,8 @@ global void GameMenuSave(void)
     ProcessMenu(MENU_SAVE_GAME, 1);
 }
 
-local void SaveSelectLBExit(Menuitem *mi)
+// FIXME: modify function
+local void SaveLBExit(Menuitem *mi)
 {
     FileList *fl;
 
@@ -2486,11 +2494,11 @@ local void SaveSelectLBExit(Menuitem *mi)
     }
 }
 
-local void SaveSelectLBInit(Menuitem *mi)
+local void SaveLBInit(Menuitem *mi)
 {
     int i;
 
-    SaveSelectLBExit(mi);
+    SaveLBExit(mi);
     
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, NULL,
 						     (FileList **)&(mi->d.listbox.options));
@@ -2504,7 +2512,8 @@ local void SaveSelectLBInit(Menuitem *mi)
     mi->d.listbox.curopt = -1;
 }
 
-local unsigned char *SaveSelectLBRetrieve(Menuitem *mi, int i)
+// FIXME: modify function
+local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
     Menu *menu;
@@ -2546,7 +2555,7 @@ local unsigned char *SaveSelectLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
-local void SaveSelectLBAction(Menuitem *mi, int i)
+local void SaveLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
 
@@ -2568,7 +2577,7 @@ local void SaveSelectLBAction(Menuitem *mi, int i)
     TypedFileName = 0;
 }
 
-local void SaveSelectVSAction(Menuitem *mi, int i)
+local void SaveVSAction(Menuitem *mi, int i)
 {
     int op, d1, d2;
 
@@ -2598,7 +2607,7 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
 		    MustRedraw |= RedrawMenu;
 		}
 	    }
-	    SaveSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
@@ -2646,7 +2655,7 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
 		DebugCheck(mi->d.listbox.startline < 0);
 		DebugCheck(mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
-		SaveSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -2654,6 +2663,257 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
 	    break;
     }
     TypedFileName = 0;
+}
+
+// FIXME: modify function
+local void SaveOk(void)
+{
+    FileList *fl;
+    Menuitem *mi = ScenSelectMenuItems + 1;
+    int i = mi->d.listbox.curopt + mi->d.listbox.startline;
+
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type == 0) {
+	    strcat(ScenSelectPath, "/");
+	    strcat(ScenSelectPath, fl[i].name);
+	    if (ScenSelectMenuItems[9].flags&MenuButtonDisabled) {
+		ScenSelectMenuItems[9].flags &= ~MenuButtonDisabled;
+		ScenSelectMenuItems[9].d.button.text = ScenSelectDisplayPath;
+	    } else {
+		strcat(ScenSelectDisplayPath, "/");
+	    }
+	    strcat(ScenSelectDisplayPath, fl[i].name);
+	    ScenSelectLBInit(mi);
+	    mi->d.listbox.cursel = -1;
+	    mi->d.listbox.startline = 0;
+	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
+	    mi[1].d.hslider.percent = 0;
+	    MustRedraw |= RedrawMenu;
+	} else {
+	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
+	    EndMenu();
+	}
+    }
+}
+
+// FIXME: modify function
+local void LoadLBExit(Menuitem *mi)
+{
+    FileList *fl;
+
+    if (mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	free(fl);
+	mi->d.listbox.options = NULL;
+	mi->d.listbox.noptions = 0;
+	mi[1].flags |= MenuButtonDisabled;
+    }
+}
+
+local void LoadLBInit(Menuitem *mi)
+{
+    int i;
+
+    LoadLBExit(mi);
+    
+    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, NULL,
+						     (FileList **)&(mi->d.listbox.options));
+    if (i != 0) {
+	if (i > 7) {
+	    LoadGameMenuItems[2].flags = MenuButtonSelected;
+	} else {
+	    LoadGameMenuItems[2].flags = MenuButtonDisabled;
+	}
+    }
+    mi->d.listbox.curopt = -1;
+}
+
+// FIXME: modify function
+local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
+{
+    FileList *fl;
+    Menu *menu;
+    MapInfo *info;
+    static char buffer[1024];
+    int j, n;
+
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type) {
+	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
+		if ((info = fl[i].xdata)) {
+		    menu = Menus + MENU_SCEN_SELECT;
+		    if (info->Description) {
+			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
+		    }
+		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
+		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
+		    for (n = j = 0; j < PlayerMax; j++) {
+			if (info->PlayerType[j] == PlayerPerson) {
+			    n++;
+			}
+		    }
+		    if (n == 1) {
+			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+		    } else {
+			sprintf(buffer, "%d players", n);
+			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+		    }
+		}
+	    }
+	    strcpy(buffer, "   ");
+	} else {
+	    strcpy(buffer, "\260 ");
+	}
+	strcat(buffer, fl[i].name);
+	return buffer;
+    }
+    return NULL;
+}
+
+local void LoadLBAction(Menuitem *mi, int i)
+{
+    FileList *fl;
+
+    DebugCheck(i<0);
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (mi->d.listbox.noptions > 7) {
+	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	}
+	if (fl[i].type) {
+	    strcpy(SaveGameMenuItems[1].d.input.buffer, fl[i].name);
+	    SaveGameMenuItems[1].d.input.nch = strlen(fl[i].name);
+	    SaveGameMenuItems[4].flags = MenuButtonSelected;
+	} else {
+	    SaveGameMenuItems[4].flags = MenuButtonDisabled;
+	}
+    }
+    TypedFileName = 0;
+}
+
+local void LoadVSAction(Menuitem *mi, int i)
+{
+    int op, d1, d2;
+
+    mi--;
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi->d.listbox.curopt == -1)
+	    mi->d.listbox.curopt = 0;
+
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    mi->d.listbox.curopt++;
+		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+			mi->d.listbox.curopt--;
+			mi->d.listbox.startline++;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    mi->d.listbox.curopt--;
+		    if (mi->d.listbox.curopt < 0) {
+			mi->d.listbox.curopt++;
+			mi->d.listbox.startline--;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    }
+	    SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    if (i == 2) {
+		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			    d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
+			    d2 = op - mi[1].d.vslider.curper;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt++;
+			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				mi->d.listbox.curopt--;
+				mi->d.listbox.startline++;
+			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+				break;
+			}
+		    }
+		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
+				     (mi->d.listbox.noptions - 1);
+			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
+			    d2 = mi[1].d.vslider.curper - op;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt--;
+			    if (mi->d.listbox.curopt < 0) {
+				mi->d.listbox.curopt++;
+				mi->d.listbox.startline--;
+			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+				break;
+			}
+		    }
+		}
+
+		DebugCheck(mi->d.listbox.startline < 0);
+		DebugCheck(mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+
+		SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
+    TypedFileName = 0;
+}
+
+// FIXME: modify function
+local void LoadOk(void)
+{
+    FileList *fl;
+    Menuitem *mi = ScenSelectMenuItems + 1;
+    int i = mi->d.listbox.curopt + mi->d.listbox.startline;
+
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type == 0) {
+	    strcat(ScenSelectPath, "/");
+	    strcat(ScenSelectPath, fl[i].name);
+	    if (ScenSelectMenuItems[9].flags&MenuButtonDisabled) {
+		ScenSelectMenuItems[9].flags &= ~MenuButtonDisabled;
+		ScenSelectMenuItems[9].d.button.text = ScenSelectDisplayPath;
+	    } else {
+		strcat(ScenSelectDisplayPath, "/");
+	    }
+	    strcat(ScenSelectDisplayPath, fl[i].name);
+	    ScenSelectLBInit(mi);
+	    mi->d.listbox.cursel = -1;
+	    mi->d.listbox.startline = 0;
+	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
+	    mi[1].d.hslider.percent = 0;
+	    MustRedraw |= RedrawMenu;
+	} else {
+	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
+	    EndMenu();
+	}
+    }
 }
 
 local void SaveMenu(void)
