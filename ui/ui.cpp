@@ -241,6 +241,9 @@ void LoadUserInterface(void)
 	}
 	if (TheUI.StatusLine.File) {
 		TheUI.StatusLine.Graphic = LoadGraphic(TheUI.StatusLine.File);
+		if (!TheUI.StatusLineW) {
+			TheUI.StatusLineW = TheUI.StatusLine.Graphic->Width;
+		}
 	}
 
 	//
