@@ -184,10 +184,6 @@ local void (*LoadCursorRectangle)(int x,int y,int w,int h);
 /**
 **	Load all cursor sprites.
 **
-**	@todo
-**		The races names (4 supported here) are compiled (hardcoded)
-**		also into this source.
-**
 **	@param race	Cursor graphics of this race to load.
 */
 global void LoadCursors(const char* race)
@@ -210,6 +206,7 @@ global void LoadCursors(const char* race)
 	//
 	//	Only load cursors of this race or universal cursors.
 	//
+	DebugLevel0Fn("%s , %s\n",Cursors[i].Race,race);
 	if( Cursors[i].Race && strcmp(Cursors[i].Race,race) ) {
 	    continue;
 	}
