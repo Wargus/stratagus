@@ -136,8 +136,11 @@ global void HandleActionSpellCast(Unit* unit)
 		const SpellType* spell = SpellTypeById( unit->Command.Data.Move.SpellId );
 		if ( unit->Mana < spell->ManaCost )
 		  {
-		  SetMessage( "%s: not enough mana to cast spell: %s", 
-                              unit->Type->Name, spell->Ident );
+       	          if( unit->Player==ThisPlayer ) 
+		    {
+		    SetMessage( "%s: not enough mana to cast spell: %s", 
+                                unit->Type->Name, spell->Ident );
+		    }		
 		  repeat = 0;	      
 		  }
 		else

@@ -210,7 +210,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "death and decay.png",
     32,32,
     { NULL },
-    MissileClassStayWithDelay,	
+    MissileClassDeathDecay,	
     1,
     },
 { MissileTypeType,
@@ -603,13 +603,15 @@ local int CalculateDamageStats(const UnitStats* attacker_stats
 	,const UnitStats* goal_stats)
 {
     int damage;
-
+    int basic_damage = attacker_stats->BasicDamage;
+    int piercing_damage = attacker_stats->PiercingDamage;
+    
     damage=-goal_stats->Armor;
-    damage+=attacker_stats->BasicDamage;
+    damage+= basic_damage;
     if( damage<0 ) {
 	damage=0;
     }
-    damage+=attacker_stats->PiercingDamage+1;	// round up
+    damage+=piercing_damage+1;	// round up
     damage/=2;
     damage*=((SyncRand()>>15)&1)+1;
     DebugLevel3Fn("Damage done %d\n",damage);
@@ -984,6 +986,7 @@ local int PointToPointMissile(Missile* missile)
     return 0;
 }
 
+local int BlizzardMissileHit = 0;
 /**
 **	Work for missile hit.
 */
@@ -1038,6 +1041,9 @@ global void MissileHit(const Missile* missile)
 	DebugLevel3Fn("Oops nothing to hit (%d,%d)?\n",x,y);
 	return;
     }
+    if ( BlizzardMissileHit && goal == missile->SourceUnit )
+      return; // blizzard cannot hit owner unit
+    BlizzardMissileHit = 0;  
     if ( missile->Damage )
       HitUnit(goal,missile->Damage); // direct damage, spells mostly
     else
@@ -1184,11 +1190,26 @@ global void MissileActions(void)
 		    missile->Frame+=4;	// FIXME: frames pro row
 		    if( (missile->Frame&127)
 			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
+			//NOTE: vladi: blizzard cannot hit owner...
+			BlizzardMissileHit = 1;
 			MissileHit(missile);
 			missile->Type=MissileFree;
 		    }
 		}
 		break;
+	    
+	    case MissileClassDeathDecay:	
+	    	//NOTE: vladi: this is exact copy of MissileClassStayWithDelay
+		// but with check for blizzard-type hit (friendly fire:))
+		missile->Wait=missile->Type->Speed;
+		if( ++missile->Frame
+			==VideoGraphicFrames(missile->Type->Sprite) ) {
+		    BlizzardMissileHit = 1;
+		    MissileHit(missile);
+		    missile->Type=MissileFree;
+		}
+		break;
+	    
 	    case MissileClassWhirlwind:
 		missile->Wait=missile->Type->Speed;
 		missile->Frame++;
@@ -1199,7 +1220,7 @@ global void MissileActions(void)
 	        if ( missile->TTL < 1 || missile->TTL % 10 == 0 )
 		  PointToPointMissile(missile);
 		break;
-		
+
 	    case MissileClassStayWithDelay:
 		missile->Wait=missile->Type->Speed;
 		if( ++missile->Frame

@@ -663,6 +663,12 @@ global int UnitVisible(const Unit* unit)
     unsigned m;
     MapField* mf;
 
+    if ( unit->Invisible && unit->Player != ThisPlayer )
+      {
+      //FIXME: vladi: should handle teams and shared vision
+      return 0;
+      }
+
     //
     //	Check if visible on screen
     //
@@ -704,6 +710,12 @@ global int UnitVisible(const Unit* unit)
 	    return 0;
 	}
     );
+
+    if ( unit->Invisible && unit->Player != ThisPlayer )
+      {
+      //FIXME: vladi: should handle teams and shared vision
+      return 0;
+      }
 
     //
     //	Check if visible on screen
@@ -2127,6 +2139,11 @@ global void HitUnit(Unit* unit,int damage)
 
     DebugCheck( damage==0 || unit->HP==0 || unit->Type->Vanishes );
 
+    if ( unit->UnholyArmor > 0 )
+      { //NOTE: vladi: units with active UnholyArmour are invulnerable
+      return;
+      }
+    
     type=unit->Type;
     if( !unit->Attacked ) {
 	if( unit->Player==ThisPlayer ) {

@@ -75,7 +75,7 @@ global SpellType SpellTypeTable[] = {
 { 0, "spell-healing",          4,   6,  -1, SpellActionHealing      , "healing",        NULL },
 { 0, "spell-exorcism",        10,   4,  -1, SpellActionExorcism     , "exorcism",       NULL },
 //      ---human mages---                                                ---human mages---          
-{ 0, "spell-fireball",         8, 100, 999, SpellActionFireball     , "fireball",       NULL },
+{ 0, "spell-fireball",         8, 100,1000, SpellActionFireball     , "fireball",       NULL },
 { 0, "spell-slow",            10,  50,1000, SpellActionSlow         , "slow",           NULL },
 { 0, "spell-flame-shield",     6,  80, 600, SpellActionFlameShield  , "flame shield",   NULL },
 { 0, "spell-invisibility",     6, 200,2000, SpellActionInvisibility , "invisibility",   NULL },
@@ -109,8 +109,11 @@ MissileType* missile_rune      = NULL;
 ----------------------------------------------------------------------------*/
 
 /*
-** Missile controllers should return 0 to continue 
-** or 1 to cancel the spell/missile
+** Missile controllers 
+**
+** To cancel a missile set it's TTL to 0, it will be handled right after
+** the controller call and missile will be down.
+**
 */
 
 /*
@@ -125,9 +128,10 @@ global int SpellFireballController( void* missile )
   Missile* mis = (Missile*)missile;
   
   //NOTE: vladi: TTL is used as counter for explosions
-  //      first 6 counts there are no explosions, then on each second
-  //      and at the target destination
-  if ( (mis->TTL < 993 && mis->TTL % 2 == 0) || (mis->X == mis->DX && mis->Y == mis->DY) ) // approx.
+  // explosions start at target and continue (10 tiles) beyond
+  // explosions are on each tile on the way
+    
+  if ( mis->TTL <= mis->State && mis->TTL % 2 == 0 ) // approx.
     {
     //+TileSize/2 to align gfx to baseline
     int x = mis->X + TileSizeX/2;
@@ -144,7 +148,8 @@ global int SpellFireballController( void* missile )
     for( i=0; i<n; ++i )
       HitUnit(table[i],FIREBALL_DAMAGE);
     }
-  return 0;	   
+  
+  return 0;
 };
 
 /*
@@ -486,6 +491,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   int sy = unit->Y;
 	   int dx = x;
 	   int dy = y;
+	   int dist;
 	   
 	   if ( target )
 	     {
@@ -493,15 +499,22 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	     dy = target->Y;
 	     }
 	   
+	   dist = MapDistance( sx, sy, dx, dy );
+	   dx += ((dx - sx)*10)/dist;
+	   dy += ((dy - sy)*10)/dist;
+	   
+	   sx = sx*TileSizeX+TileSizeX/2;
+	   sy = sy*TileSizeX+TileSizeX/2;
+	   dx = dx*TileSizeX+TileSizeX/2;
+	   dy = dy*TileSizeX+TileSizeX/2;
+	   
 	   unit->Mana -= spell->ManaCost;
 
   	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-fireball"), 
-	                sx*TileSizeX+TileSizeX/2,   
-	                sy*TileSizeX+TileSizeX/2,   
-	                dx*TileSizeX+TileSizeX/2,   
-	                dy*TileSizeX+TileSizeX/2 ); 
+	                sx, sy, dx, dy ); 
 	   
+	   mis->State = spell->TTL - (dist - 1) * 2;
 	   mis->TTL = spell->TTL;
 	   mis->Controller = SpellFireballController;
 	   }   
@@ -646,7 +659,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 //  ---orc death knights---
     case SpellActionDeathCoil:
     	 if( (target && target->Type->Organic) || (!target) )  
-	   { //NOTE: fireball can be casted on spot
+	   { 
 	   Missile* mis;
 	   int sx = unit->X;
 	   int sy = unit->Y;
