@@ -698,20 +698,21 @@ global void UpdateButtonPanel(void)
 
 	buttonaction=UnitButtonTable[z];
 	pos = buttonaction->Pos;
-	
+
 	// Same level
 	if ( buttonaction->Level != CurrentButtonLevel ) {
 	    continue;
 	}
-	
-	if ( pos > 9 ) // VLADI: this allows alt-buttons
-	  {
-	  if ( KeyModifiers & ModifierAlt )
-	    pos -= 9; // buttons with pos >9 are shown on if ALT is pressed
-	  else
-	    continue;  
-	  }
-	
+
+	if ( pos > 9 ) {	// VLADI: this allows alt-buttons
+	    if ( KeyModifiers & ModifierAlt ) {
+		// buttons with pos >9 are shown on if ALT is pressed
+		pos -= 9;
+	    } else {
+		continue;
+	    }
+	}
+
 	// any unit or unit in list
 	if ( buttonaction->UnitMask[0] != '*'
 		&& !strstr( buttonaction->UnitMask, unit_ident ) ) {
