@@ -455,6 +455,7 @@ global void DrawResources(void)
 
 // FIXME: need messages for chat!
 
+local char  MessageBuffer[40];		// message buffer
 local char* Message;			// message in map window
 local int   MessageCounter;		// how long to display message
 
@@ -488,14 +489,25 @@ global void SetMessage(char* message)
 **
 **	@param message	To be displayed in text overlay.
 */
-global void SetMessageDup(char* message)
+global void SetMessageDup(const char* message)
 {
-    static char buffer[40];
+    strncpy(MessageBuffer,message,sizeof(MessageBuffer));
+    MessageBuffer[sizeof(MessageBuffer)-1]='\0';
 
-    strncpy(buffer,message,sizeof(buffer));
-    buffer[sizeof(buffer)-1]='\0';
+    SetMessage(MessageBuffer);
+}
 
-    SetMessage(buffer);
+/**
+**	Append message to display.
+**
+**	@param message	To be displayed in text overlay.
+*/
+global void SetMessageDupCat(const char* message)
+{
+    strncat(MessageBuffer,message,sizeof(MessageBuffer)-strlen(MessageBuffer));
+    MessageBuffer[sizeof(MessageBuffer)-1]='\0';
+
+    SetMessage(MessageBuffer);
 }
 
 /**
