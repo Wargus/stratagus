@@ -619,9 +619,11 @@ static int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 */
 void DrawMissile(MissileType* mtype, int frame, int x, int y)
 {
+#ifdef DYNAMIC_LOAD
 	if (!mtype->Sprite) {
 		LoadMissileSprite(mtype);
 	}
+#endif
 
 	if (mtype->Flip) {
 		if (frame < 0) {
