@@ -55,6 +55,7 @@
 global unsigned SyncHash;	    /// Hash calculated to find sync failures
 global int BurnBuildingPercent;	    /// Max percent to burn buildings
 global int BurnBuildingDamageRate;  /// HP per second to damage buildings
+global int BurnBuildingWait;	    /// Cycles to Wait for each burn
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -261,6 +262,171 @@ local void (*HandleActionTable[256])(Unit*) = {
 };
 
 /**
+ **	Do the runestone work each second.
+ **
+ **	@param	unit	unit that heals an area
+*/
+local void IncrementAreaHealthMana(Unit* unit)
+{
+    Unit* units[UnitMax];
+    int nunits;
+    int j;
+
+    // Get all the units around the unit
+    nunits = SelectUnits(unit->X - unit->Stats->SightRange,
+		unit->Y - unit->Stats->SightRange,
+		unit->X + unit->Stats->SightRange+unit->Type->Width,
+		unit->Y + unit->Stats->SightRange+unit->Type->Height,
+		units);
+    // Mana and HP on units, 2 every time
+    for (j = 0; j < nunits; ++j) {
+	if (units[j] == unit) {
+	    continue;
+	}
+
+	// Restore HP in everything but buildings (even in other player's units)
+	if (units[j]->Type->Organic && units[j]->HP < units[j]->Stats->HitPoints ) {
+	    units[j]->HP++;
+	}
+
+	// Restore mana in all magical units
+	if(units[j]->Type->CanCastSpell && units[j]->Mana < units[j]->Type->_MaxMana)  {	
+	    units[j]->Mana++;
+	}
+    }
+}
+
+/**
+**	Increment a unit's health
+**
+**	@param	unit	the unit to operate on
+*/
+local void IncrementUnitHealth(Unit* unit)
+{
+    // Unit may not have stats assigned to it
+    if (unit->Stats) {
+	if (HitPointRegeneration && unit->HP<unit->Stats->HitPoints) {
+	    ++unit->HP;
+
+	    if( unit->Selected ) {
+		MustRedraw|=RedrawInfoPanel;
+	    }
+	}
+	
+	if( unit->Stats->RegenerationRate && unit->HP<unit->Stats->HitPoints ) {
+	    unit->HP+=unit->Stats->RegenerationRate;
+	    if( unit->HP > unit->Stats->HitPoints ) {
+		unit->HP = unit->Stats->HitPoints;
+	    }
+
+	    if( unit->Selected ) {
+		MustRedraw|=RedrawInfoPanel;
+	    }
+	}
+    }
+}
+
+/**
+**	Handle things about the unit that decay over time
+**
+**	@param	unit	the unit that the decay is handled for
+**
+**	@return	1 for dead unit, 0 otherwise
+*/
+local int HandleDecay(Unit* unit)
+{
+    int deadunit;
+    int flag;
+
+    if( unit->Type->CanCastSpell && unit->Mana!=unit->Type->_MaxMana ) {
+	unit->Mana++;
+
+	if( unit->Selected ) {
+	    MustRedraw|=RedrawInfoPanel;
+	}
+    }
+
+    deadunit=0;
+    //
+    //	Look if the time to live is over.
+    //
+    if( unit->TTL && unit->TTL<(GameCycle-unit->HP) ) {
+	DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL
+		_C_ GameCycle);
+	if( !--unit->HP ) {
+	    LetUnitDie(unit);
+	    deadunit|=1;
+	}
+	if( unit->Selected ) {
+	    MustRedraw|=RedrawInfoPanel;
+	}
+    }
+
+    // some frames delayed done my color cycling
+    flag=1;
+    //
+    // decrease spells effects time, if end redraw unit.
+    //
+    if ( unit->Bloodlust ) {
+	unit->Bloodlust--;
+	if( !flag && !unit->Bloodlust ) {
+	    flag=CheckUnitToBeDrawn(unit);
+	}
+    }
+    if ( unit->Haste ) {
+	unit->Haste--;
+	if( !flag && !unit->Haste ) {
+	    flag=CheckUnitToBeDrawn(unit);
+	}
+    }
+    if ( unit->Slow ) {
+	unit->Slow--;
+	if( !flag && !unit->Slow ) {
+	    flag=CheckUnitToBeDrawn(unit);
+	}
+    }
+    if ( unit->Invisible ) {
+	unit->Invisible--;
+	if( !flag && !unit->Invisible ) {
+	    flag=CheckUnitToBeDrawn(unit);
+	}
+    }
+    if ( unit->UnholyArmor ) {
+	unit->UnholyArmor--;
+	if( !flag && !unit->UnholyArmor ) {
+	    flag=CheckUnitToBeDrawn(unit);
+	}
+    }
+    DebugLevel3Fn("%d:%d,%d,%d,%d,%d\n" _C_ UnitNumber(unit) _C_
+	    unit->Bloodlust _C_ unit->Haste _C_ unit->Slow _C_
+	    unit->Invisible _C_ unit->UnholyArmor);
+
+    return deadunit;
+}
+
+/**
+**	Handle burning buildings
+**
+**	@param	unit	unit to burn
+*/
+local void BurnBuilding(Unit* unit)
+{
+    int f;
+
+    if( !unit->Type->Building || unit->Removed || unit->Destroyed ) {
+	return;
+    }
+
+    // don't burn buildings under construction
+    if( unit->Stats->HitPoints && unit->Orders[0].Action!=UnitActionBuilded ) {
+	f = (100 * unit->HP) / unit->Stats->HitPoints;
+	if( f <= BurnBuildingPercent ) {
+	    HitUnit(NoUnitP, unit, BurnBuildingDamageRate);
+	}
+    }
+}
+
+/**
 **	Handle the action of an unit.
 **
 **	@param unit	Pointer to handled unit.
@@ -355,6 +521,20 @@ global void UnitActions(void)
     Unit** tpos;
     Unit** tend;
     Unit* unit;
+    int burnthiscycle;
+    int healthiscycle;
+    int manathiscycle;
+    int blinkthiscycle;
+
+    if( BurnBuildingPercent ) {
+	burnthiscycle=!(GameCycle%BurnBuildingWait);
+    } else {
+	burnthiscycle=0;
+    }
+    // FIXME: Make configurable from CCL;
+    healthiscycle=!(GameCycle%CYCLES_PER_SECOND);
+    manathiscycle=!(GameCycle%CYCLES_PER_SECOND);
+    blinkthiscycle=!(GameCycle%CYCLES_PER_SECOND);
 
     //
     //	Must copy table, units could be removed.
@@ -408,6 +588,29 @@ global void UnitActions(void)
 	if( --unit->Wait ) {		// Wait until counter reached
 	    continue;
 	}
+
+	if( blinkthiscycle && unit->Blink ) {	// clear blink flag
+	    --unit->Blink;
+	}
+
+	if (manathiscycle) {
+	    if (HandleDecay(unit)) {
+		// Unit Died
+		continue;
+	    }
+	}
+
+	//FIXME: Need to configure this to work
+	if( 0 ) { //Condition for Area Heal
+	    IncrementAreaHealthMana(unit);
+	}
+	if( healthiscycle ) {
+	    IncrementUnitHealth(unit);
+	}
+	if( burnthiscycle ) {
+	    BurnBuilding(unit);
+	}
+
 	HandleUnitAction(unit);
 	DebugCheck( *tpos!=unit );	// Removed is evil.
 
@@ -457,31 +660,30 @@ global void UnitActions(void)
 }
 
 /**
-**	Handle burning buildings
+**	Handle Marking and Unmarking of Cloak
+**
+**	@note Must be handled outside the drawing fucntions and
+**	@note all at once.
 */
-global void BurnBuildings(void)
+global void HandleCloak(void)
 {
     Unit* unit;
     int i;
-    int f;
 
-    if( !BurnBuildingPercent ) {
-	return;
-    }
-
-    for( i=0; i<NumUnits; ++i) {
-	unit = Units[i];
-
-	if( !unit->Type->Building || unit->Removed || unit->Destroyed ) {
-	    continue;
-	}
-
-	// don't burn buildings under construction
-	if( unit->Stats->HitPoints && unit->Orders[0].Action!=UnitActionBuilded ) {
-	    f = (100 * unit->HP) / unit->Stats->HitPoints;
-	    if( f <= BurnBuildingPercent ) {
-		HitUnit(NoUnitP, unit, BurnBuildingDamageRate);
+    for (i=0; i<NumUnits; i++) {
+	unit=Units[i]; 
+	if (  unit->Type->PermanentCloak ) {
+	    if( (unit->Visible&(1<<ThisPlayer->Player)) ) {
+		CheckUnitToBeDrawn(unit);
 	    }
+	    unit->Visible=0;
+	}
+    }
+    for (i=0; i<NumUnits; ++i) {
+	unit=Units[i];
+	if( unit->Type->DetectCloak && !unit->Removed &&
+	    unit->Orders[0].Action!=UnitActionBuilded ) {
+	    MapDetectCloakedUnits(unit);
 	}
     }
 }
