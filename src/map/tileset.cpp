@@ -361,6 +361,34 @@ global void LoadTileset(void)
     TheMap.Tileset->OrcWallTable[13] = 0x9C0;
     TheMap.Tileset->OrcWallTable[14] = 0x9A0;
     TheMap.Tileset->OrcWallTable[15] = 0x0C0;
+
+    // Set destroyed walls to TileTypeUnknown
+    for (i=0; i<16; ++i) {
+	n = 0;
+	tile = TheMap.Tileset->HumanWallTable[i];
+	while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
+	    ++tile;
+	    ++n;
+	}
+	while (!TheMap.Tileset->Table[tile]) {	// Skip separator
+	    ++tile;
+	    ++n;
+	}
+	while (TheMap.Tileset->Table[tile]) {	// Skip good tiles
+	    ++tile;
+	    ++n;
+	}
+	while (!TheMap.Tileset->Table[tile]) {	// Skip separator
+	    ++tile;
+	    ++n;
+	}
+	while (n<16 && TheMap.Tileset->Table[tile]) {
+	    TheMap.Tileset->TileTypeTable[
+		TheMap.Tileset->Table[tile]] = TileTypeUnknown;
+	    ++tile;
+	    ++n;
+	}
+    }
 };
 
 /**
