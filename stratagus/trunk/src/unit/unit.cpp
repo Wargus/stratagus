@@ -2653,8 +2653,8 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 
     destx=x=unit->X;
     desty=y=unit->Y;
-    points=alloca(TheMap.Width*TheMap.Height/4);
-    size=TheMap.Width*TheMap.Height/sizeof(*points);
+    size=TheMap.Width*TheMap.Height/4;
+    points=alloca(size*sizeof(*points));
 	
 
     //
