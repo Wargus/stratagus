@@ -10,7 +10,7 @@
 //
 /**@name unit.c		-	The units. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -151,7 +151,9 @@ global void ReleaseUnit(Unit* unit)
 	}
     }
 
+#ifdef REFS_DEBUG
     DebugCheck( unit->Refs );
+#endif
 
 #ifdef UNIT_ON_MAP
     if( 0 ) {		// debug check
