@@ -715,6 +715,7 @@ global void LoadPud(const char* pud,WorldMap* map)
     int height;
 
     if( !(input=CLopen(pud)) ) {
+	fprintf(stderr,"Try ./path/name\n");
 	sprintf(buf, "pud: CLopen(%s)", pud);
 	perror(buf);
 	exit(-1);
