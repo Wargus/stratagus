@@ -264,9 +264,9 @@ extern void HandleButtonUp(unsigned button);
     /// Called if the mouse is moved
 extern void HandleMouseMove(int x,int y);
     /// Called if a key is pressed
-extern void HandleKeyDown(unsigned key);
+extern void HandleKeyDown(unsigned keycode,unsigned keychar);
     /// Called when a key is released
-extern void HandleKeyUp(unsigned key);
+extern void HandleKeyUp(unsigned keycode,unsigned keychar);
 
     /// Called if any mouse button is pressed down
 extern void InputMouseButtonPress(const EventCallback*,unsigned,unsigned);

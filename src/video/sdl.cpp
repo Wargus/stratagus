@@ -287,25 +287,26 @@ global void Invalidate(void)
 **
 **	@return		ASCII code or internal keycode.
 */
-local int Sdl2InternalKeycode(const SDL_keysym * code)
+local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
 {
     int icode;
 
     //
     //  Convert SDL keycodes into internal keycodes.
     //
+    *keychar = 0;
     switch ((icode = code->sym)) {
 	case SDLK_ESCAPE:
-	    icode = '\e';
+	    *keychar = icode = '\e';
 	    break;
 	case SDLK_RETURN:
-	    icode = '\r';
+	    *keychar = icode = '\r';
 	    break;
 	case SDLK_BACKSPACE:
-	    icode = '\b';
+	    *keychar = icode = '\b';
 	    break;
 	case SDLK_TAB:
-	    icode = '\t';
+	    *keychar = icode = '\t';
 	    break;
 	case SDLK_UP:
 	    icode = KeyCodeUp;
@@ -410,18 +411,12 @@ local int Sdl2InternalKeycode(const SDL_keysym * code)
 	    icode = KeyCodeSuper;
 	    break;
 	default:
-	    if (icode >= '0' && icode <= '9') {
-		if (code->mod & (KMOD_CTRL | KMOD_ALT | KMOD_META)) {
-		    // Do not translate these to support grouping!
-		    break;
-		}
-	    }
 	    if ((code->unicode & 0xFF80) == 0) {
-		icode = code->unicode & 0x7F;
+		*keychar = code->unicode & 0x7F;
 	    } else {
 		// An international character..
 		// let's asume latin 1 for now
-		icode = code->unicode & 0xFF;
+		*keychar = code->unicode & 0xFF;
 	    }
 	    break;
     }
@@ -435,14 +430,15 @@ local int Sdl2InternalKeycode(const SDL_keysym * code)
 **	@param callback	Callback funktion for key down.
 **	@param code	SDL keysym structure pointer.
 */
-local void SdlHandleKeyPress(void (*const callback) (unsigned),
+local void SdlHandleKeyPress(void (*const callback) (unsigned,unsigned),
     const SDL_keysym* code)
 {
     int icode;
+    int keychar;
 
-    icode = Sdl2InternalKeycode(code);
+    icode = Sdl2InternalKeycode(code,&keychar);
 
-    callback(icode);
+    callback(icode,keychar);
 }
 
 /**
@@ -451,14 +447,15 @@ local void SdlHandleKeyPress(void (*const callback) (unsigned),
 **	@param callback	Callback funktion for key up.
 **	@param code	SDL keysym structure pointer.
 */
-local void SdlHandleKeyRelease(void (*const callback) (unsigned),
+local void SdlHandleKeyRelease(void (*const callback) (unsigned,unsigned),
     const SDL_keysym* code)
 {
     int icode;
+    int keychar;
 
-    icode=Sdl2InternalKeycode(code);
+    icode=Sdl2InternalKeycode(code,&keychar);
 
-    callback(icode);
+    callback(icode,keychar);
 }
 
 /**
@@ -519,12 +516,12 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 	    break;
 
 	case SDL_KEYDOWN:
-	    DebugLevel3("\tKey press\n");
+	    DebugLevel2("\tKey press\n");
 	    SdlHandleKeyPress(callbacks->KeyPressed, &event->key.keysym);
 	    break;
 
 	case SDL_KEYUP:
-	    DebugLevel3("\tKey release\n");
+	    DebugLevel2("\tKey release\n");
 	    SdlHandleKeyRelease(callbacks->KeyReleased, &event->key.keysym);
 	    break;
 

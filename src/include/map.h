@@ -379,12 +379,12 @@ extern void FreeMapInfo(MapInfo* info);
 
     /// Mark a tile as seen by the player
 extern void MapMarkSeenTile(int x,int y);
-    /// FIXME: docu
+    /// Reveal the complete map, make everything known
 extern void RevealMap(void);
 
-    /// FIXME: docu
+    /// Center map on point
 extern void MapCenter(int x,int y);
-    /// FIXME: docu
+    /// Set the current map view to x,y (upper,left corner)
 extern void MapSetViewpoint(int x,int y);
 
     /// FIXME: docu

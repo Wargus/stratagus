@@ -95,6 +95,7 @@ global void ChangeSelectedUnits(Unit** units,int count)
 global int SelectUnit(Unit* unit)
 {
     if ( unit->Revealer ) {		// Revealers cannot be selected
+	DebugLevel0Fn("Selecting revealer?\n");
 	return 0;
     }
 

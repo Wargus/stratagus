@@ -395,192 +395,199 @@ local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int 
 
 /**
 **	Process keyboard event.
+**
+**	@param scancode	SVGAlib scancode
+**	@param prees	True if key was pressed
+**
+**	@todo	International scancode support.
 */
-local void KeyboardEvent(int scancode, int press) {
+local void KeyboardEvent(int scancode, int press)
+{
     int icode;
+    int keychar;
 
-    IfDebug( icode=0; );		// keeps the compiler happy
+    IfDebug( icode = 0; );		// keeps the compiler happy
+    keychar = 0;
 
-    if(press == KEY_EVENTPRESS) {
+    if (press == KEY_EVENTPRESS) {
 	// FIXME: combine scancode -> internal keycode of press and release
-	switch(scancode) {
+	switch (scancode) {
 	    case SCANCODE_1:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '1';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '!';
-		} else {
-		    icode = '1';
 		}
 		break;
 	    case SCANCODE_2:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '2';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '@';
-		} else {
-		    icode = '2';
 		}
 		break;
 	    case SCANCODE_3:
-		if(KeyModifiers & ModifierShift) {
-		    icode = '#';
-		} else {
+		keychar = icode = '3';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '3';
 		}
 		break;
 	    case SCANCODE_4:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '4';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '$';
-		} else {
-		    icode = '4';
 		}
 		break;
 	    case SCANCODE_5:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '5';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '%';
-		} else {
-		    icode = '5';
 		}
 		break;
 	    case SCANCODE_6:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '6';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '^';
-		} else {
-		    icode = '6';
 		}
 		break;
 	    case SCANCODE_7:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '7';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '&';
-		} else {
-		    icode = '7';
 		}
 		break;
 	    case SCANCODE_8:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '8';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '*';
-		} else {
-		    icode = '8';
 		}
 		break;
 	    case SCANCODE_9:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '9';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '(';
-		} else {
-		    icode = '9';
 		}
 		break;
 	    case SCANCODE_0:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '0';
+		if (KeyModifiers & ModifierShift) {
 		    icode = ')';
-		} else {
-		    icode = '0';
 		}
 		break;
 	    case SCANCODE_A:
-		icode = 'a';
+		keychar = icode = 'a';
 		break;
 	    case SCANCODE_B:
-		icode = 'b';
+		keychar = icode = 'b';
 		break;
 	    case SCANCODE_C:
-		icode = 'c';
+		keychar = icode = 'c';
 		break;
 	    case SCANCODE_D:
-		icode = 'd';
+		keychar = icode = 'd';
 		break;
 	    case SCANCODE_E:
-		icode = 'e';
+		keychar = icode = 'e';
 		break;
 	    case SCANCODE_F:
-		icode = 'f';
+		keychar = icode = 'f';
 		break;
 	    case SCANCODE_G:
-		icode = 'g';
+		keychar = icode = 'g';
 		break;
 	    case SCANCODE_H:
-		icode = 'h';
+		keychar = icode = 'h';
 		break;
 	    case SCANCODE_I:
-		icode = 'i';
+		keychar = icode = 'i';
 		break;
 	    case SCANCODE_J:
-		icode = 'j';
+		keychar = icode = 'j';
 		break;
 	    case SCANCODE_K:
-		icode = 'k';
+		keychar = icode = 'k';
 		break;
 	    case SCANCODE_L:
-		icode = 'l';
+		keychar = icode = 'l';
 		break;
 	    case SCANCODE_M:
-		icode = 'm';
+		keychar = icode = 'm';
 		break;
 	    case SCANCODE_N:
-		icode = 'n';
+		keychar = icode = 'n';
 		break;
 	    case SCANCODE_O:
-		icode = 'o';
+		keychar = icode = 'o';
 		break;
 	    case SCANCODE_P:
-		icode = 'p';
+		keychar = icode = 'p';
 		break;
 	    case SCANCODE_Q:
-		icode = 'q';
+		keychar = icode = 'q';
 		break;
 	    case SCANCODE_R:
-		icode = 'r';
+		keychar = icode = 'r';
 		break;
 	    case SCANCODE_S:
-		icode = 's';
+		keychar = icode = 's';
 		break;
 	    case SCANCODE_T:
-		icode = 't';
+		keychar = icode = 't';
 		break;
 	    case SCANCODE_U:
-		icode = 'u';
+		keychar = icode = 'u';
 		break;
 	    case SCANCODE_V:
-		icode = 'v';
+		keychar = icode = 'v';
 		break;
 	    case SCANCODE_W:
-		icode = 'w';
+		keychar = icode = 'w';
 		break;
 	    case SCANCODE_X:
-		icode = 'x';
+		keychar = icode = 'x';
 		break;
 	    case SCANCODE_Y:
-		icode = 'y';
+		keychar = icode = 'y';
 		break;
 	    case SCANCODE_Z:
-		icode = 'z';
+		keychar = icode = 'z';
 		break;
 	    case SCANCODE_SPACE:
-		icode = ' ';
+		keychar = icode = ' ';
 		break;
 	    case SCANCODE_MINUS:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '-';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '_';
-		} else {
-		    icode = '-';
 		}
 		break;
 	    case SCANCODE_EQUAL:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '=';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '+';
-		} else {
-		    icode = '=';
 		}
 		break;
 	    case SCANCODE_ESCAPE:
-		icode = '\e';
+		keychar = icode = '\e';
 		break;
 	    case SCANCODE_ENTER:
-		icode = '\r';
+		keychar = icode = '\r';
 		break;
 	    case SCANCODE_BACKSPACE:
-		icode = '\b';
+		keychar = icode = '\b';
 		break;
 	    case SCANCODE_TAB:
-		icode = '\t';
+		keychar = icode = '\t';
 		break;
+
+	    case SCANCODE_COMMA:
+		keychar = icode = ',';
+		break;
+	    case SCANCODE_PERIOD:
+		keychar = icode = '.';
+		break;
+	    case SCANCODE_SLASH:
+		keychar = icode = '/';
+		break;
+
 	    case SCANCODE_CURSORBLOCKUP:
 		icode = KeyCodeUp;
 		break;
@@ -661,7 +668,7 @@ local void KeyboardEvent(int scancode, int press) {
 		icode = KeyCodeKP9;
 		break;
 
-	    // KeyCodePause
+		// KeyCodePause
 
 	    case SCANCODE_LEFTSHIFT:
 	    case SCANCODE_RIGHTSHIFT:
@@ -674,193 +681,193 @@ local void KeyboardEvent(int scancode, int press) {
 	    case SCANCODE_LEFTALT:
 	    case SCANCODE_RIGHTALT:
 		KeyModifiers |= ModifierAlt;
-	    // Super, Hyper
+		// Super, Hyper
 	}
-	if(KeyModifiers&ModifierShift){
-	    if(icode <= 'z' && icode >= 'a')
+	if (KeyModifiers & ModifierShift) {
+	    if (icode <= 'z' && icode >= 'a') {
 		icode -= 32;
+	    }
 	}
-	SVGALibCallbacks->KeyPressed(icode);
-    } else if(press == KEY_EVENTRELEASE) {
+	SVGALibCallbacks->KeyPressed(icode, keychar);
+    } else if (press == KEY_EVENTRELEASE) {
 	// FIXME: combine scancode -> internal keycode of press and release
-	switch(scancode) {
+	switch (scancode) {
 	    case SCANCODE_1:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '1';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '!';
-		} else {
-		    icode = '1';
 		}
 		break;
 	    case SCANCODE_2:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '2';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '@';
-		} else {
-		    icode = '2';
 		}
 		break;
 	    case SCANCODE_3:
-		if(KeyModifiers & ModifierShift) {
-		    icode = '#';
-		} else {
+		keychar = icode = '3';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '3';
 		}
 		break;
 	    case SCANCODE_4:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '4';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '$';
-		} else {
-		    icode = '4';
 		}
 		break;
 	    case SCANCODE_5:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '5';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '%';
-		} else {
-		    icode = '5';
 		}
 		break;
 	    case SCANCODE_6:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '6';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '^';
-		} else {
-		    icode = '6';
 		}
 		break;
 	    case SCANCODE_7:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '7';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '&';
-		} else {
-		    icode = '7';
 		}
 		break;
 	    case SCANCODE_8:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '8';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '*';
-		} else {
-		    icode = '8';
 		}
 		break;
 	    case SCANCODE_9:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '9';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '(';
-		} else {
-		    icode = '9';
 		}
 		break;
 	    case SCANCODE_0:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '0';
+		if (KeyModifiers & ModifierShift) {
 		    icode = ')';
-		} else {
-		    icode = '0';
 		}
 		break;
 	    case SCANCODE_A:
-		icode = 'a';
+		keychar = icode = 'a';
 		break;
 	    case SCANCODE_B:
-		icode = 'b';
+		keychar = icode = 'b';
 		break;
 	    case SCANCODE_C:
-		icode = 'c';
+		keychar = icode = 'c';
 		break;
 	    case SCANCODE_D:
-		icode = 'd';
+		keychar = icode = 'd';
 		break;
 	    case SCANCODE_E:
-		icode = 'e';
+		keychar = icode = 'e';
 		break;
 	    case SCANCODE_F:
-		icode = 'f';
+		keychar = icode = 'f';
 		break;
 	    case SCANCODE_G:
-		icode = 'g';
+		keychar = icode = 'g';
 		break;
 	    case SCANCODE_H:
-		icode = 'h';
+		keychar = icode = 'h';
 		break;
 	    case SCANCODE_I:
-		icode = 'i';
+		keychar = icode = 'i';
 		break;
 	    case SCANCODE_J:
-		icode = 'j';
+		keychar = icode = 'j';
 		break;
 	    case SCANCODE_K:
-		icode = 'k';
+		keychar = icode = 'k';
 		break;
 	    case SCANCODE_L:
-		icode = 'l';
+		keychar = icode = 'l';
 		break;
 	    case SCANCODE_M:
-		icode = 'm';
+		keychar = icode = 'm';
 		break;
 	    case SCANCODE_N:
-		icode = 'n';
+		keychar = icode = 'n';
 		break;
 	    case SCANCODE_O:
-		icode = 'o';
+		keychar = icode = 'o';
 		break;
 	    case SCANCODE_P:
-		icode = 'p';
+		keychar = icode = 'p';
 		break;
 	    case SCANCODE_Q:
-		icode = 'q';
+		keychar = icode = 'q';
 		break;
 	    case SCANCODE_R:
-		icode = 'r';
+		keychar = icode = 'r';
 		break;
 	    case SCANCODE_S:
-		icode = 's';
+		keychar = icode = 's';
 		break;
 	    case SCANCODE_T:
-		icode = 't';
+		keychar = icode = 't';
 		break;
 	    case SCANCODE_U:
-		icode = 'u';
+		keychar = icode = 'u';
 		break;
 	    case SCANCODE_V:
-		icode = 'v';
+		keychar = icode = 'v';
 		break;
 	    case SCANCODE_W:
-		icode = 'w';
+		keychar = icode = 'w';
 		break;
 	    case SCANCODE_X:
-		icode = 'x';
+		keychar = icode = 'x';
 		break;
 	    case SCANCODE_Y:
-		icode = 'y';
+		keychar = icode = 'y';
 		break;
 	    case SCANCODE_Z:
-		icode = 'z';
+		keychar = icode = 'z';
 		break;
 	    case SCANCODE_SPACE:
-		icode = ' ';
+		keychar = icode = ' ';
 		break;
 	    case SCANCODE_MINUS:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '-';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '_';
-		} else {
-		    icode = '-';
 		}
 		break;
 	    case SCANCODE_EQUAL:
-		if(KeyModifiers & ModifierShift) {
+		keychar = icode = '=';
+		if (KeyModifiers & ModifierShift) {
 		    icode = '+';
-		} else {
-		    icode = '=';
 		}
 		break;
 	    case SCANCODE_ESCAPE:
-		icode = '\e';
+		keychar = icode = '\e';
 		break;
 	    case SCANCODE_ENTER:
-		icode = '\r';
+		keychar = icode = '\r';
 		break;
 	    case SCANCODE_BACKSPACE:
-		icode = '\b';
+		keychar = icode = '\b';
 		break;
 	    case SCANCODE_TAB:
-		icode = '\t';
+		keychar = icode = '\t';
 		break;
+
+	    case SCANCODE_COMMA:
+		keychar = icode = ',';
+		break;
+	    case SCANCODE_PERIOD:
+		keychar = icode = '.';
+		break;
+	    case SCANCODE_SLASH:
+		keychar = icode = '/';
+		break;
+
 	    case SCANCODE_CURSORBLOCKUP:
 		icode = KeyCodeUp;
 		break;
@@ -944,21 +951,21 @@ local void KeyboardEvent(int scancode, int press) {
 	    case SCANCODE_LEFTSHIFT:
 	    case SCANCODE_RIGHTSHIFT:
 		KeyModifiers &= ~ModifierShift;
-		icode=0;
+		icode = 0;
 		break;
 	    case SCANCODE_LEFTCONTROL:
 	    case SCANCODE_RIGHTCONTROL:
 		KeyModifiers &= ~ModifierControl;
-		icode=0;
+		icode = 0;
 		break;
 	    case SCANCODE_LEFTALT:
 	    case SCANCODE_RIGHTALT:
 		KeyModifiers &= ~ModifierAlt;
-		icode=0;
+		icode = 0;
 		break;
-	    // Super ???
+		// Super ???
 	}
-	SVGALibCallbacks->KeyReleased(icode);
+	SVGALibCallbacks->KeyReleased(icode, keychar);
     }
 }
 
