@@ -238,6 +238,7 @@ local void EditorLoadCancel(void);
 local void EditorLoadVSAction(Menuitem *mi, int i);
 
 local Menu *FindMenu(const char *menu_id);
+global void SaveMenus(FILE* file);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -1975,66 +1976,194 @@ global Menu Menus[] = {
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#define HASHADD(x,y) { \
+    *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
+    sprintf(buf,"%x",(x)); \
+    strcpy(hash_add(MenuFuncHash2,buf), (y)); \
+}
+
 global void InitMenuFuncHash(void) {
-    *(void **)hash_add(MenuFuncHash, "game-menu-save") = (void *)GameMenuSave;
-    *(void **)hash_add(MenuFuncHash, "game-options") = (void *)GameOptions;
-    *(void **)hash_add(MenuFuncHash, "help-menu") = (void *)HelpMenu;
-    *(void **)hash_add(MenuFuncHash, "game-menu-objectives") = (void *)GameMenuObjectives;
-    *(void **)hash_add(MenuFuncHash, "game-menu-end-scenario") = (void *)GameMenuEndScenario;
-    *(void **)hash_add(MenuFuncHash, "game-menu-return") = (void *)GameMenuReturn;
+    char buf[10];
 
-    *(void **)hash_add(MenuFuncHash,"end-menu") = (void *)EndMenu;
-    *(void **)hash_add(MenuFuncHash,"game-menu-end") = (void *)GameMenuEnd;
+    HASHADD(NULL,"null");
 
-    *(void **)hash_add(MenuFuncHash,"name-line-draw") = (void *)NameLineDrawFunc;
-    *(void **)hash_add(MenuFuncHash,"single-player-game-menu") = (void *)SinglePlayerGameMenu;
-    *(void **)hash_add(MenuFuncHash,"multi-player-game-menu") = (void *)MultiPlayerGameMenu;
-    *(void **)hash_add(MenuFuncHash,"campaign-game-menu") = (void *)CampaignGameMenu;
-    *(void **)hash_add(MenuFuncHash,"game-menu-load") = (void *)GameMenuLoad;
-    *(void **)hash_add(MenuFuncHash,"game-start-editor") = (void *)StartEditor;
-    *(void **)hash_add(MenuFuncHash,"game-global-options") = (void *)GameGlobalOptionsMenu;
-    *(void **)hash_add(MenuFuncHash,"game-show-credits") = (void *)GameShowCredits;
-    *(void **)hash_add(MenuFuncHash,"game-menu-exit") = (void *)GameMenuExit;
+// Game menu
+    HASHADD(InitGameMenu,"init-game-menu");
+    HASHADD(GameMenuSave,"game-menu-save");
+    HASHADD(GameMenuLoad,"game-menu-load");
+    HASHADD(GameOptions,"game-options");
+    HASHADD(HelpMenu,"help-menu");
+    HASHADD(GameMenuObjectives,"game-menu-objectives");
+    HASHADD(GameMenuEndScenario,"game-menu-end-scenario");
+    HASHADD(GameMenuReturn,"game-menu-return");
+    HASHADD(EndMenu,"end-menu");
 
-    *(void **)hash_add(MenuFuncHash,"end-scenario-quit-menu") = (void *)EndScenarioQuitMenu;
-
-    *(void **)hash_add(MenuFuncHash,"program-start") = (void *)PrgStartInit;
-
-// Tips
-    *(void **)hash_add(MenuFuncHash,"init-tips") = (void *)InitTips;
-    *(void **)hash_add(MenuFuncHash,"show-next-tip") = (void *)ShowNextTip;
-    *(void **)hash_add(MenuFuncHash,"tips-menu-end") = (void *)TipsMenuEnd;
-
-// Campaign select
-    *(void **)hash_add(MenuFuncHash,"campaign-1") = (void *)CampaignMenu1;
-    *(void **)hash_add(MenuFuncHash,"campaign-2") = (void *)CampaignMenu2;
-    *(void **)hash_add(MenuFuncHash,"campaign-3") = (void *)CampaignMenu3;
-    *(void **)hash_add(MenuFuncHash,"campaign-4") = (void *)CampaignMenu4;
+// Victory, lost
+    HASHADD(GameMenuEnd,"game-menu-end");
 
 // Scene select
-    *(void **)hash_add(MenuFuncHash,"scen-select-menu") = (void *)ScenSelectMenu;
-    *(void **)hash_add(MenuFuncHash,"scen-select-lb-exit") = (void *)ScenSelectLBExit;
-    *(void **)hash_add(MenuFuncHash,"scen-select-lb-init") = (void *)ScenSelectLBInit;
-    *(void **)hash_add(MenuFuncHash,"scen-select-lb-retrieve") = (void *)ScenSelectLBRetrieve;
-    *(void **)hash_add(MenuFuncHash,"scen-select-lb-action") = (void *)ScenSelectLBAction;
-    *(void **)hash_add(MenuFuncHash,"scen-select-tpms-action") = (void *)ScenSelectTPMSAction;
-    *(void **)hash_add(MenuFuncHash,"scen-select-vs-action") = (void *)ScenSelectVSAction;
-    *(void **)hash_add(MenuFuncHash,"scen-select-folder") = (void *)ScenSelectFolder;
-    *(void **)hash_add(MenuFuncHash,"scen-select-init") = (void *)ScenSelectInit;
-    *(void **)hash_add(MenuFuncHash,"scen-select-ok") = (void *)ScenSelectOk;
-    *(void **)hash_add(MenuFuncHash,"scen-select-cancel") = (void *)ScenSelectCancel;
-    *(void **)hash_add(MenuFuncHash,"scen-select-rd-filter") = (void *)ScenSelectRDFilter;
+    HASHADD(ScenSelectMenu,"scen-select-menu");
+    HASHADD(ScenSelectLBExit,"scen-select-lb-exit");
+    HASHADD(ScenSelectLBInit,"scen-select-lb-init");
+    HASHADD(ScenSelectLBRetrieve,"scen-select-lb-retrieve");
+    HASHADD(ScenSelectLBAction,"scen-select-lb-action");
+    HASHADD(ScenSelectTPMSAction,"scen-select-tpms-action");
+    HASHADD(ScenSelectVSAction,"scen-select-vs-action");
+    HASHADD(ScenSelectFolder,"scen-select-folder");
+    HASHADD(ScenSelectInit,"scen-select-init");
+    HASHADD(ScenSelectOk,"scen-select-ok");
+    HASHADD(ScenSelectCancel,"scen-select-cancel");
+    HASHADD(ScenSelectRDFilter,"scen-select-rd-filter");
+
+// Program start
+    HASHADD(PrgStartInit,"program-start");
+    HASHADD(NameLineDrawFunc,"name-line-draw");
+    HASHADD(SinglePlayerGameMenu,"single-player-game-menu");
+    HASHADD(MultiPlayerGameMenu,"multi-player-game-menu");
+    HASHADD(CampaignGameMenu,"campaign-game-menu");
+    HASHADD(GameGlobalOptionsMenu,"game-global-options");
+    HASHADD(StartEditor,"game-start-editor");
+    HASHADD(GameShowCredits,"game-show-credits");
+    HASHADD(GameMenuExit,"game-menu-exit");
+
+// Tips
+    HASHADD(InitTips,"init-tips");
+    HASHADD(SetTips,"set-tips");
+    HASHADD(ShowNextTip,"show-next-tip");
+    HASHADD(TipsMenuEnd,"tips-menu-end");
 
 // Custom game setup
-    *(void **)hash_add(MenuFuncHash,"game-setup-init") = (void *)GameSetupInit;
-    *(void **)hash_add(MenuFuncHash,"game-draw-func") = (void *)GameDrawFunc;
-    *(void **)hash_add(MenuFuncHash,"game-rcs-action") = (void *)GameRCSAction;
-    *(void **)hash_add(MenuFuncHash,"game-res-action") = (void *)GameRESAction;
-    *(void **)hash_add(MenuFuncHash,"game-uns-action") = (void *)GameUNSAction;
-    *(void **)hash_add(MenuFuncHash,"game-tss-action") = (void *)GameTSSAction;
-    *(void **)hash_add(MenuFuncHash,"game-cancel") = (void *)GameCancel;
-    *(void **)hash_add(MenuFuncHash,"custom-game-start") = (void *)CustomGameStart;
-    *(void **)hash_add(MenuFuncHash,"custom-game-ops-action") = (void *)CustomGameOPSAction;
+    HASHADD(GameSetupInit,"game-setup-init");
+    HASHADD(GameDrawFunc,"game-draw-func");
+    HASHADD(GameRCSAction,"game-rcs-action");
+    HASHADD(GameRESAction,"game-res-action");
+    HASHADD(GameUNSAction,"game-uns-action");
+    HASHADD(GameTSSAction,"game-tss-action");
+    HASHADD(GameGATAction,"game-gat-action");
+    HASHADD(GameCancel,"game-cancel");
+    HASHADD(CustomGameStart,"custom-game-start");
+    HASHADD(CustomGameOPSAction,"custom-game-ops-action");
+
+// Enter name
+    HASHADD(EnterNameAction,"enter-name-action");
+    HASHADD(EnterNameCancel,"enter-name-cancel");
+
+// Net create join
+    HASHADD(JoinNetGameMenu,"net-join-game");
+    HASHADD(CreateNetGameMenu,"net-create-game");
+
+// Net multi setup
+    HASHADD(MultiGameSetupInit,"multi-game-setup-init");
+    HASHADD(MultiGameDrawFunc,"multi-game-draw-func");
+    HASHADD(MultiScenSelectMenu,"multi-scen-select");
+    HASHADD(MultiGameStart,"multi-game-start");
+    HASHADD(MultiGameCancel,"multi-game-cancel");
+    HASHADD(MultiGameFWSAction,"multi-game-fws-action");
+
+// Enter server ip
+    HASHADD(EnterServerIPAction,"enter-server-ip-action");
+    HASHADD(EnterServerIPCancel,"enter-server-ip-cancel");
+
+// Net multi client
+    HASHADD(MultiGameClientInit,"multi-game-client-init");
+    HASHADD(MultiGameClientDrawFunc,"multi-client-draw-func");
+    HASHADD(MultiClientReady,"multi-client-ready");
+    HASHADD(MultiClientNotReady,"multi-client-not-ready");
+    HASHADD(MultiClientCancel,"multi-client-cancel");
+    HASHADD(MultiClientRCSAction,"multi-client-rcs-action");
+    HASHADD(MultiClientGemAction,"multi-client-gem-action");
+
+// Net connecting
+    HASHADD(NetConnectingCancel,"net-connecting-cancel");
+
+// Campaign select
+    HASHADD(CampaignMenu1,"campaign-1");
+    HASHADD(CampaignMenu2,"campaign-2");
+    HASHADD(CampaignMenu3,"campaign-3");
+    HASHADD(CampaignMenu4,"campaign-4");
+    HASHADD(SelectCampaignMenu,"select-campaign-menu");
+
+// End scenario
+    HASHADD(EndScenarioRestart,"end-scenario-restart");
+    HASHADD(EndScenarioSurrender,"end-scenario-surrender");
+    HASHADD(EndScenarioQuitMenu,"end-scenario-quit-menu");
+
+// Sound options
+    HASHADD(MasterVolumeHSAction,"master-volume-hs-action");
+    HASHADD(SetMasterPower,"set-master-power");
+    HASHADD(MusicVolumeHSAction,"music-volume-hs-action");
+    HASHADD(SetMusicPower,"set-music-power");
+    HASHADD(CdVolumeHSAction,"cd-volume-hs-action");
+    HASHADD(SetCdPower,"set-cd-power");
+    HASHADD(SetCdModeAll,"set-cd-mode-all");
+    HASHADD(SetCdModeRandom,"set-cd-mode-random");
+
+// Preferences
+    HASHADD(SetFogOfWar,"set-fog-of-war");
+    HASHADD(SetCommandKey,"set-command-key");
+
+// Speed settings
+    HASHADD(GameSpeedHSAction,"game-speed-hs-action");
+    HASHADD(MouseScrollHSAction,"mouse-scroll-hs-action");
+    HASHADD(KeyboardScrollHSAction,"keyboard-scroll-hs-action");
+
+// Game options
+    HASHADD(SoundOptions,"sound-options");
+    HASHADD(SpeedSettings,"speed-settings");
+    HASHADD(Preferences,"preferences");
+
+// Help
+    HASHADD(KeystrokeHelpMenu,"keystroke-help");
+    HASHADD(ShowTipsMenu,"show-tips");
+
+// Keystroke help
+    HASHADD(KeystrokeHelpVSAction,"keystroke-help-vs-action");
+    HASHADD(KeystrokeHelpDrawFunc,"keystroke-help-draw-func");
+
+// Save
+    HASHADD(InitSaveGameMenu,"init-save-game-menu");
+    HASHADD(SaveLBInit,"save-lb-init");
+    HASHADD(SaveLBExit,"save-lb-exit");
+    HASHADD(EnterSaveGameAction,"enter-save-game-action");
+    HASHADD(SaveLBAction,"save-lb-action");
+    HASHADD(SaveLBRetrieve,"save-lb-retrieve");
+    HASHADD(SaveVSAction,"save-vs-action");
+    HASHADD(SaveOk,"save-ok");
+    HASHADD(SaveAction,"save-action");
+    HASHADD(FcDeleteMenu,"fc-delete-menu");
+
+// Load
+    HASHADD(InitLoadGameMenu,"init-load-game-menu");
+    HASHADD(LoadLBInit,"load-lb-init");
+    HASHADD(LoadLBExit,"load-lb-exit");
+    HASHADD(LoadLBAction,"load-lb-action");
+    HASHADD(LoadLBRetrieve,"load-lb-retrieve");
+    HASHADD(LoadVSAction,"load-vs-action");
+    HASHADD(LoadOk,"load-ok");
+    HASHADD(LoadAction,"load-action");
+
+// Confirm save
+    HASHADD(ConfirmSaveInit,"confirm-save-init");
+    HASHADD(ConfirmSaveFile,"confirm-save-file");
+
+// Confirm delete
+    HASHADD(FcDeleteInit,"fc-delete-init");
+    HASHADD(FcDeleteFile,"fc-delete-file");
+
+// Editor select
+    HASHADD(EditorNewMap,"editor-new-map");
+    HASHADD(EditorLoadMap,"editor-load-map");
+
+// Editor load map
+    HASHADD(EditorLoadInit,"editor-load-init");
+    HASHADD(EditorLoadLBInit,"editor-load-lb-init");
+    HASHADD(EditorLoadLBExit,"editor-load-lb-exit");
+    HASHADD(EditorLoadLBAction,"editor-load-lb-action");
+    HASHADD(EditorLoadLBRetrieve,"editor-load-lb-retrieve");
+    HASHADD(EditorLoadVSAction,"editor-load-vs-action");
+    HASHADD(EditorLoadOk,"editor-load-ok");
+    HASHADD(EditorLoadCancel,"editor-load-cancel");
+    HASHADD(EditorLoadFolder,"editor-load-folder");
 }
 
 /**
@@ -6381,7 +6510,7 @@ normkey:
 	    switch (mi->mitype) {
 		case MI_TYPE_BUTTON:
 		    if (key == mi->d.button.hotkey) {
-			if (mi->d.button.handler) {
+			if (!(mi->flags & MenuButtonDisabled) && mi->d.button.handler) {
 			    (*mi->d.button.handler)();
 			}
 			return;
@@ -7351,6 +7480,14 @@ global void InitMenus(unsigned int race)
     //menu->items[14].d.pulldown.noptions = 4;
     //
 #endif
+
+#if 0
+    {
+	FILE *fd=fopen("menus.ccl","w");
+	SaveMenus(fd);
+	fclose(fd);
+    }
+#endif
 }
 
 /**
@@ -7363,6 +7500,259 @@ global void ExitMenus(void)
     if (Menusbgnd) {
 	VideoFree(Menusbgnd);
 	Menusbgnd = NULL;
+    }
+}
+
+char *menu_names[] = {
+    MENU_GAME,
+    MENU_VICTORY,
+    MENU_LOST,
+    MENU_SCEN_SELECT,
+    MENU_PRG_START,
+    MENU_CUSTOM_GAME_SETUP,
+    MENU_ENTER_NAME,
+    MENU_NET_CREATE_JOIN,
+    MENU_NET_MULTI_SETUP,
+    MENU_NET_ENTER_SERVER_IP,
+    MENU_NET_MULTI_CLIENT,
+    MENU_NET_CONNECTING,
+    MENU_CAMPAIGN_SELECT,
+    MENU_CAMPAIGN_CONT,
+    MENU_OBJECTIVES,
+    MENU_END_SCENARIO,
+    MENU_SOUND_OPTIONS,
+    MENU_PREFERENCES,
+    MENU_SPEED_SETTINGS,
+    MENU_GAME_OPTIONS,
+    MENU_NET_ERROR,
+    MENU_TIPS,
+    MENU_HELP,
+    MENU_KEYSTROKE_HELP,
+    MENU_SAVE_GAME,
+    MENU_LOAD_GAME,
+    MENU_CONFIRM_SAVE,
+    MENU_CONFIRM_DELETE,
+    MENU_EDITOR_SELECT,
+    MENU_EDITOR_LOAD_MAP,
+};
+
+char *menu_flags[] = {
+    "",
+    "'flags '(active)",
+    "'flags '(clicked)",
+    "",
+    "'flags '(selected)",
+    "",
+    "",
+    "",
+    "'flags '(disabled)",
+};
+
+char *images[] = {
+    "none",
+    "panel1",
+    "panel2",
+    "panel3",
+    "panel4",
+    "panel5",
+};
+
+char *font_names[] = {
+    "small",
+    "game",
+    "large",
+    "smallTitle",
+    "largeTitle",
+};
+
+char *text_flags[] = {
+    "none",
+    "center",
+    "right",
+    "",
+    "left",
+};
+
+local char *hotkey2str(int key, char *buf)
+{
+    if (isalpha(key)) {
+	buf[0] = key;
+	buf[1] = '\0';
+    } else if (KeyCodeF1 <= key && key <= KeyCodeF12) {
+	buf[0] = 'f';
+	if (key >= KeyCodeF10) {
+	    buf[1] = '1';
+	    buf[2] = key-10-KeyCodeF1+1 + '0';
+	    buf[3] = '\0';
+	} else {
+	    buf[1] = key-KeyCodeF1+1 + '0';
+	    buf[2] = '\0';
+	}
+    }
+    return buf;
+}
+
+global void SaveMenus(FILE* file)
+{
+    Menu *menu;
+    int i, j, n;
+    int OffsetX, OffsetY;
+    char hotkey[10];
+    char func[10];
+    char func2[10];
+    char func3[10];
+    char initfunc[40];
+    char exitfunc[40];
+
+    OffsetX = (VideoWidth - 640) / 2;
+    OffsetY = (VideoHeight - 480) / 2;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; $Id$\n\n");
+
+    for (i=0; i<sizeof(menu_names)/sizeof(*menu_names); ++i) {
+	menu = FindMenu(menu_names[i]);
+	if (!menu) {
+	    abort();
+	}
+	fprintf(file,";;\n;; %s\n;;\n", menu_names[i]);
+	fprintf(file,"(define-menu 'name \"%s\" 'geometry '(%d %d %d %d)\n"
+		     "    'image '%s 'default '%d)\n",
+		     menu_names[i],
+		     menu->x - OffsetX, menu->y - OffsetY,
+		     menu->xsize, menu->ysize,
+		     images[menu->image],
+		     menu->defsel);
+	for (j=0; j<menu->nitems; ++j) {
+	    if (menu->items[j].initfunc) {
+		sprintf(func,"%x",menu->items[j].initfunc);
+		sprintf(initfunc," 'init '%s",hash_find(MenuFuncHash2,func));
+	    } else {
+		initfunc[0] = '\0';
+	    }
+	    if (menu->items[j].exitfunc) {
+		sprintf(func,"%x",menu->items[j].exitfunc);
+		sprintf(exitfunc," 'exit '%s",hash_find(MenuFuncHash2,func));
+	    } else {
+		exitfunc[0] = '\0';
+	    }
+
+	    fprintf(file,"(define-menu-item 'pos '(%d %d) 'font '%s %s%s%s\n",
+			 menu->items[j].xofs, menu->items[j].yofs,
+			 font_names[menu->items[j].font],
+			 menu_flags[menu->items[j].flags],
+			 initfunc,
+			 exitfunc);
+	    switch (menu->items[j].mitype) {
+		case MI_TYPE_TEXT:
+		    fprintf(file,"    'text '(\"%s\" %s)\n",
+			    menu->items[j].d.text.text ? menu->items[j].d.text.text : "null",
+			    text_flags[menu->items[j].d.text.tflags]);
+		    break;
+		case MI_TYPE_BUTTON:
+		    sprintf(func,"%x",menu->items[j].d.button.handler);
+		    fprintf(file,"    'button '(size (%d %d)\n"
+			         "            caption \"%s\"\n"
+				 "            hotkey \"%s\"\n"
+				 "            func %s\n"
+				 "            style %s)\n",
+				 menu->items[j].d.button.xsize,
+				 menu->items[j].d.button.ysize,
+				 menu->items[j].d.button.text,
+				 hotkey2str(menu->items[j].d.button.hotkey,hotkey),
+				 hash_find(MenuFuncHash2,func),
+				 menu->items[j].d.button.button==MBUTTON_GM_FULL ? "gm-full" : "gm-half");
+
+		    break;
+		case MI_TYPE_PULLDOWN:
+		    sprintf(func,"%x",menu->items[j].d.pulldown.action);
+		    fprintf(file,"    'pulldown '(size (%d %d)\n"
+			         "              style pulldown\n"
+				 "              func %s\n",
+				 menu->items[j].d.pulldown.xsize,
+				 menu->items[j].d.pulldown.ysize,
+				 hash_find(MenuFuncHash2,func));
+		    fprintf(file,"              options (");
+		    for (n=0; n<menu->items[j].d.pulldown.noptions; ++n) {
+			fprintf(file,"\"%s\" ", menu->items[j].d.pulldown.options[n]);
+		    }
+
+		    fprintf(file,")\n"
+				 "              default %d\n"
+				 "              current %d)\n",
+				 menu->items[j].d.pulldown.defopt,
+				 menu->items[j].d.pulldown.curopt);
+		    break;
+		case MI_TYPE_LISTBOX:
+		    sprintf(func,"%x",menu->items[j].d.listbox.action);
+		    sprintf(func2,"%x",menu->items[j].d.listbox.retrieveopt);
+		    sprintf(func3,"%x",menu->items[j].d.listbox.handler);
+		    fprintf(file,"    'listbox '(size (%d %d)\n"
+				 "             style pulldown\n"
+				 "             func %s\n"
+				 "             retopt %s\n"
+				 "             handler %s\n"
+				 "             nlines %d)\n",
+				 menu->items[j].d.listbox.xsize,
+				 menu->items[j].d.listbox.ysize,
+				 hash_find(MenuFuncHash2,func),
+				 hash_find(MenuFuncHash2,func2),
+				 hash_find(MenuFuncHash2,func3),
+				 menu->items[j].d.listbox.nlines);
+		    break;
+		case MI_TYPE_VSLIDER:
+		    sprintf(func,"%x",menu->items[j].d.vslider.action);
+		    sprintf(func2,"%x",menu->items[j].d.vslider.handler);
+		    fprintf(file,"    'vslider '(size (%d %d)\n"
+			         "             func %s\n"
+				 "             handler %s)\n",
+				 menu->items[j].d.vslider.xsize,
+				 menu->items[j].d.vslider.ysize,
+				 hash_find(MenuFuncHash2,func),
+				 hash_find(MenuFuncHash2,func2));
+		    break;
+		case MI_TYPE_DRAWFUNC:
+		    sprintf(func,"%x",menu->items[j].d.drawfunc.draw);
+		    fprintf(file,"    'drawfunc '%s\n",
+			         hash_find(MenuFuncHash2,func));
+		    break;
+		case MI_TYPE_INPUT:
+		    sprintf(func,"%x",menu->items[j].d.input.action);
+		    fprintf(file,"    'input '(size (%d %d)\n"
+			         "           func %s\n"
+				 "           style pulldown)\n",
+				 menu->items[j].d.input.xsize,
+				 menu->items[j].d.input.ysize,
+				 hash_find(MenuFuncHash2,func));
+		    break;
+		case MI_TYPE_GEM:
+		    sprintf(func,"%x",menu->items[j].d.gem.action);
+		    fprintf(file,"    'gem '(size (%d %d)\n"
+			         "         state checked\n"
+				 "         func %s\n"
+				 "         style %s)\n",
+				 menu->items[j].d.gem.xsize,
+				 menu->items[j].d.gem.ysize,
+				 hash_find(MenuFuncHash2,func),
+				 menu->items[j].d.gem.button==MBUTTON_GEM_ROUND ? "gem-round" : "gem-square");
+		    break;
+		case MI_TYPE_HSLIDER:
+		    sprintf(func,"%x",menu->items[j].d.hslider.action);
+		    sprintf(func2,"%x",menu->items[j].d.hslider.handler);
+		    fprintf(file,"    'hslider '(size (%d %d)\n"
+			         "             func %s\n"
+				 "             handler %s)\n",
+				 menu->items[j].d.hslider.xsize,
+				 menu->items[j].d.hslider.ysize,
+				 hash_find(MenuFuncHash2,func),
+				 hash_find(MenuFuncHash2,func2));
+		    break;
+		default:
+		    abort();
+	    }
+	    fprintf(file,"    'menu \"%s\")\n",menu_names[i]);
+	}
+	fprintf(file,"\n\n");
     }
 }
 
