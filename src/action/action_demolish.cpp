@@ -60,34 +60,38 @@ global void HandleActionDemolish(Unit* unit)
     Unit* table[UnitMax];
     int i;
     int n;
-    int xmin, ymin, xmax, ymax;
-    int ix, iy;
+    int xmin;
+    int ymin;
+    int xmax;
+    int ymax;
+    int ix;
+    int iy;
     Unit* goal;
     int err;
 
     DebugLevel3Fn("Demolish %d\n" _C_ UnitNumber(unit));
 
-    switch( unit->SubAction ) {
+    switch (unit->SubAction) {
 	//
 	//	Move near to target.
 	//
 	case 0:				// first entry.
 	    NewResetPath(unit);
-	    unit->SubAction=1;
+	    unit->SubAction = 1;
 	    //
 	    //	Already at target? FIXME: duplicate code.
 	    //
-	    if( (goal=unit->Orders[0].Goal) ) {
-		if( MapDistanceBetweenUnits(unit,goal)<=1 ) {
-		    unit->State=0;
-		    unit->SubAction=2;
+	    if ((goal = unit->Orders[0].Goal)) {
+		if (MapDistanceBetweenUnits(unit,goal) <= 1) {
+		    unit->State = 0;
+		    unit->SubAction = 2;
 		    HandleActionDemolish(unit);
 		    return;
 		}
-	    } else if( MapDistanceToUnit(unit->Orders[0].X,
-			unit->Orders[0].Y,unit)<=1 ) {
-		unit->State=0;
-		unit->SubAction=2;
+	    } else if (MapDistanceToUnit(unit->Orders[0].X,
+		    unit->Orders[0].Y,unit) <= 1) {
+		unit->State = 0;
+		unit->SubAction = 2;
 		HandleActionDemolish(unit);
 		return;
 	    } 
@@ -95,33 +99,33 @@ global void HandleActionDemolish(Unit* unit)
 	case 1:
 	    // FIXME: reset first!! why? (johns)
 	    err=DoActionMove(unit);
-	    if( unit->Reset ) {
-		goal=unit->Orders[0].Goal;
+	    if (unit->Reset) {
+		goal = unit->Orders[0].Goal;
 		//
 		//	Target is dead, stop demolish.
 		//	FIXME: what should I do, go back or explode on place?
 		//
-		if( goal ) {
-		    if( goal->Destroyed ) {
+		if (goal) {
+		    if (goal->Destroyed) {
 			DebugLevel0Fn("Destroyed unit\n");
-			RefsDebugCheck( !goal->Refs );
-			if( !--goal->Refs ) {
+			RefsDebugCheck(!goal->Refs);
+			if (!--goal->Refs) {
 			    ReleaseUnit(goal);
 			}
 			// FIXME: perhaps I should choose an alternative
-			unit->Orders[0].Goal=NoUnitP;
-			unit->Orders[0].Action=UnitActionStill;
-			unit->SubAction=0;
+			unit->Orders[0].Goal = NoUnitP;
+			unit->Orders[0].Action = UnitActionStill;
+			unit->SubAction = 0;
 			return;
-		    } else if( goal->Removed || !goal->HP
-				|| goal->Orders[0].Action==UnitActionDie ) {
-			RefsDebugCheck( !goal->Refs );
+		    } else if (goal->Removed || !goal->HP ||
+			    goal->Orders[0].Action == UnitActionDie) {
+			RefsDebugCheck(!goal->Refs);
 			--goal->Refs;
-			RefsDebugCheck( !goal->Refs );
-			unit->Orders[0].Goal=NoUnitP;
+			RefsDebugCheck(!goal->Refs);
+			unit->Orders[0].Goal = NoUnitP;
 			// FIXME: perhaps I should choose an alternative
-			unit->Orders[0].Action=UnitActionStill;
-			unit->SubAction=0;
+			unit->Orders[0].Action = UnitActionStill;
+			unit->SubAction = 0;
 			return;
 		    }
 		}
@@ -129,20 +133,20 @@ global void HandleActionDemolish(Unit* unit)
 		//
 		//	Have reached target? FIXME: could use pathfinder result?
 		//
-		if( goal ) {
-		    if( MapDistanceBetweenUnits(unit,goal)<=1 ) {
-			unit->State=0;
-			unit->SubAction=2;
+		if (goal) {
+		    if (MapDistanceBetweenUnits(unit, goal) <= 1) {
+			unit->State = 0;
+			unit->SubAction = 2;
 		    }
-		} else if( MapDistanceToUnit(unit->Orders[0].X,unit->Orders[0].Y
-			,unit )<=1 ) {
-		    unit->State=0;
-		    unit->SubAction=2;
-		} else if( err==PF_UNREACHABLE ) {
-		    unit->Orders[0].Action=UnitActionStill;
+		} else if (MapDistanceToUnit(unit->Orders[0].X, unit->Orders[0].Y,
+			unit) <= 1) {
+		    unit->State = 0;
+		    unit->SubAction = 2;
+		} else if (err == PF_UNREACHABLE) {
+		    unit->Orders[0].Action = UnitActionStill;
 		    return;
 		}
-		DebugCheck( unit->Orders[0].Action!=UnitActionDemolish );
+		DebugCheck(unit->Orders[0].Action != UnitActionDemolish);
 	    }
 	    break;
 
@@ -150,12 +154,12 @@ global void HandleActionDemolish(Unit* unit)
 	//	Demolish the target.
 	//
 	case 2:
-	    goal=unit->Orders[0].Goal;
-	    if( goal ) {
-		RefsDebugCheck( !goal->Refs );
+	    goal = unit->Orders[0].Goal;
+	    if (goal) {
+		RefsDebugCheck(!goal->Refs);
 		--goal->Refs;
-		RefsDebugCheck( !goal->Refs );
-		unit->Orders[0].Goal=NoUnitP;
+		RefsDebugCheck(!goal->Refs);
+		unit->Orders[0].Goal = NoUnitP;
 	    }
 
 	    if (unit->Type->DemolishRange) {
@@ -163,10 +167,18 @@ global void HandleActionDemolish(Unit* unit)
 		ymin = unit->Y - unit->Type->DemolishRange;
 		xmax = unit->X + unit->Type->DemolishRange;
 		ymax = unit->Y + unit->Type->DemolishRange;
-		if (xmin<0) xmin=0;
-		if (xmax > TheMap.Width-1) xmax = TheMap.Width-1;
-		if (ymin<0) ymin=0;
-		if (ymax > TheMap.Height-1) ymax = TheMap.Height-1;
+		if (xmin < 0) {
+		    xmin = 0;
+		}
+		if (xmax > TheMap.Width - 1) {
+		    xmax = TheMap.Width - 1;
+		}
+		if (ymin < 0) {
+		    ymin = 0;
+		}
+		if (ymax > TheMap.Height - 1) {
+		    ymax = TheMap.Height - 1;
+		}
 
 		// FIXME: Must play explosion sound
 
@@ -174,13 +186,14 @@ global void HandleActionDemolish(Unit* unit)
 		//	 Effect of the explosion on units. Don't bother if damage is 0
 		//
 		if (unit->Type->DemolishDamage) {
-		    n=SelectUnits(xmin,ymin, xmax, ymax,table);
-		    for( i=0; i<n; ++i ) {
-			if( table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP
-			    && table[i] != unit 
-			    && MapDistanceBetweenUnits(unit,table[i]) <= unit->Type->DemolishRange) {
+		    n = SelectUnits(xmin, ymin, xmax, ymax, table);
+		    for (i = 0; i < n; ++i) {
+			if (table[i]->Type->UnitType != UnitTypeFly &&
+				table[i]->HP && table[i] != unit &&
+				MapDistanceBetweenUnits(unit, table[i]) <=
+				    unit->Type->DemolishRange) {
 			    // Don't hit flying units!
-			    HitUnit(unit,table[i],unit->Type->DemolishDamage);
+			    HitUnit(unit, table[i], unit->Type->DemolishDamage);
 			}
 		    }
 		}
@@ -188,18 +201,19 @@ global void HandleActionDemolish(Unit* unit)
 		//
 		//	Terrain effect of the explosion
 		//
-		for( ix=xmin; ix<=xmax; ix++ ) {
-		    for( iy=ymin; iy<=ymax; iy++ ) {
-			n=TheMap.Fields[ix+iy*TheMap.Width].Flags;
-			if ( MapDistanceToUnit(ix,iy,unit) > unit->Type->DemolishRange ) {
+		for (ix = xmin; ix <= xmax; ++ix) {
+		    for (iy = ymin; iy <= ymax; ++iy) {
+			n = TheMap.Fields[ix + iy * TheMap.Width].Flags;
+			if (MapDistanceToUnit(ix, iy, unit) >
+				unit->Type->DemolishRange) {
 			    // Not in circle range
 			    continue;
-			} else if( n&MapFieldWall ) {
-			    MapRemoveWall(ix,iy);
-			} else if( n&MapFieldRocks ) {
-			    MapRemoveRock(ix,iy);
-			} else if( n&MapFieldForest ) {
-			    MapRemoveWood(ix,iy);
+			} else if (n & MapFieldWall) {
+			    MapRemoveWall(ix, iy);
+			} else if (n & MapFieldRocks) {
+			    MapRemoveRock(ix, iy);
+			} else if (n & MapFieldForest) {
+			    MapRemoveWood(ix, iy);
 			}
 		    }
 		}

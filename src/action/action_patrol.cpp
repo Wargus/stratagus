@@ -61,43 +61,43 @@ global void HandleActionPatrol(Unit* unit)
 {
     const Unit* goal;
 
-    if( !unit->SubAction ) {		// first entry.
+    if (!unit->SubAction) {		// first entry.
 	NewResetPath(unit);
-	unit->SubAction=1;
+	unit->SubAction = 1;
     }
 
-    if( DoActionMove(unit)<0 ) {	// reached end-point or stop
+    if (DoActionMove(unit) < 0) {	// reached end-point or stop
 	int tmp;
 
-	DebugCheck( unit->Orders[0].Action!=UnitActionPatrol );
+	DebugCheck(unit->Orders[0].Action!=UnitActionPatrol);
 
 	//
 	//	Swap the points.
 	//
-	tmp=(int)unit->Orders[0].Arg1;
-	unit->Orders[0].Arg1=(void*)((unit->Orders[0].X<<16)|unit->Orders[0].Y);
-	unit->Orders[0].X=tmp>>16;
-	unit->Orders[0].Y=tmp&0xFFFF;
+	tmp = (int)unit->Orders[0].Arg1;
+	unit->Orders[0].Arg1 = (void*)((unit->Orders[0].X << 16) | unit->Orders[0].Y);
+	unit->Orders[0].X = tmp >> 16;
+	unit->Orders[0].Y = tmp & 0xFFFF;
 
 	NewResetPath(unit);
     }
 
-    if( unit->Reset ) {
+    if (unit->Reset) {
 	//
 	//	Attack any enemy in reaction range.
 	//		If don't set the goal, the unit can than choose a
 	//		better goal if moving nearer to enemy.
 	//
-	if( unit->Type->CanAttack && unit->Stats->Speed ) {
-	    goal=AttackUnitsInReactRange(unit);
-	    if( goal ) {
+	if (unit->Type->CanAttack && unit->Stats->Speed) {
+	    goal = AttackUnitsInReactRange(unit);
+	    if (goal) {
 		DebugLevel0Fn("Patrol attack %d\n" _C_ UnitNumber(goal));
-		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
+		CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
 		// Save current command to come back.
-		unit->SavedOrder=unit->Orders[0];
-		unit->Orders[0].Action=UnitActionStill;
-		unit->Orders[0].Goal=NoUnitP;
-		unit->SubAction=0;
+		unit->SavedOrder = unit->Orders[0];
+		unit->Orders[0].Action = UnitActionStill;
+		unit->Orders[0].Goal = NoUnitP;
+		unit->SubAction = 0;
 		DebugLevel0Fn("Wait %d\n" _C_ unit->Wait);
 	    }
 	}
