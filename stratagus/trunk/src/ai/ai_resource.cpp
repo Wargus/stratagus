@@ -1078,7 +1078,7 @@ local int AiHarvest(Unit * unit)
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;
-    IfDebug( bestx=besty=0; );		// keep the compiler happy
+    bestx=besty=0;		// keep the compiler happy
 
     //
     //	Make movement matrix.
