@@ -107,21 +107,21 @@ static void SaveReplayEnterAction(Menuitem *mi, int key);
 static void SaveReplayOk(void);
 
 // Scenario select
-static void ScenSelectLBExit(Menuitem *mi);
-static void ScenSelectLBInit(Menuitem *mi);
-static unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
-static void ScenSelectLBAction(Menuitem *mi, int i);
-static void ScenSelectTPMSAction(Menuitem *mi, int i);
-static void ScenSelectVSAction(Menuitem *mi, int i);
+static void ScenSelectLBExit(Menuitem* mi);
+static void ScenSelectLBInit(Menuitem* mi);
+static unsigned char *ScenSelectLBRetrieve(Menuitem* mi, int i);
+static void ScenSelectLBAction(Menuitem* mi, int i);
+static void ScenSelectTPMSAction(Menuitem* mi, int i);
+static void ScenSelectVSAction(Menuitem* mi, int i);
 static void ScenSelectFolder(void);
-static void ScenSelectInit(Menuitem *mi);
+static void ScenSelectInit(Menuitem* mi);
 static void ScenSelectOk(void);
 static void ScenSelectCancel(void);
-static int ScenSelectRDFilter(char *pathbuf, FileList *fl);
+static int ScenSelectRDFilter(char* pathbuf, FileList* fl);
 
 // Program start
-static void PrgStartInit(Menuitem *mi);
-static void NameLineDrawFunc(Menuitem *mi);
+static void PrgStartInit(Menuitem* mi);
+static void NameLineDrawFunc(Menuitem* mi);
 static void SinglePlayerGameMenu(void);
 static void MultiPlayerGameMenu(void);
 static void CampaignGameMenu(void);
@@ -254,8 +254,8 @@ static void KeystrokeHelpMenu(void);
 static void TipsMenu(void);
 
 // Keystroke help
-static void KeystrokeHelpVSAction(Menuitem *mi, int i);
-static void KeystrokeHelpDrawFunc(Menuitem *mi);
+static void KeystrokeHelpVSAction(Menuitem* mi, int i);
+static void KeystrokeHelpDrawFunc(Menuitem* mi);
 
 // Save
 static void SaveGameInit(Menuitem *mi);
@@ -996,11 +996,11 @@ static void SaveGameLBInit(Menuitem *mi)
 }
 
 /**
-** Save game listbox retrieve callback
+**  Save game listbox retrieve callback
 */
-static unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char* SaveGameLBRetrieve(Menuitem *mi, int i)
 {
-	FileList *fl;
+	FileList* fl;
 	static char buffer[1024];
 
 	if (i < mi->d.listbox.noptions) {
@@ -1026,10 +1026,6 @@ static void SaveGameLBAction(Menuitem *mi, int i)
 	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
-		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-			mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-			mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-		}
 		if (fl[i].type) {
 			sprintf(mi->menu->Items[1].d.input.buffer, "%s~!_", fl[i].name);
 			mi->menu->Items[1].d.input.nch = strlen(mi->menu->Items[1].d.input.buffer) - 3;
@@ -1043,97 +1039,10 @@ static void SaveGameLBAction(Menuitem *mi, int i)
 }
 
 /**
-** Save game vertical slider callback
+**  Save game vertical slider callback
 */
-static void SaveGameVSAction(Menuitem *mi, int i)
+static void SaveGameVSAction(Menuitem* mi, int i)
 {
-	int op;
-	int d1;
-	int d2;
-
-	mi--;
-	switch (i) {
-		case 0: // click - down
-		case 2: // key - down
-			if (mi->d.listbox.curopt == -1)
-			mi->d.listbox.curopt = 0;
-
-			if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-				if (mi->d.listbox.curopt+mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-					mi->d.listbox.curopt++;
-					if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-						mi->d.listbox.curopt--;
-						mi->d.listbox.startline++;
-					}
-				}
-			} else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-					mi->d.listbox.curopt--;
-					if (mi->d.listbox.curopt < 0) {
-						mi->d.listbox.curopt++;
-						mi->d.listbox.startline--;
-					}
-				}
-			}
-			SaveGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			if (i == 2) {
-				mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
-			}
-			break;
-		case 1: // mouse - move
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-				if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt+mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-								 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-							d2 = op - mi[1].d.vslider.curper;
-							if (d2 >= d1) {
-								break;
-							}
-							mi->d.listbox.curopt++;
-							if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-								mi->d.listbox.curopt--;
-								mi->d.listbox.startline++;
-							}
-							if (mi->d.listbox.curopt+mi->d.listbox.startline + 1 == mi->d.listbox.noptions) {
-								break;
-							}
-						}
-					}
-				} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-									 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-							d2 = mi[1].d.vslider.curper - op;
-							if (d2 >= d1) {
-								break;
-							}
-							mi->d.listbox.curopt--;
-							if (mi->d.listbox.curopt < 0) {
-								mi->d.listbox.curopt++;
-								mi->d.listbox.startline--;
-							}
-							if (mi->d.listbox.curopt+mi->d.listbox.startline == 0) {
-								break;
-							}
-						}
-					}
-				}
-
-				Assert(mi->d.listbox.startline >= 0);
-				Assert(mi->d.listbox.noptions <= 0 ||
-					mi->d.listbox.startline+mi->d.listbox.curopt < mi->d.listbox.noptions);
-
-				SaveGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			}
-			break;
-		default:
-			break;
-	}
 }
 
 /**
@@ -1240,11 +1149,11 @@ static void LoadGameLBInit(Menuitem *mi)
 }
 
 /**
-** Load game listbox retrieve callback
+**  Load game listbox retrieve callback
 */
-static unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char* LoadGameLBRetrieve(Menuitem *mi, int i)
 {
-	FileList *fl;
+	FileList* fl;
 	static char buffer[1024];
 
 	if (i < mi->d.listbox.noptions) {
@@ -1270,10 +1179,6 @@ static void LoadGameLBAction(Menuitem *mi, int i)
 	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
-		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-			mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-			mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-		}
 		if (fl[i].type) {
 			mi->menu->Items[3].flags = MI_ENABLED;
 		} else {
@@ -1285,97 +1190,10 @@ static void LoadGameLBAction(Menuitem *mi, int i)
 }
 
 /**
-** Load game vertical slider callback
+**  Load game vertical slider callback
 */
-static void LoadGameVSAction(Menuitem *mi, int i)
+static void LoadGameVSAction(Menuitem* mi, int i)
 {
-	int op;
-	int d1;
-	int d2;
-
-	mi--;
-	switch (i) {
-		case 0: // click - down
-		case 2: // key - down
-			if (mi->d.listbox.curopt == -1)
-			mi->d.listbox.curopt = 0;
-
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-					mi->d.listbox.curopt++;
-					if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-						mi->d.listbox.curopt--;
-						mi->d.listbox.startline++;
-					}
-				}
-			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-					mi->d.listbox.curopt--;
-					if (mi->d.listbox.curopt < 0) {
-						mi->d.listbox.curopt++;
-						mi->d.listbox.startline--;
-					}
-				}
-			}
-			LoadGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			if (i == 2) {
-				mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
-			}
-			break;
-		case 1: // mouse - move
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-				if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt  +mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-								 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-							d2 = op - mi[1].d.vslider.curper;
-							if (d2 >= d1) {
-								break;
-							}
-							mi->d.listbox.curopt++;
-							if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-								mi->d.listbox.curopt--;
-								mi->d.listbox.startline++;
-							}
-							if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions) {
-								break;
-							}
-						}
-					}
-				} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-									 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-							d2 = mi[1].d.vslider.curper - op;
-							if (d2 >= d1) {
-								break;
-							}
-							mi->d.listbox.curopt--;
-							if (mi->d.listbox.curopt < 0) {
-								mi->d.listbox.curopt++;
-								mi->d.listbox.startline--;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline == 0) {
-								break;
-							}
-						}
-					}
-				}
-
-				Assert(mi->d.listbox.startline >= 0);
-				Assert(mi->d.listbox.noptions <= 0 ||
-					mi->d.listbox.startline+mi->d.listbox.curopt < mi->d.listbox.noptions);
-
-				LoadGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			}
-			break;
-		default:
-			break;
-	}
 }
 
 /**
@@ -1390,7 +1208,7 @@ static void LoadGameOk(void)
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt + mi->d.listbox.startline;
+	i = mi->d.listbox.curopt;
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		sprintf(TempPathBuf, "%s/%s", SaveDir, fl[i].name);
@@ -3217,11 +3035,11 @@ static void ScenSelectInit(Menuitem *mi)
 }
 
 /**
-** Scenario select listbox action callback
+**  Scenario select listbox action callback
 */
 static void ScenSelectLBAction(Menuitem *mi, int i)
 {
-	FileList *fl;
+	FileList* fl;
 
 	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
@@ -3231,10 +3049,6 @@ static void ScenSelectLBAction(Menuitem *mi, int i)
 			mi->menu->Items[3].d.button.text = strdup("OK");
 		} else {
 			mi->menu->Items[3].d.button.text = strdup("Open");
-		}
-		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-			mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-			mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 		}
 	}
 }
@@ -3379,12 +3193,12 @@ static void ScenSelectLBInit(Menuitem *mi)
 }
 
 /**
-** Scenario select listbox retrieve callback
+**  Scenario select listbox retrieve callback
 */
-static unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
+static unsigned char* ScenSelectLBRetrieve(Menuitem* mi, int i)
 {
-	FileList *fl;
-	MapInfo *info;
+	FileList* fl;
+	MapInfo* info;
 	static char buffer[1024];
 	int j;
 	int n;
@@ -3392,7 +3206,7 @@ static unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (fl[i].type) {
-			if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
+			if (i == mi->d.listbox.curopt) {
 				if ((info = fl[i].xdata)) {
 					if (info->Description) {
 						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 254, LargeFont, info->Description);
@@ -3423,7 +3237,7 @@ static unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-** Scenario select map type action callback
+**  Scenario select map type action callback
 */
 static void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
@@ -3437,122 +3251,17 @@ static void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 }
 
 /**
-** Scenario select vertical slider action callback
+**  Scenario select vertical slider action callback
 */
-static void ScenSelectVSAction(Menuitem *mi, int i)
+static void ScenSelectVSAction(Menuitem* mi, int i)
 {
-	int op;
-	int d1;
-	int d2;
-
-	mi--;
-	switch (i) {
-		case 0: // click - down
-		case 2: // key - down
-			if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
-					mi->d.listbox.curopt++;
-					if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-						mi->d.listbox.curopt--;
-						mi->d.listbox.startline++;
-					}
-				}
-			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-					mi->d.listbox.curopt--;
-					if (mi->d.listbox.curopt < 0) {
-						mi->d.listbox.curopt++;
-						mi->d.listbox.startline--;
-					}
-				}
-			}
-			ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			if (i == 2) {
-				mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
-			}
-			break;
-		case 1: // mouse - move
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
-				if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-								 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-							d2 = op - mi[1].d.vslider.curper;
-							if (d2 >= d1)
-								break;
-							mi->d.listbox.curopt++;
-							if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-								mi->d.listbox.curopt--;
-								mi->d.listbox.startline++;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 == mi->d.listbox.noptions)
-								break;
-						}
-					}
-				} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-									 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-							d2 = mi[1].d.vslider.curper - op;
-							if (d2 >= d1)
-								break;
-							mi->d.listbox.curopt--;
-							if (mi->d.listbox.curopt < 0) {
-								mi->d.listbox.curopt++;
-								mi->d.listbox.startline--;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline == 0)
-								break;
-						}
-					}
-				}
-
-				Assert(mi->d.listbox.startline >= 0);
-				Assert(mi->d.listbox.noptions <= 0 ||
-					mi->d.listbox.startline + mi->d.listbox.curopt < mi->d.listbox.noptions);
-
-				ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			}
-			break;
-		default:
-			break;
-	}
 }
 
 /**
-** Keystroke help vertical slider action callback
+**  Keystroke help vertical slider action callback
 */
 static void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
-	int j;
-
-	switch (i) {
-		case 0: // click - down
-		case 2: // key - down
-			j = ((mi->d.vslider.percent + 1) * (nKeyStrokeHelps - 11)) / 100;
-			if (mi->d.vslider.cflags&MI_CFLAGS_DOWN && j < nKeyStrokeHelps - 11) {
-				j++;
-			} else if (mi->d.vslider.cflags  & MI_CFLAGS_UP && j > 0) {
-				j--;
-			}
-			if (i == 2) {
-				mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
-			}
-			mi->d.vslider.percent = j * 100 / (nKeyStrokeHelps - 11);
-			break;
-		case 1: // mouse - move
-			if ((mi->d.vslider.cflags&MI_CFLAGS_KNOB) && (mi->flags&MenuButtonClicked)) {
-				j = ((mi->d.vslider.curper + 1) * (nKeyStrokeHelps - 11)) / 100;
-				mi->d.vslider.percent = mi->d.vslider.curper;
-			}
-			break;
-		default:
-			break;
-	}
 }
 
 /**
@@ -3684,7 +3393,7 @@ static void ScenSelectOk(void)
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt + mi->d.listbox.startline;
+	i = mi->d.listbox.curopt;
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (fl[i].type == 0) {
@@ -5098,7 +4807,7 @@ static void EditorMainLoadOk(void)
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt + mi->d.listbox.startline;
+	i = mi->d.listbox.curopt;
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (fl[i].type == 0) {
@@ -5164,10 +4873,10 @@ static void EditorMainLoadCancel(void)
 /**
 ** Editor main load listbox retrieve callback
 */
-static unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
+static unsigned char* EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 {
-	FileList *fl;
-	MapInfo *info;
+	FileList* fl;
+	MapInfo* info;
 	static char buffer[1024];
 	int j;
 	int n;
@@ -5175,7 +4884,7 @@ static unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (fl[i].type) {
-			if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
+			if (i == mi->d.listbox.curopt) {
 				if ((info = fl[i].xdata)) {
 					if (info->Description) {
 						VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234, LargeFont, info->Description);
@@ -5206,7 +4915,7 @@ static unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-** Editor main load listbox action callback
+**  Editor main load listbox action callback
 */
 static void EditorMainLoadLBAction(Menuitem *mi, int i)
 {
@@ -5221,10 +4930,6 @@ static void EditorMainLoadLBAction(Menuitem *mi, int i)
 		} else {
 			mi->menu->Items[3].d.button.text = strdup("Open");
 		}
-		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-			mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-			mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-		}
 	}
 }
 
@@ -5233,93 +4938,10 @@ static void EditorMainLoadLBAction(Menuitem *mi, int i)
 */
 static void EditorMainLoadVSAction(Menuitem *mi, int i)
 {
-	int op;
-	int d1;
-	int d2;
-
-	mi--;
-	switch (i) {
-		case 0: // click - down
-		case 2: // key - down
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-					mi->d.listbox.curopt++;
-					if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-						mi->d.listbox.curopt--;
-						mi->d.listbox.startline++;
-					}
-				}
-			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-					mi->d.listbox.curopt--;
-					if (mi->d.listbox.curopt < 0) {
-						mi->d.listbox.curopt++;
-						mi->d.listbox.startline--;
-					}
-				}
-			}
-			EditorMainLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			if (i == 2) {
-				mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
-			}
-			break;
-		case 1: // mouse - move
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-				if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-								 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-							d2 = op - mi[1].d.vslider.curper;
-							if (d2 >= d1)
-								break;
-							mi->d.listbox.curopt++;
-							if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-								mi->d.listbox.curopt--;
-								mi->d.listbox.startline++;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 == mi->d.listbox.noptions) {
-								break;
-							}
-						}
-					}
-				} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-									 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-							d2 = mi[1].d.vslider.curper - op;
-							if (d2 >= d1) {
-								break;
-							}
-							mi->d.listbox.curopt--;
-							if (mi->d.listbox.curopt < 0) {
-								mi->d.listbox.curopt++;
-								mi->d.listbox.startline--;
-							}
-							if (mi->d.listbox.curopt+mi->d.listbox.startline == 0) {
-								break;
-							}
-						}
-					}
-				}
-
-				Assert(mi->d.listbox.startline >= 0);
-				Assert(mi->d.listbox.noptions <= 0 ||
-					mi->d.listbox.startline+mi->d.listbox.curopt < mi->d.listbox.noptions);
-
-				EditorMainLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			}
-			break;
-		default:
-			break;
-	}
 }
 
 /**
-** Editor load map menu
+**  Editor load map menu
 */
 void EditorLoadMenu(void)
 {
@@ -5364,7 +4986,7 @@ static void EditorLoadOk(void)
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt + mi->d.listbox.startline;
+	i = mi->d.listbox.curopt;
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (fl[i].type == 0) {
@@ -5951,7 +5573,7 @@ static void EditorSaveOk(void)
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt + mi->d.listbox.startline;
+	i = mi->d.listbox.curopt;
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (mi->menu->Items[3].d.input.nch == 0 && fl[i].type == 0) {
@@ -6004,11 +5626,11 @@ static void EditorSaveCancel(void)
 }
 
 /**
-** Editor save listbox retrieve callback
+**  Editor save listbox retrieve callback
 */
-static unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
+static unsigned char* EditorSaveLBRetrieve(Menuitem *mi, int i)
 {
-	FileList *fl;
+	FileList* fl;
 	static char buffer[1024];
 
 	if (i < mi->d.listbox.noptions) {
@@ -6025,11 +5647,11 @@ static unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-** Editor save listbox action callback
+**  Editor save listbox action callback
 */
-static void EditorSaveLBAction(Menuitem *mi, int i)
+static void EditorSaveLBAction(Menuitem* mi, int i)
 {
-	FileList *fl;
+	FileList* fl;
 
 	Assert(i >= 0);
 	if (i < mi->d.listbox.noptions) {
@@ -6045,97 +5667,14 @@ static void EditorSaveLBAction(Menuitem *mi, int i)
 			mi->menu->Items[4].d.button.text = strdup("Open");
 		}
 		mi->menu->Items[4].flags &= ~MenuButtonDisabled;
-		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-			mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-		}
 	}
 }
 
 /**
 ** Editor save vertical slider action callback
 */
-static void EditorSaveVSAction(Menuitem *mi, int i)
+static void EditorSaveVSAction(Menuitem* mi, int i)
 {
-	int op;
-	int d1;
-	int d2;
-
-	mi--;
-	switch (i) {
-		case 0: // click - down
-		case 2: // key - down
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-					mi->d.listbox.curopt++;
-					if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-						mi->d.listbox.curopt--;
-						mi->d.listbox.startline++;
-					}
-				}
-			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-					mi->d.listbox.curopt--;
-					if (mi->d.listbox.curopt < 0) {
-						mi->d.listbox.curopt++;
-						mi->d.listbox.startline--;
-					}
-				}
-			}
-			EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			if (i == 2) {
-				mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
-			}
-			break;
-		case 1: // mouse - move
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-				if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-								 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-							d2 = op - mi[1].d.vslider.curper;
-							if (d2 >= d1)
-								break;
-							mi->d.listbox.curopt++;
-							if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-								mi->d.listbox.curopt--;
-								mi->d.listbox.startline++;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 == mi->d.listbox.noptions)
-								break;
-						}
-					}
-				} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-									 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-							d2 = mi[1].d.vslider.curper - op;
-							if (d2 >= d1)
-								break;
-							mi->d.listbox.curopt--;
-							if (mi->d.listbox.curopt < 0) {
-								mi->d.listbox.curopt++;
-								mi->d.listbox.startline--;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline == 0)
-								break;
-						}
-					}
-				}
-
-				Assert(mi->d.listbox.startline >= 0);
-				Assert(mi->d.listbox.noptions <= 0 ||
-					mi->d.listbox.startline + mi->d.listbox.curopt < mi->d.listbox.noptions);
-
-				EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			}
-			break;
-		default:
-			break;
-	}
 }
 
 /**
@@ -6359,19 +5898,15 @@ static void ReplayGameLBAction(Menuitem *mi, int i)
 		} else {
 			mi->menu->Items[3].d.button.text = strdup("Open");
 		}
-		if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-			mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-			mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
-		}
 	}
 }
 
 /**
-** Replay game listbox retrieve
+**  Replay game listbox retrieve
 */
-static unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i)
+static unsigned char* ReplayGameLBRetrieve(Menuitem *mi, int i)
 {
-	FileList *fl;
+	FileList* fl;
 	static char buffer[1024];
 
 	if (i < mi->d.listbox.noptions) {
@@ -6388,98 +5923,14 @@ static unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-** Replay game vertical slider action
+**  Replay game vertical slider action
 */
-static void ReplayGameVSAction(Menuitem *mi, int i)
+static void ReplayGameVSAction(Menuitem* mi, int i)
 {
-	int op;
-	int d1;
-	int d2;
-
-	mi--;
-	switch (i) {
-		case 0: // click - down
-		case 2: // key - down
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-					mi->d.listbox.curopt++;
-					if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-						mi->d.listbox.curopt--;
-						mi->d.listbox.startline++;
-					}
-				}
-			} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
-				if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-					mi->d.listbox.curopt--;
-					if (mi->d.listbox.curopt < 0) {
-						mi->d.listbox.curopt++;
-						mi->d.listbox.startline--;
-					}
-				}
-			}
-			ReplayGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			if (i == 2) {
-				mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
-			}
-			break;
-		case 1: // mouse - move
-			if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-				if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-								 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-							d2 = op - mi[1].d.vslider.curper;
-							if (d2 >= d1) {
-								break;
-							}
-							mi->d.listbox.curopt++;
-							if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-								mi->d.listbox.curopt--;
-								mi->d.listbox.startline++;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline+1 == mi->d.listbox.noptions) {
-								break;
-							}
-						}
-					}
-				} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-					if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
-						for (;;) {
-							op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-									 (mi->d.listbox.noptions - 1);
-							d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-							d2 = mi[1].d.vslider.curper - op;
-							if (d2 >= d1) {
-								break;
-							}
-							mi->d.listbox.curopt--;
-							if (mi->d.listbox.curopt < 0) {
-								mi->d.listbox.curopt++;
-								mi->d.listbox.startline--;
-							}
-							if (mi->d.listbox.curopt + mi->d.listbox.startline == 0) {
-								break;
-							}
-						}
-					}
-				}
-
-				Assert(mi->d.listbox.startline >= 0);
-				Assert(mi->d.listbox.noptions <= 0 ||
-					mi->d.listbox.startline + mi->d.listbox.curopt < mi->d.listbox.noptions);
-
-				ReplayGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-			}
-			break;
-		default:
-			break;
-	}
 }
 
 /**
-** Replay game folder button callback
+**  Replay game folder button callback
 */
 static void ReplayGameFolder(void)
 {
@@ -6531,7 +5982,7 @@ static void ReplayGameOk(void)
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->d.listbox.curopt + mi->d.listbox.startline;
+	i = mi->d.listbox.curopt;
 	if (i < mi->d.listbox.noptions) {
 		fl = mi->d.listbox.options;
 		if (fl[i].type == 0) {
