@@ -174,7 +174,7 @@ local SCM CclDefineAiHelper(SCM list)
 	    free(str);
 	    continue;
 	}
-	DebugLevel0Fn("%s\n" _C_ base->Name);
+	DebugLevel3Fn("%s\n" _C_ base->Name);
 	free(str);
 
 	//
@@ -191,7 +191,7 @@ local SCM CclDefineAiHelper(SCM list)
 		    free(str);
 		    continue;
 		}
-		DebugLevel0Fn("> %s\n" _C_ upgrade->Ident);
+		DebugLevel3Fn("> %s\n" _C_ upgrade->Ident);
 	    } else if( what==4 || what==5 ) {
 		if( !strcmp(DEFAULT_NAMES[1],str) ) {
 		    cost=1;
@@ -210,7 +210,7 @@ local SCM CclDefineAiHelper(SCM list)
 		    free(str);
 		    continue;
 		}
-		DebugLevel0Fn("> %s\n" _C_ str);
+		DebugLevel3Fn("> %s\n" _C_ str);
 	    } else if( what==6 ) {
 		if( !strcmp("food",str) ) {
 		    cost=0;
@@ -219,7 +219,7 @@ local SCM CclDefineAiHelper(SCM list)
 		    free(str);
 		    continue;
 		}
-		DebugLevel0Fn("> %s\n" _C_ str);
+		DebugLevel3Fn("> %s\n" _C_ str);
 	    } else {
 		type=UnitTypeByIdent(str);
 		if( !type ) {
@@ -227,7 +227,7 @@ local SCM CclDefineAiHelper(SCM list)
 		    free(str);
 		    continue;
 		}
-		DebugLevel0Fn("> %s\n" _C_ type->Name);
+		DebugLevel3Fn("> %s\n" _C_ type->Name);
 	    }
 	    free(str);
 
@@ -305,7 +305,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0Fn("%s\n" _C_ str);
+    DebugLevel3Fn("%s\n" _C_ str);
     aitype->Name=str;
 
     //
@@ -314,7 +314,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0Fn("%s\n" _C_ str);
+    DebugLevel3Fn("%s\n" _C_ str);
     if( *str!='*' ) {
 	aitype->Race=str;
     } else {
@@ -327,7 +327,7 @@ local SCM CclDefineAi(SCM list)
     value=gh_car(list);
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel0Fn("%s\n" _C_ str);
+    DebugLevel3Fn("%s\n" _C_ str);
     aitype->Class=str;
 
     //
