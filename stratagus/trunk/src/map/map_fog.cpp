@@ -50,10 +50,6 @@
 #include "ui.h"
 #include "../video/intern_video.h"
 
-#if defined(DEBUG) && defined(TIMEIT)
-#include "rdtsc.h"
-#endif
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -664,11 +660,6 @@ void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	int p;
 	int my;
 	int mx;
-#ifdef TIMEIT
-	u_int64_t sv = rdtsc();
-	u_int64_t ev;
-	static long mv = 9999999;
-#endif
 
 	// flags must redraw or not
 	if (ReplayRevealMap) {
@@ -721,16 +712,6 @@ void DrawMapFogOfWar(Viewport* vp, int x, int y)
 		sy += TheMap.Info.MapWidth;
 		dy += TileSizeY;
 	}
-
-#ifdef TIMEIT
-	ev = rdtsc();
-	sx = (ev - sv);
-	if (sx < mv) {
-		mv = sx;
-	}
-
-	DebugPrint("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx * 100) / mv);
-#endif
 }
 
 /**
