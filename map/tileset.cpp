@@ -10,12 +10,11 @@
 //
 /**@name tileset.c	-	The tileset. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -359,6 +358,7 @@ local void SaveTilesetSolid(FILE* file,const unsigned short* table
     i=fprintf(file,"\n    #(");
     for( j=0; j<=n; ++j ) {
 	i+=fprintf(file," %3d",table[start+j]);
+	// i+=fprintf(file," %3d",table[start+j] ? start+j : 0);
     }
     i+=fprintf(file,"))");
 
@@ -393,6 +393,7 @@ local void SaveTilesetMixed(FILE* file,const unsigned short* table
 	i=6;
 	for( j=0; j<=n; ++j ) {
 	    i+=fprintf(file," %3d",table[start+x+j]);
+	    // i+=fprintf(file," %3d",table[start+x+j] ? start+x+j : 0);
 	}
 	if( x==0xF0 || (start==0x900 && x==0xD0)) {
 	    i+=fprintf(file,"))");
