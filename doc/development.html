@@ -202,12 +202,47 @@ You need a C compiler for windows.
 <LI>VC or VC++<P>
     This isn't supported yet. If you have created a project please send me 
     the url. FreeCraft now compiles without errors, but now many functions
-    are missing.
-<LI><A HREF="http://sources.redhat.com/cygwin/">cygwin</A><P>
+    are missing.<P>
+    <UL>
+    <LI>You need <A HREF="http://www.libsdl.org">SDL</A> for VC++ (
+    <A HREF="http://www.libsdl.org/release/SDL-devel-1.2.3-VC6.zip">
+    SDL-devel-1.2.3-VC6.zip</A>.
+    <LI><A HREF="http;//www.libpng.org">libpng</A> for win32 and VC++.
+    Sorry no direct download link.
+    <LI><A HREF="http;//www.zlib.org">zlib</A> for win32 and VC++.
+    Sorry no direct download link.
+    <LI>VC++ <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsp">
+    workbench</A> and
+    <A HREF="http://freecraft.sourceforge.net/snapshots/fc.dsw">project</A>.
+    </UL>
+    To use the project without changes, setup your includes like following:
+    <UL>
+    <LI>C:\SDL-1.2.2\include
+    <LI>C:\FC-010802-VC\SRC\INCLUDE
+    <LI>C:\LPNG120
+    <LI>C:\ZLIB
+    <LI>C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\INCLUDE
+    </UL>
+    and the libs like following:
+    <UL>
+    <LI>C:\LPNG120\PROJECTS\MSVC\WIN32\LIBPNG\LIB_DBG
+    <LI>C:\Program Files\Microsoft Visual Studio\VC98\LIB
+    </UL>
+    and add the lib files in the project:
+    <LI>libpng.lib
+    <LI>SDLmain.lib
+    <LI>SDL.lib
+    <LI>WS2_32.lib
+    </UL>
+    FreeCraft should now compile with VC++ and work correct.<P>
+    <B>Please send me correction and improvements for this, I can't test this.
+    </B>
+
+<P><LI><A HREF="http://sources.redhat.com/cygwin/">cygwin</A><P>
     The Cygwin tools are ports of the popular GNU development tools and
     utilities for Windows. They function by using the Cygwin library which
     provides a UNIX-like API on top of the Win32 API.
-<LI><A HREF="http://www.mingw.org">MinGW</A><P>
+<P><LI><A HREF="http://www.mingw.org">MinGW</A><P>
     MinGW is a collection of header files and import libraries that allow one
     to use GCC and produce native Windows32 programs that do not rely on any
     3rd-party DLLs.<P>
