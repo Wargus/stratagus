@@ -1021,6 +1021,26 @@ local Menuitem KeystrokeHelpMenuItems[] = {
 	{ text:{ "TEST", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*1, 0, LargeFont, NULL, NULL,
 	{ text:{ "TEST2", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*2, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST3", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*3, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST4", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*4, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST5", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*5, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST6", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*6, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST7", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*7, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST11", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*8, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST12", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*9, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST13", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*10, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST14", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*11, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST15", MI_TFLAGS_LALIGN} } },
 
 
 #else
@@ -1281,7 +1301,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	5, 5,
+	15, 15,
 	KeystrokeHelpMenuItems,
 	NULL,
     },
@@ -2968,18 +2988,18 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 {
     int op, d1, d2;
     int j = 3;
-    
+    int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
 
     mi--;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		    for (j=3; j < Menus[MENU_KEYSTROKE_HELP].nitems ;++j)
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN && KeystrokeHelpMenuItems[nitems-1].yofs > 40*5) {
+		    for (j=3; j < nitems ;++j)
 			KeystrokeHelpMenuItems[j].yofs -= 10;
 		    MustRedraw |= RedrawMenu;
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		    for (j=3; j < Menus[MENU_KEYSTROKE_HELP].nitems ;++j)
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP && KeystrokeHelpMenuItems[3].yofs < 40) {
+		    for (j=3; j < nitems ;++j)
 			KeystrokeHelpMenuItems[j].yofs += 10;
 		    MustRedraw |= RedrawMenu;
 	    }
