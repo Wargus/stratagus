@@ -145,7 +145,7 @@ CCLS	= data/ccl/clone.ccl data/ccl/units.ccl data/ccl/missiles.ccl \
 	  data/ccl/ui.ccl data/ccl/fonts.ccl data/ccl/ai.ccl \
 	  data/ccl/summer.ccl data/ccl/winter.ccl data/ccl/wasteland.ccl \
 	  data/ccl/swamp.ccl data/ccl/anim.ccl data/ccl/upgrade.ccl \
-	  data/default.cm
+	  data/ccl/wc2.ccl data/default.cm
 
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png
