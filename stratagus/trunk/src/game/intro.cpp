@@ -817,10 +817,13 @@ global void ShowPicture(CampaignChapter* chapter)
 
     VideoFree(background);
 
-    linesptr=&lines;
-    while( *linesptr ) {
-	FreeTextLines(&(*linesptr)->Text);
-	linesptr=&((*linesptr)->Next);
+    while( lines ) {
+	ChapterTextLines* ptr;
+
+	ptr=lines->Next;
+	FreeTextLines(&lines->Text);
+	free(lines);
+	lines=ptr;
     }
 
     VideoLockScreen();
