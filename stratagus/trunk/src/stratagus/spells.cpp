@@ -850,7 +850,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    RemoveUnit(target);
 	    UnitLost(target);
 	    ReleaseUnit(target);
-	    type=UnitTypeByIdent("unit-critter");
+	    type=UnitTypeCritter;
 	    if( CanMoveToMask(x,y,TypeMovementMask(type)) ) {
 		MakeUnitAndPlace(x, y, type, Players+PlayerNumNeutral);
 	    }

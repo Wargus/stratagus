@@ -93,8 +93,8 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
     int h;
     int w;
 
-    DebugCheck( UnitTypeByIdent("unit-orc-wall")->_HitPoints>=256
-	    || UnitTypeByIdent("unit-human-wall")->_HitPoints>=256 );
+    DebugCheck( UnitTypeOrcWall->_HitPoints>=256
+	    || UnitTypeHumanWall->_HitPoints>=256 );
 
     if( map->Terrain<TilesetMax ) {
 	ctab=Tilesets[map->Terrain].Table;
@@ -117,12 +117,12 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
 		    || (v&0xFFF0)==0x00C0
 		    || (v&0xFF00)==0x0900 ) {
 		map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Value=
-			UnitTypeByIdent("unit-orc-wall")->_HitPoints;
+			UnitTypeOrcWall->_HitPoints;
 	    } else if( (v&0x00F0)==0x0090
 		    || (v&0xFFF0)==0x00B0
 		    || (v&0xFF00)==0x0800 ) {
 		map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Value=
-			UnitTypeByIdent("unit-human-wall")->_HitPoints;
+			UnitTypeHumanWall->_HitPoints;
 	    }
 	}
     }

@@ -24,6 +24,7 @@
 
 #include "freecraft.h"
 #include "icons.h"
+#include "unittype.h"
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
@@ -42,9 +43,9 @@
 global void CleanModules(void)
 {
     CleanIcons();
-#if 0
-    // SaveUI();
+    // CleanUI();
     CleanUnitTypes();
+#if 0
     CleanUnits();
     CleanUpgrades();
     CleanDependencies();
@@ -64,6 +65,8 @@ global void CleanModules(void)
 global void InitModules(void)
 {
     InitIcons();
+    // InitUI();
+    InitUnitTypes();
 }
 
 /**
@@ -74,6 +77,8 @@ global void InitModules(void)
 global void LoadModules(void)
 {
     LoadIcons();
+    // LoadUI();
+    LoadUnitTypes();
 }
 
 /**

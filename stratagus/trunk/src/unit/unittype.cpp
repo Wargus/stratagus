@@ -52,19 +52,21 @@ global int NoWarningUnitType;		/// quiet ident lookup.
 **
 **	FIXME: find a way to make it configurable!
 */
-global UnitType*UnitTypeGoldMine;	/// Gold mine unit type pointer.
-global UnitType*UnitTypeOrcTanker;	/// Orc tanker unit type pointer.
-global UnitType*UnitTypeHumanTanker;	/// Human tanker unit type pointer.
-global UnitType*UnitTypeOrcTankerFull;	/// Orc tanker full unit type pointer.
-global UnitType*UnitTypeHumanTankerFull;/// Human tanker full unit type pointer.
-global UnitType*UnitTypeHumanWorker;	/// Human worker.
-global UnitType*UnitTypeOrcWorker;	/// Orc worker.
-global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold.
-global UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold.
-global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
-global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
-global UnitType*UnitTypeHumanFarm;	/// Human farm.
-global UnitType*UnitTypeOrcFarm;	/// Orc farm.
+global UnitType*UnitTypeGoldMine;	/// Gold mine unit type pointer
+global UnitType*UnitTypeOrcTanker;	/// Orc tanker unit type pointer
+global UnitType*UnitTypeHumanTanker;	/// Human tanker unit type pointer
+global UnitType*UnitTypeOrcTankerFull;	/// Orc tanker full unit type pointer
+global UnitType*UnitTypeHumanTankerFull;/// Human tanker full unit type pointer
+global UnitType*UnitTypeHumanWorker;	/// Human worker
+global UnitType*UnitTypeOrcWorker;	/// Orc worker
+global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
+global UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
+global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
+global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
+global UnitType*UnitTypeHumanFarm;	/// Human farm
+global UnitType*UnitTypeOrcFarm;	/// Orc farm
+global UnitType*UnitTypeHumanWall;	/// Human wall
+global UnitType*UnitTypeOrcWall;	/// Orc wall
 global UnitType*UnitTypeCritter;	/// Critter unit type pointer
 
 #if !defined(USE_CCL)
@@ -1278,6 +1280,28 @@ global UnitType* NewUnitTypeSlot(char* ident)
 }
 
 /**
+**	Draw unit-type on map.
+**
+**	@param type	Unit-type pointer.
+**	@param frame	Animation frame of unit-type.
+**	@param x	Screen X pixel postion to draw unit-type.
+**	@param Y	Screen Y pixel postion to draw unit-type.
+*/
+global void DrawUnitType(const UnitType* type,unsigned frame,int x,int y)
+{
+    // FIXME: move this calculation to high level.
+    x-=(type->Width-type->TileWidth*TileSizeX)/2;
+    y-=(type->Height-type->TileHeight*TileSizeY)/2;
+
+    // FIXME: This is a hack for mirrored sprites
+    if( frame&128 ) {
+	VideoDrawClipX(type->Sprite,frame&127,x,y);
+    } else {
+	VideoDrawClip(type->Sprite,frame,x,y);
+    }
+}
+
+/**
 **	Init unit types.
 */
 global void InitUnitTypes(void)
@@ -1320,13 +1344,15 @@ global void InitUnitTypes(void)
     UnitTypeOrcWorkerWithWood=UnitTypeByIdent("unit-peon-with-wood");
     UnitTypeHumanFarm=UnitTypeByIdent("unit-farm");
     UnitTypeOrcFarm=UnitTypeByIdent("unit-pig-farm");
+    UnitTypeHumanWall=UnitTypeByIdent("unit-human-wall");
+    UnitTypeOrcWall=UnitTypeByIdent("unit-orc-wall");
     UnitTypeCritter=UnitTypeByIdent("unit-critter");
 }
 
 /**
-**	Load the graphics for the units.
+**	Load the graphics for the unit-types.
 */
-global void LoadUnitSprites(void)
+global void LoadUnitTypes(void)
 {
     UnitType* type;
     const char* file;
@@ -1398,27 +1424,43 @@ global void LoadUnitSprites(void)
 }
 
 /**
-**	Draw unit-type on map.
-**
-**	@param type	Unit-type pointer.
-**	@param frame	Animation frame of unit-type.
-**	@param x	Display X postion to draw unit-type.
-**	@param Y	Display Y postion to draw unit-type.
+**	Cleanup the unit-type module.
 */
-global void DrawUnitType(const UnitType* type,unsigned frame,int x,int y)
+global void CleanUnitTypes(void)
 {
-    DebugLevel3("%s\n",type->Name);
+    void** ptr;
 
-    // FIXME: move this calculation to high level.
-    x-=(type->Width-type->TileWidth*TileSizeX)/2;
-    y-=(type->Height-type->TileHeight*TileSizeY)/2;
+    //
+    //	Mapping the original unit-type numbers in puds to our internal strings
+    //
+    if( (ptr=(void**)UnitTypeWcNames) ) {	// Free all old names
+	while( *ptr ) {
+	    free(*ptr++);
+	}
+	free(UnitTypeWcNames);
 
-    // FIXME: This is a hack for mirrored sprites
-    if( frame&128 ) {
-	VideoDrawClipX(type->Sprite,frame&127,x,y);
-    } else {
-	VideoDrawClip(type->Sprite,frame,x,y);
+	UnitTypeWcNames=NULL;
     }
+
+    //
+    //	Clean hardcoded unit types.
+    //
+    UnitTypeGoldMine=NULL;
+    UnitTypeHumanTanker=NULL;
+    UnitTypeOrcTanker=NULL;
+    UnitTypeHumanTankerFull=NULL;
+    UnitTypeOrcTankerFull=NULL;
+    UnitTypeHumanWorker=NULL;
+    UnitTypeOrcWorker=NULL;
+    UnitTypeHumanWorkerWithGold=NULL;
+    UnitTypeOrcWorkerWithGold=NULL;
+    UnitTypeHumanWorkerWithWood=NULL;
+    UnitTypeOrcWorkerWithWood=NULL;
+    UnitTypeHumanFarm=NULL;
+    UnitTypeOrcFarm=NULL;
+    UnitTypeHumanWall=NULL;
+    UnitTypeOrcWall=NULL;
+    UnitTypeCritter=NULL;
 }
 
 //@}

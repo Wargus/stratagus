@@ -288,12 +288,10 @@ global void HandleActionBuilded(Unit* unit)
 
 	// FIXME: Vladi: this is just a hack to test wall fixing,
 	// FIXME:	also not sure if the right place...
-	// FIXME: Johns: and now this is also slow
-	if ( unit->Type == UnitTypeByIdent("unit-orc-wall")
-		    || unit->Type == UnitTypeByIdent("unit-human-wall")) {
-	    MapSetWall(unit->X, unit->Y,
-		    unit->Type == UnitTypeByIdent("unit-human-wall"));
-            RemoveUnit(unit);/* automaticly: CheckUnitToBeDrawn(unit) */
+	if ( unit->Type == UnitTypeOrcWall
+		    || unit->Type == UnitTypeHumanWall ) {
+	    MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
+            RemoveUnit(unit);
 	    UnitLost(unit);
 	    ReleaseUnit(unit);
 	    return;
