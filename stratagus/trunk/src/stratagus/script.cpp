@@ -66,6 +66,7 @@
 ----------------------------------------------------------------------------*/
 
 global char* CclStartFile;		/// CCL start file
+global char* GameName;			/// Game Preferences
 global int CclInConfigFile;		/// True while config file parsing
 
 global char*	Tips[MAX_TIPS+1];	/// Array of tips
@@ -822,7 +823,7 @@ local void LoadPreferences2(void)
     char buf[1024];
 
 #ifdef USE_WIN32
-    strcpy(buf,"%s/preferences2.ccl",GameName);
+    sprintf(buf,"%s/preferences2.ccl",GameName);
 #else
     sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH,GameName);
 #endif
@@ -874,7 +875,7 @@ global void SavePreferences(void)
     //
 
 #ifdef USE_WIN32
-    strcpy(buf,"%s/preferences2.ccl",GameName);
+    sprintf(buf,"%s/preferences2.ccl",GameName);
 #else
     sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH,GameName);
 #endif
