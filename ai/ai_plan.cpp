@@ -142,7 +142,7 @@ local void AiMarkWaterTransporter(const Unit* unit,unsigned char* matrix)
 	return;
     }
 
-    points=alloca(TheMap.Width*TheMap.Height);
+    points=malloc(TheMap.Width*TheMap.Height);
     size=TheMap.Width*TheMap.Height/sizeof(*points);
 
     //
@@ -204,6 +204,8 @@ local void AiMarkWaterTransporter(const Unit* unit,unsigned char* matrix)
 	}
 	ep=wp;
     }
+
+    free(points);
 }
 
 /**

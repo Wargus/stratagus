@@ -223,7 +223,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     unsigned char* m;
     unsigned char* matrix;
 
-    points=alloca(TheMap.Width*TheMap.Height);
+    points=malloc(TheMap.Width*TheMap.Height);
     size=TheMap.Width*TheMap.Height/sizeof(*points);
 
     x=ox;
@@ -235,6 +235,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	    && (!flag || AiCheckSurrounding(worker,type, x, y)) ) {
 	*dx=x;
 	*dy=y;
+	free(points);
 	return 1;
     }
 
@@ -285,6 +286,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 			&& (!flag || AiCheckSurrounding(worker,type, x, y)) ) {
 		    *dx=x;
 		    *dy=y;
+		    free(points);
 		    return 1;
 		}
 
@@ -313,6 +315,8 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	}
 	ep=wp;
     }
+
+    free(points);
 
     return 0;
 }
