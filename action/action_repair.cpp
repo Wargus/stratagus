@@ -61,6 +61,7 @@ local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
 
     flags=UnitShowAnimation(unit,repair);
 
+#ifdef WITH_SOUND
     if( (flags&AnimationSound) ) {
 	if( GameSounds.Repair.Sound==(void*)-1 ) {
 	    PlayUnitSound(unit,VoiceAttacking);
@@ -68,6 +69,7 @@ local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
 	    PlayUnitSound(unit,VoiceRepair);
 	}
     }
+#endif
 }
 
 /**
