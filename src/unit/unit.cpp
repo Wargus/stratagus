@@ -2253,7 +2253,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     struct {
 	unsigned short X;
 	unsigned short Y;
-    } points[MaxMapWidth*MaxMapHeight];
+    } points[MaxMapWidth*MaxMapHeight/4];
     int x;
     int y;
     int rx;
@@ -2352,7 +2352,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		    *m=1;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-		    if( ++wp>=sizeof(points) ) {// round about
+		    if( ++wp>=sizeof(points)/sizeof(*points) ) {// round about
 			wp=0;
 		    }
 		} else {			// unreachable
@@ -2360,7 +2360,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		}
 	    }
 
-	    if( ++rp>=sizeof(points) ) {	// round about
+	    if( ++rp>=sizeof(points)/sizeof(*points) ) {	// round about
 		rp=0;
 	    }
 	}

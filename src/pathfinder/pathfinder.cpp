@@ -216,7 +216,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     struct {
 	unsigned short X;
 	unsigned short Y;
-    } points[TheMap.Width*TheMap.Height];
+    } points[TheMap.Width*TheMap.Height/4];
     int x;
     int y;
     int rx;
@@ -277,7 +277,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		    *m=n;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-		    if( ++wp>=sizeof(points) ) {// round about
+		    if( ++wp>=sizeof(points)/sizeof(*points) ) {// round about
 			wp=0;
 		    }
 		} else {			// unreachable
@@ -285,7 +285,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		}
 	    }
 
-	    if( ++rp>=sizeof(points) ) {	// round about
+	    if( ++rp>=sizeof(points)/sizeof(*points) ) {// round about
 		rp=0;
 	    }
 	}
@@ -583,7 +583,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	    -2, 0, 0,+2, -2,-2,+2,+2 };
     unsigned char* matrix;
     unsigned char* m;
-    unsigned short points[TheMap.Width*TheMap.Height];
+    unsigned short points[TheMap.Width*TheMap.Height/4];
     const Unit* goal;
 #ifdef USE_BEST
     int bestx;
