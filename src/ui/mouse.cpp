@@ -1336,6 +1336,7 @@ global void UIHandleButtonUp(unsigned button)
 	GameMenuButtonClicked = 0;
 	MustRedraw|=RedrawMenuButton;
 	if( ButtonUnderCursor == 0 ) {
+	    // FIXME: Not if, in input mode.
 	    GamePaused=1;
 	    SetStatusLine("Game Paused");
 	    ProcessMenu(MENU_GAME, 0);
