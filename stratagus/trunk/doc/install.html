@@ -2,7 +2,7 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2001 by Lutz Sammer
+----	(c) Copyright 2001 by Lutz Sammer, Alex.
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 
 You need:
 <UL>
-	<LI>Operating systems:
+	<LI>Operating system:
 	<UL>
 	<LI>Linux System with an installed X Windows System.
 	<LI>Linux System with console (graphic card) supported by svgalib.
@@ -61,7 +61,7 @@ You need:
 		since some features of Winsock2 (WS2_32.DLL) are used. We try
 		to emulate this using WSOCK32.DLL features, but that code is
 		not in yet.
-	    <LI>winNT mean winNT4.0 + service pack 3 or higher for the same
+	    <LI>WinNT needs to be WinNT4.0 + service pack 3 or higher for the same
 		reasons.
 	    </UL>
 	</UL>
@@ -90,7 +90,7 @@ To use this program you need the following hardware:
 	<LI>At least an i586 133 Mhz (faster recommended) and 16 MB Ram.
 	<LI>Any graphic-card running with X11 or SVGALib or Win32 in 640x480.
 	<LI>8/16/24/32 bpp video modes work
-	<LI>Freecraft is believed to be endian save, so other (big endian) 
+	<LI>Freecraft is believed to be endian safe, so other (big endian)
 	    architectures like PPC should also work at least with Linux.
 </UL>
 
@@ -99,7 +99,8 @@ To use this program you need the following hardware:
     <H3>Unix or BSD</H3>
 <A NAME="unix-src"></A>
 
-Please follow the following instruction to get a working program.
+    <H4>Unix or BSD source</H4>
+Please follow the following instructions to get a working program.
 <UL>
 	<LI>Unpack the archive freecraft-'data'.tar.gz to any directory.
 	    (stored <B>with</B> path)
@@ -119,11 +120,12 @@ Please follow the following instruction to get a working program.
 	</UL>
 	<LI>With the graphic from the FreeCraft Graphic Project:
 	<UL>
-	<LI>FIXME: not valid for 1.17
 	<LI>Get the correct fcraft (graphic) and scraft (sound) archives.
 	<LI>Download fcraft from <A HREF="http://fgp.cjb.net">FGP</A>
 	<LI>Download scraft from <A HREF="http://FreeCraft.org">FreeCraft</A>
 	<LI>Extract them.
+    <LI>Read "Readme" file that was in each of the archives for further
+    instructions on how to setup the graphics and sound packs.
 	</UL>
 	<LI>Copy Rules.make.orig to Rules.make and edit it or run the setup
 	    script.
@@ -156,6 +158,141 @@ Please follow the following instruction to get a working program.
 		the command line option "-s n" (sleep n frames) or set the build
 	costs and build times of the computer with -f 110 and -t 110 higher.
 </UL>
+
+    <H4>Unix or BSD binary</H4>
+<A NAME="unix-bin"></A>
+
+Please follow the following instructions to get a working program.
+<UL>
+    <LI>Download the binary version from the web page.
+    <LI>Unpack it into a directory of your choice (~/freecraft)
+    <LI>Open a shell.
+    <LI>Change to the top level directory. ("cd ~/freecraft")
+	<LI>Install the required libraries (development version!).
+	<LI>You own the original:
+	<UL>
+	<LI>Search the files maindat.war, sfxdat.sud,strdat.war  and rezdat.war
+	    from the original game.
+	    <B>This version supports the original or expansion CD!</B>
+	    If you have only the original CD, it should also work, ignore the
+	    warnings.
+	<LI>Edit tools/build.sh, and change ARCHIVE to the correct path.
+	    (You could use an installed version or the CD-ROM)
+	    Extract from "/cdrom" is the default. Just mount your cd to /cdrom.
+	</UL>
+	<LI>With the graphic from the FreeCraft Graphic Project:
+	<UL>
+	<LI>Get the correct fcraft (graphic) and scraft (sound) archives.
+	<LI>Download fcraft from <A HREF="http://fgp.cjb.net">FGP</A>
+	<LI>Download scraft from <A HREF="http://FreeCraft.org">FreeCraft</A>
+	<LI>Extract them.
+    <LI>Read "Readme" file that was in each of the archives for further
+    instructions on how to setup the graphics and sound packs.
+    </UL>
+    <LI>Noe you could enter "./freecraft" to play.
+	<LI>That's all, I hope you have enjoyed the game.
+	<LI>If you find any bug, look in
+		<A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please mail it to
+	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<P>
+	<LI>If you get killed everytime by the computer, let the ai sleep with
+		the command line option "-s n" (sleep n frames) or set the build
+	costs and build times of the computer with -f 110 and -t 110 higher.
+</UL>
+
+    <H3>Win32</H3>
+<A NAME="win32-src"></A>
+
+    <H4>Win32 source</H4>
+
+Please follow the following instructions to get a working program. <br>
+<b>Note:</b> If you have not used mingw32 before, remember that in the
+shell that comes with it you must type '/' instead of '\' in path names.
+<UL>
+    <LI>If you do not have a gnu compiler (eg. mingw32) then download the
+    mingw-fc-native-'date'.zip archive from
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=1965&release_id=46537">this</a>
+    page. Unzip it into any directory.
+    <LI>Download freecraft-'date'.zip and unzip it into any directory.
+    <LI>Install any required librarys. (If you downloaded mingw32 from the link
+    above you should not need to do this)
+    <LI>Open a shell. (run mingw32.bat)
+    <LI>Change to the top level freecraft directory. (cd /freecraft)
+    <LI><B>You own the original:</B>
+    <UL>
+    <LI>Edit tools\build.bat to meet your requirements.<BR>
+	If your original cdrom is in drive D:\, you didn't need to edit.
+    <LI>Run tools\build.bat from the FreeCraft toplevel directory.<BR>
+	This extracts the graphics and sound from the original data files.
+    </UL>
+    <LI><B>With the graphic from the FreeCraft Graphic Project:</B>
+    <UL>
+
+    <LI>Get the correct fcraft (graphic) and scraft (sound) archives.
+    <LI>Download fcraft from <A HREF="http://fgp.cjb.net">FGP</A>
+    <LI>Download scraft from <A HREF="http://FreeCraft.org">FreeCraft</A>
+    <LI>Extract them into your game directory.
+    <LI>Read "Readme" file that was in each of the archives for further
+    instructions on how to setup the graphics and sound packs.
+    </UL>
+    <LI>Copy Rules.make.orig to Rules.make and edit it. (In the future this
+    may be done by a script)
+    <LI>Enter "make win32" to compile.
+    <LI>Enter "freecraft" to play.
+    <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
+	or <A HREF="../stderr.txt">stderr.txt</A> for more information.
+	<LI>That's all, I hope you have enjoyed the game.
+	<LI>If you find any bug, look in
+		<A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please mail it to
+	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<LI>ADVANCED: Type "make help" for more compile options.
+	<P>
+	<LI>If you get killed everytime by the computer, let the ai sleep with
+		the command line option "-s n" (sleep n frames) or set the build
+	costs and build times of the computer with -f 110 and -t 110 higher.
+</UL>
+
+    <H4>Win32 binary</H4>
+<A NAME="win32-bin"></A>
+
+Please follow the following instructions to get a working program.
+<UL>
+    <LI>Download the binary version from the web page.
+    <LI>Unzip it into a directory of your choice (c:\games\FreeCraft)
+    <LI>Open a dos-shell.
+    <LI>Enter "cd c:\games\FreeCr~1"
+    <LI><B>You own the original:</B>
+    <UL>
+    <LI>Edit tools\build.bat to meet your requirements.<BR>
+	If your original cdrom is in drive D:\, you didn't need to edit.
+    <LI>Run tools\build.bat from the FreeCraft toplevel directory.<BR>
+	This extracts the graphics and sound from the original data files.
+    </UL>
+    <LI><B>With the graphic from the FreeCraft Graphic Project:</B>
+    <UL>
+    <LI>Get the correct fcraft (graphic) and scraft (sound) archives.
+    <LI>Download fcraft from <A HREF="http://fgp.cjb.net">FGP</A>
+    <LI>Download scraft from <A HREF="http://FreeCraft.org">FreeCraft</A>
+    <LI>Extract them into your game directory.
+    <LI>Read "Readme" file that was in each of the archives for further
+    instructions on how to setup the graphics and sound packs.
+    </UL>
+    <LI>Enter "freecraft" to play.
+    <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
+	or <A HREF="../stderr.txt">stderr.txt</A> for more information.
+	<LI>That's all, I hope you have enjoyed the game.
+	<LI>If you find any bug, look in
+		<A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please mail it to
+	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<P>
+	<LI>If you get killed everytime by the computer, let the ai sleep with
+		the command line option "-s n" (sleep n frames) or set the build
+	costs and build times of the computer with -f 110 and -t 110 higher.
+</UL>
+
 
     <H2>SVGALib support = console</H2>
 
@@ -195,49 +332,6 @@ freecraft -n localhost ./data/puds/multi/3vs3.pud.gz
 
 <P>[server] may be the hostname (e.g. www.freecraft.org) or the IP adress (e.g. 192.168.0.1.) of the
 game server. The map must be the same on all computers.
-
-    <H3>Unix or BSD</H3>
-<A NAME="unix-bin"></A>
-
-Please write this part :).
-
-
-    <H3>Win32</H3>
-<A NAME="win32-src"></A>
-
-    <H4>Win32 source</H4>
-
-See unix source and write this part.
-
-    <H4>Win32 binary</H4>
-<A NAME="win32-bin"></A>
-
-Please follow the following instruction to get a working program.
-<UL>
-    <LI>FIXME: Who writes this part?
-    <LI>Get the binary version from the web page.
-    <LI>Unpack it into a directory of your choise (c:\games\FreeCraft)  
-    <LI>Open a dos-shell.
-    <LI>Enter "cd c:\games\FreeCr~1"
-    <LI><B>You own the original:</B>
-    <UL>
-    <LI>Edit tools\build.bat to meet your requirements.<BR>
-	If your original cdrom is in drive D:\, you didn't need to edit.
-    <LI>Run tools\build.bat from the FreeCraft toplevel directory.<BR>
-	This extracts the graphics and sound from the original datafiles.
-    </UL>
-    <LI><B>With the graphic from the FreeCraft Graphic Project:</B>
-    <UL>
-    <LI>FIXME: not valid for 1.17
-    <LI>Get the correct fcraft (graphic) and scraft (sound) archives.
-    <LI>Download fcraft from <A HREF="http://fgp.cjb.net">FGP</A>
-    <LI>Download scraft from <A HREF="http://FreeCraft.org">FreeCraft</A>
-    <LI>Extract them into your game directory.
-    </UL>
-    <LI>Enter "freecraft" to play.
-    <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
-	or <A HREF="../stderr.txt">stderr.txt</A> for more informations.
-</UL>
 
     <H2>Hints</H2>
 
