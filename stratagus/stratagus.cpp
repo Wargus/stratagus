@@ -192,7 +192,6 @@ global void FreeCraftInit(void)
 	    break;
     }
     LoadRGB(GlobalPalette, PalettePath);
-
     VideoCreatePalette(GlobalPalette);
 
     //

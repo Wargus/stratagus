@@ -167,7 +167,7 @@ local int CommandKey(int key)
 
 	case '+':
 	    VideoSyncSpeed+=10;
-	    InitVideoSync();
+	    SetVideoSync();
 	    SetStatusLine("Faster");
 	    break;
 
@@ -176,7 +176,7 @@ local int CommandKey(int key)
 	    if( VideoSyncSpeed<=0 ) {
 		VideoSyncSpeed=1;
 	    }
-	    InitVideoSync();
+	    SetVideoSync();
 	    SetStatusLine("Slower");
 	    break;
 

@@ -23,12 +23,12 @@
 #include "freecraft.h"
 #include "video.h"
 
+#ifndef NEW_VIDEO	// { should be removed with new video code final
+
 #ifdef DEBUG
 global unsigned AllocatedGraphicMemory;
 global unsigned CompressedGraphicMemory;
 #endif
-
-#ifndef NEW_VIDEO	// { should be removed with new video code final
 
 /*----------------------------------------------------------------------------
 --	Clipping
@@ -1592,7 +1592,6 @@ global void FreeRleSprite(RleSprite* sprite)
     free(sprite);
 }
 
-#endif	// } !NEW_VIDEO
 
 /**
 **	Load a RGB palette.
@@ -1655,5 +1654,7 @@ global void VideoCreatePalette(const Palette* palette)
 
     VideoSetPalette(temp);
 }
+
+#endif	// } !NEW_VIDEO
 
 //@}

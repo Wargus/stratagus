@@ -91,6 +91,43 @@ global int ClipY1;			/// current clipping top left
 global int ClipX2;			/// current clipping bottom right
 global int ClipY2;			/// current clipping bottom right
 
+#ifdef DEBUG
+global unsigned AllocatedGraphicMemory;	/// Allocated memory for objects
+global unsigned CompressedGraphicMemory;/// memory for compressed objects
+#endif
+
+    /**
+    **	Architecture-dependant video depth. Set by InitVideoXXX, if 0.
+    **	(8,15,16,24,32)
+    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
+    **	@see InitVideoWin32 @see main
+    */
+global int VideoDepth;
+
+    /**
+    **	Architecture-dependant videomemory. Set by InitVideoXXX.
+    **	FIXME: need a new function to set it, see #ifdef SDL code
+    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
+    **	@see InitVideoWin32 @see VMemType
+    */
+global VMemType* VideoMemory;
+
+    /**
+    **	Architecture-dependant system palette. Applies as conversion between
+    **	GlobalPalette colors and their representation in videomemory.
+    **	Set by VideoCreatePalette or VideoSetPalette.
+    **	@see VideoCreatePalette @VideoSetPalette
+    */
+global VMemType* Pixels;
+
+#endif
+
+    ///	Loaded system palette. 256-entries long, active system palette.
+global Palette GlobalPalette[256];
+
+#ifdef NEW_VIDEO
+    /// Does ColorCycling..
+global void (*ColorCycle)(void);
 #endif
 
 /*----------------------------------------------------------------------------
@@ -139,7 +176,11 @@ global void DisplayPicture(const char *name)
     Graphic* title;
 
     title=LoadGraphic(name);
+#ifdef NEW_VIDEO
+    VideoSetPalette((VMemType*)title->Pixels);
+#else
     VideoSetPalette(title->Pixels);
+#endif
 
 #ifdef USE_SDL
     // FIXME: should be moved to system/hardware dependend part
@@ -161,6 +202,252 @@ global void DisplayPicture(const char *name)
     VideoFree(title);
     // FIXME: (ARI:) New Palette got stuck in memory?
 }
+
+#ifdef NEW_VIDEO
+
+/**
+**	Load palette from resource. Just loads palette, to set it use
+**	VideoCreatePalette, which sets system palette.
+**
+**	@param pal buffer to store palette (256-entries long)
+**	@param name resource file name
+**
+**	@see VideoCreatePalette
+*/
+global void LoadRGB(Palette *pal, const char *name)
+{
+    FILE *fp;
+    int i;
+    
+    if((fp=fopen(name,"rb")) == NULL) {
+	fprintf(stderr,"Can't load palette %s\n",name);
+	exit(-1);
+    }
+
+    for(i=0;i<256;i++){
+	pal[i].r=fgetc(fp)<<2;
+	pal[i].g=fgetc(fp)<<2;
+	pal[i].b=fgetc(fp)<<2;
+    }
+    
+    fclose(fp);
+}
+
+// FIXME: this isn't 100% correct
+// Color cycling info - forest:
+// 3	flash red/green	(attacked building on minimap)
+// 38-47	cycle		(water)
+// 48-56	cycle		(water-coast boundary)
+// 202	pulsates red	(Circle of Power)
+// 240-244	cycle		(water around ships, Runestone, Dark Portal)
+// Color cycling info - swamp:
+// 3	flash red/green	(attacked building on minimap)
+// 4	pulsates red	(Circle of Power)
+// 5-9	cycle		(Runestone, Dark Portal)
+// 38-47	cycle		(water)
+// 88-95	cycle		(waterholes in coast and ground)
+// 240-244	cycle		(water around ships)
+// Color cycling info - wasteland:
+// 3	flash red/green	(attacked building on minimap)
+// 38-47	cycle		(water)
+// 64-70	cycle		(coast)
+// 202	pulsates red	(Circle of Power)
+// 240-244	cycle		(water around ships, Runestone, Dark Portal)
+// Color cycling info - winter:
+// 3	flash red/green	(attacked building on minimap)
+// 40-47	cycle		(water)
+// 48-54	cycle		(half-sunken ice-floe)
+// 202	pulsates red	(Circle of Power)
+// 205-207	cycle		(lights on christmas tree)
+// 240-244	cycle		(water around ships, Runestone, Dark Portal)
+
+/**
+**	Color cycle for 8 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
+*/
+global void ColorCycle8(void)
+{
+    int i;
+    int x;
+    VMemType8* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
+    }
+    pixels[47] = x;
+
+    x=Pixels8[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels8[i]=Pixels8[i+1];
+    }
+    Pixels8[47]=x;
+
+    x=Pixels8[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels8[i]=Pixels8[i+1];
+    }
+    Pixels8[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Color cycle for 16 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
+*/
+global void ColorCycle16(void)
+{
+    int i;
+    int x;
+    VMemType16* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
+    }
+    pixels[47] = x;
+
+    x=Pixels16[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels16[i]=Pixels16[i+1];
+    }
+    Pixels16[47]=x;
+
+    x=Pixels16[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels16[i]=Pixels16[i+1];
+    }
+    Pixels16[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Color cycle for 24 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
+*/
+global void ColorCycle24(void)
+{
+    int i;
+    VMemType24 x;
+    VMemType24* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
+    }
+    pixels[47] = x;
+
+    x=Pixels24[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels24[i]=Pixels24[i+1];
+    }
+    Pixels24[47]=x;
+
+    x=Pixels24[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels24[i]=Pixels24[i+1];
+    }
+    Pixels24[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Color cycle for 32 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
+*/
+global void ColorCycle32(void)
+{
+    int i;
+    int x;
+    VMemType32* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
+    }
+    pixels[47] = x;
+
+    x=Pixels32[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels32[i]=Pixels32[i+1];
+    }
+    Pixels32[47]=x;
+
+    x=Pixels32[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels32[i]=Pixels32[i+1];
+    }
+    Pixels32[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Initializes system palette. Also calls SetPlayersPalette to set
+**	palette for all players.
+**
+**	@param palette VMemType structure, as created by VideoCreateNewPalette
+**	@see SetPlayersPalette
+*/
+global void VideoSetPalette(const VMemType* palette)
+{
+    if( Pixels ) {
+	free(Pixels);
+    }
+    Pixels=(VMemType*)palette;
+    SetPlayersPalette();
+}
+
+/**
+**	Set the system hardware palette from an independend Palette struct.
+**
+**	@param palette	System independ palette structure.
+*/
+global void VideoCreatePalette(const Palette* palette)
+{
+    VMemType* temp;
+
+    temp = VideoCreateNewPalette(palette);
+
+    VideoSetPalette(temp);
+}
+
+#endif
 
 /**
 **	Video initialize.
@@ -187,6 +474,13 @@ global void InitVideo(void)
 #ifdef NEW_VIDEO
     InitSprite();
     InitCursor();
+    switch( VideoDepth ) {
+	case  8: ColorCycle=ColorCycle8 ; break;
+	case 15:
+	case 16: ColorCycle=ColorCycle16; break;
+	case 24: ColorCycle=ColorCycle24; break;
+	case 32: ColorCycle=ColorCycle32; break;
+    }
 #endif
 
     DebugLevel3(__FUNCTION__": %d %d\n",MapWidth,MapHeight);
