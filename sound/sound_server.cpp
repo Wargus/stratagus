@@ -320,36 +320,24 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 global int ConvertToStereo32(const char* src, char* dest, int frequency,
 	int chansize, int channels, int bytes)
 {
-	int s;						// sample index
-	int c;						// channel index
-	int freqratio;
-	int chanratio;
-	int brratio;
-	int samplesize;				// number of bytes per sample
-	int divide;
-	int offset;
+	SDL_AudioCVT acvt;
+	SDL_AudioSpec obtained;
+	int format;
 
-	freqratio = 44100 / frequency;
-	samplesize = chansize * channels;
-	brratio = 4 / samplesize;
-	chanratio = 2 / channels;
-	divide = freqratio * brratio;
-
-	// s is the sample
-	for (s = 0; s < bytes * divide; s += 4) {
-		// c is the channel in the sample
-		for (c = 0; c < 2; ++c) {
-			offset = (((s / 4) / freqratio) * samplesize + (c / chanratio) * chansize);
-			if (chansize == 2) {
-				*(short*)(dest + s + c * 2) = *(short*)(src + offset);
-			} else {
-				*(dest + s + c * 2) = *(src + offset) + 128;
-				*(dest + s + c * 2 + 1) = *(src + offset) + 128;
-			}
-		}
+	if (channels == 1) {
+		format = AUDIO_U8;
+	} else {
+		format = AUDIO_U16;
 	}
+	SDL_BuildAudioCVT(&acvt, format, channels, frequency, obtained.format,
+		obtained.channels, obtained.freq);
 
-	return bytes * divide;
+	acvt.buf = dest;
+	acvt.len = bytes;
+
+	SDL_ConvertAudio(&acvt);
+
+	return acvt.len_mult * bytes;
 }
 
 global SoundChannel Channels[MaxChannels];
