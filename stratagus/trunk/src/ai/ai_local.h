@@ -164,7 +164,7 @@ typedef struct _player_ai_ {
     // controller
     SCM		Script;			/// Script executed
     int		ScriptDebug;		/// Flag script debuging on/off
-    int		SleepCycles;		/// Cycles to sleep
+    unsigned long	SleepCycles;	/// Cycles to sleep
 
     // forces
 #define AI_MAX_FORCES	10		/// How many forces are supported
