@@ -10,7 +10,7 @@
 //
 /**@name map.c		-	The map. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer and Vladi Shabanski
+//	(c) Copyright 1998-2002 by Lutz Sammer and Vladi Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -143,18 +143,12 @@ global void RevealMap(void)
 		TheMap.Fields[ix+iy*TheMap.Width].Visible[ThisPlayer->Player]=1;
 	    }
 #else
-#ifdef NEW_FOW2
 	    TheMap.Fields[ix+iy*TheMap.Width].Flags |= MapFieldExplored;
 
 	    if( TheMap.NoFogOfWar ) {
 		TheMap.Visible[0][((iy)*TheMap.Width+(ix))/32] |= 
 			(1<<(((iy)*TheMap.Width+(ix))%32));
 	    }
-#else
-	    TheMap.Fields[ix+iy*TheMap.Width].Flags
-		    |= MapFieldExplored
-			| (TheMap.NoFogOfWar ? MapFieldVisible : 0);
-#endif
 #endif
 	    MapMarkSeenTile(ix,iy);
 	}
@@ -614,9 +608,7 @@ global void CleanMap(void)
 {
     free(TheMap.Fields);
     free(TheMap.TerrainName);
-#ifdef NEW_FOW2
     free(TheMap.Visible[0]);
-#endif
 
     // Tileset freeed by Tileset?
 
