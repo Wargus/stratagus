@@ -163,7 +163,7 @@ const Viewport* CurrentViewport;  ///< FIXME: quick hack for split screen
 /**
 **  Show selection marker around an unit.
 **
-**  @param unit    Pointer to unit.
+**  @param unit  Pointer to unit.
 */
 void DrawUnitSelection(const Unit* unit)
 {
@@ -221,11 +221,11 @@ void DrawUnitSelection(const Unit* unit)
 }
 
 /**
-** Don't show selected units.
+**  Don't show selected units.
 **
-** @param color
-** @param x1,y1    Coordinates of the top left corner.
-** @param x2,y2    Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 void DrawSelectionNone(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -233,11 +233,11 @@ void DrawSelectionNone(Uint32 color, int x1, int y1,
 }
 
 /**
-** Show selected units with circle.
+**  Show selected units with circle.
 **
-** @param color
-** @param x1,y1    Coordinates of the top left corner.
-** @param x2,y2    Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 void DrawSelectionCircle(Uint32 color, int x1, int x2,
 	int y1, int y2)
@@ -249,11 +249,11 @@ void DrawSelectionCircle(Uint32 color, int x1, int x2,
 }
 
 /**
-** Show selected units with circle.
+**  Show selected units with circle.
 **
-** @param color
-** @param x1,y1    Coordinates of the top left corner.
-** @param x2,y2    Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -265,11 +265,11 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 }
 
 /**
-** Draw selected rectangle around the unit.
+**  Draw selected rectangle around the unit.
 **
-** @param color
-** @param x1,y1    Coordinates of the top left corner.
-** @param x2,y2    Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -278,11 +278,11 @@ void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 }
 
 /**
-** Draw selected rectangle around the unit.
+**  Draw selected rectangle around the unit.
 **
-** @param color
-** @param x1,y1    Coordinates of the top left corner.
-** @param x2,y2    Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -293,11 +293,11 @@ void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 }
 
 /**
-** Draw selected corners around the unit.
+**  Draw selected corners around the unit.
 **
-** @param color
-** @param x1,y1    Coordinates of the top left corner.
-** @param x2,y2    Coordinates of the bottom right corner.
+**  @param color  FIXME: docu
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 void DrawSelectionCorners(Uint32 color, int x1, int y1,
 	int x2, int y2)
@@ -601,7 +601,7 @@ static int CclShowHealthBar(lua_State* l)
 **  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
 **    OffsetPercent = {50, 100},
 **    Method = {"sprite", {0}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Ressource.
+**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
 **  Except for ressource which have HideNeutral = false.
 **
 **  @param l  Lua state
@@ -618,7 +618,7 @@ static int CclShowManaDot(lua_State* l)
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
 		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"Ressource\", HideNeutral = false, CenterX = true,"
+		"DefineDecorations({Index = \"Resource\", HideNeutral = false, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n";
 
 	if (lua_gettop(l) != 0) {
@@ -638,7 +638,7 @@ static int CclShowManaDot(lua_State* l)
 **  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
 **    OffsetPercent = {50, 100},
 **    Method = {"bar", {Width = 3, BorderSize = 1}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Ressource.
+**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
 **
 **  @param l  Lua state
 */
@@ -654,7 +654,7 @@ static int CclShowManaHorizontal(lua_State* l)
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
 		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"Ressource\", HideNeutral = false, CenterX = true,"
+		"DefineDecorations({Index = \"Resource\", HideNeutral = false, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n";
 
 	if (lua_gettop(l) != 0) {
@@ -673,7 +673,7 @@ static int CclShowManaHorizontal(lua_State* l)
 **  Equivalent of
 **  DefineDecorations({Index = "Mana", HideNeutral = true,
 **    Method = {"bar", {Width = 3, BorderSize = 1, Orientation = "vertical"}}})
-**  For index Mana, Transport, Research, Training, UpgradeTo, Ressource.
+**  For index Mana, Transport, Research, Training, UpgradeTo, Resource.
 **
 **  @param l  Lua state
 */
@@ -689,7 +689,7 @@ static int CclShowManaVertical(lua_State* l)
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
 		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true,"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"Ressource\", HideNeutral = false,"
+		"DefineDecorations({Index = \"Resource\", HideNeutral = false,"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n";
 
 	if (lua_gettop(l) != 0) {
@@ -1022,7 +1022,7 @@ void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 */
 void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
-	Graphic *sprite;
+	Graphic* sprite;
 
 	sprite = SpellSprite.Sprite;
 	if (Deco->IsCenteredInX) {
@@ -1096,7 +1096,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
 	}
 
-	// Ressources.
+	// Resources.
 	if (type->GivesResource) {
 		unit->Variable[RESSOURCE_INDEX].Value = unit->Value;
 		unit->Variable[RESSOURCE_INDEX].Max = 655350; // FIXME use better value ?
@@ -1109,7 +1109,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
 		int value;
 		int max;
-		const DecoVarType *Deco;
+		const DecoVarType* Deco;
 
 		Deco = &UnitTypeVar.DecoVar[i];
 		Assert(Deco->f);
@@ -2091,7 +2091,7 @@ int FindAndSortUnits(const Viewport* vp, Unit** table)
 		vp->MapY + vp->MapHeight + 1, table);
 
 	if (n) {
-		qsort((void *)table, n, sizeof(Unit*), DrawLevelCompare);
+		qsort((void*)table, n, sizeof(Unit*), DrawLevelCompare);
 	}
 
 	return n;
