@@ -56,8 +56,6 @@
 --		Functions
 ----------------------------------------------------------------------------*/
 
-	/// Get unit-type.
-extern UnitType* CclGetUnitType(lua_State* l);
 	/// Get resource by name
 extern unsigned CclGetResourceByName(lua_State* l);
 
