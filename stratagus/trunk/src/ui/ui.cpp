@@ -444,8 +444,8 @@ local void NewSaveUi(FILE * file, const UI * ui)
     fprintf(file, "  'menu-button '(pos (%d %d) image \"%s\")\n",
 	ui->MenuButtonX, ui->MenuButtonY, ui->MenuButton.File);
 
-    fprintf(file, "  'minimap '(pos (%d %d) image \"%s\")\n",
-	ui->MinimapX, ui->MinimapY, ui->Minimap.File);
+    fprintf(file, "  'minimap '(pos (%d %d) image \"%s\" 'viewport-color %d)\n",
+	ui->MinimapX, ui->MinimapY, ui->Minimap.File, ui->ViewportCursorColor);
 
     fprintf(file, "  'status-line '(pos (%d %d) image \"%s\")\n",
 	ui->StatusLineX, ui->StatusLineY, ui->StatusLine.File);
@@ -522,7 +522,7 @@ global void SaveUserInterface(FILE* file)
 
     // Save the current UI
     OldSaveUi(file,&TheUI);
-    NewSaveUi(file,&TheUI);
+    // NewSaveUi(file,&TheUI);
 }
 
 /**
