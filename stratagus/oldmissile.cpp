@@ -10,7 +10,7 @@
 //
 /**@name missile.c	-	The missiles. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -685,7 +685,9 @@ global void FireMissile(Unit* unit)
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
+#ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
+#endif
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -695,17 +697,25 @@ global void FireMissile(Unit* unit)
 	}
 	if( goal->Removed ) {
 	    DebugLevel3Fn("Missile-none hits removed unit!\n");
+#ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
+#endif
 	    --goal->Refs;
+#ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
+#endif
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 	    DebugLevel3Fn("Missile-none hits dead unit!\n");
+#ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
+#endif
 	    --goal->Refs;
+#ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
+#endif
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
@@ -723,7 +733,9 @@ global void FireMissile(Unit* unit)
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
+#ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
+#endif
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -1270,7 +1282,9 @@ global void MissileActions(void)
 
 		    unit=missile->SourceUnit;
 		    if( unit->Destroyed || !unit->HP ) {
+#ifdef REFS_DEBUG
 			DebugCheck( !unit->Refs );
+#endif
 			if( !--unit->Refs ) {
 			    ReleaseUnit(unit);
 			}
