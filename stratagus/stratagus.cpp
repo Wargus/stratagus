@@ -1065,7 +1065,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	//
 	//	Network part 1 (port set-up)
 	//
-	if( NetworkFildes!=-1 ) {
+	if( NetworkFildes!=(Socket)-1 ) {
 	    ExitNetwork1();
 	}
 	InitNetwork1();
@@ -1110,7 +1110,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    }
 	    strcpy(CurrentMapPath,filename);
 	}
-	if( NetworkFildes!=-1 && NetPlayers<2 ) {
+	if( NetworkFildes!=(Socket)-1 && NetPlayers<2 ) {
 	    ExitNetwork1();
 	}
 

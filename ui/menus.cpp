@@ -1532,14 +1532,14 @@ global void LoadGameMenu(void)
 local void GameMenuInit(Menuitem *mi __attribute__((unused)))
 {
     // Disable save menu in multiplayer and replays
-    if (NetworkFildes != -1 || ReplayGameType != ReplayNone) {
+    if (NetworkFildes != (Socket)-1 || ReplayGameType != ReplayNone) {
 	mi->menu->Items[1].flags |= MenuButtonDisabled;
     } else {
 	mi->menu->Items[1].flags &= ~MenuButtonDisabled;
     }
 
     // Disable load menu in multiplayer
-    if (NetworkFildes != -1) {
+    if (NetworkFildes != (Socket)-1) {
 	mi->menu->Items[2].flags |= MenuButtonDisabled;
     } else {
 	mi->menu->Items[2].flags &= ~MenuButtonDisabled;
@@ -2148,7 +2148,7 @@ local void PreferencesInit(Menuitem *mi __attribute__((unused)))
     }
 
     // Not available in net games or replays
-    if (NetworkFildes == -1 && ReplayGameType == ReplayNone) {
+    if (NetworkFildes == (Socket)-1 && ReplayGameType == ReplayNone) {
 	menu->Items[1].flags = MI_ENABLED;
     } else {
 	menu->Items[1].flags = MI_DISABLED;
@@ -7130,7 +7130,7 @@ local void InitPlayerRaces(Menuitem *mi)
 	}
     }
     ++n;
-    mi->d.pulldown.options = (unsigned char **)malloc(n * sizeof(char *));
+    mi->d.pulldown.options = (unsigned char **)malloc(n * sizeof(unsigned char *));
     for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
 	if (PlayerRaces.Visible[i]) {
 	    mi->d.pulldown.options[n++] = strdup(PlayerRaces.Display[i]);

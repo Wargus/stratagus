@@ -272,7 +272,7 @@ typedef struct _network_command_queue_ {
 //----------------------------------------------------------------------------
 
 global int NetworkNumInterfaces;	/// Network number of interfaces
-global int NetworkFildes = -1;		/// Network file descriptor
+global Socket NetworkFildes = -1;		/// Network file descriptor
 global int NetworkInSync = 1;		/// Network is in sync
 global int NetworkUpdates = 5;		/// Network update each # game cycles
 global int NetworkLag = 10;		/// Network lag in # game cycles
@@ -432,7 +432,7 @@ global void InitNetwork1(void)
     port = NetworkPort;
     for (i = 0; i < 10; ++i) {
 	NetworkFildes = NetOpenUDP(port + i);
-	if (NetworkFildes != -1) {
+	if (NetworkFildes != (Socket)-1) {
 	    break;
 	}
 	if (i == 9) {
@@ -483,7 +483,7 @@ global void InitNetwork1(void)
 */
 global void ExitNetwork1(void)
 {
-    if (NetworkFildes == -1) {	// No network running
+    if (NetworkFildes == (Socket)-1) {	// No network running
 	return;
     }
 #ifdef DEBUG
@@ -665,7 +665,7 @@ global void NetworkEvent(void)
     int i;
     unsigned long n;
 
-    if (NetworkFildes == -1) {
+    if (NetworkFildes == (Socket)-1) {
 	NetworkInSync = 1;
 	return;
     }
@@ -882,7 +882,7 @@ global void NetworkChatMessage(const char *msg)
     const char *cp;
     int n;
 
-    if (NetworkFildes != -1) {
+    if (NetworkFildes != (Socket)-1) {
 	cp = msg;
 	n = strlen(msg);
 	while (n >= (int)sizeof(ncm->Text)) {
@@ -1152,7 +1152,7 @@ local void NetworkSyncCommands(void)
 */
 global void NetworkCommands(void)
 {
-    if (NetworkFildes != -1) {
+    if (NetworkFildes != (Socket)-1) {
 	//
 	//	Send messages to all clients (other players)
 	//

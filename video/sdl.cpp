@@ -622,8 +622,9 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     struct timeval tv;
     fd_set rfds;
     fd_set wfds;
-    int maxfd;
+    Socket maxfd;
     int i;
+    int s;
     SDL_Event event[1];
     Uint32 ticks;
 
@@ -690,7 +691,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Network
 	//
-	if (NetworkFildes != -1) {
+	if (NetworkFildes != (Socket)-1) {
 	    if (NetworkFildes > maxfd) {
 		maxfd = NetworkFildes;
 	    }
@@ -710,7 +711,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #endif
 
 #if 0
-	maxfd = select(maxfd + 1, &rfds, &wfds, NULL,
+	s = select(maxfd + 1, &rfds, &wfds, NULL,
 	    (i = SDL_PollEvent(event)) ? &tv : NULL);
 #else
 	// QUICK HACK to fix the event/timer problem
@@ -720,7 +721,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	// The event handling of SDL is wrong designed = polling only.
 	// There is hope on SDL 1.3 which will have this fixed.
 
-	maxfd = select(maxfd + 1, &rfds, &wfds, NULL, &tv);
+	s = select(maxfd + 1, &rfds, &wfds, NULL, &tv);
 	i = SDL_PollEvent(event);
 #endif
 
@@ -728,7 +729,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    SdlDoEvent(callbacks, event);
 	}
 
-	if (maxfd > 0) {
+	if (s > 0) {
 #ifndef USE_SDLA
 	    //
 	    //	Sound
@@ -742,7 +743,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    //
 	    //	Network
 	    //
-	    if (NetworkFildes != -1 && FD_ISSET(NetworkFildes, &rfds) ) {
+	    if (NetworkFildes != (Socket)-1 && FD_ISSET(NetworkFildes, &rfds) ) {
 		callbacks->NetworkEvent();
 	    }
 	}
@@ -750,7 +751,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	No more input and time for frame over: return
 	//
-	if (!i && maxfd <= 0 && VideoInterrupts) {
+	if (!i && s <= 0 && VideoInterrupts) {
 	    break;
 	}
     }

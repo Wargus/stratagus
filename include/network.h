@@ -40,6 +40,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "upgrade.h"
+#include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -165,7 +166,7 @@ typedef struct _network_packet_ {
 ----------------------------------------------------------------------------*/
 
 extern int NetworkNumInterfaces;	/// Network number of interfaces
-extern int NetworkFildes;		/// Network file descriptor
+extern Socket NetworkFildes;		/// Network file descriptor
 extern int NetworkInSync;		/// Network is in sync
 extern int NetworkUpdates;		/// Network update each # game cycles
 extern int NetworkLag;			/// Network lag (# game cycles)

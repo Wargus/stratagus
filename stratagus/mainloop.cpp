@@ -272,7 +272,7 @@ local void DrawMenuButtonArea(void)
 		TheUI.MenuButtonGraphic.Graphic->Height,
 		TheUI.MenuButtonGraphicX, TheUI.MenuButtonGraphicY);
     }
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	if( TheUI.MenuButton.X!=-1 ) {
 	    DrawMenuButton(TheUI.MenuButton.Button,
 		    (ButtonAreaUnderCursor==ButtonAreaMenu
@@ -656,7 +656,7 @@ global void UpdateDisplay(void)
 	    }
 	}
 	if(MustRedraw&RedrawMenuButton ) {
-	    if( NetworkFildes==-1 ) {
+	    if( NetworkFildes==(Socket)-1 ) {
 		if( TheUI.MenuButton.X!=-1 ) {
 		    InvalidateAreaAndCheckCursor(
 			    TheUI.MenuButton.X,TheUI.MenuButton.Y,
@@ -778,7 +778,7 @@ global void GameMainLoop(void)
 
     showtip=0;
     RealVideoSyncSpeed = VideoSyncSpeed;
-    if( NetworkFildes==-1 ) {		// Don't show them for net play
+    if( NetworkFildes==(Socket)-1 ) {		// Don't show them for net play
 	showtip=ShowTips;
     }
 

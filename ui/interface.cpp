@@ -338,7 +338,7 @@ global void UiTogglePause(void)
 */
 local void UiEnterMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -350,7 +350,7 @@ local void UiEnterMenu(void)
 */
 local void UiEnterHelpMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -362,7 +362,7 @@ local void UiEnterHelpMenu(void)
 */
 local void UiEnterOptionsMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -374,7 +374,7 @@ local void UiEnterOptionsMenu(void)
 */
 local void UiEnterSoundOptionsMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -386,7 +386,7 @@ local void UiEnterSoundOptionsMenu(void)
 */
 local void UiEnterSpeedOptionsMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -398,7 +398,7 @@ local void UiEnterSpeedOptionsMenu(void)
 */
 local void UiEnterPreferencesOptionsMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -411,11 +411,11 @@ local void UiEnterPreferencesOptionsMenu(void)
 local void UiEnterSaveGameMenu(void)
 {
     // Disable save menu in multiplayer and replays
-    if (NetworkFildes != -1 || ReplayGameType != ReplayNone) {
+    if (NetworkFildes != (Socket)-1 || ReplayGameType != ReplayNone) {
 	return;
     }
 
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -428,11 +428,11 @@ local void UiEnterSaveGameMenu(void)
 local void UiEnterLoadGameMenu(void)
 {
     // Disable load menu in multiplayer
-    if (NetworkFildes != -1) {
+    if (NetworkFildes != (Socket)-1) {
 	return;
     }
 
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -444,7 +444,7 @@ local void UiEnterLoadGameMenu(void)
 */
 local void UiExitConfirmMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -456,7 +456,7 @@ local void UiExitConfirmMenu(void)
 */
 local void UiQuitToMenuConfirmMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -468,7 +468,7 @@ local void UiQuitToMenuConfirmMenu(void)
 */
 local void UiRestartConfirmMenu(void)
 {
-    if( NetworkFildes==-1 ) {
+    if( NetworkFildes==(Socket)-1 ) {
 	GamePaused=1;
 	SetStatusLine("Game Paused");
     }
@@ -1121,7 +1121,7 @@ local int InputKey(int key)
 		    CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
 		    CclCommand(Input);
 		}
-	    } else if (NetworkFildes==-1) {
+	    } else if (NetworkFildes==(Socket)-1) {
 		if (!GameObserve && !GamePaused) {
 		    int ret;
 		    ret = HandleCheats(Input);
