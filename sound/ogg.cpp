@@ -35,7 +35,12 @@
 #if defined(WITH_SOUND) && defined(USE_OGG)	// {
 
 #include <stdlib.h>
+#ifdef BSD
+#include <inttypes.h>
+#else
 #include <stdint.h>
+#endif // BSD
+
 #include "vorbis/codec.h"
 #include "vorbis/vorbisfile.h"
 
