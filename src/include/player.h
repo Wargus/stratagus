@@ -113,7 +113,7 @@
 **		are combined, if none bit is set, the player is neutral.
 **		@note You can be allied to a player, which sees you as enemy.
 **
-**	Player::X Player::Y
+**	Player::StartX Player::StartY
 **
 **		The tile map coordinates of the player start position. 0,0 is
 **		the upper left on the map. This members are setup from the
@@ -308,8 +308,8 @@ struct _player_ {
     unsigned	Enemy;			/// enemy bit field for this player
     unsigned	Allied;			/// allied bit field for this player
 
-    unsigned	X;			/// map tile start X position
-    unsigned	Y;			/// map tile start Y position
+    unsigned	StartX;			/// map tile start X position
+    unsigned	StartY;			/// map tile start Y position
 
     unsigned	Resources[MaxCosts];	/// resources in store
     unsigned	LastResources[MaxCosts];	/// last values for revenue

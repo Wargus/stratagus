@@ -174,8 +174,8 @@ local SCM CclPlayer(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("start")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    player->X=gh_scm2int(gh_car(value));
-	    player->Y=gh_scm2int(gh_cadr(value));
+	    player->StartX=gh_scm2int(gh_car(value));
+	    player->StartY=gh_scm2int(gh_cadr(value));
 	} else if( gh_eq_p(value,gh_symbol2scm("resources")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
@@ -257,8 +257,9 @@ local SCM CclPlayer(SCM list)
 	   errl("Unsupported tag",value);
 	}
     }
-    if (player->AiEnabled)
-	AiInit (player);
+//    if (player->AiEnabled) {
+//	AiInit (player);
+//    }
 
     return SCM_UNSPECIFIED;
 }
