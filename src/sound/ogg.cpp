@@ -137,7 +137,7 @@ local int OGG_close(void* user)
 **
 **	@return		    Number of bytes read
 */
-local int OggReadStream(Sample* sample, void* buf, unsigned len)
+local int OggReadStream(Sample* sample, void* buf, int len)
 {
     OggData* data;
     int i;
@@ -212,11 +212,11 @@ local const SampleType OggStreamSampleType = {
 **
 **	@return		    Number of bytes read
 */
-local int OggRead(Sample* sample, void* buf, unsigned len)
+local int OggRead(Sample* sample, void* buf, int len)
 {
-    unsigned pos;
+    int pos;
 
-    pos = (unsigned)sample->User;
+    pos = (int)sample->User;
     if (pos + len > sample->Length) {		// Not enough data?
 	len = sample->Length - pos;
     }

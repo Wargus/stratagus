@@ -80,7 +80,7 @@ typedef struct _sample_type_ {
 	**
 	**	@return		Number of bytes filled.
 	*/
-    int (*Read)		(Sample* o, void* buf, unsigned len);
+    int (*Read)		(Sample* o, void* buf, int len);
 	/**
 	**	Free the sample object.
 	**
@@ -99,7 +99,7 @@ struct _sample_ {
     unsigned char	Channels;	/// mono or stereo
     unsigned char	SampleSize;	/// sample size in bits
     unsigned int	Frequency;	/// frequency in hz
-    unsigned int	Length;		/// sample length
+    int			Length;		/// sample length
     char		Data[1];	/// sample bytes
 };
 
