@@ -1504,7 +1504,8 @@ local void SetRes640(Menuitem *mi __attribute__((unused)))
     flags = Screen->flags;
 #endif
     menu = FindMenu("menu-global-options");
-    
+    HideAnyCursor();
+
     if (VideoWidth != 640) {
 	VideoWidth=640;
 	VideoHeight=480;
@@ -1514,6 +1515,7 @@ local void SetRes640(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    LoadCcl();
     EndMenu();
     GlobalOptions();
 }
@@ -1527,7 +1529,8 @@ local void SetRes800(Menuitem *mi __attribute__((unused)))
 
     flags = Screen->flags;
 #endif
-    menu = FindMenu("menu-global-options");    
+    menu = FindMenu("menu-global-options");
+    HideAnyCursor();
     
     if (VideoWidth != 800) {
 	VideoWidth=800;
@@ -1538,6 +1541,7 @@ local void SetRes800(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    LoadCcl();
     EndMenu();
     GlobalOptions();
 }
@@ -1552,6 +1556,7 @@ local void SetRes1024(Menuitem *mi __attribute__((unused)))
     flags = Screen->flags;
 #endif
     menu = FindMenu("menu-global-options");
+    HideAnyCursor();
 
     if (VideoWidth != 1024) {
 	VideoWidth=1024;
@@ -1562,6 +1567,7 @@ local void SetRes1024(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    LoadCcl();
     EndMenu();
     GlobalOptions();
 }
@@ -1576,6 +1582,7 @@ local void SetRes1280(Menuitem *mi __attribute__((unused)))
     flags = Screen->flags;
 #endif
     menu = FindMenu("menu-global-options");    
+    HideAnyCursor();
 
     if (VideoWidth != 1280) {
 	VideoWidth=1280;
@@ -1586,6 +1593,7 @@ local void SetRes1280(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    LoadCcl();
     EndMenu();
     GlobalOptions();
 }
@@ -1600,6 +1608,7 @@ local void SetRes1600(Menuitem *mi __attribute__((unused)))
     flags = Screen->flags;
 #endif
     menu = FindMenu("menu-global-options");
+    HideAnyCursor();
 
     if (VideoWidth != 1600) {
 	VideoWidth=1600;
@@ -1610,6 +1619,7 @@ local void SetRes1600(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    LoadCcl();
     EndMenu();
     GlobalOptions();
 }
