@@ -931,9 +931,6 @@ global int main(int argc, char** argv)
 #ifdef USE_MAD
 		"MP3 "
 #endif
-#ifdef UNIT_ON_MAP
-		"UNIT-ON-MAP "
-#endif
 #ifdef NEW_UNIT_CACHE
 		"NEW-UNIT-CACHE "
 #endif

@@ -214,10 +214,9 @@ typedef struct _map_field_ {
 	unsigned char  Value;     /// HP for walls/ Wood Regeneration
 	unsigned char Visible[PlayerMax];  /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];  /// Visiblity for cloaking.
-#ifdef UNIT_ON_MAP
+#ifndef NEW_UNIT_CACHE
 	Unit*      UnitCache;  /// An unit on the map field
-#endif
-#ifdef NEW_UNIT_CACHE
+#else
 	UnitListItem*      UnitCache;  /// An unit on the map field
 #endif
 } MapField;
