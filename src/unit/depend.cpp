@@ -347,8 +347,7 @@ local int CclDefineDependency(lua_State* l)
 	or_flag = 0;
 	for (; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		subargs = luaL_getn(l, j + 1);
 
@@ -373,8 +372,7 @@ local int CclDefineDependency(lua_State* l)
 			++j;
 			value = LuaToString(l, j + 1);
 			if (strcmp(value, "or")) {
-				lua_pushfstring(l, "not or symbol: %s", value);
-				lua_error(l);
+				LuaError(l, "not or symbol: %s" _C_ value);
 				return 0;
 			}
 			or_flag = 1;

@@ -92,8 +92,7 @@ local int CclStratagusMap(lua_State* l)
 			TheMap.Info->Description = strdup(value);
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -107,8 +106,7 @@ local int CclStratagusMap(lua_State* l)
 
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
 					value = LuaToString(l, -1);
@@ -128,8 +126,7 @@ local int CclStratagusMap(lua_State* l)
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
 					TheMap.Width = LuaToNumber(l, -1);
@@ -162,8 +159,7 @@ local int CclStratagusMap(lua_State* l)
 
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 
 					subsubargs = luaL_getn(l, -1);
@@ -177,8 +173,7 @@ local int CclStratagusMap(lua_State* l)
 
 						lua_rawgeti(l, -1, subk + 1);
 						if (!lua_istable(l, -1)) {
-							lua_pushstring(l, "incorrect argument");
-							lua_error(l);
+							LuaError(l, "incorrect argument");
 						}
 						args2 = luaL_getn(l, -1);
 						j2 = 0;
@@ -237,8 +232,7 @@ local int CclStratagusMap(lua_State* l)
 								TheMap.Fields[i].Flags |= MapFieldBuilding;
 
 							} else {
-							   lua_pushfstring(l, "Unsupported tag: %s", value);
-							   lua_error(l);
+							   LuaError(l, "Unsupported tag: %s" _C_ value);
 							}
 						}
 						lua_pop(l, 1);
@@ -246,14 +240,12 @@ local int CclStratagusMap(lua_State* l)
 					}
 					lua_pop(l, 1);
 				} else {
-				   lua_pushfstring(l, "Unsupported tag: %s", value);
-				   lua_error(l);
+				   LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 
 		} else {
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -266,8 +258,7 @@ local int CclStratagusMap(lua_State* l)
 local int CclRevealMap(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	if (CclInConfigFile) {
 		FlagRevealMap = 1;
@@ -287,8 +278,7 @@ local int CclRevealMap(lua_State* l)
 local int CclCenterMap(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	ViewportCenterViewpoint(TheUI.SelectedViewport,
 		LuaToNumber(l, 1), LuaToNumber(l, 2), TileSizeX / 2, TileSizeY / 2);
@@ -314,8 +304,7 @@ local int CclShowMapLocation(lua_State* l)
 	// what is listed below
 
 	if (lua_gettop(l) != 4) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	unitname = LuaToString(l, 5);
 	target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
@@ -341,8 +330,7 @@ local int CclSetDefaultMap(lua_State* l)
 	char* old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = strdup(DefaultMap);
 	strcpy(DefaultMap, LuaToString(l, 1));
@@ -364,8 +352,7 @@ local int CclSetFogOfWar(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = !TheMap.NoFogOfWar;
 	TheMap.NoFogOfWar = !LuaToBoolean(l, 1);
@@ -389,8 +376,7 @@ local int CclSetMinimapTerrain(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = MinimapWithTerrain;
 	MinimapWithTerrain = LuaToBoolean(l, 1);
@@ -405,8 +391,7 @@ local int CclSetMinimapTerrain(lua_State* l)
 local int CclOriginalFogOfWar(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	OriginalFogOfWar = 1;
 
@@ -423,8 +408,7 @@ local int CclOriginalFogOfWar(lua_State* l)
 local int CclAlphaFogOfWar(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	OriginalFogOfWar = 0;
 
@@ -444,8 +428,7 @@ local int CclSetFogOfWarOpacity(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i > 255) {
@@ -477,8 +460,7 @@ local int CclSetForestRegeneration(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i > 255) {

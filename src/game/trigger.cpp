@@ -83,8 +83,7 @@ global int TriggerGetPlayer(lua_State* l)
 	if (lua_isnumber(l, -1)) {
 		ret = LuaToNumber(l, -1);
 		if (ret < 0 || ret > PlayerMax) {
-			lua_pushfstring(l, "bad player: %d", ret);
-			lua_error(l);
+			LuaError(l, "bad player: %d" _C_ ret);
 		}
 		return ret;
 	}
@@ -94,8 +93,7 @@ global int TriggerGetPlayer(lua_State* l)
 	} else if (!strcmp(player, "this")) {
 		return ThisPlayer->Player;
 	}
-	lua_pushfstring(l, "bad player: %s", player);
-	lua_error(l);
+	LuaError(l, "bad player: %s" _C_ player);
 
 	return 0;
 }
@@ -199,8 +197,7 @@ local int CclIfUnit(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 4) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -212,8 +209,7 @@ local int CclIfUnit(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-unit: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-unit: %s" _C_ op);
 	}
 
 	if (plynr == -1) {
@@ -292,8 +288,7 @@ local int CclIfUnitAt(lua_State* l)
 	int s;
 
 	if (lua_gettop(l) != 6) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -302,16 +297,14 @@ local int CclIfUnitAt(lua_State* l)
 	op = LuaToString(l, 2);
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operator in if-unit-at: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operator in if-unit-at: %s" _C_ op);
 	}
 	q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 1);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 5) || luaL_getn(l, 5) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 5, 1);
 	x1 = LuaToNumber(l, -1);
@@ -320,8 +313,7 @@ local int CclIfUnitAt(lua_State* l)
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 6) || luaL_getn(l, 6) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 6, 1);
 	x2 = LuaToNumber(l, -1);
@@ -383,8 +375,7 @@ local int CclIfNearUnit(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 5) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -399,8 +390,7 @@ local int CclIfNearUnit(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-near-unit: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-near-unit: %s" _C_ op);
 	}
 
 	//
@@ -483,8 +473,7 @@ local int CclIfRescuedNearUnit(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 5) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -499,8 +488,7 @@ local int CclIfRescuedNearUnit(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-rescued-near-unit: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-rescued-near-unit: %s" _C_ op);
 	}
 
 	//
@@ -582,8 +570,7 @@ local int CclIfOpponents(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -594,8 +581,7 @@ local int CclIfOpponents(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-opponents: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-opponents: %s" _C_ op);
 	}
 
 	if (plynr == -1) {
@@ -644,8 +630,7 @@ local int CclIfResource(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 4) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -657,8 +642,7 @@ local int CclIfResource(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-resource: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-resource: %s" _C_ op);
 	}
 
 	if (plynr == -1) {
@@ -724,8 +708,7 @@ local int CclIfKills(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -736,8 +719,7 @@ local int CclIfKills(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-kills: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-kills: %s" _C_ op);
 	}
 
 	if (plynr == -1) {
@@ -771,8 +753,7 @@ local int CclIfScore(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -783,8 +764,7 @@ local int CclIfScore(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-score: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-score: %s" _C_ op);
 	}
 
 	if (plynr == -1) {
@@ -815,8 +795,7 @@ local int CclIfElapsed(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	op = LuaToString(l, 1);
@@ -824,8 +803,7 @@ local int CclIfElapsed(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-elapsed: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-elapsed: %s" _C_ op);
 	}
 
 	if (compare(GameCycle, q)) {
@@ -847,8 +825,7 @@ local int CclIfTimer(lua_State* l)
 	CompareFunction compare;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	if (!GameTimer.Init) {
@@ -861,8 +838,7 @@ local int CclIfTimer(lua_State* l)
 
 	compare = GetCompareFunction(op);
 	if (!compare) {
-		lua_pushfstring(l, "Illegal comparison operation in if-timer: %s", op);
-		lua_error(l);
+		LuaError(l, "Illegal comparison operation in if-timer: %s" _C_ op);
 	}
 
 	if (compare(GameTimer.Cycles, q)) {
@@ -883,14 +859,12 @@ local int CclIfSwitch(lua_State* l)
 	unsigned char s;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i >= MAX_SWITCH) {
-		lua_pushfstring(l, "Invalid switch number", i);
-		lua_error(l);
+		LuaError(l, "Invalid switch number" _C_ i);
 	}
 
 	if (lua_isboolean(l, 2)) {
@@ -919,8 +893,7 @@ local int CclIfSwitch(lua_State* l)
 local int CclActionVictory(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	GameResult = GameVictory;
@@ -935,8 +908,7 @@ local int CclActionVictory(lua_State* l)
 local int CclActionDefeat(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	GameResult = GameDefeat;
@@ -951,8 +923,7 @@ local int CclActionDefeat(lua_State* l)
 local int CclActionDraw(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	GameResult = GameDraw;
@@ -967,8 +938,7 @@ local int CclActionDraw(lua_State* l)
 local int CclActionSetTimer(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	GameTimer.Cycles = LuaToNumber(l, 1);
@@ -985,8 +955,7 @@ local int CclActionSetTimer(lua_State* l)
 local int CclActionStartTimer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	GameTimer.Running = 1;
@@ -1000,8 +969,7 @@ local int CclActionStartTimer(lua_State* l)
 local int CclActionStopTimer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	GameTimer.Running = 0;
@@ -1014,8 +982,7 @@ local int CclActionStopTimer(lua_State* l)
 local int CclActionWait(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	WaitFrame = FrameCounter +
@@ -1032,14 +999,12 @@ local int CclActionSetSwitch(lua_State* l)
 	unsigned char s;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i >= MAX_SWITCH) {
-		lua_pushfstring(l, "Invalid switch number: %d", i);
-		lua_error(l);
+		LuaError(l, "Invalid switch number: %d" _C_ i);
 	}
 
 	if (lua_isboolean(l, 2)) {
@@ -1065,8 +1030,7 @@ local int CclAddTrigger(lua_State* l)
 
 	if (lua_gettop(l) != 2 || !lua_isfunction(l, 1) ||
 			(!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	//
@@ -1111,8 +1075,7 @@ local int CclAddTrigger(lua_State* l)
 local int CclSetTriggers(lua_State* l)
 {
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	Trigger = LuaToNumber(l, 1);
 	WaitTrigger = LuaToNumber(l, 2);

@@ -223,8 +223,7 @@ local int CclLoad(lua_State* l)
 	char buf[1024];
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	LibraryFileName(LuaToString(l, 1), buf);
 	if (LuaLoadFile(buf) == -1) {
@@ -244,8 +243,7 @@ local int CclSaveGame(lua_State* l)
 	char buf[1024];
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushnil(l);
@@ -266,9 +264,7 @@ local int CclSaveGame(lua_State* l)
 		} else if (!strcmp(value, "SyncRandSeed")) {
 			SyncRandSeed = LuaToNumber(l, -1);
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
-			DebugCheck(1);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
@@ -359,8 +355,7 @@ local int CclSetGameName(lua_State* l)
 
 	args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = NULL;
 	if (GameName) {
@@ -386,8 +381,7 @@ local int CclSetGameName(lua_State* l)
 local int CclSetGameCycle(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	GameCycle = LuaToNumber(l, 1);
 	return 0;
@@ -399,8 +393,7 @@ local int CclSetGameCycle(lua_State* l)
 local int CclSetGamePaused(lua_State* l)
 {
 	if (lua_gettop(l) != 1 || (!lua_isnumber(l, 1) && !lua_isboolean(l, 1))) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	if (lua_isboolean(l, 1)) {
 		GamePaused = lua_toboolean(l, 1);
@@ -416,8 +409,7 @@ local int CclSetGamePaused(lua_State* l)
 local int CclSetVideoSyncSpeed(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	VideoSyncSpeed = LuaToNumber(l, 1);
 	return 0;
@@ -431,8 +423,7 @@ local int CclSetLocalPlayerName(lua_State* l)
 	const char* str;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	str = LuaToString(l, 1);
 	strncpy(LocalPlayerName, str, sizeof(LocalPlayerName) - 1);
@@ -447,8 +438,7 @@ local int CclSetLocalPlayerName(lua_State* l)
 local int CclNoRandomPlacementMultiplayer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	NoRandomPlacementMultiplayer = 1;
 
@@ -464,8 +454,7 @@ local int CclNoRandomPlacementMultiplayer(lua_State* l)
 local int CclSetGodMode(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushboolean(l, GodMode);
 	GodMode = LuaToBoolean(l, 1);
@@ -484,8 +473,7 @@ local int CclSetShowTips(lua_State* l)
 	int old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = ShowTips;
 	ShowTips = LuaToBoolean(l, 1);
@@ -506,8 +494,7 @@ local int CclSetCurrentTip(lua_State* l)
 	lua_Number old;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	old = CurrentTip;
 	CurrentTip = LuaToNumber(l, 1);
@@ -533,8 +520,7 @@ local int CclAddTip(lua_State* l)
 	const char* str;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	str = LuaToString(l, 1);
 	for (i = 0; i < MAX_TIPS; ++i) {
@@ -563,8 +549,7 @@ local int CclSetSpeedResourcesHarvest(lua_State* l)
 	const char* resource;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	resource = LuaToString(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
@@ -573,8 +558,7 @@ local int CclSetSpeedResourcesHarvest(lua_State* l)
 			return 0;
 		}
 	}
-	lua_pushfstring(l, "Resource not found: %s", resource);
-	lua_error(l);
+	LuaError(l, "Resource not found: %s" _C_ resource);
 
 	return 0;
 }
@@ -591,8 +575,7 @@ local int CclSetSpeedResourcesReturn(lua_State* l)
 	const char* resource;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	resource = LuaToString(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
@@ -601,8 +584,7 @@ local int CclSetSpeedResourcesReturn(lua_State* l)
 			return 0;
 		}
 	}
-	lua_pushfstring(l, "Resource not found: %s", resource);
-	lua_error(l);
+	LuaError(l, "Resource not found: %s" _C_ resource);
 
 	return 0;
 }
@@ -613,8 +595,7 @@ local int CclSetSpeedResourcesReturn(lua_State* l)
 local int CclSetSpeedBuild(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	SpeedBuild = LuaToNumber(l, 1);
 
@@ -628,8 +609,7 @@ local int CclSetSpeedBuild(lua_State* l)
 local int CclSetSpeedTrain(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	SpeedTrain = LuaToNumber(l, 1);
 
@@ -643,8 +623,7 @@ local int CclSetSpeedTrain(lua_State* l)
 local int CclSetSpeedUpgrade(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	SpeedUpgrade = LuaToNumber(l, 1);
 
@@ -658,8 +637,7 @@ local int CclSetSpeedUpgrade(lua_State* l)
 local int CclSetSpeedResearch(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	SpeedResearch = LuaToNumber(l, 1);
 
@@ -676,8 +654,7 @@ local int CclSetSpeeds(lua_State* l)
 	lua_Number s;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	s = LuaToNumber(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
@@ -815,8 +792,7 @@ local int CclDefineDefaultResourceAmounts(lua_State* l)
 
 	args = lua_gettop(l);
 	if (args & 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	for (j = 0; j < args; ++j) {
 		value = LuaToString(l, j + 1);
@@ -828,8 +804,7 @@ local int CclDefineDefaultResourceAmounts(lua_State* l)
 			}
 		}
 		if (i == MaxCosts) {
-			lua_pushfstring(l, "Resource not found: %s", value);
-			lua_error(l);
+			LuaError(l, "Resource not found: %s" _C_ value);
 		}
 	}
 	return 0;
@@ -848,8 +823,7 @@ local int CclUnits(lua_State* l)
 	static char buf[80];
 
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	i = 0;
 	slot = UnitSlotFree;
@@ -892,8 +866,7 @@ local int CclGetCompileFeature(lua_State* l)
 	const char* str;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	str = LuaToString(l, 1);
@@ -943,8 +916,7 @@ local int CclGetStratagusLibraryPath(lua_State* l)
 local int CclSyncRand(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
@@ -972,8 +944,7 @@ local int CclLoadPud(lua_State* l)
 	}
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	name = LuaToString(l, 1);
 	LoadPud(LibraryFileName(name, buffer), &TheMap);
@@ -995,8 +966,7 @@ local int CclLoadMap(lua_State* l)
 	char buffer[1024];
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	name = LuaToString(l, 1);
 	if (strcasestr(name, ".pud")) {

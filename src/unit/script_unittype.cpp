@@ -85,8 +85,7 @@ global unsigned CclGetResourceByName(lua_State* l)
 			return i;
 		}
 	}
-	lua_pushfstring(l, "Unsupported resource tag: %s", value);
-	lua_error(l);
+	LuaError(l, "Unsupported resource tag: %s" _C_ value);
 	return 0xABCDEF;
 }
 
@@ -110,8 +109,7 @@ local int CclDefineUnitType(lua_State* l)
 	int k;
 
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	// Slot identifier
@@ -158,8 +156,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->SameSprite = strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Files")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -179,8 +176,7 @@ local int CclDefineUnitType(lua_State* l)
 					}
 					if (i == NumTilesets) {
 					   // This leaves half initialized unit-type
-					   lua_pushfstring(l, "Unsupported tileset tag", value);
-					   lua_error(l);
+					   LuaError(l, "Unsupported tileset tag" _C_ value);
 					}
 				}
 				if (redefine) {
@@ -192,8 +188,7 @@ local int CclDefineUnitType(lua_State* l)
 			}
 		} else if (!strcmp(value, "Shadow")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -212,8 +207,7 @@ local int CclDefineUnitType(lua_State* l)
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
 					type->ShadowWidth = LuaToNumber(l, -1);
@@ -226,8 +220,7 @@ local int CclDefineUnitType(lua_State* l)
 				} else if (!strcmp(value, "offset")) {
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
-						lua_pushstring(l, "incorrect argument");
-						lua_error(l);
+						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
 					type->ShadowOffsetX = LuaToNumber(l, -1);
@@ -237,14 +230,12 @@ local int CclDefineUnitType(lua_State* l)
 					lua_pop(l, 1);
 					lua_pop(l, 1);
 				} else {
-					lua_pushfstring(l, "Unsupported shadow tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			type->Width = LuaToNumber(l, -1);
@@ -264,8 +255,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->Icon.Icon = NULL;
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -281,8 +271,7 @@ local int CclDefineUnitType(lua_State* l)
 			}
 		} else if (!strcmp(value, "ImproveProduction")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -319,8 +308,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->_MaxMana = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TileSize")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			type->TileWidth = LuaToNumber(l, -1);
@@ -340,8 +328,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->Decoration = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			type->NeutralMinimapColorRGB.r = LuaToNumber(l, -1);
@@ -354,8 +341,7 @@ local int CclDefineUnitType(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "BoxSize")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			type->BoxWidth = LuaToNumber(l, -1);
@@ -400,8 +386,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->Supply = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			if (redefine) {
 				free(type->CorpseName);
@@ -426,8 +411,7 @@ local int CclDefineUnitType(lua_State* l)
 			} else if (!strcmp(value, "naval")) {
 				type->UnitType = UnitTypeNaval;
 			} else {
-				lua_pushfstring(l, "Unsupported Type: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported Type: %s" _C_ value);
 			}
 
 		} else if (!strcmp(value, "RightMouseAction")) {
@@ -445,8 +429,7 @@ local int CclDefineUnitType(lua_State* l)
 			} else if (!strcmp(value, "sail")) {
 				type->MouseAction = MouseActionSail;
 			} else {
-				lua_pushfstring(l, "Unsupported RightMouseAction: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported RightMouseAction: %s" _C_ value);
 			}
 
 		} else if (!strcmp(value, "CanGroundAttack")) {
@@ -459,8 +442,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->RepairHP = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RepairCosts")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -535,8 +517,7 @@ local int CclDefineUnitType(lua_State* l)
 				res = (ResourceInfo*)malloc(sizeof(ResourceInfo));
 				memset(res, 0, sizeof(ResourceInfo));
 				if (!lua_istable(l, -1)) {
-					lua_pushstring(l, "incorrect argument");
-					lua_error(l);
+					LuaError(l, "incorrect argument");
 				}
 				subargs = luaL_getn(l, -1);
 				for (k = 0; k < subargs; ++k) {
@@ -588,9 +569,7 @@ local int CclDefineUnitType(lua_State* l)
 						lua_pop(l, 1);
 					} else {
 					   printf("\n%s\n",type->Name);
-					   lua_pushfstring(l, "Unsupported tag: %s", value);
-					   lua_error(l);
-					   DebugCheck(1);
+					   LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
 				if (!res->FinalResource) {
@@ -608,8 +587,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->CanHarvest = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanStore")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -621,8 +599,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->Vanishes = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanCastSpell")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			//
 			//	Warning: can-cast-spell should only be used AFTER all spells
@@ -646,16 +623,14 @@ local int CclDefineUnitType(lua_State* l)
 				spell = SpellTypeByIdent(value);
 				DebugLevel3Fn("%d \n" _C_ id);
 				if (spell == NULL) {
-					lua_pushfstring(l, "Unknown spell type: %s", value);
-					lua_error(l);
+					LuaError(l, "Unknown spell type: %s" _C_ value);
 				}
 				lua_pop(l, 1);
 				type->CanCastSpell[spell->Slot] = 1;
 			}
 		} else if (!strcmp(value, "AutoCastActive")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			//
 			// Warning: AutoCastActive should only be used AFTER all spells
@@ -679,12 +654,10 @@ local int CclDefineUnitType(lua_State* l)
 				spell = SpellTypeByIdent(value);
 				DebugLevel3Fn("%d \n" _C_ id);
 				if (spell == NULL) {
-					lua_pushfstring(l, "AutoCastActive : Unknown spell type: %s", value);
-					lua_error(l);
+					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
 				}
 				if (!spell->AutoCast) {
-					lua_pushfstring(l, "AutoCastActive : Define autocast method for %s.", value);
-					lua_error(l);
+					LuaError(l, "AutoCastActive : Define autocast method for %s." _C_ value);
 				}
 				lua_pop(l, 1);
 				type->AutoCastActive[spell->Slot] = 1;
@@ -695,8 +668,7 @@ local int CclDefineUnitType(lua_State* l)
 			//	have been defined.
 			//
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -717,8 +689,7 @@ local int CclDefineUnitType(lua_State* l)
 					continue;
 				}
 				printf("\n%s\n", type->Name);
-				lua_pushfstring(l, "Unsupported flag tag for can-target-flag: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported flag tag for can-target-flag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "SelectableByRectangle")) {
 			type->SelectableByRectangle = LuaToBoolean(l, -1);
@@ -726,8 +697,7 @@ local int CclDefineUnitType(lua_State* l)
 			type->Teleporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -778,8 +748,7 @@ local int CclDefineUnitType(lua_State* l)
 						}
 					}
 					if (res == MaxCosts) {
-						lua_pushfstring(l, "Resource not found: %s", value);
-						lua_error(l);
+						LuaError(l, "Resource not found: %s" _C_ value);
 					}
 					if (redefine) {
 						free(type->Sound.Harvest[res].Name);
@@ -809,8 +778,7 @@ local int CclDefineUnitType(lua_State* l)
 					type->Weapon.Attack.Name = strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else {
-					lua_pushfstring(l, "Unsupported sound tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported sound tag: %s" _C_ value);
 				}
 			}
 		} else {
@@ -822,9 +790,7 @@ local int CclDefineUnitType(lua_State* l)
 			}
 			if (i == NumberBoolFlag) {
 				printf("\n%s\n",type->Name);
-				lua_pushfstring(l, "Unsupported tag: %s", value);
-				lua_error(l);
-				DebugCheck(1);
+				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		}
 		lua_pop(l, 1);
@@ -832,8 +798,7 @@ local int CclDefineUnitType(lua_State* l)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		lua_pushfstring(l, "Unit-type `%s': right-attack is set, but can-attack is not\n", type->Name);
-		lua_error(l);
+		LuaError(l, "Unit-type `%s': right-attack is set, but can-attack is not\n" _C_ type->Name);
 	}
 
 	return 0;
@@ -897,8 +862,7 @@ local int CclDefineUnitStats(lua_State* l)
 			int k;
 
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -918,14 +882,12 @@ local int CclDefineUnitStats(lua_State* l)
 				}
 				if (i == MaxCosts) {
 				   // This leaves half initialized stats
-				   lua_pushfstring(l, "Unsupported tag: %s", value);
-				   lua_error(l);
+				   LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else {
 		   // This leaves a half initialized unit
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -953,8 +915,7 @@ global UnitType* CclGetUnitType(lua_State* l)
 			return data->Data;
 		}
 	}
-	lua_pushfstring(l, "CclGetUnitType: not a unit-type");
-	lua_error(l);
+	LuaError(l, "CclGetUnitType: not a unit-type");
 	return NULL;
 }
 
@@ -972,8 +933,7 @@ local int CclUnitType(lua_State* l)
 	LuaUserData* data;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	str = LuaToString(l, 1);
@@ -996,8 +956,7 @@ local int CclUnitTypeArray(lua_State* l)
 	LuaUserData* data;
 
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_newtable(l);
@@ -1023,8 +982,7 @@ local int CclGetUnitTypeIdent(lua_State* l)
 	const UnitType* type;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	type = CclGetUnitType(l);
@@ -1044,8 +1002,7 @@ local int CclGetUnitTypeName(lua_State* l)
 	const UnitType* type;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	type = CclGetUnitType(l);
@@ -1066,8 +1023,7 @@ local int CclSetUnitTypeName(lua_State* l)
 	UnitType* type;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	lua_pushvalue(l, 1);
@@ -1155,8 +1111,7 @@ local int CclDefineAnimations(lua_State* l)
 		}
 
 		if (!lua_istable(l, j + 1)) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		subargs = luaL_getn(l, j + 1);
 		t = anim = malloc(subargs * sizeof(Animation));
@@ -1164,8 +1119,7 @@ local int CclDefineAnimations(lua_State* l)
 		for (k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 4) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			t->Flags = LuaToNumber(l, -1);
@@ -1218,8 +1172,7 @@ local int CclDefineAnimations(lua_State* l)
 				}
 			}
 			if (res == MaxCosts) {
-				lua_pushfstring(l, "Resource not found: %s", resource);
-				lua_error(l);
+				LuaError(l, "Resource not found: %s" _C_ resource);
 			}
 			if (anims->Harvest[res]) {
 				free(anims->Harvest[res]);
@@ -1231,8 +1184,7 @@ local int CclDefineAnimations(lua_State* l)
 			}
 			anims->Die = anim;
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", id);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ id);
 		}
 	}
 
