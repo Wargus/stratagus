@@ -5309,6 +5309,7 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
     suf[2] = ".chk";
     suf[3] = NULL;
     u = 0;
+    lcp = 0;
     while (suf[u]) {
 	cp = np;
 	--cp;
