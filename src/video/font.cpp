@@ -665,7 +665,7 @@ void LoadFonts(void)
 	unsigned i;
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
-		if (Fonts[i].G && !GraphicLoaded(Fonts[i].G)) {
+		if (Fonts[i].G) {
 			ShowLoadProgress("Fonts %s", Fonts[i].G->File);
 			DebugPrint("Font %s\n" _C_ Fonts[i].G->File);
 			LoadGraphic(Fonts[i].G);
