@@ -241,6 +241,8 @@ typedef struct _ui_ {
 
     // Button panel
     GraphicConfig ButtonPanel;		/// Button panel background
+    Button*	ButtonButtons;		/// Button panel buttons
+    int		NumButtonButtons;	/// Number of button panel buttons
     int		ButtonPanelX;		/// Button panel screen X position
     int		ButtonPanelY;		/// Button panel screen Y position
 
@@ -288,9 +290,6 @@ typedef struct _ui_ {
     int		StatusLineTextX;	/// status line screen text X position
     int		StatusLineTextY;	/// status line screen text Y position
     int		StatusLineFont;		/// Status line font
-
-    Button*	ButtonButtons;		/// Button panel buttons
-    int		NumButtonButtons;	/// Number of button panel buttons
 
     // Offsets for 640x480 center used by menus
     int		Offset640X;		/// Offset for 640x480 X position

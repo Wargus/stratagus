@@ -488,8 +488,19 @@ local void SaveUi(CLFile* file, const UI* ui)
 
     CLprintf(file, ")\n");    // 'info-panel
 
-    CLprintf(file, "\n  'button-panel (list \"%s\" %d %d)",
-	ui->ButtonPanel.File, ui->ButtonPanelX, ui->ButtonPanelY);
+    CLprintf(file, "\n  'button-panel (list\n");
+    CLprintf(file, "\n    'panel (list\n");
+    CLprintf(file, "\n      'file \"%s\"\n", ui->ButtonPanel.File);
+    CLprintf(file, "\n      'pos '(%d %d))",
+	ui->ButtonPanelX, ui->ButtonPanelY);
+    CLprintf(file, "\n    'icons (list\n");
+    for (i = 0; i < ui->NumButtonButtons; ++i) {
+	CLprintf(file, "\n      (list 'pos '(%d %d) 'size '(%d %d))",
+	    ui->ButtonButtons[i].X, ui->ButtonButtons[i].Y,
+	    ui->ButtonButtons[i].Width, ui->ButtonButtons[i].Height);
+    }
+    CLprintf(file, ")");
+    CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'map-area (list");
     CLprintf(file, "\n    'pos '(%3d %3d)",
@@ -557,15 +568,7 @@ local void SaveUi(CLFile* file, const UI* ui)
 	MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
     CLprintf(file, ")\n");
 
-    CLprintf(file, "\n  'button-buttons '(");
-    for (i = 0; i < ui->NumButtonButtons; ++i) {
-	CLprintf(file, "\n    (pos (%3d %3d) size (%d %d))",
-	    ui->ButtonButtons[i].X, ui->ButtonButtons[i].Y,
-	    ui->ButtonButtons[i].Width, ui->ButtonButtons[i].Height);
-    }
-    CLprintf(file, ")");
-
-    CLprintf(file, "\n\n  'cursors '(");
+    CLprintf(file, "\n  'cursors '(");
     CLprintf(file, "\n    point %s", ui->Point.Name);
     CLprintf(file, "\n    glass %s", ui->Glass.Name);
     CLprintf(file, "\n    cross %s", ui->Cross.Name);
