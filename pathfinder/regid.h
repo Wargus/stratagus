@@ -20,6 +20,7 @@ typedef struct regid_space {
 } RegidSpace;
 
 extern void RegidSpaceInitialize (RegidSpace * , int );
+extern void RegidSpaceDestroy (RegidSpace * );
 extern void RegidBitmapInflate (RegidSpace * );
 extern void RegidBitmapShrink (RegidSpace * );
 extern int  RegidInUse (RegidSpace * , int );

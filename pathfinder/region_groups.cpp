@@ -70,6 +70,7 @@ static MovementType MovementTypes[] = {
 local struct region_group_set RegGroupSet;
 local int Initialized = 0;
 
+local void RegGroupSetDestroy (void);
 local int  RegGroupSetNextId (void);
 local void RegGroupSetAddGroup (RegGroup * );
 local void RegGroupSetDeleteGroup (RegGroup * );
@@ -100,10 +101,24 @@ int RegGroupsInitialize (void)
 	//InitSuperGroups ();
 	Initialized = 1;
 #if DEBUG
-	PrintSummary ();
+	//PrintSummary ();
 #endif
 	/* TODO: should return something useful */
 	return 0;
+}
+
+void RegGroupsDestroy (void)
+{
+	int type;
+
+	RegGroupSetDestroy ();
+	for (type=0; type < NUM_MOVEMENT_TYPES; type++) {
+		while (MovementTypes[type].SuperGroups) {
+			SuperGroup *s = MovementTypes[type].SuperGroups;
+			MovementTypeDeleteSuperGroup (type, s);
+		}
+		MovementTypes[type].HighestId = 0;
+	}
 }
 
 int RegGroupSetInitialize (void)
@@ -148,7 +163,7 @@ int RegGroupSetInitialize (void)
 	 * transporter SuperGroup consists of just 2 Groups (shore and the water
 	 * itself).  In this case the recreated Groups are not adjacent to any
 	 * Groups passable by transporters which means that
-	 * RegGroupAddToSuperGroups() won't work. That's why we need call
+	 * RegGroupAddToSuperGroups() won't work. That's why we need to call
 	 * InitSuperGroups() which inspects all of the Groups and if some Group is
 	 * passable for e.g. transporters, yet it doesn't belong to any transporter
 	 * SuperGroup, a new transporter SuperGroup is created (as it is done
@@ -156,6 +171,18 @@ int RegGroupSetInitialize (void)
 	 */
 	InitSuperGroups ();
 	return 0;
+}
+
+local void RegGroupSetDestroy (void)
+{
+	while (RegGroupSet.Groups) {
+		RegGroup *g = RegGroupSet.Groups;
+		RegGroupSet.Groups = g->NextInSet;
+		free (g);
+	}
+
+	RegGroupSet.NextId = 0;
+	RegGroupSet.Groups = NULL;
 }
 
 local int RegGroupSetNextId (void)
@@ -469,8 +496,8 @@ local void SuperGroupAddRegGroup (SuperGroup *s, RegGroup *g)
 		for ( ; gptr->NextInSGroup[type]; gptr=gptr->NextInSGroup[type]);
 		gptr->NextInSGroup[type] = g;
 	}
-	DebugLevel0Fn ("added Group %4d to SuperGroup %2d of type %d.\n",
-				g->Id, s->Id, type);
+	//DebugLevel2Fn ("added Group %4d to SuperGroup %2d of type %d.\n",
+	//			g->Id, s->Id, type);
 }
 
 local void SuperGroupDeleteRegGroup (SuperGroup *s, RegGroup *group)
@@ -557,7 +584,7 @@ local void SuperGroupDestroy (SuperGroup *s)
 	/* ATTENTION: watch out for leaks!! We don't destroy RegGroups as part
      * of this process of destroying their SuperGroup! (Doing so would make
      * little sense in some situations - Groups don't neccessarily have the
-     * same life span as SuperGrous.) If Groups' destruction is desired it
+     * same life span as SuperGroups.) If Groups' destruction is desired it
      * must be done separately. */
 	for (g=s->RegGroups; g->NextInSGroup[type]; g=g->NextInSGroup[type])
 		g->SuperGroup[type] = NULL;

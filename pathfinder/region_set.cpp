@@ -36,6 +36,14 @@ void RegionSetInitialize (void)
 	RegionSetCreateNeighborLists (0, 0, TheMap.Width - 1, TheMap.Height - 1);
 }
 
+void RegionSetDestroy (void)
+{
+	RegionSetFlush ();
+	AllRegions = NULL;
+	RegidSpaceDestroy (&RegionSet.RegidSpace);
+	memset (&RegionSet, 0, sizeof (RegionSet));
+}
+
 local void RegionSetFindRegions (void)
 {
 	int i, j;
