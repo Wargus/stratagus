@@ -699,6 +699,16 @@ global void NetworkInitClientConnect(void)
 global void NetworkExitClientConnect(void)
 {
     NetConnectRunning = 0;
+    NetPlayers = 0;		// Make single player menus work again!
+}
+
+/**
+**	Terminate and detach Network connect state machine for the client
+*/
+global void NetworkDetachFromServer(void)
+{
+    NetLocalState = ccs_detaching;
+    NetStateMsgCnt = 0;
 }
 
 /**
@@ -731,6 +741,21 @@ global void NetworkInitServerConnect(void)
 */
 global void NetworkExitServerConnect(void)
 {
+    int h, i, n;
+    InitMessage message;
+
+    message.Type = MessageInitReply;
+    message.SubType = ICMServerQuit;
+    for (h = 1; h < HostsCount; ++h) {
+	// Spew out 5 and trust in God that they arrive
+	if (Hosts[h].PlyNr) {
+	    for (i = 0; i < 5; i++) {
+		n = NetworkSendICMessage(Hosts[h].Host, Hosts[h].Port, &message);
+		DebugLevel0Fn("Sending InitReply Message ServerQuit: (%d) to %d.%d.%d.%d:%d\n",
+						n, NIPQUAD(ntohl(Hosts[h].Host)),ntohs(Hosts[h].Port));
+	    }
+	}
+    }
     NetConnectRunning = 0;
 }
 
@@ -757,9 +782,31 @@ global void NetworkServerResyncClients(void)
 global void NetworkProcessClientRequest(void)
 {
     InitMessage message;
+    int i;
 
 changed:
     switch (NetLocalState) {
+	case ccs_disconnected:
+	    message.Type = MessageInitHello;
+	    message.SubType = ICMSeeYou;
+	    // Spew out 5 and trust in God that they arrive
+	    for (i = 0; i < 5; i++) {
+		NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
+	    }
+	    NetLocalState = ccs_unreachable;			
+	    NetConnectRunning = 0;	/// End the menu..
+	    break;
+	case ccs_detaching:
+	    if (NetStateMsgCnt < 10) {	/// 10 retries = 1 second
+		message.Type = MessageInitHello;
+		message.SubType = ICMGoodBye;
+		NetworkSendRateLimitedClientMessage(&message, 100);
+	    } else {
+		// Server is ignoring us - break out!
+		NetLocalState = ccs_unreachable;			
+		NetConnectRunning = 0;	/// End the menu..
+	    }
+	    break;
 	case ccs_connecting:
 	    if (NetStateMsgCnt < 60) {	/// 60 retries = 30 seconds
 		message.Type = MessageInitHello;
@@ -865,7 +912,32 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
     if (NetConnectRunning == 2) {		/// client
 	if (msg->Type == MessageInitReply) {
+	    if (msg->SubType == ICMServerQuit) { /// Server user canceled, should work in all states
+		/// FIXME: return a better code to the user...
+		NetLocalState = ccs_unreachable;
+		NetConnectRunning = 0;	/// End the menu..
+		/// No ack here - Server will spew out a few Quit msgs, which has to be enough
+		return;
+	    }
 	    switch(NetLocalState) {
+		case ccs_disconnected:
+		    DebugLevel0Fn("ccs_disconnected: Server sending GoodBye dups %d\n",msg->SubType);
+		    break;
+
+		case ccs_detaching:
+		    switch(msg->SubType) {
+
+			case ICMGoodBye:	/// Server has let us go
+			    DebugLevel3Fn("ccs_detaching: Server GoodBye subtype %d received - byebye\n",msg->SubType);
+			    NetLocalState = ccs_disconnected;
+			    break;
+
+			default:
+			    DebugLevel0Fn("ccs_detaching: Unhandled subtype %d\n",msg->SubType);
+			    break;
+		    }
+		    break;
+
 		case ccs_connecting:
 		    switch(msg->SubType) {
 
@@ -1055,13 +1127,19 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 	switch(msg->SubType) {
 	    case ICMHello:		/// a client has arrived
 		// first look up, if host is already known.
-		for (h = 0; h < HostsCount; ++h) {
+		for (h = 1; h < HostsCount; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			break;
 		    }
 		}
 		if (h == HostsCount) { 	// it is a new client
-		    if (HostsCount < NetPlayers) {
+		    for (i = 1; i < h; i++) {
+			if (Hosts[i].PlyNr == 0) {	// If possible occupy empty (previously freed) slots
+			    h = i;
+			    break;
+			}
+		    }
+		    if (h < NetPlayers) {
 			Hosts[h].Host = NetLastHost;
 			Hosts[h].Port = NetLastPort;
 			Hosts[h].PlyNr = h;
@@ -1070,7 +1148,9 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort), Hosts[h].PlyName);
 			NetStates[h].State = ccs_connecting;
 			NetStates[h].MsgCnt = 0;
-			HostsCount++;
+			if (h == HostsCount) {
+			    HostsCount++;
+			}
 		    } else {
 			message.Type = MessageInitReply;
 			message.SubType = ICMGameFull;	/// Game is full - reject connnection
@@ -1104,6 +1184,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		    // FIXME: Client sends hellos, but doesn't receive our welcome acks....
 		    ;
 		}
+		// FIXME: Resync other clients here!
 		NetConnectForceDisplayUpdate();
 		return;
 
@@ -1253,6 +1334,9 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		for (h = 0; h < HostsCount; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			switch (NetStates[h].State) {
+			    case ccs_mapinfo:
+				/// User State Change right after connect - should not happen, but..
+				/* Fall through */
 			    case ccs_synced:
 				/// Default case: Client is in sync with us, but notes a local change
 				NetStates[h].State = ccs_async;
@@ -1286,6 +1370,64 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			}
 			break;
 		    }
+		}
+		break;
+
+	    case ICMGoodBye:
+		// look up the host
+		for (h = 0; h < HostsCount; ++h) {
+		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+			switch (NetStates[h].State) {
+			    default:
+				// We can enter here from _ANY_ state!
+				NetStates[h].MsgCnt = 0;
+				NetStates[h].State = ccs_detaching;
+				/* Fall through */
+			    case ccs_detaching:
+				/// this code path happens until client acknoledges the GoodBye
+				/// by sending ICMSeeYou;
+				message.Type = MessageInitReply;
+				message.SubType = ICMGoodBye;
+				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+				DebugLevel0Fn("Sending InitReply Message GoodBye: (%d) to %d.%d.%d.%d:%d\n",
+					    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+				NetStates[h].MsgCnt++;
+				if (NetStates[h].MsgCnt > 10) {
+				    // FIXME: Client sends GoodBye, but doesn't receive our GoodBye....
+				    ;
+				}
+				break;
+			}
+			break;
+		     }
+		}
+		break;
+
+	    case ICMSeeYou:
+		// look up the host
+		for (h = 0; h < HostsCount; ++h) {
+		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+			switch (NetStates[h].State) {
+			    case ccs_detaching:
+				NetStates[h].State = ccs_unused;
+				Hosts[h].Host = 0;
+				Hosts[h].Port = 0;
+				Hosts[h].PlyNr = 0;
+				memset(Hosts[h].PlyName, 0, 16);
+				ServerSetupState.Ready[h] = 0;
+				ServerSetupState.Race[h] = 0;
+
+				// FIXME: Resync other clients here!
+				NetConnectForceDisplayUpdate();
+				break;
+
+			    default:
+				DebugLevel0Fn("Server: ICMSeeYou: Unhandled state %d Host %d\n",
+								 NetStates[h].State, h);
+				break;
+			}
+			break;
+		     }
 		}
 		break;
 
