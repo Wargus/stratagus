@@ -32,6 +32,10 @@
 
 #ifdef USE_CCL
 
+//
+//	Macros for compatibility with guile high level interface.
+//
+
 #define SCM LISP
 #define SCM_UNSPECIFIED NIL
 #define gh_null_p(lisp) NULLP(lisp)
