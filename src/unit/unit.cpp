@@ -10,7 +10,7 @@
 //
 /**@name unit.c		-	The units. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1102,16 +1102,17 @@ global int BuildingVisibleOnMap(Unit* unit)
 #endif
 
 /**
+**	FIXME: docu
+**
 **	@param x	x location to check if building is on, and mark as seen
 **	@param y	y location to check if building is on, and mark as seen
-**
-**/
+*/
 global void UnitsMarkSeen(int x,int y)
 {
     int n;
-    Unit* units[4];
+    Unit* units[UnitMax];
 
-    n = UnitCacheOnTile(x,y,units);
+    n = SelectUnitsOnTile(x,y,units);
     // FIXME: need to handle Dead buldings
     while( n ) {
 	units[n-1]->SeenIY=units[n-1]->IY;
@@ -1130,9 +1131,10 @@ global void UnitsMarkSeen(int x,int y)
 }
 
 /**
-**	@param unit	pointer to the unit to check if seen
+**	FIXME: docu
 **
-**/
+**	@param unit	pointer to the unit to check if seen
+*/
 global void UnitMarkSeen(Unit* unit)
 {
     int x;
