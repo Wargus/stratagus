@@ -86,7 +86,7 @@ global void HandleActionDie(Unit* unit)
 
 		// Update sight for new corpse
 		MapUnmarkUnitSight(unit);
-		unit->CurrentSightRange = unit->Type->Stats->SightRange;
+		unit->CurrentSightRange = unit->Type->Stats[unit->Player->Player].SightRange;
 		MapMarkUnitSight(unit);
 
 		CommandStopUnit(unit);			// This clears all order queues

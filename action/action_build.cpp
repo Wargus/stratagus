@@ -64,10 +64,8 @@ local void UpdateConstructionFrame(Unit* unit)
 	ConstructionFrame* tmp;
 	int percent;
 
-#if 0
-	percent = unit->Data.Builded.Progress * 100 / (unit->Type->Stats->Costs[TimeCost] * 600);
-#endif
-	percent = unit->Data.Builded.Progress / (unit->Type->Stats->Costs[TimeCost] * 6);
+	percent = unit->Data.Builded.Progress /
+		(unit->Type->Stats[unit->Player->Player].Costs[TimeCost] * 6);
 	cframe = tmp = unit->Type->Construction->Frames;
 	while (tmp) {
 		if (percent < tmp->Percent) {
@@ -296,7 +294,7 @@ global void HandleActionBuilded(Unit* unit)
 
 	// n is the current damage taken by the unit.
 	n = (unit->Data.Builded.Progress * unit->Stats->HitPoints) /
-		(type->Stats->Costs[TimeCost] * 600) - unit->HP;
+		(type->Stats[unit->Player->Player].Costs[TimeCost] * 600) - unit->HP;
 	// This below is most often 0
 	if (type->BuilderOutside) {
 		progress = unit->Type->AutoBuildRate;
@@ -310,7 +308,7 @@ global void HandleActionBuilded(Unit* unit)
 	unit->Data.Builded.Progress += progress;
 	// Keep the same level of damage while increasing HP.
 	unit->HP = (unit->Data.Builded.Progress * unit->Stats->HitPoints) /
-		(type->Stats->Costs[TimeCost] * 600) - n;
+		(type->Stats[unit->Player->Player].Costs[TimeCost] * 600) - n;
 	if (unit->HP > unit->Stats->HitPoints) {
 		unit->HP = unit->Stats->HitPoints;
 	}
