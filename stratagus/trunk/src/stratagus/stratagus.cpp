@@ -971,8 +971,8 @@ global int main(int argc, char** argv)
 	CclStartFile = "scripts/stratagus.lua";
 	EditorStartFile = "scripts/editor.lua";
 
-	//  Default play name to username on unix systems.
-	memset(LocalPlayerName, 0, 16);
+	//  Default player name to username on unix systems.
+	memset(LocalPlayerName, 0, sizeof(LocalPlayerName));
 #ifdef USE_WIN32
 	strcpy(LocalPlayerName, "Anonymous");
 #else
@@ -1015,8 +1015,8 @@ global int main(int argc, char** argv)
 				NetworkArg = strdup(optarg);
 				continue;
 			case 'N':
-				memset(LocalPlayerName, 0, 16);
-				strncpy(LocalPlayerName, optarg, 16);
+				memset(LocalPlayerName, 0, sizeof(LocalPlayerName));
+				strncpy(LocalPlayerName, optarg, sizeof(LocalPlayerName) - 1);
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);
