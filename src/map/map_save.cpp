@@ -93,7 +93,7 @@ global void SaveMap(FILE* file)
 #ifdef NEW_FOW
 	    DebugLevel0Fn("FIXME:\n");
 #else
-	    if( IsMapFieldVisible(h,w) ) {
+	    if( IsMapFieldVisible(w,h) ) {
 		fprintf(file," visible");
 	    }
 	    if( mf->Flags&MapFieldExplored ) {
