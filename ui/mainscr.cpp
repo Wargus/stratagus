@@ -569,10 +569,12 @@ global void DrawResources(void)
     int i;
     int v;
 
-    VideoDrawSub(TheUI.Resource.Graphic,0,0
-	    ,TheUI.Resource.Graphic->Width
-	    ,TheUI.Resource.Graphic->Height
-	    ,TheUI.ResourceX,TheUI.ResourceY);
+    if (TheUI.Resource.Graphic) {
+	VideoDrawSub(TheUI.Resource.Graphic,0,0
+		,TheUI.Resource.Graphic->Width
+		,TheUI.Resource.Graphic->Height
+		,TheUI.ResourceX,TheUI.ResourceY);
+    }
 
     if( TheUI.OriginalResources ) {
 	// FIXME: could write a sub function for this
@@ -950,10 +952,12 @@ local char StatusLine[STATUS_LINE_LEN];			/// status line/hints
 */
 global void DrawStatusLine(void)
 {
-    VideoDrawSub(TheUI.StatusLine.Graphic
+    if (TheUI.StatusLine.Graphic) {
+	VideoDrawSub(TheUI.StatusLine.Graphic
 	    ,0,0
 	    ,TheUI.StatusLine.Graphic->Width,TheUI.StatusLine.Graphic->Height
 	    ,TheUI.StatusLineX,TheUI.StatusLineY);
+    }
     if( StatusLine[0] ) {
 	PushClipping();
 	SetClipping(TheUI.StatusLineTextX,TheUI.StatusLineTextY
@@ -1107,10 +1111,12 @@ global void ClearCosts(void)
 */
 local void DrawInfoPanelBackground(unsigned frame)
 {
-    VideoDrawSub(TheUI.InfoPanel.Graphic
+    if (TheUI.InfoPanel.Graphic) {
+	VideoDrawSub(TheUI.InfoPanel.Graphic
 	    ,0,TheUI.InfoPanelH*frame
 	    ,TheUI.InfoPanelW,TheUI.InfoPanelH
 	    ,TheUI.InfoPanelX,TheUI.InfoPanelY);
+    }
 }
 
 /**
