@@ -30,10 +30,6 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-typedef unsigned long VMemType32;	/// 32 bpp modes pointer
-typedef unsigned short VMemType16;	/// 16 bpp modes pointer
-typedef unsigned char VMemType8;	///  8 bpp modes pointer
-
     /// MACRO defines speed of colorcycling
 #define COLOR_CYCLE_SPEED	(FRAMES_PER_SECOND/4)
 
@@ -112,7 +108,6 @@ extern void DrawRleSpriteClippedX(RleSprite* sprite,unsigned frame,int x,int y);
 extern void FreeRleSprite(RleSprite *sprite);
 //@}
 
-#endif	// } !NEW_VIDEO
 
 /** Set clipping for nearly all vector primitives. Functions which support
   clipping will be marked CLIPPED. Set system-wide clipping rectangle.
@@ -122,6 +117,8 @@ extern void FreeRleSprite(RleSprite *sprite);
   @param bottom bottom y coordinate
  */
 extern void SetClipping(int left,int top,int right,int bottom);
+
+#endif	// } !NEW_VIDEO
 
 /** Architecture-dependant videomemory. Set by InitVideoXXX.
   @see InitVideo
@@ -145,9 +142,11 @@ extern int VideoDepth;
 
     /// 32 bpp modes video memory address
 #define VideoMemory32	((VMemType32*)VideoMemory)
+    /// 24 bpp modes video memory address
+#define VideoMemory24	((VMemType24*)VideoMemory)
     /// 16 bpp modes video memory address
 #define VideoMemory16	((VMemType16*)VideoMemory)
-    ///8 bpp modes video memory address
+    ///  8 bpp modes video memory address
 #define VideoMemory8	((VMemType8*)VideoMemory)
 
 /** Architecture-dependant system palette. Applies as conversion between
@@ -157,6 +156,7 @@ extern int VideoDepth;
  */
 extern VMemType8 * Pixels8;	///  8 bpp
 extern VMemType16 * Pixels16;	/// 16 bpp
+extern VMemType24 * Pixels24;	/// 24 bpp
 extern VMemType32 * Pixels32;	/// 32 bpp
 
 /** Set videomode. Tries to set choosen videomode. Only 640x480, 800x600
@@ -244,11 +244,6 @@ extern volatile int VideoInterrupts;
 ** within intervals of VideoSyncSpeed, not more, not less
 */
 extern int VideoSyncSpeed;
-
-/**
-**	Wanted videomode, fullscreen or windowed.
-*/
-extern int VideoFullScreen;
 
 //@}
 
