@@ -1,0 +1,29 @@
+0.1  10.12.2004
+	* initial version
+	* conversion between color type 6 and 3 works using a palette file
+	* not userfriendly (filenames hardcoded, poor error handling)
+
+0.2  12.12.2004
+	* improved error handling
+	* filenames can (and have to be) specified as command line arguments
+	* shadow extraction implemented
+	* Makefile
+	* using cc instead of g++
+
+0.3  15.12.2004
+	* split in multiple source files
+	* new, self written command line parser (popt is not flexible enough for me)
+	* new parameter semantics
+	* include read support for images of color_type 2 and 3
+	* include text field support
+
+0.4  19.12.2004
+	* revised reading code. All color types extept gray (0,4) are now really
+	  supported.
+	* pallette composision using a median-cut algorithm. Slow up to now, but
+	  this will get improvement in the next version.
+	* Special treatment of player colors in palette generation
+
+0.5  21.12.2004
+	* optimised palette creation (a lot)
+	* a lot more debug output (with multiple -v)
