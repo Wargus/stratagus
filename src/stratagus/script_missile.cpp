@@ -182,42 +182,6 @@ static int CclDefineMissileType(lua_State* l)
 }
 
 /**
-**  Define missile type mapping from original number to internal symbol
-**
-**  @param l  Lua state.
-*/
-static int CclDefineMissileTypeWcNames(lua_State* l)
-{
-	int i;
-	int j;
-	char** cp;
-
-	if ((cp = MissileTypeWcNames)) {  // Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(MissileTypeWcNames);
-	}
-
-	//
-	// Get new table.
-	//
-	i = lua_gettop(l);
-	MissileTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
-	if (!cp) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-
-	for (j = 0; j < i; ++j) {
-		*cp++ = strdup(LuaToString(l, j + 1));
-	}
-	*cp = NULL;
-
-	return 0;
-}
-
-/**
 **  Create a missile.
 **
 **  @param l  Lua state.
@@ -416,8 +380,6 @@ static int CclDefineBurningBuilding(lua_State* l)
 */
 void MissileCclRegister(void)
 {
-	lua_register(Lua, "DefineMissileTypeWcNames",
-		CclDefineMissileTypeWcNames);
 	lua_register(Lua, "DefineMissileType", CclDefineMissileType);
 	lua_register(Lua, "Missile", CclMissile);
 	lua_register(Lua, "DefineBurningBuilding", CclDefineBurningBuilding);
