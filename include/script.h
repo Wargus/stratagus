@@ -57,7 +57,12 @@ extern int LuaLoadFile(const char* file);
 extern int LuaCall(int narg, int clear);
 
 #define LuaError(l, args) \
-	do { DebugLevel0Fn(args); lua_pushfstring(l, args); lua_error(l); } while (0)
+	do { \
+		fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); \
+		fprintf(stdout, args); \
+		fprintf(stdout, "\n"); \
+		lua_pushfstring(l, args); lua_error(l); \
+	} while (0)
 
 
 #include "iolib.h"
