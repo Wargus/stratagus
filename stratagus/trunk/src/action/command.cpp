@@ -916,64 +916,65 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,
 **	@param slot	slot number to cancel.
 **	@param type	Unit-type to cancel.
 */
-global void CommandCancelTraining(Unit* unit,int slot,const UnitType* type)
+global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 {
     int i;
     int n;
 
-    //
-    //	Check if unit is still training 'slot'? (NETWORK!)
-    //
-    if( unit->Orders[0].Action==UnitActionTrain ) {
-	n=unit->Data.Train.Count;
-	DebugCheck( n<1 );
-	if( slot==-1 ) {		// default last slot!
-	    slot+=n;
-	}
+    DebugLevel0Fn("Cancel %d type: %s\n" _C_ slot _C_
+	    type ? type->Ident : "-any-");
 
-	DebugLevel0Fn("Cancel type: %s\n" _C_ type ? type->Ident : "-any-");
+    ClearSavedAction(unit);
+
+    //
+    //  Check if unit is still training 'slot'? (NETWORK!)
+    //
+    if (unit->Orders[0].Action == UnitActionTrain) {
+	n = unit->Data.Train.Count;
+	DebugCheck(n < 1);
+	if (slot == -1) {		// default last slot!
+	    slot += n;
+	}
 	//
-	//	Check if the unit-type is still trained? (NETWORK!)
+	//      Check if slot and unit-type is still trained? (NETWORK!)
 	//
-	if( type && unit->Data.Train.What[slot]!=type ) {
+	if (slot >= n || (type && unit->Data.Train.What[slot] != type)) {
 	    // FIXME: we can look if this is now in an earlier slot.
-	    ClearSavedAction(unit);
 	    return;
 	}
 
-	if( slot<n ) {
+	DebugLevel0Fn("Cancel training\n");
 
-	    PlayerAddCostsFactor(unit->Player,
-		    unit->Data.Train.What[slot]
-			->Stats[unit->Player->Player].Costs,
-		    CancelTrainingCostsFactor);
+	PlayerAddCostsFactor(unit->Player,
+		unit->Data.Train.What[slot]->Stats[unit->Player->Player].Costs,
+		CancelTrainingCostsFactor);
 
-	    if ( --n ) {
-		for( i = slot; i < n; i++ ) {
-		    unit->Data.Train.What[i] = unit->Data.Train.What[i+1];
-		}
-		if( !slot ) {
-		    unit->Data.Train.Ticks=0;
-		}
-		unit->Data.Train.Count=n;
-	    } else {
-		DebugLevel0Fn("Last slot\n");
-		unit->Orders[0].Action=UnitActionStill;
-		unit->SubAction=0;
+	if (--n) {
+	    // Copy the other slots down
+	    for (i = slot; i < n; i++) {
+		unit->Data.Train.What[i] = unit->Data.Train.What[i + 1];
 	    }
-
-	    //
-	    //	Update interface.
-	    //
-	    if( unit->Player==ThisPlayer && unit->Selected ) {
-		UpdateButtonPanel();
-		MustRedraw|=RedrawPanels;
+	    if (!slot) {		// Canceled in work slot
+		unit->Data.Train.Ticks = 0;
+		unit->Wait = 
+		    unit->Reset = 1;	// immediately start next training
 	    }
+	    unit->Data.Train.Count = n;
+	} else {
+	    DebugLevel0Fn("Last slot\n");
+	    unit->Orders[0].Action = UnitActionStill;
+	    unit->SubAction = 0;
+	    unit->Wait = unit->Reset = 1;
+	}
 
-	    unit->Wait=unit->Reset=1;	// immediately start next training
+	//
+	//  Update interface.
+	//
+	if (unit->Player == ThisPlayer && unit->Selected) {
+	    UpdateButtonPanel();
+	    MustRedraw |= RedrawPanels;
 	}
     }
-    ClearSavedAction(unit);
 }
 
 /**
