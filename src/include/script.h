@@ -108,8 +108,14 @@ typedef enum {
 	EString_UnitName,     /// UnitType Name.
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
+	EString_GameInfo      /// Infos of game (objectives, tips, ...).
 // FIXME: add others.
 } EString; /// All possible value for a string.
+
+typedef enum {
+	ES_GameInfo_Tips = 0,        /// Current tip.
+	ES_GameInfo_Objectives       /// All Objectives of the game.
+} ES_GameInfo; /// All possible value for a game info string.
 
 /**
 **  Enumeration to know which variable to be selected.
@@ -228,6 +234,7 @@ struct _StringDesc_ {
 			NumberDesc* MaxLen;  /// Max lenght of line.
 			int Font;    /// Font to consider (else (-1) consider just char).
 		} Line; /// For specific line.
+		ES_GameInfo GameInfoType;
 	} D;
 };
 
