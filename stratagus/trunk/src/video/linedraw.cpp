@@ -814,8 +814,16 @@ global void VideoDrawCircle(SDL_Color color, int x, int y, int r)
 
 global void VideoDrawCircleClip(SDL_Color color, int x, int y, int r)
 {
-    // FIXME: clip
+    int w;
+    int h;
+
+    w = h = r * 2;
+
+    CLIP_RECTANGLE(x, y, w, h);
     VideoDrawCircle(color, x, y, r);
+
+    r = w / 2;
+    h = w / 2;
 }
 
 global void VideoDrawTransCircleClip(SDL_Color color, int x, int y,
@@ -872,15 +880,31 @@ global void VideoFillCircle(SDL_Color color, int x, int y, int r)
 
 global void VideoFillCircleClip(SDL_Color color, int x, int y, int r)
 {
-    // FIXME: clip
+    int w;
+    int h;
+
+    w = h = r * 2;
+
+    CLIP_RECTANGLE(x, y, w, h);
     VideoFillCircle(color, x, y, r);
+
+    r = w / 2;
+    h = w / 2;
 }
 
 global void VideoFillTransCircleClip(SDL_Color color, int x, int y,
     int r, unsigned char alpha)
 {
-    // FIXME: clip, trans
+    int w;
+    int h;
+
+    w = h = r * 2;
+
+    CLIP_RECTANGLE(x, y, w, h);
     VideoFillCircle(color, x, y, r);
+
+    r = w / 2;
+    h = w / 2;
 }
 
 global void DebugTestDisplayLines(void)
