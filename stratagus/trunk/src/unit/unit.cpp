@@ -966,9 +966,9 @@ void UnitLost(Unit* unit)
 
 	// Destroy resource-platform, must re-make resource patch.
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
-		if (b->Data.OnTop.ReplaceOnDie && (unit->Type->GivesResource && unit->Value != 0)) {
+		if (b->Data.OnTop.ReplaceOnDie && (unit->Type->GivesResource && unit->ResourcesHeld != 0)) {
 			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Data.OnTop.Parent, &Players[PlayerNumNeutral]);
-			temp->Value = unit->Value;
+			temp->ResourcesHeld = unit->ResourcesHeld;
 		}
 	}
 	Assert(player->NumBuildings <= UnitMax);
@@ -2909,7 +2909,7 @@ void LetUnitDie(Unit* unit)
 				unit->Orders[0].Action == UnitActionBuilded &&
 				unit->Data.Builded.Worker) {
 			// Restore value for oil-patch
-			unit->Value = unit->Data.Builded.Worker->Value;
+			unit->ResourcesHeld = unit->Data.Builded.Worker->ResourcesHeld;
 		}
 
 		DestroyAllInside(unit);
@@ -3713,7 +3713,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"group-id\", %d,\n  ", unit->GroupId);
 	CLprintf(file, "\"last-group\", %d,\n  ", unit->LastGroup);
 
-	CLprintf(file, "\"value\", %d,\n  ", unit->Value);
+	CLprintf(file, "\"resources-held\", %d,\n  ", unit->ResourcesHeld);
 	if (unit->CurrentResource) {
 		CLprintf(file, "\"current-resource\", \"%s\",\n  ",
 			DefaultResourceNames[unit->CurrentResource]);
@@ -3728,6 +3728,9 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\n  \"blink\", %d,", unit->Blink);
 	if (unit->Moving) {
 		CLprintf(file, " \"moving\",");
+	}
+	if (unit->ReCast) {
+		CLprintf(file, " \"re-cast\",");
 	}
 	if (unit->Boarded) {
 		CLprintf(file, " \"boarded\",");

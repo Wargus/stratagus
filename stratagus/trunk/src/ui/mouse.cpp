@@ -213,7 +213,7 @@ void DoRightButton(int sx, int sy)
 			if (unit->Type->Harvester) {
 				if (dest) {
 					// Return a loaded harvester to deposit
-					if (unit->Value > 0 &&
+					if (unit->ResourcesHeld > 0 &&
 							dest->Type->CanStore[unit->CurrentResource] &&
 							dest->Player == unit->Player) {
 						dest->Blink = 4;
@@ -223,7 +223,7 @@ void DoRightButton(int sx, int sy)
 					// Go and harvest from a building
 					if ((res = dest->Type->GivesResource) &&
 							unit->Type->ResInfo[res] &&
-							unit->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
+							unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
 							dest->Type->CanHarvest &&
 							(dest->Player == unit->Player ||
 								(dest->Player->Player == PlayerNumNeutral))) {
@@ -239,7 +239,7 @@ void DoRightButton(int sx, int sy)
 								IsMapFieldExplored(unit->Player, x, y) &&
 								ForestOnMap(x, y) &&
 								((unit->CurrentResource != res) ||
-									(unit->Value < unit->Type->ResInfo[res]->ResourceCapacity))) {
+									(unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity))) {
 							SendCommandResourceLoc(unit, x, y,flush);
 							break;
 						}
@@ -1029,7 +1029,7 @@ static int SendResource(int sx, int sy)
 			if (dest &&
 					(res = dest->Type->GivesResource) &&
 					unit->Type->ResInfo[res] &&
-					unit->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
+					unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
 					dest->Type->CanHarvest &&
 					(dest->Player == unit->Player ||
 						(dest->Player->Player == PlayerMax - 1))) {
@@ -1043,9 +1043,9 @@ static int SendResource(int sx, int sy)
 							unit->Type->ResInfo[res]->TerrainHarvester &&
 							IsMapFieldExplored(unit->Player, x, y) &&
 							ForestOnMap(x, y) &&
-							Selected[i]->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
+							Selected[i]->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
 							((unit->CurrentResource != res) ||
-								(unit->Value < unit->Type->ResInfo[res]->ResourceCapacity))) {
+								(unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity))) {
 						SendCommandResourceLoc(unit, x, y,
 							!(KeyModifiers & ModifierShift));
 						ret = 1;

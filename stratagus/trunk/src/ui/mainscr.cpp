@@ -316,10 +316,10 @@ static void DrawUnitInfo(const Unit* unit)
 			sprintf(buf, "%s Left:", DefaultResourceNames[type->GivesResource]);
 			VideoDrawText(x + 108 - VideoTextLength(GameFont, buf), y + 8 + 78,
 				GameFont, buf);
-			if (!unit->Value) {
+			if (!unit->ResourcesHeld) {
 				VideoDrawText(x + 108, y + 8 + 78, GameFont, "(none)");
 			} else {
-				VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->Value);
+				VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->ResourcesHeld);
 			}
 			if (unit->Orders[0].Action != UnitActionBuilded) {
 				return;
@@ -582,8 +582,8 @@ static void DrawUnitInfo(const Unit* unit)
 		DrawStats(x + 108, y + 8 + 125, stats->Speed, type->_Speed);
 
 		// FIXME: Ugly hack.
-		if (unit->Type->Harvester && unit->Value) {
-			sprintf(buf, "Carry: %d %s", unit->Value,
+		if (unit->Type->Harvester && unit->ResourcesHeld) {
+			sprintf(buf, "Carry: %d %s", unit->ResourcesHeld,
 				DefaultResourceNames[unit->CurrentResource]);
 			VideoDrawText(x + 61, y + 8 + 141, GameFont, buf);
 		}

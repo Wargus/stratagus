@@ -591,7 +591,7 @@ struct _unit_ {
 	int GroupId;        ///< unit belongs to this group id
 	int LastGroup;      ///< unit belongs to this last group
 
-	int Value;          ///< value used for much
+	int ResourcesHeld;      ///< Resources Held by a unit
 
 	unsigned SubAction : 8; ///< sub-action of unit
 	unsigned Wait;          ///< action counter
@@ -600,6 +600,8 @@ struct _unit_ {
 	unsigned Reset : 1;     ///< can process new command
 	unsigned Blink : 3;     ///< Let selection rectangle blink
 	unsigned Moving : 1;    ///< The unit is moving
+	unsigned ReCast : 1;    ///< Recast again next cycle
+
 	/** set to random 1..100 when MakeUnit()
 	** used for fancy buildings
 	*/

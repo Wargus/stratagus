@@ -1092,10 +1092,10 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 
 	// Resources.
 	if (type->GivesResource) {
-		unit->Variable[RESSOURCE_INDEX].Value = unit->Value;
+		unit->Variable[RESSOURCE_INDEX].Value = unit->ResourcesHeld;
 		unit->Variable[RESSOURCE_INDEX].Max = 655350; // FIXME use better value ?
 	} else if (type->Harvester && unit->CurrentResource) {
-		unit->Variable[RESSOURCE_INDEX].Value = unit->Value;
+		unit->Variable[RESSOURCE_INDEX].Value = unit->ResourcesHeld;
 		unit->Variable[RESSOURCE_INDEX].Max = type->ResInfo[unit->CurrentResource]->ResourceCapacity;
 	}
 
@@ -1970,7 +1970,7 @@ void DrawUnit(const Unit* unit)
 #endif
 	if (type->Harvester && unit->CurrentResource) {
 		resinfo = type->ResInfo[unit->CurrentResource];
-		if (unit->Value) {
+		if (unit->ResourcesHeld) {
 			if (resinfo->SpriteWhenLoaded) {
 				sprite = resinfo->SpriteWhenLoaded;
 #ifdef USE_OPENGL
