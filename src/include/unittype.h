@@ -233,8 +233,6 @@ extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
 extern UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
 extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
 extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
-extern UnitType*UnitTypeHumanFarm;	/// Human farm
-extern UnitType*UnitTypeOrcFarm;	/// Orc farm
 extern UnitType*UnitTypeHumanWall;	/// Human wall
 extern UnitType*UnitTypeOrcWall;	/// Orc wall
 extern UnitType*UnitTypeCritter;	/// Critter unit-type pointer

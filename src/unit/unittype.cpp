@@ -83,8 +83,6 @@ global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
 global UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
 global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
 global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
-global UnitType*UnitTypeHumanFarm;	/// Human farm
-global UnitType*UnitTypeOrcFarm;	/// Orc farm
 global UnitType*UnitTypeHumanWall;	/// Human wall
 global UnitType*UnitTypeOrcWall;	/// Orc wall
 global UnitType*UnitTypeCritter;	/// Critter unit type pointer
@@ -535,7 +533,8 @@ local void SaveUnitType(const UnitType* type,FILE* file)
 	,type->_Costs[OreCost]
 	,type->_Costs[StoneCost]
 	,type->_Costs[CoalCost]);
-    fprintf(file,"  ;;Tile    Box Size    >Attack\t<Attack\tReactC\tReactH\n");
+ 
+    fprintf(file,"  ;;Tile    Box Size    >Attack	<Attack	ReactC	ReactH\n");
     fprintf(file,"  '( %d %d ) '( %3d %3d ) %6d %7d %6d %7d\n"
 	,type->TileWidth
 	,type->TileHeight
@@ -546,7 +545,7 @@ local void SaveUnitType(const UnitType* type,FILE* file)
 	,type->ReactRangeComputer
 	,type->ReactRangeHuman);
 
-    fprintf(file,"  ;;Armor Prior\tDamage\tPierc\tWUpgr\tAUpgr\n");
+    fprintf(file,"  ;;Armor Prior	Damage	Pierc	WUpgr	AUpgr\n");
     fprintf(file,"  %6d %5d %6d %6d %7d %7d\n"
 	,type->_Armor
 	,type->Priority
@@ -555,11 +554,13 @@ local void SaveUnitType(const UnitType* type,FILE* file)
 	,type->WeaponsUpgradable
 	,type->ArmorUpgradable);
 
-    fprintf(file,"  ;;Decay Annoy\tPoints\n");
-    fprintf(file,"  %5d %6d %7d\n"
+    fprintf(file,"  ;;Decay Annoy\tPoints Food - +\n");
+    fprintf(file,"  %5d %6d %7d %5d %5d\n"
 	,type->DecayRate
 	,type->AnnoyComputerFactor
-	,type->Points);
+	,type->Points
+	,type->Demand
+	,type->Supply);
 
     fprintf(file,"  \"%s\"\n",type->Missile.Name);
     if( type->CorpseName ) {
@@ -949,11 +950,6 @@ global void InitUnitTypes(void)
 	//
 	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[type].Ident)
 		=&UnitTypes[type];
-
-	// FIXME: Should be made configurable
-	if( !UnitTypes[type].Building ) {
-	    UnitTypes[type].Demand=1;
-	}
     }
 
     //
@@ -970,23 +966,10 @@ global void InitUnitTypes(void)
     UnitTypeOrcWorkerWithGold=UnitTypeByIdent("unit-peon-with-gold");
     UnitTypeHumanWorkerWithWood=UnitTypeByIdent("unit-peasant-with-wood");
     UnitTypeOrcWorkerWithWood=UnitTypeByIdent("unit-peon-with-wood");
-    UnitTypeHumanFarm=UnitTypeByIdent("unit-farm");
-    UnitTypeOrcFarm=UnitTypeByIdent("unit-pig-farm");
     UnitTypeHumanWall=UnitTypeByIdent("unit-human-wall");
     UnitTypeOrcWall=UnitTypeByIdent("unit-orc-wall");
     UnitTypeCritter=UnitTypeByIdent("unit-critter");
     UnitTypeBerserker=UnitTypeByIdent("unit-berserker");
-
-    //
-    //	Setup some hard coded values. FIXME: should be moved to some configs.
-    //
-    UnitTypeHumanFarm->Supply=UnitTypeOrcFarm->Supply=4;
-    UnitTypeByIdent("unit-town-hall")->Supply=1;
-    UnitTypeByIdent("unit-great-hall")->Supply=1;
-    UnitTypeByIdent("unit-keep")->Supply=1;
-    UnitTypeByIdent("unit-stronghold")->Supply=1;
-    UnitTypeByIdent("unit-castle")->Supply=1;
-    UnitTypeByIdent("unit-fortress")->Supply=1;
 }
 
 /**
@@ -1194,8 +1177,6 @@ global void CleanUnitTypes(void)
     UnitTypeOrcWorkerWithGold=NULL;
     UnitTypeHumanWorkerWithWood=NULL;
     UnitTypeOrcWorkerWithWood=NULL;
-    UnitTypeHumanFarm=NULL;
-    UnitTypeOrcFarm=NULL;
     UnitTypeHumanWall=NULL;
     UnitTypeOrcWall=NULL;
     UnitTypeCritter=NULL;

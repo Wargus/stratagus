@@ -387,6 +387,22 @@ local SCM CclDefineUnitType(SCM list)
     DebugLevel3("\tPoints: %d\n",i);
     type->Points=i;
 
+    // Food demand
+    
+    list=gh_cdr(list);
+    value=gh_car(list);
+    i=gh_scm2int(value);
+    DebugLevel3("\tFood demand: %d\n",i);
+    type->Demand=i;
+    
+    // Food supply 
+    
+    list=gh_cdr(list);
+    value=gh_car(list);
+    i=gh_scm2int(value);
+    DebugLevel3("\tFood supply: %d\n",i);
+    type->Supply=i;
+    
     // Missile
 
     list=gh_cdr(list);
