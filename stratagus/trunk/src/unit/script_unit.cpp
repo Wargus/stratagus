@@ -754,6 +754,7 @@ local int CclUnit(lua_State* l)
 			unit->SeenFrame = -LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "not-seen")) {
 			unit->SeenFrame = UnitNotSeen;
+			--j;
 		} else if (!strcmp(value, "direction")) {
 			unit->Direction = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "attacked")) {
@@ -1461,7 +1462,7 @@ local int CclSlotUsage(lua_State* l)
 	prev = -1;
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
-		if (lua_isstring(l, j + 1) &&
+		if (lua_type(l, j + 1) == LUA_TSTRING &&
 				!strcmp((value = LuaToString(l, j + 1)), "-")) {
 			int range_end;
 
