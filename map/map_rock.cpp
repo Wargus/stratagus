@@ -346,4 +346,7 @@ global void MapRemoveRock(unsigned x, unsigned y)
 		MarkDrawPosMap(x, y);
 		MustRedraw |= RedrawMinimap;
 	}
+#ifdef MAP_REGIONS
+	MapSplitterTilesCleared(x, y, x, y);
+#endif
 }
