@@ -291,7 +291,8 @@ local SCM CclDefineGameSounds(SCM list)
 	name=gh_car(list);
 	list=gh_cdr(list);
 	if( !gh_symbol_p(name) ) {
-	    fprintf(stderr,__FUNCTION__": symbol expected\n");
+	    PrintFunction();
+	    fprintf(stdout,"Symbol expected\n");
 	    return list;
 	}
 	// prepare for next iteration

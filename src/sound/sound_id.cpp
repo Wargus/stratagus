@@ -77,9 +77,10 @@ global void DisplaySoundHashTable(void)
 {
     struct hash_st st;
 
-    fprintf(stderr,"Sound HashTable Begin\n");
-    fprintf(stderr,__FUNCTION__": FIXME: not written\n");
-    fprintf(stderr,"Sound HashTable End\n");
+    fprintf(stdout,"Sound HashTable Begin\n");
+    PrintFunction();
+    fprintf(stdout,"FIXME: not written\n");
+    fprintf(stdout,"Sound HashTable End\n");
 
     hash_stat(SoundIdHash, &st); 
     printf("nelem   : %d\n", st.nelem);

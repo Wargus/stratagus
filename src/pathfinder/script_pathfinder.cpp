@@ -87,7 +87,8 @@ local SCM CclAStarSetFixedUCC(SCM cost)
 
     i=gh_scm2int(cost);
     if( i<=0) {
-	fprintf(stderr,__FUNCTION__": Fixed unit crossing cost must be strictly positive\n");
+	PrintFunction();
+	fprintf(stdout,"Fixed unit crossing cost must be strictly positive\n");
 	i=TheMap.Width*TheMap.Height;
     }
     AStarFixedUnitCrossingCost=i;
@@ -104,7 +105,8 @@ local SCM CclAStarSetMovingUCC(SCM cost)
 
     i=gh_scm2int(cost);
     if( i<=0) {
-	fprintf(stderr,__FUNCTION__": Moving unit crossing cost must be strictly positive\n");
+	PrintFunction();
+	fprintf(stdout,"Moving unit crossing cost must be strictly positive\n");
 	i=1;
     }
     AStarMovingUnitCrossingCost=i;

@@ -248,7 +248,8 @@ local SCM CclFreeCraftMap(SCM list)
 local SCM CclRevealMap(void)
 {
     if( !CclInConfigFile ) {
-	fprintf(stderr,__FUNCTION__": only in config file supported\n");
+	PrintFunction();
+	fprintf(stdout,"Only supported within config file\n");
     }
     FlagRevealMap=1;
 
@@ -327,7 +328,8 @@ local SCM CclSetFogOfWarContrast(SCM contrast)
 
     i=gh_scm2int(contrast);
     if( i<0 || i>400 ) {
-	fprintf(stderr,__FUNCTION__": contrast should be 0-400\n");
+	PrintFunction();
+	fprintf(stdout,"Contrast should be 0-400\n");
 	i=100;
     }
     o=FogOfWarContrast;
@@ -350,7 +352,8 @@ local SCM CclSetFogOfWarBrightness(SCM brightness)
 
     i=gh_scm2int(brightness);
     if( i<-100 || i>100 ) {
-	fprintf(stderr,__FUNCTION__": brightness should be -100-100\n");
+	PrintFunction();
+	fprintf(stdout,"Brightness should be -100-100\n");
 	i=0;
     }
     o=FogOfWarBrightness;
@@ -373,7 +376,8 @@ local SCM CclSetFogOfWarSaturation(SCM saturation)
 
     i=gh_scm2int(saturation);
     if( i<-100 || i>200 ) {
-	fprintf(stderr,__FUNCTION__": saturation should be -100-200\n");
+	PrintFunction();
+	fprintf(stdout,"Saturation should be -100-200\n");
 	i=0;
     }
     o=FogOfWarSaturation;
@@ -400,7 +404,8 @@ local SCM CclSetForestRegeneration(SCM speed)
 
     i=gh_scm2int(speed);
     if( i<0 || i>255 ) {
-	fprintf(stderr,__FUNCTION__": regneration speed should be 0-255\n");
+	PrintFunction();
+	fprintf(stdout,"Regneration speed should be 0-255\n");
 	i=0;
     }
     o=ForestRegeneration;
@@ -423,7 +428,8 @@ local SCM CclSetGoldmineDepleted(SCM rate)
 
     i=gh_scm2int(rate);
     if( i<0 || i>100 ) {
-	fprintf(stderr,__FUNCTION__": deplated rate should be 0-100\n");
+	PrintFunction();
+	fprintf(stdout,"Deplated rate should be 0-100\n");
 	i=0;
     }
     o=OptionUseDepletedMines;
@@ -446,11 +452,13 @@ local SCM CclSetBurnBuildings(SCM percent,SCM rate)
     p=gh_scm2int(percent);
     r=gh_scm2int(rate);
     if( p<0 || p>100 ) {
-	fprintf(stderr,__FUNCTION__": burn percent should be 0-100\n");
+	PrintFunction();
+	fprintf(stdout,"Burn percent should be 0-100\n");
 	p=0;
     }
     if( r<=0 ) {
-	fprintf(stderr,__FUNCTION__": burn rate should be greater than 0\n");
+	PrintFunction();
+	fprintf(stderr,"Burn rate should be greater than 0\n");
 	p=0;
     }
     BurnBuildingPercent=p;

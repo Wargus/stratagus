@@ -593,7 +593,8 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 
     n=sizeof(struct sockaddr_in);
     if( (l=recvfrom(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,&n))<0 ) {
-	fprintf(stderr,__FUNCTION__": Could not read from UDP socket\n");
+	PrintFunction();
+	fprintf(stdout,"Could not read from UDP socket\n");
 	return -1;
     }
 
