@@ -262,7 +262,7 @@ global Graphic* MakeGraphic(SDL_Surface* surface)
 **
 **  @param graphic  Pointer to object
 */
-global void FlipGraphic(Graphic* graphic)
+global void FlipGraphic(Graphic* g)
 {
 #ifdef USE_OPENGL
 	return;
@@ -271,21 +271,23 @@ global void FlipGraphic(Graphic* graphic)
 	int j;
 	SDL_Surface* s;
 
-	s = graphic->SurfaceFlip = SDL_ConvertSurface(graphic->Surface,
-		graphic->Surface->format, SDL_SWSURFACE);
-	if (graphic->SurfaceFlip->format->BytesPerPixel == 1) {
-		VideoPaletteListAdd(graphic->SurfaceFlip);
+	s = g->SurfaceFlip = SDL_ConvertSurface(g->Surface,
+		g->Surface->format, SDL_SWSURFACE);
+	SDL_SetColorKey(g->SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
+		g->Surface->format->colorkey);
+	if (g->SurfaceFlip->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(g->SurfaceFlip);
 	}
 
-	SDL_LockSurface(graphic->Surface);
+	SDL_LockSurface(g->Surface);
 	SDL_LockSurface(s);
 	for (i = 0; i < s->h; ++i) {
 		for (j = 0; j < s->w; ++j) {
 			((char*)s->pixels)[j + i * s->pitch] =
-				((char*)graphic->Surface->pixels)[s->w - j - 1 + i * graphic->Surface->pitch];
+				((char*)g->Surface->pixels)[s->w - j - 1 + i * g->Surface->pitch];
 		}
 	}
-	SDL_UnlockSurface(graphic->Surface);
+	SDL_UnlockSurface(g->Surface);
 	SDL_UnlockSurface(s);
 #endif
 }
