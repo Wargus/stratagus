@@ -28,7 +28,7 @@
     /// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion	3
     /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	1
+#define NetworkProtocolPatchLevel	2
     /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
@@ -71,6 +71,23 @@ typedef struct _init_message_ {
     
     NetworkHost	   Hosts[PlayerMax];	/// Participant information.
 } InitMessage;
+
+/**
+**	Network init config message subtypes (menu state machine).
+*/
+enum _ic_message_subtype_ {
+    ICMHello,				/// Client Request
+    ICMConfig,				/// Setup message configure clients
+
+    ICMEngineMismatch,			/// FreeCraft engine version doesn't match
+    ICMProtocolMismatch,		/// Network protocol version doesn't match
+    ICMEngineConfMismatch,		/// Engine configuration isn't identical
+    ICMMapUidMismatch,			/// MAP Uid  doesn't match
+
+    ICMGameFull,			/// No player slots available
+
+    ICMServerQuit,			/// Server has quit game
+};
 
 /*----------------------------------------------------------------------------
 --	Variables
