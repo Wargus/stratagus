@@ -68,12 +68,6 @@
 */
 void DrawMenuButtonArea(void)
 {
-	if (TheUI.MenuPanel.Graphic) {
-		VideoDrawSub(TheUI.MenuPanel.Graphic, 0, 0,
-			TheUI.MenuPanel.Graphic->Width,
-			TheUI.MenuPanel.Graphic->Height,
-			TheUI.MenuPanelX, TheUI.MenuPanelY);
-	}
 	if (!IsNetworkGame()) {
 		if (TheUI.MenuButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.

@@ -96,7 +96,6 @@ static void CleanUIGraphics(UI* ui)
 
 	VideoSafeFree(ui->InfoPanel.Graphic);
 	VideoSafeFree(ui->ButtonPanel.Graphic);
-	VideoSafeFree(ui->MenuPanel.Graphic);
 	VideoSafeFree(ui->MinimapPanel.Graphic);
 	VideoSafeFree(ui->StatusLine.Graphic);
 	VideoSafeFree(ui->PieMenuBackground.Graphic);
@@ -231,9 +230,6 @@ void LoadUserInterface(void)
 		TheUI.PieMenuBackground.Graphic =
 			LoadGraphic(TheUI.PieMenuBackground.File);
 	}
-	if (TheUI.MenuPanel.File) {
-		TheUI.MenuPanel.Graphic = LoadGraphic(TheUI.MenuPanel.File);
-	}
 	if (TheUI.MinimapPanel.File) {
 		TheUI.MinimapPanel.Graphic = LoadGraphic(TheUI.MinimapPanel.File);
 	}
@@ -350,9 +346,6 @@ void CleanUI(UI* ui)
 
 	// Button Panel
 	free(ui->ButtonPanel.File);
-
-	// Menu Button
-	free(ui->MenuPanel.File);
 
 	// Pie Menu
 	free(ui->PieMenuBackground.File);
