@@ -120,7 +120,7 @@ local void PrintAiHelperTable(void)
 #endif
 
 /**
-**	Define helper for Ai.
+**	Define helper for AI.
 **
 **	@param list	List of all helpers.
 **
@@ -297,7 +297,7 @@ local SCM CclDefineAiHelper(SCM list)
 }
 
 /**
-**	Define an Ai engine.
+**	Define an AI engine.
 */
 local SCM CclDefineAi(SCM list)
 {
@@ -380,7 +380,7 @@ local SCM CclDefineAi(SCM list)
 }
 
 /*----------------------------------------------------------------------------
---	Ai script functions
+--	AI script functions
 ----------------------------------------------------------------------------*/
 
     /// Get unit-type.
@@ -800,7 +800,7 @@ local SCM CclAiUpgradeTo(SCM value)
 }
 
 /**
-**	Simple restart the ai.
+**	Simple restart the AI.
 */
 local SCM CclAiRestart(void)
 {
@@ -830,7 +830,7 @@ local SCM CclAiPlayer(void)
 }
 
 /**
-**	Set ai player resource reserve.
+**	Set AI player resource reserve.
 **
 **	@param vec	Resources vector
 **	@return		Old resource vector
@@ -846,6 +846,27 @@ local SCM CclAiSetReserve(SCM vec)
     }
     for( i=0; i<MaxCosts; ++i ) {
 	AiPlayer->Reserve[i]=gh_scm2int(gh_vector_ref(vec,gh_int2scm(i)));
+    }
+    return old;
+}
+
+/**
+**	Set AI player resource collect percent.
+**
+**	@param vec	Resources vector
+**	@return		Old resource vector
+*/
+local SCM CclAiSetCollect(SCM vec)
+{
+    int i;
+    SCM old;
+
+    old=cons_array(gh_int2scm(MaxCosts),NIL);
+    for( i=0; i<MaxCosts; ++i ) {
+	aset1(old,gh_int2scm(i),gh_int2scm(AiPlayer->Collect[i]));
+    }
+    for( i=0; i<MaxCosts; ++i ) {
+	AiPlayer->Collect[i]=gh_scm2int(gh_vector_ref(vec,gh_int2scm(i)));
     }
     return old;
 }
@@ -954,7 +975,7 @@ local SCM CclDefineAiWcNames(SCM list)
 #else
 
 /**
-**	Define helper for Ai.
+**	Define helper for AI.
 */
 local SCM CclDefineAiHelper(SCM list)
 {
@@ -962,7 +983,7 @@ local SCM CclDefineAiHelper(SCM list)
 }
 
 /**
-**	Define an Ai engine.
+**	Define an AI engine.
 */
 local SCM CclDefineAi(SCM list)
 {
@@ -1001,6 +1022,7 @@ global void AiCclRegister(void)
 
     gh_new_procedure0_0("ai:player",CclAiPlayer);
     gh_new_procedure1_0("ai:set-reserve!",CclAiSetReserve);
+    gh_new_procedure1_0("ai:set-collect!",CclAiSetCollect);
 
     gh_new_procedure0_0("ai:dump",CclAiDump);
 
