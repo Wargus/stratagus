@@ -36,7 +36,7 @@
 **		first.
 **
 **
-**      @subsection VideoMain Video main initialization
+**      @section VideoMain Video main initialization
 **
 **              The general setup of platform dependent video and basic video
 **		functionalities is done with function @see InitVideo
@@ -48,7 +48,7 @@
 **		@see video.h @see video.c
 **
 **
-**      @subsection Deco Decorations
+**      @section Deco Decorations
 **
 **		A mechanism beteen the Freecraft engine and draw routines
 **		to make a screen refresh/update faster and accurate.
@@ -60,7 +60,7 @@
 **              @see deco.h @see deco.c
 **
 **
-**      @subsection VideoModuleHigh High Level - video dependent functions
+**      @section VideoModuleHigh High Level - video dependent functions
 **
 **		These are the video platforms that are supported, any platform
 **		dependent settings/functionailty are located within each
@@ -83,7 +83,7 @@
 **		@see wince.c
 **
 **
-**      @subsection VideoModuleLow  Low Level - draw functions
+**      @section VideoModuleLow  Low Level - draw functions
 **
 **		All direct drawing functions
 **
@@ -93,7 +93,6 @@
 **              @see linedraw.c
 **              @see sprite.c
 */
-
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -234,7 +233,7 @@ global VMemType* VideoMemory;
     **	Architecture-dependant system palette. Applies as conversion between
     **	GlobalPalette colors and their representation in videomemory.
     **	Set by VideoCreatePalette or VideoSetPalette.
-    **	@see VideoCreatePalette @VideoSetPalette
+    **	@see VideoCreatePalette @see VideoSetPalette
     */
 global VMemType* Pixels;
 
@@ -302,8 +301,10 @@ global void (*ColorCycle)(void);
 **	@param top	Top Y screen coordinate.
 **	@param right	Right X screen coordinate.
 **	@param bottom	Bottom Y screen coordinate.
+**
+**	@todo remove the limits checks
 */
-global void SetClipping(int left,int top,int right,int bottom)
+global void SetClipping(int left, int top, int right, int bottom)
 {
     IfDebug(
 	if( left>right || top>bottom || left<0 || left>=VideoWidth
@@ -314,23 +315,42 @@ global void SetClipping(int left,int top,int right,int bottom)
     );
 
     // Note this swaps the coordinates, if wrong ordered
-    if( left>right ) { left^=right; right^=left; left^=right; }
-    if( top>bottom ) { top^=bottom; bottom^=top; top^=bottom; }
+    if (left > right) {
+	left ^= right;
+	right ^= left;
+	left ^= right;
+    }
+    if (top > bottom) {
+	top ^= bottom;
+	bottom ^= top;
+	top ^= bottom;
+    }
 
     // Limit to video width, NOTE: this should check the caller
-    if( left<0 )			left=0;
-    else if( left>=VideoWidth )		left=VideoWidth-1;
-    if( top<0 )				top=0;
-    else if( top>=VideoHeight )		top=VideoHeight-1;
-    if( right<0 )			right=0;
-    else if( right>=VideoWidth )	right=VideoWidth-1;
-    if( bottom<0 )			bottom=0;
-    else if( bottom>=VideoHeight )	bottom=VideoHeight-1;
+    if (left < 0) {
+	left = 0;
+    } else if (left >= VideoWidth) {
+	left = VideoWidth - 1;
+    if (top < 0) {
+	top = 0;
+    else if (top >= VideoHeight) {
+	top = VideoHeight - 1;
+    }
+    if (right < 0) {
+	right = 0;
+    } else if (right >= VideoWidth) {
+	right = VideoWidth - 1;
+    }
+    if (bottom < 0) {
+	bottom = 0;
+    } else if (bottom >= VideoHeight) {
+	bottom = VideoHeight - 1;
+    }
 
-    ClipX1=left;
-    ClipY1=top;
-    ClipX2=right;
-    ClipY2=bottom;
+    ClipX1 = left;
+    ClipY1 = top;
+    ClipX2 = right;
+    ClipY2 = bottom;
 }
 
 /**
