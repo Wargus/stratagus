@@ -165,6 +165,10 @@ The only actions I support for the start are.
 	Start the countdown timer.
 (action-stop-timer)
 	Stop the countdown timer.
+(add-message "Bla bla bla")
+	Show message in message area, is not automatic split at screen end!
+(play-file "voice.ogg")
+	Play a story voice file.
 
 Some examples:
 
