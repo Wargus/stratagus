@@ -48,12 +48,6 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-//
-//	Convert heading into direction.
-//			      //  N NE  E SE  S SW  W NW
-local const int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
-local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
-
 /*----------------------------------------------------------------------------
 --	Function
 ----------------------------------------------------------------------------*/
@@ -282,15 +276,11 @@ global void HandleActionMove(Unit* unit)
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;
 	NewResetPath(unit);
-	//
-	//	FIXME: should use a reachable place to reduce pathfinder time.
-	//
-	IfDebug(
-	if( !PlaceReachable(unit,unit->Orders[0].X,unit->Orders[0].Y,1) ) {
-	    DebugLevel0Fn("FIXME: should use other goal.\n");
-	});
+				    
 	DebugCheck( unit->State!=0 );
     }
+
+    // FIXME: (mr-russ) Make a reachable goal here with GoalReachable...
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
@@ -298,8 +288,11 @@ global void HandleActionMove(Unit* unit)
 	    //	Some tries to reach the goal
 	    //
 	    if( unit->SubAction++<10 ) {
+	        // FIXME: If it's not reachable, It's not
 		//	To keep the load low, retry delayed.
 		unit->Wait=CYCLES_PER_SECOND/10+unit->SubAction;
+		unit->Orders[0].RangeX++;
+		unit->Orders[0].RangeY++;
 		// FIXME: Now the units didn't defend themself :(((((((
 		break;
 	    }

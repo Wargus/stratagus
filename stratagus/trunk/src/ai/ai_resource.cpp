@@ -1113,7 +1113,7 @@ local int AiHarvest(Unit * unit)
 		//
 		//	Look if there is wood
 		//
-		if ( ForestOnMap(x,y) ) {
+		if ( CheckedForestOnMap(x,y) ) {
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
 			if( n<bestd ) {

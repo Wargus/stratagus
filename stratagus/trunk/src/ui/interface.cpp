@@ -55,6 +55,7 @@
 #include "iolib.h"
 #include "pud.h"
 #include "commands.h"
+#include "ai.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -1056,6 +1057,19 @@ global int HandleCheats(const char* Input)
 	} else {
 	    SetMessage("God Mode OFF");
 	}
+#ifdef DEBUG
+    } else if (!strcmp(Input, "ai me") ) {
+	if( ThisPlayer->AiEnabled ) {
+	    ThisPlayer->AiEnabled = 0;
+	    SetMessage("AI is off, Normal Player");
+	} else {
+	    ThisPlayer->AiEnabled = 1;
+	    if( !ThisPlayer->Ai ) {
+	    	AiInit( ThisPlayer );
+	    }
+	    SetMessage("I'm and AI Now :)");
+	}
+#endif
     } else {
 	ret = 0;
     }
@@ -1093,7 +1107,11 @@ local int InputKey(int key)
 	    }
 	    
 	    // Check for Replay and ffw x
+#ifdef DEBUG
+	    if (strncmp(Input,"ffw ",4) == 0 ) {
+#else
 	    if (strncmp(Input,"ffw ",4) == 0 && ReplayGameType != ReplayNone) {
+#endif
 		FastForwardCycle = atoi(&Input[4]);
 	    }
 	    

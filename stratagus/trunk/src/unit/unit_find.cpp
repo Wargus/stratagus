@@ -646,7 +646,7 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 **      @note   Limited to attack range smaller than 16.
 **	@note	Will be moved to unit_ai.c soon.
 */
-local Unit* FindRangeAttack(const Unit* u, int range)
+local Unit* FindRangeAttack(Unit* u, int range)
 {
     int x, y, n, cost,d,effective_hp,enemy_count;
     int missile_range,attackrange,hp_damage_evaluate;
@@ -898,7 +898,7 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 **
 **	@note	This could be improved, for better performance.
 */
-global Unit* AttackUnitsInDistance(const Unit* unit,int range)
+global Unit* AttackUnitsInDistance(Unit* unit,int range)
 {
     const Unit* dest;
     const UnitType* type;
@@ -914,6 +914,8 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
     const Player* player;
     const Unit* best_unit;
     int best_cost;
+    int tried_units;
+    int reachable;
 
     DebugLevel3Fn("(%d)%s\n" _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
@@ -932,10 +934,12 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
 
     best_unit=NoUnitP;
     best_cost=INT_MAX;
+    tried_units=0;
 
     player=unit->Player;
     type=unit->Type;
     attackrange=unit->Stats->AttackRange;
+
     //
     //	Find the best unit to attack
     //
@@ -997,10 +1001,19 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
 	//
 	//	Take this target?
 	//
-	if( cost<best_cost
-		&& (d<attackrange || UnitReachable(unit,dest,attackrange)) ) {
-	    best_unit=dest;
-	    best_cost=cost;
+	// If we failed 5 times, we probably can't get anything
+	if( tried_units >= 5 && best_cost == INT_MAX ) {
+	    best_unit=NULL;
+	    break;
+	}
+	if( cost<best_cost ) {
+	    reachable = UnitReachable(unit,dest,attackrange);
+	    if( d<attackrange || reachable ) {
+		best_unit=dest;
+		best_cost=cost;
+	    } else {
+		tried_units++;
+	    }
 	}
     }
 
@@ -1022,7 +1035,7 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
 **
 **	@return		Pointer to unit which should be attacked.
 */
-global Unit* AttackUnitsInRange(const Unit* unit)
+global Unit* AttackUnitsInRange(Unit* unit)
 {
     //
     //	Only units which can attack.
@@ -1046,7 +1059,7 @@ global Unit* AttackUnitsInRange(const Unit* unit)
 **
 **	@return		Pointer to unit which should be attacked.
 */
-global Unit* AttackUnitsInReactRange(const Unit* unit)
+global Unit* AttackUnitsInReactRange(Unit* unit)
 {
     int range;
     const UnitType* type;
