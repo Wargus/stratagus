@@ -494,6 +494,8 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 	case SDL_ACTIVEEVENT:
 	    DebugLevel3("\tFocus changed\n");
 	    InMainWindow = !InMainWindow;
+	    if (!InMainWindow)
+		HandleMouseExit();
 	    if (!event->active.state) {
                 InputMouseExit(callbacks,SDL_GetTicks());
 	    }
