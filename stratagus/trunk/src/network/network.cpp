@@ -428,7 +428,6 @@ global void InitNetwork1(void)
 	}
     }
 
-#ifdef NEW_NETMENUS
     NetworkNumInterfaces = NetSocketAddr(NetworkFildes);
     if (NetworkNumInterfaces) {
 	DebugLevel0Fn("Num IP: %d\n" _C_ NetworkNumInterfaces);
@@ -440,7 +439,6 @@ global void InitNetwork1(void)
 	ExitNetwork1();
 	return;
     }
-#endif
 
     IfDebug({
 	char buf[128];

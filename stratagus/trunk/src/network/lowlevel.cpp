@@ -111,7 +111,6 @@ global int NetInit(void)
     WSADATA wsaData;
 
     // Start up the windows networking
-#ifdef NEW_NETMENUS
     // ARI: well, I need winsock2 for SIO_GET_INTERFACE_LIST..
     // some day this needs to be rewritten using wsock32.dll's WsControl(),
     // so that we can support Windows 95 with only winsock 1.1..
@@ -120,7 +119,7 @@ global int NetInit(void)
 	fprintf(stderr,"Couldn't initialize Winsock 2\n");
 	return -1;
     }
-#else
+#if 0	// sorry, Winsock 1 not sufficient yet //
     if ( WSAStartup(MAKEWORD(1,1), &wsaData) ) {
 	fprintf(stderr,"Couldn't initialize Winsock 1.1\n");
 	return -1;
@@ -210,7 +209,6 @@ global unsigned long NetResolveHost(const char* host)
     return INADDR_NONE;
 }
 
-#ifdef NEW_NETMENUS
 /**
 **	Get IP-addrs of local interfaces from Network file descriptor
 **	and store them in the NetLocalAddrs array.
@@ -343,7 +341,6 @@ global int NetSocketAddr(const int sock)
 }
 #endif
 #endif	// } !USE_WINSOCK
-#endif
 
 /**
 **	Open an UDP Socket port.
