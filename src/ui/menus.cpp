@@ -3780,18 +3780,26 @@ local void MultiGameFWSAction(Menuitem *mi, int i)
 	    case 0:
 		TheMap.NoFogOfWar = 0;
 		FlagRevealMap = 0;
+		GameSettings.NoFogOfWar = 0;
+		GameSettings.RevealMap = 0;
 		break;
 	    case 1:
 		TheMap.NoFogOfWar = 1;
 		FlagRevealMap = 0;
+		GameSettings.NoFogOfWar = 1;
+		GameSettings.RevealMap = 0;
 		break;
 	    case 2:
 		TheMap.NoFogOfWar = 0;
 		FlagRevealMap = 1;
+		GameSettings.NoFogOfWar = 0;
+		GameSettings.RevealMap = 1;
 		break;
 	    case 3:
 		TheMap.NoFogOfWar = 1;
 		FlagRevealMap = 1;
+		GameSettings.NoFogOfWar = 1;
+		GameSettings.RevealMap = 1;
 		break;
 	}
 	ServerSetupState.FwsOpt = i;

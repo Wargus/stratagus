@@ -152,6 +152,9 @@ local void LoadMap(const char* filename,WorldMap* map)
 --	Game creation
 ----------------------------------------------------------------------------*/
 
+/**
+**	Free for all
+*/
 local void GameTypeFreeForAll(void)
 {
     int i;
@@ -166,6 +169,9 @@ local void GameTypeFreeForAll(void)
     }
 }
 
+/**
+**	Top vs Bottom
+*/
 local void GameTypeTopVsBottom(void)
 {
     int i;
@@ -189,6 +195,9 @@ local void GameTypeTopVsBottom(void)
     }
 }
 
+/**
+**	Left vs Right
+*/
 local void GameTypeLeftVsRight(void)
 {
     int i;
@@ -483,6 +492,12 @@ global void CreateGame(char* filename, WorldMap* map)
 global void InitSettings(void)
 {
     int i;
+
+    if (RestartScenario) {
+	TheMap.NoFogOfWar = GameSettings.NoFogOfWar;
+	FlagRevealMap = GameSettings.RevealMap;
+	return;
+    }
 
     for (i = 0; i < PlayerMax; i++) {
 	GameSettings.Presets[i].Race = SettingsPresetMapDefault;

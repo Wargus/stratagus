@@ -68,6 +68,8 @@ struct _settings_ {
     unsigned	Opponents;		/// Preset # of ai-opponents
     unsigned	Terrain;		/// Terrain type (summer,winter,...)
     unsigned	GameType;		/// Game type (melee, free for all,...)
+    unsigned	NoFogOfWar;		/// No fog of war
+    unsigned	RevealMap;		/// Reveal map
 };
 
 #define SettingsPresetMapDefault	(~0ul)	/// Special: Use pud/cm supplied
