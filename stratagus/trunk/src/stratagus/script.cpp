@@ -893,7 +893,7 @@ local int CclLoadMap(lua_State* l)
 **
 **		@param command		Zero terminated command string.
 */
-global void CclCommand(const char* command)
+global int CclCommand(const char* command)
 {
 	int status;
 
