@@ -878,8 +878,6 @@ global void CommandTrainUnit(Unit* unit, UnitType* type,
 	//	Not already training?
 	//
 	if (unit->Orders[0].Action != UnitActionTrain) {
-	    DebugCheck(unit->Wait > 6);
-
 	    if (unit->OrderCount == 2 && unit->Orders[1].Action == UnitActionTrain) {
 		DebugLevel0Fn("FIXME: not supported. Unit queue full!\n");
 		return;
@@ -965,7 +963,7 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 	    }
 	    if (!slot) {		// Canceled in work slot
 		unit->Data.Train.Ticks = 0;
-		unit->Wait =  unit->Reset = 1;	// immediately start next training
+		unit->Wait = unit->Reset = 1;	// immediately start next training
 	    }
 	    unit->Data.Train.Count = n;
 	} else {
