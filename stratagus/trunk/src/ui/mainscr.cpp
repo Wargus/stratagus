@@ -203,9 +203,7 @@ global void DrawUnitInfo(const Unit* unit)
     }
 
     // FIXME: allow without button
-    //if (TheUI.SingleSelectedButton) {
-    DebugCheck(!TheUI.SingleSelectedButton);
-    if (1) {
+    if (TheUI.SingleSelectedButton) {
 	x = TheUI.SingleSelectedButton->X;
 	y = TheUI.SingleSelectedButton->Y;
 	DrawUnitIcon(unit->Player, type->Icon.Icon,
@@ -213,13 +211,13 @@ global void DrawUnitInfo(const Unit* unit)
 		(IconActive | (MouseButtons & LeftButton)) : 0,
 	    x, y);
 	UiDrawLifeBar(unit, x, y);
-    }
 
-    if (unit->Player == ThisPlayer) {	// Only for own units.
-	if (unit->HP && unit->HP < 10000) {
-	    sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
-	    VideoDrawTextCentered(x + (type->Icon.Icon->Width + 7) / 2,
-		y + type->Icon.Icon->Height + 7 + 7 + 3, SmallFont, buf);
+	if (unit->Player == ThisPlayer) {	// Only for own units.
+	    if (unit->HP && unit->HP < 10000) {
+		sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
+		VideoDrawTextCentered(x + (type->Icon.Icon->Width + 7) / 2,
+		    y + type->Icon.Icon->Height + 7 + 7 + 3, SmallFont, buf);
+	    }
 	}
     }
 
