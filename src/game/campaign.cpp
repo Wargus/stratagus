@@ -79,25 +79,25 @@ global const char CampaignType[] = "campaign-type";
 */
 global char* NextChapter(void)
 {
-    if (RestartScenario) {
+    if( RestartScenario ) {
 	RestartScenario=0;
 	return CurrentMapPath;
     }
-    if ( QuitToMenu ) {
+    if( QuitToMenu ) {
 	QuitToMenu=0;
 	CurrentCampaign=NULL;
 	return NULL;
     }
-    if (!CurrentCampaign) {
+    if( !CurrentCampaign ) {
 	return NULL;
     }
-    if (!CurrentChapter) {
+    if( !CurrentChapter ) {
 	return NULL;
     }
 
     CurrentChapter->Result = GameResult;
 
-    if (GameResult == GameVictory) {
+    if( GameResult == GameVictory ) {
 	//
 	//  FIXME: do other chapter types.
 	//
@@ -119,7 +119,7 @@ global char* NextChapter(void)
 	// FIXME: handle defeat
     }
 
-    if (!CurrentChapter) {
+    if( !CurrentChapter ) {
 	return NULL;
     }
 
@@ -140,16 +140,16 @@ global void PlayCampaign(const char* name)
     //
     //  Find the campaign.
     //
-    for (i = 0; i < NumCampaigns; ++i) {
-	if (!strcmp(Campaigns[i].Ident, name)) {
+    for( i=0; i<NumCampaigns; ++i ) {
+	if( !strcmp(Campaigns[i].Ident, name) ) {
 	    CurrentCampaign = Campaigns + i;
 	}
     }
-    if (!CurrentCampaign) {
+    if( !CurrentCampaign ) {
 	return;
     }
 
-    if (!CurrentCampaign->Chapters) {
+    if( !CurrentCampaign->Chapters ) {
 	char buf[1024];
 	filename=LibraryFileName(CurrentCampaign->File,buf);
 	vload(filename, 0, 1);
@@ -157,11 +157,11 @@ global void PlayCampaign(const char* name)
 
     GameIntro.Objectives[0]=strdup(DefaultObjective);
 
-    CurrentChapter = CurrentCampaign->Chapters;
+    CurrentChapter=CurrentCampaign->Chapters;
     SkipCurrentChapter=0;
     GameResult=GameVictory;
 
-    filename = NextChapter();
+    filename=NextChapter();
     DebugCheck(!filename);
 
     SkipCurrentChapter=1;
@@ -252,6 +252,41 @@ local void ParseShowPicture(CampaignChapter *chapter,SCM list)
 }
 
 /**
+**	Free campaign chapters.
+**
+**	@param chapters	    Chapters to be freed.
+*/
+local void FreeChapters(CampaignChapter** chapters)
+{
+    CampaignChapter* ch;
+    CampaignChapter* chptr;
+    ChapterPictureText* text;
+    ChapterPictureText* textptr;
+
+    ch=*chapters;
+    while( ch ) {
+	if( ch->Type==ChapterShowPicture ) {
+	    free(ch->Data.Picture.Image);
+	    text=ch->Data.Picture.Text;
+	    while( text ) {
+		free(text->Text);
+		textptr=text;
+		text=text->Next;
+		free(textptr);
+	    }
+	} else if( ch->Type==ChapterPlayLevel ) {
+	    free(ch->Data.Level.Name);
+	} else if( ch->Type==ChapterPlayVideo ) {
+	    free(ch->Data.Movie.PathName);
+	}
+	chptr=ch;
+	ch=ch->Next;
+	free(chptr);
+    }
+    *chapters=NULL;
+}
+
+/**
 **	Define a campaign.
 **
 **	@param list	List describing the campaign.
@@ -279,8 +314,7 @@ local SCM CclDefineCampaign(SCM list)
 	for( i=0; i<NumCampaigns; ++i ) {
 	    if( !strcmp(Campaigns[i].Ident, ident) ) {
 		if( Campaigns[i].Chapters ) {
-		    free(ident);
-		    return SCM_UNSPECIFIED;
+		    FreeChapters(&Campaigns[i].Chapters);
 		}
 		campaign=Campaigns+i;
 		free(campaign->Ident);
@@ -292,7 +326,7 @@ local SCM CclDefineCampaign(SCM list)
 	if( i==NumCampaigns ) {
 	    Campaigns=realloc(Campaigns,sizeof(Campaign)*(NumCampaigns+1));
 	    campaign=Campaigns+NumCampaigns;
-	    NumCampaigns++;
+	    ++NumCampaigns;
 	}
     } else {
 	campaign=Campaigns=malloc(sizeof(Campaign));
@@ -363,6 +397,35 @@ local SCM CclDefineCampaign(SCM list)
 }
 
 /**
+**	Set the current campaign chapter
+**
+**	@param num	Number of current chapter in current campaign.
+*/
+local SCM CclSetCurrentChapter(SCM num)
+{
+    int i;
+
+    for( i=0; i<NumCampaigns; ++i ) {
+	if( !strcmp(Campaigns[i].Ident, "current") ) {
+	    CurrentCampaign=Campaigns+i;
+	    break;
+	}
+    }
+    if( !CurrentCampaign ) {
+	return SCM_UNSPECIFIED;
+    }
+
+    i=gh_scm2int(num);
+    CurrentChapter=CurrentCampaign->Chapters;
+    while( i && CurrentChapter ) {
+	--i;
+	CurrentChapter=CurrentChapter->Next;
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Set the briefing.
 **
 **	@param list	List describing the briefing.
@@ -389,25 +452,25 @@ local SCM CclBriefing(SCM list)
 	       errl("Unsupported briefing type",value);
 	    }
 	    list=gh_cdr(list);
-	} else if ( gh_eq_p(value,gh_symbol2scm("title")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("title")) ) {
 	    if( GameIntro.Title ) {
 		free(GameIntro.Title);
 	    }
 	    GameIntro.Title=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
-	} else if ( gh_eq_p(value,gh_symbol2scm("background")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("background")) ) {
 	    if( GameIntro.Background ) {
 		free(GameIntro.Background);
 	    }
 	    GameIntro.Background=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
-	} else if ( gh_eq_p(value,gh_symbol2scm("text")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
 	    if( GameIntro.TextFile ) {
 		free(GameIntro.TextFile);
 	    }
 	    GameIntro.TextFile=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
-	} else if ( gh_eq_p(value,gh_symbol2scm("voice")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("voice")) ) {
 	    if( voice==MAX_BRIEFING_VOICES ) {
 		   errl("too much voices",value);
 	    }
@@ -417,7 +480,7 @@ local SCM CclBriefing(SCM list)
 	    GameIntro.VoiceFile[voice]=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	    ++voice;
-	} else if ( gh_eq_p(value,gh_symbol2scm("objective")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("objective")) ) {
 	    if( objective==MAX_OBJECTIVES ) {
 		   errl("too much objectives",value);
 	    }
@@ -442,17 +505,96 @@ local SCM CclBriefing(SCM list)
 global void CampaignCclRegister(void)
 {
     gh_new_procedureN("define-campaign",CclDefineCampaign);
+    gh_new_procedure1_0("set-current-chapter!",CclSetCurrentChapter);
     gh_new_procedureN("briefing",CclBriefing);
 }
+
+/**
+**	FIXME: should use the names of the real fonts.
+*/
+local char *FontNames[] = {
+    "small",
+    "game",
+    "large",
+    "small-title",
+    "large-title",
+    "user1",
+    "user2",
+    "user3",
+    "user4",
+    "user5",
+};
 
 /**
 **	Save the campaign module.
 */
 global void SaveCampaign(FILE* file)
 {
+    CampaignChapter *ch;
+    ChapterPictureText *text;
+    int i;
+
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: campaign $Id$\n\n");
-    fprintf(file,";;; FIXME: Save not written\n\n");
+    if( !CurrentCampaign ) {
+	return;
+    }
+
+    fprintf(file,"(define-campaign 'current");
+    if( CurrentCampaign->Name ) {
+	fprintf(file," 'name \"%s\"",CurrentCampaign->Name);
+    }
+    fprintf(file," 'players %d",CurrentCampaign->Players);
+    fprintf(file,"\n");
+
+    fprintf(file,"  'campaign (list\n");
+    for( ch=CurrentCampaign->Chapters; ch; ch=ch->Next ) {
+	if( ch->Type == ChapterShowPicture ) {
+	    fprintf(file,"    'show-picture (list\n");
+	    fprintf(file,"      'image \"%s\"\n",ch->Data.Picture.Image);
+	    fprintf(file,"      'fade-in %d\n",ch->Data.Picture.FadeIn);
+	    fprintf(file,"      'fade-out %d\n",ch->Data.Picture.FadeOut);
+	    fprintf(file,"      'display-time %d\n",
+		ch->Data.Picture.DisplayTime);
+	    for( text=ch->Data.Picture.Text; text; text=text->Next ) {
+		fprintf(file,"      'text (list\n");
+		fprintf(file,"        'font '%s\n",FontNames[text->Font]);
+		fprintf(file,"        'x %d\n",text->X);
+		fprintf(file,"        'y %d\n",text->Y);
+		fprintf(file,"        'width %d\n",text->Width);
+		fprintf(file,"        'height %d\n",text->Height);
+		if (text->Align == PictureTextAlignLeft) {
+		    fprintf(file,"        'align 'left\n");
+		} else {
+		    fprintf(file,"        'align 'center\n");
+		}
+		fprintf(file,"        'text \"%s\"\n",text->Text);
+		fprintf(file,"      )\n");
+	    }
+	    fprintf(file,"    )\n");
+	} else if( ch->Type == ChapterPlayLevel ) {
+	    fprintf(file,"    'play-level \"%s\"\n",ch->Data.Level.Name);
+	} else if( ch->Type == ChapterPlayVideo ) {
+	    fprintf(file,"    'play-movie \"%s\" %d\n",
+		ch->Data.Movie.PathName,ch->Data.Movie.Flags);
+	}
+    }
+    fprintf(file,"  )\n");
+    fprintf(file,")\n");
+
+    ch=CurrentCampaign->Chapters;
+    i=0;
+    while( ch ) {
+	if( ch==CurrentChapter ) {
+	    break;
+	}
+	ch=ch->Next;
+	++i;
+    }
+    if( !ch ) {
+	i=0;
+    }
+    fprintf(file,"(set-current-chapter! %d)\n", i);
 }
 
 /**
