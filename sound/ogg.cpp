@@ -136,8 +136,6 @@ local int OggStreamRead(Sample* sample, void* buf, int len)
 	int i;
 	int n;
 	int bitstream;
-	int divide;
-	char sndbuf[SOUND_BUFFER_SIZE];
 
 	data = sample->User;
 
@@ -146,18 +144,16 @@ local int OggStreamRead(Sample* sample, void* buf, int len)
 		sample->Pos = 0;
 	}
 
-	divide = 176400 / (sample->Frequency * 2 * sample->Channels);
-
 	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
 		// read more data
-		n = (SOUND_BUFFER_SIZE - sample->Len) / divide;
+		n = SOUND_BUFFER_SIZE - sample->Len;
 
 #ifdef STRATAGUS_BIG_ENDIAN
-		i = ov_read(&data->VorbisFile, sndbuf, n, 1, 2, 1,
-			&bitstream);
+		i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos +
+			sample->Len, n, 1, 2, 1, &bitstream);
 #else
-		i = ov_read(&data->VorbisFile, sndbuf, n, 0, 2, 1,
-			&bitstream);
+		i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos +
+			sample->Len, n, 0, 2, 1, &bitstream);
 #endif
 		Assert(i >= 0);
 
@@ -165,9 +161,6 @@ local int OggStreamRead(Sample* sample, void* buf, int len)
 			// EOF
 			break;
 		}
-
-		i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos + sample->Len,
-			sample->Frequency, 2, sample->Channels, i);
 
 		sample->Len += i;
 	}
@@ -309,27 +302,23 @@ global Sample* LoadOgg(const char* name,int flags)
 		sample->Type = &OggStreamSampleType;
 	} else {
 		int total;
-		int divide;
 		int i;
 		int n;
 		int bitstream;
-		char sndbuf[SOUND_BUFFER_SIZE];
 		
 		total = ov_pcm_total(&data->VorbisFile, -1) * 2;
 
 		sample->Buffer = malloc(total);
 		sample->Type = &OggSampleType;
 
-		divide = 176400 / (sample->Frequency * 2 * sample->Channels);
-
 		while (sample->Len < total) {
-			n = (total - sample->Len > SOUND_BUFFER_SIZE ? SOUND_BUFFER_SIZE : total - sample->Len) / divide;
+			n = total - sample->Len > SOUND_BUFFER_SIZE ? SOUND_BUFFER_SIZE : total - sample->Len;
 
 #ifdef STRATAGUS_BIG_ENDIAN
-			i = ov_read(&data->VorbisFile, sndbuf, n, 1, 2, 1,
+			i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos + sample->Len, n, 1, 2, 1,
 				&bitstream);
 #else
-			i = ov_read(&data->VorbisFile, sndbuf, n, 0, 2, 1,
+			i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos + sample->Len, n, 0, 2, 1,
 				&bitstream);
 #endif
 			Assert(i >= 0);
@@ -338,9 +327,6 @@ global Sample* LoadOgg(const char* name,int flags)
 				// EOF
 				break;
 			}
-
-			i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos + sample->Len,
-				sample->Frequency, 2, sample->Channels, i);
 
 			sample->Len += i;
 		}

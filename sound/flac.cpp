@@ -150,7 +150,6 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	FlacData *data;
 	unsigned int i;
 	int j;
-	char *dest;
 	char *buf;
 	int ssize;
 
@@ -175,11 +174,9 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 		}
 	}
 
-	dest = sample->Buffer + sample->Pos + sample->Len;
-	i = ConvertToStereo32(buf, dest, sample->Frequency,
-		sample->SampleSize / 8, sample->Channels,
-		frame->header.blocksize * sample->Channels * 2);
-	sample->Len += i;
+	memcpy(sample->Buffer + sample->Pos + sample->Len, buf,
+		frame->header.blocksize * sample->Channels * ssize);
+	sample->Len += frame->header.blocksize * sample->Channels * ssize;
 
 	free(buf);
 

@@ -117,7 +117,6 @@ local enum mad_flow MAD_write(void* user,
 	int i;
 	int j;
 	int n;
-	void *dest;
 	short *buf;
 	int s;
 	int comp;
@@ -134,7 +133,7 @@ local enum mad_flow MAD_write(void* user,
 
 	comp = n * pcm->channels * 2;
 
-	buf = malloc(comp);
+	buf = (short*)(sample->Buffer + sample->Pos + sample->Len);
 
         for (i = 0; i < n; ++i) {
                 for (j = 0; j < sample->Channels; ++j) {
@@ -148,17 +147,12 @@ local enum mad_flow MAD_write(void* user,
 				s = -MAD_F_ONE;
 			}
 			// quantize
-			s >>= (MAD_F_FRACBITS + 1 - 16);			
+			s >>= (MAD_F_FRACBITS + 1 - 16);
                         buf[i * sample->Channels + j] = s;
                 }
         }
 
-	dest = (char*)sample->Buffer + sample->Pos + sample->Len;
-        i = ConvertToStereo32((char*)buf, dest, sample->Frequency,
-                sample->SampleSize / 8, sample->Channels, comp);
-        sample->Len += i;
-
-	free(buf);
+	sample->Len += comp;
 
 	return MAD_FLOW_CONTINUE;
 }

@@ -54,8 +54,8 @@
 **  Private wav data structure to handle wav streaming.
 */
 typedef struct _wav_data_ {
-	CLFile* WavFile;				/// Vorbis file handle
-	int ChunkRem;
+	CLFile* WavFile;      /// Wav file handle
+	int ChunkRem;         /// Bytes remaining in chunk
 } WavData;
 
 /*----------------------------------------------------------------------------
@@ -66,9 +66,8 @@ local int WavStreamRead(Sample* sample, void* buf, int len)
 {
 	WavData* data;
 	WavChunk chunk;
-	char sndbuf[SOUND_BUFFER_SIZE];
+	char *sndbuf;
 	int comp;		// number of compressed bytes actually read
-	int divide;
 	int i;
 	int read;
 	int bufrem;
@@ -79,8 +78,6 @@ local int WavStreamRead(Sample* sample, void* buf, int len)
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
 		sample->Pos = 0;
 	}
-
-	divide = 176400 / (sample->Frequency * (sample->SampleSize/8) * sample->Channels);
 
 	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
 		if (!data->ChunkRem) {
@@ -102,13 +99,15 @@ local int WavStreamRead(Sample* sample, void* buf, int len)
 			data->ChunkRem = chunk.Length;
 		}
 
-		bufrem = (SOUND_BUFFER_SIZE - (sample->Pos + sample->Len)) / divide;
+		bufrem = SOUND_BUFFER_SIZE - (sample->Pos + sample->Len);
 		if (data->ChunkRem > bufrem) {
 			read = bufrem;
 		} else {
 			read = data->ChunkRem;
 		}
 		data->ChunkRem -= read;
+
+		sndbuf = sample->Buffer + sample->Pos + sample->Len;
 
 		comp = CLread(data->WavFile, sndbuf, read);
 		if (!comp) {
@@ -120,11 +119,7 @@ local int WavStreamRead(Sample* sample, void* buf, int len)
 			((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
 		}
 
-		i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos + sample->Len,
-			sample->Frequency, sample->SampleSize / 8,
-			sample->Channels, comp);
-
-		sample->Len += i;
+		sample->Len += comp;
 	}
 
         if (sample->Len < len) {
@@ -306,7 +301,6 @@ global Sample* LoadWav(const char* name, int flags)
 		sample->Type = &WavStreamSampleType;
 	} else {
 		int comp;		// number of compressed bytes actually read
-		int divide;
 		int i;
 		int rem;
 		int read;
@@ -314,8 +308,6 @@ global Sample* LoadWav(const char* name, int flags)
 		char sndbuf[SOUND_BUFFER_SIZE];
 
 		sample->Type = &WavSampleType;
-
-		divide = 176400 / (sample->Frequency * (sample->SampleSize/8) * sample->Channels);
 
 		sample->Buffer = NULL;
 		read = 0;
@@ -339,7 +331,7 @@ global Sample* LoadWav(const char* name, int flags)
 				rem = chunk.Length;
 			}
 
-			bufrem = SOUND_BUFFER_SIZE / divide;
+			bufrem = SOUND_BUFFER_SIZE;
 			if (rem > bufrem) {
 				read = bufrem;
 			} else {
@@ -347,23 +339,22 @@ global Sample* LoadWav(const char* name, int flags)
 			}
 			rem -= read;
 
-			sample->Buffer = realloc(sample->Buffer, sample->Len + read * divide);
+			sample->Buffer = realloc(sample->Buffer, sample->Len + read);
 			Assert(sample->Buffer);
 
 			comp = CLread(data->WavFile, sndbuf, read);
-			if (!comp) {
-				break;
+			Assert(comp == read);
+
+			if (sample->SampleSize == 16) {
+				read >>= 1;
+				for (i = 0; i < read; ++i) {
+					((unsigned short*)(sample->Buffer + sample->Pos + sample->Len))[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
+				}
+			} else {
+				memcpy((sample->Buffer + sample->Pos + sample->Len), sndbuf, comp);
 			}
 
-			read >>= 1;
-			for (i = 0; i < read; ++i) {
-				((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
-			}
-
-			i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos + sample->Len,
-				sample->Frequency, sample->SampleSize / 8,
-				sample->Channels, comp);
-			sample->Len += i;
+			sample->Len += comp;
 		}
 
 		CLclose(data->WavFile);
