@@ -200,11 +200,20 @@
 **
 **				If Burning is non-zero, the unit is burning.
 **
-**		Unit::Visible
+**		Unit::VisCount[PlayerMax]
 **
-**				Used for submarines. It is a bit field for all players. If
-**				Unit::Visible&(1<<player-nr) is non-zero, the unit could be
-**				seen on the map.
+**              Used to keep track of visible units on the map, it counts the
+**              Number of seen tiles for each player. This is only modified
+**              in UnitsMarkSeen and UnitsUnmarkSeen, from fow.
+**				We keep track of visilibty for each player, and combine with
+**				Shared vision ONLY when querying and such.
+**
+**      Unit::SeenByPlayer
+**
+**              This is a bitmask of 1 and 0 values. SeenByPlayer & (1<<p) is 0
+**              If p never saw the unit and 1 if it did. This is important for
+**              keeping track of dead units under fog. We only keep track of units
+**				that are visible under fog with this.
 **
 **		Unit::Destroyed
 **
@@ -506,7 +515,6 @@ struct _unit_ {
 	int				Y;						/// Map position Y
 
 	UnitType*		Type;						/// Pointer to unit-type (peon,...)
-	UnitType*		SeenType;				/// Pointer to last seen unit-type
 	Player*	 Player;						/// Owner of this unit
 	UnitStats*		Stats;						/// Current unit stats
 	int				CurrentSightRange;		/// Unit's Current Sight Range
@@ -516,80 +524,86 @@ struct _unit_ {
 	signed char		IX;						/// X image displacement to map position
 	signed char		IY;						/// Y image displacement to map position
 	int				Frame;						/// Image frame: <0 is mirrored
-	int				SeenFrame;				/// last seen frame/stage of buildings
-	signed char		SeenIX;						/// Seen X image displacement to map position
-	signed char		SeenIY;						/// seen Y image displacement to map position
 
 	unsigned		Direction : 8;				/// angle (0-255) unit looking
 
-	unsigned long Attacked;				/// gamecycle unit was last attacked
+	unsigned long Attacked;					/// gamecycle unit was last attacked
 
-	unsigned		Burning : 1;				/// unit is burning
-	unsigned		Destroyed : 1;				/// unit is destroyed pending reference
-	unsigned		Removed : 1;				/// unit is removed (not on map)
-	unsigned		Selected : 1;				/// unit is selected
+	unsigned		Burning : 1;			/// unit is burning
+	unsigned		Destroyed : 1;			/// unit is destroyed pending reference
+	unsigned		Removed : 1;			/// unit is removed (not on map)
+	unsigned		Selected : 1;			/// unit is selected
 
-	unsigned		Visible : 16;				/// Unit is visible (submarine)
 	unsigned		Constructed : 1;		/// Unit is in construction
-	unsigned		SeenConstructed : 1;		/// Unit seen construction
-	unsigned		SeenState : 3;				/// Unit seen build/upgrade state
-	unsigned		SeenDestroyed : 1;		/// Unit seen destroyed or not
 	unsigned		Active : 1;				/// Unit is active for AI
-	Player*	 RescuedFrom;			/// The original owner of a rescued unit.
+	Player*	 RescuedFrom;					/// The original owner of a rescued unit.
 											/// NULL if the unit was not rescued.
+	/* Seen stuff. */
+	char			VisCount[PlayerMax];	/// Unit visibility counts
+	struct _seen_stuff_ {
+		unsigned		    ByPlayer : 16;		/// Track unit seen by player
+		int			        Frame;				/// last seen frame/stage of buildings
+		UnitType*	        Type;				/// Pointer to last seen unit-type
+		signed char		    IX;					/// Seen X image displacement to map position
+		signed char		    IY;					/// seen Y image displacement to map position
+		unsigned		    Constructed : 1;	/// Unit seen construction
+		unsigned		    State : 3;			/// Unit seen build/upgrade state
+		unsigned            Destroyed : PlayerMax;	/// Unit seen destroyed or not
+		ConstructionFrame*  CFrame;		 		/// Seen construction frame
+	} Seen;
 
 	int				Mana;						/// mana points
-	int				HP;						/// hit points
-	int				XP;						/// experience points
+	int				HP;							/// hit points
+	int				XP;							/// experience points
 	int				Kills;						/// how many unit has this unit killed
 
-	unsigned long		TTL;				/// time to live
-	int				Bloodlust;				/// ticks bloodlust
+	unsigned long		TTL;					/// time to live
+	int				Bloodlust;					/// ticks bloodlust
 	int				Haste;						/// ticks haste (disables slow)
 	int				Slow;						/// ticks slow (disables haste)
-	int				Invisible;				/// ticks invisible
+	int				Invisible;					/// ticks invisible
 	int				FlameShield;				/// ticks flame shield
 	int				UnholyArmor;				/// ticks unholy armor
 
-	int				GroupId;				/// unit belongs to this group id
-	int				LastGroup;				/// unit belongs to this last group
+	int				GroupId;					/// unit belongs to this group id
+	int				LastGroup;					/// unit belongs to this last group
 
 	int				Value;						/// value used for much
 
 	unsigned		SubAction : 8;				/// sub-action of unit
 	unsigned		Wait;						/// action counter
-	unsigned		State : 8;				/// action state
-#define MAX_UNIT_STATE		255				/// biggest state for action
-	unsigned		Reset : 1;				/// can process new command
-	unsigned		Blink : 3;				/// Let selection rectangle blink
-	unsigned		Moving : 1;				/// The unit is moving
+	unsigned		State : 8;					/// action state
+#define MAX_UNIT_STATE		255					/// biggest state for action
+	unsigned		Reset : 1;					/// can process new command
+	unsigned		Blink : 3;					/// Let selection rectangle blink
+	unsigned		Moving : 1;					/// The unit is moving
 										/** set to random 1..100 when MakeUnit()
 										** used for fancy buildings
 										*/
 	unsigned		Rs : 8;
 	unsigned char		CurrentResource;
 
-#define MAX_ORDERS 16						/// How many outstanding orders?
-	char		OrderCount;				/// how many orders in queue
-	char		OrderFlush;				/// cancel current order, take next
-	Order		Orders[MAX_ORDERS];		/// orders to process
-	Order		SavedOrder;				/// order to continue after current
-	Order		NewOrder;				/// order for new trained units
+#define MAX_ORDERS 16							/// How many outstanding orders?
+	char		OrderCount;						/// how many orders in queue
+	char		OrderFlush;						/// cancel current order, take next
+	Order		Orders[MAX_ORDERS];				/// orders to process
+	Order		SavedOrder;						/// order to continue after current
+	Order		NewOrder;						/// order for new trained units
 	struct _spell_type_*	AutoCastSpell;		/// spell to auto cast
 
 	union _order_data_ {
 	struct _order_move_ {
 		char		Fast;						/// Flag fast move (one step)
 		char		Length;						/// stored path length
-#define MAX_PATH_LENGTH 28				/// max length of precalculated path
+#define MAX_PATH_LENGTH 28						/// max length of precalculated path
 		char		Path[MAX_PATH_LENGTH];		/// directions of stored path
 	}				Move;						/// ActionMove,...
 	struct _order_builded_ {
 		Unit*		Worker;						/// Worker building this unit
-		int		Progress;				/// Progress counter, in 1/100 cycles.
-		int		Cancel;						/// Cancel construction
-		ConstructionFrame* Frame;		/// Construction frame
-	}				Builded;				/// ActionBuilded,...
+		int		Progress;						/// Progress counter, in 1/100 cycles.
+		int		Cancel;							/// Cancel construction
+		ConstructionFrame* Frame;				/// Construction frame
+	}				Builded;					/// ActionBuilded,...
 	struct _order_resource_ {
 		int		Active;						/// how many units are harvesting from the resource.
 	}				Resource;				/// Resource still
@@ -692,8 +706,6 @@ extern Unit** UnitSlotFree;				/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];		/// Units used
 extern int NumUnits;						/// Number of units used
-extern Unit* DestroyedBuildings;		/// List of DestroyedBuildings
-extern Unit* CorpseList;				/// List of Corpses On Map
 
 //		in unit_draw.c (FIXME: could be moved into the user interface?)
 extern int ShowHealthBar;				/// Flag: show health bar
@@ -765,17 +777,24 @@ extern void UnitClearOrders(Unit* unit);
 extern void UpdateForNewUnit(const Unit* unit, int upgrade);
 	/// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy);
-	/// Returns true, if unit is visible on the map
-extern int UnitVisibleOnMap(const Unit* unit);
-	/// Returns true, if building is known on the map
-extern int BuildingVisibleOnMap(const Unit* unit);
 
-	/// Updates seen data
-extern void UnitsMarkSeen(int x, int y);
-	/// Checks and updates if a Unit's seen information
-extern void UnitMarkSeen(Unit* unit);
-	/// Returns true, if unit is known on the map
-extern int UnitKnownOnMap(const Unit* unit);
+	/// Marks an unit as seen
+extern void UnitsOnTileMarkSeen(const Player* player, int x, int y, int p);
+	/// Unmarks an unit as seen
+extern void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int p);
+	/// Does a recount for VisCount
+extern void UnitCountSeen(Unit* unit);
+
+	/// Returns true, if unit is directly seen by an allied unit.
+extern int UnitVisible(const Unit* unit, const Player* player);
+	/// Returns true, if unit is visible as a goal.
+extern int UnitVisibleAsGoal(const Unit* unit, const Player* player);
+	/// Returns true, if unit is Visible for game logic on the map.
+extern int UnitVisibleOnMap(const Unit* unit, const Player* player);
+	/// Returns true if unit is visible on minimap. Only for ThisPlayer.
+extern int UnitVisibleOnMinimap(const Unit* unit);
+	/// Returns true if unit is visible in an viewport. Only for ThisPlayer.
+extern int UnitVisibleInViewport(const Unit* unit, const Viewport* vp);
 
 	/// To be called when the look of the unit changes.
 extern int CheckUnitToBeDrawn(Unit* unit);
@@ -889,22 +908,6 @@ extern Unit* UnitCacheOnXY(int x, int y, unsigned type);
 extern void UnitCacheStatistic(void);
 	/// Initialize unit-cache
 extern void InitUnitCache(void);
-	/// Inserts a corpse into the corpse list cache
-extern void DeadCacheInsert(Unit* unit, Unit** List);
-	/// Removes a corpse from the corpse cache
-extern void DeadCacheRemove(Unit* unit, Unit** List);
-
-#define CorpseCacheInsert(unit) \
-		(DeadCacheInsert((unit),&CorpseList))
-
-#define DeadBuildingCacheInsert(unit) \
-		(DeadCacheInsert((unit),&DestroyedBuildings))
-
-#define CorpseCacheRemove(unit) \
-		(DeadCacheRemove((unit),&CorpseList))
-
-#define DeadBuildingCacheRemove(unit) \
-		(DeadCacheRemove((unit),&DestroyedBuildings))
 
 //		in unit_draw.c
 //--------------------

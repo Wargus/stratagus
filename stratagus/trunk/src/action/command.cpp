@@ -133,50 +133,6 @@ local void ClearSavedAction(Unit* unit)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Player quit.
-**
-**  @param player  Player number that quit.
-*/
-global void CommandQuit(int player)
-{
-	int i;
-	int j;
-
-	if (Players[player].TotalNumUnits != 0) {
-		// Set player to neutral, remove allied/enemy/shared vision status
-		Players[player].Type = PlayerNeutral;
-		for (i = 0; i < NumPlayers; ++i) {
-			if (i == player) {
-				continue;
-			}
-			Players[i].Allied &= ~(1 << player);
-			Players[i].Enemy &= ~(1 << player);
-			// Check all tiles and mark unseen ones as explored.
-			if (Players[player].SharedVision & (1 << i) &&
-					(Players[i].SharedVision & (1 << player))) {
-				for (j = 0; j < TheMap.Width*TheMap.Height; ++j) {
-					if (TheMap.Fields[j].Visible[i] &&
-							!TheMap.Fields[j].Visible[player]) {
-						TheMap.Fields[j].Visible[player] = 1;
-					}
-					if (TheMap.Fields[j].Visible[player] &&
-							!TheMap.Fields[j].Visible[i]) {
-						TheMap.Fields[j].Visible[i] = 1;
-					}
-				}
-			}
-			Players[i].SharedVision &= ~(1 << player);
-			Players[player].Allied &= ~(1 << i);
-			Players[player].Enemy &= ~(1 << i);
-			Players[player].SharedVision &= ~(1 << i);
-		}
-		SetMessage("Player \"%s\" has left the game", Players[player].Name);
-	} else {
-		SetMessage("Player \"%s\" has been killed", Players[player].Name);
-	}
-}
-
-/**
 **  Stop unit.
 **
 **  @param unit  pointer to unit.
@@ -1339,49 +1295,91 @@ global void CommandDiplomacy(int player, int state, int opponent)
 */
 global void CommandSharedVision(int player, int state, int opponent)
 {
+	int before;
+	int after;
+	int x;
+	int y;
 	int i;
-	Unit* unit;
 
+	//
+	//	Do a real hardcore seen recount. First we unmark EVERYTHING.
+	//
+	for (i = 0; i < NumUnits; ++i) {
+		MapUnmarkUnitSight(Units[i]);
+	}
+
+	//
+	//	Compute Before and after.
+	//
+	before = PlayersShareVision(player, opponent);
 	if (state == 0) {
-		// Check all tiles and mark unseen ones as explored.
-		if (Players[player].SharedVision & (1 << opponent) &&
-				(Players[opponent].SharedVision & (1 << player))) {
-			for (i = 0; i < TheMap.Width * TheMap.Height; ++i) {
-				if (TheMap.Fields[i].Visible[opponent] &&
-						!TheMap.Fields[i].Visible[player]) {
-					TheMap.Fields[i].Visible[player] = 1;
-				}
-				if (TheMap.Fields[i].Visible[player] &&
-						!TheMap.Fields[i].Visible[opponent]) {
-					TheMap.Fields[i].Visible[opponent] = 1;
-				}
-			}
-		}
 		Players[player].SharedVision &= ~(1 << opponent);
 	} else {
 		Players[player].SharedVision |= (1 << opponent);
-		// Check all tiles and mark SeenTiles for wood
-		if (Players[player].SharedVision & (1 << opponent) &&
-				Players[opponent].SharedVision & (1 << player) &&
-				(player == ThisPlayer->Player ||
-					opponent == ThisPlayer->Player)) {
-			int y;
-			for (i = 0; i < TheMap.Width; ++i) {
-				for (y = 0; y < TheMap.Height; ++y) {
-					if (IsMapFieldVisible(ThisPlayer, i, y)) {
-						MapMarkSeenTile(i, y);
-						UnitsMarkSeen(i, y);
+	}
+	after = PlayersShareVision(player, opponent);
+
+	if (before && !after) {
+		//
+		//	Don't share vision anymore. Give each other explored terrain for good-bye.
+		//
+		for (x = 0; x < TheMap.Width; ++x) {
+			for (y = 0; y < TheMap.Height; ++y) {
+				i = x + y * TheMap.Width;
+				if (TheMap.Fields[i].Visible[player] && !TheMap.Fields[i].Visible[opponent]) {
+					TheMap.Fields[i].Visible[opponent] = 1;
+					if (opponent == ThisPlayer->Player) {
+						MapMarkSeenTile(x, y);
+					}
+				}
+				if (TheMap.Fields[i].Visible[opponent] && !TheMap.Fields[i].Visible[player]) {
+					TheMap.Fields[i].Visible[player] = 1;
+					if (player == ThisPlayer->Player) {
+						MapMarkSeenTile(x, y);
 					}
 				}
 			}
 		}
 	}
-	// MUST update seen buildings when vision is shared or unshared
-	for (i = 0; i < NumUnits; ++i) {
-		unit = Units[i];
-		UnitMarkSeen(unit);
-	}
 
+	//
+	//	Do a real hardcore seen recount. Now we remark EVERYTHING
+	//
+	for (i = 0; i < NumUnits; ++i) {
+		MapMarkUnitSight(Units[i]);
+	}
+}
+
+/**
+**  Player quit.
+**
+**  @param player  Player number that quit.
+*/
+global void CommandQuit(int player)
+{
+	int i;
+
+	// Set player to neutral, remove allied/enemy/shared vision status
+	// If the player doesn't have any units then this is pointless?
+	Players[player].Type = PlayerNeutral;
+	for (i = 0; i < NumPlayers; ++i) {
+		if (i != player) {
+			Players[i].Allied &= ~(1 << player);
+			Players[i].Enemy &= ~(1 << player);
+			Players[player].Enemy &= ~(1 << i);
+			Players[player].Allied &= ~(1 << i);
+			//  We clear Shared vision by sending fake shared vision commands.
+			//  We do this because Shared vision is a bit complex.
+			CommandSharedVision(i, 0, player);
+			CommandSharedVision(player, 0, i);
+		}
+	}
+	
+	if (Players[player].TotalNumUnits != 0) {
+		SetMessage("Player \"%s\" has left the game", Players[player].Name);
+	} else {
+		SetMessage("Player \"%s\" has been killed", Players[player].Name);
+	}
 }
 
 //@}

@@ -270,21 +270,74 @@ global void UpdateMinimapXY(int tx, int ty)
 	SDL_UnlockSurface(MinimapTerrainSurface);
 }
 
+/**
+**      Draw an unit on the minimap. 
+*/
+local void DrawUnitOnMinimap(Unit* unit, int red_phase)
+{
+	UnitType* type;
+	int mx;
+	int my;
+	int w;
+	int h;
+	int h0;
+	Uint32 color;
+	SDL_Color c;
+
+	if (!UnitVisibleOnMinimap(unit)) {
+		return ;
+	}
+	type = unit->Type;
+	//
+	//  FIXME: We should force unittypes to have a certain color on the minimap.
+	//
+	if (unit->Player->Player == PlayerNumNeutral) {
+		color = SDL_MapRGB(TheScreen->format,
+			unit->Type->NeutralMinimapColorRGB.r,
+			unit->Type->NeutralMinimapColorRGB.g,
+			unit->Type->NeutralMinimapColorRGB.b);
+	} else if (unit->Player == ThisPlayer) {
+		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
+				(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
+			color = ColorRed;
+		} else if (MinimapShowSelected && unit->Selected) {
+			color = ColorWhite;
+		} else {
+			color = ColorGreen;
+		}
+	} else {
+		color = unit->Player->Color;
+	}
+
+	mx = 1 + MinimapX + Map2MinimapX[unit->X];
+	my = 1 + MinimapY + Map2MinimapY[unit->Y];
+	w = Map2MinimapX[type->TileWidth];
+	if (mx + w >= TheUI.MinimapW) {				// clip right side
+		w = TheUI.MinimapW - mx;
+	}
+	h0 = Map2MinimapY[type->TileHeight];
+	if (my + h0 >= TheUI.MinimapH) {		// clip bottom side
+		h0 = TheUI.MinimapH - my;
+	}
+	while (w-- >= 0) {
+		h = h0;
+		while (h-- >= 0) {
+			SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
+			((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * TheUI.MinimapW] =
+				SDL_MapRGB(MinimapSurface->format, c.r, c.g, c.b);
+		}
+	}
+}
+
 global void UpdateMinimap(void)
 {
 	static int red_phase;
 	int red_phase_changed;
 	int mx;
 	int my;
-	UnitType* type;
-	Unit** table;
-	Unit* unit;
-	int w;
-	int h;
-	int h0;
+	int n;
+	Unit* table[UnitMax];
 	int visiontype; // 0 unexplored, 1 explored, >1 visible.
-	SDL_Color c;
-	Uint32 color;
 
 	red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
 	if (red_phase_changed) {
@@ -317,114 +370,13 @@ global void UpdateMinimap(void)
 
 	//
 	//		Draw units on map
-	//		FIXME: I should rewrite this completely
-	//		FIXME: make a bitmap of the units, and update it with the moves
-	//		FIXME: and other changes
+	//		FIXME: We should rewrite this completely
 	//
-
-	table = &CorpseList;
-
-	while (*table) {
-
-		// Only for buildings?
-		if (!(*table)->Type->Building) {
-			table = &(*table)->Next;
-			continue;
-		}
-		if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
-				&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
-			if( (*table)->Player->Player == PlayerNumNeutral ) {
-				color = SDL_MapRGB(TheScreen->format,
-					(*table)->Type->NeutralMinimapColorRGB.r,
-					(*table)->Type->NeutralMinimapColorRGB.g,
-					(*table)->Type->NeutralMinimapColorRGB.b);
-			} else {
-				color = (*table)->Player->Color;
-			}
-
-			mx = 1 + MinimapX + Map2MinimapX[(*table)->X];
-			my = 1 + MinimapY + Map2MinimapY[(*table)->Y];
-			w = Map2MinimapX[type->TileWidth];
-			if (mx + w >= TheUI.MinimapW) {		// clip right side
-				w = TheUI.MinimapW - mx;
-			}
-			h0 = Map2MinimapY[type->TileHeight];
-			if (my + h0 >= TheUI.MinimapH) {		// clip bottom side
-				h0 = TheUI.MinimapH - my;
-			}
-			while (w-- >= 0) {
-				h = h0;
-				while (h-- >= 0) {
-					SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
-					((Uint8*)MinimapSurface)[mx + w + (my + h) * TheUI.MinimapW] =
-						SDL_MapRGB(MinimapSurface->format, c.r, c.g, c.b);
-				}
-			}
-		}
-		table = &(*table)->Next;
+	n = UnitCacheSelect(0, 0, TheMap.Height, TheMap.Width, table);
+	while (n--) {
+		DrawUnitOnMinimap(table[n], red_phase);
 	}
 
-	for (table = Units; table < Units + NumUnits; ++table) {
-
-		unit = *table;
-
-		if (unit->Removed) {				// Removed, inside another building
-			continue;
-		}
-		if (unit->Invisible) {				// Can't be seen
-			continue;
-		}
-		if (!(unit->Visible & (1 << ThisPlayer->Player))) {
-			continue;						// Cloaked unit not visible
-		}
-
-		if (!UnitKnownOnMap(unit) && !ReplayRevealMap) {
-			continue;
-		}
-
-		// FIXME: submarine not visible
-
-		type = unit->Type;
-		//
-		//  FIXME: We should force unittypes to have a certain color on the minimap.
-		//
-		if (unit->Player->Player == PlayerNumNeutral) {
-			color = SDL_MapRGB(TheScreen->format,
-				(*table)->Type->NeutralMinimapColorRGB.r,
-				(*table)->Type->NeutralMinimapColorRGB.g,
-				(*table)->Type->NeutralMinimapColorRGB.b);
-		} else if (unit->Player == ThisPlayer) {
-			if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
-					(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
-				color = ColorRed;
-			} else if (MinimapShowSelected && unit->Selected) {
-				color = ColorWhite;
-			} else {
-				color = ColorGreen;
-			}
-		} else {
-			color = unit->Player->Color;
-		}
-
-		mx = 1 + MinimapX + Map2MinimapX[unit->X];
-		my = 1 + MinimapY + Map2MinimapY[unit->Y];
-		w = Map2MinimapX[type->TileWidth];
-		if (mx + w >= TheUI.MinimapW) {				// clip right side
-			w = TheUI.MinimapW - mx;
-		}
-		h0 = Map2MinimapY[type->TileHeight];
-		if (my + h0 >= TheUI.MinimapH) {		// clip bottom side
-			h0 = TheUI.MinimapH - my;
-		}
-		while (w-- >= 0) {
-			h = h0;
-			while (h-- >= 0) {
-				SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
-				((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * TheUI.MinimapW] =
-					SDL_MapRGB(MinimapSurface->format, c.r, c.g, c.b);
-			}
-		}
-	}
 	SDL_UnlockSurface(MinimapSurface);
 }
 
@@ -821,61 +773,17 @@ global void UpdateMinimap(void)
 	//		FIXME: and other changes
 	//
 
-	//		Draw Destroyed Buildings On Map
-	table = &DestroyedBuildings;
-	while (*table) {
-		VMemType color;
-
-		if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
-				&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
-			if( (*table)->Player->Player == PlayerNumNeutral ) {
-				color = VideoMapRGB((*table)->Type->NeutralMinimapColorRGB.D24.a,
-						(*table)->Type->NeutralMinimapColorRGB.D24.b,
-						(*table)->Type->NeutralMinimapColorRGB.D24.c);
-			} else {
-				color = (*table)->Player->Color;
-			}
-
-			mx = 1 + MinimapX + Map2MinimapX[(*table)->X];
-			my = 1 + MinimapY + Map2MinimapY[(*table)->Y];
-			w = Map2MinimapX[type->TileWidth];
-			if (mx + w >= TheUI.MinimapW) {		// clip right side
-				w = TheUI.MinimapW - mx;
-			}
-			h0 = Map2MinimapY[type->TileHeight];
-			if (my + h0 >= TheUI.MinimapH) {		// clip bottom side
-				h0 = TheUI.MinimapH - my;
-			}
-			while (w-- >= 0) {
-				h = h0;
-				while (h-- >= 0) {
-					MinimapGraphic[mx + w + (my + h) * TheUI.MinimapW] = color;
-				}
-			}
-		}
-		table = &(*table)->Next;
-	}
-
 	for (table = Units; table < Units + NumUnits; ++table) {
 		VMemType color;
 
 		unit = *table;
 
-		if (unit->Removed) {				// Removed, inside another building
+		//  This function is only called from here, but it's better to have all
+		//  UnitVisible functions in the same place (unit.c). Hopefully it will help 
+		//  reduce the confusion around them.
+		if (!UnitVisibleOnMinimap(unit)) {
 			continue;
 		}
-		if (unit->Invisible) {				// Can't be seen
-			continue;
-		}
-		if (!(unit->Visible & (1 << ThisPlayer->Player))) {
-			continue;						// Cloaked unit not visible
-		}
-
-		if (!UnitKnownOnMap(unit) && !ReplayRevealMap) {
-			continue;
-		}
-
-		// FIXME: submarine not visible
 
 		type = unit->Type;
 		//

@@ -749,7 +749,7 @@ global void NetworkEvent(void)
 			// FIXME: not neccessary to send this packet multiple times!!!!
 			//		other side sends re-send until it gets an answer.
 
-			DebugLevel2Fn("Resend for %lu got\n" _C_ n);
+			DebugLevel3Fn("Resend for %lu got\n" _C_ n);
 			if (n != NetworkIn[n & 0xFF][ThisPlayer->Player][0].Time) {
 				// Asking for a cycle we haven't gotten to yet, ignore for now
 				return;

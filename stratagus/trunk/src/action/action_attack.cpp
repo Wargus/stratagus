@@ -77,7 +77,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 
 	flags = UnitShowAnimation(unit, attack);
 
-	if ((flags & AnimationSound) && (UnitVisibleOnMap(unit) || ReplayRevealMap)) {
+	if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
 		PlayUnitSound(unit, VoiceAttacking);
 	}
 
@@ -120,7 +120,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	// Do we have a goal?
 	//
 	if ((goal = unit->Orders[0].Goal)) {
-		if (GoalGone(unit, goal)) {
+		if (!UnitVisibleAsGoal(goal, unit->Player)) {
 			//
 			// Goal is destroyed
 			//
@@ -129,7 +129,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 			unit->Orders[0].MinRange = 0;
 			unit->Orders[0].Range = 0;
 
-			DebugLevel0Fn("attack target %d(%s) gone for %d(%s)\n" _C_
+			DebugLevel3Fn("attack target %d(%s) gone for %d(%s)\n" _C_
 				UnitNumber(goal) _C_ goal->Type->Name _C_
 				UnitNumber(unit) _C_ unit->Type->Name);
 			RefsDecrease(goal);

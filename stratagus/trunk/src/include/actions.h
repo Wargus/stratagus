@@ -186,8 +186,6 @@ extern void HandleActionSpellCast(Unit* unit);
 --  Actions: actions.c
 ----------------------------------------------------------------------------*/
 
-	/// Check if a goal is gone/dead/invisible ?under-fow?
-extern int GoalGone(const Unit* unit, const Unit* goal);
 	/// Handle the animation of a unit
 extern int UnitShowAnimation(Unit* unit,const Animation* animation);
 	/// Handle the actions of all units each game cycle

@@ -410,7 +410,9 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	missile->Delay = action->Data.SpawnMissile.Delay;
 	missile->Damage = action->Data.SpawnMissile.Damage;
 	missile->SourceUnit = caster;
-	missile->TargetUnit = target;
+	if ((missile->TargetUnit = target)) {
+		RefsIncrease(target);
+	}
 	RefsIncrease(caster);
 	return 1;
 }
@@ -615,8 +617,9 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 {
 	int ttl;
 	int cansummon;
-	Unit** corpses;
-	Unit* tempcorpse;
+	int n;
+	Unit* table[UnitMax];
+	Unit* unit;
 	UnitType* unittype;
 
 	DebugCheck(!caster);
@@ -628,26 +631,20 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 	ttl = spell->Action->Data.Summon.TTL;
 
 	if (spell->Action->Data.Summon.RequireCorpse) {
-		corpses = &CorpseList;
+		n = UnitCacheSelect(x - 1, y - 1, x + 2, y + 2, table);
 		cansummon = 0;
-		while (*corpses) {
-			// FIXME: this tries to raise all corps, I can raise ships?
-			if ((*corpses)->Orders[0].Action == UnitActionDie &&
-					!(*corpses)->Type->Building &&
-					(*corpses)->X >= x - 1 && (*corpses)->X <= x + 1 &&
-					(*corpses)->Y >= y - 1 && (*corpses)->Y <= y + 1) {
+		while (n) {
+			n--;
+			unit = table[n];
+			if (unit->Orders[0].Action == UnitActionDie && !unit->Type->Building) {
 				//
 				//  Found a corpse. eliminate it and proceed to summoning.
 				//
-				x = (*corpses)->X;
-				y = (*corpses)->Y;
-				tempcorpse = *corpses;
-				corpses = &(*corpses)->Next;
-				ReleaseUnit(tempcorpse);
+				x = unit->X;
+				y = unit->Y;
+				ReleaseUnit(unit);
 				cansummon = 1;
 				break;
-			} else {
-				corpses = &(*corpses)->Next;
 			}
 		}
 	} else {

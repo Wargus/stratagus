@@ -207,7 +207,7 @@ global void HandleActionRepair(Unit* unit)
 				//
 				// Check if goal is correct unit.
 				if (goal) {
-					if (GoalGone(unit, goal)) {
+					if (!UnitVisibleAsGoal(goal, unit->Player)) {
 						DebugLevel0Fn("repair target gone. Booohooo\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;
@@ -266,7 +266,7 @@ global void HandleActionRepair(Unit* unit)
 				// Check if goal is correct unit.
 				// FIXME: should I do a function for this?
 				if (goal) {
-					if (GoalGone(unit, goal)) {
+					if (!UnitVisibleAsGoal(goal, unit->Player)) {
 						DebugLevel0Fn("repair goal is gone\n");
 						unit->Orders[0].X = goal->X;
 						unit->Orders[0].Y = goal->Y;

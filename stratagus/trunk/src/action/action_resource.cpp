@@ -128,7 +128,7 @@ local int MoveToResource(Unit* unit)
 				break;
 			default:
 				// Goal gone or something.
-				if (!unit->Reset || !GoalGone(unit, goal)) {
+				if (!unit->Reset || UnitVisibleAsGoal(goal, unit->Player)) {
 					return 0;
 				}
 				break;
@@ -176,7 +176,7 @@ local int StartGathering(Unit* unit)
 	//
 	// Target is dead, stop getting resources.
 	//
-	if (GoalGone(unit, goal)) {
+	if (!UnitVisibleAsGoal(goal, unit->Player)) {
 		DebugLevel3Fn("Destroyed resource goal, stop gathering.\n");
 		RefsDecrease(goal);
 		// Find an alternative, but don't look too far.
@@ -226,7 +226,6 @@ local int StartGathering(Unit* unit)
 	// Activate the resource
 	goal->Data.Resource.Active++;
 
-	UnitMarkSeen(goal);
 	//
 	// Place unit inside the resource
 	//
@@ -260,7 +259,7 @@ local void AnimateActionHarvest(Unit* unit)
 		DebugCheck(!unit->Type->Animations->Harvest[unit->CurrentResource]);
 		flags = UnitShowAnimation(unit,
 			unit->Type->Animations->Harvest[unit->CurrentResource]);
-		if ((flags & AnimationSound) && (UnitVisibleOnMap(unit) || ReplayRevealMap)) {
+		if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
 			PlayUnitSound(unit, VoiceHarvesting);
 		}
 	}
@@ -415,7 +414,7 @@ local int GatherResource(Unit* unit)
 			//
 			// Target is not dead, getting resources.
 			//
-			if (!GoalGone(unit, source)) {
+			if (UnitVisibleAsGoal(source, unit->Player)) {
 				// Don't load more that there is.
 				if (addload > source->Value) {
 					addload = source->Value;
@@ -425,7 +424,6 @@ local int GatherResource(Unit* unit)
 				unit->Value += addload;
 				source->Value -= addload;
 
-				UnitMarkSeen(source);
 				if (IsOnlySelected(source)) {
 					MustRedraw |= RedrawInfoPanel;
 				}
@@ -435,7 +433,7 @@ local int GatherResource(Unit* unit)
 			// End of resource: destroy the resource.
 			// FIXME: implement depleted resources.
 			//
-			if (GoalGone(unit, source) || (source->Value == 0)) {
+			if ((!UnitVisibleAsGoal(source, unit->Player)) || (source->Value == 0)) {
 				DebugLevel0Fn("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 				uins = source->UnitInside;
 				//
@@ -448,7 +446,7 @@ local int GatherResource(Unit* unit)
 
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
-				if (!GoalGone(unit, source)){
+				if (UnitVisibleAsGoal(source, unit->Player)){
 					LetUnitDie(source);
 					// FIXME: make the workers inside look for a new resource.
 				}
@@ -580,7 +578,7 @@ local int MoveToDepot(Unit* unit)
 		case PF_REACHED:
 			break;
 		default:
-			if (!unit->Reset || !GoalGone(unit, goal)) {
+			if (!unit->Reset || UnitVisibleAsGoal(goal, unit->Player)) {
 				return 0;
 			}
 			break;
@@ -589,7 +587,7 @@ local int MoveToDepot(Unit* unit)
 	//
 	// Target is dead, stop getting resources.
 	//
-	if (GoalGone(unit, goal)) {
+	if (!UnitVisibleAsGoal(goal, unit->Player)) {
 		DebugLevel0Fn("Destroyed depot\n");
 		RefsDecrease(goal);
 		unit->Orders[0].Goal = NoUnitP;
@@ -689,6 +687,7 @@ local int WaitInDepot(Unit* unit)
 			unit->Orders[0].Range = 1;
 			unit->Orders[0].X = unit->Orders[0].Y = -1;
 		} else {
+			DebugLevel0Fn("Unit %d Resource gone. Sit and play dumb.\n" _C_ unit->Slot);
 			DropOutOnSide(unit, LookingW, depot->Type->TileWidth, depot->Type->TileHeight);
 			unit->Orders[0].Action = UnitActionStill;
 			unit->SubAction = 0;

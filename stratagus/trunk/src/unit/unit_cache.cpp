@@ -796,42 +796,6 @@ global void InitUnitCache(void)
 //****************************************************************************/
 
 /**
-**		Inserts a dieing unit into the current dead list
-**		it may be into the building or corpse list
-**
-**		@param unit		Unit pointer to insert into list
-**		@param list		The list to insert into
-*/
-global void DeadCacheInsert(Unit* unit,Unit** list)
-{
-	unit->Next=*list;
-	*list=unit;
-}
-
-/**
-**		Removes a corpse from the current corpse list
-**
-**		@param unit		Unit pointer to remove from list
-**		@param list		The list to remove from
-*/
-global void DeadCacheRemove(Unit* unit, Unit** list)
-{
-	Unit** prev;
-
-	prev=list;
-	DebugCheck( !*prev );
-	while( *prev ) {						// find the unit, be bug friendly
-		if( *prev==unit ) {
-			*prev=unit->Next;
-			unit->Next=NULL;
-			return;
-		}
-		prev=&(*prev)->Next;
-		DebugCheck( !*prev );
-	}
-}
-
-/**
 **		Insert new unit into cache.
 **
 **		@param unit		Unit pointer to place in cache.
@@ -839,6 +803,9 @@ global void DeadCacheRemove(Unit* unit, Unit** list)
 global void UnitCacheInsert(Unit* unit)
 {
 	MapField* mf;
+
+	DebugCheck(unit->Next);
+	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
 
 	mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
 	unit->Next=mf->Here.Units;
@@ -853,19 +820,23 @@ global void UnitCacheInsert(Unit* unit)
 */
 global void UnitCacheRemove(Unit* unit)
 {
-	Unit** prev;
+	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
 
-	prev=&TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
-	DebugCheck( !*prev );
-	while( *prev ) {						// find the unit, be bug friendly
-		if( *prev==unit ) {
-			*prev=unit->Next;
-			unit->Next=NULL;
+	Unit* prev;
+	prev = TheMap.Fields[unit->Y * TheMap.Width + unit->X].Here.Units;
+	if (prev == unit) {
+		TheMap.Fields[unit->Y * TheMap.Width + unit->X].Here.Units = unit->Next;
+		unit->Next = 0;
+		return;
+	}
+	for (; prev; prev = prev->Next) {
+		if (prev->Next == unit) {
+			prev->Next = unit->Next;
+			unit->Next = 0;
 			return;
 		}
-		prev=&(*prev)->Next;
-		DebugCheck( !*prev );
 	}
+	DebugLevel0Fn("Try to remove unit not in cache.\n");
 }
 
 /**

@@ -401,9 +401,6 @@ extern void ViewportSetViewpoint(Viewport* vp, int x, int y);
 	/// Center map on point in viewport
 extern void ViewportCenterViewpoint(Viewport* vp, int x, int y);
 
-	/// Returns true, if unit is visible on current map view
-extern int UnitVisibleInViewport(const Viewport* vp, const Unit* unit);
-
 //@}
 
 #endif		// !__UI_H__
