@@ -62,70 +62,66 @@ Everything around the C UnitType structure.
 
 <h2>Functions</h2>
 <a name="DefineAnimations"></a>
-<h3>DefineAnimations( "ident-name", "still", script, "move", script, "die", script, "attack", script)</h3>
+<h3>DefineAnimations("ident-name", {type = {script}, ...})</h3>
 
 Define animations.
 
 <dl>
 <dt>"ident-name"</dt>
-<dd>Name of the animation to define. The name tells stratagus when to play the animation.
-    Supported names:
+<dd>Name of the animation to define. The name tells stratagus when to play the
+animation.</dd>
+<dt>type</dt>
+<dd>Supported types:
     <ul>
-    <li>still</li>
-    <li>move</li>
-    <li>attack</li>
-    <li>repair</li>
-    <li>harvest followed by the name of the harvested resource</li>
-    <li>die</li>
+    <li>Still</li>
+    <li>Move</li>
+    <li>Attack</li>
+    <li>Repair</li>
+    <li>Train</li>
+    <li>Research</li>
+    <li>Upgrade</li>
+    <li>Build</li>
+    <li>Harvest_ followed by the name of the harvested resource</li>
+    <li>Death</li>
     </ul>
 </dd>
 <dt>script</dt>
 <dd>
-    A script is a bunch of frames and has this format:
-    <pre>
-	{ {Flags, Pixel, Sleep, Frame},
-	  {Flags Pixel Sleep Frame},
-	 ...}</pre>
-</dd>
-
-<dt>Here is a more detailed description of a frame.</dt>
-<dd>
-    <ul>
-	<li>Flags are the sum of the following:
+	A script is a list of operations. Supported operations:
 	<ul>
-	    <li>1 Restart - restart animation
-	    <li>2 Reset   - animation could here be aborted (switch to another)
-	    <li>4 Sound   - play a sound with the animation
-	    <li>8 Missile - fire a missile at this point
-	</ul>
-	<li>Pixel is the number of pixels to move (if this is a moving animation)
-	    the sum of a walking animation should be 16 (the tile size in pixels)
-	<li>Sleep is the number of game cycles to wait until the next animation frame.
-	Sleep is limited to maximum 255 cycles.
-	The sleep value controls the unit motion speed. The speed variable in 
-        a unit type definition is only used for display. This will be fixed sometime in the future.
-	<li>Frame is the tile position on the image. Usually 5*tilerows
-	  (also if the unit actually has more than five possible headings).
-	  The engine will calculate the appropriate sprite number for the heading.
-    </ul>
+	<li>"frame X": Display this frame plus the direction offset</li>
+	<li>"exact-frame X": Display this exact frame</li>
+	<li>"wait X": Wait this number of cycles</li>
+	<li>"random-wait X Y": Wait a random number of cycles between X and Y</li>
+	<li>"sound X": Play this sound</li>
+	<li>"random-sound X Y Z ...": Randomly play one of the listed sounds</li>
+	<li>"attack": Attack</li>
+	<li>"rotate X": Rotate unit, positive for clockwise, negative for counterclockwise</li>
+	<li>"random-rotate X": Rotate in a random direction</li>
+	<li>"move X": Move this number of pixels</li>
+	<li>"unbreakable {begin|end}": Start or end an unbreakable section</li>
+	<li>"label X": Create a label (used by goto and random-goto)</li>
+	<li>"goto X": Goto a label position</li>
+	<li>"random-goto X Y": Goto label Y with X percent probability</li>
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-DefineAnimations("animations-footman",
-  "still", {	-- #5
-    { 0, 0,   4,   0}, { 3, 0,   1,   0}},
-  "move", {	-- #16, P32
-    { 0, 3,   2,   0}, { 0, 3,   1,   5}, { 0, 3,   2,   5}, { 0, 2,   1,  10},
-    { 0, 3,   1,  10}, { 0, 2,   1,   0}, { 0, 3,   2,   0}, { 0, 3,   1,  15},
-    { 0, 3,   2,  15}, { 0, 2,   1,  20}, { 0, 3,   1,  20}, { 3, 2,   1,   0}},
-  "attack", {	-- #25
-    { 0, 0,   3,  25}, { 0, 0,   3,  30}, { 0, 0,   3,  35}, {12, 0,   5,  40},
-    { 0, 0,  10,   0}, { 3, 0,   1,   0}},
-  "die", {	-- #107
-    { 0, 0,   3,  45}, { 0, 0,   3,  50}, { 0, 0, 100,  55}, { 3, 0,   1,  55}})
+DefineAnimations("animations-footman", {
+  Still = {"frame 0", "wait 4", "frame 0", "wait 1",},
+  Move = {"unbreakable begin", "frame 0", "move 3", "wait 2", "frame 5", "move 3", "wait 1",
+    "frame 5", "move 3", "wait 2", "frame 10", "move 2", "wait 1",
+    "frame 10", "move 3", "wait 1", "frame 0", "move 2", "wait 1",
+    "frame 0", "move 3", "wait 2", "frame 15", "move 3", "wait 1",
+    "frame 15", "move 3", "wait 2", "frame 20", "move 2", "wait 1",
+    "frame 20", "move 3", "wait 1", "frame 0", "move 2", "unbreakable end", "wait 1",},
+  Attack = {"unbreakable begin", "frame 25", "wait 3", "frame 30", "wait 3", "frame 35", "wait 3",
+    "frame 40", "attack", "sound footman-attack", "wait 5", "frame 0", "wait 10",
+    "frame 0", "unbreakable end", "wait 1",},
+  Death = {"unbreakable begin", "frame 45", "wait 3", "frame 50", "wait 3", "frame 55", "wait 100",
+    "frame 55", "unbreakable end", "wait 1",}
 </pre>
 
 <a name="DefineBoolFlags"></a>
