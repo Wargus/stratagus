@@ -97,7 +97,7 @@ local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
 **	@param y	Screen Y position of the unit.
 */
 local void (*DrawSelection)(const Unit*,const UnitType*,int,int)
-	=DrawSelectionCircle;
+	=DrawSelectionRectangle;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -982,8 +982,11 @@ local void ShowSingleOrder(const Unit* unit,int x1,int y1,const Order* order)
 	    dest=1;
 	    break;
 
-	case UnitActionAttack:
 	case UnitActionAttackGround:
+	    x2=Map2ScreenX(order->X)+TileSizeX/2;
+	    y2=Map2ScreenY(order->Y)+TileSizeY/2;
+	    // FALL THROUGH
+	case UnitActionAttack:
 	    if( unit->SubAction&2 ) {	// Show weak targets.
 		e_color=ColorBlue;
 	    } else {
