@@ -117,6 +117,7 @@ global void InitModules(void)
     GameCycle = 0;
     SyncHash = 0;
 
+    CallbackMusicOn();
     InitSyncRand();
     InitIcons();
     InitVideoCursors();
