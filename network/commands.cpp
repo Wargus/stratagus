@@ -159,7 +159,8 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
 	}
 	fprintf(LogFile, "  'date\t\"%s\"\n", s);
 	fprintf(LogFile, "  'map\t\"%s\"\n", TheMap.Description);
-	fprintf(LogFile, "  'map-id\t%u\n", TheMap.Info->MapUID);
+	// FIXME : does this work on 64bit arch ?
+	fprintf(LogFile, "  'map-id\t%d\n", (signed int)TheMap.Info->MapUID);
 	fprintf(LogFile, "  'map-path\t\"%s\"\n", CurrentMapPath);
 	fprintf(LogFile, "  'resources\t%d\n", GameSettings.Resources);
 	fprintf(LogFile, "  'num-units\t%d\n", GameSettings.NumUnits);
@@ -291,7 +292,8 @@ local SCM CclReplayLog(SCM list)
 	    map = get_c_string(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("map-id"))) {
-	    mapid = gh_scm2int(gh_car(list));
+	    // FIXME : does this works on 64bits archs
+	    mapid = (unsigned int)gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("map-path"))) {
 	    mappath = get_c_string(gh_car(list));
