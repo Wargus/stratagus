@@ -206,6 +206,7 @@ local int MineInGoldmine(Unit* unit)
 	//
 	//	Change unit outfit. (Unit type is used for this.)
 	//
+	unit->Player->UnitTypesCount[unit->Type->Type]--;
 	if( unit->Type==UnitTypeOrcWorker ) {
 	    unit->Type=UnitTypeOrcWorkerWithGold;
 	} else if( unit->Type==UnitTypeHumanWorker ) {
@@ -215,6 +216,7 @@ local int MineInGoldmine(Unit* unit)
 	    DebugLevel0Fn("Wrong unit (%d,%d) for mining gold %d (%s)\n"
 		,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
 	}
+	unit->Player->UnitTypesCount[unit->Type->Type]++;
         CheckUnitToBeDrawn(unit);
 	if( unit->Selected ) {
 	    UpdateButtonPanel();
@@ -320,6 +322,7 @@ local int MoveToGoldDeposit(Unit* unit)
 	MustRedraw|=RedrawResources;
     }
 
+    unit->Player->UnitTypesCount[unit->Type->Type]--;
     if( unit->Type==UnitTypeOrcWorkerWithGold ) {
 	unit->Type=UnitTypeOrcWorker;
     } else if( unit->Type==UnitTypeHumanWorkerWithGold ) {
@@ -329,6 +332,7 @@ local int MoveToGoldDeposit(Unit* unit)
 	DebugLevel0Fn("Wrong unit (%d,%d) for returning gold %d (%s)\n"
 	    ,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
     }
+    unit->Player->UnitTypesCount[unit->Type->Type]++;
 
     if( WAIT_FOR_GOLD<MAX_UNIT_WAIT ) {
 	unit->Wait=WAIT_FOR_GOLD;
