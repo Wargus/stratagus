@@ -157,6 +157,7 @@ global void ReleaseUnit(Unit* unit)
 	DebugCheck( *unit->UnitSlot!=unit );
 	temp=Units[--NumUnits];
 	temp->UnitSlot=unit->UnitSlot;
+	temp->Slot=unit->Slot;
 	*unit->UnitSlot=temp;
 	Units[NumUnits]=NULL;
 	//
@@ -2287,7 +2288,7 @@ global void DropOutAll(const Unit* source)
     i=0;
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
-	if( unit->Removed && unit->X==source->X && unit->Y==source->Y ) {
+	if( unit->Removed && unit->Next==source ) {
 	    ++i;
 	    DropOutOnSide(unit,LookingW
 		,source->Type->TileWidth,source->Type->TileHeight);
@@ -3480,8 +3481,8 @@ global void LetUnitDie(Unit* unit)
 		// Restore value for oil-patch
 		unit->Value=unit->Data.Builded.Worker->Value;
 	    }
-	    DestroyAllInside(unit);
 	}
+	DestroyAllInside(unit);
 
 	RemoveUnit(unit,NULL);
 	UnitLost(unit);
@@ -3583,7 +3584,9 @@ global void LetUnitDie(Unit* unit)
 global void DestroyAllInside(Unit* source)
 {
     Unit* unit;
+    Unit* table[UnitMax];
     int i;
+    int j;
 
     //
     // Destroy all units in Transporters
@@ -3617,14 +3620,19 @@ global void DestroyAllInside(Unit* source)
     //
     // Destroy all units in buildings or Resources (mines...)
     //
+    j = 0;
     for( i=0; i<NumUnits; i++ ) {
 	unit=Units[i];
-	if( !unit->Removed ) {		// not an unit inside
-	    continue;
+	if( unit->Removed && unit->Next==source ) {
+	    table[j++] = unit;
 	}
-	if( unit->X==source->X && unit->Y==source->Y ) {
-	    LetUnitDie(unit);
-	}
+    }
+    for( i=0; i<j; i++ ) {
+	unit=table[i];
+	RemoveUnit(unit,NULL);
+	UnitLost(unit);
+    	UnitClearOrders(unit);
+	ReleaseUnit(unit);
     }
 }
 
