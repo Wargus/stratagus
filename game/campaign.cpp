@@ -38,6 +38,7 @@
 #include "map.h"
 #include "campaign.h"
 #include "settings.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -149,6 +150,12 @@ global void PlayCampaign(const char* name)
 	return;
     }
 
+    if (!CurrentCampaign->Chapters) {
+	char buf[1024];
+	filename=LibraryFileName(CurrentCampaign->File,buf);
+	vload(filename, 0, 1);
+    }
+
     GameIntro.Objectives[0]=strdup(DefaultObjective);
 
     CurrentChapter = CurrentCampaign->Chapters;
@@ -190,13 +197,22 @@ local SCM CclDefineCampaign(SCM list)
     if( Campaigns ) {
 	for( i=0; i<NumCampaigns; ++i ) {
 	    if( !strcmp(Campaigns[i].Ident, ident) ) {
-		free(ident);
-		return SCM_UNSPECIFIED;
+		if( Campaigns[i].Chapters ) {
+		    free(ident);
+		    return SCM_UNSPECIFIED;
+		}
+		campaign=Campaigns+i;
+		free(campaign->Ident);
+		free(campaign->Name);
+		free(campaign->File);
+		break;
 	    }
 	}
-	Campaigns=realloc(Campaigns,sizeof(Campaign)*(NumCampaigns+1));
-	campaign=Campaigns+NumCampaigns;
-	NumCampaigns++;
+	if( i==NumCampaigns ) {
+	    Campaigns=realloc(Campaigns,sizeof(Campaign)*(NumCampaigns+1));
+	    campaign=Campaigns+NumCampaigns;
+	    NumCampaigns++;
+	}
     } else {
 	campaign=Campaigns=malloc(sizeof(Campaign));
 	NumCampaigns++;
