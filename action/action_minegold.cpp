@@ -56,6 +56,13 @@ local int MoveToGoldMine(Unit* unit)
 #ifdef NEW_ORDERS
     destu=unit->Orders[0].Goal;
 
+    if( !destu ) {
+	// FIXME: perhaps we should choose an alternative
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+
     DebugCheck( !destu );
     DebugCheck( unit->Wait!=1 );
 
@@ -109,8 +116,17 @@ local int MoveToGoldMine(Unit* unit)
     // we should check if there's still some gold left in the mine instead.
 
     destu->Data.Resource.Active++;
+
 #else
+
     destu=unit->Command.Data.Move.Goal;
+
+    if( !destu ) {
+	// FIXME: perhaps we should choose an alternative
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
 
     DebugCheck( !destu );
     DebugCheck( unit->Wait!=1 );
@@ -343,6 +359,13 @@ local int MoveToGoldDeposit(Unit* unit)
 #ifdef NEW_ORDERS
     destu=unit->Orders[0].Goal;
 
+    if( !destu ) {
+	// FIXME: perhaps we should choose an alternative
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+
     DebugCheck( !destu );
     DebugCheck( unit->Wait!=1 );
 
@@ -392,6 +415,13 @@ local int MoveToGoldDeposit(Unit* unit)
 #else
 
     destu=unit->Command.Data.Move.Goal;
+
+    if( !destu ) {
+	// FIXME: perhaps we should choose an alternative
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
 
     DebugCheck( !destu );
     DebugCheck( unit->Wait!=1 );
