@@ -356,6 +356,14 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     int color;
     UnitStats* stats;
 
+#ifdef REFS_DEBUG
+    #include "font.h"
+    //
+    //	Show the number of references.
+    //
+    DrawNumber(x+1,y+1,GameFont,unit->Refs);
+#endif
+
 
     //
     //	Only for selected units?

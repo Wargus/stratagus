@@ -144,7 +144,7 @@ local int AnimateActionRepair(Unit* unit)
 **
 **	@param unit	Unit, for that the attack is handled.
 */
-global int HandleActionRepair(Unit* unit)
+global void HandleActionRepair(Unit* unit)
 {
     Unit* goal;
     int err;
@@ -157,7 +157,7 @@ global int HandleActionRepair(Unit* unit)
 	//
 	case 0:
 	    // FIXME: RESET FIRST!! Why? (Johns)
-	    err=HandleActionMove(unit);
+	    err=DoActionMove(unit);
 	    if( unit->Reset ) {
 		//
 		//	No goal: if meeting enemy attack it.
@@ -231,7 +231,7 @@ global int HandleActionRepair(Unit* unit)
 			RefsDebugCheck( !goal->Refs );
 			unit->Orders[0].Goal=NoUnitP;
 		    }
-		    return 1;
+		    return;
 		}
 		unit->Orders[0].Action=UnitActionRepair;
 #else
@@ -242,7 +242,7 @@ global int HandleActionRepair(Unit* unit)
 			RefsDebugCheck( !goal->Refs );
 			unit->Command.Data.Move.Goal=NoUnitP;
 		    }
-		    return 1;
+		    return;
 		}
 		unit->Command.Action=UnitActionRepair;
 #endif
@@ -325,14 +325,13 @@ global int HandleActionRepair(Unit* unit)
 #endif
 		    unit->SubAction=0;
 		    unit->State=0;
-                    return 1;
+                    return;
 		}
 
 		// FIXME: automatic repair
 	    }
 	    break;
     }
-    return 0;
 }
 
 //@}

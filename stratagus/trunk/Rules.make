@@ -81,10 +81,6 @@ VIDEOLIB	= -lXext -lX11 -ldl
 
 # Uncomment the next to get the support for SDL.
 
-# Old SDL <1.0.0
-#SDL_CFLAGS	=
-#SDLLIB		= -lSDL -ldl -lpthread
-
 # New SDL >=1.0.0
 SDL_CFLAGS	= $(shell sdl-config --cflags)
 SDLLIB		= $(shell sdl-config --static-libs)
@@ -155,7 +151,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #------------------------------------------------------------------------------
 
 # Uncomment next to profile
-#PROFILE=	-pg
+PROFILE=	-pg
 
 # Version
 VERSION=	'-DVERSION="1.17pre1-build11"'
@@ -191,7 +187,7 @@ EXE=
 ## include flags
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## define flags
-DEBUG=	-DDEBUG # -DREFS_DEBUG # -DFLAG_DEBUG
+DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ##
 ## There are some still not well tested code parts or branches.
 ## UNITS_ON_MAP:	Faster lookup of units
@@ -202,7 +198,7 @@ DEBUG=	-DDEBUG # -DREFS_DEBUG # -DFLAG_DEBUG
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_MAPDRAW #-DNEW_ORDERS #-DNEW_NAMES -DNEW_FOW -DNEW_AI
+	$(DEBUG) -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_ORDERS #-DNEW_MAPDRAW=1 -DNEW_NAMES -DNEW_FOW -DNEW_AI
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)

@@ -46,10 +46,11 @@
 #CCLLIB	= $(GUILELIB)
 
 #------------------------------------------------------------------------------
+
 # Comment next for a version without SIOD (scheme interpreter)
 #
 
-# Try to use siod (currently default)
+# Try to use SIOD (currently default)
 CCL	= -DUSE_CCL2
 CCLLIB	= -lm
 
@@ -158,7 +159,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #PROFILE=	-pg
 
 # Version
-VERSION=	'-DVERSION="1.17pre1-build10"'
+VERSION=	'-DVERSION="1.17pre1-build11"'
 
 ############################################################################
 # below this, nothing should be changed!
@@ -202,7 +203,7 @@ DEBUG=	-DDEBUG # -DREFS_DEBUG -DFLAG_DEBUG
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DUNIT_ON_MAP #-DNEW_ORDERS -DNEW_MAPDRAW -DNEW_NAMES -DNEW_FOW -DNEW_AI -DNEW_SHIPS
+	$(DEBUG) -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_ORDERS #-DNEW_MAPDRAW -DNEW_NAMES -DNEW_FOW -DNEW_AI
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)

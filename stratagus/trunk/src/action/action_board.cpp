@@ -47,7 +47,7 @@ local int MoveToTransporter(Unit* unit)
 {
     int i;
 
-    i=HandleActionMove(unit);
+    i=DoActionMove(unit);
 #ifdef NEW_ORDERS
     unit->Orders[0].Action=UnitActionBoard;
 #else
@@ -230,6 +230,12 @@ global void HandleActionBoard(Unit* unit)
 	//
 	//	Move to transporter
 	//
+	case 0:
+#ifdef NEW_ORDERS
+		NewResetPath(unit);
+#endif
+		unit->SubAction=1;
+		// FALL THROUGH
         default:
 	    if( unit->SubAction<=200 ) {
 		// FIXME: if near transporter wait for enter

@@ -459,6 +459,8 @@ local void RegisterSource(SoundRequest* sr,int channel) {
 #ifdef USE_GLIB
     g_hash_table_insert(UnitToChannel,(gpointer)(long)(sr->Source.Base),
 			(gpointer)(channel+1));
+#else
+    DebugLevel3Fn("FIXME: must write\n");
 #endif
     DebugLevel3("Registering %p (channel %d)\n",sr->Source.Base,channel);
 }
@@ -474,6 +476,8 @@ local void UnRegisterSource(int channel) {
 	g_hash_table_remove(UnitToChannel,
 			    (gpointer)(long)(Channels[channel].Source.Base));
     }
+#else
+    DebugLevel3Fn("FIXME: must write\n");
 #endif
     DebugLevel3("Removing %p (channel %d)\n",Channels[channel].Source.Base,
 		channel);
@@ -767,8 +771,8 @@ local Sample* LoadSample(const char* name)
     return sample;
 }
 
-/*
-** Register a sound (can be a simple sound or a group)
+/**
+**	Register a sound (can be a simple sound or a group)
 */
 global SoundId RegisterSound(char* file[],unsigned char number) {
     //FIXME: handle errors
@@ -847,8 +851,9 @@ global void WriteSound(void)
     int free_channels,dummy1,dummy2;
 
     // ARI: If DSP open had failed: No soundcard, other user, etc..
-    if (SoundFildes == -1)
+    if (SoundFildes == -1) {
 	return;
+    }
 
     DebugLevel3Fn("\n");
 
@@ -1013,6 +1018,7 @@ global int InitSound(void)
 	fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
 	return(-1);
     }
+    SoundFildes=0;
     SDL_PauseAudio(0);
     }
 #else
@@ -1091,6 +1097,8 @@ global int InitSound(void)
     // WARNING: creation is only valid for a hash table using pointers as key
 #ifdef USE_GLIB
     UnitToChannel=g_hash_table_new(g_direct_hash,NULL);
+#else
+    DebugLevel0Fn("FIXME: must write\n");
 #endif
 
     return 0;
@@ -1138,6 +1146,7 @@ global void QuitSound(void)
 {
 #ifdef USE_SDLA
     SDL_CloseAudio();
+    SoundFildes=-1;
 #else
     if (SoundFildes != -1) {
 	close(SoundFildes);

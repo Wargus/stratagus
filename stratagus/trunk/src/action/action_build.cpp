@@ -53,28 +53,60 @@ global void HandleActionBuild(Unit* unit)
     Unit* build;
     Unit* temp;
 
+    if( !unit->SubAction ) {		// first entry
+	unit->SubAction=1;
+#ifdef NEW_ORDERS
+	NewResetPath(unit);
+#endif
+    }
+
 #ifdef NEW_ORDERS
     type=unit->Orders[0].Type;
 #else
     type=unit->Command.Data.Build.BuildThis;
 #endif
-    switch( HandleActionMove(unit) ) {	// reached end-point?
+
+    switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
+	    //
+	    //	Some tries to reach the goal
+	    //
+	    if( unit->SubAction++<10 ) {
+#ifndef NEW_ORDERS
+		unit->Command.Action=UnitActionBuild;
+#endif
+		//	To keep the load low, retry each 1/4 second.
+		unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
+		return;
+	    }
 	    // FIXME: use general notify/messages
 	    if( unit->Player==ThisPlayer ) {
 		SetMessage("You cannot reach building place.");
 	    } else {
 		AiCanNotReach(unit,type);
 	    }
+
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Action=UnitActionStill;
+#endif
+	    unit->SubAction=0;
+	    if( IsSelected(unit) ) {	// update display for new action
+		UpdateButtonPanel();
+	    }
+
 	    return;
+
 	case PF_REACHED:
 	    DebugLevel3Fn("reached %d,%d\n",unit->X,unit->Y);
 	    break;
+
 	default:
 	    return;
     }
 
-    // Must be reached!
+    //
+    //	Building place must be reached!
+    //
 #ifdef NEW_ORDERS
     x=unit->Orders[0].X;
     y=unit->Orders[0].Y;
@@ -82,6 +114,7 @@ global void HandleActionBuild(Unit* unit)
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
 #endif
+
     if( type->ShoreBuilding ) {		// correct coordinates.
 	++x;
 	++y;
@@ -91,12 +124,33 @@ global void HandleActionBuild(Unit* unit)
     //	Check if the building could be build there.
     //
     if( !CanBuildUnitType(unit,type,x,y) ) {
+	//
+	//	Some tries to build the building.
+	//
+	if( unit->SubAction++<10 ) {
+#ifndef NEW_ORDERS
+	    unit->Command.Action=UnitActionBuild;
+#endif
+	    //	To keep the load low, retry each 1/4 second.
+	    unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
+	    return;
+	}
+
 	// FIXME: use general notify/messages
         if( unit->Player==ThisPlayer ) {
 	    SetMessage("You cannot build %s here.", type->Name);
 	} else {
 	    AiCanNotBuild(unit,type);
 	}
+
+#ifdef NEW_ORDERS
+	unit->Orders[0].Action=UnitActionStill;
+#endif
+	unit->SubAction=0;
+	if( IsSelected(unit) ) {	// update display for new action
+	    UpdateButtonPanel();
+	}
+
 	return;
     }
 
@@ -107,8 +161,6 @@ global void HandleActionBuild(Unit* unit)
 	if( unit->Player!=ThisPlayer ) {
 	    AiCanNotBuild(unit,type);
 	}
-	// Comment: For the usual player the resources are substracted
-	// when the build icon is pressed.
 	return;
     }
     PlayerSubUnitType(unit->Player,type);
@@ -167,6 +219,7 @@ global void HandleActionBuild(Unit* unit)
 #else
     unit->Command.Action=UnitActionStill;
 #endif
+    unit->SubAction=0;
 
     CheckUnitToBeDrawn(build);
     MustRedraw|=RedrawMinimap;
@@ -191,19 +244,17 @@ global void HandleActionBuilded(Unit* unit)
     if( unit->Data.Builded.Cancel ) {
 	// Drop out unit
 	peon=unit->Data.Builded.Worker;
-	peon->Reset=1;
-	peon->Wait=1;
 	peon->Orders[0].Action=UnitActionStill;
 	unit->Data.Builded.Worker=NoUnitP;
 #else
     if( unit->Command.Data.Builded.Cancel ) {
 	// Drop out unit
 	peon=unit->Command.Data.Builded.Worker;
-	peon->Reset=1;
-	peon->Wait=1;
 	peon->Command.Action=UnitActionStill;
 	unit->Command.Data.Builded.Worker=NoUnitP;
 #endif
+	peon->Reset=peon->Wait=1;
+	peon->SubAction=0;
 
 	unit->Value=peon->Value;	// peon holding value while building
 	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
@@ -261,8 +312,7 @@ global void HandleActionBuilded(Unit* unit)
 	unit->Player->UnitTypesCount[type->Type]++;
 	unit->Constructed=0;
 	unit->Frame=0;
-	unit->Reset=1;
-	unit->Wait=1;
+	unit->Reset=unit->Wait=1;
 
 #ifdef NEW_ORDERS
 	peon=unit->Data.Builded.Worker;
@@ -271,8 +321,8 @@ global void HandleActionBuilded(Unit* unit)
 	peon=unit->Command.Data.Builded.Worker;
 	peon->Command.Action=UnitActionStill;
 #endif
-	peon->Reset=1;
-	peon->Wait=1;
+	peon->SubAction=0;
+	peon->Reset=peon->Wait=1;
 	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
 
 	//

@@ -110,7 +110,8 @@ global void FreeUnitMemory(Unit* unit)
 */
 global void ReleaseUnit(Unit* unit)
 {
-    DebugLevel3Fn(" Unit %p %Zd\n",unit,UnitNumber(unit));
+    DebugLevel2Fn(" Unit %p %Zd `%s'\n",
+	    unit,UnitNumber(unit),unit->Type->Ident);
 
     DebugCheck( !unit->Type );		// already free.
 
@@ -142,10 +143,11 @@ global void ReleaseUnit(Unit* unit)
 	//
 	//	Are more references remaining?
 	//
+	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
 	    unit->Destroyed=1;		// mark as destroyed
 
-	    DebugLevel3Fn("More references of %Zd #%d\n"
+	    DebugLevel2Fn("More references of %Zd #%d\n"
 		    ,UnitNumber(unit),unit->Refs);
 	    return;
 	}
@@ -198,7 +200,8 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     //
     //	Can use released unit?
     //
-    if( ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
+    // FIXME: releasing disabled until references are working correct.
+    if( 1 && ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
 	unit=ReleasedHead;
 	ReleasedHead=unit->Next;
 	if( ReleasedTail==&unit->Next ) {	// last element
@@ -206,7 +209,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	}
 	slot=UnitSlots+unit->Slot;
 	memset(unit,0,sizeof(*unit));
-	DebugLevel3Fn("release %p\n",unit);
+	DebugLevel2Fn("release %p\n",unit);
 	// FIXME: can release here more slots.
     } else {
 	//
@@ -274,12 +277,16 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Reset=1;
 
     unit->Rs=MyRand()%100; // used for random fancy buildings and other things
-    unit->Revealer = 0; // FOW revealer
+    // DEFAULT! unit->Revealer = 0;		// FOW revealer
 
 #ifdef NEW_ORDERS
+    unit->OrderCount=1;
     unit->Orders[0].Action=UnitActionStill;
+    DebugCheck( unit->Orders[0].Goal );
     unit->NewOrder.Action=UnitActionStill;
+    DebugCheck( unit->NewOrder.Goal );
     unit->SavedOrder.Action=UnitActionStill;
+    DebugCheck( unit->SavedOrder.Goal );
 #else
     unit->Command.Action=UnitActionStill;
     unit->PendCommand.Action=UnitActionStill;
@@ -1168,6 +1175,11 @@ global void UnitHeadingFromDeltaXY(Unit* unit,int dx,int dy)
 
 /**
 **	Reappear unit on map.
+**
+**	@param unit	Unit to drop out.
+**	@param heading	Direction in which the unit should appear.
+**	@param addx	Tile size in x.
+**	@param addy	Tile size in y.
 */
 global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
 {
@@ -1258,14 +1270,14 @@ found:
     TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("Look here\n");
-    unit->Orders[0].Action=UnitActionStill;
+    //unit->Orders[0].Action=UnitActionStill;
+    //DebugCheck( unit->SubAction );
 #else
     unit->Command.Action=UnitActionStill;
 #endif
     if( unit->Wait!=1 ) {
 	unit->Wait=1;
-	DebugLevel3("Check this\n");
+	DebugLevel2Fn("Check this\n");
     }
     unit->Removed=0;
 
@@ -1289,6 +1301,12 @@ found:
 
 /**
 **	Reappear unit on map nearest to x,y.
+**
+**	@param unit	Unit to drop out.
+**	@param gx	Goal X map tile position.
+**	@param gy	Goal Y map tile position.
+**	@param addx	Tile size in x.
+**	@param addy	Tile size in y.
 */
 global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 {
@@ -1363,19 +1381,18 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	if( bestd!=99999 ) {
 	    unit->X=bestx;
 	    unit->Y=besty;
+
 	    // FIXME: This only works with 1x1 big units
+	    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
 	    TheMap.Fields[bestx+besty*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
-#ifdef NEW_ORDERS
-	    DebugLevel0Fn("Look here\n");
-	    unit->Orders[0].Action=UnitActionStill;
-#else
+#ifndef NEW_ORDERS
 	    unit->Command.Action=UnitActionStill;
-#endif
 	    if( unit->Wait!=1 ) {
 		unit->Wait=1;
-		DebugLevel3("Check this\n");
+		DebugLevel2Fn("Check this\n");
 	    }
+#endif
 	    unit->Removed=0;
 	    UnitCacheInsert(unit);
 
@@ -1403,6 +1420,8 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 
 /**
 **	Drop out all units inside unit.
+**
+**	@param source	All units inside source are dropped out.
 */
 global void DropOutAll(const Unit* source)
 {
@@ -1418,6 +1437,13 @@ global void DropOutAll(const Unit* source)
 	if( unit->X==source->X && unit->Y==source->Y ) {
 	    DropOutOnSide(unit,LookingW
 		    ,source->Type->TileWidth,source->Type->TileHeight);
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Action=UnitActionStill;
+#else
+	    unit->Command.Action=UnitActionStill;
+#endif
+	    unit->Wait=unit->Reset=1;
+	    unit->SubAction=0;
 	}
     }
 }
@@ -2083,15 +2109,16 @@ global void DestroyUnit(Unit* unit)
     //
     //	Release all references
     //
-    for( i=unit->OrderCount+1; i>=0; --i ) {
+    for( i=unit->OrderCount; i-->0; ) {
 	if( unit->Orders[i].Goal ) {
-	    DebugCheck( !unit->Orders[i].Goal->Refs );
+	    RefsDebugCheck( !unit->Orders[i].Goal->Refs );
 	    if( !--unit->Orders[i].Goal->Refs ) {
+		RefsDebugCheck( !unit->Orders[i].Goal->Destroyed );
 		ReleaseUnit(unit->Orders[i].Goal);
 	    }
 	    unit->Orders[i].Goal=NoUnitP;
 	}
-	unit->OrderCount=0;
+	unit->OrderCount=1;
     }
 #else
     // FIXME: unit has still references, can't be reseted here.
@@ -2436,12 +2463,14 @@ global void HitUnit(Unit* unit,int damage)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Returns the distance between two points.
+**	Returns the map distance between two points.
 **
 **	@param x1	X map tile position.
 **	@param y1	Y map tile position.
 **	@param x2	X map tile position.
 **	@param y2	Y map tile position.
+**
+**	@returns	The distance between in tiles.
 */
 global int MapDistance(int x1,int y1,int x2,int y2)
 {
@@ -2449,7 +2478,15 @@ global int MapDistance(int x1,int y1,int x2,int y2)
 }
 
 /**
-**	Returns the distance to unit type.
+**	Returns the map distance between two points with unit type.
+**
+**	@param x1	X map tile position.
+**	@param y1	Y map tile position.
+**	@param type	Unit type to take into account.
+**	@param x2	X map tile position.
+**	@param y2	Y map tile position.
+**
+**	@returns	The distance between in tiles.
 */
 global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
 {
@@ -2481,15 +2518,67 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
 }
 
 /**
-**	Returns the distance to unit.
+**	Returns the map distance to unit.
 **
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 **	@param dest	Distance to this unit.
+**
+**	@returns	The distance between in tiles.
 */
 global int MapDistanceToUnit(int x,int y,const Unit* dest)
 {
     return MapDistanceToType(x,y,dest->Type,dest->X,dest->Y);
+}
+
+/**
+**	Returns the map distance between two units.
+**
+**	@param src	Distance from this unit.
+**	@param dst	Distance  to  this unit.
+**
+**	@returns	The distance between in tiles.
+*/
+global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
+{
+    int dx;
+    int dy;
+    int x1;
+    int x2;
+    int y1;
+    int y2;
+
+    x1=src->X;
+    y1=src->Y;
+    x2=dst->X;
+    y2=dst->Y;
+
+    if( x1+src->Type->TileWidth<=x2 ) {
+	dx=x2-x1-src->Type->TileWidth;
+	if( dx<0 ) {
+	    dx=0;
+	}
+    } else {
+	dx=x1-x2-dst->Type->TileWidth;
+	if( dx<0 ) {
+	    dx=0;
+	}
+    }
+
+    if( y1+src->Type->TileHeight<=y2 ) {
+	dy=y2-y1-src->Type->TileHeight;
+    } else {
+	dy=y1-y2-dst->Type->TileHeight;
+	if( dy<0 ) {
+	    dy=0;
+	}
+    }
+
+    if( src->Selected )
+    DebugLevel2("\tDistance %d,%d -> %d,%d = %d\n"
+	    ,x1,y1,x2,y2,(dy<dx) ? dx : dy);
+
+    return (dy<dx) ? dx : dy;
 }
 
 /**
@@ -2525,29 +2614,6 @@ global int ViewPointDistanceToUnit(Unit* dest) {
     return MapDistanceToUnit(x_v,y_v,dest);
 }
 
-#if 0
-/**
-**	Check if unit is an enemy.
-**
-**	FIXME: Should use a bit-field for enemies.
-*/
-global int IsEnemy(const Player* player,const Unit* dest)
-{
-    Player* dest_player;
-
-    //	Neutral unit
-    if( player->Player==PlayerNumNeutral
-	    || (dest_player=dest->Player)->Player==PlayerNumNeutral ) {
-	return 0;
-    }
-
-    //	Same team
-    if( player->Team==dest_player->Team ) {
-	return 0;
-    }
-    return 1;
-}
-#else
 /**
 **	Check if unit is an enemy.
 **
@@ -2573,7 +2639,6 @@ global int IsAllied(const Player* player,const Unit* dest)
 {
     return player->Allied&(1<<dest->Player->Player);
 }
-#endif
 
 /**
 **	Can the source unit attack the destination unit.
@@ -2629,19 +2694,23 @@ local void SaveCommand(const Command* command,FILE* file)
 	    break;
 	case UnitActionStill:
 	    fprintf(file,"'still");
+	    /*
 	    if( command->Data.Move.Goal ) {
 		ref=UnitReference(command->Data.Move.Goal);
 		fprintf(file," %s",ref);
 		free(ref);
 	    }
+	    */
 	    break;
 	case UnitActionStandGround:
 	    fprintf(file,"'stand-ground");
+	    /*
 	    if( command->Data.Move.Goal ) {
 		ref=UnitReference(command->Data.Move.Goal);
 		fprintf(file," %s",ref);
 		free(ref);
 	    }
+	    */
 	    break;
 	case UnitActionFollow:
 	    fprintf(file,"'follow");
@@ -2741,6 +2810,16 @@ local void SaveCommand(const Command* command,FILE* file)
 	    break;
 	case UnitActionHarvest:
 	    fprintf(file,"'harvest");
+	    fprintf(file," (%d %d)"
+		,command->Data.Move.SX,command->Data.Move.SY);
+	    fprintf(file," (%d %d)"
+		,command->Data.Move.DX,command->Data.Move.DY);
+	    if( command->Data.Move.Goal ) {
+		ref=UnitReference(command->Data.Move.Goal);
+		fprintf(file," %s",ref);
+		free(ref);
+	    }
+	    fprintf(file," %d",command->Data.Move.Range);
 	    fprintf(file," \"FIXME:\"");
 	    break;
 	case UnitActionMineGold:
@@ -2792,53 +2871,72 @@ global void SaveUnit(const Unit* unit,FILE* file)
     free(ref);
 
     // FIXME: This part has nobody (=johns) updated!
-    fprintf(file,"'%s ;;; \"%s\"\n",unit->Type->Ident,unit->Type->Name);
-    fprintf(file,"\t(%d %d) ",unit->X,unit->Y);
-    fprintf(file,"(%d %d) ",unit->IX,unit->IY);
-    fprintf(file,"%d ",unit->Frame);
-    fprintf(file,"%d\n",(unit->Direction*360)/256);
+
+    fprintf(file,"'%s ",unit->Type->Ident);
+    fprintf(file,"\t'player %d\n",unit->Player->Player);
+    fprintf(file,"\t'x %d 'y %d ",unit->X,unit->Y);
+    fprintf(file,"'ix %d 'iy %d ",unit->IX,unit->IY);
+    //fprintf(file,"'frame %d 'seen %d ",unit->Frame,unit->SeenFrame);
+    fprintf(file,"'frame %d ",unit->Frame);
+    fprintf(file,"'dir %d\n",(unit->Direction*360)/256);
+    i=0;
     if( unit->Attacked ) {
-	fprintf(file,"\t'attacked\n");
+	fprintf(file,"\t'attacked");
+	i=1;
+    }
+    if( unit->Burning ) {
+	fprintf(file,"\t'burning");
+	i=1;
     }
     /*
     if( unit->Visible ) {
-	fprintf(file,"\t'visible\n");
+	fprintf(file,"\t'visible");
+	i=1;
     }
     */
     if( unit->Removed ) {
-	fprintf(file,"\t'removed\n");
+	fprintf(file,"\t'removed");
+	i=1;
     }
+    /*
     if( unit->Selected ) {
-	fprintf(file,"\t'selected\n");
+	fprintf(file,"\t'selected");
+	i=1;
     }
+    */
     if( unit->Constructed ) {
-	fprintf(file,"\t'constructed\n");
+	fprintf(file,"\t'constructed");
+	i=1;
     }
-    fprintf(file,"\t%d ",unit->Player->Player);
-    fprintf(file,"%d ",unit->Mana);
-    fprintf(file,"%d ",unit->HP);
-    fprintf(file,"(%d %d %d %d %d %d)\n"
+    if( i ) {
+	fprintf(file,"\n");
+    }
+    fprintf(file,"\t'mana %d ",unit->Mana);
+    fprintf(file,"'hp %d ",unit->HP);
+    fprintf(file,"'spells (%d %d %d %d %d %d)\n"
 	    ,unit->Bloodlust
 	    ,unit->Haste
 	    ,unit->Slow
 	    ,unit->Invisible
 	    ,unit->FlameShield
 	    ,unit->UnholyArmor);
-    fprintf(file,"\t%d ",unit->GroupId);
-    fprintf(file,"%d\n",unit->Value);
+    fprintf(file,"\t'group %d ",unit->GroupId);
+    fprintf(file,"'value %d\n",unit->Value);
 
-    fprintf(file,"\t(%d %d %d%s)\n"
-	,unit->State
-	,unit->SubAction
-	,unit->Wait
-	,unit->Reset ? " 'reset" : "");
+    fprintf(file,"\t'states (%d %d %d%s)\n"
+	,unit->State,unit->SubAction,unit->Wait,unit->Reset ? " 'reset" : "");
 
+    fprintf(file,"\t'command ");
     SaveCommand(&unit->Command,file);
-    fprintf(file,"\t( ");
-    for( i=0; i<unit->NextCount; ++i ) {	// Save all commands
-	SaveCommand(unit->NextCommand+i,file);
+
+    if( unit->NextCount ) {
+	fprintf(file,"\t( 'command ");
+	for( i=0; i<unit->NextCount; ++i ) {	// Save all commands
+	    SaveCommand(unit->NextCommand+i,file);
+	}
+	fprintf(file," )");
     }
-    fprintf(file,"  ))\n");
+    fprintf(file," )\n");
 #endif
 }
 

@@ -305,8 +305,9 @@ local SCM CclSoundOff(void) {
 **		(uses SoundFildes)
 */
 local SCM CclSoundOn(void) {
-    if (SoundFildes != -1)
+    if (SoundFildes != -1) {
 	return SCM_BOOL_T;
+    }
     SoundOff=0;
     return SCM_BOOL_F;
 }
@@ -628,8 +629,9 @@ local SCM CclSoundOff(void) {
 **		(uses SoundFildes)
 */
 local SCM CclSoundOn(void) {
-    if (SoundFildes != -1)
+    if (SoundFildes != -1) {
 	return SCM_BOOL_T;
+    }
     SoundOff=0;
     return SCM_BOOL_F;
 }

@@ -10,7 +10,7 @@
 //
 /**@name unit_find.c	-	The find/select for units. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -496,6 +496,7 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
     type=unit->Type;
     for( i=0; i<n; ++i ) {
 	dest=table[i];
+	DebugCheck( dest->Destroyed );
 	// unusable unit
 	if( dest->Removed || dest->Command.Action==UnitActionDie ) {
 	    continue;
@@ -510,15 +511,15 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 		DebugLevel0Fn("HP==0\n");
 		continue;
 	    }
-	);
 
-	if( MapDistanceToUnit(x,y,dest)>range ) {
-	    DebugLevel0("Internal error: %d - %d `%s'\n"
-		    ,MapDistanceToUnit(x,y,dest)
-		    ,range
-		    ,dest->Type->Name);
-	    continue;
-	}
+	    if( MapDistanceToUnit(x,y,dest)>range ) {
+		DebugLevel0("Internal error: %d - %d `%s'\n"
+			,MapDistanceToUnit(x,y,dest)
+			,range
+			,dest->Type->Name);
+		continue;
+	    }
+	);
 
 	// Check if I can attack this unit.
 	DebugLevel3("Can attack unit %p <- %p\n",dest,unit);
@@ -613,8 +614,6 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	    continue;
 	}
 
-	d=MapDistanceToUnit(x,y,dest);
-
 	//
 	//	Calculate the costs to attack the unit.
 	//	Unit with the smallest attack costs will be taken.
@@ -631,6 +630,10 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	//
 	//	Unit in attack range?
 	//
+	d=MapDistanceBetweenUnits(unit,dest);
+	if( d<type->MinAttackRange ) {	// FIXME: we don't support moving away!
+	    continue;
+	}
 	if( d<attackrange && d>type->MinAttackRange ) {
 	    cost+=d*INRANGE_FACTOR/100;
 	    cost-=INRANGE_BONUS/100;

@@ -90,9 +90,13 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 
 /**
 **	Handle the action of an unit.
+**
+**	@param unit	Pointer to handled unit.
 */
 local void HandleUnitAction(Unit* unit)
 {
+    int z;
+
     // FIXME: Johns: What should this do?
     if ( unit->Revealer ) {
 #ifdef NEW_ORDERS
@@ -101,6 +105,7 @@ local void HandleUnitAction(Unit* unit)
 	unit->Command.Action = UnitActionDie;
 #endif
     }
+
     //
     //	If current action is breakable proceed with next one.
     //
@@ -116,7 +121,6 @@ local void HandleUnitAction(Unit* unit)
 	if( unit->OrderCount>1
 		&& (unit->Orders[0].Action==UnitActionStill || unit->OrderFlush)
 		) {
-	    int z;
 
 	    if( unit->Removed ) {	// FIXME: johns I see this as an error
 		DebugLevel0Fn("Flushing removed unit\n");
@@ -126,15 +130,16 @@ local void HandleUnitAction(Unit* unit)
 	    //	Release pending references.
 	    //
 	    if( unit->Orders[0].Goal ) {
+		// Still shouldn't have a reference
+		DebugCheck( unit->Orders[0].Action==UnitActionStill );
 		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 		if( !--unit->Orders[0].Goal->Refs ) {
 		    ReleaseUnit(unit->Orders[0].Goal);
 		}
-		IfDebug( unit->Orders[0].Goal=NoUnitP; )
 	    }
 
 	    //
-	    //	Shift queue with structure assignment
+	    //	Shift queue with structure assignment.
 	    //
 	    unit->OrderCount--;
 	    unit->OrderFlush=0;
@@ -143,12 +148,9 @@ local void HandleUnitAction(Unit* unit)
 	    }
 
 	    //
-	    //	Must reset the new order.
+	    //	Note subaction 0 should reset.
 	    //
-	    // FIXME: ResetPath(&unit->Orders[0]);
-
-	    unit->SubAction=0;
-	    unit->State=0;
+	    unit->SubAction=unit->State=0;
 	    unit->Wait=1;
 
 	    if( IsSelected(unit) ) {	// update display for new action
@@ -166,20 +168,6 @@ local void HandleUnitAction(Unit* unit)
 	if( unit->NextCount
 		&& (unit->Command.Action == UnitActionStill || unit->NextFlush)
 		&& !unit->Removed ) {
-	    int z;
-
-#if 0
-	    // FIXME: memory loose, can't fix now.
-	    //
-	    //	Release pending references.
-	    //
-	    if( unit->Command.Data.Move.Goal ) {
-		RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
-		if !--unit->Command.Data.Move.Goal->Refs ) {
-		    ReleaseUnit(unit->Command.Data.Move.Goal);
-		}
-	    }
-#endif
 
 	    //	Structure assign
 	    unit->Command=unit->NextCommand[0];
@@ -195,8 +183,7 @@ local void HandleUnitAction(Unit* unit)
 	    unit->NextFlush=0;
 
 	    // Reset for new order
-	    unit->SubAction=0;
-	    unit->State=0;
+	    unit->SubAction=unit->State=0;
 	    unit->Wait=1;
 
 	    if( IsSelected(unit) ) {	// update display for new action

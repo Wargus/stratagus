@@ -51,6 +51,10 @@ global void HandleActionResearch(Unit* unit)
     DebugLevel3("Research %Zd\n",UnitNumber(unit));
 
 #ifdef NEW_ORDERS
+    if( !unit->SubAction ) {		// first entry
+	unit->Data.Research.Ticks=0;
+	unit->SubAction=1;
+    }
     upgrade=unit->Data.Research.Upgrade;
     unit->Data.Research.Ticks+=SpeedResearch;
 
@@ -66,16 +70,18 @@ global void HandleActionResearch(Unit* unit)
 	if( unit->Player==ThisPlayer ) {
 	    SetMessage2(unit->X, unit->Y, "%s: Upgrade complete"
 		,unit->Type->Name );
+	} else {
+	    // FIXME: AiUpgradeToComplete(unit,type);
 	}
         UpgradeAcquire(unit->Player,upgrade);
 
-	unit->Reset=1;
-	unit->Wait=1;
+	unit->Reset=unit->Wait=1;
 #ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionStill;
 #else
 	unit->Command.Action=UnitActionStill;
 #endif
+	unit->SubAction=0;
 
 	// Upgrade can change all
 	UpdateButtonPanel();
@@ -91,7 +97,7 @@ global void HandleActionResearch(Unit* unit)
     unit->Reset=1;
     unit->Wait=FRAMES_PER_SECOND/6;
 
-    // FIXME: should animations here?
+    // FIXME: should be animations here?
 }
 
 //@}

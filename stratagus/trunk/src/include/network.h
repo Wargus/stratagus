@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name network.h	-	The network header file. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
@@ -32,12 +31,26 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define NetworkMaxLag	30		/// Debuging network lag (# frames)
+#define NetworkMaxLag	60		/// Debuging network lag (# frames)
 
 #define NetworkPort	6660		/// Default port for communication
 #define NetworkDups	4		/// Repeat old commands
 
-#define NetworkProtocolVersion 2	/// Network protocol version
+    /// Network protocol major version
+#define NetworkProtocolMajorVersion	0
+    /// Network protocol minor version (maximal 99)
+#define NetworkProtocolMinorVersion	2
+    /// Network protocol patch level (maximal 99)
+#define NetworkProtocolPatchLevel	1
+    /// Network protocol version (1,2,3) -> 10203
+#define NetworkProtocolVersion \
+	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
+	+NetworkProtocolPatchLevel)
+
+    /// Network protocol printf format string
+#define NetworkProtocolFormatString	"%d,%d,%d"
+    /// Network protocol printf format arguments
+#define NetworkProtocolFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
 
 /*----------------------------------------------------------------------------
 --	Declarations

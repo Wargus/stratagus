@@ -50,6 +50,10 @@ global void HandleActionUpgradeTo(Unit* unit)
 
     player=unit->Player;
 #ifdef NEW_ORDERS
+    if( !unit->SubAction ) {		// first entry
+	unit->Data.UpgradeTo.Ticks=0;
+	unit->SubAction=1;
+    }
     type=unit->Data.UpgradeTo.What;
     stats=&type->Stats[player->Player];
 
@@ -81,13 +85,13 @@ global void HandleActionUpgradeTo(Unit* unit)
 	} else {
 	    // FIXME: AiUpgradeToComplete(unit,type);
 	}
-	unit->Reset=1;
-	unit->Wait=1;
+	unit->Reset=unit->Wait=1;
 #ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionStill;
 #else
 	unit->Command.Action=UnitActionStill;
 #endif
+	unit->SubAction=0;
 
 	//
 	//	Update possible changed buttons.
@@ -97,6 +101,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 	    MustRedraw|=RedrawPanels;
 	} else if( player==ThisPlayer ) {
 	    UpdateButtonPanel();
+	    MustRedraw|=RedrawInfoPanel;
 	}
 
 	return;

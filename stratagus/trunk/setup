@@ -17,7 +17,7 @@ cat << .. > $RULESFILE
 ..
 ##	setup		-	Configure Rules.make (GNU MAKE rules).
 ##
-##	(c) Copyright 2000 by Dan Hensley
+##	(c) Copyright 2000,2001 by Dan Hensley
 ##
 ##	$Id$
 ##
@@ -25,9 +25,16 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP"
+EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_ORDERS"
 # This could be used for experimental versions
-# -DNEW_FOW -DUNIT_ON_MAP -DNEW_NAMES
+## There are some still not well tested code parts or branches.
+## UNITS_ON_MAP:	Faster lookup of units
+## MEW_ORDERS:		Johns new none memory leaking order code
+## NEW_MAPDRAW:		Stephans new map draw code
+## NEW_NAMES:		New unit names without copyleft problems
+## NEW_FOW:		New fog of war code, should work correct
+## NEW_AI:		New better improved AI code
+## NEW_SHIPS:		New correct ship movement.
 
 # Compile commands
 CC=gcc

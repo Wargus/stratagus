@@ -176,6 +176,24 @@
 #define VERSION	"1.17pre1"		/// Engine version shown.
 #endif
 
+#ifndef FreeCraftMajorVerion
+    /// FreeCraft protocol major version
+#define FreeCraftMajorVersion	1
+    /// FreeCraft minor version (maximal 99)
+#define FreeCraftMinorVersion	17
+    /// FreeCraft patch level (maximal 99)
+#define FreeCraftPatchLevel	0
+    /// FreeCraft version (1,2,3) -> 10203
+#define FreeCraftVersion \
+	(FreeCraftMajorVersion*10000+FreeCraftMinorVersion*100 \
+	+FreeCraftPatchLevel)
+
+    /// FreeCraft printf format string
+#define FreeCraftFormatString	"%d,%d,%d"
+    /// FreeCraft printf format arguments
+#define FreeCraftFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
+#endif
+
 #ifndef FREECRAFT_LIB_PATH
 #define FREECRAFT_LIB_PATH "data"	/// where to find the data files
 #endif
