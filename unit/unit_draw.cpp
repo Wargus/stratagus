@@ -1779,7 +1779,6 @@ local void DrawUnit(const Unit* unit)
 **	Draw all units on visible map.
 **	FIXME: Must use the redraw tile flags in this function
 */
-#ifdef SPLIT_SCREEN_SUPPORT
 global void DrawUnits (int v)
 {
     Unit* unit;
@@ -1794,21 +1793,6 @@ global void DrawUnits (int v)
     n = SelectUnits(TheUI.VP[v].MapX-1, TheUI.VP[v].MapY-1,
 		TheUI.VP[v].MapX+TheUI.VP[v].MapWidth+1,
 		TheUI.VP[v].MapY+TheUI.VP[v].MapHeight+1,table);
-#else /* SPLIT_SCREEN_SUPPORT */
-
-global void DrawUnits(void)
-{
-    Unit* unit;
-    Unit* table[UnitMax];
-    int n;
-    int i;
-
-    //
-    //	Select all units touching the viewpoint.
-    //
-    // FIXME: Must be here +1 on Width, Height.
-    n=SelectUnits(MapX-1,MapY-1,MapX+MapWidth+1,MapY+MapHeight+1,table);
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     //
     //	2a) corpse aren't in the cache.
@@ -1826,11 +1810,7 @@ global void DrawUnits(void)
     //
     for( i=0; i<n; ++i ) {
 	unit=table[i];
-#ifdef SPLIT_SCREEN_SUPPORT
 	if( !unit->Removed && UnitVisibleInViewport (CurrentViewport, unit) ) {
-#else /* SPLIT_SCREEN_SUPPORT */
-	if( !unit->Removed && UnitVisibleOnScreen(unit) ) {
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    if( unit->Type->Building ) {
 		DrawBuilding(unit);
 		table[i]=NoUnitP;

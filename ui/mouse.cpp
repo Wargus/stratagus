@@ -451,6 +451,7 @@ global void DoRightButton (int sx,int sy)
 local void HandleMouseOn(int x,int y)
 {
     int i;
+    int viewport;
 
     MouseScrollState = ScrollNone;
 
@@ -504,28 +505,18 @@ local void HandleMouseOn(int x,int y)
     //
     //	Map
     //
-#ifdef SPLIT_SCREEN_SUPPORT
     if (x>=TheUI.MapArea.X && x<=TheUI.MapArea.EndX
 	    && y>=TheUI.MapArea.Y && y<=TheUI.MapArea.EndY) {
 	CursorOn = CursorOnMap;
     } else {
 	CursorOn = -1;
     }
-{
-    int viewport = GetViewport (x, y);
+
+    viewport = GetViewport (x, y);
     if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
 	TheUI.ActiveViewport = viewport;
 	DebugLevel0Fn ("active viewport changed to %d.\n" _C_ viewport);
     }
-}
-#else /* SPLIT_SCREEN_SUPPORT */
-    if( x>=TheUI.MapX && x<=TheUI.MapEndX
-	    && y>=TheUI.MapY && y<=TheUI.MapEndY ) {
-	CursorOn=CursorOnMap;
-    } else {
-	CursorOn=-1;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     //
     //	Scrolling Region Handling
@@ -646,13 +637,8 @@ global void UIHandleMouseMove(int x,int y)
 	int yo;
 
 	// FIXME: Support with CTRL for faster scrolling.
-#ifdef SPLIT_SCREEN_SUPPORT
 	xo = TheUI.VP[TheUI.ActiveViewport].MapX;
 	yo = TheUI.VP[TheUI.ActiveViewport].MapY;
-#else /* SPLIT_SCREEN_SUPPORT */
-	xo = MapX;
-	yo = MapY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 	if ( TheUI.ReverseMouseMove ) {
 	    if (x < CursorStartX) {
 		xo++;
@@ -678,14 +664,9 @@ global void UIHandleMouseMove(int x,int y)
 	}
 	TheUI.WarpX = CursorStartX;
 	TheUI.WarpY = CursorStartY;
-#ifdef SPLIT_SCREEN_SUPPORT
 	if (xo != TheUI.VP[TheUI.ActiveViewport].MapX ||
 		yo != TheUI.VP[TheUI.ActiveViewport].MapY) {
 	    MapViewportSetViewpoint (TheUI.ActiveViewport, xo, yo);
-#else /* SPLIT_SCREEN_SUPPORT */
-	if (xo != MapX || yo != MapY) {
-	    MapSetViewpoint(xo, yo);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	}
 	return;
     }
@@ -698,17 +679,11 @@ global void UIHandleMouseMove(int x,int y)
     //	Restrict mouse to minimap when dragging
     if( OldCursorOn==CursorOnMinimap && CursorOn!=CursorOnMinimap &&
 	(MouseButtons&LeftButton) ) {
-#ifdef SPLIT_SCREEN_SUPPORT
 	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
 	RestrictCursorToMinimap();
 	MapViewportSetViewpoint (TheUI.ActiveViewport
 		,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
 		,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
-#else /* SPLIT_SCREEN_SUPPORT */
-	RestrictCursorToMinimap();
-	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
-		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	return;
     }
 
@@ -722,24 +697,12 @@ global void UIHandleMouseMove(int x,int y)
     //cade: this is forbidden for unexplored and not visible space
     // FIXME: This must done new, moving units, scrolling...
     if( CursorOn==CursorOnMap ) {
-#ifdef SPLIT_SCREEN_SUPPORT
 	if (IsMapFieldVisible (Viewport2MapX (TheUI.ActiveViewport, x),
 			Viewport2MapY(TheUI.ActiveViewport, y)) ) {
-{
 	    int v = TheUI.ActiveViewport;
 	    UnitUnderCursor = UnitOnScreen (NULL
 		,x-TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX
 		,y-TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY);
-}
-#else /* SPLIT_SCREEN_SUPPORT */
-	if( IsMapFieldVisible(Screen2MapX(x),Screen2MapY(y)) ) {
-	    // Map coordinate in pixels
-	    DebugLevel3Fn("%d,%d\n"
-		    ,x-TheUI.MapX+MapX*TileSizeX
-		    ,y-TheUI.MapY+MapY*TileSizeY);
-	    UnitUnderCursor=UnitOnScreen(NULL,x-TheUI.MapX+MapX*TileSizeX
-		    ,y-TheUI.MapY+MapY*TileSizeY);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	}
     } else if( CursorOn==CursorOnMinimap ) {
 	mx=ScreenMinimap2MapX(x);
@@ -774,15 +737,10 @@ global void UIHandleMouseMove(int x,int y)
 		//
 		//	Minimap move viewpoint
 		//
-#ifdef SPLIT_SCREEN_SUPPORT
 		Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
 		MapViewportSetViewpoint (TheUI.ActiveViewport
 			,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
 			,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
-#else /* SPLIT_SCREEN_SUPPORT */
-		MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
-			,ScreenMinimap2MapY(CursorY)-MapHeight/2);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    }
 	}
 	// FIXME: must move minimap if right button is down !
@@ -815,15 +773,10 @@ global void UIHandleMouseMove(int x,int y)
 	//	Minimap move viewpoint
 	//
 
-#ifdef SPLIT_SCREEN_SUPPORT
 	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
 	MapViewportSetViewpoint (TheUI.LastClickedVP
 		,ScreenMinimap2MapX(CursorX) - vp->MapWidth/2
 		,ScreenMinimap2MapY(CursorY) - vp->MapHeight/2);
-#else /* SPLIT_SCREEN_SUPPORT */
-	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
-		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	CursorStartX=CursorX;
 	CursorStartY=CursorY;
 	return;
@@ -1150,19 +1103,11 @@ local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
 
     if( (KeyModifiers&ModifierControl)
 	    || (MouseButtons&(LeftButton<<MouseDoubleShift)) ) {
-#ifdef SPLIT_SCREEN_SUPPORT
 	if( KeyModifiers&ModifierShift ) {
 	    ToggleUnitsByType(unit);
 	} else {
 	    SelectUnitsByType(unit);
 	}
-#else /* SPLIT_SCREEN_SUPPORT */
-	if( KeyModifiers&ModifierShift ) {
-	    ToggleUnitsByType(unit);
-	} else {
-	    SelectUnitsByType(unit);
-	}
-#endif /* SPLIT_SCREEN_SUPPORT */
     } else if( KeyModifiers&ModifierAlt ) {
 	if( KeyModifiers&ModifierShift ) {
 	    AddGroupFromUnitToSelection(unit);
@@ -1194,9 +1139,7 @@ local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
 local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 {
     int sx, sy;
-#ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     //
     //	Clicking on the map.
@@ -1211,7 +1154,6 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	MustRedraw|=RedrawButtonPanel|RedrawCursor;
 
 
-#ifdef SPLIT_SCREEN_SUPPORT
 	sx = CursorX - v->X + TileSizeX * v->MapX;
 	sy = CursorY - v->Y + TileSizeY * v->MapY;
 	if( MouseButtons&LeftButton ) {
@@ -1220,16 +1162,6 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		    ,v->MapY*TileSizeY+CursorY - v->Y
 		    ,v->MapX*TileSizeX+CursorX - v->X
 		    ,v->MapY*TileSizeY+CursorY - v->Y);
-#else /* SPLIT_SCREEN_SUPPORT */
-	sx = CursorX - TheUI.MapX + TileSizeX*MapX;
-	sy = CursorY - TheUI.MapY + TileSizeY*MapY;
-	if( MouseButtons&LeftButton ) {
-	    MakeLocalMissile(MissileTypeGreenCross
-		    ,MapX*TileSizeX+CursorX-TheUI.MapX
-		    ,MapY*TileSizeY+CursorY-TheUI.MapY
-		    ,MapX*TileSizeX+CursorX-TheUI.MapX
-		    ,MapY*TileSizeY+CursorY-TheUI.MapY);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    SendCommand (sx, sy);
 	}
 	return;
@@ -1255,13 +1187,9 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		    ,sx+TileSizeX/2,sy+TileSizeY/2,0,0);
 	    SendCommand(sx,sy);
 	} else {
-#ifdef SPLIT_SCREEN_SUPPORT
 	    int v = TheUI.ActiveViewport;
 	    MapViewportSetViewpoint (v, mx - TheUI.VP[v].MapWidth/2,
 			my - TheUI.VP[v].MapHeight/2);
-#else /* SPLIT_SCREEN_SUPPORT */
-	    MapSetViewpoint(mx-MapWidth/2,my-MapHeight/2);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	}
 	return;
     }
@@ -1340,13 +1268,11 @@ global void UIHandleButtonDown(unsigned button)
     //	Cursor is on the map area
     //
     if( CursorOn==CursorOnMap ) {
-#ifdef SPLIT_SCREEN_SUPPORT
 	TheUI.LastClickedVP = GetViewport (CursorX, CursorY);
 	DebugLevel0Fn ("last clicked viewport changed to %d.\n" _C_
 		TheUI.LastClickedVP);
 	MustRedraw |= RedrawMinimapCursor | RedrawMap;
 	/* to redraw the cursor immediately (and avoid up to 1 sec delay */
-#endif /* SPLIT_SCREEN_SUPPORT */
 	if( CursorBuilding ) {
 	    // Possible Selected[0] was removed from map
 	    // need to make sure there is a unit to build
@@ -1355,13 +1281,8 @@ global void UIHandleButtonDown(unsigned button)
 		int x;
 		int y;
 
-#ifdef SPLIT_SCREEN_SUPPORT
 		x = Viewport2MapX (TheUI.ActiveViewport, CursorX);
 		y = Viewport2MapY (TheUI.ActiveViewport, CursorY);
-#else /* SPLIT_SCREEN_SUPPORT */
-		x=Screen2MapX(CursorX);
-		y=Screen2MapY(CursorY);
-#endif /* SPLIT_SCREEN_SUPPORT */
 		// FIXME: error messages
 
 		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
@@ -1386,18 +1307,11 @@ global void UIHandleButtonDown(unsigned button)
 	}
 
 	if( MouseButtons&LeftButton ) { // enter select mode
+	    int v = TheUI.ActiveViewport;
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
-#ifdef SPLIT_SCREEN_SUPPORT
-{
-	    int v = TheUI.ActiveViewport;
 	    CursorStartScrMapX = CursorStartX -TheUI.VP[v].X + TileSizeX * TheUI.VP[v].MapX;
 	    CursorStartScrMapY = CursorStartY -TheUI.VP[v].Y + TileSizeY * TheUI.VP[v].MapY;
-}
-#else /* SPLIT_SCREEN_SUPPORT */
-	    CursorStartScrMapX = CursorStartX -TheUI.MapX + TileSizeX * MapX;
-	    CursorStartScrMapY = CursorStartY -TheUI.MapY + TileSizeY * MapY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    GameCursor=TheUI.Cross.Cursor;
 	    CursorState=CursorStateRectangle;
 	    MustRedraw|=RedrawCursor;
@@ -1412,14 +1326,9 @@ global void UIHandleButtonDown(unsigned button)
 		Unit* unit;
 		// FIXME: Rethink the complete chaos of coordinates here
 		// FIXME: Johns: Perhaps we should use a pixel map coordinates
-#ifdef SPLIT_SCREEN_SUPPORT
 		int v = TheUI.ActiveViewport;
 		int x = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
 		int y = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
-#else /* SPLIT_SCREEN_SUPPORT */
-		int x = CursorX - TheUI.MapX + MapX*TileSizeX;
-		int y = CursorY - TheUI.MapY + MapY*TileSizeY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 		if( x>=TheMap.Width*TileSizeX ) {	// Reduce to map limits
 		    x = (TheMap.Width-1)*TileSizeX;
@@ -1433,13 +1342,8 @@ global void UIHandleButtonDown(unsigned button)
 		    unit->Blink=4;
 		} else {		// if not not click on building -- green cross
 		    MakeLocalMissile(MissileTypeGreenCross
-#ifdef SPLIT_SCREEN_SUPPORT
 			,TheUI.VP[TheUI.ActiveViewport].MapX*TileSizeX+CursorX-TheUI.VP[TheUI.ActiveViewport].X
 			,TheUI.VP[TheUI.ActiveViewport].MapY*TileSizeY+CursorY-TheUI.VP[TheUI.ActiveViewport].Y,0,0);
-#else /* SPLIT_SCREEN_SUPPORT */
-			,MapX*TileSizeX+CursorX-TheUI.MapX
-			,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
-#endif /* SPLIT_SCREEN_SUPPORT */
 		}
 		DoRightButton (x, y);
 	    }
@@ -1449,15 +1353,10 @@ global void UIHandleButtonDown(unsigned button)
     //
     } else if( CursorOn==CursorOnMinimap ) {
 	if( MouseButtons&LeftButton ) { // enter move mini-mode
-#ifdef SPLIT_SCREEN_SUPPORT
 	    int v = TheUI.LastClickedVP;
 	    MapViewportSetViewpoint(v,
 		ScreenMinimap2MapX(CursorX)-TheUI.VP[v].MapWidth/2,
 		ScreenMinimap2MapY(CursorY)-TheUI.VP[v].MapHeight/2);
-#else /* SPLIT_SCREEN_SUPPORT */
-	    MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
-		    ,ScreenMinimap2MapY(CursorY)-MapHeight/2);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	} else if( MouseButtons&RightButton ) {
 	    if( !GameObserve ) {
 		MakeLocalMissile(MissileTypeGreenCross
@@ -1633,14 +1532,9 @@ global void UIHandleButtonUp(unsigned button)
 #endif
 	    int x0 = CursorStartScrMapX;
 	    int y0 = CursorStartScrMapY;
-#ifdef SPLIT_SCREEN_SUPPORT
 	    int v = TheUI.ActiveViewport;
 	    int x1 = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
 	    int y1 = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
-#else /* SPLIT_SCREEN_SUPPORT */
-	    int x1 = CursorX - TheUI.MapX + MapX*TileSizeX;
-	    int y1 = CursorY - TheUI.MapY + MapY*TileSizeY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    if (x0>x1) {
 		int swap=x0;	// this is faster and more readable than xor's
 				// JOHNS: no it is slower and more readable
@@ -1694,7 +1588,6 @@ global void UIHandleButtonUp(unsigned button)
 	    }
 	    // cade: cannot select unit on invisible space
 	    // FIXME: johns: only complete invisibile units
-#ifdef SPLIT_SCREEN_SUPPORT
 	    if( IsMapFieldVisible(Viewport2MapX(TheUI.ActiveViewport,CursorX),
 			Viewport2MapY (TheUI.ActiveViewport,CursorY)) ) {
 		unit=UnitOnScreen(unit
@@ -1703,13 +1596,6 @@ global void UIHandleButtonUp(unsigned button)
 		    ,CursorY-TheUI.VP[TheUI.ActiveViewport].Y+
 			TheUI.VP[TheUI.ActiveViewport].MapY*TileSizeY);
 	    }
-#else /* SPLIT_SCREEN_SUPPORT */
-	    if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
-		unit=UnitOnScreen(unit
-		    ,CursorX-TheUI.MapX+MapX*TileSizeX
-		    ,CursorY-TheUI.MapY+MapY*TileSizeY);
-	    }
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    if( unit ) {
 		// FIXME: Not nice coded, button number hardcoded!
 		if( (KeyModifiers&ModifierControl)

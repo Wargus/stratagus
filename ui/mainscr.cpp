@@ -695,13 +695,8 @@ global void DrawMessage(void)
 	MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
     }
     for (z = 0; z < MessagesCount; z++) {
-#ifdef SPLIT_SCREEN_SUPPORT
 	VideoDrawText(TheUI.MapArea.X + 8, TheUI.MapArea.Y + 8 + z * 16,
 		GameFont, Messages[z]);
-#else /* SPLIT_SCREEN_SUPPORT */
-	VideoDrawText(TheUI.MapX + 8, TheUI.MapY + 8 + z * 16, GameFont,
-		Messages[z]);
-#endif /* SPLIT_SCREEN_SUPPORT */
     }
     if (MessagesCount < 1) {
 	SameMessageCount = 0;
@@ -874,14 +869,8 @@ global void CenterOnMessage(void)
     if (MessagesEventIndex >= MessagesEventCount) {
 	return;
     }
-#ifdef SPLIT_SCREEN_SUPPORT
     MapCenterViewport (TheUI.LastClickedVP, MessagesEventX[MessagesEventIndex],
 	    MessagesEventY[MessagesEventIndex]);
-#else /* SPLIT_SCREEN_SUPPORT */
-    MapCenter(MessagesEventX[MessagesEventIndex],
-	    MessagesEventY[MessagesEventIndex]);
-#endif /* SPLIT_SCREEN_SUPPORT */
-
     SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
     MessagesEventIndex++;
 }
