@@ -101,7 +101,7 @@ global void HandleActionTrain(Unit* unit)
 
 	// FIXME: GameMessage
 	if( player==ThisPlayer ) {
-	    SetMessage("Training complete");
+	    SetMessage2( nunit->X, nunit->Y, "New %s ready", nunit->Type->Name);
 	    PlayUnitSound(nunit,VoiceReady);
 	} else {
 	    AiTrainingComplete(unit,nunit);

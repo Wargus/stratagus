@@ -297,9 +297,11 @@ extern int SyncRand(void);
 extern int main1(int argc,char* argv[]);/// init freecraft.
 extern volatile void Exit(int err);	/// exit freecraft.
 
-extern void SetMessage(char* message);
+extern void SetMessage( char* fmt, ... );
+extern void SetMessage2( int x, int y, char* fmt, ... );
 extern void SetMessageDup(const char* message);
 extern void SetMessageDupCat(const char* message);
+extern void CenterOnMessage();
 extern void ClearMessage(void);
 extern void SetStatusLine(char* status);
 extern void ClearStatusLine(void);

@@ -45,7 +45,7 @@ global void HandleActionResearch(Unit* unit)
     if( unit->Command.Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
 
 	// FIXME: should als speak and tell ai
-	SetMessage("Upgrade complete");
+	SetMessage2( unit->X, unit->Y, "%s: Upgrade complete", unit->Type->Name );
 
         UpgradeAcquire(unit->Player,upgrade);
 

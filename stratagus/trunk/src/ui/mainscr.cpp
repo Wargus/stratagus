@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "freecraft.h"
 #include "video.h"
@@ -34,6 +35,7 @@
 #include "icons.h"
 #include "interface.h"
 #include "ui.h"
+#include "map.h"
 
 #define OriginalTraining	0	/// 1 for the original training display
 
@@ -474,20 +476,84 @@ global void DrawResources(void)
 
 // FIXME: need messages for chat!
 
+#define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*2 // two seconds
+
 local char  MessageBuffer[40];		// message buffer
 local char* Message;			// message in map window
-local int   MessageCounter;		// how long to display message
+local int   MessageFrameTimeout;	// frame to expire message
+
+#define MESSAGES_MAX  10
+
+local char Messages[ MESSAGES_MAX ][64];
+local int  MessagesCount;
+
+local char MessagesEvent[ MESSAGES_MAX ][64];
+local int  MessagesEventX[ MESSAGES_MAX ];
+local int  MessagesEventY[ MESSAGES_MAX ];
+local int  MessagesEventCount;
+local int  MessagesEventIndex;
 
 /**
-**	Draw message.
+**	Shift messages array with one.
+**
+**	
+*/
+global void ShiftMessages()
+{
+  int z;
+  if ( MessagesCount == 0 ) return;
+  for ( z = 0; z < MESSAGES_MAX; z++ )
+    if ( z < MESSAGES_MAX-1)
+      {
+      strcpy( Messages[z], Messages[z+1] );
+      }
+    else
+      {
+      strcpy( Messages[z], "" );
+      }
+  MessagesCount--;    
+}
+
+/**
+**	Shift messages events array with one.
+**
+**	
+*/
+global void ShiftMessagesEvent()
+{
+  int z;
+  if ( MessagesEventCount == 0 ) return;
+  for ( z = 0; z < MESSAGES_MAX; z++ )
+    if ( z < MESSAGES_MAX-1)
+      {
+      MessagesEventX[z] = MessagesEventX[z+1];
+      MessagesEventY[z] = MessagesEventY[z+1];
+      }
+    else
+      {
+      MessagesEventX[z] = -1;
+      MessagesEventY[z] = -1;
+      }
+  MessagesCount--;    
+}
+
+/**
+**	Draw message(s).
 */
 global void DrawMessage(void)
 {
-    if( Message ) {
-	DrawReverseText(TheUI.MapX+10,TheUI.MapHeight-20,GameFont,Message);
-	if( !--MessageCounter ) {
-	    ClearMessage();
-	}
+  int z;
+  if ( MessageFrameTimeout < FrameCounter )
+    {
+    ShiftMessages();
+    MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+    }
+  for ( z = 0; z < MessagesCount; z++ )
+    {
+     if ( Messages[z][0] == '*' )
+       DrawText(TheUI.MapX+8,TheUI.MapY+8 + z*16,GameFont,Messages[z]+1);
+     else
+       DrawReverseText(TheUI.MapX+8,TheUI.MapY+8 + z*16,GameFont,Messages[z]);
     }
 }
 
@@ -496,11 +562,50 @@ global void DrawMessage(void)
 **
 **	@param message	To be displayed in text overlay.
 */
-global void SetMessage(char* message)
+global void SetMessage( char* fmt, ... )
 {
-    Message=message;
+    char temp[128];
+    va_list va;
+    va_start( va, fmt );
+    vsprintf( temp, fmt, va );
+    va_end( va );
+    if ( MessagesCount == MESSAGES_MAX )
+      ShiftMessages();
+    strcpy( Messages[ MessagesCount ], temp );  
+    MessagesCount++;
     MustRedraw|=RedrawMessage|RedrawMap;
-    MessageCounter=FRAMES_PER_SECOND*2;
+    MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+}
+
+/**
+**	Set message to display.
+**
+**	@param message	To be displayed in text overlay.
+*/
+global void SetMessage2( int x, int y, char* fmt, ... )
+{
+    //FIXME: vladi: I know this can be just separated func w/o msg but
+    //       it is handy to stick all in one call, someone?
+
+    char temp[128];
+    va_list va;
+    va_start( va, fmt );
+    vsprintf( temp, fmt, va );
+    va_end( va );
+    if ( MessagesCount == MESSAGES_MAX )
+      ShiftMessages();
+    strcpy( Messages[ MessagesCount ], temp );  
+    MessagesCount++;
+    
+    if ( MessagesEventCount == MESSAGES_MAX )
+      ShiftMessagesEvent();
+    strcpy( MessagesEvent[ MessagesEventCount ], temp );
+    MessagesEventX[ MessagesEventCount ] = x;
+    MessagesEventY[ MessagesEventCount ] = y;
+    MessagesEventCount++;
+    
+    MustRedraw|=RedrawMessage|RedrawMap;
+    MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
 }
 
 /**
@@ -510,6 +615,9 @@ global void SetMessage(char* message)
 */
 global void SetMessageDup(const char* message)
 {
+    //FIXME: is this function correct now?
+    //       it was, before multi-messages support done
+
     strncpy(MessageBuffer,message,sizeof(MessageBuffer));
     MessageBuffer[sizeof(MessageBuffer)-1]='\0';
 
@@ -523,6 +631,9 @@ global void SetMessageDup(const char* message)
 */
 global void SetMessageDupCat(const char* message)
 {
+    //FIXME: is this function correct now?
+    //       it was, before multi-messages support done
+
     strncat(MessageBuffer,message,sizeof(MessageBuffer)-strlen(MessageBuffer));
     MessageBuffer[sizeof(MessageBuffer)-1]='\0';
 
@@ -534,9 +645,24 @@ global void SetMessageDupCat(const char* message)
 */
 global void ClearMessage(void)
 {
+    //FIXME: is this function correct now?
+    //       it was, before multi-messages support done
+
     Message=NULL;
     MustRedraw|=RedrawMessage|RedrawMap;
-    MessageCounter=0;
+    MessageFrameTimeout = FrameCounter;
+}
+
+global void CenterOnMessage(void)
+{
+  if ( MessagesEventIndex >= MessagesEventCount )
+    MessagesEventIndex = 0;
+  if ( MessagesEventIndex >= MessagesEventCount )
+    return;
+  MapCenter( MessagesEventX[ MessagesEventIndex ], 
+             MessagesEventY[ MessagesEventIndex ] );  
+  SetMessage( "*Event: %s", MessagesEvent[ MessagesEventIndex ] );
+  MessagesEventIndex++;
 }
 
 /*----------------------------------------------------------------------------

@@ -255,7 +255,7 @@ extern void DrawMessage(void);
 
 extern void DrawResources(void);
 extern void DrawMessage(void);
-extern void SetMessage(char* message);
+extern void SetMessage( char* fmt, ... );
 extern void ClearMessage(void);
 extern void DrawStatusLine(void);
 extern void DrawCosts(void);
