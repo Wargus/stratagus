@@ -113,7 +113,7 @@ local void LoadFreeCraftMap(const char* filename,
 **	@param filename	map filename
 **	@param map	map loaded
 */
-global void LoadMap(const char* filename,WorldMap* map)
+local void LoadMap(const char* filename,WorldMap* map)
 {
     const char* tmp;
 
