@@ -1606,6 +1606,12 @@ inkey:
 		    break;
 		case 9:
 		    goto normkey;
+		case 'x':
+		case 'X':
+		    if( (KeyModifiers&ModifierAlt) ) {
+			goto normkey;
+		    }
+		    /* FALL THROUGH */
 		default:
 		    if (key >= 32 && key < 0x100) {
 			if (mi->d.input.nch < mi->d.input.maxch) {
@@ -1624,21 +1630,23 @@ inkey:
     }
 
 normkey:
-    mi = menu->items;
-    i = menu->nitems;
-    while (i--) {
-	switch (mi->mitype) {
-	    case MI_TYPE_BUTTON:
-		if (key == mi->d.button.hotkey) {
-		    if (mi->d.button.handler) {
-			(*mi->d.button.handler)();
+    if( !(KeyModifiers&ModifierAlt) ) {
+	mi = menu->items;
+	i = menu->nitems;
+	while (i--) {
+	    switch (mi->mitype) {
+		case MI_TYPE_BUTTON:
+		    if (key == mi->d.button.hotkey) {
+			if (mi->d.button.handler) {
+			    (*mi->d.button.handler)();
+			}
+			return 1;
 		    }
-		    return 1;
-		}
-	    default:
-		break;
+		default:
+		    break;
+	    }
+	    mi++;
 	}
-	mi++;
     }
     switch (key) {
 	case 10: case 13:			// RETURN
@@ -1756,8 +1764,11 @@ normkey:
 		}
 	    }
 	    break;
-	case 'Q':
-	    Exit(0);
+	case 'x':
+	case 'X':
+	    if( (KeyModifiers&ModifierAlt) ) {
+		Exit(0);
+	    }
 	default:
 	    mi = menu->items;
 	    i = menu->nitems;
