@@ -16,6 +16,30 @@
 
 //@{
 
+/**
+**	@mainpage
+**
+**	@section Introduction Introduction
+**	
+**	Welcome to the source code documentation of the FreeCraft engine.
+**	For an open source project it is very important to have a good
+**	source code documentation, I have tried to do this with the help
+**	of doxygen (http://www.doxygen.org) or doc++
+**	(http://www.zib.de/Visual/software/doc++/index.html). Please read the
+**	documentation of this nice open source programs, to see how this all
+**	works.
+**
+**	Any help to improve this documention is welcome. If you didn't
+**	understand something or you found a failure or a wrong spelling
+**	please write an email.
+**
+**	@section Informations Informations
+**
+**	Visit the http://FreeCraft.Org web page for the latest news and
+**	../doc/readme.html for other documentations.
+**
+*/
+
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
@@ -161,12 +185,14 @@ global void SaveAll(void)
     fprintf(file,";;;\tMap: %s\n",TheMap.Description);
     fprintf(file,";;; -----------------------------------------\n\n\n");
 
+    SaveIcons(file);
+    // SaveUI(file);
     SaveUnitTypes(file);
     SaveUnits(file);
-    SaveTileset(file);
-    SaveMap(file);
     SaveUpgrades(file);
     SaveDependencies(file);
+    SaveTileset(file);
+    SaveMap(file);
 
     // FIXME: find all state information which must be saved.
 
