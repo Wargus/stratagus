@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name map.h		-	The map headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __MAP_H__
 #define __MAP_H__
@@ -270,6 +269,9 @@ extern int OrcWallOnMap(int x,int y);
 
 extern int CheckedForestOnMap(int x,int y);
 extern int ForestOnMap(int x,int y);
+
+extern int RockOnMap(int x,int y);
+
 extern int CheckedCanMoveToMask(int x,int y,int mask);
 extern int CanMoveToMask(int x,int y,int mask);
 
