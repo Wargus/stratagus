@@ -73,9 +73,9 @@
 global Sample* MusicSample;             /// Music samples
 #endif
 
-global char* CurrentMusicFile = NULL;
+global char* CurrentMusicFile;
 
-global PlaySection *PlaySections;		// Play Sections
+global PlaySection* PlaySections;		// Play Sections
 global int NumPlaySections;			// Number of Play Sections
 global PlaySectionType CurrentPlaySection;	// Current Play Section
 
@@ -166,7 +166,7 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
     int ticks;
     int n;
 
-    ticks=GetTicks();
+    ticks = GetTicks();
     DebugLevel0Fn("Trying `%s'\n" _C_ name);
     if (!(f = CLopen(name,CL_OPEN_READ))) {
 	printf("Can't open file `%s'\n", name);
@@ -179,10 +179,10 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
     buffer = malloc(n);
     while ((i = CLread(f, buffer + size, n)) == n) {
 	size += n;
-	if (n < 1024*1024) {
+	if (n < 1024 * 1024) {
 	    n <<= 1;
 	} else {
-	    n = 2*1024*1024;
+	    n = 2 * 1024 * 1024;
 	}
 	buffer = realloc(buffer, size + n);
     }
@@ -269,15 +269,15 @@ global void PlaySectionMusic(PlaySectionType section)
     if (CDMode == CDModeDefined) {
 	track = CDTrack;
 	newtrack = 0;
-	if ( (1 << track) & PlaySections[i].CDTracks ) {
+	if ((1 << track) & PlaySections[i].CDTracks) {
 	    newtrack = 0;
 	} else {
-	    if ( !((1 << CDTrack) & PlaySections[i].CDTracks) ) {
+	    if (!((1 << CDTrack) & PlaySections[i].CDTracks)) {
 		CDTrack = 0;
 	    }
 	    if (PlaySections[i].CDOrder == PlaySectionOrderAll) {
 		for (j = CDTrack + 1; j != CDTrack; ++j) {
-		    if ( (1 << j) & PlaySections[i].CDTracks ) {
+		    if ((1 << j) & PlaySections[i].CDTracks) {
 			newtrack = j;
 			break;
 		    } else if (j == 31) {
@@ -287,8 +287,8 @@ global void PlaySectionMusic(PlaySectionType section)
 	    } else if (PlaySections[i].CDOrder == PlaySectionOrderRandom) {
     		do {
 		    newtrack = MyRand() % NumCDTracks;
-		} while ( !((1 << newtrack) & PlaySections[i].CDTracks) || 
-		    (!IsAudioTrack(newtrack)) );
+		} while (!((1 << newtrack) & PlaySections[i].CDTracks) || 
+		    (!IsAudioTrack(newtrack)));
 	    }
 	}
 	if (newtrack) {
@@ -354,8 +354,8 @@ global void PlayMusic(const char* name)
 
 #ifdef USE_OGG
     if ((sample = LoadOgg(name, PlayAudioStream))) {
-	if ((sample->Channels != 1 && sample->Channels != 2)
-		|| sample->SampleSize != 16) {
+	if ((sample->Channels != 1 && sample->Channels != 2) ||
+		sample->SampleSize != 16) {
 	    DebugLevel0Fn("Not supported music format\n");
 	    SoundFree(sample);
 	    return;
