@@ -1241,6 +1241,36 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
     }
 }
 
+/**
+**	Change current color set to units colors.
+**
+**	FIXME: use function pointer here.
+**
+**	@param unit	Pointer to unit.
+*/
+local void GraphicUnitPixels(const Unit* unit,const Graphic* sprite)
+{
+    switch( VideoBpp ) {
+	case 8:
+	    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels)+208))
+		    =unit->Colors.Depth8;
+	    break;
+	case 15:
+	case 16:
+	    *((struct __4pixel16__*)(((VMemType16*)sprite->Pixels)+208))
+		    =unit->Colors.Depth16;
+	    break;
+	case 24:
+	    *((struct __4pixel24__*)(((VMemType24*)sprite->Pixels)+208))
+		    =unit->Colors.Depth24;
+	    break;
+	case 32:
+	    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
+		    =unit->Colors.Depth32;
+	    break;
+    }
+}
+
 /*
 **	Units on map:
 **
@@ -1276,7 +1306,7 @@ local void DrawBuilding(Unit* unit)
     }
 
     type=unit->Type;
-    GraphicPlayerPixels(unit->Player,type->Sprite);
+    GraphicUnitPixels(unit,type->Sprite);
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
@@ -1342,7 +1372,7 @@ local void DrawUnit(const Unit* unit)
     //
     DrawSelection(unit,type,x,y);
 
-    GraphicPlayerPixels(unit->Player,type->Sprite);
+    GraphicUnitPixels(unit,type->Sprite);
     DrawUnitType(type,unit->Frame,x,y);
 
 #ifndef NEW_DECODRAW
