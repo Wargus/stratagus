@@ -122,14 +122,7 @@ int ShowAttackRange;             ///< Flag: show attack range
 int ShowOrders;                  ///< Flag: show orders of unit on map
 unsigned long ShowOrdersCount;   ///< Show orders for some time
 
-// See InitVar in script_unittype.c
-#define HP_INDEX          0
-#define MANA_INDEX        1
-#define TRANSPORT_INDEX   2
-#define RESEARCH_INDEX    3
-#define TRAINING_INDEX    4
-#define UPGRADINGTO_INDEX 5
-#define RESOURCE_INDEX   6
+
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?
@@ -617,8 +610,11 @@ static int CclShowManaDot(lua_State* l)
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
 		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
-		"DefineDecorations({Index = \"Resource\", HideNeutral = false, CenterX = true,"
+		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false, CenterX = true,"
+		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n"
+		"DefineDecorations({Index = \"CarryResource\", HideNeutral = false, CenterX = true,"
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n";
+
 
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -653,8 +649,11 @@ static int CclShowManaHorizontal(lua_State* l)
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
 		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
-		"DefineDecorations({Index = \"Resource\", HideNeutral = false, CenterX = true,"
+		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false, CenterX = true,"
+		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n"
+		"DefineDecorations({Index = \"CarryResource\", HideNeutral = false, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n";
+
 
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -688,8 +687,11 @@ static int CclShowManaVertical(lua_State* l)
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
 		"DefineDecorations({Index = \"UpgradeTo\", HideNeutral = true,"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
-		"DefineDecorations({Index = \"Resource\", HideNeutral = false,"
+		"DefineDecorations({Index = \"GiveResource\", HideNeutral = false,"
+		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n"
+		"DefineDecorations({Index = \"CarryResource\", HideNeutral = false,"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n";
+
 
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -1034,6 +1036,10 @@ void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
 	VideoDrawClip(sprite, Deco->Data.StaticSprite.n, x, y);
 }
 
+
+extern void UpdateUnitVariables(const Unit* unit);
+
+
 /**
 **  Draw decoration (invis, for the unit.)
 **
@@ -1056,55 +1062,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit->Refs);
 #endif
 
-	for (i = 0; i <= RESOURCE_INDEX; i++) { // default values
-		unit->Variable[i].Value = 0;
-		unit->Variable[i].Max = 0;
-		unit->Variable[i].Enable = 1;
-	}
-
-	// HP (do also building under construction :) ).
-	unit->Variable[HP_INDEX].Value = unit->HP;
-	unit->Variable[HP_INDEX].Max = unit->Stats->HitPoints;
-
-	// Mana.
-	unit->Variable[MANA_INDEX].Value = unit->Mana;
-	unit->Variable[MANA_INDEX].Max = unit->Type->_MaxMana;
-	unit->Variable[MANA_INDEX].Enable = type->CanCastSpell ? 1 : 0;
-
-	// Transport
-	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;
-	unit->Variable[TRANSPORT_INDEX].Max = unit->Type->MaxOnBoard;
-
-	// Research.
-	if (unit->Orders[0].Action == UnitActionResearch) {
-		unit->Variable[RESEARCH_INDEX].Value =
-			unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades];
-		unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
-	}
-
-	// Training
-	if (unit->Orders[0].Action == UnitActionTrain) {
-		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
-		unit->Variable[TRAINING_INDEX].Max =
-			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
-	}
-
-	// UpgradeTo
-	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
-		unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
-		unit->Variable[UPGRADINGTO_INDEX].Max =
-			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
-	}
-
-	// Resources.
-	if (type->GivesResource) {
-		unit->Variable[RESOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[RESOURCE_INDEX].Max = 655350; // FIXME use better value ?
-	} else if (type->Harvester && unit->CurrentResource) {
-		unit->Variable[RESOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[RESOURCE_INDEX].Max = type->ResInfo[unit->CurrentResource]->ResourceCapacity;
-	}
-
+	UpdateUnitVariables(unit);
 	// Now show decoration for each variable.
 	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
 		int value;
@@ -1119,7 +1077,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 
 		if (!((value == 0 && !Deco->ShowWhenNull) || (value == max && !Deco->ShowWhenMax)
 			|| (Deco->HideHalf && value != 0 && value != max)
-			|| (!Deco->ShowIfNotEnable && !unit->Variable[i].Enable)
+			|| (!Deco->ShowIfNotEnable && !unit->Variable[Deco->Index].Enable)
 			|| (Deco->ShowOnlySelected && !unit->Selected)
 			|| (unit->Player->Type == PlayerNeutral && Deco->HideNeutral)
 			|| (IsEnemy(ThisPlayer, unit) && !Deco->ShowOpponent)

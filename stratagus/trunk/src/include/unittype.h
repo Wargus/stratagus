@@ -635,6 +635,33 @@ typedef struct _variable_type_ {
 	char Enable;       ///< True if the unit doesn't have this variable. (f.e shield)
 } VariableType;
 
+// Index for variable already defined.
+#define HP_INDEX              0
+#define BUILD_INDEX           1
+#define MANA_INDEX            2
+#define TRANSPORT_INDEX       3
+#define RESEARCH_INDEX        4
+#define TRAINING_INDEX        5
+#define UPGRADINGTO_INDEX     6
+#define GIVERESOURCE_INDEX    7
+#define CARRYRESOURCE_INDEX   8
+#define XP_INDEX              9
+#define LEVEL_INDEX          10
+#define KILL_INDEX           11
+#define SUPPLY_INDEX         12
+#define DEMAND_INDEX         13
+#define ARMOR_INDEX          14
+#define SPEED_INDEX          15
+#define SIGHTRANGE_INDEX     16
+#define ATTACKRANGE_INDEX    17
+#define PIERCINGDAMAGE_INDEX 18
+#define BASICDAMAGE_INDEX    19
+#define DAMAGE_INDEX         20
+#define EXTRADAMAGE_INDEX    21
+#define SLOT_INDEX           22
+
+#define NVARALREADYDEFINED SLOT_INDEX + 1 // Hardcoded variables
+
 struct _decovartype_;
 struct _unit_;
 
@@ -960,6 +987,10 @@ extern void InitUnitTypes(int reset_player_stats);  ///< Init unit-type table
 extern void LoadUnitTypeSprite(UnitType* unittype); ///< Load the sprite for a unittype
 extern void LoadUnitTypes(void);                    ///< Load the unit-type data
 extern void CleanUnitTypes(void);                   ///< Cleanup unit-type module
+
+// in script_unittype.c
+	/// Update custom Variables with other variable (like Hp, ...)
+extern void UpdateUnitVariables(const struct _unit_* unit);
 
 //@}
 

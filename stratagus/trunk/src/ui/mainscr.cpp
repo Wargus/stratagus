@@ -58,6 +58,7 @@
 #include "trigger.h"
 #include "network.h"
 #include "menus.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --  MENU BUTTON
@@ -163,58 +164,400 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 }
 
 /**
-**  Draw completed bar into top-panel.
+**  Tell if we can show the content.
+**  verify each sub condition for that.
 **
-**  @param full   the 100% value
-**  @param ready  how much till now completed
+**  @param condition   condition to verify.
+**  @param unit        unit that certain condition can refer.
+**
+**  @return 0 if we can't show the content, else 1.
 */
-static void UiDrawCompletedBar(int full, int ready)
+static int CanShowContent(const ConditionPanel* condition, const Unit* unit)
 {
-	int f;
+	int i; // iterator on variables and flags.
 
-	if (!full) {
-		return;
+	Assert(unit);
+	if (!condition) {
+		return 1;
 	}
-	f = (100 * ready) / full;
-	f = (f * TheUI.CompletedBarW) / 100;
-	VideoFillRectangleClip(TheUI.CompletedBarColor,
-		TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
-
-	if (TheUI.CompletedBarShadow) {
-		// Shadow
-		VideoDrawVLine(ColorGray, TheUI.CompletedBarX + f, TheUI.CompletedBarY, TheUI.CompletedBarH );
-		VideoDrawHLine(ColorGray, TheUI.CompletedBarX, TheUI.CompletedBarY + TheUI.CompletedBarH, f );
-
-		// |~  Light
-		VideoDrawVLine(ColorWhite, TheUI.CompletedBarX, TheUI.CompletedBarY, TheUI.CompletedBarH );
-		VideoDrawHLine(ColorWhite, TheUI.CompletedBarX, TheUI.CompletedBarY, f );
+	if ((condition->ShowOnlySelected && !unit->Selected)
+		|| (unit->Player->Type == PlayerNeutral && condition->HideNeutral)
+		|| (IsEnemy(ThisPlayer, unit) && !condition->ShowOpponent)
+		|| (IsAllied(ThisPlayer, unit) && (unit->Player != ThisPlayer) && condition->HideAllied)) {
+		return 0;
 	}
+	if (condition->BoolFlags) {
+		for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
+			if (condition->BoolFlags[i] != CONDITION_TRUE) {
+				if ((condition->BoolFlags[i] == CONDITION_ONLY) ^ (unit->Type->BoolFlag[i])) {
+					return 0;
+				}
+			}
+		}
+	}
+	if (condition->Variables) {
+		for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+			if (condition->Variables[i] != CONDITION_TRUE) {
+				if ((condition->Variables[i] == CONDITION_ONLY)
+					^ (unit->Variable[i].Enable) ) {
+					return 0;
+				}
+			}
+		}
+	}
+	return 1;
+}
 
-	if (TheUI.CompletedBarText) {
-		VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
-			TheUI.CompletedBarFont, TheUI.CompletedBarText);
+
+typedef union {const char *s; int i;} UStrInt;
+
+/**
+**  Return the value corresponding.
+**
+**  @param unit   Unit.
+**  @param index  Index of the variable.
+**  @param e      Componant of the variable.
+**
+**  @return       Value corresponding
+*/
+UStrInt GetComponent(const Unit* unit, int index, EnumVariable e)
+{
+	UStrInt val;    // result.
+
+	Assert(unit);
+	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+	switch (e) {
+		case VariableValue :
+			val.i = unit->Variable[index].Value;
+			break;
+		case VariableMax :
+			val.i = unit->Variable[index].Max;
+			break;
+		case VariableIncrease :
+			val.i = unit->Variable[index].Increase;
+			break;
+		case VariableDiff :
+			val.i = unit->Variable[index].Max - unit->Variable[index].Value;
+			break;
+		case VariablePercent :
+			Assert(unit->Variable[index].Max != 0);
+			val.i = 100 * unit->Variable[index].Value / unit->Variable[index].Max;
+			break;
+		case VariableName :
+			if (index == GIVERESOURCE_INDEX) {
+				val.s = DefaultResourceNames[unit->Type->GivesResource];
+			} else if (index == CARRYRESOURCE_INDEX) {
+				val.s = DefaultResourceNames[unit->CurrentResource];
+			} else {
+				val.s = UnitTypeVar.VariableName[index];
+			}
+			break;
+		default :
+			Assert(0);
+	}
+	return val;
+}
+
+/**
+**  Get unit from an unit depending of the relation.
+**
+**  @param unit    unit reference.
+**  @param e       relation with unit.
+**
+**  @return The desirated unit.
+*/
+const Unit* GetUnitRef(const Unit* unit, EnumUnit e)
+{
+	Assert(unit);
+	switch (e) {
+		case UnitRefItSelf :
+			return unit;
+		case UnitRefInside :
+			return unit->UnitInside;
+		case UnitRefContainer :
+			return unit->Container;
+		case UnitRefWorker :
+			if (unit->Orders[0].Action == UnitActionBuilded) {
+				return unit->Data.Builded.Worker;
+			} else {
+				return 0;
+			}
+		case UnitRefGoal :
+			return unit->Goal;
+		default :
+			Assert(0);
+	}
+	return 0;
+}
+
+
+/**
+**  Draw text with variable.
+**
+**  @param unit         unit with variable to show.
+**  @param content      extra data.
+**  @param defaultfont  default font if no specific font in extra data.
+*/
+void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
+{
+	const char* text;       // Optionnal text to display.
+	int font;               // Font to use.
+	int index;              // Index of optionnal variable.
+	int x;                  // X coordonate to display.
+	int y;                  // Y coordonate to display.
+	EnumVariable component; // Component of the optional variable to use.
+	int value;              // Value of variable.
+	int diff;               // Max - value of the variable.
+	char buf[64];           // string to stock number conversion.
+
+	Assert(content);
+	x = content->PosX;
+	y = content->PosY;
+	text = content->Data.SimpleText.Text;
+	font = content->Data.SimpleText.Font;
+	if (font == -1) {
+		font = defaultfont;
+	}
+	Assert(font != -1);
+	index = content->Data.SimpleText.Index;
+
+	Assert(unit || index == -1);
+	Assert(index == -1 || (0 <= index && index < UnitTypeVar.NumberVariable));
+
+	if (text) {
+		VideoDrawText(x, y, font, text);
+		x += VideoTextLength(font, text);
+	}
+	if (content->Data.SimpleText.ShowName) {
+		VideoDrawTextCentered(x, y, font, unit->Type->Name);
+		x += VideoTextLength(font, unit->Type->Name);
+		return ;
+	}
+	if (index != -1) {
+		if (!content->Data.SimpleText.Stat) {
+			component = content->Data.SimpleText.Component;
+			switch (component) {
+			case VariableValue :
+			case VariableMax :
+			case VariableIncrease :
+			case VariableDiff :
+			case VariablePercent :
+			VideoDrawNumber(x, y, font, GetComponent(unit, index, component).i);
+			break;
+			case VariableName :
+			VideoDrawText(x, y, font, GetComponent(unit, index, component).s);
+			break;
+			default :
+			Assert(0);
+			}
+		} else {
+			value = unit->Variable[index].Value;
+			diff = unit->Variable[index].Max - value;
+
+			if (!diff) {
+				VideoDrawNumber(x, y, font, value);
+			} else {
+				sprintf(buf, "%d~<+%d~>", value, diff);
+				VideoDrawText(x, y, font, buf);
+			}
+		}
 	}
 }
 
 /**
-**  Draw the stats for a unit in top-panel.
+**  Draw formated text with variable value.
 **
-**  @param x         Screen X position
-**  @param y         Screen Y position
-**  @param modified  The modified stat value
-**  @param original  The original stat value
+**  @param unit         unit with variable to show.
+**  @param content      extra data.
+**  @param defaultfont  default font if no specific font in extra data.
+**
+**  @note text is limited to 256 char. (is enought ?)
+**  @note text must have exactly 1 %d.
+**  @bug if text format is incorrect.
 */
-static void DrawStats(int x, int y, int modified, int original)
+void DrawFormatedText(const Unit* unit, ContentType* content, int defaultfont)
 {
-	char buf[64];
+	const char* text;  // Format of the Text to display.
+	int font;          // Font to use.
+	int index;         // Index of variable.
+	char buf[256];     // Text to display.
 
-	if (modified == original) {
-		VideoDrawNumber(x, y, GameFont, modified);
+	Assert(content);
+	Assert(unit);
+	text = content->Data.FormatedText.Format;
+	font = content->Data.FormatedText.Font;
+	if (font == -1) {
+		font = defaultfont;
+	}
+	Assert(font != -1);
+	index = content->Data.FormatedText.Index;
+	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+	sprintf(buf, text, GetComponent(unit, index, content->Data.FormatedText.Component));
+	if (content->Data.FormatedText.Centered) {
+		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
 	} else {
-		sprintf(buf, "%d~<+%d~>", original, modified - original);
-		VideoDrawText(x, y, GameFont, buf);
+		VideoDrawText(content->PosX, content->PosY, font, buf);
 	}
 }
+
+/**
+**  Draw formated text with variable value.
+**
+**  @param unit         unit with variable to show.
+**  @param content      extra data.
+**  @param defaultfont  default font if no specific font in extra data.
+**
+**  @note text is limited to 256 char. (is enought ?)
+**  @note text must have exactly 1 %d.
+**  @bug if text format is incorrect.
+**  @bug if sizeof(int) != sizeof(char*) for sprintf.
+*/
+void DrawFormatedText2(const Unit* unit, ContentType* content, int defaultfont)
+{
+	const char* text;  // Format of the Text to display.
+	int font;          // Font to use.
+	int index1;        // Index of variable 1.
+	int index2;        // Index of variable 2.
+	char buf[256];     // Text to display.
+
+	Assert(content);
+	Assert(unit);
+	text = content->Data.FormatedText2.Format;
+	font = content->Data.FormatedText2.Font;
+	if (font == -1) {
+		font = defaultfont;
+	}
+	Assert(font != -1);
+	index1 = content->Data.FormatedText2.Index1;
+	index2 = content->Data.FormatedText2.Index2;
+	sprintf(buf, text, GetComponent(unit, index1, content->Data.FormatedText2.Component1),
+		GetComponent(unit, index2, content->Data.FormatedText2.Component2));
+	if (content->Data.FormatedText2.Centered) {
+		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
+	} else {
+		VideoDrawText(content->PosX, content->PosY, font, buf);
+	}
+}
+
+/**
+**  Draw icon for unit.
+**
+**  @param unit         unit with icon to show.
+**  @param content      extra data.
+**  @param defaultfont  unused.
+*/
+void DrawPanelIcon(const Unit* unit, ContentType* content, int defaultfont)
+{
+	int x;
+	int y;
+
+	Assert(content);
+	Assert(unit);
+	x = content->PosX;
+	y = content->PosY;
+	unit = GetUnitRef(unit, content->Data.Icon.UnitRef);
+	if (unit && unit->Type->Icon.Icon) {
+		DrawIcon(unit->Player, unit->Type->Icon.Icon, x, y);
+	}
+}
+
+/**
+**  Draw life bar of a unit using selected variable.
+**  Placed under icons on top-panel.
+**
+**  @param unit  Pointer to unit.
+**  @param x     Screen X postion of icon
+**  @param y     Screen Y postion of icon
+**
+**  @todo Color and percent value Parametrisation.
+*/
+void DrawLifeBar(const Unit* unit, ContentType* content, int defaultfont)
+{
+	int x;         // X coordinate of the bar.
+	int y;         // Y coordinate of the bar.
+	int index;     // index of variable.
+	int f;         // percent of value/Max
+	Uint32 color;  // Color of bar.
+
+	Assert(content);
+	Assert(unit);
+	x = content->PosX;
+	y = content->PosY;
+	index = content->Data.LifeBar.Index;
+	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+	if (!unit->Variable[index].Max) {
+		return;
+	}
+	f = (100 * unit->Variable[index].Value) / unit->Variable[index].Max;
+	if (f > 75) {
+		color = ColorDarkGreen;
+	} else if (f > 50) {
+		color = ColorYellow;
+	} else if (f > 25) {
+		color = ColorOrange;
+	} else {
+		color = ColorRed;
+	}
+	// Border
+	VideoFillRectangleClip(ColorBlack, x - 1, y - 1,
+		content->Data.LifeBar.Width + 2, content->Data.LifeBar.Height + 2);
+
+	VideoFillRectangleClip(color, x, y,
+		(f * content->Data.LifeBar.Width) / 100, content->Data.LifeBar.Height);
+}
+
+/**
+**  Draw life bar of a unit using selected variable.
+**  Placed under icons on top-panel.
+**
+**  @param unit  Pointer to unit.
+**  @param x     Screen X postion of icon
+**  @param y     Screen Y postion of icon
+**
+**  @todo Color and percent value Parametrisation.
+*/
+void DrawCompleteBar(const Unit* unit, ContentType* content, int defaultfont)
+{
+	int x;         // X coordinate of the bar.
+	int y;         // Y coordinate of the bar.
+	int index;     // index of variable.
+	int f;         // percent of value/Max.
+	int w;         // Width of the bar.
+	int h;         // Height of the bar.
+
+	Assert(content);
+	Assert(unit);
+	x = content->PosX;
+	y = content->PosY;
+	w = content->Data.CompleteBar.Width;
+	h = content->Data.CompleteBar.Height;
+	Assert(w > 0);
+	Assert(h > 4);
+	index = content->Data.CompleteBar.Index;
+	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+	if (!unit->Variable[index].Max) {
+		return;
+	}
+	f = (100 * unit->Variable[index].Value) / unit->Variable[index].Max;
+	if (!content->Data.CompleteBar.Border) {
+		VideoFillRectangleClip(TheUI.CompletedBarColor, x, y, f * w / 100, h);
+		if (TheUI.CompletedBarShadow) {
+			// Shadow
+			VideoDrawVLine(ColorGray, x + f * w / 100, y, h);
+			VideoDrawHLine(ColorGray, x, y + h, f * w / 100);
+
+			// |~  Light
+			VideoDrawVLine(ColorWhite, x, y, h);
+			VideoDrawHLine(ColorWhite, x, y, f * w / 100);
+		}
+	} else {
+		VideoDrawRectangleClip(ColorGray, x,     y,     w + 4, h );
+		VideoDrawRectangleClip(ColorBlack,x + 1, y + 1, w + 2, h - 2);
+		VideoFillRectangleClip(ColorBlue, x + 2, y + 2, f * w / 100, h - 4);
+	}
+}
+
+
 
 /**
 **  Draw the unit info into top-panel.
@@ -223,33 +566,35 @@ static void DrawStats(int x, int y, int modified, int original)
 */
 static void DrawUnitInfo(const Unit* unit)
 {
-	char buf[64];
+	int i; // iterator on panel. And some other things.
+	int j; // iterator on panel content.
+	ContentType* content;      // content of current panel.
+	int index;  // Index of the Panel.
 	const UnitType* type;
 	const UnitStats* stats;
-	int i;
-	int vpos;
 	int x;
 	int y;
 	Unit* uins;
 
+	Assert(unit);
+	UpdateUnitVariables(unit);
+	for (i = 0; i < TheUI.NumberPanel; i++) {
+		index = TheUI.PanelIndex[i];
+		if (CanShowContent(AllPanels[index].Condition, unit)) {
+			for (j = 0; j < AllPanels[index].NContents; j++) {
+				content = AllPanels[index].Contents + j;
+				if (CanShowContent(content->Condition, unit) && content->DrawData) {
+					content->DrawData(unit, content, AllPanels[index].DefaultFont);
+				}
+			}
+		}
+	}
+
 	type = unit->Type;
 	stats = unit->Stats;
-#ifdef DEBUG
-	if (!type) {
-		DebugPrint(" FIXME: free unit selected\n");
-		return;
-	}
-#endif
-
-	//
-	// Draw icon in upper left corner
-	//
-	if (TheUI.SingleSelectedText) {
-		VideoDrawText(TheUI.SingleSelectedTextX, TheUI.SingleSelectedTextY,
-			TheUI.SingleSelectedFont, TheUI.SingleSelectedText);
-	}
-
-	// FIXME: allow without button
+	Assert(type);
+	Assert(stats);
+	// Draw IconUnit
 	if (TheUI.SingleSelectedButton) {
 		x = TheUI.SingleSelectedButton->X;
 		y = TheUI.SingleSelectedButton->Y;
@@ -257,116 +602,13 @@ static void DrawUnitInfo(const Unit* unit)
 			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 				(IconActive | (MouseButtons & LeftButton)) : 0,
 			x, y, NULL);
-		UiDrawLifeBar(unit, x, y);
-
-		if (unit->Player == ThisPlayer ||
-				PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
-				PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
-				ReplayRevealMap) {  // Only for own units.
-			if (unit->HP && unit->HP < 10000) {
-				sprintf(buf, "%d/%d", unit->HP, stats->HitPoints);
-				VideoDrawTextCentered(x + (type->Icon.Icon->Sprite->Width) / 2,
-					y + type->Icon.Icon->Sprite->Height + 7 + 3, SmallFont, buf);
-			}
-		}
 	}
-
 	x = TheUI.InfoPanelX;
 	y = TheUI.InfoPanelY;
-
-	//
-	//  Draw unit name centered, if too long split at space.
-	//
-	i = VideoTextLength(GameFont, type->Name);
-	if (i > 110) {  // doesn't fit on line
-		const char* s;
-
-		s = strchr(type->Name, ' ');
-		Assert(s);
-		i = s-type->Name;
-		memcpy(buf, type->Name, i);
-		buf[i] = '\0';
-		VideoDrawTextCentered(x + 114, y + 8 + 3, GameFont, buf);
-		VideoDrawTextCentered(x + 114, y + 8 + 17, GameFont, s + 1);
-	} else {
-		VideoDrawTextCentered(x + 114, y + 8 + 17, GameFont, type->Name);
-	}
-
-	//
-	//  Draw unit level.
-	//
-	if (stats->Level) {
-		sprintf(buf, "Level ~<%d~>", stats->Level);
-		VideoDrawTextCentered(x + 114, y + 8 + 33, GameFont, buf);
-	}
-
-#ifdef DEBUG_UNITNUMBER
-	// Draw unit number for debug purposes
-	VideoDrawNumber(x + 10, y + 8 + 150, GameFont, unit->Slot);
-#endif
-
-	//
-	//  Show how much a resource has left for owner and neutral.
-	//
-	if (unit->Player == ThisPlayer || unit->Player->Player == PlayerNumNeutral ||
-			PlayersTeamed(ThisPlayer->Player, unit->Player->Player) ||
-			PlayersAllied(ThisPlayer->Player, unit->Player->Player) ||
-			ReplayRevealMap) {
-		if (type->GivesResource) {
-			sprintf(buf, "%s Left:", DefaultResourceNames[type->GivesResource]);
-			VideoDrawText(x + 108 - VideoTextLength(GameFont, buf), y + 8 + 78,
-				GameFont, buf);
-			if (!unit->ResourcesHeld) {
-				VideoDrawText(x + 108, y + 8 + 78, GameFont, "(none)");
-			} else {
-				VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->ResourcesHeld);
-			}
-			if (unit->Orders[0].Action != UnitActionBuilded) {
-				return;
-			}
-		}
-	}
-
-	//
-	//  Only for owning player.
-	//
-#ifndef DEBUG
-	if (unit->Player != ThisPlayer &&
-			!PlayersTeamed(ThisPlayer->Player, unit->Player->Player) &&
-			!PlayersAllied(ThisPlayer->Player, unit->Player->Player) && !ReplayRevealMap) {
-		return;
-	}
-#endif
-
-	//
-	//  Draw unit kills and experience.
-	//
-	if (stats->Level && !(type->CanTransport && unit->BoardCount)) {
-		sprintf(buf, "XP:~<%d~> Kills:~<%d~>", unit->XP, unit->Kills);
-		VideoDrawTextCentered(x + 114, y + 8 + 15 + 33, GameFont, buf);
-	}
-
 	//
 	//  Show progress for buildings only, if they are selected.
 	//
 	if (type->Building && NumSelected == 1 && Selected[0] == unit) {
-		//
-		//  Building under constuction.
-		//
-		if (unit->Orders[0].Action == UnitActionBuilded) {
-			if (unit->Data.Builded.Worker) {
-				// FIXME: Position must be configured!
-				// FIXME: Wrong button style
-				DrawUnitIcon(unit->Data.Builded.Worker->Player,
-					TheUI.SingleSelectedButton->Style,
-					unit->Data.Builded.Worker->Type->Icon.Icon,
-					0, x + 107, y + 8 + 70, NULL);
-			}
-			// FIXME: not correct must use build time!!
-			UiDrawCompletedBar(stats->HitPoints, unit->HP);
-			return;
-		}
-
 		//
 		//  Building training units.
 		//
@@ -384,10 +626,6 @@ static void DrawUnitInfo(const Unit* unit)
 							(IconActive | (MouseButtons & LeftButton)) : 0,
 						TheUI.SingleTrainingButton->X, TheUI.SingleTrainingButton->Y, NULL);
 				}
-
-				UiDrawCompletedBar(unit->Orders[0].Type->Stats[
-					unit->Player->Player].Costs[TimeCost],
-					unit->Data.Train.Ticks);
 			} else {
 				if (TheUI.TrainingText) {
 					VideoDrawTextCentered(TheUI.TrainingTextX, TheUI.TrainingTextY,
@@ -406,10 +644,6 @@ static void DrawUnitInfo(const Unit* unit)
 						}
 					}
 				}
-
-				UiDrawCompletedBar(unit->Orders[0].Type->Stats[
-					unit->Player->Player].Costs[TimeCost],
-					unit->Data.Train.Ticks);
 			}
 			return;
 		}
@@ -418,10 +652,6 @@ static void DrawUnitInfo(const Unit* unit)
 		//  Building upgrading to better type.
 		//
 		if (unit->Orders[0].Action == UnitActionUpgradeTo) {
-			if (TheUI.UpgradingText) {
-				VideoDrawText(TheUI.UpgradingTextX, TheUI.UpgradingTextY,
-					TheUI.UpgradingFont, TheUI.UpgradingText);
-			}
 			if (TheUI.UpgradingButton) {
 				DrawUnitIcon(unit->Player, TheUI.UpgradingButton->Style,
 					unit->Orders[0].Type->Icon.Icon,
@@ -430,10 +660,6 @@ static void DrawUnitInfo(const Unit* unit)
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					TheUI.UpgradingButton->X, TheUI.UpgradingButton->Y, NULL);
 			}
-
-			UiDrawCompletedBar(unit->Orders[0].Type->Stats[
-				unit->Player->Player].Costs[TimeCost],
-				unit->Data.UpgradeTo.Ticks);
 			return;
 		}
 
@@ -441,10 +667,6 @@ static void DrawUnitInfo(const Unit* unit)
 		//  Building research new technology.
 		//
 		if (unit->Orders[0].Action == UnitActionResearch) {
-			if (TheUI.ResearchingText) {
-				VideoDrawText(TheUI.ResearchingTextX, TheUI.ResearchingTextY,
-					TheUI.ResearchingFont, TheUI.ResearchingText);
-			}
 			if (TheUI.ResearchingButton) {
 				DrawUnitIcon(unit->Player, TheUI.ResearchingButton->Style,
 					unit->Data.Research.Upgrade->Icon.Icon,
@@ -453,10 +675,6 @@ static void DrawUnitInfo(const Unit* unit)
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					TheUI.ResearchingButton->X, TheUI.ResearchingButton->Y, NULL);
 			}
-
-			UiDrawCompletedBar(unit->Data.Research.Upgrade->Costs[TimeCost],
-				unit->Player->UpgradeTimers.Upgrades[
-					unit->Data.Research.Upgrade - Upgrades]);
 			return;
 		}
 	}
@@ -467,10 +685,6 @@ static void DrawUnitInfo(const Unit* unit)
 	if (type->CanTransport && unit->BoardCount) {
 		int j;
 
-		if (TheUI.TransportingText) {
-			VideoDrawText(TheUI.TransportingTextX, TheUI.TransportingTextY,
-				TheUI.TransportingFont, TheUI.TransportingText);
-		}
 		uins = unit->UnitInside;
 		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
 			if (uins->Boarded && j < TheUI.NumTransportingButtons) {
@@ -491,6 +705,11 @@ static void DrawUnitInfo(const Unit* unit)
 		}
 		return;
 	}
+
+#if 0 // Must be removed after transforming in lua
+	char buf[64];
+	int vpos;
+
 
 	//
 	//  Stores resources.
@@ -520,115 +739,7 @@ static void DrawUnitInfo(const Unit* unit)
 		// We displayed at least one resource
 		return;
 	}
-
-	//
-	//  Non-attacking buildings.
-	//
-	if (type->Building && !type->CanAttack) {
-		if (type->Supply) { // Supply unit
-			VideoDrawText(x + 16, y + 8 + 63, GameFont, "Usage");
-			VideoDrawText(x + 58, y + 8 + 78, GameFont, "Supply:");
-			VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->Player->Supply);
-			VideoDrawText(x + 51, y + 8 + 94, GameFont, "Demand:");
-			if (unit->Player->Supply < unit->Player->Demand) {
-				VideoDrawReverseNumber(x + 108, y + 8 + 94, GameFont,
-					unit->Player->Demand);
-			} else {
-				VideoDrawNumber(x + 108, y + 8 + 94, GameFont,
-					unit->Player->Demand);
-			}
-		}
-	} else {
-		// FIXME: Level was centered?
-		//sprintf(buf, "Level ~<%d~>", stats->Level);
-		//VideoDrawText(x + 91, y + 8 + 33, GameFont, buf);
-
-		VideoDrawText(x + 57, y + 8 + 63, GameFont, "Armor:");
-		DrawStats(x + 108, y + 8 + 63, stats->Armor, type->_Armor);
-
-		VideoDrawText(x + 47, y + 8 + 78, GameFont, "Damage:");
-		if ((i = type->_BasicDamage + type->_PiercingDamage)) {
-			if (stats->PiercingDamage != type->_PiercingDamage) {
-				if (stats->PiercingDamage < 30 && stats->BasicDamage < 30) {
-					sprintf(buf, "%d-%d~<+%d+%d~>",
-						(stats->PiercingDamage + 1) / 2, i,
-						stats->BasicDamage - type->_BasicDamage +
-							(int)isqrt(unit->XP / 100) * XpDamage,
-						stats->PiercingDamage-type->_PiercingDamage);
-				} else {
-					sprintf(buf, "%d-%d~<+%d+%d~>",
-						(stats->PiercingDamage + stats->BasicDamage - 30) / 2, i,
-						stats->BasicDamage - type->_BasicDamage +
-							(int)isqrt(unit->XP / 100) * XpDamage,
-						stats->PiercingDamage-type->_PiercingDamage);
-				}
-			} else if (stats->PiercingDamage || stats->BasicDamage < 30) {
-				sprintf(buf, "%d-%d", (stats->PiercingDamage + 1) / 2, i);
-			} else {
-				sprintf(buf, "%d-%d", (stats->BasicDamage - 30) / 2, i);
-			}
-		} else {
-			strcpy(buf, "0");
-		}
-		VideoDrawText(x + 108, y + 8 + 78, GameFont, buf);
-
-		VideoDrawText(x + 57, y + 8 + 94, GameFont, "Range:");
-		DrawStats(x + 108, y + 8 + 94, stats->AttackRange, type->_AttackRange);
-
-		VideoDrawText(x + 64, y + 8 + 110, GameFont, "Sight:");
-		DrawStats(x + 108, y + 8 + 110, stats->SightRange, type->_SightRange);
-
-		VideoDrawText(x + 63, y + 8 + 125, GameFont, "Speed:");
-		DrawStats(x + 108, y + 8 + 125, stats->Speed, type->_Speed);
-
-		// FIXME: Ugly hack.
-		if (unit->Type->Harvester && unit->ResourcesHeld) {
-			sprintf(buf, "Carry: %d %s", unit->ResourcesHeld,
-				DefaultResourceNames[unit->CurrentResource]);
-			VideoDrawText(x + 61, y + 8 + 141, GameFont, buf);
-		}
-		if (unit->Type->Harvester &&
-				unit->Orders->Action == UnitActionResource &&
-				unit->CurrentResource &&
-				unit->Type->ResInfo[unit->CurrentResource] &&
-				unit->SubAction == 60 &&
-				!unit->Type->ResInfo[unit->CurrentResource]->ResourceStep) {
-			sprintf(buf, "%s: %d%%", DefaultResourceNames[unit->CurrentResource],
-					100 * (unit->Type->ResInfo[unit->CurrentResource]->WaitAtResource -
-						unit->Data.ResWorker.TimeToHarvest) /
-						unit->Type->ResInfo[unit->CurrentResource]->WaitAtResource);
-			VideoDrawText(x + 61, y + 8 + 141, GameFont, buf);
-		}
-
-	}
-	//
-	//  Unit can cast spell without mana, so only show mana bar for units with mana
-	//
-	if (type->_MaxMana) {
-		if (0) {
-			VideoDrawText(x + 59, y + 8 + 140 + 1, GameFont, "Magic:");
-			VideoDrawRectangleClip(ColorGray, x + 108, y + 8 + 140, 61, 14);
-			VideoDrawRectangleClip(ColorBlack, x + 108 + 1, y + 8 + 140 + 1, 61 - 2, 14 - 2);
-			i = (100 * unit->Mana) / unit->Type->_MaxMana;
-			i = (i * (61 - 4)) / 100;
-			VideoFillRectangleClip(ColorBlue, x + 108 + 2, y + 8 + 140 + 2, i, 14 - 4);
-
-			VideoDrawNumber(x + 128, y + 8 + 140 + 1, GameFont, unit->Mana);
-		} else {
-			int w;
-
-			w = 140;
-			// fix to display mana bar properly for any maxmana value
-			// max mana can vary for the unit
-			i = (100 * unit->Mana) / unit->Type->_MaxMana;
-			i = (i * w) / 100;
-			VideoDrawRectangleClip(ColorGray, x + 16,     y + 8 + 140,     w + 4, 16 );
-			VideoDrawRectangleClip(ColorBlack,x + 16 + 1, y + 8 + 140 + 1, w + 2, 16 - 2);
-			VideoFillRectangleClip(ColorBlue, x + 16 + 2, y + 8 + 140 + 2, i,     16 - 4);
-
-			VideoDrawNumber(x + 16 + w / 2, y + 8 + 140 + 1, GameFont, unit->Mana);
-		}
-	}
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -1085,25 +1196,16 @@ void SetCosts(int mana, int food, const int* costs)
 {
 	int i;
 
-	if (CostsMana != mana) {
-		CostsMana = mana;
-	}
-
-	if (CostsFood != food) {
-		CostsFood = food;
-	}
+	CostsMana = mana;
+	CostsFood = food;
 
 	if (costs) {
 		for (i = 0; i < MaxCosts; ++i) {
-			if (Costs[i] != costs[i]) {
-				Costs[i] = costs[i];
-			}
+			Costs[i] = costs[i];
 		}
 	} else {
 		for (i = 0; i < MaxCosts; ++i) {
-			if (Costs[i]) {
-				Costs[i] = 0;
-			}
+			Costs[i] = 0;
 		}
 	}
 }
