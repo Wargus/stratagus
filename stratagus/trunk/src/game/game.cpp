@@ -237,10 +237,16 @@ local void GameTypeLeftVsRight(void)
 */
 global void CreateGame(char* filename, WorldMap* map)
 {
-    int i, j;
+    int i;
+    int j;
     char* s;
 
-    if ( filename && *filename ) {
+    if( filename && !*filename ) {
+	// Load game, already created game with Init/LoadModules
+	return;
+    }
+
+    if( filename ) {
 	s = NULL;
 	// FIXME: LibraryFile here?
 	strcpy(CurrentMapPath, filename);
