@@ -2298,8 +2298,8 @@ global void HitUnit(Unit* unit,int damage)
 	if( unit->Player->AiEnabled ) {
 	    AiHelpMe(unit);
 	}
-	unit->Attacked=1;
     }
+    unit->Attacked=7;
 
     if( unit->HP<=damage ) {	// unit is killed or destroyed
 	DestroyUnit(unit);
