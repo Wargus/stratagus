@@ -1960,11 +1960,7 @@ local void FreeTips()
 /**
 **	Initialize the tips menu
 */
-#ifdef OLD_MENU
 local void InitTips(Menuitem *mi __attribute__((unused)))
-#else
-local void InitTips(Menuitem *mi)
-#endif
 {
     int i;
     int line;
@@ -1976,11 +1972,8 @@ local void InitTips(Menuitem *mi)
     int l;
     Menu *menu;
 
-#ifdef OLD_MENU
     menu = FindMenu("menu-tips");
-#else
-    menu = mi->menu;
-#endif
+
     if( ShowTips ) {
 	menu->items[1].d.gem.state=MI_GSTATE_CHECKED;
     } else {
