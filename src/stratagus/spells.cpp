@@ -992,7 +992,7 @@ global unsigned CclGetSpellByIdent(SCM value)
 	    return i;
 	}
     }
-    return 0xABCDEF;
+    return -1;
 }
 
 /**
