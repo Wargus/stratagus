@@ -1808,9 +1808,9 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     int x;
     int y;
     int i;
+    int mask;
     int n;
     int nb;
-    int mask;
     Unit* table[UnitMax];
 
     //FIXME: vladi: this debug check fails when used for teleporting...
@@ -3861,6 +3861,11 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Selected ) {
 	fprintf(file," 'selected");
     }
+#ifdef NEW_FOW
+    if( unit->Host ) {
+	fprintf(file," 'host %d",UnitNumber(unit->Host));
+    }
+#endif
     fprintf(file," 'visible \"");
     for( i=0; i<PlayerMax; ++i ) {
 	fputc((unit->Visible&(1<<i)) ? 'X' : '_',file);

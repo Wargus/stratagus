@@ -560,6 +560,12 @@ local SCM CclUnit(SCM list)
 		free(str);
 	    }
 #endif
+#ifdef NEW_FOW
+	} else if( gh_eq_p(value,gh_symbol2scm("host")) ) {
+	    //Plus one, so we can test for null, unit num can be 0.
+	    unit->Host=(Unit*)(gh_scm2int(gh_car(list))+1);
+	    list=gh_cdr(list);
+#endif    
 	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
