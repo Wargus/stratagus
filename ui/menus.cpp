@@ -47,6 +47,7 @@
 #include "map.h"
 #include "pud.h"
 #include "iolib.h"
+#include "net_lowlevel.h"
 #include "network.h"
 #include "netconnect.h"
 #include "settings.h"
@@ -72,6 +73,8 @@ local void StartMenusSetBackground(Menuitem *mi);
 local void NameLineDrawFunc(Menuitem *mi);
 local void EnterNameAction(Menuitem *mi, int key);
 local void EnterNameCancel(void);
+local void EnterServerIPAction(Menuitem *mi, int key);
+local void EnterServerIPCancel(void);
 
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
@@ -104,11 +107,19 @@ local void CustomGameStart(void);
 local void CustomGameOPSAction(Menuitem *mi, int i);
 
 local void MultiGameSetupInit(Menuitem *mi);	// master init
+local void MultiGameSetupExit(Menuitem *mi);	// master exit
 local void MultiGameDrawFunc(Menuitem *mi);
 local void MultiGameFWSAction(Menuitem *mi, int i);
 local void NetMultiPlayerDrawFunc(Menuitem *mi);
 local void MultiGamePlayerSelectorsUpdate(int initial);
 local void MultiScenSelectMenu(void);
+
+local void MultiGameClientInit(Menuitem *mi);	// master init
+local void MultiGameClientDrawFunc(Menuitem *mi);
+local void MultiGameClientUpdate(int initial);
+
+local void NetConnectingCancel(void);
+local void TerminateNetConnect(void);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -143,6 +154,11 @@ global int CurrentMenu = -1;
 
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
+
+/**
+**	Text describing the Network Server IP
+*/
+local char NetworkServerText[64];
 
 /**
 **	Offsets from top and left, used for different resolutions
@@ -362,6 +378,20 @@ local Menuitem EnterNameMenuItems[] = {
 };
 
 /**
+**	Items for the Enter Server Menu
+*/
+local Menuitem EnterServerIPMenuItems[] = {
+    { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL,
+	{ text:{ "Enter server IP-address:", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL,
+	{ input:{ NULL, 212, 20, MBUTTON_PULLDOWN, EnterServerIPAction, 0, 0} } },
+    { MI_TYPE_BUTTON, 24, 80, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+    { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterServerIPCancel, 'c'} } },
+};
+
+/**
 **	Items for the Net Create Join Menu
 */
 local Menuitem NetCreateJoinMenuItems[] = {
@@ -433,8 +463,106 @@ local Menuitem NetMultiSetupMenuItems[] = {
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
 	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0} } },
+
+    { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+
 };
 
+
+local Menuitem NetMultiClientMenuItems[] = {
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameClientInit, NULL,
+	{ drawfunc:{ MultiGameClientDrawFunc } } },
+
+    { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL,
+	{ text:{ "~<Multi Player Setup~>", MI_TFLAGS_CENTERED} } },
+
+    { MI_TYPE_GEM, 0, 0, MenuButtonDisabled, LargeFont, NULL, NULL,				/// FIXME: REMOVE
+	{ gem:{ MI_GSTATE_INVISIBLE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 600, 0, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_INVISIBLE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },	/// FIXME: Cancelfunc
+
+    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Your Race:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+240, MenuButtonDisabled, GameFont, NULL, NULL,
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0} } },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Resources:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+240, MenuButtonDisabled, GameFont, NULL, NULL,
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Units:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, MenuButtonDisabled, GameFont, NULL, NULL,
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Fog of War:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+300, MenuButtonDisabled, GameFont, NULL, NULL,
+	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Map Tileset:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+300, MenuButtonDisabled, GameFont, NULL, NULL,
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0} } },
+
+    { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+
+};
+
+/**
+**	Items for the Connecting Network Menu
+*/
+local Menuitem ConnectingMenuItems[] = {
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Connecting to server", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
+	{ text:{ NetworkServerText, MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!Cancel", 224, 27, MBUTTON_GM_FULL, NetConnectingCancel, 'c'} } },
+};
 
 /**
 **	Menus
@@ -447,7 +575,8 @@ global Menu Menus[] = {
 	256, 288,
 	ImagePanel1,
 	7, 8,
-	GameMenuItems
+	GameMenuItems,
+	NULL,
     },
     {
 	// Victory Menu
@@ -456,7 +585,8 @@ global Menu Menus[] = {
 	288, 128,
 	ImagePanel4,
 	2, 4,
-	VictoryMenuItems
+	VictoryMenuItems,
+	NULL,
     },
     {
 	// Lost Menu
@@ -465,7 +595,8 @@ global Menu Menus[] = {
 	288, 128,
 	ImagePanel4,
 	2, 3,
-	LostMenuItems
+	LostMenuItems,
+	NULL,
     },
     {
 	// SelectScen Menu
@@ -474,7 +605,8 @@ global Menu Menus[] = {
 	352, 352,
 	ImagePanel5,
 	4, 10,
-	ScenSelectMenuItems
+	ScenSelectMenuItems,
+	NULL,
     },
     {
 	// PrgStart Menu
@@ -483,7 +615,8 @@ global Menu Menus[] = {
 	640, 480,
 	ImageNone,
 	1, 4,
-	PrgStartMenuItems
+	PrgStartMenuItems,
+	NULL,
     },
     {
 	// CustomGame Menu
@@ -492,7 +625,8 @@ global Menu Menus[] = {
 	640, 480,
 	ImageNone,
 	3, 15,
-	CustomGameMenuItems
+	CustomGameMenuItems,
+	NULL,
     },
     {
 	// Enter Name Menu
@@ -501,7 +635,8 @@ global Menu Menus[] = {
 	288, 128,
 	ImagePanel4,
 	2, 4,
-	EnterNameMenuItems
+	EnterNameMenuItems,
+	NULL,
     },
     {
 	// Net Create Join Menu
@@ -510,7 +645,8 @@ global Menu Menus[] = {
 	640, 480,
 	ImageNone,
 	2, 3,
-	NetCreateJoinMenuItems
+	NetCreateJoinMenuItems,
+	NULL,
     },
     {
 	// Multi Player Setup Menu
@@ -518,8 +654,39 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	3, 23,
-	NetMultiSetupMenuItems
+	3, 30,
+	NetMultiSetupMenuItems,
+	NULL,
+    },
+    {
+	// Enter Server Menu
+	(640-288)/2,
+	260,
+	288, 128,
+	ImagePanel4,
+	3, 4,
+	EnterServerIPMenuItems,
+	NULL,
+    },
+    {
+	// Multi Player Client Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	3, 30,
+	NetMultiClientMenuItems,		// FIXME: unfinished
+	NULL,
+    },
+    {
+	// Connecting Menu
+	(640-288)/2,
+	260,
+	288, 128,
+	ImagePanel4,
+	2, 3,
+	ConnectingMenuItems,
+	TerminateNetConnect,
     },
 };
 
@@ -772,6 +939,35 @@ local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 }
 
 /**
+**	Draw gem 'button' on menu mx, my
+**
+**	@param mi	menuitem pointer
+**	@param mx	menu X display position (offset)
+**	@param my	menu Y display position (offset)
+*/
+local void DrawGem(Menuitem *mi, unsigned mx, unsigned my)
+{
+    unsigned flags = mi->flags;
+    MenuButtonId rb = mi->d.gem.button;
+    unsigned x, y;
+
+    x = mx+mi->xofs;
+    y = my+mi->yofs;
+    if ((mi->d.gem.state & MI_GSTATE_INVISIBLE)) {
+	return;
+    }
+    if (flags&MenuButtonDisabled) {
+	rb--;
+    } else if (flags&MenuButtonClicked) {
+	rb++;
+    }
+    if ((mi->d.gem.state & MI_GSTATE_CHECKED)) {
+	rb += 2;
+    }
+    VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
+}
+
+/**
 **	Draw input 'button' on menu mx, my
 **
 **	@param mi	menuitem pointer
@@ -877,6 +1073,9 @@ global void DrawMenu(int MenuId)
 		break;
 	    case MI_TYPE_INPUT:
 		DrawInput(mi,menu->x,menu->y);
+		break;
+	    case MI_TYPE_GEM:
+		DrawGem(mi,menu->x,menu->y);
 		break;
 	    default:
 		break;
@@ -1017,13 +1216,85 @@ local void EnterNameAction(Menuitem *mi, int key)
     }
 }
 
+local void EnterServerIPCancel(void)
+{
+    EnterServerIPMenuItems[1].d.input.nch = 0;
+    EndMenu();
+}
+
+local void EnterServerIPAction(Menuitem *mi, int key)
+{
+    if (mi->d.input.nch == 0) {
+	mi[1].flags = MenuButtonDisabled;
+    } else {
+	mi[1].flags &= ~MenuButtonDisabled;
+	if (key == 10 || key == 13) {
+	    EndMenu();
+	}
+    }
+}
+
 local void JoinNetGameMenu(void)
 {
+    char ServerHostBuf[32];
+    unsigned long addr;
+
+    StartMenusSetBackground(NULL);
+    Invalidate();
+    EnterServerIPMenuItems[1].d.input.buffer = ServerHostBuf;
+    strcpy(ServerHostBuf, "~!_");
+    EnterServerIPMenuItems[1].d.input.nch = strlen(ServerHostBuf) - 3;
+    EnterServerIPMenuItems[1].d.input.maxch = 24;
+    EnterServerIPMenuItems[2].flags |= MenuButtonDisabled;
+    ProcessMenu(MENU_NET_ENTER_SERVER_IP, 1);
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    if (EnterServerIPMenuItems[1].d.input.nch == 0) {
+	return;
+    }
+
+    ServerHostBuf[EnterServerIPMenuItems[1].d.input.nch] = 0;	// Now finally here is the address
+
+    addr = NetResolveHost(ServerHostBuf);
+    if (addr == INADDR_NONE) {
+	return;
+    }
+    NetworkServerIP = addr;
+
+    DebugLevel1Fn("SELECTED SERVER: %s (%d.%d.%d.%d)\n", ServerHostBuf,
+		    NIPQUAD(ntohl(addr)));
+
+    sprintf(NetworkServerText, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
+
+    NetworkInitClientConnect();
+
+    // Here we really go...
+    ProcessMenu(MENU_NET_CONNECTING, 1);
+}
+
+local void NetConnectingCancel(void)
+{
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    NetworkExitClientConnect();
+    EndMenu();
+}
+
+local void TerminateNetConnect(void)
+{
+    if (NetLocalState == ccs_unreachable) {
+	NetConnectingCancel();
+	return;
+    }
+    DebugLevel1Fn("NetLocalState %d\n", NetLocalState);
+    NetConnectRunning = 2;
     DestroyCursorBackground();
     CustomGameStarted = 0;
-    ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
+    ProcessMenu(MENU_NET_MULTI_CLIENT, 1);
     if (CustomGameStarted) {
 	GameMenuReturn();
+    } else {
+	NetConnectingCancel();
     }
 }
 
@@ -1047,6 +1318,7 @@ local void MultiPlayerGameMenu(void)
     strcpy(NameBuf, "Anonymous~!_");
     EnterNameMenuItems[1].d.input.nch = strlen(NameBuf) - 3;
     EnterNameMenuItems[1].d.input.maxch = 15;
+    EnterNameMenuItems[2].flags &= ~MenuButtonDisabled;
     ProcessMenu(MENU_ENTER_NAME, 1);
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
@@ -1411,7 +1683,6 @@ local void CustomGameCancel(void)
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     EndMenu();
-
 }
 
 local void CustomGameStart(void)
@@ -1526,6 +1797,12 @@ local void MultiGameDrawFunc(Menuitem *mi)
     GameDrawFunc(mi);
 }
 
+local void MultiGameClientDrawFunc(Menuitem *mi)
+{
+    // FIXME: do something better
+    GameDrawFunc(mi);
+}
+
 local void MultiGamePlayerSelectorsUpdate(int initial)
 {
     int i, h, c;
@@ -1537,21 +1814,32 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     */
     for (c = h = i = 0; i < 16; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerHuman) {
-	    h++;
+	    h++;	// available human player slots
 	}
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
-	    c++;
+	    c++;	// available computer player slots
 	}
     }
+
+    /// Tell connect state machines how many human player we can have
+    NetPlayers = h;
 
     NetMultiSetupMenuItems[5] = NetMultiButtonStorage[1];
     NetMultiSetupMenuItems[5].yofs = 32;
     for (i = 1; i < 8; i++) {
 	NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
 	NetMultiSetupMenuItems[5 + i].yofs = 32 + i * 22;
+
+	// FIXME: Only here for debug - belongs into NetMultiPlayerDrawFunc
+	NetMultiSetupMenuItems[22 + i].flags = 0;
+	NetMultiSetupMenuItems[22 + i].d.gem.state = 0;	// FIXME: check player ready checkmark state
+
 	if (i >= h) {
 	    /* FIXME: This is wrong - avoid slots of net-connected player! */
 	    NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = 1;
+
+	    NetMultiSetupMenuItems[22 + i].flags = MenuButtonDisabled;
+	    NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
 	}
 	if (i >= h + c) {
 	    NetMultiSetupMenuItems[5 + i].d.pulldown.defopt =
@@ -1562,25 +1850,103 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     }
 }
 
+local void MultiGameClientUpdate(int initial)
+{
+    int i, h, c;
+
+    /* FIXME: What this has to do:
+	analyze pudinfo for available slots, disable additional buttons - partially done
+    */
+    for (c = h = i = 0; i < 16; i++) {
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerHuman) {
+	    h++;	// available human player slots
+	}
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
+	    c++;	// available computer player slots
+	}
+    }
+
+    NetMultiClientMenuItems[5] = NetMultiButtonStorage[1];
+    NetMultiClientMenuItems[5].yofs = 32;
+    for (i = 1; i < 8; i++) {
+	if (Hosts[i].PlyNr) {
+	    NetMultiClientMenuItems[5 + i] = NetMultiButtonStorage[1];
+	} else {
+	    NetMultiClientMenuItems[5 + i] = NetMultiButtonStorage[0];
+	}
+	NetMultiClientMenuItems[5 + i].yofs = 32 + i * 22;
+
+	NetMultiClientMenuItems[22 + i].flags = 0;
+	if (i == NetLocalHostsSlot) {
+	    /* FIXME: This is wrong - read from stored! */
+	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
+	} else {
+	    /* FIXME: This is wrong - read from Server! */
+	    NetMultiClientMenuItems[22 + i].d.gem.state |= MI_GSTATE_PASSIVE;
+	}
+
+
+	if (i >= h) {
+	    /* FIXME: This is wrong - read from server! */
+	    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = 1;
+	}
+	if (i >= h + c) {
+	    NetMultiClientMenuItems[22 + i].flags = MenuButtonDisabled;
+	    NetMultiClientMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+	    NetMultiClientMenuItems[5 + i].d.pulldown.defopt =
+		    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = 2;
+	    NetMultiClientMenuItems[5 + i].flags = MenuButtonDisabled;
+	}
+    }
+}
+
 local void MultiGameSetupInit(Menuitem *mi)
 {
     GameSetupInit(mi);
     MultiGamePlayerSelectorsUpdate(1);
+    NetworkInitServerConnect();
+}
+
+local void MultiGameSetupExit(Menuitem *mi)
+{
+    // FIXME : Not called yet
+    NetworkExitServerConnect();
 }
 
 local void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
-    int nc, rc;
+    int i, nc, rc;
+
+    i = mi - NetMultiSetupMenuItems - 5;
+    if (i > 0 && i < 8) {
+	if (i > 0) {
+	    NetMultiSetupMenuItems[22 + i].flags &= ~MenuButtonDisabled;
+	    // FIXME: check player ready checkmark state
+	    NetMultiSetupMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
+	}
+    } else {
+	i = mi - NetMultiClientMenuItems - 5;
+	if (i > 0) {
+	    NetMultiClientMenuItems[22 + i].flags &= ~MenuButtonDisabled;
+	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
+	}
+    }
 
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
-    /* FIXME: NetworkName has to be replaced by indexing Netplayer Names array
-	with mi - NetMultiSetupMenuItems - 5
-	to access the name of the local (game creator) or connected player.
-	also: further changes to implement client menu...
+    /* FIXME: 
+	 further changes to implement client menu...
     */
-    DrawText(mi->xofs, mi->yofs, GameFont, NetworkName);
+    DrawText(mi->xofs, mi->yofs, GameFont, Hosts[i].PlyName);
+    
     SetDefaultTextColors(nc, rc);
+}
+
+
+local void MultiGameClientInit(Menuitem *mi)
+{
+    GameSetupInit(mi);
+    MultiGameClientUpdate(1);
 }
 
 /*----------------------------------------------------------------------------
@@ -1858,6 +2224,22 @@ global void MenuHandleMouseMove(int x,int y)
 	    mi = menu->items + i;
 	    if (!(mi->flags&MenuButtonDisabled)) {
 		switch (mi->mitype) {
+		    case MI_TYPE_GEM:
+			if ((mi->d.gem.state & MI_GSTATE_PASSIVE)) {
+			    continue;
+			}
+			xs = menu->x + mi->xofs;
+			ys = menu->y + mi->yofs;
+			if (x < xs || x > xs + mi->d.gem.xsize || y < ys || y > ys + mi->d.gem.ysize) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
+				    RedrawFlag = 1;
+				    mi->flags &= ~MenuButtonActive;
+				}
+			    }
+			    continue;
+			}
+			break;
 		    case MI_TYPE_BUTTON:
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
@@ -1959,6 +2341,7 @@ global void MenuHandleMouseMove(int x,int y)
 			break;
 		}
 		switch (mi->mitype) {
+		    case MI_TYPE_GEM:
 		    case MI_TYPE_BUTTON:
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
@@ -1996,6 +2379,7 @@ global void MenuHandleButtonDown(int b)
 	    mi = menu->items + MenuButtonUnderCursor;
 	    if (!(mi->flags&MenuButtonClicked)) {
 		switch (mi->mitype) {
+		    case MI_TYPE_GEM:		// FIXME: PASSIVE ???
 		    case MI_TYPE_BUTTON:
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
@@ -2056,6 +2440,23 @@ global void MenuHandleButtonUp(int b)
 	for (i = 0; i < n; ++i) {
 	    mi = menu->items + i;
 	    switch (mi->mitype) {
+		case MI_TYPE_GEM:
+		    if (mi->flags&MenuButtonClicked) {
+			RedrawFlag = 1;
+			mi->flags &= ~MenuButtonClicked;
+			if (MenuButtonUnderCursor == i) {
+			    MenuButtonUnderCursor = -1;
+			    if ((mi->d.gem.state & MI_GSTATE_CHECKED)) {
+				mi->d.gem.state &= ~MI_GSTATE_CHECKED;
+			    } else {
+				mi->d.gem.state |= MI_GSTATE_CHECKED;
+			    }
+			    if (mi->d.gem.action) {
+				(*mi->d.gem.action)(mi);
+			    }
+			}
+		    }
+		    break;
 		case MI_TYPE_BUTTON:
 		    if (mi->flags&MenuButtonClicked) {
 			RedrawFlag = 1;
@@ -2130,7 +2531,7 @@ local void EndMenu(void)
 */
 global void ProcessMenu(int MenuId, int Loop)
 {
-    int i;
+    int i, oldncr;
     Menu *menu;
     Menuitem *mi;
     int CurrentMenuSave = -1, MenuButtonUnderCursorSave = -1, MenuButtonCurSelSave = -1;
@@ -2205,14 +2606,23 @@ global void ProcessMenu(int MenuId, int Loop)
 	    DebugLevel3("MustRedraw: 0x%08x\n",MustRedraw);
 	    UpdateDisplay();
 	    RealizeVideoMemory();
+	    oldncr = NetConnectRunning;
 	    WaitEventsAndKeepSync();
+	    if (NetConnectRunning == 2) {
+		NetworkProcessClientRequest();
+	    }
+	    if (oldncr == 2 && NetConnectRunning == 0) {	// stopped by network activity
+		if (menu->netaction) {
+		    (*menu->netaction)();
+		}
+	    }
 	}
     }
 
     for (i = 0; i < menu->nitems; ++i) {
 	mi = menu->items + i;
 	if (mi->exitfunc) {
-	    (*mi->exitfunc)(mi);	// action/destructor
+	    (*mi->exitfunc)(mi);		// action/destructor
 	}
     }
 
@@ -2275,13 +2685,16 @@ global void InitMenus(unsigned int race)
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
     }
+#ifdef HAVE_EXPANSION
     strcat(ScenSelectPath, "swamp.rgb");
     if (access(ScenSelectPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
 	CustomGameMenuItems[14].d.pulldown.noptions = 4;
-
     }
+#else
+    CustomGameMenuItems[14].d.pulldown.noptions = 4;
+#endif
 }
 
 //@}

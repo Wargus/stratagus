@@ -36,9 +36,9 @@
     /// Network protocol major version
 #define NetworkProtocolMajorVersion	0
     /// Network protocol minor version (maximal 99)
-#define NetworkProtocolMinorVersion	3
+#define NetworkProtocolMinorVersion	4
     /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	2
+#define NetworkProtocolPatchLevel	0
     /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
@@ -66,6 +66,16 @@ typedef struct _network_host_ {
 } NetworkHost;
 
 /**
+**	Connect state information of network systems active in current game.
+*/
+typedef struct _network_state_ {
+    unsigned char	State;		/// Menu: ConnectState;
+    unsigned char	Ready;		/// Menu: Player is ready
+    unsigned short	MsgCnt;		/// Menu: Counter for state msg of same type (detect unreachable)
+    // Fill in here...
+} NetworkState;
+
+/**
 **	Network init message.
 */
 typedef struct _init_message_ {
@@ -79,7 +89,10 @@ typedef struct _init_message_ {
     int		   Updates;		/// Update frequency
     char	   HostsCount;		/// Number of hosts.
 
-    NetworkHost	   Hosts[PlayerMax];	/// Participant information.
+    union {
+	NetworkHost	Hosts[PlayerMax];	/// Participant information.
+	char		MapPath[256];
+    } u;
 } InitMessage;
 
 /**
@@ -92,11 +105,33 @@ enum _ic_message_subtype_ {
     ICMEngineMismatch,			/// FreeCraft engine version doesn't match
     ICMProtocolMismatch,		/// Network protocol version doesn't match
     ICMEngineConfMismatch,		/// Engine configuration isn't identical
-    ICMMapUidMismatch,			/// MAP Uid  doesn't match
+    ICMMapUidMismatch,			/// MAP UID doesn't match
 
     ICMGameFull,			/// No player slots available
+    ICMWelcome,				/// Acknowledge for new client connections
+    ICMWaiting,				/// Client has received Welcome and is waiting
 
     ICMServerQuit,			/// Server has quit game
+};
+
+/**
+**	Network Client connect states
+*/
+enum _net_client_con_state_ {
+    ccs_unused = 0,
+    ccs_connecting,
+    ccs_connected,
+    ccs_synced,
+    ccs_unreachable,
+};
+
+/**
+**	Network Server connect states
+*/
+enum _net_server_con_state_ {
+    scs_waiting = 0,
+    scs_sending,
+    scs_synced,
 };
 
 /*----------------------------------------------------------------------------
@@ -106,10 +141,16 @@ enum _ic_message_subtype_ {
 extern char* NetworkArg;		/// Network command line argument
 extern int NetPlayers;			/// Network players
 extern int NetworkPort;			/// Local network port to use
-extern char NetworkName[16];		/// Network Name of local player
 
 extern int HostsCount;			/// Number of hosts.
 extern NetworkHost Hosts[PlayerMax];	/// Host, port, and number of all players.
+
+extern NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
+extern int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
+extern char NetworkName[16];		/// Network menu: Name of local player
+extern unsigned long NetworkServerIP;	/// Network menu: IP of server to join
+extern int NetConnectRunning;		/// Network menu: Setup mode active
+extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -118,7 +159,13 @@ extern NetworkHost Hosts[PlayerMax];	/// Host, port, and number of all players.
 extern void NetworkServerSetup(WorldMap *map);	/// connection server setup
 extern void NetworkClientSetup(WorldMap *map);	/// connection client setup
 extern void NetworkSetupArgs(void);		/// setup command line connection parameters
-extern void NetworkParseSetupEvent(const char *buf, int size); /// parse a setup event
+
+extern void NetworkInitClientConnect(void); /// setup network connect state machine for clients
+extern void NetworkExitClientConnect(void); /// terminate network connect state machine for clients
+extern void NetworkInitServerConnect(void); /// setup network connect state machine for the server
+extern void NetworkExitServerConnect(void); /// terminate network connect state machine for the server
+extern void NetworkParseSetupEvent(const char *buf, int size); /// parse a network connect event
+extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
 
 //@}
 
