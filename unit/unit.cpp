@@ -177,7 +177,7 @@ global void ReleaseUnit(Unit* unit)
     ReleasedTail=&unit->Next;
     unit->Refs=FrameCounter+NetworkMaxLag;	// could be reuse after this.
     IfDebug(
-	DebugLevel3Fn("%Zd\n",UnitNumber(unit));
+	DebugLevel2Fn("%Zd\n",UnitNumber(unit));
 	unit->Type=NULL;			// for debugging.
     );
 }
@@ -721,9 +721,9 @@ global int UnitVisible(const Unit* unit)
 #else
     unsigned x;
     unsigned y;
-    unsigned w;
-    unsigned w0;
-    unsigned h;
+    int w;
+    int w0;
+    int h;
 
     DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
 
@@ -751,8 +751,8 @@ global int UnitVisible(const Unit* unit)
     //	Check explored or if visible (building) under fog of war.
     //		FIXME: need only check the boundary, not the complete rectangle.
     //
-    for( ; (int)h>=0; --h) {
-	for( w=w0; (int)w>=0; --w ) {
+    for( ; h-->0; ) {
+	for( w=w0; w-->0; ) {
 	    if( IsMapFieldVisible(x+w,y+h)
 		    || (unit->Type->Building && unit->SeenFrame!=0xFF
 			&& IsMapFieldExplored(x+w,y+h)) ) {
