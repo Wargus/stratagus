@@ -309,7 +309,6 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 #define MenuKey FreeCraftMenuKey
 #define HideCursor FreeCraftHideCursor
 #define InitCursor FreeCraftInitCursor
-#define DrawText FreeCraftDrawText
 
 #endif // defined(__APPLE__)
 

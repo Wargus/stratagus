@@ -120,7 +120,7 @@ local void DrawMouseCoordsOnMap(int x,int y)
 	    ,flags&MapFieldExplored	?'e':'-'
 	    ,flags&MapFieldVisible	?'v':'-'
 	);
-    DrawText(TheUI.MenuButtonX+3,TheUI.MenuButtonY+3,GameFont,buf);
+    VideoDrawText(TheUI.MenuButtonX+3,TheUI.MenuButtonY+3,GameFont,buf);
     InvalidateArea(TheUI.MenuButtonX,TheUI.MenuButtonY
 	    ,TheUI.MenuButton.Graphic->Width
 	    ,TheUI.MenuButton.Graphic->Height);

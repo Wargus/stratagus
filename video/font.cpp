@@ -367,7 +367,7 @@ global int TextLength(unsigned font,const unsigned char* text)
 **
 **	@return		The lenght of the printed text.
 */
-global int DrawText(int x,int y,unsigned font,const unsigned char* text)
+global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
 {
     int w;
     int height;
@@ -439,7 +439,7 @@ global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 /**
 **	Draw reverse text with font at x,y unclipped.
 **
-**	@see DrawText for full description.
+**	@see VideoDrawText for full description.
 **
 **	@param x	X screen position
 **	@param y	Y screen position
@@ -448,12 +448,12 @@ global int DrawText(int x,int y,unsigned font,const unsigned char* text)
 **
 **	@return		The lenght of the printed text.
 */
-global int DrawReverseText(int x,int y,unsigned font,const unsigned char* text)
+global int VideoDrawReverseText(int x,int y,unsigned font,const unsigned char* text)
 {
     int w;
 
     TextColor=ReverseTextColor;
-    w=DrawText(x,y,font,text);
+    w=VideoDrawText(x,y,font,text);
     TextColor=DefaultTextColor;
 
     return w;
@@ -462,7 +462,7 @@ global int DrawReverseText(int x,int y,unsigned font,const unsigned char* text)
 /**
 **	Draw text with font at x,y centered.
 **
-**	@see DrawText for full description.
+**	@see VideoDrawText for full description.
 **
 **	@param x	X screen position
 **	@param y	Y screen position
@@ -471,12 +471,12 @@ global int DrawReverseText(int x,int y,unsigned font,const unsigned char* text)
 **
 **	@return		The lenght of the printed text.
 */
-global int DrawTextCentered(int x,int y,unsigned font,const unsigned char* text)
+global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* text)
 {
     int dx;
 
     dx=TextLength(font,text);
-    DrawText(x-dx/2,y,font,text);
+    VideoDrawText(x-dx/2,y,font,text);
 
     return dx/2;
 }
@@ -491,12 +491,12 @@ global int DrawTextCentered(int x,int y,unsigned font,const unsigned char* text)
 **
 **	@return		The lenght of the printed text.
 */
-global int DrawNumber(int x,int y,unsigned font,int number)
+global int VideoDrawNumber(int x,int y,unsigned font,int number)
 {
     char buf[sizeof(int)*10+2];
 
     sprintf(buf,"%d",number);
-    return DrawText(x,y,font,buf);
+    return VideoDrawText(x,y,font,buf);
 }
 
 /**
@@ -509,12 +509,12 @@ global int DrawNumber(int x,int y,unsigned font,int number)
 **
 **	@return		The lenght of the printed text.
 */
-global int DrawReverseNumber(int x,int y,unsigned font,int number)
+global int VideoDrawReverseNumber(int x,int y,unsigned font,int number)
 {
     char buf[sizeof(int)*10+2];
 
     sprintf(buf,"%d",number);
-    return DrawReverseText(x,y,font,buf);
+    return VideoDrawReverseText(x,y,font,buf);
 }
 
 /**

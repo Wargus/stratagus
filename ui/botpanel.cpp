@@ -511,7 +511,7 @@ global void DrawButtonPanel(void)
 	    if( ShowCommandKey ) {
 		// FIXME: real DrawChar would be usefull
 		sprintf(buf,"%c",toupper(CurrentButtons[i].Key));
-		DrawText(TheUI.Buttons[i+10].X+39,TheUI.Buttons[i+10].Y+30
+		VideoDrawText(TheUI.Buttons[i+10].X+39,TheUI.Buttons[i+10].Y+30
 			,GameFont,buf);
 	    }
 	}

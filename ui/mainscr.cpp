@@ -132,7 +132,7 @@ local void UiDrawCompleted(int full,int ready)
     f=(f*152)/100;
     VideoFillRectangleClip(TheUI.CompleteBarColor
 	    ,TheUI.CompleteBarX,TheUI.CompleteBarY,f,14);
-    DrawText(TheUI.CompleteTextX,TheUI.CompleteTextY,GameFont,"% Complete");
+    VideoDrawText(TheUI.CompleteTextX,TheUI.CompleteTextY,GameFont,"% Complete");
 }
 
 /**
@@ -148,10 +148,10 @@ local void DrawStats(int x,int y,int modified,int original)
     char buf[64];
 
     if( modified==original ) {
-	DrawNumber(x,y,GameFont,modified);
+	VideoDrawNumber(x,y,GameFont,modified);
     } else {
 	sprintf(buf,"%d~<+%d~>",original,modified-original);
-	DrawText(x,y,GameFont,buf);
+	VideoDrawText(x,y,GameFont,buf);
     }
 }
 
@@ -194,7 +194,7 @@ global void DrawUnitInfo(const Unit* unit)
     if( unit->Player==ThisPlayer ) {	// Only for own units.
 	if( unit->HP && unit->HP<10000 ) {
 	    sprintf(buf,"%d/%d",unit->HP,stats->HitPoints);
-	    DrawTextCentered(x+12+23,y+8+53,SmallFont,buf);
+	    VideoDrawTextCentered(x+12+23,y+8+53,SmallFont,buf);
 	}
     }
 
@@ -210,10 +210,10 @@ global void DrawUnitInfo(const Unit* unit)
 	i=s-type->Name;
 	memcpy(buf,type->Name,i);
 	buf[i]='\0';
-	DrawTextCentered(x+114,y+8+ 3,GameFont,buf);
-	DrawTextCentered(x+114,y+8+17,GameFont,s+1);
+	VideoDrawTextCentered(x+114,y+8+ 3,GameFont,buf);
+	VideoDrawTextCentered(x+114,y+8+17,GameFont,s+1);
     } else {
-	DrawTextCentered(x+114,y+8+17,GameFont,type->Name);
+	VideoDrawTextCentered(x+114,y+8+17,GameFont,type->Name);
     }
 
     //
@@ -221,23 +221,23 @@ global void DrawUnitInfo(const Unit* unit)
     //
     if( stats->Level ) {
         sprintf(buf,"Level ~<%d~>",stats->Level);
-	DrawTextCentered(x+114,y+8+33,GameFont,buf);
+	VideoDrawTextCentered(x+114,y+8+33,GameFont,buf);
     }
 
     //
     //	Show for all players.
     //
     if( type->GoldMine ) {
-	DrawText(x+37,y+8+78,GameFont,"Gold Left:");
-	DrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	VideoDrawText(x+37,y+8+78,GameFont,"Gold Left:");
+	VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
 	return;
     }
     // Not our building and not under construction
     if( unit->Player!=ThisPlayer
 	    || unit->Orders[0].Action!=UnitActionBuilded ) {
 	if( type->GivesOil || type->OilPatch ) {
-	    DrawText(x+47,y+8+78,GameFont,"Oil Left:");
-	    DrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	    VideoDrawText(x+47,y+8+78,GameFont,"Oil Left:");
+	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
 	    return;
 	}
     }
@@ -255,7 +255,7 @@ global void DrawUnitInfo(const Unit* unit)
     if( !OriginalLevel && stats->Level 
 	    && !(type->Transporter && unit->Value) ) {
         sprintf(buf,"XP:~<%d~> Kills:~<%d~>",unit->XP,unit->Kills);
-	DrawTextCentered(x+114,y+8+15+33,GameFont,buf);
+	VideoDrawTextCentered(x+114,y+8+15+33,GameFont,buf);
     }
 
     //
@@ -281,7 +281,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//
 	if( unit->Orders[0].Action==UnitActionTrain ) {
 	    if( OriginalTraining || unit->Data.Train.Count==1 ) {
-		DrawText(x+37,y+8+78,GameFont,"Training:");
+		VideoDrawText(x+37,y+8+78,GameFont,"Training:");
 		DrawUnitIcon(unit->Player
 			,unit->Data.Train.What[0]->Icon.Icon
 			,0,x+107,y+8+70);
@@ -291,7 +291,7 @@ global void DrawUnitInfo(const Unit* unit)
 			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Data.Train.Ticks);
 	    } else {
-		DrawTextCentered(x+114,y+8+29,GameFont,"Training...");
+		VideoDrawTextCentered(x+114,y+8+29,GameFont,"Training...");
 
 		for( i = 0; i < unit->Data.Train.Count; i++ ) {
 		    DrawUnitIcon(unit->Player
@@ -313,7 +313,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building upgrading to better type.
 	//
 	if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
-	    DrawText(x+29,y+8+78,GameFont,"Upgrading:");
+	    VideoDrawText(x+29,y+8+78,GameFont,"Upgrading:");
 	    DrawUnitIcon(unit->Player,unit->Orders[0].Type->Icon.Icon
 		    ,0,x+107,y+8+70);
 
@@ -327,7 +327,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building research new technologie.
 	//
 	if( unit->Orders[0].Action==UnitActionResearch ) {
-	    DrawText(16,y+8+78,GameFont,"Researching:");
+	    VideoDrawText(16,y+8+78,GameFont,"Researching:");
 	    DrawUnitIcon(unit->Player
 		    ,unit->Data.Research.Upgrade->Icon.Icon
 		    ,0,x+107,y+8+70);
@@ -341,52 +341,52 @@ global void DrawUnitInfo(const Unit* unit)
     }
 
     if( type->StoresWood ) {
-	DrawText(x+20,y+8+78,GameFont,"Production");
-	DrawText(x+52,y+8+93,GameFont,"Lumber:");
+	VideoDrawText(x+20,y+8+78,GameFont,"Production");
+	VideoDrawText(x+52,y+8+93,GameFont,"Lumber:");
 	// I'm assuming that it will be short enough to fit in the space
 	// I'm also assuming that it won't be 100 - x
 	// and since the default is used for comparison we might as well
 	// use that in the printing too.
-	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
+	VideoDrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 
 	if( unit->Player->Incomes[WoodCost] != DEFAULT_INCOMES[WoodCost] ) {
 	    sprintf(buf, "~<+%i~>",
 		    unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
-	    DrawText(x+126,y+8+93,GameFont,buf);
+	    VideoDrawText(x+126,y+8+93,GameFont,buf);
 	}
     } else if( type->StoresOil ) {
-	DrawText(x+20,y+8+78,GameFont,"Production");
-	DrawText(x+52,y+8+93,GameFont,"Oil:");
-	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[OilCost]);
+	VideoDrawText(x+20,y+8+78,GameFont,"Production");
+	VideoDrawText(x+52,y+8+93,GameFont,"Oil:");
+	VideoDrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[OilCost]);
 	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
 	    sprintf(buf, "~<+%i~>",
 		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
-	    DrawText(x+126,y+8+93,GameFont,buf);
+	    VideoDrawText(x+126,y+8+93,GameFont,buf);
 	}
     } else if( type->StoresGold ) {
-	DrawText(x+20,y+8+61,GameFont,"Production");
-	DrawText(x+73,y+8+77,GameFont,"Gold:");
-	DrawNumber(x+108,y+8+77,GameFont,DEFAULT_INCOMES[GoldCost]);
+	VideoDrawText(x+20,y+8+61,GameFont,"Production");
+	VideoDrawText(x+73,y+8+77,GameFont,"Gold:");
+	VideoDrawNumber(x+108,y+8+77,GameFont,DEFAULT_INCOMES[GoldCost]);
 	// Keep/Stronghold, Castle/Fortress
 	if( unit->Player->Incomes[GoldCost] != DEFAULT_INCOMES[GoldCost] ) {
 		sprintf(buf, "~<+%i~>",
 		    unit->Player->Incomes[GoldCost]-DEFAULT_INCOMES[GoldCost]);
-		DrawText(x+126,y+8+77,GameFont,buf);
+		VideoDrawText(x+126,y+8+77,GameFont,buf);
 	}
-	DrawText(x+52,y+8+93,GameFont,"Lumber:");
-	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
+	VideoDrawText(x+52,y+8+93,GameFont,"Lumber:");
+	VideoDrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 	// Lumber mill
 	if( unit->Player->Incomes[WoodCost]!=DEFAULT_INCOMES[WoodCost] ) {
 	    sprintf(buf, "~<+%i~>",
 		unit->Player->Incomes[WoodCost]-DEFAULT_INCOMES[WoodCost]);
-	    DrawText(x+126,y+8+93,GameFont,buf);
+	    VideoDrawText(x+126,y+8+93,GameFont,buf);
 	}
-	DrawText(x+84,y+8+109,GameFont,"Oil:");
-	DrawNumber(x+108,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
+	VideoDrawText(x+84,y+8+109,GameFont,"Oil:");
+	VideoDrawNumber(x+108,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
 	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
 	    sprintf(buf, "~<+%i~>",
 		    unit->Player->Incomes[OilCost]-DEFAULT_INCOMES[OilCost]);
-	    DrawText(x+126,y+8+109,GameFont,buf);
+	    VideoDrawText(x+126,y+8+109,GameFont,buf);
 	}
 
     } else if( type->Transporter && unit->Value ) {
@@ -414,28 +414,28 @@ global void DrawUnitInfo(const Unit* unit)
     if( type->Building && !type->Tower ) {
 	// FIXME: Make some bit in the unit-type structure.
 	if( type==UnitTypeHumanFarm || type==UnitTypeOrcFarm ) {
-	    DrawText(x+16,y+8+63,GameFont,"Food Usage");
-	    DrawText(x+58,y+8+78,GameFont,"Grown:");
-	    DrawNumber(x+108,y+8+78,GameFont,unit->Player->Food);
-	    DrawText(x+71,y+8+94,GameFont,"Used:");
+	    VideoDrawText(x+16,y+8+63,GameFont,"Food Usage");
+	    VideoDrawText(x+58,y+8+78,GameFont,"Grown:");
+	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Player->Food);
+	    VideoDrawText(x+71,y+8+94,GameFont,"Used:");
 	    if( unit->Player->Food<unit->Player->NumFoodUnits ) {
-		DrawReverseNumber(x+108,y+8+94,GameFont
+		VideoDrawReverseNumber(x+108,y+8+94,GameFont
 			,unit->Player->NumFoodUnits);
 	    } else {
-		DrawNumber(x+108,y+8+94,GameFont,unit->Player->NumFoodUnits);
+		VideoDrawNumber(x+108,y+8+94,GameFont,unit->Player->NumFoodUnits);
 	    }
 	}
     } else {
 	// FIXME: Level was centered?
         //sprintf(buf,"Level ~<%d~>",stats->Level);
-	//DrawText(x+91,y+8+33,GameFont,buf);
+	//VideoDrawText(x+91,y+8+33,GameFont,buf);
 
 	if( !type->Tanker && !type->Submarine ) {
-	    DrawText(x+57,y+8+63,GameFont,"Armor:");
+	    VideoDrawText(x+57,y+8+63,GameFont,"Armor:");
 	    DrawStats(x+108,y+8+63,stats->Armor,type->_Armor);
 	}
 
-	DrawText(x+47,y+8+78,GameFont,"Damage:");
+	VideoDrawText(x+47,y+8+78,GameFont,"Damage:");
 	if( (i=type->_BasicDamage+type->_PiercingDamage) ) {
 	    // FIXME: this seems not correct
 	    //		Catapult has 25-80
@@ -457,15 +457,15 @@ global void DrawUnitInfo(const Unit* unit)
 	} else {
 	    strcpy(buf,"0");
 	}
-	DrawText(x+108,y+8+78,GameFont,buf);
+	VideoDrawText(x+108,y+8+78,GameFont,buf);
 
-	DrawText(x+57,y+8+94,GameFont,"Range:");
+	VideoDrawText(x+57,y+8+94,GameFont,"Range:");
 	DrawStats(x+108,y+8+94,stats->AttackRange,type->_AttackRange);
 
-	DrawText(x+64,y+8+110,GameFont,"Sight:");
+	VideoDrawText(x+64,y+8+110,GameFont,"Sight:");
 	DrawStats(x+108,y+8+110,stats->SightRange,type->_SightRange);
 
-	DrawText(x+63,y+8+125,GameFont,"Speed:");
+	VideoDrawText(x+63,y+8+125,GameFont,"Speed:");
 	DrawStats(x+108,y+8+125,stats->Speed,type->_Speed);
 
         // Show how much wood is harvested already in percents! :) //vladi
@@ -473,18 +473,18 @@ global void DrawUnitInfo(const Unit* unit)
         if( unit->Orders[0].Action==UnitActionHarvest && unit->SubAction==64 ) {
 	    sprintf(buf,"W%%:%d"
 		    ,(100*(CHOP_FOR_WOOD-unit->Value))/CHOP_FOR_WOOD);
-	    DrawText(x+120,y+8+140,GameFont,buf);
+	    VideoDrawText(x+120,y+8+140,GameFont,buf);
         }
 
 	if( type->CanCastSpell ) {
-	    DrawText(x+59,y+8+140+1,GameFont,"Magic:");
+	    VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
 	    VideoDrawRectangleClip(ColorGray,x+108,y+8+140,61,14);
 	    VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,61-2,14-2);
 	    i=(100*unit->Mana)/255;
 	    i=(i*(61-4))/100;
 	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
 
-	    DrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
+	    VideoDrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
 	}
     }
 }
@@ -515,7 +515,7 @@ global void DrawResources(void)
 		,TheUI.Resources[GoldCost].IconW
 		,TheUI.Resources[GoldCost].IconH
 		,TheUI.ResourceX+90,TheUI.ResourceY);
-	DrawNumber(TheUI.ResourceX+107,TheUI.ResourceY+1
+	VideoDrawNumber(TheUI.ResourceX+107,TheUI.ResourceY+1
 		,GameFont,ThisPlayer->Resources[GoldCost]);
 	VideoDrawSub(TheUI.Resources[WoodCost].Icon.Graphic,0
 		,TheUI.Resources[WoodCost].IconRow
@@ -523,7 +523,7 @@ global void DrawResources(void)
 		,TheUI.Resources[WoodCost].IconW
 		,TheUI.Resources[WoodCost].IconH
 		,TheUI.ResourceX+178,TheUI.ResourceY);
-	DrawNumber(TheUI.ResourceX+195,TheUI.ResourceY+1
+	VideoDrawNumber(TheUI.ResourceX+195,TheUI.ResourceY+1
 		,GameFont,ThisPlayer->Resources[WoodCost]);
 	VideoDrawSub(TheUI.Resources[OilCost].Icon.Graphic,0
 		,TheUI.Resources[OilCost].IconRow
@@ -531,7 +531,7 @@ global void DrawResources(void)
 		,TheUI.Resources[OilCost].IconW
 		,TheUI.Resources[OilCost].IconH
 		,TheUI.ResourceX+266,TheUI.ResourceY);
-	DrawNumber(TheUI.ResourceX+283,TheUI.ResourceY+1
+	VideoDrawNumber(TheUI.ResourceX+283,TheUI.ResourceY+1
 		,GameFont,ThisPlayer->Resources[OilCost]);
     } else {
 	for( i=0; i<MaxCosts; ++i ) {
@@ -541,7 +541,7 @@ global void DrawResources(void)
 			,TheUI.Resources[i].IconW,TheUI.Resources[i].IconH
 			,TheUI.Resources[i].IconX,TheUI.Resources[i].IconY);
 		v=ThisPlayer->Resources[i];
-		DrawNumber(TheUI.Resources[i].TextX
+		VideoDrawNumber(TheUI.Resources[i].TextX
 			,TheUI.Resources[i].TextY+(v>99999)*3
 			,v>99999 ? SmallFont : GameFont,v);
 	    }
@@ -552,9 +552,9 @@ global void DrawResources(void)
 		,TheUI.FoodIconX,TheUI.FoodIconY);
 	sprintf(tmp,"%d/%d",ThisPlayer->NumFoodUnits,ThisPlayer->Food);
 	if( ThisPlayer->Food<ThisPlayer->NumFoodUnits ) {
-	    DrawReverseText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);
+	    VideoDrawReverseText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);
 	} else {
-	    DrawText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);
+	    VideoDrawText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);
 	}
 
 	VideoDrawSub(TheUI.ScoreIcon.Graphic,0
@@ -562,7 +562,7 @@ global void DrawResources(void)
 		,TheUI.ScoreIconW,TheUI.ScoreIconH
 		,TheUI.ScoreIconX,TheUI.ScoreIconY);
 	v=ThisPlayer->Score;
-	DrawNumber(TheUI.ScoreTextX
+	VideoDrawNumber(TheUI.ScoreTextX
 		,TheUI.ScoreTextY+(v>99999)*3
 		,v>99999 ? SmallFont : GameFont,v);
     }
@@ -634,7 +634,7 @@ global void DrawMessage(void)
 	MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
     }
     for (z = 0; z < MessagesCount; z++) {
-	DrawText(TheUI.MapX + 8, TheUI.MapY + 8 + z * 16, GameFont,
+	VideoDrawText(TheUI.MapX + 8, TheUI.MapY + 8 + z * 16, GameFont,
 		Messages[z]);
     }
     if (MessagesCount < 1) {
@@ -780,7 +780,7 @@ global void DrawStatusLine(void)
 	    ,TheUI.StatusLine.Graphic->Width,TheUI.StatusLine.Graphic->Height
 	    ,TheUI.StatusLineX,TheUI.StatusLineY);
     if( StatusLine ) {
-	DrawText(TheUI.StatusLineX+2,TheUI.StatusLineY+2,GameFont,StatusLine);
+	VideoDrawText(TheUI.StatusLineX+2,TheUI.StatusLineY+2,GameFont,StatusLine);
     }
 }
 
@@ -834,7 +834,7 @@ global void DrawCosts(void)
 		,TheUI.Resources[GoldCost].IconH
 		,x,TheUI.StatusLineY+1);
 
-	DrawNumber(x+15,TheUI.StatusLineY+2,GameFont,CostsMana);
+	VideoDrawNumber(x+15,TheUI.StatusLineY+2,GameFont,CostsMana);
 	x+=45;
     }
 
@@ -846,7 +846,7 @@ global void DrawCosts(void)
 			,TheUI.Resources[i].IconW,TheUI.Resources[i].IconH
 			,x,TheUI.StatusLineY+1);
 	    }
-	    DrawNumber(x+15,TheUI.StatusLineY+2,GameFont,Costs[i]);
+	    VideoDrawNumber(x+15,TheUI.StatusLineY+2,GameFont,Costs[i]);
 	    x+=45;
 	    if( x>VideoWidth-45 ) {
 		break;

@@ -478,7 +478,7 @@ global void CheckVideoInterrupts(void)
     if( VideoInterrupts ) {
         //DebugLevel1("Slow frame\n");
 	IfDebug(
-	    DrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	);
         ++SlowFrameCounter;
     }
