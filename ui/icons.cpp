@@ -37,6 +37,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#ifndef laterUSE_CCL
+
 /**
 **	Unit icons
 */
@@ -62,7 +64,11 @@ local struct _icons_ {
 		, ICON_WIDTH, ICON_HEIGHT },
 };
 
+#endif
+
 local hashtable(int,61) IconHash;	/// lookup table for icon names
+
+#ifndef laterUSE_CCL
 
 /**
 **	Table icon id -> string.
@@ -101,10 +107,10 @@ local const char* IconNames[] = {
     "icon-gryphon-rider",
     "icon-dragon",
     "icon-lothar",
-    "icon-gul'dan",
+    "icon-gul-dan",
     "icon-uther-lightbringer",
     "icon-zuljin",
-    "icon-cho'gall",
+    "icon-cho-gall",
     "icon-daemon",
     "icon-farm",
     "icon-pig-farm",
@@ -259,12 +265,16 @@ local const char* IconNames[] = {
     "icon-danath",
     "icon-teron-gorefiend",
     "icon-grom-hellscream",
-    "icon-kurdan-and-sky'ree",
+    "icon-kurdan-and-sky-ree",
     "icon-deathwing",
     "icon-khadgar",
     "icon-dentarg",
     "icon-turalyon"
 };
+
+#endif
+
+#ifndef laterUSE_CCL
 
 /**
 **	Table aliases for icons.
@@ -273,6 +283,8 @@ local const char* IconAliases[][2] = {
     { "icon-raise-dead",	"icon-skeleton" },
     { "icon-polymorph",		"icon-critter" },
 };
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -290,6 +302,8 @@ global void InitIcons(void)
 	return;
     }
     done=1;
+
+    DebugLevel0Fn("Must use CCL only\n");
 
     //
     //	Add icons name to hash table

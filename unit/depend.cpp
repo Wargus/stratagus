@@ -37,20 +37,22 @@
     /// All dependencies hash
 local DependRule*	DependHash[101];
 
+#ifndef USE_CCL
+
 /**
-**	Buildin (default) dependencies.
+**	Buildin (default) dependencies (only for support without CCL).
 **
 **	Counter -1 starts a new dependency.
 */
-local struct _default_depend_ {
+local const struct _default_depend_ {
     const char* Name;			/// operation name
     int Count;				/// counter
-} Dependencies[] = {
+} DefaultDependencies[] = {
     ///////////////////////////////////////////////////////////////////////////
     //	* Race human:
 
     //	- human naval forces
-    { "unit-human-transport",	-1 },{ "unit-elven-lumber-mill",	1 },
+    { "unit-human-transport",	-1 },{ "unit-human-foundry",		1 },
     { "unit-battleship",	-1 },{ "unit-human-foundry",		1 },
     { "unit-gnomish-submarine",	-1 },{ "unit-gnomish-inventor",		1 },
 
@@ -181,6 +183,8 @@ local struct _default_depend_ {
     { "upgrade-orc-ship-armor2",-1 },{ "upgrade-orc-ship-armor1",	1 },
 };
 
+#endif
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -213,11 +217,11 @@ global void AddDependency(const char* target,const char* required,int count
 	rule.Type = DependRuleUpgrade;
 	rule.Kind.Upgrade = UpgradeIdByIdent( target );
     } else {
-	DebugLevel0Fn("wrong dependency target %s\n",target);
+	DebugLevel0Fn("dependency target `%s' should be unit-type or upgrade\n"
+		,target);
 	return;
     }
     hash=(int)(long)rule.Kind.UnitType%(sizeof(DependHash)/sizeof(*DependHash));
-    DebugLevel3("Hash %d\n",hash);
 
     //
     //	Find correct hash slot.
@@ -250,7 +254,7 @@ global void AddDependency(const char* target,const char* required,int count
     //	Adjust count.
     //
     if ( count < 0 || count > 255 ) {
-	DebugLevel0Fn("wrong count range\n");
+	DebugLevel0Fn("wrong count `%d' range 0 .. 255\n",count);
 	count = 255;
     }
 
@@ -270,7 +274,9 @@ global void AddDependency(const char* target,const char* required,int count
 	temp->Type = DependRuleUpgrade;
 	temp->Kind.Upgrade = UpgradeIdByIdent( required );
     } else {
-	DebugLevel0Fn("wrong dependency required %s\n",required);
+	DebugLevel0Fn("
+		dependency required `%s' should be unit-type or upgrade\n"
+		,required);
 	free(temp);
 	return;
     }
@@ -295,15 +301,15 @@ global void AddDependency(const char* target,const char* required,int count
 global int CheckDependByIdent(const Player* player,const char* target)
 {
     DependRule rule;
-    DependRule* node;
-    DependRule* temp;
+    const DependRule* node;
+    const DependRule* temp;
     int i;
 
     //
-    //	first have to check if target is allowed itself
+    //	first have to check, if target is allowed itself
     //
     if ( !strncmp( target, "unit-", 5 ) ) {
-	// target string refers to unit-xxx
+	// target string refers to unit-XXX
 	rule.Kind.UnitType = UnitTypeByIdent( target );
 	if ( UnitIdAllowed( player, rule.Kind.UnitType->Type ) != 'A' ) {
 	    return 0;
@@ -312,15 +318,12 @@ global int CheckDependByIdent(const Player* player,const char* target)
     } else if ( !strncmp( target, "upgrade-", 8 ) ) {
 	// target string refers to upgrade-XXX
 	rule.Kind.Upgrade = UpgradeIdByIdent( target );
-	// z=UpgradeIdAllowed( player, upgrade );
-	// FIXME: ?? if ( z != 'R' && z != 'A' ) return 0;
 	if( UpgradeIdAllowed( player, rule.Kind.Upgrade ) != 'A' ) {
 	    return 0;
 	}
 	rule.Type = DependRuleUpgrade;
     } else {
-	// FIXME: should this be an error?!
-	// FIXME: this target string is neither UnitType nor Upgrade
+	DebugLevel0Fn("target `%s' should be unit-type or upgrade\n",target);
 	return 0;
     }
 
@@ -376,38 +379,34 @@ try_or:
 
 /**
 **	Initialize unit and upgrade dependencies.
-**
-**	FIXME:	Some problems:
-**		ballista should be possible if *any* lumber mill is available
-**		also an "or" function whould be usefull.
 */
 global void InitDependencies(void)
 {
+#ifndef USE_CCL
     int i;
     int or_flag;
     const char* target;
-
-    // FIXME: don't add default if ccl is already loaded!
 
     //
     //	Add all default dependencies
     //
     target=NULL;
     or_flag=0;
-    for( i=0; i<sizeof(Dependencies)/sizeof(*Dependencies); ++i ) {
-	if( Dependencies[i].Count==-1 ) {
+    for( i=0; i<sizeof(DefaultDependencies)/sizeof(*DefaultDependencies);
+		++i ) {
+	if( DefaultDependencies[i].Count==-1 ) {
 	    // Or rule
-	    if( target && !strcmp(target,Dependencies[i].Name) ) {
-		DebugLevel3Fn("or rule\n");
+	    if( target && !strcmp(target,DefaultDependencies[i].Name) ) {
 		or_flag=1;
 	    }
-	    target=Dependencies[i].Name;
+	    target=DefaultDependencies[i].Name;
 	    continue;
 	}
-	AddDependency(target,Dependencies[i].Name,Dependencies[i].Count
-		    ,or_flag);
+	AddDependency(target,DefaultDependencies[i].Name,
+		DefaultDependencies[i].Count,or_flag);
 	or_flag=0;
     }
+#endif
 }
 
 /**
@@ -423,42 +422,50 @@ global void SaveDependencies(FILE* file)
     const DependRule* temp;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: dependencies $Id$\n");
+    fprintf(file,";;; MODULE: dependencies $Id$\n\n");
 
     // Save all dependencies
 
     for( i=0; i<sizeof(DependHash)/sizeof(*DependHash); ++i ) {
 	node=DependHash[i];
 	while( node ) {			// all hash links
-	    fprintf(file,"(define-dependency \"");
+	    fprintf(file,"(define-dependency '");
 	    switch( node->Type ) {
 		case DependRuleUnitType:
-		    fprintf(file,"%s\"",node->Kind.UnitType->Ident);
+		    fprintf(file,"%s",node->Kind.UnitType->Ident);
 		    break;
 		case DependRuleUpgrade:
-		    fprintf(file,"%s\"",Upgrades[node->Kind.Upgrade].Ident);
+		    fprintf(file,"%s",Upgrades[node->Kind.Upgrade].Ident);
 		    break;
 	    }
 	    // All or cases
+
+	    fprintf(file,"\n  '(");
 	    rule=node->Rule;
-	    do {
-		fprintf(file,"\n  '( ");
+	    for( ;; ) {
 		temp=rule;
 		while( temp ) {
 		    switch( temp->Type ) {
 		    case DependRuleUnitType:
-			fprintf(file,"\"%s\" "
+			fprintf(file,"%s"
 				,temp->Kind.UnitType->Ident);
 			break;
 		    case DependRuleUpgrade:
-			fprintf(file,"\"%s\" "
+			fprintf(file,"%s"
 				,Upgrades[temp->Kind.Upgrade].Ident);
 			break;
 		    }
 		    temp=temp->Rule;
+		    if( temp ) {
+			fprintf(file," ");
+		    }
 		}
 		fprintf(file,")");
-	    } while( (rule=rule->Next) );
+		if( !(rule=rule->Next) ) {
+		    break;
+		}
+		fprintf(file,"\n  'or '( ");
+	    }
 
 	    fprintf(file,")\n");
 
@@ -471,12 +478,14 @@ global void SaveDependencies(FILE* file)
 --	Ccl part of dependencies
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_CCL)
+#ifdef USE_CCL
 
 #include "ccl.h"
 
 /**
 **	Define a new dependency.
+**
+**	@param list	List of the dependency.
 */
 local SCM CclDefineDependency(SCM list)
 {
@@ -485,30 +494,45 @@ local SCM CclDefineDependency(SCM list)
     int count;
     SCM value;
     SCM temp;
+    int or_flag;
 
     value=gh_car(list);
+    list=gh_cdr(list);
     target=gh_scm2newstr(value,NULL);
-    DebugLevel3("Target: %s\n",target);
 
+    //
+    //	All or rules.
+    //
+    or_flag=0;
     while( !gh_null_p(list) ) {
+	temp=gh_car(list);
 	list=gh_cdr(list);
-	value=gh_car(list);
-	while( !gh_null_p(value) ) {
-	    temp=gh_car(value);
-	    required=gh_scm2newstr(temp,NULL);
-	    value=gh_cdr(value);
-	    count=0;
-	    if( !gh_null_p(value) ) {
-		temp=gh_car(value);
-		count=gh_scm2int(temp);
-		value=gh_cdr(value);
-	    }
-	    DebugLevel3("Target: %s %d \n",required,count);
-	    //AddDependency(target,required,count,0);
 
-	    // FIXME: first upgrade must be ready than I can continue here
+	while( !gh_null_p(temp) ) {
+	    value=gh_car(temp);
+	    temp=gh_cdr(temp);
+	    required=gh_scm2newstr(value,NULL);
+	    count=1;
+	    if( !gh_null_p(temp) && gh_exact_p(temp) ) {
+		value=gh_car(temp);
+		count=gh_scm2int(value);
+		temp=gh_cdr(temp);
+	    }
+
+	    AddDependency(target,required,count,or_flag);
+	    free(required);
+	    or_flag=0;
+	}
+	if( !gh_null_p(list) ) {
+	    if( !gh_eq_p(gh_car(list),gh_symbol2scm("or")) ) {
+		errl("not or symbol",gh_car(list));
+		return SCM_UNSPECIFIED;
+	    }
+	    or_flag=1;
+	    list=gh_cdr(list);
 	}
     }
+    free(target);
 
     return SCM_UNSPECIFIED;
 }
@@ -516,11 +540,27 @@ local SCM CclDefineDependency(SCM list)
 /**
 **	Get the dependency.
 **
+**	@todo not written.
+**
 **	@param target	Unit type or upgrade.
 */
 local SCM CclGetDependency(SCM target)
 {
-    // FIXME: write this
+    DebugLevel0Fn("FIXME: write this\n");
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Check the dependency.
+**
+**	@todo not written.
+**
+**	@param target	Unit type or upgrade.
+*/
+local SCM CclCheckDependency(SCM target)
+{
+    DebugLevel0Fn("FIXME: write this\n");
 
     return SCM_UNSPECIFIED;
 }
@@ -532,6 +572,7 @@ global void DependenciesCclRegister(void)
 {
     gh_new_procedureN("define-dependency",CclDefineDependency);
     gh_new_procedure1_0("get-dependency",CclGetDependency);
+    gh_new_procedure1_0("check-dependency",CclCheckDependency);
 }
 
 #endif	// defined(USE_CCL)
