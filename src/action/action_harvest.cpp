@@ -272,11 +272,8 @@ local int ReturnWithWood(Unit* unit)
     DebugCheck( !destu );
 
     i=DoActionMove(unit);
-    if( i==0 ) {
-	return 0;
-    }
-    if( i>0 && !(destu->Destroyed || destu->Removed || !destu->HP
-	    || destu->Orders[0].Action==UnitActionDie) ) {
+    if( i>=0 && (!unit->Reset || !(destu->Destroyed || destu->Removed
+	    || !destu->HP || destu->Orders[0].Action==UnitActionDie)) ) {
 	return 0;
     }
 
