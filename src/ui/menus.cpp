@@ -63,6 +63,7 @@
 #include "ccl.h"
 #include "editor.h"
 #include "commands.h"
+#include "actions.h"
 
 #if defined(USE_SDLCD) || defined(USE_SDLA)
 #include "SDL.h"
@@ -297,6 +298,10 @@ local void ReplayGameDisableFog(Menuitem *mi);
 local void ReplayGameOk(void);
 local void ReplayGameCancel(void);
 
+local void DiplomacyWait(Menuitem *mi);
+local void DiplomacyOk(void);
+
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -508,6 +513,11 @@ global void InitMenuFuncHash(void) {
     HASHADD(InitSoundOptions,"init-sound-options");
     HASHADD(SpeedSettings,"speed-settings");
     HASHADD(Preferences,"preferences");
+    HASHADD(DiplomacyOptions,"menu-diplomacy");
+
+//Diplomacy Options
+    HASHADD(DiplomacyWait,"diplomacy-wait");
+    HASHADD(DiplomacyOk,"diplomacy-ok");
 
 // Help
     HASHADD(KeystrokeHelpMenu,"keystroke-help");
@@ -1778,6 +1788,135 @@ global void SpeedSettings(void)
     if (TheUI.KeyScroll == 0)
 	menu->items[i + 8].d.hslider.percent = 0;
     ProcessMenu("menu-settings-speed", 1);
+}
+
+/**
+**	Diplomacy options
+*/
+global void DiplomacyOptions(void)
+{
+    Menu *menu;
+    int i;
+    int j;
+
+    menu = FindMenu("menu-diplomacy");
+
+    j=0;
+    for( i=0; i<=(PlayerMax-2); ++i ) {
+	if( Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
+	    menu->items[4*j+4].d.text.text = Players[i].Name;
+	    if( ThisPlayer->Allied&(1<<Players[i].Player) ) {
+		menu->items[4*j+5].d.gem.state = MI_GSTATE_CHECKED;
+	    } else {
+		menu->items[4*j+5].d.gem.state = MI_GSTATE_UNCHECKED;
+	    }
+	    if( ThisPlayer->Enemy&(1<<Players[i].Player) ) {
+		menu->items[4*j+6].d.gem.state = MI_GSTATE_CHECKED;
+	    } else {
+		menu->items[4*j+6].d.gem.state = MI_GSTATE_UNCHECKED;
+	    }
+	    if (ThisPlayer->SharedVision&(1<<Players[i].Player) ) {
+		menu->items[4*j+7].d.gem.state = MI_GSTATE_CHECKED;
+	    } else {
+		menu->items[4*j+7].d.gem.state = MI_GSTATE_UNCHECKED;
+	    }
+
+	    ++j;
+	}
+    }
+    for( ; j<=(PlayerMax-3); ++j ) {
+	menu->items[4*j+4].d.text.text = NULL;
+	menu->items[4*j+5].d.gem.state = MI_GSTATE_INVISIBLE;
+	menu->items[4*j+6].d.gem.state = MI_GSTATE_INVISIBLE;
+	menu->items[4*j+7].d.gem.state = MI_GSTATE_INVISIBLE;
+    }
+
+    ProcessMenu("menu-diplomacy", 1);
+
+    for( i=0; i<=(PlayerMax-3); ++i ) {
+	menu->items[4*i+4].d.text.text = NULL;
+    }
+}
+
+/**
+**	Wait for diplomacy to be clicked
+*/
+local void DiplomacyWait(Menuitem *mi __attribute__((unused))) 
+{
+}
+
+/**
+**	Diplomacy Ok button
+*/
+local void DiplomacyOk(void)
+{
+    Menu *menu;
+    int i;
+    int j;
+    
+    menu = CurrentMenu;
+
+    j=0;
+    for( i=0; i<=(PlayerMax-2); ++i ) {
+	if( Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
+	    // Menu says to ally
+	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED ) {
+		// Are they allied?
+		if( !(ThisPlayer->Allied&(1<<Players[i].Player) &&
+		    !(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
+		    SendCommandDiplomacy(ThisPlayer->Player,DiplomacyAllied,
+			Players[i].Player);
+		}
+	    }
+	    // Menu says to be enemies
+	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_CHECKED ) {
+		// Are they enemies?
+		if( !(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
+		    ThisPlayer->Enemy&(1<<Players[i].Player))) {
+		    SendCommandDiplomacy(ThisPlayer->Player,DiplomacyEnemy,
+			Players[i].Player);
+		}
+	    }
+	    // Menu says to be neutral 
+	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED ) {
+		// Are they neutral?
+		if( !(!(ThisPlayer->Allied&(1<<Players[i].Player)) &&
+		    !(ThisPlayer->Enemy&(1<<Players[i].Player)))) {
+		    SendCommandDiplomacy(ThisPlayer->Player,DiplomacyNeutral,
+			Players[i].Player);
+		}
+	    }
+	    // Menu says to be crazy 
+	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
+		menu->items[4*j+6].d.gem.state == MI_GSTATE_CHECKED ) {
+		// Are they crazy?
+		if( !(ThisPlayer->Allied&(1<<Players[i].Player) &&
+		    ThisPlayer->Enemy&(1<<Players[i].Player))) {
+		    SendCommandDiplomacy(ThisPlayer->Player,DiplomacyCrazy,
+			Players[i].Player);
+		}
+	    }
+	    // Shared vision
+	    if (menu->items[4*j+7].d.gem.state == MI_GSTATE_CHECKED) {
+		if (!(ThisPlayer->SharedVision&(1<<Players[i].Player))) {
+		    SendCommandSharedVision(ThisPlayer->Player,1,
+			Players[i].Player);
+		}	  
+	    }
+	    else {
+		if (ThisPlayer->SharedVision&(1<<Players[i].Player) ) {
+		    SendCommandSharedVision(ThisPlayer->Player,0,
+			Players[i].Player);
+		}
+	    }
+
+	    ++j;
+	}
+    }
+    EndMenu();
 }
 
 /**

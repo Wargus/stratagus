@@ -83,6 +83,7 @@ local char *MenuNames[] = {
     "menu-editor-edit-ai-properties",
     "menu-editor-save",
     "menu-editor-save-confirm",
+    "menu-diplomacy",
 };
 
 local char *MenuFlags[] = {

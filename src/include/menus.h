@@ -314,6 +314,8 @@ extern void SoundOptions(void);
 extern void SpeedSettings(void);
     /// Preferences menu
 extern void Preferences(void);
+    /// Diplomacy Options
+extern void DiplomacyOptions(void);
 
     /// Save game menu
 extern void GameMenuSave(void);
