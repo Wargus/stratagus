@@ -159,6 +159,8 @@ global char** MissileTypeWcNames
 */
 global const char MissileTypeType[] = "missile-type";
 
+#ifndef laterUSE_CCL
+
 /**
 **	Define missile types.
 */
@@ -446,6 +448,8 @@ global MissileType MissileTypes[MissileTypeMax] = {
     },
 };
 
+#endif
+
 /*
 **	Next missile types are used hardcoded in the source.
 */
@@ -480,7 +484,11 @@ global void LoadMissileSprites(void)
 	    char* buf;
 
 	    buf=alloca(strlen(file)+9+1);
+#ifdef NEW_NAMES
+	    file=strcat(strcpy(buf,"graphics/"),file);
+#else
 	    file=strcat(strcpy(buf,"graphic/"),file);
+#endif
 	    ShowLoadProgress("\tMissile %s\n",file);
 	    MissileTypes[i].Sprite=LoadSprite(
 		    file,MissileTypes[i].Width,MissileTypes[i].Height);
