@@ -3178,7 +3178,9 @@ global void ProcessMenu(int menu_id, int loop)
     if (loop) {
 	while (CurrentMenu != -1) {
 	    DebugLevel3("MustRedraw: 0x%08x\n",MustRedraw);
-	    UpdateDisplay();
+	    if( MustRedraw ) {
+		UpdateDisplay();
+	    }
 	    RealizeVideoMemory();
 	    oldncr = NetConnectRunning;
 	    WaitEventsAndKeepSync();

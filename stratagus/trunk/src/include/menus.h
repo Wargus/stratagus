@@ -248,7 +248,7 @@ extern void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
     /// Draw and process a menu
 extern void ProcessMenu(int MenuId, int Loop);
     /// Keyboard handler for menus
-extern int MenuKey(int key);
+extern int MenuHandleKeyboard(int key);
     /// Called if the mouse is moved in Menu interface state
 extern void MenuHandleMouseMove(int x,int y);
     /// Called if any mouse button is pressed down
