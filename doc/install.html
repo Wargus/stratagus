@@ -26,7 +26,7 @@
 
 <body>
 
-<h1>Installation instructions for Stratagus 1.18</h1><p>
+<h1>Installation instructions for Stratagus 2.0</h1><p>
 <hr>
 
     <h2>Software Requirements</h2>
@@ -48,7 +48,8 @@
 	<li><a href="http://www.underbit.com/products/mad/">libmad</a> (optional).<p>
 	<li><a href="http://zziplib.sourceforge.net/">zziplib</a> (optional).<p>
 
-	<li>Either the original or expansion wc2 CD, or another data set, such as aleona.<br>
+	<li>Either the original or expansion wc2 CD, or another 
+	<a href="http://stratagus.sourceforge.net/datasets.shtml">data set</a>.<br>
 	<font color="red">NOTE: the Battle.net CD edition is not supported.</font><p>
     </ul>
 
@@ -132,23 +133,22 @@
 
 	<ul>
 	    <li><b>Using wc2 data:</b><p>
+	    <a href="http://wargus.sourceforge.net/download.html">Download</a> Wargus and compile it.<p>
 	    For Win32, run:
 	    <pre>	build.bat DIR</pre>
 	    where DIR is the directory to your CD or your 
 	    installation, (eg, 'e:' or 'c:\war2').<p>
 	    For Unix, run:
-	    <pre>	build.sh -p DIR</pre>
+	    <pre>	./build.sh -p DIR</pre>
 	    where DIR is the directory to your mounted CD or your 
 	    installation, (eg, '/cdrom/' or '/mnt/win/war2').<p>
 	    <font color="red">NOTE: You will need to execute this 
-	    script from within your root stratagus directory or 
+	    script from within the root wargus directory or 
 	    you will run into problems. It will take some 
 	    time to extract everything.</font><p>
 
 	    <li><b>Using another data set:</b><p>
-	    Installation for other data sets should be included with the 
-	    download. You may download Aleona from 
-	    <a href="http://www.nongnu.org/aleona/">here</a>.
+	    You may download another <a href="http://stratagus.sourceforge.net/datasets.shtml">working data set</a>.<p>
 	    <font color="red">NOTE you will need to specify the data 
 	    directory by passing '-d DIR' flag 
 	    when you run the stratagus binary, by default the binary 
