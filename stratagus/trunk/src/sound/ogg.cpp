@@ -412,7 +412,9 @@ global Sample* LoadOgg(const char* name,int flags)
 	ov_clear(vf);
 
 	DebugLevel0Fn(" %d\n" _C_ sample->Length);
-	IfDebug( AllocatedSoundMemory += sample->Length; );
+#ifdef DEBUG
+	AllocatedSoundMemory += sample->Length;
+#endif
     }
 
     return sample;
