@@ -307,7 +307,9 @@ global void DoRightButton(int x,int y)
             dest=TargetOnMapTile(unit,x,y);
             if( dest ) {
                 dest->Blink=3;
-                if( dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest) ) {
+		// Follow allied units, but not self.
+                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+			&& dest!=unit ) {
 		    SendCommandFollow(unit,dest,flush);
                     continue;
                 } else if( IsEnemy(ThisPlayer,dest) ) {
