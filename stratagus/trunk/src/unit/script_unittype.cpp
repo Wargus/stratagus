@@ -52,6 +52,8 @@ IfDebug(
 extern int NoWarningUnitType;		/// quiet ident lookup.
 );
 
+global _AnimationsHash AnimationsHash;	/// Animations hash table
+
 local long SiodUnitTypeTag;		/// siod unit-type object
 
 /*----------------------------------------------------------------------------
@@ -829,8 +831,7 @@ local SCM CclDefineAnimations(SCM list)
 	}
     }
 
-    // I generate a scheme variable containing the pointer!
-    gh_define(str,gh_int2scm((int)anims));
+    *(Animations**)hash_add(AnimationsHash,str)=anims;
     free(str);
 
     return SCM_UNSPECIFIED;
