@@ -271,10 +271,7 @@ extern SoundId RegisterSound(char* file[],unsigned number);
     */
 extern SoundId RegisterTwoGroups(const SoundId first,const SoundId second);
 
-/** Ask the sound server to change the range of a sound.
-    @param sound the id of the sound to modify.
-    @param range the new range for this sound.
-*/
+    /// Modify the range of a given sound.
 extern void SetSoundRange(SoundId sound,unsigned char range);
 
     /// Initialize the sound card.
