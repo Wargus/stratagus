@@ -7334,6 +7334,7 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     Menu* menu;
     char* port;
 
+    
     SendMetaCommand("NumberOfGames", "");
     menu = FindMenu("metaserver-list");
 
@@ -7342,11 +7343,22 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     //check okay
     if (RecvMetaReply(&reply) == -1) {
 	//TODO: Notify player that connection was aborted...
-	nummenus = 0;
+	nummenus = 1;
     } else {
-	GetMetaParameter(reply, 0, &parameter);
-	nummenus = atoi(parameter);
+	for (i = 0; i < 3; i++) {
+	    GetMetaParameter(reply, 0, &parameter);
+	    nummenus = atoi(parameter);
+	    if (nummenus == 0) {
+		RecvMetaReply(&reply); 
+	    }
+	    else {
+		break; 
+	    }
+	}
+	
     }
+
+    nummenus--;
     // Meta server only sends matching version
     // Only Displays games from Matching version
 
