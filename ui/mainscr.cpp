@@ -60,11 +60,6 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-// FIXME: should become global configurable
-#define OriginalTraining	0	/// 1 for the original training display
-#define OriginalBuilding	0	/// 1 for the original building display
-#define OriginalLevel		0	/// 1 for the original level display
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -146,8 +141,10 @@ local void UiDrawCompleted(int full, int ready)
     f = (f * TheUI.CompletedBarW) / 100;
     VideoFillRectangleClip(TheUI.CompletedBarColor,
 	TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
-    VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
-	TheUI.CompletedBarFont, TheUI.CompletedBarText);
+    if (TheUI.CompletedBarText) {
+	VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
+	    TheUI.CompletedBarFont, TheUI.CompletedBarText);
+    }
 }
 
 /**
@@ -282,8 +279,7 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Draw unit kills and experience.
     //
-    if (!OriginalLevel && stats->Level &&
-	    !(type->Transporter && unit->InsideCount)) {
+    if (stats->Level && !(type->Transporter && unit->InsideCount)) {
         sprintf(buf, "XP:~<%d~> Kills:~<%d~>", unit->XP, unit->Kills);
 	VideoDrawTextCentered(x + 114, y + 8 + 15 + 33, GameFont, buf);
     }
@@ -296,7 +292,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building under constuction.
 	//
 	if (unit->Orders[0].Action == UnitActionBuilded) {
-	    if (!OriginalBuilding && unit->Data.Builded.Worker) {
+	    if (unit->Data.Builded.Worker) {
 		// FIXME: Position must be configured!
 		DrawUnitIcon(unit->Data.Builded.Worker->Player,
 		    unit->Data.Builded.Worker->Type->Icon.Icon,
