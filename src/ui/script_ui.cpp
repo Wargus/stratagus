@@ -1461,6 +1461,8 @@ local SCM CclSetSelectionStyle(SCM style)
 	    DrawSelection=DrawSelectionCircle;
 	} else if( gh_eq_p(style,gh_symbol2scm("alpha-circle")) ) {
 	    DrawSelection=DrawSelectionCircleWithTrans;
+	} else if( gh_eq_p(style,gh_symbol2scm("corners")) ) {
+	    DrawSelection=DrawSelectionCorners;
 	} else {
 	    errl("Unsupported selection style",style);
 	}
