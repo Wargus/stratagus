@@ -179,7 +179,7 @@ local void (*LoadCursorRectangle)(int x,int y,int w,int h);
     sp=OldCursorRectangle; \
     dp=video+y*VideoWidth+x; \
     memcpy(dp,sp,w*sizeof(memtype)); \
-    if ( h ) { \
+    if ( --h ) { \
       sp+=w; \
       dp+=VideoWidth; \
       while( --h ) { \
