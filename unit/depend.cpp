@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name depend.c	-	The units/upgrade dependencies */
-/*
-**	(c) Copyright 2000 by Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -214,7 +213,7 @@ global void AddDependency(const char* target,const char* required,int count
 	rule.Type = DependRuleUpgrade;
 	rule.Kind.Upgrade = UpgradeIdByIdent( target );
     } else {
-	DebugLevel0(__FUNCTION__": wrong dependency target %s\n",target);
+	DebugLevel0Fn("wrong dependency target %s\n",target);
 	return;
     }
     hash=(int)(long)rule.Kind.UnitType%(sizeof(DependHash)/sizeof(*DependHash));
@@ -251,7 +250,7 @@ global void AddDependency(const char* target,const char* required,int count
     //	Adjust count.
     //
     if ( count < 0 || count > 255 ) {
-	DebugLevel0(__FUNCTION__": wrong count range\n");
+	DebugLevel0Fn("wrong count range\n");
 	count = 255;
     }
 
@@ -271,7 +270,7 @@ global void AddDependency(const char* target,const char* required,int count
 	temp->Type = DependRuleUpgrade;
 	temp->Kind.Upgrade = UpgradeIdByIdent( required );
     } else {
-	DebugLevel0(__FUNCTION__": wrong dependency required %s\n",required);
+	DebugLevel0Fn("wrong dependency required %s\n",required);
 	free(temp);
 	return;
     }
@@ -399,7 +398,7 @@ global void InitDependencies(void)
 	if( Dependencies[i].Count==-1 ) {
 	    // Or rule
 	    if( target && !strcmp(target,Dependencies[i].Name) ) {
-		DebugLevel3(__FUNCTION__": or rule\n");
+		DebugLevel3Fn("or rule\n");
 		or_flag=1;
 	    }
 	    target=Dependencies[i].Name;

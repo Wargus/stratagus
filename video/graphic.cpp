@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name graphic.c	-	The general graphic functions. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -547,7 +546,7 @@ global void InitGraphic(void)
 	    break;
 
 	default:
-	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
+	    DebugLevel0Fn("unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
 

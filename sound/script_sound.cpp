@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl_sound.c	-	The sound ccl functions. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 //@{
 
@@ -71,7 +70,7 @@ local SCM sound_id_ccl(SoundId id) {
      SCM sound_smob;
 
      SCM_NEWCELL(sound_smob);
-     SCM_SETCDR(sound_smob,id); 
+     SCM_SETCDR(sound_smob,id);
      SCM_SETCAR(sound_smob,GuileSoundTag);
      return sound_smob;
 }
@@ -144,7 +143,7 @@ local SCM CclMakeSound(SCM name,SCM file) {
 	    }
 	    //FIXME: check size before casting
 	    id=MakeSound(c_name,c_files,(unsigned char)nb);
-	    for(i=0;i<nb;i++) 
+	    for(i=0;i<nb;i++)
 		free(c_files[i]);
 	    free(c_files);
 	} else {
@@ -188,7 +187,7 @@ local SCM CclPlaySound(SCM sound) {
 }
 
 /** Support for the guile version of a sound id: mark function for garbage
-    collecting. 
+    collecting.
     @param sound_smob the object to gc
 */
 local SCM MarkGuileSound(SCM sound_smob) {
@@ -274,7 +273,7 @@ local SCM CclDefineGameSounds(SCM list) {
 	} else if ( gh_eq_p(name,gh_symbol2scm("orc-rescue")) ) {
 	    GameSounds.OrcRescue.Sound=CCL_SOUND_ID(data);
 	} else {
-   	    fprintf(stderr,"Incorrect symbol %s\n",gh_scm2newstr(name,NULL));
+	    fprintf(stderr,"Incorrect symbol %s\n",gh_scm2newstr(name,NULL));
 	    return list;
 	}
     }
@@ -306,7 +305,7 @@ local SCM CclSoundOff(void) {
 **		(uses SoundFildes)
 */
 local SCM CclSoundOn(void) {
-    if (SoundFildes != -1) 
+    if (SoundFildes != -1)
 	return SCM_BOOL_T;
     SoundOff=0;
     return SCM_BOOL_F;
@@ -335,7 +334,7 @@ local SCM CclSetSoundRange(SCM sound,SCM range) {
     unsigned char TheRange;
     int tmp;
     SoundId id;
-    
+
     tmp=gh_scm2int(range);
     if(tmp<0) {
 	TheRange=0;
@@ -353,7 +352,7 @@ local SCM CclSetSoundRange(SCM sound,SCM range) {
 /**
 **	Ask clone to use a sound thread
 */
-local SCM CclSoundThread(void) 
+local SCM CclSoundThread(void)
 {
 #ifdef USE_THREAD
     WithSoundThread=1;			// only if compiled with
@@ -485,7 +484,7 @@ local SCM CclMakeSound(SCM name,SCM file) {
 	}
 	//FIXME: check size before casting
 	id=MakeSound(c_name,c_files,(unsigned char)nb);
-	for(i=0;i<nb;i++) 
+	for(i=0;i<nb;i++)
 	    free(c_files[i]);
 	free(c_files);
     } else {
@@ -597,7 +596,7 @@ local SCM CclDefineGameSounds(SCM list) {
 	} else if ( gh_eq_p(name,gh_symbol2scm("orc-rescue")) ) {
 	    GameSounds.OrcRescue.Sound=CCL_SOUND_ID(data);
 	} else {
-   	    fprintf(stderr,"Incorrect symbol %s\n",gh_scm2newstr(name,NULL));
+	    fprintf(stderr,"Incorrect symbol %s\n",gh_scm2newstr(name,NULL));
 	    return list;
 	}
     }
@@ -629,7 +628,7 @@ local SCM CclSoundOff(void) {
 **		(uses SoundFildes)
 */
 local SCM CclSoundOn(void) {
-    if (SoundFildes != -1) 
+    if (SoundFildes != -1)
 	return SCM_BOOL_T;
     SoundOff=0;
     return SCM_BOOL_F;
@@ -652,7 +651,7 @@ local SCM CclSetGlobalSoundRange(SCM distance) {
 /**
 **	Ask clone to use a sound thread
 */
-local SCM CclSoundThread(void) 
+local SCM CclSoundThread(void)
 {
 #ifdef USE_THREAD
     WithSoundThread=1;
@@ -669,7 +668,7 @@ local SCM CclSetSoundRange(SCM sound,SCM range) {
     unsigned char TheRange;
     int tmp;
     SoundId id;
-    
+
     tmp=gh_scm2int(range);
     if(tmp<0) {
 	TheRange=0;
@@ -765,7 +764,7 @@ local SCM CclSetSoundRange(SCM sound,SCM range)
 /**
 **	Ask clone to use a sound thread
 */
-local SCM CclSoundThread(void) 
+local SCM CclSoundThread(void)
 {
     return SCM_UNSPECIFIED;
 }

@@ -1646,7 +1646,7 @@ build_table:
 		break;
 
 	    default:
-		DebugLevel0(__FUNCTION__": Depth unsupported\n");
+		DebugLevel0Fn("Depth unsupported\n");
 		break;
 	}
     } else {
@@ -1675,7 +1675,7 @@ build_table:
 		break;
 
 	    default:
-		DebugLevel0(__FUNCTION__": Depth unsupported\n");
+		DebugLevel0Fn("Depth unsupported\n");
 		break;
 	}
     }

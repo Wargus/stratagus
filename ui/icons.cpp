@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name icons.c	-	The icons. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -369,11 +368,11 @@ global IconId IconByIdent(const char* ident)
 
     icon=(const IconId*)hash_find(IconHash,(char*)ident);
 
-    if( icon ) { 
+    if( icon ) {
 	return *icon;
     }
 
-    DebugLevel0(__FUNCTION__": Icon %s not found\n",ident);
+    DebugLevel0Fn("Icon %s not found\n",ident);
     return NoIcon;
 }
 

@@ -9,13 +9,16 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name astar.c	-	The a* path finder routines. */
-/*
-**	(c) Copyright 1999-2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,8 +53,8 @@ local int *CloseSet;
 local int Threshold;
 local int OpenSetMaxSize;
 local int AStarMatrixSize;
-#define MAX_CLOSE_SET_RATIO 4 
-#define MAX_OPEN_SET_RATIO 8 	// 10,16 to small
+#define MAX_CLOSE_SET_RATIO 4
+#define MAX_OPEN_SET_RATIO 8	// 10,16 to small
 
 /// see pathfinder.h
 global int AStarFixedUnitCrossingCost=MaxMapWidth*MaxMapHeight;
@@ -144,7 +147,7 @@ local void AStarRemoveMinimum(int pos)
     if(--OpenSetSize) {
 	OpenSet[pos]=OpenSet[OpenSetSize];
 	// now we exchange the new root with its smallest child until the
-	// order is correct 
+	// order is correct
 	i=0;
 	end=(OpenSetSize>>1)-1;
 	while(i<=end) {
@@ -264,7 +267,7 @@ local int CostMoveTo(int ex,int ey,int mask,int current_cost) {
 		return -1;//FIXME: is this a bug?
 	    }
 	    if( goal->Moving ) {
-		// moving unit are crossable 
+		// moving unit are crossable
 		return AStarMovingUnitCrossingCost;
 	    }
 	    // for non moving unit
@@ -276,7 +279,7 @@ local int CostMoveTo(int ex,int ey,int mask,int current_cost) {
 }
 
 /**
-**	Find path.	
+**	Find path.
 */
 local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 {
@@ -304,11 +307,11 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     static int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
 
-    DebugLevel3(__FUNCTION__": %Zd %d,%d->%d,%d\n",
+    DebugLevel3Fn("%Zd %d,%d->%d,%d\n",
 	    UnitNumber(unit),
 	    unit->X,unit->Y,
 	    unit->Command.Data.Move.DX,unit->Command.Data.Move.DY);
- 
+
     OpenSetSize=0;
    /*    AStarPrepare();*/
     x=unit->X;
@@ -373,7 +376,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     //	AStarCleanUp(num_in_close);
     //	return -2;
     //    }
-	
+
     counter=TheMap.Width*TheMap.Height;	// how many tries
 
     for( ;; ) {
@@ -385,7 +388,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	y=OpenSet[shortest].Y;
 	o=OpenSet[shortest].O;
 	cost_to_goal=OpenSet[shortest].Costs-AStarMatrix[o].CostFromStart;
-	
+
 	AStarRemoveMinimum(shortest);
 
 	//
@@ -393,7 +396,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	if( AStarMatrix[o].InGoal==1 ) {
 	    ex=x;
 	    ey=y;
-	    DebugLevel3(__FUNCTION__": a star goal reached\n");
+	    DebugLevel3Fn("a star goal reached\n");
 	    break;
 	}
 
@@ -404,7 +407,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    //
 	    //	Select a "good" point from the open set.
 	    //		Nearest point to goal.
-	    DebugLevel0(__FUNCTION__": %Zd way too long\n",UnitNumber(unit));
+	    DebugLevel0Fn("%Zd way too long\n",UnitNumber(unit));
 	    ex=best_x;
 	    ey=best_y;
 	}
@@ -436,7 +439,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 		continue;
 	    }
 	    // if the point is "move to"-able an
-	    // if we have not reached this point before, 
+	    // if we have not reached this point before,
 	    // or if we have a better path to it, we add it to open set
 	    new_cost=CostMoveTo(ex,ey,mask,AStarMatrix[o].CostFromStart);
 	    if(new_cost==-1) {
@@ -453,7 +456,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 			     AStarMatrix[eo].CostFromStart+AStarCosts(ex,ey,gx,gy));
 		// we add the point to the close set
 		if(num_in_close<Threshold) {
-		    CloseSet[num_in_close++]=eo;		
+		    CloseSet[num_in_close++]=eo;
 		}
 	    } else if(new_cost<AStarMatrix[eo].CostFromStart) {
 		// Already visited node, but we have here a better path
@@ -478,11 +481,11 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    ex=best_x;
 	    ey=best_y;
 	    if(ex==unit->X && ey==unit->Y) {
-		DebugLevel3(__FUNCTION__": %Zd unreachable\n",UnitNumber(unit));
+		DebugLevel3Fn("%Zd unreachable\n",UnitNumber(unit));
 		AStarCleanUp(num_in_close);
 		return -2;
 	    }
-	    DebugLevel3(__FUNCTION__": %Zd unreachable: going to closest\n",UnitNumber(unit));
+	    DebugLevel3Fn("%Zd unreachable: going to closest\n",UnitNumber(unit));
 	    break;
 	}
     }
@@ -515,7 +518,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    //FIXME: this might lead to a deadlock, or something similar
 	    DebugLevel3("Unit %Zd waiting. Proposed move: %d %d\n",
 			UnitNumber(unit),*pxd,*pyd);
-	    path_length=0; 
+	    path_length=0;
 	} else {
 	    // j==-1 is a bug, so we should have only
 	    // j==AStarFixedUnitCrossingCost, which means
@@ -526,15 +529,15 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     }
     // let's clean up the matrix now
     AStarCleanUp(num_in_close);
-    DebugLevel3(__FUNCTION__": %Zd\n",UnitNumber(unit));
-    DebugLevel3(__FUNCTION__": proposed move: %d %d (%d)\n",*pxd,*pyd,path_length);
+    DebugLevel3Fn("%Zd\n",UnitNumber(unit));
+    DebugLevel3Fn("proposed move: %d %d (%d)\n",*pxd,*pyd,path_length);
     return path_length;
 }
 
 /**
 **	Returns the next element of a path with astar algo.
 **
-**	@param unit	Unit that wants the path element. 
+**	@param unit	Unit that wants the path element.
 **	@param pxd	Pointer for the x direction.
 **	@param pyd	Pointer for the y direction.
 **
@@ -551,19 +554,19 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
     int r=unit->Command.Data.Move.Range;
     Unit* goal=unit->Command.Data.Move.Goal;
     UnitType* type;
- 
+
     x=unit->X;
     y=unit->Y;
     if( goal ) {			// goal unit
 	type=goal->Type;
-	DebugLevel3(__FUNCTION__": Unit %d,%d Goal %d,%d - %d,%d\n"
+	DebugLevel3Fn("Unit %d,%d Goal %d,%d - %d,%d\n"
 	    ,x,y
 	    ,goal->X-r,goal->Y-r
 	    ,goal->X+type->TileWidth+r
 	    ,goal->Y+type->TileHeight+r);
 	if( x>=goal->X-r && x<goal->X+type->TileWidth+r
 		&& y>=goal->Y-r && y<goal->Y+type->TileHeight+r ) {
-	    DebugLevel3(__FUNCTION__": Goal reached\n");
+	    DebugLevel3Fn("Goal reached\n");
 	    *pxd=*pyd=0;
 	    return -1;
 	}
@@ -572,7 +575,7 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 		&& x<=unit->Command.Data.Move.DX+r
 		&& y>=unit->Command.Data.Move.DY
 		&& y<=unit->Command.Data.Move.DY+r ) {
-	    DebugLevel3(__FUNCTION__": Field reached\n");
+	    DebugLevel3Fn("Field reached\n");
 	    *pxd=*pyd=0;
 	    return -1;
 	}
@@ -585,7 +588,7 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 	    if( !CheckedCanMoveToMask(unit->Command.Data.Move.DX
 		    ,unit->Command.Data.Move.DY
 		    ,UnitMovementMask(unit)) ) {	// blocked
-		DebugLevel3(__FUNCTION__": Field unreached\n");
+		DebugLevel3Fn("Field unreached\n");
 		*pxd=*pyd=0;
 		return -2;
 	    }
@@ -598,7 +601,7 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 /**
 **	Returns the next element of a path.
 **
-**	@param unit	Unit that wants the path element. 
+**	@param unit	Unit that wants the path element.
 **	@param pxd	Pointer for the x direction.
 **	@param pyd	Pointer for the y direction.
 **

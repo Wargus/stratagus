@@ -637,7 +637,7 @@ global void InitVideo(void)
 	case 32: ColorCycle=ColorCycle32; break;
     }
 
-    DebugLevel3(__FUNCTION__": %d %d\n",MapWidth,MapHeight);
+    DebugLevel3Fn("%d %d\n",MapWidth,MapHeight);
 }
 
 //@}

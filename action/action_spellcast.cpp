@@ -3,7 +3,7 @@
 //    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
 //    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
 //    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
-//        \/		            \/	   \/	       \/		         \/
+//	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
@@ -58,10 +58,10 @@ global int AnimateActionSpellCast(Unit* unit)
 
     if( unit->Type->Animations ) {
 	    DebugCheck( !unit->Type->Animations->Attack );
-      
+
       if( (flags & AnimationSound) )
-  	    PlayUnitSound(unit,VoiceAttacking); // FIXME: ?????
-  
+	    PlayUnitSound(unit,VoiceAttacking); // FIXME: ?????
+
       if( flags & AnimationMissile ) // FIXME: ?????
         FireMissile(unit); /* we should not get here ?? */
     }
@@ -79,23 +79,23 @@ local void SpellMoveToTarget(Unit* unit)
 	int err;
 
         err = HandleActionMove(unit);
-	if ( !unit->Reset ) return;    
+	if ( !unit->Reset ) return;
 	// when reached HandleActionMove changes unit action
 	unit->Command.Action = UnitActionSpellCast;
-	
+
 	goal = unit->Command.Data.Move.Goal;
-	if( goal && MapDistanceToUnit(unit->X,unit->Y,goal) 
-	       <= unit->Command.Data.Move.Range ) 
+	if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
+	       <= unit->Command.Data.Move.Range )
 	{ // there is goal and it is in range
 	    unit->State=0;
-  	    UnitHeadingFromDeltaXY(unit,goal->X - unit->X,
+	    UnitHeadingFromDeltaXY(unit,goal->X - unit->X,
 	                                goal->Y - unit->Y);
 	    unit->SubAction = 1; // cast the spell
 	    return;
-	} else 
+	} else
 	if( !goal && MapDistance(unit->X,unit->Y,
 	             unit->Command.Data.Move.DX,unit->Command.Data.Move.DY)
-		  <= unit->Command.Data.Move.Range ) 
+		  <= unit->Command.Data.Move.Range )
 	{ // there is no goal and target spot is in range
 	    unit->State=0;
 	    UnitHeadingFromDeltaXY(unit,
@@ -103,10 +103,10 @@ local void SpellMoveToTarget(Unit* unit)
 		   unit->Command.Data.Move.DY - unit->Y);
 	    unit->SubAction = 1; // cast the spell
 	    return;
-	} else 
-	if( err ) 
+	} else
+	if( err )
 	{ // goal/spot out of range -- move to target
-   	    // FIXME: Should handle new return codes (err) here (for Fabrice)
+	    // FIXME: Should handle new return codes (err) here (for Fabrice)
 	    unit->State=0;
 	    unit->SubAction=0;
 	}
@@ -121,11 +121,11 @@ local void SpellMoveToTarget(Unit* unit)
 global void HandleActionSpellCast(Unit* unit)
 {
     int repeat = 0; // repeat spell on next pass? (defaults to `no')
-    
-    DebugLevel3(__FUNCTION__": SpellCast %Zd\n",UnitNumber(unit));
+
+    DebugLevel3Fn("SpellCast %Zd\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
-	
+
 	case 0: // Move to the target.
 	    SpellMoveToTarget(unit);
 	    break;
@@ -135,12 +135,12 @@ global void HandleActionSpellCast(Unit* unit)
 		const SpellType* spell = SpellTypeById( unit->Command.Data.Move.SpellId );
 		if ( unit->Mana < spell->ManaCost )
 		  {
-       	          if( unit->Player==ThisPlayer ) 
+   	          if( unit->Player==ThisPlayer )
 		    {
-		    SetMessage( "%s: not enough mana to cast spell: %s", 
+		    SetMessage( "%s: not enough mana to cast spell: %s",
                                 unit->Type->Name, spell->Ident );
-		    }		
-		  repeat = 0;	      
+		    }
+		  repeat = 0;
 		  }
 		else
 		  {
@@ -150,12 +150,12 @@ global void HandleActionSpellCast(Unit* unit)
 		       unit->Command.Data.Move.Goal->Destroyed )
 		  repeat = 0;
 		  else
-		  repeat = SpellCast(unit->Command.Data.Move.SpellId, 
-				    unit, 
-				    unit->Command.Data.Move.Goal, 
+		  repeat = SpellCast(unit->Command.Data.Move.SpellId,
+				    unit,
+				    unit->Command.Data.Move.Goal,
 				    unit->Command.Data.Move.DX,
 				    unit->Command.Data.Move.DY );
-		  }   
+		  }
 		  if ( !repeat ) {
 		     unit->Command.Action=UnitActionStill;
 		     unit->SubAction=0;
@@ -171,7 +171,7 @@ global void HandleActionSpellCast(Unit* unit)
 		  }
 		}
 	    break;
-	    
+
         default:
 	        unit->SubAction = 0; // Move to the target
     }

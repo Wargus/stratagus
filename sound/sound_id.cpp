@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name sound_id.c	-	The sound id. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 //@{
 
@@ -54,7 +53,7 @@ local hashtable(int,61) SoundIdHash;
 ----------------------------------------------------------------------------*/
 
 /**
-**	display the sound name hash table. 
+**	display the sound name hash table.
 */
 global void DisplaySoundHashTable(void) {
     fprintf(stderr,"Sound HashTable Begin\n");
@@ -103,7 +102,7 @@ global void MapSound(char* sound_name,SoundId id) {
 */
 global SoundId MakeSoundGroup(char* group_name,SoundId first,SoundId second) {
     SoundId sound;
-    
+
     sound=RegisterTwoGroups(first,second);
     MapSound(group_name,sound);
     return sound;

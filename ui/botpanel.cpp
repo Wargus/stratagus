@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name botpanel.c	-	The bottom panel. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer, Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -418,7 +417,7 @@ global void UpdateButtonPanel(void)
     char unit_ident[128];
     int z;
 
-    DebugLevel3(__FUNCTION__": update buttons\n");
+    DebugLevel3Fn("update buttons\n");
 
     CurrentButtons=NULL;
 
@@ -564,7 +563,7 @@ global void DoButtonButtonClicked(int button)
     UnitType* type;
     const UnitStats* stats;
 
-    DebugLevel3(__FUNCTION__": Button clicked %d\n",button);
+    DebugLevel3Fn("Button clicked %d\n",button);
 
     if( !CurrentButtons ) {		// no buttons
 	return;
@@ -582,7 +581,7 @@ global void DoButtonButtonClicked(int button)
     //
     //	Handle action on button.
     //
-    DebugLevel3(__FUNCTION__": Button clicked %d=%d\n",button,
+    DebugLevel3Fn("Button clicked %d=%d\n",button,
 	    CurrentButtons[button].Action);
     switch( CurrentButtons[button].Action ) {
 	case B_Unload:
@@ -753,7 +752,7 @@ global void DoButtonButtonClicked(int button)
 	    }
 	    break;
 	default:
-	    DebugLevel1(__FUNCTION__": Unknown action %d\n"
+	    DebugLevel1Fn("Unknown action %d\n"
 		    ,CurrentButtons[button].Action);
 	    break;
     }
