@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include <limits.h>
 
@@ -48,29 +49,9 @@
 
 #include "iocompat.h"
 
-#include "video.h"
-#include "player.h"
-#include "font.h"
-#include "tileset.h"
-#include "map.h"
-#include "minimap.h"
-#include "interface.h"
-#include "menus.h"
-#include "cursor.h"
-#include "pud.h"
-#include "iolib.h"
 #include "network.h"
 #include "netconnect.h"
-#include "settings.h"
-#include "ui.h"
-#include "campaign.h"
-#include "sound_server.h"
-#include "sound.h"
 #include "ccl.h"
-#include "editor.h"
-#include "commands.h"
-#include "actions.h"
-
 #include "master.h"
 
 // FIXME: jim4: why is this defined?
@@ -86,142 +67,183 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#define MASTER_REFRESHRATE 25000
-
-global char MasterTempString[50];		/// FIXME: docu
-global int PublicMasterAnnounce;		/// FIXME: docu
-global unsigned long LastTimeAnnounced;		/// FIXME: docu
-global int MasterPort;				/// FIXME: docu
-global unsigned long MasterHost;		/// FIXME: docu
-global char* MasterHostString;			/// FIXME: docu
-
-local int sock;					/// FIXME: docu
-local char challenge[12];			/// FIXME: docu
+//###### For Magnant META SERVER
+local int sockfd;  // This is a TCP socket. 
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
+
 /**
-**	FIXME: docu
+**	Initialize the TCP connection to the Meta Server.
+**
+**	@return	-1 fail, 0 success.
 */
-global int MasterInit(void)
+global int MetaInit(void)
 {
-    sock = NetworkFildes;
-    MasterHostString = strdup(MASTER_HOST);
-    MasterHost = NetResolveHost(MasterHostString);
-    MasterPort = htons(MASTER_PORT);
-    if (!sock) {
-	PublicMasterAnnounce = 0;
+    int TCPConnectStatus; // = 0 if not successful, -1 if not.
+    int i; 
+    char** reply;
+
+    reply = NULL;
+    sockfd = NetworkFildes;
+    for (i = 1234; i < 1244; ++i) {
+	sockfd=NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!sockfd) {...}
+	if (sockfd != -1) {
+	    break;
+	}
+    }
+    
+    // FIXME: Configurable Meta Server
+    TCPConnectStatus = NetConnectTCP(sockfd,NetResolveHost(MASTER_HOST),MASTER_PORT);
+
+    if (TCPConnectStatus == -1) {
+	//TODO: Notify player that connection was aborted...
+	return -1; 
+    }
+	
+    if (SendMetaCommand("Login","") == -1) {
+	//TODO: Notify player that connection was aborted...
 	return -1;
     }
+
+    if (RecvMetaReply(reply) == -1) {
+	//TODO: Notify player that connection was aborted...
+	return -1;
+    } else {
+	if (MetaServerOK(reply)) {
+	    free(*reply);
+	    return 0;
+	} else {
+	    free(*reply);
+	    return -1;
+	}
+    }
+
     return 0;
-}	
+}
 
-/**
-**	FIXME: docu
+/**	Close Connection to Master Server
+**
+**	@return	nothing
 */
-local int MasterSend(const void* buf, int len)
+global int MetaClose(void)
 {
-    return NetSendUDP(sock, MasterHost, MasterPort, buf, len);
+    NetCloseTCP(sockfd);
+    return 0;
 }
 
 /**
-**	FIXME: docu
+**	Checks if a Message was OK or ERR
+**
+**	@return 1 OK, 0 Error.
 */
-global void MasterSendAnnounce(void)
+global int MetaServerOK(char **reply)
 {
-    char *heartbeat = "\xFF\xFF\xFF\xFFheartbeat Stratagus\x0A";
-
-    MasterSend(heartbeat, strlen(heartbeat));
+    return !strcmp("OK",*reply);
 }
 
 /**
-**	FIXME: docu
+**	Send a command to the meta server
+**
+**	@param command	command to send
+**	@param format	format of parameters
+**	@param ...	parameters
+**
+**	@returns	-1 fail, length of command
 */
-local void MasterSendInfo(void)
+global int SendMetaCommand(char* command, char* format, ...)
 {
-    char sendinfo[1000];
-    int numplayers;
-    int mapmaxplayers;
-    int closedslots;
-    int i;
+    int n;
+    int size;
+    int ret;
+    char* p;
+    char* s;
+    va_list ap;
 
-    mapmaxplayers = 0;
-    closedslots = 0;
-    for (i = 0; i < PlayerMax; ++i) {
-	if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
-	    if (ServerSetupState.CompOpt[i] == 2) {
-		++closedslots;
-	    } else {
-		++mapmaxplayers;
-	    }
+    size = strlen(GameName)+strlen(LocalPlayerName)+strlen(command)+100;
+    ret = -1;
+    if ((p = malloc(size)) == NULL) {
+	return -1;
+    }
+
+    // Message Structure
+    // Player Name, Game Name, VERSION, Command, **Paramaters**
+    strcpy(p, LocalPlayerName);
+    strcat(p, "\n");
+    strcat(p, GameName);
+    strcat(p, "\n");
+    strcat(p, VERSION);
+    strcat(p, "\n");
+    strcat(p, command);
+    strcat(p, "\n");
+
+    // Commands
+    // Login - 1, password
+    // Logout - 0
+    // AddGame - ,Name,Map,Players,FreeSpots
+    // JoinGame - Nick of Host
+    // ChangeGame - ,Name,Map,Players,FreeSpots
+    // GameList - 0
+    // NextGameInList - 0
+    // StartGame - 0
+    // PlayerScore - Score,Win (Add razings...)
+    // EndGame - Called after PlayerScore.
+    // AbandonGame - 0
+    while (1) {
+	/* Try to print in the allocated space. */
+	va_start(ap, format);
+	s = va_arg(ap, char *);
+	n = vsnprintf(p, size, format, ap);
+	va_end(ap);
+	/* If that worked, string was processed. */
+	if (n > -1 && n < size) {
+	    break;
+	}
+	/* Else try again with more space. */
+	if (n > -1) { /* glibc 2.1 */
+	    size = n + 1; /* precisely what is needed */
+	} else {           /* glibc 2.0 */
+	    size *= 2;  /* twice the old size */
+	}
+	if ((p = realloc(p, size)) == NULL) {
+	    return -1;
 	}
     }
+    // Allocate the correct size
+    size = strlen(p);
+    ret = NetSendTCP(sockfd, p, size);
+    free(p);
+    return ret;
+}
 
-    numplayers = 1;
-    for (i = 0; i < mapmaxplayers + numplayers; ++i) {
-	if (Hosts[i].PlyNr) {
-	    ++numplayers;
+/**
+**	Receive reply from Meta Server
+**
+**	@param	reply	Text of the reply
+**	@return	error or number of bytes
+*/
+global int RecvMetaReply(char **reply)
+{
+    int n;
+    int size;
+    char *p;
+    char buf[1024];
+
+    if (NetSocketReady(sockfd, 5000) == -1) {
+	return -1;
+    }
+   
+    size=1;
+    while ((n = NetRecvTCP(sockfd, &buf, 1024))) {
+	size += n;
+	if ((p = realloc(p, size)) == NULL) {
+	    return -1;
 	}
+	strcat(p, buf);
     }
-    numplayers += mapmaxplayers - NetPlayers;
 
-    sprintf(sendinfo, "\xFF\xFF\xFF\xFFinfoResponse\x0A\\protocol\\%d:%d\\gamehost\\%s\\clients\\%d\\sv_maxclients\\%d\\gamename\\%s\\challenge\\%s", 
-	StratagusVersion, NetworkProtocolVersion, LocalPlayerName, numplayers, 
-	mapmaxplayers, MenuMapInfo->Description, challenge);
-    MasterSend(sendinfo, strlen(sendinfo));
+    reply = &p;
+    return size;
 }
-
-/**
-**	FIXME: docu
-*/
-global void MasterProcessGetServerData(const char* msg, size_t length,
-    unsigned long host, int port)
-{
-    if (!PublicMasterAnnounce || !sock) {
-	return;
-    }
-
-    if (!strncmp(msg, "getinfo ", 8)) {
-	//if (host == NetResolveHost(MasterHost)) {
-	{
-	    strncpy(challenge, msg + 8, sizeof(challenge));
-	    challenge[11] = '\0';
-	    MasterSendInfo();
-	}
-    }
-}
-
-/**
-**	FIXME: docu
-*/
-local void MasterStopAnnounced(void)
-{
-    MasterSendAnnounce();
-}
-
-/**
-**	FIXME: docu
-*/
-global void MasterLoop(unsigned long ticks)
-{
-    if (!PublicMasterAnnounce || !sock) {
-	return;
-    }
-
-    if (LastTimeAnnounced &&
-	    ticks <= LastTimeAnnounced + MASTER_REFRESHRATE) {
-	return;
-    }
-
-    LastTimeAnnounced = ticks;
-    if (PublicMasterAnnounce == 2) {
-	MasterStopAnnounced();
-	PublicMasterAnnounce = 0;
-	return;
-    }
-    MasterSendAnnounce();
-}
-
-//@}

@@ -692,12 +692,6 @@ global void NetworkEvent(void)
 	return;
     }
 
-    if (!strncmp(buf, "\xFF\xFF\xFF\xFFgetinfo", 11))
-    {
-	MasterProcessGetServerData(buf + 4, i - 4, NetLastHost, NetLastPort);
-	return;
-    }
-
     packet = (NetworkPacket*)buf;
 #ifdef DEBUG
     ++NetworkReceivedPackets;

@@ -75,9 +75,6 @@
 #include "sound.h"
 #include "interface.h"
 
-// FIXME: needs to be moved to better location
-#include "master.h"
-
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -687,9 +684,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    }
 	    NextFrameTicks += FrameTicks;
 	}
-
-	// FIXME: move to better location
-	MasterLoop(ticks);
 
 	//
 	//	Prepare select
