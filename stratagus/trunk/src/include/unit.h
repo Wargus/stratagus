@@ -82,9 +82,10 @@
 **
 **		A generic link pointer. This member is currently used, if an
 **		unit is on the map, to link all units on the same map field
-**		together.  This member is currently unused, if the unit is
-**		removed (see Unit::Removed). F.E.: A worker is removed, if he
-**		is in a mine or depot. Or an unit is on board a transporter.
+**		together.  This member points the the unit that the current
+**		is onboard/inside when a unit is removed (see Unit::Removed).
+**		F.E.: A worker is removed, if he is in a mine or depot.
+**		Or an unit is on board a transporter.
 **
 **	Unit::Name
 **
@@ -117,12 +118,6 @@
 **		for each player. This f.e. the upgradeable abilities of an
 **		unit.  (Unit::Stats::SightRange, Unit::Stats::Armor,
 **		Unit::Stats::HitPoints, ...)
-**
-**	Unit::Host
-**
-**		The unit that the current unit is on board. Used to obtain
-**		information from parent unit. The new fog of war uses the
-**		host's sight range.
 **
 **	Unit::CurrentSightRange
 **
@@ -481,7 +476,6 @@ struct _unit_ {
     Player*     Player;			/// Owner of this unit
     UnitStats*	Stats;			/// Current unit stats
 #ifdef NEW_FOW
-    Unit*	Host;			/// Unit that this unit is inside
     int		CurrentSightRange;	/// Unit's Current Sight Range
 #endif
 
