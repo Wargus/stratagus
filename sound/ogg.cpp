@@ -185,8 +185,7 @@ int OggInit(CLFile *f, OggData *data)
 		}
 
 		ogg_stream_init(&test, ogg_page_serialno(&data->page));
-		if (ogg_stream_pagein(&test, &data->page))
-			exit(-1);
+		ogg_stream_pagein(&test, &data->page);
 
 		// initial codec headers
 		while (ogg_stream_packetout(&test, &packet) == 1) {
