@@ -605,7 +605,8 @@ local int MoveToDepot(Unit* unit)
 	// If resource depot is still under construction, wait!
 	//
 	if (goal->Orders[0].Action == UnitActionBuilded) {
-		DebugLevel2Fn("Invalid resource depot. FIXME:WAIT!!! \n");
+		unit->Wait = 10;
+		DebugLevel3Fn("Invalid resource depot. WAIT!!! \n");
 		return 0;
 	}
 
