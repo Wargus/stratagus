@@ -349,23 +349,34 @@ if [ "$?" = 0 ] ; then
     echo " Found.";
   fi
 else
-  echo " NOT FOUND!";
-  echo
-  echo "...You do not appear to have a working PNG library installed!"
-  echo
-  echo "libpng is required for freecraft to compile. Please "
-  echo "refer to the LOCAL_PNG section in the setup script to "
-  echo "find out how to install a local copy to compile freecraft."
-  echo
-  echo "Please also note that the PNG library most likely also"
-  echo "requires the GZIP compression library. If you are sure"
-  echo "to have libpng installed, but this test still fails,"
-  echo "check out for libz. You may refer to the LOCAL_ZLIB"
-  echo "section of this script to find out how to install a local"
-  echo "local copy of the libz."
-  echo
+# Newer libpng (1.2.5 up) may need pow() from libm
+  LIBCHECK="$PNG_PATH -lpng $PNG_EXTRA -lm"; check_for_libs
+  if [ "$?" = 0 ] ; then
+    PNG_EXTRA="$PNG_EXTRA -lm"
+    if [ "$PNG_LOCAL" = 1 ] ; then
+      echo " Found, (local: $LOCAL_PNG).";
+    else
+      echo " Found.";
+    fi
+  else
+    echo " NOT FOUND!";
+    echo
+    echo "...You do not appear to have a working PNG library installed!"
+    echo
+    echo "libpng is required for freecraft to compile. Please "
+    echo "refer to the LOCAL_PNG section in the setup script to "
+    echo "find out how to install a local copy to compile freecraft."
+    echo
+    echo "Please also note that the PNG library most likely also"
+    echo "requires the GZIP compression library. If you are sure"
+    echo "to have libpng installed, but this test still fails,"
+    echo "check out for libz. You may refer to the LOCAL_ZLIB"
+    echo "section of this script to find out how to install a local"
+    echo "local copy of the libz."
+    echo
 
-  exit 1
+    exit 1
+  fi
 fi
 
 #------------------------------------------------------------------------------
