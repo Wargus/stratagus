@@ -2009,8 +2009,8 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 {
 #ifdef USE_SDL_SURFACE
-    memcpy(&sprite->Palette->colors[208], unit->Colors->Colors, 
-	sizeof(SDL_Color) * 4);
+    memcpy(&sprite->Surface->format->palette->colors[208], 
+	unit->Colors->Colors, sizeof(SDL_Color) * 4);
 #else
     switch (VideoBpp) {
 	case 8:

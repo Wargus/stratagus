@@ -880,8 +880,8 @@ global void PlayersEachSecond(int player)
 global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 {
 #ifdef USE_SDL_SURFACE
-    memcpy(&sprite->Palette->colors[208], player->UnitColors.Colors, 
-	sizeof(Pixels) * 4);
+    memcpy(&sprite->Surface->format->palette->colors[208], 
+	player->UnitColors.Colors, sizeof(SDL_Color) * 4);
 #else
     switch (VideoBpp) {
 	case 8:
