@@ -34,6 +34,8 @@
 	<a href="script-index.html">Script index</a> 
 	<hr>
 	<a href="stratagus.html">Stratagus.*</a>
+	<a href="missiletypes.html">Stratagus.MissileTypes.*</a>
+	<a href="players.html">Stratagus.Players.*</a>
 	<hr>
 	<dl>
 	<!-- SCRIPT -->
@@ -56,6 +58,18 @@
 		    <dd><b>Type:</b> string </dd>
 		    <dd>This is the path for the stratagus data dir, the one you specify
 		    with -d on the command line.</dd>
+	    <a name="Stratagus.SyncRand()">
+	    <dt><b>Stratagus.SyncRand()</b></dt>
+		    <dd><b>Type:</b> function, returns int </dd>
+		    <dd>This calls the internal stratagus syncronized random number generator.
+			It will get the same values across multiplayer games. Make sure you
+			don't call it from unsincronized parts of the game.</dd>
+	    <a name="Stratagus.MyRand()">
+	    <dt><b>Stratagus.MyRand()</b></dt>
+		    <dd><b>Type:</b> function, returns int </dd>
+		    <dd>This calls a random number generator. Do not use this in map
+			scripts or anything else that has to behave the same across multiplayer
+			games.</dd>
 	<!-- SCRIPT -->
 	</dl><hr>
 	Last changed: $Id$<br>

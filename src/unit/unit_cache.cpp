@@ -218,6 +218,7 @@ global void UnitCacheInsert(Unit* unit)
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
 			listitem = unit->CacheLinks + i * unit->Type->TileWidth + j;
+			DebugCheck(listitem->Next || listitem->Prev);
 
 			//	Always add at the start of the list.
 			listitem->Next = mf->UnitCache;
