@@ -513,13 +513,13 @@ local void FreeMissile(Missile* missile)
 **	@return			damage produces on goal.
 */
 local int CalculateDamageStats(const UnitStats* attacker_stats,
-	const UnitStats* goal_stats, int bloodlust)
+	const UnitStats* goal_stats, int bloodlust,int xp)
 {
     int damage;
     int basic_damage;
     int piercing_damage;
 
-    basic_damage = attacker_stats->BasicDamage;
+    basic_damage = attacker_stats->BasicDamage + (int)(sqrt(xp/100))*XpDamage;
     piercing_damage = attacker_stats->PiercingDamage;
     if (bloodlust) {
 	basic_damage *= 2;
@@ -550,9 +550,9 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 **	@return			damage produces on goal.
 */
 local int CalculateDamage(const UnitStats* attacker_stats,
-    const Unit* goal,int bloodlust)
+    const Unit* goal,int bloodlust,int xp)
 {
-    return CalculateDamageStats(attacker_stats,goal->Stats,bloodlust);
+    return CalculateDamageStats(attacker_stats,goal->Stats,bloodlust,xp);
 }
 
 /**
@@ -615,10 +615,10 @@ global void FireMissile(Unit* unit)
 	    if( WallOnMap(dx,dy) ) {
 		if( HumanWallOnMap(dx,dy) ) {
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeHumanWall->Stats,unit->Bloodlust));
+			    UnitTypeHumanWall->Stats,unit->Bloodlust,unit->XP));
 		} else {
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeOrcWall->Stats,unit->Bloodlust));
+			    UnitTypeOrcWall->Stats,unit->Bloodlust,unit->XP));
 		}
 		return;
 	    }
@@ -627,7 +627,7 @@ global void FireMissile(Unit* unit)
 	    return;
 	}
 
-	HitUnit(unit,goal,CalculateDamage(unit->Stats,goal,unit->Bloodlust));
+	HitUnit(unit,goal,CalculateDamage(unit->Stats,goal,unit->Bloodlust,unit->XP));
 
 	return;
     }
@@ -1008,7 +1008,7 @@ local void MissileHitsGoal(const Missile* missile,Unit* goal,int splash)
 	} else {
 	    HitUnit(missile->SourceUnit,goal,
 		    CalculateDamage(missile->SourceUnit->Stats,goal,
-			missile->SourceUnit->Bloodlust)/splash);
+			missile->SourceUnit->Bloodlust,0)/splash);
 	}
     }
 }
@@ -1032,14 +1032,14 @@ local void MissileHitsWall(const Missile* missile,int x,int y,int splash)
 		HitWall(x,y,missile->Damage/splash);
 	    } else {
 		HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-		    UnitTypeHumanWall->Stats,0)/splash);
+		    UnitTypeHumanWall->Stats,0,0)/splash);
 	    }
 	} else {
 	    if ( missile->Damage ) {	// direct damage, spells mostly
 		HitWall(x,y,missile->Damage/splash);
 	    } else {
 		HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-		    UnitTypeOrcWall->Stats,0)/splash);
+		    UnitTypeOrcWall->Stats,0,0)/splash);
 	    }
 	}
 	return;

@@ -483,12 +483,12 @@ global void DrawUnitInfo(const Unit* unit)
 		if( stats->PiercingDamage<30 && stats->BasicDamage<30 ) {
 		    sprintf(buf,"%d-%d~<+%d+%d~>"
 			,(stats->PiercingDamage+1)/2,i
-			,stats->BasicDamage-type->_BasicDamage
+			,stats->BasicDamage-type->_BasicDamage + (int)(sqrt(unit->XP/100))*XpDamage
 			,stats->PiercingDamage-type->_PiercingDamage);
 		} else {
 		    sprintf(buf,"%d-%d~<+%d+%d~>"
 			,(stats->PiercingDamage+stats->BasicDamage-30)/2,i
-			,stats->BasicDamage-type->_BasicDamage
+			,stats->BasicDamage-type->_BasicDamage + (int)(sqrt(unit->XP/100))*XpDamage
 			,stats->PiercingDamage-type->_PiercingDamage);
 		}
 	    } else if( stats->PiercingDamage || stats->BasicDamage<30 ) {
