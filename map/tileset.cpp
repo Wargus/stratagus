@@ -340,71 +340,130 @@ global void LoadTileset(void)
 }
 
 /**
-**	Save solid part of tileset.
+**	Save flag part of tileset.
 */
-local void SaveTilesetSolid(FILE* file,const unsigned short* table
-	,const char* name,const char* flag,int start)
+local void SaveTilesetFlags(FILE* file, unsigned flags)
+{
+    if (flags & MapFieldWaterAllowed) {
+	fprintf(file, " 'water");
+    }
+    if (flags & MapFieldLandAllowed) {
+	fprintf(file, " 'land");
+    }
+    if (flags & MapFieldCoastAllowed) {
+	fprintf(file, " 'coast");
+    }
+    if (flags & MapFieldNoBuilding) {
+	fprintf(file, " 'no-building");
+    }
+    if (flags & MapFieldUnpassable) {
+	fprintf(file, " 'unpassable");
+    }
+    if (flags & MapFieldWall) {
+	fprintf(file, " 'wall");
+    }
+    if (flags & MapFieldRocks) {
+	fprintf(file, " 'rock");
+    }
+    if (flags & MapFieldForest) {
+	fprintf(file, " 'forest");
+    }
+    if (flags & MapFieldLandUnit) {
+	fprintf(file, " 'land-unit");
+    }
+    if (flags & MapFieldAirUnit) {
+	fprintf(file, " 'air-unit");
+    }
+    if (flags & MapFieldSeaUnit) {
+	fprintf(file, " 'sea-unit");
+    }
+    if (flags & MapFieldBuilding) {
+	fprintf(file, " 'building");
+    }
+    if (flags & MapFieldHuman) {
+	fprintf(file, " 'human");
+    }
+}
+
+/**
+**	Save solid part of tileset.
+**
+**	@param file	File handle to save the solid part.
+**	@param table	Tile numbers.
+**	@param name	Ascii name of solid tile
+**	@param flags	Tile attributes.
+**	@param start	Start index into table.
+*/
+local void SaveTilesetSolid(FILE* file, const unsigned short* table,
+    const char* name, unsigned flags, int start)
 {
     int i;
     int j;
     int n;
 
-    fprintf(file,"  'solid (list \"%s\"",name);
-    if( flag && *flag ) {
-	fprintf(file," %s",flag);
+    fprintf(file, "  'solid (list \"%s\"", name);
+    SaveTilesetFlags(file, flags);
+    // Remove empty tiles at end of block
+    for (n = 15; n >= 0 && !table[start + n]; n--) {
     }
-    for( n=15; n>=0 && !table[start+n] ; n-- ) {
+    i = fprintf(file, "\n    #(");
+    for (j = 0; j <= n; ++j) {
+	i += fprintf(file, " %3d", table[start + j]);
     }
-    i=fprintf(file,"\n    #(");
-    for( j=0; j<=n; ++j ) {
-	i+=fprintf(file," %3d",table[start+j]);
-	// i+=fprintf(file," %3d",table[start+j] ? start+j : 0);
-    }
-    i+=fprintf(file,"))");
+    i += fprintf(file, "))");
 
-    while( (i+=8)<80 ) {
-	fprintf(file,"\t");
+    while ((i += 8) < 80) {
+	fprintf(file, "\t");
     }
-    fprintf(file,"; %03X\n",start);
+    fprintf(file, "; %03X\n", start);
 }
 
 /**
 **	Save mixed part of tileset.
+**
+**	@param file	File handle to save the mixed part.
+**	@param table	Tile numbers.
+**	@param name1	First ascii name of mixed tiles.
+**	@param name2	Second Ascii name of mixed tiles.
+**	@param flags	Tile attributes.
+**	@param start	Start index into table.
 */
-local void SaveTilesetMixed(FILE* file,const unsigned short* table
-	,const char* name1,const char* name2,const char* flag,int start)
+local void SaveTilesetMixed(FILE* file, const unsigned short* table,
+    const char* name1, const char* name2, unsigned flags, int start)
 {
     int x;
     int i;
     int j;
     int n;
 
-    if( start>=0x9E0 ) {
+    if (start >= 0x9E0) {
 	return;
     }
-    fprintf(file,"  'mixed (list \"%s\" \"%s\" %s\n",name1,name2,flag);
-    for( x=0; x<0x100; x+=0x10 ) {
-	if( start+x>=0x9E0 ) {
+    fprintf(file, "  'mixed (list \"%s\" \"%s\"", name1, name2);
+    SaveTilesetFlags(file, flags);
+    fprintf(file,"\n");
+    for (x = 0; x < 0x100; x += 0x10) {
+	if (start + x >= 0x9E0) {
 	    break;
 	}
-	fprintf(file,"    #(");
-	for( n=15; n>=0 && !table[start+x+n] ; n-- ) {
+	fprintf(file, "    #(");
+	// Remove empty slots at end of table
+	for (n = 15; n >= 0 && !table[start + x + n]; n--) {
 	}
-	i=6;
-	for( j=0; j<=n; ++j ) {
-	    i+=fprintf(file," %3d",table[start+x+j]);
-	    // i+=fprintf(file," %3d",table[start+x+j] ? start+x+j : 0);
+	i = 6;
+	for (j = 0; j <= n; ++j) {
+	    i += fprintf(file, " %3d", table[start + x + j]);
 	}
-	if( x==0xF0 || (start==0x900 && x==0xD0)) {
-	    i+=fprintf(file,"))");
+	if (x == 0xF0 || (start == 0x900 && x == 0xD0)) {
+	    i += fprintf(file, "))");
 	} else {
-	    i+=fprintf(file,")");
+	    i += fprintf(file, ")");
 	}
 
-	while( (i+=8)<80 ) {
-	    fprintf(file,"\t");
+	while ((i += 8) < 80) {
+	    fprintf(file, "\t");
 	}
-	fprintf(file,"; %03X\n",start+x);
+	fprintf(file, "; %03X\n", start + x);
     }
 }
 
@@ -413,13 +472,12 @@ local void SaveTilesetMixed(FILE* file,const unsigned short* table
 **
 **	@param file	Output file.
 **	@param tileset	Save the content of this tileset.
-**
-**	@todo	This didn't use the loaded values, it just generates the
-**		default tileset.
 */
 local void SaveTileset(FILE* file,const Tileset* tileset)
 {
     const unsigned short* table;
+    int i;
+    int n;
 
     fprintf(file,"\n(define-tileset\n  '%s 'class '%s",
 	    tileset->Ident,tileset->Class);
@@ -445,64 +503,32 @@ local void SaveTileset(FILE* file,const Tileset* tileset)
 	,tileset->TopOneRock ,tileset->MidOneRock ,tileset->BotOneRock);
     fprintf(file,"    'removed-rock %d )\n",tileset->RemovedRock);
 
-    table=tileset->Table;
-    //
-    //	Solids
-    //
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x00]], "", 0x00);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x10]], "'water", 0x10);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x20]], "'water", 0x20);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x30]], "'no-building", 0x30);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x40]], "'no-building", 0x40);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x50]], "", 0x50);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x60]], "", 0x60);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x70]], "'forest", 0x70);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x80]], "'rock", 0x80);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0x90]], "'wall", 0x90);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0xA0]], "'wall", 0xA0);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0xB0]], "'wall", 0xB0);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0xC0]], "'wall", 0xC0);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0xD0]], "", 0xD0);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0xE0]], "", 0xE0);
-    SaveTilesetSolid(file, table,
-	tileset->TileNames[tileset->BasicNameTable[0xF0]], "", 0xF0);
+    table = tileset->Table;
+    n = tileset->NumTiles;
 
-    //
-    //	Mixeds
-    //
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x100]],
-	tileset->TileNames[tileset->MixedNameTable[0x100]],"'water",	0x100);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x200]],
-	tileset->TileNames[tileset->MixedNameTable[0x200]],"'coast",	0x200);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x300]],
-	tileset->TileNames[tileset->MixedNameTable[0x300]],"'no-building",	0x300);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x400]],
-	tileset->TileNames[tileset->MixedNameTable[0x400]],"'rock",		0x400);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x500]],
-	tileset->TileNames[tileset->MixedNameTable[0x500]],"'no-building",	0x500);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x600]],
-	tileset->TileNames[tileset->MixedNameTable[0x600]],"",		0x600);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x700]],
-	tileset->TileNames[tileset->MixedNameTable[0x700]],"'forest",	0x700);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x800]],
-	tileset->TileNames[tileset->MixedNameTable[0x800]],"'wall",		0x800);
-    SaveTilesetMixed(file,table,tileset->TileNames[tileset->BasicNameTable[0x900]],
-	tileset->TileNames[tileset->MixedNameTable[0x900]],"'wall",		0x900);
+    for ( i = 0; i < n; ) {
+	DebugLevel0Fn("%3d: %s - %s\n" _C_ i
+		_C_ tileset->TileNames[tileset->BasicNameTable[i]]
+		_C_ tileset->TileNames[tileset->MixedNameTable[i]]);
+	//
+	//	Mixeds
+	//
+	if (tileset->BasicNameTable[i] && tileset->MixedNameTable[i]) {
+	    SaveTilesetMixed(file,table,
+		tileset->TileNames[tileset->BasicNameTable[i]],
+		tileset->TileNames[tileset->MixedNameTable[i]],
+		tileset->FlagsTable[i],i);
+	    i += 256;
+	//
+	//	Solids
+	//
+	} else {
+	    SaveTilesetSolid(file, table,
+		tileset->TileNames[tileset->BasicNameTable[i]],
+		tileset->FlagsTable[i],i);
+	    i += 16;
+	}
+    }
     fprintf(file,"  )\n");
     fprintf(file,"  ;; Animated tiles\n");
     fprintf(file,"  'animations (list #( ) )\n");
