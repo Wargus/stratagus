@@ -667,6 +667,7 @@ global void EditorDestroyAllUnits()
     Unit* unit=Units[i];
     RemoveUnit( unit ); 
     UnitLost( unit ); 
+    UnitClearOrders( unit );
     ReleaseUnit( unit ); 
     }
 }

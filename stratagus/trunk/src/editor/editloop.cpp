@@ -1326,6 +1326,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		RemoveUnit(unit = UnitUnderCursor);
 		UnitLost(unit);
+		UnitClearOrders(unit);
 		ReleaseUnit(unit);
 		SetStatusLine("Unit deleted");
 	    }
