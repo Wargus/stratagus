@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML><HEAD>
 <!--
-----	(c) Copyright 2001 by Lutz Sammer
+----	(c) Copyright 2002 by Lutz Sammer
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 2002 by The FreeCraft Project. Distributed under the
 <A HREF="../gpl.html">"GNU General Public License"</A></B>
 <HR>
 <A HREF="../freecraft.html">FreeCraft</A> 
@@ -42,14 +42,87 @@
 <A HREF="tileset.html">PREV</A> 
 <A HREF="unittype.html">NEXT</A> 
 <HR>
-<A HREF="#define-icon-wc-names">define-icon-wc-names</A>
 <A HREF="#define-icon">define-icon</A>
 <A HREF="#define-icon-alias">define-icon-alias</A>
+<A HREF="#define-icon-wc-names">define-icon-wc-names</A>
 <HR>
 <H2>Intro - Introduction to icon functions and variables</H2>
 
 Everything around the C icon structure.
 <H2>Functions</H2>
+<A NAME="define-icon"></A>
+<H3>define-icon</H3>
+
+<H4>Description</H4>
+
+    Define an icon for the engine.<P>
+
+    This could also be defined in own levels. <P>
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon ident tileset type index file)</CODE>
+
+<DL>
+<DT>ident</DT>
+<DD>The name of the icon.
+</DD>
+<DT>tileset</DT>
+<DD>The name of the tileset.
+</DD>
+<DT>type</DT>
+<DD>'normal
+</DD>
+<DT>index</DT>
+<DD>The index into the graphic file.
+</DD>
+<DT>file</DT>
+<DD>The filename of the graphic file containing the graphics.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define summer-icons-file "tilesets/summer/icons.png")
+    (define-icon 'icon-peasant 'tileset-summer 'normal 0 summer-icons-file)
+</PRE>
+
+Define the peasant icon referenced with icon-peasant for the summer tileset.
+It is a normal static icon.  The graphic is loaded from summer-icons-file
+while is defined to be the file "tilesets/summer/icons.png" and is the 
+first icon in this file.
+
+<A NAME="define-icon-alias"></A>
+<H3>define-icon-alias</H3>
+
+<H4>Description</H4>
+
+    Define an icon alias for an icon.<P>
+    This is an alternative name for the icon.
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon-alias alias icon)</CODE>
+
+<DL>
+<DT>alias</DT>
+<DD>The new alias name.
+</DD>
+<DT>icon</DT>
+<DD>An already existing icon name.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-icon-alias 'icon-raise-dead 'icon-skeleton)
+</PRE>
+
+Now it is possible to get the icon "skeleton" also with the name
+"icon-raise-dead".
+
 <A NAME="define-icon-wc-names"></A>
 <H3>define-icon-wc-names</H3>
 
@@ -86,81 +159,6 @@ number are icons defined.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
-
-<A NAME="define-icon"></A>
-<H3>define-icon</H3>
-
-<H4>Description</H4>
-
-    Define an icon for the engine.<P>
-
-    This could also be defined in own levels. <P>
-
-<H4>Syntax</H4>
-
-<CODE>(define-icon ident tileset type argument file)</CODE>
-
-FIXME:
-
-<DL>
-<DT>ident</DT>
-<DD>
-</DD>
-<DT>tileset</DT>
-<DD>
-</DD>
-<DT>type</DT>
-<DD>
-</DD>
-<DT>argument</DT>
-<DD>
-</DD>
-<DT>file</DT>
-<DD>
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (define-icon 'icon-peasant 'tileset-summer 'normal 0 "icons (summer).png")
-</PRE>
-
-Define the peasant icon referenced with icon-peasant for the summer tileset.
-It is a normal static icon.  The graphic is loaded from the file
-"icons (summer).png" and is the first icon in this file.
-
-<A NAME="define-icon-alias"></A>
-<H3>define-icon-alias</H3>
-
-<H4>Description</H4>
-
-    Define an icon alias for an icon.<P>
-    This is an alternative name for the icon.
-
-<H4>Syntax</H4>
-
-<CODE>(define-icon-alias alias icon)</CODE>
-
-FIXME:
-
-<DL>
-<DT>ident</DT>
-<DD>
-</DD>
-<DT>tileset</DT>
-<DD>
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-    (define-icon-alias 'icon-raise-dead 'icon-skeleton)
-</PRE>
-
-Now it is possible to get the icon "skeleton" also with the name
-"icon-raise-dead".
 
 <HR>
 Last changed: $Id$<BR>
