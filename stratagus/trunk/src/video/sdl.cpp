@@ -271,8 +271,8 @@ global void InitVideoSdl(void)
 global void InvalidateArea(int x, int y, int w, int h)
 {
 #ifndef USE_OPENGL
-	DebugCheck(NumRects == sizeof(Rects) / sizeof(*Rects));
-	DebugCheck(x < 0 || y < 0 || x + w > VideoWidth || y + h > VideoHeight);
+	Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
+	Assert(x >= 0 && y >= 0 && x + w <= VideoWidth && y + h <= VideoHeight);
 	Rects[NumRects].x = x;
 	Rects[NumRects].y = y;
 	Rects[NumRects].w = w;

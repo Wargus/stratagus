@@ -365,7 +365,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 			}
 		}
 
-		DebugCheck(*text < 32);
+		Assert(*text >= 32);
 
 		if (*text - 32 >= 0 && height * (*text - 32) < fp->Graphic->Height) {
 			w = fp->CharWidth[*text - 32];

@@ -1402,8 +1402,8 @@ global void VideoDrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 	//        direction vector might be slightly off. Somehow, the sub-pixel
 	//        position(s) on the clipped retangle should be denoted to the line
 	//        drawing routine..
-	DebugCheck(x1 < ClipX1 || x2 < ClipX1 || x1 > ClipX2 || x2 > ClipX2 ||
-		y1 < ClipY1 || y2 < ClipY1 || y1 > ClipY2 || y2 > ClipY2);
+	Assert(x1 >= ClipX1 && x2 >= ClipX1 && x1 <= ClipX2 && x2 <= ClipX2 &&
+		y1 >= ClipY1 && y2 >= ClipY1 && y1 <= ClipY2 && y2 <= ClipY2);
 	VideoDrawLine(color, x1, y1, x2, y2);
 }
 
@@ -1604,13 +1604,13 @@ global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 			VideoDrawPixelClip(color, x + cy, y);
 			VideoDrawPixelClip(color, x - cy, y);
 		} else if (cx == cy) {
-			DebugCheck(cx == 0 || cy == 0);
+			Assert(cx != 0 && cy != 0);
 			VideoDrawPixelClip(color, x + cx, y + cy);
 			VideoDrawPixelClip(color, x - cx, y + cy);
 			VideoDrawPixelClip(color, x + cx, y - cy);
 			VideoDrawPixelClip(color, x - cx, y - cy);
 		} else if (cx < cy) {
-			DebugCheck(cx == 0 || cy == 0);
+			Assert(cx != 0 && cy != 0);
 			VideoDrawPixelClip(color, x + cx, y + cy);
 			VideoDrawPixelClip(color, x + cx, y - cy);
 			VideoDrawPixelClip(color, x + cy, y + cx);
