@@ -297,13 +297,8 @@ typedef struct _world_map_ {
 	Tileset* Tileset; /// tileset data
 
 	unsigned TileCount; /// how many tiles,
-#ifdef USE_SDL_SURFACE
 	/// == TileGraphic->NFrames
 	Graphic* TileGraphic; /// graphic for all the tiles
-#else
-	unsigned char** Tiles;      /// pointer to tile data
-	Graphic*        TileData;   /// tiles graphic for map
-#endif
 
 	char Description[32];/// map description short
 
@@ -317,17 +312,9 @@ typedef struct _world_map_ {
 extern WorldMap TheMap;  /// The current map
 
 	/// Fast draw tile, display and video mode independ
-#ifdef USE_SDL_SURFACE
 extern void VideoDrawTile(const int, int, int);
-#else
-extern void (*VideoDrawTile)(const unsigned char*, int, int);
-#endif
 	/// Draws tiles display and video mode independ
-#ifdef USE_SDL_SURFACE
 extern void MapDrawTile(int, int, int);
-#else
-extern void (*MapDrawTile)(int, int, int);
-#endif
 	/// Vision Table to see where to locate goals and vision
 extern unsigned char *VisionTable[3];
 	/// Companion table for fast lookups

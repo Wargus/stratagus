@@ -125,11 +125,7 @@ global void LoadTileset(void)
 	buf = alloca(strlen(Tilesets[i]->ImageFile) + 9 + 1);
 	strcat(strcpy(buf, "graphics/"), Tilesets[i]->ImageFile);
 	ShowLoadProgress("Tileset `%s'", Tilesets[i]->ImageFile);
-#ifdef USE_SDL_SURFACE
 	TheMap.TileGraphic = LoadGraphic(buf);
-#else
-	TheMap.TileData = LoadGraphic(buf);
-#endif
 #ifdef USE_OPENGL
 	MakeTexture(TheMap.TileGraphic, TheMap.TileGraphic->Width, TheMap.TileGraphic->Height);
 #endif
@@ -140,17 +136,10 @@ global void LoadTileset(void)
 	//
 	//  Calculate number of tiles in graphic tile
 	//
-#ifdef USE_SDL_SURFACE
 	tiles_per_row = TheMap.TileGraphic->Width / TileSizeX;
 
 	TheMap.TileCount = n =
 		tiles_per_row * (TheMap.TileGraphic->Height / TileSizeY);
-#else
-	tiles_per_row = TheMap.TileData->Width / TileSizeX;
-
-	TheMap.TileCount = n =
-		tiles_per_row * (TheMap.TileData->Height / TileSizeY);
-#endif
 	DebugLevel2Fn(" %d Tiles in file %s, %d per row\n" _C_ TheMap.
 		TileCount _C_ TheMap.Tileset->ImageFile _C_ tiles_per_row);
 
@@ -164,48 +153,6 @@ global void LoadTileset(void)
 	//  Precalculate the graphic starts of the tiles
 	//
 	data = malloc(n * TileSizeX * TileSizeY);
-#ifndef USE_SDL_SURFACE
-	TheMap.Tiles = malloc(n * sizeof(*TheMap.Tiles));
-
-	for (i = 0; i < n; ++i) {
-		TheMap.Tiles[i] = data + i * TileSizeX * TileSizeY;
-	}
-
-	//
-	//  Convert the graphic data into faster format
-	//
-	for (tile = 0; tile < n; ++tile) {
-		unsigned char* s;
-		unsigned char* d;
-
-		s = (char *)TheMap.TileData->Frames +
-			(tile % tiles_per_row) * TileSizeX +
-			(tile / tiles_per_row) * TileSizeY * TheMap.TileData->Width;
-		d = TheMap.Tiles[tile];
-		DebugCheck(d != data + tile * TileSizeX * TileSizeY);
-		for (i = 0; i < TileSizeY; ++i) {
-			memcpy(d, s, TileSizeX * sizeof(unsigned char));
-			d += TileSizeX;
-			s += TheMap.TileData->Width;
-		}
-	}
-#endif
-
-#ifndef USE_OPENGL
-#ifdef USE_SDL_SURFACE
-/*
-	free(TheMap.TileGraphic->Frames);		// release old memory
-	TheMap.TileGraphic->Frames = data;
-	TheMap.TileGraphic->Width = TileSizeX;
-	TheMap.TileGraphic->Height = TileSizeY * n;
-*/
-#else
-	free(TheMap.TileData->Frames);		// release old memory
-	TheMap.TileData->Frames = data;
-	TheMap.TileData->Width = TileSizeX;
-	TheMap.TileData->Height = TileSizeY * n;
-#endif
-#endif
 
 	//
 	//  Build the TileTypeTable
@@ -805,15 +752,8 @@ global void CleanTilesets(void)
 	//
 	//		Should this be done by the map?
 	//
-#ifdef USE_SDL_SURFACE
 	VideoSafeFree(TheMap.TileGraphic);
 	TheMap.TileGraphic = NULL;
-#else
-	VideoSafeFree(TheMap.TileData);
-	TheMap.TileData = NULL;
-	free(TheMap.Tiles);
-	TheMap.Tiles = NULL;
-#endif
 
 	//
 	//		Mapping the original tileset numbers in puds to our internal strings

@@ -424,9 +424,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	InitMap();         // setup draw functions
 	InitMapFogOfWar(); // build tables for fog of war
 	PreprocessMap();   // Adjust map for use
-#ifndef USE_SDL_SURFACE
-	MapColorCycle();   // Setup color cycle
-#endif
 
 	InitUserInterface(ThisPlayer->RaceName); // Setup the user interface
 	LoadUserInterface(); // Load the user interface grafics
@@ -533,13 +530,7 @@ global void CreateGame(char* filename, WorldMap* map)
 
 	CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 	DestroyCursorBackground();
-#ifdef USE_SDL_SURFACE
 	VideoClearScreen();
-#else
-	VideoLockScreen();
-	VideoClearScreen();
-	VideoUnlockScreen();
-#endif
 }
 
 /**

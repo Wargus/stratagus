@@ -54,16 +54,10 @@ global PaletteLink* PaletteList;		/// List of all used palettes.
 --		Variables
 ----------------------------------------------------------------------------*/
 
-#ifndef USE_SDL_SURFACE
-local GraphicType GraphicImage8Type;		/// image type 8bit palette
-local GraphicType GraphicImage16Type;		/// image type 16bit palette
-#endif
-
 /*----------------------------------------------------------------------------
 --		Local functions
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_SDL_SURFACE
 /**
 **		Video draw part of graphic.
 **
@@ -185,260 +179,9 @@ global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 	VideoDrawSubFaded(graphic, gx, gy, w, h, x, y, fade);
 }
 
-#else
-/**
-**		Video draw part of 8bit graphic into 8 bit framebuffer.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to8(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	VMemType8* dp;
-	const VMemType8* pixels;
-	int sa;
-	int da;
-
-	pixels = graphic->Pixels;
-	sp = (const unsigned char*)graphic->Frames + gx + gy * graphic->Width;
-	gp = sp + graphic->Width * h;
-	sa = graphic->Width - w;
-	dp = VideoMemory8 + x + y * VideoWidth;
-	da = VideoWidth - w--;
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {
-			*dp++ = pixels[*sp++];		// unroll
-			*dp++ = pixels[*sp++];
-		}
-		if (sp <= lp) {
-			*dp++ = pixels[*sp++];
-		}
-		sp += sa;
-		dp += da;
-	}
-}
-
-/**
-**		Video draw part of 8bit graphic into 16 bit framebuffer.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to16(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x,int y)
-{
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	int sa;
-	const VMemType16* pixels;
-	VMemType16* dp;
-	int da;
-
-	pixels = (VMemType16*)graphic->Pixels;
-	sp = (const unsigned char*)graphic->Frames + gx + gy * graphic->Width;
-	gp = sp + graphic->Width * h;
-	sa = graphic->Width - w;
-	dp = VideoMemory16 + x + y * VideoWidth;
-	da = VideoWidth - w--;
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {
-			*dp++ = pixels[*sp++];		// unroll
-			*dp++ = pixels[*sp++];
-		}
-		if (sp <= lp) {
-			*dp++ = pixels[*sp++];
-		}
-		sp += sa;
-		dp += da;
-	}
-}
-
-/**
-**		Video draw part of 8bit graphic into 24 bit framebuffer.
-**
-**		FIXME: 24 bit blitting could be optimized.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to24(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	int sa;
-	const VMemType24* pixels;
-	VMemType24* dp;
-	int da;
-
-	pixels = (VMemType24*)graphic->Pixels;
-	sp = (const unsigned char*)graphic->Frames + gx + gy * graphic->Width;
-	gp = sp + graphic->Width * h;
-	sa = graphic->Width - w;
-	dp = VideoMemory24 + x + y * VideoWidth;
-	da = VideoWidth - w--;
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {
-			*dp++ = pixels[*sp++];		// unroll
-			*dp++ = pixels[*sp++];
-		}
-		if (sp <= lp) {
-			*dp++ = pixels[*sp++];
-		}
-		sp += sa;
-		dp += da;
-	}
-}
-
-/**
-**		Video draw part of 8bit graphic into 32 bit framebuffer.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to32(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	int sa;
-	const VMemType32* pixels;
-	VMemType32* dp;
-	int da;
-
-	pixels = (VMemType32*)graphic->Pixels;
-	sp = (const unsigned char*)graphic->Frames + gx + gy * graphic->Width;
-	gp = sp + graphic->Width * h;
-	sa = graphic->Width - w;
-	dp = VideoMemory32 + x + y * VideoWidth;
-	da = VideoWidth - w--;
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {
-			*dp++ = pixels[*sp++];		// unroll
-			*dp++ = pixels[*sp++];
-		}
-		if (sp <= lp) {
-			*dp++ = pixels[*sp++];
-		}
-		sp += sa;
-		dp += da;
-	}
-}
-#endif
-
-#ifndef USE_SDL_SURFACE
-/**
-**		Video draw part of 8bit graphic clipped into 8 bit framebuffer.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to8Clip(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub8to8(graphic, gx, gy, w, h, x, y);
-}
-
-/**
-**		Video draw part of 8bit graphic clipped into 16 bit framebuffer.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to16Clip(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub8to16(graphic, gx, gy, w, h, x, y);
-}
-
-/**
-**		Video draw part of 8bit graphic clipped into 24 bit framebuffer.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to24Clip(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub8to24(graphic, gx, gy, w, h, x, y);
-}
-
-/**
-**		Video draw part of 8bit graphic clipped into 32 bit framebuffer.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-*/
-local void VideoDrawSub8to32Clip(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub8to32(graphic, gx, gy, w, h, x, y);
-}
-#endif
-
 /**
 **		Free graphic object.
 */
-#ifdef USE_SDL_SURFACE
 global void VideoFree(Graphic* graphic)
 {
 #ifdef DEBUG
@@ -466,7 +209,8 @@ global void VideoFree(Graphic* graphic)
 	}
 	free(graphic);
 }
-#else
+
+#if 0
 local void FreeGraphic8(Graphic* graphic)
 {
 #ifdef DEBUG
@@ -490,31 +234,9 @@ local void FreeGraphic8(Graphic* graphic)
 }
 #endif
 
-
 /*----------------------------------------------------------------------------
 --		Global functions
 ----------------------------------------------------------------------------*/
-
-#ifndef USE_SDL_SURFACE
-/**
-**		Video draw part of a graphic clipped and faded.
-**
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
-**		@param fade		Amount faded, from 0 (black) to 255 (no fading)
-*/
-global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade)
-{
-	VideoDrawSubClip(graphic, gx, gy, w, h, x, y);
-	VideoFillTransRectangle(ColorBlack, x, y, w, h, fade);
-}
-#endif
 
 /**
 **		Make a graphic object.
@@ -541,34 +263,15 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-#ifndef USE_SDL_SURFACE
-	if (depth == 8) {
-		graphic->Type = &GraphicImage8Type;
-	} else if (depth == 16) {
-		graphic->Type = &GraphicImage16Type;
-	} else {
-		fprintf(stderr, "Unsported image depth\n");
-		ExitFatal(-1);
-	}
-#endif
 	graphic->Width = width;
 	graphic->Height = height;
 
-#ifdef USE_SDL_SURFACE
 	// FIXME: endian
 
 	graphic->Surface = SDL_CreateRGBSurfaceFrom(data, width, height, depth, width * depth / 8,
 		0, 0, 0, 0);
 	graphic->SurfaceFlip = NULL;
 	graphic->NumFrames = 0;
-#else
-	graphic->Pixels = NULL;
-	graphic->Palette = NULL;
-
-	graphic->NumFrames = 0;
-	graphic->Frames = data;
-	graphic->Size = size;
-#endif
 
 #ifdef USE_OPENGL
 	graphic->NumTextureNames = 0;
@@ -577,7 +280,6 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 	return graphic;
 }
 
-#ifdef USE_SDL_SURFACE
 /**
 **  Flip graphic and store in graphic->SurfaceFlip
 **
@@ -606,7 +308,6 @@ global void FlipGraphic(Graphic* graphic)
 	}
 	SDL_UnlockSurface(s);
 }
-#endif
 
 /**
 **		Make a new graphic object.
@@ -812,7 +513,6 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 	unsigned char* data;
 	int x;
 
-#ifdef USE_SDL_SURFACE
 	SDL_Color pal[256];
 
 	DebugCheck(g->Surface->format->BytesPerPixel != 1);
@@ -821,12 +521,6 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 	}
 
 	SDL_LockSurface(g->Surface);
-#else
-	DebugCheck(g->Type != &GraphicImage8Type);
-	if (g->Width == w && g->Height == h) {
-		return;
-	}
-#endif
 
 	data = (unsigned char*)malloc(w * h);
 #ifdef DEBUG
@@ -836,18 +530,12 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 
 	for (i = 0; i < h; ++i) {
 		for (j = 0; j < w; ++j) {
-#ifdef USE_SDL_SURFACE
 			data[x] = ((unsigned char*)g->Surface->pixels)[
 				(i * g->Height / h) * g->Surface->pitch + j * g->Width / w];
-#else
-			data[x] = ((unsigned char*)g->Frames)[
-				(i * g->Height / h) * g->Width + j * g->Width / w];
-#endif
 			++x;
 		}
 	}
 
-#ifdef USE_SDL_SURFACE
 	SDL_UnlockSurface(g->Surface);
 	memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
 	VideoPaletteListRemove(g->Surface);
@@ -860,15 +548,6 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 
 	g->Width = w;
 	g->Height = h;
-#else
-	free(g->Frames);
-#ifdef DEBUG
-	AllocatedGraphicMemory -= g->Width * g->Height;
-#endif
-	g->Frames = data;
-	g->Width = w;
-	g->Height = h;
-#endif
 }
 
 /**
@@ -892,12 +571,8 @@ global Graphic* LoadGraphic(const char* name)
 		ExitFatal(-1);
 	}
 
-#ifdef USE_SDL_SURFACE
 	graphic->NumFrames = 1;
 	VideoPaletteListAdd(graphic->Surface);
-#else
-	graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
-#endif
 
 	return graphic;
 }
@@ -907,40 +582,6 @@ global Graphic* LoadGraphic(const char* name)
 */
 global void InitGraphic(void)
 {
-#ifndef USE_SDL_SURFACE
-#ifdef USE_OPENGL
-	GraphicImage8Type.DrawSub = VideoDrawSubOpenGL;
-	GraphicImage8Type.DrawSubClip = VideoDrawSubOpenGLClip;
-#else
-	switch (VideoBpp) {
-		case 8:
-			GraphicImage8Type.DrawSub = VideoDrawSub8to8;
-			GraphicImage8Type.DrawSubClip = VideoDrawSub8to8Clip;
-			break;
-
-		case 15:
-		case 16:
-			GraphicImage8Type.DrawSub = VideoDrawSub8to16;
-			GraphicImage8Type.DrawSubClip = VideoDrawSub8to16Clip;
-			break;
-
-		case 24:
-			GraphicImage8Type.DrawSub = VideoDrawSub8to24;
-			GraphicImage8Type.DrawSubClip = VideoDrawSub8to24Clip;
-			break;
-
-		case 32:
-			GraphicImage8Type.DrawSub = VideoDrawSub8to32;
-			GraphicImage8Type.DrawSubClip = VideoDrawSub8to32Clip;
-			break;
-
-		default:
-			DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
-			abort();
-	}
-#endif
-	GraphicImage8Type.Free = FreeGraphic8;
-#endif
 }
 
 //@}

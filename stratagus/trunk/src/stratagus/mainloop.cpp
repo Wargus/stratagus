@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name mainloop.c	-	The main game loop. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -494,11 +494,7 @@ global void DrawMapArea(void)
 	//		Separate the viewports and mark the active viewport.
 	//
 	for (vp = TheUI.Viewports; vp < evp; ++vp) {
-#ifdef USE_SDL_SURFACE
 		Uint32 color;
-#else
-		VMemType color;
-#endif
 
 		if (vp == TheUI.SelectedViewport) {
 			color = ColorOrange;
@@ -526,10 +522,6 @@ global void DrawMapArea(void)
 global void UpdateDisplay(void)
 {
 	MustRedraw &= EnableRedraw;				// Don't redraw disabled parts
-
-#ifndef USE_SDL_SURFACE
-	VideoLockScreen();						// prepare video write
-#endif
 
 	HideAnyCursor();						// remove cursor (when available)
 
@@ -626,10 +618,6 @@ global void UpdateDisplay(void)
 	}
 
 	DrawAnyCursor();
-
-#ifndef USE_SDL_SURFACE
-	VideoUnlockScreen();				// End write access
-#endif
 
 	//
 	//		Update changes to display.
