@@ -37,6 +37,8 @@
 **	In the future it is planned to support animated and not rectangular
 **	icons and icons of different sizes.
 **
+**	The icon structure members:
+**
 **	Icon::Ident
 **
 **		Unique identifier of the icon, used to reference it in config
