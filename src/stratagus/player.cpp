@@ -886,44 +886,44 @@ void DebugPlayers(void)
 {
 #ifdef DEBUG
 	int i;
-	int k;
 	const char* colors[16] = {
 		"red", "blue", "green", "violet", "orange", "black", "white", "yellow",
 		"yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow",
 		"yellow"
 	};
+	const char* playertype;
+	const char* playerainum;
 
-	DebugPrint("Nr   Color   I Name  Type  Race Ai\n");
+	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -- ---\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (Players[i].Type == PlayerNobody) {
 			continue;
 		}
-		DebugPrint("%2d: %8.8s %c %-8.8s " _C_ i _C_ colors[i] _C_
+		switch (Players[i].Type) {
+			case 0: playertype = "Don't know 0"; break;
+			case 1: playertype = "Don't know 1"; break;
+			case 2: playertype = "neutral     "; break;
+			case 3: playertype = "nobody      "; break;
+			case 4: playertype = "computer    "; break;
+			case 5: playertype = "person      "; break;
+			case 6: playertype = "rescue pas. "; break;
+			case 7: playertype = "rescue akt. "; break;
+			default : playertype = "?unknown?   "; break;
+		}
+		switch (Players[i].AiNum) {
+			case PlayerAiLand: playerainum = "(land)"; break;
+			case PlayerAiPassive: playerainum = "(passive)"; break;
+			case PlayerAiAir: playerainum = "(air)"; break;
+			case PlayerAiSea: playerainum = "(sea)"; break;
+			default: playerainum = "?unknown?"; break;
+		}
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %2d %s\n" _C_ i _C_ colors[i] _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
-			Players[i].Name);
-		switch (Players[i].Type) {
-			case 0: DebugPrint("Don't know 0 "); break;
-			case 1: DebugPrint("Don't know 1 "); break;
-			case 2: DebugPrint("neutral   "); break;
-			case 3: DebugPrint("nobody    "); break;
-			case 4: DebugPrint("computer  "); break;
-			case 5: DebugPrint("person    "); break;
-			case 6: DebugPrint("rescue pas.  "); break;
-			case 7: DebugPrint("rescue akt.  "); break;
-		}
-		k = PlayerRacesIndex(Players[i].Race);
-		DebugPrint("%9s" _C_ PlayerRaces.Name[k]);
-		DebugPrint("%2d " _C_ Players[i].AiNum);
-		switch (Players[i].AiNum) {
-			case PlayerAiLand: DebugPrint("(land)"); break;
-			case PlayerAiPassive: DebugPrint("(passive)"); break;
-			case PlayerAiAir: DebugPrint("(air)"); break;
-			case PlayerAiSea: DebugPrint("(sea)"); break;
-			default: DebugPrint("?unknown?"); break;
-		}
-		DebugPrint("\n");
+			Players[i].Name _C_ playertype _C_
+			PlayerRaces.Name[PlayerRacesIndex(Players[i].Race)] _C_
+			Players[i].AiNum _C_ playerainum);
 	}
 #endif
 }
