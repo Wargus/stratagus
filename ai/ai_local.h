@@ -9,11 +9,20 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ai_local.h	-	The local AI header file. */
-/*
-**      (c) Copyright 2000 by Lutz Sammer
-**
-**      $Id$
-*/
+//
+//      (c) Copyright 2000,2001 by Lutz Sammer and Antonis Chaniotis.
+//
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
+//      $Id$
 
 #ifndef __AI_LOCAL_H__
 #define __AI_LOCAL_H__
@@ -35,7 +44,7 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-#if 0
+#if 0	// {
 
 /**
 **	Ai Script commands.
@@ -97,7 +106,7 @@ struct _ai_goal_ {
     AiScript**	Sp;			/// Ai script stack pointer
     AiScript**	Stack;			/// Ai script stack
 
-#endif	// --------------------------------------------------------------------
+#endif	// }-------------------------------------------------------------------
 
 /**
 **	Ai Type typedef.
@@ -233,7 +242,9 @@ typedef struct _player_ai_ {
     AiBuildQueue*	UnitTypeBuilded;
 
 	/// Last building checked for repair in this turn
-    int		LastRepairBuilding;
+    int			LastRepairBuilding;
+	/// Number of workers that unsuccessfully tried to repair a building
+    unsigned		TriedRepairWorkers[UnitMax];
 
 } PlayerAi;
 

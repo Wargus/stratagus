@@ -10,7 +10,7 @@
 //
 /**@name ai_resource.c	-	AI resource manager. */
 //
-//      (c) Copyright 2000,2001 by Lutz Sammer
+//      (c) Copyright 2000,2001 by Lutz Sammer and Antonis Chaniotis.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1062,10 +1062,14 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     Unit* unit;
     Unit* unit_temp;
     int distance[UnitMax];
-    int rX,rY,r_temp;
-    int j,index_temp;
+    int rX;
+    int rY;
+    int r_temp;
+    int index_temp;
     int nunits;
     int i;
+    int j;
+    int k;
     int num;
 
     DebugLevel2Fn("%s can repair %s\n" _C_ type->Ident _C_
@@ -1074,6 +1078,9 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     IfDebug( unit=NoUnitP; );
     //
     //  Remove all workers not mining. //on the way building something
+    //  Idea: Antonis: Put the rest of the workers in a table in case
+    //  miners can't reach but others can. This will be useful if AI becomes
+    //  more flexible (e.g.: transports workers to an island)
     //	FIXME: too hardcoded, not nice, needs improvement.
     //
 
@@ -1119,12 +1126,13 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
 	}
     }
 
-    // Check if building is reachable
-    // FIXME: Antonis: To reduce slowdowns I limit checked workers to 3 in the
-    // hope that closest workers have more possibilities to reach. Works well,
-    // but flood fill will be better. Flood fill will not need the above sorting
-    // loops and it will stop as soon as the building is unreachable.
-    for( i=0; i<num && i<3; ++i ) {
+    // Check if building is reachable and try next trio of workers
+
+    if ( (j=AiPlayer->TriedRepairWorkers[UnitNumber(building)]) > num) {
+	j=AiPlayer->TriedRepairWorkers[UnitNumber(building)]=0;
+    }
+
+    for( k=i=j; i<num && i<j+3; ++i ) {
 
 	unit=table[i];
 	DebugLevel2Fn("Have an unit to repair %d :)\n" _C_ UnitNumber(unit));
@@ -1133,8 +1141,9 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
 	    CommandRepair(unit, 0, 0, building,FlushCommands);
 	    return 1;
 	}
+	k=i;
     }
-
+    AiPlayer->TriedRepairWorkers[UnitNumber(building)]=k+1;
     return 0;
 }
 
