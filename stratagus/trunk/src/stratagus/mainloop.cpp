@@ -847,7 +847,9 @@ global void GameMainLoop(void)
 	    // XFlush
 	    //
 	    RealizeVideoMemory();
+#ifndef USE_OPENGL
 	    MustRedraw=0;
+#endif
 	}
 
 	CheckVideoInterrupts();		// look if already an interrupt

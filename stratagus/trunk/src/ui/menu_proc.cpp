@@ -1636,7 +1636,9 @@ global void ProcessMenu(const char *menu_id, int loop)
     MenuButtonUnderCursor = -1;
     if (loop) {
 	SetVideoSync();
+#ifndef USE_OPENGL
 	MustRedraw = 0;
+#endif
 	MenuHandleMouseMove(CursorX,CursorY);	// This activates buttons as appropriate!
 	MustRedraw |= RedrawCursor;
     }
