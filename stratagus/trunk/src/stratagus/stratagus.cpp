@@ -192,6 +192,12 @@ extern int optind;
 extern int getopt(int argc, char* const* argv, const char* opt);
 #endif
 
+#ifdef MAC_BUNDLE
+#define Button ButtonOSX
+#include <Carbon/Carbon.h>
+#undef Button
+#endif
+
 #ifdef USE_SDL
 #include "SDL.h"
 #endif
@@ -968,9 +974,23 @@ global int main(int argc, char** argv)
 	//
 	//  Setup some defaults.
 	//
-//#ifndef __APPLE__
-//	StratagusLibPath = STRATAGUS_LIB_PATH;
-//#endif
+#ifndef MAC_BUNDLE
+	StratagusLibPath = STRATAGUS_LIB_PATH;
+#else
+	freopen("/tmp/stdout.txt", "w", stdout);
+	freopen("/tmp/stderr.txt", "w", stderr);
+	// Look for the specified data set inside the application bundle
+	// This should be a subdir of the Resources directory
+	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
+		CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
+	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,
+		 kCFURLPOSIXPathStyle);
+	const char* pathPtr = CFStringGetCStringPtr(macPath, 
+		CFStringGetSystemEncoding());
+	assert(pathPtr);
+	StratagusLibPath = malloc(strlen(pathPtr) + 1);
+	strcpy(StratagusLibPath, pathPtr);
+#endif
 	CclStartFile = "scripts/stratagus.lua";
 	EditorStartFile = "scripts/editor.lua";
 
