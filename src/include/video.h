@@ -230,6 +230,8 @@ extern int LoadGraphicPNG(Graphic* g);
 extern Mng* LoadMNG(const char* name);
 	/// Display a MNG file
 extern void DisplayMNG(Mng* mng, int x, int y);
+	/// Reset a MNG file
+extern void ResetMNG(Mng* mng);
 	/// Free a MNG file
 extern void FreeMNG(Mng* mng);
 #endif

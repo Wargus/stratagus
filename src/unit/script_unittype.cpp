@@ -392,6 +392,21 @@ static int CclDefineUnitType(lua_State* l)
 			}
 			type->Icon.Name = strdup(LuaToString(l, -1));
 			type->Icon.Icon = NULL;
+#ifdef USE_MNG
+		} else if (!strcmp(value, "Portrait")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = luaL_getn(l, -1);
+			type->Portrait.Num = subargs;
+			type->Portrait.Files = malloc(type->Portrait.Num * sizeof(*type->Portrait.Files));
+			type->Portrait.Mngs = calloc(type->Portrait.Num, sizeof(*type->Portrait.Mngs));
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				type->Portrait.Files[k] = strdup(LuaToString(l, -1));
+				lua_pop(l, 1);
+			}
+#endif
 		} else if (!strcmp(value, "Costs")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

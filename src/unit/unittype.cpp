@@ -497,7 +497,7 @@ void LoadUnitTypeSprite(UnitType* type)
 {
 	const char* file;
 	ResourceInfo* resinfo;
-	int res;
+	int i;
 
 	if (type->ShadowFile) {
 		type->ShadowSprite = NewGraphic(type->ShadowFile, type->ShadowWidth,
@@ -510,8 +510,8 @@ void LoadUnitTypeSprite(UnitType* type)
 	}
 
 	if (type->Harvester) {
-		for (res = 0; res < MaxCosts; ++res) {
-			if ((resinfo = type->ResInfo[res])) {
+		for (i = 0; i < MaxCosts; ++i) {
+			if ((resinfo = type->ResInfo[i])) {
 				if (resinfo->FileWhenLoaded) {
 					resinfo->SpriteWhenLoaded = NewGraphic(resinfo->FileWhenLoaded,
 						type->Width, type->Height);
@@ -543,6 +543,17 @@ void LoadUnitTypeSprite(UnitType* type)
 			FlipGraphic(type->Sprite);
 		}
 	}
+
+#ifdef USE_MNG
+	if (type->Portrait.Num) {
+		for (i = 0; i < type->Portrait.Num; ++i) {
+			type->Portrait.Mngs[i] = LoadMNG(type->Portrait.Files[i]);
+		}
+		// FIXME: should be configurable
+		type->Portrait.CurrMng = 0;
+		type->Portrait.NumIterations = SyncRand() % 16 + 1;
+	}
+#endif
 }
 
 /**
@@ -791,6 +802,16 @@ void CleanUnitTypes(void)
 		}
 
 		FreeGraphic(type->Sprite);
+#ifdef USE_MNG
+		if (type->Portrait.Num) {
+			for (j = 0; j < type->Portrait.Num; ++j) {
+				FreeMNG(type->Portrait.Mngs[j]);
+				free(type->Portrait.Files[j]);
+			}
+			free(type->Portrait.Mngs);
+			free(type->Portrait.Files);
+		}
+#endif
 
 		free(UnitTypes[i]);
 		UnitTypes[i] = 0;
