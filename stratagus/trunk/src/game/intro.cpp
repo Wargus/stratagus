@@ -672,7 +672,7 @@ global void ShowCredits(Credits *credits)
 /**
 **	Draw text
 */
-local void DrawText(CampaignChapter* chapter,ChapterTextLines* chlines)
+local void PictureDrawText(CampaignChapter* chapter,ChapterTextLines* chlines)
 {
     ChapterPictureText* text;
     TextLines* lines;
@@ -762,7 +762,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	    (VideoWidth-background->Width)/2,
 	    (VideoHeight-background->Height)/2,
 	    255*i/max);
-	DrawText(chapter,lines);
+	PictureDrawText(chapter,lines);
 	VideoUnlockScreen();
 
 	Invalidate();
@@ -784,7 +784,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	    background->Width,background->Height,
 	    (VideoWidth-background->Width)/2,
 	    (VideoHeight-background->Height)/2);
-	DrawText(chapter,lines);
+	PictureDrawText(chapter,lines);
 	VideoUnlockScreen();
 
 	Invalidate();
@@ -805,7 +805,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	    (VideoWidth-background->Width)/2,
 	    (VideoHeight-background->Height)/2,
 	    255*i/max);
-	DrawText(chapter,lines);
+	PictureDrawText(chapter,lines);
 	VideoUnlockScreen();
 
 	Invalidate();
