@@ -42,17 +42,18 @@
 
 #include "stratagus.h"
 
-#include "video.h"
 #include "unit.h"
-#include "commands.h"
-#include "depend.h"
+#include "unittype.h"
+#include "upgrade.h"
 #include "interface.h"
 #include "ui.h"
-#include "map.h"
-#include "font.h"
+#include "player.h"
 #include "spells.h"
 #include "menus.h"
+#include "depend.h"
 #include "sound.h"
+#include "map.h"
+#include "commands.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

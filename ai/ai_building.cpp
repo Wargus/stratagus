@@ -39,6 +39,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unittype.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "ai_local.h"

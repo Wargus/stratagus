@@ -45,6 +45,7 @@
 #include "avi.h"
 #include "movie.h"
 #include "iocompat.h"
+#include "iolib.h"
 
 #include "vfw_PB_Interface.h"
 #include "pbdll.h"

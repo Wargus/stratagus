@@ -41,6 +41,7 @@
 
 #include "stratagus.h"
 #include "unittype.h"
+#include "upgrade.h"
 #include "script.h"
 #include "ai.h"
 #include "pathfinder.h"

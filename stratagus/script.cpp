@@ -43,7 +43,8 @@
 #include "stratagus.h"
 
 #include "iocompat.h"
-
+#include "unit.h"
+#include "unittype.h"
 #include "iolib.h"
 #include "script.h"
 #include "missile.h"

@@ -40,9 +40,18 @@
 
 #include "stratagus.h"
 
+#ifdef USE_WIN32
 #ifdef _MSC_VER
 #undef NOUSER
 #endif
+#define DrawIcon WinDrawIcon
+#define EndMenu WinEndMenu
+#include <windows.h>
+#undef EndMenu
+#undef DrawIcon
+#undef FindResource
+#endif
+
 #include "video.h"
 #include "font.h"
 #include "interface.h"
@@ -55,17 +64,6 @@
 #include "sound.h"
 #include "script.h"
 #include "campaign.h"
-
-#ifdef USE_WIN32
-#ifdef _MSC_VER
-#undef NOUSER
-#endif
-#define DrawIcon WinDrawIcon
-#define EndMenu WinEndMenu
-#include <windows.h>
-#undef EndMenu
-#undef DrawIcon
-#endif
 
 #ifdef USE_SDL
 #include "SDL.h"

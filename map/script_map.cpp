@@ -39,6 +39,8 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
+#include "unit.h"
+#include "unittype.h"
 #include "script.h"
 #include "map.h"
 #include "tileset.h"
@@ -47,7 +49,6 @@
 #include "campaign.h"
 #include "ui.h"
 #include "player.h"
-#include "unit.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

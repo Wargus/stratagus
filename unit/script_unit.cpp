@@ -39,14 +39,16 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "unittype.h"
-#include "player.h"
 #include "unit.h"
+#include "unittype.h"
+#include "upgrade.h"
+#include "player.h"
 #include "script.h"
 #include "spells.h"
 #include "pathfinder.h"
 #include "trigger.h"
 #include "actions.h"
+#include "construct.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -43,6 +43,7 @@
 #include <string.h>
 #include "sound.h"
 #include "sound_server.h"
+#include "iolib.h"
 
 #define DrawIcon WinDrawIcon
 #include <mikmod.h>

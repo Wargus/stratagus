@@ -52,6 +52,7 @@
 #include "missile.h"
 #include "sound.h"
 #include "ui.h"
+#include "iolib.h"
 
 #include "util.h"
 

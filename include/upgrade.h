@@ -54,7 +54,7 @@ struct _CL_File_;
 ----------------------------------------------------------------------------*/
 
 	 /// upgrade of identifier
-extern Upgrade* UpgradeByIdent(const char*);
+extern Upgrade* UpgradeByIdent(const char* ident);
 
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
@@ -64,9 +64,9 @@ extern void SaveUpgrades(struct _CL_File_*);
 extern void CleanUpgrades(void);
 
 	/// parse pud alow (upgrade/spell/units allow) table
-extern void ParsePudALOW(const char*, int);
+extern void ParsePudALOW(const char* alow, int length);
 	/// parse pud ugrd (upgrade cost) table
-extern void ParsePudUGRD(const char*, int);
+extern void ParsePudUGRD(const char* ugrd, int length);
 	/// Register CCL features for upgrades
 extern void UpgradesCclRegister(void);
 

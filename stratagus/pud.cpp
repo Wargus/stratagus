@@ -50,6 +50,7 @@
 #include <windows.h>
 #undef DrawIcon
 #undef EndMenu
+#undef FindResource
 #endif
 #include <stdint.h>
 #endif // BSD

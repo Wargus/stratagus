@@ -61,6 +61,7 @@
 #include "script.h"
 #include "editor.h"
 #include "spells.h"
+#include "construct.h"
 
 /*----------------------------------------------------------------------------
   -- Variables

@@ -51,6 +51,7 @@
 #include "network.h"
 #include "netconnect.h"
 #include "interface.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

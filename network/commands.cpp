@@ -41,6 +41,8 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unittype.h"
+#include "upgrade.h"
 #include "map.h"
 #include "actions.h"
 #include "player.h"
