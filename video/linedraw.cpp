@@ -853,8 +853,6 @@ global void VideoFillCircle(Uint32 color, int x, int y, int r)
 			p += 2 * px + 3;
 		} else {
 			p += 2 * (px - py) + 5;
-			py -= 1;
-
 			// Fill up the left/right half of the circle
 			if (py >= px) {
 				VideoDrawVLine(color, x + py + 1, y, px + 1);
@@ -862,6 +860,7 @@ global void VideoFillCircle(Uint32 color, int x, int y, int r)
 				VideoDrawVLine(color, x - py - 1, y, px + 1);
 				VideoDrawVLine(color, x - py - 1, y - px,  px);
 			}
+			py -= 1;
 		}
 	}
 }
@@ -893,8 +892,6 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 			p += 2 * px + 3;
 		} else {
 			p += 2 * (px - py) + 5;
-			py -= 1;
-
 			// Fill up the left/right half of the circle
 			if (py >= px) {
 				VideoDrawTransVLine(color, x + py + 2, y, px + 1, alpha);
@@ -902,6 +899,7 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 				VideoDrawTransVLine(color, x - py - 2, y, px + 1, alpha);
 				VideoDrawTransVLine(color, x - py - 2, y - px,  px, alpha);
 			}
+			py -= 1;
 		}
 	}
 }
@@ -932,8 +930,6 @@ global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 			p += 2 * px + 3;
 		} else {
 			p += 2 * (px - py) + 5;
-			py -= 1;
-
 			// Fill up the left/right half of the circle
 			if (py >= px) {
 				VideoDrawVLineClip(color, x + py + 1, y, px + 1);
@@ -941,6 +937,7 @@ global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 				VideoDrawVLineClip(color, x - py - 1, y, px + 1);
 				VideoDrawVLineClip(color, x - py - 1, y - px,  px);
 			}
+			py -= 1;
 		}
 	}
 }
@@ -972,15 +969,14 @@ global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 			p += 2 * px + 3;
 		} else {
 			p += 2 * (px - py) + 5;
-			py -= 1;
-
 			// Fill up the left/right half of the circle
 			if (py >= px) {
-				VideoDrawTransVLineClip(color, x + py + 2, y, px + 1, alpha);
-				VideoDrawTransVLineClip(color, x + py + 2, y - px, px, alpha);
-				VideoDrawTransVLineClip(color, x - py - 2, y, px + 1, alpha);
-				VideoDrawTransVLineClip(color, x - py - 2, y - px,  px, alpha);
+				VideoDrawTransVLineClip(color, x + py + 1, y, px + 1, alpha);
+				VideoDrawTransVLineClip(color, x + py + 1, y - px, px, alpha);
+				VideoDrawTransVLineClip(color, x - py - 1, y, px + 1, alpha);
+				VideoDrawTransVLineClip(color, x - py - 1, y - px,  px, alpha);
 			}
+			py -= 1;
 		}
 	}
 }
@@ -1768,15 +1764,14 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 			p += 2 * px + 3;
 		} else {
 			p += 2 * (px - py) + 5;
-			py -= 1;
-
 			// Fill up the left/right half of the circle
 			if (py >= px) {
-/*				VideoDrawTransVLine(color, x + py + 1, y, px + 1, alpha);
-				VideoDrawTransVLine(color, x + py + 1, y - px, px, alpha);*/
+				VideoDrawTransVLine(color, x + py + 1, y, px + 1, alpha);
+				VideoDrawTransVLine(color, x + py + 1, y - px, px, alpha);
 				VideoDrawTransVLine(color, x - py - 1, y, px + 1, alpha);
 				VideoDrawTransVLine(color, x - py - 1, y - px,  px, alpha);
 			}
+			py -= 1;
 		}
 	}
 }
@@ -1805,15 +1800,14 @@ global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 			p += 2 * px + 3;
 		} else {
 			p += 2 * (px - py) + 5;
-			py -= 1;
-
 			// Fill up the left/right half of the circle
 			if (py >= px) {
-/*				VideoDrawTransVLineClip(color, x + py + 1, y, px + 1, alpha);
-				VideoDrawTransVLineClip(color, x + py + 1, y - px, px, alpha);*/
+				VideoDrawTransVLineClip(color, x + py + 1, y, px + 1, alpha);
+				VideoDrawTransVLineClip(color, x + py + 1, y - px, px, alpha);
 				VideoDrawTransVLineClip(color, x - py - 1, y, px + 1, alpha);
 				VideoDrawTransVLineClip(color, x - py - 1, y - px,  px, alpha);
 			}
+			py -= 1;
 		}
 	}
 }
