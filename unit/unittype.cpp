@@ -1584,10 +1584,10 @@ global void CleanUnitTypes(void)
 		for (res = 0; res < MaxCosts; ++res) {
 			if (type->ResInfo[res]) {
 				if (type->ResInfo[res]->SpriteWhenLoaded) {
-					free(type->ResInfo[res]->SpriteWhenLoaded);
+					VideoSaveFree(type->ResInfo[res]->SpriteWhenLoaded);
 				}
 				if (type->ResInfo[res]->SpriteWhenEmpty) {
-					free(type->ResInfo[res]->SpriteWhenEmpty);
+					VideoSaveFree(type->ResInfo[res]->SpriteWhenEmpty);
 				}
 				if (type->ResInfo[res]->FileWhenEmpty) {
 					free(type->ResInfo[res]->FileWhenEmpty);
