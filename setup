@@ -406,7 +406,7 @@ if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
 else
   SDL_CONFIG=sdl-config
 fi
-if test "$($SDL_CONFIG --version 2>/dev/null)" = "1.*" ; then
+if test "$($SDL_CONFIG --version 2>/dev/null)x" = "x" ; then
   echo "...You do not appear to have SDL installed"
 else
   HAVESDL=1
@@ -650,7 +650,11 @@ case $ANSWER in
 	fi
 	echo
 
-	echo -n "Would you like to use [n]one or [i]nternal or [S]DL CD Audio support? (n) "
+	echo -n "Would you like to use [n]one or [i]nternal "
+	if test "$HAVESDL" = "1" ; then
+	echo -n "or [S]DL "
+	fi
+	echo -n "CD Audio support? (n) "
 	read -n 1 CDMode
 	echo
 	case $CDMode in
