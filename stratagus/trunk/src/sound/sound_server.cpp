@@ -32,6 +32,8 @@
 
 #ifdef WITH_SOUND	// {
 
+#define USE_LIBMODPLUG
+
 #include <stdlib.h>
 #include <string.h>
 #ifndef _MSC_VER
@@ -67,9 +69,12 @@
 #include "iolib.h"
 
 #include "sound_server.h"
-#include "missile.h"
 #include "sound.h"
 #include "wav.h"
+
+#ifdef USE_LIBMODPLUG
+#include "../libmodplug/modplug.h"
+#endif
 
 #ifdef USE_GLIB
 #include <glib.h>
@@ -117,6 +122,93 @@ global int WithSoundThread;		/// FIXME: docu
 #endif
 
 global int SoundThreadRunning;		/// FIXME: docu
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
+
+#ifdef USE_LIBMODPLUG
+local int PlayingMusic;			/// Flag true if playing music
+
+/**
+**	Some quick hacks for mods.
+*/
+local void PlayMusic(void)
+{
+    ModPlug_Settings settings;
+    CLFile* f;
+    char* name;
+    char* buffer;
+    int size;
+    int i;
+
+    ModPlug_GetSettings(&settings);
+    settings.mFrequency=SoundFrequency;
+    settings.mBits=16;
+
+    settings.mLoopCount=-1;
+    ModPlug_SetSettings(&settings);
+
+    size=0;
+    buffer=malloc(1024);
+
+    name="music/default.mod";
+
+    name=LibraryFileName(name,buffer);
+    //ModPlug_Unload();
+
+    DebugLevel2Fn("Loading `%s'\n",name);
+
+    if( !(f=CLopen(name)) ) {
+	printf("Can't open file `%s'\n",name);
+	return;
+    }
+    while( (i=CLread(f,buffer+size,1024))==1024 ) {
+	size+=1024;
+	buffer=realloc(buffer,size+1024);
+    }
+    size+=i;
+    buffer=realloc(buffer,size);
+    DebugLevel0Fn("%d\n",size);
+
+    ModPlug_Load(buffer,size);
+
+    free(buffer);
+
+    PlayingMusic=1;
+}
+
+/**
+**	Mix music to stereo 32 bit.
+**
+**	@param buffer	Buffer for mixed samples.
+**	@param size	Number of samples that fits into buffer.
+*/
+local void MixMusicToStereo32(int* buffer,int size)
+{
+    short* buf;
+    int i;
+
+    if( PlayingMusic ) {
+	buf=alloca(size*sizeof(short)*2);
+
+	i=ModPlug_Read(buf,size*2);
+	// FIXME: end of file!
+	DebugLevel3Fn("%d\n",i);
+
+	for( i=0; i<size; ++i ) {
+	    buffer[i]+=buf[i];
+	}
+    }
+}
+
+#else
+
+local void PlayMusic(void)
+{
+}
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -749,6 +841,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
 	    }
 	}
     }
+
     return new_free_channels;
 }
 
@@ -916,6 +1009,7 @@ global void WriteSound(void)
     memset(mixer_buffer,0,sizeof(mixer_buffer));
 
     MixChannelsToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
+    MixMusicToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
 
 #if SoundSampleSize==8
     ClipMixToStereo8(mixer_buffer,sizeof(mixer_buffer)/sizeof(int),buffer);
@@ -955,7 +1049,9 @@ local void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
     FillChannels(HowManyFree(),&dummy1,&dummy2);
 
     memset(mixer_buffer,0,sizeof(mixer_buffer));
+
     MixChannelsToStereo32(mixer_buffer,len);
+    MixMusicToStereo32(mixer_buffer,len);
 
 #if SoundSampleSize==8
     ClipMixToStereo8(mixer_buffer,len,stream);
@@ -1003,7 +1099,9 @@ global void WriteSoundThreaded(void)
 
 	memset(mixer_buffer,0,sizeof(mixer_buffer));
 
-	new_free_channels=MixChannelsToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
+	new_free_channels=MixChannelsToStereo32(mixer_buffer,
+		sizeof(mixer_buffer)/sizeof(int));
+	MixMusicToStereo32(mixer_buffer,sizeof(mixer_buffer)/sizeof(int));
 
 #if SoundSampleSize==8
 	ClipMixToStereo8(mixer_buffer,sizeof(mixer_buffer)/sizeof(int),buffer);
@@ -1145,8 +1243,10 @@ global int InitSound(void)
 #ifdef USE_GLIB
     UnitToChannel=g_hash_table_new(g_direct_hash,NULL);
 #else
-    DebugLevel0Fn("FIXME: must write\n");
+    DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
+
+    PlayMusic();
 
     return 0;
 }
