@@ -3139,7 +3139,7 @@ local void CreateNetGameMenu(void)
 
     menu = FindMenu("menu-multi-setup");
     menu->Items[61].d.input.buffer = MasterTempString;
-    sprintf(MasterTempString, "%s:%d", master_host, master_port);
+    sprintf(MasterTempString, "%s:%d", MasterHostString, ntohs(MasterPort));
     strcat(MasterTempString, "~!_");
     menu->Items[61].d.input.nch = strlen(MasterTempString) - 3;
     menu->Items[61].d.input.maxch = 49;
@@ -7117,6 +7117,9 @@ global void InitMenuFunctions(void)
 #endif
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiGameMasterReport(void)
 {
     Menu *menu;
@@ -7132,21 +7135,23 @@ local void MultiGameMasterReport(void)
     MasterTempString[menu->Items[61].d.input.nch] = 0;
     port = strchr(MasterTempString, ':');
     if (port) {
-	*port=0;
-	port++;
-	if (master_host) {
-	    free(master_host);
+	*port = '\0';
+	++port;
+	if (MasterHostString) {
+	    free(MasterHostString);
 	}
-	master_host = strdup(MasterTempString);
-	master_port = atoi(port);
-	port--;
-	*port=':';
+	MasterHostString = strdup(MasterTempString);
+	MasterHost = NetResolveHost(MasterHostString);
+	MasterPort = htons(atoi(port));
+	--port;
+	*port = ':';
     } else {
-	if (master_host) {
-	    free(master_host);
+	if (MasterHostString) {
+	    free(MasterHostString);
 	}
-	master_host = strdup(MasterTempString);
-	master_port = MASTER_PORT;
+	MasterHostString = strdup(MasterTempString);
+	MasterHost = NetResolveHost(MasterHostString);
+	MasterPort = htons(MASTER_PORT);
     }
 
     if (PublicMasterAnnounce) {
@@ -7161,7 +7166,9 @@ local void MultiGameMasterReport(void)
     }
 }
 
-
+/**
+**	FIXME: docu
+*/
 local void EnterMasterAction(Menuitem *mi, int key)
 {
     Menu *menu;
