@@ -621,10 +621,10 @@ extern Unit* MakeUnit(UnitType* type,Player* player);
 extern void PlaceUnit(Unit* unit,int x,int y);
     ///	Create a new unit and place on map
 extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
-    /// FIXME: more docu
+    /// Remove unit from map/groups/...
 extern void RemoveUnit(Unit* unit);
-    /// FIXME: more docu
-extern void UnitLost(const Unit* unit);
+    /// Handle the loose of an unit (food,...)
+extern void UnitLost(Unit* unit);
     /// FIXME: more docu
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
