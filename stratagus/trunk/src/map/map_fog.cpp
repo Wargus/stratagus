@@ -864,7 +864,6 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	int p;
 	int my;
 	int mx;
-
 #ifdef TIMEIT
 	u_int64_t sv = rdtsc();
 	u_int64_t ev;
@@ -872,13 +871,6 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 #endif
 
 	// flags must redraw or not
-#ifdef NEW_MAPDRAW
-	char* redraw_row;
-	char* redraw_tile;
-
-	redraw_row = vp->MustRedrawRow;
-	redraw_tile = vp->MustRedrawTile;
-#endif
 	if (ReplayRevealMap) {
 		return;
 	}
@@ -913,77 +905,19 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	ey = vp->EndY;
 
 	while (dy <= ey) {
-#ifdef NEW_MAPDRAW
-		// row must be redrawn
-		if (*redraw_row) {
-#if NEW_MAPDRAW > 1
-			(*redraw_row)--;
-#else
-			*redraw_row = 0;
-#endif
-#endif
-			sx = x + sy;
-			dx = vp->X - vp->OffsetX;
-			while (dx <= ex) {
-#ifdef NEW_MAPDRAW
-				if (*redraw_tile) {
-#if NEW_MAPDRAW > 1
-					(*redraw_tile)--;
-#else
-					*redraw_tile = 0;
-#endif
-#endif
-					mx = (dx - vp->X + vp->OffsetX) / TileSizeX + vp->MapX;
-					my = (dy - vp->Y + vp->OffsetY) / TileSizeY + vp->MapY;
-					if (VisibleTable[my * TheMap.Width + mx]) {
-						DrawFogOfWarTile(sx, sy, dx, dy);
-					} else {
-						VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
-					}
-
-// Used to debug NEW_FOW problems
-#if defined(DEBUG_FOG_OF_WAR)
-extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text);
-#define GameFont 1
-					{
-						char seen[7];
-						int x = (dx - vp->X) / TileSizeX + vp->MapX;
-						int y = (dy - vp->Y) / TileSizeY + vp->MapY;
-
-#if 1
-						// Fog of War Vision
-						// Really long and ugly, shared and own vision:
-						// sprintf(seen,"%d(%d)",TheMap.Fields[y * TheMap.Width + x].Visible[ThisPlayer->Player],IsMapFieldVisible(ThisPlayer,x, y));
-						// Shorter version, but no shared vision:
-						sprintf(seen, "%d", TheMap.Fields[y * TheMap.Width + x].Visible[ThisPlayer->Player]);
-//						if (TheMap.Fields[y * TheMap.Width + x].Visible[0]) {
-							VideoDrawText(dx, dy, GameFont,seen);
-//						}
-#else
-						// Unit Distance Checks
-						if (Selected[1] && Selected[0]) {
-							sprintf(seen, "%d", MapDistanceBetweenUnits(Selected[0], Selected[1]));
-							VideoDrawText(dx, dy, GameFont, seen);
-						} else if (Selected[0]) {
-							sprintf(seen, "%d", MapDistanceToUnit(x, y,Selected[0]));
-							VideoDrawText(dx, dy, GameFont, seen);
-						}
-#endif
-					}
-#endif
-#ifdef NEW_MAPDRAW
-				}
-				++redraw_tile;
-#endif
-				++sx;
-				dx += TileSizeX;
+		sx = x + sy;
+		dx = vp->X - vp->OffsetX;
+		while (dx <= ex) {
+			mx = (dx - vp->X + vp->OffsetX) / TileSizeX + vp->MapX;
+			my = (dy - vp->Y + vp->OffsetY) / TileSizeY + vp->MapY;
+			if (VisibleTable[my * TheMap.Width + mx]) {
+				DrawFogOfWarTile(sx, sy, dx, dy);
+			} else {
+				VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
 			}
-#ifdef NEW_MAPDRAW
-		} else {
-			redraw_tile += vp->MapWidth;
+			++sx;
+			dx += TileSizeX;
 		}
-		++redraw_row;
-#endif
 		sy += TheMap.Width;
 		dy += TileSizeY;
 	}
