@@ -71,21 +71,11 @@
 **		dependent settings/functionailty are located within each
 **		separate files:
 **
-**		X11		: Xwindows for Linux and other Unix machines
-**
-**		SVGALIB		: (Super) Vga routines for Linux only
-**				  (visit http://www.svgalib.org)
-**
 **		SDL		: Simple Direct Media for Linux,
 **				  Win32 (Windows 95/98/2000), BeOs, MacOS
 **				  (visit http://www.libsdl.org)
 **
-**		WINDOWS CE	: just what it says..
-**
-**		@see X11.c
-**		@see svgalib.c
 **		@see sdl.c
-**		@see wince.c
 **
 **
 **      @section VideoModuleLow  Low Level - draw functions
@@ -126,26 +116,8 @@
 
 // JOHNS: This is needed, because later I want to support it all with the same
 //	  executable, choosable at runtime.
-#ifdef USE_X11
-#define UseX11		1
-#define UseSdl		0
-#define UseWin32	0
-#endif
-
 #ifdef USE_SDL
-#define UseX11		0
 #define UseSdl		1
-#define UseWin32	0
-#endif
-
-#ifdef noUSE_WIN32
-#define UseX11		0
-#define UseSdl		0
-#define UseWin32	1
-#endif
-
-#ifndef UseX11
-#define UseX11		0
 #endif
 
 /**
@@ -164,10 +136,6 @@ typedef struct _clip_ {
 ----------------------------------------------------------------------------*/
 
 extern void InitVideoSdl(void);		/// Init SDL video hardware driver
-extern void InitVideoX11(void);		/// Init X11 video hardware driver
-extern void InitVideoSVGA(void);	/// Init SVGA video hardware driver
-extern void InitVideoWin32(void);	/// Init Win32 video hardware driver
-extern void InitVideoWinCE(void);	/// Init WinCE video hardware driver
 
 extern void SdlLockScreen(void);	/// Do SDL hardware lock
 extern void SdlUnlockScreen(void);	/// Do SDL hardware unlock
@@ -196,16 +164,16 @@ global unsigned CompressedGraphicMemory;/// memory for compressed objects
     /**
     **	Architecture-dependant video depth. Set by InitVideoXXX, if 0.
     **	(8,15,16,24,32)
-    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
-    **	@see InitVideoWin32 @see main
+    **	@see InitVideo @see InitVideoSdl
+    **	@see main
     */
 global int VideoDepth;
 
     /**
     **	Architecture-dependant video bpp (bits pro pixel).
     **	Set by InitVideoXXX. (8,16,24,32)
-    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
-    **	@see InitVideoWin32 @see main
+    **	@see InitVideo @see InitVideoSdl
+    **	@see main
     */
 global int VideoBpp;
 
@@ -219,8 +187,8 @@ global int VideoTypeSize;
     /**
     **	Architecture-dependant videomemory. Set by InitVideoXXX.
     **	FIXME: need a new function to set it, see #ifdef SDL code
-    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
-    **	@see InitVideoWin32 @see VMemType
+    **	@see InitVideo @see InitVideoSdl
+    **	@see VMemType
     */
 global VMemType* VideoMemory;
 
@@ -1328,11 +1296,6 @@ global unsigned long GetTicks(void)
 #if UseSdl
     return SDL_GetTicks();
 #endif
-#if UseX11
-    extern unsigned long X11GetTicks(void);
-
-    return X11GetTicks();
-#endif
 }
 
 /**
@@ -1343,10 +1306,6 @@ global void InitVideo(void)
 #ifdef __OPTIMIZE__
     if (UseSdl) {
 	InitVideoSdl();
-    } else if (UseX11) {
-	InitVideoX11();
-    } else if (UseWin32) {
-	InitVideoWin32();
     } else {
 #ifdef DEBUG
 	abort();
@@ -1356,15 +1315,7 @@ global void InitVideo(void)
     #if UseSdl
 	InitVideoSdl();
     #else
-	#if UseX11
-	    InitVideoX11();
-	#else
-	    #if UseWin32
-		InitVideoWin32();
-	    #else
-		abort();
-	    #endif
-	#endif
+	abort();
     #endif
 #endif
 
@@ -1380,15 +1331,6 @@ global void InitVideo(void)
         default: DebugLevel0Fn("Video %d bpp unsupported\n" _C_ VideoBpp);
     }
     VideoTypeSize = VideoBpp / 8;
-
-    //
-    //	Use single common palette to be used for all palettes in 8bpp
-    //
-#ifndef BPP8_NORMAL
-    if (UseX11 && VideoBpp == 8) {	// FIXME: to be extended for all video..
-      InitSingleCommonPalette8();
-    }
-#endif
 
     //
     //	Init video sub modules

@@ -163,7 +163,6 @@ global void InitVideoSdl(void)
 
 	if (SDL_Init(
 #ifdef USE_SDLA
-	    // FIXME: doesn't work with SDL SVGAlib
 	    SDL_INIT_AUDIO |
 #endif
 #ifdef DEBUG

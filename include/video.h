@@ -308,16 +308,16 @@ extern char VideoFullScreen;
     /**
     **	Architecture-dependant video depth. Set by InitVideoXXX, if 0.
     **	(8,15,16,24,32)
-    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
-    **	@see InitVideoWin32 @see main
+    **	@see InitVideo @see InitVideoSdl
+    **	@see main
     */
 extern int VideoDepth;
 
     /**
     **	Architecture-dependant video bpp (bits pro pixel).
     **	Set by InitVideoXXX. (8,16,24,32)
-    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
-    **	@see InitVideoWin32 @see main
+    **	@see InitVideo @see InitVideoSdl
+    **	@see main
     */
 extern int VideoBpp;
 
@@ -331,8 +331,8 @@ extern int VideoTypeSize;
     /**
     **	Architecture-dependant videomemory. Set by InitVideoXXX.
     **	FIXME: need a new function to set it, see #ifdef SDL code
-    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
-    **	@see InitVideoWin32 @see VMemType
+    **	@see InitVideo @see InitVideoSdl
+    **	@see VMemType
     */
 extern VMemType* VideoMemory;
 
@@ -686,8 +686,7 @@ extern void InvalidateArea(int x, int y, int w, int h);
     /// Simply invalidates whole window or screen.
 extern void Invalidate(void);
 
-    ///	Realize videomemory. X11 implemenataion just does XFlush.
-    ///	SVGALIB without linear addressing should use this.
+    ///	Realize video memory.
 extern void RealizeVideoMemory(void);
 
     ///	Process all system events. Returns if the time for a frame is over

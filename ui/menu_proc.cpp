@@ -66,12 +66,8 @@
 #undef DrawIcon
 #endif
 
-#ifdef USE_X11
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#elif defined(USE_SDL)
+#ifdef USE_SDL
 #include "SDL.h"
-#include "SDL_syswm.h"
 #endif
 
 /*----------------------------------------------------------------------------

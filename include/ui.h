@@ -48,29 +48,13 @@
 --	Definitons
 ----------------------------------------------------------------------------*/
 
-/**
-**	Defines the default SVGALIB mouse speed adjust (must be > 0)
-*/
-#define MOUSEADJUST	15
-
-/**
-**	Defines the default SVGALIB mouse speed scale
-*/
-#define MOUSESCALE	1
-
-    /// MACRO - HARDCODED NUMBER OF BUTTONS on screen
-#define MaxButtons	19
-
-    /// typedef for buttons on screen themselves
-typedef struct _button_ Button;
-
     /// buttons on screen themselves
-struct _button_ {
+typedef struct _button_ {
     int		X;			/// x coordinate on the screen
     int		Y;			/// y coordinate on the screen
     int	    Width;			/// width of the button on the screen
     int	    Height;			/// height of the button on the screen
-};
+} Button;
 
 #define MAX_NUM_VIEWPORTS 8		/// Number of supported viewports
 
@@ -166,9 +150,6 @@ typedef struct _ui_ {
 
     int		MouseWarpX;			/// Cursor warp X position
     int		MouseWarpY;			/// Cursor warp Y position
-
-    int		MouseAdjust;		/// Mouse speed adjust
-    int		MouseScale;		/// Mouse speed scale
 
     char*	NormalFontColor;	/// Color for normal text displayed
     char*	ReverseFontColor;	/// Color for reverse text displayed

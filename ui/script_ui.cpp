@@ -121,42 +121,6 @@ local SCM CclSetMouseScrollSpeedControl(SCM speed)
 }
 
 /**
-**	Defines the SVGALIB mouse speed adjust (must be > 0)
-**
-**	@param adjust	mouse adjust for SVGALIB
-**	@return		old value
-*/
-local SCM CclSetMouseAdjust(SCM adjust)
-{
-    SCM old;
-    int i;
-
-    old = gh_int2scm(TheUI.MouseAdjust);
-    i = gh_scm2int(adjust);
-    if (i > 0) {
-	TheUI.MouseAdjust = i;
-    }
-
-    return old;
-}
-
-/**
-**	Defines the SVGALIB mouse scale
-**
-**	@param scale	mouse scale for SVGALIB
-**	@return		old value
-*/
-local SCM CclSetMouseScale(SCM scale)
-{
-    SCM old;
-
-    old = gh_int2scm(TheUI.MouseScale);
-    TheUI.MouseScale = gh_scm2int(scale);
-
-    return old;
-}
-
-/**
 **	Set which missile is used for right click
 **
 **	@param missile	missile name to use
@@ -1077,9 +1041,6 @@ local SCM CclDefineUI(SCM list)
 
     ui->MouseWarpX = -1;
     ui->MouseWarpY = -1;
-
-    ui->MouseAdjust = TheUI.MouseAdjust;
-    ui->MouseScale = TheUI.MouseScale;
 
     ui->Resource.File = NULL;
     ui->ResourceX = -1;
@@ -3222,9 +3183,6 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-color-cycle-all!", CclSetColorCycleAll);
     gh_new_procedure1_0("set-mouse-scroll-speed-default!", CclSetMouseScrollSpeedDefault);
     gh_new_procedure1_0("set-mouse-scroll-speed-control!", CclSetMouseScrollSpeedControl);
-
-    gh_new_procedure1_0("set-mouse-adjust!", CclSetMouseAdjust);
-    gh_new_procedure1_0("set-mouse-scale!", CclSetMouseScale);
 
     gh_new_procedure1_0("set-click-missile!", CclSetClickMissile);
     gh_new_procedure1_0("set-damage-missile!", CclSetDamageMissile);
