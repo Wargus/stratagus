@@ -64,7 +64,7 @@
 local void CclSpellMissileLocation(SCM list, SpellActionMissileLocation* location)
 {
     SCM value;
- 
+
     DebugCheck(location == NULL);
     memset(location, 0, sizeof(*location));
     //list = gh_cdr(list);
@@ -112,7 +112,7 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 {
     char* str;
     SCM	value;
- 
+
     DebugCheck(spellaction == NULL);
 
     value = gh_car(list);
@@ -527,7 +527,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 
 /**
 **	Get a condition value from a scm object.
-**	
+**
 **	@param 	value		scm value to convert.
 **
 **	@return CONDITION_TRUE, CONDITION_FALSE, CONDITION_ONLY or -1 on error.
@@ -567,7 +567,7 @@ global char Ccl2Condition(lua_State* l, const char* value)
 
 /**
 **	Parse the Condition for spell.
-**	
+**
 **	@param list		SCM object to parse
 **	@param condition	pointer to condition to fill with data.
 **
@@ -645,9 +645,9 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
 	    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
 	        if (gh_eq_p(value, gh_symbol2scm(BoolFlagName[i]))) {
 	            condition->BoolFlag[i] = Scm2Condition(gh_car(list));
-                    list = gh_cdr(list);
+		    list = gh_cdr(list);
 	            break;
-                }
+		}
 	    }
 	    if (i != NumberBoolFlag) {
 	        continue;
@@ -691,129 +691,69 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
     args = luaL_getn(l, -1);
     for (j = 0; j < args; ++j) {
 	lua_rawgeti(l, -1, j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, -1);
+	value = LuaToString(l, -1);
 	lua_pop(l, 1);
 	++j;
 	if (!strcmp(value, "coward")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isstring(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->Coward = Ccl2Condition(l, lua_tostring(l, -1));
+	    condition->Coward = Ccl2Condition(l, LuaToString(l, -1));
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "alliance")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isstring(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->Alliance = Ccl2Condition(l, lua_tostring(l, -1));
+	    condition->Alliance = Ccl2Condition(l, LuaToString(l, -1));
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "building")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isstring(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->Building = Ccl2Condition(l, lua_tostring(l, -1));
+	    condition->Building = Ccl2Condition(l, LuaToString(l, -1));
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "self")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isstring(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->TargetSelf = Ccl2Condition(l, lua_tostring(l, -1));
+	    condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1));
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "min-hp-percent")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MinHpPercent = lua_tonumber(l, -1);
+	    condition->MinHpPercent = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-hp-percent")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MaxHpPercent = lua_tonumber(l, -1);
+	    condition->MaxHpPercent = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "min-mana-percent")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MinManaPercent = lua_tonumber(l, -1);
+	    condition->MinManaPercent = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-mana-percent")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MaxManaPercent = lua_tonumber(l, -1);
+	    condition->MaxManaPercent = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-slow-ticks")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MaxSlowTicks = lua_tonumber(l, -1);
+	    condition->MaxSlowTicks = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-haste-ticks")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MaxHasteTicks = lua_tonumber(l, -1);
+	    condition->MaxHasteTicks = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-bloodlust-ticks")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MaxBloodlustTicks = lua_tonumber(l, -1);
+	    condition->MaxBloodlustTicks = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-invisibility-ticks")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MaxInvisibilityTicks = lua_tonumber(l, -1);
+	    condition->MaxInvisibilityTicks = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "max-invincibility-ticks")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    condition->MaxInvincibilityTicks = lua_tonumber(l, -1);
+	    condition->MaxInvincibilityTicks = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else {
 	    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
 	        if (!strcmp(value, BoolFlagName[i])) {
 		    lua_rawgeti(l, -1, j + 1);
-		    if (!lua_isstring(l, -1)) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
-		    }
-	            condition->BoolFlag[i] = Ccl2Condition(l, lua_tostring(l, -1));
+	            condition->BoolFlag[i] = Ccl2Condition(l, LuaToString(l, -1));
 		    lua_pop(l, 1);
 	            break;
-                }
+		}
 	    }
 	    if (i != NumberBoolFlag) {
 	        continue;
@@ -827,7 +767,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 
 /*
 **	Parse the Condition for spell.
-**	
+**
 **	@param list		SCM object to parse
 **	@param autocast		pointer to autocast to fill with data.
 **
@@ -875,28 +815,16 @@ local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
     args = luaL_getn(l, -1);
     for (j = 0; j < args; ++j) {
 	lua_rawgeti(l, -1, j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, -1);
+	value = LuaToString(l, -1);
 	lua_pop(l, 1);
 	++j;
 	if (!strcmp(value, "range")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isnumber(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    autocast->Range = lua_tonumber(l, -1);
+	    autocast->Range = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "combat")) {
 	    lua_rawgeti(l, -1, j + 1);
-	    if (!lua_isstring(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    autocast->Combat = Ccl2Condition(l, lua_tostring(l, -1));
+	    autocast->Combat = Ccl2Condition(l, LuaToString(l, -1));
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "condition")) {
 	    if (!autocast->Condition) {
@@ -946,7 +874,7 @@ local SCM CclDefineSpell(SCM list)
 	value = gh_car(list);
 	list = gh_cdr(list);
 	if (gh_eq_p(value, gh_symbol2scm("showname"))) {
-	    if (spell->Name) { 
+	    if (spell->Name) {
 	    	free(spell->Name);
 	    }
 	    spell->Name = gh_scm2newstr(gh_car(list), NULL);
@@ -1058,11 +986,7 @@ local int CclDefineSpell(lua_State* l)
 
     args = lua_gettop(l);
     j = 0;
-    if (!lua_isstring(l, j + 1)) {
-	lua_pushstring(l, "incorrect argument");
-	lua_error(l);
-    }
-    identname = strdup(lua_tostring(l, j + 1));
+    identname = strdup(LuaToString(l, j + 1));
     ++j;
     spell = SpellTypeByIdent(identname);
     if (spell != NULL) {
@@ -1077,27 +1001,15 @@ local int CclDefineSpell(lua_State* l)
 	spell->DependencyId = -1;
     }
     for (; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, j + 1);
+	value = LuaToString(l, j + 1);
 	++j;
 	if (!strcmp(value, "showname")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    if (spell->Name) { 
+	    if (spell->Name) {
 	    	free(spell->Name);
 	    }
-	    spell->Name = strdup(lua_tostring(l, j + 1));
+	    spell->Name = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "manacost")) {
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    spell->ManaCost = lua_tonumber(l, j + 1);
+	    spell->ManaCost = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "range")) {
 	    if (!lua_isstring(l, j + 1) && !lua_isnumber(l, j + 1)) {
 		lua_pushstring(l, "incorrect argument");
@@ -1115,11 +1027,7 @@ local int CclDefineSpell(lua_State* l)
 	    spell->RepeatCast = 1;
 	    --j;
 	} else if (!strcmp(value, "target")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    value = lua_tostring(l, j + 1);
+	    value = LuaToString(l, j + 1);
 	    if (!strcmp(value, "self")) {
 		spell->Target = TargetSelf;
 	    } else if (!strcmp(value, "unit")) {
@@ -1171,15 +1079,11 @@ local int CclDefineSpell(lua_State* l)
 	    CclSpellAutocast(l, spell->AICast);
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "sound-when-cast")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
 	    //  Free the old name, get the new one
 	    if (spell->SoundWhenCast.Name) {
 		free(spell->SoundWhenCast.Name);
 	    }
-	    spell->SoundWhenCast.Name = strdup(lua_tostring(l, j + 1));
+	    spell->SoundWhenCast.Name = strdup(LuaToString(l, j + 1));
 	    spell->SoundWhenCast.Sound = SoundIdForName(spell->SoundWhenCast.Name);
 	    //  Check for sound.
 	    if (!spell->SoundWhenCast.Sound) {
@@ -1187,22 +1091,14 @@ local int CclDefineSpell(lua_State* l)
 		spell->SoundWhenCast.Name = 0;
 	    }
 	} else if (!strcmp(value, "missile-when-cast")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    value = lua_tostring(l, j + 1);
+	    value = LuaToString(l, j + 1);
 	    spell->Missile = MissileTypeByIdent(value);
 	    if (spell->Missile == NULL) {
 		DebugLevel0Fn("in spell-type '%s' : missile %s does not exist\n" _C_
 		    spell->Name _C_ value);
 	    }
 	} else if (!strcmp(value, "depend-upgrade")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    value = lua_tostring(l, j + 1);
+	    value = LuaToString(l, j + 1);
 	    spell->DependencyId = UpgradeIdByIdent(value);
 	    if (spell->DependencyId == -1) {
 		lua_pushfstring(l, "Bad upgrade name: %s", value);
@@ -1331,7 +1227,7 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
     } else if (action->CastFunction == CastSpawnPortal) {
 	CLprintf(file, "(spawn-portal portal-type %s)",
 		action->Data.SpawnPortal.PortalType->Ident);
-    } 
+    }
 }
 
 /*
@@ -1369,10 +1265,10 @@ local void SaveSpellCondition(CLFile *file, ConditionInfo* condition)
 	CLprintf(file, "self %s ", condstrings[(int)condition->TargetSelf]);
     }
     for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
-        if (condition->BoolFlag[i] != CONDITION_TRUE) {
-            CLprintf(file, "%s %s ",
-                BoolFlagName[i], condstrings[(int)condition->BoolFlag[i]]);
-        }
+	if (condition->BoolFlag[i] != CONDITION_TRUE) {
+	    CLprintf(file, "%s %s ",
+		BoolFlagName[i], condstrings[(int)condition->BoolFlag[i]]);
+	}
     }
     //
     //	Min/Max vital percents
@@ -1396,7 +1292,7 @@ local void SaveSpellCondition(CLFile *file, ConditionInfo* condition)
 }
 
 /*
-**	Save autocast info to a CCL file	 
+**	Save autocast info to a CCL file
 **
 **	@param file	The file to save to.
 **	@param autocast	Auocastinfo to save.
@@ -1408,7 +1304,7 @@ void SaveSpellAutoCast(CLFile* file, AutoCastInfo* autocast)
 	"false",		/// CONDITION_FALSE
 	"only"			/// CONDITION_ONLY
     };
-    
+
     CLprintf(file, "( range %d ", autocast->Range);
     if (autocast->Combat != CONDITION_TRUE) {
 	CLprintf(file, "combat %s ", condstrings[(int)autocast->Combat]);
@@ -1422,7 +1318,7 @@ void SaveSpellAutoCast(CLFile* file, AutoCastInfo* autocast)
 
 /*
 **	Save spells to a CCL file.
-**	
+**
 **	@param file	The file to save to.
 */
 global void SaveSpells(CLFile* file)
@@ -1431,7 +1327,7 @@ global void SaveSpells(CLFile* file)
     SpellActionType* act;
 
     DebugCheck(!file);
-    
+
     for (spell = SpellTypeTable; spell < SpellTypeTable + SpellTypeCount; ++spell) {
 	CLprintf(file, "(define-spell\n");
 	//
@@ -1445,7 +1341,7 @@ global void SaveSpells(CLFile* file)
 	}
 	CLprintf(file, "    'manacost %d\n", spell->ManaCost);
 	CLprintf(file, "    'range %d\n", spell->Range);
-	if (spell->SoundWhenCast.Name) { 
+	if (spell->SoundWhenCast.Name) {
 	    CLprintf(file, "    'sound-when-cast \"%s\"\n", spell->SoundWhenCast.Name);
 	}
 	if (spell->Missile) {

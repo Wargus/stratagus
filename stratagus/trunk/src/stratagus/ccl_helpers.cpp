@@ -163,8 +163,8 @@ global void IOStruct(SCM scmform, void *binaryform, void *para)
 
 /**
 **	Handle saving/loading a reference to a structure.
-**	The structure content is also saved/loaded. 
-**	On load, the structure is malloc'ed. 
+**	The structure content is also saved/loaded.
+**	On load, the structure is malloc'ed.
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the structure'reference to load/save ( <structure-type> ** )
@@ -194,8 +194,8 @@ global void IOStructPtr(SCM scmform, void *binaryform, void *para)
 
 /**
 **	Handle saving/loading an array of structures.
-**	The array size is found in the array_size field of the IOStructDef structure. 
-**	The array is NOT malloc'ed. 
+**	The array size is found in the array_size field of the IOStructDef structure.
+**	The array is NOT malloc'ed.
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the structure'reference to load/save ( <structure-type> * )
@@ -235,7 +235,7 @@ global void IOStructArray(SCM from, void *binaryform, void *para)
 **	The binaryform is a pointer to the "first" field.
 **	The third parameter is a pointer to a IOStructDef, describing list elements.
 **
-**	defs[0] must contain the reference to the next field on the loaded structure.  
+**	defs[0] must contain the reference to the next field on the loaded structure.
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the "first"'ref ( <any-structure>** )
@@ -254,7 +254,7 @@ global void IOLinkedList(SCM scmfrom, void *binaryform, void *para)
 	    item = gh_car(scmfrom);
 	    scmfrom = gh_cdr(scmfrom);
 
-	    // Just to be safe... 
+	    // Just to be safe...
 	    if (!gh_null_p(item)) {
 		IOStructPtr(item, current, itemDef);
 		current =
@@ -283,14 +283,14 @@ global void IOLinkedList(SCM scmfrom, void *binaryform, void *para)
 
 /**
 **	Handle saving/loading a table of structure.
-**	The table is composed of two thing : a pointer to data and a counter. 
+**	The table is composed of two thing : a pointer to data and a counter.
 **	The third parameter is a pointer to a IOStructDef, describing the table
 **	fields of the IOStructDef are :
 **		size		indicate the size of one element of the table.
-**		defs[0]:	describe the data field ( should be <any-structure>** ) 
+**		defs[0]:	describe the data field ( should be <any-structure>** )
 **		defs[1]:	describe the counter field ( should be int )
 **		defs[2]:	describe the type of each structure to load. ( func & para )
-**	
+**
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the "first"'ref ( <any-structure>** )
 **	@param	para		Pointer to the IOStructDef
@@ -371,9 +371,9 @@ global void IOString(SCM scmfrom, void *binaryform, void *para)
 	char* str, *escape;
 	char buffer[1024];
 	int i;
-	
+
 	str = (*((char **) binaryform));
-	
+
 	// Escape '"' & '\n'
 	CLprintf(IOOutFile," \"");
 	do {
@@ -386,7 +386,7 @@ global void IOString(SCM scmfrom, void *binaryform, void *para)
 		CLprintf(IOOutFile, "%s", str);
 		break;
 	    }
-	    
+
 	    while (str < escape) {
 		i = 0;
 		while (str < escape && i < 1023) {
@@ -475,7 +475,7 @@ global void IOCcl(SCM scmfrom, void *binaryform, void *para)
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the scm value to load/save ( char* )
-**	@param	para		Array of IOFlagDef, describing possible values ( IOFlagDef * ) 
+**	@param	para		Array of IOFlagDef, describing possible values ( IOFlagDef * )
 */
 global void IOCharFlag(SCM scmfrom, void *binaryform, void *para)
 {
@@ -521,7 +521,7 @@ global void IOCharFlag(SCM scmfrom, void *binaryform, void *para)
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the string buffer
-**	@param	para		Max size of string ( int ) 
+**	@param	para		Max size of string ( int )
 */
 global void IOStrBuffer(SCM scmfrom, void *binaryform, void *para)
 {
@@ -572,7 +572,7 @@ global int IOHandleNullPtr(SCM scmfrom, void *binaryform)
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the array'ref ( int ** )
-**	@param	para		Size of array to allocate/save 
+**	@param	para		Size of array to allocate/save
 */
 global void IOIntArrayPtr(SCM scmfrom, void *binaryform, void *para)
 {
@@ -610,7 +610,7 @@ global void IOIntArrayPtr(SCM scmfrom, void *binaryform, void *para)
 **
 **	@param	scmform		When loading, the scm data to load
 **	@param	binaryform	Pointer to the array ( int * )
-**	@param	para		Size of array to load/save 
+**	@param	para		Size of array to load/save
 */
 global void IOIntArray(SCM scmfrom, void *binaryform, void *para)
 {

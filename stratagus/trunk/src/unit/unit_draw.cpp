@@ -89,8 +89,8 @@ global int ShowManaBackgroundLong;
 **	Show that units are selected.
 **
 **	@param color
-**	@param x1,y1	Coordinates of the top left corner. 
-**	@param x2,y2	Coordinates of the bottom right corner. 
+**	@param x1,y1	Coordinates of the top left corner.
+**	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
 global void (*DrawSelection)(SDL_Color color, int x1, int y1,
@@ -153,7 +153,7 @@ local SDL_Color* SelectionColor(const Unit* unit)
     // If building mark all own buildings
     if (CursorBuilding && unit->Type->Building &&
 	    unit->Player == ThisPlayer) {
-	*color = ColorGray;	
+	*color = ColorGray;
 	return color;
     }
     return NULL;
@@ -183,7 +183,7 @@ local VMemType* SelectionColor(const Unit* unit)
     // If building mark all own buildings
     if (CursorBuilding && unit->Type->Building &&
 	    unit->Player == ThisPlayer) {
-	return &ColorGray;	
+	return &ColorGray;
     }
     return NULL;
 }
@@ -206,7 +206,7 @@ global void DrawUnitSelection(const Unit* unit)
     UnitType* type;
 
     type = unit->Type;
-    
+
     color = SelectionColor(unit);
     if (!color) {
 	return;
@@ -224,8 +224,8 @@ global void DrawUnitSelection(const Unit* unit)
 **	Don't show selected units.
 **
 **	@param color
-**	@param x1,y1	Coordinates of the top left corner. 
-**	@param x2,y2	Coordinates of the bottom right corner. 
+**	@param x1,y1	Coordinates of the top left corner.
+**	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
 global void DrawSelectionNone(SDL_Color color, int x1, int y1,
@@ -243,8 +243,8 @@ global void DrawSelectionNone(VMemType color, int x1, int y1,
 **	Show selected units with circle.
 **
 **	@param color
-**	@param x1,y1	Coordinates of the top left corner. 
-**	@param x2,y2	Coordinates of the bottom right corner. 
+**	@param x1,y1	Coordinates of the top left corner.
+**	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
 global void DrawSelectionCircle(SDL_Color color, int x1, int x2,
@@ -264,8 +264,8 @@ global void DrawSelectionCircle(VMemType color, int x1, int x2,
 **	Show selected units with circle.
 **
 **	@param color
-**	@param x1,y1	Coordinates of the top left corner. 
-**	@param x2,y2	Coordinates of the bottom right corner. 
+**	@param x1,y1	Coordinates of the top left corner.
+**	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
 global void DrawSelectionCircleWithTrans(SDL_Color color, int x1, int y1,
@@ -290,8 +290,8 @@ global void DrawSelectionCircleWithTrans(VMemType color, int x1, int y1,
 **	Draw selected rectangle around the unit.
 **
 **	@param color
-**	@param x1,y1	Coordinates of the top left corner. 
-**	@param x2,y2	Coordinates of the bottom right corner. 
+**	@param x1,y1	Coordinates of the top left corner.
+**	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
 global void DrawSelectionRectangle(SDL_Color color, int x1, int y1,
@@ -308,8 +308,8 @@ global void DrawSelectionRectangle(VMemType color, int x1, int y1,
 **	Draw selected rectangle around the unit.
 **
 **	@param color
-**	@param x1,y1	Coordinates of the top left corner. 
-**	@param x2,y2	Coordinates of the bottom right corner. 
+**	@param x1,y1	Coordinates of the top left corner.
+**	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
 global void DrawSelectionRectangleWithTrans(SDL_Color color, int x1, int y1,
@@ -333,8 +333,8 @@ global void DrawSelectionRectangleWithTrans(VMemType color, int x1, int y1,
 **	Draw selected corners around the unit.
 **
 **	@param color
-**	@param x1,y1	Coordinates of the top left corner. 
-**	@param x2,y2	Coordinates of the bottom right corner. 
+**	@param x1,y1	Coordinates of the top left corner.
+**	@param x2,y2	Coordinates of the bottom right corner.
 */
 #ifdef USE_SDL_SURFACE
 global void DrawSelectionCorners(SDL_Color color, int x1, int y1,
@@ -420,18 +420,17 @@ local SCM CclManaSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 #elif defined(USE_LUA)
 local int CclManaSprite(lua_State* l)
 {
-    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
-	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+    if (lua_gettop(l) != 5) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     free(ManaSprite.File);
 
-    ManaSprite.File = strdup(lua_tostring(l, 1));
-    ManaSprite.HotX = lua_tonumber(l, 2);
-    ManaSprite.HotY = lua_tonumber(l, 3);
-    ManaSprite.Width = lua_tonumber(l, 4);
-    ManaSprite.Height = lua_tonumber(l, 5);
+    ManaSprite.File = strdup(LuaToString(l, 1));
+    ManaSprite.HotX = LuaToNumber(l, 2);
+    ManaSprite.HotY = LuaToNumber(l, 3);
+    ManaSprite.Width = LuaToNumber(l, 4);
+    ManaSprite.Height = LuaToNumber(l, 5);
 
     return 0;
 }
@@ -462,18 +461,17 @@ local SCM CclHealthSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 #elif defined(USE_LUA)
 local int CclHealthSprite(lua_State* l)
 {
-    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
-	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+    if (lua_gettop(l) != 5) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     free(HealthSprite.File);
 
-    HealthSprite.File = strdup(lua_tostring(l, 1));
-    HealthSprite.HotX = lua_tonumber(l, 2);
-    HealthSprite.HotY = lua_tonumber(l, 3);
-    HealthSprite.Width = lua_tonumber(l, 4);
-    HealthSprite.Height = lua_tonumber(l, 5);
+    HealthSprite.File = strdup(LuaToString(l, 1));
+    HealthSprite.HotX = LuaToNumber(l, 2);
+    HealthSprite.HotY = LuaToNumber(l, 3);
+    HealthSprite.Width = LuaToNumber(l, 4);
+    HealthSprite.Height = LuaToNumber(l, 5);
 
     return 0;
 }
@@ -504,18 +502,17 @@ local SCM CclShadowSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 #elif defined(USE_LUA)
 local int CclShadowSprite(lua_State* l)
 {
-    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
-	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+    if (lua_gettop(l) != 5) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     free(ShadowSprite.File);
 
-    ShadowSprite.File = strdup(lua_tostring(l, 1));
-    ShadowSprite.HotX = lua_tonumber(l, 2);
-    ShadowSprite.HotY = lua_tonumber(l, 3);
-    ShadowSprite.Width = lua_tonumber(l, 4);
-    ShadowSprite.Height = lua_tonumber(l, 5);
+    ShadowSprite.File = strdup(LuaToString(l, 1));
+    ShadowSprite.HotX = LuaToNumber(l, 2);
+    ShadowSprite.HotY = LuaToNumber(l, 3);
+    ShadowSprite.Width = LuaToNumber(l, 4);
+    ShadowSprite.Height = LuaToNumber(l, 5);
 
     return 0;
 }
@@ -546,18 +543,17 @@ local SCM CclSpellSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 #elif defined(USE_LUA)
 local int CclSpellSprite(lua_State* l)
 {
-    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
-	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+    if (lua_gettop(l) != 5) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     free(SpellSprite.File);
 
-    SpellSprite.File = strdup(lua_tostring(l, 1));
-    SpellSprite.HotX = lua_tonumber(l, 2);
-    SpellSprite.HotY = lua_tonumber(l, 3);
-    SpellSprite.Width = lua_tonumber(l, 4);
-    SpellSprite.Height = lua_tonumber(l, 5);
+    SpellSprite.File = strdup(LuaToString(l, 1));
+    SpellSprite.HotX = LuaToNumber(l, 2);
+    SpellSprite.HotY = LuaToNumber(l, 3);
+    SpellSprite.Width = LuaToNumber(l, 4);
+    SpellSprite.Height = LuaToNumber(l, 5);
 
     return 0;
 }
@@ -1120,8 +1116,8 @@ local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 		(f * type->BoxHeight) / 100, 4);
 	}
 
-        w = (f * type->BoxHeight) / 100 - 1;
-        if (w > 0) { // Prevents -1 turning into unsigned int
+	w = (f * type->BoxHeight) / 100 - 1;
+	if (w > 0) { // Prevents -1 turning into unsigned int
 	    VideoFillRectangleClip(ColorBlue,
 		x + (type->TileWidth * TileSizeX - type->BoxWidth) / 2 + 1,
 		(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
@@ -1221,8 +1217,8 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			((f * type->BoxHeight) / 100) + 1, 5);
 #endif
 		}
-                w = (f * type->BoxHeight) / 100 - 1;
-                if (w > 0) { // Prevents -1 turning into unsigned int
+		w = (f * type->BoxHeight) / 100 - 1;
+		if (w > 0) { // Prevents -1 turning into unsigned int
 		    VideoFillRectangleClip(color,
 			x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2) + 1,
 			(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
@@ -1393,7 +1389,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 		DrawManaSprite(x,y,type,unit->Orders[0].Type->Stats[
 			unit->Player->Player].Costs[TimeCost],
 		    unit->Data.UpgradeTo.Ticks);
-		
+
 	    //
 	    //	Carry resource.
 	    //
@@ -1545,7 +1541,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 	}
 	return;
     }
-    
+
     // Use ShadowSprite if the unit flies
     if (type->UnitType == UnitTypeFly) {
 	int i;
@@ -1698,7 +1694,7 @@ global void DrawPath(const Unit* unit)
 
 /**
 **	Get the location of an unit's order.
-**	
+**
 **	@param unit	Pointer to unit.
 **	@param order	Pointer to order.
 **	@param x	Resulting screen X cordinate.
@@ -1761,7 +1757,7 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
     int dest;
 
     GetOrderPosition(unit, order, &x2, &y2);
-    
+
     dest = 0;
     switch (order->Action) {
 	case UnitActionNone:
@@ -1892,7 +1888,7 @@ global void ShowOrder(const Unit* unit)
     if (unit->Destroyed) {
 	return;
     }
-    
+
     x1 = Map2ViewportX(CurrentViewport,
 	unit->X) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
     y1 = Map2ViewportY(CurrentViewport,
@@ -2012,7 +2008,7 @@ local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
     SDL_LockSurface(sprite->Surface);
     SDL_SetColors(sprite->Surface, unit->Colors->Colors, 208, 4);
     if (sprite->SurfaceFlip) {
-        SDL_SetColors(sprite->SurfaceFlip, unit->Colors->Colors, 208, 4);
+	SDL_SetColors(sprite->SurfaceFlip, unit->Colors->Colors, 208, 4);
     }
     SDL_UnlockSurface(sprite->Surface);
 #else
@@ -2312,8 +2308,8 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 	drawlevel2 = c2->Type->DrawLevel;
     }
     if (drawlevel1 == drawlevel2) {
-	return c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth - c2->X ? 
-	    c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth - c2->X : 
+	return c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth - c2->X ?
+	    c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth - c2->X :
 	    c1->Slot - c2->Slot;
     } else {
 	return drawlevel1 <= drawlevel2 ? -1 : 1;

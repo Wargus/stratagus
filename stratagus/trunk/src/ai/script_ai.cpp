@@ -66,7 +66,7 @@ local void IORessourceMask(SCM scmfrom, void *binaryform, void *para);
 --	Constants
 ----------------------------------------------------------------------------*/
 
-/// Description of the AiActionEvaluation structure 
+/// Description of the AiActionEvaluation structure
 static IOStructDef AiActionEvaluationStructDef = {
     "AiActionEvaluation",
     sizeof (AiActionEvaluation),
@@ -88,7 +88,7 @@ static IOStructDef AiExplorationRequestStructDef = {
     sizeof (AiExplorationRequest),
     -1,
     {
-	{"`next", 		NULL, 		&((AiExplorationRequest *) 0)->Next, 	NULL},	
+	{"`next", 		NULL, 		&((AiExplorationRequest *) 0)->Next, 	NULL},
 	{"gamecycle",		&IOInt,		&((AiExplorationRequest *) 0)->Mask,	NULL},
 	{"map-x", 		&IOInt,		&((AiExplorationRequest *) 0)->X, 	NULL},
 	{"map-y", 		&IOInt,		&((AiExplorationRequest *) 0)->Y,	NULL},
@@ -579,7 +579,7 @@ local SCM CclDefineAiHelper(SCM list)
     UnitType *type;
     Upgrade *upgrade;
     int cost;
-    
+
 #ifdef DEBUG
     type = NULL;
     upgrade = NULL;
@@ -821,7 +821,7 @@ extern UnitType *CclGetUnitType(SCM ptr);
 local void InsertUnitTypeRequests(UnitType * type, int count)
 {
     int n;
-    
+
     if (AiPlayer->UnitTypeRequests) {
 	n = AiPlayer->UnitTypeRequestsCount;
 	AiPlayer->UnitTypeRequests = realloc(AiPlayer->UnitTypeRequests,
@@ -951,7 +951,7 @@ local SCM CclAiDebug(SCM flag)
 /**
 **	Activate AI debugging for the given player(s)
 **	Player can be
-**		a number for a specific player 
+**		a number for a specific player
 **		"self" for current human player (ai me)
 **	 	"none" to disable
 **
@@ -1389,12 +1389,12 @@ local SCM CclAiCanReachHotSpot(SCM way)
     int transporterplace;
     UnitType * transporter;
     AiUnit * aiunit;
-    
+
     if ((AiScript->HotSpot_X == -1) || (AiScript->HotSpot_Y == -1)
 	|| (AiScript->HotSpot_Ray <= 0)) {
 	return SCM_BOOL_T;
     }
-    
+
     ZoneSetClear(&sources);
     transporter = 0;
     transporterplace = 0;
@@ -1426,10 +1426,10 @@ local SCM CclAiCanReachHotSpot(SCM way)
     ZoneSetAddConnected(&transportable,&sources);
     // Add water as well
     ZoneSetAddSet(&transportable,&sources);
-    
+
 
     aiunit = AiPlayer->Force[AiScript->ownForce].Units;
-    
+
     while (aiunit) {
 	switch(aiunit->Unit->Type->UnitType) {
 	    case UnitTypeFly:
@@ -1440,13 +1440,13 @@ local SCM CclAiCanReachHotSpot(SCM way)
 	    	}
 		break;
 	    case UnitTypeLand:
-	    	
+
     		ZoneSetClear(&sources);
 		ZoneSetAddUnitZones(&sources,aiunit->Unit);
-		
+
 		ZoneSetClear(&targets);
 		ZoneSetAddGoalZones(&targets, aiunit->Unit, AiScript->HotSpot_X - 4, AiScript->HotSpot_Y - 4, 9, 9,0,0);
-		
+
 		if (!ZoneSetHasIntersect(&targets,&sources) &&
 		    (!ZoneSetHasIntersect(&targets,&transportable) ||
 		     !ZoneSetHasIntersect(&sources,&transportable))) {
@@ -1765,7 +1765,7 @@ local SCM CclAiScript(SCM value)
 	CclGcProtectedAssign(&AiPlayer->Scripts[i].Script, NIL);
 	AiPlayer->Scripts[i].SleepCycles = 0;
 	AiEraseForce(AiPlayer->Scripts[i].ownForce);
-	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");	
+	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");
     }
     return SCM_BOOL_T;
 }
@@ -1962,11 +1962,7 @@ local int CclDefineAiWcNames(lua_State* l)
     }
 
     for (j = 0; j < i; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
@@ -2007,7 +2003,7 @@ local int DefaultResourceNumber(const char *type)
 **		ai-type	=> the name of the ai
 **		script  => ???
 **		script-debug => ???
-**				
+**
 **	@param list	List of the AI Player.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
