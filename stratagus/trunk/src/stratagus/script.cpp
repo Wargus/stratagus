@@ -448,16 +448,6 @@ local SCM CclSpeeds(SCM speed)
 }
 
 /**
-**	Disable mouse scroll.
-*/
-local SCM CclMouseScrollOff(void)
-{
-    TheUI.MouseScroll=0;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
 **	Debug unit slots.
 */
 local SCM CclUnits(void)
@@ -685,6 +675,8 @@ global void CclInit(void)
     UnitTypeCclRegister();
     UpgradesCclRegister();
     DependenciesCclRegister();
+    SelectionCclRegister();
+    GroupCclRegister();
     UnitCclRegister();
     SoundCclRegister();
     FontsCclRegister();
@@ -694,7 +686,6 @@ global void CclInit(void)
     init_subr_1("load-pud",CclLoadPud);
     init_subr_2("define-map",CclDefineMap);
 
-    gh_new_procedure0_0("mouse-scroll-off",CclMouseScrollOff);
     gh_new_procedure0_0("units",CclUnits);
 
     gh_new_procedure0_0("with-sound",CclWithSound);
