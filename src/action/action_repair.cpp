@@ -150,7 +150,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	DebugLevel3("Repair animation is %d cycles long\n" _C_ animlength);
 	// FIXME: implement this below:
 	//unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
-	goal->Data.Builded.Progress+=100*animlength;
+	goal->Data.Builded.Progress+=100*animlength*SpeedBuild;
 	//  Keep the same level of damage while increasing HP.
 	goal->HP=(goal->Data.Builded.Progress*goal->Stats->HitPoints)/
 		(goal->Type->Stats->Costs[TimeCost]*600)-hp;

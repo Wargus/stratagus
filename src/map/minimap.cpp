@@ -298,8 +298,11 @@ global void UpdateMinimap(void)
 
 	if( !BuildingVisibleOnMap(*table) && (*table)->SeenState!=3
 		&& !(*table)->SeenDestroyed && (type=(*table)->SeenType) ) {
+	    //
+	    //	FIXME: We should force unittypes to have a certain color on the minimap.
+	    //
 	    if( (*table)->Player->Player==PlayerNumNeutral ) {
-		if( type->Critter ) {
+		if( type->ClicksToExplode ) {
 		    color=ColorNPC;
 		} else if( type->GivesResource==OilCost ) {
 		    color=ColorBlack;
@@ -352,8 +355,11 @@ global void UpdateMinimap(void)
 	// FIXME: submarine not visible
 
 	type=unit->Type;
+	//
+	//  FIXME: We should force unittypes to have a certain color on the minimap.
+	//
 	if( unit->Player->Player==PlayerNumNeutral ) {
-	    if( type->Critter ) {
+	    if( type->ClicksToExplode ) {
 		color=ColorNPC;
 	    } else if( type->GivesResource==OilCost ) {
 		color=ColorBlack;

@@ -109,9 +109,10 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     //
-    //	Critters:	are moving random around.
+    //	Some units, like critter are moving random around randomly
     //
-    if( type->Critter && type==UnitTypeCritter) {
+    if( type->RandomMovementProbability &&
+	    ((SyncRand()%100)<=type->RandomMovementProbability)) {
 	int x;
 	int y;
 

@@ -400,12 +400,12 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 {
     Order* order;
 
-    IfDebug(
+#if DEBUG
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
 	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
-    );
+#endif
 
     //
     //	Check if unit is still valid? (NETWORK!)

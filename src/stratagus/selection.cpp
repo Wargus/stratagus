@@ -85,12 +85,13 @@ global void UnSelectAll(void)
 }
 
 /**
-**	Handle a critter being clicked.
+**	Handle a an suicide unit click
 **
-**	@param unit	Critter unit.
+**	@param unit	suicide unit.
 */
-local void HandleCritterClick(Unit* unit)
+local void HandleSuicideClick(Unit* unit)
 {
+    DebugCheck(!unit->Type->ClicksToExplode);
     if( GameObserve ) {
 	return;
     }
@@ -102,8 +103,8 @@ local void HandleCritterClick(Unit* unit)
     }
 
     // FIXME: make this configurable
-    if( unit->Value==10 ) {
-	SendCommandAttack(unit,unit->X,unit->Y,unit,FlushCommands);
+    if( unit->Value==unit->Type->ClicksToExplode ) {
+	SendCommandDemolish(unit,unit->X,unit->Y,0,FlushCommands);
 	unit->Value=0;
     }
 }
@@ -122,8 +123,8 @@ global void ChangeSelectedUnits(Unit** units,int count)
 
     DebugCheck( count>MaxSelectable );
 
-    if( count==1 && units[0]->Type->Critter ) {
-	HandleCritterClick(units[0]);
+    if( count==1 && units[0]->Type->ClicksToExplode ) {
+	HandleSuicideClick(units[0]);
     }
 
     UnSelectAll();
@@ -280,8 +281,8 @@ global int SelectUnitsByType(Unit* base)
 	return 0;
     }
 
-    if( base->Type->Critter ) {
-	HandleCritterClick(base);
+    if( base->Type->ClicksToExplode ) {
+	HandleSuicideClick(base);
     }
 
     UnSelectAll();
@@ -677,8 +678,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	if( type->Building && !UnitVisibleOnMap(unit) ) {
 	    continue;
 	}
-	if( type->Critter || 
-		(type->GivesResource && !unit->Removed) ) { // no built resources.
+	if( (type->GivesResource && !unit->Removed) ) { // no built resources.
 	    SelectSingleUnit(unit);
 	    return 1;
 	}

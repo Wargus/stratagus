@@ -207,7 +207,7 @@ Examples:
 	this unit-type (here paladin).</dd>
     </dl>
 </dd>
-<dt>pixel_size</dt>
+<dt>pixel-size</dt>
 <dd>Size of the unit-type graphic in pixeln. A list of X (width) and Y (height)
 sizes.  F.E. '( 72 72 ), '( 96 96 ).<p></dd>
 <dt>animations</dt>
@@ -236,7 +236,7 @@ Currently are available:
 </ul>
 NOTE: this will be changed to identifiers sometime.
 <p></dd>
-<dt>sight_range</dt>
+<dt>sight-range</dt>
 <dd>Sight range (in tiles) of this unit. F.E. 6, 14.<p></dd>
 <dt>hitpoints</dt>
 <dd>Hitpoints for this Unit. F.E. 90, 1000<p></dd>
@@ -251,7 +251,7 @@ Gold is the amount required to build this unit. Wood is the amount required
 to build this unit.  Oil is the amount required to build this unit.
 F.E.: '( time 200 gold 2000 wood 1000 oil 200 ).<p>
 </dd>
-<dt>improve_production</dt>
+<dt>improve-production</dt>
 <dd>Define the production increase from defaults that this unit adds. It is an
 array of '(resource-name amount) pairs. Gold is the amount it increase the
 default gold by. All other defined resources are treated the same way. The
@@ -259,15 +259,17 @@ values are treated like percents. Improvement from multiple buildings do
 not stack, but the maximum is what matters.
 F.E.: 'improve-production '( gold 20 wood 5 ) will give 120% gold and 105% wood.<p>
 </dd>
-<dt>repair_hp</dt>
+<dt>repair-range</dt>
+<dd>Range that a unit can repair from, eg. repair-range 1.</dd>
+<dt>repair-hp</dt>
 <dd>Defines the amount of hp a unit gain for each repair animation.  Units can only be
 repaired if this value is non-zero.
 F.E.: 'repair-hp 4.<p>
 </dd>
-<dt>repair_costs</dt>
+<dt>repair-costs</dt>
 <dd>Define the costs to repair this unit. It is an array of '(
 resource-name amount) pairs.
-Gold is the amount required to repair repair_hp above.
+Gold is the amount required to repair repair-hp above.
 Wood and Oil are the same.
 F.E.: '( gold 2 wood 1 oil 1 ).<p>
 </dd>
@@ -297,7 +299,7 @@ F.E.: '( gold 2 wood 1 oil 1 ).<p>
    
     <dt>resource-capacity</dt>
     <dd>Maximum amount of resources a harvester can carry. The actual amount can be
-    modified while unloading, with improve_incomes.<p></dd>
+    modified while unloading, with improve-incomes.<p></dd>
     
     <dt>file-when-loaded</dt>
     <dd>The harvester's animation file will change when it's loaded.<p></dd>
@@ -317,22 +319,34 @@ F.E.: '( gold 2 wood 1 oil 1 ).<p>
     <dt>terrain-harvester</dt>
     <dd>The unit will harvest terrain. For now this only works for wood.<p></dd>
     </dl>
-<dt>tile_size</dt>
+<dt>tile-size</dt>
 <dd>Define the unit-type size in tiles. NOTE: currently only buildings could
 be bigger than one tile. A list of X (width) and Y (height) sizes.
-F.E. '( 1 1 ), '( 2 2 ).<p>
-</dd>
-<dt>permanent_cloak</dt>
+F.E. '( 1 1 ), '( 2 2 ).<p></dd>
+<dt>permanent-cloak</dt>
 <dd>Unit is permanently cloaked, and can only be seen by detectors (see below.)<p></dd>
-<dt>detect_cloak</dt>
+<dt>detect-cloak</dt>
 <dd>Unit can detect cloaked units. If an unit is detected other units can attack it as well<p></dd>
-<dt>box_size</dt>
+<dt>demolish-range</dt>
+<dd>If non-zero this is the range for units that can demolish.The demolished area is a square, sorry.<p></dd>
+<dt>demolish-damage</dt>
+<dd>Damage dealt to unit affected by demolition. This can be 0, in this case
+only terrain will be affected. Units have to be in demolish-range to be affected.<p></dd>
+<dt>random-movement-probablitity</dt>
+<dd>When the unit is idle this is the probability that it will take a
+step in a random direction, in percents. Usefull for netural animals.<p></dd>
+<dt>clicks-to-explode</dt>
+<dd>If this is non-zero, then after that many clicks the unit will commit
+suicide. Doesn't work with resource workers/resources. It can even be used
+in combination with demolish-damage and demolish-range, though it wouldn't
+be very fair.<p></dd>
+<dt>box-size</dt>
 <dd></dd>
-<dt>attack_range</dt>
+<dt>attack-range</dt>
 <dd></dd>
-<dt>computer_reaction_range</dt>
+<dt>computer-reaction-range</dt>
 <dd></dd>
-<dt>human_reaction_range</dt>
+<dt>human-reaction-range</dt>
 <dd></dd>
 <dt>armor</dt>
 <dd></dd>
@@ -340,15 +354,15 @@ F.E. '( 1 1 ), '( 2 2 ).<p>
 <dd></dd>
 <dt>damage</dt>
 <dd></dd>
-<dt>piercing_damge</dt>
+<dt>piercing-damge</dt>
 <dd></dd>
-<dt>weapon_upgradable</dt>
+<dt>weapon-upgradable</dt>
 <dd></dd>
-<dt>armor_upgradeable</dt>
+<dt>armor-upgradeable</dt>
 <dd></dd>
 <dt>decay</dt>
 <dd></dd>
-<dt>annoy_factor</dt>
+<dt>annoy-factor</dt>
 <dd></dd>
 <dt>points</dt>
 <dd></dd>
@@ -358,17 +372,15 @@ F.E. '( 1 1 ), '( 2 2 ).<p>
 <dd></dd>
 <dt>type</dt>
 <dd></dd>
-<dt>right_mouse</dt>
+<dt>right-mouse</dt>
 <dd></dd>
-<dt>can_target</dt>
+<dt>can-target</dt>
 <dd></dd>
-<dt>repair_range</dt>
-<dd>Range that a unit can repair from, eg. repair_range 1</dd>
 <dt>flags</dt>
 <dd></dd>
 <dt>sounds</dt>
 <dd></dd>
-<dt>attack_sound</dt>
+<dt>attack-sound</dt>
 <dd></dd>
 </dl>
 
