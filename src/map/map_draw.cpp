@@ -2228,9 +2228,9 @@ local void MapDraw32Tile16(int tile,int x,int y)
 {
     // FIXME: (johns) Why turned off?
     if( 0 && TileCached[tile] ) {
-	VideoDraw32Tile32Cached(TileCached[tile],x,y);
+	VideoDraw32Tile16Cached(TileCached[tile],x,y);
     } else {
-	VideoDraw32Tile32(TheMap.Tiles[tile],x,y);
+	VideoDraw32Tile16(TheMap.Tiles[tile],x,y);
 	TileCached[tile]=VideoMemory32+x+y*VideoWidth;
     }
 }
