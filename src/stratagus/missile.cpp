@@ -517,8 +517,14 @@ global void FireMissile(Unit* unit)
 		return;
 	}
 
-	x = unit->X * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
-	y = unit->Y * TileSizeY + TileSizeY / 2;
+	// If Firing from inside a Bunker
+	if (unit->Container) {
+		x = unit->Container->X * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
+		y = unit->Container->Y * TileSizeY + TileSizeY / 2;
+	} else {
+		x = unit->X * TileSizeX + TileSizeX / 2;  // missile starts in tile middle
+		y = unit->Y * TileSizeY + TileSizeY / 2;
+	}
 
 	if (goal) {
 		DebugCheck(!goal->Type);  // Target invalid?
@@ -532,7 +538,12 @@ global void FireMissile(Unit* unit)
 			return;
 		}
 		// Fire to nearest point of the unit!
-		NearestOfUnit(goal, unit->X, unit->Y, &dx, &dy);
+		// If Firing from inside a Bunker
+		if (unit->Container) {
+			NearestOfUnit(goal, unit->Container->X, unit->Container->Y, &dx, &dy);
+		} else {
+			NearestOfUnit(goal, unit->X, unit->Y, &dx, &dy);
+		}
 		DebugLevel3Fn("Fire to unit at %d,%d\n" _C_ dx _C_ dy);
 	} else {
 		dx = unit->Orders[0].X;
