@@ -40,6 +40,7 @@
 
 #include "stratagus.h"
 #include "video.h"
+#include "map.h"
 #include "iolib.h"
 #include "iocompat.h"
 #include "intern_video.h"
