@@ -157,7 +157,7 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
     if (!sample) {
 	fprintf(stderr, "Out of memory!\n");
 	CLclose(((MyUser *) user)->File);
-	exit(-1);
+	FatalExit(-1);
     }
     p = sample->Data + sample->Length;
     sample->Length += i;
@@ -180,7 +180,7 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 	default:
 	    fprintf(stderr, "Unsupported sample depth!\n");
 	    CLclose(((MyUser *) user)->File);
-	    exit(-1);
+	    FatalExit(-1);
     }
 
     return FLAC__STREAM_DECODER_WRITE_CONTINUE;

@@ -352,7 +352,7 @@ global Graphic* MakeGraphic(
 
     if( !graphic ) {
 	fprintf(stderr,"Out of memory\n");
-	exit(-1);
+	FatalExit(-1);
     }
     if( depth==8 ) {
 	graphic->Type=&GraphicImage8Type;
@@ -360,7 +360,7 @@ global Graphic* MakeGraphic(
 	graphic->Type=&GraphicImage16Type;
     } else {
 	fprintf(stderr,"Unsported image depth\n");
-	exit(-1);
+	FatalExit(-1);
     }
     graphic->Width=width;
     graphic->Height=height;
@@ -413,7 +413,7 @@ global Graphic* LoadGraphic(const char *name)
 
     if (!(graphic = LoadGraphicPNG(LibraryFileName(name, buf)))) {
 	fprintf(stderr, "Can't load the graphic `%s'\n", name);
-	exit(-1);
+	FatalExit(-1);
     }
 
     graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
