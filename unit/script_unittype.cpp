@@ -639,18 +639,18 @@ local int CclDefineUnitType(lua_State* l)
 
 			}
 			for (k = 0; k < subargs; ++k) {
-				int id;
+				const SpellType *spell;
 
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
-				id = SpellTypeByIdent(value)->Slot;
-				lua_pop(l, 1);
+				spell = SpellTypeByIdent(value);
 				DebugLevel3Fn("%d \n" _C_ id);
-				if (id == -1) {
+				if (spell == NULL) {
 					lua_pushfstring(l, "Unknown spell type: %s", value);
 					lua_error(l);
 				}
-				type->CanCastSpell[id] = 1;
+				lua_pop(l, 1);
+				type->CanCastSpell[spell->Slot] = 1;
 			}
 		} else if (!strcmp(value, "AutoCastActive")) {
 			if (!lua_istable(l, -1)) {
@@ -672,18 +672,22 @@ local int CclDefineUnitType(lua_State* l)
 
 			}
 			for (k = 0; k < subargs; ++k) {
-				int id;
+				const SpellType *spell;
 
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
-				id = SpellTypeByIdent(value)->Slot;
-				lua_pop(l, 1);
+				spell = SpellTypeByIdent(value);
 				DebugLevel3Fn("%d \n" _C_ id);
-				if (id == -1) {
-					lua_pushfstring(l, "Unknown spell type: %s", value);
+				if (spell == NULL) {
+					lua_pushfstring(l, "AutoCastActive : Unknown spell type: %s", value);
 					lua_error(l);
 				}
-				type->AutoCastActive[id] = 1;
+				if (!spell->AutoCast) {
+					lua_pushfstring(l, "AutoCastActive : Define autocast method for %s.", value);
+					lua_error(l);
+				}
+				lua_pop(l, 1);
+				type->AutoCastActive[spell->Slot] = 1;
 			}
 		} else if (!strcmp(value, "CanTargetFlag")) {
 			//
