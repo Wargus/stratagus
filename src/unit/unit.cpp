@@ -3227,6 +3227,15 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	return;
     }
 
+    if( GodMode ) {
+	if( attacker->Player==ThisPlayer ) {
+	    damage=255;
+	}
+	if( target->Player==ThisPlayer ) {
+	    damage=0;
+	}
+    }
+
     type=target->Type;
     if( !target->Attacked ) {
 	// NOTE: perhaps this should also be moved into the notify?

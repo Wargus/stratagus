@@ -81,6 +81,7 @@ global char OrdersDuringPause;	/// Allow giving orders in pause mode.
 global char SkipGameCycle;	/// Skip the next game cycle
 global char BigMapMode;		/// Show only the map
 global enum _iface_state_ InterfaceState; /// Current interface state
+global int GodMode;		/// Invincibility cheat
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1064,6 +1065,8 @@ global int HandleCheats(const char* Input)
     } else if (!strcmp(Input, "you pitiful worm") ) {
 	GameRunning=0;
 	GameResult=GameDefeat;
+    } else if (!strcmp(Input, "it is a good day to die") ) {
+	GodMode=1;
     } else {
 	ret=0;
     }
