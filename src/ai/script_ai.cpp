@@ -37,6 +37,8 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#if defined(NEW_AI)
+
 /**
 **	Setup AI helper table.
 */
@@ -219,9 +221,45 @@ local SCM CclDefineAi(SCM list)
     while( !gh_null_p(list) ) {
 	sub_list=gh_car(list);
 	list=gh_cdr(list);
+
+	value=gh_car(sub_list);
+	sub_list=gh_cdr(sub_list);
+	if( gh_eq_p(value,gh_symbol2scm("set-cheat-unexplored!")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("set-cheat-visible!")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("need")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("train")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("build")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("wait")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("force")) ) {
+	} else {
+	    str=gh_scm2newstr(value,NULL);
+	    fprintf(stderr,"unknown tag %s",str);
+	    free(str);
+	    continue;
+	}
     }
     return list;
 }
+
+#else
+
+/**
+**	Define helper for Ai.
+*/
+local SCM CclDefineAiHelper(SCM list)
+{
+    return list;
+}
+
+/**
+**	Define an Ai engine.
+*/
+local SCM CclDefineAi(SCM list)
+{
+    return list;
+}
+
+#endif
 
 /**
 **	Register CCL features for unit-type.
