@@ -93,6 +93,9 @@ extern MapInfo* GetPudInfo(const char*);
     /// Load a pud file
 extern void LoadPud(const char* pud,WorldMap* map);
 
+    /// Save a pud file
+extern void SavePud(const char* pud,WorldMap* map);
+
     /// Clean the pud module
 extern void CleanPud(void);
 

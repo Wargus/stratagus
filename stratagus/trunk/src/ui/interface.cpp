@@ -52,6 +52,7 @@
 #include "campaign.h"
 #include "video.h"
 #include "iolib.h"
+#include "pud.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -745,14 +746,22 @@ local int CommandKey(int key)
 	case 's':			// ALT s F11 save game menu
 	case 'S':
 	    if( KeyModifiers&ModifierControl ) {
+		if( (KeyModifiers&ModifierAlt) ) {
+		    SavePud("freecraft.pud",&TheMap);
+		    SetMessage("Pud saved");
+		    break;
+		}
 		UiToggleSound();
 		break;
 	    }
 	    if( !(KeyModifiers&ModifierAlt) ) {
+		SavePud("freecraft.pud",&TheMap);
+		SetMessage("Pud saved");
 		break;
 	    }
 	case KeyCodeF11:
 	    SaveAll();
+	    SetMessage("Game saved");
 	    break;
 
 	case 'b'&0x1F:

@@ -1293,6 +1293,17 @@ pawn:
 }
 
 /**
+**	Save pud.
+**
+**	@param pud	File name.
+**	@param map	Map filled in.
+*/
+global void SavePud(const char* pud,WorldMap* map)
+{
+
+}
+
+/**
 **	Clean pud module.
 */
 global void CleanPud(void)
