@@ -793,7 +793,7 @@ local int CclAiForceRole(lua_State* l)
 	}
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
-		LuaError(l, "Force out of range" _C_ force);
+		LuaError(l, "Force %i out of range" _C_ force);
 	}
 	flag = LuaToString(l, 2);
 	if (!strcmp(flag, "attack")) {
@@ -801,7 +801,7 @@ local int CclAiForceRole(lua_State* l)
 	} else if (!strcmp(flag, "defend")) {
 		AiPlayer->Force[force].Role = AiForceRoleDefend;
 	} else {
-		LuaError(l, "Unknown force role" _C_ flag);
+		LuaError(l, "Unknown force role '%s'" _C_ flag);
 	}
 
 	lua_pushboolean(l, 0);
