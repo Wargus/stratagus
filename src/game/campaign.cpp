@@ -193,6 +193,7 @@ local SCM CclDefineCampaign(SCM list)
     //
     ident=gh_scm2newstr(gh_car(list),NULL);
     list=gh_cdr(list);
+    campaign=NULL;
 
     if( Campaigns ) {
 	for( i=0; i<NumCampaigns; ++i ) {
