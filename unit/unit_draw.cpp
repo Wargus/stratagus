@@ -1205,7 +1205,7 @@ local void DrawBuilding(Unit* unit)
     //
     if( unit->Orders[0].Action==UnitActionBuilded ) {
 	if( unit->Constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
-	    DrawConstruction(type->OverlapFrame
+	    DrawConstruction(type->Construction
 		,frame&127
 		,x+(type->TileWidth*TileSizeX)/2
 		,y+(type->TileHeight*TileSizeY)/2);
