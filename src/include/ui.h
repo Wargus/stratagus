@@ -308,6 +308,9 @@ extern void UIHandleButtonDown(unsigned button);
     /// Called if any mouse button is released up
 extern void UIHandleButtonUp(unsigned button);
 
+    /// Restrict mouse cursor to minimap
+extern void RestrictCursorToMinimap(void);
+
 #ifdef SPLIT_SCREEN_SUPPORT
 
     /// FIXME: Short one line docu
