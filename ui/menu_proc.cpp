@@ -771,6 +771,11 @@ inkey:
 			goto normkey;
 		    }
 		    /* FALL THROUGH */
+		case 293:
+		    mi->d.input.nch = 0;
+		    mi->d.input.buffer[0] = '\0';
+		    MustRedraw |= RedrawMenu;
+		    break;
 		default:
 		    if (key >= 32 && key < 0x100) {
 			if (mi->d.input.nch < mi->d.input.maxch) {
