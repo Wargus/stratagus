@@ -499,10 +499,10 @@ struct _unit_ {
     }		Move;			/// ActionMove,...
     struct _order_builded_ {
 	Unit*	Worker;			/// Worker building this unit
-	int	Sum;			/// HP for building
-	int	Add;
-	int	Val;			/// Counter
-	int	Sub;
+	int	Sum;			/// HP sum for building
+	int	Add;			/// + to HP and sum
+	int	Val;			/// Counter (fixed point trick)
+	int	Sub;			/// - to counter
 	int	Cancel;			/// Cancel construction
     }		Builded;		/// ActionBuilded,...
     struct _order_resource_ {
