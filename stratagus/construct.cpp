@@ -404,7 +404,7 @@ local SCM CclDefineConstruction(SCM list)
 	}
 	Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
 	Constructions[i] = calloc(1, sizeof(Construction));
-	Constructions[i+1] = NULL;
+	Constructions[i + 1] = NULL;
 	construction = Constructions[i];
     }
     construction->OType = ConstructionType;
@@ -444,10 +444,10 @@ local SCM CclDefineConstruction(SCM list)
 		    i = 0;
 		    if (strcmp(str, "default")) {
 			for (; i < NumTilesets; ++i) {
-			    if (!strcmp(str,Tilesets[i]->Ident)) {
+			    if (!strcmp(str, Tilesets[i]->Ident)) {
 				break;
 			    }
-			    if (!strcmp(str,Tilesets[i]->Class)) {
+			    if (!strcmp(str, Tilesets[i]->Class)) {
 				break;
 			    }
 			}
@@ -541,6 +541,196 @@ local SCM CclDefineConstruction(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineConstruction(lua_State* l)
+{
+    const char* value;
+    char* str;
+    Construction* construction;
+    Construction** cop;
+    int i;
+    int args;
+    int j;
+    int subargs;
+    int k;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    //	Slot identifier
+
+    str = strdup(LuaToString(l, j + 1));
+    ++j;
+
+    if ((cop = Constructions) == NULL) {
+	Constructions = malloc(2 * sizeof(Construction*));
+	Constructions[0] = calloc(1, sizeof(Construction));
+	Constructions[1] = NULL;
+	construction = Constructions[0];
+    } else {
+	for (i = 0; *cop; ++i, ++cop) {
+	}
+	Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
+	Constructions[i] = calloc(1, sizeof(Construction));
+	Constructions[i + 1] = NULL;
+	construction = Constructions[i];
+    }
+    construction->OType = ConstructionType;
+    construction->Ident = str;
+
+    //
+    //	Parse the arguments, in tagged format.
+    //
+    for (; j < args; ++j) {
+	int files;
+
+	value = LuaToString(l, j + 1);
+	++j;
+
+	if ((files = !strcmp(value, "file")) ||
+		!strcmp(value, "shadow-file")) {
+	    int tileset;
+	    char* file;
+	    int w;
+	    int h;
+
+	    tileset = 0;
+	    file = NULL;
+	    w = 0;
+	    h = 0;
+
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+
+		if (!strcmp(value, "tileset")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    value = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
+
+		    // FIXME: use a general get tileset function here!
+		    i = 0;
+		    if (strcmp(value, "default")) {
+			for (; i < NumTilesets; ++i) {
+			    if (!strcmp(value, Tilesets[i]->Ident)) {
+				break;
+			    }
+			    if (!strcmp(value, Tilesets[i]->Class)) {
+				break;
+			    }
+			}
+			if (i == NumTilesets) {
+			    fprintf(stderr, "Tileset `%s' not available\n", value);
+			    lua_pushfstring(l, "tileset not available: %s", value);
+			    lua_error(l);
+			}
+		    }
+		    tileset = i;
+		} else if (!strcmp(value, "file")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    file = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "size")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    w = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 2);
+		    h = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	    if (files) {
+		free(construction->File[tileset].File);
+		construction->File[tileset].File = file;
+		construction->File[tileset].Width = w;
+		construction->File[tileset].Height = h;
+	    } else {
+		free(construction->ShadowFile[tileset].File);
+		construction->ShadowFile[tileset].File = file;
+		construction->ShadowFile[tileset].Width = w;
+		construction->ShadowFile[tileset].Height = h;
+	    }
+	} else if (!strcmp(value, "constructions")) {
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		int percent;
+		int file;
+		int frame;
+		ConstructionFrame** cframe;
+		int subsubargs;
+		int subk;
+
+		percent = 0;
+		file = 0;
+		frame = 0;
+
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_istable(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		subsubargs = luaL_getn(l, -1);
+		for (subk = 0; subk < subsubargs; ++subk) {
+		    lua_rawgeti(l, -1, subk + 1);
+		    value = LuaToString(l, -1);
+		    lua_pop(l, 1);
+		    ++subk;
+
+		    if (!strcmp(value, "percent")) {
+			lua_rawgeti(l, -1, subk + 1);
+			percent = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		    } else if (!strcmp(value, "file")) {
+			lua_rawgeti(l, -1, subk + 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			if (!strcmp(value, "construction")) {
+			    file = ConstructionFileConstruction;
+			} else if (!strcmp(value, "main")) {
+			    file = ConstructionFileMain;
+			} else {
+			    lua_pushfstring(l, "Unsupported tag: %s", value);
+			    lua_error(l);
+			}
+		    } else if (!strcmp(value, "frame")) {
+			lua_rawgeti(l, -1, subk + 1);
+			frame = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		    } else {
+			lua_pushfstring(l, "Unsupported tag: %s", value);
+			lua_error(l);
+		    }
+		}
+		lua_pop(l, 1);
+		cframe = &construction->Frames;
+		while (*cframe) {
+		    cframe = &((*cframe)->Next);
+		}
+		(*cframe) = malloc(sizeof(ConstructionFrame));
+		(*cframe)->Percent = percent;
+		(*cframe)->File = file;
+		(*cframe)->Frame = frame;
+		(*cframe)->Next = NULL;
+	    }
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 // ----------------------------------------------------------------------------
@@ -557,7 +747,7 @@ global void ConstructionCclRegister(void)
 #elif defined(USE_LUA)
     lua_register(Lua, "DefineConstructionWcNames",
 	CclDefineConstructionWcNames);
-//    lua_register(Lua, "DefineConstruction", CclDefineConstruction);
+    lua_register(Lua, "DefineConstruction", CclDefineConstruction);
 #endif
 }
 //@}
