@@ -201,7 +201,8 @@ int EnemyUnitsInDistance(const Unit* unit, unsigned range)
 	//
 	x = unit->X;
 	y = unit->Y;
-	n = UnitCacheSelect(x - range, y - range, x + range + 1, y + range + 1, table);
+	n = UnitCacheSelect(x - range, y - range, x + range + unit->Type->TileWidth,
+		y + range + unit->Type->TileHeight, table);
 
 	player = unit->Player;
 	type = unit->Type;
