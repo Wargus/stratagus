@@ -70,6 +70,8 @@ local void GameMenuEndDefeat(void);
 local void GameMenuEnd(void);
 local void GameMenuExit(void);
 local void GameMenuReturn(void);
+local void GameShowCredits(void);
+local void GameMenuObjectives(void);
 
 local void PrgStartInit(Menuitem *mi);		// master init
 local void StartMenusSetBackground(Menuitem *mi);
@@ -213,8 +215,8 @@ local Menuitem GameMenuItems[] = {
 	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF5} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, NULL, 'o'} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, GameMenuObjectives, 'o'} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEndDefeat, 'e'} } },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
@@ -255,6 +257,35 @@ local Menuitem LostMenuItems[] = {
 	{ text:{ "achieve victory!", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
+#else
+    { 0 }
+#endif
+};
+
+local Menuitem ObjectivesMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Objectives", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 14, 38+21*0, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*1, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*2, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*3, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*4, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*5, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*6, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*7, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_TEXT, 14, 38+21*8, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, 0} } },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
 #else
     { 0 }
 #endif
@@ -327,15 +358,17 @@ local Menuitem PrgStartMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
 	{ drawfunc:{ NameLineDrawFunc } } },
-    { MI_TYPE_BUTTON, 208, 248 + 36 * 0, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
-    { MI_TYPE_BUTTON, 208, 248 + 36 * 1, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
-    { MI_TYPE_BUTTON, 208, 248 + 36 * 2, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Campaign Game", 224, 27, MBUTTON_GM_FULL, CampaignGameMenu, 'c'} } },
-    { MI_TYPE_BUTTON, 208, 248 + 36 * 3, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Load Game", 224, 27, MBUTTON_GM_FULL, GameMenuLoad, 'l'} } },
-    { MI_TYPE_BUTTON, 208, 248 + 36 * 4, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, 0, LargeFont, NULL, NULL,
+	{ button:{ "S~!how Credits", 224, 27, MBUTTON_GM_FULL, GameShowCredits, 'h'} } },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL,
 	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
 #else
     { 0 }
@@ -669,11 +702,11 @@ local Menuitem CampaignSelectMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Mystical Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 'm'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Alliance Second Campaign", 224, 27, MBUTTON_GM_FULL, Alliance2CampaignMenu, 'a'} } },
+	{ button:{ "A~!lliance Second Campaign", 224, 27, MBUTTON_GM_FULL, Alliance2CampaignMenu, 'l'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Mystical Second Campaign", 224, 27, MBUTTON_GM_FULL, Mystical2CampaignMenu, 'm'} } },
+	{ button:{ "M~!ystical Second Campaign", 224, 27, MBUTTON_GM_FULL, Mystical2CampaignMenu, 'y'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 4, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Select Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 'm'} } },
+	{ button:{ "~!Select Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 's'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
 #else
@@ -755,7 +788,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	1, 6,
+	1, 7,
 	PrgStartMenuItems,
 	NULL,
     },
@@ -847,6 +880,16 @@ global Menu Menus[] = {
 	ImageNone,
 	0, 1,
 	CampaignContMenuItems,
+	NULL,
+    },
+    {
+	// Objectives Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	2, 11,
+	ObjectivesMenuItems,
 	NULL,
     },
 };
@@ -1235,6 +1278,8 @@ global void DrawMenu(int menu_id)
     for (i = 0; i < n; i++) {
 	switch (mi->mitype) {
 	    case MI_TYPE_TEXT:
+		if (!mi->d.text.text)
+		    break;
 		if (mi->d.text.tflags&MI_TFLAGS_CENTERED)
 		    VideoDrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
@@ -1373,6 +1418,19 @@ local void GameMenuLoad(void)
 }
 
 /**
+**	Show the game credits.
+*/
+local void GameShowCredits(void)
+{
+    VideoLockScreen();
+    StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
+    Invalidate();
+
+    ShowCredits(&GameCredits);
+}
+
+/**
 **	End the running game from menu.
 */
 local void GameMenuEndDefeat(void)
@@ -1397,6 +1455,90 @@ local void GameMenuEnd(void)
 local void GameMenuExit(void)
 {
     Exit(0);
+}
+
+/**
+**
+*/
+local void SetMenuObjectives()
+{
+    int i;
+    int line;
+    char* p;
+    char* s;
+    char* str;
+    int w;
+    int font;
+    int l;
+
+    w=Menus[MENU_OBJECTIVES].xsize-2*ObjectivesMenuItems[1].xofs;
+    font=ObjectivesMenuItems[1].font;
+    i=0;
+    line=1;
+
+    for( p=GameIntro.Objectives[i]; p; p=GameIntro.Objectives[++i] ) {
+	l=0;
+	s=str=strdup(p);
+
+	for( ;; ) {
+	    char* s1;
+	    char* space;
+
+	    space=NULL;
+	    for( ;; ) {
+		if( VideoTextLength(font,s)<w ) {
+		    break;
+		}
+		s1=strrchr(s,' ');
+		if( !s1 ) {
+		    fprintf(stderr, "line too long: \"%s\"\n", s);
+		    break;
+		}
+		if( space )
+		    *space=' ';
+		space=s1;
+		*space='\0';
+	    }
+	    ObjectivesMenuItems[line++].d.text.text=strdup(s);
+	    l+=strlen(s);
+	    if( !p[l] ) {
+		break;
+	    }
+	    ++l;
+	    s=str+l;
+
+	    if( line==Menus[MENU_OBJECTIVES].nitems-1 ) {
+		break;
+	    }
+	}
+	free(str);
+    }
+}
+
+/**
+**
+*/
+local void FreeMenuObjectives()
+{
+    int i;
+
+    for( i=1;i<Menus[MENU_OBJECTIVES].nitems-1;i++ ) {
+	if( ObjectivesMenuItems[i].d.text.text ) {
+	    free(ObjectivesMenuItems[i].d.text.text);
+	    ObjectivesMenuItems[i].d.text.text=NULL;
+	}
+    }
+}
+
+/**
+**
+*/
+local void GameMenuObjectives(void)
+{
+    SetMenuObjectives();
+    ProcessMenu(MENU_OBJECTIVES, 1);
+    FreeMenuObjectives();
+
 }
 
 local void ScenSelectMenu(void)
@@ -1471,6 +1613,7 @@ local void AllianceCampaignMenu(void)
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
 
@@ -1497,6 +1640,7 @@ local void MysticalCampaignMenu(void)
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
 
@@ -1523,6 +1667,7 @@ local void Alliance2CampaignMenu(void)
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
 
@@ -1549,6 +1694,7 @@ local void Mystical2CampaignMenu(void)
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
 
@@ -2052,12 +2198,24 @@ local void GameCancel(void)
 
 local void CustomGameStart(void)
 {
+    int i;
+
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+
+    // FIXME: this shouldn't be done here and the default objective should
+    //        be configurable
+    for( i=0;i<MAX_OBJECTIVES;i++) {
+	if( GameIntro.Objectives[i] ) {
+	    free(GameIntro.Objectives[i]);
+	    GameIntro.Objectives[i]=NULL;
+	}
+    }
+    GameIntro.Objectives[0]=strdup("-Destroy your enemies");
 
     // FIXME: Johns is this here needed? Can the map loaded in create game?
     // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
