@@ -312,16 +312,6 @@ local SCM CclShowOrders(void)
 }
 
 /**
-**	Enable hit point regeneration
-*/
-local SCM CclHitPointRegeneration(void)
-{
-    HitPointRegeneration=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
 **	For debug increase mining speed.
 **
 **	@param speed	Speed factor of gold mining.
@@ -751,19 +741,18 @@ global void CclInit(void)
     init_subr_0("show-react-range",CclShowReactRange);
     init_subr_0("show-attack-range",CclShowAttackRange);
     init_subr_0("show-orders",CclShowOrders);
-	init_subr_0("hitpoint-regeneration", CclHitPointRegeneration);
 
-    init_subr_1("speed-mine",CclSpeedMine);
-    init_subr_1("speed-gold",CclSpeedGold);
-    init_subr_1("speed-chop",CclSpeedChop);
-    init_subr_1("speed-wood",CclSpeedWood);
-    init_subr_1("speed-haul",CclSpeedHaul);
-    init_subr_1("speed-oil",CclSpeedOil);
-    init_subr_1("speed-build",CclSpeedBuild);
-    init_subr_1("speed-train",CclSpeedTrain);
-    init_subr_1("speed-upgrade",CclSpeedUpgrade);
-    init_subr_1("speed-research",CclSpeedResearch);
-    init_subr_1("speeds",CclSpeeds);
+    gh_new_procedure1_0("speed-mine",CclSpeedMine);
+    gh_new_procedure1_0("speed-gold",CclSpeedGold);
+    gh_new_procedure1_0("speed-chop",CclSpeedChop);
+    gh_new_procedure1_0("speed-wood",CclSpeedWood);
+    gh_new_procedure1_0("speed-haul",CclSpeedHaul);
+    gh_new_procedure1_0("speed-oil",CclSpeedOil);
+    gh_new_procedure1_0("speed-build",CclSpeedBuild);
+    gh_new_procedure1_0("speed-train",CclSpeedTrain);
+    gh_new_procedure1_0("speed-upgrade",CclSpeedUpgrade);
+    gh_new_procedure1_0("speed-research",CclSpeedResearch);
+    gh_new_procedure1_0("speeds",CclSpeeds);
 
     IconCclRegister();
     MissileCclRegister();
@@ -774,6 +763,7 @@ global void CclInit(void)
     UnitTypeCclRegister();
     UpgradesCclRegister();
     DependenciesCclRegister();
+    UnitCclRegister();
     SoundCclRegister();
     FontsCclRegister();
     UserInterfaceCclRegister();
