@@ -143,10 +143,10 @@ global void SetVideoSync(void)
 **
 **	@return		Game ticks in ms.
 */
-local long SVGALibGetTicks(void)
+global unsigned long SVGAGetTicks(void)
 {
     struct timeval now;
-    long ticks;
+    unsigned long ticks;
  
     gettimeofday(&now,NULL);
 
@@ -369,27 +369,27 @@ global void Invalidate(void)
 local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int drz) {
     if((old_button == 0) && (button == MOUSE_LEFTBUTTON)) {
 	DebugLevel3Fn("first down\n");
-	InputMouseButtonPress(SVGALibCallbacks,SVGALibGetTicks(),1);
+	InputMouseButtonPress(SVGALibCallbacks,SVGAGetTicks(),1);
     }
     if((old_button == 0) && (button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON))) {
 	DebugLevel3Fn("second down\n");
-	InputMouseButtonPress(SVGALibCallbacks,SVGALibGetTicks(),2);
+	InputMouseButtonPress(SVGALibCallbacks,SVGAGetTicks(),2);
     }
     if((old_button == 0) && (button == MOUSE_RIGHTBUTTON)) {
 	DebugLevel3Fn("third down\n");
-	InputMouseButtonPress(SVGALibCallbacks,SVGALibGetTicks(),3);
+	InputMouseButtonPress(SVGALibCallbacks,SVGAGetTicks(),3);
     }
     if((old_button == MOUSE_LEFTBUTTON) && (button == 0)) {
 	DebugLevel3Fn("first up\n");
-	InputMouseButtonRelease(SVGALibCallbacks,SVGALibGetTicks(),1);
+	InputMouseButtonRelease(SVGALibCallbacks,SVGAGetTicks(),1);
     }
     if((old_button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON)) && (button == 0)) {
 	DebugLevel3Fn("second up\n");
-	InputMouseButtonRelease(SVGALibCallbacks,SVGALibGetTicks(),2);
+	InputMouseButtonRelease(SVGALibCallbacks,SVGAGetTicks(),2);
     }
     if((old_button == MOUSE_RIGHTBUTTON) && (button == 0)) {
 	DebugLevel3Fn("third up\n");
-	InputMouseButtonRelease(SVGALibCallbacks,SVGALibGetTicks(),3);
+	InputMouseButtonRelease(SVGALibCallbacks,SVGAGetTicks(),3);
     }
     old_button = button;
 
@@ -400,7 +400,7 @@ local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int 
 	if(mouse_y + dy/TheUI.MouseAdjust >= 0
 		&& mouse_y + dy/TheUI.MouseAdjust <= VideoHeight)
 	    mouse_y += dy/TheUI.MouseAdjust;
-	InputMouseMove(SVGALibCallbacks,SVGALibGetTicks(),mouse_x,mouse_y);
+	InputMouseMove(SVGALibCallbacks,SVGAGetTicks(),mouse_x,mouse_y);
 	MustRedraw |= RedrawCursor;
     }
 }
@@ -1008,7 +1008,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
     SVGALibCallbacks=callbacks;
 
-    InputMouseTimeout(callbacks,SVGALibGetTicks());
+    InputMouseTimeout(callbacks,SVGAGetTicks());
     for(;;) {
 	//
 	//	Prepare select
@@ -1102,7 +1102,7 @@ global void WaitEventsAndKeepSync(void)
     callbacks.SoundReady=WriteSound;
     SVGALibCallbacks=&callbacks;
 
-    InputMouseTimeout(&callbacks,SVGALibGetTicks());
+    InputMouseTimeout(&callbacks,SVGAGetTicks());
     for(;;) {
 	//
 	//	Prepare select
