@@ -105,32 +105,21 @@ dnl    [  --enable-optimization	  [Enable detection of optimization flags (defau
 dnl FIXME: todo
 
 AC_ARG_WITH(client,
-    [  --with-client=sdl,x11
+    [  --with-client=sdl
 			  [Select which client (default: sdl)]])
 THREAD_LIBS=
-if test "$with_client" = "x11"; then
-    AC_CHECK_HEADERS(X11/Xlib.h,, AC_MSG_ERROR(could not find X11/Xlib.h))
-    VIDEO_CFLAGS="-DUSE_X11"
-    VIDEO_LIBS="-lXext -lX11 -L/usr/X11R6/lib -I/usr/X11R6/include"
-    if test "$PLATFORM" = "-DBSD"; then
-	THREAD_LIBS="-pthread"
-    else
-	THREAD_LIBS="-lpthread"
-    fi
+AC_CHECK_HEADERS(SDL/SDL.h,, AC_MSG_ERROR(could not find SDL/SDL.h))
+VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `sdl-config --cflags`"
+if test "$enable_static" != "yes"; then
+    VIDEO_LIBS="`sdl-config --libs`"
 else
-    AC_CHECK_HEADERS(SDL/SDL.h,, AC_MSG_ERROR(could not find SDL/SDL.h))
-    VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `sdl-config --cflags`"
-    if test "$enable_static" != "yes"; then
-	VIDEO_LIBS="`sdl-config --libs`"
+    VIDEO_LIBS="`sdl-config --static-libs`"
+fi
+if test "$WIN32" = "1"; then
+    if test "`uname -a | grep -is cygwin`"; then
+	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32"
     else
-	VIDEO_LIBS="`sdl-config --static-libs`"
-    fi
-    if test "$WIN32" = "1"; then
-	if test "`uname -a | grep -is cygwin`"; then
-	    VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32"
-	else
-	    VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
-	fi
+	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
     fi
 fi
 AC_SUBST(VIDEO_CFLAGS)

@@ -550,20 +550,6 @@ global int NetSocketReady(Socket sockfd, int timeout)
     struct timeval tv;
     fd_set mask;
 
-#if defined(linux) && defined(USE_X11)
-    sigset_t sigmask;
-
-    // FIXME: ARI: does this work with NON_UNIX hosts ? Posix, but..
-    // Linux requires SIGALRM to be blocked, otherwise the
-    // itimer set in VIDEO_X11 always kills the select() with EINTR.
-    // The SA_RESTART in the sigaction() handler setup doesn't seem
-    // to apply to the setitimer() call starting the SIGALRM ticker...
-    // This broke NetSocketReady().
-    sigemptyset(&sigmask);
-    sigaddset(&sigmask, SIGALRM);
-    sigprocmask(SIG_BLOCK, &sigmask, NULL);
-#endif
-
     //	Check the file descriptors for available data
     do {
 	// Set up the mask of file descriptors
@@ -577,15 +563,9 @@ global int NetSocketReady(Socket sockfd, int timeout)
 	// Data available?
 	retval = select(sockfd + 1, &mask, NULL, NULL, &tv);
 #ifdef _MSC_VER
-    } while (0);	    // FIXME: better way?
+    } while (retval == SOCKET_ERROR && errno == WSAEINTR);
 #else
     } while (retval == -1 && errno == EINTR);
-#endif
-
-#if defined(linux) && defined(USE_X11)
-    sigemptyset(&sigmask);
-    sigaddset(&sigmask, SIGALRM);
-    sigprocmask(SIG_UNBLOCK, &sigmask, NULL);
 #endif
 
     return retval;

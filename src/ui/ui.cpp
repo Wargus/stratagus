@@ -644,9 +644,6 @@ global void SaveUserInterface(CLFile* file)
     CLprintf(file, "(set-mouse-scroll-speed-default! %d)\n", TheUI.MouseScrollSpeedDefault);
     CLprintf(file, "(set-mouse-scroll-speed-control! %d)\n", TheUI.MouseScrollSpeedControl);
 
-    CLprintf(file, "(set-mouse-adjust! %d)\n", TheUI.MouseAdjust);
-    CLprintf(file, "(set-mouse-scale! %d)\n\n", TheUI.MouseScale);
-
     // Save the UIs for all resolutions
     for (i = 0; UI_Table[i]; ++i) {
 	SaveUi(file, UI_Table[i]);

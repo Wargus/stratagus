@@ -1191,9 +1191,6 @@ local void PrintHeader(void)
 #ifdef USE_SDLCD
     "SDL-CD "
 #endif
-#ifdef USE_X11
-    "X11 "
-#endif
 #ifdef WITH_SOUND
     "SOUND "
 #endif

@@ -44,8 +44,6 @@
 
 #define noUSE_SDL			/// Remove no for sdl support
 #define noUSE_SDLA			/// Remove no for sdl audio support
-#define noUSE_X11			/// Remove no for x11 support
-#define noUSE_WINCE			/// Remove no for win-ce video support
 
     /**
     **	Define this to support load of compressed (gzip) pud files
