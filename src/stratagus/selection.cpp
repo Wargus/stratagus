@@ -10,7 +10,7 @@
 //
 /**@name selection.c	-	The units' selection. */
 //
-//	(c) Copyright 1999-2002 by Patrice Fortier, Lutz Sammer
+//	(c) Copyright 1999-2003 by Patrice Fortier, Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -55,9 +55,9 @@
 
 global int NumSelected;			/// Number of selected units
 global Unit* Selected[MaxSelectable] = {
-    NoUnitP,NoUnitP,NoUnitP,
-    NoUnitP,NoUnitP,NoUnitP,
-    NoUnitP,NoUnitP,NoUnitP
+    NoUnitP, NoUnitP, NoUnitP,
+    NoUnitP, NoUnitP, NoUnitP,
+    NoUnitP, NoUnitP, NoUnitP
 };					/// All selected units
 
 local unsigned GroupId;			/// Unique group # for automatic groups
@@ -73,39 +73,39 @@ global void UnSelectAll(void)
 {
     Unit* unit;
 
-    while( !++GroupId ) {		// Advance group id, but keep non zero
+    while (!++GroupId) {		// Advance group id, but keep non zero
     }
 
-    while( NumSelected ) {
-	unit=Selected[--NumSelected];
-	Selected[NumSelected]=NoUnitP;	// FIXME: only needed for old code
-	unit->Selected=0;
+    while (NumSelected) {
+	unit = Selected[--NumSelected];
+	Selected[NumSelected] = NoUnitP;	// FIXME: only needed for old code
+	unit->Selected = 0;
 	CheckUnitToBeDrawn(unit);
     }
 }
 
 /**
-**	Handle a an suicide unit click
+**	Handle a suicide unit click
 **
 **	@param unit	suicide unit.
 */
 local void HandleSuicideClick(Unit* unit)
 {
     DebugCheck(!unit->Type->ClicksToExplode);
-    if( GameObserve ) {
+    if (GameObserve) {
 	return;
     }
 
-    if( NumSelected==1 && Selected[0]==unit ) {
+    if (NumSelected == 1 && Selected[0] == unit) {
 	unit->Value++;
     } else {
-	unit->Value=1;
+	unit->Value = 1;
     }
 
     // FIXME: make this configurable
-    if( unit->Value==unit->Type->ClicksToExplode ) {
-	SendCommandDemolish(unit,unit->X,unit->Y,0,FlushCommands);
-	unit->Value=0;
+    if (unit->Value == unit->Type->ClicksToExplode) {
+	SendCommandDemolish(unit, unit->X, unit->Y, 0, FlushCommands);
+	unit->Value = 0;
     }
 }
 
@@ -121,24 +121,24 @@ global void ChangeSelectedUnits(Unit** units,int count)
     int i;
     int n;
 
-    DebugCheck( count>MaxSelectable );
+    DebugCheck(count > MaxSelectable);
 
-    if( count==1 && units[0]->Type->ClicksToExplode ) {
+    if (count == 1 && units[0]->Type->ClicksToExplode) {
 	HandleSuicideClick(units[0]);
     }
 
     UnSelectAll();
-    for( n=i=0; i<count; i++ ) {
-	if( !units[i]->Removed ) {
-	    Selected[n++]=unit=units[i];
-	    unit->Selected=1;
-	    if( count>1 ) {
-		unit->LastGroup=GroupId;
+    for (n = i = 0; i < count; ++i) {
+	if (!units[i]->Removed) {
+	    Selected[n++] = unit = units[i];
+	    unit->Selected = 1;
+	    if (count > 1) {
+		unit->LastGroup = GroupId;
 	    }
 	    CheckUnitToBeDrawn(unit);
 	}
     }
-    NumSelected=n;
+    NumSelected = n;
 }
 
 /**
@@ -185,7 +185,7 @@ global int SelectUnit(Unit* unit)
 */
 global void SelectSingleUnit(Unit* unit)
 {
-    ChangeSelectedUnits(&unit,1);
+    ChangeSelectedUnits(&unit, 1);
 }
 
 /**
@@ -197,29 +197,29 @@ global void UnSelectUnit(Unit* unit)
 {
     int i;
 
-    if( !unit->Selected ) {
+    if (!unit->Selected) {
 	return;
     }
 
-    for( i=0; Selected[i]!=unit; i++) {
+    for (i = 0; Selected[i] != unit; ++i) {
 	;
     }
-    DebugCheck( i>=NumSelected );
+    DebugCheck(i >= NumSelected);
 
-    if( i<--NumSelected ) {
-	Selected[i]=Selected[NumSelected];
+    if (i < --NumSelected) {
+	Selected[i] = Selected[NumSelected];
     }
 
-    if( NumSelected>1 ) {		// Assign new group to remaining units
-	while( !++GroupId ) {		// Advance group id, but keep non zero
+    if (NumSelected > 1) {		// Assign new group to remaining units
+	while (!++GroupId) {		// Advance group id, but keep non zero
 	}
-	for( i=0; i<NumSelected; ++i ) {
-	    Selected[i]->LastGroup=GroupId;
+	for (i = 0; i < NumSelected; ++i) {
+	    Selected[i]->LastGroup = GroupId;
 	}
     }
 
-    Selected[NumSelected]=NoUnitP;	// FIXME: only needed for old code
-    unit->Selected=0;
+    Selected[NumSelected] = NoUnitP;	// FIXME: only needed for old code
+    unit->Selected = 0;
     CheckUnitToBeDrawn(unit);
 }
 
@@ -231,7 +231,7 @@ global void UnSelectUnit(Unit* unit)
 */
 global int ToggleSelectUnit(Unit* unit)
 {
-    if( unit->Selected ) {
+    if (unit->Selected) {
 	UnSelectUnit(unit);
 	return 0;
     }
@@ -262,38 +262,38 @@ global int SelectUnitsByType(Unit* base)
     int i;
     const Viewport* vp;
 
-    DebugCheck( !TheUI.MouseViewport );
+    DebugCheck(!TheUI.MouseViewport);
     DebugLevel3Fn(" %s\n" _C_ base->Type->Ident);
 
-    type=base->Type;
+    type = base->Type;
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
     /* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
      * took parameters of the selection rectangle as arguments */
     vp = TheUI.MouseViewport;
-    r = SelectUnits(vp->MapX-1, vp->MapY-1, vp->MapX + vp->MapWidth+1,
-		vp->MapY + vp->MapHeight+1, table);
+    r = SelectUnits(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	vp->MapY + vp->MapHeight + 1, table);
 
     // if unit is a cadaver or hidden (not on map)
     // no unit can be selected.
-    if( base->Removed || base->Orders[0].Action==UnitActionDie ) {
+    if (base->Removed || base->Orders[0].Action == UnitActionDie) {
 	return 0;
     }
 
-    if( base->Type->ClicksToExplode ) {
+    if (base->Type->ClicksToExplode) {
 	HandleSuicideClick(base);
     }
 
     UnSelectAll();
-    Selected[0]=base;
-    base->Selected=1;
-    NumSelected=1;
+    Selected[0] = base;
+    base->Selected = 1;
+    NumSelected = 1;
     CheckUnitToBeDrawn(base);
 
     // if unit isn't belonging to the player, or is a static unit
     // (like a building), only 1 unit can be selected at the same time.
-    if( base->Player!=ThisPlayer || !type->SelectableByRectangle ) {
+    if (base->Player != ThisPlayer || !type->SelectableByRectangle) {
 	return NumSelected;
     }
 
@@ -302,28 +302,28 @@ global int SelectUnitsByType(Unit* base)
     //
     // FIXME: peon/peasant with gold/wood & co are considered from
     //	      different type... idem for tankers
-    for( i=0; i<r; ++i ) {
-	unit=table[i];
-	if( unit->Player!=ThisPlayer || unit->Type!=type ) {
+    for (i = 0; i < r; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer || unit->Type != type) {
 	    continue;
 	}
-	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
 	    continue;
 	}
-	if( unit==base ) {  // no need to have the same unit twice :)
+	if (unit == base) {  // no need to have the same unit twice :)
 	    continue;
 	}
-	Selected[NumSelected++]=unit;
-	unit->Selected=1;
+	Selected[NumSelected++] = unit;
+	unit->Selected = 1;
 	CheckUnitToBeDrawn(unit);
-	if( NumSelected==MaxSelectable ) {
+	if (NumSelected == MaxSelectable) {
 	    break;
 	}
     }
 
-    if( NumSelected>1 ) {
-	for( i=0; i<NumSelected; ++i ) {
-	    Selected[i]->LastGroup=GroupId;
+    if (NumSelected > 1) {
+	for (i = 0; i < NumSelected; ++i) {
+	    Selected[i]->LastGroup = GroupId;
 	}
     }
 
@@ -413,13 +413,13 @@ global int SelectGroup(int group_number)
 {
     int nunits;
 
-    DebugCheck(group_number>NUM_GROUPS);
+    DebugCheck(group_number > NUM_GROUPS);
 
-    if( !(nunits=GetNumberUnitsOfGroup(group_number)) ) {
+    if (!(nunits = GetNumberUnitsOfGroup(group_number))) {
 	return 0;
     }
 
-    ChangeSelectedUnits(GetUnitsOfGroup(group_number),nunits);
+    ChangeSelectedUnits(GetUnitsOfGroup(group_number), nunits);
     return NumSelected;
 }
 
@@ -435,12 +435,12 @@ global int AddGroupFromUnitToSelection(Unit* unit)
     int i;
     int group;
 
-    if( !(group=unit->LastGroup) ) {	// belongs to no group
+    if (!(group = unit->LastGroup)) {	// belongs to no group
 	return 0;
     }
 
-    for( i=0; i<NumUnits; ++i ) {
-	if( Units[i]->LastGroup==group && !Units[i]->Removed ) {
+    for (i = 0; i < NumUnits; ++i) {
+	if (Units[i]->LastGroup == group && !Units[i]->Removed) {
 	    SelectUnit(Units[i]);
 	    if (NumSelected == MaxSelectable) {
 		return NumSelected;
@@ -461,7 +461,7 @@ global int AddGroupFromUnitToSelection(Unit* unit)
 */
 global int SelectGroupFromUnit(Unit* unit)
 {
-    if( !unit->LastGroup ) {		// belongs to no group
+    if (!unit->LastGroup) {		// belongs to no group
 	return 0;
     }
 
@@ -484,16 +484,16 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
     int n;
     int i;
 
-    for( n=i=0; i<num_units; i++ ) {
-	unit=table[i];
-	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+    for (n = i = 0; i < num_units; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
 	    continue;
 	}
-	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
 	    continue;
 	}
-	table[n++]=unit;
-	if( n==MaxSelectable ) {
+	table[n++] = unit;
+	if (n == MaxSelectable) {
 	    break;
 	}
     }
@@ -516,12 +516,12 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
 **	@return		number of units found
 */
 local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
-		Unit **table, int num_units)
+    Unit** table, int num_units)
 {
     int n;
     int i;
 
-    for (i=n=0; i<num_units; i++) {
+    for (i = n = 0; i < num_units; ++i) {
 	int sprite_x;
 	int sprite_y;
 	Unit* unit;
@@ -529,10 +529,10 @@ local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 
 	unit = table[i];
 	type = unit->Type;
-	sprite_x = unit->X*TileSizeX + unit->IX;
-	sprite_x -= (type->BoxWidth - TileSizeX*type->TileWidth)/2;
+	sprite_x = unit->X * TileSizeX + unit->IX;
+	sprite_x -= (type->BoxWidth - TileSizeX * type->TileWidth) / 2;
 	sprite_y = unit->Y*TileSizeY + unit->IY;
-	sprite_y -= (type->BoxHeight - TileSizeY*type->TileHeight)/2;
+	sprite_y -= (type->BoxHeight - TileSizeY * type->TileHeight) / 2;
 	if (sprite_x + type->BoxWidth < sx0) {
 	    continue;
 	}
@@ -559,7 +559,7 @@ local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
  **	@param y1	Y start of selection rectangle in tile coordinates
  **	@return		the _total_ number of units selected.
  */
-global int AddSelectedUnitsInRectangle(int x0,int y0,int x1,int y1)
+global int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 {
     Unit* table[UnitMax];
     int toggle_num;
@@ -567,37 +567,37 @@ global int AddSelectedUnitsInRectangle(int x0,int y0,int x1,int y1)
     int i;
 
     //	If there is no selected unit yet, do a simple selection.
-    if( !NumSelected ) {
+    if (!NumSelected) {
 	return SelectUnitsInRectangle(x0, y0, x1, y1);
     }
 
     //	Check if the original selected unit (if it's alone) is ours,
     //	and can be selectable by rectangle.
     //	In this case, do nothing.
-    if( NumSelected == 1 &&
-	( Selected[0]->Player!=ThisPlayer ||
-	    !Selected[0]->Type->SelectableByRectangle )) {
+    if (NumSelected == 1 &&
+	    (Selected[0]->Player != ThisPlayer ||
+		!Selected[0]->Type->SelectableByRectangle)) {
 	return NumSelected;
     }
 
     //	If no unit in rectangle area... do nothing
-    toggle_num=SelectUnits((x0/TileSizeX)-2, (y0/TileSizeY)-2,
-	(x1/TileSizeX)+2+1, (y1/TileSizeX)+2+1, table);
-    if( !toggle_num ) {
+    toggle_num = SelectUnits((x0 / TileSizeX) - 2, (y0 / TileSizeY) - 2,
+	(x1 / TileSizeX) + 2 + 1, (y1 / TileSizeX) + 2 + 1, table);
+    if (!toggle_num) {
 	return NumSelected;
     }
-    toggle_num=SelectSpritesInsideRectangle (x0, y0, x1, y1, table, toggle_num);
-    if( !toggle_num ) {
+    toggle_num = SelectSpritesInsideRectangle(x0, y0, x1, y1, table, toggle_num);
+    if (!toggle_num) {
 	return NumSelected;
     }
 
     //	Now we should only have mobile (organic) units belonging to us,
     //	so if there's no such units in the rectangle, do nothing.
-    if( !(n=SelectOrganicUnitsInTable(table,toggle_num)) ) {
+    if (!(n = SelectOrganicUnitsInTable(table, toggle_num))) {
 	return NumSelected;
     }
 
-    for( i=0; i<n && NumSelected<MaxSelectable; i++ ) {
+    for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 	SelectUnit(table[i]);
     }
     return NumSelected;
@@ -638,27 +638,27 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     tx1 = sx1 / TileSizeX;
     ty1 = sy1 / TileSizeY;
 
-    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
-    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+    r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+    r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
     //
     //	1) search for the player units selectable with rectangle
     //
-    if( (n=SelectOrganicUnitsInTable(table,r)) ) {
-	ChangeSelectedUnits(table,n);
+    if ((n = SelectOrganicUnitsInTable(table, r))) {
+	ChangeSelectedUnits(table, n);
 	return n;
     }
 
     //
     //	2) If no unit found, try a player's unit not selectable by rectangle
     //
-    for( i=0; i<r; ++i ) {
-	unit=table[i];
-	if( unit->Player!=ThisPlayer ) {
+    for (i = 0; i < r; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer) {
 	    continue;
 	}
 	// FIXME: Can we get this?
-	if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
+	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
 	    SelectSingleUnit(unit);
 	    return 1;
 	}
@@ -667,18 +667,18 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     //
     //	3) If no unit found, try a resource or a neutral critter
     //
-    for( i=0; i<r; ++i ) {
-	unit=table[i];
+    for (i = 0; i < r; ++i) {
+	unit = table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisibleInViewport(TheUI.SelectedViewport, unit) ) {
+	if (!UnitVisibleInViewport(TheUI.SelectedViewport, unit)) {
 	    continue;
 	}
-	type=unit->Type;
+	type = unit->Type;
 	// Buildings are visible but not selectable
-	if( type->Building && !UnitVisibleOnMap(unit) ) {
+	if (type->Building && !UnitVisibleOnMap(unit)) {
 	    continue;
 	}
-	if( (type->GivesResource && !unit->Removed) ) { // no built resources.
+	if ((type->GivesResource && !unit->Removed)) { // no built resources.
 	    SelectSingleUnit(unit);
 	    return 1;
 	}
@@ -687,17 +687,17 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     //
     //	4) If no unit found, select an enemy unit (first found)
     //
-    for( i=0; i<r; ++i ) {
-	unit=table[i];
+    for (i = 0; i < r; ++i) {
+	unit = table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisibleInViewport(TheUI.SelectedViewport,unit) ) {
+	if (!UnitVisibleInViewport(TheUI.SelectedViewport, unit)) {
 	    continue;
 	}
 	// Buildings are visible but not selectable
-	if( unit->Type->Building && !UnitVisibleOnMap(unit) ) {
+	if (unit->Type->Building && !UnitVisibleOnMap(unit)) {
 	    continue;
 	}
-	if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
+	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
 	    SelectSingleUnit(unit);
 	    return 1;
 	}
@@ -716,7 +716,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 **
 **	@return		the number of units found.
 */
-global int SelectGroundUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+global int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
     Unit* unit;
     Unit* table[UnitMax];
@@ -733,27 +733,27 @@ global int SelectGroundUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     tx1 = sx1 / TileSizeX;
     ty1 = sy1 / TileSizeY;
 
-    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
-    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+    r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+    r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
-    for( n=i=0; i<r; i++ ) {
-	unit=table[i];
-	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+    for (n = i = 0; i < r; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
 	    continue;
 	}
-	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
 	    continue;
 	}
-	if( unit->Type->UnitType==UnitTypeFly ) {
+	if (unit->Type->UnitType == UnitTypeFly) {
 	    continue;
 	}
-	table[n++]=unit;
-	if( n==MaxSelectable ) {
+	table[n++] = unit;
+	if (n == MaxSelectable) {
 	    break;
 	}
     }
-    if( n ) {
-	ChangeSelectedUnits(table,n);
+    if (n) {
+	ChangeSelectedUnits(table, n);
     }
     return n;
 }
@@ -768,7 +768,7 @@ global int SelectGroundUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 **
 **	@return		the number of units found.
 */
-global int SelectAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+global int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
     Unit* unit;
     Unit* table[UnitMax];
@@ -785,27 +785,27 @@ global int SelectAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     tx1 = sx1 / TileSizeX;
     ty1 = sy1 / TileSizeY;
 
-    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
-    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+    r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+    r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
-    for( n=i=0; i<r; i++ ) {
-	unit=table[i];
-	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+    for (n = i = 0; i < r; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
 	    continue;
 	}
-	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
 	    continue;
 	}
-	if( unit->Type->UnitType!=UnitTypeFly ) {
+	if (unit->Type->UnitType != UnitTypeFly) {
 	    continue;
 	}
-	table[n++]=unit;
-	if( n==MaxSelectable ) {
+	table[n++] = unit;
+	if (n == MaxSelectable) {
 	    break;
 	}
     }
-    if( n ) {
-	ChangeSelectedUnits(table,n);
+    if (n) {
+	ChangeSelectedUnits(table, n);
     }
     return n;
 }
@@ -820,7 +820,7 @@ global int SelectAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 **
 **	@return		the number of units found.
 */
-global int AddSelectedGroundUnitsInRectangle (int sx0, int sy0, int sx1,int sy1)
+global int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
     Unit* unit;
     Unit* table[UnitMax];
@@ -833,16 +833,16 @@ global int AddSelectedGroundUnitsInRectangle (int sx0, int sy0, int sx1,int sy1)
     int ty1;
 
     //	If there is no selected unit yet, do a simple selection.
-    if( !NumSelected ) {
+    if (!NumSelected) {
 	return SelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
     }
 
     //	Check if the original selected unit (if it's alone) is ours,
     //	and can be selectable by rectangle.
     //	In this case, do nothing.
-    if( NumSelected == 1 &&
-	( Selected[0]->Player!=ThisPlayer ||
-	    !Selected[0]->Type->SelectableByRectangle )) {
+    if (NumSelected == 1 &&
+	    (Selected[0]->Player != ThisPlayer ||
+		!Selected[0]->Type->SelectableByRectangle)) {
 	return NumSelected;
     }
 
@@ -851,22 +851,22 @@ global int AddSelectedGroundUnitsInRectangle (int sx0, int sy0, int sx1,int sy1)
     tx1 = sx1 / TileSizeX;
     ty1 = sy1 / TileSizeY;
 
-    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
-    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+    r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+    r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
-    for( n=i=0; i<r; i++ ) {
-	unit=table[i];
-	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+    for (n = i = 0; i < r; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
 	    continue;
 	}
-	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
 	    continue;
 	}
-	if( unit->Type->UnitType==UnitTypeFly ) {
+	if (unit->Type->UnitType == UnitTypeFly) {
 	    continue;
 	}
-	table[n++]=unit;
-	if( n==MaxSelectable ) {
+	table[n++] = unit;
+	if (n == MaxSelectable) {
 	    break;
 	}
     }
@@ -874,7 +874,7 @@ global int AddSelectedGroundUnitsInRectangle (int sx0, int sy0, int sx1,int sy1)
     //
     //	Add the units to selected.
     //
-    for( i=0; i<n && NumSelected<MaxSelectable; i++ ) {
+    for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 	SelectUnit(table[i]);
     }
     return NumSelected;
@@ -890,7 +890,7 @@ global int AddSelectedGroundUnitsInRectangle (int sx0, int sy0, int sx1,int sy1)
 **
 **	@return		the number of units found.
 */
-global int AddSelectedAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
     Unit* unit;
     Unit* table[UnitMax];
@@ -903,16 +903,16 @@ global int AddSelectedAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     int ty1;
 
     //	If there is no selected unit yet, do a simple selection.
-    if( !NumSelected ) {
+    if (!NumSelected) {
 	return SelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
     }
 
     //	Check if the original selected unit (if it's alone) is ours,
     //	and can be selectable by rectangle.
     //	In this case, do nothing.
-    if( NumSelected == 1 &&
-	( Selected[0]->Player!=ThisPlayer ||
-	    !Selected[0]->Type->SelectableByRectangle )) {
+    if (NumSelected == 1 &&
+	    (Selected[0]->Player != ThisPlayer ||
+		!Selected[0]->Type->SelectableByRectangle)) {
 	return NumSelected;
     }
 
@@ -921,22 +921,22 @@ global int AddSelectedAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     tx1 = sx1 / TileSizeX;
     ty1 = sy1 / TileSizeY;
 
-    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
-    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+    r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+    r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
-    for( n=i=0; i<r; i++ ) {
-	unit=table[i];
-	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+    for (n = i = 0; i < r; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer || !unit->Type->SelectableByRectangle) {
 	    continue;
 	}
-	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	if (UnitUnusable(unit)) {  // guess SelectUnits doesn't check this
 	    continue;
 	}
-	if( unit->Type->UnitType!=UnitTypeFly ) {
+	if (unit->Type->UnitType != UnitTypeFly) {
 	    continue;
 	}
-	table[n++]=unit;
-	if( n==MaxSelectable ) {
+	table[n++] = unit;
+	if (n == MaxSelectable) {
 	    break;
 	}
     }
@@ -944,7 +944,7 @@ global int AddSelectedAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     //
     //	Add the units to selected.
     //
-    for( i=0; i<n && NumSelected<MaxSelectable; i++ ) {
+    for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 	SelectUnit(table[i]);
     }
     return NumSelected;
@@ -957,9 +957,9 @@ global void InitSelections(void)
 {
     int i;
 
-    if( (i=NumSelected) ) {		// Cleanup after load
-	while( i-- ) {
-	    Selected[i]=UnitSlots[(int)Selected[i]];
+    if ((i = NumSelected)) {		// Cleanup after load
+	while (i--) {
+	    Selected[i] = UnitSlots[(int)Selected[i]];
 	}
     }
 }
@@ -972,19 +972,19 @@ global void InitSelections(void)
 global void SaveSelections(CLFile* file)
 {
     int i;
-    char *ref;
+    char* ref;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: selection $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: selection $Id$\n\n");
 
-    CLprintf(file,"(set-group-id! %d)\n",GroupId);
-    CLprintf(file,"(selection %d '(",NumSelected);
-    for( i=0; i<NumSelected; ++i ) {
-	ref=UnitReference(Selected[i]);
-	CLprintf(file,"%s ",ref);
+    CLprintf(file, "(set-group-id! %d)\n", GroupId);
+    CLprintf(file, "(selection %d '(", NumSelected);
+    for (i = 0; i < NumSelected; ++i) {
+	ref = UnitReference(Selected[i]);
+	CLprintf(file, "%s ", ref);
 	free(ref);
     }
-    CLprintf(file,"))\n");
+    CLprintf(file, "))\n");
 }
 
 /**
@@ -992,10 +992,10 @@ global void SaveSelections(CLFile* file)
 */
 global void CleanSelections(void)
 {
-    GroupId=0;
-    NumSelected=0;
-    DebugCheck( NoUnitP );		// Code fails if none zero
-    memset(Selected,0,sizeof(Selected));
+    GroupId = 0;
+    NumSelected = 0;
+    DebugCheck(NoUnitP);		// Code fails if none zero
+    memset(Selected, 0, sizeof(Selected));
 }
 
 // ----------------------------------------------------------------------------
@@ -1010,8 +1010,8 @@ local SCM CclSetGroupId(SCM id)
 {
     SCM old;
 
-    old=gh_int2scm(GroupId);
-    GroupId=gh_scm2int(id);
+    old = gh_int2scm(GroupId);
+    GroupId = gh_scm2int(id);
 
     return old;
 }
@@ -1022,19 +1022,19 @@ local SCM CclSetGroupId(SCM id)
 **	@param num	Number of units in selection
 **	@param units	Units in selection
 */
-local SCM CclSelection(SCM num,SCM units)
+local SCM CclSelection(SCM num, SCM units)
 {
     int i;
 
-    NumSelected=gh_scm2int(num);
-    i=0;
-    while( !gh_null_p(units) ) {
+    NumSelected = gh_scm2int(num);
+    i = 0;
+    while (!gh_null_p(units)) {
 	char* str;
 
-	str=gh_scm2newstr(gh_car(units),NULL);
-	Selected[i++]=(Unit*)strtol(str+1,NULL,16);
+	str = gh_scm2newstr(gh_car(units), NULL);
+	Selected[i++] = (Unit*)strtol(str + 1, NULL, 16);
 	free(str);
-	units=gh_cdr(units);
+	units = gh_cdr(units);
     }
 
     return SCM_UNSPECIFIED;
@@ -1045,8 +1045,8 @@ local SCM CclSelection(SCM num,SCM units)
 */
 global void SelectionCclRegister(void)
 {
-    gh_new_procedure1_0("set-group-id!",CclSetGroupId);
-    gh_new_procedure2_0("selection",CclSelection);
+    gh_new_procedure1_0("set-group-id!", CclSetGroupId);
+    gh_new_procedure2_0("selection", CclSelection);
 }
 
 //@}
