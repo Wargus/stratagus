@@ -10,7 +10,7 @@
 //
 /**@name action_build.c - The build building action. */
 //
-//      (c) Copyright 1998,2000-2004 by Lutz Sammer, Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon
 //          Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -347,8 +347,7 @@ static void BuildBuilding(Unit* unit)
 	Animation* anim;
 
 	AnimateActionBuild(unit);
-	if ((!unit->Type->NewAnimations && unit->Reset) ||
-			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
+	if (unit->Type->NewAnimations || unit->Reset) {
 		goal = unit->Orders[0].Goal;
 
 		// hp is the current damage taken by the unit.
@@ -357,9 +356,13 @@ static void BuildBuilding(Unit* unit)
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
-		animlength = 0;
-		for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
-			animlength += anim->Sleep;
+		if (!unit->Type->NewAnimations) {
+			animlength = 0;
+			for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
+				animlength += anim->Sleep;
+			}
+		} else {
+			animlength = 1;
 		}
 
 		// FIXME: implement this below:
