@@ -691,8 +691,9 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 		    goal=UnitCacheOnXY(x,y,unit->Type->UnitType);
 		    if( !goal ) {
 			// Should not happen.
-			DebugLevel0Fn("%p No goal for %d,%d on %d,%d?\n",
-				unit,unit->X,unit->Y,x,y);
+			DebugLevel0Fn("%Zd %s: No goal for %d,%d on %d,%d?\n",
+				UnitNumber(unit),unit->Type->Ident,
+				unit->X,unit->Y,x,y);
 			matrix[x+y*w]=99;
 			DebugCheck( 1 );
 			continue;
