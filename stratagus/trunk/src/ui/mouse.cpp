@@ -139,7 +139,8 @@ global void DoRightButton(int sx, int sy)
 	dest = UnitUnderCursor;
 
 	// don't allow stopping enemy transporters!
-	if (dest && dest->Type->Transporter && PlayersTeamed(ThisPlayer->Player, dest->Player->Player)) {
+	if (dest && dest->Type->Transporter && (!dest->Type->Building) &&
+			PlayersTeamed(ThisPlayer->Player, dest->Player->Player)) {
 		// n0b0dy: So we are clicking on a transporter. We have to:
 		// 1) Flush the transporters orders.
 		// 2) Tell the transporter to follow the units. We have to queue all
@@ -188,7 +189,11 @@ global void DoRightButton(int sx, int sy)
 			dest->Blink = 4;
 			DebugLevel0Fn("Board transporter\n");
 			//  Let the transporter move to the unit. And QUEUE!!!
-			SendCommandFollow(dest, unit, 0);
+			//  Don't do it for buildings.
+			if (!dest->Type->Building) {
+				DebugLevel0Fn("Send command follow");
+				SendCommandFollow(dest, unit, 0);
+			}
 			SendCommandBoard(unit, -1, -1, dest, flush);
 			continue;
 		}
@@ -460,7 +465,8 @@ local void HandleMouseOn(int x, int y)
 					return;
 				}
 			} else {
-				for (i = TheUI.NumTrainingButtons; i >= 0; --i) {
+				i = min(TheUI.NumTrainingButtons, Selected[0]->Data.Train.Count);
+				for (--i; i >= 0; --i) {
 					if (x >= TheUI.TrainingButtons[i].X &&
 							x < TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
 							y >= TheUI.TrainingButtons[i].Y &&
