@@ -237,6 +237,7 @@ local void MultiGameClientDrawFunc(Menuitem *mi);
 local void MultiClientUpdate(int initial);
 
 local void NetConnectingInit(Menuitem *mi);
+local void NetConnectingExit(Menuitem *mi);
 local void NetConnectingCancel(void);
 local void TerminateNetConnect(void);
 
@@ -479,6 +480,7 @@ global void InitMenuFuncHash(void) {
 
 // Net connecting
     HASHADD(NetConnectingInit,"net-connecting-init");
+    HASHADD(NetConnectingExit,"net-connecting-exit");
     HASHADD(NetConnectingCancel,"net-connecting-cancel");
 
 // Campaign select
@@ -2681,7 +2683,7 @@ local void JoinNetGameMenu(void)
 }
 
 /**
-**	Cancel button of network connect menu pressed.
+**	Network connect menu init.
 */
 local void NetConnectingInit(Menuitem *mi)
 {
@@ -2690,12 +2692,19 @@ local void NetConnectingInit(Menuitem *mi)
 }
 
 /**
+**	Network connect menu exit.
+*/
+local void NetConnectingExit(Menuitem *mi)
+{
+    mi->menu->items[1].d.text.text = NULL;
+    mi->menu->items[2].d.text.text = NULL;
+}
+
+/**
 **	Cancel button of network connect menu pressed.
 */
 local void NetConnectingCancel(void)
 {
-    Menu *menu;
-
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
@@ -2703,10 +2712,6 @@ local void NetConnectingCancel(void)
     // Trigger TerminateNetConnect() to call us again and end the menu
     NetLocalState = ccs_usercanceled;
     EndMenu();
-
-    menu = FindMenu("menu-net-connecting");
-    menu->items[1].d.text.text = NULL;
-    menu->items[2].d.text.text = NULL;
 }
 
 /**
