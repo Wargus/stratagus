@@ -1413,7 +1413,7 @@ local void ScenSelectMenu(void)
 	i = 0;
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
-    if (strstr(ScenSelectFileName, ".pud")) {
+    if (strcasestr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
@@ -1773,7 +1773,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #endif
     do {
 	lcp = cp++;
-	cp = strstr(cp, suf);
+	cp = strcasestr(cp, suf);
     } while (cp != NULL);
     if (lcp >= np) {
 	cp = lcp + strlen(suf);
@@ -1792,7 +1792,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 usezzf:
 #endif
 	    if (p) {
-		if (strstr(pathbuf, ".pud")) {
+		if (strcasestr(pathbuf, ".pud")) {
 		    info = GetPudInfo(pathbuf);
 		    if (info) {
 			DebugLevel3Fn("GetPudInfo(%s) : %p\n", pathbuf, info);
@@ -2083,7 +2083,7 @@ local void GameSetupInit(Menuitem *mi __attribute__((unused)))
 	strcat(ScenSelectPath, "/");
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
-    if (strstr(ScenSelectFileName, ".pud")) {
+    if (strcasestr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
@@ -2487,7 +2487,7 @@ global int NetClientSelectScenario(void)
 	ScenSelectPath[0] = 0;
     }
 
-    if (strstr(ScenSelectFileName, ".pud")) {
+    if (strcasestr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectFullPath);
     } else {
 	// FIXME: GetCmInfo();
