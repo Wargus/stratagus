@@ -363,7 +363,7 @@ local void HandleBuffs(Unit* unit, int amount)
 	}
 
 	// User defined variables
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		if (unit->Variable[i].Enable && unit->Variable[i].Increase) {
 			unit->Variable[i].Value += unit->Variable[i].Increase;
 			if (unit->Variable[i].Value <= 0) {

@@ -278,7 +278,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 
 				value = LuaToString(l, -1);
 				spellaction->Data.AdjustVariable.Index = -1; // Invalid index
-				for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+				for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 					if (!strcmp(value, UnitTypeVar.VariableName[i])) {
 						spellaction->Data.AdjustVariable.Index = i;
 					}
@@ -528,7 +528,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	condition->MaxBloodlustTicks = 0xFFFFFFF;
 	condition->MaxInvisibilityTicks = 0xFFFFFFF;
 	condition->MaxInvincibilityTicks = 0xFFFFFFF;
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
 		condition->Variable[i].MinValue = -1;
 		condition->Variable[i].MinMax = -1;
 		condition->Variable[i].MinValuePercent = -8;
@@ -601,7 +601,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 			condition->MaxInvincibilityTicks = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else {
-			for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
+			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined flags
 				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
 					lua_rawgeti(l, -1, j + 1);
 					condition->BoolFlag[i] = Ccl2Condition(l, LuaToString(l, -1));
@@ -612,7 +612,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 			if (i != UnitTypeVar.NumberBoolFlag) {
 				continue;
 			}
-			for (i = 0; i < UnitTypeVar.NumberVariable; i++) { // User defined flags
+			for (i = 0; i < UnitTypeVar.NumberVariable; ++i) { // User defined flags
 				if (!strcmp(value, UnitTypeVar.VariableName[i])) {
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
@@ -726,7 +726,7 @@ local int CclDefineSpell(lua_State* l)
 		spell->Slot = SpellTypeCount;
 		spell->Ident = strdup(identname);
 		spell->DependencyId = -1;
-		for (i = 0; i < NumUnitTypes; i++) { // adjust array for caster already defined
+		for (i = 0; i < NumUnitTypes; ++i) { // adjust array for caster already defined
 			if (UnitTypes[i]->CanCastSpell) {
 				UnitTypes[i]->CanCastSpell = realloc(UnitTypes[i]->CanCastSpell,
 					SpellTypeCount * sizeof((*UnitTypes)->CanCastSpell));
@@ -998,7 +998,7 @@ local void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 	if (condition->TargetSelf != CONDITION_TRUE) {
 		CLprintf(file, "self %s ", condstrings[(int)condition->TargetSelf]);
 	}
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined flags
 		if (condition->BoolFlag[i] != CONDITION_TRUE) {
 			CLprintf(file, "%s %s ",
 				UnitTypeVar.BoolFlagName[i], condstrings[(int)condition->BoolFlag[i]]);

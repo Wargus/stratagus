@@ -195,14 +195,14 @@ global void CommandMoveOrder(Unit* unit, int src, int dst)
 
 	if (src < dst) {
 		tmp = unit->Orders[src];
-		for(i = src; i < dst; i++) {
+		for (i = src; i < dst; ++i) {
 			unit->Orders[i] = unit->Orders[i+1];
 		}
 		unit->Orders[dst] = tmp;
 	} else {
 		// dst < src
 		tmp = unit->Orders[src];
-		for (i = src - 1 ; i >= dst; i--){
+		for (i = src - 1 ; i >= dst; --i){
 			unit->Orders[i + 1] = unit->Orders[i];
 		}
 		unit->Orders[dst] = tmp;

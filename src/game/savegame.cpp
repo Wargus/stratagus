@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 
 #include "stratagus.h"
 #include "icons.h"
@@ -168,10 +169,8 @@ local char* SaveGlobal(lua_State *l, int is_root)
 		if (type_key == LUA_TSTRING) {
 			int i;
 
-			for (i = 0; key[i]; i++) {
-				if (!(('a' <= key[i] && 'z' >= key[i])
-					|| ('A' <= key[i] && 'Z' >= key[i])
-					|| ('0' <= key[i] && key[i] >= '9') || key[i] == '_')) {
+			for (i = 0; key[i]; ++i) {
+				if (!isalnum(key[i]) && key[i] != '_') {
 					free(value);
 					value = NULL;
 					break;

@@ -814,8 +814,8 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 		return 1;
 	}
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
-		const Unit *unit;
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		const Unit* unit;
 
 		unit = (condition->Variable[i].ConditionApplyOnCaster) ? caster : target;
 		Assert(unit);
@@ -824,7 +824,7 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 				return 0;
 			}
 		}
-	// Value and Max
+		// Value and Max
 		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
 			return 0;
 		}
@@ -832,13 +832,13 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 			return 0;
 		}
 
-	// Percent
-		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max
-			> 100 * unit->Variable[i].Value) {
+		// Percent
+		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max >
+				100 * unit->Variable[i].Value) {
 			return 0;
 		}
-		if (condition->Variable[i].MaxValuePercent * unit->Variable[i].Max
-			< 100 * unit->Variable[i].Value) {
+		if (condition->Variable[i].MaxValuePercent * unit->Variable[i].Max <
+				100 * unit->Variable[i].Value) {
 			return 0;
 		}
 	}
@@ -856,7 +856,7 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 			return 0;
 		}
 	}
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined flags
 		if (condition->BoolFlag[i] != CONDITION_TRUE) {
 			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
 				return 0;

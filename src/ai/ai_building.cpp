@@ -114,9 +114,9 @@ local int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, 
 
 	lastval = surrounding[surroundingnb - 1];
 	obstacle = 0;
-	for (i = 0 ; i < surroundingnb; i++) {
+	for (i = 0 ; i < surroundingnb; ++i) {
 		if (lastval && !surrounding[i]) {
-			obstacle++;
+			++obstacle;
 		}
 		lastval = surrounding[i];
 	}
