@@ -80,7 +80,7 @@ global char* CclStartFile;		/// CCL start file
 global char* GameName;			/// Game Preferences
 global int CclInConfigFile;		/// True while config file parsing
 
-global char*	Tips[MAX_TIPS+1];	/// Array of tips
+global char*	Tips[MAX_TIPS + 1];	/// Array of tips
 global int	ShowTips;		/// Show tips at start of level
 global int	CurrentTip;		/// Current tip to display
 
@@ -89,102 +89,108 @@ global int	CurrentTip;		/// Current tip to display
 ----------------------------------------------------------------------------*/
 
 /** 
- * Convert a SCM to a string, SCM must be a symbol or string, else 0
- * is returned
- * 
- * @param scm the SCM to convert to string
- * 
- * @return a string representing the SCM or 0 in case the conversion
- * failed, caller must free() the returned value
- */
+**	Convert a SCM to a string, SCM must be a symbol or string, else 0
+**	is returned
+**	
+**	@param scm the SCM to convert to string
+**	
+**	@return a string representing the SCM or 0 in case the conversion
+**	failed, caller must free() the returned value
+*/
 global char* CclConvertToString(SCM scm)
 {
 #ifdef USE_GUILE
-  if (gh_string_p(scm))
-    return gh_scm2newstr(scm, NULL);
-  else if (gh_symbol_p(scm))
-    return gh_symbol2newstr(scm, NULL);
-  else 
-    return 0;
+    if (gh_string_p(scm)) {
+	return gh_scm2newstr(scm, NULL);
+    } else if (gh_symbol_p(scm)) {
+	return gh_symbol2newstr(scm, NULL);
+    } else {
+	return 0;
+    }
 #else
-  char* str = try_get_c_string(scm);
-  if (str)
-    return strdup(str);
-  else 
-    return 0;
+    char* str;
+    
+    str = try_get_c_string(scm);
+    if (str) {
+	return strdup(str);
+    } else {
+	return 0;
+    }
 #endif
 }
 
 /** 
- * Return the type of a smob
- * 
- * @param smob
- * 
- * @return type id of the smob
- */
+**	Return the type of a smob
+**	
+**	@param smob
+**	
+**	@return type id of the smob
+*/
 global ccl_smob_type_t CclGetSmobType(SCM smob)
 {
 #ifdef USE_GUILE
-  if (SCM_NIMP (smob))
-    return (ccl_smob_type_t)SCM_CAR (smob);
-  else
-    return 0;
+    if (SCM_NIMP(smob)) {
+	return (ccl_smob_type_t)SCM_CAR(smob);
+    } else {
+	return 0;
+    }
 #else  
-  return TYPE(smob);
+    return TYPE(smob);
 #endif
 }
 
 /** 
- * Return the pointer that is stored in a smob
- * 
- * @param smob the smob that contains the pointer
- * 
- * @return pointer that was inside the smob
- */
+**	Return the pointer that is stored in a smob
+**	
+**	@param smob the smob that contains the pointer
+**	
+**	@return pointer that was inside the smob
+*/
 global void* CclGetSmobData(SCM smob)
 {
 #ifdef USE_GUILE
-  return (void*)SCM_SMOB_DATA(smob);
+    return (void*)SCM_SMOB_DATA(smob);
 #else
-  return smob->storage_as.cons.cdr;
+    return smob->storage_as.cons.cdr;
 #endif
 }
 
 /** 
- * Store a pointer inside a SMOB, aka convert a pointer to a SCM
- * 
- * @param tag The type of the pointer/smob
- * @param ptr the pointer that should be converted to a SCM
- */
+**	Store a pointer inside a SMOB, aka convert a pointer to a SCM
+**	
+**	@param tag The type of the pointer/smob
+**	@param ptr the pointer that should be converted to a SCM
+*/
 global SCM CclMakeSmobObj(ccl_smob_type_t tag, void* ptr)
 {
 #ifdef USE_GUILE
-  SCM_RETURN_NEWSMOB (tag, ptr);
+    SCM_RETURN_NEWSMOB(tag, ptr);
 #else
-  SCM value   = cons(NIL,NIL);
+    SCM value;
 
-  value->type                = tag;
-  value->storage_as.cons.cdr = (SCM)ptr;
+    value = cons(NIL, NIL);
+    value->type = tag;
+    value->storage_as.cons.cdr = (SCM)ptr;
 
-  return value;
+    return value;
 #endif
 }
 
 /** 
- * Create a tag for a new type.
- * 
- * @param name 
- * 
- * @return The newly generated SMOB type
- */
+**	Create a tag for a new type.
+**	
+**	@param name 
+**	
+**	@return The newly generated SMOB type
+*/
 global ccl_smob_type_t CclMakeSmobType(const char* name)
 {
-  ccl_smob_type_t new_type;
+    ccl_smob_type_t new_type;
 
 #ifdef USE_GUILE
-  new_type = scm_make_smob_type ((char*)name, 0);
+    new_type = scm_make_smob_type((char*)name, 0);
 #else
-  new_type = allocate_user_tc();
+    new_type = allocate_user_tc();
 #endif
 
   return new_type;
@@ -201,8 +207,9 @@ global void CclGcProtect(SCM obj)
     scm_gc_protect_object(obj);
 #else
     SCM var;
-    var=gh_symbol2scm("*ccl-protect*");
-    setvar(var,cons(obj,symbol_value(var,NIL)),NIL);
+
+    var = gh_symbol2scm("*ccl-protect*");
+    setvar(var, cons(obj, symbol_value(var, NIL)), NIL);
 #endif
 }
 
@@ -216,23 +223,24 @@ global void CclGcUnprotect(SCM obj)
 #ifdef USE_GUILE
     scm_gc_unprotect_object(obj);
 #else
-    // Remove obj from the list *ccl-protect*
     SCM sym;
     SCM old_lst;
     SCM new_lst;
 
+    // Remove obj from the list *ccl-protect*
     sym = gh_symbol2scm("*ccl-protect*");
     old_lst = symbol_value(sym, NIL);
     new_lst = NIL;
 
     // FIXME: Doesn't handle nested protect/unprotects
-    while( !gh_null_p(old_lst) ) {
-        SCM el = gh_car(old_lst);
-
-        if (el != obj)
-          new_lst = cons(el, new_lst);
-        
-        old_lst = gh_cdr(old_lst);
+    while (!gh_null_p(old_lst)) {
+        SCM el;
+	
+	el = gh_car(old_lst);
+        if (el != obj) {
+	    new_lst = cons(el, new_lst);
+	}
+	old_lst = gh_cdr(old_lst);
       }
     
     setvar(sym, new_lst, NIL);
@@ -273,17 +281,17 @@ local SCM CclSetGameName(SCM gamename)
 {
     SCM old;
 
-    old=NIL;
-    if( GameName ) {
-	old=gh_str02scm(GameName);
+    old = NIL;
+    if (GameName) {
+	old = gh_str02scm(GameName);
     }
-    if( !gh_null_p(gamename) ) {
-	if( GameName ) {
+    if (!gh_null_p(gamename)) {
+	if (GameName) {
 	    free(GameName);
-	    GameName=NULL;
+	    GameName = NULL;
 	}
 
-	GameName=gh_scm2newstr(gamename,NULL);
+	GameName = gh_scm2newstr(gamename, NULL);
     }
     return old;
 }
@@ -293,7 +301,7 @@ local SCM CclSetGameName(SCM gamename)
 */
 local SCM CclSetGameCycle(SCM cycle)
 {
-    GameCycle=gh_scm2int(cycle);
+    GameCycle = gh_scm2int(cycle);
     return SCM_UNSPECIFIED;
 }
 
@@ -302,10 +310,10 @@ local SCM CclSetGameCycle(SCM cycle)
 */
 local SCM CclSetGamePaused(SCM paused)
 {
-    if( gh_boolean_p(paused) ) {
-	GamePaused=gh_scm2bool(paused);
+    if (gh_boolean_p(paused)) {
+	GamePaused = gh_scm2bool(paused);
     } else {
-	GamePaused=gh_scm2int(paused);
+	GamePaused = gh_scm2int(paused);
     }
     return SCM_UNSPECIFIED;
 }
@@ -315,7 +323,7 @@ local SCM CclSetGamePaused(SCM paused)
 */
 local SCM CclSetVideoSyncSpeed(SCM speed)
 {
-    VideoSyncSpeed=gh_scm2int(speed);
+    VideoSyncSpeed = gh_scm2int(speed);
     return SCM_UNSPECIFIED;
 }
 
@@ -326,9 +334,9 @@ local SCM CclSetLocalPlayerName(SCM name)
 {
     char* str;
 
-    str=gh_scm2newstr(name, 0);
-    strncpy(LocalPlayerName,str,sizeof(LocalPlayerName)-1);
-    LocalPlayerName[sizeof(LocalPlayerName)-1]='\0';
+    str = gh_scm2newstr(name, 0);
+    strncpy(LocalPlayerName, str, sizeof(LocalPlayerName) - 1);
+    LocalPlayerName[sizeof(LocalPlayerName) - 1] = '\0';
     return SCM_UNSPECIFIED;
 }
 
@@ -342,8 +350,8 @@ local SCM CclSetShowTips(SCM flag)
 {
     int old;
 
-    old=ShowTips;
-    ShowTips=gh_scm2bool(flag);
+    old = ShowTips;
+    ShowTips = gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
@@ -358,8 +366,8 @@ local SCM CclSetCurrentTip(SCM tip)
 {
     int old;
 
-    old=CurrentTip;
-    CurrentTip=gh_scm2int(tip);
+    old = CurrentTip;
+    CurrentTip = gh_scm2int(tip);
     if (CurrentTip >= MAX_TIPS || Tips[CurrentTip] == NULL) {
 	CurrentTip = 0;
     }
@@ -379,12 +387,12 @@ local SCM CclAddTip(SCM tip)
 {
     int i;
 
-    for( i=0; i<MAX_TIPS; i++ ) {
-	if( Tips[i] && !strcmp(get_c_string(tip),Tips[i]) ) {
+    for (i = 0; i < MAX_TIPS; ++i) {
+	if (Tips[i] && !strcmp(get_c_string(tip), Tips[i])) {
 	    break;
 	}
-	if( Tips[i]==NULL ) {
-	    Tips[i]=gh_scm2newstr(tip,NULL);
+	if (Tips[i] == NULL) {
+	    Tips[i] = gh_scm2newstr(tip, NULL);
 	    break;
 	}
     }
@@ -398,17 +406,17 @@ local SCM CclAddTip(SCM tip)
 **	@param resource	Name of resource.
 **	@param speed	Speed factor of harvesting resource.
 */
-local SCM CclSetSpeedResourcesHarvest(SCM resource,SCM speed)
+local SCM CclSetSpeedResourcesHarvest(SCM resource, SCM speed)
 {
     int i;
 
-    for( i=0; i<MaxCosts; ++i ) {
-	if( gh_eq_p(resource,gh_symbol2scm(DefaultResourceNames[i])) ) {
-	    SpeedResourcesHarvest[i]=gh_scm2int(speed);
+    for (i = 0; i < MaxCosts; ++i) {
+	if (gh_eq_p(resource, gh_symbol2scm(DefaultResourceNames[i]))) {
+	    SpeedResourcesHarvest[i] = gh_scm2int(speed);
 	    return SCM_UNSPECIFIED;
 	}
     }
-    errl("Resource not found",resource);
+    errl("Resource not found", resource);
     return SCM_UNSPECIFIED;
 }
 
@@ -418,18 +426,18 @@ local SCM CclSetSpeedResourcesHarvest(SCM resource,SCM speed)
 **	@param resource	Name of resource.
 **	@param speed	Speed factor of returning resource.
 */
-local SCM CclSetSpeedResourcesReturn(SCM resource,SCM speed)
+local SCM CclSetSpeedResourcesReturn(SCM resource, SCM speed)
 {
     int i;
 
-    for( i=0; i<MaxCosts; ++i ) {
-	if( gh_eq_p(resource,gh_symbol2scm(DefaultResourceNames[i])) ) {
-	    SpeedResourcesReturn[i]=gh_scm2int(speed);
+    for (i = 0; i < MaxCosts; ++i) {
+	if (gh_eq_p(resource, gh_symbol2scm(DefaultResourceNames[i]))) {
+	    SpeedResourcesReturn[i] = gh_scm2int(speed);
 	    break;
 	}
     }
-    if( i==MaxCosts ) {
-	errl("Resource not found",resource);
+    if (i == MaxCosts) {
+	errl("Resource not found", resource);
     }
     return speed;
 }
@@ -439,7 +447,7 @@ local SCM CclSetSpeedResourcesReturn(SCM resource,SCM speed)
 */
 local SCM CclSetSpeedBuild(SCM speed)
 {
-    SpeedBuild=gh_scm2int(speed);
+    SpeedBuild = gh_scm2int(speed);
 
     return speed;
 }
@@ -449,7 +457,7 @@ local SCM CclSetSpeedBuild(SCM speed)
 */
 local SCM CclSetSpeedTrain(SCM speed)
 {
-    SpeedTrain=gh_scm2int(speed);
+    SpeedTrain = gh_scm2int(speed);
 
     return speed;
 }
@@ -459,7 +467,7 @@ local SCM CclSetSpeedTrain(SCM speed)
 */
 local SCM CclSetSpeedUpgrade(SCM speed)
 {
-    SpeedUpgrade=gh_scm2int(speed);
+    SpeedUpgrade = gh_scm2int(speed);
 
     return speed;
 }
@@ -469,7 +477,7 @@ local SCM CclSetSpeedUpgrade(SCM speed)
 */
 local SCM CclSetSpeedResearch(SCM speed)
 {
-    SpeedResearch=gh_scm2int(speed);
+    SpeedResearch = gh_scm2int(speed);
 
     return speed;
 }
@@ -482,12 +490,12 @@ local SCM CclSetSpeeds(SCM speed)
     int i;
     int s;
 
-    s=gh_scm2int(speed);
-    for( i=0; i<MaxCosts; ++i ) {
-	SpeedResourcesHarvest[i]=s;
-	SpeedResourcesReturn[i]=s;
+    s = gh_scm2int(speed);
+    for (i = 0; i < MaxCosts; ++i) {
+	SpeedResourcesHarvest[i] = s;
+	SpeedResourcesReturn[i] = s;
     }
-    SpeedBuild=SpeedTrain=SpeedUpgrade=SpeedResearch=s;
+    SpeedBuild = SpeedTrain = SpeedUpgrade = SpeedResearch = s;
 
     return speed;
 }
@@ -499,9 +507,9 @@ local SCM CclDefineDefaultResources(SCM list)
 {
     int i;
 
-    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
-	DefaultResources[i]=gh_scm2int(gh_car(list));
-	list=gh_cdr(list);
+    for (i = 0; i < MaxCosts && !gh_null_p(list); ++i) {
+	DefaultResources[i] = gh_scm2int(gh_car(list));
+	list = gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
 }
@@ -513,9 +521,9 @@ local SCM CclDefineDefaultResourcesLow(SCM list)
 {
     int i;
 
-    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
-	DefaultResourcesLow[i]=gh_scm2int(gh_car(list));
-	list=gh_cdr(list);
+    for (i = 0; i < MaxCosts && !gh_null_p(list); ++i) {
+	DefaultResourcesLow[i] = gh_scm2int(gh_car(list));
+	list = gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
 }
@@ -527,9 +535,9 @@ local SCM CclDefineDefaultResourcesMedium(SCM list)
 {
     int i;
 
-    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
-	DefaultResourcesMedium[i]=gh_scm2int(gh_car(list));
-	list=gh_cdr(list);
+    for (i = 0; i < MaxCosts && !gh_null_p(list); ++i) {
+	DefaultResourcesMedium[i] = gh_scm2int(gh_car(list));
+	list = gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
 }
@@ -541,9 +549,9 @@ local SCM CclDefineDefaultResourcesHigh(SCM list)
 {
     int i;
 
-    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
-	DefaultResourcesHigh[i]=gh_scm2int(gh_car(list));
-	list=gh_cdr(list);
+    for (i = 0; i < MaxCosts && !gh_null_p(list); ++i) {
+	DefaultResourcesHigh[i] = gh_scm2int(gh_car(list));
+	list = gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
 }
@@ -555,9 +563,9 @@ local SCM CclDefineDefaultIncomes(SCM list)
 {
     int i;
 
-    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
-	DefaultIncomes[i]=gh_scm2int(gh_car(list));
-	list=gh_cdr(list);
+    for (i = 0; i < MaxCosts && !gh_null_p(list); ++i) {
+	DefaultIncomes[i] = gh_scm2int(gh_car(list));
+	list = gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
 }
@@ -569,13 +577,13 @@ local SCM CclDefineDefaultActions(SCM list)
 {
     int i;
 
-    for( i=0; i<MaxCosts; ++i ) {
+    for (i = 0; i < MaxCosts; ++i) {
 	free(DefaultActions[i]);
-	DefaultActions[i]=NULL;
+	DefaultActions[i] = NULL;
     }
-    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+    for (i = 0; i < MaxCosts && !gh_null_p(list); ++i) {
 	DefaultActions[i] = gh_scm2newstr(gh_car(list), 0);
-	list=gh_cdr(list);
+	list = gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
 }
@@ -587,13 +595,13 @@ local SCM CclDefineDefaultResourceNames(SCM list)
 {
     int i;
 
-    for( i=0; i<MaxCosts; ++i ) {
+    for (i = 0; i < MaxCosts; ++i) {
 	free(DefaultResourceNames[i]);
-	DefaultResourceNames[i]=NULL;
+	DefaultResourceNames[i] = NULL;
     }
-    for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
+    for (i = 0; i < MaxCosts && !gh_null_p(list); ++i) {
 	DefaultResourceNames[i] = gh_scm2newstr(gh_car(list), 0);
-	list=gh_cdr(list);
+	list = gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
 }
@@ -610,35 +618,34 @@ local SCM CclUnits(void)
     int i;
     static char buf[80];
 
-    i=0;
-    slot=UnitSlotFree;
-    while( slot ) {			// count the free slots
+    i = 0;
+    slot = UnitSlotFree;
+    while (slot) {			// count the free slots
 	++i;
-	slot=(void*)*slot;
+	slot = (void*)*slot;
     }
-    freeslots=i;
+    freeslots = i;
 
     //
     //	Look how many slots are used
     //
-    destroyed=nullrefs=0;
-    for( slot=UnitSlots; slot<UnitSlots+MAX_UNIT_SLOTS; ++slot ) {
-	if( *slot
-		&& (*slot<(Unit*)UnitSlots
-			|| *slot>(Unit*)(UnitSlots+MAX_UNIT_SLOTS)) ) {
-	    if( (*slot)->Destroyed ) {
+    destroyed = nullrefs = 0;
+    for (slot = UnitSlots; slot < UnitSlots + MAX_UNIT_SLOTS; ++slot) {
+	if (*slot && (*slot < (Unit*)UnitSlots ||
+		*slot > (Unit*)(UnitSlots + MAX_UNIT_SLOTS))) {
+	    if ((*slot)->Destroyed) {
 		++destroyed;
-	    } else if( !(*slot)->Refs ) {
+	    } else if (!(*slot)->Refs) {
 		++nullrefs;
 	    }
 	}
     }
 
-    sprintf(buf,"%d free, %d(%d) used, %d, destroyed, %d null"
-	    ,freeslots,MAX_UNIT_SLOTS-1-freeslots,NumUnits,destroyed,nullrefs);
+    sprintf(buf, "%d free, %d(%d) used, %d, destroyed, %d null",
+	freeslots, MAX_UNIT_SLOTS - 1 - freeslots, NumUnits, destroyed, nullrefs);
     SetStatusLine(buf);
-    fprintf(stderr,"%d free, %d(%d) used, %d destroyed, %d null\n"
-	    ,freeslots,MAX_UNIT_SLOTS-1-freeslots,NumUnits,destroyed,nullrefs);
+    fprintf(stderr, "%d free, %d(%d) used, %d destroyed, %d null\n",
+	freeslots, MAX_UNIT_SLOTS - 1 - freeslots, NumUnits, destroyed, nullrefs);
 
     return gh_int2scm(destroyed);
 }
@@ -663,13 +670,13 @@ local SCM CclGetStratagusHomePath(void)
     const char* cp;
     char* buf;
 
-    cp=getenv("HOME");
-    buf=alloca(strlen(cp)+strlen(GameName)+sizeof(STRATAGUS_HOME_PATH)+3);
-    strcpy(buf,cp);
-    strcat(buf,"/");
-    strcat(buf,STRATAGUS_HOME_PATH);
-    strcat(buf,"/");
-    strcat(buf,GameName);
+    cp = getenv("HOME");
+    buf = alloca(strlen(cp) + strlen(GameName) + sizeof(STRATAGUS_HOME_PATH) + 3);
+    strcpy(buf, cp);
+    strcat(buf, "/");
+    strcat(buf, STRATAGUS_HOME_PATH);
+    strcat(buf, "/");
+    strcat(buf, GameName);
 
     return gh_str02scm(buf);
 }
@@ -698,8 +705,8 @@ local SCM CclLoadPud(SCM file)
     char* name;
     char buffer[1024];
 
-    name=gh_scm2newstr(file,NULL);
-    LoadPud(LibraryFileName(name,buffer),&TheMap);
+    name = gh_scm2newstr(file, NULL);
+    LoadPud(LibraryFileName(name, buffer), &TheMap);
     free(name);
 
     // FIXME: LoadPud should return an error
@@ -718,13 +725,13 @@ local SCM CclLoadMap(SCM file)
     char* name;
     char buffer[1024];
 
-    name=gh_scm2newstr(file,NULL);
-    if( strcasestr(name,".pud") ) {
-	LoadPud(LibraryFileName(name,buffer),&TheMap);
-    } else if( strcasestr(name,".scm") ) {
-	LoadScm(LibraryFileName(name,buffer),&TheMap);
-    } else if( strcasestr(name,".chk") ) {
-	LoadChk(LibraryFileName(name,buffer),&TheMap);
+    name = gh_scm2newstr(file, NULL);
+    if (strcasestr(name, ".pud")) {
+	LoadPud(LibraryFileName(name, buffer), &TheMap);
+    } else if (strcasestr(name, ".scm")) {
+	LoadScm(LibraryFileName(name, buffer), &TheMap);
+    } else if (strcasestr(name, ".chk")) {
+	LoadChk(LibraryFileName(name, buffer), &TheMap);
     }
     free(name);
 
@@ -738,17 +745,17 @@ local SCM CclLoadMap(SCM file)
 **	@param width	Map width.
 **	@param height	Map height.
 */
-local SCM CclDefineMap(SCM width,SCM height)
+local SCM CclDefineMap(SCM width, SCM height)
 {
-    TheMap.Width=gh_scm2int(width);
-    TheMap.Height=gh_scm2int(height);
+    TheMap.Width = gh_scm2int(width);
+    TheMap.Height = gh_scm2int(height);
 
-    TheMap.Fields=calloc(TheMap.Width*TheMap.Height,sizeof(*TheMap.Fields));
-    TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+    TheMap.Fields = calloc(TheMap.Width * TheMap.Height, sizeof(*TheMap.Fields));
+    TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
     InitUnitCache();
     // FIXME: this should be CreateMap or InitMap?
 
-    // MapX=MapY=0;
+    // MapX = MapY = 0;
 
     return SCM_UNSPECIFIED;
 }
@@ -768,16 +775,17 @@ global void CclCommand(const char* command)
 #ifndef USE_GUILE
     int retval;
 #endif
-    strncpy(msg,command,sizeof(msg));
+
+    strncpy(msg, command, sizeof(msg));
 
     // FIXME: cheat protection
 #ifdef USE_GUILE
     gh_eval_str(msg);
 #else
-    retval = repl_c_string(msg,0,0,sizeof(msg));
+    retval = repl_c_string(msg, 0, 0, sizeof(msg));
     DebugLevel3("\n%d=%s\n" _C_ retval _C_ msg);
 #endif
-    SetMessage("%s",msg);
+    SetMessage("%s", msg);
 }
 
 /*............................................................................
@@ -790,13 +798,13 @@ global void CclCommand(const char* command)
 global void InitCcl(void)
 {
 #ifdef USE_GUILE
-  scm_init_guile();
+    scm_init_guile();
 
-  gh_eval_str("(display \"Guile: Enabling debugging...\\n\")"
-              "(debug-enable 'debug)"
-              "(debug-enable 'backtrace)"
-              "(read-enable 'positions)"
-              "(define *scheme* 'guile)");
+    gh_eval_str("(display \"Guile: Enabling debugging...\\n\")"
+	"(debug-enable 'debug)"
+	"(debug-enable 'backtrace)"
+	"(read-enable 'positions)"
+	"(define *scheme* 'guile)");
 #else
     char* sargv[5];
     char* buf;
@@ -806,40 +814,40 @@ global void InitCcl(void)
     sargv[1] = "-v1";
     sargv[2] = "-g0";
     sargv[3] = "-h800000:10";
-    buf=malloc(strlen(StratagusLibPath)+4);
-    sprintf(buf,"-l%s",StratagusLibPath);
+    buf = malloc(strlen(StratagusLibPath) + 4);
+    sprintf(buf, "-l%s", StratagusLibPath);
     sargv[4] = buf;			// never freed
     
-    siod_init(5,sargv);
-    repl_c_string(msg, 0,0,sizeof(msg));
+    siod_init(5, sargv);
+    repl_c_string(msg, 0, 0, sizeof(msg));
 #endif
-    gh_new_procedure0_0("library-path",CclStratagusLibraryPath);
-    gh_new_procedure0_0("game-cycle",CclGameCycle);
-    gh_new_procedure1_0("set-game-name!",CclSetGameName);
-    gh_new_procedure1_0("set-game-cycle!",CclSetGameCycle);
-    gh_new_procedure1_0("set-game-paused!",CclSetGamePaused);
-    gh_new_procedure1_0("set-video-sync-speed!",CclSetVideoSyncSpeed);
-    gh_new_procedure1_0("set-local-player-name!",CclSetLocalPlayerName);
+    gh_new_procedure0_0("library-path", CclStratagusLibraryPath);
+    gh_new_procedure0_0("game-cycle", CclGameCycle);
+    gh_new_procedure1_0("set-game-name!", CclSetGameName);
+    gh_new_procedure1_0("set-game-cycle!", CclSetGameCycle);
+    gh_new_procedure1_0("set-game-paused!", CclSetGamePaused);
+    gh_new_procedure1_0("set-video-sync-speed!", CclSetVideoSyncSpeed);
+    gh_new_procedure1_0("set-local-player-name!", CclSetLocalPlayerName);
 
-    gh_new_procedure1_0("set-show-tips!",CclSetShowTips);
-    gh_new_procedure1_0("set-current-tip!",CclSetCurrentTip);
-    gh_new_procedure1_0("add-tip",CclAddTip);
+    gh_new_procedure1_0("set-show-tips!", CclSetShowTips);
+    gh_new_procedure1_0("set-current-tip!", CclSetCurrentTip);
+    gh_new_procedure1_0("add-tip", CclAddTip);
 
-    gh_new_procedure2_0("set-speed-resources-harvest!",CclSetSpeedResourcesHarvest);
-    gh_new_procedure2_0("set-speed-resources-return!",CclSetSpeedResourcesReturn);
-    gh_new_procedure1_0("set-speed-build!",CclSetSpeedBuild);
-    gh_new_procedure1_0("set-speed-train!",CclSetSpeedTrain);
-    gh_new_procedure1_0("set-speed-upgrade!",CclSetSpeedUpgrade);
-    gh_new_procedure1_0("set-speed-research!",CclSetSpeedResearch);
-    gh_new_procedure1_0("set-speeds!",CclSetSpeeds);
+    gh_new_procedure2_0("set-speed-resources-harvest!", CclSetSpeedResourcesHarvest);
+    gh_new_procedure2_0("set-speed-resources-return!", CclSetSpeedResourcesReturn);
+    gh_new_procedure1_0("set-speed-build!", CclSetSpeedBuild);
+    gh_new_procedure1_0("set-speed-train!", CclSetSpeedTrain);
+    gh_new_procedure1_0("set-speed-upgrade!", CclSetSpeedUpgrade);
+    gh_new_procedure1_0("set-speed-research!", CclSetSpeedResearch);
+    gh_new_procedure1_0("set-speeds!", CclSetSpeeds);
 
-    gh_new_procedureN("define-default-resources",CclDefineDefaultResources);
-    gh_new_procedureN("define-default-resources-low",CclDefineDefaultResourcesLow);
-    gh_new_procedureN("define-default-resources-medium",CclDefineDefaultResourcesMedium);
-    gh_new_procedureN("define-default-resources-high",CclDefineDefaultResourcesHigh);
-    gh_new_procedureN("define-default-incomes",CclDefineDefaultIncomes);
-    gh_new_procedureN("define-default-actions",CclDefineDefaultActions);
-    gh_new_procedureN("define-default-resource-names",CclDefineDefaultResourceNames);
+    gh_new_procedureN("define-default-resources", CclDefineDefaultResources);
+    gh_new_procedureN("define-default-resources-low", CclDefineDefaultResourcesLow);
+    gh_new_procedureN("define-default-resources-medium", CclDefineDefaultResourcesMedium);
+    gh_new_procedureN("define-default-resources-high", CclDefineDefaultResourcesHigh);
+    gh_new_procedureN("define-default-incomes", CclDefineDefaultIncomes);
+    gh_new_procedureN("define-default-actions", CclDefineDefaultActions);
+    gh_new_procedureN("define-default-resource-names", CclDefineDefaultResourceNames);
 
     IconCclRegister();
     MissileCclRegister();
@@ -863,89 +871,89 @@ global void InitCcl(void)
     TriggerCclRegister();
     CreditsCclRegister();
     ObjectivesCclRegister();
-	SpellCclRegister();
+    SpellCclRegister();
 
     EditorCclRegister();
 
-    gh_new_procedure1_0("load-pud",CclLoadPud);
-    gh_new_procedure1_0("load-map",CclLoadMap);
-    gh_new_procedure2_0("define-map",CclDefineMap);
+    gh_new_procedure1_0("load-pud", CclLoadPud);
+    gh_new_procedure1_0("load-map", CclLoadMap);
+    gh_new_procedure2_0("define-map", CclDefineMap);
 
-    gh_new_procedure0_0("units",CclUnits);
+    gh_new_procedure0_0("units", CclUnits);
 
-    gh_new_procedure0_0("with-sound",CclWithSound);
-    gh_new_procedure0_0("get-stratagus-home-path",CclGetStratagusHomePath);
-    gh_new_procedure0_0("get-stratagus-library-path"
-	    ,CclGetStratagusLibraryPath);
+    gh_new_procedure0_0("with-sound", CclWithSound);
+    gh_new_procedure0_0("get-stratagus-home-path", CclGetStratagusHomePath);
+    gh_new_procedure0_0("get-stratagus-library-path",
+	CclGetStratagusLibraryPath);
 
     //
     //	Make some sombols for the compile options/features.
     //
 #ifdef USE_THREAD
-    gh_define("stratagus-feature-thread",SCM_BOOL_T);
+    gh_define("stratagus-feature-thread", SCM_BOOL_T);
 #endif
 #ifdef DEBUG
-    gh_define("stratagus-feature-debug",SCM_BOOL_T);
+    gh_define("stratagus-feature-debug", SCM_BOOL_T);
 #endif
 #ifdef DEBUG_FLAGS
-    gh_define("stratagus-feature-debug-flags",SCM_BOOL_T);
+    gh_define("stratagus-feature-debug-flags", SCM_BOOL_T);
 #endif
 #ifdef USE_ZLIB
-    gh_define("stratagus-feature-zlib",SCM_BOOL_T);
+    gh_define("stratagus-feature-zlib", SCM_BOOL_T);
 #endif
 #ifdef USE_BZ2LIB
-    gh_define("stratagus-feature-bz2lib",SCM_BOOL_T);
+    gh_define("stratagus-feature-bz2lib", SCM_BOOL_T);
 #endif
 #ifdef USE_ZZIPLIB
-    gh_define("stratagus-feature-zziplib",SCM_BOOL_T);
+    gh_define("stratagus-feature-zziplib", SCM_BOOL_T);
 #endif
 #ifdef USE_SDL
-    gh_define("stratagus-feature-sdl",SCM_BOOL_T);
+    gh_define("stratagus-feature-sdl", SCM_BOOL_T);
 #endif
 #ifdef USE_SDLA
-    gh_define("stratagus-feature-sdl-audio",SCM_BOOL_T);
+    gh_define("stratagus-feature-sdl-audio", SCM_BOOL_T);
 #endif
 #ifdef USE_SDLCD
-    gh_define("stratagus-feature-sdl-cd",SCM_BOOL_T);
+    gh_define("stratagus-feature-sdl-cd", SCM_BOOL_T);
 #endif
 #ifdef USE_X11
-    gh_define("stratagus-feature-x11",SCM_BOOL_T);
+    gh_define("stratagus-feature-x11", SCM_BOOL_T);
 #endif
 #ifdef USE_SVGALIB
-    gh_define("stratagus-feature-svgalib",SCM_BOOL_T);
+    gh_define("stratagus-feature-svgalib", SCM_BOOL_T);
 #endif
 #ifdef WITH_SOUND
-    gh_define("stratagus-feature-with-sound",SCM_BOOL_T);
+    gh_define("stratagus-feature-with-sound", SCM_BOOL_T);
 #endif
 #ifdef UNIT_ON_MAP
-    gh_define("stratagus-feature-unit-on-map",SCM_BOOL_T);
+    gh_define("stratagus-feature-unit-on-map", SCM_BOOL_T);
 #endif
 #ifdef UNITS_ON_MAP
-    gh_define("stratagus-feature-units-on-map",SCM_BOOL_T);
+    gh_define("stratagus-feature-units-on-map", SCM_BOOL_T);
 #endif
 #ifdef NEW_MAPDRAW
-    gh_define("stratagus-feature-new-mapdraw",SCM_BOOL_T);
+    gh_define("stratagus-feature-new-mapdraw", SCM_BOOL_T);
 #endif
 #ifdef HIERARCHIC_PATHFINDER
-    gh_define("stratagus-feature-hierarchic-pathfinder",SCM_BOOL_T);
+    gh_define("stratagus-feature-hierarchic-pathfinder", SCM_BOOL_T);
 #endif
 #ifdef SLOW_INPUT
-    gh_define("stratagus-feature-slow-input",SCM_BOOL_T);
+    gh_define("stratagus-feature-slow-input", SCM_BOOL_T);
 #endif
 #ifdef USE_FLAC
-    gh_define("stratagus-feature-flac",SCM_BOOL_T);
+    gh_define("stratagus-feature-flac", SCM_BOOL_T);
 #endif
 #ifdef USE_OGG
-    gh_define("stratagus-feature-ogg",SCM_BOOL_T);
+    gh_define("stratagus-feature-ogg", SCM_BOOL_T);
 #endif
 #ifdef USE_MAD
-    gh_define("stratagus-feature-mp3",SCM_BOOL_T);
+    gh_define("stratagus-feature-mp3", SCM_BOOL_T);
 #endif
 #ifdef USE_LIBCDA
-    gh_define("stratagus-feature-libcda",SCM_BOOL_T);
+    gh_define("stratagus-feature-libcda", SCM_BOOL_T);
 #endif
 
-    gh_define("*ccl-protect*",NIL);
+    gh_define("*ccl-protect*", NIL);
 
     print_welcome();
 }
@@ -959,15 +967,15 @@ local void LoadPreferences1(void)
     char buf[1024];
 
 #ifdef USE_WIN32
-    strcpy(buf,"preferences1.ccl");
+    strcpy(buf, "preferences1.ccl");
 #else
-    sprintf(buf,"%s/%s/preferences1.ccl",getenv("HOME"),STRATAGUS_HOME_PATH);
+    sprintf(buf, "%s/%s/preferences1.ccl", getenv("HOME"), STRATAGUS_HOME_PATH);
 #endif
 
-    fd=fopen(buf,"r");
-    if( fd ) {
+    fd = fopen(buf, "r");
+    if (fd) {
 	fclose(fd);
-	vload(buf,0,1);
+	vload(buf, 0, 1);
     }
 }
 
@@ -980,15 +988,16 @@ local void LoadPreferences2(void)
     char buf[1024];
 
 #ifdef USE_WIN32
-    sprintf(buf,"%s/preferences2.ccl",GameName);
+    sprintf(buf, "%s/preferences2.ccl", GameName);
 #else
-    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),STRATAGUS_HOME_PATH,GameName);
+    sprintf(buf, "%s/%s/%s/preferences2.ccl", getenv("HOME"),
+	STRATAGUS_HOME_PATH, GameName);
 #endif
 
-    fd=fopen(buf,"r");
-    if( fd ) {
+    fd = fopen(buf, "r");
+    if (fd) {
 	fclose(fd);
-	vload(buf,0,1);
+	vload(buf, 0, 1);
     }
 }
 
@@ -1006,22 +1015,22 @@ global void SavePreferences(void)
     //
 
 #ifdef USE_WIN32
-    strcpy(buf,"preferences1.ccl");
+    strcpy(buf, "preferences1.ccl");
 #else
-    sprintf(buf,"%s/%s",getenv("HOME"),STRATAGUS_HOME_PATH);
-    mkdir(buf,0777);
-    strcat(buf,"/preferences1.ccl");
+    sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
+    mkdir(buf, 0777);
+    strcat(buf, "/preferences1.ccl");
 #endif
 
-    fd=fopen(buf,"w");
-    if( !fd ) {
+    fd = fopen(buf, "w");
+    if (!fd) {
 	return;
     }
 
-    fprintf(fd,";;; -----------------------------------------\n");
-    fprintf(fd,";;; $Id$\n");
+    fprintf(fd, ";;; -----------------------------------------\n");
+    fprintf(fd, ";;; $Id$\n");
 
-    fprintf(fd,"(set-video-resolution! %d %d)\n", VideoWidth, VideoHeight);
+    fprintf(fd, "(set-video-resolution! %d %d)\n", VideoWidth, VideoHeight);
     
     fclose(fd);
 
@@ -1032,60 +1041,61 @@ global void SavePreferences(void)
     //
 
 #ifdef USE_WIN32
-    sprintf(buf,"%s/preferences2.ccl",GameName);
+    sprintf(buf, "%s/preferences2.ccl", GameName);
 #else
-    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),STRATAGUS_HOME_PATH,GameName);
+    sprintf(buf, "%s/%s/%s/preferences2.ccl", getenv("HOME"),
+	STRATAGUS_HOME_PATH, GameName);
 #endif
 
-    fd=fopen(buf,"w");
-    if( !fd ) {
+    fd = fopen(buf, "w");
+    if (!fd) {
 	return;
     }
 
-    fprintf(fd,";;; -----------------------------------------\n");
-    fprintf(fd,";;; $Id$\n");
+    fprintf(fd, ";;; -----------------------------------------\n");
+    fprintf(fd, ";;; $Id$\n");
 
     // Global options
-    if( OriginalFogOfWar ) {
-	fprintf(fd,"(original-fog-of-war)\n");
+    if (OriginalFogOfWar) {
+	fprintf(fd, "(original-fog-of-war)\n");
     } else {
-	fprintf(fd,"(alpha-fog-of-war)\n");
+	fprintf(fd, "(alpha-fog-of-war)\n");
     }
-    fprintf(fd,"(set-video-fullscreen! #%c)\n", VideoFullScreen ? 't' : 'f');
+    fprintf(fd, "(set-video-fullscreen! #%c)\n", VideoFullScreen ? 't' : 'f');
 #if 0
     // FIXME: Uncomment when this is configurable in the menus
-    fprintf(fd,"(set-contrast! %d)\n", TheUI.Contrast);
-    fprintf(fd,"(set-brightness! %d)\n", TheUI.Brightness);
-    fprintf(fd,"(set-saturation! %d)\n", TheUI.Saturation);
+    fprintf(fd, "(set-contrast! %d)\n", TheUI.Contrast);
+    fprintf(fd, "(set-brightness! %d)\n", TheUI.Brightness);
+    fprintf(fd, "(set-saturation! %d)\n", TheUI.Saturation);
 #endif
-    fprintf(fd,"(set-local-player-name! \"%s\")\n", LocalPlayerName);
+    fprintf(fd, "(set-local-player-name! \"%s\")\n", LocalPlayerName);
 
     // Game options
-    fprintf(fd,"(set-show-tips! #%c)\n", ShowTips ? 't' : 'f');
-    fprintf(fd,"(set-current-tip! %d)\n", CurrentTip);
+    fprintf(fd, "(set-show-tips! #%c)\n", ShowTips ? 't' : 'f');
+    fprintf(fd, "(set-current-tip! %d)\n", CurrentTip);
 
-    fprintf(fd,"(set-fog-of-war! #%c)\n", !TheMap.NoFogOfWar ? 't' : 'f');
-    fprintf(fd,"(set-show-command-key! #%c)\n", ShowCommandKey ? 't' : 'f');
+    fprintf(fd, "(set-fog-of-war! #%c)\n", !TheMap.NoFogOfWar ? 't' : 'f');
+    fprintf(fd, "(set-show-command-key! #%c)\n", ShowCommandKey ? 't' : 'f');
 
     // Speeds
-    fprintf(fd,"(set-video-sync-speed! %d)\n", VideoSyncSpeed);
-    fprintf(fd,"(set-mouse-scroll-speed! %d)\n", SpeedMouseScroll);
-    fprintf(fd,"(set-key-scroll-speed! %d)\n", SpeedKeyScroll);
+    fprintf(fd, "(set-video-sync-speed! %d)\n", VideoSyncSpeed);
+    fprintf(fd, "(set-mouse-scroll-speed! %d)\n", SpeedMouseScroll);
+    fprintf(fd, "(set-key-scroll-speed! %d)\n", SpeedKeyScroll);
 
     // Sound options
-    if( !SoundOff ) {
-	fprintf(fd,"(sound-on)\n");
+    if (!SoundOff) {
+	fprintf(fd, "(sound-on)\n");
     } else {
-	fprintf(fd,"(sound-off)\n");
+	fprintf(fd, "(sound-off)\n");
     }
 #ifdef WITH_SOUND
-    fprintf(fd,"(set-sound-volume! %d)\n", GlobalVolume);
-    if( !MusicOff ) {
-	fprintf(fd,"(music-on)\n");
+    fprintf(fd, "(set-sound-volume! %d)\n", GlobalVolume);
+    if (!MusicOff) {
+	fprintf(fd, "(music-on)\n");
     } else {
-	fprintf(fd,"(music-off)\n");
+	fprintf(fd, "(music-off)\n");
     }
-    fprintf(fd,"(set-music-volume! %d)\n", MusicVolume);
+    fprintf(fd, "(set-music-volume! %d)\n", MusicVolume);
 #ifdef USE_CDAUDIO
     buf[0] = '\0';
     switch (CDMode) {
@@ -1106,7 +1116,7 @@ global void SavePreferences(void)
 	    break;
     }
     if (buf[0]) {
-	fprintf(fd,"(set-cd-mode! '%s)\n", buf);
+	fprintf(fd, "(set-cd-mode! '%s)\n", buf);
     }
 #endif
 #endif
@@ -1126,17 +1136,17 @@ global void LoadCcl(void)
     //
     //	Load and evaluate configuration file
     //
-    CclInConfigFile=1;
-    file=LibraryFileName(CclStartFile,buf);
-    ShowLoadProgress("Script %s\n",file);
+    CclInConfigFile = 1;
+    file = LibraryFileName(CclStartFile, buf);
+    ShowLoadProgress("Script %s\n", file);
     LoadPreferences1();
-    if( (s=strrchr(file,'.')) && s[1]=='C' ) {
-	fast_load(gh_str02scm(file),NIL);
+    if ((s = strrchr(file, '.')) && s[1] == 'C') {
+	fast_load(gh_str02scm(file), NIL);
     } else {
-	vload(file,0,1);
+	vload(file, 0, 1);
     }
     LoadPreferences2();
-    CclInConfigFile=0;
+    CclInConfigFile = 0;
     user_gc(SCM_BOOL_F);		// Cleanup memory after load
 }
 
@@ -1152,24 +1162,24 @@ global void SaveCcl(CLFile* file)
     SCM list;
     extern SCM oblistvar;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: CCL $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: CCL $Id$\n\n");
 
-    for(list = oblistvar; gh_list_p(list); list = gh_cdr(list) ) {
+    for (list = oblistvar; gh_list_p(list); list = gh_cdr(list)) {
 	SCM sym;
 
-	sym=gh_car(list);
-	if(symbol_boundp(sym, NIL)) {
+	sym = gh_car(list);
+	if (symbol_boundp(sym, NIL)) {
 	    SCM value;
 
-	    CLprintf(file,";;(define %s\n",get_c_string(sym));
+	    CLprintf(file, ";;(define %s\n", get_c_string(sym));
 	    value = symbol_value(sym, NIL);
-	    CLprintf(file,";;");
-	    lprin1CL(value,file);
-	    CLprintf(file,"\n");
+	    CLprintf(file, ";;");
+	    lprin1CL(value, file);
+	    CLprintf(file, "\n");
 #ifdef DEBUG
 	} else {
-	    CLprintf(file,";;%s unbound\n",get_c_string(sym));
+	    CLprintf(file, ";;%s unbound\n", get_c_string(sym));
 #endif
 	}
     }
