@@ -330,63 +330,6 @@ global void VideoDrawClipX(const Graphic* sprite, unsigned frame,
 #endif
 
 #ifndef USE_OPENGL
-global void VideoDrawShadowClip(const Graphic* sprite, unsigned frame, int x, int y)
-{
-	SDL_Rect srect;
-	SDL_Rect drect;
-	int oldx;
-	int oldy;
-	unsigned char alpha;
-
-	srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
-	srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
-	srect.w = sprite->Width;
-	srect.h = sprite->Height;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-	drect.x = x;
-	drect.y = y;
-
-	alpha = sprite->Surface->format->alpha;
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
-	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
-	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
-}
-
-global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame, int x, int y)
-{
-	SDL_Rect srect;
-	SDL_Rect drect;
-	int oldx;
-	int oldy;
-	unsigned char alpha;
-
-	srect.x = (sprite->SurfaceFlip->w - (frame % (sprite->SurfaceFlip->w /
-			sprite->Width)) * sprite->Width) - sprite->Width;
-	srect.y = (frame / (sprite->SurfaceFlip->w / sprite->Width)) * sprite->Height;
-	srect.w = sprite->Width;
-	srect.h = sprite->Height;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-	drect.x = x;
-	drect.y = y;
-
-	alpha = sprite->SurfaceFlip->format->alpha;
-	SDL_SetAlpha(sprite->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
-	SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
-	SDL_SetAlpha(sprite->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
-}
-
 global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 	SDL_Rect srect;
@@ -485,12 +428,6 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 	SDL_SetAlpha(sprite->Surface, SDL_SRCALPHA, oldalpha);
 }
 #else
-global void VideoDrawShadowClip(const Graphic* sprite, unsigned frame, int x, int y)
-{
-}
-global void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame, int x, int y)
-{
-}
 global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
 }
@@ -595,7 +532,28 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 }
 
 /**
-**		Init sprite
+**  Make shadow sprite
+**
+**  @param graphic  pointer to object
+*/
+global void MakeShadowSprite(Graphic* graphic)
+{
+	SDL_Color colors[256];
+
+	// Set all colors in the palette to black and use 50% alpha
+	memset(colors, 0, sizeof(colors));
+
+	SDL_SetPalette(graphic->Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+
+	if (graphic->SurfaceFlip) {
+		SDL_SetPalette(graphic->SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+		SDL_SetAlpha(graphic->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	}
+}
+
+/**
+**  Init sprite
 */
 global void InitSprite(void)
 {

@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -616,6 +616,7 @@ global void LoadDecorations(void)
 		ShowLoadProgress("Decorations `%s'", ShadowSprite.File);
 		ShadowSprite.Sprite = LoadSprite(ShadowSprite.File,
 			ShadowSprite.Width, ShadowSprite.Height);
+		MakeShadowSprite(ShadowSprite.Sprite);
 	}
 	if (SpellSprite.File) {
 		ShowLoadProgress("Decorations `%s'", SpellSprite.File);
@@ -1199,9 +1200,9 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 			y += type->ShadowOffsetY;
 			if (type->Flip) {
 				if (frame < 0) {
-					VideoDrawShadowClipX(type->ShadowSprite, -frame - 1, x, y);
+					VideoDrawClipX(type->ShadowSprite, -frame - 1, x, y);
 				} else {
-					VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
+					VideoDrawClip(type->ShadowSprite, frame, x, y);
 				}
 			} else {
 				int row;
@@ -1212,7 +1213,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 				} else {
 					frame = (frame / row) * type->NumDirections + frame % row;
 				}
-				VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
+				VideoDrawClip(type->ShadowSprite, frame, x, y);
 			}
 		}
 		return;
@@ -1233,9 +1234,9 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 
 		if (type->Flip) {
 			if (frame < 0) {
-				VideoDrawShadowClipX(type->ShadowSprite, -frame - 1, x, y);
+				VideoDrawClipX(type->ShadowSprite, -frame - 1, x, y);
 			} else {
-				VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
+				VideoDrawClip(type->ShadowSprite, frame, x, y);
 			}
 		} else {
 			int row;
@@ -1246,7 +1247,7 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 			} else {
 				frame = (frame / row) * type->NumDirections + frame % row;
 			}
-			VideoDrawShadowClip(type->ShadowSprite, frame, x, y);
+			VideoDrawClip(type->ShadowSprite, frame, x, y);
 		}
 		return;
 	}
@@ -1776,10 +1777,10 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 //			y += type->ShadowOffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
-					VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
+					VideoDrawClipX(unit->Type->Construction->ShadowSprite,
 						-frame - 1, x, y);
 				} else {
-					VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
+					VideoDrawClip(unit->Type->Construction->ShadowSprite,
 						frame, x, y);
 				}
 			} else {
@@ -1791,7 +1792,7 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 				} else {
 					frame = (frame / row) * unit->Type->NumDirections + frame % row;
 				}
-				VideoDrawShadowClip(unit->Type->Construction->ShadowSprite, frame,
+				VideoDrawClip(unit->Type->Construction->ShadowSprite, frame,
 					x, y);
 			}
 		}
@@ -1803,9 +1804,9 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y += unit->Type->ShadowOffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
-					VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame - 1, x, y);
+					VideoDrawClipX(unit->Type->ShadowSprite, -frame - 1, x, y);
 				} else {
-					VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
+					VideoDrawClip(unit->Type->ShadowSprite, frame, x, y);
 				}
 			} else {
 				int row;
@@ -1816,7 +1817,7 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 				} else {
 					frame = (frame / row) * unit->Type->NumDirections + frame % row;
 				}
-				VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
+				VideoDrawClip(unit->Type->ShadowSprite, frame, x, y);
 			}
 		}
 	}

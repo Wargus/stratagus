@@ -271,6 +271,9 @@ extern void RealizeVideoMemory(void);
 	/// Load sprite
 extern Graphic* LoadSprite(const char* file, int w, int h);
 
+	/// Make shadow sprite
+extern void MakeShadowSprite(Graphic* graphic);
+
 	///		Draw part of a graphic clipped and faded.
 extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade);
@@ -505,13 +508,6 @@ extern void VideoDrawClipTransX(const Graphic*, unsigned frame, int x, int y, in
 #define VideoDrawClipTrans50(o, f, x, y)		VideoDrawClipTrans((o), (f), (x), (y), 128)
 	///		Draw a graphic object clipped and flipped in X direction.
 #define VideoDrawClipXTrans50(o, f, x, y)		VideoDrawClipTransX((o), (f), (x), (y), 128)
-
-	///		Draw a shadow graphic object clipped to the current clipping.
-extern void VideoDrawShadowClip(const Graphic*, unsigned frame,
-	int x, int y);
-	///		Draw a shadow graphic object clipped and flipped in X direction.
-extern void VideoDrawShadowClipX(const Graphic*, unsigned frame,
-	int x, int y);
 
 	///		Free a graphic object.
 extern void VideoFree(Graphic* o);
