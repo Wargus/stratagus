@@ -202,12 +202,10 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 ## USE_MAD		Use mad mp3 audio player support.
 ## These aren't working yet:
 ## NEW_MAPDRAW		Stephans new map draw code (broken in this release)
-## NEW_FOW		New fog of war code, should work correct
-## NEW_SHIPS		New correct ship movement.
 ## HIERARCHIC_PATHFINDER	Use hierarchic pathfinder
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
 	-DUNIT_ON_MAP -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
-	-DUSE_HP_FOR_XP # -DNEW_MAPDRAW=1 -DNEW_SHIPS
+	-DUSE_HP_FOR_XP # -DNEW_MAPDRAW=1
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
