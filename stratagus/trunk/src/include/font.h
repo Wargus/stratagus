@@ -91,14 +91,13 @@ struct _graphic_;
 
 	/// Color font definition
 typedef struct _color_font_ {
-	char* File;            ///< File containing font data
-	int   Width;           ///< Max width of characters in file
-	int   Height;          ///< Max height of characters in file
-	char  CharWidth[208];  ///< Real font width (starting with ' ')
+	int  Width;           ///< Max width of characters in file
+	int  Height;          ///< Max height of characters in file
+	char CharWidth[208];  ///< Real font width (starting with ' ')
 
 // --- FILLED UP ---
 
-	struct _graphic_* Graphic;  ///< Graphic object used to draw
+	struct _graphic_* G;  ///< Graphic object used to draw
 } ColorFont;
 
 /**

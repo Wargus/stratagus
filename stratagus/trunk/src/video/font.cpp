@@ -289,7 +289,7 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 
 	fp = Fonts + font;
 #ifndef USE_OPENGL
-	g = fp->Graphic;
+	g = fp->G;
 #else
 	g = FontColorGraphics[font][FontColor - FontColorMappings];
 #endif
@@ -351,8 +351,8 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 		c = *text - 32;
 		Assert(c >= 0);
 
-		ipr = fp->Graphic->GraphicWidth / fp->Width;
-		if (c >= 0 && c < ipr * fp->Graphic->GraphicHeight / fp->Height) {
+		ipr = fp->G->GraphicWidth / fp->Width;
+		if (c >= 0 && c < ipr * fp->G->GraphicHeight / fp->Height) {
 			w = fp->CharWidth[c];
 			DrawChar(g, (c % ipr) * fp->Width, (c / ipr) * fp->Height,
 				w, fp->Height, x + widths, y);
@@ -598,18 +598,18 @@ static void FontMeasureWidths(ColorFont* fp)
 
 	memset(fp->CharWidth, 0, sizeof(fp->CharWidth));
 	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
-	ckey = fp->Graphic->Surface->format->colorkey;
-	ipr = fp->Graphic->Surface->w / fp->Width;
+	ckey = fp->G->Surface->format->colorkey;
+	ipr = fp->G->Surface->w / fp->Width;
 
-	SDL_LockSurface(fp->Graphic->Surface);
+	SDL_LockSurface(fp->G->Surface);
 	for (y = 1; y < 207; ++y) {
-		sp = (const unsigned char*)fp->Graphic->Surface->pixels +
-			(y / ipr) * fp->Graphic->Surface->pitch * fp->Height +
+		sp = (const unsigned char*)fp->G->Surface->pixels +
+			(y / ipr) * fp->G->Surface->pitch * fp->Height +
 			(y % ipr) * fp->Width - 1;
-		gp = sp + fp->Graphic->Surface->pitch * fp->Height;
+		gp = sp + fp->G->Surface->pitch * fp->Height;
 		// Bail out if no letters left
-		if (gp >= ((const unsigned char*)fp->Graphic->Surface->pixels +
-				fp->Graphic->Surface->pitch * fp->Graphic->Height)) {
+		if (gp >= ((const unsigned char*)fp->G->Surface->pixels +
+				fp->G->Surface->pitch * fp->G->Height)) {
 			break;
 		}
 		while (sp < gp) {
@@ -621,11 +621,11 @@ static void FontMeasureWidths(ColorFont* fp)
 					}
 				}
 			}
-			sp += fp->Graphic->Surface->pitch;
+			sp += fp->G->Surface->pitch;
 		}
 
 	}
-	SDL_UnlockSurface(fp->Graphic->Surface);
+	SDL_UnlockSurface(fp->G->Surface);
 }
 
 /**
@@ -665,11 +665,10 @@ void LoadFonts(void)
 	unsigned i;
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
-		if (Fonts[i].File && !Fonts[i].Graphic) {
-			ShowLoadProgress("Fonts %s", Fonts[i].File);
-			DebugPrint("Font %s\n" _C_ Fonts[i].File);
-			Fonts[i].Graphic = NewGraphic(Fonts[i].File, 0, 0);
-			LoadGraphic(Fonts[i].Graphic);
+		if (Fonts[i].G && !GraphicLoaded(Fonts[i].G)) {
+			ShowLoadProgress("Fonts %s", Fonts[i].G->File);
+			DebugPrint("Font %s\n" _C_ Fonts[i].G->File);
+			LoadGraphic(Fonts[i].G);
 			FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
 			MakeFontColorTextures(Fonts[i].Graphic, i);
@@ -787,10 +786,7 @@ static int CclDefineFont(lua_State* l)
 	if (i == -1 || !w || !h || !file) {
 		LuaError(l, "missing argument");
 	}
-	free(Fonts[i].File);
-	FreeGraphic(Fonts[i].Graphic);
-	Fonts[i].Graphic = NULL;
-	Fonts[i].File = file;
+	Fonts[i].G = NewGraphic(file, w, h);
 	Fonts[i].Width = w;
 	Fonts[i].Height = h;
 
@@ -872,10 +868,8 @@ void CleanFonts(void)
 #endif
 
 	for (i = 0; i < (int)(sizeof(Fonts) / sizeof(*Fonts)); ++i) {
-		free(Fonts[i].File);
-		FreeGraphic(Fonts[i].Graphic);
-		Fonts[i].File = NULL;
-		Fonts[i].Graphic = NULL;
+		FreeGraphic(Fonts[i].G);
+		Fonts[i].G = NULL;
 
 #ifdef USE_OPENGL
 		for (j = 0; j < NumFontColorMappings; ++j) {
@@ -908,7 +902,7 @@ void CleanFonts(void)
 */
 int IsFontLoaded(unsigned font)
 {
-	return Fonts[font].Graphic != 0;
+	return GraphicLoaded(Fonts[font].G);
 }
 
 //@}
