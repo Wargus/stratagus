@@ -777,7 +777,7 @@ local Menuitem CampaignSelectMenuItems[] = {
 	{ button:{ "A~!lliance Second Campaign", 224, 27, MBUTTON_GM_FULL, Alliance2CampaignMenu, 'l'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL,
 	{ button:{ "M~!ystical Second Campaign", 224, 27, MBUTTON_GM_FULL, Mystical2CampaignMenu, 'y'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "~!Select Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 's'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
