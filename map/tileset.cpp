@@ -519,6 +519,233 @@ global void LoadTileset(void)
 };
 
 /**
+**	Save flag part of tileset.
+**
+**	@param file	File handle for the saved flags.
+**	@param flags	Bit field of the flags.
+*/
+local void SaveTilesetFlags(FILE* file, unsigned flags)
+{
+    if (flags & MapFieldWaterAllowed) {
+	fprintf(file, " 'water");
+    }
+    if (flags & MapFieldLandAllowed) {
+	fprintf(file, " 'land");
+    }
+    if (flags & MapFieldCoastAllowed) {
+	fprintf(file, " 'coast");
+    }
+    if (flags & MapFieldNoBuilding) {
+	fprintf(file, " 'no-building");
+    }
+    if (flags & MapFieldUnpassable) {
+	fprintf(file, " 'unpassable");
+    }
+    if (flags & MapFieldWall) {
+	fprintf(file, " 'wall");
+    }
+    if (flags & MapFieldRocks) {
+	fprintf(file, " 'rock");
+    }
+    if (flags & MapFieldForest) {
+	fprintf(file, " 'forest");
+    }
+    if (flags & MapFieldLandUnit) {
+	fprintf(file, " 'land-unit");
+    }
+    if (flags & MapFieldAirUnit) {
+	fprintf(file, " 'air-unit");
+    }
+    if (flags & MapFieldSeaUnit) {
+	fprintf(file, " 'sea-unit");
+    }
+    if (flags & MapFieldBuilding) {
+	fprintf(file, " 'building");
+    }
+    if (flags & MapFieldHuman) {
+	fprintf(file, " 'human");
+    }
+}
+
+/**
+**	Save solid part of tileset.
+**
+**	@param file	File handle to save the solid part.
+**	@param table	Tile numbers.
+**	@param name	Ascii name of solid tile
+**	@param flags	Tile attributes.
+**	@param start	Start index into table.
+*/
+local void SaveTilesetSolid(FILE* file, const unsigned short* table,
+    const char* name, unsigned flags, int start)
+{
+    int i;
+    int j;
+    int n;
+
+    fprintf(file, "  'solid (list \"%s\"", name);
+    SaveTilesetFlags(file, flags);
+    // Remove empty tiles at end of block
+    for (n = 15; n >= 0 && !table[start + n]; n--) {
+    }
+    i = fprintf(file, "\n    #(");
+    for (j = 0; j <= n; ++j) {
+	i += fprintf(file, " %3d", table[start + j]);
+    }
+    i += fprintf(file, "))");
+
+    while ((i += 8) < 80) {
+	fprintf(file, "\t");
+    }
+    fprintf(file, "; %03X\n", start);
+}
+
+/**
+**	Save mixed part of tileset.
+**
+**	@param file	File handle to save the mixed part.
+**	@param table	Tile numbers.
+**	@param name1	First ascii name of mixed tiles.
+**	@param name2	Second Ascii name of mixed tiles.
+**	@param flags	Tile attributes.
+**	@param start	Start index into table.
+**	@param end	End of tiles.
+*/
+local void SaveTilesetMixed(FILE* file, const unsigned short* table,
+    const char* name1, const char* name2, unsigned flags, int start, int end)
+{
+    int x;
+    int i;
+    int j;
+    int n;
+
+    fprintf(file, "  'mixed (list \"%s\" \"%s\"", name1, name2);
+    SaveTilesetFlags(file, flags);
+    fprintf(file,"\n");
+    for (x = 0; x < 0x100; x += 0x10) {
+	if (start + x >= end) {		// Check end must be 0x10 aligned
+	    break;
+	}
+	fprintf(file, "    #(");
+	// Remove empty slots at end of table
+	for (n = 15; n >= 0 && !table[start + x + n]; n--) {
+	}
+	i = 6;
+	for (j = 0; j <= n; ++j) {
+	    i += fprintf(file, " %3d", table[start + x + j]);
+	}
+	if (x == 0xF0 ) {
+	    i += fprintf(file, "))");
+	} else {
+	    i += fprintf(file, ")");
+	}
+
+	while ((i += 8) < 80) {
+	    fprintf(file, "\t");
+	}
+	fprintf(file, "; %03X\n", start + x);
+    }
+}
+
+/**
+**	Save the tileset.
+**
+**	@param file	Output file.
+**	@param tileset	Save the content of this tileset.
+*/
+local void SaveTileset(FILE* file, const Tileset* tileset)
+{
+    const unsigned short* table;
+    int i;
+    int n;
+
+    fprintf(file, "\n(define-tileset\n  '%s 'class '%s", tileset->Ident,
+	tileset->Class);
+    fprintf(file, "\n  'name \"%s\"", tileset->Name);
+    fprintf(file, "\n  'image \"%s\"", tileset->ImageFile);
+    fprintf(file, "\n  'palette \"%s\"", tileset->PaletteFile);
+    fprintf(file, "\n  ;; Slots descriptions");
+    fprintf(file,
+	"\n  'slots (list\n  'special (list\t\t;; Can't be in pud\n");
+    fprintf(file, "    'extra-trees #( %d %d %d %d %d %d )\n",
+	tileset->ExtraTrees[0], tileset->ExtraTrees[1]
+	, tileset->ExtraTrees[2], tileset->ExtraTrees[3]
+	, tileset->ExtraTrees[4], tileset->ExtraTrees[5]);
+    fprintf(file, "    'top-one-tree %d 'mid-one-tree %d 'bot-one-tree %d\n",
+	tileset->TopOneTree, tileset->MidOneTree, tileset->BotOneTree);
+    fprintf(file, "    'removed-tree %d\n", tileset->RemovedTree);
+    fprintf(file, "    'growing-tree #( %d %d )\n", tileset->GrowingTree[0],
+	tileset->GrowingTree[1]);
+    fprintf(file, "    'extra-rocks #( %d %d %d %d %d %d )\n",
+	tileset->ExtraRocks[0], tileset->ExtraRocks[1]
+	, tileset->ExtraRocks[2], tileset->ExtraRocks[3]
+	, tileset->ExtraRocks[4], tileset->ExtraRocks[5]);
+    fprintf(file, "    'top-one-rock %d 'mid-one-rock %d 'bot-one-rock %d\n",
+	tileset->TopOneRock, tileset->MidOneRock, tileset->BotOneRock);
+    fprintf(file, "    'removed-rock %d )\n", tileset->RemovedRock);
+
+    table = tileset->Table;
+    n = tileset->NumTiles;
+
+    for (i = 0; i < n;) {
+	//
+	//      Mixeds
+	//
+	if (tileset->BasicNameTable[i] && tileset->MixedNameTable[i]) {
+	    SaveTilesetMixed(file, table,
+		tileset->TileNames[tileset->BasicNameTable[i]],
+		tileset->TileNames[tileset->MixedNameTable[i]],
+		tileset->FlagsTable[i], i, n);
+	    i += 256;
+	    //
+	    //      Solids
+	    //
+	} else {
+	    SaveTilesetSolid(file, table,
+		tileset->TileNames[tileset->BasicNameTable[i]],
+		tileset->FlagsTable[i], i);
+	    i += 16;
+	}
+    }
+    fprintf(file, "  )\n");
+    fprintf(file, "  ;; Animated tiles\n");
+    fprintf(file, "  'animations (list #( ) )\n");
+    fprintf(file, "  'objects (list #( ) ))\n");
+}
+
+/**
+**	Save the current tileset module.
+**
+**	@param file	Output file.
+*/
+global void SaveTilesets(FILE* file)
+{
+    int i;
+    char** sp;
+
+    fprintf(file, "\n;;; -----------------------------------------\n");
+    fprintf(file,
+	";;; MODULE: tileset $Id$\n\n");
+
+    //  Original number to internal tileset name
+
+    i = fprintf(file, "(define-tileset-wc-names");
+    for (sp = TilesetWcNames; *sp; ++sp) {
+	if (i + strlen(*sp) > 79) {
+	    i = fprintf(file, "\n ");
+	}
+	i += fprintf(file, " '%s", *sp);
+    }
+    fprintf(file, ")\n");
+
+    // 	Save all loaded tilesets
+
+    for (i = 0; i < NumTilesets; ++i) {
+	SaveTileset(file, Tilesets[i]);
+    }
+}
+
+/**
 **	Cleanup the tileset module.
 **
 **	@note	this didn't frees the configuration memory.

@@ -942,6 +942,8 @@ extern void DrawSelectionCorners(const Unit* unit,const UnitType* type
 extern void DecorationCclRegister(void);
     /// Load the decorations (health,mana) of units
 extern void LoadDecorations(void);
+    /// Save the decorations (health,mana) of units
+extern void SaveDecorations(FILE* file);
     /// Clean the decorations (health,mana) of units
 extern void CleanDecorations(void);
 

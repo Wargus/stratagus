@@ -4276,9 +4276,6 @@ global void SaveUnits(FILE* file)
     //
     //	Local variables
     //
-
-    // FIXME: is this map specifig or global for the game?
-    //        if it is global, don't save it
     fprintf(file,"(set-hitpoint-regeneration! #%s)\n",
 	    HitPointRegeneration ? "t" : "f");
     fprintf(file,"(set-xp-damage! #%s)\n",
@@ -4339,7 +4336,6 @@ global void SaveUnits(FILE* file)
  */
 global void InitUnits(void)
 {
-    // probably call CleanUnits() here?
 }
 
 /**
