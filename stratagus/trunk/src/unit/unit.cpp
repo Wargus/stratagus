@@ -1773,6 +1773,7 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 	,unit->Y+unit->Type->TileHeight/2
 	,unit->CurrentSightRange);
 
+    unit->Stats=&unit->Type->Stats[newplayer->Player];
     //
     //	Must change food/gold and other.
     //
