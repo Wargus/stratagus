@@ -102,7 +102,7 @@ global void InitModules(void)
 {
     SyncRandSeed=0x87654321;
     InitIcons();
-    InitCursors();
+    InitVideoCursors();
     InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
     InitPlayers();
     InitMissileTypes();
