@@ -1889,26 +1889,33 @@ global void DrawUnit(const Unit* unit)
 #endif
 }
 
-local int DrawLevelCompare(const void *v1, const void *v2) {
+/**
+**	FIXME: docu
+*/
+local int DrawLevelCompare(const void* v1, const void* v2) {
 
-    const Unit *c1 = *(Unit**)v1;
-    const Unit *c2 = *(Unit**)v2;
-    int DrawLevelA;
-    int DrawLevelB;
+    const Unit* c1;
+    const Unit* c2;
+    int drawlevel1;
+    int drawlevel2;
+
+    c1 = *(Unit**)v1;
+    c2 = *(Unit**)v2;
+
     if( c1->Orders[0].Action == UnitActionDie && c1->Type->CorpseType) {
-	DrawLevelA = c1->Type->CorpseType->DrawLevel;
+	drawlevel1 = c1->Type->CorpseType->DrawLevel;
     } else {
-	DrawLevelA = c1->Type->DrawLevel;
+	drawlevel1 = c1->Type->DrawLevel;
     }
     if( c2->Orders[0].Action == UnitActionDie && c2->Type->CorpseType) {
-	DrawLevelB = c2->Type->CorpseType->DrawLevel;
+	drawlevel2 = c2->Type->CorpseType->DrawLevel;
     } else {
-	DrawLevelB = c2->Type->DrawLevel;
+	drawlevel2 = c2->Type->DrawLevel;
     }
-    if( DrawLevelA == DrawLevelB ) {
+    if( drawlevel1 == drawlevel2 ) {
 	return c1->Slot < c2->Slot ? -1 : 1;
     } else {
-	return DrawLevelA <= DrawLevelB ? -1 : 1;
+	return drawlevel1 <= drawlevel2 ? -1 : 1;
     }
 }
 /**
