@@ -886,7 +886,10 @@ normkey:
 		switch (mi->mitype) {
 		    case MI_TYPE_INPUT:
 			if (!(mi->flags & MenuButtonDisabled)) {
-			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
+			    if (MenuButtonCurSel != -1) {
+				menu->items[MenuButtonCurSel].flags
+					&= ~MenuButtonSelected;
+			    }
 			    mi->flags |= MenuButtonSelected;
 			    MenuButtonCurSel = mi - menu->items;
 			    MustRedraw |= RedrawMenu;
