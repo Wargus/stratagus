@@ -96,7 +96,7 @@ local hashtable(Icon*, 61) IconHash;        /// lookup table for icon names
 local void AddIcon(const char* ident, const char* tileset,
 	int index, int width, int height, const char* file)
 {
-	void** ptr;
+	IconFile** ptr;
 	char* str;
 	IconFile* iconfile;
 	Icon* icon;
@@ -104,7 +104,7 @@ local void AddIcon(const char* ident, const char* tileset,
 	//
 	//  Look up graphic file
 	//
-	ptr = (void**)hash_find(IconFileHash, file);
+	ptr = (IconFile**)hash_find(IconFileHash, file);
 	if (ptr && *ptr) {
 		iconfile = *ptr;
 	} else {  // new file
@@ -122,7 +122,7 @@ local void AddIcon(const char* ident, const char* tileset,
 	} else {
 		str = strdup(ident);
 	}
-	ptr = (void**)hash_find(IconHash, str);
+	ptr = (IconFile**)hash_find(IconHash, str);
 	if (ptr && *ptr) {
 		DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n" _C_
 			ident _C_ tileset);
@@ -223,15 +223,16 @@ global void LoadIcons(void)
 */
 global void CleanIcons(void)
 {
-	void** ptr;
+	char** ptr;
 	IconFile** table;
+	IconFile** iptr;
 	int n;
 	int i;
 
 	//
 	//  Mapping the original icon numbers in puds to our internal strings
 	//
-	if ((ptr = (void**)IconWcNames)) {  // Free all old names
+	if ((ptr = IconWcNames)) {  // Free all old names
 		while (*ptr) {
 			free(*ptr++);
 		}
@@ -261,10 +262,10 @@ global void CleanIcons(void)
 
 			free(Icons[i]->Ident);
 
-			ptr = (void**)hash_find(IconFileHash, Icons[i]->File->FileName);
-			if (ptr && *ptr) {
-				table[n++] = *ptr;
-				*ptr = NULL;
+			iptr = (IconFile**)hash_find(IconFileHash, Icons[i]->File->FileName);
+			if (iptr && *iptr) {
+				table[n++] = *iptr;
+				*iptr = NULL;
 			}
 
 			free(Icons[i]);
