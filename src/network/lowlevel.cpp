@@ -72,49 +72,6 @@ global unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host 
 /**@name lowlevel */
 //@{
 
-#ifdef USE_SDL_NET		// {
-
-// FIXME: Not written, I (johns) leave this for other people.
-//		  ARI: Really? Seems to exist..
-
-/**
-**		Hardware dependend network init.
-*/
-global int NetInit(void)
-{
-	return SDLNet_Init();
-}
-
-/**
-**		Hardware dependend network exit.
-*/
-global void NetExit(void)
-{
-	SDLNet_Exit();
-}
-
-/**
-**		Close an UDP socket port.
-**
-**		@param sock		Socket fildes
-*/
-global void NetCloseUDP(sock)
-{
-	SDLNet_UDP_Close(UDPsocket sock);
-}
-
-/**
-**		Close a TCP socket port.
-**
-**		@param sockfd		Socket fildes
-*/
-global void NetCloseTCP(sock)
-{
-	SDLNet_TCP_Close(TCPsocket sock);
-}
-
-#endif		// } USE_SDL_NET
-
 #ifdef USE_WINSOCK		// {
 
 /**
@@ -178,7 +135,7 @@ global void NetCloseTCP(Socket sockfd)
 
 #endif		// } !USE_WINSOCK
 
-#if !defined(USE_SDL_NET) && !defined(USE_WINSOCK)		// {
+#if !defined(USE_WINSOCK)		// {
 
 /**
 **		Hardware dependend network init.
@@ -215,7 +172,7 @@ global void NetCloseTCP(Socket sockfd)
 	close(sockfd);
 }
 
-#endif		// } !USE_SDL_NET && !USE_WINSOCK
+#endif		// } !USE_WINSOCK
 
 /**
 **		Set socket to non-blocking.
