@@ -627,7 +627,7 @@ local SCM CclUnit(SCM list)
 	    DebugCheck(!type);
 	    unit = UnitSlots[slot];
 	    InitUnit(unit, type);
-	    unit->SeenType = seentype;
+	    unit->Seen.Type = seentype;
 	    unit->Active = 0;
 	    unit->Removed = 0;
 	    unit->Reset = 0;		// JOHNS ????
@@ -668,35 +668,35 @@ local SCM CclUnit(SCM list)
 	//	Here is the seen stuff.
 	//
 	} else if (gh_eq_p(value, gh_symbol2scm("seen"))) {
-	    unit->SeenFrame = gh_scm2int(gh_car(list));
+	    unit->Seen.Frame = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("flipped-seen"))) {
-	    unit->SeenFrame = -gh_scm2int(gh_car(list));
+	    unit->Seen.Frame = -gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("not-seen"))) {
-	    unit->SeenFrame = UnitNotSeen;
+	    unit->Seen.Frame = UnitNotSeen;
 	} else if (gh_eq_p(value, gh_symbol2scm("seen-type"))) {
-	    unit->SeenType = seentype = UnitTypeByIdent(str = gh_scm2newstr(gh_car(list),NULL));
+	    unit->Seen.Type = seentype = UnitTypeByIdent(str = gh_scm2newstr(gh_car(list),NULL));
 	    free(str);
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("seen-pixel"))) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
-	    unit->SeenIX = gh_scm2int(gh_car(value));
-	    unit->SeenIY = gh_scm2int(gh_cadr(value));
+	    unit->Seen.IX = gh_scm2int(gh_car(value));
+	    unit->Seen.IY = gh_scm2int(gh_cadr(value));
 	} else if (gh_eq_p(value, gh_symbol2scm("seen-destroyed"))) {
-	    unit->SeenDestroyed = 1;
+	    unit->Seen.Destroyed = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("seen-constructed"))) {
-	    unit->SeenConstructed = 1;
+	    unit->Seen.Constructed = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("seen-state"))) {
-	    unit->SeenState = gh_scm2int(gh_car(list));
+	    unit->Seen.State = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("seen-construction-frame"))) {
 	    int frame;
 	    frame = gh_scm2int(gh_car(list));
-	    unit->SeenCFrame = unit->Type->Construction->Frames;
+	    unit->Seen.CFrame = unit->Type->Construction->Frames;
 	    while (frame--) {
-		unit->SeenCFrame = unit->SeenCFrame->Next;
+		unit->Seen.CFrame = unit->Seen.CFrame->Next;
 	    }
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("vis-count"))) {
