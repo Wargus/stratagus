@@ -1014,7 +1014,6 @@ local int CclSyncRand(lua_State* l)
 local int CclLoadPud(lua_State* l)
 {
 	const char* name;
-	char buffer[1024];
 
 	if (SaveGameLoading) {
 		return 0;
@@ -1024,7 +1023,7 @@ local int CclLoadPud(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	name = LuaToString(l, 1);
-	LoadPud(LibraryFileName(name, buffer), &TheMap);
+	LoadPud(name, &TheMap);
 
 	// FIXME: LoadPud should return an error
 	return 0;
@@ -1038,14 +1037,13 @@ local int CclLoadPud(lua_State* l)
 local int CclLoadMap(lua_State* l)
 {
 	const char* name;
-	char buffer[1024];
 
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
 	name = LuaToString(l, 1);
 	if (strcasestr(name, ".pud")) {
-		LoadPud(LibraryFileName(name, buffer), &TheMap);
+		LoadPud(name, &TheMap);
 	}
 
 	// FIXME: LoadPud should return an error

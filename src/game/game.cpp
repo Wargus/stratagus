@@ -63,6 +63,7 @@
 #include "campaign.h"
 #include "trigger.h"
 #include "commands.h"
+#include "iocompat.h"
 
 #include "script.h"
 
@@ -84,34 +85,40 @@ local int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 /**
 **  Load a Stratagus map.
 **
-**  @param filename  map filename
+**  @param mapname   map filename
 **  @param map       map loaded
 */
-local void LoadStratagusMap(const char* filename,
+local void LoadStratagusMap(const char* mapname,
 	WorldMap* map __attribute__((unused)))
 {
+	char mapfull[PATH_MAX];
+
+	strcpy(mapfull, StratagusLibPath);
+	strcat(mapfull, "/");
+	strcat(mapfull, mapname);
+
 	if (LcmPreventRecurse) {
 		fprintf(stderr,"recursive use of load Stratagus map!\n");
 		ExitFatal(-1);
 	}
 	InitPlayers();
 	LcmPreventRecurse = 1;
-	LuaLoadFile(filename);
+	LuaLoadFile(mapfull);
 	LcmPreventRecurse = 0;
 
 #if 0
 	// Not true if multiplayer levels!
 	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
-		fprintf(stderr, "%s: invalid Stratagus map\n", filename);
+		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
 	// FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
 #endif
 	if (!TheMap.Width || !TheMap.Height) {
-		fprintf(stderr, "%s: invalid Stratagus map\n", filename);
+		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
-	TheMap.Info->Filename = strdup(filename);
+	TheMap.Info->Filename = strdup(mapname);
 }
 
 /**
@@ -319,9 +326,6 @@ global void CreateGame(char* filename, WorldMap* map)
 			//  strcpy is not safe if parameters overlap.
 			//  Or at least this is what valgrind says.
 			strcpy(CurrentMapPath, filename);
-		}
-		if (filename[0] != '/' && filename[0] != '.') {
-			s = filename = strdcat3(StratagusLibPath, "/", filename);
 		}
 
 		//

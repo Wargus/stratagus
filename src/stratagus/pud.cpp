@@ -65,6 +65,7 @@
 #include "player.h"
 #include "unit.h"
 #include "pud.h"
+#include "iocompat.h"
 #include "iolib.h"
 #include "settings.h"
 #include "network.h"
@@ -802,14 +803,19 @@ global void LoadPud(const char* pud,WorldMap* map)
 	uint32_t length;
 	char header[5];
 	char buf[1024];
+	char pudfull[PATH_MAX];
 	int width;
 	int height;
 	int aiopps;
 
+	strcpy(pudfull, StratagusLibPath);
+	strcat(pudfull, "/");
+	strcat(pudfull, pud);
+
 	if (!map->Info) {
-		map->Info = GetPudInfo(pud);
+		map->Info = GetPudInfo(pudfull);
 	}
-	if( !(input=CLopen(pud,CL_OPEN_READ)) ) {
+	if( !(input=CLopen(pudfull,CL_OPEN_READ)) ) {
 		fprintf(stderr,"Try ./path/name\n");
 		fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
 		ExitFatal(-1);
