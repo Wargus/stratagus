@@ -749,7 +749,9 @@ global void ParsePudUGRD(const char* ugrd,int length)
     int icon;
     int group;
     int flags;
+#ifdef USE_CCL
     int costs[MaxCosts];
+#endif
 
     DebugLevel3Fn(" Length %d\n",length);
     DebugCheck( length!=780 );
