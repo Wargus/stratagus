@@ -10,7 +10,7 @@
 //
 /**@name graphic.c	-	The general graphic functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -42,6 +42,10 @@
 #include "iolib.h"
 #include "intern_video.h"
 
+#ifdef USE_SDL_SURFACE
+#include <string.h>
+#endif
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -52,13 +56,60 @@ global PaletteLink* PaletteList;	/// List of all used palettes.
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_SDL_SURFACE
+local GraphicType GraphicImage;
+#else
 local GraphicType GraphicImage8Type;	/// image type 8bit palette
 local GraphicType GraphicImage16Type;	/// image type 16bit palette
+#endif
 
 /*----------------------------------------------------------------------------
 --	Local functions
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_SDL_SURFACE
+global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
+    int w, int h, int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = gx;
+    srect.y = gy;
+    srect.w = w;
+    srect.h = h;
+
+    drect.x = x;
+    drect.y = y;
+
+    CLIP_RECTANGLE(gx, gy, w, h);
+
+    SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
+//    InvalidateArea(x, y, w, h);
+}
+
+global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
+    int w, int h, int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = gx;
+    srect.y = gy;
+    srect.w = w;
+    srect.h = h;
+
+    drect.x = x;
+    drect.y = y;
+
+    CLIP_RECTANGLE(gx, gy, w, h);
+
+    SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
+//    InvalidateArea(x, y, w, h);
+//    Invalidate();
+}
+
+#else
 /**
 **	Video draw part of 8bit graphic into 8 bit framebuffer.
 **
@@ -232,6 +283,7 @@ local void VideoDrawSub8to32(const Graphic* graphic, int gx, int gy,
 	dp += da;
     }
 }
+#endif
 
 /**
 **	Video draw part of graphic.
@@ -281,6 +333,16 @@ local void VideoDrawSubOpenGL(const Graphic* graphic, int gx, int gy,
 }
 #endif
 
+#ifdef USE_SDL_SURFACE
+/*
+local void VideoDrawSub(const Graphic* graphic, int gx, int gy,
+    int w, int h, int x, int y)
+{
+    CLIP_RECTANGLE(x, y, w, h);
+    VideoDrawSub(graphic, gx, gy, w, h, x, y);
+}
+*/
+#else
 /**
 **	Video draw part of 8bit graphic clipped into 8 bit framebuffer.
 **
@@ -352,6 +414,7 @@ local void VideoDrawSub8to32Clip(const Graphic* graphic, int gx, int gy,
     CLIP_RECTANGLE(x, y, w, h);
     VideoDrawSub8to32(graphic, gx, gy, w, h, x, y);
 }
+#endif
 
 /**
 **	Video draw part of graphic clipped.
@@ -379,8 +442,12 @@ local void VideoDrawSubOpenGLClip(const Graphic* graphic, int gx, int gy,
 local void FreeGraphic8(Graphic* graphic)
 {
 #ifdef DEBUG
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+#else
     AllocatedGraphicMemory -= graphic->Size;
     AllocatedGraphicMemory -= sizeof(Graphic);
+#endif
 #endif
 
 #ifdef USE_OPENGL
@@ -389,12 +456,17 @@ local void FreeGraphic8(Graphic* graphic)
 	free(graphic->TextureNames);
     }
 #endif
+
+#ifdef USE_SDL_SURFACE
+    SDL_FreeSurface(graphic->Surface);
+#else
     VideoFreeSharedPalette(graphic->Pixels);
     if (graphic->Palette) {
 	free(graphic->Palette);
     }
     free(graphic->Frames);
     free(graphic);
+#endif
 }
 
 // FIXME: need frame version
@@ -452,6 +524,8 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 	fprintf(stderr, "Out of memory\n");
 	ExitFatal(-1);
     }
+#ifdef USE_SDL_SURFACE
+#else
     if (depth == 8) {
 	graphic->Type = &GraphicImage8Type;
     } else if (depth == 16) {
@@ -460,15 +534,29 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 	fprintf(stderr, "Unsported image depth\n");
 	ExitFatal(-1);
     }
+#endif
     graphic->Width = width;
     graphic->Height = height;
 
+#ifdef USE_SDL_SURFACE
+    // FIXME: endian
+
+//    graphic->Surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, depth, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+    graphic->Surface = SDL_CreateRGBSurfaceFrom(data, width, height, depth, width * depth / 8, 
+//	0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	0, 0, 0, 0);
+//	depth * width);//, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+
+    graphic->NumFrames = 0;
+#else
     graphic->Pixels = NULL;
     graphic->Palette = NULL;
 
     graphic->NumFrames = 0;
     graphic->Frames = data;
     graphic->Size = size;
+#endif
+
 #ifdef USE_OPENGL
     graphic->NumTextureNames = 0;
 #endif
@@ -677,7 +765,15 @@ global void ResizeGraphic(Graphic *g, int w, int h)
     unsigned char* data;
     int x;
 
+#ifdef USE_SDL_SURFACE
+    return;
+
+    int bps;
+
+    bps = g->Surface->format->BytesPerPixel;
+#else
     DebugCheck(g->Type != &GraphicImage8Type);
+#endif
 
     if (g->Width == w && g->Height == h) {
 	return;
@@ -691,12 +787,25 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 
     for (i = 0; i < h; ++i) {
 	for (j = 0; j < w; ++j) {
+#ifdef USE_SDL_SURFACE
+	    memcpy(&data[x * g->Surface->format->BytesPerPixel],
+		&((char*)g->Surface->pixels)[(i * g->Height / h) * g->Width * bps
+		    + bps * j * g->Width / w], bps);
+#else
 	    data[x] = ((unsigned char*)g->Frames)[
 		(i * g->Height / h) * g->Width + j * g->Width / w];
+#endif
 	    ++x;
 	}
     }
 
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+    SDL_FreeSurface(g->Surface);
+    g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, bps, w * bps, 0, 0, 0, 0);
+    g->Width = w;
+    g->Height = h;
+#else
     free(g->Frames);
 #ifdef DEBUG
     AllocatedGraphicMemory -= g->Width * g->Height;
@@ -704,6 +813,7 @@ global void ResizeGraphic(Graphic *g, int w, int h)
     g->Frames = data;
     g->Width = w;
     g->Height = h;
+#endif
 }
 
 /**
@@ -727,9 +837,16 @@ global Graphic* LoadGraphic(const char* name)
 	ExitFatal(-1);
     }
 
+#ifdef USE_SDL_SURFACE
+//    Pixels = graphic->Surface->format->palette;
+//    graphic->Surface->format->palette = 
+//	VideoCreateSharedPalette(graphic->Surface->format->palette);
+    graphic->NumFrames = 1;
+#else
     graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
     //free(graphic->Palette);
     //graphic->Palette = NULL;		// JOHNS: why should we free this?
+#endif
 
     return graphic;
 }
@@ -739,10 +856,18 @@ global Graphic* LoadGraphic(const char* name)
 */
 global void InitGraphic(void)
 {
+#ifdef USE_SDL_SURFACE
+//    GlobalPalletPixels->ncolors = 256;
+//    GlobalPalette.colors = (SDL_Color*)calloc(256, sizeof(SDL_Color));
+//    GlobalPalette.ncolors = 256;
+//    GlobalPalette.colors = (SDL_Color*)calloc(256, sizeof(SDL_Color));
+#else
+
 #ifdef USE_OPENGL
     GraphicImage8Type.DrawSub = VideoDrawSubOpenGL;
     GraphicImage8Type.DrawSubClip = VideoDrawSubOpenGLClip;
 #else
+
     switch( VideoBpp ) {
 	case 8:
 	    GraphicImage8Type.DrawSub = VideoDrawSub8to8;
@@ -771,6 +896,7 @@ global void InitGraphic(void)
     }
 #endif
     GraphicImage8Type.Free = FreeGraphic8;
+#endif
 }
 
 //@}

@@ -182,14 +182,22 @@ global char MustRedrawTile[MAXMAP_W * MAXMAP_H];
 **
 **	Draws tiles display and video mode independ
 */
+#ifdef USE_SDL_SURFACE
+global void VideoDrawTile(const int, int, int);
+#else
 global void (*VideoDrawTile)(const GraphicData*, int, int);
+#endif
 
 /**
 **	Fast draw tile function pointer with cache support.
 **
 **	Draws tiles display and video mode independ
 */
+#ifdef USE_SDL_SURFACE
+global void MapDrawTile(int, int, int);
+#else
 global void (*MapDrawTile)(int, int, int);
+#endif
 
 #ifdef NEW_DECODRAW
 /**
@@ -272,6 +280,39 @@ global Deco *MapDecoration = NULL;
 --	Draw tile
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_SDL_SURFACE
+/**
+**	Fast draw tile.
+**
+**	@param tile	pointer to tile graphic data
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+**
+**	@note This is a hot spot in the program.
+**	(50% cpu time was needed for this, now only 32%)
+**
+**	@see GRID
+*/
+global void VideoDrawTile(const int tile, int x, int y)
+{
+    int tilepitch;
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+    srect.x = TileSizeX * (tile % tilepitch);
+    srect.y = TileSizeY * (tile / tilepitch);
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_LockSurface(TheScreen);
+    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, 
+	TheScreen, &drect);
+    SDL_UnlockSurface(TheScreen);
+}
+#else
 /**
 **	Fast draw 16x16 tile for 8 bpp video modes.
 **
@@ -673,6 +714,7 @@ global void VideoDraw32Tile32(const unsigned char* data, int x, int y)
     }
 #endif
 }
+#endif // ifdef USE_SDL_SURFACE
 
 #ifdef NEW_DECODRAW
 /**
@@ -1870,6 +1912,7 @@ local void MapDraw32Tile32(int tile, int x, int y)
 
 #ifdef USE_SMART_TILECACHE	// {
 
+#ifndef USE_SDL_SURFACE
 /**
 **	Fast draw 16x16 tile for 8 bpp from cache.
 **
@@ -2171,8 +2214,16 @@ local void VideoDraw32Tile32Cached(const VMemType32* graphic, int x, int y)
 	dp += da;
     }
 }
+#endif // ifndef USE_SDL_SURFACE
 
 // ---------------------------------------------------------------------------
+
+#ifdef USE_SDL_SURFACE
+local void MapDrawTile(int tile, int x, int y)
+{
+    VideoDrawTile(tile, x, y);
+}
+#else
 
 /**
 **	Draw 16x16 tile for 8 bpp video modes with cache support.
@@ -2311,6 +2362,7 @@ local void MapDraw32Tile32(int tile, int x, int y)
 	TileCached[tile] = VideoMemory32 + x + y * VideoWidth;
     }
 }
+#endif
 
 /**
 **	Draw tile.
@@ -2495,6 +2547,10 @@ global void MapColorCycle(void)
     }
 #endif
 
+#ifdef USE_SDL_SURFACE
+    // FIXME: what to do?
+    i = 0;
+#else
     if (VideoBpp == 15 || VideoBpp == 16) {
 	//
 	//	Convert 16 bit pixel table into two 32 bit tables.
@@ -2504,6 +2560,7 @@ global void MapColorCycle(void)
 	    PixelsHigh[i] = (((VMemType16*)TheMap.TileData->Pixels)[i] & 0xFFFF) << 16;
 	}
     }
+#endif
 }
 
 /**
@@ -2853,6 +2910,7 @@ global void InitMap(void)
     DebugCheck(!MapDecoration);
 
 #else
+#ifndef USE_SDL_SURFACE
     if (TileSizeX == 16 && TileSizeY == 16) {
 	switch (VideoBpp) {
 	    case  8:
@@ -2923,6 +2981,7 @@ global void InitMap(void)
 	printf("Tile size not supported: (%dx%d)\n", TileSizeX, TileSizeY);
 	exit(1);
     }
+#endif // ifdef USE_SDL_SURFACE
 #endif // NEW_DECODRAW
 
 #endif // USE_OPENGL

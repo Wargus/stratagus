@@ -57,7 +57,11 @@ extern void VPDeInitLibrary(void);
 
 #ifdef USE_SDL				/// Only supported with SDL for now
 
-extern SDL_Surface* Screen;		/// internal screen
+#ifdef USE_SDL_SURFACE
+extern SDL_Surface* TheScreen;	/// internal screen
+#else
+extern SDL_Surface* Screen;	/// internal screen
+#endif
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -246,8 +250,13 @@ global int PlayMovie(const char* name, int flags)
     if (flags & PlayMovieFullScreen) {
 	DebugLevel0Fn("FIXME: full screen switch not supported\n");
     }
+#ifdef USE_SDL_SURFACE
+    overlay = SDL_CreateYUVOverlay(avi->Width, avi->Height,
+	SDL_YV12_OVERLAY, TheScreen);
+#else
     overlay = SDL_CreateYUVOverlay(avi->Width, avi->Height,
 	SDL_YV12_OVERLAY, Screen);
+#endif
     if (!overlay) {
 	fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 	exit(1);

@@ -120,6 +120,12 @@ local const int FogTable[16] = {
 
 global unsigned char* VisionTable[3];
 global int* VisionLookup;
+
+#ifdef USE_SDL_SURFACE
+local void (*VideoDrawUnexplored)(const int, int, int);
+local void (*VideoDrawFog)(const int, int, int);
+local void (*VideoDrawOnlyFog)(const int, int x, int y);
+#else
 /**
 **	Draw unexplored area function pointer. (display and video mode independ)
 */
@@ -134,6 +140,7 @@ local void (*VideoDrawFog)(const GraphicData*, int, int);
 **	Draw only fog of war function pointer. (display and video mode independ)
 */
 local void (*VideoDrawOnlyFog)(const GraphicData*, int x, int y);
+#endif
 
 /**
 **	Precalculated fog of war alpha table.
@@ -486,6 +493,38 @@ global void UpdateFogOfWarChange(void)
 --	Draw fog solid
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_SDL_SURFACE
+/**
+**	Fast draw solid fog of war 16x16 tile for 8 bpp video modes.
+**
+**	@param data	pointer to tile graphic data.
+**	@param x	X position into video memory.
+**	@param y	Y position into video memory.
+*/
+global void VideoDrawFogSolid(const int tile, int x, int y)
+{
+    int tilepitch;
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+    srect.x = TileSizeX * (tile % tilepitch);
+    srect.y = TileSizeY * (tile / tilepitch);
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_LockSurface(TheScreen);
+    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
+    SDL_UnlockSurface(TheScreen);
+}
+
+global void VideoDrawUnexploredSolid(const int tile, int x, int y)
+{
+
+}
+#else
 // Routines for 8 bit displays .. --------------------------------------------
 
 /**
@@ -1471,6 +1510,7 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data, int x, int y)
 	dp += da;
     }
 }
+#endif
 
 /**
 **	Fast draw solid unexplored tile.
@@ -1491,6 +1531,27 @@ global void VideoDrawUnexploredSolidOpenGL(
 --	Draw real fog :-)
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_SDL_SURFACE
+global void VideoDrawFogAlpha(const int tile, int x, int y)
+{
+    int tilepitch;
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+    srect.x = TileSizeX * (tile % tilepitch);
+    srect.y = TileSizeY * (tile / tilepitch);
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_LockSurface(TheScreen);
+    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
+    SDL_UnlockSurface(TheScreen);
+}
+
+#else
 // Routines for 8 bit displays .. --------------------------------------------
 
 /**
@@ -2424,6 +2485,7 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 	dp += da;
     }
 }
+#endif
 
 // Routines for OpenGL .. -------------------------------------------
 
@@ -2590,7 +2652,11 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
     }
 
     if (tile2) {
+#ifdef USE_SDL_SURFACE
+	VideoDrawUnexplored(tile2, dx, dy);
+#else
 	VideoDrawUnexplored(TheMap.Tiles[tile2], dx, dy);
+#endif
 	if (tile2 == tile) {		// no same fog over unexplored
 //	    if (tile != 0xf) {
 //		TheMap.Fields[sx].VisibleLastFrame |= MapFieldPartiallyVisible;
@@ -2600,13 +2666,21 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
     }
     if (IsMapFieldVisible(ThisPlayer, x, y) || ReplayRevealMap) {
 	if (tile) {
+#ifdef USE_SDL_SURFACE
+	    VideoDrawFog(tile, dx, dy);
+#else
 	    VideoDrawFog(TheMap.Tiles[tile], dx, dy);
+#endif
 //	    TheMap.Fields[sx].VisibleLastFrame |= MapFieldPartiallyVisible;
 //	} else {
 //	    TheMap.Fields[sx].VisibleLastFrame |= MapFieldCompletelyVisible;
 	}
     } else {
+#ifdef USE_SDL_SURFACE
+	VideoDrawOnlyFog(UNEXPLORED_TILE, dx, dy);
+#else
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
+#endif
     }   
 }
 
@@ -2676,7 +2750,11 @@ global void DrawMapFogOfWar(const Viewport* vp, int x, int y)
 #ifdef USE_OPENGL
 			MapDrawTile(UNEXPLORED_TILE, dx, dy);
 #else
+#ifdef USE_SDL_SURFACE
+			VideoDrawTile(UNEXPLORED_TILE, dx, dy);
+#else
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
+#endif
 #endif
 		    }
 #endif
@@ -2773,6 +2851,10 @@ global void InitMapFogOfWar(void)
     VideoDrawOnlyFog = VideoDrawOnlyFogAlphaOpenGL;
     VideoDrawUnexplored = VideoDrawUnexploredSolidOpenGL;
 #else
+
+#ifdef USE_SDL_SURFACE
+
+#else
     if (!OriginalFogOfWar) {
 	int i;
 	int n;
@@ -2781,7 +2863,6 @@ global void InitMapFogOfWar(void)
 	int rmask, gmask, bmask;
 	int rshft, gshft, bshft;
 	int rloss, gloss, bloss;
-
 
 	switch (VideoDepth) {
 	    case 8:
@@ -3036,6 +3117,7 @@ build_table:
 	    exit(1);
 	}
     }
+#endif
 #endif
 }
 

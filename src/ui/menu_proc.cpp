@@ -10,7 +10,7 @@
 //
 /**@name menu_proc.c	-	The menu processing code. */
 //
-//	(c) Copyright 1999-2003 by Andreas Arens and Jimmy Salmon
+//	(c) Copyright 1999-2003 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -986,7 +986,12 @@ global void DrawMenu(Menu* menu)
 
     if (menu->Panel && !strcmp(menu->Panel, ScPanel)) {
 	// Background
+#ifdef USE_SDL_SURFACE
+	VideoFillTransRectangle(ColorBlack, MenuRedrawX + 1, 
+		MenuRedrawY + 1, MenuRedrawW - 2, MenuRedrawH - 2, 50);
+#else
 	VideoFill50TransRectangle(ColorBlack, MenuRedrawX + 1, MenuRedrawY + 1, MenuRedrawW - 2, MenuRedrawH - 2);
+#endif
 	VideoDrawHLineClip(ColorBlue, MenuRedrawX + 3, MenuRedrawY, MenuRedrawW - 6);
 	VideoDrawHLineClip(ColorBlue, MenuRedrawX + 3, MenuRedrawY + MenuRedrawH - 1, MenuRedrawW - 6);
 	VideoDrawVLineClip(ColorBlue, MenuRedrawX, MenuRedrawY + 3, MenuRedrawH - 6);

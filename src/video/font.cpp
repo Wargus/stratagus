@@ -10,7 +10,7 @@
 //
 /**@name font.c		-	The color fonts. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//	(c) Copyright 1998-2003 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -51,6 +51,17 @@
 
 #define NumFontColors 7
 
+#ifdef USE_SDL_SURFACE
+    /// Font color mapping
+typedef struct _font_color_mapping_ {
+    char* ColorName;			/// Font color name
+
+    SDL_Color Color[NumFontColors];	/// Array of hardware dependent pixels
+    struct _font_color_mapping_* Next;	/// Next pointer
+} FontColorMapping;
+
+local FontColorMapping* FontColor;
+#else
     /// Font color mapping
 typedef struct _font_color_mapping_ {
     char* Color;			/// Font color
@@ -69,6 +80,8 @@ local const VMemType* FontPixels;		/// Font pixels
 #define FontPixels24	(&FontPixels->D24)	/// font pixels 24bpp
 #define FontPixels32	(&FontPixels->D32)	/// font pixels 32bpp
 
+#endif
+
     /// Font color mappings
 local FontColorMapping* FontColorMappings;
 
@@ -79,6 +92,18 @@ local FontColorMapping* FontColorMappings;
 */
 local ColorFont Fonts[MaxFonts];
 
+#ifdef USE_SDL_SURFACE
+    /// Last text color
+local FontColorMapping* LastTextColor;
+    /// Default text color
+local FontColorMapping* DefaultTextColor;
+    /// Reverse text color
+local FontColorMapping* ReverseTextColor;
+    /// Default normal color index
+local char* DefaultNormalColorIndex;
+    /// Default reverse color index
+local char* DefaultReverseColorIndex;
+#else
     /// Last text color
 local const VMemType* LastTextColor;
     /// Default text color
@@ -89,9 +114,14 @@ local const VMemType* ReverseTextColor;
 local char* DefaultNormalColorIndex;
     /// Default reverse color index
 local char* DefaultReverseColorIndex;
+#endif
 
     /// Draw character with current video depth.
+#ifdef USE_SDL_SURFACE
+local void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
+#else
 local void (*VideoDrawChar)(const Graphic*, int, int, int, int, int, int);
+#endif
 
 #ifdef USE_OPENGL
     /// Font bitmaps
@@ -123,6 +153,31 @@ global char* FontNames[] = {
 ----------------------------------------------------------------------------*/
 
 // FIXME: should use RLE encoded fonts, not color key fonts.
+
+#ifdef USE_SDL_SURFACE
+local void VideoDrawChar(const Graphic* sprite,
+    int gx, int gy, int w, int h, int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = gx;
+    srect.y = gy;
+    srect.w = w;
+    srect.h = h;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_SetColors(sprite->Surface, FontColor->Color, 0, NumFontColors);
+
+    SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+
+    SDL_UpdateRect(TheScreen, x, y, w, h);
+    InvalidateArea(x, y, w, h);
+}
+
+#else
 
 /**
 **	Draw character with current color into 8bit video memory.
@@ -343,6 +398,7 @@ local void VideoDrawChar32(const Graphic* sprite,
     }
 #undef UNROLL
 }
+#endif
 
 #ifdef USE_OPENGL
 /**
@@ -378,6 +434,23 @@ local void VideoDrawCharOpenGL(const Graphic* sprite,
 }
 #endif
 
+#ifdef USE_SDL_SURFACE
+local FontColorMapping* GetFontColorMapping(char* color)
+{
+    FontColorMapping *fcm;
+
+    fcm = FontColorMappings;
+    while (fcm) {
+	if (!strcmp(fcm->ColorName, color)) {
+	    return fcm;
+	}
+	fcm = fcm->Next;
+    }
+    fprintf(stderr, "Font mapping not found: '%s'\n", color);
+    ExitFatal(1);
+    return NULL;
+}
+#else
 /**
 **	FIXME: docu
 */
@@ -396,6 +469,7 @@ local const VMemType* GetFontColorMapping(char* color)
     ExitFatal(1);
     return NULL;
 }
+#endif
 
 /**
 **	Set the default text colors.
@@ -407,7 +481,11 @@ global void SetDefaultTextColors(char* normal, char* reverse)
 {
     DefaultNormalColorIndex = normal;
     DefaultReverseColorIndex = reverse;
+#ifdef USE_SDL_SURFACE
+    LastTextColor = DefaultTextColor = FontColor = GetFontColorMapping(normal);
+#else
     LastTextColor = DefaultTextColor = FontPixels = GetFontColorMapping(normal);
+#endif
     ReverseTextColor = GetFontColorMapping(reverse);
 }
 
@@ -509,7 +587,11 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
     int height;
     int widths;
     const ColorFont* fp;
+#ifdef USE_SDL_SURFACE
+    FontColorMapping* rev;
+#else
     const VMemType* rev;
+#endif
     char* color;
     const unsigned char* p;
     void (*DrawChar)(const Graphic*, int, int, int, int, int, int);
@@ -535,18 +617,34 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 		case '~':
 		    break;
 		case '!':
+#ifdef USE_SDL_SURFACE
+		    rev = FontColor;
+		    FontColor = ReverseTextColor;
+#else
 		    rev = FontPixels;
 		    FontPixels = ReverseTextColor;
+#endif
+		    
 		    ++text;
 		    break;
 		case '<':
+#ifdef USE_SDL_SURFACE
+		    LastTextColor = FontColor;
+		    FontColor = ReverseTextColor;
+#else
 		    LastTextColor = FontPixels;
 		    FontPixels = ReverseTextColor;
+#endif
 		    continue;
 		case '>':
 		    rev = LastTextColor;	// swap last and current color
+#ifdef USE_SDL_SURFACE
+		    LastTextColor = FontColor;
+		    FontColor = rev;
+#else
 		    LastTextColor = FontPixels;
 		    FontPixels = rev;
+#endif
 		    continue;
 
 		default:
@@ -562,12 +660,21 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 		    memcpy(color, text, p - text);
 		    color[p - text] = '\0';
 		    text = p;
+#ifdef USE_SDL_SURFACE
+		    printf("NBNNNNNNNNNNNNNNNNNNNNNN\n");
+		    LastTextColor = FontColor;
+		    FontColor = GetFontColorMapping(color);
+#else
 		    LastTextColor = FontPixels;
 		    FontPixels = GetFontColorMapping(color);
+#endif
 		    free(color);
 		    continue;
 	    }
 	}
+#ifdef USE_SDL_SURFACE
+
+#endif
 
 	DebugCheck(*text < 32);
 
@@ -580,7 +687,11 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	}
 	widths += w + 1;
 	if (rev) {
+#ifdef USE_SDL_SURFACE
+	    FontColor = rev;
+#else
 	    FontPixels = rev;
+#endif
 	    rev = NULL;
 	}
     }
@@ -641,9 +752,15 @@ global int VideoDrawReverseText(int x, int y, unsigned font,
 {
     int w;
 
+#ifdef USE_SDL_SURFACE
+    FontColor = ReverseTextColor;
+    w = VideoDrawText(x, y, font, text);
+    FontColor = DefaultTextColor;
+#else
     FontPixels = ReverseTextColor;
     w = VideoDrawText(x, y, font, text);
     FontPixels = DefaultTextColor;
+#endif
 
     return w;
 }
@@ -737,6 +854,45 @@ global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
     return VideoDrawReverseText(x, y, font, buf);
 }
 
+#ifdef USE_SDL_SURFACE
+local void FontMeasureWidths(ColorFont* fp)
+{
+    // FIXME: todo.. can this be optimized?
+    int y;
+    const unsigned char* sp;
+    const unsigned char* lp;
+    const unsigned char* gp;
+
+    for (y = 1; y < 207; ++y) {
+	fp->CharWidth[y] = 0;
+    }
+
+    fp->CharWidth[0] = fp->Width / 2;	// a reasonable value for SPACE
+
+    for (y = 1; y < 207; ++y) {
+	sp = (const unsigned char *)fp->Graphic->Surface->pixels +
+	    y * fp->Height * fp->Graphic->Width - 1;
+	gp = sp + fp->Graphic->Width * fp->Height;
+	// Bail out if no letters left
+	if (gp >= ((const unsigned char *)fp->Graphic->Surface->pixels +
+		fp->Graphic->Width * fp->Graphic->Height)) {
+	    break;
+	}
+	while (sp < gp) {
+	    lp = sp + fp->Graphic->Width - 1;
+	    for (; sp < lp; --lp) {
+		if (*lp != 255) {
+		    if (lp - sp > fp->CharWidth[y]) {	// max width
+			fp->CharWidth[y] = lp - sp;
+		    }
+		}
+	    }
+	    sp += fp->Graphic->Width;
+	}
+
+    }    
+}
+#else
 /**
 **	Calculate widths table for a font.
 **
@@ -777,6 +933,7 @@ local void FontMeasureWidths(ColorFont* fp)
     }
     fp->CharWidth[0] = fp->Width / 2;	// a reasonable value for SPACE
 }
+#endif
 
 /**
 **	Make font bitmap.
@@ -837,13 +994,19 @@ global void LoadFonts(void)
 {
     unsigned i;
     FontColorMapping* fcm;
+#ifdef USE_SDL_SURFACE
+    SDL_Color* color;
+#else
     void* pixels;
+#endif
 
     //
     //	First select the font drawing procedure.
     //
 #ifdef USE_OPENGL
     VideoDrawChar = VideoDrawCharOpenGL;
+#else
+#ifdef USE_SDL_SURFACE
 #else
     switch (VideoBpp) {
 	case 8:
@@ -868,6 +1031,7 @@ global void LoadFonts(void)
 	    abort();
     }
 #endif
+#endif
 
     for (i = 0; i<sizeof(Fonts) / sizeof(*Fonts); ++i) {
 	if (Fonts[i].File) {
@@ -881,6 +1045,22 @@ global void LoadFonts(void)
     }
 
     fcm = FontColorMappings;
+#ifdef USE_SDL_SURFACE
+
+    while (fcm) {
+	color = fcm->Color;
+	for (i = 0; i < NumFontColors; ++i) {
+	    SDL_Color c;
+	    // FIXME: todo
+//	    c = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
+	    c = VideoMapRGB(fcm->Color[i].r, fcm->Color[i].g, fcm->Color[i].b);
+
+	    color[i] = VideoMapRGB(c.r, c.g, c.b);
+	}
+	fcm = fcm->Next;
+    }
+
+#else
     while (fcm) {
 	pixels = fcm->Pixels;
 	for (i = 0; i < NumFontColors; ++i) {
@@ -906,6 +1086,7 @@ global void LoadFonts(void)
 	}
 	fcm = fcm->Next;
     }
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -1048,18 +1229,31 @@ local SCM CclDefineFontColor(SCM list)
     } else {
 	fcmp = &FontColorMappings;
 	while (*fcmp) {
+#ifdef USE_SDL_SURFACE
+	    if (!strcmp((*fcmp)->ColorName, color)) {
+		fprintf(stderr, "Warning: Redefining color '%s'\n", color);
+		free((*fcmp)->ColorName);
+		fcm = *fcmp;
+		break;
+	    }
+#else
 	    if (!strcmp((*fcmp)->Color, color)) {
 		fprintf(stderr, "Warning: Redefining color '%s'\n", color);
 		free((*fcmp)->Color);
 		fcm = *fcmp;
 		break;
 	    }
+#endif
 	    fcmp = &(*fcmp)->Next;
 	}
 	*fcmp = calloc(sizeof(*FontColorMappings), 1);
 	fcm = *fcmp;
     }
+#ifdef USE_SDL_SURFACE
+    fcm->ColorName = color;
+#else
     fcm->Color = color;
+#endif
     fcm->Next = NULL;
 
     value = gh_car(list);
@@ -1069,9 +1263,15 @@ local SCM CclDefineFontColor(SCM list)
 	fprintf(stderr, "Wrong vector length\n");
     }
     for (i = 0; i < NumFontColors; ++i) {
+#ifdef USE_SDL_SURFACE
+	fcm->Color[i].r = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 0)));
+	fcm->Color[i].g = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 1)));
+	fcm->Color[i].b = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 2)));
+#else
 	fcm->RGB[i].R = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 0)));
 	fcm->RGB[i].G = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 1)));
 	fcm->RGB[i].B = gh_scm2int(gh_vector_ref(value, gh_int2scm(i * 3 + 2)));
+#endif
     }
 
     return SCM_UNSPECIFIED;

@@ -395,11 +395,19 @@ global void CreateGame(char* filename, WorldMap* map)
     //
     //	Graphic part
     //
+#ifdef USE_SDL_SURFACE
+    LoadRGB(&GlobalPalette,
+	    s = strdcat3(StratagusLibPath, "/graphics/",
+		TheMap.Tileset->PaletteFile));
+    free(s);
+    VideoCreatePalette(&GlobalPalette);
+#else
     LoadRGB(GlobalPalette,
 	    s = strdcat3(StratagusLibPath, "/graphics/",
 		TheMap.Tileset->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
+#endif
     InitIcons();
     LoadIcons();
 

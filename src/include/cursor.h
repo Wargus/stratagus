@@ -154,7 +154,11 @@ struct _cursor_type_ {
 
 // --- FILLED UP ---
 
+#ifdef USE_SDL_SURFACE
     Graphic*	Sprite;			/// Cursor sprite image
+#else
+    Graphic*	Sprite;			/// Cursor sprite image
+#endif
 };
 
     /// Cursor config reference
@@ -211,9 +215,13 @@ extern void CursorAnimate(unsigned ticks);
 
     /// Save/load rectangle region from/to screen
     /// Note: this is made extern for minimap only
+#ifdef USE_SDL_SURFACE
+extern void SaveCursorRectangle(void *buffer,int x,int y,int w,int h);
+extern void LoadCursorRectangle(void *buffer,int x,int y,int w,int h);
+#else
 extern void (*SaveCursorRectangle)(void *buffer,int x,int y,int w,int h);
 extern void (*LoadCursorRectangle)(void *buffer,int x,int y,int w,int h);
-
+#endif
 
     /// Invalidate given area and check if cursor won't need any
 extern void InvalidateAreaAndCheckCursor( int x, int y, int w, int h );

@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.c	-	The draw routines for units. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//	(c) Copyright 1998-2003 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -92,8 +92,13 @@ global int ShowManaBackgroundLong;
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
+#ifdef USE_SDL_SURFACE
+global void (*DrawSelection)(SDL_Color color, int x1, int y1,
+    int x2, int y2) = DrawSelectionNone;
+#else
 global void (*DrawSelection)(VMemType color, int x1, int y1,
     int x2, int y2) = DrawSelectionNone;
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -113,6 +118,47 @@ global const Viewport* CurrentViewport;	/// FIXME: quick hack for split screen
 **
 **	@return		Color for selection, or NULL if not selected.
 */
+#ifdef USE_SDL_SURFACE
+local SDL_Color* SelectionColor(const Unit* unit)
+{
+    SDL_Color *color;
+
+    color = malloc(sizeof(SDL_Color));
+
+    // FIXME: make these colors customizable via CVS
+
+    if (EditorRunning && unit==UnitUnderCursor &&
+	    EditorState == EditorSelecting) {
+	*color = ColorWhite;
+	return color;
+    }
+
+    if (unit->Selected || (unit->Blink & 1)) {
+	if (unit->Player->Player == PlayerNumNeutral) {
+	    *color = ColorYellow;
+	    return color;
+	}
+	// FIXME: better allied?
+	if (unit->Player == ThisPlayer) {
+	    *color = ColorGreen;
+	    return color;
+	}
+	if (IsEnemy(ThisPlayer, unit)) {
+	    *color = ColorRed;
+	    return color;
+	}
+	return &unit->Player->Color;
+    }
+
+    // If building mark all own buildings
+    if (CursorBuilding && unit->Type->Building &&
+	    unit->Player == ThisPlayer) {
+	*color = ColorGray;	
+	return color;
+    }
+    return NULL;
+}
+#else
 local VMemType* SelectionColor(const Unit* unit)
 {
     if (EditorRunning && unit==UnitUnderCursor &&
@@ -141,6 +187,7 @@ local VMemType* SelectionColor(const Unit* unit)
     }
     return NULL;
 }
+#endif
 
 /**
 **	Show selection marker around an unit.
@@ -149,7 +196,11 @@ local VMemType* SelectionColor(const Unit* unit)
 */
 global void DrawUnitSelection(const Unit* unit)
 {
+#ifdef USE_SDL_SURFACE
+    SDL_Color* color;
+#else
     VMemType* color;
+#endif
     int x;
     int y;
     UnitType* type;
@@ -176,10 +227,17 @@ global void DrawUnitSelection(const Unit* unit)
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
+#ifdef USE_SDL_SURFACE
+global void DrawSelectionNone(SDL_Color color, int x1, int y1,
+    int x2, int y2)
+{
+}
+#else
 global void DrawSelectionNone(VMemType color, int x1, int y1,
     int x2, int y2)
 {
 }
+#endif
 
 /**
 **	Show selected units with circle.
@@ -188,8 +246,13 @@ global void DrawSelectionNone(VMemType color, int x1, int y1,
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
+#ifdef USE_SDL_SURFACE
+global void DrawSelectionCircle(SDL_Color color, int x1, int x2,
+    int y1, int y2)
+#else
 global void DrawSelectionCircle(VMemType color, int x1, int x2,
     int y1, int y2)
+#endif
 {
     VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 	min((x2 - x1) / 2, (y2 - y1) / 2));
@@ -204,11 +267,21 @@ global void DrawSelectionCircle(VMemType color, int x1, int x2,
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
+#ifdef USE_SDL_SURFACE
+global void DrawSelectionCircleWithTrans(SDL_Color color, int x1, int y1,
+    int x2, int y2)
+#else
 global void DrawSelectionCircleWithTrans(VMemType color, int x1, int y1,
     int x2, int y2)
+#endif
 {
+#ifdef USE_SDL_SURFACE
+    VideoFillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	min((x2 - x1) / 2, (y2 - y1) / 2) - 2, 75);
+#else
     VideoFill75TransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 	min((x2 - x1) / 2, (y2 - y1) / 2) - 2);
+#endif
     VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 	min((x2 - x1) / 2, (y2 - y1) / 2));
 }
@@ -220,8 +293,13 @@ global void DrawSelectionCircleWithTrans(VMemType color, int x1, int y1,
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
+#ifdef USE_SDL_SURFACE
+global void DrawSelectionRectangle(SDL_Color color, int x1, int y1,
+    int x2, int y2)
+#else
 global void DrawSelectionRectangle(VMemType color, int x1, int y1,
     int x2, int y2)
+#endif
 {
     VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 }
@@ -233,12 +311,22 @@ global void DrawSelectionRectangle(VMemType color, int x1, int y1,
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
+#ifdef USE_SDL_SURFACE
+global void DrawSelectionRectangleWithTrans(SDL_Color color, int x1, int y1,
+    int x2, int y2)
+#else
 global void DrawSelectionRectangleWithTrans(VMemType color, int x1, int y1,
     int x2, int y2)
+#endif
 {
     VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
+#ifdef USE_SDL_SURFACE
+    VideoFillTransRectangleClip(color, x1 + 1, y1 + 1,
+	x2 - x1 - 2, y2 - y1 - 2, 75);
+#else
     VideoFill75TransRectangleClip(color, x1 + 1, y1 + 1,
 	x2 - x1 - 2, y2 - y1 - 2);
+#endif
 }
 
 /**
@@ -248,8 +336,13 @@ global void DrawSelectionRectangleWithTrans(VMemType color, int x1, int y1,
 **	@param x1,y1	Coordinates of the top left corner. 
 **	@param x2,y2	Coordinates of the bottom right corner. 
 */
+#ifdef USE_SDL_SURFACE
+global void DrawSelectionCorners(SDL_Color color, int x1, int y1,
+    int x2, int y2)
+#else
 global void DrawSelectionCorners(VMemType color, int x1, int y1,
     int x2, int y2)
+#endif
 {
 #define CORNER_PIXELS 6
 
@@ -1026,6 +1119,7 @@ local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 		    type->BoxHeight + 5,
 		(f * type->BoxHeight) / 100, 4);
 	}
+
         w = (f * type->BoxHeight) / 100 - 1;
         if (w > 0) { // Prevents -1 turning into unsigned int
 	    VideoFillRectangleClip(ColorBlue,
@@ -1048,7 +1142,11 @@ local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 {
     int f;
+#ifdef USE_SDL_SURFACE
+    SDL_Color color;
+#else
     VMemType color;
+#endif
     int w;
     int x1;
     int y1;
@@ -1653,8 +1751,13 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 {
     int x2;
     int y2;
+#ifdef USE_SDL_SURFACE
+    SDL_Color color;
+    SDL_Color e_color;
+#else
     VMemType color;
     VMemType e_color;
+#endif
     int dest;
 
     GetOrderPosition(unit, order, &x2, &y2);
@@ -1835,6 +1938,20 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
     //
     if (NumSelected == 1 && unit->Selected) {
 	if (ShowSightRange) {
+#ifdef USE_SDL_SURFACE
+	    if (ShowSightRange == 1) {
+		VideoFillTransRectangleClip(ColorGreen,
+		    x + type->TileWidth * TileSizeX / 2 - stats->SightRange * TileSizeX,
+		    y + type->TileHeight * TileSizeY / 2 - stats->SightRange * TileSizeY,
+		    stats->SightRange * TileSizeX * 2,
+		    stats->SightRange * TileSizeY * 2, 75);
+	    } else if (ShowSightRange == 2) {
+		VideoFillTransCircleClip(ColorGreen,
+		    x + type->TileWidth * TileSizeX / 2,
+		    y + type->TileHeight * TileSizeY / 2,
+		    min((stats->SightRange + (type->TileWidth - 1) / 2) * TileSizeX,
+		    (stats->SightRange + (type->TileHeight - 1) / 2) * TileSizeY), 75);
+#else
 	    if (ShowSightRange == 1) {
 		VideoFill75TransRectangleClip(ColorGreen,
 		    x + type->TileWidth * TileSizeX / 2 - stats->SightRange * TileSizeX,
@@ -1847,6 +1964,7 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 		    y + type->TileHeight * TileSizeY / 2,
 		    min((stats->SightRange + (type->TileWidth - 1) / 2) * TileSizeX,
 		    (stats->SightRange + (type->TileHeight - 1) / 2) * TileSizeY));
+#endif
 	    } else {
 		VideoDrawCircleClip(ColorGreen,
 		    x + type->TileWidth * TileSizeX / 2,
@@ -1890,6 +2008,10 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 */
 local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 {
+#ifdef USE_SDL_SURFACE
+    memcpy(&sprite->Palette->colors[208], unit->Colors->Colors, 
+	sizeof(SDL_Color) * 4);
+#else
     switch (VideoBpp) {
 	case 8:
 	    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels) + 208)) =
@@ -1909,6 +2031,7 @@ local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 		unit->Colors->Depth32;
 	    break;
     }
+#endif
 }
 
 #ifdef USE_OPENGL

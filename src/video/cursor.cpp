@@ -10,7 +10,7 @@
 //
 /**@name cursor.c	-	The cursors. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -126,7 +126,11 @@ local int HiddenCursorH;	/// saved cursor height in pixel
 
         /// Memory re-use, so can be defined although no save present!
 local int OldCursorSize;	/// size of saved cursor image
+#ifdef USE_SDL_SURFACE
+local SDL_Surface* OldCursorImage;		/// background saved behind cursor
+#else
 local void* OldCursorImage;		/// background saved behind cursor
+#endif
 
     /**
     **	Function pointer: Save 2D image behind sprite cursor
@@ -136,13 +140,19 @@ local void* OldCursorImage;		/// background saved behind cursor
     **	@param w	Width in pixels for image starting at left-top.
     **	@param h	Height in pixels for image starting at left-top.
     **
-    **	@note the complete image should be in Screen (no clipping) and
+    **	@note the complete image should be in TheScreen (no clipping) and
     **	non-empty
     **     (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
     */
+#ifdef USE_SDL_SURFACE
+local void SaveCursorBackground(int x, int y, int w, int h);
+    /// Function pointer: Load background behind cursor
+local void LoadCursorBackground(int x, int y, int w, int h);
+#else
 local void (*SaveCursorBackground)(int x, int y, int w, int h);
     /// Function pointer: Load background behind cursor
 local void (*LoadCursorBackground)(int x, int y, int w, int h);
+#endif
 
 /*--- DRAW RECTANGLE CURSOR ------------------------------------------------*/
 	// Saved area after draw rectangle, needed later to hide it again
@@ -152,7 +162,11 @@ local int OldCursorRectangleX;		/// saved cursor position on screen X
 local int OldCursorRectangleY;		/// saved cursor position on screen Y
 local int OldCursorRectangleW;		/// saved cursor width in pixel
 local int OldCursorRectangleH;		/// saved cursor height in pixel
+#ifdef USE_SDL_SURFACE
+local SDL_Surface* OldCursorRectangle;		/// background saved behind rectangle
+#else
 local void* OldCursorRectangle;		/// background saved behind rectangle
+#endif
 
 	// Area which is already hidden, but needed for invalidate
 	// (HiddenCursorRectangleW != 0 denotes it's defined)
@@ -170,11 +184,15 @@ local int HiddenCursorRectangleH;	/// saved cursor height in pixel
 **	@param w	Width in pixels for rectangle starting at left-top.
 **	@param h	Height in pixels for rectangle starting at left-top.
 **
-**	@note the complete rectangle should be in Screen (no clipping) and
+**	@note the complete rectangle should be in TheScreen (no clipping) and
 **	non-empty
 **     (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
 */
+#ifdef USE_SDL_SURFACE
+global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h);
+#else
 global void (*SaveCursorRectangle)(void* buffer, int x, int y, int w, int h);
+#endif
 
 /**
 **	Function pointer: Load rectangle behind cursor
@@ -187,7 +205,11 @@ global void (*SaveCursorRectangle)(void* buffer, int x, int y, int w, int h);
 **
 **	@note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
 */
+#ifdef USE_SDL_SURFACE
+global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h);
+#else
 global void (*LoadCursorRectangle)(void* buffer, int x, int y, int w, int h);
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -229,8 +251,13 @@ global void LoadCursors(const char* race)
 	    buf = alloca(strlen(file) + 9 + 1);
 	    file = strcat(strcpy(buf,"graphics/"), file);
 	    ShowLoadProgress("Cursor %s", file);
+#ifdef USE_SDL_SURFACE
 	    Cursors[i].Sprite = LoadSprite(file,
 		Cursors[i].Width, Cursors[i].Height);
+#else
+	    Cursors[i].Sprite = LoadSprite(file,
+		Cursors[i].Width, Cursors[i].Height);
+#endif
 	}
     }
 }
@@ -252,7 +279,11 @@ global CursorType* CursorTypeByIdent(const char* ident)
 	if (strcmp(cursortype->Ident, ident)) {
 	    continue;
 	}
+#ifdef USE_SDL_SURFACE
 	if (!cursortype->Race || cursortype->Sprite) {
+#else
+	if (!cursortype->Race || cursortype->Sprite) {
+#endif
 	    return cursortype;
 	}
     }
@@ -263,6 +294,32 @@ global CursorType* CursorTypeByIdent(const char* ident)
 /*----------------------------------------------------------------------------
 --	DRAW RECTANGLE CURSOR
 ----------------------------------------------------------------------------*/
+
+#ifdef USE_SDL_SURFACE
+global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
+{
+    // FIXME: todo
+    int i;
+
+    SDL_LockSurface(TheScreen);
+    for (i = 0; i < h; ++i) {
+	memcpy(&((char*)TheScreen->pixels)[x + (h + i) * VideoWidth], buffer, w);
+    }
+    SDL_UnlockSurface(TheScreen);
+}
+
+global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
+{
+    int i;
+
+    SDL_LockSurface(TheScreen);
+    for (i = 0; i < h; ++i) {
+	memcpy(buffer, &((char*)TheScreen->pixels)[x + (h + i) * VideoWidth], w);
+    }
+    SDL_UnlockSurface(TheScreen);
+    // FIXME: todo
+}
+#else
 /**
 **	Puts stored 'image' from SAVECURSORRECTANGLE back on the screen.
 **      Note w and h are both > 0
@@ -394,6 +451,7 @@ global void SaveCursorRectangle32(void* buffer, int x, int y, int w, int h)
 {
     SAVECURSORRECTANGLE(buffer, VideoMemory32, VMemType32, x, y, w, h);
 }
+#endif
 
 /**
 **	Draw rectangle cursor when visible, defined by
@@ -452,6 +510,39 @@ local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 /*----------------------------------------------------------------------------
 --	DRAW SPRITE CURSOR
 ----------------------------------------------------------------------------*/
+#ifdef USE_SDL_SURFACE
+local void LoadCursorBackground(int x, int y, int w, int h)
+{
+    SDL_Rect drect;
+    SDL_Rect srect;
+
+    srect.x = 0;
+    srect.y = 0;
+    srect.w = w;
+    srect.h = h;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(OldCursorImage, NULL, TheScreen, &drect);
+}
+
+local void SaveCursorBackground(int x, int y, int w, int h)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = 0;
+    srect.y = 0;
+    srect.w = w;
+    srect.h = h;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(TheScreen, &srect, OldCursorImage, NULL);
+}
+#else
 /**
 **	Restore cursor background for 8bpp frame buffer.
 **
@@ -627,6 +718,7 @@ local void SaveCursorBackground32(int x, int y, int w, int h)
 	sp += VideoWidth;
     }
 }
+#endif
 
 /**
 **	Destroy image behind cursor.
@@ -664,10 +756,22 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
     //
     spritex = (x -= type->HotX);
     spritey = (y -= type->HotY);
+#ifdef USE_SDL_SURFACE
     w = VideoGraphicWidth(type->Sprite);
     h = VideoGraphicHeight(type->Sprite);
+#else
+    w = VideoGraphicWidth(type->Sprite);
+    h = VideoGraphicHeight(type->Sprite);
+#endif
 
     //Reserve enough memory for background of sprite (also for future calls)
+#ifdef USE_SDL_SURFACE
+    size = w * h;
+    if (OldCursorSize < size) {
+	OldCursorImage = malloc(sizeof(SDL_Surface));
+	OldCursorSize = size;
+    }
+#else
     size = w * h * MemSize;
     if (OldCursorSize < size) {
 	if (OldCursorImage) {
@@ -677,14 +781,18 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 	}
 	OldCursorSize = size;
     }
-
+#endif
     //Save (seen) area behind sprite
     CLIP_RECTANGLE(x, y, w, h);
     SaveCursorBackground(OldCursorX = x, OldCursorY = y,
 	OldCursorW = w, OldCursorH = h);
 
     //Draw sprite (using its own clipping)  FIXME: prevent clipping twice
+#ifdef USE_SDL_SURFACE
     VideoDrawClip(type->Sprite, frame, spritex, spritey);
+#else
+    VideoDrawClip(type->Sprite, frame, spritex, spritey);
+#endif
     OldCursorInvalidate = 1;
 }
 
@@ -702,7 +810,11 @@ local void DrawBuildingCursor(void)
     int y1;
     int mx;
     int my;
+#ifdef USE_SDL_SURFACE
+    SDL_Color color;
+#else
     VMemType color;
+#endif
     int f;
     int w;
     int w0;
@@ -907,7 +1019,11 @@ global void CursorAnimate(unsigned ticks)
 	last = ticks + GameCursor->FrameRate;
 	GameCursor->SpriteFrame++;
 	if ((GameCursor->SpriteFrame & 127) >=
+#ifdef USE_SDL_SURFACE
 		VideoGraphicFrames(GameCursor->Sprite)) {
+#else
+		VideoGraphicFrames(GameCursor->Sprite)) {
+#endif
 	    GameCursor->SpriteFrame = 0;
 	}
 	MustRedraw |= RedrawCursor;
@@ -1072,6 +1188,10 @@ global void InitVideoCursors(void)
 	OldCursorRectangle = 0;
     }
 
+#ifdef USE_SDL_SURFACE
+    OldCursorImage = SDL_CreateRGBSurface(SDL_SWSURFACE, 40, 40, 8, 0, 0, 0, 0);
+    OldCursorRectangle = SDL_CreateRGBSurface(SDL_SWSURFACE, 40, 40, 8, 0, 0, 0, 0);
+#else
     switch (VideoBpp) {
 	case 8:
 	    SaveCursorBackground = SaveCursorBackground8;
@@ -1107,6 +1227,7 @@ global void InitVideoCursors(void)
 	    abort();
     }
     OldCursorRectangle = malloc((2 * VideoWidth + 2 * (VideoHeight - 2)) * MemSize);
+#endif // ifdef USE_SDL_SURFACE
 #endif
 
     CursorX = VideoWidth / 2;

@@ -10,7 +10,7 @@
 //
 /**@name player.c	-	The players. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//	(c) Copyright 1998-2003 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -66,8 +66,13 @@ global int NoRescueCheck;		/// Disable rescue check
 /**
 **	Colors used for minimap.	FIXME: make this configurable
 */
+#ifdef USE_SDL_SURFACE
+global SDL_Color PlayerColorsRGB[PlayerMax];
+global SDL_Color PlayerColors[PlayerMax];
+#else
 global VMemType PlayerColorsRGB[PlayerMax];
 global VMemType PlayerColors[PlayerMax];
+#endif
 
 global char* PlayerColorNames[PlayerMax] = {
     "red",
@@ -142,19 +147,32 @@ global void InitPlayers(void)
     };
 
     // FIXME: remove this
+#ifdef USE_SDL_SURFACE
+    for (p = 0; p < PlayerMax; ++p) {
+	PlayerColorsRGB[p].r = PColors[p].R;
+	PlayerColorsRGB[p].g = PColors[p].G;
+	PlayerColorsRGB[p].b = PColors[p].B;
+    }
+#else
     for (p = 0; p < PlayerMax; ++p) {
 	PlayerColorsRGB[p].D24.a = PColors[p].R;
 	PlayerColorsRGB[p].D24.b = PColors[p].G;
 	PlayerColorsRGB[p].D24.c = PColors[p].B;
     }
+#endif
 
     for (p = 0; p < PlayerMax; ++p) {
 	Players[p].Player = p;
 	if (!Players[p].Type) {
 	    Players[p].Type = PlayerNobody;
 	}
+#ifdef USE_SDL_SURFACE
+	PlayerColors[p] = VideoMapRGB(PlayerColorsRGB[p].r,
+	    PlayerColorsRGB[p].g, PlayerColorsRGB[p].b);
+#else
 	PlayerColors[p] = VideoMapRGB(PlayerColorsRGB[p].D24.a,
 	    PlayerColorsRGB[p].D24.b, PlayerColorsRGB[p].D24.c);
+#endif
     }
 }
 
@@ -861,6 +879,10 @@ global void PlayersEachSecond(int player)
 */
 global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 {
+#ifdef USE_SDL_SURFACE
+    memcpy(&sprite->Palette->colors[208], player->UnitColors.Colors, 
+	sizeof(Pixels) * 4);
+#else
     switch (VideoBpp) {
 	case 8:
 	    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels) + 208)) =
@@ -880,6 +902,7 @@ global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 		player->UnitColors.Depth32;
 	    break;
     }
+#endif
 }
 
 /**
@@ -889,6 +912,10 @@ global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 */
 global void PlayerPixels(const Player* player)
 {
+#ifdef USE_SDL_SURFACE
+    memcpy(&GlobalPalette.colors[208], player->UnitColors.Colors, 
+	sizeof(Pixels) * 4);
+#else
     // FIXME: use function pointer
     switch (VideoBpp) {
 	case 8:
@@ -905,6 +932,7 @@ global void PlayerPixels(const Player* player)
 	    *((struct __4pixel32__*)(Pixels32 + 208)) = player->UnitColors.Depth32;
 	    break;
     }
+#endif
 }
 
 /**
@@ -919,8 +947,33 @@ global void SetPlayersPalette(void)
     int i;
     int o;
 
+//    Pixels->colors = calloc(256, sizeof(SDL_Color));
+
     //o = rand() & 0x7;			// FIXME: random colors didn't work
     o = 0;
+#ifdef USE_SDL_SURFACE
+    for (i = 0; i < 7; ++i) {
+	Players[o].UnitColors.Colors[0] = GlobalPalette.colors[208];
+	Players[o].UnitColors.Colors[1] = GlobalPalette.colors[209];
+	Players[o].UnitColors.Colors[2] = GlobalPalette.colors[210];
+	Players[o].UnitColors.Colors[3] = GlobalPalette.colors[211];
+
+	Players[o + 8].UnitColors.Colors[0] = GlobalPalette.colors[208];
+	Players[o + 8].UnitColors.Colors[1] = GlobalPalette.colors[209];
+	Players[o + 8].UnitColors.Colors[2] = GlobalPalette.colors[210];
+	Players[o + 8].UnitColors.Colors[3] = GlobalPalette.colors[211];
+	o = (o + 1) & 0x7;
+    }
+
+    Players[o].UnitColors.Colors[0] = GlobalPalette.colors[12];
+    Players[o].UnitColors.Colors[1] = GlobalPalette.colors[13];
+    Players[o].UnitColors.Colors[2] = GlobalPalette.colors[14];
+    Players[o].UnitColors.Colors[3] = GlobalPalette.colors[15];
+    Players[o+8].UnitColors.Colors[0] = GlobalPalette.colors[12];
+    Players[o+8].UnitColors.Colors[1] = GlobalPalette.colors[13];
+    Players[o+8].UnitColors.Colors[2] = GlobalPalette.colors[14];
+    Players[o+8].UnitColors.Colors[3] = GlobalPalette.colors[15];
+#else
     switch (VideoBpp) {
     case 8:
 	// New player colors setup
@@ -1045,6 +1098,7 @@ global void SetPlayersPalette(void)
 
 	break;
     }
+#endif
 }
 
 /**

@@ -642,8 +642,9 @@ local void VideoEffect0(int frame __attribute__((unused)),
 {
 }
 
-#else
+#endif
 
+#ifndef USE_SDL_SURFACE
 local void VideoEffect0(int frame,
     const EventCallback* callbacks __attribute__((unused)))
 {
@@ -957,17 +958,23 @@ local void WaitForInput(int timeout)
 	WaitEventsOneFrame(&callbacks);
     }
 #else
+//#ifndef USE_SDL_SURFACE
     timeout *= CYCLES_PER_SECOND;
     while (timeout-- && WaitNoEvent) {
 	// FIXME: make this configurable
+
+#ifndef USE_SDL_SURFACE
 	if (0) {
 	    VideoEffect0(timeout, &callbacks);
 	}
+#endif
 	WaitEventsOneFrame(&callbacks);
     }
+#ifndef USE_SDL_SURFACE
     if (0) {
 	VideoEffect0(-1, &callbacks);
     }
+#endif
 #endif
 
     VideoLockScreen();
@@ -999,7 +1006,13 @@ global void ShowLoadProgress(const char* fmt, ...)
 		*s = ' ';
 	    }
 	}
+#ifdef USE_SDL_SURFACE
+	SDL_Color color = { 0, 0, 0, 0 };
+
+	VideoFillRectangle(color, 5, VideoHeight - 18, VideoWidth - 10, 18);
+#else
 	VideoFillRectangle(ColorBlack, 5, VideoHeight - 18, VideoWidth - 10, 18);
+#endif
 	VideoDrawTextCentered(VideoWidth / 2, VideoHeight - 16, GameFont, temp);
 	VideoUnlockScreen();
 	InvalidateArea(5, VideoHeight - 18, VideoWidth - 10, 18);
@@ -1024,11 +1037,19 @@ global void PreMenuSetup(void)
     // FIXME: must search tileset by identifier or use a gui palette?
     TheMap.TerrainName = Tilesets[0]->Ident;
     LoadTileset();
+#ifdef USE_SDL_SURFACE
+    LoadRGB(&GlobalPalette, s = strdcat3(StratagusLibPath,
+	"/graphics/", Tilesets[0]->PaletteFile));
+    TheMap.TerrainName = NULL;
+    free(s);
+    VideoCreatePalette(&GlobalPalette);
+#else
     LoadRGB(GlobalPalette, s = strdcat3(StratagusLibPath,
 	"/graphics/", Tilesets[0]->PaletteFile));
     TheMap.TerrainName = NULL;
     free(s);
     VideoCreatePalette(GlobalPalette);
+#endif
     SetDefaultTextColors(FontYellow, FontWhite);
 
     LoadFonts();

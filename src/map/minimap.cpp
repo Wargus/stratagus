@@ -53,7 +53,11 @@
 ----------------------------------------------------------------------------*/
 
 local Graphic* MinimapTerrainGraphic;	/// generated minimap terrain
+#ifdef USE_SDL_SURFACE
+local SDL_Surface* MinimapGraphic;	/// generated minimap
+#else
 local VMemType* MinimapGraphic;		/// generated minimap
+#endif
 local int* Minimap2MapX;		/// fast conversion table
 local int* Minimap2MapY;		/// fast conversion table
 local int Map2MinimapX[MaxMapWidth];	/// fast conversion table
@@ -136,8 +140,13 @@ global void UpdateMinimapXY(int tx, int ty)
 	    }
 
 	    tile = TheMap.Fields[x + y].Tile;
+
+#ifdef USE_SDL_SURFACE
+	    // FIXME: todod
+#else
 	    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW] =
 		TheMap.Tiles[tile][7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
+#endif
 	}
     }
 }
@@ -171,8 +180,13 @@ global void UpdateMinimapTerrain(void)
 	    int tile;
 
 	    tile = TheMap.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Tile;
+
+#ifdef USE_SDL_SURFACE
+	    // FIXME: todo
+#else
 	    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW] =
 		TheMap.Tiles[tile][7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
+#endif
 	}
     }
 }
@@ -227,12 +241,48 @@ global void CreateMinimap(void)
     }
 
     MinimapTerrainGraphic = NewGraphic(8, TheUI.MinimapW, TheUI.MinimapH);
+
+#ifdef USE_SDL_SURFACE
+    Uint32 rmask, gmask, bmask, amask;
+// FIXME: use defines for this?
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    rmask = 0xff000000;
+    gmask = 0x00ff0000;
+    bmask = 0x0000ff00;
+    amask = 0x000000ff;
+#else
+    rmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    bmask = 0x00ff0000;
+    amask = 0xff000000;
+#endif
+    // FIXME: does NewGraphic do this for MinimapTerrainGraphic??
+    // FIXME: what depth?
+    MinimapGraphic = SDL_CreateRGBSurface(SDL_SWSURFACE, TheUI.MinimapW,
+	TheUI.MinimapH, 8, rmask, gmask, bmask, amask);
+#else
     memset(MinimapTerrainGraphic->Frames, 0, TheUI.MinimapW * TheUI.MinimapH);
     MinimapGraphic = calloc(TheUI.MinimapW * TheUI.MinimapH, sizeof(VMemType));
+#endif
 
     // FIXME: looks too complicated
     for (y = 0; y < TheUI.MinimapH; ++y) {
 	for (x = 0; x < TheUI.MinimapW; ++x) {
+#ifdef USE_SDL_SURFACE
+	    SDL_Color c;
+	    int b;
+
+	    c = TheUI.MinimapPanel.Graphic->Surface->format->palette->colors[
+		x + (TheUI.MinimapPosX - TheUI.MinimapPanelX) + (y + TheUI.MinimapPosY - 
+		TheUI.MinimapPanelY) * TheUI.MinimapPanel.Graphic->Width];
+
+	    b = MinimapGraphic->format->BytesPerPixel;
+
+	    // FIXME: rgb: todo: ack
+
+//	    ((char*)MinimapGraphic->pixels)[x * b + y * TheUI.MinimapW * b] = 
+//		VideoMapRGB(c.r, c.g, c.b);
+#else
 	    Palette p;
 	    // this only copies the panel background... honest.
 	    p = GlobalPalette[
@@ -241,13 +291,19 @@ global void CreateMinimap(void)
 		    (y + TheUI.MinimapPosY - TheUI.MinimapPanelY) *
 		    TheUI.MinimapPanel.Graphic->Width]];
 	    MinimapGraphic[x + y * TheUI.MinimapW] = VideoMapRGB(p.r, p.g, p.b);
+#endif
 	}
     }
     if (!TheUI.MinimapTransparent) {
 	// make only the inner part which is going to be used black
 	for (y = MinimapY; y < TheUI.MinimapH - MinimapY; ++y) {
 	    for (x = MinimapX; x < TheUI.MinimapW - MinimapX; ++x) {
+#ifdef USE_SDL_SURFACE
+		// FIXME: todo
+//		((char*)MinimapGraphic->pixels)[x + y * TheUI.MinimapW] = ColorBlack;
+#else
 		MinimapGraphic[x + y * TheUI.MinimapW] = ColorBlack;
+#endif
 	    }
 	}
     }
@@ -305,6 +361,9 @@ global void UpdateMinimap(void)
 	    } else {
 		visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Width);
 	    }
+#ifdef USE_SDL_SURFACE
+	    // FIXME: todo
+#else
 	    if (MinimapWithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {
 		Palette p;
 		p = GlobalPalette[
@@ -313,6 +372,7 @@ global void UpdateMinimap(void)
 	    } else if (visiontype > 0) {
 		MinimapGraphic[mx + my * TheUI.MinimapW] = ColorBlack;
 	    }
+#endif
 	}
     }
 
@@ -325,6 +385,11 @@ global void UpdateMinimap(void)
 
     //	Draw Destroyed Buildings On Map
     table = &DestroyedBuildings;
+
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+    (int)type = (int)unit = w = h = h0 = 0;
+#else
     while (*table) {
 	VMemType color;
 
@@ -418,6 +483,7 @@ global void UpdateMinimap(void)
 	}
 
     }
+#endif
 }
 
 /**
@@ -429,6 +495,9 @@ global void UpdateMinimap(void)
 global void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))
 {
+#ifdef USE_SDL_SURFACE
+    // FIXME: todo
+#else
     int i;
     int j;
 
@@ -483,6 +552,7 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	    break;
 	}
     }
+#endif
 }
 
 /**
@@ -521,7 +591,11 @@ global void DrawMinimapCursor(int vx, int vy)
 	(TheUI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
     OldMinimapCursorH = h =
 	(TheUI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
+#ifdef USE_SDL_SURFACE
+    i = (w + 1 + h) * 2 * TheScreen->format->BytesPerPixel;
+#else
     i = (w + 1 + h) * 2 * VideoTypeSize;
+#endif
     if (OldMinimapCursorSize < i) {
 	if (OldMinimapCursorImage) {
 	    OldMinimapCursorImage = realloc(OldMinimapCursorImage, i);
@@ -534,7 +608,11 @@ global void DrawMinimapCursor(int vx, int vy)
     SaveCursorRectangle(OldMinimapCursorImage, x, y, w, h);
 
     // Draw cursor as rectangle (Note: unclipped, as it is always visible)
+#ifdef USE_SDL_SURFACE
+    VideoDrawTransRectangle(TheUI.ViewportCursorColor, x, y, w, h, 50);
+#else
     VideoDraw50TransRectangle(TheUI.ViewportCursorColor, x, y, w, h);
+#endif
 }
 
 /**
