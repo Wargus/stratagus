@@ -49,6 +49,7 @@
 #include "cursor.h"
 #include "spells.h"
 #include "construct.h"
+#include "actions.h"
 #include "network.h"
 #include "netconnect.h"
 #include "missile.h"
@@ -157,6 +158,8 @@ global void LoadMap(const char* filename,WorldMap* map)
 **
 **	@param filename	map filename
 **	@param map	map loaded
+**
+**	@todo 	FIXME: use in this function InitModules / LoadModules!!!
 */
 global void CreateGame(char* filename, WorldMap* map)
 {
@@ -183,7 +186,9 @@ global void CreateGame(char* filename, WorldMap* map)
 	}
     }
 
-    GameCycle=0;
+    GameCycle = 0;
+    SyncHash = 0;
+    InitSyncRand();
 
     if( NetworkFildes!=-1 ) {		// Prepare network play
 	DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
