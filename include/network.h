@@ -48,7 +48,7 @@
 
 #define NetworkMaxLag	250		/// Debuging network lag (# game cycles)
 
-#define NetworkDups	1		/// Repeat old commands
+#define MaxNetworkCommands	9		/// Max Commands In A Packet
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -60,6 +60,7 @@
 **	@todo cleanup the message types.
 */
 enum _message_type_ {
+    MessageNone,			/// When Nothing Is Happening
     MessageInitHello,			/// Start connection
     MessageInitReply,			/// Connection reply
     MessageInitConfig,			/// Setup message configure clients
@@ -119,8 +120,6 @@ typedef struct _ack_message_ {
 **	Network command message.
 */
 typedef struct _network_command_ {
-    unsigned char	Type;		/// Network command type
-    unsigned char	Cycle;		/// Destination game cycle
     UnitRef		Unit;		/// Command for unit
     unsigned short	X;		/// Map position X
     unsigned short	Y;		/// Map position Y
@@ -131,8 +130,6 @@ typedef struct _network_command_ {
 **	Extended network command message.
 */
 typedef struct _network_extended_command_ {
-    unsigned char	Type;		/// Network command type
-    unsigned char	Cycle;		/// Destination game cycle
     unsigned char	ExtendedType;	/// Extended network command type
     unsigned char	Arg1;		/// Argument 1
     unsigned short	Arg2;		/// Argument 2
@@ -144,20 +141,30 @@ typedef struct _network_extended_command_ {
 **	Network chat message.
 */
 typedef struct _network_chat_ {
-    unsigned char	Cycle;		/// Destination game cycle
-    unsigned char	Type;		/// Network command type
     unsigned char	Player;		/// Sending player
     char		Text[7];	/// Message bytes
 } NetworkChat;
 
 /**
+**	Network packet header.
+**
+**	Header for the packet.
+*/
+typedef struct _network_packet_header_ {
+    unsigned char	Cycle;		/// Destination game cycle
+    unsigned char	Type[MaxNetworkCommands];	/// Command
+    					/// Commands in packet
+} NetworkPacketHeader;
+
+/**
 **	Network packet.
 **
 **	This is sent over the network.
+**	
 */
 typedef struct _network_packet_ {
-					/// Commands in packet
-    NetworkCommand	Commands[NetworkDups];
+    NetworkPacketHeader	Header;		/// Packet Header Info
+    NetworkCommand	Command[MaxNetworkCommands];
 } NetworkPacket;
 
 /*----------------------------------------------------------------------------
