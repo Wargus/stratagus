@@ -222,8 +222,8 @@ global void LoadMissileSprites(void)
 	    // Correct the number of frames in graphic
 	    DebugCheck( MissileTypes[i].Sprite->NumFrames
 			<MissileTypes[i].SpriteFrames );
-	    // FIXME: is this still needed?
-	    // MissileTypes[i].Sprite->NumFrames=MissileTypes[i].SpriteFrames;
+	    MissileTypes[i].Sprite->NumFrames=MissileTypes[i].SpriteFrames;
+	    // FIXME: Don't use NumFrames as number of frames.
 	}
     }
 }
