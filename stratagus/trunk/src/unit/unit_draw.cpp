@@ -1297,7 +1297,11 @@ local void GraphicUnitPixels(const Unit* unit,const Graphic* sprite)
 **
 **	@param unit	Pointer to the building
 */
+#ifdef NEW_DECODRAW
+global void DrawBuilding(Unit* unit)
+#else
 local void DrawBuilding(Unit* unit)
+#endif
 {
     int x;
     int y;
@@ -1360,7 +1364,11 @@ local void DrawBuilding(Unit* unit)
 **
 **	@param unit	Pointer to the unit.
 */
+#ifdef NEW_DECODRAW
+global void DrawUnit(const Unit* unit)
+#else
 local void DrawUnit(const Unit* unit)
+#endif
 {
     int x;
     int y;
