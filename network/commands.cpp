@@ -81,6 +81,7 @@ struct _log_entry_ {
     int		DestUnitNumber;
     char*	Value;
     int		Num;
+    int		SyncRandSeed;
     LogEntry*	Next;
 };
 
@@ -145,6 +146,7 @@ static IOStructDef LogEntryStructDef = {
 	{"dest-unit-number",	&IOInt,		&((LogEntry *) 0)->DestUnitNumber,NULL},
 	{"value",		&IOString,	&((LogEntry *) 0)->Value,	NULL},
 	{"Num",			&IOInt,		&((LogEntry *) 0)->Num,		NULL},
+	{"SyncRandSeed",	&IOInt,		&((LogEntry *) 0)->SyncRandSeed,NULL},
 	{0, 0, 0, 0}
     }
 };
@@ -506,6 +508,8 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
     //
     log->Num = num;
 
+    log->SyncRandSeed = (signed)SyncRandSeed;
+
     // Append it to ReplayLog list
     AppendLog(log);
 }
@@ -677,6 +681,25 @@ local void DoNextReplay(void)
     dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NoUnitP);
     val = ReplayStep->Value;
     num = ReplayStep->Num;
+    
+    if (((signed)SyncRandSeed) != ReplayStep->SyncRandSeed) {
+#ifdef DEBUG	
+	if (!ReplayStep->SyncRandSeed) {
+	    // Replay without the 'sync info
+	    NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "No sync info for this replay !");
+	} else {
+	    NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync !");
+	    ReplayStep = 0;
+	    NextLogCycle = ~0UL;
+	    return;
+	}
+#else
+    	NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync !");
+	ReplayStep = 0;
+	NextLogCycle = ~0UL;
+	return;
+#endif
+    }
     
     if (!strcmp(name, "stop")) {
 	SendCommandStopUnit(UnitSlots[unit]);
