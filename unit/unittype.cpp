@@ -46,6 +46,8 @@
 
 /*
 **	Next unit type are used hardcoded in the source.
+**
+**	FIXME: find a way to make it configurable!
 */
 global UnitType*UnitTypeGoldMine;	/// Gold mine unit type pointer.
 global UnitType*UnitTypeOrcTanker;	/// Orc tanker unit type pointer.
@@ -58,6 +60,8 @@ global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold.
 global UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold.
 global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
 global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
+global UnitType*UnitTypeHumanFarm;	/// Human farm.
+global UnitType*UnitTypeOrcFarm;	/// Orc farm.
 
 /**
 **	Lookup table for unit-type names
@@ -1070,6 +1074,8 @@ global void InitUnitTypes(void)
     UnitTypeOrcWorkerWithGold=UnitTypeByIdent("unit-peon-with-gold");
     UnitTypeHumanWorkerWithWood=UnitTypeByIdent("unit-peasant-with-wood");
     UnitTypeOrcWorkerWithWood=UnitTypeByIdent("unit-peon-with-wood");
+    UnitTypeHumanFarm=UnitTypeByIdent("unit-farm");
+    UnitTypeOrcFarm=UnitTypeByIdent("unit-pig-farm");
 }
 
 /**

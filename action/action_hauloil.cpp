@@ -43,37 +43,51 @@
 local int MoveToOilWell(Unit* unit)
 {
     Unit* well;
-    int i;
+    int ret;
 
-    if( !(i=HandleActionMove(unit)) ) {	// reached end-point
+    if( !(ret=HandleActionMove(unit)) ) {	// reached end-point
 	return 0;
     }
-    DebugLevel3("Result: %d\n",i);
-    if( i==-1 ) {
+    // FIXME: support new return values of the pathfinder
+    if( ret==-1 ) {
 	DebugLevel2("OIL-WELL NOT REACHED\n");
-	return -1;
-    }
-
-    well=unit->Command.Data.Move.Goal;
-
-    if( !well ) {
-        DebugLevel2("Invalid Oil Well\n");
-	return -1;
-    }
-
-    // FIXME: the incomplete oil well didn't completed
-    if( well->Command.Action==UnitActionBuilded ) {
-        DebugLevel2("Invalid Oil Well\n");
 	return -1;
     }
 
     unit->Command.Action=UnitActionHaulOil;
 
-    DebugCheck( !well || MapDistanceToUnit(unit->X,unit->Y,well)!=1 );
+    well=unit->Command.Data.Move.Goal;
+#ifdef NEW_UNIT
+    if( well && (well->Destroyed || !well->HP) ) {
+	if( !--well->Refs ) {
+	    ReleaseUnit(well);
+	}
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+#endif
+    if( !well ) {			// target lost?
+	DebugLevel2("OIL-WELL LOST\n");
+	return -1;
+    }
+
+    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,well)!=1 );
+
+    // FIXME: the oil well didn't completed, should wait!
+    if( well->Command.Action==UnitActionBuilded ) {
+        DebugLevel2("Invalid Oil Well\n");
+	return -1;
+    }
+
+#ifdef NEW_UNIT
+    --well->Refs;
+#endif
 
     //
     // Activate oil-well
     //
+#ifndef NEW_UNIT
     if( !well->Type->GivesOil ) {
 	// OilWell destoryed.
 	DebugLevel3("WAIT after oil-well destroyed %d\n",unit->Wait);
@@ -81,6 +95,7 @@ local int MoveToOilWell(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
+#endif
     well->Command.Data.OilWell.Active++;
     DebugLevel0(__FUNCTION__": +%d\n",well->Command.Data.OilWell.Active);
     well->Frame=2;			// FIXME: this shouldn't be hard coded!
@@ -116,7 +131,6 @@ local int HaulInOilWell(Unit* unit)
 	//
 	// Have oil
 	//
-
 	well=PlatformOnMap(unit->X,unit->Y);
 	DebugLevel3("Found %d,%d=%Zd\n",unit->X,unit->Y,UnitNumber(well));
 	IfDebug(
@@ -145,8 +159,8 @@ local int HaulInOilWell(Unit* unit)
 	    unit->Removed=0;
 	    DropOutAll(well);
 	    DestroyUnit(well);
-	    // Also remove oil-patch
 #if 0
+	    // Also remove oil-patch  FIXME: didn't work?
 	    well=OilPatchOnMap(unit->X,unit->Y);
 	    if( well ) {
 		DebugLevel0(__FUNCTION__": removing oil patch\n");
@@ -193,18 +207,21 @@ local int HaulInOilWell(Unit* unit)
 	} else {
 	    if( well ) {
 		DropOutNearest(unit,depot->X,depot->Y
-			,well->Type->TileWidth
-			,well->Type->TileHeight);
+			,well->Type->TileWidth,well->Type->TileHeight);
 	    } else {
 		DropOutNearest(unit,depot->X,depot->Y,1,1);
 	    }
 	    unit->Command.Data.Move.Fast=1;
 	    unit->Command.Data.Move.Goal=depot;
+#ifdef NEW_UNIT
+	    ++depot->Refs;
+#endif
 	    unit->Command.Data.Move.Range=1;
 #if 1
+	    // FIXME: old pathfinder didn't found the path to the nearest
+	    // FIXME: point of the unit
 	    NearestOfUnit(depot,unit->X,unit->Y
-		,&unit->Command.Data.Move.DX
-		,&unit->Command.Data.Move.DY);
+		,&unit->Command.Data.Move.DX,&unit->Command.Data.Move.DY);
 #else
 	    unit->Command.Data.Move.DX=depot->X;
 	    unit->Command.Data.Move.DY=depot->Y;
@@ -243,28 +260,48 @@ local int HaulInOilWell(Unit* unit)
 */
 local int MoveToOilDepot(Unit* unit)
 {
-    int i;
+    int ret;
     int x;
     int y;
     Unit* depot;
 
-    if( !(i=HandleActionMove(unit)) ) {	// reached end-point
+    if( !(ret=HandleActionMove(unit)) ) {	// reached end-point
 	return 0;
     }
-    DebugLevel3("Result: %d\n",i);
-    if( i==-1 ) {
+    // FIXME: support new return values of the pathfinder
+    DebugLevel3("Result: %d\n",ret);
+    if( ret==-1 ) {
 	DebugLevel2("OIL-DEPOT NOT REACHED\n");
+	return -1;
+    }
+
+    unit->Command.Action=UnitActionHaulOil;
+
+    depot=unit->Command.Data.Move.Goal;
+#ifdef NEW_UNIT
+    if( depot && (depot->Destroyed || !depot->HP) ) {
+	if( !--depot->Refs ) {
+	    ReleaseUnit(depot);
+	}
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
     }
+#endif
+    if( !depot ) {			// target lost?
+	DebugLevel2("OIL-DEPOT LOST\n");
+	return -1;
+    }
 
-    unit->Command.Action=UnitActionHaulOil;
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
-    depot=OilDepositOnMap(x,y);
+    DebugCheck( depot!=OilDepositOnMap(x,y) );
 
-    DebugCheck( !depot || MapDistanceToUnit(unit->X,unit->Y,depot)!=1 );
+    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,depot)!=1 );
+
+#ifdef NEW_UNIT
+    --depot->Refs;
+#endif
 
     RemoveUnit(unit);
     unit->X=depot->X;
@@ -283,8 +320,7 @@ local int MoveToOilDepot(Unit* unit)
     } else if( unit->Type==UnitTypeOrcTankerFull ) {
 	unit->Type=UnitTypeOrcTanker;
     } else {
-	DebugLevel0("Wrong unit for returning oil `%s'\n"
-		,unit->Type->Ident);
+	DebugLevel0("Wrong unit for returning oil `%s'\n",unit->Type->Ident);
     }
 
     if( WAIT_FOR_OIL<MAX_UNIT_WAIT ) {
@@ -304,42 +340,44 @@ local int MoveToOilDepot(Unit* unit)
 */
 local int WaitForOilDeliver(Unit* unit)
 {
+    Unit* depot;
     Unit* platform;
 
     DebugLevel3("Waiting\n");
     if( !unit->Value ) {
+	depot=unit->Command.Data.Move.Goal;
+	// Could be destroyed, but than we couldn't be in?
+
 	// FIXME: return to last position!
 	if( !(platform=FindOilPlatform(unit->Player,unit->X,unit->Y)) ) {
 #ifdef NEW_HEADING
 	    DropOutOnSide(unit,LookingW
-		    ,UnitTypes[UnitGreatHall].TileWidth
-		    ,UnitTypes[UnitGreatHall].TileHeight);
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 #else
 	    DropOutOnSide(unit,HeadingW
-		    ,UnitTypes[UnitGreatHall].TileWidth
-		    ,UnitTypes[UnitGreatHall].TileHeight);
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 #endif
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {
-	    DropOutNearest(unit
-		    ,platform->X
-		    ,platform->Y
-		    ,UnitTypes[UnitGreatHall].TileWidth
-		    ,UnitTypes[UnitGreatHall].TileHeight);
+	    DropOutNearest(unit,platform->X,platform->Y
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    unit->Command.Data.Move.Fast=1;
 	    unit->Command.Data.Move.Goal=platform;
+#ifdef NEW_UNIT
+	    ++platform->Refs;
+#endif
 	    unit->Command.Data.Move.Range=1;
 #if 1
+	    // FIXME: old pathfinder didn't found the path to the nearest
+	    // FIXME: point of the unit
 	    NearestOfUnit(platform,unit->X,unit->Y
-		,&unit->Command.Data.Move.DX
-		,&unit->Command.Data.Move.DY);
+		,&unit->Command.Data.Move.DX,&unit->Command.Data.Move.DY);
 #else
 	    unit->Command.Data.Move.DX=platform->X;
 	    unit->Command.Data.Move.DY=platform->Y;
 #endif
 	    unit->Command.Action=UnitActionHaulOil;
-	    //unit->Value=UnitNumber(platform);	// unused
 	}
 
 	if( UnitVisible(unit) ) {
@@ -348,14 +386,13 @@ local int WaitForOilDeliver(Unit* unit)
 	unit->Wait=1;
 	unit->SubAction=0;
 	return 1;
-    } else {
-	if( unit->Value<MAX_UNIT_WAIT ) {
-	    unit->Wait=unit->Value;
-	} else {
-	    unit->Wait=MAX_UNIT_WAIT;
-	}
-	unit->Value-=unit->Wait;
     }
+    if( unit->Value<MAX_UNIT_WAIT ) {
+	unit->Wait=unit->Value;
+    } else {
+	unit->Wait=MAX_UNIT_WAIT;
+    }
+    unit->Value-=unit->Wait;
     return 0;
 }
 
@@ -366,7 +403,7 @@ local int WaitForOilDeliver(Unit* unit)
 */
 global void HandleActionHaulOil(Unit* unit)
 {
-    int i;
+    int ret;
 
     DebugLevel3(__FUNCTION__": %p (%Zd) SubAction %d\n"
 	,unit,UnitNumber(unit),unit->SubAction);
@@ -376,11 +413,16 @@ global void HandleActionHaulOil(Unit* unit)
 	//	Move to oil-platform
 	//
 	case 0:
-	    if( (i=MoveToOilWell(unit)) ) {
-		if( i==-1 ) {
+	    if( (ret=MoveToOilWell(unit)) ) {
+		if( ret==-1 ) {
 		    if( ++unit->SubAction==1 ) {
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
+#ifdef NEW_UNIT
+			if( unit->Command.Data.Move.Goal ) {
+			    --unit->Command.Data.Move.Goal->Refs;
+			}
+#endif
 		    }
 		} else {
 		    unit->SubAction=1;
@@ -399,8 +441,20 @@ global void HandleActionHaulOil(Unit* unit)
 	//	Return to oil deposit
 	//
 	case 2:
-	    if( MoveToOilDepot(unit) ) {
-		++unit->SubAction;
+	    if( (ret=MoveToOilDepot(unit)) ) {
+		if( ret==-1 ) {
+		    if( ++unit->SubAction==3 ) {
+			unit->Command.Action=UnitActionStill;
+			unit->SubAction=0;
+#ifdef NEW_UNIT
+			if( unit->Command.Data.Move.Goal ) {
+			    --unit->Command.Data.Move.Goal->Refs;
+			}
+#endif
+		    }
+		} else {
+		    unit->SubAction=3;
+		}
 	    }
 	    break;
 	//

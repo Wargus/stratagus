@@ -285,7 +285,8 @@ global void DrawUnitInfo(Unit* unit)
     }
 
     if( type->Building ) {
-	if( type->Type==UnitFarm || type->Type==UnitPigFarm ) {
+	// Make some bit in the unit type structure.
+	if( type==UnitTypeHumanFarm || type==UnitTypeOrcFarm ) {
 	    DrawText(x+16,y+8+63,GameFont,"Food Usage");
 	    DrawText(x+58,y+8+78,GameFont,"Grown:");
 	    DrawNumber(x+108,y+8+78,GameFont,unit->Player->Food);

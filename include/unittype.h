@@ -198,7 +198,7 @@ struct _unit_type_ {
     RleSprite*	RleSprite;		/// sprite images
 };
 
-#if 1
+#if 0
 /*
 **	Names for the unit-type table slots as used in puds.
 **
@@ -352,6 +352,8 @@ extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold.
 extern UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold.
 extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
 extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
+extern UnitType*UnitTypeHumanFarm;	/// Human farm
+extern UnitType*UnitTypeOrcFarm;	/// Orc farm
 
 /*----------------------------------------------------------------------------
 --	Functions
