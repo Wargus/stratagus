@@ -1506,6 +1506,9 @@ global void ProcessMenu(const char *menu_id, int loop)
 		NetworkProcessClientRequest();
 		MustRedraw |= RedrawMenu;
 	    }
+	    if (NetConnectRunning == 1) {
+		NetworkProcessServerRequest();
+	    }
 	    // stopped by network activity?
 	    if (oldncr == 2 && NetConnectRunning == 0) {
 		if (menu->netaction) {

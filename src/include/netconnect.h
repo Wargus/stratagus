@@ -43,7 +43,7 @@
     /// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion	4
     /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	2
+#define NetworkProtocolPatchLevel	3
     /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
@@ -143,6 +143,9 @@ enum _ic_message_subtype_ {
     ICMSeeYou,			/// Client has left game
 
     ICMGo,			/// Client is ready to run
+
+    ICMAYT,			/// Server asks are you there
+    ICMIAH,			/// Client answers I am here
 };
 
 /**
@@ -205,6 +208,7 @@ extern void NetworkExitServerConnect(void); /// Terminate network connect state 
 extern void NetworkParseSetupEvent(const char *buf, int size); /// Parse a network connect event
 extern int NetworkSetupServerAddress(const char *serveraddr); /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
+extern void NetworkProcessServerRequest(void); /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients(void); /// Menu Loop: Server: Mark clients state to send stateinfo message
 extern void NetworkDetachFromServer(void); /// Menu Loop: Client: Send GoodBye to the server and detach
 
