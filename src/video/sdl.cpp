@@ -694,6 +694,10 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	if (!SkipGameCycle--) {
 		SkipGameCycle = SkipFrames;
 	}
+
+#ifndef USE_OPENGL
+	VideoClearScreen();
+#endif
 }
 
 /**
@@ -709,7 +713,6 @@ global void RealizeVideoMemory(void)
 		SDL_UpdateRects(TheScreen, NumRects, Rects);
 		NumRects = 0;
 	}
-	VideoClearScreen();
 #endif
 }
 
