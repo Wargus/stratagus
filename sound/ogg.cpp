@@ -142,7 +142,7 @@ global Sample *LoadOgg(const char* name)
 	return NULL;
     }
 
-    DebugLevel2Fn("Have ogg file %s\n", name);
+    DebugLevel2Fn("Have ogg file %s\n" _C_ name);
 
     if (ov_open_callbacks(f, vf, (char *)&magic, sizeof(magic), vc)) {
 	fprintf(stderr, "Can't initialize ogg decoder\n");
@@ -186,7 +186,7 @@ global Sample *LoadOgg(const char* name)
 
     ov_clear(vf);
 
-    DebugLevel3Fn(" %d\n", sample->Length);
+    DebugLevel3Fn(" %d\n" _C_ sample->Length);
     IfDebug( AllocatedSoundMemory += sample->Length; );
 
     return sample;

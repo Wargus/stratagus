@@ -69,7 +69,7 @@ local void FLAC_error_callback(
 	FLAC__StreamDecoderErrorStatus status __attribute__((unused)),
 	void *user __attribute__((unused)))
 {
-    DebugLevel0Fn(" %s\n",FLAC__StreamDecoderErrorStatusString[status]);
+    DebugLevel0Fn(" %s\n" _C_ FLAC__StreamDecoderErrorStatusString[status]);
 }
 
 /**
@@ -89,7 +89,7 @@ local FLAC__StreamDecoderReadStatus FLAC_read_callback(
     int i;
     CLFile *f;
 
-    DebugLevel3Fn("Read callback %d\n", *bytes);
+    DebugLevel3Fn("Read callback %d\n" _C_ *bytes);
 
     f = ((MyUser *) user)->File;
 
@@ -122,8 +122,8 @@ local void FLAC_metadata_callback(
 	sample->Frequency = metadata->data.stream_info.sample_rate;
 	sample->SampleSize = metadata->data.stream_info.bits_per_sample;
 
-	DebugLevel3Fn("Stream %d Channels, %d frequency, %d bits\n",
-		sample->Channels, sample->Frequency, sample->SampleSize);
+	DebugLevel3Fn("Stream %d Channels, %d frequency, %d bits\n" _C_
+		sample->Channels _C_ sample->Frequency _C_ sample->SampleSize);
     }
 }
 
@@ -146,8 +146,8 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
     int channel;
     void *p;
 
-    DebugLevel3Fn("Write callback %d bits, %d channel, %d bytes\n",
-	frame->header.bits_per_sample, frame->header.channels,
+    DebugLevel3Fn("Write callback %d bits, %d channel, %d bytes\n" _C_
+	frame->header.bits_per_sample _C_ frame->header.channels _C_
 	frame->header.blocksize);
 
     sample = ((MyUser *) user)->Sample;
@@ -215,7 +215,7 @@ global Sample* LoadFlac(const char* name)
 	return NULL;
     }
 
-    DebugLevel2Fn("Have flac file %s\n",name);
+    DebugLevel2Fn("Have flac file %s\n" _C_ name);
 
     // FIXME: ugly way to seek to start of file
     CLclose(f);
@@ -264,7 +264,7 @@ global Sample* LoadFlac(const char* name)
     FLAC__stream_decoder_delete(stream);
     CLclose(f);
 
-    DebugLevel3Fn(" %d\n", user.Sample->Length);
+    DebugLevel3Fn(" %d\n" _C_ user.Sample->Length);
     IfDebug( AllocatedSoundMemory+=user.Sample->Length; );
 
     return user.Sample;
