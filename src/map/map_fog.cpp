@@ -518,7 +518,22 @@ global void MapUpdateVisible(void)
     unsigned long t;
 #endif
 
-    if ( TheMap.NoFogOfWar ) {		// No fog - no work
+    // No fog - only update revealers for holy vision
+    if ( TheMap.NoFogOfWar ) {
+	nunits=ThisPlayer->TotalNumUnits;
+	units=ThisPlayer->Units;
+	for( i=0; i<nunits; ++i ) {
+	    unit=units[i];
+	    x=unit->X+unit->Type->TileWidth/2;
+	    y=unit->Y+unit->Type->TileHeight/2;
+	    if( unit->Removed && unit->Revealer ) {
+#ifdef NEW_FOW
+		MapMarkSight(unit->Player,x,y,10);
+#else
+		MapMarkSight(x,y,10);
+#endif
+	    }
+	}
 	return;
     }
 
