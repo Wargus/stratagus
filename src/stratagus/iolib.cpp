@@ -221,7 +221,7 @@ CLFile* CLopen(const char* fn, long openflags)
 	}
 
 	// ok, here we go
-	result = (CLFile*)malloc(sizeof(CLFile));
+	result = malloc(sizeof(CLFile));
 	if (result) {
 		*result = clf;
 	}

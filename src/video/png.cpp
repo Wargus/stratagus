@@ -248,7 +248,7 @@ int LoadGraphicPNG(Graphic* g)
 	}
 
 	/* Create the array of pointers to image data */
-	row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
+	row_pointers = malloc(sizeof(png_bytep) * height);
 	if (row_pointers == NULL) {
 		fprintf(stderr, "Out of memory");
 		SDL_FreeSurface(surface);
@@ -357,7 +357,7 @@ void SaveScreenshotPNG(const char* name)
 
 	VideoLockScreen();
 
-	row = (char*)malloc(VideoWidth * 3);
+	row = malloc(VideoWidth * 3);
 
 	png_write_info(png_ptr, info_ptr);
 

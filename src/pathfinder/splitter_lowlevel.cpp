@@ -81,7 +81,7 @@ void RegionDelSegment(RegionDefinition* def, RegionSegment* seg)
 void RegionAddSegment(RegionDefinition* def,int x0,int x1,int y)
 {
 	RegionSegment* seg;
-	seg = (RegionSegment*) malloc(sizeof(RegionSegment));
+	seg = malloc(sizeof(RegionSegment));
 
 	seg->Y = y;
 	seg->MinX = x0;
@@ -266,7 +266,7 @@ void RegionFindPointOnY(RegionDefinition* def,int y,int * vx,int * vy)
 */
 void RegionTempStorageAllocate(void)
 {
-	RegionTempStorage = (int*) malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(int));
+	RegionTempStorage = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(int));
 }
 
 /**
@@ -400,7 +400,7 @@ int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 
 	adef = Regions + regid;
 
-	marked = (MapPoint*) malloc(sizeof(MapPoint) * adef->TileCount);
+	marked = malloc(sizeof(MapPoint) * adef->TileCount);
 	markednb = 0;
 
 	seg = adef->FirstSegment;
@@ -494,7 +494,7 @@ int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
 	adef = Regions + regid;
 	seg = adef->FirstSegment;
 
-	marked = (MapPoint*) malloc(sizeof(MapPoint) * adef->TileCount);
+	marked = malloc(sizeof(MapPoint) * adef->TileCount);
 	markednb = 0;
 
 	while (seg) {
@@ -560,8 +560,8 @@ void RegionSetConnection(RegionId rega, RegionId regb, int value)
 				adef->Connections[j] = adef->Connections[adef->ConnectionsNumber];
 				adef->ConnectionsCount[j] = adef->ConnectionsCount[adef->ConnectionsNumber];
 
-				adef->Connections = (int*) realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
-				adef->ConnectionsCount = (int*) realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
+				adef->Connections = realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
+				adef->ConnectionsCount = realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
 			}
 			return;
 		}
@@ -574,8 +574,8 @@ void RegionSetConnection(RegionId rega, RegionId regb, int value)
 	ZoneNeedRefresh = 1;
 
 	adef->ConnectionsNumber++;
-	adef->Connections = (int*) realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
-	adef->ConnectionsCount = (int*) realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
+	adef->Connections = realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
+	adef->ConnectionsCount = realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
 
 	adef->Connections[adef->ConnectionsNumber - 1] = regb;
 	adef->ConnectionsCount[adef->ConnectionsNumber - 1] = value;
@@ -606,9 +606,9 @@ void RegionAddConnection(RegionId rega, RegionId regb,int value)
 				adef->ConnectionsNumber--;
 				adef->Connections[j] = adef->Connections[adef->ConnectionsNumber];
 				adef->ConnectionsCount[j] = adef->ConnectionsCount[adef->ConnectionsNumber];
-				adef->Connections = (int*)realloc(adef->Connections,
+				adef->Connections = realloc(adef->Connections,
 					sizeof(int) * (adef->ConnectionsNumber + 1));
-				adef->ConnectionsCount = (int*)realloc(adef->ConnectionsCount,
+				adef->ConnectionsCount = realloc(adef->ConnectionsCount,
 					sizeof(int) * (adef->ConnectionsNumber + 1));
 			}
 			return;
@@ -617,8 +617,8 @@ void RegionAddConnection(RegionId rega, RegionId regb,int value)
 
 	Assert(value > 0);
 
-	adef->Connections = (int*)realloc(adef->Connections, sizeof(int) * (adef->ConnectionsNumber + 1));
-	adef->ConnectionsCount = (int*)realloc(adef->ConnectionsCount, sizeof(int) * (adef->ConnectionsNumber + 1));
+	adef->Connections = realloc(adef->Connections, sizeof(int) * (adef->ConnectionsNumber + 1));
+	adef->ConnectionsCount = realloc(adef->ConnectionsCount, sizeof(int) * (adef->ConnectionsNumber + 1));
 	adef->Connections[adef->ConnectionsNumber] = regb;
 	adef->ConnectionsCount[adef->ConnectionsNumber] = value;
 	adef->ConnectionsNumber++;
@@ -652,7 +652,7 @@ void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int
 {
 	filler->NextOne = 0;
 	filler->LastOne = 0;
-	filler->Points = (MapPoint*) malloc(sizeof(MapPoint) * Regions[region].TileCount);
+	filler->Points = malloc(sizeof(MapPoint) * Regions[region].TileCount);
 	filler->Points[0].X = startx;
 	filler->Points[0].Y = starty;
 	filler->FillValue = value;

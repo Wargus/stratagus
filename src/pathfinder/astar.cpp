@@ -110,11 +110,11 @@ void InitAStar(void)
 {
 	if (!AStarMatrix) {
 		AStarMatrixSize = sizeof(Node) * TheMap.Info.MapWidth * TheMap.Info.MapHeight;
-		AStarMatrix = (Node*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(Node));
+		AStarMatrix = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(Node));
 		Threshold = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_CLOSE_SET_RATIO;
-		CloseSet = (int*)malloc(sizeof(int) * Threshold);
+		CloseSet = malloc(sizeof(int) * Threshold);
 		OpenSetMaxSize = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_OPEN_SET_RATIO;
-		OpenSet = (Open*)malloc(sizeof(Open) * OpenSetMaxSize);
+		OpenSet = malloc(sizeof(Open) * OpenSetMaxSize);
 	}
 }
 
