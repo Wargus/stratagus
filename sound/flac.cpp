@@ -35,6 +35,7 @@
 #if defined(WITH_SOUND) && defined(USE_FLAC)	// {
 
 #include <stdlib.h>
+#include <string.h>
 #include "FLAC/stream_decoder.h"
 
 #include "myendian.h"
