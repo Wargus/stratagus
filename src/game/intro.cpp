@@ -1279,19 +1279,31 @@ global void ShowStats(void)
     callbacks.SoundReady=WriteSound;
 
     if (GameResult==GameVictory) {
-	background=LoadGraphic(TheUI.VictoryBackground.File);
+	if ( TheUI.VictoryBackground.File ) {
+	    background=LoadGraphic(TheUI.VictoryBackground.File);
+	} else {
+	    background=NULL;
+	}
     } else {
-	background=LoadGraphic(TheUI.DefeatBackground.File);
+	if ( TheUI.DefeatBackground.File ) {
+	    background=LoadGraphic(TheUI.DefeatBackground.File);
+	} else {
+	    background=NULL;
+	}
     }
-    ResizeGraphic(background,VideoWidth,VideoHeight);
+    if (background) {
+	ResizeGraphic(background,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
-    MakeTexture(background,background->Width,background->Height);
+	MakeTexture(background,background->Width,background->Height);
 #endif
+    }
 
     VideoLockScreen();
     VideoClearScreen();
-    VideoDrawSubClip(background,0,0,background->Width,background->Height,
-	(VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+    if (background) {
+	VideoDrawSubClip(background,0,0,background->Width,background->Height,
+	    (VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+    }
     VideoUnlockScreen();
 
     UseContinueButton=1;
@@ -1307,8 +1319,10 @@ global void ShowStats(void)
 	VideoLockScreen();
 	HideAnyCursor();
 #ifdef USE_OPENGL
-	VideoDrawSubClip(background,0,0,background->Width,background->Height,
-	    (VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+	if (background) {
+	    VideoDrawSubClip(background,0,0,background->Width,background->Height,
+		(VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+	}
 	GameStatsDrawFunc(frame);
 #else
 	if( !done ) {
@@ -1330,7 +1344,9 @@ global void ShowStats(void)
 	++frame;
     }
 
-    VideoFree(background);
+    if( background ) {
+	VideoFree(background);
+    }
     VideoSyncSpeed=old_video_sync;
     SetVideoSync();
 }
