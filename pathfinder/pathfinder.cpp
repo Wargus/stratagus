@@ -234,7 +234,9 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     unsigned char* m;
 
     size=TheMap.Width*TheMap.Height;
-    points=alloca(size*sizeof(*points));
+    points=alloca(size);
+    size/=sizeof(*points);
+
     w=TheMap.Width+2;
     mask=UnitMovementMask(unit);
     // Ignore all possible mobile units.
@@ -616,8 +618,10 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	    ,unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
 	    ,gx,gy,ox,oy);
 
-    size=TheMap.Width*TheMap.Height/2;
-    points=alloca(size*sizeof(*points));
+    size=TheMap.Width*TheMap.Height;
+    points=alloca(size);
+    size/=sizeof(*points)*2;
+
     w=TheMap.Width+2;
     matrix=CreateMatrix();
     matrix+=w+w+2;
