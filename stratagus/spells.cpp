@@ -230,12 +230,17 @@ local void SpellDeathCoilController(Missile * missile)
 	    if (missile->TargetUnit && !missile->TargetUnit->Destroyed
 		    && missile->TargetUnit->HP) {
 		if (missile->TargetUnit->HP <= 50) {
+		    source->Player->Score+=missile->TargetUnit->Type->Points;
+		    if( missile->TargetUnit->Type->Building ) {
+			source->Player->TotalRazings++;
+		    } else {
+			source->Player->TotalKills++;
+		    }
 #ifdef USE_HP_FOR_XP
 		    source->XP+=missile->TargetUnit->HP;
 #else
 		    source->XP+=missile->TargetUnit->Type->Points;
 #endif
-		    source->Player->Score+=missile->TargetUnit->Type->Points;
 		    ++source->Kills;
 		    missile->TargetUnit->HP = 0;
 		    LetUnitDie(missile->TargetUnit);
@@ -273,13 +278,18 @@ local void SpellDeathCoilController(Missile * missile)
 				// disperse damage between them
 				//NOTE: 1 is the minimal damage
 				if (table[i]->HP <= 50 / ec ) {
+				    source->Player->Score+=
+					    table[i]->Type->Points;
+				    if( missile->TargetUnit->Type->Building ) {
+					source->Player->TotalRazings++;
+				    } else {
+					source->Player->TotalKills++;
+				    }
 #ifdef USE_HP_FOR_XP
 				    source->XP+=table[i]->HP;
 #else
 				    source->XP+=table[i]->Type->Points;
 #endif
-				    source->Player->Score+=
-					    table[i]->Type->Points;
 				    ++source->Kills;
 				    table[i]->HP = 0;
 				    LetUnitDie(table[i]); // too much damage
@@ -1412,6 +1422,11 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    }
 	    if( !target->HP ) {
 		unit->Player->Score+=target->Type->Points;
+		if( target->Type->Building ) {
+		    unit->Player->TotalRazings++;
+		} else {
+		    unit->Player->TotalKills++;
+		}
 #ifndef USE_HP_FOR_XP
 		unit->XP+=target->Type->Points;
 #endif
@@ -1557,6 +1572,11 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    UnitType* type;
 
 	    unit->Player->Score+=target->Type->Points;
+	    if( target->Type->Building ) {
+		unit->Player->TotalRazings++;
+	    } else {
+		unit->Player->TotalKills++;
+	    }
 #ifdef USE_HP_FOR_XP
 	    unit->XP+=target->HP;
 #else
