@@ -78,6 +78,19 @@
 **
 **		Size of the cursor in pixels.
 **
+**	CursorType::SpriteFrame
+**
+**		Current displayed cursor frame.
+**		From 0 to CursorType::Graphic::NumFrames.
+**
+**	CursorType::FrameRate
+**
+**		Rate of changing the frames. The "rate" tells the engine how
+**		many milliseconds to hold each frame of the animation.
+**
+**	@note	This is the first time that for timing ms are used! I would
+**		change it to display frames.
+**
 **	CursorType::Graphic
 **
 **		Contains the sprite of the cursor, loaded from CursorType::File.
