@@ -828,6 +828,19 @@ Returns the Stratagus library path. The Stratagus library path points to the gam
     path = LibraryPath()
 </pre>
 
+<a name="ListDirectory"></a>
+<h3>ListDirectory(path)</h3>
+
+Returns a list with all files and subdirectories found in the directory pointed by path. 
+The path must point to a subdirectory of the game directory. The path cannot 
+include any special character.
+
+<h4>Example</h4>
+
+<pre>
+    list = ListDirectory("music/")
+</pre>
+
 <a name="LoadMap"></a>
 <h3>LoadMap(map)</h3>
 
