@@ -159,6 +159,8 @@ global void PlayCampaign(const char* name)
 **	Define a campaign.
 **
 **	@param list	List describing the campaign.
+**
+**	@note FIXME: play-video, defeat, draw are missing.
 */
 local SCM CclDefineCampaign(SCM list)
 {
@@ -168,8 +170,6 @@ local SCM CclDefineCampaign(SCM list)
     Campaign* campaign;
     CampaignChapter* chapter;
     CampaignChapter** tail;
-
-    DebugLevel0Fn("Not written\n");
 
     //
     //	Campaign name
