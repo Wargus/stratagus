@@ -568,7 +568,6 @@ struct _unit_ {
 	int HP;             ///< hit points
 	int XP;             ///< experience points
 	int Kills;          ///< how many unit has this unit killed
-	VariableType *Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  ///< time to live
 	int Bloodlust;      ///< ticks bloodlust
@@ -707,6 +706,15 @@ extern int NumUnits;                ///< Number of units used
 
 //		in unit_draw.c
 /// @todo could be moved into the user interface ?
+extern int ShowHealthBar;               ///< Flag: show health bar
+extern int ShowHealthDot;               ///< Flag: show health dot
+extern int ShowManaBar;                 ///< Flag: show mana bar
+extern int ShowManaDot;                 ///< Flag: show mana dot
+extern int ShowHealthHorizontal;        ///< Flag: show health bar horizontal
+extern int ShowManaHorizontal;          ///< Flag: show mana bar horizontal
+extern int ShowNoFull;                  ///< Flag: show no full health or mana
+extern int ShowEnergySelectedOnly;      ///< Flag: show energy only for selected
+extern int DecorationOnTop;             ///< Flag: show health and mana on top
 extern int ShowSightRange;              ///< Flag: show right range
 extern int ShowReactionRange;           ///< Flag: show reaction range
 extern int ShowAttackRange;             ///< Flag: show attack range

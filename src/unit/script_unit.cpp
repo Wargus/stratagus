@@ -58,8 +58,6 @@
 
 	/// Get resource by name
 extern unsigned CclGetResourceByName(lua_State* l);
-	/// Parse User Variables field.
-extern void DefineVariableField(lua_State *l, int var_index, int lua_index);
 
 /**
 **  Set xp damage
@@ -917,12 +915,6 @@ local int CclUnit(lua_State* l)
 			}
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
 		} else {
-			i = GetVariableIndex(value); // User variables
-			if (i != -1) { // Valid index
-				DefineVariableField(l, i, j + 1);
-				continue;
-			}
-		   // FIXME: this leaves a half initialized unit
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}

@@ -630,84 +630,6 @@ typedef struct _resource_info_ {
 } ResourceInfo;
 
 /**
-**  User defined variable type.
-**
-**    It is used to define variables and use it after
-**  to manage magic, energy, shield or other stuff.
-*/
-typedef struct {
-    int Max;           ///< Maximum for the variable. (Assume min is 0.)
-    int Value;         ///< Current (or initial) value of the variable (or initial value).
-    char Increase;     ///< Number to increase(decrease) Value by second.
-    char Enable;       ///< True if the unit doesn't have this variable. (f.e shield)
-} VariableType;
-
-struct _decovartype_;
-struct _unit_;
-
-typedef void DrawDecoFunc(int x, int y, const struct _unit_* unit, const struct _decovartype_* Deco);
-
-/**
-**  Decoration for userdefined variable.
-**
-**    It is used to show variables graphicly.
-**  @todo add more stuff in this struct.
-*/
-typedef struct _decovartype_{
-	int Index;                  ///< Index of the variable. @see DefineVariables
-
-	int OffsetX;                ///< Offset in X coord.
-	int OffsetY;                ///< Offset in Y coord.
-
-	int OffsetXPercent;         ///< Percent offset (TileWidth) in X coord.
-	int OffsetYPercent;         ///< Percent offset (TileHeight) in Y coord.
-
-	char IsCenteredInX;         ///< if true, use center of deco instead of left border
-	char IsCenteredInY;         ///< if true, use center of deco instead of upper border
-
-	char ShowIfNotEnable;       ///< if false, Show only if var is enable
-	char ShowWhenNull;          ///< if false, don't show if var is null (F.E poison)
-	char HideHalf;              ///< if true, don't show when 0 < var < max.
-	char ShowWhenMax;           ///< if false, don't show if var is to max. (Like mana)
-	char ShowOnlySelected;      ///< if true, show only for selected units.
-
-	char HideNeutral;           ///< if true, don't show for neutral unit.
-	char HideAllied;            ///< if true, don't show for allied unit. (but show own units)
-	char ShowOpponent;          ///< if true, show for opponent unit.
-
-	DrawDecoFunc *f;            ///< fonction to draw the decorations.
-	union {
-		struct {
-			char IsVertical;            ///< if true, vertical bar, else horizontal.
-			char SEToNW;                ///< (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
-			int Height;                 ///< Height of the bar.
-			int Width;                  ///< Width of the bar.
-			char ShowFullBackground;    ///< if true, show background like value equal to max.
-			char BorderSize;            ///< Size of the border, 0 for no border.
-// FIXME color depend of percent (red, Orange, Yellow, Green...)
-			Uint32 Color;               ///< Color of bar.
-			Uint32 BColor;              ///< Color of background.
-		} Bar; ///< Use for Horizontal and vertical Bar.
-
-//		struct {
-// FIXME : Add Color, font, format
-//		} Text;
-
-		struct {
-			char NSprite;                ///< 0 for ManaSprite, 1 for HealthSprite.
-// FIXME Sprite info. better way ?
-		} SpriteBar;
-
-		struct {
-// FIXME Sprite info. and Replace n with more appropriate var.
-			int n;                      ///< identifiant in SpellSprite
-		} StaticSprite;
-// FIXME : other method here.
-	} Data;         ///< More Datas, depend of showing method
-
-} DecoVarType;
-
-/**
 **  Typedef of base structure of unit-type
 */
 typedef struct _unit_type_ UnitType;
@@ -822,7 +744,6 @@ struct _unit_type_ {
 	unsigned CanHarvest : 1;        ///< Resource can be harvested.
 	unsigned Harvester : 1;         ///< unit is a resource harvester.
 	unsigned char *BoolFlag;        ///< User defined flag. Used for (dis)allow target.
-	VariableType *Variable;         ///< Array of user defined variables.
 	unsigned char *CanTargetFlag;   ///< Flag needed to target with missile.
 
 	unsigned SelectableByRectangle : 1; ///< Selectable with mouse rectangle.
@@ -876,18 +797,8 @@ extern UnitType*UnitTypeOrcWall;            ///< Orc wall
 
 extern char** UnitTypeWcNames;              ///< Mapping wc-number 2 symbol
 
-extern struct _UnitTypeVar_{
-	char **BoolFlagName;                ///< Array of name of user defined bool flag.
-	int NumberBoolFlag;                 ///< Number of user defined bool flag.
-
-	char **VariableName;                ///< Array of names of user defined variables.
-	VariableType *Variable;             ///< Array of user defined variables (default value for unittype).
-// EventType *Event;                   ///< Array of functions sets to call when en event occurs.
-	int NumberVariable;                 ///< Number of defined variables.
-
-	DecoVarType *DecoVar;               ///< Array to describe how showing variable.
-	int NumberDeco;                     ///< Size of DecoVar.
-} UnitTypeVar;
+extern char **BoolFlagName;                 ///< Array of name of user defined bool flag.
+extern int NumberBoolFlag;                  ///< Number of user defined bool flag.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -901,7 +812,6 @@ extern void UpdateStats(int reset_to_default);  ///< Update unit stats
 extern void ParsePudUDTA(const char*,int);      ///< Parse pud udta table
 extern UnitType* UnitTypeByIdent(const char*);  ///< Get unit-type by ident
 extern UnitType* UnitTypeByWcNum(unsigned);     ///< Get unit-type by wc number
-extern int GetVariableIndex(const char *VarName); ///< Get index of the variable
 
 	/// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);

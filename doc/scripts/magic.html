@@ -284,23 +284,6 @@ Here are the supported parameters:<p>
     bool parameter. For instance "organic", "only" will make a spell work only on
     units marked with the "organic" flag.
     </dd>
-    <dt>variable, {flag = value}</dt>
-    <dd>There is no parameter called variable. You can however use variables defined
-    by <a href="unittype.html#DefineVariables">DefineVariables()</a></dd>
-    <dl>
-      <dt>Enable, "true" or "false" or "only" </dt>
-      <dd>variable is enable ?</dd>
-      <dt>MinValue, number </dt>
-      <dd>minimal value allowed</dd>
-      <dt>MinMax, number </dt>
-      <dd>minimal maximum-value (the field Max of the variable) allowed</dd>
-      <dt>MinValuePercent, number </dt>
-      <dd>minimal value allowed in percent with Max value</dd>
-      <dt>MaxValuePercent, number </dt>
-      <dd>maximal value allowed in percent with Max value</dd>
-      <dt>ConditionApplyOnCaster, boolean </dt>
-      <dd>if true, check caster instead of target</dd>
-    <dl>
     <dt>"min-hp-percent", number</dt>
     <dd>Minimum hp percent of the target. If not specified the minimum is around -10
     You can use this to avoid casting damage spells on enemies that are dying anyway.
@@ -417,32 +400,6 @@ Here are the supported operations, their paramenters, and what they do.</dd><p>
 	<dd>The number of invincibility ticks. This makes the unit completely imune
 	to all forms of damage. Try using very low values for this :).
 	</dd>
-    </dl>
-    <dt>"adjust-variable", {tag, ...}</dt>
-    <dl>This will adjust variable of the unit
-      (defined by <a href="unittype.html#DefineVariables">DefineVariables()</a>)
-      <dt>Index = variable-name</dt>
-      <dd>Variable to modify.</dd>
-      <dt>Enable = boolean</dt>
-      <dd>Set Enable value.</dd>
-      <dt>Value = number</dt>
-      <dd>Set Value value.</dd>
-      <dt>Max = number</dt>
-      <dd>Set Max value.</dd>
-      <dt>Increase = number</dt>
-      <dd>Set Increase value.</dd>
-      <dt>InvertEnable = boolean</dt>
-      <dd>Invert Enable value.</dd>
-      <dt>AddValue = number</dt>
-      <dd>Add to Value value.</dd>
-      <dt>AddMax = number</dt>
-      <dd>Add to Max value.</dd>
-      <dt>AddIncrease = number</dt>
-      <dd>Add to Increase value.</dd>
-      <dt>IncreaseTime = number</dt>
-      <dd>add number time Increase to the value.</dd>
-      <dt>TargetIsCaster = "target" or "caster"</dt>
-      <dd>Apply to target or caster.</dd>
     </dl>
     <dt>"adjust-vitals", tag, ...</dt>
     <dl>This will adjust vitals of the unit. Vitals are health, mana, and on a sunny

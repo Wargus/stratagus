@@ -49,7 +49,6 @@
 <hr>
 <a href="#DefineAnimations">DefineAnimations</a>
 <a href="#DefineBoolFlags">DefineBoolFlags</a>
-<a href="#DefineVariables">DefineVariables</a>
 <!-- <a href="#define-unit-stats">define-unit-stats</a> -->
 <a href="#DefineUnitType">DefineUnitType</a>
 <a href="pud.html#DefineUnitTypeWcNames">DefineUnittypeWcNames</a>
@@ -130,34 +129,6 @@ or spell condition definition.)
 
 <pre>
     DefineBoolFlags("organic", "hero", "mechanical", "undead", "demonic", "angelic")
-</pre>
-
-
-<a name="DefineVariables"></a>
-<h3>DefineVariables( "varname-1", {tag = value}, "varname-2", {tag = value}, ...)</h3>
-
-Define variable for unit. Spells could use these to determine who to hit, and units can be restricted too.
-Try to avoid using names with other meanings (nothing from unit definitions
-or spell condition definition).
-tag = value represent default value for UnitType. These values can be overwritten in UnitType definition.
-
-<dl>
-<dt>Value = number</dt>
-<dd>Initial value for the variable</dd>
-<dt>Max = number</dt>
-<dd>Max value for the number, assuming 0 is the min.</dd>
-<dt>Increase = number</dt>
-<dd>Number to add each second if possible, negative value are possible.</dd>
-<dt>Enable = boolean</dt>
-<dd>if the variable is active by default.
-For example, Mana is active only for caster, but HP is available for every unit.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    DefineVariable("cooldown", {Value = 0, Increase = -1, Max = 50, Enable = false})
 </pre>
 
 <!--
@@ -567,13 +538,6 @@ alone, use this for buildings. Enemy units are never selectable by rectangle.
 <dd>You can add a bunch of flags, defined with <a href="#DefineBoolFlags">DefineBoolFlags()</a>
 You can add how many flags you would like, but keep in mind that you have to call
 <a href="#DefineBoolFlags">DefineBoolFlags()</a> before.
-</dd>
-<dt>variable = {tag = value , ...} or number or boolean<dt>
-<dd>You can add a bunch variable, defined with <a href="#DefineVariable">DefineVariable()</a>
-You can add how many flags you would like, but keep in mind that you have to call
-<a href="#DefineVariable">DefineVariable()</a> before.
-You can overwrite each tag/value by the same method you use for <a href="#DefineVariable">DefineVariable()</a>
-or simply Enable/disable it with a boolean, or set Max and value with a number
 </dd>
 <dt>CanTargetFlag = {flag, "true" or "only" or "false", ...}</dt>
 <dd>This allows check for targetting similar to spell conditions.

@@ -263,65 +263,6 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				LuaError(l, "Unsupported demolish tag: %s" _C_ value);
 			}
 		}
-	} else if (!strcmp(value, "adjust-variable")) {
-		spellaction->CastFunction = CastAdjustVariable;
-		spellaction->Data.AdjustVariable.Index = -1; // Invalid index
-		lua_rawgeti(l, -1, j + 1);
-		lua_pushnil(l);
-		Assert(lua_istable(l, -2));
-		while (lua_next(l, -2)) {
-			const char *key;
-
-			key = LuaToString(l, -2);
-			if (!strcmp(key, "Index")) {
-				int i;
-
-				value = LuaToString(l, -1);
-				spellaction->Data.AdjustVariable.Index = -1; // Invalid index
-				for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-					if (!strcmp(value, UnitTypeVar.VariableName[i])) {
-						spellaction->Data.AdjustVariable.Index = i;
-					}
-				}
-			} else if (!strcmp(key, "Enable")) {
-				spellaction->Data.AdjustVariable.Enable = LuaToBoolean(l, -1);
-				spellaction->Data.AdjustVariable.ModifEnable = 1;
-			} else if (!strcmp(key, "Value")) {
-				spellaction->Data.AdjustVariable.Value = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable.ModifValue = 1;
-			} else if (!strcmp(key, "Max")) {
-				spellaction->Data.AdjustVariable.Max = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable.ModifMax = 1;
-			} else if (!strcmp(key, "Increase")) {
-				spellaction->Data.AdjustVariable.Increase = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable.ModifIncrease = 1;
-			} else if (!strcmp(key, "InvertEnable")) {
-				spellaction->Data.AdjustVariable.InvertEnable = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "AddValue")) {
-				spellaction->Data.AdjustVariable.AddValue = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "AddMax")) {
-				spellaction->Data.AdjustVariable.AddMax = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "AddIncrease")) {
-				spellaction->Data.AdjustVariable.AddIncrease = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "IncreaseTime")) {
-				spellaction->Data.AdjustVariable.IncreaseTime = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "TargetIsCaster")) {
-				value = LuaToString(l, -1);
-				if (!strcmp(value, "caster")) {
-					spellaction->Data.AdjustVariable.TargetIsCaster = 1;
-				} else if (!strcmp(value, "target")) {
-					spellaction->Data.AdjustVariable.TargetIsCaster = 0;
-				} else { // Error
-				lua_pushfstring(l, "key '%s' not valid for TargetIsCaster in adjustvariable", value);
-				lua_error(l);
-				}
-			} else { // Error
-				lua_pushfstring(l, "key '%s' not valid for adjustvariable", key);
-				lua_error(l);
-			}
-			lua_pop(l, 1); // Pop the value.
-		}
-		lua_pop(l, 1);
 	} else if (!strcmp(value, "adjust-buffs")) {
 		spellaction->CastFunction = CastAdjustBuffs;
 		spellaction->Data.AdjustBuffs.HasteTicks = BUFF_NOT_AFFECTED;
@@ -515,8 +456,7 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	//		Set everything to 0:
 	memset(condition, 0, sizeof(ConditionInfo));
 	//		Flags are defaulted to 0(CONDITION_TRUE)
-	condition->BoolFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof (*condition->BoolFlag));
-	condition->Variable = calloc(UnitTypeVar.NumberVariable, sizeof (*condition->Variable));
+	condition->BoolFlag = calloc(NumberBoolFlag, sizeof(*condition->BoolFlag));
 	//		Initialize min/max stuff to values with no effect.
 	condition->MinHpPercent = -10;
 	condition->MaxHpPercent = 1000;
@@ -528,12 +468,6 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	condition->MaxBloodlustTicks = 0xFFFFFFF;
 	condition->MaxInvisibilityTicks = 0xFFFFFFF;
 	condition->MaxInvincibilityTicks = 0xFFFFFFF;
-	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-		condition->Variable[i].MinValue = -1;
-		condition->Variable[i].MinMax = -1;
-		condition->Variable[i].MinValuePercent = -8;
-		condition->Variable[i].MaxValuePercent = 1024;
-	}
 	//  Now parse the list and set values.
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -601,54 +535,15 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 			condition->MaxInvincibilityTicks = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else {
-			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined flags
-				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
+			for (i = 0; i < NumberBoolFlag; ++i) { // User defined flags
+				if (!strcmp(value, BoolFlagName[i])) {
 					lua_rawgeti(l, -1, j + 1);
 					condition->BoolFlag[i] = Ccl2Condition(l, LuaToString(l, -1));
 					lua_pop(l, 1);
 					break;
 				}
 			}
-			if (i != UnitTypeVar.NumberBoolFlag) {
-				continue;
-			}
-			for (i = 0; i < UnitTypeVar.NumberVariable; ++i) { // User defined flags
-				if (!strcmp(value, UnitTypeVar.VariableName[i])) {
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						lua_pushnil(l);
-						while (lua_next(l, -2)) {
-							const char *key;
-
-							key = LuaToString(l, -2);
-							if (!strcmp(key, "Enable")) {
-								condition->Variable[i].Enable = Ccl2Condition(l, LuaToString(l, -1));
-							} else if (!strcmp(key, "MinValue")) {
-								condition->Variable[i].MinValue = LuaToNumber(l, -1);
-							} else if (!strcmp(key, "MinMax")) {
-								condition->Variable[i].MinMax = LuaToNumber(l, -1);
-							} else if (!strcmp(key, "MinValuePercent")) {
-								condition->Variable[i].MinValuePercent = LuaToNumber(l, -1);
-							} else if (!strcmp(key, "MaxValuePercent")) {
-								condition->Variable[i].MaxValuePercent = LuaToNumber(l, -1);
-							} else if (!strcmp(key, "ConditionApplyOnCaster")) {
-								condition->Variable[i].ConditionApplyOnCaster = LuaToBoolean(l, -1);
-							} else { // Error
-								lua_pushfstring(l, "%s invalid for Variable in condition", key);
-								lua_error(l);
-							}
-							lua_pop(l, 1); // Pop value.
-						}
-						lua_pop(l, 1); // lua_rawgeti()
-						break;
-					} else { // Error
-						lua_pushstring(l, "Table expected in variable in condition");
-						lua_error(l);
-					}
-					lua_pop(l, 1); // lua_rawgeti()
-				}
-			}
-			if (i != UnitTypeVar.NumberVariable) {
+			if (i != NumberBoolFlag) {
 				continue;
 			}
 			LuaError(l, "Unsuported condition tag: %s" _C_ value);
@@ -998,10 +893,10 @@ local void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 	if (condition->TargetSelf != CONDITION_TRUE) {
 		CLprintf(file, "self %s ", condstrings[(int)condition->TargetSelf]);
 	}
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined flags
+	for (i = 0; i < NumberBoolFlag; ++i) { // User defined flags
 		if (condition->BoolFlag[i] != CONDITION_TRUE) {
 			CLprintf(file, "%s %s ",
-				UnitTypeVar.BoolFlagName[i], condstrings[(int)condition->BoolFlag[i]]);
+				BoolFlagName[i], condstrings[(int)condition->BoolFlag[i]]);
 		}
 	}
 	//
