@@ -121,7 +121,7 @@ local char* SaveGlobal(lua_State *l, int is_root)
 			|| !strcmp(key, "os") || !strcmp(key, "io") || !strcmp(key, "debug")
 			|| !strcmp(key, "coroutine")
 		// other string to protected ?
-#if META_LUA
+#ifdef META_LUA
 			|| !strcmp(key, "Stratagus") // do not save stratagus table. or should be ?
 #endif
 		))) {

@@ -106,6 +106,7 @@ struct _spell_action_type_ {
 			int Delay;										/// Missile original delay.
 			SpellActionMissileLocation StartPoint;		/// Start point description.
 			SpellActionMissileLocation EndPoint;		/// Start point description.
+			MissileType  *Missile;    /// Missile fired on cast
 		} SpawnMissile;
 
 		struct {
@@ -120,6 +121,7 @@ struct _spell_action_type_ {
 			/// The offset of the missile start point to the hit location.
 			int StartOffsetX;
 			int StartOffsetY;
+			MissileType *Missile;  /// Missile fired on cast
 		} AreaBombardment;
 
 		struct {
@@ -265,7 +267,6 @@ typedef struct _spell_type_ {
 
 	//		Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;				/// Sound played if cast
-	MissileType		*Missile;				/// Missile fired on cast
 } SpellType;
 
 /*----------------------------------------------------------------------------
