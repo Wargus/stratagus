@@ -555,7 +555,7 @@ global void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 			} else if (type && check->Data.Dest == htons(type->Type)) {
 				DebugLevel3Fn("Removed Repeat Command\n");
 				return;
-			} else if (check->Data.Dest == htons(-1)) {
+			} else if (check->Data.Dest == 0xFFFF) {
 				DebugLevel3Fn("Removed Repeat Command\n");
 				return;
 			}

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name editor.c	-	Editor functions. */
+/**@name editor.c - Editor functions. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2002-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,34 +26,34 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 //----------------------------------------------------------------------------
-//		Documentation
+//  Documentation
 //----------------------------------------------------------------------------
 
 /**
-**	  @page EditorModule Module - Editor
+**  @page EditorModule Module - Editor
 **
-**		This is a very simple editor for the Stratagus engine.
+**  This is a very simple editor for the Stratagus engine.
 **
-**	  @section Missing Missing features
+**  @section Missing Missing features
 **
-**		@li Edit upgrade section
-**		@li Edit allow section
-**		@li Edit .cm files
-**		@li Upgraded unit-types should be shown different on map
-**		@li Good keyboard bindings
-**		@li Script support
-**		@li Commandline support
-**		@li Cut&Paste
-**		@li More random map functions.
+**    @li Edit upgrade section
+**    @li Edit allow section
+**    @li Edit .cm files
+**    @li Upgraded unit-types should be shown different on map
+**    @li Good keyboard bindings
+**    @li Script support
+**    @li Commandline support
+**    @li Cut&Paste
+**    @li More random map functions.
 */
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -61,17 +61,17 @@
 #include "stratagus.h"
 
 /*----------------------------------------------------------------------------
---		Defines
+--  Defines
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global const char* EditorStartFile;		/// Editor CCL start file
+global const char* EditorStartFile;  /// Editor CCL start file
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 //@}
