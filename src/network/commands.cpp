@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name commands.c	-	Global command handler - network support. */
 //
-//	(c) Copyright 2000-2003 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
+//      (c) Copyright 2000-2004 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -1386,7 +1386,7 @@ global void SendCommandAutoSpellCast(Unit* unit, int spellid, int on)
 	if (NetworkFildes == (Socket)-1) {
 		CommandLog("auto-spell-cast", unit, FlushCommands, on, -1, NoUnitP,
 			NULL, spellid);
-		CommandAutoSpellCast(unit, spellid);
+		CommandAutoSpellCast(unit, spellid, on);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
 			unit, on, -1, NoUnitP, NULL, FlushCommands);
@@ -1658,7 +1658,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 				CommandSpellCast(unit, x, y, dest, SpellTypeTable[id], status);
 			} else {
 				CommandLog("auto-spell-cast", unit, status, x, -1, NoUnitP, NULL, id);
-				CommandAutoSpellCast(unit, x);
+				CommandAutoSpellCast(unit, id, x);
 			}
 			break;
 	}

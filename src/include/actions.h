@@ -124,7 +124,7 @@ extern void CommandUpgradeUnit(Unit* unit,int what,int flush);
 extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 		,SpellType* spell,int flush);
 	/// Prepare command auto spellcast
-extern void CommandAutoSpellCast(Unit* unit, int spellid);
+extern void CommandAutoSpellCast(Unit* unit, int spellid, int on);
 	/// Prepare diplomacy command
 extern void CommandDiplomacy(int player,int state,int opponent);
 	/// Prepare shared vision command
