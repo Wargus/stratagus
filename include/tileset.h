@@ -148,11 +148,6 @@
 **
 **		The different tile names. FE "light-grass", "dark-water".
 **
-**	Tileset::ExtraTrees[6]
-**
-**		This are six extra tile numbers, which are needed for lumber
-**		chopping.
-**
 **	Tileset::TopOneTree
 **
 **		The tile number of tile only containing the top part of a tree.
@@ -187,11 +182,6 @@
 **	Tileset::MixedLookupTable[MaxTilesInTileset]
 **		Table for finding what part of the tile contains wood/rock,
 **		and which part is grass or bare ground.
-**
-**	Tileset::ExtraRocks[6]
-**
-**		This are six extra tile numbers, which are needed if rocks are
-**		destroyed.
 **
 **	Tileset::TopOneRock
 **
@@ -233,6 +223,26 @@
 **	Tileset::ItemsHash
 **
 **		Hash table of item numbers to unit names.
+**
+**	@struct _tileset_ tileset.h
+**
+**	\#include "tileset.h"
+**
+**	typedef struct _tile_info_ TileInfo;
+**
+**	This structure includes everything about a specific tile from the tileset.
+**
+**	TileInfo::BaseTerrain
+**
+**		This is the base terrain type of a tile. Only 15 of those
+**		are currently supported.
+**
+**	TileInfo::MixTerrain
+**
+**		FIXME:
+**		This is the terrain the tile is mixed with. This is 0 for
+**		a solid tile, we should make it equal to BaseTerrain
+**
 */
 
 /*----------------------------------------------------------------------------
@@ -264,6 +274,20 @@ typedef enum _tile_type_ {
     TileTypeWater,			/// Any water tile
 } TileType;
 
+    /// Single tile definition
+typedef struct _tile_info_ {
+    unsigned char	BaseTerrain;	/// Basic terrain of the tile
+    unsigned char	MixTerrain;	/// Terrain mixed with this
+} TileInfo;
+
+    /// Definition for a terrain type
+typedef struct _solid_terrain_info_ {
+    char*		TerrainName;	/// Name of the terrain
+    int			NumSolidTiles;  /// How many solid tile variants
+    //  FIXME: When drawing with the editor add some kind fo probabilities for every tile.
+    unsigned short*	SolidTiles;	/// Solid tile IDs
+} SolidTerrainInfo;
+
     ///	Tileset definition
 typedef struct _tileset_ {
     char*	Ident;			/// Tileset identifier
@@ -279,18 +303,17 @@ typedef struct _tileset_ {
     unsigned short*	Table;		/// Pud to internal conversion table
     unsigned short*	FlagsTable;	/// Flag table for editor
 
-    unsigned char*	BasicNameTable;	/// Basic tile name/type
-    unsigned char*	MixedNameTable;	/// Mixed tile name/type
+    TileInfo*	Tiles;			/// Tile descriptions
+
 
     // FIXME: currently hardcoded
     unsigned char*	TileTypeTable;	/// For fast lookup of tile type
     // FIXME: currently unsupported
     unsigned short*	AnimationTable;	/// Tile animation sequences
 
-    int		NumNames;		/// Number of different tile names
-    char**	TileNames;		/// Tile names/types
+    int		NumTerrainTypes;	/// Number of different terrain types
+    SolidTerrainInfo* SolidTerrainTypes;/// Information about solid terrains.
 
-    unsigned	ExtraTrees[6];		/// Extra tree tiles for removing
     unsigned	TopOneTree;		/// Tile for one tree top
     unsigned	MidOneTree;		/// Tile for one tree middle
     unsigned	BotOneTree;		/// Tile for one tree bottom
@@ -299,7 +322,6 @@ typedef struct _tileset_ {
     int		WoodTable[20];		/// Table for tree removable
     int		MixedLookupTable[MaxTilesInTileset];
 					/// Lookup for what part of tile used
-    unsigned	ExtraRocks[6];		/// Extra rock tiles for removing
     unsigned	TopOneRock;		/// Tile for one rock top
     unsigned	MidOneRock;		/// Tile for one rock middle
     unsigned	BotOneRock;		/// Tile for one rock bottom

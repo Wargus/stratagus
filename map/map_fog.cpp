@@ -2636,17 +2636,16 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	int x=(dx-vp->X)/TileSizeX + vp->MapX;
 	int y=(dy-vp->Y)/TileSizeY + vp->MapY;
 
-#if 0
+#if 1
 	//  Fog of War Vision
 	//  Really long and ugly, shared and own vision:
 	//  sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsMapFieldVisible(ThisPlayer,x,y));
 	//  Shorter version, but no shared vision:
 	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player]);
-	if( TheMap.Fields[y*TheMap.Width+x].Visible[0] ) {
+//	if( TheMap.Fields[y*TheMap.Width+x].Visible[0] ) {
 	    VideoDrawText(dx,dy, GameFont,seen);
-	}
-#endif
-#if 1
+//	}
+#else
 	// Unit Distance Checks
 	if( Selected[1] && Selected[0] ) {
 	    sprintf(seen,"%d",MapDistanceBetweenUnits(Selected[0],Selected[1]));
@@ -2655,8 +2654,8 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	    sprintf(seen,"%d",MapDistanceToUnit(x,y,Selected[0]));
 	    VideoDrawText(dx,dy, GameFont,seen);
 	}
-	}
 #endif
+	}
 #endif 
 #if defined(HIERARCHIC_PATHFINDER) && defined(DEBUG) && 0
 		    {

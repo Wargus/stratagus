@@ -467,7 +467,7 @@ local void DrawTileIcons(void)
     while (y < TheUI.ButtonPanelY + 100) {
 	x = TheUI.ButtonPanelX + 4;
 	while (x < TheUI.ButtonPanelX + 144) {
-	    if (!TheMap.Tileset->BasicNameTable[0x10 + i * 16]) {
+	    if (!TheMap.Tileset->Tiles[0x10 + i * 16].BaseTerrain) {
 		y = TheUI.ButtonPanelY + 100;
 		break;
 	    }
@@ -858,9 +858,9 @@ local void DrawEditorInfo(void)
     DebugCheck(i == TheMap.Tileset->NumTiles);
 
     sprintf(buf, "%d %s %s", tile,
-	TheMap.Tileset->TileNames[TheMap.Tileset->BasicNameTable[i]],
-	TheMap.Tileset->MixedNameTable[i]
-	    ? TheMap.Tileset->TileNames[TheMap.Tileset->MixedNameTable[i]]
+	TheMap.Tileset->SolidTerrainTypes[TheMap.Tileset->Tiles[i].BaseTerrain].TerrainName,
+	TheMap.Tileset->Tiles[i].MixTerrain
+	    ? TheMap.Tileset->SolidTerrainTypes[TheMap.Tileset->Tiles[i].MixTerrain].TerrainName
 	    : "");
 
     VideoDrawText(TheUI.ResourceX + 252, TheUI.ResourceY + 2, GameFont, buf);
@@ -1095,8 +1095,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		TileToolDecoration ^= 1;
 		return;
 	}
-	if (TheMap.Tileset->BasicNameTable[
-		16 + (ButtonUnderCursor - 100) * 16]) {
+	if (TheMap.Tileset->Tiles[16 + (ButtonUnderCursor - 100) * 16].BaseTerrain) {
 	    TileCursor = ButtonUnderCursor - 100;
 	}
 	return;
@@ -1665,7 +1664,7 @@ local void EditorCallbackMouse(int x, int y)
 	while (by < TheUI.ButtonPanelY + 100) {
 	    bx = TheUI.ButtonPanelX + 4;
 	    while (bx < TheUI.ButtonPanelX + 144) {
-		if (!TheMap.Tileset->BasicNameTable[0x10 + i * 16]) {
+		if (!TheMap.Tileset->Tiles[0x10 + i * 16].BaseTerrain) {
 		    by = TheUI.ButtonPanelY + 100;
 		    break;
 		}
@@ -1674,8 +1673,8 @@ local void EditorCallbackMouse(int x, int y)
 		    int j;
 
 		    // FIXME: i is wrong, must find the solid type
-		    j = TheMap.Tileset->BasicNameTable[i * 16 + 16];
-		    SetStatusLine(TheMap.Tileset->TileNames[j]);
+		    j = TheMap.Tileset->Tiles[i * 16 + 16].BaseTerrain;
+		    SetStatusLine(TheMap.Tileset->SolidTerrainTypes[j].TerrainName);
 		    ButtonUnderCursor = i + 100;
 		    CursorOn = CursorOnButton;
 		    return;
