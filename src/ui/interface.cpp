@@ -763,7 +763,7 @@ global void HandleKeyDown(unsigned key,unsigned keychar)
 	    return;
 
 	case IfaceStateMenu:			// Menu active
-	    MenuKey(keychar);
+	    MenuKey(key);
 	    return;
     }
 }
