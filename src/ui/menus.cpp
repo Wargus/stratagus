@@ -2774,6 +2774,8 @@ local void MultiGameStart(void)
     VideoUnlockScreen();
     Invalidate();
 
+    GameSettings.Presets[0].Race = SettingsPresetMapDefault;
+
     NetworkServerStartGame();
     NetworkGamePrepareGameSettings();
 
@@ -3789,9 +3791,7 @@ local void GameRCSAction(Menuitem *mi, int i)
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
     if (mi->d.pulldown.curopt == i) {
-	if (NetworkFildes==-1) {
-	    GameSettings.Presets[0].Race = v[i];
-	}
+	GameSettings.Presets[0].Race = v[i];
 	ServerSetupState.Race[0] = 2 - i;
 	NetworkServerResyncClients();
     }
@@ -4424,7 +4424,7 @@ local void MultiGameClientExit(Menuitem *mi)
     // ugly hack to prevent NetMultiButtonStorage[0].d.pulldown.options
     // from being freed
     for (i=0; i<PlayerMax-1; ++i) {
-	mi->menu->items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
+	mi->menu->items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
     }
 }
 
