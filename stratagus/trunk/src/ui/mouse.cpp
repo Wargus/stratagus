@@ -1139,7 +1139,7 @@ local void SendCommand (int sx, int sy)
 **	@param num	Button number.
 **	@param button	Mouse Button pressed.
 */
-local void DoSelectionButtons(unsigned num,unsigned button __attribute__((unused)))
+local void DoSelectionButtons(int num,unsigned button __attribute__((unused)))
 {
     Unit* unit;
 
