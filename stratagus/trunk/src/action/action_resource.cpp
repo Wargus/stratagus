@@ -157,7 +157,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //
     //	Place unit inside the resource
     //
-    RemoveUnit(unit);
+    RemoveUnit(unit,NULL);
 #if 0
     // This breaks the drop out code complete
     // FIXME: this is a hack, but solves the problem, a better solution is
@@ -166,19 +166,19 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     // Place unit where pathfinder is more likely to work
     if (unit->X < goal->X) {
 	PlaceUnit(unit,goal->X,unit->Y);
- 	RemoveUnit(unit);	// Unit removal necessary to free map tiles
+ 	RemoveUnit(unit,NULL);	// Unit removal necessary to free map tiles
     }
     if (unit->X > goal->X+goal->Type->TileWidth-1) {
 	PlaceUnit(unit,goal->X+goal->Type->TileWidth-1,unit->Y);
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
     }
     if (unit->Y < goal->Y) {
 	PlaceUnit(unit,unit->X,goal->Y);
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
     }
     if (unit->Y > goal->Y+goal->Type->TileHeight-1) {
 	PlaceUnit(unit,unit->X,goal->Y+goal->Type->TileHeight-1);
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
     }
 #else
     unit->X=goal->X;
@@ -391,7 +391,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
     //
     //	Place unit inside the depot
     //
-    RemoveUnit(unit);
+    RemoveUnit(unit,NULL);
     unit->X=goal->X;
     unit->Y=goal->Y;
 

@@ -117,6 +117,15 @@
 **		for each player. This f.e. the upgradeable abilities of an
 **		unit.  (Unit::Stats::SightRange, Unit::Stats::Armor,
 **		Unit::Stats::HitPoints, ...)
+**	Unit::Host
+**
+**		The Unit that the current unit is on board.  Used to obtain information from
+**		Parent Unit.  The New Fog of War uses the hosts sight range.
+**
+**	Unit::CurrentSightRange
+**
+**		Current Sight Range of a Unit, this changes when a unit enters a transporter,
+**		building or exits one of these.
 **
 **	Unit::Colors
 **
@@ -469,6 +478,10 @@ struct _unit_ {
     UnitType*	Type;			/// Pointer to unit-type (peon,...)
     Player*     Player;			/// Owner of this unit
     UnitStats*	Stats;			/// Current unit stats
+#ifdef NEW_FOW
+    Unit*	Host;			/// Unit that this unit is inside
+    int		CurrentSightRange;	/// Unit's Current Sight Range
+#endif
 
 //	DISPLAY:
     UnitColors	Colors;			/// Player colors
@@ -706,7 +719,7 @@ extern void PlaceUnit(Unit* unit,int x,int y);
     ///	Create a new unit and place on map
 extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
     /// Remove unit from map/groups/...
-extern void RemoveUnit(Unit* unit);
+extern void RemoveUnit(Unit* unit, Unit* host);
     /// Handle the loose of an unit (food,...)
 extern void UnitLost(Unit* unit);
     /// Remove the Orders of a Unit

@@ -764,6 +764,10 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	target->X = x;
 	target->Y = y;
 	target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
+#ifdef NEW_FOW
+	target->CurrentSightRange = 10;
+	MapMarkSight(target->Player,x,y,target->CurrentSightRange);
+#endif
 	//target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
 	CheckUnitToBeDrawn(target);
 	break;
@@ -918,7 +922,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    if( target->Type->Volatile ) {
-		RemoveUnit(target);
+		RemoveUnit(target,NULL);
 		UnitLost(target);
 		UnitClearOrders(target);
 		ReleaseUnit(target);
@@ -950,7 +954,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 #endif
 	    ++unit->Kills;
 	    // as said somewhere else -- no corpses :)
-	    RemoveUnit(target);
+	    RemoveUnit(target,NULL);
 	    UnitLost(target);
 	    UnitClearOrders(target);
 	    ReleaseUnit(target);
@@ -1223,7 +1227,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    if( target->Type->Volatile ) {
-		RemoveUnit(target);
+		RemoveUnit(target,NULL);
 		UnitLost(target);
 		UnitClearOrders(target);
 		ReleaseUnit(target);
@@ -1295,7 +1299,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
 	if (cop) {
 	    // FIXME: if cop is already defined --> move it, but it doesn't work?
-	    RemoveUnit(cop);
+	    RemoveUnit(cop, NULL);
 	    PlaceUnit(cop, x, y);
 	} else {
 	    cop =

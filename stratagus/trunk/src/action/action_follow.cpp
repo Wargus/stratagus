@@ -119,7 +119,7 @@ global void HandleActionFollow(Unit* unit)
 		int n;
 		int i;
 
-		RemoveUnit(unit);
+		RemoveUnit(unit,NULL);
 		unit->X = goal->Goal->X;
 		unit->Y = goal->Goal->Y;
 		DropOutOnSide(unit,unit->Direction,1,1);

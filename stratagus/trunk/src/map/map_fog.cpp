@@ -111,19 +111,20 @@ local const int FogTable[16] = {
 /**
 **	Pythagorus table tree for use in fow calculations
 */
-local const int PythagTree[12][12] = {
-    {   0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121},
-    {   1,   2,   5,  10,  17,  26,  37,  50,  65,  82, 101, 122},
-    {   4,   5,   8,  13,  20,  29,  40,  53,  68,  85, 104, 125},
-    {   9,  10,  13,  18,  25,  34,  45,  58,  73,  90, 109, 130},
-    {  16,  17,  20,  25,  32,  41,  52,  65,  80,  97, 116, 137},
-    {  25,  26,  29,  34,  41,  50,  61,  74,  89, 106, 125, 146},
-    {  36,  37,  40,  45,  52,  61,  72,  85, 100, 117, 136, 157},
-    {  49,  50,  53,  58,  65,  74,  85,  98, 113, 130, 149, 170},
-    {  64,  65,  68,  73,  80,  89, 100, 113, 128, 145, 164, 185},
-    {  81,  82,  85,  90,  97, 106, 117, 130, 145, 162, 181, 202},
-    { 100, 101, 104, 109, 116, 125, 136, 149, 164, 181, 200, 221},
-    { 121, 122, 125, 130, 137, 146, 157, 170, 185, 202, 221, 242}};
+local const int PythagTree[13][13] = {
+    {   0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121, 144},
+    {   1,   2,   5,  10,  17,  26,  37,  50,  65,  82, 101, 122, 145},
+    {   4,   5,   8,  13,  20,  29,  40,  53,  68,  85, 104, 125, 148},
+    {   9,  10,  13,  18,  25,  34,  45,  58,  73,  90, 109, 130, 153},
+    {  16,  17,  20,  25,  32,  41,  52,  65,  80,  97, 116, 137, 160},
+    {  25,  26,  29,  34,  41,  50,  61,  74,  89, 106, 125, 146, 169},
+    {  36,  37,  40,  45,  52,  61,  72,  85, 100, 117, 136, 157, 180},
+    {  49,  50,  53,  58,  65,  74,  85,  98, 113, 130, 149, 170, 193},
+    {  64,  65,  68,  73,  80,  89, 100, 113, 128, 145, 164, 185, 208},
+    {  81,  82,  85,  90,  97, 106, 117, 130, 145, 162, 181, 202, 225},
+    { 100, 101, 104, 109, 116, 125, 136, 149, 164, 181, 200, 221, 244},
+    { 121, 122, 125, 130, 137, 146, 157, 170, 185, 202, 221, 242, 265},
+    { 144, 145, 148, 153, 160, 169, 180, 193, 208, 225, 244, 265, 288}};
 /**
 **	Draw unexplored area function pointer. (display and video mode independ)
 */
@@ -186,8 +187,8 @@ local int LookupSight(const Player* player,int tx,int ty)
     Unit* unitrange[UnitMax];
 
     visiblecount=0;
-    // Lookup all units that could possibly see this square.
-    // And see how many there are.
+    // FIXME: Do we actually lookup all units here, or just the ones on the
+    // FIXME: map.  We need ALL units that can see this spot, removed or not.
     numunits=SelectUnits(tx-MAX_SIGHT_RANGE-1,ty-MAX_SIGHT_RANGE-1,
 	tx+MAX_SIGHT_RANGE+1,ty+MAX_SIGHT_RANGE+1,unitrange);
     --numunits;
@@ -612,9 +613,13 @@ global void UpdateFogOfWarChange(void)
 **	Update visible of the map.
 **
 **	@todo	This function could be improved in speed and functionality.
+**		and is not needed in new fog of war.
 */
 global void MapUpdateVisible(void)
 {
+#ifdef NEW_FOW
+    return;
+#else
     int x;
     int y;
     Unit* unit;
@@ -648,11 +653,7 @@ global void MapUpdateVisible(void)
 		    x=unit->X+unit->Type->TileWidth/2;
 		    y=unit->Y+unit->Type->TileHeight/2;
 		    if( unit->Removed && unit->Revealer ) {
-#ifdef NEW_FOW
-			MapMarkSight(unit->Player,x,y,10);
-#else
 			MapMarkSight(x,y,10);
-#endif
 		    }
 		}
 	    } else {
@@ -664,10 +665,6 @@ global void MapUpdateVisible(void)
 	    return;
 	}
     }
-
-#ifdef NEW_FOW
-    return;
-#endif
 
     // FIXME: rewrite this function, faster and better
 #ifdef DEBUG
@@ -705,11 +702,7 @@ global void MapUpdateVisible(void)
 	    y=unit->Y+unit->Type->TileHeight/2;
 	    if( unit->Removed ) {
 		if( unit->Revealer ) {
-#ifdef NEW_FOW
-		    MapMarkSight(unit->Player,x,y,10);
-#else
 		    MapMarkSight(x,y,10);
-#endif
 		    continue;
 		}
 		//
@@ -721,15 +714,9 @@ global void MapUpdateVisible(void)
 		if( unit->Orders[0].Action==UnitActionMineGold ) {
 		    mine=GoldMineOnMap(unit->X,unit->Y);
 		    if( mine ) {  // Somtimes, the peon is at home :).
-#ifdef NEW_FOW
-			MapMarkSight(unit->Player,mine->X+mine->Type->TileWidth/2
-				,mine->Y+mine->Type->TileHeight/2
-				,mine->Stats->SightRange);
-#else
 			MapMarkSight(mine->X+mine->Type->TileWidth/2
 				     ,mine->Y+mine->Type->TileHeight/2
 				     ,mine->Stats->SightRange);
-#endif
 		    }
 		} else {
 		    continue;
@@ -737,22 +724,15 @@ global void MapUpdateVisible(void)
 	    }
 
 	    if( unit->Orders[0].Action==UnitActionBuilded ) {
-#ifdef NEW_FOW
-		MapMarkSight(unit->Player,x,y,3);
-#else
 		MapMarkSight(x,y,3);
-#endif
 	    } else {
-#ifdef NEW_FOW
-		MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
-#else
 		MapMarkSight(x,y,unit->Stats->SightRange);
-#endif
 	    }
 	}
     }
 
     DebugLevel3Fn("Ticks Total %lu\n" _C_ GetTicks()-t);
+#endif
 }
 
 /*----------------------------------------------------------------------------
