@@ -541,7 +541,6 @@ global void PreprocessMap(void)
     }
 
     // it is required for fixing the wood that all tiles are marked as seen!
-    if (!EditorRunning) {
 	for (ix = 0; ix < TheMap.Width; ix++) {
 	    for (iy = 0; iy < TheMap.Height; iy++) {
 		MapFixWoodTile(ix, iy);
@@ -552,7 +551,6 @@ global void PreprocessMap(void)
 		MapFixSeenWallTile(ix, iy);
 	    }
 	}
-    }
 }
 
 /**
