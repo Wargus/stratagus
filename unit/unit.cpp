@@ -2680,21 +2680,22 @@ global Unit* FindIdleWorker(const Player* player, const Unit* last)
   ----------------------------------------------------------------------------*/
 
 /**
-**		Unit on map screen.
+**  Unit on map screen.
 **
-**		Select units on screen. (x, y are in pixels relative to map 0,0).
+**  Select units on screen. (x, y are in pixels relative to map 0,0).
+**  Not GAMEPLAY safe, uses ReplayRevealMap
 **
-**		More units on same position.
-**				Cycle through units. ounit is the old one.
-**				First take highest unit.
+**  More units on same position.
+**    Cycle through units. ounit is the old one.
+**    First take highest unit.
 **
-**		FIXME: If no unit, we could select near units?
+**  FIXME: If no unit, we could select near units?
 **
-**		@param ounit		Old selected unit.
-**		@param x		X pixel position.
-**		@param y		Y pixel position.
+**  @param ounit  Old selected unit.
+**  @param x      X pixel position.
+**  @param y      Y pixel position.
 **
-**		@return				An unit on x, y position.
+**  @return       An unit on x, y position.
 */
 global Unit* UnitOnScreen(Unit* ounit, int x, int y)
 {
@@ -2715,7 +2716,7 @@ global Unit* UnitOnScreen(Unit* ounit, int x, int y)
 	}
 	for (table = Units; table < Units + NumUnits; ++table) {
 		unit = *table;
-		if (!UnitVisibleAsGoal(unit, ThisPlayer)) {
+		if (!UnitVisibleAsGoal(unit, ThisPlayer) && !ReplayRevealMap) {
 			continue;
 		}
 		type = unit->Type;

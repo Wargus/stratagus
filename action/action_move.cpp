@@ -163,8 +163,10 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 			if (NumSelected == 1) { //  Remove building cursor
 				CancelBuildingMode();
 			}
-			UnSelectUnit(unit);
-			SelectionChanged();
+			if (!ReplayRevealMap) {
+				UnSelectUnit(unit);
+				SelectionChanged();
+			}
 		}
 
 		unit->IX = -xd * TileSizeX;
