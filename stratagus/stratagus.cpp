@@ -698,6 +698,7 @@ local void Usage(void)
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
+\t-w\t\tWait for sound device (OSS sound driver only)\n\
 \t\t\t\t3=1024x768,4=1600x1200)\n\
 \t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
 \t-F\t\tFull screen video mode (only supported with SDL)\n\
@@ -742,7 +743,7 @@ global int main(int argc,char** argv)
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:f:hln:p:P:s:t:v:D:N:FL:S:U:W?") ) {
+	switch( getopt(argc,argv,"c:d:f:hln:p:P:s:t:v:wD:N:FL:S:U:W?") ) {
 	    case 'c':
 		CclStartFile=optarg;
 		continue;
@@ -798,6 +799,10 @@ global int main(int argc,char** argv)
 			Usage();
 			exit(-1);
 		}
+		continue;
+
+	    case 'w':
+		WaitForSoundDevice=1;
 		continue;
 
 	    case 'L':

@@ -34,16 +34,21 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_THREAD
+#if defined(USE_THREAD) && !defined(USE_SDLA)
 #include <pthread.h>
 #include <semaphore.h>
 extern sem_t SoundThreadChannelSemaphore;
 #endif
 
+#include "sound_id.h"
+
 /*----------------------------------------------------------------------------
 --	Definitons
 ----------------------------------------------------------------------------*/
 
+    /**
+    **	Maximal volume value
+    */
 #define MaxVolume 255
 
 /**
@@ -54,12 +59,12 @@ typedef struct _sample_ {
     unsigned char	SampleSize;	/// sample size in bits
     unsigned int	Frequency;	/// frequency in hz
     unsigned int	Length;		/// sample length
-    char		Data[0];	/// sample bytes
+    char		Data[1];	/// sample bytes
 } Sample;
 
 /**
-** Sound double group: a sound that groups two sounds, used to implement
-** the annoyed/selected sound system of WC
+**	Sound double group: a sound that groups two sounds, used to implement
+**	the annoyed/selected sound system of WC
 */
 typedef struct _two_groups_ {
     struct _sound_ *First;		/// first group: selected sound
@@ -84,17 +89,21 @@ typedef struct _two_groups_ {
  ** the maximum range value
  */
 #define MAX_SOUND_RANGE 254
+
 /**
 **	Sound definition.
 */
 typedef struct _sound_ {
-    unsigned char Range; /// Range is a multiplier for DistanceSilent
-    /// 255 means infinite range
-    unsigned Number ; /// 0 means 1, 1 means two groups and > 1 is a number
+	/**
+	**	Range is a multiplier for ::DistanceSilent.
+	**	255 means infinite range of the sound.
+	*/
+    unsigned char Range;	/// Range is a multiplier for DistanceSilent
+    unsigned char Number;	/// single, group, or table of sounds.
     union {
-	Sample*     OneSound; /// if it's only a simple sound
-	Sample**    OneGroup; /// when it's a simple group
-	TwoGroups*  TwoGroups; /// when it's a double group
+	Sample*     OneSound;	/// if it's only a simple sound
+	Sample**    OneGroup;	/// when it's a simple group
+	TwoGroups*  TwoGroups;	/// when it's a double group
     } Sound;
 } Sound;
 
@@ -107,7 +116,7 @@ typedef Sound* ServerSoundId;
 **	Origin of a sound
 */
 typedef struct _origin_ {
-    const void* Base;		/// pointer on a Unit
+    const void* Base;	/// pointer on a Unit
     unsigned Id;	/// unique identifier (if the pointer has been shared)
 } Origin;
 
@@ -184,14 +193,16 @@ extern int NumCDTracks;
 ----------------------------------------------------------------------------*/
 
     ///	Register a sound (can be a simple sound or a group)
-extern SoundId RegisterSound(char* file[],unsigned char number);
+extern SoundId RegisterSound(char* file[],unsigned number);
 
-/** Ask the sound server to put together to sounds to form a special sound.
-    @param first first part of the group
-    @param second second part of the group
-    @return the special sound unique identifier
-*/
-extern SoundId RegisterTwoGroups(SoundId first,SoundId second);
+    /**
+    ** 	Ask the sound server to put together two sounds to form a special sound.
+    **	@param first	first part of the group
+    **	@param second	second part of the group
+    **	@return		the special sound unique identifier
+    **  @brief Create a special sound group with two sounds
+    */
+extern SoundId RegisterTwoGroups(const SoundId first,const SoundId second);
 
 /** Ask the sound server to change the range of a sound.
     @param sound the id of the sound to modify.
@@ -199,13 +210,14 @@ extern SoundId RegisterTwoGroups(SoundId first,SoundId second);
 */
 extern void SetSoundRange(SoundId sound,unsigned char range);
 
-
-/** Initialize the sound card.
- */
+    /// Initialize the sound card.
 extern int InitSound(void);
+    /// Initialize the oss compatible sound card.
+extern int InitOssSound(const char* dev,int freq,int size,int wait);
+    /// Initialize the sound card with SDL support.
+extern int InitSdlSound(const char* dev,int freq,int size,int wait);
 
-/** Initialize the sound server.
- */
+    /// Initialize the sound server.
 extern int InitSoundServer(void);
 
 /** Ask the sound layer to write the content of its buffer to the sound
@@ -230,7 +242,9 @@ extern void QuitSound(void);
 #define QuitSound()			/// Dummy macro for without sound
 
 
-#endif	// { WITH_SOUND
+#endif	// } WITH_SOUND
+
+extern int WaitForSoundDevice;		/// Block until sound device available
 
     /// Check the cdrom status
 extern void CDRomCheck(void);
