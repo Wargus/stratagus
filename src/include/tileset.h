@@ -192,6 +192,14 @@
 **
 **		The tile number of the tile placed where rocks are removed.
 **		Is created on the map by destroying rocks.
+**
+**	Tileset::HumanWallTable
+**
+**		Table of human wall tiles, index depends on the surroundings.
+**
+**	Tileset::OrcWallTable
+**
+**		Table of orc wall tiles, index depends on the surroundings.
 */
 
 /*----------------------------------------------------------------------------
@@ -214,7 +222,6 @@
 typedef enum _tile_type_ {
     TileTypeUnknown,			/// Unknown tile type
     TileTypeWood,			/// Any wood tile
-    TileTypeGrass,			/// Any grass tile
     TileTypeRock,			/// Any rock tile
     TileTypeCoast,			/// Any coast tile
     TileTypeHumanWall,			/// Any human wall tile
@@ -257,6 +264,9 @@ typedef struct _tileset_ {
     unsigned	MidOneRock;		/// Tile for one rock middle
     unsigned	BotOneRock;		/// Tile for one rock bottom
     unsigned	RemovedRock;		/// Tile placed where rocks are gone
+
+    unsigned	HumanWallTable[16];	/// Human wall placement table
+    unsigned	OrcWallTable[16];	/// Orc wall placement table
 } Tileset;
 
 // FIXME: this #define's should be removed

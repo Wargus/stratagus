@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,7 +37,7 @@
 #include "player.h"
 #ifdef HIERARCHIC_PATHFINDER
 #include "pathfinder.h"
-#endif /* HIERARCHIC_PATHFINDER */
+#endif // HIERARCHIC_PATHFINDER
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -47,36 +46,6 @@
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
-
-/**
-**	Human wall table:
-**		Depends on surrounding units.
-**
-**	@note
-**		If we support a more complex tileset format, this must be
-**		calculated.
-*/
-local int WallHumanTable[16] = {
-//     0,    1,    2,    3,    4,    5,    6,    7,
-      0x90,0x830,0x810,0x850,0x800,0x840,0x820,0x860,
-//     8,    9,    A,    B,    C,    D,    E,    F
-     0x870,0x8B0,0x890,0x8D0,0x880,0x8C0,0x8A0, 0xB0
-};
-
-/**
-**	Orc wall table:
-**		Depends on surrounding units.
-**
-**	@note
-**		If we support a more complex tileset format, this must be
-**		calculated.
-*/
-local int WallOrcTable[16] = {
-//     0,    1,    2,    3,    4,    5,    6,    7,
-      0xA0,0x930,0x910,0x950,0x900,0x940,0x920,0x960,
-//     8,    9,    A,    B,    C,    D,    E,    F
-     0x970,0x9B0,0x990,0x9D0,0x980,0x9C0,0x9A0, 0xC0
-};
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -155,7 +124,7 @@ global void MapFixSeenWallTile(int x, int y)
     }
 
     if( t==TileTypeHumanWall ) {
-	tile = WallHumanTable[tile];
+	tile = TheMap.Tileset->HumanWallTable[tile];
 	if( mf->Value<=UnitTypeHumanWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
@@ -165,7 +134,7 @@ global void MapFixSeenWallTile(int x, int y)
 	    }
 	}
     } else {
-	tile = WallOrcTable[tile];
+	tile = TheMap.Tileset->OrcWallTable[tile];
 	if( mf->Value<=UnitTypeOrcWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
@@ -251,7 +220,7 @@ global void MapFixWallTile(int x, int y)
     }
 
     if( t&MapFieldHuman ) {
-	tile = WallHumanTable[tile];
+	tile = TheMap.Tileset->HumanWallTable[tile];
 	if( mf->Value<=UnitTypeHumanWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
@@ -261,7 +230,7 @@ global void MapFixWallTile(int x, int y)
 	    }
 	}
     } else {
-	tile = WallOrcTable[tile];
+	tile = TheMap.Tileset->OrcWallTable[tile];
 	if( mf->Value<=UnitTypeOrcWall->_HitPoints/2 ) {
 	    while( TheMap.Tileset->Table[tile] ) {	// Skip good tiles
 		++tile;
@@ -317,10 +286,10 @@ global void MapRemoveWall(unsigned x,unsigned y)
     // FIXME: support more walls of different races.
     if( mf->Flags&MapFieldHuman ) {
 	// FIXME: must search the correct tile
-	mf->Tile=TheMap.Tileset->Table[WallHumanTable[0]+4];
+	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->HumanWallTable[0]+4];
     } else {
 	// FIXME: must search the correct tile
-	mf->Tile=TheMap.Tileset->Table[WallOrcTable[0]+4];
+	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->OrcWallTable[0]+4];
     }
     mf->Flags &= ~(MapFieldHuman|MapFieldWall|MapFieldUnpassable);
 
@@ -357,11 +326,13 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
 
     // FIXME: support more walls of different races.
     if( humanwall ) {
-	mf->Tile=TheMap.Tileset->Table[WallHumanTable[0]];
+	// FIXME: Set random walls
+	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->HumanWallTable[0]];
 	mf->Flags|=MapFieldWall|MapFieldUnpassable|MapFieldHuman;
 	mf->Value=UnitTypeHumanWall->_HitPoints;
     } else {
-	mf->Tile=TheMap.Tileset->Table[WallOrcTable[0]];
+	// FIXME: Set random walls
+	mf->Tile=TheMap.Tileset->Table[TheMap.Tileset->OrcWallTable[0]];
 	mf->Flags|=MapFieldWall|MapFieldUnpassable;
 	mf->Value=UnitTypeOrcWall->_HitPoints;
     }
