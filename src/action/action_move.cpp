@@ -197,7 +197,7 @@ int CanMove(const Unit* unit)
 	Assert(unit);
 	Assert(unit->Type);
 	return (unit->Type->Animations && unit->Type->Animations->Move) ||
-		unit->Type->NewAnimations;
+		(unit->Type->NewAnimations && unit->Type->NewAnimations->Move);
 }
 
 
