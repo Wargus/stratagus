@@ -46,6 +46,7 @@
 <a href="index.html">CCL Index</a>
 <hr>
 <a href="#DefineButton">DefineButton</a>
+<a href="#DefineButtonStyle">DefineButtonStyle</a>
 <a href="#DefineCursor">DefineCursor</a>
 <a href="#DefineFont">DefineFont</a>
 <a href="#DefineFontColors">DefineFontColors</a>
@@ -191,6 +192,78 @@ DefineButton( { Pos = 8, Level = 0, Icon = "icon-build-advanced",
   Allowed = "check-units-or", AllowArg = {"unit-elven-lumber-mill", "unit-keep"},
   Key = "v", Hint = "BUILD AD~!VANCED STRUCTURE",
   ForUnit = {"unit-peasant"} } )
+</pre>
+
+<a name="DefineButtonStyle"></a>
+<h3>DefineButtonStyle(style, {tag = value, ...})</h3>
+
+Define a button style. Possible tags:
+
+<dl>
+<dt>Size = {x, y}</dt>
+<dd>Size of the button.
+</dd>
+<dt>Font = font-name</dt>
+<dd>Name of the font to use.
+</dd>
+<dt>TextNormalColor = color, TextReverseColor = color</dt>
+<dd>Color to use for the normal and reverse text.
+</dd>
+<dt>Default = {tag = value, ...}, Hover = {}, Selected = {}, Clicked = {}, Disabled = {}</dt>
+<dd>Set attributes for when the mouse is over the button (Hover), the button is
+Selected, Clicked, Disabled, or the Default setting. Possible tags:
+  <dl>
+  <dt>File = file</dt>
+  <dd>The filename.
+  </dd>
+  <dt>Size = size</dt>
+  <dd>The size of the image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>Frame = frame</dt>
+  <dd>Select the frame number from an image (only needed when using an image with multiple frames).
+  </dd>
+  <dt>TextNormalColor = color, TextReverseColor = color</dt>
+  <dd>Color to use for the normal and reverse text.  Note that this value overrides the main colors.
+  </dd>
+  <dt>TextOffset = {x, y}</dt>
+  <dd>Display the text with this offset.
+  </dd>
+  <dt>Border = { Color = color, Size = size}</dt>
+  <dd>Draw a border with the specified color and size.
+  </dd>
+  </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+<pre>
+DefineButtonStyle("main", {
+  Size = {128, 20},
+  Font = "game",
+  TextNormalColor = "yellow",
+  TextReverseColor = "white",
+  Default = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 4,
+  },
+  Hover = {
+    TextNormalColor = "white",
+  },
+  Selected = {
+    Border = {
+      Color = {252, 252, 0}, Size = 1,
+    },
+  },
+  Clicked = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 5,
+    TextNormalColor = "white",
+    TextOffset = {2, 2},
+  },
+  Disabled = {
+    File = "ui/buttons_1.png", Size = {300, 144}, Frame = 3,
+    TextNormalColor = "grey",
+    TextReverseColor = "grey",
+  },
+})
 </pre>
 
 <a name="DefineCursor"></a>
@@ -426,8 +499,6 @@ For example:
   <dd>The item is a button.<br>
   The value is a list of tags like:
   <dl>
-    <dt>"size" = (width, height)</dt>
-    <dd>Dimensions.</dd>
     <dt>"caption", "text"</dt>
     <dd>The text.</dd>
     <dt>"color-normal", "color-name"</dt>
