@@ -85,6 +85,7 @@ local enum _editor_state_ {
 } EditorState;				/// Current editor state
 
 // FIXME: support for bigger tools 2x2, 3x3, 4x4.
+local int TileCursorSize;		/// Tile cursor size 1x1 2x2 ... 4x4
 local int TileCursor;			/// Tile type number
 
 local enum _mode_buttons_ {
@@ -227,6 +228,29 @@ local void DrawTileIcons(void)
     int x;
     int y;
     int i;
+
+
+    x = TheUI.InfoPanelX + 46;
+    y = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 11;
+
+    VideoDrawTextCentered(x, y,      GameFont, "1x1");
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    y += 20;
+    VideoDrawTextCentered(x, y, GameFont, "2x2");
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    y += 20;
+    VideoDrawTextCentered(x, y, GameFont, "3x3");
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    y += 20;
+    VideoDrawTextCentered(x, y, GameFont, "4x4");
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    y += 20;
+    VideoDrawTextCentered(x, y, GameFont, "Random");
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    y += 20;
+    VideoDrawTextCentered(x, y, GameFont, "Filler");
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    y += 20;
 
     tiles=TheMap.Tiles;
 
@@ -501,10 +525,20 @@ local void DrawMapCursor(void)
 	x = Map2ViewportX(v, x);
 	y = Map2ViewportY(v, y);
 	if (EditorState == EditorEditTile) {
-	    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 +
-			TileCursor * 16]], x, y);
+	    int i;
+	    int j;
+
+	    for( i=0; i<TileCursorSize; ++i ) {
+		for( j=0; j<TileCursorSize; ++j ) {
+		    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 +
+			    TileCursor * 16]], x + i, y + j);
+		}
+	    }
+	    VideoDrawRectangle(ColorWhite, x, y, 32 * TileCursorSize,
+		    32 * TileCursorSize);
+	} else {
+	    VideoDrawRectangle(ColorWhite, x, y, 32, 32);
 	}
-	VideoDrawRectangle(ColorWhite, x, y, 32, 32);
     }
 }
 
@@ -1203,10 +1237,30 @@ local void EditorCallbackExit(void)
 */
 local void CreateEditor(void)
 {
-    FlagRevealMap=1;
-    TheMap.NoFogOfWar=1;
-    CreateGame(CurrentMapPath,&TheMap);
-    FlagRevealMap=0;
+    int i;
+
+    FlagRevealMap = 1;			// editor without fog and all visible
+    TheMap.NoFogOfWar = 1;
+    CreateGame(CurrentMapPath, &TheMap);
+    FlagRevealMap = 0;
+
+    for (i = 0; i < PlayerMax; ++i) {
+	if (Players[i].Type != PlayerNobody) {
+	    // FIXME: must support more races
+	    switch (Players[i].Race) {
+		case PlayerRaceHuman:
+		    MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
+			UnitTypeByWcNum(WC_StartLocationHuman), Players + i);
+		    break;
+		case PlayerRaceOrc:
+		    MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
+			UnitTypeByWcNum(WC_StartLocationHuman), Players + i);
+		    break;
+	    }
+	} else if (Players[i].StartX | Players[i].StartY) {
+	    DebugLevel0Fn("Player nobody has a start position\n");
+	}
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -1239,6 +1293,7 @@ global void EditorMainLoop(void)
     InterfaceState = IfaceStateNormal;
     EditorState = EditorSelecting;
     TheUI.LastClickedVP = 0;
+    TileCursorSize = 1;
 
     EditorRunning = 1;
     while (EditorRunning) {

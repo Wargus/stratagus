@@ -196,7 +196,8 @@ global void SavePlayers(FILE* file)
 	for( j=0; j<PlayerMax; ++j ) {
 	    fputc((Players[i].Allied&(1<<j)) ? 'X' : '_',file);
 	}
-	fprintf(file,"\"\n  'start '(%d %d)\n",Players[i].X,Players[i].Y);
+	fprintf(file,"\"\n  'start '(%d %d)\n",Players[i].StartX,
+		Players[i].StartY);
 
 	// Resources
 	fprintf(file,"  'resources '(");
