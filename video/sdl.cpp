@@ -38,6 +38,10 @@
 
 #ifdef USE_SDL	// {
 
+#ifdef DEBUG
+#include <signal.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -149,8 +153,21 @@ local void InitOpenGL(void)
 }
 #endif
 
+#ifdef DEBUG
+local void CleanExit(int signum)
+{
+    // Clean SDL
+    SDL_Quit();
+    // Reestablish normal behaviour for next abort call
+    signal(SIGABRT, SIG_DFL);
+    // Generates a core dump
+    abort();
+}
+#endif
+
+
 /**
-**	Initialze the video part for SDL.
+**	Initialize the video part for SDL.
 */
 global void InitVideoSdl(void)
 {
@@ -177,6 +194,12 @@ global void InitVideoSdl(void)
 
 	atexit(SDL_Quit);
 
+	// If debug is enabled, Stratagus disable SDL Parachute.
+	// So we need gracefully handle segfaults and aborts.
+#ifdef DEBUG
+	signal(SIGSEGV, CleanExit);
+	signal(SIGABRT, CleanExit);
+#endif
 	// Set WindowManager Title
 
 	SDL_WM_SetCaption("Stratagus", "Stratagus");
