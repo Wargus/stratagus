@@ -85,6 +85,10 @@
 
 #include "myendian.h"
 
+#ifdef USE_SDL
+#include <SDL.h>
+#endif
+
 /*----------------------------------------------------------------------------
 --	Defines
 ----------------------------------------------------------------------------*/
@@ -127,6 +131,11 @@ global int WithSoundThread;		/// FIXME: docu
 
 global int SoundThreadRunning;		/// FIXME: docu
 
+#ifdef USE_SDL
+global SDL_CD *cdrom;
+global char *cdmode = ":off";
+#endif
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -148,7 +157,10 @@ global void PlayMusic(const char* name)
     char* buffer;
     int size;
     int i;
-
+#ifdef USE_SDL
+    int track;
+#endif
+    
     ModPlug_GetSettings(&settings);
     settings.mFrequency=SoundFrequency;
 #ifdef USE_LIBMODPLUG32
@@ -159,6 +171,39 @@ global void PlayMusic(const char* name)
 
     settings.mLoopCount=0;		// Disable looping
     ModPlug_SetSettings(&settings);
+    
+#ifdef USE_SDL
+    if (!strcmp(cdmode,":off")) {
+	if (!strncmp(name,":",1)) {
+	    SDL_Init(SDL_INIT_CDROM);
+	    cdrom = SDL_CDOpen(0);
+	    SDL_CDStatus(cdrom);
+	}
+    }
+    
+    if (!strncmp(name,":",1)) {
+	if (!cdrom) {
+	    fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
+	    return;
+	}
+
+	// if mode is play all tracks
+	if (!strcmp(name, ":all")) {
+	    cdmode = ":all";
+	    SDL_CDPlayTracks(cdrom, 0, 0, 0, 0);
+	    return;
+	}
+	
+	// if mode is play random tracks
+	if (!strcmp(name, ":random")) {
+	    cdmode = ":random";
+	    track = MyRand() % cdrom->numtracks;
+	    SDL_CDPlayTracks(cdrom, track, 0, 0, 0);
+	    return;
+	}
+	return;
+    }
+#endif
 
     if( PlayingMusic ) {
 	if( ModFile ) {
@@ -226,6 +271,16 @@ local void MixMusicToStereo32(int* buffer,int size)
 #endif
     int i;
     int n;
+    
+    #ifdef USE_SDL
+    if (strcmp(cdmode, ":off") && SDL_CDStatus(cdrom) == 1) {
+	if (!strcmp(cdmode, ":all")) {
+	    PlayMusic(":all");
+	} else if (!strcmp(cdmode, ":random")) {
+	    PlayMusic(":random");
+	}
+    }
+    #endif
 
     if( PlayingMusic ) {
 	DebugCheck( !ModFile );
@@ -1402,7 +1457,14 @@ global void QuitSound(void)
 	close(SoundFildes);
 	SoundFildes=-1;
     }
+    
 #endif
+
+#ifdef USE_SDL
+    SDL_CDStop(cdrom);
+    SDL_CDClose(cdrom);
+#endif
+
 }
 
 #endif	// } WITH_SOUND

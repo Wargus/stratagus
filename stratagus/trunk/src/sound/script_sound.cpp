@@ -343,6 +343,19 @@ local SCM CclSetMusicVolume(SCM volume)
     return volume;
 }
 
+local SCM CclSetCdMode(SCM mode)
+{
+#ifdef USE_SDL
+    char *str;
+
+    if ( !gh_null_p(mode) ) {
+        PlayMusic(str = gh_scm2newstr(mode,NULL));
+        free(str);
+    }
+#endif
+    return mode;
+}
+
 /**
 **	Turn Off Sound (client side)
 */
@@ -451,6 +464,7 @@ global void SoundCclRegister(void)
 
     gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
     gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);
+    gh_new_procedure1_0("set-cd-mode!",CclSetCdMode);
 
     init_subr_0("sound-off",CclSoundOff);
     init_subr_0("sound-on",CclSoundOn);
@@ -491,6 +505,11 @@ local SCM CclSetSoundVolume(SCM volume)
 local SCM CclSetMusicVolume(SCM volume)
 {
     return volume;
+}
+
+local SCM CclSetCdMode(SCM mode)
+{
+    return mode;
 }
 
 /**
@@ -599,6 +618,7 @@ global void SoundCclRegister(void)
 {
     gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
     gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);
+    gh_new_procedure1_0("set-cd-mode!",CclSetCdMode);
     gh_new_procedure0_0("sound-off",CclSoundOff);
     gh_new_procedure0_0("sound-on",CclSoundOn);
     gh_new_procedure0_0("sound-thread",CclSoundThread);
