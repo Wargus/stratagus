@@ -1604,28 +1604,31 @@ global void UnitIncrementHealth(void)
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
-	if (HitPointRegeneration && unit->HP<unit->Stats->HitPoints) {
-	    ++unit->HP;
+	//Unit may not have stats assigned to it
+	if (unit->Stats) {
+	    if (HitPointRegeneration && unit->HP<unit->Stats->HitPoints) {
+		++unit->HP;
 
-	    if( 0 ) {		// some frames delayed done my color cycling
-		CheckUnitToBeDrawn(unit);
+		if( 0 ) {	// some frames delayed done my color cycling
+		    CheckUnitToBeDrawn(unit);
+		}
+		if( unit->Selected ) {
+		    MustRedraw|=RedrawInfoPanel;
+		}
 	    }
-	    if( unit->Selected ) {
-		MustRedraw|=RedrawInfoPanel;
-	    }
-	}
-	if( unit->Stats->RegenerationRate && unit->HP<unit->Stats->HitPoints ) {
-	    unit->HP+=unit->Stats->RegenerationRate;
-	    if( unit->HP > unit->Stats->HitPoints ) {
-		unit->HP = unit->Stats->HitPoints;
-	    }
+	    if( unit->Stats->RegenerationRate && unit->HP<unit->Stats->HitPoints ) {
+		unit->HP+=unit->Stats->RegenerationRate;
+		if( unit->HP > unit->Stats->HitPoints ) {
+		    unit->HP = unit->Stats->HitPoints;
+		}
 
 	    // some frames delayed done my color cycling
-	    if( 0 ) {
-		CheckUnitToBeDrawn(unit);
-	    }
-	    if( unit->Selected ) {
-		MustRedraw|=RedrawInfoPanel;
+		if( 0 ) {
+		    CheckUnitToBeDrawn(unit);
+		}
+		if( unit->Selected ) {
+		    MustRedraw|=RedrawInfoPanel;
+		}
 	    }
 	}
     }
