@@ -83,7 +83,7 @@ global void HandleActionTrain(Unit* unit)
 	//
 	//	Check if there are still unit slots.
 	//
-	if (NumUnits >= UnitMax ) {
+	if (NumUnits >= UnitMax) {
 	    unit->Data.Train.Ticks = 
 		unit->Data.Train.What[0]->Stats[player->Player].Costs[TimeCost];
 	    unit->Reset = 1;
@@ -107,7 +107,7 @@ global void HandleActionTrain(Unit* unit)
 	    return;
 	}
 
-	nunit=MakeUnit(unit->Data.Train.What[0], player);
+	nunit = MakeUnit(unit->Data.Train.What[0], player);
 	nunit->X = unit->X;
 	nunit->Y = unit->Y;
 	type = unit->Type;
