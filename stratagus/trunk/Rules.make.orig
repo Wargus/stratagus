@@ -187,12 +187,14 @@ OUTFILE=$(TOPDIR)/freecraft
 ARCH=linux
 OE=o
 EXE=
+OBJDIR=.
 
 # WIN32
 #OUTFILE=$(TOPDIR)/freecraft$(EXE)
 #ARCH=win32
 #OE=o
 #EXE=.exe
+#OBJDIR=.
 
 ## architecture-dependant objects
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
