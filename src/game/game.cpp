@@ -42,6 +42,7 @@
 #include "spells.h"
 #include "construct.h"
 #include "network.h"
+#include "missile.h"
 #include "settings.h"
 
 #include "ccl.h"
