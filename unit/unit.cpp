@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -809,7 +808,7 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 **	@param player	Player pointer that can see the submarine
 **	@param x	X map tile center position
 **	@param y	Y map tile center position
-**	@param r	Range arround center
+**	@param r	Range around center
 **
 **	@note
 **		All units are marked as visible, not only submarines.
