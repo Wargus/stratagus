@@ -1540,6 +1540,7 @@ global void MapUnitSounds(void) {
 	    // should be at least defined as remaps
 	    //FIXME: (Fabrice) I don't think it's 100% correct for death
 	    //sounds.
+
 	    if (i%2) {
 		//orc
 		if (UnitTypes[i].Building) {
