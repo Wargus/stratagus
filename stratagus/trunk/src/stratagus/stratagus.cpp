@@ -169,6 +169,9 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+extern void beos_init( int argc, char **argv );
+
 #endif
 
 #ifndef _MSC_VER
