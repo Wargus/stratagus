@@ -41,10 +41,9 @@
 
 //
 //	Convert heading into direction.
-//
-			//  N NE  E SE  S SW  W NW
-local int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
-local int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
+//			      //  N NE  E SE  S SW  W NW
+local const int Heading2X[8] = {  0,+1,+1,+1, 0,-1,-1,-1 };
+local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
 
 /*----------------------------------------------------------------------------
 --	Function
