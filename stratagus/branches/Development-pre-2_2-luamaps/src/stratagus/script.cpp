@@ -55,7 +55,6 @@
 #include "unit.h"
 #include "map.h"
 #include "tileset.h"
-#include "pud.h"
 #include "script_sound.h"
 #include "ui.h"
 #include "interface.h"
@@ -283,6 +282,7 @@ static int CclSaveGame(lua_State* l)
 		if (!strcmp(value, "SaveFile")) {
 			strcpy(CurrentMapPath, LuaToString(l, -1));
 			// If .pud, we don't need to load anything from it
+			// MAPTODO: should we skip this for .smp too ?
 			if (!strcasestr(LuaToString(l, -1), ".pud")) {
 				strcpy(buf, StratagusLibPath);
 				strcat(buf, "/");
@@ -1559,30 +1559,6 @@ static int CclSyncRand(lua_State* l)
 ............................................................................*/
 
 /**
-**  Load a pud. (Try in library path first)
-**
-**  @param l  Lua state.
-*/
-static int CclLoadPud(lua_State* l)
-{
-	const char* name;
-
-	if (SaveGameLoading) {
-		return 0;
-	}
-
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	name = LuaToString(l, 1);
-	LoadPud(name, &TheMap);
-
-	// FIXME: LoadPud should return an error
-
-	return 0;
-}
-
-/**
 **  Load a map. (Try in library path first)
 **
 **  @param l  Lua state.
@@ -1599,10 +1575,7 @@ static int CclLoadMap(lua_State* l)
 	// TODO Check if there a map has already been loaded. 
 	//  If true, memory needs to be freed.
 
-	if (strcasestr(name, ".pud")) {
-		LoadPud(name, &TheMap);
-		return 0;
-	}
+	//MAPTODO load stratagus map !!!!!!!!!!!
 
 	LuaError(l, "unknown map format");
 	return 0;
@@ -1713,11 +1686,8 @@ void InitCcl(void)
 
 	EditorCclRegister();
 
-	lua_register(Lua, "LoadPud", CclLoadPud);
 	lua_register(Lua, "LoadMap", CclLoadMap);
-
 	lua_register(Lua, "Units", CclUnits);
-
 	lua_register(Lua, "SyncRand", CclSyncRand);
 }
 

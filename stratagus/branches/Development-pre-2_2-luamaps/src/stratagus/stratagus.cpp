@@ -874,7 +874,7 @@ static void Usage(void)
 {
 	PrintHeader();
 	printf(
-"\n\nUsage: stratagus [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
+"\n\nUsage: stratagus [OPTIONS] [map.smp|map.smp.gz]\n\
 \t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
 \t-d datapath\tpath to stratagus data\n\
 \t-e\t\tStart editor\n\

@@ -60,7 +60,6 @@
 #include "interface.h"
 #include "menus.h"
 #include "cursor.h"
-#include "pud.h"
 #include "iolib.h"
 #include "network.h"
 #include "netconnect.h"
@@ -2491,10 +2490,7 @@ static void GetInfoFromSelectPath(void)
 		i = 0;
 	}
 	strcat(ScenSelectPath, ScenSelectFileName); // Final map name with path
-	if (strcasestr(ScenSelectFileName, ".pud")) {
-		GetPudInfo(ScenSelectPath, &TheMap.Info);
-		strcpy(MenuMapFullPath, ScenSelectPath);
-	} else if(strcasestr(ScenSelectFileName, ".smp")) {
+	if(strcasestr(ScenSelectFileName, ".smp")) {
 		LuaLoadFile(ScenSelectPath);
 	}
 	ScenSelectPath[i] = '\0'; // Remove appended part
@@ -3097,24 +3093,17 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	char *np;
 	int curopt;
 	unsigned u;
-	int sz;
-	static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
 	Menu* menu;
 
 	menu = FindMenu("menu-select-scenario");
 
 	curopt = menu->Items[6].D.Pulldown.curopt;
+	//MAPTODO remove map type pulldown code
 	if (curopt == 0) {
 		suf[0] = ".smp";
 		suf[1] = NULL;
-	} else if (curopt == 1) {
-		suf[0] = ".pud";
-		suf[1] = NULL;
-	} else {
-		suf[0] = ".scm";
-		suf[1] = ".chk";
-		suf[2] = NULL;
 	}
+	
 	np = strrchr(pathbuf, '/');
 	if (np) {
 		np++;
@@ -3161,20 +3150,6 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 				LuaLoadFile(pathbuf);
 				fl->xdata = DuplicateMapInfo(&TheMap.Info);
 				return 1;
-			} else if (curopt == 1) {
-				FreeMapInfo(&TheMap.Info);
-				info = GetPudInfo(pathbuf, &TheMap.Info);
-				if (info) {
-					sz = szl[menu->Items[8].D.Pulldown.curopt];
-					if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
-						fl->type = 1;
-						fl->name = strdup(np);
-						fl->xdata = DuplicateMapInfo(info);
-						return 1;
-					} else {
-						FreeMapInfo(info);
-					}
-				}
 			}
 		}
 	}
@@ -4382,11 +4357,8 @@ int NetClientSelectScenario(void)
 	}
 
 	FreeMapInfo(&TheMap.Info);
-	if (strcasestr(ScenSelectFileName, ".pud")) {
-		GetPudInfo(MenuMapFullPath, &TheMap.Info);
-	} else {
-		LuaLoadFile(MenuMapFullPath);
-	}
+	LuaLoadFile(MenuMapFullPath);
+
 	return 0;
 }
 
@@ -4724,11 +4696,10 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 	}
 	fl->type = -1;
 	suf[0] = ".smp";
-	suf[1] = ".scm";
-	suf[2] = ".pud";
-	suf[3] = NULL;
+	suf[1] = NULL;
 	u = 0;
 	lcp = 0;
+	//MAPTODO simplify as there is only one map format anymore
 	while (suf[u]) {
 		cp = np;
 		--cp;
@@ -4758,23 +4729,13 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 		}
 #endif
 		if (*cp == 0) {
-			if (strcasestr(np, ".pud")) {
-				info = GetPudInfo(pathbuf, &TheMap.Info);
-				if (info) {
-					fl->type = 1;
-					fl->name = strdup(np);
-					fl->xdata = DuplicateMapInfo(info);
-					return 1;
-				}
-			} else {
-				info = NULL;
-				fl->type = 1;
-				fl->name = strdup(np);
-				FreeMapInfo(&TheMap.Info);
-				LuaLoadFile(pathbuf);
-				fl->xdata = DuplicateMapInfo(&TheMap.Info);
-				return 1;
-			}
+			info = NULL;
+			fl->type = 1;
+			fl->name = strdup(np);
+			FreeMapInfo(&TheMap.Info);
+			LuaLoadFile(pathbuf);
+			fl->xdata = DuplicateMapInfo(&TheMap.Info);
+			return 1;
 		}
 	}
 	return 0;
@@ -5135,7 +5096,6 @@ static void EditorMapPropertiesOk(void)
 		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
 
 		LoadTileset();
-		ChangeTilesetPud(old, &TheMap);
 		SetPlayersPalette();
 		PreprocessMap();
 		LoadConstructions();

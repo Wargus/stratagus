@@ -48,7 +48,6 @@
 #include "unittype.h"
 #include "upgrade.h"
 #include "pathfinder.h"
-#include "pud.h"
 #include "ui.h"
 #include "font.h"
 #include "sound.h"
@@ -252,6 +251,7 @@ static void LoadMap(const char* filename, WorldMap* map)
 			while (tmp - 1 > filename && *--tmp != '.') {
 			}
 		} else
+		//MAPTODO this "else" looks buggy. check.
 #endif
 #ifdef USE_BZ2LIB
 		if (!strcmp(tmp, ".bz2")) {
@@ -269,24 +269,6 @@ static void LoadMap(const char* filename, WorldMap* map)
 			LoadStratagusMap(TheMap.Info.Filename, map);
 			return;
 		}
-		if (!strcmp(tmp, ".cm")
-#ifdef USE_ZLIB
-				|| !strcmp(tmp, ".cm.gz")
-#endif
-#ifdef USE_BZ2LIB
-				|| !strcmp(tmp, ".cm.bz2")
-#endif
-		) {
-			LoadStratagusMap(filename, map);
-			return;
-		}
-	}
-	// ARI: This bombs out, if no pud, so will be safe.
-	if (strcasestr(filename, ".pud")) {
-		CreateMap(TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-		LoadPud(filename, map);
-		map->Info.Filename = strdup(filename);
-		return;
 	}
 
 	printf("Unrecognized map format\n");
@@ -451,9 +433,7 @@ void CreateGame(const char* filename, WorldMap* map)
 		
 		Assert(filename);
 		LibraryFileName(filename, path);
-		if (strcasestr(filename, ".pud")) {
-			GetPudInfo(path, &TheMap.Info);
-		} else if(strcasestr(filename, ".smp")) {
+		if(strcasestr(filename, ".smp")) {
 			LuaLoadFile(path);
 		}
 	}
@@ -572,7 +552,6 @@ void CreateGame(const char* filename, WorldMap* map)
 				break;
 			case SettingsGameTypeManTeamVsMachine:
 				GameTypeManTeamVsMachine();
-
 
 			// Future game type ideas
 #if 0

@@ -53,7 +53,6 @@
 #include "campaign.h"
 #include "menus.h"
 #include "sound.h"
-#include "pud.h"
 #include "iolib.h"
 #include "iocompat.h"
 #include "commands.h"
@@ -1941,19 +1940,6 @@ static void CreateEditor(void)
 */
 int EditorSaveMap(const char* file)
 {
-	int i;
-
-	for (i = 0; i < NumUnits; ++i) {
-		const UnitType* type;
-
-		type = Units[i]->Type;
-		if (type == UnitTypeByWcNum(WC_StartLocationHuman) ||
-				type == UnitTypeByWcNum(WC_StartLocationOrc)) {
-			// FIXME: Startpoints sets the land-unit flag.
-			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Info.MapWidth].Flags &=
-				~MapFieldLandUnit;
-		}
-	}
 	if (SaveStratagusMap(file, &TheMap) == -1) {
 		ErrorMenu("Cannot save map");
 		InterfaceState = IfaceStateNormal;
@@ -1961,17 +1947,7 @@ int EditorSaveMap(const char* file)
 		InterfaceState = IfaceStateMenu;
 		return -1;
 	}
-	for (i = 0; i < NumUnits; ++i) {
-		const UnitType* type;
 
-		type = Units[i]->Type;
-		if (type == UnitTypeByWcNum(WC_StartLocationHuman) ||
-				type == UnitTypeByWcNum(WC_StartLocationOrc)) {
-			// FIXME: Startpoints sets the land-unit flag.
-			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Info.MapWidth].Flags |=
-				MapFieldLandUnit;
-		}
-	}
 	return 0;
 }
 

@@ -44,7 +44,6 @@
 #include "player.h"
 #include "unit.h"
 #include "pathfinder.h"
-#include "pud.h"
 #include "ui.h"
 
 #include "script.h"

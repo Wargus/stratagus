@@ -59,11 +59,7 @@ char DefaultObjective[] = "-Destroy your enemies";
 
 int GameResult;                              /// Outcome of the game
 char CurrentMapPath[1024];                   /// Path of the current map
-#ifdef LUA_MAP_API
 char DefaultMap[1024] = "maps/default.smp";  /// Default map path
-#else
-char DefaultMap[1024] = "maps/default.pud";  /// Default map path
-#endif
 int RestartScenario;                         /// Restart the scenario
 int QuitToMenu;                              /// Quit to menu
 Campaign* Campaigns;                         /// Campaigns
