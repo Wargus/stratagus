@@ -148,6 +148,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
@@ -208,25 +209,24 @@ extern SCM CclUnits(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global char* TitleScreen;		/// titlescreen to show at startup
-global char* MenuBackground;		/// file for menu background
-global char* MenuBackgroundWithTitle;	/// file for menu with title
-global char* TitleMusic;		/// file for title music
-global char* MenuMusic;			/// file for menu music
-global char* FreeCraftLibPath;		/// path for data directory
+global char* TitleScreen;		/// Titlescreen to show at startup
+global char* MenuBackground;		/// File for menu background
+global char* MenuBackgroundWithTitle;	/// File for menu with title
+global char* TitleMusic;		/// File for title music
+global char* MenuMusic;			/// File for menu music
+global char* FreeCraftLibPath;		/// Path for data directory
 
     /// Name, Version, Copyright
 global char NameLine[] =
     "FreeCraft V" VERSION ", (c) 1998-2002 by The FreeCraft Project.";
 
-    /// Filename of the map to load
-local char* MapName;
+local char* MapName;			/// Filename of the map to load
 
-//FIXME: all game global options should be moved in structure like `TheUI'
-global int OptionUseDepletedMines=0;    /// use depleted mines or destroy them
+    //FIXME: all game global options should be moved in structure like `TheUI'
+global int OptionUseDepletedMines;	/// Use depleted mines or destroy them
 
 /*----------------------------------------------------------------------------
---	Speedups
+--	Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
 
 global int SpeedMine=SPEED_MINE;	/// speed factor for mine gold
@@ -263,18 +263,29 @@ global unsigned long GameCycle;		/// Game simulation cycle counter
 --	Random
 ----------------------------------------------------------------------------*/
 
-global unsigned SyncRandSeed = 0x87654321;	/// sync random seed value.
+global unsigned SyncRandSeed;		/// sync random seed value.
+
+/**
+**	Inititalize sync rand seed.
+*/
+global void InitSyncRand(void)
+{
+    SyncRandSeed = 0x87654321;
+}
 
 /**
 **	Syncron rand.
+**
+**	@note This random value must be same on all machines in network game.
+**	Very simple random generations, enough for us.
 */
 global int SyncRand(void)
 {
     int val;
 
-    val=SyncRandSeed>>16;
+    val = SyncRandSeed >> 16;
 
-    SyncRandSeed=SyncRandSeed*(0x12345678 * 4 + 1) + 1;
+    SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
 
     return val;
 }
@@ -325,6 +336,7 @@ global char* strdcat3(const char* l, const char* m, const char* r)
     return res;
 }
 
+#ifndef BSD
 /**
 **	Case insensitive version of strstr
 **
@@ -333,7 +345,6 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 **
 **	@return		Pointer to first occurence of b or NULL if not found.
 */
-#ifndef BSD
 global char* strcasestr(char* a, const char* b)
 {
     int x;
@@ -495,6 +506,38 @@ local void WaitForInput(int timeout)
     RealizeVideoMemory();
 }
 
+/**
+**	Show load progress.
+**
+**	@parm fmt	printf format string.
+*/
+global void ShowLoadProgress(const char* fmt,...)
+{
+    va_list va;
+    char temp[4096];
+    char* s;
+
+    va_start(va,fmt);
+    vsnprintf(temp,sizeof(temp),fmt,va);
+    va_end(va);
+
+    if( VideoDepth && IsFontLoaded(GameFont) ) {
+	VideoLockScreen();
+	for( s=temp; *s; ++s ) {	// Remove non printable chars
+	    if( *s<32 ) {
+		*s=' ';
+	    }
+	}
+	VideoFillRectangle(ColorBlack,5,VideoHeight-18,VideoWidth-10,18);
+	VideoDrawTextCentered(VideoWidth/2,VideoHeight-16,GameFont,temp);
+	VideoUnlockScreen();
+	Invalidate();
+	RealizeVideoMemory();
+    } else {
+	DebugLevel0Fn("!!!!%s",temp);
+    }
+}
+
 //----------------------------------------------------------------------------
 
 /**
@@ -512,12 +555,13 @@ local void PreMenuSetup(void)
 	    "/graphics/",Tilesets[TilesetSummer]->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
+    SetDefaultTextColors(FontYellow,FontWhite);
+
     LoadFonts();
 
     InitVideoCursors();
 
     // All pre-start menues are orcish - may need to be switched later..
-    SetDefaultTextColors(FontYellow,FontWhite);
     InitMenus(PlayerRaceOrc);
     LoadCursors(RaceWcNames ? RaceWcNames[1] : "oops");
     InitSettings();
@@ -704,10 +748,6 @@ local void PrintHeader(void)
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
-#ifndef DEBUG
-    srand(time(NULL));
-#endif
-
     PrintHeader();
     printf(
     "\n\nFreeCraft may be copied only under the terms of the GNU General Public License\
@@ -728,14 +768,18 @@ Use it at your own risk.\n\n");
     }
 #endif
 
+#ifndef DEBUG				// For debug its better not to have:
+    srand(time(NULL));			// Random counter = random each start
+#endif
+
     //
     //	Show title screen.
     //
     SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     if( TitleScreen ) {
 	DisplayPicture(TitleScreen);
+	Invalidate();
     }
-    Invalidate();
 
     InitUnitsMemory();		// Units memory management
     PreMenuSetup();		// Load everything needed for menus
