@@ -7322,8 +7322,7 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     if (RecvMetaReply(&reply) == -1) {
 	//TODO: Notify player that connection was aborted...
 	nummenus = 0;
-    } 
-    else {
+    } else {
 	GetMetaParameter(reply, 0, &parameter);
 	nummenus = atoi(parameter);
     }
@@ -7348,11 +7347,9 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	    menu->Items[j + 1].d.text.text = NULL;
 	    menu->Items[j + 2].d.text.text = NULL;
 	    menu->Items[j + 3].d.text.text = NULL;
-	} 
-	else {
+	} else {
 	    GetMetaParameter(reply, 0, &parameter);  // Player Name
 	    menu->Items[j].d.text.text = parameter;
-	   
 	    GetMetaParameter(reply, 3, &parameter);   // IP
 	    GetMetaParameter(reply, 4, &port);		  // port	
 	    sprintf(parameter, "%s:%s", parameter, port); // IP:Port
