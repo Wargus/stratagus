@@ -55,13 +55,12 @@
 typedef struct _font_color_mapping_ {
 	char* ColorName;                        ///< Font color name
 	SDL_Color Color[NumFontColors];         ///< Array of colors
-	struct _font_color_mapping_* Next;      ///< Next pointer
 } FontColorMapping;
 
-static FontColorMapping* FontColor;         ///< FIXME
+static FontColorMapping* FontColor;         ///< Current font color
 
-	/// Font color mappings
-static FontColorMapping* FontColorMappings;
+static FontColorMapping* FontColorMappings; ///< Font color mappings
+static int NumFontColorMappings;            ///< Number of font color mappings
 
 	/// Font mapping
 typedef struct _font_mapping_ {
@@ -70,7 +69,7 @@ typedef struct _font_mapping_ {
 	struct _font_mapping_* Next;            ///< Next pointer
 } FontMapping;
 
-static FontMapping* FontMappings;           ///< FIXME
+static FontMapping* FontMappings;           ///< Font mappings
 
 /**
 **  Fonts table
@@ -89,9 +88,7 @@ static char* DefaultReverseColorIndex;     ///< Default reverse color index
 static void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
 
 #ifdef USE_OPENGL
-static GLubyte* FontBitmaps[MaxFonts][NumFontColors]; ///< Font bitmaps
-static int FontBitmapWidths[MaxFonts];                ///< Font bitmap widths
-static int CurrentFont;                               ///< Current font
+static Graphic** FontColorGraphics[MaxFonts];   ///< Font color graphics
 #endif
 
 /*----------------------------------------------------------------------------
@@ -129,31 +126,10 @@ static void VideoDrawChar(const Graphic* sprite,
 	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
 #else
-static void VideoDrawChar(const Graphic* sprite,
+static void VideoDrawChar(const Graphic* g,
 	int gx, int gy, int w, int h, int x, int y)
 {
-	SDL_Color* c;
-	int i;
-	int fy;
-
-	glDisable(GL_TEXTURE_2D);
-
-	if (y + h >= VideoHeight) {
-		h = VideoHeight - y - 1;
-	}
-	fy = gy / Fonts[CurrentFont].Height * Fonts[CurrentFont].Height;
-	fy = fy + Fonts[CurrentFont].Height - (gy - fy) - h;
-	for (i = 0; i < NumFontColors; ++i) {
-		c = FontColor->Color + i;
-		glColor3ub(c->r, c->g, c->b);
-		glRasterPos2i(x, y + h);
-		glBitmap(FontBitmapWidths[CurrentFont] * 8, h,
-			0.0f, 0.0f, 0.0f, 0.0f,
-			FontBitmaps[CurrentFont][i] +
-				fy * FontBitmapWidths[CurrentFont]);
-	}
-
-	glEnable(GL_TEXTURE_2D);
+	VideoDrawSub(g, gx, gy, w, h, x, y);
 }
 #endif
 
@@ -162,14 +138,12 @@ static void VideoDrawChar(const Graphic* sprite,
 */
 static FontColorMapping* GetFontColorMapping(char* color)
 {
-	FontColorMapping *fcm;
+	int i;
 
-	fcm = FontColorMappings;
-	while (fcm) {
-		if (!strcmp(fcm->ColorName, color)) {
-			return fcm;
+	for (i = 0; i < NumFontColorMappings; ++i) {
+		if (!strcmp(FontColorMappings[i].ColorName, color)) {
+			return &FontColorMappings[i];
 		}
-		fcm = fcm->Next;
 	}
 	fprintf(stderr, "Font color mapping not found: '%s'\n", color);
 	ExitFatal(1);
@@ -266,14 +240,14 @@ int VideoTextHeight(unsigned font)
 **  @param x        X screen position
 **  @param y        Y screen position
 */
-static void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int h,
+static void VideoDrawCharClip(const Graphic* g, int gx, int gy, int w, int h,
 	int x, int y)
 {
 	int ox;
 	int oy;
 	int ex;
 	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, ex);
-	VideoDrawChar(graphic, gx + ox, gy + oy, w, h, x, y);
+	VideoDrawChar(g, gx + ox, gy + oy, w, h, x, y);
 }
 
 /**
@@ -297,17 +271,15 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	int clip)
 {
 	int w;
-	int height;
 	int widths;
 	const ColorFont* fp;
 	FontColorMapping* rev;
 	char* color;
 	const unsigned char* p;
 	void (*DrawChar)(const Graphic*, int, int, int, int, int, int);
-
-#ifdef USE_OPENGL
-	CurrentFont = font;
-#endif
+	int ipr;
+	int c;
+	Graphic* g;
 
 	if (clip) {
 		DrawChar = VideoDrawCharClip;
@@ -316,7 +288,11 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	}
 
 	fp = Fonts + font;
-	height = fp->Height;
+#ifndef USE_OPENGL
+	g = fp->Graphic;
+#else
+	g = FontColorGraphics[font][FontColor - FontColorMappings];
+#endif
 	for (rev = NULL, widths = 0; *text; ++text) {
 		if (*text == '~') {
 			switch (*++text) {
@@ -328,17 +304,25 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 				case '!':
 					rev = FontColor;
 					FontColor = ReverseTextColor;
-
+#ifdef USE_OPENGL
+					g = FontColorGraphics[font][FontColor - FontColorMappings];
+#endif
 					++text;
 					break;
 				case '<':
 					LastTextColor = FontColor;
 					FontColor = ReverseTextColor;
+#ifdef USE_OPENGL
+					g = FontColorGraphics[font][FontColor - FontColorMappings];
+#endif
 					continue;
 				case '>':
 					rev = LastTextColor;  // swap last and current color
 					LastTextColor = FontColor;
 					FontColor = rev;
+#ifdef USE_OPENGL
+					g = FontColorGraphics[font][FontColor - FontColorMappings];
+#endif
 					continue;
 
 				default:
@@ -356,23 +340,32 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 					text = p;
 					LastTextColor = FontColor;
 					FontColor = GetFontColorMapping(color);
+#ifdef USE_OPENGL
+					g = FontColorGraphics[font][FontColor - FontColorMappings];
+#endif
 					free(color);
 					continue;
 			}
 		}
 
-		Assert(*text >= 32);
+		c = *text - 32;
+		Assert(c >= 0);
 
-		if (*text - 32 >= 0 && height * (*text - 32) < fp->Graphic->Height) {
-			w = fp->CharWidth[*text - 32];
-			DrawChar(fp->Graphic, 0, height * (*text - 32), w, height, x + widths, y);
+		ipr = fp->Graphic->GraphicWidth / fp->Width;
+		if (c >= 0 && c < ipr * fp->Graphic->GraphicHeight / fp->Height) {
+			w = fp->CharWidth[c];
+			DrawChar(g, (c % ipr) * fp->Width, (c / ipr) * fp->Height,
+				w, fp->Height, x + widths, y);
 		} else {
 			w = fp->CharWidth[0];
-			DrawChar(fp->Graphic, 0, height * 0, w, height, x + widths, y);
+			DrawChar(g, 0, 0, w, fp->Height, x + widths, y);
 		}
 		widths += w + 1;
 		if (rev) {
 			FontColor = rev;
+#ifdef USE_OPENGL
+			g = FontColorGraphics[font][FontColor - FontColorMappings];
+#endif
 			rev = NULL;
 		}
 	}
@@ -589,7 +582,9 @@ int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number)
 }
 
 /**
-**  FIXME: docu
+**  Calculate the width of each character
+**
+**  @param fp  Font to calculate
 */
 static void FontMeasureWidths(ColorFont* fp)
 {
@@ -599,15 +594,18 @@ static void FontMeasureWidths(ColorFont* fp)
 	const unsigned char* lp;
 	const unsigned char* gp;
 	Uint32 ckey;
+	int ipr;
 
 	memset(fp->CharWidth, 0, sizeof(fp->CharWidth));
 	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
 	ckey = fp->Graphic->Surface->format->colorkey;
+	ipr = fp->Graphic->Surface->w / fp->Width;
 
 	SDL_LockSurface(fp->Graphic->Surface);
 	for (y = 1; y < 207; ++y) {
 		sp = (const unsigned char*)fp->Graphic->Surface->pixels +
-			y * fp->Height * fp->Graphic->Surface->pitch - 1;
+			(y / ipr) * fp->Graphic->Surface->pitch * fp->Height +
+			(y % ipr) * fp->Width - 1;
 		gp = sp + fp->Graphic->Surface->pitch * fp->Height;
 		// Bail out if no letters left
 		if (gp >= ((const unsigned char*)fp->Graphic->Surface->pixels +
@@ -615,7 +613,7 @@ static void FontMeasureWidths(ColorFont* fp)
 			break;
 		}
 		while (sp < gp) {
-			lp = sp + fp->Width - 1;
+			lp = sp + fp->Width;
 			for (; sp < lp; --lp) {
 				if (*lp != ckey) {
 					if (lp - sp > fp->CharWidth[y]) {  // max width
@@ -632,58 +630,30 @@ static void FontMeasureWidths(ColorFont* fp)
 
 /**
 **  Make font bitmap.
+**
+**  @param g     Font graphic
+**  @param font  Font number
 */
 #ifdef USE_OPENGL
-static void MakeFontBitmap(Graphic* g, int font)
+static void MakeFontColorTextures(Graphic* g, int font)
 {
 	int i;
 	int j;
-	int k;
-	GLubyte* c;
-	GLubyte x;
-	const unsigned char* sp;
-	const unsigned char* nextsp;
-	int numfonts;
-	int n;
+	SDL_Surface* s;
 
-	FontBitmapWidths[font] = (g->Width + 7) / 8;
-
-	SDL_LockSurface(g->Surface);
-	for (n = 0; n < NumFontColors; ++n) {
-		if (FontBitmaps[font][n]) {
-			free(FontBitmaps[font][n]);
+	FontColorGraphics[font] = malloc(NumFontColorMappings * sizeof(Graphic*));
+	s = g->Surface;
+	for (i = 0; i < NumFontColorMappings; ++i) {
+		FontColorGraphics[font][i] = calloc(1, sizeof(Graphic));
+		memcpy(FontColorGraphics[font][i], g, sizeof(Graphic));
+		FontColorGraphics[font][i]->Textures = NULL;
+		SDL_LockSurface(s);
+		for (j = 0; j < NumFontColors; ++j) {
+			s->format->palette->colors[j] = FontColorMappings[i].Color[j];
 		}
-		FontBitmaps[font][n] = (GLubyte*)malloc(FontBitmapWidths[font] * g->Height);
-
-		nextsp = (const unsigned char*)g->Surface->pixels;
-		x = 0;
-		numfonts = g->Height / Fonts[font].Height;
-		for (k = 0; k < numfonts; ++k) {
-			for (i = 0; i < Fonts[font].Height; ++i) {
-				sp = nextsp;
-				nextsp += g->Surface->pitch;
-				c = FontBitmaps[font][n] + k * Fonts[font].Height * FontBitmapWidths[font] +
-					(Fonts[font].Height - 1 - i) * FontBitmapWidths[font];
-				for (j = 0; j < g->Width; ++j) {
-					if (*sp == n) {
-						x |= 0x1;
-					}
-					++sp;
-					if ((j & 0x7) == 0x7) {
-						*c++ = x;
-						x = 0;
-					} else if (j == g->Width - 1) {
-						x <<= 0x7 - (j & 0x7);
-						*c++ = x;
-						x = 0;
-					} else {
-						x <<= 1;
-					}
-				}
-			}
-		}
+		SDL_UnlockSurface(s);
+		MakeTexture(FontColorGraphics[font][i]);
 	}
-	SDL_UnlockSurface(g->Surface);
 }
 #endif
 
@@ -702,7 +672,7 @@ void LoadFonts(void)
 			LoadGraphic(Fonts[i].Graphic);
 			FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
-			MakeFontBitmap(Fonts[i].Graphic, i);
+			MakeFontColorTextures(Fonts[i].Graphic, i);
 #endif
 		}
 	}
@@ -760,8 +730,6 @@ const char* FontName(int font)
 
 /**
 **  Define the used fonts.
-**
-**  @todo  make the font name functions more general, support more fonts.
 */
 static int CclDefineFont(lua_State* l)
 {
@@ -837,32 +805,33 @@ static int CclDefineFontColor(lua_State* l)
 	char* color;
 	int i;
 	FontColorMapping* fcm;
-	FontColorMapping** fcmp;
 
 	if (lua_gettop(l) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	color = strdup(LuaToString(l, 1));
 
-	if (!FontColorMappings) {
+	if (!NumFontColorMappings) {
 		FontColorMappings = calloc(sizeof(*FontColorMappings), 1);
 		fcm = FontColorMappings;
+		++NumFontColorMappings;
 	} else {
-		fcmp = &FontColorMappings;
-		while (*fcmp) {
-			if (!strcmp((*fcmp)->ColorName, color)) {
+		for (i = 0; i < NumFontColorMappings; ++i) {
+			fcm = &FontColorMappings[i];
+			if (!strcmp(fcm->ColorName, color)) {
 				fprintf(stderr, "Warning: Redefining color '%s'\n", color);
-				free((*fcmp)->ColorName);
-				fcm = *fcmp;
+				free(fcm->ColorName);
 				break;
 			}
-			fcmp = &(*fcmp)->Next;
 		}
-		*fcmp = calloc(sizeof(*FontColorMappings), 1);
-		fcm = *fcmp;
+		if (i == NumFontColorMappings) {
+			++NumFontColorMappings;
+			FontColorMappings = realloc(FontColorMappings,
+				NumFontColorMappings * sizeof(FontColorMapping));
+			fcm = &FontColorMappings[NumFontColorMappings - 1];
+		}
 	}
 	fcm->ColorName = color;
-	fcm->Next = NULL;
 
 	if (luaL_getn(l, 2) != NumFontColors * 3) {
 		fprintf(stderr, "Wrong vector length\n");
@@ -884,22 +853,11 @@ static int CclDefineFontColor(lua_State* l)
 
 /**
 **  Register CCL features for fonts.
-**
-**  @todo FIXME: Make the remaining functions accessable from CCL.
 */
 void FontsCclRegister(void)
 {
 	lua_register(Lua, "DefineFont", CclDefineFont);
 	lua_register(Lua, "DefineFontColor", CclDefineFontColor);
-
-// lua_register(Lua, "DefaultTextColors", CclDefaultTextColors);
-// lua_register(Lua, "TextLength", CclTextLength);
-// lua_register(Lua, "DrawText", CclDrawText);
-// lua_register(Lua, "DrawReverseText", CclDrawReverseText);
-// lua_register(Lua, "DrawTextCentered", CclDrawTextCentered);
-// lua_register(Lua, "DrawReverseTextCentered", CclDrawReverseTextCentered);
-// lua_register(Lua, "DrawNumber", CclDrawNumber);
-// lua_register(Lua, "DrawReverseNumber", CclDrawReverseNumber);
 }
 
 /**
@@ -907,24 +865,36 @@ void FontsCclRegister(void)
 */
 void CleanFonts(void)
 {
-	unsigned i;
-	FontColorMapping *fcmp, *fcmpn;
+	int i;
+#ifdef USE_OPENGL
+	int j;
+#endif
 
-	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
+	for (i = 0; i < (int)(sizeof(Fonts) / sizeof(*Fonts)); ++i) {
 		free(Fonts[i].File);
 		FreeGraphic(Fonts[i].Graphic);
 		Fonts[i].File = NULL;
 		Fonts[i].Graphic = NULL;
+
+#ifdef USE_OPENGL
+		for (j = 0; j < NumFontColorMappings; ++j) {
+			if (!FontColorGraphics[i]) {
+				break;
+			}
+			glDeleteTextures(FontColorGraphics[i][j]->NumFrames,
+				FontColorGraphics[i][j]->Textures);
+			free(FontColorGraphics[i][j]->Textures);
+		}
+		free(FontColorGraphics[i]);
+#endif
 	}
 
-	fcmp = FontColorMappings;
-	while (fcmp) {
-		fcmpn = fcmp->Next;
-		free(fcmp->ColorName);
-		free(fcmp);
-		fcmp = fcmpn;
+	for (i = 0; i < NumFontColorMappings; ++i) {
+		free(FontColorMappings[i].ColorName);
 	}
+	free(FontColorMappings);
 	FontColorMappings = NULL;
+	NumFontColorMappings = 0;
 }
 
 /**
