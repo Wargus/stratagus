@@ -73,34 +73,12 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**	Get info for a pud.
-*/
-typedef struct _pud_info_ {
-    char*	Description;		/// Map description
-    char*	MapTerrainName;		/// Map terrain name
-    // FIXME: Map Terrain Nr. should be removed.
-    int		MapTerrain;		/// Map terrain
-    int		MapWidth;		/// Map width
-    int		MapHeight;		/// Map height
-    int		PlayerType[16];		/// Same player->Type
-    int		PlayerSide[16];		/// Same player->Side
-    int		PlayerGold[16];		/// Same player->Gold
-    int		PlayerWood[16];		/// Same player->Wood
-    int		PlayerOil[16];		/// Same player->Oil
-    int		PlayerAi[16];		/// Same player->Ai
-    unsigned int PudUID;		/// Unique pud ID (hash)
-} PudInfo;
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
     /// Return info for pud.
-extern PudInfo* GetPudInfo(const char*);
-
-    /// Release info for pud.
-extern void FreePudInfo(PudInfo*);
+extern MapInfo* GetPudInfo(const char*);
 
     /// Load a pud file.
 extern void LoadPud(const char* pud,WorldMap* map);

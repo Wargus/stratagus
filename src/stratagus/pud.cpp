@@ -312,17 +312,18 @@ local int PudReadByte(CLFile* input)
 /**
 **	Get the info for a pud.
 */
-global PudInfo* GetPudInfo(const char* pud)
+global MapInfo* GetPudInfo(const char* pud)
 {
     CLFile* input;
     long length;
     char header[5];
     char buf[1024];
-    PudInfo* info;
+    MapInfo* info;
     unsigned short temp_short;
     // FIXME: Reuse the temporary alloca buffer...
 
     if( !(input=CLopen(pud)) ) {
+	fprintf(stderr,"Try ./path/name\n");
 	sprintf(buf, "pud: CLopen(%s)", pud);
 	perror(buf);
 	exit(-1);
@@ -345,7 +346,7 @@ global PudInfo* GetPudInfo(const char* pud)
 	exit(-1);
     }
 
-    info=calloc(1, sizeof(PudInfo));	// clears with 0
+    info=calloc(1, sizeof(MapInfo));	// clears with 0
     if (!info) {
 	return NULL;
     }
@@ -356,7 +357,7 @@ global PudInfo* GetPudInfo(const char* pud)
     while( PudReadHeader(input,header,&length) ) {
 	DebugLevel3("\tSection: %4.4s\n",header);
 
-	info->PudUID += ChksumArea(header, 4);
+	info->MapUID += ChksumArea(header, 4);
 
 	//
 	//	PUD version
@@ -368,7 +369,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		v=PudReadWord(input);
 		DebugLevel3("\tVER: %d.%d\n",(v&0xF0)>>4,v&0xF);
 		buf[0] = v & 0xFF;
-		info->PudUID += ChksumArea(buf, 1);
+		info->MapUID += ChksumArea(buf, 1);
 		continue;
 	    }
 	    DebugLevel1("Wrong version length\n");
@@ -382,7 +383,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
-	    info->PudUID += ChksumArea(buf, length);
+	    info->MapUID += ChksumArea(buf, length);
 	    info->Description=strdup(buf);
 	    continue;
 	}
@@ -398,7 +399,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		for( i=0; i<16; ++i ) {
 		    p=PudReadByte(input);
 		    buf[0] = p & 0xFF;
-		    info->PudUID += ChksumArea(buf, 1);
+		    info->MapUID += ChksumArea(buf, 1);
 		    info->PlayerType[i]=p;
 		}
 		continue;
@@ -436,7 +437,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		info->MapTerrainName=TilesetWcNames[t];
 		info->MapTerrain=t;
 		buf[0] = t & 0xFF;
-		info->PudUID += ChksumArea(buf, 1);
+		info->MapUID += ChksumArea(buf, 1);
 		continue;
 	    } else {
 		DebugLevel1("Wrong terrain type length\n");
@@ -455,7 +456,7 @@ global PudInfo* GetPudInfo(const char* pud)
 	    buf[1] = (info->MapWidth >> 8) & 0xFF;
 	    buf[2] = info->MapHeight & 0xFF;
 	    buf[3] = (info->MapHeight >> 8) & 0xFF;
-	    info->PudUID += ChksumArea(buf, 4);
+	    info->MapUID += ChksumArea(buf, 4);
 	    continue;
 	}
 
@@ -469,7 +470,7 @@ global PudInfo* GetPudInfo(const char* pud)
 	    temp_short = PudReadWord(input);
 	    buf[0] = temp_short & 0xFF;
 	    buf[1] = (temp_short >> 8) & 0xFF;
-	    info->PudUID += ChksumArea(buf, 2);
+	    info->MapUID += ChksumArea(buf, 2);
 	    if( length<sizeof(buf) ) {
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
@@ -480,7 +481,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
-	    info->PudUID += ChksumArea(bufp, length);
+	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
 	}
 
@@ -500,7 +501,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
-	    info->PudUID += ChksumArea(bufp, length);
+	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
 	}
 
@@ -514,7 +515,7 @@ global PudInfo* GetPudInfo(const char* pud)
 	    temp_short = PudReadWord(input);
 	    buf[0] = temp_short & 0xFF;
 	    buf[1] = (temp_short >> 8) & 0xFF;
-	    info->PudUID += ChksumArea(buf, 2);
+	    info->MapUID += ChksumArea(buf, 2);
 	    if( length<sizeof(buf) ) {
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
@@ -525,7 +526,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
-	    info->PudUID += ChksumArea(bufp, length);
+	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
 	}
 
@@ -540,7 +541,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		for( i=0; i<16; ++i ) {
 		    v=PudReadByte(input);
 		    buf[0] = v & 0xFF;
-		    info->PudUID += ChksumArea(buf, 1);
+		    info->MapUID += ChksumArea(buf, 1);
 		    switch( v ) {
 			case PlayerRaceHuman:
 			case PlayerRaceOrc:
@@ -571,7 +572,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		    v=PudReadWord(input);
 		    buf[0] = v & 0xFF;
 		    buf[1] = (v >> 8) & 0xFF;
-		    info->PudUID += ChksumArea(buf, 2);
+		    info->MapUID += ChksumArea(buf, 2);
 		    info->PlayerGold[i]=v;
 		}
 		continue;
@@ -592,7 +593,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		    v=PudReadWord(input);
 		    buf[0] = v & 0xFF;
 		    buf[1] = (v >> 8) & 0xFF;
-		    info->PudUID += ChksumArea(buf, 2);
+		    info->MapUID += ChksumArea(buf, 2);
 		    info->PlayerWood[i]=v;
 		}
 		continue;
@@ -613,7 +614,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		    v=PudReadWord(input);
 		    buf[0] = v & 0xFF;
 		    buf[1] = (v >> 8) & 0xFF;
-		    info->PudUID += ChksumArea(buf, 2);
+		    info->MapUID += ChksumArea(buf, 2);
 		    info->PlayerOil[i]=v;
 		}
 		continue;
@@ -635,7 +636,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		for( i=0; i<16; ++i ) {
 		    v=PudReadByte(input);
 		    buf[0] = v & 0xFF;
-		    info->PudUID += ChksumArea(buf, 1);
+		    info->MapUID += ChksumArea(buf, 1);
 		    info->PlayerAi[i]=v;
 		}
 		continue;
@@ -666,7 +667,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
-	    info->PudUID += ChksumArea((unsigned char *)mtxm, length);
+	    info->MapUID += ChksumArea((unsigned char *)mtxm, length);
 
 	    continue;
 	}
@@ -685,7 +686,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
-	    info->PudUID += ChksumArea((unsigned char *)sqm, length);
+	    info->MapUID += ChksumArea((unsigned char *)sqm, length);
 
 	    continue;
 	}
@@ -704,7 +705,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		perror("CLread()");
 		exit(-1);
 	    }
-	    info->PudUID += ChksumArea((unsigned char *)regm, length);
+	    info->MapUID += ChksumArea((unsigned char *)regm, length);
 
 	    continue;
 	}
@@ -736,7 +737,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		buf[5] = o & 0xFF;
 		buf[6] = v & 0xFF;
 		buf[7] = (v >> 8) & 0xFF;
-		info->PudUID += ChksumArea(buf, 8);
+		info->MapUID += ChksumArea(buf, 8);
 	    }
 	    continue;
 	}
@@ -749,21 +750,6 @@ global PudInfo* GetPudInfo(const char* pud)
     CLclose(input);
 
     return info;
-}
-
-/**
-**	Release info for a pud.
-**
-**	@param pi	PudInfo pointer.
-*/
-global void FreePudInfo(PudInfo* info)
-{
-    if (info) {
-	if (info->Description) {
-	    free(info->Description);
-	}
-	free(info);
-    }
 }
 
 /**
@@ -782,6 +768,9 @@ global void LoadPud(const char* pud,WorldMap* map)
     int height;
     int aiopps;
 
+    if (!(map->Info)) {
+	map->Info = GetPudInfo(pud);
+    }
     if( !(input=CLopen(pud)) ) {
 	fprintf(stderr,"Try ./path/name\n");
 	sprintf(buf, "pud: CLopen(%s)", pud);
