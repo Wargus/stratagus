@@ -36,7 +36,9 @@
 #include <stdlib.h>
 #include <limits.h>
 #ifndef _MSC_VER
-//#include <sys/time.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 #include <SDL.h>
 
