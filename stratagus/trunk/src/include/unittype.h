@@ -199,9 +199,17 @@ struct _unit_type_ {
     Graphic*	Sprite;			/// sprite images
 };
 
-    /// Who many unit types are currently supported.
+    /// How many unit types are currently supported.
 #define UnitTypeInternalMax	0x74
 
+    /// Human Peasant (for pud use only)
+#define WC_UnitPeasant		0x02
+    /// Orc Peon (for pud use only)
+#define WC_UnitPeon		0x03
+    /// Goldmine (for pud use only)
+#define WC_UnitGoldMine		0x5C
+    /// Oilpatch (for pud use only)
+#define WC_UnitOilPatch		0x5D
     /// Start location unit type number in puds.
 #define WC_StartLocationHuman	0x5E
     /// Start location unit type number in puds.
