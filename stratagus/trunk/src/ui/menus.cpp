@@ -1758,8 +1758,6 @@ global void SoundOptions(void)
     cd_get_volume(&i, &i);
     SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
 #endif
-#else
-    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
     ProcessMenu(MENU_SOUND_OPTIONS, 1);
 #endif // with sound
