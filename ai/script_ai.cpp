@@ -1036,6 +1036,7 @@ local int CclAiSetReserve(lua_State* l)
 **  Set AI player resource collect percent.
 **
 **  @param vec  Resources vector
+**
 **  @return     Old resource vector
 */
 local int CclAiSetCollect(lua_State* l)
@@ -1046,10 +1047,11 @@ local int CclAiSetCollect(lua_State* l)
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	}
+	// FIXME: use key/value pairs
 	lua_newtable(l);
 	for (i = 0; i < MaxCosts; ++i) {
 		lua_pushnumber(l, AiPlayer->Collect[i]);
-		lua_rawseti(l, -1, i + 1);
+		lua_rawseti(l, -2, i + 1);
 	}
 	for (i = 0; i < MaxCosts; ++i) {
 		lua_rawgeti(l, 1, i + 1);
