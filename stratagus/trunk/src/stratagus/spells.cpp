@@ -793,6 +793,11 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 	if (caster->Mana < spell->ManaCost) {
 		return 0;
 	}
+
+	// Check dead units.
+	if (target->Destroyed || target->Orders->Action == UnitActionDie) {
+		return 0;
+	}
 	//
 	//		Casting an unit spell without a target.
 	//
