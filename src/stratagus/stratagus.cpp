@@ -27,6 +27,12 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#ifdef USE_BEOS
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
 #ifdef __CYGWIN__
 #include <getopt.h>
 #endif
@@ -400,6 +406,9 @@ global int mymain(int argc,char** argv)
 global int main(int argc,char** argv)
 #endif
 {
+#ifdef USE_BEOS
+    beos_init( argc, argv );
+#endif
     //
     //	Setup some defaults.
     //
