@@ -960,7 +960,7 @@ local int ParabolicCalc(Missile* missile, int amplitude)
     int thetha;
 
     missile->Xl -= missile->Xstep;
-    missile->X = (missile->Xl +500) / 1000;
+    missile->X = (missile->Xl + 500) / 1000;
 
     xmid = (missile->SourceX + missile->DX) / 2;
     sinu = (missile->X - xmid) * (missile->X - xmid);
