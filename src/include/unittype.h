@@ -656,7 +656,7 @@ extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
 
 extern void UnitTypeCclRegister(void);	/// Register ccl features
 
-extern void UpdateStats(void);		/// Update unit stats
+extern void UpdateStats(int reset_to_default);		/// Update unit stats
 extern void ParsePudUDTA(const char*,int); /// Parse pud udta table
 extern UnitType* UnitTypeByIdent(const char*);	/// Get unit-type by ident
 extern UnitType* UnitTypeByWcNum(unsigned);	/// Get unit-type by wc number
@@ -669,7 +669,7 @@ extern UnitType* NewUnitTypeSlot(char*);/// Allocate an empty unit-type slot
     /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const UnitType* type,int frame,int x,int y);
 
-extern void InitUnitTypes(void);	/// Init unit-type table
+extern void InitUnitTypes(int reset_player_stats);	/// Init unit-type table
 extern void LoadUnitTypes(void);	/// Load the unit-type data
 extern void CleanUnitTypes(void);	/// Cleanup unit-type module
 
