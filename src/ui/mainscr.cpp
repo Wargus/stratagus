@@ -1110,6 +1110,9 @@ local void DrawInfoPanelBackground(unsigned frame)
 global void DrawInfoPanel(void)
 {
     int i;
+    UI *ui;
+
+    ui = &TheUI;
 
     if (NumSelected) {
 	if (NumSelected > 1) {
@@ -1118,7 +1121,8 @@ global void DrawInfoPanel(void)
 	    //
 	    PlayerPixels(ThisPlayer);	// can only be own!
 	    DrawInfoPanelBackground(0);
-            for (i = 0; i < NumSelected; ++i) {
+            for (i = 0; i < (NumSelected > ui->NumSelectedButtons ? 
+		    ui->NumSelectedButtons : NumSelected); ++i) {
 	        DrawUnitIcon(ThisPlayer,
 		    Selected[i]->Type->Icon.Icon,
 		    (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
@@ -1139,6 +1143,11 @@ global void DrawInfoPanel(void)
 			SetStatusLine(Selected[i]->Type->Name);
 		    }
 		}
+	    }
+	    if (NumSelected > ui->NumSelectedButtons) {
+		char buf[4];
+		sprintf(buf, "+%d", NumSelected - TheUI.NumSelectedButtons);
+		VideoDrawText(ui->MaxSelectedTextX, ui->MaxSelectedTextY, GameFont, buf);
 	    }
 	    return;
 	} else {
