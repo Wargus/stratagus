@@ -335,10 +335,6 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
-	if( unit->Type->Vanishes ) {
-	    DebugLevel0Fn("Internal error\n");
-	    abort();
-	}
     );
 
     //
@@ -366,6 +362,7 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 		order->Goal=NoUnitP;
 		order->RangeX=order->RangeY=0;
 	    } else {
+		// Removed, Dying handled by action routine.
 		order->X=order->Y=-1;
 		order->Goal=attack;
 		RefsDebugCheck( !attack->Refs );
