@@ -182,16 +182,14 @@ extern void beos_init( int argc, char **argv );
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
-#if defined(__CYGWIN__)
+#ifdef __CYGWIN__
 #include <getopt.h>
 #endif
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 //#include "etlib/getopt.h"
 extern char* optarg;
 extern int optind;
-#ifndef _WIN32_WCE
 extern int getopt(int argc, char *const*argv, const char *opt);
-#endif
 #endif
 
 #ifdef USE_SDL

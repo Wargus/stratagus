@@ -51,15 +51,6 @@
 
 #define USE_WINSOCK
 
-#if !defined(_MSC_VER) || defined(_WIN32_WCE)
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
-#endif
-#ifndef WINVER
-#define WINVER 0x0400
-#endif
-#endif
-
 #ifdef __MINGW32__
 #define DrawIcon WinDrawIcon
 #define EndMenu WinEndMenu

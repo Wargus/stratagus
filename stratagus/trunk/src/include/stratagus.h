@@ -134,7 +134,6 @@
 #define inline __inline			/// Fix m$ brain damage
 #define alloca _alloca			/// I hope this works with all VC..
 
-#ifndef _WIN32_WCE
 #pragma warning(disable:4244)		// Conversion from double to uchar
 #pragma warning(disable:4761)		// Integral size mismatch
 #define snprintf _snprintf		/// Unix -> dumm
@@ -142,7 +141,6 @@
 #include <string.h>
 #define strdup _strdup
 #define strncasecmp strnicmp
-#endif
 
 
 #ifndef __FUNCTION__
@@ -512,13 +510,6 @@ extern long isqrt(long num);
 /*============================================================================
 ==	Misc
 ============================================================================*/
-
-#if !defined(_MSC_VER) || defined(_WIN32_WCE)
-#ifndef max
-    /// max macro
-#define max(n1,n2)	(((n1)<(n2)) ? (n2) : (n1))
-#endif
-#endif
 
     /// bits macro
 #define BitsOf(n)	(sizeof(n)*8)
