@@ -69,7 +69,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global int OriginalFogOfWar;                /// Use original style fog of war
 global int FogOfWarOpacity;                 /// Fog of war Opacity.
 
 /**

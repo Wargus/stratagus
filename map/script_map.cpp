@@ -386,40 +386,6 @@ local int CclSetMinimapTerrain(lua_State* l)
 }
 
 /**
-**  Original fog of war.
-*/
-local int CclOriginalFogOfWar(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-	OriginalFogOfWar = 1;
-
-	if (!CclInConfigFile) {
-		InitMapFogOfWar();
-	}
-
-	return 0;
-}
-
-/**
-**  Alpha style fog of war.
-*/
-local int CclAlphaFogOfWar(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-	OriginalFogOfWar = 0;
-
-	if (!CclInConfigFile) {
-		InitMapFogOfWar();
-	}
-
-	return 0;
-}
-
-/**
 **  Gray style fog of war brightness.
 */
 local int CclSetFogOfWarOpacity(lua_State* l)
@@ -492,9 +458,6 @@ global void MapCclRegister(void)
 	lua_register(Lua, "SetDefaultMap", CclSetDefaultMap);
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
-
-	lua_register(Lua, "OriginalFogOfWar", CclOriginalFogOfWar);
-	lua_register(Lua, "AlphaFogOfWar", CclAlphaFogOfWar);
 
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 
