@@ -1842,28 +1842,17 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	SCM cb;
-
 	if (PlayingMusic) {
 		MusicOff = 1;
 		StopMusic();
 	} else {
 		MusicOff = 0;
 		if (CallbackMusic) {
-			cb = gh_symbol2scm("music-stopped");
-			if (symbol_boundp(cb, NIL)) {
-				SCM value;
-
-				value = symbol_value(cb, NIL);
-				if (!gh_null_p(value)) {
-					gh_apply(value, NIL);
-				}
-			}
+			lua_pushstring(Lua, "MusicStopped");
+			lua_gettable(Lua, LUA_GLOBALSINDEX);
+			LuaCall(0, 1);
 		}
 	}
-#elif defined(USE_LUA)
-#endif
 #endif // WITH_SOUND
 	SoundOptionsInit(NULL);
 }
