@@ -211,6 +211,7 @@ global void VideoFree(Graphic* graphic)
 		VideoPaletteListRemove(graphic->SurfaceFlip);
 		SDL_FreeSurface(graphic->SurfaceFlip);
 	}
+	free(graphic->Data);
 	free(graphic);
 }
 
@@ -245,6 +246,7 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 	}
 	graphic->Width = width;
 	graphic->Height = height;
+	graphic->Data = data;
 
 	// FIXME: endian
 
