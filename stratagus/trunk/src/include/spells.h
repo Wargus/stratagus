@@ -47,6 +47,7 @@ struct _unit_;
 struct _unit_type_;
 struct _player_;
 struct lua_State;
+struct _spell_type_;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -274,8 +275,6 @@ typedef struct {
 	/// @todo Add stuff here for target preference.
 	/// @todo Heal units with the lowest hit points first.
 } AutoCastInfo;
-
-struct _spell_type_;
 
 /**
 **  Base structure of a spell type.
