@@ -293,7 +293,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION	"1.18pre2"		/// Engine version shown
+#define VERSION	"1.18"		/// Engine version shown
 #endif
 
 #ifndef FreeCraftMajorVerion
