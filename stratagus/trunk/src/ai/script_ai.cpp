@@ -463,6 +463,16 @@ local void InsertResearchRequests(Upgrade* upgrade)
 //----------------------------------------------------------------------------
 
 /**
+**	Get the race of the current AI player.
+*/
+local SCM CclAiGetRace(void)
+{
+    return gh_symbol2scm(AiPlayer->Player->RaceName);
+}
+
+//----------------------------------------------------------------------------
+
+/**
 **	Set debuging flag of AI script.
 */
 local SCM CclAiDebug(SCM flag)
@@ -521,8 +531,12 @@ local SCM CclAiWait(SCM value)
 
     type=CclGetUnitType(value);
     if( !(autt=FindInUnitTypeRequests(type)) ) {
-	DebugLevel0Fn("Broken, waiting on unit-type which wasn't requested.\n");
-	return SCM_BOOL_F;
+	if( AiPlayer->Player->UnitTypesCount[type->Type] ) {
+	    return SCM_BOOL_F;
+	}
+	// FIXME: could happen upgrades-to! return SCM_BOOL_F;
+	DebugLevel0Fn("Broken? waiting on unit-type which wasn't requested.\n");
+	return SCM_BOOL_T;
     }
     // units available?
     DebugLevel3Fn("%d,%d\n"
@@ -743,6 +757,8 @@ global void AiCclRegister(void)
     gh_new_procedureN("define-ai",CclDefineAi);
 
 #if defined(NEW_AI)
+    gh_new_procedure0_0("ai:get-race",CclAiGetRace);
+
     gh_new_procedure1_0("ai:debug",CclAiDebug);
     gh_new_procedure1_0("ai:need",CclAiNeed);
     gh_new_procedure2_0("ai:set",CclAiSet);
