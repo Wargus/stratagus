@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file.
 ##
-##	(c) Copyright 1998-2000 by Lutz Sammer
+##	(c) Copyright 1998-2001 by Lutz Sammer
 ##
 ##	$Id$
 ##
@@ -21,7 +21,7 @@ include $(TOPDIR)/Rules.make
 OBJS=
 
 MODULES= clone map unit action ai ui sound video network pathfinder siod \
-	 game beos
+	 game beos missile
 
 all::
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i all ; done
