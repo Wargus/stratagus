@@ -31,13 +31,13 @@
 //@{
 
 /*
-**		Note:
-**				This functions are doubled. One for the real map tile and one
-**				for the tile that the player sees.
+**  Note:
+**  This functions are doubled. One for the real map tile and one
+**  for the tile that the player sees.
 */
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -51,22 +51,22 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Check if the seen tile-type is rock.
+**  Check if the seen tile-type is rock.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+**  @param x  Map X tile-position.
+**  @param y  Map Y tile-position.
 */
 int MapIsSeenTileRock(int x, int y)
 {
@@ -76,10 +76,10 @@ int MapIsSeenTileRock(int x, int y)
 }
 
 /**
-**		Correct the seen rock field, depending on the surrounding.
+**  Correct the seen rock field, depending on the surrounding.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+**  @param x  Map X tile-position.
+**  @param y  Map Y tile-position.
 */
 void MapFixSeenRockTile(int x, int y)
 {
@@ -164,7 +164,7 @@ void MapFixSeenRockTile(int x, int y)
 	}
 
 	mf = TheMap.Fields + x + y * TheMap.Width;
-	if (tile == -1) {						// No valid rock remove it.
+	if (tile == -1) { // No valid rock remove it.
 		mf->SeenTile = TheMap.Tileset->RemovedRock;
 		MapFixSeenRockNeighbors(x, y);
 	} else if (TheMap.Tileset->MixedLookupTable[mf->SeenTile] ==
@@ -183,46 +183,46 @@ void MapFixSeenRockTile(int x, int y)
 }
 
 /**
-**		Correct the surrounding seen rock fields.
+**  Correct the surrounding seen rock fields.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+**  @param x  Map X tile-position.
+**  @param y  Map Y tile-position.
 */
 void MapFixSeenRockNeighbors(int x, int y)
 {
-	MapFixSeenRockTile(x + 1, y);				// side neighbors
+	MapFixSeenRockTile(x + 1, y);  // side neighbors
 	MapFixSeenRockTile(x - 1, y);
 	MapFixSeenRockTile(x, y + 1);
 	MapFixSeenRockTile(x, y - 1);
-	MapFixSeenRockTile(x + 1, y + 1);				// side neighbors
+	MapFixSeenRockTile(x + 1, y + 1);  // side neighbors
 	MapFixSeenRockTile(x - 1, y + 1);
 	MapFixSeenRockTile(x - 1, y - 1);
 	MapFixSeenRockTile(x + 1, y - 1);
 }
 
 /**
-**		Correct the surrounding real rock fields.
+**  Correct the surrounding real rock fields.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+**  @param x  Map X tile-position.
+**  @param y  Map Y tile-position.
 */
 static void MapFixRockNeighbors(int x, int y)
 {
-	MapFixRockTile(x + 1, y);				// side neighbors
+	MapFixRockTile(x + 1, y);  // side neighbors
 	MapFixRockTile(x - 1, y);
 	MapFixRockTile(x, y + 1);
 	MapFixRockTile(x, y - 1);
-	MapFixRockTile(x + 1, y + 1);				// diagonal neighbors
+	MapFixRockTile(x + 1, y + 1);  // diagonal neighbors
 	MapFixRockTile(x - 1, y + 1);
 	MapFixRockTile(x - 1, y - 1);
 	MapFixRockTile(x + 1, y - 1);
 }
 
 /**
-**		Correct the real rock field, depending on the surrounding.
+**  Correct the real rock field, depending on the surrounding.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+**  @param x  Map X tile-position.
+**  @param y  Map Y tile-position.
 */
 void MapFixRockTile(int x, int y)
 {
@@ -306,7 +306,7 @@ void MapFixRockTile(int x, int y)
 		tile = TheMap.Tileset->RockTable[tile];
 	}
 
-	if (tile == -1) {						// No valid rock remove it.
+	if (tile == -1) {  // No valid rock remove it.
 		MapRemoveRock(x, y);
 		MapFixRockNeighbors(x, y);
 	} else if (TheMap.Tileset->MixedLookupTable[mf->Tile] !=
@@ -323,10 +323,10 @@ void MapFixRockTile(int x, int y)
 }
 
 /**
-**		Remove rock from the map.
+**  Remove rock from the map.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+**  @param x  Map X tile-position.
+**  @param y  Map Y tile-position.
 */
 void MapRemoveRock(unsigned x, unsigned y)
 {
@@ -350,3 +350,5 @@ void MapRemoveRock(unsigned x, unsigned y)
 	MapSplitterTilesCleared(x, y, x, y);
 #endif
 }
+
+//@}
