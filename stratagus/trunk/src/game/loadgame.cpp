@@ -30,6 +30,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "freecraft.h"
 #include "icons.h"
@@ -50,6 +51,7 @@
 #include "actions.h"
 #include "minimap.h"
 #include "commands.h"
+#include "sound_server.h"
 #ifdef HIERARCHIC_PATHFINDER
 #include "pathfinder.h"
 #endif
@@ -147,6 +149,8 @@ global void InitModules(void)
 */
 global void LoadModules(void)
 {
+    char *s;
+
     LoadIcons();
     LoadCursors(ThisPlayer->RaceName);
     LoadUserInterface();
@@ -158,8 +162,25 @@ global void LoadModules(void)
 
     LoadUnitSounds();
     MapUnitSounds();
+#ifdef WITH_SOUND
+    if (SoundFildes!=-1) {
+	//FIXME: must be done after map is loaded
+	if ( InitSoundServer() ) {
+	    SoundOff=1;
+	    SoundFildes=-1;
+	} else {
+	    // must be done after sounds are loaded
+	    InitSoundClient();
+	}
+    }
+#endif
 
     LoadTileset();
+    LoadRGB(GlobalPalette,
+	    s=strdcat3(FreeCraftLibPath,"/graphics/",
+		TheMap.Tileset->PaletteFile));
+    free(s);
+    VideoCreatePalette(GlobalPalette);
     CreateMinimap();
 
     // LoadButtons();
