@@ -42,12 +42,16 @@ typedef struct _player_ Player;		// recursive includes :(
 --	Functions
 ----------------------------------------------------------------------------*/
 
-    /// init upgrade/allow structures
-extern void InitUpgrades(void);
      /// upgrade of identifier
 extern Upgrade* UpgradeByIdent(const char*);
+
+    /// init upgrade/allow structures
+extern void InitUpgrades(void);
     /// save the upgrades
 extern void SaveUpgrades(FILE*);
+    /// cleanup upgrade module
+extern void CleanUpgrades();
+
     /// parse pud alow (upgrade/spell/units allow) table
 extern void ParsePudALOW(const char*,int);
     /// parse pud ugrd (upgrade cost) table
@@ -96,34 +100,6 @@ extern void UpgradesCclRegister(void);
 /*----------------------------------------------------------------------------
 --	Init/Done/Add functions
 ----------------------------------------------------------------------------*/
-
-//extern void UpgradesDone(void);	/// free upgrade/allow structures
-
-    /// Add an new upgrade
-//extern Upgrade* AddUpgrade(const char*,const char*,int,int,int,int);
-
-// returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
-/*extern int AddUpgradeModifier( int aUid,
-
-  int aattack_range,
-  int asight_range,
-  int abasic_damage,
-  int apiercing_damage,
-  int aarmor,
-  int aspeed,
-  int ahit_points,
-
-  int* acosts,
-
-  // following are comma separated list of required string id's
-
-  const char* aaf_units,    // "A:UnitMage,F:UnitGrunt" -- allow mages, forbid grunts
-  const char* aaf_actions,  // "A:PeonAttack"
-  const char* aaf_upgrades, // "F:UpgradeShield1"
-  const char* aapply_to	    // "UnitPeon,UnitPeasant"
-
-  );
-*/
 
 // this function is used for define `simple' upgrades
 // with only one modifier

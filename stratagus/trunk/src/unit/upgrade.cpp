@@ -58,7 +58,15 @@ local UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
     /// Upgrades modifiers used
 local int UpgradeModifiersCount;
 
-local hashtable(int,61) UpgradeHash;	/// lookup table for upgrade names
+#ifdef DOXYGEN				// no real code, only for document
+
+local Upgrade* UpgradeHash[61];		/// lookup table for upgrade names
+
+#else
+
+local hashtable(Upgrade*,61) UpgradeHash;/// lookup table for upgrade names
+
+#endif
 
 local int AllowDone;			/// allow already setup.
 
@@ -348,7 +356,7 @@ local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
 
     //	Fill upgrade structure
 
-    if( (tmp=(Upgrade**)hash_find(UpgradeHash,(char*)ident)) ) {
+    if( (tmp=(Upgrade**)hash_find(UpgradeHash,(char*)ident)) && *tmp ) {
 	// FIXME: memory loose!
 	DebugLevel0Fn("Already defined upgrade `%s'\n",ident);
 	upgrade=*tmp;
@@ -468,6 +476,36 @@ global void InitUpgrades(void)
     for( i=0; i<UpgradesCount; ++i ) {
 	Upgrades[i].Icon.Icon=IconByIdent(Upgrades[i].Icon.Name);
     }
+}
+
+/**
+**	Cleanup the upgrade module.
+*/
+global void CleanUpgrades(void)
+{
+    int i;
+
+    DebugLevel0Fn("FIXME: not complete written\n");
+
+    //
+    //	Free the upgrades.
+    //
+    for( i=0; i<UpgradesCount; ++i ) {
+	// FIXME: hash_del not supported
+	*(Upgrade**)hash_add(UpgradeHash,Upgrades[i].Ident)=NULL;
+	free(Upgrades[i].Ident);
+	free(Upgrades[i].Icon.Name);
+    }
+    UpgradesCount=0;
+
+    //
+    //	Free the upgrade modifiers.
+    //
+    for( i=0; i<UpgradeModifiersCount; ++i ) {
+	free(UpgradeModifiers[i]);
+    }
+
+    UpgradeModifiersCount = 0;
 }
 
 /**
@@ -879,7 +917,7 @@ global void SaveUpgrades(FILE* file)
 	for( j=0; j<MaxCosts; ++j ) {
 	    if( UpgradeModifiers[i]->Modifier.Costs[j] ) {
 		fprintf(file,"\n  '(%s-cost %d)"
-			,DEFAULT_NAMES[j],UpgradeModifiers[i]->Modifier.Costs[j]);
+		    ,DEFAULT_NAMES[j],UpgradeModifiers[i]->Modifier.Costs[j]);
 	    }
 	}
 
@@ -1265,20 +1303,6 @@ global void UpgradesCclRegister(void)
 /*----------------------------------------------------------------------------
 --	Init/Done/Add functions
 ----------------------------------------------------------------------------*/
-
-#if 0
-void UpgradesDone(void) // free upgrade/allow structures
-{
-  int i;
-
-  memset( &Upgrades, 0, sizeof(Upgrades) );
-  UpgradesCount = 0;
-
-  for ( i = 0; i < UpgradeModifiersCount; i++ )
-    free( UpgradeModifiers[i] );
-  UpgradeModifiersCount = 0;
-}
-#endif
 
 // returns upgrade modifier id or -1 for error ( actually this id is useless, just error checking )
 local int AddUpgradeModifierBase(int uid,int attack_range,int sight_range,
