@@ -607,6 +607,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     if( ShowManaBar ) {
 	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==255) ) {
 	    DrawManaBar(x,y,type,255,unit->Mana);
+	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
+	    DrawManaBar(x,y,type,655350,unit->Value);
 	}
 	//
 	//	Show working of units.
@@ -665,9 +667,10 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Mana dot on right side of unit.
     //
     if( ShowManaDot ) {
-	if( type->CanCastSpell
-		&& !(ShowNoFull && unit->Mana==255) ) {
+	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==255) ) {
 	    DrawManaSprite(x,y,type,255,unit->Mana);
+	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
+	    DrawManaSprite(x,y,type,655350,unit->Value);
 	}
 	//
 	//	Show working of units.
