@@ -1174,6 +1174,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			if (TheMap.Info->PlayerType[CursorPlayer] != PlayerNobody) {
 				SelectedPlayer = CursorPlayer;
 				ThisPlayer = Players + SelectedPlayer;
+				MustRedraw |= RedrawMinimap;
 			}
 			return;
 		}
