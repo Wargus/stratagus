@@ -54,16 +54,16 @@ global void HandleActionReturnGoods(Unit* unit)
     //	Select target to return goods. FIXME: more races support
     //
     if( type==UnitTypeHumanWorkerWithGold || type==UnitTypeOrcWorkerWithGold ) {
-	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
-	    // No deposit -> can't return
-	    unit->Orders[0].Action=UnitActionStill;
-	    return;
+	if( !unit->Orders[0].Goal ) {
+	    if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
+		// No deposit -> can't return
+		unit->Orders[0].Action=UnitActionStill;
+		return;
+	    }
+	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
+	    ++destu->Refs;
 	}
-	unit->Orders[0].Goal=destu;
-	RefsDebugCheck( !destu->Refs );
-	++destu->Refs;
-	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	unit->Orders[0].Action=UnitActionMineGold;
 	NewResetPath(unit);
 	unit->SubAction=65;	// FIXME: hardcoded
@@ -73,15 +73,16 @@ global void HandleActionReturnGoods(Unit* unit)
     }
 
     if( type==UnitTypeHumanWorkerWithWood || type==UnitTypeOrcWorkerWithWood ) {
-	if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
-	    // No deposit -> can't return
-	    unit->Orders[0].Action=UnitActionStill;
-	    return;
+	if( !unit->Orders[0].Goal ) {
+	    if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
+		// No deposit -> can't return
+		unit->Orders[0].Action=UnitActionStill;
+		return;
+	    }
+	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
+	    ++destu->Refs;
 	}
-	unit->Orders[0].Goal=destu;
-	RefsDebugCheck( !destu->Refs );
-	++destu->Refs;
-	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	unit->Orders[0].X=unit->X;
 	unit->Orders[0].Y=unit->Y;	// Return point to continue.
 	DebugLevel3("Return to %Zd=%d,%d\n"
@@ -95,16 +96,16 @@ global void HandleActionReturnGoods(Unit* unit)
     }
 
     if( type==UnitTypeHumanTankerFull || type==UnitTypeOrcTankerFull ) {
-	if( !(destu=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
-	    // No deposit -> can't return
-	    unit->Orders[0].Action=UnitActionStill;
-	    return;
+	if( !unit->Orders[0].Goal ) {
+	    if( !(destu=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
+		// No deposit -> can't return
+		unit->Orders[0].Action=UnitActionStill;
+		return;
+	    }
+	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
+	    ++destu->Refs;
 	}
-	unit->Orders[0].Goal=destu;
-	RefsDebugCheck( !destu->Refs );
-	++destu->Refs;
-	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	DebugLevel3("Return to %Zd=%d,%d\n"
 	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHaulOil;

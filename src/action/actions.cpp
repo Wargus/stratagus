@@ -76,6 +76,12 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
     unit->IX+=animation[state].Pixel;
     unit->IY+=animation[state].Pixel;
     unit->Wait=animation[state].Sleep;
+    if( unit->Slow ) {			// unit is slowed down
+	unit->Wait<<=1;
+    }
+    if( unit->Haste && unit->Wait>1 ) {	// unit is accelerated
+	unit->Wait>>=1;
+    }
 
     // Anything changed the display?
     if( (animation[state].Frame || animation[state].Pixel) ) {
@@ -331,7 +337,7 @@ global void UnitActions(void)
 	unit=*table;
 
 #if defined(UNIT_ON_MAP) && 0		// debug unit store
-	Unit* list;
+	 { const Unit* list;
 
 	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
 	while( list ) {				// find the unit
@@ -343,7 +349,7 @@ global void UnitActions(void)
 	if( !unit->Removed ) {
 	    if( !list
 		    && (!unit->Type->Vanishes
-			&& !unit->Command.Action==UnitActionDie) ) {
+			&& !unit->Orders[0].Action==UnitActionDie) ) {
 		DebugLevel0Fn("!removed not on map %Zd\n",UnitNumber(unit));
 		abort();
 	    }
@@ -359,13 +365,15 @@ global void UnitActions(void)
 		abort();
 	    }
 	    list=list->Next;
-	}
+	} }
 #endif
+
 	if( --unit->Wait ) {		// Wait until counter reached
 	    continue;
 	}
 	HandleUnitAction(unit);
 	DebugCheck( *table!=unit );	// Removed is evil.
+
 #ifdef no_DEBUG
 	//
 	//	Dump the unit to find the network unsyncron bug.
