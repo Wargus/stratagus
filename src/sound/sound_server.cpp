@@ -1528,8 +1528,10 @@ global void QuitSound(void)
 #endif
 
 #ifdef USE_SDLCD
-    SDL_CDStop(CDRom);
-    SDL_CDClose(CDRom);
+    if (strcmp(CDMode,":off")) {
+	SDL_CDStop(CDRom);
+        SDL_CDClose(CDRom);
+    }
 #endif
 
 #ifdef USE_LIBCDA
