@@ -93,7 +93,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     //
     //	Frame, unit, (type-ident only for better readable.
     //
-    fprintf(logf,"(log %d 'U%Zd '%s '%s '%s",
+    fprintf(logf,"(log %d 'U%d '%s '%s '%s",
 	    FrameCounter,UnitNumber(unit),unit->Type->Ident,name,
 	    flag ? "flush" : "append");
 
@@ -107,7 +107,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     //	Destination given.
     //
     if( dest ) {
-	fprintf(logf," 'U%Zd",UnitNumber(dest));
+	fprintf(logf," 'U%d",UnitNumber(dest));
     }
     //
     //	Value given.
@@ -594,7 +594,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
     //	Check if unit is already killed?
     //
     if( unit->Destroyed ) {
-	DebugLevel0Fn(" destroyed unit skipping %Zd\n",UnitNumber(unit));
+	DebugLevel0Fn(" destroyed unit skipping %d\n",UnitNumber(unit));
 	return;
     }
 

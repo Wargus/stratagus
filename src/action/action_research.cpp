@@ -48,7 +48,7 @@ global void HandleActionResearch(Unit* unit)
 {
     Upgrade* upgrade;
 
-    DebugLevel3("Research %Zd\n",UnitNumber(unit));
+    DebugLevel3("Research %d\n",UnitNumber(unit));
 
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;

@@ -1180,7 +1180,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 	}
     );
 
-    DebugLevel3Fn(": %Zd spell-casts on %Zd\n"
+    DebugLevel3Fn(": %d spell-casts on %d\n"
 	,UnitNumber(unit),dest ? UnitNumber(dest) : 0);
 
     //

@@ -315,7 +315,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     static int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
 
-    DebugLevel3Fn("%Zd %d,%d->%d,%d\n",
+    DebugLevel3Fn("%d %d,%d->%d,%d\n",
 	    UnitNumber(unit),
 	    unit->X,unit->Y,
 	    unit->Command.Data.Move.DX,unit->Command.Data.Move.DY);
@@ -415,7 +415,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    //
 	    //	Select a "good" point from the open set.
 	    //		Nearest point to goal.
-	    DebugLevel0Fn("%Zd way too long\n",UnitNumber(unit));
+	    DebugLevel0Fn("%d way too long\n",UnitNumber(unit));
 	    ex=best_x;
 	    ey=best_y;
 	}
@@ -489,11 +489,11 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    ex=best_x;
 	    ey=best_y;
 	    if(ex==unit->X && ey==unit->Y) {
-		DebugLevel3Fn("%Zd unreachable\n",UnitNumber(unit));
+		DebugLevel3Fn("%d unreachable\n",UnitNumber(unit));
 		AStarCleanUp(num_in_close);
 		return -2;
 	    }
-	    DebugLevel3Fn("%Zd unreachable: going to closest\n",UnitNumber(unit));
+	    DebugLevel3Fn("%d unreachable: going to closest\n",UnitNumber(unit));
 	    break;
 	}
     }
@@ -525,7 +525,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	if(j==AStarMovingUnitCrossingCost) {
 	    // we should wait, we are blocked by a moving unit
 	    //FIXME: this might lead to a deadlock, or something similar
-	    DebugLevel3("Unit %Zd waiting. Proposed move: %d %d\n",
+	    DebugLevel3("Unit %d waiting. Proposed move: %d %d\n",
 			UnitNumber(unit),*pxd,*pyd);
 	    path_length=0;
 	} else {
@@ -538,7 +538,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     }
     // let's clean up the matrix now
     AStarCleanUp(num_in_close);
-    DebugLevel3Fn("%Zd\n",UnitNumber(unit));
+    DebugLevel3Fn("%d\n",UnitNumber(unit));
     DebugLevel3Fn("proposed move: %d %d (%d)\n",*pxd,*pyd,path_length);
     return path_length;
 }

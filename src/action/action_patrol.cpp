@@ -79,7 +79,7 @@ global void HandleActionPatrol(Unit* unit)
 	    if( goal ) {
 		Order order;
 
-		DebugLevel3("Patrol attack %Zd\n",UnitNumber(goal));
+		DebugLevel3("Patrol attack %d\n",UnitNumber(goal));
 		order=unit->Orders[0];
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		// Save current command to come back.

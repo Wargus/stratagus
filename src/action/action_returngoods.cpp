@@ -85,7 +85,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	unit->Orders[0].X=unit->X;
 	unit->Orders[0].Y=unit->Y;	// Return point to continue.
-	DebugLevel3("Return to %Zd=%d,%d\n"
+	DebugLevel3("Return to %d=%d,%d\n"
 		,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHarvest;
 	NewResetPath(unit);
@@ -106,7 +106,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	    RefsDebugCheck( !destu->Refs );
 	    ++destu->Refs;
 	}
-	DebugLevel3("Return to %Zd=%d,%d\n"
+	DebugLevel3("Return to %d=%d,%d\n"
 	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHaulOil;
 	NewResetPath(unit);

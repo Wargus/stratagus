@@ -345,7 +345,7 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     unsigned char* matrix;
     int depth;
 
-    DebugLevel3Fn("%Zd(%d,%d,%s)->%Zd(%d,%d,%s) "
+    DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s) "
 	,UnitNumber(src),src->X,src->Y,src->Type->Ident
 	,UnitNumber(dst),dst->X,dst->Y,dst->Type->Ident);
 
@@ -596,7 +596,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     int add;
     int unreachable;
 
-    DebugLevel3Fn("%s(%Zd) to %Zd=%d,%d+%d+%d\n"
+    DebugLevel3Fn("%s(%d) to %d=%d,%d+%d+%d\n"
 	    ,unit->Type->Ident,UnitNumber(unit)
 	    ,unit->Command.Data.Move.Goal
 		? UnitNumber(unit->Command.Data.Move.Goal) : 0
@@ -708,7 +708,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 		    }
 		    goal=UnitCacheOnXY(x,y,unit->Type->UnitType);
 		    if( !goal ) {	// Should not happen.
-			DebugLevel0Fn("%Zd %s: No goal for %d,%d on %d,%d?\n",
+			DebugLevel0Fn("%d %s: No goal for %d,%d on %d,%d?\n",
 				UnitNumber(unit),unit->Type->Ident,
 				unit->X,unit->Y,x,y);
 			*m=99;
@@ -856,7 +856,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     rx=unit->Orders[0].RangeX;
     ry=unit->Orders[0].RangeY;
 
-    DebugLevel3Fn("%Zd: -> %s %p | %dx%d+%d+%d\n"
+    DebugLevel3Fn("%d: -> %s %p | %dx%d+%d+%d\n"
 	,UnitNumber(unit),unit->Command.Data.Move.Fast ? "F" : "C"
 	,goal,gx,gy,rx,ry);
 

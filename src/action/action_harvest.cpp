@@ -303,7 +303,7 @@ local int ReturnWithWood(Unit* unit)
 
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another depot, or retry later.
-	DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+	DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %d=%d,%d ? %d\n"
 		  ,UnitNumber(destu),destu->X,destu->Y
 		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
 	unit->Orders[0].Action=UnitActionStill;

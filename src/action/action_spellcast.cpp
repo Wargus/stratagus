@@ -127,7 +127,7 @@ global void HandleActionSpellCast(Unit * unit)
 
     repeat = 0;			// repeat spell on next pass? (defaults to `no')
 
-    DebugLevel3Fn("%Zd %d,%d+%d+%d\n",
+    DebugLevel3Fn("%d %d,%d+%d+%d\n",
 	UnitNumber(unit),unit->Orders[0].X,unit->Orders[0].Y,
 	unit->Orders[0].RangeX,unit->Orders[0].RangeY);
 

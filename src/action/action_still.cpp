@@ -49,7 +49,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
     Unit* temp;
     Unit* goal;
 
-    DebugLevel3Fn(" %Zd\n",UnitNumber(unit));
+    DebugLevel3Fn(" %d\n",UnitNumber(unit));
 
     if( unit->Removed ) {		// Removed units, do nothing?
 	// If peon is in building or unit is in transporter it is removed.
@@ -151,7 +151,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    if( (goal=AttackUnitsInReactRange(unit)) ) {
 		// Weak goal, can choose other unit, come back after attack
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
-		DebugLevel3Fn(" %Zd Attacking in range %d\n"
+		DebugLevel3Fn(" %d Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
 		DebugCheck( unit->SavedOrder.Action!=UnitActionStill );
 		DebugCheck( unit->SavedOrder.Goal );
@@ -162,13 +162,13 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->SavedOrder.Goal=NoUnitP;
 	    }
 	} else if( (goal=AttackUnitsInRange(unit)) ) {
-	    DebugLevel3Fn(" %Zd #%d\n",UnitNumber(goal),goal->Refs);
+	    DebugLevel3Fn(" %d #%d\n",UnitNumber(goal),goal->Refs);
 	    //
 	    //	Old goal destroyed.
 	    //
 	    temp=unit->Orders[0].Goal;
 	    if( temp && temp->Destroyed ) {
-		DebugLevel3Fn(" destroyed unit %Zd #%d\n"
+		DebugLevel3Fn(" destroyed unit %d #%d\n"
 			,UnitNumber(temp),temp->Refs);
 		RefsDebugCheck( !temp->Refs );
 		if( !--temp->Refs ) {
@@ -179,7 +179,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    if( !unit->SubAction || temp!=goal ) {
 		// New target.
 		if( temp ) {
-		    DebugLevel3Fn(" old unit %Zd #%d\n"
+		    DebugLevel3Fn(" old unit %d #%d\n"
 			    ,UnitNumber(temp),temp->Refs);
 		    RefsDebugCheck( !temp->Refs );
 		    temp->Refs--;

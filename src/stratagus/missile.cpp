@@ -789,7 +789,7 @@ global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
 {
     Missile* missile;
 
-    DebugLevel3Fn("type %Zd(%s) at %d,%d to %d,%d\n"
+    DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n"
 	    ,type-MissileTypes,type->Ident,sx,sy,dx,dy);
 
     //

@@ -113,7 +113,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 local void HandleActionNone(Unit* unit)
 {
     DebugLevel1Fn("FIXME: Should not happen!\n");
-    DebugLevel1Fn("FIXME: Unit (%Zd) %s has action none.!\n",
+    DebugLevel1Fn("FIXME: Unit (%d) %s has action none.!\n",
 	    UnitNumber(unit),unit->Type->Ident);
 }
 
@@ -125,7 +125,7 @@ local void HandleActionNone(Unit* unit)
 local void HandleActionNotWritten(Unit* unit)
 {
     DebugLevel1Fn("FIXME: Not written!\n");
-    DebugLevel1Fn("FIXME: Unit (%Zd) %s has action %d.!\n",
+    DebugLevel1Fn("FIXME: Unit (%d) %s has action %d.!\n",
 	    UnitNumber(unit),unit->Type->Ident,unit->Orders[0].Action);
 }
 
@@ -350,17 +350,17 @@ global void UnitActions(void)
 	    if( !list
 		    && (!unit->Type->Vanishes
 			&& !unit->Orders[0].Action==UnitActionDie) ) {
-		DebugLevel0Fn("!removed not on map %Zd\n",UnitNumber(unit));
+		DebugLevel0Fn("!removed not on map %d\n",UnitNumber(unit));
 		abort();
 	    }
 	} else if( list ) {
-	    DebugLevel0Fn("remove on map %Zd\n",UnitNumber(unit));
+	    DebugLevel0Fn("remove on map %d\n",UnitNumber(unit));
 	    abort();
 	}
 	list=unit->Next;
 	while( list ) {
 	    if( list->X!=unit->X || list->Y!=unit->Y ) {
-		DebugLevel0Fn("Wrong X,Y %Zd %d,%d\n",UnitNumber(list)
+		DebugLevel0Fn("Wrong X,Y %d %d,%d\n",UnitNumber(list)
 			,list->X,list->Y);
 		abort();
 	    }
@@ -398,7 +398,7 @@ global void UnitActions(void)
 	}
 
 	fprintf(logf,"%d: ",FrameCounter);
-	fprintf(logf,"%Zd %s S%d/%d-%d P%d Refs %d\n",
+	fprintf(logf,"%d %s S%d/%d-%d P%d Refs %d\n",
 	    UnitNumber(unit),unit->Type ? unit->Type->Ident : "unit-killed",
 		unit->State,unit->SubAction,
 		unit->Orders[0].Action,

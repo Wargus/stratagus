@@ -110,7 +110,7 @@ global void FreeUnitMemory(Unit* unit)
 */
 global void ReleaseUnit(Unit* unit)
 {
-    DebugLevel2Fn("%d:Unit %p %Zd `%s'\n",FrameCounter,
+    DebugLevel2Fn("%d:Unit %p %d `%s'\n",FrameCounter,
 	    unit,UnitNumber(unit),unit->Type->Ident);
 
     DebugCheck( !unit->Type );		// already free.
@@ -146,7 +146,7 @@ global void ReleaseUnit(Unit* unit)
 	unit->Destroyed=1;		// mark as destroyed
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
-	    DebugLevel2Fn("%d:More references of %Zd #%d\n",FrameCounter
+	    DebugLevel2Fn("%d:More references of %d #%d\n",FrameCounter
 		    ,UnitNumber(unit),unit->Refs);
 	    return;
 	}
@@ -176,7 +176,7 @@ global void ReleaseUnit(Unit* unit)
     ReleasedTail=&unit->Next;
     unit->Refs=FrameCounter+NetworkMaxLag;	// could be reuse after this.
     IfDebug(
-	DebugLevel2Fn("%d:No more references %Zd\n",
+	DebugLevel2Fn("%d:No more references %d\n",
 		FrameCounter,UnitNumber(unit));
 	unit->Type=NULL;			// for debugging.
     );
@@ -195,7 +195,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     Unit* unit;
     Unit** slot;
 
-    DebugLevel3Fn("%s(%Zd)\n",type->Name,player-Players);
+    DebugLevel3Fn("%s(%d)\n",type->Name,player-Players);
 
     //
     //	Can use released unit?
@@ -240,7 +240,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	player->UnitTypesCount[type->Type]++;
     }
 
-    DebugLevel3Fn("%p %Zd\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("%p %d\n",unit,UnitNumber(unit));
 
     //
     //	Initialise unit structure (must be zero filled!)
@@ -458,7 +458,7 @@ global void RemoveUnit(Unit* unit)
 	}
     }
 
-    DebugLevel3Fn("%Zd %p %p\n",UnitNumber(unit),unit,unit->Next);
+    DebugLevel3Fn("%d %p %p\n",UnitNumber(unit),unit,unit->Next);
     UnitCacheRemove(unit);
 #ifdef UNIT_ON_MAP
     if( 0 ) {
@@ -467,7 +467,7 @@ global void RemoveUnit(Unit* unit)
 	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
 	while( list ) {				// find the unit
 	    if( list==unit ) {
-		DebugLevel0Fn("%Zd\n",UnitNumber(unit));
+		DebugLevel0Fn("%d\n",UnitNumber(unit));
 		abort();
 		break;
 	    }
@@ -551,7 +551,7 @@ global void UnitLost(const Unit* unit)
 	}
     }
 
-    DebugLevel3Fn("Lost %s(%Zd)\n",unit->Type->Ident,UnitNumber(unit));
+    DebugLevel3Fn("Lost %s(%d)\n",unit->Type->Ident,UnitNumber(unit));
 
     //
     //	Destroy oil-platform, must re-make oil patch.
@@ -582,7 +582,7 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
     const UnitType* type;
     Player* player;
 
-    DebugLevel3Fn("unit %Zd (%d)\n"
+    DebugLevel3Fn("unit %d (%d)\n"
 	    ,UnitNumber(unit),unit->Type->Type);
 
     player=unit->Player;
@@ -1175,7 +1175,7 @@ global void RescueUnits(void)
 	    memcpy(table,p->Units,l*sizeof(Unit*));
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
-		DebugLevel3("Checking %Zd\n",UnitNumber(unit));
+		DebugLevel3("Checking %d\n",UnitNumber(unit));
 #ifdef UNIT_ON_MAP
 		// FIXME: could be done faster?
 #endif
@@ -1461,7 +1461,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int bestd;
     int mask;
 
-    DebugLevel3Fn("%Zd\n",UnitNumber(unit));
+    DebugLevel3Fn("%d\n",UnitNumber(unit));
     DebugCheck( !unit->Removed );
 
     x=unit->X;
@@ -1834,7 +1834,7 @@ global Unit* FindGoldMine(const Unit* source,int x,int y)
 	    best=unit;
 	}
     }
-    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 
@@ -1880,7 +1880,7 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	    best=unit;
 	}
     }
-    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 
@@ -1922,7 +1922,7 @@ global Unit* FindWoodDeposit(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 
@@ -1945,7 +1945,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
     int bestd;
     Unit* destu;
 
-    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(unit),unit->X,unit->Y);
+    DebugLevel3Fn("%d %d,%d\n",UnitNumber(unit),unit->X,unit->Y);
 
     x=unit->X;
     y=unit->Y;
@@ -2071,7 +2071,7 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 
@@ -2118,7 +2118,7 @@ global Unit* FindOilDeposit(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 

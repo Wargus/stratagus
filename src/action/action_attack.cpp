@@ -115,7 +115,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 	    unit->Orders[0].Y=goal->Y+goal->Type->TileHeight/2;
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 
-	    DebugLevel0Fn("destroyed unit %Zd\n",UnitNumber(goal));
+	    DebugLevel0Fn("destroyed unit %d\n",UnitNumber(goal));
 	    RefsDebugCheck( !goal->Refs );
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
@@ -243,7 +243,7 @@ local void MoveToTarget(Unit* unit)
 		unit->Orders[0].X=unit->Orders[0].Y=-1;
 		unit->SubAction|=WEAK_TARGET;		// weak target
 		NewResetPath(unit);
-		DebugLevel3Fn("%Zd in react range %Zd\n"
+		DebugLevel3Fn("%d in react range %d\n"
 			,UnitNumber(unit),UnitNumber(goal));
 	    }
 
@@ -262,7 +262,7 @@ local void MoveToTarget(Unit* unit)
 		    // Save current command to come back.
 		    unit->SavedOrder=unit->Orders[0];
 		    if( (goal=unit->SavedOrder.Goal) ) {
-			DebugLevel0Fn("Have goal to come back %Zd\n",
+			DebugLevel0Fn("Have goal to come back %d\n",
 				UnitNumber(goal));
 			unit->SavedOrder.X=goal->X+goal->Type->TileWidth/2;
 			unit->SavedOrder.Y=goal->Y+goal->Type->TileHeight/2;
@@ -407,7 +407,7 @@ local void AttackTarget(Unit* unit)
 	    if( unit->SavedOrder.Action==UnitActionStill ) {
 		unit->SavedOrder=unit->Orders[0];
 		if( (temp=unit->SavedOrder.Goal) ) {
-		    DebugLevel0Fn("Have unit to come back %Zd?\n",
+		    DebugLevel0Fn("Have unit to come back %d?\n",
 			    UnitNumber(temp));
 		    unit->SavedOrder.X=temp->X+temp->Type->TileWidth/2;
 		    unit->SavedOrder.Y=temp->Y+temp->Type->TileHeight/2;
@@ -418,7 +418,7 @@ local void AttackTarget(Unit* unit)
 
 	    RefsDebugCheck( goal->Destroyed || !goal->Refs );
 	    goal->Refs++;
-	    DebugLevel3Fn("%Zd Unit in react range %Zd\n"
+	    DebugLevel3Fn("%d Unit in react range %d\n"
 		    ,UnitNumber(unit),UnitNumber(goal));
 	    unit->Orders[0].Goal=goal;
 	    unit->Orders[0].X=unit->Orders[0].Y=-1;
@@ -443,7 +443,7 @@ local void AttackTarget(Unit* unit)
 		    // Save current order to come back or to continue it.
 		    unit->SavedOrder=unit->Orders[0];
 		    if( (goal=unit->SavedOrder.Goal) ) {
-			DebugLevel0Fn("Have goal to come back %Zd\n",
+			DebugLevel0Fn("Have goal to come back %d\n",
 				UnitNumber(goal));
 			unit->SavedOrder.X=goal->X+goal->Type->TileWidth/2;
 			unit->SavedOrder.Y=goal->Y+goal->Type->TileHeight/2;
@@ -466,7 +466,7 @@ local void AttackTarget(Unit* unit)
 		// Save current order to come back or to continue it.
 		unit->SavedOrder=unit->Orders[0];
 		if( (temp=unit->SavedOrder.Goal) ) {
-		    DebugLevel0Fn("Have goal to come back %Zd\n",
+		    DebugLevel0Fn("Have goal to come back %d\n",
 			    UnitNumber(temp));
 		    unit->SavedOrder.X=temp->X+temp->Type->TileWidth/2;
 		    unit->SavedOrder.Y=temp->Y+temp->Type->TileHeight/2;
@@ -508,7 +508,7 @@ local void AttackTarget(Unit* unit)
 */
 global void HandleActionAttack(Unit* unit)
 {
-    DebugLevel3Fn("Attack %Zd\n",UnitNumber(unit));
+    DebugLevel3Fn("Attack %d\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	//
