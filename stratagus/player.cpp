@@ -346,8 +346,6 @@ global void SavePlayers(CLFile* file)
 		// NumBuildings done by load units.
 
 		CLprintf(file, " \"supply\", %d,", Players[i].Supply);
-		CLprintf(file, " \"demand\", %d,", Players[i].Demand);
-
 		CLprintf(file, " \"unit-limit\", %d,", Players[i].UnitLimit);
 		CLprintf(file, " \"building-limit\", %d,", Players[i].BuildingLimit);
 		CLprintf(file, " \"total-unit-limit\", %d,", Players[i].TotalUnitLimit);
