@@ -151,7 +151,11 @@ local void UiCenterOnGroup(unsigned group)
 	    x+=(units[n]->X-x)/2;
 	    y+=(units[n]->Y-y)/2;
 	}
+#ifdef SPLIT_SCREEN_SUPPORT
+	MapCenterViewport (TheUI.LastClickedVP, x,y);
+#else /* SPLIT_SCREEN_SUPPORT */
 	MapCenter(x,y);
+#endif /* SPLIT_SCREEN_SUPPORT */
     }
 }
 
@@ -499,7 +503,11 @@ local void UiCenterOnSelected(void)
 	    x+=(Selected[n]->X-x)/2;
 	    y+=(Selected[n]->Y-y)/2;
 	}
+#ifdef SPLIT_SCREEN_SUPPORT
+	MapCenterViewport (TheUI.LastClickedVP, x,y);
+#else /* SPLIT_SCREEN_SUPPORT */
 	MapCenter(x,y);
+#endif /* SPLIT_SCREEN_SUPPORT */
     }
 }
 
@@ -510,8 +518,14 @@ local void UiCenterOnSelected(void)
 */
 local void UiSaveMapPosition(unsigned position)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *vp = &TheUI.VP[TheUI.LastClickedVP];
+    SavedMapPositionX[position] = vp->MapX;
+    SavedMapPositionY[position] = vp->MapY;
+#else /* SPLIT_SCREEN_SUPPORT */
     SavedMapPositionX[position]=MapX;
     SavedMapPositionY[position]=MapY;
+#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -521,7 +535,13 @@ local void UiSaveMapPosition(unsigned position)
 */
 local void UiRecallMapPosition(unsigned position)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    MapViewportSetViewpoint (TheUI.LastClickedVP,
+		SavedMapPositionX[position],
+		SavedMapPositionY[position]);
+#else /* SPLIT_SCREEN_SUPPORT */
     MapSetViewpoint(SavedMapPositionX[position],SavedMapPositionY[position]);
+#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -555,7 +575,11 @@ local void UiFindIdleWorker(void)
 	CurrentButtonLevel=0;
 	UpdateButtonPanel();
 	PlayUnitSound(Selected[0],VoiceSelected);
+#ifdef SPLIT_SCREEN_SUPPORT
+	MapCenterViewport (TheUI.LastClickedVP,  unit->X, unit->Y);
+#else /* SPLIT_SCREEN_SUPPORT */
 	MapCenter(unit->X,unit->Y);
+#endif /* SPLIT_SCREEN_SUPPORT */
     }
 }
 

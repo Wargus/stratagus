@@ -68,7 +68,11 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "tileset.h"
+#ifdef SPLIT_SCREEN_SUPPORT
+#include "ui.h"
+#else /* SPLIT_SCREEN_SUPPORT */
 #include "map.h"
+#endif /* SPLIT_SCREEN_SUPPORT */
 #include "iolib.h"
 
 #include "sound_server.h"
@@ -1183,11 +1187,21 @@ global int InitSound(void)
 */
 global int InitSoundServer(void)
 {
+#ifdef SPLIT_SCREEN_SUPPORT
+    int MapWidth = (TheUI.MapArea.EndX-TheUI.MapArea.X +TileSizeX) / TileSizeX;
+    int MapHeight = (TheUI.MapArea.EndY-TheUI.MapArea.Y +TileSizeY) / TileSizeY;
     //FIXME: Valid only in shared memory context!
     DistanceSilent=3*max(MapWidth,MapHeight);
     DebugLevel2("Distance Silent: %d\n",DistanceSilent);
     ViewPointOffset=max(MapWidth/2,MapHeight/2);
     DebugLevel2("ViewPointOffset: %d\n",ViewPointOffset);
+#else /* SPLIT_SCREEN_SUPPORT */
+    //FIXME: Valid only in shared memory context!
+    DistanceSilent=3*max(MapWidth,MapHeight);
+    DebugLevel2("Distance Silent: %d\n",DistanceSilent);
+    ViewPointOffset=max(MapWidth/2,MapHeight/2);
+    DebugLevel2("ViewPointOffset: %d\n",ViewPointOffset);
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 #ifdef USE_THREAD
     if (WithSoundThread) {

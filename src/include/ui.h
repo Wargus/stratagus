@@ -186,14 +186,6 @@ typedef struct _ui_ {
     int		ButtonPanelX;		/// Button panel screen X position
     int		ButtonPanelY;		/// Button panel screen Y position
 
-    // The map
-    int		MapX;			/// big map screen X position
-    int		MapY;			/// big map screen Y position
-	/// map width for current mode (MapX+14*32-1 for 640x480)
-    unsigned	MapEndX;
-	/// map height for current mode (MapY+14*32-1 for 640x480)
-    unsigned	MapEndY;
-
 #ifdef SPLIT_SCREEN_SUPPORT
     ViewportMode	ViewportMode;
     int 	ActiveViewport;		/// contains (or last contained) pointer
@@ -203,6 +195,14 @@ typedef struct _ui_ {
     Viewport	VP[MAX_NUM_VIEWPORTS];
     /* Map* attributes of Viewport are unused here */
     Viewport	MapArea;		/// geometry of the whole map area
+#else /* SPLIT_SCREEN_SUPPORT */
+    // The map
+    int		MapX;			/// big map screen X position
+    int		MapY;			/// big map screen Y position
+	/// map width for current mode (MapX+14*32-1 for 640x480)
+    unsigned	MapEndX;
+	/// map height for current mode (MapY+14*32-1 for 640x480)
+    unsigned	MapEndY;
 #endif /* SPLIT_SCREEN_SUPPORT */
 
     // The menu button
@@ -292,6 +292,7 @@ extern void UIHandleButtonUp(unsigned button);
 #ifdef SPLIT_SCREEN_SUPPORT
 
 extern int GetViewport (int , int );
+extern int MapTileGetViewport (int , int );
 extern void CycleViewportMode (int );
 extern void SetViewportMode (void);
 
