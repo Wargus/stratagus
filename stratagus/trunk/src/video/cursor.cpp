@@ -228,7 +228,7 @@ global void LoadCursors(const char* race)
 
 	    buf = alloca(strlen(file) + 9 + 1);
 	    file = strcat(strcpy(buf,"graphics/"), file);
-	    ShowLoadProgress("\tCursor %s\n", file);
+	    ShowLoadProgress("Cursor %s", file);
 	    Cursors[i].Sprite = LoadSprite(file,
 		Cursors[i].Width, Cursors[i].Height);
 	}
@@ -680,7 +680,8 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 
     //Save (seen) area behind sprite
     CLIP_RECTANGLE(x, y, w, h);
-    SaveCursorBackground(OldCursorX = x, OldCursorY = y, OldCursorW = w, OldCursorH = h);
+    SaveCursorBackground(OldCursorX = x, OldCursorY = y,
+	OldCursorW = w, OldCursorH = h);
 
     //Draw sprite (using its own clipping)  FIXME: prevent clipping twice
     VideoDrawClip(type->Sprite, frame, spritex, spritey);

@@ -210,7 +210,7 @@ global void LoadIcons(void)
 		file = icon->File->FileName;
 		buf = alloca(strlen(file) + 9 + 1);
 		file = strcat(strcpy(buf, "graphics/"), file);
-		ShowLoadProgress("\tIcons %s\n", file);
+		ShowLoadProgress("Icons %s", file);
 		icon->File->Sprite = LoadSprite(file,IconWidth,IconHeight);
 #ifdef USE_OPENGL
 		MakeTexture(icon->File->Sprite, icon->File->Sprite->Width,

@@ -74,15 +74,15 @@
 **	@param offset	Seek position
 **	@param whence	How to seek
 */
-local int gzseek(CLFile* file,unsigned offset,int whence)
+local int gzseek(CLFile* file, unsigned offset, int whence)
 {
     char buf[32];
 
-    while( offset>sizeof(buf) ) {
-	gzread(file,buf,sizeof(buf));
-	offset-=sizeof(buf);
+    while (offset > sizeof(buf)) {
+	gzread(file, buf, sizeof(buf));
+	offset -= sizeof(buf);
     }
-    return gzread(file,buf,offset);
+    return gzread(file, buf, offset);
 }
 
 #endif	// } ZLIB_VERSION<="1.0.4"
@@ -106,42 +106,18 @@ local int gzseek(CLFile* file,unsigned offset,int whence)
 **	@param offset	Seek position
 **	@param whence	How to seek
 */
-local void bzseek(BZFILE* file,unsigned offset,int whence __attribute__((unused)))
+local void bzseek(BZFILE* file, unsigned offset, int whence __attribute__((unused)))
 {
     char buf[32];
 
-    while( offset>sizeof(buf) ) {
-	bzread(file,buf,sizeof(buf));
-	offset-=sizeof(buf);
+    while (offset > sizeof(buf)) {
+	bzread(file, buf, sizeof(buf));
+	offset -= sizeof(buf);
     }
-    bzread(file,buf,offset);
+    bzread(file, buf, offset);
 }
 
 #endif	// USE_BZ2LIB
-
-#ifdef USE_ZZIPLIB
-
-#if 0
-/**
-**	Seek on compressed input. (I hope newer libs support it directly)
-**
-**	@param file	File handle
-**	@param offset	Seek position
-**	@param whence	How to seek
-*/
-local void zzip_seek(ZZIP_FILE* file,unsigned offset,int whence __attribute__((unused)))
-{
-    char buf[32];
-
-    while( offset>sizeof(buf) ) {
-	zzip_read(file,buf,sizeof(buf));
-	offset-=sizeof(buf);
-    }
-    zzip_read(file,buf,offset);
-}
-#endif
-
-#endif	// USE_ZZIPLIB
 
 #if defined(USE_ZLIB) || defined(USE_BZ2LIB) || defined(USE_ZZIPLIB)
 
@@ -153,17 +129,18 @@ local void zzip_seek(ZZIP_FILE* file,unsigned offset,int whence __attribute__((u
 **
 **	@return			File Pointer
 */
-global CLFile *CLopen(const char *fn,long openflags)
+global CLFile* CLopen(const char* fn, long openflags)
 {
     CLFile clf;
-    CLFile *result;
+    CLFile* result;
     char buf[512];
     char openstring[5];
-    if ( (openflags&CL_OPEN_READ) && (openflags&CL_OPEN_WRITE) ) {
-	strcpy(openstring,"rwb");
-    } else if (openflags&CL_OPEN_READ) {
-	strcpy(openstring,"rb");
-    } else if (openflags&CL_OPEN_WRITE) {
+
+    if ((openflags & CL_OPEN_READ) && (openflags & CL_OPEN_WRITE)) {
+	strcpy(openstring, "rwb");
+    } else if (openflags &CL_OPEN_READ) {
+	strcpy(openstring, "rb");
+    } else if (openflags & CL_OPEN_WRITE) {
 	strcpy(openstring,"wb");
     } else {
 	DebugLevel0("Bad CLopen flags");
@@ -173,36 +150,36 @@ global CLFile *CLopen(const char *fn,long openflags)
 
     clf.cl_type = CLF_TYPE_INVALID;
 
-    if (openflags&CL_OPEN_WRITE) {
+    if (openflags & CL_OPEN_WRITE) {
 #ifdef USE_BZ2LIB
-	if ( (openflags&CL_WRITE_BZ2) &&
-		( clf.cl_bz = bzopen(strcat(strcpy(buf,fn),".bz2"), openstring)) ) {
+	if ((openflags & CL_WRITE_BZ2) &&
+		(clf.cl_bz = bzopen(strcat(strcpy(buf, fn), ".bz2"), openstring))) {
 	    clf.cl_type = CLF_TYPE_BZIP2;
 	} else
 #endif
 #ifdef USE_ZLIB
-	if ( (openflags&CL_WRITE_GZ) &&
-	    	( clf.cl_gz = gzopen(strcat(strcpy(buf,fn),".gz"), openstring)) ) {
-	    clf.cl_type = CLF_TYPE_GZIP;		
+	if ((openflags & CL_WRITE_GZ) &&
+	    	(clf.cl_gz = gzopen(strcat(strcpy(buf, fn), ".gz"), openstring))) {
+	    clf.cl_type = CLF_TYPE_GZIP;
 	} else
 #endif
-	if  ((clf.cl_plain = fopen(fn,openstring))) {
+	if ((clf.cl_plain = fopen(fn, openstring))) {
 	    clf.cl_type = CLF_TYPE_PLAIN;
 	}
     } else {
 	if (!(clf.cl_plain = fopen(fn, openstring))) {		// try plain first
 #ifdef USE_ZLIB
-	    if ((clf.cl_gz = gzopen(strcat(strcpy(buf,fn),".gz"), "rb"))) {
+	    if ((clf.cl_gz = gzopen(strcat(strcpy(buf, fn), ".gz"), "rb"))) {
 		clf.cl_type = CLF_TYPE_GZIP;
 	    } else
 #endif
 #ifdef USE_BZ2LIB
-	    if ((clf.cl_bz = bzopen(strcat(strcpy(buf,fn),".bz2"), "rb"))) {
+	    if ((clf.cl_bz = bzopen(strcat(strcpy(buf, fn), ".bz2"), "rb"))) {
 		clf.cl_type = CLF_TYPE_BZIP2;
 	    } else
 #endif
 #ifdef USE_ZZIPLIB
-	    if ((clf.cl_zz = zzip_open(strcpy(buf,fn),O_RDONLY|O_BINARY) )) {
+	    if ((clf.cl_zz = zzip_open(strcpy(buf, fn), O_RDONLY | O_BINARY))) {
 		clf.cl_type = CLF_TYPE_ZZIP;
 	    } else
 #endif
@@ -244,12 +221,12 @@ global CLFile *CLopen(const char *fn,long openflags)
     }
 
     if (clf.cl_type == CLF_TYPE_INVALID) {
-	//fprintf(stderr,"%s in ", buf);
+	//fprintf(stderr, "%s in ", buf);
 	return NULL;
     }
 
     // ok, here we go
-    result = (CLFile *)malloc(sizeof(CLFile));
+    result = (CLFile*)malloc(sizeof(CLFile));
     if (result) {
 	*result = clf;
     }
@@ -261,7 +238,7 @@ global CLFile *CLopen(const char *fn,long openflags)
 **
 **	@param file	CLFile pointer.
 */
-global int CLclose(CLFile *file)
+global int CLclose(CLFile* file)
 {
     int tp;
     int ret;
@@ -303,7 +280,7 @@ global int CLclose(CLFile *file)
 **	@param buf	Pointer to read the data to.
 **	@param len	number of bytes to read.
 */
-global int CLread(CLFile *file, void *buf, size_t len)
+global int CLread(CLFile* file, void* buf, size_t len)
 {
     int tp;
     int ret;
@@ -342,24 +319,24 @@ global int CLread(CLFile *file, void *buf, size_t len)
 **	@param format	String Format.
 **	@param ...	Parameter List.
 */
-global int CLprintf(CLFile *file, char *format, ...)
+global int CLprintf(CLFile* file, char* format, ...)
 {
     int n;
     int size;
     int ret;
     int tp;
-    char *p;
+    char* p;
     va_list ap;
 
-    size=100;
-    ret=-1;
-    if ((p = malloc (size)) == NULL) {
+    size = 100;
+    ret = -1;
+    if ((p = malloc(size)) == NULL) {
 	return -1;
     }
     while (1) {
 	/* Try to print in the allocated space. */
 	va_start(ap, format);
-	n = vsnprintf (p, size, format, ap);
+	n = vsnprintf(p, size, format, ap);
 	va_end(ap);
 	/* If that worked, string was processed. */
 	if (n > -1 && n < size) {
@@ -367,11 +344,11 @@ global int CLprintf(CLFile *file, char *format, ...)
 	}
 	/* Else try again with more space. */
 	if (n > -1) { /* glibc 2.1 */
-	    size = n+1; /* precisely what is needed */
+	    size = n + 1; /* precisely what is needed */
 	} else {           /* glibc 2.0 */
 	    size *= 2;  /* twice the old size */
 	}
-	if ((p = realloc (p, size)) == NULL) {
+	if ((p = realloc(p, size)) == NULL) {
 	    return -1;
 	}
     }
@@ -381,7 +358,7 @@ global int CLprintf(CLFile *file, char *format, ...)
 
     if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
 	if (tp == CLF_TYPE_PLAIN) {
-	    ret = fwrite(p,size,1,file->cl_plain);
+	    ret = fwrite(p, size, 1, file->cl_plain);
 	}
 #ifdef USE_ZLIB
 	if (tp == CLF_TYPE_GZIP) {
@@ -414,7 +391,7 @@ global int CLprintf(CLFile *file, char *format, ...)
 **	@param offset	Seek position
 **	@param whence	How to seek
 */
-global int CLseek(CLFile *file, long offset, int whence)
+global int CLseek(CLFile* file, long offset, int whence)
 {
     int tp;
     int ret;
@@ -461,7 +438,7 @@ global int CLseek(CLFile *file, long offset, int whence)
 **
 **	@return		Pointer to buffer.
 */
-global char* LibraryFileName(const char* file,char* buffer)
+global char* LibraryFileName(const char* file, char* buffer)
 {
 #ifdef USE_ZZIPLIB
     ZZIP_FILE* zp;
@@ -471,25 +448,25 @@ global char* LibraryFileName(const char* file,char* buffer)
     //
     //	Absolute path or in current directory.
     //
-    strcpy(buffer,file);
-    if( *buffer=='/' || !access(buffer,R_OK) ) {
+    strcpy(buffer, file);
+    if (*buffer == '/' || !access(buffer, R_OK)) {
 	return buffer;
     }
 #ifdef USE_ZLIB		// gzip or bzip2 in current directory
-    sprintf(buffer,"%s.gz",file);
-    if( !access(buffer,R_OK) ) {
+    sprintf(buffer, "%s.gz", file);
+    if (!access(buffer, R_OK)) {
 	return buffer;
     }
 #endif
 #ifdef USE_BZ2LIB
-    sprintf(buffer,"%s.bz2",file);
-    if( !access(buffer,R_OK) ) {
+    sprintf(buffer, "%s.bz2", file);
+    if (!access(buffer, R_OK)) {
 	return buffer;
     }
 #endif
 #ifdef USE_ZZIPLIB
-    strcpy(buffer,file);
-    if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+    strcpy(buffer, file);
+    if ((zp = zzip_open(buffer, O_RDONLY | O_BINARY))) {
 	zzip_close(zp);
 	return buffer;
     }
@@ -498,74 +475,74 @@ global char* LibraryFileName(const char* file,char* buffer)
     //
     //	Try in map directory
     //
-    if( *CurrentMapPath ) {
+    if (*CurrentMapPath) {
 	DebugLevel3Fn("Map   path: %s\n" _C_ CurrentMapPath);
-	if( *CurrentMapPath=='.' || *CurrentMapPath=='/' ) {
-	    strcpy(buffer,CurrentMapPath);
-	    if( (s=strrchr(buffer,'/')) ) {
-		s[1]='\0';
+	if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
+	    strcpy(buffer, CurrentMapPath);
+	    if ((s = strrchr(buffer, '/'))) {
+		s[1] = '\0';
 	    }
-	    strcat(buffer,file);
+	    strcat(buffer, file);
 	} else {
-	    strcpy(buffer,StratagusLibPath);
-	    if( *buffer ) {
-		strcat(buffer,"/");
+	    strcpy(buffer, StratagusLibPath);
+	    if (*buffer) {
+		strcat(buffer, "/");
 	    }
-	    strcat(buffer,CurrentMapPath);
-	    if( (s=strrchr(buffer,'/')) ) {
-		s[1]='\0';
+	    strcat(buffer, CurrentMapPath);
+	    if ((s = strrchr(buffer, '/'))) {
+		s[1] = '\0';
 	    }
-	    strcat(buffer,file);
+	    strcat(buffer, file);
 	}
-	if( !access(buffer,R_OK) ) {
+	if (!access(buffer, R_OK)) {
 	    return buffer;
 	}
 
 #ifdef USE_ZLIB		// gzip or bzip2 in map directory directory
-	strcat(buffer,".gz");
-	if( !access(buffer,R_OK) ) {
+	strcat(buffer, ".gz");
+	if (!access(buffer, R_OK)) {
 	    return buffer;
 	}
-	*strrchr(buffer,'.')='\0';
+	*strrchr(buffer, '.') = '\0';
 #endif
 #ifdef USE_BZ2LIB
-	strcat(buffer,".bz2");
-	if( !access(buffer,R_OK) ) {
+	strcat(buffer, ".bz2");
+	if (!access(buffer, R_OK)) {
 	    return buffer;
 	}
-	*strrchr(buffer,'.')='\0';
+	*strrchr(buffer, '.') = '\0';
 #endif
 #ifdef USE_ZZIPLIB
-	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	if ((zp = zzip_open(buffer, O_RDONLY | O_BINARY))) {
 	    zzip_close(zp);
 	    return buffer;
 	}
 #endif	// USE_ZZIPLIB
     }
 
-    if( (s = getenv("HOME")) ) {
+    if ((s = getenv("HOME"))) {
 	//
 	//	In user home directory
 	//
-	sprintf(buffer,"%s/%s/%s/%s",s,STRATAGUS_HOME_PATH,GameName,file);
-	if( !access(buffer,R_OK) ) {
+	sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName, file);
+	if (!access(buffer,R_OK)) {
 	    return buffer;
 	}
 #ifdef USE_ZLIB		// gzip or bzip2 in user home directory
-	sprintf(buffer,"%s/%s/%s/%s.gz",s,STRATAGUS_HOME_PATH,GameName,file);
-	if( !access(buffer,R_OK) ) {
+	sprintf(buffer, "%s/%s/%s/%s.gz", s, STRATAGUS_HOME_PATH, GameName, file);
+	if (!access(buffer, R_OK)) {
 	    return buffer;
 	}
 #endif
 #ifdef USE_BZ2LIB
-	sprintf(buffer,"%s/%s/%s/%s.bz2",s,STRATAGUS_HOME_PATH,GameName,file);
-	if( !access(buffer,R_OK) ) {
+	sprintf(buffer, "%s/%s/%s/%s.bz2", s, STRATAGUS_HOME_PATH, GameName, file);
+	if (!access(buffer, R_OK)) {
 	    return buffer;
 	}
 #endif
 #ifdef USE_ZZIPLIB
-	sprintf(buffer,"%s/%s/%s/%s",s,STRATAGUS_HOME_PATH,GameName,file);
-	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName, file);
+	if ((zp = zzip_open(buffer, O_RDONLY | O_BINARY))) {
 	    zzip_close(zp);
 	    return buffer;
 	}
@@ -575,32 +552,32 @@ global char* LibraryFileName(const char* file,char* buffer)
     //
     //	In global shared directory
     //
-    sprintf(buffer,"%s/%s",StratagusLibPath,file);
-    if( !access(buffer,R_OK) ) {
+    sprintf(buffer, "%s/%s", StratagusLibPath, file);
+    if (!access(buffer, R_OK)) {
 	return buffer;
     }
 #ifdef USE_ZLIB		// gzip or bzip2 in global shared directory
-    sprintf(buffer,"%s/%s.gz",StratagusLibPath,file);
-    if( !access(buffer,R_OK) ) {
+    sprintf(buffer, "%s/%s.gz", StratagusLibPath, file);
+    if (!access(buffer, R_OK)) {
 	return buffer;
     }
 #endif
 #ifdef USE_BZ2LIB
-    sprintf(buffer,"%s/%s.bz2",StratagusLibPath,file);
-    if( !access(buffer,R_OK) ) {
+    sprintf(buffer, "%s/%s.bz2", StratagusLibPath, file);
+    if (!access(buffer, R_OK)) {
 	return buffer;
     }
 #endif
 #ifdef USE_ZZIPLIB
-    sprintf(buffer,"%s/%s",StratagusLibPath,file);
-    if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+    sprintf(buffer, "%s/%s", StratagusLibPath, file);
+    if ((zp = zzip_open(buffer, O_RDONLY | O_BINARY))) {
 	zzip_close(zp);
 	return buffer;
     }
 #endif	// USE_ZZIPLIB
     DebugLevel0Fn("File `%s' not found\n" _C_ file);
 
-    strcpy(buffer,file);
+    strcpy(buffer, file);
     return buffer;
 }
 
@@ -612,10 +589,10 @@ global char* LibraryFileName(const char* file,char* buffer)
 **
 **	@return		v1-v2
 */
-local int flqcmp(const void *v1, const void *v2)
+local int flqcmp(const void* v1, const void* v2)
 {
-    const FileList *c1;
-    const FileList *c2;
+    const FileList* c1;
+    const FileList* c2;
 
     c1 = v1;
     c2 = v2;
@@ -654,18 +631,18 @@ __my_zzip_open_zip(const char* filename, int filemode)
     fd = -1;
     len = strlen(filename);
 #ifdef USE_WIN32
-    if (len+4 < PATH_MAX) {
+    if (len + 4 < PATH_MAX) {
 	strcpy(file, filename);
-	strcpy(file+len, ".zip");
+	strcpy(file + len, ".zip");
 	fd = open(file, filemode);
     }
 #else
     ext = my_zzip_default_fileext;
-    if (len+4 < PATH_MAX) {
-	memcpy(file, filename, len+1);
+    if (len + 4 < PATH_MAX) {
+	memcpy(file, filename, len + 1);
 
-	for ( ; *ext ; ++ext) {
-	    strcpy (file+len, *ext);
+	for (; *ext ; ++ext) {
+	    strcpy(file + len, *ext);
 	    fd = open(file, filemode);
 	    if (fd != -1) {
 		break;
@@ -686,11 +663,11 @@ __my_zzip_open_zip(const char* filename, int filemode)
 **
 **	@return		Pointer to FileList struct describing Files found.
 */
-global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *),FileList **flp)
+global int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp)
 {
 #ifdef USE_ZZIPLIB
-    ZZIP_DIR *dirp = NULL;
-    ZZIP_DIRENT *dp;
+    ZZIP_DIR* dirp = NULL;
+    ZZIP_DIRENT* dp;
     // ATTENTION: valid until end of file!
     #define readdir zzip_readdir
     #define closedir zzip_closedir
@@ -698,11 +675,11 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     int entvalid;
     char zzbasepath[PATH_MAX];
     struct stat st;
-    char *cp;
+    char* cp;
 #else
 #ifndef _MSC_VER
-    DIR *dirp;
-    struct dirent *dp;
+    DIR* dirp;
+    struct dirent* dp;
 #endif
     struct stat st;
 #endif
@@ -710,13 +687,13 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     struct _finddata_t fileinfo;
     long hFile;
 #endif
-    FileList *nfl;
-    FileList *fl = NULL;
+    FileList* nfl;
+    FileList* fl = NULL;
     int n;
     int isdir = 0; // silence gcc..
-    char *np;
+    char* np;
     char buffer[PATH_MAX];
-    char *filename;
+    char* filename;
 
     strcpy(buffer, dirname);
     n = strlen(buffer);
@@ -728,15 +705,14 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     n = 0;
 
 #ifdef USE_ZZIPLIB
-    strcpy (zzbasepath, dirname);
+    strcpy(zzbasepath, dirname);
     /* per each slash in filename, check if it there is a zzip around */
-    while ((cp = strrchr(zzbasepath, '/')))
-    {
+    while ((cp = strrchr(zzbasepath, '/'))) {
 	int fd;
 	zzip_error_t e;
 
 	*cp = '\0'; /* cut at path separator == possible zipfile basename */
-	fd = __my_zzip_open_zip(zzbasepath, O_RDONLY|O_BINARY);
+	fd = __my_zzip_open_zip(zzbasepath, O_RDONLY | O_BINARY);
 	if (fd != -1) {
 	    /* found zip-file, now open it */
 	    dirp = zzip_dir_fdopen(fd, &e);
@@ -757,7 +733,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	// and we want it vice versa in this special case. Otherwise it would not
 	// match the path separator backtrace above, which relies on recursive
 	// __zip_open_dir(). __zip_open_dir() only detects zipfiles, not real dirs!
-	fd = __my_zzip_open_zip(dirname, O_RDONLY|O_BINARY);
+	fd = __my_zzip_open_zip(dirname, O_RDONLY | O_BINARY);
 	if (fd == -1) {
 	    dirp = zzip_opendir(dirname);
 	    zzbasepath[0] = 0;
@@ -768,14 +744,16 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		close(fd);
 		dirp = NULL;
 	    } else {
-		strcpy (zzbasepath, dirname);
+		strcpy(zzbasepath, dirname);
 	    }
-	    DebugLevel3Fn("zzbasepath `%s', dirname `%s'\n"
-		_C_ zzbasepath _C_ dirname);
+	    DebugLevel3Fn("zzbasepath `%s', dirname `%s'\n" _C_
+		zzbasepath _C_ dirname);
 	}
     }
-#ifndef _MSC_VER
-    IfDebug(if (!dirp) { DebugLevel0Fn("Dir `%s' not found\n" _C_ dirname); });
+#if !defined(_MSC_VER) && defined(DEBUG)
+    if (!dirp) {
+	DebugLevel0Fn("Dir `%s' not found\n" _C_ dirname);
+    }
 #endif
 #else
 #ifndef _MSC_VER
@@ -821,10 +799,12 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 #endif
 #endif
 
-	    if (strcmp(filename, ".") == 0)
+	    if (strcmp(filename, ".") == 0) {
 		continue;
-	    if (strcmp(filename, "..") == 0)
+	    }
+	    if (strcmp(filename, "..") == 0) {
 		continue;
+	    }
 
 	    strcpy(np, filename);
 #ifdef USE_ZZIPLIB
@@ -856,10 +836,10 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		    len = strlen(zzbasepath);
 		    isdir = 0;
 		    if (strlen(dirname) > len) {
-			cp = (char *)dirname + len + 1;
+			cp = (char*)dirname + len + 1;
 			len = strlen(cp);
 			if (strlen(filename) >= len && memcmp(filename, cp, len) == 0 &&
-				    filename[len] == '/' && filename[len + 1]) {
+				filename[len] == '/' && filename[len + 1]) {
 			    strcpy(np, filename + len + 1);
 			    goto zzentry;
 			}
@@ -875,7 +855,7 @@ zzentry:
 		    if (cp) {
 			isdir = 1;
 			*cp = 0;
-			for (i = 0; i < n; i++) {
+			for (i = 0; i < n; ++i) {
 			    if (fl[i].type == 0 && strcmp(fl[i].name, np) == 0) {
 				entvalid = 0;	// already there
 				break;
@@ -932,7 +912,7 @@ zzentry:
 			    }
 			}
 		    }
-		    n++;
+		    ++n;
 		}
 	    }
 #ifndef _MSC_VER
@@ -955,7 +935,7 @@ zzentry:
     if (n == 0) {
 	fl = NULL;
     } else {
-	qsort((char *)fl, n, sizeof(FileList), flqcmp);
+	qsort((char*)fl, n, sizeof(FileList), flqcmp);
     }
     *flp = fl;
     return n;
