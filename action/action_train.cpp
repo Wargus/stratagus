@@ -10,7 +10,7 @@
 //
 /**@name action_train.c - The building train action. */
 //
-//      (c) Copyright 1998,2000-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@
 **
 **  @return  1 if the the unit can do it, 0 otherwise.
 */
-int CanHandleOrder(Unit* unit, Order* order)
+static int CanHandleOrder(Unit* unit, Order* order)
 {
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
@@ -96,7 +96,6 @@ void HandleActionTrain(Unit* unit)
 	Player* player;
 	int food;
 
-	player = unit->Player;
 	//
 	// First entry
 	//
@@ -104,17 +103,29 @@ void HandleActionTrain(Unit* unit)
 		unit->Data.Train.Ticks = 0;
 		unit->SubAction = 1;
 	}
+
+	if (unit->Type->NewAnimations) {
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Train);
+		if (unit->Wait) {
+			unit->Wait--;
+			return;
+		}
+	}
+
+	player = unit->Player;
 	unit->Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
 	if (unit->Data.Train.Ticks >=
-		unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost]) {
+			unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost]) {
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
 			unit->Data.Train.Ticks =
 				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
-			unit->Reset = 1;
+			if (!unit->Type->NewAnimations) {
+				unit->Reset = 1;
+			}
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -130,7 +141,9 @@ void HandleActionTrain(Unit* unit)
 
 			unit->Data.Train.Ticks =
 				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
-			unit->Reset = 1;
+			if (!unit->Type->NewAnimations) {
+				unit->Reset = 1;
+			}
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -165,7 +178,9 @@ void HandleActionTrain(Unit* unit)
 			AiTrainingComplete(unit, nunit);
 		}
 
-		unit->Reset = unit->Wait = 1;
+		if (!unit->Type->NewAnimations) {
+			unit->Reset = unit->Wait = 1;
+		}
 
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
@@ -210,7 +225,9 @@ void HandleActionTrain(Unit* unit)
 		return;
 	}
 
-	unit->Reset = 1;
+	if (!unit->Type->NewAnimations) {
+		unit->Reset = 1;
+	}
 	unit->Wait = CYCLES_PER_SECOND / 6;
 }
 
