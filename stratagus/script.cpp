@@ -176,9 +176,9 @@ local SCM CclSetVideoSyncSpeed(SCM speed)
 */
 local SCM CclSetLocalPlayerName(SCM name)
 {
-    char *str;
+    char* str;
 
-    str = gh_scm2newstr(name,NIL);
+    str=gh_scm2newstr(name,NIL);
     strncpy(LocalPlayerName,str,sizeof(LocalPlayerName)-1);
     LocalPlayerName[sizeof(LocalPlayerName)-1]='\0';
     return SCM_UNSPECIFIED;
@@ -350,6 +350,7 @@ local SCM CclSetSpeeds(SCM speed)
 local SCM CclDefineDefaultResources(SCM list)
 {
     int i;
+
     for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
 	DefaultResources[i]=gh_scm2int(gh_car(list));
 	list=gh_cdr(list);
@@ -363,6 +364,7 @@ local SCM CclDefineDefaultResources(SCM list)
 local SCM CclDefineDefaultResourcesLow(SCM list)
 {
     int i;
+
     for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
 	DefaultResourcesLow[i]=gh_scm2int(gh_car(list));
 	list=gh_cdr(list);
@@ -376,6 +378,7 @@ local SCM CclDefineDefaultResourcesLow(SCM list)
 local SCM CclDefineDefaultResourcesMedium(SCM list)
 {
     int i;
+
     for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
 	DefaultResourcesMedium[i]=gh_scm2int(gh_car(list));
 	list=gh_cdr(list);
@@ -389,6 +392,7 @@ local SCM CclDefineDefaultResourcesMedium(SCM list)
 local SCM CclDefineDefaultResourcesHigh(SCM list)
 {
     int i;
+
     for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
 	DefaultResourcesHigh[i]=gh_scm2int(gh_car(list));
 	list=gh_cdr(list);
@@ -402,6 +406,7 @@ local SCM CclDefineDefaultResourcesHigh(SCM list)
 local SCM CclDefineDefaultIncomes(SCM list)
 {
     int i;
+
     for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
 	DefaultIncomes[i]=gh_scm2int(gh_car(list));
 	list=gh_cdr(list);
@@ -415,6 +420,7 @@ local SCM CclDefineDefaultIncomes(SCM list)
 local SCM CclDefineDefaultActions(SCM list)
 {
     int i;
+
     for( i=0; i<MaxCosts; ++i ) {
 	free(DefaultActions[i]);
 	DefaultActions[i]=NULL;
@@ -432,6 +438,7 @@ local SCM CclDefineDefaultActions(SCM list)
 local SCM CclDefineDefaultResourceNames(SCM list)
 {
     int i;
+
     for( i=0; i<MaxCosts; ++i ) {
 	free(DefaultResourceNames[i]);
 	DefaultResourceNames[i]=NULL;
