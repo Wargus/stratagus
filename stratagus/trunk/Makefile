@@ -152,15 +152,19 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
 CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
+	  data/ccl/constructions.ccl data/ccl/human/constructions.ccl \
+	  data/ccl/orc/constructions.ccl \
 	  data/ccl/missiles.ccl data/ccl/icons.ccl \
-	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
+	  data/ccl/sound.ccl data/ccl/freecraft.ccl \
 	  data/ccl/ui.ccl data/ccl/human/ui.ccl data/ccl/orc/ui.ccl \
-	  data/ccl/fonts.ccl data/ccl/ai.ccl \
-	  data/ccl/summer.ccl data/ccl/winter.ccl data/ccl/wasteland.ccl \
-	  data/ccl/swamp.ccl data/ccl/anim.ccl data/ccl/upgrade.ccl \
-	  data/ccl/human/upgrade.ccl data/ccl/orc/upgrade.ccl \
+	  data/ccl/upgrade.ccl data/ccl/human/upgrade.ccl \
+	  data/ccl/orc/upgrade.ccl \
 	  data/ccl/buttons.ccl data/ccl/human/buttons.ccl \
-	  data/ccl/orc/buttons.ccl data/ccl/wc2.ccl data/default.cm
+	  data/ccl/orc/buttons.ccl \
+	  data/ccl/fonts.ccl data/ccl/ai.ccl \
+	  data/ccl/tilesets.ccl data/ccl/summer.ccl data/ccl/winter.ccl \
+	  data/ccl/wasteland.ccl data/ccl/swamp.ccl \
+	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm
 
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png
@@ -186,7 +190,7 @@ dist::
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	chmod -R a+r $(distdir)
+	chmod -R a+rX $(distdir)
 	tar chzf $(distdir).tar.gz $(distdir)
 	tar cjhf $(distdir).tar.bz2 $(distdir)
 	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
@@ -206,7 +210,7 @@ small-dist::
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	chmod -R a+r $(distdir)
+	chmod -R a+rX $(distdir)
 	tar chzf $(distdir)-small.tar.gz $(distdir)
 	tar cjhf $(distdir)-small.tar.bz2 $(distdir)
 	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
@@ -228,7 +232,7 @@ bin-dist:: all
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	chmod -R a+r $(distdir)
+	chmod -R a+rX $(distdir)
 	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
 	tar chzf freecraft-$(mydate)-bin.tar.gz $(distdir)
@@ -253,7 +257,7 @@ win32-bin-dist2:: win32
 	@chmod 777 $(distdir)
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	@cp tools/build.bat $(distdir)
-	@chmod -R a+r $(distdir)
+	@chmod -R a+rX $(distdir)
 	@strip -s -R .comment $(distdir)/freecraft$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
 	@echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
@@ -287,6 +291,7 @@ linux-complete:
 	tar xjf $(LCRAFT)
 	mkdir freecraft-complete
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
+	mv freecraft-complete/data freecraft-complete/data.wc2
 	cp -a fcraft/* freecraft-complete
 	cp -a fclone/* freecraft-complete
 	rm -rf freecraft-$(MYDATE)
@@ -306,6 +311,7 @@ win32-complete:
 	unzip -oq $(WCRAFT)
 	mkdir freecraft-complete
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
+	mv freecraft-complete/data freecraft-complete/data.wc2
 	cp -a fcraft/* freecraft-complete
 	cp -a fclone/* freecraft-complete
 	rm -rf freecraft-$(MYDATE)
@@ -362,7 +368,7 @@ WIN32=	\
     ZDEFS='-DUSE_ZLIB' \
     ZLIBS='-lz' \
     VIDEO='-DUSE_WIN32 $(SDL)'	\
-    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32'
+    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32'
 
 win32new:
 	@$(MAKE) distclean
