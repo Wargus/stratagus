@@ -65,9 +65,9 @@ int SoundOff; ///< True quiet, sound turned off
 int MusicOff; ///< Music turned off
 
 /**
-** Various sounds used in game.
+**  Various sounds used in game.
 **
-** FIXME: @todo support more races. Must remove static config.
+**  FIXME: @todo support more races. Must remove static config.
 */
 GameSound GameSounds
 #ifndef laterUSE_CCL
@@ -89,23 +89,22 @@ GameSound GameSounds
 	;
 
 /*----------------------------------------------------------------------------
--- Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-** Helper function: insert a sound request in the server side sound FIFO.
+**  Helper function: insert a sound request in the server side sound FIFO.
 **
-** @param unit         Pointer to unit.
-** @param id           Unit identifier, for pointer reuse detection.
-** @param power        How loud to play the sound.
-** @param sound        FIXME: docu
-** @param fight        FIXME: docu
-** @param selection    FIXME: docu
-** @param volume       FIXME: docu
-** @param stereo       FIXME: docu
+**  @param unit         Pointer to unit.
+**  @param id           Unit identifier, for pointer reuse detection.
+**  @param power        How loud to play the sound.
+**  @param sound        FIXME: docu
+**  @param selection    FIXME: docu
+**  @param volume       FIXME: docu
+**  @param stereo       FIXME: docu
 */
 static void InsertSoundRequest(const Unit* unit, unsigned id,
-	unsigned short power, SoundId sound, unsigned char fight,
+	unsigned short power, SoundId sound,
 	unsigned char selection, unsigned char volume, char stereo)
 {
 	SDL_LockAudio();
@@ -120,7 +119,6 @@ static void InsertSoundRequest(const Unit* unit, unsigned id,
 			SoundRequests[NextSoundRequestIn].Source.Id = id;
 			SoundRequests[NextSoundRequestIn].Sound = sound;
 			SoundRequests[NextSoundRequestIn].Power = power;
-			SoundRequests[NextSoundRequestIn].Fight = fight ? 1 : 0;
 			SoundRequests[NextSoundRequestIn].Selection = selection ? 1 : 0;
 			SoundRequests[NextSoundRequestIn].IsVolume = volume ? 1 : 0;
 			SoundRequests[NextSoundRequestIn].Stereo = stereo;
@@ -136,14 +134,14 @@ static void InsertSoundRequest(const Unit* unit, unsigned id,
 }
 
 /**
-** Maps a UnitVoiceGroup to a SoundId.
+**  Maps a UnitVoiceGroup to a SoundId.
 **
-** @param unit    Sound initiator
-** @param voice   Type of sound wanted
+**  @param unit    Sound initiator
+**  @param voice   Type of sound wanted
 **
-** @return Sound identifier
+**  @return Sound identifier
 **
-** @todo FIXME: The work completed sounds only supports two races.
+**  @todo FIXME: The work completed sounds only supports two races.
 */
 static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 {
@@ -175,12 +173,12 @@ static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 }
 
 /**
-** Ask to the sound server to play a sound attached to an unit. The
-** sound server may discard the sound if needed (e.g., when the same
-** unit is already speaking).
+**  Ask to the sound server to play a sound attached to an unit. The
+**  sound server may discard the sound if needed (e.g., when the same
+**  unit is already speaking).
 **
-** @param unit    Sound initiator, unit speaking
-** @param voice   Type of sound wanted (Ready,Die,Yes,...)
+**  @param unit   Sound initiator, unit speaking
+**  @param voice  Type of sound wanted (Ready,Die,Yes,...)
 */
 void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
@@ -196,15 +194,40 @@ void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 	}
 
 	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
-		ChooseUnitVoiceSoundId(unit, voice), voice == VoiceAttacking,
+		ChooseUnitVoiceSoundId(unit, voice),
 		(voice == VoiceSelected || voice == VoiceBuilding), 0, stereo);
 }
 
 /**
-** Ask the sound server to play a sound for a missile.
+**  Ask to the sound server to play a sound attached to an unit. The
+**  sound server may discard the sound if needed (e.g., when the same
+**  unit is already speaking).
 **
-** @param missile   Sound initiator, missile exploding
-** @param sound     Sound to be generated
+**  @param unit  Sound initiator, unit speaking
+**  @param id    Type of sound wanted (Ready,Die,Yes,...)
+*/
+void PlayUnitSoundId(const Unit* unit, SoundId id)
+{
+	int stereo;
+
+	stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
+		unit->IX - TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
+		((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
+	if (stereo < -128) {
+		stereo = -128;
+	} else if (stereo > 127) {
+		stereo = 127;
+	}
+
+	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
+		id, 0, 0, stereo);
+}
+
+/**
+**  Ask the sound server to play a sound for a missile.
+**
+**  @param missile  Sound initiator, missile exploding
+**  @param sound    Sound to be generated
 */
 void PlayMissileSound(const Missile* missile, SoundId sound)
 {
@@ -220,23 +243,23 @@ void PlayMissileSound(const Missile* missile, SoundId sound)
 	}
 
 	InsertSoundRequest(NULL, 0, ViewPointDistanceToMissile(missile), sound,
-		1, 0, 0, stereo);
+		0, 0, stereo);
 }
 
 /**
-** FIXME: docu
+**  FIXME: docu
 */
 void PlayGameSound(SoundId sound, unsigned char volume)
 {
-	InsertSoundRequest(NULL, 0, volume, sound, 0, 0, 1, 0);
+	InsertSoundRequest(NULL, 0, volume, sound, 0, 1, 0);
 }
 
 /**
-** Ask to the sound server to set the global volume of the sound.
+**  Ask to the sound server to set the global volume of the sound.
 **
-** @param volume     the sound volume (positive number) 0-255
+**  @param volume     the sound volume (positive number) 0-255
 **
-** @see MaxVolume
+**  @see MaxVolume
 */
 void SetGlobalVolume(int volume)
 {
@@ -253,11 +276,11 @@ void SetGlobalVolume(int volume)
 }
 
 /**
-** Ask to the sound server to set the volume of the music.
+**  Ask to the sound server to set the volume of the music.
 **
-** @param volume    the music volume (positive number) 0-255
+**  @param volume    the music volume (positive number) 0-255
 **
-** @see MaxVolume
+**  @see MaxVolume
 */
 void SetMusicVolume(int volume)
 {
@@ -275,7 +298,7 @@ void SetMusicVolume(int volume)
 }
 
 /**
-** Lookup the sound id's for the game sounds.
+**  Lookup the sound id's for the game sounds.
 */
 void InitSoundClient(void)
 {

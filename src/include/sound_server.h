@@ -169,7 +169,6 @@ typedef struct _sound_request {
 	unsigned short Power;   ///< Volume or Distance
 	SoundId Sound;          ///< which sound
 	unsigned Used : 1;      ///< flag for used/unused
-	unsigned Fight : 1;     ///< is it a fight sound?
 	unsigned Selection : 1; ///< is it a selection sound?
 	unsigned IsVolume : 1;  ///< how to interpret power (as a
 							///<volume or as a distance?)
