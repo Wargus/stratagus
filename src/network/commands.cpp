@@ -371,7 +371,7 @@ global int LoadReplay(char* name)
     vload(name,0,1);
 
     ReplayLog=symbol_value(gh_symbol2scm("*replay_log*"),NIL);
-    NextLogCycle=-1;
+    NextLogCycle=~0UL;
     if( !CommandLogDisabled ) {
 	CommandLogDisabled=1;
 	DisabledLog=1;
@@ -436,7 +436,7 @@ local void DoNextReplay(void)
 	return;
     }
 
-    NextLogCycle=-1;
+    NextLogCycle=~0UL;
     unit=-1;
     name=NULL;
     flags=0;
@@ -568,14 +568,14 @@ global void ReplayEachCycle(void)
 	return;
     }
 
-    if( NextLogCycle!=-1UL && NextLogCycle!=GameCycle ) {
+    if( NextLogCycle!=~0UL && NextLogCycle!=GameCycle ) {
 	return;
     }
 
     do {
 	DoNextReplay();
     } while( !gh_null_p(ReplayLog)
-	    && (NextLogCycle==-1UL || NextLogCycle==GameCycle) );
+	    && (NextLogCycle==~0UL || NextLogCycle==GameCycle) );
 
     if( gh_null_p(ReplayLog) ) {
 	SetMessage("End of replay");
