@@ -269,7 +269,7 @@ local void DrawMenuButtonArea(void)
 			TheUI.MenuPanel.Graphic->Height,
 			TheUI.MenuPanelX, TheUI.MenuPanelY);
 	}
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		if (TheUI.MenuButton.X != -1) {
 		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(TheUI.MenuButton.Button,
@@ -678,7 +678,7 @@ global void UpdateDisplay(void)
 			}
 		}
 		if (MustRedraw & RedrawMenuButton) {
-			if (NetworkFildes == (Socket)-1) {
+			if (!IsNetworkGame()) {
 				if (TheUI.MenuButton.X != -1) {
 					InvalidateAreaAndCheckCursor(
 						TheUI.MenuButton.X, TheUI.MenuButton.Y,
@@ -801,7 +801,7 @@ global void GameMainLoop(void)
 
 	showtip = 0;
 	RealVideoSyncSpeed = VideoSyncSpeed;
-	if (NetworkFildes == (Socket)-1) {				// Don't show them for net play
+	if (!IsNetworkGame()) {				// Don't show them for net play
 		showtip = ShowTips;
 	}
 

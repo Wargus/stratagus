@@ -387,7 +387,7 @@ local void HandleMouseOn(int x, int y)
 	//
 	//		Handle buttons
 	//
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		if (TheUI.MenuButton.X != -1 && !BigMapMode) {
 			if (x >= TheUI.MenuButton.X &&
 					x < TheUI.MenuButton.X + TheUI.MenuButton.Width &&
@@ -1689,7 +1689,7 @@ global void UIHandleButtonUp(unsigned button)
 			(ButtonUnderCursor == ButtonUnderMenu ||
 				ButtonUnderCursor == ButtonUnderNetworkMenu)) {
 			// FIXME: Not if, in input mode.
-			if (NetworkFildes == (Socket)-1) {
+			if (!IsNetworkGame()) {
 				GamePaused = 1;
 				SetStatusLine("Game Paused");
 			}

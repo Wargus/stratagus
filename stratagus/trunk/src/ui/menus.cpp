@@ -2165,7 +2165,7 @@ local void PreferencesInit(Menuitem* mi __attribute__((unused)))
 	}
 
 	// Not available in net games or replays
-	if (NetworkFildes == (Socket)-1 && ReplayGameType == ReplayNone) {
+	if (!IsNetworkGame() && ReplayGameType == ReplayNone) {
 		menu->Items[1].flags = MI_ENABLED;
 	} else {
 		menu->Items[1].flags = MI_DISABLED;
@@ -2243,7 +2243,7 @@ local void EndScenarioMenu(void)
 	Menu* menu;
 
 	menu = FindMenu("menu-end-scenario");
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		menu->Items[1].flags = MI_ENABLED;
 	} else {
 		menu->Items[1].flags = MI_DISABLED;

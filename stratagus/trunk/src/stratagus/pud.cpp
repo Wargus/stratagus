@@ -1270,7 +1270,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 								 Players[o].Type != PlayerComputer) ) {
 pawn:
 						if (t != WC_UnitGoldMine && t != WC_UnitOilPatch) {
-							if (NetworkFildes == (Socket)-1
+							if (!IsNetworkGame()
 									&& ReplayGameType != ReplayMultiPlayer
 									&& o == ThisPlayer->Player) {
 								s = GameSettings.Presets[0].Race;

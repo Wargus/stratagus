@@ -1002,7 +1002,7 @@ global void MultiPlayerReplayEachCycle(void)
 */
 global void SendCommandStopUnit(Unit* unit)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("stop", unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		CommandStopUnit(unit);
 	} else {
@@ -1018,7 +1018,7 @@ global void SendCommandStopUnit(Unit* unit)
 */
 global void SendCommandStandGround(Unit* unit, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("stand-ground", unit, flush, -1, -1, NoUnitP, NULL, -1);
 		CommandStandGround(unit, flush);
 	} else {
@@ -1035,7 +1035,7 @@ global void SendCommandStandGround(Unit* unit, int flush)
 */
 global void SendCommandFollow(Unit* unit, Unit* dest, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("follow", unit, flush, -1, -1, dest, NULL, -1);
 		CommandFollow(unit, dest, flush);
 	} else {
@@ -1053,7 +1053,7 @@ global void SendCommandFollow(Unit* unit, Unit* dest, int flush)
 */
 global void SendCommandMove(Unit* unit, int x, int y, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("move", unit, flush, x, y, NoUnitP, NULL, -1);
 		CommandMove(unit, x, y, flush);
 	} else {
@@ -1072,7 +1072,7 @@ global void SendCommandMove(Unit* unit, int x, int y, int flush)
 */
 global void SendCommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("repair", unit, flush, x, y, dest, NULL, -1);
 		CommandRepair(unit, x, y, dest, flush);
 	} else {
@@ -1091,7 +1091,7 @@ global void SendCommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 */
 global void SendCommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("attack", unit, flush, x, y, attack, NULL, -1);
 		CommandAttack(unit, x, y, attack, flush);
 	} else {
@@ -1109,7 +1109,7 @@ global void SendCommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 */
 global void SendCommandAttackGround(Unit* unit, int x, int y, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("attack-ground", unit, flush, x, y, NoUnitP, NULL, -1);
 		CommandAttackGround(unit, x, y, flush);
 	} else {
@@ -1127,7 +1127,7 @@ global void SendCommandAttackGround(Unit* unit, int x, int y, int flush)
 */
 global void SendCommandPatrol(Unit* unit, int x, int y, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("patrol", unit, flush, x, y, NoUnitP, NULL, -1);
 		CommandPatrolUnit(unit, x, y, flush);
 	} else {
@@ -1146,7 +1146,7 @@ global void SendCommandPatrol(Unit* unit, int x, int y, int flush)
 */
 global void SendCommandBoard(Unit* unit, int x, int y, Unit* dest, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("board", unit, flush, x, y, dest, NULL, -1);
 		CommandBoard(unit, dest, flush);
 	} else {
@@ -1165,7 +1165,7 @@ global void SendCommandBoard(Unit* unit, int x, int y, Unit* dest, int flush)
 */
 global void SendCommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("unload", unit, flush, x, y, what, NULL, -1);
 		CommandUnload(unit, x, y, what, flush);
 	} else {
@@ -1185,7 +1185,7 @@ global void SendCommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 global void SendCommandBuildBuilding(Unit* unit, int x, int y,
 	UnitType* what, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("build", unit, flush, x, y, NoUnitP, what->Ident, -1);
 		CommandBuildBuilding(unit, x, y, what, flush);
 	} else {
@@ -1202,7 +1202,7 @@ global void SendCommandBuildBuilding(Unit* unit, int x, int y,
 global void SendCommandDismiss(Unit* unit)
 {
 	// FIXME: currently unit and worker are same?
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("dismiss", unit, FlushCommands, -1, -1, NULL, NULL, -1);
 		CommandDismiss(unit);
 	} else {
@@ -1221,7 +1221,7 @@ global void SendCommandDismiss(Unit* unit)
 */
 global void SendCommandResourceLoc(Unit* unit, int x, int y, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("resource-loc", unit, flush, x, y, NoUnitP, NULL, -1);
 		CommandResourceLoc(unit, x, y, flush);
 	} else {
@@ -1238,7 +1238,7 @@ global void SendCommandResourceLoc(Unit* unit, int x, int y, int flush)
 */
 global void SendCommandResource(Unit* unit, Unit* dest, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("resource", unit, flush, -1, -1, dest, NULL, -1);
 		CommandResource(unit, dest, flush);
 	} else {
@@ -1255,7 +1255,7 @@ global void SendCommandResource(Unit* unit, Unit* dest, int flush)
 */
 global void SendCommandReturnGoods(Unit* unit, Unit* goal, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("return", unit, flush, -1, -1, goal, NULL, -1);
 		CommandReturnGoods(unit, goal, flush);
 	} else {
@@ -1272,7 +1272,7 @@ global void SendCommandReturnGoods(Unit* unit, Unit* goal, int flush)
 */
 global void SendCommandTrainUnit(Unit* unit, UnitType* what, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("train", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
 		CommandTrainUnit(unit, what, flush);
 	} else {
@@ -1289,7 +1289,7 @@ global void SendCommandTrainUnit(Unit* unit, UnitType* what, int flush)
 */
 global void SendCommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("cancel-train", unit, FlushCommands, -1, -1, NoUnitP,
 				type ? type->Ident : NULL, slot);
 		CommandCancelTraining(unit, slot, type);
@@ -1308,7 +1308,7 @@ global void SendCommandCancelTraining(Unit* unit, int slot, const UnitType* type
 */
 global void SendCommandUpgradeTo(Unit* unit, UnitType* what, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("upgrade-to", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
 		CommandUpgradeTo(unit, what, flush);
 	} else {
@@ -1323,7 +1323,7 @@ global void SendCommandUpgradeTo(Unit* unit, UnitType* what, int flush)
 */
 global void SendCommandCancelUpgradeTo(Unit* unit)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("cancel-upgrade-to", unit, FlushCommands,
 			-1, -1, NoUnitP, NULL, -1);
 		CommandCancelUpgradeTo(unit);
@@ -1342,7 +1342,7 @@ global void SendCommandCancelUpgradeTo(Unit* unit)
 */
 global void SendCommandResearch(Unit* unit, Upgrade* what, int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("research", unit, flush, -1, -1, NoUnitP, what->Ident, -1);
 		CommandResearch(unit, what, flush);
 	} else {
@@ -1358,7 +1358,7 @@ global void SendCommandResearch(Unit* unit, Upgrade* what, int flush)
 */
 global void SendCommandCancelResearch(Unit* unit)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("cancel-research", unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		CommandCancelResearch(unit);
 	} else {
@@ -1380,7 +1380,7 @@ global void SendCommandCancelResearch(Unit* unit)
 global void SendCommandSpellCast(Unit* unit, int x, int y, Unit* dest, int spellid,
 	int flush)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("spell-cast", unit, flush, x, y, dest, NULL, spellid);
 		CommandSpellCast(unit, x, y, dest, SpellTypeTable[spellid], flush);
 	} else {
@@ -1398,7 +1398,7 @@ global void SendCommandSpellCast(Unit* unit, int x, int y, Unit* dest, int spell
 */
 global void SendCommandAutoSpellCast(Unit* unit, int spellid, int on)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		CommandLog("auto-spell-cast", unit, FlushCommands, on, -1, NoUnitP,
 			NULL, spellid);
 		CommandAutoSpellCast(unit, spellid, on);
@@ -1417,7 +1417,7 @@ global void SendCommandAutoSpellCast(Unit* unit, int spellid, int on)
 */
 global void SendCommandDiplomacy(int player, int state, int opponent)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		switch (state) {
 			case DiplomacyNeutral:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
@@ -1452,7 +1452,7 @@ global void SendCommandDiplomacy(int player, int state, int opponent)
 */
 global void SendCommandSharedVision(int player, int state, int opponent)
 {
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		if (state == 0) {
 			CommandLog("shared-vision", NoUnitP, 0, player, opponent,
 				NoUnitP, "0", -1);

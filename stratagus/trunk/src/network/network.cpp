@@ -459,7 +459,7 @@ global void InitNetwork1(void)
 */
 global void ExitNetwork1(void)
 {
-	if (NetworkFildes == (Socket)-1) {		// No network running
+	if (!IsNetworkGame()) {		// No network running
 		return;
 	}
 #ifdef DEBUG
@@ -754,7 +754,7 @@ global void NetworkEvent(void)
 	int allowed;
 	unsigned long n;
 
-	if (NetworkFildes == (Socket)-1) {
+	if (!IsNetworkGame()) {
 		NetworkInSync = 1;
 		return;
 	}
