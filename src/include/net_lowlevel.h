@@ -49,6 +49,7 @@
 #ifdef NEW_NETMENUS
 #define _WIN32_WINNT 0x0400
 #define WINVER 0x0400
+#include <winsock2.h>
 #endif
 
 #include <windows.h>
@@ -62,7 +63,6 @@
 #define IFF_UP	1
 #define IFF_LOOPBACK 4
 #include <winsock.h>
-#include <winsock2.h>
 // MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
 typedef struct _OLD_INTERFACE_INFO
 {
