@@ -62,6 +62,14 @@
 #define MapActionRocks		0xFFFD	/// rocks on map
 #define MapActionForest		0xFFFE	/// forest on map
 
+// These are hard-coded PUD internals (and, as such, belong here!)
+#define WC_UnitPeasant		0x02	/// Human Peasant
+#define WC_UnitPeon		0x03	/// Orc Peon
+#define WC_UnitGoldMine		0x5C	/// Goldmine
+#define WC_UnitOilPatch		0x5D	/// Oilpatch
+#define WC_StartLocationHuman	0x5E	/// Start location Human
+#define WC_StartLocationOrc	0x5F	/// Start location Orc
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/

@@ -92,6 +92,7 @@ global void CreatePlayer(char* name,int type)
 
     //  Allocate memory for the "list" of this player's units.
     //  FIXME: brutal way, as we won't need MAX_UNITS for this player...
+    //	FIXME: ARI: is this needed for 'PlayerNobody' ??
     if( !(player->Units=(Unit**)calloc(MAX_UNITS,sizeof(Unit*))) ) {
 	DebugLevel0("Not enough memory to create player %d.\n",NumPlayers);
 	return;
