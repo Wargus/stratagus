@@ -420,16 +420,13 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 
 	DebugCheck(width > g->Width || height > g->Height);
 
-	if (!width || !height || (g->Width / width) * width != g->Width ||
+	if ((g->Width / width) * width != g->Width ||
 			(g->Height / height) * height != g->Height) {
 		fprintf(stderr, "Invalid graphic (width, height) %s\n", name);
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
 			width, height, g->Width, g->Height);
+		ExitFatal(1);
 	}
-
-	// Check if width and height fits.
-	DebugCheck((g->Width / width) * width != g->Width ||
-		(g->Height / height) * height != g->Height);
 
 #ifdef USE_OPENGL
 	MakeTexture(g, width, height);

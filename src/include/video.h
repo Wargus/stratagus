@@ -66,7 +66,6 @@ typedef struct _unit_colors_ {
 
 #ifdef DEBUG
 extern unsigned AllocatedGraphicMemory;		/// Allocated memory for objects
-extern unsigned CompressedGraphicMemory;/// memory for compressed objects
 #endif
 
 /**
