@@ -1092,8 +1092,8 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     for (i=0; i<num; ++i) {
 	unit = table[i];
 	//	FIXME: Probably calculated from top left corner of building
-	if (rX = unit->X - building->X < 0) rX = -rX;
-	if (rY = unit->Y - building->Y < 0) rY = -rY;	// I don't trust fabs()
+	if ((rX = unit->X - building->X) < 0) rX = -rX;
+	if ((rY = unit->Y - building->Y) < 0) rY = -rY;	// I don't trust fabs()
 	if (rX<rY) {
 	    distance[i] = rX;
 	}
