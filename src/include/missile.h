@@ -342,13 +342,13 @@ typedef int MissileClass;
 **      FIXME:  We need no class or no controller.
 */
 enum _missile_class_ {
-        /**
-        **      Missile does nothing
-        */
+	/**
+	**      Missile does nothing
+	*/
 	MissileClassNone,
-        /**
-         **      Missile flies from x,y to x1,y1
-         */
+	/**
+	**      Missile flies from x,y to x1,y1
+	*/
 	MissileClassPointToPoint,
 	/**
 	**      Missile flies from x,y to x1,y1 and stays there for a moment
@@ -403,6 +403,10 @@ enum _missile_class_ {
 	**      Missile shows the hit points.
 	*/
 	MissileClassHit,
+	/**
+	**	     Missile flies from x,y to x1,y1 using a parabolic path
+	*/
+	MissileClassParabolic,
 };
 
     ///		Base structure of missile-types
@@ -473,6 +477,11 @@ struct _missile_ {
     int		Dy;			/// delta y
     int		Xstep;			/// X step
     int		Ystep;			/// Y step
+
+    long	Angle;			/// Angle, for parabolic missiles
+    long	Xl;			/// internal use. Will be removed later.
+    int		SourceX;		/// Missile Source X
+    int		SourceY;		/// Missile Source Y
 
     unsigned	Local : 1;		/// missile is a local missile
     Missile**	MissileSlot;		/// pointer to missile slot
