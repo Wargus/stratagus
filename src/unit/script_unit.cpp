@@ -307,10 +307,43 @@ local void CclParseOrders(Unit* unit,SCM vector)
 **	@param unit	Unit pointer which should be filled with the data.
 **	@param list	All options of the builded data.
 */
-local void CclParseBuilded(Unit* unit __attribute__((unused)),
-	SCM list __attribute__((unused)))
+local void CclParseBuilded (Unit *unit, SCM list)
 {
-    DebugLevel0Fn("FIXME: builded\n");
+    SCM value;
+    char *str;
+
+    while ( !gh_null_p (list) ) {
+	value = gh_car (list);
+	list = gh_cdr (list);
+	if (gh_eq_p (value, gh_symbol2scm ("worker")) ) {
+	    int slot;
+	    value = gh_car (list);
+	    str = gh_scm2newstr (value, NULL);
+	    slot = strtol(str+1,NULL,16);
+	    unit->Data.Builded.Worker = UnitSlots[slot];
+	    ++UnitSlots[slot]->Refs;
+	    free (str);
+	    list = gh_cdr (list);
+	} else if (gh_eq_p (value, gh_symbol2scm ("sum")) ) {
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    unit->Data.Builded.Sum = gh_scm2int (value);
+	} else if (gh_eq_p (value, gh_symbol2scm ("add")) ) {
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    unit->Data.Builded.Add = gh_scm2int (value);
+	} else if (gh_eq_p (value, gh_symbol2scm ("val")) ) {
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    unit->Data.Builded.Val = gh_scm2int (value);
+	} else if (gh_eq_p (value, gh_symbol2scm ("sub")) ) {
+	    value = gh_car (list);
+	    list = gh_cdr (list);
+	    unit->Data.Builded.Sub = gh_scm2int (value);
+	} else if (gh_eq_p (value, gh_symbol2scm ("cancel")) ) {
+	    unit->Data.Builded.Cancel = 1;
+	}
+    }
 }
 
 /**
@@ -398,10 +431,20 @@ local SCM CclUnit(SCM list)
 	    player=&Players[gh_scm2int(gh_car(list))];
 	    list=gh_cdr(list);
 
+	    // During a unit's death animation (when action is "die" but the
+	    // unit still has its original type, i.e. it's still not a corpse)
+	    // the unit is already removed from map and from player's
+	    // unit list (=the unit went through LetUnitDie() which
+	    // calls RemoveUnit() and UnitLost()).  Such a unit should not
+	    // be put on player's unit list!  However, this state is not
+	    // easily detected from this place.  It seems that it is
+	    // characterized by unit->HP==0 and by
+	    // unit->Orders[0].Action==UnitActionDie so we have to wait
+	    // until we parsed at least Unit::Orders[].
 	    DebugCheck( !type );
-	    //unit=MakeUnit(type,player);
 	    unit = UnitSlots[slot];
-	    InitUnit (unit, type, player);
+	    //InitUnit (unit, type, player);
+	    InitUnit (unit, type);
 	    unit->Active=0;
 	    unit->Removed=0;
 	    unit->Reset=0;
@@ -568,6 +611,8 @@ local SCM CclUnit(SCM list)
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    CclParseOrders(unit,sublist);
+	    // now we know unit's action so we can assign it to a player
+	    AssignUnitToPlayer (unit, player);
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -607,7 +652,7 @@ local SCM CclUnit(SCM list)
     //
     //	Place on map
     //
-    if( !unit->Removed && !unit->Destroyed ) {
+    if( !unit->Removed && !unit->Destroyed && !unit->Type->Vanishes ) {
 	unit->Removed=1;
 	PlaceUnit(unit,unit->X,unit->Y);
 
@@ -618,7 +663,10 @@ local SCM CclUnit(SCM list)
     }
 
     // FIXME: johns: works only for debug code.
-    NewResetPath(unit);
+    // latimerius: I don't know whether NewResetPath is needed but if the
+    // unit's current action is anything else than Move, NewResetPath corrupts
+    // the action's data - so I comment it out for now.
+    //NewResetPath(unit);
     DebugLevel0Fn("FIXME: not written\n");
     DebugLevel0Fn ("unit #%d parsed\n", slot);
 
