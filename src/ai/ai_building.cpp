@@ -364,17 +364,12 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
     Unit* mine;
     int destx;
     int desty;
-    int bestx;
-    int besty;
     int bestd;
 
     destx=x=worker->X;
     desty=y=worker->Y;
     size=TheMap.Width*TheMap.Height/4;
     points=alloca(size*sizeof(*points));
-
-    bestd=99999;
-    IfDebug( bestx=besty=0; );		// keep the compiler happy
 
     //
     //	Make movement matrix. FIXME: can create smaller matrix.
