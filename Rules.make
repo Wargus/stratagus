@@ -54,10 +54,11 @@ OBJDIR=obj/
 
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
+DEBUG=	-DDEBUG #-DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) \
 	$(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG)
-CFLAGS=-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
+	$(DEBUG) -DHAVE_EXPANSION
+CFLAGS=-g -O1 -Wall -Werror $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_FOW2
 CTAGSFLAGS=-i defptvS -a -f 
 
 # Locks versions with a symbolic name

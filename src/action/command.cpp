@@ -1222,11 +1222,17 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	// FIXME: should I check here, if there is still enough mana?
 
+	/*
+	FIXME: vladi: any unit can cast spell, like dark-portal
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
 	    ReleaseOrder(order);
 	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+	*/
+	if( !(order=GetNextOrder(unit,flush)) ) {
 	    return;
 	}
 

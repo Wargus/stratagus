@@ -116,6 +116,8 @@ global SpellType SpellTypeTable[]
 { "spell-whirlwind",		"whirlwind",		  12, 100, 801, SpellActionWhirlwind	, { "whirlwind", NULL }      , { NULL, NULL} },
 { "spell-unholy-armor",		"unholy armor",		   6, 100, 500, SpellActionUnholyArmor	, { "unholy armour", NULL }  , { NULL, NULL} },
 { "spell-death-and-decay",	"death and decay",	  12,  25,  -1, SpellActionDeathAndDecay, { "death and decay", NULL }, { NULL, NULL} },
+//	---extensions---						 ---orc death knights-
+{ "spell-circle-of-power",	"circle of power",	0x7F,  25,  -1, SpellActionCircleOfPower, { "circle of power", NULL }, { NULL, NULL} },
 //	---eot marker---						 ---eot marker---
 { NULL,				NULL,			   0,   0,   0, 0                       , { NULL, NULL}              , { NULL, NULL} }
 };
@@ -698,6 +700,9 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	    return 0;
 
 	case SpellActionDeathAndDecay:
+	    return 1;
+	    
+	case SpellActionCircleOfPower:
 	    return 1;
 
 	default:
@@ -1327,6 +1332,20 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
     }
 	break;
 
+    case SpellActionCircleOfPower:
+    {
+    //Unit *cop;
+    printf( ">>> cop\n" );
+    /*
+    cop = MakeUnit( UnitTypeByIdent( "unit-circle-of-power" ), 
+                          unit->Player );
+    MakeMissile(MissileTypeHealing,
+		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    */		
+    };
+    break;
+    
     default:
 	DebugLevel0Fn("Unknown spell action `%d'\n" _C_ spell->Action);
 	break;
