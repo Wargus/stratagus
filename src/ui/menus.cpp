@@ -4228,11 +4228,24 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 */
 local void GameRCSAction(Menuitem *mi, int i)
 {
-    int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
+    int n;
+    int x;
 
     if (mi->d.pulldown.curopt == i) {
-	GameSettings.Presets[0].Race = v[i];
-	ServerSetupState.Race[0] = 2 - i;
+	for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
+	    if (PlayerRaces.Visible[n]) {
+		if (x == i) {
+		    break;
+		}
+		++x;
+	    }
+	}
+	if (n != PlayerRaces.Count) {
+	    GameSettings.Presets[0].Race = PlayerRaces.Race[x];
+	} else {
+	    GameSettings.Presets[0].Race = SettingsPresetMapDefault;
+	}
+	ServerSetupState.Race[0] = mi->d.pulldown.noptions - 1 - i;
 	NetworkServerResyncClients();
     }
 }
@@ -4403,6 +4416,9 @@ local void NetworkGamePrepareGameSettings(void)
     int i;
     int num[PlayerMax];
     int comp[PlayerMax];
+    int n;
+    int x;
+    int v;
 
     DebugCheck(!MenuMapInfo);
 
@@ -4437,14 +4453,22 @@ local void NetworkGamePrepareGameSettings(void)
 	    case 0:
 		GameSettings.Presets[num[i]].Type = PlayerPerson;
 		DebugLevel3Fn("Settings[%d].Type == Person\n" _C_ num[i]);
-		switch (ServerSetupState.Race[num[i]]) {
-		    case 1:
-			GameSettings.Presets[num[i]].Race = PlayerRaceOrc;
-			break;
-		    case 2:
-			GameSettings.Presets[num[i]].Race = PlayerRaceHuman;
-		    default:
-			break;
+		for (n = 0, v = 0; n < PlayerRaces.Count; ++n) {
+		    if (PlayerRaces.Visible[n]) {
+			++v;
+		    }
+		}
+		v -= ServerSetupState.Race[num[i]];
+		for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
+		    if (PlayerRaces.Visible[n]) {
+			if (x == v) {
+			    break;
+			}
+			++x;
+		    }
+		}
+		if (n != PlayerRaces.Count) {
+		    GameSettings.Presets[num[i]].Race = PlayerRaces.Race[x];
 		}
 		break;
 	    case 1:
@@ -4898,7 +4922,7 @@ local void MultiClientGemAction(Menuitem *mi)
 local void MultiClientRCSAction(Menuitem *mi, int i)
 {
     if (mi->d.pulldown.curopt == i) {
-	LocalSetupState.Race[NetLocalHostsSlot] = 2 - i;
+	LocalSetupState.Race[NetLocalHostsSlot] = mi->d.pulldown.noptions - 1 - i;
 	MultiClientUpdate(0);
     }
 }
@@ -7093,11 +7117,45 @@ global void ErrorMenu(char *error)
 ----------------------------------------------------------------------------*/
 
 /**
+**	Initialize player races for a menu item
+*/
+local void InitPlayerRaces(Menuitem *mi)
+{
+    int i;
+    int n;
+
+    for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
+	if (PlayerRaces.Visible[i]) {
+	    ++n;
+	}
+    }
+    ++n;
+    mi->d.pulldown.options = (char **)malloc(n * sizeof(char *));
+    for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
+	if (PlayerRaces.Visible[i]) {
+	    mi->d.pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
+	}
+    }
+    mi->d.pulldown.options[n++] = strdup("Map Default");
+    mi->d.pulldown.noptions = n;
+    mi->d.pulldown.defopt = n - 1;
+}
+
+/**
 **	Initialize the loaded menu data
 */
 global void InitMenuData(void)
 {
+    Menu *menu;
+
     InitNetMultiButtonStorage();
+
+    menu = FindMenu("menu-custom-game");
+    InitPlayerRaces(&menu->Items[6]);
+    menu = FindMenu("menu-multi-setup");
+    InitPlayerRaces(&menu->Items[21]);
+    menu = FindMenu("menu-net-multi-client");
+    InitPlayerRaces(&menu->Items[21]);
 }
 
 /**
