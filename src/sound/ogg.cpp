@@ -49,8 +49,10 @@
 
 #include "myendian.h"
 #include "iolib.h"
+#include "sound.h"
 #include "sound_server.h"
 #include "video.h"
+#include "avi.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -80,7 +82,7 @@ typedef struct _ogg_data_ {
 **
 **	@return			The number of elements loaded.
 */
-local size_t OGG_read(void *ptr, size_t size, size_t nmemb, void *user)
+local size_t OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 {
     return CLread(user, ptr, size * nmemb) / size;
 }
@@ -209,7 +211,7 @@ local const SampleType OggStreamSampleType = {
 **
 **	@return		    Number of bytes read
 */
-local int OggRead(Sample* sample, void *buf, int len)
+local int OggRead(Sample* sample, void* buf, int len)
 {
     unsigned pos;
 
@@ -275,7 +277,7 @@ global Sample* LoadOgg(const char* name,int flags)
 
     DebugLevel2Fn("Have ogg file %s\n" _C_ name);
 
-    if (ov_open_callbacks(f, vf, (char *)&magic, sizeof(magic), vc)) {
+    if (ov_open_callbacks(f, vf, (char*)&magic, sizeof(magic), vc)) {
 	fprintf(stderr, "Can't initialize ogg decoder\n");
 	CLclose(f);
 	return NULL;
@@ -308,7 +310,7 @@ global Sample* LoadOgg(const char* name,int flags)
     sample->Frequency = info->rate;
     sample->Length = 0;
 
-    if (flags&PlayAudioStream&0) {
+    if (flags&PlayAudioStream) {
 	OggData* data;
 
 	data = malloc(sizeof(OggData));
@@ -379,6 +381,126 @@ global Sample* LoadOgg(const char* name,int flags)
     }
 
     return sample;
+}
+
+/*----------------------------------------------------------------------------
+--	Avi support
+----------------------------------------------------------------------------*/
+
+/**
+**	OGG vorbis read callback.
+**
+**	@param ptr		Pointer to memory to fill.
+**	@param size		Size of the element.
+**	@param nmemb		Number of elements to fill.
+**	@param user		User argument.
+**
+**	@return			The number of elements loaded.
+*/
+local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
+{
+    AviFile* avi;
+    int length;
+    unsigned char* frame;
+
+    DebugLevel3Fn("%p: %p %d*%d\n" _C_ user _C_ ptr _C_ size _C_ nmemb);
+
+    avi = user;
+    if (avi->AudioRemain) {		// Bytes remaining
+	DebugLevel3Fn("Remain %d %d\n" _C_ avi->AudioRemain _C_
+		avi->AudioBuffer->Length - avi->AudioRemain);
+	length = avi->AudioRemain;
+	if (length > nmemb * size) {
+	    length = nmemb * size;
+	}
+	memcpy(ptr,
+	    avi->AudioBuffer->Data + avi->AudioBuffer->Length -
+		avi->AudioRemain, length);
+	avi->AudioRemain -= length;
+	return length / size;
+    }
+
+    length = AviReadNextAudioFrame(avi, &frame);
+    DebugLevel3Fn("Bytes %d - %d\n" _C_ length _C_ avi->AudioBuffer->Length);
+    if (length<0) {
+	return 0;
+    }
+    if (length > nmemb * size) {
+	avi->AudioRemain = length - nmemb * size;
+	length = nmemb * size;
+    }
+    memcpy(ptr, frame, length);
+
+    return length / size;
+}
+
+/**
+**	OGG vorbis close callback.
+**
+**	@param user		User argument.
+**
+**	@return			Success status.
+*/
+local int AVI_OGG_close(void* user __attribute__((unused)))
+{
+    return 0;
+}
+
+/**
+**	Play the ogg stream of an avi movie.
+**
+**	@param avi	Avi file handle
+*/
+global void PlayAviOgg(AviFile* avi)
+{
+    static const ov_callbacks vc = { AVI_OGG_read, OGG_seek, AVI_OGG_close,
+	NULL };
+    Sample* sample;
+    OggVorbis_File vf[1];
+    vorbis_info* info;
+    OggData* data;
+
+    if (ov_open_callbacks(avi, vf, 0, 0, vc)) {
+	fprintf(stderr, "Can't initialize ogg decoder\n");
+	return;
+    }
+    info = ov_info(vf, -1);
+    if (!info) {
+	fprintf(stderr, "no ogg stream\n");
+	ov_clear(vf);
+	return;
+    }
+
+    //
+    //	We have now a correct OGG stream
+    //
+
+    sample = malloc(sizeof(*sample) + OGG_BUFFER_SIZE);
+    if (!sample) {
+	fprintf(stderr, "Out of memory\n");
+	ov_clear(vf);
+	return;
+    }
+    sample->Channels = info->channels;
+    sample->SampleSize = 16;
+    sample->Frequency = info->rate;
+    sample->Length = 0;
+
+    data = malloc(sizeof(OggData));
+    if (!data) {
+	fprintf(stderr, "Out of memory\n");
+	free(sample);
+	ov_clear(vf);
+	return;
+    }
+    data->VorbisFile[0] = vf[0];
+    data->PointerInBuffer = sample->Data;
+
+    sample->Type = &OggStreamSampleType;
+    sample->User = data;
+
+    MusicSample = sample;
+    PlayingMusic = 1;
 }
 
 #endif	// } WITH_SOUND && USE_OGG
