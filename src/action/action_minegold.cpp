@@ -141,7 +141,7 @@ local int MoveToGoldMine(Unit* unit)
 	destu->Frame=1;			// FIXME: should be configurable
 	CheckUnitToBeDrawn(destu);
     }
-
+    UnitMarkSeen(destu);
     RemoveUnit(unit,destu);
 
 #if 0
@@ -225,6 +225,7 @@ local int MineInGoldmine(Unit* unit)
 	    mine->Frame=0;
 	    CheckUnitToBeDrawn(mine);
 	}
+	UnitMarkSeen(mine);
 	if( IsOnlySelected(mine) ) {
 	    MustRedraw|=RedrawInfoPanel;
 	}
