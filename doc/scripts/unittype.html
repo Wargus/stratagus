@@ -48,6 +48,7 @@
 <a href="ccl-index.html">Index</a> 
 <hr>
 <a href="#define-animations">define-animations</a>
+<a href="#define-bool-flags">define-bool-flags</a>
 <a href="#define-unit-stats">define-unit-stats</a>
 <a href="#define-unit-type">define-unit-type</a>
 <a href="pud.html#define-unittype-wc-names">define-unittype-wc-names</a>
@@ -117,6 +118,20 @@ Define animations.
         #( 0 0  10   0) #( 3 0   1   0))
       'die '(	; #107
         #( 0 0   3  45) #( 0 0   3  50) #( 0 0 100  55) #( 3 0   1  55)))
+</pre>
+
+<a name="define-bool-flags"></a>
+<h3>(define-bool-flags 'flag-1 'flag-2 ...)</h3>
+
+Define boolean unit flags. Examples are organic, mechanical, undead, etc.
+Spells use these to determine who to hit, and units can be restricted too.
+Try to avoid using names with other meanings (nothing from unit definitions
+or spell condition definition.)
+
+<h4>Example</h4>
+
+<pre>
+    (define-bool-flags 'organic 'hero 'mechanical 'undead 'demonic 'angelic)
 </pre>
 
 <a name="define-unit-stats"></a>
@@ -415,12 +430,6 @@ be built on.
 <dd>This should be true for suicide bombers, a bit of a hack. Available as a
 target check for spells, making those invisible would ruin the game.
 </dd>
-<dt>organic</dt>
-<dd>This is a flag for spell target check.
-</dd>
-<dt>hero</dt>
-<dd>This is a flag for spell target check. Prevent instant kills for instance.
-</dd>
 <dt>coward</dt>
 <dd>Unit will not attack on sight, and will run away instead of retaliating.
 Use this for units that can't attack or are next to useless in combat (like
@@ -480,9 +489,6 @@ suicide. Doesn't work with resource workers/resources. It can even be used
 in combination with demolish-damage and demolish-range, though it wouldn't
 be very fair.
 </dd>
-<dt>sniper</dt>
-<dd>Unit can only target organic units.
-</dd>
 <dt>computer-reaction-range</dt>
 <dd>This is supossed to be the reaction range for AI units, but it is not used.
 </dd>
@@ -539,6 +545,17 @@ and can't be interacted with. Please see the documentation on spells.</dd>
 <dt>selectable-by-rectangle</dt>
 <dd>Most units should have this flag. When false the unit will only get selected
 alone, use this for buildings. Enemy units are never selectable by rectangle.
+</dd>
+<dt>flags<dt>
+<dd>You can add a bunch of flags, defined with <a href="#define-bool-flags">define-bool-flags</a>
+You can add how many flags you would like, but keep in mind that you have to call
+define-bool-flags before.
+</dd>
+<dt>can-target-flag</dt>
+<dd>This allows check for targetting similar to spell conditions. It has
+the following form: can-target-flag '(flag-1 true/false/only flag-2 true/false/only ... )
+By default everything is set to true, so you can target everything. Only means that
+you can only cast units with that flag, and false only units without that flag.
 </dd>
 <!--IDEA:<dt>force-minimap-color<dt>
 <dd>An unit with this flag will ignore any friend/foe/owning player considerations

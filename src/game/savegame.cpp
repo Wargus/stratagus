@@ -137,6 +137,7 @@ global void SaveGame(const char* filename)
     SaveConstructions(file);
     SaveDecorations(file);
     SaveMissileTypes(file);
+    SaveFlags(file);
     SaveUnitTypeDefs(file);
     SaveSpells(file);
     SaveUnitTypes(file);

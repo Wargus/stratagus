@@ -1893,7 +1893,6 @@ global void MissileActionWhirlwind(Missile *missile)
     //	Animate, move.
     //
     if (!missile->AnimWait--) {
-	DebugLevel0Fn("?\n");
 	if (NextMissileFrame(missile, 1, 0)) {
 	    missile->SpriteFrame = 0;
 	    PointToPointMissile(missile);
@@ -2018,12 +2017,12 @@ global void MissileActionDeathCoil(Missile *missile)
 	    // calculate organic enemy count
 	    for (i = 0; i < n; ++i) {
 		ec += (IsEnemy(source->Player, table[i])
-		&& table[i]->Type->Organic != 0);
+		/*&& table[i]->Type->Organic != 0*/);
 	    }
 	    if (ec > 0)  {
 		// yes organic enemies found
 		for (i = 0; i < n; ++i) {
-		    if (IsEnemy(source->Player, table[i]) && table[i]->Type->Organic != 0) {
+		    if (IsEnemy(source->Player, table[i])/* && table[i]->Type->Organic != 0*/) {
 			// disperse damage between them
 			//NOTE: 1 is the minimal damage
 			HitUnit(source,table[i], missile->Damage / ec);

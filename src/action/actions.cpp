@@ -262,41 +262,6 @@ local void (*HandleActionTable[256])(Unit*) = {
 };
 
 /**
- **	Do the runestone work each second.
- **
- **	@param	unit	unit that heals an area
-*/
-local void IncrementAreaHealthMana(Unit* unit)
-{
-    Unit* units[UnitMax];
-    int nunits;
-    int j;
-
-    // Get all the units around the unit
-    nunits = SelectUnits(unit->X - unit->Stats->SightRange,
-	unit->Y - unit->Stats->SightRange,
-	unit->X + unit->Stats->SightRange+unit->Type->Width,
-	unit->Y + unit->Stats->SightRange+unit->Type->Height,
-	units);
-    // Mana and HP on units, 2 every time
-    for (j = 0; j < nunits; ++j) {
-	if (units[j] == unit) {
-	    continue;
-	}
-
-	// Restore HP in everything but buildings (even in other player's units)
-	if (units[j]->Type->Organic && units[j]->HP < units[j]->Stats->HitPoints) {
-	    units[j]->HP++;
-	}
-
-	// Restore mana in all magical units
-	if(units[j]->Type->CanCastSpell && units[j]->Mana < units[j]->Type->_MaxMana)  {	
-	    units[j]->Mana++;
-	}
-    }
-}
-
-/**
 **	Increment a unit's health
 **
 **	@param	unit	the unit to operate on
@@ -593,10 +558,6 @@ global void UnitActions(void)
 	    }
 	}
 
-	//FIXME: Need to configure this to work
-	if (0) { //Condition for Area Heal
-	    IncrementAreaHealthMana(unit);
-	}
 	if (healthiscycle) {
 	    IncrementUnitHealth(unit);
 	}

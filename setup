@@ -28,7 +28,7 @@
 ##-----------------------------------------------------------------------------
 ##	HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="$CFLAGS -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
+EXTRA_CFLAGS="$CFLAGS -DUNIT_ON_MAP -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
 EXTRA_LDFLAGS="$LDFLAGS"
 
 ## These could be used for experimental versions
@@ -41,7 +41,6 @@ EXTRA_LDFLAGS="$LDFLAGS"
 ## There are some still not well tested code parts or branches.
 ## UNIT_ON_MAP		Fast lookup of units
 ## UNITS_ON_MAP		Faster lookup of units
-## NEW_AI		New better improved AI code
 ## USE_TILECACHE	Faster tile drawing, costs memory.
 ## USE_SMART_TILECACHE	Faster tile drawing, slow with hardware video memory.
 ## USE_HP_FOR_XP	Use hit-points for XP calculations.
