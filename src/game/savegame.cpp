@@ -88,20 +88,21 @@ global void SaveGame(const char* filename)
 
     SaveIcons(file);
     SaveCursors(file);
-    // SaveUI(file);
+    SaveUserInterface(file);
+    SaveTilesets(file);
     SaveConstructions(file);
     SaveUnitTypes(file);
     SaveUpgrades(file);
     SaveDependencies(file);
     SaveButtons(file);
     SaveMissileTypes(file);
-    SaveTileset(file);
     SavePlayers(file);
     SaveMap(file);
     SaveUnits(file);
     SaveSelections(file);
     SaveGroups(file);
     SaveMissiles(file);
+    //SaveAI(file);
 
     // FIXME: find all state information which must be saved.
 

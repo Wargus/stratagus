@@ -75,7 +75,7 @@ global void CleanModules(void)
     CleanButtons();
     CleanMissileTypes();
     CleanMissiles();
-    CleanTileset();
+    CleanTilesets();
     CleanMap();
 }
 
@@ -88,7 +88,7 @@ global void InitModules(void)
 {
     InitIcons();
     InitCursors();
-    // InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
+    InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
     InitPlayers();
     InitMissileTypes();
     InitMissiles();
