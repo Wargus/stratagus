@@ -88,7 +88,6 @@ static int CclStratagusMap(lua_State* l)
 			TheMap.Info.MapUID = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "description")) {
 			value = LuaToString(l, j + 1);
-			strncpy(TheMap.Description, value, sizeof(TheMap.Description));
 			TheMap.Info.Description = strdup(value);
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {

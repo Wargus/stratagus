@@ -75,7 +75,7 @@ void SaveMap(CLFile* file)
 
 	CLprintf(file, "  \"version\", \"" StratagusFormatString "\",\n",
 		StratagusFormatArgs(StratagusVersion));
-	CLprintf(file, "  \"description\", \"%s\",\n", TheMap.Description);
+	CLprintf(file, "  \"description\", \"%s\",\n", TheMap.Info.Description);
 
 	CLprintf(file, "  \"the-map\", {\n");
 

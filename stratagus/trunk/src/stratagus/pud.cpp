@@ -862,8 +862,6 @@ void LoadPud(const char* pud,WorldMap* map)
 				ExitFatal(-1);
 			}
 			DebugPrint("\tDESC: %s\n" _C_ buf);
-			strncpy(map->Description,buf,sizeof(map->Description));
-			map->Description[sizeof(map->Description)-1]='\0';
 			continue;
 		}
 

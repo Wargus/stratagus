@@ -289,8 +289,6 @@ typedef struct _world_map_ {
 	struct _graphic_* TileGraphic; ///< graphic for all the tiles
 	struct _graphic_* FogGraphic; ///< graphic for fog of war
 
-	char Description[32];///< map description short
-
 	MapInfo Info;  ///< descriptive information
 	// TODO: (remove MapInfo Info DUPLICATES!)
 } WorldMap;
