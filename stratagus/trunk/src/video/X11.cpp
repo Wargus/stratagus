@@ -174,9 +174,9 @@ global void GameInitDisplay(void)
 	goto foundvisual;
     if(XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi))
 	goto foundvisual;
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, TrueColor, &xvi))
-	goto foundvisual;
     if(XMatchVisualInfo(TheDisplay, TheScreen, 8, PseudoColor, &xvi))
+	goto foundvisual;
+    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, TrueColor, &xvi))
 	goto foundvisual;
     fprintf(stderr,"Sorry, I couldn't find an 8, 15 , 16 or 24 bit visual.\n");
     exit(-1);
@@ -184,10 +184,11 @@ global void GameInitDisplay(void)
 foundvisual:
 
     xpfv=XListPixmapFormats(TheDisplay, &i);
-    for(i--;i>=0;i--)  {
-	DebugLevel0("pixmap %d\n", xpfv[i].depth);
-	if(xpfv[i].depth==xvi.depth)
+    for( i--; i>=0; i-- )  {
+	DebugLevel3("pixmap %d\n", xpfv[i].depth);
+	if( xpfv[i].depth==xvi.depth ) {
 	    break;
+	}
     }
     if(i<0)  {
 	fprintf(stderr,"No Pixmap format for visual depth?\n");
@@ -249,12 +250,13 @@ foundvisual:
     if(xvi.class==PseudoColor)  {
 	i|=CWColormap;
 	attributes.colormap =
-	    XCreateColormap( TheDisplay, xvi.screen, xvi.visual, AllocNone);
+		XCreateColormap( TheDisplay, DefaultRootWindow(TheDisplay),
+		    xvi.visual, AllocNone);
 	// FIXME:  Really should fill in the colormap right now
     }
     window=XCreateWindow(TheDisplay,DefaultRootWindow(TheDisplay)
 	    ,0,0,VideoWidth,VideoHeight,3
-	    ,xvi.depth,InputOutput,xvi.visual ,i,&attributes);
+	    ,xvi.depth,InputOutput,xvi.visual,i,&attributes);
     TheMainWindow=window;
 
     gcvalue.graphics_exposures=False;
@@ -955,7 +957,8 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	color.flags=DoRed|DoGreen|DoBlue;
 	if( !XAllocColor(TheDisplay,xwa.colormap,&color) ) {
 	    fprintf(stderr,"Cannot allocate color\n");
-	    exit(-1);
+	    // FIXME: Must find the nearest matching color
+	    //exit(-1);
 	}
 
 	switch( VideoDepth ) {
