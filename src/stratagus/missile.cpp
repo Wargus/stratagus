@@ -960,13 +960,13 @@ local int ParabolicCalc(Missile* missile, int amplitude)
     int thetha;
 
     missile->Xl -= missile->Xstep;
-    missile->X = missile->Xl / 100;
+    missile->X = (missile->Xl + 500) / 1000;
 
     xmid = (missile->SourceX + missile->DX) / 2;
     sinu = (missile->X - xmid) * (missile->X - xmid);
     thetha = missile->SourceX - xmid;
     missile->Y = ((missile->Angle * (missile->X - missile->SourceX)) -
-	amplitude * isqrt(-sinu + thetha * thetha) + missile->SourceY * 100) / 100;
+	amplitude * isqrt(-sinu + thetha * thetha) + missile->SourceY * 1000 + 500) / 1000;
 
     return 0;
 }
@@ -1002,12 +1002,12 @@ local int ParabolicMissile(Missile* missile)
 	    xstep = -1;
 	}
 	if (missile->SourceX - missile->DX != 0) {
-	    missile->Angle = (100 * (missile->SourceY - missile->DY)) / 
+	    missile->Angle = (1000 * (missile->SourceY - missile->DY)) / 
 		(missile->SourceX - missile->DX);
 	} else {
 	    missile->Angle = 1;
 	}
-	missile->Xl = missile->X * 100;
+	missile->Xl = missile->X * 1000;
 
 	MissileNewHeadingFromXY(missile, dx * xstep, dy * ystep);
 
@@ -1019,7 +1019,7 @@ local int ParabolicMissile(Missile* missile)
 	missile->Dy = dy;
 	dx = missile->SourceX - missile->DX;
 	dy = missile->SourceY - missile->DY;
-	missile->Xstep = (100 * dx) / isqrt(dx * dx + dy * dy);
+	missile->Xstep = (1000 * dx) / isqrt(dx * dx + dy * dy);
 	missile->Ystep = ystep;
 	++missile->State;
 	DebugLevel3Fn("Init: %d,%d\n" _C_ dx _C_ dy);
@@ -1037,7 +1037,7 @@ local int ParabolicMissile(Missile* missile)
 	    if (missile->X == missile->DX) {
 		return 1;
 	    }
-	    ParabolicCalc(missile, 50);
+	    ParabolicCalc(missile, 500);
 	}
 	MissileNewHeadingFromXY(missile, missile->X - sx, missile->Y - sy);
 	return 0;
@@ -1058,7 +1058,7 @@ local int ParabolicMissile(Missile* missile)
 		abs(missile->Y - missile->DY) <= 1) {
 	    return 1;
 	}
-	ParabolicCalc(missile, 100);
+	ParabolicCalc(missile, 1000);
 	MissileNewHeadingFromXY(missile, missile->X - sx, missile->Y - sy);
     }
     return 0;
