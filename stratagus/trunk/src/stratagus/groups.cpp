@@ -63,7 +63,13 @@ global void InitGroups(void)
     int i;
 
     for( i=0; i<NUM_GROUPS; i++ ) {
-	Groups[i].NumUnits=0;
+	int n;
+
+	if( (n=Groups[i].NumUnits) ) {		// Cleanup after load
+	    while( n-- ) {
+		Groups[i].Units[n]=UnitSlots[(int)Groups[i].Units[n]];
+	    }
+	}
     }
 }
 
@@ -225,20 +231,20 @@ global void RemoveUnitFromGroup(Unit *unit)
 */
 local SCM CclGroup(SCM group,SCM num,SCM units)
 {
-#if 0
     int i;
+    UnitGroup* grp;
 
-    NumSelected=gh_scm2int(num);
+    grp=&Groups[gh_scm2int(group)];
+    grp->NumUnits=gh_scm2int(num);
     i=0;
     while( !gh_null_p(units) ) {
 	char* str;
 
 	str=gh_scm2newstr(gh_car(units),NULL);
-	Selected[i++]=(Unit*)strtol(str+1,NULL,16);
+	grp->Units[i++]=(Unit*)strtol(str+1,NULL,16);
 	free(str);
 	units=gh_cdr(units);
     }
-#endif
 
     return SCM_UNSPECIFIED;
 }
