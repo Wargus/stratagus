@@ -361,7 +361,8 @@ extern void DecorationUpdateDisplay(void);
 **      dirtyscreen_size	= the total size in bytes of the array
 **/
 static unsigned char *dirtyscreen = NULL;
-static unsigned dirtyscreen_xtiles, dirtyscreen_ytiles, dirtyscreen_size;
+static unsigned dirtyscreen_xtiles, dirtyscreen_ytiles, dirtyscreen_size,
+                dirtyscreen_xbitmaps, dirtyscreen_ybitmaps;
 
 /**
 **	To denote an entire row/colum of tiles in one 4x4 segment, these
@@ -563,14 +564,16 @@ void DecorationInit(void)
 
   // The number of screen-tiles we support, a lower DIRTYSCREEN_BITDETAIL
   // means detailed smaller tiles, but also costs more memory.
-  dirtyscreen_xtiles = VideoWidth >> DIRTYSCREEN_BITDETAIL;
-  dirtyscreen_ytiles = VideoHeight >> DIRTYSCREEN_BITDETAIL;
+  dirtyscreen_xtiles = (VideoWidth >> DIRTYSCREEN_BITDETAIL);
+  dirtyscreen_ytiles = (VideoHeight >> DIRTYSCREEN_BITDETAIL);
   DebugCheck( (dirtyscreen_xtiles<<DIRTYSCREEN_BITDETAIL)!=VideoWidth ||
               (dirtyscreen_ytiles<<DIRTYSCREEN_BITDETAIL)!=VideoHeight );
 
   // Get memory for array dirtyscreen as 4x4bit matrixes each denoting 16
   // tiles. So (dirtyscreen_xtiles*dirtyscreen_ytiles)/16 matrixes of 2 bytes
-  dirtyscreen_size = (dirtyscreen_xtiles*dirtyscreen_ytiles)/8;
+  dirtyscreen_xbitmaps = 1 + dirtyscreen_xtiles / 4;
+  dirtyscreen_ybitmaps = 1 + dirtyscreen_ytiles / 4;
+  dirtyscreen_size     = dirtyscreen_xbitmaps * dirtyscreen_ybitmaps * 2;
   if ( dirtyscreen )
     dirtyscreen = realloc( dirtyscreen, dirtyscreen_size );
   else dirtyscreen = malloc( dirtyscreen_size );
@@ -837,8 +840,17 @@ static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
   xmasktail = xbitmasktail[ (x+w) & 0x3 ];
   if ( w < 4 && w <= 4 - bitindex )
   { // xmaskhead and xmasktail in same 4x4 matrix column  --> combine to one
-    xmaskhead &= xmasktail;
-    xmasktail = 0;
+    if ( x >= dirtyscreen_xtiles - 4 ) // at rightmost side of screen
+    { // move one 4x4 matrix to the left to prevent acces outside 2D dimension
+      t->tiles  -= 4 * 2;
+      xmasktail &= xmaskhead;
+      xmaskhead = 0;
+    }
+    else
+    {
+      xmaskhead &= xmasktail;
+      xmasktail = 0;
+    }
   }
   bitindex  = (y & 0x3);
   t->bity   = (bitindex * 4);
@@ -846,8 +858,17 @@ static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
   ymasktail = ybitmasktail[ (y+h) & 0x3 ];
   if ( h < 4 && h <= 4 - bitindex )
   { // ymaskhead and ymasktail in same 4x4 matrix row  --> combine to one
-    ymaskhead &= ymasktail;
-    ymasktail  = 0;
+    if ( x >= dirtyscreen_xtiles - 4 ) // at bottom side of screen
+    { // move one 4x4 matrix upwards to prevent acces outside 2D dimension
+      t->tiles  -= 4 * 2 * dirtyscreen_xtiles;
+      ymasktail &= ymaskhead;
+      ymaskhead = 0;
+    }
+    else
+    {
+      ymaskhead &= ymasktail;
+      ymasktail  = 0;
+    }
   }
 
   // Check is this 'single' really is restricted to a 2x2 16bit area
@@ -1000,9 +1021,6 @@ static void InvalidateDirtyscreen(void)
 
 // Invalidate remaining rectangles, which have their shadow beyond VideoHeight
   SweeplineInvalidateAll();
-
-// reset dirty array, to remember new updates for next refresh
-  ClearDirtyscreen();
 }
 
 /**
@@ -1018,13 +1036,21 @@ void DecorationRefreshDisplay(void)
   Decoration *d;
   int i;
 
+// save clip rectangle
+  PushClipping();
+
+// Handle each decoration (not the singles)
   for ( i = 0; i < LevCount; i++ )
     for ( d = dhead[i]; d; d = d->nxt )
       DrawArea( d->x, d->y, d->w, d->h, d->data, d->drawclip );
 
-  InvalidateEntireScreen();
+  Invalidate();
 
+// reset dirty array, to remember new updates for next refresh
   ClearDirtyscreen();
+
+// restore clip rectangle
+  PopClipping();
 }
 
 /**
@@ -1040,12 +1066,23 @@ void DecorationUpdateDisplay(void)
   Decoration *d;
   int i;
 
+// save clip rectangle
+  PushClipping();
+
+// Handle each decoration-single separately
   for ( i = 0; i < LevCount; i++ )
     for ( d = dhead[i]; d; d = d->nxt )
       for ( t = d->singles; t; t = t->nxt )
         CheckDraw( d, t );
 
-  InvalidateDirtyscreen();
+//  InvalidateDirtyscreen();
+  Invalidate();
+
+// reset dirty array, to remember new updates for next refresh
+  ClearDirtyscreen();
+
+// restore clip rectangle
+  PopClipping();
 }
 
 #endif
