@@ -3457,7 +3457,7 @@ local void SaveOrder(const Order* order, CLFile* file)
 		    (int)order->Arg1 >> 16, (int)order->Arg1 & 0xFFFF);
 		break;
 	    case UnitActionSpellCast:
-		CLprintf(file, " spell %s", ((SpellType*)order->Arg1)->Ident);
+		CLprintf(file, " spell %s", ((SpellType*)order->Arg1)->IdentName);
 		break;
 	    case UnitActionResearch:
 		CLprintf(file, " upgrade %s", ((Upgrade*)order->Arg1)->Ident);
