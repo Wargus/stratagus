@@ -95,6 +95,8 @@ static int HelpMeLastY;                   ///< Last Y coordinate HelpMe sound pl
 -- Functions
 ----------------------------------------------------------------------------*/
 
+static void RemoveUnitFromContainer(Unit* unit);
+
 /**
 ** Initial memory allocation for units.
 */
@@ -196,6 +198,11 @@ void ReleaseUnit(Unit* unit)
 		// Are more references remaining?
 		//
 		unit->Destroyed = 1; // mark as destroyed
+
+		if (unit->Container) {
+			MapUnmarkUnitSight(unit);
+			RemoveUnitFromContainer(unit);
+		}
 
 		if (--unit->Refs > 0) {
 			return;
@@ -827,7 +834,7 @@ void RemoveUnit(Unit* unit, Unit* host)
 {
 	if (unit->Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
-		DebugPrint("unit '%s' already remove" _C_ unit->Type->Ident);
+		DebugPrint("unit '%s(%d)' already removed\n" _C_ unit->Type->Ident _C_ unit->Slot);
 		return;
 	}
 	UnitCacheRemove(unit);
@@ -2893,7 +2900,6 @@ void LetUnitDie(Unit* unit)
 			0, 0);
 	}
 
-	//
 	// Handle Teleporter Destination Removal
 	if (type->Teleporter && unit->Goal) {
 		RemoveUnit(unit->Goal, NULL);
@@ -2903,66 +2909,18 @@ void LetUnitDie(Unit* unit)
 		unit->Goal = NULL;
 	}
 
-	//
-	// Building,...
-	//
-	if (type->Building) {
-		//
-		// Building with units inside?
-		//
-		//
-		// During resource build, the worker holds the resource amount,
-		// but if canceling building the platform, the worker is already
-		// outside.
-		if (type->GivesResource &&
-				unit->Orders[0].Action == UnitActionBuilded &&
-				unit->Data.Builded.Worker) {
-			// Restore value for oil-patch
-			unit->ResourcesHeld = unit->Data.Builded.Worker->ResourcesHeld;
-		}
-
-		DestroyAllInside(unit);
-		RemoveUnit(unit, NULL);
-		UnitLost(unit);
-		UnitClearOrders(unit);
-
-		// FIXME: buildings should get a die sequence
-
-		if (type->CorpseType) {
-			unit->State = unit->Type->CorpseScript;
-			Assert(type->TileWidth == type->CorpseType->TileWidth &&
-					type->TileHeight == type->CorpseType->TileHeight);
-			type = unit->Type = type->CorpseType;
-
-#ifdef DYNAMIC_LOAD
-			if (!type->Sprite) {
-				LoadUnitTypeSprite(type);
-			}
-#endif
-			unit->IX = (type->Width - VideoGraphicWidth(type->Sprite)) / 2;
-			unit->IY = (type->Height - VideoGraphicHeight(type->Sprite)) / 2;
-
-			unit->SubAction = 0;
-			unit->Removed = 0;
-			unit->Frame = 0;
-			unit->Orders[0].Action = UnitActionDie;
-
-			Assert(unit->Type->Animations &&
-				unit->Type->Animations->Die);
-			UnitShowAnimation(unit, unit->Type->Animations->Die);
-			DebugPrint("Frame %d\n" _C_ unit->Frame);
-			unit->CurrentSightRange = type->Stats[unit->Player->Player].SightRange;
-			MapMarkUnitSight(unit);
-			UnitCacheInsert(unit);
-		} else {
-			// no corpse available
-			unit->CurrentSightRange = 0;
-		}
-		return;
+	// During resource build, the worker holds the resource amount,
+	// but if canceling building the platform, the worker is already
+	// outside.
+	if (type->GivesResource &&
+			unit->Orders[0].Action == UnitActionBuilded &&
+			unit->Data.Builded.Worker) {
+		// Restore value for oil-patch
+		unit->ResourcesHeld = unit->Data.Builded.Worker->ResourcesHeld;
 	}
 
-	// Transporters lose their units
-	if (unit->Type->CanTransport) {
+	// Transporters lose their units and building their workers
+	if (unit->UnitInside) {
 		// FIXME: destroy or unload : do a flag.
 		DestroyAllInside(unit);
 	}
@@ -2980,14 +2938,25 @@ void LetUnitDie(Unit* unit)
 	unit->Reset = 0;
 	unit->Wait = 1;
 	unit->Orders[0].Action = UnitActionDie;
-	if (unit->Type->CorpseType) {
-		unit->CurrentSightRange = unit->Type->CorpseType->Stats[unit->Player->Player].SightRange;
-		MapMarkUnitSight(unit);
+	if (type->CorpseType) {
+#ifdef DYNAMIC_LOAD
+		if (!type->Sprite) {
+			LoadUnitTypeSprite(type);
+		}
+#endif
+		unit->IX = (type->CorpseType->Width - VideoGraphicWidth(type->CorpseType->Sprite)) / 2;
+		unit->IY = (type->CorpseType->Height - VideoGraphicHeight(type->CorpseType->Sprite)) / 2;
+
+		unit->CurrentSightRange = type->CorpseType->Stats[unit->Player->Player].SightRange;
 	} else {
 		unit->CurrentSightRange = 0;
 	}
-	unit->Removed = 0;
-	UnitCacheInsert(unit);
+	MapMarkUnitSight(unit);
+
+	if (type->CorpseType || (type->Animations && type->Animations->Die)) {
+		unit->Removed = 0;
+		UnitCacheInsert(unit);
+	}
 }
 
 /**
