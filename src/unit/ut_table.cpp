@@ -84,7 +84,7 @@ local ButtonConfig _FootmanButtons[] = {
 #define _KurdanAndSky_reeButtons	NULL
 #define _DentargButtons			NULL
 #define _KhadgarButtons			NULL
-#define _GnomHellscreamButtons		NULL
+#define _GromHellscreamButtons		NULL
 #define _TankerHumanButtons		NULL
 #define _TankerOrcButtons		NULL
 #define _TransportHumanButtons		NULL
@@ -182,10 +182,34 @@ local ButtonConfig _FootmanButtons[] = {
 --	Animations
 ----------------------------------------------------------------------------*/
 
-///	Default:
-local Animation _DefaultStill[] = {
+/*----------------------------------------------------------------------------
+--	Still
+----------------------------------------------------------------------------*/
+
+//	Default:
+local Animation DefaultStill[] = {
 // FIXME: Reset frame 0, wait 1, than endless wait 5
     {0, 0, 4, 0}, {3, 0, 1, 0}
+};
+
+//	Gryphon rider, Kurdan and Sky'ree:
+local Animation GryphonRiderStill[] = {
+    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {3, 0, 6, 5}
+};
+
+//	Dragon, Deathwing:
+local Animation DragonStill[] = {
+    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {3, 0, 6, 5}
+};
+
+//	GnomishFlyingMachine:
+local Animation GnomishFlyingMachineStill[] = {
+    {2, 0, 1, 0},  {2, 0, 1, 5},  {2, 0, 1, 0},  {3, 0, 1,-5}
+};
+
+//	Daemon:
+local Animation DaemonStill[] = {
+    {2, 0, 4, 0},  {2, 0, 4, 5},  {2, 0, 4, 5},  {3, 0, 4, 5}
 };
 
 /*----------------------------------------------------------------------------
@@ -705,7 +729,7 @@ local Animation DestroyedWaterSiteDie[] = {
 #define FootmanAnimations		GruntAnimations
 ///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
 local Animations GruntAnimations[] = {
-{   _DefaultStill,
+{   DefaultStill,
     GruntMove,
     GruntAttack,
     GruntDie,
@@ -715,7 +739,7 @@ local Animations GruntAnimations[] = {
 #define PeasantAnimations		PeonAnimations
 //	Peon, Peasant, Attacking Peon, Attacking Peasant.
 local Animations PeonAnimations[] = {
-{   NULL,
+{   DefaultStill,
     PeonMove,
     PeonAttack,
     PeonDie,
@@ -723,7 +747,7 @@ local Animations PeonAnimations[] = {
 };
 
 local Animations BallistaAnimations[] = {
-{   NULL,
+{   DefaultStill,
     BallistaMove,
     BallistaAttack,
     NULL,
@@ -731,7 +755,7 @@ local Animations BallistaAnimations[] = {
 };
 
 local Animations CatapultAnimations[] = {
-{   NULL,
+{   DefaultStill,
     CatapultMove,
     CatapultAttack,
     NULL,
@@ -739,49 +763,49 @@ local Animations CatapultAnimations[] = {
 };
 
 local Animations KnightAnimations[] = {
-{   NULL,
+{   DefaultStill,
     KnightMove,
-    NULL,
+    KnightAttack,
     KnightDie,
     NULL	}
 };
 
 local Animations OgreAnimations[] = {
-{   NULL,
+{   DefaultStill,
     OgreMove,
-    NULL,
+    OgreAttack,
     OgreDie,
     NULL	}
 };
 
 local Animations ArcherAnimations[] = {
-{   NULL,
+{   DefaultStill,
     ArcherMove,
-    NULL,
+    ArcherAttack,
     ArcherDie,
     NULL	}
 };
 
 local Animations AxethrowerAnimations[] = {
-{   NULL,
+{   DefaultStill,
     AxethrowerMove,
-    NULL,
+    AxethrowerAttack,
     AxethrowerDie,
     NULL	}
 };
 
 local Animations MageAnimations[] = {
-{   NULL,
+{   DefaultStill,
     MageMove,
-    NULL,
+    MageAttack,
     MageDie,
     NULL	}
 };
 
 local Animations DeathKnightAnimations[] = {
-{   NULL,
+{   DefaultStill,
     DeathKnightMove,
-    NULL,
+    DeathKnightAttack,
     DeathKnightDie,
     NULL	}
 };
@@ -790,17 +814,17 @@ local Animations DeathKnightAnimations[] = {
 #define OgreMageAnimations		OgreAnimations
 
 local Animations DwarvesAnimations[] = {
-{   NULL,
+{   DefaultStill,
     DwarvesMove,
-    NULL,
+    DwarvesAttack,
     DwarvesDie,
     NULL	}
 };
 
 local Animations GoblinSappersAnimations[] = {
-{   NULL,
+{   DefaultStill,
     GoblinSappersMove,
-    NULL,
+    GoblinSappersAttack,
     GoblinSappersDie,
     NULL	}
 };
@@ -813,43 +837,43 @@ local Animations GoblinSappersAnimations[] = {
 
 #define AlleriaAnimations		ArcherAnimations
 #define TeronGorefiendAnimations	DeathKnightAnimations
-#define KurdanAndSky_reeAnimations	NULL
-#define DentargAnimations		NULL
-#define KhadgarAnimations		NULL
-#define GnomHellscreamAnimations	NULL
+#define KurdanAndSky_reeAnimations	GryphonRiderAnimations
+#define DentargAnimations		OgreAnimations
+#define KhadgarAnimations		MageAnimations
+#define GromHellscreamAnimations	GruntAnimations
 
 #define TankerHumanAnimations		TankerOrcAnimations
 local Animations TankerOrcAnimations[] = {
-{   NULL,
+{   DefaultStill,
     TankerMove,
-    NULL,
+    TankerAttack,
     TankerDie,
     NULL	}
 };
 
 #define TransportHumanAnimations	TransportOrcAnimations
 local Animations TransportOrcAnimations[] = {
-{   NULL,
+{   DefaultStill,
     TransportMove,
-    NULL,
+    TransportAttack,
     TransportDie,
     NULL	}
 };
 
 #define ElvenDestroyerAnimations	TrollDestroyerAnimations
 local Animations TrollDestroyerAnimations[] = {
-{   NULL,
+{   DefaultStill,
     DestroyerMove,
-    NULL,
+    DestroyerAttack,
     DestroyerDie,
     NULL	}
 };
 
 #define BattleshipAnimations		JuggernaughtAnimations
 local Animations JuggernaughtAnimations[] = {
-{   NULL,
+{   DefaultStill,
     BattleshipMove,
-    NULL,
+    BattleshipAttack,
     BattleshipDie,
     NULL	}
 };
@@ -862,41 +886,41 @@ local Animations JuggernaughtAnimations[] = {
 
 #define GnomishSubmarineAnimations	GiantTurtleAnimations
 local Animations GiantTurtleAnimations[] = {
-{   NULL,
+{   DefaultStill,
     SubmarineMove,
-    NULL,
+    SubmarineAttack,
     SubmarineDie,
     NULL	}
 };
 
 local Animations GnomishFlyingMachineAnimations[] = {
-{   NULL,
+{   GnomishFlyingMachineStill,
     GnomishFlyingMachineMove,
-    NULL,
+    GnomishFlyingMachineAttack,
     GnomishFlyingMachineDie,
     NULL	}
 };
 
 local Animations GoblinZeppelinAnimations[] = {
-{   NULL,
+{   DefaultStill,
     GoblinZeppelinMove,
-    NULL,
+    GoblinZeppelinAttack,
     NULL,
     NULL	}
 };
 
 local Animations GryphonRiderAnimations[] = {
-{   NULL,
+{   GryphonRiderStill,
     GryphonRiderMove,
-    NULL,
+    GryphonRiderAttack,
     GryphonRiderDie,
     NULL	}
 };
 
 local Animations DragonAnimations[] = {
-{   NULL,
+{   DragonStill,
     DragonMove,
-    NULL,
+    DragonAttack,
     DragonDie,
     NULL	}
 };
@@ -904,9 +928,9 @@ local Animations DragonAnimations[] = {
 #define TuralyonAnimations		KnightAnimations
 
 local Animations EyeOfKilroggAnimations[] = {
-{   NULL,
+{   DefaultStill,
     EyeOfKilroggMove,
-    NULL,
+    EyeOfKilroggAttack,
     NULL,
     NULL	}
 };
@@ -922,81 +946,106 @@ local Animations EyeOfKilroggAnimations[] = {
 #define Nothing4Animations		NULL
 
 local Animations SkeletonAnimations[] = {
-{   NULL,
+{   DefaultStill,
     SkeletonMove,
-    NULL,
+    SkeletonAttack,
     SkeletonDie,
     NULL	}
 };
 
 local Animations DaemonAnimations[] = {
-{   NULL,
+{   DaemonStill,
     DaemonMove,
-    NULL,
+    DaemonAttack,
     DaemonDie,
     NULL	}
 };
 
 local Animations CritterAnimations[] = {
-{   NULL,
+{   DefaultStill,
     CritterMove,
-    NULL,
+    CritterAttack,
     CritterDie,
     NULL	}
 };
 
-#define FarmAnimations			NULL
-#define PigFarmAnimations		NULL
-#define BarracksHumanAnimations		NULL
-#define BarracksOrcAnimations		NULL
-#define ChurchAnimations		NULL
-#define AltarOfStormsAnimations		NULL
-#define ScoutTowerHumanAnimations	NULL
-#define ScoutTowerOrcAnimations		NULL
-#define StablesAnimations		NULL
-#define OgreMoundAnimations		NULL
-#define GnomishInventorAnimations	NULL
-#define GoblinAlchemistAnimations	NULL
-#define GryphonAviaryAnimations		NULL
-#define DragonRoostAnimations		NULL
-#define ShipyardHumanAnimations		NULL
-#define ShipyardOrcAnimations		NULL
-#define TownHallAnimations		NULL
-#define GreatHallAnimations		NULL
-#define ElvenLumberMillAnimations	NULL
-#define TrollLumberMillAnimations	NULL
-#define FoundryHumanAnimations		NULL
-#define FoundryOrcAnimations		NULL
-#define MageTowerAnimations		NULL
-#define TempleOfTheDamnedAnimations	NULL
-#define BlacksmithHumanAnimations	NULL
-#define BlacksmithOrcAnimations		NULL
-#define RefineryHumanAnimations		NULL
-#define RefineryOrcAnimations		NULL
-#define OilPlatformHumanAnimations	NULL
-#define OilPlatformOrcAnimations	NULL
-#define KeepAnimations			NULL
-#define StrongholdAnimations		NULL
-#define CastleAnimations		NULL
-#define FortressAnimations		NULL
-#define GoldMineAnimations		NULL
-#define OilPatchAnimations		NULL
-#define StartLocationHumanAnimations	NULL
-#define StartLocationOrcAnimations	NULL
-#define GuardTowerHumanAnimations	NULL
-#define GuardTowerOrcAnimations		NULL
-#define CannonTowerHumanAnimations	NULL
-#define CannonTowerOrcAnimations	NULL
-#define CircleofPowerAnimations		NULL
-#define DarkPortalAnimations		NULL
-#define RunestoneAnimations		NULL
-#define WallHumanAnimations		NULL
-#define WallOrcAnimations		NULL
-#define DeadBodyAnimations		NULL
-#define Destroyed1x1PlaceAnimations	NULL
-#define Destroyed2x2PlaceAnimations	NULL
-#define Destroyed3x3PlaceAnimations	NULL
-#define Destroyed4x4PlaceAnimations	NULL
+local Animations BuildingAnimations[] = {
+{   DefaultStill,
+    NULL,
+    NULL,
+    NULL,
+    NULL	}
+};
+
+local Animations GuardTowerAnimations[] = {
+{   DefaultStill,
+    NULL,
+    GuardTowerAttack,
+    NULL,
+    NULL	}
+};
+
+local Animations CannonTowerAnimations[] = {
+{   DefaultStill,
+    NULL,
+    CannonTowerAttack,
+    NULL,
+    NULL	}
+};
+
+#define FarmAnimations			BuildingAnimations
+#define PigFarmAnimations		BuildingAnimations
+#define BarracksHumanAnimations		BuildingAnimations
+#define BarracksOrcAnimations		BuildingAnimations
+#define ChurchAnimations		BuildingAnimations
+#define AltarOfStormsAnimations		BuildingAnimations
+#define ScoutTowerHumanAnimations	BuildingAnimations
+#define ScoutTowerOrcAnimations		BuildingAnimations
+#define StablesAnimations		BuildingAnimations
+#define OgreMoundAnimations		BuildingAnimations
+#define GnomishInventorAnimations	BuildingAnimations
+#define GoblinAlchemistAnimations	BuildingAnimations
+#define GryphonAviaryAnimations		BuildingAnimations
+#define DragonRoostAnimations		BuildingAnimations
+#define ShipyardHumanAnimations		BuildingAnimations
+#define ShipyardOrcAnimations		BuildingAnimations
+#define TownHallAnimations		BuildingAnimations
+#define GreatHallAnimations		BuildingAnimations
+#define ElvenLumberMillAnimations	BuildingAnimations
+#define TrollLumberMillAnimations	BuildingAnimations
+#define FoundryHumanAnimations		BuildingAnimations
+#define FoundryOrcAnimations		BuildingAnimations
+#define MageTowerAnimations		BuildingAnimations
+#define TempleOfTheDamnedAnimations	BuildingAnimations
+#define BlacksmithHumanAnimations	BuildingAnimations
+#define BlacksmithOrcAnimations		BuildingAnimations
+#define RefineryHumanAnimations		BuildingAnimations
+#define RefineryOrcAnimations		BuildingAnimations
+#define OilPlatformHumanAnimations	BuildingAnimations
+#define OilPlatformOrcAnimations	BuildingAnimations
+#define KeepAnimations			BuildingAnimations
+#define StrongholdAnimations		BuildingAnimations
+#define CastleAnimations		BuildingAnimations
+#define FortressAnimations		BuildingAnimations
+#define GoldMineAnimations		BuildingAnimations
+#define OilPatchAnimations		BuildingAnimations
+#define StartLocationHumanAnimations	BuildingAnimations
+#define StartLocationOrcAnimations	BuildingAnimations
+#define GuardTowerHumanAnimations	GuardTowerAnimations
+#define GuardTowerOrcAnimations		GuardTowerAnimations
+#define CannonTowerHumanAnimations	CannonTowerAnimations
+#define CannonTowerOrcAnimations	CannonTowerAnimations
+#define CircleofPowerAnimations		BuildingAnimations
+#define DarkPortalAnimations		BuildingAnimations
+#define RunestoneAnimations		BuildingAnimations
+#define WallHumanAnimations		BuildingAnimations
+#define WallOrcAnimations		BuildingAnimations
+
+#define DeadBodyAnimations		BuildingAnimations
+#define Destroyed1x1PlaceAnimations	BuildingAnimations
+#define Destroyed2x2PlaceAnimations	BuildingAnimations
+#define Destroyed3x3PlaceAnimations	BuildingAnimations
+#define Destroyed4x4PlaceAnimations	BuildingAnimations
 
 #define PeasantWithGoldAnimations	PeasantAnimations
 #define PeonWithGoldAnimations		PeonAnimations
@@ -1948,7 +1997,7 @@ global UnitType UnitTypes[] = {
 	,DEFAULT
 	,DEFAULT }
     , 72, 72			// graphic size
-   ,GnomHellscreamAnimations	// animations
+   ,GromHellscreamAnimations	// animations
    ,{ "icon-grom-hellscream" }
    ,{ "missile-none" }		// Missile
    ,CorpseHuman

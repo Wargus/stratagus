@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,166 +37,16 @@
 #include "sound_server.h"
 #include "missile.h"
 
-#ifndef USE_CCL2
 /*----------------------------------------------------------------------------
---	Still
+--	Functions
 ----------------------------------------------------------------------------*/
-
-//	Gryphon rider, Kurdan and Sky'ree:
-local Animation GryphonRiderStill[] = {
-    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {3, 0, 6, 5}
-};
-
-//	Dragon, Deathwing:
-local Animation DragonStill[] = {
-    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {3, 0, 6, 5}
-};
-
-//	GnomishFlyingMachine:
-local Animation GnomishFlyingMachineStill[] = {
-    {2, 0, 1, 0},  {2, 0, 1, 5},  {2, 0, 1, 0},  {3, 0, 1,-5}
-};
-
-//	Daemon:
-local Animation DaemonStill[] = {
-    {2, 0, 4, 0},  {2, 0, 4, 5},  {2, 0, 4, 5},  {3, 0, 4, 5}
-};
-
-//	Default:
-local Animation DefaultStill[] = {
-// FIXME: Reset frame 0, wait 1, than endless wait 5
-    {0, 0, 4, 0}, {3, 0, 1, 0}
-};
-
-/*
-**	Still animation. FIXME: move this to unit-type, CCL configurable
-*/
-global Animation* UnitStillAnimation[UnitTypeInternalMax] = {
-    DefaultStill,		// UnitFootman
-    DefaultStill,		// UnitGrunt
-    DefaultStill,		// UnitPeasant
-    DefaultStill,		// UnitPeon
-    DefaultStill,		// UnitBallista
-    DefaultStill,		// UnitCatapult
-    DefaultStill,		// UnitKnight
-    DefaultStill,		// UnitOgre
-    DefaultStill,		// UnitArcher
-    DefaultStill,		// UnitAxethrower
-    DefaultStill,		// UnitMage
-    DefaultStill,		// UnitDeathKnight
-    DefaultStill,		// UnitPaladin
-    DefaultStill,		// UnitOgreMage
-    DefaultStill,		// UnitDwarves
-    DefaultStill,		// UnitGoblinSappers
-    DefaultStill,		// UnitAttackPeasant
-    DefaultStill,		// UnitAttackPeon
-    DefaultStill,		// UnitRanger
-    DefaultStill,		// UnitBerserker
-    DefaultStill,		// UnitAlleria
-    DefaultStill,		// UnitTeronGorefiend
-    GryphonRiderStill,		// UnitKurdanAndSky_ree
-    DefaultStill,		// UnitDentarg
-    DefaultStill,		// UnitKhadgar
-    DefaultStill,		// UnitGromHellscream
-    DefaultStill,		// UnitTankerHuman
-    DefaultStill,		// UnitTankerOrc
-    DefaultStill,		// UnitTransportHuman
-    DefaultStill,		// UnitTransportOrc
-    DefaultStill,		// UnitElvenDestroyer
-    DefaultStill,		// UnitTrollDestroyer
-    DefaultStill,		// UnitBattleship
-    DefaultStill,		// UnitJuggernaught
-    DefaultStill,		// UnitNothing
-    DragonStill,		// UnitDeathwing
-    DefaultStill,		// UnitNothing1
-    DefaultStill,		// UnitNothing2
-    DefaultStill,		// UnitGnomishSubmarine
-    DefaultStill,		// UnitGiantTurtle
-    GnomishFlyingMachineStill,	// UnitGnomishFlyingMachine
-    DefaultStill,		// UnitGoblinZeppelin
-    GryphonRiderStill,		// UnitGryphonRider
-    DragonStill,		// UnitDragon
-    DefaultStill,		// UnitTuralyon
-    DefaultStill,		// UnitEyeOfKilrogg
-    DefaultStill,		// UnitDanath
-    DefaultStill,		// UnitKorgathBladefist
-    DefaultStill,		// UnitNothing3
-    DefaultStill,		// UnitCho_gall
-    DefaultStill,		// UnitLothar
-    DefaultStill,		// UnitGul_dan
-    DefaultStill,		// UnitUtherLightbringer
-    DefaultStill,		// UnitZuljin
-    DefaultStill,		// UnitNothing4
-    DefaultStill,		// UnitSkeleton
-    DaemonStill,		// UnitDaemon
-    DefaultStill,		// UnitCritter
-    DefaultStill,		// UnitFarm
-    DefaultStill,		// UnitPigFarm
-    DefaultStill,		// UnitBarracksHuman
-    DefaultStill,		// UnitBarracksOrc
-    DefaultStill,		// UnitChurch
-    DefaultStill,		// UnitAltarOfStorms
-    DefaultStill,		// UnitScoutTowerHuman
-    DefaultStill,		// UnitScoutTowerOrc
-    DefaultStill,		// UnitStables
-    DefaultStill,		// UnitOgreMound
-    DefaultStill,		// UnitGnomishInventor
-    DefaultStill,		// UnitGoblinAlchemist
-    DefaultStill,		// UnitGryphonAviary
-    DefaultStill,		// UnitDragonRoost
-    DefaultStill,		// UnitShipyardHuman
-    DefaultStill,		// UnitShipyardOrc
-    DefaultStill,		// UnitTownHall
-    DefaultStill,		// UnitGreatHall
-    DefaultStill,		// UnitElvenLumberMill
-    DefaultStill,		// UnitTrollLumberMill
-    DefaultStill,		// UnitFoundryHuman
-    DefaultStill,		// UnitFoundryOrc
-    DefaultStill,		// UnitMageTower
-    DefaultStill,		// UnitTempleOfTheDamned
-    DefaultStill,		// UnitBlacksmithHuman
-    DefaultStill,		// UnitBlacksmithOrc
-    DefaultStill,		// UnitRefineryHuman
-    DefaultStill,		// UnitRefineryOrc
-    DefaultStill,		// UnitOilPlatformHuman
-    DefaultStill,		// UnitOilPlatformOrc
-    DefaultStill,		// UnitKeep
-    DefaultStill,		// UnitStronghold
-    DefaultStill,		// UnitCastle
-    DefaultStill,		// UnitFortress
-    DefaultStill,		// UnitGoldMine
-    DefaultStill,		// UnitOilPatch
-    DefaultStill,		// UnitStartLocationHuman
-    DefaultStill,		// UnitStartLocationOrc
-    DefaultStill,		// UnitGuardTowerHuman
-    DefaultStill,		// UnitGuardTowerOrc
-    DefaultStill,		// UnitCannonTowerHuman
-    DefaultStill,		// UnitCannonTowerOrc
-    DefaultStill,		// UnitCircleofPower
-    DefaultStill,		// UnitDarkPortal
-    DefaultStill,		// UnitRunestone
-    DefaultStill,		// UnitWallHuman
-    DefaultStill,		// UnitWallOrc
-    DefaultStill,		// UnitDeadBody
-    DefaultStill,		// Unit1x1DestroyedPlace
-    DefaultStill,		// Unit2x2DestroyedPlace
-    DefaultStill,		// Unit3x3DestroyedPlace
-    DefaultStill,		// Unit4x4DestroyedPlace
-    DefaultStill,		// UnitPeonWithGold
-    DefaultStill,		// UnitPeasantWithGold
-    DefaultStill,		// UnitPeonWithWood
-    DefaultStill,		// UnitPeasantWithWood
-    DefaultStill,		// UnitTankerHumanFull
-    DefaultStill,		// UnitTankerOrcFull
-};
-#endif
 
 /**
 **	Unit stands still!
 */
 global void HandleActionStill(Unit* unit)
 {
-    UnitType* type;
+    const UnitType* type;
     Unit* goal;
 
     DebugLevel3(__FUNCTION__": %Zd\n",UnitNumber(unit));
@@ -208,10 +62,9 @@ global void HandleActionStill(Unit* unit)
 	//
 	//	Still animation
 	//
-        DebugCheck( type->Type>=UnitTypeInternalMax
-            || !UnitStillAnimation[type->Type] );
+        DebugCheck( !type->Animations || !type->Animations->Still );
 
-	UnitShowAnimation(unit,UnitStillAnimation[type->Type]);
+	UnitShowAnimation(unit,type->Animations->Still);
 
 	//
 	//	FIXME: this a workaround of a bad code.
@@ -226,12 +79,12 @@ global void HandleActionStill(Unit* unit)
 
     }
 
-    if( !unit->Reset ) {		// animation can't be aborted
+    if( !unit->Reset ) {		// animation can't be aborted here
 	return;
     }
 
     //
-    //	Building:	burning
+    //	Building:	burning FIXME: must moved to general point
     //
     if( type->Building ) {
 	if( unit->HP ) {
@@ -274,9 +127,15 @@ global void HandleActionStill(Unit* unit)
     //
     //	Critters:	are moving random around.
     //
+    // FIXME: critters: skeleton and daemon are also critters??????
     if( type->Critter ) {
-	// FIXME: critters: skeleton and daemon are also critters??????
-	if( type->Type==UnitCritter ) {
+	static const UnitType* critter;
+
+	if( !critter ) {
+	    // FIXME: remove or move the by ident, it is to slow!
+	    critter=UnitTypeByIdent("unit-critter");
+	}
+	if( type==critter ) {
 	    int x;
 	    int y;
 	
@@ -306,6 +165,7 @@ global void HandleActionStill(Unit* unit)
 	    }
 	    if( x!=unit->X || y!=unit->Y ) {
 		// FIXME: Don't use pathfinder for this.
+		// FIXME: atleast prove the field is free.
 		unit->Command.Action=UnitActionMove;
 		unit->Command.Data.Move.Fast=1;
 		unit->Command.Data.Move.Goal=NoUnitP;
