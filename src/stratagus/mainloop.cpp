@@ -758,15 +758,17 @@ global void GameMainLoop(void)
 #if defined(DEBUG) && !defined(FLAG_DEBUG)
 	MustRedraw|=RedrawMenuButton;
 #endif
-        if( FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed ) {
+        if( FastForwardCycle > GameCycle
+		&& RealVideoSyncSpeed != VideoSyncSpeed ) {
 	    RealVideoSyncSpeed = VideoSyncSpeed;
 	    VideoSyncSpeed = 3000;
 	}
 	if( FastForwardCycle >= GameCycle ) {
 	    MustRedraw = RedrawEverything;
 	}
-	if( MustRedraw /* && !VideoInterrupts */ &&
-		(FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle%97))) {
+	if( MustRedraw /* && !VideoInterrupts */
+		&& (FastForwardCycle <= GameCycle || GameCycle <= 10
+		    || !(GameCycle & 0x3f)) ) {
 	    if( Callbacks==&MenuCallbacks ) {
 		MustRedraw|=RedrawMenu;
 	    }
@@ -798,7 +800,7 @@ global void GameMainLoop(void)
 	if( FastForwardCycle == GameCycle ) {
 	    VideoSyncSpeed = RealVideoSyncSpeed;
 	}
-	if( FastForwardCycle <= GameCycle ) {
+	if( FastForwardCycle <= GameCycle || !(GameCycle & 0x3f) ) {
 	    WaitEventsOneFrame(Callbacks);
 	}
 	if( !NetworkInSync ) {
