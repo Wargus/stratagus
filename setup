@@ -526,7 +526,7 @@ case $VIDSEL in
 	if [ "$WIN32" = "1" ] ; then
 	  echo "Using SDL"
   	  USESDL=1
-	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
+	  SDLLIB="\$(shell $SDL_CONFIG --libs) -lmingwex"
 	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	  echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
           if test "$STATIC x" != " x" ; then
