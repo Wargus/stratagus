@@ -719,7 +719,7 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **
 **	@return		Unit, if an unit of correct type is on the field.
 */
-global Unit* UnitCacheOnXY(int x,int y,int type)
+global Unit* UnitCacheOnXY(int x,int y,unsigned type)
 {
     QuadTreeLeaf* leaf;
 
@@ -936,7 +936,7 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **
 **	@return		Unit, if an unit of correct type is on the field.
 */
-global Unit* UnitCacheOnXY(int x,int y,int type)
+global Unit* UnitCacheOnXY(int x,int y,unsigned type)
 {
     Unit* unit;
 
