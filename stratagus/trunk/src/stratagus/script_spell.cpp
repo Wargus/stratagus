@@ -47,55 +47,16 @@
 #include "ccl.h"
 
 // **************************************************************************
-//		Direct affectation for spell
-// **************************************************************************
-
-/**
-**      Parse the dependency of spell.
-**      list = (upgrade "upgradename")
-*/
-local void ccl_spell_dependency(const char *id, SCM list, SpellType *spell)
-{
-    char *dependencyName;
-    SCM value;
-    int dependencyId;
-
-    DebugCheck(!id);
-    DebugCheck(!spell);
-
-    dependencyName = NULL;
-    dependencyId = -1;
-
-    value = gh_car(list);
-
-    if (!gh_eq_p(value, gh_symbol2scm("upgrade"))) {
-	return;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-
-    dependencyName = gh_scm2newstr(value, NULL);
-    dependencyId = UpgradeIdByIdent(dependencyName);
-    if (dependencyId == -1) {
-	// warn user
-	DebugLevel0Fn("Bad upgrade-name '%s'\n" _C_ dependencyName);
-	free(dependencyName);
-	return ;
-    }
-    spell->DependencyId = dependencyId;
-    free(dependencyName);
-}
-
-
-// **************************************************************************
 //		Action parsers for spellAction
 // **************************************************************************
 
-/**
+/*
 **	Parse the action for spell.
-**	list = (action-type lots-of-parameters).
+**
+**	@param list		SCM list object, with somthing like (action-type params).
+**	@param spellaction	Pointer to spellactopm.
 */
-local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spellaction)
+local void CclSpellAction(SCM list, SpellActionType *spellaction)
 {
     char* str;
     SCM	value = list;
@@ -324,6 +285,8 @@ local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spel
 **	@param 	value		scm value to convert.
 **
 **	@return CONDITION_TRUE, CONDITION_FALSE, CONDITION_ONLY or -1 on error.
+**	@note 	This is a helper function to make CclSpellCondition shorter
+**		and easier to understand.
 */
 local char Scm2Condition(SCM value)
 {
@@ -347,7 +310,7 @@ local char Scm2Condition(SCM value)
 **
 **	@notes: conditions must be allocated. All data already in is LOST.
 */
-local void CclSpellParseCondition(SCM list, ConditionInfo* condition)
+local void CclSpellCondition(SCM list, ConditionInfo* condition)
 {
     SCM value;
 
@@ -428,41 +391,40 @@ local void CclSpellParseCondition(SCM list, ConditionInfo* condition)
     }
 }
 
-/**
-**	FIXME: docu
+/*
+**	Parse the Condition for spell.
+**	
+**	@param list		SCM object to parse
+**	@param autocast		pointer to autocast to fill with data.
+**
+**	@notes: autocast must be allocated. All data already in is LOST.
 */
-local void ccl_spell_autocast(const char *id, SCM list, SpellType *spell)
+local void CclSpellAutocast(SCM list, AutoCastInfo* autocast)
 {
     SCM value;
-    int range;
 
-    DebugCheck(!id);
-    DebugCheck(!spell);
+    DebugCheck(!list);
+    DebugCheck(!autocast);
 
-    value = gh_car(list);
-    if (!gh_eq_p(value, gh_symbol2scm("range"))) {
-	return ;
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value,gh_symbol2scm("range"))) {
+	    autocast->Range=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("combat"))) {
+	    autocast->Combat=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("condition"))) {
+	    if (!autocast->Condition) {
+		autocast->Condition=(ConditionInfo*)malloc(sizeof(ConditionInfo));
+	    }
+	    CclSpellCondition(gh_car(list),autocast->Condition);
+	    list=gh_cdr(list);
+	} else {
+	    errl("Unsupported autocast tag",value);
+	}
     }
-
-    list = gh_cdr(list);
-    value = gh_car(list);
-    range = gh_scm2int(value);
-    if (range <= 0 && range != -1/*no limit*/) {
-	// Warn : range <= 0 have no sens, must be strict positive. or = -1
-	return ;
-    }
-    spell->AutoCast = malloc(sizeof(*spell->AutoCast));
-    memset(spell->AutoCast, 0, sizeof(*spell->AutoCast));
-    spell->AutoCast->Range = range;
-    list = gh_cdr(list);
-    value = gh_car(list);
-    if (!gh_eq_p(value, gh_symbol2scm("condition"))) {
-	return ;
-    }
-    list = gh_cdr(list);
-    value = gh_car(list);
-    spell->AutoCast->Condition=(ConditionInfo*)malloc(sizeof(ConditionInfo));
-    CclSpellParseCondition(value,spell->AutoCast->Condition);
 }
 
 /**
@@ -525,15 +487,23 @@ local SCM CclDefineSpell(SCM list)
 	    }
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("action"))) {
-	    spell->Action=(SpellActionType*)malloc(sizeof(SpellActionType));
-	    CclParseSpellAction(gh_car(list),spell,spell->Action);
+	    if (!spell->Action) {
+		spell->Action=(SpellActionType*)malloc(sizeof(SpellActionType));
+	    }
+	    CclSpellAction(gh_car(list),spell->Action);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("condition"))) {
-	    spell->Conditions=(ConditionInfo*)malloc(sizeof(ConditionInfo));
-	    CclSpellParseCondition(gh_car(list),spell->Conditions);
+	    if (!spell->Conditions) {
+		spell->Conditions=(ConditionInfo*)malloc(sizeof(ConditionInfo));
+	    }
+	    CclSpellCondition(gh_car(list),spell->Conditions);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("autocast"))) {
-	    ccl_spell_autocast("autocast",gh_car(list),spell);
+	    if (!spell->AutoCast) {
+		spell->AutoCast=(AutoCastInfo*)malloc(sizeof(AutoCastInfo));
+		memset(spell->AutoCast,0,sizeof(AutoCastInfo*));
+	    }
+	    CclSpellAutocast(gh_car(list),spell->AutoCast);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("sound-when-cast"))) {
 	    //  Free the old name, get the new one
@@ -555,11 +525,15 @@ local SCM CclDefineSpell(SCM list)
 	    }
 	    free(str);
 	    list=gh_cdr(list);
-	} else if (gh_eq_p(value,gh_symbol2scm("depend"))) {
-	    ccl_spell_dependency("depend", gh_car(list), spell);
+	} else if (gh_eq_p(value,gh_symbol2scm("depend-upgrade"))) {
+	    str = gh_scm2newstr(gh_car(list), NULL);
+	    spell->DependencyId = UpgradeIdByIdent(str);
+	    free(str);
+	    if (spell->DependencyId == -1) {
+		errl("Bad upgrade name",gh_car(list));
+	    }
 	    list = gh_cdr(list);
-	} else 
-	{
+	} else {
 	    errl("Unsupported tag", value);
 	}
     }
@@ -591,18 +565,32 @@ local void SaveSpellCondition(CLFile *file,ConditionInfo* condition)
     DebugCheck(!file);
     DebugCheck(!condition);
 
-    CLprintf(file,"'( ");
+    CLprintf(file,"( ");
     //
     //	First save data related to flags.
     //	NOTE: (int) is there to keep compilers happy.
     //
-    CLprintf(file,"undead %s ",condstrings[(int)condition->Undead]);
-    CLprintf(file,"organic %s ",condstrings[(int)condition->Organic]);
-    CLprintf(file,"hero %s ",condstrings[(int)condition->Hero]);
-    CLprintf(file,"coward %s ",condstrings[(int)condition->Coward]);
-    CLprintf(file,"alliance %s ",condstrings[(int)condition->Alliance]);
-    CLprintf(file,"building %s ",condstrings[(int)condition->Building]);
-    CLprintf(file,"self %s ",condstrings[(int)condition->TargetSelf]);
+    if (condition->Undead!=CONDITION_TRUE) {
+	CLprintf(file,"undead %s ",condstrings[(int)condition->Undead]);
+    }
+    if (condition->Organic!=CONDITION_TRUE) {
+	CLprintf(file,"organic %s ",condstrings[(int)condition->Organic]);
+    }
+    if (condition->Hero!=CONDITION_TRUE) {
+	CLprintf(file,"hero %s ",condstrings[(int)condition->Hero]);
+    }
+    if (condition->Coward!=CONDITION_TRUE) {
+	CLprintf(file,"coward %s ",condstrings[(int)condition->Coward]);
+    }
+    if (condition->Alliance!=CONDITION_TRUE) {
+	CLprintf(file,"alliance %s ",condstrings[(int)condition->Alliance]);
+    }
+    if (condition->Building!=CONDITION_TRUE) {
+	CLprintf(file,"building %s ",condstrings[(int)condition->Building]);
+    }
+    if (condition->TargetSelf!=CONDITION_TRUE) {
+	CLprintf(file,"self %s ",condstrings[(int)condition->TargetSelf]);
+    }
     //
     //	Min/Max vital percents
     //
@@ -633,18 +621,18 @@ local void SaveSpellCondition(CLFile *file,ConditionInfo* condition)
 local void SaveSpellAction(CLFile *file,SpellActionType* action)
 {
     if (action->CastFunction==CastAreaBombardment) {
-	CLprintf(file," '(area-bombardment fields %d shards %d damage %d start-offset-x %d start-offset-y %d)",
+	CLprintf(file,"(area-bombardment fields %d shards %d damage %d start-offset-x %d start-offset-y %d)",
 		action->Data.AreaBombardment.Fields,
 		action->Data.AreaBombardment.Shards,
 		action->Data.AreaBombardment.Damage,
 		action->Data.AreaBombardment.StartOffsetX,
 		action->Data.AreaBombardment.StartOffsetY);
     } else if (action->CastFunction==CastFireball) {
-	CLprintf(file," '(fireball ttl %d damage %d)",
+	CLprintf(file,"(fireball ttl %d damage %d)",
 		action->Data.Fireball.TTL,
 		action->Data.Fireball.Damage);
     } else if (action->CastFunction==CastAdjustVitals) {
-	CLprintf(file," '(adjust-vitals");
+	CLprintf(file,"(adjust-vitals");
 	if (action->Data.AdjustVitals.HP) {
 	    CLprintf(file," hit-points %d",action->Data.AdjustVitals.HP);
 	}
@@ -656,11 +644,11 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
 	}
 	CLprintf(file,")\n");
     } else if (action->CastFunction==CastSummon) {
-	CLprintf(file," '(summon unit-type %s time-to-live %d)",
+	CLprintf(file,"(summon unit-type %s time-to-live %d)",
 		action->Data.Summon.UnitType->Ident,
 		action->Data.Summon.TTL);
     } else if (action->CastFunction==CastAdjustBuffs) {
-	CLprintf(file," '(adjust-buffs");
+	CLprintf(file,"(adjust-buffs");
 	if (action->Data.AdjustBuffs.HasteTicks!=BUFF_NOT_AFFECTED) {
 	    CLprintf(file," haste-ticks %d",action->Data.AdjustBuffs.HasteTicks);
 	}
@@ -678,27 +666,27 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
 	}
 	CLprintf(file,")");
     } else if (action->CastFunction==CastPolymorph) {
-	CLprintf(file," '(polymorph new-form %s)",
+	CLprintf(file,"(polymorph new-form %s)",
 		action->Data.Polymorph.NewForm->Ident);
     } else if (action->CastFunction==CastRaiseDead) {
-	CLprintf(file," '(raise-dead unit-raised %s time-to-live %d)",
+	CLprintf(file,"(raise-dead unit-raised %s time-to-live %d)",
 		action->Data.RaiseDead.UnitRaised->Ident,
 		action->Data.RaiseDead.TTL);
     } else if (action->CastFunction==CastFlameShield) {
-	CLprintf(file," '(flame-shield duration %d)",
+	CLprintf(file,"(flame-shield duration %d)",
 		action->Data.FlameShield.TTL);
     } else if (action->CastFunction==CastRunes) {
-	CLprintf(file," '(runes ttl %d damage %d)",
+	CLprintf(file,"(runes ttl %d damage %d)",
 		action->Data.Runes.TTL,
 		action->Data.Runes.Damage);
     } else if (action->CastFunction==CastSpawnPortal) {
-	CLprintf(file," '(spawn-portal portal-type %s)",
+	CLprintf(file,"(spawn-portal portal-type %s)",
 		action->Data.SpawnPortal.PortalType->Ident);
     } else if (action->CastFunction==CastDeathCoil) {
-	CLprintf(file," '(death-coil)");
+	CLprintf(file,"(death-coil)");
 	// FIXME: more?
     } else if (action->CastFunction==CastWhirlwind) {
-	CLprintf(file," '(whirlwind duration %d)",
+	CLprintf(file,"(whirlwind duration %d)",
 		action->Data.Whirlwind.TTL);
 	// FIXME: more?
     } 
@@ -754,20 +742,25 @@ global void SaveSpells(CLFile *file)
 	//
 	//  Save the action(effect of the spell)
 	//
-	CLprintf(file,"    'action ");
+	CLprintf(file,"    'action '");
 	SaveSpellAction(file,spell->Action);
 	CLprintf(file,"\n");
 	//
 	//  FIXME: Save conditions
 	//
 	if (spell->Conditions) {
-	    CLprintf(file,"    'condition ");
+	    CLprintf(file,"    'condition '");
 	    SaveSpellCondition(file,spell->Conditions);
 	    CLprintf(file,"\n");
 	}
 	//
 	//  FIXME: Save autocast and AI info
 	//
+	if (spell->AutoCast) {
+	    CLprintf(file,"    'autocast '(range %d condition ",spell->AutoCast->Range);
+	    SaveSpellCondition(file,spell->Conditions);
+	    CLprintf(file,")\n");
+	}
 	CLprintf(file,")\n");
     }
 }
