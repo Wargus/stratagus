@@ -1454,6 +1454,33 @@ local void InitSaveGameMenuItems() {
     SaveGameMenuItems[6].d.button  = i6;
 }
 
+local Menuitem LoadGameMenuItems[] = {
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
+    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveSelectLBInit, SaveSelectLBExit, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+};
+local void InitLoadGameMenuItems() {
+    MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
+    MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
+    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveSelectLBAction, 0, 0, 0, 0, 7, 0,
+			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
+    MenuitemVslider i3 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
+    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteFile, 'd'};
+    MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
+    SaveGameMenuItems[0].d.text    = i0;
+    SaveGameMenuItems[1].d.input   = i1;
+    SaveGameMenuItems[2].d.listbox = i2;
+    SaveGameMenuItems[3].d.vslider = i3;
+    SaveGameMenuItems[4].d.button  = i4;
+    SaveGameMenuItems[5].d.button  = i5;
+    SaveGameMenuItems[6].d.button  = i6;
+}
+
 local Menuitem ConfirmSaveMenuItems[] = {
     { MI_TYPE_TEXT, 384/2, 11, 0, GameFont, NULL, NULL, {{NULL, 0}} },
 };
@@ -1463,7 +1490,7 @@ local void InitConfirmSaveMenuItems() {
 }
 
 local Menuitem ConfirmDeleteMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 288/2, 11, 0, GameFont, NULL, NULL, {{NULL, 0}} },
 };
 local void InitConfirmDeleteMenuItems() {
     MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
@@ -1737,6 +1764,16 @@ global Menu Menus[] = {
 	NULL,
     },
     {
+	// Load Menu
+	176+(14*TileSizeX-384)/2,
+	16+(14*TileSizeY-256)/2,
+	384, 256,
+	ImagePanel3,
+	6, 7,
+	LoadGameMenuItems,
+	NULL,
+    },
+    {
 	// Confirm Save Menu
 	(640-288)/2,
 	260,
@@ -1748,8 +1785,8 @@ global Menu Menus[] = {
     },
     {
 	// Confirm Delete Menu
-	(640-288)/2,
-	260,
+	176+(14*TileSizeX-288)/2,
+	16+(14*TileSizeY-256)/2,
 	288, 128,
 	ImagePanel4,
 	1, 1,
