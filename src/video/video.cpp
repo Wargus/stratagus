@@ -699,6 +699,7 @@ local void ColorCycle16(void)
 		((VMemType16 *) (current_link->Palette))[i] =
 		    ((VMemType16 *) (current_link->Palette))[i + 1];
 	    }
+	    ((VMemType16 *) (current_link->Palette))[ColorIconCycleEnd] = x;
 
 	    x = ((VMemType16 *) (current_link->Palette))[ColorBuildingCycleStart];
 	    for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {	// Buildings color cycle
