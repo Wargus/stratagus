@@ -1402,7 +1402,7 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **
 **	@return		Unit, if an unit of correct type is on the field.
 */
-global Unit* UnitCacheOnXY(int x,int y,int type)
+global Unit* UnitCacheOnXY(int x,int y,unsigned type)
 {
     const MapField *mf = TheMap.Fields + y*TheMap.Width + x;
 
@@ -1410,6 +1410,8 @@ global Unit* UnitCacheOnXY(int x,int y,int type)
     case UnitTypeLand:
 	if (LandUnitOnMapField (mf)) {
 	    return Units[mf->LandUnit];
+	} else if (BuildingOnMapField (mf)) {
+	    return Units[mf->Building];
 	} else {
 	    return NULL;
 	}
@@ -1468,6 +1470,41 @@ global void InitUnitCache(void)
 	TheMap.Fields[m].SeaUnit = 0xffff;
     }
 }
+
+/**
+**	Inserts a dieing unit into the current dead list
+**	it may be into the building or corpse list
+**
+**	@param unit	Unit pointer to insert into list
+**/
+global void DeadCacheInsert(Unit* unit,Unit** List)
+{
+    unit->Next=*List;
+    *List=unit;
+}
+
+/**
+**	Removes a corpse from the current corpse list
+**
+**	@param unit	Unit pointer to remove from list
+**/
+global void DeadCacheRemove(Unit* unit, Unit** List )
+{
+    Unit** prev;
+
+    prev=List;
+    DebugCheck( !*prev );
+    while( *prev ) {			// find the unit, be bug friendly
+	if( *prev==unit ) {
+	    *prev=unit->Next;
+	    unit->Next=NULL;
+	    return;
+	}
+	prev=&(*prev)->Next;
+	DebugCheck( !*prev );
+    }
+}
+
 
 #endif  // UNITS_ON_MAP
 
