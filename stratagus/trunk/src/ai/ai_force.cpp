@@ -495,11 +495,11 @@ global void AiAttackWithForce(int force)
 		DebugLevel3Fn("FORCE %d started (AiAttackWithForce)\n" _C_ force);
 
 		enemy = NoUnitP;
-		for (x = 0; x < NumUnits; ++x) {
-			if (IsEnemy(AiPlayer->Player, Units[x]) && Units[x]->HP) {
-				enemy = Units[x];
-				break;
+		while (aiunit && !enemy) {
+			if (aiunit->Unit->Type->CanAttack) {
+				enemy = AttackUnitsInDistance(aiunit->Unit, MaxMapWidth);
 			}
+			aiunit = aiunit->Next;
 		}
 
 		if (!enemy) {
