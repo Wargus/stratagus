@@ -411,6 +411,8 @@ global void CreateGame(char* filename, WorldMap* map)
     LoadUnitTypes();
     LoadDecorations();
 
+    InitSelections();
+
     DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n" _C_
 	AllocatedGraphicMemory _C_
 	AllocatedGraphicMemory / 1024 _C_

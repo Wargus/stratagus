@@ -50,11 +50,12 @@
 **	Defines a group of units.
 */
 typedef struct _unit_group_ {
-    Unit*	Units[NUM_UNITS_PER_GROUP];	/// Units in the group
-    int		NumUnits;			/// How many units in the group
+    Unit**	Units;			/// Units in the group
+    int		NumUnits;		/// How many units in the group
 } UnitGroup;				/// group of units
 
 global UnitGroup Groups[NUM_GROUPS];	/// Number of groups predefined
+global int NumUnitsPerGroup;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -71,6 +72,8 @@ global void InitGroups(void)
 
     for (i = 0; i < NUM_GROUPS; ++i) {
 	int n;
+
+	Groups[i].Units = malloc(NumUnitsPerGroup * sizeof(Unit*));
 
 	if ((n = Groups[i].NumUnits)) {		// Cleanup after load
 	    while (n--) {
@@ -114,6 +117,7 @@ global void CleanGroups(void)
     int i;
 
     for (i = 0; i < NUM_GROUPS; ++i) {
+	free(Groups[i].Units);
         memset(&Groups[i], 0, sizeof(Groups[i]));
     }
 }
@@ -173,7 +177,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
     DebugCheck(num > NUM_GROUPS);
 
     group = &Groups[num];
-    for (i = 0; group->NumUnits < NUM_UNITS_PER_GROUP && i < nunits; ++i) {
+    for (i = 0; group->NumUnits < NumUnitsPerGroup && i < nunits; ++i) {
         group->Units[group->NumUnits++] = units[i];
 	units[i]->GroupId |= (1 << num);
     }
@@ -188,7 +192,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
  */
 global void SetGroup(Unit** units, int nunits, int num)
 {
-    DebugCheck(num > NUM_GROUPS || nunits > NUM_UNITS_PER_GROUP);
+    DebugCheck(num > NUM_GROUPS || nunits > NumUnitsPerGroup);
 
     ClearGroup(num);
     AddToGroup(units, nunits, num);
