@@ -539,6 +539,7 @@ local void Usage(void)
 \t\t\t\t3=1024x768,4=1600x1200)\n\
 \t-D\t\tVideomode depth = pixel pro point (for Win32/TNT)\n\
 \t-F\t\tFullscreen videomode (only with SDL supported)\n\
+\t-S\t\tSync speed (100 = 30 frames/s)\n\
 \t-W\t\tWindowed videomode (only with SDL supported)\n\
 map is relative to FreeCraftLibPath=datapath, use ./map for relative to cwd\n\
 ",NameLine);
@@ -575,7 +576,7 @@ global int main(int argc,char** argv)
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:FL:U:W?") ) {
+	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:FL:S:U:W?") ) {
 #if defined(USE_CCL) || defined(USE_CCL2)
 	    case 'c':
 		CclStartFile=optarg;
@@ -644,6 +645,9 @@ global int main(int argc,char** argv)
 	    case 'D':
 		VideoDepth=atoi(optarg);
 		continue;
+	    case 'S':
+		VideoSyncSpeed=atoi(optarg);
+		continue;
 
 	    case -1:
 		break;
@@ -674,6 +678,7 @@ global int main(int argc,char** argv)
     if (CclStartFile[0] != '/' && CclStartFile[0] != '.') {
         CclStartFile = strdcat3(FreeCraftLibPath, "/", CclStartFile);
     }
+
     CclInit();				// load configurations!
 #endif
 
