@@ -1093,6 +1093,9 @@ global void UIHandleButtonUp(int b)
 		if( Selected[0]->Command.Action==UnitActionBuilded ) {
 		//if( Selected[0]->Constructed )
 		    PlayUnitSound(Selected[0],VoiceBuilding);
+		} else if( Selected[0]->Burning ) {
+		    // FIXME: use GameSounds.Burning
+		    PlayGameSound(SoundIdForName("burning"),MaxSampleVolume);
 		} else if( Selected[0]->Player==ThisPlayer 
 			|| Selected[0]->Player->Race==PlayerRaceNeutral ) {
 		    PlayUnitSound(Selected[0],VoiceSelected);
