@@ -65,6 +65,7 @@ extern int NodeGetAreaOffset (int , int );
 #include "unit.h"
 
 extern int PfHierInitialize (void);
+extern void PfHierClean (void);
 extern int PfHierComputePath (Unit * , int * , int * );
 extern void PfHierMapChangedCallback (int , int , int , int );
 extern void PfHierReleaseData (Unit * );

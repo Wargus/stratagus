@@ -15,6 +15,12 @@ void RegidSpaceInitialize (RegidSpace *space, int size)
 	space->Bitmap = (unsigned char * )calloc (size, sizeof (unsigned char));
 }
 
+void RegidSpaceDestroy (RegidSpace *space)
+{
+	if (space->Bitmap)
+		free (space->Bitmap);
+}
+
 void RegidBitmapInflate (RegidSpace *space)
 {
 	space->Bitmap = realloc (space->Bitmap, ++space->BitmapSize);

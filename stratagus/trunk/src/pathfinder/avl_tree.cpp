@@ -23,6 +23,7 @@ local AvlTreeNode *rotate (AvlTreeNode * , int );
 void AvlFlush (AvlTree *root)
 {
 	AvlDestroyNodes (root->subtree[RIGHT]);
+	root->subtree[RIGHT] = NULL;
 }
 
 local void AvlDestroyNodes (AvlTreeNode *root)

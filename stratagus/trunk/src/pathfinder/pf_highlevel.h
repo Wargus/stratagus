@@ -30,6 +30,7 @@ struct highlevel_path {
 typedef struct highlevel_path HighlevelPath;
 
 extern int HighlevelInit (void);
+extern void HighlevelClean (void);
 extern void HighlevelReset (void);
 extern HighlevelPath *ComputeHighlevelPath (Unit * );
 extern void HighReleasePath (Unit * );

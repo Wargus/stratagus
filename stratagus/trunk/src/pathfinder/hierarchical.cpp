@@ -49,6 +49,7 @@ int PfHierShowGroupIds = 1;
 //local void AreaAddRegion (int , int , Region * );
 local void AreaDestroyRegions (int , int );
 local int AreasInitialize (void);
+local void AreasDestroy (void);
 local void AreasFillRegionLists (void);
 local int PfHierGetPrecomputed (Unit * , int * , int * );
 local int ResolveDeadlock (Unit * , Unit * , int * , int * );
@@ -76,6 +77,14 @@ int PfHierInitialize (void)
 	LowlevelInit ();
 	/* FIXME should return something useful */
 	return 1;
+}
+
+void PfHierClean (void)
+{
+	AreasDestroy ();
+	RegionSetDestroy ();
+	RegGroupsDestroy ();
+	HighlevelClean ();
 }
 
 int PfHierComputePath (Unit *unit, int *dx, int *dy)
@@ -162,6 +171,19 @@ local int AreasInitialize (void)
 		return -1;
 	else
 		return 0;
+}
+
+local void AreasDestroy (void)
+{
+	int ax, ay;
+
+	for (ay=0; ay < H.AMapHeight; ay++)
+		for (ax=0; ax < H.AMapWidth; ax++) {
+			Area *area = &H.Areas[ay * H.AMapWidth + ax];
+			free (area->Regions);
+		}
+
+	free (H.Areas);
 }
 
 #if 0
@@ -455,6 +477,8 @@ void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
 	printf ("MapChanged: (%d,%d)->(%d,%d), groups %s need to be recomputed\n",
 					x0, y0, x1, y1, RecomputeGroups ? "" : "don't");
 
+	/* FIXME: if changed rectangle touches Area boundary we need to process
+	 * that other Area too. */
 	x0 = ax0 * AreaGetWidth();
 	y0 = ay0 * AreaGetHeight();
 	x1 = (ax1 + 1) * AreaGetWidth();
