@@ -574,7 +574,10 @@ global void GameMainLoop(void)
 		    break;
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
 		case 8:				// Check cd-rom
-		    CDRomCheck();
+#ifdef USE_SDLCD
+		    if ( !GameCycle%3 )
+#endif
+			CDRomCheck();
 		    break;
 #endif
 	    }
