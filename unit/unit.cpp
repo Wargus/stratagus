@@ -354,6 +354,7 @@ global void InitUnit(Unit* unit, UnitType* type)
 
     // FIXME: this is not needed for load+save, must move to other place
     if (1) {				// Call CCL for name generation
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	SCM fun;
 
 	fun = gh_symbol2scm("gen-unit-name");
@@ -366,6 +367,8 @@ global void InitUnit(Unit* unit, UnitType* type)
 		unit->Name = gh_scm2newstr(value, NULL);
 	    }
 	}
+#elif defined(USE_LUA)
+#endif
     }
 
     unit->Frame = unit->Type->Animations->Still[0].Frame +

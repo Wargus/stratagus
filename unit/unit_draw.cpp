@@ -311,7 +311,8 @@ global Decoration SpellSprite;
 **	@param w	Mana width.
 **	@param h	Mana height.
 */
-global SCM CclManaSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclManaSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 {
     free(ManaSprite.File);
 
@@ -323,6 +324,25 @@ global SCM CclManaSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclManaSprite(lua_State* l)
+{
+    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
+	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    free(ManaSprite.File);
+
+    ManaSprite.File = strdup(lua_tostring(l, 1));
+    ManaSprite.HotX = lua_tonumber(l, 2);
+    ManaSprite.HotY = lua_tonumber(l, 3);
+    ManaSprite.Width = lua_tonumber(l, 4);
+    ManaSprite.Height = lua_tonumber(l, 5);
+
+    return 0;
+}
+#endif
 
 /**
 **	Define health sprite.
@@ -333,7 +353,8 @@ global SCM CclManaSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 **	@param w	Health width.
 **	@param h	Health height.
 */
-global SCM CclHealthSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclHealthSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 {
     free(HealthSprite.File);
 
@@ -345,9 +366,28 @@ global SCM CclHealthSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclHealthSprite(lua_State* l)
+{
+    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
+	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    free(ManaSprite.File);
+
+    HealthSprite.File = strdup(lua_tostring(l, 1));
+    HealthSprite.HotX = lua_tonumber(l, 2);
+    HealthSprite.HotY = lua_tonumber(l, 3);
+    HealthSprite.Width = lua_tonumber(l, 4);
+    HealthSprite.Height = lua_tonumber(l, 5);
+
+    return 0;
+}
+#endif
 
 /**
-**	Define health sprite.
+**	Define shadow sprite.
 **
 **	@param file	Shadow graphic file.
 **	@param x	Shadow X position.
@@ -355,7 +395,8 @@ global SCM CclHealthSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 **	@param w	Shadow width.
 **	@param h	Shadow height.
 */
-global SCM CclShadowSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclShadowSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 {
     free(ShadowSprite.File);
 
@@ -367,9 +408,28 @@ global SCM CclShadowSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShadowSprite(lua_State* l)
+{
+    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
+	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    free(ManaSprite.File);
+
+    ShadowSprite.File = strdup(lua_tostring(l, 1));
+    ShadowSprite.HotX = lua_tonumber(l, 2);
+    ShadowSprite.HotY = lua_tonumber(l, 3);
+    ShadowSprite.Width = lua_tonumber(l, 4);
+    ShadowSprite.Height = lua_tonumber(l, 5);
+
+    return 0;
+}
+#endif
 
 /**
-**	Define health sprite.
+**	Define spell sprite.
 **
 **	@param file	Spell graphic file.
 **	@param x	Spell X position.
@@ -377,7 +437,8 @@ global SCM CclShadowSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 **	@param w	Spell width.
 **	@param h	Spell height.
 */
-global SCM CclSpellSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclSpellSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 {
     free(SpellSprite.File);
 
@@ -389,10 +450,30 @@ global SCM CclSpellSprite(SCM file, SCM x, SCM y, SCM w, SCM h)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSpellSprite(lua_State* l)
+{
+    if (lua_gettop(l) != 5 || !lua_isstring(l, 1) || !lua_isnumber(l, 2) ||
+	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isnumber(l, 5)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    free(ManaSprite.File);
+
+    SpellSprite.File = strdup(lua_tostring(l, 1));
+    SpellSprite.HotX = lua_tonumber(l, 2);
+    SpellSprite.HotY = lua_tonumber(l, 3);
+    SpellSprite.Width = lua_tonumber(l, 4);
+    SpellSprite.Height = lua_tonumber(l, 5);
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display health as health-bar.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowHealthBar(void)
 {
     ShowHealthBar = 1;
@@ -400,10 +481,24 @@ local SCM CclShowHealthBar(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowHealthBar(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowHealthBar = 1;
+    ShowHealthDot = 0;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display health as health-dot.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowHealthDot(void)
 {
     ShowHealthBar = 0;
@@ -411,10 +506,24 @@ local SCM CclShowHealthDot(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowHealthDot(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowHealthBar = 0;
+    ShowHealthDot = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display health as horizontal bar.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowHealthHorizontal(void)
 {
     ShowHealthBar = 1;
@@ -423,10 +532,25 @@ local SCM CclShowHealthHorizontal(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowHealthHorizontal(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowHealthBar = 1;
+    ShowHealthDot = 0;
+    ShowHealthHorizontal = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display health as vertical bar.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowHealthVertical(void)
 {
     ShowHealthBar = 1;
@@ -435,10 +559,25 @@ local SCM CclShowHealthVertical(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowHealthVertical(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowHealthBar = 1;
+    ShowHealthDot = 0;
+    ShowHealthHorizontal = 0;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display mana as mana-bar.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowManaBar(void)
 {
     ShowManaBar = 1;
@@ -446,10 +585,24 @@ local SCM CclShowManaBar(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowManaBar(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowManaBar = 1;
+    ShowManaDot = 0;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display mana as mana-dot.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowManaDot(void)
 {
     ShowManaBar = 0;
@@ -457,31 +610,71 @@ local SCM CclShowManaDot(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowManaDot(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowManaBar = 0;
+    ShowManaDot = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable energy bars and dots only for selected units
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowEnergySelected(void)
 {
     ShowEnergySelectedOnly = 1;
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowEnergySelected(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowEnergySelectedOnly = 1;
+
+    return 0;
+}
+#endif
 
 
 /**
 **	Enable display of full bars/dots.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowFull(void)
 {
     ShowNoFull = 0;
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowFull(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowNoFull = 0;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display mana as horizontal bar.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowManaHorizontal(void)
 {
     ShowManaBar = 1;
@@ -490,10 +683,25 @@ local SCM CclShowManaHorizontal(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowManaHorizontal(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowManaBar = 1;
+    ShowManaDot = 0;
+    ShowManaHorizontal = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable display mana as vertical bar.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowManaVertical(void)
 {
     ShowManaBar = 1;
@@ -502,32 +710,73 @@ local SCM CclShowManaVertical(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowManaVertical(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowManaBar = 1;
+    ShowManaDot = 0;
+    ShowManaHorizontal = 0;
+
+    return 0;
+}
+#endif
 
 /**
 **	Disable display of full bars/dots.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowNoFull(void)
 {
     ShowNoFull = 1;
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowNoFull(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowNoFull = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Draw decorations always on top.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDecorationOnTop(void)
 {
     DecorationOnTop = 1;
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDecorationOnTop(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    DecorationOnTop = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Register CCL features for decorations.
 */
 global void DecorationCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure5_0("mana-sprite", CclManaSprite);
     gh_new_procedure5_0("health-sprite", CclHealthSprite);
     gh_new_procedure5_0("shadow-sprite", CclShadowSprite);
@@ -548,6 +797,28 @@ global void DecorationCclRegister(void)
     gh_new_procedure0_0("show-full", CclShowFull);
     gh_new_procedure0_0("show-no-full", CclShowNoFull);
     gh_new_procedure0_0("decoration-on-top", CclDecorationOnTop);
+#elif defined(USE_LUA)
+    lua_register(Lua, "ManaSprite", CclManaSprite);
+    lua_register(Lua, "HealthSprite", CclHealthSprite);
+    lua_register(Lua, "ShadowSprite", CclShadowSprite);
+    lua_register(Lua, "SpellSprite", CclSpellSprite);
+
+    lua_register(Lua, "ShowHealthBar", CclShowHealthBar);
+    lua_register(Lua, "ShowHealthDot", CclShowHealthDot);
+// adicionado por protoman
+    lua_register(Lua, "ShowHealthVertical", CclShowHealthVertical);
+    lua_register(Lua, "ShowHealthHorizontal", CclShowHealthHorizontal);
+    lua_register(Lua, "ShowManaVertical", CclShowManaVertical);
+    lua_register(Lua, "ShowManaHorizontal", CclShowManaHorizontal);
+// fim
+
+    lua_register(Lua, "ShowManaBar", CclShowManaBar);
+    lua_register(Lua, "ShowManaDot", CclShowManaDot);
+    lua_register(Lua, "ShowEnergySelectedOnly", CclShowEnergySelected);
+    lua_register(Lua, "ShowFull", CclShowFull);
+    lua_register(Lua, "ShowNoFull", CclShowNoFull);
+    lua_register(Lua, "DecorationOnTop", CclDecorationOnTop);
+#endif
 }
 
 /**

@@ -313,6 +313,7 @@ global Construction* ConstructionByWcNum(int num)
 **
 **	@param list	List of all names.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineConstructionWcNames(SCM list)
 {
     int i;
@@ -338,6 +339,42 @@ local SCM CclDefineConstructionWcNames(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineConstructionWcNames(lua_State* l)
+{
+    int i;
+    int j;
+    char** cp;
+
+    if ((cp = ConstructionWcNames)) {	// Free all old names
+	while (*cp) {
+	    free(*cp++);
+	}
+	free(ConstructionWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i = lua_gettop(l);
+    ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));
+    if (!cp) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+
+    for (j = 0; j < i; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	*cp++ = strdup(lua_tostring(l, j + 1));
+    }
+    *cp = NULL;
+
+    return 0;
+}
+#endif
 
 /**
 **	Parse the construction.
@@ -346,6 +383,7 @@ local SCM CclDefineConstructionWcNames(SCM list)
 **
 **	@note make this more flexible
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineConstruction(SCM list)
 {
     SCM value;
@@ -506,6 +544,8 @@ local SCM CclDefineConstruction(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -514,9 +554,14 @@ local SCM CclDefineConstruction(SCM list)
 */
 global void ConstructionCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-construction-wc-names",
 	CclDefineConstructionWcNames);
     gh_new_procedureN("define-construction", CclDefineConstruction);
-
+#elif defined(USE_LUA)
+    lua_register(Lua, "DefineConstructionWcNames",
+	CclDefineConstructionWcNames);
+//    lua_register(Lua, "DefineConstruction", CclDefineConstruction);
+#endif
 }
 //@}

@@ -61,6 +61,7 @@ global char* EditorUnitsIcon;
 **
 **	@param list	List of all names.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineEditorUnitTypes(SCM list)
 {
     int i;
@@ -87,38 +88,48 @@ local SCM CclDefineEditorUnitTypes(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the editor's select icon
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetEditorSelectIcon(SCM icon)
 {
     free(EditorSelectIcon);
     EditorSelectIcon = gh_scm2newstr(icon, NULL);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the editor's units icon
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetEditorUnitsIcon(SCM icon)
 {
     free(EditorUnitsIcon);
     EditorUnitsIcon = gh_scm2newstr(icon, NULL);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for the editor.
 */
 global void EditorCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     //gh_new_procedureN("player", CclPlayer);
     //gh_new_procedure0_0("get-this-player", CclGetThisPlayer);
     //gh_new_procedure1_0("set-this-player!", CclSetThisPlayer);
     gh_new_procedureN("define-editor-unittypes", CclDefineEditorUnitTypes);
     gh_new_procedure1_0("set-editor-select-icon!", CclSetEditorSelectIcon);
     gh_new_procedure1_0("set-editor-units-icon!", CclSetEditorUnitsIcon);
+#endif
 }
 
 //@}
