@@ -2269,6 +2269,7 @@ local void SaveReplayOk(void)
     fwrite(buf, s.st_size, 1, fd);
     fclose(fd);
 
+    free(buf);
     EndMenu();
 }
 
