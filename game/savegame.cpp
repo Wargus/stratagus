@@ -103,7 +103,18 @@ global void SaveGame(const char* filename)
 	FreeCraftMajorVersion,FreeCraftMinorVersion,FreeCraftPatchLevel);
     fprintf(file,";;;  'savefile\t'(%d %d %d)\n",
 	FreeCraftMajorVersion,FreeCraftMinorVersion,FreeCraftPatchLevel);
-    fprintf(file,";;;  'preview\t\"%s.pam\"\n",filename);
+    // Save media type
+    { SCM var;
+	fprintf(file,";;;  'media\t'");
+	var=gh_symbol2scm("media-version");
+	if( !gh_null_p(symbol_boundp(var, NIL)) ) {
+	    var=symbol_value(var,NIL);
+	    lprin1f(var,file);
+	} else {
+	    fprintf(file,"nil");
+	}
+    }
+    fprintf(file,"\n;;;  'preview\t\"%s.pam\"\n",filename);
     fprintf(file,";;;  )\n");
 
     // FIXME: probably not the right place for this
