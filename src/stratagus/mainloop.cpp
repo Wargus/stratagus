@@ -220,7 +220,7 @@ global void DebugTestDisplay(void)
 global void UpdateDisplay(void)
 {
     if (!MustRedraw) {
-      return;
+	return;
     }
 
     VideoLockScreen();			// prepare video write
