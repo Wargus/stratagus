@@ -473,12 +473,12 @@ extern int ForestOnMap(int x, int y);
 	/// Returns true, if rock on the map tile field
 extern int RockOnMap(int x, int y);
 
+	/// Returns true, if the unit-type(mask can enter field with bounds check
+extern int CheckedCanMoveToMask(int x, int y, int mask);
+	/// Returns true, if the unit-type can enter the field
+extern int UnitTypeCanMoveTo(int x, int y, const UnitType* type);
 	/// Returns true, if the unit can enter the field
-extern int UnitCanMoveTo(const Unit* unit, int x, int y);
-
-	/// Returns true, if the unittype can enter the field
-extern int UnitTypeCanMoveTo(const UnitType* type, int x, int y);
-
+extern int UnitCanMoveTo(int x, int y, const Unit* unit);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
