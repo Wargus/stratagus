@@ -775,6 +775,7 @@ local void ShowOrder(const Unit* unit)
     int x2;
     int y2;
     int color;
+    int e_color;
     int dest;
     const Unit* goal;
 
@@ -798,112 +799,117 @@ local void ShowOrder(const Unit* unit)
 	    break;
 
 	case UnitActionStill:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionStandGround:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionFollow:
 	case UnitActionMove:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionPatrol:
 	    VideoDrawLineClip(ColorGreen,x1,y1,x2,y2);
-	    color=ColorBlue;
+	    e_color=color=ColorBlue;
 	    x1=Map2ScreenX(((int)unit->Orders[0].Arg1)>>16)+TileSizeX/2;
 	    y1=Map2ScreenY(((int)unit->Orders[0].Arg1)&0xFFFF)+TileSizeY/2;
 	    dest=1;
 	    break;
 
 	case UnitActionRepair:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionAttack:
 	case UnitActionAttackGround:
+	    if( unit->SubAction&2 ) {	// Show weak targets.
+		e_color=ColorBlue;
+	    } else {
+		e_color=ColorRed;
+	    }
 	    color=ColorRed;
 	    dest=1;
 	    break;
 
 	case UnitActionBoard:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionUnload:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionDie:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionSpellCast:
-	    color=ColorBlue;
+	    e_color=color=ColorBlue;
 	    dest=1;
 	    break;
 
 	case UnitActionTrain:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionUpgradeTo:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionResearch:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionBuild:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionBuilded:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    break;
 
 	case UnitActionHarvest:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionMineGold:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionHaulOil:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionReturnGoods:
-	    color=ColorGreen;
+	    e_color=color=ColorGreen;
 	    dest=1;
 	    break;
 
 	case UnitActionDemolish:
-	    color=ColorRed;
+	    e_color=color=ColorRed;
 	    dest=1;
 	    break;
 
 	default:
-	    color=ColorGray;
+	    e_color=color=ColorGray;
 	    DebugLevel1Fn("Unknown action %d\n",unit->Orders[0].Action);
 	    break;
     }
     VideoFillCircleClip(color,x1,y1,2);
     if( dest ) {
 	VideoDrawLineClip(color,x1,y1,x2,y2);
-	VideoFillCircleClip(color,x2,y2,2);
+	VideoFillCircleClip(e_color,x2,y2,3);
     }
 
     //DrawPath(unit);
