@@ -71,15 +71,8 @@ global void InitGroups(void)
     int i;
 
     for (i = 0; i < NUM_GROUPS; ++i) {
-	int n;
-
-	Groups[i].Units = malloc(MaxSelectable * sizeof(Unit*));
-
-	if ((n = Groups[i].NumUnits)) {		// Cleanup after load
-	    while (n--) {
-		DebugLevel0Fn("FIXME: old code!\n");
-		Groups[i].Units[n] = UnitSlots[(int)Groups[i].Units[n]];
-	    }
+	if (!Groups[i].Units) {
+	    Groups[i].Units = malloc(MaxSelectable * sizeof(Unit*));
 	}
     }
 }
@@ -117,7 +110,9 @@ global void CleanGroups(void)
     int i;
 
     for (i = 0; i < NUM_GROUPS; ++i) {
-	free(Groups[i].Units);
+    	if (Groups[i].Units) {
+	    free(Groups[i].Units);
+	}
 	memset(&Groups[i], 0, sizeof(Groups[i]));
     }
 }
@@ -248,6 +243,9 @@ local SCM CclGroup(SCM group, SCM num, SCM units)
 
     grp = &Groups[gh_scm2int(group)];
     grp->NumUnits = gh_scm2int(num);
+    if (!grp->Units) {
+	InitGroups();
+    }
     i = 0;
     while (!gh_null_p(units)) {
 	char* str;
