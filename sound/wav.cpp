@@ -64,34 +64,31 @@ typedef struct _wav_data_ {
 local int WavReadStream(Sample *sample, void *buf, int len)
 {
     WavData* data;
-    char sndbuf[WAV_BUFFER_SIZE*4];
+    char sndbuf[WAV_BUFFER_SIZE];
     int n;
     int i;
-    int x, y;
+    int x;
+    int y;
     int rate;
 
     data = (WavData*) sample->User;
 
     if (data->PointerInBuffer - sample->Data + len > sample->Length) {
 	// need to read new data
-	n = sample->Length - (data->PointerInBuffer - sample->Data);
-	memcpy(sample->Data, data->PointerInBuffer, n);
-	sample->Length = n;
-	data->PointerInBuffer = sample->Data;
+	sample->Length -= data->PointerInBuffer - sample->Data;
+	memcpy(sample->Data, data->PointerInBuffer, sample->Length);
+	data->PointerInBuffer = sample->Data + sample->Length;
 
-	n = WAV_BUFFER_SIZE - n;
+	n = WAV_BUFFER_SIZE - sample->Length;
 
-	rate = 22050 / (sample->Frequency / sample->Channels);
-	if (!rate) {
-	    rate = 1;
-	}
+	rate = 44100 / sample->Frequency;
 
-	i = CLread(data->WavFile, sndbuf, WAV_BUFFER_SIZE/rate);
+	i = CLread(data->WavFile, sndbuf, n/rate);
 
 	// FIXME: clicking for 22khz sounds
 	for (x = 0; x < i*rate; x += 4) {
 	    for (y = 0; y < 4; ++y) {
-	        data->PointerInBuffer[x + sample->Length + y] = sndbuf[x/rate+y];
+	        data->PointerInBuffer[x + y] = sndbuf[x/rate+y];
 	    }
 	}
 
@@ -268,6 +265,8 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 
 	sample->Type = &WavStreamSampleType;
 	sample->User = data;
+
+	CLread(f, &chunk, sizeof(chunk));
 
 	DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + WAV_BUFFER_SIZE);
 	IfDebug( AllocatedSoundMemory += sizeof(*sample) + WAV_BUFFER_SIZE);
