@@ -220,7 +220,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i);
 local void SetMusicPower(Menuitem *mi);
 local void CdVolumeHSAction(Menuitem *mi, int i);
 local void SetCdPower(Menuitem *mi);
-local void SetCdModeAll(Menuitem *mi);
+local void SetCdModeDefined(Menuitem *mi);
 local void SetCdModeRandom(Menuitem *mi);
 
 // Preferences
@@ -595,7 +595,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(SetMusicPower,"set-music-power");
     HASHADD(CdVolumeHSAction,"cd-volume-hs-action");
     HASHADD(SetCdPower,"set-cd-power");
-    HASHADD(SetCdModeAll,"set-cd-mode-all");
+    HASHADD(SetCdModeDefined,"set-cd-mode-defined");
     HASHADD(SetCdModeRandom,"set-cd-mode-random");
 
 // Preferences
@@ -1595,7 +1595,7 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 	menu->items[16].flags = 0;
 	menu->items[17].flags = 0;
 
-	if (CDMode == CDModeAll) {
+	if (CDMode == CDModeDefined) {
 	    menu->items[16].d.gem.state = MI_GSTATE_CHECKED;
 	    menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
 	} else if (CDMode == CDModeRandom) {
@@ -1885,10 +1885,10 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
 /**
 **	CD play all tracks gem callback
 */
-local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
+local void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 {
 #if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_SDLCD))
-    CDMode = CDModeAll;
+    CDMode = CDModeDefined;
 #endif
     SoundOptionsInit(NULL);
 }
