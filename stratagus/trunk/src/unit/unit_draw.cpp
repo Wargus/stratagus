@@ -38,6 +38,8 @@
 #include "interface.h"
 #include "ccl.h"
 
+#include "etlib/generic.h"
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -90,11 +92,18 @@ local void DrawSelectionRectangle(Unit* unit,UnitType* type,int x,int y)
 	return;
     }
 
-    VideoDrawRectangle(color
+#if 0
+    VideoDrawRectangleClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
 	    ,type->BoxWidth
 	    ,type->BoxHeight);
+#else
+    VideoDrawCircleClip(color
+	    ,x+type->TileWidth*TileSizeX/2
+	    ,y+type->TileHeight*TileSizeY/2
+	    ,min(type->BoxWidth,type->BoxHeight)/2);
+#endif
 }
 
 /**
@@ -220,7 +229,7 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	    } else {
 		color=ColorRed;
 	    }
-	    VideoFillRectangle(color
+	    VideoFillRectangleClip(color
 		,x+(type->TileWidth*TileSizeX
 			-type->BoxWidth)/2
 		,y+(type->TileHeight*TileSizeY
@@ -279,7 +288,7 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	if( type->CanCastSpell
 		&& !(ShowNoFull && unit->Mana==255) ) {
 	    f=(100*unit->Mana)/255;
-	    VideoFillRectangle(ColorBlue
+	    VideoFillRectangleClip(ColorBlue
 		,x+(type->TileWidth*TileSizeX
 			+type->BoxWidth)/2
 		,y+(type->TileHeight*TileSizeY
@@ -410,12 +419,12 @@ global void DrawPath(Unit* unit)
 	    return;
 	}
 	// CLIPPING
-	VideoDrawRectangle(ColorGray
+	VideoDrawRectangleClip(ColorGray
 	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 	    ,6,6);
 	while( x1!=x2 ) {
 	    x1+=xstep;
-	    VideoDrawRectangle(ColorGray
+	    VideoDrawRectangleClip(ColorGray
 		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 		,6,6);
 	}
@@ -424,19 +433,19 @@ global void DrawPath(Unit* unit)
 
     if( dx==0 ) {		// vertical line
 	// CLIPPING
-	VideoDrawRectangle(ColorGray
+	VideoDrawRectangleClip(ColorGray
 	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 	    ,6,6);
 	while( y1!=y2 ) {
 	    y1++;
-	    VideoDrawRectangle(ColorGray
+	    VideoDrawRectangleClip(ColorGray
 		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 		,6,6);
 	}
 	return;
     }
 
-    VideoDrawRectangle(ColorGray
+    VideoDrawRectangleClip(ColorGray
 	,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 	,6,6);
 
@@ -451,7 +460,7 @@ global void DrawPath(Unit* unit)
 		d+=dy;
 		x1+=xstep;
 	    }
-	    VideoDrawRectangle(ColorGray
+	    VideoDrawRectangleClip(ColorGray
 		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 		,6,6);
 	}
@@ -470,7 +479,7 @@ global void DrawPath(Unit* unit)
 		d+=dx;
 		++y1;
 	    }
-	    VideoDrawRectangle(ColorGray
+	    VideoDrawRectangleClip(ColorGray
 		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 		,6,6);
 	}
@@ -481,7 +490,7 @@ global void DrawPath(Unit* unit)
     while( y1!=y2) {
 	x1+=xstep;
 	y1++;
-	VideoDrawRectangle(ColorGray
+	VideoDrawRectangleClip(ColorGray
 	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 	    ,6,6);
     }
@@ -617,7 +626,7 @@ local void DrawUnit(Unit* unit)
     //
     if( NumSelected==1 && unit->Selected ) {
 	if( ShowSightRange ) {
-	    VideoDrawRectangle(ColorGreen
+	    VideoDrawRectangleClip(ColorGreen
 		,x+TileSizeX/2-stats->SightRange*TileSizeX
 		,y+TileSizeY/2-stats->SightRange*TileSizeY
 		,stats->SightRange*TileSizeX*2
@@ -629,7 +638,7 @@ local void DrawUnit(Unit* unit)
 			? type->ReactRangeHuman
 			: type->ReactRangeComputer;
 		if( r ) {
-		    VideoDrawRectangle(ColorBlue
+		    VideoDrawRectangleClip(ColorBlue
 			,x+TileSizeX/2-r*TileSizeX
 			,y+TileSizeY/2-r*TileSizeY
 			,r*TileSizeX*2
@@ -637,7 +646,7 @@ local void DrawUnit(Unit* unit)
 		}
 	    }
 	    if( ShowAttackRange && stats->AttackRange ) {
-		VideoDrawRectangle(ColorRed
+		VideoDrawRectangleClip(ColorRed
 		    ,x+TileSizeX/2-stats->AttackRange*TileSizeX
 		    ,y+TileSizeY/2-stats->AttackRange*TileSizeY
 		    ,stats->AttackRange*TileSizeX*2

@@ -610,10 +610,10 @@ global void DrawMinimapCursor(int vx,int vy)
     // FIXME: The viewpoint color should be configurable
     switch( ThisPlayer->Race ) {
 	case PlayerRaceHuman:
-	    VideoDrawRectangle(ColorWhite,x,y,w,h);
+	    VideoDrawRectangleClip(ColorWhite,x,y,w,h);
 	    break;
 	case PlayerRaceOrc:
-	    VideoDrawRectangle(ColorWhite,x,y,w,h);
+	    VideoDrawRectangleClip(ColorWhite,x,y,w,h);
 	    break;
     }
 }
