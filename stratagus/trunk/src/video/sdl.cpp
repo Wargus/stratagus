@@ -44,6 +44,12 @@
 #include <unistd.h>
 #endif
 #include <SDL.h>
+#ifdef USE_OPENGL
+#ifdef USE_WIN32
+#include <windows.h>
+#endif
+#include <GL/gl.h>
+#endif
 
 #ifdef USE_BEOS
 #include <sys/socket.h>
@@ -77,6 +83,11 @@ local int FrameRemainder;		/// Frame remainder 0.1 ms
 local int FrameFraction;		/// Frame fractional term
 local int SkipFrames;			/// Skip this frames
 global int InMainWindow = 1;		/// cursor inside freecraft window
+
+#ifdef USE_OPENGL
+// FIXME: When all the drawing functions are done this isn't needed anymore
+VMemType *_VideoMemory;
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -121,6 +132,8 @@ global void SetVideoSync(void)
 */
 global void InitVideoSdl(void)
 {
+    Uint32 flags;
+
     //	Initialize the SDL library
 
     if( SDL_WasInit(SDL_INIT_VIDEO) == 0 ) {
@@ -158,10 +171,16 @@ global void InitVideoSdl(void)
 	VideoHeight = DEFAULT_VIDEO_HEIGHT;
     }
 
-    Screen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth
-	    // Sam said: better for windows.
-	    ,/* SDL_HWSURFACE|SDL_HWPALETTE | */
-		(VideoFullScreen ? SDL_FULLSCREEN : 0));
+    flags = 0;
+    // Sam said: better for windows.
+    /* SDL_HWSURFACE|SDL_HWPALETTE | */
+    if( VideoFullScreen ) {
+	flags |= SDL_FULLSCREEN;
+    }
+#ifdef USE_OPENGL
+    flags |= SDL_OPENGL;
+#endif
+    Screen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth, flags);
 
     if ( Screen == NULL ) {
 	fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n"
@@ -222,6 +241,24 @@ global void InitVideoSdl(void)
     // Make default character translation easier
     SDL_EnableUNICODE(1);
 
+#ifdef USE_OPENGL
+    // FIXME: When all the drawing functions are done this isn't needed anymore
+    _VideoMemory = (VMemType*)malloc(VideoWidth*VideoHeight*VideoBpp/8);
+
+    glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0,1,0,1,-1,1);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0f);
+    glShadeModel(GL_FLAT);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+#endif
+
     DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 }
 
@@ -235,6 +272,7 @@ global void InitVideoSdl(void)
 */
 global void InvalidateArea(int x,int y,int w,int h)
 {
+#ifndef USE_OPENGL
     // FIXME: This checks should be done at higher level
     // FIXME: did SDL version >1.1, check this now also?
     if( x<0 ) {
@@ -258,6 +296,7 @@ global void InvalidateArea(int x,int y,int w,int h)
 	return;
     }
     SDL_UpdateRect(Screen,x,y,w,h);
+#endif
 }
 
 /**
@@ -265,7 +304,9 @@ global void InvalidateArea(int x,int y,int w,int h)
 */
 global void Invalidate(void)
 {
+#ifndef USE_OPENGL
     SDL_UpdateRect(Screen,0,0,VideoWidth,VideoHeight);
+#endif
 }
 
 /**
@@ -580,6 +621,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     SDL_Event event[1];
     Uint32 ticks;
 
+#ifdef USE_OPENGL
+    SDL_GL_SwapBuffers();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    MustRedraw = RedrawEverything;
+#endif
+
 #if defined(WITH_SOUND) && !defined(USE_SDLA)
     // FIXME: ugly hack, move into sound part!!!
     if( SoundFildes==-1 ) {
@@ -841,8 +888,13 @@ global void RealizeVideoMemory(void)
 */
 global void SdlLockScreen(void)
 {
+#ifdef USE_OPENGL
+    // FIXME: When all the drawing functions are done this isn't needed anymore
+    VideoMemory=_VideoMemory;
+#else
     SDL_LockSurface(Screen);
     VideoMemory=Screen->pixels;
+#endif
 }
 
 /**
@@ -850,11 +902,13 @@ global void SdlLockScreen(void)
 */
 global void SdlUnlockScreen(void)
 {
+#ifndef USE_OPENGL
     SDL_UnlockSurface(Screen);
 #ifdef DEBUG
     VideoMemory=NULL;			// Catch errors!
 #else
     VideoMemory=Screen->pixels;		// Be kind
+#endif
 #endif
 }
 

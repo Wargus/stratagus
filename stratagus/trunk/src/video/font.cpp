@@ -298,6 +298,48 @@ local void VideoDrawChar32(const Graphic* sprite,
 }
 
 /**
+**	Draw character with current color.
+**
+**	@param sprite	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
+*/
+#ifdef USE_OPENGL
+local void VideoDrawCharOpenGL(const Graphic* sprite,
+	int gx,int gy,int w,int h,int x,int y)
+{
+    GLfloat sx,ex,sy,ey;
+    GLfloat stx,etx,sty,ety;
+
+    sx=(GLfloat)x/VideoWidth;
+    ex=sx+(GLfloat)w/VideoWidth;
+    ey=1.0f-(GLfloat)y/VideoHeight;
+    sy=ey-(GLfloat)h/VideoHeight;
+
+    stx=(GLfloat)gx/sprite->Width*sprite->TextureWidth;
+    etx=(GLfloat)(gx+w)/sprite->Width*sprite->TextureWidth;
+    sty=(GLfloat)gy/sprite->Height*sprite->TextureHeight;
+    ety=(GLfloat)(gy+h)/sprite->Height*sprite->TextureHeight;
+
+    glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[0]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(stx, 1.0f-ety);
+    glVertex3f(sx, sy, 0.0f);
+    glTexCoord2f(stx, 1.0f-sty);
+    glVertex3f(sx, ey, 0.0f);
+    glTexCoord2f(etx, 1.0f-sty);
+    glVertex3f(ex, ey, 0.0f);
+    glTexCoord2f(etx, 1.0f-ety);
+    glVertex3f(ex, sy, 0.0f);
+    glEnd();
+}
+#endif
+
+/**
 **	Set the default text colors.
 **
 **	@param normal	Normal text color.
@@ -463,6 +505,10 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 
 	DebugCheck( *text<32 );
 
+#ifdef USE_OPENGL
+	w=fp->CharWidth[*text-32];
+	DrawChar(fp->Graphic,((*text-32)%23)*fp->Width,(*text-32)/23*height,w,height,x+widths,y);
+#else
 	if( *text-32>=0 && height*(*text-32)<fp->Graphic->Height ) {
 	    w=fp->CharWidth[*text-32];
 	    DrawChar(fp->Graphic,0,height*(*text-32),w,height,x+widths,y);
@@ -470,6 +516,7 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
 	    w=fp->CharWidth[0];
 	    DrawChar(fp->Graphic,0,height*0,w,height,x+widths,y);
 	}
+#endif
 	widths+=w+1;
 	if( rev ) {
 	    TextColor=rev;
@@ -670,12 +717,50 @@ local void FontMeasureWidths(ColorFont * fp)
 }
 
 /**
+**	Resize the font graphic.
+**
+**	The default font graphic format is 1 character wide and 207
+**	characters high.  This function resizes the image so it's 23
+**	characters wide and 9 characters high.
+*/
+#ifdef USE_OPENGL
+local void ResizeFontGraphic(ColorFont *font)
+{
+    Graphic *g;
+    unsigned char *data;
+    int i;
+    int j;
+    int k;
+
+    g = font->Graphic;
+
+    data=(unsigned char*)malloc(23*g->Width*9*font->Height);
+    for( i=0; i<9; ++i ) {
+	for( j=0; j<23; ++j ) {
+	    for( k=0; k<font->Height; ++k ) {
+		memcpy(data + i*font->Height*(23*g->Width) + j*g->Width + k*(23*g->Width),
+		    (unsigned char*)g->Frames + (i*23+j)*g->Width*font->Height + k*g->Width,
+		    g->Width);
+	    }
+	}
+    }
+    free(g->Frames);
+    g->Frames = data;
+    g->Width *= 23;
+    g->Height /= 23;
+}
+#endif
+
+/**
 **	Load all fonts.
 */
 global void LoadFonts(void)
 {
     unsigned i;
 
+#ifdef USE_OPENGL
+    VideoDrawChar=VideoDrawCharOpenGL;
+#else
     switch( VideoBpp ) {
 	case 8:
 	    VideoDrawChar=VideoDrawChar8;
@@ -698,12 +783,17 @@ global void LoadFonts(void)
 	    DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
 	    abort();
     }
+#endif
 
     for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
 	if( Fonts[i].File ) {
 	    ShowLoadProgress("\tFonts %s\n",Fonts[i].File);
 	    Fonts[i].Graphic=LoadGraphic(Fonts[i].File);
 	    FontMeasureWidths(Fonts+i);
+#ifdef USE_OPENGL
+	    ResizeFontGraphic(Fonts+i);
+	    MakeTexture(Fonts[i].Graphic,Fonts[i].Graphic->Width,Fonts[i].Graphic->Height);
+#endif
 	}
     }
 }

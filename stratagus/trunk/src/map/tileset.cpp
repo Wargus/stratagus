@@ -112,6 +112,9 @@ global void LoadTileset(void)
     strcat(strcpy(buf, "graphics/"), Tilesets[i]->ImageFile);
     ShowLoadProgress("\tTileset `%s'\n", Tilesets[i]->ImageFile);
     TheMap.TileData = LoadGraphic(buf);
+#ifdef USE_OPENGL
+    MakeTexture(TheMap.TileData,TheMap.TileData->Width,TheMap.TileData->Height);
+#endif
 
     //
     //  Calculate number of tiles in graphic tile
@@ -144,6 +147,7 @@ global void LoadTileset(void)
 	ExitFatal(-1);
     }
 
+#ifndef USE_OPENGL
     //
     //  Precalculate the graphic starts of the tiles
     //
@@ -179,6 +183,7 @@ global void LoadTileset(void)
     TheMap.TileData->Frames = data;
     TheMap.TileData->Width = TileSizeX;
     TheMap.TileData->Height = TileSizeY * n;
+#endif
 
     //
     //  Build the TileTypeTable

@@ -213,6 +213,10 @@ global void LoadIcons(void)
 		file = strcat(strcpy(buf, "graphics/"), file);
 		ShowLoadProgress("\tIcons %s\n", file);
 		icon->File->Graphic = LoadGraphic(file);
+#ifdef USE_OPENGL
+		MakeTexture(icon->File->Graphic,icon->File->Graphic->Width,
+		            icon->File->Graphic->Height);
+#endif
 	    }
 	    icon->Graphic = icon->File->Graphic;
 

@@ -1296,6 +1296,48 @@ local void MapDraw32Tile32(int tile,int x,int y)
     }
 }
 
+/**
+**	Draw 32x32 tile with cache support.
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+#ifdef USE_OPENGL
+local void MapDrawTileOpenGL(int tile,int x,int y)
+{
+    GLfloat sx,ex,sy,ey;
+    GLfloat stx,etx,sty,ety;
+    Graphic *g;
+    int t;
+
+    g=TheMap.TileData;
+    sx=(GLfloat)x/VideoWidth;
+    ex=sx+(GLfloat)TileSizeX/VideoWidth;
+    ey=1.0f-(GLfloat)y/VideoHeight;
+    sy=ey-(GLfloat)TileSizeY/VideoHeight;
+
+    t=tile%(g->Width/TileSizeX);
+    stx=(GLfloat)t*TileSizeX/g->Width*g->TextureWidth;
+    etx=(GLfloat)(t*TileSizeX+TileSizeX)/g->Width*g->TextureWidth;
+    t=tile/(g->Width/TileSizeX);
+    sty=(GLfloat)t*TileSizeY/g->Height*g->TextureHeight;
+    ety=(GLfloat)(t*TileSizeY+TileSizeY)/g->Height*g->TextureHeight;
+
+    glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(stx, 1.0f-ety);
+    glVertex3f(sx, sy, 0.0f);
+    glTexCoord2f(stx, 1.0f-sty);
+    glVertex3f(sx, ey, 0.0f);
+    glTexCoord2f(etx, 1.0f-sty);
+    glVertex3f(ex, ey, 0.0f);
+    glTexCoord2f(etx, 1.0f-ety);
+    glVertex3f(ex, sy, 0.0f);
+    glEnd();
+}
+#endif
+
 #endif	// } USE_SMART_TILECACHE
 
 /*----------------------------------------------------------------------------
@@ -1857,6 +1899,10 @@ local void mapdeco_draw( void *dummy_data )
 */
 void InitMap(void)
 {
+#ifdef USE_OPENGL
+    MapDrawTile=MapDrawTileOpenGL;
+#else
+
 #ifdef NEW_DECODRAW
 // StephanR: Using the decoration mechanism we need to support drawing tiles
 // clipped, as by only updating a small part of the tile, we don't have to
@@ -1912,6 +1958,8 @@ void InitMap(void)
 	    DebugLevel0Fn("Depth unsupported\n");
 	    break;
     }
+#endif
+
 #endif
 }
 
