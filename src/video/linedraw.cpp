@@ -617,14 +617,14 @@ local void DrawPixel32(SysColors color,int x,int y)
 local void DrawPixelOpenGL(SysColors color,int x,int y)
 {
     VMemType32 c;
-    GLfloat r,g,b;
+    GLubyte r,g,b;
 
     c=Pixels32[color];
-    r=((c>>16)&0xff)/255.0f;
-    g=((c>>8)&0xff)/255.0f;
-    b=((c>>0)&0xff)/255.0f;
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
     glDisable(GL_TEXTURE_2D);
-    glColor4f(r, g, b, 1.0f);
+    glColor3ub(r, g, b);
     glBegin(GL_POINTS);
     glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
     glEnd();
@@ -1192,7 +1192,7 @@ local void DrawPixelClip32(SysColors color,int x,int y)
 local void DrawPixelClipOpenGL(SysColors color,int x,int y)
 {
     VMemType32 c;
-    GLfloat r,g,b;
+    GLubyte r,g,b;
 
     //	Clipping:
     if( x<ClipX1 || x>ClipX2 || y<ClipY1 || y>ClipY2 ) {
@@ -1200,11 +1200,11 @@ local void DrawPixelClipOpenGL(SysColors color,int x,int y)
     }
 
     c=Pixels32[color];
-    r=((c>>16)&0xff)/255.0f;
-    g=((c>>8)&0xff)/255.0f;
-    b=((c>>0)&0xff)/255.0f;
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
     glDisable(GL_TEXTURE_2D);
-    glColor4f(r, g, b, 1.0f);
+    glColor3ub(r, g, b);
     glBegin(GL_POINTS);
     glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
     glEnd();
@@ -1398,14 +1398,14 @@ local void DrawHLine32(SysColors color,int x,int y,int width)
 local void DrawHLineOpenGL(SysColors color,int x,int y,int width)
 {
     VMemType32 c;
-    GLfloat r,g,b;
+    GLubyte r,g,b;
 
     c=Pixels32[color];
-    r=((c>>16)&0xff)/255.0f;
-    g=((c>>8)&0xff)/255.0f;
-    b=((c>>0)&0xff)/255.0f;
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
     glDisable(GL_TEXTURE_2D);
-    glColor4f(r, g, b, 1.0f);
+    glColor3ub(r, g, b);
     glBegin(GL_LINES);
     glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
     glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
@@ -2247,14 +2247,14 @@ local void DrawVLine32(SysColors color,int x,int y,int height)
 local void DrawVLineOpenGL(SysColors color,int x,int y,int height)
 {
     VMemType32 c;
-    GLfloat r,g,b;
+    GLubyte r,g,b;
 
     c=Pixels32[color];
-    r=((c>>16)&0xff)/255.0f;
-    g=((c>>8)&0xff)/255.0f;
-    b=((c>>0)&0xff)/255.0f;
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
     glDisable(GL_TEXTURE_2D);
-    glColor4f(r, g, b, 1.0f);
+    glColor3ub(r, g, b);
     glBegin(GL_LINES);
     glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
     glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
@@ -3367,14 +3367,14 @@ local void DrawLine32(SysColors color,int x1,int y1,int x2,int y2)
 local void DrawLineOpenGL(SysColors color,int x1,int y1,int x2,int y2)
 {
     VMemType32 c;
-    GLfloat r,g,b;
+    GLubyte r,g,b;
 
     c=Pixels32[color];
-    r=((c>>16)&0xff)/255.0f;
-    g=((c>>8)&0xff)/255.0f;
-    b=((c>>0)&0xff)/255.0f;
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
     glDisable(GL_TEXTURE_2D);
-    glColor4f(r, g, b, 1.0f);
+    glColor3ub(r, g, b);
     glBegin(GL_LINES);
     glVertex3f((GLfloat)x1/VideoWidth, 1.0f-(GLfloat)y1/VideoHeight, 0.0f);
     glVertex3f((GLfloat)x2/VideoWidth, 1.0f-(GLfloat)y2/VideoHeight, 0.0f);
@@ -3661,14 +3661,14 @@ local void DrawRectangleOpenGL(SysColors color,int x,int y
 	,int w,int h)
 {
     VMemType32 c;
-    GLfloat r,g,b;
+    GLubyte r,g,b;
 
     c=Pixels32[color];
-    r=((c>>16)&0xff)/255.0f;
-    g=((c>>8)&0xff)/255.0f;
-    b=((c>>0)&0xff)/255.0f;
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
     glDisable(GL_TEXTURE_2D);
-    glColor4f(r, g, b, 1.0f);
+    glColor3ub(r, g, b);
     glBegin(GL_LINE_LOOP);
     glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
     glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
@@ -5217,14 +5217,14 @@ local void DrawFillRectangleOpenGL(SysColors color,int x,int y
 	,int w,int h)
 {
     VMemType32 c;
-    GLfloat r,g,b;
+    GLubyte r,g,b;
 
     c=Pixels32[color];
-    r=((c>>16)&0xff)/255.0f;
-    g=((c>>8)&0xff)/255.0f;
-    b=((c>>0)&0xff)/255.0f;
+    r=(c>>16)&0xff;
+    g=(c>>8)&0xff;
+    b=(c>>0)&0xff;
     glDisable(GL_TEXTURE_2D);
-    glColor4f(r, g, b, 1.0f);
+    glColor3ub(r, g, b);
     glBegin(GL_TRIANGLE_STRIP);
     glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
     glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
