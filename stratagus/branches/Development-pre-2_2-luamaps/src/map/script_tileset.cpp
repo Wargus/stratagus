@@ -48,43 +48,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Define tileset mapping from original number to internal symbol
-**
-**  @param l  Lua state.
-*/
-static int CclDefineTilesetWcNames(lua_State* l)
-{
-	int i;
-	int j;
-	char** cp;
-
-	// Free all old names
-	if ((cp = TilesetWcNames)) {
-		while (*cp) {
-			free(*cp++);
-		}
-		free(TilesetWcNames);
-	}
-
-	//
-	//  Get new table.
-	//
-	i = lua_gettop(l);
-	TilesetWcNames = cp = malloc((i + 1) * sizeof(char*));
-	if (!cp) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-
-	for (j = 0; j < i; ++j) {
-		*cp++ = strdup(LuaToString(l, j + 1));
-	}
-	*cp = NULL;
-
-	return 0;
-}
-
-/**
 **  Extend tables of the tileset.
 **
 **  @param tileset  Tileset to be extended.
@@ -119,23 +82,12 @@ static void ExtendTilesetTables(Tileset* tileset, int tiles)
 */
 static int TilesetParseName(lua_State* l, Tileset* tileset)
 {
-	char* ident;
-	int i;
-
-	ident = strdup(LuaToString(l, -1));
-	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
-		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
-			free(ident);
-			return i;
-		}
-	}
-
 	// Can't find it, then we add another solid terrain type.
 	tileset->SolidTerrainTypes = realloc(tileset->SolidTerrainTypes,
 		++tileset->NumTerrainTypes * sizeof(*tileset->SolidTerrainTypes));
-	tileset->SolidTerrainTypes[i].TerrainName = ident;
+	tileset->SolidTerrainTypes[0].TerrainName = strdup("");
 
-	return i;
+	return 0;
 }
 
 /**
@@ -668,7 +620,6 @@ static int CclDefineTileset(lua_State* l)
 */
 void TilesetCclRegister(void)
 {
-	lua_register(Lua, "DefineTilesetWcNames", CclDefineTilesetWcNames);
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
 }
 

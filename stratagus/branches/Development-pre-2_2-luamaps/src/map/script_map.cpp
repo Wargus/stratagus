@@ -100,29 +100,7 @@ static int CclStratagusMap(lua_State* l)
 				lua_pop(l, 1);
 				++k;
 
-				if (!strcmp(value, "terrain")) {
-					int i;
-
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					value = LuaToString(l, -1);
-					lua_pop(l, 1);
-					// ignore (l, -1, 2)
-					lua_pop(l, 1);
-
-					free(TheMap.TerrainName);
-					TheMap.TerrainName = strdup(value);
-
-					// Lookup the index of this tileset.
-					for (i = 0; TilesetWcNames[i] &&
-						strcmp(value, TilesetWcNames[i]); ++i) {
-					}
-					TheMap.Info.MapTerrain = i;
-					LoadTileset();
-				} else if (!strcmp(value, "size")) {
+				if (!strcmp(value, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -466,24 +444,10 @@ static int CclSetFogOfWarGraphics(lua_State* l)
 */
 static int CclSelectTileset(lua_State* l)
 {
-	const char* tileset;
-	int i;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
 
-	tileset = LuaToString(l, 1);
-
-	free(TheMap.TerrainName);
-	TheMap.TerrainName = strdup(tileset);
-
-	printf("%s\n", TilesetWcNames[0]);
-	// Lookup the index of this tileset.
-	for (i = 0; TilesetWcNames[i] &&
-		strcmp(tileset, TilesetWcNames[i]); ++i) {
-	}
-	TheMap.Info.MapTerrain = i;
 	LoadTileset();
 
 	return 0;
@@ -508,7 +472,7 @@ static int CclSetTile(lua_State* l)
 	tile = LuaToNumber(l, 1);
 	w = LuaToNumber(l, 2);
 	h = LuaToNumber(l, 3);
-	tileset = Tilesets[TheMap.Info.MapTerrain];
+	tileset = Tilesets[0];
 
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = tileset->Table[tile];
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Value = 0;

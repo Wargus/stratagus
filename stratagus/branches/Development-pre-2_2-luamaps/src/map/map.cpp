@@ -418,9 +418,6 @@ void FreeMapInfo(MapInfo* info)
 		if (info->Description) {
 			free(info->Description);
 		}
-		if (info->MapTerrainName) {
-			free(info->MapTerrainName);
-		}
 		if (info->Filename) {
 			free(info->Filename);
 		}
@@ -456,7 +453,6 @@ void CreateMap(int width, int height)
 void CleanMap(void)
 {
 	free(TheMap.Fields);
-	free(TheMap.TerrainName);
 	free(TheMap.Visible[0]);
 
 	// Tileset freed by Tileset?

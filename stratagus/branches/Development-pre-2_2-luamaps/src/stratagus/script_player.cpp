@@ -134,7 +134,7 @@ static int CclPlayer(lua_State* l)
 			if (i == PlayerRaces.Count) {
 				LuaError(l, "Unsupported race: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "ai")) {
+		} else if (!strcmp(value, "ai-name")) {
 			strcpy(player->AiName, LuaToString(l, j + 1));
 		} else if (!strcmp(value, "team")) {
 			player->Team = LuaToNumber(l, j + 1);

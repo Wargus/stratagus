@@ -430,6 +430,7 @@ void CreatePlayer(int type)
 			team = 2 + NumPlayers;
 			break;
 	}
+	printf("CreatePlayer name %s\n", player->Name);
 
 	player->Type = type;
 	player->Race = PlayerRaces.Race[0];

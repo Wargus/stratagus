@@ -136,16 +136,6 @@
 **
 **    Flag if true, the fog of war is disabled.
 **
-**  WorldMap::TerrainName
-**
-**    Terrain as name. Used for unit-type look changes depending on
-**    the current terrain type. In the future we want to support
-**    multiple terrains pro map.
-**
-**  WorldMap::Terrain
-**
-**    The terrain as number, this should be removed.
-**
 **  WorldMap::Tileset
 **
 **    Tileset data for the map. See ::Tileset. This contains all
@@ -248,10 +238,7 @@ typedef struct _map_field_ {
 */
 typedef struct _map_info_ {
 	char*  Description;     ///< Map description
-	char*  MapTerrainName;  ///< Map terrain name
 	char*  Filename;        ///< Map filename
-	// TODO: Map Terrain Nr. should be removed.
-	int MapTerrain;  ///< Map terrain
 	int MapWidth;    ///< Map width
 	int MapHeight;   ///< Map height
 	int PlayerType[PlayerMax];  ///< Same player->Type
@@ -270,7 +257,6 @@ typedef struct _world_map_ {
 
 	unsigned char NoFogOfWar;  ///< fog of war disabled
 
-	char* TerrainName;         ///< terrain as name
 	struct _tileset_* Tileset; ///< tileset data
 
 	struct _graphic_* TileGraphic; ///< graphic for all the tiles

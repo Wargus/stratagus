@@ -1672,7 +1672,7 @@ static void EditorCallbackMouse(int x, int y)
 
 					// FIXME: i is wrong, must find the solid type
 					j = TheMap.Tileset->Tiles[i * 16 + 16].BaseTerrain;
-					SetStatusLine(TheMap.Tileset->SolidTerrainTypes[j].TerrainName);
+					//MAPTODO SetStatusLine(TheMap.Tileset->SolidTerrainTypes[j].TerrainName);
 					ButtonUnderCursor = i + 100;
 					CursorOn = CursorOnButton;
 					return;
@@ -1821,8 +1821,6 @@ static void CreateEditor(void)
 		//
 		// Inititialize TheMap / Players.
 		//
-		TheMap.Info.MapTerrainName =
-			strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
 		InitPlayers();
 		for (i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerNumNeutral) {
@@ -1839,8 +1837,7 @@ static void CreateEditor(void)
 		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
 
-		TheMap.TerrainName = strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
-		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
+		TheMap.Tileset = Tilesets[0];
 		LoadTileset();
 
 		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {

@@ -3006,9 +3006,6 @@ static MapInfo* DuplicateMapInfo(MapInfo *orig)
 	if (orig->Description) {
 		dest->Description = strdup(orig->Description);
 	}
-	if (dest->MapTerrainName) {
-		dest->MapTerrainName = strdup(orig->MapTerrainName);
-	}
 	if (dest->Filename) {
 		dest->Filename = strdup(orig->Filename);
 	}
@@ -4483,7 +4480,6 @@ static void EditorNewMap(void)
 	strcpy(height, "128~!_");
 	menu->Items[5].D.Input.nch = strlen(width) - 3;
 	menu->Items[5].D.Input.maxch = 4;
-	menu->Items[7].D.Pulldown.noptions = NumTilesets;
 	ProcessMenu("menu-editor-new", 1);
 
 	if (EditorCancelled) {
@@ -4492,7 +4488,6 @@ static void EditorNewMap(void)
 
 	description[strlen(description) - 3] = '\0';
 	TheMap.Info.Description = strdup(description);
-	TheMap.Info.MapTerrainName = Tilesets[menu->Items[7].D.Pulldown.curopt]->Ident;
 	TheMap.Info.MapWidth = atoi(width);
 	TheMap.Info.MapHeight = atoi(height);
 
@@ -4576,6 +4571,11 @@ static void EditorNewOk(void)
 		ErrorMenu("Size must be a multiple of 32");
 	}
 	else {
+		char tilemodel[256];
+		
+		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath,
+			menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
+		LuaLoadFile(tilemodel);
 		EndMenu();
 	}
 }
@@ -5047,9 +5047,8 @@ static void EditorMapPropertiesMenu(void)
 
 	sprintf(size, "%d x %d", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 	menu->Items[4].D.Text.text = size;
-
-	menu->Items[6].D.Pulldown.defopt = TheMap.Info.MapTerrain;
-
+	menu->Items[6].D.Pulldown.defopt=0;
+	
 	// FIXME: Remove the version pulldown
 	menu->Items[8].D.Pulldown.defopt = 1;
 	menu->Items[8].Flags = -1;
@@ -5074,7 +5073,6 @@ static void EditorMapPropertiesOk(void)
 {
 	Menu* menu;
 	char *description;
-	int old;
 
 	menu = CurrentMenu;
 
@@ -5083,6 +5081,8 @@ static void EditorMapPropertiesOk(void)
 	free(TheMap.Info.Description);
 	TheMap.Info.Description = strdup(description);
 
+#if 0
+	//MAPTODO 
 	// Change the terrain
 	old = TheMap.Info.MapTerrain;
 	if (old != menu->Items[6].D.Pulldown.curopt) {
@@ -5101,6 +5101,9 @@ static void EditorMapPropertiesOk(void)
 		LoadIcons();
 		UpdateMinimapTerrain();
 	}
+#else
+
+#endif
 
 	EditorEndMenu();
 }
@@ -6110,6 +6113,7 @@ static void InitPlayerRaces(Menuitem* mi)
 */
 static void InitTilesets(Menuitem* mi, int mapdefault)
 {
+#if 0
 	int i;
 	int n;
 
@@ -6128,6 +6132,7 @@ static void InitTilesets(Menuitem* mi, int mapdefault)
 	}
 	mi->D.Pulldown.noptions = n;
 	mi->D.Pulldown.defopt = 0;
+#endif
 }
 
 /**

@@ -819,6 +819,11 @@ Use it at your own risk.\n\n");
 	VideoClearScreen();
 	ShowTitleScreens();
 
+	// Init player data
+	ThisPlayer = NULL;
+	memset(Players, 0, sizeof(Players));
+	NumPlayers = 0;
+
 	InitUnitsMemory();  // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 

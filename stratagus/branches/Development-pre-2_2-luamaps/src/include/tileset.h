@@ -66,7 +66,6 @@
 **      tileset. Used by the map to define which tileset should be used.
 **      Like always the identifier should only be used during
 **      configuration and not during runtime!
-**      @see WorldMap, WorldMap::TerrainName.
 **
 **  Tileset::Class
 **
@@ -335,8 +334,6 @@ enum _tileset_nr_ {
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-
-extern char** TilesetWcNames; ///< Mapping wc-number 2 symbol
 
 extern int NumTilesets;     ///< Number of available tilesets
 extern Tileset** Tilesets;  ///< Tileset information

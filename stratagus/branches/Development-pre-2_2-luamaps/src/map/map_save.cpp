@@ -70,6 +70,8 @@ void SaveMap(CLFile* file)
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: map $Id$\n");
 
+	CLprintf(file, "Load(\"scripts/tilesets/%s.lua\")\n\n", "desert"); //MAPTODO
+	
 	CLprintf(file, "StratagusMap(\n");
 
 	CLprintf(file, "  \"version\", \"" StratagusFormatString "\",\n",
@@ -77,10 +79,6 @@ void SaveMap(CLFile* file)
 	CLprintf(file, "  \"description\", \"%s\",\n", TheMap.Info.Description);
 
 	CLprintf(file, "  \"the-map\", {\n");
-
-	// FIXME: Why terrain? TheMap->Tileset->Class should be correct
-	CLprintf(file, "  \"terrain\", {\"%s\", \"%s\"},\n",
-		TheMap.TerrainName, TheMap.TerrainName);
 
 	CLprintf(file, "  \"size\", {%d, %d},\n", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 	CLprintf(file, "  \"%s\",\n", TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");

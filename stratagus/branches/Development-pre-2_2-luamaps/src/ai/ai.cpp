@@ -813,8 +813,9 @@ void AiInit(Player* player)
 	ait = AiTypes;
 
 	ainame = player->AiName;
-	DebugPrint("%d - %s - looking for class %s\n" _C_
-		player->Player _C_ player->Name _C_ ainame);
+	DebugPrint("%d - %p - looking for class %s\n" _C_
+		player->Player _C_ player _C_ ainame);
+	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//
 	//  Search correct AI type.

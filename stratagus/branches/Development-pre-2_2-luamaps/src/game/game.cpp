@@ -205,7 +205,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "\n");
 
 	gzprintf(f, "-- load tilesets\n");
-	gzprintf(f, "SelectTileset(\"%s\")\n\n", TheMap.TerrainName);
+	gzprintf(f, "Load(\"scripts/tilesets/%s.lua\")\n\n", "desert"); //MAPTODO
 	
 	for (i = 0; i < TheMap.Info.MapHeight; ++i) {
 		for (j = 0; j < TheMap.Info.MapWidth; ++j) {

@@ -121,17 +121,8 @@ static void AddIcon(const char* ident, const char* tileset,
 */
 void InitIcons(void)
 {
-	int i;
-
-	//
 	//  Add icons of the current tileset, with shortcut to hash.
-	//
-	for (i = 0; i < NumIcons; ++i) {
-		if (Icons[i]->Tileset &&
-				!strcmp(Icons[i]->Tileset, TheMap.TerrainName)) {
-			*(Icon**)hash_add(IconHash, Icons[i]->Ident) = Icons[i];
-		}
-	}
+	*(Icon**)hash_add(IconHash, Icons[0]->Ident) = Icons[0];
 }
 
 /**
@@ -141,22 +132,18 @@ void LoadIcons(void)
 {
 	int i;
 
-	//
 	//  Load all icon files.
-	//
 	for (i = 0; i < NumIcons; ++i) {
 		Icon* icon;
 
-		icon = Icons[i];
+		icon = Icons[0];
 		// If tileset only fitting tileset.
-		if (!icon->Tileset || !strcmp(icon->Tileset, TheMap.TerrainName)) {
-			LoadGraphic(icon->Sprite);
-			ShowLoadProgress("Icons %s", icon->Sprite->File);
-			if (icon->Frame >= icon->Sprite->NumFrames) {
-				DebugPrint("Invalid icon frame: %s - %d\n" _C_
-					icon->Ident _C_ icon->Frame);
-				icon->Frame = 0;
-			}
+		LoadGraphic(icon->Sprite);
+		ShowLoadProgress("Icons %s", icon->Sprite->File);
+		if (icon->Frame >= icon->Sprite->NumFrames) {
+			DebugPrint("Invalid icon frame: %s - %d\n" _C_
+				icon->Ident _C_ icon->Frame);
+			icon->Frame = 0;
 		}
 	}
 }
