@@ -79,268 +79,248 @@ global void LoadTileset(void)
     int tile;
     int gap;
     int tiles_per_row;
+    int solid;
+    int mixed;
     unsigned char* data;
     char* buf;
-    const unsigned short* table;
+    const unsigned short *table;
 
     //
-    //	Find the tileset.
+    //  Find the tileset.
     //
-    for( i=0; i<NumTilesets; ++i ) {
-	if( !strcmp(TheMap.TerrainName,Tilesets[i]->Ident) ) {
+    for (i = 0; i < NumTilesets; ++i) {
+	if (!strcmp(TheMap.TerrainName, Tilesets[i]->Ident)) {
 	    break;
 	}
     }
-    if( i==NumTilesets ) {
-	fprintf(stderr,"Tileset `%s' not available\n",TheMap.TerrainName);
+    if (i == NumTilesets) {
+	fprintf(stderr, "Tileset `%s' not available\n", TheMap.TerrainName);
 	ExitFatal(-1);
     }
-    DebugCheck( i!=TheMap.Terrain );
-    TheMap.Tileset=Tilesets[i];
+    DebugCheck(i != TheMap.Terrain);
+    TheMap.Tileset = Tilesets[i];
 
     //
-    //	Load and prepare the tileset
+    //  Load and prepare the tileset
     //
-    buf=alloca(strlen(Tilesets[i]->File)+9+1);
-    strcat(strcpy(buf,"graphics/"),Tilesets[i]->File);
-    ShowLoadProgress("\tTileset `%s'\n",Tilesets[i]->File);
-    TheMap.TileData=LoadGraphic(buf);
+    buf = alloca(strlen(Tilesets[i]->File) + 9 + 1);
+    strcat(strcpy(buf, "graphics/"), Tilesets[i]->File);
+    ShowLoadProgress("\tTileset `%s'\n", Tilesets[i]->File);
+    TheMap.TileData = LoadGraphic(buf);
 
     //
-    //	Calculate number of tiles in graphic tile
+    //  Calculate number of tiles in graphic tile
     //
-    if( TheMap.TileData->Width==626 ) {
+    if (TheMap.TileData->Width == 626) {
 	// FIXME: allow 1 pixel gap between the tiles!!
-	gap=1;
-	tiles_per_row=(TheMap.TileData->Width+1)/(TileSizeX+1);
-	TheMap.TileCount=n=tiles_per_row*((TheMap.TileData->Height+1)
-		/(TileSizeY+1));
-    } else if( TheMap.TileData->Width==527 ) {
+	gap = 1;
+	tiles_per_row = (TheMap.TileData->Width + 1) / (TileSizeX + 1);
+	TheMap.TileCount = n =
+	    tiles_per_row * ((TheMap.TileData->Height + 1) / (TileSizeY + 1));
+    } else if (TheMap.TileData->Width == 527) {
 	// FIXME: allow 1 pixel gap between the tiles!!
-	gap=1;
-	tiles_per_row=(TheMap.TileData->Width+1)/(TileSizeX+1);
-	TheMap.TileCount=n=tiles_per_row*((TheMap.TileData->Height+1)
-		/(TileSizeY+1));
+	gap = 1;
+	tiles_per_row = (TheMap.TileData->Width + 1) / (TileSizeX + 1);
+	TheMap.TileCount = n =
+	    tiles_per_row * ((TheMap.TileData->Height + 1) / (TileSizeY + 1));
     } else {
-	gap=0;
-	tiles_per_row=TheMap.TileData->Width/TileSizeX;
-	TheMap.TileCount=n=tiles_per_row*(TheMap.TileData->Height
-		/TileSizeY);
+	gap = 0;
+	tiles_per_row = TheMap.TileData->Width / TileSizeX;
+	TheMap.TileCount = n =
+	    tiles_per_row * (TheMap.TileData->Height / TileSizeY);
     }
 
-    DebugLevel2Fn(" %d Tiles in file %s, %d per row\n"
-	    _C_ TheMap.TileCount _C_ TheMap.Tileset->File _C_ tiles_per_row);
+    DebugLevel2Fn(" %d Tiles in file %s, %d per row\n" _C_ TheMap.
+	TileCount _C_ TheMap.Tileset->File _C_ tiles_per_row);
 
-    if( n>MaxTilesInTileset ) {
-	fprintf(stderr,"Too many tiles in tileset. Increase MaxTilesInTileset and recompile.\n");
+    if (n > MaxTilesInTileset) {
+	fprintf(stderr,
+	    "Too many tiles in tileset. Increase MaxTilesInTileset and recompile.\n");
 	ExitFatal(-1);
     }
 
-
     //
-    //	Precalculate the graphic starts of the tiles
+    //  Precalculate the graphic starts of the tiles
     //
-    data=malloc(n*TileSizeX*TileSizeY);
-    TheMap.Tiles=malloc(n*sizeof(*TheMap.Tiles));
-    for( i=0; i<n; ++i ) {
-	TheMap.Tiles[i]=data+i*TileSizeX*TileSizeY;
+    data = malloc(n * TileSizeX * TileSizeY);
+    TheMap.Tiles = malloc(n * sizeof(*TheMap.Tiles));
+    for (i = 0; i < n; ++i) {
+	TheMap.Tiles[i] = data + i * TileSizeX * TileSizeY;
     }
 
     //
-    //	Convert the graphic data into faster format
+    //  Convert the graphic data into faster format
     //
-    for( tile=0; tile<n; ++tile ) {
-	unsigned char* s;
-	unsigned char* d;
+    for (tile = 0; tile < n; ++tile) {
+	unsigned char *s;
+	unsigned char *d;
 
-	s=((char*)TheMap.TileData->Frames)
-		+((tile%tiles_per_row)*(TileSizeX+gap))
-		+((tile/tiles_per_row)*(TileSizeY+gap))*TheMap.TileData->Width;
-	d=TheMap.Tiles[tile];
-	if( d!=data+tile*TileSizeX*TileSizeY ) {
+	s = ((char *)TheMap.TileData->Frames)
+	    + ((tile % tiles_per_row) * (TileSizeX + gap))
+	    + ((tile / tiles_per_row) * (TileSizeY +
+		gap)) * TheMap.TileData->Width;
+	d = TheMap.Tiles[tile];
+	if (d != data + tile * TileSizeX * TileSizeY) {
 	    abort();
 	}
-	for( i=0; i<TileSizeY; ++i ) {
-	    memcpy(d,s,TileSizeX*sizeof(unsigned char));
-	    d+=TileSizeX;
-	    s+=TheMap.TileData->Width;
+	for (i = 0; i < TileSizeY; ++i) {
+	    memcpy(d, s, TileSizeX * sizeof(unsigned char));
+	    d += TileSizeX;
+	    s += TheMap.TileData->Width;
 	}
     }
 
     free(TheMap.TileData->Frames);	// release old memory
-    TheMap.TileData->Frames=data;
-    TheMap.TileData->Width=TileSizeX;
-    TheMap.TileData->Height=TileSizeY*n;
+    TheMap.TileData->Frames = data;
+    TheMap.TileData->Width = TileSizeX;
+    TheMap.TileData->Height = TileSizeY * n;
 
     //
-    //	Build the TileTypeTable
+    //  Build the TileTypeTable
     //
-    //	FIXME: types are currently hardcoded, use the supplied flags.
-    //
+    TheMap.Tileset->TileTypeTable =
+	calloc(n, sizeof(*TheMap.Tileset->TileTypeTable));
 
-    table=TheMap.Tileset->Table;
-    TheMap.Tileset->TileTypeTable
-	    =calloc(n,sizeof(*TheMap.Tileset->TileTypeTable));
+    table = TheMap.Tileset->Table;
+    n = TheMap.Tileset->NumTiles;
+    for (i = 0; i < n; ++i) {
+	if ((tile = table[i])) {
+	    unsigned flags;
 
-    //
-    //	Solid tiles
-    //
-    for( i=0; i<0x10; ++i ) {
-	if( (tile=table[0x010+i]) ) {		// solid light water
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWater;
-	}
-	if( (tile=table[0x020+i]) ) {		// solid dark water
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWater;
-	}
-	if( (tile=table[0x030+i]) ) {		// solid light coast
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeCoast;
-	}
-	if( (tile=table[0x040+i]) ) {		// solid dark coast
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeCoast;
-	}
-	if( (tile=table[0x050+i]) ) {		// solid light ground
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeGrass;
-	}
-	if( (tile=table[0x060+i]) ) {		// solid dark ground
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeGrass;
-	}
-	if( (tile=table[0x070+i]) ) {		// solid forest
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWood;
-	}
-	if( (tile=table[0x080+i]) ) {		// solid rocks
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeRock;
-	}
-
-	if( i<3 && (tile=table[0x090+i]) ) {	// solid human walls
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeHumanWall;
-	}
-	if( i<3 && (tile=table[0x0A0+i]) ) {	// solid orc walls
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeOrcWall;
-	}
-	if( i<3 && (tile=table[0x0B0+i]) ) {	// solid human walls
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeHumanWall;
-	}
-	if( i<3 && (tile=table[0x0C0+i]) ) {	// solid orc walls
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeOrcWall;
-	}
-
-	// 00,D0,E0,F0 Unused
-    }
-
-    //
-    //	Mixed tiles
-    //
-    for( i=0; i<0xE0; ++i ) {
-	if( (tile=table[0x100+i]) ) {		// mixed water
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWater;
-	}
-	if( (tile=table[0x200+i]) ) {		// mixed water/coast
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWater;
-	}
-	if( (tile=table[0x300+i]) ) {		// mixed coast
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeCoast;
-	}
-	if( (tile=table[0x400+i]) ) {		// mixed rocks/coast
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeRock;
-	}
-	if( (tile=table[0x500+i]) ) {		// mixed ground/coast
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeCoast;
-	}
-	if( (tile=table[0x600+i]) ) {		// mixed ground
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeGrass;
-	}
-	if( (tile=table[0x700+i]) ) {		// mixed forest/ground
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWood;
-	}
-	if( (((i&0xF0)==0x40 || (i&0xF0)==0x90) && (i&0xF)<5)
-		|| (i&0xF)<3 ) {
-	    if( (tile=table[0x800+i]) ) {	// mixed human wall
-		TheMap.Tileset->TileTypeTable[tile]=TileTypeHumanWall;
-	    }
-	    if( (tile=table[0x900+i]) ) {	// mixed orc wall
-		TheMap.Tileset->TileTypeTable[tile]=TileTypeOrcWall;
+	    flags = TheMap.Tileset->FlagsTable[i];
+	    if (flags & MapFieldWaterAllowed) {
+		TheMap.Tileset->TileTypeTable[tile] = TileTypeWater;
+	    } else if (flags & MapFieldCoastAllowed) {
+		TheMap.Tileset->TileTypeTable[tile] = TileTypeCoast;
+	    } else if (flags & MapFieldWall) {
+		if (flags & MapFieldHuman) {
+		    TheMap.Tileset->TileTypeTable[tile] = TileTypeHumanWall;
+		} else {
+		    TheMap.Tileset->TileTypeTable[tile] = TileTypeOrcWall;
+		}
+	    } else if (flags & MapFieldRocks) {
+		TheMap.Tileset->TileTypeTable[tile] = TileTypeRock;
+	    } else if (flags & MapFieldForest) {
+		TheMap.Tileset->TileTypeTable[tile] = TileTypeWood;
 	    }
 	}
     }
 
     //
-    //	mark the special tiles
+    //  mark the special tiles
     //
-    for( i=0; i<6; ++i ) {
-	if( (tile=TheMap.Tileset->ExtraTrees[i]) ) {
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWood;
+    for (i = 0; i < 6; ++i) {
+	if ((tile = TheMap.Tileset->ExtraTrees[i])) {
+	    TheMap.Tileset->TileTypeTable[tile] = TileTypeWood;
 	}
-	if( (tile=TheMap.Tileset->ExtraRocks[i]) ) {
-	    TheMap.Tileset->TileTypeTable[tile]=TileTypeRock;
+	if ((tile = TheMap.Tileset->ExtraRocks[i])) {
+	    TheMap.Tileset->TileTypeTable[tile] = TileTypeRock;
 	}
     }
-    if( (tile=TheMap.Tileset->TopOneTree) ) {
-	TheMap.Tileset->TileTypeTable[tile]=TileTypeWood;
+    if ((tile = TheMap.Tileset->TopOneTree)) {
+	TheMap.Tileset->TileTypeTable[tile] = TileTypeWood;
     }
-    if( (tile=TheMap.Tileset->MidOneTree) ) {
-	TheMap.Tileset->TileTypeTable[tile]=TileTypeWood;
+    if ((tile = TheMap.Tileset->MidOneTree)) {
+	TheMap.Tileset->TileTypeTable[tile] = TileTypeWood;
     }
-    if( (tile=TheMap.Tileset->BotOneTree) ) {
-	TheMap.Tileset->TileTypeTable[tile]=TileTypeWood;
+    if ((tile = TheMap.Tileset->BotOneTree)) {
+	TheMap.Tileset->TileTypeTable[tile] = TileTypeWood;
     }
-    if( (tile=TheMap.Tileset->TopOneRock) ) {
-	TheMap.Tileset->TileTypeTable[tile]=TileTypeRock;
+    if ((tile = TheMap.Tileset->TopOneRock)) {
+	TheMap.Tileset->TileTypeTable[tile] = TileTypeRock;
     }
-    if( (tile=TheMap.Tileset->MidOneRock) ) {
-	TheMap.Tileset->TileTypeTable[tile]=TileTypeRock;
+    if ((tile = TheMap.Tileset->MidOneRock)) {
+	TheMap.Tileset->TileTypeTable[tile] = TileTypeRock;
     }
-    if( (tile=TheMap.Tileset->BotOneRock) ) {
-	TheMap.Tileset->TileTypeTable[tile]=TileTypeRock;
+    if ((tile = TheMap.Tileset->BotOneRock)) {
+	TheMap.Tileset->TileTypeTable[tile] = TileTypeRock;
     }
 
     //
-    //	Build wood removement table. FIXME: use tileset type configuration
+    //  Build wood removement table.
     //
-    WoodTable[ 0]= -1;
-    WoodTable[ 1]= TheMap.Tileset->BotOneTree;
-    WoodTable[ 2]= -1;
-    WoodTable[ 3]= table[0x710];
-    WoodTable[ 4]= TheMap.Tileset->TopOneTree;
-    WoodTable[ 5]= TheMap.Tileset->MidOneTree;
-    WoodTable[ 6]= table[0x770];
-    WoodTable[ 7]= table[0x790];
-    WoodTable[ 8]= -1;
-    WoodTable[ 9]= table[0x700];
-    WoodTable[10]= -1;
-    WoodTable[11]= table[0x720];
-    WoodTable[12]= table[0x730];
-    WoodTable[13]= table[0x740];
-    WoodTable[14]= table[0x7B0];
-    WoodTable[15]= table[0x7D0];
+    n = TheMap.Tileset->NumTiles;
+    for (mixed = solid = i = 0; i < n;) {
+	if (TheMap.Tileset->BasicNameTable[i]
+	    && TheMap.Tileset->MixedNameTable[i]) {
+	    if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
+		mixed = i;
+	    }
+	    i += 256;
+	} else {
+	    if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
+		solid = i;
+	    }
+	    i += 16;
+	}
+    }
+    WoodTable[ 0] = -1;
+    WoodTable[ 1] = TheMap.Tileset->BotOneTree;
+    WoodTable[ 2] = -1;
+    WoodTable[ 3] = table[mixed + 0x10];
+    WoodTable[ 4] = TheMap.Tileset->TopOneTree;
+    WoodTable[ 5] = TheMap.Tileset->MidOneTree;
+    WoodTable[ 6] = table[mixed + 0x70];
+    WoodTable[ 7] = table[mixed + 0x90];
+    WoodTable[ 8] = -1;
+    WoodTable[ 9] = table[mixed + 0x00];
+    WoodTable[10] = -1;
+    WoodTable[11] = table[mixed + 0x20];
+    WoodTable[12] = table[mixed + 0x30];
+    WoodTable[13] = table[mixed + 0x40];
+    WoodTable[14] = table[mixed + 0xB0];
+    WoodTable[15] = table[mixed + 0xD0];
 
     //
-    //	Build rock removement table. FIXME: use tileset type configuration
+    //  Build rock removement table.
     //
-    RockTable[ 0]= -1;
-    RockTable[ 1]= TheMap.Tileset->BotOneRock;
-    RockTable[ 2]= -1;
-    RockTable[ 3]= table[0x410];
-    RockTable[ 4]= TheMap.Tileset->TopOneRock;
-    RockTable[ 5]= TheMap.Tileset->MidOneRock;
-    RockTable[ 6]= table[0x470];
-    RockTable[ 7]= table[0x490];
-    RockTable[ 8]= -1;
-    RockTable[ 9]= table[0x400];
-    RockTable[10]= -1;
-    RockTable[11]= table[0x420];
-    RockTable[12]= table[0x430];
-    RockTable[13]= table[0x440];
-    RockTable[14]= table[0x4B0];
-    RockTable[15]= table[0x080];
+    for (mixed = solid = i = 0; i < n;) {
+	if (TheMap.Tileset->BasicNameTable[i]
+	    && TheMap.Tileset->MixedNameTable[i]) {
+	    if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
+		mixed = i;
+	    }
+	    i += 256;
+	} else {
+	    if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
+		solid = i;
+	    }
+	    i += 16;
+	}
+    }
+    RockTable[ 0] = -1;
+    RockTable[ 1] = TheMap.Tileset->BotOneRock;
+    RockTable[ 2] = -1;
+    RockTable[ 3] = table[mixed + 0x10];
+    RockTable[ 4] = TheMap.Tileset->TopOneRock;
+    RockTable[ 5] = TheMap.Tileset->MidOneRock;
+    RockTable[ 6] = table[mixed + 0x70];
+    RockTable[ 7] = table[mixed + 0x90];
+    RockTable[ 8] = -1;
+    RockTable[ 9] = table[mixed + 0x00];
+    RockTable[10] = -1;
+    RockTable[11] = table[mixed + 0x20];
+    RockTable[12] = table[mixed + 0x30];
+    RockTable[13] = table[mixed + 0x40];
+    RockTable[14] = table[mixed + 0xB0];
+    RockTable[15] = table[mixed + 0x80];
 
-    RockTable[16]= table[0x4C0];
-    RockTable[17]= table[0x460];
-    RockTable[18]= table[0x4A0];
-    RockTable[19]= table[0x4D0];
+    RockTable[16] = table[mixed + 0xC0];
+    RockTable[17] = table[mixed + 0x60];
+    RockTable[18] = table[mixed + 0xA0];
+    RockTable[19] = table[mixed + 0xD0];
+
+    //
+    //	FIXME: Build wall replacement tables
+    //
+    // WallHumanTable
 }
 
 /**
 **	Save flag part of tileset.
+**
+**	@param file	File handle for the saved flags.
+**	@param flags	Bit field of the flags.
 */
 local void SaveTilesetFlags(FILE* file, unsigned flags)
 {
@@ -427,23 +407,21 @@ local void SaveTilesetSolid(FILE* file, const unsigned short* table,
 **	@param name2	Second Ascii name of mixed tiles.
 **	@param flags	Tile attributes.
 **	@param start	Start index into table.
+**	@param end	End of tiles.
 */
 local void SaveTilesetMixed(FILE* file, const unsigned short* table,
-    const char* name1, const char* name2, unsigned flags, int start)
+    const char* name1, const char* name2, unsigned flags, int start, int end)
 {
     int x;
     int i;
     int j;
     int n;
 
-    if (start >= 0x9E0) {
-	return;
-    }
     fprintf(file, "  'mixed (list \"%s\" \"%s\"", name1, name2);
     SaveTilesetFlags(file, flags);
     fprintf(file,"\n");
     for (x = 0; x < 0x100; x += 0x10) {
-	if (start + x >= 0x9E0) {
+	if (start + x >= end) {		// Check end must be 0x10 aligned
 	    break;
 	}
 	fprintf(file, "    #(");
@@ -473,66 +451,64 @@ local void SaveTilesetMixed(FILE* file, const unsigned short* table,
 **	@param file	Output file.
 **	@param tileset	Save the content of this tileset.
 */
-local void SaveTileset(FILE* file,const Tileset* tileset)
+local void SaveTileset(FILE* file, const Tileset* tileset)
 {
     const unsigned short* table;
     int i;
     int n;
 
-    fprintf(file,"\n(define-tileset\n  '%s 'class '%s",
-	    tileset->Ident,tileset->Class);
-    fprintf(file,"\n  'name \"%s\"",tileset->Name);
-    fprintf(file,"\n  'image \"%s\"",tileset->File);
-    fprintf(file,"\n  'palette \"%s\"",tileset->PaletteFile);
-    fprintf(file,"\n  ;; Slots descriptions");
-    fprintf(file,"\n  'slots (list\n  'special (list\t\t;; Can't be in pud\n");
-    fprintf(file,"    'extra-trees #( %d %d %d %d %d %d )\n"
-	,tileset->ExtraTrees[0] ,tileset->ExtraTrees[1]
-	,tileset->ExtraTrees[2] ,tileset->ExtraTrees[3]
-	,tileset->ExtraTrees[4] ,tileset->ExtraTrees[5]);
-    fprintf(file,"    'top-one-tree %d 'mid-one-tree %d 'bot-one-tree %d\n"
-	,tileset->TopOneTree ,tileset->MidOneTree ,tileset->BotOneTree);
-    fprintf(file,"    'removed-tree %d\n",tileset->RemovedTree);
-    fprintf(file,"    'growing-tree #( %d %d )\n"
-	,tileset->GrowingTree[0] ,tileset->GrowingTree[1]);
-    fprintf(file,"    'extra-rocks #( %d %d %d %d %d %d )\n"
-	,tileset->ExtraRocks[0] ,tileset->ExtraRocks[1]
-	,tileset->ExtraRocks[2] ,tileset->ExtraRocks[3]
-	,tileset->ExtraRocks[4] ,tileset->ExtraRocks[5]);
-    fprintf(file,"    'top-one-rock %d 'mid-one-rock %d 'bot-one-rock %d\n"
-	,tileset->TopOneRock ,tileset->MidOneRock ,tileset->BotOneRock);
-    fprintf(file,"    'removed-rock %d )\n",tileset->RemovedRock);
+    fprintf(file, "\n(define-tileset\n  '%s 'class '%s", tileset->Ident,
+	tileset->Class);
+    fprintf(file, "\n  'name \"%s\"", tileset->Name);
+    fprintf(file, "\n  'image \"%s\"", tileset->File);
+    fprintf(file, "\n  'palette \"%s\"", tileset->PaletteFile);
+    fprintf(file, "\n  ;; Slots descriptions");
+    fprintf(file,
+	"\n  'slots (list\n  'special (list\t\t;; Can't be in pud\n");
+    fprintf(file, "    'extra-trees #( %d %d %d %d %d %d )\n",
+	tileset->ExtraTrees[0], tileset->ExtraTrees[1]
+	, tileset->ExtraTrees[2], tileset->ExtraTrees[3]
+	, tileset->ExtraTrees[4], tileset->ExtraTrees[5]);
+    fprintf(file, "    'top-one-tree %d 'mid-one-tree %d 'bot-one-tree %d\n",
+	tileset->TopOneTree, tileset->MidOneTree, tileset->BotOneTree);
+    fprintf(file, "    'removed-tree %d\n", tileset->RemovedTree);
+    fprintf(file, "    'growing-tree #( %d %d )\n", tileset->GrowingTree[0],
+	tileset->GrowingTree[1]);
+    fprintf(file, "    'extra-rocks #( %d %d %d %d %d %d )\n",
+	tileset->ExtraRocks[0], tileset->ExtraRocks[1]
+	, tileset->ExtraRocks[2], tileset->ExtraRocks[3]
+	, tileset->ExtraRocks[4], tileset->ExtraRocks[5]);
+    fprintf(file, "    'top-one-rock %d 'mid-one-rock %d 'bot-one-rock %d\n",
+	tileset->TopOneRock, tileset->MidOneRock, tileset->BotOneRock);
+    fprintf(file, "    'removed-rock %d )\n", tileset->RemovedRock);
 
     table = tileset->Table;
     n = tileset->NumTiles;
 
-    for ( i = 0; i < n; ) {
-	DebugLevel0Fn("%3d: %s - %s\n" _C_ i
-		_C_ tileset->TileNames[tileset->BasicNameTable[i]]
-		_C_ tileset->TileNames[tileset->MixedNameTable[i]]);
+    for (i = 0; i < n;) {
 	//
-	//	Mixeds
+	//      Mixeds
 	//
 	if (tileset->BasicNameTable[i] && tileset->MixedNameTable[i]) {
-	    SaveTilesetMixed(file,table,
+	    SaveTilesetMixed(file, table,
 		tileset->TileNames[tileset->BasicNameTable[i]],
 		tileset->TileNames[tileset->MixedNameTable[i]],
-		tileset->FlagsTable[i],i);
+		tileset->FlagsTable[i], i, n);
 	    i += 256;
-	//
-	//	Solids
-	//
+	    //
+	    //      Solids
+	    //
 	} else {
 	    SaveTilesetSolid(file, table,
 		tileset->TileNames[tileset->BasicNameTable[i]],
-		tileset->FlagsTable[i],i);
+		tileset->FlagsTable[i], i);
 	    i += 16;
 	}
     }
-    fprintf(file,"  )\n");
-    fprintf(file,"  ;; Animated tiles\n");
-    fprintf(file,"  'animations (list #( ) )\n");
-    fprintf(file,"  'objects (list #( ) ))\n");
+    fprintf(file, "  )\n");
+    fprintf(file, "  ;; Animated tiles\n");
+    fprintf(file, "  'animations (list #( ) )\n");
+    fprintf(file, "  'objects (list #( ) ))\n");
 }
 
 /**
@@ -545,22 +521,25 @@ global void SaveTilesets(FILE* file)
     int i;
     char** sp;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: tileset $Id$\n\n");
+    fprintf(file, "\n;;; -----------------------------------------\n");
+    fprintf(file,
+	";;; MODULE: tileset $Id$\n\n");
 
-    //	Original number to internal unit-type name.
+    //  Original number to internal tileset name
 
-    i=fprintf(file,"(define-tileset-wc-names");
-    for( sp=TilesetWcNames; *sp; ++sp ) {
-	if( i+strlen(*sp)>79 ) {
-	    i=fprintf(file,"\n ");
+    i = fprintf(file, "(define-tileset-wc-names");
+    for (sp = TilesetWcNames; *sp; ++sp) {
+	if (i + strlen(*sp) > 79) {
+	    i = fprintf(file, "\n ");
 	}
-	i+=fprintf(file," '%s",*sp);
+	i += fprintf(file, " '%s", *sp);
     }
-    fprintf(file,")\n");
+    fprintf(file, ")\n");
 
-    for( i=0; i<NumTilesets; ++i ) {
-	SaveTileset(file,Tilesets[i]);
+    // 	Save all loaded tilesets
+
+    for (i = 0; i < NumTilesets; ++i) {
+	SaveTileset(file, Tilesets[i]);
     }
 }
 
