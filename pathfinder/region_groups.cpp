@@ -401,7 +401,7 @@ void RegGroupAddToSuperGroups (int group_id)
 	RegGroup *g = RegGroupSetFindGroup (group_id);
 	Region *r;
 
-	DebugLevel0Fn ("reinitializing group %d.\n", group_id);
+	//DebugLevel0Fn ("reinitializing group %d.\n", group_id);
 	for (r = g->Regions; r; r = r->NextInGroup) {
 		int i;
 
@@ -679,7 +679,10 @@ local void ExpandGroup (int type, SuperGroup *s, RegGroup *g)
 					ng->SuperGroup[type] = g->SuperGroup[type];
 					ExpandGroup (type, s, ng);
 				} else {
-					DebugCheck (ng->SuperGroup[type] != g->SuperGroup[type]);
+					if (ng->SuperGroup[type] != g->SuperGroup[type]) {
+						longjmp (main_loop, 1);
+					}
+					//DebugCheck (ng->SuperGroup[type] != g->SuperGroup[type]);
 				}
 			}
 		}
