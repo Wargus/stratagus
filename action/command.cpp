@@ -1531,7 +1531,7 @@ global void CommandCancelUpgradeTo(Unit* unit)
     if( unit->Orders[0].Action == UnitActionUpgradeTo ) {
 
 	PlayerAddCostsFactor(unit->Player,
-		unit->Data.UpgradeTo.What->Stats->Costs,
+		unit->Orders[0].Type->Stats->Costs,
 		CancelUpgradeCostsFactor);
 
 	unit->Orders[0].Action=UnitActionStill;
