@@ -268,11 +268,13 @@ local void QuadTreeInsert(QuadTree* tree,QuadTreeValue* value)
     //
     StatisticNewLeaf(tree);
     leaf=NewQuadTreeLeaf(value,(QuadTreeLeaf*)(*nodep));
-    if( leaf->Next ) {
-	DebugLevel3("More...\n");
-	DebugLevel3("Leaf: %p %p,",leaf,leaf->Value);
-	DebugLevel3("Leaf: %p %p\n",leaf->Next,leaf->Next->Value);
-    }
+    IfDebug(
+	if( leaf->Next ) {
+	    DebugLevel3("More...\n");
+	    DebugLevel3("Leaf: %p %p,",leaf,leaf->Value);
+	    DebugLevel3("Leaf: %p %p\n",leaf->Next,leaf->Next->Value);
+	}
+    );
     *nodep=(QuadTreeNode*)leaf;
 }
 
@@ -301,10 +303,9 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
     //
     for( level=tree->Levels-1; level>=0; level-- ) {
 	if( !(node=*nodep) ) {
-	    DebugLevel0(__FUNCTION__": Value not found\n");
-	    DebugLevel0(__FUNCTION__": %d,%d\n"
-		    ,QuadTreeValueXOf(value)
-		    ,QuadTreeValueYOf(value));
+	    DebugLevel0Fn("Value not found\n");
+	    DebugLevel0Fn("%d,%d\n"
+		    ,QuadTreeValueXOf(value),QuadTreeValueYOf(value));
 	    return;
 	}
 	stack[1+level]=nodep;
@@ -320,10 +321,9 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
     for( ;; ) {
 	leaf=*leafp;
 	if( !leaf ) {
-	    DebugLevel0(__FUNCTION__": Value not found\n");
-	    DebugLevel0(__FUNCTION__": %d,%d\n"
-		    ,QuadTreeValueXOf(value)
-		    ,QuadTreeValueYOf(value));
+	    DebugLevel0Fn("Value not found\n");
+	    DebugLevel0Fn("%d,%d\n"
+		    ,QuadTreeValueXOf(value),QuadTreeValueYOf(value));
 	    return;
 	}
 	if( leaf->Value==value ) {
@@ -344,14 +344,12 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
     if( !*leafp ) {
 	DebugLevel3("SECOND:\n");
 	while( ++level<tree->Levels ) {
-	    // DebugLevel0("CLEANUP: %p -> %p\n",stack[1+level],*stack[1+level]);
 	    nodep=stack[1+level];
 	    node=*nodep;
 	    if( node->Next[0] || node->Next[1]
 		    || node->Next[2] || node->Next[3] ) {
 		break;
 	    }
-	    // DebugLevel0("LAST-CHILD\n");
 	    *nodep=NULL;
 	    DebugLevel3("FREE: %p %p\n",nodep,node);
 	    QuadTreeNodeFree(node);
@@ -436,8 +434,7 @@ local int SelectQuadTreeLeaf(QuadTreeLeaf* leaf,QuadTreeValue** table,int index)
     if( leaf ) {
 	while( leaf ) {
 	    DebugLevel3("%d,%d "
-		,QuadTreeValueXOf(leaf->Value)
-		,QuadTreeValueYOf(leaf->Value));
+		,QuadTreeValueXOf(leaf->Value),QuadTreeValueYOf(leaf->Value));
 	    table[index++]=leaf->Value;
 	    leaf=leaf->Next;
 	}
@@ -613,7 +610,7 @@ local QuadTree* PositionCache;		/// My quad tree for lookup
 */
 global void UnitCacheInsert(Unit* unit)
 {
-    DebugLevel3(__FUNCTION__": Insert UNIT %8p %08ZX\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("Insert UNIT %8p %08ZX\n",unit,UnitNumber(unit));
     QuadTreeInsert(PositionCache,unit);
 }
 
@@ -624,7 +621,7 @@ global void UnitCacheInsert(Unit* unit)
 */
 global void UnitCacheRemove(Unit* unit)
 {
-    DebugLevel3(__FUNCTION__": Remove UNIT %8p %08ZX\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("Remove UNIT %8p %08ZX\n",unit,UnitNumber(unit));
     QuadTreeDelete(PositionCache,unit);
 }
 
@@ -680,6 +677,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
     //
     for( i=j=0; i<n; ++i ) {
 	unit=table[i];
+
 	if( unit->X+unit->Type->TileWidth<=x1 || unit->X>x2
 		|| unit->Y+unit->Type->TileHeight<=y1 || unit->Y>y2 ) {
 	    continue;
@@ -778,6 +776,11 @@ global void InitUnitCache(void)
 //	Store direct on map.
 //****************************************************************************/
 
+// FIXME: Currently are units only stored at its insertion point on the map
+// FIXME: For many functions it would be better if the units are strored in
+// FIXME: all field that they occupy. This means a 2x2 big building is stored
+// FIXME: in 4 fields.
+
 //*****************************************************************************
 //	Convert calls to internal
 //****************************************************************************/
@@ -811,6 +814,7 @@ global void UnitCacheRemove(Unit* unit)
     for( ;; ) {				// find the unit
 	if( *prev==unit ) {
 	    *prev=unit->Next;
+	    unit->Next=NULL;
 	    return;
 	}
 	prev=&(*prev)->Next;
@@ -870,14 +874,18 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 	for( i=x; i<x2; ++i ) {
 	    
 	    for( unit=mf->Here.Units; unit; unit=unit->Next ) {
-		DebugLevel3Fn("%p\n",unit);
+		IfDebug(
+		    if( !unit->Type ) {
+			DebugLevel0Fn("%d,%d: %Zd, %d,%d\n"
+			    ,i,y,UnitNumber(unit),unit->X,unit->Y);
+			fflush(stdout);
+		    }
+		);
 		//
 		//	Remove units, outside range.
 		//
-		if( unit->X+unit->Type->TileWidth<=x1
-			|| unit->X>x2
-			|| unit->Y+unit->Type->TileHeight<=y1
-			|| unit->Y>y2 ) {
+		if( unit->X+unit->Type->TileWidth<=x1 || unit->X>x2
+			|| unit->Y+unit->Type->TileHeight<=y1 || unit->Y>y2 ) {
 		    continue;
 		}
 		table[n++]=unit;
