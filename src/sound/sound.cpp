@@ -50,6 +50,9 @@
 #include "sound_server.h"
 #include "missile.h"
 #include "map.h"
+#ifdef SPLIT_SCREEN_SUPPORT
+#include "ui.h"
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 #include "sound.h"
 
@@ -201,8 +204,13 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
 global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
 {
     float stereo;
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
+    stereo = (unit->X + ((float)unit->IX / TileSizeX) - v->MapX) / v->MapWidth;
+#else /* SPLIT_SCREEN_SUPPORT */
     stereo = (unit->X + ((float)unit->IX / TileSizeX) - MapX) / MapWidth;
+#endif /* SPLIT_SCREEN_SUPPORT */
     stereo = (stereo * 2.0) - 1.0;
     if (stereo < -1.0) stereo=-1.0;
     else if (stereo > 1.0) stereo=1.0;
@@ -223,8 +231,13 @@ global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
 global void PlayMissileSound(const Missile* missile,SoundId sound)
 {
     float stereo;
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
+    stereo = (((float)missile->X / TileSizeX) - v->MapX) / v->MapWidth;
+#else /* SPLIT_SCREEN_SUPPORT */
     stereo = (((float)missile->X / TileSizeX) - MapX) / MapWidth;
+#endif /* SPLIT_SCREEN_SUPPORT */
     stereo = (stereo * 2.0) - 1.0;
     if (stereo < -1.0) stereo=-1.0;
     else if (stereo > 1.0) stereo=1.0;
