@@ -4485,7 +4485,7 @@ local void StartEditor(void)
     //  Create a default path + map.
     //
     if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
-	strcpy(CurrentMapPath, "default.pud");
+	strcpy(CurrentMapPath, "puds/default.pud");
     }
 
     //
