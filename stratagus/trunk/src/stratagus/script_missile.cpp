@@ -172,7 +172,7 @@ local SCM CclDefineMissileTypeWcNames(SCM list)
 **
 **	@param list	List of all names.
 */
-local SCM CclMissile(SCM list __attribute((unused)))
+local SCM CclMissile(SCM list __attribute__((unused)))
 {
     DebugLevel0Fn("FIXME: not written %p\n",list);
 
