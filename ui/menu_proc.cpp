@@ -1317,6 +1317,10 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
     HGLOBAL handle;
 #elif defined(_XLIB_H_)
     Display *display;
+    Window w;
+    Atom rettype;
+    unsigned long nitem, bytes;
+    int retform, ret;
 #endif
 #endif
 
@@ -1411,9 +1415,21 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			    break;
 			}
 #elif defined(_XLIB_H_)
-			display = XOpenDisplay(NULL);
-			clipboard = XFetchBytes(display, &i);
+
+			if (!(display = XOpenDisplay(NULL)))
+			    break;			
+//			if ((w = XGetSelectionOwner(display, XA_PRIMARY)) == None)
+			if ((w = DefaultRootWindow(display)) == None)
+			    break;
+
+			ret = XGetWindowProperty(display, w, XA_CUT_BUFFER0,
+					   0, 1024, False, AnyPropertyType,
+					   &rettype, &retform, &nitem, &bytes,
+					   (unsigned char **)&clipboard);
+
+#ifndef USE_X11
 			XCloseDisplay(display);
+#endif
 #endif
 			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
 			    if (clipboard[i] != '\r' && clipboard[i] != '\n') {
