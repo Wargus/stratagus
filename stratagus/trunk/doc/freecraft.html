@@ -27,7 +27,7 @@
 
     Please refer to the <A HREF="artistic-license.html">LICENSE</A>
     document provided with this distribution. To proceed beyond this point,
-    is to agree with the licence agreement.
+    is to agree with the license agreement.
 
     <H2><A NAME="disclaimer">DISCLAIMER</A></H2>
 
@@ -60,10 +60,16 @@
     Read this for the history of FreeCraft:
     <A HREF="ChangeLog.html">ChangeLog.html</A>
 
-    <H2><A NAME="todo">Todo and known bugs</A></H2>
+    <H2><A NAME="todo">To-do and known bugs</A></H2>
 
     This file contains the known bugs and what we plan in the future:
     <A HREF="todo.html">todo.html</A>
+    <P>A more up to date list of known bugs are here:
+    <A HREF="http://sourceforge.net/tracker/?group_id=1965&atid=101965">
+    SourceForge: FreeCraft real-time strategy game engine - Tracker - Bugs</A>
+    <P>A more up to date list of planned tasks are here:
+    <A HREF="http://sourceforge.net/pm/?group_id=1965">
+    SourceForge: FreeCraft real-time strategy game engine - Tasks</A>
 
     <H2><A NAME="faq">Problems</A></H2>
 
@@ -80,12 +86,13 @@
 <LI>Easy replace of unit graphics and sounds.
 <LI>64 times greater maps.
 <LI>Training queues.
-<LI>Waypoints.
+<LI>Way-points.
 <LI>Correct fog of war (terrain changes are not shown).
-<LI>Nice looking fog of war (alpha-grayscale)
+<LI>Nice looking fog of war (alpha-gray-scale)
 <LI>More resolutions 640x480, 800x600, 1024x768 and 1600x1200.
 <LI>Scripting language.
-<LI>Support for upto 6 resources.
+<LI>Support for up to 6 resources.
+<LI>Internet play.
 </UL>
 
     <H2><A NAME="open-projects">Open projects</A></H2>
@@ -98,20 +105,19 @@
 <LI>Write front end to FreeCraft. (Scenarios, puds, videos...)
 <LI>Write a video player. (fli or own format)
 <LI>Create own tilesets and unit graphics.
-<LI>Create own sounds, voices, videos and campains.
+<LI>Create own sounds, voices, videos and campaigns.
 <LI>Create an icon for window-manager.
 <LI>Create a jingle for startup and home-page.
-<LI>Write better documentation. (correct my english :-)
-<LI>Improved network support.
-<LI>Write better sound routines. (with mp3 and midi or xmi support)
+<LI>Write better documentation. (correct my English :-)
+<LI>Improved network support (viewer, proxy, automatic lag detection)
+<LI>Write better sound routines. (with mp3 or ogg and midi or xmi support)
 <LI>Write "build.sh" for demo-version.
-<LI>Port to X11 8bpp or 32bpp, fullscreen and DGA support.
+<LI>Port to X11 8bpp or 32bpp, full-screen and DGA support.
 <LI>Port to ggi.
 <LI>Port to msdos/djgpp.
-<LI>Port to beos.
 <LI>Write clone of the new game from the same company.
     (Graphic and sound formats are mostly the same.)
-<LI>Multilanguage support
+<LI>Multi-language support
 <LI>And any other help is welcome.
 </UL>
 
@@ -131,13 +137,13 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 <UL>
 <LI>OPTIONS<BR>
     You can currently give following command line options. Use "freecraft -h" to
-    get an uptodate information.
+    get an up to date information.
     <UL>
     <LI>-c "file.ccl"<BR>
-	Load freecraft config file <VAR>"file.ccl"</VAR> insteed of the default
-	"<VAR>libarypath/</VAR>ccl/freecraft.ccl".
+	Load FreeCraft config file <VAR>"file.ccl"</VAR> instead of the default
+	"<VAR>librarypath/</VAR>ccl/freecraft.ccl".
     <LI>-d "path"<BR>
-	Change the freecraft libary path to <VAR>"path"</VAR> insteed of the
+	Change the FreeCraft library path to <VAR>"path"</VAR> instead of the
 	default "./data" or "/usr/share/games/freecraft/default".
     <LI>-f factor<BR>
 	Adjust the build costs of units for the computer players by factor.
@@ -146,31 +152,40 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     <LI>-l<BR>
 	Enable command log to <VAR>"command.log"</VAR>
     <LI>-p players<BR>
-	Number of network <VAR>players</VAR> to connect.
+	Number of network <VAR>players</VAR> to connect. This computer be
+	comes the game server.
+    <LI>-n [localport:]serverhost[:port]<BR>
+	Connect to FreeCraft server <VAR>serverhost</VAR>.
+	<VAR>serverhost</VAR> is the name of the server like "freecraft.org"
+	or the IP number like "192.168.1.1". <VAR>localport</VAR>
+	is the port number on the local computer, <VAR>port</VAR> is the 
+	port on the game server. The default ports are 6660. If you have a
+	firewall please let the port 6660/UDP through.
     <LI>-s frames<BR>
 	The AI sleeps 'frames' before it starts working.
     <LI>-t factor<BR>
 	Adjust the build time of units for the computer players by factor.
     <LI>-D<BR>
-	Video depth = pixel pro point.
+	Video depth = pixel pro point. Only useful if not automatic
+	detected.
     <LI>-F<BR>
-	Fullscreen videomode.
+	Full-screen video-mode.
     <LI>-W<BR>
-	Windowed videomode.
+	Windowed video-mode.
     </UL>
 <LI>map.pud<BR>
-    Load the map "map.pud" insteed of the default
-    "<VAR>libarypath/</VAR>default.cm".
+    Load the map "map.pud" instead of the default
+    "<VAR>librarypath/</VAR>default.cm".
 <LI>map.pud.gz<BR>
-    Load the compressed map "map.pud.gz" insteed of the default
-    "<VAR>libarypath/</VAR>default.cm".
+    Load the compressed map "map.pud.gz" instead of the default
+    "<VAR>librarypath/</VAR>default.cm".
 <LI>map.cm<BR>
-    Load the freecraft map "map.cm" insteed of the default.
+    Load the FreeCraft map "map.cm" instead of the default.
 <LI>map.cm.gz<BR>
-    Load the compressed freecraft map "map.cm.gz" insteed of the default.
+    Load the compressed FreeCraft map "map.cm.gz" instead of the default.
 <LI><BR>
     If no file is given the default map
-    "<VAR>libarypath/</VAR>default.cm" will be loaded.
+    "<VAR>librarypath/</VAR>default.cm" will be loaded.
 </UL>
 
 <H3>Keyboard commands</H3>
@@ -187,7 +202,7 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 <LI><KBD>RETURN</KBD><BR>
     Enter command line.
 <LI><KBD>TAB</KBD><BR>
-    Toggle minimap mode, with/without terrain.
+    Toggle mini-map mode, with/without terrain.
 <LI><KBD>+</KBD><BR>
     Increase game speed.
 <LI><KBD>-</KBD><BR>
@@ -213,7 +228,7 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 <LI><KBD>S</KBD><BR>
     Save complete state.
 <LI><KBD>F10</KBD><BR>
-    Enter game menue.
+    Enter game menu.
 </UL>
 
     <H2><A NAME="ccl">CCL: FreeCraft Configuration Language</A></H2>
@@ -228,20 +243,20 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 
 <A HREF="ccl/ccl.html"> Here I have started a new documentation. </A> <P>
 
-Please help me writting it.
+Please help me writing it.
 
 <H3>Files</H3>
 
 <UL>
-<LI><VAR>libarypath</VAR>/ccl/freecraft.ccl is loaded before any initialisation.
+<LI><VAR>librarypath</VAR>/ccl/freecraft.ccl is loaded before any initialization.
 Contains general configuration.
-<LI><VAR>libarypath</VAR>/ccl/missile.ccl is loaded from freecraft.ccl.
+<LI><VAR>librarypath</VAR>/ccl/missile.ccl is loaded from freecraft.ccl.
 Contains missile configuration.
-<LI><VAR>libarypath</VAR>/ccl/sound.ccl is loaded from freecraft.ccl.
+<LI><VAR></VAR>/ccl/sound.ccl is loaded from freecraft.ccl.
 Contains sound configuration.
-<LI><VAR>libarypath</VAR>/ccl/tilesets.ccl is loaded from freecraft.ccl.
+<LI><VAR>librarypath</VAR>/ccl/tilesets.ccl is loaded from freecraft.ccl.
 Contains tileset configuration.
-<LI><VAR>libarypath</VAR>/ccl/units.ccl is loaded from freecraft.ccl.
+<LI><VAR>librarypath</VAR>/ccl/units.ccl is loaded from freecraft.ccl.
 Contains units configuration.
 </UL>
 
@@ -429,7 +444,7 @@ Without any order:
     <P>
 
 <LI><VAR>get-unit-type-ident</VAR><BR>
-    Get the unique identfier of the unit type structure.<P>
+    Get the unique identifier of the unit type structure.<P>
     (get-unit-type-ident type)
     <DL>
     <DT>type</DT>
@@ -467,7 +482,7 @@ Without any order:
 	Load "default.pud.gz".<P>
 
 <LI><VAR>freecraft-map</VAR><BR>
-    Define a map in freecraft own format.<P>
+    Define a map in FreeCraft own format.<P>
     (freecraft-map ...)
 
     <P>FIXME: Must write docu<P>
@@ -501,7 +516,7 @@ Without any order:
 <UL>
 
 <LI><VAR>sound-thread</VAR><BR>
-    Tells freecraft engine to use a threaded sound server. MUST be used in the
+    Tells FreeCraft engine to use a threaded sound server. MUST be used in the
     sound.ccl file, BEFORE the game fully starts. As no effect during the
     game. 
 
@@ -523,7 +538,7 @@ Without any order:
     Turn sound on.
 
 <LI><VAR>sound-for-name</VAR><BR>
-    Return a siod sound id to be used in other functions.<P>
+    Return a SIOD sound id to be used in other functions.<P>
     (sound-for-name name)<p>
     <UL>
     <LI>name<BR>
@@ -551,7 +566,7 @@ Without any order:
     (set-sound-range sound ratio)<p>
     <UL>
     <LI>sound<BR>
-    The sound either described by its name (a string) or by its siod sound
+    The sound either described by its name (a string) or by its SIOD sound
     id. 
     <LI>ratio<BR>
     This value (between 0 and 255) allows to compute the range of the
@@ -641,7 +656,7 @@ Without any order:
 <H3><A NAME="internal-sounds">Sounds</A></H3>
 
     The sounds are loaded from 'wav'-files.  Files with 8 or 16 bit, mono and
-    11025hz sample frequence are currently supported.<P>
+    11025hz sample frequency are currently supported.<P>
 
     <H3><A NAME="utilities">Utilities</A></H3>
 
@@ -653,7 +668,7 @@ Without any order:
     <H5>Usage: extract data-file entry output</H5>
     <UL>
     <LI>data-file<BR>
-	Compressed input data file. (normaly maindat.war)
+	Compressed input data file. (normally maindat.war)
     <LI>entry<BR>
 	Entry number of the data-file.
     <LI>output<BR>
@@ -707,12 +722,12 @@ Without any order:
     <DT>ore,stone,coal.png
     <DD>Orc, Stone and coal icon in resource (c) Copyright 2000 by the Guardian.
     <DT>freecraft.bmp, freecraft.ico
-    <DD>The FreeCraft icon (c) Copyright 2000 by Kyle
+    <DD>The FreeCraft icon (c) Copyright 2000 by Kyle.
     </DL>
 
     <H2><A NAME="thanks">Thanks</A></H2>
 
-    Thanks to following people for helping me develop freecraft:
+    Thanks to following people for helping me develop FreeCraft:
     <UL>
     <LI>Ari
     <LI>Edgar
@@ -767,7 +782,7 @@ Without any order:
     <LI><A HREF="#install">Install</A>
     <LI><A HREF="#upgrade">Upgrade</A>
     <LI><A HREF="#changes">Changes</A>
-    <LI><A HREF="#todo">Todo</A>
+    <LI><A HREF="#todo">To-do</A>
     <LI><A HREF="#faq">FAQ</A>
     <LI><A HREF="#features">Features</A>
     <LI><A HREF="#open-projects">Open projects</A>
@@ -784,7 +799,7 @@ Without any order:
 	    <LI><A HREF="#internal-palette">Palette</A>
 	</UL>
     </UL>
-    <LI><A HREF="#utilities">Utilites</A>
+    <LI><A HREF="#utilities">Utilities</A>
     <UL>
     </UL>
     <LI><A HREF="#arts">Arts</A>
