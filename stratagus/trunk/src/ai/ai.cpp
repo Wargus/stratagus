@@ -46,6 +46,72 @@ global AiHelper AiHelpers;		/// AI helper variables
 global PlayerAi* AiPlayer;		/// Current AI player
 
 /*----------------------------------------------------------------------------
+--	Lowlevel functions
+----------------------------------------------------------------------------*/
+
+/**
+**	Execute the AI Script.
+*/
+local void AiExecuteScript(void)
+{
+    PlayerAi* pai;
+    SCM value;
+
+    pai=AiPlayer;
+    if( !gh_null_p(pai->Script) ) {
+	if( pai->ScriptDebug ) {		// display executed command
+	    gh_display(gh_car(pai->Script));
+	    gh_newline();
+	}
+	value=leval(gh_car(pai->Script),NIL);
+	if( !gh_eq_p(value,SCM_BOOL_T) ) {
+	    pai->Script=gh_cdr(pai->Script);
+	}
+    }
+}
+
+/**
+**	Check if everything is fine, send new requests to resource manager.
+*/
+local void AiCheckUnits(void)
+{
+    int counter[UnitTypeMax];
+    int i;
+    int n;
+    int t;
+    int x;
+
+    memset(counter,0,sizeof(counter));
+    //
+    //	Count the already made build requests.
+    //
+    n=AiPlayer->BuildedCount;
+    for( i=0; i<n; ++i ) {
+	counter[AiPlayer->UnitTypeBuilded[i].Type->Type]
+		+=AiPlayer->UnitTypeBuilded[i].Want;
+	DebugLevel0Fn("Already in build queue: %s %d\n",
+		AiPlayer->UnitTypeBuilded[i].Type->Ident,
+		AiPlayer->UnitTypeBuilded[i].Want);
+    }
+
+    //
+    //	Look if something is missing.
+    //
+    n=AiPlayer->RequestsCount;
+    for( i=0; i<n; ++i ) {
+	t=AiPlayer->UnitTypeRequests[i].Table[0]->Type;
+	x=AiPlayer->UnitTypeRequests[i].Count;
+	if( x>AiPlayer->Player->UnitTypesCount[t]+counter[t] ) {
+	    DebugLevel0Fn("Need %s\n",AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
+	    // Request it.
+	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
+		    x-AiPlayer->Player->UnitTypesCount[t]-counter[t]);
+	}
+	counter[t]+=x;
+    }
+}
+
+/*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
@@ -143,25 +209,23 @@ global void AiEachFrame(Player* player)
 */
 global void AiEachSecond(Player* player)
 {
-    SCM value;
-    PlayerAi* pai;
 
     DebugLevel0Fn("%d:\n" _C_ player->Player);
 
-    AiPlayer=pai=player->Ai;
+    AiPlayer=player->Ai;
     //
     //	Advance script
     //
-    if( !gh_null_p(pai->Script) ) {
-	if( pai->ScriptDebug ) {		// display executed command
-	    gh_display(gh_car(pai->Script));
-	    gh_newline();
-	}
-	value=leval(gh_car(pai->Script),NIL);
-	if( !gh_eq_p(value,SCM_BOOL_T) ) {
-	    pai->Script=gh_cdr(pai->Script);
-	}
-    }
+    AiExecuteScript();
+    //
+    //	Look if everything is fine.
+    //
+    AiCheckUnits();
+
+    //
+    //	Handle the resource manager.
+    //
+    AiResourceManager();
 }
 
 //@}

@@ -780,7 +780,7 @@ local SCM CclAnimType(SCM list)
 /**
 **	Access unit-type object
 */
-local UnitType* CclGetUnitType(SCM ptr)
+global UnitType* CclGetUnitType(SCM ptr)
 {
     const char* str;
 

@@ -590,6 +590,7 @@ global void ParsePudALOW(const char* alow,int length)
     Player* player;
 
     DebugLevel0Fn(" Length %d FIXME: constant must be moved to ccl\n",length);
+
     InitUpgrades();
 
     //
@@ -631,17 +632,19 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0Fn(" %x\n",v);
+	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %s +R\n",spells[i*8+b]);
+			DebugLevel0Fn(" %d %s +R\n",
+				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'R');
 		    }
 		} else {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %s -F\n",spells[i*8+b]);
+			DebugLevel0Fn(" %d %s -F\n",
+				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'F');
 		    }
@@ -658,11 +661,12 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0Fn(" %x\n",v);
+	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %s +A\n",spells[i*8+b]);
+			DebugLevel0Fn(" %d %s +A\n",
+				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'A');
 		    }
@@ -679,11 +683,12 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0Fn(" %x\n",v);
+	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
-			DebugLevel0Fn(" %s +U\n",spells[i*8+b]);
+			DebugLevel0Fn(" %d %s +U\n",
+				player->Player,spells[i*8+b]);
 
 			AllowUpgradeByIdent(player,spells[i*8+b],'U');
 		    }
@@ -700,11 +705,12 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0Fn(" %x\n",v);
+	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel0Fn(" %s +A\n",upgrades[i*16+b*2]);
+			DebugLevel0Fn(" %d %s +A\n",
+				player->Player,upgrades[i*16+b*2]);
 
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'A');
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'A');
@@ -722,11 +728,12 @@ global void ParsePudALOW(const char* alow,int length)
 	    int v;
 
 	    v=*alow++;
-	    DebugLevel0Fn(" %x\n",v);
+	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
-			DebugLevel0Fn(" %s +U\n",upgrades[i*16+b*2]);
+			DebugLevel0Fn(" %d %s +U\n",
+				player->Player,upgrades[i*16+b*2]);
 
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'U');
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'U');

@@ -308,6 +308,53 @@ local SCM CclDefineAi(SCM list)
 ----------------------------------------------------------------------------*/
 
 /**
+**	Get unit-type.
+*/
+extern UnitType* CclGetUnitType(SCM ptr);
+
+/**
+**	Append unit-type to request table.
+**
+**	@param type	Unit-type to be appended.
+**	@param count	How many unit-types to build.
+*/
+local void InsertRequests(UnitType* type,int count)
+{
+    int n;
+
+    if( AiPlayer->UnitTypeRequests ) {
+	n=AiPlayer->RequestsCount;
+	AiPlayer->UnitTypeRequests=realloc(AiPlayer->UnitTypeRequests,
+		(n+1)*sizeof(*AiPlayer->UnitTypeRequests));
+    } else {
+	AiPlayer->UnitTypeRequests=malloc(sizeof(*AiPlayer->UnitTypeRequests));
+	n=0;
+    }
+    AiPlayer->UnitTypeRequests[n].Table[0]=type;
+    AiPlayer->UnitTypeRequests[n].Count=count;
+    AiPlayer->RequestsCount=n+1;
+}
+
+/**
+**	Find unit-type in request table.
+**
+**	@param type	Unit-type to be found.
+*/
+local AiUnitTypeTable* FindInRequests(const UnitType* type)
+{
+    int i;
+    int n;
+
+
+    n=AiPlayer->RequestsCount;
+    for( i=0; i<n; ++i ) {
+	if( AiPlayer->UnitTypeRequests[i].Table[0]==type ) {
+	    return &AiPlayer->UnitTypeRequests[i];
+	}
+    }
+    return NULL;
+}
+/**
 **	Set debuging flag of AI script.
 */
 local SCM CclAiDebug(SCM flag)
@@ -322,36 +369,67 @@ local SCM CclAiDebug(SCM flag)
 
 /**
 **	Need an unit.
+**
+**	@param value	Unit-type as string/symbol/object.
 */
-local SCM CclAiNeed(SCM unit)
+local SCM CclAiNeed(SCM value)
 {
-    printf("Need: ");
-    gh_display(unit);
-    gh_newline();
+    InsertRequests(CclGetUnitType(value),1);
+
     return SCM_BOOL_F;
 }
 
 /**
 **	Set the number of units.
+**
+**	@param value	Unit-type as string/symbol/object.
+**	@param count	Number of unit-types requested.
 */
-local SCM CclAiSet(SCM unit,SCM count)
+local SCM CclAiSet(SCM value,SCM count)
 {
+    AiUnitTypeTable* autt;
+    UnitType* type;
+
     printf("Set: ");
-    gh_display(unit);
-    gh_display(unit);
+    gh_display(value);
     gh_newline();
+
+    type=CclGetUnitType(value);
+    if( (autt=FindInRequests(type)) ) {
+	autt->Count=gh_scm2int(count);
+    } else {
+	InsertRequests(type,gh_scm2int(count));
+    }
+
     return SCM_BOOL_F;
 }
 
 /**
 **	Wait for an unit.
+**
+**	@param value	Unit-type as string/symbol/object.
 */
-local SCM CclAiWait(SCM unit)
+local SCM CclAiWait(SCM value)
 {
+    AiUnitTypeTable* autt;
+    UnitType* type;
+
     printf("Wait: ");
-    gh_display(unit);
+    gh_display(value);
     gh_newline();
-    return SCM_BOOL_F;
+
+    type=CclGetUnitType(value);
+    if( !(autt=FindInRequests(type)) ) {
+	DebugLevel0Fn("Broken, waiting on unit-type which wasn't requested.\n");
+	return SCM_BOOL_F;
+    }
+    // units available?
+    DebugLevel0Fn("%d,%d\n",AiPlayer->Player->UnitTypesCount[type->Type],autt->Count);
+    if( AiPlayer->Player->UnitTypesCount[type->Type]>=autt->Count ) {
+	return SCM_BOOL_F;
+    }
+
+    return SCM_BOOL_T;
 }
 
 #else
