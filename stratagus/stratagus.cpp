@@ -649,6 +649,11 @@ global void MenuLoop(char* filename, WorldMap* map)
 
 			GuiGameStarted = 0;
 			while (GuiGameStarted == 0) {
+				int old_video_sync;
+
+				old_video_sync = VideoSyncSpeed;
+				VideoSyncSpeed = 100;
+				SetVideoSync();
 				if (EditorRunning == 2) {
 					SetupEditor();
 				}
@@ -657,6 +662,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 				} else {
 					ProcessMenu("menu-program-start", 1);
 				}
+				VideoSyncSpeed = old_video_sync;
+				SetVideoSync();
 			}
 
 			EnableRedraw = RedrawEverything;
