@@ -388,7 +388,7 @@ local int CclIfNearUnit(lua_State* l)
 	Unit* table[UnitMax];
 	CompareFunction compare;
 
-	if (lua_gettop(l) != 4) {
+	if (lua_gettop(l) != 5) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	}
