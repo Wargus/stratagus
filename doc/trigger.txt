@@ -122,10 +122,9 @@ For the following syntax I use:
 	o player has quantity of unit dies
         Which quantity of the unit must be lost by the player for the
 	action.
-(if-kills <player> <op> <unit>)
-	o player has quantity of unit-type killed
-        Which quantity of the unit must be killed by the player for the
-	action.
+(if-kills <player> <op> <quantity>)
+	o player has quantity of kills
+        Which quantity must be killed by the player for the action.
 (if-kills-least <player> <op> <unit>)
 	o player has the least quantity of unit-type killed
         The player has killed the quantity of the unit at least for the
@@ -144,8 +143,8 @@ For the following syntax I use:
 	o game run for duration
         If the game run for the duration game cycles the action is executed.
 (if-timer <op> <quantity>)
-	o countdown timer reaches quantity
-        If the countdown timer reaches quantity the action is executed.
+	o timer reaches quantity
+        If the timer reaches quantity the action is executed.
 
 The most are needed if a player should win for a number kills, but must have
 more kills than all other players.
