@@ -304,6 +304,7 @@ local void ReplayGameCancel(void);
 local void DiplomacyWait(Menuitem *mi);
 local void DiplomacyOk(void);
 
+local void NetErrorMenu(char *error);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -2655,10 +2656,7 @@ local void JoinNetGameMenu(void)
     // Now finally here is the address
     server_host_buffer[menu->items[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(server_host_buffer)) {
-	menu = FindMenu("menu-net-error");
-	menu->items[1].d.text.text = "Unable to lookup host.";
-	ProcessMenu("menu-net-error", 1);
-	menu->items[1].d.text.text = NULL;
+	NetErrorMenu("Unable to lookup host.");
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
@@ -2716,59 +2714,38 @@ local void NetConnectingCancel(void)
 */
 local void TerminateNetConnect(void)
 {
-    Menu *menu;
-
-    menu = FindMenu("menu-net-error");
     switch (NetLocalState) {
 	case ccs_unreachable:
-	    menu->items[1].d.text.text = "Cannot reach server.";
-	    ProcessMenu("menu-net-error", 1);
-	    menu->items[1].d.text.text = NULL;
-
+	    NetErrorMenu("Cannot reach server.");
 	    NetConnectingCancel();
 	    return;
 	case ccs_nofreeslots:
-	    menu->items[1].d.text.text = "Server is full.";
-	    ProcessMenu("menu-net-error", 1);
-	    menu->items[1].d.text.text = NULL;
-
+	    NetErrorMenu("Server is full.");
 	    NetConnectingCancel();
 	    return;
 	case ccs_serverquits:
-	    menu->items[1].d.text.text = "Server gone.";
-	    ProcessMenu("menu-net-error", 1);
-	    menu->items[1].d.text.text = NULL;
-
+	    NetErrorMenu("Server gone.");
 	    NetConnectingCancel();
 	    return;
 	case ccs_incompatibleengine:
-	    menu->items[1].d.text.text = "Incompatible engine version.";
-	    ProcessMenu("menu-net-error", 1);
-	    menu->items[1].d.text.text = NULL;
-
+	    NetErrorMenu("Incompatible engine version.");
 	    NetConnectingCancel();
 	    return;
 	case ccs_badmap:
-	    menu->items[1].d.text.text = "Map not available.";
-	    ProcessMenu("menu-net-error", 1);
-	    menu->items[1].d.text.text = NULL;
-
+	    NetErrorMenu("Map not available.");
 	    NetConnectingCancel();
 	    return;
 	case ccs_incompatiblenetwork:
-	    menu->items[1].d.text.text = "Incompatible network version.";
-	    ProcessMenu("menu-net-error", 1);
-	    menu->items[1].d.text.text = NULL;
-
+	    NetErrorMenu("Incompatible network version.");
+	    NetConnectingCancel();
+	    return;
 	case ccs_usercanceled:
 	    NetConnectingCancel();
 	    return;
-
 	case ccs_started:
 	    NetworkGamePrepareGameSettings();
 	    CustomGameStart();
 	    return;
-
 	default:
 	    break;
     }
@@ -4785,10 +4762,7 @@ local void EditorNewOk(void)
 	    sprintf(menu->items[5].d.input.buffer, "32~!_");
 	    menu->items[5].d.input.nch = strlen(menu->items[5].d.text.text) - 3;
 	}
-	menu = FindMenu("menu-net-error");
-	menu->items[1].d.text.text = "Size smaller than 32";
-	ProcessMenu("menu-net-error", 1);
-	menu->items[1].d.text.text = NULL;
+	ErrorMenu("Size smaller than 32");
     } else if (value1 > 1024 || value2 > 1024) {
 	if (value1 == 0) {
 	    sprintf(menu->items[4].d.input.buffer, "1024~!_");
@@ -4798,10 +4772,7 @@ local void EditorNewOk(void)
 	    sprintf(menu->items[5].d.input.buffer, "1024~!_");
 	    menu->items[5].d.input.nch = strlen(menu->items[5].d.text.text) - 3;
 	}
-	menu = FindMenu("menu-net-error");
-	menu->items[1].d.text.text = "Size larger than 1024";
-	ProcessMenu("menu-net-error", 1);
-	menu->items[1].d.text.text = NULL;
+	ErrorMenu("Size larger than 1024");
     } else if (value1/32*32 != value1 || value2/32*32 != value2) {
 	if (value1/32*32 != value1) {
 	    sprintf(menu->items[4].d.input.buffer, "%d~!_", (value1+16)/32*32);
@@ -4811,10 +4782,7 @@ local void EditorNewOk(void)
 	    sprintf(menu->items[5].d.input.buffer, "%d~!_", (value2+16)/32*32);
 	    menu->items[5].d.input.nch = strlen(menu->items[5].d.text.text) - 3;
 	}
-	menu = FindMenu("menu-net-error");
-	menu->items[1].d.text.text = "Size must be a multiple of 32";
-	ProcessMenu("menu-net-error", 1);
-	menu->items[1].d.text.text = NULL;
+	ErrorMenu("Size must be a multiple of 32");
     }
     else {
 	EndMenu();
@@ -6619,6 +6587,44 @@ local void ReplayGameCancel(void)
 
     menu = FindMenu("menu-replay-game");
     menu->items[5].d.button.text = NULL;
+}
+
+/**
+**	Net error menu
+**
+**	@param error	    Error message
+*/
+local void NetErrorMenu(char *error)
+{
+    Menu *menu;
+
+    menu = FindMenu("menu-net-error");
+    menu->items[1].d.text.text = error;
+    ProcessMenu("menu-net-error", 1);
+    menu->items[1].d.text.text = NULL;
+}
+
+/**
+**	Error menu
+**
+**	@param error	    Error message
+*/
+global void ErrorMenu(char *error)
+{
+    Menu *menu;
+    int oldx;
+    int oldy;
+
+    menu = FindMenu("menu-net-error");
+    oldx = menu->x;
+    oldy = menu->y;
+    menu->x = (VideoWidth - menu->xsize) / 2;
+    menu->y = (VideoHeight - menu->ysize) / 2;
+    menu->items[1].d.text.text = error;
+    ProcessMenu("menu-net-error", 1);
+    menu->items[1].d.text.text = NULL;
+    menu->x = oldx;
+    menu->y = oldy;
 }
 
 /*----------------------------------------------------------------------------
