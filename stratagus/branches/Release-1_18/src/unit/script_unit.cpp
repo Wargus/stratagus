@@ -806,6 +806,13 @@ local SCM CclUnit(SCM list)
 	}
     }
 
+    // 
+    // Patch for broken save games
+    //
+    if( !unit->Removed && unit->Next ) {
+	unit->Next = NULL;
+    }
+
     //
     //	Place on map
     //
