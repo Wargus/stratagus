@@ -10,12 +10,11 @@
 //
 /**@name png.c		-	The png graphic file loader. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -53,11 +52,12 @@
 **	@param data	byte address to read to.
 **	@param length	number of bytes to read.
 */
-void CL_png_readfn(png_structp png_ptr,png_bytep data,png_size_t length)
+local void CL_png_readfn(png_structp png_ptr,png_bytep data,png_size_t length)
 {
    png_size_t check;
 
-   check = (png_size_t)CLread((CLFile *)png_get_io_ptr(png_ptr), data, (size_t)length);
+   check = (png_size_t)CLread((CLFile *)png_get_io_ptr(png_ptr), data,
+	(size_t)length);
    if (check != length) {
       png_error(png_ptr, "Read Error");
    }
@@ -66,11 +66,11 @@ void CL_png_readfn(png_structp png_ptr,png_bytep data,png_size_t length)
 /**
 **	Load a png graphic file.
 **
-**	FIXME: must support other formats than 8bit indexed
-**
 **	@param name	png filename to load.
 **
 **	@return		graphic object with loaded graphic, or NULL if failure.
+**
+**	@todo	FIXME: must support other formats than 8bit indexed
 */
 global Graphic* LoadGraphicPNG(const char* name)
 {
@@ -109,7 +109,6 @@ global Graphic* LoadGraphicPNG(const char* name)
 	CLclose(fp);
 	return NULL;
     }
-    /* png_init_io(png_ptr,fp); */
     png_set_read_fn(png_ptr,fp,CL_png_readfn);
 
     //
