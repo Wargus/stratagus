@@ -92,7 +92,7 @@
 
 #endif
 
-#if __GNUC__>=3 
+#if __GNUC__>=3
 
 #if !defined(__I_KNOW_THAT_GNUC_3_IS_UNSUPPORTED__)
 #warning "GCC 3.XX is not supported, downgrade to GCC 2.95"
@@ -432,15 +432,10 @@ extern int SlowFrameCounter;
 --	Convert
 ----------------------------------------------------------------------------*/
 
-extern int Screen2MapX(int x);		/// Convert screen pixel to map tile
-extern int Screen2MapY(int y);		/// Convert screen pixel to map tile
-extern int Map2ScreenX(int x);		/// Convert map tile to screen pixel
-extern int Map2ScreenY(int y);		/// Convert map tile to screen pixel
-
-extern int Viewport2MapX (int , int );
-extern int Viewport2MapY (int , int );
-extern int Map2ViewportX (int , int );
-extern int Map2ViewportY (int , int );
+extern int Viewport2MapX(int v, int x);	/// Convert screen pixel to map tile
+extern int Viewport2MapY(int v, int y);	/// Convert screen pixel to map tile
+extern int Map2ViewportX(int v, int x);	/// Convert map tile to screen pixel
+extern int Map2ViewportY(int v, int y);	/// Convert map tile to screen pixel
 
 /*----------------------------------------------------------------------------
 --	clone.c
