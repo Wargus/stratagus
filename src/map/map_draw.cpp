@@ -690,9 +690,9 @@ local void VideoDrawXXTileClip(const unsigned char* data, int x, int y)
 #if GRID==1
     VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
 	data, x, y, TileSizeX, TileSizeY-1);
-    VideoDrawLine(ColorBlack, x + TileSizeX-1, y,
+    VideoDrawLineClip(ColorBlack, x + TileSizeX-1, y,
 	    x + TileSizeX-1, y + TileSizeY);
-    VideoDrawLine(ColorBlack, x, y + TileSizeY-1,
+    VideoDrawLineClip(ColorBlack, x, y + TileSizeY-1,
 	    x + TileSizeX, y + TileSizeY - 1);
 #else
     VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,

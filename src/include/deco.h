@@ -44,14 +44,15 @@ typedef struct DecorationSingle {
   // next single-tile decoration belonging to the same decoration
   struct DecorationSingle *nxt;
   // exact 2x2 tile area
-  char *tiles;
-  // 16bit bitmask which denote the area in above tiles overlapped by this deco
-  unsigned int lefttopmask, righttopmask, leftbottommask, rightbottommask;
-  // the bit index (bity4+bitx) of the left-top in the first tile
-  // @note  bity4 is a multiple of 4 tiles (so no multiple needed)
-  int bitx, bity4;
-  // left-top pixel position
-  int topleftx, toplefty;
+  unsigned short *tiles;
+  // 16bit bitmask to and in order to *mark* the small deco
+  unsigned short bitmask;
+  // The coordinates of the upper-left corner of the 64*64 square
+  int cornerx, cornery;
+#ifdef DEBUG
+  // coordinates of the small deco on screen. mostly debug purposes.
+  int x, y, w, h;
+#endif
 } DecorationSingle;
 
 /**
@@ -80,11 +81,6 @@ typedef struct Deco {
   int x, y, w, h;
   int level;
 } Deco;
-
-/**
-**
-**
-**/
 
 /*----------------------------------------------------------------------------
 --      Functions
