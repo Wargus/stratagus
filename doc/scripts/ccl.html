@@ -20,8 +20,9 @@
     <title>Stratagus Configuration Language Description: Content</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
     <meta name="Author" content="johns98@gmx.net">
-    <meta name="Keyword" content="ccl">
-    <meta name="Description" content="">
+    <meta name="Author" content="cleonard@go.ro">
+    <meta name="Keyword" content="scripting">
+    <meta name="Description" content="Scripting languag main structure">
 </head>
 <body>
     <h1>Stratagus Configuration Language Description: Content</h1>
@@ -47,10 +48,30 @@
 <hr>
 <h2>Intro - Introduction to CCL - Craft Configuration Language</h2>
 
-Stratagus is a real-time strategy engine. To define
-the different games a configuration language is needed.<br>
-I have chosen scheme because it is easy to parse and produces easy to read
-config files.<p>
+<p>Stratagus is a real-time strategy engine. To define
+the different games a configuration language is needed.</p>
+<p>The old scripting language was used mostly in a declarative way,
+with functions for everything. I am changing that, in the branch
+called META_LUA (you just change an ifdef in stratagus.h to get it)</p>
+
+<h3>Scripting interface design</h3>
+<p>All the scripting interface will be in one big lua table, called
+<b>Stratagus</b>. If you think that's too long something like Game could do.
+Inside that table, most configurable structures in the game will be
+accessbile. For instance Stratagus.UnitTypes[3] or Stratagus.UnitTypes["unit_goldmine"]
+will get you a reference to a UnitType, with an meta-table written in C,
+that overrides __index and __new_index (meaning get and set).</p>
+<p>The main <b>Stratagus</b> table will be accessible at all times.
+However, having a lua table for each and every struct we use would be
+a huge resource waste. This is why we make a table only when we want to get it
+the actual struct. It works by returning userdate, not a table. userdata is
+a special type in lua, and it's mostly opaque to lua, it's good to store random
+C values. In userdata, the metatable also has an __gc function, that gets called
+by the lua garbage collector.</p>
+<p>All lua accessible struct get a LuaTable field, initially 0, that gets set first time
+we get the table. If lua wants it again, we just return the same thing. When __gc
+gets called it sets the field back to 0. Most of this is done with macros, to keep
+the code simple to understand.</p>
 
 <h2>Content</h2>
 
