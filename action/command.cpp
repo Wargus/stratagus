@@ -613,11 +613,7 @@ global void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
     //	Check if unit is still valid? (NETWORK!)
     //
     if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
-	if (unit->Type->Building) {
-	    // FIXME: should find a better way for pending orders.
-	    order = &unit->NewOrder;
-	    ReleaseOrder(order);
-	} else if (!(order = GetNextOrder(unit, flush))) {
+	if (!(order = GetNextOrder(unit, flush))) {
 	    return;
 	}
 
