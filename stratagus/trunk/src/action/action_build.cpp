@@ -373,7 +373,7 @@ global void HandleActionBuilded(Unit* unit)
 	    UpdateButtonPanel();
 	}
 #ifdef NEW_FOW
-	unit->CurrentSightRange=unit->Type->Stats->SightRange;
+	unit->CurrentSightRange=unit->Stats->SightRange;
 	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,
 			    unit->Y+unit->Type->TileWidth/2,
 			    unit->CurrentSightRange);
