@@ -30,8 +30,6 @@ local int ResolveDeadlock (Unit * , Unit * , int * , int * );
 
 int PfHierInitialize (void)
 {
-	int set;
-
 	if (TheMap.Width < 1024)
 		Config.Area.Width = Config.Area.Height = 8;
 	else
