@@ -32,6 +32,8 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
+#include "iocompat.h"
+
 //@{
 
 /*----------------------------------------------------------------------------
@@ -258,7 +260,7 @@ typedef struct _world_map_ {
 	unsigned char NoFogOfWar;  ///< fog of war disabled
 
 	struct _tileset_* Tileset; ///< tileset data
-
+	char TileModelsFileName[PATH_MAX]; ///< lua filename that loads all tilemodels
 	struct _graphic_* TileGraphic; ///< graphic for all the tiles
 	struct _graphic_* FogGraphic; ///< graphic for fog of war
 

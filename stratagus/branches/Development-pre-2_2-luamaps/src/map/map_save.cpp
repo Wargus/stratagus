@@ -70,7 +70,7 @@ void SaveMap(CLFile* file)
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: map $Id$\n");
 
-	CLprintf(file, "Load(\"scripts/tilesets/%s.lua\")\n\n", "desert"); //MAPTODO
+	CLprintf(file, "LoadTileModels(\"%s\")\n\n", TheMap.TileModelsFileName);
 	
 	CLprintf(file, "StratagusMap(\n");
 

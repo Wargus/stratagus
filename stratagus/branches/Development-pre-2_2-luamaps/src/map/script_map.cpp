@@ -524,6 +524,26 @@ static int CclDefinePlayerTypes(lua_State* l)
 }
 
 /**
+** Load the lua file which will define the tile models
+**
+**  @param l  Lua state.
+*/
+static int CclLoadTileModels(lua_State* l)
+{
+	char buf[1024];
+
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+	strcpy(TheMap.TileModelsFileName, LuaToString(l, 1));  
+	LibraryFileName(TheMap.TileModelsFileName, buf);
+	if (LuaLoadFile(buf) == -1) {
+		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
+	}
+	return 0;
+}
+
+/**
 **  Register CCL features for map.
 */
 void MapCclRegister(void)
@@ -544,6 +564,7 @@ void MapCclRegister(void)
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 
 	lua_register(Lua, "SelectTileset", CclSelectTileset);
+	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "SetTile", CclSetTile);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 }

@@ -4619,8 +4619,10 @@ static void EditorNewOk(void)
 		ErrorMenu("Size must be a multiple of 32");
 	}
 	else {
-		char tilemodel[256];
+		char tilemodel[PATH_MAX];
 		
+		sprintf(TheMap.TileModelsFileName, "scripts/tilesets/%s.lua",
+			menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
 		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath,
 			menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
 		LuaLoadFile(tilemodel);

@@ -207,7 +207,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "\n");
 
 	gzprintf(f, "-- load tilesets\n");
-	gzprintf(f, "Load(\"scripts/tilesets/%s.lua\")\n\n", "desert"); //MAPTODO
+	gzprintf(f, "LoadTileModels(\"%s\")\n\n", map->TileModelsFileName);
 	
 	for (i = 0; i < map->Info.MapHeight; ++i) {
 		for (j = 0; j < map->Info.MapWidth; ++j) {
