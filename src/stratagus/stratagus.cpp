@@ -641,7 +641,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 
 			// Start new music for menus
 			if (PlayingMusic && MenuMusic != NULL &&
-				strcmp(CurrentMusicFile, MenuMusic)) {
+					strcmp(CurrentMusicFile, MenuMusic)) {
 				StopMusic();
 			}
 			PlaySectionMusic(PlaySectionMainMenu);
@@ -682,6 +682,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 			strcpy(CurrentMapPath, filename);
 		}
 		if (IsNetworkGame() && NetPlayers < 2) {
+			GameSettings.Presets[0].Race = GameSettings.Presets[Hosts[0].PlyNr].Race;
 			ExitNetwork1();
 		}
 
