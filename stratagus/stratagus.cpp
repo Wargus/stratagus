@@ -1105,6 +1105,9 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    DebugLevel0Fn("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 	    filename = CurrentMapPath;
 	} else {
+	    if (EditorRunning) {
+		SetupEditor();
+	    }
 	    strcpy(CurrentMapPath,filename);
 	}
 	if( NetworkFildes!=-1 && NetPlayers<2 ) {
