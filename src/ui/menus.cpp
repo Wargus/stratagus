@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name menus.c	-	The menu buttons. */
+/**@name menus.c	-	The menu function code. */
 //
 //	(c) Copyright 1999-2002 by Andreas Arens
 //
@@ -66,7 +66,8 @@
 #include "libcda.h"
 #endif
 
-//#define OLD_MENU			/// CCL menus not used
+//#define OLD_MENU		/// CCL menus not used
+//#define SAVE_MENU_CCL		/// SAVE (REWRITE!) the menus.ccl file
 
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
@@ -257,6 +258,11 @@ global void SaveMenus(FILE* file);
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+#ifdef SAVE_MENU_CCL
+typedef char char30[30];
+extern hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
+#endif
 
     /// Name, Version, Copyright FIXME: move to headerfile
 extern char NameLine[];
@@ -2134,14 +2140,22 @@ global Menu Menus[] = {
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#ifdef SAVE_MENU_CCL
 #define HASHADD(x,y) { \
     *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
     sprintf(buf,"%p",(x)); \
     strcpy((char*)hash_add(MenuFuncHash2,buf), (y)); \
 }
+#else
+#define HASHADD(x,y) { \
+    *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
+}
+#endif
 
 global void InitMenuFuncHash(void) {
+#ifdef SAVE_MENU_CCL
     char buf[10];
+#endif
 
     HASHADD(NULL,"null");
 
@@ -6575,15 +6589,19 @@ global void InitMenuFunctions(void)
     //
 #endif
 
-#if 0
+#ifdef OLD_MENU
+#ifdef SAVE_MENU_CCL
     {
 	FILE *fd=fopen("menus.ccl","w");
 	SaveMenus(fd);
 	fclose(fd);
     }
 #endif
+#endif
 }
 
+#ifdef OLD_MENU
+#ifdef SAVE_MENU_CCL
 char *menu_names[] = {
     "menu-game",
     "menu-victory",
@@ -6902,5 +6920,7 @@ global void SaveMenus(FILE* file)
 	fprintf(file,"\n\n");
     }
 }
+#endif /// SAVE_MENU_CCL
+#endif
 
 //@}

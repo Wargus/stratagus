@@ -251,21 +251,15 @@ typedef struct _menus_ {
 ----------------------------------------------------------------------------*/
 
 extern const char *CurrentMenu;		/// Currently processed menu
-extern int MenuRedrawX;			/// X coordinate of menu to redraw
-extern int MenuRedrawY;			/// Y coordinate of menu to redraw
-extern int MenuRedrawW;			/// Width of menu to redraw
-extern int MenuRedrawH;			/// Height of menu to redraw
 extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
 extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
 
 #define MENUS_MAXMENU 128		/// FIXME: wrong place, docu
 #define MENUS_MAXFUNC 128		/// FIXME: wrong place, docu
     /// FIXME: docu
-global hashtable(Menu*,MENUS_MAXMENU) MenuHash;
+extern hashtable(Menu*,MENUS_MAXMENU) MenuHash;
     /// FIXME: docu
-typedef char char30[30];
-global hashtable(void*,MENUS_MAXFUNC) MenuFuncHash;
-global hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
+extern hashtable(void*,MENUS_MAXFUNC) MenuFuncHash;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -282,15 +276,18 @@ extern void DrawMenu(const char *MenuId);
     /// Draw menu button
 extern void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigned h,unsigned x,unsigned y,const int font,const unsigned char *text);
     /// Set menu backgound and draw it
-global void MenusSetBackground(void);
+extern void MenusSetBackground(void);
     /// Draw and process a menu
 extern void ProcessMenu(const char *MenuId, int Loop);
     /// End the current menu
-global void EndMenu(void);
+extern void EndMenu(void);
     /// Find a menu by id
-global Menu *FindMenu(const char *MenuId);
+extern Menu *FindMenu(const char *MenuId);
 
-    /// The scenario path received from server, Update the client menu.
+    /// Invalidate previously redrawn menu areas
+extern void InvalidateMenuAreas(void);
+
+    /// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);
     /// State info received from server, Update the client menu.
 extern void NetClientUpdateState(void);
