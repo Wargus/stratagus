@@ -334,7 +334,7 @@ void CreateGame(const char* filename, WorldMap* map)
 	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 	
-	if (!TheMap.Info.Filename) {
+	if (!TheMap.Info.Filename && filename) {
 		char path[PATH_MAX];
 		
 		Assert(filename);
