@@ -439,8 +439,6 @@ local void SdlHandleKey(const SDL_keysym* code)
     if( HandleKeyDown(icode) ) {
 	return;
     }
-    // FIXME: Should come first, move this into low level!!!!
-    DoButtonPanelKey(icode);
 }
 
 /**

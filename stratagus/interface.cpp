@@ -159,6 +159,13 @@ local int CommandKey(int key)
 	    }
 	    break;
 
+	case KeyCodeF1:
+	case KeyCodeF2:
+	case KeyCodeF3:
+	case KeyCodeF4:			// Set/Goto place
+	    DebugLevel0("FIXME: not written\n");
+	    break;
+
 	case KeyCodeF10:
 	    GamePaused=1;
 	    SetStatusLine("Game Paused");
@@ -400,6 +407,9 @@ global int HandleKeyDown(int key)
 	case IfaceStateNormal:			// Normal Game state
 	    switch( KeyState ) {
 		case KeyStateCommand:
+		    if( DoButtonPanelKey(key) ) {
+			return 1;
+		    }
 		    return CommandKey(key);
 		case KeyStateInput:
 		    return InputKey(key);
