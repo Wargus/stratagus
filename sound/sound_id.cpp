@@ -10,11 +10,10 @@
 //
 /**@name sound_id.c	-	The sound id. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
 //
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -108,7 +107,7 @@ global SoundId MakeSound(char* name,char* file[],unsigned char nb)
 global SoundId SoundIdForName(const char* name)
 {
     const SoundId* result;
-    
+
     DebugCheck( !name );
 
     if( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
@@ -132,18 +131,23 @@ global void MapSound(const char* name,const SoundId id)
 /**
 **	Ask the sound server to build a special sound group.
 **
+**	Register two sound groups together to make a special sound (for
+**	selection). Return the corresponding id after registering it under a
+**	given name.
+**
 **	@param name	the name of the group. MUST BE A PERMANENT STRING.
 **	@param first	id of the first group
 **	@param second	id of the second group
 **
 **	@return		Registered sound identifier.
 */
-global SoundId MakeSoundGroup(char* group_name,SoundId first,SoundId second)
+global SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second)
 {
     SoundId sound;
 
     sound=RegisterTwoGroups(first,second);
-    MapSound(group_name,sound);
+    MapSound(name,sound);
+
     return sound;
 }
 
