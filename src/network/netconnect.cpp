@@ -42,6 +42,7 @@
 #include "map.h"
 #include "network.h"
 #include "netconnect.h"
+#include "interface.h"
 
 
 //----------------------------------------------------------------------------
@@ -52,18 +53,34 @@
 //	Variables
 //----------------------------------------------------------------------------
 
-global char NetworkName[16];		/// Network Name of local player
 global char *NetworkArg;		/// Network command line argument
 global int NetPlayers;			/// How many network players
 global int NetworkPort = NetworkDefaultPort;	/// Local network port to use
-
-global int HostsCount;			/// Number of hosts.
-global NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
 
 IfDebug(
 extern unsigned long MyHost;		/// My host number.
 extern int MyPort;			/// My port number.
 );
+
+global int HostsCount;			/// Number of hosts.
+global NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
+
+global NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
+global int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
+global char NetworkName[16];		/// Network menu: Name of local player
+global unsigned long NetworkServerIP;	/// Network menu: Client: IP of server to join
+global int NetConnectRunning;		/// Network menu: Setup mode active
+global unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
+
+local int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
+local unsigned char LastStateMsgType;	/// Subtype of last InitConfig message sent
+local struct timeval NetLastPacketSent;	/// Time the last network packet was sent
+
+/// FIXME ARI: The following is a kludge to have some way to override the default port
+/// on the server to connect to. Should be selectable by advanced network menus.
+/// For now just specify with the network arg...
+local int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
+
 
 /**@name api */
 //@{
@@ -230,7 +247,7 @@ global void NetworkServerSetup(WorldMap *map)
 	if (n == HostsCount) {
 	    Hosts[HostsCount].Host = NetLastHost;
 	    Hosts[HostsCount].Port = NetLastPort;
-	    memcpy(Hosts[HostsCount].PlyName, msg->Hosts[0].PlyName, 16);
+	    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[0].PlyName, 16);
 	    DebugLevel0Fn("New client %d.%d.%d.%d:%d [%s]\n",
 		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort), Hosts[HostsCount].PlyName);
 	    HostsCount++;
@@ -269,15 +286,15 @@ global void NetworkServerSetup(WorldMap *map)
     message.SubType = ICMConfig;
     message.HostsCount = HostsCount + 1;
     for (i = 0; i < HostsCount; ++i) {
-	message.Hosts[i].Host = Hosts[i].Host;
-	message.Hosts[i].Port = Hosts[i].Port;
-	memcpy(message.Hosts[i].PlyName, Hosts[i].PlyName, 16);
-	message.Hosts[i].PlyNr = htons(num[i]);
+	message.u.Hosts[i].Host = Hosts[i].Host;
+	message.u.Hosts[i].Port = Hosts[i].Port;
+	memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+	message.u.Hosts[i].PlyNr = htons(num[i]);
 	PlayerSetName(&Players[num[i]], Hosts[i].PlyName);
     }
-    message.Hosts[i].Host = message.Hosts[i].Port = 0;	// marks the server
-    memcpy(message.Hosts[i].PlyName, NetworkName, 16);
-    message.Hosts[i].PlyNr = htons(num[i]);
+    message.u.Hosts[i].Host = message.u.Hosts[i].Port = 0;	// marks the server
+    memcpy(message.u.Hosts[i].PlyName, NetworkName, 16);
+    message.u.Hosts[i].PlyNr = htons(num[i]);
 
     DebugLevel3Fn("Player here %d\n", num[i]);
     ThisPlayer = &Players[num[i]];
@@ -295,15 +312,15 @@ global void NetworkServerSetup(WorldMap *map)
 		unsigned long host;
 		int port;
 
-		host = message.Hosts[i].Host;
-		port = message.Hosts[i].Port;
-		message.Hosts[i].Host = message.Hosts[i].Port = 0;
+		host = message.u.Hosts[i].Host;
+		port = message.u.Hosts[i].Port;
+		message.u.Hosts[i].Host = message.u.Hosts[i].Port = 0;
 		n = NetSendUDP(NetworkFildes, host, port, &message,
 			sizeof(message));
 		DebugLevel0Fn("Sending InitConfig Message Config (%d) to %d.%d.%d.%d:%d\n",
 			n, NIPQUAD(ntohl(host)), ntohs(port));
-		message.Hosts[i].Host = host;
-		message.Hosts[i].Port = port;
+		message.u.Hosts[i].Host = host;
+		message.u.Hosts[i].Port = port;
 	    }
 	}
 
@@ -372,10 +389,12 @@ global void NetworkClientSetup(WorldMap *map)
     if (cp) {
 	*cp = '\0';
 	port = htons(atoi(cp + 1));
+	NetworkServerPort = htons(port);
 	host = NetResolveHost(NetworkArg);
 	*cp = ':';
     } else {
 	port = htons(NetworkPort);
+	NetworkServerPort = htons(port);
 	host = NetResolveHost(NetworkArg);
     }
     if (host == INADDR_NONE) {
@@ -397,7 +416,7 @@ global void NetworkClientSetup(WorldMap *map)
     message.Version = htonl(NetworkProtocolVersion);
     message.Lag = htonl(NetworkLag);
     message.Updates = htonl(NetworkUpdates);
-    memcpy(message.Hosts[0].PlyName, NetworkName, 16);
+    memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);
     if (map->Info) {
 	message.MapUID = htonl(map->Info->MapUID);
     } else {
@@ -503,30 +522,30 @@ global void NetworkClientSetup(WorldMap *map)
 	NetworkUpdates = ntohl(msg->Updates);
 
 	for (i = 0; i < msg->HostsCount - 1; ++i) {
-	    if (msg->Hosts[i].Host || msg->Hosts[i].Port) {
-		Hosts[HostsCount].Host = msg->Hosts[i].Host;
-		Hosts[HostsCount].Port = msg->Hosts[i].Port;
-		Hosts[HostsCount].PlyNr = ntohs(msg->Hosts[i].PlyNr);
-		memcpy(Hosts[HostsCount].PlyName, msg->Hosts[i].PlyName, 16);
+	    if (msg->u.Hosts[i].Host || msg->u.Hosts[i].Port) {
+		Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
+		Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
+		Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+		memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
 		PlayerSetName(&Players[Hosts[HostsCount].PlyNr], Hosts[HostsCount].PlyName);
 		HostsCount++;
 		DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d [%s]\n",
-			ntohs(msg->Hosts[i].PlyNr), NIPQUAD(ntohl(msg->Hosts[i].Host)),
-			ntohs(msg->Hosts[i].Port), msg->Hosts[i].PlyName);
+			ntohs(msg->u.Hosts[i].PlyNr), NIPQUAD(ntohl(msg->u.Hosts[i].Host)),
+			ntohs(msg->u.Hosts[i].Port), msg->u.Hosts[i].PlyName);
 	    } else {			// Own client
-		DebugLevel0Fn("SELF %d [%s]\n", ntohs(msg->Hosts[i].PlyNr),
-			msg->Hosts[i].PlyName);
-		ThisPlayer = &Players[ntohs(msg->Hosts[i].PlyNr)];
+		DebugLevel0Fn("SELF %d [%s]\n", ntohs(msg->u.Hosts[i].PlyNr),
+			msg->u.Hosts[i].PlyName);
+		ThisPlayer = &Players[ntohs(msg->u.Hosts[i].PlyNr)];
 		PlayerSetName(ThisPlayer, NetworkName);
 	    }
 	}
 
 	Hosts[HostsCount].Host = host;
 	Hosts[HostsCount].Port = port;
-	DebugLevel0Fn("SERVER %d [%s]\n", ntohs(msg->Hosts[i].PlyNr),
-		msg->Hosts[i].PlyName);
-	Hosts[HostsCount].PlyNr = ntohs(msg->Hosts[i].PlyNr);
-	memcpy(Hosts[HostsCount].PlyName, msg->Hosts[i].PlyName, 16);
+	DebugLevel0Fn("SERVER %d [%s]\n", ntohs(msg->u.Hosts[i].PlyNr),
+		msg->u.Hosts[i].PlyName);
+	Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+	memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
 	PlayerSetName(&Players[Hosts[HostsCount].PlyNr], Hosts[HostsCount].PlyName);
 	HostsCount++;
 
@@ -570,6 +589,355 @@ global void NetworkClientSetup(WorldMap *map)
     DebugLevel3Fn("DONE: All client have received config - starting game\n");
 }
 
+
+//----------------------------------------------------------------------------
+//	NEW API
+//----------------------------------------------------------------------------
+
+/**
+**	Send an InitConfig message across the Network
+**
+**	@param host	Host to send to (network byte order).
+**	@param port	Port of host to send to (network byte order).
+**	@param msg	The message to send
+*/
+local int NetworkSendICMessage(unsigned long host, int port, InitMessage *msg)
+{
+    msg->FreeCraft = htonl(FreeCraftVersion);
+    msg->Version = htonl(NetworkProtocolVersion);
+    msg->Lag = htonl(NetworkLag);
+    msg->Updates = htonl(NetworkUpdates);
+    return NetSendUDP(NetworkFildes, host, port, msg, sizeof(*msg));
+}
+
+/**
+**	Send a message to the server, but only if the last packet was a while ago
+**
+**	@param msg	The message to send
+**	@param msecs	microseconds to delay
+*/
+local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
+{
+    struct timeval now;
+    unsigned long s, u, d;
+    int n;
+
+    gettimeofday(&now, NULL);
+    s = now.tv_sec - NetLastPacketSent.tv_sec;
+    u = now.tv_usec - NetLastPacketSent.tv_usec;
+    d = s * 1000 + u / 1000;
+    if (d  >= msecs) {
+	NetLastPacketSent = now;
+	if (msg->SubType == LastStateMsgType) {
+	    NetStateMsgCnt++;
+	} else {
+	    NetStateMsgCnt = 0;
+	    LastStateMsgType = msg->SubType;
+	}
+	n = NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), msg);
+	DebugLevel0Fn("Sending Init Message (%d:%d): %d:%d(%d) %d.%d.%d.%d:%d\n",
+		NetLocalState, NetStateMsgCnt, msg->Type, msg->SubType, n,
+		NIPQUAD(ntohl(NetworkServerIP)), NetworkServerPort);
+    }
+}
+
+/**
+**	Setup Network connect state machine for clients
+*/
+global void NetworkInitClientConnect(void)
+{
+    int i;
+
+    NetConnectRunning = 2;
+    gettimeofday(&NetLastPacketSent, NULL);
+    NetLocalState = ccs_connecting;
+    NetStateMsgCnt = 0;
+    LastStateMsgType = ICMServerQuit;
+    for (i = 0; i < PlayerMax; ++i) {
+	Hosts[i].Host = 0;
+	Hosts[i].Port = 0;
+	Hosts[i].PlyNr = 0;
+	memset(Hosts[i].PlyName, 0, 16);
+    }
+    HostsCount = 0;
+}
+
+/**
+**	Terminate Network connect state machine for clients
+*/
+global void NetworkExitClientConnect(void)
+{
+    NetConnectRunning = 0;
+}
+
+/**
+**	Setup Network connect state machine for the server
+*/
+global void NetworkInitServerConnect(void)
+{
+    int i;
+
+    NetConnectRunning = 1;
+
+    DebugLevel1Fn("Waiting for %d client(s)\n", NetPlayers - 1);
+
+    for (i = 0; i < NetPlayers; ++i) {
+	NetStates[i].State = ccs_unused;
+	NetStates[i].Ready = 0;
+	Hosts[i].Host = 0;
+	Hosts[i].Port = 0;
+	Hosts[i].PlyNr = 0;		/// slotnr until final cfg msg
+	memset(Hosts[i].PlyName, 0, 16);
+    }
+    NetLocalState = scs_waiting;
+
+    HostsCount = 0;
+    /// preset the server (always slot 0)
+    memcpy(Hosts[HostsCount].PlyName, NetworkName, 16);
+    HostsCount++;
+}
+
+/**
+**	Terminate Network connect state machine for the server
+*/
+global void NetworkExitServerConnect(void)
+{
+    NetConnectRunning = 0;
+}
+
+
+/**
+**	Menu Loop: Send out client request messages
+*/
+global void NetworkProcessClientRequest(void)
+{
+    InitMessage message;
+
+    switch (NetLocalState) {
+	case ccs_connecting:
+	    if (NetStateMsgCnt < 60) {	/// 60 retries = 30 seconds
+		message.Type = MessageInitHello;
+		message.SubType = ICMHello;
+		memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);
+		message.MapUID = 0L;
+		NetworkSendRateLimitedClientMessage(&message, 500);
+	    } else {
+		NetLocalState = ccs_unreachable;			
+		NetConnectRunning = 0;	/// End the menu..
+	    }
+	    break;
+	case ccs_connected:
+	    message.Type = MessageInitHello;
+	    message.SubType = ICMWaiting;
+	    // memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);
+	    message.MapUID = 0L;
+	    NetworkSendRateLimitedClientMessage(&message, 650);
+	default:
+	    break;
+    }
+}
+
+/**
+**	Parse a Network menu packet.
+**
+**	@param msg	message received
+**	@param size	size of the received packet.
+*/
+local void NetworkParseMenuPacket(const InitMessage *msg, int size)
+{
+    int i, h, n;
+    InitMessage message;
+
+    if (msg->Type > MessageInitConfig || size != sizeof(*msg)) {
+	DebugLevel0Fn("Wrong message\n");
+	return;
+    }
+    DebugLevel0Fn("Received Init Message %d:%d (%d) from %d.%d.%d.%d:%d\n",
+	    msg->Type, msg->SubType, size, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+
+    if (NetConnectRunning == 2) {		/// client
+	switch(NetLocalState) {
+	    case ccs_connecting:
+		if (msg->Type == MessageInitReply) {
+		    switch(msg->SubType) {
+
+			case ICMEngineMismatch: /// FreeCraft engine version doesn't match
+			    fprintf(stderr, "Incompatible FreeCraft version "
+					FreeCraftFormatString " <-> "
+					FreeCraftFormatString "\n"
+					"from %d.%d.%d.%d:%d\n",
+				    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
+				    FreeCraftFormatArgs(FreeCraftVersion),
+				    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+			    /// FIXME: return a better error to the user...
+			    NetLocalState = ccs_unreachable;
+			    NetConnectRunning = 0;	/// End the menu..
+			    return;
+
+			case ICMProtocolMismatch: /// Network protocol version doesn't match
+			    fprintf(stderr, "Incompatible network protocol version "
+					NetworkProtocolFormatString " <-> "
+					NetworkProtocolFormatString "\n"
+					"from %d.%d.%d.%d:%d\n",
+				    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+				    NetworkProtocolFormatArgs(NetworkProtocolVersion),
+				    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+			    /// FIXME: return a better error to the user...
+			    NetLocalState = ccs_unreachable;
+			    NetConnectRunning = 0;	/// End the menu..
+			    return;
+
+			case ICMGameFull:	/// Game is full - server rejected connnection
+			    fprintf(stderr, "Server at %d.%d.%d.%d:%d is full!\n",
+				    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+			    /// FIXME: return a better error to the user...
+			    NetLocalState = ccs_unreachable;
+			    NetConnectRunning = 0;	/// End the menu..
+			    return;
+
+			case ICMWelcome:	/// Server has accepted us
+			    NetLocalState = ccs_connected;
+			    NetLocalHostsSlot = msg->u.Hosts[0].PlyNr;
+			    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16);	/// Name of server player
+			    Hosts[0].Host = NetworkServerIP;
+			    Hosts[0].Port = htons(NetworkServerPort);
+			    HostsCount = msg->HostsCount;
+			    for (i = 1; i < HostsCount; i++) {
+				if (i != NetLocalHostsSlot) {
+				    Hosts[i].Host = msg->u.Hosts[i].Host;
+				    Hosts[i].Port = msg->u.Hosts[i].Port;
+				    Hosts[i].PlyNr = i;
+				    memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+				} else {
+				    Hosts[i].PlyNr = i;
+				    memcpy(Hosts[i].PlyName, NetworkName, 16);
+				}
+			    }
+
+			    NetConnectRunning = 0;	/// Kick the menu..
+			    break;
+		    }
+		}
+		break;
+	    default:
+		break;
+	}
+
+    } else if (NetConnectRunning == 1) {	/// server
+
+	if (ntohl(msg->FreeCraft) != FreeCraftVersion) {
+	    fprintf(stderr, "Incompatible FreeCraft version "
+			FreeCraftFormatString " <-> "
+			FreeCraftFormatString "\n"
+			"from %d.%d.%d.%d:%d\n",
+		    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
+		    FreeCraftFormatArgs(FreeCraftVersion),
+		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+
+	    message.Type = MessageInitReply;
+	    message.SubType = ICMEngineMismatch; /// FreeCraft engine version doesn't match
+	    message.MapUID = 0L;
+	    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+	    DebugLevel0Fn("Sending InitReply Message EngineMismatch: (%d) to %d.%d.%d.%d:%d\n",
+			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    return;
+	}
+
+	if (ntohl(msg->Version) != NetworkProtocolVersion) {
+	    fprintf(stderr, "Incompatible network protocol version "
+			NetworkProtocolFormatString " <-> "
+			NetworkProtocolFormatString "\n"
+			"from %d.%d.%d.%d:%d\n",
+		    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+		    NetworkProtocolFormatArgs(NetworkProtocolVersion),
+		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+
+	    message.Type = MessageInitReply;
+	    message.SubType = ICMProtocolMismatch; /// Network protocol version doesn't match
+	    message.MapUID = 0L;
+	    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+	    DebugLevel0Fn("Sending InitReply Message ProtocolMismatch: (%d) to %d.%d.%d.%d:%d\n",
+			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    return;
+	}
+
+	switch(NetLocalState) {
+	    case scs_waiting:
+		switch(msg->SubType) {
+		    case ICMHello:		/// a client has arrived
+			// first look up, if host is already known.
+			for (h = 0; h < HostsCount; ++h) {
+			    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+				break;
+			    }
+			}
+			if (h == HostsCount) { 	// it is a new client
+			    if (HostsCount < NetPlayers) {
+				Hosts[h].Host = NetLastHost;
+				Hosts[h].Port = NetLastPort;
+				Hosts[h].PlyNr = h;
+				memcpy(Hosts[h].PlyName, msg->u.Hosts[0].PlyName, 16);
+				DebugLevel0Fn("New client %d.%d.%d.%d:%d [%s]\n",
+				    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort), Hosts[h].PlyName);
+				NetStates[h].State = ccs_connecting;
+				NetStates[h].MsgCnt = 0;
+				HostsCount++;
+			    } else {
+				message.Type = MessageInitReply;
+				message.SubType = ICMGameFull;	/// Game is full - reject connnection
+				message.MapUID = 0L;
+				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+				DebugLevel0Fn("Sending InitReply Message GameFull: (%d) to %d.%d.%d.%d:%d\n",
+					    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+				return;
+			    }
+			}
+			/// this code path happens until client sends waiting (= has received this message)
+			message.Type = MessageInitReply;
+			message.SubType = ICMWelcome;				/// Acknowledge: Client is welcome
+			message.u.Hosts[0].PlyNr = h;				/// Host array slot number
+			memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);	/// Name of server player
+			message.HostsCount = (char)(HostsCount & 0xff);
+			message.MapUID = 0L;
+			for (i = 1; i < HostsCount; i++) {			/// Info about other clients
+			    if (i != h) {
+				message.u.Hosts[i].Host = Hosts[i].Host;
+				message.u.Hosts[i].Port = Hosts[i].Port;
+				message.u.Hosts[i].PlyNr = i;
+				memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+			    }
+			}
+			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+			DebugLevel0Fn("Sending InitReply Message Welcome: (%d) to %d.%d.%d.%d:%d\n",
+				    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+			NetStates[h].MsgCnt++;
+			if (NetStates[h].MsgCnt > 50) {
+			    // FIXME: Client sends hellos, but doesn't receive our welcome acks....
+			    ;
+			}
+			return;
+
+		    case ICMWaiting:		/// client has recvd welcome and is waiting for info/game start
+			// look up the host
+			for (h = 0; h < HostsCount; ++h) {
+			    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+				NetStates[h].State = ccs_connected;
+				NetStates[h].MsgCnt = 0;
+				NetStates[h].Ready = 0;
+				break;
+			    }
+			}
+			break;
+
+		    default:
+			break;
+		}
+	    default:
+		break;
+	}
+    }
+}
+
 /**
 **	Parse a setup event. (Command type <= MessageInitEvent)
 **
@@ -578,10 +946,14 @@ global void NetworkClientSetup(WorldMap *map)
 */
 global void NetworkParseSetupEvent(const char *buf, int size)
 {
-    NetworkPacket* packet;
+    NetworkPacket *packet;
 
-    packet=(NetworkPacket*)buf;
-    if ( packet->Commands[0].Type == MessageInitConfig
+    if (InterfaceState == IfaceStateMenu && NetConnectRunning) {
+	NetworkParseMenuPacket((const InitMessage *)buf, size);
+	return;
+    }
+    packet = (NetworkPacket *)buf;
+    if (packet->Commands[0].Type == MessageInitConfig
 	    && size == sizeof(InitMessage)) {
 	Acknowledge acknowledge;
 
@@ -589,7 +961,7 @@ global void NetworkParseSetupEvent(const char *buf, int size)
 
 	// Acknowledge the packets.
 	acknowledge.Type = MessageInitReply;
-	size=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
+	size = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
 		sizeof(acknowledge));
 	DebugLevel0Fn("Sending config ack (%d)\n", size);
 	return;

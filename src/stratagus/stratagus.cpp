@@ -569,6 +569,7 @@ local void Usage(void)
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tEnable command log to \"command.log\"\n\
 \t-p players\tNumber of players\n\
+\t-P port\t\tNetwork port to use (menu code only)\n\
 \t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
 \t-L lag\t\tNetwork lag in # frames (default 5 = 165ms)\n\
 \t-U update\tNetwork update frequence in # frames (default 5 = 6x pro s)\n\
@@ -623,7 +624,7 @@ global int main(int argc,char** argv)
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:N:FL:S:U:W?") ) {
+	switch( getopt(argc,argv,"c:d:f:hln:p:P:s:t:v:D:N:FL:S:U:W?") ) {
 #ifdef USE_CCL
 	    case 'c':
 		CclStartFile=optarg;
@@ -640,6 +641,9 @@ global int main(int argc,char** argv)
 		continue;
 	    case 'p':
 		NetPlayers=atoi(optarg);
+		continue;
+	    case 'P':
+		NetworkPort=atoi(optarg);
 		continue;
 	    case 'n':
 		NetworkArg=strdup(optarg);
