@@ -145,7 +145,7 @@ global void ReleaseUnit(Unit* unit)
     if( unit->Refs-->1 ) {
 	unit->Destroyed=1;		// mark as destroyed
 
-	DebugLevel0Fn("more references\n");
+	DebugLevel3Fn("more references\n");
 	return;
     }
 #ifdef UNIT_ON_MAP
@@ -170,7 +170,7 @@ global void ReleaseUnit(Unit* unit)
     ReleasedTail=&unit->Next;
     unit->Refs=FrameCounter+NetworkMaxLag;	// could be reuse after this.
     IfDebug(
-	DebugLevel0Fn("%Zd\n",UnitNumber(unit));
+	DebugLevel3Fn("%Zd\n",UnitNumber(unit));
 	unit->Type=NULL;			// for debugging.
     );
 }
@@ -201,7 +201,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	}
 	slot=UnitSlots+unit->Slot;
 	memset(unit,0,sizeof(*unit));
-	DebugLevel0Fn("release %p\n",unit);
+	DebugLevel3Fn("release %p\n",unit);
 	// FIXME: can release here more slots.
     } else {
 	//
