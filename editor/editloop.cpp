@@ -47,6 +47,8 @@
 #include "menus.h"
 #include "sound.h"
 #include "pud.h"
+#include "iolib.h"
+#include "iocompat.h"
 
 #include "ccl.h"
 
@@ -95,6 +97,8 @@ local enum _mode_buttons_ {
     TileButton,				/// Tile mode button
 };
 
+local char** EditorUnitTypes;		/// Sorted editor unit-type table
+
 local int UnitIndex;			/// Unit icon draw index
 local int CursorUnitIndex;		/// Unit icon under cursor
 local int SelectedUnitIndex;		/// Unit type to draw
@@ -123,7 +127,7 @@ local void ChangeTile(int x, int y, int tile)
     DebugCheck(tile < 0 || tile >= TheMap.Tileset->NumTiles);
 
     TheMap.Fields[y * TheMap.Width + x].Tile =
-	TheMap.Fields[y * TheMap.Width + x].SeenTile = 
+	TheMap.Fields[y * TheMap.Width + x].SeenTile =
 	    TheMap.Tileset->Table[tile];
 }
 
@@ -198,7 +202,7 @@ local void EditTile(int x, int y, int tile)
 	MapFieldWall | MapFieldRocks | MapFieldForest);
 
 #if 1
-    TheMap.Fields[y * TheMap.Width + x].Flags |= 
+    TheMap.Fields[y * TheMap.Width + x].Flags |=
 	    TheMap.Tileset->FlagsTable[16 + tile * 16];
     DebugLevel3Fn("Table %x\n" _C_ TheMap.Fields[y * TheMap.Width + x].Flags);
 #else
@@ -310,7 +314,7 @@ local void DrawTileIcons(void)
     y = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 11;
 
     if( CursorOn == CursorOnButton &&
-	    ButtonUnderCursor >= 300 && ButtonUnderCursor < 306 ) { 
+	    ButtonUnderCursor >= 300 && ButtonUnderCursor < 306 ) {
 	VideoDrawRectangle(ColorGray, x - 42,
 		y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
     }
@@ -457,16 +461,16 @@ local void DrawUnitIcons(void)
 
     i = UnitIndex;
     while( y < TheUI.ButtonPanelY
-	    + TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT ) { 
-	if( !UnitTypeWcNames[i] ) {
+	    + TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT ) {
+	if( !EditorUnitTypes[i] ) {
 	    break;
 	}
 	x = TheUI.ButtonPanelX + 10;
 	while( x < TheUI.ButtonPanelX + 146 ) {
-	    if( !UnitTypeWcNames[i] ) {
+	    if( !EditorUnitTypes[i] ) {
 		break;
 	    }
-	    icon = UnitTypeByIdent(UnitTypeWcNames[i])->Icon.Icon;
+	    icon = UnitTypeByIdent(EditorUnitTypes[i])->Icon.Icon;
 	    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width,
 		icon->Height, x, y);
 
@@ -565,13 +569,13 @@ local void DrawEditorPanel(void)
     //
     icon = IconByIdent("icon-human-patrol-land");
     DebugCheck(!icon);
-    DrawUnitIcon(Players, icon, 
+    DrawUnitIcon(Players, icon,
         (ButtonUnderCursor == SelectButton ? IconActive : 0) |
 	    (EditorState==EditorSelecting ? IconSelected : 0),
 	x, y);
     icon = IconByIdent("icon-footman");
     DebugCheck(!icon);
-    DrawUnitIcon(Players, icon, 
+    DrawUnitIcon(Players, icon,
         (ButtonUnderCursor == UnitButton ? IconActive : 0) |
 	    (EditorState==EditorEditUnit ? IconSelected : 0),
 	x + UNIT_ICON_X, y + UNIT_ICON_Y);
@@ -890,7 +894,7 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
     //
     //	Click on tile area
     //
-    if( CursorOn == CursorOnButton && ButtonUnderCursor >= 100 
+    if( CursorOn == CursorOnButton && ButtonUnderCursor >= 100
 	    && EditorState == EditorEditTile ) {
 	switch( ButtonUnderCursor ) {
 	    case 300:
@@ -936,7 +940,7 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 		&& CursorY < TheUI.ButtonPanelY + 24) {
 	    int i;
 
-	    for( i=9; i-- && UnitTypeWcNames[UnitIndex + 1]; ) {
+	    for( i=9; i-- && EditorUnitTypes[UnitIndex + 1]; ) {
 		++UnitIndex;
 	    }
 	    return;
@@ -1229,17 +1233,17 @@ local void EditorCallbackMouse(int x, int y)
 	by = TheUI.ButtonPanelY + 24;
 	while (by < TheUI.ButtonPanelY
 		+ TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT) {
-	    if( !UnitTypeWcNames[i] ) {
+	    if( !EditorUnitTypes[i] ) {
 		break;
 	    }
 	    bx = TheUI.ButtonPanelX + 10;
 	    while (bx < TheUI.ButtonPanelX + 146) {
-		if( !UnitTypeWcNames[i] ) {
+		if( !EditorUnitTypes[i] ) {
 		    break;
 		}
 		if (bx < x && x < bx + ICON_WIDTH
 			&& by < y && y < by + ICON_HEIGHT) {
-		    SetStatusLine(UnitTypeByIdent(UnitTypeWcNames[i])->Name);
+		    SetStatusLine(UnitTypeByIdent(EditorUnitTypes[i])->Name);
 		    CursorUnitIndex = i;
 		    //ButtonUnderCursor = i + 100;
 		    //CursorOn = CursorOnButton;
@@ -1396,6 +1400,28 @@ local void EditorCallbackExit(void)
 local void CreateEditor(void)
 {
     int i;
+    int n;
+    char* file;
+    char* s;
+    char buf[PATH_MAX];
+    CLFile* clf;
+    extern LISP fast_load(LISP lfname, LISP noeval);
+
+    //
+    //  Load and evaluate the editor configuration file
+    //  FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
+    //
+    file = LibraryFileName(EditorStartFile, buf);
+    if ((clf = CLopen(file))) {
+	CLclose(clf);
+	ShowLoadProgress("Script %s\n", file);
+	if ((s = strrchr(file, '.')) && s[1] == 'C') {
+	    fast_load(gh_str02scm(file), NIL);
+	} else {
+	    vload(file, 0, 1);
+	}
+	user_gc(SCM_BOOL_F);		// Cleanup memory after load
+    }
 
     FlagRevealMap = 1;			// editor without fog and all visible
     TheMap.NoFogOfWar = 1;
@@ -1418,6 +1444,18 @@ local void CreateEditor(void)
 	} else if (Players[i].StartX | Players[i].StartY) {
 	    DebugLevel0Fn("Player nobody has a start position\n");
 	}
+    }
+    //
+    //  Build editor unit-type tables.
+    //
+    i = 0;
+    while (UnitTypeWcNames[i]) {
+	++i;
+    }
+    n = i + 1;
+    EditorUnitTypes = malloc(sizeof(char*) * n);
+    for (i = 0; i < n; ++i) {
+	EditorUnitTypes[i] = UnitTypeWcNames[i];
     }
 }
 
