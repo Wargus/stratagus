@@ -226,7 +226,7 @@ global void LoadCursors(const char* race)
 	//		Free old cursor sprites.
 	//
 	for (i = 0; Cursors[i].OType; ++i) {
-		VideoSaveFree(Cursors[i].Sprite);
+		VideoSafeFree(Cursors[i].Sprite);
 		Cursors[i].Sprite = NULL;
 	}
 
@@ -1308,7 +1308,7 @@ global void CleanCursors(void)
 		free(Cursors[i].Ident);
 		free(Cursors[i].Race);
 		free(Cursors[i].File);
-		VideoSaveFree(Cursors[i].Sprite);
+		VideoSafeFree(Cursors[i].Sprite);
 	}
 	free(Cursors);
 	Cursors = NULL;

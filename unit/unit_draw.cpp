@@ -810,28 +810,28 @@ global void CleanDecorations(void)
 	if (HealthSprite.File) {
 		free(HealthSprite.File);
 	}
-	VideoSaveFree(HealthSprite.Sprite);
+	VideoSafeFree(HealthSprite.Sprite);
 	HealthSprite.File = NULL;
 	HealthSprite.Sprite = NULL;
 
 	if (ManaSprite.File) {
 		free(ManaSprite.File);
 	}
-	VideoSaveFree(ManaSprite.Sprite);
+	VideoSafeFree(ManaSprite.Sprite);
 	ManaSprite.File = NULL;
 	ManaSprite.Sprite = NULL;
 
 	if (ShadowSprite.File) {
 		free(ShadowSprite.File);
 	}
-	VideoSaveFree(ShadowSprite.Sprite);
+	VideoSafeFree(ShadowSprite.Sprite);
 	ShadowSprite.File = NULL;
 	ShadowSprite.Sprite = NULL;
 
 	if (SpellSprite.File) {
 		free(SpellSprite.File);
 	}
-	VideoSaveFree(SpellSprite.Sprite);
+	VideoSafeFree(SpellSprite.Sprite);
 	SpellSprite.File = NULL;
 	SpellSprite.Sprite = NULL;
 }

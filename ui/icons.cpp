@@ -288,7 +288,7 @@ global void CleanIcons(void)
 		for (i = 0; i < n; ++i) {
 			hash_del(IconFileHash, table[i]->FileName);
 			free(table[i]->FileName);
-			VideoSaveFree(table[i]->Sprite);
+			VideoSafeFree(table[i]->Sprite);
 			free(table[i]);
 		}
 	}
