@@ -44,6 +44,7 @@
 
 #define WEAK_TARGET	2		/// Weak target, could be changed
 #define MOVE_TO_TARGET	4		/// Move to target state
+#define ATTACK_TARGET	5		/// Attack target state
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -177,7 +178,6 @@ local void MoveToTarget(Unit* unit)
 	unit->Orders[0].Y-=unit->Orders[0].RangeY;
 	unit->Orders[0].RangeX*=2;
 	unit->Orders[0].RangeY*=2;
-	wall=unit->Orders[0].Action;
 #ifdef DEBUG
 	// This fixes the bug: if wall is gone, debug code fails.
 	unit->Goal=unit->Orders[0].Goal;
@@ -189,7 +189,6 @@ local void MoveToTarget(Unit* unit)
 	unit->Orders[0].RangeY/=2;
 	unit->Orders[0].X+=unit->Orders[0].RangeX;
 	unit->Orders[0].Y+=unit->Orders[0].RangeY;
-	unit->Orders[0].Action=wall;
 #ifdef DEBUG
 	// This fixes the bug: if wall is gone, debug code fails.
 	unit->Goal=unit->Orders[0].Goal;
@@ -285,7 +284,7 @@ local void MoveToTarget(Unit* unit)
 		// FIXME: only if heading changes
 		CheckUnitToBeDrawn(unit);
 	    }
-	    unit->SubAction=MOVE_TO_TARGET;
+	    unit->SubAction=ATTACK_TARGET;
 	    return;
 	} else if( err<0 ) {
 	    unit->State=unit->SubAction=0;
@@ -332,7 +331,7 @@ local void AttackTarget(Unit* unit)
 	goal=unit->Orders[0].Goal;
 	if( !goal && (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
 		|| unit->Orders[0].Action==UnitActionAttackGround) ) {
-	    DebugLevel3Fn("attack a wall!!!!\n");
+	    DebugLevel3Fn("attack a wall or ground!!!!\n");
 	    return;
 	}
 
