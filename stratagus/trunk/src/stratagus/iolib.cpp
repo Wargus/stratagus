@@ -568,11 +568,12 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 #ifndef _MSC_VER
     DIR *dirp;
     struct dirent *dp;
-#else
-    struct _finddata_t fileinfo;
-    long hFile;
 #endif
     struct stat st;
+#endif
+#ifdef _MSC_VER
+    struct _finddata_t fileinfo;
+    long hFile;
 #endif
     FileList *nfl, *fl = NULL;
     int n, isdir = 0; // silence gcc..
@@ -643,16 +644,42 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 #endif
 #endif
 
-#if !defined(_MSC_VER) || defined(USE_ZZIPLIB)
+#ifndef _MSC_VER
     if (dirp) {
 	while ((dp = readdir(dirp)) != NULL) {
 	    filename = dp->d_name;
 #else
-    strcat(buffer,"*.*");
+#ifdef USE_ZZIPLIB
+    if (!dirp) {
+	strcat(buffer, "*.*");
+	hFile = _findfirst(buffer, &fileinfo);
+    }
+    if (dirp || (!dirp && hFile != -1L)) {
+	int first;
+	first = 1;
+	while (1) {
+	    if (!dirp) {
+		if (first) {
+		    first = 0;
+		} else {
+		    if (_findnext(hFile, &fileinfo) != 0) {
+			break;
+		    }
+		}
+		filename = fileinfo.name;
+	    } else {
+		if ((dp = readdir(dirp)) == NULL) {
+		    break;
+		}
+		filename = dp->d_name;
+	    }
+#else
+    strcat(buffer, "*.*");
     hFile = _findfirst(buffer, &fileinfo);
     if (hFile != -1L) {
 	do {
 	    filename = fileinfo.name;
+#endif
 #endif
 
 	    if (strcmp(filename, ".") == 0)
@@ -663,7 +690,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	    strcpy(np, filename);
 #ifdef USE_ZZIPLIB
 	    entvalid = 0;
-	    if (zzip_dir_real(dirp)) {
+	    if (dirp && zzip_dir_real(dirp)) {
 		if (stat(buffer, &st) == 0) {
 		    isdir = S_ISDIR(st.st_mode);
 		    if (isdir || S_ISREG(st.st_mode)) {
@@ -684,7 +711,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 			}
 		    }
 		}
-	    } else {
+	    } else if (dirp) {
 		if (zzbasepath[0]) {
 		    i = strlen(zzbasepath);
 		    isdir = 0;
@@ -717,6 +744,16 @@ zzentry:
 		    }
 		}
 	    }
+#ifdef _MSC_VER
+	    else {
+		if (stat(buffer, &st) == 0) {
+		    isdir = S_ISDIR(st.st_mode);
+		    if (isdir || S_ISREG(st.st_mode)) {
+			entvalid = 1;
+		    }
+		}
+	    }
+#endif
 	    {
 		if (entvalid) {
 #else //    }}
@@ -758,12 +795,21 @@ zzentry:
 		    n++;
 		}
 	    }
-#if !defined(_MSC_VER) || defined(USE_ZZIPLIB)
+#ifndef _MSC_VER
 	}
 	closedir(dirp);
 #else
+#ifdef USE_ZZIPLIB
+	}
+	if (!dirp) {
+	    _findclose(hFile);
+	} else {
+	    closedir(dirp);
+	}
+#else
 	} while (_findnext(hFile, &fileinfo) == 0);
 	_findclose(hFile);
+#endif
 #endif
     }
     if (n == 0) {
