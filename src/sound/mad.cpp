@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -48,13 +48,13 @@
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------
---		Declaration
+--  Declaration
 ----------------------------------------------------------------------------*/
 
 #define MAD_INBUF_SIZE 65536
 
 /**
-**		Private mp3 data structure to handle mp3 streaming.
+**  Private mp3 data structure to handle mp3 streaming.
 */
 typedef struct _mp3_data_ {
 	struct mad_decoder MadDecoder;           /// Mad decoder handle
@@ -68,12 +68,12 @@ typedef struct _mp3_data_ {
 ----------------------------------------------------------------------------*/
 
 /**
-**		MAD read callback.
+**  MAD read callback.
 **
-**		@param user		Our user pointer.
-**		@param stream		MP3 stream.
+**  @param user    Our user pointer.
+**  @param stream  MP3 stream.
 **
-**		@return			MAP_FLOW_STOP if eof, MAD_FLOW_CONTINUE otherwise.
+**  @return        MAP_FLOW_STOP if eof, MAD_FLOW_CONTINUE otherwise.
 */
 local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 {
@@ -105,13 +105,13 @@ local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 }
 
 /**
-**		This is the output callback function. It is called after each frame of
-**		MPEG audio data has been completely decoded. The purpose of this
-**		callback is to output the decoded PCM audio.
+**  This is the output callback function. It is called after each frame of
+**  MPEG audio data has been completely decoded. The purpose of this
+**  callback is to output the decoded PCM audio.
 **
-**		@param user		User argument.
-**		@param header		MAD header.
-**		@param pcm		MAD pcm data struture.
+**  @param user    User argument.
+**  @param header  MAD header.
+**  @param pcm     MAD pcm data struture.
 */
 local enum mad_flow MAD_write(void* user,
 	struct mad_header const* header,
@@ -170,10 +170,10 @@ local enum mad_flow MAD_write(void* user,
 }
 
 /**
-**		This is the error callback function. It is called whenever a decoding
-**		error occurs. The error is indicated by stream->error; the list of
-**		possible MAD_ERROR_* errors can be found in the mad.h (or
-**		libmad/stream.h) header file.
+**  This is the error callback function. It is called whenever a decoding
+**  error occurs. The error is indicated by stream->error; the list of
+**  possible MAD_ERROR_* errors can be found in the mad.h (or
+**  libmad/stream.h) header file.
 */
 local enum mad_flow MAD_error(void* user __attribute__((unused)),
 	struct mad_stream* stream,
@@ -188,13 +188,13 @@ local enum mad_flow MAD_error(void* user __attribute__((unused)),
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 /**
-**		Read one frame from mad decoder.
+**  Read one frame from mad decoder.
 **
-**		@param decoder		Decoder
-**		@param buf		Buffer to write data to
-**		@param len		Length of the buffer
+**  @param decoder  Decoder
+**  @param buf      Buffer to write data to
+**  @param len      Length of the buffer
 **
-**		@return			Number of bytes read
+**  @return         Number of bytes read
 */
 local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
 {
@@ -264,13 +264,13 @@ local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
 }
 
 /**
-**		Type member function to read from the mp3 file
+**  Type member function to read from the mp3 file
 **
-**		@param sample		Sample reading from
-**		@param buf		Buffer to write data to
-**		@param len		Length of the buffer
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**		@return				Number of bytes read
+**  @return        Number of bytes read
 */
 local int Mp3ReadStream(Sample* sample, void* buf, int len)
 {
@@ -317,9 +317,9 @@ return 0;
 }
 
 /**
-**		Type member function to free an mp3 file
+**  Type member function to free an mp3 file
 **
-**		@param sample		Sample to free
+**  @param sample  Sample to free
 */
 local void Mp3FreeStream(Sample* sample)
 {
@@ -344,7 +344,7 @@ local void Mp3FreeStream(Sample* sample)
 }
 
 /**
-**		Mp3 object type structure.
+**  Mp3 object type structure.
 */
 local const SampleType Mp3StreamSampleType = {
 	Mp3ReadStream,
@@ -352,13 +352,13 @@ local const SampleType Mp3StreamSampleType = {
 };
 
 /**
-**		Type member function to read from the mp3 file
+**  Type member function to read from the mp3 file
 **
-**		@param sample		Sample reading from
-**		@param buf		Buffer to write data to
-**		@param len		Length of the buffer
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**		@return				Number of bytes read
+**  @return        Number of bytes read
 */
 local int Mp3Read(Sample* sample, void* buf, int len)
 {
@@ -374,9 +374,9 @@ local int Mp3Read(Sample* sample, void* buf, int len)
 }
 
 /**
-**		Type member function to free an mp3 file
+**  Type member function to free an mp3 file
 **
-**		@param sample		Sample to free
+**  @param sample  Sample to free
 */
 local void Mp3Free(Sample* sample)
 {
@@ -386,7 +386,7 @@ local void Mp3Free(Sample* sample)
 }
 
 /**
-**		Mp3 object type structure.
+**  Mp3 object type structure.
 */
 local const SampleType Mp3SampleType = {
 	Mp3Read,
@@ -394,14 +394,12 @@ local const SampleType Mp3SampleType = {
 };
 
 /**
-**		Load mp3.
+**  Load mp3.
 **
-**		@param name		File name.
-**		@param flags		Load flags.
+**  @param name   File name.
+**  @param flags  Load flags.
 **
-**		@return				Returns the loaded sample.
-**
-**		@todo				Support more flags, LoadOnDemand.
+**  @return       Returns the loaded sample.
 */
 global Sample* LoadMp3(const char* name, int flags)
 {
@@ -425,32 +423,21 @@ global Sample* LoadMp3(const char* name, int flags)
 
 	DebugLevel2Fn("Have mp3 file %s\n" _C_ name);
 
-	sample = malloc(sizeof(Sample));
 	data = malloc(sizeof(MadData));
+	data->MadFile = f;
+	data->BufferLen = 0;
+
+	sample = malloc(sizeof(Sample));
+	sample->User = data;
+	sample->Len = 0;
+	sample->Pos = 0;
+	sample->SampleSize = 0;
 
 	// streaming currently broken
 	if (0 && (flags & PlayAudioStream)) {
 /*
-		MadData* data;
-
-		sample = malloc(sizeof(*sample) + MP3_BUFFER_SIZE);
-		if (!sample) {
-			fprintf(stderr, "Out of memory\n");
-			CLclose(f);
-			return NULL;
-		}
-		data = malloc(sizeof(*data));
-		if (!data) {
-			fprintf(stderr, "Out of memory\n");
-			free(sample);
-			CLclose(f);
-			return NULL;
-		}
-		sample->User = data;
-		sample->Channels = 0;
 		sample->SampleSize = 0;
-		sample->Frequency = 0;
-		sample->Length = 0;
+
 		sample->Type = &Mp3StreamSampleType;
 
 		data->User->File = f;
@@ -487,29 +474,19 @@ global Sample* LoadMp3(const char* name, int flags)
 		return sample;
 */
 	} else {
-		struct mad_decoder decoder;
-
-		data->MadFile = f;
-		sample->User = data;
 		sample->Buffer = malloc(55000000);
 		Assert(sample->Buffer);
 
-		sample->Len = 0;
-		sample->Pos = 0;
-		sample->SampleSize = 0;
-
-		data->BufferLen = 0;
-
 		// configure input, output, and error functions
 
-		mad_decoder_init(&decoder, sample,
+		mad_decoder_init(&data->MadDecoder, sample,
 			MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
 			MAD_error, NULL /* message */);
 
-		mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
+		mad_decoder_run(&data->MadDecoder, MAD_DECODER_MODE_SYNC);
 
 		// release the decoder
-		mad_decoder_finish(&decoder);
+		mad_decoder_finish(&data->MadDecoder);
 		CLclose(f);
 
 		sample->Type = &Mp3SampleType;
