@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.c	-	The draw routines for units. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -748,6 +748,9 @@ local void DrawManaSprite(int x,int y,const UnitType* type,int full,int ready)
 {
     int n;
 
+    if( !full ) {
+	return;
+    }
     n=VideoGraphicFrames(ManaSprite.Sprite)-1;
     n-=(n*ready)/full;
 
