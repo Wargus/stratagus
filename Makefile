@@ -171,7 +171,7 @@ tags:
 
 depend:
 	@echo -n >.depend
-	@for i in $(SRC) ; do
+	@for i in $(SRC) ; do\
 	echo -n `dirname $$i`/$(OBJDIR)/ >> .depend;\
 	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
 
