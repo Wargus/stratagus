@@ -1073,8 +1073,8 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	fprintf(stderr,"FIXME: *** round robin ***\n");
     }
 
-#ifndef USE_ITIMER
     ticks=SVGAGetTicks();
+#ifndef USE_ITIMER
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 	IfDebug(
 	    if (InterfaceState == IfaceStateNormal) {
@@ -1083,8 +1083,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	);
 	++SlowFrameCounter;
     }
-#else
-    ticks = SVGAGetTicks();
 #endif
 
     InputMouseTimeout(callbacks, ticks);
