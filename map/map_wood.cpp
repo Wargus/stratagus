@@ -51,7 +51,7 @@ local int WoodTable[16] = {
 **
 ** 	Used by @see MapFixWood and @see PreprocessMap
 */
-local int MapWoodChk(int x,int y)
+global int MapWoodChk(int x,int y)
 {
     if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
 	return 1;		// outside considered wood
