@@ -38,7 +38,7 @@ fi
 if test "$ARCH" = "macosx" ; then
     EXTRA_CFLAGS=-I/sw/include
     EXTRA_LIBS=-L/sw/lib
-    CPPFLAGS+=-I/sw/include
+    CPPFLAGS="$CPPFLAGS -I/sw/include"
 fi
 
 AC_SUBST(EXTRA_CFLAGS)
