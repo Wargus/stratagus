@@ -10,7 +10,7 @@
 //
 /**@name map_draw.c - The map drawing. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Denote wether area in map is overlapping with the viewport.
+**  Denote whether area in map is overlapping with the viewport.
 **
 **  @param vp  Viewport pointer.
 **  @param sx  X map tile position of area in map to be checked.
@@ -77,21 +77,6 @@ int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 }
 
 /**
-**  Check if a point is visible (inside) a viewport.
-**
-**  @param vp  Viewport pointer.
-**  @param x   X map tile position of point in map to be checked.
-**  @param y   Y map tile position of point in map to be checked.
-**
-**  @return    True if point is in the visible map, false otherwise
-*/
-static inline int PointInViewport(const Viewport* vp, int x, int y)
-{
-	return vp->MapX <= x && x < vp->MapX + vp->MapWidth &&
-		vp->MapY <= y && y < vp->MapY + vp->MapHeight;
-}
-
-/**
 **  Check if any part of an area is visible in a viewport.
 **
 **  @param vp  Viewport pointer.
@@ -101,16 +86,15 @@ static inline int PointInViewport(const Viewport* vp, int x, int y)
 **  @param ey  Y map tile position of area in map to be checked.
 **
 **  @return    True if any part of area is visible, false otherwise
-**
-**  @todo Doesn't work if all points lay outside and the area covers
-**        the complete viewport.
 */
 int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 	int ex, int ey)
 {
-	// FIXME: Can be written faster
-	return PointInViewport(vp, sx, sy) || PointInViewport(vp, sx, ey) ||
-		PointInViewport(vp, ex, sy) || PointInViewport(vp, ex, ey);
+	if (ex < vp->MapX || ey < vp->MapY ||
+			sx >= vp->MapX + vp->MapWidth || sy >= vp->MapY + vp->MapHeight) {
+		return 0;
+	}
+	return 1;
 }
 
 /**
