@@ -251,11 +251,11 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     int shortest;
     int counter;
     int new_cost;
-    int last_dir;
+    //int last_dir;
     int path_length;
     int num_in_close=0;
     int mask=UnitMovementMask(unit);
-    int base_mask=mask&~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
+    //int base_mask=mask&~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
     Unit* goal;
     static int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
