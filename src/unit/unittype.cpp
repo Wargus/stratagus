@@ -1524,7 +1524,11 @@ global void CleanUnitTypes(void)
 
 	free(type->BoolFlag);
 	free(type->CanTargetFlag);
-	CclGcUnprotect((SCM*)&type->Property);
+
+	if ((SCM)type->Property != SCM_UNSPECIFIED) {
+	    CclGcUnprotect((SCM*)&type->Property);
+	}
+
     	if (type->SameSprite) {
 	    free(type->SameSprite);
 	}

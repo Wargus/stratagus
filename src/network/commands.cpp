@@ -412,8 +412,7 @@ global int LoadReplay(char* name)
     gh_define("*replay_log*", NIL);
     vload(name, 0, 1);
 
-    ReplayLog = symbol_value(gh_symbol2scm("*replay_log*"), NIL);
-    CclGcProtect(&ReplayLog);
+    CclGcProtectedAssign(&ReplayLog, symbol_value(gh_symbol2scm("*replay_log*"), NIL));
     NextLogCycle = ~0UL;
     if (!CommandLogDisabled) {
 	CommandLogDisabled = 1;
@@ -440,7 +439,7 @@ global void EndReplayLog(void)
 	fclose(LogFile);
 	LogFile = NULL;
     }
-    CclGcUnprotect(&ReplayLog);
+    CclGcProtectedAssign(&ReplayLog,SCM_UNSPECIFIED);
 }
 
 /**
@@ -448,7 +447,7 @@ global void EndReplayLog(void)
 */
 global void CleanReplayLog(void)
 {
-    ReplayLog = NIL;
+    CclGcProtectedAssign(&ReplayLog, NIL);
     // FIXME: LoadGame disables the log since replays aren't saved in the
     // FIXME: saved games yet.  Always enable the log again for now even
     // FIXME: though it ignores the -l command line option.
@@ -620,7 +619,7 @@ local void DoNextReplay(void)
 	DebugLevel0Fn("Invalid name: %s" _C_ name);
     }
 
-    ReplayLog = gh_cdr(ReplayLog);
+    CclGcProtectedAssign(&ReplayLog, gh_cdr(ReplayLog));
 }
 
 /**
@@ -1155,6 +1154,12 @@ global void SendCommandSharedVision(int player, int state, int opponent)
 	NetworkSendExtendedCommand(ExtendedMessageSharedVision,
 	    -1, player, state, opponent, 0);
     }
+}
+
+global void NetworkCclRegister(void)
+{
+    ReplayLog = SCM_UNSPECIFIED;
+    CclGcProtect(&ReplayLog);
 }
 
 //@}
