@@ -82,7 +82,6 @@ local void GameMenuReturn(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
-local void Preferences(void);
 local void GameOptions(void);
 
 local void SetMasterPower(Menuitem *mi);
@@ -92,6 +91,7 @@ local void SetFogOfWar(Menuitem *mi);
 
 global void SoundOptions(void);
 global void SpeedSettings(void);
+global void Preferences(void);
 
 local void EndScenarioRestart(void);
 local void EndScenarioSurrender(void);
@@ -1877,7 +1877,7 @@ global void SpeedSettings(void)
     ProcessMenu(MENU_SPEED_SETTINGS, 1);
 }
 
-local void Preferences(void)
+global void Preferences(void)
 {
     if (!TheMap.NoFogOfWar)
 	PreferencesMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;

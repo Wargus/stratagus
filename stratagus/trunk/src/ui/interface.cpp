@@ -355,7 +355,7 @@ local void UiEnterPreferencesOptionsMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    ProcessMenu(MENU_PREFERENCES, 1);
+    Preferences();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
