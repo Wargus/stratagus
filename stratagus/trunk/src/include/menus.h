@@ -117,7 +117,7 @@ typedef int MenuButtonId;
 #define MIN_GAME_SPEED 50
 #define MAX_GAME_SPEED 250
 
-typedef struct _button_style_ ButtonStyle;
+struct _button_style_;
 
 /*----------------------------------------------------------------------------
 --  Menus
@@ -134,11 +134,11 @@ typedef struct _menuitem_text_ {
 	char* normalcolor;
 	char* reversecolor;
 	int align;
-	void (*action)(struct _menuitem_ *);
+	void (*action)(struct _menuitem_*);
 } MenuitemText;
 typedef struct _menuitem_button_ {
 	unsigned char* text;
-	ButtonStyle* style;
+	struct _button_style_* style;
 	void (*handler)(void);
 	unsigned hotkey;
 } MenuitemButton;
@@ -147,7 +147,7 @@ typedef struct _menuitem_pulldown_ {
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_ *, int);
+	void (*action)(struct _menuitem_*, int);
 	int noptions;
 	int defopt;
 	int curopt;
@@ -159,7 +159,7 @@ typedef struct _menuitem_listbox_ {
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_ *, int);
+	void (*action)(struct _menuitem_*, int);
 	int noptions;
 	int defopt;
 	int curopt;
@@ -167,14 +167,14 @@ typedef struct _menuitem_listbox_ {
 	int nlines;
 	int startline;
 	int dohandler;
-	void *(*retrieveopt)(struct _menuitem_ *, int);
+	void *(*retrieveopt)(struct _menuitem_*, int);
 	void (*handler)(void);  /* for return key */
 } MenuitemListbox;
 typedef struct _menuitem_vslider_ {
 	unsigned cflags;
 	int xsize;  ///< x-size of slider, not including buttons
 	int ysize;  ///< y-size of slider, not including buttons
-	void (*action)(struct _menuitem_ *);
+	void (*action)(struct _menuitem_*);
 	int defper;
 	int percent;  ///< percent of the way to bottom (0 to 100)
 	int cursel;   ///< used in mouse-over state
@@ -185,7 +185,7 @@ typedef struct _menuitem_hslider_ {
 	unsigned cflags;
 	int xsize;  ///< x-size of slider, not including buttons
 	int ysize;  ///< y-size of slider, not including buttons
-	void (*action)(struct _menuitem_ *);
+	void (*action)(struct _menuitem_*);
 	int defper;
 	int percent;  ///< percent of the way to right (0 to 100)
 	int curper;   ///< used in mouse-move state
@@ -194,14 +194,14 @@ typedef struct _menuitem_hslider_ {
 	void (*handler)(void); ///< for return key
 } MenuitemHslider;
 typedef struct _menuitem_drawfunc_ {
-	void (*draw)(struct _menuitem_ *);
+	void (*draw)(struct _menuitem_*);
 } MenuitemDrawfunc;
 typedef struct _menuitem_input_ {
 	unsigned char *buffer;
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_ *, int);  ///< for key
+	void (*action)(struct _menuitem_*, int);  ///< for key
 	int nch;
 	int maxch;
 	char *normalcolor;
@@ -213,7 +213,7 @@ typedef struct _menuitem_gem_ {
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_ *);
+	void (*action)(struct _menuitem_*);
 	char *normalcolor;
 	char *reversecolor;
 } MenuitemGem;
@@ -226,8 +226,8 @@ typedef struct _menuitem_ {
 	unsigned flags;
 	int font;
 	int transparent;  ///< Add the transparent flag to draw a translucide menu
-	void (*initfunc)(struct _menuitem_ *);  ///< constructor
-	void (*exitfunc)(struct _menuitem_ *);  ///< destructor
+	void (*initfunc)(struct _menuitem_*);  ///< constructor
+	void (*exitfunc)(struct _menuitem_*);  ///< destructor
 	struct _menus_ *menu;  ///< backpointer for speedups
 	union {
 		MenuitemText text;
@@ -239,8 +239,7 @@ typedef struct _menuitem_ {
 		MenuitemDrawfunc drawfunc;
 		MenuitemInput input;
 		MenuitemGem gem;
-		///< ... add here ...
-
+		// ... add here ...
 	} d;
 } Menuitem;
 
@@ -312,14 +311,14 @@ typedef struct _menu_graphics_ {
 ----------------------------------------------------------------------------*/
 
 extern int GuiGameStarted;          ///< Game Started?
-extern Menu *CurrentMenu;           ///< Currently processed menu
+extern Menu* CurrentMenu;           ///< Currently processed menu
 extern MenuGraphics MenuButtonGfx;  ///< Menu button graphics
 
-extern MapInfo *MenuMapInfo;        ///< MapInfo of map used in gui menus
+extern MapInfo* MenuMapInfo;        ///< MapInfo of map used in gui menus
 extern char MenuMapFullPath[1024];  ///< Full path to currently selected map
 
 extern int nKeyStrokeHelps;    ///< Number of loaded keystroke helps
-extern char **KeyStrokeHelps;  ///< Keystroke help pairs
+extern char** KeyStrokeHelps;  ///< Keystroke help pairs
 
 #define MENUS_MAXMENU 128  ///< @todo wrong place, docu
 #define MENUS_MAXFUNC 128  ///< @todo wrong place, docu
@@ -329,10 +328,10 @@ extern char **KeyStrokeHelps;  ///< Keystroke help pairs
 #else
 
 	/// Hash table of all the menus
-typedef hashtable(Menu*,MENUS_MAXMENU) _MenuHash;
+typedef hashtable(Menu*, MENUS_MAXMENU) _MenuHash;
 extern _MenuHash MenuHash;
 	/// Hash table of all the menu functions
-typedef hashtable(void*,MENUS_MAXFUNC) _MenuFuncHash;
+typedef hashtable(void*, MENUS_MAXFUNC) _MenuFuncHash;
 extern _MenuFuncHash MenuFuncHash;
 
 #endif
@@ -350,7 +349,7 @@ extern void InitMenus(int race);
 	/// Draw menu
 extern void DrawMenu(Menu* menu);
 	/// Draw menu button
-extern void DrawMenuButton(ButtonStyle* style, unsigned flags, int transparent,
+extern void DrawMenuButton(struct _button_style_* style, unsigned flags, int transparent,
 	int x, int y, const unsigned char* text);
 	/// Set menu backgound and draw it
 extern void MenusSetBackground(void);
