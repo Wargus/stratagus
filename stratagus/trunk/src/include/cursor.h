@@ -31,6 +31,8 @@
 **	typedef struct _cursor_type_ CursorType;
 **
 **	This structure contains all informations about a cursor.
+**	The cursor changes depending of the current user input state.
+**	A cursor can have transparent areas and color cycle animated.
 **
 **	In the future it is planned to support animated cursors.
 **
@@ -38,11 +40,11 @@
 **
 **	CursorType::OType
 **
-**		Object type (future extensions). 
+**		Object type (future extensions).
 **
 **	CursorType::Ident
 **
-**	 	Unique identifier of the cursor, used to reference it in config
+**		Unique identifier of the cursor, used to reference it in config
 **		files and during startup. Don't use this in game, use instead
 **		the pointer to this structure.
 **
@@ -60,7 +62,7 @@
 **
 **		Hot spot of the cursor in pixels. Relative to the sprite origin
 **		(0,0). The hot spot of a cursor is the point to which FreeCraft
-**		refers in tracking the cursor's position. 
+**		refers in tracking the cursor's position.
 **
 **	CursorType::Width CursorType::Height
 **
@@ -69,6 +71,7 @@
 **	CursorType::Graphic
 **
 **		Contains the sprite of the cursor, loaded from CursorType::File.
+**		Multicolor image with alpha or transparency.
 */
 
 /**
@@ -107,10 +110,10 @@ typedef struct _cursor_type_ CursorType;
 
     ///	Private type which specifies the cursor-type
 struct _cursor_type_ {
-    const void*	OType;			/// Object type (future extensions)
+    const void*	OType;			/// object type (future extensions)
 
-    char*	Ident;			/// Identifier to reference it
-    char*	Race;			/// Race name
+    char*	Ident;			/// identifier to reference it
+    char*	Race;			/// race name
 
     char*	File;			/// graphic file of the cursor
 
@@ -139,7 +142,7 @@ extern CursorType* Cursors;		/// cursor-types description
 
 extern enum CursorState_e CursorState;	/// cursor state
 extern int CursorAction;		/// action for selection
-extern int CursorValue;			/// value for CursorAction (spell type f.e.)
+extern int CursorValue;			/// value for action (spell type f.e.)
 extern UnitType* CursorBuilding;	/// building cursor
 
 extern CursorType* GameCursor;		/// cursor-type
@@ -162,25 +165,25 @@ extern void* OldCursorImage;		/// background saved behind cursor
     /// Load all cursors
 extern void LoadCursors(unsigned int race);
 
-    /// cursor-type by identifier
+    /// Cursor-type by identifier
 extern CursorType* CursorTypeByIdent(const char* ident);
 
     /// Draw cursor on screen in position x,y
 extern void DrawCursor(const CursorType* type,int x,int y,int frame);
 
-    /// destroy the cursor background (for menu use!)
+    /// Destroy the cursor background (for menu use!)
 extern void DestroyCursorBackground(void);
 
-    /// hide the cursor
+    /// Hide the cursor
 extern void HideCursor(void);
 
-    /// draw any cursor
+    /// Draw any cursor
 extern void DrawAnyCursor(void);
 
-    /// hide any cursor
+    /// Hide any cursor
 extern int HideAnyCursor(void);
 
-    /// initialize the cursor module
+    /// Initialize the cursor module
 extern void InitCursor(void);
 
 //@}

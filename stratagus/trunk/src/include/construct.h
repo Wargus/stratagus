@@ -10,7 +10,7 @@
 //
 /**@name construct.h	-	The constructions headerfile. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -20,6 +20,7 @@
 //@{
 
 // FIXME: constructions must be configurable, referenced by indenifiers...
+// FIXME: need support for more races.
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -33,7 +34,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Constructions: shown during construction of a building. 
+**	Constructions: shown during construction of a building.
 */
 typedef struct _construction_ {
     char*	Ident;			/// construction identifier
@@ -54,7 +55,7 @@ typedef struct _construction_ {
 #define ConstructionWall	15	/// ident nr for wall under construction
 
 /*----------------------------------------------------------------------------
---	Fucntions
+--	Functions
 ----------------------------------------------------------------------------*/
 
     ///	Load the graphics for constructions
