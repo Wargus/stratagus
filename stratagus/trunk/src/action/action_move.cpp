@@ -233,10 +233,12 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 */
 global int DoActionMove(Unit* unit)
 {
-    if( unit->Type->Animations ) {
+    if( unit->Type->Animations && unit->Type->Animations->Move ) {
 	DebugLevel3("%s: %p\n" _C_ unit->Type->Ident _C_ unit->Type->Animations );
 	return ActionMoveGeneric(unit,unit->Type->Animations->Move);
     }
+
+    DebugLevel0Fn("Warning tried to move an object, which can't move\n");
 
     return PF_UNREACHABLE;
 }
