@@ -733,6 +733,7 @@ global void GameMainLoop(void)
 	//	Game logic part
 	//
 	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
+	    ReplayEachCycle();
 	    if( !++GameCycle ) {
 		// FIXME: tests with game cycle counter now fails :(
 		// FIXME: Should happen in 68 years :)
@@ -741,7 +742,6 @@ global void GameMainLoop(void)
 		fprintf(stderr,"FIXME: *** round robin ***\n");
 		fprintf(stderr,"FIXME: *** round robin ***\n");
 	    }
-	    ReplayEachCycle();
 	    NetworkCommands();		// Get network commands
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
