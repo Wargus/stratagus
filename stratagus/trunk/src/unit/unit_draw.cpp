@@ -682,7 +682,12 @@ global void DrawUnits(void)
     //	2a) corpse aren't in the cache.
     //
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
+    for( i=0; i<NumUnits; ++i ) {
+	unit=Units[i];
+	if( unit->Type->Vanishes || unit->Command.Action==UnitActionDie ) {
+	    DrawUnit(unit);
+	}
+    }
 #else
     for( i=0; i<NumUnits; ++i ) {
 	unit=Units[i];

@@ -44,7 +44,7 @@ global void HandleActionReturnGoods(Unit* unit)
     //
     type=unit->Type->Type;
     if( type==UnitPeonWithGold || type==UnitPeasantWithGold ) {
-	if( !(destu=FindGoldDeposit(unit->Player,unit->X,unit->Y)) ) {
+	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
 	    unit->Command.Action=UnitActionStill;
 	    return;
 	}

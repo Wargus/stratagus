@@ -258,6 +258,10 @@ local int CostMoveTo(int ex,int ey,int mask,int current_cost) {
 	    // we are already crossing a fixed unit. We don't need details
 	    return AStarMovingUnitCrossingCost;
 	} else {
+	    // FIXME: johns: must choose the correct unit, only units
+	    // FIXME: which block the moving unit should be tested
+	    // FIXME: my UnitOnMapTile returns random units.
+	    // FIXME: this means a land unit could be blocked by an air unit
 	    goal=UnitOnMapTile(ex,ey);
 	    if( !goal ) {
 		return -1;//FIXME: is this a bug?

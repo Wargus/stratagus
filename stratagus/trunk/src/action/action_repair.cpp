@@ -25,6 +25,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--      Include
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -42,14 +46,8 @@
 #include "map.h"
 
 /*----------------------------------------------------------------------------
---      Repair
+--      Functions
 ----------------------------------------------------------------------------*/
-
-//	Peon, Peasant, Attacking Peon, Attacking Peasant.
-local Animation PeonRepair[] = {
-    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0, 3,  5},
-    { 0, 0, 7,-20},{ 3, 0, 1,  0}
-};
 
 /**
 **	Generic unit repair.
@@ -57,7 +55,7 @@ local Animation PeonRepair[] = {
 **	@param unit	Unit, for that the repair animation is played.
 **	@param repair	Repair animation.
 */
-local void DoActionRepairGeneric(Unit* unit,Animation* repair)
+local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
 {
     Unit* goal;
     int flags;
@@ -114,11 +112,10 @@ local void DoActionRepairGeneric(Unit* unit,Animation* repair)
 */
 local int AnimateActionRepair(Unit* unit)
 {
-    int type;
-
-    type=unit->Type->Type;
-    if( type<UnitTypeInternalMax ) {
-	DoActionRepairGeneric(unit,PeonRepair);
+    if( unit->Type->Animations ) {
+	DebugCheck( !unit->Type->Animations->Attack );
+	// FIXME: An seperate repair animation would be nice?
+	DoActionRepairGeneric(unit,unit->Type->Animations->Attack);
     }
 
     return 0;
@@ -152,12 +149,23 @@ global int HandleActionRepair(Unit* unit)
 		//
 		//	Target is dead, choose new one.
 		//
+#ifdef NEW_UNIT
+		// Check if goal is correct unit.
+		if( goal && goal->Destroyed ) {
+		    DebugLevel0(__FUNCTION__": destroyed unit\n");
+		    if( !--goal->Refs ) {
+			FreeUnitMemory(goal);
+		    }
+		    // FIXME: should I clear this here?
+		    unit->Command.Data.Move.Goal=goal=NULL;
+		}
+#endif
 
 		//
 		//	Have reached target?
 		//
 		if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
-			<=unit->Stats->AttackRange ) {
+			<=REPAIR_RANGE ) {
 		    unit->State=0;
 		    if( !unit->Type->Tower ) {
 			UnitNewHeadingFromXY(unit

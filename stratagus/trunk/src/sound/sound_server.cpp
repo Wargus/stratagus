@@ -500,7 +500,7 @@ local unsigned char VolumeForDistance(unsigned short d,unsigned char range) {
 	    d-=ViewPointOffset;
 	    d_tmp=d*MAX_SOUND_RANGE;
 	    range_tmp=DistanceSilent*range;
-	    DebugLevel2("Distance: %d, Range: %d\n",d_tmp,range_tmp);
+	    DebugLevel3("Distance: %d, Range: %d\n",d_tmp,range_tmp);
 	    if (d_tmp > range_tmp )
 		return 0;
 	    else

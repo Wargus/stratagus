@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -32,6 +36,10 @@
 #include "sound.h"
 #include "ai.h"
 #include "interface.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Unit trains unit!
@@ -67,7 +75,7 @@ global void HandleActionTrain(Unit* unit)
 	//
 	//	Check if enough food available.
 	//
-	if( player->Food<=player->NumUnits ) {
+	if( player->Food<=player->NumFoodUnits ) {
 
 	    // FIXME: GameMessage
 	    if( player==ThisPlayer ) {

@@ -187,12 +187,12 @@ local int AiFindFreeWorkers(Unit** table)
     Unit* unit;
 
     nunits = FindPlayerUnitsByType(AiPlayer->Player,
-             AiChooseRace(UnitPeasant),table);
+             UnitTypes+AiChooseRace(UnitPeasant),table);
     /*
     nunits += FindPlayerUnitsByType(AiPlayer->Player,
-             AiChooseRace(UnitPeasantWithGold),table+nunits);
+             UnitTypes+AiChooseRace(UnitPeasantWithGold),table+nunits);
     nunits += FindPlayerUnitsByType(AiPlayer->Player,
-             AiChooseRace(UnitPeasantWithWood),table+nunits);
+             UnitTypes+AiChooseRace(UnitPeasantWithWood),table+nunits);
     */
 
     // Remove all workers on the way building
@@ -705,8 +705,9 @@ local int AiTrainCreature(int type)
     else
         {
         nunits = FindPlayerUnitsByType(AiPlayer->Player,
-         AiChooseRace(UnitBarracksHuman), //FIXME: jon: AiChooseTrainer(type),
-                  units);
+			UnitTypes+AiChooseRace(UnitBarracksHuman),
+	 //FIXME: jon: AiChooseTrainer(type),
+			units);
         }
     if(!nunits) {return -1;}
     while(nunits--)
@@ -997,7 +998,7 @@ local void AiAssignWorker(void)
     //	Send standing workers home.
     //
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	 AiChooseRace(UnitPeasantWithGold),workers);
+	 UnitTypes+AiChooseRace(UnitPeasantWithGold),workers);
     DebugLevel3("Gold %d\n",num_worker);
     if(num_worker)
 	{          // assign the non working
@@ -1014,7 +1015,7 @@ local void AiAssignWorker(void)
 	    }
 	}
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	 AiChooseRace(UnitPeasantWithWood),workers);
+	 UnitTypes+AiChooseRace(UnitPeasantWithWood),workers);
     DebugLevel3("Wood %d\n",num_worker);
     if(num_worker)
 	{          // assign the non working
@@ -1212,7 +1213,7 @@ local int AiCommandAttack(int unittype,int attack,int home)
     Unit* table[MAX_UNITS];
 
     nunits = FindPlayerUnitsByType(AiPlayer->Player,
-        AiChooseRace(unittype),table);
+        UnitTypes+AiChooseRace(unittype),table);
     if(nunits < attack + home) return 0;
     for(i=0; i<attack; i++)
        {
