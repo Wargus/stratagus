@@ -191,6 +191,21 @@ global void MapCenter(int x,int y)
 ----------------------------------------------------------------------------*/
 
 /**
+**	Tile is empty, no rocks, walls, forest, building?
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**
+**	@return		True if empty, false otherwise.
+*/
+global int IsMapFieldEmpty(int tx,int ty)
+{
+    return !(TheMap.Fields[tx+ty*TheMap.Width].Flags
+	    &(MapFieldUnpassable|MapFieldWall|MapFieldRocks|MapFieldForest
+	    |MapFieldBuilding));
+}
+
+/**
 **	Water on map tile.
 **
 **	@param x	X map tile position.
