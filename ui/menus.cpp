@@ -173,6 +173,7 @@ local void MultiClientRCSAction(Menuitem *mi, int i);
 
 local void MultiGameStart(void);
 local void MultiGameCancel(void);
+local void NetworkGamePrepareGameSettings(void);
 local void MultiGameSetupInit(Menuitem *mi);	// master init
 local void MultiGameSetupExit(Menuitem *mi);	// master exit
 local void MultiGameDrawFunc(Menuitem *mi);
@@ -3038,6 +3039,7 @@ local void TerminateNetConnect(void)
 	    return;
 
 	case ccs_started:
+	    NetworkGamePrepareGameSettings();
 	    CustomGameStart();
 	    return;
 
@@ -3081,6 +3083,7 @@ local void MultiGameStart(void)
     Invalidate();
 
     NetworkServerStartGame();
+    NetworkGamePrepareGameSettings();
 
     CustomGameStart();
 }
@@ -4010,7 +4013,7 @@ local void GameRCSAction(Menuitem *mi, int i)
 
     if (mi->d.pulldown.curopt == i) {
 	GameSettings.Presets[0].Race = v[i];
-	ServerSetupState.Race[0] = i;
+	ServerSetupState.Race[0] = 2 - i;
 	NetworkServerResyncClients();
     }
 }
@@ -4105,6 +4108,74 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
 {
     // FIXME: do something better
     GameDrawFunc(mi);
+}
+
+/**
+**	Multiplayer network game final race an player type setup.
+*/
+local void NetworkGamePrepareGameSettings(void)
+{
+    int h, i;
+    int num[PlayerMax];
+
+    DebugCheck(!ScenSelectPudInfo);
+
+    DebugLevel0Fn("NetPlayers = %d\n", NetPlayers);
+
+#ifdef DEBUG
+    for (i = 0; i < PlayerMax-1; i++) {
+	printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
+	if (ServerSetupState.CompOpt[i] == 0) {
+	    for (h = 0; h < NetPlayers; h++) {
+		if (Hosts[h].PlyNr == i) {
+		    printf("%s", Hosts[h].PlyName);
+		}
+	    }
+	}
+	printf("\n");
+    }
+#endif
+
+    // Make a list of the available player slots.
+    for (h = i = 0; i < PlayerMax-1; i++) {
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	    DebugLevel3Fn("Player slot %i is available for a person\n", i);
+	    num[h++] = i;
+	}
+    }
+    for (i = 0; i < h; i++) {
+	switch(ServerSetupState.CompOpt[num[i]]) {
+	    case 0:
+		GameSettings.Presets[num[i]].Type = PlayerPerson;
+		DebugLevel3Fn("Settings[%d].Type == Person\n", num[i]);
+		switch (ServerSetupState.Race[num[i]]) {
+		    case 1:
+			GameSettings.Presets[num[i]].Race = PlayerRaceOrc;
+			break;
+		    case 2:
+			GameSettings.Presets[num[i]].Race = PlayerRaceHuman;
+		    default:
+			break;
+		}
+		break;
+	    case 1:
+		GameSettings.Presets[num[i]].Type = PlayerComputer;
+		DebugLevel3Fn("Settings[%d].Type == Computer\n", num[i]);
+		break;
+	    case 2:
+		GameSettings.Presets[num[i]].Type = PlayerNobody;
+		DebugLevel3Fn("Settings[%d].Type == Closed\n", num[i]);
+	    default:
+		break;
+	}
+    }
+
+#ifdef DEBUG
+    for (i = 0; i < NetPlayers; i++) {
+	DebugCheck(GameSettings.Presets[Hosts[i].PlyNr].Type != PlayerPerson);
+	;
+    }
+#endif
 }
 
 /**
@@ -4421,16 +4492,8 @@ local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
 
 local void MultiClientRCSAction(Menuitem *mi, int i)
 {
-#if 0
-    int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
-#endif
-
     if (mi->d.pulldown.curopt == i) {
-	LocalSetupState.Race[NetLocalHostsSlot] = i;
-#if 0
-	// FIXME: Handle RACES -> Not visible! Delayed to final InitConfig msg...
-	GameSettings.Presets[NetLocalHostsSlot].Race = v[i];
-#endif
+	LocalSetupState.Race[NetLocalHostsSlot] = 2 - i;
 	MultiClientUpdate(0);
     }
 }
@@ -4506,11 +4569,6 @@ global void NetConnectForceDisplayUpdate(void)
 */
 global void NetClientUpdateState(void)
 {
-#if 0
-    // FIXME: Handle RACES -> Not visible! Delayed to final InitConfig msg...
-    GameSettings.Presets[0].Race = ServerSetupState.Race[0];
-#endif
-
     GameRESAction(NULL, ServerSetupState.ResOpt);
     NetMultiClientMenuItems[CLIENT_RESOURCE].d.pulldown.curopt =
 	ServerSetupState.ResOpt;
