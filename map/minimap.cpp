@@ -294,22 +294,19 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 	if (!UnitVisibleOnMinimap(unit)) {
 		return ;
 	}
-	type = unit->Type;
+	if (EditorRunning || ReplayRevealMap || UnitVisible(unit, ThisPlayer)) {
+		type = unit->Type;
+	} else {
+		type = unit->Seen.Type;
+	}
 	//
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
 	//
 	if (unit->Player->Player == PlayerNumNeutral) {
-		if ((!EditorRunning) && (!UnitVisible(unit, ThisPlayer))) {
 			color = VideoMapRGB(TheScreen->format,
-				unit->Seen.Type->NeutralMinimapColorRGB.r,
-				unit->Seen.Type->NeutralMinimapColorRGB.g,
-				unit->Seen.Type->NeutralMinimapColorRGB.b);
-		} else {
-			color = VideoMapRGB(TheScreen->format,
-				unit->Type->NeutralMinimapColorRGB.r,
-				unit->Type->NeutralMinimapColorRGB.g,
-				unit->Type->NeutralMinimapColorRGB.b);
-		}
+				type->NeutralMinimapColorRGB.r,
+				type->NeutralMinimapColorRGB.g,
+				type->NeutralMinimapColorRGB.b);
 	} else if (unit->Player == ThisPlayer) {
 		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 				(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
