@@ -679,6 +679,9 @@ local void SendRepair(int x,int y)
 **
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
+**
+**	@todo	To reduce the CPU load for pathfinder, we should check if
+**		the destination is reachable and handle nice group movements.
 */
 local void SendMove(int x,int y)
 {
@@ -718,6 +721,9 @@ local void SendAttack(int x,int y)
 	if( unit->Type->CanAttack || unit->Type->Building ) {
 	    dest=TargetOnMapTile(unit,x,y);
 	    DebugLevel3Fn("Attacking %p\n",dest);
+	    if( dest ) {
+		dest->Blink=3;
+	    }
 	    if( dest!=unit ) {  // don't let an unit self destruct
 	        SendCommandAttack(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	    }
