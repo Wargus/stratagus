@@ -253,7 +253,8 @@ MISC    += Makefile Rules.make.orig setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
 	  make/README tools/udta.c tools/ugrd.c $(CONTRIB) \
-	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h
+	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h \
+	  src/freecraft.rc
 
 mydate	= $(shell date +%y%m%d)
 distdir	= freecraft-$(mydate)
