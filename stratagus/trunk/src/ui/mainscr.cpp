@@ -440,7 +440,7 @@ global void DrawUnitInfo(const Unit* unit)
 		    if( unit->OnBoard[i]->Name ) {
 			char buf[128];
 
-			sprintf(buf,"%s %s\n",unit->OnBoard[i]->Type->Name,
+			sprintf(buf,"%s %s",unit->OnBoard[i]->Type->Name,
 			    unit->OnBoard[i]->Name);
 			SetStatusLine(buf);
 		    } else {
