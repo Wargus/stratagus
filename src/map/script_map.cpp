@@ -58,7 +58,7 @@ local SCM CclFreeCraftMap(SCM list)
     //	Parse the list:	(still everything could be changed!)
     //
 
-    if(!TheMap.Info) {
+    if( !TheMap.Info ) {
 	TheMap.Info=calloc(1, sizeof(MapInfo));
     }
 
