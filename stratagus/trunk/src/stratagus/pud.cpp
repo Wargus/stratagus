@@ -10,7 +10,7 @@
 //
 /**@name pud.c		-	The pud. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -33,6 +33,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+// Integer type definitions
+#ifdef BSD
+#include <inttypes.h>
+#else
+#if defined(_MSC_VER) && !defined(_WIN32_WCE)
+#define DrawIcon WinDrawIcon
+#define EndMenu WinEndMenu
+#include <windows.h>
+#undef DrawIcon
+#undef EndMenu
+#endif
+#include <stdint.h>
+#endif // BSD
 
 #include "freecraft.h"
 #include "video.h"
@@ -276,11 +290,11 @@ local void ConvertREGM(const unsigned short* regm,int width,int height
 **	@param length	Length is filled in.
 **
 **		4 bytes header tag (TYPE )...
-**		long	length
+**		uint32_t length
 */
-local int PudReadHeader(CLFile* input,char* header,long* length)
+local int PudReadHeader(CLFile* input,char* header,uint32_t* length)
 {
-    long len;
+    uint32_t len;
 
     if( CLread(input,header,4)!=4 ) {
 	return 0;
@@ -334,7 +348,7 @@ local int PudReadByte(CLFile* input)
 global MapInfo* GetPudInfo(const char* pud)
 {
     CLFile* input;
-    long length;
+    uint32_t length;
     char header[5];
     char buf[1024];
     MapInfo* info;
@@ -398,7 +412,7 @@ global MapInfo* GetPudInfo(const char* pud)
 	//	Map description
 	//
 	if( !memcmp(header,"DESC",4) ) {
-	    if( CLread(input,buf,length)!=length ) {
+	    if( (uint32_t)CLread(input,buf,length)!=length ) {
 		perror("CLread()");
 		FreeMapInfo(info);
 		return NULL;
@@ -489,7 +503,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		FreeMapInfo(info);
 		return NULL;
 	    }
-	    if( CLread(input,bufp,length)!=length ) {
+	    if( (uint32_t)CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
 		FreeMapInfo(info);
 		return NULL;
@@ -511,7 +525,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		FreeMapInfo(info);
 		return NULL;
 	    }
-	    if( CLread(input,bufp,length)!=length ) {
+	    if( (uint32_t)CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
 		FreeMapInfo(info);
 		return NULL;
@@ -538,7 +552,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		FreeMapInfo(info);
 		return NULL;
 	    }
-	    if( CLread(input,bufp,length)!=length ) {
+	    if( (uint32_t)CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
 		FreeMapInfo(info);
 		return NULL;
@@ -675,7 +689,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		FreeMapInfo(info);
 		return NULL;
 	    }
-	    if( CLread(input,mtxm,length)!=length ) {
+	    if( (uint32_t)CLread(input,mtxm,length)!=length ) {
 		perror("CLread()");
 		free(mtxm);
 		FreeMapInfo(info);
@@ -698,7 +712,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		FreeMapInfo(info);
 		return NULL;
 	    }
-	    if( CLread(input,sqm,length)!=length ) {
+	    if( (uint32_t)CLread(input,sqm,length)!=length ) {
 		perror("CLread()");
 		free(sqm);
 		FreeMapInfo(info);
@@ -721,7 +735,7 @@ global MapInfo* GetPudInfo(const char* pud)
 		FreeMapInfo(info);
 		return NULL;
 	    }
-	    if( CLread(input,regm,length)!=length ) {
+	    if( (uint32_t)CLread(input,regm,length)!=length ) {
 		perror("CLread()");
 		free(regm);
 		FreeMapInfo(info);
@@ -784,7 +798,7 @@ global MapInfo* GetPudInfo(const char* pud)
 global void LoadPud(const char* pud,WorldMap* map)
 {
     CLFile* input;
-    long length;
+    uint32_t length;
     char header[5];
     char buf[1024];
     int width;
@@ -830,7 +844,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	//
 	if( !memcmp(header,"VER ",4) ) {
 	    if( length==2 ) {
-		int v;
+		unsigned int v;
 
 		v=PudReadWord(input);
 		DebugLevel1("\tVER: %d.%d\n" _C_ (v&0xF0)>>4 _C_ v&0xF);
@@ -843,7 +857,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	//	Map description
 	//
 	if( !memcmp(header,"DESC",4) ) {
-	    if( CLread(input,buf,length)!=length ) {
+	    if( (uint32_t)CLread(input,buf,length)!=length ) {
 		perror("CLread()");
 		ExitFatal(-1);
 	    }
@@ -894,8 +908,8 @@ global void LoadPud(const char* pud,WorldMap* map)
 	//
 	if( !memcmp(header,"ERA ",4) || !memcmp(header,"ERAX",4) ) {
 	    if( length==2 ) {
-		int t;
-		int i;
+		unsigned int t;
+		unsigned int i;
 
 		t=PudReadWord(input);
 		if (GameSettings.Terrain != SettingsPresetMapDefault) {
@@ -971,7 +985,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		    perror("alloca()");
 		    ExitFatal(-1);
 		}
-		if( CLread(input,bufp,length)!=length ) {
+		if( (uint32_t)CLread(input,bufp,length)!=length ) {
 		    perror("CLread()");
 		    ExitFatal(-1);
 		}
@@ -992,7 +1006,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		perror("alloca()");
 		ExitFatal(-1);
 	    }
-	    if( CLread(input,bufp,length)!=length ) {
+	    if( (uint32_t)CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
 		ExitFatal(-1);
 	    }
@@ -1017,7 +1031,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		    perror("alloca()");
 		    ExitFatal(-1);
 		}
-		if( CLread(input,bufp,length)!=length ) {
+		if( (uint32_t)CLread(input,bufp,length)!=length ) {
 		    perror("CLread()");
 		    ExitFatal(-1);
 		}
@@ -1139,7 +1153,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"MTXM",4) ) {
 	    unsigned short* mtxm;
 
-	    if( length!=width*height*2 ) {
+	    if( length!=(uint32_t)width*height*2 ) {
 		DebugLevel1("wrong length of MTXM section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
@@ -1147,7 +1161,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		perror("malloc()");
 		ExitFatal(-1);
 	    }
-	    if( CLread(input,mtxm,length)!=length ) {
+	    if( (uint32_t)CLread(input,mtxm,length)!=length ) {
 		perror("CLread()");
 		ExitFatal(-1);
 	    }
@@ -1164,7 +1178,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"SQM ",4) ) {
 	    unsigned short* sqm;
 
-	    if( length!=width*height*(int)sizeof(short) ) {
+	    if( length!=(uint32_t)width*height*sizeof(short) ) {
 		DebugLevel1("wrong length of SQM  section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
@@ -1172,7 +1186,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		perror("malloc()");
 		ExitFatal(-1);
 	    }
-	    if( CLread(input,sqm,length)!=length ) {
+	    if( (uint32_t)CLread(input,sqm,length)!=length ) {
 		perror("CLread()");
 		ExitFatal(-1);
 	    }
@@ -1189,7 +1203,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"REGM",4) ) {
 	    unsigned short* regm;
 
-	    if( length!=width*height*(int)sizeof(short) ) {
+	    if( length!=(uint32_t)width*height*sizeof(short) ) {
 		DebugLevel1("wrong length of REGM section %ld\n" _C_ length);
 		ExitFatal(-1);
 	    }
@@ -1197,7 +1211,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		perror("malloc()");
 		ExitFatal(-1);
 	    }
-	    if( CLread(input,regm,length)!=length ) {
+	    if( (uint32_t)CLread(input,regm,length)!=length ) {
 		perror("CLread()");
 		ExitFatal(-1);
 	    }
