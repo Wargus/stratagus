@@ -480,7 +480,7 @@ global int CastSpawnPortal(Unit *caster, const SpellType *spell __attribute__((u
 //   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 
 /**
-**	Cast blizzard.
+**	Cast area bombardment.
 **
 **	@param caster	Unit that casts the spell
 **	@param spell	Spell-type pointer
@@ -695,11 +695,9 @@ global int CastFlameShield(Unit* caster, const SpellType *spell, Unit *target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastHaste(Unit *caster, const SpellType *spell, Unit *target,
+global int CastAdjustBuffs(Unit *caster, const SpellType *spell, Unit *target,
     int x, int y)
 {
-    struct s_haste *haste;
-
     DebugCheck(!caster);
     DebugCheck(!spell);
     DebugCheck(!spell->SpellAction);
@@ -708,51 +706,20 @@ global int CastHaste(Unit *caster, const SpellType *spell, Unit *target,
     // get mana cost
     caster->Mana -= spell->ManaCost;
 
-    for (haste = &spell->SpellAction->haste; haste != NULL; haste = haste->next) {
-	// FIXME modify unit (slow, bloodlust, ..) -> flag[] ?
-	switch (haste->flag) {
-	    case flag_slow:
-		target->Slow = haste->value / CYCLES_PER_SECOND;
-		break;
-	    case flag_haste:
-		target->Haste = haste->value / CYCLES_PER_SECOND;
-		break;
-	    case flag_bloodlust:
-		target->Bloodlust = haste->value / CYCLES_PER_SECOND;
-		break;
-	    case flag_HP:
-		target->HP = haste->value;
-		if (target->HP <= 0) {
-		    target->HP = 1; // could be to 0 ??
-		}
-		if (target->Stats->HitPoints < target->HP) {
-		    target->HP = target->Stats->HitPoints;
-		}
-		break;
-	    case flag_Mana:
-		target->Mana = haste->value;
-		if (target->Type->_MaxMana < target->Mana) {// What is Maxmana per unit.
-		    target->Mana = target->Type->_MaxMana;
-		}
-		break;
-	    case flag_HP_percent:
-		target->HP = target->HP * haste->value / 100;
-		if (target->HP < 0) {
-		    target->HP = 1; // could be to 0 ??
-		}
-		if (target->Stats->HitPoints < target->HP) {
-		    target->HP = target->Stats->HitPoints;
-		}
-		break;
-	    case flag_Mana_percent:
-		target->Mana = target->Mana * haste->value / 100;
-		if (target->Type->_MaxMana < target->Mana) {// What is Maxmana per unit.
-		    target->Mana = target->Type->_MaxMana;
-		}
-		break;
-	    default:
-		DebugCheck(1);
-	}
+    if (spell->SpellAction->AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
+	target->Haste=spell->SpellAction->AdjustBuffs.HasteTicks;
+    }
+    if (spell->SpellAction->AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
+	target->Slow=spell->SpellAction->AdjustBuffs.SlowTicks;
+    }
+    if (spell->SpellAction->AdjustBuffs.BloodlustTicks!=BUFF_NOT_AFFECTED) {
+	target->Bloodlust=spell->SpellAction->AdjustBuffs.BloodlustTicks;
+    }
+    if (spell->SpellAction->AdjustBuffs.InvisibilityTicks!=BUFF_NOT_AFFECTED) {
+	target->Invisible=spell->SpellAction->AdjustBuffs.InvisibilityTicks;
+    }
+    if (spell->SpellAction->AdjustBuffs.InvincibilityTicks!=BUFF_NOT_AFFECTED) {
+	target->UnholyArmor=spell->SpellAction->AdjustBuffs.InvincibilityTicks;
     }
     CheckUnitToBeDrawn(target);
     PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
@@ -773,50 +740,76 @@ global int CastHaste(Unit *caster, const SpellType *spell, Unit *target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastHealing(Unit *caster, const SpellType *spell, Unit *target,
+global int CastAdjustVitals(Unit *caster, const SpellType *spell, Unit *target,
     int x, int y)
 {
-    int i;
+    int castcount;
     int diffHP;
     int diffMana;
     int hp;
     int mana;
+    int manacost;
 
     DebugCheck(!caster);
     DebugCheck(!spell);
     DebugCheck(!spell->SpellAction);
     DebugCheck(!target);
 
-    diffMana = caster->Mana;
-    hp = spell->SpellAction->healing.HP;
-    mana = spell->ManaCost;
+    hp = spell->SpellAction->AdjustVitals.HP;
+    mana = spell->SpellAction->AdjustVitals.Mana;
+    manacost = spell->ManaCost;
 
-    // Healing or exorcism
-    diffHP = (hp > 0) ? target->Stats->HitPoints - target->HP : target->HP;
-    i = min(diffHP / hp + (diffHP % hp ? 1 : 0),
-	    diffMana / mana + (diffMana % mana ? 1 : 0));
-    // Stop when no mana or full HP
-    caster->Mana -= i * mana;
-    target->HP += i * hp;
+    //  Healing and harming
+    if (hp>0) {
+	diffHP = target->Stats->HitPoints - target->HP;
+    } else {
+	diffHP = target->HP;
+    }
+    if (mana>0) {
+	diffMana = target->Type->_MaxMana - target->Mana;
+    } else {
+	diffMana = target->Mana;
+    }
 
+    //  When harming cast again to send the hp to negative values.
+    //  Carefull, a perfect 0 target hp kills too.
+    //  Avoid div by 0 errors too!
+    castcount=0;
+    if (hp) {
+	castcount=max(castcount,diffHP/abs(hp)+( ( (hp<0) && (diffHP%(-hp)>0) ) ? 1 : 0));
+    }
+    if (mana) {
+	castcount=max(castcount,diffMana/abs(mana)+( ( (mana<0) && (diffMana%(-mana)>0) ) ? 1 : 0));
+    }
+    if (manacost) {
+	castcount=min(castcount,caster->Mana/manacost);
+    }
+    if (spell->SpellAction->AdjustVitals.MaxMultiCast) {
+	castcount=min(castcount,spell->SpellAction->AdjustVitals.MaxMultiCast);
+    }
+
+    DebugCheck(castcount<0);
+
+    DebugLevel0Fn("Used to have %d hp and %d mana.\n" _C_ target->HP _C_ target->Mana);
+
+    caster->Mana-=castcount*manacost;
     if (hp < 0) {
-#ifdef USE_HP_FOR_XP
-	caster->XP += i * hp;
-#endif
-	if (!target->HP) {
-	    caster->Player->Score += target->Type->Points;
-	    if (target->Type->Building) {
-		caster->Player->TotalRazings++;
-	    } else {
-		caster->Player->TotalKills++;
-	    }
-#ifndef USE_HP_FOR_XP
-	    caster->XP += target->Type->Points;
-#endif
-	    caster->Kills++;
-	    LetUnitDie(target);
+	HitUnit(caster,target,castcount*hp);
+    } else {
+	target->HP += castcount * hp;
+	if (target->HP>target->Stats->HitPoints) {
+	    target->HP=target->Stats->HitPoints;
 	}
     }
+    target->Mana+=castcount*mana;
+    if (target->Mana<0) {
+	target->Mana=0;
+    }
+    if (target->Mana>target->Type->_MaxMana) {
+	target->Mana=target->Type->_MaxMana;
+    }
+
+    DebugLevel0Fn("Unit now has %d hp and %d mana.\n" _C_ target->HP _C_ target->Mana);
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
@@ -845,7 +838,7 @@ global int CastHolyVision(Unit *caster, const SpellType *spell, Unit *target,
 
     caster->Mana -= spell->ManaCost;	// get mana cost
     // FIXME: compact with summon.
-    target = MakeUnit(spell->SpellAction->holyvision.revealer, caster->Player);
+    target = MakeUnit(spell->SpellAction->HolyVision.revealer, caster->Player);
     target->Orders[0].Action = UnitActionStill;
     target->HP = 0;
     target->X = x;
@@ -857,59 +850,6 @@ global int CastHolyVision(Unit *caster, const SpellType *spell, Unit *target,
     target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
     CheckUnitToBeDrawn(target);
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    return 0;
-}
-
-/**
-**	Cast invisibility. (or CastUnholyArmor)
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastInvisibility(Unit *caster, const SpellType *spell, Unit *target,
-    int x, int y)
-{
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
-    DebugCheck(!target);
-    DebugCheck(!spell->SpellAction->invisibility.missile);
-
-    // get mana cost
-    caster->Mana -= spell->ManaCost;
-    if (target->Type->Volatile) {
-	RemoveUnit(target,NULL);
-	UnitLost(target);
-	UnitClearOrders(target);
-	ReleaseUnit(target);
-	MakeMissile(spell->SpellAction->invisibility.missile,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    } else {
-	switch (spell->SpellAction->invisibility.flag) {
-	    case flag_invisibility:
-		target->Invisible = spell->SpellAction->invisibility.value;
-		target->Invisible /= CYCLES_PER_SECOND;
-		break;
-	    case flag_unholyarmor:
-		target->UnholyArmor = spell->SpellAction->invisibility.value;
-		target->UnholyArmor /= CYCLES_PER_SECOND;
-		break;
-	    default:
-		//  Something is WRONG!!!
-		DebugCheck(1);
-	}
-	CheckUnitToBeDrawn(target);
-    }
-    PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
-    MakeMissile(spell->Missile,
-	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2 );
     return 0;
 }
 
@@ -988,7 +928,7 @@ global int CastRaiseDead(Unit *caster, const SpellType *spell, Unit *target,
     DebugCheck(!spell->SpellAction);
 //  assert(x in range, y in range);
 
-    skeleton = spell->SpellAction->RaiseDead.Skeleton;
+    skeleton = spell->SpellAction->RaiseDead.UnitRaised;
     DebugCheck(!skeleton);
 
     corpses = &CorpseList;
@@ -1069,7 +1009,7 @@ global int CastRunes(Unit *caster, const SpellType *spell,
 		    y * TileSizeY + TileSizeY / 2,
 		    x * TileSizeX + TileSizeX / 2,
 		    y * TileSizeY + TileSizeY / 2);
-	    mis->TTL = spell->SpellAction->runes.TTL;
+	    mis->TTL = spell->SpellAction->Runes.TTL;
 	    mis->Controller = SpellRunesController;
 	    caster->Mana -= spell->ManaCost / 5;
 	}
@@ -1091,12 +1031,14 @@ global int CastRunes(Unit *caster, const SpellType *spell,
 global int CastSummon(Unit *caster, const SpellType *spell, Unit *target,
     int x, int y)
 {
+    int ttl;
+
     DebugCheck(!caster);
     DebugCheck(!spell);
     DebugCheck(!spell->SpellAction);
     DebugCheck(!spell->SpellAction->Summon.UnitType);
-//  assert(x in range, y in range);
 
+    ttl=spell->SpellAction->Summon.TTL;
     caster->Mana -= spell->ManaCost;
     // FIXME: johns: the unit is placed on the wrong position
     target = MakeUnit(spell->SpellAction->Summon.UnitType, caster->Player);
@@ -1105,7 +1047,11 @@ global int CastSummon(Unit *caster, const SpellType *spell, Unit *target,
     DropOutOnSide(target, LookingW, 0, 0);
 
     // set life span
-    target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
+    if (ttl) {
+	target->TTL=GameCycle+ttl;
+    } else {
+	target->TTL=GameCycle+target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
+    }
     CheckUnitToBeDrawn(target);
 
     PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
@@ -1143,7 +1089,7 @@ global int CastWhirlwind(Unit *caster, const SpellType *spell,
     mis = MakeMissile(spell->Missile,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    mis->TTL = spell->SpellAction->whirlwind.TTL;
+    mis->TTL = spell->SpellAction->Whirlwind.TTL;
     mis->Controller = SpellWhirlwindController;
     return 0;
 }
@@ -1681,7 +1627,7 @@ global int SpellCast(Unit *caster, const SpellType *spell, Unit *target,
     int x, int y)
 {
     DebugCheck(!spell);
-    DebugCheck(!spell->f);
+    DebugCheck(!spell->CastFunction);
     DebugCheck(!caster);
     DebugCheck(!SpellIsAvailable(caster->Player, spell->Ident));
 
@@ -1695,7 +1641,7 @@ global int SpellCast(Unit *caster, const SpellType *spell, Unit *target,
     }
     DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->IdentName _C_
 	    unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
-    return CanCastSpell(caster, spell, target, x, y) && spell->f(caster, spell, target, x, y);
+    return CanCastSpell(caster, spell, target, x, y) && spell->CastFunction(caster, spell, target, x, y);
 }
 
 
