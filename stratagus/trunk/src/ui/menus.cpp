@@ -109,9 +109,7 @@ static void SaveReplayEnterAction(Menuitem* mi, int key);
 static void SaveReplayOk(void);
 
 // Scenario select
-static void ScenSelectLBExit(Menuitem* mi);
 static void ScenSelectLBInit(Menuitem* mi);
-static unsigned char *ScenSelectLBRetrieve(Menuitem* mi, int i);
 static void ScenSelectLBAction(Menuitem* mi, int i);
 static void ScenSelectTPMSAction(Menuitem* mi, int i);
 static void ScenSelectVSAction(Menuitem* mi);
@@ -263,10 +261,8 @@ static void KeystrokeHelpDrawFunc(Menuitem* mi);
 static void SaveGameInit(Menuitem* mi);
 static void SaveGameExit(Menuitem* mi);
 static void SaveGameLBInit(Menuitem* mi);
-static void SaveGameLBExit(Menuitem* mi);
 static void SaveGameEnterAction(Menuitem* mi, int key);
 static void SaveGameLBAction(Menuitem* mi, int i);
-static unsigned char *SaveGameLBRetrieve(Menuitem* mi, int i);
 static void SaveGameVSAction(Menuitem* mi);
 static void SaveGameOk(void);
 static void DeleteConfirmMenu(void);
@@ -277,9 +273,7 @@ static void CreateSaveDir(void);
 static void LoadGameInit(Menuitem* mi);
 static void LoadGameExit(Menuitem* mi);
 static void LoadGameLBInit(Menuitem* mi);
-static void LoadGameLBExit(Menuitem* mi);
 static void LoadGameLBAction(Menuitem* mi, int i);
-static unsigned char *LoadGameLBRetrieve(Menuitem* mi, int i);
 static void LoadGameVSAction(Menuitem* mi);
 static void LoadGameOk(void);
 
@@ -314,9 +308,7 @@ static void EditorNewCancel(void);
 // Editor main load map
 static void EditorMainLoadInit(Menuitem* mi);
 static void EditorMainLoadLBInit(Menuitem* mi);
-static void EditorMainLoadLBExit(Menuitem* mi);
 static void EditorMainLoadLBAction(Menuitem* mi, int i);
-static unsigned char *EditorMainLoadLBRetrieve(Menuitem* mi, int i);
 static void EditorMainLoadVSAction(Menuitem* mi);
 static void EditorMainLoadOk(void);
 static void EditorMainLoadCancel(void);
@@ -352,10 +344,8 @@ static void EditorEditAiPropertiesCancel(void);
 
 // Editor save
 static void EditorSaveLBInit(Menuitem* mi);
-static void EditorSaveLBExit(Menuitem* mi);
 static void EditorSaveFolder(void);
 static void EditorSaveLBAction(Menuitem* mi, int i);
-static unsigned char *EditorSaveLBRetrieve(Menuitem* mi, int i);
 static void EditorSaveVSAction(Menuitem* mi);
 static void EditorSaveEnterAction(Menuitem* mi, int key);
 static void EditorSaveOk(void);
@@ -370,9 +360,7 @@ static void EditorSaveConfirmCancel(void);
 // Replay game
 static void ReplayGameInit(Menuitem* mi);
 static void ReplayGameLBInit(Menuitem* mi);
-static void ReplayGameLBExit(Menuitem* mi);
 static void ReplayGameLBAction(Menuitem* mi, int i);
-static unsigned char *ReplayGameLBRetrieve(Menuitem* mi, int i);
 static void ReplayGameVSAction(Menuitem* mi);
 static void ReplayGameFolder(void);
 static void ReplayGameDisableFog(Menuitem* mi);
@@ -462,11 +450,186 @@ static void InitNetMultiButtonStorage(void) {
 ----------------------------------------------------------------------------*/
 
 /**
+**  Allocate and deep copy a MapInfo structure
+**
+**  @param orig  source of the copy.
+**
+**  @return copy of orig.
+*/
+static MapInfo* DuplicateMapInfo(const MapInfo *orig)
+{
+	MapInfo* dest;
+
+	Assert(orig);
+
+	dest = malloc(sizeof(MapInfo));
+	memcpy(dest, orig, sizeof(MapInfo));
+	if (orig->Description) {
+		dest->Description = strdup(orig->Description);
+	}
+	if (orig->MapTerrainName) {
+		dest->MapTerrainName = strdup(orig->MapTerrainName);
+	}
+	if (orig->Filename) {
+		dest->Filename = strdup(orig->Filename);
+	}
+
+	return dest;
+}
+
+/**
+**  Free map info data
+**
+**  @param fl  File list to free.
+**  @param n   Size of file list.
+*/
+static void FreeMapInfos(FileList *fl, int n)
+{
+	int i;
+
+	Assert(fl);
+	Assert(0 <= n);
+
+	for (i = 0; i < n; i++) {
+		if (fl[i].xdata) {
+			FreeMapInfo(fl[i].xdata);
+			free(fl[i].xdata);
+		}
+		free(fl[i].name);
+		memset(fl, 0, sizeof(*fl));
+	}
+}
+
+////////////////
+// LBRetrieve //
+////////////////
+
+/**
+**  Listbox retrieve callback.
+**
+**  @param mi    Listbox.
+**  @param i     Line to retrieve.
+**
+**  @return string to display in listbox.
+*/
+static unsigned char* LBRetrieve(const Menuitem* mi, int i)
+{
+	FileList* fl;
+	static char buffer[1024];
+
+	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(i >= 0);
+
+	if (i >= mi->D.Listbox.noptions) {
+		return NULL;
+	}
+	fl = mi->D.Listbox.options;
+	if (fl[i].type) {
+		strcpy(buffer, "   ");
+	} else {
+		strcpy(buffer, "\260 ");
+	}
+	strcat(buffer, fl[i].name);
+	return buffer;
+}
+
+/**
+**  Listbox retrieve callback and draw some info.
+**
+**  @param mi    Listbox.
+**  @param i     Line to retrieve.
+**
+**  @return string to display in listbox.
+*/
+static unsigned char* LBRetrieveAndInfo(const Menuitem* mi, int i)
+{
+	FileList* fl;
+	MapInfo* info;
+
+	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(i >= 0);
+
+	if (i >= mi->D.Listbox.noptions) {
+		return NULL;
+	}
+	fl = mi->D.Listbox.options;
+	info = fl[i].xdata;
+	if (fl[i].type && i == mi->D.Listbox.curopt && info) {
+		static char buffer[1024];
+		int j;
+		int n;
+
+		// Draw optional description.
+		if (info->Description) {
+			VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254, LargeFont, info->Description);
+		}
+		// Draw map size.
+		sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
+		VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 20, LargeFont, buffer);
+
+		// Draw number of players.
+		for (n = j = 0; j < PlayerMax; j++) {
+			if (info->PlayerType[j] == PlayerPerson) {
+				n++;
+			}
+		}
+		if (n == 1) {
+			VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, "1 player");
+		} else {
+			sprintf(buffer, "%d players", n);
+			VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, buffer);
+		}
+	}
+	return LBRetrieve(mi, i);
+}
+
+/**
+**  Listbox exit callback.
+**
+**  @param mi  Listbox to free.
+*/
+static void LBExit(Menuitem* mi)
+{
+	FileList *fl;
+
+	Assert(mi->MiType == MI_TYPE_LISTBOX);
+
+	if (!mi->D.Listbox.noptions) {
+		return ;
+	}
+	fl = mi->D.Listbox.options;
+	FreeMapInfos(fl, mi->D.Listbox.noptions);
+	free(fl);
+	mi->D.Listbox.options = NULL;
+	mi->D.Listbox.noptions = 0;
+	mi[1].Flags |= MenuButtonDisabled;
+}
+
+/**
 ** Initialize the hash table of menu functions
 */
 void InitMenuFuncHash(void)
 {
-	HASHADD(NULL,"null");
+	HASHADD(NULL, "null");
+
+#if 1 // Must be rename and remove duplicate.
+	HASHADD(LBRetrieve, "save-game-lb-retrieve");
+	HASHADD(LBRetrieve, "load-game-lb-retrieve");
+	HASHADD(LBRetrieve, "editor-save-lb-retrieve");
+	HASHADD(LBRetrieve, "replay-game-lb-retrieve");
+
+	HASHADD(LBRetrieveAndInfo, "editor-load-lb-retrieve");
+	HASHADD(LBRetrieveAndInfo, "scen-select-lb-retrieve");
+	HASHADD(LBRetrieveAndInfo, "editor-main-load-lb-retrieve");
+
+	HASHADD(LBExit, "scen-select-lb-exit");
+	HASHADD(LBExit, "editor-main-load-lb-exit");
+	HASHADD(LBExit, "editor-load-lb-exit");
+	HASHADD(LBExit, "replay-game-lb-exit");
+	HASHADD(LBExit, "editor-save-lb-exit");
+	HASHADD(LBExit, "load-game-lb-exit");
+	HASHADD(LBExit, "save-game-lb-exit");
+#endif
 
 // Game menu
 	HASHADD(GameMenuInit,"game-menu-init");
@@ -492,9 +655,7 @@ void InitMenuFuncHash(void)
 	HASHADD(SaveReplayOk,"save-replay-ok");
 
 // Scenario select
-	HASHADD(ScenSelectLBExit,"scen-select-lb-exit");
 	HASHADD(ScenSelectLBInit,"scen-select-lb-init");
-	HASHADD(ScenSelectLBRetrieve,"scen-select-lb-retrieve");
 	HASHADD(ScenSelectLBAction,"scen-select-lb-action");
 	HASHADD(ScenSelectTPMSAction,"scen-select-tpms-action");
 	HASHADD(ScenSelectVSAction,"scen-select-vs-action");
@@ -652,10 +813,8 @@ void InitMenuFuncHash(void)
 	HASHADD(SaveGameInit,"save-game-init");
 	HASHADD(SaveGameExit,"save-game-exit");
 	HASHADD(SaveGameLBInit,"save-game-lb-init");
-	HASHADD(SaveGameLBExit,"save-game-lb-exit");
 	HASHADD(SaveGameEnterAction,"save-game-enter-action");
 	HASHADD(SaveGameLBAction,"save-game-lb-action");
-	HASHADD(SaveGameLBRetrieve,"save-game-lb-retrieve");
 	HASHADD(SaveGameVSAction,"save-game-vs-action");
 	HASHADD(SaveGameOk,"save-game-ok");
 	HASHADD(DeleteConfirmMenu,"delete-confirm-menu");
@@ -664,9 +823,7 @@ void InitMenuFuncHash(void)
 	HASHADD(LoadGameInit,"load-game-init");
 	HASHADD(LoadGameExit,"load-game-exit");
 	HASHADD(LoadGameLBInit,"load-game-lb-init");
-	HASHADD(LoadGameLBExit,"load-game-lb-exit");
 	HASHADD(LoadGameLBAction,"load-game-lb-action");
-	HASHADD(LoadGameLBRetrieve,"load-game-lb-retrieve");
 	HASHADD(LoadGameVSAction,"load-game-vs-action");
 	HASHADD(LoadGameOk,"load-game-ok");
 
@@ -701,9 +858,7 @@ void InitMenuFuncHash(void)
 // Editor main load map
 	HASHADD(EditorMainLoadInit,"editor-main-load-init");
 	HASHADD(EditorMainLoadLBInit,"editor-main-load-lb-init");
-	HASHADD(EditorMainLoadLBExit,"editor-main-load-lb-exit");
 	HASHADD(EditorMainLoadLBAction,"editor-main-load-lb-action");
-	HASHADD(EditorMainLoadLBRetrieve,"editor-main-load-lb-retrieve");
 	HASHADD(EditorMainLoadVSAction,"editor-main-load-vs-action");
 	HASHADD(EditorMainLoadOk,"editor-main-load-ok");
 	HASHADD(EditorMainLoadCancel,"editor-main-load-cancel");
@@ -712,9 +867,7 @@ void InitMenuFuncHash(void)
 // Editor load map
 	HASHADD(EditorMainLoadInit,"editor-load-init");
 	HASHADD(EditorMainLoadLBInit,"editor-load-lb-init");
-	HASHADD(EditorMainLoadLBExit,"editor-load-lb-exit");
 	HASHADD(EditorMainLoadLBAction,"editor-load-lb-action");
-	HASHADD(EditorMainLoadLBRetrieve,"editor-load-lb-retrieve");
 	HASHADD(EditorMainLoadVSAction,"editor-load-vs-action");
 	HASHADD(EditorLoadOk,"editor-load-ok");
 	HASHADD(EditorLoadCancel,"editor-load-cancel");
@@ -748,10 +901,8 @@ void InitMenuFuncHash(void)
 
 // Editor save
 	HASHADD(EditorSaveLBInit,"editor-save-lb-init");
-	HASHADD(EditorSaveLBExit,"editor-save-lb-exit");
 	HASHADD(EditorSaveFolder,"editor-save-folder");
 	HASHADD(EditorSaveLBAction,"editor-save-lb-action");
-	HASHADD(EditorSaveLBRetrieve,"editor-save-lb-retrieve");
 	HASHADD(EditorSaveVSAction,"editor-save-vs-action");
 	HASHADD(EditorSaveEnterAction,"editor-save-enter-action");
 	HASHADD(EditorSaveOk,"editor-save-ok");
@@ -765,9 +916,7 @@ void InitMenuFuncHash(void)
 // Replay game
 	HASHADD(ReplayGameInit,"replay-game-init");
 	HASHADD(ReplayGameLBInit,"replay-game-lb-init");
-	HASHADD(ReplayGameLBExit,"replay-game-lb-exit");
 	HASHADD(ReplayGameLBAction,"replay-game-lb-action");
-	HASHADD(ReplayGameLBRetrieve,"replay-game-lb-retrieve");
 	HASHADD(ReplayGameVSAction,"replay-game-vs-action");
 	HASHADD(ReplayGameFolder,"replay-game-folder");
 	HASHADD(ReplayGameDisableFog,"replay-game-disable-fog");
@@ -960,29 +1109,13 @@ void SaveGameMenu(void)
 }
 
 /**
-** Exit callback for listbox in save game menu
-*/
-static void SaveGameLBExit(Menuitem* mi)
-{
-	FileList *fl;
-
-	if (mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(fl);
-		mi->D.Listbox.options = NULL;
-		mi->D.Listbox.noptions = 0;
-		mi[1].Flags |= MenuButtonDisabled;
-	}
-}
-
-/**
 ** Init callback for listbox in save game menu
 */
 static void SaveGameLBInit(Menuitem* mi)
 {
 	int i;
 
-	SaveGameLBExit(mi);
+	LBExit(mi);
 
 	i = mi->D.Listbox.noptions = ReadDataDirectory(SaveDir,
 			NULL, (FileList **) & (mi->D.Listbox.options));
@@ -994,27 +1127,6 @@ static void SaveGameLBInit(Menuitem* mi)
 		}
 	}
 	mi->D.Listbox.curopt = -1;
-}
-
-/**
-**  Save game listbox retrieve callback
-*/
-static unsigned char* SaveGameLBRetrieve(Menuitem* mi, int i)
-{
-	FileList* fl;
-	static char buffer[1024];
-
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			strcpy(buffer, "   ");
-		} else {
-			strcpy(buffer, "\260 ");
-		}
-		strcat(buffer, fl[i].name);
-		return buffer;
-	}
-	return NULL;
 }
 
 /**
@@ -1113,29 +1225,13 @@ static void LoadGameExit(Menuitem* mi __attribute__ ((unused)))
 }
 
 /**
-** Exit callback for listbox in load game menu
-*/
-static void LoadGameLBExit(Menuitem* mi)
-{
-	FileList *fl;
-
-	if (mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(fl);
-		mi->D.Listbox.options = NULL;
-		mi->D.Listbox.noptions = 0;
-		mi[1].Flags |= MenuButtonDisabled;
-	}
-}
-
-/**
 ** Init callback for listbox in load game menu
 */
 static void LoadGameLBInit(Menuitem* mi)
 {
 	int i;
 
-	LoadGameLBExit(mi);
+	LBExit(mi);
 
 	i = mi->D.Listbox.noptions = ReadDataDirectory(SaveDir, SaveGameRDFilter,
 													 (FileList **)&(mi->D.Listbox.options));
@@ -1147,27 +1243,6 @@ static void LoadGameLBInit(Menuitem* mi)
 		}
 	}
 	mi->D.Listbox.curopt = -1;
-}
-
-/**
-**  Load game listbox retrieve callback
-*/
-static unsigned char* LoadGameLBRetrieve(Menuitem* mi, int i)
-{
-	FileList* fl;
-	static char buffer[1024];
-
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			strcpy(buffer, "   ");
-		} else {
-			strcpy(buffer, "\260 ");
-		}
-		strcat(buffer, fl[i].name);
-		return buffer;
-	}
-	return NULL;
 }
 
 /**
@@ -3015,45 +3090,6 @@ static void MultiPlayerInternetGame(void)
 }
 
 /**
-** Allocate and deep copy a MapInfo structure
-*/
-static MapInfo* DuplicateMapInfo(MapInfo *orig)
-{
-	MapInfo* dest;
-
-	dest = malloc(sizeof(MapInfo));
-	memcpy(dest, orig, sizeof(MapInfo));
-	if (orig->Description) {
-		dest->Description = strdup(orig->Description);
-	}
-	if (dest->MapTerrainName) {
-		dest->MapTerrainName = strdup(orig->MapTerrainName);
-	}
-	if (dest->Filename) {
-		dest->Filename = strdup(orig->Filename);
-	}
-
-	return dest;
-}
-
-/**
-** Free map info data
-*/
-static void FreeMapInfos(FileList *fl, int n)
-{
-	int i;
-
-	for (i = 0; i < n; i++) {
-		if (fl[i].type && fl[i].xdata) {
-			FreeMapInfo(fl[i].xdata);
-			free(fl[i].xdata);
-			fl[i].xdata = NULL;
-		}
-		free(fl[i].name);
-	}
-}
-
-/**
 ** Initialize the scenario selector menu.
 */
 static void ScenSelectInit(Menuitem* mi)
@@ -3081,23 +3117,6 @@ static void ScenSelectLBAction(Menuitem* mi, int i)
 		} else {
 			mi->Menu->Items[3].D.Button.Text = strdup("Open");
 		}
-	}
-}
-
-/**
-** Scenario select listbox exit callback
-*/
-static void ScenSelectLBExit(Menuitem* mi)
-{
-	FileList *fl;
-
-	if (mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		FreeMapInfos(fl, mi->D.Listbox.noptions);
-		free(fl);
-		mi->D.Listbox.options = NULL;
-		mi->D.Listbox.noptions = 0;
-		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -3204,7 +3223,7 @@ static void ScenSelectLBInit(Menuitem* mi)
 {
 	int i;
 
-	ScenSelectLBExit(mi);
+	LBExit(mi);
 	if (mi->Menu->Items[6].D.Pulldown.curopt == 0) {
 		mi->Menu->Items[8].Flags |= MenuButtonDisabled;
 	} else {
@@ -3225,50 +3244,6 @@ static void ScenSelectLBInit(Menuitem* mi)
 			mi[1].Flags |= MenuButtonDisabled;
 		}
 	}
-}
-
-/**
-**  Scenario select listbox retrieve callback
-*/
-static unsigned char* ScenSelectLBRetrieve(Menuitem* mi, int i)
-{
-	FileList* fl;
-	MapInfo* info;
-	static char buffer[1024];
-	int j;
-	int n;
-
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			if (i == mi->D.Listbox.curopt) {
-				if ((info = fl[i].xdata)) {
-					if (info->Description) {
-						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254, LargeFont, info->Description);
-					}
-					sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-					VideoDrawText(mi->Menu->X + 8,mi->Menu->Y + 254 + 20, LargeFont, buffer);
-					for (n = j = 0; j < PlayerMax; j++) {
-						if (info->PlayerType[j] == PlayerPerson) {
-							n++;
-						}
-					}
-					if (n == 1) {
-						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, "1 player");
-					} else {
-						sprintf(buffer, "%d players", n);
-						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 254 + 40, LargeFont, buffer);
-					}
-				}
-			}
-			strcpy(buffer, "   ");
-		} else {
-			strcpy(buffer, "\260 ");
-		}
-		strcat(buffer, fl[i].name);
-		return buffer;
-	}
-	return NULL;
 }
 
 /**
@@ -4686,7 +4661,7 @@ static void EditorMainLoadLBInit(Menuitem* mi)
 {
 	int i;
 
-	EditorMainLoadLBExit(mi);
+	LBExit(mi);
 	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorMainLoadRDFilter,
 		(FileList **) & (mi->D.Listbox.options));
 
@@ -4700,23 +4675,6 @@ static void EditorMainLoadLBInit(Menuitem* mi)
 		if (i > mi->D.Listbox.nlines) {
 			mi[1].Flags &= ~MenuButtonDisabled;
 		}
-	}
-}
-
-/**
-** Editor main load listbox exit callback
-*/
-static void EditorMainLoadLBExit(Menuitem* mi)
-{
-	FileList *fl;
-
-	if (mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		FreeMapInfos(fl, mi->D.Listbox.noptions);
-		free(fl);
-		mi->D.Listbox.options = NULL;
-		mi->D.Listbox.noptions = 0;
-		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -4903,50 +4861,6 @@ static void EditorMainLoadCancel(void)
 	CurrentMenu->Items[5].D.Button.Text = NULL;
 
 	EndMenu();
-}
-
-/**
-** Editor main load listbox retrieve callback
-*/
-static unsigned char* EditorMainLoadLBRetrieve(Menuitem* mi, int i)
-{
-	FileList* fl;
-	MapInfo* info;
-	static char buffer[1024];
-	int j;
-	int n;
-
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			if (i == mi->D.Listbox.curopt) {
-				if ((info = fl[i].xdata)) {
-					if (info->Description) {
-						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234, LargeFont, info->Description);
-					}
-					sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-					VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234 + 20, LargeFont, buffer);
-					for (n = j = 0; j < PlayerMax; j++) {
-						if (info->PlayerType[j] == PlayerPerson) {
-							n++;
-						}
-					}
-					if (n == 1) {
-						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234 + 40, LargeFont, "1 player");
-					} else {
-						sprintf(buffer, "%d players", n);
-						VideoDrawText(mi->Menu->X + 8, mi->Menu->Y + 234 + 40, LargeFont, buffer);
-					}
-				}
-			}
-			strcpy(buffer, "   ");
-		} else {
-			strcpy(buffer, "\260 ");
-		}
-		strcat(buffer, fl[i].name);
-		return buffer;
-	}
-	return NULL;
 }
 
 /**
@@ -5481,7 +5395,7 @@ static void EditorSaveLBInit(Menuitem* mi)
 {
 	int i;
 
-	EditorSaveLBExit(mi);
+	LBExit(mi);
 	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorSaveRDFilter,
 		(FileList **) & (mi->D.Listbox.options));
 
@@ -5497,22 +5411,6 @@ static void EditorSaveLBInit(Menuitem* mi)
 		if (i > mi->D.Listbox.nlines) {
 			mi[1].Flags &= ~MenuButtonDisabled;
 		}
-	}
-}
-
-/**
-** Editor save listbox exit callback
-*/
-static void EditorSaveLBExit(Menuitem* mi)
-{
-	FileList *fl;
-
-	if (mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(fl);
-		mi->D.Listbox.options = NULL;
-		mi->D.Listbox.noptions = 0;
-		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -5658,27 +5556,6 @@ static void EditorSaveCancel(void)
 
 	menu = FindMenu("menu-editor-save");
 	menu->Items[6].D.Button.Text = NULL;
-}
-
-/**
-**  Editor save listbox retrieve callback
-*/
-static unsigned char* EditorSaveLBRetrieve(Menuitem* mi, int i)
-{
-	FileList* fl;
-	static char buffer[1024];
-
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			strcpy(buffer, "   ");
-		} else {
-			strcpy(buffer, "\260 ");
-		}
-		strcat(buffer, fl[i].name);
-		return buffer;
-	}
-	return NULL;
 }
 
 /**
@@ -5835,7 +5712,7 @@ static void ReplayGameLBInit(Menuitem* mi)
 {
 	int i;
 
-	ReplayGameLBExit(mi);
+	LBExit(mi);
 	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, ReplayGameRDFilter,
 		(FileList **) & (mi->D.Listbox.options));
 
@@ -5851,22 +5728,6 @@ static void ReplayGameLBInit(Menuitem* mi)
 		} else {
 			mi[1].Flags |= MenuButtonDisabled;
 		}
-	}
-}
-
-/**
-** Replay game listbox exit callback
-*/
-static void ReplayGameLBExit(Menuitem* mi)
-{
-	FileList *fl;
-
-	if (mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(fl);
-		mi->D.Listbox.options = NULL;
-		mi->D.Listbox.noptions = 0;
-		mi[1].Flags |= MenuButtonDisabled;
 	}
 }
 
@@ -5934,27 +5795,6 @@ static void ReplayGameLBAction(Menuitem* mi, int i)
 			mi->Menu->Items[3].D.Button.Text = strdup("Open");
 		}
 	}
-}
-
-/**
-**  Replay game listbox retrieve
-*/
-static unsigned char* ReplayGameLBRetrieve(Menuitem* mi, int i)
-{
-	FileList* fl;
-	static char buffer[1024];
-
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			strcpy(buffer, "   ");
-		} else {
-			strcpy(buffer, "\260 ");
-		}
-		strcat(buffer, fl[i].name);
-		return buffer;
-	}
-	return NULL;
 }
 
 /**
