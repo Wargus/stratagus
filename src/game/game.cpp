@@ -499,7 +499,13 @@ global void CreateGame(char* filename, WorldMap* map)
 
     SetDefaultTextColors(TheUI.NormalFontColor,TheUI.ReverseFontColor);
 
-    MapViewportCenter(0,ThisPlayer->StartX,ThisPlayer->StartY);
+#if 0
+    if (!TheUI.SelectedViewport) {
+	TheUI.SelectedViewport = TheUI.Viewports;
+    }
+#endif
+    ViewportCenterViewpoint(TheUI.SelectedViewport,
+	    ThisPlayer->StartX,ThisPlayer->StartY);
 
     //
     //	Various hacks wich must be done after the map is loaded.

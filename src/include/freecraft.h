@@ -154,6 +154,12 @@
 #endif
 
 /*============================================================================
+==	Includes
+============================================================================*/
+
+#include "fc_types.h"
+
+/*============================================================================
 ==	Debug definitions
 ============================================================================*/
 
@@ -426,15 +432,6 @@ extern unsigned long FrameCounter;
 
     /// Counts quantity of slow frames
 extern int SlowFrameCounter;
-
-/*----------------------------------------------------------------------------
---	Convert
-----------------------------------------------------------------------------*/
-
-extern int Viewport2MapX(int v, int x);	/// Convert screen pixel to map tile
-extern int Viewport2MapY(int v, int y);	/// Convert screen pixel to map tile
-extern int Map2ViewportX(int v, int x);	/// Convert map tile to screen pixel
-extern int Map2ViewportY(int v, int y);	/// Convert map tile to screen pixel
 
 /*----------------------------------------------------------------------------
 --	clone.c

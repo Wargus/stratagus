@@ -225,19 +225,20 @@ global int SelectUnitsByType(Unit* base)
     const UnitType* type;
     int r;
     int i;
-    const Viewport* v;
+    const Viewport* vp;
+
+    DebugCheck( TheUI.MouseViewport );
+    DebugLevel3Fn(" %s\n" _C_ base->Type->Ident);
 
     type=base->Type;
-
-    DebugLevel3Fn(" %s\n" _C_ base->Type->Ident);
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
     /* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
      * took parameters of the selection rectangle as arguments */
-    v = &TheUI.VP[TheUI.ActiveViewport];
-    r = SelectUnits(v->MapX-1, v->MapY-1, v->MapX + v->MapWidth+1,
-		v->MapY + v->MapHeight+1, table);
+    vp = TheUI.MouseViewport;
+    r = SelectUnits(vp->MapX-1, vp->MapY-1, vp->MapX + vp->MapWidth+1,
+		vp->MapY + vp->MapHeight+1, table);
 
     // if unit is a cadaver or hidden (not on map)
     // no unit can be selected.
@@ -311,19 +312,18 @@ global int ToggleUnitsByType(Unit* base)
     const UnitType* type;
     int r;
     int i;
-    const Viewport* v;
 
     type = base->Type;
-
-    DebugLevel2Fn(" %s FIXME: toggle not written.\n" _C_ base->Type->Ident);
+    DebugLevel2Fn(" %s FIXME: toggle not written.\n" _C_ type->Ident);
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
-    /* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
-     * took parameters of the selection rectangle as arguments */
-    v = &TheUI.VP[TheUI.ActiveViewport];
-    r = SelectUnits(v->MapX-1, v->MapY-1, v->MapX + v->MapWidth + 1,
-		v->MapY + v->MapHeight + 1, table);
+    // FIXME: this should probably be cleaner implemented if SelectUnitsByType()
+    // took parameters of the selection rectangle as arguments */
+    r = SelectUnits(TheUI.MouseViewport->MapX - 1,
+	TheUI.MouseViewport->MapY - 1,
+	TheUI.MouseViewport->MapX + TheUI.MouseViewport->MapWidth + 1,
+	TheUI.MouseViewport->MapY + TheUI.MouseViewport->MapHeight + 1, table);
 
     // if unit is a cadaver or hidden (not on map)
     // no unit can be selected.
@@ -340,10 +340,10 @@ global int ToggleUnitsByType(Unit* base)
 	return 0;
     }
     //
-    //	Search for other visible units of the same type
+    //  Search for other visible units of the same type
     //
     // FIXME: peon/peasant with gold/wood & co are considered from
-    //	      different type... idem for tankers
+    //        different type... idem for tankers
     for (i = 0; i < r; ++i) {
 	unit = table[i];
 	if (unit->Player != ThisPlayer || unit->Type != type) {
@@ -483,22 +483,29 @@ local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
     int i;
 
     for (i=n=0; i<num_units; i++) {
-	int sprite_x, sprite_y;
-	Unit *unit = table[i];
-	UnitType *type = unit->Type;
+	int sprite_x;
+	int sprite_y;
+	Unit* unit;
+	const UnitType* type;
 
+	unit = table[i];
+	type = unit->Type;
 	sprite_x = unit->X*TileSizeX + unit->IX;
 	sprite_x -= (type->BoxWidth - TileSizeX*type->TileWidth)/2;
 	sprite_y = unit->Y*TileSizeY + unit->IY;
 	sprite_y -= (type->BoxHeight - TileSizeY*type->TileHeight)/2;
-	if (sprite_x + type->BoxWidth < sx0)
+	if (sprite_x + type->BoxWidth < sx0) {
 	    continue;
-	if (sprite_x > sx1)
+	}
+	if (sprite_x > sx1) {
 	    continue;
-	if (sprite_y + type->BoxHeight < sy0)
+	}
+	if (sprite_y + type->BoxHeight < sy0) {
 	    continue;
-	if (sprite_y > sy1)
+	}
+	if (sprite_y > sy1) {
 	    continue;
+	}
 	table[n++] = unit;
     }
     return n;
@@ -624,7 +631,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     for( i=0; i<r; ++i ) {
 	unit=table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisibleInViewport(TheUI.LastClickedVP,unit) ) {
+	if( !UnitVisibleInViewport(TheUI.SelectedViewport, unit) ) {
 	    continue;
 	}
 	type=unit->Type;
@@ -645,7 +652,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     for( i=0; i<r; ++i ) {
 	unit=table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisibleInViewport(TheUI.LastClickedVP,unit) ) {
+	if( !UnitVisibleInViewport(TheUI.SelectedViewport,unit) ) {
 	    continue;
 	}
 	// Buildings are visible but not selectable

@@ -700,12 +700,12 @@ local void GetMissileMapArea( const Missile* missile,
 /**
 **      Check missile visibility in a given viewport.
 **
-**	@param v	Number of viewport to be checked.
+**	@param vp	Viewport to be checked.
 **      @param missile  Missile pointer to check if visible.
 **
 **      @return         Returns true if visible, false otherwise.
 */
-local int MissileVisibleInViewport(int v, const Missile* missile)
+local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 {
     int min_x;
     int max_x;
@@ -713,7 +713,7 @@ local int MissileVisibleInViewport(int v, const Missile* missile)
     int max_y;
 
     GetMissileMapArea(missile, &min_x, &min_y, &max_x, &max_y);
-    if (!AnyMapAreaVisibleInViewport(v, min_x, min_y, max_x, max_y)) {
+    if (!AnyMapAreaVisibleInViewport(vp, min_x, min_y, max_x, max_y)) {
 	return 0;
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_ min_x _C_ max_x _C_
@@ -759,11 +759,10 @@ local void DrawMissile(const MissileType* mtype,int frame,int x,int y)
 /**
 **	Draw all missiles on map.
 **
-**	@param v	Viewport
+**	@param vp	Viewport pointer.
 */
-global void DrawMissiles(int v)
+global void DrawMissiles(const Viewport* vp)
 {
-    const Viewport* view;
     const Missile* missile;
     Missile* const* missiles;
     Missile* const* missiles_end;
@@ -771,7 +770,6 @@ global void DrawMissiles(int v)
     int y;
     int flag;
 
-    view = &TheUI.VP[v];
     //
     //	Loop through global missiles, than through locals.
     //
@@ -788,9 +786,9 @@ global void DrawMissiles(int v)
 		continue;	// delayed aren't shown
 	    }
 	    // Draw only visible missiles
-	    if (MissileVisibleInViewport (v, missile)) {
-		x = missile->X - view->MapX * TileSizeX + view->X;
-		y = missile->Y - view->MapY * TileSizeY + view->Y;
+	    if (MissileVisibleInViewport (vp, missile)) {
+		x = missile->X - vp->MapX * TileSizeX + vp->X;
+		y = missile->Y - vp->MapY * TileSizeY + vp->Y;
 		// FIXME: I should copy SourcePlayer for second level missiles.
 		if( missile->SourceUnit && missile->SourceUnit->Player ) {
 		    GraphicPlayerPixels(missile->SourceUnit->Player

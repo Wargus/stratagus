@@ -94,13 +94,13 @@ global jmp_buf MainLoopJmpBuf;		/// Hierarchic pathfinder error exit.
 */
 local void MoveMapViewPointUp(int step)
 {
-    Viewport* v;
+    Viewport* vp;
 
-    v = &TheUI.VP[TheUI.LastClickedVP];
-    if (v->MapY > step) {
-	v->MapY -= step;
+    vp = TheUI.SelectedViewport;
+    if (vp->MapY > step) {
+	vp->MapY -= step;
     } else {
-	v->MapY = 0;
+	vp->MapY = 0;
     }
 }
 
@@ -111,13 +111,13 @@ local void MoveMapViewPointUp(int step)
 */
 local void MoveMapViewPointLeft(int step)
 {
-    Viewport* v;
+    Viewport* vp;
 
-    v = &TheUI.VP[TheUI.LastClickedVP];
-    if (v->MapX > step) {
-	v->MapX -= step;
+    vp = TheUI.SelectedViewport;
+    if (vp->MapX > step) {
+	vp->MapX -= step;
     } else {
-	v->MapX = 0;
+	vp->MapX = 0;
     }
 }
 
@@ -128,14 +128,14 @@ local void MoveMapViewPointLeft(int step)
 */
 local void MoveMapViewPointDown(int step)
 {
-    Viewport* v;
+    Viewport* vp;
 
-    v = &TheUI.VP[TheUI.LastClickedVP];
-    if (TheMap.Height > v->MapHeight
-	    && v->MapY < TheMap.Height - v->MapHeight - step) {
-	v->MapY += step;
+    vp = TheUI.SelectedViewport;
+    if (TheMap.Height > vp->MapHeight
+	    && vp->MapY < TheMap.Height - vp->MapHeight - step) {
+	vp->MapY += step;
     } else {
-	v->MapY = TheMap.Height - v->MapHeight;
+	vp->MapY = TheMap.Height - vp->MapHeight;
     }
 }
 
@@ -146,14 +146,14 @@ local void MoveMapViewPointDown(int step)
 */
 local void MoveMapViewPointRight(int step)
 {
-    Viewport* v;
+    Viewport* vp;
 
-    v = &TheUI.VP[TheUI.LastClickedVP];
-    if (TheMap.Width > v->MapWidth
-	    && v->MapX < TheMap.Width - v->MapWidth - step) {
-	v->MapX += step;
+    vp = TheUI.SelectedViewport;
+    if (TheMap.Width > vp->MapWidth
+	    && vp->MapX < TheMap.Width - vp->MapWidth - step) {
+	vp->MapX += step;
     } else {
-	v->MapX = TheMap.Width - v->MapWidth;
+	vp->MapX = TheMap.Width - vp->MapWidth;
     }
 }
 
@@ -177,8 +177,8 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
     int stepy;
 
     if (fast) {
-	stepx = TheUI.VP[TheUI.LastClickedVP].MapWidth / 2;
-	stepy = TheUI.VP[TheUI.LastClickedVP].MapHeight / 2;
+	stepx = TheUI.SelectedViewport->MapWidth / 2;
+	stepy = TheUI.SelectedViewport->MapHeight / 2;
     } else {		// dynamic: let these variables increase upto fast..
 	stepx = stepy = 1;
     }
@@ -320,11 +320,11 @@ local void DrawMenuButtonArea(void)
 /**
 **	Draw a map viewport.
 **
-**	@param v	Viewport number.
+**	@param vp	Viewport pointer.
 **
 **	@note	Johns: I think parsing the viewport pointer is faster.
 */
-local void DrawMapViewport(int v)
+local void DrawMapViewport(Viewport* vp)
 {
 #ifdef NEW_DECODRAW
     // Experimental new drawing mechanism, which can keep track of what is
@@ -339,38 +339,37 @@ local void DrawMapViewport(int v)
 #else
     if (InterfaceState == IfaceStateNormal) {
 #ifdef NEW_MAPDRAW
-	MapUpdateFogOfWar(TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	MapUpdateFogOfWar(vp->MapX, vp->MapY);
 #else
 	int u;
 
 	// FIXME: Johns: this didn't work correct with viewports!
 	// FIXME: only needed until flags are correct set
-	for( u=0; u < TheUI.VP[v].MapHeight; ++u ) {
+	for( u=0; u < vp->MapHeight; ++u ) {
 	    MustRedrawRow[u]=1;
 	}
-	for (u=0; u<TheUI.VP[v].MapHeight*TheUI.VP[v].MapWidth; ++u ) {
+	for (u=0; u<vp->MapHeight*vp->MapWidth; ++u ) {
 	    MustRedrawTile[u]=1;
 	}
 #endif
 	//
 	//	An unit is tracked, center viewport on this unit.
 	//
-	if (TheUI.VP[v].Unit) {
-	    if (TheUI.VP[v].Unit->Destroyed ||
-		    TheUI.VP[v].Unit->Orders[0].Action == UnitActionDie) {
-		TheUI.VP[v].Unit = NoUnitP;
+	if (vp->Unit) {
+	    if (vp->Unit->Destroyed ||
+		    vp->Unit->Orders[0].Action == UnitActionDie) {
+		vp->Unit = NoUnitP;
 	    } else {
-		MapViewportCenter(v, TheUI.VP[v].Unit->X, TheUI.VP[v].Unit->Y);
+		ViewportCenterViewpoint(vp, vp->Unit->X, vp->Unit->Y);
 	    }
 	}
 
-	SetClipping(TheUI.VP[v].X, TheUI.VP[v].Y,
-		TheUI.VP[v].EndX, TheUI.VP[v].EndY);
+	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
-	DrawMapBackgroundInViewport(v, TheUI.VP[v].MapX, TheUI.VP[v].MapY);
-	DrawUnits(v);
-	DrawMapFogOfWar(v, TheUI.VP[v].MapX, TheUI.VP[v].MapY);
-	DrawMissiles(v);
+	DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
+	DrawUnits(vp);
+	DrawMapFogOfWar(vp, vp->MapX, vp->MapY);
+	DrawMissiles(vp);
 	DrawConsole();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     }
@@ -394,14 +393,16 @@ local void DrawMapViewport(int v)
 */
 global void DrawMapArea(void)
 {
-    int i;
+    Viewport* vp;
+    const Viewport* evp;
 
     // Draw all map viewports
-    for (i = 0; i < TheUI.NumViewports; i++) {
-	DrawMapViewport(i);
+    evp = TheUI.Viewports + TheUI.NumViewports;
+    for (vp = TheUI.Viewports; vp < evp; vp++) {
+	DrawMapViewport(vp);
     }
 
-    // if we a single viewport, no need to denote the "last clicked" one
+    // if we a single viewport, no need to denote the "selected" one
     if (TheUI.NumViewports == 1) {
 	return;
     }
@@ -409,24 +410,23 @@ global void DrawMapArea(void)
     //
     //	Separate the viewports and mark the active viewport.
     //
-    for (i = 0; i < TheUI.NumViewports; i++) {
+    for (vp = TheUI.Viewports; vp < evp; vp++) {
 	enum _sys_colors_ color;
 
-	if (i == TheUI.LastClickedVP) {
+	if (vp == TheUI.SelectedViewport) {
 	    color = ColorOrange;
 	} else {
 	    color = ColorBlack;
 	}
 
-	// FIXME: johns this should be always on screen?
-	VideoDrawLineClip(color, TheUI.VP[i].X, TheUI.VP[i].Y, TheUI.VP[i].X,
-	    TheUI.VP[i].EndY);
-	VideoDrawLineClip(color, TheUI.VP[i].X, TheUI.VP[i].Y,
-	    TheUI.VP[i].EndX, TheUI.VP[i].Y);
-	VideoDrawLineClip(color, TheUI.VP[i].EndX, TheUI.VP[i].Y,
-	    TheUI.VP[i].EndX, TheUI.VP[i].EndY);
-	VideoDrawLineClip(color, TheUI.VP[i].X, TheUI.VP[i].EndY,
-	    TheUI.VP[i].EndX, TheUI.VP[i].EndY);
+	// -
+	VideoDrawLine(color, vp->X, vp->Y, vp->EndX, vp->Y);
+	// |
+	VideoDrawLine(color, vp->X, vp->Y + 1, vp->X, vp->EndY);
+	// -
+	VideoDrawLine(color, vp->X + 1, vp->EndY, vp->EndX - 1, vp->EndY);
+	// |
+	VideoDrawLine(color, vp->EndX, vp->Y + 1, vp->EndX, vp->EndY);
     }
 }
 
@@ -470,24 +470,15 @@ global void UpdateDisplay(void)
     PlayerPixels(Players);		// Reset to default colors
 
     if( MustRedraw&RedrawMinimap ) {
-	int v;
-
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
-	// FIXME: We shouldn't allow TheUI.LastClickedVP==-1
-	v = TheUI.LastClickedVP;
-	if( v>=0 ) {
-	    DrawMinimap(TheUI.VP[v].MapX, TheUI.VP[v].MapY);
-	    DrawMinimapCursor(TheUI.VP[v].MapX, TheUI.VP[v].MapY);
-	}
+	DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
+	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
+		TheUI.SelectedViewport->MapY);
     } else if (MustRedraw&RedrawMinimapCursor) {
-	int v;
-
 	HideMinimapCursor();
-	v = TheUI.LastClickedVP;
-	if( v>=0 ) {
-	    DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
-	}
+	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
+		TheUI.SelectedViewport->MapY);
     }
 
     if( MustRedraw&RedrawInfoPanel ) {

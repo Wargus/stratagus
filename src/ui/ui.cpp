@@ -113,7 +113,7 @@ global void InitUserInterface(const char *race_name)
     //
     //	Calculations
     //
-    TheUI.LastClickedVP = 0;
+    TheUI.SelectedViewport = TheUI.Viewports;
 
     SetViewportMode(VIEWPORT_SINGLE);
 
@@ -125,6 +125,7 @@ global void InitUserInterface(const char *race_name)
 	TheUI.NormalFontColor = FontYellow;
 	TheUI.ReverseFontColor = FontWhite;
     }
+    TheUI.ViewportCursorColor = ColorWhite;
 }
 
 /**
@@ -576,25 +577,28 @@ global void CleanUserInterface(void)
 
 /**
 **	Takes coordinates of a pixel in freecraft's window and computes
-**	the number of the map viewport which contains this pixel.
+**	the map viewport which contains this pixel.
 **
-**	@param x	x pixel coordinate with origin at UL corner of FC window
-**	@param y	y pixel coordinate with origin at UL corner of FC window
+**	@param x	x pixel coordinate with origin at UL corner of screen
+**	@param y	y pixel coordinate with origin at UL corner of screen
 **
-**	@return		viewport number (index into TheUI.VP) or -1
-**			if this pixel is not inside any of the viewports.
+**	@return		viewport pointer or NULL if this pixel is not inside
+**			any of the viewports.
+**
+**	@note	This functions only works with rectangular viewports, when
+**		we support shaped map window, this must be rewritten.
 */
-global int GetViewport(int x, int y)
+global Viewport* GetViewport(int x, int y)
 {
-    int i;
+    Viewport* vp;
 
-    for (i = 0; i < TheUI.NumViewports; i++) {
-	if (x >= TheUI.VP[i].X && x <= TheUI.VP[i].EndX
-		&& y >= TheUI.VP[i].Y && y <= TheUI.VP[i].EndY) {
-	    return i;
+    for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports;
+	    vp++) {
+	if (x >= vp->X && x <= vp->EndX && y >= vp->Y && y <= vp->EndY) {
+	    return vp;
 	}
     }
-    return -1;
+    return NULL;
 }
 
 /**
@@ -604,7 +608,7 @@ global int GetViewport(int x, int y)
 **	@param tx	x coordinate of the map tile
 **	@param ty	y coordinate of the map tile
 **
-**	@return		viewport number (index into TheUI.VP) or -1
+**	@return		viewport pointer (index into TheUI.Viewports) or NULL
 **			if this map tile is not displayed in any of
 **			the viewports.
 **
@@ -612,20 +616,18 @@ global int GetViewport(int x, int y)
 **			than one viewports (may well happen) this function
 **			returns the first one it finds.
 */
-global int MapTileGetViewport(int tx, int ty)
+global Viewport* MapTileGetViewport(int tx, int ty)
 {
-    int i;
-    const Viewport *vp;
+    Viewport* vp;
 
-    for (i = 0; i < TheUI.NumViewports; i++) {
-
-	vp = &TheUI.VP[i];
+    for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports;
+		vp++) {
 	if (tx >= vp->MapX && tx < vp->MapX + vp->MapWidth
 		&& ty >= vp->MapY && ty < vp->MapY + vp->MapHeight) {
-	    return i;
+	    return vp;
 	}
     }
-    return -1;
+    return NULL;
 }
 
 /**
@@ -642,53 +644,57 @@ global int MapTileGetViewport(int tx, int ty)
 local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 {
     int i;
-    int active;
 
     // If the number of viewports increases we need to compute what to display
     // in the newly created ones.  We need to do this before we store new
-    // geometry information in the TheUI.VP field because we use the old
+    // geometry information in the TheUI.Viewports field because we use the old
     // geometry information for map origin computation.
     if (TheUI.NumViewports < num_vps) {
-	for (i=0; i < num_vps; i++) {
-	    int v;
+	for (i = 0; i < num_vps; i++) {
+	    const Viewport* vp;
 
-	    v = GetViewport (new_vps[i].X, new_vps[i].Y);
-	    if (v != -1) {
-		TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
-		TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
+	    vp = GetViewport(new_vps[i].X, new_vps[i].Y);
+	    if (vp) {
+		TheUI.Viewports[i].MapX = Viewport2MapX(vp, new_vps[i].X);
+		TheUI.Viewports[i].MapY = Viewport2MapY(vp, new_vps[i].Y);
 	    } else {
-		TheUI.VP[i].MapX = 0;
-		TheUI.VP[i].MapY = 0;
+		TheUI.Viewports[i].MapX = 0;
+		TheUI.Viewports[i].MapY = 0;
 	    }
 	}
     }
 
     for (i = 0; i < num_vps; i++) {
-	TheUI.VP[i].X = new_vps[i].X;
-	TheUI.VP[i].EndX = new_vps[i].EndX;
-	TheUI.VP[i].Y = new_vps[i].Y;
-	TheUI.VP[i].EndY = new_vps[i].EndY;
-	TheUI.VP[i].MapWidth =
+	TheUI.Viewports[i].X = new_vps[i].X;
+	TheUI.Viewports[i].EndX = new_vps[i].EndX;
+	TheUI.Viewports[i].Y = new_vps[i].Y;
+	TheUI.Viewports[i].EndY = new_vps[i].EndY;
+	TheUI.Viewports[i].MapWidth =
 	    (new_vps[i].EndX - new_vps[i].X + TileSizeX) / TileSizeX;
-	TheUI.VP[i].MapHeight =
+	TheUI.Viewports[i].MapHeight =
 	    (new_vps[i].EndY - new_vps[i].Y + TileSizeY) / TileSizeY;
 
-	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width) {
-	    TheUI.VP[i].MapX -=
-		(TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) - TheMap.Width;
+	if (TheUI.Viewports[i].MapWidth + TheUI.Viewports[i].MapX >
+	    TheMap.Width) {
+	    TheUI.Viewports[i].MapX -=
+		(TheUI.Viewports[i].MapWidth + TheUI.Viewports[i].MapX) -
+		TheMap.Width;
 	}
-	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height) {
-	    TheUI.VP[i].MapY -=
-		(TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) - TheMap.Height;
+	if (TheUI.Viewports[i].MapHeight + TheUI.Viewports[i].MapY >
+	    TheMap.Height) {
+	    TheUI.Viewports[i].MapY -=
+		(TheUI.Viewports[i].MapHeight + TheUI.Viewports[i].MapY) -
+		TheMap.Height;
 	}
     }
     TheUI.NumViewports = num_vps;
-    active = GetViewport(CursorX, CursorY);
-    if (active != -1) {
-	TheUI.ActiveViewport = active;
-    }
-    if (TheUI.LastClickedVP >= TheUI.NumViewports) {
-	TheUI.LastClickedVP = TheUI.NumViewports - 1;
+
+    //
+    //  Update the viewport pointers
+    //
+    TheUI.MouseViewport = GetViewport(CursorX, CursorY);
+    if (TheUI.SelectedViewport > TheUI.Viewports + TheUI.NumViewports - 1) {
+	TheUI.SelectedViewport = TheUI.Viewports + TheUI.NumViewports - 1;
     }
 }
 
@@ -697,7 +703,7 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 **	correctly filled-in and computes Viewport::End[XY] attributes
 **	according to clipping information passed in other two arguments.
 **
-**	@param v	The viewport.
+**	@param vp	The viewport.
 **	@param ClipX	Maximum x-coordinate of the viewport's right side
 **			as dictated by current UI's geometry and ViewportMode.
 **	@param ClipY	Maximum y-coordinate of the viewport's bottom side
@@ -706,26 +712,26 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 **	@note		It is supposed that values passed in Clip[XY] will
 **			never be greater than TheUI::MapArea::End[XY].
 **			However, they can be smaller according to the place
-**			the viewport v takes in context of current ViewportMode.
+**			the viewport vp takes in context of current ViewportMode.
 */
-local void ClipViewport(Viewport* v, int ClipX, int ClipY)
+local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 {
     // begin with maximum possible viewport size
-    v->EndX = v->X + TheMap.Width * TileSizeX - 1;
-    v->EndY = v->Y + TheMap.Height * TileSizeY - 1;
+    vp->EndX = vp->X + TheMap.Width * TileSizeX - 1;
+    vp->EndY = vp->Y + TheMap.Height * TileSizeY - 1;
 
     // first clip it to MapArea size if necessary
-    if (v->EndX > ClipX) {
-	v->EndX = ClipX;
+    if (vp->EndX > ClipX) {
+	vp->EndX = ClipX;
     }
     // then clip it to the nearest lower TileSize boundary if necessary
-    v->EndX -= (v->EndX - v->X + 1) % TileSizeX;
+    vp->EndX -= (vp->EndX - vp->X + 1) % TileSizeX;
 
     // the same for y
-    if (v->EndY > ClipY) {
-	v->EndY = ClipY;
+    if (vp->EndY > ClipY) {
+	vp->EndY = ClipY;
     }
-    v->EndY -= (v->EndY - v->Y + 1) % TileSizeY;
+    vp->EndY -= (vp->EndY - vp->Y + 1) % TileSizeY;
 }
 
 /**

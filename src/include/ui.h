@@ -67,9 +67,12 @@ struct _button_ {
     int	    Height;			/// height of the button on the screen
 };
 
-#define MAX_NUM_VIEWPORTS 4		/// Number of supported viewports
+#define MAX_NUM_VIEWPORTS 8		/// Number of supported viewports
 
+#if !defined(__STRUCT_VIEWPORT__)
+#define __STRUCT_VIEWPORT__		/// protect duplicate viewport typedef
 typedef struct _viewport_ Viewport;	/// Viewport typedef
+#endif
 
 /**
 **	A map viewport.
@@ -235,13 +238,11 @@ typedef struct _ui_ {
     int		ButtonPanelY;		/// Button panel screen Y position
 
     // Map area
-    ViewportMode	ViewportMode;	/// Current viewport mode
-    // FIXME: Johns: we should make the ints pointers
-	/// Contains (or last contained) pointer (index into VP[])
-    int		ActiveViewport;
-    int		LastClickedVP;		/// Last clicked = active viewport
+    ViewportMode ViewportMode;		/// Current viewport mode
+    Viewport*	MouseViewport;		/// Viewport containing mouse
+    Viewport*	SelectedViewport;	/// Current selected active viewport
     int		NumViewports;		/// # Viewports currently used
-    Viewport	VP[MAX_NUM_VIEWPORTS];	/// Parameters of all viewports
+    Viewport	Viewports[MAX_NUM_VIEWPORTS];	/// Parameters of all viewports
     // Map* attributes of Viewport are unused here:
     Viewport	MapArea;		/// geometry of the whole map area
 
@@ -254,6 +255,7 @@ typedef struct _ui_ {
     GraphicConfig Minimap;		/// minimap panel background
     int		MinimapX;		/// minimap screen X position
     int		MinimapY;		/// minimap screen Y position
+    int		ViewportCursorColor;	/// minimap cursor color
 
     // The status line
     GraphicConfig StatusLine;		/// Status line background
@@ -337,14 +339,31 @@ extern void RestrictCursorToViewport(void);
     /// Restrict mouse cursor to minimap
 extern void RestrictCursorToMinimap(void);
 
-    /// FIXME: Short one line docu
-extern int GetViewport(int, int);
-    /// FIXME: Short one line docu
-extern int MapTileGetViewport(int, int);
-    /// FIXME: Short one line docu
+    /// Get viewport for screen pixel position
+extern Viewport* GetViewport(int, int);
+    /// Get viewport for tile map position
+extern Viewport* MapTileGetViewport(int, int);
+    /// Cycle through all available viewport modes
 extern void CycleViewportMode(int);
-    /// FIXME: Short one line docu
+    /// Select viewport mode
 extern void SetViewportMode(ViewportMode mode);
+
+    /// Convert screen X pixel to map tile
+extern int Viewport2MapX(const Viewport* vp, int x);
+    /// Convert screen Y pixel to map tile
+extern int Viewport2MapY(const Viewport* vp, int y);
+    /// Convert map tile to screen X pixel
+extern int Map2ViewportX(const Viewport* vp, int x);
+    /// Convert map tile to screen Y pixel
+extern int Map2ViewportY(const Viewport* vp, int y);
+
+    /// Set the current map view to x,y(upper,left corner)
+extern void ViewportSetViewpoint(Viewport* vp, int x, int y);
+    /// Center map on point in viewport
+extern void ViewportCenterViewpoint(Viewport* vp, int x, int y);
+
+    /// Returns true, if unit is visible on current map view
+extern int UnitVisibleInViewport(const Viewport* vp, const Unit* unit);
 
 //@}
 

@@ -202,13 +202,10 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
 global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
     int stereo;
-    const Viewport* v;
-
-    v = &TheUI.VP[TheUI.LastClickedVP];
 
     stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2
-	    + unit->IX - (int)v->MapX * TileSizeX) * 256
-		/ (((int)v->MapWidth - 1) * TileSizeX)) - 128;
+	    + unit->IX - TheUI.SelectedViewport->MapX * TileSizeX) * 256
+		/ ((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
     if (stereo < -128) {
 	stereo = -128;
     } else if (stereo > 127) {
@@ -229,13 +226,10 @@ global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 global void PlayMissileSound(const Missile* missile, SoundId sound)
 {
     int stereo;
-    const Viewport *v;
-
-    v = &TheUI.VP[TheUI.LastClickedVP];
 
     stereo = ((missile->X + missile->Type->Width / 2
-	    - (int)v->MapX * TileSizeX) * 256
-		/ (((int)v->MapWidth - 1) * TileSizeX)) - 128;
+	    - TheUI.SelectedViewport->MapX * TileSizeX) * 256
+		/ ((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
     if (stereo < -128) {
 	stereo = -128;
     } else if (stereo > 127) {
