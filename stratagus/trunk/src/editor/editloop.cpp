@@ -2031,6 +2031,8 @@ global void EditorMainLoop(void)
 	TileCursorSize = 1;
 
 	while (EditorRunning) {
+	    PlayListAdvance();
+
 	    if (MustRedraw & RedrawMinimap) {
 		UpdateMinimap();
 	    }

@@ -299,6 +299,8 @@ extern int ArtsGetSpace(void);
 
     /// Initialize the sound server.
 extern int InitSoundServer(void);
+    /// Start next song if necessary
+extern void PlayListAdvance(void);
 
 /** Ask the sound layer to write the content of its buffer to the sound
     device. To be used only in the unthreaded version.
@@ -320,7 +322,7 @@ extern void QuitSound(void);
 #define InitSound()	0		/// Dummy macro for without sound
 #define WriteSound	NULL		/// Dummy macro for without sound
 #define QuitSound()			/// Dummy macro for without sound
-
+#define PlayListAdvance()		/// Dummy macro for without sound
 #endif	// } WITH_SOUND
 
 extern int WaitForSoundDevice;		/// Block until sound device available
