@@ -384,6 +384,8 @@ local SCM CclSetCdMode(SCM mode)
 	cdmode=CDModeRandom;
     } else if( gh_eq_p(mode,gh_symbol2scm("defined")) ) {
 	cdmode=CDModeDefined;
+    } else if ( gh_eq_p(mode,gh_symbol2scm("off")) ) {
+	cdmode=CDModeOff;
     } else {
 	cdmode=CDModeOff;
 	errl("Unsupported tag",mode);
