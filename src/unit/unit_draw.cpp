@@ -41,6 +41,7 @@
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
+#include "editor.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -114,6 +115,11 @@ global const Viewport* CurrentViewport;	/// FIXME: quick hack for split screen
 */
 local VMemType* SelectionColor(const Unit* unit)
 {
+    if (EditorRunning && unit==UnitUnderCursor &&
+	    EditorState == EditorSelecting) {
+	return &ColorWhite;
+    }
+
     if (unit->Selected || (unit->Blink & 1)) {
 	if (unit->Player->Player == PlayerNumNeutral) {
 	    return &ColorYellow;
@@ -1931,8 +1937,8 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 	drawlevel2 = c2->Type->DrawLevel;
     }
     if (drawlevel1 == drawlevel2) {
-	return c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth + c2->X ? 
-	    c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth + c2->X : 
+	return c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth - c2->X ? 
+	    c1->Y * MaxMapWidth + c1->X - c2->Y * MaxMapWidth - c2->X : 
 	    c1->Slot - c2->Slot;
     } else {
 	return drawlevel1 <= drawlevel2 ? -1 : 1;

@@ -41,6 +41,14 @@
 extern char EditorRunning;
     /// Map loaded in editor
 extern char EditorMapLoaded;
+    /// Current editor state type.
+typedef enum _editor_state_type_ {
+    EditorSelecting,			/// Select
+    EditorEditTile,			/// Edit tiles
+    EditorEditUnit,			/// Edit units
+} EditorStateType;			/// Current editor state
+    /// Current editor state.
+extern EditorStateType EditorState;
 
     /// Editor CCL start file
 extern const char* EditorStartFile;
