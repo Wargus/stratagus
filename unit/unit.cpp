@@ -335,6 +335,7 @@ void InitUnit(Unit* unit, UnitType* type)
 	}
 
 	if (UnitTypeVar.NumberVariable) {
+		Assert(!unit->Variable);
 		unit->Variable = malloc(UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
 		memcpy(unit->Variable, unit->Type->Variable,
 			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
@@ -438,6 +439,12 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	unit->Stats = &type->Stats[unit->Player->Player];
 	unit->Colors = &player->UnitColors;
 	unit->HP = unit->Stats->HitPoints;
+	if (UnitTypeVar.NumberVariable) {
+		Assert(unit->Variable);
+		Assert(unit->Stats->Variables);
+		memcpy(unit->Variable, unit->Stats->Variables,
+			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+	}
 }
 
 /**

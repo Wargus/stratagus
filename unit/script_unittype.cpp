@@ -71,8 +71,6 @@ struct _UnitTypeVar_ UnitTypeVar;    ///< Variables for UnitType and unit.
 
 int GetSpriteIndex(const char* SpriteName);
 
-void DefineVariableField(lua_State* l, int var_index, int lua_index);
-
 DrawDecoFunc DrawBar;
 DrawDecoFunc PrintValue;
 DrawDecoFunc DrawSpriteBar;
@@ -995,7 +993,7 @@ static int CclDefineUnitType(lua_State* l)
 				if (lua_isboolean(l, -1)) {
 					type->Variable[i].Enable = LuaToBoolean(l, -1);
 				} else if (lua_istable(l, -1)) {
-					DefineVariableField(l, i, -1);
+					DefineVariableField(l, type->Variable + i, -1);
 				} else if (lua_isnumber(l, -1)) {
 					type->Variable[i].Enable = 1;
 					type->Variable[i].Value = LuaToNumber(l, -1);
@@ -1062,6 +1060,9 @@ static int CclDefineUnitStats(lua_State* l)
 	++j;
 
 	stats = &type->Stats[i];
+	if (!stats->Variables) {
+		stats->Variables = calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
+	}
 
 	//
 	// Parse the list: (still everything could be changed!)
@@ -1116,6 +1117,21 @@ static int CclDefineUnitStats(lua_State* l)
 				}
 			}
 		} else {
+			i = GetVariableIndex(value);
+			if (i != -1) { // valid index
+				if (lua_istable(l, j + 1)) {
+					DefineVariableField(l, stats->Variables + i, j + 1);
+				} else if (lua_isnumber(l, -1)) {
+					stats->Variables[i].Enable = 1;
+					stats->Variables[i].Value = LuaToNumber(l, j + 1);
+					stats->Variables[i].Max = LuaToNumber(l, j + 1);
+				} else { // Error
+					LuaError(l, "incorrect argument for the variable in unittype");
+				}
+				continue;
+			}
+
+
 		   // This leaves a half initialized unit
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1431,12 +1447,12 @@ static int CclDefineAnimations(lua_State* l)
 **  Define the field of the UserDefined variables.
 **
 **  @param l          Lua state.
-**  @param var_index  index of variable to set.
-**  @param var_index  index of the table where are the infos
+**  @param var        Variable to set.
+**  @param lua_index  Index of the table where are the infos
 **
 **  @internal Use to not duplicate code.
 */
-void DefineVariableField(lua_State* l, int var_index, int lua_index)
+void DefineVariableField(lua_State* l, VariableType* var, int lua_index)
 {
 	if (lua_index < 0) { // relative index
 		--lua_index;
@@ -1447,16 +1463,15 @@ void DefineVariableField(lua_State* l, int var_index, int lua_index)
 
 		key = LuaToString(l, -2);
 		if (!strcmp(key, "Value")) {
-			UnitTypeVar.Variable[var_index].Value = LuaToNumber(l, -1);
+			var->Value = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Max")) {
-			UnitTypeVar.Variable[var_index].Max = LuaToNumber(l, -1);
+			var->Max = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Increase")) {
-			UnitTypeVar.Variable[var_index].Increase = LuaToNumber(l, -1);
+			var->Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Enable")) {
-			UnitTypeVar.Variable[var_index].Enable = LuaToBoolean(l, -1);
+			var->Enable = LuaToBoolean(l, -1);
 		} else { // Error.
-			LuaError(l, "incorrect field '%s' for the variable '%s'" _C_
-				key _C_ UnitTypeVar.VariableName[var_index]);
+			LuaError(l, "incorrect field '%s' for variable\n" _C_ key);
 		}
 		lua_pop(l, 1); // pop the value;
 	}
@@ -1515,7 +1530,7 @@ static int CclDefineVariables(lua_State* l)
 			continue;
 		}
 		++j;
-		DefineVariableField(l, i, j + 1);
+		DefineVariableField(l, UnitTypeVar.Variable + i, j + 1);
 	}
 	return 0;
 }
