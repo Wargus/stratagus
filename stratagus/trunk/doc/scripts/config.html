@@ -60,6 +60,14 @@
 <a href="#SetBuildingCapture">SetBuildingCapture</a>
 <a href="#SetClickMissile">SetClickMissile</a>
 <a href="#SetColorCycleAll">SetColorCycleAll</a>
+<a href="#SetColorBuildingCycleEnd">SetColorBuildingCycleEnd</a>
+<a href="#SetColorBuildingCycleStart">SetColorBuildingCycleStart</a>
+<a href="#SetColorIconCycleEnd">SetColorIconCycleEnd</a>
+<a href="#SetColorIconCycleStart">SetColorIconCycleStart</a>
+<a href="#SetColorWaterCycleEnd">SetColorWaterCycleEnd</a>
+<a href="#SetColorWaterCycleStart">SetColorWaterCycleStart</a>
+<a href="#SetCurrentChapter">SetCurrentChapter</a>
+<a href="#SetCurrentTip">SetCurrentTip</a>
 <a href="#SetDamageMissile">SetDamageMissile</a>
 <a href="#SetDoubleClickDelay">SetDoubleClickDelay</a>
 <a href="#SetEditorSelectIcon">SetEditorSelectIcon</a>
@@ -69,6 +77,8 @@
 <a href="#SetFogOfWarOpacity">SetFogOfWarOpacity</a>
 <a href="#SetForestRegeneration">SetForestRegeneration</a>
 <a href="#SetGrabMouse">SetGrabMouse</a>
+<a href="#SetGodMode">SetGodMode</a>
+<a href="#SetGroupKeys">SetGroupKeys</a>
 <a href="#SetHoldClickDelay">SetHoldClickDelay</a>
 <a href="#SetKeyScroll">SetKeyScroll</a>
 <a href="#SetKeyScrollSpeed">SetKeyScrollSpeed</a>
@@ -77,6 +87,8 @@
 <a href="#SetMinimapTerrain">SetMinimapTerrain</a>
 <a href="#SetMouseScroll">SetMouseScroll</a>
 <a href="#SetMouseScrollSpeed">SetMouseScrollSpeed</a>
+<a href="#SetMouseScrollSpeedControl">SetMouseScrollSpeedControl</a>
+<a href="#SetMouseScrollSpeedDefault">SetMouseScrollSpeedDefault</a>
 <a href="#SetRevealAttacker">SetRevealAttacker</a>
 <a href="#SetSelectionStyle">SetSelectionStyle</a>
 <a href="#SetShowAttackRange">SetShowAttackRange</a>
@@ -96,6 +108,9 @@
 <a href="#SetTrainingQueue">SetTrainingQueue</a>
 <a href="#SetXpDamage">SetXpDamage</a>
 <a href="#SetUseHPForXp">SetUseHPForXp</a>
+<a href="#SetVideoFullScreen">SetVideoFullScreen</a>
+<a href="#SetVideoResolution">SetVideoResolution</a>
+<a href="#SetVideoSyncSpeed">SetVideoSyncSpeed</a>
 <a href="#ShadowSprite">ShadowSprite</a>
 <a href="#ShowEnergySelectedOnly">ShowEnergySelectedOnly</a>
 <a href="#ShowFull">ShowFull</a>
@@ -109,7 +124,6 @@
 <a href="#ShowManaVertical">ShowManaVertical</a>
 <a href="#ShowNoFull">ShowNoFull</a>
 <a href="#SpellSprite">SpellSprite</a>
-<a href="#SetGroupKeys">SetGroupKeys</a>
 
 <hr>
 <h2>Intro - Introduction to config functions and variables</h2>
@@ -305,6 +319,178 @@ Change how the color cycling is working. This is used to make the water moving.
 SetColorCycleAll(true)
 </pre>
 
+<a name="SetColorBuildingCycleEnd"></a>
+<h3>SetColorBuildingCycleEnd(index)</h3>
+
+Sets the Color Cycling End index in the palette for buildings. RGBA images cannot use
+color cycling.
+
+<dl>
+<dt>index</dt>
+<dd>eg. 0-255 for the index in the palette.
+<dt><i>RETURNS</i></dt>
+<dd>The new value of the End of Building Color Cycling</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    --- Set Color Building Cycling between 5 and 10.
+    --- Will Cycle 5 to 6, 6 to 7, ... 10 to 5
+    SetColorBuildingCycleStart(5)
+    SetColorBuildingCycleEnd(10)
+</pre>
+
+<a name="SetColorBuildingCycleStart"></a>
+<h3>SetColorBuildingCycleStart(index)</h3>
+
+Sets the Color Cycling Start index in the palette for buildings. RGBA images cannot use
+color cycling.
+
+<dl>
+<dt>index</dt>
+<dd>eg. 0-255 for the index in the palette.
+<dt><i>RETURNS</i></dt>
+<dd>The new value of the Start of Building Color Cycling</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    --- Set Color Building Cycling between 5 and 10.
+    --- Will Cycle 5 to 6, 6 to 7, ... 10 to 5
+    SetColorBuildingCycleStart(5)
+    SetColorBuildingCycleEnd(10)
+</pre>
+
+<a name="SetColorIconCycleEnd"></a>
+<h3>SetColorIconCycleEnd(index)</h3>
+
+Sets the Color Cycling End index in the palette for icons. RGBA images cannot use
+color cycling.
+
+<dl>
+<dt>index</dt>
+<dd>eg. 0-255 for the index in the palette.
+<dt><i>RETURNS</i></dt>
+<dd>The new value of the End of Icon Color Cycling</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    --- Set Color Icon Cycling between 5 and 10.
+    --- Will Cycle 5 to 6, 6 to 7, ... 10 to 5
+    SetColorIconCycleStart(5)
+    SetColorIconCycleEnd(10)
+</pre>
+
+<a name="SetColorIconCycleStart"></a>
+<h3>SetColorIconCycleStart(index)</h3>
+
+Sets the Color Cycling Start index in the palette for icons. RGBA images cannot use
+color cycling.
+
+<dl>
+<dt>index</dt>
+<dd>eg. 0-255 for the index in the palette.
+<dt><i>RETURNS</i></dt>
+<dd>The new value of the Start of Icon Color Cycling</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    --- Set Color Icon Cycling between 5 and 10.
+    --- Will Cycle 5 to 6, 6 to 7, ... 10 to 5
+    SetColorIconCycleStart(5)
+    SetColorIconCycleEnd(10)
+</pre>
+
+<a name="SetColorWaterCycleEnd"></a>
+<h3>SetColorWaterCycleEnd(index)</h3>
+
+Sets the Color Cycling End index in the palette for water. RGBA images cannot use
+color cycling.
+
+<dl>
+<dt>index</dt>
+<dd>eg. 0-255 for the index in the palette.
+<dt><i>RETURNS</i></dt>
+<dd>The new value of the End of Water Color Cycling</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    --- Set Color Water Cycling between 5 and 10.
+    --- Will Cycle 5 to 6, 6 to 7, ... 10 to 5
+    SetColorWaterCycleStart(5)
+    SetColorWaterCycleEnd(10)
+</pre>
+
+<a name="SetColorWaterCycleStart"></a>
+<h3>SetColorWaterCycleStart(index)</h3>
+
+Sets the Color Cycling Start index in the palette for water. RGBA images cannot use
+color cycling.
+
+<dl>
+<dt>index</dt>
+<dd>eg. 0-255 for the index in the palette.
+<dt><i>RETURNS</i></dt>
+<dd>The new value of the Start of Water Color Cycling</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    --- Set Color Water Cycling between 5 and 10.
+    --- Will Cycle 5 to 6, 6 to 7, ... 10 to 5
+    SetColorWaterCycleStart(5)
+    SetColorWaterCycleEnd(10)
+</pre>
+
+<a name="SetCurrentChapter"></a>
+<h3>SetCurrentChapter(number)</h3>
+
+Sets the current chapter in a campaign.  A campaign can have any number of chapters.
+If too large a number is specified, it will default to the last chapter.
+
+<dl>
+<dt>number</dt>
+<dd>The number of the chapter to skip too as define in the campaign definition</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set to chapter 2
+	SetCurrentChapter(2)
+</pre>
+
+<a name="SetCurrentTip"></a>
+<h3>SetCurrentTip(number)</h3>
+
+Sets the number of the tip to display next. If larger than the number of tips or not tips
+are defined, it defaults to Tip 0.
+
+<dl>
+<dt>number</dt>
+<dd>The tip number to use, defaults to 0 on error</dd>
+<dt><i>RETURNS</i></dt>
+<dd>The old tip number that was set</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Tip to No 10
+    SetCurrentTip(10)
+</pre>
+
 <a name="SetDamageMissile"></a>
 <h3>SetDamageMissile("missile-type")</h3>
 
@@ -397,6 +583,25 @@ Set forest regeneration speed. (n * seconds, 0 = disabled)
 
 Enable/disable grabbing the mouse.
 
+<a name="SetGodMode"></a>
+<h3>SetGodMode(boolean)</h3>
+
+Enable/disable god Mode, you do 255 damage, and take 0 damage. You are still vulnerable to spells.
+
+<dl>
+<dt>boolean</dt>
+<dd>#t for on, #f for off</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set God mode on
+    SetGodMode(#t)
+</pre>
+
 <a name="SetHoldClickDelay"></a>
 <h3>SetHoldClickDelay(delay)</h3>
 
@@ -461,6 +666,44 @@ This is when the mouse cursor hits the border.
 <h4>Example</h4>
 <pre>
   SetMouseScrollSpeed(1)
+</pre>
+
+<a name="SetMouseScrollSpeedControl"></a>
+<h3>SetMouseScrollSpeedControl(speed)</h3>
+
+Sets the speed of the mouse scrolling while control is pressed.
+
+<dl>
+<dt>speed<dt>
+<dd>Set the number of pixels to scroll per mouse move of 1 pixel. negative = reversed</dd>
+<dt><i>RETURNS</i></dt>
+<dd>The old speed that was set</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Mouse speed to 
+    SetMouseScrollSpeedControl(4)
+</pre>
+
+<a name="SetMouseScrollSpeedDefault"></a>
+<h3>SetMouseScrollSpeedDefault(speed)</h3>
+
+Sets the speed of the mouse scrolling while the middle mouse button is pressed.
+
+<dl>
+<dt>speed</dt>
+<dd>Sets the number of pixels to scroll per mouse move of 1 pixel. negative = reversed</dd>
+<dt><i>RETURNS</i></dt>
+<dd>The old speed that was set</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Speed Scroll to 5
+    SetMouseScrollSpeedDefault(5)
 </pre>
 
 <a name="SetRevealAttacker"></a>
@@ -671,6 +914,67 @@ FIXME : damage calculation.
 How the Xp is compute :
 if it is set to true then unit gains Xp equal to damage dealt to enemy unit
 else unit gains the max HP of the  killed enemy unit.
+
+<a name="SetVideoFullScreen"></a>
+<h3>SetVideoFullScreen(boolean)</h3>
+
+Sets the video to full screen or windowed mode
+
+<dl>
+<dt>boolean</dt>
+<dd>#t, #f for true or false for full screen</dd>
+<dt><i>RETURNS</i></dt>
+<dd>the previous state of the full screen</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Fullscreen
+    SetVideoFullScreen(#t)
+</pre>
+
+<a name="SetVideoResolution"></a>
+<h3>SetVideoResolution(x, y)</h3>
+
+Sets the resolution of the video display, valid options are 640x480, 800x600, 1024x768,
+1280x960 and 1600x1200.
+
+<dl>
+<dt>x</dt>
+<dd>Resolution in x from the 640,800,1024,1280,1600 list. Must match y</dd>
+<dt>y</dt>
+<dd>Resolution in y from the 480,600,768,960,1200 list. Must match x</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Screen res to 1024x768
+    SetVideoResolution(1024, 768)
+</pre>
+
+<a name="SetVideoSyncSpeed"></a>
+<h3>SetVideoSyncSpeed(speed)</h3>
+
+Sets the video sync speed for the game. 100 is equivilent to 30 frames/second.  200
+is equivilent to 60 frames/second.
+
+<dl>
+<dt>speed</dt>
+<dd>The speed to set the game to as described, 100 is default</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Exmaple</h4>
+
+<pre>
+    -- Set Speed to 60 frames/second
+    SetVideoSyncSpeed(200)
+</pre>
 
 <a name="ShadowSprite"></a>
 <h3>ShadowSprite("file", hotx, hoty, width, height)</h3>
