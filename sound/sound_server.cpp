@@ -294,11 +294,11 @@ global void PlayMusic(const char* name)
 global void StopMusic(void)
 {
     if( PlayingMusic ) {
+	PlayingMusic=0;			// Callback!
 	if( ModFile ) {
 	    ModPlug_Unload(ModFile);
 	    ModFile=NULL;
 	}
-	PlayingMusic=0;
     }
 }
 
