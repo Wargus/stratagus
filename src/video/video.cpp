@@ -735,72 +735,63 @@ global void LoadRGB(Palette* pal, const char* name)
 // FIXME: cpu intensive to go through the whole PaletteList
 global void ColorCycle(void)
 {
-    int i;
-    SDL_Palette* pal;
-    SDL_Color c;
+    SDL_Color* palcolors;
+    SDL_Color colors[256];
+    int waterlen;
+    int iconlen;
+    int buildinglen;
+
+    waterlen = (ColorWaterCycleEnd - ColorWaterCycleStart) * sizeof(SDL_Color);
+    iconlen = (ColorIconCycleEnd - ColorIconCycleStart) * sizeof(SDL_Color);
+    buildinglen = (ColorBuildingCycleEnd - ColorBuildingCycleStart) * sizeof(SDL_Color);
 
     if (ColorCycleAll) {
 	PaletteLink* curlink;
 
 	curlink = PaletteList;
 	while (curlink != NULL) {
-	    pal = curlink->Surface->format->palette;
+	    palcolors = curlink->Surface->format->palette->colors;
 
-	    c = pal->colors[ColorWaterCycleStart];
-	    for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
-		SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		    &pal->colors[i + 1], i, 1);
-	    }
+	    memcpy(colors, palcolors, sizeof(colors));
+
+	    memcpy(colors + ColorWaterCycleStart,
+		palcolors + ColorWaterCycleStart + 1, waterlen);
+	    colors[ColorWaterCycleEnd] = palcolors[ColorWaterCycleStart];
+
+	    memcpy(colors + ColorIconCycleStart,
+		palcolors + ColorIconCycleStart + 1, iconlen);
+	    colors[ColorIconCycleEnd] = palcolors[ColorIconCycleStart];
+
+	    memcpy(colors + ColorBuildingCycleStart,
+		palcolors + ColorBuildingCycleStart + 1, buildinglen);
+	    colors[ColorBuildingCycleEnd] = palcolors[ColorBuildingCycleStart];
+
 	    SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		&c, ColorWaterCycleEnd, 1);
-
-	    c = pal->colors[ColorIconCycleStart];
-	    for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {
-		SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		    &pal->colors[i + 1], i, 1);
-	    }
-	    SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		&c, ColorIconCycleEnd, 1);
-
-	    c = pal->colors[ColorBuildingCycleStart];
-	    for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {
-		SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		    &pal->colors[i + 1], i, 1);
-	    }
-	    SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		&c, ColorBuildingCycleEnd, 1);
-
+		colors, 0, 256);
 	    curlink = curlink->Prev;
 	}
     } else {
 	//
 	//        Color cycle tileset palette
 	//
-	pal = TheMap.TileGraphic->Surface->format->palette;
+	palcolors = TheMap.TileGraphic->Surface->format->palette->colors;
 
-	c = pal->colors[ColorWaterCycleStart];
-	for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
-	    SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		&pal->colors[i + 1], i, 1);
-	}
-	SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-	    &c, ColorWaterCycleEnd, 1);
+	memcpy(colors, palcolors, sizeof(colors));
 
-	c = pal->colors[ColorIconCycleStart];
-	for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {
-	    SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		&pal->colors[i + 1], i, 1);
-	}
-	SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-	    &c, ColorIconCycleEnd, 1);
+	memcpy(colors + ColorWaterCycleStart,
+	    palcolors + ColorWaterCycleStart + 1, waterlen);
+	colors[ColorWaterCycleEnd] = palcolors[ColorWaterCycleStart];
 
-	c = pal->colors[ColorBuildingCycleStart];
-	for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {
-	    SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-		&pal->colors[i + 1], i, 1);
-	}
+	memcpy(colors + ColorIconCycleStart,
+	    palcolors + ColorIconCycleStart + 1, iconlen);
+	colors[ColorIconCycleEnd] = palcolors[ColorIconCycleStart];
+
+	memcpy(colors + ColorBuildingCycleStart,
+	    palcolors + ColorBuildingCycleStart + 1, buildinglen);
+	colors[ColorBuildingCycleEnd] = palcolors[ColorBuildingCycleStart];
+
 	SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-	    &c, ColorBuildingCycleEnd, 1);
+	    colors, 0, 256);
     }
 
     MapColorCycle();		// FIXME: could be little more informative
