@@ -274,6 +274,8 @@ local void WaitCallbackMouse(int dummy_x,int dummy_y)
 local void WaitForInput(int timeout)
 {
     EventCallback callbacks;
+    char ddate[64];
+    FILE *ddfile;
 
     SetVideoSync();
 
@@ -291,6 +293,10 @@ local void WaitForInput(int timeout)
     VideoLockScreen();
     //DrawTextCentered(VideoWidth/2,5,LargeTitleFont,"Press SPACE to continue.");
     DrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
+    ddfile=popen("`which ddate`","r");
+    fgets(ddate,64,ddfile);
+    pclose(ddfile);
+    DrawTextCentered(VideoWidth/2,20,LargeFont,ddate);
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
