@@ -611,6 +611,23 @@ local SCM CclDefineUI(SCM list)
     //	Now the real values.
     //
 
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("normal-font-color")) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	free(ui->NormalFontColor);
+	ui->NormalFontColor=gh_scm2newstr(value,NULL);
+    }
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("reverse-font-color")) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	free(ui->ReverseFontColor);
+	ui->ReverseFontColor=gh_scm2newstr(value,NULL);
+    }
+
     //	Filler 1
     temp=gh_car(list);
     list=gh_cdr(list);
