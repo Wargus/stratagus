@@ -154,7 +154,6 @@ distclean:	clean
 	$(RM) stratagus$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt \
 	srcdoc/* .depend Rules.make config.log config.status configure
 	$(RM) -rf autom4te.cache/
-	touch Rules.make
 	@echo
 
 configure:
@@ -219,13 +218,14 @@ MISC    += Makefile Rules.make.orig \
 mydate	= $(shell date +%y%m%d)
 distdir	= stratagus-$(mydate)
 
+#why is this needed?
+DISTLIST = distlist.tmp
+
 distlist:
 	@echo $(SRC_ALL) $(HDRS) src/beos/beos.cpp > $(DISTLIST)
-	for i in $(MODULES_ALL); do echo $$i/Module.make >> $(DISTLIST); done
-	for i in $(INCLUDE_DIRS); do echo $$i/Module.make >> $(DISTLIST); done
-#	@echo src/include >> $(DISTLIST)
 
 dist: distlist
+	autoconf
 	echo >>$(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
 	echo $(MISC) >>$(DISTLIST)
@@ -313,7 +313,6 @@ WIN32=	\
 win32new:
 	@$(MAKE) RULESFILE=$(WINRULESFILE) distclean
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
-	touch Rules.make.WIN32
 
 win32configure:
 	autoconf
@@ -343,25 +342,11 @@ win32distclean:
 install:	all install-stratagus install-tools
 
 install-stratagus:
-	@echo installing stratagus
-	mkdir -p $(PREFIX)/lib/games/stratagus
-	mkdir -p /var/lib/games
-	install -m 755 stratagus $(PREFIX)/lib/games/stratagus
-	cp -R data $(PREFIX)/lib/games/stratagus
-	echo "$(PREFIX)/lib/games/stratagus/stratagus \
-	-d $(PREFIX)/lib/games/stratagus/data  "\$$\@" | tee /var/lib/games/stratagus.log" \
-	>$(PREFIX)/bin/stratagus
-	chmod +x $(PREFIX)/bin/stratagus
+	install -m 755 stratagus $(PREFIX)/bin
 	@echo installation of stratagus complete
-
-install-tools:	all
-	@echo installing stratagus tools
-	mkdir -p $(PREFIX)/lib/games/stratagus/tools
-	@echo installation of stratagus tools complete
 
 uninstall:
 	@echo uninstalling stratagus and stratagus tools
-	rm -rf $(PREFIX)/lib/games/stratagus
 	rm $(PREFIX)/bin/stratagus
-	@echo uninstallation complete
+	@echo uninstallation of stratagus complete
 
