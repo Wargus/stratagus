@@ -1007,10 +1007,10 @@ global void DebugPlayers(void)
 	if( Players[i].Type==PlayerNobody ) {
 	    continue;
 	}
-	DebugLevel0("%2d: %8.8s %c %-8.8s ",i,colors[i]
-		,ThisPlayer==&Players[i] ? '*'
+	DebugLevel0("%2d: %8.8s %c %-8.8s " _C_ i _C_ colors[i]
+		_C_ ThisPlayer==&Players[i] ? '*'
 			: Players[i].AiEnabled ? '+' : ' '
-		,Players[i].Name);
+		_C_ Players[i].Name);
 	switch( Players[i].Type ) {
 	    case 0: DebugLevel0("Don't know 0 ");	break;
 	    case 1: DebugLevel0("Don't know 1 ");	break;
@@ -1025,9 +1025,9 @@ global void DebugPlayers(void)
 	    case PlayerRaceHuman:   DebugLevel0("human   ");	break;
 	    case PlayerRaceOrc:     DebugLevel0("orc     ");	break;
 	    case PlayerRaceNeutral: DebugLevel0("neutral ");	break;
-	    default: DebugLevel0("what %d ",Players[i].Race);	break;
+	    default: DebugLevel0("what %d " _C_ Players[i].Race);	break;
 	}
-	DebugLevel0("%2d ",Players[i].AiNum);
+	DebugLevel0("%2d " _C_ Players[i].AiNum);
 	switch( Players[i].AiNum ) {
 	    case PlayerAiLand:	  DebugLevel0("(land)");	break;
 	    case PlayerAiPassive: DebugLevel0("(passive)");	break;

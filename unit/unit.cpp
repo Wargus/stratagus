@@ -199,8 +199,8 @@ global void ReleaseUnit(Unit* unit)
     ReleasedTail=&unit->Next;
     unit->Refs=GameCycle+NetworkMaxLag;	// could be reuse after this.
     IfDebug(
-	DebugLevel2Fn("%lu:No more references %d\n",
-		GameCycle,UnitNumber(unit));
+	DebugLevel2Fn("%lu:No more references %d\n" _C_
+		GameCycle _C_ UnitNumber(unit));
 	unit->Type=NULL;			// for debugging.
     );
 }
