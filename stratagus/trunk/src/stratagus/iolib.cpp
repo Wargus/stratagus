@@ -33,6 +33,7 @@
 #include <stdlib.h>
 
 #ifndef _MSC_VER
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -40,15 +41,23 @@
 #include <unistd.h>
 #include <errno.h>
 #include <limits.h>
-#else
+
+#else // _MSC_VER
+
 #ifdef _WIN32_WCE
 #define R_OK	1	// FIXME: correct?
 #else
 #define R_OK	4
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <io.h>
+#define PATH_MAX _MAX_PATH
+#define S_ISDIR(x) ((x) & _S_IFDIR)
+#define S_ISREG(x) ((x) & _S_IFREG)
 #endif
+
 #endif
 
 #include "freecraft.h"
@@ -392,7 +401,7 @@ global char* LibraryFileName(const char* file,char* buffer)
     //	Try in map directory
     //
     if( *CurrentMapPath ) {
-	DebugLevel3Fn("Map   path: %s\n", CurrentMapPath);
+	DebugLevel3Fn("Map   path: %s\n" _C_ CurrentMapPath);
 	if( *CurrentMapPath=='.' || *CurrentMapPath=='/' ) {
 	    strcpy(buffer,CurrentMapPath);
 	    if( (s=strrchr(buffer,'/')) ) {
@@ -489,7 +498,7 @@ global char* LibraryFileName(const char* file,char* buffer)
 	return buffer;
     }
 #endif	// USE_ZZIPLIB
-    DebugLevel0Fn("File `%s' not found\n",file);
+    DebugLevel0Fn("File `%s' not found\n" _C_ file);
 
     strcpy(buffer,file);
     return buffer;
@@ -559,11 +568,6 @@ __my_zzip_open_zip(const char* filename, int filemode)
 */
 global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *),FileList **flp)
 {
-#ifdef _MSC_VER
-    // FIXME: help write this function
-    // find_first()/find_next() are your friends - well whoever cares..
-    return 0;
-#else
 #ifdef USE_ZZIPLIB
     ZZIP_DIR *dirp = NULL;
     ZZIP_DIRENT *dp;
@@ -573,14 +577,20 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     int i, entvalid;
     char zzbasepath[PATH_MAX];
 #else
+#ifndef _MSC_VER
     DIR *dirp;
     struct dirent *dp;
+#else
+    struct _finddata_t fileinfo;
+    long hFile;
 #endif
     struct stat st;
+#endif
     FileList *nfl, *fl = NULL;
     int n = 0, isdir = 0; // silence gcc..
     char *cp, *np;
     char buffer[PATH_MAX];
+    char *filename;
 
     strcpy(buffer, dirname);
     cp = strrchr(buffer, '/');
@@ -638,16 +648,29 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     }
     IfDebug( if (!dirp) { DebugLevel0Fn("Dir `%s' not found\n", dirname); } );
 #else
+#ifndef _MSC_VER
     dirp = opendir(dirname);
 #endif
+#endif
+
+#ifndef _MSC_VER
     if (dirp) {
 	while ((dp = readdir(dirp)) != NULL) {
-	    if (strcmp(dp->d_name, ".") == 0)
+	    filename = dp->d_name;
+#else
+    strcat(buffer,"*.*");
+    hFile = _findfirst(buffer, &fileinfo);
+    if (hFile != -1L) {
+	do {
+	    filename = fileinfo.name;
+#endif
+
+	    if (strcmp(filename, ".") == 0)
 		continue;
-	    if (strcmp(dp->d_name, "..") == 0)
+	    if (strcmp(filename, "..") == 0)
 		continue;
 
-	    strcpy(np, dp->d_name);
+	    strcpy(np, filename);
 #ifdef USE_ZZIPLIB
 	    entvalid = 0;
 	    if (zzip_dir_real(dirp)) {
@@ -678,9 +701,9 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		    if (strlen(dirname) > i) {
 			cp = (char *)dirname + i + 1;
 			i = strlen(cp);
-			if (strlen(dp->d_name) >= i && memcmp(dp->d_name, cp, i) == 0 &&
-				    dp->d_name[i] == '/' && dp->d_name[i + 1]) {
-			    strcpy(np, dp->d_name + i + 1);
+			if (strlen(filename) >= i && memcmp(filename, cp, i) == 0 &&
+				    filename[i] == '/' && filename[i + 1]) {
+			    strcpy(np, filename + i + 1);
 			    goto zzentry;
 			}
 		    } else {
@@ -745,8 +768,13 @@ zzentry:
 		    n++;
 		}
 	    }
+#ifndef _MSC_VER
 	}
 	closedir(dirp);
+#else
+	} while (_findnext(hFile, &fileinfo) == 0);
+	_findclose(hFile);
+#endif
     }
     if (n == 0) {
 	fl = NULL;
@@ -755,7 +783,6 @@ zzentry:
     }
     *flp = fl;
     return n;
-#endif
 }
 
 //@}
