@@ -24,10 +24,15 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#include "player.h"
+#ifndef __STRUCT_PLAYER__
+#define __STRUCT_PLAYER__
+typedef struct _player_ Player;		// recursive includes :(
+#endif
+
+#include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
---	Declartion
+--	Declarations
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
@@ -44,9 +49,6 @@ extern void SaveUpgrades(FILE*);	/// save the upgrades
 extern void ParsePudALOW(const char*,int); /// parse pud alow table
 extern void ParsePudUGRD(const char*,int); /// parse pud ugrd table
 extern void UpgradesCclRegister(void);	/// Register CCL features for upgrades
-
-
-
 
 
 // CHAOS PUR
@@ -153,8 +155,9 @@ void UpgradeIncTime2( Player* player, char* sid, int amount ); // by ident strin
 
 // this function will mark upgrade done and do all required modifications to
 // unit types and will modify allow/forbid maps
-void UpgradeAcquire( Player* player, int id ); // called by UpgradeIncTime() when timer reached
-void UpgradeAcquire2( Player* player, char* sid ); // by ident string
+
+    // called by UpgradeIncTime() when timer reached
+void UpgradeAcquire( Player* player,Upgrade* upgrade );
 
 // for now it will be empty?
 // perhaps acquired upgrade can be lost if ( for example ) a building is lost

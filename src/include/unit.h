@@ -26,14 +26,13 @@
 
 #ifndef __STRUCT_PLAYER__
 #define __STRUCT_PLAYER__
-typedef struct _player_ Player;
-
-// #include "player.h"			// recursive!
+typedef struct _player_ Player;		// recursive includes :(
 #endif
 
 #include "video.h"
 #include "unittype.h"
 #include "upgrade_structs.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -56,6 +55,7 @@ enum _unit_action_ {
 
     UnitActionStill,			/// unit stand still, does nothing
     UnitActionStandGround,		/// unit stands ground
+    UnitActionFollow,			/// unit follows units
     UnitActionMove,			/// unit moves to position/unit
     UnitActionAttack,			/// unit attacks position/unit
     UnitActionDie,			/// unit dies
@@ -116,7 +116,7 @@ struct _command_ {
 	    int		Val;		/// Counter
 	    int		Sub;
 	    int		Cancel;		/// Cancel construction
-	    Unit*	Peon;		/// Peon/Peasant building the unit
+	    Unit*	Worker;		/// Worker building the unit
 	} Builded;			// builded:
 	struct {
 	    unsigned	Ticks;		/// Ticks to complete
@@ -131,7 +131,7 @@ struct _command_ {
 	} UpgradeTo;			/// upgradeto:
 	struct {
 	    unsigned	Ticks;		/// Ticks to complete
-	    int		What;		/// Unit researching this
+	    Upgrade*	What;		/// Unit researching this
 	} Research;			/// research:
 	struct {
 	    unsigned	Active;		/// how much units are in the goldmine
@@ -163,8 +163,9 @@ typedef enum _unit_voice_group_ {
 */
 struct _unit_ {
 #ifdef NEW_UNIT
-    short	Refs;			/// Reference counter
-    UnitRef	Slot;			/// Assignd slot number
+    // int is faster than shorts.
+    unsigned	Refs;			/// Reference counter
+    unsigned	Slot;			/// Assignd slot number
     Unit**	UnitSlot;		/// slot pointer of Units
     Unit**	PlayerSlot;		/// slot pointer of Player->Units
     Unit*	Next;			/// generic link pointer
@@ -341,6 +342,8 @@ extern Unit* Selected[MaxSelectable];	/// currently selected units
 extern void InitUnitsMemory(void);
     /// Free memory used by unit
 extern void FreeUnitMemory(Unit* unit);
+    /// Release an unit.
+extern void ReleaseUnit(Unit* unit);
     ///	Create a new unit
 extern Unit* MakeUnit(UnitType* type,Player* player);
     ///	Create a new unit and place on map

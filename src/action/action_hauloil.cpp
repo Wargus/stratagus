@@ -157,15 +157,15 @@ local int HaulInOilWell(Unit* unit)
 	}
 
 	//
-	//	Change unit to full state.
+	//	Change unit to full state. FIXME: hardcoded good or bad?
 	//
-	if( unit->Type->Type==UnitTankerHuman ) {
-	    unit->Type=&UnitTypes[UnitTankerHumanFull];
-	} else if( unit->Type->Type==UnitTankerOrc ) {
-	    unit->Type=&UnitTypes[UnitTankerOrcFull];
+	if( unit->Type==UnitTypeHumanTanker ) {
+	    unit->Type=UnitTypeHumanTankerFull;
+	} else if( unit->Type==UnitTypeOrcTanker ) {
+	    unit->Type=UnitTypeOrcTankerFull;
 	} else {
-	    DebugLevel0("Wrong unit-type for haul oil %d\n"
-		,unit->Type->Type);
+	    DebugLevel0("Wrong unit-type for haul oil `%s'\n"
+		    ,unit->Type->Ident);
 	}
 
 	//
@@ -270,13 +270,13 @@ local int MoveToOilDepot(Unit* unit)
 	MustRedraw|=RedrawResources;
     }
 
-    if( unit->Type->Type==UnitTankerHumanFull ) {
-	unit->Type=&UnitTypes[UnitTankerHuman];
-    } else if( unit->Type->Type==UnitTankerOrcFull ) {
-	unit->Type=&UnitTypes[UnitTankerOrc];
+    if( unit->Type==UnitTypeHumanTankerFull ) {
+	unit->Type=UnitTypeHumanTanker;
+    } else if( unit->Type==UnitTypeOrcTankerFull ) {
+	unit->Type=UnitTypeOrcTanker;
     } else {
-	DebugLevel0("Wrong unit for returning oil %d\n"
-	    ,unit->Type->Type);
+	DebugLevel0("Wrong unit for returning oil `%s'\n"
+		,unit->Type->Ident);
     }
 
     if( WAIT_FOR_OIL<UNIT_MAX_WAIT ) {

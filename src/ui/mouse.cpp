@@ -131,6 +131,7 @@ global void DoRightButton(int x,int y)
     UnitType* type;
     int action;
     int acknowledged;
+    int flush;
 
     //
     // No unit selected
@@ -147,6 +148,14 @@ global void DoRightButton(int x,int y)
 	return;
     }
 
+    //
+    //	Right mouse with SHIFT appends command to old commands.
+    //
+    flush=!(KeyModifiers&ModifierShift);
+
+    // FIXME: the next should be rewritten, must select the units with
+    // FIXME: the box size and not with the tile position
+    // FIXME: and for a group of units slow!
     acknowledged=0;
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
@@ -161,55 +170,56 @@ global void DoRightButton(int x,int y)
 
         //
         //      Enter transporters?
-        //
+        //	FIXME: UnitOnMapTile returns random unit on tile
+	//
         dest=UnitOnMapTile(x,y);
         if( dest && dest->Type->Transporter
                 && dest->Player==ThisPlayer
                 && unit->Type->UnitType==UnitTypeLand ) {
             dest->Blink=3;
 	    DebugLevel3(__FUNCTION__": Board transporter\n");
-            SendCommandBoard(unit,dest);
+            SendCommandBoard(unit,-1,-1,dest,flush);
             continue;
         }
 
         //
-        //      Peon/Peasant
+        //      Worker of human or orcs
         //
         if( action==MouseActionHarvest ) {
             DebugLevel3("Action %x\n",TheMap.ActionMap[x+y*TheMap.Width]);
-            if( type->Type==UnitPeonWithWood
-                    || type->Type==UnitPeasantWithWood
-                    || type->Type==UnitPeonWithGold
-                    || type->Type==UnitPeasantWithGold ) {
+            if( type==UnitTypeOrcWorkerWithWood
+                    || type==UnitTypeHumanWorkerWithWood
+                    || type==UnitTypeOrcWorkerWithGold
+                    || type==UnitTypeHumanWorkerWithGold ) {
                 dest=UnitOnMapTile(x,y);
                 if( dest ) {
                     dest->Blink=3;
                     if( dest->Type->StoresGold
-                            && (type->Type==UnitPeonWithGold
-                                || type->Type==UnitPeasantWithGold) ) {
+                            && (type==UnitTypeOrcWorkerWithGold
+                                || type==UnitTypeHumanWorkerWithGold) ) {
                         DebugLevel3("GOLD-DEPOSIT\n");
                         // FIXME: return to this depot??
-                        SendCommandReturnGoods(unit);
+                        SendCommandReturnGoods(unit,flush);
                         continue;
                     }
                     if( (dest->Type->StoresWood || dest->Type->StoresGold)
-                            && (type->Type==UnitPeonWithWood
-                                || type->Type==UnitPeasantWithWood) ) {
+                            && (type==UnitTypeOrcWorkerWithWood
+                                || type==UnitTypeHumanWorkerWithWood) ) {
                         DebugLevel3("WOOD-DEPOSIT\n");
                         // FIXME: return to this depot??
-                        SendCommandReturnGoods(unit);
+                        SendCommandReturnGoods(unit,flush);
                         continue;
                     }
                 }
             } else {
                 if( ForestOnMap(x,y) ) {
-                    SendCommandHarvest(unit,x,y);
+                    SendCommandHarvest(unit,x,y,flush);
                     continue;
                 }
                 if( (dest=GoldMineOnMap(x,y)) ) {
                     dest->Blink=3;
                     DebugLevel3("GOLD-MINE\n");
-                    SendCommandMineGold(unit,dest);
+                    SendCommandMineGold(unit,dest,flush);
                     continue;
                 }
             }
@@ -220,13 +230,13 @@ global void DoRightButton(int x,int y)
                 dest->Blink=3;
                 if( dest->Player==ThisPlayer || 
 		        dest->Player->Player==PlayerNumNeutral) {
-		    SendCommandMoveUnit(unit,x,y);
-                    // FIXME: SendCommandFollow(unit,x,y,dest);
-                    // FIXME: continue;
 		    // FIXME: lokh: maybe we should add the ally players here
+		    // FIXME: don't work must check repairable first
+                    // SendCommandFollow(unit,dest,flush);
+                    // continue;
                 } else {
                     // FIXME: can I attack this unit?
-                    SendCommandAttack(unit,x,y,dest);
+                    SendCommandAttack(unit,x,y,dest,flush);
                     continue;
                 }
             }
@@ -237,9 +247,9 @@ global void DoRightButton(int x,int y)
 		    && dest->Player==ThisPlayer
 		    && dest->HP<dest->Stats[dest->Player->Player].HitPoints
 		    && dest->Type->Building ) {
-	        SendCommandRepair(unit,x,y);
+	        SendCommandRepair(unit,x,y,dest,flush);
 	    } else {
-	        SendCommandMoveUnit(unit,x,y);
+	        SendCommandMove(unit,x,y,flush);
 	    }
 	    continue;
 	}
@@ -248,19 +258,28 @@ global void DoRightButton(int x,int y)
         //      Tanker
         //
         if( action==MouseActionHaulOil ) {
-            if( type->Type==UnitTankerOrcFull
-                    || type->Type==UnitTankerHumanFull ) {
+	    // FIXME: How can I remove here the unit type?
+            if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
                 DebugLevel2("Should return to oil deposit\n");
+                if( (dest=UnitOnMapTile(x,y)) ) {
+                    dest->Blink=3;
+                    if( dest->Type->StoresOil ) {
+                        DebugLevel3("OIL-DEPOSIT\n");
+                        // FIXME: return to this depot??
+                        SendCommandReturnGoods(unit,flush);
+                        continue;
+                    }
+		}
             } else {
                 if( (dest=PlatformOnMap(x,y)) ) {
                     dest->Blink=3;
-                    DebugLevel2("PLATFORM\n");
-                    SendCommandHaulOil(unit,dest);
+                    DebugLevel3("PLATFORM\n");
+                    SendCommandHaulOil(unit,dest,flush);
                     continue;
                 }
             }
 
-            SendCommandMoveUnit(unit,x,y);
+            SendCommandMove(unit,x,y,flush);
             continue;
         }
 
@@ -274,13 +293,12 @@ global void DoRightButton(int x,int y)
                 dest->Blink=3;
                 if( dest->Player==ThisPlayer || 
 		        dest->Player->Player==PlayerNumNeutral) {
-		    SendCommandMoveUnit(unit,x,y);
-                    // FIXME: SendCommandFollow(unit,x,y,dest);
-                    // FIXME: continue;
 		    // FIXME: lokh: maybe we should add the ally players here
+		    SendCommandFollow(unit,dest,flush);
+                    continue;
                 } else {
                     // FIXME: can I attack this unit?
-                    SendCommandAttack(unit,x,y,dest);
+                    SendCommandAttack(unit,x,y,dest,flush);
                     continue;
                 }
             }
@@ -289,15 +307,16 @@ global void DoRightButton(int x,int y)
                 if( ThisPlayer->Race==PlayerRaceHuman
                         && OrcWallOnMap(x,y) ) {
                     DebugLevel3("HUMAN ATTACKS ORC\n");
-                    SendCommandAttack(unit,x,y,NoUnitP);
+                    SendCommandAttack(unit,x,y,NoUnitP,flush);
                 }
                 if( ThisPlayer->Race==PlayerRaceOrc
                         && HumanWallOnMap(x,y) ) {
                     DebugLevel3("ORC ATTACKS HUMAN\n");
-                    SendCommandAttack(unit,x,y,NoUnitP);
+                    SendCommandAttack(unit,x,y,NoUnitP,flush);
                 }
             }
-            SendCommandMoveUnit(unit,x,y);
+	    // Note: move is correct here, right default is move
+            SendCommandMove(unit,x,y,flush);
             continue;
         }
 
@@ -308,7 +327,7 @@ global void DoRightButton(int x,int y)
 	}
 
 //	    if( !unit->Type->Building ) {
-	SendCommandMoveUnit(unit,x,y);
+	SendCommandMove(unit,x,y,flush);
 //	    }
     }
 }
@@ -581,8 +600,8 @@ local void SendRepair(int x,int y)
         unit=Selected[i];
 // FIXME: only worker could be send repairing
 //		if( !unit->Type->Building ) {
-//		if( unit->Type->CowerPeon ) {
-	SendCommandRepair(unit,x,y);
+//		if( unit->Type->CowerWorker ) {
+	SendCommandRepair(unit,x,y,NoUnitP,!(KeyModifiers&ModifierShift));
 //		}
     }
 }
@@ -601,7 +620,7 @@ local void SendMove(int x,int y)
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
 //		if( !unit->Type->Building ) {
-	SendCommandMoveUnit(unit,x,y);
+	SendCommandMove(unit,x,y,!(KeyModifiers&ModifierShift));
 //		}
     }
 }
@@ -632,10 +651,10 @@ local void SendAttack(int x,int y)
 	    dest=TargetOnMapTile(unit,x,y);
 	    DebugLevel3(__FUNCTION__": Attacking %p\n",dest);
 	    if( dest!=unit ) {  // don't let an unit self destruct
-	        SendCommandAttack(unit,x,y,dest);
+	        SendCommandAttack(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	    }
 	} else {
-	    SendCommandMoveUnit(unit,x,y);
+	    SendCommandMove(unit,x,y,!(KeyModifiers&ModifierShift));
 	}
     }
 }
@@ -654,9 +673,9 @@ local void SendAttackGround(int x,int y)
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
 	if( unit->Type->CanAttack ) {
-	    SendCommandAttackGround(unit,x,y);
+	    SendCommandAttackGround(unit,x,y,!(KeyModifiers&ModifierShift));
 	} else {
-	    SendCommandMoveUnit(unit,x,y);
+	    SendCommandMove(unit,x,y,!(KeyModifiers&ModifierShift));
 	}
     }
 }
@@ -672,7 +691,7 @@ local void SendPatrol(int x,int y)
     for( i=0; i<NumSelected; i++ ) {
         unit=Selected[i];
 	// FIXME: Can the unit patrol ?
-	SendCommandPatrolUnit(unit,x,y);
+	SendCommandPatrol(unit,x,y,!(KeyModifiers&ModifierShift));
     }
 }
 
@@ -693,7 +712,7 @@ local void SendDemolish(int x,int y)
 	    if( dest==unit ) {	// don't let an unit self destruct
 	        dest=NoUnitP;
 	    }
-	    SendCommandDemolish(unit,x,y,dest);
+	    SendCommandDemolish(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	} else {
 	    DebugLevel0(__FUNCTION__": can't demolish %p\n",unit);
 	}
@@ -714,18 +733,17 @@ local void SendHarvest(int x,int y)
     for( i=0; i<NumSelected; ++i ) {
         if( (dest=PlatformOnMap(x,y)) ) {
 	    dest->Blink=3;
-	    DebugLevel2("PLATFORM\n");
-	    SendCommandHaulOil(Selected[i],dest);
+	    DebugLevel3("PLATFORM\n");
+	    SendCommandHaulOil(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
 	if( (dest=GoldMineOnMap(x,y)) ) {
 	    dest->Blink=3;
-	    DebugLevel2("GOLD-MINE\n");
-	    SendCommandMineGold(Selected[i],dest);
+	    DebugLevel3("GOLD-MINE\n");
+	    SendCommandMineGold(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
-	//SendCommandMoveUnit(Selected[i],x,y);
-	SendCommandHarvest(Selected[i],x,y);
+	SendCommandHarvest(Selected[i],x,y,!(KeyModifiers&ModifierShift));
     }
 }
 
@@ -740,7 +758,9 @@ local void SendUnload(int x,int y)
     int i;
 
     for( i=0; i<NumSelected; i++ ) {
-        SendCommandUnload(Selected[i],x,y,NoUnitP);
+	// FIXME: not only transporter selected?
+        SendCommandUnload(Selected[i],x,y,NoUnitP
+		,!(KeyModifiers&ModifierShift));
     }
 }
 
@@ -872,7 +892,8 @@ global void UIHandleButtonDown(int b)
 			&& MAPEXPLORED(x,y) ) {
 		    PlayGameSound(GameSounds.PlacementSuccess.Sound
 			    ,MaxSampleVolume);
-		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding);
+		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding
+			    ,!(KeyModifiers&ModifierShift));
 		    if( !(KeyModifiers&ModifierAlt) ) {
 			CancelBuildingMode();
 		    }
@@ -934,7 +955,8 @@ global void UIHandleButtonDown(int b)
 		    if( Selected[0]->OnBoard[ButtonUnderCursor-4] ) {
 			SendCommandUnload(Selected[0]
 				,Selected[0]->X,Selected[0]->Y
-				,Selected[0]->OnBoard[ButtonUnderCursor-4]);
+				,Selected[0]->OnBoard[ButtonUnderCursor-4]
+				,!(KeyModifiers&ModifierShift));
 		    }
 		}
 		DebugLevel0("Button %d\n",ButtonUnderCursor);

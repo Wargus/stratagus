@@ -112,7 +112,7 @@ global void HandleActionTrain(Unit* unit)
         
 	if ( --unit->Command.Data.Train.Count ) {
 	    int z;
-	    for( z = 0; z < MAX_UNIT_TRAIN-1; z++ ) {
+	    for( z = 0; z < unit->Command.Data.Train.Count ; z++ ) {
 		unit->Command.Data.Train.What[z] =
 			unit->Command.Data.Train.What[z+1];
 	    }

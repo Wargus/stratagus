@@ -37,18 +37,16 @@
 */
 global void HandleActionResearch(Unit* unit)
 {
-    int upgrade;
+    Upgrade* upgrade;
 
     DebugLevel3("Research %d\n",unit);
     upgrade=unit->Command.Data.Research.What;
     unit->Command.Data.Research.Ticks+=SpeedResearch;
-    if( unit->Command.Data.Research.Ticks
-	    >=Upgrades[upgrade].Costs[TimeCost] ) {
+    if( unit->Command.Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
 
 	// FIXME: should als speak and tell ai
 	SetMessage("Upgrade complete");
 
-	// NewUpgrade(upgrade);
         UpgradeAcquire(unit->Player,upgrade);
 
 	unit->Reset=1;

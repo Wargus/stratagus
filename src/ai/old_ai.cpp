@@ -63,7 +63,7 @@ typedef struct _ai_command_ {
 } AiCommand;
 
 typedef struct _ai_force_ {
-     int Peasant;
+     int Worker;
      int Footman;
      int Archer;
      int Ballista;
@@ -187,12 +187,12 @@ local int AiFindFreeWorkers(Unit** table)
     Unit* unit;
 
     nunits = FindPlayerUnitsByType(AiPlayer->Player,
-             UnitTypes+AiChooseRace(UnitPeasant),table);
+             UnitTypes+AiChooseRace(UnitTypeHumanWorker->Type),table);
     /*
     nunits += FindPlayerUnitsByType(AiPlayer->Player,
-             UnitTypes+AiChooseRace(UnitPeasantWithGold),table+nunits);
+             UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithGold),table+nunits);
     nunits += FindPlayerUnitsByType(AiPlayer->Player,
-             UnitTypes+AiChooseRace(UnitPeasantWithWood),table+nunits);
+             UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithWood),table+nunits);
     */
 
     // Remove all workers on the way building
@@ -700,7 +700,7 @@ local int AiTrainCreature(int type)
     int nunits;
     Player* player;
     DebugLevel3(__FUNCTION__":\n");
-    if(type == AiChooseRace(UnitPeasant))
+    if(type == AiChooseRace(UnitTypeHumanWorker->Type))
         {nunits = AiFindHalls(units);}
     else
         {
@@ -898,8 +898,8 @@ local void AiAssignWorker(void)
 		action=workers[w]->Command.Action;
 		if(action==UnitActionStill)
                     {
-		    if(type == AiChooseRace(UnitPeasantWithGold) ||
-                       type == AiChooseRace(UnitPeasantWithWood))
+		    if(type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type) ||
+                       type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type))
                       {CommandReturnGoods(workers[w],1);}
                     else
                       {
@@ -921,8 +921,8 @@ local void AiAssignWorker(void)
 	for(w=0; w<num_worker; ++w)
             {
 	    type=workers[w]->Type->Type;
-	    if(type == AiChooseRace(UnitPeasantWithWood) ||
-               type == AiChooseRace(UnitPeasantWithGold))
+	    if(type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type) ||
+               type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type))
                 {CommandReturnGoods(workers[w],1);}
 	    else
                 {
@@ -945,8 +945,8 @@ local void AiAssignWorker(void)
 	for(w=0; w<num_worker; ++w)
             {
 	    type=workers[w]->Type->Type;
-	    if(type == AiChooseRace(UnitPeasantWithWood) ||
-               type == AiChooseRace(UnitPeasantWithGold))
+	    if(type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type) ||
+               type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type))
                 {CommandReturnGoods(workers[w],1);}
 	    else
                 {
@@ -968,8 +968,8 @@ local void AiAssignWorker(void)
 	    if(action==UnitActionStill)
 		{
 		type=workers[w]->Type->Type;
-		if(type==AiChooseRace(UnitPeasantWithGold)
-		  || type==AiChooseRace(UnitPeasantWithWood))
+		if(type==AiChooseRace(UnitTypeHumanWorkerWithGold->Type)
+		  || type==AiChooseRace(UnitTypeHumanWorkerWithWood->Type))
 		    {
 		    if(AiPlayer->MainHall)
 			{
@@ -998,7 +998,7 @@ local void AiAssignWorker(void)
     //	Send standing workers home.
     //
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	 UnitTypes+AiChooseRace(UnitPeasantWithGold),workers);
+	 UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithGold->Type),workers);
     DebugLevel3("Gold %d\n",num_worker);
     if(num_worker)
 	{          // assign the non working
@@ -1015,7 +1015,7 @@ local void AiAssignWorker(void)
 	    }
 	}
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	 UnitTypes+AiChooseRace(UnitPeasantWithWood),workers);
+	 UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithWood->Type),workers);
     DebugLevel3("Wood %d\n",num_worker);
     if(num_worker)
 	{          // assign the non working
@@ -1151,8 +1151,13 @@ local int AiNoBuilding(int type)
 */
 local int AiNeedBuilding(int type)
     {
+    UnitType* typep;
     type = AiChooseRace(type);
     // FIXME: johns should use dependence rules some time
+    typep=UnitTypes+type;
+    if( typep==UnitTypeHumanWorker || typep==UnitTypeOrcWorker ) {
+	if(AiNoBuilding(UnitTownHall)) return 1;
+    }
     switch(type)
         {
         case UnitBallista: case UnitCatapult:
@@ -1164,9 +1169,6 @@ local int AiNeedBuilding(int type)
         case UnitFootman: case UnitGrunt:
           if(AiNoBuilding(UnitTownHall)) return 1;
           if(AiNoBuilding(UnitBarracksHuman)) return 1;
-        case UnitPeasant: case UnitPeon:
-          if(AiNoBuilding(UnitTownHall)) return 1;
-          break;
         }
     return 0;
     }
@@ -1182,11 +1184,12 @@ local int AiCommandBuild(int type,int number,int action)
     type = AiChooseRace(type);
     if(AiBuildingUnitType(type)) {return 0;} //already training
     AiCountUnits();
-    if(type == AiChooseRace(UnitPeasant))
+    if(type == AiChooseRace(UnitTypeHumanWorker->Type))
         {
         if((UnitTypesCount[type]
-           +UnitTypesCount[AiChooseRace(UnitPeasantWithGold)]
-           +UnitTypesCount[AiChooseRace(UnitPeasantWithWood)]) >= number)
+           +UnitTypesCount[AiChooseRace(UnitTypeHumanWorkerWithGold->Type)]
+           +UnitTypesCount[AiChooseRace(UnitTypeHumanWorkerWithWood->Type)])
+		>= number)
            return 1;
         }
     else { if(UnitTypesCount[type] >= number) return 1; }
@@ -1229,8 +1232,8 @@ local int AiCommandAttack(int unittype,int attack,int home)
 */
 local int AiCommandArmy(int home, int attack)
     {
-    if(!AiCommandBuild(UnitPeasant,ForceAtHome[home].Peasant +
-        ForceAttacking[attack].Peasant, AiCmdCreature)) {return 0;}
+    if(!AiCommandBuild(UnitTypeHumanWorker->Type,ForceAtHome[home].Worker +
+        ForceAttacking[attack].Worker, AiCmdCreature)) {return 0;}
     if(!AiCommandBuild(UnitFootman,ForceAtHome[home].Footman +
         ForceAttacking[attack].Footman, AiCmdCreature)) {return 0;}
     if(!AiCommandBuild(UnitArcher,ForceAtHome[home].Archer +
@@ -1355,7 +1358,7 @@ global void AiTrainingComplete(Unit* unit,Unit* what)
     }
     // FIXME: Should I put an AiPlayer pointer into the player struct?
     AiPlayer=&Ais[unit->Player->Player];
-    if(what->Type->CowerPeon) {
+    if(what->Type->CowerWorker) {
 	AiAssignWorker();
     }
     AiClearBuildUnitType(what->Type->Type);

@@ -26,6 +26,7 @@
 
 #include "unittype.h"
 #include "unit.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -40,13 +41,15 @@
 ----------------------------------------------------------------------------*/
 
     /// Prepare command stop
-extern void CommandStopUnit(Unit* unit,int flush);
+extern void CommandStopUnit(Unit* unit);
     /// Prepare command stand ground
 extern void CommandStandGround(Unit* unit,int flush);
+    /// Prepare command follow
+extern void CommandFollow(Unit* unit,Unit* dest,int flush);
     /// Prepare command move
-extern void CommandMoveUnit(Unit* unit,int x,int y,int flush);
+extern void CommandMove(Unit* unit,int x,int y,int flush);
     /// Prepare command repair
-extern void CommandRepair(Unit* unit,int x,int y,int flush);
+extern void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Prepare command attack
 extern void CommandAttack(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Prepare command attack ground
@@ -58,9 +61,9 @@ extern void CommandBoard(Unit* unit,Unit* dest,int flush);
     /// Prepare command unload
 extern void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush);
     /// Prepare command build
-extern void CommandBuildBuilding(Unit* unit,int x,int y,UnitType* what,int flush);
+extern void CommandBuildBuilding(Unit*,int,int,UnitType*,int);
     /// Prepare command cancel build
-extern void CommandCancelBuilding(Unit* unit,Unit* preon);
+extern void CommandCancelBuilding(Unit* unit,Unit* worker);
     /// Prepare command harvest
 extern void CommandHarvest(Unit* unit,int x,int y,int flush);
     /// Prepare command mine
@@ -72,15 +75,15 @@ extern void CommandReturnGoods(Unit* unit,int flush);
     /// Prepare command train
 extern void CommandTrainUnit(Unit* unit,UnitType* what,int flush);
     /// Prepare command cancel training
-extern void CommandCancelTraining(Unit* unit);
+extern void CommandCancelTraining(Unit* unit,int slot);
     /// Prepare command upgrade to
 extern void CommandUpgradeTo(Unit* unit,UnitType* what,int flush);
     /// Prepare command cancel upgrade to
-extern void CommandCancelUpgradeTo(Unit* unit,int flush);
+extern void CommandCancelUpgradeTo(Unit* unit);
     /// Prepare command research
-extern void CommandResearch(Unit* unit,int what,int flush);
+extern void CommandResearch(Unit* unit,Upgrade* what,int flush);
     /// Prepare command cancel research
-extern void CommandCancelResearch(Unit* unit,int flush);
+extern void CommandCancelResearch(Unit* unit);
     /// Prepare command upgrade
 //extern void CommandUpgradeUnit(Unit* unit,int what,int flush);
     /// Prepare command demolish

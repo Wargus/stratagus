@@ -47,7 +47,17 @@
 /*
 **	Next unit type are used hardcoded in the source.
 */
-global UnitType* UnitTypeGoldMine;	/// Gold mine unit type pointer.
+global UnitType*UnitTypeGoldMine;	/// Gold mine unit type pointer.
+global UnitType*UnitTypeOrcTanker;	/// Orc tanker unit type pointer.
+global UnitType*UnitTypeHumanTanker;	/// Human tanker unit type pointer.
+global UnitType*UnitTypeOrcTankerFull;	/// Orc tanker full unit type pointer.
+global UnitType*UnitTypeHumanTankerFull;/// Human tanker full unit type pointer.
+global UnitType*UnitTypeHumanWorker;	/// Human worker.
+global UnitType*UnitTypeOrcWorker;	/// Orc worker.
+global UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold.
+global UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold.
+global UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
+global UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
 
 /**
 **	Lookup table for unit-type names
@@ -416,7 +426,7 @@ global void PrintUnitTypeTable(void)
 	printf("\t//SeeSu\tCowerP\tTanker\tTrans\tGOil\tSOil\tVanish\tGrAtt\n");
 	printf("\t,%6d,%6d,%7d,%6d,%6d,%7d,%9d,%8d\n"
 	    ,type->CanSeeSubmarine
-	    ,type->CowerPeon
+	    ,type->CowerWorker
 	    ,type->Tanker
 	    ,type->Transporter
 	    ,type->GivesOil
@@ -692,7 +702,7 @@ global void ParsePudUDTA(const char* udta,int length)
 	unittype->Building=BIT(5,v);
 	unittype->Submarine=BIT(6,v);
 	unittype->CanSeeSubmarine=BIT(7,v);
-	unittype->CowerPeon=BIT(8,v);
+	unittype->CowerWorker=BIT(8,v);
 	unittype->Tanker=BIT(9,v);
 	unittype->Transporter=BIT(10,v);
 	unittype->GivesOil=BIT(11,v);
@@ -897,8 +907,8 @@ global void SaveUnitType(const UnitType* type,FILE* file)
     if( type->CanSeeSubmarine ) {
 	fprintf(file,"  'can-see-submarine\n");
     }
-    if( type->CowerPeon ) {
-	fprintf(file,"  'cower-peon\n");
+    if( type->CowerWorker ) {
+	fprintf(file,"  'cower-worker\n");
     }
     if( type->Tanker ) {
 	fprintf(file,"  'tanker\n");
@@ -1050,6 +1060,16 @@ global void InitUnitTypes(void)
     //	Setup hardcoded unit types.
     //
     UnitTypeGoldMine=UnitTypeByIdent("unit-gold-mine");
+    UnitTypeHumanTanker=UnitTypeByIdent("unit-human-oil-tanker");
+    UnitTypeOrcTanker=UnitTypeByIdent("unit-orc-oil-tanker");
+    UnitTypeHumanTankerFull=UnitTypeByIdent("unit-human-oil-tanker-full");
+    UnitTypeOrcTankerFull=UnitTypeByIdent("unit-orc-oil-tanker-full");
+    UnitTypeHumanWorker=UnitTypeByIdent("unit-peasant");
+    UnitTypeOrcWorker=UnitTypeByIdent("unit-peon");
+    UnitTypeHumanWorkerWithGold=UnitTypeByIdent("unit-peasant-with-gold");
+    UnitTypeOrcWorkerWithGold=UnitTypeByIdent("unit-peon-with-gold");
+    UnitTypeHumanWorkerWithWood=UnitTypeByIdent("unit-peasant-with-wood");
+    UnitTypeOrcWorkerWithWood=UnitTypeByIdent("unit-peon-with-wood");
 }
 
 /**

@@ -166,10 +166,10 @@ local int ChopWood(Unit* unit)
 	if( !(unit->WoodToHarvest = --unit->Value) ) {
 
 	    // Have wood
-	    if( unit->Type->Type==UnitPeon ) {
-		unit->Type=&UnitTypes[UnitPeonWithWood];
-	    } else if( unit->Type->Type==UnitPeasant ) {
-		unit->Type=&UnitTypes[UnitPeasantWithWood];
+	    if( unit->Type==UnitTypeOrcWorker ) {
+		unit->Type=UnitTypeOrcWorkerWithWood;
+	    } else if( unit->Type==UnitTypeHumanWorker ) {
+		unit->Type=UnitTypeHumanWorkerWithWood;
 	    } else {
 		DebugLevel0("Wrong unit for chopping wood %d\n"
 			,unit->Type->Type);
@@ -290,10 +290,10 @@ local int ReturnWithWood(Unit* unit)
 	MustRedraw|=RedrawResources;
     }
 
-    if( unit->Type->Type==UnitPeonWithWood ) {
-	unit->Type=&UnitTypes[UnitPeon];
-    } else if( unit->Type->Type==UnitPeasantWithWood ) {
-	unit->Type=&UnitTypes[UnitPeasant];
+    if( unit->Type==UnitTypeOrcWorkerWithWood ) {
+	unit->Type=UnitTypeOrcWorker;
+    } else if( unit->Type==UnitTypeHumanWorkerWithWood ) {
+	unit->Type=UnitTypeHumanWorker;
     } else {
 	DebugLevel0("Wrong unit for returning wood %d\n"
 	    ,unit->Type->Type);

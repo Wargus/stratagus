@@ -144,7 +144,7 @@ global void HandleActionBuild(Unit* unit)
     build->Command.Data.Builded.Add=stats->HitPoints/n;
     build->Command.Data.Builded.Sub=n;
     build->Command.Data.Builded.Cancel=0; // FIXME: Is it necessary?
-    build->Command.Data.Builded.Peon=unit;
+    build->Command.Data.Builded.Worker=unit;
     DebugLevel3("Build Sum %d, Add %d, Val %d, Sub %d\n"
 		,build->Command.Data.Builded.Sum
 		,build->Command.Data.Builded.Add
@@ -191,11 +191,11 @@ global void HandleActionBuilded(Unit* unit)
     //
     if( unit->Command.Data.Builded.Cancel ) {
 	// Drop out unit
-	peon=unit->Command.Data.Builded.Peon;
+	peon=unit->Command.Data.Builded.Worker;
 	peon->Reset=1;
 	peon->Wait=1;
 	peon->Command.Action=UnitActionStill;
-	unit->Command.Data.Builded.Peon=NULL;
+	unit->Command.Data.Builded.Worker=NULL;
 	DropOutOnSide(peon,HeadingW,type->TileWidth,type->TileHeight);
 	// Cancel building
 	DestroyUnit(unit);
@@ -229,7 +229,7 @@ global void HandleActionBuilded(Unit* unit)
 	unit->Reset=1;
 	unit->Wait=1;
 
-	peon=unit->Command.Data.Builded.Peon;
+	peon=unit->Command.Data.Builded.Worker;
 	peon->Command.Action=UnitActionStill;
 	peon->Reset=1;
 	peon->Wait=1;
@@ -269,7 +269,7 @@ global void HandleActionBuilded(Unit* unit)
 	    }
 	    RemoveUnit( unit );
 	    UnitLost(unit);
-	    FreeUnitMemory(unit);
+	    ReleaseUnit(unit);
 	    return;
         }
 
