@@ -667,7 +667,7 @@ local void PrgStartInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Leave menus and return to game mode
 */
 local void GameMenuReturn(void)
 {
@@ -684,7 +684,7 @@ local char *SaveDir;			/// FIXME: docu
 local int TypedFileName;		/// FIXME: docu
 
 /**
-**	FIXME: docu
+**	Init callback for save game menu
 */
 local void InitSaveGameMenu(Menuitem *mi)
 {
@@ -694,7 +694,7 @@ local void InitSaveGameMenu(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu.
+**	Save game input box callback
 */
 local void EnterSaveGameAction(Menuitem *mi, int key)
 {
@@ -712,7 +712,7 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 }
 
 /**
-**	FIXME: docu
+**	Save game
 */
 local void SaveAction(void)
 {
@@ -746,7 +746,7 @@ local void SaveAction(void)
 }
 
 /**
-**	FIXME: docu
+**	Create the save directory
 */
 local void CreateSaveDir(void)
 {
@@ -770,7 +770,7 @@ local void CreateSaveDir(void)
 }
 
 /**
-**	FIXME: docu
+**	Save game menu
 */
 global void GameMenuSave(void)
 {
@@ -787,7 +787,7 @@ global void GameMenuSave(void)
 }
 
 /**
-**	FIXME: docu
+**	Exit callback for listbox in save game menu
 */
 // FIXME: modify function
 local void SaveLBExit(Menuitem *mi)
@@ -804,7 +804,7 @@ local void SaveLBExit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Init callback for listbox in save game menu
 */
 local void SaveLBInit(Menuitem *mi)
 {
@@ -825,7 +825,7 @@ local void SaveLBInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Save game listbox retrieve callback
 */
 // FIXME: modify function
 local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
@@ -870,7 +870,7 @@ local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Save game listbox action callback
 */
 local void SaveLBAction(Menuitem *mi, int i)
 {
@@ -897,7 +897,7 @@ local void SaveLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Save game vertical scroll callback
 */
 local void SaveVSAction(Menuitem *mi, int i)
 {
@@ -1033,7 +1033,7 @@ local void SaveOk(void)
 }
 
 /**
-**	FIXME: docu
+**	Save game read directory filter
 */
 local int SaveRDFilter(char *pathbuf, FileList *fl)
 {
@@ -1082,7 +1082,7 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
 }
 
 /**
-**	FIXME: docu
+**	Load game init callback
 */
 local void InitLoadGameMenu(Menuitem *mi)
 {
@@ -1091,7 +1091,7 @@ local void InitLoadGameMenu(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Exit callback for listbox in load game menu
 */
 // FIXME: modify function
 local void LoadLBExit(Menuitem *mi)
@@ -1108,7 +1108,7 @@ local void LoadLBExit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Init callback for listbox in load game menu
 */
 local void LoadLBInit(Menuitem *mi)
 {
@@ -1129,7 +1129,7 @@ local void LoadLBInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Load game listbox retrieve callback
 */
 // FIXME: modify function
 local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
@@ -1174,7 +1174,7 @@ local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Load game listbox action callback
 */
 local void LoadLBAction(Menuitem *mi, int i)
 {
@@ -1196,7 +1196,7 @@ local void LoadLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Load game vertical scroll callback
 */
 local void LoadVSAction(Menuitem *mi, int i)
 {
@@ -1341,7 +1341,7 @@ local void SaveMenu(void)
 #endif
 
 /**
-**	FIXME: docu
+**	Save confirm init callback
 */
 local void SaveConfirmInit(Menuitem * mi)
 {
@@ -1364,7 +1364,7 @@ local void SaveConfirmInit(Menuitem * mi)
 }
 
 /**
-**	FIXME: docu
+**	Save confirm ok button
 */
 local void SaveConfirmOk(void)
 {
@@ -1393,7 +1393,7 @@ local void SaveConfirmOk(void)
 }
 
 /**
-**	FIXME: docu
+**	Save confirm cancel button
 */
 local void SaveConfirmCancel(void)
 {
@@ -1405,7 +1405,7 @@ local void SaveConfirmCancel(void)
 }
 
 /**
-**	FIXME: docu
+**	Delete menu
 */
 local void FcDeleteMenu(void)
 {
@@ -1414,7 +1414,7 @@ local void FcDeleteMenu(void)
 }
 
 /**
-**	FIXME: docu
+**	Init callback for delete menu
 */
 local void FcDeleteInit(Menuitem *mi)
 {
@@ -1428,7 +1428,7 @@ local void FcDeleteInit(Menuitem *mi)
 }
   
 /**
-**	FIXME: docu
+**	Delete ok button
 */
 local void FcDeleteOk(void)
 {
@@ -1450,7 +1450,7 @@ local void FcDeleteOk(void)
 }
 
 /**
-**	FIXME: docu
+**	Delete cancel button
 */
 local void FcDeleteCancel(void)
 {
@@ -1490,7 +1490,7 @@ local void LoadAction(void)
 }
 
 /**
-**	FIXME: docu
+**	Load game menu
 */
 global void GameMenuLoad(void)
 {
@@ -1506,7 +1506,7 @@ global void GameMenuLoad(void)
 }
 
 /**
-**	FIXME: docu
+**	Init callback for game menu
 */
 local void InitGameMenu(Menuitem *mi __attribute__((unused)))
 {
@@ -1514,7 +1514,7 @@ local void InitGameMenu(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Sound options menu
 */
 global void SoundOptions(void)
 {
@@ -1522,7 +1522,7 @@ global void SoundOptions(void)
 }
 
 /**
-**	FIXME: docu
+**	Init callback for sound options menu
 */
 local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 {
@@ -1605,7 +1605,7 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Global options menu
 */
 local void GlobalOptions(void)
 {
@@ -1613,7 +1613,7 @@ local void GlobalOptions(void)
 }
 
 /**
-**	FIXME: docu
+**	Init callback for global options menu
 */
 local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 {
@@ -1916,16 +1916,6 @@ local void GameOptions(void)
     ProcessMenu("menu-game-options", 1);
 }
 
-#if 0
-/**
-**	Show the global options.
-*/
-local void GameGlobalOptionsMenu(void)
-{
-    // FIXME: write me
-}
-#endif
-
 /**
 **	Show the game credits.
 */
@@ -2029,7 +2019,7 @@ local void GameMenuEnd(void)
 }
 
 /**
-**	FIXME: docu
+**	Keystroke help menu
 */
 local void KeystrokeHelpMenu(void)
 {
@@ -2041,7 +2031,7 @@ local void KeystrokeHelpMenu(void)
 }
 
 /**
-**	FIXME: docu
+**	Help menu
 */
 local void HelpMenu(void)
 {
@@ -2049,7 +2039,7 @@ local void HelpMenu(void)
 }
 
 /**
-**	FIXME: docu
+**	Tips menu
 */
 local void ShowTipsMenu(void)
 {
@@ -2165,7 +2155,7 @@ local void SetTips(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Cycle to the next tip
 */
 local void NextTip(void)
 {
@@ -2204,7 +2194,7 @@ local void GameMenuExit(void)
 }
 
 /**
-**	FIXME: docu
+**	Initialize the game objectives menu
 */
 local void SetMenuObjectives(void)
 {
@@ -2264,7 +2254,7 @@ local void SetMenuObjectives(void)
 }
 
 /**
-**	FIXME: docu
+**	Free the game objectives menu memory
 */
 local void FreeMenuObjectives(void)
 {
@@ -2281,7 +2271,7 @@ local void FreeMenuObjectives(void)
 }
 
 /**
-**	FIXME: docu
+**	Game objectives menu
 */
 local void GameMenuObjectives(void)
 {
@@ -2788,7 +2778,7 @@ local void MultiPlayerGameMenu(void)
 }
 
 /**
-**	FIXME: docu
+**	Free map info data
 */
 local void FreeMapInfos(FileList *fl, int n)
 {
@@ -2815,7 +2805,7 @@ local void ScenSelectInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Scenario select listbox action callback
 */
 local void ScenSelectLBAction(Menuitem *mi, int i)
 {
@@ -2838,7 +2828,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Scenario select listbox exit callback
 */
 local void ScenSelectLBExit(Menuitem *mi)
 {
@@ -2855,7 +2845,7 @@ local void ScenSelectLBExit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Scenario select read directory filter
 */
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
@@ -2971,7 +2961,7 @@ usezzf:
 }
 
 /**
-**	FIXME: docu
+**	Scenario select listbox init callback
 */
 local void ScenSelectLBInit(Menuitem *mi)
 {
@@ -2999,7 +2989,7 @@ local void ScenSelectLBInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Scenario select listbox retrieve callback
 */
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 {
@@ -3043,7 +3033,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Scenario select map type action callback
 */
 local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
@@ -3058,7 +3048,7 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Scenario select vertical scroll action callback
 */
 local void ScenSelectVSAction(Menuitem *mi, int i)
 {
@@ -3148,7 +3138,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Keystroke help vertical scroll action callback
 */
 local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
@@ -3201,7 +3191,7 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Game speed horizontal scroll action callback
 */
 local void GameSpeedHSAction(Menuitem *mi, int i)
 {
@@ -3246,7 +3236,7 @@ local void GameSpeedHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Mouse scroll horizontal scroll action callback
 */
 local void MouseScrollHSAction(Menuitem *mi, int i)
 {
@@ -3295,7 +3285,7 @@ local void MouseScrollHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Keyboard scroll horizontal scroll action callback
 */
 local void KeyboardScrollHSAction(Menuitem *mi, int i)
 {
@@ -3344,7 +3334,7 @@ local void KeyboardScrollHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Master volume horizontal scroll action callback
 */
 local void MasterVolumeHSAction(Menuitem *mi, int i)
 {
@@ -3387,7 +3377,7 @@ local void MasterVolumeHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Music volume horizontal scroll action callback
 */
 local void MusicVolumeHSAction(Menuitem *mi, int i)
 {
@@ -3431,7 +3421,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
 
 #ifdef USE_LIBCDA
 /**
-**	FIXME: docu
+**	CD volume horizontal scroll action callback
 */
 local void CdVolumeHSAction(Menuitem *mi, int i)
 {
@@ -3474,7 +3464,7 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
 }
 #else
 /**
-**	FIXME: docu
+**	CD volume horizontal scroll action callback
 */
 local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)),
 	int i __attribute__((unused)))
@@ -3483,7 +3473,7 @@ local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)),
 #endif
 
 /**
-**	FIXME: docu
+**	Scenario select folder button
 */
 local void ScenSelectFolder(void)
 {
@@ -3517,7 +3507,7 @@ local void ScenSelectFolder(void)
 }
 
 /**
-**	FIXME: docu
+**	Scenario select ok button
 */
 local void ScenSelectOk(void)
 {
@@ -3733,7 +3723,7 @@ local void GameRCSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Game resources action callback
 */
 local void GameRESAction(Menuitem *mi, int i)
 {
@@ -3750,7 +3740,7 @@ local void GameRESAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Game units action callback
 */
 local void GameUNSAction(Menuitem *mi, int i)
 {
@@ -3764,7 +3754,7 @@ local void GameUNSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Game tilesets action callback
 */
 local void GameTSSAction(Menuitem *mi, int i)
 {
@@ -3798,7 +3788,7 @@ local void GameGATAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Game opponents action callback
 */
 local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 {
@@ -3875,7 +3865,7 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer server draw func
 */
 local void MultiGameDrawFunc(Menuitem *mi)
 {
@@ -3883,7 +3873,7 @@ local void MultiGameDrawFunc(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer client draw func
 */
 local void MultiGameClientDrawFunc(Menuitem *mi)
 {
@@ -4206,7 +4196,7 @@ local void MultiClientUpdate(int initial)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer server menu init callback
 */
 local void MultiGameSetupInit(Menuitem *mi)
 {
@@ -4238,7 +4228,7 @@ local void MultiGameSetupInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer server menu exit callback
 */
 local void MultiGameSetupExit(Menuitem *mi)
 {
@@ -4334,7 +4324,7 @@ local void MultiClientCancel(void)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer client menu init callback
 */
 local void MultiGameClientInit(Menuitem *mi)
 {
@@ -4350,7 +4340,7 @@ local void MultiGameClientInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer client menu exit callback
 */
 local void MultiGameClientExit(Menuitem *mi)
 {
@@ -4386,7 +4376,7 @@ local void MultiClientGemAction(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer client races action callback
 */
 local void MultiClientRCSAction(Menuitem *mi, int i)
 {
@@ -4397,7 +4387,7 @@ local void MultiClientRCSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer client ready button
 */
 local void MultiClientReady(void)
 {
@@ -4411,7 +4401,7 @@ local void MultiClientReady(void)
 }
 
 /**
-**	FIXME: docu
+**	Multiplayer client not ready button
 */
 local void MultiClientNotReady(void)
 {
@@ -4619,7 +4609,7 @@ local void EditorNewMap(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor new map draw func
 */
 local void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
 {
@@ -4627,7 +4617,7 @@ local void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Editor new map, map description input box callback
 */
 local void EditorNewMapDescriptionEnterAction(
 	Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
@@ -4635,7 +4625,7 @@ local void EditorNewMapDescriptionEnterAction(
 }
 
 /**
-**	FIXME: docu
+**	Editor new map, size input box callback
 */
 local void EditorNewMapSizeEnterAction(Menuitem * mi,
 	int key __attribute__((unused)))
@@ -4647,7 +4637,7 @@ local void EditorNewMapSizeEnterAction(Menuitem * mi,
 }
 
 /**
-**	FIXME: docu
+**	Editor new map ok button
 */
 local void EditorNewOk(void)
 {
@@ -4705,7 +4695,7 @@ local void EditorNewOk(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor new map cancel button
 */
 local void EditorNewCancel(void)
 {
@@ -4714,7 +4704,7 @@ local void EditorNewCancel(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load map menu
 */
 local void EditorMainLoadMap(void)
 {
@@ -4754,7 +4744,7 @@ local void EditorMainLoadMap(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load init callback
 */
 local void EditorMainLoadInit(Menuitem *mi)
 {
@@ -4766,7 +4756,7 @@ local void EditorMainLoadInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load listbox init callback
 */
 local void EditorMainLoadLBInit(Menuitem *mi)
 {
@@ -4790,7 +4780,7 @@ local void EditorMainLoadLBInit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load listbox exit callback
 */
 local void EditorMainLoadLBExit(Menuitem *mi)
 {
@@ -4807,7 +4797,7 @@ local void EditorMainLoadLBExit(Menuitem *mi)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load read directory filter
 */
 local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
@@ -4895,7 +4885,7 @@ usezzf:
 }
 
 /**
-**	FIXME: docu
+**	Editor main load folder button
 */
 local void EditorMainLoadFolder(void)
 {
@@ -4930,7 +4920,7 @@ local void EditorMainLoadFolder(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load ok button
 */
 local void EditorMainLoadOk(void)
 {
@@ -4970,7 +4960,7 @@ local void EditorMainLoadOk(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load cancel button
 */
 local void EditorMainLoadCancel(void)
 {
@@ -5008,7 +4998,7 @@ local void EditorMainLoadCancel(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load listbox retrieve callback
 */
 local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 {
@@ -5052,7 +5042,7 @@ local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load listbox action callback
 */
 local void EditorMainLoadLBAction(Menuitem *mi, int i)
 {
@@ -5075,7 +5065,7 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Editor main load vertical scroll action callback
 */
 local void EditorMainLoadVSAction(Menuitem *mi, int i)
 {
@@ -5165,7 +5155,7 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Editor map properties menu
 */
 local void EditorMapProperties(void)
 {
@@ -5196,7 +5186,7 @@ local void EditorMapProperties(void)
 }
 
 /**
-**	FIXME: docu
+**	Editor map properties input box callback
 */
 local void EditorMapPropertiesEnterAction(
 	Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
@@ -5204,7 +5194,7 @@ local void EditorMapPropertiesEnterAction(
 }
 
 /**
-**	FIXME: docu
+**	Editor map properties ok button
 */
 local void EditorMapPropertiesOk(void)
 {
@@ -5228,18 +5218,8 @@ local void EditorMapPropertiesOk(void)
     EditorEndMenu();
 }
 
-#if 0
 /**
-**	FIXME: docu
-*/
-local void EditorMapPropertiesCancel(void)
-{
-    EditorEndMenu();
-}
-#endif
-
-/**
-**	FIXME: docu
+**	Editor player properties draw func
 */
 local void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
 {
@@ -5247,7 +5227,7 @@ local void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Editor player properties input box callback
 */
 local void EditorPlayerPropertiesEnterAction(Menuitem *mi,
 	int key __attribute__((unused)))
