@@ -1142,6 +1142,8 @@ global void MissileHit(Missile* missile)
 */
 local void MissileAction(Missile* missile)
 {
+    int neg;
+
     //StephanR FIXME:needed here?
     //	Johns FIXME: this is needed if the missiles moves or disappears.
     CheckMissileToBeDrawn(missile);
@@ -1160,11 +1162,19 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate missile, cycle through frames
 		//
+		neg=0;
+		if( missile->SpriteFrame<0 ) {
+		    neg=1;
+		    missile->SpriteFrame=-missile->SpriteFrame;
+		}
 		missile->SpriteFrame+=5;		// FIXME: frames pro row
 		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    missile->SpriteFrame-=
 			    VideoGraphicFrames(missile->Type->Sprite);
+		}
+		if( neg ) {
+		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 		DebugLevel3Fn("Frame %d of %d\n"
 			_C_ missile->SpriteFrame
@@ -1212,11 +1222,19 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate missile, cycle through frames
 		//
+		neg=0;
+		if( missile->SpriteFrame<0 ) {
+		    neg=1;
+		    missile->SpriteFrame=-missile->SpriteFrame;
+		}
 		missile->SpriteFrame+=5;		// FIXME: frames pro row
 		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    missile->SpriteFrame-=
 			    VideoGraphicFrames(missile->Type->Sprite);
+		}
+		if( neg ) {
+		    missile->SpriteFrame=-missile->SpriteFrame;
 		}
 		DebugLevel3Fn("Frame %d of %d\n"
 			_C_ missile->SpriteFrame
@@ -1230,6 +1248,11 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate hit
 		//
+		neg=0;
+		if( missile->SpriteFrame<0 ) {
+		    neg=1;
+		    missile->SpriteFrame=-missile->SpriteFrame;
+		}
 		missile->SpriteFrame+=5;	// FIXME: frames pro row
 		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
@@ -1237,11 +1260,19 @@ local void MissileAction(Missile* missile)
 		    FreeMissile(missile);
 		    missile=NULL;
 		}
+		if( neg ) {
+		    missile->SpriteFrame=-missile->SpriteFrame;
+		}
 	    }
 	    break;
 
 #if 0	// FIXME: is done by the mythic controller
 	case MissileClassFlameShield:
+	    neg=0;
+	    if( missile->SpriteFrame<0 ) {
+		neg=1;
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    missile->Wait=missile->Type->Sleep;
 	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
@@ -1249,6 +1280,9 @@ local void MissileAction(Missile* missile)
 		if( PointToPointMissile(missile) ) {
 		    // Must set new goal.
 		}
+	    }
+	    if( neg ) {
+		missile->SpriteFrame=-missile->SpriteFrame;
 	    }
 	    break;
 #endif
@@ -1259,6 +1293,11 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate hit
 		//
+		neg=0;
+		if( missile->SpriteFrame<0 ) {
+		    neg=1;
+		    missile->SpriteFrame=-missile->SpriteFrame;
+		}
 		missile->SpriteFrame+=4;	// FIXME: frames pro row
 		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
@@ -1266,12 +1305,20 @@ local void MissileAction(Missile* missile)
 		    FreeMissile(missile);
 		    missile=NULL;
 		}
+		if( neg ) {
+		    missile->SpriteFrame=-missile->SpriteFrame;
+		}
 	    }
 	    break;
 
 	case MissileClassDeathDecay:
 	    //NOTE: vladi: this is exact copy of MissileClassStayWithDelay
 	    // but with check for blizzard-type hit (friendly fire:))
+	    neg=0;
+	    if( missile->SpriteFrame<0 ) {
+		neg=1;
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    missile->Wait=missile->Type->Sleep;
 	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
@@ -1279,18 +1326,34 @@ local void MissileAction(Missile* missile)
 		FreeMissile(missile);
 		missile=NULL;
 	    }
+	    if( neg ) {
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    break;
 
 	case MissileClassWhirlwind:
+	    neg=0;
+	    if( missile->SpriteFrame<0 ) {
+		neg=1;
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    missile->Wait=missile->Type->Sleep;
 	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
 		missile->SpriteFrame = 0;
 		PointToPointMissile(missile);
 	    }
+	    if( neg ) {
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    break;
 
 	case MissileClassStayWithDelay:
+	    neg=0;
+	    if( missile->SpriteFrame<0 ) {
+		neg=1;
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    missile->Wait=missile->Type->Sleep;
 	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
@@ -1299,9 +1362,17 @@ local void MissileAction(Missile* missile)
 		missile=NULL;
 		// FIXME: should MissileHitAndFree();
 	    }
+	    if( neg ) {
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    break;
 
 	case MissileClassCycleOnce:
+	    neg=0;
+	    if( missile->SpriteFrame<0 ) {
+		neg=1;
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    missile->Wait=missile->Type->Sleep;
 	    switch( missile->State ) {
 		case 0:
@@ -1323,6 +1394,9 @@ local void MissileAction(Missile* missile)
 		    }
 		    break;
 	    }
+	    if( neg ) {
+		missile->SpriteFrame=-missile->SpriteFrame;
+	    }
 	    break;
 
 	case MissileClassFire: {
@@ -1333,6 +1407,11 @@ local void MissileAction(Missile* missile)
 		FreeMissile(missile);
 		missile=NULL;
 		break;
+	    }
+	    neg=0;
+	    if( missile->SpriteFrame<0 ) {
+		neg=1;
+		missile->SpriteFrame=-missile->SpriteFrame;
 	    }
 	    missile->Wait=missile->Type->Sleep;
 	    if( ++missile->SpriteFrame
@@ -1362,6 +1441,9 @@ local void MissileAction(Missile* missile)
 			missile->Y-=missile->Type->Height/2;
 		    }
 		}
+	    }
+	    if( neg ) {
+		missile->SpriteFrame=-missile->SpriteFrame;
 	    }
 	    break;
 
