@@ -52,12 +52,6 @@
 **
 **		Pointer to the graphic. This pointer is resolved during game
 **		start.
-**
-**	Example how this can be used in C initializers:
-**
-**	@code
-**		{ "peasant.png" },
-**	@endcode
 */
 
 /*----------------------------------------------------------------------------
@@ -68,24 +62,6 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**	video mode (color) types
-**
-**  FIXME: The folllowing are assumptions and might not be true for all
-**         hardware. Note that VMemType16 and VMemType32 support 2 types.
-**         An idea: convert VMemType32 to the needed coding in the very last
-**                  step, keeping it out of the main code (and this include ;)
-**
-**	VMemType8  : 8 bit (index in a special RGB pallette)
-**                   NOTE: single common palette support added (used in X11)
-**	VMemType16 :
-**        15 bit [5 bit Red|5 bit Green|5 bit Blue]
-**        16 bit [5 bit Red|6 bit Green|5 bit Blue]
-**	VMemType24 : [8 bit Red|8 bit Green|8 bit Blue]
-**	VMemType32 :
-**        24 bit [0|8 bit Red|8 bit Green|8 bit Blue]
-**        32 bit [8 bit alpha|8 bit Red|8 bit Green|8 bit Blue]
-*/
 typedef unsigned char VMemType8;	///  8 bpp modes pointer
 typedef unsigned short VMemType16;	/// 16 bpp modes pointer
 typedef struct { char a,b,c;} VMemType24;/// 24 bpp modes pointer
@@ -94,9 +70,26 @@ typedef unsigned long VMemType32;	/// 32 bpp modes pointer
 /**
 **	General video mode pointer.
 **
+**	video mode (color) types
+**
+**  FIXME: The folllowing are assumptions and might not be true for all
+**         hardware. Note that VMemType16 and VMemType32 support 2 types.
+**         An idea: convert VMemType32 to the needed coding in the very last
+**                  step, keeping it out of the main code (and this include ;)
+**
+**	@li VMemType8  : 8 bit (index in a special RGB palette)
+**                   NOTE: single common palette support added (used in X11)
+**	@li VMemType16 :
+**        15 bit [5 bit Red|5 bit Green|5 bit Blue]
+**        16 bit [5 bit Red|6 bit Green|5 bit Blue]
+**	@li VMemType24 : [8 bit Red|8 bit Green|8 bit Blue]
+**	@li VMemType32 :
+**        24 bit [0|8 bit Red|8 bit Green|8 bit Blue]
+**        32 bit [8 bit alpha|8 bit Red|8 bit Green|8 bit Blue]
+**
 **	@see VMemType8 @see VMemType16 @see VMemType24 @see VMemType32
 */
-typedef union __vmem_type__ {
+typedef union _vmem_type_ {
     VMemType8	D8;			///  8 bpp access
     VMemType16	D16;			/// 16 bpp access
     VMemType24	D24;			/// 24 bpp access
@@ -104,21 +97,19 @@ typedef union __vmem_type__ {
 } VMemType;
 
 /**
-**	Typedef of lnode.
+**	Typedef for palette links.
 */
-typedef struct __lnode__ PaletteLink;
+typedef struct _palette_link_ PaletteLink;
 
 /**
-**	sturct __lnode__, links all palettes together to join the same palettes.
+**	Links all palettes together to join the same palettes.
 */
-struct __lnode__ {
+struct _palette_link_ {
     PaletteLink*	Next;		/// Next palette
     VMemType*		Palette;	/// Palette in hardware format
     long		Checksum;	/// Checksum for quick lookup
-    // FIXME: need reference counts here!
     int			RefCount;	/// Reference counter
 };
-
 
     /// MACRO defines speed of colorcycling FIXME: should be made configurable
 #define COLOR_CYCLE_SPEED	(FRAMES_PER_SECOND/4)
@@ -419,17 +410,24 @@ extern Palette GlobalPalette[256];
 
     /**
     **	Special 8bpp functionality, only to be used in ../video
+    **	@todo use CommonPalette names!
     */
 extern Palette   *commonpalette;
+    /// FIXME: docu
 extern unsigned long commonpalette_defined[8];
+    /// FIXME: docu
 extern VMemType8 *colorcube8;
+    /// FIXME: docu
 extern VMemType8 *lookup25trans8;
+    /// FIXME: docu
 extern VMemType8 *lookup50trans8;
+    /// FIXME: docu
 extern void (*VideoAllocPalette8)( Palette *palette,
                                    Palette *syspalette,
                                    unsigned long syspalette_defined[8] );
 //FIXME: following function should be local in video.c, but this will also
 //       need VideoCreateNewPalette to be there (will all video still work?).
+    /// FIXME: docu
 extern global VMemType8* VideoFindNewPalette8( const VMemType8 *cube,
                                         const Palette *palette );
 
@@ -1028,7 +1026,6 @@ extern void (*VideoDrawRawClip)( VMemType *pixels,
     /// Does ColorCycling..
 extern void (*ColorCycle)(void);
 
-
 /*----------------------------------------------------------------------------
 --	Macros
 ----------------------------------------------------------------------------*/
@@ -1307,11 +1304,27 @@ extern void LoadRGB(Palette* pal,const char* name);
     /**
     **	Creates a hardware palette from an independend Palette struct.
     **
-    **	@param palette	System independ palette structure.
+    **	@param palette	System independend palette structure.
     **
-    **	@return		A palette in hardware  dependend format.
+    **	@return		A palette in hardware dependend format.
     */
 extern VMemType* VideoCreateNewPalette(const Palette* palette);
+
+    /**
+    **	Creates a shared hardware palette from an independend Palette struct.
+    **
+    **	@param palette	System independend palette structure.
+    **
+    **	@return		A palette in hardware dependend format.
+    */
+extern VMemType* VideoCreateSharedPalette(const Palette* palette);
+
+    /**
+    **	Free a shared hardware palette.
+    **
+    **	@param pixel	palette in hardware dependend format
+    */
+extern void VideoFreeSharedPalette(VMemType* pixels);
 
     /**
     **	Initialize Pixels[] for all players.
