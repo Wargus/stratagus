@@ -147,6 +147,12 @@ local SCM CclFreeCraftMap(SCM list)
 			field=gh_cdr(field);
 			TheMap.Fields[i].SeenTile=gh_scm2int(gh_car(field));
 			field=gh_cdr(field);
+#ifdef UNITS_ON_MAP
+			TheMap.Fields[i].Building = 0xffff;
+			TheMap.Fields[i].AirUnit = 0xffff;
+			TheMap.Fields[i].LandUnit = 0xffff;
+			TheMap.Fields[i].SeaUnit = 0xffff;
+#endif /* UNITS_ON_MAP */
 			while( !gh_null_p(field) ) {
 			    if( gh_exact_p(gh_car(field)) ) {
 				TheMap.Fields[i].Value=
