@@ -487,6 +487,10 @@ static int CclDefineUnitType(lua_State* l)
 			type->Revealer = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SightRange")) {
 			type->_SightRange = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "RadarRange")) {
+			type->RadarRange = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "RadarJammerRange")) {
+			type->RadarJammerRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ComputerReactionRange")) {
 			type->ReactRangeComputer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PersonReactionRange")) {

@@ -538,9 +538,22 @@ void MapMarkUnitSight(Unit* unit)
 
 	container = GetFirstContainer(unit);
 	Assert(container->Type);
+
 	MapMarkUnitSightRec(unit,
 		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
 		MapMarkTileSight, MapMarkTileDetectCloak);
+
+	// Never mark radar, except if the top unit?
+	if (unit == container) {
+		if (unit->Type->RadarRange) {
+			MapMarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+				unit->Type->TileHeight, unit->Type->RadarRange);
+		}
+		if (unit->Type->RadarJammerRange) {
+			MapMarkRadarJammer(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+				unit->Type->TileHeight, unit->Type->RadarJammerRange);
+		}
+	}
 }
 
 /**
@@ -562,6 +575,18 @@ void MapUnmarkUnitSight(Unit* unit)
 	MapMarkUnitSightRec(unit,
 		container->X, container->Y, container->Type->TileWidth, container->Type->TileHeight,
 		MapUnmarkTileSight, MapUnmarkTileDetectCloak);
+
+	// Never mark radar, except if the top unit?
+	if (unit == container) {
+		if (unit->Type->RadarRange) {
+			MapUnmarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+				unit->Type->TileHeight, unit->Type->RadarRange);
+		}
+		if (unit->Type->RadarJammerRange) {
+			MapUnmarkRadarJammer(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
+				unit->Type->TileHeight, unit->Type->RadarJammerRange);
+		}
+	}
 }
 
 /**
@@ -1366,7 +1391,8 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 			(!PlayersShareVision(player->Player, unit->Player->Player))) {
 		return 0;
 	}
-	if (UnitVisible(unit, player) || player->Type == PlayerComputer) {
+	if (UnitVisible(unit, player) || player->Type == PlayerComputer ||
+		UnitVisibleOnRadar(player, unit)) {
 		return  (!unit->Removed) &&
 				(!unit->Destroyed) &&
 				(unit->Orders->Action != UnitActionDie);
@@ -1419,7 +1445,8 @@ int UnitVisibleOnMinimap(const Unit* unit)
 			(!PlayersShareVision(ThisPlayer->Player, unit->Player->Player))) {
 		return 0;
 	}
-	if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
+	if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap ||
+		UnitVisibleOnRadar(ThisPlayer, unit)) {
 		return (!unit->Removed) &&
 				(!unit->Destroyed) &&
 				(unit->Orders->Action != UnitActionDie);
