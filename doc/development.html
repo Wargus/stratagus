@@ -160,7 +160,7 @@ Please note CVS is always a little newer and it is easier for you to keep
 up to date. But you find regular snapshots of the FreeCraft source here:
 
 <UL>
-<LI><A HREF="ftp://freecraft.sourceforge.net/pub/freecraft/">FTP</A>
+<LI>FTP is no longer available
 <LI><A HREF="http://freecraft.sourceforge.net/snapshots/">HTTP</A>
 <LI><A HREF="http://freecraft.net/snapshots/">HTTP</A>
 </UL>
@@ -228,6 +228,49 @@ You need a C compiler for windows.
 	libbz2 and libzzip.  Install this and download the newest FreeCraft
 	source and start FreeCraft development under windows.<P>
     </UL>
+</UL>
+
+<H3>Window CE(tm) / PocketPc(tm)</H3>
+
+You need a C compiler for this platform.<P>
+<UL>
+<LI>eMbedded Visual C++ 3.0<P>
+    You can download or order it <A HREF="http://www.microsoft.com/mobile/downloads/emvt30.asp">
+    here</A>. 
+<LI>CE support for Visual C++ or Visual Studio<P>
+    This isn't supported yet. If you know the links and how to use, please publish this.
+</UL>
+
+You need following libs for WinCE.
+<UL>
+<LI>libpng<P>
+    Required, you can download a ready compiled development version here:
+    <A HREF="http://freecraft.net/snapshots/lpngce108a.zip">lpngce108a.zip</A>
+    or <A HREF="http://www.tenik.co.jp/~adachi/wince/index.htm">author site</A>
+<LI>zlib<P>
+    Required, you can download a ready compiled development version here:
+    <A HREF="http://freecraft.net/snapshots/zlibce12.zip">zlibce12.zip</A>
+    or <A HREF="http://www.tenik.co.jp/~adachi/wince/index.htm">author site</A>
+<LI>libsdl<P>
+    Required or you write a new winCE hardware driver for FreeCraft. You
+    find informations about SDL on the
+    <A HREF="http://www.libsdl.org">libSDL home</A> and you can download it
+    <A HREF="http://www.libsdl.org/download-1.2.html">here</A> and 
+    <A HREF="http://www.libsdl.org/cvs/WinCE-SDL.zip">workbench and project</A>.
+<LI>bz2lib<P>
+    Not required and no WinCE version found.
+<LI>zziplib<P>
+    Not required and no WinCE version found.
+</UL>
+
+Now you need the 
+<A HREF="http://freecraft.sourceforge.net/snapshots/FreeCraft%20CE.vcp.gz">
+emVC++ project</A> and
+<A HREF="http://freecraft.sourceforge.net/snapshots/FreeCraft%20CE.vcw.gz">
+emVC++ workbench</A> for FreeCraft.<P>
+
+With the sources from CVS, you can continue working.<BR>
+<B>Note: WinCE isn't supported yet.</B>
 
 <H2>Make and makefiles</H2>
 
