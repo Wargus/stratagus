@@ -627,7 +627,7 @@ global void RemoveUnit(Unit* unit, Unit* host)
     unsigned flags;
 
 #ifdef NEW_FOW
-    if( unit->Removed ) {
+    if( unit->Removed && unit->Next ) {
 	MapUnmarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
 				,unit->Next->Y+unit->Next->Type->TileHeight/2
 				,unit->CurrentSightRange);
