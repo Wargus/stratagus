@@ -838,7 +838,7 @@ global void GameMainLoop(void)
 	SetStatusLine("You have lost!");
 	ProcessMenu(MENU_LOST, 1);
     }
-    if( GameResult==GameVictory ) {
+    else if( GameResult==GameVictory ) {
 	fprintf(stderr,"You have won!\n");
 	SetStatusLine("You have won!");
 	ProcessMenu(MENU_VICTORY, 1);
