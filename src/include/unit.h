@@ -58,6 +58,7 @@ enum _unit_action_ {
     UnitActionFollow,			/// unit follows units
     UnitActionMove,			/// unit moves to position/unit
     UnitActionAttack,			/// unit attacks position/unit
+    UnitActionAttackGround,		/// unit attacks ground
     UnitActionDie,			/// unit dies
 
     UnitActionTrain,			/// building is training
