@@ -66,11 +66,10 @@
 global Sample* MusicSample;		/// Music samples
 #endif
 
-				/// FIXME: remove :defined
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" ":all" or ":defined"
+global char *CDPlaySection = "menu";
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
-global char *CDPlaySection = "menu";
 #endif
 
 #if defined(USE_SDLCD)
