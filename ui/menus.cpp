@@ -32,21 +32,10 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#ifndef _MSC_VER
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#else
-#ifndef _WIN32_WCE
-#include <direct.h>
-#include <io.h>
-#define F_OK 4
-#define PATH_MAX _MAX_PATH
-#endif
-#endif
+
+#include "iocompat.h"
 
 #include "freecraft.h"
 #include "video.h"
@@ -75,10 +64,6 @@
 
 #ifdef USE_LIBCDA
 #include "libcda.h"
-#endif
-
-#ifndef O_BINARY
-#define O_BINARY 0
 #endif
 
 /*----------------------------------------------------------------------------

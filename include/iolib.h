@@ -29,9 +29,6 @@
 
 //@{
 
-// FIXME: ari: Add archive-style file support here (.DAT, .WAD, .AR, etc)
-// FIXME: johns: I want zip support, tar didn't supports compressed files.
-
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
