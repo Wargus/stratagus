@@ -6365,7 +6365,7 @@ local int CclDefineButton(lua_State* l)
     char buf[64];
     const char* value;
     char* s1;
-    char* s2;
+    const char* s2;
     ButtonAction ba;
     int args;
     int j;
@@ -6438,7 +6438,7 @@ local int CclDefineButton(lua_State* l)
 		lua_error(l);
 	    }
 	    if (lua_isnumber(l, j + 1)) {
-		sprintf(buf, "%ld", lua_tonumber(l, j + 1));
+		sprintf(buf, "%ld", (int)lua_tonumber(l, j + 1));
 		s1 = strdup(buf);
 	    } else {
 		s1 = strdup(lua_tostring(l, j + 1));
@@ -6488,14 +6488,11 @@ local int CclDefineButton(lua_State* l)
 	    subargs = luaL_getn(l, j + 1);
 	    for (k = 0; k < subargs; ++k) {
 		lua_rawgeti(l, j + 1, k + 1);
-		s2 = strdup(LuaToString(l, -1));
+		s2 = LuaToString(l, -1);
 		lua_pop(l, 1);
 		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
 		strcat(s1, s2);
-		free(s2);
-		if (k == subargs) {
-		    strcat(s1, ",");
-		}
+		strcat(s1, ",");
 	    }
 	    ba.AllowStr = s1;
 	} else if (!strcmp(value, "key")) {
@@ -6515,11 +6512,10 @@ local int CclDefineButton(lua_State* l)
 	    subargs = luaL_getn(l, j + 1);
 	    for (k = 0; k < subargs; ++k) {
 		lua_rawgeti(l, j + 1, k + 1);
-		s2 = strdup(LuaToString(l, -1));
+		s2 = LuaToString(l, -1);
 		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
 		strcat(s1, s2);
 		strcat(s1, ",");
-		free(s2);
 	    }
 	    ba.UnitMask = s1;
 	    if (!strncmp(ba.UnitMask, ",*,", 3)) {
