@@ -780,7 +780,7 @@ extern Unit* UnitOnMapTile(unsigned tx,unsigned ty);
     /// Return repairable unit on that map tile
 extern Unit* RepairableOnMapTile(unsigned tx,unsigned ty);
     /// Return possible attack target on that map tile
-extern Unit* TargetOnMapTile(Unit* unit,unsigned tx,unsigned ty);
+extern Unit* TargetOnMapTile(const Unit* unit,unsigned tx,unsigned ty);
     /// Return transporter unit on that map tile
 extern Unit* TransporterOnMapTile(unsigned tx,unsigned ty);
     /// Return any unit on that screen map position
@@ -788,7 +788,7 @@ extern Unit* UnitOnScreenMapPosition (unsigned , unsigned );
     /// Return repairable unit on that screen map position
 extern Unit* RepairableOnScreenMapPosition (unsigned , unsigned );
     /// Return possible attack target on that screen map position
-extern Unit* TargetOnScreenMapPosition (Unit* unit,unsigned , unsigned );
+extern Unit* TargetOnScreenMapPosition (const Unit* unit,unsigned , unsigned );
     /// Return transporter unit on that screen map position
 extern Unit* TransporterOnScreenMapPosition (unsigned , unsigned );
 
