@@ -378,7 +378,7 @@ local SCM CclDefineUnitType(SCM list)
 	value=gh_car(temp);
 	temp=gh_cdr(temp);
 	str=gh_scm2newstr(value,NULL);
-	DebugLevel1("\tCorpse: %s\n",str);
+	DebugLevel3("\tCorpse: %s\n",str);
 	type->CorpseName=str;
 
 	value=gh_car(temp);
