@@ -580,10 +580,13 @@ global void VideoDrawOnlyFogAlpha(int x, int y)
     SDL_Color csrc;
     SDL_Color cdest;
     unsigned char alpha;
+    unsigned char sat;
+    unsigned char max;
 
     drect.x = x;
     drect.y = y;
 
+    // Contrast
     SDL_BlitSurface(SolidFog, NULL, TheScreen, &drect);
 
     csrc.r = 255;
@@ -591,16 +594,31 @@ global void VideoDrawOnlyFogAlpha(int x, int y)
     csrc.b = 255;
 
     alpha = (255 - FogOfWarBrightness * 255 / 100);
+    sat = 100 - FogOfWarSaturation;
 
     SDL_LockSurface(TheScreen);
     for (i = y; i < y + TileSizeY; ++i) {
 	for (j = x; j < x + TileSizeX; ++j) {
 	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
 	    if (*p) {
+		// Brightness
 		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
 		cdest.r = ((cdest.r * alpha) + (csrc.r * (255 - alpha))) >> 8;
 		cdest.g = ((cdest.g * alpha) + (csrc.g * (255 - alpha))) >> 8;
 		cdest.b = ((cdest.b * alpha) + (csrc.b * (255 - alpha))) >> 8;
+
+		// Saturation
+		if (cdest.r > cdest.g && cdest.r > cdest.b) {
+		    max = cdest.r;
+		} else if (cdest.g > cdest.b) {
+		    max = cdest.g;
+		} else {
+		    max = cdest.b;
+		}
+		cdest.r += (max - cdest.r) * sat / 100;
+		cdest.g += (max - cdest.g) * sat / 100;
+		cdest.b += (max - cdest.b) * sat / 100;
+
 		*p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
 	    }
 	}
@@ -640,6 +658,8 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
     SDL_Color csrc;
     SDL_Color cdest;
     unsigned char alpha;
+    unsigned char sat;
+    unsigned char max;
 
     tilepitch = TheMap.TileGraphic->Width / TileSizeX;
 
@@ -651,6 +671,7 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
     drect.x = x;
     drect.y = y;
 
+    // Contrast
     alpha = TheMap.TileGraphic->Surface->format->alpha;
     SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA,
 	(100 - FogOfWarContrast) * 255 / 100);
@@ -662,6 +683,7 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
     csrc.b = 255;
 
     alpha = (255 - FogOfWarBrightness * 255 / 100);
+    sat = 100 - FogOfWarSaturation;
 
     SDL_LockSurface(TheScreen);
     for (i = y; i < y + TileSizeY; ++i) {
@@ -673,9 +695,23 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
 		&cdest.r, &cdest.g, &cdest.b);
 	    if (!(cdest.r | cdest.g | cdest.b) && *p) {
 		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
+		// Brightness
 		cdest.r = ((cdest.r * alpha) + (csrc.r * (255 - alpha))) >> 8;
 		cdest.g = ((cdest.g * alpha) + (csrc.g * (255 - alpha))) >> 8;
 		cdest.b = ((cdest.b * alpha) + (csrc.b * (255 - alpha))) >> 8;
+
+		// Saturation
+		if (cdest.r > cdest.g && cdest.r > cdest.b) {
+		    max = cdest.r;
+		} else if (cdest.g > cdest.b) {
+		    max = cdest.g;
+		} else {
+		    max = cdest.b;
+		}
+		cdest.r += (max - cdest.r) * sat / 100;
+		cdest.g += (max - cdest.g) * sat / 100;
+		cdest.b += (max - cdest.b) * sat / 100;
+
 		*p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
 	    }
 	}
