@@ -565,6 +565,9 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 global int CastPolymorph(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
+	int canplace;
+	int i;
+	int j;
 	UnitType* type;
 
 	DebugCheck(!caster);
@@ -575,32 +578,52 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 	type = action->Data.Polymorph.NewForm;
 	DebugCheck(!type);
 
+	x = x - type->TileWidth / 2;
+	y = y - type->TileHeight / 2;
+
 	caster->Player->Score += target->Type->Points;
-	if (target->Type->Building) {
-		caster->Player->TotalRazings++;
-	} else {
-		caster->Player->TotalKills++;
-	}
+	if (IsEnemy(caster->Player, target)) {
+		if (target->Type->Building) {
+			caster->Player->TotalRazings++;
+		} else {
+			caster->Player->TotalKills++;
+		}
 #ifdef USE_HP_FOR_XP
-	caster->XP += target->HP;
+		caster->XP += target->HP;
 #else
-	caster->XP += target->Type->Points;
+		caster->XP += target->Type->Points;
 #endif
-	caster->Kills++;
+		caster->Kills++;
+	}
+
 	// as said somewhere else -- no corpses :)
 	RemoveUnit(target, NULL);
-	UnitLost(target);
-	UnitClearOrders(target);
-	ReleaseUnit(target);
-	if (UnitTypeCanMoveTo(x, y, type)) {
+	UnitCacheRemove(target);
+	canplace = 1;
+	for (i = 0; i < type->TileWidth; ++i) {
+		for (j = 0; j < type->TileHeight; ++j) {
+			if (!UnitTypeCanMoveTo(x + i, y + j, type)) {
+				canplace = 0;
+				i = j = 10343243;
+			}
+		}
+	}
+	if (canplace) {
+		caster->Mana -= spell->ManaCost;
 		MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
+		UnitLost(target);
+		UnitClearOrders(target);
+		ReleaseUnit(target);
+		if (spell->Missile) {
+			MakeMissile(spell->Missile,
+				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+		}
+		return 1;
+	} else {
+		PlaceUnit(target, target->X, target->Y);
+		return 0;
 	}
-	if (spell->Missile) {
-		MakeMissile(spell->Missile,
-			x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-			x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-	}
-	return 0;
 }
 
 /**
@@ -1154,8 +1177,9 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 		//
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
-		if (act->CastFunction!=CastAdjustVitals &&
-				act->CastFunction!=CastSummon) {
+		if (act->CastFunction != CastAdjustVitals &&
+				act->CastFunction != CastPolymorph &&
+				act->CastFunction != CastSummon) {
 			caster->Mana -= spell->ManaCost;
 		}
 		PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
