@@ -126,9 +126,7 @@ local void HandleUnitAction(Unit* unit)
 	    //	Release pending references.
 	    //
 	    if( unit->Orders[0].Goal ) {
-#ifdef REFS_DEBUG
-		DebugCheck( !unit->Orders[0].Goal->Refs );
-#endif
+		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 		if( !--unit->Orders[0].Goal->Refs ) {
 		    ReleaseUnit(unit->Orders[0].Goal);
 		}
@@ -176,9 +174,7 @@ local void HandleUnitAction(Unit* unit)
 	    //	Release pending references.
 	    //
 	    if( unit->Command.Data.Move.Goal ) {
-#ifdef REFS_DEBUG
-		DebugCheck( !unit->Command.Data.Move.Goal->Refs-- );
-#endif
+		RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 		if !--unit->Command.Data.Move.Goal->Refs ) {
 		    ReleaseUnit(unit->Command.Data.Move.Goal);
 		}

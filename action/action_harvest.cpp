@@ -364,9 +364,7 @@ local int ReturnWithWood(Unit* unit)
     if( destu ) {
 	if( destu->Destroyed ) {
 	    DebugLevel0Fn("Destroyed unit\n");
-#ifdef REFS_DEBUG
-	    DebugCheck( !destu->Refs );
-#endif
+	    RefsDebugCheck( !destu->Refs );
 	    if( !--destu->Refs ) {
 		ReleaseUnit(destu);
 	    }
@@ -376,13 +374,9 @@ local int ReturnWithWood(Unit* unit)
 	    return 0;
 	} else if( destu->Removed || !destu->HP
 		|| destu->Orders[0].Action==UnitActionDie ) {
-#ifdef REFS_DEBUG
-	    DebugCheck( !destu->Refs );
-#endif
+	    RefsDebugCheck( !destu->Refs );
 	    --destu->Refs;
-#ifdef REFS_DEBUG
-	    DebugCheck( !destu->Refs );
-#endif
+	    RefsDebugCheck( !destu->Refs );
 	    unit->Orders[0].Goal=NoUnitP;
 	    // FIXME: perhaps I should choose an alternative
 	    unit->Orders[0].Action=UnitActionStill;
@@ -398,9 +392,7 @@ local int ReturnWithWood(Unit* unit)
     if( destu ) {
 	if( destu->Destroyed ) {
 	    DebugLevel0Fn("Destroyed unit\n");
-#ifdef REFS_DEBUG
-	    DebugCheck( !destu->Refs );
-#endif
+	    RefsDebugCheck( !destu->Refs );
 	    if( !--destu->Refs ) {
 		ReleaseUnit(destu);
 	    }
@@ -410,13 +402,9 @@ local int ReturnWithWood(Unit* unit)
 	    return 0;
 	} else if( destu->Removed || !destu->HP
 		    || destu->Command.Action==UnitActionDie ) {
-#ifdef REFS_DEBUG
-	    DebugCheck( !destu->Refs );
-#endif
+	    RefsDebugCheck( !destu->Refs );
 	    --destu->Refs;
-#ifdef REFS_DEBUG
-	    DebugCheck( !destu->Refs );
-#endif
+	    RefsDebugCheck( !destu->Refs );
 	    unit->Command.Data.Move.Goal=NoUnitP;
 	    // FIXME: perhaps I should choose an alternative
 	    unit->Command.Action=UnitActionStill;
@@ -424,13 +412,9 @@ local int ReturnWithWood(Unit* unit)
 	}
 	unit->Command.Data.Move.Goal=NoUnitP;
 #endif
-#ifdef REFS_DEBUG
-	DebugCheck( !destu->Refs );
-#endif
+	RefsDebugCheck( !destu->Refs );
 	--destu->Refs;
-#ifdef REFS_DEBUG
-	DebugCheck( !destu->Refs );
-#endif
+	RefsDebugCheck( !destu->Refs );
     }
 
 #ifdef NEW_ORDERS

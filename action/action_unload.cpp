@@ -56,7 +56,7 @@ local int MoveToCoast(Unit* unit)
 	    return 0;
     }
 
-    IfDebug( 
+    IfDebug(
 	if( !CoastOnMap(unit->X,unit->Y) ) {
 	    DebugLevel2Fn("COAST NOT REACHED\n");
 	    return -1;
@@ -95,21 +95,15 @@ local void LeaveTransporter(Unit* unit)
 #endif
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-	    DebugCheck( !goal->Refs );
-#endif
+	    RefsDebugCheck( !goal->Refs );
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
 	    return;
 	}
-#ifdef REFS_DEBUG
-	DebugCheck( !goal->Refs );
-#endif
+	RefsDebugCheck( !goal->Refs );
 	--goal->Refs;
-#ifdef REFS_DEBUG
-	DebugCheck( !goal->Refs );
-#endif
+	RefsDebugCheck( !goal->Refs );
 	for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
 	    if( goal==unit->OnBoard[i] ) {
 		goal->X=unit->X;

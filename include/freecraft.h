@@ -135,6 +135,21 @@
 
 #endif	// } !DEBUG
 
+#ifdef REFS_DEBUG	// {
+
+/**
+**	Debug check condition
+*/
+#define RefsDebugCheck(cond)	do{ if( cond ) { \
+	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
+	abort(); } }while( 0 )
+
+#else	// }{ REFS_DEBUG
+
+#define RefsDebugCheck(cond)	/* disabled */
+
+#endif	// } !REFS_DEBUG
+
 /*============================================================================
 ==	Storage types
 ============================================================================*/

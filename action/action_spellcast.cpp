@@ -135,7 +135,7 @@ global void HandleActionSpellCast(Unit* unit)
 		const SpellType* spell = SpellTypeById( unit->Command.Data.Move.SpellId );
 		if ( unit->Mana < spell->ManaCost )
 		  {
-   	          if( unit->Player==ThisPlayer )
+ 	          if( unit->Player==ThisPlayer )
 		    {
 		    SetMessage( "%s: not enough mana to cast spell: %s",
                                 unit->Type->Name, spell->Ident );
@@ -161,13 +161,9 @@ global void HandleActionSpellCast(Unit* unit)
 		     unit->SubAction=0;
 		     unit->Wait = 1;
 		     if ( unit->Command.Data.Move.Goal )
-#ifdef REFS_DEBUG
-			DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-#endif
+			RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 		        unit->Command.Data.Move.Goal->Refs--;
-#ifdef REFS_DEBUG
-			DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-#endif
+			RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 		  }
 		}
 	    break;

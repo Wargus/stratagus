@@ -81,9 +81,7 @@ local int WaitForTransporter(Unit* unit)
     }
     if( trans->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
-#ifdef REFS_DEBUG
-	DebugCheck( !trans->Refs );
-#endif
+	RefsDebugCheck( !trans->Refs );
 	if( !--trans->Refs ) {
 	    ReleaseUnit(trans);
 	}
@@ -99,13 +97,9 @@ local int WaitForTransporter(Unit* unit)
 #else
 	    !trans->HP || trans->Command.Action==UnitActionDie ) {
 #endif
-#ifdef REFS_DEBUG
-	DebugCheck( !trans->Refs );
-#endif
+	RefsDebugCheck( !trans->Refs );
 	--trans->Refs;
-#ifdef REFS_DEBUG
-	DebugCheck( !trans->Refs );
-#endif
+	RefsDebugCheck( !trans->Refs );
 #ifdef NEW_ORDERS
 	unit->Orders[0].Goal=trans=NoUnitP;
 #else
@@ -149,9 +143,7 @@ local void EnterTransporter(Unit* unit)
 #endif
     if( transporter->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
-#ifdef REFS_DEBUG
-	DebugCheck( !transporter->Refs );
-#endif
+	RefsDebugCheck( !transporter->Refs );
 	if( !--transporter->Refs ) {
 	    ReleaseUnit(transporter);
 	}
@@ -167,13 +159,9 @@ local void EnterTransporter(Unit* unit)
 #else
 	    !transporter->HP || transporter->Command.Action==UnitActionDie ) {
 #endif
-#ifdef REFS_DEBUG
-	DebugCheck( !transporter->Refs );
-#endif
+	RefsDebugCheck( !transporter->Refs );
 	--transporter->Refs;
-#ifdef REFS_DEBUG
-	DebugCheck( !transporter->Refs );
-#endif
+	RefsDebugCheck( !transporter->Refs );
 #ifdef NEW_ORDERS
 	unit->Orders[0].Goal=NoUnitP;
 #else
@@ -181,13 +169,9 @@ local void EnterTransporter(Unit* unit)
 #endif
 	return;
     }
-#ifdef REFS_DEBUG
-    DebugCheck( !transporter->Refs );
-#endif
+    RefsDebugCheck( !transporter->Refs );
     --transporter->Refs;
-#ifdef REFS_DEBUG
-    DebugCheck( !transporter->Refs );
-#endif
+    RefsDebugCheck( !transporter->Refs );
 #ifdef NEW_ORDERS
     unit->Orders[0].Goal=NoUnitP;
 #else
@@ -256,26 +240,20 @@ global void HandleActionBoard(Unit* unit)
 			    unit->Orders[0].Action=UnitActionStill;
 			    if( unit->Orders[0].Goal ) {
 
-#ifdef REFS_DEBUG
-				DebugCheck(!unit->Orders[0].Goal->Refs);
-#endif
+				RefsDebugCheck(!unit->Orders[0].Goal->Refs);
 				--unit->Orders[0].Goal->Refs;
-#ifdef REFS_DEBUG
-				DebugCheck(!unit->Orders[0].Goal->Refs);
-#endif
+				RefsDebugCheck(!unit->Orders[0].Goal->Refs);
 				unit->Orders[0].Goal=NoUnitP;
 			    }
 #else
 			    unit->Command.Action=UnitActionStill;
 			    if( unit->Command.Data.Move.Goal ) {
 
-#ifdef REFS_DEBUG
-				DebugCheck(!unit->Command.Data.Move.Goal->Refs);
-#endif
+				RefsDebugCheck(!unit->Command.Data.Move.Goal
+					->Refs);
 				--unit->Command.Data.Move.Goal->Refs;
-#ifdef REFS_DEBUG
-				DebugCheck(!unit->Command.Data.Move.Goal->Refs);
-#endif
+				RefsDebugCheck(!unit->Command.Data.Move.Goal
+					->Refs);
 				unit->Command.Data.Move.Goal=NoUnitP;
 			    }
 #endif

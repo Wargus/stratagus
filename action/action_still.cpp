@@ -196,9 +196,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    if( temp && temp->Destroyed ) {
 		DebugLevel3Fn(" destroyed unit %Zd #%d\n"
 			,UnitNumber(temp),temp->Refs);
-#ifdef REFS_DEBUG
-		DebugCheck( !temp->Refs );
-#endif
+		RefsDebugCheck( !temp->Refs );
 		if( !--temp->Refs ) {
 		    ReleaseUnit(temp);
 		}
@@ -213,13 +211,9 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		if( temp ) {
 		    DebugLevel3Fn(" old unit %Zd #%d\n"
 			    ,UnitNumber(temp),temp->Refs);
-#ifdef REFS_DEBUG
-		    DebugCheck( !temp->Refs );
-#endif
+		    RefsDebugCheck( !temp->Refs );
 		    temp->Refs--;
-#ifdef REFS_DEBUG
-		    DebugCheck( !temp->Refs );
-#endif
+		    RefsDebugCheck( !temp->Refs );
 		}
 #ifdef NEW_ORDERS
 		unit->Orders[0].Goal=goal;
@@ -245,13 +239,9 @@ global void ActionStillGeneric(Unit* unit,int ground)
 #else
 	if( (temp=unit->Command.Data.Move.Goal) ) {
 #endif
-#ifdef REFS_DEBUG
-	    DebugCheck( !temp->Refs );
-#endif
+	    RefsDebugCheck( !temp->Refs );
 	    temp->Refs--;
-#ifdef REFS_DEBUG
-	    DebugCheck( !temp->Refs );
-#endif
+	    RefsDebugCheck( !temp->Refs );
 #ifdef NEW_ORDERS
 	    unit->Orders[0].Goal=NoUnitP;
 #else

@@ -154,9 +154,7 @@ local void MoveToTarget(Unit* unit)
 	    // FIXME: Should be done by Action Move???????
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
@@ -167,10 +165,9 @@ local void MoveToTarget(Unit* unit)
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 #endif
+		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 #ifdef NEW_ORDERS
 		unit->Orders[0].Goal=goal=NoUnitP;
 #else
@@ -230,10 +227,10 @@ local void MoveToTarget(Unit* unit)
 
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
+		RefsDebugCheck( !goal->Refs );
 		goal->Refs--;
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
+		RefsDebugCheck( !temp->Refs );
 		temp->Refs++;
 #ifdef NEW_ORDERS
 		if( unit->SavedOrder.Action==UnitActionStill ) {
@@ -363,9 +360,7 @@ local void AttackTarget(Unit* unit)
 	if( goal ) {
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
@@ -377,10 +372,9 @@ local void AttackTarget(Unit* unit)
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 #endif
 		// FIXME: goal->Removed???
+		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 #ifdef NEW_ORDERS
 		unit->Orders[0].Goal=goal=NoUnitP;
 #else
@@ -446,10 +440,9 @@ local void AttackTarget(Unit* unit)
 
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
+		RefsDebugCheck( !goal->Refs );
 		goal->Refs--;
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 		temp->Refs++;
 #ifdef NEW_ORDERS
 		if( unit->SavedOrder.Action==UnitActionStill ) {
