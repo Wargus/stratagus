@@ -920,6 +920,7 @@ local void CclParseSelected(lua_State* l, UI* ui)
 	InfoText text;
 	int args;
 	int j;
+	int subargs;
 	int k;
 
 	if (!lua_istable(l, -1)) {
@@ -938,8 +939,8 @@ local void CclParseSelected(lua_State* l, UI* ui)
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			args = luaL_getn(l, -1);
-			for (k = 0; k < args; ++k) {
+			subargs = luaL_getn(l, -1);
+			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
@@ -969,8 +970,8 @@ local void CclParseSelected(lua_State* l, UI* ui)
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			args = luaL_getn(l, -1);
-			for (k = 0; k < args; ++k) {
+			subargs = luaL_getn(l, -1);
+			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
@@ -1029,6 +1030,7 @@ local void CclParseTraining(lua_State* l, UI* ui)
 	InfoText text;
 	int args;
 	int j;
+	int subargs;
 	int k;
 
 	if (!lua_istable(l, -1)) {
@@ -1047,8 +1049,8 @@ local void CclParseTraining(lua_State* l, UI* ui)
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			args = luaL_getn(l, -1);
-			for (k = 0; k < args; ++k) {
+			subargs = luaL_getn(l, -1);
+			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
@@ -1078,8 +1080,8 @@ local void CclParseTraining(lua_State* l, UI* ui)
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			args = luaL_getn(l, -1);
-			for (k = 0; k < args; ++k) {
+			subargs = luaL_getn(l, -1);
+			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
