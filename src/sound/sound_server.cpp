@@ -827,6 +827,12 @@ local Sample* LoadSample(const char* name)
 		return sample;
 	}
 #endif
+#ifdef USE_MIKMOD
+	if ((sample = LoadMikMod(buf, PlayAudioLoadInMemory))) {
+		free(buf);
+		return sample;
+	}
+#endif
 
 	fprintf(stderr, "Can't load the sound `%s'\n", name);
 

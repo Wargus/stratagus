@@ -176,6 +176,22 @@ AC_SUBST(OGG_CFLAGS)
 AC_SUBST(OGG_LIBS)
 dnl ----------------------------
 
+dnl --- CHECK FOR MIKMOD ---
+AC_ARG_WITH(mikmod, 
+    [  --with-mikmod		  [Use mikmod (default: autodetect)]], MIKMOD="$with_mikmod")
+MIKMOD_CFLAGS=
+MIKMOD_LIBS=
+if test "$MIKMOD" != "no"; then
+    AC_CHECK_HEADERS(mikmod.h, MIKMOD=yes, MIKMOD=no)
+    if test "$MIKMOD" != "no"; then
+	MIKMOD_CFLAGS="-DUSE_MIKMOD"
+	MIKMOD_LIBS="-lmikmod"
+    fi
+fi
+AC_SUBST(MIKMOD_CFLAGS)
+AC_SUBST(MIKMOD_LIBS)
+dnl ----------------------------
+
 dnl --- CHECK FOR MAD LIB ------
 AC_ARG_WITH(mad,
     [  --with-mad		  [Use mad mp3 (default: no)]], MAD="$with_mad")
