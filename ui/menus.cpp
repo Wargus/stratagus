@@ -5902,14 +5902,14 @@ local void ReplayGameMenu(void)
     strcpy(buf,"logs");
     mkdir(buf);
 
-    sprintf(ScenSelectPath, "logs/");
+    sprintf(ScenSelectPath, "logs");
 #else
     sprintf(buf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
     mkdir(buf,0777);
     strcat(buf,"/logs");
     mkdir(buf,0777);
 
-    sprintf(ScenSelectPath,"%s/%s/logs/", getenv("HOME"), FREECRAFT_HOME_PATH);
+    sprintf(ScenSelectPath,"%s/%s/logs", getenv("HOME"), FREECRAFT_HOME_PATH);
 #endif
     *ScenSelectDisplayPath = '\0';
 
