@@ -617,15 +617,15 @@ case $ANSWER in
 	esac
 	else
 	LIBCHECK="-lvorbisfile"; check_for_libs
-	if test "$?" = 0 ; then
+	if test "$?" != 0 ; then
 	echo -n "libvorbisfile "
 	fi
 	LIBCHECK="-lvorbis"; check_for_libs
-	if test "$?" = 0 ; then
+	if test "$?" != 0 ; then
 	echo -n "libvorbis "
 	fi
 	LIBCHECK="-logg"; check_for_libs
-	if test "$?" = 0 ; then
+	if test "$?" != 0 ; then
 	echo -n "libogg "
 	fi
 	echo "not found"
