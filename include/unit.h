@@ -584,8 +584,10 @@ extern void UnitLost(const Unit* unit);
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
+    /// Returns true, if unit is visible on the map.
+extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if unit is visible on current map view.
-extern int UnitVisible(const Unit* unit);
+extern int UnitVisibleOnScreen(const Unit* unit);
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
     /// FIXME: more docu

@@ -406,13 +406,12 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
     for( i=0; i<r; ++i ) {
         unit=table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisible(unit) ) {
+	if( !UnitVisibleOnScreen(unit) ) {
 	    continue;
 	}
 	type=unit->Type;
 	// Buildings are visible but not selectable
-	if( type->Building && !IsMapFieldVisible(unit->Y,unit->X) ) {
-	    // FIXME: isn't it enough to see a field of the building?
+	if( type->Building && !UnitVisibleOnMap(unit) ) {
 	    continue;
 	}
 	if( type->Critter || type->GoldMine
@@ -428,12 +427,11 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
     for( i=0; i<r; ++i ) {
         unit=table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisible(unit) ) {
+	if( !UnitVisibleOnScreen(unit) ) {
 	    continue;
 	}
 	// Buildings are visible but not selectable
-	if( unit->Type->Building && !IsMapFieldVisible(unit->Y,unit->X) ) {
-	    // FIXME: isn't it enough to see a field of the building?
+	if( unit->Type->Building && !UnitVisibleOnMap(unit) ) {
 	    continue;
 	}
 	if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {

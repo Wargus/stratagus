@@ -567,7 +567,9 @@ global void UIHandleMouseMove(int x,int y)
     }
 
     //NOTE: vladi: if unit is invisible, no cursor hint should be allowed
-    if ( UnitUnderCursor && !UnitVisible( UnitUnderCursor ) ) {
+    // FIXME: johns: not corrrect? Should I get informations about
+    // buildings under fog of war?
+    if ( UnitUnderCursor && !UnitVisibleOnMap( UnitUnderCursor ) ) {
 	UnitUnderCursor = NULL;
     }
 
