@@ -65,16 +65,16 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 {
     WavData* data;
     char sndbuf[WAV_BUFFER_SIZE];
-    int n;
-    int i;
-    int x;
-    int y;
-    int c;
+    int unc;		// number of uncompressed bytes to read
+    int comp;		// number of compressed bytes actually read
+    int s;		// sample index
+    int b;		// byte index
+    int c;		// channel index
     int freqratio;
     int chanratio;
     int brratio;
-    int chansize;
-    int samplesize;
+    int chansize;	// number of bytes per channel
+    int samplesize;	// number of bytes per sample
     int divide;
     int offset;
 
@@ -86,33 +86,34 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 	memcpy(sample->Data, data->PointerInBuffer, sample->Length);
 	data->PointerInBuffer = sample->Data;
 
-	n = WAV_BUFFER_SIZE - sample->Length;
+	unc = WAV_BUFFER_SIZE - sample->Length;
 
 	freqratio = (44100 / sample->Frequency);
-	samplesize = sample->SampleSize / 8;		// number of bytes per sample
+	samplesize = sample->SampleSize / 8;
 	brratio = 4 / samplesize;
-	chansize = samplesize / sample->Channels;	// number of bytes per channel
+	chansize = samplesize / sample->Channels;
 	chanratio = 2 / sample->Channels;
 	divide = freqratio*brratio/chanratio;
 
-	i = CLread(data->WavFile, sndbuf, n/divide);
+	comp = CLread(data->WavFile, sndbuf, unc/divide);
 
-	for (x = 0; x < i*divide; x += 4) {			// x is the sample
-	    for (c = 0; c < 2; ++c) {				// c is the channel in the sample
-	        for (y = 0; y < 2; ++y) {			// y is the byte in the channel
-		    offset=( ((x/4)/freqratio)*samplesize*chanratio + 
-			(c/chanratio)*chansize + y/(2/chansize));
+	// s is the sample
+	for (s = 0; s < comp*divide; s += 4) {
+	    // c is the channel in the sample
+	    for (c = 0; c < 2; ++c) {
+		// b is the byte in the channel
+	        for (b = 0; b < 2; ++b) {
+		    offset=( ((s/4)/freqratio)*samplesize*chanratio + 
+			(c/chanratio)*chansize + b/(2/chansize));
 
-		    DebugCheck(offset >= i*divide);
-
-		    data->PointerInBuffer[sample->Length + x + c*2 + y] = 
-		    // FIXME: should this be 127 or 128?
-		    sndbuf[offset] + (chansize == 1 ? 127 : 0);
+		    data->PointerInBuffer[sample->Length + s + c*2 + b] = 
+			sndbuf[offset] + (chansize == 1 ? 127 : 0);
+		    	// FIXME: should this be 127 or 128?
 		}
 	    }
 	}
 
-	sample->Length += i*divide;
+	sample->Length += comp*divide;
 
         if (sample->Length < len) {
             len = sample->Length;
