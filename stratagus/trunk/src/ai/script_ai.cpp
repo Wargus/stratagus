@@ -1003,7 +1003,7 @@ local SCM CclDefineAiWcNames(SCM list)
 **
 **	@param list	List of the AI Player.
 */
-local SCM CclDefineAiPlayer(SCM list __attribute__((unused)))
+local SCM CclDefineAiPlayer(SCM list)
 {
     SCM value;
     SCM sublist;
