@@ -13,18 +13,32 @@ struct hash_st
     int middepth;
 };
 
+#ifdef _MSC_VER
+typedef void hash_no_data;
+#else
 typedef struct { } hash_no_data;
+#endif
 
 extern void *_hash_get(u8 *id, void *table, int size, int usize);
 extern void *_hash_find(u8 *id, void *table, int size, int usize);
 extern void  _hash_del(u8 *id, void *table, int size, int usize);
 extern void _hash_stat(void *table, int size, struct hash_st *stat_buffer);
 
+#ifdef _MSC_VER
+
+#define hash_get(tab, id)	_hash_get(id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
+
+#define hash_find(tab, id)	_hash_find(id,(tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
+
+#else
+
 #define hash_get(tab, id)	(typeof((tab).table[0]->user)*) \
     _hash_get(id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
 
 #define hash_find(tab, id)	(typeof((tab).table[0]->user)*) \
     _hash_find(id,(tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
+
+#endif
 
 #define hash_del(tab, id)	\
     _hash_del(id, (tab).table, NELEM((tab).table), sizeof((tab).table[0]->user))
