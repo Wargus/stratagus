@@ -350,7 +350,7 @@ int AddButton(int pos, int level, const char *icon_ident,
 /**
 **	Cleanup buttons.
 */
-global void DoneButtons(void)
+global void CleanButtons(void)
 {
     int z;
 
