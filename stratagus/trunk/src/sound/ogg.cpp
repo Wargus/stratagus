@@ -266,6 +266,7 @@ int OggInit(CLFile *f, OggData *data)
 #ifdef USE_THEORA
 	if (num_theora) {
 		theora_decode_init(&data->tstate, &data->tinfo);
+		data->tstate.internal_encode = NULL;  // needed for a bug in libtheora (fixed in next release)
 	} else {
     	theora_info_clear(&data->tinfo);
     	theora_comment_clear(&data->tcomment);
