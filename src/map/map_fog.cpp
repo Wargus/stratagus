@@ -1104,19 +1104,23 @@ global void VideoDraw8Fog32Alpha(const GraphicData* data,int x,int y)
     const unsigned char* sp;
     const unsigned char* gp;
     VMemType8* dp;
+    VMemType8 fog;
     int da;
 
     sp=data;
     gp=sp+TileSizeY*TileSizeX;
     dp=VideoMemory8+x+y*VideoWidth;
     da=VideoWidth;
+    fog=((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( sp<gp ) {
 #undef UNROLL1
 #define UNROLL1(x)	\
 	if( COLOR_FOG_P(sp[x]) ) {	\
-	    dp[x]=((VMemType8*)FogOfWarAlphaTable)[dp[x]]; \
-	}
+	    if (dp[x] != fog) { \
+		dp[x]=((VMemType8*)FogOfWarAlphaTable)[dp[x]]; \
+	    } \
+	} \
 
 #undef UNROLL2
 #define UNROLL2(x)	\
@@ -1149,16 +1153,20 @@ global void VideoDraw8OnlyFog32Alpha(const GraphicData* data __attribute__((unus
 {
     const VMemType8* gp;
     VMemType8* dp;
+    VMemType8 fog;
     int da;
 
     dp=VideoMemory8+x+y*VideoWidth;
     gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
+    fog=((VMemType8*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( dp<gp ) {
 #undef UNROLL1
 #define UNROLL1(x)	\
-	dp[x]=((VMemType8*)FogOfWarAlphaTable)[dp[x]];	\
+	if (dp[x] != fog) { \
+	    dp[x]=((VMemType8*)FogOfWarAlphaTable)[dp[x]];	\
+	} \
 
 #undef UNROLL2
 #define UNROLL2(x)	\
@@ -1189,6 +1197,7 @@ global void VideoDraw16Fog32Alpha(const GraphicData* data,int x,int y)
     const unsigned char* sp;
     const unsigned char* gp;
     VMemType16* dp;
+    VMemType16 fog;
     int da;
     //int o;
 
@@ -1196,6 +1205,7 @@ global void VideoDraw16Fog32Alpha(const GraphicData* data,int x,int y)
     gp=sp+TileSizeY*TileSizeX;
     dp=VideoMemory16+x+y*VideoWidth;
     da=VideoWidth;
+    fog=((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( sp<gp ) {
 	//static int a=1234567;
@@ -1203,10 +1213,12 @@ global void VideoDraw16Fog32Alpha(const GraphicData* data,int x,int y)
 
 #undef UNROLL1
 #define UNROLL1(x)	\
-	/* o=a=a*(123456*4+1)+1; */ \
-	if( COLOR_FOG_P(sp[x]) ) {	\
-	    dp[x]=((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/]; \
-	}
+	if (dp[x] != fog) { \
+	    /* o=a=a*(123456*4+1)+1; */ \
+	    if( COLOR_FOG_P(sp[x]) ) {	\
+		dp[x]=((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/]; \
+	    } \
+	} \
 
 #undef UNROLL2
 #define UNROLL2(x)	\
@@ -1236,12 +1248,14 @@ global void VideoDraw16OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 {
     const VMemType16* gp;
     VMemType16* dp;
+    VMemType16 fog;
     int da;
     //int o;
 
     dp=VideoMemory16+x+y*VideoWidth;
     gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
+    fog=((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( dp<gp ) {
 	//static int a=1234567;
@@ -1249,8 +1263,10 @@ global void VideoDraw16OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 
 #undef UNROLL1
 #define UNROLL1(x)	\
-	/* o=a=a*(123456*4+1)+1; */ \
-	dp[x]=((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/];	\
+	if (dp[x] != fog) { \
+	    /* o=a=a*(123456*4+1)+1; */ \
+	    dp[x]=((VMemType16*)FogOfWarAlphaTable)[dp[x]/*^((o>>20)&4)*/]; \
+	} \
 
 #undef UNROLL2
 #define UNROLL2(x)	\
@@ -1277,6 +1293,7 @@ global void VideoDraw24Fog32Alpha(const GraphicData* data,int x,int y)
     const unsigned char* sp;
     const unsigned char* gp;
     VMemType24* dp;
+    VMemType24 fog;
     int da;
     int r, g, b, v ;
 
@@ -1284,6 +1301,7 @@ global void VideoDraw24Fog32Alpha(const GraphicData* data,int x,int y)
     gp=sp+TileSizeY*TileSizeX;
     dp=VideoMemory24+x+y*VideoWidth;
     da=VideoWidth;
+    fog=((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( sp<gp ) {
 #undef FOG_SCALE
@@ -1295,21 +1313,23 @@ global void VideoDraw24Fog32Alpha(const GraphicData* data,int x,int y)
 #undef UNROLL1
 #define UNROLL1(x)      \
 	if (COLOR_FOG_P(sp[x])) { \
-	    r=dp[x].a & 0xff; \
-	    g=dp[x].b & 0xff; \
-	    b=dp[x].c & 0xff; \
-	    v=r+g+b; \
+	    if (dp[x].a != fog.a || dp[x].b != fog.b || dp[x].c != fog.c) { \
+		r=dp[x].a & 0xff; \
+		g=dp[x].b & 0xff; \
+		b=dp[x].c & 0xff; \
+		v=r+g+b; \
 \
-	    r = FOG_SCALE(r); \
-	    g = FOG_SCALE(g); \
-	    b = FOG_SCALE(b); \
+		r = FOG_SCALE(r); \
+		g = FOG_SCALE(g); \
+		b = FOG_SCALE(b); \
 \
-	    r= r<0 ? 0 : r>255 ? 255 : r; \
-	    g= g<0 ? 0 : g>255 ? 255 : g; \
-	    b= b<0 ? 0 : b>255 ? 255 : b; \
-	    dp[x].a = r; \
-	    dp[x].b = g; \
-	    dp[x].c = b; \
+		r= r<0 ? 0 : r>255 ? 255 : r; \
+		g= g<0 ? 0 : g>255 ? 255 : g; \
+		b= b<0 ? 0 : b>255 ? 255 : b; \
+		dp[x].a = r; \
+		dp[x].b = g; \
+		dp[x].c = b; \
+	    } \
 	} \
 
 #undef UNROLL2
@@ -1337,12 +1357,14 @@ global void VideoDraw24OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 {
     const VMemType24* gp;
     VMemType24* dp;
+    VMemType24 fog;
     int da;
     int r, g, b, v;
 
     dp=VideoMemory24+x+y*VideoWidth;
     gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
+    fog=((VMemType24*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( dp<gp ) {
 
@@ -1354,21 +1376,23 @@ global void VideoDraw24OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 
 #undef UNROLL1
 #define UNROLL1(x)	\
-	r=dp[x].a & 0xff; \
-	g=dp[x].b & 0xff; \
-	b=dp[x].c & 0xff; \
-	v=r+g+b; \
+	if (dp[x].a != fog.a || dp[x].b != fog.b || dp[x].c != fog.c) { \
+	    r=dp[x].a & 0xff; \
+	    g=dp[x].b & 0xff; \
+	    b=dp[x].c & 0xff; \
+	    v=r+g+b; \
 \
-	r = FOG_SCALE(r); \
-	g = FOG_SCALE(g); \
-	b = FOG_SCALE(b); \
+	    r = FOG_SCALE(r); \
+	    g = FOG_SCALE(g); \
+	    b = FOG_SCALE(b); \
 \
-	r= r<0 ? 0 : r>255 ? 255 : r; \
-	g= g<0 ? 0 : g>255 ? 255 : g; \
-	b= b<0 ? 0 : b>255 ? 255 : b; \
-	dp[x].a = r; \
-	dp[x].b = g; \
-	dp[x].c = b; \
+	    r= r<0 ? 0 : r>255 ? 255 : r; \
+	    g= g<0 ? 0 : g>255 ? 255 : g; \
+	    b= b<0 ? 0 : b>255 ? 255 : b; \
+	    dp[x].a = r; \
+	    dp[x].b = g; \
+	    dp[x].c = b; \
+	} \
 
 #undef UNROLL2
 #define UNROLL2(x)	\
@@ -1394,6 +1418,7 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
     const unsigned char* sp;
     const unsigned char* gp;
     VMemType32* dp;
+    VMemType32 fog;
     int da;
     int i, r, g, b, v ;
     VMemType32 lasti;
@@ -1404,6 +1429,7 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
     dp=VideoMemory32+x+y*VideoWidth;
     da=VideoWidth;
     lastrgb=lasti=0;
+    fog=((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( sp<gp ) {
 #undef FOG_SCALE
@@ -1416,7 +1442,7 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
 #define UNROLL1(x)      \
 	if (COLOR_FOG_P(sp[x])) { \
 	    i = dp[x]; \
-	    if (i) { \
+	    if (i != fog) { \
 		if (i == lasti) { \
 		    dp[x] = lastrgb; \
 		} \
@@ -1465,6 +1491,7 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 {
     const VMemType32* gp;
     VMemType32* dp;
+    VMemType32 fog;
     int da;
     int i, r, g, b, v;
     VMemType32 lasti;
@@ -1474,6 +1501,7 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
     gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
     lastrgb=lasti=0;
+    fog=((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
 
     while( dp<gp ) {
 
@@ -1486,7 +1514,7 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 #undef UNROLL1
 #define UNROLL1(x)	\
 	i = dp[x]; \
-	if (i) { \
+	if (i != fog) { \
 	    if (i == lasti) { \
 		dp[x] = lastrgb; \
 	    } \
