@@ -461,8 +461,6 @@ static void UiToggleBigMap(void)
 
 		SetViewportMode(TheUI.ViewportMode);
 
-		EnableRedraw = RedrawMap | RedrawCursor | RedrawMessage | RedrawMenu |
-			RedrawTimer | RedrawAll;
 		SetStatusLine("Big map enabled");
 	} else {
 		TheUI.MapArea.X = mapx;
@@ -472,7 +470,6 @@ static void UiToggleBigMap(void)
 
 		SetViewportMode(TheUI.ViewportMode);
 
-		EnableRedraw = RedrawEverything;
 		SetStatusLine("Returning to old map");
 	}
 }
@@ -559,7 +556,6 @@ static void UiToggleTerrain(void)
 	} else {
 		SetStatusLine("Terrain hidden.");
 	}
-	MustRedraw |= RedrawMinimap;
 }
 
 /**

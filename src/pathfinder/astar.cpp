@@ -729,6 +729,10 @@ int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int 
 
 	// let's clean up the matrix now
 	AStarCleanUp(num_in_close);
+	if ((TheMap.Width*TheMap.Height) - counter > 500) {
+		DebugPrint("%s:%d Visited %d tiles\n" _C_ unit->Type->Name _C_ UnitNumber(unit) 
+			_C_ (TheMap.Width*TheMap.Height) - counter);
+	}
 	return path_length;
 }
 

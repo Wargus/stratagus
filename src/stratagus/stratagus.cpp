@@ -257,10 +257,6 @@ int SpeedResearch = 1;               ///< speed factor for researching
 ==  DISPLAY
 ============================================================================*/
 
-// FIXME: not the correct place
-int MustRedraw = RedrawEverything;   ///< Redraw flags
-int EnableRedraw = RedrawEverything; ///< Enable flags
-
 unsigned long GameCycle;             ///< Game simulation cycle counter
 unsigned long FastForwardCycle;      ///< Cycle to fastforward to in a replay
 
@@ -664,8 +660,6 @@ void MenuLoop(char* filename, WorldMap* map)
 				PlayMusic(MenuMusic);
 			}
 
-			EnableRedraw = RedrawMenu;
-
 			GuiGameStarted = 0;
 			while (GuiGameStarted == 0) {
 				int old_video_sync;
@@ -673,7 +667,7 @@ void MenuLoop(char* filename, WorldMap* map)
 				old_video_sync = VideoSyncSpeed;
 				VideoSyncSpeed = 100;
 				SetVideoSync();
-				if (EditorRunning == 2) {
+				if (EditorRunning == EditorCommandLine) {
 					SetupEditor();
 				}
 				if (EditorRunning) {
@@ -685,7 +679,6 @@ void MenuLoop(char* filename, WorldMap* map)
 				SetVideoSync();
 			}
 
-			EnableRedraw = RedrawEverything;
 			DebugPrint("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 			filename = CurrentMapPath;
 		} else {
@@ -983,7 +976,7 @@ int main(int argc, char** argv)
 				}
 				continue;
 			case 'e':
-				EditorRunning = 2;
+				EditorRunning = EditorCommandLine;
 				continue;
 			case 'E':
 				EditorStartFile = optarg;

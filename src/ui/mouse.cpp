@@ -445,7 +445,7 @@ static void HandleMouseOn(int x, int y)
 	}
 	if (NumSelected == 1 && Selected[0]->Type->Building && !BigMapMode) {
 		if (Selected[0]->Orders[0].Action == UnitActionTrain) {
-			if (Selected[0]->Data.Train.Count == 1) {
+			if (Selected[0]->OrderCount == 1) {
 				if (TheUI.SingleTrainingButton &&
 						x >= TheUI.SingleTrainingButton->X &&
 						x < TheUI.SingleTrainingButton->X + TheUI.SingleTrainingButton->Width + 7 &&
@@ -457,10 +457,10 @@ static void HandleMouseOn(int x, int y)
 					return;
 				}
 			} else {
-				i = (TheUI.NumTrainingButtons < Selected[0]->Data.Train.Count) ?
-					TheUI.NumTrainingButtons : Selected[0]->Data.Train.Count;
-				for (--i; i >= 0; --i) {
-					if (x >= TheUI.TrainingButtons[i].X &&
+				for (i = 0; i < Selected[0]->OrderCount &&
+					i < TheUI.NumTrainingButtons; ++i) {
+					if (Selected[0]->Orders[i].Action == UnitActionTrain &&
+							x >= TheUI.TrainingButtons[i].X &&
 							x < TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
 							y >= TheUI.TrainingButtons[i].Y &&
 							y < TheUI.TrainingButtons[i].Y + TheUI.TrainingButtons[i].Height + 7) {
@@ -1482,7 +1482,6 @@ void UIHandleButtonDown(unsigned button)
 			if (NumSelected && Selected[0]->Player == ThisPlayer &&
 					CursorState == CursorStatePoint) {
 				CursorState = CursorStatePieMenu;
-				MustRedraw |= RedrawCursor;
 			}
 		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
@@ -1587,13 +1586,14 @@ void UIHandleButtonDown(unsigned button)
 			} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
-					if (ButtonUnderCursor < Selected[0]->Data.Train.Count) {
+					if (ButtonUnderCursor < Selected[0]->OrderCount &&
+						Selected[0]->Orders[ButtonUnderCursor].Action == UnitActionTrain) {
 						DebugPrint("Cancel slot %d %s\n" _C_
 							ButtonUnderCursor _C_
-							Selected[0]->Data.Train.What[ButtonUnderCursor]->Ident);
+							Selected[0]->Orders[ButtonUnderCursor].Type->Ident);
 						SendCommandCancelTraining(Selected[0],
 							ButtonUnderCursor,
-							Selected[0]->Data.Train.What[ButtonUnderCursor]);
+							Selected[0]->Orders[ButtonUnderCursor].Type);
 					}
 				}
 			//

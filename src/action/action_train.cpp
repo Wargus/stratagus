@@ -102,20 +102,18 @@ void HandleActionTrain(Unit* unit)
 	//
 	if (!unit->SubAction) {
 		unit->Data.Train.Ticks = 0;
-		unit->Data.Train.What[0] = unit->Orders[0].Type;
-		unit->Data.Train.Count = 1;
 		unit->SubAction = 1;
 	}
 	unit->Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
 	if (unit->Data.Train.Ticks >=
-		unit->Data.Train.What[0]->Stats[player->Player].Costs[TimeCost]) {
+		unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost]) {
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
 			unit->Data.Train.Ticks =
-				unit->Data.Train.What[0]->Stats[player->Player].Costs[TimeCost];
+				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
 			unit->Reset = 1;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
@@ -124,20 +122,20 @@ void HandleActionTrain(Unit* unit)
 		//
 		// Check if enough supply available.
 		//
-		food = PlayerCheckLimits(player, unit->Data.Train.What[0]);
+		food = PlayerCheckLimits(player, unit->Orders[0].Type);
 		if (food < 0) {
 			if (food == -3 && unit->Player->AiEnabled) {
 				AiNeedMoreSupply(unit, unit->Orders[0].Type);
 			}
 
 			unit->Data.Train.Ticks =
-				unit->Data.Train.What[0]->Stats[player->Player].Costs[TimeCost];
+				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
 			unit->Reset = 1;
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
 
-		nunit = MakeUnit(unit->Data.Train.What[0], player);
+		nunit = MakeUnit(unit->Orders[0].Type, player);
 		nunit->X = unit->X;
 		nunit->Y = unit->Y;
 		type = unit->Type;
@@ -166,16 +164,8 @@ void HandleActionTrain(Unit* unit)
 
 		unit->Reset = unit->Wait = 1;
 
-		if (--unit->Data.Train.Count) {
-			int z;
-			for (z = 0; z < unit->Data.Train.Count; ++z) {
-				unit->Data.Train.What[z] = unit->Data.Train.What[z + 1];
-			}
-			unit->Data.Train.Ticks = 0;
-		} else {
-			unit->Orders[0].Action = UnitActionStill;
-			unit->SubAction = 0;
-		}
+		unit->Orders[0].Action = UnitActionStill;
+		unit->SubAction = 0;
 
 		if (!CanHandleOrder(nunit, &unit->NewOrder)) {
 			DebugPrint("Wrong order for unit\n");

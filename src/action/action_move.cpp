@@ -125,8 +125,6 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 		y = unit->Y + yd;
 		MoveUnitToXY(unit, x, y);
 
-		MustRedraw |= RedrawMinimap;
-
 		// Remove unit from the current selection
 		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, x, y)) {
 			if (NumSelected == 1) { //  Remove building cursor

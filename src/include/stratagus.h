@@ -248,6 +248,7 @@ extern char NameLine[];
 	/// Game cycles per second to simulate (original 30-40)
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
 
+#define DEFAULT_START_ORDERS 4  // The number of Orders allocated on unit creation
 	/// Must redraw flags
 enum _must_redraw_flags_ {
 	RedrawNothing   = 1 << 0,           ///< Nothing to do
@@ -274,21 +275,6 @@ enum _must_redraw_flags_ {
 	RedrawAll           = 1 << 30,      ///< All flag set by RedrawEverything
 	RedrawEverything    = -1,           ///< Must redraw everything
 };
-
-	/// Must redraw all maps
-#define RedrawMaps        (RedrawMinimap | RedrawMap)
-	/// Must redraw all cursors
-#define RedrawCursors     (RedrawMinimapCursor | RedrawCursor)
-	/// Must redraw all panels
-#define RedrawPanels      (RedrawInfoPanel | RedrawButtonPanel)
-	/// Must redraw after color cycle
-#define RedrawColorCycle  (RedrawMap | RedrawInfoPanel | RedrawButtonPanel | RedrawResources)
-
-	/// Invalidated redraw flags
-extern int MustRedraw;
-
-	/// Enable redraw flags
-extern int EnableRedraw;
 
 /*----------------------------------------------------------------------------
 --  clone.c
