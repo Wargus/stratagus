@@ -1295,7 +1295,7 @@ pawn:
 									DebugPrint("empty resource IN PUD.\n");
 									v = 10;
 								}
-								unit->Value=v*2500;
+								unit->ResourcesHeld = v*2500;
 							} else {
 								// active/inactive AI units!!
 								// Johns: it is better to have active buildings
@@ -1544,8 +1544,8 @@ static void PudSaveUnits(gzFile f)
 		buf[4]=j;
 		buf[5]=Units[i]->Player->Player;
 		if( Units[i]->Type->GivesResource ) {
-			buf[6]=(Units[i]->Value/2500) >> 0;
-			buf[7]=(Units[i]->Value/2500) >> 8;
+			buf[6]=(Units[i]->ResourcesHeld/2500) >> 0;
+			buf[7]=(Units[i]->ResourcesHeld/2500) >> 8;
 		} else {
 			buf[6]=!Units[i]->Active;
 			buf[7]=0;

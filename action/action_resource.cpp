@@ -279,7 +279,7 @@ static void LoseResource(Unit* unit, const Unit* source)
 	//
 	// If we are loaded first search for a depot.
 	//
-	if (unit->Value && (depot = FindDeposit(unit, unit->X, unit->Y,
+	if (unit->ResourcesHeld && (depot = FindDeposit(unit, unit->X, unit->Y,
 			1000, unit->CurrentResource))) {
 		if (unit->Container) {
 			DropOutNearest(unit, depot->X + depot->Type->TileWidth / 2,
@@ -382,14 +382,14 @@ static int GatherResource(Unit* unit)
 			addload = resinfo->ResourceCapacity;
 		}
 		// Make sure we don't bite more than we can chew.
-		if (unit->Value + addload > resinfo->ResourceCapacity) {
-			addload = resinfo->ResourceCapacity - unit->Value;
+		if (unit->ResourcesHeld + addload > resinfo->ResourceCapacity) {
+			addload = resinfo->ResourceCapacity - unit->ResourcesHeld;
 		}
 
 		if (resinfo->TerrainHarvester) {
-			unit->Value += addload;
+			unit->ResourcesHeld += addload;
 
-			if (addload && unit->Value == resinfo->ResourceCapacity) {
+			if (addload && unit->ResourcesHeld == resinfo->ResourceCapacity) {
 				MapRemoveWood(unit->Orders->X, unit->Orders->Y);
 			}
 		} else {
@@ -400,26 +400,26 @@ static int GatherResource(Unit* unit)
 			}
 
 			Assert(source);
-			Assert(source->Value <= 655350);
+			Assert(source->ResourcesHeld <= 655350);
 
 			//
 			// Target is not dead, getting resources.
 			//
 			if (UnitVisibleAsGoal(source, unit->Player)) {
 				// Don't load more that there is.
-				if (addload > source->Value) {
-					addload = source->Value;
+				if (addload > source->ResourcesHeld) {
+					addload = source->ResourcesHeld;
 				}
 
-				unit->Value += addload;
-				source->Value -= addload;
+				unit->ResourcesHeld += addload;
+				source->ResourcesHeld -= addload;
 			}
 
 			//
 			// End of resource: destroy the resource.
 			// FIXME: implement depleted resources.
 			//
-			if ((!UnitVisibleAsGoal(source, unit->Player)) || (source->Value == 0)) {
+			if ((!UnitVisibleAsGoal(source, unit->Player)) || (source->ResourcesHeld == 0)) {
 				DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 				uins = source->UnitInside;
 				//
@@ -443,7 +443,7 @@ static int GatherResource(Unit* unit)
 			}
 		}
 		if (resinfo->TerrainHarvester) {
-			if (unit->Value == resinfo->ResourceCapacity) {
+			if (unit->ResourcesHeld == resinfo->ResourceCapacity) {
 				// Mark as complete.
 				unit->Data.ResWorker.DoneHarvesting = 1;
 			}
@@ -451,7 +451,7 @@ static int GatherResource(Unit* unit)
 		}
 
 		if (resinfo->HarvestFromOutside && !resinfo->TerrainHarvester) {
-			if ((unit->Value == resinfo->ResourceCapacity) || (source == NULL)) {
+			if ((unit->ResourcesHeld == resinfo->ResourceCapacity) || (source == NULL)) {
 				// Mark as complete.
 				unit->Data.ResWorker.DoneHarvesting = 1;
 			}
@@ -459,7 +459,7 @@ static int GatherResource(Unit* unit)
 		}
 
 		if ((!resinfo->HarvestFromOutside) && (!resinfo->TerrainHarvester)) {
-			return unit->Value == resinfo->ResourceCapacity && source;
+			return unit->ResourcesHeld == resinfo->ResourceCapacity && source;
 		}
 	}
 
@@ -498,13 +498,13 @@ static int StopGathering(Unit* unit)
 	unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
 
 #ifdef DEBUG
-	if (!unit->Value) {
+	if (!unit->ResourcesHeld) {
 		DebugPrint("Unit %d is empty???\n" _C_ unit->Slot);
 	}
 #endif
 	// Find and send to resource deposit.
 	if (!(depot = FindDeposit(unit, unit->X, unit->Y, 1000, unit->CurrentResource)) ||
-			!unit->Value) {
+			!unit->ResourcesHeld) {
 		if (!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester)) {
 			Assert(unit->Container);
 			DropOutOnSide(unit, LookingW, source->Type->TileWidth,
@@ -602,10 +602,10 @@ static int MoveToDepot(Unit* unit)
 	// Update resource.
 	//
 	unit->Player->Resources[resinfo->FinalResource] +=
-		(unit->Value * unit->Player->Incomes[resinfo->FinalResource]) / 100;
+		(unit->ResourcesHeld * unit->Player->Incomes[resinfo->FinalResource]) / 100;
 	unit->Player->TotalResources[resinfo->FinalResource] +=
-		(unit->Value * unit->Player->Incomes[resinfo->FinalResource]) / 100;
-	unit->Value = 0;
+		(unit->ResourcesHeld * unit->Player->Incomes[resinfo->FinalResource]) / 100;
+	unit->ResourcesHeld = 0;
 
 	unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId];
 	if (!unit->Wait) {
@@ -691,8 +691,8 @@ void ResourceGiveUp(Unit* unit)
 	unit->SubAction = 0;
 	if (unit->CurrentResource &&
 			unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
-			unit->Value < unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
-		unit->Value = 0;
+			unit->ResourcesHeld < unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
+		unit->ResourcesHeld = 0;
 		unit->CurrentResource = 0;
 	}
 	if (unit->Orders[0].Goal) {
@@ -722,13 +722,13 @@ void HandleActionResource(Unit* unit)
 		}
 		if (newres != unit->CurrentResource) {
 			// Drop other resources.
-			unit->Value = 0;
+			unit->ResourcesHeld = 0;
 		}
 		if ((unit->CurrentResource = newres)) {
 			NewResetPath(unit);
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
 		} else {
-			unit->Value = 0;
+			unit->ResourcesHeld = 0;
 			ResourceGiveUp(unit);
 			return;
 		}

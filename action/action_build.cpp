@@ -228,7 +228,7 @@ void HandleActionBuild(Unit* unit)
 		b = OnTopDetails(build, ontop->Type);
 		Assert(b);
 		if (b->Data.OnTop.ReplaceOnBuild) {
-			build->Value = ontop->Value; // We capture the value of what is beneath.
+			build->ResourcesHeld = ontop->ResourcesHeld; // We capture the value of what is beneath.
 			RemoveUnit(ontop, NULL); // Destroy building beneath
 			UnitLost(ontop);
 			UnitClearOrders(ontop);
@@ -383,7 +383,7 @@ void HandleActionBuilded(Unit* unit)
 			unit->Data.Resource.Active = 0;
 			// Has StartingResources, Use those
 			if (type->StartingResources) {
-				unit->Value = type->StartingResources;
+				unit->ResourcesHeld = type->StartingResources;
 			}
 		}
 
