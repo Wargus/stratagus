@@ -507,13 +507,8 @@ case $VIDSEL in
   *)
 	echo -n "-> Using SDL"
   	USESDL=1
-	if [ "$WIN32" = "1" ]; then
-	  SDLLIB="\$(shell $SDL_CONFIG --libs) -lmingwex"
-	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS) -DUSE_WIN32" >> $RULESFILE
-	else
-	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
-	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	fi
+	SDLLIB="\$(shell $SDL_CONFIG --libs)"
+	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
 	if test "$STATIC x" != " x" ; then
@@ -522,19 +517,19 @@ case $VIDSEL in
 
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
-	echo "VIDEO             = \$(SDL)" >> $RULESFILE
-        if [ "$BEOS" != "1" ] ; then
-	    echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
-	else
-	    echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+	if [ "$WIN32" = "0" ]; then
+	    echo "VIDEO             = \$(SDL)" >> $RULESFILE
+	    if [ "$BEOS" != "1" ] ; then
+	        echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
+	    else
+		echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+	    fi
 	fi
 	echo
 	;;
 
 esac
-echo >> $RULESFILE
 
-#
 # Put in Cygwin/win32 stuff if necessary, and test for mingw32
 
 if test "$WIN32" = "1" ; then
@@ -542,9 +537,11 @@ if test "$WIN32" = "1" ; then
 	if test "`gcc -v 2>&1 | grep -is mingw32` x" = " x" ; then
 	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -lws2_32" >> $RULESFILE
 	else
-	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -lws2_32" >> $RULESFILE
+	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -lws2_32 -lmingwex -lgmon" >> $RULESFILE
 	fi
 fi
+
+echo >> $RULESFILE
 
 #------------------------------------------------------------------------------
 #	Sound part
