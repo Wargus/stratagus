@@ -721,6 +721,9 @@ local void SaveUnitType(const UnitType* type,FILE* file)
     if( type->SelectableByRectangle ) {
 	fprintf(file,"  'selectable-by-rectangle\n");
     }
+    if( type->Teleporter ) {
+	fprintf(file,"  'teleporter\n");
+    }
 
     fprintf(file,"  ;; sounds\n");
     if( type->Sound.Selected.Name ) {
