@@ -178,6 +178,9 @@ extern void PlayersEachSecond(void);
     /// Change current color set to new player.
 extern void PlayerPixels(const Player* player);
 
+    /// Change current color set to new player of the sprite
+extern void RLEPlayerPixels(const Player* player, const RleSprite * sprite);
+
     /// Output debug informations for players
 extern void DebugPlayers(void);
 

@@ -262,7 +262,7 @@ global void VideoDraw16Fog32Solid(const GraphicData* data,int x,int y)
 #undef UNROLL1
 #define UNROLL1(x)	\
 	if(COLOR_FOG_P(sp[x])) {		\
-	    dp[x]=Pixels16[COLOR_FOG];		\
+	    dp[x]=((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];		\
 	}
 
 #undef UNROLL2
@@ -307,13 +307,13 @@ global void VideoDraw16OnlyFog32Solid(const GraphicData* data,int x,int y)
     while( dp<gp ) {
 #undef UNROLL2
 #define UNROLL2(x)		\
-	dp[x+0]=Pixels16[COLOR_FOG];
+	dp[x+0]=((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
 	UNROLL32(0);
 	dp+=da;
 
 #undef UNROLL2
 #define UNROLL2(x)		\
-	dp[x+1]=Pixels16[COLOR_FOG];
+	dp[x+1]=((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];
 	UNROLL32(0);
 	dp+=da;
     }
@@ -341,7 +341,7 @@ global void VideoDraw16Unexplored32Solid(const GraphicData* data,int x,int y)
 #undef UNROLL1
 #define UNROLL1(x)	\
 	if(COLOR_FOG_P(sp[x]) ) {		\
-	    dp[x]=Pixels16[COLOR_FOG];		\
+	    dp[x]=((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];		\
 	}
 
 #undef UNROLL2
@@ -381,7 +381,7 @@ global void VideoDraw32Fog32Solid(const GraphicData* data,int x,int y)
 #undef UNROLL1
 #define UNROLL1(x)	\
 	if(COLOR_FOG_P(sp[x])) {	\
-	    dp[x]=Pixels16[COLOR_FOG];	\
+	    dp[x]=((VMemType16*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
 #undef UNROLL2
@@ -426,13 +426,13 @@ global void VideoDraw32OnlyFog32Solid(const GraphicData* data,int x,int y)
     while( dp<gp ) {
 #undef UNROLL2
 #define UNROLL2(x)		\
-	dp[x+0]=Pixels32[COLOR_FOG];
+	dp[x+0]=((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
 	UNROLL32(0);
 	dp+=da;
 
 #undef UNROLL2
 #define UNROLL2(x)		\
-	dp[x+1]=Pixels32[COLOR_FOG];
+	dp[x+1]=((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];
 	UNROLL32(0);
 	dp+=da;
     }
@@ -460,7 +460,7 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data,int x,int y)
 #undef UNROLL1
 #define UNROLL1(x)	\
 	if(COLOR_FOG_P(sp[x])) {		\
-	    dp[x]=Pixels32[COLOR_FOG];	\
+	    dp[x]=((VMemType32*)TheMap.TileData->Pixels)[COLOR_FOG];	\
 	}
 
 #undef UNROLL2

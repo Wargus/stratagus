@@ -34,8 +34,6 @@ typedef unsigned long VMemType32;	/// 32 bpp modes pointer
 typedef unsigned short VMemType16;	/// 16 bpp modes pointer
 typedef unsigned char VMemType8;	///  8 bpp modes pointer
 
-typedef unsigned char GraphicData;	/// generic graphic data type
-
     /// MACRO defines speed of colorcycling
 #define COLOR_CYCLE_SPEED	(FRAMES_PER_SECOND/4)
 
@@ -158,21 +156,9 @@ extern int VideoSubDepth;
   VideoCreatePalette.
   @see VideoCreatePalette
  */
-extern VMemType8 Pixels8[256];		///  8 bpp
-extern VMemType16 Pixels16[256];	/// 16 bpp default	
-extern VMemType32 Pixels32[256];	/// 32 bpp
-
-/// Palette structure.
-struct Palette {
-    /// RED COMPONENT
-    unsigned char r;
-    /// GREEN COMPONENT
-    unsigned char g;
-    /// BLUE COMPONENT
-    unsigned char b;
-};
-
-typedef struct Palette Palette;
+extern VMemType8 * Pixels8;		///  8 bpp
+extern VMemType16 * Pixels16;	/// 16 bpp default	
+extern VMemType32 * Pixels32;	/// 32 bpp
 
 /** Set videomode. Tries to set choosen videomode. Only 640x480, 800x600
   and 1024x768 are available. If videoadapter is not good enough module will
@@ -204,6 +190,9 @@ extern void CheckVideoInterrupts(void);
 
 /// Does ColorCycling..
 extern void ColorCycle(void);
+
+/** Creates a palette from a Palette struct */
+extern GraphicData * VideoCreateNewPalette(const struct Palette *palette);
 
 /** Initializes system palette. Also calls SetPlayersPalette to set palette for
   all players.
