@@ -40,6 +40,6 @@ SRCS	= command.c actions.c action_die.c action_patrol.c \
 	action_build.c action_train.c action_upgradeto.c \
 	action_spellcast.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

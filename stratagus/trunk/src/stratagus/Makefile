@@ -35,6 +35,6 @@ SRCS	= clone.c mainloop.c selection.c groups.c \
 	  construct.c player.c pud.c ccl.c iolib.c \
 	  spells.c ccl_player.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

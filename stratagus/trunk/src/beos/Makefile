@@ -33,7 +33,7 @@ MODULE	= beos
 
 CPPSRCS	= beos.cpp
 
-OBJS	= $(addprefix $(OBJDIR), $(CPPSRCS:.cpp=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(CPPSRCS:.cpp=.$(OE)))
 
 #distlist::
 #	@echo src/$(MODULE)/beos.cpp >>$(DISTLIST)

@@ -36,6 +36,6 @@ HDRS	= ai_local.h
 SRCS	= ai.c new_ai.c ccl_ai.c ai_resource.c \
 	  ai_building.c ai_force.c ai_plan.c ai_magic.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

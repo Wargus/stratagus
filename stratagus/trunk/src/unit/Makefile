@@ -34,6 +34,6 @@ MODULE  = unit
 SRCS	= unittype.c ccl_unittype.c upgrade.c depend.c \
 	ccl_unit.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk
