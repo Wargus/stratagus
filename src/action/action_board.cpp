@@ -72,7 +72,9 @@ local int WaitForTransporter(Unit* unit)
     }
     if( trans->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
+#ifdef REFS_DEBUG
 	DebugCheck( !trans->Refs );
+#endif
 	if( !--trans->Refs ) {
 	    ReleaseUnit(trans);
 	}
@@ -80,9 +82,13 @@ local int WaitForTransporter(Unit* unit)
 	return 0;
     } else if( trans->Removed ||
 	    !trans->HP || trans->Command.Action==UnitActionDie ) {
+#ifdef REFS_DEBUG
 	DebugCheck( !trans->Refs );
+#endif
 	--trans->Refs;
+#ifdef REFS_DEBUG
 	DebugCheck( !trans->Refs );
+#endif
 	unit->Command.Data.Move.Goal=trans=NoUnitP;
 	return 0;
     }
@@ -114,7 +120,9 @@ local void EnterTransporter(Unit* unit)
     transporter=unit->Command.Data.Move.Goal;
     if( transporter->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
+#ifdef REFS_DEBUG
 	DebugCheck( !transporter->Refs );
+#endif
 	if( !--transporter->Refs ) {
 	    ReleaseUnit(transporter);
 	}
@@ -122,15 +130,23 @@ local void EnterTransporter(Unit* unit)
 	return;
     } else if( transporter->Removed ||
 	    !transporter->HP || transporter->Command.Action==UnitActionDie ) {
+#ifdef REFS_DEBUG
 	DebugCheck( !transporter->Refs );
+#endif
 	--transporter->Refs;
+#ifdef REFS_DEBUG
 	DebugCheck( !transporter->Refs );
+#endif
 	unit->Command.Data.Move.Goal=NoUnitP;
 	return;
     }
+#ifdef REFS_DEBUG
     DebugCheck( !transporter->Refs );
+#endif
     --transporter->Refs;
+#ifdef REFS_DEBUG
     DebugCheck( !transporter->Refs );
+#endif
     unit->Command.Data.Move.Goal=NoUnitP;
 
     //
@@ -194,9 +210,13 @@ global void HandleActionBoard(Unit* unit)
 			    unit->Command.Action=UnitActionStill;
 			    if( unit->Command.Data.Move.Goal ) {
 
+#ifdef REFS_DEBUG
 				DebugCheck(!unit->Command.Data.Move.Goal->Refs);
+#endif
 				--unit->Command.Data.Move.Goal->Refs;
+#ifdef REFS_DEBUG
 				DebugCheck(!unit->Command.Data.Move.Goal->Refs);
+#endif
 				unit->Command.Data.Move.Goal=NoUnitP;
 			    }
 			    unit->SubAction=0;
