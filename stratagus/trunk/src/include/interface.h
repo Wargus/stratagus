@@ -198,6 +198,8 @@ enum _scroll_state_ {
 extern char GameRunning;
     /// Flag telling if the game is paused
 extern char GamePaused;
+    /// Flag telling not to advance to the next game cycle
+extern char SkipGameCycle;
 
     /// pressed mouse buttons (normal,double,dragged,long)
 extern enum _mouse_buttons_ MouseButtons;
