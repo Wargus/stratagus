@@ -698,14 +698,14 @@ global void UIHandleMouseMove(int x,int y)
 
 	vp = TheUI.MouseViewport;
 	if (IsMapFieldVisible(ThisPlayer, Viewport2MapX(vp, x),
-		    Viewport2MapY(vp, y)) ) {
+		    Viewport2MapY(vp, y))  || ReplayRevealMap ) {
 	    UnitUnderCursor = UnitOnScreen(NULL ,x-vp->X + vp->MapX*TileSizeX
 		,y-vp->Y + vp->MapY*TileSizeY);
 	}
     } else if( CursorOn==CursorOnMinimap ) {
 	mx=ScreenMinimap2MapX(x);
 	my=ScreenMinimap2MapY(y);
-	if( IsMapFieldVisible(ThisPlayer,mx,my) ) {
+	if( IsMapFieldVisible(ThisPlayer,mx,my) || ReplayRevealMap ) {
 	    UnitUnderCursor=UnitOnMapTile(mx,my);
 	}
     }
@@ -713,7 +713,7 @@ global void UIHandleMouseMove(int x,int y)
     //NOTE: vladi: if unit is invisible, no cursor hint should be allowed
     // FIXME: johns: not corrrect? Should I get informations about
     // buildings under fog of war?
-    if ( UnitUnderCursor && !UnitVisibleOnMap(UnitUnderCursor) ) {
+    if ( UnitUnderCursor && !(UnitVisibleOnMap(UnitUnderCursor) && !ReplayRevealMap) ) {
 	UnitUnderCursor = NULL;
     }
 
@@ -1322,7 +1322,7 @@ global void UIHandleButtonDown(unsigned button)
 		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
 			// FIXME: vladi: should check all building footprint
 			// but not just MAPEXPLORED(x,y)
-			&& IsMapFieldExplored(ThisPlayer,x,y) ) {
+			&& (IsMapFieldExplored(ThisPlayer,x,y) || ReplayRevealMap) ) {
 		    PlayGameSound(GameSounds.PlacementSuccess.Sound
 			    ,MaxSampleVolume);
 		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding
@@ -1595,7 +1595,7 @@ global void UIHandleButtonUp(unsigned button)
 	    // FIXME: johns: only complete invisibile units
 	    if( IsMapFieldVisible(ThisPlayer,
 			Viewport2MapX(TheUI.MouseViewport,CursorX),
-			Viewport2MapY(TheUI.MouseViewport,CursorY)) ) {
+			Viewport2MapY(TheUI.MouseViewport,CursorY)) || ReplayRevealMap ) {
 		unit=UnitOnScreen(unit
 		    ,CursorX-TheUI.MouseViewport->X+
 			TheUI.MouseViewport->MapX*TileSizeX
