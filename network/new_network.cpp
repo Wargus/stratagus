@@ -67,6 +67,8 @@
 #define NetworkPort	6660		/// Default port for communication
 #define NetworkDups	4		/// Repeat old commands
 
+#define NetworkProtocolVersion 0	/// Network protocol version
+
 /**
 **	Network hosts
 */
@@ -85,6 +87,8 @@ enum _message_type_ {
 
     MessageSync,			/// heart beat
     MessageQuit,			/// quit game
+    MessageResend,			/// resend message
+
     MessageChat,			/// chat message
     MessageChatCont,			/// chat message continue
 
@@ -114,11 +118,24 @@ enum _message_type_ {
 };
 
 /**
+**	Network init message
+*/
+typedef struct _init_message_ {
+    unsigned char	Type;		/// Init message type.
+    int			Version;	/// Network protocol version.
+    int			Lag;		/// Lag time
+    int			Updates;	/// Update frequence
+    char		HostsCount;	/// Number of hosts.
+    NetworkHost		Hosts[PlayerMax];/// Host and ports of all players.
+    char		Num[PlayerMax];	/// Player number.
+} InitMessage;
+
+/**
 **	Network command message.
 */
 typedef struct _network_command_ {
-    unsigned char	Frame;		/// Destination frame
     unsigned char	Type;		/// Network command type
+    unsigned char	Frame;		/// Destination frame
     UnitRef		Unit;		/// Command for unit
     unsigned short	X;		/// Map position X.
     unsigned short	Y;		/// Map position Y.
@@ -136,14 +153,14 @@ typedef struct _network_chat_ {
 } NetworkChat;
 
 /**
-**	Network init message
+**	Network packet.
+**
+**	This is send over the network.
 */
-typedef struct _init_message_ {
-    unsigned char	Type;		/// Init message type.
-    char		HostsCount;	/// Number of hosts.
-    NetworkHost		Hosts[PlayerMax];/// Host and ports of all players.
-    char		Num[PlayerMax];	/// Player number.
-} InitMessage;
+typedef struct _network_packet_ {
+					/// Commands in packet.
+    NetworkCommand	Commands[NetworkDups];
+} NetworkPacket;
 
 /**
 **	Network command in queue.
@@ -164,7 +181,6 @@ global int NetworkUpdates = 5;		/// Network update each # frames
 global int NetworkLag = 10;		/// Network lag in # frames
 global char* NetworkArg;		/// Network command line argument
 
-
 //----------------------------------------------------------------------------
 //	Functions
 //----------------------------------------------------------------------------
@@ -179,10 +195,20 @@ local struct dl_head CommandsIn[1];	/// Network command input queue
 local struct dl_head CommandsOut[1];	/// Network command output queue
 
 /**
-**	Prepare send command message.
+**	Prepare send of command message.
+**
+**	Convert arguments into network format and place it into output queue.
+**
+**	@param command	Command (Move,Attack,...).
+**	@param unit	Unit that receive the command.
+**	@param x	optional X map position.
+**	@param y	optional y map position.
+**	@param dest	optional destination unit.
+**	@param type	optional unit type argument.
+**	@param status	Append command or flush old commands.
 */
-global void NetworkSendCommand(int command,Unit* unit,int x,int y
-	,Unit* dest,UnitType* type,int status)
+global void NetworkSendCommand(int command,const Unit* unit,int x,int y
+	,const Unit* dest,const UnitType* type,int status)
 {
     NetworkCommandQueue* ncq;
 
@@ -192,6 +218,7 @@ global void NetworkSendCommand(int command,Unit* unit,int x,int y
 
     ncq=malloc(sizeof(NetworkCommandQueue));
     dl_insert_first(CommandsIn,ncq->List);
+
     ncq->Time=FrameCounter;
     ncq->Data.Type=command;
     if( status ) {
@@ -220,6 +247,17 @@ global int CommandLogEnabled;		/// True if command log is on
 
 /**
 **	Log commands into file.
+**
+**	This could later be used to recover, crashed games.
+**
+**	@param name	Command name (move,attack,...).
+**	@param unit	Unit that receive the command.
+**	@param flag	Append command or flush old commands.
+**	@param position	Flag X,Y contains position or value or nothing.
+**	@param x	optional X map position.
+**	@param y	optional y map position.
+**	@param dest	optional destination unit.
+**	@param type	optional command argument (unit-type,...).
 */
 local void CommandLog(const char* name,const Unit* unit,int flag,
 	int position,unsigned x,unsigned y,const Unit* dest,const char* value)
@@ -684,6 +722,8 @@ local int NetLastPort;			/// Last port number (net format)
 
 #ifdef USE_SDL_NET	// {
 
+// FIXME: Not written
+
 /**
 **	Hardware dependend network init.
 */
@@ -785,7 +825,9 @@ global void NetCloseUDP(int sockfd)
 #endif	// } !USE_SDL_NET && !USE_WINSOCK
 
 /**
-**	Resolve host in name or dot notation.
+**	Resolve host in name or or colon dot notation.
+**
+**	@param host	Host name.
 */
 global unsigned long NetResolveHost(const char* host)
 {
@@ -913,6 +955,8 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
     return sendto(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,n);
 }
 
+// FIXME: TCP support missing
+
 //@}
 
 //----------------------------------------------------------------------------
@@ -927,6 +971,7 @@ local NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
 local int HostsCount;			/// Number of hosts.
 local unsigned long MyHost;		/// My host number.
 local int MyPort;			/// My port number.
+local int NetworkDelay;			/// Delay counter for recover.
 
     /// Network input queue
 local NetworkCommandQueue NetworkIn[256][PlayerMax];
@@ -949,6 +994,263 @@ global void NetworkBroadcast(void* buf,int len)
 }
 
 /**
+**	Server Setup.
+*/
+local void NetworkServerSetup(void)
+{
+    int i;
+    int j;
+    int n;
+    InitMessage message;
+    int num[PlayerMax];
+
+    //
+    //	Wait for all clients to connect.
+    //
+    for( i=1; i<NetPlayers; ) {
+	DebugLevel1(__FUNCTION__": waiting\n");
+
+	if( !NetRecvUDP(NetworkFildes,&message,sizeof(message)) ) {
+	    exit(-1);
+	}
+	DebugLevel0(__FUNCTION__": receive hello %ld:%d\n"
+		,NetLastHost,NetLastPort);
+
+	if( message.Type!=MessageInitHello ) {
+	    DebugLevel0(__FUNCTION__": wrong message\n");
+	    continue;
+	}
+
+	if( ntohl(message.Version)!=NetworkProtocolVersion ) {
+	    fprintf(stderr,"Incompatible network protocol version %d-%d\n"
+		,ntohl(message.Version),NetworkProtocolVersion);
+	    exit(-1);
+	}
+
+	DebugLevel0(__FUNCTION__": Lag=%d, Updates=%d\n"
+		,ntohl(message.Lag),ntohl(message.Updates));
+
+	if( ntohl(message.Lag)!=NetworkLag ) {
+	    fprintf(stderr,"Incompatible network lag %d-%d\n"
+		,ntohl(message.Lag),NetworkLag);
+	    exit(-1);
+	}
+
+	if( ntohl(message.Updates)!=NetworkUpdates ) {
+	    fprintf(stderr,"Incompatible network updates %d-%d\n"
+		,ntohl(message.Updates),NetworkUpdates);
+	    exit(-1);
+	}
+
+	// Lookup, if host is already known.
+	for( n=0; n<HostsCount; ++n ) {
+	    if( Hosts[n].Host==NetLastHost && Hosts[n].Port==NetLastPort ) {
+		break;
+	    }
+	}
+
+	// A new client
+	if( n==HostsCount ) {
+	    Hosts[HostsCount].Host=NetLastHost;
+	    Hosts[HostsCount++].Port=NetLastPort;
+	    DebugLevel0(__FUNCTION__": New client %ld:%d\n"
+		    ,NetLastHost,ntohs(NetLastPort));
+	    ++i;
+	}
+
+	// Acknowledge the packet.
+	message.Type=MessageInitReply;
+	n=NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
+		    ,&message,sizeof(message));
+	DebugLevel0(__FUNCTION__": Sending reply %d\n",n);
+    }
+
+    //
+    //	Assign the players.
+    //
+    for( n=i=0; i<NumPlayers && n<NetPlayers; ++i ) {
+	if( Players[i].Type==PlayerHuman ) {
+	    NetPlyNr[n]=num[n]=i;
+	    DebugLevel0(__FUNCTION__": Assigning %d -> %d\n",i,n);
+	    n++;
+	}
+    }
+    if( n<NetPlayers ) {
+	fprintf(stderr,"Not enought human slots\n");
+	exit(-1);
+    }
+
+    // FIXME: randomize the slots :)
+
+    //
+    //	Send all clients host/ports to all clients.
+    //
+
+    // Prepare message:
+    message.Type=MessageInitConfig;
+    message.HostsCount=HostsCount+1;
+    for( i=0; i<HostsCount; ++i ) {
+	message.Hosts[i].Host=htonl(Hosts[i].Host);
+	message.Hosts[i].Port=htonl(Hosts[i].Port);
+	message.Num[i]=num[i];
+    }
+    message.Hosts[i].Host=htonl(MyHost);
+    message.Hosts[i].Port=htonl(MyPort);
+    message.Num[i]=num[i];
+    DebugLevel0(__FUNCTION__": player here %d\n",num[i]);
+    ThisPlayer=&Players[num[i]];
+
+    //
+    //	Send all clients host/ports to all clients.
+    //
+    for( j=HostsCount; j; ) {
+	DebugLevel1(__FUNCTION__": ready, assigning\n");
+
+	// Send to all clients.
+	for( i=0; i<HostsCount; ++i ) {
+	    if( num[i]!=-1 ) {
+		n=NetSendUDP(NetworkFildes,Hosts[i].Host,Hosts[i].Port
+			,&message,sizeof(message));
+		DebugLevel0(__FUNCTION__": Sending config %d\n",n);
+	    }
+	}
+
+	// Wait for acknowledge
+	while( NetSocketReady(NetworkFildes,500) ) {
+	    InitMessage msg;
+
+	    NetRecvUDP(NetworkFildes,&msg,sizeof(msg));
+	    DebugLevel0(__FUNCTION__": receive ack %d %ld:%d\n",
+		    msg.Type,NetLastHost,NetLastPort);
+
+	    if( message.Type==MessageInitHello ) {
+		DebugLevel0(__FUNCTION__": Acknowledge lost\n");
+
+		// Acknowledge the packets.
+		message.Type=MessageInitReply;
+		NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
+			,&message,sizeof(message));
+	    } else {
+
+		for( i=0; i<HostsCount; ++i ) {
+		    if( NetLastHost==Hosts[i].Host
+			    && NetLastPort==Hosts[i].Port
+			    && msg.Type==MessageInitReply ) {
+			num[i]=-1;
+			j--;
+			break;
+		    }
+		}
+	    }
+	}
+    }
+    sleep(3);
+}
+
+/**
+**	Client Setup.
+*/
+local void NetworkClientSetup(void)
+{
+    InitMessage message;
+    unsigned long host;
+    int port;
+    char* cp;
+    int i;
+
+    // Parse server address.
+    cp=strchr(NetworkArg,':');
+    if( cp ) {
+	*cp='\0';
+	port=htons(atoi(cp+1));
+	host=NetResolveHost(NetworkArg);
+	*cp=':';
+    } else {
+	port=htons(NetworkPort);
+	host=NetResolveHost(NetworkArg);
+    }
+    if( host==INADDR_NONE ) {
+	fprintf(stderr,"Can't resolve host %s\n",NetworkArg);
+	exit(-1);
+    }
+    DebugLevel0(__FUNCTION__": Server %ld:%d\n",host,ntohs(port));
+
+    //
+    //	Connecting to server
+    //
+    for( ;; ) {
+	message.Type=MessageInitHello;
+	message.Version=htonl(NetworkProtocolVersion);
+	message.Lag=htonl(NetworkLag);
+	message.Updates=htonl(NetworkUpdates);
+
+	i=NetSendUDP(NetworkFildes,host,port,&message,sizeof(message));
+	DebugLevel0(__FUNCTION__": Sending hello %d\n",i);
+
+	// Wait on answer (timeout 1/2s)
+	if( NetSocketReady(NetworkFildes,500) ) {
+	    
+	    if( !NetRecvUDP(NetworkFildes,&message,sizeof(message)) ) {
+		exit(-1);
+	    }
+	    DebugLevel0(__FUNCTION__": receive reply\n");
+	    if( NetLastHost==host && NetLastPort==port
+		    && message.Type==MessageInitReply ) {
+		break;
+	    }
+	}
+    }
+
+    //
+    //	Wait for address of other clients.
+    //
+    for( ;; ) {
+	DebugLevel0(__FUNCTION__": waiting for clients\n");
+	NetRecvUDP(NetworkFildes,&message,sizeof(message));
+	if( message.Type!=MessageInitConfig ) {
+	    continue;
+	}
+	DebugLevel0(__FUNCTION__": receive clients\n");
+
+	for( i=0; i<message.HostsCount; ++i ) {
+	    message.Hosts[i].Host=ntohl(message.Hosts[i].Host);
+	    message.Hosts[i].Port=ntohl(message.Hosts[i].Port);
+	    // Own client
+	    if( message.Hosts[i].Host==MyHost
+		    && message.Hosts[i].Port==MyPort ) {
+		DebugLevel0(__FUNCTION__": SELF %d\n",message.Num[i]);
+		ThisPlayer=&Players[(int)message.Num[i]];
+	    } else {
+		NetPlyNr[HostsCount]=message.Num[i];
+		Hosts[HostsCount].Host=message.Hosts[i].Host;
+		Hosts[HostsCount++].Port=message.Hosts[i].Port;
+		DebugLevel0(__FUNCTION__": Client %d %ld:%d\n"
+			,message.Num[i],message.Hosts[i].Host
+			,ntohs(message.Hosts[i].Port));
+	    }
+	}
+
+	// Acknowledge the packets.
+	message.Type=MessageInitReply;
+	NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
+		,&message,sizeof(message));
+	break;
+    }
+
+    // Acknowledge lost (timeout 3s)
+    while( NetSocketReady(NetworkFildes,3000) ) {
+	DebugLevel0(__FUNCTION__": Acknowledge lost\n");
+	NetRecvUDP(NetworkFildes,&message,sizeof(message));
+	if( message.Type==MessageInitConfig ) {
+	    // Acknowledge the packets.
+	    message.Type=MessageInitReply;
+	    NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
+		    ,&message,sizeof(message));
+	}
+    }
+}
+
+/**
 **	Initialise network.
 */
 global void InitNetwork(void)
@@ -961,8 +1263,8 @@ global void InitNetwork(void)
     //
     //	Server mode: clients connects to this computer.
     //
-    DebugLevel0(__FUNCTION__": Packet %d\n",sizeof(NetworkCommand));
-    DebugLevel0(__FUNCTION__": Packet %d\n",sizeof(NetworkChat));
+    DebugLevel3(__FUNCTION__": Packet %d\n",sizeof(NetworkCommand));
+    DebugLevel3(__FUNCTION__": Packet %d\n",sizeof(NetworkChat));
 
 
     NetworkFildes=-1;
@@ -976,6 +1278,10 @@ global void InitNetwork(void)
 	DebugLevel0(__FUNCTION__": %s arg\n",NetworkArg);
 
 	NetInit();			// machine dependend setup
+
+	if( NetworkUpdates<=0 ) {
+	    NetworkUpdates=1;
+	}
 
 	port=NetworkPort;
 	if( NetworkArg ) {
@@ -996,13 +1302,13 @@ global void InitNetwork(void)
 		exit(-1);
 	    }
 	}
-	{
+	IfDebug({
 	    char buf[128];
 
 	    gethostname(buf,sizeof(buf));
 	    DebugLevel0(__FUNCTION__": %s\n",buf);
 	    MyHost=NetResolveHost(buf);
-	}
+	});
 	MyPort=NetLastPort;
 	DebugLevel0(__FUNCTION__": My host/port %ld:%d\n",MyHost,ntohs(MyPort));
 
@@ -1010,208 +1316,15 @@ global void InitNetwork(void)
 	//	Server
 	//
 	if( NetPlayers ) {
-	    int j;
-	    InitMessage message;
-	    int num[PlayerMax];
-
-	    //
-	    //	Wait for all clients to connect
-	    //
-	    for( i=1; i<NetPlayers; ) {
-		DebugLevel1(__FUNCTION__": waiting\n");
-
-		NetRecvUDP(NetworkFildes,&message,sizeof(message));
-		DebugLevel0(__FUNCTION__": receive hello\n");
-
-		// Acknowledge the packets.
-		message.Type=MessageInitReply;
-		n=NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
-			,&message,sizeof(message));
-		DebugLevel0(__FUNCTION__": Sending reply %d\n",n);
-
-		// Lookup if host is already known.
-		for( n=0; n<HostsCount; ++n ) {
-		    if( Hosts[n].Host==NetLastHost
-			    && Hosts[n].Port==NetLastPort ) {
-			break;
-		    }
-		}
-
-		// A new client
-		if( n==HostsCount ) {
-		    Hosts[HostsCount].Host=NetLastHost;
-		    Hosts[HostsCount++].Port=NetLastPort;
-		    DebugLevel0(__FUNCTION__": New client %ld:%d\n"
-			    ,NetLastHost,ntohs(NetLastPort));
-		    ++i;
-		}
-	    }
-
-	    // Acknowledge lost (timeout 1s)
-	    while( NetSocketReady(NetworkFildes,1000) ) {
-		DebugLevel0(__FUNCTION__": Acknowledge lost\n");
-		NetRecvUDP(NetworkFildes,&message,sizeof(message));
-		if( message.Type==MessageInitHello ) {
-		    // Acknowledge the packets.
-		    message.Type=MessageInitReply;
-		    n=NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
-			    ,&message,sizeof(message));
-		}
-	    }
-
-	    //
-	    //	Assign the players.
-	    //
-	    for( n=i=0; i<NumPlayers && n<NetPlayers; ++i ) {
-		if( Players[i].Type==PlayerHuman ) {
-		    NetPlyNr[n]=num[n]=i;
-		    DebugLevel0("Assigning %d -> %d\n",i,n);
-		    n++;
-		}
-	    }
-	    if( n<NetPlayers ) {
-		fprintf(stderr,"Not enought human slots\n");
-		exit(-1);
-	    }
-
-	    // FIXME: randomize the slots :)
-
-	    //
-	    //	Send all clients host/ports to all clients.
-	    //
-	    message.Type=MessageInitConfig;
-	    message.HostsCount=HostsCount+1;
-	    for( i=0; i<HostsCount; ++i ) {
-		message.Hosts[i].Host=htonl(Hosts[i].Host);
-		message.Hosts[i].Port=htonl(Hosts[i].Port);
-		message.Num[i]=num[i];
-	    }
-	    message.Hosts[i].Host=htonl(MyHost);
-	    message.Hosts[i].Port=htonl(MyPort);
-	    message.Num[i]=num[i];
-	    DebugLevel0(__FUNCTION__": player %d\n",num[i]);
-	    ThisPlayer=&Players[num[i]];
-
-	    for( j=HostsCount; j; ) {
-		DebugLevel1(__FUNCTION__": ready, assigning\n");
-
-		// Send to all clients.
-		for( i=0; i<HostsCount; ++i ) {
-		    if( num[i]!=-1 ) {
-			n=NetSendUDP(NetworkFildes,Hosts[i].Host,Hosts[i].Port
-				,&message,sizeof(message));
-			DebugLevel0(__FUNCTION__": Sending config %d\n",n);
-		    }
-		}
-		// Wait for acknowledge
-		while( NetSocketReady(NetworkFildes,500) ) {
-		    InitMessage msg;
-
-		    NetRecvUDP(NetworkFildes,&msg,sizeof(msg));
-		    DebugLevel0(__FUNCTION__": receive ack\n");
-
-		    for( i=0; i<HostsCount; ++i ) {
-			if( NetLastHost==Hosts[i].Host
-				&& NetLastPort==Hosts[i].Port
-				&& msg.Type==MessageInitReply ) {
-			    num[i]=-1;
-			    j--;
-			    break;
-			}
-		    }
-		}
-	    }
-
-	    sleep(1);	// acknowledge timeout
-
-	    DebugLevel0(__FUNCTION__": Setup ready\n");
+	    NetworkServerSetup();
+	    DebugLevel0(__FUNCTION__": Server setup ready\n");
 
 	//
 	// Client
 	//
 	} else {
-	    InitMessage message;
-	    unsigned long host;
-
-	    // Parse server address.
-	    cp=strchr(NetworkArg,':');
-	    if( cp ) {
-		*cp='\0';
-		port=htons(atoi(cp+1));
-		host=NetResolveHost(NetworkArg);
-		*cp=':';
-	    } else {
-		port=htons(NetworkPort);
-		host=NetResolveHost(NetworkArg);
-	    }
-	    if( host==INADDR_NONE ) {
-		fprintf(stderr,"Can't resolve host %s\n",NetworkArg);
-		exit(-1);
-	    }
-	    DebugLevel0(__FUNCTION__": Server %ld:%d\n",host,ntohs(port));
-
-	    // Connecting to server
-	    for( ;; ) {
-		message.Type=MessageInitHello;
-		i=NetSendUDP(NetworkFildes,host,port,&message,sizeof(message));
-		DebugLevel0(__FUNCTION__": Sending hello %d\n",i);
-
-		// Wait on answer (timeout 1/2s)
-		if( NetSocketReady(NetworkFildes,500) ) {
-		    NetRecvUDP(NetworkFildes,&message,sizeof(message));
-		    DebugLevel0(__FUNCTION__": receive reply\n");
-		    if( NetLastHost==host && NetLastPort==port
-			    && message.Type==MessageInitReply ) {
-			break;
-		    }
-		}
-	    }
-
-	    // Wait for address of other clients.
-	    for( ;; ) {
-		DebugLevel0(__FUNCTION__": waiting for clients\n");
-		NetRecvUDP(NetworkFildes,&message,sizeof(message));
-		if( message.Type!=MessageInitConfig ) {
-		    continue;
-		}
-		DebugLevel0(__FUNCTION__": receive clients\n");
-		for( i=0; i<message.HostsCount; ++i ) {
-		    message.Hosts[i].Host=ntohl(message.Hosts[i].Host);
-		    message.Hosts[i].Port=ntohl(message.Hosts[i].Port);
-		    // Own client
-		    if( message.Hosts[i].Host==MyHost
-			    && message.Hosts[i].Port==MyPort ) {
-			DebugLevel0(__FUNCTION__": SELF %d\n",message.Num[i]);
-			ThisPlayer=&Players[(int)message.Num[i]];
-		    } else {
-			NetPlyNr[HostsCount]=message.Num[i];
-			Hosts[HostsCount].Host=message.Hosts[i].Host;
-			Hosts[HostsCount++].Port=message.Hosts[i].Port;
-			DebugLevel0(__FUNCTION__": Client %d %ld:%d\n"
-				,message.Num[i]
-				,message.Hosts[i].Host
-				,ntohs(message.Hosts[i].Port));
-		    }
-		}
-
-		// Acknowledge the packets.
-		message.Type=MessageInitReply;
-		NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
-			,&message,sizeof(message));
-		break;
-	    }
-
-	    // Acknowledge lost (timeout 1s)
-	    while( NetSocketReady(NetworkFildes,1000) ) {
-		DebugLevel0(__FUNCTION__": Acknowledge lost\n");
-		NetRecvUDP(NetworkFildes,&message,sizeof(message));
-		if( message.Type==MessageInitConfig ) {
-		    // Acknowledge the packets.
-		    message.Type=MessageInitReply;
-		    NetSendUDP(NetworkFildes,NetLastHost,NetLastPort
-			    ,&message,sizeof(message));
-		}
-	    }
+	    NetworkClientSetup();
+	    DebugLevel0(__FUNCTION__": Client setup ready\n");
 	}
 
 	//
@@ -1235,6 +1348,7 @@ global void InitNetwork(void)
 */
 global void NetworkSync(void)
 {
+    // obsolete old function.
 }
 
 /**
@@ -1242,60 +1356,89 @@ global void NetworkSync(void)
 */
 global void NetworkEvent(void)
 {
-    //NetworkCommand table[NetworkDups];
-    NetworkCommandQueue ncq;
+    NetworkPacket packet;
     int player;
+    int i;
     int n;
 
     DebugLevel3(__FUNCTION__"\n");
 
-    //	FIXME: must read old commands.
-    // NetRecvUDP(NetworkFildes,table,sizeof(table));
+    //
+    //	Read the packet.
+    //
+    NetRecvUDP(NetworkFildes,&packet,sizeof(packet));
 
-    NetRecvUDP(NetworkFildes,&ncq.Data,sizeof(ncq.Data));
-    DebugLevel3(__FUNCTION__" %d ->%d\n",ncq.Data.Type,ncq.Data.Frame);
-
-    // Place message in input.
-    if( ncq.Data.Frame>=(FrameCounter&0xFF) ) {
-	ncq.Time=(FrameCounter&~0xFF)+ncq.Data.Frame;
-    } else {
-	ncq.Time=(FrameCounter&~0xFF)+ncq.Data.Frame+0x100;
+    if( packet.Commands[0].Type==MessageInitReply ) {
+	DebugLevel0(__FUNCTION__": late init reply\n");
+	return;
     }
 
     //
-    //	Handle some messages
+    //	Parse the packet commands.
     //
-    if( ncq.Data.Type==MessageQuit ) {
-	DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
-		,FrameCounter,SlowFrameCounter      
-		,(SlowFrameCounter*100)/FrameCounter);
-	IfDebug( UnitCacheStatistic(); );
-	DebugLevel0("Got quit from network.\n");
-	exit(0);
+    for( i=0; i<NetworkDups; ++i ) {
+	NetworkCommand* nc;
+
+	nc=&packet.Commands[i];
+
+	//
+	//	Handle some messages.
+	//
+	if( nc->Type==MessageQuit ) {
+	    DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
+		    ,FrameCounter,SlowFrameCounter      
+		    ,(SlowFrameCounter*100)/FrameCounter);
+	    IfDebug( UnitCacheStatistic(); );
+	    DebugLevel0("Got quit from network.\n");
+	    exit(0);
+	}
+
+	if( nc->Type==MessageResend ) {
+	    DebugLevel0(__FUNCTION__": resend\n");
+	    return;
+	}
+
+	// need player number. This could also be calculated from the
+	//	sender ip, port.
+	if( nc->Type==MessageChat || nc->Type==MessageChatCont ) {
+	    player=((NetworkChat*)nc)->Player;
+	} else if( nc->Type==MessageSync ) {
+	    player=ntohs(nc->X);
+	} else {
+	    player=UnitSlots[ntohs(nc->Unit)]->Player->Player;
+	}
+
+	// Destination frame (time to execute).
+	n=((FrameCounter+128)&~0xFF)|nc->Frame;
+	if( n>FrameCounter+128 ) {
+	    n-=0x100;
+	}
+
+	DebugLevel3(__FUNCTION__": command %d for %d %x\n"
+		,nc->Type,n,nc->Frame);
+
+	// Place in network in
+	NetworkIn[nc->Frame][player].Time=n;
+	NetworkIn[nc->Frame][player].Data=*nc;
     }
-    if( ncq.Data.Type==MessageChat || ncq.Data.Type==MessageChatCont ) {
-	player=((NetworkChat*)&ncq.Data)->Player;
-    } else if( ncq.Data.Type==MessageSync ) {
-	player=ntohs(ncq.Data.X);
-    } else {
-	player=UnitSlots[ntohs(ncq.Data.Unit)]->Player->Player;
-    }
-    DebugLevel3(__FUNCTION__": %d Frame %d\n",player,ncq.Time);
-    NetworkIn[ncq.Data.Frame][player]=ncq;
 
     //
     //	Waiting for this
     //
     if( !NetworkInSync ) {
 	NetworkInSync=1;
-	n=(FrameCounter/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
+	n=((FrameCounter-1)/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
+	DebugLevel0(__FUNCTION__": wait for %d\n",n);
 	for( player=0; player<HostsCount; ++player ) {
 	    if( NetworkIn[n&0xFF][NetPlyNr[player]].Time!=n ) {
 		NetworkInSync=0;
+		NetworkDelay=NetworkUpdates;
 		// FIXME: should send a resent request, after sometime.
+
+		break;
 	    }
 	}
-	DebugLevel0(__FUNCTION__": in sync %d\n",NetworkInSync);
+	DebugLevel0(__FUNCTION__": %d in sync %d\n",FrameCounter,NetworkInSync);
     }
 }
 
@@ -1501,12 +1644,42 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 }
 
 /**
+**	Network resend commands.
+*/
+local void NetworkResendCommands(void)
+{
+    NetworkPacket packet;
+    NetworkCommandQueue* ncq;
+    int i;
+
+    ncq=(NetworkCommandQueue*)(CommandsOut->last);
+
+    //
+    //	Build packet of 4 messages.
+    //
+    //packet.Commands[0].Type=MessageResend;
+    //packet.Commands[0].Frame=
+    //		(FrameCounter/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
+
+    for( i=0; i<NetworkDups; ++i ) {
+	packet.Commands[i]=ncq->Data;
+	DebugLevel3(__FUNCTION__": %p %p %d %d\n"
+		,ncq,ncq->List->prev,ncq->Data.Type,ncq->Time);
+	if( ncq->List->prev->prev ) {
+	    ncq=(NetworkCommandQueue*)(ncq->List->prev);
+	}
+    }
+
+    NetworkBroadcast(&packet,sizeof(packet));
+}
+
+/**
 **	Network send commands.
 */
 local void NetworkSendCommands(void)
 {
     NetworkCommandQueue* ncq;
-    NetworkCommand table[NetworkDups];
+    NetworkPacket packet;
     int i;
 
     //
@@ -1514,7 +1687,6 @@ local void NetworkSendCommands(void)
     //
     if( dl_empty(CommandsIn) ) {
 	ncq=malloc(sizeof(NetworkCommandQueue));
-	ncq->Time=FrameCounter;
 	ncq->Data.Type=MessageSync;
 	ncq->Data.X=htons(ThisPlayer->Player);
     } else {
@@ -1525,29 +1697,28 @@ local void NetworkSendCommands(void)
 	dl_remove_first(CommandsIn);
     }
 
-    //	Insert in output que.
+    //	Insert in output queue.
     dl_insert_first(CommandsOut,ncq->List);
 
-    //	Send it now.
+    //	Fill in the time
     ncq->Time=FrameCounter+NetworkLag;
     ncq->Data.Frame=ncq->Time&0xFF;
     DebugLevel3(__FUNCTION__": sending for %d\n",ncq->Time);
 
-    NetworkBroadcast(&ncq->Data,sizeof(NetworkCommand));
 
     //
     //	Build packet of 4 messages.
     //
     for( i=0; i<NetworkDups; ++i ) {
-	table[i]=ncq->Data;
-	ncq=(NetworkCommandQueue*)(ncq->List->next);
-	if( !ncq->List->next ) {
-	    break;
+	packet.Commands[i]=ncq->Data;
+	DebugLevel3(__FUNCTION__": %p %p %d\n"
+		,ncq,ncq->List->next,ncq->Data.Type);
+	if( ncq->List->next->next ) {
+	    ncq=(NetworkCommandQueue*)(ncq->List->next);
 	}
     }
 
-    //	FIXME: must send old commands.
-    // NetworkBroadcast(table,sizeof(table));
+    NetworkBroadcast(&packet,sizeof(packet));
 }
 
 /**
@@ -1570,7 +1741,7 @@ local void NetworkExecCommands(void)
 		ncq=(NetworkCommandQueue*)(CommandsOut->last);
 		DebugLevel3(__FUNCTION__": Type %d Time %d\n"
 			,ncq->Data.Type,ncq->Time);
-		if( ncq->Time!=FrameCounter ) {
+		if( ncq->Time+NetworkLag>=FrameCounter ) {
 		    break;
 		}
 		dl_remove_last(CommandsOut);
@@ -1583,38 +1754,13 @@ local void NetworkExecCommands(void)
 	    //
 	    ncq=&NetworkIn[FrameCounter&0xFF][i];
 	    if( ncq->Time ) {
+		DebugLevel3(__FUNCTION__": execute %d,%d\n"
+			,FrameCounter,ncq->Time);
 		DebugCheck( ncq->Time!=FrameCounter );
 		ParseNetworkCommand(ncq);
 	    }
 	}
     }
-#if 0
-    // FIXME: must done in the same order on all computers.
-
-    //
-    //	Remove external commands.
-    //
-    for( i=0; i<HostsCount; ++i ) {
-	ncq=&NetworkIn[FrameCounter&0xFF][NetPlyNr[i]];
-	DebugCheck( ncq->Time!=FrameCounter );
-	ParseNetworkCommand(ncq);
-    }
-
-    //
-    //	Remove local commands from queue
-    //
-    if( !dl_empty(CommandsOut) ) {
-	ncq=(NetworkCommandQueue*)(CommandsOut->last);
-	DebugLevel3(__FUNCTION__": Type %d Time %d\n"
-		,ncq->Data.Type,ncq->Time);
-	if( ncq->Time==FrameCounter ) {
-	    dl_remove_last(CommandsOut);
-	    ParseNetworkCommand(ncq);
-	    free(ncq);
-	}
-    }
-#endif
-
 }
 
 /**
@@ -1637,8 +1783,10 @@ local void NetworkSyncCommands(void)
 	DebugLevel3(__FUNCTION__": sync %d==%d\n",ncq->Time,n); 
 	if( ncq->Time!=n ) {
 	    NetworkInSync=0;
+	    NetworkDelay=NetworkUpdates;
 	    // FIXME: should send a resent request.
-	    DebugLevel0(__FUNCTION__": not in sync %d\n",n);
+	    DebugLevel3(__FUNCTION__": %d not in sync %d\n",FrameCounter,n);
+	    break;
 	}
     }
 }
@@ -1648,8 +1796,6 @@ local void NetworkSyncCommands(void)
 */
 global void NetworkCommands(void)
 {
-    // FIXME: NetworkEvent should place the commands in a loop
-
     if( NetworkFildes!=-1 ) {
 	//
 	//	Send messages to all clients (other players)
@@ -1660,6 +1806,21 @@ global void NetworkCommands(void)
 	    NetworkSendCommands();
 	    NetworkExecCommands();
 	    NetworkSyncCommands();
+	}
+    }
+}
+
+/**
+**	Recover network.
+*/
+global void NetworkRecover(void)
+{
+    // Got no message just resent our oldest messages
+    if( NetworkDelay==VideoInterrupts ) {
+	NetworkDelay+=NetworkUpdates;
+	if( !dl_empty(CommandsOut) ) {
+	    DebugLevel0(__FUNCTION__": %d %d\n",FrameCounter,VideoInterrupts);
+	    NetworkResendCommands();
 	}
     }
 }

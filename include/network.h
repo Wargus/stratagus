@@ -55,6 +55,7 @@ extern void ExitNetwork(void);		/// cleanup network module
 extern void NetworkEvent(void);		/// handle network events
 extern void NetworkSync(void);		/// hold in sync
 extern void NetworkQuit(void);		/// quit game
+extern void NetworkRecover(void);	/// Recover network
 extern void NetworkCommands(void);	/// get all network commands
 extern void NetworkChatMessage(const char*msg);	/// send chat message
 
