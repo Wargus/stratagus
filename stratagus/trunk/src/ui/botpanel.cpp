@@ -73,8 +73,8 @@ static ButtonAction* UnitButtonTable[MAX_BUTTONS];
 	/// buttons in UnitButtonTable
 static int NumUnitButtons;
 
-ButtonAction* CurrentButtons;        /// Pointer to current buttons
-static ButtonAction* _current_buttons;    /// FIXME: this is just for test
+ButtonAction* CurrentButtons;             ///< Pointer to current buttons
+static ButtonAction* _current_buttons;    ///< FIXME: this is just for test
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -580,8 +580,8 @@ void UpdateButtonPanel(void)
 	for (z = 0; z < NumUnitButtons; ++z) {
 		int pos; // keep position, modified if alt-buttons required
 		// FIXME: we have to check and if these unit buttons are available
-		//	   i.e. if button action is ButtonTrain for example check if
-		//		required unit is not restricted etc...
+		//    i.e. if button action is ButtonTrain for example check if
+		// required unit is not restricted etc...
 
 		buttonaction = UnitButtonTable[z];
 		pos = buttonaction->Pos;
@@ -591,7 +591,7 @@ void UpdateButtonPanel(void)
 			continue;
 		}
 
-		if (pos > TheUI.NumButtonButtons) {		// VLADI: this allows alt-buttons
+		if (pos > TheUI.NumButtonButtons) { // VLADI: this allows alt-buttons
 			if (KeyModifiers & ModifierAlt) {
 				// buttons with pos >TheUI.NumButtonButtons are shown on if ALT is pressed
 				pos -= TheUI.NumButtonButtons;
@@ -756,7 +756,7 @@ void DoButtonButtonClicked(int button)
 				}
 				for (i = 0; i < NumSelected; ++i) {
 					if (Selected[i]->AutoCastSpell[spellId] != autocast) {
-						SendCommandAutoSpellCast(Selected[i], 
+						SendCommandAutoSpellCast(Selected[i],
 							spellId, autocast);
 					}
 				}
@@ -765,7 +765,7 @@ void DoButtonButtonClicked(int button)
 				GameCursor = TheUI.YellowHair.Cursor;
 				CursorAction = CurrentButtons[button].Action;
 				CursorValue = CurrentButtons[button].Value;
-				CurrentButtonLevel = 9;		// level 9 is cancel-only
+				CurrentButtonLevel = 9; // level 9 is cancel-only
 				UpdateButtonPanel();
 				SetStatusLine("Select Target");
 			}
@@ -835,7 +835,7 @@ void DoButtonButtonClicked(int button)
 				ClearCosts();
 				CursorBuilding = type;
 				// FIXME: check is this =9 necessary?
-				CurrentButtonLevel = 9;		// level 9 is cancel-only
+				CurrentButtonLevel = 9; // level 9 is cancel-only
 				UpdateButtonPanel();
 			}
 			break;

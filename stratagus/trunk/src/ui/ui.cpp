@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -48,16 +48,15 @@
 #include "menus.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-char RightButtonAttacks; /// right button 0 move, 1 attack
-char FancyBuildings;     /// Mirror buildings 1 yes, 0 now.
+char RightButtonAttacks;                   ///< right button 0 move, 1 attack
+char FancyBuildings;                       ///< Mirror buildings 1 yes, 0 now.
 
-/// keyboard scroll speed
-int SpeedKeyScroll = KEY_SCROLL_SPEED;
-/// mouse scroll speed
-int SpeedMouseScroll = MOUSE_SCROLL_SPEED;
+
+int SpeedKeyScroll = KEY_SCROLL_SPEED;     ///< keyboard scroll speed
+int SpeedMouseScroll = MOUSE_SCROLL_SPEED; ///< mouse scroll speed
 
 /**
 **  The user interface configuration
@@ -70,7 +69,7 @@ UI TheUI;
 UI** UI_Table;
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 static void ClipViewport(Viewport* vp, int ClipX, int ClipY);
@@ -787,7 +786,7 @@ void SetViewportMode(ViewportMode new_mode)
 **  Cycles through predefined viewport modes (geometry configurations)
 **  in order defined by the ViewportMode enumerated type.
 **
-**  @param step	  The size of step used for cycling. Values that
+**  @param step   The size of step used for cycling. Values that
 **               make sense are mostly 1 (next viewport mode) and
 **               -1 (previous viewport mode).
 */

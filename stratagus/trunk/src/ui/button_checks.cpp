@@ -149,7 +149,7 @@ int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 **
-**  NOTE: this check could also be moved into intialisation.
+**  @note: this check could also be moved into intialisation.
 */
 int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
@@ -165,7 +165,7 @@ int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 **
 **  @return        True if disabled.
 **
-**  NOTE: this check could also be moved into intialisation.
+**  @note: this check could also be moved into intialisation.
 */
 int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
 	const ButtonAction* button __attribute__((unused)))
