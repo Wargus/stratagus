@@ -149,6 +149,9 @@
 #include "unit.h"
 #include "ccl.h"
 #include "ccl_helpers.h"
+#include "actions.h"
+#include "map.h"
+
 #if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
 #endif
@@ -1331,6 +1334,134 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
     DebugCheck(unit->Player->Type == PlayerPerson);
 
     AiReduceMadeInBuilded(unit->Player->Ai, what);
+}
+
+/**
+**	Called if an unit can't move. Try to move unit in the way
+**
+**	@param unit	Pointer to unit what builds the building.
+**	@param what	Pointer to unit-type.
+*/
+global void AiCanNotMove(Unit * unit)
+{
+    static int dirs[8][2]={{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};    
+    int ux0,uy0,ux1,uy1;
+    int bx0,by0,bx1,by1;
+    int x,y;
+    int trycount,i;
+    Unit * blocker;
+    UnitType * unittype;
+    UnitType * blockertype;
+    Unit * movableunits[16];
+    int movablepos[16][2];
+    int movablenb;
+
+    AiPlayer = unit->Player->Ai;
+
+    // No more than 1 move per cycle ( avoid stressing the pathfinder )
+    if (GameCycle == AiPlayer->LastCanNotMoveGameCycle) {
+	return;
+    }
+
+    unittype = unit->Type;
+
+    ux0 = unit->X;
+    uy0 = unit->Y;
+    ux1 = ux0 + unittype->TileWidth - 1;
+    uy1 = uy0 + unittype->TileHeight - 1;
+
+    movablenb = 0;
+
+    DebugLevel2Fn("AiCanNotMove : %s at %d %d\n" _C_ unittype->Ident _C_ ux0 _C_ uy0);
+
+    // Try to make some unit moves around it
+    for (i = 0; i < NumUnits; ++i) {
+	blocker = Units[i];
+
+	if (UnitUnusable(blocker)) {
+	    continue;
+	}
+
+	if (!UnitIdle(blocker)) {
+	    continue;
+	}
+
+	if (blocker->Player != unit->Player) {
+	    // Not allied
+	    if (!(blocker->Player->Allied & (1 << unit->Player->Player))) {
+		continue;
+	    }
+	}
+
+	blockertype = blocker->Type;
+
+	if (blockertype->UnitType != unittype->UnitType) {
+	    continue;
+	}
+
+	
+	if (!blockertype->_Speed || blockertype->Building) {
+	    continue;
+	}
+
+	bx0 = blocker->X;
+	by0 = blocker->Y;
+	bx1 = bx0;
+	by1 = by0;
+
+	// Check for collision
+#define int_min(a,b)  ((a)<(b)?(a):(b))
+#define int_max(a,b)  ((a)>(b)?(a):(b))
+	if (!((ux0 == bx1 + 1 || ux1 == bx0 - 1) && 
+	    	(int_max(by0, uy0) <= int_min(by1, uy1)))
+	    && !((uy0 == by1 + 1 || uy1 == by0 - 1) && 
+	    	(int_max(bx0, ux0) <= int_min(bx1, ux1)))) {
+	   continue;
+	}
+#undef int_min
+#undef int_max
+
+	if (unit == blocker) {
+	    continue;
+	}
+
+	// Move blocker in a rand dir
+	i = SyncRand() & 7;
+	trycount = 8;
+	while (trycount > 0) {
+	    i = (i + 1) &7;
+	    trycount--;
+	    
+	    x = blocker->X + dirs[i][0];
+	    y = blocker->Y + dirs[i][1];
+
+	    // Out of the map => no !
+	    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+		continue;
+	    }
+	    // move to blocker ? => no !
+	    if (x == ux0 && y == uy0) {
+		continue;
+	    }
+
+	    movableunits[movablenb] = blocker;
+	    movablepos[movablenb][0] = x;
+	    movablepos[movablenb][1] = y;
+
+	    movablenb++;
+	    trycount = 0;
+	}
+	if (movablenb >= 16) {
+	    break;
+	}
+    }
+
+    // Don't move more than 1 unit.
+    if (movablenb) {
+	i = SyncRand() % movablenb;
+    	CommandMove(movableunits[i], movablepos[i][0], movablepos[i][1], FlushCommands);
+	AiPlayer->LastCanNotMoveGameCycle = GameCycle;
+    }
 }
 
 /**

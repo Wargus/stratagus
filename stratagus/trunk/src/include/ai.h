@@ -77,6 +77,8 @@ extern void AiWorkComplete(Unit* unit,Unit* what);
 extern void AiCanNotBuild(Unit* unit,const UnitType* what);
     /// Called if AI unit can't reach building place
 extern void AiCanNotReach(Unit* unit,const UnitType* what);
+    /// Called if an AI unit can't move
+extern void AiCanNotMove(Unit * unit);
     /// Called if AI unit has completed training
 extern void AiTrainingComplete(Unit* unit,Unit* what);
     /// Called if AI unit has completed upgrade to
