@@ -67,8 +67,6 @@ struct _button_ {
     int	    Height;			/// height of the button on the screen
 };
 
-#ifdef SPLIT_SCREEN_SUPPORT
-
 #define MAX_NUM_VIEWPORTS 4		/// Number of supported viewports
 
 typedef struct _viewport_ Viewport;	/// Viewport typedef
@@ -93,6 +91,12 @@ typedef struct _viewport_ Viewport;	/// Viewport typedef
 **		Tile coordinates of UL corner of this viewport with respect to
 **		UL corner of the whole map.
 **
+**	Viewport::Unit
+**
+**		Viewport is bound to an unit. If the unit moves the viewport
+**		changes the position together with the unit. 
+**		@todo binding to a group.
+**
 **	@todo mixing unsigned and int is dangerous!!!
 */
 struct _viewport_ {
@@ -105,10 +109,14 @@ struct _viewport_ {
     unsigned MapY;		/// Map tile upper corner y coordinate
     unsigned MapWidth;		/// Width in map tiles
     unsigned MapHeight;		/// Height in map tiles
+
+    Unit* Unit;			/// Bound to this unit
 };
 
 /**
 **	Enumeration of the different predefined viewport configurations.
+**
+**	@todo this should be later user configurable
 */
 typedef enum {
     VIEWPORT_SINGLE,		/// Old single viewport
@@ -118,8 +126,6 @@ typedef enum {
     VIEWPORT_QUAD,		/// Four viewports split symmetric
     NUM_VIEWPORT_MODES		/// Number of different viewports.
 } ViewportMode;
-
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 /**
 **	Panel types used in menus (and stored in ui global below)
@@ -217,24 +223,16 @@ typedef struct _ui_ {
     int		ButtonPanelX;		/// Button panel screen X position
     int		ButtonPanelY;		/// Button panel screen Y position
 
-#ifdef SPLIT_SCREEN_SUPPORT
+    // Map area
     ViewportMode	ViewportMode;	/// Current viewport mode
-    int		ActiveViewport;		/// Contains (or last contained) pointer
-					/// (index into VP[])
-    int		LastClickedVP;		/// FIXME: Docu
-    int		NumViewports;		/// viewports currently used
-    Viewport	VP[MAX_NUM_VIEWPORTS];	/// FIXME: Docu
-    /* Map* attributes of Viewport are unused here */
+    // FIXME: Johns: we should make the ints pointers
+	/// Contains (or last contained) pointer (index into VP[])
+    int		ActiveViewport;
+    int		LastClickedVP;		/// Last clicked = active viewport
+    int		NumViewports;		/// Viewports currently used
+    Viewport	VP[MAX_NUM_VIEWPORTS];	/// Parameters of all viewports
+    // Map* attributes of Viewport are unused here:
     Viewport	MapArea;		/// geometry of the whole map area
-#else /* SPLIT_SCREEN_SUPPORT */
-    // The map
-    int		MapX;			/// big map screen X position
-    int		MapY;			/// big map screen Y position
-	/// map width for current mode (MapX+14*32-1 for 640x480)
-    unsigned	MapEndX;
-	/// map height for current mode (MapY+14*32-1 for 640x480)
-    unsigned	MapEndY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     // The menu button
     GraphicConfig MenuButton;		/// menu button background
@@ -329,8 +327,6 @@ extern void RestrictCursorToViewport(void);
     /// Restrict mouse cursor to minimap
 extern void RestrictCursorToMinimap(void);
 
-#ifdef SPLIT_SCREEN_SUPPORT
-
     /// FIXME: Short one line docu
 extern int GetViewport(int, int);
     /// FIXME: Short one line docu
@@ -339,8 +335,6 @@ extern int MapTileGetViewport(int, int);
 extern void CycleViewportMode(int);
     /// FIXME: Short one line docu
 extern void SetViewportMode(ViewportMode mode);
-
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 //@}
 
