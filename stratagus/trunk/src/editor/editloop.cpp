@@ -549,7 +549,7 @@ local void DrawUnitIcons(void)
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
     }
 
-    percent = UnitIndex * 100 / (MaxUnitIndex - 3);
+    percent = UnitIndex * 100 / (MaxUnitIndex / 9 * 9);
     i = (percent * (j - 54)) / 100;
     VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
