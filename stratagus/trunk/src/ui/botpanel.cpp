@@ -517,7 +517,7 @@ global void DrawButtonPanel(void)
 	    if( ShowCommandKey ) {
 		if( CurrentButtons[i].Key==27 ) {
 		    strcpy(buf,"ESC");
-		    VideoDrawText(TheUI.Buttons[i+10].X+TheUI.Buttons[i+10].Width-VideoTextLength(GameFont,buf),
+		    VideoDrawText(TheUI.Buttons[i+10].X+4+TheUI.Buttons[i+10].Width-VideoTextLength(GameFont,buf),
 			TheUI.Buttons[i+10].Y+30,GameFont,buf);
 		} else {
 		    // FIXME: real DrawChar would be useful
