@@ -78,7 +78,7 @@ local char Input[80];		/// line input for messages/long commands
 local int InputIndex;		/// current index into input
 local char InputStatusLine[99];	/// Last input status line
 local int SpeedCheat;		/// Speed up cheat
-local char* UiGroupKeys = "0123456789`";/// Up to 11 keys, last unselect. Default for qwerty
+global char* UiGroupKeys = "0123456789`";/// Up to 11 keys, last unselect. Default for qwerty
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
 global char GameObserve;	/// Observe mode
