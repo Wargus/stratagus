@@ -1377,9 +1377,9 @@ local int CclDefineUI(lua_State* l)
 						lua_rawgeti(l, -1, subk + 1);
 						ui->Resources[res].Icon.File = strdup(LuaToString(l, -1));
 						lua_pop(l, 1);
-					} else if (!strcmp(value, "row")) {
+					} else if (!strcmp(value, "frame")) {
 						lua_rawgeti(l, -1, subk + 1);
-						ui->Resources[res].IconRow = LuaToNumber(l, -1);
+						ui->Resources[res].IconFrame = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "size")) {
 						lua_rawgeti(l, -1, subk + 1);

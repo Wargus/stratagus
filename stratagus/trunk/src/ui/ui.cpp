@@ -203,7 +203,7 @@ global void LoadUserInterface(void)
 	MenuPanel* menupanel;
 
 	//
-	//		Load graphics
+	//  Load graphics
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
 		if (TheUI.Filler[i].File) {
@@ -218,7 +218,8 @@ global void LoadUserInterface(void)
 		// FIXME: reuse same graphics?
 		if (TheUI.Resources[i].Icon.File) {
 			TheUI.Resources[i].Icon.Graphic =
-				LoadGraphic(TheUI.Resources[i].Icon.File);
+				LoadSprite(TheUI.Resources[i].Icon.File,
+					TheUI.Resources[i].IconW, TheUI.Resources[i].IconH);
 		}
 	}
 
