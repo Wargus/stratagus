@@ -474,7 +474,7 @@ local void SaveTilesetMixed(FILE* file, const unsigned short* table,
 	for (j = 0; j <= n; ++j) {
 	    i += fprintf(file, " %3d", table[start + x + j]);
 	}
-	if (x == 0xF0 || (start == 0x900 && x == 0xD0)) {
+	if (x == 0xF0 ) {
 	    i += fprintf(file, "))");
 	} else {
 	    i += fprintf(file, ")");
