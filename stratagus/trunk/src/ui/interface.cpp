@@ -926,12 +926,13 @@ local int CommandKey(int key)
 			UiRestartConfirmMenu();
 			break;
 
-		case '.':
 		case 'i':
-		case 'I':						// ., ALT+I, CTRL+I: Find idle worker
+		case 'I':
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
+			// FALL THROUGH
+		case '.':						// ., ALT+I, CTRL+I: Find idle worker
 			UiFindIdleWorker();
 			break;
 
