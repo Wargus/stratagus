@@ -10,12 +10,11 @@
 //
 /**@name action_build.c -	The build building action. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -82,11 +81,9 @@ global void HandleActionBuild(Unit* unit)
 		return;
 	    }
 
-	    // FIXME: use general notify/messages
-	    // NotifyPlayer("",unit,type);
-	    if( unit->Player==ThisPlayer ) {
-		SetMessage("You cannot reach building place.");
-	    } else if( unit->Player->Ai ) {
+	    NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+		"You cannot reach building place");
+	    if( unit->Player->Ai ) {
 		AiCanNotReach(unit,type);
 	    }
 
@@ -129,11 +126,9 @@ global void HandleActionBuild(Unit* unit)
 	    return;
 	}
 
-	// FIXME: use general notify/messages
-	// NotifyPlayer("",unit,type);
-        if( unit->Player==ThisPlayer ) {
-	    SetMessage("You cannot build %s here.", type->Name);
-	} else if( unit->Player->Ai ) {
+	NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+		"You cannot build %s here",type->Name);
+	if( unit->Player->Ai ) {
 	    AiCanNotBuild(unit,type);
 	}
 
@@ -147,14 +142,22 @@ global void HandleActionBuild(Unit* unit)
     }
 
     //
+    //	FIXME: got bug report about unit->Type==NULL in building
+    //
+    DebugCheck( !unit->Type || !unit->HP );
+
+    if( !unit->Type || !unit->HP ) {
+	return;
+    }
+
+    //
     //	Check if enough resources for the building.
     //
     if( PlayerCheckUnitType(unit->Player,type) ) {
-	// FIXME: use general notify/messages
-	// NotifyPlayer("",unit,type);
-        if( unit->Player==ThisPlayer ) {
-	    SetMessage("Not enough resources to build %s.", type->Name);
-	} else if( unit->Player->Ai ) {
+	// FIXME: Better tell what is missing?
+	NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+		"Not enough resources to build %s",type->Name);
+	if( unit->Player->Ai ) {
 	    AiCanNotBuild(unit,type);
 	}
 
@@ -170,6 +173,8 @@ global void HandleActionBuild(Unit* unit)
     //	Check if hiting any limits for the building.
     //
     if( !PlayerCheckLimits(unit->Player,type) ) {
+	NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+		"Can't build more units %s",type->Name);
 	if( unit->Player->Ai ) {
 	    AiCanNotBuild(unit,type);
 	}
@@ -343,10 +348,9 @@ global void HandleActionBuilded(Unit* unit)
 		    unit->Y+unit->Type->TileHeight/2,0);
 	}
 
-	// FIXME: General message system
-	// NotifyPlayer("",unit,type);
+	NotifyPlayer(unit->Player,NotifyGreen,unit->X,unit->Y,
+	    "New %s done", type->Name);
 	if( unit->Player==ThisPlayer ) {
-	    SetMessageEvent( unit->X, unit->Y, "New %s done", type->Name );
 	    PlayUnitSound(worker,VoiceWorkCompleted);
 	} else if( unit->Player->Ai ) {
 	    AiWorkComplete(worker,unit);
@@ -354,6 +358,7 @@ global void HandleActionBuilded(Unit* unit)
 
 	// FIXME: Vladi: this is just a hack to test wall fixing,
 	// FIXME:	also not sure if the right place...
+	// FIXME: Johns: hardcoded unit-type wall / more races!
 	if ( unit->Type == UnitTypeOrcWall
 		    || unit->Type == UnitTypeHumanWall ) {
 	    MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
