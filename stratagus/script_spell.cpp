@@ -122,6 +122,19 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		errl("Unsupported fireball tag", value);
 	    }
 	}
+    } else if (gh_eq_p(value, gh_symbol2scm("death-coil"))) {
+	spellaction->CastFunction = CastDeathCoil;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
+		spellaction->Data.Fireball.Damage = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else {
+		errl("Unsupported death-coil tag", value);
+	    }
+	}
+
     } else if (gh_eq_p(value, gh_symbol2scm("runes"))) {
 	spellaction->CastFunction = CastRunes;
 	while (!gh_null_p(list)) {

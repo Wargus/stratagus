@@ -238,6 +238,7 @@ global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
 	sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     mis->SourceUnit = caster;
+    mis->Damage = spell->Action->Data.Fireball.Damage;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
     caster->Refs++;
     if (target) {
@@ -245,7 +246,6 @@ global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
 	RefsDebugCheck(!target->Refs || target->Destroyed);
 	target->Refs++;
     }
-    mis->Controller = SpellDeathCoilController;
     return 0;
 }
 
@@ -266,7 +266,6 @@ global int CastFireball(Unit* caster, const SpellType* spell,
     Missile* missile;
     int sx;
     int sy;
-    int dist;
 
     DebugCheck(!caster);
     DebugCheck(!spell);
@@ -276,23 +275,15 @@ global int CastFireball(Unit* caster, const SpellType* spell,
     missile = NULL;
 
     // NOTE: fireball can be casted on spot
-    sx = caster->X;
-    sy = caster->Y;
-    dist = MapDistance(sx, sy, x, y);
-    DebugCheck(!dist);
-    x += ((x - sx) * 10) / dist;
-    y += ((y - sy) * 10) / dist;
-    sx = sx * TileSizeX + TileSizeX / 2;
-    sy = sy * TileSizeY + TileSizeY / 2;
+    sx = caster->X * TileSizeX + TileSizeX / 2;
+    sy = caster->Y * TileSizeY + TileSizeY / 2;
     x = x * TileSizeX + TileSizeX / 2;
     y = y * TileSizeY + TileSizeY / 2;
     caster->Mana -= spell->ManaCost;
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     missile = MakeMissile(spell->Missile, sx, sy, x, y);
-    missile->State = spell->Action->Data.Fireball.TTL - (dist - 1) * 2;
-    missile->TTL = spell->Action->Data.Fireball.TTL;
+//    missile->TTL = spell->Action->Data.Fireball.TTL;
     missile->Damage = spell->Action->Data.Fireball.Damage;
-    missile->Controller = SpellFireballController;
     missile->SourceUnit = caster;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
     caster->Refs++;
@@ -303,7 +294,7 @@ global int CastFireball(Unit* caster, const SpellType* spell,
 **	Cast flame shield.
 **
 **	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
+*	@param spell	Spell-type pointer
 **	@param target	Target unit that spell is addressed to
 **	@param x	X coord of target spot when/if target does not exist
 **	@param y	Y coord of target spot when/if target does not exist
@@ -333,7 +324,6 @@ global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
 	mis = MakeMissile(spell->Missile, 0, 0, 0, 0);
 	mis->TTL = spell->Action->Data.FlameShield.TTL + i * 7;
 	mis->TargetUnit = target;
-	mis->Controller = SpellFlameShieldController;
 	mis->Damage = spell->Action->Data.FlameShield.Damage;
 	RefsDebugCheck(!target->Refs || target->Destroyed);
 	target->Refs++;
@@ -703,7 +693,6 @@ global int CastWhirlwind(Unit* caster, const SpellType* spell,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     mis->TTL = spell->Action->Data.Whirlwind.TTL;
-    mis->Controller = SpellWhirlwindController;
     return 0;
 }
 
