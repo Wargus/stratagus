@@ -372,14 +372,15 @@ MapInfo* GetPudInfo(const char* pud, MapInfo* info)
 	char pudfull[PATH_MAX];
 	// FIXME: Reuse the temporary alloca buffer...
 
-	strcpy(pudfull, StratagusLibPath);
-	strcat(pudfull, "/");
-	strcat(pudfull, pud);
-
-	if( !(input=CLopen(pudfull,CL_OPEN_READ)) ) {
-		fprintf(stderr,"Try ./path/name\n");
-		fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
-		return NULL;
+	if( !(input=CLopen(pud,CL_OPEN_READ)) ) {
+		strcpy(pudfull, StratagusLibPath);
+		strcat(pudfull, "/");
+		strcat(pudfull, pud);
+		if( !(input=CLopen(pudfull,CL_OPEN_READ)) ) {
+			fprintf(stderr,"Try ./path/name\n");
+			fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
+			return NULL;
+		}
 	}
 	header[4]='\0';
 	if( !PudReadHeader(input,header,&length) ) {
