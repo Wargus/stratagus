@@ -932,7 +932,8 @@ local int CclUnit(lua_State* l)
 			unit->Goal = UnitSlots[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "auto-cast")) {
 			s = LuaToString(l, j + 1);
-			unit->AutoCastSpell = SpellTypeByIdent(s);
+			DebugCheck(SpellTypeByIdent(s)->Slot == -1);
+			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
 		} else {
 		   // FIXME: this leaves a half initialized unit
 		   lua_pushfstring(l, "Unsupported tag: %s", value);

@@ -1117,22 +1117,18 @@ global void ScriptProxyTypeInitBlock(ScriptProxyType* type)
 */
 local int ScriptSyncRand(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "Wrong argument count, %d got %d expected" _C_ lua_gettop(l) _C_ 1);
-	}
+	LuaCheckArgCount(l, 1);
 	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
 	return 1;
 }
 
 /**
-** 	Get a value from the Stratagus truly"" random number generator.
+** 	Get a value from the Stratagus "truly" random number generator.
 */
 local int ScriptMyRand(lua_State* l)
 {
-	if (lua_gettop(l)){
-		LuaError(l, "Wrong arguments");
-	}
-	lua_pushnumber(l, MyRand());
+	LuaCheckArgCount(l, 1);
+	lua_pushnumber(l, MyRand() % (int)LuaToNumber(l, -1));
 	return 1;
 }
 

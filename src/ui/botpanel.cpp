@@ -485,8 +485,7 @@ global void DrawButtonPanel(void)
 						break;
 					case ButtonSpellCast:
 						for (j = 0; j < NumSelected; ++j) {
-							if (Selected[j]->AutoCastSpell !=
-									SpellTypeTable[buttons[i].Value]) {
+							if (Selected[j]->AutoCastSpell[buttons[i].Value] != 1) {
 								break;
 							}
 						}
@@ -888,10 +887,10 @@ global void DoButtonButtonClicked(int button)
 			if (CurrentButtons[button].Action == ButtonSpellCast &&
 					(KeyModifiers & ModifierControl)) {
 				int autocast;
-				SpellType* spell;
+				int spellId;
 
-				spell = SpellTypeTable[CurrentButtons[button].Value];
-				if (!CanAutoCastSpell(spell)) {
+				spellId = CurrentButtons[button].Value;
+				if (!CanAutoCastSpell(SpellTypeTable[spellId])) {
 					PlayGameSound(GameSounds.PlacementError.Sound,
 						MaxSampleVolume);
 					break;
@@ -901,15 +900,15 @@ global void DoButtonButtonClicked(int button)
 				// If any selected unit doesn't have autocast on turn it on
 				// for everyone
 				for (i = 0; i < NumSelected; ++i) {
-					if (Selected[i]->AutoCastSpell != spell) {
+					if (Selected[i]->AutoCastSpell[spellId] == 0) {
 						autocast = 1;
 						break;
 					}
 				}
 				for (i = 0; i < NumSelected; ++i) {
-					if (!autocast || Selected[i]->AutoCastSpell != spell) {
-						SendCommandAutoSpellCast(Selected[i],
-							CurrentButtons[button].Value, autocast);
+					if (Selected[i]->AutoCastSpell[spellId] != autocast) {
+						SendCommandAutoSpellCast(Selected[i], 
+							spellId, autocast);
 					}
 				}
 			} else {
