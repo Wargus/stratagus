@@ -165,9 +165,6 @@ Possible tags:
       'armor 0 'basic-damage 3 'piercing-damage 6 'hit-points 40
       'costs '(time 70 gold 500 wood 50 oil 0 ore 0 stone 0 coal 0) )
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="define-unit-type"></a>
@@ -191,7 +188,7 @@ If the name is too long, it is split at space.<p>
 <dd></dd>
 <dt>graphics</dt>
 <dd>Defines the graphics used to display the unit-type in game. This could
-be an array "#( summer winter wasteland swamp) with different files for the
+be an array #( summer winter wasteland swamp) with different files for the
 tilesets. Or an indentifier "unit-xyz" if the graphics from an other unit-type
 should be reused.<p>
 
@@ -295,7 +292,7 @@ F.E.: '( gold 2 wood 1 oil 1 ).<p>
     <dd>The unit makes so-caled mining cycles. Each mining cycle it does some sort
     of animation and gains resource-step resources. You can stop after any number of
     steps. When the quantity in the harvester reaches the maximum (resource-capacity)
-    it will return home. I this is not included then it's considered infinity, and
+    it will return home. If this is not included then it's considered infinity, and
     resource-capacity will be the limit.<p></dd>
    
     <dt>resource-capacity</dt>
@@ -447,15 +444,11 @@ F.E. '( 1 1 ), '( 2 2 ).<p>
 
 Define unit-type mapping from original number to internal symbol.
 
-
 <h4>Example</h4>
 
 <pre>
     (define-unittype-wc-names)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBRARYPATH/ccl/wc2.ccl </a>
@@ -477,9 +470,6 @@ Get the ident of the unit-type structure.
 <pre>
     (get-unit-type-ident)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="get-unit-type-property"></a>
@@ -499,9 +489,6 @@ Get the property of the unit-type structure.
 <pre>
     (get-unit-type-property)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="get-unit-type-name"></a>
@@ -521,9 +508,6 @@ Get the name of the unit-type structure.
 <pre>
     (get-unit-type-name)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="set-unit-type-name!"></a>
@@ -546,9 +530,6 @@ Set the name of the unit-type structure.
 <pre>
     (set-unit-type-name!)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="set-unit-type-property"></a>
@@ -571,9 +552,6 @@ Set the property of the unit-type structure.
 <pre>
     (set-unit-type-property)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="unit-type"></a>
@@ -593,9 +571,6 @@ Get unit-type structure.
 <pre>
     (unit-type 'unit-great-hall)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/ai.ccl"> $LIBRARYPATH/ccl/ai.ccl </a>
@@ -611,9 +586,6 @@ Get all unit-type structures.
 <pre>
     (unit-type-array)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <hr>

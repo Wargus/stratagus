@@ -83,14 +83,13 @@ The condition player is set to defeat.
 <h4>Example</h4>
 
 <pre>
+    ;; Adds a trigger.  If the player on the console has 0 units then he loses.
     (add-trigger
       '(
         (if-unit 'this '== 0 'all))
       '(
         (action-defeat)))
 </pre>
-
-<p>Adds a trigger.  If the player on the console has 0 units then he loses.
 
 <h4>Used</h4>
 
@@ -107,9 +106,6 @@ The condition player is set to draw. (NOT SUPPORTED)
 <pre>
     (action-draw)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="action-set-switch"></a>
@@ -130,10 +126,9 @@ Set a switch.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets switch 1 on.
     (action-set-switch 1 #t)
 </pre>
-
-<p>Sets switch 1 on.
 
 <h4>Not Used</h4>
 
@@ -155,10 +150,9 @@ Set the timer.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
     (action-set-timer 9000 0)
 </pre>
-
-<p>Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
 
 <h4>Not Used</h4>
 
@@ -171,10 +165,9 @@ Start the timer.
 <h4>Example</h4>
 
 <pre>
+    ;; Starts the timer.
     (action-start-timer)
 </pre>
-
-<p>Starts the timer.
 
 <h4>Not Used</h4>
 
@@ -187,10 +180,9 @@ Stop the timer.
 <h4>Example</h4>
 
 <pre>
+    ;; Stops the timer.
     (action-stop-timer)
 </pre>
-
-<p>Stops the timer.
 
 <h4>Not Used</h4>
 
@@ -203,15 +195,14 @@ The condition player is set to victory.
 <h4>Example</h4>
 
 <pre>
+    ;; Adds a trigger. If the player on the console has killed all his 
+    ;; opponents he won.
     (add-trigger
       '(
         (if-opponents 'this '== 0))
       '(
         (action-victory)))
 </pre>
-
-<p>Adds a trigger. If the player on the console has killed all his 
-opponents he won.
 
 <h4>Used</h4>
 
@@ -232,6 +223,9 @@ Causes the trigger to wait a minimum number of milliseconds.
 <h4>Example</h4>
 
 <pre>
+    ;; Adds a trigger. If the player on the console has killed all his 
+    ;; opponents the message "Hello" appears then two seconds later the message
+    ;; "World" appears.
     (add-trigger
       '(
         (if-opponents 'this '== 0))
@@ -241,10 +235,6 @@ Causes the trigger to wait a minimum number of milliseconds.
         (add-message "World")
         #f))
 </pre>
-
-<p>Adds a trigger. If the player on the console has killed all his 
-opponents the message "Hello" appears then two seconds later the message
-"World" appears.
 
 <h4>Not Used</h4>
 
@@ -277,15 +267,14 @@ returns true and is removed if the action returns false.
 <h4>Example</h4>
 
 <pre>
+    ;; Adds a trigger. If the player on the console has killed all his 
+    ;; opponents he won.
     (add-trigger
       '(
         (if-opponents 'this '== 0))
       '(
         (action-victory)))
 </pre>
-
-<p>Adds a trigger. If the player on the console has killed all his 
-opponents he won.
 
 <h4>Used</h4>
 
@@ -315,10 +304,9 @@ Game run for duration.  If the game run for the duration game cycles the action 
 <h4>Example</h4>
 
 <pre>
+    ;; If the game has run for 300 cycles.
     (if-elapsed '&gt;= 300)
 </pre>
-
-<p>If the game has run for 300 cycles.
 
 <h4>Not Used</h4>
 
@@ -356,9 +344,6 @@ player for the action.
 <pre>
     (if-kills 'this '&gt;= 30)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="if-near-unit"></a>
@@ -402,10 +387,9 @@ the action.
 <h4>Example</h4>
 
 <pre>
+    ;; If the player on the console has 6 archers near the circle of power.
     (if-near-unit 'this '== 6 'unit-archer 'unit-circle-of-power)
 </pre>
-
-<p>If the player on the console has 6 archers near the circle of power.
 
 <h4>Not Used</h4>
 
@@ -442,9 +426,6 @@ Player has the quantity of opponents.
 <pre>
     (if-opponents 'this '== 0)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
@@ -490,10 +471,9 @@ for the action.
 <h4>Example</h4>
 
 <pre>
+    ;; The player on the console has 1 rescued archer near the circle of power.
     (if-rescued-near-unit 'this '== 1 'unit-archer 'unit-circle-of-power)
 </pre>
-
-<p>The player on the console has 1 rescued archer near the circle of power.
 
 <h4>Not Used</h4>
 
@@ -536,10 +516,9 @@ Name of the resource or:
 <h4>Example</h4>
 
 <pre>
+    ;; If the player on the console has at least 5000 gold.
     (if-resource 'this '&gt;= 5000 'gold)
 </pre>
-
-<p>If the player on the console has at least 5000 gold.
 
 <h4>Not Used</h4>
 
@@ -576,10 +555,9 @@ quantity of score the action is executed.
 <h4>Example</h4>
 
 <pre>
+    ;; If the player on the console has a score of at least 1000.
     (if-score 'this '&gt;= 1000)
 </pre>
-
-<p>If the player on the console has a score of at least 1000.
 
 <h4>Not Used</h4>
 
@@ -601,10 +579,9 @@ Checks the value of a switch.
 <h4>Example</h4>
 
 <pre>
+    ;; Checks if switch 1 is on.
     (if-switch 1 #t)
 </pre>
-
-<p>Checks if switch 1 is on.
 
 <h4>Not Used</h4>
 
@@ -632,10 +609,9 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
 <h4>Example</h4>
 
 <pre>
+    ;; If the timer is at 0 cycles.
     (if-timer '== 0)
 </pre>
-
-<p>If the timer is at 0 cycles.
 
 <h4>Not Used</h4>
 
@@ -679,10 +655,9 @@ units must control the player for the action.
 <h4>Example</h4>
 
 <pre>
+    ;; If the player on the console has at least 8 archers.
     (if-unit 'this '&gt;= 8 'unit-archer)
 </pre>
-
-<p>If the player on the console has at least 8 archers.
 
 <h4>Used</h4>
 
@@ -735,11 +710,10 @@ Player has the quantity of unit-type at a location.
 <h4>Example</h4>
 
 <pre>
+    ;; If the player on the console has at least 8 archers in the rectangle
+    ;; (10 10) to (12 14).
     (if-unit-at 'this '&gt;= 8 'unit-archer '(10 10) '(12 14))
 </pre>
-
-<p>If the player on the console has at least 8 archers in the rectangle
-(10 10) to (12 14).
 
 <h4>Used</h4>
 
@@ -759,10 +733,9 @@ Set the current trigger number.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the current trigger to the first trigger.
     (set-trigger-number! 0)
 </pre>
-
-<p>Set the current trigger to the first trigger.
 
 <h4>Not Used</h4>
 

@@ -128,9 +128,6 @@ Everything around the game.
 <pre>
     (add-keystroke-help)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -150,10 +147,9 @@ Add a message to be displayed.
 <h4>Example</h4>
 
 <pre>
+    ;; Adds the message.
     (add-message "This is a message")
 </pre>
-
-<p>Adds the message.
 
 <h4>Not Used</h4>
 
@@ -174,12 +170,11 @@ Add an objective to the scenario objectives text list.
 <h4>Example</h4>
 
 <pre>
+    ;; Adds the objective text "-Build a barracks" to the end of the objectives
+    ;; list and adds the objective "-Destroy all enemies" to the first position.
     (add-objective "-Build a barracks")
     (add-objective "-Destroy all enemies" 0)
 </pre>
-
-<p>Adds the objective text "-Build a barracks" to the end of the objectives
-list and adds the objective "-Destroy all enemies" to the first position.
 
 <h4>Not Used</h4>
 
@@ -200,8 +195,6 @@ Adds a tip.  Tips are shown at the start of a level.
 <pre>
     (add-tip "You can demolish trees and rocks.")
 </pre>
-
-<p>Adds the tip.
 
 <h4>Used</h4>
 
@@ -225,8 +218,6 @@ Adds a tip.  Tips are shown at the start of a level.
     (briefing)
 </pre>
 
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -249,10 +240,9 @@ Center the current viewport at a certain location.
 <h4>Example</h4>
 
 <pre>
+    ;; Centers the current viewport at tile 17x40.
     (center-map 17 40)
 </pre>
-
-<p>Centers the current viewport at tile 17x40.
 
 <h4>Not Used</h4>
 
@@ -280,11 +270,10 @@ Changes the owner of a group of units from 1 player to another.
 <h4>Example</h4>
 
 <pre>
+    ;; Changes the owner to player 2 for all units owned by player 3,
+    ;; that are located in the area (0,0)-(10,10).
     (change-units-owner '(0 0) '(10 10) 3 2)
 </pre>
-
-<p>Changes the owner to player 2 for all units owned by player 3,
-that are located in the area (0,0)-(10,10).
 
 <h4>Not Used</h4>
 
@@ -313,10 +302,9 @@ placed in the closest available spot.
 <h4>Example</h4>
 
 <pre>
+    ;; Creates a footman for player 2 at location 31x34.
     (create-unit 'unit-footman 2 31 34)
 </pre>
-
-<p>Creates a footman for player 2 at location 31x34.
 
 <h4>Not Used</h4>
 
@@ -337,17 +325,14 @@ placed in the closest available spot.
 <pre>
     (credits)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-campaign"></a>
-<h3>(define-campaign)</h3>
+<h3>(define-campaign 'ident 'name "name" 'campaign (list elements))</h3>
 
-.
+Define the campaign.
 
 
 <dl>
@@ -361,24 +346,21 @@ placed in the closest available spot.
 <pre>
     (define-campaign)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-construction"></a>
-<h3><pre</h3>
-
+<h3>(define-construction ident ...)</h3>
 Defines a construction.<br>
 <br>
 Constructions can specify multiple files and shadow files for use with
-different tilesets.  Note that shadows are optional.<br>
+different tilesets.  Shadows are optional.<br>
 <br>
 The construction frames should be ordered by increasing percentages and the
 first frame should be 0.
 
+<pre>
 (define-construction ident
   'file '(
     tileset tileset
@@ -391,8 +373,8 @@ first frame should be 0.
   'constructions (list
     '(percent percent
       file construction-file
-      frame frame-number))
-</pre></code>
+      frame frame-number)))
+</pre>
 
 <dl>
 <dt>ident</dt>
@@ -418,6 +400,10 @@ first frame should be 0.
 <h4>Example</h4>
 
 <pre>
+    ;; Defines construction-land with different graphics for summer and winter
+    ;; tilesets.  Buildings 0-24 percent complete use frame 0 of the construction
+    ;; image, 25-49 percent complete use frame 1 of the construction image, and 50-99
+    ;; percent complete use the frame 1 of the main building graphic.
     (define-construction 'construction-land
       'file '(
         tileset summer
@@ -439,11 +425,6 @@ first frame should be 0.
           frame 1)))
 </pre>
 
-<p>Defines construction-land with different graphics for summer and winter
-tilesets.  Buildings 0-24 percent complete use frame 0 of the construction
-image, 25-49 percent complete use frame 1 of the construction image, and 50-99
-percent complete use the frame 1 of the main building graphic.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/constructions.ccl"> $LIBARYPATH/ccl/constructions.ccl </a><br>
@@ -453,8 +434,7 @@ percent complete use the frame 1 of the main building graphic.
 <a name="define-construction-wc-names"></a>
 <h3>(define-construction-wc-names)</h3>
 
-.
-
+Define construction mapping from original number to internal symbol
 
 <dl>
 <dt></dt>
@@ -465,11 +445,8 @@ percent complete use the frame 1 of the main building graphic.
 <h4>Example</h4>
 
 <pre>
-    (define-construction-wc-names)
+    (define-construction-wc-names human-shipyard orc-shipyard ... )
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -491,9 +468,6 @@ percent complete use the frame 1 of the main building graphic.
 <pre>
     (define-editor-unittypes)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -515,9 +489,6 @@ percent complete use the frame 1 of the main building graphic.
 <pre>
     (define-map)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -539,9 +510,6 @@ percent complete use the frame 1 of the main building graphic.
 <pre>
     (define-missile-type)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -549,7 +517,7 @@ percent complete use the frame 1 of the main building graphic.
 <a name="define-missiletype-wc-names"></a>
 <h3>(define-missiletype-wc-names)</h3>
 
-.
+Define missiletype mapping from original number to internal symbol
 
 
 <dl>
@@ -561,20 +529,18 @@ percent complete use the frame 1 of the main building graphic.
 <h4>Example</h4>
 
 <pre>
-    (define-missiletype-wc-names)
+    (define-missiletype-wc-names lightning griffon-hammer ... )
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
 <a name="define-race-names"></a>
-<h3><pre</h3>
+<h3>(define-race-names 'race '(...) 'race '(...) ...</h3>
 
 Define the race names.
 
+<pre>
 (define-race-names
   'race '(
     race race-number
@@ -582,7 +548,7 @@ Define the race names.
     display race-display-name
     [visible])
   ['race '(...)] ...)
-</pre></code>
+</pre>
 
 <dl>
 <dt>race-number</dt>
@@ -602,6 +568,8 @@ Define the race names.
 <h4>Example</h4>
 
 <pre>
+    ;; Defines the alliance, mythical, and neutral races.  The neutral race is
+    ;; not visible in the race menus.
     (define-race-names
       'race '(
         race 0
@@ -618,9 +586,6 @@ Define the race names.
         name "neutral"
         display "Neutral"))
 </pre>
-
-<p>Defines the alliance, mythical, and neutral races.  The neutral race is
-not visible in the race menus.
 
 <h4>Used</h4>
 
@@ -648,14 +613,13 @@ rank is displayed.  Scores are expected to be sorted in increasing order.
 <h4>Example</h4>
 
 <pre>
+    ;; Defines the ranks for the alliance race.
     (define-ranks 'alliance '(
     0 Pathetic
     3000 "Not Bad"
     10000 Great
     ))
 </pre>
-
-<p>Defines the ranks for the alliance race.
 
 <h4>Used</h4>
 
@@ -678,9 +642,6 @@ rank is displayed.  Scores are expected to be sorted in increasing order.
 <pre>
     (diplomacy)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -702,9 +663,6 @@ rank is displayed.  Scores are expected to be sorted in increasing order.
 <pre>
     (stratagus-map)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -726,9 +684,6 @@ Returns the current game cycle.
 <pre>
     (game-cycle)
 </pre>
-
-<p>.
-
 <h4>Not Used</h4>
 
 <a name="get-stratagus-home-path"></a>
@@ -748,9 +703,6 @@ Returns the current game cycle.
 <pre>
     (get-stratagus-home-path)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -772,9 +724,6 @@ Returns the current game cycle.
 <pre>
     (get-stratagus-library-path)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -797,10 +746,9 @@ Get the amount of a resource for a certain player.
 <h4>Example</h4>
 
 <pre>
+    ;; Gets the amount of gold that player 0 has.
     (get-player-resource 0 'gold)
 </pre>
-
-<p>Gets the amount of gold that player 0 has.
 
 <h4>Not Used</h4>
 
@@ -821,9 +769,6 @@ Get the amount of a resource for a certain player.
 <pre>
     (get-this-player)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -845,9 +790,6 @@ Get the amount of a resource for a certain player.
 <pre>
     (get-unit-unholy-armor)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -869,9 +811,6 @@ Get the amount of a resource for a certain player.
 <pre>
     (group)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -903,10 +842,9 @@ Kill a unit.
 <h4>Example</h4>
 
 <pre>
+    ;; Kills a peasant of the player on the local computer.
     (kill-unit 'unit-peasant 'this)
 </pre>
-
-<p>Kills a peasant of the player on the local computer.
 
 <h4>Not Used</h4>
 
@@ -949,10 +887,9 @@ Kills units at a specific location.
 <h4>Example</h4>
 
 <pre>
+    ;; Kills any units in the rectangle (5,12) to (9,15).
     (kill-unit-at 'any 'any 9 '(5 12) '(9 15))
 </pre>
-
-<p>Kills any units in the rectangle (5,12) to (9,15).
 
 <h4>Not Used</h4>
 
@@ -973,9 +910,6 @@ Kills units at a specific location.
 <pre>
     (library-path)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -995,10 +929,9 @@ Load a map using any of the supported formats.
 <h4>Example</h4>
 
 <pre>
+    ;; Loads the map.
     (load-map "campaigns/human/level01h.pud")
 </pre>
-
-<p>Loads the map.
 
 <h4>Not Used</h4>
 
@@ -1017,10 +950,9 @@ Load a map using the pud format.
 <h4>Example</h4>
 
 <pre>
+    ;; Loads the pud.
     (load-pud "campaigns/human/level01h.pud")
 </pre>
-
-<p>Loads the pud.
 
 <h4>Not Used</h4>
 
@@ -1041,9 +973,6 @@ Load a map using the pud format.
 <pre>
     (log)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1065,9 +994,6 @@ Load a map using the pud format.
 <pre>
     (make-unit)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1089,9 +1015,6 @@ Load a map using the pud format.
 <pre>
     (missile)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1113,9 +1036,6 @@ Load a map using the pud format.
 <pre>
     (new-colors)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1137,9 +1057,6 @@ Load a map using the pud format.
 <pre>
     (pf-show-groupids!)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1161,9 +1078,6 @@ Load a map using the pud format.
 <pre>
     (pf-show-regids!)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1185,9 +1099,6 @@ Load a map using the pud format.
 <pre>
     (place-unit)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1209,9 +1120,6 @@ Load a map using the pud format.
 <pre>
     (player)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1230,10 +1138,9 @@ Remove an objective from the scenario objectives text list.
 <h4>Example</h4>
 
 <pre>
+    ;; Remove the first objective from the objectives list.
     (remove-objective 0)
 </pre>
-
-<p>Remove the first objective from the objectives list.
 
 <h4>Not Used</h4>
 
@@ -1254,9 +1161,6 @@ Remove an objective from the scenario objectives text list.
 <pre>
     (replay-log)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1278,9 +1182,6 @@ Remove an objective from the scenario objectives text list.
 <pre>
     (reset-keystroke-help)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1302,9 +1203,6 @@ Remove an objective from the scenario objectives text list.
 <pre>
     (selection)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1324,10 +1222,9 @@ Set the default map path.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets the default map to "puds/default.pud".
     (set-default-map! "puds/default.pud")
 </pre>
-
-<p>Sets the default map to "puds/default.pud".
 
 <h4>Not Used</h4>
 
@@ -1357,10 +1254,9 @@ Alters the diplomacy setting between two players. eg Enemy,Allied
 <h4>Example</h4>
 
 <pre>
+    ;; Sets player 1 to be an enemy of player 0.
     (set-diplomacy! 0 'enemy 1)
 </pre>
-
-<p>Sets player 1 to be an enemy of player 0.
 
 <h4>Not Used</h4>
 
@@ -1379,10 +1275,9 @@ Set the current game cycle number.
 <h4>Example</h4>
 
 <pre>
+    ;; Set the game cycle number to 100.
     (set-game-cycle! 100)
 </pre>
-
-<p>Set the game cycle number to 100.
 
 <h4>Not Used</h4>
 
@@ -1401,10 +1296,9 @@ Pause or unpause the game.
 <h4>Example</h4>
 
 <pre>
+    ;; Pauses the game.
     (set-game-paused! #t)
 </pre>
-
-<p>Pauses the game.
 
 <h4>Not Used</h4>
 
@@ -1425,9 +1319,6 @@ Pause or unpause the game.
 <pre>
     (set-group-id!)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1447,10 +1338,9 @@ Set the mission objectives.  This will overwrite any previous objectives.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets the mission objectives.
     (set-objectives! "Build 4 farms" "Mine 500 gold")
 </pre>
-
-<p>Sets the mission objectives.
 
 <h4>Not Used</h4>
 
@@ -1475,11 +1365,10 @@ Set the amount of resources for a certain player.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets player 0's gold to 2000.  Adds 500 gold to player 1.
     (set-player-resource! 0 'gold 2000)
     (set-player-resource! 1 'gold (+ 500 (get-player-resource 1 'gold)))
 </pre>
-
-<p>Sets player 0's gold to 2000.  Adds 500 gold to player 1.
 
 <h4>Not Used</h4>
 
@@ -1504,10 +1393,9 @@ Sets shared vision.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets shared vision for player 0 to on with player 2.
     (set-shared-vision! 0 #t 2)
 </pre>
-
-<p>Sets shared vision for player 0 to on with player 2.
 
 <h4>Not Used</h4>
 
@@ -1528,9 +1416,6 @@ Sets shared vision.
 <pre>
     (set-this-player!)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1552,9 +1437,6 @@ Sets shared vision.
 <pre>
     (set-unit-unholy-armor!)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1577,10 +1459,9 @@ Sets shared vision for the player at the computer.
 <h4>Example</h4>
 
 <pre>
+    ;; Sets shared vision on with player number 3.
     (shared-vision #t 3)
 </pre>
-
-<p>Sets shared vision on with player number 3.
 
 <h4>Not Used</h4>
 
@@ -1599,10 +1480,9 @@ Show an area on the map for the given player.
 <h4>Example</h4>
 
 <pre>
+    ;; Show an area of 6 tiles around location (10,10) for 500 cycles.
     (show-map-location 10 10 6 500)
 </pre>
-
-<p>Show an area of 6 tiles around location (10,10) for 500 cycles.
 
 <h4>Not Used</h4>
 
@@ -1623,9 +1503,6 @@ Show an area on the map for the given player.
 <pre>
     (slot-usage)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1647,9 +1524,6 @@ Show an area on the map for the given player.
 <pre>
     (unit)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
@@ -1671,9 +1545,6 @@ Show an area on the map for the given player.
 <pre>
     (units)
 </pre>
-
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>

@@ -97,8 +97,7 @@ FIXME:
 <a name="define-tileset-wc-names"></a>
 <h3>(define-tileset-wc-names tileset0 tileset1 tileset2 tileset3)</h3>
 
-    Define the mapping of the tileset numbers in puds, to the tileset names.
-
+    Define tileset mapping from original number to internal symbol
 
 <dl>
 <dt>tileset0</dt>
@@ -118,11 +117,10 @@ FIXME:
 <h4>Example</h4>
 
 <pre>
+    ;; This is the default tileset mapping.
     (define-tileset-wc-names 
       'tileset-summer 'tileset-winter 'tileset-wasteland 'tileset-swamp )
 </pre>
-
-<p>This is the default tileset mapping.
 
 <h4>Used</h4>
 
