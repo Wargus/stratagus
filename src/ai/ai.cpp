@@ -10,7 +10,7 @@
 //
 /**@name new_ai.c	-	The new computer player AI main file. */
 //
-//      (c) Copyright 2000,2001 by Lutz Sammer
+//      (c) Copyright 2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -199,6 +199,7 @@ local void AiCheckUnits(void)
 	DebugLevel3Fn("Already in build queue: %s %d/%d\n" _C_
 		queue->Type->Ident _C_ queue->Made _C_ queue->Want);
     }
+
     //
     //	Remove non active units.
     //
@@ -206,6 +207,8 @@ local void AiCheckUnits(void)
     for( i=0; i<n; ++i ) {
 	if( !AiPlayer->Player->Units[i]->Active ) {
 	    counter[AiPlayer->Player->Units[i]->Type->Type]--;
+	    DebugLevel3Fn("Removing non active unit: %s\n" _C_
+		    AiPlayer->Player->Units[i]->Type->Ident); 
 	}
     }
     unit_types_count=AiPlayer->Player->UnitTypesCount;
