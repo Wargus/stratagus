@@ -205,23 +205,10 @@ global void ReleaseUnit(Unit* unit)
     );
 }
 
-/**
-**	Create a new unit.
-**
-**	@param type	Pointer to unit-type.
-**	@param player	Pointer to owning player.
-**
-**	@return		Pointer to created unit.
-*/
-global Unit* MakeUnit(UnitType* type,Player* player)
+local Unit *AllocUnit ()
 {
     Unit* unit;
     Unit** slot;
-
-    DebugCheck( !player );	// Current code didn't support no player
-
-    DebugLevel3Fn("%s(%d)\n",type->Name,player-Players);
-
     //
     //	Game unit limit reached.
     //
@@ -256,6 +243,11 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	*slot=unit=calloc(1,sizeof(*unit));
     }
     unit->Slot=slot-UnitSlots;		// back index
+    return unit;
+}
+
+global void InitUnit (Unit *unit, UnitType *type, Player *player)
+{
     unit->Refs=1;
 
     //
@@ -350,7 +342,26 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     DebugCheck( unit->SavedOrder.Goal );
 
     DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
+}
 
+/**
+**	Create a new unit.
+**
+**	@param type	Pointer to unit-type.
+**	@param player	Pointer to owning player.
+**
+**	@return		Pointer to created unit.
+*/
+global Unit* MakeUnit(UnitType* type,Player* player)
+{
+    Unit* unit;
+
+    DebugCheck( !player );	// Current code didn't support no player
+
+    DebugLevel3Fn("%s(%d)\n",type->Name,player-Players);
+
+    unit = AllocUnit();
+    InitUnit (unit, type, player);
     return unit;
 }
 
@@ -3743,8 +3754,19 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	    fprintf(file,"\n  'data-upgrade-to 'FIXME");
 	    break;
 	case UnitActionTrain:
-	    DebugLevel0Fn("FIXME: not written\n");
-	    fprintf(file,"\n  'data-train 'FIXME");
+	    fprintf(file,"\n  'data-train '(");
+	    fprintf (file, "ticks %d ", unit->Data.Train.Ticks);
+	    fprintf (file, "count %d ", unit->Data.Train.Count);
+	    fprintf (file, "queue #(");
+	    for (i=0; i<MAX_UNIT_TRAIN; i++) {
+		if (i < unit->Data.Train.Count) {
+		    fprintf (file, "%s ", unit->Data.Train.What[i]->Ident);
+		} else {
+		    /* this slot is currently unused */
+		    fprintf (file, "unit-none ");
+		}
+	    }
+	    fprintf (file, "))");
 	    break;
 	default:
 	    fprintf(file,"\n  'data-move '(");
@@ -3769,6 +3791,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
 global void SaveUnits(FILE* file)
 {
     Unit** table;
+    int i;
+    unsigned char SlotUsage[MAX_UNIT_SLOTS/8 + 1];
+    int InRun, RunStart;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: units $Id$\n\n");
@@ -3782,6 +3807,44 @@ global void SaveUnits(FILE* file)
 	    FancyBuildings ? "t" : "f");
     fprintf(file,"(set-training-queue! #%s)\n",
 	    EnableTrainingQueue ? "t" : "f");
+
+    fprintf (file, "(num-units! %d)\n", NumUnits);
+    fprintf (file, "; Unit slot usage bitmap\n");
+    fprintf (file, "(slot-usage '(");
+
+    memset (SlotUsage, 0, MAX_UNIT_SLOTS/8 + 1);
+    for (i=0; i<NumUnits; i++) {
+	unsigned slot = Units[i]->Slot;
+	SlotUsage[slot/8] |= 1 << (slot%8);
+    }
+#if 0
+    /* the old way */
+    for (i=0; i<MAX_UNIT_SLOTS/8 + 1; i++) {
+	fprintf (file, " %d", SlotUsage[i]);
+	if ( (i+1) % 16 == 0 )		// 16 numbers per line
+	    fprintf (file, "\n");
+    }
+
+#else
+#define SlotUsed(slot)	( SlotUsage[(slot)/8] & (1 << ((slot)%8)) )
+    InRun = 0;
+    for (i=0; i<MAX_UNIT_SLOTS; i++) {
+	if ( !InRun && SlotUsed (i) ) {
+	    InRun = 1;
+	    RunStart = i;
+	}
+	if ( !SlotUsed (i) && InRun) {
+	    InRun = 0;
+	    if (i-1 == RunStart) {
+		fprintf (file, "%d ", i-1);
+	    } else {
+		fprintf (file, "%d - %d ", RunStart, i-1);
+	    }
+	}
+    }
+#endif
+
+    fprintf (file, "))\n");
 
     for( table=Units; table<&Units[NumUnits]; ++table ) {
 	SaveUnit(*table,file);
