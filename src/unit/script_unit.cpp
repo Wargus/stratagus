@@ -44,8 +44,6 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local int NumOfUnitsToLoad;
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -375,11 +373,11 @@ local SCM CclUnit(SCM list)
     list=gh_cdr(list);
 
     slot=strtol(str+1,NULL,16);
+    DebugLevel0Fn ("parsing unit #%d\n", slot);
     free(str);
     unit=NULL;
     type=NULL;
     player=NULL;
-    DebugLevel0Fn ("parsing unit #%d\n", slot);
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -622,6 +620,7 @@ local SCM CclUnit(SCM list)
     // FIXME: johns: works only for debug code.
     NewResetPath(unit);
     DebugLevel0Fn("FIXME: not written\n");
+    DebugLevel0Fn ("unit #%d parsed\n", slot);
 
     return SCM_UNSPECIFIED;
 }
@@ -695,13 +694,6 @@ local SCM CclSetUnitUnholyArmor(SCM ptr,SCM value)
     return value;
 }
 
-local SCM CclSetNumUnitsToLoad (SCM num)
-{
-    NumOfUnitsToLoad = gh_scm2int(num);
-    DebugLevel0Fn ("Will load %d units.\n", NumOfUnitsToLoad);
-    return SCM_UNSPECIFIED;
-}
-
 local SCM CclSlotUsage (SCM list)
 {
 #if 0
@@ -719,10 +711,8 @@ local SCM CclSlotUsage (SCM list)
     int len = MAX_UNIT_SLOTS/8 + 1;
     unsigned char SlotUsage[len];
     int i, prev;
-    Unit *UnitMemory;
     SCM value;
 
-    DebugLevel0Fn ("entered\n");
     memset (SlotUsage, 0, len);
     prev = -1;
     while ( !gh_null_p (list) ) {
@@ -742,19 +732,19 @@ local SCM CclSlotUsage (SCM list)
 	    prev = gh_scm2int (value);
 	}
     }
+    if (prev >= 0)
+	SlotUsage[prev/8] |= 1 << (prev%8);
 #endif
 
-    UnitMemory = (Unit * )calloc (NumOfUnitsToLoad, sizeof (Unit));
     /* now walk through the bitfield and create the needed unit slots */
     for (i=0; i<len*8; i++) {
 	if ( SlotUsage[i/8] & (1 << i%8) ) {
-	    Unit *new_unit = UnitMemory++;
+	    Unit *new_unit = (Unit * )calloc (1, sizeof (Unit));
 	    UnitSlotFree = (void *)UnitSlots[i];
 	    UnitSlots[i] = new_unit;
 	    new_unit->Slot = i;
 	}
     }
-    DebugLevel0Fn ("leaved\n");
     return SCM_UNSPECIFIED;
 }
 
@@ -780,7 +770,6 @@ global void UnitCclRegister(void)
     gh_new_procedure1_0("get-unit-unholy-armor",CclGetUnitUnholyArmor);
     gh_new_procedure2_0("set-unit-unholy-armor!",CclSetUnitUnholyArmor);
 
-    gh_new_procedure1_0 ("num-units!", CclSetNumUnitsToLoad);
     gh_new_procedure1_0 ("slot-usage", CclSlotUsage);
 }
 
