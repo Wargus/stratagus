@@ -500,14 +500,14 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     path_length=0;
     x=unit->X;
     y=unit->Y;
-    DebugLevel3("%d %d %d %d\n",x,y,ex,ey);
-    IfDebug(i = 0);
-    while(ex != x || ey !=y) {
+    for(;;) {
+	DebugLevel3("%d %d %d %d\n",x,y,ex,ey);
 	eo=ex*TheMap.Width+ey;
 	i=AStarMatrix[eo].Direction;
+	if (ex == x && ey == y)
+	    break;
 	ex-=xoffset[i];
 	ey-=yoffset[i];
-	DebugLevel3("%d %d %d %d\n",x,y,ex,ey);
 	path_length++;
     }
     *pxd=xoffset[i];
