@@ -1022,7 +1022,7 @@ global void InputMouseExit(const EventCallback* callbacks,
 }
 
 /**
-**	Called each frame to handle mouse time outs.
+**	Called each frame to handle mouse timeouts.
 **
 **	@param callbacks	Callback structure for events.
 **	@param ticks		Denotes time-stamp of video-system

@@ -433,9 +433,9 @@ local SCM CclAddTrigger(SCM condition,SCM action)
 }
 
 /**
-**	Check trigger each frame.
+**	Check trigger each game cycle.
 */
-global void TriggersEachFrame(void)
+global void TriggersEachCycle(void)
 {
     SCM pair;
     SCM val;

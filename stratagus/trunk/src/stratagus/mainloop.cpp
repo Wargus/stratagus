@@ -313,8 +313,36 @@ global void UpdateDisplay(void)
 	if( f<0 || f>168 ) {
 	    f=168;
 	}
-	VideoDrawHLine(ColorGreen,TheUI.MenuButtonX,TheUI.MenuButtonY,f);
-	VideoDrawHLine(ColorRed,TheUI.MenuButtonX+f,TheUI.MenuButtonY,168-f);
+	if( f ) {
+	    VideoDrawHLine(ColorGreen,TheUI.MenuButtonX,TheUI.MenuButtonY,f);
+	}
+	if( 168-f ) {
+	    VideoDrawHLine(ColorRed,TheUI.MenuButtonX+f,TheUI.MenuButtonY,168-f);
+	}
+	}
+	//
+	//	Draw line for network speed.
+	//
+	{
+	int i;
+	int f;
+
+	if( NetworkLag ) {
+	    for( i=0; i<PlayerMax; ++i ) {
+		f=16-(16*(NetworkStatus[i]-GameCycle))/(NetworkLag*2);
+		if( f<0 || f>16 ) {
+		    f=16;
+		}
+		if( f ) {
+		    VideoDrawHLine(ColorRed,
+			TheUI.MenuButtonX,TheUI.MenuButtonY+1+i,f);
+		}
+		if( 16-f ) {
+		    VideoDrawHLine(ColorGreen,
+			    TheUI.MenuButtonX+f,TheUI.MenuButtonY+1+i,16-f);
+		}
+	    }
+	}
 	}
 #endif
     }

@@ -40,7 +40,7 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void TriggersEachFrame(void);	/// test triggers
+extern void TriggersEachCycle(void);	/// test triggers
 
 extern void TriggerCclRegister(void);	/// Register ccl features
 extern void SaveTriggers(FILE*);	/// Save the trigger module
