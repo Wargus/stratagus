@@ -692,9 +692,7 @@ global void FireMissile(Unit* unit)
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-	    DebugCheck( !goal->Refs );
-#endif
+	    RefsDebugCheck( !goal->Refs );
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -709,13 +707,9 @@ global void FireMissile(Unit* unit)
 	}
 	if( goal->Removed ) {
 	    DebugLevel3Fn("Missile-none hits removed unit!\n");
-#ifdef REFS_DEBUG
-	    DebugCheck( !goal->Refs );
-#endif
+	    RefsDebugCheck( !goal->Refs );
 	    --goal->Refs;
-#ifdef REFS_DEBUG
-	    DebugCheck( !goal->Refs );
-#endif
+	    RefsDebugCheck( !goal->Refs );
 #ifdef NEW_ORDERS
 	    goal=unit->Orders[0].Goal=NULL;
 #else
@@ -729,13 +723,9 @@ global void FireMissile(Unit* unit)
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 #endif
 	    DebugLevel3Fn("Missile-none hits dead unit!\n");
-#ifdef REFS_DEBUG
-	    DebugCheck( !goal->Refs );
-#endif
+	    RefsDebugCheck( !goal->Refs );
 	    --goal->Refs;
-#ifdef REFS_DEBUG
-	    DebugCheck( !goal->Refs );
-#endif
+	    RefsDebugCheck( !goal->Refs );
 #ifdef NEW_ORDERS
 	    goal=unit->Orders[0].Goal=NULL;
 #else
@@ -761,9 +751,7 @@ global void FireMissile(Unit* unit)
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-	    DebugCheck( !goal->Refs );
-#endif
+	    RefsDebugCheck( !goal->Refs );
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -1339,9 +1327,7 @@ global void MissileActions(void)
 
 		    unit=missile->SourceUnit;
 		    if( unit->Destroyed || !unit->HP ) {
-#ifdef REFS_DEBUG
-			DebugCheck( !unit->Refs );
-#endif
+			RefsDebugCheck( !unit->Refs );
 			if( !--unit->Refs ) {
 			    ReleaseUnit(unit);
 			}

@@ -176,9 +176,7 @@ global int HandleActionRepair(Unit* unit)
 		if( goal ) {
 		    if( goal->Destroyed ) {
 			DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -198,13 +196,9 @@ global int HandleActionRepair(Unit* unit)
 				goal->Command.Action==UnitActionDie ) {
 #endif
 
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			--goal->Refs;
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			// FIXME: should I clear this here?
 #ifdef NEW_ORDERS
 			unit->Orders[0].X=goal->X;
@@ -231,13 +225,9 @@ global int HandleActionRepair(Unit* unit)
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
 #endif
 		    if( goal ) {		// release reference
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			goal->Refs--;
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 #ifdef NEW_ORDERS
 			unit->Orders[0].Goal=NoUnitP;
 		    }
@@ -274,9 +264,7 @@ global int HandleActionRepair(Unit* unit)
 		if( goal ) {
 		    if( goal->Destroyed ) {
 			DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -314,13 +302,9 @@ global int HandleActionRepair(Unit* unit)
 		//
 		if( !goal || goal->HP >= goal->Stats->HitPoints ) {
 		    if( goal ) {		// release reference
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			goal->Refs--;
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 #ifdef NEW_ORDERS
 			unit->Orders[0].Goal=NULL;
 		    }
