@@ -4,6 +4,8 @@
 #ifndef PF_LOWLEVEL_H
 #define PF_LOWLEVEL_H
 
+#include "pf_highlevel.h"
+
 typedef struct lowlevel_neighbor {
     int dx, dy;
     int Offset;
@@ -12,6 +14,10 @@ typedef struct lowlevel_neighbor {
 extern LowlevelNeighbor Neighbor[8];
 
 extern int LowlevelInit (void);
-extern int LowlevelPath (Unit * , unsigned char * );
+extern void LowlevelReset (void);
+extern int LowlevelPath (Unit * , HighlevelPath * );
+extern void LowlevelSetFieldSeen (int , int );
+extern void LowlevelSetGoal (int x, int y);
+extern void LowPrintStats (void);
 
 #endif /* PF_LOWLEVEL_H */

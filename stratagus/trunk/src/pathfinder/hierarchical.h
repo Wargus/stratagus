@@ -26,16 +26,18 @@
 #ifndef __HIERARCHICAL_H__
 #define __HIERARCHICAL_H__
 
+#include "types.h"
+#include "region.h"
+
+#define MOVEMENT_IMPORTANT_FLAGS  (MapFieldLandAllowed | \
+			MapFieldCoastAllowed| MapFieldWaterAllowed | \
+			MapFieldUnpassable | MapFieldBuilding)
+
 typedef enum _node_operation_ {
-    SET_REGID
+    SET_REGID,
+	GET_BEST,
+	MARK_BEST
 } NodeOperation;
-
-struct _coordinates_ {
-	short X, Y;
-};
-
-typedef struct _coordinates_ AreaCoords;
-typedef struct _coordinates_ FieldCoords;
 
 typedef enum _area_neighborship_type_ {
 	AREAS_NONCONNECTED,
@@ -43,18 +45,29 @@ typedef enum _area_neighborship_type_ {
 	AREAS_4CONNECTED
 } AreaNeighborshipType;
 
-extern int AreaGetWidth (void);
-extern int AreaGetHeight (void);
+extern int PfHierShowRegIds;
+extern int PfHierShowGroupIds;
+
+extern inline int AreaGetWidth (void);
+extern inline int AreaGetHeight (void);
 extern int AreaNeighborship (AreaCoords * , AreaCoords * );
+extern void AreaSetNumRegions (int , int , int );
+extern int AreaGetRegions (int , int , Region *** );
+extern void AreaAddRegion (int , int , Region * );
+extern int AreaMapWidth (void);
+extern int AreaMapHeight (void);
 extern void NodePerformOperation (int , int , NodeOperation , int []);
 extern int NodeGetAreaOffset (int , int );
 
+/* FIXME check out whether HIERARCHICAL_BACKEND is still needed */
 #ifndef HIERARCHICAL_BACKEND
 
 #include "unit.h"
 
 extern int PfHierInitialize (void);
 extern int PfHierComputePath (Unit * , int * , int * );
+extern void PfHierMapChangedCallback (int , int , int , int );
+extern void PfHierReleaseData (Unit * );
 
 #endif /* HIERARCHICAL_BACKEND */
 

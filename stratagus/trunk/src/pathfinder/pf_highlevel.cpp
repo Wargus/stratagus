@@ -7,20 +7,26 @@
 #include "freecraft.h"
 #include "unit.h"
 #include "map.h"
+#include "rdtsc.h"
+
 #include "hierarchical.h"
-#define REGION_GATHER_STATS
 #include "region_set.h"
+#include "region_groups.h"
 #include "pf_highlevel.h"
 #include "pf_high_open.h"
+#include "pf_goal.h"
 
-/* FIXME >>3 is the equivalent of /8, &0x7 is the equivalent of %8 */
+/* >>3 is the equivalent of /8, &0x7 is the equivalent of %8 */
 #define SET_SEEN(regid)		(Highlevel.Seen[(regid)>>3] |= (1 << ((regid)&0x7)))
 #define SEEN(regid)			(Highlevel.Seen[(regid)>>3] & (1 << ((regid)&0x7)))
 //#define SET_SEEN(regid)	(Highlevel.Seen[(regid)/8] |= (1 << ((regid)%8)))
 //#define SEEN(regid)		(Highlevel.Seen[(regid)/8] & (1 << ((regid)%8)))
 
-#define H(reg)				(abs((reg)->Area.X - Highlevel.GoalArea.X) + \
-							 abs((reg)->Area.Y - Highlevel.GoalArea.Y))
+/* FIXME: improve this H function. It cannot differentiate between regions
+ * that exist within the same area which is a serious problem for
+ * transporters. */
+#define H(reg)				( (abs((reg)->Area.X - Highlevel.GoalArea.X) + \
+							 abs((reg)->Area.Y - Highlevel.GoalArea.Y)) << 1 )
 
 #define GATHER_STATS
 #ifdef GATHER_STATS
@@ -40,10 +46,15 @@ typedef struct {
 #endif /* GATHER_STATS */
 
 struct pf_highlevel {
+	Unit *Unit;				/* the unit for which we search a path */
 	int BitmapSize;
 	unsigned char *Seen;
 	unsigned char *Path;
+	/* the group to which the unit's current position belongs */
+	unsigned short SrcGrp;
+	RectBounds GoalRect;
 	AreaCoords GoalArea;
+	Region *BestSoFar;
 #ifdef GATHER_STATS
 	Stats Stats;
 #endif
@@ -51,17 +62,48 @@ struct pf_highlevel {
 
 static struct pf_highlevel Highlevel;
 
-local void HighlevelReset (void);
+typedef struct path_cache_entry {
+	struct path_cache_entry *Prev, *Next;
+	int RefCnt;
+	int Valid;
+	/* FIXME: what is this for? ;-) Do we really need to store it explicitly?
+	 * RegId of the starting region of this pce can be obtained as
+	 * pce->Path.Sequence[pce->Path.NumSteps - 1].RegId */
+	Region *Start;
+	RectBounds GoalRect;
+	unsigned short GoalId;
+	HighlevelPath *Path;
+} PathCacheEntry;
+
+struct path_cache {
+	PathCacheEntry *Entries;
+};
+static struct path_cache PathCache;
+
 local void HighMarkGoal (Unit * );
 local Region *HighAstarLoop (Unit * );
-local unsigned char *HighTraceback (Region * );
+local HighlevelPath *HighTraceback (Region * );
 local unsigned short GetAdditionalPathRegion (Region * );
+local int GetPathLength (Region * );
 local void HighMarkGoalSubstitute (Unit * , int , int , int , int );
-local int CheckPotentialGoalField (int , int , int );
-#ifdef GATHER_STATS
+local int CheckGoalFieldConnectivity (int , int , int );
+local void MarkGoalField (int , int , int );
+
+local PathCacheEntry *CacheAdd (Region * , RectBounds * , HighlevelPath * );
+local void CacheInsertEntry (PathCacheEntry * );
+local void CacheDeleteEntry (PathCacheEntry * );
+local void CacheReleaseEntry (PathCacheEntry * );
+local void CacheRef (HighlevelPath * );
+local void CachePrint (void);
+local PathCacheEntry *CacheLookup (Region * , RectBounds * );
+local PathCacheEntry *CacheFindEntryByPath (HighlevelPath * );
+local PathCacheEntry *CacheEntryNew (Region * , RectBounds * , HighlevelPath *);
+local void CacheEntryDestroy (PathCacheEntry * );
+local void CacheEntryRef (PathCacheEntry * );
+local void CacheEntryUnref (PathCacheEntry * );
+local inline void CacheEntryMarkInvalid (PathCacheEntry * );
+local inline int CacheEntryValid (PathCacheEntry * );
 local void HighResetStats (void);
-local void HighPrintStats (void);
-#endif /* GATHER_STATS */
 
 /* to be called during map initialization (before the game starts), and
  * whenever number of map regions changes */
@@ -98,38 +140,106 @@ int HighlevelInit (void)
 }
 
 /* called before each highlevel pathfinder run */
-local void HighlevelReset (void)
+void HighlevelReset (void)
 {
+//	unsigned int ts0, ts1;
+//	ts0 = rdtsc ();
 	memset (Highlevel.Seen, 0, Highlevel.BitmapSize);
 	memset (Highlevel.Path, 0, Highlevel.BitmapSize);
 	HighOpenReset ();
 #ifdef GATHER_STATS
 	HighResetStats ();
 #endif
+//	ts1 = rdtsc ();
+//	printf ("HighlevelReset(): %d cycles\n", ts1-ts0);
 }
 
-unsigned char *HighlevelPath (Unit *unit)
+void HighlevelSetGoalArea (int x, int y)
 {
-	unsigned short start_regid;
-	Region *start_reg, *end_reg;
-	unsigned char *path_regions;
+	Highlevel.GoalArea.X = x;
+	Highlevel.GoalArea.Y = y;
+}
 
+void HighlevelSetRegOnPath (int regid)
+{
+	Highlevel.Path[regid / 8] |= 1 << regid % 8;
+}
+
+void HighlevelSetRegSeen (int regid)
+{
+	 SET_SEEN (regid);
+}
+
+HighlevelPath *ComputeHighlevelPath (Unit *unit)
+{
+	//unsigned int ts0, ts1, ts2, ts3, ts4, ts5, ts6, ts7, ts8, ts9;
+	PathCacheEntry *pce;
+	unsigned short start_regid;
+	int GoalReachable;
+	Region *start_reg, *end_reg;
+	HighlevelPath *HighPath;
+	RectBounds GoalRect;
+
+	/* first: if this is a flying machine just return dummy path for flying
+	 * machines */
 	if (unit->Type->UnitType == UnitTypeFly) {
-		memset (Highlevel.Path, 0xff, Highlevel.BitmapSize);
-		return Highlevel.Path;
+		/* FIXME correct this after the path cache is functional - this leaks
+		 * memory! */
+		HighlevelPath *HighPath;
+
+		HighPath = (HighlevelPath * )calloc (1, sizeof (HighlevelPath));
+		HighPath->NumSteps = 0;
+		HighPath->Set = (unsigned char * )malloc (Highlevel.BitmapSize);
+		memset (HighPath->Set, 0xff, Highlevel.BitmapSize);
+		HighPath->Sequence = NULL;
+		HighPath->OriginalGoalReachable = 1;
+		/* FIXME: modify the lowlevel pathfinder so that it doesn't need
+		 * to study the flyer's paths and always uses conventional heuristic
+		 * function for flyers. */
+		HighPath->Studied = 0;
+		return HighPath;
 	}
 
-	HighlevelReset ();
-	HighMarkGoal (unit);
+	/* second: unit might have its highlevel path already computed (this
+	 * is always the case except when the unit starts moving). If this
+	 * path is still valid, just use it. */
+	if (unit->PfHierData) {
+		pce = (PathCacheEntry * )unit->PfHierData;
+		if (CacheEntryValid (pce))
+			return pce->Path;
+		else
+			CacheReleaseEntry (pce);
+	}
 
+	/* third: even if this unit just starts moving and still doesn't have
+	 * its highlevel path computed, another unit might be already moving
+	 * our unit's way - in this case the path can be found in the cache. */
 	start_regid = MapFieldGetRegId (unit->X, unit->Y);
 	start_reg = RegionSetFind (start_regid);
+	ComputeGoalBoundaries (unit, &GoalRect.XMin, &GoalRect.XMax,
+					&GoalRect.YMin, &GoalRect.YMax);
+	Highlevel.GoalRect = GoalRect;
+	if ( (pce = CacheLookup (start_reg, &GoalRect)) ) {
+		/* CacheLookup() already made sure that the pce is valid */
+		CacheEntryRef (pce);
+		unit->PfHierData = pce;
+		/* FIXME GoalId is not unique - add some form of check to make sure
+ 	 	* the cache indeed returned what we asked for */
+		//printf ("cache hit!\n");
+		return pce->Path;
+	}
 
-	printf ("start group: %d\n", start_reg->GroupId);
+	/* fourth: well, everything else failed, now we have to do
+	 * the work *sigh* - fire up A*! */
+	HighlevelReset ();
+	GoalReachable = MarkHighlevelGoal (unit);
+	Highlevel.Unit = unit;
+
+	Highlevel.SrcGrp = start_reg->GroupId;
 
 	start_reg->Parent = NULL;
 	start_reg->g = 0;
-	start_reg->f = H (start_reg);	// f==g+h but g==0 here
+	start_reg->f = start_reg->h = H (start_reg);	// f==g+h but g==0 here
 	start_reg->Open = 1;
 	start_reg->Closed = 0;
 	/* the start region can also be the goal region in which case its
@@ -140,19 +250,27 @@ unsigned char *HighlevelPath (Unit *unit)
 		SET_SEEN (start_regid);
 	}
 	HighOpenAdd (start_reg);
+	Highlevel.BestSoFar = start_reg;
+
 
 	end_reg = HighAstarLoop (unit);
 	if (end_reg) {
-		path_regions = HighTraceback (end_reg);
+		HighPath = HighTraceback (end_reg);
 	} else {
-		path_regions = NULL;
+		HighPath = NULL;
 	}
-#ifdef GATHER_STATS
-	HighPrintStats ();
-#endif
-	return path_regions;
+	HighPath->OriginalGoalReachable = GoalReachable;
+	HighPath->Studied = 0;
+	pce = CacheAdd (start_reg, &Highlevel.GoalRect, HighPath);
+	CacheEntryRef (pce);
+	unit->PfHierData = pce;
+//	printf ("ComputeHighlevelPath(): %d %d %d %d %d %d %d %d %d cycles\n",
+//								ts1-ts0, ts2-ts1, ts3-ts2, ts4-ts3, ts5-ts4,
+//								ts6-ts5, ts7-ts6, ts8-ts7, ts9-ts8);
+	return HighPath;
 }
 
+#if 0
 local void HighMarkGoal (Unit *unit)
 {
 	Unit *GoalUnit;
@@ -161,7 +279,7 @@ local void HighMarkGoal (Unit *unit)
 	} Range;
 	int xmin, xmax, ymin, ymax, x, y;
 	int MovementMask = UnitMovementMask (unit);
-	int reachable = 0;
+	int connected = 0;
 
 	GoalUnit = unit->Orders[0].Goal;
 	Range.X = unit->Orders[0].RangeX;
@@ -187,10 +305,34 @@ local void HighMarkGoal (Unit *unit)
 
 	for (y=ymin; y<=ymax; y++)
 		for (x=xmin; x<=xmax; x++)
-			reachable |= CheckPotentialGoalField (x, y, MovementMask);
+			connected |= CheckGoalFieldConnectivity (x, y, MovementMask);
 
-	if ( !reachable )
+	if (connected) {
+		printf ("highlevel goal: reachable and connected\n");
+		/* nothing else to do - our goal is reachable and a path exists */
+	} else {
+		/* No path to the goal exists. This means that either the goal has
+		 * no reachable fields or no path to them exist. If the place we're in
+		 * doesn't have too many regions we could afford an exhaustive search
+		 * of it. */
 		HighMarkGoalSubstitute (unit, xmin, xmax, ymin, ymax);
+#if 0
+		int src_reg;
+		src_reg = SuperGroupGetNumRegions (Highlevel.Unit,Highlevel.SrcGrp);
+		if (src_reg > 1000) {		/* FIXME - arbitrary limit */
+			HighMarkGoalSubstitute (unit, xmin, xmax, ymin, ymax);
+			printf ("highlevel goal: unconnected substituted\n");
+		} else {
+			/* FIXME is this worth it? Wouldn't it be better to always
+			 * substitute the goal? How many cycles does a typical
+			 * invocation of HighMarkGoalSubstitute() consume?
+			 * I have yet to figure out in which cases substituting
+			 * the goal would be worse than exhaustive search.
+			 */
+			printf ("highlevel goal: unconnected exhaustive search\n");
+		}
+#endif
+	}
 
 	/*
 	 * We need to know which area our goal lies within in order to be able
@@ -227,55 +369,65 @@ local void HighMarkGoalSubstitute (Unit *unit, int xmin, int xmax,
 		if (ymax >= TheMap.Height) ymax = TheMap.Height - 1;
 
 		for (x=xmin; x<=xmax; x++) {
-			found |= CheckPotentialGoalField (x, ymin, MovementMask);
-			found |= CheckPotentialGoalField (x, ymax, MovementMask);
+			found |= CheckGoalFieldConnectivity (x, ymin, MovementMask);
+			found |= CheckGoalFieldConnectivity (x, ymax, MovementMask);
 		}
 		for (y=ymin; y<=ymax; y++) {
-			found |= CheckPotentialGoalField (xmin, y, MovementMask);
-			found |= CheckPotentialGoalField (xmax, y, MovementMask);
+			found |= CheckGoalFieldConnectivity (xmin, y, MovementMask);
+			found |= CheckGoalFieldConnectivity (xmax, y, MovementMask);
 		}
 	}
 }
 
-local int CheckPotentialGoalField (int x, int y, int MovementMask)
+local int CheckGoalFieldConnectivity (int x, int y, int MovementMask)
 {
 	unsigned short regid;
-	int i;
+	Region *reg;
 
-	if ((regid=MapFieldGetRegId (x, y))) {
-		Region *reg = RegionSetFind (regid);
-		if (reg->Passability & MovementMask)
-			return 0;
+	regid=MapFieldGetRegId (x, y);
+	if (!regid)
+		return 0;
 
-		printf ("goal group: %d\n", reg->GroupId);
-
-		reg->Open = 0;
-		reg->Closed = 0;
-		reg->Goal = 1;
-		SET_SEEN (regid);
-		/* We mark also neighbors of the goal region as allowed. This isn't
-		 * strictly necessary but not doing so leads to unexpected behavior
-		 * in cases when we send 9 units to a region of a single field or
-		 * when we send 9 unit to a field on a region boundary (so they can't
-		 * group around the goal field as expected because some of the field
-		 * they would occupy are in a neighboring region) etc. etc. */
-		Highlevel.Path[regid / 8] |= 1 << regid % 8;
-		for (i=0; i < reg->NumNeighbors; i++) {
-			Region *neighbor = reg->Neighbors[i].Region;
-			if (neighbor->Passability & MovementMask)
-				return 0;
-			Highlevel.Path[neighbor->RegId / 8] |= 1 << neighbor->RegId % 8;
-#ifdef GATHER_STATS
-			/* FIXME broken - at least some of these regions will be counted
-			 * once again during the traceback */
-			Highlevel.Stats.PathFields += reg->NumFields;
-#endif
-		}
-		return 1;
-	} else {
+	reg = RegionSetFind (regid);
+	if (!RegGroupCheckConnectivity (Highlevel.Unit,
+											Highlevel.SrcGrp, reg->GroupId)) {
 		return 0;
 	}
+
+	MarkGoalField (x, y, MovementMask);
+	return 1;
 }
+
+local void MarkGoalField (int x, int y, int MovementMask)
+{
+	Region *reg = RegionSetFind ( MapFieldGetRegId (x, y) );
+	int i;
+
+	reg->Open = 0;
+	reg->Closed = 0;
+	reg->Goal = 1;
+	SET_SEEN (reg->RegId);
+	/* We mark also neighbors of the goal region as allowed. This isn't
+	 * strictly necessary but not doing so leads to unexpected behavior
+	 * in cases when we send 9 units to a region of a single field or
+	 * when we send 9 unit to a field on a region boundary (so they can't
+	 * group around the goal field as expected because some of the field
+	 * they would occupy are in a neighboring region) etc. etc. */
+	Highlevel.Path[reg->RegId / 8] |= 1 << reg->RegId % 8;
+	for (i=0; i < reg->NumNeighbors; i++) {
+		Region *neighbor = reg->Neighbors[i].Region;
+		if (neighbor->Passability & MovementMask)
+			return;
+		Highlevel.Path[neighbor->RegId / 8] |= 1 << neighbor->RegId % 8;
+#ifdef GATHER_STATS
+		/* FIXME broken - at least some of these regions will be counted
+		 * once again during the traceback */
+		Highlevel.Stats.PathFields += reg->NumFields;
+#endif
+	}
+}
+
+#endif
 
 local Region *HighAstarLoop (Unit *unit)
 {
@@ -292,6 +444,10 @@ local Region *HighAstarLoop (Unit *unit)
 			return reg;
 		}
 		HighOpenDelete (reg);
+
+		if (reg->h < Highlevel.BestSoFar->h)
+			Highlevel.BestSoFar = reg;
+
 		for (i=0; i<reg->NumNeighbors; i++) {
 			Region *neigh = reg->Neighbors[i].Region;
 			int f, h;
@@ -310,6 +466,7 @@ local Region *HighAstarLoop (Unit *unit)
 			 */
 			if ( !SEEN (neigh->RegId) || neigh->Goal) {
 				neigh->g = reg->g + reg->Neighbors[i].Cost;
+				neigh->h = h;
 				neigh->f = f;
 				neigh->Parent = reg;
 				neigh->Open = 1;
@@ -324,6 +481,7 @@ local Region *HighAstarLoop (Unit *unit)
 					continue;
 				/* else */
 				neigh->g = reg->g + reg->Neighbors[i].Cost;
+				neigh->h = h;
 				neigh->f = f;
 				neigh->Parent = reg;
 				neigh->Open = 1;
@@ -343,6 +501,7 @@ local Region *HighAstarLoop (Unit *unit)
 				 */
 				HighOpenDelete (neigh);
 				neigh->g = reg->g + reg->Neighbors[i].Cost;
+				neigh->h = h;
 				neigh->f = f;
 				neigh->Parent = reg;
 				HighOpenAdd (neigh);
@@ -354,34 +513,73 @@ local Region *HighAstarLoop (Unit *unit)
 		reg->Open = 0;
 		reg->Closed = 1;
 	}
-	return NULL;
+	return Highlevel.BestSoFar;
 }
 
-local unsigned char *HighTraceback (Region *reg)
+local HighlevelPath *HighTraceback (Region *reg)
 {
+	int n = GetPathLength (reg);
+	HighlevelPath *HighPath;
+	int i=0;
+	//Region *Start;
+
+	HighPath = (HighlevelPath * )calloc (1, sizeof (HighlevelPath));
+	HighPath->NumSteps = n;
+	HighPath->Set = (unsigned char * )malloc (Highlevel.BitmapSize);
+	HighPath->Sequence = (HighPathStep * )malloc (n * sizeof (HighPathStep));
+
 	//printf ("highlevel:");
 	do {
 		Highlevel.Path[reg->RegId / 8] |= 1 << reg->RegId % 8;
+		HighPath->Sequence[i].SeqNum = i;
+		HighPath->Sequence[i++].RegId = reg->RegId;
+		//HighPath->Sequence[i++].H = H (reg);
 		//printf (" %d", reg->RegId);
 #ifdef GATHER_STATS
 		++Highlevel.Stats.PathLength;
 		Highlevel.Stats.PathFields += reg->NumFields;
 #endif
+
 		if (reg->Parent &&
 						AreaNeighborship (&reg->Area, &reg->Parent->Area) ==
 						AREAS_8CONNECTED) {
 			unsigned int regid_add = GetAdditionalPathRegion (reg);
+			Region *reg_add = RegionSetFind (regid_add);
+
 			Highlevel.Path[regid_add / 8] |= 1 << regid_add % 8;
+			HighPath->Sequence[i++].RegId = regid_add;
+			//HighPath->Sequence[i++].H = H (reg_add);
 #ifdef GATHER_STATS
 			++Highlevel.Stats.PathLength;
 			Highlevel.Stats.PathFields += reg->NumFields;
 #endif
 			//printf (" (%d)", regid_add);
 		}
+
+		//if (reg->Parent == NULL)
+		//	Start = reg;
+
 		reg=reg->Parent;
 	} while (reg);
 	//printf ("\n");
-	return Highlevel.Path;
+
+	memcpy (HighPath->Set, Highlevel.Path, Highlevel.BitmapSize);
+	return HighPath;
+}
+
+local int GetPathLength (Region *reg)
+{
+	Region *r;
+	int n;
+
+	for (n=0, r=reg; r; r = r->Parent) {
+		++n;
+		if (r->Parent && AreaNeighborship (&r->Area, &r->Parent->Area) ==
+						AREAS_8CONNECTED) {
+			++n;
+		}
+	}
+	return n;
 }
 
 /*
@@ -427,23 +625,221 @@ local unsigned short GetAdditionalPathRegion (Region *reg)
 	}
 }
 
-#ifdef GATHER_STATS
+void HighReleasePath (Unit *unit)
+{
+	PathCacheEntry *pce = (PathCacheEntry * )unit->PfHierData;
+	if (pce)
+		CacheReleaseEntry (pce);
+	unit->PfHierData = NULL;
+}
+
+/* To avoid having to find all units that reference this path, we don't flush
+ * the path(s) out of cache right away. We just mark it invalid instead.
+ * As units using this path come back for more path segments, they see that
+ * the path is invalidated and they release it. The last one destroys it.
+ */
+void HighInvalidateCacheEntries (unsigned short RegId)
+{
+	PathCacheEntry *pce;
+
+	for (pce = PathCache.Entries; pce; pce = pce->Next) {
+		/* FIXME: write object Bitmap or so that would encapsulate this
+		 * inside its methods. */
+		if (pce->Path->Set[(RegId)>>3] |= (1 << ((RegId)&0x7))) {
+			CacheEntryMarkInvalid (pce);
+		}
+	}
+}
+
+local PathCacheEntry *CacheFindEntryByPath (HighlevelPath *hp)
+{
+	PathCacheEntry *pce;
+
+	/* TODO: write faster lookup algorithm */
+	for (pce = PathCache.Entries; pce; pce = pce->Next) {
+		if (pce->Path == hp)
+			return pce;
+	}
+	return NULL;
+}
+
+local PathCacheEntry *CacheLookup (Region *Start, RectBounds *Goal)
+{
+	PathCacheEntry *pce;
+
+	/* TODO: write faster lookup algorithm */
+	for (pce = PathCache.Entries; pce; pce = pce->Next) {
+		if (pce->Start == Start && pce->GoalRect.XMin == Goal->XMin &&
+					pce->GoalRect.XMax == Goal->XMax &&
+					pce->GoalRect.YMin == Goal->YMin &&
+					pce->GoalRect.YMax == Goal->YMax) {
+			if (CacheEntryValid (pce)) {
+				return pce;
+			}
+		}
+	}
+	return NULL;
+}
+
+local void CacheRef (HighlevelPath *hp)
+{
+	PathCacheEntry *pce=CacheFindEntryByPath (hp);
+	DebugCheck (!pce);
+	DebugCheck (!CacheEntryValid (pce));
+	CacheEntryRef (pce);
+}
+
+local PathCacheEntry *CacheAdd (Region *Start, RectBounds *Goal,
+						HighlevelPath *Path)
+{
+	PathCacheEntry *pce = CacheEntryNew (Start, Goal, Path);
+	if (!pce)
+		return 0;
+	CacheInsertEntry (pce);
+	return pce;
+}
+
+local void CacheInsertEntry (PathCacheEntry *pce)
+{
+	if (PathCache.Entries) {
+		PathCache.Entries->Prev = pce;
+		pce->Next = PathCache.Entries;
+	}
+	PathCache.Entries = pce;
+	//CachePrint ();
+}
+
+local void CacheDeleteEntry (PathCacheEntry *pce)
+{
+	DebugCheck (PathCache.Entries == NULL);
+
+	if (pce == PathCache.Entries) {
+		PathCache.Entries = PathCache.Entries->Next;
+		if (PathCache.Entries)
+			PathCache.Entries->Prev = NULL;
+	} else {
+		/* should be because pce->Prev==NULL iff pce==PathCache.Entries */
+		if (pce->Prev)
+			pce->Prev->Next = pce->Next;
+		if (pce->Next)
+			pce->Next->Prev = pce->Prev;
+	}
+
+	CacheEntryDestroy (pce);
+	//CachePrint ();
+}
+
+local void CacheReleaseEntry (PathCacheEntry *pce)
+{
+	CacheEntryUnref (pce);
+	if (pce->RefCnt == 0) {
+		/* no more referenced path => flush it out of the cache */
+		CacheDeleteEntry (pce);
+	}
+}
+
+local void CachePrint (void)
+{
+	PathCacheEntry *pce;
+
+	printf ("Path cache:\n");
+	printf ("Start region    Goal rectangle   RefCnt   Valid\n");
+	for (pce = PathCache.Entries; pce; pce = pce->Next) {
+		printf ("    %4d        (%d,%d,%d,%d)      %2d        %d\n",
+				pce->Start->RegId, pce->GoalRect.XMin, pce->GoalRect.YMin,
+				pce->GoalRect.XMax, pce->GoalRect.YMax, pce->RefCnt,pce->Valid);
+	}
+}
+
+local PathCacheEntry *CacheEntryNew (Region *Start, RectBounds *Goal,
+								HighlevelPath *Path)
+{
+	PathCacheEntry *pce;
+
+	pce = (PathCacheEntry * )malloc (sizeof (PathCacheEntry));
+	if (pce == NULL)
+		return NULL;
+	pce->Prev = pce->Next = NULL;
+	pce->RefCnt = 0;
+	pce->Valid = 1;
+	pce->Start = Start;
+	pce->GoalRect = *Goal;
+	pce->Path = Path;
+	return pce;
+}
+
+local void CacheEntryDestroy (PathCacheEntry *pce)
+{
+	DebugCheck (pce->RefCnt > 0);
+	/* These should ideally go into a PathDestroy() call - would it be
+	 * worth it to write it? */
+	free (pce->Path->Sequence);
+	free (pce->Path->Set);
+
+	free (pce->Path);
+}
+
+local void CacheEntryRef (PathCacheEntry *pce)
+{
+	++pce->RefCnt;
+	//CachePrint ();
+}
+
+local void CacheEntryUnref (PathCacheEntry *pce)
+{
+	DebugCheck (pce->RefCnt <= 0);
+	--pce->RefCnt;
+	//CachePrint ();
+}
+
+local inline void CacheEntryMarkInvalid (PathCacheEntry *pce)
+{
+	pce->Valid = 0;
+	//CachePrint ();
+}
+
+local inline int CacheEntryValid (PathCacheEntry *pce)
+{
+	return pce->Valid;
+}
+
+void HighPrintPath (HighlevelPath *path, int print_allowed_regs)
+{
+	int i;
+	int num_regions = RegionSetGetNumRegions ();
+
+	printf ("Sequence:\n");
+	for (i = path->NumSteps-1; i >= 0; i--)
+		printf ("  %3d: %4d\n", path->NumSteps - i, path->Sequence[i].RegId);
+
+	if (print_allowed_regs) {
+		printf ("Set:\n ");
+#define REGION_ALLOWED(regid) (path->Set[(regid) >> 3] & (1 << ((regid) & 0x7)))
+		for (i = 1; i <= num_regions; i++)
+			if (REGION_ALLOWED (i))
+				printf (" %d", i);
+		printf ("\n");
+	}
+}
 
 local void HighResetStats (void)
 {
+#ifdef GATHER_STATS
 	Highlevel.Stats.Iterations = 0;
 	Highlevel.Stats.Revocations[OPEN] = Highlevel.Stats.Revocations[CLOSED] = 0;
 	Highlevel.Stats.PathLength = 0;
 	Highlevel.Stats.PathFields = 0;
+#endif /* GATHER_STATS */
 }
 
-local void HighPrintStats (void)
+void HighPrintStats (void)
 {
+#ifdef GATHER_STATS
 	printf ("Highlevel: %d steps, %d fields\n", Highlevel.Stats.PathLength,
 					Highlevel.Stats.PathFields);
 	printf ("  Iterations: %d\n", Highlevel.Stats.Iterations);
 	printf ("  Revocations: %d from Open, %d from Closed\n",
 		Highlevel.Stats.Revocations[OPEN], Highlevel.Stats.Revocations[CLOSED]);
+#endif /* GATHER_STATS */
 }
 
-#endif /* GATHER_STATS */
