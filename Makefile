@@ -29,7 +29,7 @@ TOPDIR=	.
 RULESFILE ?= Rules.make
 WINRULESFILE = Rules.make.WIN32
 
-include $(TOPDIR)/$(RULESFILE)
+-include $(TOPDIR)/$(RULESFILE)
 
 OBJDIR ?= .
 
@@ -154,7 +154,12 @@ distclean:	clean
 	$(RM) stratagus$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt \
 	srcdoc/* .depend Rules.make config.log config.status configure
 	$(RM) -rf autom4te.cache/
+	touch Rules.make
 	@echo
+
+configure:
+	autoconf
+	./configure
 
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
@@ -342,9 +347,11 @@ diff:
 
 release:
 	$(MAKE) distclean
+	$(MAKE) configure
 	$(MAKE) depend
 	$(MAKE) bin-dist
 	$(MAKE) win32new
+	$(MAKE) win32configure
 	$(MAKE) win32-bin-dist
 	$(MAKE) win32distclean
 	$(MAKE) dist
@@ -360,7 +367,13 @@ WIN32=	\
 win32new:
 	@$(MAKE) RULESFILE=$(WINRULESFILE) distclean
 	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
-	$(MAKE) $(WIN32) depend
+	touch Rules.make.WIN32
+
+win32configure:
+	autoconf
+	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
+	./configure --enable-win32 --host=i386-mingw32msvc --build=i386-linux \
+	--with-lua=/usr/local/cross
 
 win32_2:
 	$(MAKE) $(WIN32) all
