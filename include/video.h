@@ -255,13 +255,13 @@ extern Graphic* LoadSprite(const char* file, int w, int h);
 	/// Make shadow sprite
 extern void MakeShadowSprite(Graphic* graphic);
 
-	///		Draw a graphic clipped and faded.
+	///		Draw a graphic clipped and with alpha.
 extern void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade);
+	int w, int h, int x, int y, unsigned char alpha);
 
-	///		Draw part of a graphic clipped and faded.
+	///		Draw part of a graphic clipped and with alpha.
 extern void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade);
+	int w, int h, int x, int y, unsigned char alpha);
 
 	///		Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char* name);

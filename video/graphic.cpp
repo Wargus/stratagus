@@ -143,7 +143,7 @@ global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 }
 
 /**
-**  Video draw part of graphic faded.
+**  Video draw part of graphic with alpha.
 **
 **  @param graphic  Pointer to object
 **  @param gx       X offset into object
@@ -152,22 +152,22 @@ global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 **  @param h        height to display
 **  @param x        X screen position
 **  @param y        Y screen position
-**  @param fade     Amount to fade
+**  @param alpha    Alpha
 */
 #ifndef USE_OPENGL
 global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade)
+	int w, int h, int x, int y, unsigned char alpha)
 {
-	int alpha;
+	int oldalpha;
 
-	alpha = graphic->Surface->format->alpha;
-	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, fade);
-	VideoDrawSub(graphic, gx, gy, w, h, x, y);
+	oldalpha = graphic->Surface->format->alpha;
 	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, alpha);
+	VideoDrawSub(graphic, gx, gy, w, h, x, y);
+	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, oldalpha);
 }
 #else
 global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade)
+	int w, int h, int x, int y, unsigned char alpha)
 {
 	// FIXME: not done
 	VideoDrawSub(graphic, gx, gy, w, h, x, y);
@@ -175,7 +175,7 @@ global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 #endif
 
 /**
-**  Video draw part of graphic faded and clipped.
+**  Video draw part of graphic with alpha and clipped.
 **
 **  @param graphic  Pointer to object
 **  @param gx       X offset into object
@@ -184,18 +184,18 @@ global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 **  @param h        height to display
 **  @param x        X screen position
 **  @param y        Y screen position
-**  @param fade     Amount to fade
+**  @param alpha    Alpha
 */
 global void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade)
+	int w, int h, int x, int y, unsigned char alpha)
 {
 	int oldx;
 	int oldy;
 
 	oldx = x;
 	oldy = y;
-	CLIP_RECTANGLE(gx, gy, w, h);
-	VideoDrawSubTrans(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y, fade);
+	CLIP_RECTANGLE(x, y, w, h);
+	VideoDrawSubTrans(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
 }
 
 /**
