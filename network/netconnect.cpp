@@ -234,6 +234,7 @@ global void NetworkInitClientConnect(void)
     NetLastPacketSent = GetTicks();
     NetLocalState = ccs_connecting;
     NetStateMsgCnt = 0;
+    NetworkServerPort = NetworkPort;
     LastStateMsgType = ICMServerQuit;
     for (i = 0; i < PlayerMax; ++i) {
 	Hosts[i].Host = 0;
