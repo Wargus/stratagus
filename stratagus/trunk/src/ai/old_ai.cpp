@@ -1371,11 +1371,13 @@ local void AiNextGoal(void)
 **   Called if a Unit is Attacked
 **
 **   @param unit    Pointer to unit that is being attacked.
-**
 */
-global void AiHelpMe(Unit * unit)
+global void AiHelpMe(const Unit* attacker,Unit * defender)
 {
-    DebugLevel0("HELP %d %d", unit->X, unit->Y);
+    DebugLevel0("HELP %s(%d,%d) attacked by %s(%d,%d)",
+	    defender->Type->Ident,defender->X, defender->Y
+	    attacker ? attacker->Type->Ident : "killed",
+	    attacker ? attacker->X : 0, attacker ? attacker->Y : 0);
 }
 
 /**

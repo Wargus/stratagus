@@ -48,7 +48,7 @@ extern void AiCclRegister(void);	/// register ccl features
 --------------------------------------------------------*/
 
     /// Called if AI unit is attacked
-extern void AiHelpMe(Unit* unit);
+extern void AiHelpMe(const Unit* attacker,Unit* defender);
     /// Called if AI unit is killed
 extern void AiUnitKilled(Unit* unit);
     /// Called if AI needs more farms

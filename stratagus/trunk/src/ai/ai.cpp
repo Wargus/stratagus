@@ -414,20 +414,46 @@ local void AiReduceMadeInBuilded(const PlayerAi* pai,const UnitType* type)
 **
 **	@param unit	Pointer to unit that is being attacked.
 */
-global void AiHelpMe(Unit* unit)
+global void AiHelpMe(const Unit* attacker,Unit * defender)
 {
     PlayerAi* pai;
+    AiUnit* aiunit;
+    int force;
 
-    DebugLevel0Fn("%d: %d(%s) attacked at %d,%d\n" _C_ unit->Player->Player _C_
-	    UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
+    DebugLevel0Fn("%d: %d(%s) attacked at %d,%d\n" _C_
+	    defender->Player->Player _C_ UnitNumber(defender) _C_
+	    defender->Type->Ident _C_ defender->X _C_ defender->Y);
+
+    pai=defender->Player->Ai;
+    if( pai->Force[0].Attacking ) {		// Force 0 busy
+	return;
+    }
+
+    //
+    //	If unit belongs to an attacking force, don't defend it.
+    //
+    for( force=0; force<AI_MAX_FORCES; ++force ) {
+	aiunit=pai->Force[force].Units;
+	if( !pai->Force[force].Attacking ) {	// none attacking
+	    continue;
+	}
+	while( aiunit ) {
+	    if( defender==aiunit->Unit ) {
+		return;
+	    }
+	    aiunit=aiunit->Next;
+	}
+    }
+
     //
     //	Send force 0 defending
     //
-    pai=unit->Player->Ai;
-    if( !pai->Force[0].Attacking && unit->Type->Building ) {
-	AiAttackWithForceAt(0,unit->X,unit->Y);
-	pai->Force[0].Defending=1;
+    if( attacker ) {
+	AiAttackWithForceAt(0,attacker->X,attacker->Y);
+    } else {
+	AiAttackWithForceAt(0,defender->X,defender->Y);
     }
+    pai->Force[0].Defending=1;
 }
 
 /**
