@@ -203,14 +203,13 @@ global void DebugTestDisplay(void)
 */
 global void UpdateDisplay(void)
 {
-    int update_old_cursor;
+    if (!MustRedraw) {
+      return;
+    }
 
     VideoLockScreen();			// prepare video write
-    if (MustRedraw) {
-	update_old_cursor=HideAnyCursor();	// remove cursor
-    } else {
-	update_old_cursor = 0;
-    }
+
+    HideAnyCursor();	// remove cursor (when available)
 
     if( MustRedraw&RedrawMap ) {
 	if (InterfaceState == IfaceStateNormal) {
@@ -311,84 +310,72 @@ global void UpdateDisplay(void)
 	DrawMenu(CurrentMenu);
     }
 
-    // FIXME: this could be written better, less drawing
-    if( update_old_cursor && MustRedraw!=-1  ) {
-	// Draw restored area only if not same.
-	if( OldCursorX!=(CursorX-GameCursor->HotX)
-		|| OldCursorY!=(CursorY-GameCursor->HotY)
-		|| OldCursorW!=VideoGraphicWidth(GameCursor->Sprite)
-		|| OldCursorH!=VideoGraphicHeight(GameCursor->Sprite) ) {
-	    InvalidateArea(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
-	}
-    }
-
-    if (!MustRedraw) {
-	VideoUnlockScreen();		// End write access
-	return;
-    }
-
     DrawAnyCursor();
+
     VideoUnlockScreen();		// End write access
 
     //
     //	Update changes to X11.
     //
     if( MustRedraw==-1 ) {
-	Invalidate();
+	// refresh entire screen, so no further invalidate needed
+	InvalidateAreaAndCheckCursor(0,0,VideoWidth,VideoHeight);
     } else {
 	if( MustRedraw&RedrawMap ) {
 	    // FIXME: split into small parts see RedrawTile and RedrawRow
-	    InvalidateArea(TheUI.MapX,TheUI.MapY
+	    InvalidateAreaAndCheckCursor(
+		     TheUI.MapX,TheUI.MapY
 		    ,TheUI.MapEndX-TheUI.MapX+1,TheUI.MapEndY-TheUI.MapY+1);
 	}
 	if( (MustRedraw&RedrawFiller1) && TheUI.Filler1.Graphic ) {
-	    InvalidateArea(TheUI.Filler1X,TheUI.Filler1Y
+	    InvalidateAreaAndCheckCursor(
+		     TheUI.Filler1X,TheUI.Filler1Y
 		    ,TheUI.Filler1.Graphic->Width
 		    ,TheUI.Filler1.Graphic->Height);
 	}
-	if( MustRedraw&RedrawMenuButton ) {
-	    InvalidateArea(TheUI.MenuButtonX,TheUI.MenuButtonY
+	if(MustRedraw&RedrawMenuButton ) {
+	    InvalidateAreaAndCheckCursor(
+		     TheUI.MenuButtonX,TheUI.MenuButtonY
 		    ,TheUI.MenuButton.Graphic->Width
 		    ,TheUI.MenuButton.Graphic->Height);
 	}
 	if( MustRedraw&RedrawMinimapBorder ) {
-	    InvalidateArea(TheUI.MinimapX,TheUI.MinimapY
+	    InvalidateAreaAndCheckCursor(
+		 TheUI.MinimapX,TheUI.MinimapY
 		,TheUI.Minimap.Graphic->Width,TheUI.Minimap.Graphic->Height);
 	} else if( (MustRedraw&RedrawMinimap)
 		|| (MustRedraw&RedrawMinimapCursor) ) {
 	    // FIXME: Redraws too much of the minimap
-	    InvalidateArea(TheUI.MinimapX+24,TheUI.MinimapY+2
+	    InvalidateAreaAndCheckCursor(
+		     TheUI.MinimapX+24,TheUI.MinimapY+2
 		    ,MINIMAP_W,MINIMAP_H);
 	}
 	if( MustRedraw&RedrawInfoPanel ) {
-	    InvalidateArea(TheUI.InfoPanelX,TheUI.InfoPanelY
+	    InvalidateAreaAndCheckCursor(
+		     TheUI.InfoPanelX,TheUI.InfoPanelY
 		    ,TheUI.InfoPanelW,TheUI.InfoPanelH);
 	}
 	if( MustRedraw&RedrawButtonPanel ) {
-	    InvalidateArea(TheUI.ButtonPanelX,TheUI.ButtonPanelY
+	    InvalidateAreaAndCheckCursor(
+		     TheUI.ButtonPanelX,TheUI.ButtonPanelY
 		    ,TheUI.ButtonPanel.Graphic->Width
 		    ,TheUI.ButtonPanel.Graphic->Height);
 	}
 	if( MustRedraw&RedrawResources ) {
-	    InvalidateArea(TheUI.ResourceX,TheUI.ResourceY
+	    InvalidateAreaAndCheckCursor(
+		     TheUI.ResourceX,TheUI.ResourceY
 		    ,TheUI.Resource.Graphic->Width
 		    ,TheUI.Resource.Graphic->Height);
 	}
 	if( MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts ) {
-	    InvalidateArea(TheUI.StatusLineX,TheUI.StatusLineY
+	    InvalidateAreaAndCheckCursor(
+                     TheUI.StatusLineX,TheUI.StatusLineY
 		    ,TheUI.StatusLine.Graphic->Width
 		    ,TheUI.StatusLine.Graphic->Height);
 	}
-	/* if (MustRedraw) */ {
-	// FIXME: JOHNS: That didn't work: if (MustRedraw&RedrawCursor)
-	    DebugLevel3Fn("%d,%d,%d,%d\n",CursorX-GameCursor->HotX
-		,CursorY-GameCursor->HotY
-		,VideoGraphicWidth(GameCursor->Sprite)
-		,VideoGraphicHeight(GameCursor->Sprite));
-	    InvalidateArea(CursorX-GameCursor->HotX,CursorY-GameCursor->HotY
-		,VideoGraphicWidth(GameCursor->Sprite)
-		,VideoGraphicHeight(GameCursor->Sprite));
-	}
+
+        // And now as very last.. checking if the cursor needs a refresh
+        InvalidateCursorAreas();
     }
 }
 

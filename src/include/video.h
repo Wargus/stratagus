@@ -985,6 +985,7 @@ extern void VideoDrawTransRectangleClip(SysColors color,int x,int y
     /// Does ColorCycling..
 extern void (*ColorCycle)(void);
 
+
 /*----------------------------------------------------------------------------
 --	Macros
 ----------------------------------------------------------------------------*/
@@ -1053,6 +1054,7 @@ extern void (*ColorCycle)(void);
     ///	Save (NULL) free a graphic object.
 #define VideoSaveFree(o) \
 	do { if( (o) ) ((o)->Type->Free)((o)); } while( 0 )
+
 
 /*----------------------------------------------------------------------------
 --	Functions
