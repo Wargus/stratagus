@@ -61,7 +61,7 @@
 #  define gh_new_procedureN(name, proc) gh_new_procedure(name, proc, 0, 0, 1)
 #  define aset1(array, pos, value)      gh_vector_set_x(array, pos, value)
 #  define repl_c_string(msg, a, b, c  ) gh_eval_str(msg)
-#  define print_welcome()         
+#  define print_welcome()
 #  define gh_scm2newstr(scm, lenp) \
   (gh_symbol_p(scm) ? gh_symbol2newstr(scm, lenp) : gh_scm2newstr(scm,lenp))
 #  define gh_scm2int(val) \
@@ -150,7 +150,7 @@ extern LISP fast_load(LISP lfname,LISP noeval);
 #define SCM_BOOL_T	sym_t
 #define SCM_BOOL_F	NIL
 
-#define gh_vector_set_x(array, pos, value) aset1(array, pos, value) 
+#define gh_vector_set_x(array, pos, value) aset1(array, pos, value)
 
 extern LISP sym_t;
 typedef long ccl_smob_type_t;
@@ -162,6 +162,16 @@ typedef long ccl_smob_type_t;
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
+
+typedef struct _lua_user_data_ {
+    int Type;
+    void* Data;
+} LuaUserData;
+
+enum {
+    LuaUnitType = 100,
+    LuaSoundType,
+};
 
 extern lua_State* Lua;
 
