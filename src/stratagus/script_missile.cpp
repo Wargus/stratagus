@@ -140,6 +140,9 @@ local SCM CclDefineMissileType(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("impact-missile"))) {
 	    free(mtype->ImpactName);
 	    mtype->ImpactName = gh_scm2newstr(gh_car(list), NULL);
+	} else if (gh_eq_p(value, gh_symbol2scm("smoke-missile"))) {
+	    free(mtype->ImpactName);
+	    mtype->SmokeName = gh_scm2newstr(gh_car(list), NULL);
 	} else if (gh_eq_p(value, gh_symbol2scm("can-hit-owner"))) {
 	    mtype->CanHitOwner = gh_scm2bool(gh_car(list));
 	} else if (gh_eq_p(value, gh_symbol2scm("friendly-fire"))) {
@@ -199,13 +202,15 @@ local SCM CclMissile(SCM list)
     int y;
     int dx;
     int dy;
+    int sx;
+    int sy;
     Missile* missile;
 
     DebugLevel0Fn("FIXME: not finished\n");
 
     missile = NULL;
     type = NULL;
-    x = dx = y = dy = -1;
+    x = dx = y = dy = sx = sy = -1;
 
     while (!gh_null_p(list)) {
 	value = gh_car(list);
@@ -219,14 +224,21 @@ local SCM CclMissile(SCM list)
 	    free(str);
 	} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
 	    SCM sublist;
-	    
+
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
 	    x = gh_scm2int(gh_car(sublist));
 	    y = gh_scm2int(gh_cadr(sublist));
+	} else if (gh_eq_p(value, gh_symbol2scm("origin-pos"))) {
+	    SCM sublist;
+
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    sx = gh_scm2int(gh_car(sublist));
+	    sy = gh_scm2int(gh_cadr(sublist));
 	} else if (gh_eq_p(value, gh_symbol2scm("goal"))) {
 	    SCM sublist;
-	    
+
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
 	    dx = gh_scm2int(gh_car(sublist));
@@ -238,16 +250,20 @@ local SCM CclMissile(SCM list)
 		// the way InitMissile() (called from MakeLocalMissile()) computes
 		// them - it works for creating a missile during a game but breaks
 		// loading the missile from a file.
-		missile->X = x;
-		missile->Y = y;
-		missile->DX = dx;
-		missile->DY = dy;
+	    missile->X = x;
+	    missile->Y = y;
+	    missile->SourceX = sx;
+	    missile->SourceY = sy;
+	    missile->DX = dx;
+	    missile->DY = dy;
 	    missile->Local = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("global"))) {
 	    DebugCheck(!type);
 	    missile = MakeMissile(type, x, y, dx, dy);
 	    missile->X = x;
 	    missile->Y = y;
+	    missile->SourceX = sx;
+	    missile->SourceY = sy;
 	    missile->DX = dx;
 	    missile->DY = dy;
 	    missile->Local = 0;
@@ -295,21 +311,15 @@ local SCM CclMissile(SCM list)
 	    DebugCheck(!missile);
 	    missile->TTL = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("data"))) {
+	} else if (gh_eq_p(value, gh_symbol2scm("step"))) {
 	    SCM sublist;
-	    
+
+	    DebugCheck(!missile);
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
-	    missile->D = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    missile->Dx = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    missile->Dy = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    missile->Xstep = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    missile->Ystep = gh_scm2int(gh_car(sublist));
-	}
+	    missile->CurrentStep = gh_scm2int(gh_car(sublist));
+	    missile->TotalStep = gh_scm2int(gh_cadr(sublist));
+        }
     }
     return SCM_UNSPECIFIED;
 }

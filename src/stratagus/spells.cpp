@@ -204,52 +204,6 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 }
 
 /**
-**	Cast death coil.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
-{
-    Missile* mis;
-    int sx;
-    int sy;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->Action);
-//  DebugCheck(target);
-//  DebugCheck(x in range, y in range);
-
-    mis = NULL;
-    sx = caster->X;
-    sy = caster->Y;
-
-    caster->Mana -= spell->ManaCost;
-
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    mis = MakeMissile(spell->Missile,
-	sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    mis->SourceUnit = caster;
-    mis->Damage = spell->Action->Data.Fireball.Damage;
-    RefsDebugCheck(!caster->Refs || caster->Destroyed);
-    caster->Refs++;
-    if (target) {
-	mis->TargetUnit = target;
-	RefsDebugCheck(!target->Refs || target->Destroyed);
-	target->Refs++;
-    }
-    return 0;
-}
-
-/**
 **	Cast fireball.
 **
 **	@param caster	Unit that casts the spell
@@ -294,7 +248,7 @@ global int CastFireball(Unit* caster, const SpellType* spell,
 **	Cast flame shield.
 **
 **	@param caster	Unit that casts the spell
-*	@param spell	Spell-type pointer
+**	@param spell	Spell-type pointer
 **	@param target	Target unit that spell is addressed to
 **	@param x	X coord of target spot when/if target does not exist
 **	@param y	Y coord of target spot when/if target does not exist
@@ -693,6 +647,8 @@ global int CastWhirlwind(Unit* caster, const SpellType* spell,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     mis->TTL = spell->Action->Data.Whirlwind.TTL;
+    mis->Damage = spell->Action->Data.Whirlwind.Damage;
+    mis->SourceUnit = caster;
     return 0;
 }
 

@@ -182,6 +182,10 @@ impact spot. All fields that aren't the center get only 50% of the damage.
 <dt>impact-missile</dt>
 <dd>You can use this to spawn another missile on impact. F.E. 'impact-missile 'missile-explosion
 </dd>
+<dt>smoke-missile</dt>
+<dd>The name of the next (other) missile to generate a trailing smoke.  So it
+can be used to generate a chain of missiles.
+</dd>
 <dt>can-hit-owner</dt>
 <dd>This is a boolean value(#t or #f) that determines if the missile will affect
 the caster or not.
@@ -363,9 +367,13 @@ This function will define a mid-game missile, and it is mostly used in savegames
 <dd>The current position of the missile. It's list of and y values. Coordinates are
 in pixels, not tiles. F.E 'pos (4500 3450)
 </dd>
+<dt>origin-pos</dt>
+<dd>The starting position of the missile. It's list of and y values. Coordinates are
+in pixels, not tiles. F.E 'pos (4505 3455)
+</dd>
 <dt>goal</dt>
 <dd>The position of the missile's destination. It's list of and y values. Coordinates are
-in pixels, not tiles. F.E 'gold (4510 3500)
+in pixels, not tiles. F.E 'gold (4510 3460)
 </dd>
 <dt>local</dt>
 <dd>This unit is marked as local, and it's visible only to the player. This

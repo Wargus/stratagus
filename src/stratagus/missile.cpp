@@ -59,13 +59,6 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-//	TODO : Remove, configure in ccl.
-//	#define FIREBALL_DAMAGE		20	/// Damage of center fireball
-#define WHIRLWIND_DAMAGE1	 4	/// the center of the whirlwind
-#define WHIRLWIND_DAMAGE2	 1	/// the periphery of the whirlwind
-//#define RUNE_DAMAGE		50	/// Rune damage
-
-
 /**
 **	Missile class names, used to load/save the missiles.
 */
@@ -87,7 +80,7 @@ global const char* MissileClassNames[] = {
     NULL
 };
 
-local void (*MissileClassFunctions[])(Missile*) = {
+local FuncController *MissileClassFunctions[] = {
     MissileActionNone,
     MissileActionPointToPoint,
     MissileActionPointToPointWithHit,
@@ -128,7 +121,7 @@ global int NoWarningMissileType;		/// quiet ident lookup.
 local Missile* GlobalMissiles[MAX_MISSILES];	/// all global missiles on map
 local int NumGlobalMissiles;			/// currently used missiles
 
-local Missile* LocalMissiles[MAX_MISSILES*8];	/// all local missiles on map
+local Missile* LocalMissiles[MAX_MISSILES * 8];	/// all local missiles on map
 local int NumLocalMissiles;			/// currently used missiles
 
 #ifdef DOXYGEN                          // no real code, only for document
@@ -206,7 +199,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 **	@todo	Don't allocate an array of missile-types, allocate an array
 **		of pointers.
 **
-**	@param ident	Identifier to identify the slot (malloced by caller!).
+**	@param ident	Identifier to identify the slot.
 **
 **	@return		New allocated (zeroed) missile-type pointer.
 */
@@ -236,9 +229,8 @@ global MissileType* NewMissileTypeSlot(char* ident)
     //	Rehash.
     //
     for (i = 0; i < NumMissileTypes; ++i) {
-	*(MissileType**)hash_add(MissileTypeHash,MissileTypes[i].Ident) = &MissileTypes[i];
+	*(MissileType**)hash_add(MissileTypeHash, MissileTypes[i].Ident) = &MissileTypes[i];
     }
-
     mtype->CanHitOwner = 0;		// defaults
     mtype->FriendlyFire = 0;
 
@@ -340,7 +332,7 @@ local Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
 **
 **	@return		created missile.
 */
-global Missile* MakeMissile(MissileType* mtype,int sx,int sy,int dx,int dy)
+global Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
 {
     Missile* missile;
 
@@ -376,7 +368,7 @@ global Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx, int
 	mtype - MissileTypes _C_ mtype->Ident _C_ sx _C_ sy _C_ dx _C_ dy);
 
     if (!(missile = NewLocalMissile())) {
-	return missile;
+	return NULL;
     }
 
     return InitMissile(missile, mtype, sx, sy, dx, dy);
@@ -425,7 +417,7 @@ local void FreeMissile(Missile* missile)
     //
     if (missile->Local) {
 	DebugCheck(*missile->MissileSlot != missile);
-	temp=LocalMissiles[--NumLocalMissiles];
+	temp = LocalMissiles[--NumLocalMissiles];
 	DebugCheck(*temp->MissileSlot != temp);
 	temp->MissileSlot = missile->MissileSlot;
 	*missile->MissileSlot = temp;
@@ -469,6 +461,8 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
     int basic_damage;
     int piercing_damage;
 
+    DebugCheck(attacker_stats == NULL);
+    DebugCheck(goal_stats == NULL);
     basic_damage = attacker_stats->BasicDamage + isqrt(xp / 100) * XpDamage;
     piercing_damage = attacker_stats->PiercingDamage;
     if (bloodlust) {
@@ -477,25 +471,10 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 	DebugLevel3Fn("bloodlust\n");
     }
 
-#if 0
-    damage = basic_damage - goal_stats->Armor;
-    if (damage < 0) {
-	// Use minimum damage
-	if (piercing_damage < 30 && basic_damage < 30) {
-	    damage = (piercing_damage + 1) / 2;
-	} else {
-	    damage = (piercing_damage + basic_damage - 30) / 2;
-	}
-    } else {
-	damage += piercing_damage;
-	damage -= SyncRand() % ((damage + 2) / 2);
-    }
-#else
     damage = max(basic_damage - goal_stats->Armor, 1) + piercing_damage;
     damage -= SyncRand() % ((damage + 2) / 2);
     DebugCheck(damage < 0);
-#endif
-	
+
     DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n" _C_ goal_stats->Armor _C_
 	basic_damage _C_ piercing_damage _C_ damage);
 
@@ -596,10 +575,6 @@ global void FireMissile(Unit* unit)
 
     if (goal) {
 	DebugCheck(!goal->Type);	// Target invalid?
-	// Fire to nearest point of the unit!
-	NearestOfUnit(goal, unit->X, unit->Y, &dx, &dy);
-	DebugLevel3Fn("Fire to unit at %d,%d\n" _C_ dx _C_ dy);
-
 	//
 	//	Moved out of attack range?
 	//
@@ -609,7 +584,9 @@ global void FireMissile(Unit* unit)
 	    // FIXME: do something other?
 	    return;
 	}
-
+	// Fire to nearest point of the unit!
+	NearestOfUnit(goal, unit->X, unit->Y, &dx, &dy);
+	DebugLevel3Fn("Fire to unit at %d,%d\n" _C_ dx _C_ dy);
     } else {
 	dx = unit->Orders[0].X;
 	dy = unit->Orders[0].Y;
@@ -728,7 +705,11 @@ global void DrawMissile(const MissileType* mtype, int frame, int x, int y)
 }
 
 /**
-**	FIXME: docu
+**	Compare Draw level. Used by qsort.
+**
+**	@param v1 : adress of a missile pointer.
+**	@param v2 : adress of a missile pointer.
+**	@return -1 if v1 < v2, 1 else.
 */
 local int MissileDrawLevelCompare(const void* v1, const void* v2)
 {
@@ -741,6 +722,10 @@ local int MissileDrawLevelCompare(const void* v1, const void* v2)
     c1 = *(Missile**)v1;
     c2 = *(Missile**)v2;
 
+    DebugCheck(c1 == NULL);
+    DebugCheck(c2 == NULL);
+    DebugCheck(c1->Type == NULL);
+    DebugCheck(c2->Type == NULL);
     if (c1->Type->DrawLevel == c2->Type->DrawLevel) {
 	return c1->MissileSlot < c2->MissileSlot ? -1 : 1;
     } else {
@@ -804,6 +789,7 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
     int nextdir;
 
     DebugCheck(missile == NULL);
+    DebugCheck(missile->Type == NULL);
     if (missile->SpriteFrame < 0) {
 	missile->SpriteFrame = -missile->SpriteFrame;
     }
@@ -811,13 +797,49 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
     missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
 
     nextdir = 256 / missile->Type->NumDirections;
+    DebugCheck(nextdir == 0);
     dir = ((DirectionToHeading(dx, dy) + nextdir / 2) & 0xFF) / nextdir;
-    if (dir <= LookingS / nextdir ) {	// north->east->south
+    if (dir <= LookingS / nextdir) {	// north->east->south
 	missile->SpriteFrame += dir;
     } else {
 	missile->SpriteFrame += 256 / nextdir - dir;
 	missile->SpriteFrame = -missile->SpriteFrame;
     }
+}
+/**
+**	Init the move.
+**	@param missile : missile to initialise for movement.
+**	@return 1 if goal is reached, 0 else.
+*/
+local int MissileInitMove(Missile* missile)
+{
+    int dx;
+    int dy;
+
+    DebugCheck(missile == 0);
+    if (!(missile->State & 1)) {
+        dx = missile->DX - missile->X;
+        dy = missile->DY - missile->Y;
+        missile->CurrentStep = 0;
+        missile->TotalStep = 0;
+        if (dx == 0 && dy == 0) {
+            return 1;
+        }
+        MissileNewHeadingFromXY(missile, dx, dy);
+	// initialize
+        missile->TotalStep = MapDistance(missile->SourceX, missile->SourceY, missile->DX, missile->DY);
+        missile->State++;
+        return 0;
+    }
+    DebugCheck(missile->TotalStep == 0);
+    missile->CurrentStep += missile->Type->Speed;
+    if (missile->CurrentStep >= missile->TotalStep)
+    {
+        missile->X = missile->DX;
+        missile->Y = missile->DY;
+        return 1;
+     }
+     return 0;
 }
 
 /**
@@ -829,128 +851,26 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 */
 local int PointToPointMissile(Missile* missile)
 {
-    int dx;
-    int dy;
+    DebugCheck(missile == NULL);
+    if (MissileInitMove(missile) == 1) {
+        return 1;
+    }
     int xstep;
     int ystep;
-    int i;
+//    int zstep;
+    DebugCheck(missile->Type == NULL);
+    DebugCheck(missile->TotalStep == 0);
+    xstep = (missile->DX - missile->SourceX) * 1024 / missile->TotalStep;
+    ystep = (missile->DY - missile->SourceY) * 1024 / missile->TotalStep;
+    missile->X = missile->SourceX + xstep * missile->CurrentStep / 1024;
+    missile->Y = missile->SourceY + ystep * missile->CurrentStep / 1024;
+    if (missile->Type->SmokeMissile && missile->CurrentStep) {
+        int x;
+        int y;
 
-    if (!(missile->State & 1)) {
-	// initialize
-	dy = missile->DY - missile->Y;
-	ystep = 1;
-	if (dy < 0) {
-	    dy = -dy;
-	    ystep = -1;
-	}
-	dx = missile->DX - missile->X;
-	xstep = 1;
-	if (dx < 0) {
-	    dx = -dx;
-	    xstep = -1;
-	}
-
-	// FIXME: could be better written
-	if (missile->Type->Class == MissileClassWhirlwind ||
-		missile->Type->Class == MissileClassFlameShield) {
-	    // must not call MissileNewHeading nor frame change
-	} else if (missile->Type->Class == MissileClassPointToPointBounce) {
-	    missile->DX -= xstep * TileSizeX / 2;
-	    missile->DY -= ystep * TileSizeY / 2;
-	} else {
-	    MissileNewHeadingFromXY(missile, dx * xstep, dy * ystep);
-	}
-
-	if (dy == 0) {		// horizontal line
-	    if (dx == 0) {
-		return 1;
-	    }
-	} else if (dx == 0) {	// vertical line
-	} else if (dx < dy) {	// step in vertical direction
-	    missile->D = dy - 1;
-	    dx += dx;
-	    dy += dy;
-	} else if (dx > dy) {	// step in horizontal direction
-	    missile->D = dx - 1;
-	    dx += dx;
-	    dy += dy;
-	}
-
-	missile->Dx = dx;
-	missile->Dy = dy;
-	missile->Xstep = xstep;
-	missile->Ystep = ystep;
-	missile->State++;
-	DebugLevel3Fn("Init: %d,%d, %d,%d, =%d\n" _C_ dx _C_ dy _C_
-	    xstep _C_ ystep _C_ missile->D);
-	return 0;
-    } else {
-	// on the way
-	dx = missile->Dx;
-	dy = missile->Dy;
-	xstep = missile->Xstep;
-	ystep = missile->Ystep;
-    }
-
-    //
-    //	Move missile
-    //
-    if (dy == 0) {		// horizontal line
-	for (i = 0; i < missile->Type->Speed; ++i) {
-	    if (missile->X == missile->DX) {
-		return 1;
-	    }
-	    missile->X += xstep;
-	}
-	return 0;
-    }
-
-    if (dx == 0) {		// vertical line
-	for (i = 0; i < missile->Type->Speed; ++i) {
-	    if (missile->Y == missile->DY) {
-		return 1;
-	    }
-	    missile->Y += ystep;
-	}
-	return 0;
-    }
-
-    if (dx < dy) {		// step in vertical direction
-	for (i = 0; i < missile->Type->Speed; ++i) {
-	    if (missile->Y == missile->DY) {
-		return 1;
-	    }
-	    missile->Y += ystep;
-	    missile->D -= dx;
-	    if (missile->D < 0) {
-		missile->D += dy;
-		missile->X += xstep;
-	    }
-	}
-	return 0;
-    }
-
-    if (dx > dy) {		// step in horizontal direction
-	for (i = 0; i < missile->Type->Speed; ++i) {
-	    if (missile->X == missile->DX) {
-		return 1;
-	    }
-	    missile->X += xstep;
-	    missile->D -= dy;
-	    if (missile->D < 0) {
-		missile->D += dx;
-		missile->Y += ystep;
-	    }
-	}
-	return 0;
-    }
-				// diagonal line
-    for (i = 0; i < missile->Type->Speed; ++i) {
-	if (missile->Y == missile->DY) {
-	    return 1;
-	}
-	missile->X += xstep;
-	missile->Y += ystep;
+        x = missile->X + missile->Type->Width / 2;
+        y = missile->Y + missile->Type->Height / 2;
+        MakeMissile(missile->Type->SmokeMissile, x, y, x, y);
     }
     return 0;
 }
@@ -959,116 +879,51 @@ local int PointToPointMissile(Missile* missile)
 **	Calculate parabolic trajectories.
 **
 **	@param missile	Missile pointer.
-**	@param amplitude    How high can the missile go. This value depends
-**			    on the missile direction and game perspective.
-*/
-local int ParabolicCalc(Missile* missile, int amplitude)
-{
-    int xmid;
-    long sinu;
-    int thetha;
-
-    missile->Xl -= missile->Xstep;
-    missile->X = (missile->Xl + 500) / 1000;
-
-    xmid = (missile->SourceX + missile->DX) / 2;
-    sinu = (missile->X - xmid) * (missile->X - xmid);
-    thetha = missile->SourceX - xmid;
-    missile->Y = ((missile->Angle * (missile->X - missile->SourceX)) -
-	amplitude * isqrt(-sinu + thetha * thetha) + missile->SourceY * 1000 + 500 ) / 1000;
-
-    return 0;
-}
-
-/**
-**	Calculate parabolic trajectories.
-**
-**	@param missile	Missile pointer.
+**	@return 1 if target is reached.
+**	@return 0 else.
+**	@todo Find good values for ZprojToX et Y
 */
 local int ParabolicMissile(Missile* missile)
 {
-    int i;
-    int sx;
-    int sy;
+    int orig_x;	// position before moving.
+    int orig_y;	// position before moving.
+    int xstep;
+    int ystep;
+    int K;        // Coefficient of the parabol.
+    int ZprojToX; // Projection of Z axis on axis X.
+    int ZprojToY; // Projection of Z axis on axis Y.
+    int Z; // should be missile->Z later.
 
-    if (!(missile->State & 1)) {
-	int dx;
-	int dy;
-	int xstep;
-	int ystep;
-
-	// initialize
-	dy = missile->DY - missile->Y;
-	ystep = 1;
-	if (dy < 0) {
-	    dy = -dy;
-	    ystep = -1;
-	}
-	dx = missile->DX - missile->X;
-	xstep = 1;
-	if (dx < 0) {
-	    dx = -dx;
-	    xstep = -1;
-	}
-	if (missile->SourceX - missile->DX != 0) {
-	    missile->Angle = (1000 * (missile->SourceY - missile->DY)) / 
-		(missile->SourceX - missile->DX);
-	} else {
-	    missile->Angle = 1;
-	}
-	missile->Xl = missile->SourceX * 1000;
-
-	MissileNewHeadingFromXY(missile, dx * xstep, dy * ystep);
-
-	if (dx == 0 && dy == 0) {
-	    return 1;
-	}
-
-	missile->Dx = dx;
-	missile->Dy = dy;
-	dx = missile->SourceX - missile->DX;
-	dy = missile->SourceY - missile->DY;
-	missile->Xstep = (1000 * dx) / isqrt(dx * dx + dy * dy);
-	missile->Ystep = ystep;
-	++missile->State;
-	DebugLevel3Fn("Init: %d,%d\n" _C_ dx _C_ dy);
-	return 0;
+    DebugCheck(missile == NULL);
+    K = -1024; // Should be initialised by an other method (computed with distance...)
+    ZprojToX = 4;
+    ZprojToY = 1024;
+    if (MissileInitMove(missile) == 1) {
+        return 1;
     }
+    DebugCheck(missile->Type == NULL);
+    orig_x = missile->X;
+    orig_y = missile->Y;
+    xstep = missile->DX - missile->SourceX;
+    ystep = missile->DY - missile->SourceY;
+    DebugCheck(missile->TotalStep == 0);
+    xstep = xstep * 1000 / missile->TotalStep;
+    ystep = ystep * 1000 / missile->TotalStep;
+    missile->X = missile->SourceX + xstep * missile->CurrentStep / 1000;
+    missile->Y = missile->SourceY + ystep * missile->CurrentStep / 1000;
+    DebugCheck(K == 0);
+    Z = missile->CurrentStep * (missile->TotalStep - missile->CurrentStep) / K;
+// Until Z is used for drawing, modify X and Y.
+    missile->X += Z * ZprojToX / 64;
+    missile->Y += Z * ZprojToY / 64;
+    MissileNewHeadingFromXY(missile, missile->X - orig_x, missile->Y - orig_y);
+    if (missile->Type->SmokeMissile && missile->CurrentStep) {
+        int x;
+        int y;
 
-    sx = missile->X;
-    sy = missile->Y;
-
-    //
-    //	Move missile
-    //
-    if (missile->Dy == 0) {		// horizontal line
-	for (i = 0; i<missile->Type->Speed; ++i) {
-	    if (missile->X == missile->DX) {
-		return 1;
-	    }
-	    ParabolicCalc(missile, 500);
-	}
-	MissileNewHeadingFromXY(missile, missile->X - sx, missile->Y - sy);
-	return 0;
-    }
-
-    if (missile->Dx == 0) {		// vertical line
-	for (i = 0; i < missile->Type->Speed; ++i) {
-	    if (missile->Y == missile->DY) {
-		return 1;
-	    }					
-	    missile->Y += missile->Ystep; //no parabolic missile there.
-	}
-	return 0;
-    }
-
-    for (i = 0; i < missile->Type->Speed; ++i) {
-	if (abs(missile->X - missile->DX) <= 1 &&
-		abs(missile->Y - missile->DY) <= 1) {
-	    return 1;
-	}
-	ParabolicCalc(missile, 1000);
-	MissileNewHeadingFromXY(missile, missile->X - sx, missile->Y - sy);
+        x = missile->X + missile->Type->Width / 2;
+        y = missile->Y + missile->Type->Height / 2;
+        MakeMissile(missile->Type->SmokeMissile, x, y, x, y);
     }
     return 0;
 }
@@ -1082,6 +937,9 @@ local int ParabolicMissile(Missile* missile)
 */
 local void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 {
+    DebugCheck(missile == NULL);
+    DebugCheck(goal == NULL);
+    DebugCheck(missile->Type == NULL);
     if (!missile->Type->CanHitOwner && goal == missile->SourceUnit) {
 	return;				// blizzard cannot hit owner unit
     }
@@ -1090,6 +948,7 @@ local void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 	if (missile->Damage) {		// direct damage, spells mostly
 	    HitUnit(missile->SourceUnit, goal, missile->Damage / splash);
 	} else {
+            DebugCheck(missile->SourceUnit == NULL);
 	    HitUnit(missile->SourceUnit, goal,
 		CalculateDamage(missile->SourceUnit->Stats, goal,
 		    missile->SourceUnit->Bloodlust, 0) / splash);
@@ -1109,6 +968,7 @@ local void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 */
 local void MissileHitsWall(const Missile* missile, int x, int y, int splash)
 {
+    DebugCheck(missile == NULL);
     if (WallOnMap(x, y)) {
 	DebugLevel3Fn("Missile on wall?\n");
 	if (HumanWallOnMap(x, y)) {
@@ -1123,6 +983,7 @@ local void MissileHitsWall(const Missile* missile, int x, int y, int splash)
 	    if (missile->Damage) {	// direct damage, spells mostly
 		HitWall(x, y, missile->Damage / splash);
 	    } else {
+                DebugCheck(missile->SourceUnit == NULL);
 		HitWall(x, y,
 		    CalculateDamageStats(missile->SourceUnit->Stats,
 			UnitTypeOrcWall->Stats, 0, 0) / splash);
@@ -1146,6 +1007,8 @@ global void MissileHit(Missile* missile)
     int n;
     int i;
 
+    DebugCheck(missile == NULL);
+    DebugCheck(missile->Type == NULL);
     if (missile->Type->ImpactSound.Sound) {
 	PlayMissileSound(missile, missile->Type->ImpactSound.Sound);
     }
@@ -1181,7 +1044,7 @@ global void MissileHit(Missile* missile)
     x /= TileSizeX;
     y /= TileSizeY;
 
-    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height ) {
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 	// FIXME: this should handled by caller?
 	DebugLevel0Fn("Missile gone outside of map!\n");
 	return;				// outside the map.
@@ -1216,6 +1079,7 @@ global void MissileHit(Missile* missile)
     //
     i = missile->Type->Range;
     n = SelectUnits(x - i + 1, y - i + 1, x + i, y + i, table);
+    DebugCheck(missile->SourceUnit == NULL);
     for (i = 0; i < n; ++i) {
 	goal = table[i];
 	//
@@ -1226,7 +1090,7 @@ global void MissileHit(Missile* missile)
 	    // We are attacking the nearest field of the unit
 	    if (x < goal->X || y < goal->Y ||
 		    x >= goal->X + goal->Type->TileWidth ||
-		    y >= goal->Y + goal->Type->TileHeight ) {
+		    y >= goal->Y + goal->Type->TileHeight) {
 		MissileHitsGoal(missile, goal, 2);
 	    } else {
 		MissileHitsGoal(missile, goal, 1);
@@ -1252,32 +1116,60 @@ global void MissileHit(Missile* missile)
     }
 }
 
-/*
+/**
 **	Pass to the next frame for animation.
 **
 **	@param missile : missile to animate.
+**	@param sign : 1 for next frame, -1 for previous frame.
+**	@param LongAnimation : 1 if Frame is conditionned by covered distance, 0 else.
 **
 **	@return	1 if animation is finished, 0 else.
 */
-local int NextMissileFrame(Missile* missile)
+local int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 {
-    int neg;
-    int AnimationIsFinished;
+    int neg;                 // True for mirroring sprite.
+    int AnimationIsFinished; // returned value.
+    int NumDirections;       // Number of direction of the missile.
 
     DebugCheck(missile == NULL);
+    DebugCheck(missile->Type == NULL);
+    DebugCheck(sign != 1 && sign != -1);
 //
 //	Animate missile, cycle through frames
 //
     neg = 0;
     AnimationIsFinished = 0;
+    NumDirections = missile->Type->NumDirections;
     if (missile->SpriteFrame < 0) {
 	neg = 1;
 	missile->SpriteFrame = -missile->SpriteFrame;
     }
-    missile->SpriteFrame += missile->Type->NumDirections;
-    if (missile->SpriteFrame >= VideoGraphicFrames(missile->Type->Sprite)) {
-	missile->SpriteFrame -= VideoGraphicFrames(missile->Type->Sprite);
-	AnimationIsFinished = 1;
+    if (LongAnimation) {
+        int totalf;              // Total number of frame (for one direction).
+        int df;                  // Current frame (for one direction).
+        int totalx;              // Total distance to cover.
+        int dx;                  // Covered distance.
+
+        totalx = MapDistance(missile->DX, missile->DY, missile->SourceX, missile->SourceY);
+        dx = MapDistance(missile->X, missile->Y, missile->SourceX, missile->SourceY);
+        totalf = VideoGraphicFrames(missile->Type->Sprite) / NumDirections;
+        df = missile->SpriteFrame / NumDirections;
+        if ((sign == 1 && dx * totalf <= df * totalx)
+            || (sign == -1 && dx * totalf > df * totalx)) {
+            return AnimationIsFinished;
+        }
+    }
+    missile->SpriteFrame += sign * NumDirections;
+    if (sign > 0) {
+        if (missile->SpriteFrame >= VideoGraphicFrames(missile->Type->Sprite)) {
+	    missile->SpriteFrame -= VideoGraphicFrames(missile->Type->Sprite);
+	    AnimationIsFinished = 1;
+        }
+    } else {
+        if (missile->SpriteFrame < 0) {
+	    missile->SpriteFrame += VideoGraphicFrames(missile->Type->Sprite);
+	    AnimationIsFinished = 1;
+        }
     }
     if (neg) {
 	missile->SpriteFrame = -missile->SpriteFrame;
@@ -1287,7 +1179,7 @@ local int NextMissileFrame(Missile* missile)
     return AnimationIsFinished;
 }
 
-/*
+/**
 **	Pass the next frame of the animation.
 **	This animation goes from start to finish ONCE on the way
 **
@@ -1318,8 +1210,8 @@ local void NextMissileFrameCycle(Missile* missile)
 	    } else {
 		j = f - i;
 	    }
-	    missile->SpriteFrame = missile->SpriteFrame % 5 +
-		j * 5; // FIXME: frames per row
+	    missile->SpriteFrame = missile->SpriteFrame % missile->Type->NumDirections +
+		j * missile->Type->NumDirections;
 	    break;
 	}
     }
@@ -1328,7 +1220,7 @@ local void NextMissileFrameCycle(Missile* missile)
     }
 }
 
-/*
+/**
 **	Handle all missile actions of global/local missiles.
 **
 **	@param missiles		Table of missiles.
@@ -1338,7 +1230,7 @@ local void MissilesActionLoop(Missile** missiles)
     Missile* missile;
 
     //
-    //	NOTE: missiles[??] could be modified!!!
+    //	NOTE: missiles[??] could be modified!!! Yes (freed)
     //
     while ((missile = *missiles)) {
 	DebugLevel3Fn("Missile %s ttl %d at %d, %d\n" _C_ missile->Type->Ident
@@ -1367,6 +1259,10 @@ local void MissilesActionLoop(Missile** missiles)
 
 	MissileClassFunctions[missile->Type->Class](missile);
 
+	if (!missile->TTL) {
+	    FreeMissile(missile);
+	    continue;
+	}
 
 	if (*missiles == missile) {	// Missile not destroyed
 	    ++missiles;
@@ -1394,8 +1290,11 @@ global int ViewPointDistanceToMissile(const Missile* missile)
     int y;
 
     DebugCheck(missile == NULL);
-    x = (missile->X+missile->Type->Width / 2) / TileSizeX;
-    y = (missile->Y+missile->Type->Height / 2) / TileSizeY;	// pixel -> tile
+    DebugCheck(missile->Type == NULL);
+    DebugCheck(TileSizeX <= 0);
+    DebugCheck(TileSizeY <= 0);
+    x = (missile->X + missile->Type->Width / 2) / TileSizeX;
+    y = (missile->Y + missile->Type->Height / 2) / TileSizeY;	// pixel -> tile
 
     DebugLevel3Fn("Missile %p at %d %d\n" _C_ missile _C_ x _C_ y);
 
@@ -1420,6 +1319,7 @@ global MissileType* MissileBurningBuilding(int percent)
 	frame = tmp;
 	tmp = tmp->Next;
     }
+    DebugCheck(frame == NULL);
     return frame->Missile;
 }
 
@@ -1436,8 +1336,9 @@ global void SaveMissileTypes(CLFile* file)
     char** sp;
     int i;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: missile-types $Id$\n\n");
+    DebugCheck(file == NULL);
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: missile-types $Id$\n\n");
 
     //
     //	Original number to internal missile-type name.
@@ -1461,7 +1362,7 @@ global void SaveMissileTypes(CLFile* file)
 	}
 	CLprintf(file, " 'size '(%d %d)", mtype->Width, mtype->Height);
 	if (mtype->Sprite) {
-	    CLprintf(file," 'frames %d", mtype->SpriteFrames);
+	    CLprintf(file, " 'frames %d", mtype->SpriteFrames);
 	}
 	CLprintf(file, "\n  'num-directions %d", mtype->NumDirections);
 	CLprintf(file, "\n ");
@@ -1489,6 +1390,9 @@ global void SaveMissileTypes(CLFile* file)
 	if (mtype->ImpactMissile) {
 	    CLprintf(file, "\n  'impact-missile '%s", mtype->ImpactMissile->Ident);
 	}
+		if (mtype->SmokeMissile) {
+	    CLprintf(file, "\n  'smoke-missile '%s", mtype->SmokeMissile->Ident);
+	}
 	CLprintf(file, "\n ");
 	CLprintf(file, " 'can-hit-owner #%c", mtype->CanHitOwner ? 't' : 'f');
 	CLprintf(file, " 'friendly-fire #%c", mtype->FriendlyFire ? 't' : 'f');
@@ -1503,12 +1407,16 @@ local void SaveMissile(const Missile* missile,CLFile* file)
 {
     char* s1;
 
-    CLprintf(file, "(missile 'type '%s",missile->Type->Ident);
-    CLprintf(file, " 'pos '(%d %d) 'goal '(%d %d)",
-	missile->X, missile->Y, missile->DX, missile->DY);
-    CLprintf(file," '%s", missile->Local ? "local" : "global");
-    CLprintf(file,"\n  'frame %d 'state %d 'anim-wait %d 'wait %d 'delay %d\n ",
-	missile->SpriteFrame, missile->State, missile->AnimWait, missile->Wait, missile->Delay);
+    DebugCheck(missile == NULL);
+    DebugCheck(missile->Type == NULL);
+    DebugCheck(file == NULL);
+    CLprintf(file, "(missile 'type '%s", missile->Type->Ident);
+    CLprintf(file, " 'pos '(%d %d) 'origin-pos '(%d %d) 'goal '(%d %d)",
+	missile->X, missile->Y, missile->SourceX, missile->SourceY, missile->DX, missile->DY);
+    CLprintf(file, " '%s", missile->Local ? "local" : "global");
+    CLprintf(file, "\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
+	missile->SpriteFrame, missile->State, missile->Wait, missile->Delay);
+
     if (missile->SourceUnit) {
 	CLprintf(file, " 'source '%s", s1 = UnitReference(missile->SourceUnit));
 	free(s1);
@@ -1518,10 +1426,10 @@ local void SaveMissile(const Missile* missile,CLFile* file)
 	free(s1);
     }
     CLprintf(file, " 'damage %d", missile->Damage);
-    // FIXME: need symbolic names for controller
     CLprintf(file, " 'ttl %d",	missile->TTL);
-    CLprintf(file, " 'data '(%d %d %d %d %d)",
-	missile->D, missile->Dx, missile->Dy, missile->Xstep, missile->Ystep);
+    CLprintf(file, " 'step '(%d %d)",
+	missile->CurrentStep,
+	missile->TotalStep);
     CLprintf(file, ")\n");
 }
 
@@ -1534,6 +1442,7 @@ global void SaveMissiles(CLFile* file)
 {
     Missile* const* missiles;
 
+    DebugCheck(file == NULL);
     CLprintf(file,"\n;;; -----------------------------------------\n");
     CLprintf(file,";;; MODULE: missiles $Id$\n\n");
 
@@ -1570,6 +1479,9 @@ global void InitMissileTypes(void)
 	if (mtype->ImpactName) {
 	    mtype->ImpactMissile = MissileTypeByIdent(mtype->ImpactName);
 	}
+	if (mtype->SmokeName) {
+	    mtype->SmokeMissile = MissileTypeByIdent(mtype->SmokeName);
+	}
     }
 }
 
@@ -1588,7 +1500,7 @@ global void CleanMissileTypes(void)
 	free(mtype->FiredSound.Name);
 	free(mtype->ImpactSound.Name);
 	free(mtype->ImpactName);
-
+	free(mtype->SmokeName);
 	VideoSaveFree(mtype->Sprite);
     }
     free(MissileTypes);
@@ -1648,19 +1560,20 @@ global void CleanMissiles(void)
 **
 */
 
-/*
+/**
 **      Missile does nothing
 **	
 **	@param missile	pointer to missile
 */
 void MissileActionNone(Missile* missile)
 {
+    DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     return;//  Busy doing nothing.
 }
 
-/*
-**      Missile flies from x,y to x1,y1 aniation on the way
+/**
+**      Missile flies from x,y to x1,y1 animation on the way
 **	
 **	@param missile	pointer to missile
 */
@@ -1669,13 +1582,13 @@ void MissileActionPointToPoint(Missile* missile)
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
 	MissileHit(missile);
-	FreeMissile(missile);
+	missile->TTL = 0;
     } else {
-	NextMissileFrame(missile);
+	NextMissileFrame(missile, 1, 0);
     }
 }
 
-/*
+/**
 **      Missile flies from x,y to x1,y1 showing the first frame
 **	and then shows a hit animation.
 **	
@@ -1683,71 +1596,78 @@ void MissileActionPointToPoint(Missile* missile)
 */
 void MissileActionPointToPointWithHit(Missile* missile)
 {
+    DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
-	if (NextMissileFrame(missile)) {
+	if (NextMissileFrame(missile, 1, 0)) {
 	    MissileHit(missile);
-	    FreeMissile(missile);
+	    missile->TTL = 0;
 	}
     }
 }
 	
-/*
+/**
 **      Missile flies from x,y to x1,y1 and stays there for a moment
 **	
 **	@param missile	pointer to missile
 */
 void MissileActionPointToPointCycleOnce(Missile* missile)
 {
+    DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
 	MissileHit(missile);
-	FreeMissile(missile);
+	missile->TTL = 0;
     } else {
 	NextMissileFrameCycle(missile);
     }
 }
 
-/*
+/**
 **      Missile don't move, than disappears
 **	
 **	@param missile	pointer to missile
 */
 void MissileActionStay(Missile* missile)
 {
+    DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
-    if (NextMissileFrame(missile)) {
+    if (NextMissileFrame(missile, 1, 0)) {
 	MissileHit(missile);
-	FreeMissile(missile);
+	missile->TTL = 0;
     }
 }
 
-/*
-**      Missile flies from x,y to x1,y1 than bounces three times
+/**
+**      Missile flies from x,y to x1,y1 than bounces NumBounces times
 **	
 **	@param missile	pointer to missile
 */
 void MissileActionPointToPointBounce(Missile* missile)
 {
+    DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
-	if (missile->State<2*missile->Type->NumBounces) {
+	if (missile->State < 2 * missile->Type->NumBounces) {
+	    int sign;
+	    int tmp;
 	    missile->State += 2;
-	    missile->DX += missile->Xstep * TileSizeX * 3 / 2;
-	    missile->DY += missile->Ystep * TileSizeY * 3 / 2;
+	    sign = (tmp = missile->DX - missile->SourceX) ? tmp > 0 ? 1 : -1 : 0;
+	    missile->DX += sign * TileSizeX * 3 / 2;
+	    sign = (tmp = missile->DY - missile->SourceY) ? tmp > 0 ? 1 : -1 : 0;
+	    missile->DY += sign * TileSizeY * 3 / 2;
 	    MissileHit(missile);
 	    // FIXME: hits to left and right
 	    // FIXME: reduce damage effects on later impacts
 	} else {
-	    FreeMissile(missile);
-	    missile = NULL;
+	    missile->TTL = 0;
 	}
     } else {
-	NextMissileFrame(missile);
+	NextMissileFrame(missile, 1, 0);
     }
 }
 
-/*
+/**
 **      Missile doesn't move, it will just cycle once and vanish.
 **	Used for ui missiles (cross shown when you give and order)
 **	
@@ -1755,39 +1675,29 @@ void MissileActionPointToPointBounce(Missile* missile)
 */
 void MissileActionCycleOnce(Missile* missile)
 {
-    int neg;
+    DebugCheck(missile == NULL);
 
-    neg = 0;
     missile->Wait = missile->Type->Sleep;
-    if (missile->SpriteFrame < 0) {
-	neg = 1;
-	missile->SpriteFrame = -missile->SpriteFrame;
-    }
     switch (missile->State) {
 	case 0:
 	case 2:
 	    ++missile->State;
 	    break;
 	case 1:
-	    if (++missile->SpriteFrame == VideoGraphicFrames(missile->Type->Sprite)) {
-		--missile->SpriteFrame;
+	    if (NextMissileFrame(missile, 1, 0)) {
 		++missile->State;
 	    }
 	    break;
 	case 3:
-	    if (!missile->SpriteFrame--) {
+	    if (NextMissileFrame(missile, -1, 0)) {
 		MissileHit(missile);
-		FreeMissile(missile);
-		missile = NULL;
+		missile->TTL = 0;
 	    }
 	    break;
     }
-    if (neg && missile) {
-	missile->SpriteFrame = -missile->SpriteFrame;
-    }
 }
 
-/*
+/**
 **      Missile don't move, than checks the source unit for HP.
 **	
 **	@param missile	pointer to missile
@@ -1796,13 +1706,14 @@ void MissileActionFire(Missile* missile)
 {
     Unit* unit;
 
+    DebugCheck(missile == NULL);
     unit = missile->SourceUnit;
     missile->Wait = missile->Type->Sleep;
     if (unit->Destroyed || !unit->HP) {
-	FreeMissile(missile);
+	missile->TTL = 0;
 	return;
     }
-    if (NextMissileFrame(missile)) {
+    if (NextMissileFrame(missile, 1, 0)) {
 	int f;
 	MissileType* fire;
 
@@ -1810,8 +1721,7 @@ void MissileActionFire(Missile* missile)
 	f = (100 * unit->HP) / unit->Stats->HitPoints;
 	fire = MissileBurningBuilding(f);
 	if (!fire) {
-	    FreeMissile(missile);
-	    missile = NULL;
+	    missile->TTL = 0;
 	    unit->Burning = 0;
 	} else {
 	    if (missile->Type != fire) {
@@ -1825,29 +1735,32 @@ void MissileActionFire(Missile* missile)
     }
 }
 
-//
-//	Missile shows hit points?
-//
+/**
+**	Missile shows hit points?
+**	@param missile	pointer to missile
+*/
 void MissileActionHit(Missile* missile)
 {
+    DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
 	MissileHit(missile);
-	FreeMissile(missile);
+	missile->TTL = 0;
     }
 }
 
-/*
-**     Missile flies from x,y to x1,y1 using a parabolic path
+/**
+**      Missile flies from x,y to x1,y1 using a parabolic path
 **	
 **	@param missile	pointer to missile
 */
 void MissileActionParabolic(Missile* missile)
 {
+    DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (ParabolicMissile(missile)) {
 	MissileHit(missile);
-	FreeMissile(missile);
+	missile->TTL = 0;
     } else {
 	NextMissileFrameCycle(missile);
     }
@@ -1932,8 +1845,8 @@ global void MissileActionLandMine(Missile *missile)
     int y;
 
     DebugCheck(missile == NULL);
-    DebugCheck(TileSizeX == 0);
-    DebugCheck(TileSizeY == 0);
+    DebugCheck(TileSizeX <= 0);
+    DebugCheck(TileSizeY <= 0);
 
     x = missile->X / TileSizeX;
     y = missile->Y / TileSizeY;
@@ -1950,13 +1863,11 @@ global void MissileActionLandMine(Missile *missile)
 	}
     }
 
-    if (!missile->AnimWait) {
-	NextMissileFrame(missile);
+    if (!missile->AnimWait--) {
+	NextMissileFrame(missile, 1, 0);
 	missile->AnimWait = missile->Type->Sleep;
-    } else {
-	missile->AnimWait--;
     }
-    missile->Wait=1;
+    missile->Wait = 1;
 }
 
 /**
@@ -1966,9 +1877,6 @@ global void MissileActionLandMine(Missile *missile)
 */
 global void MissileActionWhirlwind(Missile *missile)
 {
-    Unit *table[UnitMax];
-    int i;
-    int n;
     int x;
     int y;
 
@@ -1977,23 +1885,26 @@ global void MissileActionWhirlwind(Missile *missile)
     //
     //	Animate, move.
     //
-    if (!missile->AnimWait) {
+    if (!missile->AnimWait--) {
 	DebugLevel0Fn("?\n");
-	if (NextMissileFrame(missile)) {
+	if (NextMissileFrame(missile, 1, 0)) {
 	    missile->SpriteFrame = 0;
 	    PointToPointMissile(missile);
 	}
 	missile->AnimWait = missile->Type->Sleep;
-    } else {
-	missile->AnimWait--;
     }
-    missile->Wait=1;
-
+    missile->Wait = 1;
     //
     //	Center of the tornado
     //
-    x = (missile->X+TileSizeX/2+missile->Type->Width/2) / TileSizeX;
-    y = (missile->Y+TileSizeY+missile->Type->Height/2) / TileSizeY;
+    x = (missile->X + TileSizeX / 2 + missile->Type->Width / 2) / TileSizeX;
+    y = (missile->Y + TileSizeY + missile->Type->Height / 2) / TileSizeY;
+
+#if 0
+    Unit *table[UnitMax];
+    int i;
+    int n;
+
     //
     //	Every 4 cycles 4 points damage in tornado center
     //
@@ -2020,7 +1931,12 @@ global void MissileActionWhirlwind(Missile *missile)
     }
     DebugLevel0Fn( "Whirlwind: %d, %d, TTL: %d state: %d\n" _C_
 	    missile->X _C_ missile->Y _C_ missile->TTL _C_ missile->State);
+#else
+    if (!(missile->TTL % CYCLES_PER_SECOND / 10)) {
+        MissileHit(missile);
+     }
 
+#endif
     //
     //	Changes direction every 3 seconds (approx.)
     //
@@ -2035,9 +1951,11 @@ global void MissileActionWhirlwind(Missile *missile)
 	} while (nx < 0 && ny < 0 && nx >= TheMap.Width && ny >= TheMap.Height);
 	missile->DX = nx * TileSizeX + TileSizeX / 2;
 	missile->DY = ny * TileSizeY + TileSizeY / 2;
-	missile->State=0;
+	missile->SourceX = missile->X;
+	missile->SourceY = missile->Y;
+	missile->State = 0;
 	DebugLevel0Fn( "Whirlwind new direction: %d, %d, TTL: %d\n" _C_
-		missile->X _C_ missile->Y _C_ missile->TTL );
+		missile->DX _C_ missile->DY _C_ missile->TTL );
     }
 }
 
@@ -2056,13 +1974,8 @@ global void MissileActionDeathCoil(Missile *missile)
     DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
-	//
-	//  missile has not reached target unit/spot
-	//
-	if (!(missile->X == missile->DX && missile->Y == missile->DY)) {
-	    return ;
-	}
 	source = missile->SourceUnit;
+	DebugCheck(source == NULL);
 	if (source->Destroyed) {
 	    return ;
 	}
@@ -2117,7 +2030,7 @@ global void MissileActionDeathCoil(Missile *missile)
 		}
 	    }
 	}
-	FreeMissile(missile);
+	missile->TTL = 0;
     }
 }
 
