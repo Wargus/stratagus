@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -77,7 +76,7 @@
 **		Handles players, all units are owned by a player. A player
 **		could be controlled by a human or a computer.
 **
-**		@see player.h @see player.c
+**		@see player.h @see player.c @see ::Player
 **
 **	@subsection Sound Sound
 **
@@ -112,6 +111,7 @@
 **
 **	@subsection AI AI
 **
+**		@see new_ai.h @ai_local.h
 **		@see ai.h @see ai.c
 **
 **	@subsection CCL CCL
