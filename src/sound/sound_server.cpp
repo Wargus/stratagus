@@ -137,7 +137,7 @@ local int PlayingMusic;			/// Flag true if playing music
 **
 **	@param name	Name of sound file, format is automatic detected.
 */
-local void PlayMusic(const char* name)
+global void PlayMusic(const char* name)
 {
     ModPlug_Settings settings;
     CLFile* f;
@@ -225,7 +225,10 @@ local void MixMusicToStereo32(int* buffer,int size)
 
 #else
 
-#define PlayMusic(name)
+global void PlayMusic(const char* name __attribute__((unused)))
+{
+}
+
 #define MixMusicToStereo32(buffer,size)
 
 #endif
