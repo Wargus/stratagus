@@ -210,6 +210,7 @@ global void CleanButtons(void)
 	CurrentButtonLevel = 0;
 	CurrentButtons = NULL;
 	free(_current_buttons);
+	_current_buttons = NULL;
 }
 
 /**
