@@ -70,7 +70,7 @@ extern void AiHelpMe(const Unit* attacker,Unit* defender);
     /// Called if AI unit is killed
 extern void AiUnitKilled(Unit* unit);
     /// Called if AI needs more farms
-extern void AiNeedMoreFarms(Unit* unit,const UnitType* what);
+extern void AiNeedMoreSupply(const Unit* unit,const UnitType* what);
     /// Called if AI unit has completed work
 extern void AiWorkComplete(Unit* unit,Unit* what);
     /// Called if AI unit can't build
