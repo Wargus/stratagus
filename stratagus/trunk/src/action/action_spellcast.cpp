@@ -200,7 +200,7 @@ global void HandleActionSpellCast(Unit* unit)
 			unit->Type->Name, spell->Name);
 		}
 
-		if (unit->Player->Ai) {
+		if (unit->Player->AiEnabled) {
 		    DebugLevel0Fn("FIXME: need we an AI callback?\n");
 		}
 		unit->Orders[0].Action = UnitActionStill;

@@ -85,7 +85,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 
 	NotifyPlayer(player, NotifyGreen, unit->X, unit->Y,
 	    "Upgrade to %s complete", unit->Type->Name);
-	if (unit->Player->Ai) {
+	if (unit->Player->AiEnabled) {
 	    AiUpgradeToComplete(unit, type);
 	}
 	unit->Reset = unit->Wait = 1;

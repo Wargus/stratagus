@@ -878,7 +878,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
     //
     //	Ai cast should be a lot better. Use autocast if not found.
     //
-    if (caster->Player->Ai && spell->AICast) {
+    if (caster->Player->AiEnabled && spell->AICast) {
 	DebugLevel3Fn("The borg uses AI autocast XP.\n");
 	autocast = spell->AICast;
     } else {
