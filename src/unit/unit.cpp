@@ -546,7 +546,7 @@ global void PlaceUnit(Unit* unit, int x, int y)
 
     MustRedraw |= RedrawMinimap;
     CheckUnitToBeDrawn(unit);
-    UnitMarkSeen(unit);
+    UnitCountSeen(unit);
 }
 
 /**
@@ -1030,90 +1030,134 @@ global int BuildingVisibleOnMap(const Unit* unit)
 }
 
 /**
-**	FIXME: docu
+** 	This function fills in the Seen fields of an unit from current fields.
+**	To be called when unit goes out of view.
+** 
+** 	@param unit	The unit to work on
+*/
+local void FillSeenValues(Unit* unit)
+{
+    //	Seen values are undefined for visible units.
+    unit->SeenIY = unit->IY;
+    unit->SeenIX = unit->IX;
+    unit->SeenFrame = unit->Frame;
+    unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
+	((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
+    if (unit->Orders[0].Action == UnitActionDie) {
+	unit->SeenState = 3;
+    }
+    unit->SeenType = unit->Type;
+    unit->SeenConstructed = unit->Constructed;
+    unit->SeenDestroyed = unit->Destroyed;
+    unit->SeenCFrame = unit->Data.Builded.Frame;
+}
+
+/**
+**	This function marks units on x, y as seen. It uses a reference count.
 **
 **	@param x	x location to check if building is on, and mark as seen
 **	@param y	y location to check if building is on, and mark as seen
 */
-global void UnitsMarkSeen(int x, int y)
+global void UnitsMarkSeen(const Player* player, int x, int y)
 {
     int n;
     Unit* units[UnitMax];
     Unit* unit;
 
-    if (IsMapFieldVisible(ThisPlayer, x, y)) {
-	n = SelectUnitsOnTile(x, y,units);
-	DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
-	// FIXME: need to handle Dead buldings
-	while (n) {
-	    unit = units[n - 1];
-	    if (unit->SeenFrame == UnitNotSeen) {
-		DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_
-		    unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
-	    }
-	    unit->SeenIY = unit->IY;
-	    unit->SeenIX = unit->IX;
-	    unit->SeenFrame = unit->Frame;
-	    unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
-		((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
-	    if (unit->Orders[0].Action == UnitActionDie) {
-		unit->SeenState = 3;
-	    }
-	    if (unit->SeenState == 2) {
-		unit->SeenType = unit->Orders[0].Type;
-	    } else {
-		unit->SeenType = unit->Type;
-	    }
-	    unit->SeenConstructed = unit->Constructed;
-	    unit->SeenDestroyed = unit->Destroyed;
-	    --n;
+    n = SelectUnitsOnTile(x, y,units);
+    DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
+    while (n) {
+	unit = units[n - 1];
+	if (unit->SeenFrame == UnitNotSeen) {
+	    DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_
+		unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
 	}
+	unit->VisCount[player->Player]++;
+	--n;
     }
 }
 
 /**
-**	FIXME: docu
+**	This function unmarks units on x, y as seen. It uses a reference count.
+**
+**	@param x	x location to check if building is on, and mark as seen
+**	@param y	y location to check if building is on, and mark as seen
+*/
+global void UnitsUnmarkSeen(const Player* player, int x, int y)
+{
+    int n;
+    Unit* units[UnitMax];
+    Unit* unit;
+
+    n = SelectUnitsOnTile(x, y,units);
+    DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
+    while (n) {
+	unit = units[n - 1];
+	DebugCheck(!unit->VisCount[player->Player]);
+	unit->VisCount[player->Player]--;
+	//
+	//	Check if building goes under FOW.
+	//
+	if (!unit->VisCount[player->Player]) {
+	    DebugLevel3Fn("unit %d at %d,%d is now under fog time %lu.\n" _C_
+		unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
+	    if (player == ThisPlayer) {
+		FillSeenValues(unit);
+	    }
+	}
+	--n;
+    }
+}
+
+
+/**
+**	Makes an unit count it's visibility again.
 **
 **	@param unit	pointer to the unit to check if seen
 */
-global void UnitMarkSeen(Unit* unit)
+global void UnitCountSeen(Unit* unit)
 {
     int x;
     int y;
+    int p;
+    int oldv;
+    int newv;
 
-    // Update Building Seen
-    if (!unit->Type) {
-	DebugLevel0Fn("UnitMarkSeen: Type is NULL\n");
-	return;
-    }
-    for (x = 0; x < unit->Type->TileWidth; ++x) {
-	for (y = 0; y < unit->Type->TileHeight; ++y) {
-	    if (IsMapFieldVisible(ThisPlayer, unit->X + x, unit->Y + y)) {
-		unit->SeenIY = unit->IY;
-		unit->SeenIX = unit->IX;
-		if (unit->SeenFrame == UnitNotSeen) {
-		    DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_
-			unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
+    DebugCheck(!unit->Type);
+
+    //	FIXME: optimize, only work on certain players?
+    //	This is for instance good for updating shared vision...
+    for (p = 0; p < PlayerMax; ++p) {
+	//
+	//	First calculate the new visibility count.
+	//
+	oldv = unit->VisCount[p];
+	newv = 0;
+	for (x = 0; x < unit->Type->TileWidth; ++x) {
+	    for (y = 0; y < unit->Type->TileHeight; ++y) {
+		if (IsMapFieldVisible(&Players[p], unit->X + x, unit->Y + y)) {
+		    newv++;
 		}
-		unit->SeenFrame = unit->Frame;
-		unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
-		    ((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
-		if (unit->Orders[0].Action == UnitActionDie) {
-		    unit->SeenState = 3;
-		}
-		if (unit->SeenState == 2) {
-		    unit->SeenType = unit->Orders[0].Type;
-		} else {
-		    unit->SeenType = unit->Type;
-		}
-		unit->SeenConstructed = unit->Constructed;
-		unit->SeenDestroyed = unit->Destroyed;
-		x = unit->Type->TileWidth;
-		y = unit->Type->TileHeight;
-		//  If we found one visible square, END.
-		break;
 	    }
 	}
+#ifdef DEBUG
+	if ((oldv == 0) && (newv)) {
+	    DebugLevel3Fn("unit %d(%s) at %d,%d popped into player %d's sight at cycle %lu.\n" _C_
+		    unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y _C_ p _C_ GameCycle);
+	}
+#endif
+	//
+	//	If the unit goes out of sight we have to fill in seen data.
+	//
+	if ((oldv) && (newv == 0)) {
+	    DebugLevel3Fn("unit %d(%s) at %d,%d got out of player %d's sight at cycle %lu.\n" _C_
+		    unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y _C_ p _C_ GameCycle);
+	    if (p == ThisPlayer->Player) {
+		FillSeenValues(unit);
+	    }
+	}
+	//  Now set the new visibility count
+	unit->VisCount[p] = newv;
     }
 }
 
@@ -2867,16 +2911,16 @@ global void LetUnitDie(Unit* unit)
 	    DeadBuildingCacheInsert(unit);	//Insert into corpse list
 	    // FIXME: (mr-russ) Hack to make sure we see our own building destroyed
 	    MapMarkUnitSight(unit);
-	    UnitMarkSeen(unit);
+	    UnitCountSeen(unit);
 	    MapUnmarkUnitSight(unit);
-	    UnitMarkSeen(unit);
+	    UnitCountSeen(unit);
 	    return;
 	}
 
 	// no corpse available
 	// FIXME: (mr-russ) Hack to make sure we see our own building destroyed
 	MapMarkUnitSight(unit);
-	UnitMarkSeen(unit);
+	UnitCountSeen(unit);
 	MapUnmarkUnitSight(unit);
 	ReleaseUnit(unit);
 	return;
@@ -3516,14 +3560,13 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     char* ref;
     Unit* uins;
     int i;
+    ConstructionFrame* cframe;
+    int frame;
 
     CLprintf(file, "\n(unit %d ", UnitNumber(unit));
 
     // 'type and 'player must be first, needed to create the unit slot
     CLprintf(file, "'type '%s ", unit->Type->Ident);
-    if (unit->SeenType) {
-	CLprintf(file, "'seen-type '%s ", unit->SeenType->Ident);
-    }
 
     CLprintf(file, "'player %d\n  ", unit->Player->Player);
 
@@ -3553,17 +3596,10 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     CLprintf(file, "'stats %d\n  ", unit->Player->Player);
 #endif
     CLprintf(file, "'pixel '(%d %d) ", unit->IX, unit->IY);
-    CLprintf(file, "'seen-pixel '(%d %d) ", unit->SeenIX, unit->SeenIY);
     CLprintf(file, "'%sframe %d ",
 	unit->Frame < 0 ? "flipped-" : "",
 	unit->Frame < 0 ? -unit->Frame : unit->Frame);
-    if (unit->SeenFrame != UnitNotSeen) {
-	CLprintf(file, "'%sseen %d ",
-	    unit->SeenFrame < 0 ? "flipped-" : "",
-	    unit->SeenFrame < 0 ? -unit->SeenFrame : unit->SeenFrame);
-    } else {
-	CLprintf(file, "'not-seen ");
-    }
+
     CLprintf(file, "'direction %d\n  ", unit->Direction);
     CLprintf(file, "'attacked %lu\n ", unit->Attacked);
     CLprintf(file, " 'current-sight-range %d", unit->CurrentSightRange);
@@ -3572,9 +3608,6 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     }
     if (unit->Destroyed) {
 	CLprintf(file, " 'destroyed");
-    }
-    if (unit->SeenDestroyed) {
-	CLprintf(file, " 'seen-destroyed");
     }
     if (unit->Removed) {
 	CLprintf(file, " 'removed");
@@ -3603,13 +3636,48 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     if (unit->Constructed) {
 	CLprintf(file, " 'constructed");
     }
-    if (unit->SeenConstructed) {
-	CLprintf(file, " 'seen-constructed");
-    }
-    CLprintf(file, " 'seen-state %d ", unit->SeenState);
     if (unit->Active) {
 	CLprintf(file, " 'active");
     }
+
+    //
+    //	Now save Seen stuff.
+    //
+    CLprintf(file, "\n  'vis-count #(%d", unit->VisCount[0]);
+    for (i = 1; i < PlayerMax; ++i) {
+	CLprintf(file, " %d", unit->VisCount[i]);
+    }
+    CLprintf(file, ")\n  ");
+    if (unit->VisCount[ThisPlayer->Player]==0 && unit->Type->VisibleUnderFog) {
+	CLprintf(file, "'seen-pixel '(%d %d) ", unit->SeenIX, unit->SeenIY);
+	if (unit->SeenType) {
+	    CLprintf(file, "'seen-type '%s ", unit->SeenType->Ident);
+	}
+	if (unit->SeenFrame != UnitNotSeen) {
+	    CLprintf(file, "'%sseen %d ",
+		unit->SeenFrame < 0 ? "flipped-" : "",
+		unit->SeenFrame < 0 ? -unit->SeenFrame : unit->SeenFrame);
+	} else {
+	    CLprintf(file, "'not-seen ");
+	}
+	if (unit->SeenConstructed) {
+	    CLprintf(file, " 'seen-constructed");
+	}
+	if (unit->SeenDestroyed) {
+	    CLprintf(file, " 'seen-destroyed");
+	}
+	CLprintf(file, " 'seen-state %d ", unit->SeenState);
+	if (unit->Orders->Action == UnitActionBuilded) {
+	    cframe = unit->Type->Construction->Frames;
+	    frame = 0;
+	    while (cframe != unit->SeenCFrame) {
+		cframe = cframe->Next;
+		++frame;
+	    }
+	    CLprintf(file," 'seen-construction-frame %d");
+	}
+    }
+
     CLprintf(file, " 'mana %d", unit->Mana);
     CLprintf(file, " 'hp %d", unit->HP);
     CLprintf(file, " 'xp %d", unit->XP);
@@ -3684,9 +3752,6 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	    break;
 	case UnitActionBuilded:
 	    {
-		ConstructionFrame* cframe;
-		int frame;
-
 		cframe = unit->Type->Construction->Frames;
 		frame = 0;
 		while (cframe != unit->Data.Builded.Frame) {

@@ -1551,6 +1551,12 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
     const UnitStats* stats;
     int r;
 
+#if 0 // This is for showing vis counts.
+    char buf[10];
+    sprintf(buf, "%d", unit->VisCount[ThisPlayer->Player]);
+    VideoDrawTextClip(x + 10, y + 10, 1, buf);
+#endif
+
     stats = unit->Stats;
 
     //
@@ -1725,11 +1731,9 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 **	@param x	X position.
 **	@param y	Y position.
 */
-local void DrawConstruction(const Unit* unit, int frame, int x, int y)
+local void DrawConstruction(const Unit* unit, ConstructionFrame* cframe,
+	Graphic* sprite, int frame, int x, int y)
 {
-    ConstructionFrame* cframe;
-
-    cframe = unit->Data.Builded.Frame;
     if (cframe->File == ConstructionFileConstruction) {
 	const Construction* construction;
 
@@ -1741,25 +1745,13 @@ local void DrawConstruction(const Unit* unit, int frame, int x, int y)
     } else {
 	x -= unit->Type->TileWidth * TileSizeX / 2;
 	y -= unit->Type->TileHeight * TileSizeY / 2;
-	GraphicUnitPixels(unit, unit->Type->Sprite);
-	DrawUnitType(unit->Type, unit->Type->Sprite, frame, x, y);
+	GraphicUnitPixels(unit, sprite);
+	DrawUnitType(unit->Type, sprite, frame, x, y);
 #ifdef USE_OPENGL
 	DrawUnitPlayerColor(unit->Type, unit->Player->Player, frame, x, y);
 #endif
     }
 }
-
-/*
-**	Units on map:
-**
-**	1) Must draw underground/underwater units. (FUTURE extension)
-**	2) Must draw buildings and corpse.
-**	3) Must draw land/sea units.
-**	4) Must draw decoration units. (FUTURE extension)
-**	5) Must draw low air units.
-**	6) Must draw middle air units. (FUTURE extension)
-**	7) Must draw hight air units. (FUTURE extension)
-*/
 
 /**
 **	Draw unit on map.
@@ -1773,6 +1765,7 @@ global void DrawUnit(const Unit* unit)
     int frame;
     int state;
     int constructed;
+    ConstructionFrame* cframe;
     Graphic* sprite;
     ResourceInfo* resinfo;
     const UnitType* type;
@@ -1782,23 +1775,36 @@ global void DrawUnit(const Unit* unit)
 	return;
     }
 
-    if (ReplayRevealMap || !unit->Type->VisibleUnderFog) {
+    //
+    //	This should be obviousely false.
+    //
+    DebugCheck(unit->VisCount[ThisPlayer->Player] >
+	    unit->Type->TileWidth * unit->Type->TileHeight);
+    //
+    //	If we are in replay reveal map or the unit is visible(not under fog).
+    //
+    if (ReplayRevealMap || unit->VisCount[ThisPlayer->Player]) {
 	type = unit->Type;
 	frame = unit->Frame;
-	y = unit->IY;
 	x = unit->IX;
+	y = unit->IY;
 	state = (unit->Orders[0].Action == UnitActionBuilded) |
 	    ((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 	constructed = unit->Constructed;
+	//  This is trash unless the unit is building... but we only
+	//  use it if it's building.
+	cframe = unit->Data.Builded.Frame;
     } else {
-	y = unit->SeenIY;
-	x = unit->SeenIX;
-	frame = unit->SeenFrame;
 	type = unit->SeenType;
-	constructed = unit->SeenConstructed;
+	frame = unit->SeenFrame;
+	x = unit->SeenIX;
+	y = unit->SeenIY;
 	state = unit->SeenState;
+	constructed = unit->SeenConstructed;
+	cframe = unit->SeenCFrame;
     }
 
+    DebugCheck(!type);
     if (frame == UnitNotSeen) {
 	DebugLevel0Fn("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
 	    unit->Slot _C_ GameCycle);
@@ -1824,12 +1830,12 @@ global void DrawUnit(const Unit* unit)
     //
     DrawUnitSelection(unit);
 
-    GraphicUnitPixels(unit, type->Sprite);
+    sprite = type->Sprite;
+    GraphicUnitPixels(unit, sprite);
 
     //
     //	Adjust sprite for Harvesters.
     //
-    sprite = type->Sprite;
     if (type->Harvester && unit->CurrentResource) {
 	resinfo = type->ResInfo[unit->CurrentResource];
 	if (unit->Value) {
@@ -1849,7 +1855,7 @@ global void DrawUnit(const Unit* unit)
     //
     if (state == 1) {
 	if (constructed) {
-	    DrawConstruction(unit, frame,
+	    DrawConstruction(unit, cframe, sprite, frame,
 		x + (type->TileWidth * TileSizeX) / 2,
 		y + (type->TileHeight * TileSizeY) / 2);
 	}
@@ -1859,6 +1865,8 @@ global void DrawUnit(const Unit* unit)
     } else if (state == 2) {
 	// FIXME: this frame is hardcoded!!!
 	GraphicUnitPixels(unit, type->Sprite);
+/*	DebugLevel0Fn("building in upgrade, frame %d t %s g %X\n" _C_
+		(frame < 0 ? -1 :1) _C_ type->Name _C_ (unsigned int)type->Sprite);*/
 	DrawUnitType(type, sprite, frame < 0 ? -1 : 1, x, y);
 #ifdef USE_OPENGL
 	DrawUnitPlayerColor(type, unit->Player->Player,

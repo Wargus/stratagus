@@ -206,6 +206,12 @@
 **		Unit::Visible&(1<<player-nr) is non-zero, the unit could be
 **		seen on the map.
 **
+**	Unit::VisCount[PlayerMax]
+**
+**		Used to keep track of visible units on the map, it counts the
+**		Number of seen tiles for each player. This is only modified
+**		in UnitsMarkSeen and UnitsUnmarkSeen, from fow.
+**
 **	Unit::Destroyed
 **
 **	FIXME: @todo
@@ -228,6 +234,9 @@
 **	Unit::SeenConstructed
 **		Last seen state of construction.  Used to draw correct building
 **		frame. See Unit::Constructed for more information.
+**
+**	Unit::SeenCFrame
+**		Seen construction frame. This gets copied from Data.Builded.Frame
 **
 **	Unit::SeenState
 **		The Seen State of the building.
@@ -503,7 +512,6 @@ struct _unit_ {
     int		Y;			/// Map position Y
 
     UnitType*	Type;			/// Pointer to unit-type (peon,...)
-    UnitType*	SeenType;		/// Pointer to last seen unit-type
     Player*     Player;			/// Owner of this unit
     UnitStats*	Stats;			/// Current unit stats
     int		CurrentSightRange;	/// Unit's Current Sight Range
@@ -513,9 +521,15 @@ struct _unit_ {
     signed char	IX;			/// X image displacement to map position
     signed char	IY;			/// Y image displacement to map position
     int		Frame;			/// Image frame: <0 is mirrored
+    
     int		SeenFrame;		/// last seen frame/stage of buildings
-    signed char	SeenIX;			/// Seen X image displacement to map position
-    signed char	SeenIY;			/// seen Y image displacement to map position
+    UnitType*	SeenType;		/// Pointer to last seen unit-type
+    signed char	SeenIX;			/// Unit seen X image displacement to map position
+    signed char	SeenIY;			/// Unit seen Y image displacement to map position
+    unsigned	SeenConstructed : 1;	/// Unit seen construction
+    unsigned	SeenState : 3;		/// Unit seen build/upgrade state
+    unsigned	SeenDestroyed : 1;	/// Unit seen destroyed or not
+    ConstructionFrame* SeenCFrame;	/// Unit seen construction frame
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 
@@ -526,11 +540,9 @@ struct _unit_ {
     unsigned	Removed : 1;		/// unit is removed (not on map)
     unsigned	Selected : 1;		/// unit is selected
 
+    unsigned char VisCount[PlayerMax];  /// Unit visibility counts.
     unsigned	Visible : 16;		/// Unit is visible (submarine)
     unsigned	Constructed : 1;	/// Unit is in construction
-    unsigned	SeenConstructed : 1;	/// Unit seen construction
-    unsigned	SeenState : 3;		/// Unit seen build/upgrade state
-    unsigned	SeenDestroyed : 1;	/// Unit seen destroyed or not
     unsigned	Active : 1;		/// Unit is active for AI
     Player*     RescuedFrom;            /// The original owner of a rescued unit.
     					/// NULL if the unit was not rescued.
@@ -764,10 +776,12 @@ extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if building is known on the map
 extern int BuildingVisibleOnMap(const Unit* unit);
 
-    /// Updates seen data
-extern void UnitsMarkSeen(int x, int y);
-    /// Checks and updates if a Unit's seen information
-extern void UnitMarkSeen(Unit* unit);
+    /// Marks unit seen. (increases visibility count)
+extern void UnitsMarkSeen(const Player* player, int x, int y);
+    /// Unmarks unit seen. (decreases visibility count)
+extern void UnitsUnmarkSeen(const Player* player, int x, int y);
+    /// Calculated an unit's seen information itself
+extern void UnitCountSeen(Unit* unit);
     /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
 
