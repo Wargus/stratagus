@@ -3430,8 +3430,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - (40+20*1)) / -20 ) * 100 / (nitems - 11 - 3);
 	    break;
 	case 1:		// mouse - move
-	    if ((mi[1].d.vslider.cflags&MI_CFLAGS_KNOB) &&
-	        (mi[1].flags&MenuButtonClicked)) {
+	    if ((mi[1].d.vslider.cflags&MI_CFLAGS_KNOB) && (mi[1].flags&MenuButtonClicked)) {
 		int ys;
 		// ARI: FIXME: No floats please, John!!!
 		float f;
@@ -3440,8 +3439,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 		ys = ((int)(f * (nitems-11-3) + .5f) / 100) * -20 + (40+20*1);
 		for (j=3; j < nitems; ++j) {
 		    KeystrokeHelpMenuItems[j].yofs = ys + (j-3)*20;
-		    if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) ||
-		        (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
+		    if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
 			KeystrokeHelpMenuItems[j].mitype = 0;
 		    else
 			KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
@@ -4036,6 +4034,7 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
 
 /**
 **	Player selectors have changed.
+**	Caution - will be called by network events from clients!
 */
 local void MultiGamePlayerSelectorsUpdate(int initial)
 {
@@ -4043,12 +4042,19 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     int ready;
 
     //	FIXME: What this has to do:
-    //	analyze pudinfo for available slots,
     //	disable additional buttons - partially done
-    //	put names of net-connected players in slots
     //	announce changes by the game creator to connected clients
 
-    for (ready = c = h = i = 0; i < PlayerMax; i++) {
+    DebugLevel0Fn("initial = %d\n", initial);
+
+    if (initial == 1) {
+	NetMultiSetupMenuItems[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
+	NetMultiSetupMenuItems[SERVER_PLAYER_STATE].yofs = 32;
+	memset(&ServerSetupState, 0, sizeof(ServerSetup));
+    }
+
+    //	Calculate available slots from pudinfo
+    for (c = h = i = 0; i < PlayerMax; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available person player slots
 	}
@@ -4057,54 +4063,50 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	}
     }
 
-    //	Tell connect state machines how many person player we can have
+    //	Tell connect state machines how many interactive players we can have
     NetPlayers = h;
 
-    if (initial) {
-	NetMultiSetupMenuItems[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
-	NetMultiSetupMenuItems[SERVER_PLAYER_STATE].yofs = 32;
-	memset(&ServerSetupState, 0, sizeof(ServerSetup));
-    }
-
     // Setup the player menu
-    for (i = 1; i < PlayerMax-1; i++) {
-	if (initial) {
-	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] =
-		NetMultiButtonStorage[0];
-	} else {
-	    if (Hosts[i].PlyNr) {	// Our own server slot
-		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] =
-			NetMultiButtonStorage[1];
-	    } else {
-		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] =
-			NetMultiButtonStorage[0];
-		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i]
-			.d.pulldown.state = 0;
-	    }
+    for (ready = i = 1; i < PlayerMax-1; i++) {
+	if (i >= h && initial == 1) {
+	    ServerSetupState.CompOpt[i] = 1;
 	}
+	if (initial == 2 && (NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].flags&MenuButtonClicked)) {
+	    // don't allow net events to interfere with server player action on pulldown buttons!
+	    continue;
+	}
+	if (Hosts[i].PlyNr) {
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[1];
+	    if (ServerSetupState.Ready[i]) {
+		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state |=
+		    MI_GSTATE_CHECKED;
+	    } else {
+		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state &=
+		    ~MI_GSTATE_CHECKED;
+	    }
+	} else {
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[0];
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = 0;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+	}
+
 	NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].yofs = 32 + (i&7) * 22;
-	if( i>7 ) {
+	if (i > 7) {
 	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].xofs = 320 + 40;
 	}
 
 	// FIXME: don't forget to throw out additional players
 	//	without available slots here!
 
-	if (initial) {
-	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = 0;
-	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state =
-		MI_GSTATE_PASSIVE;
-
+	if (initial == 1) {
 	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags = 0;
-	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].d.gem.state =
-		MI_GSTATE_PASSIVE;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = 0;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
 	}
+
 	if (i >= h) {
-	    if (initial) {
-		ServerSetupState.CompOpt[i] = 1;
-	    }
-	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = 
-		ServerSetupState.CompOpt[i];
 	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = 
 		MI_PSTATE_PASSIVE;
 
@@ -4130,9 +4132,11 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    ++ready;
 	}
     }
+
     // Check if all players are ready.
-    if( ready + 1 == h ) {
+    if (ready == h) {
 	NetMultiSetupMenuItems[3].flags = 0;	// enable start game button
+	DebugLevel0Fn("READY to START!\n");
     }
 }
 
@@ -4416,7 +4420,7 @@ global int NetClientSelectScenario(void)
 
 global void NetConnectForceDisplayUpdate(void)
 {
-    MultiGamePlayerSelectorsUpdate(0);
+    MultiGamePlayerSelectorsUpdate(2);
     MustRedraw |= RedrawMenu;
 }
 
