@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade.c	-	The upgrade/allow functions. */
+/**@name upgrade.c - The upgrade/allow functions. */
 //
 //      (c) Copyright 1999-2004 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
@@ -821,7 +821,6 @@ local int CclDefineModifier(lua_State* l)
 		} else {
 			lua_pushfstring(l, "wrong tag: %s", temp);
 			lua_error(l);
-			return 0;
 		}
 	}
 
