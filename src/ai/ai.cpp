@@ -198,7 +198,7 @@ local void debugForces(void)
     aiaction = AiPlayer->FirstEvaluation;
     while (aiaction) {
 	str = gh_scm2newstr(gh_car(gh_car(aiaction->AiScriptAction->Action)),NULL);
-	DebugLevel2(" %8d: (%3d,%3d) => points:%9d, needs: %9d ( %s )\n" _C_
+	DebugLevel2(" %8lu: (%3d,%3d) => points:%9d, needs: %9d ( %s )\n" _C_
 	    aiaction->GameCycle _C_
 	    aiaction->HotSpotX _C_
 	    aiaction->HotSpotY _C_
