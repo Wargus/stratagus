@@ -328,6 +328,7 @@ static void VorbisStreamFree(Sample* sample)
 		ogg_stream_clear(&data->vstream);
 		theora_comment_clear(&data->tcomment);
 		theora_info_clear(&data->tinfo);
+		theora_clear(&data->tstate);
 	}
 #endif
 
