@@ -944,8 +944,6 @@ extern int NumUnitTypes;                    ///< Number of unit-types made
 extern UnitType*UnitTypeHumanWall;          ///< Human wall
 extern UnitType*UnitTypeOrcWall;            ///< Orc wall
 
-extern char** UnitTypeWcNames;              ///< Mapping wc-number 2 symbol
-
 /**
 **  Variable info for unit and unittype.
 */
@@ -970,7 +968,6 @@ extern void UnitTypeCclRegister(void);          ///< Register ccl features
 
 extern void UpdateStats(int reset_to_default);  ///< Update unit stats
 extern UnitType* UnitTypeByIdent(const char*);  ///< Get unit-type by ident
-extern UnitType* UnitTypeByWcNum(unsigned);     ///< Get unit-type by wc number
 extern int GetVariableIndex(const char *VarName); ///< Get index of the variable
 
 	/// Get the animations structure by ident

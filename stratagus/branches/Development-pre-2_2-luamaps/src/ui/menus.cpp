@@ -4492,7 +4492,7 @@ static void EditorNewMap(void)
 
 	description[strlen(description) - 3] = '\0';
 	TheMap.Info.Description = strdup(description);
-	TheMap.Info.MapTerrain = menu->Items[7].D.Pulldown.curopt;
+	TheMap.Info.MapTerrainName = Tilesets[menu->Items[7].D.Pulldown.curopt]->Ident;
 	TheMap.Info.MapWidth = atoi(width);
 	TheMap.Info.MapHeight = atoi(height);
 
@@ -5048,7 +5048,7 @@ static void EditorMapPropertiesMenu(void)
 	sprintf(size, "%d x %d", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 	menu->Items[4].D.Text.text = size;
 
-	menu->Items[6].D.Pulldown.defopt = TheMap.Terrain;
+	menu->Items[6].D.Pulldown.defopt = TheMap.Info.MapTerrain;
 
 	// FIXME: Set the correct pud version
 	menu->Items[8].D.Pulldown.defopt = 1;
@@ -5089,7 +5089,6 @@ static void EditorMapPropertiesOk(void)
 		TheMap.Info.MapTerrain = menu->Items[6].D.Pulldown.curopt;
 		free(TheMap.Info.MapTerrainName);
 		TheMap.Info.MapTerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
-		TheMap.Terrain = TheMap.Info.MapTerrain;
 		free(TheMap.TerrainName);
 		TheMap.TerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
 		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];

@@ -273,8 +273,6 @@ typedef struct _world_map_ {
 	unsigned char NoFogOfWar;  ///< fog of war disabled
 
 	char* TerrainName;         ///< terrain as name
-	// TODO: terrain nr. should be removed?
-	int      Terrain;          ///< terrain type (summer,winter,...)
 	struct _tileset_* Tileset; ///< tileset data
 
 	struct _graphic_* TileGraphic; ///< graphic for all the tiles

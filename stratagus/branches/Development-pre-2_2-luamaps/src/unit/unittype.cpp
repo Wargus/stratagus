@@ -75,12 +75,6 @@ int NumUnitTypes;                   ///< number of unit-types made
 UnitType* UnitTypeHumanWall;       ///< Human wall
 UnitType* UnitTypeOrcWall;         ///< Orc wall
 
-/**
-**  Mapping of W*rCr*ft number to our internal unit-type symbol.
-**  The numbers are used in puds.
-*/
-char** UnitTypeWcNames;
-
 #ifdef DOXYGEN // no real code, only for document
 
 /**
@@ -332,37 +326,11 @@ void SaveUnitTypes(CLFile* file)
 {
 	int i;
 	int j;
-// char** sp;
 
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: unittypes $Id$\n\n");
-#if 0
-	// Original number to internal unit-type name.
 
-	i = CLprintf(file, "(define-unittype-wc-names");
-	for (sp = UnitTypeWcNames; *sp; ++sp) {
-		if (i + strlen(*sp) > 79) {
-			i = CLprintf(file, "\n ");
-		}
-		i += CLprintf(file, " '%s", *sp);
-	}
-	CLprintf(file, ")\n");
-
-	// Save all animations.
-
-	for (i = 0; i < NumUnitTypes; ++i) {
-		SaveAnimations(UnitTypes[i], file);
-	}
-
-	// Save all types
-
-	for (i = 0; i < NumUnitTypes; ++i) {
-		CLprintf(file, "\n");
-		SaveUnitType(file, UnitTypes[i], 0);
-	}
-#endif
 	// Save all stats
-
 	for (i = 0; i < NumUnitTypes; ++i) {
 		CLprintf(file, "\n");
 		for (j = 0; j < PlayerMax; ++j) {
@@ -386,18 +354,6 @@ UnitType* UnitTypeByIdent(const char* ident)
 
 	type = (UnitType* const*)hash_find(UnitTypeHash, ident);
 	return type ? *type : 0;
-}
-
-/**
-**  Find unit-type by wc number.
-**
-**  @param num  The unit-type number used in f.e. puds.
-**
-**  @return     Unit-type pointer.
-*/
-UnitType* UnitTypeByWcNum(unsigned num)
-{
-	return UnitTypeByIdent(UnitTypeWcNames[num]);
 }
 
 /**
@@ -541,10 +497,8 @@ void LoadUnitTypeSprite(UnitType* type)
 		}
 	}
 
-	file = type->File[TheMap.Terrain];
-	if (!file) { // default one
-		file = type->File[0];
-	}
+	file = type->File[0];
+
 	if (file) {
 		type->Sprite = NewGraphic(file, type->Width, type->Height);
 		LoadGraphic(type->Sprite);
@@ -626,25 +580,12 @@ void LoadUnitTypes(void)
 void CleanUnitTypes(void)
 {
 	UnitType* type;
-	char** ptr;
 	int i;
 	int j;
 	int res;
 	Animations* anims;
 
 	DebugPrint("FIXME: icon, sounds not freed.\n");
-
-	//
-	//  Mapping the original unit-type numbers in puds to our internal strings
-	//
-	if ((ptr = UnitTypeWcNames)) { // Free all old names
-		while (*ptr) {
-			free(*ptr++);
-		}
-		free(UnitTypeWcNames);
-
-		UnitTypeWcNames = NULL;
-	}
 
 	// FIXME: scheme contains references on this structure.
 	// Clean all animations.

@@ -108,7 +108,6 @@ void LoadTileset(void)
 		fprintf(stderr, "Tileset `%s' not available\n", TheMap.TerrainName);
 		ExitFatal(-1);
 	}
-	Assert(i == TheMap.Terrain);
 
 	if (!Tilesets[i]->Table) {
 		char buf[1024];

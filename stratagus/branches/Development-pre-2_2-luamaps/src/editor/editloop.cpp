@@ -1795,7 +1795,6 @@ static void EditorCallbackExit(void)
 static void CreateEditor(void)
 {
 	int i;
-	int n;
 	char* file;
 	char buf[PATH_MAX];
 	CLFile* clf;
@@ -1845,7 +1844,6 @@ static void CreateEditor(void)
 		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
 
-		TheMap.Terrain = TheMap.Info.MapTerrain;
 		TheMap.TerrainName = strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
 		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
 		LoadTileset();
@@ -1875,26 +1873,11 @@ static void CreateEditor(void)
 			if (SelectedPlayer == PlayerNumNeutral) {
 				SelectedPlayer = i;
 			}
-#if 0
-			// FIXME: must support more races
-			switch (TheMap.Info.PlayerSide[i]) {
-				case PlayerRaceHuman:
-					MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-						UnitTypeByWcNum(WC_StartLocationHuman),
-						Players + i);
-					break;
-				case PlayerRaceOrc:
-					MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-						UnitTypeByWcNum(WC_StartLocationOrc),
-						Players + i);
-					break;
-			}
-#endif
 		} else if (Players[i].StartX | Players[i].StartY) {
 			DebugPrint("Player nobody has a start position\n");
 		}
 	}
-
+#if 0
 	if (!EditorUnitTypes) {
 		//
 		// Build editor unit-type tables.
@@ -1910,6 +1893,7 @@ static void CreateEditor(void)
 		}
 		MaxUnitIndex = n - 1;
 	}
+	#endif
 	CalculateMaxIconSize();
 	ShowUnitsToSelect = 1; // Show all units as default
 	ShowBuildingsToSelect = 1;

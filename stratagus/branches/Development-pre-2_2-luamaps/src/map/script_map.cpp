@@ -120,7 +120,7 @@ static int CclStratagusMap(lua_State* l)
 					for (i = 0; TilesetWcNames[i] &&
 						strcmp(value, TilesetWcNames[i]); ++i) {
 					}
-					TheMap.Terrain = i;
+					TheMap.Info.MapTerrain = i;
 					LoadTileset();
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
@@ -483,7 +483,7 @@ static int CclSelectTileset(lua_State* l)
 	for (i = 0; TilesetWcNames[i] &&
 		strcmp(tileset, TilesetWcNames[i]); ++i) {
 	}
-	TheMap.Terrain = i;
+	TheMap.Info.MapTerrain = i;
 	LoadTileset();
 
 	return 0;
@@ -508,7 +508,7 @@ static int CclSetTile(lua_State* l)
 	tile = LuaToNumber(l, 1);
 	w = LuaToNumber(l, 2);
 	h = LuaToNumber(l, 3);
-	tileset = Tilesets[TheMap.Terrain];
+	tileset = Tilesets[TheMap.Info.MapTerrain];
 
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = tileset->Table[tile];
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Value = 0;
