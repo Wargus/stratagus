@@ -220,7 +220,7 @@ global void InitVideoSdl(void)
 #endif
 #endif
 
-    DebugLevel0Fn("Video init ready %d %d\n",VideoDepth,VideoBpp);
+    DebugLevel3Fn("Video init ready %d %d\n",VideoDepth,VideoBpp);
 }
 
 /**
@@ -569,11 +569,11 @@ global void WaitEventsAndKeepSync(void)
 	    }
 	}
 
-#ifndef USE_WIN32
+#ifndef USE_SDLA
 	//
 	//	Sound
 	//
-	if( !SoundOff && !SoundThreadRunning ) {
+	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
 	    if( SoundFildes>maxfd ) {
 		maxfd=SoundFildes;
 	    }
@@ -596,11 +596,11 @@ global void WaitEventsAndKeepSync(void)
 	}
 
 	if( maxfd>0 ) {
-#ifndef USE_WIN32
+#ifndef USE_SDLA
 	    //
 	    //	Sound
 	    //
-	    if( !SoundOff && !SoundThreadRunning
+	    if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 
 			&& FD_ISSET(SoundFildes,&wfds) ) {
 		WriteSound();
 	    }
