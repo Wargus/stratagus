@@ -2198,7 +2198,27 @@ local SCM CclDefineMenu(SCM list)
 	    menu = malloc(sizeof(Menu));
 	    *(Menu **)hash_add(MenuHash,name) = menu;
 	} else {
-	    // FIXME: this doesn't free everything
+	    int i;
+	    int mitype;
+	    for (i=0; i<menu->nitems; ++i) {
+		mitype = menu->items[i].mitype;
+		if (mitype == MI_TYPE_TEXT) {
+		    if (menu->items[i].d.text.text) {
+			free(menu->items[i].d.text.text);
+		    }
+		} else if (mitype == MI_TYPE_BUTTON) {
+		    if (menu->items[i].d.button.text) {
+			free(menu->items[i].d.button.text);
+		    }
+		} else if (mitype == MI_TYPE_PULLDOWN) {
+		    int j;
+		    j = menu->items[i].d.pulldown.noptions-1;
+		    for (; j>=0; --j) {
+			free(menu->items[i].d.pulldown.options[j]);
+		    }
+		    free(menu->items[i].d.pulldown.options);
+		}
+	    }
 	    free(menu->items);
 	    menu->items = NULL;
 	}
@@ -2717,10 +2737,6 @@ local SCM CclDefineMenuItem(SCM list)
 			item->d.input.xsize=gh_scm2int(gh_car(gh_car(sublist)));
 			value=gh_cdr(gh_car(sublist));
 			item->d.input.ysize=gh_scm2int(gh_car(value));
-			sublist=gh_cdr(sublist);
-		    } else if ( gh_eq_p(value, gh_symbol2scm("text")) ) {
-			item->d.input.buffer=gh_scm2newstr(gh_car(sublist),NULL);
-			item->d.input.nch=strlen(item->d.input.buffer);
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
 	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
