@@ -1,0 +1,87 @@
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+
+What is FreeCraft?
+---- -- --- ------
+
+FreeCraft was formerly known as ALE Clone or Clone.
+
+It is a clone of a famous top one sold game for the PC and console.
+
+A realtime, fantasy strategy game for UNIX with X or Console or any Win32.
+
+It comes without graphics, sounds and documentation.
+You need the original game CD or the expansion CD to use FreeCraft.
+(With over 1 million sold copies this shouldn't be a big problem)
+
+What does FreeCraft?
+---- ---- --- ------
+
+All graphics and sounds are supported, you can walk, build and collect
+resources and attack.
+
+What is new?
+---- -- ----
+
+Many bug fixes. (like always)
+
+Can I help?
+--- - -----
+
+YES! I still need help!  (No artists out there?)
+
+There are many open projects:
+
+    Campain editor, Map editor, Sound editor, Ai editor.
+    Network code, AI code. (very important to get a better playable versions)
+    Make own graphics, music and sounds.
+    Debugging the existing code.
+
+If you want to help, download it and contact me. 
+
+What did FreeCraft need?
+---- --- --- ----- -----
+
+Linux X11 with 16bit server or Win32 with 16bit videomode, libpng, libz and
+the original game CD or expansion CD.
+
+Optional libguile, libpthreads, guile-gtk and gtk.
+
+Copying-policy:
+---------------
+
+Artistic license.
+
+Is there a home page?
+-- ----- - ---- -----
+
+You can look at my home page, containing mostly FreeCraft stuff.
+
+	http://user.exit.de/johns
+
+Where download FreeCraft?
+----- -------- --- ------
+
+ATTENTION: sunsite is renamed to metalab!
+
+I have uploaded the sources to ftp://metalab.unc.edu/pub/Linux/Incoming.
+It should go to ftp://metalab.unc.edu/pub/Linux/games/strategy.
+
+	The name is freecraft-"DATE".tar.gz.
+		(This version freecraft-000402.tar.gz)
+
+or from my home page:
+
+	http://user.exit.de/johns/
+
+	You find there also pre-releases of the next stable version.
+
+Much fun,
+The FreeCraft Project (aleclone@FreeCraft.org) and Johns (johns98@gmx.net)
