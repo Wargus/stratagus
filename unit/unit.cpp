@@ -2853,9 +2853,11 @@ global void LetUnitDie(Unit* unit)
 					type->TileHeight != type->CorpseType->TileHeight);
 			type = unit->Type = type->CorpseType;
 
+#ifdef DYNAMIC_LOAD
 			if (!type->Sprite) {
 				LoadUnitTypeSprite(type);
 			}
+#endif
 			unit->IX = (type->Width - VideoGraphicWidth(type->Sprite)) / 2;
 			unit->IY = (type->Height - VideoGraphicHeight(type->Sprite)) / 2;
 
