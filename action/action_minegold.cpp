@@ -10,7 +10,7 @@
 //
 /**@name action_minegold.c -	The mine gold action. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -59,7 +59,9 @@ local int MoveToGoldMine(Unit* unit)
     destu=unit->Command.Data.Move.Goal;
     if( destu && (destu->Destroyed || !destu->HP) ) {
 	DebugLevel1Fn("WAIT after goldmine destroyed %d\n",unit->Wait);
+#ifdef REFS_DEBUG
 	DebugCheck( !destu->Refs );
+#endif
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
@@ -78,9 +80,13 @@ local int MoveToGoldMine(Unit* unit)
     //
     // FIXME: hmmm... we're in trouble here.
     // we should check if there's still some gold left in the mine instead.
+#ifdef REFS_DEBUG
     DebugCheck( !destu->Refs );
+#endif
     --destu->Refs;
+#ifdef REFS_DEBUG
     DebugCheck( !destu->Refs );
+#endif
     unit->Command.Data.Move.Goal=NoUnitP;
 
     destu->Command.Data.GoldMine.Active++;
@@ -234,7 +240,9 @@ local int MoveToGoldDeposit(Unit* unit)
 
     destu=unit->Command.Data.Move.Goal;
     if( destu && (destu->Destroyed || !destu->HP) ) {
+#ifdef REFS_DEBUG
 	DebugCheck( !destu->Refs );
+#endif
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
@@ -254,9 +262,13 @@ local int MoveToGoldDeposit(Unit* unit)
 	return -1;
     }
 
+#ifdef REFS_DEBUG
     DebugCheck( !destu->Refs );
+#endif
     --destu->Refs;
+#ifdef REFS_DEBUG
     DebugCheck( !destu->Refs );
+#endif
 
     RemoveUnit(unit);
     unit->X=destu->X;
@@ -375,9 +387,13 @@ global void HandleActionMineGold(Unit* unit)
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
+#ifdef REFS_DEBUG
 			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+#endif
 			    --unit->Command.Data.Move.Goal->Refs;
+#ifdef REFS_DEBUG
 			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+#endif
 			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 		    }
@@ -409,9 +425,13 @@ global void HandleActionMineGold(Unit* unit)
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
+#ifdef REFS_DEBUG
 			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+#endif
 			    --unit->Command.Data.Move.Goal->Refs;
+#ifdef REFS_DEBUG
 			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+#endif
 			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 		    }

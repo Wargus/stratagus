@@ -84,15 +84,21 @@ local void LeaveTransporter(Unit* unit)
 	unit->Command.Data.Move.Goal=NoUnitP;
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
+#ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
+#endif
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
 	    return;
 	}
+#ifdef REFS_DEBUG
 	DebugCheck( !goal->Refs );
+#endif
 	--goal->Refs;
+#ifdef REFS_DEBUG
 	DebugCheck( !goal->Refs );
+#endif
 	for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
 	    if( goal==unit->OnBoard[i] ) {
 		goal->X=unit->X;

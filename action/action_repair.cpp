@@ -10,7 +10,7 @@
 //
 /**@name action_repair.c	-	The repair action. */
 //
-//	(c) Copyright 1999,2000 by Vladi Shabanski
+//	(c) Copyright 1999-2001 by Vladi Shabanski
 //
 //	$Id$
 
@@ -172,7 +172,9 @@ global int HandleActionRepair(Unit* unit)
 		if( goal ) {
 		    if( goal->Destroyed ) {
 			DebugLevel0Fn("destroyed unit\n");
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -183,9 +185,13 @@ global int HandleActionRepair(Unit* unit)
 		    } else if( !goal->HP ||
 				goal->Command.Action==UnitActionDie ) {
 
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			--goal->Refs;
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			// FIXME: should I clear this here?
 			unit->Command.Data.Move.Goal=goal=NULL;
 			unit->Command.Data.Move.DX=goal->X;
@@ -202,9 +208,13 @@ global int HandleActionRepair(Unit* unit)
 		} else if( err<0 ) {
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
 		    if( goal ) {		// release reference
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			goal->Refs--;
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			unit->Command.Data.Move.Goal=NoUnitP;
 		    }
 		    return 1;
@@ -229,7 +239,9 @@ global int HandleActionRepair(Unit* unit)
 		if( goal ) {
 		    if( goal->Destroyed ) {
 			DebugLevel0Fn("destroyed unit\n");
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -254,9 +266,13 @@ global int HandleActionRepair(Unit* unit)
 		//
 		if( !goal || goal->HP >= goal->Stats->HitPoints ) {
 		    if( goal ) {		// release reference
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			goal->Refs--;
+#ifdef REFS_DEBUG
 			DebugCheck( !goal->Refs );
+#endif
 			unit->Command.Data.Move.Goal=NULL;
 		    }
                     unit->Command.Action=UnitActionStill;
