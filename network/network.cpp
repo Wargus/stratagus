@@ -245,6 +245,7 @@
 #include "commands.h"
 #include "interface.h"
 #include "campaign.h"
+#include "master.h"
 
 //#define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
 
@@ -437,8 +438,8 @@ global void InitNetwork1(void)
 	}
     }
 
-#if 1
-    // FIXME: need a working interface check
+#ifdef BSD
+    // FIXME: need a working interface check for BSD
     NetworkNumInterfaces = 1;
 #else
     NetworkNumInterfaces = NetSocketAddr(NetworkFildes);
@@ -464,6 +465,8 @@ global void InitNetwork1(void)
 	DebugLevel0Fn("My host:port %d.%d.%d.%d:%d\n" _C_
 		NIPQUAD(ntohl(MyHost)) _C_ ntohs(MyPort));
     });
+
+    MasterInit();
 
     dl_init(CommandsIn);
     dl_init(CommandsOut);
@@ -673,6 +676,13 @@ global void NetworkEvent(void)
 	NetworkInSync = 0;
 	return;
     }
+
+    if (!strncmp(buf, "\xFF\xFF\xFF\xFFgetinfo", 11))
+    {
+	MasterProcessGetServerData(buf + 4, i - 4, NetLastHost, NetLastPort);
+	return;
+    }
+
     packet = (NetworkPacket *)buf;
     IfDebug( ++NetworkReceivedPackets );
 
