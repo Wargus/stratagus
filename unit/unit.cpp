@@ -3246,13 +3246,13 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
 
-    if( UnitVisibleOnMap(target) || ReplayRevealMap ) {
-	MakeLocalMissile(MissileTypeHit,
+    if( (UnitVisibleOnMap(target) || ReplayRevealMap) && DamageMissile ) {
+	MakeLocalMissile(MissileTypeByIdent(DamageMissile),
 		target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2,
 		target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2,
 		target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2+3,
 		target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2
-		-MissileTypeHit->Range)->Damage=-damage;
+		-MissileTypeByIdent(DamageMissile)->Range)->Damage=-damage;
     }
 
 #if 0
