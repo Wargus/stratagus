@@ -110,7 +110,9 @@ static void AddIcon(const char* ident, const char* tileset,
 		iconfile = malloc(sizeof(IconFile));
 		iconfile->FileName = strdup(file);
 		iconfile->Sprite = NULL;
+#ifdef USE_OPENGL
 		memset(iconfile->PlayerColorSprite, 0, sizeof(iconfile->PlayerColorSprite));
+#endif
 		*(IconFile**)hash_add(IconFileHash, iconfile->FileName) = iconfile;
 	}
 
@@ -210,7 +212,9 @@ void LoadIcons(void)
 				icon->File->Sprite = LoadSprite(file, icon->Width, icon->Height);
 			}
 			icon->Sprite = icon->File->Sprite;
+#ifdef USE_OPENGL
 			icon->PlayerColorSprite = icon->File->PlayerColorSprite;
+#endif
 			if (icon->Index >= (unsigned)icon->Sprite->NumFrames) {
 				DebugPrint("Invalid icon index: %s - %d\n" _C_
 					icon->Ident _C_ icon->Index);
