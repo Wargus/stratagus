@@ -1045,7 +1045,8 @@ global void DrawInfoPanel(void)
 	y+=16;
 	VideoDrawText(x,y,GameFont,"Cycle:");
 	VideoDrawNumber(x+48,y,GameFont,GameCycle);
-	VideoDrawNumber(x+110,y,GameFont,CYCLES_PER_SECOND*VideoSyncSpeed/100);
+	VideoDrawNumber(x+110,y,GameFont,
+	    CYCLES_PER_SECOND*VideoSyncSpeed/100);
 	y+=20;
 
 	for( i=0; i<PlayerMax; ++i ) {
