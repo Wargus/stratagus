@@ -387,10 +387,10 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
 		if( cx[0] < TheMap.Width && cy[0] >= 0) {
 		    marker(player,cx[0],cy[0],&TheMap.Fields[cx[0]+cy[0]*TheMap.Width].Visible[p]);
 		}
-		if( cx[1] >= 0 && cy[1] < TheMap.Height) {
+		if( cx[1] >= 0 && cy[1] >= 0) {
 		    marker(player,cx[1],cy[1],&TheMap.Fields[cx[1]+cy[1]*TheMap.Width].Visible[p]);
 		}
-		if( cx[2] >= 0 && cy[2] >= 0 ) {
+		if( cx[2] >= 0 && cy[2] < TheMap.Height ) {
 		    marker(player,cx[2],cy[2],&TheMap.Fields[cx[2]+cy[2]*TheMap.Width].Visible[p]);
 		}
 		if( cx[3] < TheMap.Width && cy[3] < TheMap.Height ) {
