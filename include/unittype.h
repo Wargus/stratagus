@@ -361,15 +361,19 @@
 **
 **		Food demand
 **
-**	UnitType::Stats[PlayerMax]
+**	UnitType::ImproveIncomes[::MaxCosts]
+**
+**		Gives the player an improved income.
+**
+**	UnitType::Stats[::PlayerMax]
 **
 **		Unit status for each player
-**	// FIXME: This stats should? be moved into the player struct
+**		FIXME: This stats should? be moved into the player struct
 **
 **	UnitType::Type
 **
 **		Type as number
-**	FIXME: Should us a general name f.e. Slot here?
+**		FIXME: Should us a general name f.e. Slot here?
 **
 **	UnitType::Property
 **
@@ -551,6 +555,8 @@ struct _unit_type_ {
     unsigned	Demand;			/// Food demand
 
 // --- FILLED UP ---
+
+    unsigned	ImproveIncomes[MaxCosts];/// Gives player an improved income
 
 	// FIXME: This stats should? be moved into the player struct
     UnitStats Stats[PlayerMax];		/// Unit status for each player

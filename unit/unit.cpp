@@ -609,7 +609,7 @@ global void UnitLost(Unit* unit)
     player=unit->Player;
 
     //
-    //	Call back to AI, for killed units.
+    //	Call back to AI, for killed or lost units.
     //
     if( player && player->Ai ) {
 	AiUnitKilled(unit);
@@ -634,64 +634,50 @@ global void UnitLost(Unit* unit)
 	player->NumFoodUnits-=type->Demand;
 	if( player==ThisPlayer ) {
 	    MustRedraw|=RedrawResources;	// update food
+	    // FIXME: MustRedraw |= RedrawFood;
 	}
-    }
-
-    if( unit->Orders[0].Action!=UnitActionBuilded ) {
-	player->UnitTypesCount[type->Type]--;
     }
 
     if( unit->Type->Building ) {
-	// FIXME: This should be complete rewritten
-	// FIXME: Slow and new members are available
-	// FIXME: most redraws only needed for player==ThisPlayer
+	player->NumBuildings--;
+    }
 
-	// Still under construction
-	if( unit->Orders[0].Action!=UnitActionBuilded ) {
-	    if( type->Supply ) {
-		player->Food-=type->Supply;
-		if( player==ThisPlayer ) {
-		    MustRedraw |= RedrawResources;
-		}
+    //
+    //	Update informations.
+    //
+    if( unit->Orders[0].Action!=UnitActionBuilded ) {
+	player->UnitTypesCount[type->Type]--;
+
+	if( type->Supply ) {			// supply
+	    player->Food-=type->Supply;
+	    if( player==ThisPlayer ) {
+		MustRedraw |= RedrawResources;
+		// FIXME: MustRedraw |= RedrawFood;
 	    }
-	    if( type==UnitTypeByIdent("unit-elven-lumber-mill")
-		    || type==UnitTypeByIdent("unit-troll-lumber-mill") ) {
+	}
 
-		if( !(HaveUnitTypeByIdent(player,"unit-elven-lumber-mill")
-			+HaveUnitTypeByIdent(player
-				,"unit-troll-lumber-mill")) ) {
-		    player->Incomes[WoodCost]=DEFAULT_INCOMES[WoodCost];
-		    if( player==ThisPlayer ) {
-			MustRedraw |= RedrawInfoPanel;
+	//
+	//	Handle income improvements, look if a player looses a building
+	//	which have given him a better income, find the next lesser
+	//	income.
+	//
+	for( i=1; i<MaxCosts; ++i ) {
+	    if( type->ImproveIncomes[i]==player->Incomes[i] ) {
+		int m;
+		int j;
+
+		m=DEFAULT_INCOMES[i];
+		for( j=0; j<player->TotalNumUnits; ++j ) {
+		    if( m<player->Units[j]->Type->ImproveIncomes[i] ) {
+			m=player->Units[j]->Type->ImproveIncomes[i];
 		    }
 		}
-	    } else if( type==UnitTypeByIdent("unit-human-refinery")
-		    || type==UnitTypeByIdent("unit-orc-refinery") ) {
-		if( !(HaveUnitTypeByIdent(player,"unit-human-refinery")
-			+HaveUnitTypeByIdent(player,"unit-orc-refinery")) ) {
-		    player->Incomes[OilCost]=DEFAULT_INCOMES[OilCost];
-		    if( player==ThisPlayer ) {
-			MustRedraw |= RedrawInfoPanel;
-		    }
-		}
-	    } else if( type==UnitTypeByIdent("unit-keep")
-		    || type==UnitTypeByIdent("unit-stronghold")
-		    || type==UnitTypeByIdent("unit-castle")
-		    || type==UnitTypeByIdent("unit-fortress") ) {
-		if( !(HaveUnitTypeByIdent(player,"unit-castle")
-			+HaveUnitTypeByIdent(player,"unit-fortress")) ) {
-		    player->Incomes[GoldCost]=DEFAULT_INCOMES[GoldCost]+10;
-		    if( !(HaveUnitTypeByIdent(player,"unit-keep")
-			    +HaveUnitTypeByIdent(player,"unit-stronghold")) ) {
-			player->Incomes[GoldCost]=DEFAULT_INCOMES[GoldCost];
-		    }
-		    if( player==ThisPlayer ) {
-			MustRedraw |= RedrawInfoPanel;
-		    }
+		player->Incomes[WoodCost]=m;
+		if( player==ThisPlayer ) {
+		    MustRedraw |= RedrawInfoPanel;
 		}
 	    }
 	}
-	player->NumBuildings--;
     }
 
     //
@@ -750,6 +736,7 @@ global void UnitLost(Unit* unit)
 
     DebugCheck( player->NumFoodUnits > UnitMax);
     DebugCheck( player->NumBuildings > UnitMax);
+    DebugCheck( player->TotalNumUnits > UnitMax);
     DebugCheck( player->UnitTypesCount[type->Type] > UnitMax);
 }
 
@@ -763,14 +750,14 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
 {
     const UnitType* type;
     Player* player;
-
-    DebugLevel3Fn("unit %d (%d)\n",UnitNumber(unit),unit->Type->Type);
+    unsigned u;
 
     player=unit->Player;
     type=unit->Type;
 
     //
-    //	Handle unit demand. (Currently only food supported.)
+    //	Handle unit supply. (Currently only food supported.)
+    //		Note an upgraded unit can't give more supply.
     //
     if( type->Supply && !upgrade ) {
 	player->Food+=type->Supply;
@@ -780,40 +767,13 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
     }
 
     //
-    //	Update food and resources
+    //	Update resources
     //
-    if( unit->Type->Building ) {
-
-	// FIXME: this is slow, remove the UnitTypeByIdent.
-	// FIXME: any ideas to generalize this problems?
-
-	if( type==UnitTypeByIdent("unit-elven-lumber-mill")
-		|| type==UnitTypeByIdent("unit-troll-lumber-mill") ) {
-	    player->Incomes[WoodCost]=DEFAULT_INCOMES[WoodCost]+25;
+    for( u=1; u<MaxCosts; ++u ) {
+	if( player->Incomes[u]<unit->Type->ImproveIncomes[u] ) {
+	    player->Incomes[u]=unit->Type->ImproveIncomes[u];
 	    if( player==ThisPlayer ) {
 		MustRedraw |= RedrawInfoPanel;
-	    }
-	} else if( type==UnitTypeByIdent("unit-human-refinery")
-		|| type==UnitTypeByIdent("unit-orc-refinery") ) {
-	    player->Incomes[OilCost]=DEFAULT_INCOMES[OilCost]+25;
-	    if( player==ThisPlayer ) {
-		MustRedraw |= RedrawInfoPanel;
-	    }
-	} else if( type==UnitTypeByIdent("unit-keep")
-		|| type==UnitTypeByIdent("unit-stronghold") ) {
-	    if( player->Incomes[GoldCost]==DEFAULT_INCOMES[GoldCost] ) {
-		player->Incomes[GoldCost]=DEFAULT_INCOMES[GoldCost]+10;
-		if( player==ThisPlayer ) {
-		    MustRedraw |= RedrawInfoPanel;
-		}
-	    }
-	} else if( type==UnitTypeByIdent("unit-castle")
-		|| type==UnitTypeByIdent("unit-fortress") ) {
-	    if( player->Incomes[GoldCost]!=DEFAULT_INCOMES[GoldCost]+20 ) {
-		player->Incomes[GoldCost]=DEFAULT_INCOMES[GoldCost]+20;
-		if( player==ThisPlayer ) {
-		    MustRedraw |= RedrawInfoPanel;
-		}
 	    }
 	}
     }
