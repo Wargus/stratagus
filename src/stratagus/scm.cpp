@@ -171,6 +171,7 @@ local void ExtractMap(FILE *mpqfd,unsigned char** entry,int* size)
     *entry=NULL;
     *size=0;
     max=0;
+    maxi=0;
     // Assumes the largest file is the .chk map
     for( i=0; i<MpqFileCount; ++i ) {
 	if( MpqBlockTable[i*4+2]>max ) {
