@@ -73,6 +73,7 @@ local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
 local void GameOptions(void);
+local void SetCdMode(Menuitem *mi);
 
 local void EndScenarioRestart(void);
 local void EndScenarioSurrender(void);
@@ -756,7 +757,7 @@ local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 10, 42, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, EndMenu} } },
+	{ gem:{ 4, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
 	{ text:{ "CD Audio Enabled", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
@@ -1483,6 +1484,26 @@ local void GameOptions(void)
 {
     // TODO
     ProcessMenu(MENU_GAME_OPTIONS, 1);
+}
+
+local void SetCdMode(Menuitem *mi)
+{
+    if (!strcmp(":off", CDMode)) {
+//	CDMode = ":random";
+	PlayMusic(":random");
+    } else {
+#ifdef USE_SDLCD 
+        SDL_CDStop(CDRom);
+        SDL_CDClose(CDRom);
+#endif 
+	
+#ifdef USE_LIBCDA 
+        cd_stop();
+        cd_close();
+        cd_exit();
+#endif
+	CDMode = ":off";
+    }
 }
 
 /**
