@@ -222,7 +222,7 @@ global void RevealMap(void)
 #else
 	    TheMap.Fields[ix+iy*TheMap.Width].Flags
 		    |= MapFieldExplored
-			| TheMap.NoFogOfWar ? MapFieldVisible : 0;
+			| (TheMap.NoFogOfWar ? MapFieldVisible : 0);
 #endif
 	    MapMarkSeenTile(ix,iy);
 	}

@@ -285,16 +285,21 @@ global void MapUpdateVisible(void)
     //	Clear all visible flags.
     //
     w=TheMap.Width;
-    ye=TheMap.Height*w;
-    if (TheMap.NoFogOfWar) {
-	for( x=0; x<TheMap.Width; ++x ) {
-	    for( y=0; y<TheMap.Height; y++ ) {
-		if ( IsMapFieldVisible(x,y) ) {
+    if ( TheMap.NoFogOfWar ) {
+	for( y=0; y<TheMap.Height; y++ ) {
+	    for( x=0; x<TheMap.Width; ++x ) {
+#ifdef NEW_FOW
+		TheMap.Fields[x+y*w].Visible=-1;
+#else
+		TheMap.Fields[x+y*w].Flags|=MapFieldVisible;
+#endif
+		if ( IsMapFieldExplored(x,y) ) {
 		    MapMarkSeenTile( x,y );
 		}
 	    }
 	}
     } else {
+	ye=TheMap.Height*w;
 	for( y=0; y<ye; y+=w ) {
 	    for( x=0; x<w; ++x ) {
 #ifdef NEW_FOW
@@ -957,6 +962,10 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     //
     if( mf->Explored && mf->ExploredMask ) {
 	VideoDrawUnexplored(TheMap.Tiles[mf->ExploredMask],dx,dy);
+	// Don't need to draw the same tiles.
+	if( mf->Visible && mf->ExploredMask==mf->VisibleMask ) {
+	    return;
+	}
     }
     if( mf->Visible ) {
 	if( mf->VisibleMask ) {
@@ -965,17 +974,6 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     } else {
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
     }
-#if 0
-    if( !TheMap.NoFogOfWar ) {
-	if( TheMap.Fields[sx].Flags&MapFieldVisible ) {
-	    if( tile ) {
-		VideoDrawFog(TheMap.Tiles[tile],dx,dy);
-	    }
-	} else {
-	    VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
-	}
-    }
-#endif
 #else
     int w;
     int tile;
@@ -1065,14 +1063,12 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	    tile=0;
 	}
     }
-    if( !TheMap.NoFogOfWar ) {
-	if( TheMap.Fields[sx].Flags&MapFieldVisible ) {
-	    if( tile ) {
-		VideoDrawFog(TheMap.Tiles[tile],dx,dy);
-	    }
-	} else {
-	    VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
+    if( TheMap.Fields[sx].Flags&MapFieldVisible ) {
+	if( tile ) {
+	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
 	}
+    } else {
+	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
     }
 #endif
 }

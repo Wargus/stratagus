@@ -518,7 +518,7 @@ local void DrawBuilding(Unit* unit)
     y = unit->Y;
 
 #ifdef NEW_FOW
-    if ( !TheMap.NoFogOfWar && !IsMapFieldVisible( x, y ) ) {
+    if ( !IsMapFieldVisible( x, y ) ) {
 	frame = unit->SeenFrame;
 	if (frame == 255) {
 	    return;
@@ -536,7 +536,7 @@ local void DrawBuilding(Unit* unit)
 	return;
     }
 
-    if ( !TheMap.NoFogOfWar && !IsMapFieldVisible( x, y ) ) {
+    if ( !IsMapFieldVisible( x, y ) ) {
 	frame = unit->SeenFrame;
 	if (frame == 255) {
 	    return;

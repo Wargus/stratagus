@@ -260,7 +260,6 @@ global void DrawMinimap(int vx,int vy)
 		mf=TheMap.Fields+Minimap2MapX[mx]+Minimap2MapY[my];
 		if( (mf->Explored&bits)
 			&& ( (mf->Visible&bits)
-			    || TheMap.NoFogOfWar
 			    || ((mx&1)==(my&1)) ) ) {
 		    VideoDrawPixel(((char*)Minimap->Frames)[mx+my*MINIMAP_W]
 			    ,x+mx,y+my);
@@ -268,8 +267,7 @@ global void DrawMinimap(int vx,int vy)
 #else
 		flags=TheMap.Fields[Minimap2MapX[mx]+Minimap2MapY[my]].Flags;
 		if( flags&MapFieldExplored &&
-			( (flags&MapFieldVisible)
-			    || TheMap.NoFogOfWar || ((mx&1)==(my&1)) ) ) {
+			( (flags&MapFieldVisible) || ((mx&1)==(my&1)) ) ) {
 		    VideoDrawPixel(((char*)Minimap->Frames)[mx+my*MINIMAP_W]
 			    ,x+mx,y+my);
 		}
@@ -297,7 +295,7 @@ global void DrawMinimap(int vx,int vy)
 	    continue;
 	}
 	// Draw only units on visible fields
-	if( !TheMap.NoFogOfWar && !(mf->Visible&bits) ) {
+	if( !(mf->Visible&bits) ) {
 	    continue;
 	}
 #else
@@ -307,7 +305,7 @@ global void DrawMinimap(int vx,int vy)
 	    continue;
 	}
 	// Draw only units on visible fields
-	if( !TheMap.NoFogOfWar && !(flags&MapFieldVisible) ) {
+	if( !(flags&MapFieldVisible) ) {
 	    continue;
 	}
 #endif
@@ -370,7 +368,7 @@ global void DrawMinimap(int vx,int vy)
 	    continue;
 	}
 	// Draw only units on visible fields
-	if( !TheMap.NoFogOfWar && !(flags&MapFieldVisible) ) {
+	if( !(flags&MapFieldVisible) ) {
 	    continue;
 	}
 	// FIXME: buildings under fog of war.
