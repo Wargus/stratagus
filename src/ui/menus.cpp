@@ -5293,7 +5293,7 @@ local void EditorMapPropertiesOk(void)
     TheMap.Info->Description = strdup(description);
 
     // FIXME: Need to actually change the terrain
-    TheMap.Terrain = v[menu->items[6].d.pulldown.curopt];
+    TheMap.Info->MapTerrain = v[menu->items[6].d.pulldown.curopt];
 
     // FIXME: Save the pud version somewhere
 
@@ -5756,7 +5756,7 @@ local void EditorSaveOk(void)
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
-	if (fl[i].type == 0) {
+	if (mi->menu->items[3].d.input.nch == 0 && fl[i].type == 0) {
 	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
 	    if (menu->items[6].flags&MenuButtonDisabled) {
@@ -5847,6 +5847,7 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
 	    mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
 	    mi->menu->items[4].d.button.text = strdup("Open");
 	}
+	mi->menu->items[4].flags &= ~MenuButtonDisabled;
 	if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
@@ -5946,10 +5947,19 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 /**
 **	Editor save input callback
 */
-local void EditorSaveEnterAction(Menuitem *mi __attribute__ ((unused)), int key)
+local void EditorSaveEnterAction(Menuitem *mi, int key)
 {
-    if (key==10 || key==13) {
-	EditorSaveOk();
+    if (mi->d.input.nch == 0) {
+	mi->menu->items[4].flags = MenuButtonDisabled;
+    } else {
+	if (mi->d.input.nch == 1 && key != '\b' && key != '\177') {
+	    free(mi->menu->items[4].d.button.text);
+	    mi->menu->items[4].d.button.text = strdup("Save");
+	}
+	mi->menu->items[4].flags &= ~MenuButtonDisabled;
+	if (key==10 || key==13) {
+	    EditorSaveOk();
+	}
     }
 }
 
