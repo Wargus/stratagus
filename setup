@@ -916,7 +916,7 @@ read ANSWER
 case $ANSWER in
  [nN])
  	echo
- 	echo "Done generating $RULESFILE.  Type '$MAKE$CROSS' to compile!"
+ 	echo "Done generating $RULESFILE. Type '$MAKE $DEPEND && $MAKE$CROSS' to compile freecraft."
 	echo
 	;;
  *)
