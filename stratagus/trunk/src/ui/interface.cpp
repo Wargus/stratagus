@@ -96,8 +96,7 @@ static void ShowInput(void)
 	sprintf(InputStatusLine, "MESSAGE:%s~!_", Input);
 	input = InputStatusLine;
 	// FIXME: This is slow!
-	while (VideoTextLength(TheUI.StatusLineFont, input) >
-			TheUI.StatusLine.Graphic->Width) {
+	while (VideoTextLength(TheUI.StatusLineFont, input) > TheUI.StatusLineW) {
 		++input;
 	}
 	KeyState = KeyStateCommand;
