@@ -274,12 +274,11 @@ global void CDRomCheck(void)
 	} else if (!strcmp(CDMode, ":random")) {
 	    PlayMusic(":random");
 	}
-    } else {
+    } else if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")) {
 	DebugLevel0Fn("get track\n");
         CDTrack = cd_current_track() + 1;
-	if (CDTrack > NumCDTracks) {
+	if (CDTrack > NumCDTracks)
 	    CDTrack = 1;
-	}
     }
 #endif
 }
