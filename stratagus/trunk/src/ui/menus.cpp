@@ -4447,6 +4447,12 @@ local void EndMenu(void)
     CursorOn = CursorOnUnknown;
     CurrentMenu = -1;
     MustRedraw |= RedrawMenu|RedrawCursor;
+
+    InterfaceState = IfaceStateNormal;
+    HideAnyCursor();
+    DrawMapArea();
+    InterfaceState = IfaceStateMenu;
+    MustRedraw=RedrawEverything;
 }
 
 
