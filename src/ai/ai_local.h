@@ -189,15 +189,15 @@ typedef struct _ai_running_script_ {
 	char*         Script;      /// Script executed
 #endif
 	unsigned long SleepCycles; /// Cycles to sleep
-	char          ident[10];   /// Debugging !
+	char          Ident[10];   /// Debugging !
 	int           HotSpotX;    /// Hot spot ( for defense, attack, ... )
 	int           HotSpotY;
 	int           HotSpotRay;
-	int           ownForce;    /// A force ID ( the n° of the script... )
-	int*          gauges;      /// Gauges values ( initially 0 )
+	int           OwnForce;    /// A force ID ( the n° of the script... )
+	int*          Gauges;      /// Gauges values ( initially 0 )
 
 	// Total number of resource gauges
-#define RESOURCE_COUNT 3
+#define RESOURCE_COUNT  3
 	// Total number of forces gauges
 #define FORCE_COUNT		11
 
@@ -214,8 +214,9 @@ typedef struct _ai_running_script_ {
 typedef struct _ai_script_action_ {
 #if defined(USE_GUILE) || defined(USE_SIOD)
 	SCM Action;    /// Scheme description, in the form :
-											/// '((name evaluate-lambda run-script) ... )
+	               /// '((name evaluate-lambda run-script) ... )
 #elif defined(USE_LUA)
+	char* Action;  /// Name of lua table
 #endif
 
 	int Defensive; /// Is this action usable for defense
@@ -239,12 +240,12 @@ typedef struct _ai_action_evaluation_ AiActionEvaluation;
 **
 */
 struct _ai_action_evaluation_ {
-	AiScriptAction*     aiScriptAction; /// Action evaluated
-	int                 gamecycle;      /// Gamecycle when this evaluation occured
-	int                 hotSpotX;       /// X position of the hotspot, or -1
-	int                 hotSpotY;       /// Y position of the hotspot, or -1
-	int                 hotSpotValue;   /// Value of the hotspot ( total points to get... )
-	int                 value;          /// Result of the evaluation ( resources needed... )
+	AiScriptAction*     AiScriptAction; /// Action evaluated
+	unsigned long       GameCycle;      /// Gamecycle when this evaluation occured
+	int                 HotSpotX;       /// X position of the hotspot, or -1
+	int                 HotSpotY;       /// Y position of the hotspot, or -1
+	int                 HotSpotValue;   /// Value of the hotspot ( total points to get... )
+	int                 Value;          /// Result of the evaluation ( resources needed... )
 	AiActionEvaluation* Next;           /// Next in linked list
 };
 
@@ -492,7 +493,7 @@ extern int AiFindGaugeId(SCM id);
 extern int AiFindGaugeId(lua_State* l);
 #endif
 	/// return the force of the unittype.
-extern int AiUnittypeForce(UnitType* unitType);
+extern int AiUnitTypeForce(UnitType* unitType);
 
 //
 // Magic

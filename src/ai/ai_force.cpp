@@ -728,9 +728,7 @@ global int AiCreateSpecificForce(int* power, int* unittypes, int unittypescount)
 	curpower[0] = power[0];
 	curpower[1] = power[1];
 	curpower[2] = power[2];
-	AiEraseForce(AiScript->ownForce);
-
-
+	AiEraseForce(AiScript->OwnForce);
 
 	do {
 		forceUpdated = 0;
@@ -746,13 +744,13 @@ global int AiCreateSpecificForce(int* power, int* unittypes, int unittypescount)
 					continue;
 				}
 
-				unittypeforce = AiUnittypeForce(ut);
+				unittypeforce = AiUnitTypeForce(ut);
 				unittypeforce = (unittypeforce ? unittypeforce : 1);
 
 				// Try to respond to the most important power ...
 				maxadd = 1 + curpower[maxPower] / unittypeforce;
 
-				lefttoadd = AiEnroleSpecificUnitType(AiScript->ownForce, ut, maxadd);
+				lefttoadd = AiEnroleSpecificUnitType(AiScript->OwnForce, ut, maxadd);
 
 				// Nothing added, continue.
 				if (lefttoadd == maxadd) {
@@ -768,14 +766,14 @@ global int AiCreateSpecificForce(int* power, int* unittypes, int unittypescount)
 					(curpower[0] > curpower[2] ? 0 : 2) :
 					(curpower[1] > curpower[2] ? 1 : 2));
 				if (curpower[maxPower] <= 0) {
-					AiFinalizeForce(AiScript->ownForce);
+					AiFinalizeForce(AiScript->OwnForce);
 					return 0;
 				}
 			}
 		}
 	} while (forceUpdated);
 	// Sth missing...
-	AiFinalizeForce(AiScript->ownForce);
+	AiFinalizeForce(AiScript->OwnForce);
 	return -1;
 }
 
