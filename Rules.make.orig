@@ -202,6 +202,8 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## USE_HP_FOR_XP	Use hit-points for XP calculations.
 ## NEW_NETMENUS:	Include new menu driven network set-up.
 ## USE_LIBMODPLUG:	Use modplug audio player support.
+## USE_SDLCD		Use the SDL cd player support.
+## USE_LIBCDA		Use the LIBCDA cd player support.
 ## These aren't working yet:
 ## NEW_MAPDRAW:		Stephans new map draw code (broken in this release)
 ## USE_FFMPEG		Use ffmpeg video player support.

@@ -31,8 +31,10 @@ include $(TOPDIR)/$(RULESFILE)
 
 MODULE	= sound
 
+HDRS	= libcda.h
+
 SRCS	= sound.c sound_server.c ccl_sound.c sound_id.c \
-	  unitsound.c
+	  unitsound.c libcda.c
 
 OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
 

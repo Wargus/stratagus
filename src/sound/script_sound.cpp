@@ -345,7 +345,7 @@ local SCM CclSetMusicVolume(SCM volume)
 
 local SCM CclSetCdMode(SCM mode)
 {
-#ifdef USE_SDL
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
     char *str;
 
     if ( !gh_null_p(mode) ) {
