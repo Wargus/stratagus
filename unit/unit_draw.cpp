@@ -1111,6 +1111,7 @@ local void DrawBuilding(Unit* unit)
     //	Draw the future unit type, if upgrading to it.
     //
     } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+	// FIXME: this frame is hardcoded!!!
 	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
     } else {
 	DrawUnitType(type,frame,x,y);

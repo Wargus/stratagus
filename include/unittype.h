@@ -221,6 +221,8 @@ extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
 extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
 extern UnitType*UnitTypeHumanFarm;	/// Human farm
 extern UnitType*UnitTypeOrcFarm;	/// Orc farm
+extern UnitType*UnitTypeHumanWall;	/// Human wall
+extern UnitType*UnitTypeOrcWall;	/// Orc wall
 extern UnitType*UnitTypeCritter;	/// Critter unit-type pointer
 
 extern char** UnitTypeWcNames;		/// Mapping wc-number 2 symbol
@@ -237,13 +239,14 @@ extern void ParsePudUDTA(const char*,int); /// parse pud udta table
 extern UnitType* UnitTypeByIdent(const char*);	/// get unit-type by ident
 extern UnitType* UnitTypeByWcNum(unsigned);	/// get unit-type by wc number
 
-    /// Draw the sprite frame of unit-type
-extern void DrawUnitType(const UnitType* type,unsigned frame,int x,int y);
-extern void LoadUnitTypes(FILE* file);	/// load the unit-type table
 extern void SaveUnitTypes(FILE* file);	/// save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);/// allocate an empty unit-type slot
-extern void InitUnitTypes(void);	/// Init unit-type table
-extern void LoadUnitSprites(void);	/// Load all unit-type sprites
+    /// Draw the sprite frame of unit-type
+extern void DrawUnitType(const UnitType* type,unsigned frame,int x,int y);
+
+extern void InitUnitTypes(void);	/// init unit-type table
+extern void LoadUnitTypes(void);	/// load the unit-type data
+extern void CleanUnitTypes(void);	/// cleanup unit-type module
 
 //@}
 

@@ -980,15 +980,11 @@ global void FireMissile(Unit* unit)
 	    dy=unit->Orders[0].Y;
 	    if( WallOnMap(dx,dy) ) {
 		if( HumanWallOnMap(dx,dy) ) {
-		    // FIXME: don't use UnitTypeByIdent here, this is slow!
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeByIdent("unit-human-wall")->Stats,
-			    unit->Bloodlust));
+			    UnitTypeHumanWall->Stats,unit->Bloodlust));
 		} else {
-		    // FIXME: don't use UnitTypeByIdent here, this is slow!
 		    HitWall(dx,dy,CalculateDamageStats(unit->Stats,
-			    UnitTypeByIdent("unit-orc-wall")->Stats,
-			    unit->Bloodlust));
+			    UnitTypeOrcWall->Stats,unit->Bloodlust));
 		}
 		return;
 	    }
@@ -1337,20 +1333,19 @@ local void MissileHitsWall(const Missile* missile,int x,int y,int splash)
 {
     if( WallOnMap(x,y) ) {
 	DebugLevel3Fn("Missile on wall?\n");
-	// FIXME: don't use UnitTypeByIdent here, this is slow!
 	if( HumanWallOnMap(x,y) ) {
 	    if ( missile->Damage ) {	// direct damage, spells mostly
 		HitWall(x,y,missile->Damage/splash);
 	    } else {
 		HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-		    UnitTypeByIdent("unit-human-wall")->Stats,0)/splash);
+		    UnitTypeHumanWall->Stats,0)/splash);
 	    }
 	} else {
 	    if ( missile->Damage ) {	// direct damage, spells mostly
 		HitWall(x,y,missile->Damage/splash);
 	    } else {
 		HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-		    UnitTypeByIdent("unit-orc-wall")->Stats,0)/splash);
+		    UnitTypeOrcWall->Stats,0)/splash);
 	    }
 	}
 	return;
