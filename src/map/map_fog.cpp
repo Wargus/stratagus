@@ -319,8 +319,8 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 				remove = unit;
 				unit = unit->Next;
 				corpses=&(unit);
-				if( remove->Visible == 0x0000 ) {
-				    ReleaseUnit( remove );
+				if( remove->Visible==0x0000 && !remove->Refs ) {
+				    ReleaseUnit(remove);
 				}
 			    }
                         }
