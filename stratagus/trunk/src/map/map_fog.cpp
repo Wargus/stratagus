@@ -362,7 +362,6 @@ global void MapUpdateVisible(void)
 {
     int x;
     int y;
-    int ye;
     int w;
     Unit* unit;
     Unit** units;
@@ -390,6 +389,10 @@ global void MapUpdateVisible(void)
 	    }
 	}
     } else {
+
+#if 0
+	int ye;
+
 	ye=TheMap.Height*w;
 	for( y=0; y<ye; y+=w ) {
 	    for( x=0; x<w; ++x ) {
@@ -400,6 +403,22 @@ global void MapUpdateVisible(void)
 #endif
 	    }
 	}
+
+#else
+
+	MapField* mf;
+	MapField* mfe;
+
+	mfe=TheMap.Fields+TheMap.Height*w;
+	for( mf=TheMap.Fields; mf<mfe; ++mf ) {
+#ifdef NEW_FOW
+	    mf->Visible=0;
+#else
+	    mf->Flags&=~MapFieldVisible;
+#endif
+	}
+
+#endif
     }
 
     MarkDrawEntireMap();
