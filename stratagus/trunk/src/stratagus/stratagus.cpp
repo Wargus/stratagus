@@ -766,8 +766,6 @@ Use it at your own risk.\n\n");
 	srand(time(NULL));  // Random counter = random each start
 #endif
 
-	InitMovie();
-
 	//
 	//  Show title screen.
 	//

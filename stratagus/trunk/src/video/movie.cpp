@@ -55,9 +55,9 @@ extern void VPDeInitLibrary(void);
 #include "SDL.h"
 #endif
 
-#ifdef USE_SDL  /// Only supported with SDL for now
+#if defined(USE_SDL) && !defined(USE_OPENGL)  /// Only supported with SDL for now
 
-extern SDL_Surface* TheScreen;  /// internal screen
+extern SDL_Surface* TheScreen;	    /// internal screen
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -67,7 +67,8 @@ extern SDL_Surface* TheScreen;  /// internal screen
 --  Variables
 ----------------------------------------------------------------------------*/
 
-local char MovieKeyPressed;  /// Flag key is pressed to stop
+local char MovieKeyPressed;         /// Flag key is pressed to stop
+local int MovieInitialized;         /// Movie module initialized
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -230,6 +231,8 @@ global int PlayMovie(const char* name, int flags)
 	SDL_Rect rect;
 	int oldspeed;
 
+	InitMovie();
+
 	// FIXME: Should split this into lowlevel parts.
 
 	if (!(avi = MovieOpen(name))) {
@@ -333,6 +336,28 @@ global int PlayMovie(const char* name, int flags)
 	return 0;
 }
 
+/**
+**  Initialize the movie module.
+*/
+global void InitMovie(void)
+{
+	if (!MovieInitialized) {
+		VPInitLibrary();
+		MovieInitialized = 1;
+	}
+}
+
+/**
+**  Cleanup the movie module.
+*/
+global void CleanMovie(void)
+{
+	if (MovieInitialized) {
+		VPDeInitLibrary();
+		MovieInitialized = 0;
+	}
+}
+
 #else
 
 /**
@@ -352,14 +377,11 @@ global int PlayMovie(const char* file, int flags)
 	return 1;
 }
 
-#endif
-
 /**
 **  Initialize the movie module.
 */
 global void InitMovie(void)
 {
-	VPInitLibrary();
 }
 
 /**
@@ -367,7 +389,8 @@ global void InitMovie(void)
 */
 global void CleanMovie(void)
 {
-	VPDeInitLibrary();
 }
+
+#endif
 
 //@}
