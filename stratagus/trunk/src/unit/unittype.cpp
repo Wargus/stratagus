@@ -307,9 +307,10 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	unittype->_HitPoints = v;
     }
     for (i = 0; i < 110; ++i) {		// Flag if unit is magic
-	unittype = UnitTypeByWcNum(i);
-	v = Fetch8(udta);
-	unittype->Magic = v;
+//	unittype = UnitTypeByWcNum(i);
+//	v = Fetch8(udta);
+//	unittype->Magic = v;
+	Fetch8(udta);
     }
     for (i = 0; i < 110; ++i) {		// Build time * 6 = one second FRAMES
 	unittype = UnitTypeByWcNum(i);
