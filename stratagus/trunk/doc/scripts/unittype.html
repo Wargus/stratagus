@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML><HEAD>
 <!--
-----	(c) Copyright 2001 by Lutz Sammer
+----	(c) Copyright 2002 by Lutz Sammer
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2002 by The FreeCraft Project. Distributed under the
 <A HREF="../gpl.html">"GNU General Public License"</A></B>
 <HR>
 <A HREF="../clone.html">FreeCraft</A> 
@@ -42,13 +42,138 @@
 <A HREF="icon.html">PREV</A> 
 <A HREF="research.html">NEXT</A> 
 <HR>
+<A HREF="#define-animations">define-animations</A>
+<A HREF="#define-unit-stats">define-unit-stats</A>
 <A HREF="#define-unit-type">define-unit-type</A>
+<A HREF="#define-unittype-wc-names">define-unittype-wc-names</A>
+<A HREF="#get-unit-type-ident">get-unit-type-ident</A>
+<A HREF="#get-unit-type-name">get-unit-type-name</A>
+<A HREF="#get-unit-type-property">get-unit-type-property</A>
+<A HREF="#set-unit-type-name">set-unit-type-name</A>
+<A HREF="#set-unit-type-property">set-unit-type-property</A>
+<A HREF="#unit-type">unit-type</A>
+<A HREF="#unit-type-array">unit-type-array</A>
 <HR>
 <H2>Intro - Introduction to unit-type functions and variables</H2>
 
 Everything around the C UnitType structure.
 
 <H2>Functions</H2>
+<A NAME="define-animations"></A>
+<H3>define-animations</H3>
+
+<H4>Description</H4>
+
+Define animations.
+
+<H4>Syntax</H4>
+
+<CODE>(define-animations ident 'still script 'move script 'die script 'attack script)</CODE>
+
+<DL>
+<DT>ident</DT>
+<DD>Name of the animation to define.
+</DD>
+<DT>script</DT>
+<DD><PRE>
+	A script is a list of quad numbers.
+		(#(Flags Pixel Sleep Frame) (#Flags Pixel Sleep Frame) ...)
+	* Format of quad numbers:
+		#(Flags Pixel Sleep Frame)
+	o Flags are the sum of the following:
+		1 Restart - restart animation
+		2 Reset   - animation could here be aborted (switch to another)
+		4 Sound   - play a sound with the animation
+		8 Missile - fire a missile at this point
+	o Pixel is the number of pixels to move (if this is a moving animation)
+	o Sleep is the number of frames to wait for the next animation
+	o Frame is increment to the frame of the image
+</PRE></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-animations 'animation-footman
+      'still '(	; #5
+        #( 0 0   4   0) #( 3 0   1   0))
+      'move '(	; #16 P32
+        #( 0 3   2   0) #( 0 3   1   5) #( 0 3   2   5) #( 0 2   1  10)
+        #( 0 3   1  10) #( 0 2   1   0) #( 0 3   2   0) #( 0 3   1  15)
+        #( 0 3   2  15) #( 0 2   1  20) #( 0 3   1  20) #( 3 2   1   0))
+      'attack '(	; #25
+        #( 0 0   3  25) #( 0 0   3  30) #( 0 0   3  35) #(12 0   5  40)
+        #( 0 0  10   0) #( 3 0   1   0))
+      'die '(	; #107
+        #( 0 0   3  45) #( 0 0   3  50) #( 0 0 100  55) #( 3 0   1  55)))
+
+</PRE>
+
+<P>Defines the animations for the footman.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/anim.ccl"> $LIBRARYPATH/ccl/anim.ccl </A>
+
+<A NAME="define-unit-stats"></A>
+<H3>define-unit-stats</H3>
+
+<H4>Description</H4>
+
+Define unit stats.
+
+<H4>Syntax</H4>
+
+<CODE>(define-unit-stats ident player 'level level 'speed speed 'attack-range arange
+'sight-range srange 'armor armor 'basic-damage bdamage 'piercing-damage pdamage 
+'hit-points hp 'costs costs)</CODE>
+
+<DL>
+<DT>ident</DT>
+<DD>Ident of the unit.
+</DD>
+<DT>player</DT>
+<DD>Player number.
+</DD>
+<DT>level</DT>
+<DD>.
+</DD>
+<DT>speed</DT>
+<DD>.
+</DD>
+<DT>arange</DT>
+<DD>.
+</DD>
+<DT>srange</DT>
+<DD>.
+</DD>
+<DT>armor</DT>
+<DD>.
+</DD>
+<DT>bdamage</DT>
+<DD>.
+</DD>
+<DT>pdamage</DT>
+<DD>.
+</DD>
+<DT>hp</DT>
+<DD>.
+</DD>
+<DT>costs</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-unit-stats)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
 <A NAME="define-unit-type"></A>
 <H3>define-unit-type</H3>
 
@@ -271,8 +396,222 @@ F.E. '( 1 1 ), '( 2 2 ).
     Get the identifier of the unit type peon.<P>
 -->
 
+<A NAME="define-unittype-wc-names"></A>
+<H3>define-unittype-wc-names</H3>
+
+<H4>Description</H4>
+
+Define unit-type mapping from original number to internal symbol.
+
+<H4>Syntax</H4>
+
+<CODE>(define-unittype-wc-names footman grunt ...)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-unittype-wc-names)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBRARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="get-unit-type-ident"></A>
+<H3>get-unit-type-ident</H3>
+
+<H4>Description</H4>
+
+Get the ident of the unit-type structure.
+
+<H4>Syntax</H4>
+
+<CODE>(get-unit-type-ident unit-type)</CODE>
+
+<DL>
+<DT>unit-type</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-unit-type-ident)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
+<A NAME="get-unit-type-property"></A>
+<H3>get-unit-type-property</H3>
+
+<H4>Description</H4>
+
+Get the property of the unit-type structure.
+
+<H4>Syntax</H4>
+
+<CODE>(get-unit-type-property unit-type)</CODE>
+
+<DL>
+<DT>unit-type</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-unit-type-property)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
+<A NAME="get-unit-type-name"></A>
+<H3>get-unit-type-name</H3>
+
+<H4>Description</H4>
+
+Get the name of the unit-type structure.
+
+<H4>Syntax</H4>
+
+<CODE>(get-unit-type-name unit-type)</CODE>
+
+<DL>
+<DT>unit-type</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-unit-type-name)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
+<A NAME="set-unit-type-name!"></A>
+<H3>set-unit-type-name!</H3>
+
+<H4>Description</H4>
+
+Set the name of the unit-type structure.
+
+<H4>Syntax</H4>
+
+<CODE>(set-unit-type-name! unit-type name)</CODE>
+
+<DL>
+<DT>unit-type</DT>
+<DD>.
+</DD>
+<DT>name</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-unit-type-name!)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
+<A NAME="set-unit-type-property"></A>
+<H3>set-unit-type-property</H3>
+
+<H4>Description</H4>
+
+Set the property of the unit-type structure.
+
+<H4>Syntax</H4>
+
+<CODE>(set-unit-type-property unit-type property)</CODE>
+
+<DL>
+<DT>unit-type</DT>
+<DD>.
+</DD>
+<DT>property</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-unit-type-property)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
+<A NAME="unit-type"></A>
+<H3>unit-type</H3>
+
+<H4>Description</H4>
+
+Get unit-type structure.
+
+<H4>Syntax</H4>
+
+<CODE>(unit-type ident)</CODE>
+
+<DL>
+<DT>ident</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (unit-type 'unit-great-hall)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBRARYPATH/ccl/ai.ccl </A>
+
+<A NAME="unit-type-array"></A>
+<H3>unit-type-array</H3>
+
+<H4>Description</H4>
+
+Get all unit-type structures.
+
+<H4>Syntax</H4>
+
+<CODE>(unit-type-array)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (unit-type-array)
+</PRE>
+
+<P>.
+
+<H4>Not Used</H4>
+
 <HR>
 Last changed: $Id$<BR>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS>(c) 2000 by <A HREF="mailto:aleclone@FreeCraft.org">
+<ADDRESS>(c) 2002 by <A HREF="mailto:aleclone@FreeCraft.org">
 The FreeCraft Project</A></ADDRESS></BODY></HTML>
