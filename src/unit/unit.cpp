@@ -164,7 +164,6 @@ global void ReleaseUnit(Unit* unit)
 	//
 	unit->Destroyed=1;		// mark as destroyed
 
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
 	// Mark building as can't be destroyed, since it's still seen
         if( unit->Type->Building ) {
 	    int i;
@@ -196,7 +195,6 @@ global void ReleaseUnit(Unit* unit)
 	if( unit->Type->Building && unit->Visible != 0x0000 ) {
 	    return;
 	}
-#endif
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
 	    DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle
@@ -210,15 +208,11 @@ global void ReleaseUnit(Unit* unit)
 
     // Update Corpse Cache
     if( unit->Orders[0].Action == UnitActionDie ) {
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
 	if( unit->Type->Building ) {
 	    DeadBuildingCacheRemove(unit);
 	} else {
 	    CorpseCacheRemove(unit);
 	}
-#else
-	CorpseCacheRemove(unit);
-#endif
     }
 
     RefsDebugCheck( unit->Refs );
@@ -541,7 +535,6 @@ global void PlaceUnit(Unit* unit,int x,int y)
     //	Units under construction have no sight range.
     //
     if( !unit->Constructed ) {
-#ifdef NEW_FOW
 	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
@@ -553,12 +546,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	unit->Next = NULL;
 	unit->CurrentSightRange=unit->Stats->SightRange;
 	MapMarkSight(unit->Player,x,y,unit->CurrentSightRange);
-#else
-	if( unit->Player==ThisPlayer || 
-	    (ThisPlayer && IsSharedVision(ThisPlayer,unit)) ) {
-	    MapMarkSight(x,y,unit->Stats->SightRange);
-	}
-#endif
+
 	if( type->CanSeeSubmarine ) {
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}
@@ -635,7 +623,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
     const UnitType* type;
     unsigned flags;
 
-#ifdef NEW_FOW
     if( unit->Removed && unit->Next ) {
 	MapUnmarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
 				,unit->Next->Y+unit->Next->Type->TileHeight/2
@@ -651,7 +638,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 			host->Y+host->Type->TileWidth/2,
 			unit->CurrentSightRange);
     }
-#endif
 
     if( unit->Removed ) {		// could happen!
 	// If unit is removed (inside) and building is destroyed.
@@ -1070,7 +1056,6 @@ global int UnitVisibleOnMap(const Unit* unit)
     return 0;
 }
 
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
 /**
 **	Returns true, if unit is visible for this player on the map.
 **	An unit is visible, if any field could be seen.
@@ -1080,7 +1065,7 @@ global int UnitVisibleOnMap(const Unit* unit)
 **	@param unit	Unit to be checked.
 **	@return		True if visible, false otherwise.
 */
-global int BuildingVisibleOnMap(Unit* unit)
+global int BuildingVisibleOnMap(const Unit* unit)
 {
     int x;
     int y;
@@ -1109,7 +1094,6 @@ global int BuildingVisibleOnMap(Unit* unit)
 
     return 0;
 }
-#endif
 
 /**
 **	FIXME: docu
@@ -1267,11 +1251,7 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
 	    return 0;
 	}
 	// Visible submarine
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
 	if ( !(unit->Visible&(1<<ThisPlayer->Player)) && !unit->Type->Building ) {
-#else
-        if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
-#endif
 	    return 0;
 	}
     }
@@ -1785,14 +1765,12 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     *unit->PlayerSlot=unit;
 
     unit->Player=newplayer;
-#ifdef NEW_FOW
     MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
 	,unit->Y+unit->Type->TileHeight/2
 	,unit->CurrentSightRange);
     MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
 	,unit->Y+unit->Type->TileHeight/2
 	,unit->CurrentSightRange);
-#endif
 
     //
     //	Must change food/gold and other.
@@ -2042,18 +2020,12 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     int y;
     int i;
     int mask;
-#ifndef NEW_FOW
-    int n;
-    int nb;
-    Unit* table[UnitMax];
-#endif
 
     //FIXME: vladi: this debug check fails when used for teleporting...
     //DebugCheck( !unit->Removed );
 
     // FIXME: better and quicker solution, to find the building.
     x=y=-1;
-#ifdef NEW_FOW
     if( unit->Next ) {
 	x=unit->Next->X;
 	y=unit->Next->Y;
@@ -2062,24 +2034,7 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
 	y=unit->Y;
 	DebugLevel0Fn("No building?\n");
     }
-#else
-    n=SelectUnitsOnTile(unit->X,unit->Y,table);
-    for( nb=i=0; i<n; ++i ) {
-	if( UnitUnusable(table[i]) ) {
-	    continue;
-	}
-	if( table[i]->Type->Building ) {
-	    nb++;
-	    x=table[i]->X;
-	    y=table[i]->Y;
-	}
-    }
-    if (!nb) {	//Check if there actually is a building.
-	DebugLevel0Fn("No building?\n");
-	x=unit->X;
-	y=unit->Y;
-    }
-#endif
+
     mask=UnitMovementMask(unit);
 
     if( heading<LookingNE || heading>LookingNW) {
@@ -2176,16 +2131,12 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int bestd;
     int mask;
     int n;
-#ifndef NEW_FOW
-    Unit* table[UnitMax];
-#endif
 
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
     DebugCheck( !unit->Removed );
 
     // FIXME: better and quicker solution, to find the building.
     x=y=-1;
-#ifdef NEW_FOW
     if( unit->Next ) {
 	x=unit->Next->X;
 	y=unit->Next->Y;
@@ -2194,18 +2145,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	x=unit->X;
 	y=unit->Y;
     }
-#else
-    n=SelectUnitsOnTile(unit->X,unit->Y,table);
-    for( i=0; i<n; ++i ) {
-	if( UnitUnusable(table[i]) ) {
-	    continue;
-	}
-	if( table[i]->Type->Building ) {
-	    x=table[i]->X;
-	    y=table[i]->Y;
-	}
-    }
-#endif
+
     DebugCheck( x==-1 || y==-1 );
     mask=UnitMovementMask(unit);
 
@@ -2280,6 +2220,8 @@ global void DropOutAll(const Unit* source)
 {
     // FIXME: Rewrite this use source->Next;
     // FIXME: above is wrong, NEW_FOW use Next in another way.
+    // FIXME: (mr-russ) can't use source->Next, it's on map, and Next
+    // 		points to next unit on tile.
     Unit** table;
     Unit* unit;
     int i;
@@ -2723,11 +2665,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
 		//
 		//	Look if there is a mine
 		//
-#ifdef NEW_FOW
 		if ( (mine=GoldMineOnMap(x,y)) && IsMapFieldExplored(unit->Player,x,y) ) {
-#else
-		if ( (mine=GoldMineOnMap(x,y)) ) {
-#endif
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
 			if( n<bestd ) {
@@ -3110,11 +3048,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 		//
 		//	Look if there is wood
 		//
-#ifdef NEW_FOW
 		if ( ForestOnMap(x,y) && IsMapFieldExplored(unit->Player,x,y) ) {
-#else
-		if ( ForestOnMap(x,y) ) {
-#endif
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
 			if( n<bestd ) {
@@ -3505,31 +3439,21 @@ global void LetUnitDie(Unit* unit)
 		    || !unit->Type->Animations->Die );
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
 	    unit->Visible = 0xffff;
 	    DeadBuildingCacheInsert(unit);	//Insert into corpse list
-#else
-	    CorpseCacheInsert(unit);
-#endif
-#ifdef NEW_FOW
-	MapMarkSight(unit->Player,unit->X,unit->Y,1);
-#endif
-	UnitMarkSeen(unit);
-#ifdef NEW_FOW
-	MapUnmarkSight(unit->Player,unit->X,unit->Y,1);
-#endif
+	    // FIXME: (mr-russ) Hack to make sure we see our own building destroyed
+	    MapMarkSight(unit->Player,unit->X,unit->Y,1);
+	    UnitMarkSeen(unit);
+	    MapUnmarkSight(unit->Player,unit->X,unit->Y,1);
 	    UnitMarkSeen(unit);
 	    return;
 	}
 
 	// no corpse available
-#ifdef NEW_FOW
+	// FIXME: (mr-russ) Hack to make sure we see our own building destroyed
 	MapMarkSight(unit->Player,unit->X,unit->Y,1);
-#endif
 	UnitMarkSeen(unit);
-#ifdef NEW_FOW
 	MapUnmarkSight(unit->Player,unit->X,unit->Y,1);
-#endif
 	ReleaseUnit(unit);
 	return;
     }
@@ -3567,14 +3491,12 @@ global void LetUnitDie(Unit* unit)
     unit->Orders[0].Action=UnitActionDie;
     CorpseCacheInsert(unit);	//Insert into corpse list
 
-#ifdef NEW_FOW
     if( unit->Type->CorpseType ) {
 	unit->CurrentSightRange=unit->Type->CorpseType->Stats->SightRange;
     } else {
 	unit->CurrentSightRange=0;
     }
     MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
-#endif
 }
 
 /**
@@ -4267,9 +4189,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
     fprintf(file,"'direction %d\n  ",unit->Direction);
     fprintf(file,"'attacked %d\n ",unit->Attacked);
-#ifdef NEW_FOW
     fprintf(file," 'current-sight-range %d",unit->CurrentSightRange);
-#endif
     if( unit->Burning ) {
 	fprintf(file," 'burning");
     }
@@ -4285,13 +4205,11 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Selected ) {
 	fprintf(file," 'selected");
     }
-#ifdef NEW_FOW
     if( unit->Next && unit->Removed ) {
 	fprintf(file," 'host-tile '(%d %d) ",
 		unit->Next->X+unit->Next->Type->TileWidth/2,
 		unit->Next->Y+unit->Next->Type->TileHeight/2);
     }
-#endif
     fprintf(file," 'visible \"");
     for( i=0; i<PlayerMax; ++i ) {
 	fputc((unit->Visible&(1<<i)) ? 'X' : '_',file);

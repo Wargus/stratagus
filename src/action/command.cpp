@@ -149,7 +149,6 @@ global void CommandQuit(int player)
 	    }
 	    Players[i].Allied&=~(1 << player);
 	    Players[i].Enemy&=~(1 << player);
-#ifdef NEW_FOW
 	    // Check all tiles and mark unseen ones as explored.
 	    if( Players[player].SharedVision&(1<<i)
 		    && (Players[i].SharedVision&(1<<player)) ) {
@@ -164,7 +163,6 @@ global void CommandQuit(int player)
 		    }
 		}
 	    }
-#endif
 	    Players[i].SharedVision&=~(1<<player);
 	    Players[player].Allied&=~(1<<i);
 	    Players[player].Enemy&=~(1<<i);
@@ -1405,7 +1403,6 @@ global void CommandSharedVision(int player,int state,int opponent)
     Unit* unit;
     
     if( state==0 ) {
-#ifdef NEW_FOW
 	// Check all tiles and mark unseen ones as explored.
 	if( Players[player].SharedVision&(1<<opponent)
 		&& (Players[opponent].SharedVision&(1<<player)) ) {
@@ -1420,11 +1417,9 @@ global void CommandSharedVision(int player,int state,int opponent)
 		}
 	    }
 	}
-#endif
 	Players[player].SharedVision&=~(1<<opponent);
     } else {
 	Players[player].SharedVision|=(1<<opponent);
-#ifdef NEW_FOW
 	// Check all tiles and mark SeenTiles for wood
 	if( Players[player].SharedVision&(1<<opponent)
 		&& Players[opponent].SharedVision&(1<<player)
@@ -1440,7 +1435,6 @@ global void CommandSharedVision(int player,int state,int opponent)
 		}
 	    }
 	}
-#endif
     }
     // MUST update seen buildings when vision is shared or unshared
     for( i=0; i<NumUnits; ++i ) {

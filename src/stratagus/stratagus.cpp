@@ -1217,9 +1217,6 @@ local void PrintHeader(void)
 #ifdef NEW_MAPDRAW
     "NEW-MAPDRAW "
 #endif
-#ifdef NEW_FOW
-    "NEW-FOW "
-#endif
 #ifdef NEW_AI
     "NEW-AI "
 #endif

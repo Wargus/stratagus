@@ -150,23 +150,6 @@ local void* FogOfWarAlphaTable;
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#ifdef NEW_FOW
-/**
-**	Mask
-*/
-local int MapExploredMask(void)
-{
-    return 8;
-}
-
-/**
-**	Mask
-*/
-local int MapVisibleMask(void)
-{
-    return 8;
-}
-
 /**
 **	Find the Number of Units that can see this square using a long
 **	lookup. So when a 225 Viewed square can be calculated properly.
@@ -255,13 +238,11 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
     int width;
     int v;
     int p;
-#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
     int w;
     int h;
     Unit** corpses;
     Unit* unit;
     Unit* remove;
-#endif
 
     // Mark as seen
     if( !range ) {			// zero sight range is zero sight range
@@ -302,7 +283,6 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		    case 1:		// Unseen
 			// FIXME: mark for screen update
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
-#ifdef BUILDING_DESTROYED
 			if( player->Type == PlayerPerson ) {
 			    corpses = &DestroyedBuildings;
 			    while( *corpses ) {
@@ -324,7 +304,6 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 				}
 			    }
                         }
-#endif
 			if( IsTileVisible(ThisPlayer,i,y) > 1) {
 			    MapMarkSeenTile(i,y);
 			    UnitsMarkSeen(i,y);
@@ -392,7 +371,6 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
     p=player->Player;
     ++range;
     range=range*range;
-    // FIXME: Can be speed optimized, no * += ...
     while( height-->=0 ) {
 	for( i=x; i<=x+width; ++i ) {
 	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
@@ -401,10 +379,11 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 		    case 255:
 			TheMap.Fields[i+y*TheMap.Width].Visible[p] =
 			    LookupSight(player,i,y);
-			++TheMap.Fields[i+y*TheMap.Width].Visible[p];
+			DebugCheck( TheMap.Fields[i+y*TheMap.Width].Visible[p] < 254 );
 		    case 0:		// Unexplored
 		    case 1:
-			// We are at minimum, don't do anything.
+			// We are at minimum, don't do anything shouldn't happen.
+			DebugCheck( 1 );
 			break;
 		    case 2:
 		    	// Check visible Tile, then deduct...
@@ -441,86 +420,6 @@ global void MapMarkNewSight(const Player* player,int tx,int ty,int range
     MapUnmarkSight(player,tx-dx,ty-dy,range);
 }
 
-#else
-
-/**
-**	Mark the sight of unit. (Explore and make visible.)
-**
-**	@param tx	X center position.
-**	@param ty	Y center position.
-**	@param range	Radius to mark.
-*/
-global void MapMarkSight(int tx,int ty,int range)
-{
-    int i;
-    int x;
-    int y;
-    int height;
-    int width;
-
-    if( !range ) {			// zero sight range is zero sight range
-	DebugLevel0Fn("Zero sight range\n");
-	return;
-    }
-
-    x=tx-range;
-    y=ty-range;
-    width=height=range+range;
-
-    //	Clipping
-    if( y<0 ) {
-	height+=y;
-	y=0;
-    }
-    if( x<0 ) {
-	width+=x;
-	x=0;
-    }
-    if( y+height>=TheMap.Height ) {
-	height=TheMap.Height-y-1;
-    }
-    if( x+width>=TheMap.Width ) {
-	width=TheMap.Width-x-1;
-    }
-
-    ++range;
-    range=range*range;
-    while( height-->=0 ) {
-	for( i=x; i<=x+width; ++i ) {
-	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
-		// FIXME: can combine more bits
-		if( !IsMapFieldVisible(ThisPlayer,i,y) ) {
-		    TheMap.Fields[i+y*TheMap.Width].Flags |= MapFieldExplored;
-		    TheMap.Visible[0][(i+y*TheMap.Width)/32]
-			    |= 1<<((i+y*TheMap.Width)%32);
-		    MapMarkSeenTile(i,y);
-		    //MustRedrawRow[y]=NEW_MAPDRAW;
-		    //MustRedrawTile[y*MapWidth+i]=NEW_MAPDRAW;
-		}
-	    }
-	}
-	++y;
-    }
-}
-
-/**
-**	Mark the new sight of unit. (Explore and make visible.)
-**
-**	@param tx	X map tile position of center.
-**	@param ty	Y map tile position of center.
-**	@param range	Radius to mark.
-**	@param dx	Unused: Delta in tiles in X direction.
-**	@param dy	Unused: Delta in tiles in Y direction.
-*/
-global void MapMarkNewSight(int tx,int ty,int range
-	,int dx __attribute__((unused)),int dy __attribute__((unused)))
-{
-    // FIXME: must write this
-    MapMarkSight(tx,ty,range);
-}
-
-#endif
-
 /**
 **	Update the fog of war, for the view point. Called from UpdateDisplay.
 **
@@ -540,10 +439,8 @@ global void MapUpdateFogOfWar(int x,int y)
     int n;
     int i;
     int sx,sy,ex,ey,dx,dy;
-#ifndef NEW_FOW
     int vis;
     int last;
-#endif
 
     // Tiles not visible last frame but are this frame must be redrawn.
     redraw_row=MustRedrawRow;
@@ -557,7 +454,6 @@ global void MapUpdateFogOfWar(int x,int y)
     while( dy<=ey ) {
 	sx=x+sy;
 	dx=TheUI.MapX;
-#ifdef NEW_FOW
 	while( dx<=ex ) {
 #ifdef NEW_MAPDRAW
 	    *redraw_row=NEW_MAPDRAW;
@@ -570,29 +466,6 @@ global void MapUpdateFogOfWar(int x,int y)
 	    ++sx;
 	    dx+=TileSizeX;
 	}
-#else
-	while( dx<=ex ) {
-	    last=TheMap.Fields[sx].VisibleLastFrame;
-#ifdef NEW_FOW
-	    vis=IsTileVisible(ThisPlayer->Player,x,y);
-	    if( vis > 1 && (!last || last&MapFieldPartiallyVisible) ) {
-#else
-	    vis=TheMap.Fields[sx].Flags&MapFieldVisible;
-	    if( vis && (!last || last&MapFieldPartiallyVisible) ) {
-#endif
-#ifdef NEW_MAPDRAW
-		*redraw_row=NEW_MAPDRAW;
-		*redraw_tile=NEW_MAPDRAW;
-#else
-		*redraw_row=*redraw_tile=1;
-#endif
-	    }
-
-	    ++redraw_tile;
-	    ++sx;
-	    dx+=TileSizeX;
-	}
-#endif
 	++redraw_row;
 	sy+=TheMap.Width;
 	dy+=TileSizeY;
@@ -628,9 +501,6 @@ global void UpdateFogOfWarChange(void)
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
 		if( IsMapFieldExplored(ThisPlayer,x,y) ) {
-#ifndef NEW_FOW
-		    TheMap.Visible[0][(x+y*w)/32] |= 1<<((x+y*w)%32);
-#endif
 		    MapMarkSeenTile( x,y );
 		    UnitsMarkSeen( x,y );
 		}
@@ -638,132 +508,6 @@ global void UpdateFogOfWarChange(void)
 	}
     }
     MarkDrawEntireMap();
-}
-
-/**
-**	Update visible of the map.
-**
-**	@todo	This function could be improved in speed and functionality.
-**		and is not needed in new fog of war.
-*/
-global void MapUpdateVisible(void)
-{
-#ifdef NEW_FOW
-    return;
-#else
-    int x;
-    int y;
-    Unit* unit;
-    Unit** units;
-    Unit* mine;
-    int nunits;
-    int i;
-    int j;
-    int shared_vision;
-#ifdef DEBUG
-    unsigned long t;
-#endif
-
-    shared_vision=0;
-
-    // No fog - only update revealers for holy vision
-    if ( TheMap.NoFogOfWar ) {
-	for( j=0; j<NumPlayers; ++j ) {
-	    if( &Players[j]!=ThisPlayer &&
-		!( (ThisPlayer->SharedVision&(1<<j)) &&
-		   (Players[j].SharedVision&(1<<ThisPlayer->Player)) ) ) {
-		continue;
-	    }
-
-	    nunits=Players[j].TotalNumUnits;
-	    units=Players[j].Units;
-
-	    if( &Players[j]==ThisPlayer ) {
-		for( i=0; i<nunits; ++i ) {
-		    unit=units[i];
-		    x=unit->X+unit->Type->TileWidth/2;
-		    y=unit->Y+unit->Type->TileHeight/2;
-		    if( unit->Removed && unit->Revealer ) {
-			MapMarkSight(x,y,10);
-		    }
-		}
-	    } else {
-		shared_vision=1;
-	    }
-	}
-	if( !shared_vision ) {
-	    // No shared vision, nothing else to update
-	    return;
-	}
-    }
-
-    // FIXME: rewrite this function, faster and better
-#ifdef DEBUG
-    t=GetTicks();
-#endif
-
-    //
-    //	Clear all visible flags.
-    //
-    if( !shared_vision ) {
-	memset(TheMap.Visible[0],0,(TheMap.Width*TheMap.Height)/8);
-    }
-
-    DebugLevel3Fn("Ticks Clear %lu\n" _C_ GetTicks()-t);
-
-    MarkDrawEntireMap();
-
-    DebugLevel3Fn("Ticks Mark  %lu\n" _C_ GetTicks()-t);
-
-    //
-    //	Mark all units visible range.
-    //
-    for( j=0; j<NumPlayers; ++j ) {
-	if( &Players[j]!=ThisPlayer &&
-	    !( (ThisPlayer->SharedVision&(1<<j)) &&
-	       (Players[j].SharedVision&(1<<ThisPlayer->Player)) ) ) {
-	    continue;
-	}
-
-	nunits=Players[j].TotalNumUnits;
-	units=Players[j].Units;
-	for( i=0; i<nunits; i++ ) {
-	    unit=units[i];
-	    x=unit->X+unit->Type->TileWidth/2;
-	    y=unit->Y+unit->Type->TileHeight/2;
-	    if( unit->Removed ) {
-		if( unit->Revealer ) {
-		    MapMarkSight(x,y,10);
-		    continue;
-		}
-		//
-		//	If peon is in the mine, the mine has a sight range too.
-		//  This is quite dirty code...
-		//  This is not a big deal as far as only mines are
-		//  concerned, but for more units (like parasited ones
-		//  in *craft), maybe we should create a dedicated queue...
-		if( unit->Orders[0].Action==UnitActionMineGold ) {
-		    mine=GoldMineOnMap(unit->X,unit->Y);
-		    if( mine ) {  // Somtimes, the peon is at home :).
-			MapMarkSight(mine->X+mine->Type->TileWidth/2
-				     ,mine->Y+mine->Type->TileHeight/2
-				     ,mine->Stats->SightRange);
-		    }
-		} else {
-		    continue;
-		}
-	    }
-
-	    if( unit->Orders[0].Action==UnitActionBuilded ) {
-		MapMarkSight(x,y,3);
-	    } else {
-		MapMarkSight(x,y,unit->Stats->SightRange);
-	    }
-	}
-    }
-
-    DebugLevel3Fn("Ticks Total %lu\n" _C_ GetTicks()-t);
-#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -1941,11 +1685,10 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
     int ey;
     char* redraw_row;
     char* redraw_tile;
-#ifdef NEW_FOW
     int p;
     int my;
     int mx;
-#endif
+
 #ifdef TIMEIT
     u_int64_t sv=rdtsc();
     u_int64_t ev;
@@ -1955,9 +1698,7 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
     redraw_row=MustRedrawRow;		// flags must redraw or not
     redraw_tile=MustRedrawTile;
 
-#ifdef NEW_FOW
     p=ThisPlayer->Player;
-#endif
 
     ex = vp->EndX;
     sy = y*TheMap.Width;
@@ -1979,7 +1720,6 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
                   (*redraw_tile)--;
 #else
                   *redraw_tile=0;
-#ifdef NEW_FOW
 		    mx=(dx-vp->X)/TileSizeX + vp->MapX;
 		    my=(dy-vp->Y)/TileSizeY + vp->MapY;
 		    if( IsTileVisible(ThisPlayer,mx,my) || ReplayRevealMap ) {
@@ -1991,20 +1731,10 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
 #endif
 		    }
-#else
-		    if( TheMap.Fields[sx].Flags&MapFieldExplored || ReplayRevealMap ) {
-			DrawFogOfWarTile(sx,sy,dx,dy);
-		    } else {
-#ifdef USE_OPENGL
-			MapDrawTile(UNEXPLORED_TILE,dx,dy);
-#else
-			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
-#endif
-		    }
-#endif
 #endif
 
-#if defined(NEW_FOW) && defined(DEBUG) && !defined(HIERARCHIC_PATHFINDER) && 0
+// Used to debug NEW_FOW problems
+#if !defined(HIERARCHIC_PATHFINDER) && 0
 extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 #define GameFont 1
 	{
