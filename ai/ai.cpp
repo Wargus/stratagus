@@ -181,6 +181,7 @@ global char **AiTypeWcNames;
 
 local void debugForces(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     const AiActionEvaluation * aiaction;
     int force, i;
     int count[UnitTypeMax+1];
@@ -231,6 +232,8 @@ local void debugForces(void)
 	}
 	DebugLevel2("\n");
     }
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -238,6 +241,7 @@ local void debugForces(void)
 */
 local void AiExecuteScripts(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     int i;
     PlayerAi *pai;
     SCM value;
@@ -266,6 +270,8 @@ local void AiExecuteScripts(void)
 	    }
 	}
     }
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -664,6 +670,7 @@ local void SaveAiHelper(CLFile * file)
 */
 local void SaveAiScriptActions(CLFile * file)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     AiScriptAction *aiScriptAction;
     int i;
 
@@ -678,6 +685,8 @@ local void SaveAiScriptActions(CLFile * file)
 	lprin1CL(aiScriptAction->Action, file);
 	CLprintf(file, "\n)\n");
     }
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -688,6 +697,7 @@ local void SaveAiScriptActions(CLFile * file)
 */
 local void SaveAiType(CLFile * file, const AiType * aitype)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM list;
 
     if (aitype->Next) {
@@ -706,6 +716,8 @@ local void SaveAiType(CLFile * file, const AiType * aitype)
 	list = gh_cdr(list);
     }
     CLprintf(file, " ))\n\n");
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -730,6 +742,7 @@ local void SaveAiTypes(CLFile * file)
 */
 local void SaveAiPlayer(CLFile * file, unsigned plynr, PlayerAi * ai)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     IOOutFile = file;
     IOLoadingMode = 0;
     IOTabLevel = 1;
@@ -737,6 +750,8 @@ local void SaveAiPlayer(CLFile * file, unsigned plynr, PlayerAi * ai)
     CLprintf(IOOutFile, "(define-ai-player '");
     IOPlayerAiFullPtr(SCM_UNSPECIFIED, &ai, 0);
     CLprintf(IOOutFile, ")\n");
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -804,8 +819,11 @@ global void AiInit(Player * player)
 	pai->Scripts[i].HotSpot_Ray = -1;
 	pai->Scripts[i].gauges = 0;
 	pai->Scripts[i].SleepCycles = 0;
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	pai->Scripts[i].Script = NIL;
 	CclGcProtect(&pai->Scripts[i].Script);
+#elif defined(USE_LUA)
+#endif
 	snprintf(pai->Scripts[i].ident, 10, "Empty");
     }
 
@@ -872,7 +890,10 @@ global void AiInit(Player * player)
 	_C_ ainame _C_ ait->Class);
 
     pai->AiType = ait;
+#if defined(USE_GUILE) || defined(USE_SIOD)
     CclGcProtectedAssign(&pai->Scripts[0].Script, ait->Script);
+#elif defined(USE_LUA)
+#endif
 
     pai->Collect[TimeCost] = 0;
     pai->Collect[GoldCost] = 50;
@@ -927,7 +948,10 @@ global void CleanAi(void)
 	    }
 
 	    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
+#if defined(USE_GUILE) || defined(USE_SIOD)
 		CclGcUnprotect(&pai->Scripts[i].Script);
+#elif defined(USE_LUA)
+#endif
 	    }
 
 	    //
@@ -974,7 +998,10 @@ global void CleanAi(void)
 	free(aitype->Class);
 
 	// ai-type->Script freed by ccl
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	CclGcUnprotect(&aitype->Script);
+#elif defined(USE_LUA)
+#endif
 
 	temp = aitype->Next;
 	free(aitype);
@@ -1034,7 +1061,10 @@ global void CleanAi(void)
 
     // Free script action scm...
     for (i = 0; i < AiScriptActionNum; i++) {
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	CclGcUnprotect(&AiScriptActions[i].Action);
+#elif defined(USE_LUA)
+#endif
     }
 
     AiResetUnitTypeEquiv();

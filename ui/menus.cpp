@@ -1838,6 +1838,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM cb;
 
     if (PlayingMusic) {
@@ -1857,6 +1858,8 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 	    }
 	}
     }
+#elif defined(USE_LUA)
+#endif
 #endif // WITH_SOUND
     SoundOptionsInit(NULL);
 }

@@ -55,8 +55,9 @@
 ----------------------------------------------------------------------------*/
 
 /**
- **	Enable a*.
+**	Enable a*.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAStar(SCM list)
 {
     SCM value;
@@ -103,6 +104,73 @@ local SCM CclAStar(SCM list)
 					  
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclAStar(lua_State* l)
+{
+    const char* value;
+    int i;
+    int j;
+    int args;
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	if (!strcmp(value, "fixed-unit-cost")) {
+	    ++j;
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    i = lua_tonumber(l, j + 1);
+	    if (i <= 3) {
+		PrintFunction();
+		fprintf(stdout, "Fixed unit crossing cost must be strictly > 3\n");
+	    } else {
+		AStarFixedUnitCrossingCost = i;
+	    }
+	} else if (!strcmp(value, "moving-unit-cost")) {
+	    ++j;
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    i = lua_tonumber(l, j + 1);
+	    if (i <= 3) {
+		PrintFunction();
+		fprintf(stdout, "Moving unit crossing cost must be strictly > 3\n");
+	    } else {
+		AStarMovingUnitCrossingCost = i;
+	    }
+	} else if (!strcmp(value, "know-unseen-terrain")) {
+	    AStarKnowUnknown = 1;
+	} else if (!strcmp(value, "dont-know-unseen-terrain")) {
+	    AStarKnowUnknown = 0;
+	} else if (!strcmp(value, "unseen-terrain-cost")) {
+	    ++j;
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    i = lua_tonumber(l, j + 1);
+	    if (i < 0) {
+		PrintFunction();
+		fprintf(stdout, "Unseen Terrain Cost must be non-negative\n");
+	    } else {
+		AStarUnknownTerrainCost = i;
+	    }
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    return 0;
+}
+#endif
 
 #ifdef HIERARCHIC_PATHFINDER
 local SCM CclPfHierShowRegIds (SCM flag)
@@ -117,6 +185,7 @@ local SCM CclPfHierShowGroupIds (SCM flag)
     return SCM_UNSPECIFIED;
 }
 #else
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclPfHierShowRegIds (SCM flag __attribute__((unused)))
 {
     return SCM_UNSPECIFIED;
@@ -126,6 +195,8 @@ local SCM CclPfHierShowGroupIds (SCM flag __attribute__((unused)))
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 #endif
 
 
@@ -134,9 +205,15 @@ local SCM CclPfHierShowGroupIds (SCM flag __attribute__((unused)))
 */
 global void PathfinderCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("a-star",CclAStar);
     gh_new_procedure1_0 ("pf-show-regids!", CclPfHierShowRegIds);
     gh_new_procedure1_0 ("pf-show-groupids!", CclPfHierShowGroupIds);
+#elif defined(USE_LUA)
+    lua_register(Lua, "AStar",CclAStar);
+//    lua_register(Lua, "PfShowRegids", CclPfHierShowRegIds);
+//    lua_register(Lua, "PfShowGroupids", CclPfHierShowGroupIds);
+#endif
 }
 
 //@}

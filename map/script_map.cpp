@@ -55,6 +55,7 @@
 **
 **	@param list	list of tuples keyword data
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclStratagusMap(SCM list)
 {
     SCM value;
@@ -241,11 +242,14 @@ local SCM CclStratagusMap(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Reveal the complete map.
 **	FIXME: only functional in init file!
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclRevealMap(void)
 {
     if (!CclInConfigFile) {
@@ -256,6 +260,22 @@ local SCM CclRevealMap(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclRevealMap(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (!CclInConfigFile) {
+	PrintFunction();
+	fprintf(stdout, "Only supported within config file\n");
+    }
+    FlagRevealMap = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Center the map.
@@ -263,11 +283,25 @@ local SCM CclRevealMap(void)
 **	@param x	X tile location.
 **	@param y	Y tile location.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclCenterMap(SCM x, SCM y)
 {
     ViewportCenterViewpoint(TheUI.SelectedViewport, gh_scm2int(x), gh_scm2int(y));
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclCenterMap(lua_State* l)
+{
+    if (lua_gettop(l) != 2 || !lua_isnumber(l, 1) || !lua_isnumber(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ViewportCenterViewpoint(TheUI.SelectedViewport,
+	lua_tonumber(l, 1), lua_tonumber(l, 2));
+
+    return 0;
+}
+#endif
 
 /**
 **	Show Map Location
@@ -278,6 +312,7 @@ local SCM CclCenterMap(SCM x, SCM y)
 **	@param	cycle	cycles show vision for.
 **	@param	unit	name of unit to use for showing map
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle, SCM unit)
 {
     Unit* target;
@@ -297,6 +332,32 @@ local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle, SCM unit)
     free(unitname);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclShowMapLocation(lua_State* l)
+{
+    Unit* target;
+    const char* unitname;
+    // Put a unit on map, use it's properties, except for
+    // what is listed below
+
+    if (lua_gettop(l) != 4 || !lua_isnumber(l, 1) || !lua_isnumber(l, 2) ||
+	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isstring(l, 5)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    unitname = lua_tostring(l, 5);
+    target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
+    target->Orders[0].Action = UnitActionStill;
+    target->HP = 0;
+    target->X = lua_tonumber(l, 1);
+    target->Y = lua_tonumber(l, 2);
+    target->TTL = GameCycle + lua_tonumber(l, 4);
+    target->CurrentSightRange = lua_tonumber(l, 3);
+    MapMarkUnitSight(target);
+    return 0;
+}
+#endif
+
 /**
 **	Set the default map.
 **
@@ -304,6 +365,7 @@ local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle, SCM unit)
 **
 **	@return		The old default map.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetDefaultMap(SCM map)
 {
     SCM old;
@@ -318,6 +380,23 @@ local SCM CclSetDefaultMap(SCM map)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetDefaultMap(lua_State* l)
+{
+    char* old;
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = strdup(DefaultMap);
+    strcpy(DefaultMap, lua_tostring(l, 1));
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
 
 /**
 **	Set fog of war on/off.
@@ -326,6 +405,7 @@ local SCM CclSetDefaultMap(SCM map)
 **
 **	@return		The old state of fog of war.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetFogOfWar(SCM flag)
 {
     int old;
@@ -335,6 +415,22 @@ local SCM CclSetFogOfWar(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetFogOfWar(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = !TheMap.NoFogOfWar;
+    TheMap.NoFogOfWar = !lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Enable display of terrain in minimap.
@@ -343,6 +439,7 @@ local SCM CclSetFogOfWar(SCM flag)
 **
 **	@return		The old state of the minimap with terrain.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMinimapTerrain(SCM flag)
 {
     int old;
@@ -352,10 +449,27 @@ local SCM CclSetMinimapTerrain(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetMinimapTerrain(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = MinimapWithTerrain;
+    MinimapWithTerrain = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Original fog of war.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclOriginalFogOfWar(void)
 {
     OriginalFogOfWar = 1;
@@ -366,10 +480,27 @@ local SCM CclOriginalFogOfWar(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclOriginalFogOfWar(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    OriginalFogOfWar = 1;
+
+    if (!CclInConfigFile) {
+	InitMapFogOfWar();
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Alpha style fog of war.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAlphaFogOfWar(void)
 {
     OriginalFogOfWar = 0;
@@ -380,78 +511,178 @@ local SCM CclAlphaFogOfWar(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclAlphaFogOfWar(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    OriginalFogOfWar = 1;
+
+    if (!CclInConfigFile) {
+	InitMapFogOfWar();
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Gray style fog of war contrast.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetFogOfWarContrast(SCM contrast)
 {
     int i;
-    int o;
+    int old;
 
     i = gh_scm2int(contrast);
     if (i < 0 || i > 400) {
 	PrintFunction();
-	fprintf(stdout, "Contrast should be 0-400\n");
+	fprintf(stdout, "Contrast should be 0 - 400\n");
 	i = 100;
     }
-    o = FogOfWarContrast;
+    old = FogOfWarContrast;
     FogOfWarContrast = i;
 
     if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
-    return gh_int2scm(o);
+    return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetFogOfWarContrast(lua_State* l)
+{
+    int i;
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    i = lua_tonumber(l, 1);
+    if (i < 0 || i > 400) {
+	PrintFunction();
+	fprintf(stdout, "Contrast should be 0 - 400\n");
+	i = 100;
+    }
+    old = FogOfWarContrast;
+    FogOfWarContrast = i;
+
+    if (!CclInConfigFile) {
+	InitMapFogOfWar();
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Gray style fog of war brightness.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetFogOfWarBrightness(SCM brightness)
 {
     int i;
-    int o;
+    int old;
 
     i = gh_scm2int(brightness);
     if (i < -100 || i > 100) {
 	PrintFunction();
-	fprintf(stdout, "Brightness should be -100-100\n");
+	fprintf(stdout, "Brightness should be -100 - 100\n");
 	i = 0;
     }
-    o = FogOfWarBrightness;
+    old = FogOfWarBrightness;
     FogOfWarBrightness = i;
 
     if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
-    return gh_int2scm(o);
+    return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetFogOfWarBrightness(lua_State* l)
+{
+    int i;
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    i = lua_tonumber(l, 1);
+    if (i < -100 || i > 100) {
+	PrintFunction();
+	fprintf(stdout, "Brightness should be -100 - 100\n");
+	i = 100;
+    }
+    old = FogOfWarBrightness;
+    FogOfWarBrightness = i;
+
+    if (!CclInConfigFile) {
+	InitMapFogOfWar();
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Gray style fog of war saturation.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetFogOfWarSaturation(SCM saturation)
 {
     int i;
-    int o;
+    int old;
 
     i = gh_scm2int(saturation);
     if (i < -100 || i > 200) {
 	PrintFunction();
-	fprintf(stdout, "Saturation should be -100-200\n");
+	fprintf(stdout, "Saturation should be -100 - 200\n");
 	i = 0;
     }
-    o = FogOfWarSaturation;
+    old = FogOfWarSaturation;
     FogOfWarSaturation = i;
 
     if (!CclInConfigFile) {
 	InitMapFogOfWar();
     }
 
-    return gh_int2scm(o);
+    return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetFogOfWarSaturation(lua_State* l)
+{
+    int i;
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    i = lua_tonumber(l, 1);
+    if (i < -100 || i > 200) {
+	PrintFunction();
+	fprintf(stdout, "Saturation should be -100 - 200\n");
+	i = 100;
+    }
+    old = FogOfWarSaturation;
+    FogOfWarSaturation = i;
+
+    if (!CclInConfigFile) {
+	InitMapFogOfWar();
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set forest regeneration speed.
@@ -460,28 +691,57 @@ local SCM CclSetFogOfWarSaturation(SCM saturation)
 **
 **	@return		Old speed
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetForestRegeneration(SCM speed)
 {
     int i;
-    int o;
+    int old;
 
     i = gh_scm2int(speed);
     if (i < 0 || i > 255) {
 	PrintFunction();
-	fprintf(stdout, "Regneration speed should be 0-255\n");
+	fprintf(stdout, "Regneration speed should be 0 - 255\n");
 	i = 0;
     }
-    o = ForestRegeneration;
+    old = ForestRegeneration;
     ForestRegeneration = i;
 
-    return gh_int2scm(o);
+    return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetForestRegeneration(lua_State* l)
+{
+    int i;
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    i = lua_tonumber(l, 1);
+    if (i < 0 || i > 255) {
+	PrintFunction();
+	fprintf(stdout, "Regneration speed should be 0 - 255\n");
+	i = 100;
+    }
+    old = ForestRegeneration;
+    ForestRegeneration = i;
+
+    if (!CclInConfigFile) {
+	InitMapFogOfWar();
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Register CCL features for map.
 */
 global void MapCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("stratagus-map", CclStratagusMap);
     gh_new_procedure0_0("reveal-map", CclRevealMap);
     gh_new_procedure2_0("center-map", CclCenterMap);
@@ -499,6 +759,25 @@ global void MapCclRegister(void)
     gh_new_procedure1_0("set-fog-of-war-saturation!", CclSetFogOfWarSaturation);
 
     gh_new_procedure1_0("set-forest-regeneration!",CclSetForestRegeneration);
+#elif defined(USE_LUA)
+//    lua_register(Lua, "StratagusMap", CclStratagusMap);
+    lua_register(Lua, "RevealMap", CclRevealMap);
+    lua_register(Lua, "CenterMap", CclCenterMap);
+    lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
+
+    lua_register(Lua, "SetDefaultMap", CclSetDefaultMap);
+    lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
+    lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
+
+    lua_register(Lua, "OriginalFogOfWar", CclOriginalFogOfWar);
+    lua_register(Lua, "AlphaFogOfWar", CclAlphaFogOfWar);
+
+    lua_register(Lua, "SetFogOfWarContrast", CclSetFogOfWarContrast);
+    lua_register(Lua, "SetFogOfWarBrightness", CclSetFogOfWarBrightness);
+    lua_register(Lua, "SetFogOfWarSaturation", CclSetFogOfWarSaturation);
+
+    lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
+#endif
 }
 
 //@}

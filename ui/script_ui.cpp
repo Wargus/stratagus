@@ -74,6 +74,7 @@ typedef struct _info_text_ {
 **	@param flag	True = turn on, false = off.
 **	@return		The old state of color cylce all.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorCycleAll(SCM flag)
 {
     int old;
@@ -87,6 +88,26 @@ local SCM CclSetColorCycleAll(SCM flag)
 
     return old < 0 ? gh_int2scm(old) : gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetColorCycleAll(lua_State* l)
+{
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || (!lua_isnumber(l, 1) && !lua_isboolean(l, 1))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = ColorCycleAll;
+    if (lua_isnumber(l, 1)) {
+	ColorCycleAll = lua_tonumber(l, 1);
+    } else {
+	ColorCycleAll = lua_toboolean(l, 1);
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set speed of middle-mouse scroll
@@ -94,6 +115,7 @@ local SCM CclSetColorCycleAll(SCM flag)
 **	@param speed	number of screen pixels per mouse pixel
 **	@return		The old value.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMouseScrollSpeedDefault(SCM speed)
 {
     int old;
@@ -103,6 +125,22 @@ local SCM CclSetMouseScrollSpeedDefault(SCM speed)
 
     return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetMouseScrollSpeedDefault(lua_State* l)
+{
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = TheUI.MouseScrollSpeedDefault;
+    TheUI.MouseScrollSpeedDefault = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set speed of ctrl-middle-mouse scroll
@@ -110,6 +148,7 @@ local SCM CclSetMouseScrollSpeedDefault(SCM speed)
 **	@param speed	number of screen pixels per mouse pixel
 **	@return		The old value.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMouseScrollSpeedControl(SCM speed)
 {
     int old;
@@ -119,6 +158,22 @@ local SCM CclSetMouseScrollSpeedControl(SCM speed)
 
     return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetMouseScrollSpeedControl(lua_State* l)
+{
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = TheUI.MouseScrollSpeedControl;
+    TheUI.MouseScrollSpeedControl = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set which missile is used for right click
@@ -126,6 +181,7 @@ local SCM CclSetMouseScrollSpeedControl(SCM speed)
 **	@param missile	missile name to use
 **	@return		old value
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetClickMissile(SCM missile)
 {
     SCM old;
@@ -143,6 +199,32 @@ local SCM CclSetClickMissile(SCM missile)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetClickMissile(lua_State* l)
+{
+    char* old;
+    int args;
+
+    args = lua_gettop(l);
+    if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = NULL;
+    if (ClickMissile) {
+	old = strdup(ClickMissile);
+	free(ClickMissile);
+	ClickMissile = NULL;
+    }
+    if (args == 1 && !lua_isnil(l, 1)) {
+	ClickMissile = strdup(lua_tostring(l, 1));
+    }
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
 
 /**
 **	Set which missile shows Damage
@@ -150,6 +232,7 @@ local SCM CclSetClickMissile(SCM missile)
 **	@param missile	missile name to use
 **	@return		old value
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetDamageMissile(SCM missile)
 {
     SCM old;
@@ -167,12 +250,40 @@ local SCM CclSetDamageMissile(SCM missile)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetDamageMissile(lua_State* l)
+{
+    char* old;
+    int args;
+
+    args = lua_gettop(l);
+    if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = NULL;
+    if (DamageMissile) {
+	old = strdup(DamageMissile);
+	free(DamageMissile);
+	DamageMissile = NULL;
+    }
+    if (args == 1 && !lua_isnil(l, 1)) {
+	DamageMissile = strdup(lua_tostring(l, 1));
+    }
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
+
 /**
 **	Game contrast.
 **
 **	@param contrast	New contrast 0 - 400.
 **	@return		Old contrast.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetContrast(SCM contrast)
 {
     int i;
@@ -191,6 +302,30 @@ local SCM CclSetContrast(SCM contrast)
 
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetContrast(lua_State* l)
+{
+    int i;
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = TheUI.Contrast;
+    i = lua_tonumber(l, 1);
+    if (i < 0 || i > 400) {
+	lua_pushstring(l, "Contrast should be 0-400");
+	lua_error(l);
+    }
+    TheUI.Contrast = i;
+    VideoCreatePalette(GlobalPalette);	// rebuild palette
+    MustRedraw = RedrawEverything;
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Game brightness.
@@ -198,6 +333,7 @@ local SCM CclSetContrast(SCM contrast)
 **	@param brightness	New brightness -100 - 100.
 **	@return			Old brightness.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetBrightness(SCM brightness)
 {
     int i;
@@ -207,7 +343,7 @@ local SCM CclSetBrightness(SCM brightness)
     i = gh_scm2int(brightness);
     if (i < -100 || i > 100) {
 	PrintFunction();
-	fprintf(stdout, "Brightness should be -100-100\n");
+	fprintf(stdout, "Brightness should be -100 - 100\n");
 	i = 0;
     }
     TheUI.Brightness = i;
@@ -216,6 +352,30 @@ local SCM CclSetBrightness(SCM brightness)
 
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetBrightness(lua_State* l)
+{
+    int i;
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = TheUI.Brightness;
+    i = lua_tonumber(l, 1);
+    if (i < -100 || i > 100) {
+	lua_pushstring(l, "Brightness should be -100 - 100");
+	lua_error(l);
+    }
+    TheUI.Brightness = i;
+    VideoCreatePalette(GlobalPalette);	// rebuild palette
+    MustRedraw = RedrawEverything;
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Game saturation.
@@ -223,6 +383,7 @@ local SCM CclSetBrightness(SCM brightness)
 **	@param saturation	New saturation -100 - 200.
 **	@return			Old saturation.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSaturation(SCM saturation)
 {
     int i;
@@ -232,7 +393,7 @@ local SCM CclSetSaturation(SCM saturation)
     i = gh_scm2int(saturation);
     if (i < -100 || i > 200) {
 	PrintFunction();
-	fprintf(stdout, "Saturation should be -100-200\n");
+	fprintf(stdout, "Saturation should be -100 - 200\n");
 	i = 0;
     }
     TheUI.Saturation = i;
@@ -241,6 +402,30 @@ local SCM CclSetSaturation(SCM saturation)
 
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetSaturation(lua_State* l)
+{
+    int i;
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = TheUI.Saturation;
+    i = lua_tonumber(l, 1);
+    if (i < -100 || i > 200) {
+	lua_pushstring(l, "Saturation should be -100 - 200");
+	lua_error(l);
+    }
+    TheUI.Saturation = i;
+    VideoCreatePalette(GlobalPalette);	// rebuild palette
+    MustRedraw = RedrawEverything;
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set the video resolution.
@@ -248,6 +433,7 @@ local SCM CclSetSaturation(SCM saturation)
 **	@param width	Resolution width.
 **	@param height	Resolution height.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetVideoResolution(SCM width,SCM height)
 {
     if (CclInConfigFile) {
@@ -259,6 +445,23 @@ local SCM CclSetVideoResolution(SCM width,SCM height)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetVideoResolution(lua_State* l)
+{
+    if (lua_gettop(l) != 2 || !lua_isnumber(l, 1) || !lua_isnumber(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (CclInConfigFile) {
+	// May have been set from the command line
+	if (!VideoWidth || !VideoHeight) {
+	    VideoWidth = lua_tonumber(l, 1);
+	    VideoHeight = lua_tonumber(l, 2);
+	}
+    }
+    return 0;
+}
+#endif
 
 /**
 **	Set the video fullscreen mode.
@@ -267,6 +470,7 @@ local SCM CclSetVideoResolution(SCM width,SCM height)
 **
 **	@return			Old fullscreen mode
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetVideoFullscreen(SCM fullscreen)
 {
     SCM old;
@@ -277,6 +481,24 @@ local SCM CclSetVideoFullscreen(SCM fullscreen)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetVideoFullscreen(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = VideoFullScreen;
+    if (CclInConfigFile) {
+	VideoFullScreen = lua_toboolean(l, 1);
+    }
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Default title-screen.
@@ -285,6 +507,7 @@ local SCM CclSetVideoFullscreen(SCM fullscreen)
 **
 **	@return		None
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetTitleScreens(SCM list)
 {
     int i;
@@ -316,6 +539,54 @@ local SCM CclSetTitleScreens(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetTitleScreens(lua_State* l)
+{
+    int i;
+    int tables;
+    int args;
+
+    if (TitleScreens) {
+	for (i = 0; TitleScreens[i]; ++i) {
+	    free(TitleScreens[i]->File);
+	    free(TitleScreens[i]->Music);
+	    free(TitleScreens[i]);
+	}
+	free(TitleScreens);
+	TitleScreens = NULL;
+    }
+
+    tables = lua_gettop(l);
+    TitleScreens = calloc(tables + 1, sizeof(*TitleScreens));
+
+    for (i = 0; i < tables; ++i) {
+	args = luaL_getn(l, i + 1);
+	if (!lua_istable(l, i + 1) || (args != 1 && args != 2)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	TitleScreens[i] = calloc(1, sizeof(**TitleScreens));
+	lua_rawgeti(l, i + 1, 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	TitleScreens[i]->File = strdup(lua_tostring(l, -1));
+	lua_pop(l, 1);
+	if (args == 2) {
+	    lua_rawgeti(l, i + 1, 2);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    TitleScreens[i]->Music = strdup(lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	}
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Default menu background.
@@ -324,6 +595,7 @@ local SCM CclSetTitleScreens(SCM list)
 **
 **	@return		Old menu background.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMenuBackground(SCM background)
 {
     SCM old;
@@ -342,6 +614,30 @@ local SCM CclSetMenuBackground(SCM background)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetMenuBackground(lua_State* l)
+{
+    char* old;
+
+    old = NULL;
+    if (MenuBackground) {
+	old = strdup(MenuBackground);
+    }
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (MenuBackground) {
+	free(MenuBackground);
+	MenuBackground = NULL;
+    }
+    MenuBackground = strdup(lua_tostring(l, 1));
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
 
 /**
 **	Default menu background with title.
@@ -350,6 +646,7 @@ local SCM CclSetMenuBackground(SCM background)
 **
 **	@return		Old menu background.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMenuBackgroundWithTitle(SCM background)
 {
     SCM old;
@@ -368,6 +665,30 @@ local SCM CclSetMenuBackgroundWithTitle(SCM background)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetMenuBackgroundWithTitle(lua_State* l)
+{
+    char* old;
+
+    old = NULL;
+    if (MenuBackgroundWithTitle) {
+	old = strdup(MenuBackgroundWithTitle);
+    }
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (MenuBackgroundWithTitle) {
+	free(MenuBackgroundWithTitle);
+	MenuBackgroundWithTitle = NULL;
+    }
+    MenuBackgroundWithTitle = strdup(lua_tostring(l, 1));
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
 
 /**
 **	Default menu music.
@@ -376,6 +697,7 @@ local SCM CclSetMenuBackgroundWithTitle(SCM background)
 **
 **	@return		Old menu music.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMenuMusic(SCM music)
 {
     SCM old;
@@ -394,6 +716,30 @@ local SCM CclSetMenuMusic(SCM music)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetMenuMusic(lua_State* l)
+{
+    char* old;
+
+    old = NULL;
+    if (MenuMusic) {
+	old = strdup(MenuMusic);
+    }
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (MenuMusic) {
+	free(MenuMusic);
+	MenuMusic = NULL;
+    }
+    MenuMusic = strdup(lua_tostring(l, 1));
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
 
 /**
 **	Display a picture.
@@ -402,6 +748,7 @@ local SCM CclSetMenuMusic(SCM music)
 **
 **	@return		Nothing.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDisplayPicture(SCM file)
 {
     char* name;
@@ -414,6 +761,24 @@ local SCM CclDisplayPicture(SCM file)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDisplayPicture(lua_State* l)
+{
+    char* name;
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    name = strdup(lua_tostring(l, 1));
+    SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
+    DisplayPicture(name);
+    Invalidate();
+    free(name);
+
+    return 0;
+}
+#endif
 
 /**
 **	Process a menu.
@@ -422,6 +787,7 @@ local SCM CclDisplayPicture(SCM file)
 **
 **	@return		Nothing.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclProcessMenu(SCM id)
 {
     char* mid;
@@ -434,12 +800,31 @@ local SCM CclProcessMenu(SCM id)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclProcessMenu(lua_State* l)
+{
+    char* mid;
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    mid = strdup(lua_tostring(l, 1));
+    if (FindMenu(mid)) {
+	ProcessMenu(mid, 1);
+    }
+    free(mid);
+
+    return 0;
+}
+#endif
 
 /**
 **	Define a cursor.
 **
 **	FIXME: need some general data structure to make this parsing easier.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineCursor(SCM list)
 {
     SCM value;
@@ -533,12 +918,154 @@ local SCM CclDefineCursor(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineCursor(lua_State* l)
+{
+    const char* value;
+    char* s1;
+    char* s2;
+    int i;
+    CursorType* ct;
+    int args;
+    int j;
+
+    j = 0;
+    if (!lua_isstring(l, j + 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    s1 = strdup(lua_tostring(l, j + 1));
+    ++j;
+    if (!lua_isstring(l, j + 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    s2 = strdup(lua_tostring(l, j + 1));
+    ++j;
+    if (!strcmp(s2, "any")) {
+	free(s2);
+	s2 = NULL;
+    }
+
+    //
+    //	Look if this kind of cursor already exists.
+    //
+    ct = NULL;
+    i = 0;
+    if (Cursors) {
+	for (; Cursors[i].OType; ++i) {
+	    //
+	    //	Race not same, not found.
+	    //
+	    if (Cursors[i].Race && s2) {
+		if (strcmp(Cursors[i].Race, s2)) {
+		    continue;
+		}
+	    } else if (Cursors[i].Race != s2) {
+		continue;
+	    }
+	    if (!strcmp(Cursors[i].Ident, s1)) {
+		ct = &Cursors[i];
+		break;
+	    }
+	}
+    }
+    //
+    //	Not found, make a new slot.
+    //
+    if (ct) {
+	free(s1);
+	free(s2);
+    } else {
+	ct = calloc(i + 2, sizeof(CursorType));
+	memcpy(ct, Cursors, sizeof(CursorType) * i);
+	free(Cursors);
+	Cursors = ct;
+	ct = &Cursors[i];
+	ct->OType = CursorTypeType;
+	ct->Ident = s1;
+	ct->Race = s2;
+	ct->FrameRate = 200;
+    }
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    args = lua_gettop(l);
+    for (; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "image")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    free(ct->File);
+	    ct->File = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "hot-spot")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ct->HotX = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ct->HotY = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "size")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ct->Width = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ct->Height = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "rate")) {
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ct->FrameRate = lua_tonumber(l, j + 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Set the current game cursor.
 **
 **	@param ident	Cursor identifier.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGameCursor(SCM ident)
 {
     char* str;
@@ -549,6 +1076,17 @@ local SCM CclSetGameCursor(SCM ident)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetGameCursor(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    GameCursor = CursorTypeByIdent(lua_tostring(l, 1));
+    return 0;
+}
+#endif
 
 /**
 **	Define a menu item
@@ -557,6 +1095,7 @@ local SCM CclSetGameCursor(SCM ident)
 **
 **	@param value	Button type.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local MenuButtonId scm2buttonid(SCM value)
 {
     MenuButtonId id;
@@ -648,10 +1187,13 @@ local char* SCM_PopNewStr(SCM* list)
     *list = gh_cdr(*list);
     return gh_scm2newstr(value, NULL);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse info panel text
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclParseInfoText(SCM list, InfoText* text)
 {
     SCM value;
@@ -679,10 +1221,13 @@ local void CclParseInfoText(SCM list, InfoText* text)
 	}
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse icon
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclParseIcon(SCM list, Button* icon)
 {
     SCM value;
@@ -978,6 +1523,8 @@ local void CclParseButtonIcons(SCM list, UI* ui)
 	CclParseIcon(value, &ui->ButtonButtons[i++]);
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define the look+feel of the user interface.
@@ -985,6 +1532,7 @@ local void CclParseButtonIcons(SCM list, UI* ui)
 **	FIXME: need some general data structure to make this parsing easier.
 **	FIXME: use the new tagged config format.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineUI(SCM list)
 {
     SCM value;
@@ -1628,12 +2176,15 @@ local SCM CclDefineUI(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define the viewports.
 **
 **	@param list	List of the viewports.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineViewports(SCM list)
 {
     SCM value;
@@ -1664,6 +2215,8 @@ local SCM CclDefineViewports(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Enable/disable scrolling with the mouse.
@@ -1671,6 +2224,7 @@ local SCM CclDefineViewports(SCM list)
 **	@param flag	True = turn on, false = off.
 **	@return		The old state of scrolling.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMouseScroll(SCM flag)
 {
     int old;
@@ -1680,6 +2234,22 @@ local SCM CclSetMouseScroll(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetMouseScroll(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = TheUI.MouseScroll;
+    TheUI.MouseScroll = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set speed of mouse scrolling
@@ -1687,6 +2257,7 @@ local SCM CclSetMouseScroll(SCM flag)
 **	@param num	Mouse scroll speed in frames.
 **	@return		old scroll speed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMouseScrollSpeed(SCM num)
 {
     int speed;
@@ -1701,6 +2272,28 @@ local SCM CclSetMouseScrollSpeed(SCM num)
     }
     return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetMouseScrollSpeed(lua_State* l)
+{
+    int speed;
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = SpeedMouseScroll;
+    speed = lua_tonumber(l, 1);
+    if (speed < 1 || speed > FRAMES_PER_SECOND) {
+	SpeedMouseScroll = MOUSE_SCROLL_SPEED;
+    } else {
+	SpeedMouseScroll = speed;
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Enable/disable grabbing the mouse.
@@ -1708,6 +2301,7 @@ local SCM CclSetMouseScrollSpeed(SCM num)
 **	@param flag	True = grab on, false = grab off.
 **	@return		FIXME: not supported: The old state of grabbing.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGrabMouse(SCM flag)
 {
     if (gh_scm2bool(flag)) {
@@ -1719,6 +2313,22 @@ local SCM CclSetGrabMouse(SCM flag)
     //return gh_bool2scm(old);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSetGrabMouse(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isnumber(l, 1))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (lua_isboolean(l, 1)) {
+	ToggleGrabMouse(lua_toboolean(l, 1));
+    } else {
+	ToggleGrabMouse(-1);
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable/disable leaving the window stops scrolling.
@@ -1726,6 +2336,7 @@ local SCM CclSetGrabMouse(SCM flag)
 **	@param flag	True = stop on, false = stop off.
 **	@return		The old state of stopping.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetLeaveStops(SCM flag)
 {
     int old;
@@ -1735,6 +2346,22 @@ local SCM CclSetLeaveStops(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetLeaveStops(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = LeaveStops;
+    LeaveStops = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Enable/disable scrolling with the keyboard.
@@ -1742,6 +2369,7 @@ local SCM CclSetLeaveStops(SCM flag)
 **	@param flag	True = turn on, false = off.
 **	@return		The old state of scrolling.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetKeyScroll(SCM flag)
 {
     int old;
@@ -1751,6 +2379,22 @@ local SCM CclSetKeyScroll(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetKeyScroll(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = TheUI.KeyScroll;
+    TheUI.KeyScroll = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set speed of keyboard scrolling
@@ -1758,6 +2402,7 @@ local SCM CclSetKeyScroll(SCM flag)
 **	@param num	Keyboard scroll speed in frames.
 **	@return		old scroll speed.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetKeyScrollSpeed(SCM num)
 {
     int speed;
@@ -1772,6 +2417,28 @@ local SCM CclSetKeyScrollSpeed(SCM num)
     }
     return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetKeyScrollSpeed(lua_State* l)
+{
+    int speed;
+    lua_Number old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = SpeedKeyScroll;
+    speed = lua_tonumber(l, 1);
+    if (speed < 1 || speed > FRAMES_PER_SECOND) {
+	SpeedKeyScroll = KEY_SCROLL_SPEED;
+    } else {
+	SpeedKeyScroll = speed;
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Enable/disable display of command keys in panels.
@@ -1779,6 +2446,7 @@ local SCM CclSetKeyScrollSpeed(SCM num)
 **	@param flag	True = turn on, false = off.
 **	@return		The old state of scrolling.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetShowCommandKey(SCM flag)
 {
     int old;
@@ -1789,26 +2457,69 @@ local SCM CclSetShowCommandKey(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetShowCommandKey(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = ShowCommandKey;
+    ShowCommandKey = lua_toboolean(l, 1);
+    UpdateButtonPanel();
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Fighter right button attacks as default.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclRightButtonAttacks(void)
 {
     RightButtonAttacks = 1;
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclRightButtonAttacks(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    RightButtonAttacks = 1;
+
+    return 0;
+}
+#endif
 
 /**
 **	Fighter right button moves as default.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclRightButtonMoves(void)
 {
     RightButtonAttacks = 0;
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclRightButtonMoves(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    RightButtonAttacks = 0;
+
+    return 0;
+}
+#endif
 
 /**
 **	Enable/disable the fancy buildings.
@@ -1816,6 +2527,7 @@ local SCM CclRightButtonMoves(void)
 **	@param flag	True = turn on, false = off.
 **	@return		The old state of fancy buildings flag.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetFancyBuildings(SCM flag)
 {
     int old;
@@ -1825,6 +2537,22 @@ local SCM CclSetFancyBuildings(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetFancyBuildings(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = FancyBuildings;
+    FancyBuildings = lua_toboolean(l, 1);
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Define a menu
@@ -1833,6 +2561,7 @@ local SCM CclSetFancyBuildings(SCM flag)
 **
 **	@param list	List describing the menu.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineMenu(SCM list)
 {
     SCM value;
@@ -2051,7 +2780,10 @@ local int scm2style(SCM value)
     }
     return id;
 }
+#elif defined(USE_LUA)
+#endif
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineMenuItem(SCM list)
 {
     SCM value;
@@ -2678,12 +3410,15 @@ local SCM CclDefineMenuItem(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define menu graphics
 **
 **	@param list	List describing the menu.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineMenuGraphics(SCM list)
 {
     SCM sublist;
@@ -2718,6 +3453,85 @@ local SCM CclDefineMenuGraphics(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineMenuGraphics(lua_State* l)
+{
+    int i;
+    int j;
+    int t;
+    int tables;
+    int args;
+    const char* value;
+
+    if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    tables = luaL_getn(l, 1);
+    i = 0;
+
+    for (t = 0; t < tables; ++t) {
+	lua_rawgeti(l, 1, t + 1);
+	args = luaL_getn(l, -1);
+	if (!lua_istable(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	for (j = 0; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    value = lua_tostring(l, -1);
+	    lua_pop(l, 1);
+	    if (!strcmp(value, "file")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		if (MenuButtonGfx.File[i]) {
+		    free(MenuButtonGfx.File[i]);
+		}
+		MenuButtonGfx.File[i] = strdup(lua_tostring(l, -1));
+		lua_pop(l, 1);
+	    } else if (!strcmp(value, "size")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		lua_rawgeti(l, -1, 1);
+		if (!lua_isnumber(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		MenuButtonGfx.Width[i] = lua_tonumber(l, -1);
+		lua_pop(l, 1);
+		lua_rawgeti(l, -1, 2);
+		if (!lua_isnumber(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		MenuButtonGfx.Height[i] = lua_tonumber(l, -1);
+		lua_pop(l, 1);
+		lua_pop(l, 1);
+	    } else {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	}
+	++i;
+	lua_pop(l, 1);
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Define a button.
@@ -2726,6 +3540,7 @@ local SCM CclDefineMenuGraphics(SCM list)
 **
 **	@param list	List describing the button.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineButton(SCM list)
 {
     char buf[64];
@@ -2911,6 +3726,8 @@ local SCM CclDefineButton(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Run the set-selection-changed-hook.
@@ -2935,41 +3752,125 @@ global void SelectedUnitChanged(void)
 **	@param index	index
 **
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorWaterCycleStart(SCM index)
 {
     ColorWaterCycleStart = gh_scm2int(index);
     return index;
 }
+#elif defined(USE_LUA)
+local int CclSetColorWaterCycleStart(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ColorWaterCycleStart = lua_tonumber(l, 1);
 
+    lua_pushnumber(l, ColorWaterCycleStart);
+    return 1;
+}
+#endif
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorWaterCycleEnd(SCM index)
 {
     ColorWaterCycleEnd = gh_scm2int(index);
     return index;
 }
+#elif defined(USE_LUA)
+local int CclSetColorWaterCycleEnd(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ColorWaterCycleEnd = lua_tonumber(l, 1);
 
+    lua_pushnumber(l, ColorWaterCycleEnd);
+    return 1;
+}
+#endif
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorIconCycleStart(SCM index)
 {
     ColorIconCycleStart = gh_scm2int(index);
     return index;
 }
+#elif defined(USE_LUA)
+local int CclSetColorIconCycleStart(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ColorIconCycleStart = lua_tonumber(l, 1);
 
+    lua_pushnumber(l, ColorIconCycleStart);
+    return 1;
+}
+#endif
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorIconCycleEnd(SCM index)
 {
     ColorIconCycleEnd = gh_scm2int(index);
     return index;
 }
+#elif defined(USE_LUA)
+local int CclSetColorIconCycleEnd(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ColorIconCycleEnd = lua_tonumber(l, 1);
 
+    lua_pushnumber(l, ColorIconCycleEnd);
+    return 1;
+}
+#endif
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorBuildingCycleStart(SCM index)
 {
     ColorBuildingCycleStart = gh_scm2int(index);
     return index;
 }
+#elif defined(USE_LUA)
+local int CclSetColorBuildingCycleStart(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ColorBuildingCycleStart = lua_tonumber(l, 1);
 
+    lua_pushnumber(l, ColorBuildingCycleStart);
+    return 1;
+}
+#endif
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetColorBuildingCycleEnd(SCM index)
 {
     ColorBuildingCycleEnd = gh_scm2int(index);
     return index;
 }
+#elif defined(USE_LUA)
+local int CclSetColorBuildingCycleEnd(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ColorBuildingCycleEnd = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, ColorBuildingCycleEnd);
+    return 1;
+}
+#endif
 
 /**
 **	Set double-click delay.
@@ -2977,6 +3878,7 @@ local SCM CclSetColorBuildingCycleEnd(SCM index)
 **	@param delay	Delay in ms
 **	@return		Old delay
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetDoubleClickDelay(SCM delay)
 {
     int i;
@@ -2986,6 +3888,22 @@ local SCM CclSetDoubleClickDelay(SCM delay)
 
     return gh_int2scm(i);
 }
+#elif defined(USE_LUA)
+local int CclSetDoubleClickDelay(lua_State* l)
+{
+    lua_Number i;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    i = DoubleClickDelay;
+    DoubleClickDelay = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, i);
+    return 1;
+}
+#endif
 
 /**
 **	Set hold-click delay.
@@ -2993,6 +3911,7 @@ local SCM CclSetDoubleClickDelay(SCM delay)
 **	@param delay	Delay in ms
 **	@return		Old delay
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetHoldClickDelay(SCM delay)
 {
     int i;
@@ -3002,6 +3921,22 @@ local SCM CclSetHoldClickDelay(SCM delay)
 
     return gh_int2scm(i);
 }
+#elif defined(USE_LUA)
+local int CclSetHoldClickDelay(lua_State* l)
+{
+    lua_Number i;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    i = HoldClickDelay;
+    HoldClickDelay = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, i);
+    return 1;
+}
+#endif
 
 /**
 **	Set selection style.
@@ -3009,6 +3944,7 @@ local SCM CclSetHoldClickDelay(SCM delay)
 **	@param style	New style
 **	@return		Old style
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSelectionStyle(SCM style)
 {
     SCM old;
@@ -3034,6 +3970,39 @@ local SCM CclSetSelectionStyle(SCM style)
     }
     return old;
 }
+#elif defined(USE_LUA)
+local int CclSetSelectionStyle(lua_State* l)
+{
+    char* old;
+    const char* style;
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = NULL;
+
+    style = lua_tostring(l, 1);
+    if (!strcmp(style, "rectangle")) {
+	DrawSelection = DrawSelectionRectangle;
+    } else if (!strcmp(style, "alpha-rectangle")) {
+	DrawSelection = DrawSelectionRectangleWithTrans;
+    } else if (!strcmp(style, "circle")) {
+	DrawSelection = DrawSelectionCircle;
+    } else if (!strcmp(style, "alpha-circle")) {
+	DrawSelection = DrawSelectionCircleWithTrans;
+    } else if (!strcmp(style, "corners")) {
+	DrawSelection = DrawSelectionCorners;
+    } else {
+	lua_pushstring(l, "Unsupported selection style");
+	lua_error(l);
+    }
+
+    lua_pushstring(l, old);
+    free(old);
+    return 1;
+}
+#endif
 
 /**
 **	Set display of sight range.
@@ -3042,6 +4011,7 @@ local SCM CclSetSelectionStyle(SCM style)
 **
 **	@return		The old state of display of sight.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetShowSightRange(SCM flag)
 {
     int old;
@@ -3061,6 +4031,51 @@ local SCM CclSetShowSightRange(SCM flag)
 
     return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetShowSightRange(lua_State* l)
+{
+    lua_Number old;
+    int args;
+
+    args = lua_gettop(l);
+    if (args > 1 || (args == 1 &&
+	    (!lua_isnil(l, 1) && !lua_isboolean(l, 1) && !lua_isstring(l, 1)))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    old = ShowSightRange;
+    if (args == 1 && !lua_isnil(l, 1)) {
+	if (lua_isstring(l, 1)) {
+	    const char* flag;
+
+	    flag = lua_tostring(l, 1);
+	    if (!strcmp(flag, "rectangle")) {
+		ShowSightRange = 1;
+	    } else if (!strcmp(flag, "circle")) {
+		ShowSightRange = 2;
+	    } else {
+		lua_pushstring(l, "Unsupported selection style");
+		lua_error(l);
+	    }
+	} else {
+	    int flag;
+
+	    flag = lua_toboolean(l, 1);
+	    if (flag) {
+		ShowSightRange = 3;
+	    } else {
+		ShowSightRange = 0;
+	    }
+	}
+    } else {
+	ShowSightRange = 0;
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set display of reaction range.
@@ -3069,6 +4084,7 @@ local SCM CclSetShowSightRange(SCM flag)
 **
 **	@return		The old state of display of reaction.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetShowReactionRange(SCM flag)
 {
     int old;
@@ -3088,6 +4104,44 @@ local SCM CclSetShowReactionRange(SCM flag)
 
     return gh_int2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetShowReactionRange(lua_State* l)
+{
+    lua_Number old;
+
+    old = ShowReactionRange;
+
+    if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isstring(l, 1))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (lua_isstring(l, 1)) {
+	const char* flag;
+
+	flag = lua_tostring(l, 1);
+	if (!strcmp(flag, "rectangle")) {
+	    ShowReactionRange = 1;
+	} else if (!strcmp(flag, "circle")) {
+	    ShowReactionRange = 2;
+	} else {
+	    lua_pushstring(l, "Unsupported selection style");
+	    lua_error(l);
+	}
+    } else {
+	int flag;
+
+	flag = lua_toboolean(l, 1);
+	if (flag) {
+	    ShowReactionRange = 3;
+	} else {
+	    ShowReactionRange = 0;
+	}
+    }
+
+    lua_pushnumber(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set display of attack range.
@@ -3096,15 +4150,32 @@ local SCM CclSetShowReactionRange(SCM flag)
 **
 **	@return		The old state of display of attack.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetShowAttackRange(SCM flag)
 {
     int old;
 
-    old = !ShowAttackRange;
+    old = ShowAttackRange;
     ShowAttackRange = gh_scm2bool(flag);
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetShowAttackRange(lua_State* l)
+{
+    int old;
+
+    old = ShowAttackRange;
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    ShowAttackRange = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set display of orders.
@@ -3113,6 +4184,7 @@ local SCM CclSetShowAttackRange(SCM flag)
 **
 **	@return		The old state of display of orders.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetShowOrders(SCM flag)
 {
     int old;
@@ -3129,12 +4201,36 @@ local SCM CclSetShowOrders(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetShowOrders(lua_State* l)
+{
+    int old;
+
+    old = ShowOrders;
+    if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isnumber(l, 1))) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    if (lua_isboolean(l, 1)) {
+	ShowOrders = lua_toboolean(l, 1);
+	if (ShowOrders) {
+	    ShowOrders = SHOW_ORDERS_ALWAYS;
+	}
+    } else {
+	ShowOrders = lua_tonumber(l, 1);
+    }
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Add a new message.
 **
 **	@param message	Message to display.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAddMessage(SCM message)
 {
     const char* str;
@@ -3144,10 +4240,26 @@ local SCM CclAddMessage(SCM message)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclAddMessage(lua_State* l)
+{
+    const char* str;
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    str = lua_tostring(l, 1);
+    SetMessage("%s", str);
+
+    return 0;
+}
+#endif
 
 /**
 **	Reset the keystroke help array
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclResetKeystrokeHelp(void)
 {
     int n;
@@ -3164,12 +4276,36 @@ local SCM CclResetKeystrokeHelp(void)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclResetKeystrokeHelp(lua_State* l)
+{
+    int n;
+
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    n = nKeyStrokeHelps * 2;
+    while (n--) {
+	free(KeyStrokeHelps[n]);
+    }
+    if (KeyStrokeHelps) {
+	free(KeyStrokeHelps);
+	KeyStrokeHelps = NULL;
+    }
+    nKeyStrokeHelps = 0;
+
+    return 0;
+}
+#endif
 
 /**
 **	Add a keystroke help
 **
 **	@param list	pair describing the keystroke.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAddKeystrokeHelp(SCM list)
 {
     SCM value;
@@ -3192,10 +4328,10 @@ local SCM CclAddKeystrokeHelp(SCM list)
 	n = nKeyStrokeHelps;
 	if (!n) {
 	    n = 1;
-	    KeyStrokeHelps = malloc(2 * sizeof(char *));
+	    KeyStrokeHelps = malloc(2 * sizeof(char*));
 	} else {
 	    ++n;
-	    KeyStrokeHelps = realloc(KeyStrokeHelps, n * 2 * sizeof(char *));
+	    KeyStrokeHelps = realloc(KeyStrokeHelps, n * 2 * sizeof(char*));
 	}
 	if (KeyStrokeHelps) {
 	    nKeyStrokeHelps = n;
@@ -3211,13 +4347,46 @@ local SCM CclAddKeystrokeHelp(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclAddKeystrokeHelp(lua_State* l)
+{
+    char* s1;
+    char* s2;
+    int n;
+
+    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_isstring(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    s1 = strdup(lua_tostring(l, 1));
+    s2 = strdup(lua_tostring(l, 2));
+
+    n = nKeyStrokeHelps;
+    if (!n) {
+	n = 1;
+	KeyStrokeHelps = malloc(2 * sizeof(char*));
+    } else {
+	++n;
+	KeyStrokeHelps = realloc(KeyStrokeHelps, n * 2 * sizeof(char*));
+    }
+    if (KeyStrokeHelps) {
+	nKeyStrokeHelps = n;
+	--n;
+	KeyStrokeHelps[n * 2] = s1;
+	KeyStrokeHelps[n * 2 + 1] = s2;
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
 {
-
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure1_0("add-message", CclAddMessage);
 
     gh_new_procedure1_0("set-color-cycle-all!", CclSetColorCycleAll);
@@ -3296,6 +4465,86 @@ global void UserInterfaceCclRegister(void)
     //
     gh_new_procedure0_0("reset-keystroke-help", CclResetKeystrokeHelp);
     gh_new_procedureN("add-keystroke-help", CclAddKeystrokeHelp);
+#elif defined(USE_LUA)
+    lua_register(Lua, "AddMessage", CclAddMessage);
+
+    lua_register(Lua, "SetColorCycleAll", CclSetColorCycleAll);
+    lua_register(Lua, "SetMouseScrollSpeedDefault", CclSetMouseScrollSpeedDefault);
+    lua_register(Lua, "SetMouseScrollSpeedControl", CclSetMouseScrollSpeedControl);
+
+    lua_register(Lua, "SetClickMissile", CclSetClickMissile);
+    lua_register(Lua, "SetDamageMissile", CclSetDamageMissile);
+
+    lua_register(Lua, "SetContrast", CclSetContrast);
+    lua_register(Lua, "SetBrightness", CclSetBrightness);
+    lua_register(Lua, "SetSaturation", CclSetSaturation);
+
+    lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
+    lua_register(Lua, "SetVideoFullscreen", CclSetVideoFullscreen);
+
+    lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
+    lua_register(Lua, "SetMenuBackground", CclSetMenuBackground);
+    lua_register(Lua, "SetMenuBackgroundWithTitle",
+	CclSetMenuBackgroundWithTitle);
+    lua_register(Lua, "SetMenuMusic", CclSetMenuMusic);
+
+    lua_register(Lua, "DisplayPicture", CclDisplayPicture);
+    lua_register(Lua, "ProcessMenu", CclProcessMenu);
+
+    lua_register(Lua, "DefineCursor", CclDefineCursor);
+    lua_register(Lua, "SetGameCursor", CclSetGameCursor);
+//    lua_register(Lua, "DefineUI", CclDefineUI);
+//    lua_register(Lua, "DefineViewports", CclDefineViewports);
+
+    lua_register(Lua, "SetGrabMouse", CclSetGrabMouse);
+    lua_register(Lua, "SetLeaveStops", CclSetLeaveStops);
+    lua_register(Lua, "SetKeyScroll", CclSetKeyScroll);
+    lua_register(Lua, "SetKeyScrollSpeed", CclSetKeyScrollSpeed);
+    lua_register(Lua, "SetMouseScroll", CclSetMouseScroll);
+    lua_register(Lua, "SetMouseScrollSpeed", CclSetMouseScrollSpeed);
+
+    lua_register(Lua, "SetShowCommandKey", CclSetShowCommandKey);
+    lua_register(Lua, "RightButtonAttacks", CclRightButtonAttacks);
+    lua_register(Lua, "RightButtonMoves", CclRightButtonMoves);
+    lua_register(Lua, "SetFancyBuildings", CclSetFancyBuildings);
+
+//    lua_register(Lua, "DefineButton", CclDefineButton);
+
+//    lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
+//    lua_register(Lua, "DefineMenu", CclDefineMenu);
+    lua_register(Lua, "DefineMenuGraphics", CclDefineMenuGraphics);
+
+    //
+    //	Color cycling
+    //
+    lua_register(Lua, "SetColorWaterCycleStart", CclSetColorWaterCycleStart);
+    lua_register(Lua, "SetColorWaterCycleEnd", CclSetColorWaterCycleEnd);
+    lua_register(Lua, "SetColorIconCycleStart", CclSetColorIconCycleStart);
+    lua_register(Lua, "SetColorIconCycleEnd", CclSetColorIconCycleEnd);
+    lua_register(Lua, "SetColorBuildingCycleStart", CclSetColorBuildingCycleStart);
+    lua_register(Lua, "SetColorBuildingCycleEnd", CclSetColorBuildingCycleEnd);
+
+    //
+    //	Correct named functions
+    //
+    lua_register(Lua, "SetDoubleClickDelay", CclSetDoubleClickDelay);
+    lua_register(Lua, "SetHoldClickDelay", CclSetHoldClickDelay);
+
+    //
+    //	Look and feel of units
+    //
+    lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
+    lua_register(Lua, "SetShowSightRange", CclSetShowSightRange);
+    lua_register(Lua, "SetShowReactionRange", CclSetShowReactionRange);
+    lua_register(Lua, "SetShowAttackRange", CclSetShowAttackRange);
+    lua_register(Lua, "SetShowOrders", CclSetShowOrders);
+
+    //
+    //	Keystroke helps
+    //
+    lua_register(Lua, "ResetKeystrokeHelp", CclResetKeystrokeHelp);
+    lua_register(Lua, "AddKeystrokeHelp", CclAddKeystrokeHelp);
+#endif
 
     InitMenuFuncHash();
 }
