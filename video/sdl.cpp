@@ -372,6 +372,9 @@ local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
 	case SDLK_KP_MINUS:
 	    icode = KeyCodeKPMinus;
 	    break;
+	case SDLK_SYSREQ:
+	    icode = KeyCodePrint;
+	    break;
 
 	    // We need these because if you only hit a modifier key,
 	    // the *ots from SDL don't report correct modifiers

@@ -209,4 +209,105 @@ global Graphic* LoadGraphicPNG(const char* name)
     return graphic;
 }
 
+/**
+**	Save a screenshot to a PNG file.
+**
+**	@param name	PNG filename to save.
+*/
+global void SaveScreenshotPNG(const char* name)
+{
+    FILE *fp;
+    png_structp png_ptr;
+    png_infop info_ptr;
+    unsigned char* row;
+    int i, j;
+
+    fp = fopen(name, "wb");
+    if (fp == NULL)
+	return;
+
+    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (png_ptr == NULL) {
+	fclose(fp);
+	return;
+    }
+
+    info_ptr = png_create_info_struct(png_ptr);
+    if (info_ptr == NULL) {
+	fclose(fp);
+	png_destroy_write_struct(&png_ptr,  png_infopp_NULL);
+	return;
+    }
+
+    if (setjmp(png_jmpbuf(png_ptr)))
+    {
+	/* If we get here, we had a problem reading the file */
+	fclose(fp);
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+	return;
+    }
+
+    /* set up the output control if you are using standard C streams */
+    png_init_io(png_ptr, fp);
+
+    png_set_IHDR(png_ptr, info_ptr, VideoWidth, VideoHeight, 8,
+	PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+	PNG_FILTER_TYPE_DEFAULT);
+
+    png_set_bgr(png_ptr);
+
+    VideoLockScreen();
+
+    row = (char*)malloc(VideoWidth*3);
+
+    png_write_info(png_ptr, info_ptr);
+
+    for (i=0; i<VideoHeight; ++i) {
+	switch (VideoBpp) {
+	case 8:
+	    // FIXME: Finish
+	    break;
+	case 15:
+	    for (j=0; j<VideoWidth; ++j) {
+		VMemType16 c = VideoMemory16[i*VideoWidth+j];
+		row[j*3+0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
+		row[j*3+1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
+		row[j*3+2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
+	    }
+	    break;
+	case 16:
+	    for (j=0; j<VideoWidth; ++j) {
+		VMemType16 c = VideoMemory16[i*VideoWidth+j];
+		row[j*3+0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
+		row[j*3+1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
+		row[j*3+2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
+	    }
+	    break;
+	case 24:
+	    memcpy(row, VideoMemory24+i*VideoWidth, VideoWidth*3);
+	    break;
+	case 32:
+	    for (j=0; j<VideoWidth; ++j) {
+		VMemType32 c = VideoMemory32[i*VideoWidth+j];
+		row[j*3+0] = ((c >> 0) & 0xff);
+		row[j*3+1] = ((c >> 8) & 0xff);
+		row[j*3+2] = ((c >> 16) & 0xff);
+	    }
+	    break;
+	}
+	png_write_row(png_ptr, row);
+    }
+
+    png_write_end(png_ptr, info_ptr);
+
+    VideoUnlockScreen();
+
+    /* clean up after the write, and free any memory allocated */
+    png_destroy_write_struct(&png_ptr, &info_ptr);
+
+    free(row);
+
+    fclose(fp);
+}
+
 //@}
