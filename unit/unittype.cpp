@@ -955,6 +955,7 @@ global void CleanUnitTypes(void)
 		if (type->CanCastSpell) {
 			free(type->CanCastSpell);
 		}
+		free(type->AutoCastActive);
 
 		for (res = 0; res < MaxCosts; ++res) {
 			if (type->ResInfo[res]) {

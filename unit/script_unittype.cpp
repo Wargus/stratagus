@@ -650,6 +650,39 @@ local int CclDefineUnitType(lua_State* l)
 				}
 				type->CanCastSpell[id] = 1;
 			}
+		} else if (!strcmp(value, "AutoCastActive")) {
+			if (!lua_istable(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			//
+			// Warning: AutoCastActive should only be used AFTER all spells
+			// have been defined.
+			//
+			if (!type->AutoCastActive) {
+				type->AutoCastActive = malloc(SpellTypeCount);
+				memset(type->AutoCastActive, 0, SpellTypeCount);
+			}
+			subargs = luaL_getn(l, -1);
+			if (subargs == 0) {
+				free(type->AutoCastActive);
+				type->AutoCastActive = NULL;
+
+			}
+			for (k = 0; k < subargs; ++k) {
+				int id;
+
+				lua_rawgeti(l, -1, k + 1);
+				value = LuaToString(l, -1);
+				id = SpellTypeByIdent(value)->Slot;
+				lua_pop(l, 1);
+				DebugLevel3Fn("%d \n" _C_ id);
+				if (id == -1) {
+					lua_pushfstring(l, "Unknown spell type: %s", value);
+					lua_error(l);
+				}
+				type->AutoCastActive[id] = 1;
+			}
 		} else if (!strcmp(value, "CanTargetFlag")) {
 			//
 			//	Warning: can-target-flag should only be used AFTER all bool flags
