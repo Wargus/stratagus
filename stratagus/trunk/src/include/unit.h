@@ -40,6 +40,8 @@
 **
 **	typedef struct _unit_ Unit;
 **
+**	Everything belonging to an unit. FIXME: rearrange for less memory.
+**
 **	This structure contains all informations about an unit in game.
 **	An unit could be everything, a man, a vehicle, a ship or a building.
 **	Currently only a tile, an unit or a missile could be placed on the map.
@@ -414,13 +416,9 @@ enum _directions_ {
 
 #define NextDirection	32		/// Next direction N->NE->E...
 
-/**
-**	The big unit structure.
-**
-**	Everything belonging to an unit. FIXME: rearrange for less memory.
-*/
+    /// The big unit structure
 struct _unit_ {
-    // int is faster than shorts
+    // NOTE: int is faster than shorts
     unsigned	Refs;			/// Reference counter
     unsigned	Slot;			/// Assignd slot number
     Unit**	UnitSlot;		/// slot pointer of Units
