@@ -4698,9 +4698,11 @@ local void MultiGameClientInit(Menuitem *mi)
     if (LocalSetupState.Ready[NetLocalHostsSlot]) {
 	mi->menu->items[2].flags = MenuButtonDisabled;
 	mi->menu->items[3].flags = 0;
+	mi->menu->items[CLIENT_RACE].flags = MenuButtonDisabled;
     } else {
 	mi->menu->items[3].flags = MenuButtonDisabled;
 	mi->menu->items[2].flags = 0;
+	mi->menu->items[CLIENT_RACE].flags = 0;
     }
 }
 
@@ -4732,9 +4734,11 @@ local void MultiClientGemAction(Menuitem *mi)
 	if (LocalSetupState.Ready[i]) {
 	    mi->menu->items[2].flags = MenuButtonDisabled;
 	    mi->menu->items[3].flags = 0;
+	    mi->menu->items[CLIENT_RACE].flags = MenuButtonDisabled;
 	} else {
 	    mi->menu->items[3].flags = MenuButtonDisabled;
 	    mi->menu->items[2].flags = 0;
+	    mi->menu->items[CLIENT_RACE].flags = 0;
 	}
 	MultiClientUpdate(0);
     }
@@ -4761,7 +4765,7 @@ local void MultiClientReady(void)
     menu = FindMenu("menu-net-multi-client");
     menu->items[2].flags = MenuButtonDisabled;
     menu->items[3].flags = 0;
-    menu->items[21].flags = MenuButtonDisabled;
+    menu->items[CLIENT_RACE].flags = MenuButtonDisabled;
     LocalSetupState.Ready[NetLocalHostsSlot] = 1;
     MultiClientUpdate(0);
 }
@@ -4776,7 +4780,7 @@ local void MultiClientNotReady(void)
     menu = FindMenu("menu-net-multi-client");
     menu->items[3].flags = MenuButtonDisabled;
     menu->items[2].flags = 0;
-    menu->items[21].flags = 0;
+    menu->items[CLIENT_RACE].flags = 0;
     LocalSetupState.Ready[NetLocalHostsSlot] = 0;
     MultiClientUpdate(0);
 }
