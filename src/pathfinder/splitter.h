@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name splitter.h		-	The map splitter headerfile. */
+/**@name splitter.h - The map splitter headerfile. */
 //
-//	(c) Copyright 1998-2003 by Ludovic Pollet
+// (c) Copyright 1998-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 #ifndef __SPLITTER_H__
 #define __SPLITTER_H__
@@ -38,10 +38,10 @@
 ----------------------------------------------------------------------------*/
 
 // Should be enough for every one :-)
-#define MaxZoneNumber    512   /// Max number of zone ( separated area )
-#define MaxRegionNumber  4096  /// Max number of regions ( divisions of zones )
+#define MaxZoneNumber    512   ///< Max number of zone ( separated area )
+#define MaxRegionNumber  4096  ///< Max number of regions ( divisions of zones )
 
-#define NoRegion 				((RegionId)~0UL)
+#define NoRegion  ((RegionId)~0UL)
 
 /*----------------------------------------------------------------------------
 --  Structures

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name astar.c	-	The a* path finder routines. */
+/**@name astar.c - The a* path finder routines. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer,Fabrice Rossi, Russell Smith
+// (c) Copyright 1999-2003 by Lutz Sammer,Fabrice Rossi, Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -45,20 +45,20 @@
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+-- Declarations
 ----------------------------------------------------------------------------*/
 
 typedef struct _node_ {
-	char		Direction;		/// Direction for trace back
-	char		InGoal;		 /// is this point in the goal
-	int				CostFromStart;		/// Real costs to reach this point
+	char Direction;     ///< Direction for trace back
+	char InGoal;        ///< is this point in the goal
+	int CostFromStart;  ///< Real costs to reach this point
 } Node;
 
 typedef struct _open_ {
-	int				X;				/// X coordinate
-	int				Y;				/// Y coordinate
-	int				O;				/// Offset into matrix
-	int				Costs;				/// complete costs to goal
+	int X;     ///< X coordinate
+	int Y;     ///< Y coordinate
+	int O;     ///< Offset into matrix
+	int Costs; ///< complete costs to goal
 } Open;
 
 /// heuristic cost fonction for a star
@@ -68,11 +68,11 @@ typedef struct _open_ {
 // #define AStarCosts(sx,sy,ex,ey) isqrt((abs(sx-ex)*abs(sx-ex))+(abs(sy-ey)*abs(sy-ey)))
 // #define AStarCosts(sx,sy,ex,ey) max(abs(sx-ex),abs(sy-ey))
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 //  Convert heading into direction.
-//							//  N NE  E SE  S SW  W NW
+//                      //  N NE  E SE  S SW  W NW
 const int Heading2X[9] = {  0,+1,+1,+1, 0,-1,-1,-1, 0 };
 const int Heading2Y[9] = { -1,-1, 0,+1,+1,+1, 0,-1, 0 };
 const int XY2Heading[3][3] = { {7,6,5},{0,0,4},{1,2,3}};
@@ -84,7 +84,7 @@ static int Threshold;
 static int OpenSetMaxSize;
 static int AStarMatrixSize;
 #define MAX_CLOSE_SET_RATIO 4
-#define MAX_OPEN_SET_RATIO 8		// 10,16 to small
+#define MAX_OPEN_SET_RATIO 8 // 10,16 to small
 
 /// see pathfinder.h
 int AStarFixedUnitCrossingCost = MaxMapWidth * MaxMapHeight;
@@ -93,9 +93,9 @@ int AStarKnowUnknown = 0;
 int AStarUnknownTerrainCost = 2;
 
 /**
-**		The Open set is handled by a Heap stored in a table
-**		0 is the root
-**		node i left son is at 2*i+1 and right son is at 2*i+2
+** The Open set is handled by a Heap stored in a table
+** 0 is the root
+** node i left son is at 2*i+1 and right son is at 2*i+2
 */
 
 /// The set of Open nodes
@@ -104,7 +104,7 @@ static Open* OpenSet;
 static int OpenSetSize;
 
 /**
-**		Init A* data structures
+** Init A* data structures
 */
 void InitAStar(void)
 {
@@ -119,7 +119,7 @@ void InitAStar(void)
 }
 
 /**
-**		Free A* data structure
+** Free A* data structure
 */
 void FreeAStar(void)
 {
@@ -132,7 +132,7 @@ void FreeAStar(void)
 }
 
 /**
-**		Prepare path finder.
+** Prepare path finder.
 */
 static void AStarPrepare(void)
 {
@@ -140,7 +140,7 @@ static void AStarPrepare(void)
 }
 
 /**
-**		Clean up the AStarMatrix
+** Clean up the AStarMatrix
 */
 static void AStarCleanUp(int num_in_close)
 {
@@ -157,9 +157,9 @@ static void AStarCleanUp(int num_in_close)
 }
 
 /**
-**		Find the best node in the current open node set
-**		Returns the position of this node in the open node set (always 0 in the
-**		current heap based implementation)
+** Find the best node in the current open node set
+** Returns the position of this node in the open node set (always 0 in the
+** current heap based implementation)
 */
 #define AStarFindMinimum() 0
 #if 0
@@ -170,8 +170,8 @@ static int AStarFindMinimum()
 #endif
 
 /**
-**		Remove the minimum from the open node set (and update the heap)
-**		pos is the position of the minimum (0 in the heap based implementation)
+** Remove the minimum from the open node set (and update the heap)
+** pos is the position of the minimum (0 in the heap based implementation)
 */
 static void AStarRemoveMinimum(int pos)
 {
@@ -204,8 +204,8 @@ static void AStarRemoveMinimum(int pos)
 }
 
 /**
-**		Add a new node to the open set (and update the heap structure)
-**		Returns Pathfinder failed
+** Add a new node to the open set (and update the heap structure)
+** Returns Pathfinder failed
 */
 static int AStarAddNode(int x, int y, int o, int costs)
 {
@@ -240,8 +240,8 @@ static int AStarAddNode(int x, int y, int o, int costs)
 }
 
 /**
-**		Change the cost associated to an open node. The new cost MUST BE LOWER
-**		than the old one in the current heap based implementation.
+** Change the cost associated to an open node. The new cost MUST BE LOWER
+** than the old one in the current heap based implementation.
 */
 static void AStarReplaceNode(int pos, int costs)
 {
@@ -267,8 +267,8 @@ static void AStarReplaceNode(int pos, int costs)
 
 
 /**
-**		Check if a node is already in the open set.
-**		Return -1 if not found and the position of the node in the table if found.
+** Check if a node is already in the open set.
+** Return -1 if not found and the position of the node in the table if found.
 */
 static int AStarFindNode(int eo)
 {
@@ -283,10 +283,10 @@ static int AStarFindNode(int eo)
 }
 
 /**
-**		Compute the cost of crossing tile (dx,dy)
-**		-1 -> impossible to cross
-**		 0 -> no induced cost, except move
-**		>0 -> costly tile
+** Compute the cost of crossing tile (dx,dy)
+** -1 -> impossible to cross
+**  0 -> no induced cost, except move
+** >0 -> costly tile
 */
 static int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
 	int j;
@@ -332,7 +332,7 @@ static int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
 }
 
 /**
-**		MarkAStarGoal
+** MarkAStarGoal
 */
 static int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange,
 				int mask, int* num_in_close)
@@ -506,7 +506,7 @@ static int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 	return goal_reachable;
 }
 /**
-**		Find path.
+** Find path.
 */
 int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path)
 {
@@ -583,7 +583,7 @@ int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int 
 
 	while( 1 ) {
 		//
-		//		Find the best node of from the open set
+		// Find the best node of from the open set
 		//
 		shortest=AStarFindMinimum();
 		x=OpenSet[shortest].X;
@@ -594,7 +594,7 @@ int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int 
 		AStarRemoveMinimum(shortest);
 
 		//
-		//		If we have reached the goal, then exit.
+		// If we have reached the goal, then exit.
 		if( AStarMatrix[o].InGoal==1 ) {
 			ex=x;
 			ey=y;
@@ -602,19 +602,19 @@ int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int 
 		}
 
 		//
-		//		If we have looked too long, then exit.
+		// If we have looked too long, then exit.
 		//
 		if( !counter-- ) {
 			//
-			//		Select a "good" point from the open set.
-			//				Nearest point to goal.
+			// Select a "good" point from the open set.
+			// Nearest point to goal.
 			DebugPrint("%d way too long\n" _C_ UnitNumber(unit));
 			AStarCleanUp(num_in_close);
 			return PF_FAILED;
 		}
 
 		//
-		//		Generate successors of this node.
+		// Generate successors of this node.
 
 		// Node that this node was generated from.
 		px=x-Heading2X[(int)AStarMatrix[x+TheMap.Width*y].Direction];
@@ -631,7 +631,7 @@ int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int 
 				continue;
 			}
 			//
-			//		Outside the map or can't be entered.
+			// Outside the map or can't be entered.
 			//
 			if( ex<0 || ex>=TheMap.Width ) {
 				continue;
@@ -685,7 +685,7 @@ int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int 
 				// we don't have to add this point to the close set
 			}
 		}
-		if( OpenSetSize<=0 ) {				// no new nodes generated
+		if( OpenSetSize<=0 ) { // no new nodes generated
 			AStarCleanUp(num_in_close);
 			return PF_UNREACHABLE;
 		}
@@ -733,14 +733,14 @@ int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int 
 }
 
 /**
-**		Returns the next element of a path.
+** Returns the next element of a path.
 **
-**		@param unit		Unit that wants the path element.
-**		@param pxd		Pointer for the x direction.
-**		@param pyd		Pointer for the y direction.
+** @param unit   Unit that wants the path element.
+** @param pxd    Pointer for the x direction.
+** @param pyd    Pointer for the y direction.
 **
-**		@return				>0 remaining path length, 0 wait for path, -1
-**						reached goal, -2 can't reach the goal.
+** @return >0 remaining path length, 0 wait for path, -1
+** reached goal, -2 can't reach the goal.
 */
 int NextPathElement(Unit* unit,int* pxd,int *pyd)
 {

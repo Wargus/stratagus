@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name splitter_zoneset.c	-	Manipulation of zone set. 	*/
+/**@name splitter_zoneset.c - Manipulation of zone set.  */
 //
-//	(c) Copyright 1999-2003 by Ludovic Pollet
+// (c) Copyright 1999-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
-
-//@{
+// $Id$
 
 #ifdef MAP_REGIONS
 
+//@{
+
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -51,10 +51,10 @@
 
 
 /**
-**		Clear a ZoneSet structure (make it ready for usage)
-**		Only first call eats CPU cycle.
+** Clear a ZoneSet structure (make it ready for usage)
+** Only first call eats CPU cycle.
 **
-**		@param m		pointer to a ZoneSet structure
+** @param m pointer to a ZoneSet structure
 */
 void ZoneSetClear(ZoneSet* m)
 {
@@ -74,11 +74,11 @@ void ZoneSetClear(ZoneSet* m)
 }
 
 /**
-**		Add a zone to a ZoneSet structure
+** Add a zone to a ZoneSet structure
 **
-**		@param m		pointer to a ZoneSet structure
-**		@param zone		zone to add
-**		@return 		1 if the zone is new in the set
+** @param m      Pointer to a ZoneSet structure
+** @param zone   Zone to add
+** @return  1 if the zone is new in the set
 */
 int ZoneSetAddZone(ZoneSet * m, int zone)
 {
@@ -91,10 +91,10 @@ int ZoneSetAddZone(ZoneSet * m, int zone)
 }
 
 /**
-**		Make a union of two ZoneSet
+** Make a union of two ZoneSet
 **
-**		@param dst		ZoneSet which will be modifier
-**		@param src		ZoneSet which will be added into dst
+** @param dst   ZoneSet which will be modifier
+** @param src   ZoneSet which will be added into dst
 */
 void ZoneSetAddSet(ZoneSet* dst, ZoneSet* src)
 {
@@ -106,11 +106,11 @@ void ZoneSetAddSet(ZoneSet* dst, ZoneSet* src)
 }
 
 /**
-**		Check if two ZoneSet have at least one common zone
+** Check if two ZoneSet have at least one common zone
 **
-**		@param dst		pointer to a ZoneSet structure
-**		@param src		pointer to a ZoneSet structure
-**		@return				1 if a common zone was found, 0 else
+** @param dst    pointer to a ZoneSet structure
+** @param src    pointer to a ZoneSet structure
+** @return 1 if a common zone was found, 0 else
 */
 int ZoneSetHasIntersect(ZoneSet* dst, ZoneSet* src)
 {
@@ -124,10 +124,10 @@ int ZoneSetHasIntersect(ZoneSet* dst, ZoneSet* src)
 }
 
 /**
-**		Compute the intersection of two ZoneSet structure
+** Compute the intersection of two ZoneSet structure
 **
-**		@param dst		pointer to the ZoneSet which will hold the result
-**		@param src		other ZoneSet in the operation
+** @param dst    pointer to the ZoneSet which will hold the result
+** @param src    other ZoneSet in the operation
 */
 void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src)
 {
@@ -154,13 +154,13 @@ void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src)
 }
 
 /**
-**		Add the zone of a map cell into a ZoneSet
+** Add the zone of a map cell into a ZoneSet
 **
-**		@param zs		pointer to a ZoneSet structure
-**		@param x		X coord of the map cell
-**		@param y		Y coord of the map cell
+** @param zs    pointer to a ZoneSet structure
+** @param x     X coord of the map cell
+** @param y     Y coord of the map cell
 */
-void ZoneSetAddCell(ZoneSet * zs,int x,int y)
+void ZoneSetAddCell(ZoneSet* zs, int x, int y)
 {
 	RegionId region;
 
@@ -174,31 +174,31 @@ void ZoneSetAddCell(ZoneSet * zs,int x,int y)
 }
 
 /**
-**		Check if a ZoneSet contains a given zone
+** Check if a ZoneSet contains a given zone
 **
-**		@param zs		pointer to the ZoneSet
-**		@param zone		the zone
-**		@return 		1 if zs contains the zone, 0 else
+** @param zs    pointer to the ZoneSet
+** @param zone  The zone
+** @return  1 if zs contains the zone, 0 else
 */
-int ZoneSetContains(ZoneSet * zs,int zone)
+int ZoneSetContains(ZoneSet* zs, int zone)
 {
 	return zs->Marks[zone] == zs->Id;
 }
 
 /**
-**		Add a rectangle (not filled) of tile, if they are accessible regarding the mask
+** Add a rectangle (not filled) of tile, if they are accessible regarding the mask
 **
-**		@param zs		pointer to a ZoneSet
-**		@param x0		Rectangle coordinate
-**		@param y0		Rectangle coordinate
-**		@param x1		Rectangle coordinate
-**		@param y1		Rectangle coordinate
-**		@param range		Range around the rectangle
-**		@param mask		Mask to check cell for
+** @param zs       pointer to a ZoneSet
+** @param x0       Rectangle coordinate
+** @param y0       Rectangle coordinate
+** @param x1       Rectangle coordinate
+** @param y1       Rectangle coordinate
+** @param range    Range around the rectangle
+** @param mask     Mask to check cell for
 */
-static void ZoneSetAddPassableRange(ZoneSet * zs,int x0,int y0,int x1,int y1,int range,int mask)
+static void ZoneSetAddPassableRange(ZoneSet* zs, int x0, int y0, int x1, int y1, int range, int mask)
 {
-	static int turn[5][2]={{1,0},{0,1},{-1,0},{0,-1}};
+	static const int turn[5][2] = {{1,0},{0,1},{-1,0},{0,-1}};
 	int x,y;
 	int dir;
 
@@ -219,15 +219,15 @@ static void ZoneSetAddPassableRange(ZoneSet * zs,int x0,int y0,int x1,int y1,int
 			dir++;
 		}
 		x += turn[dir][0];
-			y += turn[dir][1];
+		y += turn[dir][1];
 	} while (dir < 4);
 }
 
 /**
-**		Add the zone(s) accessible by an unit
+** Add the zone(s) accessible by an unit
 **
-**		@param source		pointer to a ZoneSet
-**		@param src		pointer to an unit
+** @param source   Pointer to a ZoneSet
+** @param src      Pointer to an unit
 */
 void ZoneSetAddUnitZones(ZoneSet * source,Unit * src)
 {
@@ -257,16 +257,16 @@ void ZoneSetAddUnitZones(ZoneSet * source,Unit * src)
 }
 
 /**
-**		Add a unit's goal to a zoneset. The goal is checked with the unit's movement mask
+** Add a unit's goal to a zoneset. The goal is checked with the unit's movement mask
 **
-**		@param dest		pointer to a ZoneSet
-**		@param src		pointer to an unit
-**		@param goal_x		coordinate of the goal
-**		@param goal_y		coordinate of the goal
-**		@param w		width in cell of the goal
-**		@param h		height in cell of the goal
-**		@param minrange		minrange to the goal
-**		@param maxrange		maxrange to the goal
+** @param dest       pointer to a ZoneSet
+** @param src        pointer to an unit
+** @param goal_x     coordinate of the goal
+** @param goal_y     coordinate of the goal
+** @param w          width in cell of the goal
+** @param h          height in cell of the goal
+** @param minrange   minrange to the goal
+** @param maxrange   maxrange to the goal
 */
 void ZoneSetAddGoalZones(ZoneSet* dest,Unit* src, int goal_x, int goal_y,int w,int h,int minrange,int maxrange)
 {
@@ -309,11 +309,11 @@ void ZoneSetAddGoalZones(ZoneSet* dest,Unit* src, int goal_x, int goal_y,int w,i
 }
 
 /**
-**		Add To a ZoneSet zone which can be reached in one step from zone.
-**		Only Water-to-Land connexion are taken into account.
+** Add To a ZoneSet zone which can be reached in one step from zone.
+** Only Water-to-Land connexion are taken into account.
 **
-**		@param dst		pointer to a ZoneSet
-**		@param zone		the zone which adjacent are searched
+** @param dst    pointer to a ZoneSet
+** @param zone   The zone which adjacent are searched
 */
 static void ZoneSetAddZoneAdjacents(ZoneSet * dst, int zone)
 {
@@ -335,10 +335,10 @@ static void ZoneSetAddZoneAdjacents(ZoneSet * dst, int zone)
 }
 
 /**
-**		Add to a ZoneSet all zone which are directly connected zones
+** Add to a ZoneSet all zone which are directly connected zones
 **
-**		@param dst		ZoneSet to add zones to
-**		@param src		Zones for which connected zones are searched
+** @param dst    ZoneSet to add zones to
+** @param src    Zones for which connected zones are searched
 */
 void ZoneSetAddConnected(ZoneSet* dst, ZoneSet * src)
 {
@@ -349,17 +349,17 @@ void ZoneSetAddConnected(ZoneSet* dst, ZoneSet * src)
 }
 
 /**
-**		Find a path throught zones (for transporters, ...)
+** Find a path throught zones (for transporters, ...)
 **
-**		@param src		Starting zones
-**		@param dst		Destination zones
-**		@param path		will hold the zones
-**		@param pathlen		will hold the path length
+** @param src        Starting zones
+** @param dst        Destination zones
+** @param path       will hold the zones
+** @param pathlen    will hold the path length
 */
-int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen)
+int ZoneSetFindPath(ZoneSet* src, ZoneSet* dst, int* path, int* pathlen)
 {
-	static ZoneSet current={0};
-	static ZoneSet newzones={0};
+	static ZoneSet current = {0};
+	static ZoneSet newzones = {0};
 	int zonedst[MaxZoneNumber];
 	int zonenext[MaxZoneNumber];
 	int i, j, curdst;
@@ -425,6 +425,7 @@ int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen)
 	} while(1);
 }
 
-#endif		// MAP_REGIONS
 //@}
+
+#endif // MAP_REGIONS
 
