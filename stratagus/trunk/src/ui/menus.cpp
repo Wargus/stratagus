@@ -4305,8 +4305,9 @@ local void EditorNewMap(void)
     }
 
     TheMap.Info = calloc(1, sizeof(MapInfo));
+    TheMap.Info->Description = malloc(32);
     description[strlen(description)-3] = '\0';
-    TheMap.Info->Description = strdup(description);
+    strcpy(TheMap.Info->Description, description);
     TheMap.Info->MapTerrain = v[menu->items[7].d.pulldown.curopt];
     TheMap.Info->MapWidth = atoi(width);
     TheMap.Info->MapHeight = atoi(height);
@@ -4843,9 +4844,6 @@ local void EditorMapProperties(void)
 local void EditorMapPropertiesEnterAction(
 	Menuitem *mi __attribute__((unused)), int key)
 {
-    if (key == 10 || key == 13) {
-	EditorEndMenu();
-    }
 }
 
 local void EditorMapPropertiesOk(void)
