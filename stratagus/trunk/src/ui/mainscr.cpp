@@ -483,7 +483,6 @@ global void DrawResources(void)
 #define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*5 // 5 seconds
 
 local char  MessageBuffer[40];		// message buffer
-local char* Message;			// message in map window
 local int   MessageFrameTimeout;	// frame to expire message
 
 #define MESSAGES_MAX  10
@@ -547,7 +546,7 @@ global void DrawMessage(void)
     SameMessageCount = 0;  
 }
 
-/*
+/**
 **	Adds message to the stack
 **
 **	@param msg	Message to add.
@@ -556,11 +555,12 @@ global void AddMessage( const char* msg )
 {
     if ( MessagesCount == MESSAGES_MAX )
       ShiftMessages();
+    DebugCheck( strlen(msg)>=sizeof(Messages[0]) );
     strcpy( Messages[ MessagesCount ], msg );
     MessagesCount++;
 }
 
-/*
+/**
 **	Check if this message repeats
 **
 **	@param msg	Message to check.
@@ -649,9 +649,7 @@ global void SetMessage2( int x, int y, char* fmt, ... )
 */
 global void SetMessageDup(const char* message)
 {
-    //FIXME: is this function correct now?
-    //       it was, before multi-messages support done
-
+    // We need a extra buffer here for the cat.
     strncpy(MessageBuffer,message,sizeof(MessageBuffer));
     MessageBuffer[sizeof(MessageBuffer)-1]='\0';
 
@@ -667,24 +665,12 @@ global void SetMessageDupCat(const char* message)
 {
     //FIXME: is this function correct now?
     //       it was, before multi-messages support done
+    //	JOHNS: this is wrong it should append to the last message.
 
     strncat(MessageBuffer,message,sizeof(MessageBuffer)-strlen(MessageBuffer));
     MessageBuffer[sizeof(MessageBuffer)-1]='\0';
 
     SetMessage(MessageBuffer);
-}
-
-/**
-**	Clear message to display.
-*/
-global void ClearMessage(void)
-{
-    //FIXME: is this function correct now?
-    //       it was, before multi-messages support done
-
-    Message=NULL;
-    MustRedraw|=RedrawMessage|RedrawMap;
-    MessageFrameTimeout = FrameCounter;
 }
 
 /**
