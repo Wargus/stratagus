@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//           T H E   W A R   B E G I N S
+// Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sound_id.h	-	Sound identifier client side header file. */
+/**@name sound_id.h - Sound identifier client side header file. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer and Fabrice Rossi
+// (c) Copyright 1999-2002 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 #ifndef __SOUND_ID_H__
 #define __SOUND_ID_H__

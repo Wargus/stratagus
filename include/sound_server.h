@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+// T H E   W A R   B E G I N S
+// Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sound_server.h	-	The sound server header file. */
+/**@name sound_server.h - The sound server header file. */
 //
-//	(c) Copyright 1998-2004 by Lutz Sammer and Fabrice Rossi
+// (c) Copyright 1998-2004 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 #ifndef __SOUND_SERVER_H__
 #define __SOUND_SERVER_H__
@@ -115,12 +115,12 @@ typedef struct _two_groups_ {
 /**
 ** A possible value for Number in the Sound struct: means a simple sound
 */
-#define ONE_SOUND		0
+#define ONE_SOUND 0
 /**
 ** A possible value for Number in the Sound struct: means a double group (for
 ** selection/annoyed sounds)
 */
-#define TWO_GROUPS		1
+#define TWO_GROUPS 1
 
 /**
 ** the range value that makes a sound volume distance independent
@@ -194,7 +194,7 @@ typedef struct _sound_channel_
 } SoundChannel;
 
 /**
-**	  Play audio flags.
+** Play audio flags.
 */
 enum _play_audio_flags_ {
 	PlayAudioStream = 1,        ///< Stream the file from medium
@@ -204,7 +204,7 @@ enum _play_audio_flags_ {
 };
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 	/// sound file descriptor, if -1 no sound available
