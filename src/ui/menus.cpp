@@ -3486,6 +3486,8 @@ local void GameTSSAction(Menuitem *mi, int i)
     // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
     int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
+    DebugLevel0Fn("FIXME: The enums TilesetSummer, TilesetWinter, ... will be removed in version 1.18\n");
+
     if (!mi || mi->d.pulldown.curopt == i) {
 	GameSettings.Terrain = v[i];
 	ServerSetupState.TssOpt = i;
@@ -4171,10 +4173,16 @@ local void StartEditor(void)
     VideoUnlockScreen();
     Invalidate();
 
+    //
+    //  Create a default path + map.
+    //
     if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
 	strcpy(CurrentMapPath, "default.pud");
     }
 
+    //
+    //	Use the last path.
+    //
     strcpy(ScenSelectPath, FreeCraftLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
@@ -4191,19 +4199,19 @@ local void StartEditor(void)
 	*ScenSelectDisplayPath = '\0';
     }
 
-    GetInfoFromSelectPath();
-
     ProcessMenu("menu-editor-select", 1);
 }
 
+/**
+**	Called from menu, for new editor map.
+*/
 local void EditorNewMap(void)
 {
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
 
-    // FIXME: currently just loads default.pud
-    strcpy(CurrentMapPath, "default.pud");
+    *CurrentMapPath = '\0';
 
     // FIXME: Use EditorRunning and main-loop.
     EditorMainLoop();
