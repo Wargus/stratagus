@@ -74,6 +74,7 @@
 #ifdef __MINGW32__
 #undef DrawIcon
 #undef EndMenu
+#undef FindResource
 #endif
 
 // MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
