@@ -116,7 +116,8 @@ typedef struct _upgrade_ {
     const void*	OType;			/// Object type (future extensions)
     char*	Ident;			/// identifier
     int		Costs[MaxCosts];	/// costs for the upgrade
-    IconId	Icon;			/// icon to display to the user
+	// FIXME: not used by buttons
+    IconConfig	Icon;			/// icon to display to the user
 } Upgrade;
 
 /**
