@@ -370,9 +370,9 @@ local void HandleMouseOn(int x, int y)
     if (NetworkFildes == (Socket)-1) {
 	if (TheUI.MenuButton.X != -1) {
 	    if (x >= TheUI.MenuButton.X &&
-		    x <= TheUI.MenuButton.X + TheUI.MenuButton.Width &&
-		    y > TheUI.MenuButton.Y &&
-		    y <= TheUI.MenuButton.Y + TheUI.MenuButton.Height) {
+		    x < TheUI.MenuButton.X + TheUI.MenuButton.Width &&
+		    y >= TheUI.MenuButton.Y &&
+		    y < TheUI.MenuButton.Y + TheUI.MenuButton.Height) {
 		ButtonAreaUnderCursor = ButtonAreaMenu;
 		ButtonUnderCursor = ButtonUnderMenu;
 		CursorOn = CursorOnButton;
@@ -383,9 +383,9 @@ local void HandleMouseOn(int x, int y)
     } else {
 	if (TheUI.NetworkMenuButton.X != -1) {
 	    if (x >= TheUI.NetworkMenuButton.X &&
-		    x <= TheUI.NetworkMenuButton.X + TheUI.NetworkMenuButton.Width &&
-		    y > TheUI.NetworkMenuButton.Y &&
-		    y <= TheUI.NetworkMenuButton.Y + TheUI.NetworkMenuButton.Height) {
+		    x < TheUI.NetworkMenuButton.X + TheUI.NetworkMenuButton.Width &&
+		    y >= TheUI.NetworkMenuButton.Y &&
+		    y < TheUI.NetworkMenuButton.Y + TheUI.NetworkMenuButton.Height) {
 		ButtonAreaUnderCursor = ButtonAreaMenu;
 		ButtonUnderCursor = ButtonUnderNetworkMenu;
 		CursorOn = CursorOnButton;
@@ -395,9 +395,9 @@ local void HandleMouseOn(int x, int y)
 	}
 	if (TheUI.NetworkDiplomacyButton.X != -1) {
 	    if (x >= TheUI.NetworkDiplomacyButton.X &&
-		    x <= TheUI.NetworkDiplomacyButton.X + TheUI.NetworkDiplomacyButton.Width &&
-		    y > TheUI.NetworkDiplomacyButton.Y &&
-		    y <= TheUI.NetworkDiplomacyButton.Y + TheUI.NetworkDiplomacyButton.Height) {
+		    x < TheUI.NetworkDiplomacyButton.X + TheUI.NetworkDiplomacyButton.Width &&
+		    y >= TheUI.NetworkDiplomacyButton.Y &&
+		    y < TheUI.NetworkDiplomacyButton.Y + TheUI.NetworkDiplomacyButton.Height) {
 		ButtonAreaUnderCursor = ButtonAreaMenu;
 		ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
 		CursorOn = CursorOnButton;
@@ -408,9 +408,9 @@ local void HandleMouseOn(int x, int y)
     }
     for (i = 0; i < TheUI.NumButtonButtons; ++i) {
 	if (x >= TheUI.ButtonButtons[i].X &&
-		x <= TheUI.ButtonButtons[i].X + TheUI.ButtonButtons[i].Width + 7 &&
-		y > TheUI.ButtonButtons[i].Y &&
-		y <= TheUI.ButtonButtons[i].Y + TheUI.ButtonButtons[i].Height + 7) {
+		x < TheUI.ButtonButtons[i].X + TheUI.ButtonButtons[i].Width + 7 &&
+		y >= TheUI.ButtonButtons[i].Y &&
+		y < TheUI.ButtonButtons[i].Y + TheUI.ButtonButtons[i].Height + 7) {
 	    ButtonAreaUnderCursor = ButtonAreaButton;
 	    ButtonUnderCursor = i;
 	    CursorOn = CursorOnButton;
@@ -423,49 +423,49 @@ local void HandleMouseOn(int x, int y)
 	    if (Selected[0]->Data.Train.Count == 1) {
 		if (TheUI.SingleTrainingButton &&
 			x >= TheUI.SingleTrainingButton->X &&
-			x <= TheUI.SingleTrainingButton->X + TheUI.SingleTrainingButton->Width + 7 &&
-			y > TheUI.SingleTrainingButton->Y &&
-			y <= TheUI.SingleTrainingButton->Y + TheUI.SingleTrainingButton->Height + 7) {
+			x < TheUI.SingleTrainingButton->X + TheUI.SingleTrainingButton->Width + 7 &&
+			y >= TheUI.SingleTrainingButton->Y &&
+			y < TheUI.SingleTrainingButton->Y + TheUI.SingleTrainingButton->Height + 7) {
 		    ButtonAreaUnderCursor = ButtonAreaTraining;
 		    ButtonUnderCursor = 0;
 		    CursorOn = CursorOnButton;
-		    MustRedraw |= RedrawButtonPanel;
+		    MustRedraw |= RedrawInfoPanel;
 		    return;
 		}
 	    } else {
 		for (i = 0; i < TheUI.NumTrainingButtons; ++i) {
 		    if (x >= TheUI.TrainingButtons[i].X &&
-			    x <= TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
-			    y > TheUI.TrainingButtons[i].Y &&
-			    y <= TheUI.TrainingButtons[i].Y + TheUI.TrainingButtons[i].Height + 7) {
+			    x < TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
+			    y >= TheUI.TrainingButtons[i].Y &&
+			    y < TheUI.TrainingButtons[i].Y + TheUI.TrainingButtons[i].Height + 7) {
 			ButtonAreaUnderCursor = ButtonAreaTraining;
 			ButtonUnderCursor = i;
 			CursorOn = CursorOnButton;
-			MustRedraw |= RedrawButtonPanel;
+			MustRedraw |= RedrawInfoPanel;
 			return;
 		    }
 		}
 	    }
 	} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo) {
 	    if (x >= TheUI.UpgradingButton->X &&
-		    x <= TheUI.UpgradingButton->X + TheUI.UpgradingButton->Width + 7 &&
-		    y > TheUI.UpgradingButton->Y &&
-		    y <= TheUI.UpgradingButton->Y + TheUI.UpgradingButton->Height + 7) {
+		    x < TheUI.UpgradingButton->X + TheUI.UpgradingButton->Width + 7 &&
+		    y >= TheUI.UpgradingButton->Y &&
+		    y < TheUI.UpgradingButton->Y + TheUI.UpgradingButton->Height + 7) {
 		ButtonAreaUnderCursor = ButtonAreaUpgrading;
 		ButtonUnderCursor = 0;
 		CursorOn = CursorOnButton;
-		MustRedraw |= RedrawButtonPanel;
+		MustRedraw |= RedrawInfoPanel;
 		return;
 	    }
 	} else if (Selected[0]->Orders[0].Action == UnitActionResearch) {
 	    if (x >= TheUI.ResearchingButton->X &&
-		    x <= TheUI.ResearchingButton->X + TheUI.ResearchingButton->Width + 7 &&
-		    y > TheUI.ResearchingButton->Y &&
-		    y <= TheUI.ResearchingButton->Y + TheUI.ResearchingButton->Height + 7) {
+		    x < TheUI.ResearchingButton->X + TheUI.ResearchingButton->Width + 7 &&
+		    y >= TheUI.ResearchingButton->Y &&
+		    y < TheUI.ResearchingButton->Y + TheUI.ResearchingButton->Height + 7) {
 		ButtonAreaUnderCursor = ButtonAreaResearching;
 		ButtonUnderCursor = 0;
 		CursorOn = CursorOnButton;
-		MustRedraw |= RedrawButtonPanel;
+		MustRedraw |= RedrawInfoPanel;
 		return;
 	    }
 	}
@@ -473,25 +473,25 @@ local void HandleMouseOn(int x, int y)
     if (NumSelected == 1) {
 	if (TheUI.SingleSelectedButton &&
 		x >= TheUI.SingleSelectedButton->X &&
-		x <= TheUI.SingleSelectedButton->X + TheUI.SingleSelectedButton->Width + 7 &&
-		y > TheUI.SingleSelectedButton->Y &&
-		y <= TheUI.SingleSelectedButton->Y + TheUI.SingleSelectedButton->Height + 7) {
+		x < TheUI.SingleSelectedButton->X + TheUI.SingleSelectedButton->Width + 7 &&
+		y >= TheUI.SingleSelectedButton->Y &&
+		y < TheUI.SingleSelectedButton->Y + TheUI.SingleSelectedButton->Height + 7) {
 	    ButtonAreaUnderCursor = ButtonAreaSelected;
 	    ButtonUnderCursor = 0;
 	    CursorOn = CursorOnButton;
-	    MustRedraw |= RedrawButtonPanel;
+	    MustRedraw |= RedrawInfoPanel;
 	    return;
 	}
     } else {
-	for (i = 0; i < TheUI.NumSelectedButtons; ++i) {
+	for (i = NumSelected - 1; i >= 0; --i) {
 	    if (x >= TheUI.SelectedButtons[i].X &&
-		    x <= TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Width + 7 &&
-		    y > TheUI.SelectedButtons[i].Y &&
-		    y <= TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Height + 7) {
+		    x < TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Width + 7 &&
+		    y >= TheUI.SelectedButtons[i].Y &&
+		    y < TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Height + 7) {
 		ButtonAreaUnderCursor = ButtonAreaSelected;
 		ButtonUnderCursor = i;
 		CursorOn = CursorOnButton;
-		MustRedraw |= RedrawButtonPanel;
+		MustRedraw |= RedrawInfoPanel;
 		return;
 	    }
 	}
