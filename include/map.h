@@ -155,10 +155,6 @@
 **    Tileset data for the map. See ::Tileset. This contains all
 **    information about the tile.
 **
-**  WorldMap::TileCount
-**
-**    How many graphic tiles are available.
-**
 **  WorldMap::Tiles
 **
 **    Pointer into the tile graphic data. Used to find fast the start
@@ -290,7 +286,6 @@ typedef struct _world_map_ {
 	int      Terrain;          ///< terrain type (summer,winter,...)
 	struct _tileset_* Tileset; ///< tileset data
 
-	unsigned TileCount; ///< how many tiles, (== TileGraphic->NFrames)
 	struct _graphic_* TileGraphic; ///< graphic for all the tiles
 
 	char Description[32];///< map description short
@@ -305,10 +300,6 @@ typedef struct _world_map_ {
 
 extern WorldMap TheMap;  ///< The current map
 
-	/// Fast draw tile, display and video mode independ
-extern void VideoDrawTile(const int tile, int x, int y);
-	/// Draws tiles display and video mode independ
-extern void MapDrawTile(int tile, int x, int y);
 	/// Vision Table to see where to locate goals and vision
 extern unsigned char* VisionTable[3];
 	/// Companion table for fast lookups

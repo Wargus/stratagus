@@ -462,73 +462,6 @@ void UpdateFogOfWarChange(void)
 
 #ifndef USE_OPENGL
 /**
-**  Draw fog of war
-**
-**  @param tile  tile number
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-void VideoDrawFog(const int tile, int x, int y)
-{
-	int tilepitch;
-	int oldx;
-	int oldy;
-	SDL_Rect srect;
-	SDL_Rect drect;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-
-	srect.x = TileSizeX * (tile % tilepitch);
-	srect.y = TileSizeY * (tile / tilepitch);
-	srect.w = TileSizeX;
-	srect.h = TileSizeY;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_BlitSurface(AlphaFogSurface, &srect, TheScreen, &drect);
-}
-
-/**
-**  Draw unexplored fog of war
-**
-**  @param tile  tile number
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-void VideoDrawUnexplored(const int tile, int x, int y)
-{
-	int tilepitch;
-	int oldx;
-	int oldy;
-	SDL_Rect srect;
-	SDL_Rect drect;
-
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-
-	srect.x = TileSizeX * (tile % tilepitch);
-	srect.y = TileSizeY * (tile / tilepitch);
-	srect.w = TileSizeX;
-	srect.h = TileSizeY;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-	drect.x = x;
-	drect.y = y;
-	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-}
-
-/**
 **  Draw only fog of war
 **
 **  @param x     X position into video memory
@@ -559,137 +492,6 @@ void VideoDrawOnlyFog(int x, int y)
 }
 
 #else
-
-/**
-**  Draw fog of war
-**
-**  @param tile  tile number
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-void VideoDrawFog(
-	const int tile __attribute__((unused)),
-	int x __attribute__((unused)), int y __attribute__((unused)))
-{
-	int tilepitch;
-	int gx;
-	int gy;
-	int sx;
-	int ex;
-	int sy;
-	int ey;
-	GLfloat stx;
-	GLfloat etx;
-	GLfloat sty;
-	GLfloat ety;
-	Graphic* g;
-	int oldx;
-	int oldy;
-	int w;
-	int h;
-
-	w = TileSizeX;
-	h = TileSizeY;
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, w, h);
-
-	g = TheMap.TileGraphic;
-	tilepitch = g->Width / TileSizeX;
-
-	gx = TileSizeX * (tile % tilepitch);
-	gy = TileSizeY * (tile / tilepitch);
-
-	sx = x;
-	ex = sx + w;
-	sy = y;
-	ey = sy + h;
-
-	stx = (GLfloat)(gx + x - oldx) / g->Width * g->TextureWidth;
-	etx = (GLfloat)(gx + x - oldx + w) / g->Width * g->TextureWidth;
-	sty = (GLfloat)(gy + y - oldy) / g->Height * g->TextureHeight;
-	ety = (GLfloat)(gy + y - oldy + h) / g->Height * g->TextureHeight;
-
-	// FIXME: slow
-	glColor4ub(0, 0, 0, FogOfWarOpacity);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	glBindTexture(GL_TEXTURE_2D, g->Textures[0]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(stx, sty);
-	glVertex2i(sx, sy);
-	glTexCoord2f(stx, ety);
-	glVertex2i(sx, ey);
-	glTexCoord2f(etx, ety);
-	glVertex2i(ex, ey);
-	glTexCoord2f(etx, sty);
-	glVertex2i(ex, sy);
-	glEnd();
-
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-}
-
-/**
-**  Draw unexplored fog of war
-**
-**  @param tile  tile number
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
-*/
-void VideoDrawUnexplored(const int tile, int x, int y)
-{
-	int tilepitch;
-	int gx;
-	int gy;
-	int sx;
-	int ex;
-	int sy;
-	int ey;
-	GLfloat stx;
-	GLfloat etx;
-	GLfloat sty;
-	GLfloat ety;
-	Graphic* g;
-	int oldx;
-	int oldy;
-	int w;
-	int h;
-
-	w = TileSizeX;
-	h = TileSizeY;
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, w, h);
-
-	g = TheMap.TileGraphic;
-	tilepitch = g->Width / TileSizeX;
-
-	gx = TileSizeX * (tile % tilepitch);
-	gy = TileSizeY * (tile / tilepitch);
-
-	sx = x;
-	ex = sx + w;
-	sy = y;
-	ey = sy + h;
-
-	stx = (GLfloat)(gx + x - oldx) / g->Width * g->TextureWidth;
-	etx = (GLfloat)(gx + x - oldx + w) / g->Width * g->TextureWidth;
-	sty = (GLfloat)(gy + y - oldy) / g->Height * g->TextureHeight;
-	ety = (GLfloat)(gy + y - oldy + h) / g->Height * g->TextureHeight;
-
-	glBindTexture(GL_TEXTURE_2D, g->Textures[0]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(stx, sty);
-	glVertex2i(sx, sy);
-	glTexCoord2f(stx, ety);
-	glVertex2i(sx, ey);
-	glTexCoord2f(etx, ety);
-	glVertex2i(ex, ey);
-	glTexCoord2f(etx, sty);
-	glVertex2i(ex, sy);
-	glEnd();
-}
-
 /**
 **  Draw only fog of war
 **
@@ -827,13 +629,14 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 		if (tile && tile != tile2) {
-			VideoDrawFog(tile, dx, dy);
+			// FIXME: Prerender to alpha
+			VideoDrawClipTrans(TheMap.TileGraphic, tile, dx, dy, FogOfWarOpacity);
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
 	}
 	if (tile2) {
-		VideoDrawUnexplored(tile2, dx, dy);
+		VideoDrawClip(TheMap.TileGraphic, tile2, dx, dy);
 	}
 
 #undef IsMapFieldExploredTable
