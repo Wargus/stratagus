@@ -1069,6 +1069,20 @@ global int InitSound(void)
     DebugLevel3("DSP sample speed %d\n",SoundFrequency);
 #endif	// USE_SDLA
 
+    // ARI: the following must be done here to allow sound to work in pre-start menus!
+    // initialize channels
+    for(dummy=0;dummy<MaxChannels;)
+	Channels[dummy].Point=++dummy;
+
+    // initialize volume (neutral point)
+    GlobalVolume=128;
+
+    // initialize unit to channel hash table
+    // WARNING: creation is only valid for a hash table using pointers as key
+#ifdef USE_GLIB
+    UnitToChannel=g_hash_table_new(g_direct_hash,NULL);
+#endif
+
     return 0;
 }
 
@@ -1077,13 +1091,12 @@ global int InitSound(void)
 */
 global int InitSoundServer()
 {
-    int dummy;
-
     //FIXME: Valid only in shared memory context!
     DistanceSilent=3*max(MapWidth,MapHeight);
     DebugLevel2("Distance Silent: %d\n",DistanceSilent);
     ViewPointOffset=max(MapWidth/2,MapHeight/2);
     DebugLevel2("ViewPointOffset: %d\n",ViewPointOffset);
+
 #ifdef USE_THREAD
     if (WithSoundThread) {
       //prepare for the sound thread
@@ -1103,18 +1116,6 @@ global int InitSoundServer()
     }
 #endif
 
-    // initialize channels
-    for(dummy=0;dummy<MaxChannels;)
-	Channels[dummy].Point=++dummy;
-
-    // initialize volume (neutral point)
-    GlobalVolume=128;
-
-    // initialize unit to channel hash table
-    // WARNING: creation is only valid for a hash table using pointers as key
-#ifdef USE_GLIB
-    UnitToChannel=g_hash_table_new(g_direct_hash,NULL);
-#endif
     return 0;
 }
 
