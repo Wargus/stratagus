@@ -218,6 +218,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	//	Change unit to full state. FIXME: more races
 	//
+	unit->Player->UnitTypesCount[unit->Type->Type]--;
 	if( unit->Type==*resource->Human ) {
 	    unit->Type=*resource->HumanWithResource;
 	} else if( unit->Type==*resource->Orc ) {
@@ -227,6 +228,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
 		,unit->Type->Ident,DEFAULT_NAMES[resource->Cost]);
 	}
+	unit->Player->UnitTypesCount[unit->Type->Type]++;
 
 	//
 	//	Find and send to resource deposit.
@@ -364,6 +366,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
     //
     //	Change unit to empty state. FIXME: more races
     //
+    unit->Player->UnitTypesCount[unit->Type->Type]--;
     if( unit->Type==*resource->HumanWithResource ) {
 	unit->Type=*resource->Human;
     } else if( unit->Type==*resource->OrcWithResource ) {
@@ -372,6 +375,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
 	    ,unit->Type->Ident,DEFAULT_NAMES[resource->Cost]);
     }
+    unit->Player->UnitTypesCount[unit->Type->Type]++;
 
     //
     //	Time to store the resource.
