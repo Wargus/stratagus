@@ -233,7 +233,6 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 */
 local int FlacRead(Sample* sample, void* buf, int len)
 {
-DebugCheck(1);
 	FlacData *data;
 
 	data = sample->User;
@@ -258,7 +257,6 @@ DebugCheck(1);
 */
 local void FlacFree(Sample* sample)
 {
-DebugCheck(1);
 #ifdef DEBUG
 	AllocatedSoundMemory -= sample->Len;
 #endif
