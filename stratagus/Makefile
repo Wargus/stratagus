@@ -23,7 +23,7 @@ MODULE  = clone
 
 OBJS	= clone.$(OE) mainloop.$(OE) goal.$(OE) selection.$(OE) groups.$(OE) \
 	  unit.$(OE) unit_draw.$(OE) unitcache.$(OE) unit_find.$(OE) \
-	  construct.$(OE) player.$(OE) pud.$(OE) ccl.$(OE) interface.$(OE) \
-	  iolib.$(OE) spells.$(OE)
+	  construct.$(OE) player.$(OE) pud.$(OE) ccl.$(OE) iolib.$(OE) \
+	  spells.$(OE)
 
 include $(TOPDIR)/Common.mk
