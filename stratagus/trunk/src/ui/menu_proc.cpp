@@ -54,6 +54,7 @@
 #include "sound_server.h"
 #include "sound.h"
 #include "script.h"
+#include "campaign.h"
 
 #ifdef USE_WIN32
 #ifdef _MSC_VER
@@ -2374,7 +2375,7 @@ local void PopMenu(void)
 }
 
 /**
-**		End process menu
+**  End process menu
 */
 global void EndMenu(void)
 {
@@ -2382,7 +2383,8 @@ global void EndMenu(void)
 	MustRedraw = RedrawEverything;
 	PopMenu();
 
-	if (!CurrentMenu && Callbacks != &GameCallbacks && GameRunning) {
+	if (!CurrentMenu && Callbacks != &GameCallbacks &&
+			(GameRunning || GameResult != GameNoResult)) {
 		InterfaceState = IfaceStateNormal;
 		Callbacks = &GameCallbacks;
 		GamePaused = 0;
