@@ -54,135 +54,13 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**  Simple sound definition:
-**  There is only one sound/voice that could be used for this
-**  sound identifier.
-*/
-typedef struct _simple_sound_ {
-	char* Name; /// name of the sound
-	char* File; /// corresponding sound file
-} SimpleSound;
-
-/**
-**  Structure for remaping a sound to a new name.
-*/
-typedef struct _sound_remap_ {
-	char* NewName;  /// Name in unit-type definition
-	char* BaseName; /// Name used in sound definition
-} SoundRemap;
-
-#define MaxSimpleGroups 7 /// maximal number of sounds pro group
-
-/**
-**  Sound group definition:
-**  There is a collection of sounds/voices that could be randomly
-**  be used fot this sound identifier.
-*/
-typedef struct _sound_group_ {
-	char* Name;                     /// name of the group
-	char* Sounds[MaxSimpleGroups];  /// list of sound files
-} SoundGroup;
-
-/**
-**  Selection structure:
-**
-**  Special sound structure currently used for the selection of an unit.
-**  For a special number of the uses the first group is used, after this
-**  the second groups is played.
-*/
-typedef struct _selection_group_ {
-	char* Name;    /// name of the selection sound
-	char* First;   /// name of the sound
-	char* Second;  /// name of the annoyed sound
-} SelectionGroup;
-
 /*----------------------------------------------------------------------------
--- Variables
+--  Variables
 ----------------------------------------------------------------------------*/
-
-
-/**
-**  Simple sounds currently available.
-*/
-static SimpleSound* SimpleSounds;
-
-/**
-**  Sound remaping currently available.
-*/
-static SoundRemap* SoundRemaps;
-
-/**
-**  Sound-groups currently available
-*/
-static SoundGroup* SoundGroups;
-
-/**
-**  Selection-groups currently available
-*/
-static SelectionGroup* SelectionGroups;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Computes the number of sounds in a sound group
-**
-**  @param group list of file names
-**
-**  @return number of sounds in group
-*/
-static int NbSoundsInGroup(char* const* const group)
-{
-	int i;
-
-	for (i = 0; i < MaxSimpleGroups; ++i) {
-		if (!group[i]) {
-			return i;
-		}
-	}
-	return i;
-}
-
-
-/**
-**  Loads all simple sounds (listed in the SimpleSounds array).
-*/
-static void LoadSimpleSounds(void)
-{
-	int i;
-
-	if (SimpleSounds) {
-		for (i = 0; SimpleSounds[i].Name; ++i) {
-			MakeSound(SimpleSounds[i].Name, (const char**)&(SimpleSounds[i].File), 1);
-		}
-	}
-}
-
-/**
-**  Loads all sound groups.
-**  Special groups are created.
-*/
-static void LoadSoundGroups(void)
-{
-	int i;
-
-	if (SoundGroups) {
-		for (i = 0; SoundGroups[i].Name; ++i) {
-			MakeSound(SoundGroups[i].Name, (const char**)SoundGroups[i].Sounds,
-				NbSoundsInGroup(SoundGroups[i].Sounds));
-		}
-	}
-	if (SelectionGroups) {
-		for (i = 0; SelectionGroups[i].Name; ++i) {
-			//FIXME: might be more efficient
-			MakeSoundGroup(SelectionGroups[i].Name,
-				SoundIdForName(SelectionGroups[i].First),
-				SoundIdForName(SelectionGroups[i].Second));
-		}
-	}
-}
 
 /**
 **  Performs remaping listed in the Remaps array. Maps also critter
@@ -190,16 +68,6 @@ static void LoadSoundGroups(void)
 */
 static void RemapSounds(void)
 {
-	int i;
-
-	if (SoundRemaps) {
-		for (i = 0; SoundRemaps[i].NewName; ++i) {
-			//FIXME: should be more efficient
-			MapSound(SoundRemaps[i].NewName,
-				SoundIdForName(SoundRemaps[i].BaseName));
-		}
-	}
-
 	//
 	// Make some general sounds.
 	//
@@ -240,8 +108,6 @@ static void RemapSounds(void)
 void LoadUnitSounds(void)
 {
 	if (SoundEnabled()) {
-		LoadSimpleSounds();
-		LoadSoundGroups();
 		RemapSounds();
 	}
 }
@@ -294,6 +160,9 @@ static void MapAnimSounds(UnitType* type)
 	MapAnimSounds2(type->NewAnimations->StartResearch);
 	MapAnimSounds2(type->NewAnimations->Research);
 	MapAnimSounds2(type->NewAnimations->EndResearch);
+	MapAnimSounds2(type->NewAnimations->StartUpgrade);
+	MapAnimSounds2(type->NewAnimations->Upgrade);
+	MapAnimSounds2(type->NewAnimations->EndUpgrade);
 	MapAnimSounds2(type->NewAnimations->StartBuild);
 	MapAnimSounds2(type->NewAnimations->Build);
 	MapAnimSounds2(type->NewAnimations->EndBuild);
