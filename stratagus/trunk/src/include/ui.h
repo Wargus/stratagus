@@ -327,9 +327,9 @@ typedef struct _ui_ {
 
 /// @todo could use different sounds/speech for the errors
 /// Is in gamesounds?
-///	SoundConfig PlacementError;         ///< played on placements errors
-///	SoundConfig PlacementSuccess;       ///< played on placements success
-///	SoundConfig Click;                  ///< click noice used often
+/// SoundConfig PlacementError;         ///< played on placements errors
+/// SoundConfig PlacementSuccess;       ///< played on placements success
+/// SoundConfig Click;                  ///< click noice used often
 
 	MenuPanel* MenuPanels;              ///< Menu panels
 
@@ -409,4 +409,4 @@ extern void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int
 
 //@}
 
-#endif		// !__UI_H__
+#endif // !__UI_H__

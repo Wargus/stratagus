@@ -34,7 +34,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Documentation
+-- Documentation
 ----------------------------------------------------------------------------*/
 
 /**
@@ -699,7 +699,7 @@ struct _unit_type_ {
 	int RandomMovementProbability;  ///< Probability to move randomly.
 	int ClicksToExplode;            ///< Number of consecutive clicks until unit suicides.
 	int MaxOnBoard;                 ///< Number of Transporter slots.
-	int StartingResources;			///< Amount of Resources on build
+	int StartingResources;          ///< Amount of Resources on build
 	/// @note original only visual effect, we do more with this!
 	enum {
 		UnitTypeLand,               ///< Unit lives on land
@@ -828,4 +828,4 @@ extern void CleanUnitTypes(void);                   ///< Cleanup unit-type modul
 
 //@}
 
-#endif		// !__UNITTYPE_H__
+#endif // !__UNITTYPE_H__

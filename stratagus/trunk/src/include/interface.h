@@ -406,7 +406,7 @@ extern int DoButtonPanelKey(int key);
 extern int HandleMouseScrollArea(int, int);
 
 //
-//		in button_checks.c
+// in button_checks.c
 //
 	/// Check is always true
 extern int ButtonCheckTrue(const Unit*, const ButtonAction*);

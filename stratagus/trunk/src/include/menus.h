@@ -64,60 +64,60 @@ typedef int MenuButtonId;
 
 /// @todo FILL IN THIS TABLE!!!!
 
-#define MBUTTON_MAIN    4 /// @todo write docu
-#define MBUTTON_NETWORK 7
-#define MBUTTON_GM_HALF 10
-#define MBUTTON_132     13
-#define MBUTTON_GM_FULL 16
-#define MBUTTON_GEM_ROUND 19
-#define MBUTTON_GEM_SQUARE 24
-#define MBUTTON_UP_ARROW 29
-#define MBUTTON_DOWN_ARROW 32
-#define MBUTTON_LEFT_ARROW 35
+#define MBUTTON_MAIN         4 /// @todo write docu
+#define MBUTTON_NETWORK      7
+#define MBUTTON_GM_HALF     10
+#define MBUTTON_132         13
+#define MBUTTON_GM_FULL     16
+#define MBUTTON_GEM_ROUND   19
+#define MBUTTON_GEM_SQUARE  24
+#define MBUTTON_UP_ARROW    29
+#define MBUTTON_DOWN_ARROW  32
+#define MBUTTON_LEFT_ARROW  35
 #define MBUTTON_RIGHT_ARROW 38
-#define MBUTTON_S_KNOB 40
-#define MBUTTON_S_VCONT 42
-#define MBUTTON_S_HCONT 44
-#define MBUTTON_PULLDOWN 46
-#define MBUTTON_VTHIN 48
-#define MBUTTON_FOLDER 51  /* expansion gfx only */
+#define MBUTTON_S_KNOB      40
+#define MBUTTON_S_VCONT     42
+#define MBUTTON_S_HCONT     44
+#define MBUTTON_PULLDOWN    46
+#define MBUTTON_VTHIN       48
+#define MBUTTON_FOLDER      51  /* expansion gfx only */
 
-#define MBUTTON_SC_GEM_ROUND 7
-#define MBUTTON_SC_GEM_SQUARE 12
-#define MBUTTON_SC_UP_ARROW 17
-#define MBUTTON_SC_DOWN_ARROW 20
-#define MBUTTON_SC_LEFT_ARROW 23
-#define MBUTTON_SC_RIGHT_ARROW 26
-#define MBUTTON_SC_S_KNOB 28
-#define MBUTTON_SC_S_VCONT 30
-#define MBUTTON_SC_S_HCONT 33
-#define MBUTTON_SC_PULLDOWN_DOWN_ARROW 50
-#define MBUTTON_SC_PULLDOWN_DISABLED 54
-#define MBUTTON_SC_PULLDOWN 57
-#define MBUTTON_SC_PULLDOWN_TOP 60
-#define MBUTTON_SC_PULLDOWN_MIDDLE 63
-#define MBUTTON_SC_PULLDOWN_BOTTOM 66
+#define MBUTTON_SC_GEM_ROUND                 7
+#define MBUTTON_SC_GEM_SQUARE               12
+#define MBUTTON_SC_UP_ARROW                 17
+#define MBUTTON_SC_DOWN_ARROW               20
+#define MBUTTON_SC_LEFT_ARROW               23
+#define MBUTTON_SC_RIGHT_ARROW              26
+#define MBUTTON_SC_S_KNOB                   28
+#define MBUTTON_SC_S_VCONT                  30
+#define MBUTTON_SC_S_HCONT                  33
+#define MBUTTON_SC_PULLDOWN_DOWN_ARROW      50
+#define MBUTTON_SC_PULLDOWN_DISABLED        54
+#define MBUTTON_SC_PULLDOWN                 57
+#define MBUTTON_SC_PULLDOWN_TOP             60
+#define MBUTTON_SC_PULLDOWN_MIDDLE          63
+#define MBUTTON_SC_PULLDOWN_BOTTOM          66
 #define MBUTTON_SC_PULLDOWN_BOTTOM_SELECTED 69
-#define MBUTTON_SC_PULLDOWN_TOP_SELECTED 72
-#define MBUTTON_SC_INPUT 81
-#define MBUTTON_SC_BUTTON_LEFT 107
-#define MBUTTON_SC_BUTTON 116
-#define MBUTTON_SC_BUTTON_RIGHT 125
+#define MBUTTON_SC_PULLDOWN_TOP_SELECTED    72
+#define MBUTTON_SC_INPUT                    81
+#define MBUTTON_SC_BUTTON_LEFT              107
+#define MBUTTON_SC_BUTTON                   116
+#define MBUTTON_SC_BUTTON_RIGHT             125
 
 	/// Offsets into NetMultiSetupMenuItems
-#define SERVER_PLAYER_STATE	5
-#define SERVER_PLAYER_READY	32
-#define SERVER_PLAYER_LAG	46
+#define SERVER_PLAYER_STATE 5
+#define SERVER_PLAYER_READY 32
+#define SERVER_PLAYER_LAG   46
 
 	/// Offsets into NetMultiClientMenuItems
-#define CLIENT_PLAYER_STATE	5
-#define CLIENT_RACE		21
-#define CLIENT_RESOURCE		23
-#define CLIENT_UNITS		25
-#define CLIENT_FOG_OF_WAR	27
-#define CLIENT_TILESET		29
-#define CLIENT_GAMETYPE		31
-#define CLIENT_PLAYER_READY	32
+#define CLIENT_PLAYER_STATE  5
+#define CLIENT_RACE         21
+#define CLIENT_RESOURCE     23
+#define CLIENT_UNITS        25
+#define CLIENT_FOG_OF_WAR   27
+#define CLIENT_TILESET      29
+#define CLIENT_GAMETYPE     31
+#define CLIENT_PLAYER_READY 32
 
 // For the game speed slider in the speed settings screen.
 #define MIN_GAME_SPEED 50
@@ -257,37 +257,37 @@ typedef struct _menuitem_ {
 	} d;
 } Menuitem;
 
-#define MI_TYPE_TEXT 1  ///< @todo write docu
-#define MI_TYPE_BUTTON 2
+#define MI_TYPE_TEXT     1 ///< @todo write docu
+#define MI_TYPE_BUTTON   2
 #define MI_TYPE_PULLDOWN 3
-#define MI_TYPE_LISTBOX 4
-#define MI_TYPE_VSLIDER 5
+#define MI_TYPE_LISTBOX  4
+#define MI_TYPE_VSLIDER  5
 #define MI_TYPE_DRAWFUNC 6
-#define MI_TYPE_INPUT 7
-#define MI_TYPE_GEM 8
-#define MI_TYPE_HSLIDER 9
+#define MI_TYPE_INPUT    7
+#define MI_TYPE_GEM      8
+#define MI_TYPE_HSLIDER  9
 
 	/// for MI_TYPE_TEXT
 #define MI_TFLAGS_CENTERED 1
-#define MI_TFLAGS_RALIGN 2
-#define MI_TFLAGS_LALIGN 4
+#define MI_TFLAGS_RALIGN   2
+#define MI_TFLAGS_LALIGN   4
 
 	/// for MI_TYPE_xSLIDER
-#define MI_CFLAGS_UP 1
-#define MI_CFLAGS_DOWN 2
-#define MI_CFLAGS_LEFT 1
+#define MI_CFLAGS_UP    1
+#define MI_CFLAGS_DOWN  2
+#define MI_CFLAGS_LEFT  1
 #define MI_CFLAGS_RIGHT 2
-#define MI_CFLAGS_KNOB 4
-#define MI_CFLAGS_CONT 8
+#define MI_CFLAGS_KNOB  4
+#define MI_CFLAGS_CONT  8
 
 	/// for MI_TYPE_PULLDOWN
 #define MI_PSTATE_PASSIVE 1  ///< Pulldown is passive (grey) drawn
 
 	/// for MI_TYPE_GEM
-#define MI_GSTATE_UNCHECKED 0  ///< Gem has no check mark
-#define MI_GSTATE_PASSIVE 1    ///< Gem is passive (grey) drawn
-#define MI_GSTATE_INVISIBLE 2  ///< Gem is not drawn
-#define MI_GSTATE_CHECKED 4    ///< Gem is with check mark drawn
+#define MI_GSTATE_UNCHECKED 0 ///< Gem has no check mark
+#define MI_GSTATE_PASSIVE   1 ///< Gem is passive (grey) drawn
+#define MI_GSTATE_INVISIBLE 2 ///< Gem is not drawn
+#define MI_GSTATE_CHECKED   4 ///< Gem is with check mark drawn
 
 #define MI_STYLE_SC_VSLIDER 1
 #define MI_STYLE_SC_HSLIDER 2

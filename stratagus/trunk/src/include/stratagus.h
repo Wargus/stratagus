@@ -298,7 +298,7 @@ extern int EnableRedraw;
 #define MyRand()  rand()
 
 enum {
-	TitleFlagCenter	= 1 << 0,  ///< Center Text
+	TitleFlagCenter = 1 << 0,  ///< Center Text
 };
 
 typedef struct _title_screen_label_ {
@@ -391,4 +391,4 @@ extern long isqrt(long num);
 extern char* CompileOptions;
 //@}
 
-#endif		// !__STRATAGUS_H__
+#endif // !__STRATAGUS_H__

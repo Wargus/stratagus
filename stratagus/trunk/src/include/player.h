@@ -149,7 +149,7 @@
 **  Player::Revenue[::MaxCosts]
 **
 **    Production of resources per minute (or estimates)
-**  	  Used just as information (statistics) for the player...
+**    Used just as information (statistics) for the player...
 **
 **  Player::UnitTypesCount[::UnitTypeMax]
 **
