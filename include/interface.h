@@ -355,6 +355,8 @@ extern void DoRightButton(int tx, int ty);
 	/// Cancel the building input mode
 extern void CancelBuildingMode(void);
 
+	/// Draw menu button area
+extern void DrawMenuButtonArea(void);
 	/// Update messages
 extern void UpdateMessages(void);
 	/// Draw messages as overlay over of the map
