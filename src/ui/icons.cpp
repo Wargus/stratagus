@@ -450,9 +450,11 @@ global void SaveIcons(FILE* file)
     //  Icons
     //
     for (i = 0; i < NumIcons; ++i) {
-	fprintf(file, "(define-icon '%s 'tileset '%s\n", Icons[i]->Ident,
-	    Icons[i]->Tileset);
-	fprintf(file, "  'size '(%d %d) 'normal '(%d \"%s\"))\n",
+	fprintf(file, "(define-icon '%s", Icons[i]->Ident);
+	if (Icons[i]->Tileset) {
+	    fprintf(file, " 'tileset '%s", Icons[i]->Tileset);
+	}
+	fprintf(file, "\n  'size '(%d %d) 'normal '(%d \"%s\"))\n",
 	    Icons[i]->Width, Icons[i]->Height,
 	    Icons[i]->Index, Icons[i]->File->FileName);
     }
