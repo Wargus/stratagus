@@ -293,7 +293,7 @@ local int IconsCount;			/// Number of icons in Icons.
 local char** IconAliases;		/// Table of all aliases for icons.
 local int IconAliasesCount;		/// Number of icons aliases in Aliases.
 
-#ifdef DOXYGEN
+#ifdef DOXYGEN				// no real code, only for document
 
 local IconFile* IconFileHash[31];	/// lookup table for icon file names
 
@@ -328,8 +328,11 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
     IconFile* iconfile;
     Icon* icon;
 
+    //
+    //	Look up file
+    //
     ptr=hash_find(IconFileHash,file);
-    if( ptr ) {
+    if( ptr && *ptr ) {
 	iconfile=*ptr;
     } else {				// new file
 	iconfile=malloc(sizeof(IconFile));
@@ -342,10 +345,15 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
 	iconfile->Graphic=NULL;
 	*(IconFile**)hash_add(IconFileHash,iconfile->FileName)=iconfile;
     }
+
+    //
+    //	Look up icon
+    //
     str=strdcat(ident,tileset);
     ptr=hash_find(IconHash,str);
-    if( ptr ) {
-	DebugLevel0Fn("FIXME: Icon already defined `%s'\n",str);
+    if( ptr && *ptr ) {
+	DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n",ident,tileset);
+	// This is more a config error
 	free(str);
 	return;
     } else {
@@ -354,6 +362,7 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
 	icon->Tileset=strdup(tileset);
 	icon->File=iconfile;
 	icon->Index=index;
+	// FIXME: 5 icons pro row hardcoded!
 	icon->X=(index%5)*iconfile->Width;
 	icon->Y=(index/5)*iconfile->Height;
 	icon->Width=iconfile->Width;
@@ -361,6 +370,7 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
 
 	icon->Graphic=NULL;
 	*(Icon**)hash_add(IconHash,str)=icon;
+	free(str);
     }
     Icons=realloc(Icons,sizeof(Icon*)*(IconsCount+1));
     Icons[IconsCount++]=icon;
@@ -374,10 +384,6 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
 global void InitIcons(void)
 {
     unsigned i;
-    static int done;
-
-    DebugCheck( done );
-    done=1;
 
     DebugLevel0Fn("Init icons %s\n",TheMap.Tileset->Ident);
 
@@ -402,7 +408,6 @@ global void InitIcons(void)
 	    *(Icon**)hash_add(IconHash,Icons[i]->Ident)=Icons[i];
 	}
     }
-
 
 #ifndef USE_CCL
     //
@@ -439,8 +444,6 @@ global void LoadIcons(void)
 {
     unsigned i;
 
-    InitIcons();
-
     //
     //	Load all icon files.
     //
@@ -467,14 +470,87 @@ global void LoadIcons(void)
 
 /**
 **	Cleanup memory used by the icons.
-**
-**	@todo
-**		Write this cleanup function. Needed if we want to play more
-**		than one level without new start of the program.
 */
 global void CleanIcons(void)
 {
-    DebugLevel0Fn("FIXME: cleanup not supported\n");
+    void** ptr;
+    IconFile* table[IconsCount];
+    int n;
+    int i;
+
+    //
+    //	Mapping the original icon numbers in puds to our internal strings
+    //
+    if( (ptr=(void**)IconWcNames) ) {	// Free all old names
+	while( *ptr ) {
+	    free(*ptr++);
+	}
+	free(IconWcNames);
+
+	IconWcNames=NULL;
+    }
+
+    //
+    //	Icons
+    //
+    if( Icons ) {
+	n=0;
+	for( i=0; i<IconsCount; ++i ) {
+	    char* str;
+
+	    // NOTE hash_del not supported
+	    str=strdcat(Icons[i]->Ident,Icons[i]->Tileset);
+	    ptr=hash_find(IconHash,str);
+	    free(str);
+	    *ptr=NULL;
+	    ptr=hash_find(IconHash,Icons[i]->Ident);
+	    *ptr=NULL;
+
+	    free(Icons[i]->Ident);
+	    free(Icons[i]->Tileset);
+	    
+	    ptr=hash_find(IconFileHash,Icons[i]->File->FileName);
+	    if( ptr && *ptr ) {
+		table[n++]=*ptr;
+		*ptr=NULL;
+	    }
+
+	    free(Icons[i]);
+	}
+
+	free(Icons);
+	Icons=NULL;
+	IconsCount=0;
+
+	//
+	//	Handle the icon files.
+	//
+	for( i=0; i<n; ++i ) {
+	    // NOTE hash_del not supported
+	    // hash_del(IconFileHash,table[i]->FileName);
+	    free(table[i]->FileName);
+	    VideoSaveFree(table[i]->Graphic);
+	    free(table[i]);
+	}
+    }
+
+    //
+    //	Icons aliases
+    //
+    if( IconAliases ) {
+	for( i=0; i<IconAliasesCount; ++i ) {
+	    // NOTE hash_del not supported
+	    ptr=hash_find(IconHash,IconAliases[i*2+0]);
+	    *ptr=NULL;
+
+	    free(IconAliases[i*2+0]);
+	    free(IconAliases[i*2+1]);
+	}
+
+	free(IconAliases);
+	IconAliases=NULL;
+	IconAliasesCount=0;
+    }
 }
 
 /**
