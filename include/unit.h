@@ -948,10 +948,18 @@ extern int ToggleUnitsByType(Unit* base);
 extern int SelectGroup(int group_number);
     /// Select the unit from the same group as the one in parameter
 extern int SelectGroupFromUnit(Unit *unit);
-    /// Add the units in the selection rectangle to the current selection
-extern int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h);
     /// Select the units in the selection rectangle
 extern int SelectUnitsInRectangle(int tx,int ty,int w,int h);
+    /// Select ground units in the selection rectangle
+extern int SelectGroundUnitsInRectangle(int tx,int ty,int w,int h);
+    /// Select flying units in the selection rectangle
+extern int SelectAirUnitsInRectangle(int tx,int ty,int w,int h);
+    /// Add the units in the selection rectangle to the current selection
+extern int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h);
+    /// Add ground units in the selection rectangle to the current selection
+extern int AddSelectedGroundUnitsInRectangle(int tx,int ty,int w,int h);
+    /// Add flying units in the selection rectangle to the current selection
+extern int AddSelectedAirUnitsInRectangle(int tx,int ty,int w,int h);
 
     /// Init selections
 extern void InitSelections(void);
