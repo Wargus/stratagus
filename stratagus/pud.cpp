@@ -122,6 +122,7 @@ static unsigned int ChksumArea(const unsigned char* adr,int length)
 static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			,WorldMap* map)
 {
+#ifndef LUA_MAP_API
 	Tileset *tileset;
 	const unsigned short* ctab;
 	int h;
@@ -169,6 +170,7 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			}
 		}
 	}
+	#endif
 }
 
 #ifndef USE_TILEFLAGS_FROM_TILESET_WHILE_LOADING_A_PUD
@@ -891,9 +893,9 @@ void LoadPud(const char* pud,WorldMap* map)
 		if( !memcmp(header,"ERA ",4) || !memcmp(header,"ERAX",4) ) {
 			if( length==2 ) {
 				unsigned int t;
-				unsigned int i;
 
 				t=PudReadWord(input);
+				#ifndef LUA_MAP_API
 				if (GameSettings.Terrain != SettingsPresetMapDefault) {
 					t = GameSettings.Terrain;
 				}
@@ -903,6 +905,7 @@ void LoadPud(const char* pud,WorldMap* map)
 				//
 				// Look if we have this as tileset.
 				//
+				unsigned int i;
 				for( i=0; i<t && TilesetWcNames[i]; ++i ) {
 				}
 				if( !TilesetWcNames[i] ) {
@@ -911,6 +914,7 @@ void LoadPud(const char* pud,WorldMap* map)
 				map->TerrainName=strdup(TilesetWcNames[t]);
 				map->Terrain=t;
 				LoadTileset();
+				#endif
 				continue;
 			} else {
 				DebugPrint("Wrong terrain type length\n");
