@@ -172,7 +172,7 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
 	  doc/ccl/research.html doc/graphic/*.html doc/graphic/*.png \
-	  debian/freecraft.6 
+	  doc/trigger.txt debian/freecraft.6 
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
