@@ -137,27 +137,6 @@ struct _spell_action_type_ {
 		} AdjustBuffs;
 
 		struct {
-			int Index;                  ///< index of the variable to modify.
-
-			int Enable;                 ///< Value to affect to this field.
-			int Value;                  ///< Value to affect to this field.
-			int Max;                    ///< Value to affect to this field.
-			int Increase;               ///< Value to affect to this field.
-
-			char ModifEnable;           ///< true if we modify this field.
-			char ModifValue;            ///< true if we modify this field.
-			char ModifMax;              ///< true if we modify this field.
-			char ModifIncrease;         ///< true if we modify this field.
-
-			char InvertEnable;          ///< true if we invert this field.
-			int AddValue;               ///< Add this value to this field.
-			int AddMax;                 ///< Add this value to this field.
-			int AddIncrease;            ///< Add this value to this field.
-			int IncreaseTime;           ///< How many time increase the Value field.
-			char TargetIsCaster;        ///< true if the target is the caster.
-		} AdjustVariable;
-
-		struct {
 			int HP;         ///< Target HP gain.(can be negative)
 			int Mana;       ///< Target Mana gain.(can be negative)
 			/// This spell is designed to be used wit very small amounts. The spell
@@ -237,19 +216,6 @@ typedef struct ConditionInfo {
 	int MaxBloodlustTicks;      ///< Target must less bloodlust ticks left.
 	int MaxInvisibilityTicks;   ///< Target must less bloodlust ticks left.
 	int MaxInvincibilityTicks;  ///< Target must less bloodlust ticks left.
-
-	struct {
-		char Enable;                /// Target is 'user defined variable'.
-
-		int MinValue;               /// Target must have more Value than that.
-		int MinMax;                 /// Target must have more Max than that.
-		int MinValuePercent;        /// Target must have more (100 * Value / Max) than that.
-		int MaxValuePercent;        /// Target must have less (100 * Value / Max) than that.
-
-		char ConditionApplyOnCaster; /// true if these condition are for caster.
-		// FIXME : More (increase, MaxValue, MaxMax) ?
-
-	} *Variable;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
@@ -369,7 +335,6 @@ extern char Ccl2Condition(lua_State* l, const char* value);
 SpellFunc CastAreaAdjustVitals;
 SpellFunc CastAdjustVitals;
 SpellFunc CastAdjustBuffs;
-SpellFunc CastAdjustVariable;
 SpellFunc CastPolymorph;
 SpellFunc CastAreaBombardment;
 SpellFunc CastSummon;

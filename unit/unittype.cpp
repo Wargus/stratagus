@@ -927,7 +927,6 @@ global void CleanUnitTypes(void)
 		Assert(type->Name);
 		free(type->Name);
 
-		free(type->Variable);
 		free(type->BoolFlag);
 		free(type->CanTargetFlag);
 
@@ -1017,17 +1016,12 @@ global void CleanUnitTypes(void)
 	}
 	NumUnitTypes = 0;
 
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined flags
-		free(UnitTypeVar.BoolFlagName[i]);
+	for (i = 0; i < NumberBoolFlag; ++i) { // User defined flags
+		free(BoolFlagName[i]);
 	}
-	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) { // User defined variables
-		free(UnitTypeVar.VariableName[i]);
-	}
-	free(UnitTypeVar.BoolFlagName);
-	free(UnitTypeVar.VariableName);
-	free(UnitTypeVar.Variable);
-	free(UnitTypeVar.DecoVar);
-	memset(&UnitTypeVar, 0, sizeof (UnitTypeVar));
+	free(BoolFlagName);
+	BoolFlagName = NULL;
+	NumberBoolFlag = 0;
 
 	//
 	// Clean hardcoded unit types.
