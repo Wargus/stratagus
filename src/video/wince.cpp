@@ -512,7 +512,7 @@ global void ToggleGrabMouse(void)
 */
 global volatile void abort(void)
 {
-    FatalExit(-1);
+    ExitFatal(-1);
 }
 
 /**

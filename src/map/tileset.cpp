@@ -93,7 +93,7 @@ global void LoadTileset(void)
     }
     if( i==NumTilesets ) {
 	fprintf(stderr,"Tileset `%s' not available\n",TheMap.TerrainName);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     DebugCheck( i!=TheMap.Terrain );
     TheMap.Tileset=Tilesets[i];
@@ -133,7 +133,7 @@ global void LoadTileset(void)
 
     if( n>MaxTilesInTileset ) {
 	fprintf(stderr,"Too many tiles in tileset. Increase MaxTilesInTileset and recompile.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
 

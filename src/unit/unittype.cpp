@@ -889,7 +889,7 @@ global UnitType* NewUnitTypeSlot(char* ident)
     type=calloc(NumUnitTypes+2,sizeof(UnitType));
     if( !type ) {
 	fprintf(stderr,"Out of memory\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     memcpy(type,UnitTypes,sizeof(UnitType)*NumUnitTypes);
     if( UnitTypes ) {
@@ -1019,7 +1019,7 @@ global void LoadUnitTypes(void)
 	    if( !unittype ) {
 		fprintf(stderr,__FUNCTION__": unit-type %s not found\n"
 			,type->SameSprite);
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    type->Sprite=unittype->Sprite;
 	}

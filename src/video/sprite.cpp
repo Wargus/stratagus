@@ -1659,7 +1659,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 
     if( !sprite ) {
 	fprintf(stderr,"Out of memory\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if( depth==8 ) {
 	sprite->Type=&GraphicSprite8Type;
@@ -1667,7 +1667,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 	sprite->Type=&GraphicSprite16Type;
     } else {
 	fprintf(stderr,"Unsported image depth\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     sprite->Width=width;
     sprite->Height=height;
