@@ -47,10 +47,10 @@
 // MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
 typedef struct _OLD_INTERFACE_INFO
 {
-  unsigned long iiFlags;      /* Interface flags */ 
-  SOCKADDR   iiAddress;      /* Interface address */ 
-  SOCKADDR   iiBroadcastAddress;    /* Broadcast address */ 
-  SOCKADDR   iiNetmask;      /* Network mask */ 
+  unsigned long iiFlags;      /* Interface flags */
+  SOCKADDR   iiAddress;      /* Interface address */
+  SOCKADDR   iiBroadcastAddress;    /* Broadcast address */
+  SOCKADDR   iiNetmask;      /* Network mask */
 } OLD_INTERFACE_INFO;
 #define INTERFACE_INFO OLD_INTERFACE_INFO
 #endif
