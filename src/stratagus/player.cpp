@@ -515,6 +515,37 @@ global void PlayersEachSecond(void)
     }
 }
 
+#ifdef NEW_VIDEO
+/**
+**	Change current color set to new player.
+**
+**	FIXME: use function pointer here.
+**
+**	@param player	Pointer to player.
+*/
+global void GraphicPlayerPixels(const Player* player,const Graphic* sprite)
+{
+    switch( VideoDepth ) {
+	case 8:
+	    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels)+208))
+		    =player->UnitColors.Depth8;
+	    break;
+	case 15:
+	case 16:
+	    *((struct __4pixel16__*)(((VMemType16*)sprite->Pixels)+208))
+		    =player->UnitColors.Depth16;
+	    break;
+	case 24:
+	    // FIXME: support for real 24 bpp mode
+	    //*((struct __4pixel24__*)(((VMemType24*)sprite->Pixels)+208))
+	    //	    =player->UnitColors.Depth24;
+	case 32:
+	    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
+		    =player->UnitColors.Depth32;
+	    break;
+    }
+}
+#else
 /**
 **	Change current color set to new player.
 **
@@ -524,35 +555,25 @@ global void PlayersEachSecond(void)
 */
 global void RLEPlayerPixels(const Player* player, const RleSprite * sprite)
 {
-  switch(VideoDepth){
-  case 8:
-    //((VMemType8*)sprite->Pixels)[208]=player->UnitColor1;
-    //((VMemType8*)sprite->Pixels)[209]=player->UnitColor2;
-    //((VMemType8*)sprite->Pixels)[210]=player->UnitColor3;
-    //((VMemType8*)sprite->Pixels)[211]=player->UnitColor4;
-    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels)+208))
-	    =player->UnitColors.Depth8;
-    break;
-  case 15:
-  case 16:
-    //((VMemType16*)sprite->Pixels)[208]=player->UnitColor1;
-    //((VMemType16*)sprite->Pixels)[209]=player->UnitColor2;
-    //((VMemType16*)sprite->Pixels)[210]=player->UnitColor3;
-    //((VMemType16*)sprite->Pixels)[211]=player->UnitColor4;
-    *((struct __4pixel16__*)(((VMemType16*)sprite->Pixels)+208))
-	    =player->UnitColors.Depth16;
-    break;
-  case 24:
-  case 32:
-    //((VMemType32*)sprite->Pixels)[208]=player->UnitColor1;
-    //((VMemType32*)sprite->Pixels)[209]=player->UnitColor2;
-    //((VMemType32*)sprite->Pixels)[210]=player->UnitColor3;
-    //((VMemType32*)sprite->Pixels)[211]=player->UnitColor4;
-    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
-	    =player->UnitColors.Depth32;
-    break;
-  }
+    switch(VideoDepth){
+	case 8:
+	    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels)+208))
+		    =player->UnitColors.Depth8;
+	    break;
+	case 15:
+	case 16:
+	    *((struct __4pixel16__*)(((VMemType16*)sprite->Pixels)+208))
+		    =player->UnitColors.Depth16;
+	    break;
+	case 24:
+	    // FIXME: support for real 24 bpp mode
+	case 32:
+	    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
+		    =player->UnitColors.Depth32;
+	break;
+    }
 }
+#endif
 
 /**
 **	Change current color set to new player.
@@ -660,6 +681,7 @@ global void SetPlayersPalette(void)
 
 	break;
     case 24:
+	// FIXME: support for real 24 bpp mode
     case 32:
 	// New player colors setup
 	if( !Pixels32 ) {
