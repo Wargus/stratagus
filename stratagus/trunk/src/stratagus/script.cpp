@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -72,7 +72,7 @@
 
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /// Uncomment this to enable additionnal check on GC operations
@@ -82,14 +82,14 @@ global lua_State* Lua;
 
 global char* CclStartFile;              /// CCL start file
 global char* GameName;                  /// Game Preferences
-global int   CclInConfigFile;           /// True while config file parsing
+global int CclInConfigFile;             /// True while config file parsing
 
 global char* Tips[MAX_TIPS + 1];        /// Array of tips
-global int   ShowTips;                  /// Show tips at start of level
-global int   CurrentTip;                /// Current tip to display
+global int  ShowTips;                   /// Show tips at start of level
+global int  CurrentTip;                 /// Current tip to display
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -263,22 +263,29 @@ global int LuaToBoolean(lua_State* l, int narg)
 }
 
 /**
-**		Perform CCL garbage collection
+**  Perform CCL garbage collection
 **
-**		@param fast		set this flag to disable slow GC ( during game )
+**  @param fast  set this flag to disable slow GC ( during game )
 */
 global void CclGarbageCollect(int fast)
 {
+	DebugLevel0Fn("Garbage collect (before): %d/%d\n" _C_
+		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
+
+	lua_setgcthreshold(Lua, 0);
+
+	DebugLevel0Fn("Garbage collect (after): %d/%d\n" _C_
+		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 }
 
 /*............................................................................
-..		Config
+..  Config
 ............................................................................*/
 
 /**
-**		Return the stratagus library path.
+**  Return the stratagus library path.
 **
-**		@return				Current libray path.
+**  @return  Current libray path.
 */
 local int CclStratagusLibraryPath(lua_State* l)
 {
@@ -287,9 +294,9 @@ local int CclStratagusLibraryPath(lua_State* l)
 }
 
 /**
-**		Return the stratagus game-cycle
+**  Return the stratagus game-cycle
 **
-**		@return				Current game cycle.
+**  @return  Current game cycle.
 */
 local int CclGameCycle(lua_State* l)
 {
@@ -298,11 +305,11 @@ local int CclGameCycle(lua_State* l)
 }
 
 /**
-**	  Return of game name.
+**  Return of game name.
 **
-**	  @param gamename		SCM name. (nil reports only)
+**  @param gamename  SCM name. (nil reports only)
 **
-**	  @return				Old game name.
+**  @return          Old game name.
 */
 local int CclSetGameName(lua_State* l)
 {
@@ -333,7 +340,7 @@ local int CclSetGameName(lua_State* l)
 }
 
 /**
-**		Set the stratagus game-cycle
+**  Set the stratagus game-cycle
 */
 local int CclSetGameCycle(lua_State* l)
 {
@@ -346,7 +353,7 @@ local int CclSetGameCycle(lua_State* l)
 }
 
 /**
-**		Set the game paused or unpaused
+**  Set the game paused or unpaused
 */
 local int CclSetGamePaused(lua_State* l)
 {
@@ -363,7 +370,7 @@ local int CclSetGamePaused(lua_State* l)
 }
 
 /**
-**		Set the video sync speed
+**  Set the video sync speed
 */
 local int CclSetVideoSyncSpeed(lua_State* l)
 {
@@ -376,7 +383,7 @@ local int CclSetVideoSyncSpeed(lua_State* l)
 }
 
 /**
-**		Set the local player name
+**  Set the local player name
 */
 local int CclSetLocalPlayerName(lua_State* l)
 {
@@ -393,9 +400,9 @@ local int CclSetLocalPlayerName(lua_State* l)
 }
 
 /**
-**		Set God mode.
+**  Set God mode.
 **
-**		@return				The old mode.
+**  @return  The old mode.
 */
 local int CclSetGodMode(lua_State* l)
 {
@@ -409,10 +416,11 @@ local int CclSetGodMode(lua_State* l)
 }
 
 /**
-**		Enable/disable Showing the tips at the start of a level.
+**  Enable/disable Showing the tips at the start of a level.
 **
-**		@param flag		True = turn on, false = off.
-**		@return				The old state of tips displayed.
+**  @param flag  True = turn on, false = off.
+**
+**  @return      The old state of tips displayed.
 */
 local int CclSetShowTips(lua_State* l)
 {
@@ -430,10 +438,11 @@ local int CclSetShowTips(lua_State* l)
 }
 
 /**
-**		Set the current tip number.
+**  Set the current tip number.
 **
-**		@param tip		Tip number.
-**		@return				The old tip number.
+**  @param tip  Tip number.
+**
+**  @return     The old tip number.
 */
 local int CclSetCurrentTip(lua_State* l)
 {
@@ -454,12 +463,12 @@ local int CclSetCurrentTip(lua_State* l)
 }
 
 /**
-**		Add a new tip to the list of tips.
+**  Add a new tip to the list of tips.
 **
-**		@param tip		A new tip to be displayed before level.
+**  @param tip  A new tip to be displayed before level.
 **
-**		@todo		FIXME:		Memory for tips is never freed.
-**				FIXME:		Make Tips dynamic.
+**  @todo  FIXME: Memory for tips is never freed.
+**         FIXME: Make Tips dynamic.
 */
 local int CclAddTip(lua_State* l)
 {
@@ -486,10 +495,10 @@ local int CclAddTip(lua_State* l)
 }
 
 /**
-**		Set resource harvesting speed.
+**  Set resource harvesting speed.
 **
-**		@param resource		Name of resource.
-**		@param speed		Speed factor of harvesting resource.
+**  @param resource  Name of resource.
+**  @param speed     Speed factor of harvesting resource.
 */
 local int CclSetSpeedResourcesHarvest(lua_State* l)
 {
@@ -514,10 +523,10 @@ local int CclSetSpeedResourcesHarvest(lua_State* l)
 }
 
 /**
-**		Set resource returning speed.
+**  Set resource returning speed.
 **
-**		@param resource		Name of resource.
-**		@param speed		Speed factor of returning resource.
+**  @param resource  Name of resource.
+**  @param speed     Speed factor of returning resource.
 */
 local int CclSetSpeedResourcesReturn(lua_State* l)
 {
@@ -542,7 +551,7 @@ local int CclSetSpeedResourcesReturn(lua_State* l)
 }
 
 /**
-**		For debug increase building speed.
+**  For debug increase building speed.
 */
 local int CclSetSpeedBuild(lua_State* l)
 {
@@ -557,7 +566,7 @@ local int CclSetSpeedBuild(lua_State* l)
 }
 
 /**
-**		For debug increase training speed.
+**  For debug increase training speed.
 */
 local int CclSetSpeedTrain(lua_State* l)
 {
@@ -572,7 +581,7 @@ local int CclSetSpeedTrain(lua_State* l)
 }
 
 /**
-**		For debug increase upgrading speed.
+**  For debug increase upgrading speed.
 */
 local int CclSetSpeedUpgrade(lua_State* l)
 {
@@ -587,7 +596,7 @@ local int CclSetSpeedUpgrade(lua_State* l)
 }
 
 /**
-**		For debug increase researching speed.
+**  For debug increase researching speed.
 */
 local int CclSetSpeedResearch(lua_State* l)
 {
@@ -602,7 +611,7 @@ local int CclSetSpeedResearch(lua_State* l)
 }
 
 /**
-**		For debug increase all speeds.
+**  For debug increase all speeds.
 */
 local int CclSetSpeeds(lua_State* l)
 {
@@ -625,7 +634,7 @@ local int CclSetSpeeds(lua_State* l)
 }
 
 /**
-**		Define default resources for a new player.
+**  Define default resources for a new player.
 */
 local int CclDefineDefaultResources(lua_State* l)
 {
@@ -640,7 +649,7 @@ local int CclDefineDefaultResources(lua_State* l)
 }
 
 /**
-**		Define default resources for a new player with low resources.
+**  Define default resources for a new player with low resources.
 */
 local int CclDefineDefaultResourcesLow(lua_State* l)
 {
@@ -655,7 +664,7 @@ local int CclDefineDefaultResourcesLow(lua_State* l)
 }
 
 /**
-**		Define default resources for a new player with mid resources.
+**  Define default resources for a new player with mid resources.
 */
 local int CclDefineDefaultResourcesMedium(lua_State* l)
 {
@@ -670,7 +679,7 @@ local int CclDefineDefaultResourcesMedium(lua_State* l)
 }
 
 /**
-**		Define default resources for a new player with high resources.
+**  Define default resources for a new player with high resources.
 */
 local int CclDefineDefaultResourcesHigh(lua_State* l)
 {
@@ -685,7 +694,7 @@ local int CclDefineDefaultResourcesHigh(lua_State* l)
 }
 
 /**
-**		Define default incomes for a new player.
+**  Define default incomes for a new player.
 */
 local int CclDefineDefaultIncomes(lua_State* l)
 {
@@ -700,7 +709,7 @@ local int CclDefineDefaultIncomes(lua_State* l)
 }
 
 /**
-**		Define default action for the resources.
+**  Define default action for the resources.
 */
 local int CclDefineDefaultActions(lua_State* l)
 {
@@ -719,7 +728,7 @@ local int CclDefineDefaultActions(lua_State* l)
 }
 
 /**
-**		Define default names for the resources.
+**  Define default names for the resources.
 */
 local int CclDefineDefaultResourceNames(lua_State* l)
 {
@@ -738,7 +747,7 @@ local int CclDefineDefaultResourceNames(lua_State* l)
 }
 
 /**
-**		Define default names for the resources.
+**  Define default names for the resources.
 */
 local int CclDefineDefaultResourceAmounts(lua_State* l)
 {
@@ -770,7 +779,7 @@ local int CclDefineDefaultResourceAmounts(lua_State* l)
 }
 
 /**
-**		Debug unit slots.
+**  Debug unit slots.
 */
 local int CclUnits(lua_State* l)
 {
@@ -787,14 +796,14 @@ local int CclUnits(lua_State* l)
 	}
 	i = 0;
 	slot = UnitSlotFree;
-	while (slot) {						// count the free slots
+	while (slot) {  // count the free slots
 		++i;
 		slot = (void*)*slot;
 	}
 	freeslots = i;
 
 	//
-	//		Look how many slots are used
+	//  Look how many slots are used
 	//
 	destroyed = nullrefs = 0;
 	for (slot = UnitSlots; slot < UnitSlots + MAX_UNIT_SLOTS; ++slot) {
@@ -819,7 +828,7 @@ local int CclUnits(lua_State* l)
 }
 
 /**
-**		Compiled with sound.
+**  Compiled with sound.
 */
 local int CclGetCompileFeature(lua_State* l)
 {
@@ -843,7 +852,7 @@ local int CclGetCompileFeature(lua_State* l)
 }
 
 /**
-**		Get Stratagus home path.
+**  Get Stratagus home path.
 */
 local int CclGetStratagusHomePath(lua_State* l)
 {
@@ -863,7 +872,7 @@ local int CclGetStratagusHomePath(lua_State* l)
 }
 
 /**
-**		Get Stratagus library path.
+**  Get Stratagus library path.
 */
 local int CclGetStratagusLibraryPath(lua_State* l)
 {
@@ -872,15 +881,15 @@ local int CclGetStratagusLibraryPath(lua_State* l)
 }
 
 /*............................................................................
-..		Tables
+..  Tables
 ............................................................................*/
 
 /**
-**		Load a pud. (Try in library path first)
+**  Load a pud. (Try in library path first)
 **
-**		@param file		filename of pud.
+**  @param file  filename of pud.
 **
-**		@return				FIXME: Nothing.
+**  @return      FIXME: Nothing.
 */
 local int CclLoadPud(lua_State* l)
 {
@@ -899,11 +908,11 @@ local int CclLoadPud(lua_State* l)
 }
 
 /**
-**		Load a map. (Try in library path first)
+**  Load a map. (Try in library path first)
 **
-**		@param file		filename of map.
+**  @param file  filename of map.
 **
-**		@return				FIXME: Nothing.
+**  @return      FIXME: Nothing.
 */
 local int CclLoadMap(lua_State* l)
 {
@@ -924,13 +933,13 @@ local int CclLoadMap(lua_State* l)
 }
 
 /*............................................................................
-..		Commands
+..  Commands
 ............................................................................*/
 
 /**
-**		Send command to ccl.
+**  Send command to ccl.
 **
-**		@param command		Zero terminated command string.
+**  @param command  Zero terminated command string.
 */
 global int CclCommand(const char* command)
 {
@@ -945,7 +954,7 @@ global int CclCommand(const char* command)
 }
 
 /*............................................................................
-..		Setup
+..  Setup
 ............................................................................*/
 
 #ifdef META_LUA
@@ -954,7 +963,7 @@ global int CclCommand(const char* command)
 **  Generic Get Function for a script proxy. Delegate the call to the object's
 **  own Get function.
 **
-**	@param l            The lua state.
+**	@param l  The lua state.
 */
 local int ScriptGet(lua_State* l)
 {
@@ -976,7 +985,7 @@ local int ScriptGet(lua_State* l)
 **  Generic Set Function for a script proxy. Delegate the call to the object's
 **  own Set function.
 **
-**	@param l            The lua state.
+**	@param l  The lua state.
 */
 local int ScriptSet(lua_State* l)
 {
@@ -998,7 +1007,7 @@ local int ScriptSet(lua_State* l)
 **  Generic Collect Function for a script proxy. Delegate the call to the object's
 **  Collection function.
 **
-**	@param l            The lua state.
+**	@param l  The lua state.
 */
 local int ScriptCollect(lua_State* l)
 {
@@ -1016,7 +1025,7 @@ local int ScriptCollect(lua_State* l)
 	lua_settable(l, -3);
 	lua_remove(l, -1);
 
-	/// Call custom garbage collector, if any.
+	// Call custom garbage collector, if any.
 	if (sp->Type->Collect) {
 		return sp->Type->Collect(sp);
 	}
@@ -1028,12 +1037,12 @@ local int ScriptCollect(lua_State* l)
 **  userdata, but use an old one for the same structure. The userdata is pushed on
 **  the lua stack anyway.
 **
-**  @param l            The lua state
-**  @param object       The Object to create userdata for.
-**	@param Type         Type info for the object
+**  @param l       The lua state
+**  @param object  The Object to create userdata for.
+**	@param Type    Type info for the object
 **
-**	@notes The Object is sent to the get/set functions, otherwise it is not touched.
-**	@notes Internals.  All lua proxies are kept inside a weak table inside the registry.
+**	@note  The Object is sent to the get/set functions, otherwise it is not touched.
+**	@note  Internals.  All lua proxies are kept inside a weak table inside the registry.
 **  That table is indexed by the pointer to the object, get and set funcs. When This
 **	function is called it searches for an already existant userdata, and returns it if found.
 **	Otherwise it create a new userdata, and sets it's metatable. A garbage collection
@@ -1077,7 +1086,7 @@ global void ScriptCreateUserdata(lua_State* l, void* object, ScriptProxyType* ty
 /**
 **  Really dumb set function that always goes into an error, with string key
 */
-extern int ScriptGetSetStrBlock(void* object, const char* key, lua_State* l)
+global int ScriptGetSetStrBlock(void* object, const char* key, lua_State* l)
 {
 	LuaError(l, "Access denied");
 }
@@ -1085,7 +1094,7 @@ extern int ScriptGetSetStrBlock(void* object, const char* key, lua_State* l)
 /**
 **  Really dumb set function that always goes into an error, with int index
 */
-extern int ScriptGetSetIntBlock(void* object, int index, lua_State* l)
+global int ScriptGetSetIntBlock(void* object, int index, lua_State* l)
 {
 	LuaError(l, "Access denied");
 }
@@ -1093,9 +1102,9 @@ extern int ScriptGetSetIntBlock(void* object, int index, lua_State* l)
 /**
 **  Initialize a ScriptProxyType with blockers
 **
-**  @param type     ScriptProxyType
+**  @param type  ScriptProxyType
 */
-extern void ScriptProxyTypeInitBlock(ScriptProxyType* type)
+global void ScriptProxyTypeInitBlock(ScriptProxyType* type)
 {
 	type->GetStr = ScriptGetSetStrBlock;
 	type->SetStr = ScriptGetSetStrBlock;
@@ -1120,7 +1129,7 @@ local int ScriptStratagusGetValue(lua_State* l)
 	META_GET_STRING("GameName", GameName);
 	META_GET_BOOL("GamePaused", GamePaused);
 
-	//  Something went wrong.
+	// Something went wrong.
 	lua_pushfstring(l, "Unknown field \"%s\". Going DOWN!!!\n", key);
 	lua_error(l);
 	return 0;
@@ -1138,10 +1147,10 @@ local int ScriptStratagusSetValue(lua_State* l)
 	DebugCheck(!key);
 	DebugLevel0Fn("(%s)\n" _C_ key);
 
-	//  Here start the fields.
-	//  Sorry, none yet.
+	// Here start the fields.
+	// Sorry, none yet.
 	
-	//  Something went wrong.
+	// Something went wrong.
 	lua_pushfstring(l, "Unknown field \"%s\". Going DOWN!!!\n", key);
 	lua_error(l);
 	return 0;
@@ -1190,7 +1199,7 @@ local void InitScript(void)
 	lua_settable(Lua, -3);
 	lua_setmetatable(Lua, -2);
 	
-	/* Add all our namesspaces and stuff.*/
+	// Add all our namespaces and stuff.
 	ScriptSpellInit();
 	ScriptMissileTypesInit();
 	ScriptPlayerInit();
@@ -1201,7 +1210,7 @@ local void InitScript(void)
 #endif
 
 /**
-**		Initialize ccl and load the config file(s).
+**  Initialize ccl and load the config file(s).
 */
 global void InitCcl(void)
 {
@@ -1211,7 +1220,7 @@ global void InitCcl(void)
 	luaopen_string(Lua);
 	luaopen_math(Lua);
 	luaopen_debug(Lua);
-	lua_settop(Lua, 0);			// discard any results
+	lua_settop(Lua, 0);  // discard any results
 
 #ifdef META_LUA
 	InitScript();
@@ -1288,17 +1297,18 @@ global void InitCcl(void)
 }
 
 /**
-**		Load user preferences
+**  Load user preferences
 */
 local void LoadPreferences1(void)
 {
 	FILE* fd;
-	char buf[1024];
+	char buf[PATH_MAX];
 
 #ifdef USE_WIN32
-	strcpy(buf, "preferences1.lua");
+	sprintf(buf, "%s/preferences1.lua", GameName);
 #else
-	sprintf(buf, "%s/%s/preferences1.lua", getenv("HOME"), STRATAGUS_HOME_PATH);
+	sprintf(buf, "%s/%s/%s/preferences1.lua", getenv("HOME"),
+		STRATAGUS_HOME_PATH, GameName);
 #endif
 
 	fd = fopen(buf, "r");
@@ -1309,12 +1319,12 @@ local void LoadPreferences1(void)
 }
 
 /**
-**		Load user preferences
+**  Load user preferences
 */
 local void LoadPreferences2(void)
 {
 	FILE* fd;
-	char buf[1024];
+	char buf[PATH_MAX];
 
 #ifdef USE_WIN32
 	sprintf(buf, "%s/preferences2.lua", GameName);
@@ -1331,23 +1341,28 @@ local void LoadPreferences2(void)
 }
 
 /**
-**		Save user preferences
+**  Save user preferences
 */
 global void SavePreferences(void)
 {
 	FILE* fd;
-	char buf[1024];
+	char buf[PATH_MAX];
 	int i;
 
 	//
-	//			preferences1.ccl
-	//			This file is loaded before stratagus.ccl
+	//  preferences1.ccl
+	//  This file is loaded before stratagus.ccl
 	//
 
 #ifdef USE_WIN32
-	strcpy(buf, "preferences1.lua");
+	strcpy(buf, GameName);
+	mkdir(buf);
+	strcat(buf, "/preferences1.lua");
 #else
 	sprintf(buf, "%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
+	mkdir(buf, 0777);
+	strcat(buf, "/");
+	strcat(buf, GameName);
 	mkdir(buf, 0777);
 	strcat(buf, "/preferences1.lua");
 #endif
@@ -1361,24 +1376,12 @@ global void SavePreferences(void)
 	fprintf(fd, "--- $Id$\n");
 
 	fprintf(fd, "SetVideoResolution(%d, %d)\n", VideoWidth, VideoHeight);
-	fprintf(fd, "SetGroupKeys(\"");
-
-	i = 0;
-	while (UiGroupKeys[i]) {
-		if (UiGroupKeys[i] != '"') {
-			fprintf(fd, "%c", UiGroupKeys[i]);
-		} else {
-			fprintf(fd, "\\\"");
-		}
-		++i;
-	}
-	fprintf(fd, "\")\n");
 
 	fclose(fd);
 
 	//
-	//			preferences2.ccl
-	//			This file is loaded after stratagus.ccl
+	//  preferences2.ccl
+	//  This file is loaded after stratagus.ccl
 	//
 
 #ifdef USE_WIN32
@@ -1411,6 +1414,16 @@ global void SavePreferences(void)
 
 	fprintf(fd, "SetFogOfWar(%s)\n", !TheMap.NoFogOfWar ? "true" : "false");
 	fprintf(fd, "SetShowCommandKey(%s)\n", ShowCommandKey ? "true" : "false");
+
+	fprintf(fd, "SetGroupKeys(\"");
+	for (i = 0; UiGroupKeys[i]; ++i) {
+		if (UiGroupKeys[i] != '"') {
+			fprintf(fd, "%c", UiGroupKeys[i]);
+		} else {
+			fprintf(fd, "\\\"");
+		}
+	}
+	fprintf(fd, "\")\n");
 
 	// Speeds
 	fprintf(fd, "SetVideoSyncSpeed(%d)\n", VideoSyncSpeed);
@@ -1460,15 +1473,15 @@ global void SavePreferences(void)
 }
 
 /**
-**		Load stratagus config file.
+**  Load stratagus config file.
 */
 global void LoadCcl(void)
 {
 	char* file;
-	char buf[1024];
+	char buf[PATH_MAX];
 
 	//
-	//		Load and evaluate configuration file
+	//  Load and evaluate configuration file
 	//
 	CclInConfigFile = 1;
 	file = LibraryFileName(CclStartFile, buf);
@@ -1482,41 +1495,16 @@ global void LoadCcl(void)
 	LuaLoadFile(file);
 	LoadPreferences2();
 	CclInConfigFile = 0;
-	CclGarbageCollect(0);				// Cleanup memory after load
+	CclGarbageCollect(0);  // Cleanup memory after load
 }
 
 /**
-**		Save CCL Module.
+**  Save CCL Module.
 **
-**		@param file		Save file.
+**  @param file  Save file.
 */
 global void SaveCcl(CLFile* file)
 {
-#if 0
-	SCM list;
-	extern SCM oblistvar;
-
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: CCL $Id$\n\n");
-
-	for (list = oblistvar; gh_list_p(list); list = gh_cdr(list)) {
-		SCM sym;
-
-		sym = gh_car(list);
-		if (symbol_boundp(sym, NIL)) {
-			SCM value;
-			CLprintf(file, ";;(define %s\n", get_c_string(sym));
-			value = symbol_value(sym, NIL);
-			CLprintf(file, ";;");
-			lprin1CL(value, file);
-			CLprintf(file, "\n");
-#ifdef DEBUG
-		} else {
-			CLprintf(file, ";;%s unbound\n", get_c_string(sym));
-#endif
-		}
-	}
-#endif
 }
 
 //@}
