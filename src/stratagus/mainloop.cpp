@@ -72,47 +72,59 @@ global enum _scroll_state_ MouseScrollState=ScrollNone;
 //----------------------------------------------------------------------------
 
 /**
-**	FIXME: where is the docu?
+**	Move map view point up (north).
+**
+**	@param step	How many tiles.
 */
-local void move_up( int step )
+local void MoveMapViewPointUp(int step)
 {
-   if( MapY>step) {
-     MapY-=step;
-   }
-   else MapY=0;
+    if (MapY > step) {
+	MapY -= step;
+    } else {
+	MapY = 0;
+    }
 }
 
 /**
-**	FIXME: where is the docu?
+**	Move map view point left (west).
+**
+**	@param step	How many tiles.
 */
-local void move_left( int step )
+local void MoveMapViewPointLeft(int step)
 {
-   if( MapX>step) {
-     MapX-=step;
-   }
-   else MapX=0;
+    if (MapX > step) {
+	MapX -= step;
+    } else {
+	MapX = 0;
+    }
 }
 
 /**
-**	FIXME: where is the docu?
+**	Move map view point down (south).
+**
+**	@param step	How many tiles.
 */
-local void move_down( int step )
+local void MoveMapViewPointDown(int step)
 {
-   if( MapY<TheMap.Height-MapHeight-step ) {
-     MapY+=step;
-   }
-   else MapY=TheMap.Height-MapHeight;
+    if (MapY < TheMap.Height - MapHeight - step) {
+	MapY += step;
+    } else {
+	MapY = TheMap.Height - MapHeight;
+    }
 }
 
 /**
-**	FIXME: where is the docu?
+**	Move map view point right (east).
+**
+**	@param step	How many tiles.
 */
-local void move_right( int step )
+local void MoveMapViewPointRight(int step)
 {
-   if( MapX<TheMap.Width-MapWidth-step ) {
-     MapX+=step;
-   }
-   else MapX=TheMap.Width-MapWidth;
+    if (MapX < TheMap.Width - MapWidth - step) {
+	MapX += step;
+    } else {
+	MapX = TheMap.Width - MapWidth;
+    }
 }
 
 /**
@@ -121,51 +133,53 @@ local void move_right( int step )
 **	@param TempScrollState	Scroll direction/state.
 **	@param FastScroll	Flag scroll faster.
 **
-**	FIXME: Support dynamic acceleration of scroll speed.
+**	@TODO	Support dynamic acceleration of scroll speed.
+**		If the scroll key is longer pressed the area is scrolled faster.
+**
 **             StephanR: above needs one row+column of tiles extra to be
 **                       drawn (clipped), which also needs to be supported
 **                       by various functions using MustRedrawTile,..
 */
 local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 {
-    int stepx,stepy;
+    int stepx;
+    int stepy;
 
-    if( FastScroll ) {
-      stepx=MapWidth/2;
-      stepy=MapHeight/2;
-    }
-    else {
-      stepx=stepy=1;// dynamic: let these variables increase upto FastScroll..
+    if (FastScroll) {
+	stepx = MapWidth / 2;
+	stepy = MapHeight / 2;
+    } else {	// dynamic: let these variables increase upto FastScroll..
+	stepx = stepy = 1;
     }
 
     switch( TempScrollState ) {
         case ScrollUp:
-            move_up( stepy );
+            MoveMapViewPointUp( stepy );
             break;
         case ScrollDown:
-            move_down( stepy );
+            MoveMapViewPointDown( stepy );
             break;
         case ScrollLeft:
-            move_left( stepx );
+            MoveMapViewPointLeft( stepx );
             break;
         case ScrollLeftUp:
-            move_left( stepx );
-            move_up( stepy );
+            MoveMapViewPointLeft( stepx );
+            MoveMapViewPointUp( stepy );
             break;
         case ScrollLeftDown:
-            move_left( stepx );
-            move_down( stepy );
+            MoveMapViewPointLeft( stepx );
+            MoveMapViewPointDown( stepy );
             break;
         case ScrollRight:
-            move_right( stepx );
+            MoveMapViewPointRight( stepx );
             break;
         case ScrollRightUp:
-            move_right( stepx );
-            move_up( stepy );
+            MoveMapViewPointRight( stepx );
+            MoveMapViewPointUp( stepy );
             break;
         case ScrollRightDown:
-            move_right( stepx );
-            move_down( stepy );
+            MoveMapViewPointRight( stepx );
+            MoveMapViewPointDown( stepy );
             break;
         default:
             return; // skip marking map
