@@ -146,9 +146,13 @@ local struct dl_head CommandsIn[1];	/// Network command input queue
 local struct dl_head CommandsOut[1];	/// Network command output queue
 
 #ifdef DEBUG
+local int NetworkReceivedPackets;	/// Packets received packets
 local int NetworkReceivedEarly;		/// Packets received too early
 local int NetworkReceivedLate;		/// Packets received too late
 local int NetworkReceivedDups;		/// Packets received as duplicates
+
+local int NetworkSendPackets;		/// Packets send packets
+local int NetworkSendResend;		/// Packets send to resend
 #endif
 
 /**@name api */
@@ -203,24 +207,25 @@ local void NetworkSendPacket(NetworkCommandQueue *ncq)
     NetworkPacket packet;
     int i;
 
-    DebugLevel0Fn("In frame %d sending: ",FrameCounter);
+    IfDebug( ++NetworkSendPackets );
+
+    DebugLevel3Fn("In frame %d sending: ",FrameCounter);
 
     //
     //	Build packet of 4 messages.
     //
     for (i = 0; i < NetworkDups; ++i) {
-	DebugLevel2("%d %d,",ncq->Data.Type,ncq->Time);
+	DebugLevel3("%d %d,",ncq->Data.Type,ncq->Time);
 	packet.Commands[i] = ncq->Data;
 	if (ncq->List->next->next) {
 	    ncq = (NetworkCommandQueue *)(ncq->List->next);
 	}
     }
-    DebugLevel0("\n");
+    DebugLevel3("\n");
 
     // if (0 || !(rand() & 15))
 	 NetworkBroadcast(&packet, sizeof(packet));
 }
-
 
 //----------------------------------------------------------------------------
 //	API init..
@@ -509,7 +514,7 @@ local void NetworkClientSetup(void)
 		msg->Type,n,
 		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
-	if (NetLastHost != host || NetLastPort != port 
+	if (NetLastHost != host || NetLastPort != port
 		|| msg->Type != MessageInitConfig || n!=sizeof(InitMessage)) {
 	    DebugLevel0Fn("Received wrong packet\n");
 	    continue;
@@ -556,7 +561,7 @@ local void NetworkClientSetup(void)
 		msg->Type,n,
 		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
-	if (NetLastHost == host && NetLastPort == port 
+	if (NetLastHost == host && NetLastPort == port
 		&& msg->Type == MessageInitConfig && n==sizeof(InitMessage)) {
 
 	    DebugLevel0Fn("Received late clients\n");
@@ -667,6 +672,16 @@ global void InitNetwork1(void)
 */
 global void ExitNetwork1(void)
 {
+    if( NetworkFildes==-1 ) {	// No network running
+	return;
+    }
+#ifdef DEBUG
+    DebugLevel0("Received: %d packets, %d early, %d late, %d dups\n",
+	    NetworkReceivedPackets,NetworkReceivedEarly,NetworkReceivedLate,
+	    NetworkReceivedDups);
+    DebugLevel0("Send: %d packets, %d resend\n",
+	    NetworkSendPackets,NetworkSendResend);
+#endif
     NetCloseUDP(NetworkFildes);
 
     NetExit();			// machine dependend setup
@@ -709,7 +724,6 @@ global void InitNetwork2(void)
 	}
     }
 }
-
 
 //----------------------------------------------------------------------------
 //	Commands input
@@ -761,6 +775,10 @@ global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
 /**
 **	Called if message for the network is ready.
 **	(by WaitEventsAndKeepSync)
+**
+**	@todo
+**		NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
+**		Must be calculated.
 */
 global void NetworkEvent(void)
 {
@@ -773,13 +791,13 @@ global void NetworkEvent(void)
     //
     if( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
 	//
-	//	Server gone?
+	//	Server or client gone?
 	//
-	DebugLevel0("Server gone.\n");
+	DebugLevel0("Server/Client gone.\n");
 	Exit(0);
     }
     packet=(NetworkPacket*)buf;
-
+    IfDebug( NetworkReceivedPackets++ );
 
     //
     //	Minimal checks for good/correct packet.
@@ -850,7 +868,7 @@ global void NetworkEvent(void)
 	    // Both directions are same fast/slow
 	    ncq = (NetworkCommandQueue *)(CommandsOut->last);
 	    while (ncq->List->prev) {
-		DebugLevel3Fn("resend %d? %d\n", ncq->Time, n); 
+		DebugLevel3Fn("resend %d? %d\n", ncq->Time, n);
 		if (ncq->Time == n) {
 		    NetworkSendPacket(ncq);
 		    break;
@@ -864,7 +882,7 @@ global void NetworkEvent(void)
 #else
 	    ncq = (NetworkCommandQueue *)(CommandsOut->first);
 	    while (ncq->List->next) {
-		DebugLevel3Fn("resend %d? %d\n", ncq->Time, n); 
+		DebugLevel3Fn("resend %d? %d\n", ncq->Time, n);
 		if (ncq->Time == n) {
 		    NetworkSendPacket(ncq);
 		    break;
@@ -898,7 +916,7 @@ global void NetworkEvent(void)
 	}
 
 	if( NetworkIn[nc->Frame][player].Time != n ) {
-	    DebugLevel2Fn("Command %3d for %8d(%02X) got\n",
+	    DebugLevel3Fn("Command %3d for %8d(%02X) got\n",
 		    nc->Type, n, nc->Frame);
 	}
 
@@ -1013,13 +1031,21 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 }
 
 /**
-**	Network resend commands.
+**	Network resend commands, we have a missing packet send to all clients
+**	what packet we are missing.
+**
+**	@todo
+**		We need only send to the clients, that have not delivered the
+**		packet. I'm not sure that the extra packets I send with this
+**		packet are useful.
 */
 local void NetworkResendCommands(void)
 {
     NetworkPacket packet;
     NetworkCommandQueue *ncq;
     int i;
+
+    IfDebug( ++NetworkSendResend );
 
     //
     //	Build packet of 4 messages.
@@ -1100,7 +1126,7 @@ local void NetworkExecCommands(void)
 		ncq = (NetworkCommandQueue *)(CommandsOut->last);
 		// FIXME: how many packets must be kept exactly?
 		// if (ncq->Time + NetworkLag + NetworkUpdates >= FrameCounter)
-		// THIS is too much if (ncq->Time >= FrameCounter) 
+		// THIS is too much if (ncq->Time >= FrameCounter)
 		if (ncq->Time + NetworkLag > FrameCounter) {
 		    break;
 		}
@@ -1156,7 +1182,7 @@ local void NetworkSyncCommands(void)
     for (i = 0; i < HostsCount; ++i) {
 	DebugLevel3Fn("sync %d\n", NetPlyNr[i]);
 	ncq = &NetworkIn[n & 0xFF][NetPlyNr[i]];
-	DebugLevel3Fn("sync %d==%d\n", ncq->Time, n); 
+	DebugLevel3Fn("sync %d==%d\n", ncq->Time, n);
 	if (ncq->Time != n) {
 	    NetworkInSync = 0;
 	    NetworkDelay = NetworkUpdates;
