@@ -1445,47 +1445,89 @@ local Menuitem KeystrokeHelpMenuItems[] = {
     { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, NULL, {{NULL,0}} },
 };
 // FIXME: ccl these...
 // FIXME: add newer helps
-local unsigned char *keystrokehelptexts[] = {
-    "Alt-F  - toggle full screen",
-    "Alt-G  - toggle grab mouse",
-    "Ctrl-S - mute sound",
-    "Ctrl-M - mute music (NOT SUPPORTED)",
-    "+      - increase game speed",
-    "-      - decrease game speed",
-    "Ctrl-P - pause game",
-    "PAUSE  - pause game",
-    "PRINT  - make screen shot",
-    "Alt-H  - help menu",
-    "Alt-R  - restart scenario (NOT SUPPORTED)",
-    "Alt-Q  - quit to main menu",
-    "Alt-X  - quit game",
-    "Alt-B  - toggle expand map",
-    "Alt-M  - game menu",
-    "ENTER  - write a message",
-    "SPACE  - goto last event",
-    "TAB    - hide/unhide terrain",
-    "Alt-I  - find idle peon",
-    "Alt-C  - center on selected unit",
-    "Alt-V  - next view port",
-    "Ctrl-V - previous view port",
-    "^      - select nothing",
-    "#      - select group",
-    "##     - center on group",
-    "Ctrl-# - define group",
-    "Shift-#- add to group",
-    "Alt-#  - add to alternate group",
-    "F2-F4  - recall map position",
-    "Shift F2-F4 - save map postition",
-    "F5     - game options",
-    "F7     - sound options",
-    "F8     - speed options",
-    "F9     - preferences",
-    "F10    - game menu",
-    "F11    - save game",
-    "F12    - load game",
+local unsigned char *keystrokekeystexts[] = {
+    "Alt-F",
+    "Alt-G",
+    "Ctrl-S",
+    "Ctrl-M",
+    "+",
+    "-",
+    "Ctrl-P",
+    "PAUSE",
+    "PRINT",
+    "Alt-H",
+    "Alt-R",
+    "Alt-Q",
+    "Alt-X",
+    "Alt-B",
+    "Alt-M",
+    "ENTER",
+    "SPACE",
+    "TAB",
+    "Alt-I",
+    "Alt-C",
+    "Alt-V",
+    "Ctrl-V",
+    "^",
+    "#",
+    "##",
+    "Ctrl-#",
+    "Shift-#",
+    "Alt-#",
+    "F2-F4",
+    "Shift F2-F4",
+    "F5",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11",
+    "F12",
+};
+
+local unsigned char *keystrokehintstexts[] = {
+    "- toggle full screen",
+    "- toggle grab mouse",
+    "- mute sound",
+    "- mute music (NOT SUPPORTED)",
+    "- increase game speed",
+    "- decrease game speed",
+    "- pause game",
+    "- pause game",
+    "- make screen shot",
+    "- help menu",
+    "- restart scenario (NOT SUPPORTED)",
+    "- quit to main menu",
+    "- quit game",
+    "- toggle expand map",
+    "- game menu",
+    "- write a message",
+    "- goto last event",
+    "- hide/unhide terrain",
+    "- find idle peon",
+    "- center on selected unit",
+    "- next view port",
+    "- previous view port",
+    "- select nothing",
+    "- select group",
+    "- center on group",
+    "- define group",
+    "- add to group",
+    "- add to alternate group",
+    "- recall map position",
+    "- save map postition",
+    "- game options",
+    "- sound options",
+    "- speed options",
+    "- preferences",
+    "- game menu",
+    "- save game",
+    "- load game",
+
 };
 
 #ifdef OLD_MENU
@@ -1494,10 +1536,12 @@ local void InitKeystrokeHelpMenuItems() {
     MenuitemVslider  i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
     MenuitemButton   i2 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
     MenuitemDrawfunc i3 = { KeystrokeHelpDrawFunc };
+    MenuitemDrawfunc i4 = { NULL };
     KeystrokeHelpMenuItems[0].d.text     = i0;
     KeystrokeHelpMenuItems[1].d.vslider  = i1;
     KeystrokeHelpMenuItems[2].d.button   = i2;
     KeystrokeHelpMenuItems[3].d.drawfunc = i3;
+    KeystrokeHelpMenuItems[4].d.drawfunc = i4;
 }
 #endif
 
@@ -4531,7 +4575,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 
 local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
-    int j, nitems = sizeof(keystrokehelptexts) / sizeof(unsigned char *);
+    int j, nitems = sizeof(keystrokekeystexts) / sizeof(unsigned char *);
 
     switch (i) {
 	case 0:		// click - down
@@ -4566,7 +4610,8 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 */
 local void KeystrokeHelpDrawFunc(Menuitem *mi)
 {
-    int i, j, nitems = sizeof(keystrokehelptexts) / sizeof(unsigned char *);
+    int i, j, nitems = sizeof(keystrokekeystexts) / sizeof(unsigned char *);
+    int i2, j2, nitems2 = sizeof(keystrokehintstexts) / sizeof(unsigned char *);
 #ifdef OLD_MENU
     Menu *menu = FindMenu(MENU_KEYSTROKE_HELP);
 #else
@@ -4576,9 +4621,17 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
     j = ((mi[-2].d.vslider.percent + 1) * (nitems - 11)) / 100;
     for (i = 0; i < 11; i++) {
 	VideoDrawText(menu->x+mi->xofs,menu->y+mi->yofs+(i*20),
-			    mi->font,keystrokehelptexts[j]);
+			    mi->font,keystrokekeystexts[j]);
 	j++;
     }
+
+    j2 = ((mi[-2].d.vslider.percent + 1) * (nitems2 - 11)) / 100;
+    for (i2 = 0; i2 < 11; i2++) {
+	VideoDrawText(menu->x+mi->xofs+80,menu->y+mi->yofs+(i2*20),
+			    mi->font,keystrokehintstexts[j2]);
+	j2++;
+    }
+
 }
 
 local void GameSpeedHSAction(Menuitem *mi, int i)
