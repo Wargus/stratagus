@@ -324,8 +324,11 @@ global _MenuFuncHash MenuFuncHash;
     /// Name, Version, Copyright FIXME: move to headerfile
 extern char NameLine[];
 
+    /// FIXME: Docu
 local int GameLoaded;
-global int GuiGameStarted = 0;
+    /// FIXME: Docu
+global int GuiGameStarted;
+    /// FIXME: Docu
 local int EditorCancelled;
 
 /**
@@ -340,7 +343,10 @@ global char ScenSelectFullPath[1024];		/// Scenario selector path+name
 
 global MapInfo *ScenSelectPudInfo;		/// Selected pud info
 
+    /// FIXME: Docu
 global int nKeyStrokeHelps;
+
+    /// FIXME: Docu
 global char **KeyStrokeHelps;
 
 /// FIXME: -> ccl...
@@ -717,7 +723,7 @@ local char *SaveDir;			/// FIXME: docu
 */
 local void InitSaveGameMenu(Menuitem *mi)
 {
-    mi->menu->items[4].flags = MenuButtonDisabled;    
+    mi->menu->items[4].flags = MenuButtonDisabled;
     mi->menu->items[5].flags = MenuButtonDisabled;
     CreateSaveDir();
 }
@@ -748,7 +754,7 @@ local void SaveOk(void)
     char *name;
     Menu *menu;
     size_t nameLength;
-  
+
     menu = FindMenu("menu-save-game");
     name = menu->items[1].d.input.buffer;
 
@@ -1356,7 +1362,7 @@ local void FcDeleteInit(Menuitem *mi)
     name[strlen(name) - 3] = '\0';
     mi->menu->items[2].d.text.text = name;
 }
-  
+
 /**
 **	Delete ok button
 */
@@ -1552,7 +1558,7 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
     Menu *menu;
 
     menu = FindMenu("menu-global-options");
-    
+
     menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
@@ -1564,13 +1570,13 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
     if (VideoWidth == 640) {
 	menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 800) {
-    	menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 1024) {
-    	menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 1280) {
-    	menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
     } else if (VideoWidth == 1600) {
-    	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
     }
 
     if (VideoFullScreen) {
@@ -1865,7 +1871,7 @@ global void DiplomacyOptions(void)
 /**
 **	Wait for diplomacy to be clicked
 */
-local void DiplomacyWait(Menuitem *mi __attribute__((unused))) 
+local void DiplomacyWait(Menuitem *mi __attribute__((unused)))
 {
 }
 
@@ -1877,7 +1883,7 @@ local void DiplomacyOk(void)
     Menu *menu;
     int i;
     int j;
-    
+
     menu = CurrentMenu;
 
     j=0;
@@ -1903,7 +1909,7 @@ local void DiplomacyOk(void)
 			Players[i].Player);
 		}
 	    }
-	    // Menu says to be neutral 
+	    // Menu says to be neutral
 	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_UNCHECKED &&
 		menu->items[4*j+6].d.gem.state == MI_GSTATE_UNCHECKED ) {
 		// Are they neutral?
@@ -1913,7 +1919,7 @@ local void DiplomacyOk(void)
 			Players[i].Player);
 		}
 	    }
-	    // Menu says to be crazy 
+	    // Menu says to be crazy
 	    if( menu->items[4*j+5].d.gem.state == MI_GSTATE_CHECKED &&
 		menu->items[4*j+6].d.gem.state == MI_GSTATE_CHECKED ) {
 		// Are they crazy?
@@ -1928,7 +1934,7 @@ local void DiplomacyOk(void)
 		if (!(ThisPlayer->SharedVision&(1<<Players[i].Player))) {
 		    SendCommandSharedVision(ThisPlayer->Player,1,
 			Players[i].Player);
-		}	  
+		}
 	    }
 	    else {
 		if (ThisPlayer->SharedVision&(1<<Players[i].Player) ) {
@@ -6157,7 +6163,7 @@ local void EditorSaveConfirmCancel(void)
 local void EditorQuitMenu(void)
 {
     QuitToMenu = 1;
-    EditorRunning = 0;    
+    EditorRunning = 0;
     EndMenu();
 }
 
