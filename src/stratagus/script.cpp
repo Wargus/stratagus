@@ -149,6 +149,15 @@ local SCM CclSetGameCycle(SCM cycle)
 }
 
 /**
+**	Set the game paused or unpaused
+*/
+local SCM CclSetGamePaused(SCM paused)
+{
+    GamePaused=gh_scm2int(paused);
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Set the video sync speed
 */
 local SCM CclSetVideoSyncSpeed(SCM speed)
@@ -632,6 +641,7 @@ global void InitCcl(void)
     gh_new_procedure0_0("game-cycle",CclGameCycle);
     gh_new_procedure1_0("set-game-name!",CclSetGameName);
     gh_new_procedure1_0("set-game-cycle!",CclSetGameCycle);
+    gh_new_procedure1_0("set-game-paused!",CclSetGamePaused);
     gh_new_procedure1_0("set-video-sync-speed!",CclSetVideoSyncSpeed);
     gh_new_procedure1_0("set-local-player-name!",CclSetLocalPlayerName);
 
