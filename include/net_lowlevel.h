@@ -43,10 +43,6 @@
 #endif
 
 // Include system network headers
-#ifdef USE_SDL_NET
-#include "SDLnet.h"
-#else
-
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32)
 
 #define USE_WINSOCK
@@ -94,7 +90,6 @@ typedef struct _OLD_INTERFACE_INFO
 #endif
 #define INVALID_SOCKET -1
 #endif // !WIN32
-#endif // !USE_SDL_NET
 
 #ifndef INADDR_NONE
 #define INADDR_NONE -1
