@@ -618,7 +618,7 @@ static int flqcmp(const void* v1, const void* v2)
 ** @param filter     Optional xdata-filter function.
 ** @param flp        Filelist pointer.
 **
-** @return Pointer to FileList struct describing Files found.
+** @return the number of entries added to FileList.
 */
 int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp)
 {
