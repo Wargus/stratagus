@@ -911,8 +911,8 @@ local int AiHarvest(Unit * unit)
 
     x=unit->X;
     y=unit->Y;
-    points=alloca(TheMap.Width*TheMap.Height/4);
-    size=TheMap.Width*TheMap.Height/sizeof(*points);
+    size=TheMap.Width*TheMap.Height/4;
+    points=alloca(size*sizeof(*points));
 	
     //
     //	Find the nearest wood depot
