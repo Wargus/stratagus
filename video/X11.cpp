@@ -97,7 +97,7 @@ local struct timeval X11TicksStart;	/// My counter start
 /**
 **	Called from SIGALRM.
 */
-local void VideoSyncHandler(int unused)
+local void VideoSyncHandler(int unused __attribute__((unused)))
 {
     DebugLevel3("Interrupt\n");
     ++VideoInterrupts;
@@ -135,6 +135,7 @@ global void SetVideoSync(void)
 	itv.it_interval.tv_sec,itv.it_interval.tv_usec);
 }
 
+#if 0
 /**
 **	Watch opening/closing of X11 connections
 */
@@ -146,6 +147,7 @@ local void MyConnectionWatch
     } else {				// file handle closed
     }
 }
+#endif
 
 #else
 
@@ -481,7 +483,7 @@ foundvisual:
     //
     //	Input handling.
     //
-    XAddConnectionWatch(TheDisplay,MyConnectionWatch,NULL);
+    //XAddConnectionWatch(TheDisplay,MyConnectionWatch,NULL);
 
     XFlush(TheDisplay);
 
