@@ -123,14 +123,15 @@ local Unit* CheckForDeadGoal(Unit* unit)
 		if (!UnitVisibleAsGoal(goal, unit->Player)) {
 			//
 			// Goal is destroyed
+			// Cannot use type as it's NULL
 			//
-			unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
-			unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
+			unit->Orders[0].X = goal->X;
+			unit->Orders[0].Y = goal->Y;
 			unit->Orders[0].MinRange = 0;
 			unit->Orders[0].Range = 0;
 
-			DebugLevel3Fn("attack target %d(%s) gone for %d(%s)\n" _C_
-				UnitNumber(goal) _C_ goal->Type->Name _C_
+			DebugLevel3Fn("attack target %d gone for %d(%s)\n" _C_
+				UnitNumber(goal) _C_ 
 				UnitNumber(unit) _C_ unit->Type->Name);
 			RefsDecrease(goal);
 
