@@ -103,7 +103,7 @@ src/$(OBJDIR)main.$(OE): src/main.c
 	@if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
 	$(CC) -c $(CFLAGS) $< -o $@
 
-src/$(OBJDIR)/libclone.a: ;
+src/$(OBJDIR)libclone.a: ;
 
 # UNIX-TARGET
 freecraft:	src etlib/$(OBJDIR)hash.$(OE) src/$(OBJDIR)libclone.a
