@@ -114,6 +114,7 @@ global void NetworkSetupArgs(void)
     }
 }
 
+#if 0
 /**
 **	Server Setup.
 */
@@ -605,7 +606,7 @@ global void NetworkClientSetup(WorldMap *map)
     }
     DebugLevel3Fn("DONE: All client have received config - starting game\n");
 }
-
+#endif
 
 //----------------------------------------------------------------------------
 //	NEW API
@@ -1352,6 +1353,9 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    NetStateMsgCnt = 0;
 			    NetLocalHostsSlot = ntohs(msg->u.Hosts[0].PlyNr);
 			    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16); // Name of server player
+			    NetworkLag= ntohl(msg->Lag);
+			    NetworkUpdates= ntohl(msg->Updates);
+
 			    Hosts[0].Host = NetworkServerIP;
 			    Hosts[0].Port = htons(NetworkServerPort);
 			    for (i = 1; i < PlayerMax; i++) {
