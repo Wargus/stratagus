@@ -831,6 +831,7 @@ local void PreMenuSetup(void)
 */
 global void MenuLoop(char* filename, WorldMap* map)
 {
+
     for( ;; ) {
 	//
 	//	Clear screen
@@ -840,10 +841,13 @@ global void MenuLoop(char* filename, WorldMap* map)
 	VideoUnlockScreen();
 	Invalidate();
 	RealizeVideoMemory();
+
 	//
 	//	Network part 1 (port set-up)
-	//	FIXME: JOHNS: -> ARI can this be called multiple?
 	//
+	if( NetworkFildes!=-1 ) {
+	    ExitNetwork1();
+	}
 	InitNetwork1();
 	//
 	// Don't leak when called multiple times
@@ -855,6 +859,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	//	No filename given, choose with the menus
 	//
 	if ( !filename ) {
+	    NetPlayers = 0;
 	    // Start new music for menus?
 	    // FIXME: If second loop?
 	    if( strcmp(TitleMusic,MenuMusic) ) {
@@ -866,6 +871,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    if( NetworkFildes!=-1 && NetPlayers<2 ) {
 		ExitNetwork1();
 	    }
+	    DebugLevel0Fn("Menu start: NetPlayers %d\n", NetPlayers);
+	    filename = CurrentMapPath;
 	}
 	//
 	//	Create the game.

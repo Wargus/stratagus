@@ -653,7 +653,7 @@ local Menuitem NetMultiButtonStorage[] = {
 #ifdef __GNUC__
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
 	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN,
-	    MultiGamePTSAction, 3, 0, 0, 0, 0} } },
+	    MultiGamePTSAction, 3, -1, 0, 0, 0} } },
     { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL,
 	{ drawfunc:{ NetMultiPlayerDrawFunc } } },
 #else
@@ -2763,7 +2763,6 @@ local void StartCampaignFromMenu(int number)
     // int the CAMPAIN_CONT menu processed below...
     ProcessMenu(MENU_CAMPAIGN_CONT, 1);
     // Set GuiGameStarted = 1 to acctually run a game here...
-    // But select and load the map first...
     // See CustomGameStart() for info...
 #endif
 
@@ -3062,7 +3061,7 @@ local void MultiPlayerGameMenu(void)
     // Here we really go...
     ProcessMenu(MENU_NET_CREATE_JOIN, 1);
 
-    DebugLevel0Fn("What here?\n");
+    DebugLevel0Fn("GuiGameStarted: %d\n", GuiGameStarted);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -3862,15 +3861,6 @@ local void CustomGameStart(void)
     }
     GameIntro.Objectives[0] = strdup(DefaultObjective);
 
-    // FIXME: Johns is this here needed? Can the map loaded in create game?
-    // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
-    InitUnitTypes();
-    UpdateStats();
-    // ARI: And this finally loads it.
-    //  For an alternative Method see network games..
-    //  That way it should work finally..
-    LoadMap(ScenSelectPath, &TheMap);
-
     GuiGameStarted = 1;
     EndMenu();
 }
@@ -4050,7 +4040,9 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
 
 /**
 **	Player selectors have changed.
+**	Caution: Called by map change (inital = 1)!
 **	Caution: Called by network events from clients (inital = 2)!
+**	Caution: Called by button action on server (inital = 3)!
 */
 local void MultiGamePlayerSelectorsUpdate(int initial)
 {
@@ -4058,15 +4050,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     int avail, ready;
 
     //	FIXME: What this has to do:
-    //	disable additional buttons - partially done
+    //	Use lag gem as KICK button
     //  Notify clients about MAP change: (initial = 1...)
 
-    DebugLevel0Fn("initial = %d\n", initial);
-
-    if (initial == 1) {
-	NetMultiSetupMenuItems[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
-	NetMultiSetupMenuItems[SERVER_PLAYER_STATE].yofs = 32;
-    }
+    DebugLevel3Fn("initial = %d\n", initial);
 
     //	Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
@@ -4078,16 +4065,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	}
     }
 
-    //	Tell connect state machines how many interactive players we can have
-    NetPlayers = avail = h;
-
+    avail = h;
     //	Setup the player menu
     for (ready = i = 1; i < PlayerMax-1; i++) {
 	if (initial == 1) {
-	    if (i >= h) {
-		ServerSetupState.CompOpt[i] = 1;
-	    }
-
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = 0;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
 
@@ -4106,10 +4087,6 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    if (ServerSetupState.Ready[i]) {
 		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state |= MI_GSTATE_CHECKED;
 		++ready;
-#if 0
-	    } else {
-		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state &= ~MI_GSTATE_CHECKED;
-#endif
 	    }
 
 	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags = 0;
@@ -4155,8 +4132,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	}
     }
 
+    //	Tell connect state machines how many interactive players we can have
+    NetPlayers = avail;
     //	Check if all players are ready.
-    DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d! (NetPlayers = %d)\n", avail, ready, NetPlayers);
+    DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d\n", avail, ready);
     if (ready == avail) {
 	NetMultiSetupMenuItems[3].flags = 0;	// enable start game button
     } else {
@@ -4229,10 +4208,25 @@ local void MultiClientUpdate(int initial)
 
 local void MultiGameSetupInit(Menuitem *mi)
 {
+    int i, h;
+
     GameSetupInit(mi);
     NetworkInitServerConnect();
+    NetMultiSetupMenuItems[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
+    NetMultiSetupMenuItems[SERVER_PLAYER_STATE].yofs = 32;
+
     memset(&ServerSetupState, 0, sizeof(ServerSetup));
+    //	Calculate available slots from pudinfo
+    for (h = i = 0; i < PlayerMax; i++) {
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	    h++;	// available interactive player slots
+	}
+    }
+    for (i = h; i < PlayerMax-1; i++) {
+	ServerSetupState.CompOpt[i] = 1;
+    }
     MultiGamePlayerSelectorsUpdate(1);
+    DebugLevel3Fn("h = %d, NetPlayers = %d\n", h, NetPlayers);
 }
 
 local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))

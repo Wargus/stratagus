@@ -474,6 +474,7 @@ global void ExitNetwork1(void)
     NetExit();			// machine dependend setup
     NetworkFildes = -1;
     NetworkInSync = 1;
+    NetPlayers = 0;
     HostsCount = 0;
 }
 
