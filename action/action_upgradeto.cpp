@@ -44,6 +44,7 @@
 #include "actions.h"
 #include "ai.h"
 #include "interface.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -94,6 +95,11 @@ global void HandleActionUpgradeTo(Unit* unit)
 		unit->Reset = unit->Wait = 1;
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
+
+		// Update Possible sight range change
+		MapUnmarkUnitSight(unit);
+		unit->CurrentSightRange = unit->Stats[player->Player].SightRange;
+		MapMarkUnitSight(unit);
 
 		//
 		// Update possible changed buttons.
