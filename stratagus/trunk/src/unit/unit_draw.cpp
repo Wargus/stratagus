@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_draw.c	-	The draw routines for units. */
+/**@name unit_draw.c - The draw routines for units. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2004 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -219,6 +219,9 @@ global void DrawUnitSelection(const Unit* unit)
 		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
 		(type->Height - VideoGraphicHeight(type->Sprite)) / 2;
 	DrawSelection(*color, x, y, x + type->BoxWidth, y + type->BoxHeight);
+#ifdef USE_SDL_SURFACE
+	free(color);
+#endif
 }
 
 /**
@@ -1785,22 +1788,18 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 }
 
 /**
-**		Change current color set to units colors.
+**  Change current color set to units colors.
 **
-**		FIXME: use function pointer here.
-**
-**		@param unit		Pointer to unit.
-**		@param sprite		Change the palette entries 208-210 in this sprite.
+**  @param unit    Pointer to unit.
+**  @param sprite  Change the palette entries 208-211 in this sprite.
 */
 local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 {
 #ifdef USE_SDL_SURFACE
-	SDL_LockSurface(sprite->Surface);
 	SDL_SetColors(sprite->Surface, unit->Colors->Colors, 208, 4);
 	if (sprite->SurfaceFlip) {
 		SDL_SetColors(sprite->SurfaceFlip, unit->Colors->Colors, 208, 4);
 	}
-	SDL_UnlockSurface(sprite->Surface);
 #else
 	switch (VideoBpp) {
 		case 8:
