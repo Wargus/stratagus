@@ -727,9 +727,6 @@ local void PrintHeader(void)
 	// vvv---- looks weird, but is needed for GNU brain damage
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
 	"\t(http://Stratagus.Org)"
-#ifdef USE_LIBMODPLUG
-	"\n  libmodplug Copyright by Kenton Varda & Olivier Lapique."
-#endif
 	"\n  VP3 codec Copyright by On2 Technologies Inc."
 #ifdef USE_SDL
 	"\n  SDL Copyright by Sam Lantinga."

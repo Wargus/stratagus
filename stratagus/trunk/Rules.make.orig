@@ -194,7 +194,6 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 ## USE_TILECACHE	Faster tile drawing, costs memory.
 ## USE_SMART_TILECACHE	Faster tile drawing, slow with hardware video memory.
 ## USE_HP_FOR_XP	Use hit-points for XP calculations.
-## USE_LIBMODPLUG	Use modplug audio player support.
 ## USE_SDLCD		Use the SDL cd player support.
 ## USE_LIBCDA		Use the LIBCDA cd player support.
 ## USE_FLAC		Use flac audio player support.

@@ -38,11 +38,6 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#if !defined(USE_LIBMODPLUG) && !defined(noUSE_LIBMODPLUG)
-#define USE_LIBMODPLUG						/// Include lib modplug support
-#endif
-#define _USE_LIBMODPLUG32				/// Test with 32bit resolution
-
 #include <stdlib.h>
 #include <string.h>
 #ifndef _MSC_VER
@@ -65,10 +60,6 @@
 #include "sound.h"
 #include "cdaudio.h"
 #include "script.h"
-
-#ifdef USE_LIBMODPLUG
-#include "../libmodplug/modplug.h"
-#endif
 
 #ifdef USE_GLIB
 #include <glib.h>
@@ -120,7 +111,7 @@ SDL_mutex * MusicTerminatedMutex;
 --		Functions
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG) || defined(USE_CDDA)
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_CDDA)
 
 
 /**
