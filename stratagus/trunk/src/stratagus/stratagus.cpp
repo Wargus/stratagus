@@ -254,17 +254,16 @@ global char* CompileOptions;                /// Compile options.
 
 global int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
 global int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
-global int SpeedBuild = 1;        /// speed factor for building
-global int SpeedTrain = 1;        /// speed factor for training
-global int SpeedUpgrade = 1;    /// speed factor for upgrading
-global int SpeedResearch = 1;  /// speed factor for researching
+global int SpeedBuild = 1;                  /// speed factor for building
+global int SpeedTrain = 1;                  /// speed factor for training
+global int SpeedUpgrade = 1;                /// speed factor for upgrading
+global int SpeedResearch = 1;               /// speed factor for researching
 
 /*============================================================================
 ==  DISPLAY
 ============================================================================*/
 
 // FIXME: move to video header file
-global int VideoPitch;                      /// Offset to reach next scan line
 global int VideoWidth;                      /// Window width in pixels
 global int VideoHeight;                     /// Window height in pixels
 
@@ -733,7 +732,7 @@ local void PrintHeader(void)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-global int main1(int argc __attribute__ ((unused)),
+local int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
 	int i;
