@@ -485,9 +485,7 @@ step in a random direction, in percents. Usefull for neutral animals.
 </dd>
 <dt>clicks-to-explode</dt>
 <dd>If this is non-zero, then after that many clicks the unit will commit
-suicide. Doesn't work with resource workers/resources. It can even be used
-in combination with demolish-damage and demolish-range, though it wouldn't
-be very fair.
+suicide. Doesn't work with resource workers/resources.
 </dd>
 <dt>computer-reaction-range</dt>
 <dd>This is supossed to be the reaction range for AI units, but it is not used.
@@ -507,6 +505,12 @@ it should be used to attack resource buildings first? You can safely ignore it.
 <dd>This is the unit's decay rate, in 1/6 seconds. It should be really really really changed to
 cycles. If you set this the unit will die by itself after a while. Don't use it for spells,
 spells will override this with their own ttl setting.
+</dd>
+<dt>burn-percent</dt>
+<dd>The unit will start burning when it has less health than this, in percents.
+</dd>
+<dt>burn-damage-rate</dt>
+<dd>The rate at which the unit will get damaged. The period is the same as with regeneration.
 </dd>
 <dt>points</dt>
 <dd>This is the score value of an unit. Used for the final score.
