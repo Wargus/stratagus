@@ -2664,6 +2664,8 @@ local void DeleteFile(void)
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
     unlink(name);
     EndMenu();
+    *SaveGameMenuItems[1].d.input.buffer = '\0';
+    SaveGameMenuItems[1].d.input.nch = 0;
     ProcessMenu(MENU_SAVE_GAME, 1);
 }
 
