@@ -460,8 +460,8 @@ enum _directions_ {
     /// The big unit structure
 struct _unit_ {
     // NOTE: int is faster than shorts
-    unsigned	Refs;			/// Reference counter
-    unsigned	Slot;			/// Assignd slot number
+    int		Refs;			/// Reference counter
+    int		Slot;			/// Assigned slot number
     Unit**	UnitSlot;		/// Slot pointer of Units
     Unit**	PlayerSlot;		/// Slot pointer of Player->Units
     Unit*	Next;			/// Generic link pointer (on map)
@@ -498,22 +498,22 @@ struct _unit_ {
 
 #define MaxMana	255			/// maximal mana for units
     unsigned	Mana : 8;		/// mana points
-    unsigned	HP;			/// hit points
-    unsigned	XP;			/// experience points
-    unsigned	Kills;			/// how many unit has this unit killed
+    int		HP;			/// hit points
+    int		XP;			/// experience points
+    int		Kills;			/// how many unit has this unit killed
 
-    unsigned	TTL;			/// time to life
-    unsigned	Bloodlust;		/// ticks bloodlust
-    unsigned	Haste;			/// ticks haste (disables slow)
-    unsigned	Slow;			/// ticks slow (disables haste)
-    unsigned	Invisible;		/// ticks invisible
-    unsigned	FlameShield;		/// ticks flame shield
-    unsigned	UnholyArmor;		/// ticks unholy armor
+    int		TTL;			/// time to life
+    int		Bloodlust;		/// ticks bloodlust
+    int		Haste;			/// ticks haste (disables slow)
+    int		Slow;			/// ticks slow (disables haste)
+    int		Invisible;		/// ticks invisible
+    int		FlameShield;		/// ticks flame shield
+    int		UnholyArmor;		/// ticks unholy armor
 
-    unsigned	GroupId;		/// unit belongs to this group id
-    unsigned	LastGroup;		/// unit belongs to this last group
+    int		GroupId;		/// unit belongs to this group id
+    int		LastGroup;		/// unit belongs to this last group
 
-    unsigned	Value;			/// value used for much
+    int		Value;			/// value used for much
 
     unsigned	SubAction : 8;		/// sub-action of unit
     unsigned	Wait : 8;		/// action counter
@@ -562,11 +562,11 @@ struct _unit_ {
 	Upgrade* Upgrade;		/// Upgrade researched
     }		Research;		/// Research action
     struct _order_upgradeto_ {
-	unsigned	Ticks;		/// Ticks to complete
+	int	Ticks;			/// Ticks to complete
     } UpgradeTo;			/// Upgrade to action
     struct _order_train_ {
-	unsigned	Ticks;		/// Ticks to complete
-	unsigned	Count;		/// Units in training queue
+	int	Ticks;			/// Ticks to complete
+	int	Count;			/// Units in training queue
 	// FIXME: vladi: later we should train more units or automatic
 #define MAX_UNIT_TRAIN	6		/// max number of units in queue
 	UnitType*	What[MAX_UNIT_TRAIN];	/// Unit trained
@@ -762,7 +762,7 @@ extern void DropOutNearest(Unit* unit,int x,int y,int addx,int addy);
 extern void DropOutAll(const Unit* unit);
 
     /// FIXME: more docu
-extern int CanBuildHere(const UnitType* type,unsigned x,unsigned y);
+extern int CanBuildHere(const UnitType* type,int x,int y);
     /// FIXME: more docu
 extern int CanBuildOn(int x,int y,int mask);
     /// FIXME: more docu
@@ -785,7 +785,7 @@ extern int FindWoodInSight(const Unit* unit,int* x,int* y);
 extern Unit* FindOilPlatform(const Player* player,int x,int y);
 
     /// FIXME: more docu
-extern Unit* UnitOnScreen(Unit* unit,unsigned x,unsigned y);
+extern Unit* UnitOnScreen(Unit* unit,int x,int y);
 
     /// Let an unit die
 extern void LetUnitDie(Unit* unit);
@@ -855,11 +855,6 @@ extern int TypeMovementMask(const UnitType* type);
 extern int UnitMovementMask(const Unit* unit);
 #endif
 
-//	in bottom_panel.c
-//--------------------
-    /// FIXME: more docu
-extern void UpgradeButtons(int upgrade);
-
 //	in unit_draw.c
 //--------------------
     /// Draw nothing around unit
@@ -909,21 +904,21 @@ extern int FindUnitsByType(const UnitType* type,Unit** table);
     /// Find all units of this type of the player
 extern int FindPlayerUnitsByType(const Player*,const UnitType*,Unit**);
     /// Return any unit on that map tile
-extern Unit* UnitOnMapTile(unsigned tx,unsigned ty);
+extern Unit* UnitOnMapTile(int tx,int ty);
     /// Return repairable unit on that map tile
-extern Unit* RepairableOnMapTile(unsigned tx,unsigned ty);
+extern Unit* RepairableOnMapTile(int tx,int ty);
     /// Return possible attack target on that map tile
-extern Unit* TargetOnMapTile(const Unit* unit,unsigned tx,unsigned ty);
+extern Unit* TargetOnMapTile(const Unit* unit,int tx,int ty);
     /// Return transporter unit on that map tile
-extern Unit* TransporterOnMapTile(unsigned tx,unsigned ty);
+extern Unit* TransporterOnMapTile(int tx,int ty);
     /// Return any unit on that screen map position
-extern Unit* UnitOnScreenMapPosition (unsigned , unsigned );
+extern Unit* UnitOnScreenMapPosition (int , int );
     /// Return repairable unit on that screen map position
-extern Unit* RepairableOnScreenMapPosition (unsigned , unsigned );
+extern Unit* RepairableOnScreenMapPosition (int , int );
     /// Return possible attack target on that screen map position
-extern Unit* TargetOnScreenMapPosition (const Unit* unit,unsigned , unsigned );
+extern Unit* TargetOnScreenMapPosition (const Unit* unit,int , int );
     /// Return transporter unit on that screen map position
-extern Unit* TransporterOnScreenMapPosition (unsigned , unsigned );
+extern Unit* TransporterOnScreenMapPosition (int , int );
 
     /// Return gold mine, if on map tile
 extern Unit* GoldMineOnMap(int tx,int ty);
@@ -938,10 +933,8 @@ extern Unit* OilDepositOnMap(int tx,int ty);
     /// Return wood deposit, if on map tile
 extern Unit* WoodDepositOnMap(int tx,int ty);
 
-    /// Find any enemy in numeric range
-extern Unit* EnemyInRage(const Unit* unit,unsigned range);
     /// Find best enemy in numeric range to attack
-extern Unit* AttackUnitsInDistance(const Unit* unit,unsigned range);
+extern Unit* AttackUnitsInDistance(const Unit* unit,int range);
     /// Find best enemy in attack range to attack
 extern Unit* AttackUnitsInRange(const Unit* unit);
     /// Find best enemy in reaction range to attack

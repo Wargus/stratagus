@@ -57,19 +57,19 @@ struct _settings_ {
 //  Individual presets:
 //  For single-player game only Presets[0] will be used..
     struct {
-	unsigned	Race;		/// Race of the player
-	unsigned	Team;		/// Team of player -- NOT SELECTABLE YET
-	unsigned	Type;		/// Type of player (for network games)
+	int		Race;		/// Race of the player
+	int		Team;		/// Team of player -- NOT SELECTABLE YET
+	int		Type;		/// Type of player (for network games)
     }	Presets[PlayerMax];
 
 //  Common settings:
-    unsigned	Resources;		/// Preset resource factor
-    unsigned	NumUnits;		/// Preset # of units
-    unsigned	Opponents;		/// Preset # of ai-opponents
-    unsigned	Terrain;		/// Terrain type (summer,winter,...)
-    unsigned	GameType;		/// Game type (melee, free for all,...)
-    unsigned	NoFogOfWar;		/// No fog of war
-    unsigned	RevealMap;		/// Reveal map
+    int		Resources;		/// Preset resource factor
+    int		NumUnits;		/// Preset # of units
+    int		Opponents;		/// Preset # of ai-opponents
+    int		Terrain;		/// Terrain type (summer,winter,...)
+    int		GameType;		/// Game type (melee, free for all,...)
+    int		NoFogOfWar;		/// No fog of war
+    int		RevealMap;		/// Reveal map
 };
 
 #define SettingsPresetMapDefault	(~0ul)	/// Special: Use pud/cm supplied

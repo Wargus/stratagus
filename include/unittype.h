@@ -507,7 +507,7 @@ struct _unit_type_ {
 // this is taken from the UDTA section
     Construction*Construction;		/// What is shown in construction phase
     int		_SightRange;		/// Sight range
-    unsigned	_HitPoints;		/// Maximum hit points
+    int		_HitPoints;		/// Maximum hit points
     int		_MaxMana;		/// Maximum mana points
     // FIXME: only flag
     int		Magic;			/// Unit can cast spells
@@ -588,12 +588,12 @@ struct _unit_type_ {
     // FIXME: temporary solution
     WeaponSound Weapon;                 /// Currently sound for weapon
 
-    unsigned	Supply;			/// Food supply
-    unsigned	Demand;			/// Food demand
+    int		Supply;			/// Food supply
+    int		Demand;			/// Food demand
 
 // --- FILLED UP ---
 
-    unsigned	ImproveIncomes[MaxCosts];/// Gives player an improved income
+    int		ImproveIncomes[MaxCosts];/// Gives player an improved income
 
     unsigned	FieldFlags;		/// Unit map field flags
     unsigned	MovementMask;		/// Unit check this map flags for move
@@ -602,7 +602,7 @@ struct _unit_type_ {
     UnitStats Stats[PlayerMax];		/// Unit status for each player
 
 	// FIXME: Should us a general name f.e. Slot here?
-    unsigned	Type;			/// Type as number
+    int		Type;			/// Type as number
 
     void*	Property;		/// CCL property storage
 
