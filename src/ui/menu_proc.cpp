@@ -527,9 +527,9 @@ local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
     }
     if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w,h);
+	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w+4,h);
 	} else {
-	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w,h);
+	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w+4,h);
 	}
     }
     SetDefaultTextColors(nc,rc);
