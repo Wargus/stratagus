@@ -940,11 +940,6 @@ if [ "$DARWIN" = "1" ] ; then
 fi
 echo >> $RULESFILE
 
-echo "\$(OBJDIR)/%.dep: %.c" >> $RULESFILE
-echo "	@echo -n \"\$(OBJDIR)/\" >\$@" >> $RULESFILE
-echo "	@\$(CC) -MM \$(IFLAGS) \$(DFLAGS) \$(CFLAGS) \$< >>\$@" >> $RULESFILE
-echo >> $RULESFILE
-
 echo "\$(OBJDIR)/%.dep: %.cpp" >> $RULESFILE
 echo "	@echo -n \"\$(OBJDIR)/\" >\$@" >> $RULESFILE
 echo "	@\$(CC) -MM \$(IFLAGS) \$(DFLAGS) \$(CFLAGS) \$< >>\$@" >> $RULESFILE

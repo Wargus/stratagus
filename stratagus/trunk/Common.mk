@@ -28,18 +28,17 @@ all:	$(OBJS)
 
 doc:	$(SRCS:.c=.doc) $(CPPSRCS.cpp=.doc) $(HDRS:.h=.doc)
 
-DEPOBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.dep)) $(addprefix $(OBJDIR)/, $(CPPSRCS:.cpp=.dep))
-
 clean::
 	$(RM) $(OBJS) core *.doc
 
 clobber: clean
 	$(RM) .depend .#* *~ *.$(OE)
 
-depend:: $(DEPOBJS)
+depend::
 	@echo -n >.depend
-	@for i in $(DEPOBJS) ; do\
-	cat $$i >>.depend ; $(RM) $$i ; done
+	@for i in $(SRCS) $(CPPSRCS) ; do\
+	echo -n $(OBJDIR)/ >> .depend;\
+	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
 
 tags::
 	for i in $(SRCS) $(CPPSRCS) ; do\
