@@ -210,7 +210,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## USE_MAD:		Use mad mp3 audio player support.
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
-## NEW_REGIONS:		Support for new regions code
+## HIERARCHIC_PATHFINDER:	Use hierarchic pathfinder
 ## USE_LUA:		Lua scripting support
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
 	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
