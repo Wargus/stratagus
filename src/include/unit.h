@@ -434,7 +434,7 @@ enum _unit_action_ {
 	UnitActionTrain,        ///< building is training
 	UnitActionUpgradeTo,    ///< building is upgrading itself
 	UnitActionResearch,     ///< building is researching spell
-	UnitActionBuilded,      ///< building is under construction
+	UnitActionBuilt,      ///< building is under construction
 
 // Compound actions
 	UnitActionBoard,        ///< unit entering transporter
@@ -644,12 +644,12 @@ struct _unit_ {
 #define MAX_PATH_LENGTH 28          ///< max length of precalculated path
 		char Path[MAX_PATH_LENGTH]; ///< directions of stored path
 	} Move; ///< ActionMove,...
-	struct _order_builded_ {
+	struct _order_built_ {
 		Unit* Worker;               ///< Worker building this unit
 		int Progress;               ///< Progress counter, in 1/100 cycles.
 		int Cancel;                 ///< Cancel construction
 		struct _construction_frame_* Frame; ///< Construction frame
-	} Builded; ///< ActionBuilded,...
+	} Built; ///< ActionBuilt,...
 	struct _order_resource_ {
 		int Active; ///< how many units are harvesting from the resource.
 	} Resource; ///< Resource still
@@ -680,11 +680,11 @@ struct _unit_ {
 
 /**
 **  Returns true, if unit is unusable. (for attacking,...)
-**  @todo look if correct used (UnitActionBuilded is no problem if attacked)?
+**  @todo look if correct used (UnitActionBuilt is no problem if attacked)?
 */
 #define UnitUnusable(unit) \
 	((unit)->Removed || (unit)->Orders[0].Action == UnitActionDie || \
-	  (unit)->Orders[0].Action == UnitActionBuilded || (unit)->Destroyed)
+	  (unit)->Orders[0].Action == UnitActionBuilt || (unit)->Destroyed)
 
 /**
 **  Returns unit number (unique to this unit)

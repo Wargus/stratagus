@@ -210,7 +210,7 @@ static int StartGathering(Unit* unit)
 	// If resource is still under construction, wait!
 	//
 	if ((goal->Type->MaxOnBoard && goal->Data.Resource.Active >= goal->Type->MaxOnBoard) ||
-			goal->Orders[0].Action == UnitActionBuilded) {
+			goal->Orders[0].Action == UnitActionBuilt) {
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
 		// FIXME: We should add a flag for that, and a limited range.
@@ -601,7 +601,7 @@ static int MoveToDepot(Unit* unit)
 	//
 	// If resource depot is still under construction, wait!
 	//
-	if (goal->Orders[0].Action == UnitActionBuilded) {
+	if (goal->Orders[0].Action == UnitActionBuilt) {
 		unit->Wait = 10;
 		return 0;
 	}

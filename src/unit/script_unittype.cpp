@@ -1940,8 +1940,8 @@ void UpdateUnitVariables(const Unit* unit)
 	unit->Variable[HP_INDEX].Max = unit->Stats->HitPoints;
 
 	// Build
-	if (unit->Orders[0].Action == UnitActionBuilded) {
-		unit->Variable[BUILD_INDEX].Value = unit->Data.Builded.Progress;
+	if (unit->Orders[0].Action == UnitActionBuilt) {
+		unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
 		unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Player].Costs[TimeCost] * 600;
 
 		// This should happen when building unit with several peons

@@ -65,7 +65,7 @@ static void UpdateConstructionFrame(Unit* unit)
 	ConstructionFrame* tmp;
 	int percent;
 
-	percent = unit->Data.Builded.Progress /
+	percent = unit->Data.Built.Progress /
 		(unit->Type->Stats[unit->Player->Player].Costs[TimeCost] * 6);
 	cframe = tmp = unit->Type->Construction->Frames;
 	while (tmp) {
@@ -75,8 +75,8 @@ static void UpdateConstructionFrame(Unit* unit)
 		cframe = tmp;
 		tmp = tmp->Next;
 	}
-	if (cframe != unit->Data.Builded.Frame) {
-		unit->Data.Builded.Frame = cframe;
+	if (cframe != unit->Data.Built.Frame) {
+		unit->Data.Built.Frame = cframe;
 		if (unit->Frame < 0) {
 			unit->Frame = -cframe->Frame - 1;
 		} else {
@@ -237,7 +237,7 @@ void HandleActionBuild(Unit* unit)
 	}
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
-	build->Orders[0].Action = UnitActionBuilded;
+	build->Orders[0].Action = UnitActionBuilt;
 	
 	// Must place after previous for map flags
 	PlaceUnit(build, x, y);
@@ -252,7 +252,7 @@ void HandleActionBuild(Unit* unit)
 
 	build->Wait = 1;
 	// Make sure the bulding doesn't cancel itself out right away.
-	build->Data.Builded.Progress = 100;
+	build->Data.Built.Progress = 100;
 	build->HP = 1;
 	UpdateConstructionFrame(build);
 
@@ -260,7 +260,7 @@ void HandleActionBuild(Unit* unit)
 	build->HP = 1;
 	if (!type->BuilderOutside) {
 		// Place the builder inside the building
-		build->Data.Builded.Worker = unit;
+		build->Data.Built.Worker = unit;
 		RemoveUnit(unit, build);
 		build->CurrentSightRange = 0;
 		unit->X = x;
@@ -286,9 +286,9 @@ void HandleActionBuild(Unit* unit)
 /**
 **  Unit under Construction
 **
-**  @param unit  Unit that is builded.
+**  @param unit  Unit that is built.
 */
-void HandleActionBuilded(Unit* unit)
+void HandleActionBuilt(Unit* unit)
 {
 	Unit* worker;
 	UnitType* type;
@@ -298,7 +298,7 @@ void HandleActionBuilded(Unit* unit)
 	type = unit->Type;
 
 	// n is the current damage taken by the unit.
-	n = (unit->Data.Builded.Progress * unit->Stats->HitPoints) /
+	n = (unit->Data.Built.Progress * unit->Stats->HitPoints) /
 		(type->Stats[unit->Player->Player].Costs[TimeCost] * 600) - unit->HP;
 	// This below is most often 0
 	if (type->BuilderOutside) {
@@ -306,13 +306,13 @@ void HandleActionBuilded(Unit* unit)
 	} else {
 		progress = 100;
 		// FIXME: implement this below:
-		// unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
+		// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
 	}
 	// Building speeds increase or decrease.
 	progress *= SpeedBuild;
-	unit->Data.Builded.Progress += progress;
+	unit->Data.Built.Progress += progress;
 	// Keep the same level of damage while increasing HP.
-	unit->HP = (unit->Data.Builded.Progress * unit->Stats->HitPoints) /
+	unit->HP = (unit->Data.Built.Progress * unit->Stats->HitPoints) /
 		(type->Stats[unit->Player->Player].Costs[TimeCost] * 600) - n;
 	if (unit->HP > unit->Stats->HitPoints) {
 		unit->HP = unit->Stats->HitPoints;
@@ -321,12 +321,12 @@ void HandleActionBuilded(Unit* unit)
 	//
 	// Check if construction should be canceled...
 	//
-	if (unit->Data.Builded.Cancel || unit->Data.Builded.Progress < 0) {
+	if (unit->Data.Built.Cancel || unit->Data.Built.Progress < 0) {
 		DebugPrint("%s canceled.\n" _C_ unit->Type->Name);
 		// Drop out unit
-		if ((worker = unit->Data.Builded.Worker)) {
+		if ((worker = unit->Data.Built.Worker)) {
 			worker->Orders[0].Action = UnitActionStill;
-			unit->Data.Builded.Worker = NoUnitP;
+			unit->Data.Built.Worker = NoUnitP;
 			worker->Reset = worker->Wait = 1;
 			worker->SubAction = 0;
 			DropOutOnSide(worker, LookingW, type->TileWidth, type->TileHeight);
@@ -343,7 +343,7 @@ void HandleActionBuilded(Unit* unit)
 	//
 	// Check if building ready. Note we can both build and repair.
 	//
-	if (unit->Data.Builded.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
+	if (unit->Data.Built.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
 			unit->HP >= unit->Stats->HitPoints) {
 		DebugPrint("Building ready.\n");
 		if (unit->HP > unit->Stats->HitPoints) {
@@ -360,7 +360,7 @@ void HandleActionBuilded(Unit* unit)
 		}
 		unit->Reset = unit->Wait = 1;
 
-		if ((worker = unit->Data.Builded.Worker)) {
+		if ((worker = unit->Data.Built.Worker)) {
 			// Bye bye worker.
 			if (type->BuilderLost) {
 				// FIXME: enough?

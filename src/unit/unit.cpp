@@ -960,7 +960,7 @@ void UnitLost(Unit* unit)
 			}
 		}
 
-		if (unit->Orders[0].Action != UnitActionBuilded) {
+		if (unit->Orders[0].Action != UnitActionBuilt) {
 			player->UnitTypesCount[type->Slot]--;
 		}
 	}
@@ -976,7 +976,7 @@ void UnitLost(Unit* unit)
 	//
 	//  Update information.
 	//
-	if (unit->Orders[0].Action != UnitActionBuilded) {
+	if (unit->Orders[0].Action != UnitActionBuilt) {
 		if (type->Supply) {
 			player->Supply -= type->Supply;
 		}
@@ -1134,14 +1134,14 @@ static void UnitFillSeenValues(Unit* unit)
 	unit->Seen.IY = unit->IY;
 	unit->Seen.IX = unit->IX;
 	unit->Seen.Frame = unit->Frame;
-	unit->Seen.State = (unit->Orders[0].Action == UnitActionBuilded) |
+	unit->Seen.State = (unit->Orders[0].Action == UnitActionBuilt) |
 			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 	if (unit->Orders[0].Action == UnitActionDie) {
 		unit->Seen.State = 3;
 	}
 	unit->Seen.Type = unit->Type;
 	unit->Seen.Constructed = unit->Constructed;
-	unit->Seen.CFrame = unit->Data.Builded.Frame;
+	unit->Seen.CFrame = unit->Data.Built.Frame;
 }
 
 /**
@@ -2236,7 +2236,7 @@ Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 					for (i = 0; i < n; ++i) {
 						if (table[i]->Type == b->Data.OnTop.Parent &&
 							table[i]->X == x && table[i]->Y == y &&
-							table[i]->Orders[0].Action != UnitActionBuilded &&
+							table[i]->Orders[0].Action != UnitActionBuilt &&
 							!table[i]->Destroyed &&
 							table[i]->Orders[0].Action != UnitActionDie) {
 							success = 1;
@@ -2952,10 +2952,10 @@ void LetUnitDie(Unit* unit)
 	// but if canceling building the platform, the worker is already
 	// outside.
 	if (type->GivesResource &&
-			unit->Orders[0].Action == UnitActionBuilded &&
-			unit->Data.Builded.Worker) {
+			unit->Orders[0].Action == UnitActionBuilt &&
+			unit->Data.Built.Worker) {
 		// Restore value for oil-patch
-		unit->ResourcesHeld = unit->Data.Builded.Worker->ResourcesHeld;
+		unit->ResourcesHeld = unit->Data.Built.Worker->ResourcesHeld;
 	}
 
 	// Transporters lose their units and building their workers
@@ -3546,8 +3546,8 @@ void SaveOrder(const Order* order, CLFile* file)
 		case UnitActionResearch:
 			CLprintf(file, "\"action-research\",");
 			break;
-		case UnitActionBuilded:
-			CLprintf(file, "\"action-builded\",");
+		case UnitActionBuilt:
+			CLprintf(file, "\"action-built\",");
 			break;
 
 		case UnitActionBoard:
@@ -3814,27 +3814,27 @@ void SaveUnit(const Unit* unit, CLFile* file)
 			}
 			CLprintf(file, "}");
 			break;
-		case UnitActionBuilded:
+		case UnitActionBuilt:
 			{
 				ConstructionFrame* cframe;
 				int frame;
 
 				cframe = unit->Type->Construction->Frames;
 				frame = 0;
-				while (cframe != unit->Data.Builded.Frame) {
+				while (cframe != unit->Data.Built.Frame) {
 					cframe = cframe->Next;
 					++frame;
 				}
-				CLprintf(file, ",\n  \"data-builded\", {");
+				CLprintf(file, ",\n  \"data-built\", {");
 
-				if (unit->Data.Builded.Worker) {
+				if (unit->Data.Built.Worker) {
 					CLprintf(file, "\"worker\", \"%s\", ",
-					ref = UnitReference(unit->Data.Builded.Worker));
+					ref = UnitReference(unit->Data.Built.Worker));
 					free(ref);
 				}
 				CLprintf(file, "\"progress\", %d, \"frame\", %d,",
-					unit->Data.Builded.Progress, frame);
-				if (unit->Data.Builded.Cancel) {
+					unit->Data.Built.Progress, frame);
+				if (unit->Data.Built.Cancel) {
 					CLprintf(file, " \"cancel\",");
 				}
 				CLprintf(file, "}");

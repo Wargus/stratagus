@@ -136,7 +136,7 @@ static int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 	// Count food supplies under construction.
 	//
 	remaining = 0;
-	for (queue = pai->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = pai->UnitTypeBuilt; queue; queue = queue->Next) {
 		if (queue->Type->Supply) {
 			remaining += queue->Made * queue->Type->Supply;
 		}
@@ -152,7 +152,7 @@ static int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 	//
 	// Count what we train.
 	//
-	for (queue = pai->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = pai->UnitTypeBuilt; queue; queue = queue->Next) {
 		if ((remaining -= queue->Made * queue->Type->Demand) < 0) {
 			return 0;
 		}
@@ -309,7 +309,7 @@ static void AiRequestSupply(void)
 	// Count the already made build requests.
 	//
 	memset(counter, 0, sizeof(counter));
-	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = AiPlayer->UnitTypeBuilt; queue; queue = queue->Next) {
 		counter[queue->Type->Slot] += queue->Want;
 	}
 
@@ -331,12 +331,12 @@ static void AiRequestSupply(void)
 			return;
 		} else {
 			if (AiMakeUnit(type)) {
-				queue = malloc(sizeof (*AiPlayer->UnitTypeBuilded));
-				queue->Next = AiPlayer->UnitTypeBuilded;
+				queue = malloc(sizeof (*AiPlayer->UnitTypeBuilt));
+				queue->Next = AiPlayer->UnitTypeBuilt;
 				queue->Type = type;
 				queue->Want = 1;
 				queue->Made = 1;
-				AiPlayer->UnitTypeBuilded = queue;
+				AiPlayer->UnitTypeBuilt = queue;
 			}
 		}
 	}
@@ -696,7 +696,7 @@ void AiAddUpgradeToRequest(UnitType* type)
 }
 
 /**
-**  Check what must be builded / trained.
+**  Check what must be built / trained.
 */
 static void AiCheckingWork(void)
 {
@@ -706,7 +706,7 @@ static void AiCheckingWork(void)
 
 	// Suppy has the highest priority
 	if (AiPlayer->NeedSupply) {
-		if (!(AiPlayer->UnitTypeBuilded && AiPlayer->UnitTypeBuilded->Type->Supply)) {
+		if (!(AiPlayer->UnitTypeBuilt && AiPlayer->UnitTypeBuilt->Type->Supply)) {
 			AiPlayer->NeedSupply = 0;
 			AiRequestSupply();
 		}
@@ -714,7 +714,7 @@ static void AiCheckingWork(void)
 	//
 	// Look to the build requests, what can be done.
 	//
-	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
+	for (queue = AiPlayer->UnitTypeBuilt; queue; queue = queue->Next) {
 		if (queue->Want > queue->Made) {
 			type = queue->Type;
 
@@ -1240,7 +1240,7 @@ static void AiCheckRepair(void)
 		// Unit damaged?
 		// Don't repair attacked unit ( wait 5 sec before repairing )
 		if (unit->Type->Building
-			&& unit->Orders[0].Action != UnitActionBuilded
+			&& unit->Orders[0].Action != UnitActionBuilt
 			&& unit->Orders[0].Action != UnitActionUpgradeTo
 			&& unit->HP < unit->Stats->HitPoints
 			&& unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
@@ -1289,10 +1289,10 @@ void AiAddUnitTypeRequest(UnitType* type, int count)
 	//
 	// Find end of the list.
 	//
-	for (queue = &AiPlayer->UnitTypeBuilded; *queue; queue = &(*queue)->Next) {
+	for (queue = &AiPlayer->UnitTypeBuilt; *queue; queue = &(*queue)->Next) {
 	}
 
-	*queue = malloc(sizeof (*AiPlayer->UnitTypeBuilded));
+	*queue = malloc(sizeof (*AiPlayer->UnitTypeBuilt));
 	(*queue)->Next = NULL;
 	(*queue)->Type = type;
 	(*queue)->Want = count;

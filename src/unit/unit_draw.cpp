@@ -1503,7 +1503,7 @@ static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order
 			dest = 1;
 			break;
 
-		case UnitActionBuilded:
+		case UnitActionBuilt:
 			e_color = color = ColorGray;
 			break;
 
@@ -1698,7 +1698,7 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 {
 	ConstructionFrame* cframe;
 
-	cframe = unit->Data.Builded.Frame;
+	cframe = unit->Data.Built.Frame;
 	if (cframe->File == ConstructionFileConstruction) {
 		if (unit->Type->Construction->ShadowSprite) {
 			x -= (unit->Type->Construction->Width - unit->Type->TileWidth * TileSizeX) / 2;
@@ -1833,7 +1833,7 @@ void DrawUnit(const Unit* unit)
 		x = unit->IX;
 		x += Map2ViewportX(CurrentViewport, unit->X);
 		y += Map2ViewportY(CurrentViewport, unit->Y);
-		state = (unit->Orders[0].Action == UnitActionBuilded) |
+		state = (unit->Orders[0].Action == UnitActionBuilt) |
 			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 		constructed = unit->Constructed;
 		// Reset Type to the type being upgraded to
@@ -1841,7 +1841,7 @@ void DrawUnit(const Unit* unit)
 			type = unit->Orders[0].Type;
 		}
 		// This is trash unless the unit is being built, and that's when we use it.
-		cframe = unit->Data.Builded.Frame;
+		cframe = unit->Data.Built.Frame;
 	} else {
 		y = unit->Seen.IY;
 		x = unit->Seen.IX;
