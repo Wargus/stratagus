@@ -37,32 +37,32 @@ For any questions not mentioned here, please contact
 
 <DL>
 <P>
-<DT><FONT COLOR="#FF0000">Q: I was playing in 800x600 mode, and the graphics around the edge didn't paint the full screen?</FONT>
-<DD>A: The original graphics aren't designed for this resolutions, you could
+<DT><FONT COLOR="#FF0000">Q: In 800x600 mode or higher, the graphics around the edge doesn't draw around the full screen?</FONT>
+<DD>A: The original graphics aren't designed for these resolutions, you could
     design your own user interface, see "data/ccl/ui.ccl".
 <P>
-<DT><FONT COLOR="#FF0000">Q: The graphics didn't fit on 800x600 or higher resolution?</FONT>
-<DD>A: The original graphics aren't designed for this resolutions, you could
+<DT><FONT COLOR="#FF0000">Q: The graphics don't fit on 800x600 or higher resolution?</FONT>
+<DD>A: The original graphics aren't designed for these resolutions, you could
     design your own user interface, see "data/ccl/ui.ccl".
 <P>
-<DT><FONT COLOR="#FF0000">Q: I get the error "gzseek already defined or undefined!", what should I do?</FONT>
-<DD>A: You have an incompatible libpng version, better you install the latest
-libpng1.0.X. You get it here:
-    <A HREF="ftp://swrinde.nde.swri.edu/pub/png/">SwRI</A>
+<DT><FONT COLOR="#FF0000">Q: I am getting the error "gzseek already defined or undefined!" ?</FONT>
+<DD>A: You have an old version of libpng, install the libpng1.0.X or later. You get it here:
+    <A HREF="http://www.libpng.org/pub/png/libpng.html">http://www.libpng.org/pub/png/libpng.html</A>
 <P>
-<DT><FONT COLOR="#FF0000">Q: The software cursor is too slow, how can I get it quicker?</FONT>
+<DT><FONT COLOR="#FF0000">Q: The software cursor is too slow, how can I make it faster ?</FONT>
 
-<DD>A: I will improve the speed later, but I was told:<BR>
-Using Accelerated X on a Pentium 75 FreeCraft is now playable.
+<DD>A: We will improve the speed later, but we were told that 
+on an Accelerated X server with a Pentium 75, FreeCraft is now playable.
 <P>
-<DT><FONT COLOR="#FF0000">Q: Did FreeCraft work with ALSA?</FONT>
+<DT><FONT COLOR="#FF0000">Q: Does FreeCraft work with ALSA?</FONT>
 
-<DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA) - Driver.
-I have tested it with version 0.3.2 - 0.9.0.<P>
-More informations <A HREF="http://www.alsa-project.org">
+<DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA) Driver if 
+you compile FreeCraft using SDL and SDL was compiled to support ALSA (--enable-alsa).
+It has been tested with versions 0.3.2 to 0.9.0.<P>
+More informationcan be found here: <A HREF="http://www.alsa-project.org">
 http://www.alsa-project.org</A><P>
 <P>
-<DT><FONT COLOR="#FF0000">Q: How did I get big maps?</FONT>
+<DT><FONT COLOR="#FF0000">Q: How do I get big maps?</FONT>
 
 <DD>A: If you want a map of the size 256 x 256.
 Create and edit 4 maps (128 x 128) in the original editor.
@@ -75,7 +75,7 @@ Now create a file bigmap.cm containing:
 	(load-pud "bigmap3.pud")
 	(load-pud "bigmap4.pud")
 </PRE><P>
-If you now load this file as map (freecraft bigmap.cm), you see this big map.
+Now you can load this file as a map (freecraft bigmap.cm).
 bigmap1.pud is in the upper left corner.
 bigmap2.pud is in the upper right corner.
 bigmap3.pud is in the lower left corner.
@@ -83,17 +83,16 @@ bigmap4.pud is in the lower right corner.
 <P>
 CraftED - The FreeCraft map editor, also supports the creation of big maps.
 <P>
-<DT><FONT COLOR="#FF0000">Q: Can I use the original without expansion?</FONT>
+<DT><FONT COLOR="#FF0000">Q: Can I use the original CD without expansion?</FONT>
 
-<DD>A: There are only more graphics and sounds in the expansion CD version.
-Me was told, it works without problems with the german version. Just try it.
-With the new versions this should work without problems.
+<DD>A: Yes. Only difference is there are more graphics and sounds in the expansion CD version.
+It works without problems with the german version. If you are still not sure, just try it.
+It should work without problems.
 
 <P>
 <DT><FONT COLOR="#FF0000">Q: I have tried to start a level with
-    './freecraft data/puds/internal/internal01.pud.gz' and I only get this
-    error message 'pud: fopen,gzopen,bzopen(): No such file or directory'.
-    What do I wrong?
+    './freecraft data/puds/internal/internal01.pud.gz' , why do I get this
+    error message 'pud: fopen,gzopen,bzopen(): No such file or directory' ?
     </FONT>
 <DD>A: We have changed the loading syntax:
     <UL>
@@ -104,47 +103,47 @@ With the new versions this should work without problems.
     This means you must type './freecraft ./data/puds/internal/internal01.pud.gz'!
 <P>
 <DT><FONT COLOR="#FF0000">
-    Q: Why did the mouse react after seconds on my moves?</FONT>
-<DD>A: I didn't found the real problem. Currently use the threaded sound
-    support and enable it (in data/ccl/sound.ccl) or and add to the line
+    Q: Why does the cursor react after several seconds when i move it?</FONT>
+<DD>A: We didn't find the real problem. Currently use the threaded sound
+    support and enable it (in data/ccl/sound.ccl) or add to the line
 <P>
-DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG)
+"-DSLOW_INPUT" to:
 <P>
-"-DSLOW_INPUT" in Rules.make.
+"DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) \
+	$(DEBUG)" in Rules.make
 <P>
-<DT><FONT COLOR="#FF0000">Q: I want play but do not want use CD...  can i copy files from cd to hdd ?
-    What i have to copy ?</FONT>
-<DD>A: After running 'build.bat' (WINDOWS) or 'build.sh' (UNIX) the CD isn't
+<DT><FONT COLOR="#FF0000">Q: I want to play without having the CD in the drive, 
+can i copy files from CD to hdd ?</FONT>
+<DD>A: After running 'build.bat' (WINDOWS) or 'build.sh' (UNIX) the CD is no
     longer needed. This script converts the data on CD into our own format.
     <BR>
     A: You didn't need to copy, the installation did it for you.
 <P>
 <DT><FONT COLOR="#FF0000">
-    Q: Why did the game becomes very slow under X11?</FONT>
+    Q: Why does the game become very slow under X11?</FONT>
 <DD>A: Give your X11 server a higher priority than the clients.<P>
     renice -5 &lt;pid-of-your-x11-server&gt;<P>
-    newer linux distributions (debian) does this automatic.<P>
+    newer linux distributions (debian) does this automatically, 
     or start freecraft with<P>
     nice -n 5 ./freecraft
 <P>
-<DT><FONT COLOR="#FF0000">Q: Can I use FreeCraft to join in an original network game?</FONT>
-<DD>A: Sorry, FreeCraft use its own network protocol. You can only play
-    with FreeCraft against other FreeCrafts.
+<DT><FONT COLOR="#FF0000">Q: Can I use FreeCraft to join a W*rcr*ft 2 network game?</FONT>
+<DD>A: Sorry, FreeCraft use its own network protocol. You can only join 
+    FreeCraft network games.
 <P>
-<DT><FONT COLOR="#FF0000">Q: It is planned to support playing against the original in network game?</FONT>
-<DD>A: The both network protocols are that way, that this is impossible.
+<DT><FONT COLOR="#FF0000">Q: Is it planned to support joining a W*rcr*ft 2 network game?</FONT>
+<DD>A: Both network protocols are in such a way, that this would be impossible.
 
 <P>
 <DT><FONT COLOR="#FF0000">Q: I only have the original BNE version, can I use it?</FONT>
-<DD>A: No. Until now nobody has written a converter for this, if you want to
-	write it, please contact me. It is only a question of time and you
-	must understand writting C.
+<DD>A: No. Nobody has written a converter for this, if you want to
+	write it, please contact us. It is only a question of time and you
+	must understand writing C.
 
 <P>
-<DT><FONT COLOR="#FF0000">Q: I get only a black window, after I have installed
-	it on windows. What have I done wrong?</FONT>
-<DD>A: Try installing FreeCraft to C:\.
+<DT><FONT COLOR="#FF0000">Q: Why do I get only a black window after I installed
+	it on windows?</FONT>
+<DD>A: Try installing FreeCraft to C: drive.
 
 <P>
 <DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with VC++?</FONT>
@@ -153,59 +152,52 @@ development.html</A>. But mingw32 is better supported and regular tested.
 
 <P>
 <DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with Borland C++?</FONT>
-<DD>A: This C compiler isn't support yet, you can build a project and
+<DD>A: This C compiler isn't support yet, you can build a project, 
 write the instrutions and than mail it to us.<P>
 
 But you can use <A HREF="http://sources.redhat.com/cygwin/">cygwin</A> or
 <A HREF="http://www.mingw.org">MinGW</A> both are GNU C compilers for windows.
 <P>
-
+Information on how to use MingGW and libSDL for cross development and native
+development:<P>
 <A HREF="http://www.libsdl.org/Xmingw32/">
 http://www.libsdl.org/Xmingw32/</A><P>
-Informations how to use MingGW and libSDL for cross development and native
-development.<P>
+Compiler package for windows built by Sam Lantinga:<P>
 <A HREF="http://www.libsdl.org/Xmingw32/mingw32.zip">
 http://www.libsdl.org/Xmingw32/mingw32.zip</A><P>
-Compiler packet for windows, build by Sam Lantinga.<P>
-
+Based on the above this is our build. It contains SDL 1.2.4, libpng, zlib and zziplib.
+Install this and download the newest FreeCraft source and start FreeCraft
+development with windows:<P>
 <A HREF="http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip">
 http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip</A><P>
-
-Based on above this is my build. Contains SDL 1.2.4, libpng, zlib and zziplib.
-Install this and download the newest FreeCraft source and start FreeCraft
-development with windows.<P>
-
 <P>
 <DT><FONT COLOR="#FF0000">Q: What port or ports did FreeCraft use for network play?</FONT>
-<DD>A: As default is only the port 6660 UDP used on client and server side.
+<DD>A: As default the only port used is 6660 UDP for both the client and server side.
 
 <P>
-<DT><FONT COLOR="#FF0000">Q: When I start FreeCraft there are some fields gray, did I something wrong?</FONT>
-<DD>A: No. The gray menu entries are planned features, which aren't finished yet. You are welcome to write it.
-
+<DT><FONT COLOR="#FF0000">Q: Why are there some grayed out fields in the FreeCraft menus?</FONT>
+<DD>A: The grayed out menu entries are planned features 
+which aren't finished yet. You are welcome to write them.
 <P>
 <DT><FONT COLOR="#FF0000">Q: Can I save and load a game?</FONT>
-<DD>A: No. Sorry Load+Save aren't yet written.
+<DD>A: No. Sorry Load & Save aren't written yet.
 
 <P>
-<DT><FONT COLOR="#FF0000">Q: I get the following compiler failure:<BR>
+<DT><FONT COLOR="#FF0000">Q: Why do I get the following compiler failure:<BR>
 network.c:282: initializer element is not constant<BR>
-network.c:282: (near initialization for `CommandsIn[0].first')<BR>
-What should I do? </FONT>
+network.c:282: (near initialization for `CommandsIn[0].first')<BR></FONT>
 <DD>A: This is a bug in the GNU C Compiler 2.96, downgrade to GCC 2.95.x or
 upgrade to GCC 3.xx (expect many wrong warnings). If you are using the
 Redhat distribution 7.2, you can change CC=gcc to CC=kgcc in Rules.make.
 
 <P>
 <DT><FONT COLOR="#FF0000">Q: Can I play FreeCraft in fullscreen?</FONT>
-<DD>A: Yes fullscreen is supported with SDL, if you have downloaded the binary
-, installer or complete version. <P>
-In game use ALT-F or CTRL-F to switch to fullscreen and back.<P>
-Or you can use the commandline option -F to get the game started in fullscreen
+<DD>A: Yes fullscreen is supported with SDL. <P>
+In game use ALT-F or CTRL-F to switch between fullscreen and windowed mode.<P>
+You can also use the commandline option -F to start the game in fullscreen
 mode.<P>
-For windows create a shortcut to get this always.
-<P>
-The disabled option menu will handle this in the future.<P>
+You can create and edit a windows shortcut to make this the default mode.<P>
+The options menu will handle this in the future.<P>
 </DL>
 
 <HR>
