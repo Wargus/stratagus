@@ -129,7 +129,7 @@ unsigned long ShowOrdersCount;   ///< Show orders for some time
 #define RESEARCH_INDEX    3
 #define TRAINING_INDEX    4
 #define UPGRADINGTO_INDEX 5
-#define RESSOURCE_INDEX   6
+#define RESOURCE_INDEX   6
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?
@@ -1056,7 +1056,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit->Refs);
 #endif
 
-	for (i = 0; i <= RESSOURCE_INDEX; i++) { // default values
+	for (i = 0; i <= RESOURCE_INDEX; i++) { // default values
 		unit->Variable[i].Value = 0;
 		unit->Variable[i].Max = 0;
 		unit->Variable[i].Enable = 1;
@@ -1098,11 +1098,11 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 
 	// Resources.
 	if (type->GivesResource) {
-		unit->Variable[RESSOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[RESSOURCE_INDEX].Max = 655350; // FIXME use better value ?
+		unit->Variable[RESOURCE_INDEX].Value = unit->ResourcesHeld;
+		unit->Variable[RESOURCE_INDEX].Max = 655350; // FIXME use better value ?
 	} else if (type->Harvester && unit->CurrentResource) {
-		unit->Variable[RESSOURCE_INDEX].Value = unit->ResourcesHeld;
-		unit->Variable[RESSOURCE_INDEX].Max = type->ResInfo[unit->CurrentResource]->ResourceCapacity;
+		unit->Variable[RESOURCE_INDEX].Value = unit->ResourcesHeld;
+		unit->Variable[RESOURCE_INDEX].Max = type->ResInfo[unit->CurrentResource]->ResourceCapacity;
 	}
 
 	// Now show decoration for each variable.
