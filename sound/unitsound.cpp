@@ -1258,9 +1258,9 @@ Remap Remaps[]={
     { "grunt-attack",
       "sword attack"},
     { "peasant-attack",
-      "fist"},
+      "peasant attack"},
     { "peon-attack",
-      "fist"},
+      "peasant attack"},
     { "ballista-attack",
       "catapult-ballista attack"},
     { "catapult-attack",
@@ -1351,13 +1351,13 @@ Remap Remaps[]={
 	//{ "orc-cannon-tower-attack",
 	//},
     { "peon-with-gold-attack",
-      "fist"},
+      "peasant attack"},
     { "peasant-with-gold-attack",
-      "fist"},
+      "peasant attack"},
     { "peon-with-wood-attack",
-      "fist"},
+      "peasant attack"},
     { "peasant-with-wood-attack",
-      "fist"}
+      "peasant attack"}
     //    { "",
     //      ""},
 };
@@ -1502,7 +1502,7 @@ global void MapUnitSounds(void) {
     int i;
     int nb;
     SoundId HumanHelp,HumanCityHelp,OrcHelp,OrcCityHelp;
-    SoundId HumanDead,OrcDead,BuildingDestroyed,ShipSinking;
+    SoundId HumanDead,OrcDead,BuildingDestroyed,ShipSinking,NonOrganicDead;
 
     if( SoundFildes!=-1 ) {
 	SetSoundRange(SoundIdForName("tree chopping"),32);
@@ -1522,6 +1522,7 @@ global void MapUnitSounds(void) {
 	OrcDead=SoundIdForName("basic orc voices dead");
 	BuildingDestroyed=SoundIdForName("building destroyed");
 	ShipSinking=SoundIdForName("ship sinking");
+	NonOrganicDead=SoundIdForName("explosion");
 	for(i=0;i<nb;i++) {
 	    UnitTypes[i].Sound.Selected.Sound=
 		SoundIdForName(UnitTypes[i].Sound.Selected.Name);
@@ -1551,7 +1552,11 @@ global void MapUnitSounds(void) {
 		    if (UnitTypes[i].SeaUnit) {
 			UnitTypes[i].Sound.Dead.Sound=ShipSinking;
 		    } else {
-			UnitTypes[i].Sound.Dead.Sound=OrcDead;
+			if (UnitTypes[i].Organic) {
+			    UnitTypes[i].Sound.Dead.Sound=OrcDead;
+			} else {
+			    UnitTypes[i].Sound.Dead.Sound=NonOrganicDead;
+			}
 		    }
 		}
 	    } else {
@@ -1564,7 +1569,11 @@ global void MapUnitSounds(void) {
 		    if (UnitTypes[i].SeaUnit) {
 			UnitTypes[i].Sound.Dead.Sound=ShipSinking;
 		    } else {
-			UnitTypes[i].Sound.Dead.Sound=HumanDead;
+			if (UnitTypes[i].Organic) {
+			    UnitTypes[i].Sound.Dead.Sound=HumanDead;
+			} else {
+			    UnitTypes[i].Sound.Dead.Sound=NonOrganicDead;
+			}
 		    }
 		}
 	    }
