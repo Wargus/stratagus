@@ -1,16 +1,16 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_die.c	-	The die action. */
+/**@name action_die.c - The die action. */
 //
-//	(c) Copyright 1998,2000,2001,2003 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -45,62 +45,66 @@
 #include "map.h"
 
 /*----------------------------------------------------------------------------
---	Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Unit dies!
+**  Unit dies!
 **
-**	@param unit	The unit which dies.
+**  @param unit  The unit which dies.
 */
 global void HandleActionDie(Unit* unit)
 {
-    //
-    //	Show death animation
-    //
-    if (unit->Type->Animations && unit->Type->Animations->Die) {
-	UnitShowAnimation(unit, unit->Type->Animations->Die);
-    } else {
-	// some units has no death animation
-	unit->Reset = unit->Wait = 1;
-    }
-
-    //
-    //	Die sequence terminated, generate corpse.
-    //
-    if (unit->Reset) {
-	DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
-
-	if (!unit->Type->CorpseType) {
-	    UnitMarkSeen(unit);
-	    ReleaseUnit(unit);
-	    return;
+	//
+	// Show death animation
+	//
+	if (unit->Type->Animations && unit->Type->Animations->Die) {
+		UnitShowAnimation(unit, unit->Type->Animations->Die);
+	} else {
+		// some units has no death animation
+		unit->Reset = unit->Wait = 1;
 	}
 
-	//Fixes sight from death
-	MapUnmarkUnitSight(unit);
-	//unit->CurrentSightRange=unit->Type->Stats->SightRange;
+	//
+	// Die sequence terminated, generate corpse.
+	//
+	if (unit->Reset) {
+		DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
 
-	unit->State = unit->Type->CorpseScript;
-	unit->Type = unit->Type->CorpseType;
-        
-	CommandStopUnit(unit);		// This clears all order queues
-#ifdef DEBUG
-	if (unit->Orders[0].Action != UnitActionDie) {
-	    DebugLevel0Fn("Reset to die is really needed\n");
-	}
+		if (!unit->Type->CorpseType) {
+			UnitMarkSeen(unit);
+			ReleaseUnit(unit);
+			return;
+		}
+
+		// Fixes sight from death
+		MapUnmarkUnitSight(unit);
+#if 0
+		unit->CurrentSightRange = unit->Type->Stats->SightRange;
 #endif
-	unit->Orders[0].Action = UnitActionDie;
-	--unit->OrderCount;		// remove the stop command
-	unit->SubAction = 0;
-	unit->Frame = 0;
-	UnitUpdateHeading(unit);
-	UnitShowAnimation(unit, unit->Type->Animations->Die);
 
-	// FIXME: perhaps later or never is better
-	//ChangeUnitOwner(unit, &Players[PlayerNumNeutral]);
-    }
-    UnitMarkSeen(unit);
+		unit->State = unit->Type->CorpseScript;
+		unit->Type = unit->Type->CorpseType;
+
+		CommandStopUnit(unit);			// This clears all order queues
+#ifdef DEBUG
+		if (unit->Orders[0].Action != UnitActionDie) {
+			DebugLevel0Fn("Reset to die is really needed\n");
+		}
+#endif
+		unit->Orders[0].Action = UnitActionDie;
+		--unit->OrderCount;			// remove the stop command
+		unit->SubAction = 0;
+		unit->Frame = 0;
+		UnitUpdateHeading(unit);
+		UnitShowAnimation(unit, unit->Type->Animations->Die);
+
+		// FIXME: perhaps later or never is better
+#if 0
+		ChangeUnitOwner(unit, &Players[PlayerNumNeutral]);
+#endif
+	}
+	UnitMarkSeen(unit);
 }
 
 //@}
