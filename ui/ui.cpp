@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ui.c		-	The user interface globals. */
+/**@name ui.c - The user interface globals. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Andreas Arens, and
-//	                           Jimmy Salmon
+//      (c) Copyright 1999-2004 by Lutz Sammer, Andreas Arens, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -159,12 +159,11 @@ global void InitUserInterface(const char* race_name)
 		TheUI.CompletedBarColorRGB.r,
 		TheUI.CompletedBarColorRGB.g,
 		TheUI.CompletedBarColorRGB.b);
-	TheUI.ViewportCursorColor = ColorWhite;
 #else
 	TheUI.CompletedBarColor = VideoMapRGB(TheUI.CompletedBarColorRGB.D24.a,
 		TheUI.CompletedBarColorRGB.D24.b, TheUI.CompletedBarColorRGB.D24.c);
-	TheUI.ViewportCursorColor = ColorWhite;
 #endif
+	TheUI.ViewportCursorColor = ColorWhite;
 }
 
 /**
@@ -639,6 +638,7 @@ local void SaveViewports(CLFile* file, const UI* ui)
 	int i;
 	const Viewport* vp;
 
+	// FIXME: don't save the number
 	CLprintf(file, "DefineViewports(\"mode\", %d", ui->ViewportMode);
 	for (i = 0; i < ui->NumViewports; ++i) {
 		vp = &ui->Viewports[i];
@@ -682,7 +682,7 @@ global void SaveUserInterface(CLFile* file)
 }
 
 /**
-**		Clean up a user interface.
+**  Clean up a user interface.
 */
 global void CleanUI(UI* ui)
 {
