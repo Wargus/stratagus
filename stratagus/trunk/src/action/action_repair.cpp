@@ -257,7 +257,11 @@ global void HandleActionRepair(Unit* unit)
 			// FIXME: should I clear this here?
 			NewResetPath(unit);
 		    }
+		} else if ( unit->Player->AiEnabled ) {
+		    // Ai players workers should stop if target is killed
+		    err=-1;
 		}
+
 		//
 		//	Have reached target? FIXME: could use return value
 		//
@@ -283,6 +287,7 @@ global void HandleActionRepair(Unit* unit)
 		    }
 		    return;
 		}
+
 		// FIXME: Should be it already?
 		DebugCheck( unit->Orders[0].Action!=UnitActionRepair );
 	    }
