@@ -470,9 +470,9 @@ local void UiToggleBigMap(void)
 
 		SetViewportMode(TheUI.ViewportMode);
 
-		EnableRedraw ^= RedrawEverything;
-		EnableRedraw |= RedrawMap | RedrawAll;
-		MustRedraw |= RedrawEverything;
+		EnableRedraw = RedrawMap | RedrawCursor | RedrawMessage | RedrawMenu |
+			RedrawTimer | RedrawAll;
+		MustRedraw = RedrawEverything;
 		SetStatusLine("Big map enabled");
 		VideoClearScreen();
 	} else {
