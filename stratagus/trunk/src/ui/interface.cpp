@@ -1101,9 +1101,9 @@ local int InputKey(int key)
 		    }
 		}
 	    }
-	    // FIXME: only to selected players ...
-	    sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
 	    if (strlen(Input)) {
+		sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
+		// FIXME: only to selected players ...
 		NetworkChatMessage(ChatMessage);
 	    }
 	    // FALL THROUGH
