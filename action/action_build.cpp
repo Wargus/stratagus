@@ -78,7 +78,11 @@ local void UpdateConstructionFrame(Unit* unit)
 	}
 	if (cframe != unit->Data.Builded.Frame) {
 		unit->Data.Builded.Frame = cframe;
-		unit->Frame = cframe->Frame;
+		if (unit->Frame < 0) {
+			unit->Frame = -cframe->Frame - 1;
+		} else {
+			unit->Frame = cframe->Frame;
+		}
 		CheckUnitToBeDrawn(unit);
 	}
 }
@@ -354,7 +358,11 @@ global void HandleActionBuilded(Unit* unit)
 		// HACK: the building is ready now
 		unit->Player->UnitTypesCount[type->Type]++;
 		unit->Constructed = 0;
-		unit->Frame = 0;
+		if (unit->Frame < 0) {
+			unit->Frame = -1;
+		} else {
+			unit->Frame = 0;
+		}
 		unit->Reset = unit->Wait = 1;
 
 		if ((worker = unit->Data.Builded.Worker)) {

@@ -101,10 +101,18 @@ global void ActionStillGeneric(Unit* unit, int ground)
 		// FIXME: the frames are hardcoded they should be configurable
 		//
 		if (unit->State == 1 && type->GivesResource == GoldCost) {
-			unit->Frame = unit->Data.Resource.Active ? 1 : 0;
+			if (unit->Frame < 0) {
+				unit->Frame = unit->Data.Resource.Active ? -1 - 1 : -1;
+			} else {
+				unit->Frame = unit->Data.Resource.Active ? 1 : 0;
+			}
 		}
 		if (unit->State == 1 && type->GivesResource == OilCost) {
-			unit->Frame = unit->Data.Resource.Active ? 2 : 0;
+			if (unit->Frame < 0) {
+				unit->Frame = unit->Data.Resource.Active ? -2 - 1 : -1;
+			} else {
+				unit->Frame = unit->Data.Resource.Active ? 2 : 0;
+			}
 		}
 	}
 
