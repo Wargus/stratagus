@@ -6682,7 +6682,9 @@ local int CclDefineButton(lua_State* l)
 				lua_pop(l, 1);
 				s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
 				strcat(s1, s2);
-				strcat(s1, ",");
+				if (k != subargs - 1) {
+					strcat(s1, ",");
+				}
 			}
 			ba.AllowStr = s1;
 		} else if (!strcmp(value, "Key")) {
