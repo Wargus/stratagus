@@ -593,7 +593,7 @@ extern Unit* Selected[MaxSelectable];	/// currently selected units
     /// Prepare unit memory allocator
 extern void InitUnitsMemory(void);
     /// Free memory used by unit
-extern void FreeUnitMemory(Unit* unit);
+//extern void FreeUnitMemory(Unit* unit);
     /// Release an unit
 extern void ReleaseUnit(Unit* unit);
     ///	Create a new unit
@@ -698,6 +698,11 @@ extern int CanTarget(const UnitType* type,const UnitType* dest);
 
 extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
 extern void SaveUnits(FILE* file);			/// save all units
+
+    /// Initialize unit module
+extern void InitUnits(void);
+    /// Clean unit module
+extern void CleanUnits(void);
 
 //	in unitcache.c
     /// Insert new unit into cache
@@ -825,6 +830,11 @@ extern int SelectGroupFromUnit(Unit *unit);
 extern int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h);
     /// Select the units in the selection rectangle
 extern int SelectUnitsInRectangle(int tx,int ty,int w,int h);
+
+//	in ccl_unit.c
+
+    /// register ccl features
+extern void UnitCclRegister(void);
 
 //@}
 
