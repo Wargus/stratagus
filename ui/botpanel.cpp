@@ -26,7 +26,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "clone.h"
+#include "freecraft.h"
 
 // FIXME: Check if all are needed?
 #include "video.h"

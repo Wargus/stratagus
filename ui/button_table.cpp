@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "upgrade.h"
 #include "depend.h"
 #include "interface.h"

@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "player.h"
 #include "unit.h"
 

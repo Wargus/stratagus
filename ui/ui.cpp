@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name ui.c	-	The user interface globals. */
+/**@name ui.c		-	The user interface globals. */
 /*
 **	(c) Copyright 1999,2000 by Lutz Sammer and Andreas Arens
 **
@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "interface.h"
 #include "image.h"
 #include "map.h"

@@ -26,7 +26,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "tileset.h"
 #include "map.h"

@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "map.h"
 #include "minimap.h"
 #include "player.h"

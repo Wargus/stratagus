@@ -19,7 +19,7 @@
 //@{
 
 #include <stdio.h>
-#include "clone.h"
+#include "freecraft.h"
 
 #ifdef WITH_SOUND	// {
 

@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "upgrade_structs.h"
 #include "upgrade.h"
 #include "depend.h"

@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "map.h"
 #include "minimap.h"
 

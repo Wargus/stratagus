@@ -10,7 +10,6 @@
 //
 /**@name video.c	-	The universal video functions. */
 /*
-**
 **	(c) Copyright 1999,2000 by Lutz Sammer
 **
 **	$Id$
@@ -25,7 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 
 #include "map.h"

@@ -41,7 +41,7 @@ extern char *optarg;
 extern int getopt(int argc, char *const*argv, const char *opt);
 #endif
 
-#include "clone.h"
+#include "freecraft.h"
 
 #include "video.h"
 #include "image.h"
