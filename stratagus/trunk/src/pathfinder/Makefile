@@ -14,6 +14,6 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = pathfinder
 
-OBJS	= pathfinder.$(OE) astar.$(OE)
+OBJS	= pathfinder.$(OE) astar.$(OE) ccl_pathfinder.$(OE)
 
 include $(TOPDIR)/Common.mk

@@ -47,6 +47,12 @@ enum _move_return_ {
 
 extern unsigned char Matrix[(MaxMapWidth+1)*(MaxMapHeight+1)];  /// Path matrix
 
+extern int AStarOn; /// are we using a* or the old path finder
+extern int AStarFixedUnitCrossingCost; /// cost associated to move on a tile
+                                       /// occupied by a fixed unit
+extern int AStarMovingUnitCrossingCost; /// cost associated to move on a tile
+                                        /// occupied by a moving unit
+
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -63,6 +69,12 @@ extern int UnitReachable(Unit* unit,Unit* dest);
 
     /// Returns the next element of the path
 extern int NextPathElement(Unit*,int* xdp,int* ydp);
+
+//
+//	in ccl_pathfinder.c
+//
+    /// register ccl features
+extern void PathfinderCclRegister(void);
 
 //@}
 
