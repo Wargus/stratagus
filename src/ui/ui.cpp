@@ -102,6 +102,7 @@ global void InitUserInterface(const char *race_name)
     }
 
     // FIXME: overwrites already set slots?
+    // ARI: Yes, it does :(((
     TheUI=*UI_Table[best];
 
     //
