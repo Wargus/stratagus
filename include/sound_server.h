@@ -48,6 +48,8 @@
 	*/
 #define MaxVolume 255
 
+#define SOUND_BUFFER_SIZE 16384
+
 /**
 **  General sample object typedef. (forward)
 */
@@ -82,15 +84,21 @@ typedef struct _sample_type_ {
 **  RAW samples.
 */
 struct _sample_ {
-	const SampleType* Type;  ///< Object type dependend
-	void*             User;  ///< Object user data
+	const SampleType* Type;       ///< Object type dependend
+	void*             User;       ///< Object user data
 
 	unsigned char Channels;       ///< mono or stereo
 	unsigned char SampleSize;     ///< sample size in bits
 	unsigned int Frequency;       ///< frequency in hz
 	unsigned short BitsPerSample; ///< bits in a sample 8/16/32
-	int Length;                   ///< sample length
-	char Data[1];                 ///< sample bytes
+
+	char *Buffer;                 ///< sample buffer
+	int Pos;                      ///< buffer position
+	unsigned int Len;                      ///< length of filled buffer
+
+
+	int Length;
+	char Data[1];
 };
 
 	/// Free a sample object.
