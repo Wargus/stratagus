@@ -162,13 +162,6 @@ enum _mouse_buttons_ {
     MiddleAndRightButton= MiddleButton|RightButton,
 };
 
-    /// Cursor state
-enum _cursor_state_ {
-    CursorStatePoint,			/// normal cursor
-    CursorStateSelect,			/// select position
-    CursorStateRectangle,		/// rectangle selecting
-};
-
     /// Where is our cursor ?
 enum _cursor_on_ {
     CursorOnUnknown = -1,		/// not known
