@@ -992,6 +992,22 @@ extern void VideoDraw75TransRectangleClip(SysColors color,int x,int y
 extern void VideoDrawTransRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h,unsigned char alpha);
 
+    /**
+    **	Draw 8bit raw graphic data clipped, using given pixel pallette
+    **
+    **  @param pixels VMemTypeXX 256 color palette to translate given data
+    **                ( @note it has proper type VMemType8..VMemType32)
+    **  @param data   raw graphic data in 8bit color indexes of above palette
+    **  @param x      left-top corner x coordinate in pixels on the screen
+    **  @param y      left-top corner y coordinate in pixels on the screen
+    **  @param w      width of above graphic data in pixels
+    **  @param h      height of above graphic data in pixels
+    */
+extern void (*VideoDrawRawClip)( VMemType *pixels,
+                                 const unsigned char *data,
+                                 unsigned int x, unsigned int y,
+                                 unsigned int w, unsigned int h );
+
     /// Does ColorCycling..
 extern void (*ColorCycle)(void);
 

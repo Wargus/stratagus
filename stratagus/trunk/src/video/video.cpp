@@ -1175,6 +1175,11 @@ global void InitVideo(void)
     InitLineDraw();
     InitSprite();
 
+#ifdef NEW_DECODRAW
+// Use the decoration mechanism to only redraw what is needed on screen update
+    DecorationInit();
+#endif
+
     DebugLevel3Fn("%d %d\n",MapWidth,MapHeight);
 }
 

@@ -36,6 +36,8 @@
 #include "freecraft.h"
 #include "video.h"
 
+#include "intern_video.h"
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -55,6 +57,11 @@ extern int ClipY2;			/// current clipping bottom right
 
 local GraphicType GraphicSprite8Type;	/// sprite type 8bit palette
 local GraphicType GraphicSprite16Type;	/// sprite type 16bit palette
+
+global void (*VideoDrawRawClip)( VMemType *pixels,
+                                 const unsigned char *data,
+                                 unsigned int x, unsigned int y,
+                                 unsigned int w, unsigned int h );
 
 /*----------------------------------------------------------------------------
 --	Local functions
@@ -368,6 +375,7 @@ global void VideoDraw8to32X(const Graphic* sprite,unsigned frame,int x,int y)
 global void VideoDraw8to8Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
+    int ex;
     int oy;
     int w;
     int h;
@@ -384,27 +392,10 @@ global void VideoDraw8to8Clip(const Graphic* sprite,unsigned frame,int x,int y)
     sw=w=sprite->Width;
     h=sprite->Height;
 
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -522,6 +513,7 @@ right_trans:
 global void VideoDraw8to16Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
+    int ex;
     int oy;
     int w;
     int h;
@@ -538,27 +530,10 @@ global void VideoDraw8to16Clip(const Graphic* sprite,unsigned frame,int x,int y)
     sw=w=sprite->Width;
     h=sprite->Height;
 
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -676,6 +651,7 @@ right_trans:
 global void VideoDraw8to24Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
+    int ex;
     int oy;
     int w;
     int h;
@@ -692,27 +668,10 @@ global void VideoDraw8to24Clip(const Graphic* sprite,unsigned frame,int x,int y)
     sw=w=sprite->Width;
     h=sprite->Height;
 
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -830,6 +789,7 @@ right_trans:
 global void VideoDraw8to32Clip(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
+    int ex;
     int oy;
     int w;
     int h;
@@ -846,27 +806,10 @@ global void VideoDraw8to32Clip(const Graphic* sprite,unsigned frame,int x,int y)
     sw=w=sprite->Width;
     h=sprite->Height;
 
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -985,6 +928,7 @@ right_trans:
 global void VideoDraw8to8ClipX(const Graphic* sprite,unsigned frame,int x,int y)
 {
     int ox;
+    int ex;
     int oy;
     int w;
     int h;
@@ -1001,27 +945,10 @@ global void VideoDraw8to8ClipX(const Graphic* sprite,unsigned frame,int x,int y)
     sw=w=sprite->Width;
     h=sprite->Height;
 
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -1141,6 +1068,7 @@ global void VideoDraw8to16ClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ox;
+    int ex;
     int oy;
     int w;
     int h;
@@ -1157,27 +1085,10 @@ global void VideoDraw8to16ClipX(const Graphic* sprite,unsigned frame
     sw=w=sprite->Width;
     h=sprite->Height;
 
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -1297,6 +1208,7 @@ global void VideoDraw8to24ClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
     int ox;
+    int ex;
     int oy;
     int w;
     int h;
@@ -1313,27 +1225,10 @@ global void VideoDraw8to24ClipX(const Graphic* sprite,unsigned frame
     sw=w=sprite->Width;
     h=sprite->Height;
 
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -1452,6 +1347,7 @@ right_trans:
 global void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
+    int ex;
     int ox;
     int oy;
     int w;
@@ -1465,31 +1361,10 @@ global void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
     const VMemType32* pixels;
     unsigned da;
 
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
+    //
+    // reduce to visible range
+    //
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
     //
     //	Draw the clipped sprite
@@ -1533,13 +1408,13 @@ global void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
 
     } else {				// Clip horizontal
 
-	da-=sw-w-ox;
+	da-=ex;
 	while( dp<ep ) {		// all lines
 	    lp=dp-w;
 	    //
 	    //	Clip right side
 	    //
-	    pp=dp+sw-w-ox;
+	    pp=dp+ex;
 	    for( ;; ) {
 		pp-=*sp++;		// transparent
 		if( pp<=dp ) {
@@ -1594,6 +1469,132 @@ right_trans:
 
 	}
     }
+}
+
+/**
+**	Draw 8bit raw graphic data clipped, using given pixel pallette
+**	of a given color-depth in bytes: 8=1, 16=2, 24=3, 32=4
+**
+**	@param pixels	VMemType 256 color palette to translate given data
+**	@param data	raw graphic data in 8bit color indexes of above palette
+**	@param x	left-top corner x coordinate in pixels on the screen
+**	@param y	left-top corner y coordinate in pixels on the screen
+**	@param w	width of above graphic data in pixels
+**	@param h	height of above graphic data in pixels
+**	@param bytes	color-depth of given palette
+**
+**	FIXME: make this faster..
+*/
+global void VideoDrawRawXXClip( char *pixels,
+                                const unsigned char *data,
+                                int x, int y,
+                                unsigned int w, unsigned int h,
+                                char bytes )
+{
+  char *dest;
+  unsigned int ofsx, ofsy, skipx, nextline;
+
+// Clip given rectangle area, keeping track of start- and end-offsets
+  nextline=w;
+  CLIP_RECTANGLE_OFS(x,y,w,h,ofsx,ofsy,skipx);
+  data+=(ofsy*nextline)+ofsx;
+  skipx+=ofsx;
+
+// Draw the raw data, through the given palette
+  dest     = (char *)VideoMemory + (y * VideoWidth + x) * bytes;
+  nextline = (VideoWidth - w) * bytes;
+
+  do
+  {
+    int w2 = w;
+
+    do
+    {
+      memcpy( dest, pixels + *data++ * bytes, bytes );
+      dest+=bytes;
+    }
+    while ( --w2 > 0 );
+
+    data += skipx;
+    dest += nextline;
+  }
+  while ( --h > 0 );
+}
+
+/**
+**	Draw 8bit raw graphic data clipped, using given pixel pallette
+**	into 8bit framebuffer.
+**
+**	@param pixels	VMemType8 256 color palette to translate given data
+**	@param data	raw graphic data in 8bit color indexes of above palette
+**	@param x	left-top corner x coordinate in pixels on the screen
+**	@param y	left-top corner y coordinate in pixels on the screen
+**	@param w	width of above graphic data in pixels
+**	@param h	height of above graphic data in pixels
+*/
+local void VideoDrawRaw8Clip( VMemType *pixels,
+                              const unsigned char *data,
+                              unsigned int x, unsigned int y,
+                              unsigned int w, unsigned int h )
+{
+  VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType8) );
+}
+
+/**
+**	Draw 8bit raw graphic data clipped, using given pixel pallette
+**	into 16bit framebuffer.
+**
+**	@param pixels	VMemType16 256 color palette to translate given data
+**	@param data	raw graphic data in 8bit color indexes of above palette
+**	@param x	left-top corner x coordinate in pixels on the screen
+**	@param y	left-top corner y coordinate in pixels on the screen
+**	@param w	width of above graphic data in pixels
+**	@param h	height of above graphic data in pixels
+*/
+local void VideoDrawRaw16Clip( VMemType *pixels,
+                               const unsigned char *data,
+                               unsigned int x, unsigned int y,
+                               unsigned int w, unsigned int h )
+{
+  VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType16) );
+}
+
+/**
+**	Draw 8bit raw graphic data clipped, using given pixel pallette
+**	into 24bit framebuffer.
+**
+**	@param pixels	VMemType24 256 color palette to translate given data
+**	@param data	raw graphic data in 8bit color indexes of above palette
+**	@param x	left-top corner x coordinate in pixels on the screen
+**	@param y	left-top corner y coordinate in pixels on the screen
+**	@param w	width of above graphic data in pixels
+**	@param h	height of above graphic data in pixels
+*/
+local void VideoDrawRaw24Clip( VMemType *pixels,
+                               const unsigned char *data,
+                               unsigned int x, unsigned int y,
+                               unsigned int w, unsigned int h )
+{
+  VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType24) );
+}
+
+/**
+**	Draw 8bit raw graphic data clipped, using given pixel pallette
+**	into 32bit framebuffer.
+**
+**	@param pixels	VMemType32 256 color palette to translate given data
+**	@param data	raw graphic data in 8bit color indexes of above palette
+**	@param x	left-top corner x coordinate in pixels on the screen
+**	@param y	left-top corner y coordinate in pixels on the screen
+**	@param w	width of above graphic data in pixels
+**	@param h	height of above graphic data in pixels
+*/
+local void VideoDrawRaw32Clip( VMemType *pixels,
+                               const unsigned char *data,
+                               unsigned int x, unsigned int y,
+                               unsigned int w, unsigned int h )
+{
+  VideoDrawRawXXClip( (char *)pixels, data, x, y, w, h, sizeof(VMemType32) );
 }
 
 /**
@@ -1783,6 +1784,7 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawClip=VideoDraw8to8Clip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to8X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to8ClipX;
+            VideoDrawRawClip=VideoDrawRaw8Clip;
 	    break;
 
 	case 15:
@@ -1791,6 +1793,7 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawClip=VideoDraw8to16Clip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to16X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to16ClipX;
+            VideoDrawRawClip=VideoDrawRaw16Clip;
 	    break;
 
 	case 24:
@@ -1798,6 +1801,7 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawClip=VideoDraw8to24Clip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to24X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to24ClipX;
+            VideoDrawRawClip=VideoDrawRaw24Clip;
 	    break;
 
 	case 32:
@@ -1805,6 +1809,7 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawClip=VideoDraw8to32Clip;
 	    GraphicSprite8Type.DrawX=VideoDraw8to32X;
 	    GraphicSprite8Type.DrawClipX=VideoDraw8to32ClipX;
+            VideoDrawRawClip=VideoDrawRaw32Clip;
 	    break;
 
 	default:

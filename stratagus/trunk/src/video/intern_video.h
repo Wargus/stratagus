@@ -69,16 +69,21 @@ extern int ClipY2;                      /// current clipping bottom right
 --	Macros
 ----------------------------------------------------------------------------*/
 /**
-**      Clip to clipping rectangle.
+**      Clip rectangle area to clipping rectangle.
+**	This means given arguments can be changed to take the clipping
+**      rectangle into account.
+**
 **      FIXME: not easy to debug, but making it a function needs:
 **             - pointers to be able to alter given arguments
 **             - special return value to denote 'outside' clipping region
 **               (which is now handled by a simple return in caller function)
 **
-**      @param w        unsigned int width to display
-**      @param h        unsigned int height to display
 **      @param x        int X screen position
 **      @param y        int Y screen position
+**                      (return value of X and Y can be made larger)
+**      @param w        unsigned int width to display
+**      @param h        unsigned int height to display
+**                      (return value of width and height can be made smaller)
 */
 #define CLIP_RECTANGLE(x,y,width,height) { \
   unsigned int f;                          \
@@ -110,6 +115,64 @@ extern int ClipY2;                      /// current clipping bottom right
     }                                      \
     height=ClipY2-y+1;                     \
   }                                        \
+}
+
+/**
+**      Clip rectangle area (just like CLIP_RECTANGLE), but also return offsets
+**	(these offsets can be used to skip data when used for sprites and such)
+**
+**      FIXME: not easy to debug, but making it a function needs:
+**             - pointers to be able to alter given arguments
+**             - special return value to denote 'outside' clipping region
+**               (which is now handled by a simple return in caller function)
+**
+**      @param x     int X screen position
+**      @param y     int Y screen position
+**                   (return value of X and Y can be made larger)
+**      @param w     unsigned int width to display
+**      @param h     unsigned int height to display
+**                   (return value of width and height can be made smaller)
+**  returns:
+**      @param ofsx  unsigned int offset X from start of sprite data
+**      @param ofsy  unsigned int offset Y from start of sprite data
+**      @param endx  unsigned int offset to skip the remaining data at the end
+**                   of each horizontal line of the sprite.
+**
+**  @note there was no need for 'endy', as it isn't used to draw sprites..
+*/
+#define CLIP_RECTANGLE_OFS(x,y,width,height,ofsx,ofsy,endx) { \
+  if( y<ClipY1 ) {                                            \
+    ofsy=ClipY1-y;                                            \
+    if( height<=ofsy ) {                                      \
+      return;                                                 \
+    }                                                         \
+    height-=ofsy;                                             \
+    y=ClipY1;                                                 \
+  }                                                           \
+  else ofsy=0;                                                \
+  if( (y+height)>ClipY2+1 )   {                               \
+    if( y>ClipY2 ) {                                          \
+        return;                                               \
+    }                                                         \
+    height=ClipY2-y+1;                                        \
+  }                                                           \
+  if( x<ClipX1 ) {                                            \
+    ofsx=ClipX1-x;                                            \
+    if( width<=ofsx ) {                                       \
+       return;                                                \
+    }                                                         \
+    width-=ofsx;                                              \
+    x=ClipX1;                                                 \
+  }                                                           \
+  else ofsx=0;                                                \
+  if( (x+width)>ClipX2+1 ) {                                  \
+    if( x>ClipX2 ) {                                          \
+      return;                                                 \
+    }                                                         \
+    endx=(x+width)-(ClipX2+1);                                \
+    width=ClipX2-x+1;                                         \
+  }                                                           \
+  else endx=0;                                                \
 }
 
 
