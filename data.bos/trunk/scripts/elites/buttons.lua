@@ -27,7 +27,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: buttons.lua,v 1.10 2004/12/12 16:07:28 feb Exp $
+--	$Id$
 
 -- general commands -- almost all units have it -------------------------------
 
@@ -151,17 +151,17 @@ DefineButton({
 
 DefineButton({
 	Pos = 9, Level = 1, Icon = "icon-cancel", Action = "button",
-	Value = 0, Key = "\033", Hint = "~<ESC~> CANCEL",
+	Value = 0, Key = "\027", Hint = "~<ESC~> CANCEL",
 	ForUnit = {"unit-engineer"}})
 
 DefineButton({
 	Pos = 9, Level = 2, Icon = "icon-cancel", Action = "button",
-	Value = 0, Key = "\033", Hint = "~<ESC~> CANCEL",
+	Value = 0, Key = "\027", Hint = "~<ESC~> CANCEL",
 	ForUnit = {"unit-engineer"}})
 
 DefineButton({
 	Pos = 9, Level = 3, Icon = "icon-cancel", Action = "button",
-	Value = 0, Key = "\033", Hint = "~<ESC~> CANCEL",
+	Value = 0, Key = "\027", Hint = "~<ESC~> CANCEL",
 	ForUnit = {"unit-engineer"}})
 -- buildings commands ---------------------------------------------------------
 
