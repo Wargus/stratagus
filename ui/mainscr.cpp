@@ -168,6 +168,27 @@ global void DrawUnitInfo(Unit* unit)
     }
 
     //
+    //	Show for all players.
+    //
+    if( type->GoldMine ) {
+	DrawText(x+37,y+8+78,GameFont,"Gold Left:");
+	DrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	return;
+    }
+    if( type->GivesOil || type->OilPatch ) {
+	DrawText(x+47,y+8+78,GameFont,"Oil Left:");
+	DrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	return;
+    }
+
+    //
+    //	Only for owning player.
+    //
+    if( unit->Player!=ThisPlayer ) {
+	return;
+    }
+
+    //
     //	Show progress for buildings only if they are selected.
     //
     if( type->Building && NumSelected==1 && Selected[0]==unit ) {
@@ -230,13 +251,7 @@ global void DrawUnitInfo(Unit* unit)
 	}
     }
 
-    if( type->GoldMine ) {
-	DrawText(x+37,y+8+78,GameFont,"Gold Left:");
-	DrawNumber(x+108,y+8+78,GameFont,unit->Value);
-    } else if( type->GivesOil || type->OilPatch ) {
-	DrawText(x+47,y+8+78,GameFont,"Oil Left:");
-	DrawNumber(x+108,y+8+78,GameFont,unit->Value);
-    } else if( type->StoresWood ) {
+    if( type->StoresWood ) {
 	DrawText(x+20,y+8+78,GameFont,"Production");
 	DrawText(x+52,y+8+93,GameFont,"Lumber:");
 	// FIXME: if production plus isn't 25!
