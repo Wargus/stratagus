@@ -93,11 +93,15 @@
 extern MapInfo* GetPudInfo(const char*);
     /// Return info for scm
 extern MapInfo* GetScmInfo(const char*);
+    /// Return info for chk
+extern MapInfo* GetChkInfo(const char*);
 
     /// Load a pud file
 extern void LoadPud(const char* pud,WorldMap* map);
     /// Load a scm file
 extern void LoadScm(const char* scm,WorldMap* map);
+    /// Load a chk file
+extern void LoadChk(const char* chk,WorldMap* map);
 
     /// Save a pud file
 extern void SavePud(const char* pud,const WorldMap* map);
@@ -106,6 +110,8 @@ extern void SavePud(const char* pud,const WorldMap* map);
 extern void CleanPud(void);
     /// Clean the scm module
 extern void CleanScm(void);
+    /// Clean the chk module
+extern void CleanChk(void);
 
 //@}
 
