@@ -204,7 +204,6 @@ local int PlayCDRom(const char* name)
 	    CDTrack = MyRand() % CDRom->numtracks;
 	    SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0);
 	}
-	CDMode = ":off";
 	return 1;
     }
 
@@ -259,7 +258,6 @@ local int PlayCDRom(const char* name)
 	    cd_play(CDTrack);
 	    return 1;
 	}
-	CDMode = ":off";
 	return 1;
     }
 
