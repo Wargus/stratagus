@@ -140,13 +140,13 @@ echo::
 	@-echo LIBS: $(CLONELIBS)
 
 clean::
-	for i in $(MODULES); do \
+	for i in $(MODULES_ALL); do \
 	$(RM) -rf $$i/$(OBJDIR)/*.o $$i/*.doc; done
 	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)/*.$(OE)
 	@echo
 
 distclean:	clean
-	for i in $(MODULES); do \
+	for i in $(MODULES_ALL); do \
 	[ $(OBJDIR) == "." ] || $(RM) -rf $$i/$(OBJDIR); \
 	$(RM) $$i/.#* $$i/*~; done
 	$(RM) freecraft$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt
