@@ -175,7 +175,7 @@ if test "$ZZIPLIB" != "no"; then
     AC_CHECK_LIB(zziplib, main,
         [ZZIPLIB_CFLAGS="-DUSE_ZZIPLIB"
          ZZIPLIB_LIBS="-lzzip"],
-        [ZZIPLIB_CFLAGS="",
+        [ZZIPLIB_CFLAGS=""
          ZZIPLIB_LIBS=""])
 else
     ZZIPLIB_CFLAGS=""
