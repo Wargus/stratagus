@@ -484,7 +484,7 @@ local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
     const ColorFont* fp;
     const VMemType* rev;
     char* color;
-    const char* p;
+    const unsigned char* p;
     void (*DrawChar)(const Graphic*,int,int,int,int,int,int);
 
 #ifdef USE_OPENGL
