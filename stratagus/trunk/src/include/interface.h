@@ -310,7 +310,7 @@ extern void DrawStatusLine(void);
     /// Draw costs in status line
 extern void DrawCosts(void);
     /// Set costs to be displayed in status line
-extern void SetCosts(int,const int* costs);
+extern void SetCosts(int,int,const int* costs);
     /// Clear the costs displayed in status line (undisplay!)
 extern void ClearCosts(void);
 
