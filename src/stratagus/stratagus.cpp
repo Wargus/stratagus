@@ -1077,18 +1077,12 @@ global void MenuLoop(char* filename, WorldMap* map)
 	//
 	if ( !filename ) {
 	    NetPlayers = 0;
-	    // Start new music for menus?
-	    // FIXME: If second loop?
 
 #ifdef WITH_SOUND
-	    if( !PlayingMusic ) {
-		if (CDMode == CDModeOff) {
-		    PlayMusic(MenuMusic);
-		} else if (CDMode == CDModeDefined) {
-		    PlaySectionMusic(PlaySectionMainMenu);
-		}
-	    }
+	    // Start new music for menus
+	    PlaySectionMusic(PlaySectionMainMenu);
 #endif
+
 	    EnableRedraw=RedrawMenu;
 
 	    GuiGameStarted = 0;
