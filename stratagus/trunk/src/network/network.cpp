@@ -278,23 +278,7 @@ global void ExitNetwork1(void)
 */
 global void InitNetwork2(void)
 {
-    int i;
-    int n;
-
-    //
-    //	Server
-    //
-    if (NetPlayers) {
-	NetworkServerSetup();
-	DebugLevel0Fn("Server setup ready\n");
-
-    //
-    // Client
-    //
-    } else {
-	NetworkClientSetup();
-	DebugLevel0Fn("Client setup ready\n");
-    }
+    int i, n;
 
     //
     //	Prepare first time without syncs.
