@@ -187,46 +187,46 @@ typedef struct {
 */
 
 /**
-**	Informations about the conditions of autocasting mode and simple cast.
+**	Conditions for a spell.
 **
 **	@todo	Move more parameters into this structure.
 */
-struct s_Conditions;
-
-/*
-**	 Specific conditions.
-*/
-typedef	int f_specific_condition(const struct s_Conditions *condition,
-	const Unit* caster,const Unit* target,int x,int y);
-
-typedef	int f_generic_condition(const struct s_Conditions *condition,const Unit* caster);
-
-
-/**
-**	Informations about the condition of autocasting mode.
-**
-**	@todo	Move more parameters into this structure.
-*/
-typedef struct s_Conditions {
-    int expectvalue;				/// Value expected (function expected result, true or false)
-    union {
-	f_specific_condition *specific;		/// Evaluation Function for the condition.
-	f_generic_condition  *generic;		/// Evaluation Function for the condition.
-    } f;
-    union {
-	int range;	/// range
-//	struct {
-//	    t_SpecificConditions c1;
-//	    t_SpecificConditions c2;
-//	} or;		//
-	unsigned int flag;	///< flag
-	struct {
-	    unsigned int	flag;
-	    unsigned int	ttl;
-	} durationeffect;	///< durationeffect
-    } u;
-    struct s_Conditions	*next;	///< for list.
-} t_Conditions;
+typedef struct ConditionInfo {
+    //
+    //	Conditions that check specific flags. Possible values are the defines below.
+    //
+#define CONDITION_FALSE 1
+#define CONDITION_TRUE  0
+#define CONDITION_ONLY  2
+    char Undead;		/// Target is undead.
+    char Organic;		/// Target is organic.
+    char Hero;			/// Target is hero. Set this to false for instant-kill spells.
+    char Coward;		/// Target is coward. Don't bloodlust them.
+    char Alliance;		/// Target is allied.
+    char Building;		/// Target is a building.
+    char TargetSelf;		/// Target is the same as the caster.
+	/// FIXME: NOT IMPLEMENTED:
+    char UnitBuffed;		/// Target is buffed(haste/slow/bloodlust). Dispel magic?
+    //
+    //	Conditions related to vitals:
+    //	
+    int MinHpPercent;		/// Target must have more hp than that.
+    int MaxHpPercent;		/// Target must have less hp than that. Used for heal-like spells.
+    int MinManaPercent;		/// Target must have more mana than that. Mana drain spells?
+    int MaxManaPercent;		/// Target must have less mana than that. Mana fountains?
+    //
+    //	Conditions related to buffs:
+    //	
+    int MaxHasteTicks;		/// Target must less haste ticks left.
+    int MaxSlowTicks;		/// Target must less slow ticks left.
+    int MaxBloodlustTicks;	/// Target must less bloodlust ticks left.
+    int MaxInvisibilityTicks;	/// Target must less bloodlust ticks left.
+    int MaxInvincibilityTicks;	/// Target must less bloodlust ticks left.
+    //
+    //	FIXME: more? feel free to add, here and to
+    //	FIXME: PassCondition, CclSpellParseCondition, SaveSpells
+    //
+} ConditionInfo;
 
 
 /**
@@ -234,22 +234,18 @@ typedef struct s_Conditions {
 **
 */
 typedef struct {
-	t_Conditions	*Condition_generic;		///< Conditions to cast the spell. (generic (no test for each target))
-	t_Conditions	*Condition_specific;	///< Conditions to cast the spell. (target specific (ex:Hp full))
-// Something to have a position target
-	int				Range;							/// Max range of the target.
-#if 0	// When sort supported
-	t_f_order			*f;							/// Sort functions for the best target.
-#endif
-} t_AutoCast;
+    ConditionInfo *Condition;		/// Conditions to cast the spell.
+    int Range;				/// Max range of the target.
+    /// FIXME: Add stuff here for target preference.
+    /// FIXME: Heal units with the lowest hit points first.
+} AutoCastInfo;
 
 struct _spell_type_;
 
 /*
 **	Pointer on function that cast the spell.
 */
-typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell, Unit* target,
-	int x, int y);
+typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell, Unit* target,int x, int y);
 
 /**
 **	Base structure of a spell type.
@@ -264,14 +260,15 @@ typedef struct _spell_type_ {
     TargetType	Target;			/// Targetting information. See TargetType.
     SpellFunc *CastFunction;		/// function to cast the spell.
     SpellActionType *SpellAction;	/// More arguments for spell (damage, delay, additional sounds...).
+#define INFINITE_RANGE 0xFFFFFFF
     int Range;				/// Max range of the target.
     int ManaCost;			/// required mana for each cast
 
     int DependencyId;			/// Id of upgrade, -1 if no upgrade needed for cast the spell.
-    t_Conditions *Condition_generic;	/// Conditions to cast the spell. (generic (no test for each target))
-    t_Conditions *Condition_specific;	/// Conditions to cast the spell. (target specific (ex:Hp full))
+    ConditionInfo *Conditions;		/// Conditions to cast the spell. (generic (no test for each target))
+
 //	Autocast	// FIXME : can use different for AI ? Use it in this structure ?
-    t_AutoCast	*AutoCast;					/// AutoCast information
+    AutoCastInfo *AutoCast;		/// AutoCast information
 
 //	Uses for graphics and sounds
     SoundConfig SoundWhenCast;		/// sound played if cast
@@ -353,18 +350,6 @@ SpellFunc CastRaiseDead;
 SpellFunc CastWhirlwind;
 SpellFunc CastSpawnPortal;
 
-
-/*
-**	generic condition.
-*/
-f_generic_condition	CheckEnemyPresence;
-
-/*
-**	Specific condition.
-*/
-f_specific_condition	CheckUnitTypeFlag;
-f_specific_condition	CheckAllied;
-f_specific_condition	CheckUnitDurationEffect;
 
 //@}
 
