@@ -489,6 +489,7 @@ global void InitCcl(void)
     CampaignCclRegister();
     TriggerCclRegister();
     CreditsCclRegister();
+    ObjectivesCclRegister();
 
     EditorCclRegister();
 
