@@ -504,7 +504,7 @@ local void VideoDrawXOpenGL(const Graphic* sprite, unsigned frame, int x, int y)
 }
 #endif
 
-#ifndef
+#ifndef USE_SDL_SURFACE
 /**
 **	Draw 8bit graphic object clipped into 8 bit framebuffer.
 **
