@@ -25,16 +25,6 @@
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Variables
-----------------------------------------------------------------------------*/
-
-extern global int ColorCycleAll;
-#ifdef DEBUG
-extern unsigned AllocatedGraphicMemory;
-extern unsigned CompressedGraphicMemory;
-#endif
-
-/*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
 
@@ -67,6 +57,7 @@ struct __lnode__ {
     PaletteLink*	Next;		/// Next palette
     VMemType*		Palette;	/// Palette in hardware format
     long		Checksum;	/// Checksum for quick lookup
+    // FIXME: need reference counts here!
 };
 
 
@@ -245,9 +236,43 @@ struct _graphic_ {
     //void*		Offsets;	/// Offsets into frames
 };
 
+/**
+**	Event call back.
+**
+**	This is placed in the video part, because it depends on the video
+**	hardware driver.
+*/
+typedef struct _event_callback_ {
+
+	/// Callback for mouse button press
+    void	(*ButtonPressed)(unsigned buttons);
+	/// Callback for mouse button release
+    void	(*ButtonReleased)(unsigned buttons);
+	/// Callback for mouse move
+    void	(*MouseMoved)(int x,int y);
+
+	/// Callback for key press
+    void	(*KeyPressed)(unsigned key);
+	/// Callback for key release
+    void	(*KeyReleased)(unsigned key);
+
+	/// Callback for network event
+    void	(*NetworkEvent)(void);
+	/// Callback for sound output ready
+    void	(*SoundReady)(void);
+
+} EventCallback;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+extern PaletteLink* PaletteList;	/// List of all used palettes loaded
+extern int ColorCycleAll;		/// Flag color cycle all palettes
+#ifdef DEBUG
+extern unsigned AllocatedGraphicMemory;	/// Allocated memory for objects
+extern unsigned CompressedGraphicMemory;/// memory for compressed objects
+#endif
 
     /**
     **	Wanted videomode, fullscreen or windowed.
@@ -973,6 +998,11 @@ extern void Invalidate(void);
 extern void RealizeVideoMemory(void);
 
     /**
+    **	Process all system events. Returns if the time for a frame is over.
+    */
+extern void WaitEventsOneFrame(const EventCallback* callbacks);
+
+    /**
     **	Process all system events. This function also keeps synchronization
     **	of game.
     */
@@ -1187,6 +1217,12 @@ extern void CheckVideoInterrupts(void);
 
     /// Toggle mouse grab mode
 extern void ToggleGrabMouse(void);
+
+    ///	Lock the screen for display
+extern void VideoLockScreen(void);
+
+    ///	Unlock the screen for display
+extern void VideoUnlockScreen(void);
 
 //@}
 

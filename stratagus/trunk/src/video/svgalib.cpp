@@ -40,7 +40,6 @@
 #include "video.h"
 #include "tileset.h"
 #include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -61,9 +60,13 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local int old_button;			/// FIXME: docu?
-local int mouse_x;			/// FIXME: docu?
-local int mouse_y;			/// FIXME: docu?
+local int old_button;			/// Svgalib old button state
+local int mouse_x;			/// Svgalib mouse x position
+local int mouse_y;			/// Svgalib mouse y position
+
+local struct timeval SVGALibTicksStart;	/// My counter start
+
+local const EventCallback* SVGALibCallbacks;	/// My event call back
 
 /*----------------------------------------------------------------------------
 --	Forwards
@@ -81,6 +84,10 @@ local void KeyboardEvent(int scancode,int press);
 /*----------------------------------------------------------------------------
 --	Sync
 ----------------------------------------------------------------------------*/
+
+/*
+**	The timer resolution is 10ms, which make the timer useless for us.
+*/
 
 /**
 **	Called from SIGALRM.
@@ -122,6 +129,25 @@ global void SetVideoSync(void)
     DebugLevel3Fn("Timer installed\n");
 }
 
+/**
+**	SVGALib get ticks in ms.
+*/
+long SVGALibGetTicks(void)
+{
+    struct timeval now;
+    long ticks;
+ 
+    gettimeofday(&now,NULL);
+
+    ticks=(now.tv_sec-SVGALibTicksStart.tv_sec)*1000
+	    +(now.tv_usec-SVGALibTicksStart.tv_usec)/1000;
+
+    return ticks;
+}
+
+/**
+**	Close the display.
+*/
 local void CloseDisplay(void)
 {
     free(VideoMemory);
@@ -136,6 +162,8 @@ global void InitVideoSVGA(void)
     int real_uid;
     int mode;
     vga_modeinfo *vga_info;
+
+    gettimeofday(&SVGALibTicksStart,NULL);
 
     if( !VideoDepth ) {
 	VideoDepth = 16;
@@ -306,6 +334,11 @@ global int SetVideoMode(int width)
 
 /**
 **	Invalidate some area
+**
+**	@param x	screen pixel X position.
+**	@param y	screen pixel Y position.
+**	@param w	width of rectangle in pixels.
+**	@param h	height of rectangle in pixels.
 */
 global void InvalidateArea(int x,int y,int w,int h)
 {
@@ -324,27 +357,27 @@ global void Invalidate(void)
 local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int drz) {
     if((old_button == 0) && (button == MOUSE_LEFTBUTTON)) {
 	DebugLevel3Fn("first down\n");
-	HandleButtonDown(1);
+	InputMouseButtonPress(SVGALibCallbacks,SVGALibGetTicks(),1);
     }
     if((old_button == 0) && (button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON))) {
 	DebugLevel3Fn("second down\n");
-	HandleButtonDown(2);
+	InputMouseButtonPress(SVGALibCallbacks,SVGALibGetTicks(),2);
     }
     if((old_button == 0) && (button == MOUSE_RIGHTBUTTON)) {
 	DebugLevel3Fn("third down\n");
-	HandleButtonDown(3);
+	InputMouseButtonPress(SVGALibCallbacks,SVGALibGetTicks(),3);
     }
     if((old_button == MOUSE_LEFTBUTTON) && (button == 0)) {
 	DebugLevel3Fn("first up\n");
-	HandleButtonUp(1);
+	InputMouseButtonRelease(SVGALibCallbacks,SVGALibGetTicks(),1);
     }
     if((old_button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON)) && (button == 0)) {
 	DebugLevel3Fn("second up\n");
-	HandleButtonUp(2);
+	InputMouseButtonRelease(SVGALibCallbacks,SVGALibGetTicks(),2);
     }
     if((old_button == MOUSE_RIGHTBUTTON) && (button == 0)) {
 	DebugLevel3Fn("third up\n");
-	HandleButtonUp(3);
+	InputMouseButtonRelease(SVGALibCallbacks,SVGALibGetTicks(),3);
     }
     old_button = button;
 
@@ -355,7 +388,7 @@ local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int 
 	if(mouse_y + dy/TheUI.MouseAdjust >= 0
 		&& mouse_y + dy/TheUI.MouseAdjust <= VideoHeight)
 	    mouse_y += dy/TheUI.MouseAdjust;
-	HandleMouseMove(mouse_x, mouse_y);
+	InputMouseMove(SVGALibCallbacks,SVGALibGetTicks(),mouse_x,mouse_y);
 	MustRedraw |= RedrawCursor;
     }
 }
@@ -647,9 +680,7 @@ local void KeyboardEvent(int scancode, int press) {
 	    if(icode <= 'z' && icode >= 'a')
 		icode -= 32;
 	}
-	if(HandleKeyDown(icode)) {
-	    return;
-	}
+	SVGALibCallbacks->KeyPressed(icode);
     } else if(press == KEY_EVENTRELEASE) {
 	// FIXME: combine scancode -> internal keycode of press and release
 	switch(scancode) {
@@ -927,35 +958,131 @@ local void KeyboardEvent(int scancode, int press) {
 		break;
 	    // Super ???
 	}
-	HandleKeyUp(icode);
+	SVGALibCallbacks->KeyReleased(icode);
     }
 }
 
 /**
-**	Wait for interactive input event.
+**	Wait for interactive input event for one frame.
 **
-**	Handles X11 events, keyboard, mouse.
-**	Video interrupt for sync.
-**	Network messages.
-**	Sound queue.
+**	Handles system events, joystick, keyboard, mouse.
+**	Handles the network messages.
+**	Handles the sound queue.
 **
-**	We must handle atlast one X11 event
+**	All events available are fetched. Sound and network only if available.
+**	Returns if the time for one frame is over.
 **
-**	FIXME:	the initialition could be moved out of the loop
+**	@param callbacks	Call backs that handle the events.
 */
-global void WaitEventsAndKeepSync(void)
+global void WaitEventsOneFrame(const EventCallback* callbacks)
 {
     struct timeval tv;
     fd_set rfds;
     fd_set wfds;
     int ret;
 
+    SVGALibCallbacks=callbacks;
+
+    InputMouseTimeout(callbacks,SVGALibGetTicks());
     for(;;) {
 	//
 	//	Prepare select
 	//
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;
+	tv.tv_sec = tv.tv_usec = 0;
+
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+
+	//
+	//	Network
+	//
+	if(NetworkFildes != -1) {
+	    FD_SET(NetworkFildes, &rfds);
+	}
+
+	//
+	//	Sound
+	//
+	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
+	    FD_SET(SoundFildes, &wfds);
+	}
+
+	ret = vga_waitevent(VGA_MOUSEEVENT | VGA_KEYEVENT, &rfds, &wfds, NULL, &tv);
+
+	if(ret >= 0) {
+	    //
+	    //	Sound
+	    //
+	    if(!SoundOff && !SoundThreadRunning && SoundFildes!=-1 
+			&& FD_ISSET(SoundFildes, &wfds)) {
+		callbacks->SoundReady();
+	    }
+
+	    //
+	    //	Network in sync and time for frame over: return
+	    //
+	    if(VideoInterrupts) {
+		break;
+	    }
+
+	    //
+	    //	Network
+	    //
+	    if(NetworkFildes != -1 && FD_ISSET(NetworkFildes, &rfds)) {
+		callbacks->NetworkEvent();
+	    }
+	}
+
+	//
+	//	Network in sync and time for frame over: return
+	//
+	if(VideoInterrupts) {
+	    break;
+	}
+    }
+
+    //
+    //	Prepare return, time for one frame is over.
+    //
+    VideoInterrupts=0;
+}
+
+/**
+**	Wait for interactive input event.
+**
+**	Handles SVGALib events, keyboard, mouse.
+**	Video interrupt for sync.
+**	Network messages.
+**	Sound queue.
+**
+**	We must handle atlast one SVGALib event
+**
+**	FIXME:	the initialition could be moved out of the loop
+*/
+global void WaitEventsAndKeepSync(void)
+{
+    EventCallback callbacks;
+    struct timeval tv;
+    fd_set rfds;
+    fd_set wfds;
+    int ret;
+
+    callbacks.ButtonPressed=(void*)HandleButtonDown;
+    callbacks.ButtonReleased=(void*)HandleButtonUp;
+    callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.KeyPressed=HandleKeyDown;
+    callbacks.KeyReleased=HandleKeyUp;
+
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+    SVGALibCallbacks=&callbacks;
+
+    InputMouseTimeout(&callbacks,SVGALibGetTicks());
+    for(;;) {
+	//
+	//	Prepare select
+	//
+	tv.tv_sec = tv.tv_usec = 0;
 
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
@@ -985,21 +1112,21 @@ global void WaitEventsAndKeepSync(void)
 	    //
 	    if(!SoundOff && !SoundThreadRunning && SoundFildes!=-1 
 			&& FD_ISSET(SoundFildes, &wfds)) {
-		WriteSound();
+		callbacks.SoundReady();
 	    }
 
 	    //
 	    //	Network in sync and time for frame over: return
 	    //
 	    if(NetworkInSync && VideoInterrupts) {
-		return;
+		break;
 	    }
 
 	    //
 	    //	Network
 	    //
 	    if(NetworkFildes != -1 && FD_ISSET(NetworkFildes, &rfds)) {
-		NetworkEvent();
+		callbacks.NetworkEvent();
 	    }
 	}
 
@@ -1007,9 +1134,14 @@ global void WaitEventsAndKeepSync(void)
 	//	Network in sync and time for frame over: return
 	//
 	if(NetworkInSync && VideoInterrupts) {
-	    return;
+	    break;
 	}
     }
+
+    //
+    //	Prepare return, time for one frame is over.
+    //
+    VideoInterrupts=0;
 }
 
 /**

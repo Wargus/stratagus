@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -71,9 +72,17 @@ local GC GcLine;			/// My drawing context
 
 local Atom WmDeleteWindowAtom;		/// Atom for WM_DELETE_WINDOW
 
+local struct timeval X11TicksStart;	/// My counter start
+
 /*----------------------------------------------------------------------------
 --	Sync
 ----------------------------------------------------------------------------*/
+
+#if 1
+
+/*
+**	The timer resolution is 10ms, which make the timer useless for us.
+*/
 
 /**
 **	Called from SIGALRM.
@@ -100,7 +109,7 @@ global void SetVideoSync(void)
     sigemptyset(&sa.sa_mask);
     sa.sa_flags=SA_RESTART;
     if( sigaction(SIGALRM,&sa,NULL) ) {
-	fprintf(stderr,"Can't set signal\n");
+	fprintf(stderr,"Can't set signal handler\n");
     }
 
     itv.it_interval.tv_sec=itv.it_value.tv_sec=
@@ -112,7 +121,8 @@ global void SetVideoSync(void)
 	fprintf(stderr,"Can't set itimer\n");
     }
 
-    // DebugLevel1("Timer installed\n");
+    DebugLevel3("Timer installed %ld,%ld\n",
+	itv.it_interval.tv_sec,itv.it_interval.tv_usec);
 }
 
 /**
@@ -125,6 +135,33 @@ local void MyConnectionWatch
     if( flag ) {			// file handle opened
     } else {				// file handle closed
     }
+}
+
+#else
+
+/**
+**	Initialise video sync.
+*/
+global void SetVideoSync(void)
+{
+}
+
+#endif
+
+/**
+**	X11 get ticks in ms.
+*/
+long X11GetTicks(void)
+{
+    struct timeval now;
+    long ticks;
+ 
+    gettimeofday(&now,NULL);
+
+    ticks=(now.tv_sec-X11TicksStart.tv_sec)*1000
+	    +(now.tv_usec-X11TicksStart.tv_usec)/1000;
+
+    return ticks;
 }
 
 /**
@@ -149,6 +186,8 @@ global void GameInitDisplay(void)
 	fprintf(stderr,"Cannot connect to X-Server.\n");
 	exit(-1);
     }
+
+    gettimeofday(&X11TicksStart,NULL);
 
     TheScreen=DefaultScreen(TheDisplay);
 
@@ -360,6 +399,11 @@ global int SetVideoMode(int width)
 
 /**
 **	Invalidate some area
+**
+**	@param x	screen pixel X position.
+**	@param y	screen pixel Y position.
+**	@param w	width of rectangle in pixels.
+**	@param h	height of rectangle in pixels.
 */
 global void InvalidateArea(int x,int y,int w,int h)
 {
@@ -412,9 +456,13 @@ local void X11HandleModifiers(XKeyEvent* keyevent)
 }
 
 /**
-**	Handle keyboard!
+**	Convert X11 keysym into internal keycode.
+**
+**	@param code	X11 keysym structure pointer.
+**
+**	@return		ASCII code or internal keycode.
 */
-local void X11HandleKey(KeySym code)
+local unsigned X112InternalKeycode(const KeySym code)
 {
     int icode;
 
@@ -546,95 +594,43 @@ local void X11HandleKey(KeySym code)
 	    break;
     }
 
-    if( HandleKeyDown(icode) ) {
-	return;
-    }
+    return icode;
+}
+
+/**
+**	Handle keyboard! (pressed)
+**
+**	@param callbacks	Call backs that handle the events.
+**	@param code		X11 keysym structure pointer.
+*/
+local void X11HandleKeyPress(const EventCallback* callbacks,const KeySym code)
+{
+    int icode;
+
+    icode=X112InternalKeycode(code);
+
+    callbacks->KeyPressed(icode);
 }
 
 /**
 **	Handle keyboard! (release)
+**
+**	@param callbacks	Call backs that handle the events.
+**	@param code		X11 keysym structure pointer.
 */
-local void X11HandleKeyUp(KeySym code)
+local void X11HandleKeyRelease(const EventCallback* callbacks,const KeySym code)
 {
     int icode;
 
-    // FIXME: Combine X11 keysym mapping to internal in up and down.
-    switch( (icode=code) ) {
-	case XK_Shift_L:
-	case XK_Shift_R:
-	    icode = KeyCodeShift;
-	    break;
-	case XK_Control_L:
-	case XK_Control_R:
-	    icode = KeyCodeControl;
-	    break;
-	case XK_Alt_L:
-	case XK_Alt_R:
-	case XK_Meta_L:
-	case XK_Meta_R:
-	    icode = KeyCodeAlt;
-	    break;
-	case XK_Super_L:
-	case XK_Super_R:
-	    icode = KeyCodeHyper;
-	    break;
+    icode=X112InternalKeycode(code);
 
-	case XK_Up:
-	    icode = KeyCodeUp;
-	    break;
-	case XK_Down:
-	    icode = KeyCodeDown;
-	    break;
-	case XK_Left:
-	    icode = KeyCodeLeft;
-	    break;
-	case XK_Right:
-	    icode = KeyCodeRight;
-	    break;
-
-	case XK_KP_0:
-	    icode=KeyCodeKP0;
-	    break;
-	case XK_KP_1:
-	    icode=KeyCodeKP1;
-	    break;
-	case XK_KP_2:
-	    icode=KeyCodeKP2;
-	    break;
-	case XK_KP_3:
-	    icode=KeyCodeKP3;
-	    break;
-	case XK_KP_4:
-	    icode=KeyCodeKP4;
-	    break;
-	case XK_KP_5:
-	    icode=KeyCodeKP5;
-	    break;
-	case XK_KP_6:
-	    icode=KeyCodeKP6;
-	    break;
-	case XK_KP_7:
-	    icode=KeyCodeKP7;
-	    break;
-	case XK_KP_8:
-	    icode=KeyCodeKP8;
-	    break;
-	case XK_KP_9:
-	    icode=KeyCodeKP9;
-	    break;
-
-	default:
-	    DebugLevel3("\tUnknown key %x\n",code);
-	    break;
-    }
-
-    HandleKeyUp(icode);
+    callbacks->KeyReleased(icode);
 }
 
 /**
 **	Handle interactive input event.
 */
-local void DoEvent(void)
+local void X11DoEvent(const EventCallback* callbacks)
 {
     XEvent event;
     int xw, yw;
@@ -644,12 +640,14 @@ local void DoEvent(void)
     switch( event.type ) {
 	case ButtonPress:
 	    DebugLevel3("\tbutton press %d\n",event.xbutton.button);
-	    HandleButtonDown(event.xbutton.button);
+	    InputMouseButtonPress(callbacks, X11GetTicks(),
+		    event.xbutton.button);
 	    break;
 
 	case ButtonRelease:
 	    DebugLevel3("\tbutton release %d\n",event.xbutton.button);
-	    HandleButtonUp(event.xbutton.button);
+	    InputMouseButtonRelease(callbacks, X11GetTicks(),
+		    event.xbutton.button);
 	    break;
 
 	case Expose:
@@ -660,7 +658,8 @@ local void DoEvent(void)
 	case MotionNotify:
 	    DebugLevel3("\tmotion notify %d,%d\n"
 		,event.xbutton.x,event.xbutton.y);
-	    HandleMouseMove(event.xbutton.x,event.xbutton.y);
+	    InputMouseMove(callbacks, X11GetTicks(),
+		    event.xbutton.x,event.xbutton.y);
 	    if ( (TheUI.WarpX != -1 || TheUI.WarpY != -1)
 		    && (event.xbutton.x!=TheUI.WarpX
 			 || event.xbutton.y!=TheUI.WarpY)
@@ -706,16 +705,16 @@ local void DoEvent(void)
 	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
 	    DebugLevel3("\tKey %lx `%s'\n",keysym,buf);
 	    if( num==1 ) {
-		X11HandleKey(*buf);
+		X11HandleKeyPress(callbacks,*buf);
 	    } else {
-		X11HandleKey(keysym);
+		X11HandleKeyPress(callbacks,keysym);
 	    }
 	}
 	    break;
 
 	case KeyRelease:
 	    DebugLevel3("\tKey release\n");
-	    X11HandleKeyUp(XLookupKeysym((XKeyEvent*)&event,0));
+	    X11HandleKeyRelease(callbacks,XLookupKeysym((XKeyEvent*)&event,0));
 	    break;
 
 	case ConfigureNotify:	// IGNORE, not useful for us yet - 
@@ -730,18 +729,18 @@ local void DoEvent(void)
 }
 
 /**
-**	Wait for interactive input event.
+**	Wait for interactive input event for one frame.
 **
-**	Handles X11 events, keyboard, mouse.
-**	Video interrupt for sync.
-**	Network messages.
-**	Sound queue.
+**	Handles system events, joystick, keyboard, mouse.
+**	Handles the network messages.
+**	Handles the sound queue.
 **
-**	We must handle atlast one X11 event
+**	All events available are fetched. Sound and network only if available.
+**	Returns if the time for one frame is over.
 **
-**	FIXME:	the initialition could be moved out of the loop
+**	@param callbacks	Call backs that handle the events.
 */
-global void WaitEventsAndKeepSync(void)
+global void WaitEventsOneFrame(const EventCallback* callbacks)
 {
     struct timeval tv;
     fd_set rfds;
@@ -754,22 +753,27 @@ global void WaitEventsAndKeepSync(void)
     int connection;
 
     connection=ConnectionNumber(TheDisplay);
+    if( SoundFildes==-1 ) {
+	SoundOff=1;
+    }
+
+    InputMouseTimeout(callbacks,X11GetTicks());
 
     for( ;; ) {
 #ifdef SLOW_INPUT
 	while( XPending(TheDisplay) ) {
-	   DoEvent();
+	   X11DoEvent(callbacks);
 	}
 #endif
 
 	//
 	//	Prepare select
 	//
+	maxfd=0;
 	tv.tv_sec=tv.tv_usec=0;
 
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
-	maxfd=0;
 
 	//
 	//	X11 how many events already in queue
@@ -801,7 +805,7 @@ global void WaitEventsAndKeepSync(void)
 	//
 	//	Sound
 	//
-	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
+	if( !SoundOff && !SoundThreadRunning ) {
 	    if( SoundFildes>maxfd ) {
 		maxfd=SoundFildes;
 	    }
@@ -816,13 +820,12 @@ global void WaitEventsAndKeepSync(void)
 		maxfd=NetworkFildes;
 	    }
 	    FD_SET(NetworkFildes,&rfds);
-	    if( !NetworkInSync ) {
-		NetworkRecover();	// recover network
-	    }
 	}
 
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
 		,(morex|VideoInterrupts) ? &tv : NULL);
+
+	DebugLevel3Fn("%d, %d\n",morex|VideoInterrupts,maxfd);
 
 	//
 	//	X11
@@ -848,30 +851,207 @@ global void WaitEventsAndKeepSync(void)
 	}
 
 	for( i=morex; i--; ) {		// handle new + *OLD* x11 events
-	    DoEvent();
+	   X11DoEvent(callbacks);
 	}
 
 	if( maxfd>0 ) {
 	    //
 	    //	Sound
 	    //
-	    if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 
+	    if( !SoundOff && !SoundThreadRunning 
 		    && FD_ISSET(SoundFildes,&wfds) ) {
-		WriteSound();
+		callbacks->SoundReady();
 	    }
 
 	    //
-	    //	Network in sync and time for frame over: return
+	    //	Not more input and time for frame over: return
 	    //
-	    if( !morex && NetworkInSync && VideoInterrupts ) {
-		return;
+	    if( !morex && VideoInterrupts ) {
+		break;
 	    }
 
 	    //
 	    //	Network
 	    //
 	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
-		NetworkEvent();
+		callbacks->NetworkEvent();
+	    }
+	}
+
+	//
+	//	Not more input and time for frame over: return
+	//
+	if( !morex && VideoInterrupts ) {
+	    break;
+	}
+    }
+
+    //
+    //	Prepare return, time for one frame is over.
+    //
+    VideoInterrupts=0;
+}
+
+/**
+**	Wait for interactive input event.
+**
+**	Handles X11 events, keyboard, mouse.
+**	Video interrupt for sync.
+**	Network messages.
+**	Sound queue.
+**
+**	We must handle atlast one X11 event
+**
+**	FIXME:	the initialition could be moved out of the loop
+*/
+global void WaitEventsAndKeepSync(void)
+{
+    EventCallback callbacks;
+    struct timeval tv;
+    fd_set rfds;
+    fd_set wfds;
+    int maxfd;
+    int* xfd;
+    int n;
+    int i;
+    int morex;
+    int connection;
+
+    callbacks.ButtonPressed=(void*)HandleButtonDown;
+    callbacks.ButtonReleased=(void*)HandleButtonUp;
+    callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.KeyPressed=HandleKeyDown;
+    callbacks.KeyReleased=HandleKeyUp;
+
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+
+    connection=ConnectionNumber(TheDisplay);
+    if( SoundFildes==-1 ) {
+	SoundOff=1;
+    }
+
+    InputMouseTimeout(&callbacks,X11GetTicks());
+
+    for( ;; ) {
+#ifdef SLOW_INPUT
+	while( XPending(TheDisplay) ) {
+	   X11DoEvent(&callbacks);
+	}
+#endif
+
+	//
+	//	Prepare select
+	//
+	maxfd=0;
+	tv.tv_sec=tv.tv_usec=0;
+
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+
+	//
+	//	X11 how many events already in queue
+	//
+	xfd=NULL;
+	morex=QLength(TheDisplay);
+	if( !morex ) {
+	    //
+	    //	X11 connections number
+	    //
+	    maxfd=connection;
+	    FD_SET(connection,&rfds);
+
+	    //
+	    //	Get all X11 internal connections
+	    //
+	    if( !XInternalConnectionNumbers(TheDisplay,&xfd,&n) ) {
+		DebugLevel0Fn(": out of memory\n");
+		abort();
+	    }
+	    for( i=n; i--; ) {
+		FD_SET(xfd[i],&rfds);
+		if( xfd[i]>maxfd ) {
+		    maxfd=xfd[i];
+		}
+	    }
+	}
+
+	//
+	//	Sound
+	//
+	if( !SoundOff && !SoundThreadRunning ) {
+	    if( SoundFildes>maxfd ) {
+		maxfd=SoundFildes;
+	    }
+	    FD_SET(SoundFildes,&wfds);
+	}
+
+	//
+	//	Network
+	//
+	if( NetworkFildes!=-1 ) {
+	    if( NetworkFildes>maxfd ) {
+		maxfd=NetworkFildes;
+	    }
+	    FD_SET(NetworkFildes,&rfds);
+	    if( !NetworkInSync ) {
+		NetworkRecover();	// recover network
+	    }
+	}
+
+	maxfd=select(maxfd+1,&rfds,&wfds,NULL
+		,(1|morex|VideoInterrupts) ? &tv : NULL);
+
+	DebugLevel3Fn("%d, %d\n",morex|VideoInterrupts,maxfd);
+
+	//
+	//	X11
+	//
+	if( maxfd>0 ) {
+	    if( !morex ) {		// look if new events
+		if (xfd) {
+		    for( i=n; i--; ) {
+			if( FD_ISSET(xfd[i],&rfds) ) {
+			    XProcessInternalConnection(TheDisplay,xfd[i]);
+			}
+		    }
+		}
+		if( FD_ISSET(connection,&rfds) ) {
+		    morex=XEventsQueued(TheDisplay,QueuedAfterReading);
+		} else {
+		    morex=QLength(TheDisplay);
+		}
+	    }
+	}
+	if( xfd) {
+	    XFree(xfd);
+	}
+
+	for( i=morex; i--; ) {		// handle new + *OLD* x11 events
+	   X11DoEvent(&callbacks);
+	}
+
+	if( maxfd>0 ) {
+	    //
+	    //	Sound
+	    //
+	    if( !SoundOff && !SoundThreadRunning 
+		    && FD_ISSET(SoundFildes,&wfds) ) {
+		callbacks.SoundReady();
+	    }
+
+	    //
+	    //	Network in sync and time for frame over: return
+	    //
+	    if( !morex && NetworkInSync && VideoInterrupts ) {
+		break;
+	    }
+
+	    //
+	    //	Network
+	    //
+	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
+		callbacks.NetworkEvent();
 	    }
 	}
 
@@ -879,9 +1059,14 @@ global void WaitEventsAndKeepSync(void)
 	//	Network in sync and time for frame over: return
 	//
 	if( !morex && NetworkInSync && VideoInterrupts ) {
-	    return;
+	    break;
 	}
     }
+
+    //
+    //	Prepare return, time for one frame is over.
+    //
+    VideoInterrupts=0;
 }
 
 /**
