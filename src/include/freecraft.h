@@ -322,18 +322,6 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 #define UnitMax		2048		/// How many units supported
 
 /*----------------------------------------------------------------------------
---	MacOS X fixes
-----------------------------------------------------------------------------*/
-
-#if defined(__APPLE__)
-
-#define MenuKey FreeCraftMenuKey
-#define HideCursor FreeCraftHideCursor
-#define InitCursor FreeCraftInitCursor
-
-#endif // defined(__APPLE__)
-
-/*----------------------------------------------------------------------------
 --	Screen
 ----------------------------------------------------------------------------*/
 
@@ -368,6 +356,8 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 
     /// frames per second to display (original 30-40)
 #define FRAMES_PER_SECOND	30	// 1/30s
+    /// game cycles per second to simulate (original 30-40)
+#define CYCLES_PER_SECOND	30	// 1/30s 0.33ms
 
     /// must redraw flags
 enum MustRedraw_e {
@@ -423,6 +413,9 @@ extern int VideoHeight;
     /// invalidated map
 extern enum MustRedraw_e MustRedraw;
 
+    /// Next frame ticks
+extern unsigned long NextFrameTicks;
+
     /// counts frames
 extern int FrameCounter;
 
@@ -475,6 +468,8 @@ extern int SpeedResearch;		/// speed factor for researching
 extern int OptionUseDepletedMines;      /// use depleted mines or destroy them
 
 extern unsigned SyncRandSeed;		/// sync random seed value.
+
+extern unsigned long GameCycle;		/// Game simulation cycle counter
 
 extern void LoadGame(char*);		/// Load saved game back
 extern void SaveGame(const char*);	/// Save game for later load
