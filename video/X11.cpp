@@ -909,7 +909,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 **
 **	@param callbacks	Call backs that handle the events.
 **
-**	FIXME:	the initialition could be moved out of the loop
+**	@todo FIXME:	the initialition could be moved out of the loop
 */
 global void WaitEventsOneFrame(const EventCallback* callbacks)
 {
@@ -940,6 +940,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	fprintf(stderr,"FIXME: *** round robin ***\n");
     }
 
+#ifndef USE_ITIMER
     ticks=X11GetTicks();
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 	IfDebug(
@@ -950,6 +951,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	);
 	++SlowFrameCounter;
     }
+#endif
 
     InputMouseTimeout(callbacks,ticks);
 
@@ -1326,6 +1328,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 */
 global void CheckVideoInterrupts(void)
 {
+#ifdef USE_ITIMER
     if( VideoInterrupts ) {
         //DebugLevel1("Slow frame\n");
 	IfDebug(
@@ -1336,6 +1339,7 @@ global void CheckVideoInterrupts(void)
 	);
         ++SlowFrameCounter;
     }
+#endif
 }
 
 /**
