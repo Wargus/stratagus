@@ -1531,7 +1531,9 @@ local int scm2hotkey(SCM value)
     s = gh_scm2newstr(value,NULL);
     l = strlen(s);
 
-    if (l==1) {
+    if (l==0) {
+	key=0;
+    } else if (l==1) {
 	key=s[0];
     } else if (!strcmp(s,"esc")) {
 	key=27;
