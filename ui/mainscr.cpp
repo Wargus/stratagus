@@ -1197,7 +1197,7 @@ global void DrawInfoPanel(void)
 	y+=20;
 
 	GetDefaultTextColors(&nc, &rc);
-	for( i=0; i<PlayerMax; ++i ) {
+	for( i=0; i<PlayerMax-1; ++i ) {
 	    if( Players[i].Type!=PlayerNobody ) {
 		if( ThisPlayer->Allied&(1<<Players[i].Player) ) {
 		    SetDefaultTextColors(FontGreen, rc);
