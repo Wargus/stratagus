@@ -823,8 +823,13 @@ global void GameMainLoop(void)
 	    DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
 	}
 
-	if( ColorCycleAll>=0 && !(FrameCounter%COLOR_CYCLE_SPEED) ) {
-	    ColorCycle();
+	if( !(FrameCounter%COLOR_CYCLE_SPEED) ) {
+	    if( ColorCycleAll>=0 ) {
+		ColorCycle();
+	    } else {
+		// FIXME: should only update when needed
+		MustRedraw|=RedrawInfoPanel;
+	    }
 	}
 
 #if defined(DEBUG) && !defined(FLAG_DEBUG)
