@@ -96,7 +96,8 @@ static void ReleaseOrders(Unit* unit)
 */
 static Order* GetNextOrder(Unit* unit, int flush)
 {
-	if (flush) {			// empty command queue
+	if (flush) {
+		// empty command queue
 		ReleaseOrders(unit);
 	} else if (unit->OrderCount == MAX_ORDERS) {
 		// FIXME: johns: wrong place for an error message.
@@ -164,6 +165,7 @@ void CommandStopUnit(Unit* unit)
 void CommandAnyOrder(Unit* unit, Order* cpyorder, int flush)
 {
 	Order* order;
+
 	if (!(order = GetNextOrder(unit, flush))) {
 		return;
 	}
@@ -187,6 +189,7 @@ void CommandMoveOrder(Unit* unit, int src, int dst)
 {
 	Order tmp;
 	int i;
+
 	Assert(src != 0 && dst != 0 && src < unit->OrderCount && dst < unit->OrderCount);
 
 	if (src == dst) {
@@ -294,12 +297,7 @@ void CommandMove(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
-#ifdef DEBUG
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugPrint("Internal movement error\n");
-		return;
-	}
-#endif
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
 
 	//
 	//  Check if unit is still valid? (NETWORK!)
@@ -394,12 +392,7 @@ void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 {
 	Order* order;
 
-#ifdef DEBUG
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugPrint("Internal movement error\n");
-		return;
-	}
-#endif
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -465,12 +458,7 @@ void CommandAttackGround(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
-#ifdef DEBUG
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugPrint("Internal movement error\n");
-		return;
-	}
-#endif
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -512,12 +500,7 @@ void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
-#ifdef DEBUG
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugPrint("Internal movement error\n");
-		return;
-	}
-#endif
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -959,7 +942,7 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 			return;
 		}
 
-		DebugPrint	("Cancel training\n");
+		DebugPrint("Cancel training\n");
 
 		PlayerAddCostsFactor(unit->Player,
 			unit->Data.Train.What[slot]->Stats[unit->Player->Player].Costs,
@@ -1180,12 +1163,7 @@ void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 {
 	Order* order;
 
-#ifdef DEBUG
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugPrint("Internal movement error\n");
-		return;
-	}
-#endif
+	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
 
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 		UnitNumber(unit) _C_ spell->Ident _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
