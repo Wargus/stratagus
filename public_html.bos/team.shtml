@@ -1,0 +1,23 @@
+
+<!--#set var="title" value="Bos"-->
+<!--#include file="header.shtml" -->
+      
+<h2>The Invasion Team</h2>
+
+Bos is an open source project open to everybody. 
+The currently active members are:
+<ul>
+<li>François Beerten "feb", project manager 
+<li> Tejay Penfold "TimberDragon", 3d specialist
+<li>Frank Loeffler "gorm", script writer and blender specialist
+<li>Loïs Taulelle "GruiicK", maps and campaigns creator
+<li>"darren", story writer and 3d modeler
+</ul> 
+<p>
+Tina Petersen "p0ng" started the project. She unfortunatly passed away in 2003.
+<p>
+Every contributor becomes in a sense a member of the project. 
+For a detailed list of the contributions, check the svn and cvs repositories.
+<p>
+
+<!--#include file="footer.shtml" -->
