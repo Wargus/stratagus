@@ -63,14 +63,14 @@ extern int AStarMovingUnitCrossingCost; /// cost associated to move on a tile
 --	Functions
 ----------------------------------------------------------------------------*/
 
-    ///
+    /// Create a matrix for the old pathfinder
 extern unsigned char* CreateMatrix(void);
-    ///
+    /// Get next element of the way to goal.
 extern int NewPath(Unit* unit,int* xdp,int* ydp);
-    ///
-extern int PlaceReachable(const Unit* unit,int x,int y);
-    ///
-extern int UnitReachable(const Unit* unit,const Unit* dest);
+    /// Return distance to place.
+extern int PlaceReachable(const Unit* unit,int x,int y,int range);
+    /// Return distance to unit.
+extern int UnitReachable(const Unit* unit,const Unit* dest,int range);
 
 //
 //	in astar.c

@@ -172,7 +172,7 @@ local void PathTraceBack(const unsigned char* matrix,int x,int y,int n
     int w2;
     const unsigned char* m;
 
-    DebugLevel3(__FUNCTION__": %d\n",n);
+    DebugLevel3Fn("%d\n",n);
 
     w=TheMap.Width+2;
     w2=w+w;
@@ -305,7 +305,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 	ep=wp;
 	n&=7;
     }
-    DebugLevel3(__FUNCTION__": Can't reach point\n");
+    DebugLevel3Fn("Can't reach point\n");
 
     return -1;
 }
@@ -314,37 +314,50 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 --	PATH-FINDER USE
 ----------------------------------------------------------------------------*/
 
-/*
+/**
 **	Can the unit 'src' reach the place x,y.
+**
+**	@param src	Unit for the path.
+**	@param x	Map X tile position.
+**	@param y	Map Y tile position.
+**	@param range	Range to the tile.
 */
-global int PlaceReachable(const Unit* src,int x,int y)
+global int PlaceReachable(const Unit* src,int x,int y,int range)
 {
     unsigned char* matrix;
 
-    DebugLevel3(__FUNCTION__": %p -> %d,%d\n",src,x,y);
+    DebugLevel3Fn("%p -> %d,%d\n",src,x,y);
 
     //
     //	Setup movement.
     //
     matrix=CreateMatrix();
-    MarkPlaceInMatrix(x,y,1,1,matrix);
+    MarkPlaceInMatrix(x,y,range,range,matrix);
 
+    //
+    //	Find a path to the place.
+    //
     if( MarkPathInMatrix(src,matrix) < 0 ) {
 	DebugLevel3("Can't move to destination\n");
 	return 0;
     }
 
+    // FIXME: should return the distance.
     return 1;
 }
 
-/*
+/**
 **	Can the unit 'src' reach the unit 'dst'.
+**
+**	@param src	Unit for the path.
+**	@param dst	Unit to be reached.
+**	@param range	Range to unit.
 */
-global int UnitReachable(const Unit* src,const Unit* dst)
+global int UnitReachable(const Unit* src,const Unit* dst,int range)
 {
     unsigned char* matrix;
 
-    DebugLevel3(__FUNCTION__": %Zd(%d,%d,%s)->%Zd(%d,%d,%s) "
+    DebugLevel3Fn("%Zd(%d,%d,%s)->%Zd(%d,%d,%s) "
 	,UnitNumber(src),src->X,src->Y,src->Type->Ident
 	,UnitNumber(dst),dst->X,dst->Y,dst->Type->Ident);
 
@@ -352,14 +365,18 @@ global int UnitReachable(const Unit* src,const Unit* dst)
     //	Setup movement.
     //
     matrix=CreateMatrix();
-    MarkGoalInMatrix(dst,1,matrix);
+    MarkGoalInMatrix(dst,range,matrix);
 
+    //
+    //	Find a path to the goal.
+    //
     if( MarkPathInMatrix(src,matrix)<0 ) {
 	DebugLevel3("NO WAY\n");
 	return 0;
     }
     DebugLevel3("OK\n");
 
+    // FIXME: should return the distance.
     return 1;
 }
 
@@ -413,19 +430,19 @@ local int FastNewPath(const Unit* unit,int *xdp,int* ydp)
     yd-=y;
     if( yd<0 ) yd=-1; else if( yd>0 ) yd=1;
     *ydp=yd;
-    DebugLevel3(__FUNCTION__": %d,%d\n",xd,yd);
+    DebugLevel3Fn("%d,%d\n",xd,yd);
 
     r=unit->Command.Data.Move.Range;
     while( steps-- ) {
 	x+=xd;
 	y+=yd;
-	DebugLevel3(__FUNCTION__": Check %d,%d=%x\n",x,y,mask);
+	DebugLevel3Fn("Check %d,%d=%x\n",x,y,mask);
 
 	//
 	//	Now check if we can move to this field
 	//
 	if( !CheckedCanMoveToMask(x,y,mask) ) {	// blocked
-	    DebugLevel3(__FUNCTION__": The way is blocked in sight range\n");
+	    DebugLevel3Fn("The way is blocked in sight range\n");
 	    return 0;
 	}
 
@@ -434,7 +451,7 @@ local int FastNewPath(const Unit* unit,int *xdp,int* ydp)
 	//	FIXME: This could be improved
 	//
 	if( goal ) {
-	    DebugLevel3(__FUNCTION__": Unit %d, %d Goal %d,%d - %d,%d\n"
+	    DebugLevel3Fn("Unit %d, %d Goal %d,%d - %d,%d\n"
 		,x,y
 		,goal->X-r,goal->Y-r
 		,goal->X+type->TileWidth+r
@@ -451,7 +468,7 @@ local int FastNewPath(const Unit* unit,int *xdp,int* ydp)
 		    && x<=unit->Command.Data.Move.DX+r
 		    && y>=unit->Command.Data.Move.DY
 		    && y<=unit->Command.Data.Move.DY+r ) {
-		DebugLevel3(__FUNCTION__": Field in sight\n");
+		DebugLevel3Fn("Field in sight\n");
 		return 1;
 	    }
 	    xd=unit->Command.Data.Move.DX;
@@ -468,7 +485,7 @@ local int FastNewPath(const Unit* unit,int *xdp,int* ydp)
 	yd-=y;
 	if( yd<0 ) yd=-1; else if( yd>0 ) yd=1;
     }
-    DebugLevel3(__FUNCTION__": Nothing in sight range\n");
+    DebugLevel3Fn("Nothing in sight range\n");
 
     return 1;
 }
@@ -511,7 +528,7 @@ local int ComplexNewPath(Unit* unit,int *xdp,int* ydp)
     int f;
     int depth;
 
-    DebugLevel3(__FUNCTION__": %s(%Zd) to %Zd=%d,%d~%d\n"
+    DebugLevel3Fn("%s(%Zd) to %Zd=%d,%d~%d\n"
 	    ,unit ? unit->Type->Ident : ""
 	    ,UnitNumber(unit)
 	    ,unit->Command.Data.Move.Goal
@@ -646,9 +663,8 @@ local int ComplexNewPath(Unit* unit,int *xdp,int* ydp)
 		    goal=UnitCacheOnXY(x,y,unit->Type->UnitType);
 		    if( !goal ) {
 			// Should not happen.
-			DebugLevel0(__FUNCTION__
-			    ": %p No goal for %d,%d on %d,%d?\n",
-				    unit,unit->X,unit->Y,x,y);
+			DebugLevel0Fn("%p No goal for %d,%d on %d,%d?\n",
+				unit,unit->X,unit->Y,x,y);
 			matrix[w+1+x+y*w]=99;
 			continue;
 		    }
@@ -756,18 +772,18 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     y=unit->Y;
     r=unit->Command.Data.Move.Range;
     goal=unit->Command.Data.Move.Goal;
-    DebugLevel3(__FUNCTION__": Goal %p\n",unit->Command.Data.Move.Goal);
+    DebugLevel3Fn("Goal %p\n",unit->Command.Data.Move.Goal);
 
     if( goal ) {			// goal unit
 	type=goal->Type;
-	DebugLevel3(__FUNCTION__": Unit %d,%d Goal %d,%d - %d,%d\n"
+	DebugLevel3Fn("Unit %d,%d Goal %d,%d - %d,%d\n"
 	    ,x,y
 	    ,goal->X-r,goal->Y-r
 	    ,goal->X+type->TileWidth+r
 	    ,goal->Y+type->TileHeight+r);
 	if( x>=goal->X-r && x<goal->X+type->TileWidth+r
 		&& y>=goal->Y-r && y<goal->Y+type->TileHeight+r ) {
-	    DebugLevel3(__FUNCTION__": Goal reached\n");
+	    DebugLevel3Fn("Goal reached\n");
 	    *xdp=*ydp=0;
 	    return 1;
 	}
@@ -776,7 +792,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 		&& x<=unit->Command.Data.Move.DX+r
 		&& y>=unit->Command.Data.Move.DY
 		&& y<=unit->Command.Data.Move.DY+r ) {
-	    DebugLevel3(__FUNCTION__": Field reached\n");
+	    DebugLevel3Fn("Field reached\n");
 	    *xdp=*ydp=0;
 	    return 1;
 	}
@@ -789,7 +805,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 	    if( !CheckedCanMoveToMask(unit->Command.Data.Move.DX
 		    ,unit->Command.Data.Move.DY
 		    ,UnitMovementMask(unit)) ) {	// blocked
-		DebugLevel3(__FUNCTION__": Field unreached\n");
+		DebugLevel3Fn("Field unreached\n");
 		*xdp=*ydp=0;
 		return -1;
 	    }
@@ -805,7 +821,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 	    return 0;
 	}
 	ResetPath(unit->Command);
-	DebugLevel3(__FUNCTION__": Fallback to slow method\n");
+	DebugLevel3Fn("Fallback to slow method\n");
     }
 
     //

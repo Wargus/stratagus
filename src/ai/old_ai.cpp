@@ -715,7 +715,7 @@ local int AiBuildHall(int type)
 	    d=MapDistanceToUnit(x,y,goldmines[g]);
 	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n"
 		    ,x,y,goldmines[g]->X,goldmines[g]->Y,d);
-	    if(d<cost && UnitReachable(workers[w],goldmines[g]))
+	    if(d<cost && UnitReachable(workers[w],goldmines[g],1))
                 {
 		best_w=w;
 		best_g=g;
@@ -777,7 +777,7 @@ local int AiBuildBuilding(int type)
 	if((d=AiNearHall(AiPlayer->MainHall,
             workers[w],&UnitTypes[type],&x,&y)))
             {
-	    if(d<cost && PlaceReachable(workers[w],x,y))
+	    if(d<cost && PlaceReachable(workers[w],x,y,1))
                 {
 		// JOHNS: ?if(x != y)
                     {
