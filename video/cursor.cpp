@@ -814,13 +814,13 @@ local void DrawBuildingCursor(void)
 {
     int x;
     int y;
-    int x1;
-    int y1;
     int mx;
     int my;
 #ifdef USE_SDL_SURFACE
     SDL_Color color;
 #else
+    int x1;
+    int y1;
     VMemType color;
 #endif
     int f;
@@ -869,10 +869,12 @@ local void DrawBuildingCursor(void)
     while (h--) {
 	w = w0;
 	while (w--) {
+#ifndef USE_SDL_SURFACE
 	    int basex;
 	    int basey;
 	    int i;
 	    int j;
+#endif
 
 	    // FIXME: The field is covered by fog of war!
 	    if (f && (CursorBuilding->MustBuildOnTop ||
@@ -885,6 +887,11 @@ local void DrawBuildingCursor(void)
 	    } else {
 		color = ColorRed;
 	    }
+#ifdef USE_SDL_SURFACE
+	    printf("w = %d\n", w);
+	    VideoFillTransRectangle(color, x + w * TileSizeX, y + h * 
+		TileSizeY, TileSizeX, TileSizeY, 95);
+#else
 	    // FIXME: I could do this faster+better
 	    /* latimerius: I'm not sure what you have in mind but I can
 	     * at least move invariants out of the loops. */
@@ -903,6 +910,7 @@ local void DrawBuildingCursor(void)
 		    break;
 		}
 	    }
+#endif
 	}
     }
 }
