@@ -130,7 +130,6 @@
 **
 */
 
-
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
@@ -138,11 +137,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _MSC_VER
-#include <unistd.h>
-#include <sys/time.h>
-#include <time.h>
-#endif
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -150,6 +144,9 @@
 #include <sys/stat.h>
 #endif
 
+#ifndef _MSC_VER
+#include <unistd.h>
+#endif
 #if defined(__CYGWIN__) 
 #include <getopt.h>
 #endif
@@ -170,57 +167,42 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #endif
 
 #include "freecraft.h"
-
 #include "video.h"
-#include "tileset.h"
-#include "map.h"
-#include "minimap.h"
-#include "sound_id.h"
-#include "unitsound.h"
-#include "icons.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "missile.h"
-#include "actions.h"
-#include "construct.h"
-#include "ai.h"
-#include "ccl.h"
-#include "cursor.h"
-#include "upgrade.h"
-#include "depend.h"
 #include "font.h"
-#include "interface.h"
+#include "cursor.h"
 #include "ui.h"
+#include "interface.h"
 #include "menus.h"
 #include "sound_server.h"
 #include "sound.h"
+#include "settings.h"
+#include "ccl.h"
 #include "network.h"
 #include "netconnect.h"
+#include "ai.h"
 #include "commands.h"
-#include "settings.h"
-
-/*----------------------------------------------------------------------------
---	Variables
-----------------------------------------------------------------------------*/
 
 #ifdef DEBUG
 extern SCM CclUnits(void);
 #endif
 
-global char* TitleScreen;		/// Titlescreen to show at startup
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+global char* TitleScreen;		/// titlescreen to show at startup
 global char* MenuBackground;		/// file for menu background
 global char* MenuBackgroundWithTitle;	/// file for menu with title
 global char* TitleMusic;		/// file for title music
 global char* MenuMusic;			/// file for menu music
-global char* FreeCraftLibPath;		/// Path for data
+global char* FreeCraftLibPath;		/// path for data directory
 
     /// Name, Version, Copyright
 global char NameLine[] =
     "FreeCraft V" VERSION ", (c) 1998-2002 by The FreeCraft Project.";
 
     /// Filename of the map to load
-local char* MapName = NULL;
+local char* MapName;
 
 /*----------------------------------------------------------------------------
 --	Speedups
@@ -262,7 +244,6 @@ global unsigned SyncRandSeed = 0x87654321;	/// sync random seed value.
 */
 global int SyncRand(void)
 {
-    //static unsigned SyncRandSeed = 0x87654321;
     int val;
 
     val=SyncRandSeed>>16;
@@ -278,25 +259,42 @@ global int SyncRand(void)
 
 /**
 **	String duplicate/concatenate (two arguments)
+**
+**	@param l	Left string
+**	@param r	Right string
+**
+**	@return		Allocated combined string (must be freeded).
 */
-global char *strdcat(const char *l, const char *r) {
-    char *res = malloc(strlen(l) + strlen(r) + 1);
+global char* strdcat(const char* l, const char* r)
+{
+    char* res;
+
+    res = malloc(strlen(l) + strlen(r) + 1);
     if (res) {
-        strcpy(res, l);
-        strcat(res, r);
+	strcpy(res, l);
+	strcat(res, r);
     }
     return res;
 }
 
 /**
 **	String duplicate/concatenate (three arguments)
+**
+**	@param l	Left string
+**	@param m	Middle string
+**	@param r	Right string
+**
+**	@return		Allocated combined string (must be freeded).
 */
-global char* strdcat3(const char* l, const char* m, const char* r) {
-    char* res = malloc(strlen(l) + strlen(m) + strlen(r) + 1);
+global char* strdcat3(const char* l, const char* m, const char* r)
+{
+    char* res;
+
+    res = malloc(strlen(l) + strlen(m) + strlen(r) + 1);
     if (res) {
-        strcpy(res, l);
+	strcpy(res, l);
 	strcat(res, m);
-        strcat(res, r);
+	strcat(res, r);
     }
     return res;
 }
@@ -353,7 +351,7 @@ local void WaitForInput(int timeout)
     EventCallback callbacks;
 #ifdef linux
     char ddate[72+1];
-    FILE *ddfile;
+    FILE* ddfile;
 #endif
 
     SetVideoSync();
@@ -395,6 +393,33 @@ local void WaitForInput(int timeout)
     Invalidate();
     RealizeVideoMemory();
 }
+
+//----------------------------------------------------------------------------
+
+/**
+**	Menu loop.
+**
+**	Show the menus, start game, return back.
+**
+**	@param filename	map filename
+**	@param map	map loaded
+*/
+global void MenuLoop(char* filename, WorldMap* map)
+{
+    for( ;; ) {
+	//
+	//	Create the game.
+	//
+	CreateGame(filename,map);
+
+	SetStatusLine(NameLine);
+	SetMessage("Do it! Do it now!");
+
+	GameMainLoop();
+    }
+}
+
+//----------------------------------------------------------------------------
 
 /**
 **	Print headerline, copyright, ...
@@ -539,20 +564,14 @@ Use it at your own risk.\n\n");
     InitSettings();
 
     InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
-    InitSettings();
     LoadUserInterface();
 
+    //
+    //	Show game intro
+    //
     WaitForInput(15);
 
-    //
-    //	Create the game.
-    //
-    CreateGame(MapName,&TheMap);
-
-    SetStatusLine(NameLine);
-    SetMessage("Do it! Do it now!");
-
-    GameMainLoop();
+    MenuLoop(MapName,&TheMap);
 
     return 0;
 }
