@@ -136,7 +136,7 @@ clean::
 
 clobber:	clean
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clobber ; done
-	$(RM) freecraft$(EXE) gmon.sum *~
+	$(RM) freecraft$(EXE) gmon.sum *~ stderr.txt stdout.txt
 	$(RM) -r srcdoc/*
 	@$(MAKE) -C tools RULESFILE=$(RULESFILE) clobber
 
