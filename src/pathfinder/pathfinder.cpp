@@ -216,7 +216,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     struct {
 	unsigned short X;
 	unsigned short Y;
-    } points[TheMap.Width*TheMap.Height/4];
+    } *points;
     int x;
     int y;
     int rx;
@@ -232,6 +232,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     int depth;
     unsigned char* m;
 
+    points=alloca(TheMap.Width*TheMap.Height);
     w=TheMap.Width+2;
     mask=UnitMovementMask(unit);
     // Ignore all possible mobile units.
@@ -583,7 +584,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	    -2, 0, 0,+2, -2,-2,+2,+2 };
     unsigned char* matrix;
     unsigned char* m;
-    unsigned short points[TheMap.Width*TheMap.Height/4];
+    unsigned short* points;
     const Unit* goal;
 #ifdef USE_BEST
     int bestx;
@@ -612,6 +613,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	    ,unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
 	    ,gx,gy,ox,oy);
 
+    points=alloca(TheMap.Width*TheMap.Height/2);
     w=TheMap.Width+2;
     matrix=CreateMatrix();
     matrix+=w+w+2;
