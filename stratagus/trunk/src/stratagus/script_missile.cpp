@@ -198,6 +198,8 @@ local int CclDefineMissileType(lua_State* l)
     }
 
     mtype->NumDirections = 1;
+    // Ensure we don't divide by zero.
+    mtype->SplashFactor = 100;
     //
     //	Parse the arguments, already the new tagged format.
     //
@@ -540,6 +542,52 @@ local SCM CclDefineBurningBuilding(SCM list)
 #elif defined(USE_LUA)
 local int CclDefineBurningBuilding(lua_State* l)
 {
+    const char* value;
+    BurningBuildingFrame** frame;
+    BurningBuildingFrame* ptr;
+    BurningBuildingFrame* next;
+    int args;
+    int j;
+    int subargs;
+    int k;
+
+    ptr = BurningBuildingFrames;
+    while (ptr) {
+	next = ptr->Next;
+	free(ptr);
+	ptr = next;
+    }
+    BurningBuildingFrames = NULL;
+
+    frame = &BurningBuildingFrames;
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_istable(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+
+	*frame = calloc(1, sizeof(BurningBuildingFrame));
+	subargs = luaL_getn(l, j + 1);
+	for (k = 0; k < subargs; ++k) {
+	    lua_rawgeti(l, j + 1, k + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++k;
+
+	    if (!strcmp(value, "percent")) {
+		lua_rawgeti(l, j + 1, k + 1);
+		(*frame)->Percent = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    } else if (!strcmp(value, "missile")) {
+		lua_rawgeti(l, j + 1, k + 1);
+		(*frame)->Missile = MissileTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+	    }
+	}
+	frame = &((*frame)->Next);
+    }
     return 0;
 }
 #endif
