@@ -848,6 +848,15 @@ local SCM CclDefineUI(SCM list)
     ui->InfoPanelX=x;
     ui->InfoPanelY=y;
 
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    x=gh_scm2int(value);
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    y=gh_scm2int(value);
+    ui->InfoPanelW=x;
+    ui->InfoPanelH=y;
+
     //	Completed Bar
     value=gh_car(list);
     list=gh_cdr(list);
@@ -947,22 +956,23 @@ local SCM CclDefineUI(SCM list)
 
     //	Menu Button
     temp=gh_car(list);
-    list=gh_cdr(list);
-
     if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
-    }
+	str=NULL;
+	x=-1;
+	y=-1;
+    } else {
+	list=gh_cdr(list);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        str=gh_scm2newstr(value,NULL);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        x=gh_scm2int(value);
+        value=gh_car(temp);
+        temp=gh_cdr(temp);
+        y=gh_scm2int(value);
 
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
+    }
 
     ui->MenuButtonGraphic.File=str;
     ui->MenuButtonGraphicX=x;
