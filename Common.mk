@@ -37,25 +37,25 @@ clobber: clean
 
 depend::
 	@echo -n >.depend
-	@for i in $(OBJS:.o=.c) ; do\
+	@for i in $(OBJS:.o=.c*) ; do\
 	$(CC) -MM $(IFLAGS) $(DFLAGS) $$i >>.depend ; done
 
 tags::
-	@for i in $(OBJS:.o=.c) ; do\
+	@for i in $(OBJS:.o=.c*) ; do\
 	cd .. ;\
 	ctags $(CTAGSFLAGS) $(TAGS) $(MODULE)/$$i ;\
 	cd $(MODULE) ;\
 	done
 
 ci::
-	ci -l $(OBJS:.o=.c) $(HDRS) Makefile
+	ci -l $(OBJS:.o=.c*) $(HDRS) Makefile
 
 lockver::
-	$(LOCKVER) $(OBJS:.o=.c) $(HDRS) Makefile
+	$(LOCKVER) $(OBJS:.o=.c*) $(HDRS) Makefile
 
 distlist::
 	@echo >>$(DISTLIST)
-	@for i in `echo $(OBJS:.o=.c)` $(HDRS) Makefile $(EXTRA) ; do \
+	@for i in `echo $(OBJS:.o=.c*)` $(HDRS) Makefile $(EXTRA) ; do \
 	echo src/$(MODULE)/$$i >>$(DISTLIST) ; done
 
 $(OBJS): $(TOPDIR)/Rules.make

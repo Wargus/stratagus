@@ -212,6 +212,7 @@ CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -Wall $(IFLAGS)  $(DFLAGS)
 #CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS) -static
 
 CC=cc
+CCLD=c++
 RM=rm -f
 MAKE=make
 
