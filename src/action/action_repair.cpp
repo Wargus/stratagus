@@ -204,6 +204,10 @@ global void HandleActionRepair(Unit* unit)
 			<=REPAIR_RANGE ) {
 		    unit->State=0;
 		    unit->SubAction=2;
+		    UnitHeadingFromDeltaXY(unit,
+			    goal->X-unit->X,goal->Y-unit->Y);
+		    // FIXME: only if heading changes
+		    CheckUnitToBeDrawn(unit);
 		} else if( err<0 ) {
 		    if( goal ) {		// release reference
 			RefsDebugCheck( !goal->Refs );
