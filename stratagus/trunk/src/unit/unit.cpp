@@ -223,9 +223,22 @@ global void ReleaseUnit(Unit* unit)
     if( unit->Refs-->1 ) {
 	unit->Destroyed=1;		// mark as destroyed
 
-	DebugLevel0(__FUNCTION__": more references\n");
+	DebugLevel0Fn("more references\n");
 	return;
     }
+#ifdef UNIT_ON_MAP
+    if( 0 ) {		// debug check
+    Unit* list;
+
+    list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
+    while( list ) {				// find the unit
+	if( list==unit ) {
+	    abort();
+	}
+	list=list->Next;
+    }
+    }
+#endif
     //
     //	No more references remaining, but the network could have an order
     //	on the way.
@@ -233,7 +246,10 @@ global void ReleaseUnit(Unit* unit)
     *ReleasedTail=unit;
     ReleasedTail=&unit->Next;
     unit->Refs=FrameCounter+NetworkMaxLag;	// could be reuse after this.
-    unit->Type=NULL;			// for debugging.
+    IfDebug(
+	DebugLevel0Fn("%Zd\n",UnitNumber(unit));
+	unit->Type=NULL;			// for debugging.
+    );
 #else
     FreeUnitMemory(unit);
 #endif
@@ -254,15 +270,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     Unit** slot;
 #endif
 
-    IfDebug(
-	if( type>UnitTypes+sizeof(UnitTypes)/sizeof(*UnitTypes)
-		|| type<UnitTypes ) {
-	    fprintf(stderr,__FUNCTION__": Illegal type\n");
-	    return NoUnitP;
-	}
-    );
-
-    DebugLevel3(__FUNCTION__": %s(%Zd)\n",type->Name,player-Players);
+    DebugLevel3Fn("%s(%Zd)\n",type->Name,player-Players);
 
 #ifdef NEW_UNIT
     //
@@ -271,22 +279,26 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     if( ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
 	unit=ReleasedHead;
 	ReleasedHead=unit->Next;
+	if( ReleasedTail==&unit->Next ) {	// last element
+	    ReleasedTail=&ReleasedHead;
+	}
+	slot=UnitSlots+unit->Slot;
 	memset(unit,0,sizeof(*unit));
-	DebugLevel0(__FUNCTION__": release %p\n",unit);
+	DebugLevel0Fn("release %p\n",unit);
 	// FIXME: can release here more slots.
     } else {
 	//
 	//	Allocate structure
 	//
 	if( !(slot=UnitSlotFree) ) {	// should not happen!
-	    DebugLevel0(__FUNCTION__": Maximum of units reached\n");
+	    DebugLevel0Fn("Maximum of units reached\n");
 	    return NoUnitP;
 	}
 	UnitSlotFree=(void*)*slot;
 	*slot=unit=calloc(1,sizeof(*unit));
-	unit->Refs=1;
-	unit->Slot=slot-UnitSlots;		// back index
     }
+    unit->Slot=slot-UnitSlots;		// back index
+    unit->Refs=1;
 
     //
     //	Build all unit table
@@ -304,7 +316,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	player->UnitTypesCount[type->Type]++;
     }
 
-    DebugLevel3(__FUNCTION__": %p %Zd\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("%p %Zd\n",unit,UnitNumber(unit));
 #else
     if( NumFreeUnits ) {
 	unit=FreeUnits[--NumFreeUnits];
@@ -315,7 +327,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	return NoUnitP;
     }
 
-    DebugLevel3(__FUNCTION__": %p %Zd\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("%p %Zd\n",unit,UnitNumber(unit));
 
     player->Units[player->TotalNumUnits++]=unit;
     player->UnitTypesCount[type->Type]++;
@@ -500,7 +512,7 @@ global void RemoveUnit(Unit* unit)
 	    // FIXME: Removing buildings without HP.
 	    if( !type->Stats[unit->Player->Player].HitPoints
 		    && !type->OilPatch ) {
-		DebugLevel0(__FUNCTION__": internal error\n");
+		DebugLevel0Fn("internal error\n");
 	    }
 	);
 
@@ -521,7 +533,21 @@ global void RemoveUnit(Unit* unit)
 	}
     }
 
+    DebugLevel0Fn("%Zd %p %p\n",UnitNumber(unit),unit,unit->Next);
     UnitCacheRemove(unit);
+    {	
+	Unit* list;
+
+	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
+	while( list ) {				// find the unit
+	    if( list==unit ) {
+		DebugLevel0Fn("%Zd\n",UnitNumber(unit));
+		abort();
+		break;
+	    }
+	    list=list->Next;
+	}
+    }
 
     MustRedraw|=RedrawMinimap;
     if( UnitVisible(unit) ) {
@@ -626,7 +652,7 @@ global void UpdateForNewUnit(const Unit* unit,int upgrade)
     const UnitType* type;
     Player* player;
 
-    DebugLevel3(__FUNCTION__": unit %Zd (%d)\n"
+    DebugLevel3Fn("unit %Zd (%d)\n"
 	    ,UnitNumber(unit),unit->Type->Type);
 
     player=unit->Player;
@@ -707,7 +733,7 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 	*dy=ty;
     }
 
-    DebugLevel3(__FUNCTION__": Goal is (%d,%d)\n",*dx,*dy);
+    DebugLevel3Fn("Goal is (%d,%d)\n",*dx,*dy);
 }
 
 /**
@@ -958,7 +984,7 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     //	Must change food/gold and other.
     //
     if( unit->Type->GivesOil ) {
-	DebugLevel0(__FUNCTION__":FIXME: oil platform transfer unsupported\n");
+	DebugLevel0Fn("oil platform transfer unsupported\n");
     }
     if( !unit->Type->Building ) {
         newplayer->NumFoodUnits++;	// food needed
@@ -1265,7 +1291,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int bestd;
     int mask;
 
-    DebugLevel3(__FUNCTION__": %d\n",unit);
+    DebugLevel3Fn("%d\n",unit);
 
     x=unit->X;
     y=unit->Y;
@@ -1647,7 +1673,7 @@ global int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y)
 	    break;
 	case UnitTypeFly:
 	default:
-	    DebugLevel1(__FUNCTION__": Were moves this unit?\n");
+	    DebugLevel1Fn("Were moves this unit?\n");
 	    return 0;
     }
 
@@ -1710,7 +1736,7 @@ global Unit* FindGoldMine(const Unit* source,int x,int y)
 	    best=unit;
 	}
     }
-    DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 #else
     Unit* unit;
@@ -1738,7 +1764,7 @@ global Unit* FindGoldMine(const Unit* source,int x,int y)
 	    }
 	}
     }
-    DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 #endif
 }
@@ -1786,7 +1812,7 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	    best=unit;
 	}
     }
-    DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 #else
     Unit* unit;
@@ -1821,7 +1847,7 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	}
     }
 
-    DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 #endif
 }
@@ -1864,7 +1890,7 @@ global Unit* FindWoodDeposit(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 
@@ -1887,7 +1913,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
     int bestd;
     Unit* destu;
 
-    DebugLevel3(__FUNCTION__": %d %d,%d\n",unit,unit->X,unit->Y);
+    DebugLevel3Fn("%d %d,%d\n",unit,unit->X,unit->Y);
 
     x=unit->X;
     y=unit->Y;
@@ -1959,7 +1985,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 	    }
 	}
 	if( bestd!=99999 ) {
-	    DebugLevel3(__FUNCTION__": wood on %d,%d\n",x,y);
+	    DebugLevel3Fn("wood on %d,%d\n",x,y);
 	    *px=bestx;
 	    *py=besty;
 	    return 1;
@@ -1967,7 +1993,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
 	++addy;
     }
 
-    DebugLevel3(__FUNCTION__": no wood in sight-range\n");
+    DebugLevel3Fn("no wood in sight-range\n");
     return 0;
 }
 
@@ -2013,7 +2039,7 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3(__FUNCTION__": %d %d,%d\n",best-Units,best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",best-Units,best->X,best->Y);
     return best;
 }
 
@@ -2060,7 +2086,7 @@ global Unit* FindOilDeposit(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3(__FUNCTION__": %d %d,%d\n",best-Units,best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",best-Units,best->X,best->Y);
     return best;
 }
 
@@ -2300,11 +2326,11 @@ global void DestroyUnit(Unit* unit)
 	    DebugCheck( !unit->Type->Animations
 		    || !unit->Type->Animations->Die );
 	    if( unit->NextCount ) {
-		DebugLevel0(__FUNCTION__": NextCount = %d\n",unit->NextCount);
+		DebugLevel0Fn("NextCount = %d\n",unit->NextCount);
 	    }
 	    unit->NextCount=0;
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
-	    DebugLevel0(__FUNCTION__": Frame %d\n",unit->Frame);
+	    DebugLevel0Fn("Frame %d\n",unit->Frame);
 
 	    return;
 	}
@@ -2579,12 +2605,6 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
 */
 global int MapDistanceToUnit(int x,int y,const Unit* dest)
 {
-    IfDebug(
-	if( !dest ) {			// FIXME: should be handled by caller
-	    DebugLevel0(__FUNCTION__": NULL pointer\n");
-	    return InfiniteDistance;
-	}
-    );
     return MapDistanceToType(x,y,dest->Type,dest->X,dest->Y);
 }
 
