@@ -651,12 +651,6 @@ global void LoadFonts(void)
 {
     unsigned i;
 
-    for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
-	ShowLoadProgress("\tFonts %s\n",Fonts[i].File);
-	Fonts[i].Graphic=LoadGraphic(Fonts[i].File);
-	FontMeasureWidths(Fonts+i);
-    }
-
     switch( VideoBpp ) {
 	case 8:
 	    VideoDrawChar=VideoDrawChar8;
@@ -678,6 +672,12 @@ global void LoadFonts(void)
 	default:
 	    DebugLevel0Fn("unsupported %d bpp\n",VideoBpp);
 	    abort();
+    }
+
+    for( i=0; i<sizeof(Fonts)/sizeof(*Fonts); ++i ) {
+	ShowLoadProgress("\tFonts %s\n",Fonts[i].File);
+	Fonts[i].Graphic=LoadGraphic(Fonts[i].File);
+	FontMeasureWidths(Fonts+i);
     }
 }
 
@@ -780,6 +780,18 @@ global void CleanFonts(void)
 	Fonts[i].Graphic=NULL;
     }
 
+}
+
+/**
+**	Check if font is already loaded.
+**
+**	@param font	Font number
+**
+**	@return		True if loaded, false otherwise.
+*/
+global int IsFontLoaded(unsigned font)
+{
+    return Fonts[font].Graphic!=0;
 }
 
 //@}
