@@ -669,7 +669,7 @@ int SavePNG(const char* name,unsigned char* image,int w,int h)
 */
 void ConvertFile(const char* file)
 {
-    int i;
+    unsigned i;
     int f;
     struct stat stat_buf;
     unsigned char* buf;
