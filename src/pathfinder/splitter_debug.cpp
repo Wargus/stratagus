@@ -201,8 +201,6 @@ global void MapSplitterDebug(void)
 		}
 	}
 
-	DebugLevel2Fn("Total assigned tiles : %d\n" _C_ total);
-
 	total = 0;
 	for (i = 0; i < RegionMax; i++) {
 		seg = Regions[i].FirstSegment;
@@ -219,8 +217,6 @@ global void MapSplitterDebug(void)
 			}
 		}
 	}
-
-	DebugLevel2Fn("Total segment defined tiles : %d\n" _C_ total);
 }
 
 /**
@@ -258,12 +254,12 @@ local void RegionDebugConnexion(RegionId reg)
 	int Connections[MaxRegionNumber];
 	int ConnectionsCount[MaxRegionNumber];
 	int ConnectionNb;
-	RegionDefinition * adef;
+//	RegionDefinition * adef;
 
 	int tx,ty;
 	int x,y;
 	int i,j;
-	int found;
+//	int found;
 
 	seg = Regions[reg].FirstSegment;
 	ConnectionNb = 0;
@@ -301,23 +297,14 @@ local void RegionDebugConnexion(RegionId reg)
 
 		seg = seg->Next;
 	}
-
+/*
 	adef = Regions + reg;
 	// OK, compare to existing stats
 	for (i = 0; i < ConnectionNb; i++) {
 		found = 0;
 		for (j = 0; j < adef->ConnectionsNumber; j++) {
 			if (Connections[i] == adef->Connections[j]) {
-
-				if (found) {
-					DebugLevel2Fn("Region %d : Connection number to %d is given twice\n" _C_ reg _C_ Connections[i]);
-				}
-
 				found = 1;
-				if (ConnectionsCount[i] != adef->ConnectionsCount[j]) {
-					DebugLevel2Fn("Region %d : Connection number to %d is wrong ( %d instead of %d )\n"
-							_C_ reg _C_ Connections[i] _C_ adef->ConnectionsCount[j] _C_ ConnectionsCount[j]);
-				}
 			}
 		}
 		if (!found) {
@@ -336,6 +323,7 @@ local void RegionDebugConnexion(RegionId reg)
 			DebugLevel2Fn("Region %d : Connection to %d does not exists\n" _C_ reg _C_ Connections[i]);
 		}
 	}
+*/
 }
 
 /**

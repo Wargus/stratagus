@@ -398,7 +398,6 @@ global int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen)
 		}
 		curdst++;
 		if (!shouldcontinue) {
-			DebugLevel3Fn("No path between zones.\n");
 			return 0;
 		}
 	}

@@ -591,7 +591,7 @@ local void UiFindIdleWorker(void)
 */
 local void UiToggleGrabMouse(void)
 {
-	DebugLevel0Fn("%x\n" _C_ KeyModifiers);
+	DebugPrint("%x\n" _C_ KeyModifiers);
 	ToggleGrabMouse(0);
 	SetStatusLine("Grab mouse toggled.");
 }
@@ -902,7 +902,6 @@ local int CommandKey(int key)
 			break;
 
 		default:
-			DebugLevel3("Key %d\n" _C_ key);
 			return 0;
 	}
 	return 1;
@@ -937,7 +936,7 @@ global int HandleCheats(const char* input)
 	lua_pushstring(Lua, "HandleCheats");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	if (!lua_isfunction(Lua, -1)) {
-		DebugLevel0Fn("No HandleCheats function in lua.\n");
+		DebugPrint("No HandleCheats function in lua.\n");
 		return 0;
 	}
 	lua_pushstring(Lua, input);
@@ -1027,7 +1026,6 @@ local int InputKey(int key)
 			ClearStatusLine();
 			return 1;
 		case '\b':
-			DebugLevel3("Key <-\n");
 			if (InputIndex) {
 				if (Input[InputIndex - 1] == '~') {
 					Input[--InputIndex] = '\0';
@@ -1065,7 +1063,6 @@ local int InputKey(int key)
 			if (key >= ' ' && key <= 256) {
 				if ((key == '~' && InputIndex < (int)sizeof(Input) - 2) ||
 						InputIndex < (int)sizeof(Input) - 1) {
-					DebugLevel3("Key %c\n" _C_ key);
 					Input[InputIndex++] = key;
 					Input[InputIndex] = '\0';
 					if (key == '~') {

@@ -131,18 +131,14 @@ local int CclMakeSound(lua_State* l)
 		// only one file
 		c_file = LuaToString(l, 2);
 		id = MakeSound(c_name, &c_file, 1);
-		DebugLevel3("Making sound `%s' from `%s' with id %p\n" _C_ c_name _C_
-			c_file _C_ id);
 	} else if (lua_istable(l, 2)) {
 		// several files
-		DebugLevel3("Making sound `%s'\n" _C_ c_name);
 		args = luaL_getn(l, 2);
 		c_files = malloc(args * sizeof(char*));
 		for (j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
 			c_files[j] = strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
-			DebugLevel3("\tComponent %d: `%s'\n" _C_ i _C_ c_files[j]);
 		}
 		// FIXME: check size before casting
 		id = MakeSound(c_name, (const char**)c_files, (unsigned char)args);
@@ -663,7 +659,6 @@ local int CclSetSoundRange(lua_State* l) {
 	} else {
 		theRange = (unsigned char)tmp;
 	}
-	DebugLevel3("Range: %u (%d)\n" _C_ TheRange _C_ tmp);
 	lua_pushvalue(l, 1);
 	id = CclGetSoundId(l);
 	SetSoundRange(id, theRange);

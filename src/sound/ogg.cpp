@@ -278,8 +278,6 @@ global Sample* LoadOgg(const char* name,int flags)
 		return NULL;
 	}
 
-	DebugLevel2Fn("Loading ogg file: %s\n" _C_ name);
-
 	data = malloc(sizeof(OggData));
 
 	CLseek(f, 0, SEEK_SET);
@@ -373,12 +371,8 @@ local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 	size_t length;
 	unsigned char* frame;
 
-	DebugLevel3Fn("%p: %p %d*%d\n" _C_ user _C_ ptr _C_ size _C_ nmemb);
-
 	avi = user;
 	if (avi->AudioRemain) {				// Bytes remaining
-		DebugLevel3Fn("Remain %d %d\n" _C_ avi->AudioRemain _C_
-				avi->AudioBuffer->Length - avi->AudioRemain);
 		length = avi->AudioRemain;
 		if (length > nmemb * size) {
 			length = nmemb * size;
@@ -391,7 +385,6 @@ local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 	}
 
 	length = AviReadNextAudioFrame(avi, &frame);
-	DebugLevel3Fn("Bytes %d - %d\n" _C_ length _C_ avi->AudioBuffer->Length);
 	if ((int)length < 0) {
 		return 0;
 	}

@@ -69,8 +69,6 @@ global void HandleActionDie(Unit* unit)
 	// Die sequence terminated, generate corpse.
 	//
 	if (unit->Reset) {
-		DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
-
 		if (!unit->Type->CorpseType) {
 			// Unmark corpse sight, if it has any
 			MapUnmarkUnitSight(unit);
@@ -94,7 +92,7 @@ global void HandleActionDie(Unit* unit)
 		CommandStopUnit(unit);			// This clears all order queues
 #ifdef DEBUG
 		if (unit->Orders[0].Action != UnitActionDie) {
-			DebugLevel0Fn("Reset to die is really needed\n");
+			DebugPrint("Reset to die is really needed\n");
 		}
 #endif
 		unit->Orders[0].Action = UnitActionDie;

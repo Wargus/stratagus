@@ -254,7 +254,7 @@ global void SetClipping(int left, int top, int right, int bottom)
 	if (left > right || top > bottom || left < 0 || left >= VideoWidth ||
 			top < 0 || top >= VideoHeight || right < 0 ||
 			right >= VideoWidth || bottom < 0 || bottom >= VideoHeight) {
-		DebugLevel0Fn("Wrong clipping %d->%d %d->%d, write cleaner code.\n" _C_
+		DebugPrint("Wrong clipping %d->%d %d->%d, write cleaner code.\n" _C_
 			left _C_ right _C_ top _C_ bottom);
 //		Assert(0);
 	}

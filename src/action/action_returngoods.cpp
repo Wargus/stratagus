@@ -69,21 +69,18 @@ global void HandleActionReturnGoods(Unit* unit)
 	//
 	Assert(type->Harvester );
 	if ((!unit->CurrentResource) && (!unit->Value)) {
-		DebugLevel0("Unit can't return resources, it doesn't carry any.\n");
+		DebugPrint("Unit can't return resources, it doesn't carry any.\n");
 	}
 	if (!unit->Orders[0].Goal) {
 		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
 				unit->CurrentResource))) {
-			DebugLevel3Fn("No deposit -> can't return\n");
 			unit->Orders[0].Action = UnitActionStill;
 			return;
 		}
 		unit->Orders[0].Goal = destu;
 		RefsIncrease(destu);
 	}
-	DebugLevel3("Return to %d=%d,%d\n" _C_
-		UnitNumber(unit->Orders[0].Goal) _C_
-		unit->Orders[0].X _C_ unit->Orders[0].Y);
+
 	unit->Orders[0].Action = UnitActionResource;
 	// Somewhere on the way the loaded worker could have change Arg1
 	// Bummer, go get the closest resource to the depot

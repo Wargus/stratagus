@@ -227,7 +227,7 @@ global int PlayMusic(const char* name)
 	if ((sample = LoadOgg(name, PlayAudioStream))) {
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
-			DebugLevel0Fn("Not supported music format\n");
+			DebugPrint("Not supported music format\n");
 			SoundFree(sample);
 			return 0;
 		}
@@ -241,7 +241,7 @@ global int PlayMusic(const char* name)
 	if ((sample = LoadMp3(name, PlayAudioStream))) {
 //		if (sample->Channels != 2 || sample->SampleSize != 16
 //			|| sample->Frequency != SoundFrequency) {
-//			DebugLevel0Fn("Not supported music format\n");
+//			DebugPrint("Not supported music format\n");
 //			SoundFree(sample);
 //			return;
 //		}
@@ -256,7 +256,7 @@ global int PlayMusic(const char* name)
 /*
 		if (sample->Channels != 2 || sample->SampleSize != 16
 			|| sample->Frequency != SoundFrequency) {
-			DebugLevel0Fn("Not supported music format\n");
+			DebugPrint("Not supported music format\n");
 			SoundFree(sample);
 			return;
 		}

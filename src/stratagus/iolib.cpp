@@ -143,7 +143,7 @@ global CLFile* CLopen(const char* fn, long openflags)
 	} else if (openflags & CL_OPEN_WRITE) {
 		strcpy(openstring,"wb");
 	} else {
-		DebugLevel0("Bad CLopen flags");
+		DebugPrint("Bad CLopen flags");
 		Assert(0);
 		return NULL;
 	}
@@ -339,7 +339,7 @@ global int CLprintf(CLFile* file, char* format, ...)
 		if (n > -1) { /* glibc 2.1 */
 			size = n + 1; /* precisely what is needed */
 		} else {		   /* glibc 2.0 */
-			DebugLevel0Fn("Something could be wrong in CLprintf.\n");
+			DebugPrint("Something could be wrong in CLprintf.\n");
 			size *= 2;  /* twice the old size */
 		}
 		if ((p = realloc(p, size)) == NULL) {
@@ -480,7 +480,6 @@ global char* LibraryFileName(const char* file, char* buffer)
 	//		Try in map directory
 	//
 	if (*CurrentMapPath) {
-		DebugLevel3Fn("Map   path: %s\n" _C_ CurrentMapPath);
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
 			strcpy(buffer, CurrentMapPath);
 			if ((s = strrchr(buffer, '/'))) {
@@ -581,7 +580,7 @@ global char* LibraryFileName(const char* file, char* buffer)
 		return buffer;
 	}
 #endif
-	DebugLevel0Fn("File `%s' not found\n" _C_ file);
+	DebugPrint("File `%s' not found\n" _C_ file);
 
 	strcpy(buffer, file);
 	return buffer;

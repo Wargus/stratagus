@@ -411,7 +411,7 @@ local int CclDefineCampaign(lua_State* l)
 					ParseShowPicture(l, chapter);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "play-movie")) {
-					DebugLevel0Fn("FIXME: not supported\n");
+					DebugPrint("FIXME: not supported\n");
 				} else if (!strcmp(value, "play-level")) {
 					chapter->Type = ChapterPlayLevel;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -623,7 +623,7 @@ global void CleanCampaign(void)
 	int i;
 
 	// FIXME: Can't clean campaign needed for continue.
-	DebugLevel0Fn("FIXME: Cleaning campaign not written\n");
+	DebugPrint("FIXME: Cleaning campaign not written\n");
 
 	if (GameIntro.Title) {
 		free(GameIntro.Title);

@@ -227,7 +227,7 @@ global void MapMarkTileSight(const Player* player, int x, int y)
 			}
 			return;
 		case 255:  // Overflow
-			DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ player->Player);
+			DebugPrint("Visible overflow (Player): %d\n" _C_ player->Player);
 			break;
 		default:  // seen -> seen
 			++v;
@@ -340,7 +340,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
 
 	// Mark as seen
 	if (!range) {
-		DebugLevel0Fn("Zero sight range\n");
+		DebugPrint("Zero sight range\n");
 		return;
 	}
 
@@ -429,7 +429,7 @@ global void UpdateFogOfWarChange(void)
 	int y;
 	int w;
 
-	DebugLevel0Fn("\n");
+	DebugPrint("\n");
 	//
 	//  Mark all explored fields as visible again.
 	//

@@ -1028,8 +1028,6 @@ global void EditorUpdateDisplay(void)
 */
 local void EditorCallbackButtonUp(unsigned button)
 {
-	DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
-
 	if (GameCursor == TheUI.Scroll.Cursor) {
 		// Move map.
 		GameCursor = TheUI.Point.Cursor; // Reset
@@ -1054,8 +1052,6 @@ local void EditorCallbackButtonUp(unsigned button)
 */
 local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 {
-	DebugLevel3Fn("%x %x\n" _C_ button _C_ MouseButtons);
-
 	//
 	// Click on menu button
 	//
@@ -1287,7 +1283,6 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 			GameCursor = TheUI.Scroll.Cursor;
-			DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
 		}
 	}
 }
@@ -1339,7 +1334,6 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case 'r':
 		case 'R': // CTRL+R Randomize map
 			if (KeyModifiers & ModifierControl) {
-				DebugLevel3Fn("Randomizing map...\n");
   				EditorCreateRandomMap();
 			}
 			break;
@@ -1408,7 +1402,6 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 
 		default:
-			DebugLevel3("Key %d\n" _C_ key);
 			return;
 	}
 	return;
@@ -1454,8 +1447,6 @@ local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 local void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
-	DebugLevel3Fn("Repeated %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_
-		dummy2);
 }
 
 /**
@@ -1473,8 +1464,6 @@ local void EditorCallbackMouse(int x, int y)
 	static int LastMapY;
 	enum _cursor_on_ OldCursorOn;
 	char buf[256];
-
-	DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
 	HandleCursorMove(&x, &y); // Reduce to screen
 
@@ -1792,7 +1781,7 @@ local void EditorCallbackMouse(int x, int y)
 		Assert(vp);
 		if (TheUI.MouseViewport != vp) { // viewport changed
 			TheUI.MouseViewport = vp;
-			DebugLevel0Fn("active viewport changed to %d.\n" _C_
+			DebugPrint("active viewport changed to %d.\n" _C_
 				TheUI.Viewports - vp);
 		}
 		CursorOn = CursorOnMap;
@@ -1828,7 +1817,6 @@ local void EditorCallbackMouse(int x, int y)
 */
 local void EditorCallbackExit(void)
 {
-	DebugLevel3Fn("Exit\n");
 }
 
 /**
@@ -1936,7 +1924,7 @@ local void CreateEditor(void)
 			}
 #endif
 		} else if (Players[i].StartX | Players[i].StartY) {
-			DebugLevel0Fn("Player nobody has a start position\n");
+			DebugPrint("Player nobody has a start position\n");
 		}
 	}
 

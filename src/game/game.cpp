@@ -90,8 +90,6 @@ local int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 local void LoadStratagusMap(const char* filename,
 	WorldMap* map __attribute__((unused)))
 {
-	DebugLevel3Fn("%p \n" _C_ map);
-
 	if (LcmPreventRecurse) {
 		fprintf(stderr,"recursive use of load Stratagus map!\n");
 		ExitFatal(-1);
@@ -343,7 +341,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	InitSyncRand();
 
 	if (IsNetworkGame()) { // Prepare network play
-		DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
+		DebugPrint("Client setup: Calling InitNetwork2\n");
 		InitNetwork2();
 	} else {
 		if (LocalPlayerName && strcmp(LocalPlayerName, "Anonymous")) {

@@ -251,7 +251,7 @@ global int NetSocketAddr(const Socket sock)
 		wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
 			sizeof(localAddr), &bytesReturned, NULL, NULL);
 		if (wsError == SOCKET_ERROR) {
-			DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_
+			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_
 				WSAGetLastError());
 		}
 
@@ -298,7 +298,7 @@ global int NetSocketAddr(const Socket sock)
 		ifc.ifc_len = sizeof(buf);
 		ifc.ifc_buf = buf;
 		if (ioctl(sock, SIOCGIFCONF, (char*)&ifc) < 0) {
-			DebugLevel0Fn("SIOCGIFCONF - errno %d\n" _C_ errno);
+			DebugPrint("SIOCGIFCONF - errno %d\n" _C_ errno);
 			return 0;
 		}
 		// with some inspiration from routed..
@@ -309,7 +309,7 @@ global int NetSocketAddr(const Socket sock)
 			ifr = (struct ifreq*)cp;
 			ifreq = *ifr;
 			if (ioctl(sock, SIOCGIFFLAGS, (char*)&ifreq) < 0) {
-				DebugLevel0Fn("%s: SIOCGIFFLAGS - errno %d\n" _C_
+				DebugPrint("%s: SIOCGIFFLAGS - errno %d\n" _C_
 					ifr->ifr_name _C_ errno);
 				continue;
 			}
@@ -329,7 +329,7 @@ global int NetSocketAddr(const Socket sock)
 			NetLocalAddrs[nif] = sap->sin_addr.s_addr;
 			if (ifreq.ifr_flags & IFF_POINTOPOINT) {
 				if (ioctl(sock, SIOCGIFDSTADDR, (char*)&ifreq) < 0) {
-					DebugLevel0Fn("%s: SIOCGIFDSTADDR - errno %d\n" _C_
+					DebugPrint("%s: SIOCGIFDSTADDR - errno %d\n" _C_
 						ifr->ifr_name _C_ errno);
 					// failed to obtain dst addr - ignore
 					continue;
@@ -350,8 +350,6 @@ global int NetSocketAddr(const Socket sock)
 					continue;
 				}
 			}
-			DebugLevel3Fn("FOUND INTERFACE %s: %d.%d.%d.%d\n" _C_
-				ifr->ifr_name _C_ NIPQUAD(ntohl(NetLocalAddrs[nif])));
 			++nif;
 			if (nif == MAX_LOC_IP) {
 				break;
@@ -383,7 +381,6 @@ global Socket NetOpenUDP(int port)
 
 	// open the socket
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	DebugLevel3Fn(" socket %d\n" _C_ sockfd);
 	if (sockfd == INVALID_SOCKET) {
 		return -1;
 	}
@@ -401,7 +398,6 @@ global Socket NetOpenUDP(int port)
 			NetCloseUDP(sockfd);
 			return -1;
 		}
-		DebugLevel3Fn(" bind ok\n");
 		NetLastHost = sock_addr.sin_addr.s_addr;
 		NetLastPort = sock_addr.sin_port;
 	}
@@ -420,7 +416,6 @@ global Socket NetOpenTCP(int port)
 	Socket sockfd;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	DebugLevel3Fn(" socket %d\n" _C_ sockfd);
 	if (sockfd == INVALID_SOCKET) {
 		return (Socket)-1;
 	}
@@ -442,7 +437,6 @@ global Socket NetOpenTCP(int port)
 			NetCloseTCP(sockfd);
 			return (Socket)-1;
 		}
-		DebugLevel3Fn(" bind ok\n");
 		NetLastHost = sock_addr.sin_addr.s_addr;
 		NetLastPort = sock_addr.sin_port;
 	}
@@ -551,8 +545,6 @@ global int NetRecvUDP(Socket sockfd, void* buf, int len)
 
 	NetLastHost = sock_addr.sin_addr.s_addr;
 	NetLastPort = sock_addr.sin_port;
-	DebugLevel3Fn(" %d.%d.%d.%d:%d\n" _C_
-		NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
 
 	return l;
 }

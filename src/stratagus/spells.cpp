@@ -153,7 +153,6 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 	if (action->Data.Demolish.Damage) {
 		n = UnitCacheSelect(xmin, ymin, xmax, ymax, table);
 		for (i = 0; i < n; ++i) {
-			DebugLevel3("Hit an unit at %d %d?\n" _C_ table[i]->X _C_ table[i]->Y);
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP &&
 					MapDistanceToUnit(x, y, table[i]) <= action->Data.Demolish.Range) {
 				// Don't hit flying units!
@@ -204,7 +203,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 
 	ptype = action->Data.SpawnPortal.PortalType;
 
-	DebugLevel0Fn("Spawning a portal exit.\n");
+	DebugPrint("Spawning a portal exit.\n");
 	portal = caster->Goal;
 	if (portal) {
 		// FIXME: if cop is already defined --> move it, but it doesn't work?
@@ -508,9 +507,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 		castcount = min(castcount, action->Data.AdjustVitals.MaxMultiCast);
 	}
 
-	DebugLevel3Fn("Used to have %d hp and %d mana.\n" _C_
-		target->HP _C_ target->Mana);
-
 	caster->Mana -= castcount * manacost;
 	if (hp < 0) {
 		HitUnit(caster, target, -(castcount * hp));
@@ -528,8 +524,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 		target->Mana = target->Type->_MaxMana;
 	}
 
-	DebugLevel3Fn("Unit now has %d hp and %d mana.\n" _C_
-		target->HP _C_ target->Mana);
 	return 0;
 }
 
@@ -642,7 +636,7 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 	}
 
 	if (cansummon) {
-		DebugLevel0("Summoning a %s\n" _C_ unittype->Name);
+		DebugPrint("Summoning a %s\n" _C_ unittype->Name);
 
 		//
 		//		Create units.
@@ -661,7 +655,7 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 		//		Revealers are always removed, since they don't have graphics
 		//
 		if (target->Type->Revealer) {
-			DebugLevel0Fn("summoned unit is a revealer, removed.\n");
+			DebugPrint("summoned unit is a revealer, removed.\n");
 			target->Removed = 1;
 			target->CurrentSightRange = target->Stats->SightRange;
 			MapMarkUnitSight(target);
@@ -852,10 +846,8 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 
 	// Ai cast should be a lot better. Use autocast if not found.
 	if (caster->Player->AiEnabled && spell->AICast) {
-		DebugLevel3Fn("The borg uses AI autocast XP.\n");
 		autocast = spell->AICast;
 	} else {
-		DebugLevel3Fn("You puny mortal, join the colective!\n");
 		autocast = spell->AutoCast;
 	}
 	Assert(autocast);
@@ -938,7 +930,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 			break;
 		default:
 			// Something is wrong
-			DebugLevel0Fn("Spell is screwed up, unknown target type\n");
+			DebugPrint("Spell is screwed up, unknown target type\n");
 			Assert(0);
 			return NULL;
 			break;
@@ -1094,7 +1086,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 		y = caster->Y;
 		target = caster;
 	}
-	DebugLevel0Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
+	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
 		caster->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
 	if (CanCastSpell(caster, spell, target, x, y)) {
 		act = spell->Action;
@@ -1143,7 +1135,7 @@ void CleanSpells(void)
 	SpellActionType *act;
 	SpellActionType *nextact;
 
-	DebugLevel0("Cleaning spells.\n");
+	DebugPrint("Cleaning spells.\n");
 	for (i = 0; i < SpellTypeCount; ++i) {
 		spell = SpellTypeTable[i];
 		free(spell->Ident);

@@ -325,7 +325,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 		if (*text == '~') {
 			switch (*++text) {
 				case '\0':  // wrong formated string.
-					DebugLevel0Fn("oops, format your ~\n");
+					DebugPrint("oops, format your ~\n");
 					return widths;
 				case '~':
 					break;
@@ -351,7 +351,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 						++p;
 					}
 					if (!*p) {
-						DebugLevel0Fn("oops, format your ~\n");
+						DebugPrint("oops, format your ~\n");
 						return widths;
 					}
 					color = malloc(p - text + 1);

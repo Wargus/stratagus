@@ -346,7 +346,7 @@ global void SavePlayers(CLFile* file)
 		CLprintf(file, "})\n\n");
 	}
 
-	DebugLevel0Fn("FIXME: must save unit-stats?\n");
+	DebugPrint("FIXME: must save unit-stats?\n");
 
 	//
 	//  Dump local variables
@@ -365,8 +365,6 @@ global void CreatePlayer(int type)
 	int i;
 	Player* player;
 
-	DebugLevel3("Player %d, type %d\n" _C_ NumPlayers _C_ type);
-
 	if (NumPlayers == PlayerMax) {		// already done for bigmaps!
 		return;
 	}
@@ -378,7 +376,7 @@ global void CreatePlayer(int type)
 	//  FIXME: ARI: is this needed for 'PlayerNobody' ??
 	//  FIXME: A: Johns: currently we need no init for the nobody player.
 	if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
-		DebugLevel0("Not enough memory to create player %d.\n" _C_ NumPlayers);
+		DebugPrint("Not enough memory to create player %d.\n" _C_ NumPlayers);
 		return;
 	}
 
@@ -401,7 +399,7 @@ global void CreatePlayer(int type)
 		static int already_warned;
 
 		if (!already_warned) {
-			DebugLevel0("Too many players\n");
+			DebugPrint("Too many players\n");
 			already_warned = 1;
 		}
 		return;
@@ -652,10 +650,6 @@ global int PlayerCheckCosts(const Player* player, const int* costs)
 			NotifyPlayer(player, NotifyYellow, 0, 0, "Not enough %s...%s more %s.",
 				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
 
-			if (player->AiEnabled) {
-				DebugLevel3("Ai: Not enough %s...%s more %s." _C_
-					DefaultResourceNames[i] _C_ DefaultActions[i] _C_ DefaultResourceNames[i]);
-			}
 			err |= 1 << i;
 		}
 	}
@@ -715,7 +709,6 @@ global void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 	int i;
 
 	for (i = 1; i < MaxCosts; ++i) {
-		DebugLevel3("%d %d\n" _C_ i _C_ costs[i] * factor / 100);
 		player->Resources[i] += costs[i] * factor / 100;
 	}
 }
@@ -896,37 +889,37 @@ global void DebugPlayers(void)
 		"yellow"
 	};
 
-	DebugLevel0("Nr   Color   I Name	 Type		 Race	Ai\n");
-	DebugLevel0("--  -------- - -------- ------------ ------- -- ---\n");
+	DebugPrint("Nr   Color   I Name	 Type		 Race	Ai\n");
+	DebugPrint("--  -------- - -------- ------------ ------- -- ---\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (Players[i].Type == PlayerNobody) {
 			continue;
 		}
-		DebugLevel0("%2d: %8.8s %c %-8.8s " _C_ i _C_ colors[i] _C_
+		DebugPrint("%2d: %8.8s %c %-8.8s " _C_ i _C_ colors[i] _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name);
 		switch (Players[i].Type) {
-			case 0: DebugLevel0("Don't know 0 ");		break;
-			case 1: DebugLevel0("Don't know 1 ");		break;
-			case 2: DebugLevel0("neutral	  ");		break;
-			case 3: DebugLevel0("nobody	   ");		break;
-			case 4: DebugLevel0("computer	 ");		break;
-			case 5: DebugLevel0("person	   ");		break;
-			case 6: DebugLevel0("rescue pas.  ");		break;
-			case 7: DebugLevel0("rescue akt.  ");		break;
+			case 0: DebugPrint("Don't know 0 ");		break;
+			case 1: DebugPrint("Don't know 1 ");		break;
+			case 2: DebugPrint("neutral	  ");		break;
+			case 3: DebugPrint("nobody	   ");		break;
+			case 4: DebugPrint("computer	 ");		break;
+			case 5: DebugPrint("person	   ");		break;
+			case 6: DebugPrint("rescue pas.  ");		break;
+			case 7: DebugPrint("rescue akt.  ");		break;
 		}
 		k = PlayerRacesIndex(Players[i].Race);
-		DebugLevel0("%9s" _C_ PlayerRaces.Name[k]);
-		DebugLevel0("%2d " _C_ Players[i].AiNum);
+		DebugPrint("%9s" _C_ PlayerRaces.Name[k]);
+		DebugPrint("%2d " _C_ Players[i].AiNum);
 		switch (Players[i].AiNum) {
-			case PlayerAiLand:		  DebugLevel0("(land)");		break;
-			case PlayerAiPassive: DebugLevel0("(passive)");		break;
-			case PlayerAiAir:		  DebugLevel0("(air)");				break;
-			case PlayerAiSea:		  DebugLevel0("(sea)");				break;
-			default:				  DebugLevel0("?unknown?");		break;
+			case PlayerAiLand: DebugPrint("(land)"); break;
+			case PlayerAiPassive: DebugPrint("(passive)"); break;
+			case PlayerAiAir: DebugPrint("(air)"); break;
+			case PlayerAiSea: DebugPrint("(sea)"); break;
+			default: DebugPrint("?unknown?"); break;
 		}
-		DebugLevel0("\n");
+		DebugPrint("\n");
 	}
 #endif
 }

@@ -129,25 +129,21 @@ local int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 	int remaining;
 	const AiBuildQueue* queue;
 
-	DebugLevel3Fn(" for player %d\n" _C_ pai->Player->Player);
 	//
 	// Count food supplies under construction.
 	//
 	remaining = 0;
 	for (queue = pai->UnitTypeBuilded; queue; queue = queue->Next) {
 		if (queue->Type->Supply) {
-			DebugLevel3Fn("Builded %d remain %d\n" _C_ queue->Made _C_ remaining);
 			remaining += queue->Made * queue->Type->Supply;
 		}
 	}
-	DebugLevel3Fn("Remain %d" _C_ remaining);
+
 	//
 	// We are already out of food.
 	//
 	remaining += pai->Player->Supply - pai->Player->Demand - type->Demand;
-	DebugLevel3Fn("-Demand %d\n" _C_ remaining);
 	if (remaining < 0) {
-		DebugLevel3Fn(" player %d needs more food\n" _C_ pai->Player->Player);
 		return 0;
 	}
 	//
@@ -155,9 +151,7 @@ local int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 	//
 	for (queue = pai->UnitTypeBuilded; queue; queue = queue->Next) {
 		if (!queue->Type->Building) {
-			DebugLevel3Fn("Trained %d remain %d\n" _C_ queue->Made _C_ remaining);
 			if ((remaining -= queue->Made * queue->Type->Demand) < 0) {
-				DebugLevel3Fn(" player %d needs more food\n" _C_ pai->Player->Player);
 				return 0;
 			}
 		}
@@ -198,8 +192,6 @@ global int EnemyUnitsInDistance(const Unit* unit, unsigned range)
 	unsigned i;
 	int e;
 	const Player* player;
-
-	DebugLevel3Fn("(%d)%s\n" _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
 	//
 	// Select all units in range.
@@ -258,8 +250,6 @@ local int AiBuildBuilding(const UnitType* type, UnitType* building)
 	int x;
 	int y;
 
-	DebugLevel3Fn("%s can made %s\n" _C_ type->Ident _C_ building->Ident);
-
 #ifdef DEBUG
 	unit = NoUnitP;
 #endif
@@ -283,7 +273,6 @@ local int AiBuildBuilding(const UnitType* type, UnitType* building)
 	for (i = 0; i < num; ++i) {
 
 		unit = table[i];
-		DebugLevel3Fn("Have an unit to build %d :)\n" _C_ UnitNumber(unit));
 
 		//
 		// Find place on that could be build.
@@ -291,8 +280,6 @@ local int AiBuildBuilding(const UnitType* type, UnitType* building)
 		if (!AiFindBuildingPlace(unit, building, &x, &y)) {
 			continue;
 		}
-
-		DebugLevel3Fn("Have a building place %d,%d for %s:)\n" _C_ x _C_ y _C_ building->Name);
 
 		CommandBuildBuilding(unit, x, y, building, FlushCommands);
 
@@ -334,16 +321,13 @@ local void AiRequestSupply(void)
 			return;
 		}
 
-		DebugLevel3Fn("Must build: %s\n" _C_ type->Ident);
 		//
 		// Check if resources available.
 		//
 		if ((c = AiCheckUnitTypeCosts(type))) {
-			DebugLevel3("- no resources\n");
 			AiPlayer->NeededMask |= c;
 			return;
 		} else {
-			DebugLevel3("- enough resources\n");
 			if (AiMakeUnit(type)) {
 				queue = malloc(sizeof (*AiPlayer->UnitTypeBuilded));
 				queue->Next = AiPlayer->UnitTypeBuilded;
@@ -374,8 +358,6 @@ local int AiTrainUnit(const UnitType* type, UnitType* what)
 	int i;
 	int num;
 
-	DebugLevel3Fn("%s can made %s\n" _C_ type->Ident _C_ what->Ident);
-
 #ifdef DEBUG
 	unit = NoUnitP;
 #endif
@@ -392,9 +374,7 @@ local int AiTrainUnit(const UnitType* type, UnitType* what)
 	}
 
 	for (i = 0; i < num; ++i) {
-
 		unit = table[i];
-		DebugLevel3Fn("Have an unit to train %d :)\n" _C_ UnitNumber(unit));
 
 		CommandTrainUnit(unit, what, FlushCommands);
 
@@ -419,7 +399,7 @@ global int AiCountUnitBuilders(UnitType* type)
 	const AiUnitTypeTable* table;
 
 	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0) {
-		DebugLevel0Fn("Can't build `%s' now\n" _C_ type->Ident);
+		DebugPrint("Can't build `%s' now\n" _C_ type->Ident);
 		return 0;
 	}
 	//
@@ -433,12 +413,12 @@ global int AiCountUnitBuilders(UnitType* type)
 		tablep = AiHelpers.Train;
 	}
 	if (type->Slot > n) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
 	table = tablep[type->Slot];
 	if (!table) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
 	n = table->Count;
@@ -475,8 +455,6 @@ local int AiMakeUnit(UnitType* type)
 	int usableTypesCount;
 	int currentType;
 
-	DebugLevel3Fn(":%s\n" _C_ type->Name);
-
 	// Find equivalents unittypes.
 	usableTypesCount = AiFindAvailableUnitTypeEquiv(type, usableTypes);
 
@@ -496,12 +474,12 @@ local int AiMakeUnit(UnitType* type)
 			tablep = AiHelpers.Train;
 		}
 		if (type->Slot > n) { // Oops not known.
-			DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 			continue;
 		}
 		table = tablep[type->Slot];
 		if (!table) { // Oops not known.
-			DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+			DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 			continue;
 		}
 		n = table->Count;
@@ -512,7 +490,6 @@ local int AiMakeUnit(UnitType* type)
 			// The type for builder/trainer is available
 			//
 			if (unit_count[table->Table[i]->Slot]) {
-				DebugLevel3("Found a builder for a %s.\n" _C_ type->ident);
 				if (type->Building) {
 					if (AiBuildBuilding(table->Table[i], type)) {
 						return 1;
@@ -546,8 +523,6 @@ local int AiResearchUpgrade(const UnitType* type, Upgrade* what)
 	int i;
 	int num;
 
-	DebugLevel3Fn("%s can research %s\n" _C_ type->Ident _C_ what->Ident);
-
 #ifdef DEBUG
 	unit = NoUnitP;
 #endif
@@ -562,9 +537,7 @@ local int AiResearchUpgrade(const UnitType* type, Upgrade* what)
 	}
 
 	for (i = 0; i < num; ++i) {
-
 		unit = table[i];
-		DebugLevel3Fn("Have an unit to research %d :)\n" _C_ UnitNumber(unit));
 
 		CommandResearch(unit, what, FlushCommands);
 
@@ -601,12 +574,12 @@ global void AiAddResearchRequest(Upgrade* upgrade)
 	tablep = AiHelpers.Research;
 
 	if (upgrade - Upgrades > n) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ upgrade->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
 		return;
 	}
 	table = tablep[upgrade - Upgrades];
 	if (!table) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ upgrade->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
 		return;
 	}
 	n = table->Count;
@@ -644,8 +617,6 @@ local int AiUpgradeTo(const UnitType* type, UnitType* what)
 	int i;
 	int num;
 
-	DebugLevel3Fn("%s can upgrade-to %s\n" _C_ type->Ident _C_ what->Ident);
-
 #ifdef DEBUG
 	unit = NoUnitP;
 #endif
@@ -660,9 +631,7 @@ local int AiUpgradeTo(const UnitType* type, UnitType* what)
 	}
 
 	for (i = 0; i < num; ++i) {
-
 		unit = table[i];
-		DebugLevel3Fn("Have an unit to upgrade-to %d :)\n" _C_ UnitNumber(unit));
 
 		CommandUpgradeTo(unit, what, FlushCommands);
 
@@ -699,12 +668,12 @@ global void AiAddUpgradeToRequest(UnitType* type)
 	tablep = AiHelpers.Upgrade;
 
 	if (type->Slot > n) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return;
 	}
 	table = tablep[type->Slot];
 	if (!table) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return;
 	}
 	n = table->Count;
@@ -733,13 +702,8 @@ local void AiCheckingWork(void)
 	UnitType *type;
 	AiBuildQueue *queue;
 
-	DebugLevel3Fn("%d:%d %d %d\n" _C_ AiPlayer->Player->Player _C_
-		AiPlayer->Player->Resources[1] _C_
-		AiPlayer->Player->Resources[2] _C_ AiPlayer->Player->Resources[3]);
-
 	// Suppy has the highest priority
 	if (AiPlayer->NeedSupply) {
-		DebugLevel3Fn("player %d needs food.\n" _C_ AiPlayer->Player->Player);
 		if (!(AiPlayer->UnitTypeBuilded && AiPlayer->UnitTypeBuilded->Type->Supply)) {
 			AiPlayer->NeedSupply = 0;
 			AiRequestSupply();
@@ -751,7 +715,6 @@ local void AiCheckingWork(void)
 	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
 		if (queue->Want > queue->Made) {
 			type = queue->Type;
-			DebugLevel3Fn("Must build: %s\n" _C_ type->Ident);
 
 			//
 			// FIXME: must check if requirements are fulfilled.
@@ -768,21 +731,18 @@ local void AiCheckingWork(void)
 			// Check limits, AI should be broken if reached.
 			//
 			if (PlayerCheckLimits(AiPlayer->Player, type) < 0) {
-				DebugLevel3Fn("Unit limits reached, or Need Supply\n");
 				continue;
 			}
 			//
 			// Check if resources available.
 			//
 			if ((c = AiCheckUnitTypeCosts(type))) {
-				DebugLevel3("- no resources\n");
 				AiPlayer->NeededMask |= c;
 				//
 				// NOTE: we can continue and build things with lesser
 				//  resource or other resource need!
 				continue;
 			} else {
-				DebugLevel3("- enough resources\n");
 				if (AiMakeUnit(type)) {
 					++queue->Made;
 				}
@@ -964,21 +924,7 @@ local void AiCollectResources(void)
 	total = 0;
 	for (c = 0; c < MaxCosts; ++c) {
 		total += num_units_assigned[c] + num_units_with_resource[c];
-		DebugLevel3Fn("Assigned %d = %d\n" _C_ c _C_ num_units_assigned[c]);
-		DebugLevel3Fn("Resource %d = %d\n" _C_ c _C_ num_units_with_resource[c]);
 	}
-#ifdef DEBUG
-	DebugLevel3Fn("Unassigned %d of total %d\n" _C_ num_units_unassigned[c] _C_ total);
-	if (AiPlayer->Player == ThisPlayer) {
-		DebugLevel3Fn("Percent Assignment:");
-		for (c = 0; c < MaxCosts; ++c) {
-			if (percent[c]) {
-				DebugLevel3(" %s:%d%%" _C_ DefaultResourceNames[c] _C_ percent[c]);
-			}
-		}
-		DebugLevel3("\n");
-	}
-#endif
 
 	//
 	// Turn percent values into harvester numbers.
@@ -1140,8 +1086,6 @@ local int AiRepairBuilding(const UnitType* type, Unit* building)
 	int k;
 	int num;
 
-	DebugLevel3Fn("%s can repair %s\n" _C_ type->Ident _C_ building->Type->Ident);
-
 #ifdef DEBUG
 	unit = NoUnitP;
 #endif
@@ -1208,7 +1152,6 @@ local int AiRepairBuilding(const UnitType* type, Unit* building)
 	for (k = i = j; i < num && i < j + 3; ++i) {
 
 		unit = table[i];
-		DebugLevel2Fn("Have an unit to repair %d :)\n" _C_ UnitNumber(unit));
 
 		if (UnitReachable(unit, building, unit->Type->RepairRange)) {
 			CommandRepair(unit, 0, 0, building, FlushCommands);
@@ -1240,12 +1183,12 @@ local int AiRepairUnit(Unit* unit)
 	tablep = AiHelpers.Repair;
 	type = unit->Type;
 	if (type->Slot > n) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
 	table = tablep[type->Slot];
 	if (!table) { // Oops not known.
-		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+		DebugPrint("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
 
@@ -1300,9 +1243,6 @@ local void AiCheckRepair(void)
 			&& unit->HP < unit->Stats->HitPoints
 			&& unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
-			DebugLevel3Fn("Have building to repair %d(%s)\n" _C_
-				UnitNumber(unit) _C_ unit->Type->Ident);
-
 			//
 			// FIXME: Repair only buildings under control
 			//
@@ -1343,8 +1283,6 @@ local void AiCheckRepair(void)
 global void AiAddUnitTypeRequest(UnitType* type, int count)
 {
 	AiBuildQueue** queue;
-
-	DebugLevel3Fn("%s %d\n" _C_ type->Ident _C_ count);
 
 	//
 	// Find end of the list.
@@ -1395,7 +1333,6 @@ global void AiResourceManager(void)
 	// Look if we can build a farm in advance.
 	//
 	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
-		DebugLevel3Fn("Farm in advance request\n");
 		AiRequestSupply();
 	}
 	//

@@ -126,7 +126,7 @@ global void SetVideoSync(void)
 
 	FrameTicks = ms / 10;
 	FrameRemainder = ms % 10;
-	DebugLevel0Fn("frames %d - %d.%dms\n" _C_ SkipFrames _C_ ms / 10 _C_ ms % 10);
+	DebugPrint("frames %d - %d.%dms\n" _C_ SkipFrames _C_ ms / 10 _C_ ms % 10);
 }
 
 /*----------------------------------------------------------------------------
@@ -254,8 +254,6 @@ global void InitVideoSdl(void)
 	ColorRed = VideoMapRGB(TheScreen->format, 252, 0, 0);
 	ColorGreen = VideoMapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = VideoMapRGB(TheScreen->format, 252, 252, 0);
-
-	DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 
 	TheUI.MouseWarpX = TheUI.MouseWarpY = -1;
 }
@@ -499,7 +497,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 {
 	switch (event->type) {
 		case SDL_MOUSEBUTTONDOWN:
-			DebugLevel3("\tbutton press %d\n" _C_ event->button.button);
 			//
 			//  SDL has already a good order of the buttons.
 			//
@@ -508,7 +505,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			DebugLevel3("\tbutton release %d\n" _C_ event->button.button);
 			//
 			//  SDL has already a good order of the buttons.
 			//
@@ -519,8 +515,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			// FIXME: check if this is only useful for the cursor
 			// FIXME: if this is the case we don't need this.
 		case SDL_MOUSEMOTION:
-			DebugLevel3("\tmotion notify %d,%d\n" _C_ event->motion.x _C_
-				event->motion.y);
 			InputMouseMove(callbacks, SDL_GetTicks(),
 				event->motion.x, event->motion.y);
 			// FIXME: Same bug fix from X11
@@ -542,7 +536,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			if (event->active.state & SDL_APPMOUSEFOCUS) {
 				static int InMainWindow = 1;
 
-				DebugLevel3("\tMouse focus changed\n");
 				if (InMainWindow && !event->active.gain) {
 					InputMouseExit(callbacks, SDL_GetTicks());
 				}
@@ -551,7 +544,6 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			if (event->active.state & SDL_APPACTIVE) {
 				static int IsVisible = 1;
 
-				DebugLevel3("\tApp focus changed\n");
 				if (IsVisible && !event->active.gain) {
 					IsVisible = 0;
 					UiTogglePause();
@@ -563,12 +555,10 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			break;
 
 		case SDL_KEYDOWN:
-			DebugLevel3("\tKey press\n");
 			SdlHandleKeyPress(callbacks, &event->key.keysym);
 			break;
 
 		case SDL_KEYUP:
-			DebugLevel3("\tKey release\n");
 			SdlHandleKeyRelease(callbacks, &event->key.keysym);
 			break;
 

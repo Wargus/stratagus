@@ -253,7 +253,7 @@ global void CclParseOrder(lua_State* l, Order* order)
 			slot = strtol(value + 1, NULL, 16);
 			order->Goal = UnitSlots[slot];
 			if (!UnitSlots[slot]) {
-				DebugLevel0Fn("FIXME: Forward reference not supported\n");
+				DebugPrint("FIXME: Forward reference not supported\n");
 			}
 			//++UnitSlots[slot]->Refs;
 
@@ -436,7 +436,6 @@ local void CclParseResWorker(lua_State* l, Unit* unit)
 		if (!strcmp(value, "time-to-harvest")) {
 			lua_rawgeti(l, -1, j + 1);
 			unit->Data.ResWorker.TimeToHarvest = LuaToNumber(l, -1);
-			DebugLevel3("Unit %d load TimeToHarvest %d\n" _C_ unit->Slot _C_ unit->Data.ResWorker.TimeToHarvest);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "done-harvesting")) {
 			unit->Data.ResWorker.DoneHarvesting = 1;
@@ -625,7 +624,6 @@ local int CclUnit(lua_State* l)
 
 	slot = LuaToNumber(l, j + 1);
 	++j;
-	DebugLevel3Fn("parsing unit #%d\n" _C_ slot);
 
 	unit = NULL;
 	type = NULL;
@@ -870,7 +868,7 @@ local int CclUnit(lua_State* l)
 			AssignUnitToPlayer (unit, player);
 			unit->HP = hp;
 			if (unit->Orders[0].Action == UnitActionBuilded) {
-				DebugLevel0Fn("HACK: the building is not ready yet\n");
+				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
 			}
@@ -958,8 +956,6 @@ local int CclUnit(lua_State* l)
 		unit->Colors = &unit->RescuedFrom->UnitColors;
 	}
 	
-	DebugLevel3Fn("unit #%d parsed\n" _C_ slot);
-
 	return 0;
 }
 

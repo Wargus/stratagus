@@ -61,8 +61,6 @@ global void HandleActionUpgradeTo(Unit* unit)
 	UnitType* type;
 	const UnitStats* stats;
 
-	DebugLevel3Fn(" %d\n" _C_ UnitNumber(unit));
-
 	player = unit->Player;
 	if (!unit->SubAction) { // first entry
 		unit->Data.UpgradeTo.Ticks = 0;

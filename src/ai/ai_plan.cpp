@@ -139,7 +139,7 @@ local void AiMarkWaterTransporter(const Unit * unit, unsigned char *matrix)
 	w = TheMap.Width + 2;
 	matrix += w + w + 2;
 	if (matrix[x + y * w]) { // already marked
-		DebugLevel0("Done\n");
+		DebugPrint("Done\n");
 		return;
 	}
 
@@ -279,7 +279,7 @@ local int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy
 				if (state != OnWater) {
 					if (*m) { // already checked
 						if (state == OnLand && *m == 66) { // tansporter?
-							DebugLevel0Fn("->Water\n");
+							DebugPrint("->Water\n");
 							*m = 6;
 							points[wp].X = x; // push the point
 							points[wp].Y = y;
@@ -294,7 +294,7 @@ local int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy
 					// FIXME: the move code didn't likes a shore building as
 					//  target
 					if (EnemyOnMapTile(unit, x, y)) {
-						DebugLevel0Fn("Target found %d,%d-%d\n" _C_ x _C_ y _C_ state);
+						DebugPrint("Target found %d,%d-%d\n" _C_ x _C_ y _C_ state);
 						*dx = x;
 						*dy = y;
 						*ds = state;
@@ -328,7 +328,7 @@ local int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy
 						continue;
 					}
 					if (CanMoveToMask(x, y, mask)) { // reachable
-						DebugLevel0Fn("->Land\n");
+						DebugPrint("->Land\n");
 						*m = 1;
 						points[wp].X = x; // push the point
 						points[wp].Y = y;
@@ -444,7 +444,7 @@ global int AiFindWall(AiForce* force)
 				// Check for a wall
 				//
 				if (WallOnMap(x, y)) {
-					DebugLevel0Fn("Wall found %d,%d\n" _C_ x _C_ y);
+					DebugPrint("Wall found %d,%d\n" _C_ x _C_ y);
 					destx = x;
 					desty = y;
 					break;
@@ -514,7 +514,7 @@ global int AiPlanAttack(AiForce* force)
 	int state;
 	Unit* transporter;
 
-	DebugLevel0Fn("Planning for force #%d of player #%d\n" _C_
+	DebugPrint("Planning for force #%d of player #%d\n" _C_
 		force - AiPlayer->Force _C_ AiPlayer->Player->Player);
 
 	watermatrix = CreateMatrix();
@@ -527,7 +527,7 @@ global int AiPlanAttack(AiForce* force)
 	state = 1;
 	while (aiunit) {
 		if (aiunit->Unit->Type->Transporter) {
-			DebugLevel0Fn("Transporter #%d\n" _C_ UnitNumber(aiunit->Unit));
+			DebugPrint("Transporter #%d\n" _C_ UnitNumber(aiunit->Unit));
 			AiMarkWaterTransporter(aiunit->Unit, watermatrix);
 			state = 0;
 		}
@@ -544,7 +544,7 @@ global int AiPlanAttack(AiForce* force)
 
 			unit = AiPlayer->Player->Units[i];
 			if (unit->Type->Transporter && UnitIdle(unit)) {
-				DebugLevel0Fn("Assign any transporter\n");
+				DebugPrint("Assign any transporter\n");
 				AiMarkWaterTransporter(unit, watermatrix);
 				// FIXME: can be the wrong transporter.
 				transporter = unit;
@@ -554,7 +554,7 @@ global int AiPlanAttack(AiForce* force)
 	}
 
 	if (state) { // Absolute no transporter
-		DebugLevel0Fn("No transporter available\n");
+		DebugPrint("No transporter available\n");
 		// FIXME: should tell the resource manager we need a transporter!
 		return 0;
 	}
@@ -565,14 +565,14 @@ global int AiPlanAttack(AiForce* force)
 	aiunit = force->Units;
 	while (aiunit) {
 		if (aiunit->Unit->Type->UnitType == UnitTypeLand) {
-			DebugLevel0Fn("Landunit %d\n" _C_ UnitNumber(aiunit->Unit));
+			DebugPrint("Landunit %d\n" _C_ UnitNumber(aiunit->Unit));
 			break;
 		}
 		aiunit = aiunit->Next;
 	}
 
 	if (!aiunit) {
-		DebugLevel0Fn("No land unit in force\n");
+		DebugPrint("No land unit in force\n");
 		return 0;
 	}
 
@@ -587,7 +587,7 @@ global int AiPlanAttack(AiForce* force)
 			RefsIncrease(transporter);
 		}
 
-		DebugLevel0Fn("Can attack\n");
+		DebugPrint("Can attack\n");
 		force->GoalX = x;
 		force->GoalY = y;
 		force->MustTransport = state == 2;

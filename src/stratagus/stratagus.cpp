@@ -436,7 +436,6 @@ local int WaitMouseY;                       /// Mouse Y position
 */
 local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 {
-	DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
 	WaitNoEvent = 0;
 }
 
@@ -445,7 +444,6 @@ local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 */
 local void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
 {
-	DebugLevel3Fn("Released %8x %8x\n" _C_ MouseButtons _C_ dummy);
 }
 
 /**
@@ -454,7 +452,6 @@ local void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
 local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
-	DebugLevel3Fn("Pressed %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
 	WaitNoEvent = 0;
 }
 
@@ -464,7 +461,6 @@ local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
-	DebugLevel3Fn("Released %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
 }
 
 /**
@@ -473,7 +469,6 @@ local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
 local void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
-	DebugLevel3Fn("Repeated %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
 }
 
 /**
@@ -490,7 +485,6 @@ local void WaitCallbackMouse(int x, int y)
 */
 local void WaitCallbackExit(void)
 {
-	DebugLevel3Fn("Exit\n");
 }
 
 /**
@@ -586,7 +580,7 @@ global void ShowLoadProgress(const char* fmt, ...)
 		InvalidateArea(5, VideoHeight - 18, VideoWidth - 10, 18);
 		RealizeVideoMemory();
 	} else {
-		DebugLevel0Fn("!!!!%s\n" _C_ temp);
+		DebugPrint("!!!!%s\n" _C_ temp);
 	}
 }
 
@@ -645,7 +639,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 		//  Don't leak when called multiple times
 		//    - FIXME: not the ideal place for this..
 		//
-		DebugLevel0Fn("Freeing map info, wrong place\n");
+		DebugPrint("Freeing map info, wrong place\n");
 		FreeMapInfo(map->Info);
 		map->Info = NULL;
 
@@ -688,7 +682,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 			}
 
 			EnableRedraw = RedrawEverything;
-			DebugLevel0Fn("Menu start: NetPlayers %d\n" _C_ NetPlayers);
+			DebugPrint("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 			filename = CurrentMapPath;
 		} else {
 			if (EditorRunning) {
@@ -730,7 +724,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 		PreMenuSetup();
 
 		filename = NextChapter();
-		DebugLevel0Fn("Next chapter %s\n" _C_ filename);
+		DebugPrint("Next chapter %s\n" _C_ filename);
 	}
 }
 
@@ -817,7 +811,7 @@ global void Exit(int err)
 
 	ExitNetwork1();
 #ifdef DEBUG
-	DebugLevel0("Frames %lu, Slow frames %d = %ld%%\n" _C_
+	DebugPrint("Frames %lu, Slow frames %d = %ld%%\n" _C_
 		FrameCounter _C_ SlowFrameCounter _C_
 		(SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
 	CclUnits(Lua);

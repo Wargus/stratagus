@@ -122,11 +122,9 @@ local int CclDefineUnitType(lua_State* l)
 	NoWarningUnitType = i;
 #endif
 	if (type) {
-		DebugLevel3Fn("Redefining unit-type `%s'\n" _C_ str);
 		free(str);
 		redefine = 1;
 	} else {
-		DebugLevel3Fn("Defining unit-type `%s'\n" _C_ str);
 		type = NewUnitTypeSlot(str);
 		type->BoolFlag = calloc(NumberBoolFlag, sizeof(*type->BoolFlag));
 		type->CanTargetFlag = calloc(NumberBoolFlag, sizeof(*type->CanTargetFlag));
@@ -318,7 +316,7 @@ local int CclDefineUnitType(lua_State* l)
 			value = LuaToString(l, -1);
 			auxtype = UnitTypeByIdent(value);
 			if (!auxtype) {
-				DebugLevel0("Build on top of undefined unit \"%s\".\n" _C_ str);
+				DebugPrint("Build on top of undefined unit \"%s\".\n" _C_ str);
 				Assert(0);
 			}
 			type->MustBuildOnTop = auxtype;
@@ -619,7 +617,6 @@ local int CclDefineUnitType(lua_State* l)
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				spell = SpellTypeByIdent(value);
-				DebugLevel3Fn("%d \n" _C_ id);
 				if (spell == NULL) {
 					LuaError(l, "Unknown spell type: %s" _C_ value);
 				}
@@ -650,7 +647,6 @@ local int CclDefineUnitType(lua_State* l)
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
 				spell = SpellTypeByIdent(value);
-				DebugLevel3Fn("%d \n" _C_ id);
 				if (spell == NULL) {
 					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
 				}
@@ -906,7 +902,6 @@ global UnitType* CclGetUnitType(lua_State* l)
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
 		str = LuaToString(l, -1);
-		DebugLevel3("CclGetUnitType: %s\n"_C_ str);
 		return UnitTypeByIdent(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData* data;
@@ -938,7 +933,6 @@ local int CclUnitType(lua_State* l)
 
 	str = LuaToString(l, 1);
 	type = UnitTypeByIdent(str);
-	DebugLevel3Fn("CclUnitType: '%s' -> '%ld'\n" _C_ str _C_ (long)type);
 	data = lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaUnitType;
 	data->Data = type;
@@ -1212,12 +1206,12 @@ local int CclDefineBoolFlags(lua_State* l)
 		str = LuaToString(l, j + 1);
 		for (i = 0; i < NumberBoolFlag; ++i) {
 			if (!strcmp(str, BoolFlagName[i])) {
-				DebugLevel0("Warning, Bool flags already defined\n");
+				DebugPrint("Warning, Bool flags already defined\n");
 				break;
 			}
 		}
 		if (i != NumberBoolFlag) {
-			DebugLevel0("Warning, Bool flags '%s' already defined\n" _C_ BoolFlagName[i]);
+			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ BoolFlagName[i]);
 			continue;
 		}
 		BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof(*BoolFlagName));
