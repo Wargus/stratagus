@@ -254,7 +254,7 @@ typedef int f_spell(Unit* caster, const struct _spell_type_* spell, Unit* target
 */
 typedef struct _spell_type_ {
     //  Identification stuff
-    unsigned int Ident;			/// Spell numeric identifier
+    int Ident;				/// Spell numeric identifier
     char *IdentName;			/// Spell unique identifier (spell-holy-vision)
     char *Name;				/// Spell name shown by the engine
 
@@ -265,6 +265,7 @@ typedef struct _spell_type_ {
     int Range;				/// Max range of the target.
     unsigned int ManaCost;		/// required mana for each cast
 
+    int DependencyId;			/// Id of upgrade, -1 if no upgrade needed for cast the spell.
     t_Conditions *Condition_generic;	/// Conditions to cast the spell. (generic (no test for each target))
     t_Conditions *Condition_specific;	/// Conditions to cast the spell. (target specific (ex:Hp full))
 //	Autocast	// FIXME : can use different for AI ? Use it in this structure ?
@@ -303,6 +304,9 @@ extern void SaveSpells(CLFile * file);
 
 /// done spell tables
 extern void DoneSpells(void);
+
+/// return 1 if spell is availible, 0 if not (must upgrade)
+extern int SpellIsAvailable(const Player* player, int SpellId);
 
 /// returns != 0 if spell can be casted (enough mana, valid target)
 extern int CanCastSpell(const Unit* caster, const SpellType*,

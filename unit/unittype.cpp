@@ -149,9 +149,9 @@ global void UpdateStats(int reset)
 {
     UnitType* type;
     UnitStats* stats;
-    unsigned player;
+    int player;
     unsigned i;
-    unsigned j;
+    int j;
 
     //
     //  Update players stats

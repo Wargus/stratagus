@@ -650,12 +650,12 @@ typedef struct _missile_config_ {
 } MissileConfig;
 
 typedef struct _resource_info_ {
-    char * 	FileWhenLoaded;			/// Change the graphic when the unit is loaded.
-    char * 	FileWhenEmpty;			/// Change the graphic when the unit is empty.
+    char* 	FileWhenLoaded;			/// Change the graphic when the unit is loaded.
+    char* 	FileWhenEmpty;			/// Change the graphic when the unit is empty.
     unsigned 	HarvestFromOutside;		/// Unit harvests without entering the building.
     unsigned 	WaitAtResource;			/// Cycles the unit waits while mining.
     unsigned 	ResourceStep;			/// Resources the unit gains per mining cycle.
-    unsigned 	ResourceCapacity;		/// Max amount of resources to carry.
+    int 	ResourceCapacity;		/// Max amount of resources to carry.
     unsigned 	WaitAtDepot;			/// Cycles the unit waits while returning.
     unsigned	ResourceId;			/// Id of the resource harvested. Redundant.
     unsigned 	FinalResource;			/// Convert resource when delivered. 
@@ -726,6 +726,15 @@ struct _unit_type_ {
     int		_RegenerationRate;	/// HP regeneration HP per sec
     int		WeaponsUpgradable;	/// Weapons could be upgraded
     int		ArmorUpgradable;	/// Armor could be upgraded
+    int 	DemolishRange;		/// Unit will Demolish around when dead.
+    int 	DemolishDamage;		/// Damage dealt to unit affected by demolition.
+    int 	RepairRange;		/// Units repair range.
+    char 	*CanCastSpell;		/// Unit is able to use spells.
+    // FIXME: n0body: AutoBuildRate not implemented.
+    int		AutoBuildRate;		/// The rate at which the building builds itself
+    int 	RandomMovementProbability;	/// Probability to move randomly.
+    int		ClicksToExplode;	/// Number of consecutive clicks until unit suicides.
+    int		MaxOnBoard;		/// Number of Transporter slots.
     // FIXME: original only visual effect, we do more with this!
     enum {
 	UnitTypeLand,			/// Unit lives on land
@@ -754,8 +763,6 @@ struct _unit_type_ {
     unsigned AirUnit : 1;		/// Air animated
     unsigned SeaUnit : 1;		/// Sea animated
     unsigned ExplodeWhenKilled : 1;	/// Death explosion animated
-    unsigned int RandomMovementProbability;/// Probability to move randomly.
-    unsigned int ClicksToExplode;	/// Number of consecutive clicks until unit suicides.
     unsigned Sniper : 1;		/// The unit can only hit organic units.
     unsigned Wall : 1;			/// Wall
     unsigned Building : 1;		/// Building
@@ -763,34 +770,28 @@ struct _unit_type_ {
     unsigned DetectCloak : 1;		/// Can see Cloaked units.
     unsigned Coward : 1;		/// Unit will only attack if instructed.
     unsigned Transporter : 1;		/// Can transport units
-    unsigned MaxOnBoard;		/// Number of Transporter slots.
     unsigned Vanishes : 1;		/// Corpes & destroyed places.
     unsigned GroundAttack : 1;		/// Can do command ground attack.
     unsigned IsUndead : 1;		/// Unit is already dead.
     unsigned ShoreBuilding : 1;		/// Building must be build on coast.
-    char *CanCastSpell;			/// Unit is able to use spells.
     unsigned CanAttack : 1;		/// Unit can attack.
-    unsigned int DemolishRange;		/// Unit will Demolish around when dead.
-    unsigned int DemolishDamage;	/// Damage dealt to unit affected by demolition.
-    unsigned int RepairRange;		/// Units repair range.
     unsigned BuilderOutside : 1;	/// The builder stays outside during the build.
     unsigned BuilderLost : 1;		/// The builder is lost after the build.
-    // FIXME: n0body: AutoBuildRate not implemented.
-    unsigned AutoBuildRate;		/// The rate at which the building builds itself
     unsigned Hero : 1;			/// Is hero only used for triggers .
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
     unsigned Organic : 1;		/// Organic can be healed.
-
-    unsigned CanStore[MaxCosts];	/// Resources that we can store here.
-    unsigned GivesResource;		/// The resource this unit gives.
-    unsigned MaxWorkers;		/// Maximum number of workers.
     unsigned CanHarvest : 1;		/// Resource can be harvested.
     unsigned Harvester : 1;		/// unit is a resource harvester.
-    ResourceInfo* ResInfo[MaxCosts];	/// Resource information.
-    UnitType* MustBuildOnTop;		/// Must be built on top of something.
 
     unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle.
     unsigned Teleporter : 1;		/// Can teleport other units.
+
+    int		 CanStore[MaxCosts];	/// Resources that we can store here.
+    int		 GivesResource;		/// The resource this unit gives.
+    int		 MaxWorkers;		/// Maximum number of workers.
+    ResourceInfo* ResInfo[MaxCosts];	/// Resource information.
+    UnitType* MustBuildOnTop;		/// Must be built on top of something.
+
 
     UnitSound Sound;			/// Sounds for events
     // FIXME: temporary solution

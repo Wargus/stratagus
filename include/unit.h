@@ -432,8 +432,8 @@ enum _unit_action_ {
 typedef struct _order_ {
     unsigned char	Action;		/// global action
     unsigned char	Flags;		/// Order flags (unused)
-    unsigned int	RangeX;		/// How near in X direction
-    unsigned int	RangeY;		/// How near in Y direction
+    int			RangeX;		/// How near in X direction
+    int			RangeY;		/// How near in Y direction
     unsigned int	MinRange;	/// How far away minimum
     unsigned char	IsRect:1;	/// For goal as a square, not circle
 
@@ -494,7 +494,7 @@ struct _unit_ {
     
     Unit*	Next;		/// Generic link pointer (on map)
     
-    unsigned	InsideCount;		/// Number of units inside.
+    int		InsideCount;		/// Number of units inside.
     Unit*	UnitInside;		/// Pointer to one of the units inside.
     Unit*	Container;		/// Pointer to the unit containing it (or 0)
     Unit*	NextContained;		/// Next unit in the container.
@@ -568,7 +568,7 @@ struct _unit_ {
 					** ,used for fancy buildings
 					*/
     unsigned	Rs : 8;
-    unsigned	CurrentResource;
+    int		CurrentResource;
 
 #define MAX_ORDERS 16			/// How many outstanding orders?
     char	OrderCount;		/// how many orders in queue
