@@ -1011,7 +1011,8 @@ global void InputMouseMove(const EventCallback* callbacks,
 **	@param ticks		Denotes time-stamp of video-system
 **
 */
-global void InputMouseExit(const EventCallback* callbacks, unsigned ticks)
+global void InputMouseExit(const EventCallback* callbacks,
+	unsigned ticks __attribute__((unused)))
 {
 //FIXME: should we do anything here with ticks? don't know, but conform others
     callbacks->MouseExit();

@@ -10,12 +10,11 @@
 //
 /**@name sprite.c	-	The general sprite functions. */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//	(c) Copyright 2000-2002 by Lutz Sammer, Stephan Rasenberg
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,6 +31,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "freecraft.h"
 #include "video.h"
@@ -46,10 +46,12 @@
 --	Externals
 ----------------------------------------------------------------------------*/
 
+#if 0 // FIXME: in intern_video.h
 extern int ClipX1;			/// current clipping top left
 extern int ClipY1;			/// current clipping top left
 extern int ClipX2;			/// current clipping bottom right
 extern int ClipY2;			/// current clipping bottom right
+#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
