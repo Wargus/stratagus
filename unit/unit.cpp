@@ -2651,7 +2651,7 @@ global Unit* FindIdleWorker(const Player* player, const Unit* last)
 
     for (i = 0; i < nunits; ++i) {
 	unit = units[i];
-	if (unit->Type->Coward && !unit->Removed) {
+	if (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed) {
 	    if (unit->Orders[0].Action == UnitActionStill) {
 		if (SelectNextUnit && !IsOnlySelected(unit)) {
 		    return unit;
