@@ -3846,6 +3846,11 @@ local void MultiGameSetupInit(Menuitem *mi)
     menu = mi->menu;
 #endif
 
+    // FIXME: Remove this when .cm is supported
+    if (*CurrentMapPath && strstr(CurrentMapPath, ".cm\0")) {
+	*CurrentMapPath='\0';
+    }
+
     GameSetupInit(mi);
     NetworkInitServerConnect();
     menu->items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
