@@ -1878,7 +1878,7 @@ void InitDefinedVariables()
 		}; // names of the variable.
 	const char* boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
-		"\"VisibleUnderFog\", \"PermanentCloack\", \"AttackFromTransporter\","
+		"\"VisibleUnderFog\", \"PermanentCloack\", \"DetectCloak\", \"AttackFromTransporter\","
 		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
 		"\"BuilderOutSide\", \"BuilderLost\", \"CanHarvest\", \"Harvester\")";
 	int i; // iterator for var and boolflag.
