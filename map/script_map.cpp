@@ -478,44 +478,6 @@ local SCM CclSetForestRegeneration(SCM speed)
 }
 
 /**
-**	Set burning buildings percent and rate.
-**
-**	@param percent	    Max percent needed to burn buildings
-**	@param rate	    HP per cycle to damage buildings
-**	@param wait	    Number of cycles to wait
-*/
-local SCM CclSetBurnBuildings(SCM percent, SCM rate, SCM wait)
-{
-    int p;
-    int r;
-    int w;
-
-    p = gh_scm2int(percent);
-    r = gh_scm2int(rate);
-    w = gh_scm2int(wait);
-    if (p < 0 || p > 100) {
-	PrintFunction();
-	fprintf(stdout, "Burn percent should be 0-100\n");
-	p = 0;
-    }
-    if (r <= 0) {
-	PrintFunction();
-	fprintf(stderr, "Burn rate should be greater than 0\n");
-	p = 0;
-    }
-    if (w <= 0) {
-	PrintFunction();
-	fprintf(stderr, "Wait Cycles must be greater than 0\n");
-	w = CYCLES_PER_SECOND;
-    }
-    BurnBuildingPercent = p;
-    BurnBuildingDamageRate = r;
-    BurnBuildingWait = w;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
 **	Register CCL features for map.
 */
 global void MapCclRegister(void)
@@ -537,8 +499,6 @@ global void MapCclRegister(void)
     gh_new_procedure1_0("set-fog-of-war-saturation!", CclSetFogOfWarSaturation);
 
     gh_new_procedure1_0("set-forest-regeneration!",CclSetForestRegeneration);
-
-    gh_new_procedure3_0("set-burn-buildings!", CclSetBurnBuildings);
 }
 
 //@}
