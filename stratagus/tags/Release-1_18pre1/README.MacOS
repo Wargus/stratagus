@@ -1,0 +1,38 @@
+    _____________________________README.MacOS______________________________
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+
+To compile FreeCraft for Mac OS X simply decompress the file named
+"macosx.tgz" (located in the "contrib" directory) so that the "macosx"
+directory appears in the same directory as this document.
+
+Once you have done this, more detailed instructions on compiling FreeCraft
+for Mac OS X are provided in the "Read Me.rtf" file (located in the
+decompressed "macosx" directory). Please be aware that the FreeCraft
+Project Builder file cannot be compiled without first compiling various
+frameworks upon which it relies. It is for this reason important that you
+follow the given instructions when compiling FreeCraft for Mac OS X.
+
+---
+
+    FreeCraft is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; only version 2 of the License.
+
+    FreeCraft is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FreeCraft; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 
+    
+---

@@ -1,0 +1,173 @@
+<HTML><HEAD>
+<!--
+----	$Id$
+
+----	(c) Copyright 2001-2003 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FAQ for FreeCraft Version 1.18</TITLE>
+</HEAD>
+<BODY>
+    <H1>FAQ for FreeCraft Version 1.18</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
+<A HREF="gpl.html">"GNU General Public License"</A></B>
+<HR>
+
+For any questions not mentioned here, please visit
+<A HREF="http://freecraft.org">http://freecraft.org</A>.<P>
+
+<DL>
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: I am getting the error "gzseek already defined or
+    undefined!" ?</FONT>
+<DD>A: You have an old version of libpng, install the libpng1.0.X or later.
+    You get it here:
+    <A HREF="http://www.libpng.org/pub/png/libpng.html">http://www.libpng.org/pub/png/libpng.html</A>
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Does FreeCraft work with ALSA?</FONT>
+<DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA)
+    Driver if you compile FreeCraft using SDL and SDL was compiled to support
+    ALSA (--enable-alsa). It has been tested with versions 0.3.2 to 0.9.0.
+    <P>
+    More informationcan be found here:
+    <A HREF="http://www.alsa-project.org">http://www.alsa-project.org</A>
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I use the original CD without expansion?</FONT>
+<DD>A: Yes. Only difference is there are more graphics and sounds in the
+    expansion CD version. It works without problems with the german version. If
+    you are still not sure, just try it. It should work without problems.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Why does the cursor react after several seconds
+    when i move it?</FONT>
+<DD>A: We didn't find the real problem. Currently use the threaded sound
+    support and enable it (in data/ccl/sound.ccl) or add to the line
+    <P>
+    "-DSLOW_INPUT" to:
+    <P>
+    "DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG)"
+    in Rules.make
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: I want to play without having the CD in the drive, 
+    can i copy files from CD to hdd ?</FONT>
+<DD>A: After running 'build.bat' (WINDOWS) or 'build.sh' (UNIX) the CD is no
+    longer needed. This script converts the data on CD into our own format.
+    <BR>
+    A: You don't need to copy, the installation did it for you.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Why does the game become very slow under X11?
+    </FONT>
+<DD>A: Give your X11 server a higher priority than the clients.
+    <P>
+    renice -5 &lt;pid-of-your-x11-server&gt;
+    <P>
+    newer linux distributions (debian) does this automatically, 
+    or start freecraft with<P>
+    nice -n 5 ./freecraft
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I use FreeCraft to join a W*rcr*ft 2 network
+    game?</FONT>
+<DD>A: Sorry, FreeCraft use its own network protocol. You can only join 
+    FreeCraft network games.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Is it planned to support joining a W*rcr*ft 2
+    network game?</FONT>
+<DD>A: Both network protocols are in such a way, that this would be impossible.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: I only have the original BNE version, can I use
+    it?</FONT>
+<DD>A: No. Nobody has written a converter for this, if you want to
+    write it, please contact us. It is only a question of time and you
+    must understand writing C.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Why do I get only a black window after I installed
+    it on windows?</FONT>
+<DD>A: Try installing FreeCraft to C: drive.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with VC++?</FONT>
+<DD>A: Yes. Follow the instructions in <A HREF="development.html">
+    development.html</A>.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with Borland C++?</FONT>
+<DD>A: This C compiler isn't supported yet, you can build a project, 
+    write the instrutions and than mail it to us.<P>
+    <P>
+    Information on how to use MingGW and libSDL for cross development and
+    native development:<P>
+    <A HREF="http://www.libsdl.org/Xmingw32/">
+    http://www.libsdl.org/Xmingw32/</A><P>
+    Compiler package for windows built by Sam Lantinga:<P>
+    <A HREF="http://www.libsdl.org/Xmingw32/mingw32.zip">
+    http://www.libsdl.org/Xmingw32/mingw32.zip</A>
+    <P>
+    Based on the above this is our build. It contains SDL 1.2.4, libpng, zlib
+    and zziplib. Install this and download the newest FreeCraft source and
+    start FreeCraft development with windows:
+    <P>
+    <A HREF="http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip">
+    http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip</A>
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: What port or ports did FreeCraft use for network
+    play?</FONT>
+<DD>A: As default the only port used is 6660 UDP for both the client and
+    server side.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Why are there some grayed out fields in the
+    FreeCraft menus?</FONT>
+<DD>A: The grayed out menu entries are planned features which aren't finished
+    yet. You are welcome to write them.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Why do I get the following compiler failure:<BR>
+    network.c:282: initializer element is not constant<BR>
+    network.c:282: (near initialization for `CommandsIn[0].first')</FONT>
+<DD>A: This is a bug in the GNU C Compiler 2.96, downgrade to GCC 2.95.x or
+    upgrade to GCC 3.xx (expect many wrong warnings). If you are using the
+    Redhat distribution 7.2, you can change CC=gcc to CC=kgcc in Rules.make.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I play FreeCraft in fullscreen?</FONT>
+<DD>A: Yes fullscreen is supported with SDL. Click on the Options button
+    from the main program menu. In addition, in game use ALT-F or CTRL-F to
+    switch between fullscreen and windowed mode. You can also use the
+    commandline option -F to start the game in fullscreen mode.
+
+</DL>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="http://freecraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>

@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2002-2003 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Icon</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Icon</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="game.html">PREV</A> 
+<A HREF="research.html">NEXT</A> 
+<A HREF="ccl-index.html">Index</A> 
+<HR>
+<A HREF="#define-icon">define-icon</A>
+<A HREF="#define-icon-alias">define-icon-alias</A>
+<A HREF="#define-icon-wc-names">define-icon-wc-names</A>
+<A HREF="#set-icon-size!">set-icon-size!</A>
+<A HREF="#set-icons-per-row!">set-icons-per-row!</A>
+<HR>
+<H2>Intro - Introduction to icon functions and variables</H2>
+
+Everything around the C icon structure.
+<H2>Functions</H2>
+<A NAME="define-icon"></A>
+<H3>define-icon</H3>
+
+<H4>Description</H4>
+
+    Define an icon for the engine.<P>
+
+    This could also be defined in own levels. <P>
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon ident 'tileset tileset 'size '(x y) type '(index file))</CODE>
+
+<DL>
+<DT>ident</DT>
+<DD>The name of the icon.
+</DD>
+<DT>'tileset tileset</DT>
+<DD>Optional name of the tileset.
+</DD>
+<DT>'size '(x y)</DT>
+<DD>Size of the icon in pixel.
+</DD>
+<DT>x</DT>
+<DD>Width in pixel.
+</DD>
+<DT>y</DT>
+<DD>Height in pixel.
+</DD>
+<DT>type</DT>
+<DD>
+    <UL>
+    <LI>'normal is a normal icon, its look is defined with (index file).
+    </UL>
+</DD>
+<DT>index</DT>
+<DD>The index into the graphic file.
+</DD>
+<DT>file</DT>
+<DD>The filename of the graphic file containing the graphics.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define summer-icons-file "tilesets/summer/icons.png")
+    (define-icon 'icon-peasant 'tileset 'tileset-summer 'size '(46 38) 'normal
+	'(0 summer-icons-file))
+</PRE>
+
+Define the peasant icon referenced with icon-peasant for the summer tileset.
+It is a normal static icon with a sizeof 46x38 pixel.  The graphic is loaded
+from summer-icons-file, which is defined to be the file
+"tilesets/summer/icons.png" and is the first icon in this file.
+
+<A NAME="define-icon-alias"></A>
+<H3>define-icon-alias</H3>
+
+<H4>Description</H4>
+
+    Define an icon alias for an icon.<P>
+    This is an alternative name for the icon.
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon-alias alias icon)</CODE>
+
+<DL>
+<DT>alias</DT>
+<DD>The new alias name.
+</DD>
+<DT>icon</DT>
+<DD>An already existing icon name.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-icon-alias 'icon-raise-dead 'icon-skeleton)
+</PRE>
+
+Now it is possible to get the icon "skeleton" also with the name
+"icon-raise-dead".
+
+<A NAME="define-icon-wc-names"></A>
+<H3>define-icon-wc-names</H3>
+
+<H4>Description</H4>
+
+    Define the mapping of the icon numbers in puds, to the icon names.
+
+<H4>Syntax</H4>
+
+<CODE>(define-icon-wc-names icon-0 icon-1 ... icon-195)</CODE>
+
+<DL>
+<DT>icon-0</DT>
+<DD>Name of the icon assigned to index 0 (peasant).
+</DD>
+<DT>icon-1</DT>
+<DD>Name of the icon assigned to index 1 (peon).
+</DD>
+<DT>icon-195</DT>
+<DD>Name of the icon assigned to index 195. In the original only until this
+number are icons defined.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-icon-wc-names 
+      'icon-peasant 'icon-peon 'icon-footman ... )
+</PRE>
+
+<P>This is the default icon mapping.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-icon-size!"></A>
+<H3>set-icon-size!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-icon-size! width height)</CODE>
+
+<DL>
+<DT>width</DT>
+<DD>Width of the icons.
+</DD>
+<DT>height</DT>
+<DD>Height of the icons.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-icon-size! 46 38)
+</PRE>
+
+<P>Sets the icon size to 46x38.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/icons.ccl"> $LIBARYPATH/ccl/icons.ccl </A>
+
+<A NAME="set-icons-per-row!"></A>
+<H3>set-icons-per-row!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-icons-per-row! icons)</CODE>
+
+<DL>
+<DT>icons</DT>
+<DD>Number of icons per row.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-icons-per-row! 5)
+</PRE>
+
+<P>Sets the number of icons per row to 5.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/icons.ccl"> $LIBARYPATH/ccl/icons.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2002-2003 by <A HREF="http://freecraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
