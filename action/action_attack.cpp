@@ -190,6 +190,7 @@ global int HandleActionAttack(Unit* unit)
 		    unit->SubAction=0;
 		    return 1;
 		}
+		DebugCheck( unit->Type->Vanishes );
 		unit->Command.Action=UnitActionAttack;
 	    }
 	    break;

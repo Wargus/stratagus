@@ -292,11 +292,12 @@ global void UpdateDisplay(void)
 		,TheUI.MinimapX,TheUI.MinimapY);
     }
 
+    PlayerPixels(Players);		// Reset to default colors
+
 #if 1
     if( MustRedraw&RedrawMinimap ) {
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
-	PlayerPixels(Players);		// why color 0?
 	DrawMinimap(MapX,MapY);
 	DrawMinimapCursor(MapX,MapY);
     } else if( MustRedraw&RedrawMinimapCursor ) {
@@ -307,10 +308,11 @@ global void UpdateDisplay(void)
 
     if( MustRedraw&RedrawInfoPanel ) {
 	DrawInfoPanel();
+	PlayerPixels(Players);		// Reset to default colors
     }
     if( MustRedraw&RedrawButtonPanel ) {
-	PlayerPixels(ThisPlayer);
 	DrawButtonPanel();
+	PlayerPixels(Players);		// Reset to default colors
     }
     if( MustRedraw&RedrawResources ) {
 	DrawResources();

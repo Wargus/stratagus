@@ -210,6 +210,8 @@ global void DrawButtonPanel(void)
 	return;
     }
 
+    PlayerPixels(ThisPlayer);		// could only select own units.
+
     for( i=0; i<9; ++i ) {
 	if( buttons[i].Pos!=-1 ) {
 	    // cursor is on that button

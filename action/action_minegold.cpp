@@ -135,7 +135,7 @@ local int MineInGoldmine(Unit* unit)
 	}
 	// FIXME: I use goldmine after destory!!!
 
-	if( !(destu=FindGoldDeposit(unit->Player,unit->X,unit->Y)) ) {
+	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
 	    DropOutOnSide(unit,HeadingW
 		    ,mine->Type->TileWidth
 		    ,mine->Type->TileHeight);

@@ -533,15 +533,24 @@ global void FireMissile(Unit* unit)
 	// FIXME: make sure thats the correct unit.
 #ifdef NEW_UNIT
 	// Check if goal is correct unit.
-
+	if( goal->Destroyed ) {
+	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    if( !--goal->Refs ) {
+		FreeUnitMemory(goal);
+	    }
+	    // FIXME: should I clear this here?
+	    unit->Command.Data.Move.Goal=NULL;
+	    return;
+	}
 #endif
-
 	if( goal->Removed ) {
-	    DebugLevel1("Missile-none hits removed unit!\n");
+	    DebugLevel3("Missile-none hits removed unit!\n");
+	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-	    DebugLevel1("Missile-none hits dead unit!\n");
+	    DebugLevel3("Missile-none hits dead unit!\n");
+	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
 
@@ -549,6 +558,8 @@ global void FireMissile(Unit* unit)
 
 	return;
     }
+
+    // FIXME: goal is already dead, but missile could hit others?
 
     x=unit->X*TileSizeX+TileSizeX/2;
     y=unit->Y*TileSizeY+TileSizeY/2;

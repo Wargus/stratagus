@@ -368,15 +368,15 @@ extern int CanBuildOn(int x,int y,int mask);
 extern int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y);
 
     /// Find nearest gold mine
-extern Unit* FindGoldMine(const Unit*,int x,int y);
-extern Unit* GoldDepositOnMap(int tx,int ty);
-extern Unit* FindGoldDeposit(const Player* player,int x,int y);
-
-extern Unit* WoodDepositOnMap(int tx,int ty);
+extern Unit* FindGoldMine(const Unit*,int,int);
+    /// Find nearest gold deposit
+extern Unit* FindGoldDeposit(const Unit*,int,int);
+    /// Find nearest wood deposit
 extern Unit* FindWoodDeposit(const Player* player,int x,int y);
+    /// Find nearest oil deposit
+extern Unit* FindOilDeposit(const Player* player,int x,int y);
 
 extern int FindWoodInSight(Unit* unit,int* x,int* y);
-extern Unit* FindOilDeposit(const Player* player,int x,int y);
 extern Unit* FindOilPlatform(const Player* player,int x,int y);
 
 extern Unit* UnitOnScreen(Unit* unit,unsigned x,unsigned y);
@@ -392,6 +392,7 @@ extern int MapDistanceToUnit(int x,int y,const Unit* dest);
 extern int ViewPointDistance(int x,int y);
 extern int ViewPointDistanceToUnit(Unit* dest);
 
+    /// Return true, if unit is an enemy of the player
 extern int IsEnemy(const Player* player,const Unit* dest);
 extern int CanTarget(const UnitType* type,const UnitType* dest);
 
@@ -424,14 +425,27 @@ extern void DrawUnits(void);
 extern int SelectUnits(int x1,int y1,int x2,int y2,Unit** table);
     /// Find all units of this type
 extern int FindUnitsByType(const UnitType* type,Unit** table);
-extern int FindPlayerUnitsByType(const Player* player,int type,Unit** table);
+    /// Find all units of this type of the player
+extern int FindPlayerUnitsByType(const Player*,const UnitType*,Unit**);
+    /// Return any unit on that map tile
 extern Unit* UnitOnMapTile(unsigned tx,unsigned ty);
+    /// Return repairable unit on that map tile
+extern Unit* RepairableOnMapTile(unsigned tx,unsigned ty);
+    /// Return possible attack target on that map tile
 extern Unit* TargetOnMapTile(Unit* unit,unsigned tx,unsigned ty);
 
+    /// Return gold mine, if on map tile
 extern Unit* GoldMineOnMap(int tx,int ty);
+    /// Return gold deposit, if on map tile
+extern Unit* GoldDepositOnMap(int tx,int ty);
+    /// Return oil patch, if on map tile
 extern Unit* OilPatchOnMap(int tx,int ty);
+    /// Return oil platform, if on map tile
 extern Unit* PlatformOnMap(int tx,int ty);
+    /// Return oil deposit, if on map tile
 extern Unit* OilDepositOnMap(int tx,int ty);
+    /// Return wood deposit, if on map tile
+extern Unit* WoodDepositOnMap(int tx,int ty);
 
     /// Find any enemy in numeric range
 extern Unit* EnemyInRage(const Unit* unit,unsigned range);

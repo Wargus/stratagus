@@ -271,7 +271,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->SeenFrame=-1;
     if( !type->Building ) {
         unit->Heading=(MyRand()>>13)&7;	// random heading
-        player->NumUnits++;		// food needed
+        player->NumFoodUnits++;		// food needed
 	MustRedraw|=RedrawResources;	// update food
     } else {
 	player->NumBuildings++;
@@ -519,7 +519,7 @@ global void UnitLost(const Unit* unit)
 	}
 	player->NumBuildings--;
     } else {
-	player->NumUnits--;
+	player->NumFoodUnits--;
 	MustRedraw|=RedrawResources;	// update food
     }
 
@@ -539,7 +539,7 @@ global void UnitLost(const Unit* unit)
 
     player->UnitTypesCount[type->Type]--;
 
-    DebugCheck( player->NumUnits < 0 );
+    DebugCheck( player->NumFoodUnits < 0 );
     DebugCheck( player->NumBuildings < 0 );
     DebugCheck( player->UnitTypesCount[type->Type] < 0 );
 }
@@ -1172,8 +1172,7 @@ global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
 	for( i=0; i<NumUnits; i++ ) {
 	  unit=Units[i];
 	  if( unit->Type->GoldMine ) {
-	    DebugLevel3("Check goldmine %d,%d\n"
-			,unit->X,unit->Y);
+	    DebugLevel3("Check goldmine %d,%d\n",unit->X,unit->Y);
 	    if( unit->X<x ) {
 	      dx=x-unit->X-unit->Type->TileWidth;
 	    } else {
@@ -1196,8 +1195,7 @@ global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
 	for( i=0; i<NumUnits; i++ ) {
 	  unit=Units[i];
 	  if( unit->Type->GoldMine ) {
-	    DebugLevel3("Check goldmine %d,%d\n"
-			,unit->X,unit->Y);
+	    DebugLevel3("Check goldmine %d,%d\n",unit->X,unit->Y);
 	    if( unit->X<x ) {
 	      dx=x-unit->X-unit->Type->TileWidth;
 	    } else {
@@ -1472,52 +1470,54 @@ global Unit* FindGoldMine(const Unit* source,int x,int y)
 }
 
 /**
-**	Gold deposit on map tile
-*/
-global Unit* GoldDepositOnMap(int tx,int ty)
-{
-#ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
-    return NULL;
-#else
-    Unit* unit;
-    UnitType* type;
-    int i;
-
-    for( i=0; i<NumUnits; i++ ) {
-	unit=Units[i];
-	if( UnitUnusable(unit) ) {  // includes type->Vanishes
-	    continue;
-	}
-	type=unit->Type;
-	// Want gold-deposit
-	if( !type->StoresGold ) {
-	    continue;
-	}
-	if( tx<unit->X || tx>=unit->X+type->TileWidth
-		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
-	    continue;
-	}
-	return unit;
-    }
-    return NoUnitP;
-#endif
-}
-
-/**
 **	Find gold deposit.
 **
+**	@param unit	Pointer for source unit.
 **	@param player	A deposit owning this player
+**	@param x	X tile position to start.
+**	@param y	Y tile position to start.
+**
+**	@returns	Pointer to the nearest gold mine.
 */
-global Unit* FindGoldDeposit(const Player* player,int x,int y)
+global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
-    return NULL;
+    Unit** table;
+    Unit* unit;
+    Unit* best;
+    int best_d;
+    int d;
+    const Player* player;
+
+    //	FIXME:	this is not the best one
+    //		We need the deposit with the shortest way!
+    //		At least it must be reachable!
+    //		Should use the same pathfinder flood fill, like the attacking
+    //		code.
+    player=source->Player;
+
+    best=NoUnitP;
+    best_d=99999;
+    for( table=player->Units; table<player->Units+player->TotalNumUnits;
+		table++ ) {
+	unit=*table;
+	// Want gold deposit and not dieing.
+	if( !unit->Type->StoresGold || UnitUnusable(unit) ) {
+	    continue;
+	}
+	d=MapDistanceToUnit(x,y,unit);
+	if( d<best_d && UnitReachable(source,unit) ) {
+	    best_d=d;
+	    best=unit;
+	}
+    }
+    DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    return best;
 #else
     Unit* unit;
     Unit* best;
-    Unit** units;
+    Unit*const * units;
+    const Player* player;
     int nunits;
     int best_d;
     int d,i;
@@ -1525,10 +1525,10 @@ global Unit* FindGoldDeposit(const Player* player,int x,int y)
     //	FIXME:	this is not the best one
     //		We need the deposit with the shortest way!
     //		At least it must be reachable!
-    //
 
     best=NoUnitP;
     best_d=99999;
+    player=source->Player;
     nunits=player->TotalNumUnits;
     units=player->Units;
     for( i=0; i<nunits; i++ ) {
@@ -1548,39 +1548,6 @@ global Unit* FindGoldDeposit(const Player* player,int x,int y)
 
     DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
-#endif
-}
-
-/**
-**	Wood deposit on map tile
-*/
-global Unit* WoodDepositOnMap(int tx,int ty)
-{
-#ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
-    return NULL;
-#else
-    Unit* unit;
-    UnitType* type;
-    int i;
-
-    for( i=0; i<NumUnits; i++ ) {
-	unit=Units[i];
-	if( UnitUnusable(unit) ) {
-	    continue;
-	}
-	type=unit->Type;
-	// Want wood-deposit
-	if( !type->StoresWood && !type->StoresGold ) {
-	    continue;
-	}
-	if( tx<unit->X || tx>=unit->X+type->TileWidth
-		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
-	    continue;
-	}
-	return unit;
-    }
-    return NoUnitP;
 #endif
 }
 
@@ -1835,13 +1802,78 @@ global Unit* FindOilDeposit(const Player* player,int x,int y)
 **		Cycle through units. ounit is the old one.
 **		First take highest unit.
 **
-**	FIXME: overlapping units, which to choose?
+**	FIXME: If no unit, we could select near units?
+**
+**	@param ounit	Old selected unit.
+**	@param x	X pixel position.
+**	@param y	Y pixel position.
+**
+**	@return		An unit on X,Y position.
 */
 global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
-    return NULL;
+    Unit** table;
+    Unit* unit;
+    Unit* nunit;
+    Unit* funit;			// first possible unit
+    UnitType* type;
+    int flag;				// flag take next unit
+    unsigned gx;
+    unsigned gy;
+
+    funit=NULL;
+    nunit=NULL;
+    flag=0;
+    if( !ounit ) {			// no old on this position
+	flag=1;
+    }
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	// We don't use UnitUnusable() to be able to select
+	// a building under construction.
+	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
+	    continue;
+	}
+	type=unit->Type;
+
+	//
+	//	Check if mouse is over the unit.
+	//
+	gx=unit->X*TileSizeX+unit->IX;
+	if( x+(type->BoxWidth-type->TileWidth*TileSizeX)/2<gx ) {
+	    continue;
+	}
+	if( x>gx+(type->TileWidth*TileSizeX+type->BoxWidth)/2 ) {
+	    continue;
+	}
+
+	gy=unit->Y*TileSizeY+unit->IY;
+	if( y+(type->BoxHeight-type->TileHeight*TileSizeY)/2<gy ) {
+	    continue;
+	}
+	if( y>gy+(type->TileHeight*TileSizeY+type->BoxHeight)/2 ) {
+	    continue;
+	}
+
+	//
+	//	This could be taken.
+	//
+	if( flag ) {
+	    return unit;
+	}
+	if( unit==ounit ) {
+	    flag=1;
+	} else if( !funit ) {
+	    funit=unit;
+	}
+	nunit=unit;
+    }
+
+    if( flag && funit ) {
+	return funit;
+    }
+    return nunit;
 #else
     Unit* unit;
     Unit* nunit;
@@ -1975,38 +2007,6 @@ global void DestroyUnit(Unit* unit)
 	RemoveUnit(unit);
 	UnitLost(unit);
 
-#if 0
-	unit->SubAction=unit->Type->Type;
-
-	// Create corpse FIXME: this should be handled by die?
-	// FIXME: Can use faster lookup of unit-types.
-	switch( type->TileWidth ) {
-	    case 1:
-		type=UnitTypeByIdent("unit-destroyed-1x1-place");
-		break;
-	    case 2:
-		type=UnitTypeByIdent("unit-destroyed-2x2-place");
-		break;
-	    case 3:
-		type=UnitTypeByIdent("unit-destroyed-3x3-place");
-		break;
-	    case 4:
-		type=UnitTypeByIdent("unit-destroyed-4x4-place");
-		break;
-	}
-	unit->Frame=0;
-
-	unit->Type=type;
-	unit->IX=(type->Width-type->RleSprite->Width)/2;
-	unit->IY=(type->Height-type->RleSprite->Height)/2;
-
-	unit->State=0;
-	unit->Reset=0;
-	unit->Wait=1;
-	unit->Removed=0;
-	unit->Command.Action=UnitActionDie;
-#endif
-
 	// FIXME: buildings should get a die sequence
 
 	if( (type=type->CorpseType) ) {
@@ -2018,11 +2018,15 @@ global void DestroyUnit(Unit* unit)
 
 	    unit->SubAction=0;
 	    unit->Removed=0;
+	    unit->Frame=0;
 	    unit->Command.Action=UnitActionDie;
 
 	    DebugCheck( !unit->Type->Animations
 		    || !unit->Type->Animations->Die );
-	    unit->Frame=0;
+	    if( unit->NextCount ) {
+		DebugLevel0(__FUNCTION__": NextCount = %d\n",unit->NextCount);
+	    }
+	    unit->NextCount=0;
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    DebugLevel0(__FUNCTION__": Frame %d\n",unit->Frame);
 
@@ -2042,13 +2046,22 @@ global void DestroyUnit(Unit* unit)
     RemoveUnit(unit);
     UnitLost(unit);
 
+    // FIXME: ugly trick unit-peon-with-gold ... has no die sequence.
+    if( type==UnitTypeByIdent("unit-peon-with-gold")
+	    || type==UnitTypeByIdent("unit-peon-with-wood") ) {
+	unit->Type=UnitTypeByIdent("unit-peon");
+    } else if( type==UnitTypeByIdent("unit-peasant-with-gold")
+	    || type==UnitTypeByIdent("unit-peasant-with-wood") ) {
+	unit->Type=UnitTypeByIdent("unit-peasant");
+    }
+
     // Not good: UnitNewHeading(unit);
+    unit->SubAction=0;
+    unit->Removed=0;
     unit->State=0;
     unit->Reset=0;
-    unit->Removed=0;
     unit->Wait=1;
     unit->Command.Action=UnitActionDie;
-
 }
 
 /**
@@ -2087,7 +2100,20 @@ global void DestroyAllInside(Unit* source)
     }
 
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
+    // FIXME: should use a better methode, linking all units in a building
+    // FIXME: f.e. with the next pointer.
+    //
+    // Destroy all units in buildings or Resources (mines...)
+    //
+    for( i=0; i<NumUnits; i++ ) {
+	unit=Units[i];
+	if( !unit->Removed ) {		// not an unit inside
+	    continue;
+	}
+	if( unit->X==source->X && unit->Y==source->Y ) {
+	    DestroyUnit(unit);
+	}
+    }
 #else
     //
     // Destroy all units in buildings or Resources (mines...)
@@ -2112,7 +2138,7 @@ global void HitUnit(Unit* unit,int damage)
     UnitType* type;
     Unit* goal;
 
-    DebugCheck( damage==0 || unit->HP==0 );
+    DebugCheck( damage==0 || unit->HP==0 || unit->Type->Vanishes );
 
     type=unit->Type;
     if( !unit->Attacked ) {
@@ -2131,7 +2157,6 @@ global void HitUnit(Unit* unit,int damage)
 	if( unit->Player->AiEnabled ) {
 	    AiHelpMe(unit);
 	}
-        // FIXME: who clears this flag, currently nobody
 	unit->Attacked=1;
     }
 
@@ -2141,14 +2166,12 @@ global void HitUnit(Unit* unit,int damage)
     }
     unit->HP-=damage;		// UNSIGNED!
 
-    if( type->Organic ) {
 #if 0
+    if( type->Organic ) {
 	MakeMissile(MissileBlood
 		,unit->X*TileSizeX+TileSizeX/2
 		,unit->Y*TileSizeY+TileSizeY/2,0,0);
-#endif
     }
-#if 0
     if( type->Building ) {
 	MakeMissile(MissileSmallFire
 		,unit->X*TileSizeX
@@ -2534,10 +2557,11 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	,unit->Reset ? " 'reset" : "");
 
     SaveCommand(&unit->Command,file);
+    fprintf(file,"\t( ");
     for( i=0; i<unit->NextCount; ++i ) {	// Save all commands
 	SaveCommand(unit->NextCommand+i,file);
     }
-    fprintf(file,")\n");
+    fprintf(file,"  ))\n");
 }
 
 /**
@@ -2547,9 +2571,6 @@ global void SaveUnit(const Unit* unit,FILE* file)
 */
 global void SaveUnits(FILE* file)
 {
-#ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
-#else
     Unit** unit;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
@@ -2557,7 +2578,6 @@ global void SaveUnits(FILE* file)
     for( unit=Units; unit<&Units[NumUnits]; ++unit ) {
 	SaveUnit(*unit,file);
     }
-#endif
 }
 
 //@}
