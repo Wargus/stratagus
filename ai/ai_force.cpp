@@ -10,12 +10,11 @@
 //
 /**@name ai_force.c	-	AI force functions. */
 //
-//      (c) Copyright 2001 by Lutz Sammer
+//      (c) Copyright 2001,2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -61,6 +60,8 @@ local void AiCleanForce(int force)
 {
     AiUnit** prev;
     AiUnit* aiunit;
+    const AiUnitType* aitype;
+    int counter[UnitTypeMax];
 
     //
     //	Release all killed units.
@@ -72,7 +73,6 @@ local void AiCleanForce(int force)
 	    if( !--aiunit->Unit->Refs ) {
 		ReleaseUnit(aiunit->Unit);
 	    }
-	    AiPlayer->Force[force].Completed=0;
 	    *prev=aiunit->Next;
 	    free(aiunit);
 	    continue;
@@ -81,12 +81,35 @@ local void AiCleanForce(int force)
 	    RefsDebugCheck( !aiunit->Unit->Refs );
 	    --aiunit->Unit->Refs;
 	    RefsDebugCheck( !aiunit->Unit->Refs );
-	    AiPlayer->Force[force].Completed=0;
 	    *prev=aiunit->Next;
 	    free(aiunit);
 	    continue;
 	}
 	prev=&aiunit->Next;
+    }
+
+    //
+    //	Count units in force.
+    //
+    memset(counter,0,sizeof(counter));
+    aiunit=AiPlayer->Force[force].Units;
+    while( aiunit ) {
+	counter[aiunit->Unit->Type->Type]++;
+	aiunit=aiunit->Next;
+    }
+
+    //
+    //	Look if the force is complete.
+    //
+    AiPlayer->Force[force].Completed=1;
+    aitype=AiPlayer->Force[force].UnitTypes;
+    while( aitype ) {
+	if( aitype->Want>counter[aitype->Type->Type] ) {
+	    AiPlayer->Force[force].Completed=0;
+	    break;
+	}
+	counter[aitype->Type->Type]-=aitype->Want;
+	aitype=aitype->Next;
     }
 }
 
@@ -153,6 +176,8 @@ local int AiCheckBelongsToForce(int force,const UnitType* type)
 
 /**
 **	Ai assign unit to force.
+**
+**	@param unit	Unit to assign to force.
 */
 global void AiAssignToForce(Unit* unit)
 {
@@ -328,6 +353,9 @@ global void AiForceManager(void)
 		AiPlayer->Force[force].Defending=0;
 		AiPlayer->Force[force].Attacking=0;
 	    }
+	}
+	if( AiPlayer->Force[force].Attacking ) {
+	    AiCleanForce(force);
 	}
     }
 
