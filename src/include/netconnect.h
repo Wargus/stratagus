@@ -96,6 +96,9 @@ typedef struct _setup_state_ {
 
 /**
 **	Network init message.
+**
+**	@todo Transfering the same data in each message is waste of bandwidth.
+**	I mean the versions and the UID ...
 */
 typedef struct _init_message_ {
     unsigned char  Type;		/// Init message type
