@@ -1063,7 +1063,7 @@ local void DrawUnit(const Unit* unit)
 		,stats->SightRange*TileSizeX*2
 		,stats->SightRange*TileSizeY*2);
 	}
-	if( type->CanAttack ) {
+	if( type->CanAttack || type->Tower ) {
 	    if( ShowReactRange ) {
 		r= (unit->Player->Type==PlayerHuman)
 			? type->ReactRangeHuman
