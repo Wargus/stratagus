@@ -829,16 +829,16 @@ local Menuitem SpeedSettingsMenuItems[] = {
 	{ text:{ "Mouse Scroll", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSMouseSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 42, 36*4 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "off", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 82, 36*5, 0, LargeFont, NULL, NULL,
 	{ text:{ "Keyboard Scroll", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSKeyboardSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL,
-	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 42, 36*6 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "off", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
@@ -1723,6 +1723,9 @@ global void SpeedSettings(void)
 	SpeedSettingsMenuItems[i].d.hslider.percent = 0;
     if (SpeedSettingsMenuItems[i].d.hslider.percent > 100)
 	SpeedSettingsMenuItems[i].d.hslider.percent = 100;
+    SpeedSettingsMenuItems[i + 4].d.hslider.percent = 100 - (SpeedMouseScroll-1)* 100 / 15;
+    SpeedSettingsMenuItems[i + 8].d.hslider.percent = 100 - (SpeedKeyScroll-1)* 100 / 15;
+//    SpeedMouseScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
     ProcessMenu(MENU_SPEED_SETTINGS, 1);
 }
 
@@ -2527,14 +2530,14 @@ local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing game speed by 10");
+		DebugLevel0Fn("Increasing mouse speed by 10");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		printf("%d\n", SpeedMouseScroll);
 		SpeedMouseScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing game speed by 10");
+		DebugLevel0Fn("Decreasing mouse speed by 10");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
@@ -2570,14 +2573,14 @@ local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing game speed by 10");
+		DebugLevel0Fn("Increasing keyboard speed by 10");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		printf("%d\n", SpeedMouseScroll);
 		SpeedKeyScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing game speed by 10");
+		DebugLevel0Fn("Decreasing keyboard speed by 10");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
