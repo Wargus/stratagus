@@ -748,12 +748,8 @@ local int CclUnit(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "frame")) {
 			unit->Frame = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "flipped-frame")) {
-			unit->Frame = -LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "seen")) {
 			unit->Seen.Frame = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "flipped-seen")) {
-			unit->Seen.Frame = -LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "not-seen")) {
 			unit->Seen.Frame = UnitNotSeen;
 			--j;
