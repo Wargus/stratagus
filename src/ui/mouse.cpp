@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -234,7 +234,7 @@ global void DoRightButton(int sx,int sy)
 		}
 	    }
 	    //  Go and repair
-	    if ( (unit->Type->CanRepair) && dest &&
+	    if ( (unit->Type->RepairRange) && dest &&
 		    (dest->Type->Building || dest->Type->Transporter) &&
 		    dest->HP < dest->Stats->HitPoints  &&
 		    (dest->Player==unit->Player || IsAllied(dest->Player,dest)) ) {
@@ -777,7 +777,7 @@ local void SendRepair(int sx,int sy)
 	    (dest->Player==ThisPlayer||IsAllied(ThisPlayer,dest))) {
 	for( i=0; i<NumSelected; ++i ) {
 	    unit=Selected[i];
-	    if( unit->Type->CanRepair ) {
+	    if( unit->Type->RepairRange ) {
 		SendCommandRepair(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	    } else {
 		DebugLevel0Fn("Non-worker repairs\n");

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -397,12 +397,14 @@
 **
 **		Unit is able to attack.
 **
-**	UnitType::CanRepair
+**	UnitType::RepairRange
 **
 **		Unit can repair buildings. It will use the actack animation.
 **		It will heal 4 points for every repair cycle, and cost 1 of
 **		each resource, alternatively(1 cycle wood, 1 cycle gold)
 **		FIXME: The above should be more configurable.
+**		If units have a repair range, they can repair, and this is the
+**		distance.
 **
 **	UnitType::BuilderOutside
 **
@@ -665,7 +667,7 @@ struct _unit_type_ {
     unsigned ShoreBuilding : 1;		/// Building must be build on coast.
     unsigned CanCastSpell : 1;		/// Unit is able to use spells.
     unsigned CanAttack : 1;		/// Unit can attack.
-    unsigned CanRepair : 1;		/// Unit can repair .
+    unsigned int RepairRange;		/// Units repair range.
     unsigned BuilderOutside : 1;	/// The builder stays outside during the build.
     unsigned BuilderLost : 1;		/// The builder is lost after the build.
     // FIXME: n0body: AutoBuildRate not implemented.

@@ -201,7 +201,7 @@ Define unit stats.
     box_size attack_range computer_reaction_range human_reaction_range armor
     priorty damage piercing_damge weapon_upgradable armor_upgradeable
     decay annoy_factor points missle corpse type right_mouse can_target
-    flags sounds attack_sound)</code>
+    repair_range flags sounds attack_sound)</code>
 
 <dl>
 <dt>ident</dt>
@@ -325,6 +325,8 @@ F.E. '( 1 1 ), '( 2 2 ).
 <dd></dd>
 <dt>can_target</dt>
 <dd></dd>
+<dt>repair_range</dt>
+<dd>Range that a unit can repair from, eg. repair_range 1</dd>
 <dt>flags</dt>
 <dd></dd>
 <dt>sounds</dt>
@@ -357,7 +359,7 @@ F.E. '( 1 1 ), '( 2 2 ).
       'corpse-human
       'type-land
       'right-attack
-      'can-target-land 
+      'can-target-land
       ;; flags
       'land-unit
       'can-attack

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -557,9 +557,6 @@ extern long isqrt(long num);
 
     /// How near could a depot be build to a resource
 #define RESOURCE_DISTANCE	3
-
-    /// How near we could repair an unit
-#define REPAIR_RANGE		1
 
 //@}
 

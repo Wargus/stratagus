@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -819,8 +819,8 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->CanAttack ) {
 	CLprintf(file,"  'can-attack\n");
     }
-    if( type->CanRepair ) {
-	CLprintf(file,"  'can-repair\n");
+    if( type->RepairRange ) {
+	CLprintf(file,"  'repair-range %d\n",type->RepairRange);
     }
     if( type->CanTarget ) {
 	CLprintf(file,"  ");
