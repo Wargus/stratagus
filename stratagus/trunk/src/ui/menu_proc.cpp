@@ -29,17 +29,10 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <limits.h>
-
-#include "iocompat.h"
-
-#include "iolib.h"
 
 #include "freecraft.h"
+
 #include "video.h"
 #include "font.h"
 #include "interface.h"
