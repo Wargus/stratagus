@@ -401,7 +401,7 @@ WIN32=	\
     RULESFILE=$(WINRULESFILE)
 
 win32new:
-	@$(MAKE) distclean
+	@$(MAKE) RULESFILE=$(WINRULESFILE) distclean
 	export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
 	$(MAKE) $(WIN32) depend
 
