@@ -98,9 +98,7 @@ global void DisplayPicture(const char *name)
     Graphic* title;
 
     title=LoadGraphic(name);
-    memcpy(GlobalPalette,title->Palette,sizeof(GlobalPalette));
-    VideoCreatePalette(GlobalPalette);
-    // FIXME: Make some function? SetPalette(palette);
+    VideoSetPalette(title->Pixels);
 
 #ifdef USE_SDL
     { extern SDL_Surface *Screen;		/// internal screen
@@ -118,6 +116,7 @@ global void DisplayPicture(const char *name)
     SDL_UnlockSurface(Screen); }
 #endif
     VideoFree(title);
+    // FIXME: (ARI:) New Palette got stuck in memory?
 }
 
 /**
