@@ -230,9 +230,7 @@ global void ReleaseUnit(Unit* unit)
 	DebugLevel2Fn("%lu:No more references, only wait for network lag, unit %d\n" _C_
 		GameCycle _C_ UnitNumber(unit));
 	unit->Type = 0; 						// for debugging.
-#ifdef NEW_UNIT_CACHE
 	free(unit->CacheLinks);
-#endif
 }
 
 /**
@@ -288,9 +286,7 @@ local Unit *AllocUnit(void)
 */
 global void InitUnit(Unit* unit, UnitType* type)
 {
-#ifdef NEW_UNIT_CACHE
 	int i;
-#endif
 
 	Assert(type);
 
@@ -309,13 +305,11 @@ global void InitUnit(Unit* unit, UnitType* type)
 	//  Initialise unit structure (must be zero filled!)
 	//
 	unit->Type = type;
-#ifdef NEW_UNIT_CACHE
-	unit->CacheLinks = (UnitListItem *)malloc(type->TileWidth * type->TileHeight * sizeof(UnitListItem));
+	unit->CacheLinks = (UnitListItem*)malloc(type->TileWidth * type->TileHeight * sizeof(UnitListItem));
 	for (i = 0; i < type->TileWidth * type->TileHeight; ++i) {
 		unit->CacheLinks[i].Prev = unit->CacheLinks[i].Next = 0;
 		unit->CacheLinks[i].Unit = unit;
 	}
-#endif
 
 	unit->Seen.Frame = UnitNotSeen;				// Unit isn't yet seen
 

@@ -37,9 +37,6 @@
 ==  Config definitions
 ============================================================================*/
 
-// New unit cache
-#define NEW_UNIT_CACHE
-
 // Dynamic loading.
 //#define DYNAMIC_LOAD
 

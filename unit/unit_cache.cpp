@@ -14,7 +14,7 @@
 //      Sort of trivial implementation, since most queries are on a single tile.
 //      Unit is just inserted in a double linked list for every tile it's on.
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer(older implementations) and Crestez Leonard
+//      (c) Copyright 2004 by Crestez Leonard
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -46,165 +46,10 @@
 #include "unit.h"
 #include "map.h"
 
-#ifndef NEW_UNIT_CACHE
-
 /**
-**		Insert new unit into cache.
+**  Insert new unit into cache.
 **
-**		@param unit		Unit pointer to place in cache.
-*/
-global void UnitCacheInsert(Unit* unit)
-{
-	MapField* mf;
-
-	Assert(!unit->Next);
-	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
-
-	mf = TheMap.Fields + unit->Y * TheMap.Width + unit->X;
-	unit->Next = mf->UnitCache;
-	mf->UnitCache = unit;
-	DebugLevel3Fn("%d,%d %p %p\n" _C_ unit->X _C_ unit->Y _C_ unit _C_ unit->Next);
-}
-
-/**
-**		Remove unit from cache.
-**
-**		@param unit		Unit pointer to remove from cache.
-*/
-global void UnitCacheRemove(Unit* unit)
-{
-	Unit* prev;
-
-	prev = TheMap.Fields[unit->Y * TheMap.Width + unit->X].UnitCache;
-	if (prev == unit) {
-		TheMap.Fields[unit->Y * TheMap.Width + unit->X].UnitCache = unit->Next;
-		unit->Next = 0;
-		return;
-	}
-	for (; prev; prev = prev->Next) {
-		if (prev->Next == unit) {
-			prev->Next = unit->Next;
-			unit->Next = 0;
-			return;
-		}
-	}
-	DebugLevel0Fn("Try to remove unit not in cache. (%d)\n" _C_ unit->Slot);
-}
-
-/**
-**		Change unit in cache.
-**
-**		@param unit		Unit pointer to change in cache.
-*/
-global void UnitCacheChange(Unit* unit)
-{
-	UnitCacheRemove(unit);				// must remove first
-	UnitCacheInsert(unit);
-}
-
-/**
-**		Select units in rectangle range.
-**
-**		@param x1		Left column of selection rectangle
-**		@param y1		Top row of selection rectangle
-**		@param x2		Right column of selection rectangle
-**		@param y2		Bottom row of selection rectangle
-**		@param table		All units in the selection rectangle
-**
-**		@return				Returns the number of units found
-*/
-//#include "rdtsc.h"
-global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
-{
-	int x;
-	int y;
-	int n;
-	int i;
-	Unit* unit;
-	MapField* mf;
-//  int ts0 = rdtsc(), ts1;
-
-	DebugLevel3Fn("%d,%d %d,%d\n" _C_ x1 _C_ y1 _C_ x2 _C_ y2);
-	//
-	//		Units are inserted by origin position
-	//
-	x = x1 - 4;
-	if (x < 0) {
-		x = 0;				// Only for current unit-cache !!
-	}
-	y = y1 - 4;
-	if (y < 0) {
-		y = 0;
-	}
-
-	//
-	//		Reduce to map limits. FIXME: should the caller check?
-	//
-	if (x2 > TheMap.Width) {
-		x2 = TheMap.Width;
-	}
-	if (y2 > TheMap.Height) {
-		y2 = TheMap.Height;
-	}
-
-	for (n = 0; y < y2; ++y) {
-		mf = TheMap.Fields + y * TheMap.Width + x;
-		for (i = x; i < x2; ++i) {
-
-			for (unit = mf->UnitCache; unit; unit = unit->Next) {
-				//
-				//		Remove units, outside range.
-				//
-				if (unit->X + unit->Type->TileWidth <= x1 || unit->X > x2 ||
-						unit->Y + unit->Type->TileHeight <= y1 || unit->Y > y2) {
-					continue;
-				}
-				table[n++] = unit;
-			}
-			++mf;
-		}
-	}
-
-//  ts1 = rdtsc();
-//  printf("UnitCacheSelect on %dx%d took %d cycles\n", x2 - x1, y2 - y1, ts1 - ts0);
-
-	return n;
-}
-
-/**
-**		Select units on map tile.
-**
-**		@param x		Map X tile position
-**		@param y		Map Y tile position
-**		@param table		All units in the selection rectangle
-**
-**		@return				Returns the number of units found
-*/
-global int UnitCacheOnTile(int x, int y, Unit** table)
-{
-	return UnitCacheSelect(x, y, x + 1, y + 1, table);
-}
-
-/**
-**		Print unit-cache statistic.
-*/
-global void UnitCacheStatistic(void)
-{
-}
-
-/**
-**		Initialize unit-cache.
-*/
-global void InitUnitCache(void)
-{
-}
-
-#else 		// NEW_UNIT_CACHE
-
-/**
-**		Insert new unit into cache.
-**
-**		@param unit		Unit pointer to place in cache.
+**  @param unit  Unit pointer to place in cache.
 */
 global void UnitCacheInsert(Unit* unit)
 {
@@ -220,10 +65,10 @@ global void UnitCacheInsert(Unit* unit)
 			listitem = unit->CacheLinks + i * unit->Type->TileWidth + j;
 			Assert(!listitem->Next && !listitem->Prev);
 
-			//	Always add at the start of the list.
+			// Always add at the start of the list.
 			listitem->Next = mf->UnitCache;
 			listitem->Prev = 0;
-			//  update Prev link if cache on tile is no empty
+			// update Prev link if cache on tile is no empty
 			if (mf->UnitCache) {
 				mf->UnitCache->Prev = listitem;
 			}
@@ -233,9 +78,9 @@ global void UnitCacheInsert(Unit* unit)
 }
 
 /**
-**		Remove unit from cache.
+**  Remove unit from cache.
 **
-**		@param unit		Unit pointer to remove from cache.
+**  @param unit  Unit pointer to remove from cache.
 */
 global void UnitCacheRemove(Unit* unit)
 {
@@ -271,10 +116,10 @@ global void UnitCacheRemove(Unit* unit)
 }
 
 /**
-**		Change unit in cache.
-**		FIXME: optimize, add destination to parameters
+**  Change unit in cache.
+**  FIXME: optimize, add destination to parameters
 **
-**		@param unit		Unit pointer to change in cache.
+**  @param unit  Unit pointer to change in cache.
 */
 global void UnitCacheChange(Unit* unit)
 {
@@ -283,15 +128,15 @@ global void UnitCacheChange(Unit* unit)
 }
 
 /**
-**		Select units in rectangle range.
+**  Select units in rectangle range.
 **
-**		@param x1		Left column of selection rectangle
-**		@param y1		Top row of selection rectangle
-**		@param x2		Right column of selection rectangle
-**		@param y2		Bottom row of selection rectangle
-**		@param table	All units in the selection rectangle
+**  @param x1     Left column of selection rectangle
+**  @param y1     Top row of selection rectangle
+**  @param x2     Right column of selection rectangle
+**  @param y2     Bottom row of selection rectangle
+**  @param table  All units in the selection rectangle
 **
-**		@return				Returns the number of units found
+**  @return       Returns the number of units found
 */
 global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 {
@@ -306,7 +151,7 @@ global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 	}
 
 	//
-	//		Reduce to map limits. FIXME: should the caller check?
+	//  Reduce to map limits. FIXME: should the caller check?
 	//
 	if (x1 < 0) {
 		x1 = 0;
@@ -351,13 +196,13 @@ global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 }
 
 /**
-**		Select units on map tile.
+**  Select units on map tile.
 **
-**		@param x		Map X tile position
-**		@param y		Map Y tile position
-**		@param table		All units in the selection rectangle
+**  @param x      Map X tile position
+**  @param y      Map Y tile position
+**  @param table  All units in the selection rectangle
 **
-**		@return				Returns the number of units found
+**  @return       Returns the number of units found
 */
 global int UnitCacheOnTile(int x, int y, Unit** table)
 {
@@ -380,18 +225,8 @@ global int UnitCacheOnTile(int x, int y, Unit** table)
 }
 
 /**
-**		Print unit-cache statistic.
-*/
-global void UnitCacheStatistic(void)
-{
-	// FIXME: stats about query sizes.. you can get the rest by profiling.
-}
-
-/**
-**		Initialize unit-cache.
+**  Initialize unit-cache.
 */
 global void InitUnitCache(void)
 {
 }
-
-#endif 		// } NEW_UNIT_CACHE
