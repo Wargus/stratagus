@@ -440,7 +440,7 @@ global void RemoveUnit(Unit* unit)
 	}
     }
 
-    DebugLevel0Fn("%Zd %p %p\n",UnitNumber(unit),unit,unit->Next);
+    DebugLevel3Fn("%Zd %p %p\n",UnitNumber(unit),unit,unit->Next);
     UnitCacheRemove(unit);
     {	
 	Unit* list;
