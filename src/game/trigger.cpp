@@ -864,7 +864,7 @@ local int CclIfSwitch(lua_State* l)
 
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i >= MAX_SWITCH) {
-		LuaError(l, "Invalid switch number" _C_ i);
+		LuaError(l, "Invalid switch number %i" _C_ i);
 	}
 
 	if (lua_isboolean(l, 2)) {
