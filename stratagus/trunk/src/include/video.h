@@ -1137,6 +1137,9 @@ extern void WaitEventsOneFrame(const EventCallback* callbacks);
     ///	Load graphic from PNG file
 extern Graphic* LoadGraphicPNG(const char* name);
 
+    ///	Save a screenshot to a PNG file
+extern void SaveScreenshotPNG(const char* name);
+
     /// New graphic
 extern Graphic* NewGraphic(unsigned d,unsigned w,unsigned h);
 
