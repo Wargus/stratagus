@@ -858,7 +858,7 @@ local void VideoEffect0(int frame,
 }
 #endif
 
-#ifdef _DEBUG
+#ifdef DEBUG
 /**
 **	Draw the fonts, for screen shots.
 */
@@ -913,7 +913,7 @@ local void DebugDrawFonts(void)
 local void WaitForInput(int timeout)
 {
     EventCallback callbacks;
-#ifdef linux
+#if defined(linux) && !defined(DEBUG)
     char* s;
     char ddate[72 + 1];
     FILE* ddfile;
