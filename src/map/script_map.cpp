@@ -10,7 +10,7 @@
 //
 /**@name ccl_map.c	-	The map ccl functions. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -115,9 +115,7 @@ local SCM CclFreeCraftMap(SCM list)
 		    free(TheMap.Fields);
 		    TheMap.Fields=calloc(TheMap.Width*TheMap.Height,
 			    sizeof(*TheMap.Fields));
-#ifdef NEW_FOW2
 		    TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
-#endif
 		    InitUnitCache();
 		    // FIXME: this should be CreateMap or InitMap?
 
@@ -162,11 +160,7 @@ local SCM CclFreeCraftMap(SCM list)
 #else
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("visible")) ) {
-#ifdef NEW_FOW2
 				TheMap.Visible[0][i/32] |= 1<<(i%32);
-#else
-				TheMap.Fields[i].Flags|=MapFieldVisible;
-#endif
 			    } else if( gh_eq_p(gh_car(field),
 					gh_symbol2scm("explored")) ) {
 				TheMap.Fields[i].Flags|=MapFieldExplored;
