@@ -62,6 +62,7 @@ extern int NoWarningUnitType;        ///< quiet ident lookup.
 #endif
 
 _AnimationsHash AnimationsHash;      ///< Animations hash table
+_NewAnimationsHash NewAnimationsHash;///< NewAnimations hash table
 
 struct _UnitTypeVar_ UnitTypeVar;    ///< Variables for UnitType and unit.
 
@@ -1430,6 +1431,170 @@ static int CclDefineAnimations(lua_State* l)
 }
 
 /**
+**  Parse an animation frame
+*/
+static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
+{
+	NewAnimation* anim;
+	char* op1;
+	char* op2;
+
+	anim = calloc(1, sizeof(*anim));
+	op1 = strdup(str);
+	op2 = strchr(op1, ' ');
+	if (op2) {
+		while (*op2 == ' ') {
+			*op2++ = '\0';
+		}
+	}
+
+	if (!strcmp(op1, "frame")) {
+		anim->Type = NewAnimationFrame;
+		anim->D.Frame.Frame = atoi(op2);
+	} else if (!strcmp(op1, "exact-frame")) {
+		anim->Type = NewAnimationExactFrame;
+		anim->D.Frame.Frame = atoi(op2);
+	} else if (!strcmp(op1, "wait")) {
+		anim->Type = NewAnimationWait;
+		anim->D.Wait.Wait = atoi(op2);
+	} else if (!strcmp(op1, "random-wait")) {
+		anim->Type = NewAnimationRandomWait;
+		anim->D.RandomWait.MinWait = atoi(op2);
+		op2 = strchr(op2, ' ');
+		while (*op2 == ' ') {
+			++op2;
+		}
+		anim->D.RandomWait.MaxWait = atoi(op2);
+	} else if (!strcmp(op1, "sound")) {
+		anim->Type = NewAnimationSound;
+		anim->D.Sound.Sound = strdup(op2);
+	} else if (!strcmp(op1, "random-sound")) {
+		// FIXME: multiple sounds
+		anim->Type = NewAnimationRandomSound;
+		anim->D.RandomSound.Sound = strdup(op2);
+	} else if (!strcmp(op1, "attack")) {
+		anim->Type = NewAnimationAttack;
+	} else if (!strcmp(op1, "rotate")) {
+		anim->Type = NewAnimationRotate;
+		anim->D.Rotate.Rotate = atoi(op2);
+	} else if (!strcmp(op1, "move")) {
+		anim->Type = NewAnimationMove;
+		anim->D.Move.Move = atoi(op2);
+	} else if (!strcmp(op1, "unbreakable")) {
+		anim->Type = NewAnimationUnbreakable;
+		anim->D.Unbreakable.Begin = !strcmp(op2, "begin");
+	} else {
+		LuaError(l, "Unknown animation: %s" _C_ op1);
+	}
+
+	free(op1);
+	return anim;
+}
+
+/**
+**  Parse an animation
+*/
+static NewAnimation* ParseAnimation(lua_State* l, int idx)
+{
+	NewAnimation* anim;
+	NewAnimation* tail;
+	NewAnimation* newanim;
+	int args;
+	int j;
+	const char* str;
+
+	if (!lua_istable(l, idx)) {
+		LuaError(l, "incorrect argument");
+	}
+	args = luaL_getn(l, idx);
+	anim = tail = NULL;
+
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, idx, j + 1);
+		str = LuaToString(l, -1);
+		lua_pop(l, 1);
+		newanim = ParseAnimationFrame(l, str);
+		if (!anim) {
+			anim = tail = newanim;
+		} else {
+			tail->Next = newanim;
+			tail = newanim;
+		}
+	}
+
+	return anim;
+}
+
+/**
+**  Define a unit-type animation set.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineNewAnimations(lua_State* l)
+{
+	const char* name;
+	const char* value;
+	NewAnimations* anims;
+
+	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument");
+	}
+	anims = calloc(1, sizeof(*anims));
+
+	name = LuaToString(l, 1);
+
+	lua_pushnil(l);
+	while (lua_next(l, 2)) {
+		value = LuaToString(l, -2);
+
+		if (!strcmp(value, "Start")) {
+			anims->Start = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Idle")) {
+			anims->Idle = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Death")) {
+			anims->Death = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "StartAttack")) {
+			anims->StartAttack = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Attack")) {
+			anims->Attack = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "EndAttack")) {
+			anims->EndAttack = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "StartMove")) {
+			anims->StartMove = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Move")) {
+			anims->Move = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "EndMove")) {
+			anims->EndMove = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "StartTrain")) {
+			anims->StartTrain = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Train")) {
+			anims->Train = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "EndTrain")) {
+			anims->EndTrain = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "StartBuild")) {
+			anims->StartBuild = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Build")) {
+			anims->Build = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "EndBuild")) {
+			anims->EndBuild = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "StartHarvest_", 12)) {
+			anims->StartHarvest[0] = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "Harvest_", 8)) {
+			anims->Harvest[0] = ParseAnimation(l, -1);
+		} else if (!strncmp(value, "EndHarvest_", 11)) {
+			anims->EndHarvest[0] = ParseAnimation(l, -1);
+		} else {
+			LuaError(l, "Unsupported animation: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+	}
+
+	*(NewAnimations**)hash_add(NewAnimationsHash, name) = anims;
+
+	return 0;
+}
+
+/**
 **  Define the field of the UserDefined variables.
 **
 **  @param l          Lua state.
@@ -1984,6 +2149,7 @@ void UnitTypeCclRegister(void)
 	lua_register(Lua, "DefineUnitTypeWcNames", CclDefineUnitTypeWcNames);
 
 	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
+	lua_register(Lua, "DefineNewAnimations", CclDefineNewAnimations);
 }
 
 //@}
