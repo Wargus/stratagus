@@ -387,6 +387,9 @@ local void FreeGraphic8(Graphic* graphic)
     }
 #endif
     VideoFreeSharedPalette(graphic->Pixels);
+    if (graphic->Palette) {
+	free(graphic->Palette);
+    }
     free(graphic->Frames);
     free(graphic);
 }
@@ -601,9 +604,11 @@ global void MakeTexture(Graphic* graphic,int width,int height)
     graphic->NumTextureNames = n;
     graphic->TextureNames = (GLuint*)malloc(n*sizeof(GLuint));
     glGenTextures(n, graphic->TextureNames);
-    for( i=1; i<width; i<<=1 ) ;
+    for( i=1; i<width; i<<=1 ) {
+    }
     w=i;
-    for( i=1; i<height; i<<=1 ) ;
+    for( i=1; i<height; i<<=1 ) {
+    }
     h=i;
     graphic->TextureWidth = (float)width/w;
     graphic->TextureHeight = (float)height/h;
@@ -616,8 +621,10 @@ global void MakeTexture(Graphic* graphic,int width,int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	for( i=0; i<height; ++i ) {
 	    sp=(const unsigned char*)graphic->Frames+(x%fl)*width+((x/fl)*height+i)*graphic->Width;
+#if 0
 	    for( j=0; j<width; ++j ) {
 		VMemType32 c;
+
 		if( *sp==255 ) {
 		    tex[(h-i-1)*w*4+j*4+3] = 0;
 		} else {
@@ -629,9 +636,30 @@ global void MakeTexture(Graphic* graphic,int width,int height)
 		}
 		++sp;
 	    }
+#else
+	    for( j=0; j<width; ++j ) {
+		int c;
+
+		if( (c=*sp)==255 ) {
+		    tex[(h-i-1)*w*4+j*4+3] = 0;
+		} else {
+		    tex[(h-i-1)*w*4+j*4+0] = graphic->Palette[c].r;
+		    tex[(h-i-1)*w*4+j*4+1] = graphic->Palette[c].g;
+		    tex[(h-i-1)*w*4+j*4+2] = graphic->Palette[c].b;
+		    tex[(h-i-1)*w*4+j*4+3] = 0xff;
+		}
+		++sp;
+	    }
+#endif
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
 	    GL_UNSIGNED_BYTE, tex);
+	IfDebug(
+	i = glGetError();
+	if (i) {
+	    DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
+	}
+	);
     }
     free(tex);
 }
@@ -659,8 +687,8 @@ global Graphic* LoadGraphic(const char *name)
     }
 
     graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
-    free(graphic->Palette);
-    graphic->Palette = NULL;		// JOHNS: why should we free this?
+    //free(graphic->Palette);
+    //graphic->Palette = NULL;		// JOHNS: why should we free this?
 
     return graphic;
 }
