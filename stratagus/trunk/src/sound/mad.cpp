@@ -23,6 +23,8 @@
 //
 //	$Id$
 
+//	FIXME: JOHNS: MP3 streaming did not yet work.
+
 //@{
 
 /*----------------------------------------------------------------------------
@@ -54,6 +56,17 @@ typedef struct _mad_user_ {
     Sample* Sample;			// Sample buffer
     unsigned char Buffer[4096];		// Decoded buffer
 } MyUser;
+
+/**
+**	Private mp3 data structure to handle mp3 streaming.
+*/
+typedef struct _mp3_data_ {
+    char*		PointerInBuffer;	/// Pointer into buffer
+    struct mad_decoder	Decoder[1];		/// Mad decoder handle
+    MyUser		User[1];		/// Decoder user data
+} Mp3Data;
+
+#define MP3_BUFFER_SIZE  (12 * 1024)		/// Buffer size to fill
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -181,39 +194,113 @@ local enum mad_flow MAD_error(void *user __attribute__((unused)),
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+/**
+**	Read one frame from mad decoder.
+**
+**	@param decoder	Decoder
+**	@param buf	Buffer to write data to
+**	@param len	Length of the buffer
+**
+**	@return		Number of bytes read
+*/
+local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
+{
+    struct mad_stream *stream;
+    struct mad_frame *frame;
+    struct mad_synth *synth;
+
+    DebugLevel0Fn("%p %p %d\n" _C_ decoder _C_ buf _C_ len);
+
+    stream = &decoder->sync->stream;
+    frame = &decoder->sync->frame;
+    synth = &decoder->sync->synth;
+    DebugLevel0Fn("Error: %d\n" _C_ stream->error);
+    do {
+	DebugLevel0Fn("Read stream\n");
+	switch (MAD_read(decoder->cb_data, stream)) {
+	    case MAD_FLOW_STOP:
+		return 0;
+	    case MAD_FLOW_BREAK:
+		return -1;
+	    case MAD_FLOW_IGNORE:
+		continue;
+	    case MAD_FLOW_CONTINUE:
+		break;
+	}
+
+	while (1) {
+	    if (mad_frame_decode(frame, stream) == -1) {
+		if (!MAD_RECOVERABLE(stream->error)) {
+		    break;
+		}
+
+		switch (MAD_error(decoder->cb_data, stream, frame)) {
+		    case MAD_FLOW_STOP:
+			return 0;
+		    case MAD_FLOW_BREAK:
+			return -1;
+		    case MAD_FLOW_IGNORE:
+			break;
+		    case MAD_FLOW_CONTINUE:
+		    default:
+			continue;
+		}
+	    }
+
+	    mad_synth_frame(synth, frame);
+
 #if 0
+	    // FIXME: write out the frame buffer!
+	    switch (decoder->output_func(decoder->cb_data, &frame->header,
+		    &synth->pcm)) {
+		case MAD_FLOW_STOP:
+		    return 0;
+		case MAD_FLOW_BREAK:
+		    return -1;
+		case MAD_FLOW_IGNORE:
+		case MAD_FLOW_CONTINUE:
+		    break;
+	    }
+#endif
+
+	}
+	// Should stop here!
+    } while (stream->error == MAD_ERROR_BUFLEN);
+
+    return -1;
+}
 
 /**
-**	Type member function to read from the Mp3 file
+**	Type member function to read from the mp3 file
 **
-**	@param sample	    Sample reading from
-**	@param buf	    Buffer to write data to
-**	@param len	    Length of the buffer
+**	@param sample	Sample reading from
+**	@param buf	Buffer to write data to
+**	@param len	Length of the buffer
 **
-**	@return		    Number of bytes read
+**	@return		Number of bytes read
 */
 local int Mp3ReadStream(Sample* sample, void* buf, int len)
 {
     Mp3Data* data;
     int i;
     int n;
-    int bitstream;
 
-    data = (Mp3Data*) sample->User;
+    DebugLevel0Fn("%p %d\n" _C_ buf _C_ len);
+
+    data = sample->User;
 
     // see if we have enough read already
-    if (data->PointerInBuffer + len - sample->Data > sample->Length) {
+    if (data->PointerInBuffer - sample->Data + len > sample->Length) {
 	// not enough in buffer, read more
 	n = sample->Length - (data->PointerInBuffer - sample->Data);
 	memcpy(sample->Data, data->PointerInBuffer, n);
 	sample->Length = n;
 	data->PointerInBuffer = sample->Data;
 
-	n = OGG_BUFFER_SIZE - n;
+	n = MP3_BUFFER_SIZE - n;
 	for (;;) {
-	    i = ov_read(data->VorbisFile,
-		    data->PointerInBuffer + sample->Length, n, 0, 2, 1,
-		    &bitstream);
+	    i = MadRead(data->Decoder, data->PointerInBuffer + sample->Length,
+		    n);
 	    if (i <= 0) {
 		break;
 	    }
@@ -234,18 +321,30 @@ local int Mp3ReadStream(Sample* sample, void* buf, int len)
 }
 
 /**
-**	Type member function to free an Mp3 file
+**	Type member function to free an mp3 file
 **
-**	@param sample	    Sample to free
+**	@param sample	Sample to free
 */
 local void Mp3FreeStream(Sample* sample)
 {
     Mp3Data* data;
 
-    IfDebug( AllocatedSoundMemory -= sizeof(*sample) + OGG_BUFFER_SIZE);
+    IfDebug( AllocatedSoundMemory -= sizeof(*sample) + MP3_BUFFER_SIZE);
 
-    data = (Mp3Data*)sample->User;
-    ov_clear(data->VorbisFile);
+    data = sample->User;
+
+    // release the decoder
+
+    mad_synth_finish(data->Decoder->sync->synth);
+    mad_frame_finish(&data->Decoder->sync->frame);
+    mad_stream_finish(&data->Decoder->sync->stream);
+
+    free(data->Decoder->sync);
+    data->Decoder->sync = NULL;
+    mad_decoder_finish(data->Decoder);
+
+    CLclose(data->User->File);
+
     free(data);
     free(sample);
 }
@@ -257,16 +356,15 @@ local const SampleType Mp3StreamSampleType = {
     Mp3ReadStream,
     Mp3FreeStream,
 };
-#endif
 
 /**
-**	Type member function to read from the Mp3 file
+**	Type member function to read from the mp3 file
 **
-**	@param sample	    Sample reading from
-**	@param buf	    Buffer to write data to
-**	@param len	    Length of the buffer
+**	@param sample	Sample reading from
+**	@param buf	Buffer to write data to
+**	@param len	Length of the buffer
 **
-**	@return		    Number of bytes read
+**	@return		Number of bytes read
 */
 local int Mp3Read(Sample* sample, void* buf, int len)
 {
@@ -284,9 +382,9 @@ local int Mp3Read(Sample* sample, void* buf, int len)
 }
 
 /**
-**	Type member function to free an Mp3 file
+**	Type member function to free an mp3 file
 **
-**	@param sample	    Sample to free
+**	@param sample	Sample to free
 */
 local void Mp3Free(Sample* sample)
 {
@@ -304,134 +402,19 @@ local const SampleType Mp3SampleType = {
 };
 
 /**
-**	Test code.
-*/
-static int run_sync(struct mad_decoder *decoder)
-{
-    enum mad_flow (*error_func) (void *, struct mad_stream *,
-	struct mad_frame *);
-    void *error_data;
-    int bad_last_frame = 0;
-    struct mad_stream *stream;
-    struct mad_frame *frame;
-    struct mad_synth *synth;
-    int result = 0;
-
-    error_func = decoder->error_func;
-    error_data = decoder->cb_data;
-
-    stream = &decoder->sync->stream;
-    frame = &decoder->sync->frame;
-    synth = &decoder->sync->synth;
-
-    mad_stream_init(stream);
-    mad_frame_init(frame);
-    mad_synth_init(synth);
-
-    mad_stream_options(stream, decoder->options);
-
-    do {
-	switch (decoder->input_func(decoder->cb_data, stream)) {
-	    case MAD_FLOW_STOP:
-		goto done;
-	    case MAD_FLOW_BREAK:
-		goto fail;
-	    case MAD_FLOW_IGNORE:
-		continue;
-	    case MAD_FLOW_CONTINUE:
-		break;
-	}
-
-	while (1) {
-	    if (decoder->header_func) {
-		if (mad_header_decode(&frame->header, stream) == -1) {
-		    if (!MAD_RECOVERABLE(stream->error))
-			break;
-
-		    switch (error_func(error_data, stream, frame)) {
-			case MAD_FLOW_STOP:
-			    goto done;
-			case MAD_FLOW_BREAK:
-			    goto fail;
-			case MAD_FLOW_IGNORE:
-			case MAD_FLOW_CONTINUE:
-			default:
-			    continue;
-		    }
-		}
-
-		switch (decoder->header_func(decoder->cb_data, &frame->header)) {
-		    case MAD_FLOW_STOP:
-			goto done;
-		    case MAD_FLOW_BREAK:
-			goto fail;
-		    case MAD_FLOW_IGNORE:
-			continue;
-		    case MAD_FLOW_CONTINUE:
-			break;
-		}
-	    }
-
-	    if (mad_frame_decode(frame, stream) == -1) {
-		if (!MAD_RECOVERABLE(stream->error))
-		    break;
-
-		switch (error_func(error_data, stream, frame)) {
-		    case MAD_FLOW_STOP:
-			goto done;
-		    case MAD_FLOW_BREAK:
-			goto fail;
-		    case MAD_FLOW_IGNORE:
-			break;
-		    case MAD_FLOW_CONTINUE:
-		    default:
-			continue;
-		}
-	    } else
-		bad_last_frame = 0;
-
-	    mad_synth_frame(synth, frame);
-
-	    if (decoder->output_func) {
-		switch (decoder->output_func(decoder->cb_data, &frame->header,
-			&synth->pcm)) {
-		    case MAD_FLOW_STOP:
-			goto done;
-		    case MAD_FLOW_BREAK:
-			goto fail;
-		    case MAD_FLOW_IGNORE:
-		    case MAD_FLOW_CONTINUE:
-			break;
-		}
-	    }
-	}
-    } while (stream->error == MAD_ERROR_BUFLEN);
-
-fail:
-    result = -1;
-
-done:
-    mad_synth_finish(synth);
-    mad_frame_finish(frame);
-    mad_stream_finish(stream);
-
-    return result;
-}
-
-/**
 **	Load mp3.
 **
 **	@param name	File name.
 **	@param flags	Load flags.
 **
 **	@return		Returns the loaded sample.
+**
+**	@todo		Support more flags, LoadOnDemand.
 */
-global Sample *LoadMp3(const char* name, int flags __attribute__((unused)))
+global Sample *LoadMp3(const char* name, int flags)
 {
-    MyUser user;
     CLFile* f;
     unsigned char magic[2];
-    struct mad_decoder decoder;
     Sample* sample;
 
     if (!(f = CLopen(name))) {
@@ -454,47 +437,95 @@ global Sample *LoadMp3(const char* name, int flags __attribute__((unused)))
 
     DebugLevel2Fn("Have mp3 file %s\n" _C_ name);
 
-    sample = malloc(sizeof(*sample));
-    sample->Channels = 0;
-    sample->SampleSize = 0;
-    sample->Frequency = 0;
-    sample->Length = 0;
+#ifdef MP3_STREAM_WORKS
+    if (flags & PlayAudioStream)
+#else
+    if (0 && (flags & PlayAudioStream))
+#endif
+    {
+	Mp3Data* data;
 
-    // configure input, output, and error functions
-    user.File = f;
-    user.Sample = sample;
+	sample = malloc(sizeof(*sample) + MP3_BUFFER_SIZE);
+	if (!sample) {
+	    fprintf(stderr, "Out of memory\n");
+	    CLclose(f);
+	    return NULL;
+	}
+	data = malloc(sizeof(*data));
+	if (!data) {
+	    fprintf(stderr, "Out of memory\n");
+	    free(sample);
+	    CLclose(f);
+	    return NULL;
+	}
+	sample->User = data;
+	sample->Channels = 0;
+	sample->SampleSize = 0;
+	sample->Frequency = 0;
+	sample->Length = 0;
+	sample->Type = &Mp3StreamSampleType;
 
-    mad_decoder_init(&decoder, &user,
-	MAD_read, 0 /* header */, 0 /* filter */, MAD_write,
-	MAD_error, 0 /* message */);
+	data->User->File = f;
+	data->User->Sample = sample;
 
-    // start decoding
-    // mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
+	// configure input, output, and error functions
 
-    decoder.sync = malloc(sizeof(*decoder.sync));
-    if (!decoder.sync) {
+	mad_decoder_init(data->Decoder, data->User,
+	    MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
+	    MAD_error, NULL /* message */);
+
+	data->Decoder->sync = malloc(sizeof(*data->Decoder->sync));
+	if (!data->Decoder->sync) {
+	    fprintf(stderr, "Out of memory\n");
+	    mad_decoder_finish(data->Decoder);
+	    free(data);
+	    free(sample);
+	    CLclose(f);
+	    return NULL;
+	}
+
+	mad_stream_init(&data->Decoder->sync->stream);
+	mad_frame_init(&data->Decoder->sync->frame);
+	mad_synth_init(&data->Decoder->sync->synth);
+	mad_stream_options(&data->Decoder->sync->stream,
+		data->Decoder->options);
+
+	// Read first frame for channels, ...
+	data->PointerInBuffer = sample->Data;
+	sample->Length = MadRead(data->Decoder, sample->Data, MP3_BUFFER_SIZE);
+
+	DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + MP3_BUFFER_SIZE);
+	IfDebug( AllocatedSoundMemory += sizeof(*sample) + MP3_BUFFER_SIZE);
+
+	return sample;
+    } else {
+	MyUser user;
+	struct mad_decoder decoder;
+
+	sample = calloc(1, sizeof(*sample));
+	user.File = f;
+	user.Sample = sample;
+
+	// configure input, output, and error functions
+
+	mad_decoder_init(&decoder, &user,
+	    MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
+	    MAD_error, NULL /* message */);
+
+	mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
+
+	// release the decoder
 	mad_decoder_finish(&decoder);
 	CLclose(f);
-	return NULL;
+
+	user.Sample->Type = &Mp3SampleType;
+	user.Sample->User = 0;
+
+	DebugLevel0Fn(" %d\n" _C_ user.Sample->Length);
+	IfDebug( AllocatedSoundMemory += user.Sample->Length; );
+
+	return user.Sample;
     }
-
-    run_sync(&decoder);
-
-    free(decoder.sync);
-    decoder.sync = 0;
-
-    // release the decoder
-
-    mad_decoder_finish(&decoder);
-    CLclose(f);
-
-    user.Sample->Type = &Mp3SampleType;
-    user.Sample->User = 0;
-
-    DebugLevel0Fn(" %d\n" _C_ user.Sample->Length);
-    IfDebug( AllocatedSoundMemory += user.Sample->Length; );
-
-    return user.Sample;
 }
 
 #endif	// } WITH_SOUND && USE_MAD
