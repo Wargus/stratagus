@@ -2273,7 +2273,7 @@ local SCM CclDefineMenu(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    name=gh_scm2newstr(value, NULL);
-	} else if( gh_eq_p(value,gh_symbol2scm("image")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("panel")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    if( !gh_eq_p(value,gh_symbol2scm("none")) ) {
