@@ -117,8 +117,6 @@ struct _campaign_chapter_ {
 **  Campaign structure.
 */
 typedef struct _campaign_ {
-	const void* OType;  ///< Object type (future extensions)
-
 	char* Ident;    ///< Unique identifier
 	char* Name;     ///< Campaign name
 	int   Players;  ///< Campaign for X players
