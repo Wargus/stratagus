@@ -107,7 +107,9 @@ local void MoveToTarget(Unit* unit)
     int wall;
     int err;
 
-    if( unit->Command.Action==UnitActionAttackGround ) {
+    if( unit->Command.Action==UnitActionAttackGround
+	|| WallOnMap(unit->Command.Data.Move.DX,unit->Command.Data.Move.DY) ) { 
+	// FIXME: I think also needed for attacking wall
 	// FIXME: workaround for pathfinder problem
 	unit->Command.Data.Move.DX-=unit->Command.Data.Move.Range;
 	unit->Command.Data.Move.DY-=unit->Command.Data.Move.Range;
