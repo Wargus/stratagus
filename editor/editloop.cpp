@@ -901,24 +901,26 @@ global void EditorUpdateDisplay(void)
     //
     //  Menu button
     //
-    if (TheUI.MenuButton.Graphic) {
-	VideoDrawSub(TheUI.MenuButton.Graphic, 0, 0,
-	    TheUI.MenuButton.Graphic->Width, TheUI.MenuButton.Graphic->Height,
-	    TheUI.MenuButtonX, TheUI.MenuButtonY);
+    if (TheUI.MenuButtonGraphic.Graphic) {
+	VideoDrawSub(TheUI.MenuButtonGraphic.Graphic, 0, 0,
+		TheUI.MenuButtonGraphic.Graphic->Width,
+		TheUI.MenuButtonGraphic.Graphic->Height,
+		TheUI.MenuButtonGraphicX, TheUI.MenuButtonGraphicY);
     }
-    DrawMenuButton(MBUTTON_MAIN,
-	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
+    DrawMenuButton(TheUI.MenuButton.Button,
+	    (ButtonAreaUnderCursor == ButtonAreaMenu
+		&& ButtonUnderCursor == 0 ? MenuButtonActive : 0) |
 	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
-	    128, 19,
-	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
-	    GameFont,"Menu (~<F10~>)",NULL,NULL);
+	    TheUI.MenuButton.Width, TheUI.MenuButton.Height,
+	    TheUI.MenuButton.X,TheUI.MenuButton.Y,
+	    GameFont,TheUI.MenuButton.Text,NULL,NULL);
 
     //
     //  Minimap border
     //
     if (TheUI.Minimap.Graphic) {
 	VideoDrawSub(TheUI.Minimap.Graphic, 0, 0, TheUI.Minimap.Graphic->Width,
-	    TheUI.Minimap.Graphic->Height, TheUI.MinimapX, TheUI.MinimapY);
+		TheUI.Minimap.Graphic->Height, TheUI.MinimapX, TheUI.MinimapY);
     }
     //
     //  Minimap
@@ -1713,18 +1715,17 @@ local void EditorCallbackMouse(int x, int y)
 	SetStatusLine("Tile mode");
 	return;
     }
-    for (i = 0; i < (int)(sizeof(TheUI.Buttons)/sizeof(*TheUI.Buttons)); ++i) {
-	if (x < TheUI.Buttons[i].X
-		|| x > TheUI.Buttons[i].X + TheUI.Buttons[i].Width
-		|| y < TheUI.Buttons[i].Y
-		|| y > TheUI.Buttons[i].Y + TheUI.Buttons[i].Height) {
-	    continue;
+    if( TheUI.MenuButton.X!=-1 ) {
+	if( x>=TheUI.MenuButton.X
+		&& x<=TheUI.MenuButton.X+TheUI.MenuButton.Width
+		&& y>TheUI.MenuButton.Y
+		&& y<=TheUI.MenuButton.Y+TheUI.MenuButton.Height ) {
+	    ButtonAreaUnderCursor=ButtonAreaMenu;
+	    ButtonUnderCursor=ButtonUnderMenu;
+	    CursorOn=CursorOnButton;
+	    MustRedraw|=RedrawMenuButton;
+	    return;
 	}
-	DebugLevel3("On button %d\n" _C_ i);
-	ButtonUnderCursor = i;
-	CursorOn = CursorOnButton;
-	ClearStatusLine();
-	return;
     }
 
     //

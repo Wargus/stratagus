@@ -229,10 +229,22 @@ typedef struct _ui_ {
     // Map* attributes of Viewport are unused here:
     Viewport	MapArea;		/// geometry of the whole map area
 
-    // The menu button
-    GraphicConfig MenuButton;		/// menu button background
-    int		MenuButtonX;		/// menu button screen X position
-    int		MenuButtonY;		/// menu button screen Y position
+    // The menu button graphic
+    GraphicConfig MenuButtonGraphic;	/// menu button background
+    int		MenuButtonGraphicX;	/// menu button screen X position
+    int		MenuButtonGraphicY;	/// menu button screen Y position
+
+    /// Menu buttons
+    struct {
+	int	X;			/// button screen X position
+	int	Y;			/// button screen Y position
+	char*	Text;			/// button caption
+	int	Width;			/// button width
+	int	Height;			/// button height
+	int	Button;			/// button style
+    }		MenuButton,
+		NetworkMenuButton,
+		NetworkDiplomacyButton;
 
     // The minimap
     GraphicConfig Minimap;		/// minimap panel background
@@ -245,10 +257,12 @@ typedef struct _ui_ {
     int		StatusLineX;		/// status line screeen X position
     int		StatusLineY;		/// status line screeen Y position
 
-	/// all buttons (1 Menu, 9 Group, 9 Command)
-    Button	Buttons[MaxButtons];
-	/// used for displaying unit training queues
-    Button	Buttons2[6];
+    Button*	InfoButtons;		/// Info buttons
+    int		NumInfoButtons;		/// Number of info buttons
+    Button*	TrainingButtons;	/// Training buttons
+    int		NumTrainingButtons;	/// Number of training buttons
+    Button*	ButtonButtons;		/// Button panel buttons
+    int		NumButtonButtons;	/// Number of button panel buttons
 
     // Offsets for 640x480 center used by menus
     int		Offset640X;		/// Offset for 640x480 X position

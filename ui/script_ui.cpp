@@ -530,6 +530,86 @@ local SCM CclSetGameCursor(SCM ident)
 }
 
 /**
+**	Define a menu item
+**
+**	FIXME: need some general data structure to make this parsing easier.
+**
+**	@param value	Button type.
+*/
+local MenuButtonId scm2buttonid(SCM value)
+{
+    MenuButtonId id;
+
+    if ( gh_eq_p(value, gh_symbol2scm("main")) ) {
+        id=MBUTTON_MAIN;
+    } else if ( gh_eq_p(value, gh_symbol2scm("network")) ) {
+        id=MBUTTON_NETWORK;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gm-half")) ) {
+        id=MBUTTON_GM_HALF;
+    } else if ( gh_eq_p(value, gh_symbol2scm("132")) ) {
+        id=MBUTTON_132;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gm-full")) ) {
+        id=MBUTTON_GM_FULL;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gem-round")) ) {
+        id=MBUTTON_GEM_ROUND;
+    } else if ( gh_eq_p(value, gh_symbol2scm("gem-square")) ) {
+        id=MBUTTON_GEM_SQUARE;
+    } else if ( gh_eq_p(value, gh_symbol2scm("up-arrow")) ) {
+        id=MBUTTON_UP_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("down-arrow")) ) {
+        id=MBUTTON_DOWN_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("left-arrow")) ) {
+        id=MBUTTON_LEFT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("right-arrow")) ) {
+        id=MBUTTON_RIGHT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("s-knob")) ) {
+        id=MBUTTON_S_KNOB;
+    } else if ( gh_eq_p(value, gh_symbol2scm("s-vcont")) ) {
+        id=MBUTTON_S_VCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("s-hcont")) ) {
+        id=MBUTTON_S_HCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("pulldown")) ) {
+        id=MBUTTON_PULLDOWN;
+    } else if ( gh_eq_p(value, gh_symbol2scm("vthin")) ) {
+        id=MBUTTON_VTHIN;
+    } else if ( gh_eq_p(value, gh_symbol2scm("folder")) ) {
+        id=MBUTTON_FOLDER;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-gem-round")) ) {
+        id=MBUTTON_SC_GEM_ROUND;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-gem-square")) ) {
+        id=MBUTTON_SC_GEM_SQUARE;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-up-arrow")) ) {
+        id=MBUTTON_SC_UP_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-down-arrow")) ) {
+        id=MBUTTON_SC_DOWN_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-left-arrow")) ) {
+        id=MBUTTON_SC_LEFT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-right-arrow")) ) {
+        id=MBUTTON_SC_RIGHT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-knob")) ) {
+        id=MBUTTON_SC_S_KNOB;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-vcont")) ) {
+        id=MBUTTON_SC_S_VCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-hcont")) ) {
+        id=MBUTTON_SC_S_HCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-pulldown")) ) {
+        id=MBUTTON_SC_PULLDOWN;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-button-left")) ) {
+        id=MBUTTON_SC_BUTTON_LEFT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-button")) ) {
+        id=MBUTTON_SC_BUTTON;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-button-right")) ) {
+        id=MBUTTON_SC_BUTTON_RIGHT;
+    } else {
+	char *s1=gh_scm2newstr(value, NULL);
+        fprintf(stderr, "Unsupported button %s\n", s1);
+        free(s1);
+	return 0;
+    }
+    return id;
+}
+
+/**
 **	Define the look+feel of the user interface.
 **
 **	FIXME: need some general data structure to make this parsing easier.
@@ -896,10 +976,10 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    free(ui->MenuButton.File);
-    ui->MenuButton.File=str;
-    ui->MenuButtonX=x;
-    ui->MenuButtonY=y;
+    free(ui->MenuButtonGraphic.File);
+    ui->MenuButtonGraphic.File=str;
+    ui->MenuButtonGraphicX=x;
+    ui->MenuButtonGraphicY=y;
 
     //	Minimap
     temp=gh_car(list);
@@ -950,61 +1030,203 @@ local SCM CclDefineUI(SCM list)
     ui->StatusLineY=y;
 
     // Buttons
-    for( i=0; i<MaxButtons; ++i ) {
-	temp=gh_car(list);
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("menu-button")) ) {
+	sublist=gh_car(list);
 	list=gh_cdr(list);
-
-	if( !gh_list_p(temp) ) {
-	    fprintf(stderr,"list expected\n");
-	    return SCM_UNSPECIFIED;
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->MenuButton.X=gh_scm2int(gh_car(value));
+		ui->MenuButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->MenuButton.Width=gh_scm2int(gh_car(value));
+		ui->MenuButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->MenuButton.Text=gh_scm2newstr(value,NULL);
+	    } else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->MenuButton.Button=scm2buttonid(value);
+	    } else {
+		errl("Unsupported tag",value);
+	    }
 	}
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Buttons[i].X=x;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	y=gh_scm2int(value);
-	ui->Buttons[i].Y=y;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Buttons[i].Width=x;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	y=gh_scm2int(value);
-	ui->Buttons[i].Height=y;
     }
-    for( i=0; i<6; ++i ) {
-	temp=gh_car(list);
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("network-menu-button")) ) {
+	sublist=gh_car(list);
 	list=gh_cdr(list);
-
-	if( !gh_list_p(temp) ) {
-	    fprintf(stderr,"list expected\n");
-	    return SCM_UNSPECIFIED;
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkMenuButton.X=gh_scm2int(gh_car(value));
+		ui->NetworkMenuButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkMenuButton.Width=gh_scm2int(gh_car(value));
+		ui->NetworkMenuButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkMenuButton.Text=gh_scm2newstr(value,NULL);
+	    } else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkMenuButton.Button=scm2buttonid(value);
+	    } else {
+		errl("Unsupported tag",value);
+	    }
 	}
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Buttons2[i].X=x;
+    }
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("network-diplomacy-button")) ) {
+	sublist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkDiplomacyButton.X=gh_scm2int(gh_car(value));
+		ui->NetworkDiplomacyButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkDiplomacyButton.Width=gh_scm2int(gh_car(value));
+		ui->NetworkDiplomacyButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkDiplomacyButton.Text=gh_scm2newstr(value,NULL);
+	    } else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->NetworkDiplomacyButton.Button=scm2buttonid(value);
+	    } else {
+		errl("Unsupported tag",value);
+	    }
+	}
+    }
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("info-buttons")) ) {
+	SCM slist;
+	SCM sslist;
+	Button* b;
 
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	y=gh_scm2int(value);
-	ui->Buttons2[i].Y=y;
+	slist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(slist) ) {
+	    sslist=gh_car(slist);
+	    slist=gh_cdr(slist);
+	    ui->NumInfoButtons++;
+	    ui->InfoButtons=realloc(ui->InfoButtons,
+		    ui->NumInfoButtons*sizeof(*ui->InfoButtons));
+	    b=&ui->InfoButtons[ui->NumInfoButtons-1];
+	    while( !gh_null_p(sslist) ) {
+		value=gh_car(sslist);
+		sslist=gh_cdr(sslist);
+		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    b->X=gh_scm2int(gh_car(value));
+		    b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    b->Width=gh_scm2int(gh_car(value));
+		    b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	}
+    }
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("training-buttons")) ) {
+	SCM slist;
+	SCM sslist;
+	Button* b;
 
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Buttons2[i].Width=x;
+	slist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(slist) ) {
+	    sslist=gh_car(slist);
+	    slist=gh_cdr(slist);
+	    ui->NumTrainingButtons++;
+	    ui->TrainingButtons=realloc(ui->TrainingButtons,
+		    ui->NumTrainingButtons*sizeof(*ui->TrainingButtons));
+	    b=&ui->TrainingButtons[ui->NumTrainingButtons-1];
+	    while( !gh_null_p(sslist) ) {
+		value=gh_car(sslist);
+		sslist=gh_cdr(sslist);
+		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    b->X=gh_scm2int(gh_car(value));
+		    b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    b->Width=gh_scm2int(gh_car(value));
+		    b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	}
+    }
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("button-buttons")) ) {
+	SCM slist;
+	SCM sslist;
+	Button* b;
 
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	y=gh_scm2int(value);
-	ui->Buttons2[i].Height=y;
+	slist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(slist) ) {
+	    sslist=gh_car(slist);
+	    slist=gh_cdr(slist);
+	    ui->NumButtonButtons++;
+	    ui->ButtonButtons=realloc(ui->ButtonButtons,
+		    ui->NumButtonButtons*sizeof(*ui->ButtonButtons));
+	    b=&ui->ButtonButtons[ui->NumButtonButtons-1];
+	    while( !gh_null_p(sslist) ) {
+		value=gh_car(sslist);
+		sslist=gh_cdr(sslist);
+		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    b->X=gh_scm2int(gh_car(value));
+		    b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    b->Width=gh_scm2int(gh_car(value));
+		    b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	}
     }
 
     //
@@ -1512,84 +1734,6 @@ local SCM CclDefineMenu(SCM list)
     }
 
     return SCM_UNSPECIFIED;
-}
-
-/**
-**	Define a menu item
-**
-**	FIXME: need some general data structure to make this parsing easier.
-**
-**	@param value	Button type.
-*/
-local MenuButtonId scm2buttonid(SCM value)
-{
-    MenuButtonId id;
-
-    if ( gh_eq_p(value, gh_symbol2scm("main")) ) {
-        id=MBUTTON_MAIN;
-    } else if ( gh_eq_p(value, gh_symbol2scm("gm-half")) ) {
-        id=MBUTTON_GM_HALF;
-    } else if ( gh_eq_p(value, gh_symbol2scm("132")) ) {
-        id=MBUTTON_132;
-    } else if ( gh_eq_p(value, gh_symbol2scm("gm-full")) ) {
-        id=MBUTTON_GM_FULL;
-    } else if ( gh_eq_p(value, gh_symbol2scm("gem-round")) ) {
-        id=MBUTTON_GEM_ROUND;
-    } else if ( gh_eq_p(value, gh_symbol2scm("gem-square")) ) {
-        id=MBUTTON_GEM_SQUARE;
-    } else if ( gh_eq_p(value, gh_symbol2scm("up-arrow")) ) {
-        id=MBUTTON_UP_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("down-arrow")) ) {
-        id=MBUTTON_DOWN_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("left-arrow")) ) {
-        id=MBUTTON_LEFT_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("right-arrow")) ) {
-        id=MBUTTON_RIGHT_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("s-knob")) ) {
-        id=MBUTTON_S_KNOB;
-    } else if ( gh_eq_p(value, gh_symbol2scm("s-vcont")) ) {
-        id=MBUTTON_S_VCONT;
-    } else if ( gh_eq_p(value, gh_symbol2scm("s-hcont")) ) {
-        id=MBUTTON_S_HCONT;
-    } else if ( gh_eq_p(value, gh_symbol2scm("pulldown")) ) {
-        id=MBUTTON_PULLDOWN;
-    } else if ( gh_eq_p(value, gh_symbol2scm("vthin")) ) {
-        id=MBUTTON_VTHIN;
-    } else if ( gh_eq_p(value, gh_symbol2scm("folder")) ) {
-        id=MBUTTON_FOLDER;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-gem-round")) ) {
-        id=MBUTTON_SC_GEM_ROUND;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-gem-square")) ) {
-        id=MBUTTON_SC_GEM_SQUARE;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-up-arrow")) ) {
-        id=MBUTTON_SC_UP_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-down-arrow")) ) {
-        id=MBUTTON_SC_DOWN_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-left-arrow")) ) {
-        id=MBUTTON_SC_LEFT_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-right-arrow")) ) {
-        id=MBUTTON_SC_RIGHT_ARROW;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-knob")) ) {
-        id=MBUTTON_SC_S_KNOB;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-vcont")) ) {
-        id=MBUTTON_SC_S_VCONT;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-hcont")) ) {
-        id=MBUTTON_SC_S_HCONT;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-pulldown")) ) {
-        id=MBUTTON_SC_PULLDOWN;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-button-left")) ) {
-        id=MBUTTON_SC_BUTTON_LEFT;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-button")) ) {
-        id=MBUTTON_SC_BUTTON;
-    } else if ( gh_eq_p(value, gh_symbol2scm("sc-button-right")) ) {
-        id=MBUTTON_SC_BUTTON_RIGHT;
-    } else {
-	char *s1=gh_scm2newstr(value, NULL);
-        fprintf(stderr, "Unsupported button %s\n", s1);
-        free(s1);
-	return 0;
-    }
-    return id;
 }
 
 local int scm2hotkey(SCM value)

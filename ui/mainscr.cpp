@@ -188,10 +188,10 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Draw icon in upper left corner
     //
-    x=TheUI.Buttons[1].X;
-    y=TheUI.Buttons[1].Y;
+    x=TheUI.InfoButtons[0].X;
+    y=TheUI.InfoButtons[0].Y;
     DrawUnitIcon(unit->Player,type->Icon.Icon
-	    ,(ButtonUnderCursor==1)
+	    ,(ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==0)
 		? (IconActive|(MouseButtons&LeftButton)) : 0
 	    ,x,y);
     UiDrawLifeBar(unit,x,y);
@@ -313,12 +313,12 @@ global void DrawUnitInfo(const Unit* unit)
 	    } else {
 		VideoDrawTextCentered(x+114,y+8+29,GameFont,"Training...");
 
-		for( i = 0; i < unit->Data.Train.Count; i++ ) {
+		for( i=0; i<unit->Data.Train.Count; ++i ) {
 		    DrawUnitIcon(unit->Player
 			    ,unit->Data.Train.What[i]->Icon.Icon
-			    ,(ButtonUnderCursor==i+4)
+			    ,(ButtonAreaUnderCursor==ButtonAreaTraining && ButtonUnderCursor==i)
 				? (IconActive|(MouseButtons&LeftButton)) : 0
-			    ,TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y);
+			    ,TheUI.TrainingButtons[i].X,TheUI.TrainingButtons[i].Y);
 		}
 
 		UiDrawCompleted(
@@ -431,16 +431,16 @@ global void DrawUnitInfo(const Unit* unit)
 	    if( unit->OnBoard[i]!=NoUnitP ) {
 		DrawUnitIcon(unit->Player
 		    ,unit->OnBoard[i]->Type->Icon.Icon
-		    ,(ButtonUnderCursor==i+4)
+		    ,(ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==i+3)
 			? (IconActive|(MouseButtons&LeftButton)) : 0
-			    ,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
+			    ,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
 		UiDrawLifeBar(unit->OnBoard[i]
-			,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
+			,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
 		if( unit->OnBoard[i]->Type->CanCastSpell ) {
 		    UiDrawManaBar(unit->OnBoard[i]
-			    ,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
+			    ,TheUI.InfoButtons[i+3].X,TheUI.InfoButtons[i+3].Y);
 		}
-		if( ButtonUnderCursor==i+4 ) {
+		if( ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==i+3 ) {
 		    if( unit->OnBoard[i]->Name ) {
 			char buf[128];
 
@@ -1125,13 +1125,14 @@ global void DrawInfoPanel(void)
             for( i=0; i<NumSelected; ++i ) {
 	        DrawUnitIcon(ThisPlayer
 			,Selected[i]->Type->Icon.Icon
-			,(ButtonUnderCursor==i+1)
+			,(ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==i)
 			    ? (IconActive|(MouseButtons&LeftButton)) : 0
-				,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
+				,TheUI.InfoButtons[i].X,TheUI.InfoButtons[i].Y);
 		UiDrawLifeBar(Selected[i]
-			,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
+			,TheUI.InfoButtons[i].X,TheUI.InfoButtons[i].Y);
 
-		if( ButtonUnderCursor==1+i ) {
+		if( ButtonAreaUnderCursor==ButtonAreaInfo
+			&& ButtonUnderCursor==i ) {
 		    if( Selected[i]->Name ) {
 			char buf[128];
 
@@ -1163,7 +1164,7 @@ global void DrawInfoPanel(void)
 	    }
 	    DrawInfoPanelBackground(i);
 	    DrawUnitInfo(Selected[0]);
-	    if( ButtonUnderCursor==1 ) {
+	    if( ButtonAreaUnderCursor==ButtonAreaInfo && ButtonUnderCursor==0 ) {
 		if( Selected[0]->Name ) {
 		    char buf[128];
 
