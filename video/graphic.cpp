@@ -175,8 +175,10 @@ void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
 void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
 {
-	// FIXME: not done
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
 	VideoDrawSub(g, gx, gy, w, h, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 #endif
 
