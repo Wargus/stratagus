@@ -125,6 +125,8 @@ local SCM CclDefineMissileType(SCM list)
 		// FIXME: this leaves a half initialized missile-type
 		errl("Unsupported class", value);
 	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("num-bounces"))) {
+	    mtype->NumBounces = gh_scm2int(gh_car(list));
 	} else if (gh_eq_p(value, gh_symbol2scm("delay"))) {
 	    mtype->StartDelay = gh_scm2int(gh_car(list));
 	} else if (gh_eq_p(value, gh_symbol2scm("sleep")) ) {
@@ -257,6 +259,10 @@ local SCM CclMissile(SCM list)
 	    DebugCheck(!missile);
 	    missile->State = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("anim-wait"))) {
+	    DebugCheck(!missile);
+	    missile->AnimWait = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("wait"))) {
 	    DebugCheck(!missile);
 	    missile->Wait = gh_scm2int(gh_car(list));
@@ -288,12 +294,6 @@ local SCM CclMissile(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
 	    DebugCheck(!missile);
 	    missile->TTL = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("controller"))) {
-	    DebugCheck(!missile);
-	    DebugLevel0Fn("FIXME: no point in reading a pointer value from a saved game!!\n");
-	    //missile->Controller = gh_scm2int(gh_car(list));
-	    missile->Controller = NULL;
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("data"))) {
 	    SCM sublist;
