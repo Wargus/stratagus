@@ -86,7 +86,6 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 
 	for (x = 0; x < i*rate; x += 4) {
 	    for (y = 0; y < 4; ++y) {
-		DebugCheck(x/rate+(y&1) >= i);
 		data->PointerInBuffer[sample->Length + x + y] = sndbuf[x/rate+(y&1)];
 	    }
 	}
