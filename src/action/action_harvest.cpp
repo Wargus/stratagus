@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_harvest.c -	The harvest action. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -211,9 +210,7 @@ local int ChopWood(Unit* unit)
 		ResetPath(unit->Command);
 		unit->Command.Data.Move.Range=1;
 		unit->Command.Data.Move.Goal=destu;
-#ifdef NEW_UNIT
 		destu->Refs++;
-#endif
 #if 1
 		// Fast movement need this??
 		NearestOfUnit(destu,unit->X,unit->Y
@@ -257,7 +254,6 @@ local int ReturnWithWood(Unit* unit)
     //	Target is dead, stop harvest
     //
     if( destu ) {
-#ifdef NEW_UNIT
 	if( destu->Destroyed ) {
 	    DebugLevel0Fn("Destroyed unit\n");
 	    if( !--destu->Refs ) {
@@ -277,11 +273,6 @@ local int ReturnWithWood(Unit* unit)
 	}
 	unit->Command.Data.Move.Goal=NoUnitP;
 	--destu->Refs;
-#else
-
-    // FIXME: stored target not used!
-
-#endif
     }
 
     x=unit->Command.Data.Move.DX;

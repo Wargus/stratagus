@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_returngoods.c -	The return goods action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -61,9 +60,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
-#ifdef NEW_UNIT
 	++destu->Refs;
-#endif
 	unit->Command.Data.Move.Range=1;
 #if 1
 	NearestOfUnit(destu,unit->X,unit->Y
@@ -87,9 +84,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
-#ifdef NEW_UNIT
 	++destu->Refs;
-#endif
 	unit->Command.Data.Move.Range=1;
 #if 1
 	NearestOfUnit(destu,unit->X,unit->Y
@@ -117,9 +112,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=destu;
-#ifdef NEW_UNIT
 	++destu->Refs;
-#endif
 	unit->Command.Data.Move.Range=1;
 #if 1
 	NearestOfUnit(destu,unit->X,unit->Y

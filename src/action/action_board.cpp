@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_board.c	-	The board action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -71,7 +70,6 @@ local int WaitForTransporter(Unit* unit)
 	DebugLevel3Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
 	return 0;
     }
-#ifdef NEW_UNIT
     if( trans->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
 	if( !--trans->Refs ) {
@@ -85,7 +83,6 @@ local int WaitForTransporter(Unit* unit)
 	unit->Command.Data.Move.Goal=trans=NoUnitP;
 	return 0;
     }
-#endif
 
     if( MapDistanceToUnit(unit->X,unit->Y,trans)==1 ) {
 	DebugLevel3Fn("Enter transporter\n");
@@ -112,7 +109,6 @@ local void EnterTransporter(Unit* unit)
     unit->SubAction=0;
 
     transporter=unit->Command.Data.Move.Goal;
-#ifdef NEW_UNIT
     if( transporter->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
 	if( !--transporter->Refs ) {
@@ -125,7 +121,6 @@ local void EnterTransporter(Unit* unit)
 	return;
     }
     --transporter->Refs;
-#endif
 
     //
     //	Find free slot in transporter.
@@ -186,11 +181,9 @@ global void HandleActionBoard(Unit* unit)
 		    if( i==PF_UNREACHABLE ) {
 			if( ++unit->SubAction==200 ) {
 			    unit->Command.Action=UnitActionStill;
-#ifdef NEW_UNIT
 			    if( unit->Command.Data.Move.Goal ) {
 				--unit->Command.Data.Move.Goal->Refs;
 			    }
-#endif
 			    unit->SubAction=0;
 			}
 		    } else if( i==PF_REACHED ) {

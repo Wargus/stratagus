@@ -79,7 +79,7 @@ etlib/prgname.o: etlib/prgname.c
 
 # UNIX-TARGET
 freecraft:	src etlib/hash.o src/libclone.a 
-	$(CC) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
+	$(CC) -o freecraft src/libclone.a -lefence $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
 freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o src/libclone.a 
@@ -256,6 +256,7 @@ buildclean:
 	rm -rf data/*.rgb data/*.gimp data/puds data/sound data/graphic \
 	data/interface data/campaigns data/text data/health.png data/mana.png \
 	data/default.pud.gz data/freecraft.png
+	rm -rf data/graphics data/sounds data/texts
 
 release:
 	make distclean

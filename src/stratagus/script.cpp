@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl.c		-	The craft configuration language. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -457,7 +456,6 @@ local SCM CclMouseScrollOff(void)
 */
 local SCM CclUnits(void)
 {
-#ifdef NEW_UNIT
     Unit** slot;
     int freeslots;
     int destroyed;
@@ -497,9 +495,6 @@ local SCM CclUnits(void)
 	    ,freeslots,MAX_UNIT_SLOTS-2-freeslots,destroyed,nullrefs);
 
     return gh_int2scm(destroyed);
-#else
-    return SCM_UNSPECIFIED;
-#endif
 }
 
 /**

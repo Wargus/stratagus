@@ -79,7 +79,6 @@ global int SelectUnitsOnTile(int x,int y,Unit** table)
 */
 global int FindUnitsByType(const UnitType* type,Unit** table)
 {
-#ifdef NEW_UNIT
     Unit* unit;
     int i;
     int num;
@@ -91,19 +90,6 @@ global int FindUnitsByType(const UnitType* type,Unit** table)
 	}
     }
     return num;
-#else
-    Unit* unit;
-    int i;
-    int num;
-
-    for( num=i=0; i<NumUnits; i++ ) {
-	unit=Units[i];
-	if( unit->Type==type && !UnitUnusable(unit) ) {
-	    table[num++]=unit;
-	}
-    }
-    return num;
-#endif
 }
 
 /**
@@ -198,7 +184,6 @@ global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
 */
 global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 {
-#ifdef NEW_UNIT
     Unit* table[MAX_UNITS];
     Unit* unit;
     UnitType* type;
@@ -224,31 +209,6 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 	// FIXME: more possible targets? choose the best one
 	return unit;
     }
-#else
-    Unit* unit;
-    UnitType* type;
-    int i;
-
-    // FIXME: This can be later rewritten.
-
-    for( i=0; i<NumUnits; i++ ) {
-	unit=Units[i];
-	// unusable unit ?
-	// if( UnitUnusable(unit) ) can't attack constructions
-	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
-	    continue;
-	}
-	type=unit->Type;
-	if( tx<unit->X || tx>=unit->X+type->TileWidth
-		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
-	    continue;
-	}
-	if( !CanTarget(source->Type,unit->Type) ) {
-	    continue;
-	}
-	return unit;
-    }
-#endif
     return NoUnitP;
 }
 

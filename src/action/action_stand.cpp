@@ -51,7 +51,7 @@ global void HandleActionStandGround(Unit* unit)
     const UnitType* type;
     Unit* goal;
 
-    DebugLevel3(__FUNCTION__": %Zd\n",UnitNumber(unit));
+    DebugLevel3Fn("%Zd\n",UnitNumber(unit));
 
     type=unit->Type;
 
@@ -180,15 +180,11 @@ global void HandleActionStandGround(Unit* unit)
 	    // FIXME: johns, looks wired what I have written here
 	    // FIXME: Why have I written such a chaos? (johns)
 	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
-#ifdef NEW_UNIT
 		if( unit->Command.Data.Move.Goal ) {
 		    unit->Command.Data.Move.Goal--;
 		}
 		unit->Command.Data.Move.Goal=goal;
 		goal->Refs++;
-#else
-		unit->Command.Data.Move.Goal=goal;
-#endif
 		unit->State=0;
 		unit->SubAction=1;
 		// Turn to target

@@ -959,7 +959,6 @@ local void Abort(void) { abort(); }
 */
 local Unit* NetworkValidUnit(int nr,int id)
 {
-#ifdef NEW_UNIT
     nr = ntohl(nr);
 
     if( UnitSlots[nr]->Slot==nr ) {
@@ -967,35 +966,6 @@ local Unit* NetworkValidUnit(int nr,int id)
     }
     DebugLevel0("Couldn't find unit %x", nr);
     return NoUnitP;
-#else
-    Unit* unit;
-    int i;
-
-    nr = ntohl(nr);
-    for (i = 0; i < NumUnits ; ++i) {
-	if (UnitsPool[i].Id == nr)
-	    break;
-    }
-    IfDebug(
-	if (i >= NumUnits) {
-	    DebugLevel0("Couldn't find unit %x", nr);
-	    Abort();
-	    return NoUnitP;
-	}
-    );
-
-    unit = UnitsPool + i;
-
-    IfDebug(
-	if( UnitUnusable(unit) ) {
-	    DebugLevel0("Unit Dying?\n");
-	    Abort();
-	    return NoUnitP;
-	}
-    );
-
-    return unit;
-#endif
 }
 
 /**
@@ -1337,22 +1307,13 @@ global void NetworkSendCommand(int command,Unit* unit,int x,int y
     // We must find another solution than this one...
     // guess this is a networked crash :)
     message.Data.Command.UnitNr=htonl(UnitNumber(unit));
-#ifdef NEW_UNIT
     message.Data.Command.DestId=0;
-#else
-    message.Data.Command.UnitId=htonl(unit->Id);
-#endif
     message.Data.Command.X=htonl(x);
     message.Data.Command.Y=htonl(y);
     if( dest ) {
 	// We must find another solution than this one...
-#ifdef NEW_UNIT
 	message.Data.Command.DestNr=htonl(UnitNumber(dest));
 	message.Data.Command.DestId=0;
-#else
-	message.Data.Command.DestNr=htonl(UnitNumber(dest));
-	message.Data.Command.DestId=htonl(dest->Id);
-#endif
     } else {
 	message.Data.Command.DestNr=htonl(-1);
 	message.Data.Command.DestId=htonl(-1);

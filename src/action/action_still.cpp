@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_still.c	-	The stand still action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -208,15 +207,11 @@ global void HandleActionStill(Unit* unit)
 	    // FIXME: Applies now only for towers
 	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
 		// New target.
-#ifdef NEW_UNIT
 		if( unit->Command.Data.Move.Goal ) {
 		    unit->Command.Data.Move.Goal--;
 		}
 		unit->Command.Data.Move.Goal=goal;
 		goal->Refs++;
-#else
-		unit->Command.Data.Move.Goal=goal;
-#endif
 		unit->State=0;
 		unit->SubAction=1;
 		// Turn to target
@@ -230,11 +225,9 @@ global void HandleActionStill(Unit* unit)
     }
 
     if( unit->SubAction ) {		// was attacking.
-#ifdef NEW_UNIT
 	if( unit->Command.Data.Move.Goal ) {
 	    unit->Command.Data.Move.Goal--;
 	}
-#endif
 	unit->SubAction=unit->State=0;
     }
 

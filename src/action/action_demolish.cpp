@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_demolish.c	-	The demolish action. */
-/*
-**	(c) Copyright 1999,2000 by Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999,2000 by Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -62,7 +61,6 @@ global void HandleActionDemolish(Unit* unit)
 	    err=HandleActionMove(unit); 
 	    if( unit->Reset ) {
 		goal=unit->Command.Data.Move.Goal;
-#ifdef NEW_UNIT
 		//
 		//	Target is dead, stop demolish
 		//
@@ -85,18 +83,6 @@ global void HandleActionDemolish(Unit* unit)
 			return;
 		    }
 		}
-#else
-		//
-		//	Target is dead, stop demolish
-		//
-		if( goal && (!goal->Type || !goal->HP
-			|| goal->Command.Action==UnitActionDie) ) {
-		    // FIXME: this can't happen, HandleActionMove resets goal!
-		    unit->Command.Data.Move.Goal=NoUnitP;
-		    unit->Command.Action=UnitActionStill;
-		    return;
-		}
-#endif
 
 		//
 		//	Have reached target? FIXME: could use result?
@@ -122,12 +108,10 @@ global void HandleActionDemolish(Unit* unit)
 	//	Demolish the target.
 	//
 	case 1:
-#ifdef NEW_UNIT
 	    goal=unit->Command.Data.Move.Goal;
 	    if( goal ) {
 		--goal->Refs;
 	    }
-#endif
 
             x=unit->X;
             y=unit->Y;

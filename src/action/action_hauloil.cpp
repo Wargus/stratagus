@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_hauloil.c -	The haul oil action. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -62,7 +61,6 @@ local int MoveToOilWell(Unit* unit)
     unit->Command.Action=UnitActionHaulOil;
 
     well=unit->Command.Data.Move.Goal;
-#ifdef NEW_UNIT
     if( well && (well->Destroyed || !well->HP) ) {
 	if( !--well->Refs ) {
 	    ReleaseUnit(well);
@@ -71,7 +69,6 @@ local int MoveToOilWell(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
-#endif
     if( !well ) {			// target lost?
 	DebugLevel2Fn("OIL-WELL LOST\n");
 	return -1;
@@ -85,22 +82,11 @@ local int MoveToOilWell(Unit* unit)
 	return -1;
     }
 
-#ifdef NEW_UNIT
     --well->Refs;
-#endif
 
     //
     // Activate oil-well
     //
-#ifndef NEW_UNIT
-    if( !well->Type->GivesOil ) {
-	// OilWell destoryed.
-	DebugLevel3Fn("WAIT after oil-well destroyed %d\n",unit->Wait);
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-#endif
     well->Command.Data.OilWell.Active++;
     DebugLevel0Fn("+%d\n",well->Command.Data.OilWell.Active);
     well->Frame=2;			// FIXME: this shouldn't be hard coded!
@@ -209,9 +195,7 @@ local int HaulInOilWell(Unit* unit)
 	    }
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=depot;
-#ifdef NEW_UNIT
 	    ++depot->Refs;
-#endif
 	    unit->Command.Data.Move.Range=1;
 #if 1
 	    // FIXME: old pathfinder didn't found the path to the nearest
@@ -273,7 +257,6 @@ local int MoveToOilDepot(Unit* unit)
     unit->Command.Action=UnitActionHaulOil;
 
     depot=unit->Command.Data.Move.Goal;
-#ifdef NEW_UNIT
     if( depot && (depot->Destroyed || !depot->HP) ) {
 	if( !--depot->Refs ) {
 	    ReleaseUnit(depot);
@@ -282,7 +265,6 @@ local int MoveToOilDepot(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
-#endif
     if( !depot ) {			// target lost?
 	DebugLevel2Fn("OIL-DEPOT LOST\n");
 	return -1;
@@ -294,9 +276,7 @@ local int MoveToOilDepot(Unit* unit)
 
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,depot)!=1 );
 
-#ifdef NEW_UNIT
     --depot->Refs;
-#endif
 
     RemoveUnit(unit);
     unit->X=depot->X;
@@ -354,9 +334,7 @@ local int WaitForOilDeliver(Unit* unit)
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=platform;
-#ifdef NEW_UNIT
 	    ++platform->Refs;
-#endif
 	    unit->Command.Data.Move.Range=1;
 #if 1
 	    // FIXME: old pathfinder didn't found the path to the nearest
@@ -408,11 +386,9 @@ global void HandleActionHaulOil(Unit* unit)
 		    if( ++unit->SubAction==1 ) {
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
-#ifdef NEW_UNIT
 			if( unit->Command.Data.Move.Goal ) {
 			    --unit->Command.Data.Move.Goal->Refs;
 			}
-#endif
 		    }
 		} else {
 		    unit->SubAction=1;
@@ -436,11 +412,9 @@ global void HandleActionHaulOil(Unit* unit)
 		    if( ++unit->SubAction==3 ) {
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
-#ifdef NEW_UNIT
 			if( unit->Command.Data.Move.Goal ) {
 			    --unit->Command.Data.Move.Goal->Refs;
 			}
-#endif
 		    }
 		} else {
 		    unit->SubAction=3;
