@@ -38,9 +38,11 @@
 #endif
 
 #ifdef USE_BZ2LIB
-#define DrawIcon __DrawIcon__
+#define DrawIcon WinDrawIcon
+#define EndMenu WinEndMenu
 #include <bzlib.h>
 #undef DrawIcon
+#undef EndMenu
 #endif
 
 #ifdef USE_ZZIPLIB
