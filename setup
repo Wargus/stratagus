@@ -25,13 +25,13 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_NETMENUS"
+EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP"
 # This could be used for experimental versions
 ## There are some still not well tested code parts or branches.
-## UNIT_ON_MAP:	Faster lookup of units
+## UNIT_ON_MAP:		Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
-## These aren't working yet:
 ## NEW_NAMES:		New unit names without copyleft problems
+## These aren't working yet:
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
