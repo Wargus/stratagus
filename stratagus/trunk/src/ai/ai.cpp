@@ -704,15 +704,15 @@ local void SaveAiTypes( CLFile * file )
 **	@param plynr	Player number.
 **	@param ai	Player AI.
 */
-local void SaveAiPlayer( CLFile * file, unsigned plynr, const PlayerAi * ai )
+local void SaveAiPlayer(CLFile* file, unsigned plynr, const PlayerAi * ai)
 {
     IOOutFile = file;
     IOLoadingMode = 0;
     IOTabLevel = 1;
 
-    CLprintf( IOOutFile, "(define-ai-player '" );
-    IOPlayerAiFullPtr( SCM_UNSPECIFIED, &ai, 0 );
-    CLprintf( IOOutFile, ")\n" );
+    CLprintf(IOOutFile, "(define-ai-player '");
+    IOPlayerAiFullPtr(SCM_UNSPECIFIED, &ai, 0);
+    CLprintf(IOOutFile, ")\n");
 }
 
 /**

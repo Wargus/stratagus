@@ -184,7 +184,7 @@ global void IOStructPtr(SCM scmform, void *binaryform, void *para)
 **	@param	binaryform	Pointer to the structure'reference to load/save ( <structure-type> * )
 **	@param	para		Pointer to a CclStructDef structure, describing format of the structure.
 */
-local void IOStructArray(SCM from, void *binaryform, void *para)
+global void IOStructArray(SCM from, void *binaryform, void *para)
 {
     CclStructDef *def;
     int i;
