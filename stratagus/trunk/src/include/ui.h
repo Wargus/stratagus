@@ -298,9 +298,9 @@ typedef struct _ui_ {
 //    SoundConfig	PlacementSuccess;	/// played on placements success
 //    SoundConfig	Click;			/// click noice used often
 
-    GraphicConfig	GameMenuePanel;	/// Panel 256 x 288
-    GraphicConfig	Menue1Panel;	/// Panel 288 x 256
-    GraphicConfig	Menue2Panel;	/// Panel 384 x 256
+    GraphicConfig	GameMenuPanel;	/// Panel 256 x 288
+    GraphicConfig	Menu1Panel;	/// Panel 288 x 256
+    GraphicConfig	Menu2Panel;	/// Panel 384 x 256
     GraphicConfig	VictoryPanel;	/// Panel 288 x 128
     GraphicConfig	ScenarioPanel;	/// Panel 352 x 352
 
