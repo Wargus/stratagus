@@ -477,7 +477,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
     //
     //	Make movement matrix.
     //
-    matrix=CreateMatrix();
+    matrix=MakeMatrix();
     w=TheMap.Width+2;
     matrix+=w+w+2;
 
@@ -509,6 +509,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 		//
 		if ( ForestOnMap(x,y) ) {
 		    if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,0) ) {
+			free(matrix);
 			return 1;
 		    }
 		}
@@ -539,6 +540,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 	ep=wp;
     }
 
+    free(matrix);
     return 0;
 }
 
