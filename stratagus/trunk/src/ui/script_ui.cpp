@@ -443,8 +443,8 @@ local SCM CclDefineUI(SCM list)
     ui->KeyScroll=TheUI.KeyScroll;
     ui->ReverseMouseMove=TheUI.ReverseMouseMove;
 
-    ui->WarpX=TheUI.WarpX;
-    ui->WarpY=TheUI.WarpY;
+    ui->WarpX=-1;
+    ui->WarpY=-1;
 
     ui->MouseAdjust=TheUI.MouseAdjust;
     ui->MouseScale=TheUI.MouseScale;
