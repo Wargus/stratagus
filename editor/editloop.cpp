@@ -641,8 +641,7 @@ local void DrawUnitIcons(void)
 		break;
 	    }
 	    icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
-	    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width,
-		icon->Height, x, y);
+	    DrawIcon(Players + SelectedPlayer, icon, x, y);
 
 	    VideoDrawRectangle(ColorGray, x, y, icon->Width, icon->Height);
 	    if( i==SelectedUnitIndex ) {
@@ -1380,16 +1379,6 @@ local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 	default:
 	    break;
     }
-}
-
-/**
-**	Callback for input.
-*/
-local void EditorCallbackKey2(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
-{
-    DebugLevel3Fn("Pressed %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_
-	    dummy2);
 }
 
 /**
