@@ -278,7 +278,6 @@ dist: distlist
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-src.tar.gz $(distdir)
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
@@ -295,7 +294,6 @@ small-dist: distlist
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-small.tar.gz $(distdir)
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
@@ -318,7 +316,6 @@ bin-dist: all
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	chown -R johns:freecraft $(distdir)
 	chmod -R a+rX $(distdir)
 	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
@@ -344,7 +341,6 @@ win32-bin-dist2: win32
 	@chmod 777 $(distdir)
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	@cp tools/build.bat $(distdir)
-	chown -R johns:freecraft $(distdir)
 	@chmod -R a+rX $(distdir)
 	@strip -s -R .comment $(distdir)/freecraft$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
@@ -375,7 +371,6 @@ linux-complete:
 	tar xzCf freecraft-complete $(FCMP)
 	rm -rf freecraft-$(MYDATE)
 	chmod 777 freecraft-complete
-	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
 	-tar czhf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
 	rm -rf freecraft-complete
@@ -389,7 +384,6 @@ win32-complete:
 	tar xzCf freecraft-complete $(FCMP)
 	rm -rf freecraft-$(MYDATE)
 	chmod 777 freecraft-complete
-	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
 	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
