@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl.c		-	The craft configuration language. */
+/**@name ccl.c - The craft configuration language. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -228,7 +228,10 @@ local int CclLoad(lua_State* l)
 		lua_error(l);
 	}
 	LibraryFileName(LuaToString(l, 1), buf);
-	LuaLoadFile(buf);
+	if (LuaLoadFile(buf) == -1) {
+		lua_pushfstring(l, "Load failed: %s", LuaToString(l, 1));
+		lua_error(l);
+	}
 	return 0;
 }
 
