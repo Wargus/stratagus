@@ -1082,6 +1082,8 @@ global int HandleCheats(const char* Input)
 local int InputKey(int key)
 {
     char ChatMessage[sizeof(Input)+40];
+    int i;
+    char *namestart = NULL;
 
     switch (key) {
 	case '\r':
@@ -1112,6 +1114,27 @@ local int InputKey(int key)
 	    if (InputIndex) {
 		Input[--InputIndex] = '\0';
 		ShowInput();
+	    }
+	    return 1;
+	case '\t':
+	    namestart = strrchr(Input, ' ');
+	    if (namestart) {
+		++namestart;
+	    } else {
+		namestart = Input;
+	    }
+	    if (!strlen(namestart)) {
+		return 1;
+	    }
+	    for (i = 0; i < PlayerMax; ++i)
+	    {
+		if (!strncmp(namestart, Players[i].Name, strlen(namestart)))
+		{
+		    InputIndex += strlen(Players[i].Name) - strlen(namestart) + 2;
+		    strcpy(namestart, Players[i].Name);
+		    strcat(namestart, ": ");
+		    ShowInput();
+		}
 	    }
 	    return 1;
 	default:
