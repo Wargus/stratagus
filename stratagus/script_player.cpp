@@ -527,45 +527,65 @@ local SCM CclNewPlayerColors(void)
 /**
 **	Get player resources.
 **
-**	@param ptr	Player
-**	@return		Player resource vector
+**	@param plyr	Player
+**	@param resource	Resource name
+**
+**	@return		Player resource
 */
-local SCM CclGetPlayerResources(SCM ptr)
+local SCM CclGetPlayerResource(SCM player,SCM resource)
 {
     int i;
-    Player* player;
-    SCM vec;
+    Player* plyr;
+    char* res;
+    SCM ret;
 
-    player=CclGetPlayer(ptr);
-    vec=cons_array(gh_int2scm(MaxCosts),NIL);
+    plyr=CclGetPlayer(player);
+    res=gh_scm2newstr(resource,NULL);
+
     for( i=0; i<MaxCosts; ++i ) {
-	aset1(vec,gh_int2scm(i),gh_int2scm(player->Resources[i]));
+	if( !strcmp(res,DefaultResourceNames[i]) ) {
+	    break;
+	}
     }
-    return vec;
+    if( i==MaxCosts ) {
+       // FIXME: this leaves a half initialized player
+       errl("Invalid resource",resource);
+    }
+    ret=gh_int2scm(plyr->Resources[i]);
+    free(res);
+    return ret;
 }
 
 /**
-**	Set player resources.
+**	Set player resource.
 **
-**	@param ptr	Player
-**	@param vec	Resources vector
-**	@return		Old resource vector
+**	@param list	Resource list
 */
-local SCM CclSetPlayerResources(SCM ptr,SCM vec)
+local SCM CclSetPlayerResource(SCM list)
 {
     int i;
     Player* player;
-    SCM old;
+    SCM value;
 
-    player=CclGetPlayer(ptr);
-    old=cons_array(gh_int2scm(MaxCosts),NIL);
-    for( i=0; i<MaxCosts; ++i ) {
-	aset1(old,gh_int2scm(i),gh_int2scm(player->Resources[i]));
+    player=CclGetPlayer(gh_car(list));
+    list=gh_cdr(list);
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	for( i=0; i<MaxCosts; ++i ) {
+	    if( gh_eq_p(value,gh_symbol2scm((char*)DefaultResourceNames[i])) ) {
+		break;
+	    }
+	}
+	if( i==MaxCosts ) {
+	   // FIXME: this leaves a half initialized player
+	   errl("Unsupported tag",value);
+	}
+	value=gh_car(list);
+	list=gh_cdr(list);
+	player->Resources[i]=gh_scm2int(value);
     }
-    for( i=0; i<MaxCosts; ++i ) {
-	player->Resources[i]=gh_scm2int(gh_vector_ref(vec,gh_int2scm(i)));
-    }
-    return old;
+    return SCM_UNSPECIFIED;
 }
 
 // ----------------------------------------------------------------------------
@@ -596,8 +616,8 @@ global void PlayerCclRegister(void)
     gh_new_procedure0_0("new-colors",CclNewPlayerColors);
 
     // player member access functions
-    gh_new_procedure1_0("get-player-resources",CclGetPlayerResources);
-    gh_new_procedure2_0("set-player-resources!",CclSetPlayerResources);
+    gh_new_procedure2_0("get-player-resource",CclGetPlayerResource);
+    gh_new_procedureN("set-player-resource!",CclSetPlayerResource);
 }
 
 //@}
