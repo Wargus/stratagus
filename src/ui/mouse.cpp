@@ -1265,53 +1265,32 @@ global void UIHandleButtonUp(unsigned button)
 	//
 	//	Little threshold
 	//
-	if( CursorStartX<CursorX-1
-		|| CursorStartX>CursorX+1
-		|| CursorStartY<CursorY-1
-		|| CursorStartY>CursorY+1 ) {
+	if( CursorStartX<CursorX-1 || CursorStartX>CursorX+1
+		|| CursorStartY<CursorY-1 || CursorStartY>CursorY+1 ) {
 	    //
 	    //	Select rectangle
 	    //
 	    int x,y,w,h;
 
-#if 0
-	    x=CursorStartX;
-	    if( x>CursorX ) {
-		x=CursorX;
-		w=CursorStartX-x;
-	    } else {
-		w=CursorX-x;
-	    }
-
-	    y=CursorStartY;
-	    if( y>CursorY ) {
-		y=CursorY;
-		h=CursorStartY-y;
-	    } else {
-		h=CursorY-y;
-	    }
-#endif
-	    x = Screen2MapX (CursorStartX);
-	    y = Screen2MapY (CursorStartY);
-	    w = Screen2MapX (CursorX);
-	    h = Screen2MapY (CursorY);
+	    x = Screen2MapX(CursorStartX);
+	    y = Screen2MapY(CursorStartY);
+	    w = Screen2MapX(CursorX);
+	    h = Screen2MapY(CursorY);
 	    if (x>w) {
-		int swap = x;
-		x = w;
-		w = swap;
+		x ^= w;			// Hint: this swaps x and w
+		w ^= x;
+		x ^= w;
 	    }
 	    if (y>h) {
-		int swap = y;
-		y = h;
-		h = swap;
+		h ^= y;			// Hint: this swaps y and h
+		y ^= h;
+		h ^= y;
 	    }
 	    w -= x;
 	    h -= y;
             if( KeyModifiers&ModifierShift ) {
-//              num=AddSelectedUnitsInRectangle(x,y,w/TileSizeX,h/TileSizeY);
                 num=AddSelectedUnitsInRectangle(x,y,w,h);
             } else {
-//              num=SelectUnitsInRectangle(x,y,w/TileSizeX,h/TileSizeY);
                 num=SelectUnitsInRectangle(x,y,w,h);
             }
 	} else {
@@ -1338,8 +1317,11 @@ global void UIHandleButtonUp(unsigned button)
                     num=SelectGroupFromUnit(unit);
 
 		    // Don't allow to select own and enemy units.
+		    // Don't allow mixing buildings
 		} else if( KeyModifiers&ModifierShift
 			&& unit->Player==ThisPlayer
+			&& !unit->Type->Building 
+			&& (NumSelected!=1 || !Selected[0]->Type->Building)
 			&& (NumSelected!=1
 			    || Selected[0]->Player==ThisPlayer)) {
 		    num=ToggleSelectUnit(unit);
