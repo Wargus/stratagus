@@ -2703,10 +2703,6 @@ local void SaveOk(void)
     }
 }
 
-#ifndef O_BINARY
-#define O_BINARY	0
-#endif
-
 local int SaveRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
@@ -4186,10 +4182,6 @@ local void ScenSelectLBExit(Menuitem *mi)
 	mi[1].flags |= MenuButtonDisabled;
     }
 }
-
-#ifndef O_BINARY
-#define O_BINARY	0
-#endif
 
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {

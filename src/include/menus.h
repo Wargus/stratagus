@@ -81,6 +81,10 @@ typedef unsigned MenuButtonId;
 #define MIN_GAME_SPEED		50
 #define MAX_GAME_SPEED		250
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 /*----------------------------------------------------------------------------
 --	Menus
 ----------------------------------------------------------------------------*/
