@@ -202,7 +202,7 @@ global Sample* LoadFlac(const char* name)
     MyUser user;
     CLFile* f;
     Sample* sample;
-    unsigned long magic[1];
+    unsigned int magic[1];
     FLAC__StreamDecoder* stream;
 
     if( !(f=CLopen(name)) ) {

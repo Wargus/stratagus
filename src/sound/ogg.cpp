@@ -126,7 +126,7 @@ global Sample *LoadOgg(const char* name)
     CLFile* f;
     Sample* sample;
     OggVorbis_File vf[1];
-    unsigned long magic[1];
+    unsigned int magic[1];
     vorbis_info* info;
     static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, OGG_tell };
     int n;

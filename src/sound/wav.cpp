@@ -66,7 +66,7 @@ global Sample* LoadWav(const char* name)
     CLFile* f;
     WavChunk chunk;
     WavFMT wavfmt;
-    unsigned long t;
+    unsigned int t;
     int i;
     Sample* sample;
 
@@ -95,7 +95,7 @@ global Sample* LoadWav(const char* name)
     t = ConvertLE32(t);
     DebugLevel3("Magic: $%lx\n", t);
     if (t != WAVE) {
-	printf("Wrong magic %lx (not %x)\n", t, WAVE);
+	printf("Wrong magic %x (not %x)\n", t, WAVE);
 	CLclose(f);
 	ExitFatal(-1);
     }
