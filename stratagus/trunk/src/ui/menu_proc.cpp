@@ -590,7 +590,7 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 				SetDefaultTextColors(nc, rc);
 				text = (*mi->d.listbox.retrieveopt)(mi, i + s);
 				if (text) {
-					if (i == mi->d.listbox.curopt) {
+					if (i + s == mi->d.listbox.curopt) {
 						SetDefaultTextColors(rc, rc);
 					} else {
 						SetDefaultTextColors(nc, rc);
@@ -599,6 +599,11 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 				}
 			}
 		}
+	}
+	if (mi->d.listbox.curopt != -1 &&
+			(mi->d.listbox.curopt < mi->d.listbox.startline ||
+				mi->d.listbox.curopt >= mi->d.listbox.startline + mi->d.listbox.nlines)) {
+		(*mi->d.listbox.retrieveopt)(mi, mi->d.listbox.curopt);
 	}
 
 	if (flags & MenuButtonSelected) {
@@ -1355,38 +1360,32 @@ normkey:
 							break;
 						case MI_TYPE_LISTBOX:
 							if (key == KeyCodeDown) {
-								if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
-									mi->d.listbox.curopt++;
-									if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-										mi->d.listbox.curopt--;
-										mi->d.listbox.startline++;
-									}
-								} else {
-									break;
+								if (mi->d.listbox.startline + mi->d.listbox.nlines < mi->d.pulldown.noptions) {
+									mi->d.listbox.startline++;
 								}
-							} else {
-								if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
-									mi->d.listbox.curopt--;
-									if (mi->d.listbox.curopt < 0) {
-										mi->d.listbox.curopt++;
-										mi->d.listbox.startline--;
-									}
-								} else {
-									break;
-								}
+							} else if (mi->d.listbox.startline > 0) {
+								mi->d.listbox.startline--;
 							}
-							if (mi->d.listbox.action) {
-								(*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+							if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
+								mi[1].d.vslider.percent = (mi->d.listbox.curopt * 100) / (mi->d.listbox.noptions - mi->d.listbox.nlines);
 							}
 							break;
 						case MI_TYPE_VSLIDER:
 							if (key == KeyCodeDown) {
 								mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
+								// Update listbox
+								if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
+									mi[-1].d.listbox.startline++;
+								}
 							} else {
 								mi->d.vslider.cflags |= MI_CFLAGS_UP;
+								// Update listbox
+								if (mi[-1].d.listbox.startline > 0) {
+									mi[-1].d.listbox.startline--;
+								}
 							}
-							if (mi->d.vslider.action) {
-								(*mi->d.vslider.action)(mi, 2);
+							if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
+								mi->d.vslider.percent = (mi->d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
 							}
 							break;
 						default:
@@ -1702,15 +1701,15 @@ static void MenuHandleMouseMove(int x, int y)
 							continue;
 						}
 						j = (y - ys) / 18;
-						if (j != mi->d.listbox.cursel) {
-							mi->d.listbox.cursel = j; // just store for click
+						if (j + mi->d.listbox.startline != mi->d.listbox.cursel) {
+							mi->d.listbox.cursel = j + mi->d.listbox.startline; // just store for click
 						}
 						if (mi->flags & MenuButtonClicked && mi->flags & MenuButtonActive) {
 							if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
 								mi->d.listbox.dohandler = 0;
 								mi->d.listbox.curopt = mi->d.listbox.cursel;
 								if (mi->d.listbox.action) {
-									(*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+									(*mi->d.listbox.action)(mi, mi->d.listbox.curopt);
 								}
 							}
 						}
@@ -1765,13 +1764,21 @@ static void MenuHandleMouseMove(int x, int y)
 								j = arrowsize;
 							}
 
-							mi->d.vslider.curper = ((j - arrowsize) * 100) / (mi->d.vslider.ysize - 54);
-							if (mi->d.vslider.curper > 100) {
-								mi->d.vslider.curper = 100;
+							mi->d.vslider.percent = ((j - arrowsize) * 100) / (mi->d.vslider.ysize - 54);
+							if (mi->d.vslider.percent > 100) {
+								mi->d.vslider.percent = 100;
 							}
 						}
-						if (mi->d.vslider.action) {
-							(*mi->d.vslider.action)(mi, 1); // 1 indicates move
+
+						// Update listbox
+						if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
+							if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
+								mi[-1].d.listbox.startline = (mi->d.vslider.percent *
+									(mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines) + 50) / 100;
+							}
+						}
+						if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
+							mi->d.vslider.percent = (mi[-1].d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
 						}
 						break;
 					}
@@ -1940,9 +1947,19 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			switch (mi->mitype) {
 				case MI_TYPE_VSLIDER:
 					mi->d.vslider.cflags = mi->d.vslider.cursel;
-					if (mi->d.vslider.action) {
-						(*mi->d.vslider.action)(mi, 0); // 0 indicates down
+
+					// Update listbox
+					--mi;
+					if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
+						if (mi->d.listbox.startline + mi->d.listbox.nlines < mi->d.listbox.noptions) {
+							mi->d.listbox.startline++;
+						}
+					} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
+						if (mi->d.listbox.startline > 0) {
+							mi->d.listbox.startline--;
+						}
 					}
+					++mi;
 					break;
 				case MI_TYPE_HSLIDER:
 					mi->d.hslider.cflags = mi->d.hslider.cursel;
@@ -1970,10 +1987,9 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						mi->d.listbox.dohandler = 0;
 						mi->d.listbox.curopt = mi->d.listbox.cursel;
 						if (mi->d.listbox.action) {
-							(*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+							(*mi->d.listbox.action)(mi, mi->d.listbox.curopt);
 						}
-					}
-					else {
+					} else {
 						mi->d.listbox.dohandler = 1;
 					}
 					break;
@@ -2007,30 +2023,21 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			mi = menu->Items + MenuButtonUnderCursor;
 			switch (mi->mitype) {
 				case MI_TYPE_LISTBOX:
-					if (mi->d.listbox.curopt < 0) {
-						mi->d.listbox.curopt = 0;
-					}
 					if (mi->d.listbox.startline > 0) {
 						mi->d.listbox.startline--;
-						if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1) {
-							mi->d.listbox.curopt++;
-						}
-					} else {
-						if (mi->d.listbox.curopt != 0) {
-							mi->d.listbox.curopt--;
-						}
 					}
-					if (mi->d.listbox.action) {
-						(*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-					}
-					mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)
-						/ (mi->d.listbox.noptions - 1);
+					mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
+						(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_VSLIDER:
 					mi->d.vslider.cflags |= MI_CFLAGS_UP;
-					if (mi->d.vslider.action) {
-						(*mi->d.vslider.action)(mi, 2);
+
+					// Update listbox
+					if (mi[-1].d.listbox.startline > 0) {
+						mi[-1].d.listbox.startline--;
 					}
+					mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
 				case MI_TYPE_HSLIDER:
 					mi->d.hslider.percent -= 10;
@@ -2061,28 +2068,21 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			mi = menu->Items + MenuButtonUnderCursor;
 			switch (mi->mitype) {
 				case MI_TYPE_LISTBOX:
-					if (mi->d.listbox.curopt < 0)
-						mi->d.listbox.curopt = 0;
-					if (mi->d.listbox.startline < mi->d.listbox.noptions - mi->d.listbox.nlines) {
+					if (mi->d.listbox.startline + mi->d.listbox.nlines < mi->d.listbox.noptions) {
 						mi->d.listbox.startline++;
-						if (mi->d.listbox.curopt != 0)
-							mi->d.listbox.curopt--;
-					} else {
-						if (mi->d.listbox.curopt != mi->d.listbox.nlines - 1 &&
-							mi->d.listbox.curopt != mi->d.listbox.noptions - 1)
-								mi->d.listbox.curopt++;
 					}
-					if (mi->d.listbox.action) {
-						(*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-					}
-					mi[1].d.vslider.percent = 100 * (mi->d.listbox.curopt + mi->d.listbox.startline)
-						/ (mi->d.listbox.noptions - 1);
+					mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
+						(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_VSLIDER:
 					mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
-					if (mi->d.vslider.action) {
-						(*mi->d.vslider.action)(mi, 2);
+
+					// Update listbox
+					if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
+						mi[-1].d.listbox.startline++;
 					}
+					mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
 				case MI_TYPE_HSLIDER:
 					mi->d.hslider.percent += 10;
