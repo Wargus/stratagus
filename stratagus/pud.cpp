@@ -991,7 +991,11 @@ void LoadPud(const char* pud,WorldMap* map)
 					perror("CLread()");
 					ExitFatal(-1);
 				}
+#if 0
+				//We are not supporting UDTA as it's broken and we are making
+				//  a new format
 				ParsePudUDTA(bufp,length);
+#endif
 			}
 			continue;
 		}
