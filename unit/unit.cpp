@@ -2247,7 +2247,6 @@ int CanBuildOn(int x, int y, int mask)
 **
 **  @return      OnTop, parent unit, builder on true, NULL false.
 **
-**  @todo can't handle building units !1x1, needs a rewrite.
 */
 Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int real)
 {
@@ -2260,7 +2259,7 @@ Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int
 
 	// Terrain Flags don't matter if building on top of a unit.
 	ontop = CanBuildHere(unit, type, x, y);
-	if (ontop != unit) {
+	if (unit != NULL && ontop != unit) {
 		return ontop;
 	}
 
@@ -2269,10 +2268,13 @@ Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int
 	//
 	j = 0;
 	if (unit) {
-		// FIXME: This only works with 1x1 big units
-		Assert(unit->Type->TileWidth == 1 && unit->Type->TileHeight == 1);
 		j = unit->Type->FieldFlags;
-		TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags &= ~j;
+		for (h = unit->Type->TileHeight; h > 0; --h) {
+			for (w = unit->Type->TileWidth; w > 0; --w) {
+				TheMap.Fields[(unit->X + w - 1) + 
+						(unit->Y - 1 + h) * TheMap.Width].Flags &= ~j;
+			}
+		}
 	}
 
 	player = NULL;
@@ -2300,7 +2302,13 @@ Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int
 		}
 	}
 	if (unit) {
-		TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
+		j = unit->Type->FieldFlags;
+		for (h = unit->Type->TileHeight; h > 0; --h) {
+			for (w = unit->Type->TileWidth; w > 0; --w) {
+				TheMap.Fields[(unit->X + w - 1) + 
+						(unit->Y - 1 + h) * TheMap.Width].Flags |= j;
+			}
+		}
 	}
 
 	//
