@@ -156,9 +156,15 @@ local int OggReadStream(Sample* sample, void* buf, int len)
 
 	n = OGG_BUFFER_SIZE - n;
 	for (;;) {
+		#ifdef WORDS_BIGENDIAN
+	    i = ov_read(data->VorbisFile,
+		    data->PointerInBuffer + sample->Length, n, 1, 2, 1,
+		    &bitstream);
+		#else
 	    i = ov_read(data->VorbisFile,
 		    data->PointerInBuffer + sample->Length, n, 0, 2, 1,
 		    &bitstream);
+		#endif
 	    if (i <= 0) {
 		break;
 	    }
@@ -364,7 +370,11 @@ global Sample* LoadOgg(const char* name,int flags)
 		p = sample->Data + sample->Length;
 	    }
 
+	    #ifdef WORDS_BIGENDIAN
+	    i = ov_read(vf, p, 4096, 1, 2, 1, &bitstream);
+	    #else
 	    i = ov_read(vf, p, 4096, 0, 2, 1, &bitstream);
+	    #endif
 	    if (i <= 0) {
 		break;
 	    }
