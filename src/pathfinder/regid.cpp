@@ -67,7 +67,7 @@ void RegidMarkUsed (RegidSpace *space, unsigned int regid)
 
 int RegidFind (RegidSpace *space, enum regid_dir dir, enum regid_usage used)
 {
-	unsigned int byte;
+	int byte;
 	int increment;
 
 	if (dir==REGID_LOWEST) {

@@ -396,8 +396,8 @@ local int ResolveDeadlock (Unit *unit, Unit *obstacle, int *dx, int *dy)
 {
 	int i, x, odx, ody;
 	static LowlevelNeighbor clockwise[8] = {
-		{ 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 },
-		{ 0,  1 }, {-1,  1 }, {-1, 0 }, {-1,-1 }
+		{ 0, -1, 0 }, { 1, -1, 0 }, { 1, 0, 0 }, { 1, 1, 0 },
+		{ 0,  1, 0 }, {-1,  1, 0 }, {-1, 0, 0 }, {-1,-1, 0 }
 	};
 
 	if (unit->Retreating == UNIT_WINNING) {
