@@ -10,7 +10,7 @@
 //
 /**@name interface.c - The interface. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -163,31 +163,12 @@ static void UiCenterOnGroup(unsigned group)
 }
 
 /**
-**  Select group. If already selected center on the group.
+**  Select group.
 **
 **  @param group  Group number to select.
 */
 static void UiSelectGroup(unsigned group)
 {
-	Unit** units;
-	int n;
-
-	//
-	//  Check if group is already selected.
-	//
-	n = GetNumberUnitsOfGroup(group);
-	if (n && NumSelected == n) {
-		units = GetUnitsOfGroup(group);
-
-		// FIXME: what should we do with the removed units? ignore?
-		while (n-- && units[n] == Selected[n]) {
-		}
-		if (n == -1) {
-			UiCenterOnGroup(group);
-			return;
-		}
-	}
-
 	SelectGroup(group);
 	SelectionChanged();
 }
@@ -639,7 +620,7 @@ static int CommandKey(int key)
 		case '6': case '7': case '8':
 		case '9':
 			if (KeyModifiers & ModifierShift) {
-				if (KeyModifiers & ModifierAlt) {
+				if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
 					UiCenterOnGroup(key - '0');
 				} else if (KeyModifiers & ModifierControl) {
 					UiAddToGroup(key - '0');
@@ -647,7 +628,7 @@ static int CommandKey(int key)
 					UiAddGroupToSelection(key - '0');
 				}
 			} else {
-				if (KeyModifiers & ModifierAlt) {
+				if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
 					UiCenterOnGroup(key - '0');
 				} else if (KeyModifiers & ModifierControl) {
 					UiDefineGroup(key - '0');
@@ -1519,6 +1500,7 @@ static int HoldKeyAdditionalDelay = 50;      ///< Time to detect additional hold
 static unsigned LastIKey;                    ///< last key handled
 static unsigned LastIKeyChar;                ///< last keychar handled
 static unsigned LastKeyTicks;                ///< Ticks of last key
+static unsigned DoubleKey;                   ///< last key pressed
 
 /**
 **  Handle keyboard key press.
@@ -1531,10 +1513,16 @@ static unsigned LastKeyTicks;                ///< Ticks of last key
 void InputKeyButtonPress(const EventCallback* callbacks,
 	unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
+	if (!LastIKey && DoubleKey == ikey &&
+			ticks < LastKeyTicks + DoubleClickDelay) {
+		KeyModifiers |= ModifierDoublePress;
+	}
+	DoubleKey = ikey;
 	LastIKey = ikey;
 	LastIKeyChar = ikeychar;
 	LastKeyTicks = ticks;
 	callbacks->KeyPressed(ikey, ikeychar);
+	KeyModifiers &= ~ModifierDoublePress;
 }
 
 /**
@@ -1546,12 +1534,12 @@ void InputKeyButtonPress(const EventCallback* callbacks,
 **  @param ikeychar   Character code.
 */
 void InputKeyButtonRelease(const EventCallback* callbacks,
-	unsigned ticks __attribute__((unused)), unsigned ikey,
-	unsigned ikeychar)
+	unsigned ticks, unsigned ikey, unsigned ikeychar)
 {
 	if (ikey == LastIKey) {
 		LastIKey = 0;
 	}
+	LastKeyTicks = ticks;
 	callbacks->KeyReleased(ikey, ikeychar);
 }
 
