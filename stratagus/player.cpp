@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "freecraft.h"
 #include "video.h"
@@ -576,8 +577,7 @@ global int PlayerCheckCosts(const Player* player,const int* costs)
 			,DEFAULT_NAMES[i],DEFAULT_ACTIONS[i],DEFAULT_NAMES[i]);
 		//	FIXME: use the general notify function vor this
 		if( player==ThisPlayer ) {
-		    //FIXME: vladi: can SetMessage be used instead?
-		    SetMessageDup(buf);
+		    SetMessage(buf);
 		} else {
 		    DebugLevel3("Ai: %s.\n",buf);
 		}
@@ -998,6 +998,38 @@ global void DebugPlayers(void)
 	}
 	DebugLevel0("\n");
     }
+}
+
+/**
+**	Notify player about a problem.
+**
+**	@param player	Player with it
+**	@param type	Problem type
+**	@param X	Map X tile position
+**	@param Y	Map Y tile position
+**	@param fmt	Message format
+**	@param ...	Message varargs
+**
+**	@todo FIXME:	We must also notfiy allied players.
+*/
+global void NotifyPlayer(const Player* player,int type,int x,int y,
+	const char* fmt, ...)
+{
+    char temp[128];
+    va_list va;
+
+    if( player!=ThisPlayer ) {		// Currently only notfiy me
+	return;
+    }
+
+    va_start( va, fmt );
+    vsprintf( temp, fmt, va );
+    va_end( va );
+
+    //
+    //	FIXME: show minimap animation for the event.
+    //
+    SetMessageEvent(x,y,temp);
 }
 
 //@}

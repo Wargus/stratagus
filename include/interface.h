@@ -297,10 +297,8 @@ extern void DrawResources(void);
     /// Set message to display
 extern void SetMessage( const char* fmt, ... );
     /// Set message to display with event point
-extern void SetMessage2( int x, int y, const char* fmt, ... );
-    /// Set message to display, saving the message
-extern void SetMessageDup(const char* message);
-    /// Center view-point on last message
+extern void SetMessageEvent( int x, int y, const char* fmt, ... );
+    /// Center view-point on last event message
 extern void CenterOnMessage();
 
     /// Set status line to show this information
