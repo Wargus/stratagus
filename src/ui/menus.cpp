@@ -119,7 +119,9 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
-local void ScenSelectHSSpeedAction(Menuitem *mi, int i);
+local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i);
+local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i);
+local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
@@ -815,13 +817,29 @@ local Menuitem SpeedSettingsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 64, 11 + 36*1, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 64, 36*1, 0, LargeFont, NULL, NULL,
 	{ text:{ "Game Speed", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_HSLIDER, 32, 11 + 36*1.5, 0, 0, NULL, NULL,
-            { hslider:{ 0, 11*18, 18, ScenSelectHSSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_TEXT, 44, 11 + 36*2 + 6, 0, SmallFont, NULL, NULL,
+    { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL,
+        { hslider:{ 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 218, 11 + 36*2 + 6, 0, SmallFont, NULL, NULL,
+    { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 70, 36*3, 0, LargeFont, NULL, NULL,
+	{ text:{ "Mouse Scroll", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
+        { hslider:{ 0, 11*18, 18, ScenSelectHSMouseSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 82, 36*5, 0, LargeFont, NULL, NULL,
+	{ text:{ "Keyboard Scroll", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
+        { hslider:{ 0, 11*18, 18, ScenSelectHSKeyboardSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL,
+	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
@@ -1059,7 +1077,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	6, 6,
+	14, 14,
 	SpeedSettingsMenuItems,
 	NULL,
     },
@@ -2455,7 +2473,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSSpeedAction(Menuitem *mi, int i)
+local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 {
     mi--;
     
@@ -2463,14 +2481,14 @@ local void ScenSelectHSSpeedAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing game speed by 10%");
+		DebugLevel0Fn("Increasing game speed by 10");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		VideoSyncSpeed = mi[1].d.hslider.percent + 50;
 		SetVideoSync();
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing game speed by 10%");
+		DebugLevel0Fn("Decreasing game speed by 10");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
@@ -2491,6 +2509,92 @@ local void ScenSelectHSSpeedAction(Menuitem *mi, int i)
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		    VideoSyncSpeed = mi[1].d.hslider.percent + 50;
 		    SetVideoSync();
+		}
+		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
+}
+
+local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
+{
+    mi--;
+    
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+		DebugLevel0Fn("Increasing game speed by 10");
+		mi[1].d.hslider.percent += 10;
+		if (mi[1].d.hslider.percent > 100)
+		    mi[1].d.hslider.percent = 100;
+		printf("%d\n", SpeedMouseScroll);
+		SpeedMouseScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
+	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+		DebugLevel0Fn("Decreasing game speed by 10");
+		mi[1].d.hslider.percent -= 10;
+		if (mi[1].d.hslider.percent < 0)
+		    mi[1].d.hslider.percent = 0;
+		SpeedMouseScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
+	    }
+	    if (i == 2) {
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
+		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		    SpeedMouseScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
+		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
+		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		    SpeedMouseScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
+		}
+		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
+}
+
+local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
+{
+    mi--;
+    
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
+		DebugLevel0Fn("Increasing game speed by 10");
+		mi[1].d.hslider.percent += 10;
+		if (mi[1].d.hslider.percent > 100)
+		    mi[1].d.hslider.percent = 100;
+		printf("%d\n", SpeedMouseScroll);
+		SpeedKeyScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
+	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
+		DebugLevel0Fn("Decreasing game speed by 10");
+		mi[1].d.hslider.percent -= 10;
+		if (mi[1].d.hslider.percent < 0)
+		    mi[1].d.hslider.percent = 0;
+		SpeedKeyScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
+	    }
+	    if (i == 2) {
+		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
+		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		    SpeedKeyScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
+		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
+		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		    SpeedKeyScroll = 16 - (mi[1].d.hslider.percent * 15) / 100;
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		MustRedraw |= RedrawMenu;
