@@ -1044,12 +1044,15 @@ local int InputKey(int key)
 				*q++ = *p++;
 			}
 			*q = '\0';
-			if (Input[0] == '(') {
+#ifdef DEBUG
+			if (Input[0] == '-') {
 				if (!GameObserve && !GamePaused) {
 					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
-					CclCommand(Input);
+					CclCommand(Input + 1);
 				}
-			} else if (NetworkFildes == (Socket)-1) {
+			} else
+#endif
+			if (NetworkFildes == (Socket)-1) {
 				if (!GameObserve && !GamePaused) {
 					int ret;
 					ret = HandleCheats(Input);
