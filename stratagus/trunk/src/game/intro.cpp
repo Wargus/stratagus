@@ -354,7 +354,7 @@ global void ShowIntro(const Intro *intro)
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
-    VideoCreatePalette(GlobalPalette);
+    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
     OldVideoSyncSpeed=VideoSyncSpeed;
     VideoSyncSpeed=100;
@@ -653,7 +653,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     OldVideoSyncSpeed=VideoSyncSpeed;
     VideoSyncSpeed=100;
     SetVideoSync();
-    VideoCreatePalette(GlobalPalette);
+    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
     callbacks.ButtonPressed=IntroCallbackButton1;
     callbacks.ButtonReleased=IntroCallbackButton2;
@@ -1138,7 +1138,7 @@ global void ShowStats(void)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(MenuBackground);
-    VideoCreatePalette(GlobalPalette);
+    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
     VideoLockScreen();
     VideoClearScreen();
