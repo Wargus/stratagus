@@ -31,6 +31,7 @@
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
+#include "map.h"
 #include "ai.h"
 #include "network.h"
 #include "netconnect.h"

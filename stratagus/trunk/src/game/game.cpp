@@ -85,6 +85,7 @@ local void LoadCloneMap(const char* filename,WorldMap* map)
 	fprintf(stderr,"%s: invalid clone map\n", filename);
 	exit(-1);
     }
+    // FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
 #else
     fprintf(stderr,"Sorry, you need siod installed to use clone maps!\n");
     exit(-1);
@@ -154,6 +155,12 @@ global void CreateGame(char* filename, WorldMap* map)
     NetworkSetupArgs();
 
     //
+    // Don't leak when called multiple times - FIXME: not the ideal place for this..
+    //
+    FreeMapInfo(map->Info);
+    map->Info = NULL;
+
+    //
     //	Network part 1 (port set-up)
     //
     InitNetwork1();
@@ -187,14 +194,14 @@ global void CreateGame(char* filename, WorldMap* map)
 		//	Server
 		//
 		if (NetPlayers > 1) {
-		    NetworkServerSetup();
+		    NetworkServerSetup(map);
 		    DebugLevel0Fn("Server setup ready\n");
 		    InitNetwork2();
 		//
 		// Client
 		//
 		} else if (NetworkArg) {
-		    NetworkClientSetup();
+		    NetworkClientSetup(map);
 		    DebugLevel0Fn("Client setup ready\n");
 		    InitNetwork2();
 		}

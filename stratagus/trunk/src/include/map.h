@@ -173,6 +173,31 @@ typedef struct _map_field_ {
 #define MapFieldSeaUnit		0x4000	/// Water unit on field
 #define MapFieldBuilding	0x8000	/// Building on field
 
+
+/*----------------------------------------------------------------------------
+--	Map info structure
+----------------------------------------------------------------------------*/
+
+/**
+**	Get info about a map.
+*/
+typedef struct _map_info_ {
+    char*	Description;		/// Map description
+    char*	MapTerrainName;		/// Map terrain name
+    // FIXME: Map Terrain Nr. should be removed.
+    int		MapTerrain;		/// Map terrain
+    int		MapWidth;		/// Map width
+    int		MapHeight;		/// Map height
+    int		PlayerType[16];		/// Same player->Type
+    int		PlayerSide[16];		/// Same player->Side
+    int		PlayerGold[16];		/// Same player->Gold
+    int		PlayerWood[16];		/// Same player->Wood
+    int		PlayerOil[16];		/// Same player->Oil
+    // FIXME: Add NEW RESOURCES
+    int		PlayerAi[16];		/// Same player->Ai
+    unsigned int MapUID;		/// Unique Map ID (hash)
+} MapInfo;
+
 /*----------------------------------------------------------------------------
 --	Map itself
 ----------------------------------------------------------------------------*/
@@ -198,6 +223,8 @@ typedef struct _world_map_ {
     Graphic*		TileData;	/// tiles graphic for map
 
     char		Description[32];/// map description short
+
+    MapInfo*		Info;		/// descriptive information (FIXME: DUPLICATES!)
 } WorldMap;
 
 /*----------------------------------------------------------------------------
@@ -346,6 +373,9 @@ extern void MapCclRegister(void);
 extern void LoadMap(const char* file,WorldMap* map);
     /// Save the map
 extern void SaveMap(FILE* file);
+
+    /// Release info for a map.
+extern void FreeMapInfo(MapInfo* info);
 
     /// Mark a tile as seen by the player
 extern void MapMarkSeenTile(int x,int y);
