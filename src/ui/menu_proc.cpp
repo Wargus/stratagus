@@ -2025,6 +2025,7 @@ global void EndMenu(void)
     if (!CurrentMenu && Callbacks!=&GameCallbacks) {
 	InterfaceState=IfaceStateNormal;
 	Callbacks=&GameCallbacks;
+	GamePaused=0;
     }
 }
 
