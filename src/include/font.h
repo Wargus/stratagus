@@ -143,6 +143,10 @@ extern int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* 
 extern int VideoDrawNumber(int x,int y,unsigned font,int number);
     /// Draw reverse number unclipped
 extern int VideoDrawReverseNumber(int x,int y,unsigned font,int number);
+    /// Draw number clipped
+extern int VideoDrawNumberClip(int x,int y,unsigned font,int number);
+    /// Draw reverse number clipped
+extern int VideoDrawReverseNumberClip(int x,int y,unsigned font,int number);
 
     /// Load and initialize the fonts
 extern void LoadFonts(void);

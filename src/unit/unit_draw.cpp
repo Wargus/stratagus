@@ -549,10 +549,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //
     //	Show the number of references.
     //
-    if( x>TheUI.MapX && x<TheUI.MapEndX &&
-		y+8>TheUI.MapY && y+8<TheUI.MapEndY ) {
-	VideoDrawNumber(x+1,y+1,GameFont,unit->Refs);
-    }
+    VideoDrawNumberClip(x+1,y+1,GameFont,unit->Refs);
 #endif
 
     //
@@ -834,17 +831,14 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     if( unit->Selected && unit->GroupId!=-1 ) {
 	char buf[2];
 
+	// FIXME: ugly hack!
 	buf[0]=unit->GroupId+'0';
 	buf[1]='\0';
 	f=VideoTextLength(GameFont,buf);
 	x+=(type->TileWidth*TileSizeX+type->BoxWidth)/2-f;
+	// FIXME: should use the font height!
 	y+=(type->TileHeight*TileSizeY+type->BoxHeight)/2-14;
-	// FIXME: should use FontHeight(GameFont);
-	// FIXME: need clipping
-	if( x>TheUI.MapX && x+f<TheUI.MapEndX && y>TheUI.MapY
-		&& y+14<TheUI.MapEndY ) {
-	    VideoDrawNumber(x,y,GameFont,unit->GroupId);
-	}
+	VideoDrawNumberClip(x,y,GameFont,unit->GroupId);
     }
 }
 

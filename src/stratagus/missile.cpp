@@ -35,6 +35,7 @@
 
 #include "freecraft.h"
 #include "video.h"
+#include "font.h"
 #include "tileset.h"
 #include "map.h"
 #include "sound_id.h"
@@ -119,6 +120,10 @@ enum _missile_class_ {
 	**	Missile is controlled completely by Controller() function.
 	*/
     MissileClassCustom,
+	/**
+	**	Missile shows the hit points.
+	*/
+    MissileClassHit,
 };
 
 /*----------------------------------------------------------------------------
@@ -143,6 +148,7 @@ global const char* MissileClassNames[] = {
     "missile-class-point-to-point-with-hit",
     "missile-class-fire",
     "missile-class-custom",
+    "missile-class-hit",
     NULL
 };
 
@@ -172,6 +178,7 @@ global MissileType* MissileTypeGreenCross;	/// Green cross missile-type
 global MissileType* MissileTypeRedCross;	/// Red cross missile-type
     /// missile-type for the explosion missile
 global MissileType* MissileTypeExplosion;
+global MissileType* MissileTypeHit;		/// Hit missile-type
 
 IfDebug(
 global int NoWarningMissileType;		/// quiet ident lookup.
@@ -763,7 +770,14 @@ global void DrawMissiles(void)
 		    GraphicPlayerPixels(missile->SourceUnit->Player
 			    ,missile->Type->Sprite);
 		}
-		DrawMissile(missile->Type,missile->SpriteFrame,x,y);
+		switch( missile->Type->Class ) {
+		    case MissileClassHit:
+			VideoDrawNumberClip(x,y,GameFont, missile->Damage);
+			break;
+		    default:
+			DrawMissile(missile->Type,missile->SpriteFrame,x,y);
+			break;
+		}
 	    }
 	}
 	missiles=LocalMissiles;
@@ -1335,6 +1349,15 @@ local void MissileAction(Missile* missile)
 		}
 	    }
 	    break;
+
+	case MissileClassHit:
+	    missile->Wait=missile->Type->Sleep;
+	    if( PointToPointMissile(missile) ) {
+		MissileHit(missile);
+		FreeMissile(missile);
+		missile=NULL;
+	    }
+	    break;
 	}
     }
 
@@ -1571,6 +1594,7 @@ global void InitMissileTypes(void)
     MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
     MissileTypeRedCross=MissileTypeByIdent("missile-red-cross");
     MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
+    MissileTypeHit = MissileTypeByIdent("missile-hit");
 }
 
 /**
@@ -1599,7 +1623,7 @@ global void CleanMissileTypes(void)
     MissileTypeBigFire=NULL;
     MissileTypeGreenCross=NULL;
     MissileTypeRedCross=NULL;
-    MissileTypeExplosion=NULL;
+    MissileTypeHit=NULL;
 }
 
 /**
