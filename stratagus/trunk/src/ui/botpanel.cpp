@@ -272,7 +272,7 @@ local ButtonAction  _current_buttons[9];	/// FIXME: this is just for test
 
 /// FIXME: docu
 int AddButton(int pos, int level, const char *icon_ident,
-	enum _button_cmd_ action, const char *value, const void *func,
+	enum _button_cmd_ action, const char *value, const ButtonCheckFunc func,
 	const void *allow, int key, const char *hint, const char *umask)
 {
     char buf[2048];
