@@ -78,6 +78,36 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
 
 
 /**
+**  Clean the user interface graphics
+*/
+local void CleanUIGraphics(UI* ui)
+{
+	MenuPanel* menupanel;
+	int i;
+
+	for (i = 0; i < ui->NumFillers; ++i) {
+		VideoSaveFree(ui->Filler[i].Graphic);
+	}
+	VideoSaveFree(ui->Resource.Graphic);
+
+	for (i = 0; i < MaxCosts + 2; ++i) {
+		VideoSaveFree(ui->Resources[i].Icon.Graphic);
+	}
+
+	VideoSaveFree(ui->InfoPanel.Graphic);
+	VideoSaveFree(ui->ButtonPanel.Graphic);
+	VideoSaveFree(ui->MenuPanel.Graphic);
+	VideoSaveFree(ui->MinimapPanel.Graphic);
+	VideoSaveFree(ui->StatusLine.Graphic);
+
+	menupanel = ui->MenuPanels;
+	while (menupanel) {
+		VideoSaveFree(menupanel->Panel.Graphic);
+		menupanel = menupanel->Next;
+	}
+}
+
+/**
 **		Initialize the user interface.
 **
 **		The function looks through ::UI_Table, to find a matching user
@@ -124,8 +154,7 @@ global void InitUserInterface(const char* race_name)
 		vps[i].MapY = TheUI.Viewports[i].MapY;
 	}
 
-	// FIXME: overwrites already set slots?
-	// ARI: Yes, it does :(((
+	CleanUIGraphics(&TheUI);
 	TheUI = *UI_Table[best];
 
 	TheUI.Offset640X = (VideoWidth - 640) / 2;
@@ -789,31 +818,8 @@ global void CleanUserInterface(void)
 {
 	int i;
 	int j;
-	MenuPanel* menupanel;
 
-	//
-	//		Free the graphics. FIXME: if they are shared this will crash.
-	//
-	for (i = 0; i < TheUI.NumFillers; ++i) {
-		VideoSaveFree(TheUI.Filler[i].Graphic);
-	}
-	VideoSaveFree(TheUI.Resource.Graphic);
-
-	for (i = 0; i < MaxCosts + 2; ++i) {
-		VideoSaveFree(TheUI.Resources[i].Icon.Graphic);
-	}
-
-	VideoSaveFree(TheUI.InfoPanel.Graphic);
-	VideoSaveFree(TheUI.ButtonPanel.Graphic);
-	VideoSaveFree(TheUI.MenuPanel.Graphic);
-	VideoSaveFree(TheUI.MinimapPanel.Graphic);
-	VideoSaveFree(TheUI.StatusLine.Graphic);
-
-	menupanel = TheUI.MenuPanels;
-	while (menupanel) {
-		VideoSaveFree(menupanel->Panel.Graphic);
-		menupanel = menupanel->Next;
-	}
+	CleanUIGraphics(&TheUI);
 
 	//
 	//		Free the available user interfaces.
@@ -843,9 +849,6 @@ global void CleanUserInterface(void)
 		free(TitleScreens);
 		TitleScreens = NULL;
 	}
-
-	// FIXME: Johns: Implement this correctly or we will lose memory!
-	DebugLevel0Fn("FIXME: not completely written\n");
 
 	memset(&TheUI, 0, sizeof(TheUI));
 }
