@@ -136,10 +136,10 @@ WIN32=0
 DARWIN=0
 
 # Choose optimization level
-#DEBUG_CFLAGS="-g -O0 -fsigned-char \$(PROFILE) -pipe -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
-DEBUG_CFLAGS="-g -O1 -fsigned-char -Wall -Werror \$(IFLAGS) \$(DFLAGS) -Wno-comment"
+#DEBUG_CFLAGS="-g -O0 -fsigned-char \$(PROFILE) -pipe -Wall \$(IFLAGS) \$(DFLAGS)"
+DEBUG_CFLAGS="-g -O1 -fsigned-char -W -Wall \$(IFLAGS) \$(DFLAGS)"
 #-- Production (default)
-NORMAL_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS) -Wno-comment"
+NORMAL_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS)"
 
 # Note, -fconserve-space is really not recommended for gcc 3.x. Rtfm on gcc, in the -fconserve-space
 # section.
