@@ -136,23 +136,23 @@ global void HandleActionFollow(Unit* unit)
 	    if ((goal = unit->Orders[0].Goal) && 
 		    goal->Type->Teleporter && goal->Goal &&
 		    MapDistanceBetweenUnits(unit, goal) < 4) {
-		Unit* table[UnitMax];
+		//Unit* table[UnitMax];
 		Unit* dest;
-		int n;
-		int i;
+		//int n;
+		//int i;
 
 		RemoveUnit(unit, NULL);
 		unit->X = goal->Goal->X;
 		unit->Y = goal->Goal->Y;
 		DropOutOnSide(unit, unit->Direction, 1, 1);
 		//FIXME: SoundIdForName() should be called once
-		PlayGameSound(SoundIdForName("invisibility"), MaxSampleVolume);
+/*		PlayGameSound(SoundIdForName("invisibility"), MaxSampleVolume);
 		//FIXME: MissileTypeByIdent() should be called once
 		MakeMissile(MissileTypeByIdent("missile-normal-spell"),
 		    unit->X * TileSizeX + TileSizeX / 2,
 		    unit->Y * TileSizeY + TileSizeY / 2,
 		    unit->X * TileSizeX + TileSizeX / 2,
-		    unit->Y * TileSizeY + TileSizeY / 2);
+		    unit->Y * TileSizeY + TileSizeY / 2);*/
 
 		unit->Wait = 1;
 		unit->SubAction = 0;
@@ -161,13 +161,7 @@ global void HandleActionFollow(Unit* unit)
 		//
 		//	FIXME: we must check if the units supports the new order.
 		//
-		dest = NoUnitP;
-		n = SelectUnitsOnTile(goal->Goal->X, goal->Goal->Y, table);
-		for (i = 0; i < n; ++i) {
-		    if (table[i]->Type == UnitTypeByIdent("unit-circle-of-power")) {
-			dest = table[i];
-		    }
-		}
+		dest = goal->Goal;
 
 		if (dest) {
 		    if ((dest->NewOrder.Action == UnitActionResource &&
@@ -177,7 +171,8 @@ global void HandleActionFollow(Unit* unit)
 			    (dest->NewOrder.Action == UnitActionBoard &&
 				unit->Type->UnitType != UnitTypeLand)) {
 			DebugLevel0Fn("Wrong order for unit\n");
-			unit->Orders[0].Action = UnitActionStill;
+			unit->Orders->Action = UnitActionStill;
+			unit->Orders->Goal = NoUnitP;
 		    } else {
 			if (dest->NewOrder.Goal) {
 			    if (dest->NewOrder.Goal->Destroyed) {

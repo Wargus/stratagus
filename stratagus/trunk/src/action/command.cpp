@@ -1188,7 +1188,7 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
     }
 #endif
 
-    DebugLevel3Fn(": %d spell-casts on %d\n" _C_
+    DebugLevel0Fn(": %d spell-casts on %d\n" _C_
 	UnitNumber(unit) _C_ dest ? UnitNumber(dest) : 0);
 
     //
