@@ -26,12 +26,16 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include "ccl.h"
 #include "player.h"
 #include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
+
+#if 0
 
 /**
 **	Ai Script commands.
@@ -52,28 +56,6 @@ typedef struct _ai_script_ {
     unsigned char	Arg;		/// argument
     unsigned char	Cnt;		/// counter
 } AiScript;
-
-/**
-**	Ai Type typedef.
-*/
-typedef struct _ai_type_ AiType;
-
-/**
-**	Ai Type structure.
-*/
-struct _ai_type_ {
-    AiType*		Next;			/// Next ai type.
-
-    char*		Name;			/// Name of this ai.
-    char*		Race;			/// for this race.
-    char*		Class;			/// class of this ai.
-
-    // nice flags
-    unsigned char	AllExplored : 1;	/// Ai sees unexplored area.
-    unsigned char	AllVisibile : 1;	/// Ai sees invisibile area.
-
-    AiScript*		Script;			/// Main script
-};
 
 /**
 **	AI goal typedef.
@@ -101,41 +83,97 @@ struct _ai_goal_ {
     int		Priority;		/// Priority of this goal.
 };
 
+    // goals stuff
+    AiGoal*     GoalHead;               /// Goals start of double linked list
+    AiGoal*     GoalNil1;               /// Goals dummy end of dl-list
+    AiGoal*     GoalTail;               /// Goals end of double linked list
+
+    AiGoal*     WaitHead;               /// Wait start of double linked list
+    AiGoal*     WaitNil1;               /// Wait dummy end of dl-list
+    AiGoal*     WaitTail;               /// Wait end of double linked list
+
+    // scripting stuff
+    AiScript*	Ip;			/// AI script instruction pointer
+    AiScript**	Sp;			/// Ai script stack pointer
+    AiScript**	Stack;			/// Ai script stack
+
+#endif	// --------------------------------------------------------------------
+
+/**
+**	Ai Type typedef.
+*/
+typedef struct _ai_type_ AiType;
+
+/**
+**	Ai Type structure.
+*/
+struct _ai_type_ {
+    AiType*		Next;			/// Next ai type.
+
+    char*		Name;			/// Name of this ai.
+    char*		Race;			/// for this race.
+    char*		Class;			/// class of this ai.
+
+    // nice flags
+    //unsigned char	AllExplored : 1;	/// Ai sees unexplored area.
+    //unsigned char	AllVisibile : 1;	/// Ai sees invisibile area.
+
+    SCM			Script;			/// Main script
+};
+
+/**
+**	AI unit-type table with counter in front.
+*/
+typedef struct _ai_unittype_table_ {
+    int		Count;			/// elements in table
+    UnitType*	Table[1];		/// the table
+} AiUnitTypeTable;
+
+/**
+**	AI force typedef.
+*/
+typedef struct _ai_force_ AiForce;
+
+/**
+**	Define an AI force.
+**
+**	A force is a group of units belonging together.
+*/
+struct _ai_force_ {
+    AiUnitTypeTable	UnitTypeTable;	/// Count and types of unit-type
+};
+
 /**
 **	AI variables.
 */
 typedef struct _player_ai_ {
-    Player*     Player;                 /// engine player structure.
+    Player*     Player;                 /// Engine player structure
 
-    AiType*	AiType;			/// AI type of this player AI.
+    AiType*	AiType;			/// AI type of this player AI
 
-    // goals stuff.
-    AiGoal*     GoalHead;               /// goals start of double linked list
-    AiGoal*     GoalNil1;               /// goals dummy end of dl-list
-    AiGoal*     GoalTail;               /// goals end of double linked list
+    // controller
+    SCM		Script;			/// Script executed
+    int		ScriptDebug;		/// Flag script debuging on/off
 
-    AiGoal*     WaitHead;               /// wait start of double linked list
-    AiGoal*     WaitNil1;               /// wait dummy end of dl-list
-    AiGoal*     WaitTail;               /// wait end of double linked list
+    // resource manager
 
-    // scripting stuff.
-    AiScript*		Ip;		/// AI script instruction pointer.
-    AiScript**		Sp;		/// Ai script stack pointer.
-    AiScript**		Stack;		/// Ai script stack.
+	/// unit-types to build/train requested and priority list
+    AiUnitTypeTable*	UnitTypeRequests;
 
-    UnitType*	Priority[256];		/// Building order
+    struct {
+	int		Want;		/// requested number
+	int		Made;		/// builded number
+	UnitType*	Type;		/// unit-type
+    }*		UnitTypeBuilded;	/// What the resource manager does
+
 } PlayerAi;
 
 /**
-**	AI Unittable with counter in front.
-*/
-typedef struct _ai_unittable_ {
-    unsigned	Count;			/// elements in table
-    UnitType*	Table[0];		/// the table (GNU feature used) 
-} AiUnitTable;
-
-/**
 **	AI Helper.
+**
+**	Contains informations needed for the AI. If the AI needs an unit or
+**	building or upgrade or spell, it could lookup in this tables to find
+**	where it could be trained, builded or researched.
 */
 typedef struct _ai_helper_ {
     /**
@@ -143,33 +181,35 @@ typedef struct _ai_helper_ {
     **	units/buildings which could train this unit.
     */
     int			TrainCount;
-    AiUnitTable*	Train;
+    AiUnitTypeTable**	Train;
     /**
     **	The index is the unit that should be build, giving a table of all
     **	units/buildings which could build this unit.
     */
     int			BuildCount;
-    AiUnitTable*	Build;
+    AiUnitTypeTable**	Build;
     /**
     **	The index is the upgrade that should be made, giving a table of all
     **	units/buildings which could do the upgrade.
     */
     int			UpgradeCount;
-    AiUnitTable*	Upgrade;
+    AiUnitTypeTable**	Upgrade;
     /**
     **	The index is the research that should be made, giving a table of all
     **	units/buildings which could research this upgrade.
     */
     int			ResearchCount;
-    AiUnitTable*	Research;
+    AiUnitTypeTable**	Research;
 } AiHelper;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern AiType* AiTypes;			/// List of all AI types.
+extern AiType* AiTypes;			/// List of all AI types
 extern AiHelper AiHelpers;		/// AI helper variables
+
+extern PlayerAi* AiPlayer;		/// Current AI player
 
 /*----------------------------------------------------------------------------
 --	Functions

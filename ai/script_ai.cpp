@@ -40,49 +40,83 @@
 
 /**
 **	Setup AI helper table.
+**
+**	Expand the table if needed.
+**
+**	@param count	Pointer to number of elements in table.
+**	@param table	Pointer to table with elements.
+**	@param n	Index to insert new into table
 */
-local void AiHelperSetupTable(int* count,AiUnitTable** table,UnitType* type)
+local void AiHelperSetupTable(int* count,AiUnitTypeTable*** table,int n)
 {
-    if( type->Type>=*count ) {
+    int i;
+    
+    ++n;
+    if( n>(i=*count) ) {
 	if( *table ) {
-	    *table=realloc(*table,(1+type->Type)*sizeof(UnitType*));
-	    memset(*table+*count,0,((1+type->Type)-*count)*sizeof(UnitType*));
+	    *table=realloc(*table,n*sizeof(AiUnitTypeTable*));
+	    memset((*table)+i,0,(n-i)*sizeof(AiUnitTypeTable*));
 	} else {
-	    *table=malloc((1+type->Type)*sizeof(UnitType*));
-	    memset(*table,0,(1+type->Type)*sizeof(UnitType*));
+	    *table=malloc(n*sizeof(AiUnitTypeTable*));
+	    memset(*table,0,n*sizeof(AiUnitTypeTable*));
 	}
-	*count=type->Type+1;
+	*count=n;
     }
 }
 
 /**
-**	Insert new element.
+**	Insert new unit-type element.
+**
+**	@param table	Pointer to table with elements.
+**	@param base	Base type to insert into table.
 */
-local void AiHelperInsert(AiUnitTable** table,UnitType* base)
+local void AiHelperInsert(AiUnitTypeTable** tablep,UnitType* base)
 {
     int i;
     int n;
+    AiUnitTypeTable* table;
 
-    if( !*table ) {
-	*table=malloc(sizeof(AiUnitTable*)+sizeof(UnitType*));
-	(*table)->Count=1;
-	(*table)->Table[0]=base;
+    //
+    //	New unit-type
+    //
+    if( !(table=*tablep) ) {
+	table=*tablep=malloc(sizeof(AiUnitTypeTable));
+	table->Count=1;
+	table->Table[0]=base;
 	return;
     }
-    n=(*table)->Count;
+
+    //
+    //	Look if already known.
+    //
+    n=table->Count;
     for( i=0; i<n; ++i ) {
-	if( (*table)->Table[i]==base ) {
+	if( table->Table[i]==base ) {
 	    return;
 	}
     }
-    n++;
-    *table=realloc(*table,sizeof(AiUnitTable*)+sizeof(UnitType*)*n);
-    (*table)->Count=n;
-    (*table)->Table[n-1]=base;
+
+    //
+    //	Append new base unit-type to units.
+    //
+    table=*tablep=realloc(table,sizeof(AiUnitTypeTable)+sizeof(UnitType*)*n);
+    table->Count=n+1;
+    table->Table[n]=base;
 }
+
+#ifdef DEBUG
+/**
+**	Print AI helper table.
+*/
+local void PrintAiHelperTable(void)
+{
+}
+#endif
 
 /**
 **	Define helper for Ai.
+**
+**	@param list	List of all helpers.
 */
 local SCM CclDefineAiHelper(SCM list)
 {
@@ -92,7 +126,9 @@ local SCM CclDefineAiHelper(SCM list)
     char* str;
     UnitType* base;
     UnitType* type;
+    Upgrade* upgrade;
 
+    IfDebug( type=NULL; upgrade=NULL; );	// keep the compiler happy
     while( !gh_null_p(list) ) {
 	sub_list=gh_car(list);
 	list=gh_cdr(list);
@@ -111,9 +147,10 @@ local SCM CclDefineAiHelper(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("research")) ) {
 	    what=3;
 	} else {
-	    fprintf(stderr,"unknown tag");
+	    fprintf(stderr,"unknown tag\n");
 	    continue;
 	}
+
 	//
 	//	Get the base unit type, which could handle the action.
 	//
@@ -122,7 +159,7 @@ local SCM CclDefineAiHelper(SCM list)
 	str=gh_scm2newstr(value,NULL);
 	base=UnitTypeByIdent(str);
 	if( !base ) {
-	    fprintf(stderr,"unknown unittype %s",str);
+	    fprintf(stderr,"unknown unittype %s\n",str);
 	    free(str);
 	    continue;
 	}
@@ -136,39 +173,56 @@ local SCM CclDefineAiHelper(SCM list)
 	    value=gh_car(sub_list);
 	    sub_list=gh_cdr(sub_list);
 	    str=gh_scm2newstr(value,NULL);
-	    type=UnitTypeByIdent(str);
-	    if( !type ) {
-		fprintf(stderr,"unknown unittype %s",str);
-		free(str);
-		continue;
+	    if( what==3 ) {
+		upgrade=UpgradeByIdent(str);
+		if( !upgrade ) {
+		    fprintf(stderr,"unknown upgrade %s\n",str);
+		    free(str);
+		    continue;
+		}
+		DebugLevel0Fn("> %s\n",upgrade->Ident);
+	    } else {
+		type=UnitTypeByIdent(str);
+		if( !type ) {
+		    fprintf(stderr,"unknown unittype %s\n",str);
+		    free(str);
+		    continue;
+		}
+		DebugLevel0Fn("> %s\n",type->Name);
 	    }
-	    DebugLevel0Fn("> %s\n",type->Name);
 	    free(str);
 
 	    switch( what ) {
 		case 0:			// build
 		    AiHelperSetupTable(
-			    &AiHelpers.BuildCount,&AiHelpers.Build,type);
+			    &AiHelpers.BuildCount,&AiHelpers.Build,type->Type);
 		    AiHelperInsert(
-			    &AiHelpers.Build+type->Type,base);
+			    AiHelpers.Build+type->Type,base);
 		    break;
 		case 1:			// train
 		    AiHelperSetupTable(
-			    &AiHelpers.TrainCount,&AiHelpers.Train,type);
+			    &AiHelpers.TrainCount,&AiHelpers.Train,type->Type);
 		    AiHelperInsert(
-			    &AiHelpers.Train+type->Type,base);
+			    AiHelpers.Train+type->Type,base);
 		    break;
 		case 2:			// upgrade
 		    AiHelperSetupTable(
-			    &AiHelpers.UpgradeCount,&AiHelpers.Upgrade,type);
+			    &AiHelpers.UpgradeCount,&AiHelpers.Upgrade,
+			    type->Type);
 		    AiHelperInsert(
-			    &AiHelpers.Upgrade+type->Type,base);
+			    AiHelpers.Upgrade+type->Type,base);
 		    break;
 		case 3:			// research
+		    AiHelperSetupTable(
+			    &AiHelpers.ResearchCount,&AiHelpers.Research,
+			    upgrade-Upgrades);
+		    AiHelperInsert(
+			    AiHelpers.Research+(upgrade-Upgrades),base);
 		    break;
 	    }
 	}
     }
+
     return list;
 }
 
@@ -177,7 +231,6 @@ local SCM CclDefineAiHelper(SCM list)
 */
 local SCM CclDefineAi(SCM list)
 {
-    SCM sub_list;
     SCM value;
     char* str;
     AiType* aitype;
@@ -216,6 +269,15 @@ local SCM CclDefineAi(SCM list)
     //
     //	AI Script
     //
+    value=gh_car(list);
+    list=gh_cdr(list);
+    aitype->Script=value;
+    //gc_protect(&aitype->Script);
+
+#if 0
+    //
+    //	AI Script
+    //
     list=gh_car(list);
     while( !gh_null_p(list) ) {
 	sub_list=gh_car(list);
@@ -232,12 +294,64 @@ local SCM CclDefineAi(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("force")) ) {
 	} else {
 	    str=gh_scm2newstr(value,NULL);
-	    fprintf(stderr,"unknown tag %s",str);
+	    fprintf(stderr,"unknown tag %s\n",str);
 	    free(str);
 	    continue;
 	}
     }
+#endif
     return list;
+}
+
+/*----------------------------------------------------------------------------
+--	Ai script functions
+----------------------------------------------------------------------------*/
+
+/**
+**	Set debuging flag of AI script.
+*/
+local SCM CclAiDebug(SCM flag)
+{
+    if( gh_eq_p(flag,SCM_BOOL_T) ) {
+	AiPlayer->ScriptDebug=1;
+    } else {
+	AiPlayer->ScriptDebug=0;
+    }
+    return SCM_BOOL_F;
+}
+
+/**
+**	Need an unit.
+*/
+local SCM CclAiNeed(SCM unit)
+{
+    printf("Need: ");
+    gh_display(unit);
+    gh_newline();
+    return SCM_BOOL_F;
+}
+
+/**
+**	Set the number of units.
+*/
+local SCM CclAiSet(SCM unit,SCM count)
+{
+    printf("Set: ");
+    gh_display(unit);
+    gh_display(unit);
+    gh_newline();
+    return SCM_BOOL_F;
+}
+
+/**
+**	Wait for an unit.
+*/
+local SCM CclAiWait(SCM unit)
+{
+    printf("Wait: ");
+    gh_display(unit);
+    gh_newline();
+    return SCM_BOOL_F;
 }
 
 #else
@@ -270,6 +384,14 @@ global void AiCclRegister(void)
 
     gh_new_procedureN("define-ai-helper",CclDefineAiHelper);
     gh_new_procedureN("define-ai",CclDefineAi);
+
+#if defined(NEW_AI)
+    gh_new_procedure1_0("ai:debug",CclAiDebug);
+    gh_new_procedure1_0("ai:need",CclAiNeed);
+    gh_new_procedure2_0("ai:set",CclAiSet);
+    gh_new_procedure1_0("ai:wait",CclAiWait);
+#endif
+
 }
 
 #endif	// } USE_CCL

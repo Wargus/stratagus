@@ -963,7 +963,7 @@ local void DrawBuilding(Unit* unit)
 	frame = unit->SeenFrame = unit->Frame;
     } else {
 	frame = unit->SeenFrame;
-	DebugCheck( frame==-1 || frame==255 );
+	DebugCheck( frame==-1 || frame==0xFF );
     }
 
     type=unit->Type;
