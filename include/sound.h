@@ -94,7 +94,7 @@ extern GameSound GameSounds;		/// Game sound configuration
     @param unit the unit speaking
     @param unit_voice_group the sound to play
 */
-extern void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group);
+extern void PlayUnitSound(const Unit* unit,UnitVoiceGroup unit_voice_group);
 
 /** Ask to the sound server to play a sound associated to a missile.
     @param missile the missile (origin of the sound)

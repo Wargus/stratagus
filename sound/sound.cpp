@@ -99,7 +99,7 @@ global GameSound GameSounds
 **	@param selection
 **	@param volume
 */
-local void InsertSoundRequest(Unit* unit,unsigned id,unsigned char power,
+local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
 			      SoundId sound,unsigned char fight,
 			      unsigned char selection,unsigned char volume) 
 {
