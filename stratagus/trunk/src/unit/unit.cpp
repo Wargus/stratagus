@@ -2951,12 +2951,11 @@ void LetUnitDie(Unit* unit)
 	} else {
 		unit->CurrentSightRange = 0;
 	}
-	MapMarkUnitSight(unit);
-
 	if (type->CorpseType || (type->Animations && type->Animations->Die)) {
 		unit->Removed = 0;
 		UnitCacheInsert(unit);
 	}
+	MapMarkUnitSight(unit);
 }
 
 /**
