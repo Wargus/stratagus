@@ -10,7 +10,7 @@
 //
 /**@name action_spellcast.c	-	The spell cast action. */
 //
-//	(c) Copyright 1998-2001 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 2000,2001 by Vladi Belperchinov-Shabanski
 //
 //	$Id$
 
@@ -135,7 +135,7 @@ global void HandleActionSpellCast(Unit* unit)
 		const SpellType* spell = SpellTypeById( unit->Command.Data.Move.SpellId );
 		if ( unit->Mana < spell->ManaCost )
 		  {
- 	          if( unit->Player==ThisPlayer )
+	          if( unit->Player==ThisPlayer )
 		    {
 		    SetMessage( "%s: not enough mana to cast spell: %s",
                                 unit->Type->Name, spell->Ident );
