@@ -42,7 +42,20 @@ for i in `seq -w 1 24`; do
   rm cropped.png.1
 done
 
-create cropped unit_camera.png
-create normal  unit_camera_n.png
-create shadow  unit_camera_s.png
+create cropped unit_camera_tc.png
+create normal  unit_camera_tc_n.png
+create shadow  unit_camera_tc_s.png
+
+pngtc2pngp unit_camera_tc.png unit_camera.png \
+           --player-color 0  \
+           --title "BOS, unit camera" \
+           --author "Frank Loeffler" \
+           --copyright "GPL, v2" \
+           --source "camera.blend"
+pngtc2pngp unit_camera_tc_n.png -s unit_camera_tc_s.png unit_camera_s.png \
+           --player-color 0  \
+           --title "BOS, unit camera" \
+           --author "Frank Loeffler" \
+           --copyright "GPL, v2" \
+           --source "camera.blend"
 
