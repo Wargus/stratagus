@@ -511,10 +511,13 @@ global int VideoTextLength(unsigned font, const unsigned char* text)
 	int width;
 	const unsigned char* s;
 	const char* widths;
+	int isformat;
 
 	widths = Fonts[font].CharWidth;
+	isformat = 0;
 	for (width = 0, s = text; *s; ++s) {
 		if (*s == '~') {
+			isformat = !isformat;
 			if (!*++s) {				// bad formated string
 				break;
 			}
@@ -522,7 +525,9 @@ global int VideoTextLength(unsigned font, const unsigned char* text)
 				continue;
 			}
 		}
+		if (!isformat) {
 		width += widths[*s - 32] + 1;
+	}
 	}
 	return width;
 }
