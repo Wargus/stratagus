@@ -178,6 +178,9 @@
 **
 **	Unit::Removed
 **
+**		This flag means the unit is not active on map. This flag
+**		have workers set if they are inside a building, units that are
+**		on board of a transporter.
 **
 **	Unit::Selected
 **
