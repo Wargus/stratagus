@@ -119,10 +119,10 @@ local void UiDrawManaBar(const Unit* unit, int x, int y)
     int f;
 
     y += IconHeight + 7;
-    VideoFillRectangleClip(ColorBlack, x, y + 3,IconWidth + 7, 4);
+    VideoFillRectangleClip(ColorBlack, x, y + 3, IconWidth + 7, 4);
     if (unit->HP) {
-	/* s0m3body: mana bar should represent proportional value of Mana with respect to
-	 * MaxMana (unit->Type->_MaxMana) for the unit */
+	// s0m3body: mana bar should represent proportional value of Mana
+	// with respect to MaxMana (unit->Type->_MaxMana) for the unit
 	f = (100 * unit->Mana) / unit->Type->_MaxMana;
 	f = (f * (IconWidth + 5)) / 100;
 	VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
@@ -143,11 +143,11 @@ local void UiDrawCompleted(int full, int ready)
 	return;
     }
     f = (100 * ready) / full;
-    f = (f * TheUI.CompleteBarW) / 100;
-    VideoFillRectangleClip(TheUI.CompleteBarColor,
-	TheUI.CompleteBarX, TheUI.CompleteBarY, f, TheUI.CompleteBarH);
-    VideoDrawText(TheUI.CompleteTextX, TheUI.CompleteTextY,
-	TheUI.CompleteBarFont, TheUI.CompleteBarText);
+    f = (f * TheUI.CompletedBarW) / 100;
+    VideoFillRectangleClip(TheUI.CompletedBarColor,
+	TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
+    VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
+	TheUI.CompletedBarFont, TheUI.CompletedBarText);
 }
 
 /**
@@ -198,13 +198,19 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Draw icon in upper left corner
     //
-    x = TheUI.InfoButtons[0].X;
-    y = TheUI.InfoButtons[0].Y;
-    DrawUnitIcon(unit->Player,type->Icon.Icon,
-	(ButtonAreaUnderCursor == ButtonAreaInfo && ButtonUnderCursor == 0) ?
-	    (IconActive | (MouseButtons & LeftButton)) : 0,
-	x, y);
-    UiDrawLifeBar(unit, x, y);
+    if (TheUI.SingleSelectedText) {
+	VideoDrawText(TheUI.SingleSelectedTextX, TheUI.SingleSelectedTextY,
+	    TheUI.SingleSelectedFont, TheUI.SingleSelectedText);
+    }
+    if (TheUI.SingleSelectedButton) {
+	x = TheUI.SingleSelectedButton->X;
+	y = TheUI.SingleSelectedButton->Y;
+	DrawUnitIcon(unit->Player, type->Icon.Icon,
+	    (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
+		(IconActive | (MouseButtons & LeftButton)) : 0,
+	    x, y);
+	UiDrawLifeBar(unit, x, y);
+    }
 
     if (unit->Player == ThisPlayer) {	// Only for own units.
 	if (unit->HP && unit->HP < 10000) {
@@ -301,24 +307,36 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building training units.
 	//
 	if (unit->Orders[0].Action == UnitActionTrain) {
-	    if (OriginalTraining || unit->Data.Train.Count == 1) {
-		VideoDrawText(x + 37, y + 8 + 78, GameFont, "Training:");
-		DrawUnitIcon(unit->Player,unit->Data.Train.What[0]->Icon.Icon,
-		    0, x + 107, y + 8 + 70);
+	    if (unit->Data.Train.Count == 1) {
+		if (TheUI.SingleTrainingText) {
+		    VideoDrawText(TheUI.SingleTrainingTextX, TheUI.SingleTrainingTextY,
+			TheUI.SingleTrainingFont, TheUI.SingleTrainingText);
+		}
+		if (TheUI.SingleTrainingButton) {
+		    DrawUnitIcon(unit->Player, unit->Data.Train.What[0]->Icon.Icon,
+			(ButtonAreaUnderCursor == ButtonAreaTraining &&
+			    ButtonUnderCursor == 0) ?
+			    (IconActive | (MouseButtons & LeftButton)) : 0,
+			TheUI.SingleTrainingButton->X, TheUI.SingleTrainingButton->Y);
+		}
 
 		UiDrawCompleted(unit->Data.Train.What[0]->Stats[
 		    unit->Player->Player].Costs[TimeCost],
 		    unit->Data.Train.Ticks);
 	    } else {
-		VideoDrawTextCentered(x + 114, y + 8 + 29, GameFont, "Training...");
-
-		for (i = 0; i < unit->Data.Train.Count; ++i) {
-		    DrawUnitIcon(unit->Player,
-			unit->Data.Train.What[i]->Icon.Icon,
-			(ButtonAreaUnderCursor == ButtonAreaTraining &&
-			    ButtonUnderCursor == i) ?
-			    (IconActive | (MouseButtons&LeftButton)) : 0,
-			TheUI.TrainingButtons[i].X, TheUI.TrainingButtons[i].Y);
+		if (TheUI.TrainingText) {
+		    VideoDrawTextCentered(TheUI.TrainingTextX, TheUI.TrainingTextY,
+			TheUI.TrainingFont, TheUI.TrainingText);
+		}
+		if (TheUI.TrainingButtons) {
+		    for (i = 0; i < unit->Data.Train.Count &&
+			    i < TheUI.NumTrainingButtons; ++i) {
+			DrawUnitIcon(unit->Player, unit->Data.Train.What[i]->Icon.Icon,
+			    (ButtonAreaUnderCursor == ButtonAreaTraining &&
+				ButtonUnderCursor == i) ?
+				(IconActive | (MouseButtons & LeftButton)) : 0,
+			    TheUI.TrainingButtons[i].X, TheUI.TrainingButtons[i].Y);
+		    }
 		}
 
 		UiDrawCompleted(unit->Data.Train.What[0]->Stats[
@@ -332,9 +350,17 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building upgrading to better type.
 	//
 	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
-	    VideoDrawText(x + 29, y + 8 + 78, GameFont, "Upgrading:");
-	    DrawUnitIcon(unit->Player, unit->Orders[0].Type->Icon.Icon,
-		0, x + 107, y + 8 + 70);
+	    if (TheUI.UpgradingText) {
+		VideoDrawText(TheUI.UpgradingTextX, TheUI.UpgradingTextY,
+		    TheUI.UpgradingFont, TheUI.UpgradingText);
+	    }
+	    if (TheUI.UpgradingButton) {
+		DrawUnitIcon(unit->Player, unit->Orders[0].Type->Icon.Icon,
+		    (ButtonAreaUnderCursor == ButtonAreaUpgrading &&
+			ButtonUnderCursor == 0) ?
+			(IconActive | (MouseButtons & LeftButton)) : 0,
+		    TheUI.UpgradingButton->X, TheUI.UpgradingButton->Y);
+	    }
 
 	    UiDrawCompleted(unit->Orders[0].Type->Stats[
 		unit->Player->Player].Costs[TimeCost],
@@ -346,10 +372,17 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building research new technologie.
 	//
 	if (unit->Orders[0].Action == UnitActionResearch) {
-	    VideoDrawText(16, y + 8 + 78, GameFont, "Researching:");
-	    DrawUnitIcon(unit->Player,
-		unit->Data.Research.Upgrade->Icon.Icon,
-		0, x + 107, y + 8 + 70);
+	    if (TheUI.ResearchingText) {
+		VideoDrawText(TheUI.ResearchingTextX, TheUI.ResearchingTextY,
+		    TheUI.ResearchingFont, TheUI.ResearchingText);
+	    }
+	    if (TheUI.ResearchingButton) {
+		DrawUnitIcon(unit->Player, unit->Data.Research.Upgrade->Icon.Icon,
+		    (ButtonAreaUnderCursor == ButtonAreaResearching &&
+			ButtonUnderCursor == 0) ?
+			(IconActive | (MouseButtons & LeftButton)) : 0,
+		    TheUI.ResearchingButton->X, TheUI.ResearchingButton->Y);
+	    }
 
 	    UiDrawCompleted(unit->Data.Research.Upgrade->Costs[TimeCost],
 		unit->Player->UpgradeTimers.Upgrades[
@@ -383,19 +416,23 @@ global void DrawUnitInfo(const Unit* unit)
 	// We displayed at least one resource
 	return;
     }
-    
+
     if (type->Transporter && unit->InsideCount) {
+	if (TheUI.TransportingText) {
+	    VideoDrawText(TheUI.TransportingTextX, TheUI.TransportingTextY,
+		TheUI.TransportingFont, TheUI.TransportingText);
+	}
 	uins = unit->UnitInside;
 	for (i = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
 	    DrawUnitIcon(unit->Player,uins->Type->Icon.Icon,
-		(ButtonAreaUnderCursor == ButtonAreaInfo && ButtonUnderCursor == i + 3) ?
+		(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 		    (IconActive | (MouseButtons & LeftButton)) : 0,
-		TheUI.InfoButtons[i + 3].X, TheUI.InfoButtons[i + 3].Y);
-	    UiDrawLifeBar(uins, TheUI.InfoButtons[i + 3].X, TheUI.InfoButtons[i + 3].Y);
+		TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
+	    UiDrawLifeBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
 	    if (uins->Type->CanCastSpell) {
-		UiDrawManaBar(uins, TheUI.InfoButtons[i + 3].X, TheUI.InfoButtons[i + 3].Y);
+		UiDrawManaBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
 	    }
-	    if (ButtonAreaUnderCursor == ButtonAreaInfo && ButtonUnderCursor == i + 3) {
+	    if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == i) {
 		if (uins->Name) {
 		    char buf[128];
 		    sprintf(buf, "%s %s", uins->Type->Name, uins->Name);
@@ -441,13 +478,13 @@ global void DrawUnitInfo(const Unit* unit)
 		if (stats->PiercingDamage < 30 && stats->BasicDamage < 30) {
 		    sprintf(buf, "%d-%d~<+%d+%d~>",
 			(stats->PiercingDamage + 1) / 2, i,
-			stats->BasicDamage-type->_BasicDamage +
+			stats->BasicDamage - type->_BasicDamage +
 			    (int)isqrt(unit->XP / 100) * XpDamage,
 			stats->PiercingDamage-type->_PiercingDamage);
 		} else {
 		    sprintf(buf, "%d-%d~<+%d+%d~>",
-			(stats->PiercingDamage+stats->BasicDamage - 30) / 2, i,
-			stats->BasicDamage-type->_BasicDamage +
+			(stats->PiercingDamage + stats->BasicDamage - 30) / 2, i,
+			stats->BasicDamage - type->_BasicDamage +
 			    (int)isqrt(unit->XP / 100) * XpDamage,
 			stats->PiercingDamage-type->_PiercingDamage);
 		}
@@ -1013,7 +1050,7 @@ global void SetCosts(int mana, int food, const int* costs)
     }
 
     if (costs) {
-	for (i=0; i < MaxCosts; ++i) {
+	for (i = 0; i < MaxCosts; ++i) {
 	    if (Costs[i] != costs[i]) {
 		Costs[i] = costs[i];
 		MustRedraw |= RedrawCosts;
@@ -1034,10 +1071,7 @@ global void SetCosts(int mana, int food, const int* costs)
 */
 global void ClearCosts(void)
 {
-    int costs[MaxCosts];
-
-    memset(costs, 0, sizeof(costs));
-    SetCosts(0, 0, costs);
+    SetCosts(0, 0, NULL);
 }
 
 /*----------------------------------------------------------------------------
@@ -1082,13 +1116,13 @@ global void DrawInfoPanel(void)
             for (i = 0; i < NumSelected; ++i) {
 	        DrawUnitIcon(ThisPlayer,
 		    Selected[i]->Type->Icon.Icon,
-		    (ButtonAreaUnderCursor == ButtonAreaInfo && ButtonUnderCursor == i) ?
+		    (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 			(IconActive | (MouseButtons & LeftButton)) : 0,
-		    TheUI.InfoButtons[i].X, TheUI.InfoButtons[i].Y);
+		    TheUI.SelectedButtons[i].X, TheUI.SelectedButtons[i].Y);
 		UiDrawLifeBar(Selected[i],
-		    TheUI.InfoButtons[i].X, TheUI.InfoButtons[i].Y);
+		    TheUI.SelectedButtons[i].X, TheUI.SelectedButtons[i].Y);
 
-		if (ButtonAreaUnderCursor == ButtonAreaInfo &&
+		if (ButtonAreaUnderCursor == ButtonAreaSelected &&
 			ButtonUnderCursor == i) {
 		    if (Selected[i]->Name) {
 			char buf[128];
@@ -1121,7 +1155,7 @@ global void DrawInfoPanel(void)
 	    }
 	    DrawInfoPanelBackground(i);
 	    DrawUnitInfo(Selected[0]);
-	    if (ButtonAreaUnderCursor == ButtonAreaInfo && ButtonUnderCursor == 0) {
+	    if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		if (Selected[0]->Name) {
 		    char buf[128];
 
@@ -1225,9 +1259,9 @@ global void UpdateTimer(void)
 {
     if (GameTimer.Running) {
 	if (GameTimer.Increasing) {
-	    GameTimer.Cycles += GameCycle-GameTimer.LastUpdate;
+	    GameTimer.Cycles += GameCycle - GameTimer.LastUpdate;
 	} else {
-	    GameTimer.Cycles -= GameCycle-GameTimer.LastUpdate;
+	    GameTimer.Cycles -= GameCycle - GameTimer.LastUpdate;
 	    if (GameTimer.Cycles < 0) {
 		GameTimer.Cycles = 0;
 	    }
