@@ -161,6 +161,12 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
     unit->IY+=yd*anim[state].Pixel;
     unit->Frame+=anim[state].Frame;
     unit->Wait=anim[state].Sleep;
+    if( unit->Slow ) {			// unit is slowed down
+	unit->Wait<<=1;
+    }
+    if( unit->Haste && unit->Wait>1 ) {	// unit is accelerated
+	unit->Wait>>=1;
+    }
 
     //
     //	Any graphic change?
