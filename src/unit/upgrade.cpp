@@ -1058,7 +1058,7 @@ local int AddUpgradeModifier( int uid,
 
     const char* af_units,    // "A:unit-mage,F:unit-grunt" -- allow mages, forbid grunts
     const char* af_upgrades, // "F:upgrade-Shield1,R:upgrade-ShieldTotal" -- :)
-    const char* apply_to	    // "unit-Peon,unit-Peasant"
+    const char* apply_to	    // "unit-peon,unit-peasant"
 
     )
 {
@@ -1169,7 +1169,7 @@ global void AddSimpleUpgrade( const char* ident,
 
     int* mcosts,
 
-    const char* apply_to		// "unit-Peon,unit-Peasant"
+    const char* apply_to		// "unit-peon,unit-peasant"
     )
 {
     Upgrade* up;
