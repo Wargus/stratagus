@@ -774,6 +774,7 @@ global void GameMainLoop(void)
 	EnableDrawRefresh();
 	GameCursor = TheUI.Point.Cursor;
 	GameRunning = 1;
+	SaveGameLoading = 0;
 
 	showtip = 0;
 	RealVideoSyncSpeed = VideoSyncSpeed;
