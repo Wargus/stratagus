@@ -708,12 +708,28 @@ global void DrawMessage(void)
 */
 local void AddMessage(const char *msg)
 {
+    char *ptr;
+    char *message;
+
     if (MessagesCount == MESSAGES_MAX) {
 	ShiftMessages();
     }
-    DebugCheck(strlen(msg) >= sizeof(Messages[0]));
-    strcpy(Messages[MessagesCount], msg);
+
+    message = Messages[MessagesCount];
+    strncpy(message, msg, sizeof(Messages[0])-1);
+    message[sizeof(Messages[0])-1] = '\0';
+
+    ptr = message + strlen(message);
+
+    while (VideoTextLength(GameFont, message) >= 440+(VideoWidth-640)/2 ) {
+	*--ptr = '\0';
+    }
+
     MessagesCount++;
+
+    if (strlen(msg) != ptr-message) {
+	AddMessage(msg+(ptr-message));
+    }
 }
 
 /**
