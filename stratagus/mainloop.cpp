@@ -187,8 +187,8 @@ local void MoveMapViewPointRight(unsigned step)
 /**
 **	Handle scrolling area.
 **
-**	@param TempScrollState	Scroll direction/state.
-**	@param FastScroll	Flag scroll faster.
+**	@param state	Scroll direction/state.
+**	@param fast	Flag scroll faster.
 **
 **	@TODO	Support dynamic acceleration of scroll speed.
 **		If the scroll key is longer pressed the area is scrolled faster.
@@ -197,12 +197,12 @@ local void MoveMapViewPointRight(unsigned step)
 **                       drawn (clipped), which also needs to be supported
 **                       by various functions using MustRedrawTile,..
 */
-local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
+global void DoScrollArea(enum _scroll_state_ state, int fast)
 {
     int stepx;
     int stepy;
 
-    if (FastScroll) {
+    if (fast) {
 #ifdef SPLIT_SCREEN_SUPPORT
 	stepx = TheUI.VP[TheUI.LastClickedVP].MapWidth / 2;
 	stepy = TheUI.VP[TheUI.LastClickedVP].MapHeight / 2;
@@ -210,44 +210,44 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 	stepx = MapWidth / 2;
 	stepy = MapHeight / 2;
 #endif /* SPLIT_SCREEN_SUPPORT */
-    } else {	// dynamic: let these variables increase upto FastScroll..
+    } else {		// dynamic: let these variables increase upto fast..
 	stepx = stepy = 1;
     }
 
-    switch( TempScrollState ) {
-        case ScrollUp:
-            MoveMapViewPointUp( stepy );
-            break;
-        case ScrollDown:
-            MoveMapViewPointDown( stepy );
-            break;
-        case ScrollLeft:
-            MoveMapViewPointLeft( stepx );
-            break;
-        case ScrollLeftUp:
-            MoveMapViewPointLeft( stepx );
-            MoveMapViewPointUp( stepy );
-            break;
-        case ScrollLeftDown:
-            MoveMapViewPointLeft( stepx );
-            MoveMapViewPointDown( stepy );
-            break;
-        case ScrollRight:
-            MoveMapViewPointRight( stepx );
-            break;
-        case ScrollRightUp:
-            MoveMapViewPointRight( stepx );
-            MoveMapViewPointUp( stepy );
-            break;
-        case ScrollRightDown:
-            MoveMapViewPointRight( stepx );
-            MoveMapViewPointDown( stepy );
-            break;
-        default:
-            return; // skip marking map
+    switch (state) {
+	case ScrollUp:
+	    MoveMapViewPointUp(stepy);
+	    break;
+	case ScrollDown:
+	    MoveMapViewPointDown(stepy);
+	    break;
+	case ScrollLeft:
+	    MoveMapViewPointLeft(stepx);
+	    break;
+	case ScrollLeftUp:
+	    MoveMapViewPointLeft(stepx);
+	    MoveMapViewPointUp(stepy);
+	    break;
+	case ScrollLeftDown:
+	    MoveMapViewPointLeft(stepx);
+	    MoveMapViewPointDown(stepy);
+	    break;
+	case ScrollRight:
+	    MoveMapViewPointRight(stepx);
+	    break;
+	case ScrollRightUp:
+	    MoveMapViewPointRight(stepx);
+	    MoveMapViewPointUp(stepy);
+	    break;
+	case ScrollRightDown:
+	    MoveMapViewPointRight(stepx);
+	    MoveMapViewPointDown(stepy);
+	    break;
+	default:
+	    return;			// skip marking map
     }
     MarkDrawEntireMap();
-    MustRedraw|=RedrawMinimap|RedrawCursors;
+    MustRedraw |= RedrawMinimap | RedrawCursors;
 }
 
 #ifdef DEBUG	// {
