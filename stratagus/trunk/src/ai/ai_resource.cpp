@@ -858,13 +858,13 @@ local void AiCollectResources(void)
 	}
     }
 
-#ifdef DEBUG
     total=0;
     for( c=0; c<MaxCosts; ++c ) {
 	total+=num_units_assigned[c]+num_units_with_resource[c];
 	DebugLevel3Fn("Assigned %d = %d\n" _C_ c _C_ num_units_assigned[c]);
 	DebugLevel3Fn("Resource %d = %d\n" _C_ c _C_ num_units_with_resource[c]);
     }
+#ifdef DEBUG
     DebugLevel3Fn("Unassigned %d of total %d\n" _C_ num_units_unassigned[c] _C_ total);
     if (AiPlayer->Player==ThisPlayer) {
 	DebugLevel3Fn("Percent Assignment:");
