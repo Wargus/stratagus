@@ -905,8 +905,7 @@ if [ "$DEBUG" != 1 ] ; then
     echo "optimizations, based on how stable you want Freecraft. The higher the"
     echo "optimization, the more unstable Freecraft is. High Optimization also"
     echo "may cause Freecraft to fail to compile, but usually doesnt. High"
-    echo "Optimization will also increase compile times. It is recommended"
-    echo "that you use GCC 3.2 or later with High Optimization."
+    echo "Optimization will also increase compile times."
     echo
     echo " *** DO NOT REPORT BUGS ABOUT A HIGHLY OPTIMIZED FREECRAFT FAILING ***"
     echo
@@ -1033,6 +1032,17 @@ if [ "$DEBUG" != 1 ] ; then
 	    ;;
     esac
 fi
+fi
+if [ $CCMAJOR -ne 3 -o $CCMAJOR -eq 3 -a $CCMINOR -ne 2 ] ; then
+    if [ "$DEBUG" != 1 ] ; then
+	echo
+	echo
+	echo Compiler is $CC $CCMAJOR.$CCMINOR
+	echo
+	echo "Optimization Menu Disabled: Not running GCC 3.2.x"
+ 	echo "Using Normal Optimization"
+	CFLAGS="$CFLAGS $NORMAL_CFLAGS"
+    fi
 fi
 
 ###############################################################################
