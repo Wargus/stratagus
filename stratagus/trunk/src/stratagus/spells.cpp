@@ -110,8 +110,6 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 	int n;
 	Unit* table[UnitMax];
 
-	Assert(!caster);
-	Assert(!action);
 	//
 	//		Allow error margins. (Lame, I know)
 	//
@@ -187,11 +185,6 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 	Unit* portal;
 	UnitType* ptype;
 
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
-	Assert(!action->Data.SpawnPortal.PortalType);
-
 	ptype = action->Data.SpawnPortal.PortalType;
 
 	DebugLevel0Fn("Spawning a portal exit.\n");
@@ -232,9 +225,6 @@ global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 	int hp;
 	int mana;
 
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
 	// Get all the units around the unit
 	nunits = UnitCacheSelect(x - spell->Range,
 		y - spell->Range,
@@ -297,11 +287,6 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	int i;
 	MissileType *missile;
 
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
-	//assert(x in range, y in range);
-
 	mis = NULL;
 
 	fields = action->Data.AreaBombardment.Fields;
@@ -310,7 +295,6 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	offsetx = action->Data.AreaBombardment.StartOffsetX;
 	offsety = action->Data.AreaBombardment.StartOffsetY;
 	missile = action->Data.AreaBombardment.Missile;
-	Assert(!missile);
 	while (fields--) {
 			// FIXME: radius configurable...
 		do {
@@ -398,11 +382,6 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	int dx;
 	int dy;
 
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
-	Assert(!action->Data.SpawnMissile.Missile);
-
 	EvaluateMissileLocation(&action->Data.SpawnMissile.StartPoint,
 		caster, target, x, y, &sx, &sy);
 	EvaluateMissileLocation(&action->Data.SpawnMissile.EndPoint,
@@ -437,11 +416,6 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
-	Assert(!target);
-
 	if (action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
 		target->Haste = action->Data.AdjustBuffs.HasteTicks;
 	}
@@ -482,11 +456,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	int mana;
 	int manacost;
 
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
-	Assert(!target);
-
 	hp = action->Data.AdjustVitals.HP;
 	mana = action->Data.AdjustVitals.Mana;
 	manacost = spell->ManaCost;
@@ -522,7 +491,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 		castcount = min(castcount, action->Data.AdjustVitals.MaxMultiCast);
 	}
 
-	Assert(castcount < 0);
 	DebugLevel3Fn("Used to have %d hp and %d mana.\n" _C_
 		target->HP _C_ target->Mana);
 
@@ -567,13 +535,7 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 	int j;
 	UnitType* type;
 
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
-	Assert(!target);
-
 	type = action->Data.Polymorph.NewForm;
-	Assert(!type);
 
 	x = x - type->TileWidth / 2;
 	y = y - type->TileHeight / 2;
@@ -637,11 +599,6 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 	Unit* table[UnitMax];
 	Unit* unit;
 	UnitType* unittype;
-
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!action);
-	Assert(!action->Data.Summon.UnitType);
 
 	unittype = action->Data.Summon.UnitType;
 	ttl = action->Data.Summon.TTL;
@@ -721,10 +678,6 @@ local Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 
 	target = (Target*)malloc(sizeof(*target));
 
-	Assert(unit == NULL && t == TargetUnit);
-	Assert(!(0 <= x && x < TheMap.Width) && t == TargetPosition);
-	Assert(!(0 <= y && y < TheMap.Height) && t == TargetPosition);
-
 	target->which_sort_of_target = t;
 	target->unit = (Unit*)unit;
 	target->X = x;
@@ -741,7 +694,6 @@ local Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 */
 local Target* NewTargetUnit(const Unit* unit)
 {
-	Assert(!unit);
 	return NewTarget(TargetUnit, unit, 0, 0);
 }
 
@@ -755,9 +707,6 @@ local Target* NewTargetUnit(const Unit* unit)
 */
 local Target* NewTargetPosition(int x, int y)
 {
-	Assert(!(0 <= x && x < TheMap.Width));
-	Assert(!(0 <= y && y < TheMap.Height));
-
 	return NewTarget(TargetPosition, NULL, x, y);
 }
 
@@ -884,10 +833,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 	int combat;
 	AutoCastInfo* autocast;
 
-	Assert(!spell);
-	Assert(!caster);
-
-	//		Ai cast should be a lot better. Use autocast if not found.
+	// Ai cast should be a lot better. Use autocast if not found.
 	if (caster->Player->AiEnabled && spell->AICast) {
 		DebugLevel3Fn("The borg uses AI autocast XP.\n");
 		autocast = spell->AICast;
@@ -895,7 +841,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 		DebugLevel3Fn("You puny mortal, join the colective!\n");
 		autocast = spell->AutoCast;
 	}
-	Assert(!autocast);
+	Assert(autocast);
 	x = caster->X;
 	y = caster->Y;
 	range = spell->AutoCast->Range;
@@ -976,7 +922,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 		default:
 			// Something is wrong
 			DebugLevel0Fn("Spell is screwed up, unknown target type\n");
-			Assert(1);
+			Assert(0);
 			return NULL;
 			break;
 		}
@@ -1009,7 +955,6 @@ global SpellType* SpellTypeByIdent(const char* ident)
 {
 	int i;
 
-	Assert(!ident);
 	for (i = 0; i < SpellTypeCount; ++i) {
 		if (strcmp(SpellTypeTable[i]->Ident, ident) == 0) {
 			return SpellTypeTable[i];
@@ -1033,9 +978,6 @@ global int SpellIsAvailable(const Player* player, int spellid)
 {
 	int dependencyId;
 
-	Assert(!player);
-	Assert(!(0 <= spellid && spellid < SpellTypeCount));
-
 	dependencyId = SpellTypeTable[spellid]->DependencyId;
 
 	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
@@ -1051,8 +993,6 @@ global int SpellIsAvailable(const Player* player, int spellid)
 */
 global int CanAutoCastSpell(const SpellType* spell)
 {
-	Assert(!spell);
-
 	return spell->AutoCast ? 1 : 0;
 }
 
@@ -1071,11 +1011,6 @@ global int CanAutoCastSpell(const SpellType* spell)
 global int CanCastSpell(const Unit* caster, const SpellType* spell,
 	const Unit* target, int x, int y)
 {
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!SpellIsAvailable(caster->Player, spell->Slot));
-	Assert(!(caster->Type->CanCastSpell && caster->Type->CanCastSpell[spell->Slot]));
-
 	if (spell->Target == TargetUnit && target == NULL) {
 		return 0;
 	}
@@ -1093,12 +1028,6 @@ global int CanCastSpell(const Unit* caster, const SpellType* spell,
 global int AutoCastSpell(Unit* caster, const SpellType* spell)
 {
 	Target* target;
-
-	Assert(!caster);
-	Assert(!spell);
-	Assert(!(0 <= spell->Slot && spell->Slot < SpellTypeCount));
-	Assert(!(caster->Type->CanCastSpell));
-	Assert(!(caster->Type->CanCastSpell[spell->Slot]));
 
 	//  Check for mana, trivial optimization.
 	if (!SpellIsAvailable(caster->Player, spell->Slot)
@@ -1135,12 +1064,6 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	int cont;
 	SpellActionType* act;
 
-	Assert(!spell);
-	Assert(!spell->Action);
-	Assert(!spell->Action->CastFunction);
-	Assert(!caster);
-	Assert(!SpellIsAvailable(caster->Player, spell->Slot));
-
 	caster->Invisible = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
 		x = target->X;
@@ -1169,7 +1092,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 		}
 		PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 		while (act) {
-			Assert(!act->CastFunction);
+			Assert(act->CastFunction);
 			cont = cont & act->CastFunction(caster, spell, act, target, x, y);
 			act = act->Next;
 		}
