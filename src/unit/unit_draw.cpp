@@ -1046,6 +1046,7 @@ global void DrawUnits(void)
     //
     //	Select all units touching the viewpoint.
     //
+    // FIXME: Must be here +1 on Width, Height.
     n=SelectUnits(MapX,MapY,MapX+MapWidth,MapY+MapHeight,table);
 
     //
