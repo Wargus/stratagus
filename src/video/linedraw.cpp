@@ -748,23 +748,6 @@ global void VideoFillRectangle(SDL_Color color, int x, int y,
     SDL_FillRect(TheScreen, &drect, c);
 }
 
-global void VideoFillTransRectangle(SDL_Color color, int x, int y,
-    int w, int h, unsigned char alpha)
-{
-    // FIXME: alpha
-    // FIXME: do clipping
-
-    SDL_Rect drect;
-    Uint32 c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
-
-    drect.x = x;
-    drect.y = y;
-    drect.w = w;
-    drect.h = h;
-
-    SDL_FillRect(TheScreen, &drect, c);
-}
-
 global void VideoFillRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
@@ -772,12 +755,36 @@ global void VideoFillRectangleClip(SDL_Color color, int x, int y,
     VideoFillRectangle(color, x, y, w, h);
 }
 
+global void VideoFillTransRectangle(SDL_Color color, int x, int y,
+    int w, int h, unsigned char alpha)
+{
+    SDL_Rect drect;
+    SDL_Surface* s;
+
+    s = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, 
+	32, RMASK, GMASK, BMASK, AMASK);
+
+    Uint32 c = SDL_MapRGBA(s->format, color.r, color.g, color.b, alpha);
+
+    drect.x = 0;
+    drect.y = 0;
+    drect.w = w;
+    drect.h = h;
+
+    SDL_FillRect(s, &drect, c);
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(s, NULL, TheScreen, &drect);
+    SDL_FreeSurface(s);
+}
+
 global void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
-    // FIXME: trans
     CLIP_RECTANGLE(x, y, w, h);
-    VideoFillRectangle(color, x, y, w, h);
+    VideoFillTransRectangle(color, x, y, w, h, alpha);
 }
 
 global void VideoDrawCircle(SDL_Color color, int x, int y, int r)

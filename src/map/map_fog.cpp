@@ -606,6 +606,29 @@ global void VideoDrawUnexploredSolid(const int tile, int x, int y)
 
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
+
+global void VideoDrawFogAlpha(const int tile, int x, int y)
+{
+    int tilepitch;
+    int alpha;
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+    srect.x = TileSizeX * (tile % tilepitch);
+    srect.y = TileSizeY * (tile / tilepitch);
+    srect.w = TileSizeX;
+    srect.h = TileSizeY;
+
+    drect.x = x;
+    drect.y = y;
+
+    alpha = TheMap.TileGraphic->Surface->format->alpha;
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, 128);
+    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, alpha);
+}
 #else
 // Routines for 8 bit displays .. --------------------------------------------
 
@@ -1613,27 +1636,7 @@ global void VideoDrawUnexploredSolidOpenGL(
 --	Draw real fog :-)
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_SDL_SURFACE
-global void VideoDrawFogAlpha(const int tile, int x, int y)
-{
-    int tilepitch;
-    SDL_Rect srect;
-    SDL_Rect drect;
-
-    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-
-    srect.x = TileSizeX * (tile % tilepitch);
-    srect.y = TileSizeY * (tile / tilepitch);
-    srect.w = TileSizeX;
-    srect.y = TileSizeY;
-
-    drect.x = x;
-    drect.y = y;
-
-    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-}
-
-#else
+#ifndef USE_SDL_SURFACE
 // Routines for 8 bit displays .. --------------------------------------------
 
 /**
@@ -2759,7 +2762,8 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	}
     } else {
 #ifdef USE_SDL_SURFACE
-	VideoDrawOnlyFog(UNEXPLORED_TILE, dx, dy);
+	// Tile is fully FOW
+	VideoFillTransRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY, 128);
 #else
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
 #endif
@@ -2833,7 +2837,7 @@ global void DrawMapFogOfWar(const Viewport* vp, int x, int y)
 			MapDrawTile(UNEXPLORED_TILE, dx, dy);
 #else
 #ifdef USE_SDL_SURFACE
-			VideoDrawTile(UNEXPLORED_TILE, dx, dy);
+			VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
 #else
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
 #endif

@@ -234,9 +234,7 @@ int ckey;
     graphic = MakeGraphic(8, w, h, data, w * h);	// data freed by make graphic
 #ifdef USE_SDL_SURFACE
     SDL_SetPalette(graphic->Surface, SDL_LOGPAL|SDL_PHYSPAL, palettecolors, 0, 256);
-    SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, 
-	SDL_MapRGB(graphic->Surface->format, palettecolors[255].r, 
-	palettecolors[255].g, palettecolors[255].b));
+    SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, 255);
 #else
     graphic->Palette = palette;  //FIXME: should this be part of MakeGraphic
 #endif
