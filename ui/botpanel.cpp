@@ -107,15 +107,155 @@ global void InitButtons(void)
 */
 global void SaveButtons(FILE* file)
 {
+#ifndef NEW_UI
+    int i;
+    int n;
+    char* cp;
+#endif
+
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: buttons $Id$\n\n");
 
-    // Hmm, is this needed? maybe it is set in a tutorial level which
-    // might be saved?
+#ifndef NEW_UI
+    for( i=0; i<NumUnitButtons; ++i ) {
+	fprintf(file,"(define-button 'pos %d 'level %d 'icon '%s\n",
+		UnitButtonTable[i]->Pos,
+		UnitButtonTable[i]->Level,
+		IdentOfIcon(UnitButtonTable[i]->Icon.Icon));
+	fprintf(file,"  'action ");
+	switch( UnitButtonTable[i]->Action ) {
+	    case ButtonMove:
+		fprintf(file,"'move"); break;
+	    case ButtonStop:
+		fprintf(file,"'stop"); break;
+	    case ButtonAttack:
+		fprintf(file,"'attack"); break;
+	    case ButtonRepair:
+		fprintf(file,"'repair"); break;
+	    case ButtonHarvest:
+		fprintf(file,"'harvest"); break;
+	    case ButtonButton:
+		fprintf(file,"'button"); break;
+	    case ButtonBuild:
+		fprintf(file,"'build"); break;
+	    case ButtonTrain:
+		fprintf(file,"'train-unit"); break;
+	    case ButtonPatrol:
+		fprintf(file,"'patrol"); break;
+	    case ButtonStandGround:
+		fprintf(file,"'stand-ground"); break;
+	    case ButtonAttackGround:
+		fprintf(file,"'attack-ground"); break;
+	    case ButtonReturn:
+		fprintf(file,"'return-goods"); break;
+	    case ButtonDemolish:
+		fprintf(file,"'demolish"); break;
+	    case ButtonSpellCast:
+		fprintf(file,"'cast-spell"); break;
+	    case ButtonResearch:
+		fprintf(file,"'research"); break;
+	    case ButtonUpgradeTo:
+		fprintf(file,"'upgrade-to"); break;
+	    case ButtonUnload:
+		fprintf(file,"'unload"); break;
+	    case ButtonCancel:
+		fprintf(file,"'cancel"); break;
+	    case ButtonCancelUpgrade:
+		fprintf(file,"'cancel-upgrade"); break;
+	    case ButtonCancelTrain:
+		fprintf(file,"'cancel-train-unit"); break;
+	    case ButtonCancelBuild:
+		fprintf(file,"'cancel-build"); break;
+	}
+	if( UnitButtonTable[i]->ValueStr ) {
+	    if( isdigit(UnitButtonTable[i]->ValueStr[0]) ) {
+		fprintf(file," 'value %s\n",UnitButtonTable[i]->ValueStr);
+	    } else {
+		fprintf(file," 'value '%s\n",UnitButtonTable[i]->ValueStr);
+	    }
+	} else {
+	    fprintf(file,"\n");
+	}
+	if( UnitButtonTable[i]->Allowed ) {
+	    fprintf(file,"  'allowed ");
+	    if( UnitButtonTable[i]->Allowed == ButtonCheckTrue ) {
+		fprintf(file,"'check-true");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckFalse ) {
+		fprintf(file,"'check-false");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUpgrade ) {
+		fprintf(file,"'check-upgrade");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnitsOr ) {
+		fprintf(file,"'check-units-or");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUnitsAnd ) {
+		fprintf(file,"'check-units-and");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNetwork ) {
+		fprintf(file,"'check-network");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoNetwork ) {
+		fprintf(file,"'check-no-network");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoWork ) {
+		fprintf(file,"'check-no-work");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckNoResearch ) {
+		fprintf(file,"'check-no-research");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckAttack ) {
+		fprintf(file,"'check-attack");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckUpgradeTo ) {
+		fprintf(file,"'check-upgrade-to");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckResearch ) {
+		fprintf(file,"'check-research");
+	    } else if( UnitButtonTable[i]->Allowed == ButtonCheckSingleResearch ) {
+		fprintf(file,"'check-single-research");
+	    } else {
+		DebugLevel0Fn("Unsupported check function %p\n" _C_
+			UnitButtonTable[i]->Allowed);
+		fprintf(file,"%p",UnitButtonTable[i]->Allowed);
+	    }
+	    if( UnitButtonTable[i]->AllowStr ) {
+		fprintf(file," 'allow-arg '(");
+		cp=alloca(strlen(UnitButtonTable[i]->AllowStr));
+		strcpy(cp,UnitButtonTable[i]->AllowStr);
+		cp=strtok(cp,",");
+		while( cp ) {
+		    fprintf(file,"%s",cp);
+		    cp=strtok(NULL,",");
+		    if( cp ) {
+			fprintf(file," ");
+		    }
+		}
+		fprintf(file,")");
+	    }
+	    fprintf(file,"\n");
+	}
+	fprintf(file,"  'key \"");
+	switch( UnitButtonTable[i]->Key ) {
+	    case '\033':
+		fprintf(file,"\\%03o",UnitButtonTable[i]->Key);
+		break;
+	    default:
+		fprintf(file,"%c",UnitButtonTable[i]->Key);
+		break;
+	}
+	fprintf(file,"\" 'hint \"%s\"\n",UnitButtonTable[i]->Hint);
+	n=fprintf(file,"  'for-unit '(");
+	cp=alloca(strlen(UnitButtonTable[i]->UnitMask));
+	strcpy(cp,UnitButtonTable[i]->UnitMask);
+	cp=strtok(cp,",");
+	while( cp ) {
+	    if( n+strlen(cp)>78 ) {
+		n=fprintf(file,"\n    ");
+	    }
+	    n+=fprintf(file,"%s",cp);
+	    cp=strtok(NULL,",");
+	    if( cp ) {
+		n+=fprintf(file," ");
+	    }
+	}
+	fprintf(file,"))\n\n");
+    }
+#endif
+
     fprintf(file,"(set-show-command-key! %s)\n\n",
 	    ShowCommandKey ? "#t" : "#f");
 }
-
 
 
 
