@@ -10,12 +10,11 @@
 //
 /**@name command.c	-	Give units a command. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -923,23 +922,34 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,
 **
 **	@param unit	pointer to unit.
 **	@param slot	slot number to cancel.
+**	@param type	Unit-type to cancel.
 */
-global void CommandCancelTraining(Unit* unit,int slot)
+global void CommandCancelTraining(Unit* unit,int slot,const UnitType* type)
 {
     int i;
     int n;
-
-    // FIXME: over network we could cancel the wrong slot.
-
 
     //
     //	Check if unit is still training 'slot'? (NETWORK!)
     //
     if( unit->Orders[0].Action==UnitActionTrain ) {
+	n=unit->Data.Train.Count;
+	DebugCheck( n<1 );
 	if( slot==-1 ) {		// default last slot!
-	    slot+=unit->Data.Train.Count;
+	    slot+=n;
 	}
-	if( slot<(n=unit->Data.Train.Count) ) {
+
+	DebugLevel0Fn("Cancel type: %s\n",type ? type->Ident : "-any-");
+	//
+	//	Check if the unit-type is still trained? (NETWORK!)
+	//
+	if( type && unit->Data.Train.What[slot]!=type ) {
+	    // FIXME: we can look if this is now in an earlier slot.
+	    ClearSavedAction(unit);
+	    return;
+	}
+
+	if( slot<n ) {
 
 	    PlayerAddCostsFactor(unit->Player,
 		    unit->Data.Train.What[slot]
