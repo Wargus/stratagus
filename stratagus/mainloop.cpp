@@ -246,6 +246,12 @@ global void UpdateDisplay(void)
 {
     int update_old_cursor;
 
+#ifdef USE_SDL
+    extern SDL_Surface *Screen;			/// internal screen
+
+    SDL_LockSurface(Screen);
+    VideoMemory=Screen->pixels;
+#endif
     if (MustRedraw) {
 	update_old_cursor=HideAnyCursor();	// remove cursor
     } else {
@@ -358,11 +364,17 @@ global void UpdateDisplay(void)
     }
 
     if (!MustRedraw) {
+#ifdef USE_SDL
+	SDL_UnlockSurface(Screen);
+#endif
 	return;
     }
 
     DrawAnyCursor();
 
+#ifdef USE_SDL
+    SDL_UnlockSurface(Screen);
+#endif
     //
     //	Update changes to X11.
     //
@@ -506,10 +518,6 @@ global void GameMainLoop(void)
 	}
 
 	if( MustRedraw /* && !VideoInterrupts */ ) {
-#ifdef USE_SDL
-	    extern SDL_Surface *Screen;		/// internal screen
-	    SDL_LockSurface(Screen);
-#endif
 	    UpdateDisplay();
 	    //
 	    // If double-buffered mode, we will display the contains of
@@ -518,9 +526,6 @@ global void GameMainLoop(void)
 	    //
 	    RealizeVideoMemory();
 	    MustRedraw=0;
-#ifdef USE_SDL
-	    SDL_UnlockSurface(Screen);
-#endif
 	}
 
 	CheckVideoInterrupts();
