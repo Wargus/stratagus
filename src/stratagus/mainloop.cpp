@@ -564,18 +564,6 @@ global void UpdateDisplay(void)
 
 	if (MustRedraw & RedrawMap) {
 		DrawMapArea();
-
-#ifdef USE_MAGNANT
-        		DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
-		DrawMinimapCursor(TheUI.SelectedViewport->MapX,
-			TheUI.SelectedViewport->MapY);
-       
-
-        DrawButtonPanel();
-		DrawInfoPanel();
-		PlayerPixels(Players);				// Reset to default colors
-        //DrawMessages();
-#endif
 	}
 
 	if (MustRedraw & (RedrawMessage | RedrawMap)) {
