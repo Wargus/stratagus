@@ -1039,7 +1039,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 		CLprintf(file, "  'can-cast-spell '( ");
 		for (i = 0; i < SpellTypeCount; ++i) {
 			if (type->CanCastSpell[i]) {
-				CLprintf(file, "%s ", SpellTypeTable[i].IdentName);
+				CLprintf(file, "%s ", SpellTypeTable[i]->IdentName);
 			}
 		}
 		CLprintf(file, ")\n");

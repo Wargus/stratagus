@@ -242,6 +242,7 @@ struct _spell_type_;
 */
 typedef struct _spell_type_ {
 	//  Identification stuff
+	void* ScriptData;       				/// Script Data for this object.
 	int Ident;								/// Spell numeric identifier
 	char *IdentName;						/// Spell unique identifier (spell-holy-vision)
 	char *Name;								/// Spell name shown by the engine
@@ -274,7 +275,7 @@ typedef struct _spell_type_ {
 /**
 **		Define the names and effects of all available spells.
 */
-extern SpellType *SpellTypeTable;
+extern SpellType **SpellTypeTable;
 
 /// How many spell-types are available
 extern int SpellTypeCount;
@@ -341,6 +342,17 @@ SpellFunc CastDemolish;
 SpellFunc CastDeathCoil;
 SpellFunc CastSpawnPortal;
 SpellFunc CastSpawnMissile;
+
+#ifdef META_LUA
+
+	/// Initialize Spell scripting.
+extern void ScriptSpellInit(void);
+    /// Register the spell-table user-data.
+extern void ScriptSpellTableCreateUserdata(lua_State* l);
+	/// Register a spell user-data.
+extern void ScriptSpellCreateUserdata(lua_State* l, SpellType* spell);
+
+#endif
 
 //@}
 
