@@ -10,7 +10,7 @@
 //
 /**@name sdl_audio.c		-	SDL hardware support */
 //
-//	(c) Copyright 2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 2002-2003 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -48,8 +48,8 @@
 ----------------------------------------------------------------------------*/
 
     /// FIXME: move function to here.
-extern void FillAudio(void* udata __attribute__((unused)),Uint8* stream,
-	int len);
+extern void FillAudio(void* udata __attribute__((unused)), Uint8* stream,
+    int len);
 
 /**
 **	Initialize sound card hardware part with SDL.
@@ -62,7 +62,7 @@ extern void FillAudio(void* udata __attribute__((unused)),Uint8* stream,
 **	@return		True if failure, false if everything ok.
 */
 global int InitSdlSound(const char* dev __attribute__((unused)), int freq,
-	int size, int wait __attribute__((unused)))
+    int size, int wait __attribute__((unused)))
 {
     SDL_AudioSpec wanted;
 
