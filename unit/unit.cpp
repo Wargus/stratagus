@@ -2528,7 +2528,8 @@ global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 	    best=unit;
 	}
     }
-    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
+                               best?best->X:-1,best?best->Y:-1);
     return best;
 }
 
@@ -2575,7 +2576,8 @@ global Unit* FindWoodDeposit(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
+                               best?best->X:-1,best?best->Y:-1);
     return best;
 }
 
@@ -2886,7 +2888,8 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
+                               best?best->X:-1,best?best->Y:-1);
     /*	Oil platforms are our own, they should be known
     if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
 	return NoUnitP;
@@ -2942,7 +2945,8 @@ global Unit* FindOilDeposit(const Unit* source,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    DebugLevel3Fn("%d %d,%d\n",best?UnitNumber(best):-1,
+                               best?best->X:-1,best?best->Y:-1);
     return best;
 }
 
