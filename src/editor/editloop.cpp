@@ -54,6 +54,7 @@
 
 extern void PreMenuSetup(void);		/// FIXME: not here!
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
+local void EditorSavePud(const char *file);
 
 extern struct {
     const char*	File[PlayerMaxRaces];	/// Resource filename one for each race
@@ -124,12 +125,13 @@ local int SelectedPlayer;		/// Player selected for draw
 */
 local void ChangeTile(int x, int y, int tile)
 {
+    MapField *mf;
+
     DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
     DebugCheck(tile < 0 || tile >= TheMap.Tileset->NumTiles);
 
-    TheMap.Fields[y * TheMap.Width + x].Tile =
-	TheMap.Fields[y * TheMap.Width + x].SeenTile =
-	    TheMap.Tileset->Table[tile];
+    mf = &TheMap.Fields[y * TheMap.Width + x];
+    mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
 }
 
 /**
@@ -190,6 +192,8 @@ local int GetTileNumber(int basic, int random, int filler)
 */
 local void EditTile(int x, int y, int tile)
 {
+    MapField* mf;
+
     DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
 
     ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
@@ -197,70 +201,65 @@ local void EditTile(int x, int y, int tile)
     //
     //  Change the flags
     //
-    TheMap.Fields[y * TheMap.Width + x].Flags &=
-	~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+    mf = &TheMap.Fields[y * TheMap.Width + x];
+    mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 	MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 	MapFieldWall | MapFieldRocks | MapFieldForest);
 
-#if 1
-    TheMap.Fields[y * TheMap.Width + x].Flags |=
-	    TheMap.Tileset->FlagsTable[16 + tile * 16];
-    DebugLevel3Fn("Table %x\n" _C_ TheMap.Fields[y * TheMap.Width + x].Flags);
-#else
-    switch (tile) {
-	case 0:			// LIGHT_WATER
-	case 1:			// DARK_WATER
-	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldWaterAllowed;
-	    break;
-	case 2:			// LIGHT_COAST
-	case 3:			// DARK_COAST
-	    TheMap.Fields[y * TheMap.Width + x].Flags |=
-		MapFieldNoBuilding | MapFieldLandAllowed;
-	    break;
-	case 4:			// LIGHT_GRASS
-	case 5:			// DARK_GRASS
-	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldLandAllowed;
-	    break;
-	case 6:			// FOREST
-	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldForest;
-	    break;
-	case 7:			// ROCKS
-	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldRocks;
-	    break;
-	case 8:			// HUMAN_CLOSED_WALL
-	case 10:		// HUMAN_OPEN_WALL
-	    TheMap.Fields[y * TheMap.Width + x].Flags |=
-		MapFieldHuman | MapFieldWall;
-	    break;
-	case 9:			// ORC_CLOSED_WALL
-	case 11:		// ORC_OPEN_WALL
-	    TheMap.Fields[y * TheMap.Width + x].Flags |= MapFieldWall;
-	    break;
-	case 12:		// BRIDGE
-	    TheMap.Fields[y * TheMap.Width + x].Flags |=
-		MapFieldLandAllowed | MapFieldWaterAllowed |
-		MapFieldNoBuilding;
-	    break;
-	case 13:		// ROAD
-	    TheMap.Fields[y * TheMap.Width + x].Flags |=
-		MapFieldLandAllowed | MapFieldNoBuilding;
-	    break;
-	case 14:		// FORD
-	    TheMap.Fields[y * TheMap.Width + x].Flags |=
-		MapFieldLandAllowed | MapFieldCoastAllowed |
-		MapFieldWaterAllowed | MapFieldNoBuilding;
-	    break;
-	case 15:		// ... free ...
-	    TheMap.Fields[y * TheMap.Width + x].Flags |=
-		MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
-		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable
-		| MapFieldWall | MapFieldRocks | MapFieldForest;
-	    break;
-    }
-#endif
+    mf->Flags |= TheMap.Tileset->FlagsTable[16 + tile * 16];
 
-    UpdateMinimapSeenXY(x,y);
-    UpdateMinimapXY(x,y);
+    UpdateMinimapSeenXY(x, y);
+    UpdateMinimapXY(x, y);
+
+    //
+    //  Fix the wood tiles.
+    //
+    if (mf->Flags & MapFieldForest) {
+	if( y ) {
+	    ChangeTile(x, y - 1, GetTileNumber(tile, TileToolRandom,
+		TileToolDecoration));
+	    mf[-TheMap.Width].Flags |=
+		TheMap.Tileset->FlagsTable[16 + tile * 16];
+	} else {
+	    ChangeTile(x, y + 1, GetTileNumber(tile, TileToolRandom,
+		TileToolDecoration));
+	    mf[+TheMap.Width].Flags |=
+		TheMap.Tileset->FlagsTable[16 + tile * 16];
+	}
+	MapFixWoodTile(x + 1, y + 0);
+	MapFixWoodTile(x + 0, y + 1);
+	MapFixWoodTile(x - 1, y + 0);
+	MapFixWoodTile(x + 0, y - 1);
+	MapFixWoodTile(x + 0, y + 0);
+    } else if (mf->Flags & MapFieldRocks) {
+	if( y ) {
+	    ChangeTile(x, y - 1, GetTileNumber(tile, TileToolRandom,
+		TileToolDecoration));
+	    mf[-TheMap.Width].Flags |=
+		TheMap.Tileset->FlagsTable[16 + tile * 16];
+	} else {
+	    ChangeTile(x, y + 1, GetTileNumber(tile, TileToolRandom,
+		TileToolDecoration));
+	    mf[+TheMap.Width].Flags |=
+		TheMap.Tileset->FlagsTable[16 + tile * 16];
+	}
+	MapFixRockTile(x + 1, y + 0);
+	MapFixRockTile(x + 0, y + 1);
+	MapFixRockTile(x - 1, y + 0);
+	MapFixRockTile(x + 0, y - 1);
+	MapFixRockTile(x + 0, y + 0);
+    } else if (mf->Flags & MapFieldWall) {
+	if (mf->Flags & MapFieldHuman) {
+	    mf->Value = UnitTypeHumanWall->_HitPoints;
+	} else {
+	    mf->Value = UnitTypeOrcWall->_HitPoints;
+	}
+	MapFixWallTile(x + 0, y + 0);
+	MapFixWallTile(x + 1, y + 0);
+	MapFixWallTile(x + 0, y + 1);
+	MapFixWallTile(x - 1, y + 0);
+	MapFixWallTile(x + 0, y - 1);
+    }
 }
 
 /**
@@ -290,6 +289,29 @@ local void EditTiles(int x, int y, int tile, int size)
 	    EditTile(i, y, tile);
 	}
 	++y;
+    }
+}
+
+/**
+**	Edit unit.
+**
+**	@param x	X map tile coordinate.
+**	@param y	Y map tile coordinate.
+**	@param type	Unit type to edit.
+**	@param player	Player owning the unit.
+**
+**	@todo	FIXME: Check if the player has already a start-point.
+*/
+local void EditUnit(int x, int y, UnitType* type, Player* player)
+{
+    Unit *unit;
+
+    unit = MakeUnitAndPlace(x, y, type, player);
+    if (type->OilPatch || type->GivesOil) {
+	unit->Value = 50000;
+    }
+    if (unit->Type->GoldMine) {
+	unit->Value = 100000;
     }
 }
 
@@ -1017,19 +1039,11 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	    if (CanBuildUnitType(NULL, CursorBuilding,
 		    Viewport2MapX(TheUI.ActiveViewport, CursorX),
 		    Viewport2MapY(TheUI.ActiveViewport, CursorY))) {
-		Unit *unit;
-
 		PlayGameSound(GameSounds.PlacementSuccess.Sound,
 		    MaxSampleVolume);
-		unit = MakeUnitAndPlace(Viewport2MapX(TheUI.ActiveViewport,
-		    CursorX), Viewport2MapY(TheUI.ActiveViewport, CursorY),
+		EditUnit(Viewport2MapX(TheUI.ActiveViewport,CursorX),
+		    Viewport2MapY(TheUI.ActiveViewport, CursorY),
 		    CursorBuilding, Players + SelectedPlayer);
-		if (unit->Type->OilPatch || unit->Type->GivesOil) {
-		    unit->Value = 50000;
-		}
-		if (unit->Type->GoldMine) {
-		    unit->Value = 100000;
-		}
 	    } else {
 		SetStatusLine("Unit can't be placed here.");
 		PlayGameSound(GameSounds.PlacementError.Sound,
@@ -1065,7 +1079,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	case 'S':
 	case KeyCodeF11:
 	    //UiEnterSaveGameMenu();
-	    SavePud("freecraft.pud.gz",&TheMap);
+	    EditorSavePud("freecraft.pud.gz");
 	    SetStatusLine("Pud saved");
 	    break;
 
@@ -1239,17 +1253,9 @@ local void EditorCallbackMouse(int x, int y)
 	    if (CanBuildUnitType(NULL, CursorBuilding,
 		    Viewport2MapX(TheUI.LastClickedVP, CursorX),
 		    Viewport2MapY(TheUI.LastClickedVP, CursorY))) {
-		Unit* unit;
-
-		unit = MakeUnitAndPlace(Viewport2MapX(TheUI.LastClickedVP,
-		    CursorX), Viewport2MapY(TheUI.LastClickedVP, CursorY),
+		EditUnit(Viewport2MapX(TheUI.LastClickedVP, CursorX),
+		    Viewport2MapY(TheUI.LastClickedVP, CursorY),
 		    CursorBuilding, Players + SelectedPlayer);
-		if (unit->Type->OilPatch || unit->Type->GivesOil) {
-		    unit->Value = 50000;
-		}
-		if (unit->Type->GoldMine) {
-		    unit->Value = 100000;
-		}
 	    }
 	}
 
@@ -1532,7 +1538,7 @@ local void CreateEditor(void)
 		    break;
 		case PlayerRaceOrc:
 		    MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-			UnitTypeByWcNum(WC_StartLocationHuman), Players + i);
+			UnitTypeByWcNum(WC_StartLocationOrc), Players + i);
 		    break;
 	    }
 	} else if (Players[i].StartX | Players[i].StartY) {
@@ -1559,6 +1565,44 @@ local void CreateEditor(void)
     if( 1 ) {
 	ProcessMenu("menu-editor-tips", 1);
 	InterfaceState = IfaceStateNormal;
+    }
+}
+
+/**
+**	Save a pud from editor.
+**
+**	@param file	Save the level to this file.
+**
+**	@todo	FIXME: Check if the pud is valid, contains no failures.
+**		Alteast two players, one human slot, every player a startpoint
+**		...
+*/
+local void EditorSavePud(const char *file)
+{
+    int i;
+
+    for (i = 0; i < NumUnits; ++i) {
+	const UnitType *type;
+
+	type = Units[i]->Type;
+	if (type == UnitTypeByWcNum(WC_StartLocationHuman)
+		|| type == UnitTypeByWcNum(WC_StartLocationOrc)) {
+	    // FIXME: Startpoints sets the land-unit flag.
+	    TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Width].Flags &=
+		~MapFieldLandUnit;
+	}
+    }
+    SavePud(file, &TheMap);
+    for (i = 0; i < NumUnits; ++i) {
+	const UnitType *type;
+
+	type = Units[i]->Type;
+	if (type == UnitTypeByWcNum(WC_StartLocationHuman)
+		|| type == UnitTypeByWcNum(WC_StartLocationOrc)) {
+	    // FIXME: Startpoints sets the land-unit flag.
+	    TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Width].Flags |=
+		MapFieldLandUnit;
+	}
     }
 }
 
