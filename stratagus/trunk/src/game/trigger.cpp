@@ -550,8 +550,9 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 	int j;
 	int sum;
 
+	sum=0;
 	for( ; plynr<pn; ++plynr ) {
-	    for( j=1,sum=0; j<MaxCosts; ++j ) {
+	    for( j=1; j<MaxCosts; ++j ) {
 		sum += Players[plynr].Resources[j];
 	    }
 	}
