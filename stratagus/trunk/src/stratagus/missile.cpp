@@ -10,7 +10,7 @@
 //
 /**@name missile.c	-	The missiles. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -78,6 +78,7 @@ global const char* MissileClassNames[] = {
     "missile-class-fire",
     "missile-class-custom",
     "missile-class-hit",
+    "missile-class-parabolic",
     NULL
 };
 
@@ -288,6 +289,8 @@ local Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
     missile->Y = sy - mtype->Height / 2;
     missile->DX = dx - mtype->Width / 2;
     missile->DY = dy - mtype->Height / 2;
+    missile->SourceX = sx;
+    missile->SourceY = sy;
     missile->Type = mtype;
     missile->SpriteFrame = 0;
     missile->State = 0;
@@ -905,6 +908,120 @@ local int PointToPointMissile(Missile* missile)
 }
 
 /**
+**	Calculate parabolic trajectories.
+**
+**	@param missile	Missile pointer.
+**	@param amplitude    How high can the missile go. This value depends
+**			    on the missile direction and game perspective.
+*/
+local int ParabolicCalc(Missile* missile, int amplitude)
+{
+    int xmid;
+    long sinu;
+    int thetha;
+
+    missile->Xl -= missile->Xstep;
+    missile->X = missile->Xl / 100;
+
+    xmid = (missile->SourceX + missile->DX) / 2;
+    sinu = (missile->X - xmid) * (missile->X - xmid);
+    thetha = missile->SourceX - xmid;
+    missile->Y = ((missile->Angle * (missile->X - missile->SourceX)) -
+	amplitude * isqrt(-sinu + thetha * thetha) + missile->SourceY * 100) / 100;
+
+    return 0;
+}
+
+/**
+**	Calculate parabolic trajectories.
+**
+**	@param missile	Missile pointer.
+*/
+local int ParabolicMissile(Missile* missile)
+{
+    int i;
+    int sx;
+    int sy;
+
+    if (!(missile->State & 1)) {
+	int dx;
+	int dy;
+	int xstep;
+	int ystep;
+
+	// initialize
+	dy = missile->DY - missile->Y;
+	ystep = 1;
+	if (dy < 0) {
+	    dy = -dy;
+	    ystep = -1;
+	}
+	dx = missile->DX - missile->X;
+	xstep = 1;
+	if (dx < 0) {
+	    dx = -dx;
+	    xstep = -1;
+	}
+	missile->Angle = (100 * (missile->SourceY - missile->DY)) / 
+	    (missile->SourceX - missile->DX);
+	missile->Xl = missile->X * 100;
+
+	MissileNewHeadingFromXY(missile, dx * xstep, dy * ystep);
+
+	if (dx == 0 && dy == 0) {
+	    return 1;
+	}
+
+	missile->Dx = dx;
+	missile->Dy = dy;
+	dx = missile->SourceX - missile->DX;
+	dy = missile->SourceY - missile->DY;
+	missile->Xstep = (100 * dx) / isqrt(dx * dx + dy * dy);
+	missile->Ystep = ystep;
+	++missile->State;
+	DebugLevel3Fn("Init: %d,%d\n" _C_ dx _C_ dy);
+	return 0;
+    }
+
+    sx = missile->X;
+    sy = missile->Y;
+
+    //
+    //	Move missile
+    //
+    if (missile->Dy == 0) {		// horizontal line
+	for (i = 0; i<missile->Type->Speed; ++i) {
+	    if (missile->X == missile->DX) {
+		return 1;
+	    }
+	    ParabolicCalc(missile, 50);
+	}
+	MissileNewHeadingFromXY(missile, missile->X - sx, missile->Y - sy);
+	return 0;
+    }
+
+    if (missile->Dx == 0) {		// vertical line
+	for (i = 0; i < missile->Type->Speed; ++i) {
+	    if (missile->Y == missile->DY) {
+		return 1;
+	    }					
+	    missile->Y += missile->Ystep; //no parabolic missile there.
+	}
+	return 0;
+    }
+
+    for (i = 0; i < missile->Type->Speed; ++i) {
+	if (abs(missile->X - missile->DX) <= 1 &&
+		abs(missile->Y - missile->DY) <= 1) {
+	    return 1;
+	}
+	ParabolicCalc(missile, 100);
+	MissileNewHeadingFromXY(missile, missile->X - sx, missile->Y - sy);
+    }
+    return 0;
+}
+
+/**
 **	Missile hits the goal.
 **
 **	@param missile	Missile hitting the goal.
@@ -1119,7 +1236,7 @@ local void MissileAction(Missile* missile)
 		    neg = 1;
 		    missile->SpriteFrame = -missile->SpriteFrame;
 		}
-		missile->SpriteFrame += 5;		// FIXME: frames pro row
+		missile->SpriteFrame += 5;		// FIXME: frames per row
 		if (missile->SpriteFrame >= VideoGraphicFrames(missile->Type->Sprite)) {
 		    missile->SpriteFrame-=
 			VideoGraphicFrames(missile->Type->Sprite);
@@ -1140,10 +1257,36 @@ local void MissileAction(Missile* missile)
 		FreeMissile(missile);
 		missile = NULL;
 	    } else {
-		//
-		//	Animate missile, depends on the way.
-		//		FIXME: becomes bigger than smaller.
-		// FIXME: how?
+		int totalx;
+		int dx;
+		int f;
+		int i;
+		int j;
+
+		neg = 0;
+		if (missile->SpriteFrame < 0) {
+		    neg = 1;
+		    missile->SpriteFrame = -missile->SpriteFrame;
+		}
+		totalx = abs(missile->DX - missile->SourceX);
+		dx = abs(missile->X - missile->SourceX);
+		f = VideoGraphicFrames(missile->Type->Sprite) / 5; // FIXME: frames per row
+		f = 2 * f - 1;
+		for (i = 1, j = 1; i <= f; ++i) {
+		    if (dx * f / i < totalx) {
+			if ((i - 1) * 2 < f) {
+			    j = i - 1;
+			} else {
+			    j = f - i;
+			}
+			missile->SpriteFrame = missile->SpriteFrame % 5 +
+			    j * 5; // FIXME: frames per row
+			break;
+		    }
+		}
+		if (neg) {
+		    missile->SpriteFrame = -missile->SpriteFrame;
+		}
 	    }
 	    break;
 
@@ -1178,7 +1321,7 @@ local void MissileAction(Missile* missile)
 		    neg = 1;
 		    missile->SpriteFrame = -missile->SpriteFrame;
 		}
-		missile->SpriteFrame += 5;		// FIXME: frames pro row
+		missile->SpriteFrame += 5;		// FIXME: frames per row
 		if (missile->SpriteFrame >= VideoGraphicFrames(missile->Type->Sprite)) {
 		    missile->SpriteFrame-=
 			VideoGraphicFrames(missile->Type->Sprite);
@@ -1392,6 +1535,46 @@ local void MissileAction(Missile* missile)
 	    }
 	    break;
 	}
+
+	case MissileClassParabolic:
+	    missile->Wait = missile->Type->Sleep;
+	    if (ParabolicMissile(missile)) {
+		MissileHit(missile);
+		FreeMissile(missile);
+		missile = NULL;
+	    } else {
+		int totalx;
+		int dx;
+		int f;
+		int i;
+		int j;
+
+		neg = 0;
+		if (missile->SpriteFrame < 0) {
+		    neg = 1;
+		    missile->SpriteFrame = -missile->SpriteFrame;
+		}
+		totalx = abs(missile->DX - missile->SourceX);
+		dx = abs(missile->X - missile->SourceX);
+		f = VideoGraphicFrames(missile->Type->Sprite) / 5; // FIXME: frames per row
+		f = 2 * f - 1;
+		for (i = 1, j = 1; i <= f; ++i) {
+		    if (dx * f / i < totalx) {
+			if ((i - 1) * 2 < f) {
+			    j = i - 1;
+			} else {
+			    j = f - i;
+			}
+			missile->SpriteFrame = missile->SpriteFrame % 5 +
+			    j * 5; // FIXME: frames per row
+			break;
+		    }
+		}
+		if (neg) {
+		    missile->SpriteFrame = -missile->SpriteFrame;
+		}
+	    }
+	    break;
     }
 
     if (missile) {			// check after movement
