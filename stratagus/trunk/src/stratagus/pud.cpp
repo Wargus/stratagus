@@ -1293,14 +1293,218 @@ pawn:
 }
 
 /**
+**	Write pud header.
+**
+**	@param f	File handle
+**	@param type	4 byte header
+**	@param length	section length
+*/
+local void PudWriteHeader(gzFile f,char* type,int length)
+{
+    unsigned char buf[4];
+
+    DebugCheck( strlen(type)!=4 );
+    if( gzwrite(f,type,4)!=4 ) {
+	ExitFatal(-1);
+    }
+
+    buf[0]=length>> 0;
+    buf[1]=length>> 8;
+    buf[2]=length>>16;
+    buf[3]=length>>24;
+
+    if( gzwrite(f,buf,4)!=4 ) {
+	ExitFatal(-1);
+    }
+}
+
+/**
+**	Save the MTXM section
+**
+**	@param f	File handle
+**	@param map	Map to save.
+*/
+local void PudWriteMTXM(gzFile f,WorldMap* map)
+{
+    int i;
+    int n;
+    unsigned short* mtxm;
+    Tileset* tileset;
+
+    tileset=map->Tileset;
+    n=map->Width*map->Height;
+    PudWriteHeader(f,"MTXM",n*2);
+    mtxm=alloca(n*sizeof(unsigned short));
+
+    for( i=0; i<n; ++i ) {
+	int tile;
+	int j;
+
+	tile=map->Fields[i].Tile;
+	// Find the tile in the conversion table, this can be done faster
+	for( j=0; j<tileset->NumTiles ; ++j ) {
+	    if( tile==tileset->Table[j] ) {
+		break;
+	    }
+	}
+	mtxm[i]=j;
+    }
+
+    gzwrite(f,mtxm,n*2);
+}
+
+/**
 **	Save pud.
 **
 **	@param pud	File name.
-**	@param map	Map filled in.
+**	@param map	Map to save.
 */
 global void SavePud(const char* pud,WorldMap* map)
 {
+    gzFile f;
+    int i;
+    unsigned char buf[5950];
 
+    if( !(f=gzopen(pud,strcasestr(pud,".gz") ? "wb9" : "wb0")) ) {
+	fprintf(stderr,"Can't save pud `%s'\n",pud);
+	return;
+    }
+
+    PudWriteHeader(f,"TYPE",16);
+    memcpy(buf,"WAR2 MAP",8);
+    buf[0x8]=0x00;
+    buf[0x9]=0x00;
+    buf[0xA]=0x0A;
+    buf[0xB]=0xFF;
+    buf[0xC]=map->Info->MapUID >>  0;
+    buf[0xD]=map->Info->MapUID >>  8;
+    buf[0xE]=map->Info->MapUID >> 16;
+    buf[0xF]=map->Info->MapUID >> 24;
+    gzwrite(f,buf,16);
+
+    PudWriteHeader(f,"VER ",2);
+    buf[0]=0x13;	// 1.3
+    buf[1]=0x00;
+    gzwrite(f,buf,2);
+
+    PudWriteHeader(f,"DESC",32);
+    memset(buf,0,32);
+    strncpy(buf,map->Info->Description,32);
+    gzwrite(f,buf,32);
+
+    PudWriteHeader(f,"OWNR",16);
+    for( i=0; i<16; ++i ) {
+	buf[i]=map->Info->PlayerType[i];
+    }
+    gzwrite(f,buf,16);
+
+    PudWriteHeader(f,"ERAX",2);
+    buf[0]=map->Info->MapTerrain >> 0;
+    buf[1]=map->Info->MapTerrain >> 8;
+    gzwrite(f,buf,2);
+
+    PudWriteHeader(f,"DIM ",4);
+    buf[0]=map->Width  >> 0;
+    buf[1]=map->Width  >> 8;
+    buf[2]=map->Height >> 0;
+    buf[3]=map->Height >> 8;
+    gzwrite(f,buf,4);
+
+#if 0
+    PudWriteHeader(f,"UDTA",5950);
+    gzwrite(f,buf,5950);
+    // FIXME:
+
+    PudWriteHeader(f,"ALOW",384);
+    gzwrite(f,buf,384);
+    // FIXME:
+
+    PudWriteHeader(f,"UGRD",782);
+    gzwrite(f,buf,782);
+    // FIXME:
+#endif
+
+    PudWriteHeader(f,"SIDE",16);
+    for( i=0; i<16; ++i ) {
+	buf[i]=map->Info->PlayerSide[i];
+    }
+    gzwrite(f,buf,16);
+
+    PudWriteHeader(f,"SGLD",32);
+    for( i=0; i<16; ++i ) {
+	buf[i*2+0]=map->Info->PlayerGold[i] >> 0;
+	buf[i*2+1]=map->Info->PlayerGold[i] >> 8;
+    }
+    gzwrite(f,buf,32);
+
+    PudWriteHeader(f,"SLBR",32);
+    for( i=0; i<16; ++i ) {
+	buf[i*2+0]=map->Info->PlayerWood[i] >> 0;
+	buf[i*2+1]=map->Info->PlayerWood[i] >> 8;
+    }
+    gzwrite(f,buf,32);
+
+    PudWriteHeader(f,"SOIL",32);
+    for( i=0; i<16; ++i ) {
+	buf[i*2+0]=map->Info->PlayerOil[i] >> 0;
+	buf[i*2+1]=map->Info->PlayerOil[i] >> 8;
+    }
+    gzwrite(f,buf,32);
+
+    PudWriteHeader(f,"AIPL",16);
+    for( i=0; i<16; ++i ) {
+	buf[i]=map->Info->PlayerAi[i];
+    }
+    gzwrite(f,buf,16);
+
+    PudWriteMTXM(f,map);
+
+#if 0
+    PudWriteHeader(f,"SQM ",map->Width*map->Height*2);
+    gzwrite(f,buf,map->Width*map->Height*2);
+    // FIXME:
+ 
+#if 0
+    PudWriteHeader(f,"OILM",map->Width*map->Height*1);
+    gzwrite(f,buf,map->Width*map->Height*1);
+    // FIXME:
+#endif
+
+    PudWriteHeader(f,"REGM",map->Width*map->Height*2);
+    gzwrite(f,buf,map->Width*map->Height*2);
+    // FIXME:
+#endif
+
+    PudWriteHeader(f,"UNIT",8*NumUnits);
+    for( i=0; i<NumUnits; ++i ) {
+	int j;
+
+	buf[i*8+0]=Units[i]->X >> 0;
+	buf[i*8+1]=Units[i]->X >> 8;
+	buf[i*8+2]=Units[i]->Y >> 0;
+	buf[i*8+3]=Units[i]->Y >> 8;
+
+	// Convert our name to pud number
+	for( j=0; UnitTypeWcNames[j]; ++j ) {
+	    if( !strcmp(UnitTypeWcNames[j],Units[i]->Type->Ident) ) {
+		break;
+	    }
+	}
+	buf[i*8+4]=j;
+	buf[i*8+5]=Units[i]->Player->Player;
+	if( Units[i]->Type->GoldMine
+		|| Units[i]->Type->OilPatch
+		|| Units[i]->Type->GivesOil ) {
+	    buf[i*8+6]=(Units[i]->Value/2500) >> 0;
+	    buf[i*8+7]=(Units[i]->Value/2500) >> 8;
+	} else {
+	    buf[i*8+6]=!Units[i]->Active;
+	    buf[i*8+7]=0;
+	}
+    }
+    gzwrite(f,buf,8*NumUnits);
+
+    gzclose(f);
 }
 
 /**
