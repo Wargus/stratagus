@@ -1,31 +1,32 @@
-##       _________ __                 __                               
+##       _________ __                 __
 ##      /   _____//  |_____________ _/  |______     ____  __ __  ______
 ##      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-##      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+##      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
 ##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-##             \/                  \/          \//_____/            \/ 
+##             \/                  \/          \//_____/            \/
 ##  ______________________                           ______________________
 ##			  T H E   W A R   B E G I N S
 ##	   Stratagus - A free fantasy real time strategy game engine
 ##
 ##	Module.make	-	Module Makefile (included from Makefile).
 ##
-##	(c) Copyright 2002 by Nehal Mistry
+##	(c) Copyright 2004 by The Stratagus Team
 ##
-##	Stratagus is free software; you can redistribute it and/or modify
-##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; only version 2 of the License.
+##      This program is free software; you can redistribute it and/or modify
+##      it under the terms of the GNU General Public License as published by
+##      the Free Software Foundation; version 2 dated June, 1991.
 ##
-##	Stratagus is distributed in the hope that it will be useful,
-##	but WITHOUT ANY WARRANTY; without even the implied warranty of
-##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##	GNU General Public License for more details.
+##      This program is distributed in the hope that it will be useful,
+##      but WITHOUT ANY WARRANTY; without even the implied warranty of
+##      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##      GNU General Public License for more details.
 ##
+##      You should have received a copy of the GNU General Public License
+##      along with this program; if not, write to the Free Software
+##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-MODULE= src/stratagus
-MSRC=	script.c script_player.c stratagus.c construct.c groups.c iolib.c mainloop.c \
-	player.c pud.c selection.c spells.c \
-	script_spell.c
+MODULE = src/stratagus
+MSRC =   script.c script_player.c stratagus.c construct.c groups.c iolib.c \
+         mainloop.c player.c pud.c selection.c spells.c script_spell.c
 
-SRC+=	$(addprefix $(MODULE)/,$(MSRC))
-HDRS+=
+SRC +=   $(addprefix $(MODULE)/,$(MSRC))

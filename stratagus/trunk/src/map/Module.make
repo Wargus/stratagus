@@ -1,3 +1,32 @@
-SRC += src/map/script_map.c src/map/script_tileset.c src/map/map.c src/map/map_draw.c src/map/map_fog.c src/map/map_rock.c src/map/map_save.c src/map/map_wall.c src/map/map_wood.c src/map/minimap.c src/map/tileset.c 
-HDRS +=
-OBJ += src/map/$(OBJDIR)/script_map.o src/map/$(OBJDIR)/script_tileset.o src/map/$(OBJDIR)/map.o src/map/$(OBJDIR)/map_draw.o src/map/$(OBJDIR)/map_fog.o src/map/$(OBJDIR)/map_rock.o src/map/$(OBJDIR)/map_save.o src/map/$(OBJDIR)/map_wall.o src/map/$(OBJDIR)/map_wood.o src/map/$(OBJDIR)/minimap.o src/map/$(OBJDIR)/tileset.o 
+##       _________ __                 __
+##      /   _____//  |_____________ _/  |______     ____  __ __  ______
+##      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+##      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
+##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+##             \/                  \/          \//_____/            \/
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   Stratagus - A free fantasy real time strategy game engine
+##
+##	Module.make	-	Module Makefile (included from Makefile).
+##
+##	(c) Copyright 2004 by The Stratagus Team
+##
+##      This program is free software; you can redistribute it and/or modify
+##      it under the terms of the GNU General Public License as published by
+##      the Free Software Foundation; version 2 dated June, 1991.
+##
+##      This program is distributed in the hope that it will be useful,
+##      but WITHOUT ANY WARRANTY; without even the implied warranty of
+##      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##      GNU General Public License for more details.
+##
+##      You should have received a copy of the GNU General Public License
+##      along with this program; if not, write to the Free Software
+##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+MODULE = src/map
+MSRC =   script_map.c script_tileset.c map.c map_draw.c map_fog.c map_rock.c \
+         map_save.c map_wall.c map_wood.c minimap.c tileset.c
+
+SRC +=   $(addprefix $(MODULE)/,$(MSRC))
