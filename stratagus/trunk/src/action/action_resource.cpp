@@ -353,8 +353,6 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	    break;
     }
 
-    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
-
     //
     //	Target is dead, stop getting resources.
     //
@@ -380,6 +378,8 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	unit->SubAction=0;
 	return 0;
     }
+
+    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
 
     DebugCheck( unit->Wait!=1 );
     DebugCheck( unit->Orders[0].Action!=resource->Action );
