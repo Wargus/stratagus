@@ -168,19 +168,23 @@ global Sample *LoadOgg(const char* name)
 	int bitstream;
 	int i;
 
-	if (n < 4096) {
-	    n = 8192 * 4;
-	    sample = realloc(sample, sizeof(*sample) + sample->Length + n);
-	    if (!sample) {
+	if (n < 8192) {
+	    Sample* s;
+
+	    n = 8192 * 64;
+	    s = realloc(sample, sizeof(*sample) + sample->Length + n);
+	    if (!s) {
+		free(sample);
 		fprintf(stderr, "out of memory\n");
 		ov_clear(vf);
 		CLclose(f);
 		return NULL;
 	    }
+	    sample = s;
 	    p = sample->Data + sample->Length;
 	}
 
-	i = ov_read(vf, p, 4096, 0, 2, 1, &bitstream);
+	i = ov_read(vf, p, 8192, 0, 2, 1, &bitstream);
 	if (i <= 0) {
 	    break;
 	}
@@ -194,7 +198,7 @@ global Sample *LoadOgg(const char* name)
     ov_clear(vf);
     CLclose(f);
 
-    DebugLevel2Fn(" %d\n" _C_ sample->Length);
+    printf(" %d\n" _C_ sample->Length);
     IfDebug( AllocatedSoundMemory += sample->Length; );
 
     return sample;
