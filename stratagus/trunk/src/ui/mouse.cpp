@@ -350,7 +350,7 @@ global void DoRightButton(int sx, int sy)
 		//
 
 		if (type->Building) {
-			if (dest && dest->Type->GivesResource) {
+			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
 				DebugLevel3("Set rally point to a resource.\n");
 				SendCommandResource(unit, dest, flush);
@@ -1072,7 +1072,7 @@ local int SendResource(int sx, int sy)
 			}
 		}
 		if (unit->Type->Building) {
-			if (dest && dest->Type->GivesResource) {
+			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
 				DebugLevel3("Set rally point to a resource.\n");
 				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));
