@@ -1391,7 +1391,7 @@ global void UIHandleButtonDown(unsigned button)
 	    //
 	    } else if( ButtonUnderCursor==1 && NumSelected==1 ) {
 		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
-		MapCenterViewport(TheUI.LastClickedVP, Selected[0]->X,
+		MapViewportCenter(TheUI.LastClickedVP, Selected[0]->X,
 				Selected[0]->Y);
 	    //
 	    //	clicked on info panel - single unit shown
