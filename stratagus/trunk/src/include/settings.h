@@ -86,15 +86,15 @@ struct _settings_ {
 
 // ----------------------------------------------------------------------------
 
-#define MAX_OBJECTIVES 9
+#define MAX_BRIEFING_VOICES	2	/// How many intro voices supported
+#define MAX_OBJECTIVES		9	/// How many objectives supported
 
 typedef struct _intro_ {
     char*	Title;				/// Intro title
     char*	Background;			/// Background picture
     char*	TextFile;			/// Intro text file
-    char*	VoiceFile1;			/// Intro voice file
-    char*	VoiceFile2;			/// Intro voice file
-    char*	Objectives[MAX_OBJECTIVES];	/// Objectives
+    char*	VoiceFile[MAX_BRIEFING_VOICES];	/// Intro voice file
+    char*	Objectives[MAX_OBJECTIVES];	/// Objectives text
 } Intro;					/// Intro definition
 
 /*----------------------------------------------------------------------------
