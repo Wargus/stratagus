@@ -6815,7 +6815,7 @@ local void InitPlayerRaces(Menuitem* mi)
 			mi->d.pulldown.options[n++] = strdup(PlayerRaces.Display[i]);
 		}
 	}
-	mi->d.pulldown.options[n++] = "Map Default";
+	mi->d.pulldown.options[n++] = strdup("Map Default");
 	mi->d.pulldown.noptions = n;
 	mi->d.pulldown.defopt = n - 1;
 }
@@ -6836,7 +6836,7 @@ local void InitTilesets(Menuitem* mi, int mapdefault)
 	mi->d.pulldown.options = (unsigned char**)malloc(n * sizeof(unsigned char*));
 	n = 0;
 	if (mapdefault) {
-		mi->d.pulldown.options[n++] = "Map Default";
+		mi->d.pulldown.options[n++] = strdup("Map Default");
 	}
 	for (i = 0; i < NumTilesets; ++i) {
 		mi->d.pulldown.options[n++] = strdup(Tilesets[i]->Name);
