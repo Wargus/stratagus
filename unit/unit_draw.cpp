@@ -99,23 +99,6 @@ global void (*DrawSelection)(const Unit* unit,const UnitType* type,int x,int y)
 
 local int CurrentViewport;		/// FIXME: quick hack for split screen
 
-#define Map2ScreenX	Map2ScreenXV	/// FIXME: quick hack for split screen
-#define Map2ScreenY	Map2ScreenYV	/// FIXME: quick hack for split screen
-
-/// FIXME: quick hack for split screen
-local inline int Map2ScreenXV(int x)
-{
-    return (TheUI.VP[CurrentViewport].X + ((x) -
-	    TheUI.VP[CurrentViewport].MapX) * TileSizeX);
-}
-
-/// FIXME: quick hack for split screen
-local inline int Map2ScreenYV(int y)
-{
-    return (TheUI.VP[CurrentViewport].Y + ((y) -
-	    TheUI.VP[CurrentViewport].MapY) * TileSizeY);
-}
-
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /**
@@ -1058,8 +1041,10 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Mana dot on right side of unit.
     //
     if( ShowManaDot ) {
-	    /* s0m3body: MaxMana can vary for each unit, it is stored in unit->Type->_MaxMana */	
-	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==unit->Type->_MaxMana) ) {
+	    // s0m3body: MaxMana can vary for each unit,
+	    // 		it is stored in unit->Type->_MaxMana
+	if( type->CanCastSpell
+		&& !(ShowNoFull && unit->Mana==unit->Type->_MaxMana) ) {
 	    DrawManaSprite(x,y,type,unit->Type->_MaxMana,unit->Mana);
 	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
 	    DrawManaSprite(x,y,type,655350,unit->Value);
@@ -1186,19 +1171,26 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 **
-**	@todo FIXME: later units should have its own shadows with animation.
+**	@todo FIXME: combine new shadow code with old shadow code.
 */
 local void DrawShadow(const Unit* unit, int x, int y)
 {
-    if( unit->Type->Building ) {
-	if( unit->Orders[0].Action==UnitActionBuilded &&
-	    (unit->Constructed || VideoGraphicFrames(unit->Type->Sprite)<=1) ) {
-	    if( unit->Type->Construction->ShadowSprite ) {
-		x-=(unit->Type->Construction->ShadowWidth-unit->Type->TileWidth*TileSizeX)/2;
-		y-=(unit->Type->Construction->ShadowHeight-unit->Type->TileHeight*TileSizeY)/2;
-		if( unit->Frame<0 ) {
-		    VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
-			-unit->Frame, x, y);
+    //
+    //	A building can be under construction and is drawn with construction
+    //		frames.
+    //
+    if (unit->Type->Building) {
+	// What constrution shadow must be drawn?
+	if (unit->Orders[0].Action == UnitActionBuilded && (unit->Constructed
+		|| VideoGraphicFrames(unit->Type->Sprite) <= 1)) {
+	    if (unit->Type->Construction->ShadowSprite) {
+		x -= (unit->Type->Construction->ShadowWidth -
+		    unit->Type->TileWidth * TileSizeX) / 2;
+		y -= (unit->Type->Construction->ShadowHeight -
+		    unit->Type->TileHeight * TileSizeY) / 2;
+		if (unit->Frame < 0) {
+		    VideoDrawShadowClipX(unit->Type->Construction->
+			ShadowSprite, -unit->Frame, x, y);
 		} else {
 		    VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
 			unit->Frame, x, y);
@@ -1206,27 +1198,38 @@ local void DrawShadow(const Unit* unit, int x, int y)
 	    }
 	    return;
 	}
-	if( unit->Type->ShadowSprite ) {
-	    x-=(unit->Type->ShadowWidth-unit->Type->TileWidth*TileSizeX)/2;
-	    y-=(unit->Type->ShadowHeight-unit->Type->TileHeight*TileSizeY)/2;
-	    if( unit->Frame<0 ) {
-		VideoDrawShadowClipX(unit->Type->ShadowSprite, -unit->Frame, x, y);
+	// Draw normal shadow
+	if (unit->Type->ShadowSprite) {
+	    // FIXME: this can be combined with the unit else part.
+	    x -= (unit->Type->ShadowWidth -
+		unit->Type->TileWidth * TileSizeX) / 2;
+	    y -= (unit->Type->ShadowHeight -
+		unit->Type->TileHeight * TileSizeY) / 2;
+	    if (unit->Frame < 0) {
+		VideoDrawShadowClipX(unit->Type->ShadowSprite, -unit->Frame, x,
+		    y);
 	    } else {
-		VideoDrawShadowClip(unit->Type->ShadowSprite, unit->Frame, x, y);
+		VideoDrawShadowClip(unit->Type->ShadowSprite, unit->Frame, x,
+		    y);
 	    }
 	}
     } else {
-	if( unit->Type->ShadowSprite ) {
-	    x-=(unit->Type->ShadowWidth-unit->Type->TileWidth*TileSizeX)/2;
-	    y-=(unit->Type->ShadowHeight-unit->Type->TileHeight*TileSizeY)/2;
-	    if( unit->Type->AirUnit ) {
-		y+=TileSizeY;
+	// Draw normal shadow sprite if available
+	if (unit->Type->ShadowSprite) {
+	    x -= (unit->Type->ShadowWidth -
+		unit->Type->TileWidth * TileSizeX) / 2;
+	    y -= (unit->Type->ShadowHeight -
+		unit->Type->TileHeight * TileSizeY) / 2;
+	    if (unit->Type->AirUnit) {
+		y += TileSizeY;
 	    }
 
-	    if( unit->Frame<0 ) {
-		VideoDrawShadowClipX(unit->Type->ShadowSprite, -unit->Frame, x, y);
+	    if (unit->Frame < 0) {
+		VideoDrawShadowClipX(unit->Type->ShadowSprite, -unit->Frame, x,
+		    y);
 	    } else {
-		VideoDrawShadowClip(unit->Type->ShadowSprite, unit->Frame, x, y);
+		VideoDrawShadowClip(unit->Type->ShadowSprite, unit->Frame, x,
+		    y);
 	    }
 	} else {
 	    int i;
@@ -1251,9 +1254,10 @@ local void DrawShadow(const Unit* unit, int x, int y)
 **
 **	@param unit	Pointer to the unit.
 **
-**	FIXME: this is the start of the routine which shows the orders
+**	@todo FIXME: this is the start of the routine which shows the orders
 **	FIXME: of the current selected unit.
 **	FIXME: should be extend to show waypoints, which order (repair...)
+**	FIXME: remove or reduce the Map2ViewportX and Map2ViewportY.
 */
 global void DrawPath(const Unit* unit)
 {
@@ -1268,108 +1272,112 @@ global void DrawPath(const Unit* unit)
 
     // initialize
 
-    x1=unit->X;
-    y1=unit->Y;
-    if( unit->Orders[0].Goal ) {
-	x2=unit->Orders[0].Goal->X;
-	y2=unit->Orders[0].Goal->Y;
+    x1 = unit->X;
+    y1 = unit->Y;
+    if (unit->Orders[0].Goal) {
+	x2 = unit->Orders[0].Goal->X;
+	y2 = unit->Orders[0].Goal->Y;
     } else {
-	x2=unit->Orders[0].X;
-	y2=unit->Orders[0].Y;
+	x2 = unit->Orders[0].X;
+	y2 = unit->Orders[0].Y;
     }
 
-    if( y1>y2 ) {			// exchange coordinates
-	x1^=x2; x2^=x1; x1^=x2;
-	y1^=y2; y2^=y1; y1^=y2;
+    if (y1 > y2) {			// exchange coordinates
+	x1 ^= x2;
+	x2 ^= x1;
+	x1 ^= x2;
+	y1 ^= y2;
+	y2 ^= y1;
+	y1 ^= y2;			// NOTE: ^= swap(x1,x2), swap(y1,y2)
     }
-    dy=y2-y1;
-    dx=x2-x1;
-    if( dx<0 ) {
-	dx=-dx;
-	xstep=-1;
+    dy = y2 - y1;
+    dx = x2 - x1;
+    if (dx < 0) {
+	dx = -dx;
+	xstep = -1;
     } else {
-	xstep=1;
+	xstep = 1;
     }
 
-    if( dy==0 ) {		// horizontal line
-	if( dx==0 ) {
+    if (dy == 0) {			// horizontal line
+	if (dx == 0) {
 	    return;
 	}
 	// CLIPPING
-	VideoDrawRectangleClip(ColorGray
-	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-	    ,6,6);
-	while( x1!=x2 ) {
-	    x1+=xstep;
-	    VideoDrawRectangleClip(ColorGray
-		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-		,6,6);
+	VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+		x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+		y1) + TileSizeY / 2 - 3, 6, 6);
+	while (x1 != x2) {
+	    x1 += xstep;
+	    VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+		    x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+		    y1) + TileSizeY / 2 - 3, 6, 6);
 	}
 	return;
     }
 
-    if( dx==0 ) {		// vertical line
+    if (dx == 0) {			// vertical line
 	// CLIPPING
-	VideoDrawRectangleClip(ColorGray
-	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-	    ,6,6);
-	while( y1!=y2 ) {
+	VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+		x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+		y1) + TileSizeY / 2 - 3, 6, 6);
+	while (y1 != y2) {
 	    y1++;
-	    VideoDrawRectangleClip(ColorGray
-		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-		,6,6);
+	    VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+		    x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+		    y1) + TileSizeY / 2 - 3, 6, 6);
 	}
 	return;
     }
 
-    VideoDrawRectangleClip(ColorGray
-	,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-	,6,6);
+    VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+	    x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+	    y1) + TileSizeY / 2 - 3, 6, 6);
 
-    if( dx<dy ) {		// step in vertical direction
-	d=dy-1;
-	dx+=dx;
-	dy+=dy;
-	while( y1!=y2 ) {
+    if (dx < dy) {			// step in vertical direction
+	d = dy - 1;
+	dx += dx;
+	dy += dy;
+	while (y1 != y2) {
 	    y1++;
-	    d-=dx;
-	    if( d<0 ) {
-		d+=dy;
-		x1+=xstep;
+	    d -= dx;
+	    if (d < 0) {
+		d += dy;
+		x1 += xstep;
 	    }
-	    VideoDrawRectangleClip(ColorGray
-		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-		,6,6);
+	    VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+		    x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+		    y1) + TileSizeY / 2 - 3, 6, 6);
 	}
 	return;
     }
 
-    if( dx>dy ) {		// step in horizontal direction
-	d=dx-1;
-	dx+=dx;
-	dy+=dy;
+    if (dx > dy) {			// step in horizontal direction
+	d = dx - 1;
+	dx += dx;
+	dy += dy;
 
-	while( x1!=x2 ) {
-	    x1+=xstep;
-	    d-=dy;
-	    if( d<0 ) {
-		d+=dx;
+	while (x1 != x2) {
+	    x1 += xstep;
+	    d -= dy;
+	    if (d < 0) {
+		d += dx;
 		++y1;
 	    }
-	    VideoDrawRectangleClip(ColorGray
-		,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-		,6,6);
+	    VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+		    x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+		    y1) + TileSizeY / 2 - 3, 6, 6);
 	}
 	return;
     }
 
-				// diagonal line
-    while( y1!=y2) {
-	x1+=xstep;
+    // diagonal line
+    while (y1 != y2) {
+	x1 += xstep;
 	y1++;
-	VideoDrawRectangleClip(ColorGray
-	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
-	    ,6,6);
+	VideoDrawRectangleClip(ColorGray, Map2ViewportX(CurrentViewport,
+		x1) + TileSizeX / 2 - 3, Map2ViewportY(CurrentViewport,
+		y1) + TileSizeY / 2 - 3, 6, 6);
     }
 }
 
@@ -1381,7 +1389,7 @@ global void DrawPath(const Unit* unit)
 **	@param y1	Y pixel coordinate.
 **	@param order	Order to display.
 */
-local void ShowSingleOrder(const Unit* unit,int x1,int y1,const Order* order)
+local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 {
     int x2;
     int y2;
@@ -1390,134 +1398,140 @@ local void ShowSingleOrder(const Unit* unit,int x1,int y1,const Order* order)
     int dest;
     const Unit* goal;
 
-    if( (goal=order->Goal) && goal->Type ) {
-	x2=Map2ScreenX(goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
-	y2=Map2ScreenY(goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
+    if ((goal = order->Goal) && goal->Type) {
+	x2 = Map2ViewportX(CurrentViewport,
+	    goal->X) + goal->IX + goal->Type->TileWidth * TileSizeX / 2;
+	y2 = Map2ViewportY(CurrentViewport,
+	    goal->Y) + goal->IY + goal->Type->TileHeight * TileSizeY / 2;
     } else {
-	x2=Map2ScreenX(order->X+order->RangeX/2)+TileSizeX/2;
-	y2=Map2ScreenY(order->Y+order->RangeY/2)+TileSizeY/2;
+	x2 = Map2ViewportX(CurrentViewport,
+	    order->X + order->RangeX / 2) + TileSizeX / 2;
+	y2 = Map2ViewportY(CurrentViewport,
+	    order->Y + order->RangeY / 2) + TileSizeY / 2;
     }
-    dest=0;
-    switch( order->Action ) {
+    dest = 0;
+    switch (order->Action) {
 	case UnitActionNone:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    break;
 
 	case UnitActionStill:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    break;
 
 	case UnitActionStandGround:
-	    e_color=color=ColorGreen;
+	    e_color = color = ColorGreen;
 	    break;
 
 	case UnitActionFollow:
 	case UnitActionMove:
-	    e_color=color=ColorGreen;
-	    dest=1;
+	    e_color = color = ColorGreen;
+	    dest = 1;
 	    break;
 
 	case UnitActionPatrol:
-	    VideoDrawLineClip(ColorGreen,x1,y1,x2,y2);
-	    e_color=color=ColorBlue;
-	    x1=Map2ScreenX(((int)order->Arg1)>>16)+TileSizeX/2;
-	    y1=Map2ScreenY(((int)order->Arg1)&0xFFFF)+TileSizeY/2;
-	    dest=1;
+	    VideoDrawLineClip(ColorGreen, x1, y1, x2, y2);
+	    e_color = color = ColorBlue;
+	    x1 = Map2ViewportX(CurrentViewport,
+		((int)order->Arg1) >> 16) + TileSizeX / 2;
+	    y1 = Map2ViewportY(CurrentViewport,
+		((int)order->Arg1) & 0xFFFF) + TileSizeY / 2;
+	    dest = 1;
 	    break;
 
 	case UnitActionRepair:
-	    e_color=color=ColorGreen;
-	    dest=1;
+	    e_color = color = ColorGreen;
+	    dest = 1;
 	    break;
 
 	case UnitActionAttackGround:
-	    x2=Map2ScreenX(order->X)+TileSizeX/2;
-	    y2=Map2ScreenY(order->Y)+TileSizeY/2;
+	    x2 = Map2ViewportX(CurrentViewport, order->X) + TileSizeX / 2;
+	    y2 = Map2ViewportY(CurrentViewport, order->Y) + TileSizeY / 2;
 	    // FALL THROUGH
 	case UnitActionAttack:
-	    if( unit->SubAction&2 ) {	// Show weak targets.
-		e_color=ColorBlue;
+	    if (unit->SubAction & 2) {	// Show weak targets.
+		e_color = ColorBlue;
 	    } else {
-		e_color=ColorRed;
+		e_color = ColorRed;
 	    }
-	    color=ColorRed;
-	    dest=1;
+	    color = ColorRed;
+	    dest = 1;
 	    break;
 
 	case UnitActionBoard:
-	    e_color=color=ColorGreen;
-	    dest=1;
+	    e_color = color = ColorGreen;
+	    dest = 1;
 	    break;
 
 	case UnitActionUnload:
-	    e_color=color=ColorGreen;
-	    dest=1;
+	    e_color = color = ColorGreen;
+	    dest = 1;
 	    break;
 
 	case UnitActionDie:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    break;
 
 	case UnitActionSpellCast:
-	    e_color=color=ColorBlue;
-	    dest=1;
+	    e_color = color = ColorBlue;
+	    dest = 1;
 	    break;
 
 	case UnitActionTrain:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    break;
 
 	case UnitActionUpgradeTo:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    break;
 
 	case UnitActionResearch:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    break;
 
 	case UnitActionBuild:
-	    e_color=color=ColorGreen;
-	    dest=1;
+	    e_color = color = ColorGreen;
+	    dest = 1;
 	    break;
 
 	case UnitActionBuilded:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    break;
 
 	case UnitActionHarvest:
-	    e_color=color=ColorYellow;
-	    dest=1;
+	    e_color = color = ColorYellow;
+	    dest = 1;
 	    break;
 
 	case UnitActionMineGold:
-	    e_color=color=ColorYellow;
-	    dest=1;
+	    e_color = color = ColorYellow;
+	    dest = 1;
 	    break;
 
 	case UnitActionHaulOil:
-	    e_color=color=ColorYellow;
-	    dest=1;
+	    e_color = color = ColorYellow;
+	    dest = 1;
 	    break;
 
 	case UnitActionReturnGoods:
-	    e_color=color=ColorYellow;
-	    dest=1;
+	    e_color = color = ColorYellow;
+	    dest = 1;
 	    break;
 
 	case UnitActionDemolish:
-	    e_color=color=ColorRed;
-	    dest=1;
+	    e_color = color = ColorRed;
+	    dest = 1;
 	    break;
 
 	default:
-	    e_color=color=ColorGray;
+	    e_color = color = ColorGray;
 	    DebugLevel1Fn("Unknown action %d\n" _C_ order->Action);
 	    break;
     }
-    VideoFillCircleClip(color,x1,y1,2);
-    if( dest ) {
-	VideoDrawLineClip(color,x1,y1,x2,y2);
-	VideoFillCircleClip(e_color,x2,y2,3);
+    VideoFillCircleClip(color, x1, y1, 2);
+    if (dest) {
+	VideoDrawLineClip(color, x1, y1, x2, y2);
+	VideoFillCircleClip(e_color, x2, y2, 3);
     }
     //DrawPath(unit);
 }
@@ -1532,15 +1546,17 @@ local void ShowOrder(const Unit* unit)
     int x1;
     int y1;
 
-    if( unit->Destroyed ) {
+    if (unit->Destroyed) {
 	return;
     }
-    x1=Map2ScreenX(unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
-    y1=Map2ScreenY(unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
+    x1 = Map2ViewportX(CurrentViewport,
+	unit->X) + unit->IX + unit->Type->TileWidth * TileSizeX / 2;
+    y1 = Map2ViewportY(CurrentViewport,
+	unit->Y) + unit->IY + unit->Type->TileHeight * TileSizeY / 2;
 
-    ShowSingleOrder(unit,x1,y1,unit->Orders);
-    if( unit->Type->Building ) {
-	ShowSingleOrder(unit,x1,y1,&unit->NewOrder);
+    ShowSingleOrder(unit, x1, y1, unit->Orders);
+    if (unit->Type->Building) {
+	ShowSingleOrder(unit, x1, y1, &unit->NewOrder);
     }
 }
 
@@ -1551,6 +1567,8 @@ local void ShowOrder(const Unit* unit)
 **	@param type	Unit-type pointer.
 **	@param x	X screen pixel position of unit.
 **	@param y	Y screen pixel position of unit.
+**
+**	@todo FIXME: The different styles should become a function call.
 */
 local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 {
@@ -1652,10 +1670,10 @@ local void GraphicUnitPixels(const Unit* unit,const Graphic* sprite)
     }
 }
 
-/**
-**
-*/
 #ifdef USE_OPENGL
+/**
+**	FIXME: docu?
+*/
 local void DrawUnitPlayerColor(const UnitType* type,int player,int frame,int x,int y)
 {
     if( !type->PlayerColorSprite[player] ||
@@ -1730,8 +1748,8 @@ local void DrawBuilding(Unit* unit)
     }
 
     type=unit->Type;
-    x=Map2ScreenX(unit->X)+unit->IX;
-    y=Map2ScreenY(unit->Y)+unit->IY;
+    x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX;
+    y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY;
 
     DrawShadow(unit,x,y);
 
@@ -1801,8 +1819,8 @@ local void DrawUnit(const Unit* unit)
 	return;
     }
 
-    x=Map2ScreenX(unit->X)+unit->IX;
-    y=Map2ScreenY(unit->Y)+unit->IY;
+    x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX;
+    y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY;
 
     type=unit->Type;
     if( type->UnitType==UnitTypeFly || type->ShadowSprite ) {
@@ -1835,20 +1853,23 @@ local void DrawUnit(const Unit* unit)
 **
 **	@todo FIXME: Must use the redraw tile flags in this function
 */
-global void DrawUnits (int v)
+global void DrawUnits(int v)
 {
     Unit* unit;
     Unit* table[UnitMax];
     int n;
     int i;
+    const Viewport* viewport;
 
     CurrentViewport = v;
+    viewport = &TheUI.VP[v];
+
     //
     //	Select all units touching the viewpoint.
     //
-    n = SelectUnits(TheUI.VP[v].MapX-1, TheUI.VP[v].MapY-1,
-		TheUI.VP[v].MapX+TheUI.VP[v].MapWidth+1,
-		TheUI.VP[v].MapY+TheUI.VP[v].MapHeight+1,table);
+    n = SelectUnits(viewport->MapX-1, viewport->MapY-1,
+		viewport->MapX+viewport->MapWidth+1,
+		viewport->MapY+viewport->MapHeight+1,table);
 
     //
     //	2a) corpse aren't in the cache.
@@ -1866,7 +1887,7 @@ global void DrawUnits (int v)
     //
     for( i=0; i<n; ++i ) {
 	unit=table[i];
-	if( !unit->Removed && UnitVisibleInViewport (CurrentViewport, unit) ) {
+	if( !unit->Removed && UnitVisibleInViewport(v, unit) ) {
 	    if( unit->Type->Building ) {
 		DrawBuilding(unit);
 		table[i]=NoUnitP;
