@@ -32,11 +32,18 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int CommandLogEnabled;		/// True, if command log is on
+extern int CommandLogDisabled;		/// True, if command log is off
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+    /// Replay user commands from log each cycle
+extern void ReplayEachCycle(void);
+    /// Load replay
+extern int LoadReplay(char* name);
+    /// End logging
+extern void EndReplayLog(void);
 
 /*
 **	The send command functions sends a command, if needed over the

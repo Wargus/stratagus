@@ -58,6 +58,7 @@
 #include "campaign.h"
 #include "sound_server.h"
 #include "settings.h"
+#include "commands.h"
 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
 #include "sound_server.h"
@@ -740,6 +741,7 @@ global void GameMainLoop(void)
 		fprintf(stderr,"FIXME: *** round robin ***\n");
 		fprintf(stderr,"FIXME: *** round robin ***\n");
 	    }
+	    ReplayEachCycle();
 	    NetworkCommands();		// Get network commands
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
@@ -865,6 +867,7 @@ global void GameMainLoop(void)
     //	Game over
     //
     NetworkQuit();
+    EndReplayLog();
     if( GameResult==GameDefeat ) {
 	fprintf(stderr,"You have lost!\n");
 	SetStatusLine("You have lost!");
