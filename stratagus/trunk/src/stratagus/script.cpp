@@ -101,48 +101,6 @@ local SCM CclFreeCraftLibraryPath(void)
     return gh_str02scm(FreeCraftLibPath);
 }
 
-/**
-**	Default title-screen.
-**
-**	@param title	SCM title. (nil reports only)
-**
-**	@return		Current title screen.
-*/
-local SCM CclTitleScreen(SCM title)
-{
-    if( !gh_null_p(title) ) {
-	if( TitleScreen ) {
-	    CclFree(TitleScreen);
-	    TitleScreen=NULL;
-	}
-
-	TitleScreen=gh_scm2newstr(title,NULL);
-    } else {
-	title=gh_str02scm(TitleScreen);
-    }
-    return title;
-}
-
-/**
-**	FIXME: docu.
-*/
-local SCM CclColorCycleAll(void)
-{
-  ColorCycleAll = 1;
-
-  return SCM_UNSPECIFIED;
-}
-
-/**
-**	FIXME: docu.
-*/
-local SCM CclNoColorCycleAll(void)
-{
-  ColorCycleAll = 0;
-
-  return SCM_UNSPECIFIED;
-}
-
 // FIXME: remove this
 extern SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
 extern SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
@@ -625,13 +583,10 @@ global void CclInit(void)
     siod_init(5,sargv);
 
     init_subr_0("library-path",CclFreeCraftLibraryPath);
-    init_subr_1("title-screen",CclTitleScreen);
 
 // FIXME: Should move into own C file.
     init_subr_5("mana-sprite",CclManaSprite);
     init_subr_5("health-sprite",CclHealthSprite);
-    init_subr_0("color-cycle-all",CclColorCycleAll);
-    init_subr_0("no-color-cycle-all",CclNoColorCycleAll);
 
     init_subr_0("show-health-bar",CclShowHealthBar);
     init_subr_0("show-health-dot",CclShowHealthDot);

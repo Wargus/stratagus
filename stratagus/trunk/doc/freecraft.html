@@ -401,17 +401,6 @@ Without any order:
 <H2>Unsorted CCL functions/variables</H2>
 
 <UL>
-<LI><VAR>title-screen</VAR><BR>
-    Change the default title screen ("graphics/ui/title.png").<P>
-    (title-screen title)<P>
-    <UL>
-    <LI>title<BR>
-	The title graphic file.
-    </UL>
-    <H4>Example:</H4>
-	(title-screen "graphics/ui/ale-title.png")<P>
-    Change the title to "graphics/ui/ale-title.png".<P>
-
 <LI><VAR>show-health-bar</VAR><BR>
     Show the health as bar on the map.<P>
 
@@ -471,25 +460,6 @@ Without any order:
 
 <LI><VAR>speeds</VAR><BR>
     Decrease the time off all by this factor.
-
-<LI><VAR>tileset</VAR><BR>
-    Defines a tileset.<P>
-    (tileset slot-name name file table)<P>
-    <UL>
-    <LI>slot-name<BR>
-	The tileset slot name.
-    <LI>name<BR>
-	The tileset name.
-    <LI>file<BR>
-	The tileset graphic file.
-    <LI>table<BR>
-	The conversion table from pud tile number (0 - 0x9DF) into internal
-	tile number.
-    </UL>
-    <H4>Example:</H4>
-	(tileset 'tileset-summer "summer" "summer.png" #( ... ) )<P>
-	Define the tileset slot 0 as summer with the graphics in summer.png.
-	#( ... ) is the conversion table of 2528 entries.
 
 <LI><VAR>missile-type</VAR><BR>
     Defines the missile types.<P>
