@@ -166,8 +166,16 @@ local Unit* CheckForDeadGoal(Unit* unit)
 local void MoveToTarget(Unit* unit)
 {
     Unit* goal;
+    Unit* temp;
     int wall;
     int err;
+
+    if( !unit->Orders[0].Goal ) {
+	if( unit->Orders[0].X==-1 || unit->Orders[0].Y==-1 ) {
+	    DebugLevel0Fn("FIXME: Wrong goal position, check where set!\n");
+	    unit->Orders[0].X=unit->Orders[0].Y=0;
+	}
+    }
 
     if( unit->Orders[0].Action==UnitActionAttackGround
 	    || (!unit->Orders[0].Goal &&
@@ -236,8 +244,6 @@ local void MoveToTarget(Unit* unit)
 	//	Have a weak target, try a better target.
 	//
 	} else if( goal && (unit->SubAction&WEAK_TARGET) ) {
-	    Unit* temp;
-
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
 		RefsDebugCheck( !goal->Refs );
@@ -248,11 +254,14 @@ local void MoveToTarget(Unit* unit)
 		if( unit->SavedOrder.Action==UnitActionStill ) {
 		    // Save current command to come back.
 		    unit->SavedOrder=unit->Orders[0];
-		    if( goal ) {
+		    if( (goal=unit->SavedOrder.Goal) ) {
 			DebugLevel0Fn("Have goal to come back %Zd\n",
 				UnitNumber(goal));
+			unit->SavedOrder.X=goal->X+goal->Type->TileWidth/2;
+			unit->SavedOrder.Y=goal->Y+goal->Type->TileHeight/2;
+			unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
+			unit->SavedOrder.Goal=NoUnitP;
 		    }
-		    unit->SavedOrder.Goal=NoUnitP;
 		}
 		unit->Orders[0].Goal=goal=temp;
 		unit->Orders[0].X=unit->Orders[0].Y=-1;
@@ -323,6 +332,14 @@ local void MoveToTarget(Unit* unit)
 local void AttackTarget(Unit* unit)
 {
     Unit* goal;
+    Unit* temp;
+
+    if( !unit->Orders[0].Goal ) {
+	if( unit->Orders[0].X==-1 || unit->Orders[0].Y==-1 ) {
+	    DebugLevel0Fn("FIXME: Wrong goal position, check where set!\n");
+	    unit->Orders[0].X=unit->Orders[0].Y=0;
+	}
+    }
 
     AnimateActionAttack(unit);
     if( unit->Reset ) {
@@ -372,11 +389,14 @@ local void AttackTarget(Unit* unit)
 	    //
 	    if( unit->SavedOrder.Action==UnitActionStill ) {
 		unit->SavedOrder=unit->Orders[0];
-		if( goal ) {
+		if( (temp=unit->SavedOrder.Goal) ) {
 		    DebugLevel0Fn("Have unit to come back %Zd?\n",
-			    UnitNumber(goal));
+			    UnitNumber(temp));
+		    unit->SavedOrder.X=temp->X+temp->Type->TileWidth/2;
+		    unit->SavedOrder.Y=temp->Y+temp->Type->TileHeight/2;
+		    unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
+		    unit->SavedOrder.Goal=NoUnitP;
 		}
-		unit->SavedOrder.Goal=NoUnitP;
 	    }
 
 	    RefsDebugCheck( goal->Destroyed || !goal->Refs );
@@ -394,8 +414,6 @@ local void AttackTarget(Unit* unit)
 	//	Have a weak target, try a better target.
 	//
 	} else if( goal && (unit->SubAction&WEAK_TARGET) ) {
-	    Unit* temp;
-
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
 		RefsDebugCheck( !goal->Refs );
@@ -407,11 +425,14 @@ local void AttackTarget(Unit* unit)
 		if( unit->SavedOrder.Action==UnitActionStill ) {
 		    // Save current order to come back or to continue it.
 		    unit->SavedOrder=unit->Orders[0];
-		    if( goal ) {
-			DebugLevel0Fn("Have unit to come back %Zd?\n",
+		    if( (goal=unit->SavedOrder.Goal) ) {
+			DebugLevel0Fn("Have goal to come back %Zd\n",
 				UnitNumber(goal));
+			unit->SavedOrder.X=goal->X+goal->Type->TileWidth/2;
+			unit->SavedOrder.Y=goal->Y+goal->Type->TileHeight/2;
+			unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
+			unit->SavedOrder.Goal=NoUnitP;
 		    }
-		    unit->SavedOrder.Goal=NoUnitP;
 		}
 		unit->Orders[0].Goal=goal=temp;
 		unit->Orders[0].X=unit->Orders[0].Y=-1;
@@ -427,11 +448,14 @@ local void AttackTarget(Unit* unit)
 	    if( unit->SavedOrder.Action==UnitActionStill ) {
 		// Save current order to come back or to continue it.
 		unit->SavedOrder=unit->Orders[0];
-		if( goal ) {
+		if( (temp=unit->SavedOrder.Goal) ) {
 		    DebugLevel0Fn("Have goal to come back %Zd\n",
-			    UnitNumber(goal));
+			    UnitNumber(temp));
+		    unit->SavedOrder.X=temp->X+temp->Type->TileWidth/2;
+		    unit->SavedOrder.Y=temp->Y+temp->Type->TileHeight/2;
+		    unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
+		    unit->SavedOrder.Goal=NoUnitP;
 		}
-		unit->SavedOrder.Goal=NoUnitP;
 	    }
 	    NewResetPath(unit);
 	    unit->Frame=0;
