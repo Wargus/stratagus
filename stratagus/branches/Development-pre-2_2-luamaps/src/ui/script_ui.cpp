@@ -4493,7 +4493,7 @@ static int CclPresentMap(lua_State* l)
 }
 
 /**
-** Define the lua file that will be build the map
+** Define the lua file that will build the map
 **
 **  @param l  Lua state.
 */

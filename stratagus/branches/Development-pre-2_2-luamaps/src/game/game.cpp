@@ -138,11 +138,9 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	char mapsetup[PATH_MAX];
 	char *extension;
 
-	//MAPTODO use map-> or TheMap. but not both !
-
 	printf("SaveStratagusMap %s\n", mapname);
 
-	if (!TheMap.Info.MapWidth || !TheMap.Info.MapHeight) {
+	if (!map->Info.MapWidth || !map->Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
@@ -211,13 +209,13 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "-- load tilesets\n");
 	gzprintf(f, "Load(\"scripts/tilesets/%s.lua\")\n\n", "desert"); //MAPTODO
 	
-	for (i = 0; i < TheMap.Info.MapHeight; ++i) {
-		for (j = 0; j < TheMap.Info.MapWidth; ++j) {
+	for (i = 0; i < map->Info.MapHeight; ++i) {
+		for (j = 0; j < map->Info.MapWidth; ++j) {
 			int tile;
 			int n;
 			
-			tile = TheMap.Fields[j+i*TheMap.Info.MapWidth].Tile;
-			for (n=0; n < TheMap.Tileset->NumTiles && tile != TheMap.Tileset->Table[n]; ++n) {
+			tile = map->Fields[j+i*map->Info.MapWidth].Tile;
+			for (n=0; n < map->Tileset->NumTiles && tile != map->Tileset->Table[n]; ++n) {
 			}
 			gzprintf(f, "SetTile(%3d, %d, %d)\n", n, j, i);
 		}
