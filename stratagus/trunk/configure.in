@@ -29,7 +29,7 @@ else
 fi
 
 AC_ARG_ENABLE(win32,
-    [  --enable-win32	  Force win32 (default: no)])
+    [  --enable-win32	  Force win32, useful for cross-compiling (default: no)])
 if test "$enable_win32" = "yes"; then
     WIN32=1
     EXE=.exe

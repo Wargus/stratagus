@@ -22,8 +22,8 @@
 ##	GNU General Public License for more details.
 ##
 
-MODULE= etlib
-MSRC=	hash.c prgname.c
+MODULE = etlib
+MSRC = hash.c prgname.c getopt.c
 
-SRC+=	$(addprefix $(MODULE)/,$(MSRC))
-HDRS+=
+SRC += $(addprefix $(MODULE)/,$(MSRC))
+HDRS += etlib/prgname.h
