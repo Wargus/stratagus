@@ -1078,7 +1078,8 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 	IfDebug(
 	    if (InterfaceState == IfaceStateNormal) {
-		VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+		VideoDrawText(TheUI.MapArea.X+10,TheUI.MapArea.Y+10,GameFont,
+		    "SLOW FRAME!!");
 	    }
 	);
 	++SlowFrameCounter;
