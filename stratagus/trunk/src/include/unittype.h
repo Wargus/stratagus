@@ -88,6 +88,10 @@
 **		have the same size. Also all sprites (tilesets) must have the
 **		same size.
 **
+**	UnitType::ShadowOffset
+**
+**		Vertical offset to draw the shadow in pixels.
+**
 **	UnitType::Animations
 **
 **		Animation scripts for the different actions. Currently the
@@ -492,6 +496,7 @@ struct _unit_type_ {
     int		Height;			/// Sprite height
     int		ShadowWidth;		/// Shadow sprite width
     int		ShadowHeight;		/// Shadow sprite height
+    int		ShadowOffset;		/// Shadow vertical offset
 
     Animations*	Animations;		/// Animation scripts
 
