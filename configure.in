@@ -1,7 +1,6 @@
 
 AC_INIT(configure.in)
 AC_PREREQ([2.50])
-dnl AC_CANONICAL_TARGET
 
 CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 
