@@ -95,6 +95,8 @@ extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid, int 
 --	Actions:	in action_<name>.c
 ----------------------------------------------------------------------------*/
 
+    /// Generic still action
+extern void ActionStillGeneric(Unit* unit,int ground);
     /// Handle command still
 extern void HandleActionStill(Unit* unit);
     /// Handle command stand ground
