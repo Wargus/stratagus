@@ -37,10 +37,14 @@ cat << .. > $RULESFILE
 
 EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
 ## SLOW_INPUT		If you have problems that events aren't fetched.
-# This could be used for experimental versions
+## BPP8_*               Only for X11 8bpp common palette:
+##   BPP8_NORMAL          disables default, like other Xbpp (delivers errors)
+##   BPP8_WINSAFE         Uses a windows safe palette instead.
+##   BPP8_IRGB            Uses a palette based on 4x4x4 RGB in 4 intensities
+## These could be used for experimental versions
 ## There are some still not well tested code parts or branches.
 ## UNIT_ON_MAP:		Faster lookup of units
-## NEW_MAPDRAW:		Stephans new map draw code
+## NEW_MAPDRAW:		Stephans new map draw code (value>1 shows update)
 ## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_AI:		New better improved AI code
 ## These aren't working yet:
@@ -420,7 +424,7 @@ fi
   [vV])
 	echo "Using SVGALIB"
 	echo "VIDEO		= -DUSE_SVGALIB" >> $RULESFILE
-	echo "VIDEOLIB	= -lvga" >> $RULESFILE
+	echo "VIDEOLIB	= -lvga -ldl" >> $RULESFILE
 	;;
 
   [bB])
