@@ -116,31 +116,29 @@ global const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
 */
 local Uint32* SelectionColor(const Unit* unit)
 {
-	Uint32* color;
-
-	color = malloc(sizeof(Uint32));
+	static Uint32 color;
 
 	// FIXME: make these colors customizable via CVS
 
 	if (EditorRunning && unit == UnitUnderCursor &&
 			EditorState == EditorSelecting) {
-		*color = ColorWhite;
-		return color;
+		color = ColorWhite;
+		return &color;
 	}
 
 	if (unit->Selected || (unit->Blink & 1)) {
 		if (unit->Player->Player == PlayerNumNeutral) {
-			*color = ColorYellow;
-			return color;
+			color = ColorYellow;
+			return &color;
 		}
 		// FIXME: better allied?
 		if (unit->Player == ThisPlayer) {
-			*color = ColorGreen;
-			return color;
+			color = ColorGreen;
+			return &color;
 		}
 		if (IsEnemy(ThisPlayer, unit)) {
-			*color = ColorRed;
-			return color;
+			color = ColorRed;
+			return &color;
 		}
 		return &unit->Player->Color;
 	}
@@ -148,8 +146,8 @@ local Uint32* SelectionColor(const Unit* unit)
 	// If building mark all own buildings
 	if (CursorBuilding && unit->Type->Building &&
 			unit->Player == ThisPlayer) {
-		*color = ColorGray;
-		return color;
+		color = ColorGray;
+		return &color;
 	}
 	return NULL;
 }

@@ -188,12 +188,14 @@ global Graphic* LoadGraphicPNG(const char* name)
 	if (!lines) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		CLclose(fp);
+		free(palettecolors);
 		return NULL;
 	}
 	data = malloc(h * w);
 	if (!data) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		CLclose(fp);
+		free(palettecolors);
 		return NULL;
 	}
 #ifdef DEBUG
@@ -213,6 +215,8 @@ global Graphic* LoadGraphicPNG(const char* name)
 	graphic = MakeGraphic(8, w, h, data, w * h);		// data freed by make graphic
 	SDL_SetPalette(graphic->Surface, SDL_LOGPAL | SDL_PHYSPAL, palettecolors, 0, 256);
 	SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, 255);
+
+	free(palettecolors);
 
 	return graphic;
 }
