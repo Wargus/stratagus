@@ -90,6 +90,7 @@ global int SpellTypeCount;
 ** 		Cast demolish
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -172,6 +173,7 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -202,9 +204,6 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 	} else {
 		portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerNumNeutral]);
 	}
-/*	MakeMissile(spell->Missile,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);*/
 	//  Goal is used to link to destination circle of power
 	caster->Goal = portal;
 	RefsIncrease(portal);
@@ -217,6 +216,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -269,21 +269,19 @@ global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 	return 0;
 }
 
-
-//		AreaBombardment
-//   NOTE: vladi: blizzard differs than original in this way:
-//   original: launches 50 shards at 5 random spots x 10 for 25 mana.
-
 /**
 **		Cast area bombardment.
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
 **
 **		@return				=!0 if spell should be repeated, 0 if not
+**      @internal: vladi: blizzard differs than original in this way:
+**       original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
 global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
@@ -346,18 +344,18 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 /**
 **		Evaluate missile location description.
 **
+**      @param location     Parameters for location.
 **		@param caster		Unit that casts the spell
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
-**
 **		@param resx		pointer to X coord of the result
 **		@param resy		pointer to Y coord of the result
 */
 local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 	Unit* caster, Unit* target, int x, int y, int* resx, int* resy)
 {
-	if (location->Base==LocBaseCaster) {
+	if (location->Base == LocBaseCaster) {
 		*resx = caster->X * TileSizeX + TileSizeX / 2;
 		*resy = caster->Y * TileSizeY + TileSizeY / 2;
 	} else {
@@ -384,6 +382,7 @@ local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -403,8 +402,6 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 	DebugCheck(!spell);
 	DebugCheck(!action);
 	DebugCheck(!action->Data.SpawnMissile.Missile);
-
-	missile = NULL;
 
 	EvaluateMissileLocation(&action->Data.SpawnMissile.StartPoint,
 		caster, target, x, y, &sx, &sy);
@@ -430,6 +427,7 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -468,6 +466,7 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -525,7 +524,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	}
 
 	DebugCheck(castcount < 0);
-
 	DebugLevel3Fn("Used to have %d hp and %d mana.\n" _C_
 		target->HP _C_ target->Mana);
 
@@ -556,6 +554,7 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -565,7 +564,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 global int CastPolymorph(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
-	int canplace;
 	int i;
 	int j;
 	UnitType* type;
@@ -599,30 +597,24 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 	// as said somewhere else -- no corpses :)
 	RemoveUnit(target, NULL);
 	UnitCacheRemove(target);
-	canplace = 1;
 	for (i = 0; i < type->TileWidth; ++i) {
 		for (j = 0; j < type->TileHeight; ++j) {
 			if (!UnitTypeCanMoveTo(x + i, y + j, type)) {
-				canplace = 0;
-				i = j = 10343243;
+				PlaceUnit(target, target->X, target->Y);
+				return 0;
 			}
 		}
 	}
-	if (canplace) {
-		caster->Mana -= spell->ManaCost;
-		if (action->Data.Polymorph.PlayerNeutral) {
-			MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
-		} else {
-			MakeUnitAndPlace(x, y, type, target->Player);
-		}
-		UnitLost(target);
-		UnitClearOrders(target);
-		ReleaseUnit(target);
-		return 1;
+	caster->Mana -= spell->ManaCost;
+	if (action->Data.Polymorph.PlayerNeutral) {
+		MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
 	} else {
-		PlaceUnit(target, target->X, target->Y);
-		return 0;
+		MakeUnitAndPlace(x, y, type, target->Player);
 	}
+	UnitLost(target);
+	UnitClearOrders(target);
+	ReleaseUnit(target);
+	return 1;
 }
 
 /**
@@ -630,6 +622,7 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 **
 **		@param caster		Unit that casts the spell
 **		@param spell		Spell-type pointer
+**      @param action       Parameters of the spell.
 **		@param target		Target unit that spell is addressed to
 **		@param x		X coord of target spot when/if target does not exist
 **		@param y		Y coord of target spot when/if target does not exist
@@ -705,12 +698,9 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 			DropOutOnSide(target, LookingW, 0, 0);
 			CheckUnitToBeDrawn(target);
 		}
-
 		caster->Mana -= spell->ManaCost;
-
 		return 1;
 	}
-
 	return 0;
 }
 
@@ -719,7 +709,13 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 // ****************************************************************************
 
 /**
-**		FIXME: docu
+**      Target constructor.
+**
+**      @param t            Type of target (unit, position).
+**      @param unit         Unit target.
+**      @param x            x coord of the target.
+**      @param y            y coord of the target.
+**      @return the new target.
 */
 local Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 {
@@ -739,7 +735,11 @@ local Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 }
 
 /**
-**		FIXME: docu
+**      Target constructor for unit.
+**
+**      @param unit     Target unit.
+**
+**      @return the new target.
 */
 local Target* NewTargetUnit(const Unit* unit)
 {
@@ -748,7 +748,12 @@ local Target* NewTargetUnit(const Unit* unit)
 }
 
 /**
-**		FIXME: docu
+**      Target constructor for position.
+**
+**      @param x        x position.
+**      @param y        y position.
+**
+**      @return the new target.
 */
 local Target* NewTargetPosition(int x, int y)
 {
@@ -765,9 +770,9 @@ local Target* NewTargetPosition(int x, int y)
 /*
 **		Check the condition.
 **
-**		@param caster				Pointer to caster unit.
-**		@param spell 				Pointer to the spell to cast.
-**		@param target				Pointer to target unit, or 0 if it is a position spell.
+**		@param caster			Pointer to caster unit.
+**		@param spell 			Pointer to the spell to cast.
+**		@param target			Pointer to target unit, or 0 if it is a position spell.
 **		@param x				X position, or -1 if it is an unit spell.
 **		@param y				Y position, or -1 if it is an unit spell.
 **		@param condition		Pointer to condition info.
@@ -778,95 +783,83 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 	int x, int y, const ConditionInfo* condition)
 {
 	int i;
-	//
-	//		Check caster mana. FIXME: move somewhere else?
-	//
-	if (caster->Mana < spell->ManaCost) {
+
+	if (caster->Mana < spell->ManaCost) { // Check caster mana.
 		return 0;
 	}
-
-	//
-	//		Casting an unit spell without a target.
-	//
-	if (spell->Target == TargetUnit) {
+	if (spell->Target == TargetUnit) { // Casting an unit spell without a target.
 		if ((!target) || target->Destroyed || target->Orders->Action == UnitActionDie) {
 			return 0;
 		}
 	}
-	if (!condition) {
-		// no condition, pass.
+	if (!condition) { // no condition, pass.
 		return 1;
 	}
-	// Check dead units.
+	if (!target) {
+		return 1;
+	}
+	if (condition->Building != CONDITION_TRUE) {
+		if ((condition->Building == CONDITION_ONLY) ^ (target->Type->Building)) {
+			return 0;
+		}
+	}
+	if (condition->Coward != CONDITION_TRUE) {
+		if ((condition->Coward == CONDITION_ONLY) ^ (target->Type->Coward)) {
+			return 0;
+		}
+	}
+	for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+		if (condition->BoolFlag[i] != CONDITION_TRUE) {
+			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
+				return 0;
+			}
+		}
+	}
+	if (condition->Alliance != CONDITION_TRUE) {
+		if ((condition->Alliance == CONDITION_ONLY) ^
+				(IsAllied(caster->Player,target) || target->Player == caster->Player)) {
+			return 0;
+		}
+	}
+	if (condition->TargetSelf != CONDITION_TRUE) {
+		if ((condition->TargetSelf == CONDITION_ONLY) ^ (caster == target)) {
+			return 0;
+		}
+	}
 	//
-	//		Now check conditions regarding the target unit.
+	//		Check vitals now.
 	//
-	if (target) {
-		if (condition->Building != CONDITION_TRUE) {
-			if ((condition->Building == CONDITION_ONLY) ^ (target->Type->Building)) {
-				return 0;
-			}
-		}
-		if (condition->Coward != CONDITION_TRUE) {
-			if ((condition->Coward == CONDITION_ONLY) ^ (target->Type->Coward)) {
-				return 0;
-			}
-		}
-		for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
-			if (condition->BoolFlag[i] != CONDITION_TRUE) {
-				if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {
-					return 0;
-				}
-			}
-		}
-		if (condition->Alliance != CONDITION_TRUE) {
-			if ((condition->Alliance == CONDITION_ONLY) ^
-					(IsAllied(caster->Player,target) || target->Player == caster->Player)) {
-				return 0;
-			}
-		}
-		if (condition->TargetSelf != CONDITION_TRUE) {
-			if ((condition->TargetSelf == CONDITION_ONLY) ^ (caster == target)) {
-				return 0;
-			}
-		}
-		//
-		//		Check vitals now.
-		//
-		if (condition->MinHpPercent * target->Stats->HitPoints / 100 > target->HP) {
+	if (condition->MinHpPercent * target->Stats->HitPoints / 100 > target->HP) {
+		return 0;
+	}
+	if (condition->MaxHpPercent * target->Stats->HitPoints / 100 <= target->HP) {
+		return 0;
+	}
+	if (target->Type->CanCastSpell) {
+		if (condition->MinManaPercent * target->Type->_MaxMana / 100 > target->Mana) {
 			return 0;
 		}
-		if (condition->MaxHpPercent * target->Stats->HitPoints / 100 <= target->HP) {
+		if (condition->MaxManaPercent * target->Type->_MaxMana / 100 < target->Mana) {
 			return 0;
 		}
-		if (target->Type->CanCastSpell) {
-			if (condition->MinManaPercent * target->Type->_MaxMana / 100 > target->Mana) {
-				return 0;
-			}
-			if (condition->MaxManaPercent * target->Type->_MaxMana / 100 < target->Mana) {
-				return 0;
-			}
-		}
-		//
-		//		Check for slow/haste stuff
-		//		This should be used mostly for ai, if you want to keep casting
-		//		slow to no effect I can't see why should we stop you.
-		//
-		if (condition->MaxSlowTicks < target->Slow) {
-			return 0;
-		}
-		if (condition->MaxHasteTicks < target->Haste) {
-			return 0;
-		}
-		if (condition->MaxBloodlustTicks < target->Bloodlust) {
-			return 0;
-		}
-		if (condition->MaxInvisibilityTicks < target->Invisible) {
-			return 0;
-		}
-		if (condition->MaxInvincibilityTicks < target->UnholyArmor) {
-			return 0;
-		}
+	}
+	//		Check for slow/haste stuff
+	//		This should be used mostly for ai, if you want to keep casting
+	//		slow to no effect I can't see why should we stop you.
+	if (condition->MaxSlowTicks < target->Slow) {
+		return 0;
+	}
+	if (condition->MaxHasteTicks < target->Haste) {
+		return 0;
+	}
+	if (condition->MaxBloodlustTicks < target->Bloodlust) {
+		return 0;
+	}
+	if (condition->MaxInvisibilityTicks < target->Invisible) {
+		return 0;
+	}
+	if (condition->MaxInvincibilityTicks < target->UnholyArmor) {
+		return 0;
 	}
 	return 1;
 }
@@ -878,9 +871,9 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 **		@param spell		Spell-type pointer.
 **
 **		@return Target*		choosen target or Null if spell can't be cast.
-**
+**      @fixme should be global (for AI) ???
+**      @fixme write for position target.
 */
-// FIXME: should be global (for AI) ???
 local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* spell)
 {
 	Unit* table[UnitMax];
@@ -894,12 +887,9 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 	AutoCastInfo* autocast;
 
 	DebugCheck(!spell);
-	DebugCheck(!spell->AutoCast);
 	DebugCheck(!caster);
 
-	//
 	//		Ai cast should be a lot better. Use autocast if not found.
-	//
 	if (caster->Player->AiEnabled && spell->AICast) {
 		DebugLevel3Fn("The borg uses AI autocast XP.\n");
 		autocast = spell->AICast;
@@ -907,7 +897,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 		DebugLevel3Fn("You puny mortal, join the colective!\n");
 		autocast = spell->AutoCast;
 	}
-
+	DebugCheck(!autocast);
 	x = caster->X;
 	y = caster->Y;
 	range = spell->AutoCast->Range;
@@ -1027,7 +1017,7 @@ global SpellType* SpellTypeByIdent(const char* ident)
 			return SpellTypeTable[i];
 		}
 	}
-	return 0;
+	return NULL;
 }
 
 // ****************************************************************************
@@ -1037,7 +1027,9 @@ global SpellType* SpellTypeByIdent(const char* ident)
 /**
 **		Check if spell is research for player \p player.
 **		@param		player : player for who we want to know if he knows the spell.
-**		@param		id :
+**		@param		spellid : id of the spell to check.
+**
+**      @return 0 if spell is not available, else no null.
 */
 global int SpellIsAvailable(const Player* player, int spellid)
 {
@@ -1076,24 +1068,19 @@ global int CanAutoCastSpell(const SpellType* spell)
 **		@param y		Y coord of target spot when/if target does not exist
 **
 **		@return				=!0 if spell should/can casted, 0 if not
+**		@note caster must know the spell, and spell must be researched.
 */
 global int CanCastSpell(const Unit* caster, const SpellType* spell,
-	const Unit* target, // FIXME: Use a unique struture t_Target ?
-	int x, int y)
+	const Unit* target, int x, int y)
 {
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-
-	// And caster must know the spell
-	// FIXME: spell->Ident < MaxSpell
+	DebugCheck(!SpellIsAvailable(caster->Player, spell->Slot));
 	DebugCheck(!(caster->Type->CanCastSpell && caster->Type->CanCastSpell[spell->Slot]));
 
-	if (!caster->Type->CanCastSpell ||
-			!caster->Type->CanCastSpell[spell->Slot] ||
-			(spell->Target == TargetUnit && target == NULL)) {
+	if (spell->Target == TargetUnit && target == NULL) {
 		return 0;
 	}
-
 	return PassCondition(caster, spell, target, x, y, spell->Condition);
 }
 
@@ -1115,10 +1102,9 @@ global int AutoCastSpell(Unit* caster, const SpellType* spell)
 	DebugCheck(!(caster->Type->CanCastSpell));
 	DebugCheck(!(caster->Type->CanCastSpell[spell->Slot]));
 
-	target = NULL;
-
 	//  Check for mana, trivial optimization.
-	if (caster->Mana < spell->ManaCost) {
+	if (!SpellIsAvailable(caster->Player, spell->Slot)
+		|| caster->Mana < spell->ManaCost) {
 		return 0;
 	}
 	target = SelectTargetUnitsOfAutoCast(caster, spell);
@@ -1152,6 +1138,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	SpellActionType* act;
 
 	DebugCheck(!spell);
+	DebugCheck(!spell->Action);
 	DebugCheck(!spell->Action->CastFunction);
 	DebugCheck(!caster);
 	DebugCheck(!SpellIsAvailable(caster->Player, spell->Slot));
@@ -1164,10 +1151,10 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	//
 	//		For TargetSelf, you target.... YOURSELF
 	//
-	if (spell->Target==TargetSelf) {
-		x=caster->X;
-		y=caster->Y;
-		target=caster;
+	if (spell->Target == TargetSelf) {
+		x = caster->X;
+		y = caster->Y;
+		target = caster;
 	}
 	DebugLevel0Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
 		caster->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
@@ -1252,9 +1239,7 @@ void CleanSpells(void)
 			}
 			free(spell->AICast);
 		}
-		if (spell->SoundWhenCast.Name) {
-			free(spell->SoundWhenCast.Name);
-		}
+		free(spell->SoundWhenCast.Name);
 		free(spell);
 		// FIXME: missile free somewhere else, right?
 	}
@@ -1262,34 +1247,5 @@ void CleanSpells(void)
 	SpellTypeTable = 0;
 	SpellTypeCount = 0;
 }
-
-#if 0
-
-/*
-**		 TODO :
-**		- Modify missile.c for better configurable and clear the code.
-** ccl info
-
-
-// !!! Special deathcoil
-
-// if (!target->Type->Building
-		   && (target->Type->UnitType == UnitTypeLand || target->Type->UnitType == UnitTypeNaval)
-		&& target->FlameShield < spell->TTL) // FlameShield
-
-		= {
-
-  NOTE: vladi:
-
-  The point to have variable unsorted list of spell-types and
-  dynamic id's and in the same time -- SpellAction id's is that
-  spell actions are hardcoded and cannot be changed at all.
-  On the other hand we can have different spell-types as with
-  different range, cost and time to live (possibly and other
-  parameters as extensions)
-
-*/
-
-#endif
 
 //@}
