@@ -637,7 +637,7 @@ global void DrawResources(void)
 
 #define MESSAGES_TIMEOUT  (FRAMES_PER_SECOND*5)	/// Message timeout 5 seconds
 
-local int   MessageFrameTimeout;		/// frame to expire message
+local unsigned long   MessageFrameTimeout;	/// frame to expire message
 
 #define MESSAGES_MAX  10			/// FIXME: docu
 
@@ -769,7 +769,7 @@ local void AddMessage(const char *msg)
 
     MessagesCount++;
 
-    if (strlen(msg) != ptr-message) {
+    if (strlen(msg) != (size_t)(ptr-message)) {
 	AddMessage(msg+(next-message));
     }
 }

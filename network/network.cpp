@@ -257,7 +257,7 @@
 */
 typedef struct _network_command_queue_ {
     struct dl_node	List[1];	/// double linked list
-    int			Time;		/// time to execute
+    unsigned long	Time;		/// time to execute
     NetworkCommand	Data;		/// command content
 } NetworkCommandQueue;
 
@@ -270,7 +270,7 @@ global int NetworkFildes = -1;		/// Network file descriptor
 global int NetworkInSync = 1;		/// Network is in sync
 global int NetworkUpdates = 5;		/// Network update each # game cycles
 global int NetworkLag = 10;		/// Network lag in # game cycles
-global int NetworkStatus[PlayerMax];	/// Network status
+global unsigned long NetworkStatus[PlayerMax];	/// Network status
 
 local char NetMsgBuf[128][PlayerMax];	/// Chat message buffers
 local int NetMsgBufLen[PlayerMax];	/// Stored chat message length
@@ -611,7 +611,7 @@ global void NetworkEvent(void)
     NetworkPacket* packet;
     int player;
     int i;
-    int n;
+    unsigned long n;
 
     if (NetworkFildes == -1) {
 	NetworkInSync = 1;
@@ -620,7 +620,7 @@ global void NetworkEvent(void)
     //
     //	Read the packet.
     //
-    if( (n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
+    if( (i = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
 	//
 	//	Server or client gone?
 	//
@@ -636,14 +636,14 @@ global void NetworkEvent(void)
     //	Setup messages
     //
     if (packet->Commands[0].Type <= MessageInitConfig) {
-	NetworkParseSetupEvent(buf, n);
+	NetworkParseSetupEvent(buf, i);
 	return;
     }
 
     //
     //	Minimal checks for good/correct packet.
     //
-    if (n != sizeof(NetworkPacket) && packet->Commands[0].Type != MessageQuit) {
+    if (i != sizeof(NetworkPacket) && packet->Commands[0].Type != MessageQuit) {
 	DebugLevel0Fn("Bad packet\n");
 	return;
     }
@@ -1047,7 +1047,7 @@ local void NetworkSyncCommands(void)
 {
     const NetworkCommandQueue *ncq;
     int i;
-    int n;
+    unsigned long n;
 
     //
     //	Check if all next messages are available.
