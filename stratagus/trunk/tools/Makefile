@@ -69,10 +69,15 @@ extract$(EXE): extract.c
 aledoc$(EXE):	aledoc.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
-wartool$(EXE): wartool.c $(TOPDIR)/Makefile $(TOPDIR)/Rules.make
+wartool$(EXE): wartool.c $(TOPDIR)/Makefile $(TOPDIR)/Rules.make \
+	$(TOPDIR)/src/include/freecraft.h $(TOPDIR)/src/include/iocompat.h \
+	$(TOPDIR)/src/include/myendian.h
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
-startool$(EXE):	startool.c $(TOPDIR)/Makefile $(TOPDIR)/Rules.make
+startool$(EXE):	startool.c $(TOPDIR)/Makefile $(TOPDIR)/Rules.make \
+	$(TOPDIR)/src/clone/mpq.c $(TOPDIR)/src/include/freecraft.h \
+	$(TOPDIR)/src/include/iocompat.h $(TOPDIR)/src/include/myendian.h \
+	$(TOPDIR)/src/include/mpq.h
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
 
 FILES= 	gfx2png.c tile2png.c extract.c \
