@@ -1081,6 +1081,12 @@ local int InputKey(int key)
 		    }
 		}
 	    }
+	    
+	    // Check for Replay and ffw x
+	    if (strncmp(Input,"ffw ",4) == 0 && ReplayGameType != ReplayNone) {
+		FastForwardCycle = atoi(&Input[4]);
+	    }
+	    
 	    if (strlen(Input)) {
 		sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
 		// FIXME: only to selected players ...
