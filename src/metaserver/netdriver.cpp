@@ -38,6 +38,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#ifndef _MSC_VER
+#include <errno.h>
+#endif
 
 #include "stratagus.h"
 #include "netdriver.h"

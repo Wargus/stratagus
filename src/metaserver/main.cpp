@@ -47,6 +47,7 @@
 
 #ifndef _MSC_VER
 #include <unistd.h>
+#include <errno.h>
 #endif
 #ifdef __CYGWIN__
 #include <getopt.h>
