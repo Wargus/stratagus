@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -80,7 +80,7 @@ global Unit* DestroyedBuildings;	/// List of DestroyedBuildings
 global Unit* CorpseList;		/// List of Corpses On Map
 
 global int HitPointRegeneration;	/// Hit point regeneration for all units
-global int XpDamage;				/// Hit point regeneration for all units
+global int XpDamage;			/// Hit point regeneration for all units
 global char EnableTrainingQueue;	/// Config: training queues enabled
 global char EnableBuildingCapture;	/// Config: capture buildings enabled
 global char RevealAttacker;		/// Config: reveal attacker enabled
@@ -411,7 +411,7 @@ global void AssignUnitToPlayer(Unit *unit, Player *player)
 
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
-    unit->Colors=player->UnitColors;
+    unit->Colors=&player->UnitColors;
 }
 
 /**
@@ -543,12 +543,14 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
-	if( unit->Next && unit->Removed ) {
-	    MapUnmarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
-				,unit->Next->Y+unit->Next->Type->TileHeight/2
+	if( unit->Container && unit->Removed ) {
+	    MapUnmarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
+				,unit->Container->Y+unit->Container->Type->TileHeight/2
 				,unit->CurrentSightRange);
 	}
-	unit->Next = NULL;
+	if (unit->Container) {
+	    RemoveUnitFromContainer(unit);
+	}
 	unit->CurrentSightRange=unit->Stats->SightRange;
 	MapMarkSight(unit->Player,x,y,unit->CurrentSightRange);
 
@@ -611,7 +613,61 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
     return unit;
 }
 
-/**
+/*
+** 	Add unit to a container. It only updates linked list stuff
+**
+**	@param unit	Pointer to unit.
+**	@param host	Pointer to container.
+*/
+global void AddUnitInContainer(Unit* unit, Unit* host)
+{
+    if (unit->Container) {
+	printf("Unit is already contained.\n");
+	exit(0);
+    }
+    unit->Container=host;
+    if (host->InsideCount==0) {
+    	unit->NextContained=unit->PrevContained=unit;
+    } else {
+	unit->NextContained=host->UnitInside;
+	unit->PrevContained=host->UnitInside->PrevContained;
+	host->UnitInside->PrevContained->NextContained=unit;
+	host->UnitInside->PrevContained=unit;
+    }
+    host->UnitInside=unit;
+    ++host->InsideCount;
+}
+
+/*
+** 	Remove unit from a container. It only updates linked list stuff
+**
+**	@param unit	Pointer to unit.
+*/
+global void RemoveUnitFromContainer(Unit* unit)
+{
+    Unit* host;
+    host=unit->Container;
+    if (!unit->Container) {
+	printf("Unit not contained.\n");
+	exit(0);
+    }
+    if (host->InsideCount==0) {
+	printf("host's inside count reached -1.");
+	exit(0);
+    }
+    host->InsideCount--;
+    unit->NextContained->PrevContained=unit->PrevContained;
+    unit->PrevContained->NextContained=unit->NextContained;
+    if (host->InsideCount==0) {
+	host->UnitInside=NoUnitP;
+    } else {
+	if (host->UnitInside==unit)
+	    host->UnitInside=unit->NextContained;
+    }
+    unit->Container=NoUnitP;
+}
+
+/*
 **	Remove unit from map.
 **
 **	Update selection.
@@ -628,9 +684,9 @@ global void RemoveUnit(Unit* unit, Unit* host)
     const UnitType* type;
     unsigned flags;
 
-    if( unit->Removed && unit->Next ) {
-	MapUnmarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
-				,unit->Next->Y+unit->Next->Type->TileHeight/2
+    if( unit->Removed && unit->Container ) {
+	MapUnmarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
+				,unit->Container->Y+unit->Container->Type->TileHeight/2
 				,unit->CurrentSightRange);
     } else {
 	MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
@@ -642,11 +698,11 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2,
 			host->Y+host->Type->TileWidth/2,
 			unit->CurrentSightRange);
+    	AddUnitInContainer(unit,host);
     }
 
     if( unit->Removed ) {		// could happen!
 	// If unit is removed (inside) and building is destroyed.
-	unit->Next=NULL;
 	return;
     }
     unit->Removed=1;
@@ -1722,6 +1778,7 @@ global void UnitIncrementHealth(void)
 global void ChangeUnitOwner(Unit* unit,Player* newplayer)
 {
     int i;
+    Unit* uins;
     Player* oldplayer;
 
     oldplayer=unit->Player;
@@ -1732,25 +1789,15 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
         return;
     }
   
-    // For st*rcr*ft (dark archons),
-    if( unit->Type->Transporter ) {
-        for( i=0; i<MAX_UNITS_ONBOARD; i++) {
-	    if( unit->OnBoard[i] ) {
-	        ChangeUnitOwner(unit->OnBoard[i],newplayer);
-	    }
-	}
-    }
-    // FIXME: should use a better methode, linking all units in a building
-    // FIXME: f.e. with the next pointer. How???
     //
-    // Rescue all units in buildings
+    // Rescue all units in buildings/transporters.
     //
     printf("Rescue of a %s at 0x%X\n",unit->Type->Name,(unsigned)unit);
-    for( i=0; i<NumUnits; i++ ) {
-	if( Units[i]->Removed && Units[i]->Next==unit ) {
-            printf("Chain rescue of a %s\n at 0x%X",Units[i]->Type->Name,(unsigned)Units[i]);
-            ChangeUnitOwner(Units[i],newplayer);
-	}
+
+    uins=unit->UnitInside;
+    for( i=unit->InsideCount; i; --i,uins=uins->NextContained) {
+        printf("Chain rescue of a %s\n at 0x%X",Units[i]->Type->Name,(unsigned)Units[i]);
+	ChangeUnitOwner(uins,newplayer);
     }
 
     //
@@ -1794,12 +1841,12 @@ global void ChangeUnitOwner(Unit* unit,Player* newplayer)
 
     unit->Player=newplayer;
     
-    if ( unit->Removed&&unit->Next ) {
-        MapUnmarkSight(oldplayer,unit->Next->X+unit->Next->Type->TileWidth/2
-            ,unit->Next->Y+unit->Next->Type->TileHeight/2
+    if ( unit->Removed && unit->Container ) {
+        MapUnmarkSight(oldplayer,unit->Container->X+unit->Container->Type->TileWidth/2
+            ,unit->Container->Y+unit->Container->Type->TileHeight/2
 	    ,unit->CurrentSightRange);
-        MapMarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
-	    ,unit->Next->Y+unit->Next->Type->TileHeight/2
+        MapMarkSight(unit->Player,unit->Container->X+unit->Container->Type->TileWidth/2
+	    ,unit->Container->Y+unit->Container->Type->TileHeight/2
             ,unit->CurrentSightRange);
     } else {
         MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
@@ -1854,7 +1901,6 @@ local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
         }
 	ChangeUnitOwner(unit,newplayer);
 	unit->Blink=5;
-	unit->Rescued=1;
 	unit->RescuedFrom=oldplayer;
     }
 }
@@ -1932,15 +1978,14 @@ global void RescueUnits(void)
         		//
 			//	City center converts complete race
 			//	NOTE: I use a trick here, centers could
-			//		store gold.
-			if( unit->Type->StoresGold ) {
+			//		store gold. FIXME!!!
+			if( unit->Type->Stores[GoldCost] ) {
 			    ChangePlayerOwner(p,around[i]->Player);
                             break;
 			}
                         unit->RescuedFrom=unit->Player;
 			ChangeUnitOwner(unit,around[i]->Player);
 			unit->Blink=5;
-		        unit->Rescued=1;
 			PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound
 				,MaxSampleVolume);
 			break;
@@ -2070,15 +2115,15 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     //DebugCheck( !unit->Removed );
 
     // FIXME: better and quicker solution, to find the building.
-    x=y=-1;
-    if( unit->Next ) {
-	x=unit->Next->X;
-	y=unit->Next->Y;
+    if( unit->Container ) {
+	x=unit->Container->X;
+	y=unit->Container->Y;
     } else {
 	x=unit->X;
 	y=unit->Y;
-	DebugLevel0Fn("No building?\n");
+	// n0b0dy: yes, when training an unit.
     }
+
 
     mask=UnitMovementMask(unit);
 
@@ -2182,11 +2227,10 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 
     // FIXME: better and quicker solution, to find the building.
     x=y=-1;
-    if( unit->Next ) {
-	x=unit->Next->X;
-	y=unit->Next->Y;
+    if( unit->Container ) {
+	x=unit->Container->X;
+	y=unit->Container->Y;
     } else {
-	DebugLevel0Fn("No building?\n");
 	x=unit->X;
 	y=unit->Y;
     }
@@ -2263,26 +2307,17 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 */
 global void DropOutAll(const Unit* source)
 {
-    // FIXME: Rewrite this use source->Next;
-    // FIXME: above is wrong, NEW_FOW use Next in another way.
-    // FIXME: (mr-russ) can't use source->Next, it's on map, and Next
-    // 		points to next unit on tile.
-    Unit** table;
     Unit* unit;
     int i;
 
-    i=0;
-    for( table=Units; table<Units+NumUnits; table++ ) {
-	unit=*table;
-	if( unit->Removed && unit->Next==source ) {
-	    ++i;
-	    DropOutOnSide(unit,LookingW
+    unit=source->UnitInside;
+    for( i=source->InsideCount; i; --i,unit=unit->NextContained ) {
+	DropOutOnSide(unit,LookingW
 		,source->Type->TileWidth,source->Type->TileHeight);
-	    DebugCheck( unit->Orders[0].Goal );
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->Wait=unit->Reset=1;
-	    unit->SubAction=0;
-	}
+	DebugCheck( unit->Orders[0].Goal );
+	unit->Orders[0].Action=UnitActionStill;
+	unit->Wait=unit->Reset=1;
+	unit->SubAction=0;
     }
     DebugLevel0Fn("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
 }
@@ -2343,7 +2378,7 @@ global int CanBuildHere(const UnitType* type,int x,int y)
 	}
     }
 
-    if( type->StoresGold ) {
+    if( type->Stores[GoldCost] ) {
 	//
 	//	Gold deposit can't be build too near to gold-mine.
 	//
@@ -2392,7 +2427,7 @@ global int CanBuildHere(const UnitType* type,int x,int y)
     }
 
 next:
-    if( type->StoresOil ) {
+    if( type->Stores[OilCost] ) {
 	//
 	//	Oil deposit can't be build too near to oil-patch or platform.
 	//
@@ -2630,7 +2665,7 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
     //
     //	Find the nearest gold depot
     //
-    if( (destu=FindGoldDeposit(unit,x,y)) ) {
+    if( (destu=FindDeposit(unit->Player,x,y,GoldCost)) ) {
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;
@@ -2763,100 +2798,6 @@ global Unit* FindGoldMine(const Unit* unit,int x,int y)
 
     free(points);
     return NoUnitP;
-}
-
-/**
-**	Find gold deposit (where we can deliver gold).
-**
-**	@param source	Pointer for source unit.
-**	@param x	X tile position to start.
-**	@param y	Y tile position to start.
-**
-**	@return		Pointer to the nearest gold depot.
-*/
-global Unit* FindGoldDeposit(const Unit* source,int x,int y)
-{
-    Unit** table;
-    Unit* unit;
-    Unit* best;
-    int best_d;
-    int d;
-    const Player* player;
-
-    //	FIXME:	this is not the best one
-    //		We need the deposit with the shortest way!
-    //		At least it must be reachable!
-    //		Should use the same pathfinder flood fill, like the attacking
-    //		code.
-    player=source->Player;
-
-    best=NoUnitP;
-    best_d=99999;
-    for( table=player->Units; table<player->Units+player->TotalNumUnits;
-		table++ ) {
-	unit=*table;
-	// Want gold deposit and not dieing.
-	if( !unit->Type->StoresGold || UnitUnusable(unit) ) {
-	    continue;
-	}
-	d=MapDistanceToUnit(x,y,unit);
-	// FIXME: UnitReachable didn't work with unit inside
-	if( d<best_d /* && (d=UnitReachable(source,unit,1)) && d<best_d */ ) {
-	    best_d=d;
-	    best=unit;
-	}
-    }
-    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
-                               best?best->X:-1 _C_ best?best->Y:-1);
-    return best;
-}
-
-/**
-**	Find wood deposit.
-**
-**	@param player	A deposit owning this player
-**	@param x	X tile position to start.
-**	@param y	Y tile position to start.
-**
-**	@return		Pointer to the nearest wood depot.
-*/
-global Unit* FindWoodDeposit(const Player* player,int x,int y)
-{
-    Unit* unit;
-    Unit* best;
-    Unit** units;
-    int nunits;
-    int best_d;
-    int d,i;
-
-    //	FIXME:	this is not the best one
-    //		We need the deposit with the shortest way!
-    //		At least it must be reachable!
-    //	FIXME:	Could we use unit-cache to find it faster?
-    //
-
-    best=NoUnitP;
-    best_d=99999;
-    nunits=player->TotalNumUnits;
-    units=player->Units;
-    for( i=0; i<nunits; i++ ) {
-	unit=units[i];
-	if( UnitUnusable(unit) ) {
-	    continue;
-	}
-	// Want wood-deposit
-	if( unit->Type->StoresWood || unit->Type->StoresGold ) {
-	    d=MapDistanceToUnit(x,y,unit);
-	    if( d<best_d ) {
-		best_d=d;
-		best=unit;
-	    }
-	}
-    }
-
-    DebugLevel3Fn("%d %d,%d\n" _C_ best?UnitNumber(best):-1 _C_
-                               best?best->X:-1 _C_ best?best->Y:-1);
-    return best;
 }
 
 #if 0
@@ -3017,7 +2958,7 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     //
     //	Find the nearest wood depot
     //
-    if( (destu=FindWoodDeposit(unit->Player,x,y)) ) {
+    if( (destu=FindDeposit(unit->Player,x,y,WoodCost)) ) {
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;
@@ -3210,15 +3151,16 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 }
 
 /**
-**	Find oil deposit.
+**	Find deposit. This will find a deposit for a resource 
 **
-**	@param source	A deposit for this unit.
+**	@param player   The player the deposit must belong to.
 **	@param x	Nearest to X position.
 **	@param y	Nearest to Y position.
+**	@param resource The resource oyu need the deposit to hold.
 **
 **	@return		NoUnitP or oil deposit unit
 */
-global Unit* FindOilDeposit(const Unit* source,int x,int y)
+global Unit* FindDeposit(const Player* player,int x,int y,int resource)
 {
     Unit* unit;
     Unit* best;
@@ -3226,14 +3168,12 @@ global Unit* FindOilDeposit(const Unit* source,int x,int y)
     int nunits;
     int best_d;
     int d,i;
-    const Player* player;
 
     //	FIXME:	this is not the best one
     //		We need the deposit with the shortest way!
     //		At least it must be reachable!
     //	FIXME:	Could we use unit-cache to find it faster?
     //
-    player=source->Player;
 
     best=NoUnitP;
     best_d=INT_MAX;
@@ -3244,8 +3184,7 @@ global Unit* FindOilDeposit(const Unit* source,int x,int y)
 	if( UnitUnusable(unit) ) {
 	    continue;
 	}
-	// Want oil-deposit
-	if( unit->Type->StoresOil ) {
+	if( unit->Type->Stores[resource] ) {
 	    d=MapDistanceToUnit(x,y,unit);
 	    if( d<best_d
 		    // FIXME: UnitReachable didn't work with unit inside
@@ -3451,20 +3390,15 @@ global void LetUnitDie(Unit* unit)
 	//
 	//	Building with units inside?
 	//
-	if( type->GoldMine
-		|| type->StoresGold || type->StoresWood
-		|| type->GivesOil || type->StoresOil
-		|| unit->Orders[0].Action==UnitActionBuilded ) {
-	    //
-	    //	During oil platform build, the worker holds the oil value,
-	    //	but if canceling building the platform, the worker is already
-	    //	outside.
-	    if( type->GivesOil
-			&& unit->Orders[0].Action==UnitActionBuilded
-			&& unit->Data.Builded.Worker ) {
-		// Restore value for oil-patch
-		unit->Value=unit->Data.Builded.Worker->Value;
-	    }
+	//
+	//	During oil platform build, the worker holds the oil value,
+	//	but if canceling building the platform, the worker is already
+	//	outside.
+	if( type->GivesOil
+		    && unit->Orders[0].Action==UnitActionBuilded
+		    && unit->Data.Builded.Worker ) {
+	    // Restore value for oil-patch
+	    unit->Value=unit->Data.Builded.Worker->Value;
 	}
 	DestroyAllInside(unit);
 
@@ -3556,56 +3490,17 @@ global void LetUnitDie(Unit* unit)
 global void DestroyAllInside(Unit* source)
 {
     Unit* unit;
-    Unit* table[UnitMax];
     int i;
-    int j;
 
-    //
-    // Destroy all units in Transporters
-    //
-    if( source->Type->Transporter ) {
-        for( i=0; i<MAX_UNITS_ONBOARD; i++) {
-	    // FIXME: check if valid pointer
-	    if( (unit=source->OnBoard[i]) ) {
-		// FIXME: no corpse!
-	        // LetUnitDie(unit);
-		RemoveUnit(unit,NULL);
-		UnitLost(unit);
-    		UnitClearOrders(unit);
-		ReleaseUnit(unit);
-	    }
-	}
-	return;
-    }
-
-    //
-    // Destroy the peon in building under construction...
-    //
-    if( source->Orders[0].Action==UnitActionBuilded
-	    && source->Data.Builded.Worker ) {
-	LetUnitDie(source->Data.Builded.Worker);
-	return;
-    }
-
-    // FIXME: should use a better methode, linking all units in a building
-    // FIXME: f.e. with the next pointer.
-    //
-    // Destroy all units in buildings or Resources (mines...)
-    //
-    j = 0;
-    for( i=0; i<NumUnits; i++ ) {
-	unit=Units[i];
-	if( unit->Removed && unit->Next==source ) {
-	    table[j++] = unit;
-	}
-    }
-    for( i=0; i<j; i++ ) {
-	unit=table[i];
-	RemoveUnit(unit,NULL);
-	UnitLost(unit);
-    	UnitClearOrders(unit);
+    // FIXME: n0b0dy: No corpses, is that corrent behaviour?
+    unit=source->UnitInside;
+    for( i=source->InsideCount; i; --i,unit=unit->NextContained ) {
+    	RemoveUnit(unit,NULL);
+    	UnitLost(unit);
+	UnitClearOrders(unit);
 	ReleaseUnit(unit);
     }
+    
 }
 
 
@@ -4198,6 +4093,7 @@ local void SaveOrder(const Order* order,FILE* file)
 global void SaveUnit(const Unit* unit,FILE* file)
 {
     char* ref;
+    Unit* uins;
     int i;
 
     fprintf(file,"\n(unit %d ",UnitNumber(unit));
@@ -4214,7 +4110,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file,"'name \"%s\" ",unit->Name);
     }
 
-    if( unit->Next && unit->Removed ) {
+    if( unit->Next ) {
 	fprintf(file,"'next '%d ",UnitNumber(unit->Next));
     }
 
@@ -4263,14 +4159,14 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Selected ) {
 	fprintf(file," 'selected");
     }
-    if( unit->Rescued ) {
-	fprintf(file," 'rescued");
+    if( unit->RescuedFrom ) {
 	fprintf(file," 'rescued-from %d",unit->RescuedFrom->Player);
     }
-    if( unit->Next && unit->Removed ) {
+    // n0b0dy: How is this usefull?
+    if( unit->Container && unit->Removed ) {
 	fprintf(file," 'host-tile '(%d %d) ",
-		unit->Next->X+unit->Next->Type->TileWidth/2,
-		unit->Next->Y+unit->Next->Type->TileHeight/2);
+		unit->Container->X+unit->Container->Type->TileWidth/2,
+		unit->Container->Y+unit->Container->Type->TileHeight/2);
     }
     fprintf(file," 'visible \"");
     for( i=0; i<PlayerMax; ++i ) {
@@ -4319,15 +4215,12 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Revealer ) {
 	fprintf(file," 'revealer");
     }
-    fprintf(file,"\n  'on-board #(");
-    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
-	if( unit->OnBoard[i] ) {
-	    fprintf(file,"%s",ref=UnitReference(unit->OnBoard[i]));
-	    free(ref);
-	} else {
-	    fprintf(file,"()");
-	}
-	if( i<MAX_UNITS_ONBOARD-1 ) {
+    fprintf(file," 'units-contained-count %d",unit->InsideCount);
+    fprintf(file,"\n  'units-contained #(");
+    uins=unit->UnitInside;
+    for( i=unit->InsideCount; i; --i,uins=uins->NextContained ) {
+	fprintf(file,"%s",ref=UnitReference(uins));
+	if( i>1 ) {
 	    fputc(' ',file);
 	}
     }
