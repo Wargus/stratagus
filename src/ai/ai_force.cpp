@@ -323,6 +323,7 @@ global void AiAttackWithForce(int force)
 
 	if (!enemy) {
 	    DebugLevel0Fn("Need to plan an attack with transporter\n");
+	    AiPlanAttack(&AiPlayer->Force[force]);
 	    return;
 	}
 	x = enemy->X;

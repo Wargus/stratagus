@@ -858,11 +858,16 @@ local SCM CclAiDump(void)
     int i;
     int n;
     const AiUnitType* aut;
+    const AiBuildQueue* queue;
 
     //
     //	Script
     //
-    printf("-----\n");
+    printf("------\n");
+    for( i=0; i<MaxCosts; ++i ) {
+	printf("%s(%4d) ",DEFAULT_NAMES[i],AiPlayer->Player->Resources[i]);
+    }
+    printf("\n");
     printf("%d:",AiPlayer->Player->Player);
     gh_display(gh_car(AiPlayer->Script));
     gh_newline();
@@ -890,9 +895,18 @@ local SCM CclAiDump(void)
     printf("\n");
 
     //
+    //	Building queue
+    //
+    printf("Building queue:\n");
+    for( queue=AiPlayer->UnitTypeBuilded; queue; queue=queue->Next ) {
+	printf("%s(%d/%d) ",queue->Type->Ident,queue->Made,queue->Want);
+    }
+    printf("\n");
+
+    //
     //	PrintForce
     //
-    for( i=0; i<AI_MAX_FORCES; ++i) { 
+    for( i=0; i<AI_MAX_FORCES; ++i) {
 	printf("Force(%d%s%s%s):\n",i,
 		AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
 		AiPlayer->Force[i].Attacking ? ",attack" : "",

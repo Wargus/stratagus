@@ -181,6 +181,13 @@ struct _ai_force_ {
     int			Attacking;	/// Flag saying force is attacking
     AiUnitType*		UnitTypes;	/// Count and types of unit-type
     AiUnit*		Units;		/// Units in the force
+	//
+	// If attacking
+	//
+    int			State;		/// Attack state
+    int			GoalX;		/// Attack point X tile map position
+    int			GoalY;		/// Attack point Y tile map position
+    int			MustTransport;	/// Flag must use transporter
 };
 
 /**
@@ -356,6 +363,12 @@ extern void AiAttackWithForceAt(int force,int x,int y);
 extern void AiAttackWithForce(int force);
     /// Periodic called force manager handler
 extern void AiForceManager(void);
+
+//
+//	Plans
+//
+    /// Plan the an attack
+extern void AiPlanAttack(AiForce* force);
 
 //@}
 
