@@ -487,15 +487,15 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
-	if( unit->Host ) {
+	if( unit->Host && !unit->Host->Data.Builded.Cancel ) {
 	    MapUnmarkSight(unit->Player,unit->Host->X+unit->Host->Type->TileWidth/2
 				,unit->Host->Y+unit->Host->Type->TileHeight/2
 				,unit->CurrentSightRange);
 
+	    unit->Host = NULL;
 	}
 	unit->CurrentSightRange=unit->Type->Stats->SightRange;
 	MapMarkSight(unit->Player,x,y,unit->CurrentSightRange);
-	unit->Host = NULL;
 #else
 	if( unit->Player==ThisPlayer || 
 	    (ThisPlayer && IsSharedVision(ThisPlayer,unit)) ) {
@@ -3157,7 +3157,11 @@ global void LetUnitDie(Unit* unit)
     unit->Wait=1;
     unit->Orders[0].Action=UnitActionDie;
 #ifdef NEW_FOW
-    unit->CurrentSightRange=unit->Type->CorpseType->Stats->SightRange;
+    if( unit->Type->CorpseType ) {
+	unit->CurrentSightRange=unit->Type->CorpseType->Stats->SightRange;
+    } else {
+	unit->CurrentSightRange=1;
+    }
     MapMarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
 #endif
 }
