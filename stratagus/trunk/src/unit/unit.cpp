@@ -753,10 +753,8 @@ global int UnitVisible(const Unit* unit)
 	m=1<<ThisPlayer->Player;
 	while( h-- ) {
 	    for( i=w; i--; ) {
-		// FIXME: the NoFogOfWar could be removed here, if visible is
-		// FIXME: correct set.
-		if( (mf->Explored&m) && (TheMap.NoFogOfWar
-			|| unit->Type->Building || (mf->Visible&m)) ) {
+		if( (mf->Explored&m) && (unit->Type->Building
+			    || (mf->Visible&m)) ) {
 		    return 1;
 		}
 		mf++;
@@ -796,8 +794,7 @@ global int UnitVisible(const Unit* unit)
     //	FIXME: isn't it enough to see a field of the building?
     //
     if( !(TheMap.Fields[y*TheMap.Width+x].Flags&MapFieldExplored)
-	    || (!TheMap.NoFogOfWar
-		&& !unit->Type->Building
+	    || (!unit->Type->Building
 		&& !(TheMap.Fields[y*TheMap.Width+x].Flags&MapFieldVisible)) ) {
 	return 0;
     }
@@ -1358,7 +1355,7 @@ found:
     //
     //	Update fog of war, if unit belongs to player on this computer
     //
-    if( player==ThisPlayer ) {
+    if( unit->Player==ThisPlayer ) {
 	MapMarkSight(x,y,unit->Stats->SightRange);
     }
 #endif
@@ -1465,7 +1462,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    //
 	    //	Update fog of war, if unit belongs to player on this computer
 	    //
-	    if( player==ThisPlayer ) {
+	    if( unit->Player==ThisPlayer ) {
 		MapMarkSight(bestx,besty,unit->Stats->SightRange);
 	    }
 #endif
