@@ -1733,13 +1733,21 @@ global void DrawMapFogOfWar(int v, int x,int y)
 		    if( TheMap.Fields[sx].Visible[p] ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
 		    } else {
+#ifdef USE_OPENGL
+			MapDrawTile(UNEXPLORED_TILE,dx,dy);
+#else
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
+#endif
 		    }
 #else
 		    if( TheMap.Fields[sx].Flags&MapFieldExplored ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
 		    } else {
+#ifdef USE_OPENGL
+			MapDrawTile(UNEXPLORED_TILE,dx,dy);
+#else
 			VideoDrawTile(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
+#endif
 		    }
 #endif
 #endif

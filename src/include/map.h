@@ -347,12 +347,12 @@ extern unsigned MapHeight;
 extern char MustRedrawRow[MAXMAP_W];		/// Flags must redraw map row
 extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
 
-    ///  Fast draw tile, display and video mode independ
+    /// Fast draw tile, display and video mode independ
 extern void (*VideoDrawTile)(const unsigned char*,int,int);
+    /// Draws tiles display and video mode independ
+extern void (*MapDrawTile)(int,int,int);
 
 #ifdef NEW_DECODRAW
-    /// FIXME: docu
-extern void (*MapDrawTile)(int,int,int);
     /// FIXME: docu
 extern void InitMapDecoration(void);
 #endif

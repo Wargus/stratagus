@@ -147,7 +147,6 @@ global void LoadTileset(void)
 	ExitFatal(-1);
     }
 
-#ifndef USE_OPENGL
     //
     //  Precalculate the graphic starts of the tiles
     //
@@ -179,6 +178,7 @@ global void LoadTileset(void)
 	}
     }
 
+#ifndef USE_OPENGL
     free(TheMap.TileData->Frames);	// release old memory
     TheMap.TileData->Frames = data;
     TheMap.TileData->Width = TileSizeX;

@@ -425,7 +425,11 @@ local void DrawTileIcons(void)
     while (y < TheUI.ButtonPanelY + 100) {
 	x = TheUI.ButtonPanelX + 4;
 	while (x < TheUI.ButtonPanelX + 144) {
+#ifdef USE_OPENGL
+	    MapDrawTile(TheMap.Tileset->Table[0x10 + i * 16], x, y);
+#else
 	    VideoDrawTile(tiles[TheMap.Tileset->Table[0x10 + i * 16]], x, y);
+#endif
 	    VideoDrawRectangle(ColorGray, x, y, 32, 32);
 	    if (TileCursor == i) {
 		VideoDrawRectangle(ColorGreen, x + 1, y + 1, 30, 30);
@@ -694,7 +698,11 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 
     x+=4;
     y+=4;
+#ifdef USE_OPENGL
+    MapDrawTile(TheMap.Tileset->Table[tilenum], x, y);
+#else
     VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[tilenum]], x, y);
+#endif
 
     if( flags&IconSelected ) {
 	VideoDrawRectangleClip(ColorGreen,x,y,TILE_WIDTH,TILE_HEIGHT);
@@ -783,8 +791,12 @@ local void DrawMapCursor(void)
 		    if (tx >= TheUI.VP[v].EndX) {
 			break;
 		    }
+#ifdef USE_OPENGL
+		    MapDrawTile(TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
+#else
 		    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 +
 				TileCursor * 16]], tx, ty);
+#endif
 		}
 	    }
 	    SetClipping (TheUI.VP[v].X, TheUI.VP[v].Y,
