@@ -1083,10 +1083,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	);
 	++SlowFrameCounter;
     }
+#else
+    ticks = SVGAGetTicks();
 #endif
 
-    InputMouseTimeout(callbacks,SVGAGetTicks());
-    InputKeyTimeout(callbacks,SVGAGetTicks());
+    InputMouseTimeout(callbacks, ticks);
+    InputKeyTimeout(callbacks, ticks);
     CursorAnimate(ticks);
 
     for(;;) {
