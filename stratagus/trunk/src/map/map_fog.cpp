@@ -1396,11 +1396,14 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
     VMemType32* dp;
     int da;
     int i, r, g, b, v ;
+    VMemType32 lasti;
+    VMemType32 lastrgb;
 
     sp=data;
     gp=sp+TileSizeY*TileSizeX;
     dp=VideoMemory32+x+y*VideoWidth;
     da=VideoWidth;
+    lasti=0;
 
     while( sp<gp ) {
 #undef FOG_SCALE
@@ -1414,19 +1417,26 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
 	if (COLOR_FOG_P(sp[x])) { \
 	    i = dp[x]; \
 	    if (i) { \
-		r=i       & 0xff; \
-		g=(i>>8 ) & 0xff; \
-		b=(i>>16) & 0xff; \
-		v=r+g+b; \
+		if (i == lasti) { \
+		    dp[x] = lastrgb; \
+		} \
+		else { \
+		    lasti = i; \
+		    r=i       & 0xff; \
+		    g=(i>>8 ) & 0xff; \
+		    b=(i>>16) & 0xff; \
+		    v=r+g+b; \
  \
-		r = FOG_SCALE(r); \
-		g = FOG_SCALE(g); \
-		b = FOG_SCALE(b); \
+		    r = FOG_SCALE(r); \
+		    g = FOG_SCALE(g); \
+		    b = FOG_SCALE(b); \
  \
-		r= r<0 ? 0 : r>255 ? 255 : r; \
-		g= g<0 ? 0 : g>255 ? 255 : g; \
-		b= b<0 ? 0 : b>255 ? 255 : b; \
-		dp[x]= (r | (g << 8) | (b << 16)); \
+		    r= r<0 ? 0 : r>255 ? 255 : r; \
+		    g= g<0 ? 0 : g>255 ? 255 : g; \
+		    b= b<0 ? 0 : b>255 ? 255 : b; \
+		    dp[x]= (r | (g << 8) | (b << 16)); \
+		    lastrgb = dp[x]; \
+		} \
 	    } \
 	} \
 
@@ -1457,10 +1467,13 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
     VMemType32* dp;
     int da;
     int i, r, g, b, v;
+    VMemType32 lasti;
+    VMemType32 lastrgb;
 
     dp=VideoMemory32+x+y*VideoWidth;
     gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
+    lasti = 0;
 
     while( dp<gp ) {
 
@@ -1474,19 +1487,26 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unu
 #define UNROLL1(x)	\
 	i = dp[x]; \
 	if (i) { \
-	    r=i       & 0xff; \
-	    g=(i>>8 ) & 0xff; \
-	    b=(i>>16) & 0xff; \
-	    v=r+g+b; \
+	    if (i == lasti) { \
+		dp[x] = lastrgb; \
+	    } \
+	    else { \
+		lasti = i; \
+		r=i       & 0xff; \
+		g=(i>>8 ) & 0xff; \
+		b=(i>>16) & 0xff; \
+		v=r+g+b; \
  \
-	    r = FOG_SCALE(r); \
-	    g = FOG_SCALE(g); \
-	    b = FOG_SCALE(b); \
+		r = FOG_SCALE(r); \
+		g = FOG_SCALE(g); \
+		b = FOG_SCALE(b); \
  \
-	    r= r<0 ? 0 : r>255 ? 255 : r; \
-	    g= g<0 ? 0 : g>255 ? 255 : g; \
-	    b= b<0 ? 0 : b>255 ? 255 : b; \
-	    dp[x]= r | (g << 8) | (b << 16); \
+		r= r<0 ? 0 : r>255 ? 255 : r; \
+		g= g<0 ? 0 : g>255 ? 255 : g; \
+		b= b<0 ? 0 : b>255 ? 255 : b; \
+		dp[x]= r | (g << 8) | (b << 16); \
+		lastrgb = dp[x]; \
+	    } \
 	} \
 
 #undef UNROLL2
