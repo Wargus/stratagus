@@ -591,6 +591,7 @@ typedef struct __animations__ {
     Animation*	Move;			/// Unit moving
     Animation*	Attack;			/// Unit attacking/working
     Animation*	Repair;			/// Unit repairing
+    Animation*	Harvest[MaxCosts];	/// Unit harvesting
     Animation*	Die;			/// Unit dieing
     Animation**	Extend;			/// For future extensions
 } Animations;

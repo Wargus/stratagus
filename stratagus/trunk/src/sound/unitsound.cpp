@@ -257,6 +257,7 @@ global void MapUnitSounds(void)
 {
     UnitType* type;
     int i;
+    int j;
 
     if (SoundFildes != -1) {
 	SetSoundRange(SoundIdForName("tree chopping"), 32);
@@ -289,6 +290,12 @@ global void MapUnitSounds(void)
 	    if (type->Sound.Repair.Name) {
 		type->Sound.Repair.Sound =
 		    SoundIdForName(type->Sound.Repair.Name);
+	    }
+	    for (j = 0; j < MaxCosts; ++j) {
+		if (type->Sound.Harvest[j].Name) {
+		    type->Sound.Harvest[j].Sound =
+			SoundIdForName(type->Sound.Harvest[j].Name);
+		}
 	    }
 	    // FIXME: will be modified, attack sound be moved to missile/weapon
 	    if (type->Weapon.Attack.Name) {
