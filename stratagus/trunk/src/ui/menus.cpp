@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #ifndef _MSC_VER
 #include <unistd.h>
 #else
@@ -125,10 +126,11 @@ local void MultiPlayerGameMenu(void);
 local void CampaignGameMenu(void);
 local void ScenSelectMenu(void);
 
-local void AllianceCampaignMenu(void);
-local void MysticalCampaignMenu(void);
-local void Alliance2CampaignMenu(void);
-local void Mystical2CampaignMenu(void);
+local void CampaignMenu1(void);
+local void CampaignMenu2(void);
+local void CampaignMenu3(void);
+local void CampaignMenu4(void);
+local void SelectCampaignMenu(void);
 
 local void ScenSelectLBExit(Menuitem *mi);
 local void ScenSelectLBInit(Menuitem *mi);
@@ -394,6 +396,7 @@ local Menuitem EndScenarioMenuItems[] = {
 local unsigned char *ssmtoptions[] = {
     "Freecraft scenario (cm)",
     "Foreign scenario (pud)"
+    // FIXME: what is about levels in zips?
 };
 
 local unsigned char *ssmsoptions[] = {
@@ -402,6 +405,7 @@ local unsigned char *ssmsoptions[] = {
     "64 x 64",
     "96 x 96",
     "128 x 128",
+    // FIXME: We support bigger sizes
 };
 
 local char ScenSelectDisplayPath[1024];
@@ -488,6 +492,7 @@ local unsigned char *rcsoptions[] = {
     "Human",
     "Orc",
     "Map Default",
+    // FIXME: we support more and other race names
 };
 
 local unsigned char *resoptions[] = {
@@ -500,6 +505,7 @@ local unsigned char *resoptions[] = {
 local unsigned char *unsoptions[] = {
     "Map Default",
     "One Peasant Only",
+    // FIXME: we support more and other unit names
 };
 
 // FIXME: Must load this from some place.
@@ -509,7 +515,7 @@ local unsigned char *tssoptions[] = {
     "Winter",
     "Wasteland",
     "Orc Swamp",	// hmm. need flag if XPN-GFX is present! - tmp-hack in InitMenus()..
-			// Some time later _all_ tilesets should be a dynamic (ccl-defineable) resource..
+			// FIXME: Some time later _all_ tilesets should be a dynamic (ccl-defineable) resource..
 };
 
 local unsigned char *cgopsoptions[] = {
@@ -521,6 +527,7 @@ local unsigned char *cgopsoptions[] = {
     "5 Opponents",
     "6 Opponents",
     "7 Opponents",
+    // FIXME: We support upto 15 opponents
 };
 
 local unsigned char *mgfwsoptions[] = {
@@ -817,15 +824,16 @@ local Menuitem ConnectingMenuItems[] = {
 local Menuitem CampaignSelectMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Alliance Campaign", 224, 27, MBUTTON_GM_FULL, AllianceCampaignMenu, 'a'} } },
+	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu1, 'a'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Mystical Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 'm'} } },
+	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu2, 'm'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL,
-	{ button:{ "A~!lliance Second Campaign", 224, 27, MBUTTON_GM_FULL, Alliance2CampaignMenu, 'l'} } },
+	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu3, 'l'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL,
-	{ button:{ "M~!ystical Second Campaign", 224, 27, MBUTTON_GM_FULL, Mystical2CampaignMenu, 'y'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "~!Select Campaign", 224, 27, MBUTTON_GM_FULL, MysticalCampaignMenu, 's'} } },
+	{ button:{ NULL, 224, 27, MBUTTON_GM_FULL, CampaignMenu4, 'y'} } },
+    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, MenuButtonDisabled, LargeFont, NULL,
+	NULL, { button:{ "~!Select Campaign", 224, 27, MBUTTON_GM_FULL,
+		SelectCampaignMenu, 's'} } },
     { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
 #else
@@ -1831,13 +1839,15 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
 
+#ifdef WITH_SOUND
     if( SoundFildes==-1 ) {
 	VideoDrawText(16,16,LargeFont,"Sound disabled, please check!");
     }
+#endif
 
     VideoDrawTextCentered(VideoWidth/2, OffsetY + 440, GameFont, NameLine);
     VideoDrawTextCentered(VideoWidth/2, OffsetY + 456, GameFont,
-	"Distributed under the terms of the GNU General Public License.");
+	"Engine distributed under the terms of the GNU General Public License.");
     SetDefaultTextColors(nc, rc);
 }
 
@@ -2441,26 +2451,72 @@ local void SinglePlayerGameMenu(void)
     }
 }
 
+/**
+**	Show the campaign select menu.
+**
+**	Look which campaigns are available and how they are called.
+*/
 local void CampaignGameMenu(void)
 {
+    int i;
+
     VideoLockScreen();
     StartMenusSetBackground(NULL);
     VideoUnlockScreen();
     Invalidate();
+
+    DebugLevel0Fn("%d campaigns available\n",NumCampaigns);
+    IfDebug(
+	for( i=0; i<NumCampaigns; ++i ) {
+	    DebugLevel0Fn("Campaign %d: %16.16s: %s\n",i,
+		Campaigns[i].Ident,
+		Campaigns[i].Name);
+	}
+    );
+
+    //
+    //	Setup campaign name.
+    //
+    for( i=0; i<NumCampaigns && i<4; ++i ) {
+	char* s;
+
+	CampaignSelectMenuItems[i].d.button.text=Campaigns[i].Name;
+	CampaignSelectMenuItems[i].flags&=~MenuButtonDisabled;
+
+	if( (s=strchr(Campaigns[i].Name,'!')) ) {
+	    CampaignSelectMenuItems[i].d.button.hotkey=tolower(s[1]);
+	}
+    }
+    for( ; i<4; ++i ) {
+	CampaignSelectMenuItems[i].d.button.text="Not available";
+	CampaignSelectMenuItems[i].flags|=MenuButtonDisabled;
+    }
 
     GuiGameStarted = 0;
     ProcessMenu(MENU_CAMPAIGN_SELECT, 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
+
+    for( i=0; i<4; ++i ) {
+	CampaignSelectMenuItems[i].d.button.text=NULL;
+    }
 }
 
-local void AllianceCampaignMenu(void)
+/**
+**	Start campaign from menu.
+**
+**	@param number	Number of the compaign.
+*/
+local void StartCampaignFromMenu(int number)
 {
     VideoLockScreen();
     StartMenusSetBackground(NULL);
     VideoUnlockScreen();
     Invalidate();
+
+#if 0
+    // JOHNS: this is currently not needed:
 
     // Any Campaign info should be displayed through a DrawFunc() Item
     // int the CAMPAIN_CONT menu processed below...
@@ -2468,8 +2524,9 @@ local void AllianceCampaignMenu(void)
     // Set GuiGameStarted = 1 to acctually run a game here...
     // But select and load the map first...
     // See CustomGameStart() for info...
+#endif
 
-    PlayCampaign("human");
+    PlayCampaign(Campaigns[number].Ident);
     GuiGameStarted = 1;
 
     VideoLockScreen();
@@ -2482,93 +2539,66 @@ local void AllianceCampaignMenu(void)
     EndMenu();
 }
 
-local void MysticalCampaignMenu(void)
+/**
+**	Call back for 1st entry of campaign menu.
+**
+**	@note FIXME: Isn't it possible to have an argument in the menu?
+*/
+local void CampaignMenu1(void)
 {
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoUnlockScreen();
-    Invalidate();
-
-    // Any Campaign info should be displayed through a DrawFunc() Item
-    // int the CAMPAIN_CONT menu processed below...
-    ProcessMenu(MENU_CAMPAIGN_CONT, 1);
-    // Set GuiGameStarted = 1 to acctually run a game here...
-    // But select and load the map first...
-    // See CustomGameStart() for info...
-
-    PlayCampaign("orc");
-    GuiGameStarted = 1;
-
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoClearScreen();
-    VideoUnlockScreen();
-    Invalidate();
-
-    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
-    EndMenu();
+    StartCampaignFromMenu(0);
 }
 
-local void Alliance2CampaignMenu(void)
+/**
+**	Call back for 2nd entry of campaign menu.
+**
+**	@note FIXME: Isn't it possible to have an argument in the menu?
+*/
+local void CampaignMenu2(void)
 {
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoUnlockScreen();
-    Invalidate();
-
-    // Any Campaign info should be displayed through a DrawFunc() Item
-    // int the CAMPAIN_CONT menu processed below...
-    ProcessMenu(MENU_CAMPAIGN_CONT, 1);
-    // Set GuiGameStarted = 1 to acctually run a game here...
-    // But select and load the map first...
-    // See CustomGameStart() for info...
-
-    PlayCampaign("human-exp");
-    GuiGameStarted = 1;
-
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoClearScreen();
-    VideoUnlockScreen();
-    Invalidate();
-
-    // FIXME: johns othewise crash in UpdateDisplay -> DrawMinimapCursor
-    EndMenu();
+    StartCampaignFromMenu(1);
 }
 
-local void Mystical2CampaignMenu(void)
+/**
+**	Call back for 3rd entry of campaign menu.
+**
+**	@note FIXME: Isn't it possible to have an argument in the menu?
+*/
+local void CampaignMenu3(void)
 {
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoUnlockScreen();
-    Invalidate();
-
-    // Any Campaign info should be displayed through a DrawFunc() Item
-    // int the CAMPAIN_CONT menu processed below...
-    ProcessMenu(MENU_CAMPAIGN_CONT, 1);
-    // Set GuiGameStarted = 1 to acctually run a game here...
-    // But select and load the map first...
-    // See CustomGameStart() for info...
-
-    PlayCampaign("orc-exp");
-    GuiGameStarted = 1;
-
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoClearScreen();
-    VideoUnlockScreen();
-    Invalidate();
-
-    // FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
-    EndMenu();
+    StartCampaignFromMenu(2);
 }
 
+/**
+**	Call back for 4th entry of campaign menu.
+**
+**	@note FIXME: Isn't it possible to have an argument in the menu?
+*/
+local void CampaignMenu4(void)
+{
+    StartCampaignFromMenu(3);
+}
+
+/**
+**	Call back for select entry of campaign menu.
+*/
+local void SelectCampaignMenu(void)
+{
+    // FIXME: not written
+}
+
+/**
+**	FIXME: docu.
+*/
 local void EnterNameCancel(void)
 {
     EnterNameMenuItems[1].d.input.nch = 0;
     EndMenu();
 }
 
+/**
+**	FIXME: docu.
+*/
 local void EnterNameAction(Menuitem *mi, int key)
 {
     if (mi->d.input.nch == 0) {
