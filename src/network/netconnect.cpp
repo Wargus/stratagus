@@ -579,6 +579,19 @@ breakout:
     }
 
     DebugLevel0Fn("DONE: All configs acked - Now starting..\n");
+
+    // Give clients a quick-start kick..
+    message.SubType = ICMGo;
+    for (i = 0; i < HostsCount; ++i) {
+	unsigned long host;
+	int port;
+
+	host = message.u.Hosts[i].Host;
+	port = message.u.Hosts[i].Port;
+	n = NetworkSendICMessage(host, port, &message);
+	DebugLevel0Fn("Sending InitReply Message Go: (%d) to %d.%d.%d.%d:%d\n" _C_
+		n _C_ NIPQUAD(ntohl(host)) _C_ ntohs(port));
+    }
 }
 
 /**
@@ -1104,6 +1117,25 @@ local void ClientParseGoAhead(const InitMessage* msg)
 }
 
 /**
+**	Parse a network menu packet in client final started state
+**
+**	@param msg	message received
+*/
+local void ClientParseStarted(const InitMessage* msg)
+{
+    switch(msg->SubType) {
+
+	case ICMGo:			// Server's final go ..
+	    NetConnectRunning = 0;	// End the menu..
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_started: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+    }
+}
+
+/**
 **	Parse a network menu AreYouThere keepalive packet and reply IAmHere.
 **
 **	@param msg	message received
@@ -1620,6 +1652,10 @@ IfDebug(
 		    ClientParseBadMap(msg);
 		    break;
 
+		case ccs_started:
+		    ClientParseStarted(msg);
+		    break;
+
 		default:
 		    DebugLevel0Fn("Client: Unhandled state %d\n" _C_ NetLocalState);
 		    break;
@@ -1634,8 +1670,7 @@ IfDebug(
 	    return;
 	}
 
-	// look up the host
-	// last Player slot (15) is special - avoid!
+	// look up the host - avoid last player slot (15) which is special
 	for (i = 0; i < PlayerMax-1; ++i) {
 	    if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort) {
 		switch(msg->SubType) {
@@ -1700,8 +1735,9 @@ global int NetworkParseSetupEvent(const char *buf, int size)
 
     if (msg->Type > MessageInitConfig || size != sizeof(*msg)) {
 	if (NetConnectRunning == 2 && NetLocalState == ccs_started) {
-	    // Client has acked ready to start and receives first real network packed.
-	    // This indicates game has been started by server, so do the same for client.
+	    // Client has acked ready to start and receives first real network packet.
+	    // This indicates that we missed the 'Go' in started state and the game
+	    // has been started by the server, so do the same for the client.
 	    NetConnectRunning = 0;	// End the menu..
 	}
 	DebugLevel3Fn("Wrong message\n");
