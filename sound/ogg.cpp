@@ -35,6 +35,7 @@
 #if defined(WITH_SOUND) && defined(USE_OGG)	// {
 
 #include <stdlib.h>
+#include <string.h>
 #ifdef BSD
 #include <inttypes.h>
 #else
