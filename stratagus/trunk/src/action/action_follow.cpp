@@ -139,6 +139,34 @@ global void HandleActionFollow(Unit* unit)
 	}
 	NewResetPath(unit);
     }
+
+    if( unit->Reset ) {
+	//
+	//	Attack any enemy in reaction range.
+	//		If don't set the goal, the unit can than choose a
+	//		better goal if moving nearer to enemy.
+	//
+	if( unit->Type->CanAttack && !unit->Type->Tower
+		&& goal->Orders[0].Action==UnitActionAttack ) {
+	    goal=AttackUnitsInReactRange(unit);
+	    if( goal ) {
+		Order order;
+
+		DebugLevel2Fn("Follow attack %d\n",UnitNumber(goal));
+		order=unit->Orders[0];
+		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
+		// Save current command to come back.
+		unit->SavedOrder=order;
+		if( unit->SavedOrder.Goal ) {
+		    RefsDebugCheck(!order.Goal->Refs || order.Goal->Destroyed);
+		    order.Goal->Refs++;
+		}
+		unit->Orders[0].Action=UnitActionStill;
+		unit->SubAction=0;
+		unit->Wait=1;
+	    }
+	}
+    }
 }
 
 //@}
