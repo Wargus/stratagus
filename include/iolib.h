@@ -10,7 +10,7 @@
 //
 /**@name iolib.h - The iolib functions header file. */
 //
-//      (c) Copyright 2000-2004 by Andreas Arens
+//      (c) Copyright 2000-2005 by Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -58,9 +58,9 @@
 **  FileList struct used by directory access routine
 */
 typedef struct _filelist_ {
-	char* name;   /// Name of the file
-	int   type;   /// Type of the file
-	void* xdata;  /// Extra data attached by high level
+	char* name;                /// Name of the file
+	int   type;                /// Type of the file
+	struct _map_info_* xdata;  /// Extra data attached by high level
 } FileList;
 
 
