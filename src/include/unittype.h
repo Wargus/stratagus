@@ -632,14 +632,14 @@ typedef struct _resource_info_ {
 /**
 **  User defined variable type.
 **
-**    It is used to define variables and use it after
+**  It is used to define variables and use it after
 **  to manage magic, energy, shield or other stuff.
 */
 typedef struct {
-    int Max;           ///< Maximum for the variable. (Assume min is 0.)
-    int Value;         ///< Current (or initial) value of the variable (or initial value).
-    char Increase;     ///< Number to increase(decrease) Value by second.
-    char Enable;       ///< True if the unit doesn't have this variable. (f.e shield)
+	int Max;           ///< Maximum for the variable. (Assume min is 0.)
+	int Value;         ///< Current (or initial) value of the variable (or initial value).
+	char Increase;     ///< Number to increase(decrease) Value by second.
+	char Enable;       ///< True if the unit doesn't have this variable. (f.e shield)
 } VariableType;
 
 struct _decovartype_;
@@ -675,7 +675,7 @@ typedef struct _decovartype_{
 	char HideAllied;            ///< if true, don't show for allied unit. (but show own units)
 	char ShowOpponent;          ///< if true, show for opponent unit.
 
-	DrawDecoFunc *f;            ///< fonction to draw the decorations.
+	DrawDecoFunc* f;            ///< function to draw the decorations.
 	union {
 		struct {
 			char IsVertical;            ///< if true, vertical bar, else horizontal.
