@@ -115,12 +115,12 @@ all-src: make-objdir $(OBJ)
 
 # UNIX-TARGET
 stratagus: $(OBJ) 
-	$(CCLD) -o stratagus $^ $(STRATAGUS_LIBS) -I. $(CFLAGS)
+	$(CCLD) -o stratagus $^ $(STRATAGUS_LIBS)
 
 # WIN32-TARGET
 stratagus.exe:	$(OBJ) \
 	    src/$(OBJDIR)/stratagusrc.$(OE)
-	$(CCLD) -o stratagus$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS) -I. $(CFLAGS)
+	$(CCLD) -o stratagus$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS)
 
 strip:
 	@if [ -f stratagus ]; then strip stratagus; fi
