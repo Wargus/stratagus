@@ -637,13 +637,14 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 **		Choose the best target, that can be attacked. It takes into
 **		account allied unit which could be hit by the missile
 **
-**	@param unit	Find in distance for this unit.
+**	@param u	Find in distance for this unit.
 **	@param range	Distance range to look.
 **
 **	@return		Unit to be attacked.
 **
 **	@note	This could be improved, for better performance / better trade.
 **      @note   Limited to attack range smaller than 16.
+**	@note	Will be moved to unit_ai.c soon.
 */
 local Unit* FindRangeAttack(const Unit* u, int range)
 {

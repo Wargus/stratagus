@@ -85,8 +85,8 @@ global void (*VideoDrawRawClip)( VMemType *pixels,
 /**
 **	Draw a RLE encoded graphic object unclipped into framebuffer.
 **
-**	@NOTE: This macro looks nice, but is absolutly no debugable.
-**	@TODO: Make this an inline function.
+**	@note	This macro looks nice, but is absolutly no debugable.
+**	@todo	Make this an inline function.
 **
 **	@param bpp	Bit depth of target framebuffer
 **	@param sprite	pointer to object
