@@ -44,6 +44,7 @@
 #include <direct.h>
 #include <io.h>
 #define F_OK 4
+#define PATH_MAX _MAX_PATH
 #endif
 #endif
 
