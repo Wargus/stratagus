@@ -559,6 +559,7 @@ case $ANSWER in
 	case $ANSWER in 
 	    [yY])
 		echo "FLAC		= -DUSE_FLAC" >> $RULESFILE
+		echo "FLACLIB		= -lFLAC" >> $RULESFILE
 		;;
 	    *)
 		;;
@@ -570,17 +571,19 @@ case $ANSWER in
 	case $ANSWER in 
 	    [yY])
 		echo "OGG		= -DUSE_OGG" >> $RULESFILE
+		echo "OGGLIB		= -lvorbisfile -lvorbis -logg" >> $RULESFILE
 		;;
 	    *)
 		;;
 	esac
 	echo
 	
-	echo -n "Would you like MP3 support? (n) "
+	echo -n "Would you like MAD MP3 support? (n) "
 	read ANSWER
 	case $ANSWER in 
 	    [yY])
 		echo "MAD		= -DUSE_MAD" >> $RULESFILE
+		echo "MADLIB		= -lmad" >> $RULESFILE
 		;;
 	    *)
 		;;
@@ -767,7 +770,8 @@ if [ "$BEOS" != 1 ] ; then
 
     # Libraries needed to build freecraft
     echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
-    echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+    echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
+    echo "	\$(FLACLIB) \$(OGGLIB) \$(MADLIB) " >> $RULESFILE
   else
     # Libraries needed to build tools
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
