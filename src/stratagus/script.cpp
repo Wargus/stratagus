@@ -500,7 +500,7 @@ local SCM CclMissileType(SCM list)
 }
 
 /**
-**	Load a pud.
+**	Load a pud. (Try in library path first)
 **
 **	@param file	filename of pud.
 **
@@ -509,9 +509,10 @@ local SCM CclMissileType(SCM list)
 local SCM CclLoadPud(SCM file)
 {
     char* name;
+    char buffer[1024];
 
     name=gh_scm2newstr(file,NULL);
-    LoadPud(name,&TheMap);
+    LoadPud(LibraryFileName(name,buffer),&TheMap);
     free(name);
 
     // FIXME: LoadPud should return an error
@@ -806,7 +807,6 @@ global void CclInit(void)
     char* sargv[5];
     char buf[1024];
     char* file;
-    extern char* LibraryFileName(const char* file,char* buffer);
 
     sargv[0] = "FreeCraft";
     sargv[1] = "-v1";
