@@ -103,8 +103,6 @@ global int NumMissileTypes;		/// number of missile-types made.
 */
 global MissileType* MissileTypeSmallFire;	/// Small fire missile-type
 global MissileType* MissileTypeBigFire;		/// Big fire missile-type
-global MissileType* MissileTypeGreenCross;	/// Green cross missile-type
-global MissileType* MissileTypeRedCross;	/// Red cross missile-type
     /// missile-type for the explosion missile
 global MissileType* MissileTypeExplosion;
 global MissileType* MissileTypeHit;		/// Hit missile-type
@@ -1659,8 +1657,6 @@ global void InitMissileTypes(void)
 
     MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
     MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
-    MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
-    MissileTypeRedCross=MissileTypeByIdent("missile-red-cross");
     MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
     MissileTypeHit = MissileTypeByIdent("missile-hit");
 }
@@ -1689,8 +1685,6 @@ global void CleanMissileTypes(void)
 
     MissileTypeSmallFire=NULL;
     MissileTypeBigFire=NULL;
-    MissileTypeGreenCross=NULL;
-    MissileTypeRedCross=NULL;
     MissileTypeHit=NULL;
 }
 

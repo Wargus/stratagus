@@ -179,9 +179,6 @@ local void AiMarkWaterTransporter(const Unit* unit,unsigned char* matrix)
 		}
 
 		if( CanMoveToMask(x,y,mask) ) {	// reachable
-		    /*MakeLocalMissile(MissileTypeRedCross,
-			x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2,
-			x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2);*/
 			
 		    *m=66;
 		    points[wp].X=x;		// push the point
@@ -309,9 +306,6 @@ local int AiFindTarget(const Unit* unit,unsigned char* matrix,
 		    }
 
 		    if( CanMoveToMask(x,y,mask) ) {	// reachable
-			/*MakeLocalMissile(MissileTypeGreenCross,
-			    x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2,
-			    x*TileSizeX+TileSizeX/2,y*TileSizeY+TileSizeY/2);*/
 			    
 			*m=1;
 			points[wp].X=x;		// push the point

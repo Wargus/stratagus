@@ -1230,11 +1230,13 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	sx = CursorX - vp->X + TileSizeX * vp->MapX;
 	sy = CursorY - vp->Y + TileSizeY * vp->MapY;
 	if( MouseButtons&LeftButton ) {
-	    MakeLocalMissile(MissileTypeGreenCross
+	    if( ClickMissile ) {
+		MakeLocalMissile(MissileTypeByIdent(ClickMissile)
 		    ,vp->MapX*TileSizeX+CursorX - vp->X
 		    ,vp->MapY*TileSizeY+CursorY - vp->Y
 		    ,vp->MapX*TileSizeX+CursorX - vp->X
 		    ,vp->MapY*TileSizeY+CursorY - vp->Y);
+	    }
 	    SendCommand(sx, sy);
 	}
 #ifdef NEW_UI
@@ -1264,8 +1266,10 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
 #endif
-	    MakeLocalMissile(MissileTypeGreenCross
+	    if( ClickMissile ) {
+		MakeLocalMissile(MissileTypeByIdent(ClickMissile)
 		    ,sx+TileSizeX/2,sy+TileSizeY/2,0,0);
+	    }
 	    SendCommand(sx,sy);
 #ifdef NEW_UI
 	    ChooseTargetFinish();
@@ -1454,11 +1458,13 @@ global void UIHandleButtonDown(unsigned button)
 		if( UnitUnderCursor && (unit=UnitOnMapTile(x/TileSizeX,y/TileSizeY)) ) {
 		    unit->Blink=4;	// if right click on building -- blink
 		} else {	// if not not click on building -- green cross
-		    MakeLocalMissile(MissileTypeGreenCross
-			,TheUI.MouseViewport->MapX*TileSizeX
-			    +CursorX-TheUI.MouseViewport->X
-			,TheUI.MouseViewport->MapY*TileSizeY
-			    +CursorY-TheUI.MouseViewport->Y,0,0);
+		    if( ClickMissile ) {
+			MakeLocalMissile(MissileTypeByIdent(ClickMissile)
+				,TheUI.MouseViewport->MapX*TileSizeX
+				    +CursorX-TheUI.MouseViewport->X
+				,TheUI.MouseViewport->MapY*TileSizeY
+				    +CursorY-TheUI.MouseViewport->Y,0,0);
+		    }
 		}
 		DoRightButton(x,y);
 	    }
@@ -1472,9 +1478,11 @@ global void UIHandleButtonDown(unsigned button)
 		ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY));
 	} else if( MouseButtons&RightButton ) {
 	    if( !GameObserve && !GamePaused ) {
-		MakeLocalMissile(MissileTypeGreenCross
+		if( ClickMissile ) {
+		    MakeLocalMissile(MissileTypeByIdent(ClickMissile)
 			,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 			,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
+		}
 		// DoRightButton() takes screen map coordinates
 		DoRightButton(ScreenMinimap2MapX(CursorX) * TileSizeX,
 			ScreenMinimap2MapY(CursorY) * TileSizeY);

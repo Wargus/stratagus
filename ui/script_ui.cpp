@@ -64,6 +64,7 @@ local SCM ChooseTargetBeginHook;   /// Script to draw target selection buttons
 local SCM ChooseTargetFinishHook;  /// Script to draw target selection buttons
 #endif
 
+global char* ClickMissile;
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -780,6 +781,30 @@ local SCM CclSetMouseScale(SCM scale)
     old=gh_int2scm(TheUI.MouseScale);
     TheUI.MouseScale=gh_scm2int(scale);
 
+    return old;
+}
+
+/**
+**	Set which missile is used for right click
+**
+**	@param missile	missile name to use
+**	@return		old value
+*/
+local SCM CclSetClickMissile(SCM missile)
+{
+    SCM old;
+
+    old=NIL;
+    
+    if( ClickMissile ) {
+	old=gh_str02scm(ClickMissile);
+	free( ClickMissile );
+	ClickMissile = NULL;
+    }
+
+    if( !gh_null_p(missile) ) {
+	ClickMissile=gh_scm2newstr(missile,NULL);
+    }
     return old;
 }
 
@@ -3690,6 +3715,8 @@ global void UserInterfaceCclRegister(void)
 
     gh_new_procedure1_0("set-mouse-adjust!",CclSetMouseAdjust);
     gh_new_procedure1_0("set-mouse-scale!",CclSetMouseScale);
+
+    gh_new_procedure1_0("set-click-missile!",CclSetClickMissile);
 
     gh_new_procedure1_0("set-contrast!",CclSetContrast);
     gh_new_procedure1_0("set-brightness!",CclSetBrightness);

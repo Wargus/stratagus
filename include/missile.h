@@ -487,8 +487,6 @@ extern char** MissileTypeWcNames;	/// Mapping wc-number 2 symbol
 extern MissileType* MissileTypes;		/// All missile-types
 extern MissileType* MissileTypeSmallFire;	/// Small fire missile-type
 extern MissileType* MissileTypeBigFire;		/// Big fire missile-type
-extern MissileType* MissileTypeGreenCross;	/// Green cross missile-type
-extern MissileType* MissileTypeRedCross;	/// Red cross missile-type
 extern MissileType* MissileTypeExplosion;	/// Explosion missile-type
 extern MissileType* MissileTypeHit;		/// Hit missile-type
 
