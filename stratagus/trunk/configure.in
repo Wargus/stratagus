@@ -3,13 +3,15 @@ AC_INIT(configure.in)
 AC_PREREQ([2.50])
 dnl AC_CANONICAL_TARGET
 
-if test "`uname -a` | grep -is cygwin" -o "`uname -a` | grep -is mingw"; then
+if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
+    WIN32=1
     EXE=.exe
     OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
     ARCH=win32
     OE=o
     OBJDIR=winobj
 else
+    WIN32=0
     EXE=
     OUTFILE="\$(TOPDIR)/freecraft\$(EXE)"
     ARCH=linux
@@ -195,4 +197,9 @@ else
 fi
 AC_SUBST(PREFIX)
 
-AC_OUTPUT(Rules.make)
+if test "$WIN32" = "1"; then
+    AC_CONFIG_FILES(Rules.make.WIN32:Rules.make.in)
+else
+    AC_CONFIG_FILES(Rules.make)
+fi
+AC_OUTPUT
