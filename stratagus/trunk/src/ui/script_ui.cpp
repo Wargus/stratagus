@@ -1461,9 +1461,17 @@ local SCM CclDefineMenu(SCM list)
     }
 
     if (name) {
-	menu = malloc(sizeof(Menu));
-	memcpy(menu, &item, sizeof(Menu));
+	menu = FindMenu(name);
+	if (!menu) {
+	    menu = malloc(sizeof(Menu));
+	    *(Menu **)hash_add(MenuHash,name) = menu;
+	} else {
+	    // FIXME: this doesn't free everything
+	    free(menu->items);
+	    menu->items = NULL;
+	}
 	menu->nitems = 0; // reset to zero
+	memcpy(menu, &item, sizeof(Menu));
 	//move the buttons for different resolutions..
 	if (VideoWidth != 640) {
 	    if (VideoWidth == 0) {
@@ -1480,7 +1488,6 @@ local SCM CclDefineMenu(SCM list)
 	    }
 	}
 	//printf("Me:%s\n", name);
-	*(Menu **)hash_add(MenuHash,name) = menu;
     } else {
 	fprintf(stderr,"Name of menu is missed, skip definition\n");
     }
@@ -1717,11 +1724,6 @@ local SCM CclDefineMenuItem(SCM list)
 			if ( !gh_null_p(gh_car(sublist)) ) {
 			    item->d.button.text = gh_scm2newstr(
 				gh_car(sublist),NULL);
-			    // FIXME: can be removed
-			    if ( !strcmp(item->d.button.text, "null") ) {
-				free(item->d.button.text);
-				item->d.button.text = NULL;
-			    }
 			}
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("hotkey")) ) {
