@@ -374,12 +374,9 @@ global void DrawButtonPanel(void)
     const ButtonAction* buttons;
     char buf[8];
 
-    //
-    //	Draw background
-    //
-    VideoDrawSub(TheUI.ButtonPanel.Graphic,0,0
-	    ,TheUI.ButtonPanel.Graphic->Width,TheUI.ButtonPanel.Graphic->Height
-	    ,TheUI.ButtonPanelX,TheUI.ButtonPanelY);
+    if( !TheUI.NumButtonButtons ) {
+	return;
+    }
 
     if( !(buttons=CurrentButtons) ) {	// no buttons
 	return;
@@ -388,13 +385,14 @@ global void DrawButtonPanel(void)
     // FIXME: this is unneeded DrawUnitIcon does it self
     PlayerPixels(ThisPlayer);		// could only select own units.
 
-    for( i=0; i<9; ++i ) {
+    for( i=0; i<TheUI.NumButtonButtons; ++i ) {
 	if( buttons[i].Pos!=-1 ) {
 	    int j;
 	    int action;
 
 	    // cursor is on that button
-	    if( ButtonUnderCursor==i+10 ) {
+	    if( ButtonAreaUnderCursor==ButtonAreaButton
+		    && ButtonUnderCursor==i ) {
 		v=IconActive;
 		if( MouseButtons&LeftButton ) {
 		    v=IconClicked;
@@ -493,12 +491,13 @@ global void DrawButtonPanel(void)
 	    }
 
 	    DrawUnitIcon(ThisPlayer,buttons[i].Icon.Icon
-		    ,v,TheUI.Buttons[i+10].X,TheUI.Buttons[i+10].Y);
+		    ,v,TheUI.ButtonButtons[i].X,TheUI.ButtonButtons[i].Y);
 
 	    //
 	    //	Update status line for this button
 	    //
-	    if( ButtonUnderCursor==i+10 && KeyState!=KeyStateInput ) {
+	    if( ButtonAreaUnderCursor==ButtonAreaButton
+		    && ButtonUnderCursor==i && KeyState!=KeyStateInput ) {
 		SetStatusLine(buttons[i].Hint);
 		// FIXME: Draw costs
 		v=buttons[i].Value;
@@ -539,7 +538,7 @@ global void DrawButtonPanel(void)
 	    if( ShowCommandKey ) {
 		Button* b;
 
-		b=&TheUI.Buttons[i+10];
+		b=&TheUI.ButtonButtons[i];
 		if( CurrentButtons[i].Key==27 ) {
 		    strcpy(buf,"ESC");
 		    VideoDrawText(b->X+4+b->Width-VideoTextLength(GameFont,buf),

@@ -515,22 +515,6 @@ global void CampaignCclRegister(void)
 }
 
 /**
-**	FIXME: should use the names of the real fonts.
-*/
-local char *FontNames[] = {
-    "small",
-    "game",
-    "large",
-    "small-title",
-    "large-title",
-    "user1",
-    "user2",
-    "user3",
-    "user4",
-    "user5",
-};
-
-/**
 **	Save the campaign module.
 */
 global void SaveCampaign(FILE* file)

@@ -339,13 +339,12 @@ local int CalculateUnitIcons(void)
     i = 0;
     count = 0;
     x = TheUI.ButtonPanelY + 24;
-    while (x < TheUI.ButtonPanelY + TheUI.ButtonPanel.Graphic->Height
-	    - IconHeight) {
+    while (x < TheUI.ButtonPanelEndY - IconHeight) {
 	++i;
 	x += IconHeight + 2;
     }
     x = TheUI.ButtonPanelX + 10;
-    while (x < TheUI.ButtonPanelX + 146) {
+    while (x < TheUI.ButtonPanelEndX) {
 	count += i;
 	x += IconWidth + 8;
     }
@@ -619,8 +618,7 @@ local void DrawUnitIcons(void)
     y = TheUI.ButtonPanelY + 24;
 
     i = UnitIndex;
-    while (y < TheUI.ButtonPanelY
-	    + TheUI.ButtonPanel.Graphic->Height - IconHeight) {
+    while (y < TheUI.ButtonPanelEndY - IconHeight) {
 	if (i >= MaxShownUnits) {
 	    break;
 	}
@@ -901,25 +899,13 @@ global void EditorUpdateDisplay(void)
     //
     //  Menu button
     //
-    if (TheUI.MenuButton.Graphic) {
-	VideoDrawSub(TheUI.MenuButton.Graphic, 0, 0,
-	    TheUI.MenuButton.Graphic->Width, TheUI.MenuButton.Graphic->Height,
-	    TheUI.MenuButtonX, TheUI.MenuButtonY);
-    }
-    DrawMenuButton(MBUTTON_MAIN,
+    DrawMenuButton(TheUI.MenuButton.Button,
 	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
 	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
-	    128, 19,
-	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
-	    GameFont,"Menu (~<F10~>)",NULL,NULL);
+	    TheUI.MenuButton.Width, TheUI.MenuButton.Height,
+	    TheUI.MenuButton.X,TheUI.MenuButton.Y,
+	    GameFont,TheUI.MenuButton.Text,NULL,NULL);
 
-    //
-    //  Minimap border
-    //
-    if (TheUI.Minimap.Graphic) {
-	VideoDrawSub(TheUI.Minimap.Graphic, 0, 0, TheUI.Minimap.Graphic->Width,
-	    TheUI.Minimap.Graphic->Height, TheUI.MinimapX, TheUI.MinimapY);
-    }
     //
     //  Minimap
     //
@@ -935,15 +921,6 @@ global void EditorUpdateDisplay(void)
 	VideoDrawSub(TheUI.InfoPanel.Graphic, 0, 0,
 	    TheUI.InfoPanel.Graphic->Width, TheUI.InfoPanel.Graphic->Height/4,
 	    TheUI.InfoPanelX, TheUI.InfoPanelY);
-    }
-    //
-    //  Button panel
-    //
-    if (TheUI.ButtonPanel.Graphic) {
-	VideoDrawSub(TheUI.ButtonPanel.Graphic, 0, 0,
-	    TheUI.ButtonPanel.Graphic->Width,
-	    TheUI.ButtonPanel.Graphic->Height, TheUI.ButtonPanelX,
-	    TheUI.ButtonPanelY);
     }
     DrawEditorPanel();
 
@@ -962,12 +939,12 @@ global void EditorUpdateDisplay(void)
     //
     //  Fillers
     //
-    for (i = 0; i < TheUI.NumFillers; ++i) {
-	if (TheUI.Filler[i].Graphic) {
-	    VideoDrawSub(TheUI.Filler[i].Graphic, 0, 0,
-		    TheUI.Filler[i].Graphic->Width,
-		    TheUI.Filler[i].Graphic->Height,
-		    TheUI.FillerX[i], TheUI.FillerY[i]);
+    for (i = 0; i < TheUI.NumPanels; ++i) {
+	if (TheUI.Panel[i].Graphic) {
+	    VideoDrawSub(TheUI.Panel[i].Graphic, 0, 0,
+		    TheUI.Panel[i].Graphic->Width,
+		    TheUI.Panel[i].Graphic->Height,
+		    TheUI.PanelX[i], TheUI.PanelY[i]);
 	}
     }
     //
@@ -1576,8 +1553,8 @@ local void EditorCallbackMouse(int x, int y)
     //
     //	Minimap
     //
-    if (x >= TheUI.MinimapX+24 && x < TheUI.MinimapX+24+MINIMAP_W
-	    && y >= TheUI.MinimapY+2 && y < TheUI.MinimapY+2+MINIMAP_H) {
+    if (x >= TheUI.MinimapX && x < TheUI.MinimapX+TheUI.MinimapW
+	    && y >= TheUI.MinimapY && y < TheUI.MinimapY+TheUI.MinimapH) {
 	CursorOn = CursorOnMinimap;
     }
 
@@ -1609,8 +1586,7 @@ local void EditorCallbackMouse(int x, int y)
 
 	i = UnitIndex;
 	by = TheUI.ButtonPanelY + 24;
-	while (by < TheUI.ButtonPanelY
-		+ TheUI.ButtonPanel.Graphic->Height - IconHeight) {
+	while (by < TheUI.ButtonPanelEndY - IconHeight) {
 	    if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
 		break;
 	    }
@@ -1713,6 +1689,7 @@ local void EditorCallbackMouse(int x, int y)
 	SetStatusLine("Tile mode");
 	return;
     }
+#if 0
     for (i = 0; i < (int)(sizeof(TheUI.Buttons)/sizeof(*TheUI.Buttons)); ++i) {
 	if (x < TheUI.Buttons[i].X
 		|| x > TheUI.Buttons[i].X + TheUI.Buttons[i].Width
@@ -1726,12 +1703,13 @@ local void EditorCallbackMouse(int x, int y)
 	ClearStatusLine();
 	return;
     }
+#endif
 
     //
     //  Minimap
     //
-    if (x >= TheUI.MinimapX + 24 && x < TheUI.MinimapX + 24 + MINIMAP_W
-	    && y >= TheUI.MinimapY + 2 && y < TheUI.MinimapY + 2 + MINIMAP_H) {
+    if (x >= TheUI.MinimapX && x < TheUI.MinimapX + TheUI.MinimapW
+	    && y >= TheUI.MinimapY && y < TheUI.MinimapY + TheUI.MinimapH) {
 	CursorOn = CursorOnMinimap;
 	return;
     }
