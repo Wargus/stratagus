@@ -1484,7 +1484,13 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 		anim->D.Move.Move = atoi(op2);
 	} else if (!strcmp(op1, "unbreakable")) {
 		anim->Type = NewAnimationUnbreakable;
-		anim->D.Unbreakable.Begin = !strcmp(op2, "begin");
+		if (!strcmp(op2, "begin")) {
+			anim->D.Unbreakable.Begin = 1;
+		} else if (!strcmp(op2, "end")) {
+			anim->D.Unbreakable.Begin = 0;
+		} else {
+			LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
+		}
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1);
 	}
@@ -1528,6 +1534,22 @@ static NewAnimation* ParseAnimation(lua_State* l, int idx)
 }
 
 /**
+**  Find the index of a resource
+*/
+static int ResourceIndex(lua_State* l, const char* resource)
+{
+	int res;
+
+	for (res = 0; res < MaxCosts; ++res) {
+		if (!strcmp(resource, DefaultResourceNames[res])) {
+			return res;
+		}
+	}
+	LuaError(l, "Resource not found: %s" _C_ resource);
+	return 0;
+}
+
+/**
 **  Define a unit-type animation set.
 **
 **  @param l  Lua state.
@@ -1537,6 +1559,7 @@ static int CclDefineNewAnimations(lua_State* l)
 	const char* name;
 	const char* value;
 	NewAnimations* anims;
+	int res;
 
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
@@ -1580,10 +1603,13 @@ static int CclDefineNewAnimations(lua_State* l)
 		} else if (!strcmp(value, "EndBuild")) {
 			anims->EndBuild = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "StartHarvest_", 12)) {
+			res = ResourceIndex(l, value + 12);
 			anims->StartHarvest[0] = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Harvest_", 8)) {
-			anims->Harvest[0] = ParseAnimation(l, -1);
+			res = ResourceIndex(l, value + 8);
+			anims->Harvest[res] = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "EndHarvest_", 11)) {
+			res = ResourceIndex(l, value + 11);
 			anims->EndHarvest[0] = ParseAnimation(l, -1);
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);
