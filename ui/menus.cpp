@@ -414,7 +414,7 @@ local Menuitem NetMultiSetupMenuItems[] = {
 */
 global Menu Menus[] = {
     {
-	/// Game Menu
+	// Game Menu
 	176+(14*TileSizeX-256)/2,
 	16+(14*TileSizeY-288)/2,
 	256, 288,
@@ -423,7 +423,7 @@ global Menu Menus[] = {
 	GameMenuItems
     },
     {
-	/// Victory Menu
+	// Victory Menu
 	176+(14*TileSizeX-288)/2,
 	16+(14*TileSizeY-128)/2,
 	288, 128,
@@ -432,7 +432,7 @@ global Menu Menus[] = {
 	VictoryMenuItems
     },
     {
-	/// Lost Menu
+	// Lost Menu
 	176+(14*TileSizeX-288)/2,
 	16+(14*TileSizeY-128)/2,
 	288, 128,
@@ -441,7 +441,7 @@ global Menu Menus[] = {
 	LostMenuItems
     },
     {
-	/// SelectScen Menu
+	// SelectScen Menu
 	(640-352)/2,
 	(480-352)/2,
 	352, 352,
@@ -450,7 +450,7 @@ global Menu Menus[] = {
 	ScenSelectMenuItems
     },
     {
-	/// PrgStart Menu
+	// PrgStart Menu
 	0,
 	0,
 	640, 480,
@@ -459,7 +459,7 @@ global Menu Menus[] = {
 	PrgStartMenuItems
     },
     {
-	/// CustomGame Menu
+	// CustomGame Menu
 	0,
 	0,
 	640, 480,
@@ -468,7 +468,7 @@ global Menu Menus[] = {
 	CustomGameMenuItems
     },
     {
-	/// Enter Name Menu
+	// Enter Name Menu
 	(640-288)/2,
 	260,
 	288, 128,
@@ -477,7 +477,7 @@ global Menu Menus[] = {
 	EnterNameMenuItems
     },
     {
-	/// Net Create Join Menu
+	// Net Create Join Menu
 	0,
 	0,
 	640, 480,
@@ -486,7 +486,7 @@ global Menu Menus[] = {
 	NetCreateJoinMenuItems
     },
     {
-	/// Multi Player Setup Menu
+	// Multi Player Setup Menu
 	0,
 	0,
 	640, 480,
@@ -895,7 +895,7 @@ local void GameMenuReturn(void)
 
 local void GameMenuSave(void)
 {
-    SaveAll();	/// FIXME: Sample code
+    SaveAll();	// FIXME: Sample code
 }
 
 local void GameMenuEnd(void)
@@ -1560,7 +1560,7 @@ normkey:
 	mi++;
     }
     switch (key) {
-	case 10: case 13:			/// RETURN
+	case 10: case 13:			// RETURN
 	    if (MenuButtonCurSel != -1) {
 		mi = menu->items + MenuButtonCurSel;
 		switch (mi->mitype) {
@@ -1650,7 +1650,7 @@ normkey:
 		}
 	    }
 	    break;
-	case 9: 				/// TAB			// FIXME: Add Shift-TAB
+	case 9:				// TAB			// FIXME: Add Shift-TAB
 	    if (MenuButtonCurSel != -1 && !(menu->items[MenuButtonCurSel].flags&MenuButtonClicked)) {
 		n = menu->nitems;
 		for (i = 0; i < n; ++i) {
