@@ -146,7 +146,7 @@ global void InitVideoSdl(void)
     }
 
     if( SDL_MUSTLOCK(Screen) ) {
-	DebugLevel0(__FUNCTION__": Must locksurface!\n");
+	DebugLevel0Fn("Must locksurface!\n");
 	fflush(stdout);
 	fflush(stderr);
     }
@@ -163,7 +163,7 @@ global void InitVideoSdl(void)
 	int i;
 	int j;
 
-	DebugLevel3(__FUNCTION__"Mask R%x G%x B%x\n"
+	DebugLevel3Fn("Mask R%x G%x B%x\n"
 		,Screen->format->Rmask
 		,Screen->format->Gmask
 		,Screen->format->Bmask);
@@ -176,6 +176,11 @@ global void InitVideoSdl(void)
 
 	    for( i=0; j&(1<<i); ++i ) {
 	    }
+#ifdef USE_BEOS
+	    if( i==24 ) {	// beos compatibility hack
+		i=32;
+	    }
+#endif
 	    VideoDepth=i;
 	} else {
 	    VideoDepth=Screen->format->BitsPerPixel;
@@ -189,7 +194,7 @@ global void InitVideoSdl(void)
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
 #endif
 
-    DebugLevel0(__FUNCTION__": Video init ready %d\n",VideoDepth);
+    DebugLevel0Fn("Video init ready %d\n",VideoDepth);
 }
 
 /**
@@ -598,7 +603,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	pixels=malloc(256*sizeof(VMemType32));
 	break;
     default:
-	DebugLevel0(__FUNCTION__": Unknown depth\n");
+	DebugLevel0Fn("Unknown depth\n");
 	return NULL;
     }
 
