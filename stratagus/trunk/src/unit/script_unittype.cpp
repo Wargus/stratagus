@@ -595,6 +595,13 @@ local SCM CclDefineUnitType(SCM list)
 		    type->Sound.Ready.Name = gh_scm2newstr(
 			gh_car(sublist), NULL);
 		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("repair"))) {
+		    if (redefine) {
+			free(type->Sound.Repair.Name);
+		    }
+		    type->Sound.Repair.Name = gh_scm2newstr(
+			gh_car(sublist), NULL);
+		    sublist = gh_cdr(sublist);
 		} else if (gh_eq_p(value, gh_symbol2scm("help"))) {
 		    if (redefine) {
 			free(type->Sound.Help.Name);
@@ -1013,6 +1020,11 @@ local SCM CclDefineAnimations(SCM list)
 		free(anims->Attack);
 	    }
 	    anims->Attack = anim;
+	} else if (gh_eq_p(id, gh_symbol2scm("repair"))) {
+	    if (anims->Repair) {
+		free(anims->Repair);
+	    }
+	    anims->Repair = anim;
 	} else if (gh_eq_p(id, gh_symbol2scm("die"))) {
 	    if (anims->Die) {
 		free(anims->Die);

@@ -347,14 +347,6 @@ local SCM CclDefineGameSounds(SCM list)
 		ExitFatal(1);
 	    }
 	    GameSounds.WorkComplete[i].Sound = CCL_SOUND_ID(data);
-	} else if (gh_eq_p(value,gh_symbol2scm("repair"))) {
-	    data = gh_car(list);
-	    list = gh_cdr(list);
-	    if (!CCL_SOUNDP(data)) {
-		GameSounds.Repair.Sound = (void*)-1;
-	    } else {
-		GameSounds.Repair.Sound = CCL_SOUND_ID(data);
-	    }
 	} else if (gh_eq_p(value,gh_symbol2scm("rescue"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);

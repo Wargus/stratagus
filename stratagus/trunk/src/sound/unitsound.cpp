@@ -10,7 +10,7 @@
 //
 /**@name unitsound.c	-	The unit sounds. */
 //
-//	(c) Copyright 1999-2001 by Fabrice Rossi
+//	(c) Copyright 1999-2001,2003 by Fabrice Rossi and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -285,6 +285,10 @@ global void MapUnitSounds(void)
 		// Ready sounds have infinite range
 		SetSoundRange(type->Sound.Ready.Sound,
 		    INFINITE_SOUND_RANGE);
+	    }
+	    if (type->Sound.Repair.Name) {
+		type->Sound.Repair.Sound =
+		    SoundIdForName(type->Sound.Repair.Name);
 	    }
 	    // FIXME: will be modified, attack sound be moved to missile/weapon
 	    if (type->Weapon.Attack.Name) {

@@ -10,7 +10,7 @@
 //
 /**@name action_repair.c	-	The repair action. */
 //
-//	(c) Copyright 1999-2002 by Vladi Shabanski
+//	(c) Copyright 1999-2003 by Vladi Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -67,11 +67,7 @@ local void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 
 #ifdef WITH_SOUND
     if ((flags & AnimationSound)) {
-	if (GameSounds.Repair.Sound == (void*)-1) {
-	    PlayUnitSound(unit, VoiceAttacking);
-	} else {
-	    PlayUnitSound(unit, VoiceRepair);
-	}
+	PlayUnitSound(unit, VoiceRepairing);
     }
 #endif
 }
@@ -143,7 +139,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 	//  Calculate the length of the attack (repair) anim.
 	//
 	animlength = 0;
-	for (anim = unit->Type->Animations->Attack; !(anim->Flags & AnimationReset); ++anim) {
+	for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
 	    animlength += anim->Sleep;
 	}
 
@@ -181,9 +177,8 @@ local void RepairUnit(Unit* unit, Unit* goal)
 local int AnimateActionRepair(Unit* unit)
 {
     if (unit->Type->Animations) {
-	DebugCheck(!unit->Type->Animations->Attack);
-	// FIXME: A seperate repair animation would be nice?
-	DoActionRepairGeneric(unit, unit->Type->Animations->Attack);
+	DebugCheck(!unit->Type->Animations->Repair);
+	DoActionRepairGeneric(unit, unit->Type->Animations->Repair);
     }
 
     return 0;
@@ -254,7 +249,7 @@ global void HandleActionRepair(Unit* unit)
 		//
 		//	Have reached target? FIXME: could use return value
 		//
-		if(goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange &&
+		if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange &&
 			goal->HP < goal->Type->Stats->HitPoints) {
 		    unit->State = 0;
 		    unit->SubAction = 2;
