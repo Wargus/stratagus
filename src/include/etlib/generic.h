@@ -13,14 +13,31 @@
 #define Case break; case
 #define Default break; default
 #define streq(a, b) (strcmp((a), (b)) == 0)
+
 #ifndef min
+#ifdef _MSC_VER
+#define min min
+static inline min(int a,int b) { return a<b ? a : b; }
+#else
 #define min(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a < _b ? _a : _b; })
 #endif
+#endif
+
 #ifndef max
+#ifdef _MSC_VER
+#define max max
+static inline max(int a,int b) { return a>b ? a : b; }
+#else
 #define max(a,b) ({ typeof(a) _a = a; typeof(b) _b = b; _a > _b ? _a : _b; })
 #endif
+#endif
+
+#ifdef _MSC_VER
+// FIXME: not written!
+#else
 #define bound(a,b,c) ({ typeof(a) _a = a; typeof(b) _b = b; typeof(c) _c = c; \
 			_b < _a ? _a : _b > _c ? _c : _b; })
+#endif
 
 typedef unsigned char u8;
 typedef unsigned short u16;
