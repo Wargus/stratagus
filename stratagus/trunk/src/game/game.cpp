@@ -564,6 +564,7 @@ global void InitSettings(void)
     GameSettings.Opponents = SettingsPresetMapDefault;
     GameSettings.Terrain = SettingsPresetMapDefault;
     GameSettings.GameType = SettingsPresetMapDefault;
+    GameSettings.NetGameType = SettingsSinglePlayerGame;
 }
 
 //@}
