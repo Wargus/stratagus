@@ -334,9 +334,6 @@ typedef struct _ui_ {
 		int   X;                        ///< button screen X position
 		int   Y;                        ///< button screen Y position
 		char* Text;                     ///< button caption
-		int   Font;                     ///< button caption font
-		int   Width;                    ///< button width
-		int   Height;                   ///< button height
 		ButtonStyle* Style;             ///< button style
 	} MenuButton,
 	  NetworkMenuButton,

@@ -383,9 +383,9 @@ static void HandleMouseOn(int x, int y)
 	if (!IsNetworkGame()) {
 		if (TheUI.MenuButton.X != -1 && !BigMapMode) {
 			if (x >= TheUI.MenuButton.X &&
-					x < TheUI.MenuButton.X + TheUI.MenuButton.Width &&
+					x < TheUI.MenuButton.X + TheUI.MenuButton.Style->Width &&
 					y >= TheUI.MenuButton.Y &&
-					y < TheUI.MenuButton.Y + TheUI.MenuButton.Height) {
+					y < TheUI.MenuButton.Y + TheUI.MenuButton.Style->Height) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderMenu;
 				CursorOn = CursorOnButton;
@@ -395,9 +395,9 @@ static void HandleMouseOn(int x, int y)
 	} else {
 		if (TheUI.NetworkMenuButton.X != -1 && !BigMapMode) {
 			if (x >= TheUI.NetworkMenuButton.X &&
-					x < TheUI.NetworkMenuButton.X + TheUI.NetworkMenuButton.Width &&
+					x < TheUI.NetworkMenuButton.X + TheUI.NetworkMenuButton.Style->Width &&
 					y >= TheUI.NetworkMenuButton.Y &&
-					y < TheUI.NetworkMenuButton.Y + TheUI.NetworkMenuButton.Height) {
+					y < TheUI.NetworkMenuButton.Y + TheUI.NetworkMenuButton.Style->Height) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
 				CursorOn = CursorOnButton;
@@ -406,9 +406,9 @@ static void HandleMouseOn(int x, int y)
 		}
 		if (TheUI.NetworkDiplomacyButton.X != -1 && !BigMapMode) {
 			if (x >= TheUI.NetworkDiplomacyButton.X &&
-					x < TheUI.NetworkDiplomacyButton.X + TheUI.NetworkDiplomacyButton.Width &&
+					x < TheUI.NetworkDiplomacyButton.X + TheUI.NetworkDiplomacyButton.Style->Width &&
 					y >= TheUI.NetworkDiplomacyButton.Y &&
-					y < TheUI.NetworkDiplomacyButton.Y + TheUI.NetworkDiplomacyButton.Height) {
+					y < TheUI.NetworkDiplomacyButton.Y + TheUI.NetworkDiplomacyButton.Style->Height) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
 				CursorOn = CursorOnButton;
