@@ -766,11 +766,10 @@ global void ResizeGraphic(Graphic *g, int w, int h)
     int x;
 
 #ifdef USE_SDL_SURFACE
-    return;
+    SDL_Color pal[256];
 
-    int bps;
-
-    bps = g->Surface->format->BytesPerPixel;
+    DebugCheck(g->Surface->format->BytesPerPixel != 1);
+    SDL_LockSurface(g->Surface);
 #else
     DebugCheck(g->Type != &GraphicImage8Type);
 #endif
@@ -788,9 +787,8 @@ global void ResizeGraphic(Graphic *g, int w, int h)
     for (i = 0; i < h; ++i) {
 	for (j = 0; j < w; ++j) {
 #ifdef USE_SDL_SURFACE
-	    memcpy(&data[x * g->Surface->format->BytesPerPixel],
-		&((char*)g->Surface->pixels)[(i * g->Height / h) * g->Width * bps
-		    + bps * j * g->Width / w], bps);
+	    data[x] = ((unsigned char*)g->Surface->pixels)[
+		(i * g->Height / h) * g->Surface->pitch + j * g->Width / w];
 #else
 	    data[x] = ((unsigned char*)g->Frames)[
 		(i * g->Height / h) * g->Width + j * g->Width / w];
@@ -800,9 +798,13 @@ global void ResizeGraphic(Graphic *g, int w, int h)
     }
 
 #ifdef USE_SDL_SURFACE
-    // FIXME: todo
+    SDL_UnlockSurface(g->Surface);
+    memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
     SDL_FreeSurface(g->Surface);
-    g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, bps, w * bps, 0, 0, 0, 0);
+
+    g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
+    SDL_SetPalette(g->Surface, SDL_LOGPAL|SDL_PHYSPAL, pal, 0, 256);
+
     g->Width = w;
     g->Height = h;
 #else
