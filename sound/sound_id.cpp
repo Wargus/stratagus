@@ -144,6 +144,7 @@ global SoundId MakeSound(const char* name,char* file[],int nb)
 	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
 	return *result;
     }
+
     // ask the server to register the sound
     id=RegisterSound(file,nb);
     // save the mapping from name to id in the hash table.
@@ -167,6 +168,12 @@ global SoundId MakeSound(const char* name,char* file[],int nb)
 global SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second)
 {
     SoundId sound;
+    const SoundId* result;
+
+    if ( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
+	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
+	return *result;
+    }
 
     sound=RegisterTwoGroups(first,second);
     MapSound(name,sound);
