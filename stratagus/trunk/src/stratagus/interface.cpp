@@ -196,7 +196,8 @@ local int CommandKey(int key)
 
 	case 'F':			// toggle fullscreen
 #ifdef USE_SDL
-#if SDL_VERSIONNUM(SDL_MAJOR_VERSION,SDL_MINOR_VERSION,SDL_PATCHLEVEL)>=1008
+//#if SDL_VERSIONNUM(SDL_MAJOR_VERSION,SDL_MINOR_VERSION,SDL_PATCHLEVEL)>=1008
+#if (SDL_MAJOR_VERSION*1000+SDL_MINOR_VERSION+100+SDL_PATCHLEVEL)>=1008
 	    {
 	    #include <SDL/SDL.h>
 	    // FIXME: move to system api part!
