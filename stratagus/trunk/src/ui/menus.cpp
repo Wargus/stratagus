@@ -293,6 +293,7 @@ local void ReplayGameLBAction(Menuitem *mi, int i);
 local unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i);
 local void ReplayGameVSAction(Menuitem *mi, int i);
 local void ReplayGameFolder(void);
+local void ReplayGameDisableFog(Menuitem *mi);
 local void ReplayGameOk(void);
 local void ReplayGameCancel(void);
 
@@ -617,6 +618,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(ReplayGameLBRetrieve,"replay-game-lb-retrieve");
     HASHADD(ReplayGameVSAction,"replay-game-vs-action");
     HASHADD(ReplayGameFolder,"replay-game-folder");
+    HASHADD(ReplayGameDisableFog,"replay-game-disable-fog");
     HASHADD(ReplayGameOk,"replay-game-ok");
     HASHADD(ReplayGameCancel,"replay-game-cancel");
 }
@@ -5915,6 +5917,7 @@ local void ReplayGameInit(Menuitem *mi)
     mi->menu->items[5].flags =
 	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
     mi->menu->items[5].d.button.text = ScenSelectDisplayPath;
+    mi->menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
@@ -6193,6 +6196,13 @@ local void ReplayGameFolder(void)
 }
 
 /**
+**	Replay game disable fog gem callback
+*/
+local void ReplayGameDisableFog(Menuitem *mi __attribute__((unused)))
+{
+}
+
+/**
 **	Replay game ok button callback
 */
 local void ReplayGameOk(void)
@@ -6247,6 +6257,13 @@ local void ReplayGameOk(void)
 	    GuiGameStarted = 1;
 	    EndMenu();
 	    menu->items[5].d.button.text = NULL;
+
+	    if (menu->items[6].d.gem.state == MI_GSTATE_CHECKED) {
+		TheMap.NoFogOfWar = 1;
+		FlagRevealMap = 1;
+		GameSettings.NoFogOfWar = 1;
+		GameSettings.RevealMap = 1;
+	    }
 	}
     }
 }
