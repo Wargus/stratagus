@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,299 +37,9 @@
 #include "tileset.h"
 #include "map.h"
 
-
-#ifndef USE_CCL2
 /*----------------------------------------------------------------------------
---	Attack
+--	Functions
 ----------------------------------------------------------------------------*/
-
-//
-//	FIXME: Attack animations sequences, should me moved into unit
-//	FIXME: structure and defined with ccl.
-//
-
-///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
-local Animation GruntAttack[] = {
-    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
-    { 3, 0, 1,  0}
-};
-
-///	Peon, Peasant, Attacking Peon, Attacking Peasant.
-global Animation PeonAttack[] = {
-    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0, 3,  5},
-    { 0, 0, 7,-20},{ 3, 0, 1,  0}
-};
-
-///	Ballista
-local Animation BallistaAttack[] = {
-    { 0, 0,25, 10},{12, 0,25,  5},{ 0, 0,100, 0},{ 0, 0,49,-15},{ 3, 0, 1,  0}
-};
-
-///	Catapult
-local Animation CatapultAttack[] = {
-    {12, 0, 4, 15},{ 0, 0, 4,- 5},{ 0, 0, 3,  5},{ 0, 0, 2,- 5},{ 0, 0, 2,  5},
-    { 0, 0,30,- 5},{ 0, 0, 4,  5},{ 0, 0,100, 0},{ 0, 0,50,-15},{ 3, 0, 1,  0}
-};
-
-///	Knight, Paladin, Turalyon, Lothar, Uther Lightbringer
-local Animation KnightAttack[] = {
-    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
-    { 3, 0, 1,  0}
-};
-
-///	Ogre, Ogre-mage, Dentarg, Cho'gall
-local Animation OgreAttack[] = {
-    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
-    { 3, 0, 1,  0}
-};
-
-///	Archer, Ranger, Alleria
-local Animation ArcherAttack[] = {
-    { 0, 0,10, 25},{12, 0,10,  5},{ 0, 0,44,-30},
-    { 3, 0, 1,  0}
-};
-
-///	Axethrower, Berserker, Zuljin
-local Animation AxethrowerAttack[] = {
-    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 3,  5},{ 0, 0,52,-40},
-    { 3, 0, 1,  0}
-};
-
-///	Mage, Khadar
-local Animation MageAttack[] = {
-    { 0, 0, 5, 25},{ 0, 0, 5,  5},{12, 0, 7,  5},{ 0, 0, 5,  5},{ 0, 0,17,-40},
-    { 3, 0, 1,  0}
-};
-
-///	Death Knight, Teron Gorefiend, Gul'dan
-local Animation DeathKnightAttack[] = {
-    { 0, 0, 5, 25},{ 0, 0, 5,  5},{12, 0, 7,  5},{ 0, 0, 5,  5},{ 0, 0,17,-40},
-    { 3, 0, 1,  0}
-};
-
-///	Dwarves
-local Animation DwarvesAttack[] = {
-    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{ 3, 0, 1,  0}
-};
-
-///	Goblin Sappers
-local Animation GoblinSappersAttack[] = {
-    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{ 3, 0, 1,  0}
-};
-
-///	Gryphon Rider, Kurdan and Sky'ree:
-local Animation GryphonRiderAttack[] = {
-    { 0, 0, 6,  0},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 2, 0, 1,  0},
-    { 0, 0, 6,  5},{ 0, 0, 6,  5},{12, 0, 8,  5},{ 0, 0, 6,-30},{ 0, 0, 6,  5},
-    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
-    { 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
-    { 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},
-    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},
-    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 1, 0, 1,-15}
-};
-
-///	Dragon, Deathwing
-local Animation DragonAttack[] = {
-    { 0, 0, 6,  0},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 2, 0, 1,  0},
-    {12, 0,20,  5},{ 0, 0, 6,-20},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
-    { 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},
-    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},
-    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
-    { 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
-    { 1, 0, 1,-15}
-};
-
-///	Eye of kilrogg
-local Animation EyeOfKilroggAttack[] = {
-    { 3, 0, 1,  0}
-};
-
-///	Human tanker, orc tanker:
-local Animation TankerAttack[] = {
-    {12, 0,30,  0},{ 0, 0,99,  0},{ 3, 0, 1,  0}
-};
-
-///	Human transporter, orc transporter:
-local Animation TransportAttack[] = {
-    {12, 0,119,  0},{ 3, 0, 1,  0}
-};
-
-///	Elven destroyer, Troll destroyer:
-local Animation DestroyerAttack[] = {
-    {12, 0,119,  0},{ 3, 0, 1,  0}
-};
-
-///	Battleship, Juggernaught
-local Animation BattleshipAttack[] = {
-    {12, 0,127,  0},{ 0, 0,102,  0},{ 3, 0, 1,  0}
-};
-
-///	Gnomish submarine, giant turtle
-local Animation SubmarineAttack[] = {
-    { 0, 0,10,  5},{ 0, 0,25,  5},{12, 0,25,  0},{ 0, 0,25,- 5},{ 0, 0,29,- 5},
-    { 3, 0, 1,  0}
-};
-
-///	Gnomish flying machine
-local Animation GnomishFlyingMachineAttack[] = {
-    { 3, 0, 1,  0}
-};
-
-///	Goblin zeppelin
-local Animation GoblinZeppelinAttack[] = {
-    { 3, 0, 1,  0}
-};
-
-///	Critter
-local Animation CritterAttack[] = {
-    { 3, 0, 1,  0}
-};
-
-///	Skeleton
-local Animation SkeletonAttack[] = {
-    { 0, 0, 4, 15},{ 0, 0, 4, 15},{12, 0, 4, 15},{ 0, 0, 4, 15},{ 0, 0,18,-60},
-    { 3, 0, 1,  0}
-};
-
-///	Daemon
-local Animation DaemonAttack[] = {
-    { 0, 0, 4,  0},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{ 0, 0, 4,  5},
-    { 2, 0, 1,  0},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{12, 0, 4,  5},
-    { 0, 0, 4,  5},{ 1, 0, 1,-45}
-};
-
-///	Guard tower
-local Animation GuardTowerAttack[] = {
-    {12, 0,59,  0},{ 3, 0, 1,  0},
-};
-
-///	Cannon tower
-local Animation CannonTowerAttack[] = {
-    {12, 0,150,  0},{ 3, 0, 1,  0},
-};
-
-/**
-**	Attack animation. FIXME: move this to unit-type. CCL configurable
-*/
-local Animation* UnitAttack[UnitTypeInternalMax] = {
-    GruntAttack,		// UnitFootman
-    GruntAttack,		// UnitGrunt
-    PeonAttack,			// UnitPeasant
-    PeonAttack,			// UnitPeon
-    BallistaAttack,		// UnitBallista
-    CatapultAttack,		// UnitCatapult
-    KnightAttack,		// UnitKnight
-    OgreAttack,			// UnitOgre
-    ArcherAttack,		// UnitArcher
-    AxethrowerAttack,		// UnitAxethrower
-    MageAttack,			// UnitMage
-    DeathKnightAttack,		// UnitDeathKnight
-    KnightAttack,		// UnitPaladin
-    OgreAttack,			// UnitOgreMage
-    DwarvesAttack,		// UnitDwarves
-    GoblinSappersAttack,	// UnitGoblinSappers
-    PeonAttack,			// UnitAttackPeasant
-    PeonAttack,			// UnitAttackPeon
-    ArcherAttack,		// UnitRanger
-    AxethrowerAttack,		// UnitBerserker
-    ArcherAttack,		// UnitAlleria
-    DeathKnightAttack,		// UnitTeronGorefiend
-    GryphonRiderAttack,		// UnitKurdanAndSky_ree
-    OgreAttack,			// UnitDentarg
-    MageAttack,			// UnitKhadgar
-    GruntAttack,		// UnitGromHellscream
-    TankerAttack,		// UnitTankerHuman
-    TankerAttack,		// UnitTankerOrc
-    TransportAttack,		// UnitTransportHuman
-    TransportAttack,		// UnitTransportOrc
-    DestroyerAttack,		// UnitElvenDestroyer
-    DestroyerAttack,		// UnitTrollDestroyer
-    BattleshipAttack,		// UnitBattleship
-    BattleshipAttack,		// UnitJuggernaught
-    0,				// UnitNothing
-    DragonAttack,		// UnitDeathwing
-    0,				// UnitNothing1
-    0,				// UnitNothing2
-    SubmarineAttack,		// UnitGnomishSubmarine
-    SubmarineAttack,		// UnitGiantTurtle
-    GnomishFlyingMachineAttack,	// UnitGnomishFlyingMachine
-    GoblinZeppelinAttack,	// UnitGoblinZeppelin
-    GryphonRiderAttack,		// UnitGryphonRider
-    DragonAttack,		// UnitDragon
-    KnightAttack,		// UnitTuralyon
-    EyeOfKilroggAttack,		// UnitEyeOfKilrogg
-    GruntAttack,		// UnitDanath
-    GruntAttack,		// UnitKorgathBladefist
-    0,				// UnitNothing3
-    OgreAttack,			// UnitCho_gall
-    KnightAttack,		// UnitLothar
-    DeathKnightAttack,		// UnitGul_dan
-    KnightAttack,		// UnitUtherLightbringer
-    AxethrowerAttack,		// UnitZuljin
-    0,				// UnitNothing4
-    SkeletonAttack,		// UnitSkeleton
-    DaemonAttack,		// UnitDaemon
-    CritterAttack,		// UnitCritter
-    0,				// UnitFarm
-    0,				// UnitPigFarm
-    0,				// UnitBarracksHuman
-    0,				// UnitBarracksOrc
-    0,				// UnitChurch
-    0,				// UnitAltarOfStorms
-    GuardTowerAttack,		// UnitScoutTowerHuman
-    GuardTowerAttack,		// UnitScoutTowerOrc
-    0,				// UnitStables
-    0,				// UnitOgreMound
-    0,				// UnitGnomishInventor
-    0,				// UnitGoblinAlchemist
-    0,				// UnitGryphonAviary
-    0,				// UnitDragonRoost
-    0,				// UnitShipyardHuman
-    0,				// UnitShipyardOrc
-    0,				// UnitTownHall
-    0,				// UnitGreatHall
-    0,				// UnitElvenLumberMill
-    0,				// UnitTrollLumberMill
-    0,				// UnitFoundryHuman
-    0,				// UnitFoundryOrc
-    0,				// UnitMageTower
-    0,				// UnitTempleOfTheDamned
-    0,				// UnitBlacksmithHuman
-    0,				// UnitBlacksmithOrc
-    0,				// UnitRefineryHuman
-    0,				// UnitRefineryOrc
-    0,				// UnitOilPlatformHuman
-    0,				// UnitOilPlatformOrc
-    0,				// UnitKeep
-    0,				// UnitStronghold
-    0,				// UnitCastle
-    0,				// UnitFortress
-    0,				// UnitGoldMine
-    0,				// UnitOilPatch
-    0,				// UnitStartLocationHuman
-    0,				// UnitStartLocationOrc
-    GuardTowerAttack,		// UnitGuardTowerHuman
-    GuardTowerAttack,		// UnitGuardTowerOrc
-    CannonTowerAttack,		// UnitCannonTowerHuman
-    CannonTowerAttack,		// UnitCannonTowerOrc
-    0,				// UnitCircleofPower
-    0,				// UnitDarkPortal
-    0,				// UnitRunestone
-    0,				// UnitWallHuman
-    0,				// UnitWallOrc
-    0,				// UnitDeadBody
-    0,				// Unit1x1DestroyedPlace
-    0,				// Unit2x2DestroyedPlace
-    0,				// Unit3x3DestroyedPlace
-    0,				// Unit4x4DestroyedPlace
-    PeonAttack,			// UnitPeasantWithGold
-    PeonAttack,			// UnitPeonWithGold
-    PeonAttack,			// UnitPeasantWithWood
-    PeonAttack,			// UnitPeonWithWood
-    TankerAttack,		// UnitTankerHumanFull
-    TankerAttack,		// UnitTankerOrcFull
-};
-#endif
 
 /**
 **	Generic unit attacker.
@@ -333,12 +47,16 @@ local Animation* UnitAttack[UnitTypeInternalMax] = {
 **	@param unit	Unit, for that the attack animation is played.
 **	@param attack	Attack animation.
 */
-local void DoActionAttackGeneric(Unit* unit,Animation* attack)
+local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 {
     int flags;
+
+    IfDebug(
     int oframe;
 
     oframe=unit->Frame;
+    );
+
     flags=UnitShowAnimation(unit,attack);
 
     IfDebug(
@@ -370,11 +88,9 @@ local void DoActionAttackGeneric(Unit* unit,Animation* attack)
 */
 global int AnimateActionAttack(Unit* unit)
 {
-    int type;
-
-    type=unit->Type->Type;
-    if( type<UnitTypeInternalMax && UnitAttack[type] ) {
-	DoActionAttackGeneric(unit,UnitAttack[type]);
+    if( unit->Type->Animations ) {
+	DebugCheck( !unit->Type->Animations->Attack );
+	DoActionAttackGeneric(unit,unit->Type->Animations->Attack);
     }
 
     return 0;
