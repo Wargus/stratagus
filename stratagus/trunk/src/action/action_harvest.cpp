@@ -101,17 +101,20 @@ local int MoveToWood(Unit* unit)
     return 1;
 }
 
-/*
+/**
 **	Chop the wood.
+**
+**	@param unit	Unit pointer chopping wood.
+**
+**
 **	Return TRUE if ready, otherwise FALSE.
 */
 local int ChopWood(Unit* unit)
 {
     Unit* destu;
     int flags;
-    //extern Animation PeonAttack[];
 
-    flags=UnitShowAnimation(unit,UnitAttack[unit->Type->Type]);
+    flags=UnitShowAnimation(unit,unit->Type->Animations->Attack);
 
     if( (flags&AnimationSound) ) {
 	PlayUnitSound(unit,VoiceTreeChopping);
