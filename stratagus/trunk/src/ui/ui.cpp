@@ -466,7 +466,8 @@ global int MapTileGetViewport (int tx, int ty)
 */
 local void FinishViewportModeConfiguration (Viewport new_vps[], int num_vps)
 {
-    int i, active;
+    int i;
+    int active;
 
     /* If the number of viewports increases we need to compute what to display
      * in the newly created ones.  We need to do this before we store new
@@ -475,10 +476,15 @@ local void FinishViewportModeConfiguration (Viewport new_vps[], int num_vps)
      */
     if (TheUI.NumViewports < num_vps) {
 	for (i=0; i < num_vps; i++) {
-	    int v = GetViewport (new_vps[i].X, new_vps[i].Y);
-
-	    TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
-	    TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
+	    int v;
+	    v = GetViewport (new_vps[i].X, new_vps[i].Y);
+	    if (v != -1) {
+		TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
+		TheUI.VP[i].MapY = Viewport2MapY (v, new_vps[i].Y);
+	    } else {
+		TheUI.VP[i].MapX = 0;
+		TheUI.VP[i].MapY = 0;
+	    }
 	}
     }
 
@@ -745,7 +751,9 @@ global void SetViewportMode (ViewportMode new_mode)
 */
 global void CycleViewportMode (int step)
 {
-    int new_mode = (int )TheUI.ViewportMode + step;
+    int new_mode;
+
+    new_mode = TheUI.ViewportMode + step;
 
     if (new_mode >= NUM_VIEWPORT_MODES)
 	new_mode = 0;
