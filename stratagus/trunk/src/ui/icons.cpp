@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -331,7 +341,7 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
     //
     //	Look up file
     //
-    ptr=hash_find(IconFileHash,file);
+    ptr=(void**)hash_find(IconFileHash,file);
     if( ptr && *ptr ) {
 	iconfile=*ptr;
     } else {				// new file
@@ -350,7 +360,7 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
     //	Look up icon
     //
     str=strdcat(ident,tileset);
-    ptr=hash_find(IconHash,str);
+    ptr=(void**)hash_find(IconHash,str);
     if( ptr && *ptr ) {
 	DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n",ident,tileset);
 	// This is more a config error
@@ -500,16 +510,16 @@ global void CleanIcons(void)
 
 	    // NOTE hash_del not supported
 	    str=strdcat(Icons[i]->Ident,Icons[i]->Tileset);
-	    ptr=hash_find(IconHash,str);
+	    ptr=(void**)hash_find(IconHash,str);
 	    free(str);
 	    *ptr=NULL;
-	    ptr=hash_find(IconHash,Icons[i]->Ident);
+	    ptr=(void**)hash_find(IconHash,Icons[i]->Ident);
 	    *ptr=NULL;
 
 	    free(Icons[i]->Ident);
 	    free(Icons[i]->Tileset);
 	    
-	    ptr=hash_find(IconFileHash,Icons[i]->File->FileName);
+	    ptr=(void**)hash_find(IconFileHash,Icons[i]->File->FileName);
 	    if( ptr && *ptr ) {
 		table[n++]=*ptr;
 		*ptr=NULL;
@@ -540,7 +550,7 @@ global void CleanIcons(void)
     if( IconAliases ) {
 	for( i=0; i<IconAliasesCount; ++i ) {
 	    // NOTE hash_del not supported
-	    ptr=hash_find(IconHash,IconAliases[i*2+0]);
+	    ptr=(void**)hash_find(IconHash,IconAliases[i*2+0]);
 	    *ptr=NULL;
 
 	    free(IconAliases[i*2+0]);
