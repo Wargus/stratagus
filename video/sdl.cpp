@@ -67,7 +67,8 @@
 */
 local Uint32 VideoSyncHandler(Uint32 unused)
 {
-    DebugLevel3("Interrupt\n");
+    DebugLevel2("Interrupt %d - %d\n"
+	    ,VideoInterrupts,(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
 
     ++VideoInterrupts;
 
@@ -87,20 +88,20 @@ global void SetVideoSync(void)
 	return;
     }
 
-    // FIXME: doesn't work with SDL/SVGAlib
 #ifdef __linux__
+    // FIXME: doesn't work with SDL/SVGAlib 1.0
     {
 	// ARI: kick svgalib's butt - WE handled SIGALRM, no bombing any more!
-	// JOHNS: I think this will no longer work with SDL 1.1
-	extern void SDL_TimerInit();
-	SDL_TimerInit();
+	// JOHNS: I think this will no longer work with SDL 1.1, yes it doesn't
+	//extern void SDL_TimerInit();
+	//SDL_TimerInit();
     }
 #endif
-
     if( SDL_SetTimer(
 		(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed,
 		VideoSyncHandler) ) {
-	fprintf(stderr, "Can't set timer or you use SDL 1.1.X\n");
+	fprintf(stderr, "Can't set timer or you use SDL 1.1.X %d\n"
+		,(100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
     }
 
     // DebugLevel1("Timer installed\n");
