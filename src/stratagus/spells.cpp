@@ -1240,12 +1240,21 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 void CleanSpells(void)
 {
 	SpellType* spell;
+	SpellActionType *act;
+	SpellActionType *nextact;
 
 	DebugLevel0("Cleaning spells.\n");
 	for (spell = SpellTypeTable; spell < SpellTypeTable + SpellTypeCount; ++spell) {
 		free(spell->IdentName);
 		free(spell->Name);
-		free(spell->Action);
+
+		act = spell->Action;
+		while (act) {
+			nextact = act->Next;
+			free(act);
+			act = nextact;
+		}
+
 		if (spell->Condition) {
 			free(spell->Condition->BoolFlag);
 			free(spell->Condition);

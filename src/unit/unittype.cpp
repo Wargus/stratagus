@@ -1491,7 +1491,7 @@ global void CleanUnitTypes(void)
 		if (!(anims = type->Animations)) {		// Must be handled?
 			continue;
 		}
-			for (j = i; j < NumUnitTypes; ++j) {		// Remove all uses.
+		for (j = i; j < NumUnitTypes; ++j) {		// Remove all uses.
 			if (anims == UnitTypes[j]->Animations) {
 				UnitTypes[j]->Animations = NULL;
 			}
@@ -1508,6 +1508,14 @@ global void CleanUnitTypes(void)
 		}
 		if (anims->Die) {
 			free(anims->Die);
+		}
+		if (anims->Repair) {
+			free(anims->Repair);
+		}
+		for (i = 0; i < MaxCosts; ++i) {
+			if (anims->Harvest[i]) {
+				free(anims->Harvest[i]);
+			}
 		}
 		free(anims);
 	}

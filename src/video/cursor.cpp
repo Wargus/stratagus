@@ -880,7 +880,6 @@ global void CleanCursors(void)
 		free(Cursors[i].Ident);
 		free(Cursors[i].Race);
 		free(Cursors[i].File);
-		VideoSafeFree(Cursors[i].Sprite);
 	}
 	free(Cursors);
 	Cursors = NULL;
