@@ -293,14 +293,19 @@ int ckey;
 */
 global void SaveScreenshotPNG(const char* name)
 {
-#ifdef USE_SDL_SURFACE
-#else
     FILE* fp;
     png_structp png_ptr;
     png_infop info_ptr;
     unsigned char* row;
     int i;
     int j;
+#ifdef USE_SDL_SURFACE
+//    Uint32 c;
+    int bpp;
+
+    bpp = TheScreen->format->BytesPerPixel;
+#else
+#endif
 
     fp = fopen(name, "wb");
     if (fp == NULL) {
@@ -343,6 +348,48 @@ global void SaveScreenshotPNG(const char* name)
     png_write_info(png_ptr, info_ptr);
 
     for (i = 0; i < VideoHeight; ++i) {
+#ifdef USE_SDL_SURFACE
+	switch (VideoDepth) {
+	    case 15: {
+		Uint16 c;
+		for (j = 0; j < VideoWidth; ++j) {
+		    c = ((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
+		    row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
+		    row[j * 3 + 1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
+		    row[j * 3 + 2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
+		}
+		break;
+	    }
+	    case 16: {
+		Uint16 c;
+		for (j = 0; j < VideoWidth; ++j) {
+		    c = ((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
+		    row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
+		    row[j * 3 + 1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
+		    row[j * 3 + 2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
+		}
+		break;
+	    }
+	    case 24: {
+		Uint8 c;
+		for (j = 0; j < VideoWidth; ++j) {
+		    c = ((Uint8*)TheScreen->pixels)[j * bpp + i * VideoWidth * 3];
+		    memcpy(row, TheScreen->pixels + i * VideoWidth, VideoWidth * 3);
+		}
+		break;
+	    }
+	    case 32: {
+		Uint32 c;
+		for (j = 0; j < VideoWidth; ++j) {
+		    c = ((Uint32*)TheScreen->pixels)[j + i * VideoWidth];
+		    row[j * 3 + 0] = ((c >> 0) & 0xff);
+		    row[j * 3 + 1] = ((c >> 8) & 0xff);
+		    row[j * 3 + 2] = ((c >> 16) & 0xff);
+		}
+		break;
+	    }
+	}
+#else
 	switch (VideoDepth) {
 	case 8:
 	    // FIXME: Finish
@@ -381,6 +428,7 @@ global void SaveScreenshotPNG(const char* name)
 	    }
 	    break;
 	}
+#endif
 	png_write_row(png_ptr, row);
     }
 
@@ -394,7 +442,6 @@ global void SaveScreenshotPNG(const char* name)
     free(row);
 
     fclose(fp);
-#endif
 }
 
 //@}
