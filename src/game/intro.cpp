@@ -378,7 +378,6 @@ global void ShowIntro(const Intro *intro)
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
-    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
     old_video_sync=VideoSyncSpeed;
     VideoSyncSpeed=100;
@@ -396,6 +395,7 @@ global void ShowIntro(const Intro *intro)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(intro->Background);
+    ResizeGraphic(background,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
     MakeTexture(background,background->Width,background->Height);
 #endif
@@ -561,6 +561,7 @@ global void ShowCredits(Credits *credits)
     background=NULL;
     if( credits->Background ) {
 	background=LoadGraphic(credits->Background);
+	ResizeGraphic(background,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
 	MakeTexture(background,background->Width,background->Height);
 #endif
@@ -686,7 +687,6 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     old_video_sync=VideoSyncSpeed;
     VideoSyncSpeed=100;
     SetVideoSync();
-    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
     callbacks.ButtonPressed=IntroCallbackButton1;
     callbacks.ButtonReleased=IntroCallbackButton2;
@@ -700,6 +700,7 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(picture);
+    ResizeGraphic(background,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
     MakeTexture(background,background->Width,background->Height);
 #endif
@@ -1208,10 +1209,10 @@ global void ShowStats(void)
     callbacks.SoundReady=WriteSound;
 
     background=LoadGraphic(MenuBackground);
+    ResizeGraphic(background,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
     MakeTexture(background,background->Width,background->Height);
 #endif
-    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 
     VideoLockScreen();
     VideoClearScreen();
