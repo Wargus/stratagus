@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML><HEAD>
 <!--
-----	(c) Copyright 2001 by Lutz Sammer
+----	(c) Copyright 2002 by Lutz Sammer
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 2002 by The FreeCraft Project. Distributed under the
 <A HREF="../gpl.html">"GNU General Public License"</A></B>
 <HR>
 <A HREF="../freecraft.html">FreeCraft</A> 
@@ -42,52 +42,151 @@
 <A HREF="unittype.html">PREV</A> 
 <A HREF="ai.html">NEXT</A> 
 <HR>
+<A HREF="#check-dependency">check-dependency</A>
 <A HREF="#define-allow">define-allow</A>
 <A HREF="#define-dependency">define-dependency</A>
 <A HREF="#define-modifier">define-modifier</A>
 <A HREF="#define-upgrade">define-upgrade</A>
+<A HREF="#define-upgrade-wc-names">define-upgrade-wc-names</A>
+<A HREF="#get-dependency">get-dependency</A>
 <HR>
 <H2>Intro - Introduction to research functions and variables</H2>
 
 Everything around researching and upgrades.
 <H2>Functions</H2>
-<A NAME="define-upgrade"></A>
-<H3>define-upgrade</H3>
+
+<A NAME="check-dependency"></A>
+<H3>check-dependency</H3>
 
 <H4>Description</H4>
 
-    Define an upgrade, how it is shown and how much it costs.
+NOT WRITTEN YET.
 
 <H4>Syntax</H4>
 
-<CODE>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</CODE>
+<CODE>(check-dependency)</CODE>
 
 <DL>
-<DT>name</DT>
-<DD>Name of the upgrade, used in buttons (define-button) and 
-<A HREF="#define-modifier">(define-modifier)</A>.
-</DD>
-<DT>'icon icon-id</DT>
-<DD>Name of the upgrade icon, shown in buttons or during the research of the
-upgrade.  The icon is defined with 
-<A HREF="icon.html#define-icon">(define-icon)</A> or
-<A HREF="icon.html#define-icon-alias">(define-icon-alias)</A>
-<DT>'costs #( time resource1 resource2 resource3 resource4 resource5 resource6)</DT>
-<DD>This are the costs for the upgrade. The costs (resource1-resource6) could
-be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
+<DT>.</DT>
+<DD>.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-upgrade 'upgrade-sword1 'icon 'icon-sword2
-      'costs #(   200   800     0     0     0     0     0))
+    (check-dependency)
 </PRE>
 
-<P>This is the default definition of the first sword upgrade. The icon
-"icon-sword2" is shown in buttons and during the upgrade. The upgrade costs
-200 frame cycles to research and 800 gold from the store.
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
+<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
+<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+
+<A NAME="define-allow"></A>
+<H3>define-allow</H3>
+
+<H4>Description</H4>
+
+Define what unit-types and upgrades are enabled for each player during
+a level.
+
+<H4>Syntax</H4>
+
+<CODE>(define-allow name str16)</CODE>
+
+<DL>
+<DT>name</DT>
+<DD>Name of an unit-type or an upgrade to be defined.
+</DD>
+<DT>str16</DT>
+<DD>
+  The initial allow state for the unit-type or upgrade at level start:
+  <UL>
+  <LI>A - Allowed
+  <LI>E - Enabled, allowed by level but currently forbidden
+  <LI>F - Forbidden
+  <LI>R - Researched or acquired
+  <LI>Q - Acquired but currently forbidden (does it make sense?:)
+  </UL>
+  Each player has his own character, the first is for player 0 and the last
+  is for player 15.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-allow 'unit-catapult                    "AAAAAAAAAAAAAAAA")
+</PRE>
+
+<P>Allow the catapult for all 16 players.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
+<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
+<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+
+<A NAME="define-dependency"></A>
+<H3>define-dependency</H3>
+
+<H4>Description</H4>
+
+Define the dependencies for an unit-type or an upgrade. The dependency
+must be full filled before an unit or research can be used.
+
+<H4>Syntax</H4>
+
+<CODE>(define-dependency unit-type/upgrade '( unit-type/upgrade count ... )
+    ['or '( unit-type/upgrade count ... ) ...] )
+</CODE><P>
+<CODE>(define-dependency unit-type/upgrade '( required-part )
+     ['or '( optional-or-part ) ...] )
+</CODE>
+
+<DL>
+<DT>required-part</DT>
+<DD><CODE>unit/upgrade [count]</CODE><P>
+   A list of unit-types or upgrades required.
+   <DL>
+   <DT>unit/upgrade</DT>
+   <DD>Unit-type name or upgrade name required.
+   </DD>
+   <DT>count</DT>
+   <DD>Optional count, how many units of the unit-type are required.
+   </DL>
+</DD>
+<DT>'or optional-or-part</DT>
+<DD><CODE>unit/upgrade [count]</CODE><P>
+    Optional list of or parts. One or list must be complete full filled.<P>
+   <DL>
+   <DT>unit/upgrade</DT>
+   <DD>Unit-type name or upgrade name required.
+   </DD>
+   <DT>count</DT>
+   <DD>Optional count, how many units of the unit-type are required.
+   </DL>
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-dependency 'upgrade-sword2 '(upgrade-sword1))
+</PRE>
+
+<P>The second sword upgrade is only possible, if the first sword upgrade is
+   researched.
+
+<PRE>
+    (define-dependency 'upgrade-ranger '(unit-keep) 'or '(unit-castle))
+</PRE>
+
+<P>The ranger upgrade is only available if a keep or castle is available.
 
 <H4>Used</H4>
 
@@ -100,9 +199,9 @@ be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
 
 <H4>Description</H4>
 
-    Define the effects (modifier) of an upgrade. An upgrade can have multiple 
-    modifiers. It can activate, enable or disable other upgrades and allows
-    complex reactions.
+Define the effects (modifier) of an upgrade. An upgrade can have multiple 
+modifiers. It can activate, enable or disable other upgrades and allows
+complex reactions.
 
 <H4>Syntax</H4>
 
@@ -217,45 +316,43 @@ of the listed units is increased.
 <A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
 <A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
 
-
-<A NAME="define-allow"></A>
-<H3>define-allow</H3>
+<A NAME="define-upgrade"></A>
+<H3>define-upgrade</H3>
 
 <H4>Description</H4>
 
-    Define what unit-types and upgrades are enabled for each player during
-    a level.
+Define an upgrade, how it is shown and how much it costs.
 
 <H4>Syntax</H4>
 
-<CODE>(define-allow name str16)</CODE>
+<CODE>(define-upgrade name 'icon icon-id 'costs #( costs ... ))</CODE>
 
 <DL>
 <DT>name</DT>
-<DD>Name of an unit-type or an upgrade to be defined.
+<DD>Name of the upgrade, used in buttons (define-button) and 
+<A HREF="#define-modifier">(define-modifier)</A>.
 </DD>
-<DT>str16</DT>
-<DD>
-  The initial allow state for the unit-type or upgrade at level start:
-  <UL>
-  <LI>A - Allowed
-  <LI>E - Enabled, allowed by level but currently forbidden
-  <LI>F - Forbidden
-  <LI>R - Researched or acquired
-  <LI>Q - Acquired but currently forbidden (does it make sense?:)
-  </UL>
-  Each player has his own character, the first is for player 0 and the last
-  is for player 15.
+<DT>'icon icon-id</DT>
+<DD>Name of the upgrade icon, shown in buttons or during the research of the
+upgrade.  The icon is defined with 
+<A HREF="icon.html#define-icon">(define-icon)</A> or
+<A HREF="icon.html#define-icon-alias">(define-icon-alias)</A>
+<DT>'costs #( time resource1 resource2 resource3 resource4 resource5 resource6)</DT>
+<DD>This are the costs for the upgrade. The costs (resource1-resource6) could
+be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-allow 'unit-catapult                    "AAAAAAAAAAAAAAAA")
+    (define-upgrade 'upgrade-sword1 'icon 'icon-sword2
+      'costs #(   200   800     0     0     0     0     0))
 </PRE>
 
-<P>Allow the catapult for all 16 players.
+<P>This is the default definition of the first sword upgrade. The icon
+"icon-sword2" is shown in buttons and during the upgrade. The upgrade costs
+200 frame cycles to research and 800 gold from the store.
 
 <H4>Used</H4>
 
@@ -263,62 +360,61 @@ of the listed units is increased.
 <A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
 <A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
 
-<A NAME="define-dependency"></A>
-<H3>define-dependency</H3>
+<A NAME="define-upgrade-wc-names"></A>
+<H3>define-upgrade-wc-names</H3>
 
 <H4>Description</H4>
 
-    Define the dependencies for an unit-type or an upgrade. The dependency
-    must be full filled before an unit or research can be used.
+.
 
 <H4>Syntax</H4>
 
-<CODE>(define-dependency unit-type/upgrade '( unit-type/upgrade count ... )
-    ['or '( unit-type/upgrade count ... ) ...] )
-</CODE><P>
-<CODE>(define-dependency unit-type/upgrade '( required-part )
-     ['or '( optional-or-part ) ...] )
-</CODE>
+<CODE>(define-upgrade-wc-names sword1 sword2 ...)</CODE>
 
 <DL>
-<DT>required-part</DT>
-<DD><CODE>unit/upgrade [count]</CODE><P>
-   A list of unit-types or upgrades required.
-   <DL>
-   <DT>unit/upgrade</DT>
-   <DD>Unit-type name or upgrade name required.
-   </DD>
-   <DT>count</DT>
-   <DD>Optional count, how many units of the unit-type are required.
-   </DL>
-</DD>
-<DT>'or optional-or-part</DT>
-<DD><CODE>unit/upgrade [count]</CODE><P>
-    Optional list of or parts. One or list must be complete full filled.<P>
-   <DL>
-   <DT>unit/upgrade</DT>
-   <DD>Unit-type name or upgrade name required.
-   </DD>
-   <DT>count</DT>
-   <DD>Optional count, how many units of the unit-type are required.
-   </DL>
+<DT>.</DT>
+<DD>.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-dependency 'upgrade-sword2 '(upgrade-sword1))
+    (define-upgrade-wc-names 'upgrade-sword1 'upgrade-sword2 ...)
 </PRE>
 
-<P>The second sword upgrade is only possible, if the first sword upgrade is
-   researched.
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/upgrade.ccl"> $LIBARYPATH/ccl/upgrade.ccl</A> ,
+<A HREF="../../data/ccl/human/upgrade.ccl"> $LIBARYPATH/ccl/human/upgrade.ccl</A> ,
+<A HREF="../../data/ccl/orc/upgrade.ccl"> $LIBARYPATH/ccl/orc/upgrade.ccl</A>
+
+<A NAME="get-dependency"></A>
+<H3>get-dependency</H3>
+
+<H4>Description</H4>
+
+NOT WRITTEN YET.
+
+<H4>Syntax</H4>
+
+<CODE>(get-dependency)</CODE>
+
+<DL>
+<DT>.</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
 
 <PRE>
-    (define-dependency 'upgrade-ranger '(unit-keep) 'or '(unit-castle))
+    (get-dependency)
 </PRE>
 
-<P>The ranger upgrade is only available if a keep or castle is available.
+<P>.
 
 <H4>Used</H4>
 
@@ -329,5 +425,5 @@ of the listed units is increased.
 <HR>
 Last changed: $Id$<BR>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS>(c) 2001 by<A HREF="mailto:aleclone@FreeCraft.org">
+<ADDRESS>(c) 2002 by<A HREF="mailto:aleclone@FreeCraft.org">
 The FreeCraft Project</A></ADDRESS></BODY></HTML>
