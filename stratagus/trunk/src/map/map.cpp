@@ -10,7 +10,7 @@
 //
 /**@name map.c - The map. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Vladi Shabanski and François Beerten
+//      (c) Copyright 1998-2005 by Lutz Sammer, Vladi Shabanski and François Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -474,10 +474,11 @@ void CleanMap(void)
 ----------------------------------------------------------------------------*/
 
 /**
-** Check if the seen tile-type is wood.
+**  Check if the seen tile-type is wood or rock.
 **
-** @param x  Map X tile-position.
-** @param y  Map Y tile-position.
+**  @param type  Tile type
+**  @param x     Map X tile-position.
+**  @param y     Map Y tile-position.
 */
 int MapIsSeenTile(unsigned short type, int x, int y)
 {
@@ -663,11 +664,12 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 }
 
 /**
-** Correct the surrounding fields.
+**  Correct the surrounding fields.
 **
-** @param type  Tiletype of tile to adjust
-** @param x     Map X tile-position.
-** @param y     Map Y tile-position.
+**  @param type  Tiletype of tile to adjust
+**  @param seen  1 if updating seen value, 0 for real
+**  @param x     Map X tile-position.
+**  @param y     Map Y tile-position.
 */
 void MapFixNeighbors(unsigned short type, int seen, int x, int y)
 {

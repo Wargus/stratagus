@@ -799,7 +799,7 @@ int EvalNumber(const NumberDesc* number)
 /**
 **  compute the string expression
 **
-**  @param number  struct with definition of the calculation.
+**  @param s  struct with definition of the calculation.
 **
 **  @return the result string.
 **
