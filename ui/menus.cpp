@@ -865,7 +865,7 @@ local void SaveLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	Save game vertical scroll callback
+**	Save game vertical slider callback
 */
 local void SaveVSAction(Menuitem *mi, int i)
 {
@@ -1099,7 +1099,7 @@ local void LoadLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	Load game vertical scroll callback
+**	Load game vertical slider callback
 */
 local void LoadVSAction(Menuitem *mi, int i)
 {
@@ -2946,7 +2946,7 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 }
 
 /**
-**	Scenario select vertical scroll action callback
+**	Scenario select vertical slider action callback
 */
 local void ScenSelectVSAction(Menuitem *mi, int i)
 {
@@ -3036,7 +3036,7 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 }
 
 /**
-**	Keystroke help vertical scroll action callback
+**	Keystroke help vertical slider action callback
 */
 local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
@@ -3089,7 +3089,7 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
 }
 
 /**
-**	Game speed horizontal scroll action callback
+**	Game speed horizontal slider action callback
 */
 local void GameSpeedHSAction(Menuitem *mi, int i)
 {
@@ -3134,7 +3134,7 @@ local void GameSpeedHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	Mouse scroll horizontal scroll action callback
+**	Mouse scroll horizontal slider action callback
 */
 local void MouseScrollHSAction(Menuitem *mi, int i)
 {
@@ -3183,7 +3183,7 @@ local void MouseScrollHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	Keyboard scroll horizontal scroll action callback
+**	Keyboard scroll horizontal slider action callback
 */
 local void KeyboardScrollHSAction(Menuitem *mi, int i)
 {
@@ -3232,7 +3232,7 @@ local void KeyboardScrollHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	Master volume horizontal scroll action callback
+**	Master volume horizontal slider action callback
 */
 local void MasterVolumeHSAction(Menuitem *mi, int i)
 {
@@ -3275,7 +3275,7 @@ local void MasterVolumeHSAction(Menuitem *mi, int i)
 }
 
 /**
-**	Music volume horizontal scroll action callback
+**	Music volume horizontal slider action callback
 */
 local void MusicVolumeHSAction(Menuitem *mi, int i)
 {
@@ -3319,7 +3319,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
 
 #ifdef USE_LIBCDA
 /**
-**	CD volume horizontal scroll action callback
+**	CD volume horizontal slider action callback
 */
 local void CdVolumeHSAction(Menuitem *mi, int i)
 {
@@ -3362,7 +3362,7 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
 }
 #else
 /**
-**	CD volume horizontal scroll action callback
+**	CD volume horizontal slider action callback
 */
 local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)),
 	int i __attribute__((unused)))
@@ -4963,7 +4963,7 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	Editor main load vertical scroll action callback
+**	Editor main load vertical slider action callback
 */
 local void EditorMainLoadVSAction(Menuitem *mi, int i)
 {
@@ -5670,7 +5670,7 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
 }
 
 /**
-**	Editor save vertical scroll action callback
+**	Editor save vertical slider action callback
 */
 local void EditorSaveVSAction(Menuitem *mi, int i)
 {
@@ -6027,7 +6027,7 @@ local unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i)
 }
 
 /**
-**	Replay game vertical scroll action
+**	Replay game vertical slider action
 */
 local void ReplayGameVSAction(Menuitem *mi, int i)
 {
