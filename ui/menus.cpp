@@ -723,6 +723,19 @@ local Menuitem NetMultiClientMenuItems[] = {
 #endif
 };
 
+local Menuitem NetErrorMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Error:", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 38, 0, LargeFont, NULL, NULL,
+	{ text:{ NULL, MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 92, 80, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+#else
+    { 0 }
+#endif
+};
+
 /**
 **	Items for the Connecting Network Menu
 */
@@ -1131,6 +1144,16 @@ global Menu Menus[] = {
 	ImagePanel1,
 	4, 5,
 	GameOptionsMenuItems,
+	NULL,
+    },
+    {
+	// Net Errors Menu
+	(640-288)/2,
+	260,
+	288, 128,
+	ImagePanel4,
+	2, 3,
+	NetErrorMenuItems,
 	NULL,
     },
     
@@ -2216,6 +2239,9 @@ local void JoinNetGameMenu(void)
 
     ServerHostBuf[EnterServerIPMenuItems[1].d.input.nch] = 0;	// Now finally here is the address
     if (NetworkSetupServerAddress(ServerHostBuf, NetworkServerText) != 0) {
+	NetErrorMenuItems[1].d.text.text = "Unable to lookup host.";
+	ProcessMenu(MENU_NET_ERROR, 1);
+	StartMenusSetBackground(NULL);
 	return;
     }
     NetworkInitClientConnect();
