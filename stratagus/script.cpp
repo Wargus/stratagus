@@ -749,9 +749,6 @@ global void InitCcl(void)
 #ifdef SLOW_INPUT
     gh_define("freecraft-feature-slow-input",SCM_BOOL_T);
 #endif
-#ifdef HAVE_EXPANSION
-    gh_define("freecraft-feature-have-expansion",SCM_BOOL_T);
-#endif
 #ifdef USE_FLAC
     gh_define("freecraft-feature-flac",SCM_BOOL_T);
 #endif

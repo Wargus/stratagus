@@ -6977,7 +6977,6 @@ global void InitMenuData(void)
 */
 global void InitMenuFunctions(void)
 {
-#ifdef HAVE_EXPANSION
     Menu *menu;
 
     //
@@ -7001,13 +7000,6 @@ global void InitMenuFunctions(void)
 	// build the menu from that..
 	menu->items[14].d.pulldown.noptions = 4;
     }
-#else
-    //
-    // HACK_MOUSE
-    //
-    //menu->items[14].d.pulldown.noptions = 4;
-    //
-#endif
 
 #ifdef SAVE_MENU_CCL
     {
