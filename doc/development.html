@@ -1,4 +1,6 @@
-<html><head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
 <!--
 ----	$Id$
 
@@ -14,388 +16,151 @@
 ----    GNU General Public License for more details.
 -->
     <title>Development for FreeCraft Version 1.18</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
+
 <body>
-    <h1>Development for FreeCraft Version 1.18</h1>
-<hr><pre width=80>
-     ___________		     _________		      _____  __
-     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
-      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
-	  \/		    \/	   \/	     \/		   \/
-    ______________________                           ______________________
-			  T H E   W A R   B E G I N S
-	   FreeCraft - A free fantasy real time strategy game engine
-</pre>
-<p><b>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
-<a href="gpl.html">"GNU General Public License"</a></b>
+
+<h1>Development for FreeCraft Version 1.18</h1>
 <hr>
 
-This file should give you some information to help to develop FreeCraft.<p>
-If you make bigger changes please always extend the copyright with your name.<p>
+This file should give you some information to help with development of FreeCraft.<p>
 
 <h2>Mailing list</h2>
 
-If you want to develop for FreeCraft you should join the development mailing
-list.<p>
-
-<a href="http://sourceforge.net/mailarchive/forum.php?forum_id=6268">FreeCraft development Archives</a><p>
-<a href="http://lists.sourceforge.net/mailman/listinfo/freecraft-hackers">Subscribe FreeCraft development</a><p>
+If you want to help with development for FreeCraft you should 
+<a href="http://lists.sourceforge.net/mailman/listinfo/freecraft-hackers">join</a> 
+the freecraft-hackers mailing list.<br> You may also want to look at the 
+<a href="http://sourceforge.net/mailarchive/forum.php?forum_id=6268">archives.</a>
 
 <h2>IRC - Internet Relay Chat</h2>
 
-You can try to meet other FreeCraft developers and users on IRC:
-<a href="http://www.freenode.net/">FreeNode</a> FreeNode Network, channel
-#FreeCraft.
+You can try to meet other FreeCraft developers and users on the 
+<a href="http://www.freenode.net/">FreeNode</a> IRC Network, in channel
+<a href="irc://irc.freenode.net/freecraft">#FreeCraft</a>.
 
 <h2>Bugs and tasks</h2>
 
-You can find known bugs here:<p>
+You can find 
+<a href="http://sourceforge.net/tracker/?group_id=1965&amp;atid=101965">known bugs</a> 
+and <a href="http://sourceforge.net/pm/?group_id=1965">planned tasks</a> on the 
+<a href="http://sourceforge.net/tracker/?group_id=1965">sourceforge tracker</a>.<p>
 
-<a href="http://sourceforge.net/tracker/?group_id=1965&atid=101965">FreeCraft real-time strategy game engine - Tracker - Bugs</a><p>
+Before starting on a bug or task, please ask on the mailing list or in the 
+IRC channel whether anybody else is already working on it.
 
-And the planned tasks here:<p>
-
-<a href="http://sourceforge.net/pm/task.php?group_project_id=1539&group_id=1965&func=browse">FreeCraft real-time strategy game engine - Tasks</a><p>
-
-Before doing some work, please ask on the mailing list, whether anybody else is
-doing the same thing and write what you plan to do to avoid that someone else
-starts the same work.
-
-<h2>Compiling, tools, and libraries</h2>
+<h2>Building FreeCraft</h2>
 
 <h3>Installing CVS client</h3>
 
 If you want to help develop, it is the best that you use CVS. To do so, first
-you need CVS for your system.<p>
-
-You find all information about CVS on <a href="http://www.sourceforge.net/">
-SourceForge</a>.<p>
-
-<ul>
-<li><a href="http://sourceforge.net/docman/display_doc.php?docid=763&group_id=1">
-Sourceforge: CVS HOWTO</a><p>
-CVS on SF - rookie should read it. General, should read it, <b>*too*.</b>
-<li><a href="http://sourceforge.net/docman/display_doc.php?docid=767&group_id=1">
-Win32/CVS/SSH HowTo</a><p>
-A "quick & dirty" guide
-<li><a href="http://sourceforge.net/docman/display_doc.php?docid=769&group_id=1">
-Win32/CVS/SSH addendum for WinCVS</a><p>
-Read after the Win32 Guide & Howto
-<li><a href="http://sourceforge.net/docman/display_doc.php?docid=770&group_id=1">
-SourceForge setup tool for CVS/SSH/Win32</a><p>
-There's a tool to help
-<li>Linux<p>
-Install CVS, CVS-BOOK, and if you like, a CVS GUI.
-<p>
-In Debian: apt-get install cvs; apt-get install cvsbook; apt-get install lincvs
-</ul>
+you need CVS for your system. Sourceforge has a guide that will 
+help you get started, you can go to section '<b>F</b>' of their 
+<a href="http://sourceforge.net/docman/?group_id=1">documentation page</a>.<p>
 
 <h3>Getting FreeCraft from CVS</h3>
 
-<h4>There are four modules in CVS repository.</h4>
+<h4>There are 3 modules in the CVS repository.</h4>
 
 <ul>
-<li>freecraft - The FreeCraft engine source<p>
-	All you need to use with the original WC2 CD. The sources is licenced
-	under the terms of the GPL (GNU General Public License).
+    <li>freecraft - The FreeCraft engine source<p>
+	The source to the FreeCraft engine. The source is licenced
+	under the GNU General Public License.
 	<b>This module is needed for development.</b>
 
-<li>fcsp - The FreeCraft Sound Project<p>
-	<b>This module will be removed.</b><p>
-	A collection of free sounds and music, GPL (GNU General Public License)
-	prefered. But each file can have its own license, so please read.
-
-<li>fcgp - The FreeCraft Graphic Project<p>
-	<b>This module will be removed.</b><p>
-	A collection of free graphics, animations and models, GPL
-	(GNU General Public License) prefered. But each file can have its own
-	license, so please read.
-
-<li>Planned: fcmp - The FreeCraft Media Project<p>
-	This will be the replacement of FcSP and FcGP.<p>
+    <li>fcmp - The FreeCraft Media Project<p>
 	A collection of free media (free sounds, music, videos, graphics,
-	animations and models), GPL (GNU General Public License) prefered.
-	But each file can have its own license, so please read.
+	animations and models), licensed under the GNU General Public License.
 
-<li>crafted - The FreeCraft Map Editor<p>
-	A map editor for FreeCraft. This project has just started and also needs
-	more developers.
+    <li>crafted - The FreeCraft Map Editor<p>
+	A map editor for FreeCraft. This is obsolete now as FreeCraft 
+	has an internal editor.
 </ul>
 
 <h4>How do I access to these modules?</h4>
 
-<h5>Anonymous CVS Access</h5>
+The instructions for accessing the modules are on the 
+<a href="http://sourceforge.net/cvs/?group_id=1965">project cvs</a> page.<br> 
+NOTE: it is highly recommended that you use the -z3 flag, this compresses 
+the data and therefore speeds the transfer up.<p>
 
-This is for all user/developer/designer without account on SourceForge.<p>
-
-Make somewhere a directory FreeCraft. Enter this directory.<p>
+For example:<p>
 
 cvs -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft login<br>
 <i>"When prompted for a password for anonymous, simply press the Enter key."</i><br>
-cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co freecraft<br>
-cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co crafted<br>
-cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcgp<br>
-cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcsp<p>
+cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co freecraft<p>
 
-You will now have the directories freecraft, crafted, fcpg and fcsp.<p>
+This is done only once. To update your CVS directory, go into 
+the module directory and type 'cvs -z3 -q update -dP'.<p>
 
-In the future, only go into any directory and enter "cvs -q update -d" to update to
-the latest version.<p>
-
-<h5>Developer CVS Access via SSH</h5>
-
-Only project developers can access the CVS tree via this method. Substitute
-<i>developername</i> with the proper values. Enter your site password when
-prompted.<p>
-
-export CVS_RSH=ssh<br>
-cvs -z3 -d:ext:<i>developername</i>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co freecraft<br>
-cvs -z3 -d:ext:<i>developername</i>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co crafted<br>
-cvs -z3 -d:ext:<i>developername</i>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcgp<br>
-cvs -z3 -d:ext:<i>developername</i>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcsp<p>
-
-You will now have the directories freecraft, crafted, fcpg and fcsp.<p>
-
-In the future only go into any directory and enter "cvs -q update -d" to get
-the latest version. You'll be prompted to enter your ssh password.<p>
+You may put these flags in your ~/.cvsrc file so that you only 
+need to type 'cvs update', the cvs (1) man page will show you how.
 
 <h3>Getting FreeCraft without CVS</h3>
 
-Please note CVS is always a little newer and it is easier for you to keep
-up to date. But you find can regular snapshots of FreeCraft in source or
-binary format under the files section on sourceforge.
+Please note CVS is always the latest and it is easier for you to keep
+up to date. But if for some reason you cannot get the source via CVS, 
+you find can regular snapshots of FreeCraft 
+<a href="http://freecraft.sourceforge.net/snapshots">here</a>.
 
-<ul>
-<li><a href="http://http://sourceforge.net/project/showfiles.php?group_id=1965">Sourceforge Files</a>
-</ul>
+<h3>Compiling FreeCraft</h3>
 
-<h3>Linux(tm)</h3>
-
-To build FreeCraft with Linux you will need the following packages. The
-following list refers mainly to Debian packages. You'll have to figure out
-the corresponding packages in your particular distribution.
-<ul>
-<li>gcc - The GNU C compiler<p>
-    gcc-2.95 preferred. Old gcc 2.96 can't compile FreeCraft. gcc 3.0 produce
-    many wrong! warnings. gcc 3.2 will work nicely.
-<li>libc6-dev - GNU C Library: Development Libraries and Header Files<p>
-    Contains the symlinks, headers, and object files needed to compile and link
-    programs which use the standard C library.
-<li>libpng2-dev - PNG library - development<p>
-    libpng is a library implementing an interface for reading and writing PNG
-    (Portable Network Graphics) format files.
-<li>zlib-dev - compression library - development<p>
-    zlib is a library implementing the deflate compression method found in gzip
-    and pkzip.  This package includes the development support files.
-<li>xlibs-dev - X Window System client library development files<p>
-    xlibs-dev provides static versions of the libraries provided in xlibs, as
-    well as several libraries that do not exist in shared object form for  
-    various reasons (such as the fact that their API's have not stabilized, or
-    that they are deprecated).  Include files and manual pages are also
-    provided.
-<li>libsdl1.2-dev - Development files for Simple DirectMedia Layer<p>
-    Very simply, SDL is a library that allows you portable low level access to
-    a video framebuffer, audio output, mouse, and keyboard.<p>
-    This package contains the files needed to compile and link programs which
-    use SDL.<p>
-    If not included in your distribution you can get it
-    <a href="http://www.libsdl.org">here</a>.
-</ul>
-
-<h3>MacOS(tm)</h3>
-
-To build FreeCraft with MacOS you will need the following packages.
-<ul>
-<ul>
-<li>gcc - The GNU C compiler<p>
-    gcc-2.95 preferred. Old gcc 2.96 can't compile FreeCraft. gcc 3.0 produce
-    many wrong! warnings. gcc 3.2 will work nicely.
-<li>If you have MacOS, can you please write this section. And send it us as
-    patch.
-<li>You can run ./setup which should work on MacOS/Darwin.
-<li>Or extract the project builder archive "contrib/macosx.tgz", this should
-    work on MacOS X.
-</ul>
-<li>libpng2-dev - PNG library - development<p>
-    libpng is a library implementing an interface for reading and writing PNG
-    (Portable Network Graphics) format files.
-<li>zlib-dev - compression library - development<p>
-    zlib is a library implementing the deflate compression method found in gzip
-    and pkzip.  This package includes the development support files.
-<li>libsdl1.2-dev - Development files for Simple DirectMedia Layer<p>
-    Very simply, SDL is a library that allows you portable low level access to
-    a video framebuffer, audio output, mouse, and keyboard.<p>
-    This package contains the files needed to compile and link programs which
-    use SDL.<p>
-    If not included in your distribution you can get it
-    <a href="http://www.libsdl.org">here</a>.
-</ul>
-
-<h3>Windows(tm)</h3>
-
-You need a C compiler for Windows. Get <b>one</b> of the following.
-<ul>
-<li>VC++<p>
-    In order to compile FreeCraft with VC++ follow these instructions:
-    <ul>
-    <li>Extract the VC++ project and workspace files from
-	freecraft\contrib\msvc.zip into the root freecraft directory.
-    <li><a href="http://freecraft.sourceforge.net/snapshots/msvc-libs.zip">
-	Download</a> the VC++ libraries and extract them into the root
-	freecraft directory.
-    <li>Copy freecraft\contrib\freecraft.ico to freecraft\src.
-    <li>You should now be able to compile freecraft.
-    </ul>
-    
-
-<p><li><a href="http://sources.redhat.com/cygwin/">cygwin</a><p>
-    The Cygwin tools are ports of the popular GNU development tools and
-    utilities for Windows. They function by using the Cygwin library which
-    provides a UNIX-like API on top of the Win32 API.
-<p><li><a href="http://www.mingw.org">MinGW</a><p>
-    MinGW is a collection of header files and import libraries that allow one
-    to use GCC and produce native Win32 programs that do not rely on any
-    3rd-party DLLs.<p>
-
-    <ul>
-    <li><b>CROSSCOMPILE ONLY</b>: <a href="http://www.libsdl.org/Xmingw32/">
-	http://www.libsdl.org/Xmingw32/</a><p>
-	Informations how to use MingGW and libSDL for cross development and
-	native development.<p>
-    <li><a href="http://www.libsdl.org/Xmingw32/mingw32.zip">
-	http://www.libsdl.org/Xmingw32/mingw32.zip</a><p>
-	Compiler package for Windows, built by Sam Lantinga.<p>
-
-    
-    <li><a href="http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-021216.zip?download">
-	http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-021216.zip?download
-	</a><p>
-
-	My build is based on the above. Contains SDL 1.2.4, libpng, zlib.
-	libbz2 and libzzip.  Install this, download the newest FreeCraft
-	source and start FreeCraft development under Windows. Come on!<p>
-	<b>If unclear, please download only this.</b>
-    </ul>
-</ul>
-
-<h3>Windows CE(tm) / PocketPc(tm)</h3>
-
-You need a C compiler for this platform.<p>
-<ul>
-<li>eMbedded Visual C++ 3.0<p>
-    You can download or order it <a href="http://www.microsoft.com/mobile/downloads/emvt30.asp">
-    here</a>. 
-<li>CE support for Visual C++ or Visual Studio<p>
-    This isn't supported yet. If you know the links and how to use, please
-    publish this.
-</ul>
-
-You need the following libs for WinCE.
-<ul>
-<li>libpng<p>
-    Required, you can download a ready and compiled development version here:
-    <a href="http://freecraft.net/snapshots/win-ce/lpngce108a.zip">lpngce108a.zip</a>
-    or <a href="http://www.tenik.co.jp/~adachi/wince/index.htm">author site</a>
-<li>zlib<p>
-    Required, you can download a ready and compiled development version here:
-    <a href="http://freecraft.net/snapshots/win-ce/zlibce12.zip">zlibce12.zip</a>
-    or <a href="http://www.tenik.co.jp/~adachi/wince/index.htm">author site</a>
-<li>libsdl<p>
-    Required, or you should write a new WinCE hardware driver for FreeCraft. You
-    will find information about SDL on the
-    <a href="http://www.libsdl.org">libSDL home</a> and you can download it
-    <a href="http://www.libsdl.org/download-1.2.html">here</a> and 
-    <a href="http://www.libsdl.org/cvs/WinCE-SDL.zip">workbench and project</a>.
-<li>bz2lib<p>
-    Not required and no WinCE version found.
-<li>zziplib<p>
-    Not required and no WinCE version found.
-</ul>
-
-Now you need the 
-<a href="http://freecraft.sourceforge.net/snapshots/win-ce/FreeCraft%20CE.vcp.gz">
-emVC++ project</a> and
-<a href="http://freecraft.sourceforge.net/snapshots/win-ce/FreeCraft%20CE.vcw.gz">
-emVC++ workbench</a> for FreeCraft.<p>
-
-With the sources from CVS, you can continue working.<br>
-<b>Note: WinCE isn't supported yet.</b>
-
-<h2>Make and makefiles</h2>
-
-<i>Remember the first time you must start ./setup <b>or</b> copy
-Rules.make.orig to Rules.make and edit it.</i><p>
-
-Type 'make help' to get an overview what all could be made.<p>
-
-'make depend'<p>
-
-and then<p>
-
-'make'<p>
-
-is all you need, most times.<p>
-
-<h2>C code documentation</h2>
-
-See below: you can use always the source code documentation.<p>
-
-I have prepared some extra documentation:<p>
-
-<ul>
-<li><a href="datadir.html">FreeCraft data directory description.</a>
-</ul>
+You can find instructions for compiling FreeCraft at 
+<a href="install.html">install.html</a>.<br>
+Since you already have a copy of the source, you may skip 
+ahead to step 2.
 
 <h2>Source code documentation</h2>
 
-Valery Shchedrin has introduced tagged source documentation. I continue to
-use them.<p>
+Valery Shchedrin has introduced tagged source 
+documentation for FreeCraft.<p>
 
 <h3>This programs are required</h3>
 
 You need one these programs to generate source code documentation.
 <ul>
-<li><a href="http://www.stack.nl/~dimitri/doxygen/download.html">DoxyGen</a>
-or <a href="http://www.doxygen.org">DoxyGen</a>
-<li><a href="http://www.zib.de/Visual/software/doc++/index.html">DOC++</a>
+    <li><a href="http://www.doxygen.org">DoxyGen</a>
+    <li><a href="http://www.zib.de/Visual/software/doc++/index.html">DOC++</a>
 </ul>
 
 <h3>Generate documentation from source code</h3>
 
 Please compile and install one of the above programs.
-With these commands you produce the documentation:
+Use the following commands to produce the documentation:
 <ul>
-<li><em>make doc</em> If you use DoxyGen.
-<li><em>make doc++</em> If you use DOC++.
+    <li><em>make doc</em> If you use DoxyGen.
+    <li><em>make doc++</em> If you use DOC++.
 </ul>
 
 <h3>Tags used in source code</h3>
 
-I use the doc++ tags:<p>
+We use the doc++ tags:<p>
 
+Multi line source code documentation:<p>
 /** ... */<p>
-Multi line source code documentation.<p>
+
+Single line source code documentation:<p>
 /// ... <p>
-Single line source code documentation.<p>
+
+Start grouping:<p>
 //@{ or /*@{*/<p>
-Start grouping.<p>
+
+End grouping:<p>
 //@} or /*@}*/<p>
-End grouping.<p>
+
 
 <ul>
-<li>@name
-<br>Name of file or group.
-<li>@param
-<br>Describes function/macro parameter
-<li>@return
-<br>Describes function return
-<li>@see
-<br>Links to other section
-</ul>
-<p>
-Please read the documentation of the programs.
+    <li>@name
+    <br>Name of file or group.
+    <li>@param
+    <br>Describes function/macro parameter
+    <li>@return
+    <br>Describes function return
+    <li>@see
+    <br>Links to other section
+</ul><p>
+
+Please read the doxygen/doc++ documentation.
 
 <h2>Empty C prototype file</h2>
 
@@ -455,61 +220,48 @@ Please read the documentation of the programs.
 <h2>Coding style</h2>
 
 You can use your own coding style in your own modules.
-If you fix in other modules, please imitate the coding style of the old coder.
+If you fix in other modules, please imitate the coding style of the original coder.
 
-<p>I suggest: <a href="/usr/src/linux/Documentation/CodingStyle">
-(Linux kernel coding style) </a>
+<p>We suggest the 
+<a href="/usr/src/linux/Documentation/CodingStyle">Linux kernel coding style</a> (also 
+found online <a href="http://lwn.net/2001/1115/a/CodingStyle.php3">here</a>).
 <ul>
-<li>Write ANSI C.
-<li>Use 8 spaces tabulators.
-<li>Use 4 spaces indentation levels.
-<li>No line should be longer than 78 characters.
-<li>Use C++ comments for to end of line comments.
-<li>Use { } also for one statement blocks.
+    <li>Write ANSI C.
+    <li>Use 8 spaces tabulators.
+    <li>Use 4 spaces indentation levels.
+    <li>No line should be longer than 78 characters.
+    <li>Use C++ comments for to end of line comments.
+    <li>Use { } even for one statement blocks.
 </ul>
+
+NOTE: If you make big changes please always extend the copyright with your name, 
+and always update the copyright year if required.<p>
 
 <h2>Sending a patch</h2>
 
-Now you made something, how this should be included into the main distribution?
-<p>
+Once you have completed some work, you will probably want it to be 
+included in the main FreeCraft source.<p>
 
-Follow the following steps:<p>
+Follow these steps:<p>
 
 <ul>
-<li>cvs -q update -d
-<li>cvs -q diff -u &gt; your-nickname.diff
-<li>upload it to <a href="http://sourceforge.net/tracker/?func=add&group_id=1965&atid=301965">patch tracker on sourceforge</a>
+    <li>cvs -q update -d
+    <li>cvs -q diff -u &gt; your-nickname.diff
+    <li>upload your-nickname.diff to the
+    <a href="http://sourceforge.net/tracker/?group_id=1965&amp;atid=301965">patch tracker</a>.
 </ul>
 
 <h2>Building FcMP</h2>
 
-The new FcMP (FreeCraft Media Project) isn't yet available from CVS. You
-can only download it as complete archive. Download it, extract it, copy
-the binary freecraft(.exe) into the top directory and start it.
+Once you have the fcmp module, go into the 'fcmp' directory, and edit 
+the location variables if necessary in 'buildfcmp.sh'. Then run 
+the 'buildfcmp.sh' script and it will create a working data.fcmp directory.<p>
 
-<h2>Building CraftED from CVS</h2>
-
-CraftED uses autoconf and configure. To build from CVS use.<p>
-
-./autogen.sh<br>
-make<br>
-./src/crafted<p>
-
-<i>Note: the first time you must enter your path to the FcMP/original data
-directory.</i> For more documentation please look into the docs directory.
-
-<h2>Building CraftED from tarball</h2>
-
-CraftED uses autoconf and configure. To build from tarball distribution use.<p>
-
-./configure<br>
-make<br>
-./src/crafted<p>
-
-<i>Note: the first time you must enter your path to the FcMP/original data
-directory.</i> For more documentation please look into the docs directory.
+Please read the <a href="datadir.html">FreeCraft data directory description.</a>
 
 <hr>
-All trademarks and copyrights on this page are owned by their respective owners.
-<address><a href="http://freecraft.org">The FreeCraft Project</a>
-</address></body></html>
+(C) Copyright 1998-2003 by The <a href="http://freecraft.sf.net">FreeCraft</a> Project  
+under the <a href="gpl.html">GNU General Public License</a>.<br>                        
+All trademarks and copyrights on this page are owned by their respective owners.<br>    
+</body>
+</html>                                                                   
