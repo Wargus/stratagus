@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -112,8 +112,12 @@ global void HandleActionTrain(Unit* unit)
 	nunit->X=unit->X;
 	nunit->Y=unit->Y;
 	type=unit->Type;
-	// Set unit to belong to the building building it.
-	nunit->Next=unit;
+
+	//  Some guy made DropOutOnSide set unit to belong to the building
+	//  training it. This was an ugly hack, setting X and Y is enough,
+	//  no need to add the unit only to be removed.
+	nunit->X=unit->X;
+	nunit->Y=unit->Y;
 
 	DropOutOnSide(nunit,LookingW,type->TileWidth,type->TileHeight);
 

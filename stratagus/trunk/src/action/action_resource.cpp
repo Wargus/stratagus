@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -58,12 +58,7 @@ typedef struct _resource_ {
     unsigned char Action;		/// Unit action.
     int	Frame;				/// Frame for active resource
     Unit* (*ResourceOnMap)(int,int);	/// Get the resource on map.
-    Unit* (*DepositOnMap)(int,int);	/// Get the deposit on map.
-	 /// Find the source of resource
-    Unit* (*FindResource)(const Player*,int,int);
-	 /// Find the deposit of resource
-    Unit* (*FindDeposit)(const Unit*,int,int);
-    int Cost;				/// How many can the unit carry.
+    int Cost;				/// Resource type
     UnitType** Human;			/// Human worker
     UnitType** HumanWithResource;	/// Human worker with resource
     UnitType** Orc;			/// Orc worker
@@ -284,7 +279,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	//	Find and send to resource deposit.
 	//
-	if( !(depot=resource->FindDeposit(unit,unit->X,unit->Y)) ) {
+	if( !(depot=FindDeposit(unit->Player,unit->X,unit->Y,resource->Cost)) ) {
 	    if( source ) {
 		DropOutOnSide(unit,LookingW
 		    ,source->Type->TileWidth,source->Type->TileHeight);
@@ -463,7 +458,7 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 
     DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
-	depot=resource->DepositOnMap(unit->X,unit->Y);
+	depot=ResourceDepositOnMap(unit->X,unit->Y,resource->Cost);
 	DebugCheck( !depot );
 	// Could be destroyed, but than we couldn't be in?
 
@@ -474,7 +469,7 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 	    x=(int)unit->Orders[0].Arg1>>16;
 	    y=(int)unit->Orders[0].Arg1&0xFFFF;
 	}
-	if( !(goal=resource->FindResource(unit->Player,x,y)) ) {
+	if( !(goal=FindOilPlatform(unit->Player,x,y)) ) {
 	    DropOutOnSide(unit,LookingW,
 		    depot->Type->TileWidth,depot->Type->TileHeight);
 	    unit->Orders[0].Action=UnitActionStill;
@@ -618,9 +613,6 @@ local Resource ResourceOil[1] = {
     UnitActionHaulOil,
     2,					// FIXME: hardcoded.
     PlatformOnMap,
-    OilDepositOnMap,
-    FindOilPlatform,
-    FindOilDeposit,
     OilCost,
     // FIXME: The & could be removed.
     &UnitTypeHumanTanker,

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -506,32 +506,6 @@ global Unit* GoldMineOnMap(int tx,int ty)
 }
 
 /**
-**	Gold deposit on map tile
-**
-**	@param tx	X position on map, tile-based.
-**	@param ty	Y position on map, tile-based.
-**
-**	@return		Returns the gold deposit if found, or NoUnitP.
-*/
-global Unit* GoldDepositOnMap(int tx,int ty)
-{
-    Unit* table[UnitMax];
-    int i;
-    int n;
-
-    n=SelectUnitsOnTile(tx,ty,table);
-    for( i=0; i<n; ++i ) {
-	if( UnitUnusable(table[i]) ) {
-	    continue;
-	}
-	if( table[i]->Type->StoresGold ) {
-	    return table[i];
-	}
-    }
-    return NoUnitP;
-}
-
-/**
 **	Oil patch on map tile
 **
 **	@param tx	X position on map, tile-based.
@@ -581,14 +555,15 @@ global Unit* PlatformOnMap(int tx,int ty)
 }
 
 /**
-**	Oil deposit on map tile
+**	Resource deposit on map tile
 **
 **	@param tx	X position on map, tile-based.
 **	@param ty	Y position on map, tile-based.
+**	@param resource	resource type.
 **
-**	@return		Returns the oil deposit if found, or NoUnitP.
+**	@return		Returns the deposit if found, or NoUnitP.
 */
-global Unit* OilDepositOnMap(int tx,int ty)
+global Unit* ResourceDepositOnMap(int tx,int ty,int resource)
 {
     Unit* table[UnitMax];
     int i;
@@ -599,33 +574,7 @@ global Unit* OilDepositOnMap(int tx,int ty)
 	if( UnitUnusable(table[i]) ) {
 	    continue;
 	}
-	if( table[i]->Type->StoresOil ) {
-	    return table[i];
-	}
-    }
-    return NoUnitP;
-}
-
-/**
-**	Wood deposit on map tile
-**
-**	@param tx	X position on map, tile-based.
-**	@param ty	Y position on map, tile-based.
-**
-**	@return		Returns the wood deposit if found, or NoUnitP.
-*/
-global Unit* WoodDepositOnMap(int tx,int ty)
-{
-    Unit* table[UnitMax];
-    int i;
-    int n;
-
-    n=SelectUnitsOnTile(tx,ty,table);
-    for( i=0; i<n; ++i ) {
-	if( UnitUnusable(table[i]) ) {
-	    continue;
-	}
-	if( table[i]->Type->StoresWood || table[i]->Type->StoresGold ) {
+	if( table[i]->Type->Stores[resource] ) {
 	    return table[i];
 	}
     }

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -298,6 +298,10 @@
 **
 **		Can transport units
 **
+**	UnitType::MaxOnBoard
+**
+**		Maximum units on board (for transporters)
+**
 **	UnitType::GivesOil
 **
 **		We get here oil
@@ -585,20 +589,22 @@ struct _unit_type_ {
     unsigned CowerWorker : 1;		/// Is a worker, runs away if attcked
     unsigned Tanker : 1;		/// FIXME: used? Can transport oil
     unsigned Transporter : 1;		/// Can transport units
+    unsigned MaxOnBoard;		/// Number of Transporter slots.
     unsigned GivesOil : 1;		/// We get here oil
+/*    unsigned StoresWood : 1;		/// We can store wood here
     unsigned StoresGold : 1;		/// We can store oil/gold/wood here
+    unsigned StoresOil : 1;		/// We can store oil here*/
+    unsigned Stores[MaxCosts];		/// Resources that we can store here.
     unsigned Vanishes : 1;		/// Corpes & destroyed places
     unsigned GroundAttack : 1;		/// Can do command ground attack
     unsigned IsUndead : 1;		/// Unit is already dead
     unsigned ShoreBuilding : 1;		/// Building must be build on coast
     unsigned CanCastSpell : 1;		/// Unit is able to use spells
-    unsigned StoresWood : 1;		/// We can store wood here
     unsigned CanAttack : 1;		/// Unit can attack
     unsigned Tower : 1;			/// Unit can attack, but not move
     unsigned OilPatch : 1;		/// Platform can be build here
     unsigned GoldMine : 1;		/// Gold can be collected here
     unsigned Hero : 1;			/// Is hero only used for triggers 
-    unsigned StoresOil : 1;		/// We can store oil here
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit
     unsigned CowerMage : 1;		/// FIXME: docu
     unsigned Organic : 1;		/// Organic can be healed

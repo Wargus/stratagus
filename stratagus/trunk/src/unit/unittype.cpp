@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -462,19 +462,19 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->Tanker=BIT(9,v);
 	unittype->Transporter=BIT(10,v);
 	unittype->GivesOil=BIT(11,v);
-	unittype->StoresGold=BIT(12,v);
+	unittype->Stores[GoldCost]=BIT(12,v);
 	unittype->Vanishes=BIT(13,v);
 	unittype->GroundAttack=BIT(14,v);
 	unittype->IsUndead=BIT(15,v);
 	unittype->ShoreBuilding=BIT(16,v);
 	unittype->CanCastSpell=BIT(17,v);
-	unittype->StoresWood=BIT(18,v);
+	unittype->Stores[WoodCost]=BIT(18,v);
 	unittype->CanAttack=BIT(19,v);
 	unittype->Tower=BIT(20,v);
 	unittype->OilPatch=BIT(21,v);
 	unittype->GoldMine=BIT(22,v);
 	unittype->Hero=BIT(23,v);
-	unittype->StoresOil=BIT(24,v);
+	unittype->Stores[OilCost]=BIT(24,v);
 	unittype->Volatile=BIT(25,v);
 	unittype->CowerMage=BIT(26,v);
 	unittype->Organic=BIT(27,v);
@@ -879,20 +879,25 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     if( type->GivesOil ) {
 	fprintf(file,"  'gives-oil\n");
     }
-    if( type->StoresGold ) {
-	fprintf(file,"  'stores-gold\n");
-    }
-    if( type->StoresWood ) {
-	fprintf(file,"  'stores-wood\n");
-    }
+
+    // Save store info.
+    for (flag=i=0;i<MaxCosts;i++)
+	if (type->Stores[i]) {
+	    if (!flag) {
+		flag=1;
+		fprintf(file," 'can-store '(%s",DefaultResourceNames[i]);
+	    } else {
+	    	fprintf(file," %s",DefaultResourceNames[i]);
+	    }
+	}
+    if (flag)
+	fprintf(file,")");
+    
     if( type->OilPatch ) {
 	fprintf(file,"  'oil-patch\n");
     }
     if( type->GoldMine ) {
 	fprintf(file,"  'gives-gold\n");
-    }
-    if( type->StoresOil ) {
-	fprintf(file,"  'stores-oil\n");
     }
 
     if( type->Vanishes ) {

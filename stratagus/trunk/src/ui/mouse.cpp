@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________			     ______________________
@@ -206,14 +206,14 @@ global void DoRightButton(int sx,int sy)
 		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
 		    if( dest->Player==unit->Player ) {
 			dest->Blink=4;
-			if( dest->Type->StoresGold
+			if( dest->Type->Stores[GoldCost]
 				&& (type==UnitTypeOrcWorkerWithGold
 				    || type==UnitTypeHumanWorkerWithGold) ) {
 			    DebugLevel3("GOLD-DEPOSIT\n");
 			    SendCommandReturnGoods(unit,dest,flush);
 			    continue;
 			}
-			if( (dest->Type->StoresWood || dest->Type->StoresGold)
+			if( (dest->Type->Stores[WoodCost])
 				&& (type==UnitTypeOrcWorkerWithWood
 				    || type==UnitTypeHumanWorkerWithWood) ) {
 			    DebugLevel3("WOOD-DEPOSIT\n");
@@ -278,7 +278,7 @@ global void DoRightButton(int sx,int sy)
 		if( UnitUnderCursor && (dest=UnitOnMapTile(x,y))
 			&& dest->Player==unit->Player ) {
 		    dest->Blink=4;
-		    if( dest->Type->StoresOil ) {
+		    if( dest->Type->Stores[OilCost] ) {
 			DebugLevel3("OIL-DEPOSIT\n");
 			SendCommandReturnGoods(unit,dest,flush);
 			continue;
@@ -1326,6 +1326,8 @@ global void UIHandleButtonDown(unsigned button)
     static int OldShowAttackRange;
     static int OldShowReactionRange;
     static int OldValid;
+    Unit* uins;
+    int i;
 
 /**
 **	Detect long selection click, FIXME: tempory hack to test the feature.
@@ -1533,11 +1535,16 @@ global void UIHandleButtonDown(unsigned button)
 		} else if( ButtonUnderCursor>2 && ButtonUnderCursor<9 ) {
 		    if( NumSelected==1 && Selected[0]->Type->Transporter ) {
 			if( !GameObserve && !GamePaused ) {
-			    if( Selected[0]->OnBoard[ButtonUnderCursor-3] ) {
+			    if (Selected[0]->InsideCount>=ButtonUnderCursor-3) {
+
 				// FIXME: should check if valid here.
+				// n0b0dy: check WHAT?
+				uins=Selected[0]->UnitInside;
+				for (i=0;i<ButtonUnderCursor-3;i++)
+				    uins=uins->NextContained;
 				SendCommandUnload(Selected[0],
 					Selected[0]->X,Selected[0]->Y,
-					Selected[0]->OnBoard[ButtonUnderCursor-3],
+					uins,
 					!(KeyModifiers&ModifierShift));
 			    }
 			}

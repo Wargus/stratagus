@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -144,7 +144,6 @@ local int WaitForTransporter(Unit* unit)
 local void EnterTransporter(Unit* unit)
 {
     Unit* transporter;
-    int i;
 
     unit->Wait=1;
     unit->Orders[0].Action=UnitActionStill;
@@ -175,24 +174,20 @@ local void EnterTransporter(Unit* unit)
     unit->Orders[0].Goal=NoUnitP;
 
     //
-    //	Find free slot in transporter.
+    //		Place the unit inside the transporter.
     //
-    for( i=0; i<(int)(sizeof(unit->OnBoard)/sizeof(*unit->OnBoard)); ++i ) {
-	if( transporter->OnBoard[i]==NoUnitP ) {
-	    transporter->OnBoard[i]=unit;
-	    // FIXME: reference counts?
-	    transporter->Value++;
-	    RemoveUnit(unit,transporter);
-            //Don't make anything funny after going out of the transporter.
-            // FIXME: This is probably wrong, but it works for me (n0b0dy)
-            unit->OrderCount=1;
-            unit->Orders[0].Action=UnitActionStill;
-	    if( IsOnlySelected(transporter) ) {
-		UpdateButtonPanel();
-		MustRedraw|=RedrawPanels;
-	    }
-	    return;
+   
+    if (transporter->InsideCount<transporter->Type->MaxOnBoard) {
+    	RemoveUnit(unit,transporter);
+    	//Don't make anything funny after going out of the transporter.
+    	// FIXME: This is probably wrong, but it works for me (n0b0dy)
+    	unit->OrderCount=1;
+    	unit->Orders[0].Action=UnitActionStill;
+    	if( IsOnlySelected(transporter) ) {
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawPanels;
 	}
+	return;
     }
     DebugLevel0Fn("No free slot in transporter\n");
 }

@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -257,6 +257,9 @@ local void LeaveTransporter(Unit* unit)
     stillonboard=0;
 
     goal=unit->Orders[0].Goal;
+    //
+    //	Goal is the specific unit unit that you want to unload.
+    //	This can be NULL, in case you want to unload everything.
     DebugLevel3Fn("Goal %p\n" _C_ goal);
     if( goal ) {
 	unit->Orders[0].Goal=NoUnitP;
@@ -271,28 +274,18 @@ local void LeaveTransporter(Unit* unit)
 	RefsDebugCheck( !goal->Refs );
 	--goal->Refs;
 	RefsDebugCheck( !goal->Refs );
-	for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
-	    if( goal==unit->OnBoard[i] ) {
-		goal->X=unit->X;
-		goal->Y=unit->Y;
-		if( UnloadUnit(goal) ) {
-		    unit->OnBoard[i]=NoUnitP;
-		    unit->Value--;
-		}
-		break;
-	    }
-	}
+	goal->X=unit->X;
+	goal->Y=unit->Y;
+	// Try to unload the unit. If it doesn't work there is no problem.
+	UnloadUnit(goal);
     } else {
-	for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
-	    if( (goal=unit->OnBoard[i]) ) {
-		goal->X=unit->X;
-		goal->Y=unit->Y;
-		if( UnloadUnit(goal) ) {
-		    unit->OnBoard[i]=NoUnitP;
-		    unit->Value--;
-		} else {
-                    stillonboard++;
-                }
+	// Unload all units.
+	goal=unit->UnitInside;
+	for( i=unit->InsideCount; i; --i,goal=goal->NextContained) {
+	    goal->X=unit->X;
+	    goal->Y=unit->Y;
+	    if( !UnloadUnit(goal) ) {
+		stillonboard++;
 	    }
 	}
     }

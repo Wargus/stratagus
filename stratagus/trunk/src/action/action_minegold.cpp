@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -282,7 +282,7 @@ local int MineInGoldmine(Unit* unit)
 	//
 	//	Find gold depot
 	//
-	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
+	if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,GoldCost)) ) {
 	    if( mine ) {
 		DropOutOnSide(unit,LookingW
 			,mine->Type->TileWidth,mine->Type->TileHeight);
@@ -474,7 +474,7 @@ local int StoreGoldInDeposit(Unit* unit)
 
     DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
-	depot=GoldDepositOnMap(unit->X,unit->Y);
+	depot=ResourceDepositOnMap(unit->X,unit->Y,GoldCost);
 	DebugCheck( !depot );
 	// Could be destroyed, but than we couldn't be in?
 

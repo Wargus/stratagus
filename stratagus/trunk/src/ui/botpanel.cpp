@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -820,7 +820,7 @@ global void UpdateButtonPanel(void)
 				buttonaction->ValueStr )=='R';
 		break;
 	    case ButtonUnload:
-		allow = Selected[0]->Value;
+		allow = (Selected[0]->Type->Transporter&&Selected[0]->InsideCount);
 		break;
 	    case ButtonCancel:
 		allow = 1;

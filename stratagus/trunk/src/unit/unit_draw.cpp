@@ -1,7 +1,7 @@
 //       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
@@ -1046,14 +1046,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    //	Transporter with units on board.
 	    //
 	    } else if( unit->Type->Transporter ) {
-		// Count units on board.
-		// FIXME: We can do this nicer?
-		for( w=f=0; f<MAX_UNITS_ONBOARD; ++f ) {
-		    if( unit->OnBoard[f] ) {
-			++w;
-		    }
-		}
-		DrawManaBar(x,y,type,MAX_UNITS_ONBOARD,w);
+		DrawManaBar(x,y,type,unit->Type->MaxOnBoard,unit->InsideCount);
 	    }
 	}
     }
@@ -1121,14 +1114,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    //	Transporter with units on board.
 	    //
 	    } else if( unit->Type->Transporter ) {
-		// Count units on board.
-		// FIXME: We can do this nicer?
-		for( w=f=0; f<MAX_UNITS_ONBOARD; ++f ) {
-		    if( unit->OnBoard[f] ) {
-			++w;
-		    }
-		}
-		DrawManaSprite(x,y,type,MAX_UNITS_ONBOARD,w);
+		DrawManaSprite(x,y,type,unit->Type->MaxOnBoard,unit->InsideCount);
 	    }
 	}
     }
@@ -1689,20 +1675,20 @@ local void GraphicUnitPixels(const Unit* unit,const Graphic* sprite)
     switch( VideoBpp ) {
 	case 8:
 	    *((struct __4pixel8__*)(((VMemType8*)sprite->Pixels)+208))
-		    =unit->Colors.Depth8;
+		    =unit->Colors->Depth8;
 	    break;
 	case 15:
 	case 16:
 	    *((struct __4pixel16__*)(((VMemType16*)sprite->Pixels)+208))
-		    =unit->Colors.Depth16;
+		    =unit->Colors->Depth16;
 	    break;
 	case 24:
 	    *((struct __4pixel24__*)(((VMemType24*)sprite->Pixels)+208))
-		    =unit->Colors.Depth24;
+		    =unit->Colors->Depth24;
 	    break;
 	case 32:
 	    *((struct __4pixel32__*)(((VMemType32*)sprite->Pixels)+208))
-		    =unit->Colors.Depth32;
+		    =unit->Colors->Depth32;
 	    break;
     }
 }
