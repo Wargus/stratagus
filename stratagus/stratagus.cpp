@@ -977,9 +977,13 @@ local void WaitForInput(int timeout)
 #endif
 #endif
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
     Invalidate();
     RealizeVideoMemory();
 }
@@ -1000,7 +1004,9 @@ global void ShowLoadProgress(const char* fmt, ...)
     va_end(va);
 
     if (VideoDepth && IsFontLoaded(GameFont)) {
+#ifndef USE_SDL_SURFACE
 	VideoLockScreen();
+#endif
 	for (s = temp; *s; ++s) {	// Remove non printable chars
 	    if (*s < 32) {
 		*s = ' ';
@@ -1014,7 +1020,9 @@ global void ShowLoadProgress(const char* fmt, ...)
 	VideoFillRectangle(ColorBlack, 5, VideoHeight - 18, VideoWidth - 10, 18);
 #endif
 	VideoDrawTextCentered(VideoWidth / 2, VideoHeight - 16, GameFont, temp);
+#ifndef USE_SDL_SURFACE
 	VideoUnlockScreen();
+#endif
 	InvalidateArea(5, VideoHeight - 18, VideoWidth - 10, 18);
 	RealizeVideoMemory();
     } else {
@@ -1080,10 +1088,15 @@ global void MenuLoop(char* filename, WorldMap* map)
 	//
 	//	Clear screen
 	//
+#ifdef USE_SDL_SURFACE
+	VideoClearScreen();
+	Invalidate();
+#else
 	VideoLockScreen();
 	VideoClearScreen();
 	VideoUnlockScreen();
 	Invalidate();
+#endif
 	RealizeVideoMemory();
 
 	//
