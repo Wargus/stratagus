@@ -543,7 +543,7 @@ echo
 #	CDRom options part
 #------------------------------------------------------------------------------
 echo
-echo -n "Would you like to use the [i]nternal or [S]DL CD Audio support? (i) "
+echo -n "Would you like to use [n]one or [i]nternal or [S]DL CD Audio support? (n) "
 read CDMode
 case $CDMode in
   [sS])
@@ -554,13 +554,19 @@ case $CDMode in
     echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
     echo >> $RULESFILE
     ;;
-  *)
+  [iI])
     echo "Using internal cdrom support"
     echo
     USE_SDLCD=0
     USE_LIBCDA=1
     echo "LIBCDA          = -DUSE_LIBCDA" >> $RULESFILE
     echo >> $RULESFILE
+    ;;
+  *)
+    echo "Using none cdrom support"
+    echo
+    USE_SDLCD=0
+    USE_LIBCDA=0
     ;;
 esac
 
