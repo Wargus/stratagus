@@ -858,8 +858,8 @@ void AiInit(Player* player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ ait->Race
-		_C_ ainame _C_ ait->Class);
+	DebugPrint("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ 
+		ait->Race ? ait->Race : "All" _C_ ainame _C_ ait->Class);
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;

@@ -811,7 +811,7 @@ static int CclSetPlayerData(lua_State* l)
 	} else if (!strcmp(data, "RaceName")) {
 		int i;
 
-		free(p->Name);
+		free(p->RaceName);
 		p->RaceName = strdup(LuaToString(l, 3));
 		p->Race = PlayerRaceNeutral;
 		for (i = 0; i < MAX_RACES; ++i) {

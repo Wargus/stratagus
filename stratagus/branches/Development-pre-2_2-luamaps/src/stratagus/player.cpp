@@ -874,7 +874,7 @@ void DebugPlayers(void)
 	const char* playertype;
 
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
-	DebugPrint("--  -------- - -------- ------------ ------- -- ---\n");
+	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (Players[i].Type == PlayerNobody) {
 			continue;
