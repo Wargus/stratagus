@@ -25,9 +25,6 @@
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -36,6 +33,7 @@
 #include "sound.h"
 #include "tileset.h"
 #include "map.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --      Functions
@@ -159,7 +157,7 @@ global int HandleActionRepair(Unit* unit)
 	//	Move near to target.
 	//
 	case 0:
-	    // FIXME: RESET FIRST!!
+	    // FIXME: RESET FIRST!! Why? (Johns)
 	    err=HandleActionMove(unit); 
 	    if( unit->Reset ) {
 		//
@@ -193,13 +191,13 @@ global int HandleActionRepair(Unit* unit)
 		}
 #endif
 		//
-		//	Have reached target?
+		//	Have reached target? FIXME: could use return value
 		//
 		if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
 			<=REPAIR_RANGE ) {
 		    unit->State=0;
 		    unit->SubAction=1;
-		} else if( err ) {
+		} else if( err<0 ) {
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
 #ifdef NEW_UNIT
 		    if( goal ) {		// release reference

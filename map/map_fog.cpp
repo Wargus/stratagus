@@ -261,6 +261,21 @@ global void MapMarkSight(int tx,int ty,int range)
     }
 }
 
+/**
+**	Mark the new sight of unit. (Explore and make visible.)
+**
+**	@param player	Player to mark sight.
+**	@param tx	X center position.
+**	@param ty	Y center position.
+**	@param range	Radius to mark.
+*/
+global void MapMarkNewSight(int tx,int ty,int range
+	,int dx,int dy)
+{
+    // FIXME: must write this
+    MapMarkSight(tx,ty,range);
+}
+
 #endif
 
 /**

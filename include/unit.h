@@ -400,8 +400,6 @@ extern void UnitUpdateHeading(Unit* unit);
     /// Heading and frame from delta direction x,y
 extern void UnitHeadingFromDeltaXY(Unit* unit,int x,int y);
 
-//extern int HeadingFromXY2XY(int x,int y,int dx,int dy);
-
     /// FIXME: more docu
 extern void DropOutOnSide(Unit* unit,int heading,int addx,int addy);
     /// FIXME: more docu

@@ -32,6 +32,7 @@
 #include "unit.h"
 #include "tileset.h"
 #include "map.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -168,7 +169,7 @@ global void HandleActionStill(Unit* unit)
 		// FIXME: Don't use pathfinder for this.
 		// FIXME: atleast prove the field is free.
 		unit->Command.Action=UnitActionMove;
-		unit->Command.Data.Move.Fast=1;
+		ResetPath(unit->Command);
 		unit->Command.Data.Move.Goal=NoUnitP;
 		unit->Command.Data.Move.Range=0;
 		unit->Command.Data.Move.SX=unit->X;

@@ -155,7 +155,7 @@ global void HandleActionStandGround(Unit* unit)
 	    if( x!=unit->X || y!=unit->Y ) {
 		// FIXME: Don't use pathfinder for this.
 		unit->Command.Action=UnitActionMove;
-		unit->Command.Data.Move.Fast=1;
+		ResetPath(unit->Command);
 		unit->Command.Data.Move.Goal=NoUnitP;
 		unit->Command.Data.Move.Range=0;
 		unit->Command.Data.Move.SX=unit->X;
