@@ -939,11 +939,12 @@ local void AiCollectResources(void)
 	DebugLevel3Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
 
 	//
-	//	Assign the worker
+	//	Assign the the first half of the worker
 	//
-	for( i=0; i<nunits; ++i ) {
+	for( i=0; i<nunits/2; ++i ) {
 	    // Unit is already *very* busy
 	    if (table[i]->Orders[0].Action != UnitActionBuild
+		    && table[i]->Orders[0].Action != UnitActionRepair
 		    && table[i]->OrderCount==1 ) {
 		switch( c ) {
 		    case GoldCost:
