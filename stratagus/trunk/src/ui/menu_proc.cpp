@@ -181,69 +181,26 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
     int rc;
 
     GetDefaultTextColors(&nc, &rc);
-    if (button == MBUTTON_SC_BUTTON) {
-	SysColors color;
-
-	// FIXME: colors have to be configurable
-
-	color = 123;
-	// Outer circle
-	VideoDrawHLineClip(color,x+3,y,w-6);
-	VideoDrawHLineClip(color,x+3,y+h-1,w-6);
-	VideoDrawVLineClip(color,x,y+3,h-6);
-	VideoDrawVLineClip(color,x+w-1,y+3,h-6);
-	// top left
-	VideoDrawPixelClip(color,x+1,y+1);
-	VideoDrawPixelClip(color,x+2,y+1);
-	VideoDrawPixelClip(color,x+1,y+2);
-	// top right
-	VideoDrawPixelClip(color,x+w-3,y+1);
-	VideoDrawPixelClip(color,x+w-2,y+1);
-	VideoDrawPixelClip(color,x+w-2,y+2);
-	// bottom left
-	VideoDrawPixelClip(color,x+1,y+h-3);
-	VideoDrawPixelClip(color,x+1,y+h-2);
-	VideoDrawPixelClip(color,x+2,y+h-2);
-	// bottom right
-	VideoDrawPixelClip(color,x+w-3,y+h-2);
-	VideoDrawPixelClip(color,x+w-2,y+h-2);
-	VideoDrawPixelClip(color,x+w-2,y+h-3);
-
-	// Inner circle
-	if (flags&MenuButtonClicked) {
-	    color = 199;
+    if (button == MBUTTON_SC_BUTTON || button == MBUTTON_SC_BUTTON_LEFT
+	    || button == MBUTTON_SC_BUTTON_RIGHT) {
+	if (flags&MenuButtonDisabled) {
+	    rb = button - 3;
+	    SetDefaultTextColors(FontGrey,FontGrey);
+	} else if (flags&MenuButtonClicked) {
+	    rb = button + 3;
+	    SetDefaultTextColors(rc,rc);
 	} else {
-	    color = 123;
-	}
-	VideoDrawHLineClip(color,x+8,y+3,w-16);
-	VideoDrawHLineClip(color,x+8,y+h-4,w-16);
-	VideoDrawVLineClip(color,x+4,y+7,h-14);
-	VideoDrawVLineClip(color,x+w-5,y+7,h-14);
-	// top left
-	VideoDrawPixelClip(color,x+6,y+4);
-	VideoDrawPixelClip(color,x+7,y+4);
-	VideoDrawPixelClip(color,x+5,y+5);
-	VideoDrawPixelClip(color,x+5,y+6);
-	// top right
-	VideoDrawPixelClip(color,x+w-8,y+4);
-	VideoDrawPixelClip(color,x+w-7,y+4);
-	VideoDrawPixelClip(color,x+w-6,y+5);
-	VideoDrawPixelClip(color,x+w-6,y+6);
-	// bottom left
-	VideoDrawPixelClip(color,x+5,y+h-7);
-	VideoDrawPixelClip(color,x+5,y+h-6);
-	VideoDrawPixelClip(color,x+6,y+h-5);
-	VideoDrawPixelClip(color,x+7,y+h-5);
-	// bottom right
-	VideoDrawPixelClip(color,x+w-6,y+h-7);
-	VideoDrawPixelClip(color,x+w-6,y+h-6);
-	VideoDrawPixelClip(color,x+w-8,y+h-5);
-	VideoDrawPixelClip(color,x+w-7,y+h-5);
-
-	if (text) {
+	    rb = button;
 	    if (flags&MenuButtonActive) {
 		SetDefaultTextColors(rc,rc);
 	    }
+	}
+	VideoDraw(MenuButtonGfx.Sprite, rb-1, x, y);
+	for (s = x+8; s < x+w-1-8; s += 8) {
+	    VideoDraw(MenuButtonGfx.Sprite, rb, s, y);
+	}
+	VideoDraw(MenuButtonGfx.Sprite, rb+1, x+w-1-8, y);
+	if (text) {
 	    VideoDrawTextCentered(x+w/2,y+(h-VideoTextHeight(font))/2,font,text);
 	}
 	if (flags&MenuButtonSelected) {
