@@ -62,9 +62,6 @@ enum _costs_ {
     MaxCosts				/// how many different costs
 };
 
-#define FoodCost MaxCosts
-#define ScoreCost MaxCosts+1
-
 /**
 **	Speed factor for harvesting resources
 */
