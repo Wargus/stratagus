@@ -835,11 +835,16 @@ global void AiInit(Player* player)
     ait=AiTypes;
 
     ainame=AiTypeWcNames[player->AiNum];
-    DebugLevel0(" %s\n" _C_ ainame);
+    DebugLevel0(" looking for class %s\n" _C_ ainame);
 
     //
     //	Search correct AI type.
     //
+    if( !ait ) {
+	DebugLevel0Fn("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
+	DebugLevel0Fn("AI: Look at the (define-ai) documentation.\n");
+	exit(0);
+    }
     for( ;; ) {
 	if( ait->Race && strcmp(ait->Race,player->RaceName) ) {
 	    ait=ait->Next;
@@ -847,7 +852,7 @@ global void AiInit(Player* player)
 		ainame=NULL;
 		ait=AiTypes;
 	    }
-	    DebugCheck( !ait );
+	    if( !ait ) break;
 	    continue;
 	}
 	if( ainame && strcmp(ainame,ait->Class) ) {
@@ -856,13 +861,18 @@ global void AiInit(Player* player)
 		ainame=NULL;
 		ait=AiTypes;
 	    }
-	    DebugCheck( !ait );
+	    if( !ait ) break;
 	    continue;
 	}
 	break;
     }
+    if( !ait ) {
+	DebugLevel0Fn("AI: Found no matching ai scripts at all!\n");
+	exit(0);
+    }
     if( !ainame ) {
 	DebugLevel0Fn("AI: not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+	DebugLevel0Fn("AI: Using fallback:\n");
     }
     DebugLevel0Fn("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ ait->Race
 	    _C_ ainame _C_ ait->Class );
