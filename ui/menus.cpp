@@ -275,6 +275,9 @@ local void EditorSaveVSAction(Menuitem *mi, int i);
 local void EditorSaveEnterAction(Menuitem *mi, int key);
 local void EditorSaveOk(void);
 local void EditorSaveCancel(void);
+local void EditorSaveConfirmInit(Menuitem *mi);
+local void EditorSaveConfirmOk(void);
+local void EditorSaveConfirmCancel(void);
 local void EditorQuitMenu(void);
 
 /*----------------------------------------------------------------------------
@@ -575,6 +578,9 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorSaveEnterAction,"editor-save-enter-action");
     HASHADD(EditorSaveOk,"editor-save-ok");
     HASHADD(EditorSaveCancel,"editor-save-cancel");
+    HASHADD(EditorSaveConfirmInit,"editor-save-confirm-init");
+    HASHADD(EditorSaveConfirmOk,"editor-save-confirm-ok");
+    HASHADD(EditorSaveConfirmCancel,"editor-save-confirm-cancel");
 }
 
 /*----------------------------------------------------------------------------
@@ -5128,7 +5134,7 @@ local void EditorEditAiPropertiesCancel(void)
 }
 
 /**
-**
+**	Save map from the editor
 */
 global int EditorSave(void)
 {
@@ -5148,7 +5154,6 @@ global int EditorSave(void)
     menu->items[6].flags =
 	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
     menu->items[6].d.button.text = ScenSelectDisplayPath;
-    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
     ProcessMenu("menu-editor-save", 1);
 
@@ -5166,6 +5171,9 @@ global int EditorSave(void)
     return 0;
 }
 
+/**
+**	Editor save listbox init callback
+*/
 local void EditorSaveLBInit(Menuitem *mi)
 {
     Menu *menu;
@@ -5194,6 +5202,9 @@ local void EditorSaveLBInit(Menuitem *mi)
     }
 }
 
+/**
+**	Editor save listbox exit callback
+*/
 local void EditorSaveLBExit(Menuitem *mi)
 {
     FileList *fl;
@@ -5207,6 +5218,9 @@ local void EditorSaveLBExit(Menuitem *mi)
     }
 }
 
+/**
+**	Editor save read directory filter
+*/
 local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 {
     char *suf;
@@ -5265,6 +5279,9 @@ usezzf:
     return 0;
 }
 
+/**
+**	Editor save folder button
+*/
 local void EditorSaveFolder(void)
 {
     Menu *menu;
@@ -5297,7 +5314,7 @@ local void EditorSaveFolder(void)
 }
 
 /**
-**
+**	Editor save ok button
 */
 local void EditorSaveOk(void)
 {
@@ -5305,6 +5322,7 @@ local void EditorSaveOk(void)
     Menuitem *mi;
     FileList *fl;
     int i;
+    char path[PATH_MAX];
 
     menu = FindMenu("menu-editor-save");
     mi = &menu->items[1];
@@ -5333,13 +5351,21 @@ local void EditorSaveOk(void)
 	    if (!strcasestr(ScenSelectFileName, ".pud\0")) {
 		strcat(ScenSelectFileName, ".pud");
 	    }
+	    sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
+	    if (!access(path, F_OK)) {
+		ProcessMenu("menu-editor-save-confirm", 1);
+		if (EditorCancelled) {
+		    EditorCancelled = 0;
+		    return;
+		}
+	    }
 	    EditorEndMenu();
 	}
     }
 }
 
 /**
-**
+**	Editor save cancel button
 */
 local void EditorSaveCancel(void)
 {
@@ -5347,6 +5373,9 @@ local void EditorSaveCancel(void)
     EditorEndMenu();
 }
 
+/**
+**	Editor save listbox retrieve callback
+*/
 local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
@@ -5365,6 +5394,9 @@ local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
+/**
+**	Editor save listbox action callback
+*/
 local void EditorSaveLBAction(Menuitem *mi, int i)
 {
     Menu *menu;
@@ -5393,6 +5425,9 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	Editor save vertical scroll action callback
+*/
 local void EditorSaveVSAction(Menuitem *mi, int i)
 {
     int op, d1, d2;
@@ -5477,11 +5512,39 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	Editor save input callback
+*/
 local void EditorSaveEnterAction(Menuitem *mi __attribute__ ((unused)), int key)
 {
     if (key==10 || key==13) {
 	EditorSaveOk();
     }
+}
+
+/**
+**	Editor save confirm init callback
+*/
+local void EditorSaveConfirmInit(Menuitem *mi)
+{
+    mi->menu->items[2].d.text.text = ScenSelectFileName;
+}
+
+/**
+**	Editor save confirm ok button
+*/
+local void EditorSaveConfirmOk(void)
+{
+    EditorEndMenu();
+}
+
+/**
+**	Editor save confirm cancel button
+*/
+local void EditorSaveConfirmCancel(void)
+{
+    EditorCancelled = 1;
+    EditorEndMenu();
 }
 
 /**
