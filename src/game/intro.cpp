@@ -434,7 +434,9 @@ global void ShowIntro(const Intro *intro)
 
     CallbackMusicOff();
     StopMusic();
+#ifdef WITH_SOUND
     PlaySectionMusic(PlaySectionBriefing);
+#endif
     if( intro->VoiceFile[0] ) {
 	PlayFile(intro->VoiceFile[0]);
     }
@@ -539,11 +541,13 @@ global void ShowIntro(const Intro *intro)
     CallbackMusicOn();
     StopMusic();
     // FIXME: should this be GameMusic?
+#ifdef WITH_SOUND
     if (CDMode == CDModeOff || CDMode == CDModeStopped) {
 	PlayMusic(MenuMusic);
     } else {
 	CDRomCheck(NULL);
     }
+#endif
 }
 
 /**
