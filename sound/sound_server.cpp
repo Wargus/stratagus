@@ -524,14 +524,16 @@ static int FillOneChannel(SoundRequest* sr)
 	Assert(NextFreeChannel < MaxChannels);
 
 	next_free = Channels[NextFreeChannel].Point;
-	Channels[NextFreeChannel].Source = sr->Source;
-	Channels[NextFreeChannel].Point = 0;
 	Channels[NextFreeChannel].Volume = ComputeVolume(sr);
-	Channels[NextFreeChannel].Command = ChannelPlay;
-	Channels[NextFreeChannel].Sound = sr->Sound;
-	Channels[NextFreeChannel].Sample = ChooseSample(sr);
-	Channels[NextFreeChannel].Stereo = sr->Stereo;
-	NextFreeChannel = next_free;
+	if (Channels[NextFreeChannel].Volume) {
+		Channels[NextFreeChannel].Source = sr->Source;
+		Channels[NextFreeChannel].Point = 0;
+		Channels[NextFreeChannel].Command = ChannelPlay;
+		Channels[NextFreeChannel].Sound = sr->Sound;
+		Channels[NextFreeChannel].Sample = ChooseSample(sr);
+		Channels[NextFreeChannel].Stereo = sr->Stereo;
+		NextFreeChannel = next_free;
+	}
 
 	return old_free;
 }
