@@ -180,7 +180,8 @@ local int PlayCDRom(const char* name)
     // Old mode off, starting cdrom play.
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
-	    SDL_Init(SDL_INIT_CDROM);
+	    if (SDL_Init(SDL_INIT_CDROM) < 0)
+		return 1;
 	    CDRom = SDL_CDOpen(0);
 	    if (!SDL_CDStatus(CDRom)) {
 		CDMode = ":off";
@@ -192,19 +193,22 @@ local int PlayCDRom(const char* name)
     if (!strncmp(name, ":", 1)) {
 	if (!CDRom) {
 	    fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
+	    CDMode = ":stopped";
 	    return 1;
 	}
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
 	    CDMode = ":all";
-	    SDL_CDPlayTracks(CDRom, 0, 0, 0, 0);
+	    if (SDL_CDPlayTracks(CDRom, 0, 0, 0, 0) < 0)
+		CDMode = ":stopped";
 	    return 1;
 	}
 	// if mode is play random tracks
 	if (!strcmp(name, ":random")) {
 	    CDMode = ":random";
 	    CDTrack = MyRand() % CDRom->numtracks;
-	    SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0);
+	    if (SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0) < 0)
+		CDMode = ":stopped";
 	}
 	return 1;
     }
