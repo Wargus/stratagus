@@ -69,7 +69,7 @@ global int PlayerColors[PlayerMax] = {
     208,	// red
     1,		// blue
     216,	// green
-    220,	// violett
+    220,	// violet
     224,	// orange
     228,	// black
     255,	// white
@@ -78,12 +78,31 @@ global int PlayerColors[PlayerMax] = {
     208,	// red
     1,		// blue
     216,	// green
-    220,	// violett
+    220,	// violet
     224,	// orange
     228,	// black
     255,	// white
 
     251,	// yellow
+};
+
+global char* PlayerColorNames[PlayerMax] = {
+    "red",
+    "blue",
+    "green",
+    "violet",
+    "orange",
+    "black",
+    "white"
+    "yellow",
+    "red",
+    "blue",
+    "green",
+    "violet",
+    "orange",
+    "black",
+    "white"
+    "yellow",
 };
 
 /*----------------------------------------------------------------------------

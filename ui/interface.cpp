@@ -10,7 +10,7 @@
 //
 /**@name interface.c	-	The interface. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1086,7 +1086,8 @@ local int InputKey(int key)
 	    }
 	    
 	    if (strlen(Input)) {
-		sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
+		sprintf(ChatMessage, "~%s~<%s>~> %s", PlayerColorNames[ThisPlayer->Player],
+			ThisPlayer->Name, Input);
 		// FIXME: only to selected players ...
 		NetworkChatMessage(ChatMessage);
 	    }
