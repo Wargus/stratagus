@@ -523,7 +523,7 @@ local void Usage(void)
 #ifdef USE_CCL2
     " SIOD Copyright by George J. Carrette."
 #endif
-"\n\nUsage: clone [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
+"\n\nUsage: freecraft [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
 \t-d datapath\tpath to clone data\n\
 \t-c file.ccl\tccl start file\n\
 \t-f factor\tComputer units cost factor\n\
@@ -533,14 +533,14 @@ local void Usage(void)
 \t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
 \t-L lag\t\tNetwork lag in # frames\n\
 \t-U update\tNetwork update frequence in # frames\n\
-\t-s sleep\tNumber of frames for the AI to sleep before they starts\n\
+\t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
 \t\t\t\t3=1024x768,4=1600x1200)\n\
-\t-D\t\tVideomode depth = pixel pro point (for Win32/TNT)\n\
-\t-F\t\tFullscreen videomode (only with SDL supported)\n\
+\t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
+\t-F\t\tFull screen video mode (only supported with SDL)\n\
 \t-S\t\tSync speed (100 = 30 frames/s)\n\
-\t-W\t\tWindowed videomode (only with SDL supported)\n\
+\t-W\t\tWindowed video mode (only supported with SDL)\n\
 map is relative to FreeCraftLibPath=datapath, use ./map for relative to cwd\n\
 ",NameLine);
 }
@@ -567,7 +567,7 @@ global int main(int argc,char** argv)
     CclStartFile="ccl/clone.ccl";
     MapName="default.cm";
 #else
-    MapName="default.pud";	// .gz/.bz2 automatic appended as needed.
+    MapName="default.pud";	// .gz/.bz2 automatically appended as needed.
 #endif
 
     // FIXME: Parse options before ccl oder after?
