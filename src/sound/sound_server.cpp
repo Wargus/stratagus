@@ -465,6 +465,7 @@ local int KeepRequest(SoundRequest* sr) {
 	for(channel=0;channel<MaxChannels;channel++) {
 	    if ((*theChannel).Command == ChannelPlay
 		    && (*theChannel).Source.Base==sr->Source.Base
+		    && (*theChannel).Sound==sr->Sound
 		    && (*theChannel).Source.Id==sr->Source.Id) {
 		//FIXME: decision should take into account the sound
 		return 0;
@@ -671,6 +672,7 @@ local int FillOneChannel(SoundRequest* sr)
 	Channels[NextFreeChannel].Point=0;
 	Channels[NextFreeChannel].Volume=ComputeVolume(sr);
 	Channels[NextFreeChannel].Command=ChannelPlay;
+	Channels[NextFreeChannel].Sound=sr->Sound;
 	Channels[NextFreeChannel].Sample=ChooseSample(sr);
 	Channels[NextFreeChannel].Stereo=sr->Stereo;
 	NextFreeChannel=next_free;
