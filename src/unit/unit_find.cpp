@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -30,6 +34,10 @@
 #include "interface.h"
 #include "tileset.h"
 #include "map.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Select units in range.
@@ -93,7 +101,8 @@ global int FindUnitsByType(const UnitType* type,Unit** table)
 **
 **	@return		Returns the number of units found.
 */
-global int FindPlayerUnitsByType(const Player* player,int type,Unit** table)
+global int FindPlayerUnitsByType(const Player* player,const UnitType* type
+	,Unit** table)
 {
     Unit* unit;
     Unit** units;
@@ -104,7 +113,7 @@ global int FindPlayerUnitsByType(const Player* player,int type,Unit** table)
     // FIXME: Can't abort if all units are found: UnitTypeCount
     for( num=0,i=0; i<nunits; i++ ) {
 	unit=units[i];
-	if( unit->Type->Type==type && !UnitUnusable(unit) ) {
+	if( unit->Type==type && !UnitUnusable(unit) ) {
 	    table[num++]=unit;
 	}
     }
@@ -139,6 +148,34 @@ global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
 }
 
 /**
+**	Repairable unit on map tile.
+**
+**	@param tx	X position on map, tile-based.
+**	@param ty	Y position on map, tile-based.
+**
+**	@return		Returns repairable unit found on tile.
+*/
+global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
+{
+    Unit* table[MAX_UNITS];
+    int n;
+    int i;
+
+    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
+	// FIXME: could use more or less for repair?
+	if( table[i]->Type->Building ) {
+	    return table[i];
+	}
+    }
+
+    return NoUnitP;
+}
+
+/**
 **	Choose target on map tile.
 **
 **	@param source	Unit which want to attack.
@@ -150,7 +187,32 @@ global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
 global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
+    Unit* table[MAX_UNITS];
+    Unit* unit;
+    UnitType* type;
+    int n;
+    int i;
+
+    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+
+    for( i=0; i<n; ++i ) {
+	unit=table[i];
+	// unusable unit ?
+	// if( UnitUnusable(unit) ) can't attack constructions
+	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
+	    continue;
+	}
+	type=unit->Type;
+	if( tx<unit->X || tx>=unit->X+type->TileWidth
+		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
+	    continue;
+	}
+	if( !CanTarget(source->Type,unit->Type) ) {
+	    continue;
+	}
+	// FIXME: more possible targets? choose the best one
+	return unit;
+    }
 #else
     Unit* unit;
     UnitType* type;
@@ -161,7 +223,7 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
     for( i=0; i<NumUnits; i++ ) {
 	unit=Units[i];
 	// unusable unit ?
-	// if( UnitUnusable(unit) ) 
+	// if( UnitUnusable(unit) ) can't attack constructions
 	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
 	    continue;
 	}
@@ -199,7 +261,37 @@ global Unit* GoldMineOnMap(int tx,int ty)
 
     n=SelectUnits(tx,ty,tx+1,ty+1,table);
     for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
 	if( table[i]->Type->GoldMine ) {
+	    return table[i];
+	}
+    }
+    return NoUnitP;
+}
+
+/**
+**	Gold deposit on map tile
+**
+**	@param tx	X position on map, tile-based.
+**	@param ty	Y position on map, tile-based.
+**
+**	@return		Returns the gold deposit if found, or NoUnitP.
+*/
+global Unit* GoldDepositOnMap(int tx,int ty)
+{
+    Unit* table[MAX_UNITS];
+    int i;
+    int n;
+
+    // FIXME: perhaps I should write a select on tile function?
+    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
+	if( table[i]->Type->StoresGold ) {
 	    return table[i];
 	}
     }
@@ -245,6 +337,9 @@ global Unit* PlatformOnMap(int tx,int ty)
 
     n=SelectUnits(tx,ty,tx+1,ty+1,table);
     for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
 	if( table[i]->Type->GivesOil ) {
 	    return table[i];
 	}
@@ -268,7 +363,36 @@ global Unit* OilDepositOnMap(int tx,int ty)
 
     n=SelectUnits(tx,ty,tx+1,ty+1,table);
     for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
 	if( table[i]->Type->StoresOil ) {
+	    return table[i];
+	}
+    }
+    return NoUnitP;
+}
+
+/**
+**	Wood deposit on map tile
+**
+**	@param tx	X position on map, tile-based.
+**	@param ty	Y position on map, tile-based.
+**
+**	@return		Returns the wood deposit if found, or NoUnitP.
+*/
+global Unit* WoodDepositOnMap(int tx,int ty)
+{
+    Unit* table[MAX_UNITS];
+    int i;
+    int n;
+
+    n=SelectUnits(tx,ty,tx+1,ty+1,table);
+    for( i=0; i<n; ++i ) {
+	if( UnitUnusable(table[i]) ) {
+	    continue;
+	}
+	if( table[i]->Type->StoresWood || table[i]->Type->StoresGold ) {
 	    return table[i];
 	}
     }

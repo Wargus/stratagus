@@ -232,7 +232,7 @@ global void DoRightButton(int x,int y)
             }
 
 	    // cade: this is default repair action
-	    dest=UnitOnMapTile(x,y);
+	    dest=RepairableOnMapTile(x,y);
 	    if( dest && dest->Type
 		    && dest->Player==ThisPlayer
 		    && dest->HP<dest->Stats[dest->Player->Player].HitPoints

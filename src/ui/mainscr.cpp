@@ -290,10 +290,11 @@ global void DrawUnitInfo(Unit* unit)
 	    DrawText(x+58,y+8+78,GameFont,"Grown:");
 	    DrawNumber(x+108,y+8+78,GameFont,unit->Player->Food);
 	    DrawText(x+71,y+8+94,GameFont,"Used:");
-	    if( unit->Player->Food<unit->Player->NumUnits ) {
-		DrawReverseNumber(x+108,y+8+94,GameFont,unit->Player->NumUnits);
+	    if( unit->Player->Food<unit->Player->NumFoodUnits ) {
+		DrawReverseNumber(x+108,y+8+94,GameFont
+			,unit->Player->NumFoodUnits);
 	    } else {
-		DrawNumber(x+108,y+8+94,GameFont,unit->Player->NumUnits);
+		DrawNumber(x+108,y+8+94,GameFont,unit->Player->NumFoodUnits);
 	    }
 	}
     } else {
@@ -383,7 +384,7 @@ global void DrawResources(void)
     }
 
     ThisPlayer->Score=999999;
-    ThisPlayer->NumUnits=9999;
+    ThisPlayer->NumFoodUnits=9999;
     ThisPlayer->Food=9999;
 #endif
 
@@ -430,8 +431,8 @@ global void DrawResources(void)
 		,TheUI.FoodIconRow*TheUI.FoodIconH
 		,TheUI.FoodIconW,TheUI.FoodIconH
 		,TheUI.FoodIconX,TheUI.FoodIconY);
-	sprintf(tmp,"%d/%d",ThisPlayer->NumUnits,ThisPlayer->Food);
-	if( ThisPlayer->Food<ThisPlayer->NumUnits ) {
+	sprintf(tmp,"%d/%d",ThisPlayer->NumFoodUnits,ThisPlayer->Food);
+	if( ThisPlayer->Food<ThisPlayer->NumFoodUnits ) {
 	    DrawReverseText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);
 	} else {
 	    DrawText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);

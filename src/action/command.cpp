@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -30,6 +34,10 @@
 #include "actions.h"
 #include "tileset.h"
 #include "map.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Get next command.
@@ -154,10 +162,8 @@ global void CommandRepair(Unit* unit,int x,int y,int flush)
 
     command->Action=UnitActionRepair;
     command->Data.Move.Fast=1;
-    // FIXME: must choose a repairable unit
-    command->Data.Move.Goal=UnitOnMapTile(x,y);
-    // FIXME: must choose repair range
-    command->Data.Move.Range=1;
+    command->Data.Move.Goal=RepairableOnMapTile(x,y);
+    command->Data.Move.Range=REPAIR_RANGE;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
@@ -183,6 +189,10 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
 	    DebugLevel0("Internal movement error\n");
 	    return;
+	}
+	if( unit->Type->Vanishes ) {
+	    DebugLevel0("Internal error\n");
+	    abort();
 	}
     );
 
@@ -232,6 +242,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 	    DebugLevel0("Internal movement error\n");
 	    return;
 	}
+	DebugCheck( unit->Type->Vanishes );
     );
 
     if( !(command=GetNextCommand(unit,flush)) ) {

@@ -44,6 +44,8 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+// FIXME: must write more goals. Currently only last side wins supported
+
 /**
 **	Check if the goals for this game are reached.
 */
@@ -56,9 +58,9 @@ global void CheckGoals(void)
 
     for( i=n=0; i<NumPlayers; ++i ) {
 	if( Players[i].Race!=PlayerRaceNeutral ) {
-	    DebugLevel3("%d: %d %d\n",i,Players[i].NumUnits
+	    DebugLevel3("%d: %d %d\n",i,Players[i].NumFoodUnits
 			,Players[i].NumBuildings);
-	    if( Players[i].NumUnits+Players[i].NumBuildings ) {
+	    if( Players[i].NumFoodUnits+Players[i].NumBuildings ) {
 		++n;
 	    }
 	}
@@ -66,7 +68,7 @@ global void CheckGoals(void)
 
     if( n==1 ) {			// only one player remains.
 	NetworkQuit();
-	if( ThisPlayer->NumUnits+ThisPlayer->NumBuildings ) {
+	if( ThisPlayer->NumFoodUnits+ThisPlayer->NumBuildings ) {
 	    fprintf(stderr,"You have won!\n");
             SetStatusLine("You have won!");
             GamePaused=1;
