@@ -10,7 +10,7 @@
 //
 /**@name graphic.c - The general graphic functions. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -63,13 +63,13 @@ static hashtable(Graphic*, 4099) GraphicHash;/// lookup table for graphic data
 /**
 **  Video draw part of graphic.
 **
-**  @param graphic  Pointer to object
-**  @param gx       X offset into object
-**  @param gy       Y offset into object
-**  @param w        width to display
-**  @param h        height to display
-**  @param x        X screen position
-**  @param y        Y screen position
+**  @param g   Pointer to object
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X screen position
+**  @param y   Y screen position
 */
 #ifndef USE_OPENGL
 void VideoDrawSub(const Graphic* g, int gx, int gy,
@@ -249,7 +249,7 @@ Graphic* NewGraphic(const char* file, int w, int h)
 /**
 **  Load a graphic
 **
-**  @param graphic  Graphic object to load
+**  @param g  Graphic object to load
 */
 void LoadGraphic(Graphic* g)
 {
@@ -300,6 +300,7 @@ void FreeGraphic(Graphic* g)
 #ifdef USE_OPENGL
 	int i;
 #endif
+	void* pixels;
 
 	if (!g) {
 		return;
@@ -326,14 +327,26 @@ void FreeGraphic(Graphic* g)
 			if (g->Surface->format->BytesPerPixel == 1) {
 				VideoPaletteListRemove(g->Surface);
 			}
+			if (g->Surface->flags & SDL_PREALLOC) {
+				pixels = g->Surface->pixels;
+			} else {
+				pixels = NULL;
+			}
 			SDL_FreeSurface(g->Surface);
+			free(pixels);
 		}
 #ifndef USE_OPENGL
 		if (g->SurfaceFlip) {
 			if (g->SurfaceFlip->format->BytesPerPixel == 1) {
 				VideoPaletteListRemove(g->SurfaceFlip);
 			}
+			if (g->SurfaceFlip->flags & SDL_PREALLOC) {
+				pixels = g->SurfaceFlip->pixels;
+			} else {
+				pixels = NULL;
+			}
 			SDL_FreeSurface(g->SurfaceFlip);
+			free(pixels);
 		}
 #endif
 		Assert(g->File);
@@ -408,9 +421,9 @@ void FlipGraphic(Graphic* g)
 /**
 **  Make an OpenGL texture or textures out of a graphic object.
 **
-**  @param graphic  The graphic object.
-**  @param width    Graphic width.
-**  @param height   Graphic height.
+**  @param g       The graphic object.
+**  @param width   Graphic width.
+**  @param height  Graphic height.
 */
 #ifdef USE_OPENGL
 static void MakeTextures(Graphic* g, GLuint* textures, UnitColors* colors)
@@ -544,7 +557,7 @@ static void MakeTextures(Graphic* g, GLuint* textures, UnitColors* colors)
 /**
 **  Make an OpenGL texture or textures out of a graphic object.
 **
-**  @param graphic  The graphic object.
+**  @param g  The graphic object.
 */
 void MakeTexture(Graphic* g)
 {
@@ -560,8 +573,8 @@ void MakeTexture(Graphic* g)
 /**
 **  Make an OpenGL texture with the player colors.
 **
-**  @param graphic  The graphic to texture with player colors.
-**  @param player   Player number to make textures for.
+**  @param g       The graphic to texture with player colors.
+**  @param player  Player number to make textures for.
 */
 void MakePlayerColorTexture(Graphic* g, int player)
 {
