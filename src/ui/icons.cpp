@@ -10,7 +10,7 @@
 //
 /**@name icons.c - The icons. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -259,6 +259,7 @@ void DrawIcon(const Player* player, Icon* icon, int x, int y)
 **
 **  @param player  Player pointer used for icon colors
 **  @param style   Button style
+**  @param icon    Icon
 **  @param flags   State of icon (clicked, mouse over...)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
