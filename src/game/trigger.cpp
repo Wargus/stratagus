@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger.c	-	The trigger handling. */
+/**@name trigger.c - The trigger handling. */
 //
-//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,20 +26,20 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
-#include "stratagus.h"
 
+#include "stratagus.h"
 #include "ccl.h"
 #include "unittype.h"
 #include "player.h"
@@ -48,7 +48,7 @@
 #include "interface.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 	/// Get unit-type.
@@ -58,35 +58,35 @@ extern UnitType* CclGetUnitType(SCM ptr);
 extern UnitType* CclGetUnitType(lua_State* l);
 #endif
 
-#define MAX_SWITCH		256				/// Maximum number of switches
+#define MAX_SWITCH 256 /// Maximum number of switches
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global Timer GameTimer;						/// The game timer
-local unsigned long WaitFrame;				/// Frame to wait for
+global Timer GameTimer; /// The game timer
+local unsigned long WaitFrame; /// Frame to wait for
 #if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM Trigger;						/// Current trigger
-local SCM WaitScript;						/// Script to run after wait is over
-local SCM WaitTrigger;						/// Old Trigger value during wait
+local SCM Trigger;      /// Current trigger
+local SCM WaitScript;   /// Script to run after wait is over
+local SCM WaitTrigger;  /// Old Trigger value during wait
 #elif defined(USE_LUA)
 local int Trigger;
 local int WaitScript;
 local int WaitTrigger;
 #endif
-local unsigned char Switch[MAX_SWITCH];		/// Switches
+local unsigned char Switch[MAX_SWITCH]; /// Switches
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Get player number.
+**  Get player number.
 **
-**		@param player		The player
+**  @param player  The player
 **
-**		@return				The player number, -1 matches any.
+**  @return  The player number, -1 matches any.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 global int TriggerGetPlayer(SCM player)
@@ -137,11 +137,11 @@ global int TriggerGetPlayer(lua_State* l)
 #endif
 
 /**
-**		Get the unit-type.
+**  Get the unit-type.
 **
-**		@param unit		The unit type.
+**  @param unit  The unit type.
 **
-**		@return				The unit-type pointer.
+**  @return      The unit-type pointer.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 global const UnitType* TriggerGetUnitType(SCM unit)
@@ -178,9 +178,9 @@ global const UnitType* TriggerGetUnitType(lua_State* l)
 }
 #endif
 
-// --------------------------------------------------------------------------
-//		Conditions
-
+/*--------------------------------------------------------------------------
+--  Conditions
+--------------------------------------------------------------------------*/
 local int CompareEq(int a, int b)
 {
 	return a == b;
@@ -209,11 +209,11 @@ local int CompareLe(int a, int b)
 typedef int (*CompareFunction)(int, int);
 
 /**
-**		Returns a function pointer to the comparison function
+**  Returns a function pointer to the comparison function
 **
-**		@param op		The operation
+**  @param op  The operation
 **
-**		@return				Function pointer to the compare function
+**  @return    Function pointer to the compare function
 */
 local CompareFunction GetCompareFunction(const char* op)
 {
@@ -240,7 +240,7 @@ local CompareFunction GetCompareFunction(const char* op)
 }
 
 /**
-**		Player has the quantity of unit-type.
+**  Player has the quantity of unit-type.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfUnit(SCM player, SCM operation, SCM quantity, SCM unit)
@@ -391,9 +391,9 @@ local int CclIfUnit(lua_State* l)
 #endif
 
 /**
-**		Player has the quantity of unit-type at a location.
+**  Player has the quantity of unit-type at a location.
 **
-**		(if-unit-at {player} {op} {quantity} {unit} {location} {location})
+**  (if-unit-at {player} {op} {quantity} {unit} {location} {location})
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfUnitAt(SCM list)
@@ -431,7 +431,7 @@ local SCM CclIfUnitAt(SCM list)
 	list = gh_cdr(list);
 
 	//
-	//		Get all unit types in location.
+	// Get all unit types in location.
 	//
 #ifdef UNIT_ON_MAP
 	// FIXME: could be done faster?
@@ -441,12 +441,12 @@ local SCM CclIfUnitAt(SCM list)
 	// NOTE: +1 right,bottom isn't inclusive :(
 	an = SelectUnits(x1, y1, x2 + 1, y2 + 1, table);
 	//
-	//		Count the requested units
+	// Count the requested units
 	//
 	for (j = s = 0; j < an; ++j) {
 		unit = table[j];
 		//
-		//		Check unit type
+		// Check unit type
 		//
 		// FIXME: ALL_UNITS
 		if (unittype == ANY_UNIT ||
@@ -454,7 +454,7 @@ local SCM CclIfUnitAt(SCM list)
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 				(unittype == unit->Type)) {
 			//
-			//		Check the player
+			// Check the player
 			//
 			if (plynr == -1 || plynr == unit->Player->Player) {
 				++s;
@@ -525,7 +525,7 @@ local int CclIfUnitAt(lua_State* l)
 	lua_pop(l, 1);
 
 	//
-	//		Get all unit types in location.
+	// Get all unit types in location.
 	//
 #ifdef UNIT_ON_MAP
 	// FIXME: could be done faster?
@@ -535,12 +535,12 @@ local int CclIfUnitAt(lua_State* l)
 	// NOTE: +1 right,bottom isn't inclusive :(
 	an = SelectUnits(x1, y1, x2 + 1, y2 + 1, table);
 	//
-	//		Count the requested units
+	// Count the requested units
 	//
 	for (j = s = 0; j < an; ++j) {
 		unit = table[j];
 		//
-		//		Check unit type
+		// Check unit type
 		//
 		// FIXME: ALL_UNITS
 		if (unittype == ANY_UNIT ||
@@ -548,7 +548,7 @@ local int CclIfUnitAt(lua_State* l)
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 				(unittype == unit->Type)) {
 			//
-			//		Check the player
+			// Check the player
 			//
 			if (plynr == -1 || plynr == unit->Player->Player) {
 				++s;
@@ -566,7 +566,7 @@ local int CclIfUnitAt(lua_State* l)
 #endif
 
 /**
-**		Player has the quantity of unit-type near to unit-type.
+**  Player has the quantity of unit-type near to unit-type.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
@@ -594,7 +594,7 @@ local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
 	}
 
 	//
-	//		Get all unit types 'near'.
+	// Get all unit types 'near'.
 	//
 	n = FindUnitsByType(ut2, table);
 	DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
@@ -624,12 +624,12 @@ local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
 		}
 		DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 		//
-		//		Count the requested units
+		// Count the requested units
 		//
 		for (j = s = 0; j < an; ++j) {
 			unit = around[j];
 			//
-			//		Check unit type
+			// Check unit type
 			//
 			// FIXME: ALL_UNITS
 			if (unittype == ANY_UNIT ||
@@ -637,7 +637,7 @@ local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
 					(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 					(unittype == unit->Type)) {
 				//
-				//		Check the player
+				// Check the player
 				//
 				if (plynr == -1 || plynr == unit->Player->Player) {
 					++s;
@@ -692,7 +692,7 @@ local int CclIfNearUnit(lua_State* l)
 	}
 
 	//
-	//		Get all unit types 'near'.
+	// Get all unit types 'near'.
 	//
 	n = FindUnitsByType(ut2, table);
 	DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
@@ -722,12 +722,12 @@ local int CclIfNearUnit(lua_State* l)
 		}
 		DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 		//
-		//		Count the requested units
+		// Count the requested units
 		//
 		for (j = s = 0; j < an; ++j) {
 			unit = around[j];
 			//
-			//		Check unit type
+			// Check unit type
 			//
 			// FIXME: ALL_UNITS
 			if (unittype == ANY_UNIT ||
@@ -735,7 +735,7 @@ local int CclIfNearUnit(lua_State* l)
 					(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 					(unittype == unit->Type)) {
 				//
-				//		Check the player
+				// Check the player
 				//
 				if (plynr == -1 || plynr == unit->Player->Player) {
 					++s;
@@ -760,7 +760,7 @@ local int CclIfNearUnit(lua_State* l)
 #endif
 
 /**
-**		Player has the quantity of rescued unit-type near to unit-type.
+** Player has the quantity of rescued unit-type near to unit-type.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
@@ -788,7 +788,7 @@ local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit
 	}
 
 	//
-	//		Get all unit types 'near'.
+	// Get all unit types 'near'.
 	//
 	n = FindUnitsByType(ut2, table);
 	DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
@@ -818,13 +818,13 @@ local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit
 		}
 		DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 		//
-		//		Count the requested units
+		// Count the requested units
 		//
 		for (j = s = 0; j < an; ++j) {
 			unit = around[j];
-			if (unit->RescuedFrom) {		// only rescued units
+			if (unit->RescuedFrom) { // only rescued units
 				//
-				//		Check unit type
+				// Check unit type
 				//
 				// FIXME: ALL_UNITS
 				if (unittype == ANY_UNIT ||
@@ -832,7 +832,7 @@ local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit
 						(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 						(unittype == unit->Type)) {
 					//
-					//		Check the player
+					// Check the player
 					//
 					if (plynr == -1 || plynr == unit->Player->Player) {
 						++s;
@@ -888,7 +888,7 @@ local int CclIfRescuedNearUnit(lua_State* l)
 	}
 
 	//
-	//		Get all unit types 'near'.
+	// Get all unit types 'near'.
 	//
 	n = FindUnitsByType(ut2, table);
 	DebugLevel3Fn("%s: %d\n" _C_ ut2->Ident _C_ n);
@@ -918,13 +918,13 @@ local int CclIfRescuedNearUnit(lua_State* l)
 		}
 		DebugLevel3Fn("Units around %d: %d\n" _C_ UnitNumber(unit) _C_ an);
 		//
-		//		Count the requested units
+		// Count the requested units
 		//
 		for (j = s = 0; j < an; ++j) {
 			unit = around[j];
-			if (unit->RescuedFrom) {		// only rescued units
+			if (unit->RescuedFrom) { // only rescued units
 				//
-				//		Check unit type
+				// Check unit type
 				//
 				// FIXME: ALL_UNITS
 				if (unittype == ANY_UNIT ||
@@ -932,7 +932,7 @@ local int CclIfRescuedNearUnit(lua_State* l)
 						(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 						(unittype == unit->Type)) {
 					//
-					//		Check the player
+					// Check the player
 					//
 					if (plynr == -1 || plynr == unit->Player->Player) {
 						++s;
@@ -958,7 +958,7 @@ local int CclIfRescuedNearUnit(lua_State* l)
 #endif
 
 /**
-**		Player has n opponents left.
+**  Player has n opponents left.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfOpponents(SCM player, SCM operation, SCM quantity)
@@ -987,14 +987,14 @@ local SCM CclIfOpponents(SCM player, SCM operation, SCM quantity)
 	}
 
 	//
-	//		Check the player opponents
+	// Check the player opponents
 	//
 	for (n = 0; plynr < pn; ++plynr) {
 		int i;
 
 		for (i = 0; i < PlayerMax; ++i) {
 			//
-			//		This player is our enemy and has units left.
+			// This player is our enemy and has units left.
 			//
 			if ((Players[i].Enemy & (1 << plynr)) && Players[i].TotalNumUnits) {
 				++n;
@@ -1043,14 +1043,14 @@ local int CclIfOpponents(lua_State* l)
 	}
 
 	//
-	//		Check the player opponents
+	// Check the player opponents
 	//
 	for (n = 0; plynr < pn; ++plynr) {
 		int i;
 
 		for (i = 0; i < PlayerMax; ++i) {
 			//
-			//		This player is our enemy and has units left.
+			// This player is our enemy and has units left.
 			//
 			if ((Players[i].Enemy & (1 << plynr)) && Players[i].TotalNumUnits) {
 				++n;
@@ -1069,7 +1069,7 @@ local int CclIfOpponents(lua_State* l)
 #endif
 
 /**
-**		Player has the quantity of resource.
+**  Player has the quantity of resource.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfResource(SCM player, SCM operation, SCM quantity, SCM resource)
@@ -1217,7 +1217,7 @@ local int CclIfResource(lua_State* l)
 #endif
 
 /**
-**		Player has quantity kills
+**  Player has quantity kills
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfKills(SCM player, SCM operation, SCM quantity)
@@ -1300,7 +1300,7 @@ local int CclIfKills(lua_State* l)
 #endif
 
 /**
-**		Player has a certain score
+**  Player has a certain score
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfScore(SCM player, SCM operation, SCM quantity)
@@ -1383,7 +1383,7 @@ local int CclIfScore(lua_State* l)
 #endif
 
 /**
-**		Number of game cycles elapsed
+**  Number of game cycles elapsed
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfElapsed(SCM operation, SCM quantity)
@@ -1438,7 +1438,7 @@ local int CclIfElapsed(lua_State* l)
 #endif
 
 /**
-**		Check the timer value
+**  Check the timer value
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfTimer(SCM operation, SCM quantity)
@@ -1502,7 +1502,7 @@ local int CclIfTimer(lua_State* l)
 #endif
 
 /**
-**		Check the switch value
+**  Check the switch value
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfSwitch(SCM number, SCM set)
@@ -1564,11 +1564,11 @@ local int CclIfSwitch(lua_State* l)
 }
 #endif
 
-// --------------------------------------------------------------------------
-//		Actions
-
+/*---------------------------------------------------------------------------
+--		Actions
+---------------------------------------------------------------------------*/
 /**
-**		Action condition player wins.
+**  Action condition player wins.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionVictory(void)
@@ -1594,7 +1594,7 @@ local int CclActionVictory(lua_State* l)
 #endif
 
 /**
-**		Action condition player lose.
+**  Action condition player lose.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionDefeat(void)
@@ -1620,7 +1620,7 @@ local int CclActionDefeat(lua_State* l)
 #endif
 
 /**
-**		Action condition player draw.
+**  Action condition player draw.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionDraw(void)
@@ -1646,7 +1646,7 @@ local int CclActionDraw(lua_State* l)
 #endif
 
 /**
-**		Action set timer
+**  Action set timer
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionSetTimer(SCM cycles, SCM increasing)
@@ -1676,7 +1676,7 @@ local int CclActionSetTimer(lua_State* l)
 #endif
 
 /**
-**		Action start timer
+**  Action start timer
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionStartTimer(void)
@@ -1700,7 +1700,7 @@ local int CclActionStartTimer(lua_State* l)
 #endif
 
 /**
-**		Action stop timer
+**  Action stop timer
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionStopTimer(void)
@@ -1722,7 +1722,7 @@ local int CclActionStopTimer(lua_State* l)
 #endif
 
 /**
-**		Action wait
+**  Action wait
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionWait(SCM ms)
@@ -1746,7 +1746,7 @@ local int CclActionWait(lua_State* l)
 #endif
 
 /**
-**		Action stop timer
+**  Action stop timer
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionSetSwitch(SCM number, SCM set)
@@ -1804,7 +1804,7 @@ local int CclActionSetSwitch(lua_State* l)
 #endif
 
 /**
-**		Add a trigger.
+**  Add a trigger.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAddTrigger(SCM condition, SCM action)
@@ -1812,8 +1812,8 @@ local SCM CclAddTrigger(SCM condition, SCM action)
 	SCM var;
 
 	//
-	//		Make a list of all triggers.
-	//				A trigger is a pair of condition and action
+	// Make a list of all triggers.
+	// A trigger is a pair of condition and action
 	//
 	var = gh_symbol2scm("*triggers*");
 
@@ -1846,8 +1846,8 @@ local int CclAddTrigger(lua_State* l)
 	}
 
 	//
-	//		Make a list of all triggers.
-	//				A trigger is a pair of condition and action
+	// Make a list of all triggers.
+	// A trigger is a pair of condition and action
 	//
 	lua_pushstring(l, "_triggers_");
 	lua_gettable(l, LUA_GLOBALSINDEX);
@@ -1887,9 +1887,9 @@ local int CclAddTrigger(lua_State* l)
 #endif
 
 /**
-**		Set the current trigger number
+**  Set the current trigger number
 **
-**		@param number			Trigger number
+**  @param number  Trigger number
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetTriggerNumber(SCM number)
@@ -1922,11 +1922,11 @@ local SCM CclSetTriggerNumber(SCM number)
 #endif
 
 /**
-**		Execute a trigger action
+**  Execute a trigger action
 **
-**		@param script		Script to execute
+**  @param script  Script to execute
 **
-**		@return				1 if the trigger should be removed
+**  @return        1 if the trigger should be removed
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local int TriggerExecuteAction(SCM script)
@@ -1984,9 +1984,9 @@ local int TriggerExecuteAction(int script)
 #endif
 
 /**
-**		Remove a trigger
+**  Remove a trigger
 **
-**		@param trig		Current trigger
+**  @param trig  Current trigger
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local void TriggerRemoveTrigger(SCM trig)
@@ -2011,7 +2011,7 @@ local void TriggerRemoveTrigger(int trig)
 #endif
 
 /**
-**		Check trigger each game cycle.
+**  Check trigger each game cycle.
 */
 global void TriggersEachCycle(void)
 {
@@ -2041,7 +2041,7 @@ global void TriggersEachCycle(void)
 		return;
 	}
 
-	if (!gh_null_p(trig)) {				// Next trigger
+	if (!gh_null_p(trig)) { // Next trigger
 		pair = gh_car(trig);
 		CclGcProtectedAssign(&Trigger, gh_cdr(trig));
 		CclGcProtectedAssign(&WaitTrigger, trig);
@@ -2122,7 +2122,7 @@ global void TriggersEachCycle(void)
 }
 
 /**
-**		Register CCL features for triggers.
+**  Register CCL features for triggers.
 */
 global void TriggerCclRegister(void)
 {
@@ -2160,7 +2160,9 @@ global void TriggerCclRegister(void)
 	gh_define("*triggers*", NIL);
 #elif defined(USE_LUA)
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
-//	lua_register(Lua, "SetTriggerNumber!", CclSetTriggerNumber);
+#if 0
+	lua_register(Lua, "SetTriggerNumber!", CclSetTriggerNumber);
+#endif
 	// Conditions
 	lua_register(Lua, "IfUnit", CclIfUnit);
 	lua_register(Lua, "IfUnitAt", CclIfUnitAt);
@@ -2186,12 +2188,12 @@ global void TriggerCclRegister(void)
 }
 
 /**
-**		Print a trigger from a LISP object.
-**		This is a modified version of lprin1g that prints
-**		(lambda) instead of #&lt;CLOSURE&gt;
+**  Print a trigger from a LISP object.
+**  This is a modified version of lprin1g that prints
+**  (lambda) instead of #&lt;CLOSURE&gt;
 **
-**		@param exp		Expression
-**		@param f		File to print to
+**  @param exp  Expression
+**  @param f    File to print to
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local void PrintTrigger(SCM exp, CLFile* f)
@@ -2200,7 +2202,9 @@ local void PrintTrigger(SCM exp, CLFile* f)
 #else
 	SCM tmp;
 	long n;
-//	struct user_type_hooks *p;
+#if 0
+	struct user_type_hooks *p;
+#endif
 	extern char* subr_kind_str(long);
 
 	STACK_CHECK(&exp);
@@ -2280,9 +2284,9 @@ local void PrintTrigger(SCM exp, CLFile* f)
 #endif
 
 /**
-**		Save the trigger module.
+**  Save the trigger module.
 **
-**		@param file		Open file to print to
+**  @param file  Open file to print to
 */
 global void SaveTriggers(CLFile* file)
 {
@@ -2323,12 +2327,12 @@ global void SaveTriggers(CLFile* file)
 }
 
 /**
-**		Initialize the trigger module.
+**  Initialize the trigger module.
 */
 global void InitTriggers(void)
 {
 	//
-	//		Setup default triggers
+	// Setup default triggers
 	//
 	WaitFrame = 0;
 
@@ -2354,7 +2358,7 @@ global void InitTriggers(void)
 }
 
 /**
-**		Clean up the trigger module.
+**  Clean up the trigger module.
 */
 global void CleanTriggers(void)
 {

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name loadgame.c	-	Load game. */
+/**@name loadgame.c - Load game. */
 //
-//	(c) Copyright 2001-2003 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2004 by Lutz Sammer, Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -62,17 +62,17 @@
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Cleanup modules.
+**  Cleanup modules.
 **
-**		Call each module to clean up.
+**  Call each module to clean up.
 */
 global void CleanModules(void)
 {
@@ -85,7 +85,9 @@ global void CleanModules(void)
 
 	CleanIcons();
 	CleanCursors();
-	// CleanMenus();
+#if 0
+	CleanMenus();
+#endif
 	CleanUserInterface();
 	CleanCampaign();
 	CleanTriggers();
@@ -117,7 +119,7 @@ global void CleanModules(void)
 	FreeAStar();
 
 	//
-	//		Free our protected objects, AI scripts, unit-type properties.
+	// Free our protected objects, AI scripts, unit-type properties.
 	//
 #if defined(USE_GUILE) || defined(USE_SIOD)
 	var = gh_symbol2scm("*ccl-protect*");
@@ -126,9 +128,9 @@ global void CleanModules(void)
 }
 
 /**
-**		Initialize all modules.
+**  Initialize all modules.
 **
-**		Call each module to initialize.
+**  Call each module to initialize.
 */
 global void InitModules(void)
 {
@@ -146,7 +148,9 @@ global void InitModules(void)
 	InitMissileTypes();
 	InitMissiles();
 	InitConstructions();
-	// InitDecorations();
+#if 0
+	InitDecorations();
+#endif
 
 	// LUDO : 0 = don't reset player stats ( units level , upgrades, ... ) !
 	InitUnitTypes(0);
@@ -166,13 +170,13 @@ global void InitModules(void)
 	PfHierInitialize();
 #endif
 	InitMap();
-	InitMapFogOfWar();						// build tables for fog of war
+	InitMapFogOfWar(); // build tables for fog of war
 }
 
 /**
-**		Load all.
+**  Load all.
 **
-**		Call each module to load additional files (graphics,sounds).
+**  Call each module to load additional files (graphics,sounds).
 */
 global void LoadModules(void)
 {
@@ -181,7 +185,9 @@ global void LoadModules(void)
 	LoadIcons();
 	LoadCursors(ThisPlayer->RaceName);
 	LoadUserInterface();
-	// LoadPlayers();
+#if 0
+	LoadPlayers();
+#endif
 	LoadMissileSprites();
 	LoadConstructions();
 	LoadDecorations();
@@ -219,15 +225,17 @@ global void LoadModules(void)
 
 	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
 
-	// LoadButtons();
+#if 0
+	LoadButtons();
+#endif
 }
 
 /**
-**		Load a game to file.
+**  Load a game to file.
 **
-**		@param filename		File name to be loaded.
+**  @param filename  File name to be loaded.
 **
-**		@note		Later we want to store in a more compact binary format.
+**  @note  Later we want to store in a more compact binary format.
 */
 global void LoadGame(char* filename)
 {
@@ -269,9 +277,9 @@ global void LoadGame(char* filename)
 }
 
 /**
-**		Load all game data.
+**  Load all game data.
 **
-**		Test function for the later load/save functions.
+**  Test function for the later load/save functions.
 */
 global void LoadAll(void)
 {
@@ -283,7 +291,9 @@ global void LoadAll(void)
 	SaveGame("save_file_of_stratagus2.ccl");
 	LoadGame("save_file_of_stratagus2.ccl");
 #endif
-	//LoadGame ("save_file_of_stratagus.ccl");
+#if 0
+	LoadGame ("save_file_of_stratagus.ccl");
+#endif
 }
 
 //@}

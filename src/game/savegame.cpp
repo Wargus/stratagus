@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name savegame.c	-	Save game. */
+/**@name savegame.c - Save game. */
 //
-//	(c) Copyright 2001,2002 by Lutz Sammer, Andreas Arens
+//      (c) Copyright 2001-2004 by Lutz Sammer, Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <string.h>
@@ -39,7 +39,6 @@
 #include <time.h>
 
 #include "stratagus.h"
-
 #include "icons.h"
 #include "ui.h"
 #include "construct.h"
@@ -59,23 +58,22 @@
 #include "iolib.h"
 #include "spells.h"
 #include "commands.h"
-
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Save a game to file.
+**  Save a game to file.
 **
-**		@param filename		File name to be stored.
+**  @param filename  File name to be stored.
 **
-**		@note		Later we want to store in a more compact binary format.
+**  @note  Later we want to store in a more compact binary format.
 */
 global void SaveGame(const char* filename)
 {
@@ -118,12 +116,14 @@ global void SaveGame(const char* filename)
 		CLprintf(file, ";;;  'media\t'");
 		var = gh_symbol2scm("media-version");
 		// FIXME : guile todo
-		//if (symbol_boundp(var, NIL)) {
-		//	var = symbol_value(var, NIL);
-		//	lprin1CL(var, file);
-		//} else {
+#if 0
+		if (symbol_boundp(var, NIL)) {
+			var = symbol_value(var, NIL);
+			lprin1CL(var, file);
+		} else {
 			CLprintf(file, "nil");
-		//}
+		}
+#endif
 #elif defined(USE_LUA)
 #endif
 	}

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name campaign.c	-	The campaign control. */
+/**@name campaign.c - The campaign control. */
 //
-//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,17 +26,18 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "stratagus.h"
 #include "ccl.h"
 #include "unittype.h"
@@ -47,36 +48,36 @@
 #include "font.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 global char DefaultObjective[] = "-Destroy your enemies";
 
-global int GameResult;						/// Outcome of the game
-global char CurrentMapPath[1024];		/// Path of the current map
+global int GameResult;  /// Outcome of the game
+global char CurrentMapPath[1024];  /// Path of the current map
 global char DefaultMap[1024] = "puds/default.pud";  /// Default map path
-global int RestartScenario;				/// Restart the scenario
-global int QuitToMenu;						/// Quit to menu
-global Campaign* Campaigns;				/// Campaigns
-global int NumCampaigns;				/// Number of campaigns
+global int RestartScenario;  /// Restart the scenario
+global int QuitToMenu;  /// Quit to menu
+global Campaign* Campaigns;  /// Campaigns
+global int NumCampaigns;  /// Number of campaigns
 
-local Campaign* CurrentCampaign;		/// Playing this campaign
-local CampaignChapter* CurrentChapter;		/// Playing this chapter of campaign
-local int SkipCurrentChapter = 1;		/// Skip the current chapter when
-										/// looking for the next one
+local Campaign* CurrentCampaign;        /// Playing this campaign
+local CampaignChapter* CurrentChapter;  /// Playing this chapter of campaign
+local int SkipCurrentChapter = 1;       /// Skip the current chapter when
+                                        /// looking for the next one
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Return filename of next chapter.
+**  Return filename of next chapter.
 **
-**		@return				The filename of the next level
+**  @return  The filename of the next level
 */
 global char* NextChapter(void)
 {
@@ -100,7 +101,7 @@ global char* NextChapter(void)
 
 	if (GameResult == GameVictory) {
 		//
-		//  FIXME: do other chapter types.
+		// FIXME: do other chapter types.
 		//
 		if (SkipCurrentChapter) {
 			CurrentChapter = CurrentChapter->Next;
@@ -126,10 +127,11 @@ global char* NextChapter(void)
 }
 
 /**
-**		Play the campaign.
+**  Play the campaign.
 **
-**		@param name		Name of the campaign.
-**		@note				::CurrentMapPath contains the filename of first level.
+**  @param name  Name of the campaign.
+**
+**  @note  ::CurrentMapPath contains the filename of first level.
 */
 global void PlayCampaign(const char* name)
 {
@@ -137,7 +139,7 @@ global void PlayCampaign(const char* name)
 	int i;
 
 	//
-	//  Find the campaign.
+	// Find the campaign.
 	//
 	for (i = 0; i < NumCampaigns; ++i) {
 		if (!strcmp(Campaigns[i].Ident, name)) {
@@ -174,10 +176,10 @@ global void PlayCampaign(const char* name)
 }
 
 /**
-**		Parse campaign show-picture.
+**  Parse campaign show-picture.
 **
-**		@param chapter			Chapter.
-**		@param list			List describing show-picture.
+**  @param chapter  Chapter.
+**  @param list     List describing show-picture.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local void ParseShowPicture(CampaignChapter* chapter, SCM list)
@@ -361,9 +363,9 @@ local void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 #endif
 
 /**
-**		Free campaign chapters.
+**  Free campaign chapters.
 **
-**		@param chapters			Chapters to be freed.
+**  @param chapters  Chapters to be freed.
 */
 local void FreeChapters(CampaignChapter** chapters)
 {
@@ -396,11 +398,11 @@ local void FreeChapters(CampaignChapter** chapters)
 }
 
 /**
-**		Define a campaign.
+**  Define a campaign.
 **
-**		@param list		List describing the campaign.
+**  @param list  List describing the campaign.
 **
-**		@note FIXME: play-video, defeat, draw are missing.
+**  @note FIXME: play-video, defeat, draw are missing.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineCampaign(SCM list)
@@ -453,7 +455,7 @@ local SCM CclDefineCampaign(SCM list)
 	tail = &campaign->Chapters;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	//  Parse the list: (still everything could be changed!)
 	//
 	while (!gh_null_p(list)) {
 
@@ -473,7 +475,7 @@ local SCM CclDefineCampaign(SCM list)
 			sublist = gh_car(list);
 			list = gh_cdr(list);
 			//
-			//		Parse the list
+			// Parse the list
 			//
 			while (!gh_null_p(sublist)) {
 
@@ -497,13 +499,13 @@ local SCM CclDefineCampaign(SCM list)
 					chapter->Type = ChapterPlayLevel;
 					chapter->Data.Level.Name = gh_scm2newstr(value, NULL);
 				} else {
-				   // FIXME: this leaves a half initialized campaign
-				   errl("Unsupported tag", value);
+					// FIXME: this leaves a half initialized campaign
+					errl("Unsupported tag", value);
 				}
 			}
 		} else {
-		   // FIXME: this leaves a half initialized campaign
-		   errl("Unsupported tag", value);
+			// FIXME: this leaves a half initialized campaign
+			errl("Unsupported tag", value);
 		}
 	}
 
@@ -527,7 +529,7 @@ local int CclDefineCampaign(lua_State* l)
 	j = 0;
 
 	//
-	//		Campaign name
+	// Campaign name
 	//
 	ident = strdup(LuaToString(l, j + 1));
 	++j;
@@ -566,7 +568,7 @@ local int CclDefineCampaign(lua_State* l)
 	tail = &campaign->Chapters;
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	// Parse the list: (still everything could be changed!)
 	//
 	for (; j < args; ++j) {
 		value = LuaToString(l, j + 1);
@@ -584,7 +586,7 @@ local int CclDefineCampaign(lua_State* l)
 				lua_error(l);
 			}
 			//
-			//		Parse the list
+			// Parse the list
 			//
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -610,13 +612,13 @@ local int CclDefineCampaign(lua_State* l)
 					chapter->Data.Level.Name = strdup(LuaToString(l, -1));
 					lua_pop(l, 1);
 				} else {
-				   lua_pushfstring(l, "Unsupported tag: %s", value);
-				   lua_error(l);
+					lua_pushfstring(l, "Unsupported tag: %s", value);
+					lua_error(l);
 				}
 			}
 		} else {
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+			lua_pushfstring(l, "Unsupported tag: %s", value);
+			lua_error(l);
 		}
 	}
 
@@ -625,9 +627,9 @@ local int CclDefineCampaign(lua_State* l)
 #endif
 
 /**
-**		Set the current campaign chapter
+**  Set the current campaign chapter
 **
-**		@param num		Number of current chapter in current campaign.
+**  @param num  Number of current chapter in current campaign.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetCurrentChapter(SCM num)
@@ -685,9 +687,9 @@ local int CclSetCurrentChapter(lua_State* l)
 #endif
 
 /**
-**		Set the briefing.
+**  Set the briefing.
 **
-**		@param list		List describing the briefing.
+**  @param list  List describing the briefing.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclBriefing(SCM list)
@@ -698,7 +700,7 @@ local SCM CclBriefing(SCM list)
 
 	voice = objective = 0;
 	//
-	//		Parse the list:		(still everything could be changed!)
+	// Parse the list: (still everything could be changed!)
 	//
 	while (!gh_null_p(list)) {
 
@@ -708,8 +710,8 @@ local SCM CclBriefing(SCM list)
 		if (gh_eq_p(value, gh_symbol2scm("type"))) {
 			if (!gh_eq_p(gh_car(list), gh_symbol2scm("wc2")) &&
 					!gh_eq_p(gh_car(list), gh_symbol2scm("sc")) ) {
-			   // FIXME: this leaves a half initialized briefing
-			   errl("Unsupported briefing type", value);
+				// FIXME: this leaves a half initialized briefing
+				errl("Unsupported briefing type", value);
 			}
 			list = gh_cdr(list);
 		} else if (gh_eq_p(value, gh_symbol2scm("title"))) {
@@ -732,7 +734,7 @@ local SCM CclBriefing(SCM list)
 			list = gh_cdr(list);
 		} else if (gh_eq_p(value, gh_symbol2scm("voice"))) {
 			if (voice == MAX_BRIEFING_VOICES) {
-			   errl("too many voices", value);
+				errl("too many voices", value);
 			}
 			if (GameIntro.VoiceFile[voice]) {
 				free(GameIntro.VoiceFile[voice]);
@@ -751,8 +753,8 @@ local SCM CclBriefing(SCM list)
 			list = gh_cdr(list);
 			++objective;
 		} else {
-		   // FIXME: this leaves a half initialized briefing
-		   errl("Unsupported tag", value);
+			// FIXME: this leaves a half initialized briefing
+			errl("Unsupported tag", value);
 		}
 	}
 
@@ -769,7 +771,7 @@ local int CclBriefing(lua_State* l)
 
 	voice = objective = 0;
 	//
-	//		Parse the list:		(still everything could be changed!)
+	// Parse the list: (still everything could be changed!)
 	//
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
@@ -779,8 +781,8 @@ local int CclBriefing(lua_State* l)
 		if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (strcmp(value, "wc2") && strcmp(value, "sc")) {
-			   lua_pushfstring(l, "Unsupported briefing type: %s", value);
-			   lua_error(l);
+				lua_pushfstring(l, "Unsupported briefing type: %s", value);
+				lua_error(l);
 			}
 		} else if (!strcmp(value, "title")) {
 			if (GameIntro.Title) {
@@ -799,8 +801,8 @@ local int CclBriefing(lua_State* l)
 			GameIntro.TextFile = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "voice")) {
 			if (voice == MAX_BRIEFING_VOICES) {
-			   lua_pushfstring(l, "too many voices");
-			   lua_error(l);
+				lua_pushfstring(l, "too many voices");
+				lua_error(l);
 			}
 			if (GameIntro.VoiceFile[voice]) {
 				free(GameIntro.VoiceFile[voice]);
@@ -809,8 +811,8 @@ local int CclBriefing(lua_State* l)
 			++voice;
 		} else if (!strcmp(value, "objective")) {
 			if (objective == MAX_OBJECTIVES) {
-			   lua_pushfstring(l, "too many objectives");
-			   lua_error(l);
+				lua_pushfstring(l, "too many objectives");
+				lua_error(l);
 			}
 			if (GameIntro.Objectives[objective]) {
 				free(GameIntro.Objectives[objective]);
@@ -818,8 +820,8 @@ local int CclBriefing(lua_State* l)
 			GameIntro.Objectives[objective] = strdup(LuaToString(l, j + 1));
 			++objective;
 		} else {
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+			lua_pushfstring(l, "Unsupported tag: %s", value);
+			lua_error(l);
 		}
 	}
 
@@ -828,7 +830,7 @@ local int CclBriefing(lua_State* l)
 #endif
 
 /**
-**		Register CCL features for campaigns.
+** Register CCL features for campaigns.
 */
 global void CampaignCclRegister(void)
 {
@@ -844,7 +846,7 @@ global void CampaignCclRegister(void)
 }
 
 /**
-**		Save the campaign module.
+**  Save the campaign module.
 */
 global void SaveCampaign(CLFile* file)
 {
@@ -868,32 +870,32 @@ global void SaveCampaign(CLFile* file)
 	CLprintf(file, "  'campaign (list\n");
 	for (ch = CurrentCampaign->Chapters; ch; ch = ch->Next) {
 		if (ch->Type == ChapterShowPicture) {
-			CLprintf(file, "	'show-picture (list\n");
-			CLprintf(file, "	  'image \"%s\"\n", ch->Data.Picture.Image);
-			CLprintf(file, "	  'fade-in %d\n", ch->Data.Picture.FadeIn);
-			CLprintf(file, "	  'fade-out %d\n", ch->Data.Picture.FadeOut);
-			CLprintf(file, "	  'display-time %d\n",
+			CLprintf(file, "    'show-picture (list\n");
+			CLprintf(file, "      'image \"%s\"\n", ch->Data.Picture.Image);
+			CLprintf(file, "      'fade-in %d\n", ch->Data.Picture.FadeIn);
+			CLprintf(file, "      'fade-out %d\n", ch->Data.Picture.FadeOut);
+			CLprintf(file, "      'display-time %d\n",
 				ch->Data.Picture.DisplayTime);
 			for (text = ch->Data.Picture.Text; text; text = text->Next) {
-				CLprintf(file, "	  'text (list\n");
-				CLprintf(file, "		'font '%s\n", FontNames[text->Font]);
-				CLprintf(file, "		'x %d\n", text->X);
-				CLprintf(file, "		'y %d\n", text->Y);
-				CLprintf(file, "		'width %d\n", text->Width);
-				CLprintf(file, "		'height %d\n", text->Height);
+				CLprintf(file, "      'text (list\n");
+				CLprintf(file, "        'font '%s\n", FontNames[text->Font]);
+				CLprintf(file, "        'x %d\n", text->X);
+				CLprintf(file, "        'y %d\n", text->Y);
+				CLprintf(file, "        'width %d\n", text->Width);
+				CLprintf(file, "        'height %d\n", text->Height);
 				if (text->Align == PictureTextAlignLeft) {
-					CLprintf(file,"		'align 'left\n");
+					CLprintf(file,"     'align 'left\n");
 				} else {
-					CLprintf(file,"		'align 'center\n");
+					CLprintf(file,"     'align 'center\n");
 				}
-				CLprintf(file, "		'text \"%s\"\n", text->Text);
-				CLprintf(file, "	  )\n");
+				CLprintf(file, "        'text \"%s\"\n", text->Text);
+				CLprintf(file, ")\n");
 			}
-			CLprintf(file,"	)\n");
+			CLprintf(file," )\n");
 		} else if (ch->Type == ChapterPlayLevel) {
-			CLprintf(file, "	'play-level \"%s\"\n", ch->Data.Level.Name);
+			CLprintf(file, "    'play-level \"%s\"\n", ch->Data.Level.Name);
 		} else if (ch->Type == ChapterPlayVideo) {
-			CLprintf(file, "	'play-movie \"%s\" %d\n",
+			CLprintf(file, "    'play-movie \"%s\" %d\n",
 				ch->Data.Movie.PathName, ch->Data.Movie.Flags);
 		}
 	}
@@ -916,7 +918,7 @@ global void SaveCampaign(CLFile* file)
 }
 
 /**
-**		Clean up the campaign module.
+**  Clean up the campaign module.
 */
 global void CleanCampaign(void)
 {
