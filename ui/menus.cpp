@@ -2428,7 +2428,7 @@ local void TipsFreeTips(void)
     Menu *menu;
 
     menu = FindMenu("menu-tips");
-    for (i = 5; i < 13; i++) {
+    for (i = 4; i < 12; i++) {
 	if (menu->items[i].d.text.text) {
 	    free(menu->items[i].d.text.text);
 	    menu->items[i].d.text.text = NULL;

@@ -2932,6 +2932,9 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
 			value=gh_car(sublist);
 			item->d.gem.button=scm2buttonid(value);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("text")) ) {
+			value=gh_car(sublist);
+			item->d.gem.text=gh_scm2newstr(value, NULL);
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
