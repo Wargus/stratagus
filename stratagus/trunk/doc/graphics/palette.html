@@ -29,59 +29,35 @@
 <h1>Stratagus Palette Documentation</h1>
 <hr>
 
-<h2>General Palette</h2>
-
-Stratagus graphics use a 256 color palette. Although the palette may 
-be different for all images, it is recommended to use a shared one 
-to save memory.<p>
+Stratagus graphics use a 256 color palette.<p>
 
 To see color indices, open the 'Indexed Palette' dialog in gimp.<p>
 
 Some colors are fixed for specific usage as follows:<p>
 
 <ul>
-    <li>0 : General background color, will be transparent in the game.
-    <li>38-47 : Water Cycling.
-    <li>240-244 : Icon Cycling.
-    <li>205-207 : Building Cycling.
-    <li>208-211 : These are the player colors, going from lightest to 
+    <li>38-47 : Water Cycling. Or any other range as defined in the
+	scripts with SetColorWaterCycleStart and SetColorWaterCycleEnd.
+    <li>240-244 : Icon Cycling. Or any other range as defined in the
+	scripts with SetColorIconCycleStart and SetColorIconCycleEnd.
+    <li>205-207 : Building Cycling. Or any other range as defined in the
+	scripts with SetColorBuildingCycleStart and SetColorBuildingCycleEnd.
+    <li>208-211 : These are the player colors, going from lightest to
     darkest and will be replaced depending on the player color.
-    <li>253 : Reserved for editor, should NOT be used in any image.
-    <li>255 : General background color, will be transparent in the game.
     <li>The remaining colors may be used as regular colors
 </ul>
 
-NOTE: the cycling applies to all images, eg, the building cycling 
-occurs for icons as well. The color cycling can be configured 
-from ccl eg, by editing the "(set-color-water-cycle-start! 38)" line 
-you can set the start for the water cycling.<p>
+NOTE: the cycling applies to all images, eg, the building cycling
+occurs for icons as well. The color cycling can be configured
+from ccl eg, by editing the "SetColorWaterCycleStart(38)" line
+you can set the start for the water cycling. Color cycling can
+be disabled or enabled with "SetColorCycleAll".<p>
 
-<h2>Global Palette</h2>
-
-The tileset palette is used as a general palette for purposes 
-such as line-drawing. The following color indices are used in 
-addition to the fixed colors described above and 
-should be taken into account when creating a tileset:<p>
-
-<ul>
-    <li>0 : Black
-    <li>149 : Dark Green
-    <li>206 : Blue
-    <li>246 : White
-    <li>247 : NPC
-    <li>248 : Gray
-    <li>249 : Red
-    <li>250 : Green
-    <li>251 : Yellow
-    <li>252 : Blinking Red
-    <li>253 : Violet
-</ul>
-
-A sample palette, <a href="stratagus.gimp">stratagus.gimp</a>, 
-is included. If unsure please use this.<p>
+A sample palette, <a href="stratagus.gimp">stratagus.gimp</a>,
+is included.<p>
 
 <hr>
-(C) Copyright 1998-2003 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
+(C) Copyright 1998-2004 by The <a href="http://stratagus.sf.net">Stratagus</a> Project
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>
