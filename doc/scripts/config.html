@@ -62,6 +62,7 @@
 <a href="#set-brightness!">set-brightness!</a>
 <a href="#set-building-capture!">set-building-capture!</a>
 <a href="#set-burn-buildings!">set-burn-buildings!</a>
+<a href="#set-click-missile!">set-click-missile!</a>
 <a href="#set-color-cycle-all!">set-color-cycle-all!</a>
 <a href="#set-contrast!">set-contrast!</a>
 <a href="#set-double-click-delay!">set-double-click-delay!</a>
@@ -435,6 +436,27 @@ Enable or disable building capture.
 <pre>
     (set-burn-buildings! 25 2)
 </pre>
+
+<h4>Used</h4>
+
+<a href="../../data/ccl/stratagus.ccl"> $LIBRARYPATH/ccl/stratagus.ccl </a>
+
+<a name="set-click-missile!"></a>
+<h3>(set-click-missile! missile)</h3>
+
+Sets the missile to use for displaying when a player clicks on a location on the map.
+
+<dl>
+<dt>missile</dt>
+<dd>The missile to use, as defined in the missiles section</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (set-click-missile! 'missile-green-cross)
+</pre>
+
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
