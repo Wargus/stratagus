@@ -641,8 +641,7 @@ local Unit* FindRangeAttack(Unit* u, int range)
 	    }
      	    d=MapDistanceBetweenUnits(u,dest);
 
-            // FIXME: we don't support moving away!
-	    if((d>=type->MinAttackRange)&&(d<=range)&&UnitReachable(u,dest,attackrange)) {
+	    if((d<=range)&&UnitReachable(u,dest,attackrange)) {
 	    	enemy_count++;
 	    } else {
 	    	table[i]=0;
@@ -841,9 +840,7 @@ global Unit* AttackUnitsInDistance(Unit* unit,int range)
 	//	Unit in attack range?
 	//
 	d=MapDistanceBetweenUnits(unit,dest);
-	if( d<type->MinAttackRange ) {	// FIXME: we don't support moving away!
-	    continue;
-	}
+
 	// Use Circle, not square :)
 	if( d>range ) {
 	    continue;
