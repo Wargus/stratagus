@@ -265,10 +265,10 @@ extern char **KeyStrokeHelps;		/// Keystroke help pairs
 
 #else
 
-    /// FIXME: docu
+    /// Hash table of all the menus
 typedef hashtable(Menu*,MENUS_MAXMENU) _MenuHash;
 extern _MenuHash MenuHash;
-    /// FIXME: docu
+    /// Hash table of all the menu functions
 typedef hashtable(void*,MENUS_MAXFUNC) _MenuFuncHash;
 extern _MenuFuncHash MenuFuncHash;
 
@@ -310,18 +310,18 @@ extern void NetConnectForceDisplayUpdate(void);
 extern void NetClientCheckLocalState(void);
 
     /// Sound options menu
-extern void SoundOptions(void);
+extern void SoundOptionsMenu(void);
     /// Speed options menu
-extern void SpeedSettings(void);
+extern void SpeedOptionsMenu(void);
     /// Preferences menu
-extern void Preferences(void);
-    /// Diplomacy Options
-extern void DiplomacyOptions(void);
+extern void PreferencesMenu(void);
+    /// Diplomacy menu
+extern void DiplomacyMenu(void);
 
     /// Save game menu
-extern void GameMenuSave(void);
+extern void SaveGameMenu(void);
     /// Load game menu
-extern void GameMenuLoad(void);
+extern void LoadGameMenu(void);
 
     /// Restart confirm menu
 extern void RestartConfirmMenu(void);
@@ -341,7 +341,7 @@ extern void EditorEditResource(void);
 extern void EditorEditAiProperties(void);
 
     /// Save map from the editor
-extern int EditorSave(void);
+extern int EditorSaveMenu(void);
 
     /// Error menu
 extern void ErrorMenu(char *);

@@ -81,100 +81,21 @@ local void EditorEndMenu(void);
 --	Prototypes for action handlers and helper functions
 ----------------------------------------------------------------------------*/
 
-local void GameMenuEnd(void);
-local void GameMenuExit(void);
-local void GameMenuReturn(void);
-local void GameShowCredits(void);
-local void GameMenuObjectives(void);
-local void GameMenuEndScenario(void);
-local void GameOptions(void);
-
-local void SurrenderConfirmMenu(void);
-
+// Game menu
+local void GameMenuInit(Menuitem *mi);
+local void GameOptionsMenu(void);
 local void HelpMenu(void);
-local void KeystrokeHelpMenu(void);
-local void ShowTipsMenu(void);
-local void InitTips(Menuitem *mi);
-local void TipsMenuEnd(void);
-local void SetTips(Menuitem *mi);
-local void ShowNextTip(void);
+local void ObjectivesMenu(void);
+local void EndScenarioMenu(void);
 
-local void InitGameMenu(Menuitem *mi);
+// Objectives
+local void ObjectivesInit(Menuitem *mi);
+local void ObjectivesExit(Menuitem *mi);
 
-local void GlobalOptions(void);
-local void InitGlobalOptions(Menuitem *mi);
-local void SetRes(Menuitem *mi);
-local void SetFullscreen(Menuitem *mi);
-local void SetShadowFogAlpha(Menuitem *mi);
-local void SetShadowFogGray(Menuitem *mi);
+// Victory, lost
+local void GameMenuEnd(void);
 
-local void InitSoundOptions(Menuitem *mi);
-local void SetMasterPower(Menuitem *mi);
-local void SetMusicPower(Menuitem *mi);
-local void SetCdPower(Menuitem *mi);
-local void SetFogOfWar(Menuitem *mi);
-local void SetCommandKey(Menuitem *mi);
-local void SetCdModeAll(Menuitem *mi);
-local void SetCdModeRandom(Menuitem *mi);
-
-local void EndScenarioRestart(void);
-local void EndScenarioSurrender(void);
-local void EndScenarioQuitMenu(void);
-
-local void PrgStartInit(Menuitem *mi);		// master init
-local void NameLineDrawFunc(Menuitem *mi);
-local void EnterNameAction(Menuitem *mi, int key);
-local void EnterNameCancel(void);
-local void EnterServerIPAction(Menuitem *mi, int key);
-local void EnterServerIPCancel(void);
-
-local void InitSaveGameMenu(Menuitem *mi);
-local void EnterSaveGameAction(Menuitem *mi, int key);
-local void CreateSaveDir(void);
-
-local void SaveLBExit(Menuitem *mi);
-local void SaveLBInit(Menuitem *mi);
-local unsigned char *SaveLBRetrieve(Menuitem *mi, int i);
-local void SaveLBAction(Menuitem *mi, int i);
-local void SaveVSAction(Menuitem *mi, int i);
-local void SaveOk(void);
-
-local void InitLoadGameMenu(Menuitem *mi);
-local void LoadLBExit(Menuitem *mi);
-local void LoadLBInit(Menuitem *mi);
-local unsigned char *LoadLBRetrieve(Menuitem *mi, int i);
-local void LoadLBAction(Menuitem *mi, int i);
-local void LoadVSAction(Menuitem *mi, int i);
-local void LoadOk(void);
-local int SaveRDFilter(char *pathbuf, FileList *fl);
-
-local void FcDeleteMenu(void);
-local void FcDeleteInit(Menuitem *mi);
-local void FcDeleteOk(void);
-local void FcDeleteCancel(void);
-
-local void SaveConfirmInit(Menuitem *mi);
-local void SaveConfirmOk(void);
-local void SaveConfirmCancel(void);
-
-local void LoadAction(void);
-
-local void JoinNetGameMenu(void);
-local void CreateNetGameMenu(void);
-
-local void SinglePlayerGameMenu(void);
-local void MultiPlayerGameMenu(void);
-local void CampaignGameMenu(void);
-local void ScenSelectMenu(void);
-
-local void MultiPlayerLANGame(void);
-
-local void CampaignMenu1(void);
-local void CampaignMenu2(void);
-local void CampaignMenu3(void);
-local void CampaignMenu4(void);
-local void SelectCampaignMenu(void);
-
+// Scenario select
 local void ScenSelectLBExit(Menuitem *mi);
 local void ScenSelectLBInit(Menuitem *mi);
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
@@ -182,117 +103,247 @@ local void ScenSelectLBAction(Menuitem *mi, int i);
 local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
-local void ScenSelectInit(Menuitem *mi);	// master init
+local void ScenSelectInit(Menuitem *mi);
 local void ScenSelectOk(void);
 local void ScenSelectCancel(void);
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl);
 
-local void KeystrokeHelpVSAction(Menuitem *mi, int i);
-local void KeystrokeHelpDrawFunc(Menuitem *mi);
+// Program start
+local void PrgStartInit(Menuitem *mi);
+local void NameLineDrawFunc(Menuitem *mi);
+local void SinglePlayerGameMenu(void);
+local void MultiPlayerGameMenu(void);
+local void CampaignGameMenu(void);
+local void ReplayGameMenu(void);
+local void GlobalOptionsMenu(void);
+local void StartEditor(void);
+local void GameShowCredits(void);
+local void GameMenuExit(void);
 
-local void GameSpeedHSAction(Menuitem *mi, int i);
-local void MouseScrollHSAction(Menuitem *mi, int i);
-local void KeyboardScrollHSAction(Menuitem *mi, int i);
-local void MasterVolumeHSAction(Menuitem *mi, int i);
-local void MusicVolumeHSAction(Menuitem *mi, int i);
-local void CdVolumeHSAction(Menuitem *mi, int i);
+// Confirm menus
+local void SurrenderConfirmMenu(void);
 
-local void GameSetupInit(Menuitem *mi);		// master init
+// Global Options
+local void GlobalOptionsInit(Menuitem *mi);
+local void GlobalOptionsResolutionGem(Menuitem *mi);
+local void GlobalOptionsFullscreenGem(Menuitem *mi);
+local void GlobalOptionsFogAlphaGem(Menuitem *mi);
+local void GlobalOptionsFogGrayGem(Menuitem *mi);
+
+// Tips
+local void TipsInit(Menuitem *mi);
+local void TipsExit(Menuitem *mi);
+local void TipsShowTipsGem(Menuitem *mi);
+local void TipsNextTip(void);
+
+// Custom game setup
+local void GameSetupInit(Menuitem *mi);
+local void ScenSelectMenu(void);
+local void CustomGameStart(void);
+local void GameCancel(void);
 local void GameDrawFunc(Menuitem *mi);
-
 local void GameRCSAction(Menuitem *mi, int i);
 local void GameRESAction(Menuitem *mi, int i);
 local void GameUNSAction(Menuitem *mi, int i);
 local void GameTSSAction(Menuitem *mi, int i);
 local void GameGATAction(Menuitem *mi, int i);
-
-local void GameCancel(void);
-
-local void CustomGameStart(void);
 local void CustomGameOPSAction(Menuitem *mi, int i);
 
-local void MultiClientReady(void);
-local void MultiClientNotReady(void);
-local void MultiClientGemAction(Menuitem *mi);
-local void MultiClientCancel(void);
-local void MultiClientRCSAction(Menuitem *mi, int i);
+// Enter name
+local void EnterNameAction(Menuitem *mi, int key);
+local void EnterNameCancel(void);
 
+// Net create join
+local void JoinNetGameMenu(void);
+local void CreateNetGameMenu(void);
+
+// Multi net type
+local void MultiPlayerLANGame(void);
+
+// Net multi setup
+local void MultiGameSetupInit(Menuitem *mi);
+local void MultiGameSetupExit(Menuitem *mi);
+local void MultiGameDrawFunc(Menuitem *mi);
+local void MultiScenSelectMenu(void);
 local void MultiGameStart(void);
 local void MultiGameCancel(void);
-local void NetworkGamePrepareGameSettings(void);
-local void MultiGameSetupInit(Menuitem *mi);	// master init
-local void MultiGameSetupExit(Menuitem *mi);	// master exit
-local void MultiGameDrawFunc(Menuitem *mi);
 local void MultiGameFWSAction(Menuitem *mi, int i);
-local void MultiGamePTSAction(Menuitem *mi, int o);
-local void NetMultiPlayerDrawFunc(Menuitem *mi);
-local void MultiGamePlayerSelectorsUpdate(int initial);
-local void MultiScenSelectMenu(void);
 
-local void MultiGameClientInit(Menuitem *mi);	// master init
-local void MultiGameClientExit(Menuitem *mi);	// master exit
+// Enter server ip
+local void EnterServerIPAction(Menuitem *mi, int key);
+local void EnterServerIPCancel(void);
+
+// Net multi client
+local void TerminateNetConnect(void);
+local void MultiGameClientInit(Menuitem *mi);
+local void MultiGameClientExit(Menuitem *mi);
 local void MultiGameClientDrawFunc(Menuitem *mi);
+local void MultiClientReady(void);
+local void MultiClientNotReady(void);
+local void MultiClientCancel(void);
+local void MultiClientRCSAction(Menuitem *mi, int i);
+local void MultiClientGemAction(Menuitem *mi);
 local void MultiClientUpdate(int initial);
 
+// Net connecting
 local void NetConnectingInit(Menuitem *mi);
 local void NetConnectingExit(Menuitem *mi);
 local void NetConnectingCancel(void);
-local void TerminateNetConnect(void);
 
-local void StartEditor(void);
-local void EditorSelectCancel(void);
+// Campaign select
+local void CampaignMenu1(void);
+local void CampaignMenu2(void);
+local void CampaignMenu3(void);
+local void CampaignMenu4(void);
+local void SelectCampaignMenu(void);
+
+// End scenario
+local void EndScenarioRestart(void);
+local void EndScenarioSurrender(void);
+local void EndScenarioQuitMenu(void);
+
+// Sound options
+local void SoundOptionsInit(Menuitem *mi);
+local void MasterVolumeHSAction(Menuitem *mi, int i);
+local void SetMasterPower(Menuitem *mi);
+local void MusicVolumeHSAction(Menuitem *mi, int i);
+local void SetMusicPower(Menuitem *mi);
+local void CdVolumeHSAction(Menuitem *mi, int i);
+local void SetCdPower(Menuitem *mi);
+local void SetCdModeAll(Menuitem *mi);
+local void SetCdModeRandom(Menuitem *mi);
+
+// Preferences
+local void PreferencesInit(Menuitem *mi);
+local void SetFogOfWar(Menuitem *mi);
+local void SetCommandKey(Menuitem *mi);
+
+// Speed options
+local void GameSpeedHSAction(Menuitem *mi, int i);
+local void MouseScrollHSAction(Menuitem *mi, int i);
+local void KeyboardScrollHSAction(Menuitem *mi, int i);
+
+// Game options
+
+// Diplomacy options
+local void DiplomacyWait(Menuitem *mi);
+local void DiplomacyOk(void);
+
+// Help
+local void KeystrokeHelpMenu(void);
+local void TipsMenu(void);
+
+// Keystroke help
+local void KeystrokeHelpVSAction(Menuitem *mi, int i);
+local void KeystrokeHelpDrawFunc(Menuitem *mi);
+
+// Save
+local void SaveGameInit(Menuitem *mi);
+local void SaveGameLBInit(Menuitem *mi);
+local void SaveGameLBExit(Menuitem *mi);
+local void SaveGameEnterAction(Menuitem *mi, int key);
+local void SaveGameLBAction(Menuitem *mi, int i);
+local unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i);
+local void SaveGameVSAction(Menuitem *mi, int i);
+local void SaveGameOk(void);
+local void DeleteConfirmMenu(void);
+local int SaveGameRDFilter(char *pathbuf, FileList *fl);
+local void CreateSaveDir(void);
+
+// Load
+local void LoadGameInit(Menuitem *mi);
+local void LoadGameLBInit(Menuitem *mi);
+local void LoadGameLBExit(Menuitem *mi);
+local void LoadGameLBAction(Menuitem *mi, int i);
+local unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i);
+local void LoadGameVSAction(Menuitem *mi, int i);
+local void LoadGameOk(void);
+
+// Confirm save
+local void SaveConfirmInit(Menuitem *mi);
+local void SaveConfirmExit(Menuitem *mi);
+local void SaveConfirmOk(void);
+local void SaveConfirmCancel(void);
+
+// Confirm delete
+local void DeleteConfirmInit(Menuitem *mi);
+local void DeleteConfirmExit(Menuitem *mi);
+local void DeleteConfirmOk(void);
+local void DeleteConfirmCancel(void);
+
+// Editor select
 local void EditorNewMap(void);
+local void EditorMainLoadMap(void);
+local void EditorSelectCancel(void);
+
+// Editor new
 local void EditorNewDrawFunc(Menuitem *mi);
 local void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
 local void EditorNewMapSizeEnterAction(Menuitem *mi, int key);
 local void EditorNewOk(void);
 local void EditorNewCancel(void);
-local void EditorMainLoadMap(void);
+
+// Editor main load map
 local void EditorMainLoadInit(Menuitem *mi);
 local void EditorMainLoadLBInit(Menuitem *mi);
 local void EditorMainLoadLBExit(Menuitem *mi);
-local void EditorMainLoadFolder(void);
-local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
 local void EditorMainLoadLBAction(Menuitem *mi, int i);
 local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i);
+local void EditorMainLoadVSAction(Menuitem *mi, int i);
 local void EditorMainLoadOk(void);
 local void EditorMainLoadCancel(void);
-local void EditorMainLoadVSAction(Menuitem *mi, int i);
-local void EditorLoadMap(void);
+local void EditorMainLoadFolder(void);
+local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
+
+// Editor load map
 local void EditorLoadOk(void);
 local void EditorLoadCancel(void);
-local void EditorMapProperties(void);
-local void EditorPlayerProperties(void);
-local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
-local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
+
+// Editor menu
+local void EditorLoadMenu(void);
+local void EditorMapPropertiesMenu(void);
+local void EditorPlayerPropertiesMenu(void);
+local void EditorQuitToMenu(void);
+
+// Editor map properties
 local void EditorMapPropertiesEnterAction(Menuitem *mi, int key);
 local void EditorMapPropertiesOk(void);
+
+// Editor player properties
+local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
+local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
+
+// Editor edit resource
 local void EditorEditResourceEnterAction(Menuitem *mi,int key);
 local void EditorEditResourceOk(void);
 local void EditorEditResourceCancel(void);
+
+// Editor edit ai properties
 local void EditorEditAiPropertiesGem(Menuitem *mi);
 local void EditorEditAiPropertiesOk(void);
 local void EditorEditAiPropertiesCancel(void);
+
+// Editor save
 local void EditorSaveLBInit(Menuitem *mi);
 local void EditorSaveLBExit(Menuitem *mi);
 local void EditorSaveFolder(void);
-local int EditorSaveRDFilter(char *pathbuf, FileList *fl);
 local void EditorSaveLBAction(Menuitem *mi, int i);
 local unsigned char *EditorSaveLBRetrieve(Menuitem *mi, int i);
 local void EditorSaveVSAction(Menuitem *mi, int i);
 local void EditorSaveEnterAction(Menuitem *mi, int key);
 local void EditorSaveOk(void);
 local void EditorSaveCancel(void);
+local int EditorSaveRDFilter(char *pathbuf, FileList *fl);
+
+// Editor save confirm
 local void EditorSaveConfirmInit(Menuitem *mi);
 local void EditorSaveConfirmOk(void);
 local void EditorSaveConfirmCancel(void);
-local void EditorQuitMenu(void);
 
-local void ReplayGameMenu(void);
+// Replay game
 local void ReplayGameInit(Menuitem *mi);
 local void ReplayGameLBInit(Menuitem *mi);
 local void ReplayGameLBExit(Menuitem *mi);
-local int ReplayGameRDFilter(char *pathbuf, FileList *fl);
 local void ReplayGameLBAction(Menuitem *mi, int i);
 local unsigned char *ReplayGameLBRetrieve(Menuitem *mi, int i);
 local void ReplayGameVSAction(Menuitem *mi, int i);
@@ -300,19 +351,24 @@ local void ReplayGameFolder(void);
 local void ReplayGameDisableFog(Menuitem *mi);
 local void ReplayGameOk(void);
 local void ReplayGameCancel(void);
+local int ReplayGameRDFilter(char *pathbuf, FileList *fl);
 
-local void DiplomacyWait(Menuitem *mi);
-local void DiplomacyOk(void);
 
+local void GameMenuReturn(void);
 local void NetErrorMenu(char *error);
+local void NetworkGamePrepareGameSettings(void);
+local void MultiGamePTSAction(Menuitem *mi, int o);
+local void NetMultiPlayerDrawFunc(Menuitem *mi);
+local void MultiGamePlayerSelectorsUpdate(int initial);
+
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-    /// FIXME: Docu, Johns why typedef?
+    /// Hash table of all the menus
 global _MenuHash MenuHash;
-    /// FIXME: Docu, Johns why typedef?
+    /// Hash table of all the menu functions
 global _MenuFuncHash MenuFuncHash;
 
 #define HASHADD(x,y) { \
@@ -322,12 +378,14 @@ global _MenuFuncHash MenuFuncHash;
     /// Name, Version, Copyright FIXME: move to headerfile
 extern char NameLine[];
 
-    /// FIXME: Docu
+    /// A game was loaded
 local int GameLoaded;
-    /// FIXME: Docu
+    /// Game started
 global int GuiGameStarted;
-    /// FIXME: Docu
+    /// Editor cancel button pressed
 local int EditorCancelled;
+    /// Confirmed, used for save and delete confirm menus
+local int Confirmed;
 
 /**
 **	Other client and server selection state for Multiplayer clients
@@ -340,6 +398,9 @@ local char ScenSelectFileName[128];		/// Scenario selector name
 global char ScenSelectFullPath[1024];		/// Scenario selector path+name
 
 global MapInfo *ScenSelectMapInfo;		/// Selected pud info
+
+local char *SaveDir;				/// Save game directory
+local char TempPathBuf[PATH_MAX];		/// Temporary buffer for paths
 
 global int nKeyStrokeHelps;			/// Number of keystroke help lines
 global char **KeyStrokeHelps;			/// Array of keystroke help lines
@@ -371,29 +432,31 @@ local void InitNetMultiButtonStorage() {
 --	Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	Initialize the hash table of menu functions
+*/
 global void InitMenuFuncHash(void) {
-#ifdef SAVE_MENU_CCL
-    char buf[10];
-#endif
-
     HASHADD(NULL,"null");
 
 // Game menu
-    HASHADD(InitGameMenu,"init-game-menu");
-    HASHADD(GameMenuSave,"game-menu-save");
-    HASHADD(GameMenuLoad,"game-menu-load");
-    HASHADD(GameOptions,"game-options");
-    HASHADD(HelpMenu,"menu-help");
-    HASHADD(GameMenuObjectives,"game-menu-objectives");
-    HASHADD(GameMenuEndScenario,"game-menu-end-scenario");
+    HASHADD(GameMenuInit,"game-menu-init");
+    HASHADD(SaveGameMenu,"save-game-menu");
+    HASHADD(LoadGameMenu,"load-game-menu");
+    HASHADD(GameOptionsMenu,"game-options-menu");
+    HASHADD(HelpMenu,"help-menu");
+    HASHADD(ObjectivesMenu,"objectives-menu");
+    HASHADD(EndScenarioMenu,"end-scenario-menu");
     HASHADD(GameMenuReturn,"game-menu-return");
     HASHADD(EndMenu,"end-menu");
+
+// Objectives
+    HASHADD(ObjectivesInit,"objectives-init");
+    HASHADD(ObjectivesExit,"objectives-exit");
 
 // Victory, lost
     HASHADD(GameMenuEnd,"game-menu-end");
 
-// Scene select
-    HASHADD(ScenSelectMenu,"scen-select-menu");
+// Scenario select
     HASHADD(ScenSelectLBExit,"scen-select-lb-exit");
     HASHADD(ScenSelectLBInit,"scen-select-lb-init");
     HASHADD(ScenSelectLBRetrieve,"scen-select-lb-retrieve");
@@ -412,6 +475,8 @@ global void InitMenuFuncHash(void) {
     HASHADD(SinglePlayerGameMenu,"single-player-game-menu");
     HASHADD(MultiPlayerGameMenu,"multi-player-game-menu");
     HASHADD(CampaignGameMenu,"campaign-game-menu");
+    HASHADD(ReplayGameMenu,"replay-game-menu");
+    HASHADD(GlobalOptionsMenu,"global-options-menu");
     HASHADD(StartEditor,"game-start-editor");
     HASHADD(GameShowCredits,"game-show-credits");
     HASHADD(GameMenuExit,"game-menu-exit");
@@ -423,29 +488,29 @@ global void InitMenuFuncHash(void) {
     HASHADD(ExitConfirmMenu,"exit-confirm-menu");
 
 // Global Options
-    HASHADD(GlobalOptions,"menu-global-options");
-    HASHADD(InitGlobalOptions,"init-global-options");
-    HASHADD(SetRes,"set-res");
-    HASHADD(SetFullscreen,"set-fullscreen");
-    HASHADD(SetShadowFogAlpha,"set-shadow-fog-alpha");
-    HASHADD(SetShadowFogGray,"set-shadow-fog-gray");
+    HASHADD(GlobalOptionsInit,"global-options-init");
+    HASHADD(GlobalOptionsResolutionGem,"global-options-resolution-gem");
+    HASHADD(GlobalOptionsFullscreenGem,"global-options-fullscreen-gem");
+    HASHADD(GlobalOptionsFogAlphaGem,"global-options-fog-alpha-gem");
+    HASHADD(GlobalOptionsFogGrayGem,"global-options-fog-gray-gem");
 
 // Tips
-    HASHADD(InitTips,"init-tips");
-    HASHADD(SetTips,"set-tips");
-    HASHADD(ShowNextTip,"show-next-tip");
-    HASHADD(TipsMenuEnd,"tips-menu-end");
+    HASHADD(TipsInit,"tips-init");
+    HASHADD(TipsExit,"tips-exit");
+    HASHADD(TipsShowTipsGem,"tips-show-tips-gem");
+    HASHADD(TipsNextTip,"tips-next-tip");
 
 // Custom game setup
     HASHADD(GameSetupInit,"game-setup-init");
+    HASHADD(ScenSelectMenu,"scen-select-menu");
+    HASHADD(CustomGameStart,"custom-game-start");
+    HASHADD(GameCancel,"game-cancel");
     HASHADD(GameDrawFunc,"game-draw-func");
     HASHADD(GameRCSAction,"game-rcs-action");
     HASHADD(GameRESAction,"game-res-action");
     HASHADD(GameUNSAction,"game-uns-action");
     HASHADD(GameTSSAction,"game-tss-action");
     HASHADD(GameGATAction,"game-gat-action");
-    HASHADD(GameCancel,"game-cancel");
-    HASHADD(CustomGameStart,"custom-game-start");
     HASHADD(CustomGameOPSAction,"custom-game-ops-action");
 
 // Enter name
@@ -501,6 +566,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(EndScenarioQuitMenu,"end-scenario-quit-to-menu");
 
 // Sound options
+    HASHADD(SoundOptionsInit,"sound-options-init");
     HASHADD(MasterVolumeHSAction,"master-volume-hs-action");
     HASHADD(SetMasterPower,"set-master-power");
     HASHADD(MusicVolumeHSAction,"music-volume-hs-action");
@@ -511,63 +577,64 @@ global void InitMenuFuncHash(void) {
     HASHADD(SetCdModeRandom,"set-cd-mode-random");
 
 // Preferences
+    HASHADD(PreferencesInit,"preferences-init");
     HASHADD(SetFogOfWar,"set-fog-of-war");
     HASHADD(SetCommandKey,"set-command-key");
 
-// Speed settings
+// Speed options
     HASHADD(GameSpeedHSAction,"game-speed-hs-action");
     HASHADD(MouseScrollHSAction,"mouse-scroll-hs-action");
     HASHADD(KeyboardScrollHSAction,"keyboard-scroll-hs-action");
 
 // Game options
-    HASHADD(SoundOptions,"sound-options");
-    HASHADD(InitSoundOptions,"init-sound-options");
-    HASHADD(SpeedSettings,"speed-settings");
-    HASHADD(Preferences,"preferences");
-    HASHADD(DiplomacyOptions,"menu-diplomacy");
+    HASHADD(SoundOptionsMenu,"sound-options-menu");
+    HASHADD(SpeedOptionsMenu,"speed-options-menu");
+    HASHADD(PreferencesMenu,"preferences-menu");
+    HASHADD(DiplomacyMenu,"diplomacy-menu");
 
-//Diplomacy Options
+// Diplomacy options
     HASHADD(DiplomacyWait,"diplomacy-wait");
     HASHADD(DiplomacyOk,"diplomacy-ok");
 
 // Help
-    HASHADD(KeystrokeHelpMenu,"keystroke-help");
-    HASHADD(ShowTipsMenu,"show-tips");
+    HASHADD(KeystrokeHelpMenu,"keystroke-help-menu");
+    HASHADD(TipsMenu,"tips-menu");
 
 // Keystroke help
     HASHADD(KeystrokeHelpVSAction,"keystroke-help-vs-action");
     HASHADD(KeystrokeHelpDrawFunc,"keystroke-help-draw-func");
 
 // Save
-    HASHADD(InitSaveGameMenu,"init-save-game-menu");
-    HASHADD(SaveLBInit,"save-lb-init");
-    HASHADD(SaveLBExit,"save-lb-exit");
-    HASHADD(EnterSaveGameAction,"enter-save-game-action");
-    HASHADD(SaveLBAction,"save-lb-action");
-    HASHADD(SaveLBRetrieve,"save-lb-retrieve");
-    HASHADD(SaveVSAction,"save-vs-action");
-    HASHADD(SaveOk,"save-ok");
-    HASHADD(FcDeleteMenu,"fc-delete-menu");
+    HASHADD(SaveGameInit,"save-game-init");
+    HASHADD(SaveGameLBInit,"save-game-lb-init");
+    HASHADD(SaveGameLBExit,"save-game-lb-exit");
+    HASHADD(SaveGameEnterAction,"save-game-enter-action");
+    HASHADD(SaveGameLBAction,"save-game-lb-action");
+    HASHADD(SaveGameLBRetrieve,"save-game-lb-retrieve");
+    HASHADD(SaveGameVSAction,"save-game-vs-action");
+    HASHADD(SaveGameOk,"save-game-ok");
+    HASHADD(DeleteConfirmMenu,"delete-confirm-menu");
 
 // Load
-    HASHADD(InitLoadGameMenu,"init-load-game-menu");
-    HASHADD(LoadLBInit,"load-lb-init");
-    HASHADD(LoadLBExit,"load-lb-exit");
-    HASHADD(LoadLBAction,"load-lb-action");
-    HASHADD(LoadLBRetrieve,"load-lb-retrieve");
-    HASHADD(LoadVSAction,"load-vs-action");
-    HASHADD(LoadOk,"load-ok");
-    HASHADD(LoadAction,"load-action");
+    HASHADD(LoadGameInit,"load-game-init");
+    HASHADD(LoadGameLBInit,"load-game-lb-init");
+    HASHADD(LoadGameLBExit,"load-game-lb-exit");
+    HASHADD(LoadGameLBAction,"load-game-lb-action");
+    HASHADD(LoadGameLBRetrieve,"load-game-lb-retrieve");
+    HASHADD(LoadGameVSAction,"load-game-vs-action");
+    HASHADD(LoadGameOk,"load-game-ok");
 
 // Confirm save
     HASHADD(SaveConfirmInit,"save-confirm-init");
+    HASHADD(SaveConfirmExit,"save-confirm-exit");
     HASHADD(SaveConfirmOk,"save-confirm-ok");
     HASHADD(SaveConfirmCancel,"save-confirm-cancel");
 
 // Confirm delete
-    HASHADD(FcDeleteInit,"fc-delete-init");
-    HASHADD(FcDeleteOk,"fc-delete-ok");
-    HASHADD(FcDeleteCancel,"fc-delete-cancel");
+    HASHADD(DeleteConfirmInit,"delete-confirm-init");
+    HASHADD(DeleteConfirmExit,"delete-confirm-exit");
+    HASHADD(DeleteConfirmOk,"delete-confirm-ok");
+    HASHADD(DeleteConfirmCancel,"delete-confirm-cancel");
 
 // Editor select
     HASHADD(EditorNewMap,"editor-new-map");
@@ -604,11 +671,11 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorMainLoadFolder,"editor-load-folder");
 
 // Editor menu
-    HASHADD(EditorSave,"editor-save");
-    HASHADD(EditorLoadMap,"editor-load-map");
-    HASHADD(EditorMapProperties,"editor-map-properties");
-    HASHADD(EditorPlayerProperties,"editor-player-properties");
-    HASHADD(EditorQuitMenu,"editor-quit-menu");
+    HASHADD(EditorSaveMenu,"editor-save-menu");
+    HASHADD(EditorLoadMenu,"editor-load-menu");
+    HASHADD(EditorMapPropertiesMenu,"editor-map-properties-menu");
+    HASHADD(EditorPlayerPropertiesMenu,"editor-player-properties-menu");
+    HASHADD(EditorQuitToMenu,"editor-quit-to-menu");
 
 // Editor map properties
     HASHADD(EditorMapPropertiesEnterAction,"editor-map-properties-enter-action");
@@ -639,12 +706,13 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorSaveEnterAction,"editor-save-enter-action");
     HASHADD(EditorSaveOk,"editor-save-ok");
     HASHADD(EditorSaveCancel,"editor-save-cancel");
+
+// Editor save confirm
     HASHADD(EditorSaveConfirmInit,"editor-save-confirm-init");
     HASHADD(EditorSaveConfirmOk,"editor-save-confirm-ok");
     HASHADD(EditorSaveConfirmCancel,"editor-save-confirm-cancel");
 
 // Replay game
-    HASHADD(ReplayGameMenu,"replay-game-menu");
     HASHADD(ReplayGameInit,"replay-game-init");
     HASHADD(ReplayGameLBInit,"replay-game-lb-init");
     HASHADD(ReplayGameLBExit,"replay-game-lb-exit");
@@ -714,12 +782,10 @@ local void GameMenuReturn(void)
     GamePaused = 0;
 }
 
-local char *SaveDir;			/// FIXME: docu
-
 /**
 **	Init callback for save game menu
 */
-local void InitSaveGameMenu(Menuitem *mi)
+local void SaveGameInit(Menuitem *mi)
 {
     mi->menu->items[4].flags = MenuButtonDisabled;
     mi->menu->items[5].flags = MenuButtonDisabled;
@@ -729,14 +795,14 @@ local void InitSaveGameMenu(Menuitem *mi)
 /**
 **	Save game input box callback
 */
-local void EnterSaveGameAction(Menuitem *mi, int key)
+local void SaveGameEnterAction(Menuitem *mi, int key)
 {
     if (mi->d.input.nch == 0) {
 	mi[3].flags = MenuButtonDisabled;	/* mi[i]: Save button! */
     } else {
 	mi[3].flags &= ~MenuButtonDisabled;
 	if (key == 10 || key == 13) {
-	    SaveOk();
+	    SaveGameOk();
 	    return;
 	}
     }
@@ -746,32 +812,35 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 /**
 **	Save game
 */
-local void SaveOk(void)
+local void SaveGameOk(void)
 {
-    char filename[PATH_MAX];
     char *name;
     Menu *menu;
     size_t nameLength;
 
-    menu = FindMenu("menu-save-game");
+    menu = CurrentMenu;
     name = menu->items[1].d.input.buffer;
 
     nameLength = strlen(name) - 3;
+    if (nameLength != 0) {
+	strcpy(TempPathBuf, SaveDir);
+	strcat(TempPathBuf, "/");
+	strncat(TempPathBuf, name, nameLength);
+	if (strstr(TempPathBuf, ".sav") == NULL) {
+	    strcat(TempPathBuf, ".sav");
+	}
 
-    strcpy(filename, SaveDir);
-    strcat(filename, "/");
-    strncat(filename, name, nameLength);
-    if (strstr(filename, ".sav") == NULL)
-	strcat(filename, ".sav");
-
-    if (access(filename,F_OK)) {
-        SaveGame(filename);
-	SetMessage("Saved game to: %s", filename);
-    } else {
-	ProcessMenu("menu-save-confirm", 1);
+	if (access(TempPathBuf,F_OK)) {
+	    SaveGame(TempPathBuf);
+	    SetMessage("Saved game to: %s", TempPathBuf);
+	    EndMenu();
+	} else {
+	    ProcessMenu("menu-save-confirm", 1);
+	    if (Confirmed) {
+		EndMenu();
+	    }
+	}
     }
-
-    EndMenu();
 }
 
 /**
@@ -779,29 +848,28 @@ local void SaveOk(void)
 */
 local void CreateSaveDir(void)
 {
-#ifdef USE_WIN32
-    SaveDir="save";
-    mkdir(SaveDir);
-#else
-    char path[PATH_MAX];
-
-    strcpy(path,getenv("HOME"));
-    strcat(path,"/");
-    strcat(path,FREECRAFT_HOME_PATH);
-    mkdir(path,0777);
-    strcat(path,"/save");
-    mkdir(path,0777);
     if (SaveDir) {
 	free(SaveDir);
     }
-    SaveDir = strdup(path);
+
+#ifdef USE_WIN32
+    SaveDir=strdup("save");
+    mkdir(SaveDir);
+#else
+    strcpy(TempPathBuf,getenv("HOME"));
+    strcat(TempPathBuf,"/");
+    strcat(TempPathBuf,FREECRAFT_HOME_PATH);
+    mkdir(TempPathBuf,0777);
+    strcat(TempPathBuf,"/save");
+    mkdir(TempPathBuf,0777);
+    SaveDir = strdup(TempPathBuf);
 #endif
 }
 
 /**
 **	Save game menu
 */
-global void GameMenuSave(void)
+global void SaveGameMenu(void)
 {
     char savegame_buffer[32];
     Menu *menu;
@@ -818,8 +886,7 @@ global void GameMenuSave(void)
 /**
 **	Exit callback for listbox in save game menu
 */
-// FIXME: modify function
-local void SaveLBExit(Menuitem *mi)
+local void SaveGameLBExit(Menuitem *mi)
 {
     FileList *fl;
 
@@ -835,11 +902,11 @@ local void SaveLBExit(Menuitem *mi)
 /**
 **	Init callback for listbox in save game menu
 */
-local void SaveLBInit(Menuitem *mi)
+local void SaveGameLBInit(Menuitem *mi)
 {
     int i;
 
-    SaveLBExit(mi);
+    SaveGameLBExit(mi);
 
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir,
 	    NULL, (FileList **) & (mi->d.listbox.options));
@@ -856,7 +923,7 @@ local void SaveLBInit(Menuitem *mi)
 /**
 **	Save game listbox retrieve callback
 */
-local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
+local unsigned char *SaveGameLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
     static char buffer[1024];
@@ -877,7 +944,7 @@ local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 /**
 **	Save game listbox action callback
 */
-local void SaveLBAction(Menuitem *mi, int i)
+local void SaveGameLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
 
@@ -903,7 +970,7 @@ local void SaveLBAction(Menuitem *mi, int i)
 /**
 **	Save game vertical slider callback
 */
-local void SaveVSAction(Menuitem *mi, int i)
+local void SaveGameVSAction(Menuitem *mi, int i)
 {
     int op;
     int d1;
@@ -935,7 +1002,7 @@ local void SaveVSAction(Menuitem *mi, int i)
 		    MustRedraw |= RedrawMenu;
 		}
 	    }
-	    SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    SaveGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
@@ -984,7 +1051,7 @@ local void SaveVSAction(Menuitem *mi, int i)
 		DebugCheck(mi->d.listbox.noptions > 0 &&
 		    mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
-		SaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		SaveGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -996,7 +1063,7 @@ local void SaveVSAction(Menuitem *mi, int i)
 /**
 **	Save game read directory filter
 */
-local int SaveRDFilter(char *pathbuf, FileList *fl)
+local int SaveGameRDFilter(char *pathbuf, FileList *fl)
 {
     char *suf;
     char *cp;
@@ -1045,7 +1112,7 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
 /**
 **	Load game init callback
 */
-local void InitLoadGameMenu(Menuitem *mi)
+local void LoadGameInit(Menuitem *mi)
 {
     mi->menu->items[3].flags = MI_DISABLED;
     CreateSaveDir();
@@ -1054,8 +1121,7 @@ local void InitLoadGameMenu(Menuitem *mi)
 /**
 **	Exit callback for listbox in load game menu
 */
-// FIXME: modify function
-local void LoadLBExit(Menuitem *mi)
+local void LoadGameLBExit(Menuitem *mi)
 {
     FileList *fl;
 
@@ -1071,13 +1137,13 @@ local void LoadLBExit(Menuitem *mi)
 /**
 **	Init callback for listbox in load game menu
 */
-local void LoadLBInit(Menuitem *mi)
+local void LoadGameLBInit(Menuitem *mi)
 {
     int i;
 
-    LoadLBExit(mi);
+    LoadGameLBExit(mi);
 
-    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveRDFilter,
+    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveGameRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i != 0) {
 	if (i > mi->d.listbox.nlines) {
@@ -1092,7 +1158,7 @@ local void LoadLBInit(Menuitem *mi)
 /**
 **	Load game listbox retrieve callback
 */
-local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
+local unsigned char *LoadGameLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
     static char buffer[1024];
@@ -1113,7 +1179,7 @@ local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 /**
 **	Load game listbox action callback
 */
-local void LoadLBAction(Menuitem *mi, int i)
+local void LoadGameLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
 
@@ -1137,7 +1203,7 @@ local void LoadLBAction(Menuitem *mi, int i)
 /**
 **	Load game vertical slider callback
 */
-local void LoadVSAction(Menuitem *mi, int i)
+local void LoadGameVSAction(Menuitem *mi, int i)
 {
     int op;
     int d1;
@@ -1169,7 +1235,7 @@ local void LoadVSAction(Menuitem *mi, int i)
 		    MustRedraw |= RedrawMenu;
 		}
 	    }
-	    LoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    LoadGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
@@ -1218,7 +1284,7 @@ local void LoadVSAction(Menuitem *mi, int i)
 		DebugCheck(mi->d.listbox.noptions > 0 &&
 		    mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
-		LoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		LoadGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -1228,66 +1294,40 @@ local void LoadVSAction(Menuitem *mi, int i)
 }
 
 /**
-**	FIXME: docu
+**	Load game ok button callback
 */
-// FIXME: modify function
-local void LoadOk(void)
+local void LoadGameOk(void)
 {
     FileList *fl;
     Menuitem *mi;
     Menu *menu;
     int i;
 
-    menu = FindMenu("menu-select-scenario");
+    menu = CurrentMenu;
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
-	if (fl[i].type == 0) {
-	    strcat(ScenSelectPath, "/");
-	    strcat(ScenSelectPath, fl[i].name);
-	    if (menu->items[9].flags&MenuButtonDisabled) {
-		menu->items[9].flags &= ~MenuButtonDisabled;
-		menu->items[9].d.button.text = ScenSelectDisplayPath;
-	    } else {
-		strcat(ScenSelectDisplayPath, "/");
-	    }
-	    strcat(ScenSelectDisplayPath, fl[i].name);
-	    ScenSelectLBInit(mi);
-	    mi->d.listbox.cursel = -1;
-	    mi->d.listbox.startline = 0;
-	    mi->d.listbox.curopt = 0;
-	    mi[1].d.vslider.percent = 0;
-	    mi[1].d.hslider.percent = 0;
-	    MustRedraw |= RedrawMenu;
-	} else {
-	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
-	    EndMenu();
-	    menu->items[9].d.button.text = NULL;
-	}
+	sprintf(TempPathBuf, "%s/%s", SaveDir, fl[i].name);
+	LoadGame(TempPathBuf);
+	SetMessage("Loaded game: %s", TempPathBuf);
+	GameLoaded = 1;
+	GuiGameStarted = 1;
+	CurrentMapPath[0] = '\0';
+	EndMenu();
     }
 }
-
-#if 0
-/**
-**	FIXME: docu
-*/
-local void SaveMenu(void)
-{
-    EndMenu();
-    ProcessMenu("menu-save-confirm", 1);
-}
-#endif
 
 /**
 **	Save confirm init callback
 */
-local void SaveConfirmInit(Menuitem * mi)
+local void SaveConfirmInit(Menuitem *mi)
 {
     static char name[PATH_MAX];		// FIXME: much memory wasted
     int fileLength;
     Menu *menu;
 
+    Confirmed = 0;
     menu = FindMenu("menu-save-game");
     fileLength = strlen(menu->items[1].d.input.buffer) - 3;
 
@@ -1297,6 +1337,14 @@ local void SaveConfirmInit(Menuitem * mi)
 	strcat(name, ".sav");
     }
     mi->menu->items[2].d.text.text = name;
+}
+
+/**
+**	Save confirm exit callback
+*/
+local void SaveConfirmExit(Menuitem *mi)
+{
+    mi->menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -1304,25 +1352,22 @@ local void SaveConfirmInit(Menuitem * mi)
 */
 local void SaveConfirmOk(void)
 {
-    char name[PATH_MAX];
     int fileLength;
     Menu *menu;
 
+    Confirmed = 1;
     menu = FindMenu("menu-save-game");
     fileLength = strlen(menu->items[1].d.input.buffer) - 3;
 
-    strcpy(name, SaveDir);
-    strcat(name, "/");
-    strncat(name, menu->items[1].d.input.buffer, fileLength);
-    if (strstr(name, ".sav") == NULL) {
-	strcat(name, ".sav");
+    strcpy(TempPathBuf, SaveDir);
+    strcat(TempPathBuf, "/");
+    strncat(TempPathBuf, menu->items[1].d.input.buffer, fileLength);
+    if (strstr(TempPathBuf, ".sav") == NULL) {
+	strcat(TempPathBuf, ".sav");
     }
-    SaveGame(name);
-    SetMessage("Saved game to: %s", name);
+    SaveGame(TempPathBuf);
+    SetMessage("Saved game to: %s", TempPathBuf);
     EndMenu();
-
-    menu = FindMenu("menu-save-confirm");
-    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -1330,30 +1375,33 @@ local void SaveConfirmOk(void)
 */
 local void SaveConfirmCancel(void)
 {
-    Menu *menu;
-
     EndMenu();
-    menu = FindMenu("menu-save-confirm");
-    menu->items[2].d.text.text = NULL;
 }
 
 /**
 **	Delete menu
 */
-local void FcDeleteMenu(void)
+local void DeleteConfirmMenu(void)
 {
-    EndMenu();
     ProcessMenu("menu-delete-confirm", 1);
+
+    if (Confirmed) {
+	// Update list of files and clear input
+	SaveGameLBInit(&CurrentMenu->items[2]);
+	strcpy(CurrentMenu->items[1].d.input.buffer,"~!_");
+	CurrentMenu->items[1].d.input.nch = 0;
+    }
 }
 
 /**
-**	Init callback for delete menu
+**	Init callback for delete confirm menu
 */
-local void FcDeleteInit(Menuitem *mi)
+local void DeleteConfirmInit(Menuitem *mi)
 {
     Menu *menu;
     static char name[PATH_MAX];		// FIXME: much memory wasted
 
+    Confirmed = 0;
     menu = FindMenu("menu-save-game");
     strcpy(name, "the file: ");
     strcat(name, menu->items[1].d.input.buffer);
@@ -1362,74 +1410,42 @@ local void FcDeleteInit(Menuitem *mi)
 }
 
 /**
-**	Delete ok button
+**	Exit callback for delete confirm menu
 */
-local void FcDeleteOk(void)
+local void DeleteConfirmExit(Menuitem *mi)
+{
+    mi->menu->items[2].d.text.text = NULL;
+}
+
+/**
+**	Delete confirm ok button
+*/
+local void DeleteConfirmOk(void)
 {
     Menu *menu;
-    char name[PATH_MAX];
 
+    Confirmed = 1;
     menu = FindMenu("menu-save-game");
-    strcpy(name, SaveDir);
-    strcat(name, "/");
-    strcat(name, menu->items[1].d.input.buffer);
-    name[strlen(name) - 3] = '\0';
-    unlink(name);
+    strcpy(TempPathBuf, SaveDir);
+    strcat(TempPathBuf, "/");
+    strcat(TempPathBuf, menu->items[1].d.input.buffer);
+    TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
+    unlink(TempPathBuf);
     EndMenu();
-    *menu->items[1].d.input.buffer = '\0';
-    menu->items[1].d.input.nch = 0;
-    ProcessMenu("menu-save-game", 1);
-
-    menu = FindMenu("menu-delete-confirm");
-    menu->items[2].d.text.text = NULL;
 }
 
 /**
-**	Delete cancel button
+**	Delete confirm cancel button
 */
-local void FcDeleteCancel(void)
+local void DeleteConfirmCancel(void)
 {
-    Menu *menu;
-
-    EndMenu();
-    menu = FindMenu("menu-delete-confirm");
-    menu->items[2].d.text.text = NULL;
-}
-
-/**
-**	FIXME: docu
-*/
-local void LoadAction(void)
-{
-    Menu *menu;
-    char filename[256];
-    FileList *fl;
-    char *name;
-    size_t nameLength;
-
-    // menu = FindMenu("menu-load-game");
-    menu = CurrentMenu;
-    fl = menu->items[1].d.listbox.options;
-
-    name = fl[menu->items[1].d.listbox.curopt + menu->items[1].d.listbox.startline].name;
-    nameLength = strlen(name);
-
-    strcpy(filename, SaveDir);
-    strcat(filename, "/");
-    strncat(filename, name, nameLength);
-
-    LoadGame(filename);
-    SetMessage("Loaded game: %s", filename);
-    GameLoaded=1;
-    GuiGameStarted = 1;
-    CurrentMapPath[0]='\0';
     EndMenu();
 }
 
 /**
 **	Load game menu
 */
-global void GameMenuLoad(void)
+global void LoadGameMenu(void)
 {
     Menu *menu;
 
@@ -1445,7 +1461,7 @@ global void GameMenuLoad(void)
 /**
 **	Init callback for game menu
 */
-local void InitGameMenu(Menuitem *mi __attribute__((unused)))
+local void GameMenuInit(Menuitem *mi __attribute__((unused)))
 {
     // FIXME: populate...
 }
@@ -1453,7 +1469,7 @@ local void InitGameMenu(Menuitem *mi __attribute__((unused)))
 /**
 **	Sound options menu
 */
-global void SoundOptions(void)
+global void SoundOptionsMenu(void)
 {
     ProcessMenu("menu-sound-options", 1);
 }
@@ -1461,7 +1477,7 @@ global void SoundOptions(void)
 /**
 **	Init callback for sound options menu
 */
-local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
+local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
     Menu *menu;
@@ -1546,7 +1562,7 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 /**
 **	Global options menu
 */
-local void GlobalOptions(void)
+local void GlobalOptionsMenu(void)
 {
     ProcessMenu("menu-global-options", 1);
 }
@@ -1554,11 +1570,11 @@ local void GlobalOptions(void)
 /**
 **	Init callback for global options menu
 */
-local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
+local void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
 {
     Menu *menu;
 
-    menu = FindMenu("menu-global-options");
+    menu = CurrentMenu;
 
     menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
@@ -1592,32 +1608,37 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	Set the resolution
+**	Global options resolution gem callback
 */
-local void SetRes(Menuitem *mi)
+local void GlobalOptionsResolutionGem(Menuitem *mi)
 {
-    Menu *menu;
     int res;
-    int i;
 
-    menu = FindMenu("menu-global-options");
-
-    res=VideoWidth;
-    if (mi[+1].d.text.text == menu->items[3].d.text.text) {
-	res=640;
-    } else if (mi[+1].d.text.text == menu->items[5].d.text.text) {
-	res=800;
-    } else if (mi[+1].d.text.text == menu->items[7].d.text.text) {
-	res=1024;
-    } else if (mi[+1].d.text.text == menu->items[9].d.text.text) {
-	res=1280;
-    } else if (mi[+1].d.text.text == menu->items[11].d.text.text) {
-	res=1600;
+    res = VideoWidth;
+    switch (mi - mi->menu->items) {
+	case 2:
+	    res = 640;
+	    break;
+	case 4:
+	    res = 800;
+	    break;
+	case 6:
+	    res = 1024;
+	    break;
+	case 8:
+	    res = 1280;
+	    break;
+	case 10:
+	    res = 1600;
+	    break;
     }
 
     if (VideoWidth != res) {
-	VideoWidth=res;
-	VideoHeight=res * 3 / 4;
+	Menu *menu;
+	int i;
+
+	VideoWidth = res;
+	VideoHeight = res * 3 / 4;
 	InitVideo();
 	DestroyCursorBackground();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
@@ -1633,38 +1654,38 @@ local void SetRes(Menuitem *mi)
 	DrawMenu(menu);
 	VideoUnlockScreen();
     }
-    InitGlobalOptions(NULL);
+    GlobalOptionsInit(NULL);
 }
 
 /**
-**	Set fullscreen mode on or off
+**	Global options fullscreen gem callback
 */
-local void SetFullscreen(Menuitem *mi __attribute__((unused)))
+local void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
 {
     ToggleFullScreen();
-    InitGlobalOptions(NULL);
+    GlobalOptionsInit(NULL);
 }
 
 /**
-**	Set shadow fog alpha mode
+**	Global options fog alpha gem callback
 */
-local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
+local void GlobalOptionsFogAlphaGem(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=1;
-    InitGlobalOptions(NULL);
+    GlobalOptionsInit(NULL);
 }
 
 /**
-**	Set shadow fog gray mode
+**	Global options fog gray gem callback
 */
-local void SetShadowFogGray(Menuitem *mi __attribute__((unused)))
+local void GlobalOptionsFogGrayGem(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=0;
-    InitGlobalOptions(NULL);
+    GlobalOptionsInit(NULL);
 }
 
 /**
-**	FIXME: docu
+**	Master volume gem callback
 */
 local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 {
@@ -1683,11 +1704,11 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 	InitSoundClient();
     }
 #endif
-    InitSoundOptions(NULL);
+    SoundOptionsInit(NULL);
 }
 
 /**
-**	FIXME: docu
+**	Music volume gem callback
 */
 local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
@@ -1709,12 +1730,12 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 	    }
 	}
     }
-#endif // with sound
-    InitSoundOptions(NULL);
+#endif // WITH_SOUND
+    SoundOptionsInit(NULL);
 }
 
 /**
-**	FIXME: docu
+**	CD volume gem callback
 */
 local void SetCdPower(Menuitem *mi __attribute__((unused)))
 {
@@ -1730,8 +1751,9 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
         SDL_CDPause(CDRom);
 	CDMode = ":stopped";
     }
-    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
+    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
 	StopMusic();
+    }
 #elif defined(USE_LIBCDA)
     // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
@@ -1751,7 +1773,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 	CDMode = ":stopped";
     }
 #endif
-    InitSoundOptions(NULL);
+    SoundOptionsInit(NULL);
 }
 
 /**
@@ -1786,62 +1808,70 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	CD play all tracks gem callback
 */
 local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 {
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":all";
 #endif
-    InitSoundOptions(NULL);
+    SoundOptionsInit(NULL);
 }
 
 /**
-**	FIXME: docu
+**	CD play random tracks gem callback
 */
 local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":random";
 #endif
-    InitSoundOptions(NULL);
+    SoundOptionsInit(NULL);
 }
 
 /**
-**	FIXME: docu
+**	Speed settings menu
 */
-global void SpeedSettings(void)
+global void SpeedOptionsMenu(void)
 {
     Menu *menu;
-    int i = 2;
+    int i;
+    
+    i = 2;
+    menu = FindMenu("menu-speed-options");
 
-    menu = FindMenu("menu-settings-speed");
     menu->items[i].d.hslider.percent = ((VideoSyncSpeed - MIN_GAME_SPEED) * 100) / (MAX_GAME_SPEED - MIN_GAME_SPEED);
-    if (menu->items[i].d.hslider.percent < 0)
+    if (menu->items[i].d.hslider.percent < 0) {
 	menu->items[i].d.hslider.percent = 0;
-    if (menu->items[i].d.hslider.percent > 100)
+    }
+    if (menu->items[i].d.hslider.percent > 100) {
 	menu->items[i].d.hslider.percent = 100;
+    }
+
     menu->items[i + 4].d.hslider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
-    if (TheUI.MouseScroll == 0)
+    if (TheUI.MouseScroll == 0) {
 	menu->items[i + 4].d.hslider.percent = 0;
+    }
     menu->items[i + 8].d.hslider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
-    if (TheUI.KeyScroll == 0)
+    if (TheUI.KeyScroll == 0) {
 	menu->items[i + 8].d.hslider.percent = 0;
-    ProcessMenu("menu-settings-speed", 1);
+    }
+
+    ProcessMenu("menu-speed-options", 1);
 }
 
 /**
-**	Diplomacy options
+**	Diplomacy options menu
 */
-global void DiplomacyOptions(void)
+global void DiplomacyMenu(void)
 {
     Menu *menu;
     int i;
     int j;
 
     menu = FindMenu("menu-diplomacy");
+    j = 0;
 
-    j=0;
     for( i=0; i<=(PlayerMax-2); ++i ) {
 	if( Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
 	    menu->items[4*j+4].d.text.text = Players[i].Name;
@@ -1879,14 +1909,15 @@ global void DiplomacyOptions(void)
 }
 
 /**
-**	Wait for diplomacy to be clicked
+**	Diplomacy gem callback
 */
 local void DiplomacyWait(Menuitem *mi __attribute__((unused)))
 {
+    // Don't set diplomacy until clicking ok
 }
 
 /**
-**	Diplomacy Ok button
+**	Diplomacy Ok button callback
 */
 local void DiplomacyOk(void)
 {
@@ -1895,8 +1926,8 @@ local void DiplomacyOk(void)
     int j;
 
     menu = CurrentMenu;
+    j = 0;
 
-    j=0;
     for( i=0; i<=(PlayerMax-2); ++i ) {
 	if( Players[i].Type!=PlayerNobody && &Players[i]!=ThisPlayer) {
 	    // Menu says to ally
@@ -1962,14 +1993,20 @@ local void DiplomacyOk(void)
 /**
 **	Enter the preferences menu.
 **	Setup if the options are enabled / disabled.
-**
-**	@todo	FIXME: The init should be done by the init callback.
 */
-global void Preferences(void)
+global void PreferencesMenu(void)
+{
+    ProcessMenu("menu-preferences", 1);
+}
+
+/**
+**	Preferences menu init callback
+*/
+local void PreferencesInit(Menuitem *mi __attribute__((unused)))
 {
     Menu *menu;
 
-    menu = FindMenu("menu-preferences");
+    menu = CurrentMenu;
     if (!TheMap.NoFogOfWar) {
 	menu->items[1].d.gem.state = MI_GSTATE_CHECKED;
     } else {
@@ -1987,14 +2024,12 @@ global void Preferences(void)
     } else {
 	menu->items[3].d.gem.state = MI_GSTATE_UNCHECKED;
     }
-
-    ProcessMenu("menu-preferences", 1);
 }
 
 /**
 **	Show the game options.
 */
-local void GameOptions(void)
+local void GameOptionsMenu(void)
 {
     ProcessMenu("menu-game-options", 1);
 }
@@ -2019,7 +2054,7 @@ global void RestartConfirmMenu(void)
 }
 
 /**
-**	Show the Surrender  Confirm menu
+**	Show the Surrender Confirm menu
 */
 local void SurrenderConfirmMenu(void)
 {
@@ -2051,7 +2086,7 @@ global void ExitConfirmMenu(void)
 /**
 **	Show the End Scenario menu
 */
-local void GameMenuEndScenario(void)
+local void EndScenarioMenu(void)
 {
     ProcessMenu("menu-end-scenario", 1);
     if (!GameRunning) {
@@ -2106,10 +2141,6 @@ local void GameMenuEnd(void)
 */
 local void KeystrokeHelpMenu(void)
 {
-    Menu *menu;
-
-    menu = FindMenu("menu-keystroke-help");
-    menu->items[1].d.vslider.percent = 0;
     ProcessMenu("menu-keystroke-help", 1);
 }
 
@@ -2124,24 +2155,15 @@ local void HelpMenu(void)
 /**
 **	Tips menu
 */
-local void ShowTipsMenu(void)
+local void TipsMenu(void)
 {
-    Menu *menu;
-
-    menu = FindMenu("menu-tips");
-    if (ShowTips) {
-	menu->items[1].d.gem.state = MI_GSTATE_CHECKED;
-    } else {
-	menu->items[1].d.gem.state = MI_GSTATE_UNCHECKED;
-    }
-
     ProcessMenu("menu-tips", 1);
 }
 
 /**
 **	Free the tips from the menu
 */
-local void FreeTips(void)
+local void TipsFreeTips(void)
 {
     int i;
     Menu *menu;
@@ -2158,7 +2180,7 @@ local void FreeTips(void)
 /**
 **	Initialize the tips menu
 */
-local void InitTips(Menuitem *mi __attribute__((unused)))
+local void TipsInit(Menuitem *mi __attribute__((unused)))
 {
     int i;
     int line;
@@ -2170,7 +2192,7 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
     int l;
     Menu *menu;
 
-    menu = FindMenu("menu-tips");
+    menu = CurrentMenu;
 
     if( ShowTips ) {
 	menu->items[1].d.gem.state=MI_GSTATE_CHECKED;
@@ -2178,7 +2200,7 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
 	menu->items[1].d.gem.state=MI_GSTATE_UNCHECKED;
     }
 
-    FreeTips();
+    TipsFreeTips();
 
     w=menu->xsize-2*menu->items[5].xofs;
     font=menu->items[5].font;
@@ -2226,9 +2248,29 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
 }
 
 /**
+**	Cycle to the next tip
+*/
+local void TipsCycleNextTip(void)
+{
+    ++CurrentTip;
+    if (Tips[CurrentTip] == NULL) {
+	CurrentTip = 0;
+    }
+}
+
+/**
+**	Tips menu exit callback
+*/
+local void TipsExit(Menuitem *mi __attribute__((unused)))
+{
+    TipsCycleNextTip();
+    TipsFreeTips();
+}
+
+/**
 **	Show tips at startup gem callback
 */
-local void SetTips(Menuitem *mi)
+local void TipsShowTipsGem(Menuitem *mi)
 {
     if (mi->menu->items[1].d.gem.state == MI_GSTATE_CHECKED) {
 	ShowTips = 1;
@@ -2238,35 +2280,13 @@ local void SetTips(Menuitem *mi)
 }
 
 /**
-**	Cycle to the next tip
+**	Tips menu next tip button callback
 */
-local void NextTip(void)
+local void TipsNextTip(void)
 {
-    CurrentTip++;
-    if (Tips[CurrentTip] == NULL)
-	CurrentTip = 0;
+    TipsCycleNextTip();
+    TipsInit(NULL);
 }
-
-/**
-**	Cycle through the tips
-*/
-local void ShowNextTip(void)
-{
-    NextTip();
-    InitTips(NULL);
-}
-
-/**
-**	Exit the tips menu
-*/
-local void TipsMenuEnd(void)
-{
-    NextTip();
-    FreeTips();
-
-    EndMenu();
-}
-
 
 /**
 **	Exit the game from menu.
@@ -2279,7 +2299,7 @@ local void GameMenuExit(void)
 /**
 **	Initialize the game objectives menu
 */
-local void SetMenuObjectives(void)
+local void ObjectivesInit(Menuitem *mi __attribute__((unused)))
 {
     int i;
     int line;
@@ -2339,12 +2359,12 @@ local void SetMenuObjectives(void)
 /**
 **	Free the game objectives menu memory
 */
-local void FreeMenuObjectives(void)
+local void ObjectivesExit(Menuitem *mi)
 {
     int i;
     Menu *menu;
 
-    menu = FindMenu("menu-objectives");
+    menu = mi->menu;
     for( i=1;i<menu->nitems-1;i++ ) {
 	if( menu->items[i].d.text.text ) {
 	    free(menu->items[i].d.text.text);
@@ -2356,11 +2376,9 @@ local void FreeMenuObjectives(void)
 /**
 **	Game objectives menu
 */
-local void GameMenuObjectives(void)
+local void ObjectivesMenu(void)
 {
-    SetMenuObjectives();
     ProcessMenu("menu-objectives", 1);
-    FreeMenuObjectives();
 }
 
 /**
@@ -2520,9 +2538,9 @@ local void StartCampaignFromMenu(int number)
     // JOHNS: this is currently not needed:
 
     // Any Campaign info should be displayed through a DrawFunc() Item
-    // int the CAMPAIN_CONT menu processed below...
+    // in the CAMPAIN_CONT menu processed below...
     ProcessMenu("menu-campaign-continue", 1);
-    // Set GuiGameStarted = 1 to acctually run a game here...
+    // Set GuiGameStarted = 1 to actually run a game here...
     // See CustomGameStart() for info...
 #endif
 
@@ -2593,7 +2611,8 @@ local void SelectCampaignMenu(void)
 local void EnterNameCancel(void)
 {
     Menu *menu;
-    menu = FindMenu("menu-enter-name");
+
+    menu = CurrentMenu;
     menu->items[1].d.input.nch = 0;
     EndMenu();
 }
@@ -2703,6 +2722,11 @@ local void JoinNetGameMenu(void)
 	return;
     }
     NetworkInitClientConnect();
+    if (!NetConnectRunning) {
+	TerminateNetConnect();
+	return;
+    }
+
     if (NetworkArg) {
 	free(NetworkArg);
     }
@@ -3630,7 +3654,7 @@ local void ScenSelectFolder(void)
     Menu *menu;
     Menuitem *mi;
 
-    menu = FindMenu("menu-select-scenario");
+    menu = CurrentMenu;
     mi = menu->items + 1;
     if (ScenSelectDisplayPath[0]) {
 	cp = strrchr(ScenSelectDisplayPath, '/');
@@ -3665,7 +3689,7 @@ local void ScenSelectOk(void)
     Menuitem *mi;
     int i;
 
-    menu = FindMenu("menu-select-scenario");
+    menu = CurrentMenu;
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -3700,7 +3724,6 @@ local void ScenSelectOk(void)
 */
 local void ScenSelectCancel(void)
 {
-    Menu *menu;
     char *s;
 
     //
@@ -3725,14 +3748,13 @@ local void ScenSelectCancel(void)
 
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
-    EndMenu();
+    CurrentMenu->items[9].d.button.text = NULL;
 
-    menu = FindMenu("menu-select-scenario");
-    menu->items[9].d.button.text = NULL;
+    EndMenu();
 }
 
 /**
-**	FIXME: docu
+**	Custom game cancel button callback
 */
 local void GameCancel(void)
 {
@@ -3949,7 +3971,6 @@ local void GameTSSAction(Menuitem *mi, int i)
 local void GameGATAction(Menuitem *mi, int i)
 {
     if (!mi || mi->d.pulldown.curopt == i) {
-	// FIXME: not supported
 	GameSettings.GameType = i ? SettingsGameTypeMelee + i-1 : SettingsGameTypeMapDefault;
 	ServerSetupState.GaTOpt = i;
 	if (mi) {
@@ -3968,8 +3989,6 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 
 /**
 **	Menu setup fog-of-war pulldown action.
-**
-**	@note FIXME: Want to support more features. fe. reveal map on start.
 */
 local void MultiGameFWSAction(Menuitem *mi, int i)
 {
@@ -4722,6 +4741,9 @@ local void StartEditor(void)
     EndMenu();
 }
 
+/**
+**	Editor select cancel button callback
+*/
 local void EditorSelectCancel(void)
 {
     QuitToMenu = 1;
@@ -5069,7 +5091,7 @@ local void EditorMainLoadFolder(void)
     Menuitem *mi;
     char *cp;
 
-    menu = FindMenu("menu-editor-main-load-map");
+    menu = CurrentMenu;
     mi = &menu->items[1];
 
     if (ScenSelectDisplayPath[0]) {
@@ -5105,7 +5127,7 @@ local void EditorMainLoadOk(void)
     FileList *fl;
     int i;
 
-    menu = FindMenu("menu-editor-main-load-map");
+    menu = CurrentMenu;
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -5140,7 +5162,6 @@ local void EditorMainLoadOk(void)
 */
 local void EditorMainLoadCancel(void)
 {
-    Menu *menu;
     char *s;
 
     EditorCancelled=1;
@@ -5167,10 +5188,9 @@ local void EditorMainLoadCancel(void)
 
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
-    EndMenu();
+    CurrentMenu->items[5].d.button.text = NULL;
 
-    menu = FindMenu("menu-editor-main-load-map");
-    menu->items[5].d.button.text = NULL;
+    EndMenu();
 }
 
 /**
@@ -5333,13 +5353,13 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 /**
 **	Editor load map menu
 */
-local void EditorLoadMap(void)
+local void EditorLoadMenu(void)
 {
     char *p;
     char *s;
 
     EditorCancelled=0;
-    ProcessMenu("menu-editor-load-map", 1);
+    ProcessMenu("menu-editor-load", 1);
     GetInfoFromSelectPath();
 
     if (EditorCancelled) {
@@ -5376,7 +5396,7 @@ local void EditorLoadOk(void)
     FileList *fl;
     int i;
 
-    menu = FindMenu("menu-editor-load-map");
+    menu = CurrentMenu;
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -5411,7 +5431,6 @@ local void EditorLoadOk(void)
 */
 local void EditorLoadCancel(void)
 {
-    Menu *menu;
     char *s;
 
     EditorCancelled=1;
@@ -5438,16 +5457,15 @@ local void EditorLoadCancel(void)
 
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
-    EditorEndMenu();
+    CurrentMenu->items[5].d.button.text = NULL;
 
-    menu = FindMenu("menu-editor-load-map");
-    menu->items[5].d.button.text = NULL;
+    EditorEndMenu();
 }
 
 /**
 **	Editor map properties menu
 */
-local void EditorMapProperties(void)
+local void EditorMapPropertiesMenu(void)
 {
     Menu *menu;
     char description[36];
@@ -5493,7 +5511,7 @@ local void EditorMapPropertiesOk(void)
     // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
     int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
-    menu = FindMenu("menu-editor-map-properties");
+    menu = CurrentMenu;
 
     description = menu->items[2].d.input.buffer;
     description[strlen(description)-3] = '\0';
@@ -5527,7 +5545,8 @@ local void EditorPlayerPropertiesEnterAction(Menuitem *mi,
     }
 }
 
-local int player_types_fc_to_menu[] = {
+    /// Player type conversion from internal fc to menu number
+local int PlayerTypesFcToMenu[] = {
     0,
     0,
     4,
@@ -5537,7 +5556,9 @@ local int player_types_fc_to_menu[] = {
     2,
     3,
 };
-local int player_types_menu_to_fc[] = {
+
+    /// Player type conversion from menu to internal fc number
+local int PlayerTypesMenuToFc[] = {
     PlayerPerson,
     PlayerComputer,
     PlayerRescuePassive,
@@ -5547,9 +5568,11 @@ local int player_types_menu_to_fc[] = {
 };
 
 /**
-**	FIXME: docu
+**	Convert player ai from internal fc number to menu number
+**
+**	@param num	Ai number
 */
-local int player_ai_fc_to_menu(int num)
+local int PlayerAiFcToMenu(int num)
 {
     if (num == PlayerAiLand) {
 	return 0;
@@ -5563,10 +5586,13 @@ local int player_ai_fc_to_menu(int num)
     DebugLevel0Fn("Invalid Ai number: %d\n" _C_ num);
     return -1;
 }
+
 /**
-**	FIXME: docu
+**	Convert player ai from menu number to internal fc number
+**
+**	@param num	Ai number
 */
-local int player_ai_menu_to_fc(int num)
+local int PlayerAiMenuToFc(int num)
 {
     if (num == 0) {
 	return PlayerAiLand;
@@ -5584,7 +5610,7 @@ local int player_ai_menu_to_fc(int num)
 /**
 **	Edit player properties menu
 */
-local void EditorPlayerProperties(void)
+local void EditorPlayerPropertiesMenu(void)
 {
     Menu *menu;
     char gold[16][15];
@@ -5603,8 +5629,8 @@ local void EditorPlayerProperties(void)
 
     for (i=0; i<16; ++i) {
 	menu->items[RACE_POSITION+i].d.pulldown.defopt = TheMap.Info->PlayerSide[i];
-	menu->items[TYPE_POSITION+i].d.pulldown.defopt = player_types_fc_to_menu[TheMap.Info->PlayerType[i]];
-	menu->items[AI_POSITION+i].d.pulldown.defopt = player_ai_fc_to_menu(TheMap.Info->PlayerAi[i]);
+	menu->items[TYPE_POSITION+i].d.pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info->PlayerType[i]];
+	menu->items[AI_POSITION+i].d.pulldown.defopt = PlayerAiFcToMenu(TheMap.Info->PlayerAi[i]);
 	sprintf(gold[i], "%d~!_", TheMap.Info->PlayerGold[i]);
 	sprintf(lumber[i], "%d~!_", TheMap.Info->PlayerWood[i]);
 	sprintf(oil[i], "%d~!_", TheMap.Info->PlayerOil[i]);
@@ -5623,14 +5649,12 @@ local void EditorPlayerProperties(void)
 
     for (i=0; i<16; ++i) {
 	TheMap.Info->PlayerSide[i] = menu->items[RACE_POSITION+i].d.pulldown.curopt;
-	TheMap.Info->PlayerType[i] = player_types_menu_to_fc[menu->items[TYPE_POSITION+i].d.pulldown.curopt];
-	TheMap.Info->PlayerAi[i] = player_ai_menu_to_fc(menu->items[AI_POSITION+i].d.pulldown.curopt);
+	TheMap.Info->PlayerType[i] = PlayerTypesMenuToFc[menu->items[TYPE_POSITION+i].d.pulldown.curopt];
+	TheMap.Info->PlayerAi[i] = PlayerAiMenuToFc(menu->items[AI_POSITION+i].d.pulldown.curopt);
 	TheMap.Info->PlayerGold[i] = atoi(gold[i]);
 	TheMap.Info->PlayerWood[i] = atoi(lumber[i]);
 	TheMap.Info->PlayerOil[i] = atoi(oil[i]);
     }
-
-    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 }
 
 /**
@@ -5676,7 +5700,7 @@ local void EditorEditResourceOk(void)
     Menu *menu;
     unsigned value;
 
-    menu = FindMenu("menu-editor-edit-resource");
+    menu = CurrentMenu;
     value = atoi(menu->items[1].d.input.buffer);
     if (value < 2500) {
 	strcpy(menu->items[1].d.text.text, "2500~!_");
@@ -5754,7 +5778,7 @@ local void EditorEditAiPropertiesOk(void)
 {
     Menu *menu;
 
-    menu = FindMenu("menu-editor-edit-ai-properties");
+    menu = CurrentMenu;
     if (menu->items[1].d.gem.state == MI_GSTATE_CHECKED) {
 	UnitUnderCursor->Active = 1;
     } else {
@@ -5776,7 +5800,7 @@ local void EditorEditAiPropertiesCancel(void)
 **
 **	@return		0 for success, -1 for error
 */
-global int EditorSave(void)
+global int EditorSaveMenu(void)
 {
     Menu *menu;
     char path[PATH_MAX];
@@ -5928,7 +5952,7 @@ local void EditorSaveFolder(void)
     Menuitem *mi;
     char *cp;
 
-    menu = FindMenu("menu-editor-save");
+    menu = CurrentMenu;
     mi = &menu->items[1];
 
     if (ScenSelectDisplayPath[0]) {
@@ -5962,9 +5986,8 @@ local void EditorSaveOk(void)
     Menuitem *mi;
     FileList *fl;
     int i;
-    char path[PATH_MAX];
 
-    menu = FindMenu("menu-editor-save");
+    menu = CurrentMenu;
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -5991,8 +6014,8 @@ local void EditorSaveOk(void)
 	    if (!strcasestr(ScenSelectFileName, ".pud\0")) {
 		strcat(ScenSelectFileName, ".pud");
 	    }
-	    sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
-	    if (!access(path, F_OK)) {
+	    sprintf(TempPathBuf, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
+	    if (!access(TempPathBuf, F_OK)) {
 		ProcessMenu("menu-editor-save-confirm", 1);
 		if (EditorCancelled) {
 		    EditorCancelled = 0;
@@ -6189,12 +6212,8 @@ local void EditorSaveConfirmInit(Menuitem *mi)
 */
 local void EditorSaveConfirmOk(void)
 {
-    Menu *menu;
-
+    CurrentMenu->items[2].d.text.text = NULL;
     EditorEndMenu();
-
-    menu = FindMenu("menu-save-confirm");
-    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -6202,13 +6221,9 @@ local void EditorSaveConfirmOk(void)
 */
 local void EditorSaveConfirmCancel(void)
 {
-    Menu *menu;
-
+    CurrentMenu->items[2].d.text.text = NULL;
     EditorCancelled = 1;
     EditorEndMenu();
-
-    menu = FindMenu("menu-save-confirm");
-    menu->items[2].d.text.text = NULL;
 }
 
 /**
@@ -6216,7 +6231,7 @@ local void EditorSaveConfirmCancel(void)
 **
 **	@todo Should check if modified file should be saved.
 */
-local void EditorQuitMenu(void)
+local void EditorQuitToMenu(void)
 {
     QuitToMenu = 1;
     EditorRunning = 0;
@@ -6243,18 +6258,16 @@ local void EditorEndMenu(void)
 */
 local void ReplayGameMenu(void)
 {
-    char buf[PATH_MAX];
-
 #ifdef USE_WIN32
-    strcpy(buf,"logs");
-    mkdir(buf);
+    strcpy(TempPathBuf,"logs");
+    mkdir(TempPathBuf);
 
     sprintf(ScenSelectPath, "logs");
 #else
-    sprintf(buf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
-    mkdir(buf,0777);
-    strcat(buf,"/logs");
-    mkdir(buf,0777);
+    sprintf(TempPathBuf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+    mkdir(TempPathBuf,0777);
+    strcat(TempPathBuf,"/logs");
+    mkdir(TempPathBuf,0777);
 
     sprintf(ScenSelectPath,"%s/%s/logs", getenv("HOME"), FREECRAFT_HOME_PATH);
 #endif
@@ -6534,7 +6547,7 @@ local void ReplayGameFolder(void)
     Menuitem *mi;
     char *cp;
 
-    menu = FindMenu("menu-replay-game");
+    menu = CurrentMenu;
     mi = &menu->items[1];
 
     if (ScenSelectDisplayPath[0]) {
@@ -6577,7 +6590,7 @@ local void ReplayGameOk(void)
     FileList *fl;
     int i;
 
-    menu = FindMenu("menu-replay-game");
+    menu = CurrentMenu;
     mi = &menu->items[1];
     i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
@@ -6638,7 +6651,6 @@ local void ReplayGameOk(void)
 */
 local void ReplayGameCancel(void)
 {
-    Menu *menu;
     char *s;
 
     //
@@ -6663,10 +6675,9 @@ local void ReplayGameCancel(void)
 
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 
-    EndMenu();
+    CurrentMenu->items[5].d.button.text = NULL;
 
-    menu = FindMenu("menu-replay-game");
-    menu->items[5].d.button.text = NULL;
+    EndMenu();
 }
 
 /**
