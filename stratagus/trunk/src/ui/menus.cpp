@@ -1488,6 +1488,7 @@ local void GameOptions(void)
 
 local void SetCdMode(Menuitem *mi)
 {
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
     if (!strcmp(":off", CDMode)) {
 //	CDMode = ":random";
 	PlayMusic(":random");
@@ -1504,6 +1505,7 @@ local void SetCdMode(Menuitem *mi)
 #endif
 	CDMode = ":off";
     }
+#endif
 }
 
 /**
