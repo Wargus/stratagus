@@ -1,6 +1,6 @@
+--blank-lines-before-block-comments
 --blank-lines-after-declarations
 --blank-lines-after-procedures
---no-blank-lines-after-block-comments
 --no-blank-lines-after-commas
 --braces-on-if-line
 --no-blank-before-sizeof
@@ -11,7 +11,7 @@
 --dont-format-comments
 --parameter-indentation4
 --indent-level4
---line-comments-indentation4
+--line-comments-indentation0
 --cuddle-else
 --brace-indent0
 //--start-left-side-of-comments
@@ -28,3 +28,5 @@
 --line-length79
 --comment-line-length79
 --dont-break-procedure-type
+--break-before-boolean-operator
+--ignore-newlines
