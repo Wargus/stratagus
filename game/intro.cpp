@@ -371,7 +371,7 @@ global void ShowIntro(const Intro *intro)
     int old_video_sync;
 
     UseContinueButton=1;
-    InitContinueButton(TheUI.Offset640X+455,TheUI.Offset480Y+440);
+    InitContinueButton(VideoWidth-185,VideoHeight-40);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
@@ -431,7 +431,7 @@ global void ShowIntro(const Intro *intro)
 	}
     }
 
-    x=TheUI.Offset640X;
+    x=TheUI.Offset640X*2;
     line=0;
     stage=1;
     IntroNoEvent=1;
@@ -455,17 +455,18 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw title
 	//
-	VideoDrawTextCentered(x+422,y+28,LargeFont,intro->Title);
+	VideoDrawTextCentered(VideoWidth-218,y+28,LargeFont,intro->Title);
 	//
 	//	Draw scrolling text
 	//
-	ScrollText(x+70,y+80,320,170,line,scrolling_text);
+	ScrollText(70,y+80,320,170,line,scrolling_text);
 
 	//
 	//	Draw objectives
 	//
-	VideoDrawText(x+372,y+306,LargeFont,"Objectives:");
-	y+=330;
+	y=VideoHeight-(TheUI.Offset480Y/2)-174;
+	VideoDrawText(x+372,y,LargeFont,"Objectives:");
+	y+=30;
 	for( i=0; i<MAX_OBJECTIVES && objectives_text[i]; ++i ) {
 	    TextLines* ptr;
 
