@@ -12,7 +12,7 @@
 
 #ifdef HIERARCHIC_PATHFINDER	// {
 
-Region *AllRegions = NULL;
+Region *AllRegions;
 
 local void RegionDestroyNeighborList (Region * );
 local void RegionRemoveFromNeighborLists (Region * );
