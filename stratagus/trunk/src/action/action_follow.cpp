@@ -127,20 +127,14 @@ global void HandleActionFollow(Unit* unit)
 			}
 			// FALL THROUGH
 		case PF_REACHED:
-			// FIXME: dark portal teleportation: Goal is used for target circle of power
-			// FIXME: teleporting of units should use dark portal's mana
+			// Handle Teleporter Units
+			// FIXME: BAD HACK
 			if ((goal = unit->Orders[0].Goal) &&
 					goal->Type->Teleporter && goal->Goal &&
-					MapDistanceBetweenUnits(unit, goal) < 4) {
-#if 0
-				Unit* table[UnitMax];
-#endif
+					MapDistanceBetweenUnits(unit, goal) <= 1) {
 				Unit* dest;
-#if 0
-				int n;
-				int i;
-#endif
 
+				// Teleport the unit
 				RemoveUnit(unit, NULL);
 				unit->X = goal->Goal->X;
 				unit->Y = goal->Goal->Y;
