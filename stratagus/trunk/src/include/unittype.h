@@ -685,6 +685,7 @@ struct _unit_type_ {
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
 	char *CanCastSpell;             /// Unit is able to use spells.
+	char *AutoCastActive;           /// Default value for autocast.
 	// FIXME: n0body: AutoBuildRate not implemented.
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.
