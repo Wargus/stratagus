@@ -570,19 +570,17 @@ global void VideoDrawOnlyFogAlpha(int x, int y)
     for (i = y; i < y + TileSizeY; ++i) {
 	for (j = x; j < x + TileSizeX; ++j) {
 	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
-	    if (*p) {
-		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
-		// Saturation + Brightness
-		max = (cdest.r + cdest.g + cdest.b) / 3;
-		v = cdest.r + bright;
-		cdest.r = (v > 255 ? 255 : v) + (max - cdest.r) * sat / 100;
-		v = cdest.g + bright;
-		cdest.g = (v > 255 ? 255 : v) + (max - cdest.g) * sat / 100;
-		v = cdest.b + bright;
-		cdest.b = (v > 255 ? 255 : v) + (max - cdest.b) * sat / 100;
+	    SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
+	    // Saturation + Brightness
+	    max = (cdest.r + cdest.g + cdest.b) / 3;
+	    v = cdest.r + bright;
+	    cdest.r = (v > 255 ? 255 : v) + (max - cdest.r) * sat / 100;
+	    v = cdest.g + bright;
+	    cdest.g = (v > 255 ? 255 : v) + (max - cdest.g) * sat / 100;
+	    v = cdest.b + bright;
+	    cdest.b = (v > 255 ? 255 : v) + (max - cdest.b) * sat / 100;
 
-		*p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
-	    }
+	    *p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
 	}
     }
     VideoUnlockScreen();
@@ -655,9 +653,9 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
 	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
 	    ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[srect.x + j - x 
 		+ srect.y + (i - y) * TheMap.TileGraphic->Surface->w];
-	    SDL_GetRGB(*ptile, TheMap.TileGraphic->Surface->format, 
-		&cdest.r, &cdest.g, &cdest.b);
-	    if (!(cdest.r | cdest.g | cdest.b) && *p) {
+	    SDL_GetRGBA(*ptile, TheMap.TileGraphic->Surface->format, 
+		&cdest.r, &cdest.g, &cdest.b, &alpha);
+	    if (!(cdest.r | cdest.g | cdest.b)) {
 		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
 		// Saturation + Brightness
 		max = (cdest.r + cdest.g + cdest.b) / 3;
@@ -2781,19 +2779,6 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	tile = 0;
     }
 
-    if (tile2) {
-#ifdef USE_SDL_SURFACE
-	VideoDrawUnexplored(tile2, dx, dy);
-#else
-	VideoDrawUnexplored(TheMap.Tiles[tile2], dx, dy);
-#endif
-	if (tile2 == tile) {		// no same fog over unexplored
-//	    if (tile != 0xf) {
-//		TheMap.Fields[sx].VisibleLastFrame |= MapFieldPartiallyVisible;
-//	    }
-	    tile = 0;
-	}
-    }
     if (IsMapFieldVisible(ThisPlayer, x, y) || ReplayRevealMap) {
 	if (tile) {
 #ifdef USE_SDL_SURFACE
@@ -2812,6 +2797,21 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
 #endif
     }   
+    if (tile2) {
+#ifdef USE_SDL_SURFACE
+	VideoDrawUnexplored(tile2, dx, dy);
+#else
+	VideoDrawUnexplored(TheMap.Tiles[tile2], dx, dy);
+#endif
+/*
+	if (tile2 == tile) {		// no same fog over unexplored
+//	    if (tile != 0xf) {
+//		TheMap.Fields[sx].VisibleLastFrame |= MapFieldPartiallyVisible;
+//	    }
+	    tile = 0;
+	}
+*/
+    }
 }
 
 #ifdef HIERARCHIC_PATHFINDER
