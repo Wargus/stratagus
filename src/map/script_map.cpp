@@ -517,7 +517,7 @@ local int CclAlphaFogOfWar(lua_State* l)
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    OriginalFogOfWar = 1;
+    OriginalFogOfWar = 0;
 
     if (!CclInConfigFile) {
 	InitMapFogOfWar();
