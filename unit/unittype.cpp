@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unittype.c	-	The unit types. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -225,7 +224,7 @@ local const char* UnitTypeNames[] = {
     "KurdanAndSky_ree",
     "Dentarg",
     "Khadgar",
-    "GnomHellscream",
+    "GromHellscream",
     "TankerHuman",
     "TankerOrc",
     "TransportHuman",
@@ -365,7 +364,7 @@ global void PrintUnitTypeTable(void)
 	printf("    ,%3d,%3d\t\t\t// graphic size\n"
 		,type->Width,type->Height);
 
-	printf("   ,_%sAnimations\t// animations\n",UnitTypeNames[i]);
+	printf("   ,%sAnimations\t// animations\n",UnitTypeNames[i]);
 	printf("   ,{ \"%s\" }\n",IdentOfIcon(type->Icon.Icon));
 
 	printf("   ,{ \"%s\" }\t\t// Missile\n",type->Missile.Name);
@@ -376,25 +375,30 @@ global void PrintUnitTypeTable(void)
 	} else {
 	    printf("   ,NULL, NULL, 0\n");
 	}
-	break;
 
-	printf("\t//Speed\tOvFrame\tSightR\tHitpnt\tMagic\tBTime\tGold\tWood\tOil\n");
-	printf("\t,%6d,%7d,%6d,%7d,%6d, {%5d,%6d,%7d,%6d }\n"
+	printf("\t//Speed\tOverlay\tSightR\tHitpnt\tMagic\n");
+	printf("\t,%6d,%7d,%6d,%7d,%6d\n"
 	    ,type->_Speed
 	    ,type->OverlapFrame
 	    ,type->_SightRange
 	    ,type->_HitPoints
-	    ,type->Magic
+	    ,type->Magic);
+	printf("\t// BTime  Gold  Wood   Oil   Ore Stone  Coal\n");
+	printf("\t,{%5d,%5d,%5d,%5d,%5d,%5d,%5d }\n"
 	    ,type->_Costs[TimeCost]
 	    ,type->_Costs[GoldCost]
 	    ,type->_Costs[WoodCost]
-	    ,type->_Costs[OilCost]);
-	printf("\t//TileW\tTileH\tBoxW\tBoxH\tAttack\tReactC\tReactH\n");
-	printf("\t,%6d,%5d,%6d,%7d,%9d,%7d,%7d\n"
+	    ,type->_Costs[OilCost]
+	    ,type->_Costs[OreCost]
+	    ,type->_Costs[StoneCost]
+	    ,type->_Costs[CoalCost]);
+	printf("\t//TileW\tTileH\tBoxW\tBoxH\t>Attack\t<Attack\tReactC\tReactHuman\n");
+	printf("\t,%6d,%5d,%6d,%7d,%9d,%7d,%6d,%7d\n"
 	    ,type->TileWidth
 	    ,type->TileHeight
 	    ,type->BoxWidth
 	    ,type->BoxHeight
+	    ,type->MinAttackRange
 	    ,type->_AttackRange
 	    ,type->ReactRangeComputer
 	    ,type->ReactRangeHuman);
@@ -537,7 +541,7 @@ global void ParsePudUDTA(const char* udta,int length)
     IfDebug(
 	if( length!=5694 && length!=5948 ) {
 	    DebugLevel0("\n"__FUNCTION__": ***\n"__FUNCTION__": %d\n",length);
-	    DebugLevel0(__FUNCTION__": ***\n\n");
+	    DebugLevel0Fn("***\n\n");
 	}
     )
     start=udta;
@@ -780,8 +784,8 @@ global void SaveUnitType(const UnitType* type,FILE* file)
     fprintf(file,"  \"animations-%s\"\t;; animations\n",type->Ident+5);
     fprintf(file,"  \"%s\"\n",IdentOfIcon(type->Icon.Icon));
 
-    fprintf(file,"  ;;Speed OvFrame SightR Hitpnt Magic  BTime\tGold\tWood\tOil\n");
-    fprintf(file,"  %6d %7d %6d %6d %6d #(%5d %6d %7d %6d )\n"
+    fprintf(file,"  ;;Speed Constr SightR Hitpnt Magic  BTime  Gold  Wood   Oil   Ore Stone  Coal\n");
+    fprintf(file,"  %6d %6d %6d %6d %5d #(%4d %5d %5d %5d %5d %5d %5d)\n"
 	,type->_Speed
 	,type->OverlapFrame
 	,type->_SightRange
@@ -790,13 +794,17 @@ global void SaveUnitType(const UnitType* type,FILE* file)
 	,type->_Costs[TimeCost]
 	,type->_Costs[GoldCost]
 	,type->_Costs[WoodCost]
-	,type->_Costs[OilCost]);
-    fprintf(file,"  ;;Tile    Box Size    Attack\tReactC\tReactH\n");
-    fprintf(file,"  '( %d %d ) '( %3d %3d ) %5d %7d %7d\n"
+	,type->_Costs[OilCost]
+	,type->_Costs[OreCost]
+	,type->_Costs[StoneCost]
+	,type->_Costs[CoalCost]);
+    fprintf(file,"  ;;Tile    Box Size    >Attack\t<Attack\tReactC\tReactH\n");
+    fprintf(file,"  '( %d %d ) '( %3d %3d ) %6d %7d %6d %7d\n"
 	,type->TileWidth
 	,type->TileHeight
 	,type->BoxWidth
 	,type->BoxHeight
+	,type->MinAttackRange
 	,type->_AttackRange
 	,type->ReactRangeComputer
 	,type->ReactRangeHuman);
@@ -1021,7 +1029,7 @@ global UnitType* UnitTypeByIdent(const char* ident)
 	return *type;
     }
 
-    DebugLevel0(__FUNCTION__": Name %s not found\n",ident);
+    DebugLevel0Fn("Name %s not found\n",ident);
 
     return NULL;
 }

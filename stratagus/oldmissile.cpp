@@ -598,8 +598,10 @@ global void FireMissile(Unit* unit)
 
     DebugLevel3Fn("\n");
 
+    //
+    //	None missile hits immediately!
+    //
     if( ((MissileType*)unit->Type->Missile.Missile)->Class==MissileClassNone ) {
-	// Hit immediately
 	if( !(goal=unit->Command.Data.Move.Goal) ) {
 	    dx=unit->Command.Data.Move.DX;
 	    dy=unit->Command.Data.Move.DY;
@@ -621,6 +623,7 @@ global void FireMissile(Unit* unit)
 	}
 
 	// FIXME: make sure thats the correct unit.
+
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
@@ -668,13 +671,23 @@ global void FireMissile(Unit* unit)
 	// Fire to nearest point of unit!
 	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
 	DebugLevel3Fn("Fire to unit at %d,%d\n",dx,dy);
-	dx=dx*TileSizeX+TileSizeX/2;
-	dy=dy*TileSizeY+TileSizeY/2;
     } else {
-	dx=unit->Command.Data.Move.DX*TileSizeX+TileSizeX/2;
-	dy=unit->Command.Data.Move.DY*TileSizeY+TileSizeY/2;
+	dx=unit->Command.Data.Move.DX;
+	dy=unit->Command.Data.Move.DY;
     }
 
+    //
+    //	Moved out of attack range?
+    //
+    if( MapDistance(unit->X,unit->Y,dx,dy)<=unit->Type->MinAttackRange ) {
+	DebugLevel0Fn("Missile target too near %d,%d\n"
+	    ,MapDistance(unit->X,unit->Y,dx,dy),unit->Type->MinAttackRange);
+	// FIXME: do something other?
+	return;
+    }
+
+    dx=dx*TileSizeX+TileSizeX/2;
+    dy=dy*TileSizeY+TileSizeY/2;
     missile=MakeMissile(unit->Type->Missile.Missile,x,y,dx,dy);
     //
     //	Damage of missile
@@ -950,7 +963,7 @@ global void MissileHit(const Missile* missile)
 	    }
 	    return;
 	}
-	DebugLevel0Fn("Oops nothing to hit (%d,%d)?\n",x,y);
+	DebugLevel3Fn("Oops nothing to hit (%d,%d)?\n",x,y);
 	return;
     }
 
