@@ -52,7 +52,6 @@
 
 #include "ccl.h"
 
-extern void PreMenuSetup(void);		/// FIXME: not here!
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
 // FIXME: export+import the structure correct

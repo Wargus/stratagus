@@ -352,6 +352,9 @@ extern void ErrorMenu(char *);
     /// Menu Loop
 extern void MenuLoop(char *filename, WorldMap *map);
 
+    /// Pre menu setup
+extern void PreMenuSetup(void);
+
 //@}
 
 #endif	// !__MENUS_H__
