@@ -574,28 +574,15 @@
     <LI>Removed old command code, only the new order code is now present.
     <LI>Fixed bug: Attacking walls broken with new orders.
     <LI>Fixed bug: Building buildings with 0 build time, dumps core. (/0)
+    <LI>Fixed bug: ShiftMessagesEvent overwrites memory. Found and fixed by
+	Jan Uerpmann.
+    <LI>Missile could now hits units always. Set range to zero.
+    <LI>Fixed bug: Repairing didn't work with network code.
+    <LI>Fixed bug: Worker repairing didn't turn to target.
+    <LI>Fixed bug: Unit does not return to starting point, if attacking.
+    <LI>Improved network code. More error checking.
     <LI>+++
-    <LI>TODO: Fixed bug: Unit does not return to starting point, if attacking.
     </UL>
-
-<!--
-Not done yet:
-patch submitted by me (Lokh):
-- added a SetCursor() function to the cursor API
-- added a couple of function to handle the palettes, and get rid of
-the 2 global variables GlobalPalette and PNGPalette. This isn't
-yet perfect, but at least it's better.
-- I changed all the Graphic (or derivated like Sprite...) functions
-so that they allocate _all_ the memory of their structure and not
-take an half allocated struct, and finish to allocate it. It's
-very important to make a something-else-than-X11 port.
-- A buch of bones (as it can't be called a skeleton) made of SDL
-functions calls. This part is totally unoptimized, work in progress
-and won't even compile!
-In fact the API changes showed earlier were made to make an SDL (or
-whetever video library you want to use) port easier.
-- Some other cosmetic changes I don't remeber of :).
--->
     </UL>
 </UL>
 
