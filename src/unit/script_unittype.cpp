@@ -10,7 +10,7 @@
 //
 /**@name ccl_unittype.c	-	The unit-type ccl functions. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1018,7 +1018,7 @@ global void UnitTypeCclRegister(void)
 
     gh_new_procedure1_0("unit-type",CclUnitType);
     gh_new_procedure0_0("unit-type-array",CclUnitTypeArray);
-    // unit structure access
+    // unit type structure access
     gh_new_procedure1_0("get-unit-type-ident",CclGetUnitTypeIdent);
     gh_new_procedure1_0("get-unit-type-name",CclGetUnitTypeName);
     gh_new_procedure2_0("set-unit-type-name!",CclSetUnitTypeName);
