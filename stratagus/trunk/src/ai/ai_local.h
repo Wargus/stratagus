@@ -45,7 +45,7 @@ enum _ai_script_command_ {
     AiCmdBuild,				/// build building
     AiCmdTrain,				/// train unit
     AiCmdResearch,			/// research upgrade
-    AiCmdForce,				/// Set force.
+    AiCmdForce,				/// Set force
 };
 
 /**
@@ -78,9 +78,9 @@ enum _ai_priority_ {
 */
 struct _ai_goal_ {
     AiGoal*	Next;			/// double linked list of all goals
-    AiGoal*	Down;			/// dependend goals.
+    AiGoal*	Down;			/// dependend goals
     AiGoal*	Prev;			/// double linked list of all goals
-    int		Priority;		/// Priority of this goal.
+    int		Priority;		/// Priority of this goal
 };
 
     // goals stuff
@@ -108,15 +108,15 @@ typedef struct _ai_type_ AiType;
 **	Ai Type structure.
 */
 struct _ai_type_ {
-    AiType*		Next;			/// Next ai type.
+    AiType*		Next;			/// Next ai type
 
-    char*		Name;			/// Name of this ai.
-    char*		Race;			/// for this race.
-    char*		Class;			/// class of this ai.
+    char*		Name;			/// Name of this ai
+    char*		Race;			/// for this race
+    char*		Class;			/// class of this ai
 
     // nice flags
-    //unsigned char	AllExplored : 1;	/// Ai sees unexplored area.
-    //unsigned char	AllVisibile : 1;	/// Ai sees invisibile area.
+    //unsigned char	AllExplored : 1;	/// Ai sees unexplored area
+    //unsigned char	AllVisibile : 1;	/// Ai sees invisibile area
 
     SCM			Script;			/// Main script
 };
@@ -156,6 +156,11 @@ typedef struct _player_ai_ {
     int		ScriptDebug;		/// Flag script debuging on/off
 
     // resource manager
+
+    int		Reserve[MaxCosts];	/// Resources to keep in reserve
+    int		Used[MaxCosts];		/// Used resources
+    int		Needed[MaxCosts];	/// Needed resources
+    int		NeededMask;		/// Mask for needed resources
 
 	/// number of elements in UnitTypeRequests
     int			RequestsCount;
@@ -204,6 +209,12 @@ typedef struct _ai_helper_ {
     */
     int			ResearchCount;
     AiUnitTypeTable**	Research;
+    /**
+    **	The index is the costs that should be collected, giving a table of all
+    **	untis/buildings which could collect this resource.
+    */
+    int			CollectCount;
+    AiUnitTypeTable**	Collect;
 } AiHelper;
 
 /*----------------------------------------------------------------------------

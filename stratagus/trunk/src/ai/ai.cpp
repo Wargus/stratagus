@@ -89,8 +89,8 @@ local void AiCheckUnits(void)
     for( i=0; i<n; ++i ) {
 	counter[AiPlayer->UnitTypeBuilded[i].Type->Type]
 		+=AiPlayer->UnitTypeBuilded[i].Want;
-	DebugLevel0Fn("Already in build queue: %s %d\n",
-		AiPlayer->UnitTypeBuilded[i].Type->Ident,
+	DebugLevel0Fn("Already in build queue: %s %d\n" _C_
+		AiPlayer->UnitTypeBuilded[i].Type->Ident _C_
 		AiPlayer->UnitTypeBuilded[i].Want);
     }
 
@@ -102,7 +102,8 @@ local void AiCheckUnits(void)
 	t=AiPlayer->UnitTypeRequests[i].Table[0]->Type;
 	x=AiPlayer->UnitTypeRequests[i].Count;
 	if( x>AiPlayer->Player->UnitTypesCount[t]+counter[t] ) {
-	    DebugLevel0Fn("Need %s\n",AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
+	    DebugLevel0Fn("Need %s\n" _C_
+		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
 	    // Request it.
 	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
 		    x-AiPlayer->Player->UnitTypesCount[t]-counter[t]);
@@ -123,6 +124,7 @@ local void AiCheckUnits(void)
 global void AiInit(Player* player)
 {
     PlayerAi* pai;
+    AiType* ait;
 
     DebugLevel0Fn("%d - %s\n" _C_ player->Player _C_ player->Name);
 
@@ -132,8 +134,16 @@ global void AiInit(Player* player)
 	exit(0);
     }
     pai->Player=player;
-    pai->AiType=AiTypes;
-    pai->Script=AiTypes->Script;
+    ait=AiTypes;
+    //
+    //	Search correct AI type.
+    //
+    while( ait->Race && strcmp(ait->Race,player->RaceName) ) {
+	ait=ait->Next;
+	DebugCheck( !ait );
+    }
+    pai->AiType=ait;
+    pai->Script=ait->Script;
 
     player->Ai=pai;
 }

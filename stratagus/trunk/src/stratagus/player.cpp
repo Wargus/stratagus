@@ -159,6 +159,7 @@ global void CreatePlayer(char* name,int type)
     player->Name=name;
     player->Type=type;
     player->Race=PlayerRaceHuman;
+    player->RaceName="human";
     player->Team=team;
     player->Enemy=0;
     player->Allied=0;
@@ -262,6 +263,18 @@ global void CreatePlayer(char* name,int type)
 global void PlayerSetSide(Player* player,int side)
 {
     player->Race=side;
+    switch( side ) {
+	case PlayerRaceHuman:
+	    player->RaceName="human";
+	    break;
+	case PlayerRaceOrc:
+	    player->RaceName="orc";
+	    break;
+	default:
+	    DebugLevel0Fn("Unsupported side %d\n",side);
+	    player->RaceName="oops";
+	    break;
+    }
 }
 
 /**
