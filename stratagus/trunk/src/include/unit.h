@@ -135,9 +135,9 @@ struct _command_ {
 	} Build;			/// build:
 	struct {
 	    int		Sum;		/// HP for building
-	    int		Add;
-	    int		Val;		/// Counter
-	    int		Sub;
+	    int		Add;		/// added to sum
+	    int		Val;		/// counter
+	    int		Sub;		/// subtracted from counter
 	    int		Cancel;		/// Cancel construction
 	    Unit*	Worker;		/// Worker building the unit
 	} Builded;			// builded:
@@ -162,14 +162,6 @@ struct _command_ {
 	struct {
 	    unsigned	Active;		/// how much units are in the resource
 	} Resource;			/// generic resource
-	struct {
-	    int		Sum;		/// HP for building
-	    int		Add;		/// added to sum
-	    int		Val;		/// counter
-	    int		Sub;		/// subtracted from counter
-	    int		Cancel;		/// Cancel construction
-	    Unit*	Worker;		/// Worker building the unit
-	} Builded;			// builded:
     } Data;				/// data for action
 };
 #endif
