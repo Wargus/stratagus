@@ -298,7 +298,7 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
 	//
 	if (unit->Player->Player == PlayerNumNeutral) {
-		if (!UnitVisible(ThisPlayer, unit)) {
+		if (!UnitVisible(unit, ThisPlayer)) {
 			color = VideoMapRGB(TheScreen->format,
 				unit->Seen.Type->NeutralMinimapColorRGB.r,
 				unit->Seen.Type->NeutralMinimapColorRGB.g,
