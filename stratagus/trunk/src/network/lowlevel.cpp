@@ -58,20 +58,20 @@
 //  Variables
 //----------------------------------------------------------------------------
 
-int NetLastSocket;				/// Last socket
-unsigned long NetLastHost;		/// Last host number (net format)
-int NetLastPort;						/// Last port number (net format)
+int NetLastSocket;         ///< Last socket
+unsigned long NetLastHost; ///< Last host number (net format)
+int NetLastPort;           ///< Last port number (net format)
 
-unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net format)
+unsigned long NetLocalAddrs[MAX_LOC_IP]; ///< Local IP-Addrs of this host (net format)
 
 //----------------------------------------------------------------------------
 //  Low level functions
 //----------------------------------------------------------------------------
 
-#ifdef USE_WINSOCK		// {
+#ifdef USE_WINSOCK // {
 
 /**
-**		Hardware dependend network init.
+** Hardware dependend network init.
 */
 int NetInit(void)
 {
@@ -86,7 +86,7 @@ int NetInit(void)
 		fprintf(stderr, "Couldn't initialize Winsock 2\n");
 		return -1;
 	}
-#if 0		// sorry, Winsock 1 not sufficient yet //
+#if 0 // sorry, Winsock 1 not sufficient yet //
 	if (WSAStartup(MAKEWORD(1, 1), &wsaData)) {
 		fprintf(stderr, "Couldn't initialize Winsock 1.1\n");
 		return -1;
@@ -96,7 +96,7 @@ int NetInit(void)
 }
 
 /**
-**		Hardware dependend network exit.
+** Hardware dependend network exit.
 */
 void NetExit(void)
 {
@@ -110,9 +110,9 @@ void NetExit(void)
 }
 
 /**
-**		Close an UDP socket port.
+** Close an UDP socket port.
 **
-**		@param sockfd		Socket fildes
+** @param sockfd Socket fildes
 */
 void NetCloseUDP(Socket sockfd)
 {
@@ -120,21 +120,21 @@ void NetCloseUDP(Socket sockfd)
 }
 
 /**
-**		Close a TCP socket port.
+** Close a TCP socket port.
 **
-**		@param sockfd		Socket fildes
+** @param sockfd Socket fildes
 */
 void NetCloseTCP(Socket sockfd)
 {
 	closesocket(sockfd);
 }
 
-#endif		// } !USE_WINSOCK
+#endif // } !USE_WINSOCK
 
-#if !defined(USE_WINSOCK)		// {
+#if !defined(USE_WINSOCK) // {
 
 /**
-**		Hardware dependend network init.
+** Hardware dependend network init.
 */
 int NetInit(void)
 {
@@ -142,16 +142,16 @@ int NetInit(void)
 }
 
 /**
-**		Hardware dependend network exit.
+** Hardware dependend network exit.
 */
 void NetExit(void)
 {
 }
 
 /**
-**		Close an UDP socket port.
+** Close an UDP socket port.
 **
-**		@param sockfd		Socket fildes
+** @param sockfd Socket fildes
 */
 void NetCloseUDP(Socket sockfd)
 {
@@ -159,23 +159,23 @@ void NetCloseUDP(Socket sockfd)
 }
 
 /**
-**		Close a TCP socket port.
+** Close a TCP socket port.
 **
-**		@param sockfd		Socket fildes
+** @param sockfd Socket fildes
 */
 void NetCloseTCP(Socket sockfd)
 {
 	close(sockfd);
 }
 
-#endif		// } !USE_WINSOCK
+#endif // } !USE_WINSOCK
 
 /**
-**		Set socket to non-blocking.
+** Set socket to non-blocking.
 **
-**		@param sockfd		Socket
+** @param sockfd Socket
 **
-**		@return				0 for success, -1 for error
+** @return 0 for success, -1 for error
 */
 #ifdef USE_WINSOCK
 int NetSetNonBlocking(Socket sockfd)
@@ -196,16 +196,16 @@ int NetSetNonBlocking(Socket sockfd)
 #endif
 
 /**
-**		Resolve host in name or dotted quad notation.
+** Resolve host in name or dotted quad notation.
 **
-**		@param host		Host name (f.e. 192.168.0.0 or stratagus.net)
+** @param host Host name (f.e. 192.168.0.0 or stratagus.net)
 */
 unsigned long NetResolveHost(const char* host)
 {
 	unsigned long addr;
 
 	if (host) {
-		addr = inet_addr(host);				// try dot notation
+		addr = inet_addr(host); // try dot notation
 		if (addr == INADDR_NONE) {
 			struct hostent *he;
 
@@ -223,18 +223,18 @@ unsigned long NetResolveHost(const char* host)
 }
 
 /**
-**		Get IP-addrs of local interfaces from Network file descriptor
-**		and store them in the NetLocalAddrs array.
+** Get IP-addrs of local interfaces from Network file descriptor
+** and store them in the NetLocalAddrs array.
 **
-**		@param sock		local socket.
+** @param sock local socket.
 **
-**		@return				number of IP-addrs found.
+** @return number of IP-addrs found.
 */
-#ifdef USE_WINSOCK		// {
+#ifdef USE_WINSOCK // {
 // ARI: MS documented this for winsock2, so I finally found it..
-//		I also found a way for winsock1.1 (= win95), but
-//		that one was too complex to start with.. -> trouble
-//		Lookout for INTRFC.EXE on the MS web site...
+// I also found a way for winsock1.1 (= win95), but
+// that one was too complex to start with.. -> trouble
+// Lookout for INTRFC.EXE on the MS web site...
 int NetSocketAddr(const Socket sock)
 {
 	INTERFACE_INFO localAddr[MAX_LOC_IP];  // Assume there will be no more than MAX_LOC_IP interfaces
@@ -275,11 +275,11 @@ int NetSocketAddr(const Socket sock)
 	}
 	return nif;
 }
-#else		// } { !USE_WINSOCK
+#else // } { !USE_WINSOCK
 #ifdef unix // {
 // ARI: I knew how to write this for a unix environment,
-//		but am quite certain that porting this can cause you
-//		trouble..
+// but am quite certain that porting this can cause you
+// trouble..
 int NetSocketAddr(const Socket sock)
 {
 	char buf[4096];
@@ -303,7 +303,7 @@ int NetSocketAddr(const Socket sock)
 		}
 		// with some inspiration from routed..
 		ifr = ifc.ifc_req;
-		cplim = buf + ifc.ifc_len;		// skip over if's with big ifr_addr's
+		cplim = buf + ifc.ifc_len; // skip over if's with big ifr_addr's
 		for (cp = buf; cp < cplim;
 				cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
 			ifr = (struct ifreq*)cp;
@@ -366,14 +366,14 @@ int NetSocketAddr(const Socket sock)
 	return 1;
 }
 #endif
-#endif		// } !USE_WINSOCK
+#endif // } !USE_WINSOCK
 
 /**
-**		Open an UDP Socket port.
+** Open an UDP Socket port.
 **
-**		@param port		!=0 Port to bind in host notation.
+** @param port !=0 Port to bind in host notation.
 **
-**		@return				If success the socket fildes, -1 otherwise.
+** @return If success the socket fildes, -1 otherwise.
 */
 Socket NetOpenUDP(int port)
 {
@@ -405,11 +405,11 @@ Socket NetOpenUDP(int port)
 }
 
 /**
-**		Open a TCP socket
+** Open a TCP socket
 **
-**		@param port		Bind socket to a specific port number
+** @param port Bind socket to a specific port number
 **
-**		@return				If success the socket fildes, -1 otherwise
+** @return If success the socket fildes, -1 otherwise
 */
 Socket NetOpenTCP(int port)
 {
@@ -445,13 +445,13 @@ Socket NetOpenTCP(int port)
 }
 
 /**
-**		Open a TCP connection
+** Open a TCP connection
 **
-**		@param sockfd		An open socket to use
-**		@param addr		Address returned from NetResolveHost
-**		@param port		Port on remote host to connect to
+** @param sockfd  An open socket to use
+** @param addr    Address returned from NetResolveHost
+** @param port    Port on remote host to connect to
 **
-**		@return				0 if success, -1 if failure
+** @return 0 if success, -1 if failure
 */
 int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 {
@@ -484,12 +484,12 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 }
 
 /**
-**		Wait for socket ready.
+** Wait for socket ready.
 **
-**		@param sockfd		Socket fildes to probe.
-**		@param timeout		Timeout in 1/1000 seconds.
+** @param sockfd   Socket fildes to probe.
+** @param timeout  Timeout in 1/1000 seconds.
 **
-**		@return				1 if data is available, 0 if not, -1 if failure.
+** @return 1 if data is available, 0 if not, -1 if failure.
 */
 int NetSocketReady(Socket sockfd, int timeout)
 {
@@ -497,7 +497,7 @@ int NetSocketReady(Socket sockfd, int timeout)
 	struct timeval tv;
 	fd_set mask;
 
-	//		Check the file descriptors for available data
+	// Check the file descriptors for available data
 	do {
 		// Set up the mask of file descriptors
 		FD_ZERO(&mask);
@@ -519,13 +519,13 @@ int NetSocketReady(Socket sockfd, int timeout)
 }
 
 /**
-**		Receive from a UDP socket.
+** Receive from a UDP socket.
 **
-**		@param sockfd		Socket
-**		@param buf		Receive message buffer.
-**		@param len		Receive message buffer length.
+** @param sockfd   Socket
+** @param buf      Receive message buffer.
+** @param len      Receive message buffer length.
 **
-**		@return				Number of bytes placed in buffer, or -1 if failure.
+** @return Number of bytes placed in buffer, or -1 if failure.
 */
 int NetRecvUDP(Socket sockfd, void* buf, int len)
 {
@@ -550,13 +550,13 @@ int NetRecvUDP(Socket sockfd, void* buf, int len)
 }
 
 /**
-**		Receive from a TCP socket.
+** Receive from a TCP socket.
 **
-**		@param sockfd		Socket
-**		@param buf		Receive message buffer.
-**		@param len		Receive message buffer length.
+** @param sockfd   Socket
+** @param buf      Receive message buffer.
+** @param len      Receive message buffer length.
 **
-**		@return				Number of bytes placed in buffer or -1 if failure.
+** @return Number of bytes placed in buffer or -1 if failure.
 */
 int NetRecvTCP(Socket sockfd, void* buf, int len)
 {
@@ -565,15 +565,15 @@ int NetRecvTCP(Socket sockfd, void* buf, int len)
 }
 
 /**
-**		Send through a UPD socket to a host:port.
+** Send through a UPD socket to a host:port.
 **
-**		@param sockfd		Socket
-**		@param host		Host to send to (network byte order).
-**		@param port		Port of host to send to (network byte order).
-**		@param buf		Send message buffer.
-**		@param len		Send message buffer length.
+** @param sockfd    Socket
+** @param host      Host to send to (network byte order).
+** @param port      Port of host to send to (network byte order).
+** @param buf       Send message buffer.
+** @param len       Send message buffer length.
 **
-**		@return				Number of bytes sent.
+** @return Number of bytes sent.
 */
 int NetSendUDP(Socket sockfd,unsigned long host, int port,
 	const void* buf, int len)
@@ -592,13 +592,13 @@ int NetSendUDP(Socket sockfd,unsigned long host, int port,
 }
 
 /**
-**		Send through a TCP socket.
+** Send through a TCP socket.
 **
-**		@param sockfd		Socket
-**		@param buf		Send message buffer.
-**		@param len		Send message buffer length.
+** @param sockfd    Socket
+** @param buf       Send message buffer.
+** @param len       Send message buffer length.
 **
-**		@return				Number of bytes sent.
+** @return Number of bytes sent.
 */
 int NetSendTCP(Socket sockfd, const void* buf, int len)
 {
@@ -606,11 +606,11 @@ int NetSendTCP(Socket sockfd, const void* buf, int len)
 }
 
 /**
-**		Listen for connections on a TCP socket.
+** Listen for connections on a TCP socket.
 **
-**		@param sockfd		Socket
+** @param sockfd    Socket
 **
-**		@return				0 for success, -1 for error
+** @return 0 for success, -1 for error
 */
 int NetListenTCP(Socket sockfd)
 {
@@ -618,11 +618,11 @@ int NetListenTCP(Socket sockfd)
 }
 
 /**
-**		Accept a connection on a TCP socket.
+** Accept a connection on a TCP socket.
 **
-**		@param sockfd		Socket
+** @param sockfd Socket
 **
-**		@return				If success the new socket fildes, -1 otherwise.
+** @return If success the new socket fildes, -1 otherwise.
 */
 Socket NetAcceptTCP(Socket sockfd)
 {
