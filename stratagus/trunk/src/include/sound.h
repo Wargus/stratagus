@@ -71,6 +71,8 @@ typedef enum _play_section_type_ {
     PlaySectionGame,			/// Game
     PlaySectionBriefing,		/// Briefing
     PlaySectionStats,			/// Stats
+    PlaySectionStatsVictory,		/// Stats Victory
+    PlaySectionStatsDefeat,		/// Stats Defeat
     PlaySectionMainMenu,		/// Main menu
 } PlaySectionType;
 

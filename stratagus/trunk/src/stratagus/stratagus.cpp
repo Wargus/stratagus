@@ -1074,7 +1074,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    // Start new music for menus?
 	    // FIXME: If second loop?
 
-	    if( !PlayingMusic && strcmp(TitleMusic,MenuMusic) ) {
+	    if( !PlayingMusic ) {
 		if (CDMode == CDModeOff) {
 		    PlayMusic(MenuMusic);
 		} else if (CDMode == CDModeDefined) {
@@ -1122,7 +1122,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	CleanModules();
 	CleanFonts();
 
-	CurrentPlaySection = PlaySectionMainMenu;
+	PlaySectionMusic(PlaySectionMainMenu);
 
 	LoadCcl();			// Reload the main config file
 
