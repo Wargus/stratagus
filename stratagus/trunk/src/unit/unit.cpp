@@ -1069,8 +1069,6 @@ global int UnitKnownOnMap(const Unit* unit)
     return 0;
 }
 
-#ifdef SPLIT_SCREEN_SUPPORT
-
 /**
 **	Returns true, if unit is visible in viewport.
 **
@@ -1152,77 +1150,6 @@ global int UnitVisibleOnScreen(const Unit* unit)
     }
     return 0;
 }
-
-#else /* SPLIT_SCREEN_SUPPORT */
-
-/**
-**	Returns true, if unit is visible on current map view.
-**
-**	@param unit	Unit to be checked.
-**	@return		True if visible, false otherwise.
-*/
-global int UnitVisibleOnScreen(const Unit* unit)
-{
-    unsigned x;
-    unsigned y;
-    int w;
-    int w0;
-    int h;
-
-    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
-
-    if (!ThisPlayer) {
-	//FIXME: ARI: Added here for early game setup state by
-	//	MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
-	//	so don't show anything until first real map-draw.
-	return 0;
-    }
-
-    if( unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
-	// Invisible by spell
-	if ( unit->Invisible ) {
-	    return 0;
-	}
-	// Visible submarine
-	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
-	    return 0;
-	}
-    }
-
-    //
-    //	Check if visible on screen.
-    //		FIXME: This could be better checked, tells to much!
-    //		FIXME: This is needed to show moving units.
-    //		FIXME: flyers disappears to fast.
-    //
-    x = unit->X;
-    y = unit->Y;
-    w = w0 = unit->Type->TileWidth;
-    h = unit->Type->TileHeight;
-    if( (x+w) < MapX || x > (MapX+MapWidth)
-	    || (y+h) < MapY || y > (MapY+MapHeight) ) {
-	return 0;
-    }
-
-    //
-    //	Check explored or if visible (building) under fog of war.
-    //		FIXME: need only check the boundary, not the complete rectangle.
-    //
-    for( ; h-->0; ) {
-	for( w=w0; w-->0; ) {
-	    if( IsMapFieldVisible(x+w,y+h)
-		    || (unit->Type->Building && unit->SeenFrame!=UnitNotSeen
-			&& IsMapFieldExplored(x+w,y+h)) ) {
-		return 1;
-	    }
-	}
-    }
-
-    return 0;
-}
-
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 /**
 **      StephanR: Get area of tiles covered by unit, including its displacement
