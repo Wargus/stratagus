@@ -748,6 +748,7 @@ global void CclInit(void)
     init_subr_1("speed-research",CclSpeedResearch);
     init_subr_1("speeds",CclSpeeds);
 
+    IconCclRegister();
     MissileCclRegister();
     TilesetCclRegister();
     MapCclRegister();

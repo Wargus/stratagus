@@ -26,10 +26,11 @@
 
 #include "freecraft.h"
 #include "tileset.h"
-#include "video.h"
 #include "map.h"
+#include "video.h"
 #include "icons.h"
 #include "player.h"
+#include "ccl.h"
 
 #include "etlib/hash.h"
 
@@ -37,43 +38,36 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifndef laterUSE_CCL
+#ifndef USE_CCL
 
 /**
 **	Unit icons
 */
-local struct _icons_ {
+local struct _icons_files_ {
     char*	File[TilesetMax];	/// file name
     unsigned	Width;			/// icon width
     unsigned	Height;			/// icon height
-
-// --- FILLED UP ---
-    Graphic*	IconGraphic;		/// graphic data loaded
-} Icons[] = {
+} IconsFiles[] = {
 #ifdef NEW_NAMES
     { {  "tilesets/summer/icons.png"
 	,"tilesets/winter/icons.png"
 	,"tilesets/wasteland/icons.png"
 	,"tilesets/swamp/icons.png" }
+		, ICON_WIDTH, ICON_HEIGHT },
 #else
     { {  "icons (summer).png"
 	,"icons (winter).png"
 	,"icons (wasteland).png"
 	,"icons (swamp).png" }
-#endif
 		, ICON_WIDTH, ICON_HEIGHT },
+#endif
 };
 
-#endif
-
-local hashtable(int,61) IconHash;	/// lookup table for icon names
-
-#ifndef laterUSE_CCL
-
 /**
-**	Table icon id -> string.
+**	Default without CCL support.
+**	Table mapping the original icon numbers in puds to our internal string.
 */
-local const char* IconNames[] = {
+local char* DefaultIconWcNames[] = {
     "icon-peasant",
     "icon-peon",
     "icon-footman",
@@ -269,20 +263,47 @@ local const char* IconNames[] = {
     "icon-deathwing",
     "icon-khadgar",
     "icon-dentarg",
-    "icon-turalyon"
+    "icon-turalyon",
+
+    NULL
 };
-
-#endif
-
-#ifndef laterUSE_CCL
 
 /**
 **	Table aliases for icons.
 */
-local const char* IconAliases[][2] = {
+local const char* DefaultIconAliases[][2] = {
     { "icon-raise-dead",	"icon-skeleton" },
     { "icon-polymorph",		"icon-critter" },
 };
+
+#endif
+
+/**
+**	Maps the original icon numbers in puds to our internal strings.
+*/
+global char** IconWcNames
+#ifndef USE_CCL
+    = DefaultIconWcNames
+#endif
+    ;
+
+local Icon** Icons;			/// Table of all icons.
+local int IconsCount;			/// Number of icons in Icons.
+
+local char** IconAliases;		/// Table of all aliases for icons.
+local int IconAliasesCount;		/// Number of icons aliases in Aliases.
+
+#ifdef DOXYGEN
+
+local IconFile* IconFileHash[31];	/// lookup table for icon file names
+
+local Icon* IconHash[61];		/// lookup table for icon names
+
+#else
+
+local hashtable(IconFile*,31) IconFileHash;/// lookup table for icon file names
+
+local hashtable(Icon*,61) IconHash;	/// lookup table for icon names
 
 #endif
 
@@ -291,90 +312,177 @@ local const char* IconAliases[][2] = {
 ----------------------------------------------------------------------------*/
 
 /**
+**	@brief Add an icon definition.
+**
+**	@bug Redefining an icon isn't supported.
+**
+**	@param ident	Icon identifier.
+**	@param tileset	Tileset identifier.
+**	@param index	Index into file.
+**	@param file	Graphic file containing the icons.
+*/
+local void AddIcon(char* ident,char* tileset,int index,char* file)
+{
+    void** ptr;
+    char* str;
+    IconFile* iconfile;
+    Icon* icon;
+
+    ptr=hash_find(IconFileHash,file);
+    if( ptr ) {
+	iconfile=*ptr;
+    } else {				// new file
+	iconfile=malloc(sizeof(IconFile));
+	iconfile->FileName=strdup(file);
+	iconfile->Width=ICON_WIDTH;
+	iconfile->Height=ICON_HEIGHT;
+
+	iconfile->Icons=0;
+
+	iconfile->Graphic=NULL;
+	*(IconFile**)hash_add(IconFileHash,iconfile->FileName)=iconfile;
+    }
+    str=strdcat(ident,tileset);
+    ptr=hash_find(IconHash,str);
+    if( ptr ) {
+	DebugLevel0Fn("FIXME: Icon already defined `%s'\n",str);
+	free(str);
+	return;
+    } else {
+	icon=malloc(sizeof(Icon));
+	icon->Ident=strdup(ident);
+	icon->Tileset=strdup(tileset);
+	icon->File=iconfile;
+	icon->Index=index;
+	icon->X=(index%5)*iconfile->Width;
+	icon->Y=(index/5)*iconfile->Height;
+	icon->Width=iconfile->Width;
+	icon->Height=iconfile->Height;
+
+	icon->Graphic=NULL;
+	*(Icon**)hash_add(IconHash,str)=icon;
+    }
+    Icons=realloc(Icons,sizeof(Icon*)*(IconsCount+1));
+    Icons[IconsCount++]=icon;
+}
+
+/**
 **	Init the icons.
+**
+**	Add the short name and icon aliases to hash table.
 */
 global void InitIcons(void)
 {
     unsigned i;
     static int done;
 
-    if( done ) {
-	return;
-    }
+    DebugCheck( done );
     done=1;
 
-    DebugLevel0Fn("Must use CCL only\n");
+    DebugLevel0Fn("Init icons %s\n",TheMap.Tileset->Ident);
 
+#ifndef USE_CCL
     //
     //	Add icons name to hash table
     //
-    for( i=0; i<sizeof(IconNames)/sizeof(*IconNames); ++i ) {
-	*(IconId*)hash_add(IconHash,(char*)IconNames[i])=i;
+    for( i=0; IconWcNames[i]; ++i ) {
+	unsigned j;
+
+	for( j=0; j<4; ++j ) {
+	    AddIcon(IconWcNames[i],Tilesets[j].Ident,i,IconsFiles[0].File[j]);
+	}
+    }
+#endif
+
+    //
+    //	Add icons of the current tileset, with shortcut to hash.
+    //
+    for( i=0; i<IconsCount; ++i ) {
+	if( !strcmp(Icons[i]->Tileset,TheMap.Tileset->Ident) ) {
+	    *(Icon**)hash_add(IconHash,Icons[i]->Ident)=Icons[i];
+	}
     }
 
+
+#ifndef USE_CCL
     //
     //	Different names for the same thing
     //
-    for( i=0; i<sizeof(IconAliases)/sizeof(*IconAliases); ++i ) {
+    for( i=0; i<sizeof(DefaultIconAliases)/sizeof(*DefaultIconAliases); ++i ) {
 	IconId id;
 
-	id=IconByIdent(IconAliases[i][1]);
-	if( id==NoIcon ) {
-	    abort();
-	}
+	id=IconByIdent(DefaultIconAliases[i][1]);
+	DebugCheck( id==NoIcon );
 
-	*(IconId*)hash_add(IconHash,(char*)IconAliases[i][0])=id;
+	*(Icon**)hash_add(IconHash,(char*)DefaultIconAliases[i][0])=id;
     }
+#else
+    //
+    //	Different names for the same thing
+    //
+    for( i=0; i<IconAliasesCount; ++i ) {
+	IconId id;
+
+	id=IconByIdent(IconAliases[i*2+1]);
+	DebugCheck( id==NoIcon );
+
+	*(Icon**)hash_add(IconHash,IconAliases[i*2+0])=id;
+    }
+#endif
 }
 
 /**
-**	Load the graphics for the icons.
+**	Load the graphics for the icons. Graphic data is only loaded once
+**	and than shared.
 */
 global void LoadIcons(void)
 {
     unsigned i;
-    const char* file;
 
     InitIcons();
 
     //
     //	Load all icon files.
     //
-    for( i=0; i<sizeof(Icons)/sizeof(*Icons); ++i ) {
-	file=Icons[i].File[TheMap.Terrain];
-	if( !file ) {			// default one
-	    file=Icons[i].File[0];
-	}
-	if( *file ) {
-	    char* buf;
+    for( i=0; i<IconsCount; ++i ) {
+	if( !strcmp(Icons[i]->Tileset,TheMap.Tileset->Ident) ) {
+	    if( !Icons[i]->File->Graphic ) {
+		char* buf;
+		char* file;
 
-	    buf=alloca(strlen(file)+9+1);
-	    file=strcat(strcpy(buf,"graphic/"),file);
-	    ShowLoadProgress("\tIcons %s\n",file);
-	    Icons[i].IconGraphic=LoadGraphic(file);
+		file=Icons[i]->File->FileName;
+		buf=alloca(strlen(file)+9+1);
+#ifdef NEW_NAMES
+		file=strcat(strcpy(buf,"graphics/"),file);
+#else
+		file=strcat(strcpy(buf,"graphic/"),file);
+#endif
+		ShowLoadProgress("\tIcons %s\n",file);
+		Icons[i]->File->Graphic=LoadGraphic(file);
+	    }
+	    Icons[i]->Graphic=Icons[i]->File->Graphic;
 	}
     }
 }
 
 /**
 **	Cleanup memory used by the icons.
+**
+**	@todo
+**		Write this cleanup function. Needed if we want to play more
+**		than one level without new start of the program.
 */
 global void CleanIcons(void)
 {
-    int i;
-
-    // FIXME: only the graphics or also the complete hash?
-    for( i=0; i<sizeof(Icons)/sizeof(*Icons); ++i ) {
-	VideoSaveFree(Icons[i].IconGraphic);
-	Icons[i].IconGraphic=NULL;
-    }
+    DebugLevel0Fn("FIXME: cleanup not supported\n");
 }
 
 /**
-**	Find icon by identifier.
+**	Find the icon by identifier.
 **
 **	@param ident	The icon identifier.
-**	@return		Icon id or -1 if not found.
+**
+**	@return		Icon pointer or NoIcon == NULL if not found.
 */
 global IconId IconByIdent(const char* ident)
 {
@@ -391,21 +499,21 @@ global IconId IconByIdent(const char* ident)
 }
 
 /**
-**	Get identifier of icon.
+**	Get the identifier of an icon.
 **
-**	@param icon	Icon identifier
+**	@param icon	Icon pointer
+**
 **	@return		The identifier for the icon
-**
 */
 global const char* IdentOfIcon(IconId icon)
 {
-    DebugCheck( icon<0 || icon>sizeof(IconNames)/sizeof(*IconNames) );
+    DebugCheck( !icon );
 
-    return IconNames[icon];
+    return icon->Ident;
 }
 
 /**
-**	Draw icon 'icon' with border on x,y
+**	Draw unit icon 'icon' with border on x,y
 **
 **	@param icon	Icon identifier
 **	@param flags	State of icon (clicked, mouse over...)
@@ -417,7 +525,7 @@ global void DrawUnitIcon(const void* player,IconId icon,unsigned flags
 {
     int color;
 
-    DebugCheck( icon<0 || icon>sizeof(IconNames)/sizeof(*IconNames) );
+    DebugCheck( !icon );
 
     color= (flags&IconActive) ? ColorGray : ColorBlack;
 
@@ -439,27 +547,170 @@ global void DrawUnitIcon(const void* player,IconId icon,unsigned flags
 	++x; ++y;
     }
 
-    GraphicPlayerPixels(player,Icons[0].IconGraphic);
-    VideoDrawSub(Icons[0].IconGraphic
-	    ,(icon%5)*Icons[0].Width,(icon/5)*Icons[0].Height
-	    ,Icons[0].Width,Icons[0].Height,x+4,y+4);
+    x+=4;
+    y+=4;
+    GraphicPlayerPixels(player,icon->Graphic);
+    VideoDrawSub(icon->Graphic,icon->X,icon->Y,icon->Width,icon->Height,x,y);
 
     if( flags&IconSelected ) {
-	VideoDrawRectangleClip(ColorGreen,x+4,y+4,ICON_WIDTH-1,ICON_HEIGHT-1);
+	VideoDrawRectangleClip(ColorGreen,x,y,ICON_WIDTH-1,ICON_HEIGHT-1);
     }
 }
 
-// FIXME:	The icon files must be configurable by ccl
-// FIXME:	The icon names must be configurable by ccl
-// FIXME:	The icon alias must be configurable by ccl
-
-/*
-**	FIXME:
-**		I want to support more icon files, this should make it
-**		possible that the user can use the original icons and
-**		his own icons for his extensions.
+/**
+**	Save state of the icons to file.
 **
-**		Even loading and adding single icons I want to support.
+**	@param file	Output file.
 */
+global void SaveIcons(FILE* file)
+{
+    char** cp;
+    int i;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: icons $Id$\n\n");
+
+    if( (cp=IconWcNames) ) {
+	fprintf(file,"(define-icon-wc-names");
+
+	i=90;
+	while( *cp ) {
+	    if( i+strlen(*cp)>79 ) {
+		i=fprintf(file,"\n ");
+	    }
+	    i+=fprintf(file," '%s",*cp++);
+	}
+	fprintf(file,")\n\n");
+    }
+
+    for( i=0; i<IconsCount; ++i ) {
+	fprintf(file,"(define-icon '%s '%s\n",
+		Icons[i]->Ident,Icons[i]->Tileset);
+	fprintf(file,"  'normal %d \"%s\")\n",
+		Icons[i]->Index,Icons[i]->File->FileName);
+    }
+}
+
+#ifdef USE_CCL
+
+/**
+**	@brief Parse icon definition.
+**
+**	@param list	Icon definition list.
+*/
+local SCM CclDefineIcon(SCM list)
+{
+    SCM value;
+    char* ident;
+    char* tileset;
+    char* str;
+    int n;
+
+    IfDebug( n=0; );
+
+    //	Identifier
+
+    ident=gh_scm2newstr(gh_car(list),NULL);
+    list=gh_cdr(list);
+
+    //	Tileset
+
+    tileset=gh_scm2newstr(gh_car(list),NULL);
+    list=gh_cdr(list);
+
+    //	Type
+
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("normal")) ) {
+	//	Normal icon - index, file
+	n=gh_scm2int(gh_car(list));
+	list=gh_cdr(list);
+	str=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+
+    } else {
+	str=gh_scm2newstr(value,NULL);
+	fprintf(stderr,"%s: Wrong tag `%s'\n",ident,str);
+    }
+
+    if( !gh_null_p(list) ) {
+	fprintf(stderr,"too much arguments\n");
+    }
+
+    DebugLevel3Fn("icon %s/%s %d of %s\n",ident,tileset,n,str);
+    AddIcon(ident,tileset,n,str);
+    free(ident);
+    free(tileset);
+    free(str);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	@brief Parse icon alias definition.
+**
+**	@todo
+**		Should check if alias is free and icon already defined.
+**
+**	@param alias	Icon alias name.
+**	@param icon	Original icon.
+*/
+local SCM CclDefineIconAlias(SCM alias,SCM icon)
+{
+    IconAliases=realloc(IconAliases,sizeof(char*)*2*(IconAliasesCount+1));
+    IconAliases[IconAliasesCount*2+0]=gh_scm2newstr(alias,NULL);
+    IconAliases[IconAliasesCount*2+1]=gh_scm2newstr(icon,NULL);
+    IconAliasesCount++;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	@brief Define icon mapping from original number to internal symbol
+**
+**	@param list	List of all names.
+*/
+local SCM CclDefineIconWcNames(SCM list)
+{
+    int i;
+    char** cp;
+
+    if( (cp=IconWcNames) ) {		// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(IconWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i=gh_length(list);
+    IconWcNames=cp=malloc((i+1)*sizeof(char*));
+    while( i-- ) {
+	*cp++=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+    }
+    *cp=NULL;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Register CCL features for icons.
+**
+**	@todo
+**		Add more functions for CCL. (draw-icon)
+*/
+global void IconCclRegister(void)
+{
+    gh_new_procedureN("define-icon",CclDefineIcon);
+    gh_new_procedure2_0("define-icon-alias",CclDefineIconAlias);
+
+    gh_new_procedureN("define-icon-wc-names",CclDefineIconWcNames);
+}
+
+#endif
 
 //@}

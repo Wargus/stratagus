@@ -273,7 +273,7 @@ global void DrawUnitInfo(const Unit* unit)
 	if( unit->Orders[0].Action==UnitActionResearch ) {
 	    DrawText(16,y+8+78,GameFont,"Researching:");
 	    DrawUnitIcon(unit->Player
-		    ,unit->Data.Research.Upgrade->Icon
+		    ,unit->Data.Research.Upgrade->Icon.Icon
 		    ,0,x+107,y+8+70);
 
 	    DrawCompleted(
