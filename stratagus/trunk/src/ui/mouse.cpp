@@ -428,7 +428,7 @@ local void HandleMouseOn(int x, int y)
 		}
 	}
 	if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->BoardCount &&
-		!BigMapMode) {
+			!BigMapMode) {
 		for (i = Selected[0]->BoardCount - 1; i >= 0; --i) {
 			if (x >= TheUI.TransportingButtons[i].X &&
 					x < TheUI.TransportingButtons[i].X + TheUI.TransportingButtons[i].Width + 7 &&
@@ -662,23 +662,6 @@ global void UIHandleMouseMove(int x, int y)
 		return;
 	}
 
-	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
-		// in the map area
-		// make the piemenu "follow" the mouse
-		if (CursorX - CursorStartX > TheUI.PieX[2]) {
-			CursorStartX = CursorX - TheUI.PieX[2];
-		}
-		if (CursorStartX - CursorX > TheUI.PieX[2]) {
-			CursorStartX = CursorX + TheUI.PieX[2];
-		}
-		if (CursorStartY - CursorY > TheUI.PieY[4]) {
-			CursorStartY = CursorY + TheUI.PieY[4];
-		}
-		if (CursorY - CursorStartY > TheUI.PieY[4]) {
-			CursorStartY = CursorY - TheUI.PieY[4];
-		}
-	}
-
 	//
 	//  Move map.
 	//
@@ -713,6 +696,25 @@ global void UIHandleMouseMove(int x, int y)
 	UnitUnderCursor = NULL;
 	GameCursor = TheUI.Point.Cursor;  // Reset
 	HandleMouseOn(x, y);
+
+	//
+	//  Make the piemenu "follow" the mouse
+	//
+	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
+		if (CursorX - CursorStartX > TheUI.PieX[2]) {
+			CursorStartX = CursorX - TheUI.PieX[2];
+		}
+		if (CursorStartX - CursorX > TheUI.PieX[2]) {
+			CursorStartX = CursorX + TheUI.PieX[2];
+		}
+		if (CursorStartY - CursorY > TheUI.PieY[4]) {
+			CursorStartY = CursorY + TheUI.PieY[4];
+		}
+		if (CursorY - CursorStartY > TheUI.PieY[4]) {
+			CursorStartY = CursorY - TheUI.PieY[4];
+		}
+		return;
+	}
 
 	// Restrict mouse to minimap when dragging
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap &&
@@ -1400,11 +1402,12 @@ global void UIHandleButtonDown(unsigned button)
 	if (CursorState == CursorStatePieMenu) {
 		if (CursorOn == CursorOnMap) {
 			HandlePieMenuMouseSelection();
+			return;
 		} else {
 			// Pie Menu canceled
 			CursorState = CursorStatePoint;
+			// Don't return, we might be over another button
 		}
-		return;
 	}
 
 	//
@@ -1465,6 +1468,8 @@ global void UIHandleButtonDown(unsigned button)
 		}
 
 		if (MouseButtons & TheUI.PieMouseButton) { // enter pie menu
+			UnitUnderCursor = NULL;
+			GameCursor = TheUI.Point.Cursor;  // Reset
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 			if (NumSelected && Selected[0]->Player == ThisPlayer &&
@@ -1673,9 +1678,9 @@ global void UIHandleButtonUp(unsigned button)
 	//  Pie Menu
 	//
 	if (CursorState == CursorStatePieMenu) {
-		if (CursorStartX == CursorX && CursorStartY == CursorY) {
-			// no move; wait for a click to select the pie
-		} else {
+		// Little threshold
+		if (CursorStartX < CursorX - 1 || CursorStartX > CursorX + 1 ||
+				CursorStartY < CursorY - 1 || CursorStartY > CursorY + 1) {
 			// there was a move, handle the selected button/pie
 			HandlePieMenuMouseSelection();
 		}
@@ -1901,7 +1906,7 @@ global void DrawPieMenu(void)
 	Player* player;
 	char buf[2] = "?";
 
-	if(CursorState != CursorStatePieMenu)
+	if (CursorState != CursorStatePieMenu)
 		return;
 
 	if (!(buttons = CurrentButtons)) {		// no buttons
@@ -1941,7 +1946,7 @@ global void DrawPieMenu(void)
 					buf[0] = toupper(CurrentButtons[i].Key);
 					text = buf;
 				}
-				VideoDrawText(x + 4, y + 4, GameFont, text);
+				VideoDrawTextClip(x + 4, y + 4, GameFont, text);
 			}
 		}
 	}
@@ -1949,7 +1954,7 @@ global void DrawPieMenu(void)
 	PopClipping();
 
 	i = GetPieUnderCursor();
-	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos!=-1) {
+	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
 		UpdateStatusLineForButton(&buttons[i]);
 	}
 }
@@ -1967,21 +1972,25 @@ local void HandlePieMenuMouseSelection(void)
 
 	pie = GetPieUnderCursor();
 	if (pie != -1) {
+		DoButtonButtonClicked(pie);
 		if (CurrentButtons[pie].Action == ButtonButton) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 		} else {
-			CursorState = CursorStatePoint;
+			if (CursorState == CursorStatePieMenu) {
+				CursorState = CursorStatePoint;
+			}
+			CursorOn = CursorOnUnknown;
+			UIHandleMouseMove(CursorX, CursorY); // recompute CursorOn and company
 		}
-		DoButtonButtonClicked(pie);
 	} else {
 		CursorState = CursorStatePoint;
+		CursorOn = CursorOnUnknown;
+		UIHandleMouseMove(CursorX, CursorY); // recompute CursorOn and company
 	}
 
 	return;
 }
-
-
 //@}
