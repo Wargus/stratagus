@@ -53,6 +53,7 @@
 #include "ai.h"
 #include "campaign.h"
 #include "trigger.h"
+#include "settings.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
