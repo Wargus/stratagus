@@ -395,7 +395,7 @@ global void InitIcons(void)
 {
     unsigned i;
 
-    DebugLevel0Fn("Init icons %s\n",TheMap.Tileset->Ident);
+    DebugLevel0Fn("Init icons %s\n",TheMap.TerrainName);
 
 #ifndef USE_CCL
     //
@@ -414,7 +414,7 @@ global void InitIcons(void)
     //	Add icons of the current tileset, with shortcut to hash.
     //
     for( i=0; i<IconsCount; ++i ) {
-	if( !strcmp(Icons[i]->Tileset,TheMap.Tileset->Ident) ) {
+	if( !strcmp(Icons[i]->Tileset,TheMap.TerrainName) ) {
 	    *(Icon**)hash_add(IconHash,Icons[i]->Ident)=Icons[i];
 	}
     }
@@ -458,7 +458,7 @@ global void LoadIcons(void)
     //	Load all icon files.
     //
     for( i=0; i<IconsCount; ++i ) {
-	if( !strcmp(Icons[i]->Tileset,TheMap.Tileset->Ident) ) {
+	if( !strcmp(Icons[i]->Tileset,TheMap.TerrainName) ) {
 	    if( !Icons[i]->File->Graphic ) {
 		char* buf;
 		char* file;
