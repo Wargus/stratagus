@@ -923,7 +923,6 @@ extern void DrawShadow(const Unit* unit, const UnitType* type, int frame,
     int x, int y);
     /// Draw A single Unit
 extern void DrawUnit(const Unit* unit);
-extern void DrawBuilding(const Unit* unit);
     /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const Viewport* vp, Unit** table);
     /// Show an unit's orders.

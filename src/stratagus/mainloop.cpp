@@ -423,11 +423,7 @@ local void DrawMapViewport(Viewport* vp)
 	while (i < nunits && j < nmissiles) {
 	    if (table[i]->Type->DrawLevel <= missiletable[j]->Type->DrawLevel) {
 		if (UnitVisibleInViewport(vp, table[i])) {
-		    if (table[i]->Type->Building) {
-			DrawBuilding(table[i]);
-		    } else {
-			DrawUnit(table[i]);
-		    }
+		    DrawUnit(table[i]);
 		}
 		++i;
 	    } else {
@@ -452,11 +448,7 @@ local void DrawMapViewport(Viewport* vp)
 	}
 	for (; i < nunits; ++i) {
 	    if (UnitVisibleInViewport(vp, table[i])) {
-		if (table[i]->Type->Building) {
-		    DrawBuilding(table[i]);
-		} else {
-		    DrawUnit(table[i]);
-		}
+		DrawUnit(table[i]);
 	    }
 	}
 	for (; j < nmissiles; ++j) {

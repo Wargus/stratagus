@@ -727,7 +727,7 @@ local void DrawBuildingCursor(void)
     SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
     DrawShadow(NULL, CursorBuilding, frame, x, y);
     GraphicPlayerPixels(ThisPlayer, CursorBuilding->Sprite);
-    DrawUnitType(CursorBuilding, frame, x, y);
+    DrawUnitType(CursorBuilding, CursorBuilding->Sprite, frame, x, y);
     PopClipping();
 
     //

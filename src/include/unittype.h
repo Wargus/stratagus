@@ -306,6 +306,10 @@
 **
 **		Unit is a Building
 **
+**	UnitType::VisibileUnderFog
+**
+**		Unit is visible under fog of war.
+**
 **	UnitType::PermanentCloak
 **
 **		Unit is permanently cloaked.
@@ -725,6 +729,7 @@ struct _unit_type_ {
     unsigned SeaUnit : 1;		/// Sea animated
     unsigned ExplodeWhenKilled : 1;	/// Death explosion animated
     unsigned Building : 1;		/// Building
+    unsigned VisibleUnderFog : 1;	/// Unit is visible under fog of war.
     unsigned PermanentCloak : 1;	/// Is only visible by CloakDetectors.
     unsigned DetectCloak : 1;		/// Can see Cloaked units.
     unsigned Coward : 1;		/// Unit will only attack if instructed.
@@ -820,7 +825,7 @@ extern void SaveUnitTypeDefs(CLFile* file);		/// Declare the unit-type table fir
 extern void SaveUnitTypes(CLFile* file);		/// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);		/// Allocate an empty unit-type slot
     /// Draw the sprite frame of unit-type
-extern void DrawUnitType(const UnitType* type,int frame,int x,int y);
+extern void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);	/// Init unit-type table
 extern void LoadUnitTypes(void);			/// Load the unit-type data
