@@ -10,7 +10,7 @@
 //
 /**@name construct.h	-	The constructions headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -119,8 +119,6 @@ typedef struct _construction_ {
     char*	Ident;			/// construction identifier
     char*	File[TilesetMax];	/// sprite file
     char*	ShadowFile;		/// shadow sprite file
-
-    int		Nr;			/// FIXME: remove Number for save
 
     int		Width;			/// sprite width
     int		Height;			/// sprite height
