@@ -781,6 +781,7 @@ Use it at your own risk.\n\n");
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
 	SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
+	VideoClearScreen();
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
 			if (TitleScreens[i]->Music) {
