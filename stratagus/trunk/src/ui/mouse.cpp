@@ -617,7 +617,7 @@ global void HandleMouseExit(void)
 /**
 **	Restrict mouse cursor to minimap
 */
-local void RestrictCursorToMinimap(void)
+global void RestrictCursorToMinimap(void)
 {
     if( CursorX<TheUI.MinimapX+24 ) {
 	CursorStartX=TheUI.MinimapX+24;
