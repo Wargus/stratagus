@@ -1206,8 +1206,12 @@ local Menuitem KeystrokeHelpMenuItems[] = {
     { MI_TYPE_TEXT, 16, 40+20*12, 0, GameFont, NULL, NULL,
 	{ text:{ "Alt-I  - find idle peon", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*13, 0, GameFont, NULL, NULL,
-	{ text:{ "F10    - game menu", MI_TFLAGS_LALIGN} } },
+	{ text:{ "Alt-V  - next view port", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*14, 0, GameFont, NULL, NULL,
+	{ text:{ "Ctrl-V - previous view port", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*15, 0, GameFont, NULL, NULL,
+	{ text:{ "F10    - game menu", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*16, 0, GameFont, NULL, NULL,
 	{ text:{ "F5     - game options", MI_TFLAGS_LALIGN} } },
 
 
@@ -1491,7 +1495,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-352)/2,
 	352, 352,
 	ImagePanel5,
-	17, 17,
+	19, 19,
 	KeystrokeHelpMenuItems,
 	NULL,
     },
