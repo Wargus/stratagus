@@ -1892,18 +1892,28 @@ global void DrawUnit(const Unit* unit)
 local int DrawLevelCompare(const void *v1, const void *v2) {
 
     const Unit *c1 = *(Unit**)v1, *c2 = *(Unit**)v2;
-
-    return c1->Type->DrawLevel <= c2->Type->DrawLevel ? -1 : 1;
+    int DrawLevelA;
+    int DrawLevelB;
+    if ( c1->Orders[0].Action == UnitActionDie && c1->Type->CorpseType) {
+	DrawLevelA = c1->Type->CorpseType->DrawLevel;
+    } else {
+	DrawLevelA = c1->Type->DrawLevel;
+    }
+    if ( c2->Orders[0].Action == UnitActionDie && c2->Type->CorpseType) {
+	DrawLevelB = c2->Type->CorpseType->DrawLevel;
+    } else {
+	DrawLevelB = c2->Type->DrawLevel;
+    }
+    return DrawLevelA <= DrawLevelB ? -1 : 1;
 }
 /**
-**	Draw all units on visible map.
+**	Find all units to draw in viewport.
 **
 **	@param v	Viewport to be drawn.
 **
 **	@todo FIXME: Must use the redraw tile flags in this function
-**		FIXME: Use const Viewport*
 */
-global int DrawUnits(const Viewport* vp, Unit** table)
+global int FindAndSortUnits(const Viewport* vp, Unit** table)
 {
     Unit** corpses;
     int n;

@@ -517,7 +517,7 @@ extern int CheckMissileToBeDrawn(const Missile* missile);
 
     /// Draw all missiles
 extern void DrawMissile(const MissileType* mtype,int frame,int x,int y);
-extern int DrawMissiles(const Viewport* vp, Missile** table);
+extern int FindAndSortMissiles(const Viewport* vp, Missile** table);
 
     /// handle all missiles
 extern void MissileActions(void);
