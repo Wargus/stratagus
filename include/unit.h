@@ -855,6 +855,8 @@ extern void DrawSelectionRectangleWithTrans(const Unit* unit
 extern void DrawSelectionCorners(const Unit* unit,const UnitType* type
 	,int x,int y);
 
+    /// Register CCL decorations features
+extern void DecorationCclRegister(void);
     /// Load the decorations (health,mana) of units
 extern void LoadDecorations(void);
     /// Save the decorations (health,mana) of units

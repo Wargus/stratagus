@@ -190,7 +190,7 @@ global void LoadGame(char* filename)
 */
 global void LoadAll(void)
 {
-#if 0
+#if 1
     SaveGame("save_file_of_freecraft0.ccl");
     LoadGame("save_file_of_freecraft0.ccl");
     SaveGame("save_file_of_freecraft1.ccl");
