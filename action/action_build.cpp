@@ -256,7 +256,7 @@ global void HandleActionBuild(Unit* unit)
     unit->Y=y;
     unit->Orders[0].Action=UnitActionStill;
     unit->SubAction=0;
-    UnitMarkSeen(unit);
+    UnitMarkSeen(build);
 }
 
 /**
