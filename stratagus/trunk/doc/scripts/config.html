@@ -20,7 +20,7 @@
     <title>Stratagus Configuration Language Description: Config</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
     <meta name="Author" content="johns98@gmx.net">
-    <meta name="Keyword" content="ccl,config">
+    <meta name="Keyword" content="scripts,config">
     <meta name="Description" content="">
 </head>
 <body>
@@ -42,84 +42,77 @@
 <a href="../stratagus.html">Stratagus</a> 
 <a href="../readme.html">Readme</a> 
 <a href="../faq.html">FAQ</a> 
-<a href="ccl.html">CCL</a> 
+<a href="ccl.html">Script</a> 
 <a href="ai.html">PREV</a> 
 <a href="game.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#a-star">a-star</a>
-<a href="#alpha-fog-of-war">alpha-fog-of-war</a>
-<a href="#decoration-on-top">decoration-on-top</a>
-<a href="#health-sprite">health-sprite</a>
-<a href="#mana-sprite">mana-sprite</a>
-<a href="#original-fog-of-war">original-fog-of-war</a>
-<a href="#reveal-map">reveal-map</a>
-<a href="#right-button-attacks">right-button-attacks</a>
-<a href="#right-button-moves">right-button-moves</a>
-<a href="#set-all-players-building-limit!">set-all-players-building-limit!</a>
-<a href="#set-all-players-unit-limit!">set-all-players-unit-limit!</a>
-<a href="#set-all-players-total-unit-limit!">set-all-players-total-unit-limit!</a>
-<a href="#set-brightness!">set-brightness!</a>
-<a href="#set-building-capture!">set-building-capture!</a>
-<a href="#set-click-missile!">set-click-missile!</a>
-<a href="#set-color-cycle-all!">set-color-cycle-all!</a>
-<a href="#set-contrast!">set-contrast!</a>
-<a href="#set-damage-missile!">set-damage-missile!</a>
-<a href="#set-double-click-delay!">set-double-click-delay!</a>
-<a href="#set-editor-select-icon!">set-editor-select-icon!</a>
-<a href="#set-editor-units-icon!">set-editor-units-icon!</a>
-<a href="#set-fancy-buildings!">set-fancy-buildings!</a>
-<a href="#set-fog-of-war!">set-fog-of-war!</a>
-<a href="#set-fog-of-war-brightness!">set-fog-of-war-brightness!</a>
-<a href="#set-fog-of-war-contrast!">set-fog-of-war-contrast!</a>
-<a href="#set-fog-of-war-saturation!">set-fog-of-war-saturation!</a>
-<a href="#set-forest-regeneration!">set-forest-regeneration!</a>
-<a href="#set-grab-mouse!">set-grab-mouse!</a>
-<a href="#set-hold-click-delay!">set-hold-click-delay!</a>
-<a href="#set-key-scroll!">set-key-scroll!</a>
-<a href="#set-key-scroll-speed!">set-key-scroll-speed!</a>
-<a href="#set-leave-stops!">set-leave-stops!</a>
-<a href="#set-max-selectable!">set-max-selectable!</a>
-<a href="#set-menu-background!">set-menu-background!</a>
-<a href="#set-menu-background-with-title!">set-menu-background-with-title!</a>
-<a href="#set-minimap-terrain!">set-minimap-terrain!</a>
-<a href="#set-mouse-scroll!">set-mouse-scroll!</a>
-<a href="#set-mouse-scroll-speed!">set-mouse-scroll-speed!</a>
-<a href="#set-original-resources!">set-original-resources!</a>
-<a href="#set-reveal-attacker!">set-reveal-attacker!</a>
-<a href="#set-reverse-map-move!">set-reverse-map-move!</a>
-<a href="#set-saturation!">set-saturation!</a>
-<a href="#set-selection-style!">set-selection-style!</a>
-<a href="#set-show-attack-range!">set-show-attack-range!</a>
-<a href="#set-show-command-key!">set-show-command-key!</a>
-<a href="#set-show-orders!">set-show-orders!</a>
-<a href="#set-show-reaction-range!">set-show-reaction-range!</a>
-<a href="#set-show-sight-range!">set-show-sight-range!</a>
-<a href="#set-show-tips!">set-show-tips!</a>
-<a href="#set-speed-build!">set-speed-build!</a>
-<a href="#set-speed-research!">set-speed-research!</a>
-<a href="#set-speed-resources-harvest!">set-speed-resources-harvest!</a>
-<a href="#set-speed-resources-return!">set-speed-resources-return!</a>
-<a href="#set-speed-train!">set-speed-train!</a>
-<a href="#set-speed-upgrade!">set-speed-upgrade!</a>
-<a href="#set-speeds!">set-speeds!</a>
-<a href="#set-title-screens!">set-title-screens!</a>
-<a href="#set-training-queue!">set-training-queue!</a>
-<a href="#set-xp-damage!">set-xp-damage!</a>
-<a href="#shadow-sprite">shadow-sprite</a>
-<a href="#show-energy-selected-only">show-energy-selected-only</a>
-<a href="#show-full">show-full</a>
-<a href="#show-health-bar">show-health-bar</a>
-<a href="#show-health-dot">show-health-dot</a>
-<a href="#show-health-horizontal">show-health-horizontal</a>
-<a href="#show-health-vertical">show-health-vertical</a>
-<a href="#show-mana-bar">show-mana-bar</a>
-<a href="#show-mana-dot">show-mana-dot</a>
-<a href="#show-mana-horizontal">show-mana-horizontal</a>
-<a href="#show-mana-vertical">show-mana-vertical</a>
-<a href="#show-no-full">show-no-full</a>
-<a href="#spell-sprite">spell-sprite</a>
-<a href="#set-group-keys">set-group-keys</a>
+<a href="#a-star">AStar()</a>
+<a href="#alpha-fog-of-war">AlphaFogOfWar()</a>
+<a href="#decoration-on-top">DecorationOnTop()</a>
+<a href="#health-sprite">HealthSprite()</a>
+<a href="#mana-sprite">ManaSprite()</a>
+<a href="#original-fog-of-war">OriginalFogOfWar()</a>
+<a href="#reveal-map">RevealMap()</a>
+<a href="#right-button-attacks">RightButtonAttacks()</a>
+<a href="#right-button-moves">RightButtonMoves()</a>
+<a href="#set-all-players-building-limit!">SetAllPlayersBuildingLimit()</a>
+<a href="#set-all-players-unit-limit!">SetAllPlayersUnitLimit()</a>
+<a href="#set-all-players-total-unit-limit!">SetAllPlayersTotalUnitLimit()</a>
+<a href="#set-building-capture!">SetBuildingCapture()</a>
+<a href="#set-click-missile!">SetClickMissile()</a>
+<a href="#set-color-cycle-all!">SetColorCycleAll()</a>
+<a href="#set-damage-missile!">SetDamageMissile()</a>
+<a href="#set-double-click-delay!">SetDoubleClickDelay()</a>
+<a href="#set-editor-select-icon!">SetEditorSelectIcon()</a>
+<a href="#set-editor-units-icon!">SetEditorUnitsIcon()</a>
+<a href="#set-fancy-buildings!">SetFancyBuildings()</a>
+<a href="#set-fog-of-war!">SetFogOfWar()</a>
+<a href="#set-fog-of-war-opacity">SetFogOfWarOpacity()</a>
+<a href="#set-forest-regeneration!">SetForestRegeneration()</a>
+<a href="#set-grab-mouse!">SetGrabMouse()</a>
+<a href="#set-hold-click-delay!">SetHoldClickDelay()</a>
+<a href="#set-key-scroll!">SetKeyScroll()</a>
+<a href="#set-key-scroll-speed!">SetKeyScrollSpeed()</a>
+<a href="#set-leave-stops!">SetLeaveStops()</a>
+<a href="#set-max-selectable!">SetMaxSelectable()</a>
+<a href="#set-menu-background!">SetMenuBackground()</a>
+<a href="#set-minimap-terrain!">SetMinimapTerrain()</a>
+<a href="#set-mouse-scroll!">SetMouseScroll()</a>
+<a href="#set-mouse-scroll-speed!">SetMouseScrollSpeed()</a>
+<a href="#set-reveal-attacker!">SetRevealAttacker()</a>
+<a href="#set-selection-style!">SetSelectionStyle()</a>
+<a href="#set-show-attack-range!">SetShowAttackRange()</a>
+<a href="#set-show-command-key!">SetShowCommandKey()</a>
+<a href="#set-show-orders!">SetShowOrders()</a>
+<a href="#set-show-reaction-range!">SetShowReactionRange()</a>
+<a href="#set-show-sight-range!">SetShowSightRange()</a>
+<a href="#set-show-tips!">SetShowTips()</a>
+<a href="#set-speed-build!">SetSpeedBuild()</a>
+<a href="#set-speed-research!">SetSpeedResearch()</a>
+<a href="#set-speed-resources-harvest!">SetSpeedResourcesHarvest()</a>
+<a href="#set-speed-resources-return!">SetSpeedResourcesReturn()</a>
+<a href="#set-speed-train!">SetSpeedTrain()</a>
+<a href="#set-speed-upgrade!">SetSpeedUpgrade()</a>
+<a href="#set-speeds!">SetSpeeds()</a>
+<a href="#set-title-screens!">SetTitleScreens()</a>
+<a href="#set-training-queue!">SetTrainingQueue()</a>
+<a href="#set-xp-damage!">SetXpDamage()</a>
+<a href="#set-use-hp-for-xp">SetUseHPForXp()</a>
+<a href="#shadow-sprite">ShadowSprite()</a>
+<a href="#show-energy-selected-only">ShowEnergySelectedOnly()</a>
+<a href="#show-full">ShowFull()</a>
+<a href="#show-health-bar">ShowHealthBar()</a>
+<a href="#show-health-dot">ShowHealthDot()</a>
+<a href="#show-health-horizontal">ShowHealthHorizontal()</a>
+<a href="#show-health-vertical">ShowHealthVertical()</a>
+<a href="#show-mana-bar">ShowManaBar()</a>
+<a href="#show-mana-dot">ShowManaDot()</a>
+<a href="#show-mana-horizontal">ShowManaHorizontal()</a>
+<a href="#show-mana-vertical">ShowManaVertical()</a>
+<a href="#show-no-full">ShowNoFull()</a>
+<a href="#spell-sprite">SpellSprite()</a>
+<a href="#set-group-keys">SetGroupKeys()</a>
 
 <hr>
 <h2>Intro - Introduction to config functions and variables</h2>
@@ -128,7 +121,7 @@ General configurations.
 
 <h2>Functions</h2>
 <a name="a-star"></a>
-<h3>(a-star fixed-unit-cost moving-unit-cost unseen-terrain unseen-terrain-cost)</h3>
+<h3>AStar(tag, value, ...)</h3>
 
 Sets variables about the pathfinder.
 What the movement cost for unseen terrian is and whether units are aware of what's under unseen terrain.
@@ -139,305 +132,173 @@ the performance, turn it off.
 The Cost of a move it 1 if moving straight, or 2 if moving diagonal.
 
 <dl>
-<dt>fixed-unit-cost</dt>
-<dd>cost to move over a unit that is standing still.</dd>
-<dt>moving-unit-cost</dt>
-<dd>cost to move over a unit that is moving to somewhere.</dd>
-<dt>unseen-terrain</dt>
+<dt>"fixed-unit-cost", number</dt>
+<dd>cost to move over a unit that is standing still. (must be greater than 3)</dd>
+<dt>"moving-unit-cost", number</dt>
+<dd>cost to move over a unit that is moving to somewhere. (must be greater than 3)</dd>
+<dt>"unseen-terrain", number</dt>
 <dd>Whether the pathfinder treats unknown terrain as visible when calculating paths or not. &lt;'dont-know-unseen-terrain|'know-unseen-terrain&gt;</dd>
-<dt>unseen-terrain-cost</dt>
+<dt>"unseen-terrain-cost", number</dt>
 <dd>Extra cost to move on unseen terrain, makes units tend towards know areas when finding paths.</dd>
-<dd></dd>
-
+<dt>"know-unseen-terrain"</dt>
+<dd>consider (FIXME ? AI and human ?) know(s) all the terrain.</dd>
+<dt>"dont-know-unseen-terrain"</dt>
+<dd>consider (FIXME ? AI and human ?) do(es)n't know all the terrain.</dd>
 
 <h4>Example</h4>
-
 <pre>
-    (a-star 'on 'fixed-unit-cost 1000 'moving-unit-cost 2 'dont-know-unseen-terrain 'unseen-terrain-cost 100)
+AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "unseen-terrain-cost", 2)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="alpha-fog-of-war"></a>
-<h3>(alpha-fog-of-war)</h3>
+<h3>AlphaFogOfWar()</h3>
 
 Use alpha style fog of war.
 
-
-<h4>Example</h4>
-
-<pre>
-    ;; Use alpha style fog of war.
-    (alpha-fog-of-war)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="decoration-on-top"></a>
-<h3>(decoration-on-top)</h3>
+<h3>DecorationOnTop()</h3>
 
 Show bars and dots always on top. (Planned feature)
 
-
-<h4>Example</h4>
-
-<pre>
-    (decoration-on-top)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="health-sprite"></a>
-<h3>(health-sprite file hotx hoty width height)</h3>
+<h3>HealthSprite(file, hotx, hoty, width, height)</h3>
 
 Define health-sprite.
 
 <dl>
-<dt>file</dt>
-<dd>.
-<dt>hotx</dt>
-<dd>.
-<dt>hoty</dt>
-<dd>.
-<dt>width</dt>
-<dd>.
-<dt>height</dt>
-<dd>.
-</dd>
-</dd>
+  <dt>file</dt>
+  <dd>.</dd>
+  <dt>hotx</dt>
+  <dd>.</dd>
+  <dt>hoty</dt>
+  <dd>.</dd>
+  <dt>width</dt>
+  <dd>.</dd>
+  <dt>height</dt>
+  <dd>.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (health-sprite "graphics/ui/health2.png" 0 -4 31 4)
+HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="mana-sprite"></a>
-<h3>(mana-sprite file hotx hoty width height))</h3>
+<h3>ManaSprite(file, hotx, hoty, width, height)</h3>
 
-.
+define mana-sprite.
 
 <dl>
-<dt>file</dt>
-<dd>.
-<dt>hotx</dt>
-<dd>.
-<dt>hoty</dt>
-<dd>.
-<dt>width</dt>
-<dd>.
-<dt>height</dt>
-<dd>.
-</dd>
+  <dt>file</dt>
+  <dd>.</dd>
+  <dt>hotx</dt>
+  <dd>.</dd>
+  <dt>hoty</dt>
+  <dd>.</dd>
+  <dt>width</dt>
+  <dd>.</dd>
+  <dt>height</dt>
+  <dd>.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (mana-sprite "graphics/ui/mana2.png" 0 -1 31 4)
+ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
 </pre>
 
 <a name="original-fog-of-war"></a>
-<h3>(original-fog-of-war)</h3>
+<h3>OriginalFogOfWar()</h3>
 
 Use original style fog of war.
 
 
-<h4>Example</h4>
-
-<pre>
-    ;; Use original style fog of war.
-    (original-fog-of-war)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="reveal-map"></a>
-<h3>(reveal-map)</h3>
+<h3>RevealMap()</h3>
 
 Reveal the entire map.
 
-
-<h4>Example</h4>
-
-<pre>
-    (reveal-map)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="right-button-attacks"></a>
-<h3>(right-button-attacks)</h3>
+<h3>RightButtonAttacks()</h3>
 
-.
+If you prefer fighters are attacking by right clicking empty space.
 
-
-<h4>Example</h4>
-
-<pre>
-    (right-button-attacks)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+FIXME: this option will be renamed
 
 <a name="right-button-moves"></a>
-<h3>(right-button-moves)</h3>
+<h3>RightButtonMoves()</h3>
 
-.
+If you prefer fighters are moving by right clicking empty space.
 
-
-<h4>Example</h4>
-
-<pre>
-    (right-button-moves)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+FIXME: this option will be renamed
 
 <a name="set-all-players-building-limit!"></a>
-<h3>(set-all-players-building-limit! limit)</h3>
+<h3>SetAllPlayersBuildingLimit(limit)</h3>
 
 .
 
-
 <dl>
-<dt>limit</dt>
-<dd>.
-</dd>
+  <dt>limit</dt>
+  <dd>.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (set-all-players-building-limit! 200)
+SetAllPlayersBuildingLimit(200)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-all-players-unit-limit!"></a>
-<h3>(set-all-players-unit-limit! limit)</h3>
+<h3>SetAllPlayersUnitLimit(limit)</h3>
 
 Sets the number of non-building type units a player can have.
 
-
 <dl>
-<dt>limit</dt>
-<dd>.
-</dd>
+  <dt>limit</dt>
+  <dd>.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (set-all-players-unit-limit! 200)
+SetAllPlayersUnitLimit(200)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-all-players-total-unit-limit!"></a>
-<h3>(set-all-players-total-unit-limit! limit)</h3>
+<h3>SetAllPlayersTotalUnitLimit(limit)</h3>
 
 .
 
 
 <dl>
-<dt>limit</dt>
-<dd>.
-</dd>
+  <dt>limit</dt>
+  <dd>.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (set-all-players-total-unit-limit! 400)
+SetAllPlayersTotalUnitLimit(400)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-brightness!"></a>
-<h3>(set-brightness! brightness)</h3>
-
-Change the global game brightness. Use this to adapt Stratagus to your monitor
-settings.
-
-
-<dl>
-<dt>brightness</dt>
-<dd>Your brightness, can be a value from -100 to 100. 0 is the neutral point.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; This is the default brightness. A little lighter than the original.
-    (set-brightness! 15)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-building-capture!"></a>
-<h3>(set-building-capture! capture)</h3>
+<h3>SetBuildingCapture(boolean)</h3>
 
 Enable or disable building capture.
 
-
-<dl>
-<dt>capture</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-building-capture! #f)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-click-missile!"></a>
-<h3>(set-click-missile! missile)</h3>
+<h3>SetClickMissile("missile-type")</h3>
 
 Sets the missile to use for displaying when a player clicks on a location on the map.
 
 <dl>
-<dt>missile</dt>
-<dd>The missile to use, as defined in the missiles section</dd>
+  <dt>missile-type</dt>
+  <dd>The missile to use, as defined in the missiles section</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (set-click-missile! 'missile-green-cross)
+SetClickMissile("missile-green-cross")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-color-cycle-all!"></a>
-<h3>(set-color-cycle-all! flag)</h3>
+<h3>SetColorCycleAll(flag)</h3>
 
 Change how the color cycling is working. This is used to make the water moving
 or the circle in the dark portal rotating.
@@ -445,1116 +306,510 @@ or the circle in the dark portal rotating.
 
 <dl>
 <dt>flag</dt>
-<dd>If flag is true (#t) all images are color cycled. If flag is false (#f) only the tileset and global palettes  are color cycled.
-</dd>
+  <dd>If flag is true all images are color cycled.
+  If flag is false  only the tileset and global palettes are color cycled.
+  </dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; This is the default, all images are color cycled.
-    (set-color-cycle-all! #t)
+-- This is the default, all images are color cycled.
+SetColorCycleAll(true)
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-contrast!"></a>
-<h3>(set-contrast! contrast)</h3>
-
-Change the global game contrast. Use this to adapt Stratagus to your monitor
-settings.
-
-
-<dl>
-<dt>contrast</dt>
-<dd>Your contrast, can be a value from 0 to 400. 100 is the neutral point.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; This is the default contrast. A little more than the original.
-    (set-contrast! 110)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-damage-missile!"></a>
-<h3>(set-damage-missile! missile)</h3>
+<h3>SetDamageMissile("missile-type")</h3>
 
-Sets the missile to use for displaying the damage done to units
+Sets the missile to use for displaying the damage done to units.
 
 <dl>
-<dt>missile</dt>
-<dd>missile name to use to display the damage</dd>
+  <dt>"missile-type"</dt>
+  <dd>missile name to use to display the damage</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-   (set-damage-missile! 'missile-hit)
+SetDamageMissile("missile-hit")
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-double-click-delay!"></a>
-<h3>(set-double-click-delay! delay)</h3>
+<h3>SetDoubleClickDelay(delay)</h3>
 
 .
 
-
 <dl>
-<dt>delay</dt>
-<dd>The delay in ms.
-</dd>
+  <dt>delay</dt>
+  <dd>The delay in ms.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (set-double-click-delay! 300)
+SetDoubleClickDelay(300)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-editor-select-icon!"></a>
-<h3>(set-editor-select-icon! icon)</h3>
+<h3>SetEditorSelectIcon("icon-name")</h3>
 
 .
-
+FIXME
 
 <dl>
-<dt>icon</dt>
-<dd>The name of the icon.
-</dd>
+  <dt>"icon-name"</dt>
+  <dd>The name of the icon.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Use "icon-human-patrol-land" for the editor's select icon.
-    (set-editor-select-icon! 'icon-human-patrol-land)
+-- Use "icon-human-patrol-land" for the editor's select icon.
+SetEditorSelectIcon("icon-human-patrol-land")
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </a>
 
 <a name="set-editor-units-icon!"></a>
-<h3>(set-editor-units-icon! icon)</h3>
+<h3>SetEditorUnitsIcon("icon-name")</h3>
 
 .
-
+FIXME
 
 <dl>
-<dt>icon</dt>
-<dd>The name of the icon.
-</dd>
+  <dt>icon</dt>
+  <dd>The name of the icon.</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; Use "icon-footman" for the editor's units icon.
-    (set-editor-units-icon! 'unit-footman)
+-- Use "icon-footman" for the editor's units icon.
+SetEditorUnitsIcon("unit-footman")
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </a>
 
 <a name="set-fancy-buildings!"></a>
-<h3>(set-fancy-buildings! fancy)</h3>
+<h3>SetFancyBuildings(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>fancy</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-fancy-buildings! #t)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+if true, enable fancy building (random mirroring buildings).
 
 <a name="set-fog-of-war!"></a>
-<h3>(set-fog-of-war! fow)</h3>
+<h3>SetFogOfWar(boolean)</h3>
 
-.
+If true, enable fog of war.
 
+<a name="set-fog-of-war-opacity"></a>
+<h3>SetFogOfWarOpacity(number)</h3>
 
-<dl>
-<dt>fow</dt>
-<dd>.
-</dd>
-</dl>
+FIXME.
 
 <h4>Example</h4>
-
 <pre>
-    (set-fog-of-war! #t)
+SetFogOfWarOpacity(128)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-fog-of-war-brightness!"></a>
-<h3>(set-fog-of-war-brightness! brightness)</h3>
-
-.
-
-
-<dl>
-<dt>brightness</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-fog-of-war-brightness! 10)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-fog-of-war-contrast!"></a>
-<h3>(set-fog-of-war-contrast! contrast)</h3>
-
-.
-
-
-<dl>
-<dt>contrast</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-fog-of-war-contrast! 30)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-fog-of-war-saturation!"></a>
-<h3>(set-fog-of-war-saturation! saturation)</h3>
-
-.
-
-
-<dl>
-<dt>saturation</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-fog-of-war-saturation! 100)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-forest-regeneration!"></a>
-<h3>(set-forest-regeneration! speed)</h3>
+<h3>SetForestRegeneration(number)</h3>
 
-.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-forest-regeneration! 0)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Set forest regeneration speed. (n * seconds, 0 = disabled)
+--  (Auf allgemeinen Wunsch eines einzelnen Herrn :)
 
 <a name="set-grab-mouse!"></a>
-<h3>(set-grab-mouse! grab)</h3>
+<h3>SetGrabMouse(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>grab</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-grab-mouse! #f)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Enable/disable grabbing the mouse.
 
 <a name="set-hold-click-delay!"></a>
-<h3>(set-hold-click-delay! delay)</h3>
+<h3>SetHoldClickDelay(delay)</h3>
 
-.
-
-
-<dl>
-<dt>delay</dt>
-<dd>.
-</dd>
-</dl>
+for the wanted hold-click delay (in ms)..
 
 <h4>Example</h4>
-
 <pre>
-    (set-hold-click-delay! 1000)
+SetHoldClickDelay(1000)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-key-scroll!"></a>
-<h3>(set-key-scroll! scroll)</h3>
+<h3>SetKeyScroll(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>scroll</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-key-scroll! #t)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+enable/disable keyboard scrolling.
 
 <a name="set-key-scroll-speed!"></a>
-<h3>(set-key-scroll-speed! speed)</h3>
+<h3>SetKeyScrollSpeed(number)</h3>
 
-.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
+Set keyboard scroll speed in frames (1 = each frame,2 each second,...)
 
 <h4>Example</h4>
-
 <pre>
-    (set-key-scroll-speed! 1)
+SetKeyScrollSpeed(1)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-leave-stops!"></a>
-<h3>(set-leave-stops! leave)</h3>
+<h3>SetLeaveStops(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>leave</dt>
-<dd>.
-</dd>
-</dl>
+Enable/disable stopping scrolling on mouse leave.
 
 <h4>Example</h4>
-
 <pre>
-    (set-leave-stops! #t)
+SetLeaveStops(true)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-max-selectable!"></a>
-<h3>(set-max-selectable! max)</h3>
+<h3>SetMaxSelectable(number)</h3>
 
-Set the maximum number of selectable units.
-
-
-<dl>
-<dt>max</dt>
-<dd>The max can be any positive value.
-
-</dd>
-</dl>
+Set the maximum number of selectable units. (must be positive value)
 
 <h4>Example</h4>
-
 <pre>
-    ;;      Maximum number of selectable units
-    (set-max-selectable! 18)
+SetMaxSelectable(18)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-menu-background!"></a>
-<h3>(set-menu-background! image)</h3>
+<h3>SetMenuBackground("image-file")</h3>
 
 Set the default menu background.
 
-
 <dl>
-<dt>image</dt>
-<dd>Image to be displayed as menu background, this is the second screen 
+  <dt>"image-file"</dt>
+  <dd>Image to be displayed as menu background, this is the second screen 
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
-</dd>
+  </dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; This is the default menu background displayed.
-    (set-menu-background! "graphics/ui/Menu background without title.png")
+SetMenuBackground("graphics/ui/Menu_background_without_title.png")
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-menu-background-with-title!"></a>
-<h3>(set-menu-background-with-title! image)</h3>
-
-Set the default menu background with title.
-
-
-<dl>
-<dt>image</dt>
-<dd>Image to be displayed as menu background with title, this is the second screen 
-displayed. The image should be a png file with 640x480 8-bit indexed colormap.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; This is the default menu background with title displayed.
-    (set-menu-background-with-title! "graphics/ui/Menu background with title.png")
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-minimap-terrain!"></a>
-<h3>(set-minimap-terrain! terrain)</h3>
+<h3>SetMinimapTerrain(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>terrain</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-minimap-terrain! #t)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+for minimap with/without terrain.
 
 <a name="set-mouse-scroll!"></a>
-<h3>(set-mouse-scroll! scroll)</h3>
+<h3>SetMouseScroll(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>scroll</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-mouse-scroll! #t)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+enable/disable mouse scrolling.
 
 <a name="set-mouse-scroll-speed!"></a>
-<h3>(set-mouse-scroll-speed! speed)</h3>
+<h3>SetMouseScrollSpeed(number)</h3>
 
-.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
+Set mouse scroll speed in frames (1=each frame,2 each second,...)
+This is when the mouse cursor hits the border.
 
 <h4>Example</h4>
-
 <pre>
-    (set-mouse-scroll-speed! 1)
+SetMouseScrollSpeed(1)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-original-resources!"></a>
-<h3>(set-original-resources! resources)</h3>
-
-.
-
-
-<dl>
-<dt>resources</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-original-resources! #f)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-reveal-attacker!"></a>
-<h3>(set-reveal-attacker! reveal)</h3>
+<h3>SetRevealAttacker(boolean)</h3>
 
 Sets where unit will respond the the attacking unit or not.  If set to true,
 they will respond whether they can see the unit or not.  If set to false,
 they will only response if the attacker is within their reaction range.
 
-<dl>
-<dt>reveal</dt>
-<dd>#f or #t
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-reveal-attacker! #f)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-reverse-map-move!"></a>
-<h3>(set-reverse-map-move! reverse)</h3>
-
-.
-
-
-<dl>
-<dt>reverse</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-reverse-map-move! #f)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
-<a name="set-saturation!"></a>
-<h3>(set-saturation! saturation)</h3>
-
-Change the global game saturation. Use this to adapt Stratagus to your monitor
-settings.
-
-
-<dl>
-<dt>saturation</dt>
-<dd>Your saturation, can be a value from -100 to 200. 100 is the neutral point.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; This is the default saturation.
-    (set-saturation! 100)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-selection-style!"></a>
-<h3>(set-selection-style! style)</h3>
+<h3>SetSelectionStyle(tag)</h3>
 Set selection style, show what units the user had selected.
 
 <dl>
-<dt>style</dt>
-<dd>Possible values:<pre>
-#f                      None
-'rectangle              Rectangle around unit
-'circle                 Circle around unit
-'alpha-rectangle        Rectangle with alpha around unit
-'alpha-circle           Circle with alpha around unit
-'corners                Draw corners of rectangle
-</pre>
-</dd>
+  <dt>"rectangle"</dt>
+  <dd>Rectangle around unit</dd>
+  <dt>"circle"</dt>
+  <dd>Circle around unit</dd>
+  <dt>"alpha-rectangle"</dt>
+  <dd>Rectangle with alpha around unit</dd>
+  <dt>"alpha-circle"</dt>
+  <dd>Circle with alpha around unit</dd>
+  <dt>"corners"</dt>
+  <dd>Draw corners of rectangle</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    (set-selection-style! 'corners)
+SetSelectionStyle("corners")
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-show-attack-range!"></a>
-<h3>(set-show-attack-range! show)</h3>
+<h3>SetShowAttackRange(boolean)</h3>
 
 Enable/disable display of attack range of the selected unit on map.
 
-<dl>
-<dt>show</dt>
-<dd>#f or #t
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-show-attack-range! #f)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-show-command-key!"></a>
-<h3>(set-show-command-key! show)</h3>
+<h3>SetShowCommandKey(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>show</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-show-command-key! #t)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+enable/disable the display of the command keys in buttons.
 
 <a name="set-show-orders!"></a>
-<h3>(set-show-orders! show)</h3>
+<h3>SetShowOrders(boolean or number)</h3>
 
 Enable/disable display of the orders of the selected unit on map.
 
 <dl>
-<dt>show</dt>
-<dd>Use #t to always show unit orders, #f to never show orders.  Or use a
-number to specify the number of seconds an order should be shown.
-</dd>
+  <dt>true</dt>
+  <dd>to always show unit orders</dd>
+  <dt>false</dt>
+  <dd>to never show orders.</dd>
+  <dt>number</dt>
+  <dd>the number of seconds an order should be shown.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; never show unit orders
-    (set-show-orders! #f)
-    ;; show orders for 2 seconds
-    (set-show-orders! 2)
+-- show orders for 2 seconds
+SetShowOrders(2)
 </pre>
 
 <a name="set-show-reaction-range!"></a>
-<h3>(set-show-reaction-range! show)</h3>
+<h3>SetShowReactionRange(boolean)</h3>
 
 Enable/disable display of reaction range of the selected unit on map.
 
-<dl>
-<dt>show</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-show-reaction-reaction-range! #f)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-show-sight-range!"></a>
-<h3>(set-show-sight-range! range)</h3>
+<h3>SetShowSightRange(tag)</h3>
 
 How the sight range of the selected unit is shown on map.
 
 <dl>
-<dt>range</dt>
-<dd>Possible values:
+  <dt>tag</dt>
+  <dd>Possible values:
 <pre>
-#f                      None
-'rectangle              Alpha rectangle around unit
-'circle                 Alpha circle around unit
-#t                      Rectangle around unit
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-show-sight-range! #f)
+false                     None
+"rectangle"              Alpha rectangle around unit
+"circle"                 Alpha circle around unit
+true                     Rectangle around unit
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+  </dd>
+</dl>
 
 <a name="set-show-tips!"></a>
-<h3>(set-show-tips! tips)</h3>
+<h3>SetShowTips(boolean)</h3>
 
-.
+enable/disable show tips at the start of a level
 
-
-<dl>
-<dt>tips</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-show-tips! #t)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-build!"></a>
-<h3>(set-speed-build! speed)</h3>
+<h3>SetSpeedBuild(number)</h3>
 
-Set build speed.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-speed-build! 10)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Decrease the time to build a unit by this factor.
 
 <a name="set-speed-research!"></a>
-<h3>(set-speed-research! speed)</h3>
+<h3>SetSpeedResearch(number)</h3>
 
-Set research speed.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-speed-research! 10)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Decrease the time to research by this factor.
 
 <a name="set-speed-resources-harvest!"></a>
-<h3>(set-speed-resources-harvest! resource speed)</h3>
+<h3>SetSpeedResourcesHarvest("resource-name", number)</h3>
 
-Set the harvesting speed of a resource.
-
-
-<dl>
-<dt>resource</dt>
-<dd>Name of the resource.
-</dd>
-<dt>speed</dt>
-<dd>Speed factor to increase harvesting time.
-</dd>
-</dl>
+Set the harvesting speed of the resource.
 
 <h4>Example</h4>
-
 <pre>
-    ;; Speeds up gold mining time by a factor of 10.
-    (set-speed-resources-harvest! 'gold 10)
+-- Speeds up gold mining time by a factor of 10.
+SetSpeedResourcesHarvest("gold", 10)
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-resources-return!"></a>
-<h3>(set-speed-resources-return! resource speed)</h3>
+<h3>SetSpeedResourcesReturn("resource-name", number)</h3>
 
-Set the returning speed of a resource.
-
-
-<dl>
-<dt>resource</dt>
-<dd>Name of the resource.
-</dd>
-<dt>speed</dt>
-<dd>Speed factor to increase returning time.
-</dd>
-</dl>
+Set the returning speed of the resource.
 
 <h4>Example</h4>
-
 <pre>
-    ;; Speeds up the time spent returning gold by a factor of 10.
-    (set-speed-resources-return! 'gold 10)
+-- Speeds up the time spent returning gold by a factor of 10.
+SetSpeedResourcesReturn("gold", 10)
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-train!"></a>
-<h3>(set-speed-train! speed)</h3>
+<h3>SetSpeedTrain(number)</h3>
 
-Set train speed.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-speed-train! 10)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Decrease the time to train a unit by this factor.
 
 <a name="set-speed-upgrade!"></a>
-<h3>(set-speed-upgrade! speed)</h3>
+<h3>SetSpeedUpgrade(number)</h3>
 
-Set upgrade speed.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-speed-upgrade! 10)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Decrease the time to upgrade a unit by this factor.
 
 <a name="set-speeds!"></a>
-<h3>(set-speeds! speed)</h3>
+<h3>SetSpeeds(number)</h3>
 
 Set all speeds.
-
-
-<dl>
-<dt>speed</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
+This is equivalent to
 <pre>
-    (set-speeds! 1)
+SetSpeedResourcesHarvest("all-resource", number)
+SetSpeedResourcesReturn("all-resource", number)
+SetSpeedBuild(number)
+SetSpeedTrain(number)
+SetSpeedUpgrade(number)
+SetSpeedResearch(number)
 </pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-title-screens!"></a>
-<h3>(set-title-screens! '(tag1 value1 tag2 value ...) ...)</h3>
+<h3>SetTitleScreens({tag = value, ...}, ...)</h3>
 
 Change the default title screens.<br>
 <br>
 Possible tags:
 
 <dl>
-<dt>image</dt>
-<dd>Image or video to be displayed as title screen, this is the first screen 
+  <dt>Image = "filepath"</dt>
+  <dd>Image or video to be displayed as title screen, this is the first screen 
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
-</dd>
-<dt>music</dt>
-<dd>Optional music to be played with the image or video.  Use "none" to stop
+  </dd>
+<dt>Music = "filepath" or "none"</dt>
+  <dd>Optional music to be played with the image or video.  Use "none" to stop
 previously playing music.
-</dd>
-<dt>timeout</dt>
-<dd>The number of seconds we should show this title-screen.</dd>
-<dt>label</dt>
-<dd>Optional text to be displayed. It's a list of elements with three tags:
-<dl>
-<dt>text</dt>
-<dd>The text string to render
-</dd>
-<dt>pos</dt>
-<dd>The text coords to render
-</dd>
-<dt>flags</dt>
-<dd>The flags that tell us how should be interpretated the pos coords. Possible values is center
-</dd>
-</dl>
-</dd>
+  </dd>
+  <dt>Timeout = number</dt>
+  <dd>The number of seconds we should show this title-screen.(20 by default)</dd>
+  <dt>Label = { {Text = "text", Pos = {x, y}, Font = "font-name"}, ... }</dt>
+  <dd>Optional text to be displayed. It's a list of elements with three tags:
+  <dl>
+    <dt>Text = "text"</dt>
+    <dd>The text string to render.</dd>
+    <dt>Pos = {x, y}</dt>
+    <dd>The text coords to render.</dd>
+    <dt>Font = FIXME</dt>
+    <dd>Font to use.</dd>
+    <dt>Flags = {tag, ...}</dt>
+    <dd>The flags that tell us how should be interpretated the pos coords.
+        Possible and only value is "center".
+    </dd>
+  </dl>
+  </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; This is the default title displayed.
-    (set-title-screens!
-      '(image "graphics/ui/title.png"
-        music "music/title.wav.gz"
-        label
-         ((text "~white~Copyright © 1998-2003 The Stratagus Project. All rights reserved."
-           pos (0 45) flags (bottom center)))))
+-- This is the default title displayed.
+SetTitleScreens(
+		{Image = "video/int_logo_stratagus.avi", Music =  "video/int_logo_stratagus.ogg",
+		Label = {{Text = "~white~Copyright © 1998-2003 The Stratagus Project. All rights reserved.",
+                          Pos = {0, 45}, Flags = {"center"}}} },
+		{Image = "video/int_logo_bos.avi", Music =  "video/int_logo_bos.ogg"})
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-training-queue!"></a>
-<h3>(set-training-queue! queue)</h3>
+<h3>SetTrainingQueue(boolean)</h3>
 
-.
-
-
-<dl>
-<dt>queue</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-training-queue! #t)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+enable/disable the training queues.
+(ability to train several units in a row)
 
 <a name="set-xp-damage!"></a>
-<h3>(set-xp-damage! damage)</h3>
+<h3>SetXPDamage(boolean)</h3>
 
-.
+enable/disable XP to add more damage to attacks.
+FIXME : damage calculation.
 
+<a name="set-use-hp-for-xp!"></a>
+<h3>SetUseHPForXp(boolean)</h3>
 
-<dl>
-<dt>damage</dt>
-<dd>.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    (set-xp-damage! #f)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+How the Xp is compute :
+if it is set to true then unit gains Xp equal to damage dealt to enemy unit
+else unit gains the max HP of the  killed enemy unit.
 
 <a name="shadow-sprite"></a>
-<h3>(shadow-sprite file hotx hoty width height)</h3>
+<h3>ShadowSprite("file", hotx, hoty, width, height)</h3>
 
 Define shadow-sprite.
 
 <dl>
-<dt>file</dt>
-<dd>.
-<dt>hotx</dt>
-<dd>.
-<dt>hoty</dt>
-<dd>.
-<dt>width</dt>
-<dd>.
-<dt>height</dt>
-<dd>.
-</dd>
+  <dt>file</dt>
+  <dd>.</dd>
+  <dt>hotx</dt>
+  <dd>.</dd>
+  <dt>hoty</dt>
+  <dd>.</dd>
+  <dt>width</dt>
+  <dd>.</dd>
+  <dt>height</dt>
+  <dd>.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    (shadow-sprite "graphics/missiles/unit shadow.png" 3 42 32 32)
+ShadowSprite("graphics/missiles/unit_shadow.png",3, 42, 32, 32)
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="show-energy-selected-only"></a>
-<h3>(show-energy-selected-only)</h3>
+<h3>ShowEnergySelectedOnly()</h3>
 
-.
-
-
-<h4>Example</h4>
-
-<pre>
-    (show-energy-selected-only)
-</pre>
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+FIXME.
 
 <a name="show-full"></a>
-<h3>(show-full)</h3>
+<h3>ShowFull()</h3>
 
 Use to show always bars or dots. No parameters.
 
 <a name="show-health-bar"></a>
-<h3>(show-health-bar)</h3>
+<h3>ShowHealthBar()</h3>
 
 Adds a health bar to the left of the unit. No parameters.
 
 <a name="show-health-dot"></a>
-<h3>(show-health-dot)</h3>
+<h3>ShowHealthDot()</h3>
 
 Adds a health dot to the left of the unit. No parameters.
 
 <a name="show-health-horizontal"></a>
-<h3>(show-health-horizontal)</h3>
+<h3>ShowHealthHorizontal()</h3>
 
 Show health bars horizontal. No parameters.
 
 <a name="show-health-vertical"></a>
-<h3>(show-health-vertical)</h3>
+<h3>ShowHealthVertical()</h3>
 
 Show health bars vertical. No parameters.
 
 <a name="show-mana-bar"></a>
-<h3>(show-mana-bar)</h3>
+<h3>ShowManaBar()</h3>
 
 Show a mana bar to the right of the unit. No parameters.
 
 <a name="show-mana-dot"></a>
-<h3>(show-mana-dot)</h3>
+<h3>ShowManaDot()</h3>
 
 Show a mana dot to the right of the unit. No parameters.
 
 <a name="show-mana-horizontal"></a>
-<h3>(show-mana-horizontal)</h3>
+<h3>ShowManaHorizontal()</h3>
 
 Show mana bars horizontal. No parameters.
 
 <a name="show-mana-vertical"></a>
-<h3>(show-mana-vertical)</h3>
+<h3>ShowManaVertical()</h3>
 
 Show mana bars vertical. No parameters.
 
 <a name="show-no-full"></a>
-<h3>(show-no-full)</h3>
+<h3>ShowNoFull()</h3>
 
 Use to get no full bars or dots. No parameters.
 
 <a name="spell-sprite"></a>
-<h3>(spell-sprite file hotx hoty width height)</h3>
+<h3>SpellSprite("file", hotx, hoty, width, height)</h3>
 
 Define spell-sprite.
+with bloodlust, haste, slow, invisible and shield
 
 <dl>
-<dt>file</dt>
-<dd>.
-<dt>hotx</dt>
-<dd>.
-<dt>hoty</dt>
-<dd>.
-<dt>width</dt>
-<dd>.
-<dt>height</dt>
-<dd>.
-</dd>
+  <dt>file</dt>
+  <dd>.</dd>
+  <dt>hotx</dt>
+  <dd>.</dd>
+  <dt>hoty</dt>
+  <dd>.</dd>
+  <dt>width</dt>
+  <dd>.</dd>
+  <dt>height</dt>
+  <dd>.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    (spell-sprite "graphics/ui/bloodlust,haste,slow,invisible,shield.png" 1 1 16 16)
+SpellSprite("graphics/ui/bloodlust,haste,slow,invisible,shield.png",
+  1, 1, 16, 16)
 </pre>
 
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-group-keys"></a>
-<h3>(set-group-keys "0123456789~")</h3>
+<h3>SetGroupKeys("0123456789~")</h3>
 
 Define the key to use for group on non-us keyborads. It should be placed in
 preferences1.ccl, with the key to use for group 0, 1, 2, ... 9, and the key
@@ -1570,13 +825,8 @@ For french azerty, use :
 <pre>
 	(set-group-keys "à&é\"'(-è_ç²")
 </pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> ~/.stratagus/preferences1.ccl </a>
-
 <hr>
 Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<address>(c) 2002-2003 by <a href="http://stratagus.org">
+<address>(c) 2002-2004 by <a href="http://stratagus.org">
 The Stratagus Project</a></address></body></html>
