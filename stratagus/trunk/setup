@@ -111,10 +111,10 @@ WIN32=0
 DARWIN=0
 
 # Choose optimization level
-#DEBUG_CFLAGS="-g -O0 \$(PROFILE) -pipe -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
-DEBUG_CFLAGS="-g -O1 -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
+#DEBUG_CFLAGS="-g -O0 -fsigned-char \$(PROFILE) -pipe -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
+DEBUG_CFLAGS="-g -O1 -fsigned-char -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
 #-- Production (default)
-CFLAGS="-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS)"
+CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS)"
 
 #------------------------------------------------------------------------------
 # Function declarations
