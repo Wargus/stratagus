@@ -371,7 +371,7 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
     int x, int y)
 {
 #ifdef USE_SDL_SURFACE
-    SDL_Color color;
+    Uint32 color;
 #else
     VMemType color;
 #endif

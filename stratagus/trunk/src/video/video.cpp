@@ -286,15 +286,15 @@ global int ColorBuildingCycleEnd;
 #ifdef USE_SDL_SURFACE
 global void ColorCycle(void);
 
-SDL_Color ColorBlack;
-SDL_Color ColorDarkGreen;
-SDL_Color ColorBlue;
-SDL_Color ColorOrange;
-SDL_Color ColorWhite;
-SDL_Color ColorGray;
-SDL_Color ColorRed;
-SDL_Color ColorGreen;
-SDL_Color ColorYellow;
+Uint32 ColorBlack;
+Uint32 ColorDarkGreen;
+Uint32 ColorBlue;
+Uint32 ColorOrange;
+Uint32 ColorWhite;
+Uint32 ColorGray;
+Uint32 ColorRed;
+Uint32 ColorGreen;
+Uint32 ColorYellow;
 #else
 global void (*ColorCycle)(void);
 

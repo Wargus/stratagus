@@ -1047,12 +1047,15 @@ global void LoadFonts(void)
     while (fcm) {
 	color = fcm->Color;
 	for (i = 0; i < NumFontColors; ++i) {
-	    SDL_Color c;
+///	    SDL_Color c;
 	    // FIXME: todo
 //	    c = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
-	    c = VideoMapRGB(fcm->Color[i].r, fcm->Color[i].g, fcm->Color[i].b);
+///	    c = VideoMapRGB(fcm->Color[i].r, fcm->Color[i].g, fcm->Color[i].b);
 
-	    color[i] = VideoMapRGB(c.r, c.g, c.b);
+///	    color[i] = VideoMapRGB(c.r, c.g, c.b);
+	    color[i].r = fcm->Color[i].r;
+	    color[i].g = fcm->Color[i].g;
+	    color[i].b = fcm->Color[i].b;
 	}
 	fcm = fcm->Next;
     }

@@ -155,8 +155,10 @@ global void InitUserInterface(const char* race_name)
     }
 
 #ifdef USE_SDL_SURFACE
-    TheUI.CompletedBarColor = VideoMapRGB(TheUI.CompletedBarColorRGB.r,
-	TheUI.CompletedBarColorRGB.g, TheUI.CompletedBarColorRGB.b);
+    TheUI.CompletedBarColor = SDL_MapRGB(TheScreen->format,
+	TheUI.CompletedBarColorRGB.r,
+	TheUI.CompletedBarColorRGB.g,
+	TheUI.CompletedBarColorRGB.b);
     TheUI.ViewportCursorColor = ColorWhite;
 #else
     TheUI.CompletedBarColor = VideoMapRGB(TheUI.CompletedBarColorRGB.D24.a,

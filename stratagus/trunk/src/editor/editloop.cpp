@@ -666,7 +666,7 @@ local void DrawUnitIcons(void)
 local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {
 #ifdef USE_SDL_SURFACE
-    SDL_Color color;
+    Uint32 color;
 #else
     VMemType color;
 #endif
