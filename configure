@@ -801,7 +801,7 @@ fi
 echo
 echo Which compression types do you wish to enable?
 echo
-echo "	N-None"$DEF1
+echo "  N-None"$DEF1
 if [ "$HAVE_LIBZ" = 1 ] ; then
   echo "  G-GZip"$DEF2
 fi
