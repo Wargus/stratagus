@@ -98,8 +98,7 @@ local SCM CclDefineMissileType(SCM list)
 	    value=gh_cdr(value);
 	    type->Height=gh_scm2int(gh_car(value));
 	} else if( gh_eq_p(value,gh_symbol2scm("frames")) ) {
-	    //gh_scm2int(gh_car(list));
-	    // FIXME: not used now
+	    type->Frames=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("fired-sound")) ) {
 	    CclFree(type->FiredSound.Name);
 	    type->FiredSound.Name=gh_scm2newstr(gh_car(list),NULL);
