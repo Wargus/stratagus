@@ -2627,6 +2627,7 @@ local void EnterServerIPAction(Menuitem *mi, int key)
 local void JoinNetGameMenu(void)
 {
     char server_host_buffer[28];
+    char *port;
     Menu *menu;
 
     VideoLockScreen();
@@ -2663,6 +2664,12 @@ local void JoinNetGameMenu(void)
     if (menu->items[1].d.input.nch == 0) {
 	return;
     }
+
+    if ( (port = strchr(server_host_buffer, ':')) != NULL) {
+	NetworkPort = atoi(port + 1);
+	port[0] = 0;
+    }
+
     // Now finally here is the address
     server_host_buffer[menu->items[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(server_host_buffer)) {
