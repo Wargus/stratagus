@@ -42,6 +42,7 @@
 #include "icons.h"
 #include "missile.h"
 #include "ccl.h"
+#include "construct.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -60,13 +61,324 @@ local long SiodUnitTypeTag;		/// siod unit-type object
 /**
 **	Parse unit-type.
 **
-**	@note FIXME: This should be the new format parser.
 **	@note Should write a general parser for this.
 **
 **	@param list	List describing the unit-type.
 */
-local SCM CclDefineNewUnitType(SCM list __attribute__((unused)))
+local SCM CclDefineNewUnitType(SCM list)
 {
+    SCM value;
+    SCM sublist;
+    UnitType* type;
+    char* str;
+    int i;
+
+    //	Slot identifier
+
+    str=gh_scm2newstr(gh_car(list),NULL);
+    list=gh_cdr(list);
+
+    IfDebug( i=NoWarningUnitType; NoWarningUnitType=1; );
+    type=UnitTypeByIdent(str);
+    IfDebug( NoWarningUnitType=i; );
+    if( type ) {
+	DebugLevel0Fn("Redefining unit-type `%s'\n",str);
+	free(str);
+	// FIXME: loose memory, old content isn't freed.
+    } else {
+	type=NewUnitTypeSlot(str);
+    }
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("name")) ) {
+	    type->Name=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("use")) ) {
+	    type->SameSprite=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("files")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		for( i=0; i<TilesetMax; ++i ) {
+		    if( gh_eq_p(value,gh_symbol2scm(Tilesets[i]->Ident)) ) {
+			type->File[i]=gh_scm2newstr(gh_car(sublist),NULL);
+			break;
+		    }
+		}
+		if( i==TilesetMax ) {
+		   // FIXME: this leaves half initialized unit-type
+		   errl("Unsupported tileset tag",value);
+		}
+		sublist=gh_cdr(sublist);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    type->Width=gh_scm2int(gh_car(sublist));
+	    type->Height=gh_scm2int(gh_cadr(sublist));
+	} else if( gh_eq_p(value,gh_symbol2scm("animations")) ) {
+	    SCM temp;
+
+	    // FIXME: type->Animations=
+	    // FIXME:	AnimationsByIdent(str=gh_scm2newstr(gh_car(list),NULL));
+	    temp=gh_car(list);
+	    list=gh_cdr(list);
+	    if( symbol_boundp(temp,NIL)==SCM_BOOL_T ) {
+		type->Animations=(void*)gh_scm2int(symbol_value(temp,NIL));
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
+	    type->Icon.Name=gh_scm2newstr(gh_car(list),NULL);
+	    type->Icon.Icon=NULL;
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("costs")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		for( i=0; i<MaxCosts; ++i ) {
+		    if( gh_eq_p(value,gh_symbol2scm((char*)DEFAULT_NAMES[i])) ) {
+			type->_Costs[i]=gh_scm2int(gh_car(sublist));
+			break;
+		    }
+		}
+		if( i==MaxCosts ) {
+		   // FIXME: this leaves half initialized unit-type
+		   errl("Unsupported resource tag",value);
+		}
+		sublist=gh_cdr(sublist);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("construction")) ) {
+	    // FIXME: What if constructions arn't yet loaded?
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    type->Construction=ConstructionByIdent(str);
+	    list=gh_cdr(list);
+	    free(str);
+	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
+	    type->_Speed=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("hit-points")) ) {
+	    type->_HitPoints=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("magic")) ) {
+	    type->Magic=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("tile-size")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    type->TileWidth=gh_scm2int(gh_car(sublist));
+	    type->TileHeight=gh_scm2int(gh_cadr(sublist));
+	} else if( gh_eq_p(value,gh_symbol2scm("box-size")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    type->BoxWidth=gh_scm2int(gh_car(sublist));
+	    type->BoxHeight=gh_scm2int(gh_cadr(sublist));
+	} else if( gh_eq_p(value,gh_symbol2scm("sight-range")) ) {
+	    type->_SightRange=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("computer-reaction-range")) ) {
+	    type->ReactRangeComputer=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("person-reaction-range")) ) {
+	    type->ReactRangePerson=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("armor")) ) {
+	    type->_Armor=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("basic-damage")) ) {
+	    type->_BasicDamage=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("piercing-damage")) ) {
+	    type->_PiercingDamage=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("missile")) ) {
+	    type->Missile.Name=gh_scm2newstr(gh_car(list),NULL);
+	    type->Missile.Missile=NULL;
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("min-attack-range")) ) {
+	    type->MinAttackRange=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("max-attack-range")) ) {
+	    type->_AttackRange=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("weapons-upgradable")) ) {
+	    type->WeaponsUpgradable=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("armor-upgradable")) ) {
+	    type->ArmorUpgradable=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("priority")) ) {
+	    type->Priority=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("annoy-computer-factor")) ) {
+	    type->AnnoyComputerFactor=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("decay-rate")) ) {
+	    type->DecayRate=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("points")) ) {
+	    type->Points=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("demand")) ) {
+	    type->Demand=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("supply")) ) {
+	    type->Supply=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("corpse")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    type->CorpseName=gh_scm2newstr(gh_car(sublist),NULL);
+	    type->CorpseType=NULL;
+	    type->CorpseScript=gh_scm2int(gh_cadr(sublist));
+	} else if( gh_eq_p(value,gh_symbol2scm("explode-when-killed")) ) {
+	    type->ExplodeWhenKilled=1;
+	    list=gh_cdr(list);
+
+	} else if( gh_eq_p(value,gh_symbol2scm("type-land")) ) {
+	    type->UnitType=UnitTypeLand;
+	} else if( gh_eq_p(value,gh_symbol2scm("type-fly")) ) {
+	    type->UnitType=UnitTypeFly;
+	} else if( gh_eq_p(value,gh_symbol2scm("type-naval")) ) {
+	    type->UnitType=UnitTypeNaval;
+
+	} else if( gh_eq_p(value,gh_symbol2scm("right-none")) ) {
+	    type->MouseAction=MouseActionNone;
+	} else if( gh_eq_p(value,gh_symbol2scm("right-attack")) ) {
+	    type->MouseAction=MouseActionAttack;
+	} else if( gh_eq_p(value,gh_symbol2scm("right-move")) ) {
+	    type->MouseAction=MouseActionMove;
+	} else if( gh_eq_p(value,gh_symbol2scm("right-harvest")) ) {
+	    type->MouseAction=MouseActionHarvest;
+	} else if( gh_eq_p(value,gh_symbol2scm("right-haul-oil")) ) {
+	    type->MouseAction=MouseActionHaulOil;
+	} else if( gh_eq_p(value,gh_symbol2scm("right-demolish")) ) {
+	    type->MouseAction=MouseActionDemolish;
+	} else if( gh_eq_p(value,gh_symbol2scm("right-sail")) ) {
+	    type->MouseAction=MouseActionSail;
+
+	} else if( gh_eq_p(value,gh_symbol2scm("can-ground-attack")) ) {
+	    type->GroundAttack=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("can-attack")) ) {
+	    type->CanAttack=1;
+
+	} else if( gh_eq_p(value,gh_symbol2scm("can-target-land")) ) {
+	    type->CanTarget|=CanTargetLand;
+	} else if( gh_eq_p(value,gh_symbol2scm("can-target-sea")) ) {
+	    type->CanTarget|=CanTargetSea;
+	} else if( gh_eq_p(value,gh_symbol2scm("can-target-air")) ) {
+	    type->CanTarget|=CanTargetAir;
+
+	} else if( gh_eq_p(value,gh_symbol2scm("building")) ) {
+	    type->Building=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("shore-building")) ) {
+	    type->ShoreBuilding=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("land-unit")) ) {
+	    type->LandUnit=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("air-unit")) ) {
+	    type->AirUnit=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("sea-unit")) ) {
+	    type->SeaUnit=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("critter")) ) {
+	    type->Critter=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("submarine")) ) {
+	    type->Submarine=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("can-see-submarine")) ) {
+	    type->CanSeeSubmarine=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("transporter")) ) {
+	    type->Transporter=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("cower-worker")) ) {
+	    type->CowerWorker=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("tanker")) ) {
+	    type->Tanker=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("gives-oil")) ) {
+	    type->GivesOil=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("stores-gold")) ) {
+	    type->StoresGold=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("stores-wood")) ) {
+	    type->StoresWood=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("oil-patch")) ) {
+	    type->OilPatch=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("gives-gold")) ) {
+	    type->GoldMine=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("stores-oil")) ) {
+	    type->StoresOil=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("vanishes")) ) {
+	    type->Vanishes=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("tower")) ) {
+	    type->Tower=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("hero")) ) {
+	    type->Hero=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("volatile")) ) {
+	    type->Volatile=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("cower-mage")) ) {
+	    type->CowerMage=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("isundead")) ) {
+	    type->IsUndead=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("can-cast-spell")) ) {
+	    type->CanCastSpell=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("organic")) ) {
+	    type->Organic=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("selectable-by-rectangle")) ) {
+	    type->SelectableByRectangle=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("teleporter")) ) {
+	    type->Teleporter=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("sounds")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		if( gh_eq_p(value,gh_symbol2scm("selected")) ) {
+		    type->Sound.Selected.Name=gh_scm2newstr(
+			gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("acknowledge")) ) {
+		    type->Sound.Acknowledgement.Name=gh_scm2newstr(
+			gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("ready")) ) {
+		    type->Sound.Ready.Name=gh_scm2newstr(
+			gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("help")) ) {
+		    type->Sound.Help.Name=gh_scm2newstr(
+			gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("dead")) ) {
+		    type->Sound.Dead.Name=gh_scm2newstr(
+			gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("attack")) ) {
+		    type->Weapon.Attack.Name=gh_scm2newstr(
+			gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else {
+		    errl("Unsupported sound tag",value);
+		}
+	    }
+	} else {
+	   // FIXME: this leaves a half initialized unit-type
+	   errl("Unsupported tag",value);
+	}
+    }
+
     return SCM_UNSPECIFIED;
 }
 
@@ -79,7 +391,7 @@ local SCM CclDefineNewUnitType(SCM list __attribute__((unused)))
 **
 **	@param list	List describing the unit-type.
 */
-local SCM CclDefineUnitType(SCM list)
+local SCM CclDefineOldUnitType(SCM list)
 {
     SCM value;
     SCM temp;
@@ -88,6 +400,8 @@ local SCM CclDefineUnitType(SCM list)
     int i;
     int j;
     int n;
+
+    DebugLevel0Fn("This version will be soon removed.\n");
 
     //	Slot identifier
 
@@ -400,21 +714,21 @@ local SCM CclDefineUnitType(SCM list)
     type->Points=i;
 
     // Food demand
-    
+
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
     DebugLevel3("\tFood demand: %d\n",i);
     type->Demand=i;
-    
-    // Food supply 
-    
+
+    // Food supply
+
     list=gh_cdr(list);
     value=gh_car(list);
     i=gh_scm2int(value);
     DebugLevel3("\tFood supply: %d\n",i);
     type->Supply=i;
-    
+
     // Missile
 
     list=gh_cdr(list);
@@ -1026,7 +1340,7 @@ local SCM CclDefineAnimations(SCM list)
 */
 global void UnitTypeCclRegister(void)
 {
-    gh_new_procedureN("define-unit-type",CclDefineUnitType);
+    gh_new_procedureN("define-old-unit-type",CclDefineOldUnitType);
     gh_new_procedureN("define-new-unit-type",CclDefineNewUnitType);
     gh_new_procedureN("define-unit-stats",CclDefineUnitStats);
 
