@@ -65,10 +65,10 @@ function check_for_libs() {
   cat << "  EOF" > $TEMPFILE.c
   int main(){ int i; }
   EOF
-  if test "`cc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1` x" == " x" ; then
+  if test "`cc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1` x" = " x" ; then
     rm -f $TEMPFILE.[coa] > /dev/null 2>&1
     return 0
-  elif test "`gcc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1` x" == " x" ; then
+  elif test "`gcc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1` x" = " x" ; then
     rm -f $TEMPFILE.[coa] > /dev/null 2>&1
     return 0
   else
