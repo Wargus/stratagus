@@ -471,11 +471,7 @@ global void CreateGame(char* filename, WorldMap* map)
     }
     // FIXME: support more races
 
-#ifdef SPLIT_SCREEN_SUPPORT
     MapCenterViewport (0, ThisPlayer->StartX,ThisPlayer->StartY);
-#else /* SPLIT_SCREEN_SUPPORT */
-    MapCenter(ThisPlayer->StartX,ThisPlayer->StartY);
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     //FIXME: must be done after map is loaded
     if(AStarOn) {

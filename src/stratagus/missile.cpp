@@ -694,7 +694,6 @@ local void GetMissileMapArea( const Missile* missile,
     *ey=(missile->Y+missile->Type->Height)/TileSizeY;
 }
 
-#ifdef SPLIT_SCREEN_SUPPORT
 /**
 **      Check missile visibility in a given viewport.
 **
@@ -718,31 +717,6 @@ local int MissileVisibleInViewport (int v, const Missile* missile)
 		tileMinX _C_ tileMaxX _C_ tileMinY _C_ tileMaxY);
     return 1;
 }
-#else /* SPLIT_SCREEN_SUPPORT */
-/**
-**      Check missile visibility.
-**
-**      @param missile  Missile pointer to check if visible.
-**
-**      @return         Returns true if visible, false otherwise.
-*/
-local int MissileVisible(const Missile* missile)
-{
-    int tileMinX;
-    int tileMaxX;
-    int tileMinY;
-    int tileMaxY;
-
-    GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
-    if ( !AnyMapAreaVisibleOnScreen(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
-	return 0;
-    }
-    DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n" _C_
-		tileMinX _C_ tileMaxX _C_ tileMinY _C_ tileMaxY _C_
-		MapX _C_ MapX+MapWidth _C_ MapY _C_ MapY+MapHeight);
-    return 1;
-}
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 /**
 **      Check and sets if missile must be drawn on screen-map
@@ -774,14 +748,9 @@ local void DrawMissile(const MissileType* mtype,int frame,int x,int y)
 /**
 **	Draw all missiles on map.
 */
-#ifdef SPLIT_SCREEN_SUPPORT
 global void DrawMissiles(int v)
 {
     Viewport *view = &TheUI.VP[v];
-#else /* SPLIT_SCREEN_SUPPORT */
-global void DrawMissiles(void)
-{
-#endif /* SPLIT_SCREEN_SUPPORT */
     const Missile* missile;
     Missile* const* missiles;
     Missile* const* missiles_end;
@@ -804,17 +773,10 @@ global void DrawMissiles(void)
 	    if( missile->Delay ) {
 		continue;	// delayed aren't shown
 	    }
-#ifdef SPLIT_SCREEN_SUPPORT
 	    // Draw only visible missiles
 	    if (MissileVisibleInViewport (v, missile)) {
 		x = missile->X - view->MapX * TileSizeX + view->X;
 		y = missile->Y - view->MapY * TileSizeY + view->Y;
-#else /* SPLIT_SCREEN_SUPPORT */
-	    // Draw only visible missiles
-	    if (MissileVisible(missile)) {
-		x=missile->X-MapX*TileSizeX+TheUI.MapX;
-		y=missile->Y-MapY*TileSizeY+TheUI.MapY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 		// FIXME: I should copy SourcePlayer for second level missiles.
 		if( missile->SourceUnit && missile->SourceUnit->Player ) {
 		    GraphicPlayerPixels(missile->SourceUnit->Player

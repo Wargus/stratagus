@@ -401,11 +401,9 @@ global void DrawMinimapCursor(int vx,int vy)
     int w;
     int h;
     int i;
-#ifdef SPLIT_SCREEN_SUPPORT
     int v = TheUI.LastClickedVP;
     unsigned MapWidth = TheUI.VP[v].MapWidth;
     unsigned MapHeight = TheUI.VP[v].MapHeight;
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     // Determine and save region below minimap cursor
     OldMinimapCursorX=x=TheUI.MinimapX+24+MinimapX+
