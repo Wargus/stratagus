@@ -316,6 +316,7 @@ Mng* LoadMNG(const char* name)
 		mh = (mng_handle)mng->Handle;
 		mng_cleanup(&mh);
 		free(mng->Buffer);
+		free(mng->Name);
 		free(mng);
 		return NULL;
 	}

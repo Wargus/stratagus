@@ -756,34 +756,18 @@ void InitUnitTypes(int reset_player_stats)
 /**
 **  Loads the Sprite for a unit type
 **
-**  @param unittype  type of unit to load
+**  @param type  type of unit to load
 */
-void LoadUnitTypeSprite(UnitType* unittype)
+void LoadUnitTypeSprite(UnitType* type)
 {
 	const char* file;
 	ResourceInfo* resinfo;
 	int res;
-	UnitType* type;
-
-	if (unittype->SameSprite) {
-		type = UnitTypeByIdent(unittype->SameSprite);
-		if (!type) {
-			PrintFunction();
-			fprintf(stdout, "Unit-type %s not found\n", type->SameSprite);
-			ExitFatal(-1);
-		}
-		if (!type->Sprite) {
-			LoadUnitTypeSprite(type);
-		}
-		unittype->Sprite = type->Sprite;
-		return;
-	} else {
-		type = unittype;
-	}
 
 	if (type->ShadowFile) {
-		type->ShadowSprite = LoadSprite(type->ShadowFile, type->ShadowWidth,
+		type->ShadowSprite = NewGraphic(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
+		LoadGraphic(type->ShadowSprite);
 		FlipGraphic(type->ShadowSprite);
 		MakeShadowSprite(type->ShadowSprite);
 	}
@@ -792,13 +776,15 @@ void LoadUnitTypeSprite(UnitType* unittype)
 		for (res = 0; res < MaxCosts; ++res) {
 			if ((resinfo = type->ResInfo[res])) {
 				if (resinfo->FileWhenLoaded) {
-					resinfo->SpriteWhenLoaded = LoadSprite(resinfo->FileWhenLoaded,
+					resinfo->SpriteWhenLoaded = NewGraphic(resinfo->FileWhenLoaded,
 						type->Width, type->Height);
+					LoadGraphic(resinfo->SpriteWhenLoaded);
 					FlipGraphic(resinfo->SpriteWhenLoaded);
 				}
 				if (resinfo->FileWhenEmpty) {
-					resinfo->SpriteWhenEmpty = LoadSprite(resinfo->FileWhenEmpty,
+					resinfo->SpriteWhenEmpty = NewGraphic(resinfo->FileWhenEmpty,
 						type->Width, type->Height);
+					LoadGraphic(resinfo->SpriteWhenLoaded);
 					FlipGraphic(resinfo->SpriteWhenEmpty);
 				}
 			}
@@ -810,7 +796,8 @@ void LoadUnitTypeSprite(UnitType* unittype)
 		file = type->File[0];
 	}
 	if (file) {
-		type->Sprite = LoadSprite(file, type->Width, type->Height);
+		type->Sprite = NewGraphic(file, type->Width, type->Height);
+		LoadGraphic(type->Sprite);
 		FlipGraphic(type->Sprite);
 	}
 }
@@ -987,9 +974,6 @@ void CleanUnitTypes(void)
 			}
 			free(type->BuildingRules);
 		}
-		if (type->SameSprite) {
-			free(type->SameSprite);
-		}
 		for (j = 0; j < TilesetMax; ++j) {
 			if (type->File[j]) {
 				free(type->File[j]);
@@ -1015,10 +999,10 @@ void CleanUnitTypes(void)
 		for (res = 0; res < MaxCosts; ++res) {
 			if (type->ResInfo[res]) {
 				if (type->ResInfo[res]->SpriteWhenLoaded) {
-					VideoSafeFree(type->ResInfo[res]->SpriteWhenLoaded);
+					FreeGraphic(type->ResInfo[res]->SpriteWhenLoaded);
 				}
 				if (type->ResInfo[res]->SpriteWhenEmpty) {
-					VideoSafeFree(type->ResInfo[res]->SpriteWhenEmpty);
+					FreeGraphic(type->ResInfo[res]->SpriteWhenEmpty);
 				}
 				if (type->ResInfo[res]->FileWhenEmpty) {
 					free(type->ResInfo[res]->FileWhenEmpty);
@@ -1060,9 +1044,7 @@ void CleanUnitTypes(void)
 			free(type->Weapon.Attack.Name);
 		}
 
-		if (!type->SameSprite) { // our own graphics
-			VideoSafeFree(type->Sprite);
-		}
+		FreeGraphic(type->Sprite);
 
 		free(UnitTypes[i]);
 		UnitTypes[i] = 0;

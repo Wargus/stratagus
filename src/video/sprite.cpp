@@ -412,7 +412,7 @@ Graphic* LoadSprite(const char* name, int width, int height)
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	g->File = (char*)name;
+	g->File = strdup(name);
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(g) == -1) {
