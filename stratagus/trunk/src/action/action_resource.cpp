@@ -88,13 +88,6 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 
     goal=unit->Orders[0].Goal;
 
-    if( !goal ) {			// Move checks for killed units.
-	// FIXME: perhaps we should choose an alternative
-	unit->Orders[0].Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-
     DebugCheck( !goal );
     DebugCheck( unit->Wait!=1 );
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
@@ -125,7 +118,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 	return 0;
     }
 
-    unit->Orders[0].Action=resource->Action;
+    DebugCheck( unit->Orders[0].Action!=resource->Action );
 
     //
     //	If resource is still under construction, wait!
@@ -219,6 +212,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	if( source->Value<DEFAULT_INCOMES[resource->Cost] ) {
 	    unit->Removed=0;		// BUG ALERT: Unit not dropped out!
 	    DropOutAll(source);
+	    unit->Removed=1;
 	    DestroyUnit(source);
 	    source=NULL;
 	}
@@ -312,13 +306,6 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 
     goal=unit->Orders[0].Goal;
 
-    if( !goal ) {			// Move checks for killed units.
-	// FIXME: perhaps we should choose an alternative
-	unit->SubAction=0;
-	unit->Orders[0].Action=UnitActionStill;
-	return 0;
-    }
-
     DebugCheck( !goal );
     DebugCheck( unit->Wait!=1 );
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
@@ -349,7 +336,15 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	return 0;
     }
 
-    unit->Orders[0].Action=resource->Action;
+    DebugCheck( unit->Orders[0].Action!=resource->Action );
+
+    //
+    //	If resource is still under construction, wait!
+    //
+    if( goal->Orders[0].Action==UnitActionBuilded ) {
+        DebugLevel2Fn("Invalid resource\n");
+	return 0;
+    }
 
     RefsDebugCheck( !goal->Refs );
     --goal->Refs;

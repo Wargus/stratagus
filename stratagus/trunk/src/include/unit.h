@@ -634,7 +634,7 @@ extern void UnitHeadingFromDeltaXY(Unit* unit,int x,int y);
 extern void DropOutOnSide(Unit* unit,int heading,int addx,int addy);
     /// FIXME: more docu
 extern void DropOutNearest(Unit* unit,int x,int y,int addx,int addy);
-    /// FIXME: more docu
+    /// Drop out all units in the unit.
 extern void DropOutAll(const Unit* unit);
 
     /// FIXME: more docu
