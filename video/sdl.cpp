@@ -196,12 +196,11 @@ global void InitVideoSdl(void)
 
 	// If debug is enabled, Stratagus disable SDL Parachute.
 	// So we need gracefully handle segfaults and aborts.
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(USE_WIN32)
 	signal(SIGSEGV, CleanExit);
 	signal(SIGABRT, CleanExit);
 #endif
 	// Set WindowManager Title
-
 	SDL_WM_SetCaption("Stratagus", "Stratagus");
     } else {
 	if (VideoBpp == 32 && VideoDepth == 24) {
