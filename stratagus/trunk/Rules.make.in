@@ -55,7 +55,7 @@ CFLAGS=@EXTRA_CFLAGS@ @PROFILE_CFLAGS@ @DEBUG_CFLAGS@ $(IFLAGS) \
     @OGG_CFLAGS@ @MAD_CFLAGS@ @FLAC_CFLAGS@ @CDAUDIO_CFLAGS@ \
     @MIKMOD_CFLAGS@ @LUA_CFLAGS@ $(CCL) \
     $(COMP_CFLAGS) @PLATFORM@ \
-    -I/usr/local/include
+    -I/usr/local/include -I/usr/X11R6/include
 
 CTAGSFLAGS=-i defptvS -a -f 
 
