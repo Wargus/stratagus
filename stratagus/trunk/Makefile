@@ -209,7 +209,8 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/health.png contrib/mana.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
-	  contrib/music/toccata.mod.gz
+	  contrib/music/toccata.mod.gz \
+	  contrib/msvc.zip
 
 MISC    = Makefile Common.mk Rules.make.orig FreeCraft-beos.proj setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
@@ -330,7 +331,7 @@ FCGP1=	../fcgp-*.tar.bz2
 FCSP1=	../fcsp-general-*.tar.bz2
 FCSP2=	../fcsp-mythical-*.tar.bz2
 FCSP3=	../fcsp-alliance-*.tar.bz2
-FCMP=	../fcmp-020312.tar.gz
+FCMP=	../fcmp-020409.tar.gz
 
 linux-complete:
 	mkdir freecraft-complete
