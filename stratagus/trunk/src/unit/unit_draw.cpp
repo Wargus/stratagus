@@ -78,6 +78,7 @@ local void DrawSelectionRectangle(Unit* unit,UnitType* type,int x,int y)
     //	Select color for the rectangle
     //
     if( unit->Selected || (unit->Blink&1) ) {
+#if 1
 	if( unit->Player->Player==PlayerNumNeutral ) {
 	    color=ColorYellow;
 	} else if( unit->Player==ThisPlayer ) {
@@ -85,6 +86,9 @@ local void DrawSelectionRectangle(Unit* unit,UnitType* type,int x,int y)
 	} else {
 	    color=ColorRed;
 	}
+#else
+	color=unit->Player->Color;
+#endif
     } else if( CursorBuilding && type->Building && unit->Player==ThisPlayer ) {
 	// If building mark all buildings
 	color=ColorGray;
@@ -92,12 +96,19 @@ local void DrawSelectionRectangle(Unit* unit,UnitType* type,int x,int y)
 	return;
     }
 
-#if 0
+#if 1
     VideoDrawRectangleClip(color
 	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
 	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
 	    ,type->BoxWidth
 	    ,type->BoxHeight);
+#if 0
+    VideoFill75TransRectangleClip(color
+	    ,x+1+(type->TileWidth*TileSizeX-type->BoxWidth)/2
+	    ,y+1+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+	    ,type->BoxWidth-2
+	    ,type->BoxHeight-2);
+#endif
 #else
     VideoFill25TransCircleClip(color
 	    ,x+type->TileWidth*TileSizeX/2
@@ -555,17 +566,15 @@ local void DrawBuilding(Unit* unit)
     }
 #endif
 
-#if 0
-    // Moved to init, FIXME: cade look if correct
-    n_frame = 0;
-    if ((frame & 128) == 0 && unit->Rs > 50) {
-	n_frame = 128; // fancy buildings
-    }
-#endif
-
     GraphicPlayerPixels(unit->Player,unit->Type->Sprite);
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
+
+#if 0
+#else
+    // FIXME: Johns: don't remember why I have draw this after the unit type.
+    DrawSelectionRectangle(unit,type,x,y);
+#endif
 
     //
     //	Buildings under construction/upgrade/ready.
@@ -585,11 +594,18 @@ local void DrawBuilding(Unit* unit)
 	DrawUnitType(type,frame,x,y);
     }
 
+#if 0
     // FIXME: johns: ugly check here should be removed!
     if( unit->Command.Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
 	DrawSelectionRectangle(unit,type,x,y);
     }
+#else
+    // FIXME: johns: ugly check here should be removed!
+    if( unit->Command.Action!=UnitActionDie ) {
+	DrawDecoration(unit,type,x,y);
+    }
+#endif
 }
 
 /**
@@ -690,6 +706,7 @@ global void DrawUnits(void)
 #ifdef NEW_UNIT
     for( i=0; i<NumUnits; ++i ) {
 	unit=Units[i];
+	// FIXME: this tries to draw all corps, ohje
 	if( unit->Type->Vanishes || unit->Command.Action==UnitActionDie ) {
 	    DrawUnit(unit);
 	}
