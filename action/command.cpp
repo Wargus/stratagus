@@ -144,6 +144,7 @@ static void RemoveOrder(Unit* unit, int order)
 		memset(unit->Orders + i, 0, sizeof(*unit->Orders));
 		unit->Orders[i].Action = UnitActionStill;
 		unit->Orders[i].X = unit->Orders[i].Y = -1;
+		unit->SubAction = 0;
 	}
 }
 
