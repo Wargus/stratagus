@@ -250,6 +250,7 @@ typedef struct _menus_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
+extern int GuiGameStarted;		/// Game Started?
 extern Menu *CurrentMenu;		/// Currently processed menu
 extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
 extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map

@@ -325,7 +325,7 @@ global _MenuFuncHash MenuFuncHash;
 extern char NameLine[];
 
 local int GameLoaded;
-local int GuiGameStarted;
+global int GuiGameStarted = 0;
 local int EditorCancelled;
 
 /**
@@ -4657,7 +4657,7 @@ local void StartEditor(void)
     }
 
     EditorRunning = 1;
-    MenuLoop(NULL, &TheMap);
+    EndMenu();
 }
 
 local void CancelEditorSelect(void)
@@ -4722,6 +4722,7 @@ local void EditorNewMap(void)
 
     *CurrentMapPath = '\0';
 
+    GuiGameStarted = 1;
     EndMenu();
 }
 
@@ -4845,9 +4846,7 @@ local void EditorMainLoadMap(void)
 	strcpy(CurrentMapPath, ScenSelectFileName);
     }
 
-    // FIXME: Use EditorRunning and main-loop.
-    EditorRunning=1;
-    EditorMainLoop();
+    GuiGameStarted = 1;
     EndMenu();
 }
 

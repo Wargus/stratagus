@@ -1022,14 +1022,16 @@ global void MenuLoop(char* filename, WorldMap* map)
 		PlayMusic(MenuMusic);
 	    }
 	    EnableRedraw=RedrawMenu;
-	    if( EditorRunning ) {
-		QuitToMenu = 0;
-		ProcessMenu("menu-editor-select", 1);
-		if (QuitToMenu)
-		    return;
-	    } else {
-		ProcessMenu("menu-program-start", 1);
+
+	    GuiGameStarted = 0;
+	    while (GuiGameStarted == 0) {
+		if( EditorRunning ) {
+		    ProcessMenu("menu-editor-select", 1);
+		} else {
+		    ProcessMenu("menu-program-start", 1);
+		}
 	    }
+
 	    EnableRedraw=RedrawEverything;
 	    DebugLevel0Fn("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 	    filename = CurrentMapPath;
