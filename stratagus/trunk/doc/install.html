@@ -2,7 +2,7 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2002 by Lutz Sammer, Alex.
+----	(c) Copyright 2002-2003 by Lutz Sammer, Alex.
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -13,10 +13,10 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <TITLE>INSTALL: The FreeCraft Version 1.18(pre)</TITLE>
+    <TITLE>INSTALL: The FreeCraft Version 1.18</TITLE>
 </HEAD>
 <BODY>
-    <H1>INSTALL: The FreeCraft Version 1.18(pre)</H1>
+    <H1>INSTALL: The FreeCraft Version 1.18</H1>
 <HR><PRE WIDTH=80>
      ___________		     _________		      _____  __
      \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
@@ -28,7 +28,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2002 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
 <A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
@@ -54,7 +54,7 @@ You need:
 	<LI>X Windows System with 8/15/16/24/32bit X Server.
 	    Remote displays aren't supported!
 	<LI>On Unix/BSD-like systems, you'll need bash for the setup script.
-	<LI>Win32 system: Win95, Win98, WinME, WinNT or Win2000.
+	<LI>Win32 system:
 	    <UL>
 	    <LI>For network play, Win95 OSR2 (aka Win95b) or higher is required,
 		since some features of Winsock2 (WS2_32.DLL) are used. We will try
@@ -65,12 +65,10 @@ You need:
 		otherwise FreeCraft won't start.
 	    <LI>WinNT needs to be WinNT4.0 + Service Pack 3 or higher, for the same
 		reasons.
-	    <LI>Please note that WinXP is <I>not</I> supported for various incompatibilities
-		and most likely will never be.
 	    </UL>
 	</UL>
-	<LI>libpng. (I use libpng-2.1, aka 1.0.12)
-	<LI>zlib. (Also needed for libpng, I use libz-1.1.4)
+	<LI>libpng.
+	<LI>zlib.
 	<LI>SIOD. (Included in the distribution)
 	<LI>The original game CD or expansion CD for manuals and maindat.war
 	    for graphics and sfxdat.sud for sounds.
@@ -159,15 +157,15 @@ Please follow the following instructions to get a working program.
 	</UL>
 	<LI>Now you could start with "./freecraft".
 	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in
-		<A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please mail it to
-	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please submit it to
+	    <A HREF="http://sourceforge.net/projects/freecraft">
+            The FreeCraft Project</A>.
 	<LI>ADVANCED: Type "make help" for more compile options.
 	<P>
 	<LI>If you get killed everytime by the computer, let the AI sleep with
-		the command line option "-s n" (sleep n frames) or set the build
-	costs and build times of the computer with -f 110 and -t 110 higher.
+            the command line option "-s n" (sleep n frames) or set the build
+            costs and build times of the computer with -f 110 and -t 110 higher.
 </UL>
 
     <H4>Unix or BSD binary</H4>
@@ -206,14 +204,14 @@ Please follow the following instructions to get a working program.
 	</UL>
     <LI>Now you could enter "./freecraft" to play.
 	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in
-		<A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please mail it to
-	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please submit it to
+	    <A HREF="http://sourceforge.net/projects/freecraft">
+            The FreeCraft Project</A>.
 	<P>
 	<LI>If you get killed everytime by the computer, let the ai sleep with
-		the command line option "-s n" (sleep n frames) or set the build
-	costs and build times of the computer with -f 110 and -t 110 higher.
+            the command line option "-s n" (sleep n frames) or set the build
+            costs and build times of the computer with -f 110 and -t 110 higher.
 </UL>
 
     <H3>Win32</H3>
@@ -226,8 +224,8 @@ Please follow the following instructions to get a working program. <br>
 shell that comes with it, you must type '/' instead of '\' in path names.
 <UL>
     <LI>If you do not have a gnu compiler (eg. mingw32) then download the
-    mingw-fc-native-'date'.zip or freecraft-compiler-'date'.zip archive from
-    <a href="http://sourceforge.net/project/showfiles.php?group_id=1965&release_id=46537">this page.</a>
+    freecraft-compiler-'date'.zip archive from
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=1965&release_id=128486">this page.</a>
     Unzip it into to the C:\ directory.
     <LI>Download freecraft-'date'.zip and unzip it into any directory.
     <LI>Install all required libraries. (If you downloaded mingw32 from the link
@@ -268,15 +266,15 @@ shell that comes with it, you must type '/' instead of '\' in path names.
     <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
 	or <A HREF="../stderr.txt">stderr.txt</A> for more information.
 	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in
-		<A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please mail it to
-	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please submit it to
+	    <A HREF="http://sourceforge.net/projects/freecraft">
+            The FreeCraft Project</A>.
 	<LI>ADVANCED: Type "make help" for more compile options.
 	<P>
 	<LI>If you get killed everytime by the computer, let the ai sleep with
-		the command line option "-s n" (sleep n frames) or set the build
-	costs and build times of the computer with -f 110 and -t 110 higher.
+            the command line option "-s n" (sleep n frames) or set the build
+            costs and build times of the computer with -f 110 and -t 110 higher.
 </UL>
 
     <H4>Win32 binary</H4>
@@ -313,14 +311,14 @@ Please follow the following instructions to get a working program.
     <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
 	or <A HREF="../stderr.txt">stderr.txt</A> for more information.
 	<LI>That's all, I hope you have enjoyed the game.
-	<LI>If you find any bug, look in
-		<A HREF="todo.html">todo.html</A>
-	    if it is already known, if not please mail it to
-	    <A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>.
+	<LI>If you find any bug, look in <A HREF="todo.html">todo.html</A>
+	    if it is already known, if not please submit it to
+	    <A HREF="http://sourceforge.net/projects/freecraft">
+            The FreeCraft Project</A>.
 	<P>
 	<LI>If you get killed everytime by the computer, let the ai sleep with
-		the command line option "-s n" (sleep n frames) or set the build
-	costs and build times of the computer with -f 110 and -t 110 higher.
+            the command line option "-s n" (sleep n frames) or set the build
+            costs and build times of the computer with -f 110 and -t 110 higher.
 </UL>
 
 
@@ -366,9 +364,9 @@ You can now start it on each computer with:
 <LI>The level is now loaded and the clients are started.
 </UL>
 
-Press ALT-'q' to quit the game. If you have won or loose the game exits.
+Press ALT-'q' to quit the game. If you have won or lost the game exits.
 
-<H3>Than you need the clients:</H3>
+<H3>Then you need the clients:</H3>
 
 
 After the server is running!
@@ -393,7 +391,7 @@ After the server is running!
 <LI>Wait now until all are ready and the server player presses "Start Game".
 </UL>
     
-Press ALT-'q' to quit the game. If you have won or loose the game exits.
+Press ALT-'q' to quit the game. If you have won or lost the game exits.
 
     <H2>Hints</H2>
 
@@ -490,5 +488,5 @@ Press ALT-'q' to quit the game. If you have won or loose the game exits.
 
 <HR>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+<ADDRESS><A HREF="http://freecraft.org">The FreeCraft Project</A>
 </ADDRESS></BODY></HTML>

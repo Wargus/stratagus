@@ -2,7 +2,7 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2001,2002 by Lutz Sammer
+----	(c) Copyright 2001-2003 by Lutz Sammer
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2002 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
 <A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
@@ -147,13 +147,13 @@
 </UL>
 
 If you want to help, please join the FreeCraft mailing list and check
-if not already somebody is working on your project. Than tell what you
-want to make.
+if somebody is already working on your project. Then tell us what you
+want to work on.
 
     <H2><A NAME="documentation">Documentation</A></H2>
 
     Look into the original game documentation for playing instructions.
-    Look into the sources for more informations.
+    Look into the sources for more information.
 
 <H3><A NAME="commandline">Command line options</A></H3>
 
@@ -171,7 +171,7 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
 	Change the FreeCraft library path to <VAR>"path"</VAR> instead of the
 	default "./data" or "/usr/share/games/freecraft/default".
     <LI>-e<BR>
-	Start the editor direct.
+	Start the editor directly.
     <LI>-f factor<BR>
 	Adjust the build costs of units for the computer players by factor.
     <LI>-h<BR>
@@ -325,7 +325,7 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     Select all units of the previous group.
 <LI>Double click with left mouse button<BR>
     Select all units of the same unit-type.
-<LI>Click & Hold with left mouse button<BR>
+<LI>Click &amp; Hold with left mouse button<BR>
     Not supported.
 <HR>
 <LI>CTRL Single click with right mouse button on unit<BR>
@@ -342,8 +342,15 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     Not supported.
 <LI>Double click with right mouse button<BR>
     Not supported.
-<LI>Click & Hold with right mouse button<BR>
+<LI>Click &amp; Hold with right mouse button<BR>
     Not supported.
+</UL>
+
+<H4>Clicking on buttons</H4>
+
+<UL>
+<LI>CTRL single click with left mouse button<BR>
+    Enable or disable automatic spell casting.
 </UL>
 
     <H2><A NAME="ccl">CCL: FreeCraft Configuration Language</A></H2>
@@ -354,320 +361,11 @@ freecraft [OPTIONS] [map.pud|map.pud.gz]
     .<P> You can also enter CCL commands at the message prompt. Each
     line starting with "(" is taken as CCL command.
 
-<H3>New documentation</H3>
+<H3>Documentation</H3>
 
-<A HREF="ccl/ccl.html"> Here I have started a new documentation. </A> <P>
+<A HREF="ccl/ccl.html">I have started new documentation here. </A> <P>
 
 Please help me writing it.
-
-<H3>Files</H3>
-
-<UL>
-<LI><VAR>librarypath</VAR>/ccl/freecraft.ccl is loaded before any initialization.
-Contains general configuration.
-<LI><VAR>librarypath</VAR>/ccl/missile.ccl is loaded from freecraft.ccl.
-Contains missile configuration.
-<LI><VAR></VAR>/ccl/sound.ccl is loaded from freecraft.ccl.
-Contains sound configuration.
-<LI><VAR>librarypath</VAR>/ccl/tilesets.ccl is loaded from freecraft.ccl.
-Contains tileset configuration.
-<LI><VAR>librarypath</VAR>/ccl/units.ccl is loaded from freecraft.ccl.
-Contains units configuration.
-</UL>
-
-<H3>Functions</H3>
-
-Without any order:
-
-<H2>Map CCL functions/variables</H2>
-
-<DL>
-<DT><VAR>reveal-map</VAR>
-<DD>Reveal the complete map.
-
-<DT><VAR>set-fog-of-war!</VAR><BR>
-<DD>Enable (set-fog-of-war! #t) or disable (set-fog-of-war! #f) the fog of war.
-
-<DT><VAR>set-minimap-terrain!</VAR><BR>
-<DD>Enable or disable display of terrain in the minimap window.
-
-<DT><VAR>original-fog-of-war</VAR>
-<DD>Enable original like fog of war style.
-
-<DT><VAR>gray-fog-of-war</VAR>
-<DD>Enable gray fog of war style.
-
-<DT><VAR>set-fog-of-war-contrast! contrast</VAR>
-<DD>Set the gray style fog of war contrast.
-    Contrast could be from 0 to OO.
-    A contrast of 100 didn't change anything.
-
-<DT><VAR>set-fog-of-war-brightness! brightness</VAR>
-<DD>Set the gray style fog of war brightness.
-    Brightness could be from -100 to 100.
-    A brightness of 0 didn't change anything.
-
-<DT><VAR>set-fog-of-war-saturation! saturation</VAR>
-<DD>Set the gray style fog of war saturation.
-    Saturation could be from -100 to 200.
-    A saturation of 100 didn't change anything.
-
-</DL>
-
-<H2>Unsorted CCL functions/variables</H2>
-
-<UL>
-<LI><VAR>show-health-bar</VAR><BR>
-    Show the health as bar on the map.<P>
-
-<LI><VAR>show-health-dot</VAR><BR>
-    Show the health as dot on the map.<P>
-
-<LI><VAR>show-mana-bar</VAR><BR>
-    Show the mana as bar on the map.<P>
-
-<LI><VAR>show-mana-dot</VAR><BR>
-    Show the mana as dot on the map.<P>
-
-<LI><VAR>show-full</VAR><BR>
-    Show full health or mana on the map.<P>
-
-<LI><VAR>show-no-full</VAR><BR>
-    Show no full health or mana on the map.<P>
-
-<LI><VAR>set-show-sight-range!</VAR><BR>
-    Show the sight range of the selected unit on map.<P>
-
-<LI><VAR>set-show-reaction-range!</VAR><BR>
-    Show the reaction range of the selected unit on map.<P>
-
-<LI><VAR>set-show-attack-range!</VAR><BR>
-    Show the attack range of the selected unit on map.<P>
-
-<LI><VAR>speed-mine</VAR><BR>
-    Decrease the mining time by this factor.
-
-<LI><VAR>speed-gold</VAR><BR>
-    Decrease the time in a gold deposit by this factor.
-
-<LI><VAR>speed-chop</VAR><BR>
-    Decrease the time for chopping a tree by this factor.
-
-<LI><VAR>speed-wood</VAR><BR>
-    Decrease the time in a wood deposit by this factor.
-
-<LI><VAR>speed-haul</VAR><BR>
-    Decrease the time for haul oil by this factor.
-
-<LI><VAR>speed-oil</VAR><BR>
-    Decrease the time in an oil deposit by this factor.
-
-<LI><VAR>speed-build</VAR><BR>
-    Decrease the time to build a unit by this factor.
-
-<LI><VAR>speed-train</VAR><BR>
-    Decrease the time to train a unit by this factor.
-
-<LI><VAR>speed-upgrade</VAR><BR>
-    Decrease the time to upgrade a unit by this factor.
-
-<LI><VAR>speed-research</VAR><BR>
-    Decrease the time to research by this factor.
-
-<LI><VAR>speeds</VAR><BR>
-    Decrease the time off all by this factor.
-
-<LI><VAR>define-unit-type</VAR><BR>
-    <A HREF="ccl/unittype.html">unittype.html</A>
-
-<LI><VAR>print-unit-type-table</VAR><BR>
-    <A HREF="ccl/unittype.html">unittype.html</A>
-
-<LI><VAR>unit-type</VAR><BR>
-    Get the pointer to the unit type structure.<P>
-    (unit-type ident)
-    <DL>
-    <DT>ident</DT>
-    <DD>The unit-type unique identifier.</DD>
-    </DL>
-    <P>
-    <H4>Example:</H4>
-    (unit-type "unit-peon")<P>
-    Get the unit type structure of the peon. #<UnitType 0x80ac350 unit-peon><P>
-
-<LI><VAR>unit-type-array</VAR><BR>
-    Get an array of all currently defined unit type structures.<P>
-    (unit-type-array)
-    <P>
-
-<LI><VAR>get-unit-type-ident</VAR><BR>
-    Get the unique identifier of the unit type structure.<P>
-    (get-unit-type-ident type)
-    <DL>
-    <DT>type</DT>
-    <DD>Unit type pointer</DD>
-    </DL>
-    <P>
-    <H4>Example:</H4>
-    (get-unit-type-ident (unit-type "unit-peon"))<P>
-    Get the identifier of the unit type peon.<P>
-
-<LI><VAR>define-map</VAR><BR>
-    Define the size of a new map.<P>
-    (define-map width height)
-    <UL>
-    <LI>width<BR>
-	The width of the new map.
-    <LI>height<BR>
-	The height of the new map.
-    </UL>
-
-    <H4>Example:</H4>
-	(define-map 256 256)
-	Define a new map of the size 256 x 256.<P>
-
-<LI><VAR>load-pud</VAR><BR>
-    Load a map in pud format.<P>
-    (load-pud name)
-    <UL>
-    <LI>name<BR>
-	The file name.
-    </UL>
-
-    <H4>Example:</H4>
-	(load-pud "data/default.pud.gz")
-	Load "default.pud.gz".<P>
-
-<LI><VAR>freecraft-map</VAR><BR>
-    Define a map in FreeCraft own format.<P>
-    (freecraft-map ...)
-
-    <P>FIXME: Must write docu<P>
-
-<LI><VAR>set-key-scroll!</VAR><BR>
-    Set the speed of keyboard scrolling. <P>
-    (set-key-scroll! speed)
-    <UL>
-    <LI>speed<BR>
-	Number frames to wait between scrolls.
-    </UL>
-
-    <H4>Example:</H4>
-	(set-key-scroll! 1)
-	Sets keyboard scrolling speed to fastest.<P>
-
-<LI><VAR>set-mouse-scroll!</VAR><BR>
-    Set the speed of mouse scrolling. <P>
-    (set-mouse-scroll! speed)
-    <UL>
-    <LI>speed<BR>
-	Number frames to wait between scrolls.
-    </UL>
-
-    <H4>Example:</H4>
-	(set-mouse-scroll! 10)
-	Sets mouse scrolling speed to pretty slow ( 3 times / second.)<P>
-
-
-<LI>Sound part
-<UL>
-
-<LI><VAR>sound-thread</VAR><BR>
-    Tells FreeCraft engine to use a threaded sound server. MUST be used in the
-    sound.ccl file, BEFORE the game fully starts. As no effect during the
-    game. 
-
-<LI><VAR>set-sound-volume!</VAR><BR>
-    Set global volume.<P>
-    (set-sound-volume! volume)<P>
-    <UL>
-    <LI>volume<BR>
-	The volume from 0 (min=quiet) to 255 (max).
-    </UL>
-    <H4>Example:</H4>
-	(set-sound-volume! 128)<p>
-	Set volume to 1/2.
-
-<LI><VAR>sound-off</VAR><BR>
-    Turn sound off. Can be later turned on by sound-on.
-
-<LI><VAR>sound-on</VAR><BR>
-    Turn sound on.
-
-<LI><VAR>sound-for-name</VAR><BR>
-    Return a SIOD sound id to be used in other functions.<P>
-    (sound-for-name name)<p>
-    <UL>
-    <LI>name<BR>
-	The name of the sound (a string). 
-    </UL>
-    <H4>Example:</H4>
-	(sound-for-name "tree chopping")<p>
-	Returns the sound id of the tree chopping sound.
-
-
-<LI><VAR>set-global-sound-range!</VAR><BR>
-    Set the cut off distance.<P>
-    (set-global-sound-range! distance)<p>
-    <UL>
-    <LI>distance<BR>
-	The maximum range of a sound in tiles.
-    </UL>
-    <H4>Example:</H4>
-	(set-global-sound-range! 64)<p>
-	Set the maximal sound range to 64 tiles. Sound events happening more
-	than 64 tiles away from the viewpoint won't be eared.
-
-<LI><VAR>set-sound-range!</VAR><BR>
-    Set the cut off distance for a given sound.<P>
-    (set-sound-range! sound ratio)<p>
-    <UL>
-    <LI>sound<BR>
-    The sound either described by its name (a string) or by its SIOD sound
-    id. 
-    <LI>ratio<BR>
-    This value (between 0 and 255) allows to compute the range of the
-    sound. 255 means an infinite range. Any number strictly below 255 is a
-    coefficient that will be applied to the cut off distance: the cut off
-    distance for this sound is ratio/254*cut off distance.
-    </UL>
-    <H4>Example:</H4>
-	(set-sound-range! "tree chopping" 50)<p>
-	Set the sound range for "tree chopping" to 50/254 times the cut off
-	distance. 
-
-
-<LI><VAR>define-game-sounds</VAR><BR>
-    Allows to define what sounds are going to be used for some game level
-    events (such as the click sound).
-
-    <P>FIXME: Must write docu<P>
-
-<LI><VAR>display-sounds</VAR><BR>
-    Test function. Dump on stdio all the client side mappings between sound
-    names and sound ids.
-
-<LI><VAR>map-sound</VAR><BR>
-    Defines a new mapping between a sound name (a string) and a sound id.
-
-    <P>FIXME: Must write docu<P>
-
-<LI><VAR>make-sound</VAR><BR>
-   Ask the sound server to register a new sound. Ask the sound client to store
-   the mapping between the obtained sound id and the given sound name.
-
-    <P>FIXME: Must write docu<P>
-
-<LI><VAR>play-sound</VAR><BR>
-   Ask the sound server to play a sound.
-
-    <P>FIXME: Must write docu<P>
-</UL>
-
-<UL>
-</UL>
-
-</UL>
 
     <H2><A NAME="internal">Internal Formats</A></H2>
 
@@ -772,7 +470,7 @@ Without any order:
 
     <DL>
     <DT>cross.png, health.png, mana.png.
-    <DD>(c) Copyright 1998-2002 by Johns.
+    <DD>(c) Copyright 1998-2003 by Johns.
     <DT>food.png
     <DD>Food resource icon (c) Copyright 2000 by the Guardian.
     <DT>score.png
@@ -887,5 +585,5 @@ Without any order:
 
 <HR>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+<ADDRESS><A HREF="http://freecraft.org">The FreeCraft Project</A>
 </ADDRESS></BODY></HTML>
