@@ -10,7 +10,8 @@
 //
 /**@name map_fog.c	-	The map fog of war handling. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer and Vladi Shabanski
+//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Shabanski and
+//					Russell Smith
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -626,6 +627,7 @@ global void UpdateFogOfWarChange(void)
 		    TheMap.Visible[0][(x+y*w)/32] |= 1<<((x+y*w)%32);
 #endif
 		    MapMarkSeenTile( x,y );
+		    UnitsMarkSeen( x,y );
 		}
 	    }
 	}
