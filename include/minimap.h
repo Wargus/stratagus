@@ -10,7 +10,7 @@
 //
 /**@name minimap.h	-	The minimap headerfile. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//	(c) Copyright 1998,2000-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -55,6 +55,8 @@ extern int MinimapShowSelected;		/// highlight selected units
 
     /// Update tile change in minimap
 extern void UpdateMinimapXY(int tx,int ty);
+    /// Update minimap terrain
+extern void UpdateMinimapTerrain(void);
     /// Update complete minimap
 extern void UpdateMinimap(void);
     /// Create new minimap

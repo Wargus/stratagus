@@ -5829,7 +5829,7 @@ local void EditorMapPropertiesOk(void)
 	LoadConstructions();
 	LoadUnitTypes();
 	LoadIcons();
-	UpdateMinimap();
+	UpdateMinimapTerrain();
     }
 
     // FIXME: Save the pud version somewhere
