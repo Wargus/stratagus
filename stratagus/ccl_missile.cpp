@@ -162,8 +162,12 @@ local SCM CclDefineMissileType(SCM list)
 		// FIXME: this leaves a half initialized missile-type
 		errl("Unsupported class",value);
 	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("sleep")) ) {
+	    type->Sleep=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
 	    type->Speed=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("range")) ) {
+	    type->Range=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("impact-missile")) ) {
 	    CclFree(type->ImpactName);
 	    type->ImpactName=gh_scm2newstr(gh_car(list),NULL);
