@@ -216,6 +216,8 @@ global int PlayMusic(const char* name)
 
 	name = LibraryFileName(name, buffer);
 
+	DebugPrint("attempting to play %s\n" _C_ name);
+
 	if ((sample = LoadWav(name, PlayAudioStream))) {
 		StopMusic();
 		MusicSample = sample;
@@ -275,6 +277,8 @@ global int PlayMusic(const char* name)
 		return 1;
 	}
 #endif
+	DebugPrint("could not play %s\n" _C_ name);
+
 	return 0;
 }
 
