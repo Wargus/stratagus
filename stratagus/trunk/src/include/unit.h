@@ -139,9 +139,9 @@
 **
 **	Unit::Visible
 **
-**		Currently unused. Planned for submarines. If Visible is
-**		non-zero, the unit could be seen on the map. Perhaps this should
-**		become a bit field for all players.
+**		Used for submarines. It is a bit field for all players. If
+**		Unit::Visible&(1<<player-nr) is non-zero, the unit could be
+**		seen on the map.
 **
 **	Unit::Destroyed
 **
@@ -425,10 +425,11 @@ struct _unit_ {
     unsigned	Attacked : 4;		/// unit is attacked
 
     unsigned	Burning : 1;		/// unit is burning
-    unsigned	Visible : 1;		/// unit is visible (submarine)
     unsigned	Destroyed : 1;		/// unit is destroyed pending reference
     unsigned	Removed : 1;		/// unit is removed (not on map)
     unsigned	Selected : 1;		/// unit is selected
+
+    unsigned	Visible : 16;		/// unit is visible (submarine)
     unsigned	Constructed : 1;	/// unit is in construction
     unsigned	Active : 1;		/// unit is active for AI
 
@@ -607,7 +608,7 @@ extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
     /// Mark submarine as seen.
-extern void MarkSubmarineSeen(int x,int y,int range);
+extern void MarkSubmarineSeen(const Player* player,int x,int y,int range);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if unit is known on the map
