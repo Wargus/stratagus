@@ -311,6 +311,11 @@ void InitUnit(Unit* unit, UnitType* type)
 			(type->Building ? 0 : type->NumDirections / 2 + 1 - 1);
 	}
 
+	if (UnitTypeVar.NumberVariable) {
+		unit->Variable = malloc(UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+		memcpy(unit->Variable, unit->Type->Variable, UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+	}
+
 	if (!type->Building && type->Sprite &&
 			VideoGraphicFrames(type->Sprite) > 5) {
 		unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
@@ -446,7 +451,7 @@ Unit* MakeUnit(UnitType* type, Player* player)
 static void MapMarkUnitSightRec(Unit* unit, int x, int y, int width, int height,
 	MapMarkerFunc* f, MapMarkerFunc* f2)
 {
-	Unit* unit_inside; // iterator on units inside unit. 
+	Unit* unit_inside; // iterator on units inside unit.
 	int i;             // number of units inside to process.
 
 	Assert(unit);
@@ -534,7 +539,7 @@ void MapUnmarkUnitSight(Unit* unit)
 */
 static void UpdateUnitSightRange(Unit* unit)
 {
-	Unit* unit_inside; // iterator on units inside unit. 
+	Unit* unit_inside; // iterator on units inside unit.
 	int i;             // number of units inside to process.
 
 #if 0 // which is the better ? caller check ?
@@ -689,7 +694,7 @@ static void RemoveUnitFromContainer(Unit* unit)
 */
 static void UnitInXY(Unit* unit, int x, int y)
 {
-	Unit* unit_inside;      // iterator on units inside unit. 
+	Unit* unit_inside;      // iterator on units inside unit.
 	int i;                  // number of units inside to process.
 
 	Assert(unit);
@@ -3220,7 +3225,7 @@ int CanTarget(const UnitType* source, const UnitType* dest)
 {
 	int i;
 
-	for (i = 0; i < NumberBoolFlag; ++i) {
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
 		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
 			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
 				return 0;
@@ -3265,7 +3270,7 @@ int CanTransport(const Unit* transporter, const Unit* unit)
 			unit->Type->UnitType != UnitTypeLand) {
 		return 0;
 	}
-	for (i = 0; i < NumberBoolFlag; i++) {
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
 		if (transporter->Type->CanTransport[i] != CONDITION_TRUE) {
 			if ((transporter->Type->CanTransport[i] == CONDITION_ONLY) ^
 					unit->Type->BoolFlag[i]) {
@@ -3524,6 +3529,12 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"invisible\", %d, ", unit->Invisible);
 	CLprintf(file, "\"flame-shield\", %d, ", unit->FlameShield);
 	CLprintf(file, "\"unholy-armor\", %d,\n  ", unit->UnholyArmor);
+
+	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+			CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+				UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
+				unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
+	}
 
 	CLprintf(file, "\"group-id\", %d,\n  ", unit->GroupId);
 	CLprintf(file, "\"last-group\", %d,\n  ", unit->LastGroup);
@@ -3785,6 +3796,7 @@ void CleanUnits(void)
 	//
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		free((*table)->AutoCastSpell);
+		free((*table)->Variable);
 		free(*table);
 		*table = NULL;
 	}
@@ -3796,7 +3808,6 @@ void CleanUnits(void)
 		ReleasedHead = unit->Next;
 		free(unit);
 	}
-
 	InitUnitsMemory();
 
 	XpDamage = 0;
