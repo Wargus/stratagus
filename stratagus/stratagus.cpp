@@ -309,7 +309,7 @@ global int SyncRand(void)
 }
 
 /*----------------------------------------------------------------------------
---		Utility
+--  Utility
 ----------------------------------------------------------------------------*/
 
 /**
@@ -756,7 +756,7 @@ This software is provided as-is.  The author(s) can not be held liable for any\
 Use it at your own risk.\n\n");
 
 	//
-	//		Hardware drivers setup
+	//  Hardware drivers setup
 	//
 
 	// Setup video display
@@ -776,7 +776,7 @@ Use it at your own risk.\n\n");
 	InitMovie();
 
 	//
-	//		Show title screen.
+	//  Show title screen.
 	//
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
@@ -901,6 +901,8 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 */
 global int main(int argc, char** argv)
 {
+	char* p;
+
 	CompileOptions =
 #ifdef USE_THREAD
 		"THREAD "
@@ -995,6 +997,11 @@ global int main(int argc, char** argv)
 				continue;
 			case 'd':
 				StratagusLibPath = optarg;
+				for (p = StratagusLibPath; *p; ++p) {
+					if (*p == '\\') {
+						*p = '/';
+					}
+				}
 				continue;
 			case 'e':
 				EditorRunning = 2;
@@ -1102,6 +1109,11 @@ global int main(int argc, char** argv)
 
 	if (argc - optind) {
 		MapName = argv[optind];
+		for (p = MapName; *p; ++p) {
+			if (*p == '\\') {
+				*p = '/';
+			}
+		}
 		--argc;
 	}
 
