@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ccl.c		-	The craft configuration language. */
 //
 //	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 #include "iocompat.h"
 
@@ -96,17 +96,17 @@ global void CclGcProtect(SCM obj)
 ............................................................................*/
 
 /**
-**	Return the freecraft library path.
+**	Return the stratagus library path.
 **
 **	@return		Current libray path.
 */
-local SCM CclFreeCraftLibraryPath(void)
+local SCM CclStratagusLibraryPath(void)
 {
-    return gh_str02scm(FreeCraftLibPath);
+    return gh_str02scm(StratagusLibPath);
 }
 
 /**
-**	Return the freecraft game-cycle
+**	Return the stratagus game-cycle
 **
 **	@return		Current game cycle.
 */
@@ -141,7 +141,7 @@ local SCM CclSetGameName(SCM gamename)
 }
 										    
 /**
-**	Set the freecraft game-cycle
+**	Set the stratagus game-cycle
 */
 local SCM CclSetGameCycle(SCM cycle)
 {
@@ -508,9 +508,9 @@ local SCM CclWithSound(void)
 }
 
 /**
-**	Get FreeCraft home path.
+**	Get Stratagus home path.
 */
-local SCM CclGetFreeCraftHomePath(void)
+local SCM CclGetStratagusHomePath(void)
 {
     const char* cp;
     char* buf;
@@ -527,9 +527,9 @@ local SCM CclGetFreeCraftHomePath(void)
 }
 
 /**
-**	Get FreeCraft library path.
+**	Get Stratagus library path.
 */
-local SCM CclGetFreeCraftLibraryPath(void)
+local SCM CclGetStratagusLibraryPath(void)
 {
     return gh_str02scm(STRATAGUS_LIB_PATH);
 }
@@ -640,16 +640,16 @@ global void InitCcl(void)
     char* sargv[5];
     char* buf;
 
-    sargv[0] = "FreeCraft";
+    sargv[0] = "Stratagus";
     sargv[1] = "-v1";
     sargv[2] = "-g0";
     sargv[3] = "-h400000:20";
-    buf=malloc(strlen(FreeCraftLibPath)+4);
-    sprintf(buf,"-l%s",FreeCraftLibPath);
+    buf=malloc(strlen(StratagusLibPath)+4);
+    sprintf(buf,"-l%s",StratagusLibPath);
     sargv[4] = buf;			// never freed
     siod_init(5,sargv);
 
-    gh_new_procedure0_0("library-path",CclFreeCraftLibraryPath);
+    gh_new_procedure0_0("library-path",CclStratagusLibraryPath);
     gh_new_procedure0_0("game-cycle",CclGameCycle);
     gh_new_procedure1_0("set-game-name!",CclSetGameName);
     gh_new_procedure1_0("set-game-cycle!",CclSetGameCycle);
@@ -709,81 +709,81 @@ global void InitCcl(void)
     gh_new_procedure0_0("units",CclUnits);
 
     gh_new_procedure0_0("with-sound",CclWithSound);
-    gh_new_procedure0_0("get-freecraft-home-path",CclGetFreeCraftHomePath);
-    gh_new_procedure0_0("get-freecraft-library-path"
-	    ,CclGetFreeCraftLibraryPath);
+    gh_new_procedure0_0("get-stratagus-home-path",CclGetStratagusHomePath);
+    gh_new_procedure0_0("get-stratagus-library-path"
+	    ,CclGetStratagusLibraryPath);
 
     //
     //	Make some sombols for the compile options/features.
     //
 #ifdef USE_THREAD
-    gh_define("freecraft-feature-thread",SCM_BOOL_T);
+    gh_define("stratagus-feature-thread",SCM_BOOL_T);
 #endif
 #ifdef DEBUG
-    gh_define("freecraft-feature-debug",SCM_BOOL_T);
+    gh_define("stratagus-feature-debug",SCM_BOOL_T);
 #endif
 #ifdef DEBUG_FLAGS
-    gh_define("freecraft-feature-debug-flags",SCM_BOOL_T);
+    gh_define("stratagus-feature-debug-flags",SCM_BOOL_T);
 #endif
 #ifdef USE_ZLIB
-    gh_define("freecraft-feature-zlib",SCM_BOOL_T);
+    gh_define("stratagus-feature-zlib",SCM_BOOL_T);
 #endif
 #ifdef USE_BZ2LIB
-    gh_define("freecraft-feature-bz2lib",SCM_BOOL_T);
+    gh_define("stratagus-feature-bz2lib",SCM_BOOL_T);
 #endif
 #ifdef USE_ZZIPLIB
-    gh_define("freecraft-feature-zziplib",SCM_BOOL_T);
+    gh_define("stratagus-feature-zziplib",SCM_BOOL_T);
 #endif
 #ifdef USE_SDL
-    gh_define("freecraft-feature-sdl",SCM_BOOL_T);
+    gh_define("stratagus-feature-sdl",SCM_BOOL_T);
 #endif
 #ifdef USE_SDLA
-    gh_define("freecraft-feature-sdl-audio",SCM_BOOL_T);
+    gh_define("stratagus-feature-sdl-audio",SCM_BOOL_T);
 #endif
 #ifdef USE_SDLCD
-    gh_define("freecraft-feature-sdl-cd",SCM_BOOL_T);
+    gh_define("stratagus-feature-sdl-cd",SCM_BOOL_T);
 #endif
 #ifdef USE_X11
-    gh_define("freecraft-feature-x11",SCM_BOOL_T);
+    gh_define("stratagus-feature-x11",SCM_BOOL_T);
 #endif
 #ifdef USE_SVGALIB
-    gh_define("freecraft-feature-svgalib",SCM_BOOL_T);
+    gh_define("stratagus-feature-svgalib",SCM_BOOL_T);
 #endif
 #ifdef WITH_SOUND
-    gh_define("freecraft-feature-with-sound",SCM_BOOL_T);
+    gh_define("stratagus-feature-with-sound",SCM_BOOL_T);
 #endif
 #ifdef UNIT_ON_MAP
-    gh_define("freecraft-feature-unit-on-map",SCM_BOOL_T);
+    gh_define("stratagus-feature-unit-on-map",SCM_BOOL_T);
 #endif
 #ifdef UNITS_ON_MAP
-    gh_define("freecraft-feature-units-on-map",SCM_BOOL_T);
+    gh_define("stratagus-feature-units-on-map",SCM_BOOL_T);
 #endif
 #ifdef NEW_MAPDRAW
-    gh_define("freecraft-feature-new-mapdraw",SCM_BOOL_T);
+    gh_define("stratagus-feature-new-mapdraw",SCM_BOOL_T);
 #endif
 #ifdef HIERARCHIC_PATHFINDER
-    gh_define("freecraft-feature-hierarchic-pathfinder",SCM_BOOL_T);
+    gh_define("stratagus-feature-hierarchic-pathfinder",SCM_BOOL_T);
 #endif
 #ifdef NEW_AI
-    gh_define("freecraft-feature-new-ai",SCM_BOOL_T);
+    gh_define("stratagus-feature-new-ai",SCM_BOOL_T);
 #endif
 #ifdef NEW_SHIPS
-    gh_define("freecraft-feature-new-ships",SCM_BOOL_T);
+    gh_define("stratagus-feature-new-ships",SCM_BOOL_T);
 #endif
 #ifdef SLOW_INPUT
-    gh_define("freecraft-feature-slow-input",SCM_BOOL_T);
+    gh_define("stratagus-feature-slow-input",SCM_BOOL_T);
 #endif
 #ifdef USE_FLAC
-    gh_define("freecraft-feature-flac",SCM_BOOL_T);
+    gh_define("stratagus-feature-flac",SCM_BOOL_T);
 #endif
 #ifdef USE_OGG
-    gh_define("freecraft-feature-ogg",SCM_BOOL_T);
+    gh_define("stratagus-feature-ogg",SCM_BOOL_T);
 #endif
 #ifdef USE_MAD
-    gh_define("freecraft-feature-mp3",SCM_BOOL_T);
+    gh_define("stratagus-feature-mp3",SCM_BOOL_T);
 #endif
 #ifdef USE_LIBCDA
-    gh_define("freecraft-feature-libcda",SCM_BOOL_T);
+    gh_define("stratagus-feature-libcda",SCM_BOOL_T);
 #endif
 
     gh_define("*ccl-protect*",NIL);
@@ -843,7 +843,7 @@ global void SavePreferences(void)
 
     //
     //	    preferences1.ccl
-    //	    This file is loaded before freecraft.ccl
+    //	    This file is loaded before stratagus.ccl
     //
 
 #ifdef USE_WIN32
@@ -869,7 +869,7 @@ global void SavePreferences(void)
 
     //
     //	    preferences2.ccl
-    //	    This file is loaded after freecraft.ccl
+    //	    This file is loaded after stratagus.ccl
     //
 
 #ifdef USE_WIN32
@@ -956,7 +956,7 @@ global void SavePreferences(void)
 }
 
 /**
-**	Load freecraft config file.
+**	Load stratagus config file.
 */
 global void LoadCcl(void)
 {

@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name master.c	-	The master server. */
 //
 //	(c) Copyright 2003 by Tom Zickel and Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -39,7 +39,7 @@
 #include <fcntl.h>
 #endif
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 #include "iocompat.h"
 
@@ -126,7 +126,7 @@ local int MasterSend(const void *buf, int len)
 */
 global void MasterSendAnnounce(void)
 {
-    char *heartbeat = "\xFF\xFF\xFF\xFFheartbeat FreeCraft\x0A";
+    char *heartbeat = "\xFF\xFF\xFF\xFFheartbeat Stratagus\x0A";
 
     MasterSend(heartbeat, strlen(heartbeat));
 }
@@ -163,7 +163,7 @@ local void MasterSendInfo(void)
     numplayers += mapmaxplayers - NetPlayers;
 
     sprintf(sendinfo, "\xFF\xFF\xFF\xFFinfoResponse\x0A\\protocol\\%d:%d\\gamehost\\%s\\clients\\%d\\sv_maxclients\\%d\\gamename\\%s\\challenge\\%s", 
-	    FreeCraftVersion, NetworkProtocolVersion, LocalPlayerName, numplayers, 
+	    StratagusVersion, NetworkProtocolVersion, LocalPlayerName, numplayers, 
 	    mapmaxplayers, MenuMapInfo->Description, challenge);
     MasterSend(sendinfo, strlen(sendinfo));
 }

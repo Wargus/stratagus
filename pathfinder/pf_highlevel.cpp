@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "unit.h"
 #include "map.h"
 #if defined(DEBUG) && defined(TIMEIT)

@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name clone.c	-	The main file. */
 //
 //	(c) Copyright 1998-2003 by Lutz Sammer
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -30,7 +30,7 @@
 **
 **	@section Introduction Introduction
 **
-**	Welcome to the source code documentation of the FreeCraft engine.
+**	Welcome to the source code documentation of the Stratagus engine.
 **	For an open source project it is very important to have a good
 **	source code documentation, I have tried to do this with the help
 **	of doxygen (http://www.doxygen.org) or doc++
@@ -44,12 +44,12 @@
 **
 **	@section Informations Informations
 **
-**	Visit the http://FreeCraft.Org web page for the latest news and
+**	Visit the http://Stratagus.Org web page for the latest news and
 **	../doc/readme.html for other documentations.
 **
 **	@section Modules Modules
 **
-**	This are the main modules of the FreeCraft engine.
+**	This are the main modules of the Stratagus engine.
 **
 **	@subsection Map Map
 **
@@ -135,7 +135,7 @@
 **	@subsection CCL CCL
 **
 **		CCL is Craft Configuration Language, which is used to
-**		configure and customize FreeCraft.
+**		configure and customize Stratagus.
 **
 **		@see ccl.h @see ccl.c
 **
@@ -202,7 +202,7 @@ extern char *optarg;
 extern int getopt(int argc, char *const*argv, const char *opt);
 #endif
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "video.h"
 #include "font.h"
 #include "cursor.h"
@@ -236,12 +236,12 @@ global char* MenuBackground;		/// File for menu background
 global char* MenuBackgroundWithTitle;	/// File for menu with title
 global char* TitleMusic;		/// File for title music
 global char* MenuMusic;			/// File for menu music
-global char* FreeCraftLibPath;		/// Path for data directory
+global char* StratagusLibPath;		/// Path for data directory
 global char LocalPlayerName[16];	/// Name of local player
 
     /// Name, Version, Copyright
 global char NameLine[] =
-    "FreeCraft V" VERSION ", (c) 1998-2003 by The FreeCraft Project.";
+    "Stratagus V" VERSION ", (c) 1998-2003 by The Stratagus Project.";
 
 local char* MapName;			/// Filename of the map to load
 
@@ -517,7 +517,7 @@ local void VideoEffect0(int frame, const EventCallback* callbacks)
     //	Inititialize
     //
     if( !Logo ) {
-	Logo=LoadSprite("freecraft.png",628,141);
+	Logo=LoadSprite("stratagus.png",628,141);
     }
     VideoLockScreen();
 
@@ -859,35 +859,35 @@ local void DebugDrawFonts(void)
     SetClipping(0,0,VideoWidth-1,VideoHeight-1);
 
     VideoFillRectangle(ColorWhite,0,0,40,VideoHeight-1);
-    VideoDrawTextClip(8,   0+ 10,SmallFont,"FreeCraft");
+    VideoDrawTextClip(8,   0+ 10,SmallFont,"Stratagus");
     VideoDrawTextClip(8,   0+ 20,SmallFont,
 	"~black~0~red~1~green~2~yellow~3~blue~4~magenta~5~cyan~6~white~7"
 	"~grey~8~light-red~9~light-green~A~light-yellow~B~light-blue~C"
 	"~light-magenta~D~light-cyan~E~light-grey~F");
     VideoDrawTextClip(8,   0+ 30,SmallFont,"abdefgABCDEFQ");
 
-    VideoDrawTextClip(8,  40+ 10,GameFont,"FreeCraft");
+    VideoDrawTextClip(8,  40+ 10,GameFont,"Stratagus");
     VideoDrawTextClip(8,  40+ 25,GameFont,
 	"~black~0~red~1~green~2~yellow~3~blue~4~magenta~5~cyan~6~white~7"
 	"~grey~8~light-red~9~light-green~A~light-yellow~B~light-blue~C"
 	"~light-magenta~D~light-cyan~E~light-grey~F");
     VideoDrawTextClip(8,  40+ 40,GameFont,"abdefgABCDEFQ");
 
-    VideoDrawTextClip(8, 100+ 10,LargeFont,"FreeCraft");
+    VideoDrawTextClip(8, 100+ 10,LargeFont,"Stratagus");
     VideoDrawTextClip(8, 100+ 25,LargeFont,
 	"~black~0~red~1~green~2~yellow~3~blue~4~magenta~5~cyan~6~white~7"
 	"~grey~8~light-red~9~light-green~A~light-yellow~B~light-blue~C"
 	"~light-magenta~D~light-cyan~E~light-grey~F");
     VideoDrawTextClip(8, 100+ 40,LargeFont,"abdefgABCDEFQ");
 
-    VideoDrawTextClip(8, 160+ 10,SmallTitleFont,"FreeCraft");
+    VideoDrawTextClip(8, 160+ 10,SmallTitleFont,"Stratagus");
     VideoDrawTextClip(8, 160+ 35,SmallTitleFont,
 	"~black~0~red~1~green~2~yellow~3~blue~4~magenta~5~cyan~6~white~7"
 	"~grey~8~light-red~9~light-green~A~light-yellow~B~light-blue~C"
 	"~light-magenta~D~light-cyan~E~light-grey~F");
     VideoDrawTextClip(8, 160+ 60,SmallTitleFont,"abdefgABCDEFQ");
 
-    VideoDrawTextClip(8, 260+ 10,LargeTitleFont,"FreeCraft");
+    VideoDrawTextClip(8, 260+ 10,LargeTitleFont,"Stratagus");
     VideoDrawTextClip(8, 260+ 55,LargeTitleFont,
 	"~black~0~red~1~green~2~yellow~3~blue~4~magenta~5~cyan~6~white~7"
 	"~grey~8~light-red~9~light-green~A~light-yellow~B~light-blue~C"
@@ -1023,7 +1023,7 @@ global void PreMenuSetup(void)
     // FIXME: must search tileset by identifier or use a gui palette?
     TheMap.TerrainName=Tilesets[0]->Ident;
     LoadTileset();
-    LoadRGB(GlobalPalette, s=strdcat3(FreeCraftLibPath,
+    LoadRGB(GlobalPalette, s=strdcat3(StratagusLibPath,
 	    "/graphics/",Tilesets[0]->PaletteFile));
     TheMap.TerrainName=NULL;
     free(s);
@@ -1151,7 +1151,7 @@ local void PrintHeader(void)
 {
     // vvv---- looks wired, but is needed for GNU brain damage
     fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
-    "\t(http://FreeCraft.Org)"
+    "\t(http://Stratagus.Org)"
     "\n  SIOD Copyright by George J. Carrette."
 #ifdef USE_LIBMODPLUG
     "\n  libmodplug Copyright by Kenton Varda & Olivier Lapique."
@@ -1249,8 +1249,8 @@ global int main1(int argc __attribute__ ((unused)),
 
     PrintHeader();
     printf(
-    "\n\nFreeCraft may be copied only under the terms of the GNU General Public License\
-\nwhich may be found in the FreeCraft source kit."
+    "\n\nStratagus may be copied only under the terms of the GNU General Public License\
+\nwhich may be found in the Stratagus source kit."
     "\n\nDISCLAIMER:\n\
 This software is provided as-is.  The author(s) can not be held liable for any\
 \ndamage that might arise from the use of this software.\n\
@@ -1337,7 +1337,7 @@ global volatile void Exit(int err)
 
     CleanMovie();
 
-    fprintf(stderr,"Thanks for playing FreeCraft.\n");
+    fprintf(stderr,"Thanks for playing Stratagus.\n");
     exit(err);
 }
 
@@ -1361,9 +1361,9 @@ local void Usage(void)
 {
     PrintHeader();
     printf(
-"\n\nUsage: freecraft [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
-\t-c file.ccl\tccl start file (default freecraft.ccl)\n\
-\t-d datapath\tpath to freecraft data\n\
+"\n\nUsage: stratagus [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
+\t-c file.ccl\tccl start file (default stratagus.ccl)\n\
+\t-d datapath\tpath to stratagus data\n\
 \t-e\t\tStart editor\n\
 \t-f factor\tComputer units cost factor\n\
 \t-h\t\tHelp shows this page\n\
@@ -1382,7 +1382,7 @@ local void Usage(void)
 \t-F\t\tFull screen video mode (only supported with SDL)\n\
 \t-S\t\tSync speed (100 = 30 frames/s)\n\
 \t-W\t\tWindowed video mode (only supported with SDL)\n\
-map is relative to FreeCraftLibPath=datapath, use ./map for relative to cwd\n\
+map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 ");
 }
 
@@ -1405,9 +1405,9 @@ global int main(int argc,char** argv)
     //	Setup some defaults.
     //
 #ifndef __APPLE__
-    FreeCraftLibPath=STRATAGUS_LIB_PATH;
+    StratagusLibPath=STRATAGUS_LIB_PATH;
 #endif
-    CclStartFile="ccl/freecraft.ccl";
+    CclStartFile="ccl/stratagus.ccl";
     EditorStartFile="ccl/editor.ccl";
 
     memset(LocalPlayerName, 0, 16);
@@ -1424,7 +1424,7 @@ global int main(int argc,char** argv)
 		CclStartFile=optarg;
 		continue;
             case 'd':
-                FreeCraftLibPath=optarg;
+                StratagusLibPath=optarg;
                 continue;
 	    case 'e':
 		EditorRunning=1;

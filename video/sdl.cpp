@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name sdl.c		-	SDL video support. */
 //
 //	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -29,7 +29,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 #ifdef USE_SDL	// {
 
@@ -82,7 +82,7 @@
 ----------------------------------------------------------------------------*/
 
 global SDL_Surface *Screen;		/// Internal screen
-global int InMainWindow = 1;		/// Cursor inside freecraft window
+global int InMainWindow = 1;		/// Cursor inside stratagus window
 
 local int FrameTicks;			/// Frame length in ms
 local int FrameRemainder;		/// Frame remainder 0.1 ms
@@ -178,7 +178,7 @@ global void InitVideoSdl(void)
 
 	// Set WindowManager Title
 
-	SDL_WM_SetCaption("FreeCraft","FreeCraft");
+	SDL_WM_SetCaption("Stratagus","Stratagus");
     } else {
 	if( VideoBpp == 32 && VideoDepth == 24 ) {
 	    VideoDepth = 0;

@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name arts_audio.c		-	Arts daemon sound support */
 //
 //	(c) Copyright 2002 by Andreas Arens
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -33,7 +33,7 @@
 
 #include <artsc.h>
 #include <stdio.h>
-#include "freecraft.h"
+#include "stratagus.h"
 
 #include "sound_server.h"
 
@@ -72,7 +72,7 @@ global int InitArtsSound(int freq, int size)
     //
     //	Open daemon stream, size bit samples, stereo.
     //
-    stream = arts_play_stream(freq, size, 2, "Freecraft");
+    stream = arts_play_stream(freq, size, 2, "Stratagus");
     if (stream == NULL) {
 	fprintf(stderr, "Sound [arts]: Unable to open a stream\n");
 	arts_free();

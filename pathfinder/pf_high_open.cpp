@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "freecraft.h"
+#include "stratagus.h"
 #include "region.h"
 #include "pf_high_open.h"
 

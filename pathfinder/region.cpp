@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "map.h"
 #include "hierarchical.h"
 #include "region.h"

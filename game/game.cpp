@@ -6,18 +6,18 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name game.c		-	The game set-up and creation. */
 //
 //	(c) Copyright 1998-2003 by Lutz Sammer, Andreas Arens, and
 //	                           Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "map.h"
 #include "minimap.h"
 #include "player.h"
@@ -77,18 +77,18 @@ global int lcm_prevent_recurse;		/// prevent recursion through LoadGameMap
 ----------------------------------------------------------------------------*/
 
 /**
-**	Load a FreeCraft map.
+**	Load a Stratagus map.
 **
 **	@param filename	map filename
 **	@param map	map loaded
 */
-local void LoadFreeCraftMap(const char* filename,
+local void LoadStratagusMap(const char* filename,
 	WorldMap* map __attribute__((unused)))
 {
     DebugLevel3Fn("%p \n" _C_ map);
 
     if (lcm_prevent_recurse) {
-	fprintf(stderr,"recursive use of load FreeCraft map!\n");
+	fprintf(stderr,"recursive use of load Stratagus map!\n");
 	ExitFatal(-1);
     }
     InitPlayers();
@@ -99,13 +99,13 @@ local void LoadFreeCraftMap(const char* filename,
 #if 0
     // Not true if multiplayer levels!
     if (!ThisPlayer) {		/// ARI: bomb if nothing was loaded!
-	fprintf(stderr,"%s: invalid FreeCraft map\n", filename);
+	fprintf(stderr,"%s: invalid Stratagus map\n", filename);
 	ExitFatal(-1);
     }
     // FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
 #endif
     if( !TheMap.Width || !TheMap.Height ) {
-	fprintf(stderr,"%s: invalid FreeCraft map\n", filename);
+	fprintf(stderr,"%s: invalid Stratagus map\n", filename);
 	ExitFatal(-1);
     }
 }
@@ -142,7 +142,7 @@ local void LoadMap(const char* filename,WorldMap* map)
 		|| !strcmp(tmp,".cm.bz2")
 #endif
 	) {
-	    LoadFreeCraftMap(filename,map);
+	    LoadStratagusMap(filename,map);
 	    return;
 	}
     }
@@ -282,7 +282,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	// FIXME: LibraryFile here?
 	strcpy(CurrentMapPath, filename);
 	if (filename[0] != '/' && filename[0] != '.') {
-	    s = filename = strdcat3(FreeCraftLibPath, "/", filename);
+	    s = filename = strdcat3(StratagusLibPath, "/", filename);
 	}
 
 	//
@@ -389,7 +389,7 @@ global void CreateGame(char* filename, WorldMap* map)
     //	Graphic part
     //
     LoadRGB(GlobalPalette,
-	    s=strdcat3(FreeCraftLibPath,"/graphics/",
+	    s=strdcat3(StratagusLibPath,"/graphics/",
 		TheMap.Tileset->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
