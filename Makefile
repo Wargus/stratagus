@@ -141,7 +141,8 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
-CCLS	= data/ccl/units.ccl data/ccl/missiles.ccl data/ccl/icons.ccl \
+CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
+	  data/ccl/missiles.ccl data/ccl/icons.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
 	  data/ccl/ui.ccl data/ccl/human/ui.ccl data/ccl/orc/ui.ccl \
 	  data/ccl/fonts.ccl data/ccl/ai.ccl \
@@ -264,13 +265,12 @@ MYDATE	= $(shell date +%y%m%d)
 PCRAFT= freecraft-$(MYDATE).tar.bz2
 LCRAFT= freecraft-$(MYDATE)-bin.tar.bz2
 WCRAFT= freecraft-$(MYDATE)-win32bin.zip
-FCRAFT=	../fcraft-0.14pre2.tar.gz
+FCRAFT=	../fcraft-0.15.tar.gz
 SCRAFT= ../scraft-0.02.tar.bz2
 
 linux-complete:
 	tar xzf $(FCRAFT)
 	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
-	#cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
 	tar xjf $(SCRAFT)
 	tar xjf $(PCRAFT)
 	tar xjf $(LCRAFT)
@@ -288,7 +288,6 @@ linux-complete:
 win32-complete:
 	tar xzf $(FCRAFT)
 	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
-	#cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
 	tar xjf $(SCRAFT)
 	tar xjf $(PCRAFT)
 	unzip -oq $(WCRAFT)
@@ -299,7 +298,6 @@ win32-complete:
 	rm -rf freecraft-$(MYDATE)
 	rm -rf fcraft
 	rm -rf fclone
-	mv freecraft-complete/CONTRIB freecraft-complete/CONTRIB-fgp.txt
 	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
 	cat tools/SFXWiz32-gcc.exe freecraft-$(MYDATE)-complete-win32.zip \
