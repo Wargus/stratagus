@@ -1548,6 +1548,10 @@ local int CclDefineUI(lua_State* l)
 					}
 					CclParseButtonIcons(l, ui);
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "command-key-font")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					ui->CommandKeyFont = FontByIdent(LuaToString(l, -1));
+					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
