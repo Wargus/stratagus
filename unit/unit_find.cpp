@@ -728,7 +728,7 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	    cost-=CANATTACK_BONUS/100;
 	}
 
-	DebugLevel3Fn("%s -> %s\t%08x\n",type->Ident,dtype->Ident,cost);
+	DebugLevel3Fn("%s -> %s\t%08x\n" _C_ type->Ident _C_ dtype->Ident _C_ cost);
 	//
 	//	Take this target?
 	//

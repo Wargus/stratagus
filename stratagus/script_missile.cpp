@@ -74,7 +74,7 @@ local SCM CclDefineMissileType(SCM list)
     mtype=MissileTypeByIdent(str);
     IfDebug( NoWarningMissileType=i; );
     if( mtype ) {
-	DebugLevel0Fn("Redefining missile-type `%s'\n",str);
+	DebugLevel0Fn("Redefining missile-type `%s'\n" _C_ str);
 	free(str);
     } else {
 	mtype=NewMissileTypeSlot(str);	// str consumed!

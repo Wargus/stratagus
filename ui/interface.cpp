@@ -590,7 +590,7 @@ local void UiFindIdleWorker(void)
 */
 local void UiToggleGrabMouse(void)
 {
-    DebugLevel0Fn("%x\n",KeyModifiers);
+    DebugLevel0Fn("%x\n" _C_ KeyModifiers);
     ToggleGrabMouse(0);
     SetStatusLine("Grab mouse toggled.");
 }
@@ -850,7 +850,7 @@ local int CommandKey(int key)
 	    break;
 
 	default:
-	    DebugLevel3("Key %d\n",key);
+	    DebugLevel3("Key %d\n" _C_ key);
 	    return 0;
     }
     return 1;
@@ -969,7 +969,7 @@ local int InputKey(int key)
 	default:
 	    if (key >= ' ' && key <= 256) {
 		if (InputIndex < sizeof(Input) - 1) {
-		    DebugLevel3("Key %c\n", key);
+		    DebugLevel3("Key %c\n" _C_ key);
 		    Input[InputIndex++] = key;
 		    Input[InputIndex] = '\0';
 		    ShowInput();

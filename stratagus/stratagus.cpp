@@ -382,7 +382,7 @@ local int WaitMouseY;			/// Mouse Y position
 */
 local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 {
-    DebugLevel3Fn("Pressed %8x %8x\n",MouseButtons,dummy);
+    DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
     WaitNoEvent=0;
 }
 
@@ -392,7 +392,7 @@ local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
-    DebugLevel3Fn("Pressed %8x %8x %8x\n",MouseButtons,dummy1,dummy2);
+    DebugLevel3Fn("Pressed %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
     WaitNoEvent=0;
 }
 
@@ -402,7 +402,7 @@ local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 local void WaitCallbackMouse(int dummy_x __attribute__((unused)),
 	int dummy_y __attribute__((unused)))
 {
-    DebugLevel3Fn("Moved %d,%d\n",dummy_x,dummy_y);
+    DebugLevel3Fn("Moved %d,%d\n" _C_ dummy_x _C_ dummy_y);
     WaitMouseX=dummy_x;
     WaitMouseY=dummy_y;
 }
@@ -785,7 +785,7 @@ global void ShowLoadProgress(const char* fmt,...)
 	Invalidate();
 	RealizeVideoMemory();
     } else {
-	DebugLevel0Fn("!!!!%s",temp);
+	DebugLevel0Fn("!!!!%s" _C_ temp);
     }
 }
 
@@ -868,7 +868,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    EnableRedraw=RedrawMenu;
 	    ProcessMenu(MENU_PRG_START, 1);
 	    EnableRedraw=RedrawEverything;
-	    DebugLevel0Fn("Menu start: NetPlayers %d\n", NetPlayers);
+	    DebugLevel0Fn("Menu start: NetPlayers %d\n" _C_ NetPlayers);
 	    filename = CurrentMapPath;
 	}
 	if( NetworkFildes!=-1 && NetPlayers<2 ) {
@@ -895,7 +895,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	PreMenuSetup();
 
 	filename=NextChapter();
-	DebugLevel0Fn("Next chapter %s\n",filename);
+	DebugLevel0Fn("Next chapter %s\n" _C_ filename);
     }
 }
 

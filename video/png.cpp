@@ -117,13 +117,13 @@ global Graphic* LoadGraphicPNG(const char* name)
     png_read_info(png_ptr,info_ptr);
 
     DebugLevel3("%s: width %ld height %ld = %ld bytes\n"
-	    ,name,info_ptr->width,info_ptr->height
-	    ,info_ptr->width*info_ptr->height);
-    DebugLevel3("%s: %s",name
-	,png_get_valid(png_ptr,info_ptr,PNG_INFO_PLTE) ? "palette" : "");
+	    _C_ name _C_ info_ptr->width _C_ info_ptr->height
+	    _C_ info_ptr->width*info_ptr->height);
+    DebugLevel3("%s: %s" _C_ name
+	_C_ png_get_valid(png_ptr,info_ptr,PNG_INFO_PLTE) ? "palette" : "");
     DebugLevel3(" %s"
-	,png_get_valid(png_ptr,info_ptr,PNG_INFO_tRNS) ? "transparent" : "");
-    DebugLevel3(" depth %d\n",info_ptr->bit_depth);
+	_C_ png_get_valid(png_ptr,info_ptr,PNG_INFO_tRNS) ? "transparent" : "");
+    DebugLevel3(" depth %d\n" _C_ info_ptr->bit_depth);
 
     //	Setup translators:
 
@@ -132,7 +132,7 @@ global Graphic* LoadGraphicPNG(const char* name)
     if( info_ptr->color_type==PNG_COLOR_TYPE_PALETTE ) {
 	DebugLevel3("Color palette\n");
 	if( info_ptr->valid&PNG_INFO_PLTE ) {
-	    DebugLevel3Fn(" palette %d\n",info_ptr->num_palette);
+	    DebugLevel3Fn(" palette %d\n" _C_ info_ptr->num_palette);
 	    if( info_ptr->num_palette>256 ) {
 		abort();
 	    }
@@ -175,7 +175,7 @@ global Graphic* LoadGraphicPNG(const char* name)
     h=info_ptr->height;
     if( info_ptr->width!=info_ptr->rowbytes ) {
 	DebugLevel0("width(%ld)!=rowbytes(%ld) in file:%s\n"
-	    ,info_ptr->width,info_ptr->rowbytes,name);
+	    _C_ info_ptr->width _C_ info_ptr->rowbytes _C_ name);
 	abort();
     }
 

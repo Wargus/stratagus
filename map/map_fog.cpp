@@ -1861,7 +1861,7 @@ global void InitMapFogOfWar(void)
 			r=GlobalPalette[i].r;
 			g=GlobalPalette[i].g;
 			b=GlobalPalette[i].b;
-			DebugLevel3("%d,%d,%d\n",r,g,b);
+			DebugLevel3("%d,%d,%d\n" _C_ r _C_ g _C_ b);
 			v=r+g+b;
 
 			r= ((((r*3-v)*FogOfWarSaturation + v*100)
@@ -1898,9 +1898,9 @@ global void InitMapFogOfWar(void)
 				l=j;
 			    }
 			}
-			DebugLevel3("%d,%d,%d -> %d,%d,%d\n",r,g,b
-				,GlobalPalette[l].r,GlobalPalette[l].g
-				,GlobalPalette[l].b);
+			DebugLevel3("%d,%d,%d -> %d,%d,%d\n" _C_ r _C_ g _C_ b
+				_C_ GlobalPalette[l].r _C_ GlobalPalette[l].g
+				_C_ GlobalPalette[l].b);
 			((VMemType8*)FogOfWarAlphaTable)[i]=l;
 		    }
 		}
@@ -1982,7 +1982,7 @@ build_table:
 		break;
 
 	    default:
-		DebugLevel0Fn("Depth unsupported %d\n",VideoDepth);
+		DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
 		break;
 	}
     } else {
@@ -2014,7 +2014,7 @@ build_table:
 		break;
 
 	    default:
-		DebugLevel0Fn("Depth unsupported %d\n",VideoDepth);
+		DebugLevel0Fn("Depth unsupported %d\n" _C_ VideoDepth);
 		break;
 	}
     }

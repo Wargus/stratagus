@@ -106,7 +106,7 @@ global void SetVideoSync(void)
 
     FrameTicks = ms / 10;
     FrameRemainder = ms % 10;
-    DebugLevel0Fn("frames %d - %d.%dms\n", SkipFrames, ms / 10, ms % 10);
+    DebugLevel0Fn("frames %d - %d.%dms\n" _C_ SkipFrames _C_ ms / 10 _C_ ms % 10);
 }
 
 /*----------------------------------------------------------------------------
@@ -180,9 +180,9 @@ global void InitVideoSdl(void)
 	int j;
 
 	DebugLevel3Fn("Mask R%x G%x B%x\n"
-		,Screen->format->Rmask
-		,Screen->format->Gmask
-		,Screen->format->Bmask);
+		_C_ Screen->format->Rmask
+		_C_ Screen->format->Gmask
+		_C_ Screen->format->Bmask);
 
 	if( Screen->format->BitsPerPixel>8 ) {
 	    j=Screen->format->Rmask;
@@ -211,7 +211,7 @@ global void InitVideoSdl(void)
     // Make default character translation easier
     SDL_EnableUNICODE(1);
 
-    DebugLevel3Fn("Video init ready %d %d\n",VideoDepth,VideoBpp);
+    DebugLevel3Fn("Video init ready %d %d\n" _C_ VideoDepth _C_ VideoBpp);
 }
 
 /**
@@ -451,7 +451,7 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 {
     switch (event->type) {
 	case SDL_MOUSEBUTTONDOWN:
-	    DebugLevel3("\tbutton press %d\n", event->button.button);
+	    DebugLevel3("\tbutton press %d\n" _C_ event->button.button);
 	    //
 	    //  SDL has already a good order of the buttons.
 	    //
@@ -460,7 +460,7 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 	    break;
 
 	case SDL_MOUSEBUTTONUP:
-	    DebugLevel3("\tbutton release %d\n", event->button.button);
+	    DebugLevel3("\tbutton release %d\n" _C_ event->button.button);
 	    //
 	    //  SDL has already a good order of the buttons.
 	    //
@@ -471,7 +471,7 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 	    // FIXME SDL: check if this is only usefull for the cursor
 	    //            if this is the case we don't need this.
 	case SDL_MOUSEMOTION:
-	    DebugLevel3("\tmotion notify %d,%d\n", event->motion.x,
+	    DebugLevel3("\tmotion notify %d,%d\n" _C_ event->motion.x _C_
 		event->motion.y);
 	    InputMouseMove(callbacks, SDL_GetTicks(),
 		event->motion.x, event->motion.y);

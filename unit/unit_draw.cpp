@@ -1482,7 +1482,7 @@ local void ShowSingleOrder(const Unit* unit,int x1,int y1,const Order* order)
 
 	default:
 	    e_color=color=ColorGray;
-	    DebugLevel1Fn("Unknown action %d\n",order->Action);
+	    DebugLevel1Fn("Unknown action %d\n" _C_ order->Action);
 	    break;
     }
     VideoFillCircleClip(color,x1,y1,2);
@@ -1719,7 +1719,7 @@ local void DrawUnit(const Unit* unit)
     const UnitType* type;
 
     if ( unit->Revealer ) {		// Revealers are not drawn
-	DebugLevel3Fn("Drawing revealer %d\n",UnitNumber(unit));
+	DebugLevel3Fn("Drawing revealer %d\n" _C_ UnitNumber(unit));
 	return;
     }
 

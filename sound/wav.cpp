@@ -70,7 +70,7 @@ global Sample* LoadWav(const char* name)
     int i;
     Sample* sample;
 
-    DebugLevel3("Loading `%s'\n", name);
+    DebugLevel3("Loading `%s'\n" _C_ name);
 
     if (!(f = CLopen(name))) {
 	printf("Can't open file `%s'\n", name);
@@ -83,8 +83,8 @@ global Sample* LoadWav(const char* name)
     chunk.Magic = ConvertLE32(chunk.Magic);
     chunk.Length = ConvertLE32(chunk.Length);
 
-    DebugLevel3("Magic: $%x\n", chunk.Magic);
-    DebugLevel3("Length: %d\n", chunk.Length);
+    DebugLevel3("Magic: $%x\n" _C_ chunk.Magic);
+    DebugLevel3("Length: %d\n" _C_ chunk.Length);
     if (chunk.Magic != RIFF) {
 	printf("Wrong magic %x (not %x)\n", chunk.Magic, RIFF);
 	CLclose(f);
@@ -93,7 +93,7 @@ global Sample* LoadWav(const char* name)
 
     CLread(f, &t, sizeof(t));
     t = ConvertLE32(t);
-    DebugLevel3("Magic: $%lx\n", t);
+    DebugLevel3("Magic: $%lx\n" _C_ t);
     if (t != WAVE) {
 	printf("Wrong magic %x (not %x)\n", t, WAVE);
 	CLclose(f);
@@ -113,20 +113,20 @@ global Sample* LoadWav(const char* name)
     wavfmt.SampleSize = ConvertLE16(wavfmt.SampleSize);
     wavfmt.BitsPerSample = ConvertLE16(wavfmt.BitsPerSample);
 
-    DebugLevel3("Magic: $%x\n", wavfmt.FMTchunk);
-    DebugLevel3("Length: %d\n", wavfmt.FMTlength);
+    DebugLevel3("Magic: $%x\n" _C_ wavfmt.FMTchunk);
+    DebugLevel3("Length: %d\n" _C_ wavfmt.FMTlength);
     if (wavfmt.FMTchunk != FMT) {
 	printf("Wrong magic %x (not %x)\n", wavfmt.FMTchunk, FMT);
 	CLclose(f);
 	ExitFatal(-1);
     }
     if (wavfmt.FMTlength != 16 && wavfmt.FMTlength != 18) {
-	DebugLevel2("Encoding\t%d\t", wavfmt.Encoding);
-	DebugLevel2("Channels\t%d\t", wavfmt.Channels);
-	DebugLevel2("Frequency\t%d\n", wavfmt.Frequency);
-	DebugLevel2("Byterate\t%d\t", wavfmt.ByteRate);
-	DebugLevel2("SampleSize\t%d\t", wavfmt.SampleSize);
-	DebugLevel2("BitsPerSample\t%d\n", wavfmt.BitsPerSample);
+	DebugLevel2("Encoding\t%d\t" _C_ wavfmt.Encoding);
+	DebugLevel2("Channels\t%d\t" _C_ wavfmt.Channels);
+	DebugLevel2("Frequency\t%d\n" _C_ wavfmt.Frequency);
+	DebugLevel2("Byterate\t%d\t" _C_ wavfmt.ByteRate);
+	DebugLevel2("SampleSize\t%d\t" _C_ wavfmt.SampleSize);
+	DebugLevel2("BitsPerSample\t%d\n" _C_ wavfmt.BitsPerSample);
 
 	printf("Wrong length %d (not %d)\n", wavfmt.FMTlength, 16);
 	CLclose(f);
@@ -138,12 +138,12 @@ global Sample* LoadWav(const char* name)
 	    abort();
 	}
     }
-    DebugLevel3("Encoding\t%d\t", wavfmt.Encoding);
-    DebugLevel3("Channels\t%d\t", wavfmt.Channels);
-    DebugLevel3("Frequency\t%d\n", wavfmt.Frequency);
-    DebugLevel3("Byterate\t%d\t", wavfmt.ByteRate);
-    DebugLevel3("SampleSize\t%d\t", wavfmt.SampleSize);
-    DebugLevel3("BitsPerSample\t%d\n", wavfmt.BitsPerSample);
+    DebugLevel3("Encoding\t%d\t" _C_ wavfmt.Encoding);
+    DebugLevel3("Channels\t%d\t" _C_ wavfmt.Channels);
+    DebugLevel3("Frequency\t%d\n" _C_ wavfmt.Frequency);
+    DebugLevel3("Byterate\t%d\t" _C_ wavfmt.ByteRate);
+    DebugLevel3("SampleSize\t%d\t" _C_ wavfmt.SampleSize);
+    DebugLevel3("BitsPerSample\t%d\n" _C_ wavfmt.BitsPerSample);
 
     //
     //  Check if supported
@@ -187,12 +187,12 @@ global Sample* LoadWav(const char* name)
 	chunk.Magic = ConvertLE32(chunk.Magic);
 	chunk.Length = ConvertLE32(chunk.Length);
 
-	DebugLevel3("Magic: $%x\n", chunk.Magic);
-	DebugLevel3("Length: %d\n", chunk.Length);
+	DebugLevel3("Magic: $%x\n" _C_ chunk.Magic);
+	DebugLevel3("Length: %d\n" _C_ chunk.Length);
 	if (chunk.Magic != DATA) {
 	    // FIXME: cleanup the wav files, remove this junk, and don't support
 	    // FIXME: this!!
-	    DebugLevel3("Wrong magic %x (not %x)\n", chunk.Magic, DATA);
+	    DebugLevel3("Wrong magic %x (not %x)\n" _C_ chunk.Magic _C_ DATA);
 	    DebugLevel3("Junk at end of file\n");
 	    break;
 	}

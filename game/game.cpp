@@ -82,7 +82,7 @@ global int lcm_prevent_recurse;		/// prevent recursion through LoadGameMap
 local void LoadFreeCraftMap(const char* filename,
 	WorldMap* map __attribute__((unused)))
 {
-    DebugLevel3Fn("%p \n",map);
+    DebugLevel3Fn("%p \n" _C_ map);
 
     if (lcm_prevent_recurse) {
 	fprintf(stderr,"recursive use of load FreeCraft map!\n");

@@ -327,7 +327,7 @@ global int PlaceReachable(const Unit* src,int x,int y,int range)
     unsigned char* matrix;
     int depth;
 
-    DebugLevel3Fn("%p -> %d,%d\n",src,x,y);
+    DebugLevel3Fn("%p -> %d,%d\n" _C_ src _C_ x _C_ y);
 
     //
     //	Setup movement.
@@ -361,8 +361,8 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     int depth;
 
     DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s)+%d "
-	,UnitNumber(src),src->X,src->Y,src->Type->Ident
-	,UnitNumber(dst),dst->X,dst->Y,dst->Type->Ident,range);
+	_C_ UnitNumber(src) _C_ src->X _C_ src->Y _C_ src->Type->Ident
+	_C_ UnitNumber(dst) _C_ dst->X _C_ dst->Y _C_ dst->Type->Ident _C_ range);
 
     //
     //	Setup movement.
@@ -442,15 +442,15 @@ local int FastNewPath(const Unit* unit,int gx,int gy,int ox,int oy
     yd-=y;
     if( yd<0 ) yd=-add; else if( yd>0 ) yd=add;
     *ydp=yd;
-    DebugLevel3Fn("%d,%d\n",xd,yd);
+    DebugLevel3Fn("%d,%d\n" _C_ xd _C_ yd);
 
     while( (steps-=add)>0 ) {
 	x+=xd;
 	y+=yd;
 
 	DebugLevel3Fn("Unit %d,%d Goal %d,%d - %d,%d\n"
-		,x,y,gx,gy,gx+ox,gy+oy);
-	DebugLevel3Fn("Check %d,%d=%x\n",x,y,mask);
+		_C_ x _C_ y _C_ gx _C_ gy _C_ gx+ox _C_ gy+oy);
+	DebugLevel3Fn("Check %d,%d=%x\n" _C_ x _C_ y _C_ mask);
 
 	//
 	//	Now check if we can move to this field
@@ -613,9 +613,9 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     int size;
 
     DebugLevel3Fn("%s(%d) to %d=%d,%d+%d+%d\n"
-	    ,unit->Type->Ident,UnitNumber(unit)
-	    ,unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
-	    ,gx,gy,ox,oy);
+	    _C_ unit->Type->Ident _C_ UnitNumber(unit)
+	    _C_ unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
+	    _C_ gx _C_ gy _C_ ox _C_ oy);
 
     size=TheMap.Width*TheMap.Height;
     points=alloca(size);
@@ -718,18 +718,18 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 		i=TheMap.Fields[x+y*TheMap.Width].Flags&mask;
 		if( i ) {		// unreachable
 		    // Blocked by non-moving in not first round
-		    DebugLevel3("%x - %x\n",mask,i);
+		    DebugLevel3("%x - %x\n" _C_ mask _C_ i);
 		    if( depth==1 || (i&~(MapFieldLandUnit
 				|MapFieldAirUnit|MapFieldSeaUnit)) ) {
-			DebugLevel3("NO: %d,%d\n",x,y);
+			DebugLevel3("NO: %d,%d\n" _C_ x _C_ y);
 			*m=99;
 			continue;
 		    }
 		    goal=UnitCacheOnXY(x,y,unit->Type->UnitType);
 		    if( !goal ) {	// Should not happen.
-			DebugLevel0Fn("%d %s: No goal for %d,%d on %d,%d?\n",
-				UnitNumber(unit),unit->Type->Ident,
-				unit->X,unit->Y,x,y);
+			DebugLevel0Fn("%d %s: No goal for %d,%d on %d,%d?\n" _C_
+				UnitNumber(unit) _C_ unit->Type->Ident _C_
+				unit->X _C_ unit->Y _C_ x _C_ y);
 			*m=99;
 			DebugCheck( 1 );
 			continue;
@@ -757,7 +757,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 		//
 		xd=abs(gx-x);
 		yd=abs(gy-y);
-		DebugLevel3("Best: %d,%d-%d - %d,%d\n",bestx,besty,bestd,xd,yd);
+		DebugLevel3("Best: %d,%d-%d - %d,%d\n" _C_ bestx _C_ besty _C_ bestd _C_ xd _C_ yd);
 		if( xd>yd && xd<bestd ) {
 		    bestd=xd;
 		    bestx=x;
@@ -778,7 +778,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 		rp=0;
 	    }
 	}
-	DebugLevel3("%d,%d\n",rp,wp);
+	DebugLevel3("%d,%d\n" _C_ rp _C_ wp);
 
 	//
 	//	Continue with next frame.
@@ -803,8 +803,8 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
     //
     //	We now move to the best reachable point.
     //
-    DebugLevel3Fn("Unreachable Best %d,%d -> %d=%d,%d\n",
-	  unit->X,unit->Y,bestn,bestx,besty);
+    DebugLevel3Fn("Unreachable Best %d,%d -> %d=%d,%d\n" _C_
+	  unit->X _C_ unit->Y _C_ bestn _C_ bestx _C_ besty);
 
     IfDebug(
 	PfCounterFail++;
@@ -876,8 +876,8 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     ry=unit->Orders[0].RangeY;
 
     DebugLevel3Fn("%d: -> %s %p | %dx%d+%d+%d\n"
-	,UnitNumber(unit),unit->Data.Move.Fast ? "F" : "C"
-	,goal,gx,gy,rx,ry);
+	_C_ UnitNumber(unit) _C_ unit->Data.Move.Fast ? "F" : "C"
+	_C_ goal _C_ gx _C_ gy _C_ rx _C_ ry);
 
 #ifdef DEBUG
     //
@@ -905,7 +905,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 	rx+=rx+type->TileWidth;
 	ry+=ry+type->TileHeight;
 	DebugLevel3Fn("Unit %d,%d Goal %d,%d - %d,%d\n"
-		,x,y,gx,gy,gx+rx,gy+ry);
+		_C_ x _C_ y _C_ gx _C_ gy _C_ gx+rx _C_ gy+ry);
 	if( x>=gx && x<gx+rx && y>=gy && y<gy+ry ) {
 	    DebugLevel3Fn("Goal reached\n");
 	    *xdp=*ydp=0;

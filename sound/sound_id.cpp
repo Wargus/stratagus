@@ -115,7 +115,7 @@ global SoundId SoundIdForName(const char* name)
     if( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
 	return *result;
     }
-    DebugLevel0("Can't find sound `%s' in sound table\n",name);
+    DebugLevel0("Can't find sound `%s' in sound table\n" _C_ name);
     return NULL;
 }
 
@@ -137,7 +137,7 @@ global SoundId MakeSound(char* name,char* file[],unsigned char nb)
     const SoundId* result;
 
     if ( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
-	DebugLevel0Fn("re-register sound `%s'\n",name);
+	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
 	return *result;
     }
     // ask the server to register the sound

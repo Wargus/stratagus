@@ -423,7 +423,7 @@ global void CclCommand(char* command)
 
     // FIXME: cheat protection
     retval=repl_c_string(msg,0,0,sizeof(msg));
-    DebugLevel3("\n%d=%s\n",retval,msg);
+    DebugLevel3("\n%d=%s\n" _C_ retval _C_ msg);
 
     SetMessage(msg);
 }
