@@ -315,13 +315,13 @@ local void SaveFullLog(CLFile* dest)
 	CLprintf(dest, "  Players = {\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (CurrentReplay->Players[i].Name) {
-			CLprintf(dest, "	{ Name = \"%s\",\n", CurrentReplay->Players[i].Name);
+			CLprintf(dest, "	{ Name = \"%s\",", CurrentReplay->Players[i].Name);
 		} else {
-			CLprintf(dest, "	{\n");
+			CLprintf(dest, "	{");
 		}
-		CLprintf(dest, "	  Race = %d,\n", CurrentReplay->Players[i].Race);
-		CLprintf(dest, "	  Team = %d,\n", CurrentReplay->Players[i].Team);
-		CLprintf(dest, "	  Type = %d }%s", CurrentReplay->Players[i].Type,
+		CLprintf(dest, " Race = %d,", CurrentReplay->Players[i].Race);
+		CLprintf(dest, " Team = %d,", CurrentReplay->Players[i].Team);
+		CLprintf(dest, " Type = %d }%s", CurrentReplay->Players[i].Type,
 			i != PlayerMax - 1 ? ",\n" : "\n");
 	}
 	CLprintf(dest, "  },\n");
@@ -384,7 +384,7 @@ local void AppendLog(LogEntry* log, CLFile* dest)
 		CLprintf(dest, "DestUnitNumber = %d, ", log->DestUnitNumber);
 	}
 	if (log->Value) {
-		CLprintf(dest, "Value = \"%s\", ", log->Value);
+		CLprintf(dest, "Value = [[%s]], ", log->Value);
 	}
 	if (log->Num != -1) {
 		CLprintf(dest, "Num = %d, ", log->Num);
@@ -899,8 +899,8 @@ local void DoNextReplay(void)
 		}
 		SendCommandSharedVision(posx, state, posy);
 	} else if (!strcmp(action, "input")) {
-		if (val[0] == '(') {
-			CclCommand(val);
+		if (val[0] == '-') {
+			CclCommand(val + 1);
 		} else {
 			HandleCheats(val);
 		}

@@ -895,17 +895,14 @@ local int CclLoadMap(lua_State* l)
 */
 global void CclCommand(const char* command)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	char msg[80];
+	int status;
 
-	strncpy(msg, command, sizeof(msg));
-
-	// FIXME: cheat protection
-	retval = repl_c_string(msg, 0, 0, sizeof(msg));
-	DebugLevel3("\n%d=%s\n" _C_ retval _C_ msg);
-	SetMessage("%s", msg);
-#elif defined(USE_LUA)
-#endif
+	if (!(status = luaL_loadbuffer(Lua, command, strlen(command), command))) {
+		LuaCall(0, 1);
+	} else {
+		report(status);
+	}
+	return status;
 }
 
 /*............................................................................
