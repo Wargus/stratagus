@@ -408,6 +408,8 @@ global void PlaceUnit(Unit* unit,int x,int y)
     DebugCheck( !unit->Removed || unit->Destroyed );
 
     type=unit->Type;
+
+#ifdef NEW_SHIPS
     //
     //	Sea and air units are 2 tiles aligned
     //
@@ -415,6 +417,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	x&=~1;
 	y&=~1;
     }
+#endif
 
     unit->X=x;
     unit->Y=y;
