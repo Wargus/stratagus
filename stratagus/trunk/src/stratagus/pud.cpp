@@ -1327,34 +1327,6 @@ pawn:
     }
 }
 
-#ifdef USE_ZLIB
-
-/**
-**	Write pud header.
-**
-**	@param f	File handle
-**	@param type	4 byte header
-**	@param length	section length
-*/
-local void PudWriteHeader(gzFile f,char* type,int length)
-{
-    unsigned char buf[4];
-
-    DebugCheck( strlen(type)!=4 );
-    if( gzwrite(f,type,4)!=4 ) {
-	ExitFatal(-1);
-    }
-
-    buf[0]=length>> 0;
-    buf[1]=length>> 8;
-    buf[2]=length>>16;
-    buf[3]=length>>24;
-
-    if( gzwrite(f,buf,4)!=4 ) {
-	ExitFatal(-1);
-    }
-}
-
 /**
 **	Convert the map to MTXM format and save in a buffer.
 **
@@ -1385,6 +1357,34 @@ local void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
     }
 }
 
+#ifdef USE_ZLIB
+
+/**
+**	Write pud header.
+**
+**	@param f	File handle
+**	@param type	4 byte header
+**	@param length	section length
+*/
+local void PudWriteHeader(gzFile f,char* type,int length)
+{
+    unsigned char buf[4];
+
+    DebugCheck( strlen(type)!=4 );
+    if( gzwrite(f,type,4)!=4 ) {
+	ExitFatal(-1);
+    }
+
+    buf[0]=length>> 0;
+    buf[1]=length>> 8;
+    buf[2]=length>>16;
+    buf[3]=length>>24;
+
+    if( gzwrite(f,buf,4)!=4 ) {
+	ExitFatal(-1);
+    }
+}
+
 /**
 **	Save the MTXM section
 **
@@ -1405,23 +1405,6 @@ local void PudWriteMTXM(gzFile f,const WorldMap* map)
     PudConvertMTXM(mtxm,map,tileset);
 
     gzwrite(f,mtxm,n*2);
-    free(mtxm);
-}
-
-/**
-**	Change a pud's tileset
-**
-**	@param old	    Number of old tileset
-**	@param map	    Map to change
-*/
-global void ChangeTilesetPud(int old,WorldMap* map)
-{
-    unsigned char* mtxm;
-
-    MapOffsetX=MapOffsetY=0;
-    mtxm=malloc(map->Width*map->Height*2);
-    PudConvertMTXM(mtxm,map,Tilesets[old]);
-    ConvertMTXM((const unsigned short*)mtxm,map->Width,map->Height,map);
     free(mtxm);
 }
 
@@ -1716,6 +1699,23 @@ global int SavePud(const char* pud __attribute__((unused)),
 }
 
 #endif
+
+/**
+**	Change a pud's tileset
+**
+**	@param old	    Number of old tileset
+**	@param map	    Map to change
+*/
+global void ChangeTilesetPud(int old,WorldMap* map)
+{
+    unsigned char* mtxm;
+
+    MapOffsetX=MapOffsetY=0;
+    mtxm=malloc(map->Width*map->Height*2);
+    PudConvertMTXM(mtxm,map,Tilesets[old]);
+    ConvertMTXM((const unsigned short*)mtxm,map->Width,map->Height,map);
+    free(mtxm);
+}
 
 /**
 **	Clean pud module.
