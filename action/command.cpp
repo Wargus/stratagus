@@ -690,19 +690,21 @@ global void CommandBuildBuilding(Unit* unit, int x, int y,
 }
 
 /**
-**	Cancel the building construction.
+**	Cancel the building construction, or kill an unit.
 **
 **	@param unit	pointer to unit.
 **	@param worker	pointer to unit.
 */
-global void CommandCancelBuilding(Unit* unit,
-    Unit* worker __attribute__((unused)))
+global void CommandDismiss(Unit* unit)
 {
     //
     //	Check if building is still under construction? (NETWORK!)
     //
     if (unit->Orders[0].Action == UnitActionBuilded) {
 	unit->Data.Builded.Cancel = 1;
+    } else {
+	DebugLevel0("Suicide unit ... \n");
+	LetUnitDie(unit);
     }
     ClearSavedAction(unit);
 }

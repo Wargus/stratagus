@@ -559,8 +559,8 @@ local void DoNextReplay(void)
 	SendCommandUnload(UnitSlots[unit], posx, posy, dunit, flags);
     } else if (!strcmp(name, "build")) {
 	SendCommandBuildBuilding(UnitSlots[unit], posx, posy, UnitTypeByIdent(val), flags);
-    } else if (!strcmp(name, "cancel-build")) {
-	SendCommandCancelBuilding(UnitSlots[unit], dunit);
+    } else if (!strcmp(name, "dismiss")) {
+	SendCommandDismiss(UnitSlots[unit]);
     } else if (!strcmp(name, "resource-loc")) {
 	SendCommandResourceLoc(UnitSlots[unit], posx, posy, flags);
     } else if (!strcmp(name, "resource")) {
@@ -887,14 +887,14 @@ global void SendCommandBuildBuilding(Unit* unit, int x, int y,
 **	@param unit	pointer to unit.
 **	@param worker	Worker which should stop.
 */
-global void SendCommandCancelBuilding(Unit* unit, Unit* worker)
+global void SendCommandDismiss(Unit* unit)
 {
     // FIXME: currently unit and worker are same?
     if (NetworkFildes == (Socket)-1) {
-	CommandLog("cancel-build", unit, FlushCommands, -1, -1, worker, NULL, -1);
-	CommandCancelBuilding(unit, worker);
+	CommandLog("dismiss", unit, FlushCommands, -1, -1, NULL, NULL, -1);
+	CommandDismiss(unit);
     } else {
-	NetworkSendCommand(MessageCommandCancelBuild, unit, 0, 0, worker, 0,
+	NetworkSendCommand(MessageCommandDismiss, unit, 0, 0, NULL, 0,
 	    FlushCommands);
     }
 }
@@ -1277,15 +1277,9 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 		-1);
 	    CommandBuildBuilding(unit, x, y, UnitTypes[dstnr], status);
 	    break;
-	case MessageCommandCancelBuild:
-	    // dest is the worker building the unit...
-	    dest = NoUnitP;
-	    if (dstnr != (unsigned short)0xFFFF) {
-		dest = UnitSlots[dstnr];
-		DebugCheck(!dest || !dest->Type);
-	    }
-	    CommandLog("cancel-build", unit, FlushCommands, -1, -1, dest, NULL, -1);
-	    CommandCancelBuilding(unit, dest);
+	case MessageCommandDismiss:
+	    CommandLog("dismiss", unit, FlushCommands, -1, -1, NULL, NULL, -1);
+	    CommandDismiss(unit);
 	    break;
 	case MessageCommandResourceLoc:
 	    CommandLog("resource-loc", unit, status, x, y, NoUnitP, NULL, -1);

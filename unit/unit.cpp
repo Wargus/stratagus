@@ -796,7 +796,7 @@ global void UnitLost(Unit* unit)
 	unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades] = 0;
     }
 
-    DebugLevel3Fn("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
+    DebugLevel0Fn("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
 
     //	Destroy resource-platform, must re-make resource patch.
     if (type->MustBuildOnTop && unit->Value > 0) {
@@ -2776,6 +2776,7 @@ global void LetUnitDie(Unit* unit)
 
     //	removed units,  just remove.
     if (unit->Removed) {
+	DebugLevel0Fn("Killing a removed unit?\n");
 	RemoveUnit(unit, NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
