@@ -722,6 +722,7 @@ local void DrawBuildingCursor(void)
     //
     PushClipping();
     SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
+    DrawShadow(NULL, CursorBuilding, x, y);
     GraphicPlayerPixels(ThisPlayer, CursorBuilding->Sprite);
     if (VideoGraphicFrames(CursorBuilding->Sprite) > 5) {
 	DrawUnitType(CursorBuilding, 4, x, y);
