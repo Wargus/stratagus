@@ -181,7 +181,8 @@ freecraft:	$(OBJ)
 	$(CCLD) -o freecraft $^ $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	$(OBJ) etlib/$(OBJDIR)/winobj src/$(OBJDIR)/freecraftrc.$(OE) src/$(OBJDIR)/main.$(OE)
+freecraft.exe:	$(OBJ) etlib/$(OBJDIR)/getopt.$(OE) \
+	    src/$(OBJDIR)/freecraftrc.$(OE) src/$(OBJDIR)/main.$(OE)
 	$(CCLD) -o freecraft$(EXE) $^ -lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 strip:
@@ -208,15 +209,18 @@ tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
 
 clean::
 	@for i in $(MODULES) ; do \
-	$(RM) -rf $$i/$(OBJDIR) $$i/*.doc; done
+	$(RM) -rf $$i/$(OBJDIR)/*.o $$i/*.doc; done
 	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)/*.$(OE) .#*
 	@echo
 
 distclean:	clean
+	[ $(OBJDIR) == "." ] || $(RM) -rf $(OBJDIR)
 	$(RM) freecraft$(EXE) gmon.sum *~ stderr.txt stdout.txt
 	$(RM) $$i/.depend $$i/.#* $$i/*~
 	$(RM) -r srcdoc/*
 	@echo
+
+clobber:	distclean
 
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
@@ -246,8 +250,8 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
-PUDS	= contrib/puds/single/*.pud.gz contrib/puds/multi/*.pud.gz \
-	  contrib/puds/single/*.txt contrib/puds/multi/*.txt
+PUDS	= contrib/puds/single/*.txt contrib/puds/single/*.pud.gz \
+	  contrib/puds/multi/*.txt contrib/puds/multi/*.pud.gz
 
 CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/constructions.ccl data/ccl/human/constructions.ccl \
@@ -266,9 +270,9 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/campaigns.ccl data/ccl/credits.ccl \
 	  data/ccl/human/campaign1.ccl data/ccl/human/campaign2.ccl \
 	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
-	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm \
+	  data/ccl/anim.ccl data/ccl/wc2.ccl data/ccl/ranks.ccl \
 	  data/ccl/tips.ccl data/ccl/menus.ccl data/ccl/keystrokes.ccl \
-	  data/ccl/editor.ccl data/campaigns/*/*.cm
+	  data/ccl/editor.ccl # data/campaigns/*/*.cm
 
 CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/health.png contrib/mana.png \
@@ -276,7 +280,8 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz \
 	  contrib/FreeCraft-beos.proj \
-	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h
+	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h \
+	  contrib/campaigns/*/*.cm
 
 MISC    += Makefile Rules.make.orig setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
