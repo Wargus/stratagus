@@ -1063,7 +1063,7 @@ local void VideoDraw8to8ClipX(const Graphic* sprite,unsigned frame,int x,int y)
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory8+x+y*VideoWidth+w;
+    dp=VideoMemory8+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( w==sw ) {			// Unclipped horizontal
@@ -1202,7 +1202,7 @@ local void VideoDraw8to16ClipX(const Graphic* sprite,unsigned frame
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory16+x+y*VideoWidth+w;
+    dp=VideoMemory16+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( w==sw ) {			// Unclipped horizontal
@@ -1340,7 +1340,7 @@ local void VideoDraw8to24ClipX(const Graphic* sprite,unsigned frame
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory24+x+y*VideoWidth+w;
+    dp=VideoMemory24+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( w==sw ) {			// Unclipped horizontal
@@ -1478,7 +1478,7 @@ local void VideoDraw8to32ClipX(const Graphic* sprite,unsigned frame
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory32+x+y*VideoWidth+w;
+    dp=VideoMemory32+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( w==sw ) {			// Unclipped horizontal
@@ -2280,7 +2280,7 @@ local void VideoDraw8to8ShadowClipX(const Graphic* sprite,unsigned frame
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory8+x+y*VideoWidth+w;
+    dp=VideoMemory8+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( w==sw ) {			// Unclipped horizontal
@@ -2429,7 +2429,7 @@ local void VideoDraw8to16ShadowClipX(const Graphic* sprite,unsigned frame
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory16+x+y*VideoWidth+w;
+    dp=VideoMemory16+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( VideoBpp==15 ) {
@@ -2588,7 +2588,7 @@ local void VideoDraw8to24ShadowClipX(const Graphic* sprite,unsigned frame
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory24+x+y*VideoWidth+w;
+    dp=VideoMemory24+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( w==sw ) {			// Unclipped horizontal
@@ -2728,7 +2728,7 @@ local void VideoDraw8to32ShadowClipX(const Graphic* sprite,unsigned frame
     }
 
     da=VideoWidth+sw;
-    dp=VideoMemory32+x+y*VideoWidth+w;
+    dp=VideoMemory32+x+y*VideoWidth+w-1;
     ep=dp+VideoWidth*h;
 
     if( w==sw ) {			// Unclipped horizontal
