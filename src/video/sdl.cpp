@@ -158,7 +158,7 @@ static void InitOpenGL(void)
 }
 #endif
 
-#if 0
+#if defined(DEBUG) && !defined(USE_WIN32)
 static void CleanExit(int signum)
 {
 	// Clean SDL
@@ -169,7 +169,6 @@ static void CleanExit(int signum)
 	abort();
 }
 #endif
-
 
 /**
 **  Initialize the video part for SDL.
