@@ -155,11 +155,8 @@ void LoadIcons(void)
 		icon = Icons[i];
 		// If tileset only fitting tileset.
 		if (!icon->Tileset || !strcmp(icon->Tileset, TheMap.TerrainName)) {
-			// File already loaded?
-			if (!GraphicLoaded(icon->Sprite)) {
-				LoadGraphic(icon->Sprite);
-				ShowLoadProgress("Icons %s", icon->Sprite->File);
-			}
+			LoadGraphic(icon->Sprite);
+			ShowLoadProgress("Icons %s", icon->Sprite->File);
 			if (icon->Frame >= icon->Sprite->NumFrames) {
 				DebugPrint("Invalid icon frame: %s - %d\n" _C_
 					icon->Ident _C_ icon->Frame);

@@ -123,7 +123,8 @@ void LoadTileset(void)
 	//  Load and prepare the tileset
 	//
 	ShowLoadProgress("Tileset `%s'", Tilesets[i]->ImageFile);
-	TheMap.TileGraphic = LoadSprite(Tilesets[i]->ImageFile, 0, 0);
+	TheMap.TileGraphic = NewGraphic(Tilesets[i]->ImageFile, 0, 0);
+	LoadGraphic(TheMap.TileGraphic);
 
 	TileSizeX = Tilesets[i]->TileSizeX;
 	TileSizeY = Tilesets[i]->TileSizeY;
@@ -527,7 +528,7 @@ void CleanTilesets(void)
 	//
 	// Should this be done by the map?
 	//
-	VideoSafeFree(TheMap.TileGraphic);
+	FreeGraphic(TheMap.TileGraphic);
 	TheMap.TileGraphic = NULL;
 
 	//

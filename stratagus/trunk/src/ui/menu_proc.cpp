@@ -160,7 +160,7 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 			pimage = &style->Default;
 		}
 	}
-	if (pimage->Sprite && !GraphicLoaded(pimage->Sprite)) {
+	if (pimage->Sprite) {
 		LoadGraphic(pimage->Sprite);
 	}
 	if (pimage->Sprite) {
@@ -844,7 +844,7 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
 			}
 		}
 	}
-	if (pimage->Sprite && !GraphicLoaded(pimage->Sprite)) {
+	if (pimage->Sprite) {
 		LoadGraphic(pimage->Sprite);
 	}
 	if (pimage->Sprite) {
@@ -1007,7 +1007,8 @@ void DrawMenu(Menu* menu)
 
 	if (menu->Background) {
 		if (!menu->BackgroundG) {
-			menu->BackgroundG = LoadSprite(menu->Background, 0, 0);
+			menu->BackgroundG = NewGraphic(menu->Background, 0, 0);
+			LoadGraphic(menu->BackgroundG);
 			ResizeGraphic(menu->BackgroundG, VideoWidth, VideoHeight);
 		}
 		VideoDraw(menu->BackgroundG, 0, 0, 0);
@@ -2603,12 +2604,13 @@ void InitMenus(int race)
 		MenuCallbacks.NetworkEvent = NetworkEvent;
 	} else {
 		// free previous sprites for different race
-		VideoFree(MenuButtonGfx.Sprite);
+		FreeGraphic(MenuButtonGfx.Sprite);
 	}
 	last_race = race;
 	width = MenuButtonGfx.Width[race];
 	height = MenuButtonGfx.Height[race];
-	MenuButtonGfx.Sprite = LoadSprite(MenuButtonGfx.File[race], width, height);
+	MenuButtonGfx.Sprite = NewGraphic(MenuButtonGfx.File[race], width, height);
+	LoadGraphic(MenuButtonGfx.Sprite);
 
 	CurrentMenu = NULL;
 }
