@@ -282,7 +282,7 @@ global void ShowIntro(const Intro *intro)
     LibraryFileName(intro->TextFile,buf);
     if( !(file=CLopen(buf)) ) {
 	fprintf(stderr,"Can't open file `%s'\n",intro->TextFile);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     l=0;
     text=malloc(8192);

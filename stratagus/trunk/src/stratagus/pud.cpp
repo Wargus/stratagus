@@ -282,7 +282,7 @@ local int PudReadHeader(CLFile* input,char* header,long* length)
     }
     if( CLread(input,&len,4)!=4 ) {
 	perror("CLread()");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     *length=ConvertLE32(len);
     return 1;
@@ -299,7 +299,7 @@ local int PudReadWord(CLFile* input)
 
     if( CLread(input,&temp_short,2)!=2 ) {
 	perror("CLread()");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     return ConvertLE16(temp_short);
@@ -316,7 +316,7 @@ local int PudReadByte(CLFile* input)
 
     if( CLread(input,&temp_char,1)!=1 ) {
 	perror("CLread()");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     return temp_char;
@@ -339,24 +339,24 @@ global MapInfo* GetPudInfo(const char* pud)
 	fprintf(stderr,"Try ./path/name\n");
 	sprintf(buf, "pud: CLopen(%s)", pud);
 	perror(buf);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     header[4]='\0';
     if( !PudReadHeader(input,header,&length) ) {
 	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if( memcmp(header,"TYPE",4) || length!=16 ) {
 	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if( CLread(input,buf,16)!=16 ) {	// IGNORE TYPE
 	perror("CLread()");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if( strcmp(buf,"WAR2 MAP") ) {	// ONLY CHECK STRING
 	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     info=calloc(1, sizeof(MapInfo));	// clears with 0
@@ -394,7 +394,7 @@ global MapInfo* GetPudInfo(const char* pud)
 	if( !memcmp(header,"DESC",4) ) {
 	    if( CLread(input,buf,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    info->MapUID += ChksumArea(buf, length);
 	    info->Description=strdup(buf);
@@ -479,11 +479,11 @@ global MapInfo* GetPudInfo(const char* pud)
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
@@ -499,11 +499,11 @@ global MapInfo* GetPudInfo(const char* pud)
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
@@ -524,11 +524,11 @@ global MapInfo* GetPudInfo(const char* pud)
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
@@ -666,11 +666,11 @@ global MapInfo* GetPudInfo(const char* pud)
 	    // FIXME: linux didn't like this big alloca :((((((
 	    if( !(mtxm=malloc(length)) ) {
 		perror("malloc()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,mtxm,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)mtxm, length);
 	    free(mtxm);
@@ -686,11 +686,11 @@ global MapInfo* GetPudInfo(const char* pud)
 
 	    if( !(sqm=malloc(length)) ) {
 		perror("malloc()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,sqm,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)sqm, length);
 	    free(sqm);
@@ -706,11 +706,11 @@ global MapInfo* GetPudInfo(const char* pud)
 
 	    if( !(regm=malloc(length)) ) {
 		perror("malloc()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,regm,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)regm, length);
 	    free(regm);
@@ -783,24 +783,24 @@ global void LoadPud(const char* pud,WorldMap* map)
 	fprintf(stderr,"Try ./path/name\n");
 	sprintf(buf, "pud: CLopen(%s)", pud);
 	perror(buf);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     header[4]='\0';
     if( !PudReadHeader(input,header,&length) ) {
 	fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if( memcmp(header,"TYPE",4) || length!=16 ) {
 	fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if( CLread(input,buf,16)!=16 ) {	// IGNORE TYPE
 	perror("CLread()");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if( strcmp(buf,"WAR2 MAP") ) {	// ONLY CHECK STRING
 	fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     aiopps=width=height=0;
@@ -831,7 +831,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 	if( !memcmp(header,"DESC",4) ) {
 	    if( CLread(input,buf,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    DebugLevel1("\tDESC: %s\n",buf);
 	    strncpy(map->Description,buf,sizeof(map->Description));
@@ -915,12 +915,12 @@ global void LoadPud(const char* pud,WorldMap* map)
 		map->Fields=calloc(width*height,sizeof(*map->Fields));
 		if( !map->Fields ) {
 		    perror("calloc()");
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 		TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
 		if( !TheMap.Visible[0] ) {
 		    perror("calloc()");
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 		InitUnitCache();
 		// FIXME: this should be CreateMap or InitMap?
@@ -945,11 +945,11 @@ global void LoadPud(const char* pud,WorldMap* map)
 		    bufp=buf;
 		} else if( !(bufp=alloca(length)) ) {
 		    perror("alloca()");
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 		if( CLread(input,bufp,length)!=length ) {
 		    perror("CLread()");
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 		ParsePudUDTA(bufp,length);
 	    }
@@ -966,11 +966,11 @@ global void LoadPud(const char* pud,WorldMap* map)
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    ParsePudALOW(bufp,length);
 	    continue;
@@ -991,11 +991,11 @@ global void LoadPud(const char* pud,WorldMap* map)
 		    bufp=buf;
 		} else if( !(bufp=alloca(length)) ) {
 		    perror("alloca()");
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 		if( CLread(input,bufp,length)!=length ) {
 		    perror("CLread()");
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 		ParsePudUGRD(bufp,length);
 	    }
@@ -1124,15 +1124,15 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 	    if( length!=width*height*2 ) {
 		DebugLevel1("wrong length of MTXM section %ld\n",length);
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( !(mtxm=malloc(length)) ) {
 		perror("malloc()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,mtxm,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 
 	    ConvertMTXM(mtxm,width,height,map);
@@ -1149,15 +1149,15 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 	    if( length!=width*height*sizeof(short) ) {
 		DebugLevel1("wrong length of SQM  section %ld\n",length);
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( !(sqm=malloc(length)) ) {
 		perror("malloc()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,sqm,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 
 	    ConvertSQM(sqm,width,height,map);
@@ -1174,15 +1174,15 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 	    if( length!=width*height*sizeof(short) ) {
 		DebugLevel1("wrong length of REGM section %ld\n",length);
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( !(regm=malloc(length)) ) {
 		perror("malloc()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    if( CLread(input,regm,length)!=length ) {
 		perror("CLread()");
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 
 	    ConvertREGM(regm,width,height,map);

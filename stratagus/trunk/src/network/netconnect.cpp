@@ -147,7 +147,7 @@ global void NetworkServerSetup(WorldMap *map)
     msg = (InitMessage *)buf;
     for (i = 1; i < NetPlayers;) {
 	if ((n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
-	    FatalExit(-1);
+	    ExitFatal(-1);
 	}
 
 	if (msg->Type != MessageInitHello || n != sizeof(*msg)) {
@@ -176,7 +176,7 @@ global void NetworkServerSetup(WorldMap *map)
 	    DebugLevel0Fn("Sending InitConfig Message EngineMismatch: (%d) to %d.%d.%d.%d:%d\n",
 			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 	    continue;
-	    // FatalExit(-1);
+	    // ExitFatal(-1);
 	}
 
 	if (ntohl(msg->Version) != NetworkProtocolVersion) {
@@ -191,7 +191,7 @@ global void NetworkServerSetup(WorldMap *map)
 	    DebugLevel0Fn("Sending InitConfig Message ProtocolMismatch: (%d) to %d.%d.%d.%d:%d\n",
 			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 	    continue;
-	    // FatalExit(-1);
+	    // ExitFatal(-1);
 	}
 	n = 0;
 	if (map->Info) {
@@ -214,7 +214,7 @@ global void NetworkServerSetup(WorldMap *map)
 	    DebugLevel0Fn("Sending InitConfig Message MapUIDMismatch: (%d) to %d.%d.%d.%d:%d\n",
 			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 	    continue;
-	    // FatalExit(-1);
+	    // ExitFatal(-1);
 	}
 
 	DebugLevel0Fn("Version=" FreeCraftFormatString
@@ -276,7 +276,7 @@ global void NetworkServerSetup(WorldMap *map)
     }
     if (n < NetPlayers) {
 	fprintf(stderr, "Not enough person slots\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     // Randomize them.
@@ -415,7 +415,7 @@ global void NetworkClientSetup(WorldMap *map)
     }
     if (host == INADDR_NONE) {
 	fprintf(stderr, "Can't resolve host %s\n", NetworkArg);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     DebugLevel0Fn("Server host:port %d.%d.%d.%d:%d\n",
 	    NIPQUAD(ntohl(host)), ntohs(port));
@@ -446,7 +446,7 @@ global void NetworkClientSetup(WorldMap *map)
 	// Wait for answer (timeout 1/2s)
 	if (NetSocketReady(NetworkFildes, 500)) {
 	    if ((n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
-		FatalExit(-1);
+		ExitFatal(-1);
 	    }
 	    DebugLevel0Fn("Received reply? %d:%d(%d) %d.%d.%d.%d:%d\n",
 		    msg->Type, msg->SubType, n,
@@ -455,7 +455,7 @@ global void NetworkClientSetup(WorldMap *map)
 	    IfDebug(
 		if (NetLastHost == MyHost && NetLastPort == MyPort) {
 		    fprintf(stderr, "Network client setup: Talking to myself!\n");
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 	    );
 
@@ -475,7 +475,7 @@ global void NetworkClientSetup(WorldMap *map)
 					FreeCraftFormatString "\n",
 				    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
 				    FreeCraftFormatArgs(FreeCraftVersion));
-			    FatalExit(-1);
+			    ExitFatal(-1);
 
 			case ICMProtocolMismatch:
 			    fprintf(stderr, "Incompatible network protocol version "
@@ -483,25 +483,25 @@ global void NetworkClientSetup(WorldMap *map)
 					NetworkProtocolFormatString "\n",
 				    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
 				    NetworkProtocolFormatArgs(NetworkProtocolVersion));
-			    FatalExit(-1);
+			    ExitFatal(-1);
 
 			case ICMEngineConfMismatch:	/// FIXME: Not Implemented yet
-			    FatalExit(-1);
+			    ExitFatal(-1);
 
 			case ICMMapUidMismatch:
 			    fprintf(stderr, "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
 					map->Info ?
 					    (unsigned int)map->Info->MapUID : 0,
 					    (unsigned int)ntohl(msg->MapUID));
-			    FatalExit(-1);
+			    ExitFatal(-1);
 
 			case ICMGameFull:
 			    fprintf(stderr, "Server is full!\n");
-			    FatalExit(-1);
+			    ExitFatal(-1);
 
 			case ICMServerQuit:
 			    fprintf(stderr, "Server has quit!\n");
-			    FatalExit(-1);
+			    ExitFatal(-1);
 		    }
 		}
 	    }
@@ -517,7 +517,7 @@ global void NetworkClientSetup(WorldMap *map)
     acknowledge.Type = MessageInitReply;
     for (;;) {
 	if ((n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
-	    FatalExit(-1);
+	    ExitFatal(-1);
 	}
 
 	DebugLevel0Fn("Received config? %d(%d) %d.%d.%d.%d:%d\n",
@@ -577,7 +577,7 @@ global void NetworkClientSetup(WorldMap *map)
     //
     while (NetSocketReady(NetworkFildes, 3000)) {
 	if ((n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
-	    FatalExit(-1);
+	    ExitFatal(-1);
 	}
 
 	DebugLevel3Fn("Received config? %d(%d) %d.%d.%d.%d:%d\n",
