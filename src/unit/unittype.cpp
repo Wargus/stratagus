@@ -441,12 +441,20 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	if( BIT(31,v) )	DebugLevel0("Unused bit 31 used in %d\n" _C_ i);
 #endif
 #undef BIT
+	//
+	//	Unit type checks.
+	//
+	if( unittype->CanCastSpell && !unittype->_MaxMana ) {
+	    DebugLevel0Fn("%s: Need max mana value\n" _C_ unittype->Ident);
+	    unittype->_MaxMana=255;
+	}
     }
 
     // FIXME: peon applies also to peon-with-gold and peon-with-wood
     // FIXME: oil-tanker applies also to oil-tanker-full
 
     DebugLevel0("\tUDTA used %d bytes\n" _C_ udta-start);
+
 
     UpdateStats();
 }
