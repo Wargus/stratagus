@@ -53,12 +53,10 @@ extern void PreMenuSetup(void);		/// FIXME: not here!
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
 extern struct {
-	/// resource filename one for each race
-    const char*	File[PlayerMaxRaces];
-	/// Width of button
-    int		Width, Height;
-	/// sprite : FILLED
-    Graphic*	Sprite;
+    const char*	File[PlayerMaxRaces];	/// Resource filename one for each race
+    int		Width;			/// Width of button
+    int		Height;			/// Height of button
+    Graphic*	Sprite;			/// Sprite : FILLED
 } MenuButtonGfx;
 
 /*----------------------------------------------------------------------------
@@ -1071,7 +1069,8 @@ local void EditorCallbackMouse(int x, int y)
 	    bx = TheUI.ButtonPanelX + 4;
 	    while (bx < TheUI.ButtonPanelX + 144) {
 		if (bx < x && x < bx + 32 && by < y && y < by + 32) {
-		    DebugLevel3Fn("Button %d\n" _C_ i);
+		    SetStatusLine(TheMap.Tileset->TileNames[
+			    TheMap.Tileset->BasicNameTable[i * 16 + 16]]);
 		    ButtonUnderCursor = i + 100;
 		    CursorOn = CursorOnButton;
 		    return;
