@@ -810,7 +810,7 @@ local void DoNextReplay(void)
 
 	DebugCheck(unit != -1 && strcmp(ReplayStep->UnitIdent, UnitSlots[unit]->Type->Ident));
 
-	if (((signed)SyncRandSeed) != ReplayStep->SyncRandSeed) {
+	if (SyncRandSeed != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG
 		if (!ReplayStep->SyncRandSeed) {
 			// Replay without the 'sync info
