@@ -258,8 +258,11 @@ typedef struct _ui_ {
 
     // The status line
     GraphicConfig StatusLine;		/// Status line background
-    int		StatusLineX;		/// status line screeen X position
-    int		StatusLineY;		/// status line screeen Y position
+    int		StatusLineX;		/// status line screen X position
+    int		StatusLineY;		/// status line screen Y position
+    int		StatusLineTextX;	/// status line screen text X position
+    int		StatusLineTextY;	/// status line screen text Y position
+    unsigned	StatusLineFont;		/// Status line font
 
     Button*	InfoButtons;		/// Info buttons
     int		NumInfoButtons;		/// Number of info buttons
@@ -324,7 +327,8 @@ extern int SpeedMouseScroll;		/// Mouse Scrolling Speed, in Frames
 extern void InitUserInterface(const char*);	/// initialize the ui
 extern void LoadUserInterface(void);		/// load ui graphics
 extern void SaveUserInterface(FILE*);		/// save the ui state
-extern void CleanUserInterface(void);		/// clean up the ui
+extern void CleanUI(UI*);			/// clean up a ui
+extern void CleanUserInterface(void);		/// clean up the ui module
 extern void UserInterfaceCclRegister(void);	/// register ccl features
 
     /// Called if the mouse is moved in Normal interface state

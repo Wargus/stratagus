@@ -954,8 +954,14 @@ global void DrawStatusLine(void)
 	    ,0,0
 	    ,TheUI.StatusLine.Graphic->Width,TheUI.StatusLine.Graphic->Height
 	    ,TheUI.StatusLineX,TheUI.StatusLineY);
-    if( StatusLine ) {
-	VideoDrawText(TheUI.StatusLineX+2,TheUI.StatusLineY+2,GameFont,StatusLine);
+    if( StatusLine[0] ) {
+	PushClipping();
+	SetClipping(TheUI.StatusLineTextX,TheUI.StatusLineTextY
+		,TheUI.StatusLineX+TheUI.StatusLine.Graphic->Width
+		,TheUI.StatusLineY+TheUI.StatusLine.Graphic->Height);
+	VideoDrawTextClip(TheUI.StatusLineTextX,TheUI.StatusLineTextY
+		,TheUI.StatusLineFont,StatusLine);
+	PopClipping();
     }
 }
 
@@ -966,10 +972,10 @@ global void DrawStatusLine(void)
 */
 global void SetStatusLine(char* status)
 {
-    if( KeyState!=KeyStateInput && strcmp( StatusLine, status ) ) {
+    if( KeyState!=KeyStateInput && strcmp(StatusLine,status) ) {
 	MustRedraw|=RedrawStatusLine;
-	strncpy( StatusLine, status, STATUS_LINE_LEN-1 );
-	StatusLine[STATUS_LINE_LEN-1] = 0;
+	strncpy(StatusLine,status,STATUS_LINE_LEN-1);
+	StatusLine[STATUS_LINE_LEN-1]='\0';
     }
 }
 
@@ -979,7 +985,7 @@ global void SetStatusLine(char* status)
 global void ClearStatusLine(void)
 {
     if( KeyState!=KeyStateInput ) {
-	SetStatusLine( "" );
+	SetStatusLine("");
     }
 }
 

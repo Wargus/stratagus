@@ -1368,6 +1368,7 @@ local void LoadGameOk(void)
 	fl = mi->d.listbox.options;
 	sprintf(TempPathBuf, "%s/%s", SaveDir, fl[i].name);
 	LoadGame(TempPathBuf);
+	Callbacks = &GameCallbacks;
 	SetMessage("Loaded game: %s", TempPathBuf);
 	GuiGameStarted = 1;
 	CurrentMapPath[0] = '\0';
