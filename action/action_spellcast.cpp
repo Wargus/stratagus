@@ -160,10 +160,11 @@ global void HandleActionSpellCast(Unit* unit)
 		     unit->Command.Action=UnitActionStill;
 		     unit->SubAction=0;
 		     unit->Wait = 1;
-		     if ( unit->Command.Data.Move.Goal )
+		     if ( unit->Command.Data.Move.Goal ) {
 			RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 		        unit->Command.Data.Move.Goal->Refs--;
 			RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
+		     }
 		  }
 		}
 	    break;
