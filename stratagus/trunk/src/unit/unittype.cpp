@@ -1346,7 +1346,7 @@ global void LoadUnitSprites(void)
 	if( file ) {
 	    char* buf;
 
-	    buf=alloca(strlen(file)+10+1);
+	    buf=alloca(strlen(file)+9+1);
 #ifdef NEW_NAMES
 	    file=strcat(strcpy(buf,"graphics/"),file);
 #else
