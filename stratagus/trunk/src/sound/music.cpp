@@ -103,6 +103,10 @@ global void StopMusic(void)
 #endif
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 	if (MusicSample) {
+	    if (MusicSample->Type) {
+		MusicSample->Type->Free(MusicSample);
+		free(MusicSample->Type);
+	    }
 	    free(MusicSample);
 	    MusicSample = NULL;
 	    MusicIndex = 0;
@@ -399,7 +403,7 @@ global void PlayFile(const char* name)
 #endif
     name = LibraryFileName(name, buffer);
 #ifdef USE_OGG
-    if ((sample = LoadOgg(name))) {
+    if ((sample = LoadOggStreaming(name))) {
 	if( sample->Channels!=2
 		|| sample->SampleSize!=16
 		|| sample->Frequency!=SoundFrequency ) {
