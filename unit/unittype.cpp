@@ -541,10 +541,12 @@ global Animations* AnimationsByIdent(const char* ident)
 **	Save state of an animition set to file.
 **
 **	@param name	Animation name.
+**	@param resname	Resource name.
 **	@param anim	Save this animation.
 **	@param file	Output file.
 */
-local void SaveAnimation(const char* name, const Animation* anim, CLFile* file)
+local void SaveAnimation(const char* name, const char* resname,
+    const Animation* anim, CLFile* file)
 {
     int i;
     int p;
@@ -567,7 +569,11 @@ local void SaveAnimation(const char* name, const Animation* anim, CLFile* file)
 	    }
 	}
 
-	CLprintf(file, "\n  '%s '(\t; #%d", name, i);
+	CLprintf(file, "\n  '%s ", name);
+	if (resname) {
+	    CLprintf(file, "'%s ", resname);
+	}
+	CLprintf(file, "'(\t; #%d", i);
 	if (p) {
 	    CLprintf(file, " P%d", p);
 	}
@@ -604,7 +610,7 @@ local void SaveAnimation(const char* name, const Animation* anim, CLFile* file)
 **	@param type	Save animations of this unit-type.
 **	@param file	Output file.
 */
-local void SaveAnimations(const UnitType* type,CLFile* file)
+local void SaveAnimations(const UnitType* type, CLFile* file)
 {
     const Animations* anims;
     int i;
@@ -639,10 +645,15 @@ local void SaveAnimations(const UnitType* type,CLFile* file)
     }
     CLprintf(file, "\n(define-animations 'animations-%s", type->Ident + 5);
 
-    SaveAnimation("still", anims->Still,file);
-    SaveAnimation("move", anims->Move,file);
-    SaveAnimation("attack", anims->Attack,file);
-    SaveAnimation("die", anims->Die,file);
+    SaveAnimation("still", NULL, anims->Still, file);
+    SaveAnimation("move", NULL, anims->Move, file);
+    SaveAnimation("attack", NULL, anims->Attack, file);
+    SaveAnimation("repair", NULL, anims->Repair, file);
+    for (i = 0; i < MaxCosts; ++i) {
+	SaveAnimation("harvest", DefaultResourceNames[i],
+	    anims->Harvest[i], file);
+    }
+    SaveAnimation("die", NULL, anims->Die, file);
 
     CLprintf(file, ")\n");
 }
@@ -690,7 +701,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     //
     //	Animations are shared, find first use of the unit-type animation.
     //
-    for (i = 0; i < NumUnitTypes && UnitTypes[i] != type ; ++i) {
+    for (i = 0; i < NumUnitTypes && UnitTypes[i] != type; ++i) {
 	if (UnitTypes[i]->Animations == type->Animations) {
 	    break;
 	}
@@ -1069,6 +1080,12 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     }
     if (type->Sound.Repair.Name) {
 	CLprintf(file, "\n    repair \"%s\"", type->Sound.Repair.Name);
+    }
+    for (i = 0; i < MaxCosts; ++i) {
+	if (type->Sound.Harvest[i].Name) {
+	    CLprintf(file, "\n    harvest %s \"%s\"", DefaultResourceNames[i],
+		type->Sound.Harvest[i].Name);
+	}
     }
     if (type->Sound.Help.Name) {
 	CLprintf(file, "\n    help \"%s\"", type->Sound.Help.Name);
@@ -1568,6 +1585,11 @@ global void CleanUnitTypes(void)
 	}
 	if (type->Sound.Repair.Name) {
 	    free(type->Sound.Repair.Name);
+	}
+	for (j = 0; j < MaxCosts; ++j) {
+	    if (type->Sound.Harvest[j].Name) {
+		free(type->Sound.Harvest[j].Name);
+	    }
 	}
 	if (type->Sound.Help.Name) {
 	    free(type->Sound.Help.Name);

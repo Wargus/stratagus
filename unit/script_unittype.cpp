@@ -602,6 +602,27 @@ local SCM CclDefineUnitType(SCM list)
 		    type->Sound.Repair.Name = gh_scm2newstr(
 			gh_car(sublist), NULL);
 		    sublist = gh_cdr(sublist);
+		} else if (gh_eq_p(value, gh_symbol2scm("harvest"))) {
+		    int res;
+		    char* name;
+
+		    name = gh_scm2newstr(gh_car(sublist), NULL);
+		    sublist = gh_cdr(sublist);
+		    for (res = 0; res < MaxCosts; ++res) {
+			if (!strcmp(name, DefaultResourceNames[res])) {
+			    break;
+			}
+		    }
+		    if (res == MaxCosts) {
+			errl("Resource not found", value);
+		    }
+		    free(name);
+		    if (redefine) {
+			free(type->Sound.Harvest[res].Name);
+		    }
+		    type->Sound.Harvest[res].Name = gh_scm2newstr(
+			gh_car(sublist), NULL);
+		    sublist = gh_cdr(sublist);
 		} else if (gh_eq_p(value, gh_symbol2scm("help"))) {
 		    if (redefine) {
 			free(type->Sound.Help.Name);
@@ -972,6 +993,7 @@ local SCM CclDefineAnimations(SCM list)
     char* str;
     SCM id;
     SCM value;
+    SCM resource;
     Animations* anims;
     Animation* anim;
     Animation* t;
@@ -985,6 +1007,10 @@ local SCM CclDefineAnimations(SCM list)
     while (!gh_null_p(list)) {
 	id = gh_car(list);
 	list = gh_cdr(list);
+	if (gh_eq_p(id, gh_symbol2scm("harvest"))) {
+	    resource = gh_car(list);
+	    list = gh_cdr(list);
+	}
 	value = gh_car(list);
 	list = gh_cdr(list);
 
@@ -1025,6 +1051,24 @@ local SCM CclDefineAnimations(SCM list)
 		free(anims->Repair);
 	    }
 	    anims->Repair = anim;
+	} else if (gh_eq_p(id, gh_symbol2scm("harvest"))) {
+	    int res;
+	    char* name;
+
+	    name = gh_scm2newstr(resource, NULL);
+	    for (res = 0; res < MaxCosts; ++res) {
+		if (!strcmp(name, DefaultResourceNames[res])) {
+		    break;
+		}
+	    }
+	    if (res == MaxCosts) {
+		errl("Resource not found", value);
+	    }
+	    free(name);
+	    if (anims->Harvest[res]) {
+		free(anims->Harvest[res]);
+	    }
+	    anims->Harvest[res] = anim;
 	} else if (gh_eq_p(id, gh_symbol2scm("die"))) {
 	    if (anims->Die) {
 		free(anims->Die);
