@@ -738,14 +738,10 @@ global int UnitVisible(const Unit* unit)
     unsigned x;
     unsigned y;
     unsigned w;
+    unsigned w0;
     unsigned h;
 
-    IfDebug(
-	if (!unit->Type) {	// FIXME: Can this happen, if yes it is a bug
-	    abort();
-	    return 0;
-	}
-    );
+    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
 
     if ( unit->Invisible && unit->Player != ThisPlayer ) {
 	//FIXME: vladi: should handle teams and shared vision
@@ -753,25 +749,29 @@ global int UnitVisible(const Unit* unit)
     }
 
     //
-    //	Check if visible on screen
+    //	Check if visible on screen.
+    //		FIXME: This could be better checked, tells to much!
+    //		FIXME: This is needed to show moving units.
+    //		FIXME: flyers disappears to fast.
     //
     x = unit->X;
     y = unit->Y;
-    w = unit->Type->TileWidth;
+    w = w0 = unit->Type->TileWidth;
     h = unit->Type->TileHeight;
-    if( (x+w-1) < MapX || x > (MapX+MapWidth) ||
-	(y+h-1) < MapY || y > (MapY+MapHeight) ) {
+    if( (x+w) < MapX || x > (MapX+MapWidth)
+	    || (y+h) < MapY || y > (MapY+MapHeight) ) {
 	return 0;
     }
 
     //
-    //	Check explored or if visible under fog of war.
-    //	FIXME: isn't it enough to see a field of the building?
+    //	Check explored or if visible (building) under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //		FIXME: do we know this building SeenFrame!=-1 ?
     //
-    for( ; (int)w>=0; --w ) {
-	for( ; (int)h>=0; --h) {
-	    if( IsMapFieldExplored(x+w,y+h) &&
-		(unit->Type->Building || IsMapFieldVisible(x+w,y+h)) ) {
+    for( ; (int)h>=0; --h) {
+	for( w=w0; (int)w>=0; --w ) {
+	    if( IsMapFieldVisible(x+w,y+h) 
+		    || (unit->Type->Building && IsMapFieldExplored(x+w,y+h)) ) {
 		return 1;
 	    }
 	}
