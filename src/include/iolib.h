@@ -37,22 +37,23 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#define FindResource WinFindResource
+#define DrawIcon WinDrawIcon
+#define EndMenu WinEndMenu
 #ifdef USE_ZLIB
 #include <zlib.h>
 #endif
 
 #ifdef USE_BZ2LIB
-#define DrawIcon WinDrawIcon
-#define EndMenu WinEndMenu
 #include <bzlib.h>
-#undef DrawIcon
-#undef EndMenu
-#undef FindResource
 #endif
 
 #ifdef USE_ZZIPLIB
 #include <zzip.h>
 #endif
+#undef DrawIcon
+#undef EndMenu
+#undef FindResource
 
 /*----------------------------------------------------------------------------
 --	Definitons
