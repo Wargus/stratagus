@@ -128,7 +128,9 @@ static int MoveToResource(Unit* unit)
 				break;
 			default:
 				// Goal gone or something.
-				if (!unit->Reset || UnitVisibleAsGoal(goal, unit->Player)) {
+				if ((!unit->Type->NewAnimations && !unit->Reset) ||
+						(unit->Type->NewAnimations && unit->Anim.Unbreakable) ||
+						UnitVisibleAsGoal(goal, unit->Player)) {
 					return 0;
 				}
 				break;
@@ -256,6 +258,9 @@ static void AnimateActionHarvest(Unit* unit)
 		if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
 			PlayUnitSound(unit, VoiceHarvesting);
 		}
+	} else if (unit->Type->NewAnimations) {
+		Assert(unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
 	}
 }
 
@@ -356,7 +361,8 @@ static int GatherResource(Unit* unit)
 
 	if (unit->Data.ResWorker.DoneHarvesting) {
 		Assert(resinfo->HarvestFromOutside || resinfo->TerrainHarvester);
-		return unit->Reset;
+		return (!unit->Type->NewAnimations && unit->Reset) ||
+			(unit->Type->NewAnimations && !unit->Anim.Unbreakable);
 	}
 
 	// Target gone?
@@ -366,7 +372,12 @@ static int GatherResource(Unit* unit)
 			// Action now breakable, move to resource again.
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
 			// Give it some reasonable look while serching.
-			unit->Frame = unit->Type->Animations->Still->Frame;
+			if (unit->Type->Animations) {
+				unit->Frame = unit->Type->Animations->Still->Frame;
+			} else {
+				// FIXME: which frame?
+				unit->Frame = 0;
+			}
 		}
 		return 0;
 		// No wood? Freeze!!!
@@ -585,7 +596,7 @@ static int MoveToDepot(Unit* unit)
 		return 0;
 	}
 
-	Assert(unit->Wait == 1);
+	Assert((!unit->Type->NewAnimations && unit->Wait == 1) || unit->Type->NewAnimations);
 
 	//
 	// If resource depot is still under construction, wait!
