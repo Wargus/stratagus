@@ -1329,7 +1329,7 @@ local void PudWriteHeader(gzFile f,char* type,int length)
 **	@param f	File handle
 **	@param map	Map to save.
 */
-local void PudWriteMTXM(gzFile f,WorldMap* map)
+local void PudWriteMTXM(gzFile f,const WorldMap* map)
 {
     int i;
     int n;
@@ -1365,7 +1365,7 @@ local void PudWriteMTXM(gzFile f,WorldMap* map)
 **	@param f	File handle
 **	@param map	Map to save.
 */
-local void PudWriteSQM(gzFile f,WorldMap* map)
+local void PudWriteSQM(gzFile f,const WorldMap* map)
 {
     int i;
     int n;
@@ -1426,7 +1426,7 @@ local void PudWriteSQM(gzFile f,WorldMap* map)
 **	@param f	File handle
 **	@param map	Map to save.
 */
-local void PudWriteREGM(gzFile f,WorldMap* map)
+local void PudWriteREGM(gzFile f,const WorldMap* map)
 {
     int i;
     int n;
