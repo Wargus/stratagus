@@ -554,10 +554,10 @@ global void UpdateDisplay(void)
 		if (!TheUI.Resource.Graphic) {
 			MustRedraw |= RedrawResources;
 		}
-		if (!TheUI.StatusLine.Graphic) {
+		MustRedraw |= RedrawStatusLine;
+		/*if (!TheUI.StatusLine.Graphic) {
 			MustRedraw |= RedrawStatusLine;
-		}
-		
+		}*/
 	}
 
 	if (MustRedraw & (RedrawMessage | RedrawMap)) {
