@@ -16,6 +16,9 @@
 
 //@{
 
+// FIXME: should split the next into small modules!
+// FIXME: I (Johns) leave this for other people (this means you!)
+
 //----------------------------------------------------------------------------
 //	Includes
 //----------------------------------------------------------------------------
@@ -28,13 +31,14 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "etlib/dllist.h"
 #include "freecraft.h"
 #include "unit.h"
 #include "map.h"
 #include "actions.h"
 #include "player.h"
 #include "network.h"
-#include "etlib/dllist.h"
+#include "commands.h"
 
 // Include system network headers
 #ifdef USE_SDL_NET
@@ -70,13 +74,8 @@
 //	Declaration
 //----------------------------------------------------------------------------
 
-#define NetworkPort	6660		/// Default port for communication
-#define NetworkDups	4		/// Repeat old commands
-
-#define NetworkProtocolVersion 2	/// Network protocol version
-
 /**
-**	Network hosts
+**	Network systems active in current game.
 */
 typedef struct _network_host_ {
     unsigned long	Host;		/// host address
@@ -84,50 +83,7 @@ typedef struct _network_host_ {
 } NetworkHost;
 
 /**
-**	Network message types.
-*/
-enum _message_type_ {
-    MessageInitHello,			/// start connection
-    MessageInitReply,			/// connection reply
-    MessageInitConfig,			/// setup message configure clients
-
-    MessageSync,			/// heart beat
-    MessageQuit,			/// quit game
-    MessageQuitAck,			/// quit reply - UNUSED YET	Protocol Version 2 - Reserved for menus
-    MessageResend,			/// resend message
-
-    MessageChat,			/// chat message
-    MessageChatCont,			/// chat message continue
-    MessageChatTerm,			/// chat message termination -  Protocol Version 2
-
-    MessageCommandStop,			/// unit command stop
-    MessageCommandStand,		/// unit command stand ground
-    MessageCommandFollow,		/// unit command follow
-    MessageCommandMove,			/// unit command move
-    MessageCommandRepair,		/// unit command repair
-    MessageCommandAttack,		/// unit command attack
-    MessageCommandGround,		/// unit command attack ground
-    MessageCommandPatrol,		/// unit command patrol
-    MessageCommandBoard,		/// unit command borad
-    MessageCommandUnload,		/// unit command unload
-    MessageCommandBuild,		/// unit command build building
-    MessageCommandCancelBuild,		/// unit command cancel building
-    MessageCommandHarvest,		/// unit command harvest
-    MessageCommandMine,			/// unit command mine gold
-    MessageCommandHaul,			/// unit command haul oil
-    MessageCommandReturn,		/// unit command return goods
-    MessageCommandTrain,		/// unit command train
-    MessageCommandCancelTrain,		/// unit command cancel training
-    MessageCommandUpgrade,		/// unit command upgrade
-    MessageCommandCancelUpgrade,	/// unit command cancel upgrade
-    MessageCommandResearch,		/// unit command research
-    MessageCommandCancelResearch,	/// unit command cancel research
-    MessageCommandDemolish,		/// unit command demolish
-    MessageCommandSpellCast		/// unit command spell cast
-};
-
-/**
-**	Network init message
+**	Network init message.
 */
 typedef struct _init_message_ {
     unsigned char	Type;		/// Init message type.
@@ -149,7 +105,6 @@ typedef struct _network_command_ {
     unsigned short	X;		/// Map position X.
     unsigned short	Y;		/// Map position Y.
     UnitRef 		Dest;		/// Destination unit.
-    int			xdata;		/// Extra data for some commands - Protocol Version 2,
 } NetworkCommand;
 
 /**
@@ -165,7 +120,7 @@ typedef struct _network_chat_ {
 /**
 **	Network packet.
 **
-**	This is send over the network.
+**	This is sent over the network.
 */
 typedef struct _network_packet_ {
 					/// Commands in packet.
@@ -173,7 +128,7 @@ typedef struct _network_packet_ {
 } NetworkPacket;
 
 /**
-**	Network command in queue.
+**	Network command input/output queue.
 */
 typedef struct _network_command_queue_ {
     struct dl_node	List[1];	/// double linked list
@@ -181,8 +136,6 @@ typedef struct _network_command_queue_ {
     NetworkCommand	Data;		/// command content
 } NetworkCommandQueue;
 
-    /// Send packets
-local void NetworkSendPacket(NetworkCommandQueue* ncq);
 
 //----------------------------------------------------------------------------
 //	Variables
@@ -199,555 +152,9 @@ global char* NetworkArg;		/// Network command line argument
 //	Functions
 //----------------------------------------------------------------------------
 
-// FIXME: should split the next into small modules!
-// FIXME: I (Johns) leave this for other people (this means you!)
+    /// Send packets
+local void NetworkSendPacket(NetworkCommandQueue* ncq);
 
-//----------------------------------------------------------------------------
-//	Commands input
-//----------------------------------------------------------------------------
-
-local struct dl_head CommandsIn[1];	/// Network command input queue
-local struct dl_head CommandsOut[1];	/// Network command output queue
-
-/**
-**	Prepare send of command message.
-**
-**	Convert arguments into network format and place it into output queue.
-**
-**	@param command	Command (Move,Attack,...).
-**	@param unit	Unit that receive the command.
-**	@param x	optional X map position.
-**	@param y	optional y map position.
-**	@param dest	optional destination unit.
-**	@param type	optional unit type argument.
-**	@param status	Append command or flush old commands.
-*/
-global void NetworkSendCommand(int command,const Unit* unit,int x,int y
-	,const Unit* dest,const UnitType* type,int status)
-{
-    NetworkCommandQueue* ncq;
-
-    DebugLevel3Fn(" %d,%d,(%d,%d),%d,%s,%s\n"
-	,command,unit->Slot,x,y,dest ? dest->Slot : -1
-	,type ? type->Ident : "-",status ? "flush" : "append");
-
-    ncq=malloc(sizeof(NetworkCommandQueue));
-    dl_insert_first(CommandsIn,ncq->List);
-
-    ncq->Time=FrameCounter;
-    ncq->Data.Type=command;
-    if( status ) {
-	ncq->Data.Type|=0x80;
-    }
-    ncq->Data.Unit=htons(unit->Slot);
-    ncq->Data.X=htons(x);
-    ncq->Data.Y=htons(y);
-    if( dest ) {
-	ncq->Data.Dest=htons(dest->Slot);
-    } else if( type ) {
-	ncq->Data.Dest=htons(type-UnitTypes);
-    } else {
-	ncq->Data.Dest=htons(-1);
-    }
-}
-
-//----------------------------------------------------------------------------
-//	Log commands
-//----------------------------------------------------------------------------
-
-/**@name log */
-//@{
-
-global int CommandLogEnabled;		/// True if command log is on
-
-/**
-**	Log commands into file.
-**
-**	This could later be used to recover, crashed games.
-**
-**	@param name	Command name (move,attack,...).
-**	@param unit	Unit that receive the command.
-**	@param flag	Append command or flush old commands.
-**	@param position	Flag X,Y contains position or value or nothing.
-**	@param x	optional X map position.
-**	@param y	optional y map position.
-**	@param dest	optional destination unit.
-**	@param type	optional command argument (unit-type,...).
-*/
-local void CommandLog(const char* name,const Unit* unit,int flag,
-	int position,unsigned x,unsigned y,const Unit* dest,const char* value)
-{
-    static FILE* logf;
-
-    if( !CommandLogEnabled ) {
-	return;
-    }
-
-    if( !logf ) {
-	time_t now;
-
-	logf=fopen("command.log","wb");
-	if( !logf ) {
-	    return;
-	}
-	fprintf(logf,";;; Log file generated by FreeCraft Version "
-		VERSION "\n");
-	time(&now);
-	fprintf(logf,";;;\tDate: %s",ctime(&now));
-	fprintf(logf,";;;\tMap: %s\n\n",TheMap.Description);
-    }
-    fprintf(logf,"(log %d 'U%Zd '%s '%s",
-	    FrameCounter,UnitNumber(unit),name,
-	    flag ? "flush" : "append");
-    switch( position ) {
-	case 1:
-	    fprintf(logf," (%d %d)",x,y);
-	    break;
-	case 2:
-	    fprintf(logf," %d",x);
-    }
-    if( dest ) {
-	fprintf(logf," 'U%Zd",UnitNumber(unit));
-    }
-    if( value ) {
-	fprintf(logf," '%s",value);
-    }
-    fprintf(logf,")\n");
-    fflush(logf);
-}
-
-//@}
-
-//----------------------------------------------------------------------------
-//	Send commands over the network.
-//----------------------------------------------------------------------------
-
-/**@name send */
-//@{
-
-/**
-**	Send command: Unit stop.
-**
-**	@param unit	pointer to unit.
-*/
-global void SendCommandStopUnit(Unit* unit)
-{
-    CommandLog("stop",unit,1,0,0,0,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandStopUnit(unit);
-    } else {
-	NetworkSendCommand(MessageCommandStop,unit,0,0,NoUnitP,0,1);
-    }
-}
-
-/**
-**	Send command: Unit stand ground.
-**
-**	@param unit	pointer to unit.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandStandGround(Unit* unit,int flush)
-{
-    CommandLog("stand-ground",unit,flush,0,0,0,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandStandGround(unit,flush);
-    } else {
-	NetworkSendCommand(MessageCommandStand,unit,0,0,NoUnitP,0,flush);
-    }
-}
-
-/**
-**	Send command: Follow unit to position.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position to move to.
-**	@param y	Y map tile position to move to.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandFollow(Unit* unit,Unit* dest,int flush)
-{
-    CommandLog("move",unit,flush,0,0,0,dest,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandFollow(unit,dest,flush);
-    } else {
-	NetworkSendCommand(MessageCommandFollow,unit,0,0,dest,0,flush);
-    }
-}
-
-/**
-**	Send command: Move unit to position.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position to move to.
-**	@param y	Y map tile position to move to.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandMove(Unit* unit,int x,int y,int flush)
-{
-    CommandLog("move",unit,flush,1,x,y,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandMove(unit,x,y,flush);
-    } else {
-	NetworkSendCommand(MessageCommandMove,unit,x,y,NoUnitP,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit repair.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position to repair.
-**	@param y	Y map tile position to repair.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
-{
-    CommandLog("repair",unit,flush,1,x,y,dest,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandRepair(unit,x,y,dest,flush);
-    } else {
-	NetworkSendCommand(MessageCommandRepair,unit,x,y,dest,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit attack unit or at position.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position to attack.
-**	@param y	Y map tile position to attack.
-**	@param attack	or !=NoUnitP unit to be attacked.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
-{
-    CommandLog("attack",unit,flush,1,x,y,attack,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandAttack(unit,x,y,attack,flush);
-    } else {
-	NetworkSendCommand(MessageCommandAttack,unit,x,y,attack,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit attack ground.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position to fire on.
-**	@param y	Y map tile position to fire on.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandAttackGround(Unit* unit,int x,int y,int flush)
-{
-    CommandLog("attack-ground",unit,flush,1,x,y,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandAttackGround(unit,x,y,flush);
-    } else {
-	NetworkSendCommand(MessageCommandGround,unit,x,y,NoUnitP,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit patrol between current and position.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position to patrol between.
-**	@param y	Y map tile position to patrol between.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandPatrol(Unit* unit,int x,int y,int flush)
-{
-    CommandLog("patrol",unit,flush,1,x,y,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandPatrolUnit(unit,x,y,flush);
-    } else {
-	NetworkSendCommand(MessageCommandPatrol,unit,x,y,NoUnitP,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit board unit.
-**
-**	@param unit	pointer to unit.
-**	@param dest	Destination to be boarded.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandBoard(Unit* unit,int x,int y,Unit* dest,int flush)
-{
-    CommandLog("board",unit,flush,1,x,y,dest,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandBoard(unit,dest,flush);
-    } else {
-	NetworkSendCommand(MessageCommandBoard,unit,x,y,dest,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit unload unit.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position of unload.
-**	@param y	Y map tile position of unload.
-**	@param what	Passagier to be unloaded.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
-{
-    CommandLog("unload",unit,flush,1,x,y,what,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandUnload(unit,x,y,what,flush);
-    } else {
-	NetworkSendCommand(MessageCommandUnload,unit,x,y,what,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit builds building at position.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position of construction.
-**	@param y	Y map tile position of construction.
-**	@param what	pointer to unit-type of the building.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandBuildBuilding(Unit* unit,int x,int y
-	,UnitType* what,int flush)
-{
-    CommandLog("build",unit,flush,1,x,y,NULL,what->Ident);
-    if( NetworkFildes==-1 ) {
-	CommandBuildBuilding(unit,x,y,what,flush);
-    } else {
-	NetworkSendCommand(MessageCommandBuild,unit,x,y,NoUnitP,what,flush);
-    }
-}
-
-/**
-**	Send command: Cancel this building construction.
-**
-**	@param unit	pointer to unit.
-*/
-global void SendCommandCancelBuilding(Unit* unit,Unit* worker)
-{
-    // FIXME: currently unit and worker are same?
-    CommandLog("cancel-build",unit,1,0,0,0,worker,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandCancelBuilding(unit,worker);
-    } else {
-	NetworkSendCommand(MessageCommandCancelBuild,unit,0,0,worker,0,1);
-    }
-}
-
-/**
-**	Send command: Unit harvest wood.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position where to harvest.
-**	@param y	Y map tile position where to harvest.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandHarvest(Unit* unit,int x,int y,int flush)
-{
-    CommandLog("harvest",unit,flush,1,x,y,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandHarvest(unit,x,y,flush);
-    } else {
-	NetworkSendCommand(MessageCommandHarvest,unit,x,y,NoUnitP,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit mine gold.
-**
-**	@param unit	pointer to unit.
-**	@param dest	pointer to destination (gold-mine).
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandMineGold(Unit* unit,Unit* dest,int flush)
-{
-    CommandLog("mine",unit,flush,0,0,0,dest,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandMineGold(unit,dest,flush);
-    } else {
-	NetworkSendCommand(MessageCommandMine,unit,0,0,dest,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit haul oil.
-**
-**	@param unit	pointer to unit.
-**	@param dest	pointer to destination (oil-platform).
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandHaulOil(Unit* unit,Unit* dest,int flush)
-{
-    CommandLog("haul",unit,flush,0,0,0,dest,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandHaulOil(unit,dest,flush);
-    } else {
-	NetworkSendCommand(MessageCommandHaul,unit,0,0,dest,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit return goods.
-**
-**	@param unit	pointer to unit.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandReturnGoods(Unit* unit,int flush)
-{
-    CommandLog("return",unit,flush,0,0,0,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandReturnGoods(unit,flush);
-    } else {
-	NetworkSendCommand(MessageCommandReturn,unit,0,0,NoUnitP,0,flush);
-    }
-}
-
-/**
-**	Send command: Building/unit train new unit.
-**
-**	@param unit	pointer to unit.
-**	@param what	pointer to unit-type of the unit to be trained.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
-{
-    CommandLog("train",unit,flush,0,0,0,NULL,what->Ident);
-    if( NetworkFildes==-1 ) {
-	CommandTrainUnit(unit,what,flush);
-    } else {
-	NetworkSendCommand(MessageCommandTrain,unit,0,0,NoUnitP,what,flush);
-    }
-}
-
-/**
-**	Send command: Cancel training.
-**
-**	@param unit	pointer to unit.
-*/
-global void SendCommandCancelTraining(Unit* unit,int slot)
-{
-    CommandLog("cancel-train",unit,1,2,slot,0,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandCancelTraining(unit,slot);
-    } else {
-	NetworkSendCommand(MessageCommandCancelTrain,unit,slot,0,NoUnitP,0,1);
-    }
-}
-
-/**
-**	Send command: Building starts upgrading to.
-**
-**	@param unit	pointer to unit.
-**	@param what	pointer to unit-type of the unit upgrade.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush)
-{
-    CommandLog("upgrade-to",unit,flush,0,0,0,NULL,what->Ident);
-    if( NetworkFildes==-1 ) {
-	CommandUpgradeTo(unit,what,flush);
-    } else {
-	NetworkSendCommand(MessageCommandUpgrade,unit,0,0,NoUnitP,what,flush);
-    }
-}
-
-/**
-**	Send command: Cancel building upgrading to.
-**
-**	@param unit	pointer to unit.
-*/
-global void SendCommandCancelUpgradeTo(Unit* unit)
-{
-    CommandLog("cancel-upgrade-to",unit,1,0,0,0,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandCancelUpgradeTo(unit);
-    } else {
-	NetworkSendCommand(MessageCommandCancelUpgrade,unit
-		,0,0,NoUnitP,NULL,1);
-    }
-}
-
-/**
-**	Send command: Building/unit research.
-**
-**	@param unit	pointer to unit.
-**	@param what	research-type of the research.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandResearch(Unit* unit,Upgrade* what,int flush)
-{
-    CommandLog("research",unit,flush,0,0,0,NULL,what->Ident);
-    if( NetworkFildes==-1 ) {
-	CommandResearch(unit,what,flush);
-    } else {
-	NetworkSendCommand(MessageCommandResearch,unit
-		,what-Upgrades,0,NoUnitP,0,flush);
-    }
-}
-
-/**
-**	Send command: Cancel Building/unit research.
-**
-**	@param unit	pointer to unit.
-*/
-global void SendCommandCancelResearch(Unit* unit)
-{
-    CommandLog("cancel-research",unit,1,0,0,0,NoUnitP,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandCancelResearch(unit);
-    } else {
-	NetworkSendCommand(MessageCommandCancelResearch,unit
-		,0,0,NoUnitP,0,1);
-    }
-}
-
-/**
-**	Send command: Unit demolish at position.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position where to demolish.
-**	@param y	Y map tile position where to demolish.
-**	@param attack	or !=NoUnitP unit to be demolished.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
-{
-    CommandLog("demolish",unit,flush,1,x,y,attack,NULL);
-    if( NetworkFildes==-1 ) {
-	CommandDemolish(unit,x,y,attack,flush);
-    } else {
-	NetworkSendCommand(MessageCommandDemolish,unit,x,y,attack,0,flush);
-    }
-}
-
-/**
-**	Send command: Unit spell cast on position/unit.
-**
-**	@param unit	pointer to unit.
-**	@param x	X map tile position where to cast spell.
-**	@param y	Y map tile position where to cast spell.
-**	@param attack	Cast spell on unit (if exist).
-**	@param spellid  Spell type id.
-**	@param flush	Flag flush all pending commands.
-*/
-global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid,int flush)
-{
-    CommandLog("spell-cast",unit,flush,1,x,y,dest,NULL); //FIXME: vladi: spellid?
-    if( NetworkFildes==-1 ) {
-	CommandSpellCast(unit,x,y,dest,spellid,flush);
-    } else {
-        // FIXME: WARNING: vladi: this is weird, we should have and
-	// integer argument to all this or just few bytes buffer or 
-	// something... I'll pass spell id's as pointers until...
-	UnitType* ut = (UnitType*)spellid;
-	NetworkSendCommand(MessageCommandSpellCast,unit,x,y,dest,ut,flush);
-    }
-}
-
-//@}
 
 //----------------------------------------------------------------------------
 //	Low level
@@ -1015,9 +422,9 @@ local unsigned long MyHost;		/// My host number.
 local int MyPort;			/// My port number.
 );
 local int NetworkDelay;			/// Delay counter for recover.
-
-    /// Network input queue
-local NetworkCommandQueue NetworkIn[256][PlayerMax];
+local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network packet input queue
+local struct dl_head CommandsIn[1];	/// Network command input queue
+local struct dl_head CommandsOut[1];	/// Network command output queue
 
 /**
 **	Send message to all clients.
@@ -1453,6 +860,53 @@ global void InitNetwork2(void)
     dl_init(CommandsOut);
 }
 
+
+//----------------------------------------------------------------------------
+//	Commands input
+//----------------------------------------------------------------------------
+
+/**
+**	Prepare send of command message.
+**
+**	Convert arguments into network format and place it into output queue.
+**
+**	@param command	Command (Move,Attack,...).
+**	@param unit	Unit that receive the command.
+**	@param x	optional X map position.
+**	@param y	optional y map position.
+**	@param dest	optional destination unit.
+**	@param type	optional unit type argument.
+**	@param status	Append command or flush old commands.
+*/
+global void NetworkSendCommand(int command,const Unit* unit,int x,int y
+	,const Unit* dest,const UnitType* type,int status)
+{
+    NetworkCommandQueue* ncq;
+
+    DebugLevel3Fn(" %d,%d,(%d,%d),%d,%s,%s\n"
+	,command,unit->Slot,x,y,dest ? dest->Slot : -1
+	,type ? type->Ident : "-",status ? "flush" : "append");
+
+    ncq=malloc(sizeof(NetworkCommandQueue));
+    dl_insert_first(CommandsIn,ncq->List);
+
+    ncq->Time=FrameCounter;
+    ncq->Data.Type=command;
+    if( status ) {
+	ncq->Data.Type|=0x80;
+    }
+    ncq->Data.Unit=htons(unit->Slot);
+    ncq->Data.X=htons(x);
+    ncq->Data.Y=htons(y);
+    if( dest ) {
+	ncq->Data.Dest=htons(dest->Slot);
+    } else if( type ) {
+	ncq->Data.Dest=htons(type-UnitTypes);
+    } else {
+	ncq->Data.Dest=htons(-1);
+    }
+}
+
 /**
 **	Called if message for the network is ready.
 */
@@ -1638,160 +1092,36 @@ global void NetworkChatMessage(const char* msg)
 */
 local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 {
-    Unit* unit;
-    int status;
-    Unit* dest;
-    int x;
-    int y;
+    int ply;
+    NetworkChat *ncm;
 
     if( ncq->Data.Type==MessageSync ) {
 	return;
     }
-    if( ncq->Data.Type==MessageChat || ncq->Data.Type==MessageChatCont || ncq->Data.Type==MessageChatTerm ) {
-	NetworkChat *ncm=(NetworkChat*)(&ncq->Data);
-	int ply=ncm->Player;
-	if ( NetMsgBufLen[ply]+sizeof(ncm->Text)<128 ) {
-	    memcpy(((char *)NetMsgBuf[ply])+NetMsgBufLen[ply],ncm->Text,sizeof(ncm->Text));
-	}
-	switch( ncq->Data.Type ) {
-	    case MessageChat:
-		NetMsgBufLen[ply]=sizeof(ncm->Text);
-		break;
-	    case MessageChatCont:
-		NetMsgBufLen[ply]+=sizeof(ncm->Text);
-		break;
-	    case MessageChatTerm:
+    switch( ncq->Data.Type ) {
+	case MessageChat:
+	    NetMsgBufLen[((NetworkChat*)(&ncq->Data))->Player]=0;
+	    /* FALL THROUGH */
+	case MessageChatTerm:
+	case MessageChatCont:
+	    ncm=(NetworkChat*)(&ncq->Data);
+	    ply=ncm->Player;
+	    if( NetMsgBufLen[ply]+sizeof(ncm->Text)<128 ) {
+		memcpy(((char *)NetMsgBuf[ply])+NetMsgBufLen[ply],ncm->Text,sizeof(ncm->Text));
+	    }
+	    NetMsgBufLen[ply]+=sizeof(ncm->Text);
+	    if( ncq->Data.Type==MessageChatTerm ) {
 		NetMsgBuf[127][ply] = '\0';
 		SetMessageDup(NetMsgBuf[ply]);
 		NetMsgBufLen[ply]=0;
-		/* FALL THROUGH */
-	    default:
-		break;
-	}
-	return;
-    }
-    DebugLevel3Fn(" %d frame %d\n",ncq->Data.Type,FrameCounter);
-
-    unit=UnitSlots[ntohs(ncq->Data.Unit)];
-    DebugCheck( !unit );
-    if( unit->Destroyed ) {
-	DebugLevel0Fn(" destroyed unit skipping %Zd\n"
-		,UnitNumber(unit));
-	return;
-    }
-
-    status=(ncq->Data.Type&0x80)>>7;
-    x=ntohs(ncq->Data.X);
-    y=ntohs(ncq->Data.Y);
-
-    // Note: destroyed destination unit is handled by the action routines.
-
-    switch( ncq->Data.Type&0x7F ) {
-	case MessageSync:
-	    return;
-	case MessageQuit:
-	    return;
-	case MessageCommandStop:
-	    CommandStopUnit(unit);
-	    break;
-	case MessageCommandStand:
-	    CommandStandGround(unit,status);
-	    break;
-	case MessageCommandMove:
-	    CommandMove(unit,x,y,status);
-	    break;
-	case MessageCommandAttack:
-	    dest=NoUnitP;
-	    DebugLevel3Fn(" %x\n",ntohs(ncq->Data.Dest));
-	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
-		dest=UnitSlots[ntohs(ncq->Data.Dest)];
-		DebugCheck( !dest );
 	    }
-	    CommandAttack(unit,x,y,dest,status);
 	    break;
-	case MessageCommandGround:
-	    CommandAttackGround(unit,x,y,status);
-	    break;
-	case MessageCommandPatrol:
-	    CommandPatrolUnit(unit,x,y,status);
-	    break;
-	case MessageCommandBoard:
-	    dest=NoUnitP;
-	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
-		dest=UnitSlots[ntohs(ncq->Data.Dest)];
-		DebugCheck( !dest );
-	    }
-	    CommandBoard(unit,dest,status);
-	    break;
-	case MessageCommandUnload:
-	    dest=NoUnitP;
-	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
-		dest=UnitSlots[ntohs(ncq->Data.Dest)];
-		DebugCheck( !dest );
-	    }
-	    CommandUnload(unit,x,y,dest,status);
-	    break;
-	case MessageCommandBuild:
-	    CommandBuildBuilding(unit,x,y
-		    ,UnitTypes+ntohs(ncq->Data.Dest),status);
-	    break;
-	case MessageCommandCancelBuild:
-	    // dest is the worker building the unit...
-	    dest=NoUnitP;
-	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
-		dest=UnitSlots[ntohs(ncq->Data.Dest)];
-		DebugCheck( !dest );
-	    }
-	    CommandCancelBuilding(unit,dest);
-	    break;
-	case MessageCommandHarvest:
-	    CommandHarvest(unit,x,y,status);
-	    break;
-	case MessageCommandMine:
-	    dest=NoUnitP;
-	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
-		dest=UnitSlots[ntohs(ncq->Data.Dest)];
-		DebugCheck( !dest );
-	    }
-	    CommandMineGold(unit,dest,status);
-	    break;
- 	case MessageCommandHaul:
-	    dest=NoUnitP;
-	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
-		dest=UnitSlots[ntohs(ncq->Data.Dest)];
-		DebugCheck( !dest );
-	    }
-	    CommandHaulOil(unit,dest,status);
-	    break;
- 	case MessageCommandReturn:
-	    CommandReturnGoods(unit,status);
-	    break;
- 	case MessageCommandTrain:
-	    CommandTrainUnit(unit,UnitTypes+ntohs(ncq->Data.Dest),status);
-	    break;
-	case MessageCommandCancelTrain:
-	    // FIXME: cancel slot?
-	    CommandCancelTraining(unit,0);
-	    break;
- 	case MessageCommandUpgrade:
-	    CommandUpgradeTo(unit,UnitTypes+ntohs(ncq->Data.Dest),status);
-	    break;
- 	case MessageCommandResearch:
-	    CommandResearch(unit,Upgrades+x,status);
-	    break;
-	case MessageCommandDemolish:
-	    dest=NoUnitP;
-	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
-		dest=UnitSlots[ntohs(ncq->Data.Dest)];
-		DebugCheck( !dest );
-	    }
-	    CommandDemolish(unit,x,y,dest,status);
-	    break;
-	case MessageCommandSpellCast:
-	    // FIXME: WARNING: vladi: currently network protocol
-	    // cannot carry required information for spell cast
-	    // it is required to handle dest unit and aditional
-	    // integer value!
+	default:
+	    ParseCommand(ncq->Data.Type,
+			ntohs(ncq->Data.Unit),
+			ntohs(ncq->Data.X),
+			ntohs(ncq->Data.Y),
+			ntohs(ncq->Data.Dest));
 	    break;
     }
 }
@@ -1946,7 +1276,7 @@ local void NetworkExecCommands(void)
 }
 
 /**
-**	Network syncronize commands.
+**	Network synchronize commands.
 */
 local void NetworkSyncCommands(void)
 {
