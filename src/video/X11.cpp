@@ -947,18 +947,22 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 #ifdef SPLIT_SCREEN_SUPPORT
 	IfDebug(
-	    VideoDrawText(TheUI.MapArea.X+10,TheUI.MapArea.Y+10,GameFont,
-		"SLOW FRAME!!");
-	    XClearArea(TheDisplay,TheMainWindow
-		,TheUI.MapArea.X+10,TheUI.MapArea.Y+10,13*13,13
-		,False);
+	    if (InterfaceState == IfaceStateNormal) {
+		VideoDrawText(TheUI.MapArea.X+10,TheUI.MapArea.Y+10,GameFont,
+		    "SLOW FRAME!!");
+		XClearArea(TheDisplay,TheMainWindow
+		    ,TheUI.MapArea.X+10,TheUI.MapArea.Y+10,13*13,13
+		    ,False);
+	    }
 	);
 #else
 	IfDebug(
-	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
-	    XClearArea(TheDisplay,TheMainWindow
-		,TheUI.MapX+10,TheUI.MapY+10,13*13,13
-		,False);
+	    if (InterfaceState == IfaceStateNormal) {
+		VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+		XClearArea(TheDisplay,TheMainWindow
+		    ,TheUI.MapX+10,TheUI.MapY+10,13*13,13
+		    ,False);
+	    }
 	);
 #endif
 	++SlowFrameCounter;
@@ -1308,10 +1312,12 @@ global void CheckVideoInterrupts(void)
     if( VideoInterrupts ) {
 	//DebugLevel1("Slow frame\n");
 	IfDebug(
-	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
-	    XClearArea(TheDisplay,TheMainWindow
-		,TheUI.MapX+10,TheUI.MapX+10,13*13,13
-		,False);
+	    if (InterfaceState == IfaceStateNormal) {
+		VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+		XClearArea(TheDisplay,TheMainWindow
+		    ,TheUI.MapX+10,TheUI.MapX+10,13*13,13
+		    ,False);
+	    }
 	);
 	++SlowFrameCounter;
     }

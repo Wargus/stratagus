@@ -583,7 +583,9 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     if( ticks>NextFrameTicks ) {	// We are too slow :(
 //	IfDebug(
 	    // FIXME: need locking!
-	    //VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    // if (InterfaceState == IfaceStateNormal) {
+	    // VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    // }
 //	);
 	++SlowFrameCounter;
     }
