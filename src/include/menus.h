@@ -56,19 +56,18 @@ typedef unsigned MenuButtonId;
 */
 typedef struct _menuitem_ {
     int mitype;
+    unsigned xofs;
+    unsigned yofs;
+    unsigned flags;
+    int font;
+    void (*initfunc)(struct _menuitem_ *);	// constructor
+    void (*exitfunc)(struct _menuitem_ *);	// destructor
     union {
 	struct {
-	    unsigned xofs;
-	    unsigned yofs;
-	    unsigned flags;
-	    int font;
 	    unsigned char *text;
+	    unsigned tflags;
 	} text;
 	struct {
-	    unsigned xofs;
-	    unsigned yofs;
-	    unsigned flags;
-	    int font;
 	    unsigned char *text;
 	    unsigned xsize;
 	    unsigned ysize;
@@ -77,10 +76,6 @@ typedef struct _menuitem_ {
 	    int hotkey;
 	} button;
 	struct {
-	    unsigned xofs;
-	    unsigned yofs;
-	    unsigned flags;
-	    int font;
 	    unsigned char **options;
 	    unsigned xsize;
 	    unsigned ysize;
@@ -91,13 +86,28 @@ typedef struct _menuitem_ {
 	    int curopt;
 	    int cursel;		/* used in popup state */
 	} pulldown;
+	struct {
+	    unsigned char **options;
+	    unsigned xsize;
+	    unsigned ysize;
+	    MenuButtonId button;
+	    void (*handler)(void);
+	    int noptions;
+	    int defopt;
+	    int curopt;
+	    int cursel;		/* used in popup state */
+	    int nlines;
+	    int startline;
+	} listbox;
 	/// ... add here ...
+
     } d;
 } Menuitem;
 
 #define MI_TYPE_TEXT 1
 #define MI_TYPE_BUTTON 2
 #define MI_TYPE_PULLDOWN 3
+#define MI_TYPE_LISTBOX 4
 
     /// for MI_TYPE_TEXT
 #define MI_FLAGS_CENTERED 1
