@@ -1562,7 +1562,6 @@ global RleSprite* LoadRleSprite(const char* name,unsigned width,unsigned height)
 
     sprite->Width=width;
     sprite->Height=height;
-
     
     sprite->Pixels = graphic->Pixels;
     /*switch( VideoDepth ){
@@ -1621,6 +1620,31 @@ global void LoadRGB(Palette *pal, const char *name)
 }
 
 /**
+**	Set palette -> Video
+*/
+global void VideoSetPalette(const GraphicData *palette)
+{
+  // -> Video
+  switch( VideoDepth ) {
+  case 8:
+    Pixels8 =(VMemType8  *)palette;
+    break;
+  case 15:
+  case 16:
+    Pixels16=(VMemType16 *)palette;
+    break;
+  case 24:
+  case 32:
+    Pixels32=(VMemType32 *)palette;
+    break;
+  default:
+    DebugLevel0(__FUNCTION__": Unknown depth\n");
+    break;
+  }
+  SetPlayersPalette();
+}
+
+/**
 **	Create palette.
 */
 global void VideoCreatePalette(const Palette* palette)
@@ -1628,25 +1652,8 @@ global void VideoCreatePalette(const Palette* palette)
   GraphicData * temp;
 
   temp = VideoCreateNewPalette(palette);
-  // -> Video
-  switch( VideoDepth ) {
-  case 8:
-    Pixels8 =(VMemType8  *)temp;
-    break;
-  case 15:
-  case 16:
-    Pixels16=(VMemType16 *)temp;
-    break;
-  case 24:
-  case 32:
-    Pixels32=(VMemType32 *)temp;
-    break;
-  default:
-    DebugLevel0(__FUNCTION__": Unknown depth\n");
-    break;
-  }
 
-  SetPlayersPalette();
+  VideoSetPalette(temp);
 }
 
 #endif	// } !NEW_VIDEO
