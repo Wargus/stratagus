@@ -34,6 +34,7 @@
 #include "freecraft.h"
 #include "video.h"
 #include "map.h"
+#include "minimap.h"
 #include "settings.h"
 #include "network.h"
 #include "sound_server.h"
@@ -42,6 +43,7 @@
 #include "font.h"
 #include "editor.h"
 #include "campaign.h"
+#include "menus.h"
 
 #include "ccl.h"
 
@@ -54,20 +56,153 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
 local char EditorRunning;		/// True editor is running
 
+enum _editor_state_ {
+    EditorSelecting,			/// Select
+    EditorEditTile,			/// Edit tiles
+} EditorState;				/// Current editor state
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	Draw tile icons.
+**
+**	@todo for the start the solid tiles are hardcoded
+**	If we have more solid tiles, than they fit into the panel, we need
+**	some new ideas.
+*/
+local void DrawTileIcons(void)
+{
+    unsigned char** tiles;
+    int x;
+    int y;
+    int i;
+
+    tiles=TheMap.Tiles;
+
+    y=TheUI.ButtonPanelY+4;
+    i=0x10;
+
+    while( y<TheUI.ButtonPanelY+100 ) {
+	x=TheUI.ButtonPanelX+4;
+	while( x<TheUI.ButtonPanelX+144 ) {
+	    VideoDrawTile(tiles[TheMap.Tileset->Table[i]],x,y);
+	    VideoDrawRectangle(ColorWhite,x,y,32,32);
+	    x+=34;
+	    i+=0x10;
+	}
+	y+=34;
+    }
+}
+
+/**
+**	Draw special cursor on map.
+*/
+local void DrawMapCursor(void)
+{
+    int v;
+    int x;
+    int y;
+
+    //
+    //	Draw map cursor
+    //
+
+    v = TheUI.LastClickedVP;
+    if( v != -1 ) {
+	x = Viewport2MapX(v, CursorX);
+	y = Viewport2MapY(v, CursorY);
+	VideoDrawRectangle(ColorWhite,Map2ViewportX(v,x),Map2ViewportY(v,y),
+		32,32);
+    }
+}
 
 /**
 **	Update editor display.
 */
 local void EditorUpdateDisplay(void)
 {
+    int i;
+
     VideoLockScreen();			// { prepare video write
 
     HideAnyCursor();			// remove cursor (when available)
 
     DrawMapArea();			// draw the map area
+    DrawMapCursor();			// cursor on map
+
+    //
+    //  Menu button
+    //
+    if (TheUI.MenuButton.Graphic) {
+	VideoDrawSub(TheUI.MenuButton.Graphic, 0, 0,
+	    TheUI.MenuButton.Graphic->Width, TheUI.MenuButton.Graphic->Height,
+	    TheUI.MenuButtonX, TheUI.MenuButtonY);
+    }
+    DrawMenuButton(MBUTTON_MAIN,
+	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
+	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
+	    128, 19,
+	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
+	    GameFont,"Menu (~<F10~>)");
+
+    //
+    //  Minimap border
+    //
+    if (TheUI.Minimap.Graphic) {
+	VideoDrawSub(TheUI.Minimap.Graphic, 0, 0, TheUI.Minimap.Graphic->Width,
+	    TheUI.Minimap.Graphic->Height, TheUI.MinimapX, TheUI.MinimapY);
+    }
+    //
+    //  Minimap
+    //
+    i = TheUI.LastClickedVP;
+    if (i >= 0) {
+	DrawMinimap(TheUI.VP[i].MapX, TheUI.VP[i].MapY);
+	DrawMinimapCursor(TheUI.VP[i].MapX, TheUI.VP[i].MapY);
+    }
+    //
+    //  Info panel
+    //
+    if (TheUI.InfoPanel.Graphic) {
+	VideoDrawSub(TheUI.InfoPanel.Graphic, 0, 0,
+	    TheUI.InfoPanel.Graphic->Width, TheUI.InfoPanel.Graphic->Height/4,
+	    TheUI.InfoPanelX, TheUI.InfoPanelY);
+    }
+    //
+    //  Button panel
+    //
+    if (TheUI.ButtonPanel.Graphic) {
+	VideoDrawSub(TheUI.ButtonPanel.Graphic, 0, 0,
+	    TheUI.ButtonPanel.Graphic->Width,
+	    TheUI.ButtonPanel.Graphic->Height, TheUI.ButtonPanelX,
+	    TheUI.ButtonPanelY);
+    }
+    DrawTileIcons();
+    //
+    //  Resource
+    //
+    if (TheUI.Resource.Graphic) {
+	VideoDrawSub(TheUI.Resource.Graphic, 0, 0,
+	    TheUI.Resource.Graphic->Width, TheUI.Resource.Graphic->Height,
+	    TheUI.ResourceX, TheUI.ResourceY);
+    }
+    //
+    //  Filler
+    //
+    if (TheUI.Filler1.Graphic) {
+	VideoDrawSub(TheUI.Filler1.Graphic, 0, 0, TheUI.Filler1.Graphic->Width,
+	    TheUI.Filler1.Graphic->Height, TheUI.Filler1X, TheUI.Filler1Y);
+    }
+    //
+    //  Status line
+    //
+    if (TheUI.StatusLine.Graphic) {
+	VideoDrawSub(TheUI.StatusLine.Graphic, 0, 0,
+	    TheUI.StatusLine.Graphic->Width, TheUI.StatusLine.Graphic->Height,
+	    TheUI.StatusLineX, TheUI.StatusLineY);
+    }
 
     DrawAnyCursor();
 
@@ -76,7 +211,7 @@ local void EditorUpdateDisplay(void)
     // FIXME: For now update everything each frame
 
     // refresh entire screen, so no further invalidate needed
-    InvalidateAreaAndCheckCursor(0,0,VideoWidth,VideoHeight);
+    InvalidateAreaAndCheckCursor(0, 0, VideoWidth, VideoHeight);
 }
 
 /*----------------------------------------------------------------------------
@@ -89,7 +224,24 @@ local void EditorUpdateDisplay(void)
 local void EditorCallbackKey(unsigned dummy __attribute__((unused)))
 {
     DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
-    EditorRunning=0;
+}
+
+/**
+**	Called if mouse button pressed down.
+**
+**	@param button	Mouse button number (0 left, 1 middle, 2 right)
+*/
+global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
+{
+    DebugLevel3Fn("%x %x\n",button,MouseButtons);
+
+    //
+    //	Click on menu button just exit.
+    //
+    if( CursorOn == CursorOnButton && ButtonUnderCursor == 0 ) {
+	EditorRunning=0;
+	return;
+    }
 }
 
 /**
@@ -191,12 +343,32 @@ local void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
 */
 local void EditorCallbackMouse(int x, int y)
 {
-    DebugLevel2Fn("Moved %d,%d\n" _C_ x _C_ y);
+    int i;
+
+    DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
     HandleCursorMove(&x, &y);		// Reduce to screen
 
     MouseScrollState = ScrollNone;
     GameCursor = TheUI.Point.Cursor;
+    CursorOn = -1;
+
+    //
+    //  Handle buttons
+    //  FIXME: just a copy from the engine.
+    //
+    for (i = 0; i < sizeof(TheUI.Buttons) / sizeof(*TheUI.Buttons); ++i) {
+	if (x < TheUI.Buttons[i].X
+		|| x > TheUI.Buttons[i].X + TheUI.Buttons[i].Width
+		|| y < TheUI.Buttons[i].Y
+		|| y > TheUI.Buttons[i].Y + TheUI.Buttons[i].Height) {
+	    continue;
+	}
+	DebugLevel2("On button %d\n" _C_ i);
+	ButtonUnderCursor = i;
+	CursorOn = CursorOnButton;
+	return;
+    }
 
     //
     //  Scrolling Region Handling
@@ -278,7 +450,7 @@ global void EditorMainLoop(void)
 
     SetVideoSync();
 
-    callbacks.ButtonPressed = EditorCallbackKey;
+    callbacks.ButtonPressed = EditorCallbackButtonDown;
     callbacks.ButtonReleased = EditorCallbackKey;
     callbacks.MouseMoved = EditorCallbackMouse;
     callbacks.MouseExit = EditorCallbackExit;
@@ -291,6 +463,8 @@ global void EditorMainLoop(void)
 
     GameCursor = TheUI.Point.Cursor;
     InterfaceState = IfaceStateNormal;
+    EditorState = EditorSelecting;
+    TheUI.LastClickedVP = 0;
 
     EditorRunning = 1;
     while (EditorRunning) {
