@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name groups.c	-	The units' groups handling. */
+/**@name groups.c - The units' groups handling. */
 //
-//	(c) Copyright 1999-2003 by Patrice Fortier, Lutz Sammer,
-//	                           and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Patrice Fortier, Lutz Sammer,
+//                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -44,27 +44,27 @@
 #include "script.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		Defines a group of units.
+**  Defines a group of units.
 */
 typedef struct _unit_group_ {
-	Unit**		Units;						/// Units in the group
-	int				NumUnits;				/// How many units in the group
-} UnitGroup;								/// group of units
+	Unit** Units;                       /// Units in the group
+	int    NumUnits;                    /// How many units in the group
+} UnitGroup;                            /// group of units
 
-global UnitGroup Groups[NUM_GROUPS];		/// Number of groups predefined
+global UnitGroup Groups[NUM_GROUPS];    /// Number of groups predefined
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Initialize group part.
+**  Initialize group part.
 **
-**		@todo Not needed with the new unit code!
+**  @todo Not needed with the new unit code!
 */
 global void InitGroups(void)
 {
@@ -103,14 +103,14 @@ global void SaveGroups(CLFile* file)
 }
 
 /**
-**		Clean up group part.
+**  Clean up group part.
 */
 global void CleanGroups(void)
 {
 	int i;
 
 	for (i = 0; i < NUM_GROUPS; ++i) {
-			if (Groups[i].Units) {
+		if (Groups[i].Units) {
 			free(Groups[i].Units);
 		}
 		memset(&Groups[i], 0, sizeof(Groups[i]));
@@ -118,35 +118,37 @@ global void CleanGroups(void)
 }
 
 /**
- **		Return the number of units of group #num
- **
- **		@param num		Group number.
- **		@return				Returns the number of units in the group.
- */
+**  Return the number of units of group #num
+**
+**  @param num  Group number.
+**
+**  @return     Returns the number of units in the group.
+*/
 global int GetNumberUnitsOfGroup(int num)
 {
 	return Groups[num].NumUnits;
 }
 
 /**
- **		Return the units of group #num
- **
- **		@param num		Group number.
- **		@return				Returns an array of all units in the group.
- */
+**  Return the units of group #num
+**
+**  @param num  Group number.
+**
+**  @return     Returns an array of all units in the group.
+*/
 global Unit** GetUnitsOfGroup(int num)
 {
 	return Groups[num].Units;
 }
 
 /**
- **		Clear contents of group #num
- **
- **		@param num		Group number.
- */
+**  Clear contents of group #num
+**
+**  @param num  Group number.
+*/
 global void ClearGroup(int num)
 {
-	UnitGroup *group;
+	UnitGroup* group;
 	int i;
 
 	group = &Groups[num];
@@ -158,12 +160,12 @@ global void ClearGroup(int num)
 }
 
 /**
- **		Add units to group #num contents from unit array "units"
- **
- **		@param units		Array of units to place into group.
- **		@param nunits		Number of units in array.
- **		@param num		Group number for storage.
- */
+**  Add units to group #num contents from unit array "units"
+**
+**  @param units   Array of units to place into group.
+**  @param nunits  Number of units in array.
+**  @param num     Group number for storage.
+*/
 global void AddToGroup(Unit** units, int nunits, int num)
 {
 	UnitGroup* group;
@@ -179,12 +181,12 @@ global void AddToGroup(Unit** units, int nunits, int num)
 }
 
 /**
- **		Set group #num contents to unit array "units"
- **
- **		@param units		Array of units to place into group.
- **		@param nunits		Number of units in array.
- **		@param num		Group number for storage.
- */
+**  Set group #num contents to unit array "units"
+**
+**  @param units   Array of units to place into group.
+**  @param nunits  Number of units in array.
+**  @param num     Group number for storage.
+*/
 global void SetGroup(Unit** units, int nunits, int num)
 {
 	DebugCheck(num > NUM_GROUPS || nunits > MaxSelectable);
@@ -194,17 +196,17 @@ global void SetGroup(Unit** units, int nunits, int num)
 }
 
 /**
- **		Remove unit from its groups
- **
- **		@param unit		Unit to remove from group.
- */
+**  Remove unit from its groups
+**
+**  @param unit  Unit to remove from group.
+*/
 global void RemoveUnitFromGroups(Unit* unit)
 {
 	UnitGroup* group;
 	int num;
 	int i;
 
-	DebugCheck(unit->GroupId == 0);		// unit doesn't belong to a group
+	DebugCheck(unit->GroupId == 0);  // unit doesn't belong to a group
 
 	for (num = 0; unit->GroupId; ++num, unit->GroupId >>= 1) {
 		if ((unit->GroupId & 1) != 1) {
@@ -216,7 +218,7 @@ global void RemoveUnitFromGroups(Unit* unit)
 			;
 		}
 
-		DebugCheck(i >= group->NumUnits);		// oops not found
+		DebugCheck(i >= group->NumUnits);  // oops not found
 
 		// This is a clean way that will allow us to add a unit
 		// to a group easily, or make an easy array walk...
@@ -229,11 +231,11 @@ global void RemoveUnitFromGroups(Unit* unit)
 // ----------------------------------------------------------------------------
 
 /**
-**		Define the group.
+**  Define the group.
 **
-**		@param group		Group number
-**		@param num		Number of units in group
-**		@param units		Units in group
+**  @param group  Group number
+**  @param num    Number of units in group
+**  @param units  Units in group
 */
 local int CclGroup(lua_State* l)
 {
@@ -265,7 +267,7 @@ local int CclGroup(lua_State* l)
 }
 
 /**
-**		Register CCL features for groups.
+**  Register CCL features for groups.
 */
 global void GroupCclRegister(void)
 {
