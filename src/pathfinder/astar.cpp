@@ -327,8 +327,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 
     DebugLevel3Fn("%d %d,%d->%d,%d\n",
 	    UnitNumber(unit),
-	    unit->X,unit->Y,
-	    unit->Command.Data.Move.DX,unit->Command.Data.Move.DY);
+	    unit->X,unit->Y,unit->Orders[0].X,unit->Orders[0].Y);
 
     OpenSetSize=0;
    /*    AStarPrepare();*/
