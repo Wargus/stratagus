@@ -1749,24 +1749,36 @@ global void SoundOptions(void)
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     int i = 17;
 #endif
-    
-    if (SoundFildes != -1)
+    // Set master volume checkbox and slider
+    if (SoundFildes != -1) {
 	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;
-    else
+	SoundOptionsMenuItems[2].flags = 0;
+	SoundOptionsMenuItems[11].flags = 0;
+    } else {
 	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_UNCHECKED;
+	SoundOptionsMenuItems[2].flags = -1;
+	SoundOptionsMenuItems[11].flags = -1;
+    }
     SoundOptionsMenuItems[2].d.hslider.percent = (GlobalVolume * 100) / 255;
 
-    if (PlayingMusic == 1 && SoundFildes != -1)
+    // Set music volume checkbox and slider
+    if (PlayingMusic == 1 && SoundFildes != -1) {
         SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_CHECKED;
-    else 
+	SoundOptionsMenuItems[8].flags = 0;
+    } else {
 	SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_UNCHECKED;
+	SoundOptionsMenuItems[8].flags = -1;
+    }
     SoundOptionsMenuItems[8].d.hslider.percent = (MusicVolume * 100) / 255;
     
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
-    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
+    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
 	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
-    else
+	SoundOptionsMenuItems[14].flags = 0;
+    } else {
 	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
+	SoundOptionsMenuItems[14].flags = -1;
+    }
 #ifdef USE_LIBCDA
     cd_get_volume(&i, &i);
     SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
@@ -1835,20 +1847,20 @@ local void SetMusicPower(Menuitem *mi)
 local void SetCdPower(Menuitem *mi)
 {
 #ifdef USE_SDLCD
-    /// Start Playing CD
+    // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
     } else {
-    /// Stop Playing CD
+    // Stop Playing CD
         SDL_CDStop(CDRom);
 	CDMode = ":stopped";
     }
 #elif defined(USE_LIBCDA)
-    /// Start Playing CD
+    // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
     } else {
-    /// Stop Playing CD
+    // Stop Playing CD
         cd_pause();
 	CDMode = ":stopped";
     }
