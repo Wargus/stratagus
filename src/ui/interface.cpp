@@ -612,7 +612,7 @@ local int InputKey(int key)
 	case '\r':
 	    if (Input[0] == '(') {
 		CclCommand(Input);
-	    } else if( NetworkFildes!=-1 ) {
+	    } else if( NetworkFildes==-1 ) {
 		// Handle cheats
 		// FIXME: disable cheats
 		if (strcmp(Input, "there is no aliens level") == 0) {
