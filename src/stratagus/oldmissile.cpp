@@ -987,7 +987,7 @@ global void MissileHit(const Missile* missile)
 	    }
 	    return;
 	}
-	DebugLevel0(__FUNCTION__": Oops nothing to hit?");
+	DebugLevel0(__FUNCTION__": Oops nothing to hit (%d,%d)?\n",x,y);
 	return;
     }
 
