@@ -40,6 +40,7 @@
 #include "trigger.h"
 #include "campaign.h"
 #include "interface.h"
+#include "siodp.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -781,7 +782,47 @@ local SCM CclAddTrigger(SCM condition,SCM action)
     //		A trigger is a pair of condition and action
     //
     var=gh_symbol2scm("*triggers*");
-    setvar(var,cons(cons(condition,action),symbol_value(var,NIL)),NIL);
+    if( gh_null_p(symbol_value(var,NIL)) ) {
+	setvar(var, cons(cons(condition,action),NIL), NIL);
+    } else {
+	var=symbol_value(var,NIL);
+	while( !gh_null_p(gh_cdr(var)) ) {
+	    var=gh_cdr(var);
+	}
+	setcdr(var,cons(cons(condition,action),NIL));
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the current trigger number
+**
+**	@param number	    Trigger number
+*/
+local SCM CclSetTriggerNumber(SCM number)
+{
+    int num;
+    int i;
+
+    num=gh_scm2int(number);
+    if( num==-1 ) {
+	Trigger=NULL;
+    } else {
+	Trigger=symbol_value(gh_symbol2scm("*triggers*"),NIL);
+	if( gh_null_p(Trigger) ) {
+	    DebugLevel0Fn("Invalid trigger number: %d out of -1\n" _C_ num);
+	} else {
+	    for( i=0; i<num; ++i ) {
+		if( gh_null_p(Trigger) ) {
+		    DebugLevel0Fn("Invalid trigger number: %d out of %d\n" _C_
+			num _C_ i-1);
+		    break;
+		}
+		Trigger=gh_cdr(Trigger);
+	    }
+	}
+    }
 
     return SCM_UNSPECIFIED;
 }
@@ -825,6 +866,7 @@ global void TriggersEachCycle(void)
 global void TriggerCclRegister(void)
 {
     gh_new_procedure2_0("add-trigger",CclAddTrigger);
+    gh_new_procedure1_0("set-trigger-number!",CclSetTriggerNumber);
     // Conditions
     gh_new_procedure4_0("if-unit",CclIfUnit);
     gh_new_procedure5_0("if-near-unit",CclIfNearUnit);
@@ -847,13 +889,120 @@ global void TriggerCclRegister(void)
 }
 
 /**
+**	Print a trigger from a LISP object.
+**	This is a modified version of lprin1g that prints
+**	(lambda) instead of #<CLOSURE>
+**
+**	@param exp	Expression
+**	@param f	File to print to
+*/
+local void PrintTrigger(LISP exp,FILE *f)
+{
+    LISP tmp;
+    long n;
+//    struct user_type_hooks *p;
+    extern char *subr_kind_str(long);
+
+    STACK_CHECK(&exp);
+    INTERRUPT_CHECK();
+    switch TYPE(exp) {
+    case tc_nil:
+	fprintf(f,"()");
+	break;
+    case tc_cons:
+	fprintf(f,"(");
+	PrintTrigger(car(exp),f);
+	for(tmp=cdr(exp);CONSP(tmp);tmp=cdr(tmp)) {
+	    fprintf(f," ");
+	    PrintTrigger(car(tmp),f);
+	}
+	if NNULLP(tmp) {
+	    fprintf(f," . ");
+	    PrintTrigger(tmp,f);
+	}
+	fprintf(f,")");
+	break;
+    case tc_flonum:
+	n = (long) FLONM(exp);
+	if (((double) n) == FLONM(exp)) {
+	    sprintf(tkbuffer,"%ld",n);
+	} else {
+	    sprintf(tkbuffer,"%g",FLONM(exp));
+	}
+	fprintf(f,tkbuffer);
+	break;
+    case tc_symbol:
+	fprintf(f,PNAME(exp));
+	break;
+    case tc_subr_0:
+    case tc_subr_1:
+    case tc_subr_2:
+    case tc_subr_2n:
+    case tc_subr_3:
+    case tc_subr_4:
+    case tc_subr_5:
+    case tc_lsubr:
+    case tc_fsubr:
+    case tc_msubr:
+	sprintf(tkbuffer,"#<%s ",subr_kind_str(TYPE(exp)));
+	fprintf(f,tkbuffer);
+	fprintf(f,(*exp).storage_as.subr.name);
+	fprintf(f,">");
+	break;
+    case tc_closure:
+	fprintf(f,"(lambda ");
+	if CONSP((*exp).storage_as.closure.code) {
+	    PrintTrigger(car((*exp).storage_as.closure.code),f);
+	    fprintf(f," ");
+	    PrintTrigger(cdr((*exp).storage_as.closure.code),f);
+	} else
+	    PrintTrigger((*exp).storage_as.closure.code,f);
+	fprintf(f,")");
+	break;
+    default:
+	break;
+#if 0
+	p = get_user_type_hooks(TYPE(exp));
+	if (p->prin1)
+	    (*p->prin1)(exp,f);
+	else {
+	    sprintf(tkbuffer,"#<UNKNOWN %d %p>",TYPE(exp),exp);
+	    fprintf(f,tkbuffer);
+	}
+#endif
+    }
+}
+
+/**
 **	Save the trigger module.
+**
+**	@param file	Open file to print to
 */
 global void SaveTriggers(FILE* file)
 {
+    SCM list;
+    int i;
+    int trigger;
+
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: trigger $Id$\n\n");
-    fprintf(file,";;; FIXME: Save not written\n\n");
+
+    i=0;
+    trigger=-1;
+    list=symbol_value(gh_symbol2scm("*triggers*"),NIL);
+    while( !gh_null_p(list) ) {
+	if( gh_eq_p(Trigger,list) ) {
+	    trigger=i;
+	}
+	fprintf(file,"(add-trigger ");
+	PrintTrigger(gh_car(gh_car(list)),file);
+	fprintf(file," ");
+	PrintTrigger(gh_cdr(gh_car(list)),file);
+	fprintf(file,")\n");
+	list=gh_cdr(list);
+	++i;
+    }
+    fprintf(file,"(set-trigger-number! %d)\n",trigger);
 }
 
 /**
