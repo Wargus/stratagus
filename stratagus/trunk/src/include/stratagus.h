@@ -186,7 +186,7 @@ typedef struct _missile_type_ MissileType;
 	/// Stratagus major version
 #define StratagusMajorVersion  2
 	/// Stratagus minor version (maximal 99)
-#define StratagusMinorVersion  0
+#define StratagusMinorVersion  1
 	/// Stratagus patch level (maximal 99)
 #define StratagusPatchLevel    0
 	/// Stratagus version (1,2,3) -> 10203
