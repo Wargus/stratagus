@@ -252,12 +252,12 @@ echo
 #------------------------------------------------------------------------------
 # Determine if this is for UNIX, BEOS, or WIN32
 
-if [ "$UNIX" != "1" ] ; then
-  if [ "$BEOS" != "1" ] ; then
-    if [ "$WIN32" != "1" ] ; then
-      if [ "$DARWIN" != "1" ] ; then
+if [ "$UNIX" != 1 ] ; then
+  if [ "$BEOS" != 1 ] ; then
+    if [ "$WIN32" != 1 ] ; then
+      if [ "$DARWIN" != 1 ] ; then
 
-if [ "$WIN32" = "0" ] ; then
+if [ "$WIN32" = 0 ] ; then
   if [ "x`uname | grep -is cygwin`" != x ] \
   || [ "x`uname | grep -is MINGW`" != x ] ; then
     UNIX=0
@@ -268,7 +268,7 @@ if [ "$WIN32" = "0" ] ; then
   fi
 fi
 
-if [ "$BEOS" = "0" ] ; then
+if [ "$BEOS" = 0 ] ; then
   if [ "x`uname -a | grep -is beos`" != x ] ; then
     UNIX=0
     BEOS=1
@@ -278,7 +278,7 @@ if [ "$BEOS" = "0" ] ; then
   fi
 fi
 
-if [ "$DARWIN" = "0" ] ; then
+if [ "$DARWIN" = 0 ] ; then
   if [ "x`uname -a | grep -is darwin`" != x ] ; then
     DARWIN=1
     UNIX=0
@@ -293,10 +293,10 @@ if [ "$DARWIN" = "0" ] ; then
   fi
 fi
 
-if [ "$UNIX" = "0" ] ; then
-  if [ "$BEOS" = "0" ] ; then
-    if [ "$WIN32" = "0" ] ; then
-      if [ "$DARWIN" = "0" ] ; then
+if [ "$UNIX" = 0 ] ; then
+  if [ "$BEOS" = 0 ] ; then
+    if [ "$WIN32" = 0 ] ; then
+      if [ "$DARWIN" = 0 ] ; then
 	UNIX=1
 	BEOS=0
 	WIN32=0
@@ -382,7 +382,7 @@ echo >> $RULESFILE
 #	Install part
 #------------------------------------------------------------------------------
 
-if [ "$WIN32" = "0" ] ; then
+if [ "$WIN32" = 0 ] ; then
   echo "# Prefix for 'make install'" >> $RULESFILE
   echo "PREFIX=${PREFIX-/usr/local}" >> $RULESFILE
   echo >> $RULESFILE
@@ -393,8 +393,8 @@ fi
 #------------------------------------------------------------------------------
 
 echo "# Use SIOD support" >> $RULESFILE
-if [ "$BEOS" != "1" ] ; then
-  if [ "$DARWIN" != "1" ] ; then
+if [ "$BEOS" != 1 ] ; then
+  if [ "$DARWIN" != 1 ] ; then
     echo "CCL		= -DUSE_CCL" >> $RULESFILE
     echo "CCLLIB		= -lm" >> $RULESFILE
   else
@@ -428,9 +428,9 @@ else
   echo -n "  Found SDL..."
 fi
 
-if [ "$BEOS" != "1" ] ; then
+if [ "$BEOS" != 1 ] ; then
 
-if [ "$DARWIN" != "1" ] && [ "$WIN32" != "1" ] ; then
+if [ "$DARWIN" != 1 ] && [ "$WIN32" != 1 ] ; then
   # Check for SVGALIB
   LIBCHECK="-lvga -lvgagl"
   check_for_libs
@@ -494,12 +494,11 @@ case $VIDSEL in
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
-    if [ "$BEOS" != "1" ] ; then
+	if [ "$BEOS" != 1 ] ; then
 	    echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
-    else
+	else
 	    echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
-    fi
-
+	fi
 
 	echo
 	;;
@@ -529,7 +528,7 @@ case $VIDSEL in
 	;;
 
   *)
-	if [ "$WIN32" = "1" ] ; then
+	if [ "$WIN32" = 1 ] ; then
 	  echo "Using SDL..."
 	  USESDL=1
 	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
@@ -736,7 +735,7 @@ case $ANSWER in
 		USE_SDLCD=1
 		USE_LIBCDA=0
 		echo "SDLCD	      = -DUSE_SDLCD" >> $RULESFILE
-		if [ "$USESDL" != "1" ]; then
+		if [ "$USESDL" != 1 ]; then
 		    echo "SDLCD = $SDLCD \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 		    echo "CLONELIBS	= \$(shell $SDL_CONFIG --libs)" >> $RULESFILE
 		fi
@@ -867,7 +866,7 @@ echo
 echo
 echo COMPILE OPTIONS
 
-if [ "$DEBUG" != "1" ] ; then
+if [ "$DEBUG" != 1 ] ; then
     echo "Debug Support allows you to debug Freecraft more easily, but disables a lot of"
     echo "optimization support, which may cause Freecraft to run much slower."
     echo
@@ -895,7 +894,7 @@ fi
 
 CFLAGS="$CFLAGS $NORMAL_CFLAGS"
 if [ "x`gcc -v 2>&1 | grep -is 3\.2`" != x ] ; then
-if [ "$DEBUG" != "1" ] ; then
+if [ "$DEBUG" != 1 ] ; then
     echo
     echo
     echo
@@ -1062,7 +1061,7 @@ if [ "$PNG_LOCAL" = 1 ] ; then
     IF_PNG_PATH="-I\$(TOPDIR)/$LOCAL_PNG "
 fi
 
-if [ "$WIN32" = "0" ] ; then
+if [ "$WIN32" = 0 ] ; then
     echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib $LDF_PNG_PATH $LOCAL_LDF" >> $RULESFILE
     echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include $IF_PNG_PATH $LOCAL_IF" >> $RULESFILE
 fi
@@ -1177,7 +1176,7 @@ echo >> $RULESFILE
 echo "\$(OBJDIR)/%.\$(OE): %.c" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
 echo "	@\$(AR) cru \$(TOPDIR)/src/\$(OBJDIR)/libclone.a \$@" >> $RULESFILE
-if [ "$DARWIN" = "1" ] ; then
+if [ "$DARWIN" = 1 ] ; then
   echo "	ranlib \$(TOPDIR)/src/\$(OBJDIR)/libclone.a" >> $RULESFILE
 fi
 echo >> $RULESFILE
@@ -1185,7 +1184,7 @@ echo >> $RULESFILE
 echo "\$(OBJDIR)/%.\$(OE): %.cpp" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
 echo "	@\$(AR) cru \$(TOPDIR)/src/\$(OBJDIR)/libclone.a \$@" >> $RULESFILE
-if [ "$DARWIN" = "1" ] ; then
+if [ "$DARWIN" = 1 ] ; then
   echo "	ranlib \$(TOPDIR)/src/\$(OBJDIR)/libclone.a" >> $RULESFILE
 fi
 echo >> $RULESFILE
