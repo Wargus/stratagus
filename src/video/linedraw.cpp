@@ -1038,7 +1038,7 @@ void VideoDrawTransPixel(Uint32 color, int x, int y,
 
 	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
-	glColor4ub(r, g, b, 255 - alpha);
+	glColor4ub(r, g, b, alpha);
 	glBegin(GL_POINTS);
 	glVertex2i(x, y);
 	glEnd();
@@ -1142,7 +1142,7 @@ void VideoDrawTransHLine(Uint32 color, int x, int y, int width,
 
 	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
-	glColor4ub(r, g, b, 255 - alpha);
+	glColor4ub(r, g, b, alpha);
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x + width, y);
@@ -1238,7 +1238,7 @@ void VideoDrawTransVLine(Uint32 color, int x, int y, int height,
 
 	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
-	glColor4ub(r, g, b, 255 - alpha);
+	glColor4ub(r, g, b, alpha);
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x, y + height);
@@ -1478,7 +1478,7 @@ void VideoDrawTransRectangle(Uint32 color, int x, int y,
 
 	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
-	glColor4ub(r, g, b, 255 - alpha);
+	glColor4ub(r, g, b, alpha);
 	glBegin(GL_LINE_LOOP);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
@@ -1547,7 +1547,7 @@ void VideoFillTransRectangle(Uint32 color, int x, int y,
 
 	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
-	glColor4ub(r, g, b, 255 - alpha);
+	glColor4ub(r, g, b, alpha);
 	glBegin(GL_TRIANGLE_STRIP);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
