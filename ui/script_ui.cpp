@@ -2007,6 +2007,81 @@ local SCM CclDefineMenuItem(SCM list)
 			//free(s1);
 		    }
 		}
+	    } else if ( gh_eq_p(value,gh_symbol2scm("hslider")) ) {
+		sublist=gh_car(list);
+		list=gh_cdr(list);
+		item->mitype=MI_TYPE_HSLIDER;
+
+		while ( !gh_null_p(sublist) ) {
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+
+		    if ( gh_eq_p(value, gh_symbol2scm("size")) ) {
+			item->d.hslider.xsize=gh_scm2int(gh_car(gh_car(sublist)));
+			value=gh_cdr(gh_car(sublist));
+			item->d.hslider.ysize=gh_scm2int(gh_car(value));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("flags")) ) {
+			SCM slist;
+
+			slist = gh_car(sublist);
+			while ( !gh_null_p(slist) ) {
+	    
+			    value = gh_car(slist);
+			    slist = gh_cdr(slist);
+	    
+			    if ( gh_eq_p(value,gh_symbol2scm("up")) ) {
+				item->d.hslider.cflags|=MI_CFLAGS_UP;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("down")) ) {
+				item->d.hslider.cflags|=MI_CFLAGS_DOWN;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("left")) ) {
+				item->d.hslider.cflags|=MI_CFLAGS_LEFT;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("right")) ) {
+				item->d.hslider.cflags|=MI_CFLAGS_RIGHT;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("knob")) ) {
+				item->d.hslider.cflags|=MI_CFLAGS_KNOB;
+			    } else if ( gh_eq_p(value,gh_symbol2scm("cont")) ) {
+				item->d.hslider.cflags|=MI_CFLAGS_CONT;
+			    } else {
+				s1=gh_scm2newstr(gh_car(value),NULL);
+				fprintf(stderr,"Unknow flag %s\n",s1);
+				free(s1);
+			    }
+			}
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("func")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.hslider.action=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("handler")) ) {
+	    		s1 = gh_scm2newstr(gh_car(sublist),NULL);
+			func = (void **)hash_find(MenuFuncHash,s1);
+			if (func != NULL) {
+			    item->d.hslider.handler=(void *)*func;
+			} else {
+			    fprintf(stderr,"Can't find function: %s\n", s1);
+			}
+			free(s1);
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("default")) ) {
+			item->d.hslider.defper=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
+			item->d.hslider.percent=gh_scm2int(gh_car(sublist));
+			sublist=gh_cdr(sublist);
+		    } else {
+			//s1=gh_scm2newstr(value, NULL);
+			//fprintf(stderr, "Unsupported property %s\n", s1);
+			//free(s1);
+		    }
+		}
 	    }
 	} else {
 	    s1=gh_scm2newstr(value, NULL);
