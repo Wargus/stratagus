@@ -108,10 +108,15 @@ global void CommandLog(const char* name,const Unit* unit,int flag,
 	char* s1;
 
 #ifdef USE_WIN32
-	strcpy(buf,"logs");
+	strcpy(buf,GameName);
+	mkdir(buf);
+	strcat(buf,"/logs");
 	mkdir(buf);
 #else
 	sprintf(buf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+	mkdir(buf,0777);
+	strcat(buf,"/");
+	strcat(buf,GameName);
 	mkdir(buf,0777);
 	strcat(buf,"/logs");
 	mkdir(buf,0777);

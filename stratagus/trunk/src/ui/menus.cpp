@@ -912,6 +912,8 @@ local void CreateSaveDir(void)
     strcat(TempPathBuf,"/");
     strcat(TempPathBuf,FREECRAFT_HOME_PATH);
     mkdir(TempPathBuf,0777);
+    strcat(TempPathBuf,"/");
+    strcat(TempPathBuf,GameName);
     strcat(TempPathBuf,"/save");
     mkdir(TempPathBuf,0777);
     SaveDir = strdup(TempPathBuf);
@@ -2363,9 +2365,9 @@ local void SaveReplayOk(void)
     }
 
 #ifdef WIN32
-    sprintf(TempPathBuf, "logs/");
+    sprintf(TempPathBuf, "%s/logs/",GameName);
 #else
-    sprintf(TempPathBuf, "%s/%s", getenv("HOME"), FREECRAFT_HOME_PATH);
+    sprintf(TempPathBuf, "%s/%s/%s", getenv("HOME"), FREECRAFT_HOME_PATH,GameName);
     strcat(TempPathBuf, "/logs/");
 #endif
     ptr = TempPathBuf + strlen(TempPathBuf);
@@ -6601,17 +6603,22 @@ local void EditorEndMenu(void)
 local void ReplayGameMenu(void)
 {
 #ifdef USE_WIN32
-    strcpy(TempPathBuf,"logs");
+    strcpy(TempPathBuf,"%s",GameName);
+    mkdir(TempPathBuf);
+    strcat(TempPathBuf,"/logs");
     mkdir(TempPathBuf);
 
-    sprintf(ScenSelectPath, "logs");
+    sprintf(ScenSelectPath, "%s/logs",GameName);
 #else
     sprintf(TempPathBuf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+    mkdir(TempPathBuf,0777);
+    strcat(TempPathBuf,"/");
+    strcat(TempPathBuf,GameName);
     mkdir(TempPathBuf,0777);
     strcat(TempPathBuf,"/logs");
     mkdir(TempPathBuf,0777);
 
-    sprintf(ScenSelectPath,"%s/%s/logs", getenv("HOME"), FREECRAFT_HOME_PATH);
+    sprintf(ScenSelectPath,"%s/%s/%s/logs", getenv("HOME"), FREECRAFT_HOME_PATH,GameName);
 #endif
     *ScenSelectDisplayPath = '\0';
 
