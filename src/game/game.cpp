@@ -48,7 +48,6 @@
 #include "depend.h"
 #include "interface.h"
 #include "cursor.h"
-#include "image.h"
 #include "spells.h"
 #include "construct.h"
 #include "network.h"
@@ -261,7 +260,6 @@ global void CreateGame(char* filename, WorldMap* map)
 
     // FIXME: Race only known in single player game:
     InitMenus(ThisPlayer->Race);
-    LoadImages(ThisPlayer->Race);
     LoadCursors(ThisPlayer->RaceName);
 
     InitMissileTypes();

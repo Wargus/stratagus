@@ -36,7 +36,7 @@ MODULE	= include
 OBJS	=
 
 HDRS	= actions.h ai.h ccl.h freecraft.h construct.h cursor.h font.h icons.h \
-	  image.h interface.h map.h minimap.h missile.h pathfinder.h player.h \
+	  interface.h map.h minimap.h missile.h pathfinder.h player.h \
 	  pud.h tileset.h unit.h unittype.h upgrade.h upgrade_structs.h \
 	  ccl_sound.h sound.h sound_id.h unitsound.h wav.h sound_server.h \
 	  video.h network.h commands.h goal.h ui.h menus.h spells.h \
