@@ -985,7 +985,8 @@ global void DoButtonButtonClicked(int button)
 	    if( Selected[0]->Orders[0].Action==UnitActionTrain
 		    && (Selected[0]->Data.Train.Count==MAX_UNIT_TRAIN
 			|| !EnableTrainingQueue) ) {
-		SetMessage( "Unit training queue is full" );
+		NotifyPlayer(Selected[0]->Player,NotifyYellow,Selected[0]->X,
+			Selected[0]->Y, "Unit training queue is full" );
 	    } else if( PlayerCheckFood(ThisPlayer,type)
 			&& !PlayerCheckUnitType(ThisPlayer,type) ) {
 		//PlayerSubUnitType(ThisPlayer,type);
