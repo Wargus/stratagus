@@ -73,8 +73,6 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>The thing is, if whatever is blocking the path to the wood moves, the
     worker will stay locked up.
 <LI>Building tower I start see in it range before it completed
-<LI>Works: Building a peon and seting relay point to gold mine it will not enter
-    it but will be standing near it.
 <LI>First sound of attack i never hear, only second,..
 <LI>4map of orc compain - I cann't get option for creation of transport
    (can't upgrade townhall)
@@ -87,18 +85,13 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <H2> Known  bugs scheduled to next release (1.19):</H2>
 <!-- ----- ---- --------- -- ---- ------- ------- -->
 <UL>
-<LI>Arrows and axes did always hits the target, even if moving away.
 <LI>Building-cursor and cursor over units shouldn't change to looking glas.
-<LI>Flying and ships could only on even fields.
+<LI>Flying and ships could only be on even fields.
 <LI>The heading of attacking units isn't 100% correct. 
 <LI>The heading of missiles isn't 100% correct.
 <LI>Units trained says nothing?
-<LI>Buildings which are busy (fires,attack, train) didn't show the flame.
 <LI>Only one and incomplete goals implemented.
-<LI>Rescue passive units are attacked.
 <LI>Fix all known core dumpers.
-<LI>Units removed are still shown on minimap. (enters transporters, than it moves)
-<LI>defaulth.pud: AttackUnitsInDistance: HP==0 QuadTreeDelete: Value not found
 <LI>Ships should first attack units with distance weapon.
 <LI>Units attacked, which can't reattack should go out of range.
 <LI>Wrong unit to mine gold 113, find the problem.
@@ -108,7 +101,6 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <!-- ==== == ========== -->
 <UL>
 <LI>Document all functions with doc++ or doxygen comments.
-<LI>Should be fixed: Search bug peon on the way for building, and than let him build an other.
 <LI>Show the units in a transporter on map.
 <LI>New spell "show units in enemy transporters"
 <LI>Make a spy unit.
@@ -123,21 +115,19 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 	and will remain on the screen until another price comes up.
 <LI>The brown background is never updated, and it will build a mass of
 	strange bits of pictures.
-<LI>Water buildings couldn't be always be reached???
+<LI>Water buildings couldn't be always be reached with new ship code.?
 <LI>Selecting with rectangle and scrolling with keyboard: some solutions??
-<LI>Transporter and party didn't meet automatic!
+<LI>Transporter and party didn't meet automatic (fixed, but not perfect)!
 <LI>Multiple orc units selected shows human units!
 <LI>Another big thing I noticed - When loading 
-data/puds/multi/jimland.pud, before the player stats appear,
-MANY lines saying "REGM:  contains unknown action 0x4100" are
-shown.  I didn't even look to see where this message is
-generated, but this serves as a heads-up.
+    data/puds/multi/jimland.pud, before the player stats appear,
+    MANY lines saying "REGM:  contains unknown action 0x4100" are
+    shown.  I didn't even look to see where this message is
+    generated, but this serves as a heads-up.
 <LI>the final mission of the humans data/campaigns/human-exp/levelx12h.pud.gz
-is very slow and dumps core.
+    is very slow and dumps core.
 <LI>Status line isn't correct cleared.
 <LI>Make color-cycling speed configurable.
-<LI>Buildings under fog of war shouldn't be selectable
-<LI>Buildings under fog of war shouldn't show decoration
 <LI>ActionNone is used, where?
 <LI>Show intro (story) message for levels.
 <LI>Show outcome for levels.

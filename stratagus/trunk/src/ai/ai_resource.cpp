@@ -517,10 +517,17 @@ local void AiCheckingWork(void)
 	    DebugLevel3Fn("Must build: %s " _C_ type->Ident);
 
 	    //
+	    //	Check limits, AI should be broken if reached.
+	    //
+	    if( !PlayerCheckLimits(AiPlayer->Player,type) ) {
+		DebugLevel2Fn("Unit limits reached\n");
+		continue;
+	    }
+
+	    //
 	    //	Check if we have enough food.
 	    //
-	    if( !type->Building && AiPlayer->Player->Food
-			<=AiPlayer->Player->NumFoodUnits ) {
+	    if( !type->Building && !PlayerCheckFood(AiPlayer->Player,type) ) {
 		DebugLevel3Fn("Need food\n");
 		AiPlayer->NeedFood=1;
 		AiRequestFarms();

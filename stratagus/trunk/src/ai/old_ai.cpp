@@ -1156,6 +1156,10 @@ local int AiNeedFood(const UnitType * type)
     Player *player;
 
     player = AiPlayer->Player;
+
+    if (PlayerCheckLimits(player, type)) {
+	return 1;
+    }
     if (!PlayerCheckFood(player, type)) {
 	// already building new food (farm or hall)
 	if (AiBuildingUnitType(UnitTypeByWcNum(AiChooseRace(UnitFarm)))
