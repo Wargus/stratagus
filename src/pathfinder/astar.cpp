@@ -723,7 +723,10 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
     *pxd=0;
     *pyd=0;
 
-    if( unit->Data.Move.Length <= 0 ) {
+    // Goal has moved, need to recalculate path or no cached path
+    if( unit->Data.Move.Length <= 0 || 
+	( unit->Goal && (unit->Goal->X != unit->Orders[0].X
+	    || unit->Goal->Y != unit->Orders[0].Y)) ) {
         result=NewPath(unit);
         if( result==PF_UNREACHABLE ) {
 	    unit->Data.Move.Length=0;
@@ -732,7 +735,13 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
 	if( result==PF_REACHED ) {
 	    return result;
 	}
+	if( unit->Goal ) {
+	    // Update Orders
+	    unit->Orders[0].X=unit->Goal->X;
+	    unit->Orders[0].Y=unit->Goal->Y;
+	}
     }
+
     *pxd=Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
     *pyd=Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
     result=unit->Data.Move.Length;

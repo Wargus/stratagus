@@ -161,6 +161,15 @@
 **
 **		How many resources needed
 **
+**	UnitType::RepairHP
+**
+**		The HP given to a unit each cycle it's repaired.
+**		If zero, unit cannot be repaired
+**
+**	UnitType::_RepairCosts[::MaxCosts]
+**
+**		Costs per repair cycle to fix a unit.
+**
 **	UnitType::TileWidth
 **
 **		Tile size on map width
@@ -276,6 +285,10 @@
 **
 **		Unit is marked as critter. The effect of this is that when
 **		idle the unit will move around randomly.
+**
+**	UnitType::Wall
+**
+**		This Unit is a wall, and should exihibit joining properties
 **
 **	UnitType::Building
 **
@@ -611,6 +624,8 @@ struct _unit_type_ {
     int		Magic;			/// Unit can cast spells
 
     int		_Costs[MaxCosts];	/// How many resources needed
+    int		RepairHP;		/// Amount of HP per repair
+    int		_RepairCosts[MaxCosts]; /// How much it costs to repair
 
     int		TileWidth;		/// Tile size on map width
     int		TileHeight;		/// Tile size on map height
@@ -655,6 +670,7 @@ struct _unit_type_ {
     unsigned SeaUnit : 1;		/// Sea animated
     unsigned ExplodeWhenKilled : 1;	/// Death explosion animated
     unsigned Critter : 1;		/// Unit is controlled by nobody
+    unsigned Wall : 1;			/// Wall
     unsigned Building : 1;		/// Building
     unsigned Submarine : 1;		/// Is only visible by CanSeeSubmarine
     unsigned CanSeeSubmarine : 1;	/// Only this units can see Submarine
