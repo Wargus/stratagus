@@ -190,6 +190,22 @@ AC_SUBST(MIKMOD_CFLAGS)
 AC_SUBST(MIKMOD_LIBS)
 dnl ----------------------------
 
+dnl --- CHECK FOR MNG LIB ------
+AC_ARG_WITH(mng,
+    [  --with-mng		  [Use mng (default: no)]], MAD="$with_mng")
+MNG_CFLAGS=
+MNG_LIBS=
+if test "$MNG" != "yes"; then
+    MNG_CFLAGS=""
+    MNG_LIBS=""
+else
+    MNG_CFLAGS="-DUSE_MNG"
+    MNG_LIBS="-lmng"
+fi
+AC_SUBST(MNG_CFLAGS)
+AC_SUBST(MNG_LIBS)
+dnl ----------------------------
+
 dnl --- CHECK FOR MAD LIB ------
 AC_ARG_WITH(mad,
     [  --with-mad		  [Use mad mp3 (default: no)]], MAD="$with_mad")
