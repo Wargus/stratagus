@@ -297,11 +297,10 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		switch( v ) {
 		    case 0:		// Unexplored
 		    case 1:		// Unseen
-#if 0
 			if( IsTileVisible(ThisPlayer,i,y) > 1) {
 			    MapMarkSeenTile(i,y);
 			}
-#endif
+
 			// FIXME: mark for screen update
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
 			break;
