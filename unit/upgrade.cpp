@@ -1531,6 +1531,63 @@ global void UpgradeIncTime(Player * player, int id, int amount)
 }
 
 /**
+**	Convert unit-type to.
+**
+**	@param player	For this player.
+**	@param src	From this unit-type.
+**	@param dst	To this unit-type.
+*/
+local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
+{
+    Unit* unit;
+    int i;
+    int j;
+
+    for( i=0; i<player->TotalNumUnits; ++i ) {
+	unit=player->Units[i];
+	//
+	//	Convert already existing units to this type.
+	//
+	if( unit->Type==src ) {
+	    unit->HP+=dst->Stats[player->Player].HitPoints
+		    -unit->Stats->HitPoints;
+	    // don't have such unit now
+	    player->UnitTypesCount[src->Type]--;
+	    unit->Type=dst;
+	    unit->Stats=&dst->Stats[player->Player];
+	    // and we have new one...
+	    player->UnitTypesCount[dst->Type]++;
+	    UpdateForNewUnit(unit,1);
+	    if( dst->CanCastSpell ) {
+		unit->Mana=MAGIC_FOR_NEW_UNITS;
+	    }
+	    CheckUnitToBeDrawn(unit);
+	//
+	//	Convert trained units to this type.
+	//	FIXME: what about buildings?
+	//
+	} else {
+	    if( unit->Orders[0].Action==UnitActionTrain ) {
+		for( j=0; j<unit->Data.Train.Count; ++j ) {
+		     if( unit->Data.Train.What[j]==src ) {
+			unit->Data.Train.What[j]=dst; 
+			if( IsOnlySelected(unit) ) {
+			    MustRedraw|=RedrawInfoPanel;
+			}
+		     }
+		}
+	    }
+	    for( j=1; j<unit->OrderCount; ++j ) {
+		if( unit->Orders[j].Action==UnitActionTrain	
+			&& unit->Orders[j].Type==src ) {
+		    unit->Orders[j].Type=dst; 
+		}
+	    }
+	}
+    }
+}
+
+/**
 **	Apply the modifiers of an upgrade.
 **
 **	This function will mark upgrade done and do all required modifications
@@ -1595,32 +1652,8 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 	    UnitTypes[z].Stats[pn].Level++;
 
 	    if( um->ConvertTo ) {
-		UnitType* dst;
-		UnitType* src;
-		Unit* unit;
-		int i;
-
-		src=&UnitTypes[z];
-		dst=(UnitType*)um->ConvertTo;
-		dst->Stats[pn].Level++;
-		for( i=0; i<player->TotalNumUnits; ++i ) {
-		    unit=player->Units[i];
-		    if( unit->Type==src ) {
-			unit->HP+=dst->Stats[pn].HitPoints
-				-unit->Stats->HitPoints;
-			// don't have such unit now
-			player->UnitTypesCount[src->Type]--;
-			unit->Type=dst;
-			unit->Stats=&dst->Stats[pn];
-			// and we have new one...
-			player->UnitTypesCount[dst->Type]++;
-			UpdateForNewUnit(unit,1);
-			if( dst->CanCastSpell ) {
-			    unit->Mana=MAGIC_FOR_NEW_UNITS;
-			}
-			CheckUnitToBeDrawn(unit);
-		    }
-		}
+		((UnitType*)um->ConvertTo)->Stats[pn].Level++;
+		ConvertUnitTypeTo(player,&UnitTypes[z],um->ConvertTo);
 	    }
 	}
     }
