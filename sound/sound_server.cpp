@@ -258,6 +258,7 @@ global int CDRomCheck(void *unused)
 {
 #ifdef USE_SDLCD
     if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped") && SDL_CDStatus(CDRom) == 1) {
+	DebugLevel0Fn("Playing new track\n");
 	if (!strcmp(CDMode, ":all")) {
 	    PlayMusic(":all");
 	} else if (!strcmp(CDMode, ":random")) {
