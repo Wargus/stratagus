@@ -154,7 +154,13 @@ global void HandleActionBuild(Unit* unit)
     build->Data.Builded.Sum=0;  // FIXME: Is it necessary?
     build->Data.Builded.Val=stats->HitPoints;
     n=(stats->Costs[TimeCost]*FRAMES_PER_SECOND/6)/(SpeedBuild*5);
-    build->Data.Builded.Add=stats->HitPoints/n;
+    if( n ) {
+	build->Data.Builded.Add=stats->HitPoints/n;
+    } else {				// No build time pops-up?
+	build->Data.Builded.Add=stats->HitPoints;
+	// This checks if the value fits in the data type
+	DebugCheck( build->Data.Builded.Add!=stats->HitPoints );
+    }
     build->Data.Builded.Sub=n;
     build->Data.Builded.Cancel=0; // FIXME: Is it necessary?
     build->Data.Builded.Worker=unit;
