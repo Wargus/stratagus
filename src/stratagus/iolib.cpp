@@ -30,16 +30,17 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifndef _MSC_VER
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#ifndef __MSC__
 #include <unistd.h>
-#endif
 #include <errno.h>
+#endif
 
 #include "freecraft.h"
 #include "iolib.h"

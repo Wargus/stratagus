@@ -117,10 +117,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef __MSC__
+#ifndef _MSC_VER
 #include <unistd.h>
-#endif
 #include <sys/time.h>
+#endif
 #include <time.h>
 
 #ifdef USE_BEOS
@@ -129,7 +129,7 @@
 #include <sys/stat.h>
 #endif
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(_MSC_VER)
 #include <getopt.h>
 #endif
 
