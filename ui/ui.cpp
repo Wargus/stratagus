@@ -553,6 +553,8 @@ local void SetViewportModeSplitHoriz3 (void)
     new_vps[1].EndX = TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2;
     // I don't know why I need to add 1 but if I don't do it the routines in
     // map_draw.c complain about unaligned memory.
+    // JOHNS:	map_draw.c draws two pixels at the same time, the pixel must
+    //		start at an even pixel.
     new_vps[1].EndX -= (new_vps[1].EndX - new_vps[1].X) % TileSizeX + 1;
     new_vps[1].Y = new_vps[0].EndY + 1;
     new_vps[1].EndY = TheUI.MapArea.EndY;
