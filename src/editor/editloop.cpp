@@ -853,35 +853,35 @@ local void EditorCallbackButtonUp(unsigned button)
 **
 **	@param button	Mouse button number (0 left, 1 middle, 2 right)
 */
-global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
+local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 {
+    int i;
+
     DebugLevel3Fn("%x %x\n" _C_ button _C_ MouseButtons);
 
     //
-    //	Click on menu button just exit.
+    //  Click on menu button
     //
-    if( CursorOn == CursorOnButton && ButtonUnderCursor == 0 &&
-	(MouseButtons&LeftButton) && GameMenuButtonClicked==0 ) {
-	PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
-	GameMenuButtonClicked=1;
+    if (CursorOn == CursorOnButton && ButtonUnderCursor == 0
+	    && (MouseButtons & LeftButton) && !GameMenuButtonClicked) {
+	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+	GameMenuButtonClicked = 1;
 	return;
     }
-
-    if( CursorOn==CursorOnMinimap ) {
-	if( MouseButtons&LeftButton ) { // enter move mini-mode
-#ifdef SPLIT_SCREEN_SUPPORT
-	    int v = TheUI.LastClickedVP;
-	    MapViewportSetViewpoint(v,
-	    ScreenMinimap2MapX(CursorX)-TheUI.VP[v].MapWidth/2,
-	    ScreenMinimap2MapY(CursorY)-TheUI.VP[v].MapHeight/2);
-#else /* SPLIT_SCREEN_SUPPORT */
-	    MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2,
-		ScreenMinimap2MapY(CursorY)-MapHeight/2);
-#endif /* SPLIT_SCREEN_SUPPORT */
+    //
+    //  Click on minimap
+    //
+    if (CursorOn == CursorOnMinimap) {
+	if (MouseButtons & LeftButton) {	// enter move mini-mode
+	    i = TheUI.LastClickedVP;
+	    MapViewportSetViewpoint(i,
+		ScreenMinimap2MapX(CursorX) - TheUI.VP[i].MapWidth / 2,
+		ScreenMinimap2MapY(CursorY) - TheUI.VP[i].MapHeight / 2);
 	}
+	return;
     }
     //
-    //	Click on mode area
+    //  Click on mode area
     //
     if (CursorOn == CursorOnButton) {
 	if (ButtonUnderCursor == SelectButton) {
@@ -899,13 +899,12 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	    return;
 	}
     }
-
     //
-    //	Click on tile area
+    //  Click on tile area
     //
-    if( CursorOn == CursorOnButton && ButtonUnderCursor >= 100
-	    && EditorState == EditorEditTile ) {
-	switch( ButtonUnderCursor ) {
+    if (CursorOn == CursorOnButton && ButtonUnderCursor >= 100
+	    && EditorState == EditorEditTile) {
+	switch (ButtonUnderCursor) {
 	    case 300:
 		TileCursorSize = 1;
 		return;
@@ -929,16 +928,15 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	return;
     }
     //
-    //	Click on unit area
+    //  Click on unit area
     //
     if (EditorState == EditorEditUnit) {
 	if (TheUI.ButtonPanelX + 4 < CursorX
 		&& CursorX < TheUI.ButtonPanelX + 24
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
-	    int i;
 
-	    for( i=9; i-- && UnitIndex; ) {
+	    for (i = 9; i-- && UnitIndex;) {
 		--UnitIndex;
 	    }
 	    return;
@@ -947,20 +945,19 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 		&& CursorX < TheUI.ButtonPanelX + 176 - 4
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
-	    int i;
 
-	    for( i=9; i-- && EditorUnitTypes[UnitIndex + 1]; ) {
+	    for (i = 9; i-- && EditorUnitTypes[UnitIndex + 1];) {
 		++UnitIndex;
 	    }
 	    return;
 	}
-	if( CursorUnitIndex!=-1 ) {
+	if (CursorUnitIndex != -1) {
 	    SelectedUnitIndex = CursorUnitIndex;
 	    CursorBuilding = UnitTypeByIdent(EditorUnitTypes[CursorUnitIndex]);
 	    ThisPlayer = Players + SelectedPlayer;
 	    return;
 	}
-	if( CursorPlayer!=-1 ) {
+	if (CursorPlayer != -1) {
 	    SelectedPlayer = CursorPlayer;
 	    return;
 	}
@@ -981,41 +978,41 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
     }
 
     //
-    //	Click on map area
+    //  Click on map area
     //
-    if( CursorOn == CursorOnMap ) {
-	TheUI.LastClickedVP = GetViewport (CursorX, CursorY);
-	DebugLevel0Fn ("last clicked viewport changed to %d.\n" _C_
-		TheUI.LastClickedVP);
-	MustRedraw = RedrawMinimapCursor | RedrawMap;
-
-	if( EditorState == EditorEditTile ) {
-	    EditTiles(Viewport2MapX(TheUI.ActiveViewport, CursorX),
-		    Viewport2MapY(TheUI.ActiveViewport, CursorY),
-		    TileCursor,TileCursorSize);
+    if (CursorOn == CursorOnMap) {
+	i = GetViewport(CursorX, CursorY);
+	if (TheUI.LastClickedVP != i) {	// New viewport
+	    TheUI.LastClickedVP = i;
+	    MustRedraw = RedrawMinimapCursor | RedrawMap;
 	}
-	if( EditorState == EditorEditUnit && CursorBuilding ) {
-	    if( CanBuildUnitType(NULL, CursorBuilding,
-		    Viewport2MapX(TheUI.ActiveViewport, CursorX),
-		    Viewport2MapY(TheUI.ActiveViewport, CursorY)) ) {
-		Unit* unit;
 
-		PlayGameSound(GameSounds.PlacementSuccess.Sound
-			,MaxSampleVolume);
-		unit=MakeUnitAndPlace(
+	if (EditorState == EditorEditTile) {
+	    EditTiles(Viewport2MapX(TheUI.ActiveViewport, CursorX),
+		Viewport2MapY(TheUI.ActiveViewport, CursorY), TileCursor,
+		TileCursorSize);
+	}
+	if (EditorState == EditorEditUnit && CursorBuilding) {
+	    if (CanBuildUnitType(NULL, CursorBuilding,
 		    Viewport2MapX(TheUI.ActiveViewport, CursorX),
-		    Viewport2MapY(TheUI.ActiveViewport, CursorY),
+		    Viewport2MapY(TheUI.ActiveViewport, CursorY))) {
+		Unit *unit;
+
+		PlayGameSound(GameSounds.PlacementSuccess.Sound,
+		    MaxSampleVolume);
+		unit = MakeUnitAndPlace(Viewport2MapX(TheUI.ActiveViewport,
+		    CursorX), Viewport2MapY(TheUI.ActiveViewport, CursorY),
 		    CursorBuilding, Players + SelectedPlayer);
-		if( unit->Type->OilPatch || unit->Type->GivesOil ) {
+		if (unit->Type->OilPatch || unit->Type->GivesOil) {
 		    unit->Value = 50000;
 		}
-		if( unit->Type->GoldMine ) {
+		if (unit->Type->GoldMine) {
 		    unit->Value = 100000;
 		}
 	    } else {
 		SetStatusLine("Unit can't be placed here.");
-		PlayGameSound(GameSounds.PlacementError.Sound
-			,MaxSampleVolume);
+		PlayGameSound(GameSounds.PlacementError.Sound,
+		    MaxSampleVolume);
 	    }
 	}
     }
@@ -1027,7 +1024,7 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 **	@param key	Key scancode.
 **	@param keychar	Character code.
 */
-global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
+local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 {
     if (HandleKeyModifiersDown(key, keychar)) {
 	return;
@@ -1112,7 +1109,7 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 **	@param key	Key scancode.
 **	@param keychar	Character code.
 */
-global void EditorCallbackKeyUp(unsigned key, unsigned keychar)
+local void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 {
     if (HandleKeyModifiersUp(key, keychar)) {
 	return;
@@ -1184,6 +1181,38 @@ local void EditorCallbackMouse(int x, int y)
     //
     if( CursorOn == CursorOnMap && EditorState == EditorEditTile
 	    && (MouseButtons&LeftButton) ) {
+
+	//
+	//	Scroll the map
+	//
+	if( !(FrameCounter % SpeedMouseScroll) ) {
+	    viewport = TheUI.LastClickedVP;
+	    if (CursorX < TheUI.VP[viewport].X) {
+		MapViewportSetViewpoint(viewport,
+		    TheUI.VP[viewport].MapX - 1, TheUI.VP[viewport].MapY);
+	    } else if (CursorX >= TheUI.VP[viewport].EndX) {
+		MapViewportSetViewpoint(viewport,
+		    TheUI.VP[viewport].MapX + 1, TheUI.VP[viewport].MapY);
+	    }
+
+	    if (CursorY < TheUI.VP[viewport].Y) {
+		MapViewportSetViewpoint(viewport,
+		    TheUI.VP[viewport].MapX, TheUI.VP[viewport].MapY - 1);
+	    } else if (CursorY >= TheUI.VP[viewport].EndY) {
+		MapViewportSetViewpoint(viewport,
+		    TheUI.VP[viewport].MapX, TheUI.VP[viewport].MapY + 1);
+	    }
+	}
+
+	//
+	//	Scroll the map, if cursor moves outside the viewport.
+	//
+	RestrictCursorToViewport();
+
+	EditTiles(Viewport2MapX(TheUI.LastClickedVP, CursorX),
+	    Viewport2MapY(TheUI.LastClickedVP, CursorY), TileCursor,
+	    TileCursorSize);
+#if 0
 	// FIXME: should scroll the map!
 	viewport = GetViewport(x, y);
 	if (viewport >= 0 && viewport == TheUI.ActiveViewport) {
@@ -1191,8 +1220,24 @@ local void EditorCallbackMouse(int x, int y)
 		Viewport2MapY(TheUI.ActiveViewport, CursorY), TileCursor,
 		TileCursorSize);
 	}
+#endif
 	return;
     }
+
+    //
+    //	Minimap move viewpoint
+    //
+    if( CursorOn==CursorOnMinimap && (MouseButtons&LeftButton) ) {
+	Viewport *vp;
+
+	RestrictCursorToMinimap();
+	vp = &TheUI.VP[TheUI.LastClickedVP];
+	MapViewportSetViewpoint (TheUI.LastClickedVP
+		,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
+		,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
+	return;
+    }
+
 
     OldCursorOn = CursorOn;
 
@@ -1209,25 +1254,7 @@ local void EditorCallbackMouse(int x, int y)
     if( x>=TheUI.MinimapX+24 && x<TheUI.MinimapX+24+MINIMAP_W
 	    && y>=TheUI.MinimapY+2 && y<TheUI.MinimapY+2+MINIMAP_H ) {
 	CursorOn=CursorOnMinimap;
-    }
 
-    //	Minimap move viewpoint
-    if( OldCursorOn==CursorOnMinimap && (MouseButtons&LeftButton) ) {
-#ifdef SPLIT_SCREEN_SUPPORT
-	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
-#endif
-	if( CursorOn!=CursorOnMinimap) {
-	    RestrictCursorToMinimap();
-	}
-#ifdef SPLIT_SCREEN_SUPPORT
-	MapViewportSetViewpoint (TheUI.LastClickedVP
-		,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
-		,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
-#else /* SPLIT_SCREEN_SUPPORT */
-	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
-		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
-#endif /* SPLIT_SCREEN_SUPPORT */
-	return;
     }
 
     //
