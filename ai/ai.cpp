@@ -809,11 +809,11 @@ global void AiResearchComplete(Unit* unit,const Upgrade* what)
 }
 
 /**
-**	This is called for each player, each frame.
+**	This is called for each player, each game cycle.
 **
 **	@param player	The player structure pointer.
 */
-global void AiEachFrame(Player* player __attribute__((unused)))
+global void AiEachCycle(Player* player __attribute__((unused)))
 {
 }
 

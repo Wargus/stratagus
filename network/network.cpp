@@ -267,6 +267,7 @@ global int NetworkFildes = -1;		/// Network file descriptor
 global int NetworkInSync = 1;		/// Network is in sync
 global int NetworkUpdates = 5;		/// Network update each # game cycles
 global int NetworkLag = 5;		/// Network lag in # game cycles
+global int NetworkStatus[PlayerMax];	/// Network status
 
 local char NetMsgBuf[128][PlayerMax];	/// Chat message buffers
 local int NetMsgBufLen[PlayerMax];	/// Stored chat message length
@@ -286,6 +287,7 @@ local int NetworkReceivedPackets;	/// Packets received packets
 local int NetworkReceivedEarly;		/// Packets received too early
 local int NetworkReceivedLate;		/// Packets received too late
 local int NetworkReceivedDups;		/// Packets received as duplicates
+local int NetworkReceivedLost;		/// Packets received packet lost
 
 local int NetworkSendPackets;		/// Packets send packets
 local int NetworkSendResend;		/// Packets send to resend
@@ -459,9 +461,9 @@ global void ExitNetwork1(void)
 	return;
     }
 #ifdef DEBUG
-    DebugLevel0("Received: %d packets, %d early, %d late, %d dups\n",
+    DebugLevel0("Received: %d packets, %d early, %d late, %d dups, %d lost.\n",
 	    NetworkReceivedPackets, NetworkReceivedEarly, NetworkReceivedLate,
-	    NetworkReceivedDups);
+	    NetworkReceivedDups,NetworkReceivedLost);
     DebugLevel0("Send: %d packets, %d resend\n",
 	    NetworkSendPackets, NetworkSendResend);
 #endif
@@ -548,7 +550,7 @@ global void NetworkSendCommand(int command, const Unit *unit, int x, int y,
 
 /**
 **	Called if message for the network is ready.
-**	(by WaitEventsAndKeepSync)
+**	(by WaitEventsOneFrame)
 **
 **	@todo
 **		NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
@@ -676,6 +678,25 @@ global void NetworkEvent(void)
 	    DebugLevel3Fn("Command %3d for %8d(%02X) got\n",
 		    nc->Type, n, nc->Cycle);
 	}
+
+	// Receive statistic
+	if( n>NetworkStatus[player] ) {
+	    NetworkStatus[player] = n;
+	}
+#ifdef DEBUG
+	if( i ) {
+	    // Not in first slot and not got packet lost!
+	    // FIXME: if more than 1 in sequence is lost, I count one to much!
+	    if( NetworkIn[nc->Cycle][player].Time != n ) {
+		++NetworkReceivedLost;
+	    }
+	} else {
+	    // FIXME: more network statistic
+	    if( NetworkIn[nc->Cycle][player].Time == n ) {
+		++NetworkReceivedDups;
+	    }
+	}
+#endif
 
 	// Place in network in
 	NetworkIn[nc->Cycle][player].Time = n;
