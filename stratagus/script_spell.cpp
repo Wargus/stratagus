@@ -1013,10 +1013,10 @@ global void SaveSpells(CLFile* file)
 
 #ifdef META_LUA
 
-	/// Get func for SpellType 
-local int ScriptSpellGet(SpellType* spell, const char* key, lua_State* l);
-	/// Set func for SpellType 
-local int ScriptSpellSet(SpellType* spell, const char* key, lua_State* l);
+	/// Proxy type for SpellType
+local ScriptProxyType ScriptProxySpell;
+	/// Proxy type for the SpellType array
+local ScriptProxyType ScriptProxySpellTypes;
 
 //
 //	Functions directly acessible from lua. Placed in the stratagus namespace.
@@ -1045,7 +1045,7 @@ local int ScriptSpellCreate(lua_State* l)
 		spell->Slot = SpellTypeCount - 1;
 		spell->Ident = strdup(name);
 		spell->DependencyId = -1;
-		ScriptCreateUserdata(l, spell, ScriptSpellGet, ScriptSpellSet);
+		ScriptCreateUserdata(l, spell, &ScriptProxySpell);
 		return 1;
 	}
 }
@@ -1120,34 +1120,28 @@ local int ScriptSpellSet(SpellType* spell, const char* key, lua_State* l)
 }
 
 /**
-**	Get function for the big spell namespace.
+**	Get function for the big spell namespace, with int index
 */
-local int ScriptSpellNamespaceGet(lua_State* l)
+local int ScriptSpellTypesGetInt(void* object, int index, lua_State* l)
 {
-	int i;
-	const char* key;
+	if (index < 0 || index >= SpellTypeCount) {
+		LuaError(l, "Spell index out of range");
+	}
+	ScriptCreateUserdata(l, SpellTypeTable[index], &ScriptProxySpell);
+	return 1;
+}
+
+/**
+**	Get function for the big spell namespace, with string key
+*/
+local int ScriptSpellTypesGetStr(void* object, const char* key, lua_State* l)
+{
 	SpellType* spell;
 
-	//  Index with number
-	if (lua_isnumber(l, 2)) {
-		i = LuaToNumber(l, 2);
-		DebugLevel3Fn("(%d)\n" _C_ i);
-		if (i < 0 || i >= SpellTypeCount) {
-			LuaError(l, "Spell index out of range");
-		}
-		ScriptCreateUserdata(l, SpellTypeTable[i], ScriptSpellGet, ScriptSpellSet);
-		return 1;
-	}
-
-	//  Index with string. FIXME: hashtable? :)
-	key = LuaToString(l, 2);
-	DebugCheck(!key);
-	DebugLevel3Fn("(%s)\n" _C_ key);
-
 	META_GET_INT("n", SpellTypeCount);
-
+	META_GET_FUNC("Create", ScriptSpellCreate);
 	if ((spell = SpellTypeByIdent(key))) {
-		ScriptCreateUserdata(l, spell, ScriptSpellGet, ScriptSpellSet);
+		ScriptCreateUserdata(l, spell, &ScriptProxySpell);
 		return 1;
 	}
 
@@ -1159,26 +1153,21 @@ local int ScriptSpellNamespaceGet(lua_State* l)
 */
 global void ScriptSpellInit(void)
 {
+	ScriptProxySpell.GetStr = (ScriptGetSetStrFunction *)ScriptSpellGet;
+	ScriptProxySpell.SetStr = (ScriptGetSetStrFunction *)ScriptSpellSet;
+	ScriptProxySpell.GetInt = ScriptGetSetIntBlock;
+	ScriptProxySpell.SetInt = ScriptGetSetIntBlock;
+	ScriptProxySpell.Collect = 0;
+
+	ScriptProxySpellTypes.GetStr = (ScriptGetSetStrFunction *)ScriptSpellTypesGetStr;
+	ScriptProxySpellTypes.SetStr = ScriptGetSetStrBlock;
+	ScriptProxySpellTypes.GetInt = (ScriptGetSetIntFunction *)ScriptSpellTypesGetInt;
+	ScriptProxySpellTypes.SetInt = ScriptGetSetIntBlock;
+	ScriptProxySpellTypes.Collect = 0;
+
 	// Create Stratagus.Spells namespace.
-	// No userdata, there's no data. And no finalizer
 	lua_pushstring(Lua, "Spells");
-	lua_newtable(Lua);
-
-	// Generate the metatable
-	lua_newtable(Lua);
-	lua_pushstring(Lua, "__index");
-	lua_pushcfunction(Lua, ScriptSpellNamespaceGet);
-	lua_settable(Lua, -3);
-	lua_pushstring(Lua, "__newindex");
-	lua_pushcfunction(Lua, ScriptSetValueBlock); // Read-Only
-	lua_settable(Lua, -3);
-	lua_setmetatable(Lua, -2);
-
-	// Add functions.
-	lua_pushstring(Lua, "Create");
-	lua_pushcfunction(Lua, ScriptSpellCreate);
-	lua_rawset(Lua, -3);
-
+	ScriptCreateUserdata(Lua, 0, &ScriptProxySpellTypes);
 	lua_rawset(Lua, -3);
 }
 
