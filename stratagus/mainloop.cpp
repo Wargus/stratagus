@@ -842,7 +842,8 @@ global void GameMainLoop(void)
 	    if( Callbacks==&MenuCallbacks ) {
 		MustRedraw|=RedrawMenu;
 	    }
-	    if( CurrentMenu && CurrentMenu->Image == ScPanel ) {
+	    if( CurrentMenu && CurrentMenu->Panel
+		    && !strcmp(CurrentMenu->Panel, ScPanel) ) {
 		MustRedraw = RedrawEverything;
 	    }
 

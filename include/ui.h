@@ -128,18 +128,16 @@ typedef enum {
     NUM_VIEWPORT_MODES		/// Number of different viewports.
 } ViewportMode;
 
+#define ScPanel "sc-panel"	/// hack for transparency
+
 /**
-**	Panel types used in menus (and stored in ui global below)
+**	Menu panels
 */
-enum {
-    ImageNone,
-    ImagePanel1,	// 256 x 288
-    ImagePanel2,	// 288 x 256
-    ImagePanel3,	// 384 x 256
-    ImagePanel4,	// 288 x 128
-    ImagePanel5,	// 352 x 352
-    ScPanel,		// transparent any size
-};
+typedef struct _menu_panel_ {
+    char*			Ident;	/// Unique identifier
+    GraphicConfig		Panel;	/// Panel
+    struct _menu_panel_*	Next;	/// Next pointer
+} MenuPanel;
 
 /**
 **	Defines the user interface.
@@ -299,11 +297,7 @@ typedef struct _ui_ {
 //    SoundConfig	PlacementSuccess;	/// played on placements success
 //    SoundConfig	Click;			/// click noice used often
 
-    GraphicConfig	GameMenuPanel;	/// Panel 256 x 288
-    GraphicConfig	Menu1Panel;	/// Panel 288 x 256
-    GraphicConfig	Menu2Panel;	/// Panel 384 x 256
-    GraphicConfig	VictoryPanel;	/// Panel 288 x 128
-    GraphicConfig	ScenarioPanel;	/// Panel 352 x 352
+    MenuPanel*		MenuPanels;	/// Menu panels
 
     GraphicConfig	VictoryBackground;
     GraphicConfig	DefeatBackground;

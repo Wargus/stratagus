@@ -927,64 +927,47 @@ global void DrawMenu(Menu *menu)
     MenuRedrawW = menu->Width;
     MenuRedrawH = menu->Height;
 
-    switch (menu->Image) {
-	case ScPanel:
-	    // Background
-	    VideoFill50TransRectangle(ColorBlack,MenuRedrawX+1,MenuRedrawY+1,MenuRedrawW-2,MenuRedrawH-2);
-	    VideoDrawHLineClip(ColorBlue,MenuRedrawX+3,MenuRedrawY,MenuRedrawW-6);
-	    VideoDrawHLineClip(ColorBlue,MenuRedrawX+3,MenuRedrawY+MenuRedrawH-1,MenuRedrawW-6);
-	    VideoDrawVLineClip(ColorBlue,MenuRedrawX,MenuRedrawY+3,MenuRedrawH-6);
-	    VideoDrawVLineClip(ColorBlue,MenuRedrawX+MenuRedrawW-1,MenuRedrawY+3,MenuRedrawH-6);
-	    // top left
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+1);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+2,MenuRedrawY+1);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+2);
-	    // top right
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-3,MenuRedrawY+1);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+1);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+2);
-	    // bottom left
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+MenuRedrawH-3);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+MenuRedrawH-2);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+2,MenuRedrawY+MenuRedrawH-2);
-	    // bottom right
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-3,MenuRedrawY+MenuRedrawH-2);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+MenuRedrawH-2);
-	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+MenuRedrawH-3);
-	    break;
+    if (menu->Panel && !strcmp(menu->Panel, ScPanel)) {
+	// Background
+	VideoFill50TransRectangle(ColorBlack,MenuRedrawX+1,MenuRedrawY+1,MenuRedrawW-2,MenuRedrawH-2);
+	VideoDrawHLineClip(ColorBlue,MenuRedrawX+3,MenuRedrawY,MenuRedrawW-6);
+	VideoDrawHLineClip(ColorBlue,MenuRedrawX+3,MenuRedrawY+MenuRedrawH-1,MenuRedrawW-6);
+	VideoDrawVLineClip(ColorBlue,MenuRedrawX,MenuRedrawY+3,MenuRedrawH-6);
+	VideoDrawVLineClip(ColorBlue,MenuRedrawX+MenuRedrawW-1,MenuRedrawY+3,MenuRedrawH-6);
+	// top left
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+1);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+2,MenuRedrawY+1);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+2);
+	// top right
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-3,MenuRedrawY+1);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+1);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+2);
+	// bottom left
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+MenuRedrawH-3);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+MenuRedrawH-2);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+2,MenuRedrawY+MenuRedrawH-2);
+	// bottom right
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-3,MenuRedrawY+MenuRedrawH-2);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+MenuRedrawH-2);
+	VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+MenuRedrawH-3);
+    } else if (menu->Panel) {
+	MenuPanel *menupanel;
 
-	case ImagePanel1:
-	    VideoDrawSub(TheUI.GameMenuPanel.Graphic,0,0,
-		    VideoGraphicWidth(TheUI.GameMenuPanel.Graphic),
-		    VideoGraphicHeight(TheUI.GameMenuPanel.Graphic),
+	menupanel = TheUI.MenuPanels;
+	while (menupanel) {
+	    if (!strcmp(menupanel->Ident, menu->Panel)) {
+		break;
+	    }
+	    menupanel=menupanel->Next;
+	}
+	if (menupanel) {
+	    VideoDrawSub(menupanel->Panel.Graphic,0,0,
+		    VideoGraphicWidth(menupanel->Panel.Graphic),
+		    VideoGraphicHeight(menupanel->Panel.Graphic),
 		    menu->X,menu->Y);
-	    break;
-	case ImagePanel2:
-	    VideoDrawSub(TheUI.Menu1Panel.Graphic,0,0,
-		    VideoGraphicWidth(TheUI.Menu1Panel.Graphic),
-		    VideoGraphicHeight(TheUI.Menu1Panel.Graphic),
-		    menu->X,menu->Y);
-	    break;
-	case ImagePanel3:
-	    VideoDrawSub(TheUI.Menu2Panel.Graphic,0,0,
-		   VideoGraphicWidth(TheUI.Menu2Panel.Graphic),
-		   VideoGraphicHeight(TheUI.Menu2Panel.Graphic),
-		   menu->X,menu->Y);
-	    break;
-	case ImagePanel4:
-	    VideoDrawSub(TheUI.VictoryPanel.Graphic,0,0,
-		   VideoGraphicWidth(TheUI.VictoryPanel.Graphic),
-		   VideoGraphicHeight(TheUI.VictoryPanel.Graphic),
-		   menu->X,menu->Y);
-	    break;
-	case ImagePanel5:
-	    VideoDrawSub(TheUI.ScenarioPanel.Graphic,0,0,
-		   VideoGraphicWidth(TheUI.ScenarioPanel.Graphic),
-		   VideoGraphicHeight(TheUI.ScenarioPanel.Graphic),
-		   menu->X,menu->Y);
-	default:
-	    break;
+	}
     }
+
     n = menu->NumItems;
     mi = menu->Items;
     mip = NULL;
@@ -2360,7 +2343,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 	    }
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
-		if (CurrentMenu->Image == ScPanel) {
+		if (CurrentMenu->Panel && !strcmp(CurrentMenu->Panel, ScPanel)) {
 		    MustRedraw = RedrawEverything;
 		}
 		if (MustRedraw == RedrawEverything) {

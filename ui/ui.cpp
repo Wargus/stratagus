@@ -168,6 +168,7 @@ global void InitUserInterface(const char *race_name)
 global void LoadUserInterface(void)
 {
     int i;
+    MenuPanel* menupanel;
 
     //
     //	Load graphics
@@ -264,35 +265,17 @@ global void LoadUserInterface(void)
     TheUI.ArrowS.Cursor=CursorTypeByIdent(TheUI.ArrowS.Name);
     TheUI.ArrowSE.Cursor=CursorTypeByIdent(TheUI.ArrowSE.Name);
 
-    if( TheUI.GameMenuPanel.File ) {
-	TheUI.GameMenuPanel.Graphic=LoadGraphic(TheUI.GameMenuPanel.File);
+    menupanel=TheUI.MenuPanels;
+    while( menupanel ) {
+	if( menupanel->Panel.File ) {
+	    menupanel->Panel.Graphic=LoadGraphic(menupanel->Panel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.GameMenuPanel.Graphic,TheUI.GameMenuPanel.Graphic->Width,TheUI.GameMenuPanel.Graphic->Height);
+	    MakeTexture(menupanel->Panel.Graphic,
+		    menupanel->Panel.Graphic->Width,
+		    menupanel->Panel.Graphic->Height);
 #endif
-    }
-    if( TheUI.Menu1Panel.File ) {
-	TheUI.Menu1Panel.Graphic=LoadGraphic(TheUI.Menu1Panel.File);
-#ifdef USE_OPENGL
-	MakeTexture(TheUI.Menu1Panel.Graphic,TheUI.Menu1Panel.Graphic->Width,TheUI.Menu1Panel.Graphic->Height);
-#endif
-    }
-    if( TheUI.Menu2Panel.File ) {
-	TheUI.Menu2Panel.Graphic=LoadGraphic(TheUI.Menu2Panel.File);
-#ifdef USE_OPENGL
-	MakeTexture(TheUI.Menu2Panel.Graphic,TheUI.Menu2Panel.Graphic->Width,TheUI.Menu2Panel.Graphic->Height);
-#endif
-    }
-    if( TheUI.VictoryPanel.File ) {
-	TheUI.VictoryPanel.Graphic=LoadGraphic(TheUI.VictoryPanel.File);
-#ifdef USE_OPENGL
-	MakeTexture(TheUI.VictoryPanel.Graphic,TheUI.VictoryPanel.Graphic->Width,TheUI.VictoryPanel.Graphic->Height);
-#endif
-    }
-    if( TheUI.ScenarioPanel.File ) {
-	TheUI.ScenarioPanel.Graphic=LoadGraphic(TheUI.ScenarioPanel.File);
-#ifdef USE_OPENGL
-	MakeTexture(TheUI.ScenarioPanel.Graphic,TheUI.ScenarioPanel.Graphic->Width,TheUI.ScenarioPanel.Graphic->Height);
-#endif
+	}
+	menupanel=menupanel->Next;
     }
 }
 
@@ -305,6 +288,7 @@ global void LoadUserInterface(void)
 local void OldSaveUi(FILE* file,const UI* ui)
 {
     int i;
+    MenuPanel* menupanel;
 
     fprintf(file,"(define-old-ui '%s %d %d\t; Selector\n",
 	    ui->Name,ui->Width,ui->Height);
@@ -402,11 +386,11 @@ local void OldSaveUi(FILE* file,const UI* ui)
     fprintf(file," '%s",ui->ArrowS.Name);
     fprintf(file," '%s)\n",ui->ArrowSE.Name);
 
-    fprintf(file,"  (list \"%s\")\n",ui->GameMenuPanel.File);
-    fprintf(file,"  (list \"%s\")\n",ui->Menu1Panel.File);
-    fprintf(file,"  (list \"%s\")\n",ui->Menu2Panel.File);
-    fprintf(file,"  (list \"%s\")\n",ui->VictoryPanel.File);
-    fprintf(file,"  (list \"%s\")\n",ui->ScenarioPanel.File);
+    menupanel=ui->MenuPanels;
+    while( menupanel ) {
+	fprintf(file,"  (list \"%s\")\n",menupanel->Panel.File);
+	menupanel=menupanel->Next;
+    }
 
     fprintf(file,"  (list \"%s\")\n",ui->VictoryBackground.File);
     fprintf(file,"  (list \"%s\")",ui->DefeatBackground.File);
@@ -414,6 +398,7 @@ local void OldSaveUi(FILE* file,const UI* ui)
     fprintf(file," )\n\n");
 }
 
+#if 0
 /**
 **	Save the UI structure.
 **
@@ -528,6 +513,7 @@ local void NewSaveUi(FILE * file, const UI * ui)
 
     fprintf(file, " )\n\n");
 }
+#endif
 
 /**
 **	Save the viewports.
@@ -589,6 +575,8 @@ global void CleanUserInterface(void)
 {
     int i;
     UI* ui;
+    MenuPanel* menupanel;
+    MenuPanel* tmp;
 
     //
     //	Free the graphics. FIXME: if they are shared this will crash.
@@ -610,11 +598,11 @@ global void CleanUserInterface(void)
     VideoSaveFree(TheUI.Minimap.Graphic);
     VideoSaveFree(TheUI.StatusLine.Graphic);
 
-    VideoSaveFree(TheUI.GameMenuPanel.Graphic);
-    VideoSaveFree(TheUI.Menu1Panel.Graphic);
-    VideoSaveFree(TheUI.Menu2Panel.Graphic);
-    VideoSaveFree(TheUI.VictoryPanel.Graphic);
-    VideoSaveFree(TheUI.ScenarioPanel.Graphic);
+    menupanel=TheUI.MenuPanels;
+    while( menupanel ) {
+	VideoSaveFree(menupanel->Panel.Graphic);
+	menupanel=menupanel->Next;
+    }
 
     //
     //	Free the available user interfaces.
@@ -625,6 +613,14 @@ global void CleanUserInterface(void)
 	    // FIXME: not completely written
 	    free(ui->NormalFontColor);
 	    free(ui->ReverseFontColor);
+	    menupanel=ui->MenuPanels;
+	    while( menupanel ) {
+		tmp=menupanel;
+		menupanel=menupanel->Next;
+		free(tmp->Panel.File);
+		free(tmp->Ident);
+		free(tmp);
+	    }
 	    free(ui);
 	}
 	free(UI_Table);
