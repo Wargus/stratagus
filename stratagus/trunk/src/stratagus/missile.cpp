@@ -1865,7 +1865,7 @@ void MissileActionDeathCoil(Missile* missile)
 			x = missile->DX / TileSizeX;
 			y = missile->DY / TileSizeY;
 
-			n = UnitCacheSelect(x - 2, y - 2, x + 2, y + 2, table);
+			n = UnitCacheSelect(x - 2, y - 2, x + 2 + 1, y + 2 + 1, table);
 			if (n == 0) {
 				return;
 			}
