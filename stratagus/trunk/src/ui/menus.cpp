@@ -2482,14 +2482,14 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing game speed by 10");
+		DebugLevel0Fn("Increasing game speed by 10%s\n", "%");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		VideoSyncSpeed = mi[1].d.hslider.percent + 50;
 		SetVideoSync();
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing game speed by 10");
+		DebugLevel0Fn("Decreasing game speed by 10%s\n", "%");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
@@ -2528,14 +2528,14 @@ local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing mouse speed by 10");
+		DebugLevel0Fn("Increasing mouse speed\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		TheUI.MouseScroll = 1;
 		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing mouse speed by 10");
+		DebugLevel0Fn("Decreasing mouse speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
@@ -2578,14 +2578,14 @@ local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing keyboard speed by 10");
+		DebugLevel0Fn("Increasing keyboard speed\n");
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
 		TheUI.KeyScroll = 1;
 		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing keyboard speed by 10");
+		DebugLevel0Fn("Decreasing keyboard speed\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
