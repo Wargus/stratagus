@@ -136,6 +136,8 @@ global void RevealMap(void)
 {
 	int x;
 	int y;
+	int p;
+
 	//
 	//	Mark every explored tile as visible. 1 turns into 2.
 	//
@@ -154,6 +156,20 @@ global void RevealMap(void)
 	//	Global seen recount. Simple and effective.
 	//
 	for (x = 0; x < NumUnits; ++x) {
+		//
+		//	Reveal neutral buildings. Gold mines:)
+		//
+		if (Units[x]->Player->Type == PlayerNeutral) {
+			for (p = 0; p < PlayerMax; ++p) {
+				if (Players[p].Type != PlayerNobody &&
+						(!(Units[x]->Seen.ByPlayer & (1 << p)))) {
+					if (1) {
+						UnitGoesOutOfFog(Units[x], Players + p);
+						UnitGoesUnderFog(Units[x], Players + p);
+					}
+				}
+			}
+		}
 		UnitCountSeen(Units[x]);
 	}
 }
