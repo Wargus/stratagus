@@ -559,15 +559,8 @@ global MapInfo* GetPudInfo(const char* pud)
 		    v=PudReadByte(input);
 		    buf[0] = v & 0xFF;
 		    info->MapUID += ChksumArea(buf, 1);
-		    switch( v ) {
-			case PlayerRaceHuman:
-			case PlayerRaceOrc:
-			case PlayerRaceNeutral:
-			    break;
-			default:
-			    DebugLevel1("Unknown race %d\n" _C_ v);
-			    v=PlayerRaceNeutral;
-			    break;
+		    if( PlayerRacesIndex(v)==-1 ) {
+			v=PlayerRaces.Race[PlayerRaces.Count-1];
 		    }
 		    info->PlayerSide[i]=v;
 		}
@@ -1043,15 +1036,8 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 		for( i=0; i<16; ++i ) {
 		    v=PudReadByte(input);
-		    switch( v ) {
-			case PlayerRaceHuman:
-			case PlayerRaceOrc:
-			case PlayerRaceNeutral:
-			    break;
-			default:
-			    DebugLevel1("Unknown race %d\n" _C_ v);
-			    v=PlayerRaceNeutral;
-			    break;
+		    if( PlayerRacesIndex(v)==-1 ) {
+			v=PlayerRaces.Race[PlayerRaces.Count-1];
 		    }
 		    if (GameSettings.Presets[i].Race == SettingsPresetMapDefault) {
 			PlayerSetSide(&Players[i],v);
@@ -1274,13 +1260,13 @@ pawn:
 				s = GameSettings.Presets[o].Race;
 			    }
 			    if (s != SettingsPresetMapDefault) {
-				if (s == PlayerRaceHuman && (t & 1) == 1) {
+				// FIXME: Support more races?
+				if (s == PlayerRaces.Race[0] && (t & 1) == 1) {
 				    t--;
 				}
-				if (s == PlayerRaceOrc && (t & 1) == 0) {
+				if (s == PlayerRaces.Race[1] && (t & 1) == 0) {
 				    t++;
 				}
-				// FIXME: ARI: This is hard-coded WAR2 ... also: support more races?
 			    }
 			}
 			if (Players[o].Type != PlayerNobody) {

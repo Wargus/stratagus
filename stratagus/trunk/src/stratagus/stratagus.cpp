@@ -1020,7 +1020,7 @@ global void PreMenuSetup(void)
     char* s;
 
     //
-    //  Inital menues require some gfx.
+    //  Initial menus require some gfx.
     //
     // FIXME: must search tileset by identifier or use a gui palette?
     TheMap.TerrainName=Tilesets[0]->Ident;
@@ -1036,12 +1036,14 @@ global void PreMenuSetup(void)
 
     InitVideoCursors();
 
-    // All pre-start menues are orcish - may need to be switched later..
-    InitMenus(PlayerRaceOrc);
-    LoadCursors(RaceWcNames ? RaceWcNames[1] : "oops");
+    // FIXME: make the race configurable
+    InitMenus(PlayerRaces.Count>1 ? PlayerRaces.Race[1] : 0);
+    LoadCursors(PlayerRaces.Count>1 ? PlayerRaces.Name[1] :
+	PlayerRaces.Name[0]);
     InitSettings();
 
-    InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
+    InitUserInterface(PlayerRaces.Count>1 ? PlayerRaces.Name[1] :
+	PlayerRaces.Name[0]);
     LoadUserInterface();
 }
 

@@ -118,33 +118,18 @@ local SCM CclPlayer(SCM list)
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("race")) ) {
 	    str=gh_scm2newstr(gh_car(list),NULL);
-	    if( RaceWcNames ) {
-		for( i=0; RaceWcNames[i]; ++i ) {
-		    if( !strcmp(str,RaceWcNames[i]) ) {
-			player->RaceName=RaceWcNames[i];
-			player->Race=i;
-			break;
-		    }
+	    for( i=0; i<PlayerRaces.Count; ++i ) {
+		if( !strcmp(str,PlayerRaces.Name[i]) ) {
+		    player->RaceName=PlayerRaces.Name[i];
+		    player->Race=i;
+		    break;
 		}
 	    }
 	    free(str);
-	    if( !RaceWcNames || !RaceWcNames[i] ) {
+	    if( i==PlayerRaces.Count ) {
 	       // FIXME: this leaves a half initialized player
 	       errl("Unsupported tag",gh_car(list));
 	    }
-#if 0
-	    player->RaceName=str=gh_scm2newstr(gh_car(list),NULL);
-	    if( !strcmp(str,"human") ) {
-		player->Race=PlayerRaceHuman;
-	    } else if( !strcmp(str,"orc") ) {
-		player->Race=PlayerRaceOrc;
-	    } else if( !strcmp(str,"neutral") ) {
-		player->Race=PlayerRaceNeutral;
-	    } else {
-	       // FIXME: this leaves a half initialized player
-	       errl("Unsupported tag",gh_car(list));
-	    }
-#endif
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("ai")) ) {
 	    player->AiNum=gh_scm2int(gh_car(list));
@@ -479,32 +464,50 @@ local SCM CclSharedVision(SCM state,SCM player)
 }
 
 /**
-**	Define race mapping from original number to internal symbol
+**	Define race names
 **
-**	@param list	List of all names.
+**	@param list	List of all races.
 */
-local SCM CclDefineRaceWcNames(SCM list)
+local SCM CclDefineRaceNames(SCM list)
 {
+    SCM sublist;
+    SCM value;
     int i;
-    char** cp;
 
-    if( (cp=RaceWcNames) ) {		// Free all old names
-	while( *cp ) {
-	    free(*cp++);
-	}
-	free(RaceWcNames);
-    }
-
-    //
-    //	Get new table.
-    //
-    i=gh_length(list);
-    RaceWcNames=cp=malloc((i+1)*sizeof(char*));
-    while( i-- ) {
-	*cp++=gh_scm2newstr(gh_car(list),NULL);
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
 	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("race")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    i=PlayerRaces.Count++;
+	    PlayerRaces.Race[i]=0;
+	    PlayerRaces.Name[i]=NULL;
+	    PlayerRaces.Display[i]=NULL;
+	    PlayerRaces.Visible[i]=0;
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( gh_eq_p(value,gh_symbol2scm("race")) ) {
+		    PlayerRaces.Race[i]=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
+		    PlayerRaces.Name[i]=gh_scm2newstr(gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("display")) ) {
+		    PlayerRaces.Display[i]=gh_scm2newstr(gh_car(sublist),NULL);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("visible")) ) {
+		    PlayerRaces.Visible[i]=1;
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	} else {
+	    errl("Unsupported tag",value);
+	}
     }
-    *cp=NULL;
 
     return SCM_UNSPECIFIED;
 }
@@ -588,7 +591,7 @@ global void PlayerCclRegister(void)
     gh_new_procedure3_0("set-shared-vision!",CclSetSharedVision);
     gh_new_procedure2_0("shared-vision",CclSharedVision);
 
-    gh_new_procedureN("define-race-wc-names",CclDefineRaceWcNames);
+    gh_new_procedureN("define-race-names",CclDefineRaceNames);
 
     gh_new_procedure0_0("new-colors",CclNewPlayerColors);
 
