@@ -989,10 +989,8 @@ local void MakeFontBitmap(Graphic* g, int font)
 global void LoadFonts(void)
 {
 	unsigned i;
+#ifndef USE_SDL_SURFACE
 	FontColorMapping* fcm;
-#ifdef USE_SDL_SURFACE
-	SDL_Color* color;
-#else
 	void* pixels;
 #endif
 

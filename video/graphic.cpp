@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name graphic.c	-	The general graphic functions. */
+/**@name graphic.c - The general graphic functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer and Nehal Mistry
+//      (c) Copyright 1999-2004 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -36,15 +36,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "video.h"
 #include "iolib.h"
 #include "intern_video.h"
-
-#ifdef USE_SDL_SURFACE
-#include <string.h>
-#endif
 
 /*----------------------------------------------------------------------------
 --		Declarations
@@ -56,9 +53,7 @@ global PaletteLink* PaletteList;		/// List of all used palettes.
 --		Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_SDL_SURFACE
-local GraphicType GraphicImage;
-#else
+#ifndef USE_SDL_SURFACE
 local GraphicType GraphicImage8Type;		/// image type 8bit palette
 local GraphicType GraphicImage16Type;		/// image type 16bit palette
 #endif
@@ -344,16 +339,7 @@ local void VideoDrawSubOpenGL(const Graphic* graphic, int gx, int gy,
 }
 #endif
 
-#ifdef USE_SDL_SURFACE
-/*
-local void VideoDrawSub(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub(graphic, gx, gy, w, h, x, y);
-}
-*/
-#else
+#ifndef USE_SDL_SURFACE
 /**
 **		Video draw part of 8bit graphic clipped into 8 bit framebuffer.
 **
@@ -453,12 +439,9 @@ local void VideoDrawSubOpenGLClip(const Graphic* graphic, int gx, int gy,
 local void FreeGraphic8(Graphic* graphic)
 {
 #ifdef DEBUG
-#ifdef USE_SDL_SURFACE
-	// FIXME: todo
-#else
-	AllocatedGraphicMemory -= graphic->Size;
+	AllocatedGraphicMemory -=
+		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
 	AllocatedGraphicMemory -= sizeof(Graphic);
-#endif
 #endif
 
 #ifdef USE_OPENGL
@@ -470,14 +453,21 @@ local void FreeGraphic8(Graphic* graphic)
 
 #ifdef USE_SDL_SURFACE
 	SDL_FreeSurface(graphic->Surface);
+	if (graphic->SurfaceFlip) {
+#ifdef DEBUG
+		AllocatedGraphicMemory -=
+			graphic->Width * graphic->Height * graphic->SurfaceFlip->format->BytesPerPixel;
+#endif
+		SDL_FreeSurface(graphic->SurfaceFlip);
+	}
 #else
 	VideoFreeSharedPalette(graphic->Pixels);
 	if (graphic->Palette) {
 		free(graphic->Palette);
 	}
 	free(graphic->Frames);
-	free(graphic);
 #endif
+	free(graphic);
 }
 
 // FIXME: need frame version
@@ -537,8 +527,7 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-#ifdef USE_SDL_SURFACE
-#else
+#ifndef USE_SDL_SURFACE
 	if (depth == 8) {
 		graphic->Type = &GraphicImage8Type;
 	} else if (depth == 16) {
@@ -556,9 +545,7 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 
 	graphic->Surface = SDL_CreateRGBSurfaceFrom(data, width, height, depth, width * depth / 8,
 		0, 0, 0, 0);
-
 	graphic->SurfaceFlip = NULL;
-
 	graphic->NumFrames = 0;
 #else
 	graphic->Pixels = NULL;
@@ -578,9 +565,9 @@ global Graphic* MakeGraphic(unsigned depth, int width, int height,
 
 #ifdef USE_SDL_SURFACE
 /**
+**  Flip graphic and store in graphic->SurfaceFlip
 **
-**		Flip graphic and store in graphic->SurfaceFlip
-**
+**  @param graphic  Pointer to object
 */
 global void FlipGraphic(Graphic* graphic)
 {
@@ -590,16 +577,18 @@ global void FlipGraphic(Graphic* graphic)
 
 	s = graphic->SurfaceFlip = SDL_ConvertSurface(graphic->Surface,
 		graphic->Surface->format, SDL_SWSURFACE);
+#ifdef DEBUG
+	AllocatedGraphicMemory +=
+		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
+#endif
 
 	SDL_LockSurface(s);
-
 	for (i = 0; i < s->h; ++i) {
 		for (j = 0; j < s->w; ++j) {
 			((char*)s->pixels)[j + i * s->w] =
 				((char*)graphic->Surface->pixels)[s->w - j + i * s->w];
 		}
 	}
-
 	SDL_UnlockSurface(s);
 }
 #endif
@@ -816,7 +805,6 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 	SDL_LockSurface(g->Surface);
 #else
 	DebugCheck(g->Type != &GraphicImage8Type);
-
 	if (g->Width == w && g->Height == h) {
 		return;
 	}
@@ -885,38 +873,26 @@ global Graphic* LoadGraphic(const char* name)
 	}
 
 #ifdef USE_SDL_SURFACE
-//	Pixels = graphic->Surface->format->palette;
-//	graphic->Surface->format->palette =
-//		VideoCreateSharedPalette(graphic->Surface->format->palette);
 	graphic->NumFrames = 1;
 	VideoPaletteListAdd(graphic->Surface);
 #else
 	graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
-	//free(graphic->Palette);
-	//graphic->Palette = NULL;				// JOHNS: why should we free this?
 #endif
 
 	return graphic;
 }
 
 /**
-**		Init graphic
+**  Init graphic
 */
 global void InitGraphic(void)
 {
-#ifdef USE_SDL_SURFACE
-//	GlobalPalletPixels->ncolors = 256;
-//	GlobalPalette.colors = (SDL_Color*)calloc(256, sizeof(SDL_Color));
-//	GlobalPalette.ncolors = 256;
-//	GlobalPalette.colors = (SDL_Color*)calloc(256, sizeof(SDL_Color));
-#else
-
+#ifndef USE_SDL_SURFACE
 #ifdef USE_OPENGL
 	GraphicImage8Type.DrawSub = VideoDrawSubOpenGL;
 	GraphicImage8Type.DrawSubClip = VideoDrawSubOpenGLClip;
 #else
-
-	switch( VideoBpp ) {
+	switch (VideoBpp) {
 		case 8:
 			GraphicImage8Type.DrawSub = VideoDrawSub8to8;
 			GraphicImage8Type.DrawSubClip = VideoDrawSub8to8Clip;
