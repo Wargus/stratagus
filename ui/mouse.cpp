@@ -1427,6 +1427,13 @@ global void UIHandleButtonUp(unsigned button)
 		} else {
 		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		}
+	        if ( Selected[0]->Player == ThisPlayer ) {
+			char buf[64];
+			sprintf( buf, "You have ~<%d~> %s(s)",
+				 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
+				 Selected[0]->Type->Name);
+			SetStatusLine( buf );
+	        }
 	    }
 	}
 
