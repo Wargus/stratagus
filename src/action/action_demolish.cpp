@@ -56,7 +56,8 @@ global void HandleActionDemolish(Unit* unit)
     Unit* table[UnitMax];
     int i;
     int n;
-    int x, y, ix, iy;
+    int xmin, ymin, xmax, ymax;
+    int ix, iy;
     Unit* goal;
     int err;
 
@@ -137,8 +138,15 @@ global void HandleActionDemolish(Unit* unit)
 		unit->Orders[0].Goal=NoUnitP;
 	    }
 
-            x=unit->X;
-            y=unit->Y;
+	    xmin = unit->X - 2;
+	    ymin = unit->Y - 2;
+	    xmax = unit->X + 2;
+	    ymax = unit->Y + 2;
+	    if (xmin<0) xmin=0;
+	    if (xmax > TheMap.Width-1) xmax = TheMap.Width-1;
+	    if (ymin<0) ymin=0;
+	    if (ymax > TheMap.Height-1) ymax = TheMap.Height-1;
+
             LetUnitDie(unit);
 	    // FIXME: Must play explosion sound
 
@@ -153,7 +161,7 @@ global void HandleActionDemolish(Unit* unit)
 	    //
 	    //	 Effect of the explosion on units.
 	    //
-            n=SelectUnits(x-2,y-2, x+2, y+2,table);
+            n=SelectUnits(xmin,ymin, xmax, ymax,table);
             for( i=0; i<n; ++i ) {
 		if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
 		    // Don't hit flying units!
@@ -164,8 +172,8 @@ global void HandleActionDemolish(Unit* unit)
 	    //
 	    //	Terrain effect of the explosion
 	    //
-            for( ix=x-2; ix<=x+2; ix++ ) {
-		for( iy=y-2; iy<=y+2; iy++ ) {
+            for( ix=xmin; ix<=xmax; ix++ ) {
+		for( iy=ymin; iy<=ymax; iy++ ) {
 		    n=TheMap.Fields[ix+iy*TheMap.Width].Flags;
 		    if( n&MapFieldWall ) {
 			MapRemoveWall(ix,iy);
@@ -176,6 +184,7 @@ global void HandleActionDemolish(Unit* unit)
 		    }
 		}
 	    }
+	    PfHierMapChangedCallback (xmin, ymin, xmax, ymax);
 	    break;
     }
 }
