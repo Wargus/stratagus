@@ -237,7 +237,12 @@ extern unsigned CompressedSoundMemory;
     /// cd play mode, ":off" ":random" ":all" or ":defined"
 extern char *CDMode;
     /// FIXME: docu
-extern char *CDPlaySection;
+enum _play_section_ {
+    PlaySectionMainMenu,
+    PlaySectionGame,
+    PlaySectionStats,
+    PlaySectionBriefing,
+} PlaySection;
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     /// FIXME: docu
 extern int CDTrack;
