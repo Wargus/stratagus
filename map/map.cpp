@@ -49,6 +49,9 @@
 #include "pud.h"
 #include "ui.h"
 #include "editor.h"
+#if defined(MAP_REGIONS)
+#include "pathfinder.h"
+#endif
 
 #include "script.h"
 
@@ -59,6 +62,7 @@
 WorldMap TheMap;                 /// The current map
 int FlagRevealMap;               /// Flag must reveal the map
 int ReplayRevealMap;             /// Reveal Map is replay
+int ForestRegeneration;          /// Forest regeneration
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
@@ -96,26 +100,26 @@ void MapMarkSeenTile(int x, int y)
 	//
 	if (seentile != TheMap.Tileset->RemovedTree &&
 			tile == TheMap.Tileset->RemovedTree) {
-		MapFixSeenWoodNeighbors(x, y);
+		MapFixNeighbors(MapFieldForest, 1, x, y);
 	} else if (seentile == TheMap.Tileset->RemovedTree &&
 			tile != TheMap.Tileset->RemovedTree) {
-		MapFixSeenWoodTile(x, y);
+		MapFixTile(MapFieldForest, 1, x, y);
 	} else if (ForestOnMap(x, y)) {
-		MapFixSeenWoodTile(x, y);
-		MapFixSeenWoodNeighbors(x, y);
+		MapFixTile(MapFieldForest, 1, x, y);
+		MapFixNeighbors(MapFieldForest, 1, x, y);
 
 	//
 	// Handle rock changes.
 	//
 	} else if (seentile != TheMap.Tileset->RemovedRock &&
 			tile == TheMap.Tileset->RemovedRock) {
-		MapFixSeenRockNeighbors(x, y);
+		MapFixNeighbors(MapFieldRocks, 1, x, y);
 	} else if (seentile == TheMap.Tileset->RemovedRock &&
 			tile != TheMap.Tileset->RemovedRock) {
-		MapFixSeenRockTile(x, y);
+		MapFixTile(MapFieldRocks, 1, x, y);
 	} else if (RockOnMap(x, y)) {
-		MapFixSeenRockTile(x, y);
-		MapFixSeenRockNeighbors(x, y);
+		MapFixTile(MapFieldRocks, 1, x, y);
+		MapFixNeighbors(MapFieldRocks, 1, x, y);
 
 	//
 	//  Handle Walls changes.
@@ -174,57 +178,6 @@ void RevealMap(void)
 		}
 		UnitCountSeen(Units[x]);
 	}
-}
-
-/**
-**  Change viewpoint of map viewport v to x,y.
-**
-**  @param vp       Viewport pointer.
-**  @param x        X map tile position.
-**  @param y        Y map tile position.
-**  @param offsetx  X offset in tile.
-**  @param offsety  Y offset in tile.
-*/
-void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
-{
-	Assert(vp);
-
-	x = x * TileSizeX + offsetx;
-	y = y * TileSizeY + offsety;
-	if (x < 0) {
-		x = 0;
-	}
-	if (y < 0) {
-		y = 0;
-	}
-	if (x > TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1) {
-		x = TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1;
-	}
-	if (y > TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1) {
-		y = TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1;
-	}
-	vp->MapX = x / TileSizeX;
-	vp->MapY = y / TileSizeY;
-	vp->OffsetX = x % TileSizeX;
-	vp->OffsetY = y % TileSizeY;
-	vp->MapWidth = ((vp->EndX - vp->X) + vp->OffsetX - 1) / TileSizeX + 1;
-	vp->MapHeight = ((vp->EndY - vp->Y) + vp->OffsetY - 1) / TileSizeY + 1;
-}
-
-/**
-**  Center map viewport v on map tile (x,y).
-**
-**  @param vp  Viewport pointer.
-**  @param x   X map tile position.
-**  @param y   Y map tile position.
-**  @param offsetx  X offset in tile.
-**  @param offsety  Y offset in tile.
-*/
-void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
-{
-	x = x * TileSizeX + offsetx - (vp->EndX - vp->X) / 2;
-	y = y * TileSizeY + offsety - (vp->EndY - vp->Y) / 2;
-	ViewportSetViewpoint(vp, x / TileSizeX, y / TileSizeY, x % TileSizeX, y % TileSizeY);
 }
 
 /*----------------------------------------------------------------------------
@@ -445,70 +398,6 @@ void PreprocessMap(void)
 }
 
 /**
-**  Convert viewport x coordinate to map tile x coordinate.
-**
-**  @param vp  Viewport pointer.
-**  @param x   X coordinate into this viewport (in pixels, relative
-**             to origin of Stratagus's window - not the viewport
-**             itself!).
-**
-**  @return    X map tile coordinate.
-*/
-int Viewport2MapX(const Viewport* vp, int x)
-{
-	int r;
-
-	r = (x - vp->X + vp->MapX * TileSizeX + vp->OffsetX) / TileSizeX;
-	return r < TheMap.Width ? r : TheMap.Width - 1;
-}
-
-/**
-**  Convert viewport y coordinate to map tile y coordinate.
-**
-**  @param vp  Viewport pointer.
-**  @param y   Y coordinate into this viewport (in pixels, relative
-**             to origin of Stratagus's window - not the viewport
-**             itself!).
-**
-**  @return    Y map tile coordinate.
-*/
-int Viewport2MapY(const Viewport* vp, int y)
-{
-	int r;
-
-	r = (y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY) / TileSizeY;
-	return r < TheMap.Height ? r : TheMap.Height - 1;
-}
-
-/**
-**  Convert a map tile X coordinate into a viewport x pixel coordinate.
-**
-**  @param vp  Viewport pointer.
-**  @param x   The map tile's X coordinate.
-**
-**  @return    X screen coordinate in pixels (relative
-**             to origin of Stratagus's window).
-*/
-int Map2ViewportX(const Viewport* vp, int x)
-{
-	return vp->X + (x - vp->MapX) * TileSizeX - vp->OffsetX;
-}
-
-/**
-**  Convert a map tile Y coordinate into a viewport y pixel coordinate.
-**
-**  @param vp  Viewport pointer.
-**  @param y   The map tile's Y coordinate.
-**
-**  @return    Y screen coordinate in pixels (relative
-**             to origin of Stratagus's window).
-*/
-int Map2ViewportY(const Viewport* vp, int y)
-{
-	return vp->Y + (y - vp->MapY) * TileSizeY - vp->OffsetY;
-}
-
-/**
 **  Release info about a map.
 **
 **  @param info  MapInfo pointer.
@@ -550,6 +439,318 @@ void CleanMap(void)
 	CleanMapFogOfWar();
 
 	CleanPud();
+}
+
+
+/*----------------------------------------------------------------------------
+-- Map Tile Update Functions
+----------------------------------------------------------------------------*/
+
+/**
+** Check if the seen tile-type is wood.
+**
+** @param x  Map X tile-position.
+** @param y  Map Y tile-position.
+*/
+int MapIsSeenTile(unsigned short type, int x, int y)
+{
+	switch (type) {
+		case MapFieldForest:
+			return TheMap.Tileset->TileTypeTable[
+				TheMap.Fields[x + y * TheMap.Width].SeenTile] == TileTypeWood;
+		case MapFieldRocks:
+			return TheMap.Tileset->TileTypeTable[
+				TheMap.Fields[x + y * TheMap.Width].SeenTile] == TileTypeRock;
+		default:
+			return 0;
+	}
+}
+
+/**
+** Correct the seen wood field, depending on the surrounding.
+**
+** @param type  type fo tile to update
+** @param seen  1 if updating seen value, 0 for real
+** @param x     Map X tile-position.
+** @param y     Map Y tile-position.
+*/
+void MapFixTile(unsigned short type, int seen, int x, int y)
+{
+	int tile;
+	int ttup;
+	int ttdown;
+	int ttleft;
+	int ttright;
+	int *lookuptable;
+	int removedtile;
+	int flags;
+	MapField* mf;
+
+
+	//  Outside of map or no wood.
+	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+		return;
+	}
+
+	mf = TheMap.Fields + x + y * TheMap.Width;
+
+	if (seen && !MapIsSeenTile(type, x, y)) {
+		return;
+	} else if (!seen && !(mf->Flags & MapFieldForest)) {
+		return;
+	}
+
+	// Select Table to lookup
+	switch (type) {
+		case MapFieldForest:
+			lookuptable = TheMap.Tileset->WoodTable;
+			removedtile = TheMap.Tileset->RemovedTree;
+			flags = (MapFieldForest | MapFieldUnpassable);
+			break;
+		case MapFieldRocks:
+			lookuptable = TheMap.Tileset->RockTable;
+			removedtile = TheMap.Tileset->RemovedRock;
+			flags = (MapFieldRocks | MapFieldUnpassable);
+			break;
+		default:
+			lookuptable = NULL;
+			removedtile = 0;
+			flags = 0;
+	}
+	//
+	//  Find out what each tile has with respect to wood, or grass.
+	//
+	tile = 0;
+	if (y - 1 < 0) {
+		ttup = 15; //Assign trees in all directions
+	} else {
+		if (seen) {
+			ttup = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x + (y - 1) * TheMap.Width].SeenTile];
+		} else {
+			ttup = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x + (y - 1) * TheMap.Width].Tile];
+		}
+	}
+	if (x + 1 >= TheMap.Width) {
+		ttright = 15; //Assign trees in all directions
+	} else {
+		if (seen) {
+			ttright = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x + 1 + y  * TheMap.Width].SeenTile];
+		} else {
+			ttright = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x + 1 + y  * TheMap.Width].Tile];
+		}
+	}
+	if (y + 1 >= TheMap.Height) {
+		ttdown = 15; //Assign trees in all directions
+	} else {
+		if (seen) {
+			ttdown = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x + (y + 1) * TheMap.Width].SeenTile];
+		} else {
+			ttdown = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x + (y + 1) * TheMap.Width].Tile];
+		}
+	}
+	if (x - 1 < 0) {
+		ttleft = 15; //Assign trees in all directions
+	} else {
+		if (seen) {
+			ttleft = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x -1 + y * TheMap.Width].SeenTile];
+		} else {
+			ttleft = TheMap.Tileset->MixedLookupTable[
+				TheMap.Fields[x -1 + y * TheMap.Width].Tile];
+		}
+	}
+
+	//
+	//  Check each of the corners to ensure it has both connecting
+	//  ?**?
+	//  *mm*
+	//  *mm*
+	//  ?**?
+	//  *
+	//   *  type asterixs must match for wood to be present
+
+	tile += ((ttup & 0x01) && (ttleft & 0x04)) * 8;
+	tile += ((ttup & 0x02) && (ttright & 0x08)) * 4;
+	tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
+	tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
+
+	//Test if we have top tree, or bottom tree, they are special
+	if ((ttdown & 0x10) && 1) {
+		tile |= ((ttleft & 0x06) && 1)* 1;
+		tile |= ((ttright & 0x09) && 1) * 2;
+	}
+
+	if ((ttup & 0x20) && 1) {
+		tile |= ((ttleft & 0x06) && 1) * 8;
+		tile |= ((ttright & 0x09) && 1) * 4;
+	}
+
+	tile = lookuptable[tile];
+
+	//If tile is -1, then we should check if we are to draw just one tree
+	//Check for tile about, or below or both...
+	if (tile == -1) {
+		tile = 16;
+		tile += ((ttup & 0x01) || (ttup & 0x02)) * 1;
+		tile += ((ttdown & 0x04) || (ttdown & 0x08)) * 2;
+		tile = lookuptable[tile];
+	}
+
+	//Update seen tile.
+	if (tile == -1) { // No valid wood remove it.
+		if (seen) {
+			mf->SeenTile = removedtile;
+			MapFixNeighbors(type, seen, x, y);
+		} else {
+			mf->Tile = removedtile;
+			mf->Flags &= ~flags;
+			mf->Value = 0;
+#ifdef MAP_REGIONS
+			MapSplitterTilesCleared(x, y, x, y);
+#endif
+			UpdateMinimapXY(x, y);
+		}
+	} else if (seen && TheMap.Tileset->MixedLookupTable[mf->SeenTile] ==
+				TheMap.Tileset->MixedLookupTable[tile]) { //Same Type
+		return;
+	} else {
+		if (seen) {
+			mf->SeenTile = tile;
+		} else {
+			mf->Tile = tile;
+		}
+	}
+
+	if (IsMapFieldVisible(ThisPlayer, x, y)) {
+		UpdateMinimapSeenXY(x, y);
+		if (!seen) {
+			MapMarkSeenTile(x, y);
+		}
+	}
+}
+
+/**
+** Correct the surrounding fields.
+**
+** @param type  Tiletype of tile to adjust
+** @param x     Map X tile-position.
+** @param y     Map Y tile-position.
+*/
+void MapFixNeighbors(unsigned short type, int seen, int x, int y)
+{
+	MapFixTile(type, seen, x + 1, y); // side neighbors
+	MapFixTile(type, seen, x - 1, y);
+	MapFixTile(type, seen, x, y + 1);
+	MapFixTile(type, seen, x, y - 1);
+	MapFixTile(type, seen, x + 1, y - 1); // side neighbors
+	MapFixTile(type, seen, x - 1, y - 1);
+	MapFixTile(type, seen, x - 1, y + 1);
+	MapFixTile(type, seen, x + 1, y + 1);
+}
+
+/**
+** Remove wood from the map.
+**
+** @param type  TileType to clear
+** @param x     Map X tile-position.
+** @param y     Map Y tile-position.
+*/
+void MapClearTile(unsigned short type, unsigned x, unsigned y)
+{
+	MapField* mf;
+	int removedtile;
+	int flags;
+
+	mf = TheMap.Fields + x + y * TheMap.Width;
+
+	// Select Table to lookup
+	switch (type) {
+		case MapFieldForest:
+			removedtile = TheMap.Tileset->RemovedTree;
+			flags = (MapFieldForest | MapFieldUnpassable);
+			break;
+		case MapFieldRocks:
+			removedtile = TheMap.Tileset->RemovedRock;
+			flags = (MapFieldRocks | MapFieldUnpassable);
+			break;
+		default:
+			removedtile = flags = 0;
+	}
+	//
+	mf->Tile = removedtile;
+	mf->Flags &= ~flags;
+	mf->Value = 0;
+
+	UpdateMinimapXY(x, y);
+#ifdef MAP_REGIONS
+	MapSplitterTilesCleared(x, y, x, y);
+#endif
+	MapFixNeighbors(type, 0, x, y);
+
+	if (IsMapFieldVisible(ThisPlayer, x, y)) {
+		UpdateMinimapSeenXY(x, y);
+		MapMarkSeenTile(x, y);
+	}
+}
+
+/**
+** Regenerate forest.
+*/
+void RegenerateForest(void)
+{
+	MapField* mf;
+	MapField* tmp;
+	int x;
+	int y;
+
+	if (!ForestRegeneration) {
+		return;
+	}
+
+	//
+	//  Increment each value of no wood.
+	//  If gown up, place new wood.
+	//  FIXME: a better looking result would be fine
+	//    Allow general updates to any tiletype that regrows
+	for (x = 0; x < TheMap.Width; ++x) {
+		for (y = 0; y < TheMap.Height; ++y) {
+			mf = TheMap.Fields + x + y * TheMap.Width;
+			if (mf->Tile == TheMap.Tileset->RemovedTree) {
+				if (mf->Value >= ForestRegeneration ||
+						++mf->Value == ForestRegeneration) {
+					if (x && !(mf->Flags & (MapFieldWall | MapFieldUnpassable |
+							  MapFieldLandUnit | MapFieldBuilding))) {
+						tmp = mf - TheMap.Width;
+						if (tmp->Tile == TheMap.Tileset->RemovedTree &&
+								tmp->Value >= ForestRegeneration &&
+								!(tmp->Flags & (MapFieldWall | MapFieldUnpassable |
+									  MapFieldLandUnit | MapFieldBuilding))) {
+							DebugPrint("Real place wood\n");
+							tmp->Tile = TheMap.Tileset->TopOneTree;
+							tmp->Value = 0;
+							tmp->Flags |= MapFieldForest | MapFieldUnpassable;
+
+							mf->Tile = TheMap.Tileset->BotOneTree;
+							mf->Value = 0;
+							mf->Flags |= MapFieldForest | MapFieldUnpassable;
+							if (IsMapFieldVisible(ThisPlayer, x, y)) {
+								MapMarkSeenTile(x, y);
+							}
+							if (IsMapFieldVisible(ThisPlayer, x, y - 1)) {
+								MapMarkSeenTile(x, y - 1);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 //@}
