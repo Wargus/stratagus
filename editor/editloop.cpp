@@ -1837,8 +1837,6 @@ static void CreateEditor(void)
 			}
 		}
 
-		TheMap.Info.MapWidth = TheMap.Info.MapWidth;
-		TheMap.Info.MapHeight = TheMap.Info.MapHeight;
 		TheMap.Fields = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(MapField));
 		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
