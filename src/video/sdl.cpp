@@ -79,32 +79,35 @@
 #include "interface.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 global SDL_Surface* TheScreen;				/// Internal screen
+
+local SDL_Rect Rects[100];
+local int NumRects;
 
 local int FrameTicks;						/// Frame length in ms
 local int FrameRemainder;				/// Frame remainder 0.1 ms
 local int FrameFraction;				/// Frame fractional term
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Sync
+--  Sync
 ----------------------------------------------------------------------------*/
 
 /**
-**		Initialise video sync.
-**		Calculate the length of video frame and any simulation skips.
+**  Initialise video sync.
+**  Calculate the length of video frame and any simulation skips.
 **
-**		@see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
+**  @see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
 */
 global void SetVideoSync(void)
 {
@@ -127,12 +130,12 @@ global void SetVideoSync(void)
 }
 
 /*----------------------------------------------------------------------------
---		Video
+--  Video
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_OPENGL
 /**
-**		Initialize open gl for doing 2d with 3d.
+**  Initialize open gl for doing 2d with 3d.
 */
 local void InitOpenGL(void)
 {
@@ -257,59 +260,47 @@ global void InitVideoSdl(void)
 }
 
 /**
-**		Invalidate some area
+**  Invalidate some area
 **
-**		@param x		screen pixel X position.
-**		@param y		screen pixel Y position.
-**		@param w		width of rectangle in pixels.
-**		@param h		height of rectangle in pixels.
+**  @param x  screen pixel X position.
+**  @param y  screen pixel Y position.
+**  @param w  width of rectangle in pixels.
+**  @param h  height of rectangle in pixels.
 */
 global void InvalidateArea(int x, int y, int w, int h)
 {
 #ifndef USE_OPENGL
-	// FIXME: This checks should be done at higher level
-	// FIXME: did SDL version >1.1, check this now also?
-	if (x < 0) {
-		w += x;
-		x = 0;
-	}
-	if (x + w >= VideoWidth) {
-		w = VideoWidth - x;
-	}
-	if (w <= 0) {
-		return;
-	}
-	if (y < 0) {
-		h += y;
-		y = 0;
-	}
-	if (y + h >= VideoHeight) {
-		h = VideoHeight - y;
-	}
-	if (h <= 0) {
-		return;
-	}
-	SDL_UpdateRect(TheScreen, x, y, w, h);
+	DebugCheck(NumRects == sizeof(Rects) / sizeof(*Rects));
+	DebugCheck(x < 0 || y < 0 || x + w > VideoWidth || y + h > VideoHeight);
+	Rects[NumRects].x = x;
+	Rects[NumRects].y = y;
+	Rects[NumRects].w = w;
+	Rects[NumRects].h = h;
+	++NumRects;
 #endif
 }
 
 /**
-**		Invalidate whole window
+**  Invalidate whole window
 */
 global void Invalidate(void)
 {
 #ifndef USE_OPENGL
-	SDL_UpdateRect(TheScreen, 0, 0, VideoWidth, VideoHeight);
+	Rects[0].x = 0;
+	Rects[0].y = 0;
+	Rects[0].w = VideoWidth;
+	Rects[0].h = VideoHeight;
+	NumRects = 1;
 #endif
 }
 
 /**
-**		Convert SDL keysym into internal keycode.
+**  Convert SDL keysym into internal keycode.
 **
-**		@param code		SDL keysym structure pointer.
-**		@param keychar		Internal keycode.
+**  @param code     SDL keysym structure pointer.
+**  @param keychar  Internal keycode.
 **
-**		@return				ASCII code or internal keycode.
+**  @return         ASCII code or internal keycode.
 */
 local int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
 {
@@ -466,10 +457,10 @@ local int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
 }
 
 /**
-**		Handle keyboard key press!
+**  Handle keyboard key press!
 **
-**		@param callbacks		Callback funktion for key down.
-**		@param code				SDL keysym structure pointer.
+**  @param callbacks  Callback funktion for key down.
+**  @param code       SDL keysym structure pointer.
 */
 local void SdlHandleKeyPress(const EventCallback* callbacks,
 	const SDL_keysym* code)
@@ -482,10 +473,10 @@ local void SdlHandleKeyPress(const EventCallback* callbacks,
 }
 
 /**
-**		Handle keyboard key release!
+**  Handle keyboard key release!
 **
-**		@param callbacks		Callback funktion for key up.
-**		@param code				SDL keysym structure pointer.
+**  @param callbacks  Callback funktion for key up.
+**  @param code       SDL keysym structure pointer.
 */
 local void SdlHandleKeyRelease(const EventCallback* callbacks,
 	const SDL_keysym* code)
@@ -748,16 +739,16 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 }
 
 /**
-**		Check video interrupt.
+**  Check video interrupt.
 **
-**		Display and count too slow frames.
+**  Display and count too slow frames.
 */
 global void CheckVideoInterrupts(void)
 {
 }
 
 /**
-**		Realize video memory.
+**  Realize video memory.
 */
 global void RealizeVideoMemory(void)
 {
@@ -765,11 +756,16 @@ global void RealizeVideoMemory(void)
 	SDL_GL_SwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	MustRedraw = RedrawEverything;
+#else
+	if (NumRects) {
+		SDL_UpdateRects(TheScreen, NumRects, Rects);
+		NumRects = 0;
+	}
 #endif
 }
 
 /**
-**		Lock the screen for write access.
+**  Lock the screen for write access.
 */
 global void SdlLockScreen(void)
 {
@@ -781,7 +777,7 @@ global void SdlLockScreen(void)
 }
 
 /**
-**		Unlock the screen for write access.
+**  Unlock the screen for write access.
 */
 global void SdlUnlockScreen(void)
 {
@@ -793,9 +789,9 @@ global void SdlUnlockScreen(void)
 }
 
 /**
-**		Toggle grab mouse.
+**  Toggle grab mouse.
 **
-**		@param mode		Wanted mode, 1 grab, -1 not grab, 0 toggle.
+**  @param mode  Wanted mode, 1 grab, -1 not grab, 0 toggle.
 */
 global void ToggleGrabMouse(int mode)
 {
@@ -812,10 +808,7 @@ global void ToggleGrabMouse(int mode)
 }
 
 /**
-**		Toggle full screen mode.
-**
-**		@todo FIXME: didn't work with windows,
-**				must quit video system and restart it.
+**  Toggle full screen mode.
 */
 global void ToggleFullScreen(void)
 {
