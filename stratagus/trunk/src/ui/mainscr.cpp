@@ -232,7 +232,7 @@ global void DrawUnitInfo(const Unit* unit)
 
 		DrawCompleted(
 			unit->Data.Train.What[0]
-			    ->Stats[ThisPlayer->Player].Costs[TimeCost]
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Data.Train.Ticks);
 	    } else {
 		DrawTextCentered(x+114,y+8+29,GameFont,"Training...");
@@ -247,7 +247,7 @@ global void DrawUnitInfo(const Unit* unit)
 
 		DrawCompleted(
 			unit->Data.Train.What[0]
-			    ->Stats[ThisPlayer->Player].Costs[TimeCost]
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Data.Train.Ticks);
 	    }
 	    return;
@@ -258,13 +258,11 @@ global void DrawUnitInfo(const Unit* unit)
 	//
 	if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
 	    DrawText(x+29,y+8+78,GameFont,"Upgrading:");
-	    DrawUnitIcon(unit->Player
-		    ,unit->Data.UpgradeTo.What->Icon.Icon
+	    DrawUnitIcon(unit->Player,unit->Orders[0].Type->Icon.Icon
 		    ,0,x+107,y+8+70);
 
-	    DrawCompleted(
-		    unit->Data.UpgradeTo.What
-			->Stats[ThisPlayer->Player].Costs[TimeCost]
+	    DrawCompleted(unit->Orders[0].Type
+			->Stats[unit->Player->Player].Costs[TimeCost]
 		    ,unit->Data.UpgradeTo.Ticks);
 	    return;
 	}
@@ -300,7 +298,7 @@ global void DrawUnitInfo(const Unit* unit)
 
 		DrawCompleted(
 			unit->Command.Data.Train.What[0]
-			    ->Stats[ThisPlayer->Player].Costs[TimeCost]
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Command.Data.Train.Ticks);
 	    } else {
 		DrawTextCentered(x+114,y+8+29,GameFont,"Training...");
@@ -315,7 +313,7 @@ global void DrawUnitInfo(const Unit* unit)
 
 		DrawCompleted(
 			unit->Command.Data.Train.What[0]
-			    ->Stats[ThisPlayer->Player].Costs[TimeCost]
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Command.Data.Train.Ticks);
 	    }
 	    return;
@@ -328,7 +326,7 @@ global void DrawUnitInfo(const Unit* unit)
 
 	    DrawCompleted(
 		    unit->Command.Data.UpgradeTo.What
-			->Stats[ThisPlayer->Player].Costs[TimeCost]
+			->Stats[unit->Player->Player].Costs[TimeCost]
 		    ,unit->Command.Data.UpgradeTo.Ticks);
 	    return;
 	}

@@ -314,7 +314,6 @@ struct _unit_ {
     }		Research;		/// Research action
     struct _order_upgradeto_ {
 	unsigned	Ticks;		/// Ticks to complete
-	UnitType*	What;		/// Unit upgraded to
     } UpgradeTo;			/// Upgrade to action
     struct _order_train_ {
 	unsigned	Ticks;		/// Ticks to complete
