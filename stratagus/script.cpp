@@ -518,8 +518,9 @@ global void InitCcl(void)
 #ifdef __MINGW32__
     sprintf(buf,"-l%s\\",FreeCraftLibPath);
 #else
-    sprintf(buf,"-l%s",FreeCraftLibPath);
+    snprintf(buf,sizeof(buf),"-l%s",FreeCraftLibPath);
 #endif
+    buf[sizeof(buf)-1]='\0';
     sargv[4] = strdup(buf);		// never freed
     siod_init(5,sargv);
 
