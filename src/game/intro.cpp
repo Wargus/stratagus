@@ -1477,6 +1477,29 @@ local SCM CclRemoveObjective(SCM objective)
 }
 
 /**
+**	Set the objectives
+*/
+local SCM CclSetObjectives(SCM list)
+{
+    int i;
+
+    // Clean old objectives
+    for( i=0; i<MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i ) {
+	free(GameIntro.Objectives[i]);
+	GameIntro.Objectives[i]=NULL;
+    }
+
+    i=0;
+    while( !gh_null_p(list) ) {
+	GameIntro.Objectives[i]=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+	++i;
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Parse the define-ranks ccl function
 */
 local SCM CclDefineRanks(SCM list)
@@ -1533,6 +1556,7 @@ global void ObjectivesCclRegister(void)
 {
     gh_new_procedureN("add-objective",CclAddObjective);
     gh_new_procedure1_0("remove-objective",CclRemoveObjective);
+    gh_new_procedureN("set-objectives!",CclSetObjectives);
     gh_new_procedureN("define-ranks",CclDefineRanks);
 }
 
@@ -1542,8 +1566,13 @@ global void ObjectivesCclRegister(void)
 global void SaveObjectives(FILE *file)
 {
     int i;
-    for( i=0; i<MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i ) {
-	fprintf(file,"(add-objective \"%s\")\n",GameIntro.Objectives[i]);
+
+    if( GameIntro.Objectives[0] ) {
+	fprintf(file,"(set-objectives!");
+	for( i=0; i<MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i ) {
+	    fprintf(file,"\n  \"%s\"",GameIntro.Objectives[i]);
+	}
+	fprintf(file,")\n");
     }
 }
 

@@ -88,6 +88,7 @@
 <A HREF="#set-game-cycle!">set-game-cycle!</A>
 <A HREF="#set-game-paused!">set-game-paused!</A>
 <A HREF="#set-group-id!">set-group-id!</A>
+<A HREF="#set-objectives!">set-objectives!</A>
 <A HREF="#set-player-resource!">set-player-resource!</A>
 <A HREF="#set-shared-vision!">set-shared-vision!</A>
 <A HREF="#set-this-player!">set-this-player!</A>
@@ -1522,6 +1523,33 @@ Pause or unpause the game.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-objectives!"></A>
+<H3>set-objectives!</H3>
+
+<H4>Description</H4>
+
+Set the mission objectives.  This will overwrite any previous objectives.
+
+<H4>Syntax</H4>
+
+<CODE>(set-objectives! objective [objective ...])</CODE>
+
+<DL>
+<DT>objective</DT>
+<DD>Mission objective text.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-objectives! "Build 4 farms" "Mine 500 gold")
+</PRE>
+
+<P>Sets the mission objectives.
+
+<H4>Not Used</H4>
 
 <A NAME="set-player-resource!"></A>
 <H3>set-player-resource!</H3>
