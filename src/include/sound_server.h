@@ -42,12 +42,13 @@ extern sem_t SoundThreadChannelSemaphore;
 
 #include "sound_id.h"
 
-#ifdef USE_LIBCDA
-#include "libcda.h"
-#endif
-
-#ifdef USE_SDLCD
+#if defined(USE_SDLCD)
 #include <SDL.h>
+#elif defined(USE_LIBCDA)
+#include "libcda.h"
+#elif defined(USE_CDDA)
+#include <cdda_interface.h>
+#include <cdda_paranoia.h>
 #endif
 
 /*----------------------------------------------------------------------------
@@ -232,20 +233,20 @@ extern unsigned AllocatedSoundMemory;
 extern unsigned CompressedSoundMemory;
 #endif
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     /// cd play mode, ":off" ":random" or ":all"
 extern char *CDMode;
     /// FIXME: docu
 extern int CDTrack;
 #endif
 
-#ifdef USE_LIBCDA
+#if defined(USE_LIBCDA)
     /// number of tracks on the cd
 extern int NumCDTracks;
-#endif
-
-#ifdef USE_SDLCD
+#elif defined(USE_SDLCD)
 extern SDL_CD *CDRom;                   /// SDL cdrom device
+#elif defined(USE_CDDA)
+// FIXME: fill up
 #endif
 
 extern Sample* MusicSample;		/// Music samples

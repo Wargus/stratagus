@@ -60,7 +60,7 @@
 #include "settings.h"
 #include "commands.h"
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined (USE_CDDA)
 #include "sound_server.h"
 #endif
 
