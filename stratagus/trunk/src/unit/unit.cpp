@@ -3654,10 +3654,14 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 		    cframe = cframe->Next;
 		    ++frame;
 		}
-		CLprintf(file, "\n  'data-builded '(worker %s",
+		CLprintf(file, "\n  'data-builded '(");
+		
+		if (unit->Data.Builded.Worker) {
+		    CLprintf(file, "worker %s ",
 		    ref = UnitReference(unit->Data.Builded.Worker));
-		free(ref);
-		CLprintf(file, " progress %d frame %d",
+		    free(ref);
+		}
+		CLprintf(file, "progress %d frame %d",
 		    unit->Data.Builded.Progress, frame);
 		if (unit->Data.Builded.Cancel) {
 		    CLprintf(file, " cancel");
