@@ -1691,7 +1691,7 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit->Orders[0].Action != UnitActionDie) {
+	if (unit->Orders[0].Action != UnitActionDie && UnitVisible(unit, ThisPlayer)) {
 		DrawDecoration(unit, type, x, y);
 	}
 }
