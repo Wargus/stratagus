@@ -70,7 +70,6 @@ enum _message_type_ {
     MessageResend,			/// resend message
 
     MessageChat,			/// chat message
-    MessageChatCont,			/// chat message continue
     MessageChatTerm,			/// chat message termination -  Protocol Version 2
 
     MessageCommandStop,			/// unit command stop
@@ -106,6 +105,7 @@ enum _message_type_ {
 ----------------------------------------------------------------------------*/
 
 extern char NetworkName[16];		/// Network Name of local player
+extern int NetworkNumInterfaces;	/// Network number of interfaces
 extern int NetworkFildes;		/// Network file descriptor
 extern int NetworkInSync;		/// Network is in sync
 extern int NetworkUpdates;		/// Network update each # frames

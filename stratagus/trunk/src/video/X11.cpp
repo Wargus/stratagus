@@ -696,7 +696,7 @@ local void DoEvent(void)
 
 	case KeyPress:
 	    DebugLevel3("\tKey press\n");
-{
+	{
 	    char buf[128];
 	    int num;
 	    KeySym keysym;
@@ -710,7 +710,7 @@ local void DoEvent(void)
 	    } else {
 		X11HandleKey(keysym);
 	    }
-}
+	}
 	    break;
 
 	case KeyRelease:
@@ -718,9 +718,14 @@ local void DoEvent(void)
 	    X11HandleKeyUp(XLookupKeysym((XKeyEvent*)&event,0));
 	    break;
 
-	default:
-	    DebugLevel0("\tUnkown event\n");
+	case ConfigureNotify:	// IGNORE, not useful for us yet - 
+				// we may be able to limit hidden map draw here later
 	    break;
+
+	default:
+	    DebugLevel0("\tX11: Unknown event type: %d\n", event.type);
+	    break;
+
     }
 }
 
