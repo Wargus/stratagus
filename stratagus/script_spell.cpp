@@ -194,6 +194,8 @@ local void CclSpellAction(SCM list, SpellActionType *spellaction)
 	    } else if (gh_eq_p(value, gh_symbol2scm("time-to-live"))) {
 		spellaction->Data.Summon.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
+	    } else if (gh_eq_p(value, gh_symbol2scm("require-corpse"))) {
+		spellaction->Data.Summon.RequireCorpse = 1;
 	    } else {
 		errl("Unsupported summon tag",value);
 	    }
@@ -216,27 +218,6 @@ local void CclSpellAction(SCM list, SpellActionType *spellaction)
 		errl("Unsupported spawn-portal tag",value);
 	    }
 	}
-    } else if (gh_eq_p(value,gh_symbol2scm("raise-dead"))) {
-	spellaction->CastFunction=CastRaiseDead;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("unit-raised"))) {
-		str = gh_scm2newstr(gh_car(list),0);
-		spellaction->Data.RaiseDead.UnitRaised = UnitTypeByIdent(str);
-		if (!spellaction->Data.RaiseDead.UnitRaised) {
-		    spellaction->Data.RaiseDead.UnitRaised = 0;
-		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ str);
-		}
-		free(str);
-		list = gh_cdr(list);
-	    } else if (gh_eq_p(value, gh_symbol2scm("time-to-live"))) {
-		spellaction->Data.RaiseDead.TTL = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else {
-		errl("Unsupported raise-dead tag",value);
-	    }
-	}
     } else if (gh_eq_p(value,gh_symbol2scm("polymorph"))) {
 	spellaction->CastFunction=CastPolymorph;
 	while (!gh_null_p(list)) {
@@ -247,7 +228,7 @@ local void CclSpellAction(SCM list, SpellActionType *spellaction)
 		spellaction->Data.Summon.UnitType = UnitTypeByIdent(str);
 		if (!spellaction->Data.Summon.UnitType) {
 		    spellaction->Data.Summon.UnitType = 0;
-		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ str);
+		    DebugLevel0("unit type \"%s\" not found for polymorph spell.\n" _C_ str);
 		}
 		free(str);
 		list = gh_cdr(list);
@@ -342,6 +323,9 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("organic"))) {
 	    condition->Organic=Scm2Condition(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("volatile"))) {
+	    condition->Volatile=Scm2Condition(gh_car(list));
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("hero"))) {
 	    condition->Hero=Scm2Condition(gh_car(list));
@@ -474,9 +458,7 @@ local SCM CclDefineSpell(SCM list)
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("target"))) {
 	    value=gh_car(list);
-	    if (gh_eq_p(value,gh_symbol2scm("none"))) {
-		spell->Target=TargetNone;
-	    } else if (gh_eq_p(value,gh_symbol2scm("self"))) {
+	    if (gh_eq_p(value,gh_symbol2scm("self"))) {
 		spell->Target=TargetSelf;
 	    } else if (gh_eq_p(value,gh_symbol2scm("unit"))) {
 		spell->Target=TargetUnit;
@@ -587,9 +569,13 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
 	}
 	CLprintf(file,")\n");
     } else if (action->CastFunction==CastSummon) {
-	CLprintf(file,"(summon unit-type %s time-to-live %d)",
+	CLprintf(file,"(summon unit-type %s time-to-live %d",
 		action->Data.Summon.UnitType->Ident,
 		action->Data.Summon.TTL);
+	if (action->Data.Summon.RequireCorpse) {
+	    CLprintf(file," require-corpse ");
+	}
+	CLprintf(file,")\n");
     } else if (action->CastFunction==CastAdjustBuffs) {
 	CLprintf(file,"(adjust-buffs");
 	if (action->Data.AdjustBuffs.HasteTicks!=BUFF_NOT_AFFECTED) {
@@ -611,10 +597,6 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
     } else if (action->CastFunction==CastPolymorph) {
 	CLprintf(file,"(polymorph new-form %s)",
 		action->Data.Polymorph.NewForm->Ident);
-    } else if (action->CastFunction==CastRaiseDead) {
-	CLprintf(file,"(raise-dead unit-raised %s time-to-live %d)",
-		action->Data.RaiseDead.UnitRaised->Ident,
-		action->Data.RaiseDead.TTL);
     } else if (action->CastFunction==CastFlameShield) {
 	CLprintf(file,"(flame-shield duration %d)",
 		action->Data.FlameShield.TTL);
@@ -662,6 +644,9 @@ local void SaveSpellCondition(CLFile *file,ConditionInfo* condition)
     }
     if (condition->Organic!=CONDITION_TRUE) {
 	CLprintf(file,"organic %s ",condstrings[(int)condition->Organic]);
+    }
+    if (condition->Volatile!=CONDITION_TRUE) {
+	CLprintf(file,"volatile %s ",condstrings[(int)condition->Volatile]);
     }
     if (condition->Hero!=CONDITION_TRUE) {
 	CLprintf(file,"hero %s ",condstrings[(int)condition->Hero]);
@@ -757,9 +742,6 @@ global void SaveSpells(CLFile *file)
 	switch (spell->Target) {
 	    case TargetSelf:
 		CLprintf(file,"self\n");
-		break;
-	    case TargetNone:
-		CLprintf(file,"none\n");
 		break;
 	    case TargetPosition:
 		CLprintf(file,"position\n");

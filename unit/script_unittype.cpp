@@ -240,7 +240,7 @@ local SCM CclDefineUnitType(SCM list)
 		sublist = gh_cdr(sublist);
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("construction"))) {
-	    // FIXME: What if constructions arn't yet loaded?
+	    // FIXME: What if constructions aren't yet loaded?
 	    str = gh_scm2newstr(gh_car(list), NULL);
 	    type->Construction = ConstructionByIdent(str);
 	    list = gh_cdr(list);
@@ -262,9 +262,6 @@ local SCM CclDefineUnitType(SCM list)
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("max-mana"))) {
 	    type->_MaxMana = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("magic"))) {
-	    type->Magic = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("tile-size"))) {
 	    sublist = gh_car(list);
@@ -318,12 +315,6 @@ local SCM CclDefineUnitType(SCM list)
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("max-attack-range"))) {
 	    type->_AttackRange = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("weapons-upgradable"))) {
-	    type->WeaponsUpgradable = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("armor-upgradable"))) {
-	    type->ArmorUpgradable = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("priority"))) {
 	    type->Priority = gh_scm2int(gh_car(list));
@@ -528,10 +519,12 @@ local SCM CclDefineUnitType(SCM list)
 	    }
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
+	    type->Magic=0;
 	    while (!gh_null_p(sublist)) {
 		DebugLevel3Fn("%d \n" _C_ CclGetSpellByIdent(gh_car(sublist)));
 		type->CanCastSpell[CclGetSpellByIdent(gh_car(sublist))] = 1;
 		sublist = gh_cdr(sublist);
+		type->Magic=1;
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("organic"))) {
 	    type->Organic = 1;

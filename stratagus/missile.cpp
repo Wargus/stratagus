@@ -427,15 +427,15 @@ local void FreeMissile(Missile* missile)
 **	damage is multiplied by random between 1 and 2.
 **
 **	@todo NOTE: different targets (big are hit by some missiles better)
-**	@todo NOTE: hidden targets are hit worser.
-**	@todo NOTE: targets higher are hit worser.
+**	@todo NOTE: lower damage for hidden targets.
+**	@todo NOTE: lower damage for targets on higher ground.
 **
 **	@param attacker_stats	Attacker attributes.
 **	@param goal_stats	Goal attributes.
 **	@param bloodlust	If attacker has bloodlust
-**	@param xp		Experience of attack.
+**	@param xp		Experience of attacker.
 **
-**	@return			damage produces on goal.
+**	@return			damage inflicted to goal.
 */
 local int CalculateDamageStats(const UnitStats* attacker_stats,
     const UnitStats* goal_stats, int bloodlust, int xp)
@@ -449,9 +449,10 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
     if (bloodlust) {
 	basic_damage *= 2;
 	piercing_damage *= 2;
-	DebugLevel0Fn("bloodlust\n");
+	DebugLevel3Fn("bloodlust\n");
     }
 
+#if 0
     damage = basic_damage - goal_stats->Armor;
     if (damage < 0) {
 	// Use minimum damage
@@ -464,6 +465,10 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
     }
+#else
+    damage = min(basic_damage-goal_stats->Armor,1)+piercing_damage;
+    damage -= SyncRand() % ((damage+2)/2);
+#endif
     DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n" _C_ goal_stats->Armor _C_
 	    basic_damage _C_ piercing_damage _C_ damage);
 
@@ -526,7 +531,7 @@ global void FireMissile(Unit* unit)
     }
 
     //
-    //	None missile hits immediately!
+    //	No missile hits immediately!
     //
     if (((MissileType*)unit->Type->Missile.Missile)->Class == MissileClassNone) {
 	// No goal, take target coordinates

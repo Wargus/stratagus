@@ -80,7 +80,6 @@ enum {
 */
 typedef enum {
 	TargetSelf,
-	TargetNone,
 	TargetPosition,
 	TargetUnit
 #if 0
@@ -100,9 +99,9 @@ typedef struct
     union {
 // FIXME time information doesn't work as it should.
 	struct {
-	    int Fields;		/// The size of the affected square
-	    int Shards;		/// Number of shards thrown.
-	    int Damage;		/// Damage for every shard.
+	    int Fields;			/// The size of the affected square
+	    int Shards;			/// Number of shards thrown.
+	    int Damage;			/// Damage for every shard.
 	    /// The offset of the missile start point to the hit location.
 	    int StartOffsetX;
 	    int StartOffsetY;
@@ -113,54 +112,50 @@ typedef struct
 	} SpawnPortal;
 	
 	struct {
-	    int TTL;		/// time to live (ticks)
-	    int Damage;		/// Damage.
+	    int TTL;			/// time to live (ticks)
+	    int Damage;			/// Damage.
 	} Fireball;
 	
 	struct {
-	    int TTL;		/// time to live (ticks)
+	    int TTL;			/// time to live (ticks)
 	} FlameShield;
 
 	struct {
 	    int HasteTicks;		/// Number of ticks to set Haste to.
 	    int SlowTicks;		/// Number of ticks to set Slow to.
-	    int BloodlustTicks;	/// Number of ticks to set Bloodlust to.
+	    int BloodlustTicks;		/// Number of ticks to set Bloodlust to.
 	    int InvisibilityTicks;	/// Number of ticks to set Invisibility to.
 	    int InvincibilityTicks;	/// Number of ticks to set UnholyArmor to.
-#define BUFF_NOT_AFFECTED 0xC0FF33 /// Don't like the value? The value doesn't like you!
+#define BUFF_NOT_AFFECTED 0xC0FF33 	/// Don't like the value? The value doesn't like you!
 	} AdjustBuffs;
 	
 	struct {
 	    int HP;			/// Target HP gain.(can be negative)
-	    int Mana;		/// Target Mana gain.(can be negative)
+	    int Mana;			/// Target Mana gain.(can be negative)
 	    /// This spell is designed to be used wit very small amounts. The spell
 	    /// can scale up to MaxMultiCast times. Use 0 for infinite.
 	    int MaxMultiCast; 
 	} AdjustVitals;
 	
 	struct {
-	    UnitType *NewForm;	/// The new form
+	    UnitType *NewForm;		/// The new form
 	    //  TODO: temporary polymorphs would be awesome, but hard to implement
 	} Polymorph;
 	
 	struct {
-	    UnitType *UnitType;	/// Type of unit to be summoned.
-	    int TTL;		/// Time to live for summoned unit. 0 means infinite
+	    UnitType *UnitType;		/// Type of unit to be summoned.
+	    int TTL;			/// Time to live for summoned unit. 0 means infinite
+	    int RequireCorpse;		/// Corpse consumed while summoning.
 	} Summon;
-	
-	struct {
-	    UnitType *UnitRaised;	/// The unit to spawn from corpses
-	    int TTL;		/// Time to live for summon. 0 means infinite.
-	} RaiseDead;
 	//  What about a resurection spell?
 
 	struct {
-	    int TTL;		/// time to live (ticks)
-	    int Damage;		/// Damage.
+	    int TTL;			/// time to live (ticks)
+	    int Damage;			/// Damage.
 	} Runes;
 	
 	struct {
-	    int  TTL;		/// time to live (ticks)
+	    int  TTL;			/// time to live (ticks)
 	    // FIXME: more configurations
 	} Whirlwind;
     } Data;
@@ -198,6 +193,7 @@ typedef struct ConditionInfo {
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
     char Undead;		/// Target is undead.
+    char Volatile;		/// Target is volatile (suicide bomber).
     char Organic;		/// Target is organic.
     char Hero;			/// Target is hero. Set this to false for instant-kill spells.
     char Coward;		/// Target is coward. Don't bloodlust them.
@@ -347,7 +343,6 @@ SpellFunc CastAreaBombardment;
 SpellFunc CastSummon;
 SpellFunc CastRunes;
 SpellFunc CastDeathCoil;
-SpellFunc CastRaiseDead;
 SpellFunc CastWhirlwind;
 SpellFunc CastSpawnPortal;
 

@@ -870,69 +870,6 @@ global int CastPolymorph(Unit *caster, const SpellType *spell, Unit *target,
 }
 
 /**
-**	Cast raise dead.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastRaiseDead(Unit *caster, const SpellType *spell, Unit *target,
-    int x, int y)
-{
-    Unit **corpses;
-    Unit *tempcorpse;
-    UnitType *skeleton;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->Action);
-//  assert(x in range, y in range);
-
-    skeleton = spell->Action->Data.RaiseDead.UnitRaised;
-    DebugCheck(!skeleton);
-
-    corpses = &CorpseList;
-
-    while (*corpses) {
-	// FIXME: this tries to raise all corps, ohje
-	// FIXME: I can raise ships?
-	if ((*corpses)->Orders[0].Action == UnitActionDie
-		&& !(*corpses)->Type->Building
-		&& (*corpses)->X >= x - 1 && (*corpses)->X <= x + 1
-		&& (*corpses)->Y >= y - 1 && (*corpses)->Y <= y + 1) {
-	    // FIXME: did they count on food?
-	    // nobody: unlikely.
-	    // Can there be more than 1 skeleton created on the same tile? yes
-	    target = MakeUnit(skeleton, caster->Player);
-	    target->X = (*corpses)->X;
-	    target->Y = (*corpses)->Y;
-	    DropOutOnSide(target,LookingW,0,0);
-	    // set life span
-	    target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
-	    CheckUnitToBeDrawn(target);
-	    tempcorpse = *corpses;
-	    corpses = &(*corpses)->Next;
-	    ReleaseUnit(tempcorpse);
-	    caster->Mana -= spell->ManaCost;
-	    if (caster->Mana<spell->ManaCost) {
-		break;
-	    }
-	} else {
-	    corpses=&(*corpses)->Next;
-	}
-    }
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    MakeMissile(spell->Missile,
-	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-    return 0;
-}
-
-/**
 **	Cast runes.
 **
 **	@param caster	Unit that casts the spell
@@ -996,36 +933,76 @@ global int CastSummon(Unit *caster, const SpellType *spell, Unit *target,
     int x, int y)
 {
     int ttl;
+    int cansummon;
+    Unit **corpses;
+    Unit *tempcorpse;
+    UnitType* unittype;
 
     DebugCheck(!caster);
     DebugCheck(!spell);
     DebugCheck(!spell->Action);
     DebugCheck(!spell->Action->Data.Summon.UnitType);
 
-    DebugLevel0("Summoning\n");
+    unittype=spell->Action->Data.Summon.UnitType;
     ttl=spell->Action->Data.Summon.TTL;
-    caster->Mana -= spell->ManaCost;
-    // FIXME: johns: the unit is placed on the wrong position
-    target = MakeUnit(spell->Action->Data.Summon.UnitType, caster->Player);
-    target->X = x;
-    target->Y = y;
-    // set life span
-    if (ttl) {
-	target->TTL=GameCycle+ttl;
-    } else {
-	target->TTL=GameCycle+target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
+
+    if (spell->Action->Data.Summon.RequireCorpse) {
+	corpses = &CorpseList;
+	cansummon=0;
+	while (*corpses) {
+	    // FIXME: this tries to raise all corps, I can raise ships?
+	    if ((*corpses)->Orders[0].Action == UnitActionDie
+		    && !(*corpses)->Type->Building
+		    && (*corpses)->X >= x - 1 && (*corpses)->X <= x + 1
+		    && (*corpses)->Y >= y - 1 && (*corpses)->Y <= y + 1) {
+		//
+		//  Found a corpse. eliminate it and proceed to summoning.
+		//  
+		x=(*corpses)->X;
+		y=(*corpses)->Y;
+		tempcorpse = *corpses;
+		corpses = &(*corpses)->Next;
+		ReleaseUnit(tempcorpse);
+		cansummon=1;
+		break;
+	    } else {
+		corpses=&(*corpses)->Next;
+	    }
+	}
+    } else { 
+	cansummon=1;
     }
-    //
-    //	Revealers are always removed, since they don't have graphics
-    //
-    if (target->Type->Revealer) {
-	DebugLevel0Fn("new unit is a revealer, removed.\n");
-	target->Removed=1;
-	target->CurrentSightRange = target->Stats->SightRange;
-	MapMarkUnitSight(target);
-    } else {
-	DropOutOnSide(target, LookingW, 0, 0);
-	CheckUnitToBeDrawn(target);
+
+    if (cansummon) {
+	DebugLevel0("Summoning a %s\n" _C_ unittype->Name);
+
+	//
+	//	Create units.
+	//	FIXME: do summoned units count on food?
+	//
+	target = MakeUnit(unittype, caster->Player);
+	target->X = x;
+	target->Y = y;
+	//
+	//  set life span. ttl=0 results in a permanent unit.
+	//  
+	if (ttl) {
+	    target->TTL=GameCycle+ttl;
+	}
+	//
+	//	Revealers are always removed, since they don't have graphics
+	//
+	if (target->Type->Revealer) {
+	    DebugLevel0Fn("summoned unit is a revealer, removed.\n");
+	    target->Removed=1;
+	    target->CurrentSightRange = target->Stats->SightRange;
+	    MapMarkUnitSight(target);
+	} else {
+	    DropOutOnSide(target, LookingW, 0, 0);
+	    CheckUnitToBeDrawn(target);
+	}
+	
+	caster->Mana -= spell->ManaCost;
     }
 
     PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
@@ -1095,14 +1072,6 @@ local Target *NewTarget(TargetType t, const Unit *unit, int x, int y)
 /**
 **	FIXME: docu
 */
-local Target *NewTargetNone(void)
-{
-    return NewTarget(TargetNone, NULL, 0, 0);
-}
-
-/**
-**	FIXME: docu
-*/
 local Target *NewTargetUnit(const Unit *unit)
 {
     DebugCheck(!unit);
@@ -1166,6 +1135,11 @@ local int PassCondition(const Unit* caster,const SpellType* spell,const Unit* ta
 	}
 	if (condition->Organic!=CONDITION_TRUE) {
 	    if ((condition->Organic==CONDITION_ONLY)^(target->Type->Organic)) {
+		return 0;
+	    }
+	}
+	if (condition->Volatile!=CONDITION_TRUE) {
+	    if ((condition->Volatile==CONDITION_ONLY)^(target->Type->Volatile)) {
 		return 0;
 	    }
 	}
@@ -1301,9 +1275,6 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
     }
 
     switch (spell->Target) {
-	case TargetNone :
-	    // TargetNone?
-	    return NewTargetNone();
 	case TargetSelf :
 	    if (PassCondition(caster, spell, caster, x, y, spell->Condition) &&
 		    PassCondition(caster, spell, caster, x, y, autocast->Condition)) {

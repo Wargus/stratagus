@@ -475,7 +475,13 @@ global void InitNetwork1(void)
     }
 #endif
 
-    MasterInit();
+//	This goes to all of you networking programmers out there.
+//	People are not always on the net. Traffic congestion, low
+//	speed links, unplugged cables or an bad adress can result
+//	in long wait times for gethostbyname. So here is the catch:
+//	Don't get the master server adress until you need it. Or we
+//	will make sure that horrible horrible things happen to you.
+//    MasterInit();
 
     dl_init(CommandsIn);
     dl_init(CommandsOut);

@@ -144,21 +144,21 @@
 **		move, 1 is the slowest speed and 32 s the fastest supported
 **		speed. This is how many pixels the missiles moves with each
 **		animation step.  The real use of this member depends on the
-**		MisleType::Class or Missile::Controller.
+**		MissileType::Class or Missile::Controller.
 **		@note This is currently only used by the point-to-point
 **		missiles (::MissileClassPointToPoint, ...).  Perhaps we should
 **		later allow animation scripts for more complex animations.
 **
 **	MissileType::Range
 **
-**		Determines the range that a projectile will deal its damage.
-**		A range of 0 will mean that the damage will be limited to only
-**		where the missile was directed towards.  So if you shot a
-**		missile at a unit, it would only damage that unit.  A value of
-**		1 only effects the field on that the missile is shot.  A value
-**		of 2  would mean that for a range of 1 around the impact spot,
-**		the damage for that particular missile would be dealt.
-**		All fields that aren't the center get only 50% of the damage.
+**		Determines the range in which a projectile will deal its damage.
+**		A range of 0 will mean that the damage will be limited to the
+**		targetted unit only.  So if you shot a missile at a unit, it
+**		would only damage that unit.  A value of 1 only affects the 
+**		field where the missile hits.  A value of 2  would mean that
+**		the damage for that particular missile would be dealt for a range
+**		of 1 around the impact spot. All fields that aren't the center
+**		get only 50% of the damage.
 **		@note Can this value be higher? 3 (3x3 area with 25%),
 **		4 (4x4 area with 12.5%)! Yes, but is currently not written.
 **
@@ -216,7 +216,7 @@
 **
 **	Missile::SpriteFrame
 **
-**		Current sprite frame of the missile.  The rang is from 0
+**		Current sprite frame of the missile.  The range is from 0
 **		to MissileType::SpriteFrames-1.  The topmost bit (128) is
 **		used as flag to mirror the sprites in X direction.
 **		Animation scripts aren't currently supported for missiles,
