@@ -42,7 +42,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef NEW_VIDEO
+#ifdef noNEW_VIDEO
 
 /**
 **	Define cursor-types.
@@ -627,6 +627,7 @@ global int HideAnyCursor(void)
 */
 global void InitCursor(void)
 {
+#ifdef noNEW_VIDEO
     switch( VideoDepth ) {
 	case 8:
 	    SaveCursorBackground=SaveCursorBackground8;
@@ -649,6 +650,7 @@ global void InitCursor(void)
 	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
+#endif
 }
 
 //@}
