@@ -131,7 +131,7 @@ local void IntroCallbackKey1(unsigned key, unsigned keychar)
 local void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
     if( UseContinueButton ) {
-	if( (keychar=='c' || keychar=='\r') &&
+	if( (key =='c' || key =='\r') &&
 	    (ContinueButtonFlags&MenuButtonClicked) ) {
 	    IntroNoEvent=0;
 	    ContinueButtonFlags&=~MenuButtonClicked;
