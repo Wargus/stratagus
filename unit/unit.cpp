@@ -81,7 +81,7 @@ global char RevealAttacker;		/// Config: reveal attacker enabled
 ----------------------------------------------------------------------------*/
 
 /**
-**	Initial memory allocation for Units.
+**	Initial memory allocation for units.
 */
 global void InitUnitsMemory(void)
 {
@@ -249,109 +249,9 @@ local Unit *AllocUnit (void)
     return unit;
 }
 
-#if 0
 /**
 **	FIXME: Docu
 */
-global void InitUnit (Unit *unit, UnitType *type, Player *player)
-{
-    unit->Refs=1;
-
-    //
-    //	Build all unit table
-    //
-    unit->UnitSlot=&Units[NumUnits];	// back pointer
-    Units[NumUnits++]=unit;
-
-    //
-    //	Build player unit table
-    //
-    if( player && !type->Vanishes ) {
-	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
-	if( type->Building ) {
-	    player->TotalBuildings++;
-	}
-	else {
-	    player->TotalUnits++;
-	}
-	*unit->PlayerSlot=unit;
-
-	player->UnitTypesCount[type->Type]++;
-    }
-
-    DebugLevel3Fn("%p %d\n",unit,UnitNumber(unit));
-
-    //
-    //	Initialise unit structure (must be zero filled!)
-    //
-    unit->Type=type;
-    unit->SeenFrame=0xFF;
-
-    if( 1 ) {				// Call CCL for name generation
-	SCM fun;
-
-	fun = gh_symbol2scm("gen-unit-name");
-	if (!gh_null_p(symbol_boundp(fun, NIL))) {
-	    SCM value;
-
-	    value = symbol_value(fun, NIL);
-	    if (!gh_null_p(value)) {
-		value=gh_apply(value, cons(gh_symbol2scm(type->Ident),NIL));
-		unit->Name=gh_scm2newstr(value,NULL);
-	    }
-	}
-    }
-
-    if( type->Demand ) {
-        player->NumFoodUnits+=type->Demand;	// food needed
-	if( player==ThisPlayer ) {
-	    MustRedraw|=RedrawResources;	// update food
-	}
-    }
-    if( type->Building ) {
-	player->NumBuildings++;
-    } else {
-        unit->Direction=(MyRand()>>8)&0xFF;	// random heading
-    }
-    unit->Player=player;
-    unit->Stats=&type->Stats[unit->Player->Player];
-    unit->Colors=player->UnitColors;
-
-    if( type->CanCastSpell ) {
-	unit->Mana=MAGIC_FOR_NEW_UNITS;
-    }
-    unit->HP=unit->Stats->HitPoints;
-    unit->Active=1;
-
-    unit->GroupId=0;
-
-    unit->Wait=1;
-    unit->Reset=1;
-    unit->Removed=1;
-
-#ifdef NEW_DECODRAW
-    // JOHNS: not needed unit->deco=NULL;
-#endif
-
-    // Invisible as default for submarines
-    if( !type->Submarine ) {
-	unit->Visible=-1;		// Visible as default
-    }
-
-    unit->Rs=MyRand()%100; // used for random fancy buildings and other things
-
-    unit->OrderCount=1;
-    unit->Orders[0].Action=UnitActionStill;
-    DebugCheck( unit->Orders[0].Goal );
-    unit->NewOrder.Action=UnitActionStill;
-    DebugCheck( unit->NewOrder.Goal );
-    unit->SavedOrder.Action=UnitActionStill;
-    DebugCheck( unit->SavedOrder.Goal );
-
-    DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
-}
-#endif
-
 global void InitUnit (Unit *unit, UnitType *type)
 {
     /* Refs need to be *increased* by 1, not *set* to 1, because if InitUnit()
@@ -391,15 +291,16 @@ global void InitUnit (Unit *unit, UnitType *type)
 	}
     }
 
-    if( !type->Building )
+    if( !type->Building ) {
         unit->Direction=(MyRand()>>8)&0xFF;	// random heading
+    }
 
     if( type->CanCastSpell ) {
 	unit->Mana=MAGIC_FOR_NEW_UNITS;
     }
     unit->Active=1;
 
-    unit->GroupId=0;
+    // JOHNS: not needed unit->GroupId=0;
 
     unit->Wait=1;
     unit->Reset=1;
@@ -427,9 +328,13 @@ global void InitUnit (Unit *unit, UnitType *type)
     DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
 }
 
+/**
+**	FIXME: Docu
+*/
 global void AssignUnitToPlayer (Unit *unit, Player *player)
 {
     UnitType *type = unit->Type;
+
     //
     //	Build player unit table
     //
@@ -470,18 +375,16 @@ global void AssignUnitToPlayer (Unit *unit, Player *player)
 **
 **	@return		Pointer to created unit.
 */
-global Unit* MakeUnit(UnitType* type,Player* player)
+global Unit* MakeUnit(UnitType* type, Player* player)
 {
     Unit* unit;
 
-    DebugCheck( !player );	// Current code didn't support no player
-
-    DebugLevel3Fn("%s(%d)\n",type->Name,player-Players);
+    DebugCheck(!player);		// Current code didn't support no player
 
     unit = AllocUnit();
-    //InitUnit (unit, type, player);
-    InitUnit (unit, type);
-    AssignUnitToPlayer (unit, player);
+    InitUnit(unit, type);
+    AssignUnitToPlayer(unit, player);
+
     return unit;
 }
 
@@ -647,10 +550,12 @@ global void RemoveUnit(Unit* unit)
 	UpdateButtonPanel();
     }
 
+#if 0
     //  Remove unit from its groups
-    if( unit->GroupId!=0 ) {
+    if( unit->GroupId ) {
         RemoveUnitFromGroups(unit);
     }
+#endif
 
     // Unit is seen as under cursor
     if( unit==UnitUnderCursor ) {
@@ -739,12 +644,20 @@ global void UnitLost(Unit* unit)
     DebugCheck( !unit );
 
     player=unit->Player;
+    DebugCheck( !player );		// Next code didn't support no player!
 
     //
     //	Call back to AI, for killed or lost units.
     //
     if( player && player->Ai ) {
 	AiUnitKilled(unit);
+    }
+
+    //
+    //  Remove unit from its groups
+    //
+    if( unit->GroupId ) {
+        RemoveUnitFromGroups(unit);
     }
 
     //
