@@ -127,6 +127,7 @@ typedef struct _full_replay_ {
 //	Constants
 //----------------------------------------------------------------------------
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 /// Description of the LogEntry structure 
 static IOStructDef LogEntryStructDef = {
     "LogEntry",
@@ -190,6 +191,7 @@ static IOStructDef FullReplayStructDef = {
 	{0, 0, 0, 0}
     }
 };
+#endif
 
 //----------------------------------------------------------------------------
 //	Variables
@@ -358,11 +360,7 @@ global void SaveFullLog(CLFile* dest)
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
     CLprintf(dest, "(replay-log (quote\n");
-#endif
-
     IOStructPtr(SCM_UNSPECIFIED, (void*)&CurrentReplay, (void*)&FullReplayStructDef);
-
-#if defined(USE_GUILE) || defined(USE_SIOD)
     CLprintf(dest, "))\n");
 #endif
     // FIXME : IODone();
@@ -398,9 +396,7 @@ global void AppendLog(LogEntry* log)
     IOTabLevel = 2;
 #if defined(USE_GUILE) || defined(USE_SIOD)
     CLprintf(LogFile, "(log (quote ");
-#endif
     IOLinkedList(SCM_UNSPECIFIED, (void*)&log, (void*)&LogEntryStructDef);
-#if defined(USE_GUILE) || defined(USE_SIOD)
     CLprintf(LogFile,"))\n");
 #endif
     CLflush(LogFile);
