@@ -68,18 +68,18 @@ global GameSound GameSounds
 #ifndef laterUSE_CCL
 // FIXME: Must make this configurable through CCL.
 ={
-    { "placement error" },
-    { "placement success" },
-    { "click" },
-    { "tree chopping"},
-    { "transport docking"},
-    { "building construction"},
-    { "basic human voices work complete" },
-    { "peasant work complete" },
-    { "basic orc voices work complete" },
-    { "repair" },
-    { "rescue (human)" },
-    { "rescue (orc)" },
+    { "placement error" , NULL },
+    { "placement success" , NULL },
+    { "click" , NULL },
+    { "tree chopping", NULL },
+    { "transport docking", NULL },
+    { "building construction", NULL },
+    { "basic human voices work complete" , NULL },
+    { "peasant work complete" , NULL },
+    { "basic orc voices work complete" , NULL },
+    { "repair" , NULL },
+    { "rescue (human)" , NULL },
+    { "rescue (orc)" , NULL },
 }
 #endif
     ;

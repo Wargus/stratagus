@@ -48,6 +48,7 @@
 #include "pud.h"
 #include "ccl_sound.h"
 #include "ui.h"
+#include "interface.h"
 #include "font.h"
 #include "pathfinder.h"
 #include "ai.h"
@@ -68,7 +69,7 @@ global int CclInConfigFile;		/// True while config file parsing
 **
 **	@param ptr	Pointer into heap.
 */
-global void CclFree(void* ptr)
+global void CclFree(void* ptr __attribute__((unused)))
 {
 #if 0
 #ifndef __MINGW32__

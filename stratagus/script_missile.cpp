@@ -173,7 +173,7 @@ local SCM CclDefineMissileTypeWcNames(SCM list)
 */
 local SCM CclMissile(SCM list)
 {
-    DebugLevel0Fn("FIXME: not written\n");
+    DebugLevel0Fn("FIXME: not written %p\n",list);
 
     return SCM_UNSPECIFIED;
 }

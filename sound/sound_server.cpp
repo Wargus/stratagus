@@ -475,7 +475,8 @@ local int KeepRequest(SoundRequest* sr) {
 /*
 ** Register the source of a request in the selection handling hash table.
 */
-local void RegisterSource(SoundRequest* sr,int channel) {
+local void RegisterSource(SoundRequest* sr,int channel)
+{
     // always keep the last registered channel
     // use channel+1 to avoid inserting null values
     //FIXME: we should use here the unique identifier of the source, not only
@@ -484,7 +485,12 @@ local void RegisterSource(SoundRequest* sr,int channel) {
     g_hash_table_insert(UnitToChannel,(gpointer)(long)(sr->Source.Base),
 			(gpointer)(channel+1));
 #else
-    DebugLevel3Fn("FIXME: must write\n");
+    int i;
+    void* p;
+
+    i=channel;
+    p=sr;
+    DebugLevel3Fn("FIXME: must write %p -> %d\n",sr,channel);
 #endif
     DebugLevel3("Registering %p (channel %d)\n",sr->Source.Base,channel);
 }
@@ -501,7 +507,10 @@ local void UnRegisterSource(int channel) {
 			    (gpointer)(long)(Channels[channel].Source.Base));
     }
 #else
-    DebugLevel3Fn("FIXME: must write\n");
+    int i;
+
+    i=channel;
+    DebugLevel3Fn("FIXME: must write %d\n", channel);
 #endif
     DebugLevel3("Removing %p (channel %d)\n",Channels[channel].Source.Base,
 		channel);
@@ -936,10 +945,10 @@ global void WriteSound(void)
 {
 }
 
-/*
+/**
 **	Fill buffer for the sound card.
 */
-local void FillAudio(void* udata,Uint8* stream,int len)
+local void FillAudio(void* udata __attribute__((unused)),Uint8* stream,int len)
 {
     int mixer_buffer[len];
     int dummy1,dummy2;
@@ -1127,8 +1136,9 @@ global int InitSound(void)
 
     // ARI: the following must be done here to allow sound to work in pre-start menus!
     // initialize channels
-    for(dummy=0;dummy<MaxChannels;)
-	Channels[dummy].Point=++dummy;
+    for(dummy=0;dummy<MaxChannels; ++dummy) {
+	Channels[dummy].Point=dummy+1;
+    }
 
     // initialize volume (neutral point)
     GlobalVolume=128;

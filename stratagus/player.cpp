@@ -45,6 +45,7 @@
 #include "ai.h"
 #include "network.h"
 #include "netconnect.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -534,7 +535,8 @@ global int PlayerCheckLimits(const Player* player,const UnitType* type)
 **
 **	@note	The return values of the PlayerCheck functions are inconsistent.
 */
-global int PlayerCheckFood(const Player* player,const UnitType* type)
+global int PlayerCheckFood(const Player* player,
+	const UnitType* type __attribute__((unused)))
 {
     // FIXME: currently all units costs 1 food
 

@@ -286,9 +286,9 @@ global Decoration ShadowSprite
 #ifndef laterUSE_CCL
 // FIXME: Must make this configurable through CCL.
 #ifdef NEW_NAMES
-     = { "graphics/missiles/unit shadow.png",	0,42, 32,32 };
+     = { "graphics/missiles/unit shadow.png",	0,42, 32,32, 0 };
 #else
-     = { "graphic/unit shadow.png",	0,42, 32,32 };
+     = { "graphic/unit shadow.png",	0,42, 32,32, 0 };
 #endif
 #endif
     ;
@@ -780,7 +780,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawShadow(const Unit* unit,const UnitType* type,int x,int y)
+local void DrawShadow(const Unit* unit __attribute__((unused)),
+	const UnitType* type,int x,int y)
 {
     int i;
 

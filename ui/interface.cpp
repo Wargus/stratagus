@@ -760,7 +760,7 @@ global void HandleKeyDown(unsigned key,unsigned keychar)
 **
 **	@param key	Key scancode.
 */
-global void HandleKeyUp(unsigned key,unsigned keychar)
+global void HandleKeyUp(unsigned key,unsigned keychar __attribute__((unused)))
 {
     switch( key ) {
 	case KeyCodeShift:

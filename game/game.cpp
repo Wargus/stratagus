@@ -78,7 +78,8 @@ global int lcm_prevent_recurse = 0;	/// prevent recursion through LoadGameMap
 **	@param filename	map filename
 **	@param map	map loaded
 */
-local void LoadFreeCraftMap(const char* filename,WorldMap* map)
+local void LoadFreeCraftMap(const char* filename,
+	WorldMap* map __attribute__((unused)))
 {
     DebugLevel3Fn("%p \n",map);
 
@@ -282,7 +283,7 @@ global void CreateGame(char* filename, WorldMap* map)
     MapColorCycle();			// Setup color cycle
 
     CleanUserInterface();
-    InitUserInterface(ThisPlayer->RaceName);		// Setup the user interface.
+    InitUserInterface(ThisPlayer->RaceName);	// Setup the user interface
     LoadUserInterface();		// Load the user interface grafics
 
     //

@@ -202,8 +202,6 @@ extern char GamePaused;
 extern enum _mouse_buttons_ MouseButtons;
     /// current active modifiers
 extern enum _key_modifiers_ KeyModifiers;
-    /// current cursor state
-extern enum _cursor_state_ CursorState;
     /// current interface state
 extern enum _iface_state_ InterfaceState;
     /// current scroll state of keyboard
@@ -297,7 +295,18 @@ extern void DrawMessage(void);
     /// Draw the player resource in resource line
 extern void DrawResources(void);
     /// Set message to display
-extern void SetMessage( char* fmt, ... );
+extern void SetMessage( const char* fmt, ... );
+    /// Set message to display with event point
+extern void SetMessage2( int x, int y, const char* fmt, ... );
+    /// Set message to display, saving the message
+extern void SetMessageDup(const char* message);
+    /// Center view-point on last message
+extern void CenterOnMessage();
+
+    /// Set status line to show this information
+extern void SetStatusLine(char* status);
+    /// Clear the content of the message line
+extern void ClearStatusLine(void);
     /// Draw status line
 extern void DrawStatusLine(void);
     /// Draw costs in status line
@@ -306,6 +315,7 @@ extern void DrawCosts(void);
 extern void SetCosts(int,const int* costs);
     /// Clear the costs displayed in status line (undisplay!)
 extern void ClearCosts(void);
+
     /// Draw the unit info panel
 extern void DrawInfoPanel(void);
     /// Draw the unit button panel

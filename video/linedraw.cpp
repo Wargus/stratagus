@@ -916,9 +916,9 @@ local void DrawTransPixel8(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawNoTransPixel8(SysColors color,int x,int y
-        ,unsigned char alpha)
+        ,unsigned char alpha __attribute__((unused)))
 {
-  DrawPixel8(color,x,y);
+    DrawPixel8(color,x,y);
 }
 
 /**
@@ -995,7 +995,7 @@ local void DrawTransPixel16(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawTransPixel24(SysColors color,int x,int y
-        ,unsigned char alpha)
+        ,unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
     VideoMemory24[x+y*VideoWidth]=Pixels24[color];
@@ -1302,7 +1302,8 @@ local void Draw25TransHLine8(SysColors color,int x,int y,unsigned width)
     c=Pixels8[color]<<8;
 
     while( p<e ) {
-      *p++ = lookup25trans8[ c | *p ];
+      *p = lookup25trans8[ c | *p ];
+      ++p;
     }
 }
 
@@ -1437,7 +1438,8 @@ local void Draw50TransHLine8(SysColors color,int x,int y,unsigned width)
     c=Pixels8[color]<<8;
 
     while( p<e ) {
-      *p++ = lookup50trans8[ c | *p ];
+      *p = lookup50trans8[ c | *p ];
+      ++p;
     }
 }
 
@@ -1569,7 +1571,8 @@ local void Draw75TransHLine8(SysColors color,int x,int y,unsigned width)
     c=Pixels8[color];
 
     while( p<e ) {
-      *p++ = lookup25trans8[ (*p<<8) | c ];
+      *p = lookup25trans8[ (*p<<8) | c ];
+      ++p;
     }
 }
 
@@ -1711,19 +1714,22 @@ local void DrawTransHLine8(SysColors color,int x,int y,unsigned width
       break;
     case 1:
       while( p<e ) {
-        *p++ = lookup25trans8[ (*p<<8) | c ];
+        *p = lookup25trans8[ (*p<<8) | c ];
+	++p;
       }
       break;
     case 2:
       c<<=8;
       while( p<e ) {
-        *p++ = lookup50trans8[ c | *p ];
+        *p = lookup50trans8[ c | *p ];
+	++p;
       }
       break;
     case 3:
       c<<=8;
       while( p<e ) {
-        *p++ = lookup25trans8[ c | *p ];
+        *p = lookup25trans8[ c | *p ];
+	++p;
       }
       break;
     default:
@@ -1740,9 +1746,9 @@ local void DrawTransHLine8(SysColors color,int x,int y,unsigned width
 **      @param alpha    alpha value of pixel.
 */
 local void DrawNoTransHLine8(SysColors color,int x,int y,unsigned width
-        ,unsigned char alpha)
+        ,unsigned char alpha __attribute__((unused)))
 {
-  DrawHLine8(color,x,y,width);
+    DrawHLine8(color,x,y,width);
 }
 
 /**
@@ -2548,9 +2554,9 @@ local void DrawTransVLine8(SysColors color,int x,int y,unsigned height
 **      @param alpha    alpha value of pixel.
 */
 local void DrawNoTransVLine8(SysColors color,int x,int y,unsigned height
-        ,unsigned char alpha)
+        ,unsigned char alpha __attribute__((unused)))
 {
-  DrawVLine8(color,x,y,height);
+    DrawVLine8(color,x,y,height);
 }
 
 /**
@@ -2631,10 +2637,10 @@ local void DrawTransVLine16(SysColors color,int x,int y,unsigned height
 **	@param alpha	alpha value of pixels.
 */
 local void DrawTransVLine24(SysColors color,int x,int y,unsigned height
-	,unsigned char alpha)
+	,unsigned char alpha __attribute__((unused)))
 {
     // FIXME: does 24bpp holds R|G|B ?
-  DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
+    DrawVLine24(color,x,y,height); // no trans functionaility for the moment :(
 }
 
 /**
@@ -3413,7 +3419,8 @@ local void Draw25TransRectangle8(SysColors color,int x,int y
   c=Pixels8[color]<<8;
   if ( h && (ofs=w) ) {
     do { // Draw top horizontal line
-      *p++ = lookup25trans8[ c | *p ];
+      *p = lookup25trans8[ c | *p ];
+      ++p;
     } while( --ofs );
 
     if ( --h ) {
@@ -3431,7 +3438,8 @@ local void Draw25TransRectangle8(SysColors color,int x,int y
         }
 
       do { // Draw bottom horizontal line
-        *p++ = lookup25trans8[ c | *p ];
+        *p = lookup25trans8[ c | *p ];
+	++p;
       } while( ofs-- );
     }
   }
@@ -3677,7 +3685,8 @@ local void Draw50TransRectangle8(SysColors color,int x,int y
   c=Pixels8[color]<<8;
   if ( h && (ofs=w) ) {
     do { // Draw top horizontal line
-      *p++ = lookup50trans8[ c | *p ];
+      *p = lookup50trans8[ c | *p ];
+      ++p;
     } while( --ofs );
 
     if ( --h ) {
@@ -3695,7 +3704,8 @@ local void Draw50TransRectangle8(SysColors color,int x,int y
         }
 
       do { // Draw bottom horizontal line
-        *p++ = lookup50trans8[ c | *p ];
+        *p = lookup50trans8[ c | *p ];
+	++p;
       } while( ofs-- );
     }
   }
@@ -3939,7 +3949,8 @@ local void Draw75TransRectangle8(SysColors color,int x,int y
   c=Pixels8[color];
   if ( h && (ofs=w) ) {
     do { // Draw top horizontal line
-      *p++ = lookup25trans8[ (*p<<8) | c ];
+      *p = lookup25trans8[ (*p<<8) | c ];
+      ++p;
     } while( --ofs );
 
     if ( --h ) {
@@ -3957,7 +3968,8 @@ local void Draw75TransRectangle8(SysColors color,int x,int y
         }
 
       do { // Draw bottom horizontal line
-        *p++ = lookup25trans8[ (*p<<8) | c ];
+        *p = lookup25trans8[ (*p<<8) | c ];
+	++p;
       } while( ofs-- );
     }
   }
@@ -4222,9 +4234,9 @@ local void DrawTransRectangle8(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawNoTransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
 {
-  DrawRectangle8(color,x,y,w,h);
+    DrawRectangle8(color,x,y,w,h);
 }
 
 /**
@@ -4370,10 +4382,10 @@ local void DrawTransRectangle16(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawTransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
-  DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
+    DrawRectangle24(color,x,y,w,h); // no trans functionaility for the moment :(
 }
 
 /**
@@ -4831,7 +4843,8 @@ local void DrawFill25TransRectangle8(SysColors color,int x,int y
     while( h-- ) {
       i=w;
       do {
-        *p++ = lookup25trans8[ c | *p ];
+        *p = lookup25trans8[ c | *p ];
+	++p;
       } while ( --i );
       p+=swidth;
     }
@@ -4992,7 +5005,8 @@ local void DrawFill50TransRectangle8(SysColors color,int x,int y
     while( h-- ) {
       i=w;
       do {
-        *p++ = lookup50trans8[ c | *p ];
+        *p = lookup50trans8[ c | *p ];
+	++p;
       } while ( --i );
       p+=swidth;
     }
@@ -5150,7 +5164,8 @@ local void DrawFill75TransRectangle8(SysColors color,int x,int y
     while( h-- ) {
       i=w;
       do {
-        *p++ = lookup25trans8[ (*p<<8) | c ];
+        *p = lookup25trans8[ (*p<<8) | c ];
+	++p;
       } while ( --i );
       p+=swidth;
     }
@@ -5312,7 +5327,8 @@ local void DrawFillTransRectangle8(SysColors color,int x,int y
       while( h-- ) {
         i=w;
         do {
-          *p++ = c;
+          *p = c;
+	  ++p;
         } while ( --i );
         p+=swidth;
       }
@@ -5322,7 +5338,8 @@ local void DrawFillTransRectangle8(SysColors color,int x,int y
       while( h-- ) {
         i=w;
         do {
-          *p++ = lookup25trans8[ *p | c ];
+          *p = lookup25trans8[ *p | c ];
+	  ++p;
         } while ( --i );
         p+=swidth;
       }
@@ -5332,7 +5349,8 @@ local void DrawFillTransRectangle8(SysColors color,int x,int y
       while( h-- ) {
         i=w;
         do {
-          *p++ = lookup50trans8[ *p | c ];
+          *p = lookup50trans8[ *p | c ];
+	  ++p;
         } while ( --i );
         p+=swidth;
       }
@@ -5341,7 +5359,8 @@ local void DrawFillTransRectangle8(SysColors color,int x,int y
       while( h-- ) {
         i=w;
         do {
-          *p++ = lookup25trans8[ (*p<<8) | c ];
+          *p = lookup25trans8[ (*p<<8) | c ];
+	  ++p;
         } while ( --i );
         p+=swidth;
       }
@@ -5362,9 +5381,9 @@ local void DrawFillTransRectangle8(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillNoTransRectangle8(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
 {
-  DrawFillRectangle8(color,x,y,w,h);
+    DrawFillRectangle8(color,x,y,w,h);
 }
 
 /**
@@ -5452,10 +5471,10 @@ local void DrawFillTransRectangle16(SysColors color,int x,int y
 **      @param alpha    alpha value of pixel.
 */
 local void DrawFillTransRectangle24(SysColors color,int x,int y
-	,unsigned w,unsigned h,unsigned char alpha)
+	,unsigned w,unsigned h,unsigned char alpha __attribute__((unused)))
 {
 //FIXME: does 24bpp represents R|G|B?
-  DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
+    DrawFillRectangle24(color,x,y,w,h); // no trans functionaility :(
 }
 
 /**

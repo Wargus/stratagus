@@ -100,7 +100,7 @@ local void gzseek(CLFile* file,unsigned offset,int whence)
 **	@param offset	Seek position
 **	@param whence	How to seek
 */
-local void bzseek(BZFILE* file,unsigned offset,int whence)
+local void bzseek(BZFILE* file,unsigned offset,int whence __attribute__((unused)))
 {
     char buf[32];
 

@@ -279,7 +279,7 @@ global void MapMarkSight(int tx,int ty,int range)
 **	@param range	Radius to mark.
 */
 global void MapMarkNewSight(int tx,int ty,int range
-	,int dx,int dy)
+	,int dx __attribute__((unused)),int dy __attribute__((unused)))
 {
     // FIXME: must write this
     MapMarkSight(tx,ty,range);
@@ -519,7 +519,7 @@ global void VideoDraw8Fog32Solid(const GraphicData* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDraw8OnlyFog32Solid(const GraphicData* data,int x,int y)
+global void VideoDraw8OnlyFog32Solid(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType8* gp;
     VMemType8* dp;
@@ -642,7 +642,7 @@ global void VideoDraw16Fog32Solid(const GraphicData* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDraw16OnlyFog32Solid(const GraphicData* data,int x,int y)
+global void VideoDraw16OnlyFog32Solid(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType16* gp;
     VMemType16* dp;
@@ -764,7 +764,7 @@ global void VideoDraw24Fog32Solid(const GraphicData* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDraw24OnlyFog32Solid(const GraphicData* data,int x,int y)
+global void VideoDraw24OnlyFog32Solid(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType24* gp;
     VMemType24* dp;
@@ -886,7 +886,7 @@ global void VideoDraw32Fog32Solid(const GraphicData* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDraw32OnlyFog32Solid(const GraphicData* data,int x,int y)
+global void VideoDraw32OnlyFog32Solid(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType32* gp;
     VMemType32* dp;
@@ -1011,7 +1011,7 @@ global void VideoDraw8Fog32Alpha(const GraphicData* data,int x,int y)
 **
 **	The random effect is commented out
 */
-global void VideoDraw8OnlyFog32Alpha(const GraphicData* data,int x,int y)
+global void VideoDraw8OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType8* gp;
     VMemType8* dp;
@@ -1098,7 +1098,7 @@ global void VideoDraw16Fog32Alpha(const GraphicData* data,int x,int y)
 **
 **	The random effect is commented out
 */
-global void VideoDraw16OnlyFog32Alpha(const GraphicData* data,int x,int y)
+global void VideoDraw16OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType16* gp;
     VMemType16* dp;
@@ -1199,7 +1199,7 @@ global void VideoDraw24Fog32Alpha(const GraphicData* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDraw24OnlyFog32Alpha(const GraphicData* data,int x,int y)
+global void VideoDraw24OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType24* gp;
     VMemType24* dp;
@@ -1317,7 +1317,7 @@ global void VideoDraw32Fog32Alpha(const GraphicData* data,int x,int y)
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
-global void VideoDraw32OnlyFog32Alpha(const GraphicData* data,int x,int y)
+global void VideoDraw32OnlyFog32Alpha(const GraphicData* data __attribute__((unused)),int x,int y)
 {
     const VMemType32* gp;
     VMemType32* dp;
