@@ -729,6 +729,11 @@ global void GameMainLoop(void)
 		    CDRomCheck(NULL);
 #endif
 		    break;
+		case 10:
+		    if ( !(GameCycle%2) ) {
+			PlaySectionMusic(PlaySectionUnknown);
+		    }
+		    break;
 	    }
 #endif
 	}
