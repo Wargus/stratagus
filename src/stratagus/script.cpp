@@ -826,7 +826,9 @@ global void SavePreferences(void)
 #ifdef USE_WIN32
     strcpy(buf,"preferences1.ccl");
 #else
-    sprintf(buf,"%s/%s/preferences1.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+    sprintf(buf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+    mkdir(buf,0777);
+    strcat(buf,"/preferences1.ccl");
 #endif
 
     fd=fopen(buf,"w");
