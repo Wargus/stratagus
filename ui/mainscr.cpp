@@ -480,17 +480,28 @@ global void DrawUnitInfo(const Unit* unit)
 	    VideoDrawText(x+120,y+8+140,GameFont,buf);
         }
 
+    }
 	if( type->CanCastSpell ) {
+	/*
 	    VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
 	    VideoDrawRectangleClip(ColorGray,x+108,y+8+140,61,14);
 	    VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,61-2,14-2);
 	    i=(100*unit->Mana)/255;
 	    i=(i*(61-4))/100;
 	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
-
+	
 	    VideoDrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
+	*/    
+	    int w = 130;
+	    i=(100*unit->Mana)/255;
+	    i=(i*w)/100;
+	    VideoDrawRectangleClip(ColorGray, x+16,  y+8+140,  x+16+w,  16  );
+	    VideoDrawRectangleClip(ColorBlack,x+16+1,y+8+140+1,x+16+w-2,16-2);
+	    VideoFillRectangleClip(ColorBlue, x+16+2,y+8+140+2,i,       16-4);
+	
+	    // VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
+	    VideoDrawNumber(x+16+w/2,y+8+140+1,GameFont,unit->Mana);
 	}
-    }
 }
 
 /*----------------------------------------------------------------------------

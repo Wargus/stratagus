@@ -44,6 +44,7 @@
 #include "pathfinder.h"
 #include "spells.h"
 #include "interface.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -403,6 +404,15 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 	}
 	order->Type=NULL;
 	order->Arg1=NULL;
+	
+        if ( order->Goal == NoUnitP )
+	  {
+	  MakeLocalMissile(MissileTypeRedCross
+		    ,x*TileSizeX+TileSizeX/2
+		    ,y*TileSizeY+TileSizeY/2
+		    ,x*TileSizeX+TileSizeX/2
+		    ,y*TileSizeY+TileSizeY/2);
+	  }
     }
     ClearSavedAction(unit);
 }
