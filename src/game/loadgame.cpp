@@ -52,6 +52,8 @@
 #include "minimap.h"
 #include "commands.h"
 #include "sound_server.h"
+#include "font.h"
+#include "menus.h"
 #ifdef HIERARCHIC_PATHFINDER
 #include "pathfinder.h"
 #endif
@@ -122,7 +124,7 @@ global void InitModules(void)
     InitIcons();
     InitVideoCursors();
     InitUserInterface(ThisPlayer->RaceName);
-    // InitMenus();
+    InitMenus(ThisPlayer->Race);
     InitPlayers();
     InitMissileTypes();
     InitMissiles();
@@ -186,6 +188,8 @@ global void LoadModules(void)
     free(s);
     VideoCreatePalette(GlobalPalette);
     CreateMinimap();
+
+    SetDefaultTextColors(TheUI.NormalFontColor,TheUI.ReverseFontColor);
 
     // LoadButtons();
 }
