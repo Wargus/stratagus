@@ -1108,10 +1108,10 @@ local void Usage(void)
 \t-f factor\tComputer units cost factor\n\
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tEnable command log to \"command.log\"\n\
-\t-p players\tNumber of players\n\
+\t-p players\tDON'T USE! Number of players\n\
 \t-P port\t\tNetwork port to use (menu code only)\n\
 \t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
-\t-L lag\t\tNetwork lag in # frames (default 5 = 165ms)\n\
+\t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
 \t-U update\tNetwork update rate in # frames (default 5=6x pro s)\n\
 \t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\

@@ -268,7 +268,7 @@ global int NetworkNumInterfaces;	/// Network number of interfaces
 global int NetworkFildes = -1;		/// Network file descriptor
 global int NetworkInSync = 1;		/// Network is in sync
 global int NetworkUpdates = 5;		/// Network update each # game cycles
-global int NetworkLag = 5;		/// Network lag in # game cycles
+global int NetworkLag = 10;		/// Network lag in # game cycles
 global int NetworkStatus[PlayerMax];	/// Network status
 
 local char NetMsgBuf[128][PlayerMax];	/// Chat message buffers
