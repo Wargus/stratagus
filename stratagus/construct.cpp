@@ -331,6 +331,7 @@ local SCM CclDefineConstruction(SCM list)
 	    while( !gh_null_p(sublist) ) {
 		str=gh_scm2newstr(gh_car(sublist),NULL);
 
+		// FIXME: use a general get tileset function here!
 		i=0; 
 		if( strcmp(str,"default") ) {
 		    for( ; i<NumTilesets; ++i ) {
