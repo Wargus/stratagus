@@ -2876,10 +2876,20 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 		if (!d) {
 			d = 1;
 		}
-		x = target->X + (x * 5) / d;
-		y = target->Y + (y * 5) / d;
+		x = target->X + (x * 5) / d + (SyncRand() & 3);
+		if (x < 0) {
+			x = 0;
+		} else if (x >= TheMap.Width) {
+			x = TheMap.Width - 1;
+		}
+		y = target->Y + (y * 5) / d + (SyncRand() & 3);
+		if (y < 0) {
+			y = 0;
+		} else if (y >= TheMap.Height) {
+			y = TheMap.Height - 1;
+		}
 		CommandStopUnit(target);
-		CommandMove(target, x + (SyncRand() & 3), y + (SyncRand() & 3), 0);
+		CommandMove(target, x, y, 0);
 	}
 }
 
