@@ -79,6 +79,7 @@
 <a href="#set-key-scroll!">set-key-scroll!</a>
 <a href="#set-key-scroll-speed!">set-key-scroll-speed!</a>
 <a href="#set-leave-stops!">set-leave-stops!</a>
+<a href="#set-max-selectable!">set-max-selectable!</a>
 <a href="#set-menu-background!">set-menu-background!</a>
 <a href="#set-menu-background-with-title!">set-menu-background-with-title!</a>
 <a href="#set-minimap-terrain!">set-minimap-terrain!</a>
@@ -795,6 +796,30 @@ Sets the missile to use for displaying the damage done to units
 <pre>
     (set-leave-stops! #t)
 </pre>
+<h4>Used</h4>
+
+<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+
+<a name="set-max-selectable!"></a>
+<h3>(set-max-selectable! max)</h3>
+
+Set the maximum number of selectable units.
+
+
+<dl>
+<dt>max</dt>
+<dd>The max can be any positive value.
+
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    ;;      Maximum number of selectable units
+    (set-max-selectable! 18)
+</pre>
+
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
