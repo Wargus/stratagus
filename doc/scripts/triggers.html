@@ -44,6 +44,7 @@
 <HR>
 <A HREF="#action-defeat">action-defeat</A>
 <A HREF="#action-draw">action-draw</A>
+<A HREF="#action-set-switch">action-set-switch</A>
 <A HREF="#action-set-timer">action-set-timer</A>
 <A HREF="#action-start-timer">action-start-timer</A>
 <A HREF="#action-stop-timer">action-stop-timer</A>
@@ -57,6 +58,7 @@
 <A HREF="#if-rescued-near-unit">if-rescued-near-unit</A>
 <A HREF="#if-resource">if-resource</A>
 <A HREF="#if-score">if-score</A>
+<A HREF="#if-switch">if-switch</A>
 <A HREF="#if-timer">if-timer</A>
 <A HREF="#if-unit">if-unit</A>
 <A HREF="#if-unit-at">if-unit-at</A>
@@ -112,6 +114,36 @@ The condition player is set to draw. (NOT SUPPORTED)
 </PRE>
 
 <P>.
+
+<H4>Not Used</H4>
+
+<A NAME="action-set-switch"></A>
+<H3>action-set-switch</H3>
+
+<H4>Description</H4>
+
+Set a switch.
+
+<H4>Syntax</H4>
+
+<CODE>(action-set-switch number set)</CODE>
+
+<DL>
+<DT>number</DT>
+<DD>The switch number.
+</DD>
+<DT>set</DT>
+<DD>#t to set the switch on, #f to clear or turn the switch off
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (action-set-switch 1 #t)
+</PRE>
+
+<P>Sets switch 1 on.
 
 <H4>Not Used</H4>
 
@@ -623,6 +655,36 @@ quantity of score the action is executed.
 </PRE>
 
 <P>If the player on the console has a score of at least 1000.
+
+<H4>Not Used</H4>
+
+<A NAME="if-switch"></A>
+<H3>if-switch</H3>
+
+<H4>Description</H4>
+
+Checks the value of a switch.
+
+<H4>Syntax</H4>
+
+<CODE>(if-switch number set)</CODE>
+
+<DL>
+<DT>number</DT>
+<DD>Number of the switch
+</DD>
+<DT>set</DT>
+<DD>#t to check if the switch is on, #f for off
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (if-switch 1 #t)
+</PRE>
+
+<P>Checks if switch 1 is on.
 
 <H4>Not Used</H4>
 
