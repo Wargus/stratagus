@@ -50,12 +50,6 @@
     /// Get unit-type.
 extern UnitType* CclGetUnitType(SCM ptr);
 
-
-#define ANY_UNIT	((const UnitType*)0)
-#define ALL_UNITS	((const UnitType*)-1)
-#define ALL_FOODUNITS	((const UnitType*)-2)
-#define ALL_BUILDINGS	((const UnitType*)-3)
-
 #define MAX_SWITCH	256		/// Maximum number of switches
 
 /*----------------------------------------------------------------------------
@@ -80,7 +74,7 @@ local unsigned char Switch[MAX_SWITCH];	/// Switches
 **
 **	@return		The player number, -1 matches any.
 */
-local int TriggerGetPlayer(SCM player)
+global int TriggerGetPlayer(SCM player)
 {
     int ret;
 
@@ -108,7 +102,7 @@ local int TriggerGetPlayer(SCM player)
 **
 **	@return		The unit-type pointer.
 */
-local const UnitType* TriggerGetUnitType(SCM unit)
+global const UnitType* TriggerGetUnitType(SCM unit)
 {
     if (gh_eq_p(unit, gh_symbol2scm("any"))) {
 	return ANY_UNIT;
