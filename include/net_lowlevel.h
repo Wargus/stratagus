@@ -39,7 +39,7 @@
 
 // Include system network headers
 #ifdef USE_SDL_NET
-#include <SDLnet.h>
+#include "SDLnet.h"
 #else
 
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32)
