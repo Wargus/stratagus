@@ -1202,16 +1202,7 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 pawn:
 			    if( !SC_IsUnitMineral(t) && t != SC_UnitGeyser ) {
 				if( (s = GameSettings.Presets[o].Race) != SettingsPresetMapDefault ) {
-#if 0
 				    // FIXME: change races
-				    if( s == PlayerRaceHuman && (t & 1) == 1 ) {
-					t--;
-				    }
-				    if( s == PlayerRaceOrc && (t & 1) == 0 ) {
-					t++;
-				    }
-				    // FIXME: ARI: This is hard-coded WAR2 ... also: support more races?
-#endif
 				}
 			    }
 			    if( Players[o].Type != PlayerNobody ) {
