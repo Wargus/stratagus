@@ -40,6 +40,8 @@ extern const char* EditorStartFile;
 
 extern char** EditorUnitTypes;		/// Sorted editor unit-type table
 
+extern int MaxUnitIndex;		/// Max unit icon draw index
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
