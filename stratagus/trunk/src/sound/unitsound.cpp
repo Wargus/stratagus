@@ -201,6 +201,7 @@ local void RemapSounds(void)
     //
     //	Make some general sounds.
     //
+    // FIXME: move to config CCL
     MapSound("gold-mine-help",SoundIdForName("basic orc voices help 1"));
 
     // critter mapping FIXME: must support more terrains.
