@@ -97,11 +97,15 @@
 **
 **	Tileset::BasicNameTable
 **
-**		Name of the basic tile type. FE. "light-water".
+**		Index to name of the basic tile type. FE. "light-water".
+**		If the index is 0, the tile is not used.
+**		@see Tileset::TileNames
 **
 **	Tileset::MixedNameTable
 **
-**		Name of the mixed tile type. FE. "light-water".
+**		Index to name of the mixed tile type. FE. "light-water".
+**		If this index is 0, the tile is a solid tile.
+**		@see Tileset::TileNames
 **
 **	Tileset::TileTypeTable
 **
@@ -286,15 +290,6 @@ extern void SaveTilesets(FILE*);	/// Save the tileset configuration
 extern void CleanTilesets(void);	/// Cleanup the tileset module
 
 extern void TilesetCclRegister(void);	/// Register CCL features for tileset
-
-/*----------------------------------------------------------------------------
---	Predicates
-----------------------------------------------------------------------------*/
-
-    /// True if this is the fog color
-#define COLOR_FOG_P(x) ((x) == 239)
-    /// Solid fog color number in global palette
-#define COLOR_FOG (0)
 
 //@}
 
