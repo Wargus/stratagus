@@ -1516,7 +1516,7 @@ global UnitType DefaultUnitTypes[] = {
 	,{ "dwarves-acknowledge" }
 	,{ "dwarves-ready" }
 	,{ "basic human voices help 1" }
-	,{ "basic human voices dead" }
+	,{ "explosion" }
    },   {	 { "dwarves-attack" }
    } },
 
@@ -1555,7 +1555,7 @@ global UnitType DefaultUnitTypes[] = {
 	,{ "goblin-sappers-acknowledge" }
 	,{ "goblin-sappers-ready" }
 	,{ "basic orc voices help 1" }
-	,{ "basic orc voices dead" }
+	,{ "explosion" }
    },   {	 { "goblin-sappers-attack" }
    } },
 
