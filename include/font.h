@@ -10,7 +10,7 @@
 //
 /**@name font.h		-	The font headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -119,25 +119,11 @@ enum _game_font_ {
 /**
 **	Color selector for the font functions.
 */
-enum _font_color {
-    FontBlack,				/// Black font color
-    FontRed,				/// Red font color
-    FontGreen,				/// Green font color
-    FontYellow,				/// Yellow font color
-    FontBlue,				/// Blue font color
-    FontMagenta,			/// Magenta font color
-    FontCyan,				/// Cyan font color
-    FontWhite,				/// White font color
-    FontBrightBlack,			/// Bright black font color
-    FontGrey=FontBrightBlack,		/// Grey font color
-    FontBrightRed,			/// Bright red font color
-    FontBrightGreen,			/// Bright green font color
-    FontBrightYellow,			/// Bright yellow font color
-    FontBrightBlue,			/// Bright blue font color
-    FontBrightMagenta,			/// Bright magenta font color
-    FontBrightCyan,			/// Bright cyan font color
-    FontBrightWhite,			/// Bright white font color
-};
+#define FontRed "red"
+#define FontGreen "green"
+#define FontYellow "yellow"
+#define FontWhite "white"
+#define FontGrey "grey"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -148,9 +134,9 @@ enum _font_color {
 ----------------------------------------------------------------------------*/
 
     /// Set the default text colors for normal and reverse text
-extern void SetDefaultTextColors(int normal,int reverse);
+extern void SetDefaultTextColors(char* normal,char* reverse);
     /// Get the default text colors for normal and reverse text
-extern void GetDefaultTextColors(int *normalp,int *reversep);
+extern void GetDefaultTextColors(char** normalp,char** reversep);
     /// Returns the pixel length of a text
 extern int VideoTextLength(unsigned font,const unsigned char* text);
     /// Returns the height of the font

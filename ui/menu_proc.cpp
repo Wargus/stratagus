@@ -173,8 +173,8 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
 {
     MenuButtonId rb;
     int s;
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
 
     GetDefaultTextColors(&nc, &rc);
     if (button == MBUTTON_SC_BUTTON || button == MBUTTON_SC_BUTTON_LEFT
@@ -263,8 +263,8 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
 local void DrawPulldown(Menuitem *mi, int mx, int my)
 {
     int i;
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
     char *text;
     unsigned flags;
     MenuButtonId rb;
@@ -492,8 +492,8 @@ local void DrawListbox(Menuitem *mi, int mx, int my)
 {
     int i;
     int s;
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
     char *text;
     MenuButtonId rb;
     unsigned flags;
@@ -745,8 +745,8 @@ local void DrawGem(Menuitem *mi, int mx, int my)
     MenuButtonId rb;
     int x;
     int y;
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
 
     flags = mi->flags;
     rb = mi->d.gem.button;
@@ -789,8 +789,8 @@ local void DrawGem(Menuitem *mi, int mx, int my)
 */
 local void DrawInput(Menuitem *mi, int mx, int my)
 {
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
     char *text;
     unsigned flags;
     MenuButtonId rb;
@@ -859,8 +859,8 @@ global void DrawMenu(Menu *menu)
     int i;
     int n;
     int l;
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
     Menuitem *mi;
     Menuitem *mip;
 

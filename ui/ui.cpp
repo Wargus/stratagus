@@ -425,7 +425,7 @@ local void NewSaveUi(FILE * file, const UI * ui)
     fprintf(file, "(define-ui '%s %d %d\t; Selector\n",
 	ui->Name, ui->Width, ui->Height);
 
-    fprintf(file, "  'normal-font-color %d 'reverse-font-color %d\n",
+    fprintf(file, "  'normal-font-color %s 'reverse-font-color %s\n",
 	ui->NormalFontColor, ui->ReverseFontColor);
 
     fprintf(file, "  'filler-1 '(pos (%d %d) image \"%s\")\n",
