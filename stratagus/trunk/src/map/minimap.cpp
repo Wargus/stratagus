@@ -422,9 +422,6 @@ static void DrawUnitOnMinimap(Unit* unit, int red_phase)
 	int bpp;
 #endif
 
-	if (!UnitVisibleOnMinimap(unit)) {
-		return ;
-	}
 	if (EditorRunning || ReplayRevealMap || UnitVisible(unit, ThisPlayer)) {
 		type = unit->Type;
 	} else {
@@ -505,7 +502,6 @@ void UpdateMinimap(void)
 	int mx;
 	int my;
 	int n;
-	Unit* table[UnitMax];
 	int visiontype; // 0 unexplored, 1 explored, >1 visible.
 #ifndef USE_OPENGL
 	int bpp;
@@ -514,6 +510,15 @@ void UpdateMinimap(void)
 	red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
 	if (red_phase_changed) {
 		red_phase = !red_phase;
+	}
+
+	// Clear Minimap background if not transparent
+	if (!TheUI.MinimapTransparent) {
+#ifndef USE_OPENGL
+		SDL_FillRect(MinimapSurface, NULL, 0);
+#else
+		memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
+#endif
 	}
 
 #ifndef USE_OPENGL
@@ -585,9 +590,10 @@ void UpdateMinimap(void)
 	// Draw units on map
 	// FIXME: We should rewrite this completely
 	//
-	n = UnitCacheSelect(0, 0, TheMap.Info.MapHeight, TheMap.Info.MapWidth, table);
-	while (n--) {
-		DrawUnitOnMinimap(table[n], red_phase);
+	for(n = 0; n < NumUnits; ++n) {
+		if (UnitVisibleOnMinimap(Units[n])) {
+			DrawUnitOnMinimap(Units[n], red_phase);
+		}
 	}
 
 #ifndef USE_OPENGL
