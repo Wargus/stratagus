@@ -61,7 +61,7 @@ global void HandleActionDemolish(Unit* unit)
     Unit* goal;
     int err;
 
-    DebugLevel3Fn("Demolish %d\n",UnitNumber(unit));
+    DebugLevel3Fn("Demolish %d\n" _C_ UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	//

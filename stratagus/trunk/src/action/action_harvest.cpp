@@ -205,7 +205,7 @@ local int ChopWood(Unit* unit)
 	    } else {
 		// FIXME: support more races!
 		DebugLevel0Fn("Wrong unit for chopping wood %d\n"
-			,unit->Type->Type);
+			_C_ unit->Type->Type);
 	    }
 	    unit->Player->UnitTypesCount[unit->Type->Type]++;
 
@@ -330,8 +330,8 @@ local int ReturnWithWood(Unit* unit)
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another depot, or retry later.
 	DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %d=%d,%d ? %d\n"
-		  ,UnitNumber(destu),destu->X,destu->Y
-		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
+		  _C_ UnitNumber(destu) _C_ destu->X _C_ destu->Y
+		  _C_ MapDistanceToUnit(unit->X,unit->Y,destu));
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
@@ -381,7 +381,7 @@ local int ReturnWithWood(Unit* unit)
 	unit->Type=UnitTypeHumanWorker;
     } else {
 	// FIXME: must support more races.
-	DebugLevel0Fn("Wrong unit for returning wood %d\n",unit->Type->Type);
+	DebugLevel0Fn("Wrong unit for returning wood %d\n" _C_ unit->Type->Type);
     }
     unit->Player->UnitTypesCount[unit->Type->Type]++;
 

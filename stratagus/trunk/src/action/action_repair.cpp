@@ -91,7 +91,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //		original per 100 hit points only 25 gold 25 wood
     //
     hp=GIVES_HP;
-    DebugLevel2Fn("hitpoints %d\n",hp);
+    DebugLevel2Fn("hitpoints %d\n" _C_ hp);
 
     //
     //	Calculate the repair costs.
@@ -197,7 +197,7 @@ global void HandleActionRepair(Unit* unit)
     Unit* goal;
     int err;
 
-    DebugLevel3("Repair %d\n",UnitNumber(unit));
+    DebugLevel3("Repair %d\n" _C_ UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	case 0:

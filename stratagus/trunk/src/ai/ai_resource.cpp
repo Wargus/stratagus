@@ -1151,10 +1151,10 @@ local void AiCollectResources(void)
     total=0;
     for( c=0; c<MaxCosts; ++c ) {
 	total+=an[c]+rn[c];
-	DebugLevel3Fn("Assigned %d = %d\n",c,an[c]);
-	DebugLevel3Fn("Resource %d = %d\n",c,rn[c]);
+	DebugLevel3Fn("Assigned %d = %d\n" _C_ c _C_ an[c]);
+	DebugLevel3Fn("Resource %d = %d\n" _C_ c _C_ rn[c]);
     }
-    DebugLevel3Fn("Unassigned %d of total %d\n",un,total);
+    DebugLevel3Fn("Unassigned %d of total %d\n" _C_ un _C_ total);
 
     //
     //	Now assign the free workers.
@@ -1165,7 +1165,7 @@ local void AiCollectResources(void)
 	unit=unassigned[i];
 
 	for( o=c=0; c<MaxCosts; ++c ) {
-	    DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*pt,p[c],total*p[c]);
+	    DebugLevel3Fn("%d, %d, %d\n" _C_ (an[c]+rn[c])*pt _C_ p[c] _C_ total*p[c]);
 	    if( (an[c]+rn[c])*pt<total*p[c] ) {
 		o=c;
 		break;

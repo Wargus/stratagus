@@ -147,7 +147,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //	Activate the resource
     //
     goal->Data.Resource.Active++;
-    DebugLevel3Fn("+%d\n",goal->Data.Resource.Active);
+    DebugLevel3Fn("+%d\n" _C_ goal->Data.Resource.Active);
 
     if( !goal->Frame ) {		// show resource working
 	goal->Frame=resource->Frame;
@@ -234,7 +234,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	source->Value-=DEFAULT_INCOMES[resource->Cost];
 
-	DebugLevel3Fn("-%d\n",source->Data.Resource.Active);
+	DebugLevel3Fn("-%d\n" _C_ source->Data.Resource.Active);
 	if( !--source->Data.Resource.Active ) {
 	    source->Frame=0;
 	    CheckUnitToBeDrawn(source);
@@ -264,7 +264,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	} else {
 	    // FIXME: should support more races
 	    DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
-		,unit->Type->Ident,DEFAULT_NAMES[resource->Cost]);
+		_C_ unit->Type->Ident _C_ DEFAULT_NAMES[resource->Cost]);
 	}
 	unit->Player->UnitTypesCount[unit->Type->Type]++;
 
@@ -416,7 +416,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	unit->Type=*resource->Orc;
     } else {
 	DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
-	    ,unit->Type->Ident,DEFAULT_NAMES[resource->Cost]);
+	    _C_ unit->Type->Ident _C_ DEFAULT_NAMES[resource->Cost]);
     }
     unit->Player->UnitTypesCount[unit->Type->Type]++;
 
@@ -508,7 +508,7 @@ global void HandleActionResource(Unit* unit,const Resource* resource)
     int ret;
 
     DebugLevel3Fn("%s(%d) SubAction %d\n"
-	,unit->Type->Ident,UnitNumber(unit),unit->SubAction);
+	_C_ unit->Type->Ident _C_ UnitNumber(unit) _C_ unit->SubAction);
 
     switch( unit->SubAction ) {
 	//

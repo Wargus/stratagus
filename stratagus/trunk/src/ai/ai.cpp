@@ -150,7 +150,7 @@ local void AiCheckUnits(void)
 
 	if( x>e+counter[t] ) {	// Request it.
 	    DebugLevel3Fn("Need %s *%d\n" _C_
-		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident,x);
+		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident _C_ x);
 	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
 		    x-e-counter[t]);
 	    counter[t]+=x-e-counter[t];
@@ -175,7 +175,7 @@ local void AiCheckUnits(void)
 	    x=aiut->Want;
 	    if( x>unit_types_count[t]+counter[t] ) {	// Request it.
 		DebugLevel2Fn("Force %d need %s * %d\n" _C_ i _C_
-			aiut->Type->Ident,x);
+			aiut->Type->Ident _C_ x);
 		AiAddUnitTypeRequest(aiut->Type,
 			x-unit_types_count[t]-counter[t]);
 		counter[t]+=x-unit_types_count[t]-counter[t];
@@ -495,7 +495,7 @@ local void SaveAiType(FILE* file,const AiType* aitype)
     if( aitype->Next ) {
 	SaveAiType(file,aitype->Next);
     }
-    DebugLevel3Fn("%s,%s,%s\n",aitype->Name,aitype->Race,aitype->Class);
+    DebugLevel3Fn("%s,%s,%s\n" _C_ aitype->Name _C_ aitype->Race _C_ aitype->Class);
     fprintf(file,"(define-ai \"%s\" '%s '%s\n",
 	    aitype->Name,aitype->Race ? aitype->Race : "*",aitype->Class);
 
@@ -735,7 +735,7 @@ global void AiInit(Player* player)
     ait=AiTypes;
 
     ainame=AiTypeWcNames[player->AiNum];
-    DebugLevel0(" %s\n",ainame);
+    DebugLevel0(" %s\n" _C_ ainame);
 
     //
     //	Search correct AI type.
@@ -841,7 +841,7 @@ global void CleanAi(void)
     //	Free AiTypes.
     //
     for( aitype=AiTypes; aitype; aitype=temp ) {
-	DebugLevel3Fn("%s,%s,%s\n",aitype->Name,aitype->Race,aitype->Class);
+	DebugLevel3Fn("%s,%s,%s\n" _C_ aitype->Name _C_ aitype->Race _C_ aitype->Class);
 	free(aitype->Name);
 	free(aitype->Race);
 	free(aitype->Class);
