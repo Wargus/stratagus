@@ -1333,8 +1333,20 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionCircleOfPower:
     {
-    MakeUnitAndPlace(x, y, UnitTypeByIdent( "unit-circle-of-power" ),
-	unit->Player);
+    Unit *cop = MakeUnitAndPlace(x, y, UnitTypeByIdent( "unit-circle-of-power" ),
+	         unit->Player);
+    MakeMissile(MissileTypeSpell,
+		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    
+    // Goal is used to link destination circle of power and back:
+    // the circle of power owner (source DP)
+    unit->Goal = cop;
+    cop->Goal = unit;
+    unit->Refs++;
+    cop->Refs++;
+    //FIXME: setting destination circle of power should use mana
+    
     /*
     Unit *cop;
     DebugLevel0Fn( ">>> cop %d,%d\n" _C_ x _C_ y );
