@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map.c		-	The map. */
+/**@name map.c - The map. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Vladi Shabanski
+//      (c) Copyright 1998-2004 by Lutz Sammer and Vladi Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -51,22 +51,22 @@
 #include "script.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global WorldMap TheMap;						/// The current map
-global int FlagRevealMap;				/// Flag must reveal the map
-global int ReplayRevealMap;				/// Reveal Map is replay
+global WorldMap TheMap;                 /// The current map
+global int FlagRevealMap;               /// Flag must reveal the map
+global int ReplayRevealMap;             /// Reveal Map is replay
 
 /*----------------------------------------------------------------------------
---		Visible and explored handling
+--  Visible and explored handling
 ----------------------------------------------------------------------------*/
 
 /**
-**	  Marks seen tile -- used mainly for the Fog Of War
+**  Marks seen tile -- used mainly for the Fog Of War
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+**  @param x  Map X tile-position.
+**  @param y  Map Y tile-position.
 */
 global void MapMarkSeenTile(int x, int y)
 {
@@ -76,7 +76,7 @@ global void MapMarkSeenTile(int x, int y)
 
 	mf = TheMap.Fields + x + y * TheMap.Width;
 	//
-	// Nothing changed? Seeing already the correct tile.
+	//  Nothing changed? Seeing already the correct tile.
 	//
 	if ((tile = mf->Tile) == (seentile = mf->SeenTile)) {
 		// FIXME: Check bounds
@@ -86,7 +86,7 @@ global void MapMarkSeenTile(int x, int y)
 	mf->SeenTile = tile;
 
 	// FIXME: this is needed, because tileset is loaded after this function
-	//		  is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
+	//        is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
 	if (!TheMap.Tileset) {
 		return;
 	}
@@ -104,9 +104,9 @@ global void MapMarkSeenTile(int x, int y)
 		MapFixSeenWoodTile(x, y);
 		MapFixSeenWoodNeighbors(x, y);
 
-		//
-		//  Handle rock changes.
-		//
+	//
+	// Handle rock changes.
+	//
 	} else if (seentile != TheMap.Tileset->RemovedRock &&
 			tile == TheMap.Tileset->RemovedRock) {
 		MapFixSeenRockNeighbors(x, y);
@@ -117,9 +117,9 @@ global void MapMarkSeenTile(int x, int y)
 		MapFixSeenRockTile(x, y);
 		MapFixSeenRockNeighbors(x, y);
 
-		//
-		//  Handle Walls changes.
-		//
+	//
+	//  Handle Walls changes.
+	//
 	} else if (TheMap.Tileset->TileTypeTable[tile] == TileTypeHumanWall ||
 			TheMap.Tileset->TileTypeTable[tile] == TileTypeOrcWall ||
 			TheMap.Tileset->TileTypeTable[seentile] == TileTypeHumanWall ||
@@ -132,7 +132,7 @@ global void MapMarkSeenTile(int x, int y)
 }
 
 /**
-**		Reveal the entire map.
+**  Reveal the entire map.
 */
 global void RevealMap(void)
 {
@@ -141,7 +141,7 @@ global void RevealMap(void)
 	int p;
 
 	//
-	//	Mark every explored tile as visible. 1 turns into 2.
+	//  Mark every explored tile as visible. 1 turns into 2.
 	//
 	for (x = 0; x < TheMap.Width; ++x) {
 		for (y = 0; y < TheMap.Height; ++y) {
@@ -155,11 +155,11 @@ global void RevealMap(void)
 		}
 	}
 	//
-	//	Global seen recount. Simple and effective.
+	//  Global seen recount. Simple and effective.
 	//
 	for (x = 0; x < NumUnits; ++x) {
 		//
-		//	Reveal neutral buildings. Gold mines:)
+		//  Reveal neutral buildings. Gold mines:)
 		//
 		if (Units[x]->Player->Type == PlayerNeutral) {
 			for (p = 0; p < PlayerMax; ++p) {
@@ -177,11 +177,11 @@ global void RevealMap(void)
 }
 
 /**
-**		Change viewpoint of map viewport v to x,y.
+**  Change viewpoint of map viewport v to x,y.
 **
-**		@param vp		Viewport pointer.
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
+**  @param vp  Viewport pointer.
+**  @param x   X map tile position.
+**  @param y   Y map tile position.
 */
 global void ViewportSetViewpoint(Viewport* vp, int x, int y)
 {
@@ -189,7 +189,8 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y)
 	int map_height;
 
 	if (x == vp->MapX && y == vp->MapY) {
-		return;								// Already using this view.
+		// Already using this view.
+		return;
 	}
 
 	map_width = vp->MapWidth;
@@ -215,11 +216,11 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y)
 }
 
 /**
-**		Center map viewport v on map tile (x,y).
+**  Center map viewport v on map tile (x,y).
 **
-**		@param vp		Viewport pointer.
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
+**  @param vp  Viewport pointer.
+**  @param x   X map tile position.
+**  @param y   Y map tile position.
 */
 global void ViewportCenterViewpoint(Viewport* vp, int x, int y)
 {
@@ -227,16 +228,16 @@ global void ViewportCenterViewpoint(Viewport* vp, int x, int y)
 }
 
 /*----------------------------------------------------------------------------
---		Map queries
+--  Map queries
 ----------------------------------------------------------------------------*/
 
 /**
-**		Tile is empty, no rocks, walls, forest, building?
+**  Tile is empty, no rocks, walls, forest, building?
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
 **
-**		@return				True if empty, false otherwise.
+**  @return    True if empty, false otherwise.
 */
 global int IsMapFieldEmpty(int tx, int ty)
 {
@@ -246,12 +247,12 @@ global int IsMapFieldEmpty(int tx, int ty)
 }
 
 /**
-**		Water on map tile.
+**  Water on map tile.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
 **
-**		@return				True if water, false otherwise.
+**  @return    True if water, false otherwise.
 */
 global int WaterOnMap(int tx, int ty)
 {
@@ -259,11 +260,12 @@ global int WaterOnMap(int tx, int ty)
 }
 
 /**
-**		Coast on map tile.
+**  Coast on map tile.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
-**		@return				True if coast, false otherwise.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
+**
+**  @return    True if coast, false otherwise.
 */
 global int CoastOnMap(int tx, int ty)
 {
@@ -271,11 +273,12 @@ global int CoastOnMap(int tx, int ty)
 }
 
 /**
-**		Wall on map tile.
+**  Wall on map tile.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
-**		@return				True if wall, false otherwise.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
+**
+**  @return    True if wall, false otherwise.
 */
 global int WallOnMap(int tx, int ty)
 {
@@ -283,11 +286,12 @@ global int WallOnMap(int tx, int ty)
 }
 
 /**
-**		Human wall on map tile.
+**  Human wall on map tile.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
-**		@return				True if human wall, false otherwise.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
+**
+**  @return    True if human wall, false otherwise.
 */
 global int HumanWallOnMap(int tx, int ty)
 {
@@ -296,11 +300,12 @@ global int HumanWallOnMap(int tx, int ty)
 }
 
 /**
-**		Orc wall on map tile.
+**  Orc wall on map tile.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
-**		@return				True if orcish wall, false otherwise.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
+**
+**  @return    True if orcish wall, false otherwise.
 */
 global int OrcWallOnMap(int tx, int ty)
 {
@@ -309,12 +314,12 @@ global int OrcWallOnMap(int tx, int ty)
 }
 
 /**
-**		Forest on map tile. Checking version.
+**  Forest on map tile. Checking version.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
 **
-**		@return				True if forest, false otherwise.
+**  @return    True if forest, false otherwise.
 */
 global int CheckedForestOnMap(int tx, int ty)
 {
@@ -325,12 +330,12 @@ global int CheckedForestOnMap(int tx, int ty)
 }
 
 /**
-**		Forest on map tile.
+**  Forest on map tile.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
 **
-**		@return				True if forest, false otherwise.
+**  @return    True if forest, false otherwise.
 */
 global int ForestOnMap(int tx, int ty)
 {
@@ -347,12 +352,12 @@ global int ForestOnMap(int tx, int ty)
 }
 
 /**
-**		Rock on map tile.
+**  Rock on map tile.
 **
-**		@param tx		X map tile position.
-**		@param ty		Y map tile position.
+**  @param tx  X map tile position.
+**  @param ty  Y map tile position.
 **
-**		@return				True if rock, false otherwise.
+**  @return    True if rock, false otherwise.
 */
 global int RockOnMap(int tx, int ty)
 {
@@ -369,13 +374,13 @@ global int RockOnMap(int tx, int ty)
 }
 
 /**
-**		Can move to this point, applying mask.
+**  Can move to this point, applying mask.
 **
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
-**		@param mask		Mask for movement to apply.
+**  @param x     X map tile position.
+**  @param y     Y map tile position.
+**  @param mask  Mask for movement to apply.
 **
-**		@return				True if could be entered, false otherwise.
+**  @return      True if could be entered, false otherwise.
 */
 global int CheckedCanMoveToMask(int x, int y, int mask)
 {
@@ -386,39 +391,14 @@ global int CheckedCanMoveToMask(int x, int y, int mask)
 	return !(TheMap.Fields[x + y * TheMap.Width].Flags & mask);
 }
 
-#ifndef CanMoveToMask
 /**
-**		Can move to this point, applying mask.
+**  Can a unit of unit-type move to this point.
 **
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
-**		@param mask		Mask for movement to apply.
+**  @param x     X map tile position.
+**  @param y     Y map tile position.
+**  @param type  unit-type to be checked.
 **
-**		@return				True if could be entered, false otherwise.
-*/
-global int CanMoveToMask(int x, int y, int mask)
-{
-#ifdef DEBUG
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		// FIXME: must cleanup calling function !
-		fprintf(stderr, "Used x %d, y %d, mask %x\n", x, y, mask);
-		abort();
-		return 0;
-	}
-#endif
-
-	return !(TheMap.Fields[x + y * TheMap.Width].Flags & mask);
-}
-#endif
-
-/**
-**		Can an unit of unit-type move to this point.
-**
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
-**		@param type		unit-type to be checked.
-**
-**		@return				True if could be entered, false otherwise.
+**  @return      True if could be entered, false otherwise.
 */
 global int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
 {
@@ -426,103 +406,21 @@ global int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
 }
 
 /**
-**		Can an unit move to this point.
+**  Can an unit move to this point.
 **
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
-**		@param unit		unit to be checked.
+**  @param x     X map tile position.
+**  @param y     Y map tile position.
+**  @param unit  unit to be checked.
 **
-**		@return				True if could be entered, false otherwise.
+**  @return      True if could be entered, false otherwise.
 */
 global int UnitCanMoveTo(int x, int y, const Unit* unit)
 {
 	return CanMoveToMask(x, y, TypeMovementMask(unit->Type));
 }
 
-#if 0
-
 /**
-**		Return the units field flags.
-**		This flags are used to mark the field for this unit.
-**
-**		@param unit		Pointer to unit.
-**
-**		@return				Field flags to be set.
-*/
-global unsigned UnitFieldFlags(const Unit* unit)
-{
-	// FIXME: Should be moved into unittype structure, and allow more types.
-	switch (unit->Type->UnitType) {
-		case UnitTypeLand:				// on land
-			return MapFieldLandUnit;
-		case UnitTypeFly:				// in air
-			return MapFieldAirUnit;
-		case UnitTypeNaval:				// on water
-			return MapFieldSeaUnit;
-		default:
-			DebugLevel1Fn("Were moves this unit?\n");
-			return 0;
-	}
-}
-
-/**
-**		Return the unit type movement mask.
-**				TODO: Should add this to unit-type structure.
-**
-**		@param type		Unit type pointer.
-**
-**		@return				Movement mask of unit type.
-*/
-global int TypeMovementMask(const UnitType* type)
-{
-	// FIXME: Should be moved into unittype structure, and allow more types.
-	switch (type->UnitType) {
-		case UnitTypeLand:				// on land
-			return MapFieldLandUnit |
-				MapFieldBuilding |		// already occuppied
-				MapFieldWall |
-				MapFieldRocks |
-				MapFieldForest |		// wall,rock,forest not 100% clear?
-				MapFieldCoastAllowed |
-				MapFieldWaterAllowed |		// can't move on this
-				MapFieldUnpassable;
-		case UnitTypeFly:				// in air
-			return MapFieldAirUnit;		// already occuppied
-		case UnitTypeNaval:				// on water
-			if( type->Transporter ) {
-				return MapFieldLandUnit |
-					MapFieldSeaUnit |
-					MapFieldBuilding |		// already occuppied
-					MapFieldLandAllowed;		// can't move on this
-					//| MapFieldUnpassable;		// FIXME: bug?
-			}
-			return MapFieldSeaUnit |
-				MapFieldBuilding |		// already occuppied
-				MapFieldCoastAllowed |
-				MapFieldLandAllowed |		// can't move on this
-				MapFieldUnpassable;
-		default:
-			DebugLevel1Fn("Were moves this unit?\n");
-			return 0;
-	}
-}
-
-/**
-**		Return units movement mask.
-**
-**		@param unit		Unit pointer.
-**
-**		@return				Movement mask of unit.
-*/
-global int UnitMovementMask(const Unit* unit)
-{
-	return TypeMovementMask(unit->Type);
-}
-
-#endif
-
-/**
-**		Fixes initially the wood and seen tiles.
+**  Fixes initially the wood and seen tiles.
 */
 global void PreprocessMap(void)
 {
@@ -547,14 +445,14 @@ global void PreprocessMap(void)
 }
 
 /**
-**		Convert viewport x coordinate to map tile x coordinate.
+**  Convert viewport x coordinate to map tile x coordinate.
 **
-**		@param vp		Viewport pointer.
-**		@param x		X coordinate into this viewport (in pixels, relative
-**						to origin of Stratagus's window - not the viewport
-**						itself!).
+**  @param vp  Viewport pointer.
+**  @param x   X coordinate into this viewport (in pixels, relative
+**             to origin of Stratagus's window - not the viewport
+**             itself!).
 **
-**		@return				X map tile coordinate.
+**  @return    X map tile coordinate.
 */
 global int Viewport2MapX(const Viewport* vp, int x)
 {
@@ -565,14 +463,14 @@ global int Viewport2MapX(const Viewport* vp, int x)
 }
 
 /**
-**		Convert viewport y coordinate to map tile y coordinate.
+**  Convert viewport y coordinate to map tile y coordinate.
 **
-**		@param vp		Viewport pointer.
-**		@param y		Y coordinate into this viewport (in pixels, relative
-**						to origin of Stratagus's window - not the viewport
-**						itself!).
+**  @param vp  Viewport pointer.
+**  @param y   Y coordinate into this viewport (in pixels, relative
+**             to origin of Stratagus's window - not the viewport
+**             itself!).
 **
-**		@return				Y map tile coordinate.
+**  @return    Y map tile coordinate.
 */
 global int Viewport2MapY(const Viewport* vp, int y)
 {
@@ -583,13 +481,13 @@ global int Viewport2MapY(const Viewport* vp, int y)
 }
 
 /**
-**		Convert a map tile X coordinate into a viewport x pixel coordinate.
+**  Convert a map tile X coordinate into a viewport x pixel coordinate.
 **
-**		@param vp		Viewport pointer.
-**		@param x		The map tile's X coordinate.
+**  @param vp  Viewport pointer.
+**  @param x   The map tile's X coordinate.
 **
-**		@return				X screen coordinate in pixels (relative
-**					  to origin of Stratagus's window).
+**  @return    X screen coordinate in pixels (relative
+**             to origin of Stratagus's window).
 */
 global int Map2ViewportX(const Viewport* vp, int x)
 {
@@ -597,13 +495,13 @@ global int Map2ViewportX(const Viewport* vp, int x)
 }
 
 /**
-**		Convert a map tile Y coordinate into a viewport y pixel coordinate.
+**  Convert a map tile Y coordinate into a viewport y pixel coordinate.
 **
-**		@param vp		Viewport pointer.
-**		@param y		The map tile's Y coordinate.
+**  @param vp  Viewport pointer.
+**  @param y   The map tile's Y coordinate.
 **
-**		@return				Y screen coordinate in pixels (relative
-**					  to origin of Stratagus's window).
+**  @return    Y screen coordinate in pixels (relative
+**             to origin of Stratagus's window).
 */
 global int Map2ViewportY(const Viewport* vp, int y)
 {
@@ -611,9 +509,9 @@ global int Map2ViewportY(const Viewport* vp, int y)
 }
 
 /**
-**		Release info about a map.
+**  Release info about a map.
 **
-**		@param info		MapInfo pointer.
+**  @param info  MapInfo pointer.
 */
 global void FreeMapInfo(MapInfo* info)
 {
@@ -632,7 +530,7 @@ global void FreeMapInfo(MapInfo* info)
 }
 
 /**
-**		Cleanup the map module.
+**  Cleanup the map module.
 */
 global void CleanMap(void)
 {
@@ -640,7 +538,7 @@ global void CleanMap(void)
 	free(TheMap.TerrainName);
 	free(TheMap.Visible[0]);
 
-	// Tileset freeed by Tileset?
+	// Tileset freed by Tileset?
 
 	FreeMapInfo(TheMap.Info);
 	memset(&TheMap, 0, sizeof(TheMap));
