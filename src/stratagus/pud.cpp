@@ -148,20 +148,20 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			int v;
 
 			v=ConvertLE16(mtxm[h*width+w]);
-			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Tile=ctab[v];
-			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Value=0;
+			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Tile=ctab[v];
+			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Value=0;
 			//
 			// Walls are handled special (very ugly).
 			//
 			if( (v&0xFFF0)==0x00A0
 					|| (v&0xFFF0)==0x00C0
 					|| (v&0xFF00)==0x0900 ) {
-				map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Value=
+				map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Value=
 						UnitTypeOrcWall->_HitPoints;
 			} else if( (v&0x00F0)==0x0090
 					|| (v&0xFFF0)==0x00B0
 					|| (v&0xFF00)==0x0800 ) {
-				map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Value=
+				map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth].Value=
 						UnitTypeHumanWall->_HitPoints;
 			}
 		}
@@ -187,7 +187,7 @@ static void ConvertSQM(const unsigned short* sqm,int width,int height
 	for( h=0; h<height; ++h ) {
 		for( w=0; w<width; ++w ) {
 			v=ConvertLE16(sqm[w+h*width]);
-			i=MapOffsetX+w+(MapOffsetY+h)*TheMap.Width;
+			i=MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth;
 			if( v&MapMoveOnlyLand ) {
 				map->Fields[i].Flags|=MapFieldLandAllowed;
 			}
@@ -254,7 +254,7 @@ static void ConvertREGM(const unsigned short* regm,int width,int height
 	for( h=0; h<height; ++h ) {
 		for( w=0; w<width; ++w ) {
 			v=ConvertLE16(regm[w+h*width]);
-			i=MapOffsetX+w+(MapOffsetY+h)*TheMap.Width;
+			i=MapOffsetX+w+(MapOffsetY+h)*TheMap.Info.MapWidth;
 			if( v==MapActionForest ) { // forest could be chopped
 				map->Fields[i].Flags|=MapFieldForest;
 				continue;
@@ -943,15 +943,12 @@ void LoadPud(const char* pud,WorldMap* map)
 			height=PudReadWord(input);
 
 			if( !map->Fields ) {
-				map->Width=width;
-				map->Height=height;
-
 				map->Fields=calloc(width*height,sizeof(*map->Fields));
 				if( !map->Fields ) {
 					perror("calloc()");
 					ExitFatal(-1);
 				}
-				TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+				TheMap.Visible[0]=calloc(TheMap.Info.MapWidth*TheMap.Info.MapHeight/8,1);
 				if( !TheMap.Visible[0] ) {
 					perror("calloc()");
 					ExitFatal(-1);
@@ -1321,7 +1318,7 @@ pawn:
 	CLclose(input);
 
 	MapOffsetX+=width;
-	if( MapOffsetX>=map->Width ) {
+	if( MapOffsetX>=map->Info.MapWidth ) {
 		MapOffsetX=0;
 		MapOffsetY+=height;
 	}
@@ -1340,7 +1337,7 @@ static void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
 	int i;
 	int n;
 
-	n=map->Width*map->Height;
+	n=map->Info.MapWidth*map->Info.MapHeight;
 	for( i=0; i<n; ++i ) {
 		int tile;
 		int j;
@@ -1398,7 +1395,7 @@ static void PudWriteMTXM(gzFile f,const WorldMap* map)
 	Tileset* tileset;
 
 	tileset=map->Tileset;
-	n=map->Width*map->Height;
+	n=map->Info.MapWidth*map->Info.MapHeight;
 	PudWriteHeader(f,"MTXM",n*2);
 	mtxm=malloc(n*2);
 
@@ -1420,7 +1417,7 @@ static void PudWriteSQM(gzFile f,const WorldMap* map)
 	int n;
 	unsigned char* sqm;
 
-	n=map->Width*map->Height;
+	n=map->Info.MapWidth*map->Info.MapHeight;
 	PudWriteHeader(f,"SQM ",n*2);
 	sqm=malloc(n*2);
 
@@ -1488,7 +1485,7 @@ static void PudWriteREGM(gzFile f,const WorldMap* map)
 	int n;
 	unsigned char* regm;
 
-	n=map->Width*map->Height;
+	n=map->Info.MapWidth*map->Info.MapHeight;
 	PudWriteHeader(f,"REGM",n*2);
 	regm=malloc(n*2);
 	for( i=0; i<n; ++i ) {
@@ -1607,10 +1604,10 @@ int SavePud(const char* pud,const WorldMap* map)
 	gzwrite(f,buf,2);
 
 	PudWriteHeader(f,"DIM ",4);
-	buf[0]=map->Width  >> 0;
-	buf[1]=map->Width  >> 8;
-	buf[2]=map->Height >> 0;
-	buf[3]=map->Height >> 8;
+	buf[0]=map->Info.MapWidth  >> 0;
+	buf[1]=map->Info.MapWidth  >> 8;
+	buf[2]=map->Info.MapHeight >> 0;
+	buf[3]=map->Info.MapHeight >> 8;
 	gzwrite(f,buf,4);
 
 	PudWriteHeader(f,"UDTA",5950);
@@ -1709,9 +1706,9 @@ void ChangeTilesetPud(int old,WorldMap* map)
 	unsigned char* mtxm;
 
 	MapOffsetX=MapOffsetY=0;
-	mtxm=malloc(map->Width*map->Height*2);
+	mtxm=malloc(map->Info.MapWidth*map->Info.MapHeight*2);
 	PudConvertMTXM(mtxm,map,Tilesets[old]);
-	ConvertMTXM((const unsigned short*)mtxm,map->Width,map->Height,map);
+	ConvertMTXM((const unsigned short*)mtxm,map->Info.MapWidth,map->Info.MapHeight,map);
 	free(mtxm);
 }
 

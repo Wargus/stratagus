@@ -83,17 +83,17 @@ void SaveMap(CLFile* file)
 	CLprintf(file, "  \"terrain\", {\"%s\", \"%s\"},\n",
 		TheMap.TerrainName, Tilesets[TheMap.Terrain]->Class);
 
-	CLprintf(file, "  \"size\", {%d, %d},\n", TheMap.Width, TheMap.Height);
+	CLprintf(file, "  \"size\", {%d, %d},\n", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 	CLprintf(file, "  \"%s\",\n", TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 	CLprintf(file, "  \"filename\", \"%s\",\n", TheMap.Info.Filename);
 
 	CLprintf(file, "  \"map-fields\", {\n");
-	for (h = 0; h < TheMap.Height; ++h) {
+	for (h = 0; h < TheMap.Info.MapHeight; ++h) {
 		CLprintf(file, "  -- %d\n", h);
-		for (w = 0; w < TheMap.Width; ++w) {
+		for (w = 0; w < TheMap.Info.MapWidth; ++w) {
 			MapField* mf;
 
-			mf = &TheMap.Fields[h * TheMap.Width + w];
+			mf = &TheMap.Fields[h * TheMap.Info.MapWidth + w];
 			CLprintf(file, "  {%3d, %3d,", mf->Tile, mf->SeenTile);
 			if (mf->Value) {
 				CLprintf(file, " %d,", mf->Value);

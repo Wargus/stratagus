@@ -273,9 +273,6 @@ typedef struct _map_info_ {
 
 	/// Describes the wold map
 typedef struct _world_map_ {
-	int Width;   ///< the map width
-	int Height;  ///< the map height
-
 	MapField* Fields;              ///< fields on map
 	unsigned* Visible[PlayerMax];  ///< visible bit-field
 
@@ -290,7 +287,6 @@ typedef struct _world_map_ {
 	struct _graphic_* FogGraphic; ///< graphic for fog of war
 
 	MapInfo Info;  ///< descriptive information
-	// TODO: (remove MapInfo Info DUPLICATES!)
 } WorldMap;
 
 /*----------------------------------------------------------------------------
@@ -472,7 +468,7 @@ void MapUnmarkUnitSight(struct _unit_* unit);
 
 	/// Can a unit with 'mask' enter the field
 #define CanMoveToMask(x, y, mask) \
-	!(TheMap.Fields[(x) + (y) * TheMap.Width].Flags & (mask))
+	!(TheMap.Fields[(x) + (y) * TheMap.Info.MapWidth].Flags & (mask))
 
 #define MapMarkSight(player, x, y, w, h, range) \
 	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileSight)

@@ -187,14 +187,14 @@ void EditTile(int x, int y, int tile)
 {
 	MapField* mf;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
 	ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
 
 	//
 	// Change the flags
 	//
-	mf = &TheMap.Fields[y * TheMap.Width + x];
+	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
@@ -225,12 +225,12 @@ void EditTilesInternal(int x, int y, int tile, int size)
 	int i;
 
 	ex = x + size;
-	if (ex > TheMap.Width) {
-		ex = TheMap.Width;
+	if (ex > TheMap.Info.MapWidth) {
+		ex = TheMap.Info.MapWidth;
 	}
 	ey = y + size;
-	if (ey > TheMap.Height) {
-		ey = TheMap.Height;
+	if (ey > TheMap.Info.MapHeight) {
+		ey = TheMap.Info.MapHeight;
 	}
 	while (y < ey) {
 		for (i = x; i < ex; ++i) {
@@ -254,8 +254,8 @@ void EditTiles(int x, int y, int tile, int size)
 	int mx;
 	int my;
 
-	mx = TheMap.Width;
-	my = TheMap.Height;
+	mx = TheMap.Info.MapWidth;
+	my = TheMap.Info.MapHeight;
 
 	EditTilesInternal(x, y, tile, size);
 
@@ -311,8 +311,8 @@ static void EditUnit(int x, int y, UnitType* type, Player* player)
 	int mx;
 	int my;
 
-	mx = TheMap.Width;
-	my = TheMap.Height;
+	mx = TheMap.Info.MapWidth;
+	my = TheMap.Info.MapHeight;
 
 	EditUnitInternal(x, y, type, player);
 
@@ -850,9 +850,9 @@ static void DrawEditorInfo(void)
 	//
 	// Flags info
 	//
-	flags = TheMap.Fields[x + y * TheMap.Width].Flags;
+	flags = TheMap.Fields[x + y * TheMap.Info.MapWidth].Flags;
 	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-		TheMap.Fields[x + y * TheMap.Width].Value, flags,
+		TheMap.Fields[x + y * TheMap.Info.MapWidth].Value, flags,
 		flags & MapFieldUnpassable   ? 'u' : '-',
 		flags & MapFieldNoBuilding   ? 'n' : '-',
 		flags & MapFieldHuman        ? 'h' : '-',
@@ -871,7 +871,7 @@ static void DrawEditorInfo(void)
 	//
 	// Tile info
 	//
-	tile = TheMap.Fields[x + y * TheMap.Width].Tile;
+	tile = TheMap.Fields[x + y * TheMap.Info.MapWidth].Tile;
 
 	for (i = 0; i < TheMap.Tileset->NumTiles; ++i) {
 		if (tile == TheMap.Tileset->Table[i]) {
@@ -1837,10 +1837,10 @@ static void CreateEditor(void)
 			}
 		}
 
-		TheMap.Width = TheMap.Info.MapWidth;
-		TheMap.Height = TheMap.Info.MapHeight;
-		TheMap.Fields = calloc(TheMap.Width * TheMap.Height, sizeof(MapField));
-		TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
+		TheMap.Info.MapWidth = TheMap.Info.MapWidth;
+		TheMap.Info.MapHeight = TheMap.Info.MapHeight;
+		TheMap.Fields = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(MapField));
+		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
 
 		TheMap.Terrain = TheMap.Info.MapTerrain;
@@ -1848,7 +1848,7 @@ static void CreateEditor(void)
 		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
 		LoadTileset();
 
-		for (i = 0; i < TheMap.Width * TheMap.Height; ++i) {
+		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile =
 				TheMap.Tileset->Table[0x50];
@@ -1949,7 +1949,7 @@ int EditorSavePud(const char* file)
 		if (type == UnitTypeByWcNum(WC_StartLocationHuman) ||
 				type == UnitTypeByWcNum(WC_StartLocationOrc)) {
 			// FIXME: Startpoints sets the land-unit flag.
-			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Width].Flags &=
+			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Info.MapWidth].Flags &=
 				~MapFieldLandUnit;
 		}
 	}
@@ -1967,7 +1967,7 @@ int EditorSavePud(const char* file)
 		if (type == UnitTypeByWcNum(WC_StartLocationHuman) ||
 				type == UnitTypeByWcNum(WC_StartLocationOrc)) {
 			// FIXME: Startpoints sets the land-unit flag.
-			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Width].Flags |=
+			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Info.MapWidth].Flags |=
 				MapFieldLandUnit;
 		}
 	}

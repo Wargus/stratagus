@@ -16,7 +16,7 @@
 //      it under the terms of the GNU General Public License as published by
 //      the Free Software Foundation; only version 2 of the License.
 //
-//      This program is distributed in the hope that it will be useful,
+//      This program is TheMap.Info.MapHeight in the hope that it will be useful,
 //      but WITHOUT ANY WARRANTY; without even the implied warranty of
 //      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //      GNU General Public License for more details.
@@ -84,7 +84,7 @@ int MapIsSeenTileWall(int x, int y, int walltype)
 	int t;
 
 	t = TheMap.Tileset->TileTypeTable[
-		TheMap.Fields[x + y * TheMap.Width].SeenTile];
+		TheMap.Fields[x + y * TheMap.Info.MapWidth].SeenTile];
 	if (walltype == -1) {
 		return t == TileTypeHumanWall || t == TileTypeOrcWall;
 	}
@@ -104,10 +104,10 @@ void MapFixSeenWallTile(int x, int y)
 	MapField* mf;
 
 	//  Outside of map or no wall.
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
 		return;
 	}
-	mf = TheMap.Fields + x + y * TheMap.Width;
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 	t = TheMap.Tileset->TileTypeTable[mf->SeenTile];
 	if (t != TileTypeHumanWall && t != TileTypeOrcWall) {
 		return;
@@ -120,10 +120,10 @@ void MapFixSeenWallTile(int x, int y)
 	if ((y - 1) < 0 || MapIsSeenTileWall(x, y - 1, t)) {
 		tile |= 1 << 0;
 	}
-	if ((x + 1) >= TheMap.Width || MapIsSeenTileWall(x + 1, y, t)) {
+	if ((x + 1) >= TheMap.Info.MapWidth || MapIsSeenTileWall(x + 1, y, t)) {
 		tile |= 1 << 1;
 	}
-	if ((y + 1) >= TheMap.Height || MapIsSeenTileWall(x, y + 1, t)) {
+	if ((y + 1) >= TheMap.Info.MapHeight || MapIsSeenTileWall(x, y + 1, t)) {
 		tile |= 1 << 2;
 	}
 	if ((x - 1) < 0 || MapIsSeenTileWall(x - 1, y, t)) {
@@ -198,10 +198,10 @@ void MapFixWallTile(int x, int y)
 	int t;
 
 	//  Outside of map or no wall.
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
 		return;
 	}
-	mf = TheMap.Fields + x + y * TheMap.Width;
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 	if (!(mf->Flags & MapFieldWall)) {
 		return;
 	}
@@ -211,19 +211,19 @@ void MapFixWallTile(int x, int y)
 	//  Calculate the correct tile. Depends on the surrounding.
 	//
 	tile = 0;
-	if ((y - 1) < 0 || (TheMap.Fields[x + (y - 1) * TheMap.Width].
+	if ((y - 1) < 0 || (TheMap.Fields[x + (y - 1) * TheMap.Info.MapWidth].
 			Flags & t) == t) {
 		tile |= 1 << 0;
 	}
-	if ((x + 1) >= TheMap.Width || (TheMap.Fields[x + 1 + y * TheMap.Width].
+	if ((x + 1) >= TheMap.Info.MapWidth || (TheMap.Fields[x + 1 + y * TheMap.Info.MapWidth].
 			Flags & t) == t) {
 		tile |= 1 << 1;
 	}
-	if ((y + 1) >= TheMap.Height || (TheMap.Fields[x + (y + 1) * TheMap.Width].
+	if ((y + 1) >= TheMap.Info.MapHeight || (TheMap.Fields[x + (y + 1) * TheMap.Info.MapWidth].
 			Flags & t) == t) {
 		tile |= 1 << 2;
 	}
-	if ((x - 1) < 0 || (TheMap.Fields[x - 1 + y * TheMap.Width].
+	if ((x - 1) < 0 || (TheMap.Fields[x - 1 + y * TheMap.Info.MapWidth].
 			Flags & t) == t) {
 		tile |= 1 << 3;
 	}
@@ -294,7 +294,7 @@ void MapRemoveWall(unsigned x, unsigned y)
 {
 	MapField* mf;
 
-	mf = TheMap.Fields + x + y * TheMap.Width;
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 	// FIXME: support more walls of different races.
 	mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
@@ -324,7 +324,7 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 {
 	MapField* mf;
 
-	mf = TheMap.Fields + x + y * TheMap.Width;
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 
 	// FIXME: support more walls of different races.
 	if (humanwall) {
@@ -363,12 +363,12 @@ void HitWall(unsigned x, unsigned y, unsigned damage)
 {
 	unsigned v;
 
-	v = TheMap.Fields[x + y * TheMap.Width].Value;
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Value;
 	if( v <= damage ) {
-		TheMap.Fields[x + y * TheMap.Width].Value = 0;
+		TheMap.Fields[x + y * TheMap.Info.MapWidth].Value = 0;
 		MapRemoveWall(x, y);
 	} else {
-		TheMap.Fields[x + y * TheMap.Width].Value = v - damage;
+		TheMap.Fields[x + y * TheMap.Info.MapWidth].Value = v - damage;
 		MapFixWallTile(x, y);
 	}
 }

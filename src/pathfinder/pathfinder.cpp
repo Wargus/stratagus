@@ -103,8 +103,8 @@ static void InitMatrix(unsigned char* matrix)
 	unsigned h;
 	unsigned e;
 
-	w = TheMap.Width + 2;
-	h = TheMap.Height;
+	w = TheMap.Info.MapWidth + 2;
+	h = TheMap.Info.MapHeight;
 
 	i = w + w + 1;
 	memset(matrix, 98, i);          // +1 for ships!
@@ -121,7 +121,7 @@ static void InitMatrix(unsigned char* matrix)
 #ifndef MAP_REGIONS
 static void InitLocalMatrix(void)
 {
-	memset(LocalMatrix, 0, TheMap.Width * TheMap.Height * sizeof(int)); // initialize matrix
+	memset(LocalMatrix, 0, TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(int)); // initialize matrix
 }
 #endif
 
@@ -141,7 +141,7 @@ unsigned char* MakeMatrix(void)
 {
 	unsigned char* matrix;
 
-	matrix = malloc((TheMap.Width + 2) * (TheMap.Height + 3) + 2);
+	matrix = malloc((TheMap.Info.MapWidth + 2) * (TheMap.Info.MapHeight + 3) + 2);
 	InitMatrix(matrix);
 
 	return matrix;
@@ -172,29 +172,29 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 	int filler;
 
 	if (range == 0 && gw == 0 && gh == 0) {
-		return matrix[gx + gy * TheMap.Width];
+		return matrix[gx + gy * TheMap.Info.MapWidth];
 	}
 
 	// Mark top, bottom, left, right
 
 	// Mark Top and Bottom of Goal
 	for (x = gx; x <= gx + gw; ++x) {
-		if (x >= 0 && x < TheMap.Width) {
-			if ( gy - range >= 0 && matrix[(gy - range) * TheMap.Width + x]) {
+		if (x >= 0 && x < TheMap.Info.MapWidth) {
+			if ( gy - range >= 0 && matrix[(gy - range) * TheMap.Info.MapWidth + x]) {
 				return 1;
 			}
-			if (gy + range + gh < TheMap.Height && matrix[(gy + range + gh) * TheMap.Width + x]) {
+			if (gy + range + gh < TheMap.Info.MapHeight && matrix[(gy + range + gh) * TheMap.Info.MapWidth + x]) {
 				return 1;
 			}
 		}
 	}
 
 	for (y = gy; y <= gy + gh; ++y) {
-		if (y >= 0 && y < TheMap.Height) {
-			if (gx - range >= 0 && matrix[y * TheMap.Width + gx - range]) {
+		if (y >= 0 && y < TheMap.Info.MapHeight) {
+			if (gx - range >= 0 && matrix[y * TheMap.Info.MapWidth + gx - range]) {
 				return 1;
 			}
-			if (gx + gw + range < TheMap.Width && matrix[y * TheMap.Width + gx + gw + range]) {
+			if (gx + gw + range < TheMap.Info.MapWidth && matrix[y * TheMap.Info.MapWidth + gx + gw + range]) {
 				return 1;
 			}
 		}
@@ -237,8 +237,8 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 					} else {
 						filler = -1;
 					}
-					if (cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad] + filler >= 0 &&
-						cy[quad] + filler < TheMap.Height && matrix[(cy[quad] + filler) * TheMap.Width + cx[quad]]) {
+					if (cx[quad] >= 0 && cx[quad] < TheMap.Info.MapWidth && cy[quad] + filler >= 0 &&
+						cy[quad] + filler < TheMap.Info.MapHeight && matrix[(cy[quad] + filler) * TheMap.Info.MapWidth + cx[quad]]) {
 						return 1;
 					}
 					++quad;
@@ -257,9 +257,9 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 			// Mark Actually Goal curve change
 			quad = 0;
 			while (quad < 4) {
-				if (cx[quad] >= 0 && cx[quad] < TheMap.Width && cy[quad] >= 0 &&
-					cy[quad] < TheMap.Height &&
-					matrix[cy[quad] * TheMap.Width + cx[quad]] ) {
+				if (cx[quad] >= 0 && cx[quad] < TheMap.Info.MapWidth && cy[quad] >= 0 &&
+					cy[quad] < TheMap.Info.MapHeight &&
+					matrix[cy[quad] * TheMap.Info.MapWidth + cx[quad]] ) {
 					return 1;
 				}
 				++quad;
@@ -303,9 +303,9 @@ static void FillMatrix(Unit* unit, unsigned int* matrix)
 	int size;
 	unsigned int* m;
 
-	size = 4 * (TheMap.Width + TheMap.Height) * sizeof(*points);
+	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight) * sizeof(*points);
 	points = malloc(size);
-	size = 4 * (TheMap.Width + TheMap.Height);
+	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight);
 
 	mask = UnitMovementMask(unit);
 	// Ignore all possible mobile units.
@@ -315,7 +315,7 @@ static void FillMatrix(Unit* unit, unsigned int* matrix)
 	points[0].Y = y = unit->Y;
 	points[0].depth = 1;
 	rp = 0;
-	matrix[x + y * TheMap.Width] = depth = 1;   // mark start point
+	matrix[x + y * TheMap.Info.MapWidth] = depth = 1;   // mark start point
 	ep = wp = 1;                                // start with one point
 	n = 2;
 
@@ -330,11 +330,11 @@ static void FillMatrix(Unit* unit, unsigned int* matrix)
 			for (j = 0; j < 8; ++j) {       // mark all neighbors
 				x = rx + Heading2X[j];
 				y = ry + Heading2Y[j];
-				if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+				if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
 					// Outside the map
 					continue;
 				}
-				m = matrix + x + y * TheMap.Width;
+				m = matrix + x + y * TheMap.Info.MapWidth;
 				if (*m) {
 					continue;
 				}
@@ -399,7 +399,7 @@ int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribu
 	//  Setup movement.
 	//
 	if (src->Type->MovementMask != mask || LastGameCycle != GameCycle
-		|| LocalMatrix[src->X + src->Y * TheMap.Width] == 0) {
+		|| LocalMatrix[src->X + src->Y * TheMap.Info.MapWidth] == 0) {
 		InitLocalMatrix();
 		FillMatrix(src, LocalMatrix);
 		LastGameCycle = GameCycle;

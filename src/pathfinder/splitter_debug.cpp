@@ -139,11 +139,11 @@ void MapSplitterDebug(void)
 	}
 
 	/* Output the map. */
-	StartXpm(f, TheMap.Width, 2 * TheMap.Height, (RegionMax > 4 ? 1 + RegionMax : 5));
+	StartXpm(f, TheMap.Info.MapWidth, 2 * TheMap.Info.MapHeight, (RegionMax > 4 ? 1 + RegionMax : 5));
 
-	for (y = 0; y < TheMap.Height; y++) {
+	for (y = 0; y < TheMap.Info.MapHeight; y++) {
 			fprintf(f, "  \"");
-		for (x = 0; x < TheMap.Width; x++) {
+		for (x = 0; x < TheMap.Info.MapWidth; x++) {
 			if (!TileMappable(x, y)) {
 				color = 0;
 			} else {
@@ -155,15 +155,15 @@ void MapSplitterDebug(void)
 			fprintf(f,"%04x",color);
 		}
 
-		fprintf(f, "\"%c\n", (y + 1 == TheMap.Height ? ' ':','));
+		fprintf(f, "\"%c\n", (y + 1 == TheMap.Info.MapHeight ? ' ':','));
 	}
 
 	RegionAssignColor();
 
 	/* Output the map regions */
-	for (y = 0; y < TheMap.Height; y++) {
+	for (y = 0; y < TheMap.Info.MapHeight; y++) {
 			fprintf(f, "  \"");
-		for (x = 0; x < TheMap.Width; x++) {
+		for (x = 0; x < TheMap.Info.MapWidth; x++) {
 			if (!TileMappable(x, y)) {
 				color = 0;
 			} else {
@@ -177,7 +177,7 @@ void MapSplitterDebug(void)
 			fprintf(f,"%04x",color);
 		}
 
-		fprintf(f, "\"%c\n", (y + 1 == TheMap.Height ? ' ':','));
+		fprintf(f, "\"%c\n", (y + 1 == TheMap.Info.MapHeight ? ' ':','));
 	}
 
 	fprintf(f,"}\n");
@@ -193,8 +193,8 @@ void MapSplitterDebug(void)
 		total += Regions[i].TileCount;
 	}
 
-	for (y = 0; y < TheMap.Height; y++) {
-		for (x = 0; x < TheMap.Width; x++) {
+	for (y = 0; y < TheMap.Info.MapHeight; y++) {
+		for (x = 0; x < TheMap.Info.MapWidth; x++) {
 			if (RegionMapping(x,y) == NoRegion) {
 				total++;
 			}
@@ -210,8 +210,8 @@ void MapSplitterDebug(void)
 		}
 	}
 
-	for (y = 0; y < TheMap.Height; y++) {
-		for (x = 0; x < TheMap.Width; x++) {
+	for (y = 0; y < TheMap.Info.MapHeight; y++) {
+		for (x = 0; x < TheMap.Info.MapWidth; x++) {
 			if (RegionMapping(x,y) == NoRegion) {
 				total++;
 			}
@@ -228,8 +228,8 @@ void RegionDebugWater(void)
 {
 	int x,y;
 	RegionId reg;
-	for (y = 0; y < TheMap.Width; y++) {
-			for (x = 0; x < TheMap.Width; x++) {
+	for (y = 0; y < TheMap.Info.MapWidth; y++) {
+			for (x = 0; x < TheMap.Info.MapWidth; x++) {
 			reg = RegionMapping(x,y);
 			if (!TileMappable(x,y)) {
 				Assert(reg == NoRegion);

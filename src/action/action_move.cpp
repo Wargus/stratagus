@@ -241,8 +241,8 @@ void HandleActionMove(Unit* unit)
 			//
 			// Some tries to reach the goal
 			//
-			if (unit->Orders[0].Range <= TheMap.Width ||
-					unit->Orders[0].Range <= TheMap.Height) {
+			if (unit->Orders[0].Range <= TheMap.Info.MapWidth ||
+					unit->Orders[0].Range <= TheMap.Info.MapHeight) {
 				unit->Orders[0].Range++;
 				break;
 			}
