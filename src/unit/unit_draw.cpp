@@ -1737,20 +1737,34 @@ local void DrawBuilding(Unit* unit)
     const UnitType* type;
     int frame;
     int visible;
+    int state;
+    int constructed;
 
     visible=UnitVisibleOnMap(unit);
     // FIXME: is this the correct place? No, but now correct working.
     if( visible ) {
 	frame = unit->SeenFrame = unit->Frame;
 	type = unit->SeenType = unit->Type;
-	unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
+	state = unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
 			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
-	unit->SeenConstructed = unit->Constructed;
+	constructed = unit->SeenConstructed = unit->Constructed;
 	
     } else {
 	frame = unit->SeenFrame;
 	type = unit->SeenType;
-	DebugCheck( frame==UnitNotSeen );
+	constructed = unit->SeenConstructed;
+	state = unit->SeenState;
+	if( !ReplayRevealMap ) {
+	    DebugCheck( frame==UnitNotSeen );
+	}
+    }
+    
+    if( ReplayRevealMap ) {
+	type = unit->Type;
+	frame = unit->Frame;
+	state = (unit->Orders[0].Action==UnitActionBuilded) |
+			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
+	constructed = unit->Constructed;
     }
     
     x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX;
@@ -1766,8 +1780,8 @@ local void DrawBuilding(Unit* unit)
     //
     //	Buildings under construction/upgrade/ready.
     //
-    if( unit->SeenState == 1 ) {
-	if( unit->SeenConstructed || VideoGraphicFrames(type->Sprite)<=1 ) {
+    if( state == 1 ) {
+	if( constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
 	    GraphicUnitPixels(unit,type->Construction->Sprite);
 	    DrawConstruction(type->Construction
 		,frame&127
@@ -1783,7 +1797,7 @@ local void DrawBuilding(Unit* unit)
     //
     //	Draw the future unit type, if upgrading to it.
     //
-    } else if( unit->SeenState == 2 ) {
+    } else if( state == 2 ) {
 	// FIXME: this frame is hardcoded!!!
 	GraphicUnitPixels(unit,unit->Orders[0].Type->Sprite);
 	DrawUnitType(unit->Orders[0].Type,frame<0?-1:1,x,y);
