@@ -1854,6 +1854,7 @@ local int CclAddTrigger(lua_State* l)
 
     if (lua_isnil(l, -1)) {
 	puts("Trigger not set, defining trigger");
+	lua_pop(l, 1);
 	lua_pushstring(l, "_triggers_");
 	lua_newtable(l);
 	lua_settable(l, LUA_GLOBALSINDEX);
