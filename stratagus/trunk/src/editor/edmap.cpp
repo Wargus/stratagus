@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name edmap.c	-	Editor map functions. */
+/**@name edmap.c - Editor map functions. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2002-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -46,46 +46,46 @@
 #include "player.h"
 
 /*----------------------------------------------------------------------------
---		Defines
+--  Defines
 ----------------------------------------------------------------------------*/
 
-#define TH_QUAD_M		0xFFFF0000		/// Top half quad mask
-#define BH_QUAD_M		0x0000FFFF		/// Bottom half quad mask
-#define LH_QUAD_M		0xFF00FF00		/// Left half quad mask
-#define RH_QUAD_M		0x00FF00FF		/// Right half quad mask
+#define TH_QUAD_M 0xFFFF0000 /// Top half quad mask
+#define BH_QUAD_M 0x0000FFFF /// Bottom half quad mask
+#define LH_QUAD_M 0xFF00FF00 /// Left half quad mask
+#define RH_QUAD_M 0x00FF00FF /// Right half quad mask
 
 	/// Callback for changed tile (with direction mask)
 local void EditorTileChanged2(int x, int y, int d);
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Get quad from tile.
+**  Get quad from tile.
 **
-**		A quad is a 32 bit value defining the content of the tile.
+**  A quad is a 32 bit value defining the content of the tile.
 **
-**		A tile is split into 4 parts, the basic tile type of this part
-**		is stored as 8bit value in the quad.
+**  A tile is split into 4 parts, the basic tile type of this part
+**    is stored as 8bit value in the quad.
 **
-**		ab
-**		cd -> abcd
+**  ab
+**  cd -> abcd
 **
-**		If the tile is 100% light grass the value is 0x5555.
-**		If the tile is 3/4 light grass and dark grass in upper left corner
-**		the value is 0x6555.
+**  If the tile is 100% light grass the value is 0x5555.
+**  If the tile is 3/4 light grass and dark grass in upper left corner
+**    the value is 0x6555.
 **
-**		@param x		X map tile position
-**		@param y		Y map tile position
+**  @param x  X map tile position
+**  @param y  Y map tile position
 **
-**		@return				the 'quad' of the tile.
+**  @return   the 'quad' of the tile.
 **
-**		@todo		Make a lookup table to speed up the things.
+**  @todo     Make a lookup table to speed up the things.
 */
 local unsigned QuadFromTile(int x, int y)
 {
@@ -95,7 +95,7 @@ local unsigned QuadFromTile(int x, int y)
 	unsigned mix;
 
 	//
-	//  find the abstact tile number
+	// find the abstact tile number
 	//
 	tile = TheMap.Fields[y * TheMap.Width + x].Tile;
 	for (i = 0; i < TheMap.Tileset->NumTiles; ++i) {
@@ -110,11 +110,11 @@ local unsigned QuadFromTile(int x, int y)
 
 	DebugLevel3Fn("Tile %d:%04x %d,%d\n" _C_ tile _C_ i _C_ quad _C_ mix);
 
-	if (!mix) {								// a solid tile
+	if (!mix) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
 	}
 	//
-	//  Mixed tiles, mix together
+	// Mixed tiles, mix together
 	//
 	switch ((i & 0x00F0) >> 4) {
 		case 0:
@@ -153,13 +153,13 @@ local unsigned QuadFromTile(int x, int y)
 }
 
 /**
-**		Find a tile path.
+**  Find a tile path.
 **
-**		@param base		Start tile type.
-**		@param goal		Goal tile type.
-**		@param length		Best found path length.
-**		@param marks		Already visited tile types.
-**		@param tile		Tile pointer.
+**  @param base    Start tile type.
+**  @param goal    Goal tile type.
+**  @param length  Best found path length.
+**  @param marks   Already visited tile types.
+**  @param tile    Tile pointer.
 */
 local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 {
@@ -171,7 +171,7 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 	DebugLevel0Fn("base %X goal %X\n" _C_ base _C_ goal);
 
 	//
-	//  Find any mixed tile
+	// Find any mixed tile
 	//
 	l = INT_MAX;
 	for (i = 0; i < TheMap.Tileset->NumTiles;) {
@@ -226,11 +226,11 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 }
 
 /**
-**		Get tile from quad.
+**  Get tile from quad.
 **
-**		@param fixed		Part can't be changed.
-**		@param quad		Quad of the tile type.
-**		@return				Best matching tile.
+**  @param fixed  Part can't be changed.
+**  @param quad   Quad of the tile type.
+**  @return       Best matching tile.
 */
 local int TileFromQuad(unsigned fixed, unsigned quad)
 {
@@ -239,13 +239,13 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	unsigned type2;
 	int base;
 	int direction;
-	//				 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
+	// 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
 	char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
 
 	DebugLevel3Fn("%x %x\n" _C_ fixed _C_ quad);
 
 	//
-	//  Get tile type from fixed.
+	// Get tile type from fixed.
 	//
 	while (!(type1 = (fixed & 0xFF))) {
 		fixed >>= 8;
@@ -258,17 +258,17 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 		fixed >>= 8;
 	}
 	//
-	//  Need an second type.
+	// Need an second type.
 	//
 	if (!type2 || type2 == type1) {
 		fixed = quad;
 		while ((type2 = (fixed & 0xFF)) == type1 && fixed) {
 			fixed >>= 8;
 		}
-		if (type1 == type2) {				// Oooh a solid tile.
+		if (type1 == type2) { // Oooh a solid tile.
 		  find_solid:
 			//
-			//  Find the solid tile
+			// Find the solid tile
 			//
 			for (i = 0; i < TheMap.Tileset->NumTiles;) {
 				if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
@@ -294,8 +294,8 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 		marks[type2] = type2;
 
 		//
-		//	  What fixed tile-type should replace the non useable tile-types.
-		//	  FIXME: write a loop.
+		// What fixed tile-type should replace the non useable tile-types.
+		// FIXME: write a loop.
 		//
 		fixed = (quad >> 0) & 0xFF;
 		if (fixed != type1 && fixed != type2) {
@@ -342,7 +342,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	DebugLevel3Fn("type1 %x type2 %x\n" _C_ type1 _C_ type2);
 
 	//
-	//  Need a mixed tile
+	// Need a mixed tile
 	//
 	for (i = 0; i < TheMap.Tileset->NumTiles;) {
 		if (type1 == TheMap.Tileset->Tiles[i].BaseTerrain &&
@@ -370,7 +370,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 
 		DebugLevel3Fn("No good mix found\n");
 		//
-		//	  Find the best tile path.
+		// Find the best tile path.
 		//
 		marks = alloca(TheMap.Tileset->NumTerrainTypes);
 		memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
@@ -410,13 +410,13 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 }
 
 /**
-**		Change tile from abstract tile-type.
+**  Change tile from abstract tile-type.
 **
-**		@param x		X map tile coordinate.
-**		@param y		Y map tile coordinate.
-**		@param tile		Abstract tile type to edit.
+**  @param x     X map tile coordinate.
+**  @param y     Y map tile coordinate.
+**  @param tile  Abstract tile type to edit.
 **
-**		@note  this is a rather dumb function, doesn't do any tile fixing.
+**  @note  this is a rather dumb function, doesn't do any tile fixing.
 */
 global void ChangeTile(int x, int y, int tile)
 {
@@ -429,18 +429,18 @@ global void ChangeTile(int x, int y, int tile)
 	mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
 }
 
-#define DIR_UP				8		/// Go up allowed
-#define DIR_DOWN		4		/// Go down allowed
-#define DIR_LEFT		2		/// Go left allowed
-#define DIR_RIGHT		1		/// Go right allowed
+#define DIR_UP     8 /// Go up allowed
+#define DIR_DOWN   4 /// Go down allowed
+#define DIR_LEFT   2 /// Go left allowed
+#define DIR_RIGHT  1 /// Go right allowed
 
 /**
-**		Editor change tile.
+**  Editor change tile.
 **
-**		@param x		X map tile coordinate.
-**		@param y		Y map tile coordinate.
-**		@param tile		Tile type to edit.
-**		@param d		Fix direction flag 8 up, 4 down, 2 left, 1 right.
+**  @param x     X map tile coordinate.
+**  @param y     Y map tile coordinate.
+**  @param tile  Tile type to edit.
+**  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
 local void EditorChangeTile(int x, int y, int tile, int d)
 {
@@ -451,7 +451,7 @@ local void EditorChangeTile(int x, int y, int tile, int d)
 	ChangeTile(x, y, tile);
 
 	//
-	//  Change the flags
+	// Change the flags
 	//
 	mf = &TheMap.Fields[y * TheMap.Width + x];
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
@@ -467,11 +467,11 @@ local void EditorChangeTile(int x, int y, int tile, int d)
 }
 
 /**
-**		Update surroundings for tile changes.
+**  Update surroundings for tile changes.
 **
-**		@param x		Map X tile position of change.
-**		@param y		Map Y tile position of change.
-**		@param d		Fix direction flag 8 up, 4 down, 2 left, 1 right.
+**  @param x  Map X tile position of change.
+**  @param y  Map Y tile position of change.
+**  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
 local void EditorTileChanged2(int x, int y, int d)
 {
@@ -486,11 +486,11 @@ local void EditorTileChanged2(int x, int y, int d)
 		TheMap.Fields[y * TheMap.Width + x].Tile);
 
 	//
-	//  Change the surrounding
+	// Change the surrounding
 	//
 
 	//
-	//		Special case 1) Walls.
+	// Special case 1) Walls.
 	//
 	mf = &TheMap.Fields[y * TheMap.Width + x];
 	if (mf->Flags & MapFieldWall) {
@@ -508,19 +508,19 @@ local void EditorTileChanged2(int x, int y, int d)
 	}
 
 	//
-	// 		How this works:
-	// 		first get the quad of the neighbouring tile, then
-	// 		check if the margin matches. otherwise, call
-	// 		EditorChangeTile again.
+	// How this works:
+	//  first get the quad of the neighbouring tile, then
+	//  check if the margin matches. otherwise, call
+	//  EditorChangeTile again.
 	//
 	if (d & DIR_UP && y) {
 		//
-		//	  Insert into the bottom the new tile.
+		// Insert into the bottom the new tile.
 		//
 		q2 = QuadFromTile(x, y - 1);
 		u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("U+	%08x -> %08x\n" _C_ q2 _C_ u);
+			DebugLevel3Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & BH_QUAD_M, u);
 			DebugLevel3Fn("= %08x\n" _C_ tile);
 			EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
@@ -528,36 +528,36 @@ local void EditorTileChanged2(int x, int y, int d)
 	}
 	if (d & DIR_DOWN && y < TheMap.Height - 1) {
 		//
-		//	  Insert into the top the new tile.
+		// Insert into the top the new tile.
 		//
 		q2 = QuadFromTile(x, y + 1);
 		u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("D+	%08x -> %08x\n" _C_ q2 _C_ u);
+			DebugLevel3Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & TH_QUAD_M, u);
 			EditorChangeTile(x, y + 1, tile, d&~DIR_UP);
 		}
 	}
 	if (d & DIR_LEFT && x) {
 		//
-		//	  Insert into the left the new tile.
+		// Insert into the left the new tile.
 		//
 		q2 = QuadFromTile(x - 1, y);
 		u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("L+	%08x -> %08x\n" _C_ q2 _C_ u);
+			DebugLevel3Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & RH_QUAD_M, u);
 			EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
 		}
 	}
 	if (d & DIR_RIGHT && x < TheMap.Width - 1) {
 		//
-		//	  Insert into the right the new tile.
+		// Insert into the right the new tile.
 		//
 		q2 = QuadFromTile(x + 1, y);
 		u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("R+	%08x -> %08x\n" _C_ q2 _C_ u);
+			DebugLevel3Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & LH_QUAD_M, u);
 			EditorChangeTile(x + 1, y, tile, d&~DIR_LEFT);
 		}
@@ -565,10 +565,10 @@ local void EditorTileChanged2(int x, int y, int d)
 }
 
 /**
-**		Update surroundings for tile changes.
+**  Update surroundings for tile changes.
 **
-**		@param x		Map X tile position of change.
-**		@param y		Map Y tile position of change.
+**  @param x  Map X tile position of change.
+**  @param y  Map Y tile position of change.
 */
 global void EditorTileChanged(int x, int y)
 {
@@ -576,20 +576,20 @@ global void EditorTileChanged(int x, int y)
 }
 
 /**
-**		Make random map
-**	  FIXME: vladi: we should have parameters control here...
+**  Make random map
+**  FIXME: vladi: we should have parameters control here...
 */
 
 /**
-**		TileFill
+**  TileFill
 **
-**		@param x		X map tile coordinate for area center.
-**		@param y		Y map tile coordinate for area center.
-**		@param tile		Tile type to edit.
-**		@param size		Size of surrounding rectangle.
+**  @param x     X map tile coordinate for area center.
+**  @param y     Y map tile coordinate for area center.
+**  @param tile  Tile type to edit.
+**  @param size  Size of surrounding rectangle.
 **
-**	  TileFill(centerx, centery, tile_type_water, map_width)
-**	  will fill map with water...
+**  TileFill(centerx, centery, tile_type_water, map_width)
+**  will fill map with water...
 */
 local void TileFill(int x, int y, int tile, int size)
 {
@@ -624,14 +624,18 @@ local void TileFill(int x, int y, int tile, int size)
 	}
 }
 
-#define WATER_TILE	  0x10
-#define COAST_TILE	  0x30
-#define GRASS_TILE	  0x50
-#define WOOD_TILE	   0x70
-#define ROCK_TILE	   0x80
+#define WATER_TILE  0x10
+#define COAST_TILE  0x30
+#define GRASS_TILE  0x50
+#define WOOD_TILE   0x70
+#define ROCK_TILE   0x80
 
 /**
-**		FIXME: docu
+**  FIXME: docu
+**
+**  @param tile      FIXME: docu
+**  @param count     FIXME: docu
+**  @param max_size  FIXME: docu
 */
 local void EditorRandomizeTile(int tile, int count, int max_size)
 {
@@ -658,9 +662,13 @@ local void EditorRandomizeTile(int tile, int count, int max_size)
 }
 
 /**
-**		FIXME: docu
+**  FIXME: docu
+**
+**  @param unit_type  FIXME: docu
+**  @param count      FIXME: docu
+**  @param value      FIXME: docu
 */
-local void EditorRandomizeUnit(const char *unit_type, int count, int value)
+local void EditorRandomizeUnit(const char* unit_type, int count, int value)
 {
 	int mx;
 	int my;
@@ -706,7 +714,7 @@ local void EditorRandomizeUnit(const char *unit_type, int count, int value)
 }
 
 /**
-**		Destroy all units
+**  Destroy all units
 */
 local void EditorDestroyAllUnits(void)
 {
@@ -722,7 +730,7 @@ local void EditorDestroyAllUnits(void)
 }
 
 /**
-**		Create a random map
+**  Create a random map
 */
 global void EditorCreateRandomMap(void)
 {
