@@ -30,7 +30,7 @@
 //@{
 
 // ============================================================================
-#ifdef SDL	// {
+#ifdef USE_SDL	// {
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -55,24 +55,72 @@
 /**
 **	Access a 16 bit value in little endian and return it in native format.
 */
+#ifdef __ULTRA_SPARC__
+
+extern unsigned short inline AccessLE16(unsigned char *p) {
+        return p[0] + (p[1] << 8);
+}
+
+#else
+
 #define	AccessLE16(p)	SDL_SwapLE16(*((unsigned short*)(p)))
+
+#endif
 
 /**
 **	Access a 32 bit value in little endian and return it in native format.
 */
+#ifdef __ULTRA_SPARC__
+
+extern unsigned inline AccessLE32(unsigned char *p) {
+    return  p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
+}
+
+#else
+
 #define	AccessLE32(p)	SDL_SwapLE32(*((unsigned int*)(p)))
+
+#endif
 
 /**
 **	Fetch a 16 bit value in little endian with incrementing pointer
 **	and return it in native format.
 */
+#ifdef __ULTRA_SPARC__
+
+extern unsigned short inline _FetchLE16(unsigned char **pp) {
+    unsigned char *p = *pp;
+    unsigned short i = p[0] + (p[1] << 8);
+    (*pp) += 2;
+    return i;
+}
+#define FetchLE16(p)    _FetchLE16(&p)
+
+#else
+
 #define	FetchLE16(p)	SDL_SwapLE16(*((unsigned short*)(p))++)
+
+#endif
 
 /**
 **	Fetch a 32 bit value in little endian with incrementing pointer
 **	and return it in native format.
 */
+#ifdef __ULTRA_SPARC__
+
+extern unsigned inline _FetchLE32(unsigned char **pp) {
+    unsigned char *p = *pp;
+    unsigned int i = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] <<24);
+    (*pp) += 4;
+    return i;
+}
+#define FetchLE32(p)    _FetchLE32(&p)
+
+#else
+
 #define	FetchLE32(p)	SDL_SwapLE32(*((unsigned int*)(p))++)
+
+#endif
 
 // ============================================================================
 #else		// }{ SDL
