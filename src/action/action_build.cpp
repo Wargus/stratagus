@@ -77,10 +77,13 @@ global void HandleActionBuild(Unit* unit)
 	    //
 	    if( unit->SubAction++<10 ) {
 		//	To keep the load low, retry each 1/4 second.
+		// NOTE: we can already inform the AI about this problem?
 		unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
 		return;
 	    }
+
 	    // FIXME: use general notify/messages
+	    // NotifyPlayer("",unit,type);
 	    if( unit->Player==ThisPlayer ) {
 		SetMessage("You cannot reach building place.");
 	    } else if( unit->Player->Ai ) {
@@ -92,7 +95,6 @@ global void HandleActionBuild(Unit* unit)
 	    if( unit->Selected ) {	// update display for new action
 		UpdateButtonPanel();
 	    }
-
 	    return;
 
 	case PF_REACHED:
@@ -122,11 +124,13 @@ global void HandleActionBuild(Unit* unit)
 	//
 	if( unit->SubAction++<10 ) {
 	    //	To keep the load low, retry each 1/4 second.
+	    // NOTE: we can already inform the AI about this problem?
 	    unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
 	    return;
 	}
 
 	// FIXME: use general notify/messages
+	// NotifyPlayer("",unit,type);
         if( unit->Player==ThisPlayer ) {
 	    SetMessage("You cannot build %s here.", type->Name);
 	} else if( unit->Player->Ai ) {
@@ -147,6 +151,7 @@ global void HandleActionBuild(Unit* unit)
     //
     if( PlayerCheckUnitType(unit->Player,type) ) {
 	// FIXME: use general notify/messages
+	// NotifyPlayer("",unit,type);
         if( unit->Player==ThisPlayer ) {
 	    SetMessage("Not enough resources to build %s.", type->Name);
 	} else if( unit->Player->Ai ) {
@@ -189,18 +194,18 @@ global void HandleActionBuild(Unit* unit)
     build->Wait=FRAMES_PER_SECOND/6;
 
     //
-    //	Building oil-platform, must remove oilpatch.
+    //	Building oil-platform, must remove oil-patch.
     //
     if( type->GivesOil ) {
         DebugLevel0Fn("Remove oil-patch\n");
 	temp=OilPatchOnMap(x,y);
 	DebugCheck( !temp );
-	unit->Value=temp->Value;	// Let peon hold value while building
-	// oil patch should NOT make sound, handled by destroy unit
+	unit->Value=temp->Value;	// Let worker hold value while building
+	// oil patch should NOT make sound, handled by let unit die
 	LetUnitDie(temp);		// Destroy oil patch
     }
 
-    RemoveUnit(unit);	/* automaticly: CheckUnitToBeDrawn(unit) */
+    RemoveUnit(unit);	// automaticly: CheckUnitToBeDrawn(unit)
 
     unit->X=x;
     unit->Y=y;
@@ -218,7 +223,7 @@ global void HandleActionBuild(Unit* unit)
 */
 global void HandleActionBuilded(Unit* unit)
 {
-    Unit* peon;
+    Unit* worker;
     UnitType* type;
 
     type=unit->Type;
@@ -228,14 +233,14 @@ global void HandleActionBuilded(Unit* unit)
     //
     if( unit->Data.Builded.Cancel ) {
 	// Drop out unit
-	peon=unit->Data.Builded.Worker;
-	peon->Orders[0].Action=UnitActionStill;
+	worker=unit->Data.Builded.Worker;
+	worker->Orders[0].Action=UnitActionStill;
 	unit->Data.Builded.Worker=NoUnitP;
-	peon->Reset=peon->Wait=1;
-	peon->SubAction=0;
+	worker->Reset=worker->Wait=1;
+	worker->SubAction=0;
 
-	unit->Value=peon->Value;	// peon holding value while building
-	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
+	unit->Value=worker->Value;	// worker holding value while building
+	DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
 
 	// Player gets back 75% of the original cost for a building.
 	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
@@ -245,8 +250,9 @@ global void HandleActionBuilded(Unit* unit)
 	return;
     }
 
-    // FIXME: if attacked subtract hit points!!
-
+    //
+    //	Fixed point HP calculation
+    //
     unit->Data.Builded.Val-=unit->Data.Builded.Sub;
     if( unit->Data.Builded.Val<0 ) {
 	unit->Data.Builded.Val+=unit->Stats->HitPoints;
@@ -257,7 +263,7 @@ global void HandleActionBuilded(Unit* unit)
     unit->Data.Builded.Sum+=unit->Data.Builded.Add;
 
     //
-    //	Check if building ready.
+    //	Check if building ready. Note we can build and repair.
     //
     if( unit->Data.Builded.Sum>=unit->Stats->HitPoints
 		|| unit->HP>=unit->Stats->HitPoints ) {
@@ -271,29 +277,37 @@ global void HandleActionBuilded(Unit* unit)
 	unit->Frame=0;
 	unit->Reset=unit->Wait=1;
 
-	peon=unit->Data.Builded.Worker;
-	peon->Orders[0].Action=UnitActionStill;
-	peon->SubAction=0;
-	peon->Reset=peon->Wait=1;
-	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
+	worker=unit->Data.Builded.Worker;
+	worker->Orders[0].Action=UnitActionStill;
+	worker->SubAction=0;
+	worker->Reset=worker->Wait=1;
+	DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
 
 	//
 	//	Building oil-platform, must update oil.
 	//
 	if( type->GivesOil ) {
-	    CommandHaulOil(peon,unit,0);	// Let the unit haul oil
+	    CommandHaulOil(worker,unit,0);	// Let the unit haul oil
 	    DebugLevel0Fn("Update oil-platform\n");
 	    DebugLevel0Fn(" =%d\n",unit->Data.Resource.Active);
 	    unit->Data.Resource.Active=0;
-	    unit->Value=peon->Value;	// peon was holding value while building
+	    unit->Value=worker->Value;	// worker holding value while building
+	}
+	//
+	//	Building lumber mill, let worker automatic chopping wood.
+	//
+	if( type->StoresWood ) {
+	    CommandHarvest(worker,unit->X+unit->Type->TileWidth/2,
+		    unit->Y+unit->Type->TileHeight/2,0);
 	}
 
 	// FIXME: General message system
+	// NotifyPlayer("",unit,type);
 	if( unit->Player==ThisPlayer ) {
 	    SetMessage2( unit->X, unit->Y, "New %s done", type->Name );
-	    PlayUnitSound(peon,VoiceWorkCompleted);
+	    PlayUnitSound(worker,VoiceWorkCompleted);
 	} else if( unit->Player->Ai ) {
-	    AiWorkComplete(peon,unit);
+	    AiWorkComplete(worker,unit);
 	}
 
 	// FIXME: Vladi: this is just a hack to test wall fixing,
