@@ -60,6 +60,19 @@ local long SiodUnitTypeTag;		/// siod unit-type object
 /**
 **	Parse unit-type.
 **
+**	@note FIXME: This should be the new format parser.
+**	@note Should write a general parser for this.
+**
+**	@param list	List describing the unit-type.
+*/
+local SCM CclDefineNewUnitType(SCM list __attribute__((unused)))
+{
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Parse unit-type.
+**
 **	@note FIXME: This should be changed to a more readable and useable
 **	format. I thinking of an tagged format 'size and this should be
 **	parsed by a general parser.
@@ -1014,6 +1027,7 @@ local SCM CclDefineAnimations(SCM list)
 global void UnitTypeCclRegister(void)
 {
     gh_new_procedureN("define-unit-type",CclDefineUnitType);
+    gh_new_procedureN("define-new-unit-type",CclDefineNewUnitType);
     gh_new_procedureN("define-unit-stats",CclDefineUnitStats);
 
     SiodUnitTypeTag=allocate_user_tc();
