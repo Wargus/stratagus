@@ -771,7 +771,7 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 	DebugCheck(dir < -missile->Type->NumDirections + 1);
 	missile->SpriteFrame = dir;
 	if (missile->SpriteFrame < 0) {
-		missile->SpriteFrame = -missile->SpriteFrame - 1;
+		missile->SpriteFrame--;
 	}
 }
 
