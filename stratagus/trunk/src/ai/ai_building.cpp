@@ -156,7 +156,7 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 	struct {
 		unsigned short X;
 		unsigned short Y;
-	}	 *points;
+	} *points;
 	int size;
 	int x;
 	int y;
@@ -432,7 +432,7 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 		//
 		// Continue with next frame.
 		//
-		if (rp == wp) {	// unreachable, no more points available
+		if (rp == wp) { // unreachable, no more points available
 			break;
 		}
 		ep = wp;
