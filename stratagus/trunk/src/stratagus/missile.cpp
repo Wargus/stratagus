@@ -851,12 +851,16 @@ local int MissileInitMove(Missile* missile)
 */
 local int PointToPointMissile(Missile* missile)
 {
+    int xstep;
+    int ystep;
+    int x;
+    int y;
+
     DebugCheck(missile == NULL);
     if (MissileInitMove(missile) == 1) {
         return 1;
     }
-    int xstep;
-    int ystep;
+
 //    int zstep;
     DebugCheck(missile->Type == NULL);
     DebugCheck(missile->TotalStep == 0);
@@ -865,8 +869,6 @@ local int PointToPointMissile(Missile* missile)
     missile->X = missile->SourceX + xstep * missile->CurrentStep / 1024;
     missile->Y = missile->SourceY + ystep * missile->CurrentStep / 1024;
     if (missile->Type->SmokeMissile && missile->CurrentStep) {
-        int x;
-        int y;
 
         x = missile->X + missile->Type->Width / 2;
         y = missile->Y + missile->Type->Height / 2;
