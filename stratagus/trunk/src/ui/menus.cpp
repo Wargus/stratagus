@@ -1478,7 +1478,19 @@ global void LoadGameMenu(void)
 */
 local void GameMenuInit(Menuitem *mi __attribute__((unused)))
 {
-    // FIXME: populate...
+    // Disable save menu in multiplayer and replays
+    if (NetworkFildes != -1 || ReplayGameType != ReplayNone) {
+	mi->menu->items[1].flags |= MenuButtonDisabled;
+    } else {
+	mi->menu->items[1].flags &= ~MenuButtonDisabled;
+    }
+
+    // Disable load menu in multiplayer
+    if (NetworkFildes != -1) {
+	mi->menu->items[2].flags |= MenuButtonDisabled;
+    } else {
+	mi->menu->items[2].flags &= ~MenuButtonDisabled;
+    }
 }
 
 /**
