@@ -74,7 +74,11 @@
 ----------------------------------------------------------------------------*/
 
 #if !defined(__CYGWIN__) && !defined(__MINGW32__)
+#if defined(__FreeBSD__)
+#include <sys/types.h>
+#else
 #include <endian.h>
+#endif /* __FreeBSD__ */
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 #include <byteswap.h>
 #endif
