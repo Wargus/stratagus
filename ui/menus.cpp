@@ -79,6 +79,7 @@ local void GameMenuLoad(void);
 local void GameMenuEnd(void);
 local void GameMenuExit(void);
 local void GameMenuReturn(void);
+local void GameGlobalOptionsMenu(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
@@ -358,7 +359,7 @@ local unsigned char *ssmsoptions[] = {
 
 local char ScenSelectDisplayPath[1024];
 local char ScenSelectFileName[128];
-local int GuiGameStarted = 0;
+local int GuiGameStarted;
 local char ScenSelectPath[1024];
 
 global char ScenSelectFullPath[1024];
@@ -401,24 +402,33 @@ local Menuitem ScenSelectMenuItems[] = {
 };
 
 /**
-**	Items for the Prg Start Menu
+**	Items for the Program Start Menu
 */
 local Menuitem PrgStartMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
 	{ drawfunc:{ NameLineDrawFunc } } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 0, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 1, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 2, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Campaign Game", 224, 27, MBUTTON_GM_FULL, CampaignGameMenu, 'c'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 3, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Load Game", 224, 27, MBUTTON_GM_FULL, GameMenuLoad, 'l'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 4, 0, LargeFont, NULL, NULL,
-	{ button:{ "S~!how Credits", 224, 27, MBUTTON_GM_FULL, GameShowCredits, 'h'} } },
-    { MI_TYPE_BUTTON, 208, 212 + 36 * 5, 0, LargeFont, NULL, NULL,
-	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 0, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Single Player Game", 224, 27,
+	    MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 1, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Multi Player Game", 224, 27,
+	    MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 2, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Campaign Game", 224, 27,
+	    MBUTTON_GM_FULL, CampaignGameMenu, 'c'} } },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 3, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "~!Load Game", 224, 27,
+	    MBUTTON_GM_FULL, GameMenuLoad, 'l'} } },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "~!Options", 224, 27,
+	    MBUTTON_GM_FULL, GameGlobalOptionsMenu, 'o'} } },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 5, 0, LargeFont, NULL, NULL,
+	{ button:{ "S~!how Credits", 224, 27,
+	    MBUTTON_GM_FULL, GameShowCredits, 'h'} } },
+    { MI_TYPE_BUTTON, 208, 180 + 36 * 6, 0, LargeFont, NULL, NULL,
+	{ button:{ "E~!xit Program", 224, 27,
+	    MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
 #else
     { 0 }
 #endif
@@ -985,7 +995,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	1, 7,
+	1, 8,
 	PrgStartMenuItems,
 	NULL,
     },
@@ -1695,9 +1705,11 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Start menu master init.
+**
+**	@param mi	The menu.
 */
-local void PrgStartInit(Menuitem *mi)	// Start menu master init
+local void PrgStartInit(Menuitem *mi)
 {
 #ifdef NEW_NETMENUS
     if (NetworkNumInterfaces == 0) {
@@ -1708,7 +1720,6 @@ local void PrgStartInit(Menuitem *mi)	// Start menu master init
 #else
     mi[2].flags = MenuButtonDisabled;
 #endif
-    mi[4].flags = MenuButtonDisabled;
 }
 
 local void GameMenuReturn(void)
@@ -1885,9 +1896,20 @@ global void Preferences(void)
     ProcessMenu(MENU_PREFERENCES, 1);
 }
 
+/**
+**	Show the game options.
+*/
 local void GameOptions(void)
 {
     ProcessMenu(MENU_GAME_OPTIONS, 1);
+}
+
+/**
+**	Show the global options.
+*/
+local void GameGlobalOptionsMenu(void)
+{
+    // FIXME: write me
 }
 
 /**
