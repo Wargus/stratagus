@@ -254,9 +254,8 @@ local int CclSaveGame(lua_State* l)
 		if (!strcmp(value, "SaveFile")) {
 			value = LuaToString(l, -1);
 			strcpy(CurrentMapPath, value);
-			if (strcasestr(value, ".pud")) {
-				//LoadPud(LibraryFileName(value, buf), &TheMap);
-			} else {
+			// If .pud, we don't need to load anything from it
+			if (!strcasestr(value, ".pud")) {
 				LibraryFileName(value, buf);
 				if (LuaLoadFile(buf) == -1) {
 					DebugLevel0Fn("Load failed: %s" _C_ value);
