@@ -509,13 +509,15 @@ start the script from. FE: Corpse = {"unit-dead-body", 0}
 <dd>Sets unit to explode when killed, syntax is followed by the missile to use.
 eg. ExplodeWhenKilled "missile-explosion"
 </dd>
-<dt>Transporter = boolean</dt>
-<dd>Unit is a transporter, you can place units inside. Note: you really should add
-an unload button for transporters.
-</dd>
 <dt>AttackFromTransporter = boolean</dt>
 <dd>Gives units with range the ability to attack from within a transporter such as a building.
 These can act like amoured personnel carriers or bunkers
+</dd>
+<dt>CanTransport = {flag, "true" or "only" or "false", ...}</dt>
+<dd>Unit is a transporter, you can place units with good flag inside.
+<br>Note: If you want the unit to be able to transport all land unit, use CanTransport = {}.
+<br>Note: you really should add an unload button for transporters.
+<br>Note: flag must be defined before with <a href="#define-bool-flags">DefineBoolFlags()</a>
 </dd>
 <dt>MaxOnBoard = number</dt>
 <dd>This is only used for transporters, It's the maximum allowed on board. Curently
