@@ -84,6 +84,7 @@ global int HandleActionDie(Unit* unit)
 	    }
 	);
 	unit->Orders[0].Action=UnitActionDie;
+	--unit->OrderCount;
 #else
 	unit->Command.Action=UnitActionDie;
 	if( unit->NextCount ) {
