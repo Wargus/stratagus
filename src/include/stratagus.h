@@ -183,11 +183,6 @@
 #ifdef DEBUG	// {
 
     /**
-    **	Include code only if debugging.
-    */
-#define IfDebug(code)	code
-
-    /**
     **	Debug check condition. If cond is true abort with file,line.
     */
 #define DebugCheck(cond)	do{ if( cond ) { \
@@ -244,7 +239,6 @@
 
 #else	// }{ DEBUG
 
-#define IfDebug(code)		/* disabled */
 #define DebugCheck(cond)	/* disabled */
 
 #define DebugLevel0(args)	/* disabled */

@@ -262,8 +262,9 @@ local int AiBuildBuilding(const UnitType * type, UnitType * building)
 
     DebugLevel3Fn("%s can made %s\n" _C_ type->Ident _C_ building->Ident);
 
-    IfDebug(unit = NoUnitP;
-	);
+#ifdef DEBUG
+    unit = NoUnitP;
+#endif
     //
     //  Remove all workers on the way building something
     //
@@ -375,8 +376,10 @@ local int AiTrainUnit(const UnitType * type, UnitType * what)
 
     DebugLevel3Fn("%s can made %s\n" _C_ type->Ident _C_ what->Ident);
 
-    IfDebug(unit = NoUnitP;
-	);
+#ifdef DEBUG
+    unit = NoUnitP;
+#endif
+
     //
     //  Remove all units already doing something.
     //
@@ -531,9 +534,9 @@ local int AiResearchUpgrade(const UnitType * type, Upgrade * what)
 
     DebugLevel3Fn("%s can research %s\n" _C_ type->Ident _C_ what->Ident);
 
-    IfDebug(unit = NoUnitP;
-	);
-    //
+#ifdef DEBUG
+    unit = NoUnitP;
+#endif
     //  Remove all units already doing something.
     //
     nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
@@ -626,9 +629,9 @@ local int AiUpgradeTo(const UnitType * type, UnitType * what)
 
     DebugLevel3Fn("%s can upgrade-to %s\n" _C_ type->Ident _C_ what->Ident);
 
-    IfDebug(unit = NoUnitP;
-	);
-    //
+#ifdef DEBUG
+    unit = NoUnitP;
+#endif
     //  Remove all units already doing something.
     //
     nunits = FindPlayerUnitsByType(AiPlayer->Player, type, table);
@@ -1053,8 +1056,9 @@ local int AiRepairBuilding(const UnitType * type, Unit * building)
 
     DebugLevel3Fn("%s can repair %s\n" _C_ type->Ident _C_ building->Type->Ident);
 
-    IfDebug(unit = NoUnitP;
-	);
+#ifdef DEBUG
+    unit = NoUnitP;
+#endif
     //
     //  Remove all workers not mining. on the way building something
     //  FIXME: It is not clever to use workers with gold
