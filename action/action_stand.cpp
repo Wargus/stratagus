@@ -1,16 +1,16 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_stand.c	-	The stand ground action. */
+/**@name action_stand.c - The stand ground action. */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//      (c) Copyright 2000-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -41,17 +41,17 @@
 #include "actions.h"
 
 /*----------------------------------------------------------------------------
---	Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Unit stands ground!
+**  Unit stands ground!
 **
-**	@param unit	Action handled for this unit pointer.
+**  @param unit  Action handled for this unit pointer.
 */
 global void HandleActionStandGround(Unit* unit)
 {
-    ActionStillGeneric(unit, 1);
+	ActionStillGeneric(unit, 1);
 }
 
 //@}
