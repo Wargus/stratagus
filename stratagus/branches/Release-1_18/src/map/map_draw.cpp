@@ -1736,13 +1736,15 @@ local void mapdeco_draw(void *dummy_data)
 #endif
 
 /**
-**	Initialise the fog of war.
+**	Initialize the fog of war.
 **	Build tables, setup functions.
 **
 **	@see VideoBpp
 */
 void InitMap(void)
 {
+    MapColorCycle();
+
 #ifdef USE_OPENGL
     MapDrawTile=MapDrawTileOpenGL;
 #else
