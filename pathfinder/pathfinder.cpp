@@ -129,21 +129,21 @@ local void MarkPlaceInMatrix(int x,int y,int w,int h,unsigned char* matrix)
     int mw;
 
     if( x<0 ) {				// reduce to map limits
-	w=x;
+	w-=x;
 	x=0;
     }
     if( x+w>TheMap.Width ) {
 	w=TheMap.Width-x;
     }
     if( y<0 ) {
-	w=y;
+	h-=y;
 	y=0;
     }
     if( y+h>TheMap.Height ) {
 	h=TheMap.Height-y;
     }
 
-    DebugCheck( h==0 || w==0 );
+    DebugCheck( h==0 || w==0 );		// atleast one tile should be there!
 
     mw=TheMap.Width+2;
     matrix+=mw+mw+2;
