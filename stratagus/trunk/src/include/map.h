@@ -521,7 +521,6 @@ extern void MapSetWall(unsigned x, unsigned y, int humanwall);
 	MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
 			(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileSight); \
 	if (unit->Type->DetectCloak) { \
-		DebugLevel0Fn("P%d Mark detect cloak at %d, %d\n" _C_ (unit)->Player->Player _C_ (unit)->X _C_ (unit)->Y);\
 		MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
 				(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileDetectCloak); \
 	}\
@@ -532,7 +531,6 @@ extern void MapSetWall(unsigned x, unsigned y, int humanwall);
 	MapSight((unit)->Player,(unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
 			(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight); \
 	if (unit->Type->DetectCloak) { \
-		DebugLevel0Fn("P%d Unmark detect cloak at %d, %d\n" _C_ (unit)->Player->Player _C_ (unit)->X _C_ (unit)->Y);\
 		MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
 				(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapUnmarkTileDetectCloak); \
 	}\
