@@ -779,61 +779,64 @@ global void CclInit(void)
     //	Make some sombols for the compile options/features.
     //
 #ifdef USE_CCL
-    gh_symbol2scm("freecraft-feature-use-ccl");
+    gh_define("freecraft-feature-use-ccl",SCM_BOOL_T);
 #endif
 #ifdef USE_SDL
-    gh_symbol2scm("freecraft-feature-use-sdl");
+    gh_define("freecraft-feature-use-sdl",SCM_BOOL_T);
 #endif
 #ifdef USE_ONLYCCL
-    gh_symbol2scm("freecraft-feature-only-ccl");
+    gh_define("freecraft-feature-only-ccl",SCM_BOOL_T);
 #endif
 #ifdef USE_THREAD
-    gh_symbol2scm("freecraft-feature-thread");
+    gh_define("freecraft-feature-thread",SCM_BOOL_T);
 #endif
 #ifdef DEBUG
-    gh_symbol2scm("freecraft-feature-debug");
+    gh_define("freecraft-feature-debug",SCM_BOOL_T);
 #endif
 #ifdef USE_ZLIB
-    gh_symbol2scm("freecraft-feature-zlib");
+    gh_define("freecraft-feature-zlib",SCM_BOOL_T);
 #endif
 #ifdef USE_BZ2LIB
-    gh_symbol2scm("freecraft-feature-bz2lib");
+    gh_define("freecraft-feature-bz2lib",SCM_BOOL_T);
 #endif
 #ifdef USE_SDL
-    gh_symbol2scm("freecraft-feature-sdl");
+    gh_define("freecraft-feature-sdl",SCM_BOOL_T);
 #endif
 #ifdef USE_SDLA
-    gh_symbol2scm("freecraft-feature-sdla");
+    gh_define("freecraft-feature-sdl-audio",SCM_BOOL_T);
 #endif
 #ifdef USE_X11
-    gh_symbol2scm("freecraft-feature-x11");
+    gh_define("freecraft-feature-x11",SCM_BOOL_T);
+#endif
+#ifdef USE_SVGALIB
+    gh_define("freecraft-feature-svgalib",SCM_BOOL_T);
 #endif
 #ifdef WITH_SOUND
-    gh_symbol2scm("freecraft-feature-with-sound");
+    gh_define("freecraft-feature-with-sound",SCM_BOOL_T);
 #endif
 #ifdef UNIT_ON_MAP
-    gh_symbol2scm("freecraft-feature-unit-on-map");
+    gh_define("freecraft-feature-unit-on-map",SCM_BOOL_T);
 #endif
 #ifdef NEW_MAPDRAW
-    gh_symbol2scm("freecraft-feature-new-mapdraw");
+    gh_define("freecraft-feature-new-mapdraw",SCM_BOOL_T);
 #endif
 #ifdef NEW_NAMES
-    gh_symbol2scm("freecraft-feature-new-names");
+    gh_define("freecraft-feature-new-names",SCM_BOOL_T);
 #endif
 #ifdef NEW_FOW
-    gh_symbol2scm("freecraft-feature-new-fow");
+    gh_define("freecraft-feature-new-fow",SCM_BOOL_T);
 #endif
 #ifdef NEW_AI
-    gh_symbol2scm("freecraft-feature-new-ai");
+    gh_define("freecraft-feature-new-ai",SCM_BOOL_T);
 #endif
 #ifdef NEW_SHIPS
-    gh_symbol2scm("freecraft-feature-new-ships");
+    gh_define("freecraft-feature-new-ships",SCM_BOOL_T);
 #endif
 #ifdef SLOW_INPUT
-    gh_symbol2scm("freecraft-feature-slow-input");
+    gh_define("freecraft-feature-slow-input",SCM_BOOL_T);
 #endif
 #ifdef HAVE_EXPANSION
-    gh_symbol2scm("freecraft-feature-have-expansion");
+    gh_define("freecraft-feature-have-expansion",SCM_BOOL_T);
 #endif
 
     print_welcome();
