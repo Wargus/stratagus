@@ -689,12 +689,16 @@ global void GameMainLoop(void)
     GameCursor=TheUI.Point.Cursor;
     GameRunning=1;
 
-    showtip=ShowTips;
+    showtip=0;
+    if( NetworkFildes==-1 ) {		// Don't show them for net play
+	showtip=ShowTips;
+    }
 
     for( ; GameRunning; ) {
 #if DEBUG
-	if (setjmp (main_loop))
+	if (setjmp (main_loop)) {
 	    GamePaused = 1;
+	}
 #endif
 	//
 	//	Game logic part
