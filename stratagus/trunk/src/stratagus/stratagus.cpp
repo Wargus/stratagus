@@ -1384,7 +1384,7 @@ global volatile void Exit(int err)
 
     CleanMovie();
 
-    fprintf(stderr, "Thanks for playing Stratagus.\n");
+    fprintf(stdout, "Thanks for playing Stratagus.\n");
     exit(err);
 }
 
