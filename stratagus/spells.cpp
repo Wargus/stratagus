@@ -3,7 +3,7 @@
 //    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
 //    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
 //    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
-//        \/                        \/     \/          \/                        \/
+//	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
 //         FreeCraft - A free fantasy real time strategy game engine
@@ -728,8 +728,15 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
 	   for( i=0; i<NumUnits; ++i ) {
 	       // FIXME: this tries to draw all corps, ohje
-	       if( (Units[i]->Type->Vanishes || Units[i]->Command.Action==UnitActionDie)
-	           && Units[i]->X == x && Units[i]->Y == y ) {
+#ifdef NEW_ORDERS
+	       if( (Units[i]->Type->Vanishes
+		    || Units[i]->Orders[0].Action==UnitActionDie)
+		      && Units[i]->X == x && Units[i]->Y == y ) {
+#else
+	       if( (Units[i]->Type->Vanishes
+		    || Units[i]->Command.Action==UnitActionDie)
+		      && Units[i]->X == x && Units[i]->Y == y ) {
+#endif
  	           //FIXME: URGENT: remove corpse
 		   //RemoveUnit( Units[i] );
 	           //UnitLost( Units[i] );
