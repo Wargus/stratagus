@@ -133,44 +133,8 @@ int ckey;
 	info_ptr->width * info_ptr->height);
     DebugLevel3("%s: %s" _C_ name _C_
 	png_get_valid(png_ptr, info_ptr, PNG_INFO_PLTE) ? "palette" : "");
-#ifdef USE_SDL_SURFACE
-
-    // FIXME: need to get the correct color
-    /*
-    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
-	Exit(-1);
-	Uint8 *trans;
-	int num_trans;
-
-	int t = -1;
-	png_color_16 *transv;
-	png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, &transv);
-	printf("num_trans = %d\n", num_trans);
-	    for (i = 0; i < num_trans; ++i) {
-		if(trans[i] == 0) {
-		    if (t >= 0) {
-			break;
-		    }
-		    t = i;
-		} else if (trans[i] != 255) {
-		    break;
-		}
-	    }
-	    if (i == num_trans) {
-		// exactly one transparent index
-		ckey = t;
-	    } else {
-		// more than one transparent index, or translucency
-		png_set_expand(png_ptr);
-	    }
-
-    }
-*/
-#else
     DebugLevel3(" %s" _C_
 	png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ? "transparent" : "");
-#endif
-
     DebugLevel3(" depth %d\n" _C_ info_ptr->bit_depth);
 
     //	Setup translators:
@@ -270,15 +234,9 @@ int ckey;
     graphic = MakeGraphic(8, w, h, data, w * h);	// data freed by make graphic
 #ifdef USE_SDL_SURFACE
     SDL_SetPalette(graphic->Surface, SDL_LOGPAL|SDL_PHYSPAL, palettecolors, 0, 256);
-//    SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, ckey);
-
-    // FIXME: need to find correct color
     SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, 
-	SDL_MapRGB(graphic->Surface->format, 255, 255, 255));
-
-//	SDL_MapRGB(graphic->Surface->format, 255, 255, 255));
-//    SDL_SetPalette(graphic->Surface, 0, palettecolors, 0, 256);
-//    SDL_SetPalette(TheScreen, SDL_LOGPAL|SDL_PHYSPAL, palettecolors, 0, 256);
+	SDL_MapRGB(graphic->Surface->format, palettecolors[255].r, 
+	palettecolors[255].g, palettecolors[255].b));
 #else
     graphic->Palette = palette;  //FIXME: should this be part of MakeGraphic
 #endif
