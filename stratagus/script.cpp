@@ -2139,6 +2139,11 @@ global void LoadCcl(void)
     //
     CclInConfigFile = 1;
     file = LibraryFileName(CclStartFile, buf);
+    if (access(buf, R_OK)) {
+	printf("Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
+	ExitFatal(-1);
+    }
+
     ShowLoadProgress("Script %s\n", file);
     LoadPreferences1();
 #if defined(USE_GUILE) || defined(USE_SIOD)
