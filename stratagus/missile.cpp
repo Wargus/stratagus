@@ -691,15 +691,21 @@ global void DrawMissile(const MissileType* mtype,int frame,int x,int y)
     }
 }
 
-local int MissileDrawLevelCompare(const void *v1, const void *v2) 
+/**
+**	FIXME: docu
+*/
+local int MissileDrawLevelCompare(const void* v1, const void* v2)
 {
-    const Missile *c1 = *(Missile**)v1;
-    const Missile *c2 = *(Missile**)v2;
+    const Missile* c1;
+    const Missile* c2;
 
-    if ( c1->Type->DrawLevel == c2->Type->DrawLevel ) {
+    c1 = *(Missile**)v1;
+    c2 = *(Missile**)v2;
+
+    if( c1->Type->DrawLevel == c2->Type->DrawLevel ) {
 	return c1->MissileSlot < c2->MissileSlot ? -1 : 1;
     } else {
-        return c1->Type->DrawLevel <= c2->Type->DrawLevel ? -1 : 1;
+	return c1->Type->DrawLevel <= c2->Type->DrawLevel ? -1 : 1;
     }
 }
 /**
@@ -707,7 +713,7 @@ local int MissileDrawLevelCompare(const void *v1, const void *v2)
 **
 **	@param vp	Viewport pointer.
 */
-global int FindAndSortMissiles(const Viewport* vp, Missile **table)
+global int FindAndSortMissiles(const Viewport* vp, Missile** table)
 {
     Missile* missile;
     Missile* const* missiles;
