@@ -48,7 +48,6 @@
 #include "netconnect.h"
 #include "campaign.h"						// for CurrentMapPath
 #include "script.h"
-#include "script_helpers.h"
 #include "commands.h"
 #include "interface.h"
 #include "iocompat.h"
