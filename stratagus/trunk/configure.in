@@ -170,7 +170,7 @@ if test "$OGG" != "no"; then
     AC_CHECK_HEADERS(ogg/ogg.h,, OGG=no)
     AC_CHECK_HEADERS(vorbis/vorbisfile.h,, OGG=no)
     if test "$OGG" != "no"; then
-	AC_CHECK_LIB(vorbis, vorbis_info_init,, AC_MSG_ERROR(libvorbis not found))
+	AC_CHECK_LIB(vorbis, vorbis_info_init,, AC_MSG_ERROR(libvorbis not found), -logg)
 	OGG_CFLAGS="-DUSE_OGG"
 	OGG_LIBS="-lvorbisfile -lvorbis -logg"
     fi
