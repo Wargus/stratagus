@@ -1295,6 +1295,8 @@ pawn:
     }
 }
 
+#ifdef USE_ZLIB
+
 /**
 **	Write pud header.
 **
@@ -1463,7 +1465,7 @@ local void PudWriteREGM(gzFile f,WorldMap* map)
 **	@param pud	File name.
 **	@param map	Map to save.
 */
-global void SavePud(const char* pud,WorldMap* map)
+global void SavePud(const char* pud,const WorldMap* map)
 {
     gzFile f;
     int i;
@@ -1607,6 +1609,22 @@ global void SavePud(const char* pud,WorldMap* map)
 
     gzclose(f);
 }
+
+#else
+
+/**
+**	Save pud.
+**
+**	@param pud	File name.
+**	@param map	Map to save.
+*/
+global void SavePud(const char* pud __attribute__((unused)),
+	const WorldMap* map __attribute__((unused)))
+{
+    DebugLevel0Fn("Only supported with ZLIB\n");
+}
+
+#endif
 
 /**
 **	Clean pud module.
