@@ -2585,6 +2585,14 @@ local SCM CclDefineMenuItem(SCM list)
 		    	    fprintf(stderr,"Can't find function: %s\n", s1);
 			}
 			free(s1);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
@@ -2630,6 +2638,14 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
 			value=gh_car(sublist);
 			item->d.button.button=scm2buttonid(value);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
@@ -2687,6 +2703,14 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
 			item->d.pulldown.curopt=gh_scm2int(gh_car(sublist));
 			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
@@ -2753,6 +2777,14 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
 			item->d.listbox.curopt=gh_scm2int(gh_car(sublist));
 			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
@@ -2882,6 +2914,14 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("maxch")) ) {
 			value=gh_car(sublist);
 			item->d.input.maxch=gh_scm2int(value);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
@@ -2930,6 +2970,14 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("text")) ) {
 			value=gh_car(sublist);
 			item->d.gem.text=gh_scm2newstr(value, NULL);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
+		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
