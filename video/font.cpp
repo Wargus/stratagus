@@ -602,7 +602,7 @@ local void FontMeasureWidths(ColorFont* fp)
 	const unsigned char* sp;
 	const unsigned char* lp;
 	const unsigned char* gp;
-	int ckey;
+	Uint32 ckey;
 
 	memset(fp->CharWidth, 0, sizeof(fp->CharWidth));
 	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
