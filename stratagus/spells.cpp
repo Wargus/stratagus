@@ -33,6 +33,7 @@
 /*----------------------------------------------------------------------------
 --      Includes
 ----------------------------------------------------------------------------*/
+
 #include "spells.h"
 #include "sound.h"
 #include "missile.h"
@@ -69,40 +70,40 @@ global SpellType SpellTypeTable[] = {
 
 //TTL's below are in ticks: approx: 500=13sec, 1000=25sec, 2000=50sec
 
-//id, ident,                range, mana, ttl, spell action,           sound ident,   sound id
+//id, ident,                range, mana, ttl, spell action,           sound config
 //      ---human paladins---
-{ 0, "spell-holy-vision",   1024,  70,  -1, SpellActionHolyVision   , "holy vision",    NULL },
-{ 0, "spell-healing",          4,   6,  -1, SpellActionHealing      , "healing",        NULL },
-{ 0, "spell-exorcism",        10,   4,  -1, SpellActionExorcism     , "exorcism",       NULL },
+{ 0, "spell-holy-vision",   1024,  70,  -1, SpellActionHolyVision   , { "holy vision" }    },
+{ 0, "spell-healing",          4,   6,  -1, SpellActionHealing      , { "healing" }        },
+{ 0, "spell-exorcism",        10,   4,  -1, SpellActionExorcism     , { "exorcism" }       },
 //      ---human mages---                                                ---human mages---
-{ 0, "spell-fireball",         8, 100,1000, SpellActionFireball     , "fireball",       NULL },
-{ 0, "spell-slow",            10,  50,1000, SpellActionSlow         , "slow",           NULL },
-{ 0, "spell-flame-shield",     6,  80, 600, SpellActionFlameShield  , "flame shield",   NULL },
-{ 0, "spell-invisibility",     6, 200,2000, SpellActionInvisibility , "invisibility",   NULL },
-{ 0, "spell-polymorph",       10, 200,  -1, SpellActionPolymorph    , "polymorph",      NULL },
-{ 0, "spell-blizzard",        12,   5,  -1, SpellActionBlizzard     , "blizzard",       NULL },
+{ 0, "spell-fireball",         8, 100,1000, SpellActionFireball     , { "fireball" }       },
+{ 0, "spell-slow",            10,  50,1000, SpellActionSlow         , { "slow" }           },
+{ 0, "spell-flame-shield",     6,  80, 600, SpellActionFlameShield  , { "flame shield" }   },
+{ 0, "spell-invisibility",     6, 200,2000, SpellActionInvisibility , { "invisibility" }   },
+{ 0, "spell-polymorph",       10, 200,  -1, SpellActionPolymorph    , { "polymorph" }      },
+{ 0, "spell-blizzard",        12,   5,  -1, SpellActionBlizzard     , { "blizzard" }       },
 //      ---orc ogres---                                                  ---orc ogres---
-{ 0, "spell-eye-of-kilrogg",1024,  70,  -1, SpellActionEyeOfKilrogg , "eye of kilrogg", NULL },
-{ 0, "spell-bloodlust",        6,  50,1000, SpellActionBloodlust    , "bloodlust",      NULL },
-{ 0, "spell-runes",           10,  50,2000, SpellActionRunes        , "runes",          NULL },
+{ 0, "spell-eye-of-kilrogg",1024,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg" } },
+{ 0, "spell-bloodlust",        6,  50,1000, SpellActionBloodlust    , { "bloodlust" }      },
+{ 0, "spell-runes",           10,  50,2000, SpellActionRunes        , { "runes" }          },
 //      ---orc death knights---                                          ---orc death knights-
-{ 0, "spell-death-coil",      10, 100,  -1, SpellActionDeathCoil    , "death coil",     NULL },
-{ 0, "spell-haste",            6,  50,1000, SpellActionHaste        , "haste",          NULL },
-{ 0, "spell-raise-dead",       6,  50,  -1, SpellActionRaiseDead    , "raise dead",     NULL },
-{ 0, "spell-whirlwind",       12, 100, 800, SpellActionWhirlwind    , "whirlwind",      NULL },
-{ 0, "spell-unholy-armor",     6, 100, 500, SpellActionUnholyArmor  , "unholy armor",   NULL },
-{ 0, "spell-death-and-decay", 12,   5,  -1, SpellActionDeathAndDecay, "death and decay",NULL },
+{ 0, "spell-death-coil",      10, 100,  -1, SpellActionDeathCoil    , { "death coil" }     },
+{ 0, "spell-haste",            6,  50,1000, SpellActionHaste        , { "haste" }          },
+{ 0, "spell-raise-dead",       6,  50,  -1, SpellActionRaiseDead    , { "raise dead" }     },
+{ 0, "spell-whirlwind",       12, 100, 800, SpellActionWhirlwind    , { "whirlwind" }      },
+{ 0, "spell-unholy-armor",     6, 100, 500, SpellActionUnholyArmor  , { "unholy armor" }   },
+{ 0, "spell-death-and-decay", 12,   5,  -1, SpellActionDeathAndDecay, { "death and decay" },},
 //      ---eot marker---                                                 ---eot marker---
-{-1, "",                       1,   1,  -1, SpellActionNone         , "",                      }
+{-1, "",                       1,   1,  -1, SpellActionNone         , { "" }                }
 };
 
 local int SpellTypeCount;
 
-MissileType* missile_healing   = NULL;
-MissileType* missile_spell     = NULL;
-MissileType* missile_exorcism  = NULL;
-MissileType* missile_explosion = NULL;
-MissileType* missile_rune      = NULL;
+local MissileType* missile_healing   = NULL;
+local MissileType* missile_spell     = NULL;
+local MissileType* missile_exorcism  = NULL;
+local MissileType* missile_explosion = NULL;
+local MissileType* missile_rune      = NULL;
 
 /*----------------------------------------------------------------------------
 --      Functions (Spells Controllers/Callbacks)
@@ -328,14 +329,15 @@ global void InitSpells()
     SpellTypeTable[z].Id = z;
 #ifdef WITH_SOUND	// FIXME: no ifdef orgie
     //FIXME: vladi: this won't work 'cos sound init is called after InitSpells()
-    SpellTypeTable[z].SoundId = SoundIdForName(SpellTypeTable[z].SoundIdent);
+    SpellTypeTable[z].Casted.Sound = SoundIdForName(SpellTypeTable[z].Casted.Name);
 #else
-    SpellTypeTable[z].SoundId = NULL;
+    SpellTypeTable[z].Casted.Sound = NULL;
 #endif
 
-    if( SpellTypeTable[z].SoundId == NULL )
+    if( SpellTypeTable[z].Casted.Sound == NULL )
       {
-      DebugLevel0Fn( "cannot get SoundId for `%s'\n", SpellTypeTable[z].SoundIdent ); //FIXME: vladi: some log level func instead of printf?
+      DebugLevel0Fn( "cannot get SoundId for `%s'\n", SpellTypeTable[z].Casted.Name );
+      //FIXME: vladi: some log level func instead of printf?
       }
     z++;
     }
@@ -396,7 +398,7 @@ global const SpellType* SpellTypeByIdent( const char* Ident )
 **
 **      @return spell type struct ptr
 */
-global const SpellType* SpellTypeById( int Id )
+global SpellType* SpellTypeById( int Id )
 {
   DebugCheck( Id < 0 || Id >= SpellTypeCount );
   if ( Id < 0 || Id >= SpellTypeCount ) return NULL;
@@ -447,7 +449,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
   #define PLAY_FIREWORKS(s) \
 	{ \
-	PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
+	PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
 	MakeMissile( s, x*TileSizeX+TileSizeX/2,   \
 	                y*TileSizeX+TileSizeX/2,   \
 	                x*TileSizeX+TileSizeX/2,   \
@@ -528,7 +530,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
+  	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-fireball"),
 	                sx, sy, dx, dy );
 
@@ -618,7 +620,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
            sx = dx - 1 - SyncRand() % 4;
 	   sy = dy - 1 - SyncRand() % 4;
 
-	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent( "missile-blizzard" ),
 		              sx*TileSizeX+TileSizeX/2,
 	                      sy*TileSizeX+TileSizeX/2,
@@ -663,7 +665,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   //FIXME: vladi: runes should be set on empty tile (ground or water)
 	   Missile* mis;
 	   unit->Mana -= spell->ManaCost;
-	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent( "missile-custom" ),
 		              x*TileSizeX+TileSizeX/2,
 	                      y*TileSizeX+TileSizeX/2,
@@ -692,7 +694,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
+  	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-death-coil"),
 	                sx*TileSizeX+TileSizeX/2,
 	                sy*TileSizeX+TileSizeX/2,
@@ -757,7 +759,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   Missile* mis;
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
+  	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-whirlwind"),
 	                x*TileSizeX+TileSizeX/2,
 	                y*TileSizeX+TileSizeX/2,
@@ -799,7 +801,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	     }
 	   while(  dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height );
 
-	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Sound),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent( "missile-death-and-decay" ),
 		              dx*TileSizeX+TileSizeX/2,
 	                      dy*TileSizeX+TileSizeX/2,
