@@ -46,6 +46,7 @@
 #include "ccl.h"
 
 extern void PreMenuSetup(void);		/// FIXME: not here!
+extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -78,6 +79,10 @@ local void EditorUpdateDisplay(void)
     InvalidateAreaAndCheckCursor(0,0,VideoWidth,VideoHeight);
 }
 
+/*----------------------------------------------------------------------------
+--	Input / Keyboard / Mouse
+----------------------------------------------------------------------------*/
+
 /**
 **	Callback for input.
 */
@@ -85,6 +90,77 @@ local void EditorCallbackKey(unsigned dummy __attribute__((unused)))
 {
     DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
     EditorRunning=0;
+}
+
+/**
+**	Handle key down.
+**
+**	@param key	Key scancode.
+**	@param keychar	Character code.
+*/
+global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
+{
+    if (HandleKeyModifiersDown(key, keychar)) {
+	return;
+    }
+
+    switch (key) {
+	case KeyCodeUp:		// Keyboard scrolling
+	case KeyCodeKP8:
+	    KeyScrollState |= ScrollUp;
+	    break;
+	case KeyCodeDown:
+	case KeyCodeKP2:
+	    KeyScrollState |= ScrollDown;
+	    break;
+	case KeyCodeLeft:
+	case KeyCodeKP4:
+	    KeyScrollState |= ScrollLeft;
+	    break;
+	case KeyCodeRight:
+	case KeyCodeKP6:
+	    KeyScrollState |= ScrollRight;
+	    break;
+
+	default:
+	    DebugLevel3("Key %d\n" _C_ key);
+	    return;
+    }
+    return;
+}
+
+/**
+**	Handle key up.
+**
+**	@param key	Key scancode.
+**	@param keychar	Character code.
+*/
+global void EditorCallbackKeyUp(unsigned key, unsigned keychar)
+{
+    if (HandleKeyModifiersUp(key, keychar)) {
+	return;
+    }
+
+    switch (key) {
+	case KeyCodeUp:			// Keyboard scrolling
+	case KeyCodeKP8:
+	    KeyScrollState &= ~ScrollUp;
+	    break;
+	case KeyCodeDown:
+	case KeyCodeKP2:
+	    KeyScrollState &= ~ScrollDown;
+	    break;
+	case KeyCodeLeft:
+	case KeyCodeKP4:
+	    KeyScrollState &= ~ScrollLeft;
+	    break;
+	case KeyCodeRight:
+	case KeyCodeKP6:
+	    KeyScrollState &= ~ScrollRight;
+	    break;
+	default:
+	    break;
+    }
 }
 
 /**
@@ -154,8 +230,8 @@ global void EditorMainLoop(void)
     callbacks.ButtonReleased = EditorCallbackKey;
     callbacks.MouseMoved = EditorCallbackMouse;
     callbacks.MouseExit = EditorCallbackExit;
-    callbacks.KeyPressed = EditorCallbackKey2;
-    callbacks.KeyReleased = EditorCallbackKey2;
+    callbacks.KeyPressed = EditorCallbackKeyDown;
+    callbacks.KeyReleased = EditorCallbackKeyUp;
     callbacks.KeyRepeated = EditorCallbackKey3;
 
     callbacks.NetworkEvent = NetworkEvent;
@@ -167,6 +243,20 @@ global void EditorMainLoop(void)
     EditorRunning = 1;
     while (EditorRunning) {
 	EditorUpdateDisplay();
+
+	//
+	//	Map scrolling
+	//
+	if( TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll) ) {
+	    DoScrollArea(MouseScrollState, 0);
+	}
+	if( TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll) ) {
+	    DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
+	}
+
+	if( !(FrameCounter%COLOR_CYCLE_SPEED) ) {
+	    ColorCycle();
+	}
 
 	WaitEventsOneFrame(&callbacks);
     }
@@ -183,6 +273,10 @@ global void EditorMainLoop(void)
 
     InterfaceState = IfaceStateMenu;
     GameCursor = TheUI.Point.Cursor;
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
 }
 
 //@}
