@@ -66,6 +66,8 @@
   parameters as extensions)
 
   FIXME: this should be configurable by CCL.
+
+  FIXME: 0x7F as unlimited range is too less for big maps.
 */
 
 /**
@@ -77,7 +79,7 @@ global SpellType SpellTypeTable[] = {
 
 // ident,		 	name,			range,mana,ttl, spell action,		  sound config
 //	---human paladins---
-{ "spell-holy-vision",		"holy vison",		9999,  70,  -1, SpellActionHolyVision	, { "holy vision" }    },
+{ "spell-holy-vision",		"holy vison",		0x7F,  70,  -1, SpellActionHolyVision	, { "holy vision" }    },
 { "spell-healing",		"healing",		   4,	6,  -1, SpellActionHealing	, { "healing" }	       },
 { "spell-exorcism",		"exorcism",		  10,	4,  -1, SpellActionExorcism	, { "exorcism" }       },
 //	---human mages---						 ---human mages---
@@ -88,7 +90,7 @@ global SpellType SpellTypeTable[] = {
 { "spell-polymorph",		"polymorph",		  10, 200,  -1, SpellActionPolymorph	, { "polymorph" }      },
 { "spell-blizzard",		"blizzard",		  12,	5,  -1, SpellActionBlizzard	, { "blizzard" }       },
 //	---orc ogres---							 ---orc ogres---
-{ "spell-eye-of-kilrogg",	"eye of kilrogg",	9999,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg" } },
+{ "spell-eye-of-kilrogg",	"eye of kilrogg",	0x7F,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg" } },
 { "spell-bloodlust",		"bloodlust",		   6,  50,1000, SpellActionBloodlust	, { "bloodlust" }      },
 { "spell-runes",		"runes",		  10,  50,2000, SpellActionRunes	, { "runes" }	       },
 //	---orc death knights---						 ---orc death knights-
@@ -437,13 +439,13 @@ global int CanCastSpell( Unit* unit, int SpellId )
 global int SpellCast( const SpellType* spell, Unit* unit, Unit* target,
 	int x, int y )
 {
-  int repeat;
+    int repeat;
 
-  if( !target ) {
-    x+=spell->Range;
-    y+=spell->Range;
-  }
-  repeat = 0;
+    if( !target ) {
+	x+=spell->Range;
+	y+=spell->Range;
+    }
+    repeat = 0;
 /*
     this does not work when no target unit
     DebugLevel0Fn("Spell cast: %d (%s), %s -> %s (%d,%d)",
