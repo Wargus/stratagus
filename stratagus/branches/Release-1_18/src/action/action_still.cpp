@@ -205,6 +205,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->Orders[0].Goal=goal;
 		RefsDebugCheck( !goal->Refs );
 		goal->Refs++;
+		unit->Reset=0;
 		unit->State=0;
 		unit->SubAction=1;	// Mark attacking.
 		if( !type->Tower ) {
