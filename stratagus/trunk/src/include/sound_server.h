@@ -250,6 +250,7 @@ extern Sample* LoadFlac(const char* name,int flags); ///< Load a flac file
 extern Sample* LoadWav(const char* name,int flags);  ///< Load a wav file
 extern Sample* LoadOgg(const char* name,int flags);  ///< Load an ogg file
 extern Sample* LoadMp3(const char* name,int flags);  ///< Load a mp3 file
+extern Sample* LoadMikMod(const char* name,int flags);  ///< Load a module file
 
 extern int ConvertToStereo32(const char* in, char* out, int frequency,
 	int bitrate, int channels, int bytes);
