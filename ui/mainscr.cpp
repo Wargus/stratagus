@@ -298,7 +298,7 @@ const Unit* GetUnitRef(const Unit* unit, EnumUnit e)
 */
 void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 {
-	const char* text;       // Optionnal text to display.
+	char* text;             // Optionnal text to display.
 	int font;               // Font to use.
 	int index;              // Index of optionnal variable.
 	int x;                  // X coordonate to display.
@@ -311,7 +311,6 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 	Assert(content);
 	x = content->PosX;
 	y = content->PosY;
-	text = content->Data.SimpleText.Text;
 	font = content->Data.SimpleText.Font;
 	if (font == -1) {
 		font = defaultfont;
@@ -322,13 +321,18 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 	Assert(unit || index == -1);
 	Assert(index == -1 || (0 <= index && index < UnitTypeVar.NumberVariable));
 
-	if (text) {
-		VideoDrawText(x, y, font, text);
+	if (content->Data.SimpleText.Text) {
+		text = EvalString(content->Data.SimpleText.Text);
+		if (content->Data.SimpleText.Centered) {
+			VideoDrawTextCentered(x, y, font, text);
+		} else {
+			VideoDrawText(x, y, font, text);
+		}
 		x += VideoTextLength(font, text);
+		free(text);
 	}
 	if (content->Data.SimpleText.ShowName) {
 		VideoDrawTextCentered(x, y, font, unit->Type->Name);
-		x += VideoTextLength(font, unit->Type->Name);
 		return ;
 	}
 	if (index != -1) {

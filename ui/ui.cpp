@@ -277,6 +277,7 @@ static void CleanContent(ContentType* content)
 	}
 	CleanConditionPanel(content->Condition);
 	if (content->DrawData == DrawSimpleText) {
+		FreeStringDesc(content->Data.SimpleText.Text);
 		free(content->Data.SimpleText.Text);
 	} else if (content->DrawData == DrawFormattedText) {
 		free(content->Data.FormattedText.Format);

@@ -77,8 +77,14 @@ typedef enum {
 	ENumber_Min,         ///< Min(a, b).
 	ENumber_Max,         ///< Max(a, b).
 	ENumber_Rand,        ///< Rand(a) : number in [0..a-1].
-	ENumber_LetIn,       ///< Let [daclare VarTmp] in Number.
-	ENumber_TmpVar,      ///< Tmp variable declare in LetIn.
+
+	ENumber_Gt,          ///< a  > b.
+	ENumber_GtEq,        ///< a >= b.
+	ENumber_Lt,          ///< a  < b.
+	ENumber_LtEq,        ///< a <= b.
+	ENumber_Eq,          ///< a == b.
+	ENumber_NEq,         ///< a <> b.
+
 	ENumber_UnitStat     ///< Property of Unit.
 // FIXME: add others.
 } ENumber; ///< All possible value for a number.
@@ -88,6 +94,19 @@ typedef enum {
 	EUnit_Ref           ///< Unit direct reference.
 // FIXME: add others.
 } EUnit; ///< All possible value for a unit.
+
+typedef enum {
+	EString_Dir,          ///< directly a string.
+	EString_Concat,       ///< a + b [+ c ...].
+	EString_String,       ///< Convert number in string.
+	EString_InverseVideo, ///< Inverse video for the string ("a" -> "~<a~>").
+	EString_If,           ///< If cond then String1 else String2.
+	EString_UnitName,     ///< UnitType Name.
+#if 0
+	EString_Extract,     ///< Substring.
+#endif
+// FIXME: add others.
+} EString; ///< All possible value for a string.
 
 /**
 **  Enumeration to know which variable to be selected.
@@ -127,6 +146,13 @@ typedef struct _NumberDesc_ NumberDesc;
 typedef struct _UnitDesc_ UnitDesc;
 
 
+/**
+** String description
+**  Use to describe complex string in script to use when game running.
+*/
+typedef struct _StringDesc_ StringDesc;
+
+
 typedef struct {
 	NumberDesc* Left;           ///< Left operand.
 	NumberDesc* Right;          ///< Right operand.
@@ -159,6 +185,40 @@ struct _UnitDesc_ {
 	} D;
 };
 
+/**
+**  String description.
+*/
+struct _StringDesc_ {
+	EString e;       ///< which number.
+	union {
+		char *Val;       ///< Direct value.
+		struct {
+			StringDesc** Strings;  ///< Array of operands.
+			int n;                 ///< number of operand to concat
+		} Concat; ///< for Concat two string.
+		NumberDesc* Number;  ///< Number.
+		StringDesc* String;  ///< String.
+		UnitDesc* Unit;      ///< Unit desciption.
+		struct {
+			NumberDesc* Cond;  ///< Branch condition.
+			StringDesc* True;  ///< String if Cond is true.
+			StringDesc* False; ///< String if Cond is false.
+		} If; ///< conditional string.
+
+
+#if 0
+		struct {
+			StringDesc* s; ///< Original string.
+			int Begin;     ///< Begin of result string.
+			int End;       ///< End of result string.
+		} Extract; ///< For extract a substring
+#endif
+
+	} D;
+};
+
+
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -186,12 +246,16 @@ extern void CleanCclCredits();            ///< Free Ccl Credits Memory
 extern EnumVariable Str2EnumVariable(lua_State* l, const char *s);
 extern NumberDesc* CclParseNumberDesc(lua_State* l); ///< Parse a number description.
 extern UnitDesc* CclParseUnitDesc(lua_State* l);     ///< Parse a unit description.
+StringDesc* CclParseStringDesc(lua_State* l);        ///< Parse a string description.
 
 extern int EvalNumber(const NumberDesc* numberdesc); ///< Evaluate the number.
 extern Unit* EvalUnit(const UnitDesc* unitdesc);     ///< Evaluate the unit.
+char* EvalString(const StringDesc* s);               ///< Evaluate the string.
 
 void FreeNumberDesc(NumberDesc* number);  ///< Free number description content. (no pointer itself).
 void FreeUnitDesc(UnitDesc* unitdesc);    ///< Free unit description content. (no pointer itself).
+void FreeStringDesc(StringDesc* s);       ///< Frre string description content. (no pointer itself).
+
 
 //@}
 
