@@ -253,6 +253,9 @@ Without any order:
 <DT><VAR>reveal-map</VAR>
 <DD>Reveal the complete map.
 
+<DT><VAR>set-fog-of-war!</VAR><BR>
+<DD>Enable or disable the fog of war.
+
 <DT><VAR>fog-of-war</VAR><BR>
 <DD>Enable the fog of war.
 
@@ -401,55 +404,10 @@ Without any order:
 	Define the missile slot 0 as "Lightning".<P>
 
 <LI><VAR>define-unit-type</VAR><BR>
-    Defines an unit type.<P>
-    (define-unit-type ident name graphics ...)
-    <DL>
-    <DT>ident</DT>
-    <DD>The unit-type unique identifier.</DD>
-    <DT>name</DT>
-    <DD>The unit-type name shown in the game.</DD>
-    <DT>graphics</DT>
-    </DL>
-    More to come.
-
-    <H4>Example:</H4>
-<PRE>
-(define-unit-type "unit-footman" "Footman"
-  ;; graphic data
-  #("footman.png" nil nil nil )
-  '(  72  72 )			;; graphic size
-  "animations-footman"	;; animations
-  "icon-footman"
-  ;;Speed OvFrame SightR Hitpnt Magic  BTime	Gold	Wood	Oil
-      10       0      4     60      0 #(   60    600       0      0 )
-  ;;Tile    Box Size    Attack	ReactC	ReactH
-  '( 1 1 ) '(  31  31 )     1       6       4
-  ;;Armor Prior	Damage	Pierc	WUpgr	AUpgr
-       2    60      6      3       1       1
-  ;;Decay Annoy	Points
-      0      0      50
-  "missile-none"
-  'type-land
-  'right-attack
-  'can-target-land 
-  ;; flags
-  'land-unit
-  'can-attack
-  'organic
-  'selectable-by-rectangle
-  ;; sounds
-  #("footman-selected"
-    "footman-acknowledge"
-    "footman-ready"
-    "footman-help"
-    "footman-dead" )
-  "footman-attack" )
-</PRE>
-	Define the unit-type unit-footman as footman.<P>
+    <A HREF="ccl/unittype.html">unittype.html</A>
 
 <LI><VAR>print-unit-type-table</VAR><BR>
-    Print the current unit type table for the C code. (src/unittype/ut_table.c
-    contains the result) Use "Save" to generate the scheme tables. <P>
+    <A HREF="ccl/unittype.html">unittype.html</A>
 
 <LI><VAR>unit-type</VAR><BR>
     Get the pointer to the unit type structure.<P>
@@ -786,6 +744,7 @@ Without any order:
     <LI>David Slimp
     <LI>Iuri Fiedoruk
     <LI>Luke Mauldin
+    <LI>Natan Adams
     </UL>
     <P><EM>And to all I have forgot to write up!</EM><BR>
     Please drop me an email, if I forgot you.
