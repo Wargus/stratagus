@@ -1093,6 +1093,9 @@ global int main(int argc, char** argv)
 		--argc;
 	}
 
+	// Init the random number generator.
+	InitSyncRand();
+
 	// Init CCL and load configurations!
 	InitCcl();
 
