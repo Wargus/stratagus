@@ -413,6 +413,9 @@ local void SaveTilesetMixed(FILE* file,const unsigned short* table
 **
 **	@param file	Output file.
 **	@param tileset	Save the content of this tileset.
+**
+**	@todo	This didn't use the loaded values, it just generates the
+**		default tileset.
 */
 local void SaveTileset(FILE* file,const Tileset* tileset)
 {
