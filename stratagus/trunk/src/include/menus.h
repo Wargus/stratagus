@@ -411,6 +411,9 @@ extern void MenuLoop(char *filename, WorldMap *map);
     /// Pre menu setup
 extern void PreMenuSetup(void);
 
+    /// Exit Menus
+extern void ExitMenus();
+
 //@}
 
 #endif	// !__MENUS_H__
