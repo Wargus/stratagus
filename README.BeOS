@@ -26,9 +26,9 @@ To compile FreeCraft for BeOS, you can either use 'setup' like normal people
 (but the executable produced can't run from the Tracker) or you can use
 BeIDE... BeIDE is the prefered method.
 
-And the simplest. Copy FreeCraft-beos.proj from contrib to the top level
-directory of FreeCraft. Just start it, open the FreeCraft-beos.proj file, and
-"Make" it (Alt-M). That's it.
+And the simplest. Copy FreeCraft-beos.proj.gz from contrib to the top level
+directory of FreeCraft and uncompress it. Just start the BeIDE, open the
+FreeCraft-beos.proj file, and "Make" it (Alt-M). That's it.
 
 Now you have a working copy of FreeCraft, thats all there is to it.
 ---
