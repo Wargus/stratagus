@@ -412,7 +412,8 @@ void ShowIntro(const Intro* intro)
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	background = LoadSprite(intro->Background, 0, 0);
+	background = NewGraphic(intro->Background, 0, 0);
+	LoadGraphic(background);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
 
 	LibraryFileName(intro->TextFile, buf);
@@ -537,7 +538,7 @@ void ShowIntro(const Intro* intro)
 	}
 
 	free(text);
-	VideoFree(background);
+	FreeGraphic(background);
 
 	VideoClearScreen();
 
@@ -584,7 +585,8 @@ void ShowCredits(Credits* credits)
 
 	background = NULL;
 	if (credits->Background) {
-		background = LoadSprite(credits->Background, 0, 0);
+		background = NewGraphic(credits->Background, 0, 0);
+		LoadGraphic(background);
 		ResizeGraphic(background, VideoWidth, VideoHeight);
 	}
 
@@ -646,9 +648,7 @@ void ShowCredits(Credits* credits)
 		FreeTextLines(&scrolling_credits);
 	}
 
-	if (background) {
-		VideoFree(background);
-	}
+	FreeGraphic(background);
 
 	VideoClearScreen();
 
@@ -725,7 +725,8 @@ void ShowPicture(CampaignChapter* chapter)
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	background = LoadSprite(chapter->Data.Picture.Image, 0, 0);
+	background = NewGraphic(chapter->Data.Picture.Image, 0, 0);
+	LoadGraphic(background);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
 	IntroNoEvent = 1;
 
@@ -799,7 +800,7 @@ void ShowPicture(CampaignChapter* chapter)
 		--i;
 	}
 
-	VideoFree(background);
+	FreeGraphic(background);
 
 	while (lines) {
 		ChapterTextLines* ptr;
@@ -1208,11 +1209,13 @@ void ShowStats(void)
 	background = NULL;
 	if (GameResult == GameVictory) {
 		if (TheUI.VictoryBackground.File) {
-			background = LoadSprite(TheUI.VictoryBackground.File, 0, 0);
+			background = NewGraphic(TheUI.VictoryBackground.File, 0, 0);
+			LoadGraphic(background);
 		}
 	} else {
 		if (TheUI.DefeatBackground.File) {
-			background = LoadSprite(TheUI.DefeatBackground.File, 0, 0);
+			background = NewGraphic(TheUI.DefeatBackground.File, 0, 0);
+			LoadGraphic(background);
 		}
 	}
 	ResizeGraphic(background, VideoWidth, VideoHeight);
@@ -1247,7 +1250,7 @@ void ShowStats(void)
 		++frame;
 	}
 
-	VideoFree(background);
+	FreeGraphic(background);
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();

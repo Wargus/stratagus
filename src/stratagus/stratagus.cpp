@@ -532,7 +532,8 @@ static void ShowTitleScreens(void)
 			g = NULL;
 			if (!mng) {
 #endif
-				g = LoadSprite(TitleScreens[i]->File, 0, 0);
+				g = NewGraphic(TitleScreens[i]->File, 0, 0);
+				LoadGraphic(g);
 				ResizeGraphic(g, VideoWidth, VideoHeight);
 #ifdef USE_MNG
 			}
@@ -574,7 +575,7 @@ static void ShowTitleScreens(void)
 				FreeMNG(mng);
 			}
 #endif
-			VideoSafeFree(g);
+			FreeGraphic(g);
 		}
 
 		VideoClearScreen();

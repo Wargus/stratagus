@@ -147,8 +147,9 @@ BurningBuildingFrame* BurningBuildingFrames; /// Burning building frames
 void LoadMissileSprite(MissileType* mtype)
 {
 	if (mtype->File) {
-		mtype->Sprite = LoadSprite(
+		mtype->Sprite = NewGraphic(
 			mtype->File, mtype->Width, mtype->Height);
+		LoadGraphic(mtype->Sprite);
 		FlipGraphic(mtype->Sprite);
 
 		// Correct the number of frames in graphic
@@ -1361,7 +1362,7 @@ void CleanMissileTypes(void)
 		free(mtype->ImpactSound.Name);
 		free(mtype->ImpactName);
 		free(mtype->SmokeName);
-		VideoSafeFree(mtype->Sprite);
+		FreeGraphic(mtype->Sprite);
 	}
 	free(MissileTypes);
 	MissileTypes = NULL;

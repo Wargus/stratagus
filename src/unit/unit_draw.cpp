@@ -829,19 +829,22 @@ void LoadDecorations(void)
 	for (i = 0; i < DecoSprite.SpriteNumber; i++) {
 		deco = &DecoSprite.SpriteArray[i];
 		ShowLoadProgress("Decorations `%s'", deco->File);
-		deco->Sprite = LoadSprite(deco->File, deco->Width, deco->Height);
+		deco->Sprite = NewGraphic(deco->File, deco->Width, deco->Height);
+		LoadGraphic(deco->Sprite);
 	}
 
 	if (ShadowSprite.File) {
 		ShowLoadProgress("Decorations `%s'", ShadowSprite.File);
-		ShadowSprite.Sprite = LoadSprite(ShadowSprite.File,
+		ShadowSprite.Sprite = NewGraphic(ShadowSprite.File,
 			ShadowSprite.Width, ShadowSprite.Height);
+		LoadGraphic(ShadowSprite.Sprite);
 		MakeShadowSprite(ShadowSprite.Sprite);
 	}
 	if (SpellSprite.File) {
 		ShowLoadProgress("Decorations `%s'", SpellSprite.File);
-		SpellSprite.Sprite = LoadSprite(SpellSprite.File,
+		SpellSprite.Sprite = NewGraphic(SpellSprite.File,
 			SpellSprite.Width, SpellSprite.Height);
+		LoadGraphic(SpellSprite.Sprite);
 	}
 }
 
@@ -857,7 +860,7 @@ void CleanDecorations(void)
 		deco = &DecoSprite.SpriteArray[i];
 		free(DecoSprite.Name[i]);
 		free(deco->File);
-		VideoSafeFree(deco->Sprite);
+		FreeGraphic(deco->Sprite);
 	}
 
 	free(DecoSprite.SpriteArray);
@@ -865,12 +868,12 @@ void CleanDecorations(void)
 	memset(&DecoSprite, 0, sizeof(DecoSprite));
 
 	free(ShadowSprite.File);
-	VideoSafeFree(ShadowSprite.Sprite);
+	FreeGraphic(ShadowSprite.Sprite);
 	ShadowSprite.File = NULL;
 	ShadowSprite.Sprite = NULL;
 
 	free(SpellSprite.File);
-	VideoSafeFree(SpellSprite.Sprite);
+	FreeGraphic(SpellSprite.Sprite);
 	SpellSprite.File = NULL;
 	SpellSprite.Sprite = NULL;
 }

@@ -103,8 +103,9 @@ void LoadConstructions(void)
 			}
 			if (file && *file) {
 				ShowLoadProgress("Construction %s", file);
-				(*cop)->Sprite = LoadSprite(file,
+				(*cop)->Sprite = NewGraphic(file,
 					(*cop)->Width, (*cop)->Height);
+				LoadGraphic((*cop)->Sprite);
 				FlipGraphic((*cop)->Sprite);
 			}
 			file = (*cop)->ShadowFile[TheMap.Terrain].File;
@@ -118,8 +119,9 @@ void LoadConstructions(void)
 			}
 			if (file && *file) {
 				ShowLoadProgress("Construction %s", file);
-				(*cop)->ShadowSprite = LoadSprite(file,
+				(*cop)->ShadowSprite = NewGraphic(file,
 					(*cop)->ShadowWidth, (*cop)->ShadowHeight);
+				LoadGraphic((*cop)->ShadowSprite);
 				FlipGraphic((*cop)->ShadowSprite);
 				MakeShadowSprite((*cop)->ShadowSprite);
 			}
@@ -163,13 +165,13 @@ void CleanConstructions(void)
 					free((*cop)->File[j].File);
 				}
 			}
-			VideoSafeFree((*cop)->Sprite);
+			FreeGraphic((*cop)->Sprite);
 			for (j = 0; j < TilesetMax; ++j) {
 				if ((*cop)->ShadowFile[j].File) {
 					free((*cop)->ShadowFile[j].File);
 				}
 			}
-			VideoSafeFree((*cop)->ShadowSprite);
+			FreeGraphic((*cop)->ShadowSprite);
 			cframe = (*cop)->Frames;
 			while (cframe) {
 				tmp = cframe->Next;
