@@ -487,11 +487,12 @@ local void DrawUnitIcons(void)
 	if (i == PlayerMax / 2) {
 	    y += 20;
 	}
-	if( i==CursorPlayer ) {
+	if( i==CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody ) {
 	    VideoDrawRectangle(ColorWhite,x + i % 8 * 20, y, 20, 20);
 	}
 	VideoDrawRectangle(
-	    i==CursorPlayer ? ColorWhite : ColorGray,
+	    i==CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody
+		? ColorWhite : ColorGray,
 	    x + i % 8 * 20, y, 19, 19);
 	if( TheMap.Info->PlayerType[i] != PlayerNobody ) {
 	    VideoFillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
@@ -794,8 +795,6 @@ local void DrawEditorInfo(void)
 	y = Viewport2MapY(TheUI.MouseViewport, CursorY);
     }
 
-    // FIXME: Info only valid if cursor is OnMap or Minimap
-
     sprintf(buf, "Editor (%d %d)", x, y);
     VideoDrawText(TheUI.ResourceX + 2, TheUI.ResourceY + 2, GameFont, buf);
 
@@ -934,7 +933,9 @@ global void EditorUpdateDisplay(void)
 	    TheUI.Resource.Graphic->Width, TheUI.Resource.Graphic->Height,
 	    TheUI.ResourceX, TheUI.ResourceY);
     }
-    DrawEditorInfo();
+    if (CursorOn==CursorOnMap) {
+	DrawEditorInfo();
+    }
 
     //
     //  Filler
@@ -1106,8 +1107,10 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	}
 	// Cursor on player icons
 	if (CursorPlayer != -1) {
-	    SelectedPlayer = CursorPlayer;
-	    ThisPlayer = Players + SelectedPlayer;
+	    if (TheMap.Info->PlayerType[CursorPlayer] != PlayerNobody) {
+		SelectedPlayer = CursorPlayer;
+		ThisPlayer = Players + SelectedPlayer;
+	    }
 	    return;
 	}
 	// Cursor on unit selection icons
@@ -1508,8 +1511,12 @@ local void EditorCallbackMouse(int x, int y)
 		by += 20;
 	    }
 	    if (bx < x && x < bx + 20 && by < y && y < by + 20) {
-		sprintf(buf,"Select player #%d",i);
-		SetStatusLine(buf);
+		if (TheMap.Info->PlayerType[i] != PlayerNobody) {
+		    sprintf(buf,"Select player #%d",i);
+		    SetStatusLine(buf);
+		} else {
+		    ClearStatusLine();
+		}
 		CursorPlayer = i;
 		//ButtonUnderCursor = i + 100;
 		//CursorOn = CursorOnButton;
@@ -1781,14 +1788,19 @@ local void CreateEditor(void)
 
     ReplayRevealMap = 1;
     FlagRevealMap = 0;
+    SelectedPlayer = 15;
 
     //
     //	Place the start points, which the loader discarded.
     //
     for (i = 0; i < PlayerMax; ++i) {
-	if (Players[i].Type != PlayerNobody) {
+	if (TheMap.Info->PlayerType[i] != PlayerNobody) {
+	    // Set SelectedPlayer to a valid player
+	    if (SelectedPlayer == 15) {
+		SelectedPlayer = i;
+	    }
 	    // FIXME: must support more races
-	    switch (Players[i].Race) {
+	    switch (TheMap.Info->PlayerSide[i]) {
 		case PlayerRaceHuman:
 		    MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
 			UnitTypeByWcNum(scm?SC_StartLocation:WC_StartLocationHuman),
