@@ -41,6 +41,7 @@
 #include "interface.h"
 #include "font.h"
 #include "editor.h"
+#include "campaign.h"
 
 #include "ccl.h"
 
@@ -134,7 +135,7 @@ local void CreateEditor(void)
 {
     FlagRevealMap=1;
     TheMap.NoFogOfWar=1;
-    CreateGame("default.pud",&TheMap);
+    CreateGame(CurrentMapPath,&TheMap);
     FlagRevealMap=0;
 }
 
