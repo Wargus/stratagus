@@ -38,6 +38,10 @@
 --	Defines/Declarations
 ----------------------------------------------------------------------------*/
 
+// DISABLED grays out the menu item
+#define MITEM_DISABLED		-1
+#define MITEM_ENABLED		0
+
 #define MenuButtonActive	1	/// cursor on button
 #define MenuButtonClicked	2	/// mouse button down on button
 #define MenuButtonSelected	4	/// selected button
