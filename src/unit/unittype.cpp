@@ -623,10 +623,11 @@ global void SaveUnitTypes(CLFile* file)
 }
 
 /**
-**		Find unit-type by identifier.
+**  Find unit-type by identifier.
 **
-**		@param ident		The unit-type identifier.
-**		@return				Unit-type pointer.
+**  @param ident  The unit-type identifier.
+**
+**  @return       Unit-type pointer.
 */
 global UnitType* UnitTypeByIdent(const char* ident)
 {
@@ -637,10 +638,11 @@ global UnitType* UnitTypeByIdent(const char* ident)
 }
 
 /**
-**		Find unit-type by wc number.
+**  Find unit-type by wc number.
 **
-**		@param num		The unit-type number used in f.e. puds.
-**		@return				Unit-type pointer.
+**  @param num  The unit-type number used in f.e. puds.
+**
+**  @return     Unit-type pointer.
 */
 global UnitType* UnitTypeByWcNum(unsigned num)
 {
@@ -648,36 +650,32 @@ global UnitType* UnitTypeByWcNum(unsigned num)
 }
 
 /**
-**		Allocate an empty unit-type slot.
+**  Allocate an empty unit-type slot.
 **
-**		@param ident		Identifier to identify the slot (malloced by caller!).
+**  @param ident  Identifier to identify the slot (malloced by caller!).
 **
-**		@return				New allocated (zeroed) unit-type pointer.
+**  @return       New allocated (zeroed) unit-type pointer.
 */
 global UnitType* NewUnitTypeSlot(char* ident)
 {
 	UnitType* type;
 
-	type = malloc(sizeof(UnitType));
+	type = calloc(1, sizeof(UnitType));
 	if (!type) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	memset(type, 0, sizeof(UnitType));
 	type->Slot = NumUnitTypes;
-	DebugLevel3Fn("Making a new unit, called %s, branded %d\n"
-			_C_ ident _C_ type->Type);
+	DebugLevel3Fn("Making a new unit, called %s, branded %d\n" _C_
+		ident _C_ type->Type);
 	type->Ident = ident;
 	UnitTypes[NumUnitTypes++] = type;
-	//
-	//		Rehash.
-	//
 	*(UnitType**)hash_add(UnitTypeHash, type->Ident) = type;
 	return type;
 }
 
 /**
-**		Draw unit-type on map.
+**  Draw unit-type on map.
 **
 **  @param type    Unit-type pointer.
 **  @param frame   Animation frame of unit-type.
@@ -857,7 +855,7 @@ global void LoadUnitTypes(void)
 }
 
 /**
-**		Cleanup the unit-type module.
+**  Cleanup the unit-type module.
 */
 global void CleanUnitTypes(void)
 {
@@ -871,7 +869,7 @@ global void CleanUnitTypes(void)
 	DebugLevel0Fn("FIXME: icon, sounds not freed.\n");
 
 	//
-	//		Mapping the original unit-type numbers in puds to our internal strings
+	//  Mapping the original unit-type numbers in puds to our internal strings
 	//
 	if ((ptr = (void**)UnitTypeWcNames)) {		// Free all old names
 		while (*ptr) {
@@ -882,8 +880,8 @@ global void CleanUnitTypes(void)
 		UnitTypeWcNames = NULL;
 	}
 
-	//		FIXME: scheme contains references on this structure.
-	//		Clean all animations.
+	// FIXME: scheme contains references on this structure.
+	// Clean all animations.
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		type = UnitTypes[i];
@@ -912,15 +910,15 @@ global void CleanUnitTypes(void)
 		if (anims->Repair) {
 			free(anims->Repair);
 		}
-		for (i = 0; i < MaxCosts; ++i) {
-			if (anims->Harvest[i]) {
-				free(anims->Harvest[i]);
+		for (j = 0; j < MaxCosts; ++j) {
+			if (anims->Harvest[j]) {
+				free(anims->Harvest[j]);
 			}
 		}
 		free(anims);
 	}
 
-	//		Clean all unit-types
+	// Clean all unit-types
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		type = UnitTypes[i];
@@ -937,17 +935,10 @@ global void CleanUnitTypes(void)
 		if (type->SameSprite) {
 			free(type->SameSprite);
 		}
-		if (type->File[0]) {
-			free(type->File[0]);
-		}
-		if (type->File[1]) {
-			free(type->File[1]);
-		}
-		if (type->File[2]) {
-			free(type->File[2]);
-		}
-		if (type->File[3]) {
-			free(type->File[3]);
+		for (j = 0; j < TilesetMax; ++j) {
+			if (type->File[j]) {
+				free(type->File[j]);
+			}
 		}
 		if (type->Icon.Name) {
 			free(type->Icon.Name);
