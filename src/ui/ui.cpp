@@ -786,6 +786,7 @@ global void CleanUI(UI* ui)
 global void CleanUserInterface(void)
 {
 	int i;
+	int j;
 	MenuPanel* menupanel;
 
 	//
@@ -828,6 +829,13 @@ global void CleanUserInterface(void)
 		for (i = 0; TitleScreens[i]; ++i) {
 			free(TitleScreens[i]->File);
 			free(TitleScreens[i]->Music);
+			if (TitleScreens[i]->Labels) {
+				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
+					free(TitleScreens[i]->Labels[j]->Text);
+					free (TitleScreens[i]->Labels[j]);
+				}
+				free(TitleScreens[i]->Labels);
+			}
 			free(TitleScreens[i]);
 		}
 		free(TitleScreens);
