@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,8 +47,6 @@
 #include "ui.h"
 
 #include "etlib/hash.h"
-
-#define NEW_MISSILES			// New missile allocation code
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -182,23 +179,11 @@ global int NoWarningMissileType;		/// quiet ident lookup.
 
 #define MAX_MISSILES	1800		/// maximum number of missiles
 
-#ifdef NEW_MISSILES
-
 local Missile* GlobalMissiles[MAX_MISSILES];	/// all global missiles on map
 local int NumGlobalMissiles;			/// currently used missiles
 
 local Missile* LocalMissiles[MAX_MISSILES];	/// all local missiles on map
 local int NumLocalMissiles;			/// currently used missiles
-
-#else
-
-    /// mark a free missile slot
-#define MissileFree			(MissileType*)0
-
-local Missile Missiles[MAX_MISSILES];	/// all missiles on map
-local int NumMissiles;			/// currently used missiles
-
-#endif
 
 #ifdef DOXYGEN                          // no real code, only for document
 
@@ -313,8 +298,6 @@ global MissileType* NewMissileTypeSlot(char* ident)
     return mtype;
 }
 
-#ifdef NEW_MISSILES
-
 /**
 **	Allocate memory for a new global missile.
 */
@@ -357,38 +340,6 @@ local Missile* NewLocalMissile(void)
 
     return missile;
 }
-
-#else
-
-/**
-**	Allocate memory for a new missile.
-*/
-local Missile* NewGlobalMissile(void)
-{
-    Missile* missile;
-
-    //
-    //	Find free slot, FIXME: see MakeUnit for better code
-    //
-    for( missile=Missiles; missile<Missiles+NumMissiles; ++missile ) {
-	if( missile->Type==MissileFree ) {
-	    return missile;
-	}
-    }
-
-    //	Check maximum missiles!
-    if( NumMissiles==MAX_MISSILES ) {
-	printf("Maximum of missiles reached\n");
-	abort();
-	return NULL;
-    }
-
-    return Missiles+NumMissiles++;
-}
-
-#define NewLocalMissile NewGlobalMissile
-
-#endif
 
 /**
 **	Initialize a new made missle.
@@ -475,8 +426,6 @@ global Missile* MakeLocalMissile(MissileType* mtype,int sx,int sy,int dx,int dy)
     return InitMissile(missile,mtype,sx,sy,dx,dy);
 }
 
-#ifdef NEW_MISSILES
-
 /**
 **	Free a missile.
 **
@@ -535,45 +484,6 @@ local void FreeMissile(Missile* missile)
 
     free(missile);
 }
-
-
-#else
-
-/**
-**	Free a missile.
-**
-**	@param missile	Missile pointer.
-*/
-local void FreeMissile(Missile* missile)
-{
-    missile->Type=MissileFree;
-    if( missile->SourceUnit ) {
-	RefsDebugCheck( !missile->SourceUnit->Refs );
-	if( missile->SourceUnit->Destroyed ) {
-	    if( !--missile->SourceUnit->Refs ) {
-		ReleaseUnit(missile->SourceUnit);
-	    }
-	} else {
-	    --missile->SourceUnit->Refs;
-	    RefsDebugCheck( !missile->SourceUnit->Refs );
-	}
-	missile->SourceUnit=NoUnitP;
-    }
-    if( missile->TargetUnit ) {
-	RefsDebugCheck( !missile->TargetUnit->Refs );
-	if( missile->TargetUnit->Destroyed ) {
-	    if( !--missile->TargetUnit->Refs ) {
-		ReleaseUnit(missile->TargetUnit);
-	    }
-	} else {
-	    --missile->TargetUnit->Refs;
-	    RefsDebugCheck( !missile->TargetUnit->Refs );
-	}
-	missile->TargetUnit=NoUnitP;
-    }
-}
-
-#endif
 
 /**
 **	Calculate damage.
@@ -812,8 +722,6 @@ global void DrawMissile(const MissileType* mtype,unsigned frame,int x,int y)
     }
 }
 
-#ifdef NEW_MISSILES
-
 /**
 **	Draw all missiles on map.
 */
@@ -857,46 +765,6 @@ global void DrawMissiles(void)
 	missiles_end=missiles+NumLocalMissiles;
     } while( flag-- );
 }
-
-#else
-
-/**
-**	Draw all missiles on map.
-*/
-global void DrawMissiles(void)
-{
-    const Missile* missile;
-    const Missile* missiles_end;
-    int x;
-    int y;
-
-    missiles_end=Missiles+NumMissiles;
-    for( missile=Missiles; missile<missiles_end; ++missile ) {
-	// FIXME: make table of used slots!
-	if( missile->Type==MissileFree ) {
-	    continue;
-	}
-	if( missile->Type->Class == MissileClassCustom ) {
-	    continue;	// custom missiles are handled by Controller() only
-	}
-	if( missile->Delay ) {
-	    continue;	// delayed missiles aren't shown
-	}
-	// Draw only visible missiles
-	if (MissileVisible(missile)) {
-	    x=missile->X-MapX*TileSizeX+TheUI.MapX;
-	    y=missile->Y-MapY*TileSizeY+TheUI.MapY;
-	    // FIXME: I should copy SourcePlayer for second level missiles.
-	    if( missile->SourceUnit && missile->SourceUnit->Player ) {
-		GraphicPlayerPixels(missile->SourceUnit->Player
-			,missile->Type->Sprite);
-	    }
-	    DrawMissile(missile->Type,missile->SpriteFrame,x,y);
-	}
-    }
-}
-
-#endif
 
 /**
 **	Change missile heading from x,y.
@@ -1233,8 +1101,6 @@ global void MissileHit(Missile* missile)
     }
 }
 
-#ifdef NEW_MISSILES
-
 /**
 **	Handle action for a missile.
 */
@@ -1532,271 +1398,6 @@ global void MissileActions(void)
     MissilesActionLoop(LocalMissiles);
 }
 
-#else
-
-/**
-**	Handle all missile actions.
-**
-**	@todo	Split this function, into small functions, than it is
-**		better readable and easier to extend.
-*/
-global void MissileActions(void)
-{
-    Missile* missile;
-    const Missile* missiles_end;
-
-    missiles_end=Missiles+NumMissiles;
-    for( missile=Missiles; missile<missiles_end; ++missile ) {
-	if( missile->Type==MissileFree ) {
-	    continue;
-	}
-	if( missile->Delay && missile->Delay-- ) {
-	    continue;		// delay start of missile
-	}
-
-	if ( missile->TTL > 0 ) {
-	    missile->TTL--;	// overall time to live if specified
-	}
-
-	if ( missile->Controller ) {
-	    missile->Controller( missile );
-	}
-
-	if ( !missile->TTL ) {
-	    FreeMissile(missile);
-	    continue;
-	}
-
-	if( --missile->Wait ) {	// wait until time is over
-	    continue;
-	}
-
-	if ( missile->Type->Class == MissileClassCustom ) {
-	    missile->Wait=missile->Type->Sleep;
-	    continue;	// custom missiles are handled by Controller() only
-	}
-
-	CheckMissileToBeDrawn(missile); //StephanR FIXME:needed here?
-
-	switch( missile->Type->Class ) {
-	    //
-	    //	Missile flies from x,y to x1,y1
-	    //
-	    case MissileClassPointToPoint:
-		missile->Wait=missile->Type->Sleep;
-		if( PointToPointMissile(missile) ) {
-		    MissileHit(missile);
-		    FreeMissile(missile);
-		} else {
-		    //
-		    //	Animate missile, cycle through frames
-		    //
-		    missile->SpriteFrame+=5;		// FIXME: frames pro row
-		    if( (missile->SpriteFrame&127)
-			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
-			missile->SpriteFrame-=
-				VideoGraphicFrames(missile->Type->Sprite);
-		    }
-		    DebugLevel3Fn("Frame %d of %d\n"
-			    ,missile->SpriteFrame
-			    ,VideoGraphicFrames(missile->Type->Sprite));
-		}
-		break;
-
-	    case MissileClassPointToPointWithDelay:
-		missile->Wait=missile->Type->Sleep;
-		if( PointToPointMissile(missile) ) {
-		    MissileHit(missile);
-		    FreeMissile(missile);
-		} else {
-		    //
-		    //	Animate missile, depends on the way.
-		    //		FIXME: becomes bigger than smaller.
-		    // FIXME: how?
-		}
-		break;
-
-	    case MissileClassPointToPoint3Bounces:
-		missile->Wait=missile->Type->Sleep;
-		if( PointToPointMissile(missile) ) {
-		    //
-		    //	3 Bounces.
-		    //
-		    switch( missile->State ) {
-			case 1:
-			case 3:
-			case 5:
-			    missile->State+=2;
-			    missile->DX+=missile->Xstep*TileSizeX*2;
-			    missile->DY+=missile->Ystep*TileSizeY*2;
-			    MissileHit(missile);
-			    // FIXME: hits to left and right
-			    // FIXME: reduce damage effects on later impacts
-			    break;
-			default:
-			    FreeMissile(missile);
-			    break;
-		    }
-		} else {
-		    //
-		    //	Animate missile, cycle through frames
-		    //
-		    missile->SpriteFrame+=5;		// FIXME: frames pro row
-		    if( (missile->SpriteFrame&127)
-			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
-			missile->SpriteFrame-=
-				VideoGraphicFrames(missile->Type->Sprite);
-		    }
-		    DebugLevel3Fn("Frame %d of %d\n"
-			    ,missile->SpriteFrame
-			    ,VideoGraphicFrames(missile->Type->Sprite));
-		}
-		break;
-
-	    case MissileClassPointToPointWithHit:
-		missile->Wait=missile->Type->Sleep;
-		if( PointToPointMissile(missile) ) {
-		    //
-		    //	Animate hit
-		    //
-		    missile->SpriteFrame+=5;	// FIXME: frames pro row
-		    if( (missile->SpriteFrame&127)
-			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
-			MissileHit(missile);
-			FreeMissile(missile);
-		    }
-		}
-		break;
-
-	    case MissileClassFlameShield:
-		missile->Wait=missile->Type->Sleep;
-		if( ++missile->SpriteFrame
-			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    missile->SpriteFrame = 0;
-		    if( PointToPointMissile(missile) ) {
-			// Must set new goal.
-		    }
-		}
-		//missile->X-=unit->TargetUnit->X*TileSizeX+unit->TargetUnit->IY;
-		break;
-
-	    case MissileClassBlizzard:
-		missile->Wait=missile->Type->Sleep;
-		if( PointToPointMissile(missile) ) {
-		    //
-		    //	Animate hit
-		    //
-		    missile->SpriteFrame+=4;	// FIXME: frames pro row
-		    if( (missile->SpriteFrame&127)
-			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
-			MissileHit(missile);
-			FreeMissile(missile);
-		    }
-		}
-		break;
-
-	    case MissileClassDeathDecay:
-		//NOTE: vladi: this is exact copy of MissileClassStayWithDelay
-		// but with check for blizzard-type hit (friendly fire:))
-		missile->Wait=missile->Type->Sleep;
-		if( ++missile->SpriteFrame
-			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    MissileHit(missile);
-		    FreeMissile(missile);
-		}
-		break;
-
-	    case MissileClassWhirlwind:
-		missile->Wait=missile->Type->Sleep;
-		if( ++missile->SpriteFrame
-			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    missile->SpriteFrame = 0;
-		    PointToPointMissile(missile);
-		}
-		break;
-
-	    case MissileClassStayWithDelay:
-		missile->Wait=missile->Type->Sleep;
-		if( ++missile->SpriteFrame
-			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    MissileHit(missile);
-		    FreeMissile(missile);
-		    // FIXME: should MissileHitAndFree();
-		}
-		break;
-
-	    case MissileClassCycleOnce:
-		missile->Wait=missile->Type->Sleep;
-		switch( missile->State ) {
-		    case 0:
-		    case 2:
-			++missile->State;
-			break;
-		    case 1:
-			if( ++missile->SpriteFrame
-				==VideoGraphicFrames(missile->Type->Sprite) ) {
-			    --missile->SpriteFrame;
-			    ++missile->State;
-			}
-			break;
-		    case 3:
-			if( !missile->SpriteFrame-- ) {
-			    MissileHit(missile);
-			    FreeMissile(missile);
-			}
-			break;
-		}
-		break;
-
-	    case MissileClassFire: {
-		Unit* unit;
-
-		unit=missile->SourceUnit;
-		if( unit->Destroyed || !unit->HP ) {
-		    FreeMissile(missile);
-		    break;
-		}
-		missile->Wait=missile->Type->Sleep;
-		if( ++missile->SpriteFrame
-			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    int f;
-
-		    missile->SpriteFrame=0;
-		    f=(100*unit->HP)/unit->Stats->HitPoints;
-		    if( f>75) {
-			FreeMissile(missile);
-			unit->Burning=0;
-		    } else if( f>50 ) {
-			if( missile->Type!=MissileTypeSmallFire ) {
-			    missile->X+=missile->Type->Width/2;
-			    missile->Y+=missile->Type->Height/2;
-			    missile->Type=MissileTypeSmallFire;
-			    missile->X-=missile->Type->Width/2;
-			    missile->Y-=missile->Type->Height/2;
-			}
-		    } else {
-			if( missile->Type!=MissileTypeBigFire ) {
-			    missile->X+=missile->Type->Width/2;
-			    missile->Y+=missile->Type->Height/2;
-			    missile->Type=MissileTypeBigFire;
-			    missile->X-=missile->Type->Width/2;
-			    missile->Y-=missile->Type->Height/2;
-			}
-		    }
-		}
-		break;
-	    }
-	}
-
-	if (missile->Type!=MissileFree) {
-	    // check after movement
-	    CheckMissileToBeDrawn(missile);
-	}
-    }
-}
-
-#endif
-
 /**
 **	Calculate distance from view-point to missle.
 **
@@ -1911,8 +1512,6 @@ local void SaveMissile(const Missile* missile,FILE* file)
     fprintf(file,")\n");
 }
 
-#ifdef NEW_MISSILES
-
 /**
 **	Save the state missiles to file.
 **
@@ -1932,29 +1531,6 @@ global void SaveMissiles(FILE* file)
 	SaveMissile(*missiles,file);
     }
 }
-
-#else
-
-/**
-**	Save the state missiles to file.
-**
-**	@param file	Output file.
-*/
-global void SaveMissiles(FILE* file)
-{
-    Missile* missile;
-
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: missiles $Id$\n\n");
-
-    for( missile=Missiles; missile<&Missiles[NumMissiles]; ++missile ) {
-	if( missile->Type!=MissileFree ) {
-	    SaveMissile(missile,file);
-	}
-    }
-}
-
-#endif
 
 /**
 **	Initialize missile-types.
@@ -2031,7 +1607,6 @@ global void InitMissiles(void)
 */
 global void CleanMissiles(void)
 {
-#ifdef NEW_MISSILES
     Missile** missiles;
     Missile* missile;
 
@@ -2045,9 +1620,6 @@ global void CleanMissiles(void)
 	*missiles=NULL;
     }
     NumLocalMissiles=0;
-#else
-    NumMissiles=0;
-#endif
 }
 
 //@}
