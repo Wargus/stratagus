@@ -941,7 +941,8 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 	return;
     }
     DebugLevel0Fn("Received Init Message %d:%d (%d) from %d.%d.%d.%d:%d\n",
-	    msg->Type, msg->SubType, size, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+	    msg->Type, msg->SubType, size, NIPQUAD(ntohl(NetLastHost)),
+	    ntohs(NetLastPort));
 
     if (NetConnectRunning == 2) {		/// client
 	if (msg->Type == MessageInitReply) {
