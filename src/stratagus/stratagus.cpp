@@ -120,8 +120,8 @@
 #ifndef _MSC_VER
 #include <unistd.h>
 #include <sys/time.h>
-#endif
 #include <time.h>
+#endif
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -129,8 +129,13 @@
 #include <sys/stat.h>
 #endif
 
-#if defined(__CYGWIN__) || defined(_MSC_VER)
+#if defined(__CYGWIN__) 
 #include <getopt.h>
+#endif
+#if defined(_MSC_VER)
+//#include "etlib/getopt.h"
+extern char* optarg;
+extern int optind;
 #endif
 
 #ifdef __MINGW32__
@@ -535,7 +540,7 @@ global volatile void Exit(int err)
     IfDebug(
 	DebugLevel0( "Frames %d, Slow frames %d = %d%%\n"
 	    _C_ FrameCounter _C_ SlowFrameCounter
-	    _C_ (SlowFrameCounter*100)/(FrameCounter ? : 1) );
+	    _C_ (SlowFrameCounter*100)/(FrameCounter ? FrameCounter : 1) );
 	UnitCacheStatistic();
 	DebugLevel0("Path: Error: %u Unreachable: %u OK: %u Depth: %u\n"
 		_C_ PfCounterFail _C_ PfCounterNotReachable
