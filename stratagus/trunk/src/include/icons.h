@@ -158,7 +158,7 @@ typedef struct _icon_file_ {
     //unsigned	Icons;			/// Number of icons in this file
 
 // --- FILLED UP ---
-    Graphic*	Graphic;		/// Graphic data loaded
+    Graphic*	Sprite;			/// Graphic data loaded
 } IconFile;
 
     ///	Icon: rectangle image used in menus
@@ -169,14 +169,11 @@ typedef struct _icon_ {
     IconFile*	File;			/// File containing the data
     unsigned	Index;			/// Index into file
 
-    unsigned	X;			/// X index into graphic
-    unsigned	Y;			/// Y index into graphic
-
     unsigned	Width;			/// Icon width
     unsigned	Height;			/// Icon height
 
 // --- FILLED UP ---
-    Graphic*	Graphic;		/// Graphic data loaded
+    Graphic*	Sprite;		/// Graphic data loaded
 } Icon;
 
 #define NoIcon	NULL			/// used for errors == no valid icon
