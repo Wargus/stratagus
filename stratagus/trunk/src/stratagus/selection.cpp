@@ -365,6 +365,48 @@ local int SelectOrganicUnitsInTable(Unit** table,int num_units)
 }
 
 /**
+**	Selects units from the table whose sprite is at least partially
+**	covered by the rectangle. The rectangle is determined by coordinates
+**	of its upper left and lower right corner expressed in screen map
+**	coordinate system.
+**
+**	@param sx0	x-coord of upper left corner of the rectangle 
+**	@param sy0	y-coord of upper left corner of the rectangle 
+**	@param sx1	x-coord of lower right corner of the rectangle 
+**	@param sy1	y-coord of lower right corner of the rectangle 
+**	@param table	table of units
+**	@param num_units	number of units in table
+**
+**	@return		number of units found
+*/
+local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
+		Unit **table, int num_units)
+{
+    int n, i;
+
+    for (i=n=0; i<num_units; i++) {
+	int sprite_x, sprite_y;
+	Unit *unit = table[i];
+	UnitType *type = unit->Type;
+
+	sprite_x = unit->X*TileSizeX + unit->IX;
+	sprite_x -= (type->BoxWidth - TileSizeX*type->TileWidth)/2;
+	sprite_y = unit->Y*TileSizeY + unit->IY;
+	sprite_y -= (type->BoxHeight - TileSizeY*type->TileHeight)/2;
+	if (sprite_x + type->BoxWidth < sx0)
+	    continue;
+	if (sprite_x > sx1)
+	    continue;
+	if (sprite_y + type->BoxHeight < sy0)
+	    continue;
+	if (sprite_y > sy1)
+	    continue;
+	table[n++] = unit;
+    }
+    return n;
+}
+
+/**
  **     Add the units in the rectangle to the current selection
  **
  **	@param tx	X start of selection rectangle in tile coordinates
@@ -423,7 +465,7 @@ global int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h)
  **	@param h	Selection rectangle height.
  **	@return		the number of units found.
  */
-global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
+global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 {
     Unit* unit;
     Unit* table[UnitMax];
@@ -431,10 +473,18 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
     int r;
     int n;
     int i;
+    int tx0, ty0, tx1, ty1;
 
     DebugLevel3Fn(" (%d,%d,%d,%d)\n",tx,ty,w,h);
 
-    r=SelectUnits(tx,ty,tx+w+1,ty+h+1,table);
+    tx0 = sx0 / TileSizeX;
+    ty0 = sy0 / TileSizeY;
+    tx1 = sx1 / TileSizeX;
+    ty1 = sy1 / TileSizeY;
+
+//  r=SelectUnits(tx,ty,tx+w+1,ty+h+1,table);
+    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
+    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
 
     //
     //	1) search for the player units selectable with rectangle
