@@ -532,6 +532,10 @@ global void UnitActions(void)
 	if (buffsthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
 			HandleBuffs(table[i], CYCLES_PER_SECOND);
+			if (table[i]->Destroyed) {
+				table[i] = table[--tabsize];
+				--i;
+			}
 		}
 	}
 
@@ -554,7 +558,7 @@ global void UnitActions(void)
 
 		HandleUnitAction(unit);
 
-#ifdef DEBUG_ACTIONS
+#ifdef DEBUG
 		//
 		// Dump the unit to find the network sync bugs.
 		//
