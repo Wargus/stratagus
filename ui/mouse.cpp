@@ -295,11 +295,11 @@ global void DoRightButton(int x,int y)
                 if( dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest) ) {
 		    SendCommandFollow(unit,dest,flush);
                     continue;
-                } else {
+                } else if( IsEnemy(ThisPlayer,dest) ) {
                     // FIXME: can I attack this unit?
                     SendCommandAttack(unit,x,y,dest,flush);
                     continue;
-                }
+		}
             }
             if( WallOnMap(x,y) ) {
                 DebugLevel3("WALL ON TILE\n");
