@@ -1058,7 +1058,11 @@ global void WaitEventsAndKeepSync(void)
 	//
 	//	Network in sync and time for frame over: return
 	//
-	if( !morex && NetworkInSync && VideoInterrupts ) {
+	if(
+#ifndef SLOW_INPUT
+	    !morex &&
+#endif
+		      NetworkInSync && VideoInterrupts ) {
 	    break;
 	}
     }
