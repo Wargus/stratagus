@@ -1296,7 +1296,6 @@ global int main1(int argc __attribute__ ((unused)),
 	int j;
 	int x;
 	int y;
-	float ratio;
 
 	PrintHeader();
 	printf(
@@ -1340,37 +1339,25 @@ Use it at your own risk.\n\n");
 			}
 			if (PlayMovie(TitleScreens[i]->File,
 					PlayMovieZoomScreen | PlayMovieKeepAspect)) {
+				TitleScreenLabel** labels;
+
 				DisplayPicture(TitleScreens[i]->File);
-				if (TitleScreens[i]->Labels) {
-					if (VideoDepth && IsFontLoaded(SmallFont) &&
-						IsFontLoaded(GameFont) && IsFontLoaded(LargeFont)) {
+				labels = TitleScreens[i]->Labels;
+				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
 #ifndef USE_SDL_SURFACE
-						VideoLockScreen();
+					VideoLockScreen();
 #endif
-						for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
-							if (VideoWidth == 640) {
-								x = TitleScreens[i]->Labels[j]->xofs;
-								y = TitleScreens[i]->Labels[j]->yofs;
-							} else {
-								ratio = (float) VideoWidth / 640.0;
-								x = ratio * TitleScreens[i]->Labels[j]->xofs;
-								y = ratio * TitleScreens[i]->Labels[j]->yofs;
-							}
-							if (TitleScreens[i]->Labels[j]->flags & TitleFlagCenter) {
-								x += VideoWidth/2;
-							}
-							if (VideoWidth == 640) {
-								VideoDrawTextCentered(x, y, GameFont, TitleScreens[i]->Labels[j]->Text);
-							} else if (VideoWidth == 800) {
-								VideoDrawTextCentered(x, y, GameFont, TitleScreens[i]->Labels[j]->Text);
-							} else {
-								VideoDrawTextCentered(x, y, LargeFont, TitleScreens[i]->Labels[j]->Text);
-							}
+					for (j = 0; labels[j]; ++j) {
+						x = labels[j]->Xofs * VideoWidth / 640;
+						y = labels[j]->Yofs * VideoWidth / 640;
+						if (labels[j]->Flags & TitleFlagCenter) {
+							x -= VideoTextLength(labels[j]->Font, labels[j]->Text) / 2;
 						}
-#ifndef USE_SDL_SURFACE
-						VideoUnlockScreen();
-#endif
+						VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
 					}
+#ifndef USE_SDL_SURFACE
+					VideoUnlockScreen();
+#endif
 				}
 				Invalidate();
 				WaitForInput(TitleScreens[i]->Timeout);
@@ -1378,10 +1365,10 @@ Use it at your own risk.\n\n");
 		}
 	}
 
-	InitUnitsMemory();				// Units memory management
-	PreMenuSetup();				// Load everything needed for menus
+	InitUnitsMemory();  // Units memory management
+	PreMenuSetup();     // Load everything needed for menus
 
-	MenuLoop(MapName, &TheMap);		// Enter the menu loop
+	MenuLoop(MapName, &TheMap);  // Enter the menu loop
 
 	return 0;
 }
