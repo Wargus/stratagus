@@ -147,7 +147,7 @@ global void LoadMissileSprites(void)
 
 	    buf = alloca(strlen(file) + 9 + 1);
 	    file = strcat(strcpy(buf, "graphics/"), file);
-	    ShowLoadProgress("\tMissile %s\n", file);
+	    ShowLoadProgress("Missile %s", file);
 	    MissileTypes[i].Sprite = LoadSprite(
 		    file, MissileTypes[i].Width, MissileTypes[i].Height);
 

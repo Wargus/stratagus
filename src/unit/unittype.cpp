@@ -1315,7 +1315,7 @@ global void LoadUnitTypes(void)
 	type = UnitTypes[i];
 	if ((file = type->ShadowFile)) {
 	    file = strcat(strcpy(buf, "graphics/"), file);
-	    ShowLoadProgress("\tUnit `%s'\n", file);
+	    ShowLoadProgress("Unit `%s'", file);
 	    type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
 		type->ShadowHeight);
 	}
@@ -1326,13 +1326,13 @@ global void LoadUnitTypes(void)
 		if ((resinfo = type->ResInfo[res])) {
 		    if ((file = resinfo->FileWhenLoaded)) {
 			file = strcat(strcpy(buf, "graphics/"), file);
-			ShowLoadProgress("\tUnit `%s'\n", file);
+			ShowLoadProgress("Unit `%s'", file);
 			resinfo->SpriteWhenLoaded = LoadSprite(file, type->Width,
 			    type->Height);
 		    }
 		    if ((file = resinfo->FileWhenEmpty)) {
 			file = strcat(strcpy(buf, "graphics/"), file);
-			ShowLoadProgress("\tUnit `%s'\n", file);
+			ShowLoadProgress("Unit `%s'", file);
 			resinfo->SpriteWhenEmpty = LoadSprite(file, type->Width,
 			    type->Height);
 		    }
@@ -1360,7 +1360,7 @@ global void LoadUnitTypes(void)
 
 	    buf = alloca(strlen(file) + 9 + 1);
 	    file = strcat(strcpy(buf, "graphics/"), file);
-	    ShowLoadProgress("\tUnit `%s'\n", file);
+	    ShowLoadProgress("Unit `%s'", file);
 	    type->Sprite = LoadSprite(file, type->Width, type->Height);
 	}
     }

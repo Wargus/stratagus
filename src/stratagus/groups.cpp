@@ -10,7 +10,7 @@
 //
 /**@name groups.c	-	The units' groups handling. */
 //
-//	(c) Copyright 1999-2002 by Patrice Fortier and Lutz Sammer
+//	(c) Copyright 1999-2003 by Patrice Fortier and Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -69,13 +69,13 @@ global void InitGroups(void)
 {
     int i;
 
-    for( i=0; i<NUM_GROUPS; i++ ) {
+    for (i = 0; i < NUM_GROUPS; ++i) {
 	int n;
 
-	if( (n=Groups[i].NumUnits) ) {		// Cleanup after load
-	    while( n-- ) {
+	if ((n = Groups[i].NumUnits)) {		// Cleanup after load
+	    while (n--) {
 		DebugLevel0Fn("FIXME: old code!\n");
-		Groups[i].Units[n]=UnitSlots[(int)Groups[i].Units[n]];
+		Groups[i].Units[n] = UnitSlots[(int)Groups[i].Units[n]];
 	    }
 	}
     }
@@ -92,17 +92,17 @@ global void SaveGroups(CLFile* file)
     int g;
     char* ref;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: groups $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: groups $Id$\n\n");
 
-    for( g=0; g<NUM_GROUPS; g++ ) {
-	CLprintf(file,"(group %d %d '(",g,Groups[g].NumUnits);
-	for( i=0; i<Groups[g].NumUnits; ++i ) {
-	    ref=UnitReference(Groups[g].Units[i]);
-	    CLprintf(file,"%s ",ref);
+    for (g = 0; g < NUM_GROUPS; ++g) {
+	CLprintf(file, "(group %d %d '(", g, Groups[g].NumUnits);
+	for (i = 0; i < Groups[g].NumUnits; ++i) {
+	    ref = UnitReference(Groups[g].Units[i]);
+	    CLprintf(file, "%s ", ref);
 	    free(ref);
 	}
-	CLprintf(file,"))\n");
+	CLprintf(file, "))\n");
     }
 }
 
@@ -113,8 +113,8 @@ global void CleanGroups(void)
 {
     int i;
 
-    for( i=0; i<NUM_GROUPS; i++ ) {
-        memset(&Groups[i],0,sizeof(Groups[i]));
+    for (i = 0; i < NUM_GROUPS; ++i) {
+        memset(&Groups[i], 0, sizeof(Groups[i]));
     }
 }
 
@@ -150,12 +150,12 @@ global void ClearGroup(int num)
     UnitGroup *group;
     int i;
 
-    group=&Groups[num];
-    for( i=0; i<group->NumUnits; i++ ) {
-	group->Units[i]->GroupId &= ~(1<<num);
-	DebugCheck( group->Units[i]->Destroyed );
+    group = &Groups[num];
+    for (i = 0; i < group->NumUnits; ++i) {
+	group->Units[i]->GroupId &= ~(1 << num);
+	DebugCheck(group->Units[i]->Destroyed);
     }
-    group->NumUnits=0;
+    group->NumUnits = 0;
 }
 
 /**
@@ -165,17 +165,17 @@ global void ClearGroup(int num)
  **	@param nunits	Number of units in array.
  **	@param num	Group number for storage.
  */
-global void AddToGroup(Unit **units,int nunits,int num)
+global void AddToGroup(Unit** units, int nunits, int num)
 {
-    UnitGroup *group;
+    UnitGroup* group;
     int i;
 
-    DebugCheck(num>NUM_GROUPS);
+    DebugCheck(num > NUM_GROUPS);
 
-    group=&Groups[num];
-    for( i=0; group->NumUnits<NUM_UNITS_PER_GROUP && i<nunits; i++ ) {
-        group->Units[group->NumUnits++]=units[i];
-	units[i]->GroupId |= (1<<num);
+    group = &Groups[num];
+    for (i = 0; group->NumUnits < NUM_UNITS_PER_GROUP && i < nunits; ++i) {
+        group->Units[group->NumUnits++] = units[i];
+	units[i]->GroupId |= (1 << num);
     }
 }
 
@@ -186,12 +186,12 @@ global void AddToGroup(Unit **units,int nunits,int num)
  **	@param nunits	Number of units in array.
  **	@param num	Group number for storage.
  */
-global void SetGroup(Unit **units,int nunits,int num)
+global void SetGroup(Unit** units, int nunits, int num)
 {
-    DebugCheck(num>NUM_GROUPS || nunits>NUM_UNITS_PER_GROUP);
+    DebugCheck(num > NUM_GROUPS || nunits > NUM_UNITS_PER_GROUP);
 
     ClearGroup(num);
-    AddToGroup(units,nunits,num);
+    AddToGroup(units, nunits, num);
 }
 
 /**
@@ -199,30 +199,30 @@ global void SetGroup(Unit **units,int nunits,int num)
  **
  **	@param unit	Unit to remove from group.
  */
-global void RemoveUnitFromGroups(Unit *unit)
+global void RemoveUnitFromGroups(Unit* unit)
 {
-    UnitGroup *group;
+    UnitGroup* group;
     int num;
     int i;
 
-    DebugCheck( unit->GroupId==0 );	// unit doesn't belong to a group
+    DebugCheck(unit->GroupId == 0);	// unit doesn't belong to a group
 
-    for( num=0; unit->GroupId; num++,unit->GroupId>>=1 ) {
-	if( (unit->GroupId & 1) != 1 ) {
+    for (num = 0; unit->GroupId; ++num, unit->GroupId >>= 1) {
+	if ((unit->GroupId & 1) != 1) {
 	    continue;
 	}
 
-	group=&Groups[num];
-	for( i=0; group->Units[i]!=unit; i++ ) {
+	group = &Groups[num];
+	for (i = 0; group->Units[i] != unit; ++i) {
 	    ;
 	}
 
-	DebugCheck( i>=group->NumUnits );	// oops not found
+	DebugCheck(i >= group->NumUnits);	// oops not found
 
 	// This is a clean way that will allow us to add a unit
 	// to a group easily, or make an easy array walk...
-	if( i<--group->NumUnits ) {
-	    group->Units[i]=group->Units[group->NumUnits];
+	if (i < --group->NumUnits) {
+	    group->Units[i] = group->Units[group->NumUnits];
 	}
     }
 }
@@ -236,21 +236,21 @@ global void RemoveUnitFromGroups(Unit *unit)
 **	@param num	Number of units in group
 **	@param units	Units in group
 */
-local SCM CclGroup(SCM group,SCM num,SCM units)
+local SCM CclGroup(SCM group, SCM num, SCM units)
 {
     int i;
     UnitGroup* grp;
 
-    grp=&Groups[gh_scm2int(group)];
-    grp->NumUnits=gh_scm2int(num);
-    i=0;
-    while( !gh_null_p(units) ) {
+    grp = &Groups[gh_scm2int(group)];
+    grp->NumUnits = gh_scm2int(num);
+    i = 0;
+    while (!gh_null_p(units)) {
 	char* str;
 
-	str=gh_scm2newstr(gh_car(units),NULL);
-	grp->Units[i++]=(Unit*)strtol(str+1,NULL,16);
+	str = gh_scm2newstr(gh_car(units), NULL);
+	grp->Units[i++] = (Unit*)strtol(str + 1, NULL, 16);
 	free(str);
-	units=gh_cdr(units);
+	units = gh_cdr(units);
     }
 
     return SCM_UNSPECIFIED;
@@ -261,7 +261,7 @@ local SCM CclGroup(SCM group,SCM num,SCM units)
 */
 global void GroupCclRegister(void)
 {
-    gh_new_procedure3_0("group",CclGroup);
+    gh_new_procedure3_0("group", CclGroup);
 }
 
 //@}
