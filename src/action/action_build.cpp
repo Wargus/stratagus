@@ -163,7 +163,7 @@ global void HandleActionBuild(Unit* unit)
 	temp=OilPatchOnMap(x,y);
 	DebugCheck( !temp );
 	unit->Value=temp->Value;	// Let peon hold value while building
-	// FIXME: oil patch should NOT make sound
+	// oil patch should NOT make sound, handled by destroy unit
 	DestroyUnit(temp);		// Destroy oil patch
     }
 
@@ -199,6 +199,7 @@ global void HandleActionBuilded(Unit* unit)
 	peon->Wait=1;
 	peon->Command.Action=UnitActionStill;
 	unit->Command.Data.Builded.Worker=NULL;
+	unit->Value=peon->Value;	// peon holding value while building
 	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
 	// Cancel building
 	DestroyUnit(unit);
@@ -244,8 +245,8 @@ global void HandleActionBuilded(Unit* unit)
 	if( type->GivesOil ) {
 	    CommandHaulOil(peon,unit,0);	// Let the unit haul oil
 	    DebugLevel0Fn("Update oil-platform\n");
-	    DebugLevel0Fn(" =%d\n",unit->Command.Data.OilWell.Active);
-	    unit->Command.Data.OilWell.Active=0;
+	    DebugLevel0Fn(" =%d\n",unit->Command.Data.Resource.Active);
+	    unit->Command.Data.Resource.Active=0;
 	    unit->Value=peon->Value;		// peon was holding value while building
 	}
 
