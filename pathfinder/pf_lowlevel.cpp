@@ -3,17 +3,22 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "freecraft.h"
 #include "unit.h"
 #include "map.h"
+#include "rdtsc.h"
 
+#include "hierarchical.h"
 #include "region_set.h"
 #include "pf_lowlevel.h"
 #include "pf_low_open.h"
 
 #define COST_MOVING_UNIT	2
 #define COST_WAITING_UNIT	4
+
+#define SCALE 20
 
 /* Experimentally modified Manhattan - classic Manhattan doesn't differentiate
  * between e.g. (dx,dy) = (1,1) and (2,0). However, this is not intuitive from
@@ -37,10 +42,10 @@
 #define SET_SEEN(mfo)       (Lowlevel.Seen[(mfo)/8] |= (1 << ((mfo)%8)))
 #define SEEN(mfo)           (Lowlevel.Seen[(mfo)/8] & (1 << ((mfo)%8)))
 
-#define REGION_FORBIDDEN(mf) ( !( Lowlevel.AllowedRegions[(mf)->RegId >> 3] \
+#define REGION_FORBIDDEN(mf) ( !( Lowlevel.HighPath->Set[(mf)->RegId >> 3] \
 		& (1 << ((mf)->RegId & 0x7)) ))
 
-#define rdtsc(ts)	asm volatile ("rdtsc" : "=a" (ts) : : "edx" )
+#define l_rdtsc(ts)	asm volatile ("rdtsc" : "=a" (ts) : : "edx" )
 
 #define GATHER_STATS
 #ifdef GATHER_STATS
@@ -57,11 +62,10 @@ typedef struct {
 #endif /* GATHER_STATS */
 
 struct pf_lowlevel {
-	unsigned char *AllowedRegions;
+	HighlevelPath *HighPath;
 	int BitmapSize;
 	unsigned char *Seen;
 	FieldCoords Goal;
-	int GoalReachable;
 	MapField *BestSoFar;
 	char Traceback[8];
 #ifdef GATHER_STATS
@@ -73,14 +77,13 @@ LowlevelNeighbor Neighbor[8];
 
 static struct pf_lowlevel Lowlevel;
 
-local void LowlevelReset (void);
-local int LowMarkGoal (Unit * );
+local void LowMarkGoal (Unit * );
 local MapField *LowAstarLoop (Unit * );
 local int LowTraceback (Unit * , MapField * );
-#ifdef GATHER_STATS
 local void LowResetStats (void);
-local void LowPrintStats (void);
-#endif /* GATHER_STATS */
+local int CostOfNeighbor (int , int , int , int );
+local void StudyHighlevelPath (HighlevelPath * );
+local int ComputeH (MapField * , int , int );
 
 int LowlevelInit (void)
 {
@@ -136,7 +139,7 @@ int LowlevelInit (void)
 	return 0;
 }
 
-local void LowlevelReset (void)
+void LowlevelReset (void)
 {
 	/* 210000 - 330000 (average about 300000) cycles on a 256x256 map */
 	memset (Lowlevel.Seen, 0, Lowlevel.BitmapSize);
@@ -146,18 +149,35 @@ local void LowlevelReset (void)
 #endif
 }
 
-int LowlevelPath (Unit *unit, unsigned char *allowed_regions)
+void LowlevelSetFieldSeen (int x, int y)
+{
+	int mfo = y * TheMap.Width + x;
+	SET_SEEN (mfo);
+}
+
+void LowlevelSetGoal (int x, int y)
+{
+	Lowlevel.Goal.X = x;
+	Lowlevel.Goal.Y = y;
+}
+
+int LowlevelPath (Unit *unit, HighlevelPath *HighPath)
 {
 	MapField *start, *end;
 	int retval;
 
-	Lowlevel.AllowedRegions = allowed_regions;
-	LowlevelReset ();
-	Lowlevel.GoalReachable = LowMarkGoal (unit);
+	if ( !HighPath->Studied) {
+		StudyHighlevelPath (HighPath);
+		HighPath->Studied = 1;
+	}
+	Lowlevel.HighPath = HighPath;
+	//LowlevelReset ();
+	//LowMarkGoal (unit);
 
 	start = TheMap.Fields + (unit->Y * TheMap.Width + unit->X);
 	start->g = 0;
-	start->f = start->h = H (unit->X, unit->Y);
+	//start->f = start->h = H (unit->X, unit->Y);
+	start->f = start->h = ComputeH (start, unit->X, unit->Y);
 	start->Traceback = -1;
 	start->Set = HIER_LOW_OPEN;
 	if ( !SEEN (start-TheMap.Fields) ) {
@@ -172,13 +192,10 @@ int LowlevelPath (Unit *unit, unsigned char *allowed_regions)
 	} else {
 		retval = 0;
 	}
-#ifdef GATHER_STATS
-	LowPrintStats ();
-#endif
 	return retval;
 }
 
-local int LowMarkGoal (Unit *unit)
+local void LowMarkGoal (Unit *unit)
 {
 	Unit *GoalUnit;
 	struct {
@@ -222,36 +239,67 @@ local int LowMarkGoal (Unit *unit)
 			}
 		}
 
-	/* FIXME find a goal substitute if the goal itself is not reachable - see
-	 * pf_highlevel.c */
-
 	Lowlevel.Goal.X = (xmax+xmin) / 2;
 	Lowlevel.Goal.Y = (ymax+ymin) / 2;
-	return reachable;
 }
+
+static int h_count=0;
 
 local MapField *LowAstarLoop (Unit *unit)
 {
 	int MovementMask = UnitMovementMask (unit);
 	MapField *mf;
+	unsigned ts0, ts1, ts2, ts[9], zzz;
+	int expanded = 0;
 
 	while ( (mf = LowOpenGetFirst()) ) {
 		int i;
+//#if 0
 		int mfo = mf - TheMap.Fields;
 		int mfx = mfo % TheMap.Width;
 		int mfy = mfo / TheMap.Width;
+//#endif
+
+/* DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG */
+#if 0
+		int mfo, mfx, mfy;
+		ts0 = ts1;
+		l_rdtsc (ts1);
+		printf ("iteration (%d,%d): %d cycles (h computed %d times)\n  ",
+							mfx, mfy, ts1-ts0, h_count);
+		printf ("  %d", ts2-ts0);
+		for (zzz=1; zzz<9; zzz++) {
+			printf ("+%d", ts[zzz] - ts[zzz-1]);
+		}
+		printf ("\n");
+		h_count = 0;
+		l_rdtsc (ts1);
+		mfo = mf - TheMap.Fields;
+		mfx = mfo % TheMap.Width;
+		mfy = mfo / TheMap.Width;
+#endif
+/* DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG */
+
 
 #ifdef GATHER_STATS
 		++Lowlevel.Stats.Iterations;
 #endif
+
+		if (expanded++ > 150)
+			break;
 
 		if (mf->Goal && SEEN (mfo)) {
 			return mf;
 		}
 		LowOpenDelete (mf);
 
+		//printf ("expanding (%3d,%3d) (g=%4d, h=%4d, f=%4d)\n", mfx, mfy,
+		//			mf->g, mf->h, mf->f);
+
 		if (mf->h < Lowlevel.BestSoFar->h)
 			Lowlevel.BestSoFar = mf;
+
+		l_rdtsc (ts2);
 
 		for (i=0; i<8; i++) {
 			int neigho = mfo + Neighbor[i].Offset;
@@ -260,6 +308,8 @@ local MapField *LowAstarLoop (Unit *unit)
 			int blocked, NeighCost;
 			int f, g, h;
 			int byte, bit;
+
+			ts[i] = rdtsc ();
 
 			/* FIXME what order of the following tests is the best? */
 
@@ -298,22 +348,25 @@ local MapField *LowAstarLoop (Unit *unit)
 				} else {
 					Unit *obstacle = UnitOnMapTile (neighx, neighy);
 					if (obstacle->Moving) {
-						NeighCost = COST_MOVING_UNIT;
+						NeighCost = SCALE * COST_MOVING_UNIT;
 					} else if ((obstacle->Wait && 
 								obstacle->Orders[0].Action == UnitActionMove)) {
-							NeighCost = COST_WAITING_UNIT;
+							NeighCost = SCALE * COST_WAITING_UNIT;
 					} else
 						continue;
 				}
-			} else
-				NeighCost = 1;
+			} else {
+				//NeighCost = 1;
+				NeighCost = CostOfNeighbor (mfx, mfy, neighx, neighy);
+			}
 
 			/* f, g and h computation takes ~42 cycles */
 			g = mf->g + NeighCost;
-			h = H (neighx, neighy);
-			f = g + h;
+			//h = H (neighx, neighy);
+			//h = ComputeH (neigh, neighx, neighy);
+			//f = g + h;
 
-			//rdtsc (ts0);
+			//l_rdtsc (ts0);
 			byte = neigho >> 3;
 			bit = 1 << (neigho & 0x7);
 #undef SEEN
@@ -321,48 +374,50 @@ local MapField *LowAstarLoop (Unit *unit)
 #undef SET_SEEN
 #define SET_SEEN(byte, bit) (Lowlevel.Seen[(byte)] |= (bit))
 			if ( !SEEN (byte, bit)) {
-				neigh->f = f;
 				neigh->g = g;
-				neigh->h = h;
+				neigh->h = ComputeH (neigh, neighx, neighy);
+				neigh->f = neigh->g + neigh->h;
 				neigh->Traceback = Lowlevel.Traceback[i];
 				neigh->Set = HIER_LOW_OPEN;
 				LowOpenAdd (neigh);
 				neigh->Goal = 0;
 				SET_SEEN (byte, bit);
-			} else
+			} else {
 				if (neigh->Goal) {
-					neigh->f = f;
 					neigh->g = g;
-					neigh->h = h;
+					neigh->h = ComputeH (neigh, neighx, neighy);
+					neigh->f = neigh->g + neigh->h;
 					neigh->Traceback = Lowlevel.Traceback[i];
 					neigh->Set = HIER_LOW_OPEN;
 					LowOpenAdd (neigh);
 				} else {
-				if (neigh->f <= f)
-					continue;
-				if (neigh->Set == HIER_LOW_CLOSED) {
-					neigh->f = f;
-					neigh->g = g;
-					neigh->h = h;
-					neigh->Traceback = Lowlevel.Traceback[i];
-					neigh->Set = HIER_LOW_OPEN;
-					LowOpenAdd (neigh);
+					if (neigh->g <= g)
+						continue;
+					if (neigh->Set == HIER_LOW_CLOSED) {
+						neigh->g = g;
+						neigh->h = ComputeH (neigh, neighx, neighy);
+						neigh->f = neigh->g + neigh->h;
+						neigh->Traceback = Lowlevel.Traceback[i];
+						neigh->Set = HIER_LOW_OPEN;
+						LowOpenAdd (neigh);
 #ifdef GATHER_STATS
-					++Lowlevel.Stats.Revocations[CLOSED];
+						++Lowlevel.Stats.Revocations[CLOSED];
 #endif
-				} else if (neigh->Set == HIER_LOW_OPEN) {
-					LowOpenDelete (neigh);
-					neigh->f = f;
-					neigh->g = g;
-					neigh->h = h;
-					neigh->Traceback = Lowlevel.Traceback[i];
-					LowOpenAdd (neigh);
+					} else if (neigh->Set == HIER_LOW_OPEN) {
+						LowOpenDelete (neigh);
+						neigh->g = g;
+						neigh->h = ComputeH (neigh, neighx, neighy);
+						neigh->f = neigh->g + neigh->h;
+						neigh->Traceback = Lowlevel.Traceback[i];
+						LowOpenAdd (neigh);
 #ifdef GATHER_STATS
-					++Lowlevel.Stats.Revocations[OPEN];
+						++Lowlevel.Stats.Revocations[OPEN];
+					}
 #endif
 				}
 			}
 		}
+		ts[i] = rdtsc ();
 		mf->Set = HIER_LOW_CLOSED;
 		//LowOpenPrint ();
 	}
@@ -437,24 +492,157 @@ local int LowTraceback (Unit *unit, MapField *end)
 	return path_length;
 }
 
-#ifdef GATHER_STATS
+#define DIAGONAL_PENALTY 3
+//#define SQUARE_PENALTY DIAGONAL_PENALTY
+#define SQUARE_PENALTY 0
+local int ComputeH (MapField *mf, int x, int y)
+{
+	int h;
+	int ul, ur, ll, lr;
+	int aw = AreaGetWidth ();
+	int ah = AreaGetHeight ();
+	int tmp0, tmp1, H;
+	FieldCoords InArea;
+	unsigned ts0, ts1, ts2;
+
+//	++h_count;
+
+	l_rdtsc (ts0);
+
+	/* TODO: find a better way of finding the appropriate HighPathStep than
+	 * this dumb linear search */
+	for (h=0; h < Lowlevel.HighPath->NumSteps; h++) {
+		if (mf->RegId == Lowlevel.HighPath->Sequence[h].RegId)
+			break;
+	}
+
+	l_rdtsc (ts1);
+
+	if (h==0 || h==1 || h==Lowlevel.HighPath->NumSteps) {
+		/* we're either inside goal region or inside one of the regions
+		 * (neighbors of the goal region) that are marked as usable but
+		 * don't lie on path (= they appear in the Set but not in Sequence)
+		 */
+		H = SCALE * (abs (x-Lowlevel.Goal.X) + abs (y-Lowlevel.Goal.Y));
+//		printf ("H(%3d,%3d, regid=%4d)==%4d (shortened)\n", x, y, mf->RegId, H);
+		return H;
+	}
+
+	ul = Lowlevel.HighPath->Sequence[h].H[UL];
+	ur = Lowlevel.HighPath->Sequence[h].H[UR];
+	ll = Lowlevel.HighPath->Sequence[h].H[LL];
+	lr = Lowlevel.HighPath->Sequence[h].H[LR];
+
+	InArea.X = x % aw;
+	InArea.Y = y % ah;
+	tmp0 = ul - ((ul-ur) * InArea.X) / (aw-1);
+	tmp1 = ll - ((ll-lr) * InArea.X) / (aw-1);
+	H = tmp0 - ((tmp0-tmp1) * InArea.Y) / (ah-1);
+	l_rdtsc (ts2);
+	//printf ("H(%3d,%3d, regid=%4d)==%4d\n", x, y, mf->RegId, H);
+	//printf ("ComputeH(): %4d %4d cycles\n", ts1-ts0, ts2-ts1);
+	return H;
+}
+
+local int CostOfNeighbor (int x0, int y0, int x1, int y1)
+{
+	return (x0 == x1) || (y0 == y1) ? SCALE-4-DIAGONAL_PENALTY : SCALE-4;
+}
+
+#define LOOK_AHEAD 3	/* we look this number of regions ahead */
+local void StudyHighlevelPath (HighlevelPath *hp)
+{
+	int h, i;
+	int amw = AreaMapWidth ();
+	int aw = AreaGetWidth ();
+	int ah = AreaGetHeight ();
+	struct {
+		int Offset;
+		FieldCoords Center;
+		FieldCoords Corners[NUM_CORNERS];
+	} a[hp->NumSteps-1 + LOOK_AHEAD], *Areas;
+	unsigned ts0, ts1;
+
+	l_rdtsc (ts0);
+
+	Areas = a + LOOK_AHEAD;
+	for (h=0; h < hp->NumSteps; h++) {
+		/* TODO: store these values in Area descriptors so that they don't
+		 * need to be recomputed over and over again */
+		Region *reg = RegionSetFind (hp->Sequence[h].RegId);
+		Areas[h].Offset = reg->Area.Y * amw + reg->Area.X;
+		Areas[h].Center.X = reg->Area.X * aw + aw/2;
+		Areas[h].Center.Y = reg->Area.Y * ah + ah/2;
+		Areas[h].Corners[UL].X = reg->Area.X * aw;
+		Areas[h].Corners[UL].Y = reg->Area.Y * ah;
+		Areas[h].Corners[UR].X = reg->Area.X * aw + aw-1;
+		Areas[h].Corners[UR].Y = reg->Area.Y * ah;
+		Areas[h].Corners[LL].X = reg->Area.X * aw;
+		Areas[h].Corners[LL].Y = reg->Area.Y * ah + ah-1;
+		Areas[h].Corners[LR].X = reg->Area.X * aw + aw-1;
+		Areas[h].Corners[LR].Y = reg->Area.Y * ah + ah-1;
+	}
+	for (h=-1; h >= -LOOK_AHEAD; h--) {
+		Areas[h].Offset = -1;
+		Areas[h].Center.X = SHRT_MAX;
+		Areas[h].Center.Y = SHRT_MAX;
+	}
+
+#define DIST(c0, c1)    (max ( abs ((c0).X - (c1).X), abs ( (c0).Y - (c1).Y)))
+	for (h = hp->NumSteps-1; h > 0; h--) {
+		int default_h = (h+1)*(aw*SCALE + SQUARE_PENALTY);
+		for (i=0; i<NUM_CORNERS; i++)
+			hp->Sequence[h].H[i] = default_h;
+
+		for (i=0; i<NUM_CORNERS; i++) {
+#if 0
+			if (DIST (Areas[h].Corners[i], Areas[h-1].Center) > aw ||
+					Areas[h-1].Offset == Areas[h].Offset)
+				continue;
+			hp->Sequence[h].H[i] -= (aw-1)*SCALE + SQUARE_PENALTY;
+			if (DIST (Areas[h].Corners[i], Areas[h-2].Center) > aw ||
+					Areas[h-2].Offset == Areas[h].Offset)
+				continue;
+			hp->Sequence[h].H[i] -= (aw-1)*SCALE + SQUARE_PENALTY;
+			if (DIST (Areas[h].Corners[i], Areas[h-3].Center) > aw ||
+					Areas[h-3].Offset == Areas[h].Offset)
+				continue;
+			hp->Sequence[h].H[i] -= (aw-1)*SCALE + SQUARE_PENALTY;
+#endif
+			if (DIST (Areas[h].Corners[i], Areas[h-1].Center) > aw)
+				continue;
+			hp->Sequence[h].H[i] -= (aw-1)*SCALE + SQUARE_PENALTY;
+			if (DIST (Areas[h].Corners[i], Areas[h-2].Center) > aw)
+				continue;
+			hp->Sequence[h].H[i] -= (aw-1)*SCALE + SQUARE_PENALTY;
+			if (DIST (Areas[h].Corners[i], Areas[h-3].Center) > aw)
+				continue;
+			hp->Sequence[h].H[i] -= (aw-1)*SCALE + SQUARE_PENALTY;
+		}
+	}
+	l_rdtsc (ts1);
+	//printf ("path studied in %d cycles.\n", ts1-ts0);
+}
 
 local void LowResetStats (void)
 {
+#ifdef GATHER_STATS
 	Lowlevel.Stats.Iterations = 0;
 	Lowlevel.Stats.Revocations[OPEN] = Lowlevel.Stats.Revocations[CLOSED] = 0;
 	Lowlevel.Stats.PathLength = 0;
+#endif /* GATHER_STATS */
 }
 
-local void LowPrintStats (void)
+void LowPrintStats (void)
 {
+#ifdef GATHER_STATS
 	printf ("Lowlevel: %d steps\n", Lowlevel.Stats.PathLength);
 	printf ("  Iterations: %d\n", Lowlevel.Stats.Iterations);
 	printf ("  Revocations: %d from Open, %d from Closed\n",
 		Lowlevel.Stats.Revocations[OPEN], Lowlevel.Stats.Revocations[CLOSED]);
+#endif /* GATHER_STATS */
 }
 
-#endif /* GATHER_STATS */
 
 #if 0
 void ExportMap (void)

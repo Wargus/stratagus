@@ -4,8 +4,8 @@
 #ifndef REGION_H
 #define REGION_H
 
-#define HIERARCHICAL_BACKEND
-#include "hierarchical.h"
+//#define HIERARCHICAL_BACKEND
+#include "types.h"
 
 /**
 **  Map region typedef
@@ -23,9 +23,11 @@ struct _region_neighbor_ {
 **  A region of the map
 */
 struct _region_ {
-    unsigned short RegId;			/* this Region's id number */
-    unsigned short GroupId;		/* id of the RegGroup to which Region belongs */
-	unsigned short Passability;		/* MapField::Flags of the region's fields */
+    unsigned short RegId;			// this Region's id number
+    unsigned short GroupId;		// id of the RegGroup to which Region belongs
+	struct _region_ *Next;
+	struct _region_ *NextInGroup;
+	unsigned short Passability;		// MapField::Flags of the region's fields
     /*
      * Tile map coordinates of one of the region's tiles. It doesn't really
      * matter which one of the region's tiles will be stored here since this
@@ -40,6 +42,7 @@ struct _region_ {
     /* Highlevel A* stuff */
     Region *Parent;
     unsigned short f, g;
+	unsigned short h;				// for BestSoFar computation only
 	unsigned int Open:1;
 	unsigned int Closed:1;
 	unsigned int Goal:1;
@@ -48,10 +51,10 @@ struct _region_ {
 	 * and store it here so that we can avoid computing it repeatedly in
 	 * highlevel pathfinder's inner loops */
 	AreaCoords Area;		// which area this region lies in
-#ifdef REGION_GATHER_STATS
 	int NumFields;			// number of MapFields belonging to this Region
-#endif
 };
+
+extern Region *AllRegions;
 
 extern Region *RegionNew (int , int );
 extern void RegionDestroy (Region * );
@@ -60,5 +63,7 @@ extern void RegionDeleteNeighbor (Region * , Region * );
 extern int RegionIsNeighbor (Region * , Region * );
 extern unsigned int RegionComputeCost (Region * , Region * );
 extern void RegionChangeRegId (Region * , int );
+extern int RegionGetH (Region * , int , int );
+extern void RegionMarkBest (Region * , int , int );
 
 #endif /* REGION_H */

@@ -22,11 +22,8 @@ static struct region_set {
 } RegionSet;
 
 local void RegionSetFindRegions (void);
-local void RegionSetFindRegionsInArea (int , int );
 local void RegionSetFlush (void);
 local void RegionSetInsert (Region * );
-//local void RegionSetDelete (Region * );
-local void RegionSetCreateNeighborLists (int , int , int , int);
 
 void RegionSetInitialize (void)
 {
@@ -36,33 +33,37 @@ void RegionSetInitialize (void)
 	RegidSpaceInitialize (&RegionSet.RegidSpace, TheMap.Width*TheMap.Height/4);
 	RegionSetFindRegions ();
 	RegidBitmapShrink (&RegionSet.RegidSpace);
-	RegionSetCreateNeighborLists (0, 0, TheMap.Width, TheMap.Height);
+	RegionSetCreateNeighborLists (0, 0, TheMap.Width - 1, TheMap.Height - 1);
 }
 
 local void RegionSetFindRegions (void)
 {
 	int i, j;
 
-	printf ("looking for regions:      ");
+//	printf ("looking for regions:      ");
 	for (j=0; j < TheMap.Height / AreaGetHeight (); j++)
 		for (i=0; i < TheMap.Width / AreaGetWidth (); i++) {
 			RegionSetFindRegionsInArea (i, j);
 		}
 
-	printf (" found\n");
+//	printf (" found\n");
+	printf ("Found %d regions.\n", RegionSetGetNumRegions ());
 }
 
-local void RegionSetFindRegionsInArea (int x, int y)
+void RegionSetFindRegionsInArea (int x, int y)
 {
 	int i, j;
 	int area_width = AreaGetWidth ();
 	int area_height = AreaGetHeight ();
+	int num_reg = 0;
 
 	for (j = y * area_height; j < (y+1) * area_height; j++)
 		for (i = x * area_width; i < (x+1) * area_width; i++) {
 			Region *new;
 			int regid;
 
+			if (!MapFieldPassable (i, j, MapFieldBuilding))
+				continue;
 			/* MapField flags are really quite unorthogonal and difficult
 			 * to work with. There's no elegant way of specifying which
 			 * MapField types are suitable for being part of a region. Rocks
@@ -79,6 +80,7 @@ local void RegionSetFindRegionsInArea (int x, int y)
 			if (MapFieldGetRegId (i, j))
 				continue;	// this field's been assigned to a region already
 			new = RegionNew (i, j);
+			++num_reg;
 
 			regid = RegidFind (&RegionSet.RegidSpace, REGID_LOWEST,
 									REGID_UNUSED);
@@ -93,9 +95,13 @@ local void RegionSetFindRegionsInArea (int x, int y)
 			RegionSetInsert (new);
 			++RegionSet.NumRegions;
 
+			AreaAddRegion (x, y, new);
+
+#if 0
 			printf ("\b\b\b\b\b");
 			printf ("%5d", RegionSet.NumRegions);
 			fflush (stdout);
+#endif
 		}
 }
 
@@ -109,12 +115,11 @@ local void RegionSetInsert (Region *reg)
 	AvlAdd (&RegionSet.Regions, reg, reg->RegId);
 }
 
-#if 0
-local void RegionSetDelete (Region *reg)
+void RegionSetDelete (Region *reg)
 {
 	AvlDelete (&RegionSet.Regions, reg->RegId);
+	RegidMarkUnused (&RegionSet.RegidSpace, reg->RegId);
 }
-#endif
 
 Region *RegionSetFind (int regid)
 {
@@ -128,7 +133,7 @@ inline int RegionSetGetNumRegions (void)
 
 
 /* FIXME surely there's a smarter way of doing this */
-local void RegionSetCreateNeighborLists (int x0, int y0, int x1, int y1)
+void RegionSetCreateNeighborLists (int x0, int y0, int x1, int y1)
 {
 	int x, y;
 	static struct {
@@ -138,8 +143,8 @@ local void RegionSetCreateNeighborLists (int x0, int y0, int x1, int y1)
 		{ 0,  1 }, {-1,  1 }, {-1, 0 }, {-1,-1 }
 	};
 
-	for (y=y0; y<y1; y++)
-		for (x=x0; x<x1; x++) {
+	for (y=y0; y<=y1; y++)
+		for (x=x0; x<=x1; x++) {
 			int regid = MapFieldGetRegId (x, y);
 			Region *reg;
 			int i;

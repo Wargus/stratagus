@@ -8,12 +8,14 @@
 #include "map.h"
 #include "unit.h"
 
-#include "hierarchical.h"
 #include "region_set.h"
 #include "region_groups.h"
+#include "hierarchical.h"
 #include "pf_highlevel.h"
 #include "pf_lowlevel.h"
+#include "pf_goal.h"
 
+#define TIMEIT
 #if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
 #endif
@@ -28,8 +30,36 @@ struct pf_hier_config {
 
 static struct pf_hier_config Config;
 
+typedef struct area {
+	int NumRegions;
+	//int NextRegSlot;
+	Region **Regions;
+} Area;
+
+struct hierarchic {
+	/* these are dimensions of the map expressed in units of area dimensions */
+	int AMapWidth;
+	int AMapHeight;
+	Area *Areas;
+} H;
+
+int PfHierShowRegIds = 1;
+int PfHierShowGroupIds = 1;
+
+//local void AreaAddRegion (int , int , Region * );
+local void AreaDestroyRegions (int , int );
+local int AreasInitialize (void);
+local void AreasFillRegionLists (void);
 local int PfHierGetPrecomputed (Unit * , int * , int * );
 local int ResolveDeadlock (Unit * , Unit * , int * , int * );
+local int GetGroupIds (int , int , int , int , unsigned short ** );
+local int RegGroupRecomputationNeeded (int , int , int , int );
+local int GetGroupsInNeighborhood (int , int , int , int , unsigned short ** );
+local int ScanNeighborhood (int x0, int y0, int x1, int y1, unsigned int );
+local void RestoreGroupIds (int , int , int , int );
+local void CheckBounds (int * , int * , int * , int * );
+local unsigned int MapFieldGetGroupId (int , int );
+local unsigned short MapFieldGetPassability (int , int );
 
 int PfHierInitialize (void)
 {
@@ -38,8 +68,10 @@ int PfHierInitialize (void)
 	else
 		Config.Area.Width = Config.Area.Height = 16;
 
+	AreasInitialize ();
 	RegionSetInitialize ();
-	RegGroupSetInitialize ();
+	RegGroupsInitialize ();
+	//AreasFillRegionLists ();
 	HighlevelInit ();
 	LowlevelInit ();
 	/* FIXME should return something useful */
@@ -48,32 +80,101 @@ int PfHierInitialize (void)
 
 int PfHierComputePath (Unit *unit, int *dx, int *dy)
 {
-	unsigned int ts0, ts1, hightime, lowtime;
-	unsigned char *AllowedRegions;
+	unsigned int ts0, ts1, ts2, ts3, hightime, lowtime;
+	unsigned int low_reset, low_mark, low_path;
+	HighlevelPath *HighPath;
+	int retval;
 
 	if (unit->Data.Move.Length) {
 		/* there are still precomputed path segments left */
 		int nexthop_status;
 		if ((nexthop_status = PfHierGetPrecomputed (unit, dx, dy)) != -2)
 			return nexthop_status;
+		/* FIXME: add check whether we are next to our goal - in that case
+		 * firing the pathfinder is unnecessary. */
 	}
 
+	if (GoalReached (unit)) {
+		HighReleasePath (unit);
+		return -1;		/* PF_REACHED */
+	}
+
+	/* We need to reset lowlevel pathfinder even before we run highlevel
+	 * pathfinder because in case the goal is reachable, highlevel pathfinder
+	 * will mark goal fields for the lowlevel one. Running LowlevelReset()
+	 * *after* the highlevel pathfinder has run would erase this information.
+	 */
 	ts0 = rdtsc ();
-	AllowedRegions = HighlevelPath (unit);
+	LowlevelReset ();
 	ts1 = rdtsc ();
+	low_reset = ts1-ts0;
+
+	ts0 = rdtsc ();
+	HighPath = ComputeHighlevelPath (unit);
+	ts1 = rdtsc ();
+	if (!HighPath)
+		return -2;	/* PF_UNREACHABLE */
+
 	hightime = ts1-ts0;
+	//HighPrintStats ();
+	//HighPrintPath (HighPath, unit->Type->UnitType != UnitTypeFly);
 
-	if (!AllowedRegions)
-		return 1;
-
-	ts0 = rdtsc ();
-	LowlevelPath (unit, AllowedRegions);
 	ts1 = rdtsc ();
-	lowtime = ts1-ts0;
-	printf ("hierarchical: %d/%d cycles.\n", hightime, lowtime);
+	MarkLowlevelGoal (unit, HighPath);
+	ts2 = rdtsc ();
+	low_mark = ts2-ts1;
+	LowlevelPath (unit, HighPath);
+	ts3 = rdtsc ();
+	lowtime = ts3-ts0;
+	low_path = ts3-ts2;
+	//LowPrintStats ();
+	//printf ("hierarchical: %d/%d(%d,%d,%d) cycles.\n\n", hightime, lowtime,
+	//			low_reset, low_mark, low_path);
 
-	return PfHierGetPrecomputed (unit, dx, dy);
+	retval = PfHierGetPrecomputed (unit, dx, dy);
+	if (retval == -1 /* PF_REACHED */)
+		HighReleasePath (unit);
+	return retval;
 }
+
+void PfHierReleaseData (Unit *unit)
+{
+	HighReleasePath (unit);
+}
+
+int AreaMapWidth (void)
+{
+	return H.AMapWidth;
+}
+
+int AreaMapHeight (void)
+{
+	return H.AMapHeight;
+}
+
+local int AreasInitialize (void)
+{
+	H.AMapWidth = TheMap.Width / AreaGetWidth();
+	H.AMapHeight = TheMap.Width / AreaGetHeight();
+
+	H.Areas = (Area * )calloc (H.AMapWidth * H.AMapHeight, sizeof (Area));
+	if ( !H.Areas)
+		return -1;
+	else
+		return 0;
+}
+
+#if 0
+local void AreasFillRegionLists (void)
+{
+	int i;
+
+	for (i=1; i<=RegionSetGetNumRegions(); i++) {
+		Region *reg = RegionSetFind (i);
+		AreaAddRegion (reg->Area.X, reg->Area.Y, reg);
+	}
+}
+#endif
 
 inline int AreaGetWidth (void)
 {
@@ -83,6 +184,60 @@ inline int AreaGetWidth (void)
 inline int AreaGetHeight (void)
 {
 	return Config.Area.Height;
+}
+
+void AreaSetNumRegions (int ax, int ay, int num_reg)
+{
+	H.Areas[ay * H.AMapWidth + ax].NumRegions = num_reg;
+}
+
+int AreaGetRegions (int x, int y, Region ***regs)
+{
+	int aoffset = y * H.AMapWidth + x;
+	*regs = H.Areas[aoffset].Regions;
+	return H.Areas[aoffset].NumRegions;
+}
+
+#if 0
+local void AreaAddRegion (int ax, int ay, Region *reg)
+{
+	Area *area = &H.Areas[ay * H.AMapWidth + ax];
+
+	if (!area->Regions) {
+		area->Regions = (Region ** )malloc (area->NumRegions*sizeof (Region *));
+		area->NextRegSlot = 0;
+	}
+	area->Regions[area->NextRegSlot++] = reg;
+}
+#endif
+
+void AreaAddRegion (int ax, int ay, Region *reg)
+{
+	Area *area = &H.Areas[ay * H.AMapWidth + ax];
+
+	++area->NumRegions;
+	area->Regions = (Region ** )realloc (area->Regions,
+						area->NumRegions * sizeof (Region * ));
+	area->Regions[area->NumRegions - 1] = reg;
+}
+
+local void AreaDestroyRegions (int ax, int ay)
+{
+	Area *area = &H.Areas[ay * H.AMapWidth + ax];
+	int i;
+
+	for (i=0; i<area->NumRegions; i++) {
+		Region *r = area->Regions[i];
+
+		HighInvalidateCacheEntries (r->RegId);
+		RegionSetDelete (r);
+		if (r->GroupId)		/* if r still belongs to a RegGroup */
+			RegGroupIdDeleteRegion (r->GroupId, r);
+		RegionDestroy (r);
+	}
+	area->NumRegions = 0;
+	free (area->Regions);
+	area->Regions = NULL;
 }
 
 int AreaNeighborship (AreaCoords *a0, AreaCoords *a1)
@@ -100,9 +255,30 @@ int AreaNeighborship (AreaCoords *a0, AreaCoords *a1)
 
 void NodePerformOperation (int x, int y, NodeOperation opcode, int opargs[])
 {
+	int h, dx, dy;
+
 	switch (opcode) {
 	case SET_REGID:
 		MapFieldSetRegId (x, y, opargs[0]);
+		break;
+	case GET_BEST:
+		dx = abs (x - opargs[0]);
+		dy = abs (y - opargs[1]);
+		//h = dx + dy + max (dx, dy);
+		h = dx*dx + dy*dy;
+		if (h < opargs[2])
+			opargs[2] = h;
+		break;
+	case MARK_BEST:
+		dx = abs (x - opargs[0]);
+		dy = abs (y - opargs[1]);
+		//h = dx + dy + max (dx, dy);
+		h = dx*dx + dy*dy;
+		if (h == opargs[2]) {
+			TheMap.Fields[ y * TheMap.Width + x ].Goal = 1;
+			LowlevelSetFieldSeen (x, y);
+			//printf ("marking (%d,%d) as best\n", x, y);
+		}
 		break;
 	default:
 		break;
@@ -261,4 +437,349 @@ local int ResolveDeadlock (Unit *unit, Unit *obstacle, int *dx, int *dy)
 
 	*dx = *dy = 0;
 	return 0;
+}
+
+/* it is presumed that x0<=x1 && y0<=y1 and it is the caller's responsibility
+ * to make sure that these conditions really hold */
+void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
+{
+	unsigned ts1, ts0 = rdtsc ();
+	int ax0 = x0 / AreaGetWidth();
+	int ay0 = y0 / AreaGetHeight();
+	int ax1 = x1 / AreaGetWidth();
+	int ay1 = y1 / AreaGetHeight();
+	int x, y;
+	unsigned short *GrpsToRecompute=NULL;
+	int RecomputeGroups = RegGroupRecomputationNeeded (x0, y0, x1, y1);
+
+	printf ("MapChanged: (%d,%d)->(%d,%d), groups %s need to be recomputed\n",
+					x0, y0, x1, y1, RecomputeGroups ? "" : "don't");
+
+	x0 = ax0 * AreaGetWidth();
+	y0 = ay0 * AreaGetHeight();
+	x1 = (ax1 + 1) * AreaGetWidth();
+	y1 = (ay1 + 1) * AreaGetHeight();
+
+	/* reset regids in concerned area to zero */
+	for (y=y0; y<y1; y++) {
+		for (x=x0; x<x1; x++)
+			MapFieldSetRegId (x, y, 0);
+	}
+
+	if (RecomputeGroups) {
+		int num_grps = GetGroupIds (ax0, ay0, ax1, ay1, &GrpsToRecompute);
+		for (x=0; x<num_grps; x++) {
+			/* FIXME remove once debugged */
+			RegGroupConsistencyCheck (GrpsToRecompute[x]);
+			RegGroupDestroy (GrpsToRecompute[x]);
+		}
+	}
+
+	/* destroy regions in concerned Area(s) and find new ones */
+	for (y=ay0; y<=ay1; y++)
+		for (x=ax0; x<=ax1; x++) {
+			AreaDestroyRegions (x, y);
+			RegionSetFindRegionsInArea (x, y);
+		}
+
+	/* restore neighborship information */
+	--x0; --y0;
+	CheckBounds (&x0, &y0, &x1, &y1);
+	RegionSetCreateNeighborLists (x0, y0, x1, y1);
+	if (RecomputeGroups) {
+		RegGroupSetInitialize ();
+	} else {
+		RestoreGroupIds (ax0, ay0, ax1, ay1);
+	}
+	ts1 = rdtsc ();
+	printf ("PfHierMapChangedCallback(): %d cycles.\n", ts1-ts0);
+}
+
+local int GetGroupIds (int ax0, int ay0, int ax1, int ay1,
+				unsigned short **grpids)
+{
+	int x, y, num_grps=0;
+
+	*grpids = NULL;
+	for (y=ay0; y<=ay1; y++)
+		for (x=ax0; x<=ax1; x++) {
+			Area *area = &H.Areas[y * H.AMapWidth + x];
+			int i;
+
+			for (i=0; i<area->NumRegions; i++) {
+				int n, seen;
+				for (n=0, seen=0; n<num_grps; n++)
+					if ((*grpids)[n] == area->Regions[i]->GroupId) {
+						seen = 1;
+						break;
+					}
+
+				if (seen)
+					continue;
+
+				++num_grps;
+				*grpids = (unsigned short * )realloc (*grpids,
+									num_grps * sizeof (unsigned short * ));
+				(*grpids)[num_grps-1] = area->Regions[i]->GroupId;
+			}
+		}
+
+	return num_grps;
+}
+
+/* If the part of map which is being changed is wholly surrounded by just one
+ * GroupId *or* if it has exactly one continuous area of a different GroupId
+ * in its neighborhood *then* there's no chance that RegGroups should be joined
+ * or split. */
+/* FIXME the previous comment is not entirely correct */
+
+local int RegGroupRecomputationNeeded (int x0, int y0, int x1, int y1)
+{
+	unsigned short *GroupsInNeighborhood=NULL;
+	int i, num_grps;
+	int xmin=x0-1;
+	int ymin=y0-1;
+	int xmax=x1+1;
+	int ymax=y1+1;
+
+	CheckBounds (&xmin, &ymin, &xmax, &ymax);
+	num_grps = GetGroupsInNeighborhood (xmin, ymin, xmax, ymax,
+							&GroupsInNeighborhood);
+	/* TODO: if *any* of the adjacent groups needs to be recomputed, currently
+	 * we recompute *all* of them. This is very wasteful a should be fixed
+	 * so that we recompute affected groups only. */
+	for (i=0; i<num_grps; i++)
+		if (ScanNeighborhood (x0, y0, x1, y1, GroupsInNeighborhood[i]))
+			return 1;
+
+	return 0;
+}
+
+#define USE_PASSABILITY 1	/* instead of GroupId's */
+
+local int GetGroupsInNeighborhood (int x0, int y0, int x1, int y1,
+				unsigned short **grpids)
+{
+	int x, y, num_grps=0;
+
+	*grpids = NULL;
+	for (y=y0; y<=y1; y++)
+		for (x=x0; x<=x1; x++) {
+			int n, seen;
+			unsigned int GroupId;
+#ifdef USE_PASSABILITY
+			unsigned short Passability;
+#endif
+
+			if ( (x!=x0 && x!=x1) && (y!=y0 && y!=y1) )
+				continue;
+
+			GroupId = MapFieldGetGroupId (x, y);
+			if (GroupId == 0)
+				continue;
+
+#ifdef USE_PASSABILITY
+			Passability = MapFieldGetPassability (x, y);
+#endif
+
+			for (n=0, seen=0; n<num_grps; n++)
+#ifdef USE_PASSABILITY
+				if ((*grpids)[n] == Passability) {
+#else
+				if ((*grpids)[n] == GroupId) {
+#endif
+					seen = 1;
+					break;
+				}
+
+			if (seen)
+				continue;
+
+			++num_grps;
+			*grpids = (unsigned short * )realloc (*grpids,
+								num_grps * sizeof (unsigned short * ));
+#ifdef USE_PASSABILITY
+			(*grpids)[num_grps-1] = Passability;
+#else
+			(*grpids)[num_grps-1] = GroupId;
+#endif
+		}
+
+	return num_grps;
+}
+
+local int ScanNeighborhood (int x0, int y0, int x1, int y1,
+						unsigned int group_id)
+{
+	unsigned int FirstGroupId, LastGroupId, GroupId;
+	int x, y, changes=0;
+#ifdef USE_PASSABILITY
+	unsigned short Passability;
+
+	FirstGroupId = LastGroupId = MapFieldGetPassability(x0, y0-1>=0 ? y0-1 : 0);
+#else
+	FirstGroupId = LastGroupId = MapFieldGetGroupId (x0, y0-1>=0 ? y0-1 : 0);
+#endif
+
+	y = y0-1;
+	if (y>=0) {
+		for (x=x0; x<=x1+1; x++) {
+			if (x<0 || x>=TheMap.Width)
+				continue;
+#ifdef USE_PASSABILITY
+			Passability = MapFieldGetPassability (x, y);
+			if ( Passability == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = Passability;
+#else
+			GroupId = MapFieldGetGroupId (x, y);
+			if ( GroupId == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = GroupId;
+#endif
+			if (x==x1 && LastGroupId==group_id)
+				break;
+		}
+	}
+
+	x = x1+1;
+	if (x < TheMap.Width) {
+		for (y=y0; y<=y1+1; y++) {
+			if (y<0 || y>=TheMap.Height)
+				continue;
+#ifdef USE_PASSABILITY
+			Passability = MapFieldGetPassability (x, y);
+			if ( Passability == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = Passability;
+#else
+			GroupId = MapFieldGetGroupId (x, y);
+			if ( GroupId == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = GroupId;
+#endif
+			if (y==y1 && LastGroupId==group_id)
+				break;
+		}
+	}
+
+	y = y1+1;
+	if (y < TheMap.Height) {
+		for (x=x1; x>=x0-1; x--) {
+			if (x<0 || x>=TheMap.Width)
+				continue;
+#ifdef USE_PASSABILITY
+			Passability = MapFieldGetPassability (x, y);
+			if ( Passability == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = Passability;
+#else
+			GroupId = MapFieldGetGroupId (x, y);
+			if ( GroupId == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = GroupId;
+#endif
+			if (x==x0 && LastGroupId==group_id)
+				break;
+		}
+	}
+
+	x = x0-1;
+	if (x>=0) {
+		for (y=y1; y>=y0-1; y--) {
+			if (y<0 || y>=TheMap.Height)
+				continue;
+#ifdef USE_PASSABILITY
+			Passability = MapFieldGetPassability (x, y);
+			if ( Passability == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = Passability;
+#else
+			GroupId = MapFieldGetGroupId (x, y);
+			if ( GroupId == group_id && LastGroupId != group_id)
+				++changes;
+			LastGroupId = GroupId;
+#endif
+			if (y==y0 && LastGroupId==group_id)
+				break;
+		}
+	}
+
+	if ( FirstGroupId == group_id && LastGroupId != group_id)
+		++changes;
+
+	if (changes > 1)
+		return 1;
+	else
+		return 0;
+}
+
+local void RestoreGroupIds (int ax0, int ay0, int ax1, int ay1)
+{
+	int i, done = 0;
+	int x, y;
+
+	//while (!done) {
+	for (i=0; i<2; i++) {
+		/* We go through this loop exactly twice. During the first pass
+		 * we assign to a RegGroup any of the orphaned Regions that *have*
+		 * at least one suitable neighbor from which proper GroupId can be
+		 * extracted. During the second pass we take check for any Regions
+		 * that still don't belong to any RegGroup (in other words, they
+		 * don't have any neighbor with the same Passability that *does*
+		 * belong to a RegGroup). Should any of these be detected, we need
+		 * to launch full-fledged RegGroupSetInitialize().
+		 */
+		done = 1;
+		for (y=ay0; y<=ay1; y++)
+			for (x=ax0; x<=ax1; x++) {
+				Area *area = &H.Areas[y * H.AMapWidth + x];
+				int i;
+
+				for (i=0; i<area->NumRegions; i++) {
+					Region *reg = area->Regions[i];
+					int j;
+
+					if (reg->GroupId)
+						continue;
+
+					for (j=0; j < reg->NumNeighbors; j++) {
+						Region *neigh = reg->Neighbors[j].Region;
+						if (neigh->GroupId &&
+									reg->Passability == neigh->Passability) {
+							RegGroupIdMarkRegions (neigh->GroupId, reg);
+							break;
+						}
+					}
+					done = 0;
+				}
+			}
+	}
+
+	if ( !done)
+		RegGroupSetInitialize ();
+}
+
+local void CheckBounds (int *x0, int *y0, int *x1, int *y1)
+{
+	if (*x0<0) *x0=0;
+	if (*x1>TheMap.Width-1) *x1=TheMap.Width-1;
+	if (*y0<0) *y0=0;
+	if (*y1>TheMap.Height-1) *y1=TheMap.Height-1;
+}
+
+local unsigned int MapFieldGetGroupId (int tx, int ty)
+{
+	unsigned int regid, GroupId;
+	Region *r;
+
+	regid = MapFieldGetRegId (tx, ty);
+	r = RegionSetFind (regid);
+	GroupId = r ? r->GroupId : 0;
+	return GroupId;
+}
+
+local unsigned short MapFieldGetPassability (int tx, int ty)
+{
+	return TheMap.Fields[ty*TheMap.Height+tx].Flags & MOVEMENT_IMPORTANT_FLAGS;
 }
