@@ -1064,7 +1064,7 @@ global void WriteSoundThreaded(void)
 	    audio_buf_info info;
 
 	    ioctl(SoundFildes, SNDCTL_DSP_GETOSPACE, &info);
-	    DebugLevel0("Free bytes %d\n", info.bytes);
+	    DebugLevel0("Free bytes %d\n" _C_ info.bytes);
 	}
 	FillChannels(free_channels, &discarded_request, &started_request);
 	how_many_playing += started_request;
@@ -1101,16 +1101,16 @@ global void WriteSoundThreaded(void)
 	    how_many_playing -= new_free_channels;
 	}
 	free_channels = MaxChannels - how_many_playing;
-	DebugLevel3("Channels: %d %d %d\n", free_channels, how_many_playing,
+	DebugLevel3("Channels: %d %d %d\n" _C_ free_channels _C_ how_many_playing _C_
 	    new_free_channels);
 	new_free_channels += discarded_request;
 	// decrement semaphore by the number of stopped channels
 	for (; new_free_channels > 0; new_free_channels--) {
 	    //        sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
-	    //        DebugLevel3("SoundSemaphore: %d\n",tmp);
+	    //        DebugLevel3("SoundSemaphore: %d\n" _C_ tmp);
 	    sem_wait(&SoundThreadChannelSemaphore);
 	    //        sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
-	    //        DebugLevel3("SoundSemaphore: %d\n",tmp);
+	    //        DebugLevel3("SoundSemaphore: %d\n" _C_ tmp);
 	}
     }
 }
@@ -1178,9 +1178,9 @@ global int InitSoundServer(void)
 #else /* SPLIT_SCREEN_SUPPORT */
     //FIXME: Valid only in shared memory context!
     DistanceSilent=3*max(MapWidth,MapHeight);
-    DebugLevel2("Distance Silent: %d\n",DistanceSilent);
+    DebugLevel2("Distance Silent: %d\n" _C_ DistanceSilent);
     ViewPointOffset=max(MapWidth/2,MapHeight/2);
-    DebugLevel2("ViewPointOffset: %d\n",ViewPointOffset);
+    DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
 #endif /* SPLIT_SCREEN_SUPPORT */
 
 #ifdef USE_THREAD
