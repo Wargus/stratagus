@@ -122,7 +122,7 @@ local SCM CclStratagusMap(SCM list)
 		    TheMap.Terrain = i;
 		    // Ignore: str=gh_scm2newstr(gh_cadr(value),NULL);
 		    LoadTileset();
-		   
+
 		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
 		    value = gh_car(data);
 		    data = gh_cdr(data);
@@ -292,12 +292,12 @@ local SCM CclCenterMap(SCM x, SCM y)
 #elif defined(USE_LUA)
 local int CclCenterMap(lua_State* l)
 {
-    if (lua_gettop(l) != 2 || !lua_isnumber(l, 1) || !lua_isnumber(l, 2)) {
+    if (lua_gettop(l) != 2) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     ViewportCenterViewpoint(TheUI.SelectedViewport,
-	lua_tonumber(l, 1), lua_tonumber(l, 2));
+	LuaToNumber(l, 1), LuaToNumber(l, 2));
 
     return 0;
 }
@@ -340,19 +340,18 @@ local int CclShowMapLocation(lua_State* l)
     // Put a unit on map, use it's properties, except for
     // what is listed below
 
-    if (lua_gettop(l) != 4 || !lua_isnumber(l, 1) || !lua_isnumber(l, 2) ||
-	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4) || !lua_isstring(l, 5)) {
+    if (lua_gettop(l) != 4) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    unitname = lua_tostring(l, 5);
+    unitname = LuaToString(l, 5);
     target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
     target->Orders[0].Action = UnitActionStill;
     target->HP = 0;
-    target->X = lua_tonumber(l, 1);
-    target->Y = lua_tonumber(l, 2);
-    target->TTL = GameCycle + lua_tonumber(l, 4);
-    target->CurrentSightRange = lua_tonumber(l, 3);
+    target->X = LuaToNumber(l, 1);
+    target->Y = LuaToNumber(l, 2);
+    target->TTL = GameCycle + LuaToNumber(l, 4);
+    target->CurrentSightRange = LuaToNumber(l, 3);
     MapMarkUnitSight(target);
     return 0;
 }
@@ -385,12 +384,12 @@ local int CclSetDefaultMap(lua_State* l)
 {
     char* old;
 
-    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = strdup(DefaultMap);
-    strcpy(DefaultMap, lua_tostring(l, 1));
+    strcpy(DefaultMap, LuaToString(l, 1));
 
     lua_pushstring(l, old);
     free(old);
@@ -420,12 +419,12 @@ local int CclSetFogOfWar(lua_State* l)
 {
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = !TheMap.NoFogOfWar;
-    TheMap.NoFogOfWar = !lua_toboolean(l, 1);
+    TheMap.NoFogOfWar = !LuaToBoolean(l, 1);
 
     lua_pushboolean(l, old);
     return 1;
@@ -454,12 +453,12 @@ local int CclSetMinimapTerrain(lua_State* l)
 {
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     old = MinimapWithTerrain;
-    MinimapWithTerrain = lua_toboolean(l, 1);
+    MinimapWithTerrain = LuaToBoolean(l, 1);
 
     lua_pushboolean(l, old);
     return 1;
@@ -558,11 +557,11 @@ local int CclSetFogOfWarContrast(lua_State* l)
     int i;
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    i = lua_tonumber(l, 1);
+    i = LuaToNumber(l, 1);
     if (i < 0 || i > 400) {
 	PrintFunction();
 	fprintf(stdout, "Contrast should be 0 - 400\n");
@@ -610,11 +609,11 @@ local int CclSetFogOfWarBrightness(lua_State* l)
     int i;
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    i = lua_tonumber(l, 1);
+    i = LuaToNumber(l, 1);
     if (i < -100 || i > 100) {
 	PrintFunction();
 	fprintf(stdout, "Brightness should be -100 - 100\n");
@@ -662,11 +661,11 @@ local int CclSetFogOfWarSaturation(lua_State* l)
     int i;
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    i = lua_tonumber(l, 1);
+    i = LuaToNumber(l, 1);
     if (i < -100 || i > 200) {
 	PrintFunction();
 	fprintf(stdout, "Saturation should be -100 - 200\n");
@@ -714,11 +713,11 @@ local int CclSetForestRegeneration(lua_State* l)
     int i;
     int old;
 
-    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    i = lua_tonumber(l, 1);
+    i = LuaToNumber(l, 1);
     if (i < 0 || i > 255) {
 	PrintFunction();
 	fprintf(stdout, "Regneration speed should be 0 - 255\n");

@@ -204,7 +204,7 @@ local void VideoDrawChar8(const Graphic* sprite,
     dp = VideoMemory8 + x + y * VideoWidth - 1;
     da = VideoWidth - w;
     --w;
-    
+
 #define UNROLL \
     ++dp; \
     p = *++sp; \
@@ -621,7 +621,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 		    rev = FontPixels;
 		    FontPixels = ReverseTextColor;
 #endif
-		    
+
 		    ++text;
 		    break;
 		case '<':
@@ -887,7 +887,7 @@ local void FontMeasureWidths(ColorFont* fp)
 	    sp += fp->Graphic->Width;
 	}
 
-    }    
+    }
 }
 #else
 /**
@@ -1186,18 +1186,17 @@ local int CclDefineFont(lua_State* l)
 {
     int i;
 
-    if (lua_gettop(l) != 4 || !lua_isstring(l, 1) || !lua_isstring(l, 2) ||
-	    !lua_isnumber(l, 3) || !lua_isnumber(l, 4)) {
+    if (lua_gettop(l) != 4) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    i = CclFontByIdentifier(lua_tostring(l, 1));
+    i = CclFontByIdentifier(LuaToString(l, 1));
     free(Fonts[i].File);
     VideoSaveFree(Fonts[i].Graphic);
     Fonts[i].Graphic = NULL;
-    Fonts[i].File = strdup(lua_tostring(l, 2));
-    Fonts[i].Width = lua_tonumber(l, 3);
-    Fonts[i].Height = lua_tonumber(l, 4);
+    Fonts[i].File = strdup(LuaToString(l, 2));
+    Fonts[i].Width = LuaToNumber(l, 3);
+    Fonts[i].Height = LuaToNumber(l, 4);
 
     return 0;
 }
@@ -1281,11 +1280,11 @@ local int CclDefineFontColor(lua_State* l)
     FontColorMapping* fcm;
     FontColorMapping** fcmp;
 
-    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_istable(l, 2)) {
+    if (lua_gettop(l) != 2) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    color = strdup(lua_tostring(l, 1));
+    color = strdup(LuaToString(l, 1));
 
     if (!FontColorMappings) {
 	FontColorMappings = calloc(sizeof(*FontColorMappings), 1);
@@ -1312,25 +1311,13 @@ local int CclDefineFontColor(lua_State* l)
     }
     for (i = 0; i < NumFontColors; ++i) {
 	lua_rawgeti(l, 2, i * 3 + 1);
-	if (!lua_isnumber(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	fcm->RGB[i].R = lua_tonumber(l, -1);
+	fcm->RGB[i].R = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 2, i * 3 + 2);
-	if (!lua_isnumber(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	fcm->RGB[i].G = lua_tonumber(l, -1);
+	fcm->RGB[i].G = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	lua_rawgeti(l, 2, i * 3 + 3);
-	if (!lua_isnumber(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	fcm->RGB[i].B = lua_tonumber(l, -1);
+	fcm->RGB[i].B = LuaToNumber(l, -1);
 	lua_pop(l, 1);
     }
 

@@ -62,13 +62,13 @@ local SCM CclAStar(SCM list)
 {
     SCM value;
     int i;
-    
+
     while( !gh_null_p(list) ) {
 	value=gh_car(list);
 	list=gh_cdr(list);
 	if( gh_eq_p(value,gh_symbol2scm("fixed-unit-cost")) ) {
 	    i=gh_scm2int(gh_car(list));
-            list=gh_cdr(list);
+	    list=gh_cdr(list);
 	    if( i <=3 ) {
 		PrintFunction();
 		fprintf(stdout,"Fixed unit crossing cost must be strictly > 3\n");
@@ -101,7 +101,7 @@ local SCM CclAStar(SCM list)
 	    errl("Unsupported tag",value);
 	}
     }
-					  
+
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
@@ -114,18 +114,10 @@ local int CclAStar(lua_State* l)
 
     args = lua_gettop(l);
     for (j = 0; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, j + 1);
+	value = LuaToString(l, j + 1);
 	if (!strcmp(value, "fixed-unit-cost")) {
 	    ++j;
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    i = lua_tonumber(l, j + 1);
+	    i = LuaToNumber(l, j + 1);
 	    if (i <= 3) {
 		PrintFunction();
 		fprintf(stdout, "Fixed unit crossing cost must be strictly > 3\n");
@@ -134,11 +126,7 @@ local int CclAStar(lua_State* l)
 	    }
 	} else if (!strcmp(value, "moving-unit-cost")) {
 	    ++j;
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    i = lua_tonumber(l, j + 1);
+	    i = LuaToNumber(l, j + 1);
 	    if (i <= 3) {
 		PrintFunction();
 		fprintf(stdout, "Moving unit crossing cost must be strictly > 3\n");
@@ -151,11 +139,7 @@ local int CclAStar(lua_State* l)
 	    AStarKnowUnknown = 0;
 	} else if (!strcmp(value, "unseen-terrain-cost")) {
 	    ++j;
-	    if (!lua_isnumber(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    i = lua_tonumber(l, j + 1);
+	    i = LuaToNumber(l, j + 1);
 	    if (i < 0) {
 		PrintFunction();
 		fprintf(stdout, "Unseen Terrain Cost must be non-negative\n");

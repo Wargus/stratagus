@@ -216,11 +216,7 @@ local int CclDefineMissileTypeWcNames(lua_State* l)
     }
 
     for (j = 0; j < i; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
@@ -364,7 +360,7 @@ local SCM CclMissile(SCM list)
 	    list = gh_cdr(list);
 	    missile->CurrentStep = gh_scm2int(gh_car(sublist));
 	    missile->TotalStep = gh_scm2int(gh_cadr(sublist));
-        }
+	}
     }
     return SCM_UNSPECIFIED;
 }
