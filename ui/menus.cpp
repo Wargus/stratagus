@@ -140,6 +140,7 @@ local void TipsInit(Menuitem *mi);
 local void TipsExit(Menuitem *mi);
 local void TipsShowTipsGem(Menuitem *mi);
 local void TipsNextTip(void);
+local void TipsPreviousTip(void);
 
 // Custom game setup
 local void GameSetupInit(Menuitem *mi);
@@ -508,6 +509,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(TipsExit,"tips-exit");
     HASHADD(TipsShowTipsGem,"tips-show-tips-gem");
     HASHADD(TipsNextTip,"tips-next-tip");
+    HASHADD(TipsPreviousTip,"tips-previous-tip");
 
 // Custom game setup
     HASHADD(GameSetupInit,"game-setup-init");
@@ -2396,6 +2398,20 @@ local void TipsCycleNextTip(void)
 }
 
 /**
+**	Cycle to the previous tip
+*/
+local void TipsCyclePreviousTip(void)
+{
+    if (CurrentTip != 0) {
+	--CurrentTip;
+    } else {
+	while (Tips[CurrentTip+1] != NULL) {
+	    ++CurrentTip;
+	}
+    }
+}
+
+/**
 **	Tips menu exit callback
 */
 local void TipsExit(Menuitem *mi __attribute__((unused)))
@@ -2423,6 +2439,15 @@ local void TipsShowTipsGem(Menuitem *mi)
 local void TipsNextTip(void)
 {
     TipsCycleNextTip();
+    TipsInit(NULL);
+}
+
+/**
+**	Tips menu previous tip button callback
+*/
+local void TipsPreviousTip(void)
+{
+    TipsCyclePreviousTip();
     TipsInit(NULL);
 }
 
