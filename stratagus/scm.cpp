@@ -61,8 +61,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local char *scm_ptr;
-local char *scm_endptr;
+local char *chk_ptr;
+local char *chk_endptr;
 
 local int MapOffsetX;			/// Offset X for combined maps
 local int MapOffsetY;			/// Offset Y for combined maps
@@ -79,7 +79,7 @@ local int MapOffsetY;			/// Offset Y for combined maps
 **	@param height	Section height
 **	@param map	Map to store into
 */
-local void ScmConvertMTXM(const unsigned short * mtxm,int width,int height,WorldMap* map)
+local void ChkConvertMTXM(const unsigned short * mtxm,int width,int height,WorldMap* map)
 {
     const unsigned short* ctab;
     int h;
@@ -110,17 +110,17 @@ local void ScmConvertMTXM(const unsigned short * mtxm,int width,int height,World
 /**
 **	Read header
 */
-local int ScmReadHeader(char* header,long* length)
+local int ChkReadHeader(char* header,long* length)
 {
     long len;
 
-    if( scm_ptr >= scm_endptr) {
+    if( chk_ptr >= chk_endptr) {
 	return 0;
     }
-    memcpy(header, scm_ptr, 4);
-    scm_ptr += 4;
-    memcpy(&len, scm_ptr, 4);
-    scm_ptr += 4;
+    memcpy(header, chk_ptr, 4);
+    chk_ptr += 4;
+    memcpy(&len, chk_ptr, 4);
+    chk_ptr += 4;
     *length = ConvertLE32(len);
     return 1;
 }
@@ -128,36 +128,36 @@ local int ScmReadHeader(char* header,long* length)
 /**
 **	Read dword
 */
-local int ScmReadDWord(void)
+local int ChkReadDWord(void)
 {
     unsigned int temp_int;
 
-    memcpy(&temp_int, scm_ptr, 4);
-    scm_ptr += 4;
+    memcpy(&temp_int, chk_ptr, 4);
+    chk_ptr += 4;
     return ConvertLE32(temp_int);
 }
 
 /**
 **	Read word
 */
-local int ScmReadWord(void)
+local int ChkReadWord(void)
 {
     unsigned short temp_short;
 
-    memcpy(&temp_short, scm_ptr, 2);
-    scm_ptr += 2;
+    memcpy(&temp_short, chk_ptr, 2);
+    chk_ptr += 2;
     return ConvertLE16(temp_short);
 }
 
 /**
 **	Read byte
 */
-local int ScmReadByte(void)
+local int ChkReadByte(void)
 {
     unsigned char temp_char;
 
-    temp_char = *scm_ptr;
-    scm_ptr += 1;
+    temp_char = *chk_ptr;
+    chk_ptr += 1;
     return temp_char;
 }
 
@@ -194,45 +194,26 @@ local void ExtractMap(FILE *mpqfd,unsigned char** entry,int* size)
 }
 
 /**
-**	Get the info for a scm level.
+**	Get the info for a chk level.
+**
+**	@param chkdata	Buffer containing chk data
+**	@param len	Length of chk data
+**
+**	@return		Info about the map
 */
-global MapInfo* GetScmInfo(const char* scm)
+global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 {
-    unsigned char *scmdata;
-    long length;
-    char header[5];
-    char buf[1024];
     MapInfo* info;
-    FILE *fpMpq;
-    int entry_size;
-
-    if( !(fpMpq=fopen(scm, "rb")) ) {
-	fprintf(stderr,"Try ./path/name\n");
-	sprintf(buf, "scm: fopen(%s)", scm);
-	perror(buf);
-	ExitFatal(-1);
-    }
-
-    if( MpqReadInfo(fpMpq) ) {
-	fprintf(stderr,"MpqReadInfo failed\n");
-	ExitFatal(-1);
-    }
-
-    ExtractMap(fpMpq, &scmdata, &entry_size);
-
-    fclose(fpMpq);
-    if( !scmdata ) {
-	fprintf(stderr,"Could not extract map in %s\n",scm);
-	ExitFatal(-1);
-    }
+    char header[5];
+    long length;
 
     info=calloc(1, sizeof(MapInfo));	// clears with 0
 
-    scm_ptr = scmdata;
-    scm_endptr = scm_ptr + entry_size;
+    chk_ptr = chkdata;
+    chk_endptr = chk_ptr + len;
     header[4] = '\0';
 
-    while( ScmReadHeader(header,&length) ) {
+    while( ChkReadHeader(header,&length) ) {
 
 	//
 	//	SCM version
@@ -240,7 +221,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "VER ",4) ) {
 	    if( length==2 ) {
 		int v;
-		v = ScmReadWord();
+		v = ChkReadWord();
 		// 57 - beta57
 		// 59 - 1.00
 		// 63 - 1.04
@@ -256,7 +237,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "IVER",4) ) {
 	    if( length==2 ) {
 		int v;
-		v = ScmReadWord();
+		v = ChkReadWord();
 		// 9 - obsolete, beta
 		// 10 - current
 		continue;
@@ -269,7 +250,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	//
 	if( !memcmp(header, "VCOD",4) ) {
 	    if( length==1040 ) {
-		scm_ptr += 1040;
+		chk_ptr += 1040;
 		continue;
 	    }
 	    DebugLevel1("Wrong VCOD length\n");
@@ -280,7 +261,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	//
 	if( !memcmp(header, "IOWN",4) ) {
 	    if( length==12 ) {
-		scm_ptr += 12;
+		chk_ptr += 12;
 		continue;
 	    }
 	    DebugLevel1("Wrong IOWN length\n");
@@ -295,7 +276,7 @@ global MapInfo* GetScmInfo(const char* scm)
 		int p;
 
 		for( i=0; i<12; ++i ) {
-		    p=ScmReadByte();
+		    p=ChkReadByte();
 		    if( p==0 ) {
 			info->PlayerType[i]=PlayerNobody;
 		    }
@@ -329,7 +310,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	    if( length==2 ) {
 		int i;
 		int t;
-		t = ScmReadWord();
+		t = ChkReadWord();
 		//
 		//	Look if we have this as tileset.
 		//
@@ -358,8 +339,8 @@ global MapInfo* GetScmInfo(const char* scm)
 	//
 	if( !memcmp(header, "DIM ",4) ) {
 	    if( length==4 ) {
-		info->MapWidth=ScmReadWord();
-		info->MapHeight=ScmReadWord();
+		info->MapWidth=ChkReadWord();
+		info->MapHeight=ChkReadWord();
 		continue;
 	    }
 	    DebugLevel1("Wrong DIM  length\n");
@@ -383,7 +364,7 @@ global MapInfo* GetScmInfo(const char* scm)
 		// 10 - Human
 
 		for( i=0; i<12; ++i ) {
-		    v=ScmReadByte();
+		    v=ChkReadByte();
 		    info->PlayerSide[i]=v;
 		}
 		continue;
@@ -395,7 +376,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	//	Graphical tile map
 	//
 	if( !memcmp(header, "MTXM",4) ) {
-	    scm_ptr += length;
+	    chk_ptr += length;
 	    continue;
 	}
 
@@ -404,7 +385,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	//
 	if( !memcmp(header, "PUNI",4) ) {
 	    if( length==228*12 + 228 + 228*12 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong PUNI length\n");
@@ -415,7 +396,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	//
 	if( !memcmp(header, "UPGR",4) ) {
 	    if( length==46*12 + 46*12 + 46 + 46 + 46*12 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPGR length\n");
@@ -426,7 +407,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	//
 	if( !memcmp(header, "PTEC",4) ) {
 	    if( length==24*12 + 24*12 + 24 + 24 + 24*12 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong PTEC length\n");
@@ -438,7 +419,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "UNIT",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UNIT length\n");
@@ -450,7 +431,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "ISOM",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong ISOM length\n");
@@ -462,7 +443,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "TILE",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TILE length\n");
@@ -474,7 +455,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "DD2 ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong DD2  length\n");
@@ -486,7 +467,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "THG2",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong THG2 length\n");
@@ -498,7 +479,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "MASK",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong MASK length\n");
@@ -510,8 +491,8 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "STR ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		info->Description=strdup(scm_ptr+2051);
-		scm_ptr += length;
+		info->Description=strdup(chk_ptr+2051);
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong STR  length\n");
@@ -523,7 +504,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "UPRP",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPRP length\n");
@@ -535,7 +516,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "UPUS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPUS length\n");
@@ -547,7 +528,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "MRGN",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong MRGN length\n");
@@ -559,7 +540,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "TRIG",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TRIG length\n");
@@ -571,7 +552,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "MBRF",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong MBRF length\n");
@@ -583,7 +564,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "SPRP",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong SPRP length\n");
@@ -595,7 +576,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "FORC",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong FORC length\n");
@@ -607,7 +588,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "WAV ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong WAV  length\n");
@@ -619,7 +600,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "UNIS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UNIS length\n");
@@ -631,7 +612,7 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "UPGS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPGS length\n");
@@ -643,70 +624,135 @@ global MapInfo* GetScmInfo(const char* scm)
 	if( !memcmp(header, "TECS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TECS length\n");
 	}
 
 	DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
-	scm_ptr += length;
+	chk_ptr += length;
     }
-
-    free(scmdata);
-    CleanMpq();
 
     return info;
 }
 
 /**
-**	Load scm
+**	Get the info for a scm level.
 **
-**	@param scm	Name of the scm file
-**	@param map	The map
+**	@param scm	Name of the scm map
+**
+**	@return		Info about the map
 */
-global void LoadScm(const char* scm,WorldMap* map)
+global MapInfo* GetScmInfo(const char* scm)
 {
-    unsigned char *scmdata;
-    long length;
-    char header[5];
+    unsigned char *chkdata;
     char buf[1024];
-    int width;
-    int height;
-    int aiopps;
     FILE *fpMpq;
-    int entry_size;
+    int chklen;
+    MapInfo *info;
 
-    if (!map->Info) {
-	map->Info = GetScmInfo(scm);
-    }
-
-    if( !(fpMpq=fopen(scm, "rb")) ) {
-	fprintf(stderr,"Try ./path/name\n");
+    if( !(fpMpq = fopen(scm, "rb")) ) {
+	fprintf(stderr, "Try ./path/name\n");
 	sprintf(buf, "scm: fopen(%s)", scm);
 	perror(buf);
 	ExitFatal(-1);
     }
 
     if( MpqReadInfo(fpMpq) ) {
-	fprintf(stderr,"MpqReadInfo failed\n");
+	fprintf(stderr, "MpqReadInfo failed\n");
 	ExitFatal(-1);
     }
 
-    ExtractMap(fpMpq, &scmdata, &entry_size);
+    ExtractMap(fpMpq, &chkdata, &chklen);
 
     fclose(fpMpq);
-    if( !scmdata ) {
-	fprintf(stderr,"Could not extract map in %s\n",scm);
+    if( !chkdata ) {
+	fprintf(stderr, "Could not extract map in %s\n", scm);
 	ExitFatal(-1);
     }
 
-    scm_ptr = scmdata;
-    scm_endptr = scm_ptr + entry_size;
+    info = GetChkInfoFromBuffer(chkdata, chklen);
+
+    free(chkdata);
+    CleanMpq();
+
+    return info;
+}
+
+/**
+**	Get the info for a chk level.
+**
+**	@param chk	Name of the chk file
+**
+**	@return		Info about the map
+*/
+global MapInfo* GetChkInfo(const char* chk)
+{
+    unsigned char *chkdata;
+    char buf[1024];
+    FILE *fpChk;
+    int chklen;
+    MapInfo *info;
+    int n;
+    int i;
+
+    if( !(fpChk = fopen(chk, "rb")) ) {
+	fprintf(stderr, "Try ./path/name\n");
+	sprintf(buf, "chk: fopen(%s)", chk);
+	perror(buf);
+	ExitFatal(-1);
+    }
+
+    chklen = 0;
+    n = 16384;
+    chkdata = malloc(n);
+    while( (i = fread(chkdata+chklen, 1, n, fpChk)) == n ) {
+	chklen += n;
+	if( n < 1024*1024 ) {
+	    n <<= 1;
+	} else {
+	    n = 2*1024*1024;
+	}
+	chkdata = realloc(chkdata, chklen+n);
+    }
+    chklen += i;
+    chkdata = realloc(chkdata, chklen);
+
+    fclose(fpChk);
+    if( !chkdata ) {
+	fprintf(stderr, "Could not extract map in %s\n", chk);
+	ExitFatal(-1);
+    }
+
+    info = GetChkInfoFromBuffer(chkdata, chklen);
+
+    free(chkdata);
+
+    return info;
+}
+
+/**
+**	Load chk from buffer
+**
+**	@param chkdata	Buffer containing chk data
+**	@param len	Length of chk buffer
+**	@param map	The map
+*/
+global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
+{
+    char header[5];
+    int width;
+    int height;
+    int aiopps;
+    long length;
+
+    chk_ptr = chkdata;
+    chk_endptr = chk_ptr + len;
     header[4] = '\0';
     aiopps=width=height=0;
 
-    while( ScmReadHeader(header,&length) ) {
+    while( ChkReadHeader(header,&length) ) {
 
 	//
 	//	SCM version
@@ -714,7 +760,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	if( !memcmp(header, "VER ",4) ) {
 	    if( length==2 ) {
 		int v;
-		v = ScmReadWord();
+		v = ChkReadWord();
 		continue;
 	    }
 	    DebugLevel1("Wrong VER  length\n");
@@ -726,7 +772,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	if( !memcmp(header, "IVER",4) ) {
 	    if( length==2 ) {
 		int v;
-		v = ScmReadWord();
+		v = ChkReadWord();
 		continue;
 	    }
 	    DebugLevel1("Wrong IVER length\n");
@@ -737,7 +783,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//
 	if( !memcmp(header, "VCOD",4) ) {
 	    if( length==1040 ) {
-		scm_ptr += 1040;
+		chk_ptr += 1040;
 		continue;
 	    }
 	    DebugLevel1("Wrong VCOD length\n");
@@ -748,7 +794,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//
 	if( !memcmp(header, "IOWN",4) ) {
 	    if( length==12 ) {
-		scm_ptr += 12;
+		chk_ptr += 12;
 		continue;
 	    }
 	    DebugLevel1("Wrong IOWN length\n");
@@ -763,7 +809,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 		int p;
 
 		for( i=0; i<12; ++i ) {
-		    p=ScmReadByte();
+		    p=ChkReadByte();
 		    if( p==0 ) {
 			p=PlayerNobody;
 		    }
@@ -823,7 +869,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 		int t;
 		int i;
 
-		t = ScmReadWord();
+		t = ChkReadWord();
 		if (GameSettings.Terrain != SettingsPresetMapDefault) {
 		    t = GameSettings.Terrain;
 		}
@@ -851,8 +897,8 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//
 	if( !memcmp(header, "DIM ",4) ) {
 	    if( length==4 ) {
-		width=ScmReadWord();
-		height=ScmReadWord();
+		width=ChkReadWord();
+		height=ChkReadWord();
 
 		DebugLevel2("\tMap %d x %d\n" _C_ width _C_ height);
 
@@ -889,7 +935,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 		int v;
 
 		for( i=0; i<12; ++i ) {
-		    v=ScmReadByte();
+		    v=ChkReadByte();
 		    switch( v ) {
 			case 0: // Zerg
 			case 1: // Terran
@@ -928,8 +974,8 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//
 	if( !memcmp(header, "MTXM",4) ) {
 	    if( length==width*height*2 ) {
-		ScmConvertMTXM((unsigned short*)scm_ptr,width,height,map);
-		scm_ptr += length;
+		ChkConvertMTXM((unsigned short*)chk_ptr,width,height,map);
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong MTXM length\n");
@@ -940,7 +986,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//
 	if( !memcmp(header, "PUNI",4) ) {
 	    if( length==228*12 + 228 + 228*12 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong PUNI length\n");
@@ -953,7 +999,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	    // 1748
 //	    if( length==45*12 + 45*12 + 45 + 45 + 45*12 ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPGR length\n");
@@ -964,7 +1010,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//
 	if( !memcmp(header, "PTEC",4) ) {
 	    if( length==24*12 + 24*12 + 24 + 24 + 24*12 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong PTEC length\n");
@@ -996,21 +1042,21 @@ global void LoadScm(const char* scm,WorldMap* map)
 		UnitType* type;
 
 		while( length>0 ) {
-		    scm_ptr += 4;	// unknown
-		    x = ScmReadWord();	// x coordinate
-		    y = ScmReadWord();	// y coordinate
-		    t = ScmReadWord();	// unit type
-		    scm_ptr += 2;	// unknown
-		    f1 = ScmReadWord();	// special properties flag
-		    f2 = ScmReadWord();	// valid elements
-		    o = ScmReadByte();	// owner
-		    hpp = ScmReadByte();// hit point %
-		    shp = ScmReadByte();// shield point %
-		    ep = ScmReadByte();	// energy point %
-		    res = ScmReadDWord(); // resource amount
-		    nh = ScmReadWord();	// num units in hanger
-		    st = ScmReadWord();	// state flags
-		    scm_ptr += 8;	// unknown
+		    chk_ptr += 4;	// unknown
+		    x = ChkReadWord();	// x coordinate
+		    y = ChkReadWord();	// y coordinate
+		    t = ChkReadWord();	// unit type
+		    chk_ptr += 2;	// unknown
+		    f1 = ChkReadWord();	// special properties flag
+		    f2 = ChkReadWord();	// valid elements
+		    o = ChkReadByte();	// owner
+		    hpp = ChkReadByte();// hit point %
+		    shp = ChkReadByte();// shield point %
+		    ep = ChkReadByte();	// energy point %
+		    res = ChkReadDWord(); // resource amount
+		    nh = ChkReadWord();	// num units in hanger
+		    st = ChkReadWord();	// state flags
+		    chk_ptr += 8;	// unknown
 
 		    length -= 36;
 
@@ -1124,7 +1170,7 @@ pawn:
 	if( !memcmp(header, "ISOM",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong ISOM length\n");
@@ -1136,7 +1182,7 @@ pawn:
 	if( !memcmp(header, "TILE",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TILE length\n");
@@ -1148,7 +1194,7 @@ pawn:
 	if( !memcmp(header, "DD2 ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong DD2  length\n");
@@ -1160,7 +1206,7 @@ pawn:
 	if( !memcmp(header, "THG2",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong THG2 length\n");
@@ -1172,7 +1218,7 @@ pawn:
 	if( !memcmp(header, "MASK",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong MASK length\n");
@@ -1184,8 +1230,8 @@ pawn:
 	if( !memcmp(header, "STR ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		strcpy(map->Description, scm_ptr+2051);
-		scm_ptr += length;
+		strcpy(map->Description, chk_ptr+2051);
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong STR  length\n");
@@ -1197,7 +1243,7 @@ pawn:
 	if( !memcmp(header, "UPRP",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPRP length\n");
@@ -1209,7 +1255,7 @@ pawn:
 	if( !memcmp(header, "UPUS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPUS length\n");
@@ -1221,7 +1267,7 @@ pawn:
 	if( !memcmp(header, "MRGN",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong MRGN length\n");
@@ -1233,7 +1279,7 @@ pawn:
 	if( !memcmp(header, "TRIG",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TRIG length\n");
@@ -1245,7 +1291,7 @@ pawn:
 	if( !memcmp(header, "MBRF",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong MBRF length\n");
@@ -1257,7 +1303,7 @@ pawn:
 	if( !memcmp(header, "SPRP",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong SPRP length\n");
@@ -1269,7 +1315,7 @@ pawn:
 	if( !memcmp(header, "FORC",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong FORC length\n");
@@ -1281,7 +1327,7 @@ pawn:
 	if( !memcmp(header, "WAV ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong WAV  length\n");
@@ -1293,7 +1339,7 @@ pawn:
 	if( !memcmp(header, "UNIS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UNIS length\n");
@@ -1305,7 +1351,7 @@ pawn:
 	if( !memcmp(header, "UPGS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPGS length\n");
@@ -1317,14 +1363,14 @@ pawn:
 	if( !memcmp(header, "TECS",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-		scm_ptr += length;
+		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TECS length\n");
 	}
 
 	DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
-	scm_ptr += length;
+	chk_ptr += length;
     }
 
     MapOffsetX+=width;
@@ -1332,14 +1378,112 @@ pawn:
 	MapOffsetX=0;
 	MapOffsetY+=height;
     }
+}
+
+/**
+**	Load scm
+**
+**	@param scm	Name of the scm file
+**	@param map	The map
+*/
+global void LoadScm(const char* scm,WorldMap* map)
+{
+    unsigned char *chkdata;
+    char buf[1024];
+    FILE *fpMpq;
+    int chklen;
+
+    if (!map->Info) {
+	map->Info = GetScmInfo(scm);
+    }
+
+    if( !(fpMpq=fopen(scm, "rb")) ) {
+	fprintf(stderr,"Try ./path/name\n");
+	sprintf(buf, "scm: fopen(%s)", scm);
+	perror(buf);
+	ExitFatal(-1);
+    }
+
+    if( MpqReadInfo(fpMpq) ) {
+	fprintf(stderr,"MpqReadInfo failed\n");
+	ExitFatal(-1);
+    }
+
+    ExtractMap(fpMpq, &chkdata, &chklen);
+
+    fclose(fpMpq);
+    if( !chkdata ) {
+	fprintf(stderr,"Could not extract map in %s\n",scm);
+	ExitFatal(-1);
+    }
+
+    LoadChkFromBuffer(chkdata,chklen,map);
 
     CleanMpq();
+}
+
+/**
+**	Load chk
+**
+**	@param chk	Name of the chk file
+**	@param map	The map
+*/
+global void LoadChk(const char* chk,WorldMap* map)
+{
+    unsigned char *chkdata;
+    char buf[1024];
+    FILE *fpChk;
+    int chklen;
+    int n;
+    int i;
+
+    if (!map->Info) {
+	map->Info = GetChkInfo(chk);
+    }
+
+    if( !(fpChk=fopen(chk, "rb")) ) {
+	fprintf(stderr, "Try ./path/name\n");
+	sprintf(buf, "scm: fopen(%s)", chk);
+	perror(buf);
+	ExitFatal(-1);
+    }
+
+    chklen = 0;
+    n = 16384;
+    chkdata = malloc(n);
+    while( (i = fread(chkdata+chklen, 1, n, fpChk)) == n ) {
+	chklen += n;
+	if( n < 1024*1024 ) {
+	    n <<= 1;
+	} else {
+	    n = 2*1024*1024;
+	}
+	chkdata = realloc(chkdata, chklen+n);
+    }
+    chklen += i;
+    chkdata = realloc(chkdata, chklen);
+
+    fclose(fpChk);
+    if( !chkdata ) {
+	fprintf(stderr,"Could not extract map in %s\n",chk);
+	ExitFatal(-1);
+    }
+
+    LoadChkFromBuffer(chkdata,chklen,map);
 }
 
 /**
 **	Clean scm module.
 */
 global void CleanScm(void)
+{
+    MapOffsetX=MapOffsetY=0;
+}
+
+/**
+**	Clean chk module.
+*/
+global void CleanChk(void)
 {
     MapOffsetX=MapOffsetY=0;
 }

@@ -1780,7 +1780,8 @@ local void CreateEditor(void)
 	CreateGame(NULL, &TheMap);
     } else {
 	CreateGame(CurrentMapPath, &TheMap);
-	if (strcasestr(CurrentMapPath,".scm")) {
+	if (strcasestr(CurrentMapPath,".scm") ||
+	    strcasestr(CurrentMapPath,".chk")) {
 	    scm = 1;
 	}
     }
