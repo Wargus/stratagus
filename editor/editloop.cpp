@@ -260,6 +260,29 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	return;
     }
 
+    if( CursorOn==CursorOnMinimap ) {
+	if( MouseButtons&LeftButton ) { // enter move mini-mode
+#ifdef SPLIT_SCREEN_SUPPORT
+	    int v = TheUI.LastClickedVP;
+	    MapViewportSetViewpoint(v,
+	    ScreenMinimap2MapX(CursorX)-TheUI.VP[v].MapWidth/2,
+	    ScreenMinimap2MapY(CursorY)-TheUI.VP[v].MapHeight/2);
+#else /* SPLIT_SCREEN_SUPPORT */
+	    MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2,
+		ScreenMinimap2MapY(CursorY)-MapHeight/2);
+#endif /* SPLIT_SCREEN_SUPPORT */
+	}
+#if 0
+	else if( MouseButtons&RightButton ) {
+	    MakeLocalMissile(MissileTypeGreenCross,
+		ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2,
+		ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
+	    // DoRightButton() takes screen map coordinates
+	    DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX,
+	    ScreenMinimap2MapY(CursorY) * TileSizeY);
+	}
+#endif
+    }
     //
     //	Click on tile area
     //
@@ -372,14 +395,44 @@ local void EditorCallbackMouse(int x, int y)
     int i;
     int bx;
     int by;
+    enum _cursor_on_ OldCursorOn;
 
     DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
     HandleCursorMove(&x, &y);		// Reduce to screen
 
+    OldCursorOn=CursorOn;
+
     MouseScrollState = ScrollNone;
     GameCursor = TheUI.Point.Cursor;
     CursorOn = -1;
+
+    //
+    //	Minimap
+    //
+    if( x>=TheUI.MinimapX+24 && x<TheUI.MinimapX+24+MINIMAP_W
+	    && y>=TheUI.MinimapY+2 && y<TheUI.MinimapY+2+MINIMAP_H ) {
+	CursorOn=CursorOnMinimap;
+    }
+
+    //	Minimap move viewpoint
+    if( OldCursorOn==CursorOnMinimap && (MouseButtons&LeftButton) ) {
+#ifdef SPLIT_SCREEN_SUPPORT
+	Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
+#endif
+	if( CursorOn!=CursorOnMinimap) {
+	    RestrictCursorToMinimap();
+	}
+#ifdef SPLIT_SCREEN_SUPPORT
+	MapViewportSetViewpoint (TheUI.LastClickedVP
+		,ScreenMinimap2MapX (CursorX) - vp->MapWidth/2
+		,ScreenMinimap2MapY (CursorY) - vp->MapHeight/2);
+#else /* SPLIT_SCREEN_SUPPORT */
+	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
+		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
+#endif /* SPLIT_SCREEN_SUPPORT */
+	return;
+    }
 
     //
     //  Handle tile area
