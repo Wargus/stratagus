@@ -10,7 +10,7 @@
 //
 /**@name game.c - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Andreas Arens, and
+//      (c) Copyright 1998-2005 by Lutz Sammer, Andreas Arens, and
 //                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -519,7 +519,7 @@ void CreateGame(const char* filename, WorldMap* map)
 	//
 	LoadUnitSounds();
 	MapUnitSounds();
-	if (SoundFildes != -1) {
+	if (SoundEnabled()) {
 		if (InitSoundServer()) {
 			SoundOff = 1;
 		} else {
