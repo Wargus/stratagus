@@ -216,10 +216,6 @@ static int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 			* sample->Channels);
 
 	local_volume = (int)volume * GlobalVolume / MaxVolume;
-	if (local_volume < 32) {
-		// minimum volume
-		local_volume = 32;
-	}
 
 	if (stereo < 0) {
 		left = 128;
@@ -230,8 +226,6 @@ static int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	}
 
 	Assert(!(index & 1));
-
-	memset(buffer, 0, size * 4);
 
 	if (size >= (sample->Len - index) * div / 2) {
 		size = (sample->Len - index) * div / 2;
@@ -526,20 +520,19 @@ static int FillOneChannel(SoundRequest* sr)
 	int old_free;
 
 	old_free = NextFreeChannel;
-	if (NextFreeChannel < MaxChannels) {
-		next_free = Channels[NextFreeChannel].Point;
-		Channels[NextFreeChannel].Source = sr->Source;
-		Channels[NextFreeChannel].Point = 0;
-		Channels[NextFreeChannel].Volume = ComputeVolume(sr);
-		Channels[NextFreeChannel].Command = ChannelPlay;
-		Channels[NextFreeChannel].Sound = sr->Sound;
-		Channels[NextFreeChannel].Sample = ChooseSample(sr);
-		Channels[NextFreeChannel].Stereo = sr->Stereo;
-		NextFreeChannel = next_free;
-	} else {
-		// should not happen
-		DebugPrint("***** NO FREE CHANNEL *****\n");
-	}
+
+	Assert(NextFreeChannel < MaxChannels);
+
+	next_free = Channels[NextFreeChannel].Point;
+	Channels[NextFreeChannel].Source = sr->Source;
+	Channels[NextFreeChannel].Point = 0;
+	Channels[NextFreeChannel].Volume = ComputeVolume(sr);
+	Channels[NextFreeChannel].Command = ChannelPlay;
+	Channels[NextFreeChannel].Sound = sr->Sound;
+	Channels[NextFreeChannel].Sample = ChooseSample(sr);
+	Channels[NextFreeChannel].Stereo = sr->Stereo;
+	NextFreeChannel = next_free;
+
 	return old_free;
 }
 
@@ -574,6 +567,7 @@ static void FillChannels(int free_channels,int* discarded,int* started)
 		  (*discarded)++;
 		}
 		if(NextSoundRequestOut >= MAX_SOUND_REQUESTS) {
+			Assert(1);
 			NextSoundRequestOut = 0;
 		}
 		sr = SoundRequests + NextSoundRequestOut;
