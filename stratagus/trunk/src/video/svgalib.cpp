@@ -10,7 +10,7 @@
 //
 /**@name svgalib.c	-	svgalib support. */
 //
-//	(c) Copyright 1999-2002 by Jarek Sobieszek
+//	(c) Copyright 1999-2003 by Jarek Sobieszek
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -622,6 +622,7 @@ local void KeyboardEvent(int scancode, int press)
 		keychar = icode = '\e';
 		break;
 	    case SCANCODE_ENTER:
+	    case SCANCODE_KEYPADENTER:
 		keychar = icode = '\r';
 		break;
 	    case SCANCODE_BACKSPACE:
@@ -725,6 +726,9 @@ local void KeyboardEvent(int scancode, int press)
 		break;
 	    case SCANCODE_KEYPADMINUS:
 		icode = KeyCodeKPMinus;
+		break;
+	    case SCANCODE_KEYPADPERIOD:
+		icode = KeyCodeKPPeriod;
 		break;
 	    case SCANCODE_PRINTSCREEN:
 		icode = KeyCodePrint;
