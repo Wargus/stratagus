@@ -3966,6 +3966,8 @@ void CleanUnits(void)
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		free((*table)->AutoCastSpell);
 		free((*table)->Variable);
+		free((*table)->Orders);
+		free((*table)->CacheLinks);
 		free(*table);
 		*table = NULL;
 	}

@@ -284,11 +284,6 @@ static int CclDefineUnitType(lua_State* l)
 				free(type->Name);
 			}
 			type->Name = strdup(LuaToString(l, -1));
-		} else if (!strcmp(value, "Use")) {
-			if (redefine) {
-				free(type->SameSprite);
-			}
-			type->SameSprite = strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Files")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

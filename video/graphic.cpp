@@ -230,6 +230,9 @@ void VideoFree(Graphic* graphic)
 		SDL_FreeSurface(graphic->SurfaceFlip);
 	}
 #endif
+	if (graphic->File) {
+		free(graphic->File);
+	}
 	free(graphic);
 }
 

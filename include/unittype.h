@@ -66,10 +66,6 @@ struct lua_State;
 **    Pretty name shown by the engine. The name should be shorter
 **    than 17 characters and no word can be longer than 8 characters.
 **
-**  UnitType::SameSprite
-**
-**    Identifier of an unit-type with this are the sprites shared.
-**
 **  UnitType::File[::TilesetMax]
 **
 **    Path file name of sprite files for the different tilesets.
@@ -771,7 +767,6 @@ struct _unit_type_ {
 	char* Ident;                    ///< Identifier
 	char* Name;                     ///< Pretty name shown from the engine
 	int Slot;                       ///< Type as number
-	char* SameSprite;               ///< Unit-type shared sprites
 	char* File[TilesetMax];         ///< Sprite files
 	char* ShadowFile;               ///< Shadow file
 
