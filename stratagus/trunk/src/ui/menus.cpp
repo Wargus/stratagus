@@ -112,7 +112,11 @@ local struct {
 	/// sprite : FILLED
     Graphic*	Sprite;
 } MenuButtonGfx = {
+#ifdef NEW_NAMES
+    { "ui/buttons 1.png" ,"ui/buttons 2.png" },
+#else
     { "interface/buttons 1.png" ,"interface/buttons 2.png" },
+#endif
     300, 7632
 };
 
@@ -873,13 +877,24 @@ global void DrawMenu(int MenuId)
 --	Button action handler and Init/Exit functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	FIXME: docu.
+*/
 local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 {
     HideCursor();
     DestroyCursorBackground();
+    // FIXME: make this configurable from CCL.
+#ifdef NEW_NAMES
+    DisplayPicture("graphics/ui/Menu background without title.png");
+#else
     DisplayPicture("graphic/interface/Menu background without title.png");
+#endif
 }
 
+/**
+**	FIXME: docu.
+*/
 local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
 {
     int nc, rc;
@@ -2145,15 +2160,20 @@ global void InitMenus(unsigned int race)
 	MoveButtons();
     }
 
-    if (race == last_race)	// same race? already loaded!
+    if (race == last_race) {	// same race? already loaded!
 	return;
+    }
     if (last_race != -1) {	// free previous sprites for different race
 	VideoFree(MenuButtonGfx.Sprite);
     }
     last_race = race;
     file = MenuButtonGfx.File[race];
     buf = alloca(strlen(file) + 9 + 1);
+#ifdef NEW_NAMES
+    file = strcat(strcpy(buf, "graphics/"), file);
+#else
     file = strcat(strcpy(buf, "graphic/"), file);
+#endif
     MenuButtonGfx.Sprite = LoadSprite(file, 0, 144);
 
     strcpy(ScenSelectPath, FreeCraftLibPath);
