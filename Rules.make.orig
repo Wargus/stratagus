@@ -190,6 +190,8 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## UNIT_ON_MAP:		Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
 ## NEW_AI:		New better improved AI code
+## USE_TILECACHE:	Faster tile drawing, costs memory.
+## USE_SMART_TILECACHE:	Faster tile drawing, slow with hardware video memory.
 ## This aren't working:
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
