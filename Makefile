@@ -61,68 +61,10 @@ OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
 
 .SUFFIXES: .c .o
 
-MAKERULE = @if [ ! -d $(shell dirname $@) ]; then mkdir $(shell dirname $@); fi ;
-MAKERULE += echo $(CC) -c \$(CFLAGS) $< -o $@ ; $(CC) -c \$(CFLAGS) $< -o $@ ;
-
-src/ai/$(OBJDIR)/%.o: src/ai/%.c
-	$(MAKERULE)
-
-src/beos/$(OBJDIR)/%.o: src/beos/%.c
-	$(MAKERULE)
-
-src/clone/$(OBJDIR)/%.o: src/clone/%.c
-	$(MAKERULE)
-
-src/editor/$(OBJDIR)/%.o: src/editor/%.c
-	$(MAKERULE)
-
-src/freecraft/$(OBJDIR)/%.o: src/freecraft/%.c
-	$(MAKERULE)
-
-src/game/$(OBJDIR)/%.o: src/game/%.c
-	$(MAKERULE)
-
-src/libmodplug/$(OBJDIR)/%.o: src/libmodplug/%.c
-	$(MAKERULE)
-
-src/map/$(OBJDIR)/%.o: src/map/%.c
-	$(MAKERULE)
-
-src/missile/$(OBJDIR)/%.o: src/missile/%.c
-	$(MAKERULE)
-
-src/movie/$(OBJDIR)/%.o: src/movie/%.c
-	$(MAKERULE)
-
-src/movie/vp31/$(OBJDIR)/%.o: src/movie/vp31/%.c
-	$(MAKERULE)
-
-src/network/$(OBJDIR)/%.o: src/network/%.c
-	$(MAKERULE)
-
-src/pathfinder/$(OBJDIR)/%.o: src/pathfinder/%.c
-	$(MAKERULE)
-
-src/siod/$(OBJDIR)/%.o: src/siod/%.c
-	$(MAKERULE)
-
-src/sound/$(OBJDIR)/%.o: src/sound/%.c
-	$(MAKERULE)
-
-src/ui/$(OBJDIR)/%.o: src/ui/%.c
-	$(MAKERULE)
-
-src/unit/$(OBJDIR)/%.o: src/unit/%.c
-	$(MAKERULE)
-
-src/video/$(OBJDIR)/%.o: src/video/%.c
-	$(MAKERULE)
-
-etlib/$(OBJDIR)/%.o: etlib/%.c
-	$(MAKERULE)
-
-src/$(OBJDIR)/%.o: src/%.c
-	$(MAKERULE)
+%.o: $(dir $@)../%.c
+	@if [ ! -d $(shell dirname $@) ]; then \
+	mkdir $(shell dirname $@); fi
+	$(CC) -c \$(CFLAGS) $< -o $@
 
 all:	all-src freecraft$(EXE) tools
 
