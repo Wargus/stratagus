@@ -1045,8 +1045,8 @@ global void LoadFonts(void)
 #endif
 #endif
 
-	for (i = 0; i<sizeof(Fonts) / sizeof(*Fonts); ++i) {
-		if (Fonts[i].File) {
+	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
+		if (Fonts[i].File && !Fonts[i].Graphic) {
 			ShowLoadProgress("Fonts %s", Fonts[i].File);
 			Fonts[i].Graphic = LoadGraphic(Fonts[i].File);
 			FontMeasureWidths(Fonts + i);
