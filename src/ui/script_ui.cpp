@@ -292,6 +292,7 @@ local SCM CclSetTitleScreen(SCM list)
     if (TitleScreen) {
 	for (i = 0; TitleScreen[i]; ++i) {
 	    free(TitleScreen[i]);
+	    TitleScreen[i]=NULL;
 	}
     }
     if (!gh_null_p(list)) {
@@ -2267,6 +2268,9 @@ local SCM CclDefineMenuItem(SCM list)
 			    int i;
 
 			    n = item->d.pulldown.noptions = gh_length(value);
+			    if (item->d.pulldown.options) {
+			    	free(item->d.pulldown.options);
+			    }
 			    item->d.pulldown.options = (unsigned char**)malloc(sizeof(unsigned char*)*n);
 			    for (i = 0; i < n; ++i) {
 				item->d.pulldown.options[i] = gh_scm2newstr(gh_car(value), NULL);
@@ -2802,9 +2806,7 @@ local SCM CclDefineButton(SCM list)
 	    } else if (gh_eq_p(value, gh_symbol2scm("cancel-build"))) {
 		ba.Action = ButtonCancelBuild;
 	    } else {
-		s1 = gh_scm2newstr(value, NULL);
-		fprintf(stderr, "Unsupported action %s\n",s1);
-		free(s1);
+		errl("Unsupported button action ",value);
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("value"))) {
 	    value = gh_car(list);

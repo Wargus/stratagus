@@ -88,7 +88,7 @@ local SCM CclDefineMissileType(SCM list)
 	mtype = NewMissileTypeSlot(str);	// str consumed!
     }
 
-    mtype->NumDirections = 8;
+    mtype->NumDirections = 1;
     //
     //	Parse the arguments, already the new tagged format.
     //

@@ -1506,6 +1506,9 @@ global void CleanUnitTypes(void)
 	if (type->CorpseName) {
 	    free(type->CorpseName);
 	}
+	if (type->CanCastSpell) {
+	    free(type->CanCastSpell);
+	}
 
 	for (res = 0; res < MaxCosts; ++res) {
 	    if (type->ResInfo[res]) {

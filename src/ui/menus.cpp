@@ -7184,6 +7184,10 @@ local void InitPlayerRaces(Menuitem *mi)
 	}
     }
     ++n;
+    //  Reallocate pulldown options.
+    if (mi->d.pulldown.options) {
+	free (mi->d.pulldown.options);
+    }
     mi->d.pulldown.options = (unsigned char **)malloc(n * sizeof(unsigned char *));
     for (i = 0, n = 0; i < PlayerRaces.Count; ++i) {
 	if (PlayerRaces.Visible[i]) {

@@ -808,6 +808,14 @@ global void CleanUserInterface(void)
 	UI_Table = NULL;
     }
 
+    //	Free Title screen.
+    if (TitleScreen) {
+	for (i = 0; TitleScreen[i]; ++i) {
+	    free(TitleScreen[i]);
+	    TitleScreen[i]=NULL;
+	}
+    }
+
     // FIXME: Johns: Implement this correctly or we will lose memory!
     DebugLevel0Fn("FIXME: not completely written\n");
 
