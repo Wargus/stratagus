@@ -190,10 +190,14 @@ global void HandleActionBuild(Unit* unit)
     build=MakeUnit(type,unit->Player);
     build->Constructed=1;
 #ifdef NEW_FOW
+    build->CurrentSightRange=0;
+#endif
+    PlaceUnit(build,x,y);
+#ifdef NEW_FOW
     build->CurrentSightRange=build->Type->TileWidth < build->Type->TileHeight
 				? build->Type->TileHeight : build->Type->TileWidth;
 #endif
-    PlaceUnit(build,x,y);
+
 /* Done by PlaceUnit now
 #ifdef HIERARCHIC_PATHFINDER
     PfHierMapChangedCallback (build->X, build->Y,
@@ -245,7 +249,9 @@ global void HandleActionBuild(Unit* unit)
     unit->Value=build->Value;		// worker holding value while building
 
     RemoveUnit(unit,build);		// automaticly: CheckUnitToBeDrawn(unit)
-    // FIXME: Johns: should connect it to the building with ->Next?
+#ifdef NEW_FOW
+    build->CurrentSightRange=0;
+#endif
     unit->X=x;
     unit->Y=y;
     unit->Orders[0].Action=UnitActionStill;
@@ -284,9 +290,6 @@ global void HandleActionBuilded(Unit* unit)
 	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
 		CancelBuildingCostsFactor);
 	// Cancel building
-#ifdef NEW_FOW
-	unit->CurrentSightRange=0;
-#endif
 	LetUnitDie(unit);
 	return;
     }
@@ -354,10 +357,7 @@ global void HandleActionBuilded(Unit* unit)
 	if ( unit->Type == UnitTypeOrcWall
 		    || unit->Type == UnitTypeHumanWall ) {
 	    MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
-#ifdef NEW_FOW
-	    unit->CurrentSightRange=0;
-#endif
-            RemoveUnit(unit,NULL);
+	    RemoveUnit(unit,NULL);
 	    UnitLost(unit);
 	    UnitClearOrders(unit);
 	    ReleaseUnit(unit);
