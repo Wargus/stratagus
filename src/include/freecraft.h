@@ -497,6 +497,7 @@ extern int SyncRand(void);		/// Syncron rand
 
 extern int main1(int argc,char* argv[]);/// init freecraft
 extern volatile void Exit(int err);	/// exit freecraft
+extern volatile void FatalExit(int err);/// exit freecraft with fatal error
 
 extern void UpdateDisplay(void);	/// game display update
 extern void InitModules(void);		/// Initinalize all modules
