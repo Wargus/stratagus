@@ -44,6 +44,9 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+global char* EditorSelectIcon;
+global char* EditorUnitsIcon;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -80,6 +83,25 @@ local SCM CclDefineEditorUnitTypes(SCM list)
     return SCM_UNSPECIFIED;
 }
 
+/**
+**	Set the editor's select icon
+*/
+local SCM CclSetEditorSelectIcon(SCM icon)
+{
+    free(EditorSelectIcon);
+    EditorSelectIcon=gh_scm2newstr(icon,NULL);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the editor's units icon
+*/
+local SCM CclSetEditorUnitsIcon(SCM icon)
+{
+    free(EditorUnitsIcon);
+    EditorUnitsIcon=gh_scm2newstr(icon,NULL);
+    return SCM_UNSPECIFIED;
+}
 
 /**
 **	Register CCL features for the editor.
@@ -90,6 +112,8 @@ global void EditorCclRegister(void)
     //gh_new_procedure0_0("get-this-player",CclGetThisPlayer);
     //gh_new_procedure1_0("set-this-player!",CclSetThisPlayer);
     gh_new_procedureN("define-editor-unittypes",CclDefineEditorUnitTypes);
+    gh_new_procedure1_0("set-editor-select-icon!",CclSetEditorSelectIcon);
+    gh_new_procedure1_0("set-editor-units-icon!",CclSetEditorUnitsIcon);
 }
 
 //@}
