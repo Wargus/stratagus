@@ -2097,7 +2097,7 @@ local void PreferencesInit(Menuitem *mi __attribute__((unused)))
     }
 
     // Not available in net games or replays
-    if (NetworkFildes == -1 && ReplayGameType != ReplayNone) {
+    if (NetworkFildes == -1 && ReplayGameType == ReplayNone) {
 	menu->items[1].flags = MI_ENABLED;
     } else {
 	menu->items[1].flags = MI_DISABLED;
