@@ -365,11 +365,13 @@ global void DoRightButton (int sx,int sy)
 			&& OrcWallOnMap(x,y) ) {
 		    DebugLevel3("HUMAN ATTACKS ORC\n");
 		    SendCommandAttack(unit,x,y,NoUnitP,flush);
+		    continue;
 		}
 		if( ThisPlayer->Race==PlayerRaceOrc
 			&& HumanWallOnMap(x,y) ) {
 		    DebugLevel3("ORC ATTACKS HUMAN\n");
 		    SendCommandAttack(unit,x,y,NoUnitP,flush);
+		    continue;
 		}
 	    }
 
