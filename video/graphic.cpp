@@ -33,18 +33,21 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-struct lnode *PalettePointer;
+/**
+**	Typedef of lnode.
+*/
+typedef struct __lnode__ PaletteLink;
 
-struct lnode {
-  struct lnode * next;
-  GraphicData * Palette;
-  long checksum;
+/**
+**	sturct __lnode__, links all palettes together to join the same palettes.
+*/
+struct __lnode__ {
+    PaletteLink*	Next;		/// Next palette
+    GraphicData*	Palette;	/// Palette in hardware format
+    long		Checksum;	/// Checksum for quick lookup
 };
 
-typedef struct lnode PaletteLink;
-
-PaletteLink * palette_list = NULL;
-
+local PaletteLink *palette_list;	/// List of all used palettes.
 
 /*----------------------------------------------------------------------------
 --	Externals
@@ -54,6 +57,11 @@ extern int ClipX1;			/// current clipping top left
 extern int ClipY1;			/// current clipping top left
 extern int ClipX2;			/// current clipping bottom right
 extern int ClipY2;			/// current clipping bottom right
+
+#ifdef DEBUG
+extern unsigned AllocatedGraphicMemory;
+extern unsigned CompressedGraphicMemory;
+#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -78,31 +86,32 @@ local GraphicType GraphicImage16Type;	/// image type 16bit palette
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to8(
-	Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    unsigned char* sp;
-    unsigned char* lp;
-    unsigned char* gp;
-    int sa;
+    const unsigned char* sp;
+    const unsigned char* lp;
+    const unsigned char* gp;
     VMemType8* dp;
+    const VMemType8* pixels;
+    int sa;
     int da;
 
+    pixels=graphic->Pixels;
     sp=graphic->Frames+gx+gy*graphic->Width;
     gp=sp+graphic->Width*h;
     sa=graphic->Width-w;
     dp=VideoMemory8+x+y*VideoWidth;
-    da=VideoWidth-w;
-    --w;
+    da=VideoWidth-w--;
 
     while( sp<gp ) {
 	lp=sp+w;
 	while( sp<lp ) {
-	    *dp++=Pixels8[*sp++];	// unroll
-	    *dp++=Pixels8[*sp++];
+	    *dp++=pixels[*sp++];	// unroll
+	    *dp++=pixels[*sp++];
 	}
 	if( sp<=lp ) {
-	    *dp++=Pixels8[*sp++];
+	    *dp++=pixels[*sp++];
 	}
 	sp+=sa;
 	dp+=da;
@@ -121,31 +130,32 @@ local void VideoDrawSub8to8(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to16(
-	Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    unsigned char* sp;
-    unsigned char* lp;
-    unsigned char* gp;
+    const unsigned char* sp;
+    const unsigned char* lp;
+    const unsigned char* gp;
     int sa;
+    const VMemType16* pixels;
     VMemType16* dp;
     int da;
 
+    pixels=(VMemType16*)graphic->Pixels;
     sp=graphic->Frames+gx+gy*graphic->Width;
     gp=sp+graphic->Width*h;
     sa=graphic->Width-w;
     dp=VideoMemory16+x+y*VideoWidth;
-    da=VideoWidth-w;
-    --w;
+    da=VideoWidth-w--;
 
     while( sp<gp ) {
 	lp=sp+w;
 	while( sp<lp ) {
-	    *dp++=Pixels16[*sp++];	// unroll
-	    *dp++=Pixels16[*sp++];
+	    *dp++=pixels[*sp++];	// unroll
+	    *dp++=pixels[*sp++];
 	}
 	if( sp<=lp ) {
-	    *dp++=Pixels16[*sp++];
+	    *dp++=pixels[*sp++];
 	}
 	sp+=sa;
 	dp+=da;
@@ -153,12 +163,49 @@ local void VideoDrawSub8to16(
 }
 
 /**
-**	Free graphic object.
+**	Video draw part of 8bit graphic into 24 bit framebuffer.
+**
+**	FIXME: 24 bit blitting could be optimized.
+**
+**	@param graphic	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
 */
-local void FreeGraphic8(Graphic* graphic)
+local void VideoDrawSub8to24(
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	int x,int y)
 {
-    free(graphic->Frames);
-    free(graphic);
+    const unsigned char* sp;
+    const unsigned char* lp;
+    const unsigned char* gp;
+    int sa;
+    const VMemType24* pixels;
+    VMemType24* dp;
+    int da;
+
+    pixels=(VMemType24*)graphic->Pixels;
+    sp=graphic->Frames+gx+gy*graphic->Width;
+    gp=sp+graphic->Width*h;
+    sa=graphic->Width-w;
+    dp=VideoMemory24+x+y*VideoWidth;
+    da=VideoWidth-w--;
+
+    while( sp<gp ) {
+	lp=sp+w;
+	while( sp<lp ) {
+	    *dp++=pixels[*sp++];	// unroll
+	    *dp++=pixels[*sp++];
+	}
+	if( sp<=lp ) {
+	    *dp++=pixels[*sp++];
+	}
+	sp+=sa;
+	dp+=da;
+    }
 }
 
 /**
@@ -173,36 +220,80 @@ local void FreeGraphic8(Graphic* graphic)
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to32(
-	Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    unsigned char* sp;
-    unsigned char* lp;
-    unsigned char* gp;
+    const unsigned char* sp;
+    const unsigned char* lp;
+    const unsigned char* gp;
     int sa;
+    const VMemType32* pixels;
     VMemType32* dp;
     int da;
 
+    pixels=(VMemType32*)graphic->Pixels;
     sp=graphic->Frames+gx+gy*graphic->Width;
     gp=sp+graphic->Width*h;
     sa=graphic->Width-w;
     dp=VideoMemory32+x+y*VideoWidth;
-    da=VideoWidth-w;
-    --w;
+    da=VideoWidth-w--;
 
     while( sp<gp ) {
 	lp=sp+w;
 	while( sp<lp ) {
-	    *dp++=Pixels32[*sp++];	// unroll
-	    *dp++=Pixels32[*sp++];
+	    *dp++=pixels[*sp++];	// unroll
+	    *dp++=pixels[*sp++];
 	}
 	if( sp<=lp ) {
-	    *dp++=Pixels32[*sp++];
+	    *dp++=pixels[*sp++];
 	}
 	sp+=sa;
 	dp+=da;
     }
 }
+
+/**
+**	Clip to clipping rectangle.
+**
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
+*/
+#define DO_CLIPPING(w,h,x,y) \
+    do {						\
+	int f;						\
+							\
+	if( x<ClipX1 ) {				\
+	    f=ClipX1-x;					\
+	    x=ClipX1;					\
+	    if( w<f ) {			/* outside */	\
+		return;					\
+	    }						\
+	    w-=f;					\
+	}						\
+	if( (x+w)>ClipX2 ) {				\
+	    if( w<ClipX2-x ) {		/* outside */	\
+		return;					\
+	    }						\
+	    w=ClipX2-x;					\
+	}						\
+							\
+	if( y<ClipY1 ) {				\
+	    f=ClipY1-y;					\
+	    y=ClipY1;					\
+	    if( h<f ) {			/* outside */	\
+		return;					\
+	    }						\
+	    h-=f;					\
+	}						\
+	if( (y+h)>ClipY2 ) {				\
+	    if( h<ClipY2-y ) {		/* outside */	\
+		return;					\
+	    }						\
+	    h=ClipY2-y;					\
+	}						\
+    } while( 0 )
 
 /**
 **	Video draw part of 8bit graphic clipped into 8 bit framebuffer.
@@ -216,41 +307,10 @@ local void VideoDrawSub8to32(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to8Clip(
-	Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    int f;
-
-    if( x<ClipX1 ) {
-	f=ClipX1-x;
-	x=ClipX1;
-	if( w<f ) {			// outside
-	    return;
-	}
-	w-=f;
-    }
-    if( (x+w)>ClipX2 ) {
-	if( w<ClipX2-x ) {		// outside
-	    return;
-	}
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	f=ClipY1-y;
-	y=ClipY1;
-	if( h<f ) {			// outside
-	    return;
-	}
-	h-=f;
-    }
-    if( (y+h)>ClipY2 ) {
-	if( h<ClipY2-y ) {		// outside
-	    return;
-	}
-	h=ClipY2-y;
-    }
-
+    DO_CLIPPING(w,h,x,y);
     VideoDrawSub8to8(graphic,gx,gy,w,h,x,y);
 }
 
@@ -266,84 +326,67 @@ local void VideoDrawSub8to8Clip(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to16Clip(
-	Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    int f;
-
-    if( x<ClipX1 ) {
-	f=ClipX1-x;
-	x=ClipX1;
-	if( w<f ) {			// outside
-	    return;
-	}
-	w-=f;
-    }
-    if( (x+w)>ClipX2 ) {
-	if( w<ClipX2-x ) {		// outside
-	    return;
-	}
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	f=ClipY1-y;
-	y=ClipY1;
-	if( h<f ) {			// outside
-	    return;
-	}
-	h-=f;
-    }
-    if( (y+h)>ClipY2 ) {
-	if( h<ClipY2-y ) {		// outside
-	    return;
-	}
-	h=ClipY2-y;
-    }
-
+    DO_CLIPPING(w,h,x,y);
     VideoDrawSub8to16(graphic,gx,gy,w,h,x,y);
 }
 
-/* FIXME: It would be nice to combine all the clips somehow, there is much
-   duplicated code. */
-local void VideoDrawSub8to32Clip(
-	Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+/**
+**	Video draw part of 8bit graphic clipped into 24 bit framebuffer.
+**
+**	@param graphic	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
+*/
+local void VideoDrawSub8to24Clip(
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    int f;
+    DO_CLIPPING(w,h,x,y);
+    VideoDrawSub8to24(graphic,gx,gy,w,h,x,y);
+}
 
-    if( x<ClipX1 ) {
-	f=ClipX1-x;
-	x=ClipX1;
-	if( w<f ) {			// outside
-	    return;
-	}
-	w-=f;
-    }
-    if( (x+w)>ClipX2 ) {
-	if( w<ClipX2-x ) {		// outside
-	    return;
-	}
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	f=ClipY1-y;
-	y=ClipY1;
-	if( h<f ) {			// outside
-	    return;
-	}
-	h-=f;
-    }
-    if( (y+h)>ClipY2 ) {
-	if( h<ClipY2-y ) {		// outside
-	    return;
-	}
-	h=ClipY2-y;
-    }
-
+/**
+**	Video draw part of 8bit graphic clipped into 32 bit framebuffer.
+**
+**	@param graphic	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
+**	@param x	X screen position
+**	@param y	Y screen position
+*/
+local void VideoDrawSub8to32Clip(
+	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	int x,int y)
+{
+    DO_CLIPPING(w,h,x,y);
     VideoDrawSub8to32(graphic,gx,gy,w,h,x,y);
 }
+
+/**
+**	Free graphic object.
+*/
+local void FreeGraphic8(Graphic* graphic)
+{
+    IfDebug( AllocatedGraphicMemory-=graphic->Size );
+    IfDebug( AllocatedGraphicMemory-=sizeof(Graphic) );
+    free(graphic->Frames);
+    free(graphic);
+}
+
+// FIXME: need frame version
+
+// FIXME: need 16 bit palette version
+
+// FIXME: need zooming version
 
 /*----------------------------------------------------------------------------
 --	Global functions
@@ -358,11 +401,13 @@ local void VideoDrawSub8to32Clip(
 **	@param data	Object data.
 */
 global Graphic* MakeGraphic(
-	unsigned depth,unsigned width,unsigned height,void* data)
+	unsigned depth,unsigned width,unsigned height,void* data,unsigned size)
 {
     Graphic* graphic;
 
     graphic=malloc(sizeof(Graphic));
+    IfDebug( AllocatedGraphicMemory+=sizeof(Graphic) );
+
     if( !graphic ) {
 	fprintf(stderr,"Out of memory\n");
 	exit(-1);
@@ -378,8 +423,12 @@ global Graphic* MakeGraphic(
     graphic->Width=width;
     graphic->Height=height;
 
+    graphic->Pixels=NULL;
+    graphic->Palette=NULL;
+
     graphic->NumFrames=0;
     graphic->Frames=data;
+    graphic->Size=size;
 
     return graphic;
 }
@@ -395,10 +444,13 @@ global Graphic* NewGraphic(
 	unsigned depth,unsigned width,unsigned height)
 {
     void* data;
+    int size;
 
-    data=malloc(width*height*(depth+7)/8);
+    size=width*height*(depth+7)/8;
+    data=malloc(size);
+    IfDebug( AllocatedGraphicMemory+=size );
 
-    return MakeGraphic(depth,width,height,data);
+    return MakeGraphic(depth,width,height,data,size);
 }
 
 /**
@@ -488,23 +540,29 @@ global char* LibraryFileName(const char* file,char* buffer)
     return buffer;
 }
 
-/*
-**  creates a checksum used to compare palettes.
-**  change the method if you have better ideas.
+/**
+**	creates a checksum used to compare palettes.
+**	JOSH: change the method if you have better ideas.
+**	JOHNS: I say this also always :)
+**
+**	@param palette	Palette source.
+**
+**	@return		Calculated hash/checksum.
 */
-local long GetPaletteChecksum(Palette * palette){
-  long retVal = 0;
-  int i;
-  for(i = 0; i < 256; i++){
-    //This is designed to return different values if
-    // the pixels are in a different order.
-    retVal = ((palette[i].r+i)&0xff)+retVal;
-    retVal = ((palette[i].g+i)&0xff)+retVal;
-    retVal = ((palette[i].b+i)&0xff)+retVal;
-  }
-  return retVal;
-}
+local long GetPaletteChecksum(const Palette* palette)
+{
+    long retVal;
+    int i;
 
+    for(retVal = i = 0; i < 256; i++){
+	//This is designed to return different values if
+	// the pixels are in a different order.
+	retVal = ((palette[i].r+i)&0xff)+retVal;
+	retVal = ((palette[i].g+i)&0xff)+retVal;
+	retVal = ((palette[i].b+i)&0xff)+retVal;
+    }
+    return retVal;
+}
 
 /**
 **	Load graphic from file.
@@ -524,38 +582,39 @@ global Graphic* LoadGraphic(const char* name)
     // FIXME: I want also support JPG file format!
 
     if( !(graphic=LoadGraphicPNG(LibraryFileName(name,buf))) ) {
-	printf("Can't load the graphic `%s'\n",name);
+	fprintf(stderr,"Can't load the graphic `%s'\n",name);
 	exit(-1);
     }
 
     checksum = GetPaletteChecksum(graphic->Palette);
     while(current_link != NULL){
-      if(current_link->checksum == checksum)
+      if(current_link->Checksum == checksum)
 	break;
       prev_link = current_link;
-      current_link = current_link->next;
+      current_link = current_link->Next;
     }
     //Palette Not found
     if(current_link == NULL){
       Pixels = VideoCreateNewPalette(graphic->Palette);
-      printf("loading new palette with %s\n",name);
+      DebugLevel0("loading new palette with %s\n",name);
       if(prev_link == NULL){
 	palette_list = (PaletteLink *)malloc(sizeof(PaletteLink));
-	palette_list->checksum = checksum;
-	palette_list->next = NULL;
+	palette_list->Checksum = checksum;
+	palette_list->Next = NULL;
 	palette_list->Palette = Pixels;
       } else {
-	prev_link->next = (PaletteLink *)malloc(sizeof(PaletteLink));
-	prev_link->next->checksum = checksum;
-	prev_link->next->next = NULL;
-	prev_link->next->Palette = Pixels;
+	prev_link->Next = (PaletteLink *)malloc(sizeof(PaletteLink));
+	prev_link->Next->Checksum = checksum;
+	prev_link->Next->Next = NULL;
+	prev_link->Next->Palette = Pixels;
       }
     } else {
       Pixels = current_link->Palette;
     }
     graphic->Pixels = Pixels;
     free(graphic->Palette);
-    
+    graphic->Palette=NULL;		// JOHNS: why should we free this?
+
     return graphic;
 }
 
@@ -577,6 +636,11 @@ global void InitGraphic(void)
 	    break;
 
 	case 24:
+	    GraphicImage8Type.DrawSub=VideoDrawSub8to24;
+	    GraphicImage8Type.DrawSubClip=VideoDrawSub8to24Clip;
+	    // FIXME: how detect real 24?
+	    // break;
+
 	case 32:
 	    GraphicImage8Type.DrawSub=VideoDrawSub8to32;
 	    GraphicImage8Type.DrawSubClip=VideoDrawSub8to32Clip;
