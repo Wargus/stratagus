@@ -1476,7 +1476,7 @@ local void EditorCallbackMouse(int x, int y)
 	//	Scroll the map
 	//
 	if( !(FrameCounter % SpeedMouseScroll) ) {
-	    if (CursorX < TheUI.SelectedViewport->X) {
+	    if (CursorX <= TheUI.SelectedViewport->X) {
 		ViewportSetViewpoint(TheUI.SelectedViewport,
 		    TheUI.SelectedViewport->MapX - 1,
 		    TheUI.SelectedViewport->MapY);
@@ -1486,7 +1486,7 @@ local void EditorCallbackMouse(int x, int y)
 		    TheUI.SelectedViewport->MapY);
 	    }
 
-	    if (CursorY < TheUI.SelectedViewport->Y) {
+	    if (CursorY <= TheUI.SelectedViewport->Y) {
 		ViewportSetViewpoint(TheUI.SelectedViewport,
 		    TheUI.SelectedViewport->MapX,
 		    TheUI.SelectedViewport->MapY - 1);
