@@ -2892,6 +2892,8 @@ local void StartCampaignFromMenu(int number)
 
 #ifdef USE_SDL_SURFACE
     MenusSetBackground();
+    VideoClearScreen();
+    Invalidate();
 #else
     VideoLockScreen();
     MenusSetBackground();
@@ -5006,9 +5008,13 @@ local void EditorNewMap(void)
     TheMap.Info->MapWidth = atoi(width);
     TheMap.Info->MapHeight = atoi(height);
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 
     *CurrentMapPath = '\0';
 
@@ -5121,9 +5127,13 @@ local void EditorMainLoadMap(void)
 	return;
     }
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 
     if (ScenSelectPath[0]) {
 	s = ScenSelectPath + strlen(ScenSelectPath);
@@ -5564,9 +5574,13 @@ global void EditorLoadMenu(void)
 	return;
     }
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 
     if (ScenSelectPath[0]) {
 	s = ScenSelectPath + strlen(ScenSelectPath);
@@ -6507,6 +6521,7 @@ local void ReplayGameMenu(void)
 #ifdef USE_SDL_SURFACE
     VideoClearScreen();
     MenusSetBackground();
+    Invalidate();
 #else
     VideoLockScreen();
     VideoClearScreen();
