@@ -3599,7 +3599,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 {
     Menu *menu;
     int i, h, c;
-    int avail, ready;
+    int avail, ready, plyrs;
 
     menu = FindMenu("menu-multi-setup");
 
@@ -3620,6 +3620,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     }
 
     avail = h;
+    plyrs = 0;
     //	Setup the player menu
     for (ready = i = 1; i < PlayerMax-1; i++) {
 	if (initial == 1) {
@@ -3641,6 +3642,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 
 	    menu->items[SERVER_PLAYER_READY - 1 + i].flags = 0;
 	    menu->items[SERVER_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+	    ++plyrs;
 	    if (ServerSetupState.Ready[i]) {
 		menu->items[SERVER_PLAYER_READY - 1 + i].d.gem.state |= MI_GSTATE_CHECKED;
 		++ready;
@@ -3702,10 +3704,21 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	}
     }
 
+
     //	Tell connect state machines how many interactive players we can have
     NetPlayers = avail;
     //	Check if all players are ready.
-    DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d\n" _C_ avail _C_ ready);
+    DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d\n" _C_ avail
+	    _C_ ready);
+
+    // Disable the select scenario after players have joined.
+    if (plyrs) {
+	// disable Select Scenario button
+	menu->items[2].flags = MenuButtonDisabled;
+    } else {
+	// enable Select Scenario button
+	menu->items[2].flags = 0;
+    }
     if (ready == avail) {
 	if (menu->items[3].flags == MenuButtonDisabled) {
 	    // enable start game button
@@ -3723,20 +3736,25 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 local void MultiClientUpdate(int initial)
 {
     Menu *menu;
-    int i, h, c;
+    int i;
+    int h;
+    int c;
 
     menu = FindMenu("menu-net-multi-client");
 
-    //	Calculate available slots from pudinfo
+    //  Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
-	    h++;	// available interactive player slots
+	    h++;			// available interactive player slots
 	}
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
-	    c++;	// available computer player slots
+	    c++;			// available computer player slots
 	}
     }
 
+    //
+    //	Setup defaults, reset values.
+    //
     if (initial) {
 	menu->items[CLIENT_PLAYER_STATE] = NetMultiButtonStorage[1];
 	menu->items[CLIENT_PLAYER_STATE].yofs = 32;
@@ -3744,40 +3762,58 @@ local void MultiClientUpdate(int initial)
 	memset(&LocalSetupState, 0, sizeof(ServerSetup));
     }
     for (i = 1; i < PlayerMax - 1; i++) {
-	if (Hosts[i].PlyNr) {
-	    menu->items[CLIENT_PLAYER_STATE + i] =
-		NetMultiButtonStorage[1];
+	DebugLevel3Fn("%d: %d %d\n" _C_ i _C_ Hosts[i].PlyNr
+		_C_ NetLocalHostsSlot);
+	//
+	//	Johns: This works only if initial. Hosts[i].PlyNr is later lost.
+	//
+	if (Hosts[i].PlyNr || i == NetLocalHostsSlot) {
+	    menu->items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
 	    if (i == NetLocalHostsSlot) {
 		menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state = 0;
 	    } else {
-		menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
+		menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
+		    MI_GSTATE_PASSIVE;
 	    }
 	} else {
 	    menu->items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[0];
-	    menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.state = MI_PSTATE_PASSIVE;
-	    menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
-	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+	    menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.state =
+		MI_PSTATE_PASSIVE;
+	    menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt =
+		ServerSetupState.CompOpt[i];
+	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
+		MI_GSTATE_INVISIBLE;
 	}
-	menu->items[CLIENT_PLAYER_STATE + i].yofs = 32 + (i&7) * 22;
+	menu->items[CLIENT_PLAYER_STATE + i].yofs = 32 + (i & 7) * 22;
 	if (i > 7) {
 	    menu->items[CLIENT_PLAYER_STATE + i].xofs = 320 + 40;
 	}
-
 	menu->items[CLIENT_PLAYER_READY - 1 + i].flags = 0;
+
 	if (ServerSetupState.Ready[i]) {
-	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state |= MI_GSTATE_CHECKED;
+	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state |=
+		MI_GSTATE_CHECKED;
 	} else {
-	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state &= ~MI_GSTATE_CHECKED;
+	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state &=
+		~MI_GSTATE_CHECKED;
 	}
 
-	if (i >= h) {
-	    menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+#if 0
+	if (i != NetLocalHostsSlot) {
+	//if (i >= h) {
+	    menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt =
+		ServerSetupState.CompOpt[i];
 	}
+#endif
+
+	// Unused slots are always disabled.
 	if (i >= h + c) {
-	    menu->items[CLIENT_PLAYER_READY - 1 + i].flags = MenuButtonDisabled;
-	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+	    menu->items[CLIENT_PLAYER_READY - 1 + i].flags =
+		MenuButtonDisabled;
+	    menu->items[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
+		MI_GSTATE_INVISIBLE;
 	    menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.defopt =
-			 menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt = 2;
+		menu->items[CLIENT_PLAYER_STATE + i].d.pulldown.curopt = 2;
 	    menu->items[CLIENT_PLAYER_STATE + i].flags = MenuButtonDisabled;
 	}
     }
