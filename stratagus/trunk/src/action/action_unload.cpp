@@ -156,6 +156,7 @@ global int UnloadUnit(Unit* unit)
 	unit->X = x;
 	unit->Y = y;
 	unit->Wait = 1;			// should be correct unit has still action
+	unit->Boarded = 0;
 	PlaceUnit(unit, x, y);
 	return 1;
 }
@@ -344,15 +345,21 @@ local void LeaveTransporter(Unit* unit)
 		goal->X = unit->X;
 		goal->Y = unit->Y;
 		// Try to unload the unit. If it doesn't work there is no problem.
-		UnloadUnit(goal);
+		if (UnloadUnit(goal)) {
+			unit->BoardCount--;
+		}
 	} else {
 		// Unload all units.
 		goal = unit->UnitInside;
 		for (i = unit->InsideCount; i; --i, goal = goal->NextContained) {
-			goal->X = unit->X;
-			goal->Y = unit->Y;
-			if (!UnloadUnit(goal)) {
-				++stillonboard;
+			if (goal->Boarded) {
+				goal->X = unit->X;
+				goal->Y = unit->Y;
+				if (!UnloadUnit(goal)) {
+					++stillonboard;
+				} else {
+					unit->BoardCount--;
+				}
 			}
 		}
 	}

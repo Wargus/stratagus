@@ -441,7 +441,9 @@ local int GatherResource(Unit* unit)
 				//
 				LoseResource(unit,source);
 				for (i = source->InsideCount; i; --i, uins = uins->NextContained) {
-					LoseResource(uins,source);
+					if (uins->Orders->Action == UnitActionResource) {
+						LoseResource(uins,source);
+					}
 				}
 
 				// Don't destroy the resource twice.

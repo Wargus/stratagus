@@ -110,10 +110,13 @@
 **
 **		Unit::InsideCount
 **
-**				The number of units inside the container. This used to be
-**				Value for transporters, but since gold mines also use this
-**				field, it has changed to InsideCount, to allow counting
-**				units inside a gold mine.)
+**				The number of units inside the container.
+**
+**		Unit::BoardCount
+**
+**				The number of units transported inside the container. This
+**				does not include for instance stuff like harvesters returning
+**				cargo.
 **
 **		Unit::Name
 **
@@ -242,6 +245,10 @@
 **				The Seen State of the building.
 **				01 The building in being built when last seen.
 **				10 The building was been upgraded when last seen.
+**
+**		Unit::Boarded
+**
+**				This is 1 if the unit is on board a transporter.
 **
 **		Unit::Mana
 **
@@ -516,6 +523,7 @@ struct _unit_ {
 #endif
 
 	int				InsideCount;				/// Number of units inside.
+	int				BoardCount;				/// Number of units transported inside.
 	Unit*		    UnitInside;				/// Pointer to one of the units inside.
 	Unit*		    Container;				/// Pointer to the unit containing it (or 0)
 	Unit*		    NextContained;				/// Next unit in the container.
@@ -547,6 +555,7 @@ struct _unit_ {
 
 	unsigned		Constructed : 1;		/// Unit is in construction
 	unsigned		Active : 1;				/// Unit is active for AI
+	unsigned		Boarded : 1;			/// Unit is on board a transporter.
 	Player*	 RescuedFrom;					/// The original owner of a rescued unit.
 											/// NULL if the unit was not rescued.
 	/* Seen stuff. */

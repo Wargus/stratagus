@@ -1510,7 +1510,7 @@ local int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
 
 		result = 1;
 
-		if (unit->InsideCount >= unit->Type->MaxOnBoard) {
+		if (unit->BoardCount >= unit->Type->MaxOnBoard) {
 			continue;
 		}
 
@@ -1531,7 +1531,7 @@ local int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
 				unit->OrderCount < MAX_ORDERS - 1 &&
 				unit->Orders[unit->OrderFlush ? 1 : 0].Action == UnitActionFollow &&
 				unit->Orders[unit->OrderCount - 1].Action == UnitActionUnload &&
-				unit->InsideCount + unit->OrderCount - (unit->OrderFlush ? 1 : 0) <= unit->Type->MaxOnBoard) {
+				unit->BoardCount + unit->OrderCount - (unit->OrderFlush ? 1 : 0) <= unit->Type->MaxOnBoard) {
 
 			// Check that it will unload in the dest zone
 			ZoneSetClear(&TransporterZones);

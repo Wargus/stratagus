@@ -1041,7 +1041,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			//		Transporter with units on board.
 			//
 			} else if (unit->Type->Transporter) {
-				DrawManaBar(x, y, type, unit->Type->MaxOnBoard, unit->InsideCount);
+				DrawManaBar(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
 			}
 		}
 	}
@@ -1109,7 +1109,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			//		Transporter with units on board.
 			//
 			} else if (unit->Type->Transporter) {
-				DrawManaSprite(x, y, type, unit->Type->MaxOnBoard, unit->InsideCount);
+				DrawManaSprite(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
 			}
 		}
 	}
@@ -1635,7 +1635,7 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 	const UnitStats* stats;
 	int r;
 
-#if 1 // This is for showing vis counts and refs.
+#if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
 	sprintf(buf, "%d%c%c%d", unit->VisCount[ThisPlayer->Player],
 		unit->Seen.ByPlayer & (1 << ThisPlayer->Player) ? 'Y' : 'N',
