@@ -346,7 +346,8 @@ local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
     //	Fill upgrade structure
 
     if( (tmp=(Upgrade**)hash_find(UpgradeHash,(char*)ident)) ) {
-	DebugLevel0Fn("Already defined upgrade\n");
+	// FIXME: memory loose!
+	DebugLevel0Fn("Already defined upgrade `%s'\n",ident);
 	upgrade=*tmp;
     } else {
 	upgrade=Upgrades+UpgradesCount++;
@@ -583,8 +584,7 @@ global void ParsePudALOW(const char* alow,int length)
     int b;
     Player* player;
 
-    DebugLevel0Fn(" Length %d\n",length);
-    //SetupAllow();
+    DebugLevel0Fn(" Length %d FIXME: constant must be moved to ccl\n",length);
     InitUpgrades();
 
     //
@@ -755,7 +755,6 @@ global void ParsePudUGRD(const char* ugrd,int length)
 
     DebugLevel3Fn(" Length %d\n",length);
     DebugCheck( length!=780 );
-    DebugLevel3Fn(" Upgrades %d\n",UpgradesCount);
 
     for( i=0; i<52; ++i ) {
 	time=((unsigned char*)ugrd)[i];
@@ -984,7 +983,6 @@ local SCM CclDefineModifier(SCM list)
     list=gh_cdr(list);
 
     str=gh_scm2newstr(value,NULL);
-    DebugLevel2Fn(" %s\n",str);
     uid=UpgradeIdByIdent(str);
     free(str);
 
@@ -1030,7 +1028,7 @@ local SCM CclDefineModifier(SCM list)
 	    value=gh_cdr(value);
 	    str=gh_scm2newstr(gh_car(value),NULL);
 	    value=gh_cdr(value);
-	    DebugLevel0Fn("%s\n",str);
+	    DebugLevel3Fn("%s\n",str);
 	    if( !strncmp(str,"upgrade-",8) ) {
 		upgrades[UpgradeIdByIdent(str)]=gh_scm2int(gh_car(value));
 	    } else if( !strncmp(str,"unit-",5) ) {
@@ -1508,6 +1506,7 @@ global int UpgradeIdByIdent(const char* sid)
     return -1;
 }
 
+#if 0
 // FIXME: Docu
 global int ActionIdByIdent( const char* sid )
 {
@@ -1515,6 +1514,7 @@ global int ActionIdByIdent( const char* sid )
   DebugLevel0Fn(" fix this %s\n",sid);
   return -1;
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --	Upgrades
