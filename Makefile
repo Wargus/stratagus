@@ -191,7 +191,7 @@ endif
 #	Distributions
 ##############################################################################
 
-DOCS    = README doc/*.html doc/*.txt doc/ccl/*.html doc/ccl/*.py \
+DOCS    = README doc/*.html doc/*.txt doc/scripts/*.html doc/scripts/*.py \
 	  doc/graphics/*.html doc/graphics/*.gimp doc/graphics/*.png
 
 PICS    = contrib/stratagus.ico
