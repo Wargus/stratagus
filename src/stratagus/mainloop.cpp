@@ -388,43 +388,53 @@ local void DrawMapViewport(int v)
 
 /**
 **	Draw map area
+**
+**	@todo	Fix the FIXME's and we only need to draw a line between the
+**		viewports and show the active viewport.
 */
 global void DrawMapArea(void)
 {
     int i;
 
-    for (i=0; i < TheUI.NumViewports; i++) {
-	DrawMapViewport (i);
+    // Draw all map viewports
+    for (i = 0; i < TheUI.NumViewports; i++) {
+	DrawMapViewport(i);
     }
 
     // if we a single viewport, no need to denote the "last clicked" one
-    if (TheUI.NumViewports==1) {
+    if (TheUI.NumViewports == 1) {
 	return;
     }
 
-    for (i=0; i < TheUI.NumViewports; i++) {
+    //
+    //	Separate the viewports and mark the active viewport.
+    //
+    for (i = 0; i < TheUI.NumViewports; i++) {
 	enum _sys_colors_ color;
 
-	if (i==TheUI.LastClickedVP) {
+	if (i == TheUI.LastClickedVP) {
 	    color = ColorOrange;
 	} else {
 	    color = ColorBlack;
 	}
 
 	// FIXME: johns this should be always on screen?
-	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].Y,
-			TheUI.VP[i].X, TheUI.VP[i].EndY);
-	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].Y,
-			TheUI.VP[i].EndX, TheUI.VP[i].Y);
-	VideoDrawLineClip (color, TheUI.VP[i].EndX, TheUI.VP[i].Y,
-			TheUI.VP[i].EndX, TheUI.VP[i].EndY);
-	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].EndY,
-			TheUI.VP[i].EndX, TheUI.VP[i].EndY);
+	VideoDrawLineClip(color, TheUI.VP[i].X, TheUI.VP[i].Y, TheUI.VP[i].X,
+	    TheUI.VP[i].EndY);
+	VideoDrawLineClip(color, TheUI.VP[i].X, TheUI.VP[i].Y,
+	    TheUI.VP[i].EndX, TheUI.VP[i].Y);
+	VideoDrawLineClip(color, TheUI.VP[i].EndX, TheUI.VP[i].Y,
+	    TheUI.VP[i].EndX, TheUI.VP[i].EndY);
+	VideoDrawLineClip(color, TheUI.VP[i].X, TheUI.VP[i].EndY,
+	    TheUI.VP[i].EndX, TheUI.VP[i].EndY);
     }
 }
 
 /**
 **	Display update.
+**
+*	This functions updates everything on screen. The map, the gui, the
+**	cursors.
 */
 global void UpdateDisplay(void)
 {
@@ -460,17 +470,21 @@ global void UpdateDisplay(void)
     PlayerPixels(Players);		// Reset to default colors
 
     if( MustRedraw&RedrawMinimap ) {
+	int v;
+
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
-	int v = TheUI.LastClickedVP;
 	// FIXME: We shouldn't allow TheUI.LastClickedVP==-1
+	v = TheUI.LastClickedVP;
 	if( v>=0 ) {
-	    DrawMinimap (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
-	    DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	    DrawMinimap(TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	    DrawMinimapCursor(TheUI.VP[v].MapX, TheUI.VP[v].MapY);
 	}
     } else if (MustRedraw&RedrawMinimapCursor) {
-	int v = TheUI.LastClickedVP;
-	HideMinimapCursor ();
+	int v;
+
+	HideMinimapCursor();
+	v = TheUI.LastClickedVP;
 	if( v>=0 ) {
 	    DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
 	}
@@ -507,7 +521,7 @@ global void UpdateDisplay(void)
     VideoUnlockScreen();		// End write access
 
     //
-    //	Update changes to X11.
+    //	Update changes to display.
     //
     if( MustRedraw&RedrawAll ) {
 	// refresh entire screen, so no further invalidate needed
@@ -601,7 +615,7 @@ local void EnableDrawRefresh(void)
 global void GameMainLoop(void)
 {
     EventCallback callbacks;
-#ifdef DEBUG
+#ifdef DEBUG	// removes the setjmp warnings
     static int showtip;
 #else
     int showtip;
@@ -701,18 +715,19 @@ global void GameMainLoop(void)
 	    //
 	    // Work todo each realtime second.
 	    //		Check cd-rom (every 2nd second)
+	    // FIXME: Not called while pause or in the user interface.
 	    //
-	    switch( GameCycle% ((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
+	    switch( GameCycle%((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
 		case 0:				// Check cd-rom
 #if defined(USE_SDLCD)
-		    if ( !(GameCycle%4) )	// every 2nd second
+		    if ( !(GameCycle%4) ) {	// every 2nd second
 			SDL_CreateThread(CDRomCheck, NULL);
+		    }
 #elif defined(USE_LIBCDA) || defined(USE_CDDA)
 		    CDRomCheck(NULL);
 #endif
 		    break;
 	    }
-
 	}
 
 	//
