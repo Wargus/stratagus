@@ -473,7 +473,8 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	//	unusable unit
 	//
 	// FIXME: did SelectUnits already filter this.
-	if( dest->Removed || dest->Orders[0].Action==UnitActionDie ) {
+	if( dest->Removed || dest->Invisible
+		|| dest->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
 

@@ -408,6 +408,7 @@ struct _unit_ {
     unsigned	Mana : 8;		/// mana points
     unsigned	HP;			/// hit points
 
+    unsigned	TTL;			/// time to life
     unsigned	Bloodlust;		/// ticks bloodlust
     unsigned	Haste;			/// ticks haste (disables slow)
     unsigned	Slow;			/// ticks slow (disables haste)

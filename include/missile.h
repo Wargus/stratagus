@@ -79,8 +79,6 @@
 **
 **	MissileType::Delay
 **
-**	@note	This isn't implemented yet.
-**
 **		Delay after the missile generation, until the missile animation
 **		starts.
 **
@@ -101,8 +99,6 @@
 **
 **	MissileType::Range
 **
-**	@note	This isn't implemented yet.
-**
 **		Determines the range that a projectile will deal its damage.
 **		A range of 0 will mean that the damage will be limited to only
 **		where the missile was directed towards. So if you shot a
@@ -110,6 +106,7 @@
 **		1 only effects the field on that the missile is shot. A value
 **		of 2  would mean that for a range of 1 around the impact spot,
 **		the damage for that particular missile would be dealt.
+**		All fields that aren't the center get only 50% of the damage.
 **
 **	MissileType::ImpactName
 **
@@ -124,6 +121,22 @@
 **	MissileType::Sprite
 **
 **		Missile sprite loaded from MissileType::File
+*/
+
+/**
+**	@struct _missile_ missile.h
+**
+**	\#include "missile.h"
+**
+**	typedef struct _missile_ Missile;
+**
+**	This structure contains all informations about a missile in game.
+**	A missile could have different effects, based on its missile-type.
+**	Currently only a tile, an unit or a missile could be placed on the map.
+**
+**	The missile structure members:
+**
+**	FIXME: not written documentation
 */
 
 /*----------------------------------------------------------------------------
@@ -166,6 +179,7 @@ struct _missile_type_ {
     SoundConfig	ImpactSound;		/// impact sound for this missile-type
 
     int		Class;			/// missile class
+    int		Delay;			/// missile delay
     int		Sleep;			/// missile sleep
     int		Speed;			/// missile speed
 
@@ -189,7 +203,6 @@ struct _missile_type_ {
 */
 typedef struct _missile_ Missile;
 
-
 /**
 **	Missile on the map.
 */
@@ -199,23 +212,25 @@ struct _missile_ {
     int		DX;			/// missile pixel destination
     int		DY;			/// missile pixel destination
     MissileType*Type;			/// missile-type pointer
-    int		Frame;			/// frame counter
-    int		State;			/// state
-    int		Wait;			/// delay
+    int short	Frame;			/// frame counter
+    int short	State;			/// state
+    int short	Wait;			/// delay between frames
+    int short	Delay;			/// delay to showup
 
     Unit*	SourceUnit;		/// unit that fires (could be killed)
     Unit*	TargetUnit;             /// target unit, used for spells
 
     int		Damage;                 /// direct damage that missile applies
 
+    int		TTL;			/// time to live (ticks) used for spells
+    void (*Controller)( Missile* );	/// used to controll spells
+
+// Internal use:
     int		D;			/// for point to point missiles
     int		Dx;			/// delta x
     int		Dy;			/// delta y
     int		Xstep;			/// X step
     int		Ystep;			/// Y step
-
-    int TTL;				/// time to live (ticks) used for spells
-    int (*Controller)( Missile* this_missile );    /// used to controll spells
 };
 
 /*----------------------------------------------------------------------------
