@@ -10,7 +10,7 @@
 //
 /**@name action_upgradeto.c - The unit upgrading to new action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -61,11 +61,20 @@ void HandleActionUpgradeTo(Unit* unit)
 	UnitType* type;
 	const UnitStats* stats;
 
-	player = unit->Player;
 	if (!unit->SubAction) { // first entry
 		unit->Data.UpgradeTo.Ticks = 0;
 		unit->SubAction = 1;
 	}
+
+	if (unit->Type->NewAnimations) {
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Upgrade);
+		if (unit->Wait) {
+			unit->Wait--;
+			return;
+		}
+	}
+
+	player = unit->Player;
 	type = unit->Orders[0].Type;
 	stats = &type->Stats[player->Player];
 
@@ -78,7 +87,7 @@ void HandleActionUpgradeTo(Unit* unit)
 		player->UnitTypesCount[unit->Type->Slot]--;
 
 		Assert(unit->Type->TileWidth == type->TileWidth &&
-				unit->Type->TileHeight == type->TileHeight);
+			unit->Type->TileHeight == type->TileHeight);
 		unit->Type = type;
 		unit->Stats = (UnitStats*)stats;
 		// and we have new one...
@@ -90,7 +99,9 @@ void HandleActionUpgradeTo(Unit* unit)
 		if (unit->Player->AiEnabled) {
 			AiUpgradeToComplete(unit, type);
 		}
-		unit->Reset = unit->Wait = 1;
+		if (!unit->Type->NewAnimations) {
+			unit->Reset = unit->Wait = 1;
+		}
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
 
@@ -110,7 +121,9 @@ void HandleActionUpgradeTo(Unit* unit)
 		return;
 	}
 
-	unit->Reset = 1;
+	if (!unit->Type->NewAnimations) {
+		unit->Reset = 1;
+	}
 	unit->Wait = CYCLES_PER_SECOND / 6;
 }
 
