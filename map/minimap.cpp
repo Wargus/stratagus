@@ -273,6 +273,14 @@ global void DrawMinimap(int vx,int vy)
 
 	unit=*table;
 
+	if( unit->Removed ) {		// Removed, inside another building
+	    continue;
+	}
+	if( unit->Invisible ) {		// Can't be seen
+	    continue;
+	}
+
+
 #ifdef NEW_FOW
 	mf=TheMap.Fields+unit->X+unit->Y*TheMap.Width;
 	// Draw only units on explored fields
@@ -284,6 +292,7 @@ global void DrawMinimap(int vx,int vy)
 	    continue;
 	}
 #else
+#if 0
 	flags=TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags;
 	// Draw only units on explored fields
 	if( !(flags&MapFieldExplored) ) {
@@ -294,7 +303,11 @@ global void DrawMinimap(int vx,int vy)
 	    continue;
 	}
 #endif
-	// FIXME: buildings under fog of war.
+	if( !UnitKnownOnMap(unit) ) {
+	    continue;
+	}
+#endif
+
 	// FIXME: submarine not visible
 
 	type=unit->Type;

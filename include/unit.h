@@ -586,6 +586,8 @@ extern void UpdateForNewUnit(const Unit* unit,int upgrade);
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
     /// Returns true, if unit is visible on the map.
 extern int UnitVisibleOnMap(const Unit* unit);
+    /// Returns true, if unit is known on the map.
+extern int UnitKnownOnMap(const Unit* unit);
     /// Returns true, if unit is visible on current map view.
 extern int UnitVisibleOnScreen(const Unit* unit);
     /// FIXME: more docu
