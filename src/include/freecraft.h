@@ -107,6 +107,8 @@
 #ifdef _MSC_VER	// { m$ auto detection
 
 #define inline __inline			// fix m$ brain damage
+#define alloca _alloca			// I hope this works with all VC..
+
 #ifndef __FUNCTION__
     // I don't know, but eVC didn't has it, even it is documented
 #define __FUNCTION__ __FILE__ ":" /* __LINE__ */
