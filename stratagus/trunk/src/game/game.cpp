@@ -10,7 +10,8 @@
 //
 /**@name game.c		-	The game set-up and creation. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer, Andreas Arens
+//	(c) Copyright 1998-2003 by Lutz Sammer, Andreas Arens, and
+//	                           Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -192,8 +193,9 @@ local void GameTypeTopVsBottom(void)
 	for (j=0; j<15; j++) {
 	    if (i != j) {
 		if ((top && Players[j].StartY <= middle) ||
-		    (!top && Players[j].StartY > middle)) {
+			(!top && Players[j].StartY > middle)) {
 		    CommandDiplomacy(i,DiplomacyAllied,j);
+		    Players[i].SharedVision |= (1<<j);
 		} else {
 		    CommandDiplomacy(i,DiplomacyEnemy,j);
 		}
@@ -209,17 +211,18 @@ local void GameTypeLeftVsRight(void)
 {
     int i;
     int j;
-    int top;
+    int left;
     int middle;
 
     middle = TheMap.Width/2;
     for (i=0; i<15; i++) {
-	top = Players[i].StartX <= middle;
+	left = Players[i].StartX <= middle;
 	for (j=0; j<15; j++) {
 	    if (i != j) {
-		if ((top && Players[j].StartX <= middle) ||
-		    (!top && Players[j].StartX > middle)) {
+		if ((left && Players[j].StartX <= middle) ||
+			(!left && Players[j].StartX > middle)) {
 		    CommandDiplomacy(i,DiplomacyAllied,j);
+		    Players[i].SharedVision |= (1<<j);
 		} else {
 		    CommandDiplomacy(i,DiplomacyEnemy,j);
 		}
@@ -244,6 +247,7 @@ local void GameTypeManVsMachine(void)
 	    if (i != j) {
 		if (Players[i].Type==Players[j].Type) {
 		    CommandDiplomacy(i,DiplomacyAllied,j);
+		    Players[i].SharedVision |= (1<<j);
 		} else {
 		    CommandDiplomacy(i,DiplomacyEnemy,j);
 		}
