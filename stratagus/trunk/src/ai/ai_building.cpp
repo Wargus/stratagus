@@ -447,6 +447,9 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 **	@param dx	Pointer for X position returned.
 **	@param dy	Pointer for Y position returned.
 **	@return		True if place found, false if no found.
+**
+**	@todo	FIXME: This is slow really slow, using two flood fills, is not
+**		a perfect solution.
 */
 local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 	int *dx, int *dy)
@@ -454,8 +457,8 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
     struct {
-		unsigned short X;
-		unsigned short Y;
+	unsigned short X;
+	unsigned short Y;
     } * points;
     int size;
     int x;
@@ -469,6 +472,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
     int i;
     int w;
     unsigned char* m;
+    unsigned char* morg;
     unsigned char* matrix;
 
     x=worker->X;
@@ -479,9 +483,9 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
     //
     //	Make movement matrix.
     //
-    matrix=MakeMatrix();
+    morg=MakeMatrix();
     w=TheMap.Width+2;
-    matrix+=w+w+2;
+    matrix=morg+w+w+2;
 
     points[0].X=x;
     points[0].Y=y;
@@ -511,7 +515,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 		//
 		if ( ForestOnMap(x,y) ) {
 		    if( AiFindBuildingPlace2(worker,type,x,y,dx,dy,0) ) {
-			free(matrix);
+			free(morg);
 			return 1;
 		    }
 		}
@@ -542,7 +546,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 	ep=wp;
     }
 
-    free(matrix);
+    free(morg);
     return 0;
 }
 
