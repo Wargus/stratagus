@@ -318,7 +318,7 @@ static int HowManyFree(void)
 
 	nb = 0;
 	channel = NextFreeChannel;
-	while(channel < MaxChannels) {
+	while (channel < MaxChannels) {
 		++nb;
 		channel = Channels[channel].Point;
 	}
@@ -474,7 +474,7 @@ static Sample* ChooseSample(SoundRequest* sr)
 					if (SelectionHandler.Sound->Number > 1) {
 						result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
 						SelectionHandler.HowMany++;
-						if(SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
+						if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
 							SelectionHandler.HowMany = 0;
 							SelectionHandler.Sound = (ServerSoundId)theSound->Sound.TwoGroups->First;
 						}
@@ -573,7 +573,7 @@ static void FillChannels(int free_channels,int* discarded,int* started)
 		  ++NextSoundRequestOut;
 		  (*discarded)++;
 		}
-		if(NextSoundRequestOut >= MAX_SOUND_REQUESTS) {
+		if (NextSoundRequestOut >= MAX_SOUND_REQUESTS) {
 			Assert(1);
 			NextSoundRequestOut = 0;
 		}

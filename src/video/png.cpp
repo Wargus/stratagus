@@ -123,7 +123,7 @@ int LoadGraphicPNG(Graphic* graphic)
 	/* Create the PNG loading context structure */
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
 		NULL, NULL, NULL);
-	if (png_ptr == NULL){
+	if (png_ptr == NULL) {
 		fprintf(stderr, "Couldn't allocate memory for PNG file");
 		goto done;
 	}

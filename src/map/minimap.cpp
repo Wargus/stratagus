@@ -590,7 +590,7 @@ void UpdateMinimap(void)
 	// Draw units on map
 	// FIXME: We should rewrite this completely
 	//
-	for(n = 0; n < NumUnits; ++n) {
+	for (n = 0; n < NumUnits; ++n) {
 		if (UnitVisibleOnMinimap(Units[n])) {
 			DrawUnitOnMinimap(Units[n], red_phase);
 		}

@@ -45,11 +45,6 @@
 #include "iolib.h"
 #include "iocompat.h"
 
-#ifdef USE_WIN32
-#define MNG_USE_DLL
-#else
-#define MNG_USE_SO
-#endif
 #include <libmng.h>
 
 /*----------------------------------------------------------------------------

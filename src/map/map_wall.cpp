@@ -133,7 +133,7 @@ void MapFixSeenWallTile(int x, int y)
 	if (t == TileTypeHumanWall) {
 		tile = TheMap.Tileset->HumanWallTable[tile];
 		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
-			while (TheMap.Tileset->Table[tile]){ // Skip good tiles
+			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
 			while (!TheMap.Tileset->Table[tile]) { // Skip separator
@@ -259,7 +259,7 @@ void MapFixWallTile(int x, int y)
 	}
 	tile = TheMap.Tileset->Table[tile];
 
-	if( mf->Tile != tile ) {
+	if (mf->Tile != tile) {
 		mf->Tile = tile;
 		UpdateMinimapXY(x, y);
 
@@ -364,7 +364,7 @@ void HitWall(unsigned x, unsigned y, unsigned damage)
 	unsigned v;
 
 	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Value;
-	if( v <= damage ) {
+	if (v <= damage) {
 		TheMap.Fields[x + y * TheMap.Info.MapWidth].Value = 0;
 		MapRemoveWall(x, y);
 	} else {

@@ -343,7 +343,7 @@ void CreateGame(const char* filename, WorldMap* map)
 		LibraryFileName(filename, path);
 		if (strcasestr(filename, ".pud")) {
 			GetPudInfo(path, &TheMap.Info);
-		} else if(strcasestr(filename, ".smp")) {
+		} else if (strcasestr(filename, ".smp")) {
 			LuaLoadFile(path);
 		}
 	}

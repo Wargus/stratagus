@@ -149,7 +149,7 @@ void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src)
 	}
 
 	ZoneSetClear(dst);
-	for (i = 0;i < newzonecount; i++) {
+	for (i = 0; i < newzonecount; ++i) {
 		ZoneSetAddZone(dst, dst->Zones[i]);
 	}
 }

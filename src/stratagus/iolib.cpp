@@ -190,7 +190,7 @@ CLFile* CLopen(const char* fn, long openflags)
 					if ((clf.cl_bz = bzopen(fn, "rb"))) {
 						clf.cl_type = CLF_TYPE_BZIP2;
 					} else {
-						if(!(clf.cl_plain = fopen(fn, "rb"))) {
+						if (!(clf.cl_plain = fopen(fn, "rb"))) {
 							clf.cl_type = CLF_TYPE_INVALID;
 						}
 					}
@@ -202,7 +202,7 @@ CLFile* CLopen(const char* fn, long openflags)
 					if ((clf.cl_gz = gzopen(fn, "rb"))) {
 						clf.cl_type = CLF_TYPE_GZIP;
 					} else {
-						if(!(clf.cl_plain = fopen(fn, "rb"))) {
+						if (!(clf.cl_plain = fopen(fn, "rb"))) {
 							clf.cl_type = CLF_TYPE_INVALID;
 						}
 					}
