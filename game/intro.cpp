@@ -822,10 +822,44 @@ local int GameStatsDrawFunc(int frame)
     }
 
     else if( dodraw==2 ) {
-	char* Rank;
-	VideoDrawTextCentered(x+324,y+TopOffset,LargeFont,"Rank");
 	// FIXME: Use ccl
-	Rank="Overlord";
+	char* Rank;
+	char** Ranks;
+	char* HumanRanks[] = {
+	    "Servant", "Peasant", "Squire", "Footman", "Corporal",
+	    "Sergeant", "Lieutenant", "Captain", "Major", "Knight",
+	    "General", "Admiral", "Marshall", "Lord", "Grand Admiral",
+	    "Highlord", "Thundergod", "God", "Designer"
+	};
+	char* OrcRanks[] = {
+	    "Slave", "Peon", "Rogue", "Grunt", "Slasher",
+	    "Marauder", "Commander", "Captain", "Major", "Knight",
+	    "General", "Master", "Marshall", "Chieftain", "Overlord",
+	    "War Chief", "Demigod", "God", "Designer"
+	};
+	unsigned RankScores[] = {
+	    2000, 5000, 8000, 18000, 28000,
+	    40000, 55000, 70000, 85000, 105000,
+	    125000, 145000, 165000, 185000, 205000,
+	    230000, 255000, 280000, -1
+	};
+
+	if( ThisPlayer->Race==PlayerRaceHuman )
+	    Ranks=HumanRanks;
+	else
+	    Ranks=OrcRanks;
+
+	Rank = NULL;
+	for( i=0; i<sizeof(RankScores); i++ ) {
+	    if( ThisPlayer->Score<RankScores[i] ) {
+		Rank=Ranks[i];
+		break;
+	    }
+	}
+	if( !Rank )
+	    Rank="No Rank";
+
+	VideoDrawTextCentered(x+324,y+TopOffset,LargeFont,"Rank");
 	VideoDrawTextCentered(x+324,y+TopOffset+21,SmallTitleFont,Rank);
     }
 
