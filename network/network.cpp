@@ -635,9 +635,9 @@ global void NetworkEvent(void)
     //
     //	Setup messages
     //
-    if (packet->Commands[0].Type <= MessageInitConfig) {
-	NetworkParseSetupEvent(buf, i);
-	return;
+    if (NetConnectRunning) {
+	if (NetworkParseSetupEvent(buf, i))
+	    return;
     }
 
     //
@@ -647,6 +647,7 @@ global void NetworkEvent(void)
 	DebugLevel0Fn("Bad packet\n");
 	return;
     }
+    
     for (i = 0; i < HostsCount; ++i) {
 	if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort) {
 	    break;

@@ -801,8 +801,9 @@ global void NetworkProcessServerRequest(void)
     }
 }
 
+IfDebug(
 /**
-**	Parse a network menu packet in client disconneccted state.
+**	Parse a network menu packet in client disconnected state.
 **
 **	@param msg	message received
 */
@@ -812,9 +813,10 @@ local void ClientParseDisconnected(
     DebugLevel0Fn("ccs_disconnected: Server sending GoodBye dups %d\n" _C_
 	    msg->SubType);
 }
+);
 
 /**
-**	FIXME: docu
+**	Parse a network menu packet in client detaching state.
 **
 **	@param msg	message received
 */
@@ -835,7 +837,7 @@ local void ClientParseDetaching(const InitMessage* msg)
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu packet in client connecting state.
 **
 **	@param msg	message received
 */
@@ -909,19 +911,18 @@ local void ClientParseConnecting(const InitMessage* msg)
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu packet in client connected state.
 **
 **	@param msg	message received
 */
 local void ClientParseConnected(const InitMessage* msg)
 {
+    int pathlen;
+
     switch(msg->SubType) {
-	int pathlen;
 
 	case ICMMap:		// Server has sent us new map info
-	    sprintf(ScenSelectFullPath, "%s/", FreeCraftLibPath);
-	    // FIXME: pathlen = sprintf should work?
-	    pathlen = strlen(ScenSelectFullPath);
+	    pathlen = sprintf(ScenSelectFullPath, "%s/", FreeCraftLibPath);
 	    memcpy(ScenSelectFullPath+pathlen, msg->u.MapPath, 256);
 	    ScenSelectFullPath[pathlen+255] = 0;
 	    if (NetClientSelectScenario()) {
@@ -952,7 +953,7 @@ local void ClientParseConnected(const InitMessage* msg)
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu packet in client initial mapinfo state.
 **
 **	@param msg	message received
 */
@@ -975,7 +976,7 @@ local void ClientParseMapInfo(const InitMessage* msg)
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu packet in client synced state.
 **
 **	@param msg	message received
 */
@@ -993,7 +994,7 @@ local void ClientParseSynced(const InitMessage* msg)
 	    NetStateMsgCnt = 0;
 	    break;
 
-	case ICMConfig:		// Server gives the go ahead..
+	case ICMConfig:		// Server gives the go ahead.. - start game
 	    DebugLevel0Fn("ccs_synced: Config subtype %d received - starting\n" _C_ msg->SubType);
 	    HostsCount = 0;
 	    for (i = 0; i < msg->HostsCount - 1; ++i) {
@@ -1040,7 +1041,7 @@ local void ClientParseSynced(const InitMessage* msg)
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu packet in client async state.
 **
 **	@param msg	message received
 */
@@ -1077,7 +1078,7 @@ local void ClientParseAsync(const InitMessage* msg)
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu packet in client final goahead waiting state.
 **
 **	@param msg	message received
 */
@@ -1090,7 +1091,7 @@ local void ClientParseGoAhead(const InitMessage* msg)
 	    break;
 
 	case ICMState:		// Server has sent final state info
-	    DebugLevel3Fn("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg->SubType);
+	    DebugLevel0Fn("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg->SubType);
 	    ServerSetupState = msg->u.State;
 	    NetLocalState = ccs_started;
 	    NetStateMsgCnt = 0;
@@ -1103,7 +1104,7 @@ local void ClientParseGoAhead(const InitMessage* msg)
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu AreYouThere keepalive packet and reply IAmHere.
 **
 **	@param msg	message received
 */
@@ -1117,7 +1118,7 @@ local void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused))
 }
 
 /**
-**	FIXME: docu
+**	Parse a network menu Bad Map reply from server.
 **
 **	@param msg	message received
 */
@@ -1134,6 +1135,7 @@ local void ClientParseBadMap(const InitMessage* msg __attribute__((unused)))
     }
     NetConnectRunning = 0;	// End the menu..
 }
+
 
 /**
 **	Parse the initial 'Hello' message of new client that wants to join the game
@@ -1559,16 +1561,11 @@ local int CheckVersions(const InitMessage* msg)
 **	Parse a Network menu packet.
 **
 **	@param msg	message received
-**	@param size	size of the received packet.
 */
-local void NetworkParseMenuPacket(const InitMessage *msg, int size)
+local void NetworkParseMenuPacket(const InitMessage *msg)
 {
-    if (msg->Type > MessageInitConfig || size != sizeof(*msg)) {
-	DebugLevel0Fn("Wrong message\n");
-	return;
-    }
-    DebugLevel0Fn("Received %s Init Message %d:%d (%d) from %d.%d.%d.%d:%d (%ld)\n" _C_
-	    icmsgsubtypenames[msg->SubType] _C_ msg->Type _C_ msg->SubType _C_ size _C_ NIPQUAD(ntohl(NetLastHost)) _C_
+    DebugLevel0Fn("Received %s Init Message %d:%d from %d.%d.%d.%d:%d (%ld)\n" _C_
+	    icmsgsubtypenames[msg->SubType] _C_ msg->Type _C_ msg->SubType _C_ NIPQUAD(ntohl(NetLastHost)) _C_
 	    ntohs(NetLastPort) _C_ FrameCounter);
 
     if (NetConnectRunning == 2) {		// client
@@ -1585,7 +1582,9 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 	    }
 	    switch(NetLocalState) {
 		case ccs_disconnected:
+IfDebug(
 		    ClientParseDisconnected(msg);
+);
 		    break;
 
 		case ccs_detaching:
@@ -1692,33 +1691,27 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 **
 **	@param buf	Packet received
 **	@param size	size of the received packet.
+**
+**	@return		1 if packet is an InitConfig message, 0 otherwise
 */
-global void NetworkParseSetupEvent(const char *buf, int size)
+global int NetworkParseSetupEvent(const char *buf, int size)
 {
-    NetworkPacket *packet;
+    const InitMessage *msg = (const InitMessage *)buf;
 
-    if (InterfaceState == IfaceStateMenu && NetConnectRunning) {
-	NetworkParseMenuPacket((const InitMessage *)buf, size);
-	return;
+    if (msg->Type > MessageInitConfig || size != sizeof(*msg)) {
+	if (NetConnectRunning == 2 && NetLocalState == ccs_started) {
+	    // Client has acked ready to start and receives first real network packed.
+	    // This indicates game has been started by server, so do the same for client.
+	    NetConnectRunning = 0;	// End the menu..
+	}
+	DebugLevel3Fn("Wrong message\n");
+	return 0;
     }
-    packet = (NetworkPacket *)buf;
-    if (packet->Commands[0].Type == MessageInitConfig
-	    && size == sizeof(InitMessage)) {
-	Acknowledge acknowledge;
-
-	DebugLevel0Fn("Received late clients\n");
-
-	// Acknowledge the packets.
-	acknowledge.Type = MessageInitReply;
-	size = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
-		sizeof(acknowledge));
-	DebugLevel0Fn("Sending config ack (%d)\n" _C_ size);
-	return;
+    if (InterfaceState == IfaceStateMenu) {
+	NetworkParseMenuPacket(msg);
+	return 1;
     }
-    if (packet->Commands[0].Type == MessageInitReply) {
-	DebugLevel0Fn("late init reply\n");
-	return;
-    }
+    return 0;
 }
 
 //@}
