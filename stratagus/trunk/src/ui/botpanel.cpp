@@ -10,7 +10,7 @@
 //
 /**@name botpanel.c - The bottom panel. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2005 by Lutz Sammer, Vladi Belperchinov-Shabanski,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -77,7 +77,6 @@ static ButtonAction* UnitButtonTable[MAX_BUTTONS];
 static int NumUnitButtons;
 
 ButtonAction* CurrentButtons;             ///< Pointer to current buttons
-static ButtonAction* _current_buttons;    ///< FIXME: this is just for test
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -97,7 +96,7 @@ void InitButtons(void)
 		UnitButtonTable[z]->Icon.Icon =
 			IconByIdent(UnitButtonTable[z]->Icon.Name);
 	}
-	_current_buttons = malloc(TheUI.NumButtonButtons * sizeof(ButtonAction));
+	CurrentButtons = NULL;
 }
 
 /*----------------------------------------------------------------------------
@@ -191,40 +190,151 @@ void CleanButtons(void)
 	//
 	for (z = 0; z < NumUnitButtons; ++z) {
 		Assert(UnitButtonTable[z]);
-		if (UnitButtonTable[z]->Icon.Name) {
-			free(UnitButtonTable[z]->Icon.Name);
-		}
-		if (UnitButtonTable[z]->ValueStr) {
-			free(UnitButtonTable[z]->ValueStr);
-		}
-		if (UnitButtonTable[z]->AllowStr) {
-			free(UnitButtonTable[z]->AllowStr);
-		}
-		if (UnitButtonTable[z]->Hint) {
-			free(UnitButtonTable[z]->Hint);
-		}
-		if (UnitButtonTable[z]->UnitMask) {
-			free(UnitButtonTable[z]->UnitMask);
-		}
+		free(UnitButtonTable[z]->Icon.Name);
+		free(UnitButtonTable[z]->ValueStr);
+		free(UnitButtonTable[z]->AllowStr);
+		free(UnitButtonTable[z]->Hint);
+		free(UnitButtonTable[z]->UnitMask);
 		free(UnitButtonTable[z]);
 	}
 	NumUnitButtons = 0;
 
 	CurrentButtonLevel = 0;
+	free(CurrentButtons);
 	CurrentButtons = NULL;
-	free(_current_buttons);
-	_current_buttons = NULL;
 }
 
 /**
-**  Draw bottom panel.
+**  Return Status of button.
+**
+**  @param button  button to check status
+**
+**  @return status of button
+**  @return Icon(Active | Selected | Clicked | AutoCast | Disabled).
+**
+**  @todo FIXME : add IconDisabled when needed.
+**  @todo FIXME : Should show the rally action for training unit ? (NewOrder)
+*/
+static int GetButtonStatus(const ButtonAction* button)
+{
+	int res;    // result value.
+	int action; // action done with button.
+	int i;      // Iterator
+
+	Assert(button);
+	Assert(NumSelected);
+
+	res = 0;
+	// cursor is on that button
+	if (ButtonAreaUnderCursor == ButtonAreaButton && ButtonUnderCursor == button->Pos - 1) {
+		res |= IconActive;
+		if (MouseButtons & LeftButton) {
+			// Overwrite IconActive.
+			res = IconClicked;
+		}
+	}
+
+	action = UnitActionNone;
+	switch (button->Action) {
+		case ButtonStop:
+			action = UnitActionStill;
+			break;
+		case ButtonStandGround:
+			action = UnitActionStandGround;
+			break;
+		case ButtonAttack:
+			action = UnitActionAttack;
+			break;
+		case ButtonAttackGround:
+			action = UnitActionAttackGround;
+			break;
+		case ButtonPatrol:
+			action = UnitActionPatrol;
+			break;
+		case ButtonHarvest:
+		case ButtonReturn:
+			action = UnitActionResource;
+			break;
+		default:
+			break;
+	}
+	// Simple case.
+	if (action != UnitActionNone) {
+		for (i = 0; i < NumSelected; i++) {
+			if (Selected[i]->Orders[0].Action != action) {
+				break;
+			}
+		}
+		if (i == NumSelected) {
+			res |= IconSelected;
+		}
+		return res;
+	}
+	// other cases : manage AutoCast and different possible action.
+	switch (button->Action) {
+		case ButtonMove:
+			for (i = 0; i < NumSelected; i++) {
+				if (Selected[i]->Orders[0].Action != UnitActionMove &&
+						Selected[i]->Orders[0].Action != UnitActionBuild &&
+						Selected[i]->Orders[0].Action != UnitActionFollow) {
+					break;
+				}
+			}
+			if (i == NumSelected) {
+				res |= IconSelected;
+			}
+			break;
+		case ButtonSpellCast:
+			// FIXME : and IconSelected ?
+
+			// Autocast
+			for (i = 0; i < NumSelected; i++) {
+				Assert(Selected[i]->AutoCastSpell);
+				if (Selected[i]->AutoCastSpell[button->Value] != 1) {
+					break;
+				}
+			}
+			if (i == NumSelected) {
+				res |= IconAutoCast;
+			}
+			break;
+		case ButtonRepair:
+			for (i = 0; i < NumSelected; i++) {
+				if (Selected[i]->Orders[0].Action != UnitActionRepair) {
+					break;
+				}
+			}
+			if (i == NumSelected) {
+				res |= IconSelected;
+			}
+			// Auto repair
+			for (i = 0; i < NumSelected; i++) {
+				if (Selected[i]->AutoRepair != 1) {
+					break;
+				}
+			}
+			if (i == NumSelected) {
+				res |= IconAutoCast;
+			}
+			break;
+		break;
+		// FIXME: must handle more actions
+		default:
+			break;
+	}
+	return res;
+}
+
+/**
+**  Draw button panel.
+**
+**  Draw all action buttons.
 */
 void DrawButtonPanel(void)
 {
-	int i;
-	int v;
-	Player* player;
-	const ButtonAction* buttons;
+	int i;                       // Iterator.
+	Player* player;              // Selected[0]->Player.
+	const ButtonAction* buttons; // button which are displayed (== CurrentButtons).
 	char buf[8];
 
 	//
@@ -241,156 +351,44 @@ void DrawButtonPanel(void)
 		return;
 	}
 
+	Assert(NumSelected > 0);
 	player = Selected[0]->Player;
 
+	//
+	//  Draw all buttons.
+	//
 	for (i = 0; i < TheUI.NumButtonButtons; ++i) {
-		if (buttons[i].Pos != -1) {
-			int j;
-			int action;
-
-			// cursor is on that button
-			if (ButtonAreaUnderCursor == ButtonAreaButton &&
-					ButtonUnderCursor == i) {
-				v = IconActive;
-				if (MouseButtons & LeftButton) {
-					v = IconClicked;
-				}
+		if (buttons[i].Pos == -1) {
+			continue;
+		}
+		Assert(buttons[i].Pos == i + 1);
+		//
+		//  Tutorial show command key in icons
+		//
+		if (ShowCommandKey) {
+			if (CurrentButtons[i].Key == 27) {
+				strcpy(buf, "ESC");
 			} else {
-				v = 0;
+				buf[0] = toupper(CurrentButtons[i].Key);
+				buf[1] = '\0';
 			}
-			//
-			//  Any better ideas?
-			//  Show the current action state of the unit with the buttons.
-			//
-			//  FIXME: Should show the rally action of buildings.
-			//
+		} else {
+			buf[0] = '\0';
+		}
 
-			// NEW_UI:
-			/*  FIXME: maxy: had to disable this feature :(
-				should be re-enabled from ccl as a boolean button option,
-				together with something like (selected-action-is 'patrol) */
+		//
+		// Draw main Icon.
+		//
+		DrawUnitIcon(player, TheUI.ButtonButtons[i].Style, buttons[i].Icon.Icon,
+			GetButtonStatus(&buttons[i]),
+			TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y, buf);
 
-			action = UnitActionNone;
-			switch (buttons[i].Action) {
-				case ButtonStop:
-					action = UnitActionStill;
-					break;
-				case ButtonStandGround:
-					action = UnitActionStandGround;
-					break;
-				case ButtonAttack:
-					action = UnitActionAttack;
-					break;
-				case ButtonAttackGround:
-					action = UnitActionAttackGround;
-					break;
-				case ButtonPatrol:
-					action = UnitActionPatrol;
-					break;
-				default:
-					break;
-			}
-			if (action != UnitActionNone) {
-				for (j = 0; j < NumSelected; ++j) {
-					if (Selected[j]->Orders[0].Action != action) {
-						break;
-					}
-				}
-				if (j == NumSelected) {
-					v |= IconSelected;
-				}
-			} else {
-				switch (buttons[i].Action) {
-					case ButtonMove:
-						for (j = 0; j < NumSelected; ++j) {
-							if (Selected[j]->Orders[0].Action != UnitActionMove &&
-									Selected[j]->Orders[0].Action != UnitActionBuild &&
-									Selected[j]->Orders[0].Action != UnitActionFollow) {
-								break;
-							}
-						}
-						if (j == NumSelected) {
-							v |= IconSelected;
-						}
-						break;
-					case ButtonHarvest:
-					case ButtonReturn:
-						for (j = 0; j < NumSelected; ++j) {
-							if (Selected[j]->Orders[0].Action != UnitActionResource) {
-								break;
-							}
-						}
-						if (j == NumSelected) {
-							v |= IconSelected;
-						}
-						break;
-					case ButtonSpellCast:
-						// FIXME : and IconSelected ?
-
-						// Autocast
-						for (j = 0; j < NumSelected; ++j) {
-							Assert(Selected[j]->AutoCastSpell);
-							if (Selected[j]->AutoCastSpell[buttons[i].Value] != 1) {
-								break;
-							}
-						}
-						if (j == NumSelected) {
-							v |= IconAutoCast;
-						}
-						break;
-					case ButtonRepair:
-						for (j = 0; j < NumSelected; ++j) {
-							if (Selected[j]->Orders[0].Action != UnitActionRepair) {
-								break;
-							}
-						}
-						if (j == NumSelected) {
-							v |= IconSelected;
-						}
-						// Auto repair
-						for (j = 0; j < NumSelected; ++j) {
-							if (Selected[j]->AutoRepair != 1) {
-								break;
-							}
-						}
-						if (j == NumSelected) {
-							v |= IconAutoCast;
-						}
-						break;
-					break;
-
-
-					// FIXME: must handle more actions
-
-					default:
-						break;
-				}
-			}
-
-			//
-			//  Tutorial show command key in icons
-			//
-			if (ShowCommandKey) {
-				if (CurrentButtons[i].Key == 27) {
-					strcpy(buf, "ESC");
-				} else {
-					buf[0] = toupper(CurrentButtons[i].Key);
-					buf[1] = '\0';
-				}
-			} else {
-				buf[0] = '\0';
-			}
-
-			DrawUnitIcon(player, TheUI.ButtonButtons[i].Style, buttons[i].Icon.Icon,
-				v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y, buf);
-
-			//
-			//  Update status line for this button
-			//
-			if (ButtonAreaUnderCursor == ButtonAreaButton &&
-					ButtonUnderCursor == i && KeyState != KeyStateInput) {
-				UpdateStatusLineForButton(&buttons[i]);
-			}
+		//
+		//  Update status line for this button
+		//
+		if (ButtonAreaUnderCursor == ButtonAreaButton &&
+				ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			UpdateStatusLineForButton(&buttons[i]);
 		}
 	}
 }
@@ -402,11 +400,12 @@ void DrawButtonPanel(void)
 */
 void UpdateStatusLineForButton(const ButtonAction* button)
 {
-	int v;
+	int v;  // button->Value.
 	const UnitStats* stats;
 
+	Assert(button);
 	SetStatusLine(button->Hint);
-	// FIXME: Draw costs
+
 	v = button->Value;
 	switch (button->Action) {
 		case ButtonBuild:
@@ -433,21 +432,134 @@ void UpdateStatusLineForButton(const ButtonAction* button)
 ----------------------------------------------------------------------------*/
 
 /**
-**  Update bottom panel for multiple units.
+**  tell if the button is allowed for the unit.
+**
+**  @param unit         unit which checks for allow.
+**  @param buttonaction button to check if it is allowed.
+**
+**  @return 1 if button is allowed, 0 else.
+**
+**  @todo FIXME : better check. (dependancy, resource, ...)
+**  @todo FIXME : make difference with impossible and not yet researched.
 */
-static void UpdateButtonPanelMultipleUnits(void)
+static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 {
-	char unit_ident[128];
-	int z;
-	int i;
+	int res;              // result.
+	const Player* player; // unit->Player.
 
-	// first clear the table
-	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
-		_current_buttons[z].Pos = -1;
+	Assert(unit);
+	Assert(buttonaction);
+
+	if (buttonaction->Allowed) {
+		return buttonaction->Allowed(unit, buttonaction);
 	}
 
-	i = PlayerRacesIndex(ThisPlayer->Race);
-	sprintf(unit_ident, ",%s-group,", PlayerRaces.Name[i]);
+	res = 0;
+	player = unit->Player;
+	// FIXME: we have to check and if these unit buttons are available
+	//    i.e. if button action is ButtonTrain for example check if
+	// required unit is not restricted etc...
+	switch (buttonaction->Action) {
+		case ButtonMove:
+		case ButtonStop:
+		case ButtonRepair:
+		case ButtonButton:
+		case ButtonPatrol:
+		case ButtonStandGround:
+			res = 1;
+			break;
+		case ButtonHarvest:
+			if (!unit->CurrentResource ||
+					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
+					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
+						unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
+				res = 1;
+			}
+			break;
+		case ButtonReturn:
+			if (!(!unit->CurrentResource ||
+					!(unit->ResourcesHeld > 0 && !unit->Type->ResInfo[unit->CurrentResource]->LoseResources) ||
+					(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
+						unit->Type->ResInfo[unit->CurrentResource]->LoseResources))) {
+				res = 1;
+			}
+			break;
+		case ButtonAttack:
+			res = ButtonCheckAttack(unit, buttonaction);
+			break;
+		case ButtonAttackGround:
+			if (Selected[0]->Type->GroundAttack) {
+				res = 1;
+			}
+			break;
+		case ButtonTrain:
+			// Check if building queue is enabled
+			if (!EnableTrainingQueue &&
+					unit->Orders[0].Action == UnitActionTrain) {
+				break;
+			}
+			// FALL THROUGH
+		case ButtonUpgradeTo:
+		case ButtonResearch:
+		case ButtonBuild:
+			res = CheckDependByIdent(player, buttonaction->ValueStr);
+			if (res && !strncmp(buttonaction->ValueStr, "upgrade-", 8)) {
+				res = UpgradeIdentAllowed(player, buttonaction->ValueStr) == 'A';
+			}
+			break;
+		case ButtonSpellCast:
+			res = CheckDependByIdent(player,buttonaction->ValueStr) &&
+				UpgradeIdentAllowed(player, buttonaction->ValueStr) == 'R';
+			break;
+		case ButtonUnload:
+			res = (Selected[0]->Type->CanTransport && Selected[0]->BoardCount);
+			break;
+		case ButtonCancel:
+			res = 1;
+			break;
+		case ButtonCancelUpgrade:
+			res = unit->Orders[0].Action == UnitActionUpgradeTo ||
+				unit->Orders[0].Action == UnitActionResearch;
+			break;
+		case ButtonCancelTrain:
+			res = unit->Orders[0].Action == UnitActionTrain;
+			break;
+		case ButtonCancelBuild:
+			res = unit->Orders[0].Action == UnitActionBuilt;
+			break;
+	}
+#if 0
+	// there is a additional check function -- call it
+	if (res && buttonaction->Disabled) {
+		return buttonaction->Disabled(unit, buttonaction);
+	}
+#endif
+	return res;
+}
+
+/**
+**  Update bottom panel for multiple units.
+**
+**  @return array of TheUI.NumButtonButtons buttons to show.
+**
+**  @todo FIXME : make UpdateButtonPanelMultipleUnits more configurable.
+**  @todo show all possible buttons or just same button...
+*/
+static ButtonAction* UpdateButtonPanelMultipleUnits(void)
+{
+	char unit_ident[128];
+	int z;             // Iterator.
+	int i;             // Iterator.
+	ButtonAction* res; // result.
+	int allow;         // button is available for at least 1 unit.
+
+	res = calloc(TheUI.NumButtonButtons, sizeof (*res));
+	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
+		res[z].Pos = -1;
+	}
+
+	sprintf(unit_ident,	",%s-group,",
+			PlayerRaces.Name[PlayerRacesIndex(ThisPlayer->Race)]);
 
 	for (z = 0; z < NumUnitButtons; ++z) {
 		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
@@ -455,124 +567,51 @@ static void UpdateButtonPanelMultipleUnits(void)
 		}
 
 		// any unit or unit in list
-		if (UnitButtonTable[z]->UnitMask[0] == '*' ||
-				strstr(UnitButtonTable[z]->UnitMask, unit_ident)) {
-			int allow;
-
-			allow = 0;
-			if (UnitButtonTable[z]->Allowed) {
-				// there is check function -- call it
-				if (UnitButtonTable[z]->Allowed(NULL, UnitButtonTable[z])) {
-					allow = 1;
-				}
-			} else {
-				// there is no allow function -- should check dependencies
-				// any unit of the group must have this feature
-				if (UnitButtonTable[z]->Action == ButtonAttack) {
-					for (i = NumSelected; --i;) {
-						if (Selected[i]->Type->CanAttack) {
-							allow = 1;
-							break;
-						}
-					}
-				} else if (UnitButtonTable[z]->Action == ButtonAttackGround) {
-					for (i = NumSelected; --i;) {
-						if (Selected[i]->Type->GroundAttack) {
-							allow = 1;
-							break;
-						}
-					}
-				} else if (UnitButtonTable[z]->Action == ButtonCancel) {
-					allow = 1;
-				} else if (UnitButtonTable[z]->Action == ButtonCancelUpgrade) {
-					for (i = NumSelected; --i;) {
-						if (Selected[i]->Orders[0].Action == UnitActionUpgradeTo ||
-								Selected[i]->Orders[0].Action == UnitActionResearch) {
-							allow = 1;
-							break;
-						}
-					}
-				} else if (UnitButtonTable[z]->Action == ButtonCancelTrain) {
-					for (i = NumSelected; --i;) {
-						if (Selected[i]->Orders[0].Action == UnitActionTrain) {
-							allow = 1;
-							break;
-						}
-					}
-				} else if (UnitButtonTable[z]->Action == ButtonCancelBuild) {
-					for (i = NumSelected; --i;) {
-						if (Selected[i]->Orders[0].Action == UnitActionBuilt) {
-							allow = 1;
-							break;
-						}
-					}
-				} else {
-					allow = 1;
-				}
-			}
-
-			// is button allowed after all?
-			if (allow && _current_buttons[UnitButtonTable[z]->Pos - 1].Pos == -1) {
-				_current_buttons[UnitButtonTable[z]->Pos - 1] =
-					*UnitButtonTable[z];
+		if (UnitButtonTable[z]->UnitMask[0] != '*' &&
+				!strstr(UnitButtonTable[z]->UnitMask, unit_ident)) {
+			continue;
+		}
+		allow = 1;
+		for (i = 0; i < NumSelected; i++) {
+			if (!IsButtonAllowed(Selected[i], UnitButtonTable[z])) {
+				allow = 0;
+				break;
 			}
 		}
-	}
+		Assert(1 <= UnitButtonTable[z]->Pos);
+		Assert(UnitButtonTable[z]->Pos <= TheUI.NumButtonButtons);
 
-	CurrentButtons = _current_buttons;
+		// is button allowed after all?
+		if (allow && res[UnitButtonTable[z]->Pos - 1].Pos == -1) {
+			res[UnitButtonTable[z]->Pos - 1] = *UnitButtonTable[z];
+		}
+	}
+	return res;
 }
 
 /**
-**  Update bottom panel.
+**  Update bottom panel for single unit.
+**  or unit group with the same type.
+**
+**  @param unit  unit which has actions shown with buttons.
+**
+**  @return array of TheUI.NumButtonButtons buttons to show.
+**
+**  @todo FIXME : Remove Hack for cancel button.
 */
-void UpdateButtonPanel(void)
+static ButtonAction* UpdateButtonPanelSingleUnit(const Unit* unit)
 {
-	Unit* unit;
-	char unit_ident[128];
-	Player* player;
-	ButtonAction* buttonaction;
-	int z;
 	int allow;
+	char unit_ident[128];
+	ButtonAction* buttonaction; // Current button.
+	int z;              // Iterator
+	ButtonAction* res;  // Result.
 
-	CurrentButtons = NULL;
+	Assert(unit);
 
-	// no unit selected
-	if (!NumSelected) {
-		return;
-	}
-
-	// multiple selected
-	if (NumSelected > 1) {
-		for (allow = z = 1; z < NumSelected; ++z) {
-			// if current type is equal to first one count it
-			if (Selected[z]->Type == Selected[0]->Type) {
-			   ++allow;
-			}
-		}
-
-		if (allow != NumSelected) {
-			// oops we have selected different units types
-			// -- set default buttons and exit
-			UpdateButtonPanelMultipleUnits();
-			return;
-		}
-		// we have same type units selected
-		// -- continue with setting buttons as for the first unit
-	}
-
-	unit = Selected[0];
-	player = unit->Player;
-	Assert(unit != NoUnitP);
-
-	// foreign unit
-	if (unit->Player != ThisPlayer &&
-			!PlayersTeamed(ThisPlayer->Player, player->Player)) {
-		return;
-	}
-
-	// first clear the table
+	res = calloc(TheUI.NumButtonButtons, sizeof (*res));
 	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
-		_current_buttons[z].Pos = -1;
+		res[z].Pos = -1;
 	}
 
 	//
@@ -593,25 +632,13 @@ void UpdateButtonPanel(void)
 
 	for (z = 0; z < NumUnitButtons; ++z) {
 		int pos; // keep position, modified if alt-buttons required
-		// FIXME: we have to check and if these unit buttons are available
-		//    i.e. if button action is ButtonTrain for example check if
-		// required unit is not restricted etc...
 
 		buttonaction = UnitButtonTable[z];
-		pos = buttonaction->Pos;
+		Assert(0 < buttonaction->Pos && buttonaction->Pos <= TheUI.NumButtonButtons);
 
 		// Same level
 		if (buttonaction->Level != CurrentButtonLevel) {
 			continue;
-		}
-
-		if (pos > TheUI.NumButtonButtons) { // VLADI: this allows alt-buttons
-			if (KeyModifiers & ModifierAlt) {
-				// buttons with pos >TheUI.NumButtonButtons are shown on if ALT is pressed
-				pos -= TheUI.NumButtonButtons;
-			} else {
-				continue;
-			}
 		}
 
 		// any unit or unit in list
@@ -619,96 +646,61 @@ void UpdateButtonPanel(void)
 				!strstr(buttonaction->UnitMask, unit_ident)) {
 			continue;
 		}
+		allow = IsButtonAllowed(unit, buttonaction);
 
-		if (buttonaction->Allowed) {
-			// there is check function -- call it
-			allow = buttonaction->Allowed(unit, buttonaction);
-		} else {
-			// there is no allow function -- should check dependencies
-			allow = 0;
-			switch (buttonaction->Action) {
-				case ButtonMove:
-				case ButtonStop:
-				case ButtonRepair:
-				case ButtonButton:
-				case ButtonPatrol:
-				case ButtonStandGround:
-					allow = 1;
-					break;
-				case ButtonHarvest:
-					if (!unit->CurrentResource ||
-							(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
-								unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
-						allow = 1;
-					}
-					break;
-				case ButtonReturn:
-					if (!(!unit->CurrentResource ||
-							(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
-								unit->Type->ResInfo[unit->CurrentResource]->LoseResources))) {
-						allow = 1;
-					}
-					break;
-				case ButtonAttack:
-					allow = ButtonCheckAttack(unit, buttonaction);
-					break;
-				case ButtonAttackGround:
-					if (Selected[0]->Type->GroundAttack) {
-						allow = 1;
-					}
-					break;
-				case ButtonTrain:
-					// Check if building queue is enabled
-					if (!EnableTrainingQueue &&
-							unit->Orders[0].Action == UnitActionTrain) {
-						break;
-					}
-					// FALL THROUGH
-				case ButtonUpgradeTo:
-				case ButtonResearch:
-				case ButtonBuild:
-					allow = CheckDependByIdent(player, buttonaction->ValueStr);
-					if (allow && !strncmp(buttonaction->ValueStr, "upgrade-", 8)) {
-						allow = UpgradeIdentAllowed(player,
-							buttonaction->ValueStr) == 'A';
-					}
-					break;
-				case ButtonSpellCast:
-					allow = CheckDependByIdent(player,buttonaction->ValueStr) &&
-						UpgradeIdentAllowed(player, buttonaction->ValueStr) == 'R';
-					break;
-				case ButtonUnload:
-					allow = (Selected[0]->Type->CanTransport && Selected[0]->BoardCount);
-					break;
-				case ButtonCancel:
-					allow = 1;
-					break;
-
-				case ButtonCancelUpgrade:
-					allow = unit->Orders[0].Action == UnitActionUpgradeTo ||
-						unit->Orders[0].Action == UnitActionResearch;
-					break;
-				case ButtonCancelTrain:
-					allow = unit->Orders[0].Action == UnitActionTrain;
-					break;
-				case ButtonCancelBuild:
-					allow = unit->Orders[0].Action == UnitActionBuilt;
-					break;
-
-				default:
-					DebugPrint("Unsupported button-action %d\n" _C_
-						buttonaction->Action);
-					break;
-			}
-		}
+		pos = buttonaction->Pos;
 
 		// is button allowed after all?
-		if (allow && _current_buttons[pos - 1].Pos == -1) {
-			_current_buttons[pos - 1] = (*buttonaction);
+		if (allow && res[pos - 1].Pos == -1) {
+			res[pos - 1] = *buttonaction;
+		}
+	}
+	return res;
+}
+
+/**
+**  Update button panel.
+**
+**  @internal Affect CurrentButtons with buttons to show.
+*/
+void UpdateButtonPanel(void)
+{
+	Unit* unit;     // SelectedUnit[0].
+	int i;          // iterator.
+	int sameType;   // 1 if all selected units are same type, 0 else.
+
+	// Default is no button.
+	free(CurrentButtons);
+	CurrentButtons = NULL;
+
+	if (!NumSelected) {
+		return;
+	}
+
+	unit = Selected[0];
+	// foreign unit
+	if (unit->Player != ThisPlayer &&
+		!PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {
+		return;
+	}
+
+	sameType = 1;
+	// multiple selected
+	for (i = 1; i < NumSelected; ++i) {
+		if (Selected[i]->Type != unit->Type) {
+			sameType = 0;
+			break;
 		}
 	}
 
-	CurrentButtons = _current_buttons;
+	// We have selected different units types
+	if (sameType == 0) {
+		CurrentButtons = UpdateButtonPanelMultipleUnits();
+	} else {
+		// We have same type units selected
+		// -- continue with setting buttons as for the first unit
+		CurrentButtons = UpdateButtonPanelSingleUnit(unit);
+	}
 }
 
 /**
@@ -721,6 +713,7 @@ void DoButtonButtonClicked(int button)
 	int i;
 	UnitType* type;
 
+	Assert(0 <= button && button < TheUI.NumButtonButtons);
 	// no buttons
 	if (!CurrentButtons) {
 		return;
@@ -936,10 +929,6 @@ void DoButtonButtonClicked(int button)
 				ClearStatusLine();
 				ClearCosts();
 			}
-			break;
-		default:
-			DebugPrint("Unknown action %d\n" _C_
-				CurrentButtons[button].Action);
 			break;
 	}
 }
