@@ -33,6 +33,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "map.h"
+#include "etlib/hash.h"
 
 /*----------------------------------------------------------------------------
 --	Defines/Declarations
@@ -242,45 +243,46 @@ typedef struct _menus_ {
 } Menu;
 
 
-#define MENU_GAME 0			/// FIXME: write docu
-#define MENU_VICTORY 1
-#define MENU_LOST 2
-#define MENU_SCEN_SELECT 3
-#define MENU_PRG_START 4
-#define MENU_CUSTOM_GAME_SETUP 5
-#define MENU_ENTER_NAME 6
-#define MENU_NET_CREATE_JOIN 7
-#define MENU_NET_MULTI_SETUP 8
-#define MENU_NET_ENTER_SERVER_IP 9
-#define MENU_NET_MULTI_CLIENT 10
-#define MENU_NET_CONNECTING 11
-#define MENU_CAMPAIGN_SELECT 12
-#define MENU_CAMPAIGN_CONT 13
-#define MENU_OBJECTIVES 14
-#define MENU_END_SCENARIO 15
-#define MENU_SOUND_OPTIONS 16
-#define MENU_PREFERENCES 17
-#define MENU_SPEED_SETTINGS 18
-#define MENU_GAME_OPTIONS 19
-#define MENU_NET_ERROR 20
-#define MENU_TIPS 21
-#define MENU_HELP 22
-#define MENU_KEYSTROKE_HELP 23
-#define MENU_SAVE_GAME 24
-#define MENU_LOAD_GAME 25
-#define MENU_CONFIRM_SAVE 26
-#define MENU_CONFIRM_DELETE 27
-#define MENU_EDITOR_SELECT 28
-#define MENU_EDITOR_LOAD_MAP 29
-#define MENU_MAX 29			/// highest available menu id (for ccl)
 
-/// FIXME: FILL IN THIS TABLE!!!!
+#define MENU_GAME "game-menu"			/// FIXME: write docu
+#define MENU_VICTORY "victory-menu"
+#define MENU_LOST "lost-menu"
+#define MENU_SCEN_SELECT "scene-select-menu"
+#define MENU_PRG_START "program-start-menu"
+#define MENU_CUSTOM_GAME_SETUP "custom-game-menu"
+#define MENU_ENTER_NAME "enter-name-menu"
+#define MENU_NET_CREATE_JOIN "net-create-join-menu"
+#define MENU_NET_MULTI_SETUP "net-multi-setup-menu"
+#define MENU_NET_ENTER_SERVER_IP "net-enter-server-menu"
+#define MENU_NET_MULTI_CLIENT "net-multi-client-menu"
+#define MENU_NET_CONNECTING "net-connecting-menu"
+#define MENU_CAMPAIGN_SELECT "campaign-select-menu"
+#define MENU_CAMPAIGN_CONT "campaign-continue-menu"
+#define MENU_OBJECTIVES "objectives-menu"
+#define MENU_END_SCENARIO "end-scenario-menu"
+#define MENU_SOUND_OPTIONS "sound-options-menu"
+#define MENU_PREFERENCES "preferences-menu"
+#define MENU_SPEED_SETTINGS "speed-settings-menu"
+#define MENU_GAME_OPTIONS "game-options-menu"
+#define MENU_NET_ERROR "net-error-menu"
+#define MENU_TIPS "tips-menu"
+#define MENU_HELP "help-menu"
+#define MENU_KEYSTROKE_HELP "keystroke-help-menu"
+#define MENU_SAVE_GAME "save-game-menu"
+#define MENU_LOAD_GAME "load-game-menu"
+#define MENU_CONFIRM_SAVE "save-confirm-menu"
+#define MENU_CONFIRM_DELETE "delete-confirm-menu"
+#define MENU_EDITOR_SELECT "editor-select-menu"
+#define MENU_EDITOR_LOAD_MAP "editor-load-map-menu"
+#define MENU_MAX "max"			/// highest available menu id (for ccl)
+
+// FIXME: FILL IN THIS TABLE!!!!
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int CurrentMenu;			/// Currently processed menu
+extern const char *CurrentMenu;		/// Currently processed menu
 extern int MenuRedrawX;			/// X coordinate of menu to redraw
 extern int MenuRedrawY;			/// Y coordinate of menu to redraw
 extern int MenuRedrawW;			/// Width of menu to redraw
@@ -288,30 +290,37 @@ extern int MenuRedrawH;			/// Height of menu to redraw
 extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
 extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
 
+#define MENUS_MAXMENU 128		/// FIXME: wrong place, docu
+#define MENUS_MAXFUNC 128		/// FIXME: wrong place, docu
+    /// FIXME: docu
+global hashtable(Menu*,MENUS_MAXMENU) MenuHash;
+    /// FIXME: docu
+global hashtable(void*,MENUS_MAXFUNC) MenuFuncHash;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
+    /// Initialize the hash tables for the menus
+extern void InitMenuFuncHash(void);
+
     /// Set-up menus for a specific race
 extern void InitMenus(unsigned int race);
 
-    /// draw menu
-extern void DrawMenu(int MenuId);
-    /// draw menu button
+      /// draw menu
+extern void DrawMenu(const char *MenuId);
+      /// draw menu button
 extern void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigned h,unsigned x,unsigned y,const int font,const unsigned char *text);
-    /// Draw and process a menu
-extern void ProcessMenu(int MenuId, int Loop);
+      /// Draw and process a menu
+extern void ProcessMenu(const char *MenuId, int Loop);
 
-    /// The scenario path received from server
-    /// Update the client menu.
+    /// The scenario path received from server, Update the client menu.
 extern int NetClientSelectScenario(void);
-    /// State info received from server
-    /// Update the client menu.
+    /// State info received from server, Update the client menu.
 extern void NetClientUpdateState(void);
     /// Notify menu display code to update info
 extern void NetConnectForceDisplayUpdate(void);
-    /// Compare Local State with Server's information
-    /// and force Update when changes have occured.
+    /// Compare Local State <-> Server's state, force Update when changes
 extern void NetClientCheckLocalState(void);
 
     /// Sound options menu
