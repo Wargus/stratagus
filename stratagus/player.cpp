@@ -103,6 +103,7 @@ global void CreatePlayer(char* name,int type)
     //	Take first slot for human on this computer,
     //	fill other with computer players.
     //
+#if 0
     if( type==PlayerHuman ) {
 	if( !ThisPlayer ) {
 	    ThisPlayer=player;
@@ -111,6 +112,15 @@ global void CreatePlayer(char* name,int type)
 	    type=PlayerComputer;
 	}
     }
+#else
+    if( type==PlayerHuman && !NetPlayers && !NetworkArg ) {
+	if( !ThisPlayer ) {
+	    ThisPlayer=player;
+	} else {
+	    type=PlayerComputer;
+	}
+    }
+#endif
 
     //
     //	Make simple teams:
