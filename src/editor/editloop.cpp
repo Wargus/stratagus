@@ -1930,7 +1930,7 @@ global void EditorMainLoop(void)
 	    }
 	}
 
-	if( !(FrameCounter%COLOR_CYCLE_SPEED) ) {
+	if( ColorCycleAll>=0 && !(FrameCounter%COLOR_CYCLE_SPEED) ) {
 	    ColorCycle();
 	}
 

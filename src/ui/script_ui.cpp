@@ -60,9 +60,13 @@ local SCM CclSetColorCycleAll(SCM flag)
     int old;
 
     old=ColorCycleAll;
-    ColorCycleAll=gh_scm2bool(flag);
+    if( gh_boolean_p(flag) ) {
+	ColorCycleAll=gh_scm2bool(flag);
+    } else {
+	ColorCycleAll=gh_scm2int(flag);
+    }
 
-    return gh_bool2scm(old);
+    return old<0 ? gh_int2scm(old) : gh_bool2scm(old);
 }
 
 /**
