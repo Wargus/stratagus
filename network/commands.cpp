@@ -329,6 +329,7 @@ global int LoadReplay(char* name)
     } else {
 	DisabledShowTips=0;
     }
+    GameObserve=1;
 
     return 0;
 }
@@ -350,6 +351,7 @@ global void EndReplayLog(void)
 	ShowTips=1;
 	DisabledShowTips=0;
     }
+    GameObserve=0;
 }
 
 /**
