@@ -2552,10 +2552,8 @@ static void TipsFreeTips(void)
 
 	menu = FindMenu("menu-tips");
 	for (i = 4; i < 12; i++) {
-		if (menu->Items[i].D.Text.text) {
-			free(menu->Items[i].D.Text.text);
-			menu->Items[i].D.Text.text = NULL;
-		}
+		free(menu->Items[i].D.Text.text);
+		menu->Items[i].D.Text.text = NULL;
 	}
 }
 
@@ -2565,65 +2563,26 @@ static void TipsFreeTips(void)
 static void TipsInit(Menu* menu)
 {
 	int i;
-	int line;
-	char* p;
-	char* s;
-	char* str;
 	int w;
 	int font;
-	int l;
+	char* text;
 
-	if(ShowTips) {
+	if (ShowTips) {
 		menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
 	} else {
 		menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	}
-
 	TipsFreeTips();
 
-	w = menu->Width-2 * menu->Items[5].XOfs;
+	w = menu->Width - 2 * menu->Items[5].XOfs;
 	font = menu->Items[5].Font;
-	i = 0;
-	line = 5;
-
-	p = Tips[CurrentTip];
-	if(!p) {
-		return;
+	text = Tips[CurrentTip];
+	if (!text) {
+		text = "";
 	}
-
-	l = 0;
-	s = str = strdup(p);
-
-	while (line<13) {
-		char* s1;
-		char* space;
-
-		space = NULL;
-		for(;;) {
-			if(VideoTextLength(font, s) < w) {
-				break;
-			}
-			s1 = strrchr(s,' ');
-			if(!s1) {
-				fprintf(stderr, "line too long: \"%s\"\n", s);
-				break;
-			}
-			if(space) {
-				*space=' ';
-			}
-			space = s1;
-			*space = '\0';
-		}
-		menu->Items[line++].D.Text.text = strdup(s);
-		l += strlen(s);
-		if(!p[l]) {
-			break;
-		}
-		++l;
-		s = str+l;
+	for (i = 0; i < 8; ++i) {
+		menu->Items[i + 4].D.Text.text = GetLineFont(1 + i, text, w, font);
 	}
-
-	free(str);
 }
 
 /**
@@ -2720,57 +2679,30 @@ static void GameMenuExit(void)
 static void ObjectivesInit(Menu* menu)
 {
 	int i;
-	int line;
-	char* p;
-	char* s;
-	char* str;
 	int w;
 	int font;
-	int l;
+	char* text;
+	char* tmp;
 
-	w = menu->Width-2 * menu->Items[1].XOfs;
+	ObjectivesExit(menu);
+
+	w = menu->Width - 2 * menu->Items[1].XOfs;
 	font = menu->Items[1].Font;
-	i = 0;
-	line = 1;
-
-	for (p = GameIntro.Objectives[i]; p; p = GameIntro.Objectives[++i]) {
-		l = 0;
-		s = str = strdup(p);
-
-		for (;;) {
-			char* s1;
-			char* space;
-
-			space = NULL;
-			for (;;) {
-				if(VideoTextLength(font, s) < w) {
-					break;
-				}
-				s1=strrchr(s, ' ');
-				if(!s1) {
-					fprintf(stderr, "line too long: \"%s\"\n", s);
-					break;
-				}
-				if( space ) {
-					*space=' ';
-				}
-				space = s1;
-				*space = '\0';
-			}
-			menu->Items[line++].D.Text.text = strdup(s);
-			l += strlen(s);
-			if (!p[l]) {
-				break;
-			}
-			++l;
-			s = str + l;
-
-			if (line == menu->NumItems-1) {
-				break;
-			}
-		}
-		free(str);
+	text = GameIntro.Objectives[0];
+	if (!text) {
+		return;
 	}
+	text = strdup(text);
+	for (i = 1; GameIntro.Objectives[i]; ++i) {
+		tmp = strdcat(text, "\n");
+		free(text);
+		text = strdcat(tmp, GameIntro.Objectives[i]);
+		free(tmp);
+	}
+	for (i = 1; i < menu->NumItems - 1; ++i) {
+		menu->Items[i].D.Text.text = GetLineFont(i, text, w, font);
+	}
+	free(text);
 }
 
 /**
@@ -2781,10 +2713,8 @@ static void ObjectivesExit(Menu* menu)
 	int i;
 
 	for (i = 1; i < menu->NumItems - 1; ++i) {
-		if (menu->Items[i].D.Text.text) {
-			free(menu->Items[i].D.Text.text);
-			menu->Items[i].D.Text.text = NULL;
-		}
+		free(menu->Items[i].D.Text.text);
+		menu->Items[i].D.Text.text = NULL;
 	}
 }
 
