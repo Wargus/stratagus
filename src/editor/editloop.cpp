@@ -915,6 +915,7 @@ local void EditorCallbackMouse(int x, int y)
 		+ TheUI.VP[viewport].MapY * TileSizeY);
 	if( UnitUnderCursor ) {
 	    ShowUnitInfo(UnitUnderCursor);
+	    return;
 	}
     } else {
 	UnitUnderCursor = NULL;
