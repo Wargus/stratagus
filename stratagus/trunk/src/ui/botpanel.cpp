@@ -85,24 +85,6 @@ local int UnitButtonCount;
 --      Functions
 ----------------------------------------------------------------------------*/
 
-#ifndef USE_CCL
-
-/**
-**	Add buttons table.
-**
-**	@param button	Table of buttons to add.
-*/
-local void AddButtonTable(const ButtonAction* button)
-{
-    for( ;button->Pos; ++button ) {
-	AddButton(button->Pos,button->Level,button->Icon.Name
-		,button->Action,button->ValueStr,button->Allowed
-		,button->AllowStr,button->Key,button->Hint,button->UnitMask);
-    }
-}
-
-#endif
-
 /**
 **	Initialize the buttons.
 */
@@ -110,13 +92,6 @@ global void InitButtons(void)
 {
     int z;
 
-#ifndef USE_CCL
-    //
-    //	Add all pre-defined buttons.
-    //
-    AddButtonTable(AllButtons);
-    // FIXME: AddButtonTable(ExtensionButtons);
-#endif
     //
     //	Resolve the icon names.
     //
