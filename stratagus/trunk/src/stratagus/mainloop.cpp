@@ -591,7 +591,7 @@ global void GameMainLoop(void)
 #endif
 
 #ifdef USE_LIBCDA
-		    CDRomCheck();
+		    CDRomCheck(NULL);
 #endif
 		    break;
 	    }
