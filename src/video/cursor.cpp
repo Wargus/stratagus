@@ -545,14 +545,11 @@ local void DrawBuildingCursor(void)
 	while (h--) {
 		w = w0;
 		while (w--) {
-
 			if (f && (CursorBuilding->MustBuildOnTop ||
-					CanBuildOn(mx + w, my + h, mask & ((NumSelected &&
-						!CursorBuilding->BuilderOutside &&
+					CanBuildOn(mx + w, my + h, MapFogFilterFlags(ThisPlayer, mx + w, my + h, 
+						mask & ((NumSelected && !CursorBuilding->BuilderOutside &&
 						Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
-							~(MapFieldLandUnit | MapFieldSeaUnit) : -1) &
-						(IsTileVisible(ThisPlayer, mx + w, my + h) == 1 ? 
-						~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding) : -1)))
+							~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
 				  && IsMapFieldExplored(ThisPlayer, mx + w, my + h))  {
 				color = ColorGreen;
 			} else {

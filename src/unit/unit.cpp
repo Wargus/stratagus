@@ -2106,6 +2106,7 @@ global int CanBuildUnitTypeMask(const Unit* unit, const UnitType* type, int x, i
 	int w;
 	int h;
 	int j;
+	int testmask;
 	Player* player;
 
 	// Terrain Flags don't matter.
@@ -2209,7 +2210,12 @@ global int CanBuildUnitTypeMask(const Unit* unit, const UnitType* type, int x, i
 
 	for (h = type->TileHeight; h--;) {
 		for (w = type->TileWidth; w--;) {
-			if (!CanBuildOn(x + w, y + h, mask)) {
+			if (player) {
+				testmask = MapFogFilterFlags(player, x + w, y + h, mask);
+			} else {
+				testmask = mask;
+			}
+			if (!CanBuildOn(x + w, y + h, testmask)) {
 				if (unit) {
 					TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
 				}
