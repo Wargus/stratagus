@@ -317,7 +317,7 @@ Unit* TransporterOnMapTile(int tx, int ty)
 
 	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
-		if (table[i]->Type->Transporter) {
+		if (table[i]->Type->CanTransport) {
 			return table[i];
 		}
 	}

@@ -2625,7 +2625,8 @@ void LetUnitDie(Unit* unit)
 	}
 
 	// Transporters lose their units
-	if (unit->Type->Transporter) {
+	if (unit->Type->CanTransport) {
+		// FIXME: destroy or unload : do a flag.
 		DestroyAllInside(unit);
 	}
 
@@ -2664,6 +2665,7 @@ void DestroyAllInside(Unit* source)
 	// No Corpses, we are inside something, and we can't be seen
 	unit = source->UnitInside;
 	for (i = source->InsideCount; i; --i, unit = unit->NextContained) {
+		// Transporter inside a transporter?
 		if (unit->UnitInside) {
 			DestroyAllInside(unit);
 		}
@@ -3082,6 +3084,40 @@ int CanTarget(const UnitType* source, const UnitType* dest)
 		return source->CanTarget & CanTargetSea;
 	}
 	return 0;
+}
+
+/**
+**  Can the transporter transport the other unit.
+**
+**  @param transporter  Unit which is the transporter.
+**  @param unit         Unit which wants to go in the transporter.
+**
+**  @return 1 if transporter can transport unit, 0 else.
+*/
+int CanTransport(const Unit* transporter, const Unit* unit)
+{
+	int i;
+
+	if (!transporter->Type->CanTransport || unit->Type->Building) {
+		return 0;
+	}
+	if (transporter->BoardCount >= transporter->Type->MaxOnBoard) { // full
+		return 0;
+	}
+	// FIXME: remove UnitTypeLand requirement
+	if (PlayersTeamed(transporter->Player->Player, unit->Player->Player) &&
+			unit->Type->UnitType != UnitTypeLand) {
+		return 0;
+	}
+	for (i = 0; i < NumberBoolFlag; i++) {
+		if (transporter->Type->CanTransport[i] != CONDITION_TRUE) {
+			if ((transporter->Type->CanTransport[i] == CONDITION_ONLY) ^
+					unit->Type->BoolFlag[i]) {
+				return 0;
+			}
+		}
+	}
+	return 1;
 }
 
 /*----------------------------------------------------------------------------

@@ -203,7 +203,7 @@ void UpdateStats(int reset)
 					MapFieldAirUnit; // already occuppied
 				break;
 			case UnitTypeNaval:                             // on water
-				if (type->Transporter) {
+				if (type->CanTransport) {
 					type->MovementMask =
 						MapFieldLandUnit |
 						MapFieldSeaUnit |
@@ -481,7 +481,8 @@ void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 			unittype->ResInfo[OilCost]->WaitAtDepot = 150;
 			unittype->ResInfo[OilCost]->ResourceCapacity = 100;
 		}
-		unittype->Transporter = BIT(10, v);
+		unittype->CanTransport = BIT(10, v) ?
+			calloc(NumberBoolFlag, sizeof(*unittype->CanTransport)) : NULL;
 		unittype->CanStore[GoldCost] = BIT(12, v);
 		unittype->Vanishes = BIT(13, v);
 		unittype->GroundAttack = BIT(14, v);
@@ -931,6 +932,7 @@ void CleanUnitTypes(void)
 
 		free(type->BoolFlag);
 		free(type->CanTargetFlag);
+		free(type->CanTransport);
 
 		if (type->SameSprite) {
 			free(type->SameSprite);
