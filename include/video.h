@@ -10,12 +10,11 @@
 //
 /**@name video.h	-	The video headerfile. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -71,7 +70,7 @@
 
 /**
 **	video mode (color) types
-**             
+**
 **  FIXME: The folllowing are assumptions and might not be true for all
 **         hardware. Note that VMemType16 and VMemType32 support 2 types.
 **         An idea: convert VMemType32 to the needed coding in the very last
@@ -83,7 +82,7 @@
 **        15 bit [5 bit Red|5 bit Green|5 bit Blue]
 **        16 bit [5 bit Red|6 bit Green|5 bit Blue]
 **	VMemType24 : [8 bit Red|8 bit Green|8 bit Blue]
-**	VMemType32 : 
+**	VMemType32 :
 **        24 bit [0|8 bit Red|8 bit Green|8 bit Blue]
 **        32 bit [8 bit alpha|8 bit Red|8 bit Green|8 bit Blue]
 */
@@ -302,6 +301,24 @@ typedef struct _graphic_config_ {
     char*	File;			/// config graphic name or file
     Graphic*	Graphic;		/// graphic pointer to use to run time
 } GraphicConfig;
+
+/**
+**	Colors of units. Same sprite can have different colors.
+*/
+typedef union _unit_colors_ {
+    struct __4pixel8__ {
+	VMemType8	Pixels[4];	/// palette colors #0 ... #3
+    }	Depth8;				/// player colors for 8bpp
+    struct __4pixel16__ {
+	VMemType16	Pixels[4];	/// palette colors #0 ... #3
+    }	Depth16;			/// player colors for 16bpp
+    struct __4pixel24__ {
+	VMemType24	Pixels[4];	/// palette colors #0 ... #3
+    }	Depth24;			/// player colors for 24bpp
+    struct __4pixel32__ {
+	VMemType32	Pixels[4];	/// palette colors #0 ... #3
+    }	Depth32;			/// player colors for 32bpp
+} UnitColors;				/// Unit colors for faster setup
 
 /**
 **	Event call back.

@@ -221,6 +221,10 @@
 **		Total number of points. You can get points for killing units,
 **		destroying buildings ...
 **
+**	Player::Kills
+**
+**		Total number of kills.
+**
 **	Player::Color
 **
 **		Color of units of this player on the minimap. Index number
@@ -318,25 +322,13 @@ struct _player_ {
     unsigned	TotalUnitLimit;		/// # total unit number allowed
     unsigned	LastRepairResource;	/// last resource for repair cycles
 
-    unsigned	Score;			/// points for killing ...
+    unsigned	Score;			/// Points for killing ...
+    unsigned	Kills;			/// How many unit killed
 
 // Display video
     unsigned	Color;			/// color of units on minimap
 
-    union {
-	struct __4pixel8__ {
-	    VMemType8	Pixels[4];	/// palette colors #0 ... #3
-	}	Depth8;			/// player colors for 8bpp
-	struct __4pixel16__ {
-	    VMemType16	Pixels[4];	/// palette colors #0 ... #3
-	}	Depth16;		/// player colors for 16bpp
-	struct __4pixel24__ {
-	    VMemType24	Pixels[4];	/// palette colors #0 ... #3
-	}	Depth24;		/// player colors for 24bpp
-	struct __4pixel32__ {
-	    VMemType32	Pixels[4];	/// palette colors #0 ... #3
-	}	Depth32;		/// player colors for 32bpp
-    }		UnitColors;		/// Unit colors for faster setup
+    UnitColors	UnitColors;		/// Unit colors for new units
 
 //  Upgrades/Allows:
     Allow		Allow;		/// Allowed for player

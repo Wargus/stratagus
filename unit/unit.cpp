@@ -268,8 +268,8 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     //	Initialise unit structure (must be zero filled!)
     //
     unit->Type=type;
-
     unit->SeenFrame=0xFF;
+
     if( type->Demand ) {
         player->NumFoodUnits+=type->Demand;	// food needed
 	if( player==ThisPlayer ) {
@@ -283,6 +283,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     }
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
+    unit->Colors=player->UnitColors;
 
     if( type->CanCastSpell ) {
 	unit->Mana=MAGIC_FOR_NEW_UNITS;
@@ -299,9 +300,8 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->deco=NULL;
 #endif
 
-    if( type->Submarine ) {
-	unit->Visible=0;		// Invisible as default
-    } else {
+    // Invisible as default for submarines
+    if( !type->Submarine ) {
 	unit->Visible=-1;		// Visible as default
     }
 
@@ -3011,6 +3011,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     if( target->HP<=damage ) {	// unit is killed or destroyed
 	if( attacker ) {
 	    attacker->Player->Score+=target->Type->Points;
+	    attacker->Player->Kills++;
 #ifdef USE_HP_FOR_XP
 	    attacker->XP+=target->HP;
 #else
