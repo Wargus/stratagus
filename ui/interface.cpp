@@ -575,6 +575,14 @@ local int CommandKey(int key)
 	    GameRunning=0;
 	    break;
 
+	case 'i':
+	case 'I':			// ALT+I, CTRL+I: Find idle worker
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    FindIdleWorker();
+	    break;
+
 	case KeyCodeUp:
 	case KeyCodeKP8:
 	    KeyScrollState |= ScrollUp;
