@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name mouse.c		-	The mouse handling. */
+/**@name mouse.c	-	The mouse handling. */
 /*
 **	(c) Copyright 1998-2000 by Lutz Sammer
 **
@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "tileset.h"
 #include "video.h"
 #include "map.h"

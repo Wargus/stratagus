@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name action_board.c		-	The board action. */
+/**@name action_board.c	-	The board action. */
 /*
 **	(c) Copyright 1998,2000 by Lutz Sammer
 **
@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"

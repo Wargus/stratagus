@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "clone.h"
+#include "freecraft.h"
 
 #if defined(USE_CCL) || defined(USE_CCL2)	// {
 

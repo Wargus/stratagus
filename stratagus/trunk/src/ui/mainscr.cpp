@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "image.h"
 #include "font.h"

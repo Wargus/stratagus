@@ -10,7 +10,7 @@
 //
 /**@name action_attack.c	-	The attack action. */
 /*
-**	(c) Copyright 1998,1999 by Lutz Sammer
+**	(c) Copyright 1998-2000 by Lutz Sammer
 **
 **	$Id$
 */
@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"

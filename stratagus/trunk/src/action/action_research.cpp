@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"

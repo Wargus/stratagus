@@ -37,7 +37,7 @@
 
 #include <errno.h>
 
-#include "clone.h"
+#include "freecraft.h"
 #include "video.h"
 #include "tileset.h"
 #include "sound_id.h"
