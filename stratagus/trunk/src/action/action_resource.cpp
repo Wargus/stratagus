@@ -270,7 +270,7 @@ local void AnimateActionHarvest(Unit* unit)
 	flags = UnitShowAnimation(unit,
 	    unit->Type->Animations->Harvest[unit->CurrentResource]);
 #ifdef WITH_SOUND
-	if ((flags & AnimationSound)) {
+	if ((flags & AnimationSound) && UnitVisibleOnMap(unit)) {
 	    PlayUnitSound(unit, VoiceHarvesting);
 	}
 #endif
