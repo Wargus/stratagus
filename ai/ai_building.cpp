@@ -208,6 +208,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	unsigned short X;
 	unsigned short Y;
     } * points;
+    int size;
     int x;
     int y;
     int rx;
@@ -222,6 +223,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     unsigned char* matrix;
 
     points=alloca(TheMap.Width*TheMap.Height);
+    size=TheMap.Width*TheMap.Height/sizeof(*points);
 
     x=worker->X;
     y=worker->Y;
@@ -281,7 +283,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		    *m=1;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-		    if( ++wp>=sizeof(points)/sizeof(*points) ) {// round about
+		    if( ++wp>=size ) {		// round about
 			wp=0;
 		    }
 		} else {			// unreachable
@@ -289,7 +291,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		}
 	    }
 
-	    if( ++rp>=sizeof(points)/sizeof(*points) ) {	// round about
+	    if( ++rp>=size ) {			// round about
 		rp=0;
 	    }
 	}
