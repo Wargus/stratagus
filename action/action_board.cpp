@@ -161,7 +161,7 @@ local void EnterTransporter(Unit* unit)
 	    transporter->OnBoard[i]=unit;
 	    // FIXME: reference counts?
 	    transporter->Value++;
-	    RemoveUnit(unit);
+	    RemoveUnit(unit,transporter);
 	    if( IsOnlySelected(transporter) ) {
 		UpdateButtonPanel();
 		MustRedraw|=RedrawPanels;

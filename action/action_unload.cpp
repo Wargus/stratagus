@@ -126,35 +126,7 @@ found:
 
     unit->Wait=1;		// should be correct unit has still action
 
-    // FIXME: Should I use PlaceUnit here?
-    UnitCacheInsert(unit);
-    // FIXME: This only works with 1x1 big units
-    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
-    TheMap.Fields[x+y*TheMap.Width].Flags|=unit->Type->FieldFlags;
-
-    unit->Removed=0;
-
-    x+=unit->Type->TileWidth/2;
-    y+=unit->Type->TileHeight/2;
-#ifdef NEW_FOW
-    //
-    //	Update fog of war.
-    //
-    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
-#else
-    //
-    //	Update fog of war, if unit belongs to player on this computer
-    //
-    if( unit->Player==ThisPlayer || IsSharedVision(ThisPlayer,unit) ) {
-	MapMarkSight(x,y,unit->Stats->SightRange);
-    }
-#endif
-    if( unit->Type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
-    }
-
-    MustRedraw|=RedrawMinimap;
-    CheckUnitToBeDrawn(unit);
+    PlaceUnit(unit,x,y);
 
     return 1;
 }

@@ -1277,7 +1277,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	    if( UnitUnderCursor ) {
 		Unit* unit;
 
-		RemoveUnit(unit = UnitUnderCursor);
+		RemoveUnit(unit = UnitUnderCursor,NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		ReleaseUnit(unit);

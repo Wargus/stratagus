@@ -485,13 +485,18 @@ global void PlaceUnit(Unit* unit,int x,int y)
     if( !unit->Constructed ) {
 #ifdef NEW_FOW
 	//
-	//	Update fog of war.
-	//
-	MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
-#else
-	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
+	if ( unit->Host ) {
+	    MapUnmarkSight(unit->Player,unit->Host->X+unit->Host->Type->TileWidth/2
+				,unit->Host->Y+unit->Host->Type->TileHeight/2
+				,unit->CurrentSightRange);
+
+	}
+	unit->CurrentSightRange=unit->Type->Stats->SightRange;
+	MapMarkSight(unit->Player,x,y,unit->CurrentSightRange);
+	unit->Host = NULL;
+#else
 	if( unit->Player==ThisPlayer || 
 	    (ThisPlayer && IsSharedVision(ThisPlayer,unit)) ) {
 	    MapMarkSight(x,y,unit->Stats->SightRange);
@@ -501,7 +506,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}
     }
-
+    
     unit->Removed=0;
     UnitCacheInsert(unit);
 
@@ -564,23 +569,31 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 **
 **	@param unit	Pointer to unit.
 */
-global void RemoveUnit(Unit* unit)
+global void RemoveUnit(Unit* unit, Unit* host)
 {
     int h;
     int w;
     const UnitType* type;
     unsigned flags;
 
+#ifdef NEW_FOW
+    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+			,unit->Y+unit->Type->TileHeight/2
+			,unit->CurrentSightRange);
+    if ( host ) {
+	unit->CurrentSightRange=host->CurrentSightRange;
+	MapMarkSight(unit->Player,host->X+host->Type->TileWidth/2
+				,host->Y+host->Type->TileWidth/2
+				,unit->CurrentSightRange);
+	unit->Host=host;
+    }
+#endif
+
     if( unit->Removed ) {		// could happen!
 	// If unit is removed (inside) and building is destroyed.
 	return;
     }
     unit->Removed=1;
-#ifdef NEW_FOW
-    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-				     ,unit->Y+unit->Type->TileHeight/2
-				     ,unit->Stats->SightRange);
-#endif
     //  Remove unit from the current selection
     if( unit->Selected ) {
         if( NumSelected==1 ) {		//  Remove building cursor
@@ -3016,7 +3029,7 @@ global void LetUnitDie(Unit* unit)
     //	Oil patch or removed units,  just remove.
     //
     if( type->OilPatch || unit->Removed ) {
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 	ReleaseUnit(unit);
@@ -3034,7 +3047,7 @@ global void LetUnitDie(Unit* unit)
 	    ,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
 	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
 	    ,0,0);
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 	ReleaseUnit(unit);
@@ -3070,7 +3083,7 @@ global void LetUnitDie(Unit* unit)
 	    DestroyAllInside(unit);
 	}
 
-	RemoveUnit(unit);
+	RemoveUnit(unit,NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 
@@ -3108,7 +3121,7 @@ global void LetUnitDie(Unit* unit)
 	DestroyAllInside(unit);
     }
 
-    RemoveUnit(unit);
+    RemoveUnit(unit,NULL);
     UnitLost(unit);
     UnitClearOrders(unit);
 
@@ -3151,7 +3164,7 @@ global void DestroyAllInside(Unit* source)
 	    if( (unit=source->OnBoard[i]) ) {
 		// FIXME: no corpse!
 	        // LetUnitDie(unit);
-		RemoveUnit(unit);
+		RemoveUnit(unit,NULL);
 		UnitLost(unit);
     		UnitClearOrders(unit);
 		ReleaseUnit(unit);
