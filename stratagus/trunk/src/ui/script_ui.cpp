@@ -204,8 +204,11 @@ local SCM CclSetSaturation(SCM saturation)
 local SCM CclSetVideoResolution(SCM width,SCM height)
 {
     if( CclInConfigFile ) {
-	VideoWidth=gh_scm2int(width);
-	VideoHeight=gh_scm2int(height);
+	// May have been set from the command line
+	if( !VideoWidth || !VideoHeight ) {
+	    VideoWidth=gh_scm2int(width);
+	    VideoHeight=gh_scm2int(height);
+	}
     }
     return SCM_UNSPECIFIED;
 }
