@@ -890,7 +890,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 		IfDebug(
 		    if( !unit->Type ) {
 			DebugLevel0Fn("%d,%d: %d, %d,%d\n"
-			    ,i,y,UnitNumber(unit),unit->X,unit->Y);
+			    _C_ i _C_ y _C_ UnitNumber(unit) _C_ unit->X _C_ unit->Y);
 			fflush(stdout);
 		    }
 		);
