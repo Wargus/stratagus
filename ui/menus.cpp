@@ -95,6 +95,7 @@ local void ObjectivesExit(Menuitem *mi);
 
 // Victory, lost
 local void GameMenuEnd(void);
+local void SaveReplay(void);
 
 // Scenario select
 local void ScenSelectLBExit(Menuitem *mi);
@@ -457,6 +458,7 @@ global void InitMenuFuncHash(void) {
 
 // Victory, lost
     HASHADD(GameMenuEnd,"game-menu-end");
+    HASHADD(SaveReplay,"save-replay");
 
 // Scenario select
     HASHADD(ScenSelectLBExit,"scen-select-lb-exit");
@@ -2191,6 +2193,14 @@ local void GameMenuEnd(void)
     GameRunning = 0;
     CursorOn = CursorOnUnknown;
     CurrentMenu = NULL;
+}
+
+/**
+**	TODO
+*/
+local void SaveReplay(void)
+{
+
 }
 
 /**
