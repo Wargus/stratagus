@@ -429,8 +429,6 @@ local SCM CclDefineUnitType(SCM list)
 	    type->AirUnit=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("sea-unit")) ) {
 	    type->SeaUnit=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("critter")) ) {
-	    type->Critter=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("random-movement-probability")) ) {
 	    type->RandomMovementProbability=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
