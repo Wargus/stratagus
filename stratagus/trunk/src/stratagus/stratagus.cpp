@@ -1129,10 +1129,6 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    //	Play the game.
 	    //
 	    GameMainLoop();
-
-	    if (AStarOn) {
-		FreeAStar();
-	    }
 	}
 
 	CleanModules();
