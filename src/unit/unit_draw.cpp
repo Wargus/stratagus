@@ -1950,6 +1950,8 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 	const Unit* c2;
 	int drawlevel1;
 	int drawlevel2;
+    int diffpos;
+    
 
 	c1 = *(Unit**)v1;
 	c2 = *(Unit**)v2;
@@ -1965,12 +1967,10 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 		drawlevel2 = c2->Type->DrawLevel;
 	}
 	if (drawlevel1 == drawlevel2) {
-        /*return (c1->Y) * MaxMapWidth + (c1->X) - (c2->Y) * MaxMapWidth - (c2->X) ?
-			(c1->Y) * MaxMapWidth + (c1->X) - (c2->Y) * MaxMapWidth - (c2->X) :
-			c1->Slot - c2->Slot; //*/ //Previous code, will be removed if new one is ok.
-        return (c1->Y*TileSizeY+c1->IY) - (c2->Y*TileSizeY + c2->IY) ?
-		(c1->Y*TileSizeY+c1->IY) - (c2->Y*TileSizeY + c2->IY) :
-			c1->Slot - c2->Slot; //*/
+        // diffpos compares unit's Y positions (botton of sprite) on the map and uses X position in case Y positions are equal.
+        // FIXME: Use BoxHeight?
+        diffpos = c1->Y * TileSizeY + c1->Type->Height + c1->IY - c2->Y * TileSizeY - c2->Type->Height - c2->IY; 
+        return diffpos ? diffpos : c1->X - c2->X ? c1->X - c2->X : c1->Slot - c2->Slot; 
 	} else {
 		return drawlevel1 <= drawlevel2 ? -1 : 1;
 	}
