@@ -332,15 +332,8 @@
 **
 **	Unit::Goal
 **
-**		Unit pointer of the goal of the current command, only used for
-**		debugging the new orders, will be removed in release 1.18.
-**		The pathfinder must be trigger, if the goal changes.
-**
-**	Unit::GoalX Unit::GoalY
-**
-**		Map tile position of the goal of the current command. only used
-**		for debugging the new orders, will be removed in release 1.18.
-**		The pathfinder must be trigger, if the goal changes.
+**		Generic goal pointer.  Used by teleporters to point to circle
+**		of power.
 **
 **	Unit::Retreating
 **
@@ -594,9 +587,7 @@ struct _unit_ {
     } Train;				/// Train units action
     }		Data;			/// Storage room for different commands
 
-    const Unit*	Goal;			/// Goal for pathfinder
-    int		GoalX;			/// Destination X of pathfinder
-    int		GoalY;			/// Destination Y of pathfinder
+    Unit*	Goal;			/// Generic goal pointer
 
 #ifdef HIERARCHIC_PATHFINDER
 #define UNIT_CLEAN		0	/// FIXME: comment missing

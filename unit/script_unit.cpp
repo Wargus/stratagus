@@ -776,6 +776,9 @@ local SCM CclUnit(SCM list)
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    CclParseMove(unit,sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("goal")) ) {
+	    unit->Goal=UnitSlots[gh_scm2int(gh_car(list))];
+	    list=gh_cdr(list);
 	} else {
 	   // FIXME: this leaves a half initialized unit
 	   errl("Unsupported tag",value);

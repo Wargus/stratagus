@@ -896,22 +896,6 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 	_C_ UnitNumber(unit) _C_ unit->Data.Move.Fast ? "F" : "C"
 	_C_ goal _C_ gx _C_ gy _C_ rx _C_ ry);
 
-#ifdef DEBUG
-    //
-    //	Check if the path is correct reseted.
-    //	A new path should always have the fast flag set.
-    //
-    if( unit->Goal!=goal || unit->GoalX!=gx || unit->GoalY!=gy ) {
-	if( !unit->Data.Move.Fast ) {
-	    DebugLevel0Fn("ResetPath missing\n");
-	    abort();
-	}
-	unit->Goal=goal;
-	unit->GoalX=gx;
-	unit->GoalY=gy;
-    }
-#endif
-
     //
     //	Check if goal is already reached.
     //
