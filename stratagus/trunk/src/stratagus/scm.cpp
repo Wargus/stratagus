@@ -8,9 +8,9 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name pud.c		-	The pud. */
+/**@name scm.c		-	The scm. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 2002 by Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -38,7 +38,7 @@
 #include "player.h"
 #include "settings.h"
 #include "mpq.h"
-
+#include "iocompat.h"
 #include "myendian.h"
 
 
@@ -113,7 +113,7 @@ local void ScmConvertMTXM(const unsigned short * mtxm,int width,int height,World
 }
 
 /**
-**
+**	Read header
 */
 local int ScmReadHeader(char* header,long* length)
 {
@@ -131,7 +131,7 @@ local int ScmReadHeader(char* header,long* length)
 }
 
 /**
-**
+**	Read word
 */
 local int ScmReadWord(void)
 {
@@ -143,7 +143,7 @@ local int ScmReadWord(void)
 }
 
 /**
-**
+**	Read byte
 */
 local int ScmReadByte(void)
 {
@@ -155,16 +155,48 @@ local int ScmReadByte(void)
 }
 
 /**
+**	Extract/uncompress entry.
+**
+**	@param mpqfd	The mpq file
+**	@param name	Name of the entry to extract
+**	@param entry	Returns the entry, NULL if not found
+**	@param size	Returns the size of the entry
+*/
+local void ExtractMap(FILE *mpqfd,unsigned char** entry,int* size)
+{
+    int i;
+    int max;
+    int maxi;
+
+    *entry=NULL;
+    *size=0;
+    max=0;
+    // Assumes the largest file is the .chk map
+    for( i=0; i<MpqFileCount; ++i ) {
+	if( MpqBlockTable[i*4+2]>max ) {
+	    maxi=i;
+	    max=MpqBlockTable[i*4+2];
+	}
+    }
+    if( max!=0 ) {
+	*size=MpqBlockTable[maxi*4+2];
+	*entry=malloc(*size+1);
+	MpqExtractTo(*entry,maxi,mpqfd);
+    }
+}
+
+/**
 **	Get the info for a scm level.
 */
 global MapInfo* GetScmInfo(const char* scm)
 {
-    char *scmdata;
+    unsigned char *scmdata;
     long length;
     char header[5];
     char buf[1024];
     MapInfo* info;
     FILE *fpMpq;
+    int entry_size;
 
     if( !(fpMpq=fopen(scm, "rb")) ) {
 	fprintf(stderr,"Try ./path/name\n");
@@ -178,16 +210,18 @@ global MapInfo* GetScmInfo(const char* scm)
 	ExitFatal(-1);
     }
 
-    // FIXME: not always the first entry
-    scmdata = malloc(MpqBlockTable[0*4+2]+1);
-    MpqExtractTo(scmdata, 0, fpMpq);
+    ExtractMap(fpMpq, &scmdata, &entry_size);
 
     fclose(fpMpq);
+    if( !scmdata ) {
+	fprintf(stderr,"Could not extract map in %s\n",scm);
+	ExitFatal(-1);
+    }
 
     info=calloc(1, sizeof(MapInfo));	// clears with 0
 
     scm_ptr = scmdata;
-    scm_endptr = scm_ptr + MpqBlockTable[0*4+2];
+    scm_endptr = scm_ptr + entry_size;
     header[4] = '\0';
 
     while( ScmReadHeader(header,&length) ) {
@@ -618,11 +652,14 @@ global MapInfo* GetScmInfo(const char* scm)
 }
 
 /**
+**	Load scm
 **
+**	@param scm	Name of the scm file
+**	@param map	The map
 */
 global void LoadScm(const char* scm,WorldMap* map)
 {
-    char *scmdata;
+    unsigned char *scmdata;
     long length;
     char header[5];
     char buf[1024];
@@ -630,6 +667,7 @@ global void LoadScm(const char* scm,WorldMap* map)
     int height;
     int aiopps;
     FILE *fpMpq;
+    int entry_size;
 
     if (!map->Info) {
 	map->Info = GetScmInfo(scm);
@@ -643,25 +681,27 @@ global void LoadScm(const char* scm,WorldMap* map)
     }
 
     if( MpqReadInfo(fpMpq) ) {
-	fprintf(stderr,"ReadMpqInfo failed\n");
+	fprintf(stderr,"MpqReadInfo failed\n");
 	ExitFatal(-1);
     }
 
-    // FIXME: not always the first entry
-    scmdata = malloc(MpqBlockTable[0*4+2]+1);
-    MpqExtractTo(scmdata, 0, fpMpq);
+    ExtractMap(fpMpq, &scmdata, &entry_size);
 
     fclose(fpMpq);
+    if( !scmdata ) {
+	fprintf(stderr,"Could not extract map in %s\n",scm);
+	ExitFatal(-1);
+    }
 
     scm_ptr = scmdata;
-    scm_endptr = scm_ptr + MpqBlockTable[0*4+2];
+    scm_endptr = scm_ptr + entry_size;
     header[4] = '\0';
     aiopps=width=height=0;
 
     while( ScmReadHeader(header,&length) ) {
 
 	//
-	//	PUD version
+	//	SCM version
 	//
 	if( !memcmp(header, "VER ",4) ) {
 	    if( length==2 ) {
@@ -673,7 +713,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 	}
 
 	//
-	//	PUD version additional information
+	//	SCM version additional information
 	//
 	if( !memcmp(header, "IVER",4) ) {
 	    if( length==2 ) {
