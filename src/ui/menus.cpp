@@ -4305,9 +4305,8 @@ local void EditorNewMap(void)
     }
 
     TheMap.Info = calloc(1, sizeof(MapInfo));
-    TheMap.Info->Description = malloc(32);
     description[strlen(description)-3] = '\0';
-    strcpy(TheMap.Info->Description, description);
+    TheMap.Info->Description = strdup(description);
     TheMap.Info->MapTerrain = v[menu->items[7].d.pulldown.curopt];
     TheMap.Info->MapWidth = atoi(width);
     TheMap.Info->MapHeight = atoi(height);
@@ -4857,7 +4856,8 @@ local void EditorMapPropertiesOk(void)
 
     description = menu->items[2].d.input.buffer;
     description[strlen(description)-3] = '\0';
-    strcpy(TheMap.Info->Description, description);
+    free(TheMap.Info->Description);
+    TheMap.Info->Description = strdup(description);
 
     // FIXME: Need to actually change the terrain
     TheMap.Terrain = v[menu->items[6].d.pulldown.curopt];
