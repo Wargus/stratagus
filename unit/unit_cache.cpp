@@ -91,6 +91,7 @@ void UnitCacheRemove(Unit* unit)
 	MapField* mf;
 	UnitListItem* listitem;
 
+	Assert(!unit->Removed);
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
 		listitem = unit->CacheLinks + i * unit->Type->TileWidth;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
@@ -102,13 +103,9 @@ void UnitCacheRemove(Unit* unit)
 			} else {
 				// item is head of the list.
 				mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
-				// FIXME: this check shouldn't be necessary but the editor
-				// FIXME: removes a unit from the cache twice
-				Assert(EditorRunning || mf->UnitCache == listitem);
-				if (mf->UnitCache == listitem) {
-					mf->UnitCache = listitem->Next;
-					Assert(!mf->UnitCache || !mf->UnitCache->Prev);
-				}
+				Assert(mf->UnitCache == listitem);
+				mf->UnitCache = listitem->Next;
+				Assert(!mf->UnitCache || !mf->UnitCache->Prev);
 			}
 
 			listitem->Next = listitem->Prev = NULL;
