@@ -13,11 +13,13 @@
 --indent-level4
 --line-comments-indentation0
 --cuddle-else
+--cuddle-do-while
 --brace-indent0
 //--start-left-side-of-comments
 --leave-preprocessor-space
 --continuation-indentation8
 --case-indentation0
+--case-brace-indentation0
 --else-endif-column0
 --no-space-after-casts
 --declaration-indentation1
