@@ -347,23 +347,53 @@ You can play FreeCraft via network or internet or may run 2 or more clients on
 the same computer.  Install it on all computers with the above instructions. 
 You can now start it on each computer with:
 
-<H3>First you need a server:</H3>
+<H3>First you need one server:</H3>
 
-<I>freecraft -p [players] [map]</I><P>
-freecraft -p 2 ./data/puds/multi/3vs3.pud.gz
+<UL>
+<LI>Start the server:<P>
+    <I>freecraft</I>
+<LI>Choose:<P>
+    "Multi Player Game"
+<LI>Enter your name: ...
+<LI>Press OK to continue
+<LI>Choose:<P>
+    "Create Game"
+<LI>Choose a multi player level with:<P>
+    "Select Scenario"
+<LI>Wait for clients to connect, you will see their names in the menu.
+    After all slots are filled the gray "Start Game" becomes colored.
+<LI>Press "Start Game" to play.
+<LI>The level is now loaded and the clients are started.
+</UL>
 
-<P>After the title screen, the game waits with black screen until all players
-are connected.
-Press ALT-'q' to quit the game.
+Press ALT-'q' to quit the game. If you have won or loose the game exits.
 
 <H3>Than you need the clients:</H3>
 
-<I>freecraft -n [server] [map]</I><P>
-freecraft -n localhost ./data/puds/multi/3vs3.pud.gz
 
-<P>[server] may be the hostname (e.g. www.freecraft.org) or the IP address
-(e.g. 192.168.0.1.) of the game server. The map must be the same on all
-computers.
+After the server is running!
+
+<UL>
+<LI>Every client does:<P>
+    <I>freecraft</I> or <I>freecraft -n [server]</I><P>
+    [server] may be the hostname (e.g. www.freecraft.org) or the IP address
+    (e.g. 192.168.0.1.) of the game server. If you want test on a single
+    computer use "localhost" or "127.0.0.1".
+<LI>Choose:<P>
+    "Multi Player Game"
+<LI>Enter your name: ...
+<LI>Press OK to continue
+<LI>Choose:<P>
+    "Join Game"
+<LI>Enter the server name or IP address, above is the default.<BR>
+    Possible inputs are www.freecraft.org or 127.0.0.1.
+<LI>Press OK to continue
+<LI>You new see a menu with the possible game options.
+<LI>Press "Ready" to show that you are ready.
+<LI>Wait now until all are ready and the server player presses "Start Game".
+</UL>
+    
+Press ALT-'q' to quit the game. If you have won or loose the game exits.
 
     <H2>Hints</H2>
 
@@ -378,6 +408,10 @@ computers.
 
 	<P><LI>You find the FreeCraft Media Project here:<BR>
 	<A HREF="http://FreeCraft.Net/fcmp/">The FreeCraft Media Project</A>
+
+	<P><LI>You find multiplayer levels on our home page or with 
+	<A HREF="http://www.google.com/search?q=download+pud">
+	http://www.google.com/search?q=download+pud</A>
 
 	<P><LI>You'll get libpng and libz here:<BR>
 	<A HREF="ftp://ftp.uu.net/graphics/png">
