@@ -148,14 +148,6 @@ global void InitUserInterface(const char *race_name)
 	SetViewportMode(VIEWPORT_SINGLE);
     }
 
-    // FIXME: Can be removed after new config is working
-    if( !strcmp(race_name,"human") || !strcmp(race_name,"alliance") ) {
-	TheUI.NormalFontColor=strdup(FontWhite);
-	TheUI.ReverseFontColor=strdup(FontYellow);
-    } else {
-	TheUI.NormalFontColor=strdup(FontYellow);
-	TheUI.ReverseFontColor=strdup(FontWhite);
-    }
     TheUI.ViewportCursorColor=ColorWhite;
 }
 
@@ -291,8 +283,14 @@ local void SaveUi(FILE* file,const UI* ui)
     int i;
     MenuPanel* menupanel;
 
-    fprintf(file,"(define-ui '%s %d %d\t; Selector\n",
+    fprintf(file,"(define-ui '%s %d %d\t; Selector",
 	    ui->Name,ui->Width,ui->Height);
+
+    fprintf(file,"\n  'normal-font-color '%s"
+                 "\n  'reverse-font-color '%s",
+	    ui->NormalFontColor, ui->ReverseFontColor);
+    fprintf(file,"\n");
+
     fprintf(file,"  ; Filler 1\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
 	    ui->Filler[0].File,ui->FillerX[0],ui->FillerY[0]);
@@ -493,8 +491,6 @@ global void CleanUserInterface(void)
 	for( i=0; UI_Table[i]; ++i ) {
 	    ui=UI_Table[i];
 	    // FIXME: not completely written
-	    free(ui->NormalFontColor);
-	    free(ui->ReverseFontColor);
 	    menupanel=ui->MenuPanels;
 	    while( menupanel ) {
 		tmp=menupanel;
