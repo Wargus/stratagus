@@ -4920,7 +4920,7 @@ global void EditorEditResource(void)
     sprintf(buf, "%d~!_", UnitUnderCursor->Value);
     menu->items[1].d.input.buffer = buf;
     menu->items[1].d.input.nch = strlen(buf) - 3;
-    menu->items[1].d.input.maxch = 7;
+    menu->items[1].d.input.maxch = 6;
     ProcessMenu("menu-editor-edit-resource", 1);
 }
 
@@ -4946,17 +4946,24 @@ local void EditorEditResourceOk(void)
 
     menu = FindMenu("menu-editor-edit-resource");
     value = atoi(menu->items[1].d.input.buffer);
-    if (value == 0) {
+    if (value < 2500) {
+	strcpy(menu->items[1].d.text.text, "2500~!_");
+	menu->items[1].d.input.nch = strlen(menu->items[1].d.text.text) - 3;
 	menu = FindMenu("menu-editor-error");
-	menu->items[1].d.text.text = "Must be greater than 0";
+	menu->items[1].d.text.text = "Must be greater than 2500";
+	ProcessMenu("menu-editor-error", 1);
+    } else if (value > 655000) {
+	strcpy(menu->items[1].d.text.text, "655000~!_");
+	menu->items[1].d.input.nch = strlen(menu->items[1].d.text.text) - 3;
+	menu = FindMenu("menu-editor-error");
+	menu->items[1].d.text.text = "Must be smaller than 655000";
 	ProcessMenu("menu-editor-error", 1);
     } else if (value/2500*2500 != value) {
+	value = (value+1250)/2500*2500;
+	sprintf(menu->items[1].d.text.text, "%d~!_", value);
+	menu->items[1].d.input.nch = strlen(menu->items[1].d.text.text) - 3;
 	menu = FindMenu("menu-editor-error");
 	menu->items[1].d.text.text = "Must be a multiple of 2500";
-	ProcessMenu("menu-editor-error", 1);
-    } else if (value > 655350) {
-	menu = FindMenu("menu-editor-error");
-	menu->items[1].d.text.text = "Must be smaller than 655350";
 	ProcessMenu("menu-editor-error", 1);
     } else {
 	UnitUnderCursor->Value = value;
