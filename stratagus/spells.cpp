@@ -109,8 +109,10 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 	int n;
 	Unit* table[UnitMax];
 
+	DebugCheck(!caster);
+	DebugCheck(!action);
 	//
-	//		Allow error margnins. (Lame, I know)
+	//		Allow error margins. (Lame, I know)
 	//
 	xmin = x - action->Data.Demolish.Range - 2;
 	ymin = y - action->Data.Demolish.Range - 2;
@@ -185,10 +187,10 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!spell->Action);
-	DebugCheck(!spell->Action->Data.SpawnPortal.PortalType);
+	DebugCheck(!action);
+	DebugCheck(!action->Data.SpawnPortal.PortalType);
 
-	ptype = spell->Action->Data.SpawnPortal.PortalType;
+	ptype = action->Data.SpawnPortal.PortalType;
 
 	DebugLevel0Fn("Spawning a portal exit.\n");
 	portal = caster->Goal;
@@ -297,16 +299,16 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!spell->Action);
+	DebugCheck(!action);
 	//assert(x in range, y in range);
 
 	mis = NULL;
 
-	fields = spell->Action->Data.AreaBombardment.Fields;
-	shards = spell->Action->Data.AreaBombardment.Shards;
-	damage = spell->Action->Data.AreaBombardment.Damage;
-	offsetx = spell->Action->Data.AreaBombardment.StartOffsetX;
-	offsety = spell->Action->Data.AreaBombardment.StartOffsetY;
+	fields = action->Data.AreaBombardment.Fields;
+	shards = action->Data.AreaBombardment.Shards;
+	damage = action->Data.AreaBombardment.Damage;
+	offsetx = action->Data.AreaBombardment.StartOffsetX;
+	offsety = action->Data.AreaBombardment.StartOffsetY;
 	while (fields--) {
 			// FIXME: radius configurable...
 		do {
@@ -395,7 +397,7 @@ global int CastSpawnMissile(Unit* caster, const SpellType* spell,
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!spell->Action);
+	DebugCheck(!action);
 	DebugCheck(!spell->Missile);
 
 	missile = NULL;
@@ -433,23 +435,23 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 {
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!spell->Action);
+	DebugCheck(!action);
 	DebugCheck(!target);
 
-	if (spell->Action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
-		target->Haste = spell->Action->Data.AdjustBuffs.HasteTicks;
+	if (action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
+		target->Haste = action->Data.AdjustBuffs.HasteTicks;
 	}
-	if (spell->Action->Data.AdjustBuffs.SlowTicks != BUFF_NOT_AFFECTED) {
-		target->Slow = spell->Action->Data.AdjustBuffs.SlowTicks;
+	if (action->Data.AdjustBuffs.SlowTicks != BUFF_NOT_AFFECTED) {
+		target->Slow = action->Data.AdjustBuffs.SlowTicks;
 	}
-	if (spell->Action->Data.AdjustBuffs.BloodlustTicks != BUFF_NOT_AFFECTED) {
-		target->Bloodlust = spell->Action->Data.AdjustBuffs.BloodlustTicks;
+	if (action->Data.AdjustBuffs.BloodlustTicks != BUFF_NOT_AFFECTED) {
+		target->Bloodlust = action->Data.AdjustBuffs.BloodlustTicks;
 	}
-	if (spell->Action->Data.AdjustBuffs.InvisibilityTicks != BUFF_NOT_AFFECTED) {
-		target->Invisible = spell->Action->Data.AdjustBuffs.InvisibilityTicks;
+	if (action->Data.AdjustBuffs.InvisibilityTicks != BUFF_NOT_AFFECTED) {
+		target->Invisible = action->Data.AdjustBuffs.InvisibilityTicks;
 	}
-	if (spell->Action->Data.AdjustBuffs.InvincibilityTicks != BUFF_NOT_AFFECTED) {
-		target->UnholyArmor = spell->Action->Data.AdjustBuffs.InvincibilityTicks;
+	if (action->Data.AdjustBuffs.InvincibilityTicks != BUFF_NOT_AFFECTED) {
+		target->UnholyArmor = action->Data.AdjustBuffs.InvincibilityTicks;
 	}
 	CheckUnitToBeDrawn(target);
 	MakeMissile(spell->Missile,
@@ -481,11 +483,11 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!spell->Action);
+	DebugCheck(!action);
 	DebugCheck(!target);
 
-	hp = spell->Action->Data.AdjustVitals.HP;
-	mana = spell->Action->Data.AdjustVitals.Mana;
+	hp = action->Data.AdjustVitals.HP;
+	mana = action->Data.AdjustVitals.Mana;
 	manacost = spell->ManaCost;
 
 	//  Healing and harming
@@ -515,8 +517,8 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	if (manacost) {
 		castcount = min(castcount, caster->Mana / manacost);
 	}
-	if (spell->Action->Data.AdjustVitals.MaxMultiCast) {
-		castcount = min(castcount, spell->Action->Data.AdjustVitals.MaxMultiCast);
+	if (action->Data.AdjustVitals.MaxMultiCast) {
+		castcount = min(castcount, action->Data.AdjustVitals.MaxMultiCast);
 	}
 
 	DebugCheck(castcount < 0);
@@ -567,10 +569,10 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!spell->Action);
+	DebugCheck(!action);
 	DebugCheck(!target);
 
-	type = spell->Action->Data.Polymorph.NewForm;
+	type = action->Data.Polymorph.NewForm;
 	DebugCheck(!type);
 
 	caster->Player->Score += target->Type->Points;
@@ -624,13 +626,13 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!spell->Action);
-	DebugCheck(!spell->Action->Data.Summon.UnitType);
+	DebugCheck(!action);
+	DebugCheck(!action->Data.Summon.UnitType);
 
-	unittype = spell->Action->Data.Summon.UnitType;
-	ttl = spell->Action->Data.Summon.TTL;
+	unittype = action->Data.Summon.UnitType;
+	ttl = action->Data.Summon.TTL;
 
-	if (spell->Action->Data.Summon.RequireCorpse) {
+	if (action->Data.Summon.RequireCorpse) {
 		n = UnitCacheSelect(x - 1, y - 1, x + 2, y + 2, table);
 		cansummon = 0;
 		while (n) {
@@ -1147,8 +1149,8 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	DebugLevel0Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
 		caster->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
 	if (CanCastSpell(caster, spell, target, x, y)) {
-		act=spell->Action;
-		cont=1;
+		act = spell->Action;
+		cont = 1;
 		//
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
@@ -1159,8 +1161,8 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 		PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 		while (act) {
 			DebugCheck(!act->CastFunction);
-			cont = cont && act->CastFunction(caster, spell, act, target, x, y);
-			act=act->Next;
+			cont = cont & act->CastFunction(caster, spell, act, target, x, y);
+			act = act->Next;
 		}
 		//
 		//		Spells like blizzard are casted again.
@@ -1179,7 +1181,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	return 0;
 }
 
-/*
+/**
 **		Cleanup the spell subsystem.
 **
 **		@note: everything regarding spells is gone now.
