@@ -180,7 +180,6 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->SavedOrder.Y=unit->Y;
 		unit->SavedOrder.Goal=NoUnitP;
 		ResetPath(unit->SavedOrder);
-		DebugLevel2Fn("Save order\n");
 #else
 		unit->SavedCommand.Action=UnitActionAttack;
 		unit->SavedCommand.Data.Move.Range=0;
