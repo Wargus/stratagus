@@ -2908,8 +2908,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    (attacker->Type==UnitTypeOrcWorker
 	    || attacker->Type==UnitTypeHumanWorker) ) {
 	ChangeUnitOwner(target, target->Player, attacker->Player);
-	attacker->Orders[0].Action=UnitActionStill;
-	attacker->SubAction=attacker->State=0;
+	CommandStop(attacker);		// Attacker shouldn't continue attack!
     }
 
 #if 0
