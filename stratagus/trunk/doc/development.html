@@ -17,7 +17,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
 <A HREF="artistic-license.html">"Artistic License"</A></B>
 <HR>
 
@@ -26,6 +26,17 @@ This file should give you some information to help too develop FreeCraft.<P>
 <H2>Make and makefiles</H2>
 
 Type 'make help' to get an overview what all could be made.<P>
+
+<H2>C code documentation</H2>
+
+See below: you can use always the source code documentation.<P>
+
+I have prepared some extra documentations:<P>
+
+<UL>
+<LI><A HREF="datadir.html">FreeCraft data file description.</A>
+<LI><A HREF="unit.html">C "Unit" type description.</A>
+</UL>
 
 <H2>Source code documentation</H2>
 
@@ -76,6 +87,52 @@ Grouping.<P>
 
 Please read the documentation of the programs.
 
+<H2>Empty C prototype file</H2>
+
+<PRE>
+//   ___________		     _________		      _____  __
+//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//	  \/		    \/	   \/	     \/		   \/
+//  ______________________                           ______________________
+//			  T H E   W A R   B E G I N S
+//	   FreeCraft - A free fantasy real time strategy game engine
+//
+/**@name {filename}.c	-	{One line description of this file} */
+//
+//      (c) Copyright 2001 by {insert your name here}
+//
+//      $Id$
+
+//@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+
+#include "freecraft.h"
+
+// More game includes.
+
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+// Global and local variables of this module.
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
+
+// Local and global functions of this module.
+
+//@}
+</PRE>
+
 <H2>Coding style</H2>
 
 You can use your own coding style in your own modules.
@@ -86,7 +143,7 @@ If you fix in other modules, please imitate the coding style of the old coder.
 <UL>
 <LI>Write ANSI C.
 <LI>Use 8 spaces tabulators.
-<LI>Use 4 spaces indention levels.
+<LI>Use 4 spaces indentation levels.
 <LI>Use C++ comments for to end of line comments.
 <LI>Use { } also for one statement blocks.
 </UL>

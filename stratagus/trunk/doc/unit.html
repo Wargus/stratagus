@@ -1,0 +1,224 @@
+<HTML><HEAD>
+<!--
+----	$Id$
+-->
+    <TITLE>FreeCraft Version 1.17 - Unit: C type description</TITLE>
+</HEAD>
+<BODY>
+    <H1>FreeCraft Version 1.17 - Unit: C type description</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+<PRE>
+Unit:
+=====
+
+    #include "unit.h"
+    typedef struct _unit_ Unit;
+
+    This structure contains all informations about an unit in game.
+    An unit could be everything, a man, a vehicle, a ship or a building.
+
+The unit structure members:
+
+Unit::Refs
+----------
+    The reference counter of the unit. If the pointer to the unit is stored
+    the counter must be incremented and if this reference is destroyed the
+    counter must be decremented. Alternative it would be possible to
+    implement a garbage collector for this.
+
+Unit::Slot
+----------
+    This is the unique slot number. It is not possible that two units have
+    the same slot number at the same time. The slot numbers are reused.
+    This field could be accessed by UnitNumber(Unit*).
+    Maximal 65535 (=MAX_UNIT_SLOTS) simultaneous units are supported.
+
+Unit::UnitSlot
+--------------
+    This is the pointer into Units[], where the unit pointer is stored.
+    Units[] is a table of all units currently active in game.
+    This pointer is only needed to speed up, the remove of the unit pointer
+    from Units[].
+
+Unit::PlayerSlot
+----------------
+    A pointer into Player::Units[], where the unit pointer is stored.
+    Player::Units[] is a table of all units currently belonging to a player.
+    This pointer is only needed to speed up, the remove of the unit pointer
+    from Player::Units[].
+
+Unit::Next
+----------
+    A generic link pointer. This member is currently used, if an unit is on
+    the map, to link all units on the same map field together.  This member is
+    currently unused, if the unit is removed. (see Unit::Removed)
+    F.E.: A worker is removed, if he is in a mine or depot. Or an unit is
+    on board a transporter.
+
+Unit::X Unit::Y
+------- -------
+    The tile map coordinates of the unit. 0,0 is the upper left on the map.
+
+Unit::Type
+----------
+    Pointer to the unit type (UnitType). The unit type contains all informations
+    that all units of the same type shares. (Animations, Name, ...)
+
+Unit::Player
+------------
+    Pointer to the owner of this unit (Player). An unit could only be owned
+    by one player.
+
+Unit::Stats
+-----------
+    Pointer to the current status (UnitStats) of an unit. The units of the
+    same player and the same type could share the same stats. The status
+    contains all values which could be different for each player. This
+    are f.e. the upgradeable abilities of an unit.  (Unit::Stats::SightRange,
+    Unit::Stats::Armor, Unit::Stats::HitPoints, ...)
+
+Unit::IX Unit::IY
+-------- --------
+    Coordinate displacement in pixels or coordinates inside a tile. Currently
+    only !=0, if the unit is moving from one tile to another (0-32).
+
+Unit::Frame
+-----------
+    Current graphic image of the animation sequence. The high bit (128) is used
+    to flip this image horizontal (x direction).
+
+Unit::SeenFrame
+---------------
+    Graphic image (see Unit::Frame) what the player on this computer has last
+    seen. If -1 the player haven't seen this unit.
+
+
+    FIXME:
+	If you need more informations, please send me an email or write it
+	self.
+
+Unit::Direction
+---------------
+
+Unit::Attacked
+--------------
+
+Unit::Burning
+-------------
+
+Unit::Visible
+-------------
+
+Unit::Destroyed
+---------------
+
+Unit::Removed
+-------------
+
+Unit::Selected
+--------------
+
+Unit::Constructed
+-----------------
+
+Unit::Mana
+----------
+
+Unit::HP
+--------
+
+Unit::Bloodlust
+---------------
+
+Unit::Haste
+-----------
+
+Unit::Slow
+----------
+
+Unit::Invisible
+---------------
+
+Unit::FlameShield
+-----------------
+
+Unit::UnholyArmor
+-----------------
+
+Unit::GroupId
+-------------
+
+Unit::Value
+-----------
+
+Unit::SubAction
+---------------
+
+Unit::Wait
+----------
+
+Unit::State
+-----------
+
+Unit::Reset
+-----------
+
+Unit::Blink
+-----------
+
+Unit::Moving
+------------
+
+Unit::Rs
+--------
+
+Unit::Revealer
+--------------
+
+Unit::OnBoard
+-------------
+
+Unit::OrderCount
+----------------
+
+Unit::OrderFlush
+----------------
+
+Unit::Orders
+------------
+
+Unit::SavedOrder
+----------------
+
+Unit::NewOrder
+--------------
+
+Unit::Data
+----------
+
+Unit::Goal
+----------
+
+Unit::GoalX
+-----------
+
+Unit::GoalY
+-----------
+
+</PRE><HR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>

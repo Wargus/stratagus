@@ -1,0 +1,272 @@
+<HTML><HEAD>
+<!--
+----	$Id$
+-->
+    <TITLE>FreeCraft Version 1.17 - Data directory structure</TITLE>
+</HEAD>
+<BODY>
+    <H1>FreeCraft Version 1.17 - Data directory structure</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+      |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+      |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+      \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________			     ______________________
+			  T H E	  W A R	  B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<B>(C) Copyright 2001 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+<PRE>
+Proposal for the new FreeCraft data directory structure:
+
+<I>{race}</I>		: Replace with a race name: human, orc, alliance or mythical..
+<I>{tileset}</I>	: Replace with a tileset name: winter, summer, ...
+<I>{unit}</I>		: Replace with an unit name: footman, bowman, ...
+<I>{building}</I>	: Replace with a building name: goldmine, farm, ...
+<I>{race-campaign}</I> : Replace with a name of a campaign of a race: human-exp, ...
+
+<B>$FREECRAFT_LIBRARY_PATH/data</B>
+|   Contains all data files for the FreeCraft game engine.
+|
+|-- <B>data/campaigns</B>
+|   |	Contains all available campaigns.
+|   |
+|   `-- <B>data/campaigns/<I>{race-campaign}</I></B>
+|	|   Contains all data for a campaign: scripts, maps, texts, intros.
+|	|
+|	`-- <B>data/campaigns/<I>{race-campaign}</I>/interface</B>
+|		Contains special backgrounds images for the campaign.
+|    
+|-- <B>data/ccl</B>
+|	Contains all global CCL - Craft Configuration Language files.
+|
+|-- <B>data/graphics</B>
+|   |	Contains all available graphics.
+|   |
+|   |-- <B>data/graphics/<I>{race}</I></B>
+|   |	|   Contains all graphics of a race, which could be used in any
+|   |	|   tileset.
+|   |	|
+|   |	|-- <B>data/graphics/<I>{race}</I>/buildings</B>
+|   |	|	Contains the building of the race, which could be used in
+|   |	|	any tileset.
+|   |	|
+|   |	`-- <B>data/graphics/<I>{race}</I>/units</B>
+|   |		Contains all units of the race, which could be used in any
+|   |		any tileset.
+|   |
+|   |-- <B>data/graphics/neutral</B>
+|   |	|   Contains all graphics that didn't belong to a special race and
+|   |	|   which could be used in any tileset.
+|   |	|
+|   |	|-- <B>data/graphics/neutral/buildings</B>
+|   |	|	Contains all buildings that didn't belong to a special race
+|   |	|	and which could be used in any tileset.
+|   |	|
+|   |	`-- <B>data/graphics/neutral/units</B>
+|   |		Contains all units that didn't belong to a special race and
+|   |		which could be used in any tileset.
+|   |
+|   |-- <B>data/graphics/missiles</B>
+|   |	    Contains all graphics of missiles.
+|   |
+|   |-- <B>data/graphics/tilesets</B>
+|   |	|   Contains the graphics special to a single tileset.
+|   |	|   Icons, buildings, units, tileset, decorations.
+|   |	|
+|   |	`-- <B>data/graphics/tilesets/<I>{tileset}</I></B>
+|   |	    |	Contains the special graphics of this tileset of all races.
+|   |	    |
+|   |	    |-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I></B>
+|   |	    |	|   Contains all graphics of a race special to this tileset.
+|   |	    |	|
+|   |	    |	|-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I>/buildings</B>
+|   |	    |	|	Contains all buildings graphics of a race and a tileset.
+|   |	    |	|
+|   |	    |	`-- <B>data/graphics/tilesets/<I>{tileset}</I>/<I>{race}</I>/units</B>
+|   |	    |		Contains all units graphics of a race and a tileset.
+|   |	    |
+|   |	    |-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral</B>
+|   |	    |	|   Contains the graphics not belonging to any race.
+|   |	    |	|
+|   |	    |	|-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral/buildings</B>
+|   |	    |	|	Contains the buildings graphics of the neutral race.
+|   |	    |	|
+|   |	    |	`-- <B>data/graphics/tilesets/<I>{tileset}</I>/neutral/units</B>
+|   |	    |		Contains the units graphics of the neutral race.
+|   |	    |
+|   |	    `-- <B>data/graphics/tilesets/<I>{tileset}</I>/terrain</B>
+|   |		    Contains the graphics for the tileset self.
+|   |
+|   |
+|   `-- <B>data/graphics/ui</B>
+|	|   Contains all user interface graphics.
+|	|
+|	|-- <B>data/graphics/ui/cursors</B>
+|	|	Contains all cursors not special to any race.
+|	|
+|	|-- <B>data/graphics/ui/fonts</B>
+|	|	Contains all fonts not special to any race.
+|	|
+|	`-- <B>data/graphics/ui/<I>{race}</I></B>
+|	    |	Contains all user interface graphics special to a race.
+|	    |
+|	    |-- <B>data/graphics/ui/<I>{race}</I>/640x480</B>
+|	    |	    Contains the user interface graphics for this resolution.
+|	    |
+|	    `-- <B>data/graphics/ui/<I>{race}</I>/cursors</B>
+|		    Contains the cursors special to this race.
+|
+|
+|-- <B>data/puds</B>
+|   |	Contains all 'puds' the original level format.
+|   |
+|   |-- <B>data/puds/demo</B>
+|   |	    Contains the demo levels.
+|   |
+|   |-- <B>data/puds/internal</B>
+|   |	    Contains the internal (stored in the data file) levels.
+|   |
+|   |-- <B>data/puds/multi</B>
+|   |	    Contains multi-player levels.
+|   |
+|   |-- <B>data/puds/my_puds</B>
+|   |	    Contains your own levels.
+|   |
+|   |-- <B>data/puds/single</B>
+|   |	    Contains single player levels.
+|   |
+|   `-- <B>data/puds/strange</B>
+|	    Contains strange levels.
+|
+|-- <B>data/maps</B>
+|   |	Contains all maps in our own level format.
+|   |
+|   |-- <B>data/maps/single</B>
+|   |	    Contains single player levels.
+|   |
+|   `-- <B>data/maps/multi</B>
+|	    Contains multi-player player levels.
+|
+|
+`-- <B>data/sounds</B>
+    |	Contains all available sounds.
+    |
+    |-- <B>data/sounds/buildings</B>
+    |	    Contains all general buildings sounds.
+    |
+    |-- <B>data/sounds/<I>{race}</I></B>
+    |	|   Contains all sounds special to a race.
+    |	|
+    |	|-- <B>data/sounds/<I>{race}</I>/basic_voices</B>
+    |	|   |	Contains the general sounds of this race.
+    |	|   |
+    |	|   |-- <B>data/sounds/<I>{race}</I>/basic_voices/acknowledgement</B>
+    |	|   |	    Contains the general acknowledgement sounds of this race.
+    |	|   |
+    |	|   |-- <B>data/sounds/<I>{race}</I>/basic_voices/annoyed</B>
+    |	|   |	    Contains the general annoyed sounds of this race.
+    |	|   |
+    |	|   |-- <B>data/sounds/<I>{race}</I>/basic_voices/help</B>
+    |	|   |	    Contains the general help sounds of this race.
+    |	|   |
+    |	|   `-- <B>data/sounds/<I>{race}</I>/basic_voices/selected</B>
+    |	|	    Contains the general selected sounds of this race.
+    |	|
+    |	|-- <B>data/sounds/<I>{race}</I>/buildings</B>
+    |	|	Contains the buildings sounds of this race.
+    |	|
+    |	|-- <B>data/sounds/<I>{race}</I>/ships</B>
+    |	|   |	Contains all general ship sounds of this race.
+    |	|   |
+    |	|   |-- <B>data/sounds/<I>{race}</I>/ships/acknowledgement</B>
+    |	|   |	    Contains the ship acknowledgement sound of this race.
+    |	|   |
+    |	|   |-- <B>data/sounds/<I>{race}</I>/ships/annoyed</B>
+    |	|   |	    Contains the ship annoyed sound of this race.
+    |	|   |
+    |	|   `-- <B>data/sounds/<I>{race}</I>/ships/selected</B>
+    |	|	    Contains the ship selected sound of this race.
+    |	|
+    |	`-- <B>data/sounds/<I>{race}</I>/units</B>
+    |	    |	Contains the special sounds of a race and unit.
+    |	    |
+    |	    `-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I></B>
+    |		|   Contains the special sounds of this units of the race.
+    |		|
+    |		|-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/acknowledgement</B>
+    |		|	Contains the acknowledge sound of this unit.
+    |		|
+    |		|-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/annoyed</B>
+    |		|	Contains the annoyed sound of this unit.
+    |		|
+    |		`-- <B>data/sounds/<I>{race}</I>/units/<I>{unit}</I>/selected</B>
+    |			Contains the selected sound of this unit.
+    |
+    |-- <B>data/sounds/misc</B>
+    |	|   Contains the sounds that didn't fit in any section.
+    |	|
+    |	|-- <B>data/sounds/misc/building explosion</B>
+    |	|	Contains the building explosion sounds.
+    |	|
+    |	`-- <B>data/sounds/misc/tree chopping</B>
+    |		Contains the tree chopping sounds.
+    |
+    |-- <B>data/sounds/missiles</B>
+    |	|   Contains the fire and hit sounds of missiles.
+    |	|
+    |	`-- <B>data/sounds/missiles/sword attack</B>
+    |		Contains different sounds of the same kind.
+    |
+    |-- <B>data/sounds/neutral</B>
+    |	|   Contains the sounds of buildings or units not belonging to any race.
+    |	|
+    |	|-- <B>data/sounds/neutral/buildings</B>
+    |	|	Contains the building sounds of the neutral race.
+    |	|
+    |	`-- <B>data/sounds/neutral/units</B>
+    |	    |	Contains the units sounds of the neutral race.
+    |	    |
+    |	    `-- <B>data/sounds/neutral/units/<I>{unit}</I></B>
+    |		|   Contains the special sounds of the unit of the neutral race.
+    |		|
+    |		|-- <B>data/sounds/neutral/units/<I>{unit}</I>/acknowledgement</B>
+    |		|	Contains the acknowledgement sound of the unit of
+    |		|	the neutral race.
+    |		|
+    |		|-- <B>data/sounds/neutral/units/<I>{unit}</I>/annoyed</B>
+    |		|	Contains the annoyed sound of the unit of the neutral
+    |		|	race.
+    |		|
+    |		`-- <B>data/sounds/neutral/units/<I>{unit}</I>/selected</B>
+    |			Contains the selected sound of the unit of the neutral
+    |			race.
+    |
+    |-- <B>data/sounds/spells</B>
+    |	    Contains the sounds of the different spells.
+    |
+    |-- <B>data/sounds/ui</B>
+    |	    Contains the sounds for the user interface.
+    |
+    `-- <B>data/sounds/units</B>
+	|   Contains the sounds of units common for all races.
+	|
+	`-- <B>data/sounds/units/<I>{unit}</I></B>
+	    |	Contains the sounds of this unit.
+	    |
+	    |-- <B>data/sounds/units/<I>{unit}</I>/acknowledgement</B>
+	    |	    Contains the acknowledgement sound of this unit.
+	    |
+	    |-- <B>data/sounds/units/<I>{unit}</I>/annoyed</B>
+	    |	    Contains the annoyed sound of this unit.
+	    |
+	    `-- <B>data/sounds/units/<I>{unit}</I>/selected</B>
+		    Contains the selected sound of this unit.
+</PRE><HR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>
