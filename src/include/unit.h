@@ -455,8 +455,8 @@ typedef enum _unit_voice_group_ {
     VoiceWorkCompleted,			/// only worker, work completed
     VoiceBuilding,			/// only for building under construction
     VoiceDocking,			/// only for transport reaching coast
-    VoiceTreeChopping,			/// only worker tree chopping
     VoiceRepairing,			/// repairing
+    VoiceHarvesting,			/// harvesting
 } UnitVoiceGroup;
 
 /**

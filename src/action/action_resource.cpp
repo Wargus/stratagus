@@ -266,12 +266,12 @@ local void AnimateActionHarvest(Unit* unit)
     int flags;
 
     if (unit->Type->Animations) {
-	//FIXME: Animation->Harvest
-	DebugCheck(!unit->Type->Animations->Attack);
-	flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
+	DebugCheck(!unit->Type->Animations->Harvest[unit->CurrentResource]);
+	flags = UnitShowAnimation(unit,
+	    unit->Type->Animations->Harvest[unit->CurrentResource]);
 #ifdef WITH_SOUND
 	if ((flags & AnimationSound)) {
-	    PlayUnitSound(unit, VoiceTreeChopping);
+	    PlayUnitSound(unit, VoiceHarvesting);
 	}
 #endif
     }

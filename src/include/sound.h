@@ -57,7 +57,6 @@ typedef struct _game_sound_ {
     SoundConfig PlacementSuccess;	/// used by ui
     SoundConfig Click;			/// used by ui
 
-    SoundConfig TreeChopping;		/// FIXME: currently unused
     SoundConfig Docking;		/// ship reaches coast
     SoundConfig BuildingConstruction;	/// building under construction
 

@@ -78,7 +78,6 @@ global GameSound GameSounds
     { "placement error", NULL },
     { "placement success", NULL },
     { "click", NULL },
-    { "tree chopping", NULL },
     { "transport docking", NULL },
     { "building construction", NULL },
     {	{ "basic human voices work complete", NULL },
@@ -176,8 +175,6 @@ local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 	    return unit->Type->Sound.Help.Sound;
 	case VoiceDying:
 	    return unit->Type->Sound.Dead.Sound;
-	case VoiceTreeChopping:
-	    return GameSounds.TreeChopping.Sound;
 	case VoiceWorkCompleted:
 	    return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 	case VoiceBuilding:
@@ -186,6 +183,8 @@ local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 	    return GameSounds.Docking.Sound;
 	case VoiceRepairing:
 	    return unit->Type->Sound.Repair.Sound;
+	case VoiceHarvesting:
+	    return unit->Type->Sound.Harvest[unit->CurrentResource].Sound;
     }
     return NULL;
 }
@@ -313,10 +312,6 @@ global void InitSoundClient(void)
     }
     if (!GameSounds.Click.Sound) {
 	GameSounds.Click.Sound = SoundIdForName(GameSounds.Click.Name);
-    }
-    if (!GameSounds.TreeChopping.Sound) {
-	GameSounds.TreeChopping.Sound =
-	    SoundIdForName(GameSounds.TreeChopping.Name);
     }
     if (!GameSounds.Docking.Sound) {
 	GameSounds.Docking.Sound =
