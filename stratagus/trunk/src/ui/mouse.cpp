@@ -273,7 +273,11 @@ global void DoRightButton(int sx, int sy)
 			DebugCheck(spellnum == SpellTypeCount);
 			SendCommandSpellCast(unit, x, y, dest, spellnum, flush);
 		    } else {
-			SendCommandAttack(unit, x, y, dest, flush);
+		        if (CanTarget(unit->Type, dest->Type)) {
+			    SendCommandAttack(unit, x, y, dest, flush);
+			} else { // No valid target
+			    SendCommandAttack(unit, x, y, NoUnitP, flush);
+			}
 		    }
 		    continue;
 		}

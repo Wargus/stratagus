@@ -141,7 +141,21 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		errl("Unsupported area-bombardment tag", value);
 	    }
 	}
-	
+    } else if (gh_eq_p(value, gh_symbol2scm("area-adjust-vitals"))) {
+	spellaction->CastFunction = CastAreaAdjustVitals;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (gh_eq_p(value, gh_symbol2scm("hit-points"))) {
+		spellaction->Data.AreaAdjustVitals.HP = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (gh_eq_p(value, gh_symbol2scm("mana-points"))) {
+		spellaction->Data.AreaAdjustVitals.Mana = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else {
+		errl("Unsupported area-adjust-vitals tag", value);
+	    }
+	}
     } else if (gh_eq_p(value, gh_symbol2scm("area-bombardment"))) {
 	spellaction->CastFunction = CastAreaBombardment;
 	while (!gh_null_p(list)) {
@@ -302,7 +316,7 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 **	@note 	This is a helper function to make CclSpellCondition shorter
 **		and easier to understand.
 */
-local char Scm2Condition(SCM value)
+global char Scm2Condition(SCM value)
 {
     if (gh_eq_p(value, gh_symbol2scm("true"))) {
 	return CONDITION_TRUE;
@@ -327,7 +341,7 @@ local char Scm2Condition(SCM value)
 local void CclSpellCondition(SCM list, ConditionInfo* condition)
 {
     SCM value;
-
+    int i;
     //
     //	Initializations:
     //
@@ -335,7 +349,8 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
     //	Set everything to 0:
     memset(condition, 0, sizeof(ConditionInfo));
     //	Flags are defaulted to 0(CONDITION_TRUE)
-
+    condition->BoolFlag = malloc(NumberBoolFlag * sizeof (*condition->BoolFlag));
+    memset(condition->BoolFlag, 0, NumberBoolFlag * sizeof (*condition->BoolFlag));
     //	Initialize min/max stuff to values with no effect.
     condition->MinHpPercent = -10;
     condition->MaxHpPercent = 1000;
@@ -351,17 +366,8 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
     while (!gh_null_p(list)) {
 	value = gh_car(list);
 	list = gh_cdr(list);
-	if (gh_eq_p(value, gh_symbol2scm("undead"))) {
-	    condition->Undead = Scm2Condition(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("organic"))) {
-	    condition->Organic = Scm2Condition(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("volatile"))) {
+	if (gh_eq_p(value, gh_symbol2scm("volatile"))) {
 	    condition->Volatile = Scm2Condition(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("hero"))) {
-	    condition->Hero = Scm2Condition(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("coward"))) {
 	    condition->Coward = Scm2Condition(gh_car(list));
@@ -403,6 +409,16 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
 	    condition->MaxInvincibilityTicks = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else {
+	    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+	        if (gh_eq_p(value, gh_symbol2scm(BoolFlagName[i]))) {
+	            condition->BoolFlag[i] = Scm2Condition(gh_car(list));
+                    list = gh_cdr(list);
+	            break;
+                }
+	    }
+	    if (i != NumberBoolFlag) {
+	        continue;
+	    }
 	    errl("Unsuported condition tag", value);
 	}
     }
@@ -597,6 +613,15 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
 		action->Data.AreaBombardment.Damage,
 		action->Data.AreaBombardment.StartOffsetX,
 		action->Data.AreaBombardment.StartOffsetY);
+    } else if (action->CastFunction == CastAreaAdjustVitals) {
+	CLprintf(file, "(area-adjust-vitals");
+	if (action->Data.AreaAdjustVitals.HP) {
+	    CLprintf(file, " hit-points %d", action->Data.AdjustVitals.HP);
+	}
+	if (action->Data.AreaAdjustVitals.Mana) {
+	    CLprintf(file, " mana-points %d", action->Data.AdjustVitals.Mana);
+	}
+	CLprintf(file, ")\n");
     } else if (action->CastFunction == CastSpawnMissile) {
 	CLprintf(file, "(spawn-missile delay %d ttl %d damage %d ",
 		action->Data.SpawnMissile.Delay,
@@ -691,7 +716,7 @@ local void SaveSpellCondition(CLFile *file, ConditionInfo* condition)
 	"false",		/// CONDITION_FALSE
 	"only"			/// CONDITION_ONLY
     };
-
+    int i;
     DebugCheck(!file);
     DebugCheck(!condition);
 
@@ -700,17 +725,8 @@ local void SaveSpellCondition(CLFile *file, ConditionInfo* condition)
     //	First save data related to flags.
     //	NOTE: (int) is there to keep compilers happy.
     //
-    if (condition->Undead != CONDITION_TRUE) {
-	CLprintf(file, "undead %s ", condstrings[(int)condition->Undead]);
-    }
-    if (condition->Organic != CONDITION_TRUE) {
-	CLprintf(file, "organic %s ", condstrings[(int)condition->Organic]);
-    }
     if (condition->Volatile != CONDITION_TRUE) {
 	CLprintf(file, "volatile %s ", condstrings[(int)condition->Volatile]);
-    }
-    if (condition->Hero != CONDITION_TRUE) {
-	CLprintf(file, "hero %s ", condstrings[(int)condition->Hero]);
     }
     if (condition->Coward != CONDITION_TRUE) {
 	CLprintf(file, "coward %s ", condstrings[(int)condition->Coward]);
@@ -723,6 +739,12 @@ local void SaveSpellCondition(CLFile *file, ConditionInfo* condition)
     }
     if (condition->TargetSelf != CONDITION_TRUE) {
 	CLprintf(file, "self %s ", condstrings[(int)condition->TargetSelf]);
+    }
+    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+        if (condition->BoolFlag[i] != CONDITION_TRUE) {
+            CLprintf(file, "%s %s ",
+                BoolFlagName[i], condstrings[(int)condition->BoolFlag[i]]);
+        }
     }
     //
     //	Min/Max vital percents

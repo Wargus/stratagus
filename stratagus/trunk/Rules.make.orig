@@ -192,7 +192,6 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 ## There are some still not well tested code parts or branches.
 ## UNIT_ON_MAP		Fast lookup of units
 ## UNITS_ON_MAP		Faster lookup of units
-## NEW_AI		New better improved AI code
 ## USE_TILECACHE	Faster tile drawing, costs memory.
 ## USE_SMART_TILECACHE	Faster tile drawing, slow with hardware video memory.
 ## USE_HP_FOR_XP	Use hit-points for XP calculations.
@@ -210,7 +209,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 ## HIERARCHIC_PATHFINDER	Use hierarchic pathfinder
 ## USE_LUA		Lua scripting support
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DUNIT_ON_MAP -DNEW_AI -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
+	-DUNIT_ON_MAP -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
 	-DUSE_HP_FOR_XP # -DNEW_MAPDRAW=1 -DNEW_SHIPS
 
 ## choose optimise level

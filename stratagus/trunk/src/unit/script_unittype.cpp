@@ -62,6 +62,9 @@ global _AnimationsHash AnimationsHash;	/// Animations hash table
 
 local ccl_smob_type_t SiodUnitTypeTag;		/// siod unit-type object
 
+global char **BoolFlagName = NULL;	/// Name of user defined flag
+global int NumberBoolFlag = 0;		/// Number of defined flags.
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -128,6 +131,11 @@ local SCM CclDefineUnitType(SCM list)
 	type->_RegenerationRate = 0;
 	type->Selectable = 1;
     }
+    type->BoolFlag = realloc(type->BoolFlag, NumberBoolFlag * sizeof (*type->BoolFlag));
+    memset(type->BoolFlag, 0, NumberBoolFlag * sizeof (*type->BoolFlag));
+    type->CanTargetFlag = realloc(type->CanTargetFlag, NumberBoolFlag * sizeof (*type->CanTargetFlag));
+    memset(type->CanTargetFlag, 0, NumberBoolFlag * sizeof (*type->CanTargetFlag));
+
     type->NumDirections = 8;
 
     //
@@ -406,8 +414,6 @@ local SCM CclDefineUnitType(SCM list)
 
 	} else if (gh_eq_p(value, gh_symbol2scm("building"))) {
 	    type->Building = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("wall"))) {
-	    type->Wall = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("builder-outside"))) {
 	    type->BuilderOutside = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("builder-lost"))) {
@@ -429,8 +435,6 @@ local SCM CclDefineUnitType(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("clicks-to-explode"))) {
 	    type->ClicksToExplode = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("sniper"))) {
-	    type->Sniper = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("permanent-cloak"))) {
 	    type->PermanentCloak = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("detect-cloak"))) {
@@ -506,12 +510,8 @@ local SCM CclDefineUnitType(SCM list)
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("vanishes"))) {
 	    type->Vanishes = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("hero"))) {
-	    type->Hero = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("volatile"))) {
 	    type->Volatile = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("isundead"))) {
-	    type->IsUndead = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("can-cast-spell"))) {
 	    //
 	    //    Warning: can-cast-spell should only be used AFTER all spells
@@ -535,8 +535,29 @@ local SCM CclDefineUnitType(SCM list)
 		sublist = gh_cdr(sublist);
 		type->Magic = 1;
 	    }
-	} else if (gh_eq_p(value, gh_symbol2scm("organic"))) {
-	    type->Organic = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("can-target-flag"))) {
+	    //
+	    //    Warning: can-target-flag should only be used AFTER all bool flags
+	    //    have been defined.
+	    //
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		for (i = 0; i < NumberBoolFlag; i++) {
+		    if (gh_eq_p(value, gh_symbol2scm(BoolFlagName[i]))) {
+		        type->CanTargetFlag[i] = Scm2Condition(gh_car(sublist));
+		        sublist = gh_cdr(sublist);
+		        break;
+		    }
+		}
+		if (i != NumberBoolFlag) {
+		    continue;
+		}
+		printf("\n%s\n", type->Name);
+		errl("Unsupported flag tag for can-target-flag", value);
+	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("selectable-by-rectangle"))) {
 	    type->SelectableByRectangle = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("teleporter"))) {
@@ -596,6 +617,15 @@ local SCM CclDefineUnitType(SCM list)
 		}
 	    }
 	} else {
+            for (i = 0; i < NumberBoolFlag; i++) { // User defined bool flags
+                if (gh_eq_p(value, gh_symbol2scm(BoolFlagName[i]))) {
+                    type->BoolFlag[i] = 1;
+                    break;
+	        }
+            }
+            if (i != NumberBoolFlag) {
+                continue;
+	    }
 	   // FIXME: this leaves a half initialized unit-type
 	   printf("\n%s\n",type->Name);
 	   errl("Unsupported tag", value);
@@ -978,7 +1008,7 @@ local SCM CclDefineAnimations(SCM list)
 	    if (anims->Attack) {
 		free(anims->Attack);
 	    }
-	    anims->Attack=anim;
+	    anims->Attack = anim;
 	} else if (gh_eq_p(id, gh_symbol2scm("die"))) {
 	    if (anims->Die) {
 		free(anims->Die);
@@ -995,6 +1025,37 @@ local SCM CclDefineAnimations(SCM list)
     return SCM_UNSPECIFIED;
 }
 
+/*
+**	Define boolean flag.
+**
+**	@param list : list of flags' name.
+*/
+local SCM CclDefineBoolFlags(SCM list)
+{
+    char* str;
+    int i;
+
+    if (NumberBoolFlag != 0) {
+        DebugLevel0("Warning, Redefine Bool flags\n");
+    }
+    while (!gh_null_p(list)) {
+        str = gh_scm2newstr(gh_car(list), NULL);
+        list = gh_cdr(list);
+        for (i = 0; i < NumberBoolFlag; i++) {
+            if (!strcmp(str, BoolFlagName[i])) {
+                DebugLevel0("Warning, Bool flags already defined\n");
+                break;
+            }
+	}
+        if (i != NumberBoolFlag) {
+            break;
+	}
+        BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof (*BoolFlagName));
+        BoolFlagName[NumberBoolFlag++] = str;
+    }
+    return SCM_UNSPECIFIED;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -1004,6 +1065,7 @@ global void UnitTypeCclRegister(void)
 {
     gh_new_procedureN("define-unit-type", CclDefineUnitType);
     gh_new_procedureN("define-unit-stats", CclDefineUnitStats);
+    gh_new_procedureN("define-bool-flags", CclDefineBoolFlags);
 
     SiodUnitTypeTag = CclMakeSmobType("UnitType");
 

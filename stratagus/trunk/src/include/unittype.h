@@ -293,16 +293,6 @@
 **		If this is non-zero, then after that many clicks the unit will
 **		commit suicide. Doesn't work with resource workers/resources.
 **
-**	UnitType::Sniper
-**
-**		This unit can only hit organic units.
-**		TODO: have a table of armor types and damage types with damage
-**		modifiers.
-**
-**	UnitType::Wall
-**
-**		This Unit is a wall, and should exihibit joining properties
-**
 **	UnitType::Building
 **
 **		Unit is a Building
@@ -375,10 +365,6 @@
 **
 **		Can do command ground attack
 **
-**	UnitType::IsUndead
-**
-**		Unit is already dead
-**
 **	UnitType::ShoreBuilding
 **
 **		Building must be build on coast
@@ -413,19 +399,9 @@
 **		Only valid for buildings without the BuilderOutside flag.
 **		The worker is lost when the building is completed.
 **
-**	UnitType::Hero
-**
-**		FIXME:  I don't think w*rcr*ft 2 exp heroes have this flag.
-**		This is should be used for spells, to make heroes imune to
-**		instant kill spells (like polymorph)
-**
 **	UnitType::Volatile
 **
 **		Unit is a suicide bomber	
-**
-**	UnitType::Organic
-**
-**		Organic can be healed
 **
 **	UnitType::SelectableByRectangle
 **
@@ -740,8 +716,6 @@ struct _unit_type_ {
     unsigned AirUnit : 1;		/// Air animated
     unsigned SeaUnit : 1;		/// Sea animated
     unsigned ExplodeWhenKilled : 1;	/// Death explosion animated
-    unsigned Sniper : 1;		/// The unit can only hit organic units.
-    unsigned Wall : 1;			/// Wall
     unsigned Building : 1;		/// Building
     unsigned PermanentCloak : 1;	/// Is only visible by CloakDetectors.
     unsigned DetectCloak : 1;		/// Can see Cloaked units.
@@ -749,16 +723,15 @@ struct _unit_type_ {
     unsigned Transporter : 1;		/// Can transport units
     unsigned Vanishes : 1;		/// Corpes & destroyed places.
     unsigned GroundAttack : 1;		/// Can do command ground attack.
-    unsigned IsUndead : 1;		/// Unit is already dead.
     unsigned ShoreBuilding : 1;		/// Building must be build on coast.
     unsigned CanAttack : 1;		/// Unit can attack.
     unsigned BuilderOutside : 1;	/// The builder stays outside during the build.
     unsigned BuilderLost : 1;		/// The builder is lost after the build.
-    unsigned Hero : 1;			/// Is hero only used for triggers .
     unsigned Volatile : 1;		/// Unit is a suicide bomber.
-    unsigned Organic : 1;		/// Organic can be healed.
     unsigned CanHarvest : 1;		/// Resource can be harvested.
     unsigned Harvester : 1;		/// unit is a resource harvester.
+    unsigned char *BoolFlag;		/// User defined flag. Used for (dis)allow target.
+    unsigned char *CanTargetFlag;	/// Flag needed to target with missile.
 
     unsigned SelectableByRectangle : 1;	/// Selectable with mouse rectangle.
     unsigned Selectable : 1;		/// Unit Is Selectable at all.
@@ -818,6 +791,9 @@ extern UnitType*UnitTypeOrcWall;		/// Orc wall
 
 extern char** UnitTypeWcNames;			/// Mapping wc-number 2 symbol
 
+extern char **BoolFlagName;			/// Array of name of user defined bool flag.
+extern int NumberBoolFlag;			/// Number of user defined bool flag.
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -832,6 +808,7 @@ extern UnitType* UnitTypeByWcNum(unsigned);		/// Get unit-type by wc number
     /// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
 
+extern void SaveFlags(CLFile* file);			/// Save declaration of user defined flas.
 extern void SaveUnitTypeDefs(CLFile* file);		/// Declare the unit-type table first.
 extern void SaveUnitTypes(CLFile* file);		/// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);		/// Allocate an empty unit-type slot

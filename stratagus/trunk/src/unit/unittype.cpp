@@ -481,17 +481,17 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	unittype->CanStore[GoldCost] = BIT(12, v);
 	unittype->Vanishes = BIT(13, v);
 	unittype->GroundAttack = BIT(14, v);
-	unittype->IsUndead = BIT(15, v);
+//	unittype->IsUndead = BIT(15, v);
 	unittype->ShoreBuilding = BIT(16, v);
 //	unittype->CanCastSpell = BIT(17,v);
 //	unittype->CanCastSpell = (char*)malloc(/*nb_spell*/);
 	unittype->CanCastSpell = NULL;//
 	unittype->CanStore[WoodCost] = BIT(18, v);
 	unittype->CanAttack = BIT(19, v);
-	unittype->Hero = BIT(23, v);
+//	unittype->Hero = BIT(23, v);
 	unittype->CanStore[OilCost] = BIT(24, v);
 	unittype->Volatile = BIT(25, v);
-	unittype->Organic = BIT(27, v);
+//	unittype->Organic = BIT(27, v);
 	
 	if (BIT(11, v) || BIT(21, v)) {
 	    unittype->GivesResource = OilCost;
@@ -890,6 +890,14 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 	}
 	CLprintf(file, "\n");
     }
+    CLprintf(file, "'can-target-flag '(");
+    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+        if (type->CanTargetFlag[i] != CONDITION_TRUE) {
+            CLprintf(file, "%s %s ", BoolFlagName[i],
+                type->CanTargetFlag[i] == CONDITION_ONLY ? "only" : "false");
+        }
+    }
+    CLprintf(file, ") ");
 
     if (type->Building) {
 	CLprintf(file, "  'building");
@@ -922,9 +930,6 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     }
     if (type->ClicksToExplode) {
 	CLprintf(file, "  'clicks-to-explode %d\n", type->ClicksToExplode);
-    }
-    if (type->Sniper) {
-	CLprintf(file, "  'sniper \n");
     }
     if (type->Revealer) {
 	CLprintf(file, "  'revealer\n");
@@ -1034,23 +1039,19 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     if (type->Vanishes) {
 	CLprintf(file, "  'vanishes\n");
     }
-    if (type->Hero) {
-	CLprintf(file, "  'hero\n");
-    }
     if (type->Volatile) {
 	CLprintf(file, "  'volatile\n");
-    }
-    if (type->IsUndead) {
-	CLprintf(file, "  'isundead\n");
-    }
-    if (type->Organic) {
-	CLprintf(file, "  'organic\n");
     }
     if (type->SelectableByRectangle) {
 	CLprintf(file, "  'selectable-by-rectangle\n");
     }
     if (type->Teleporter) {
 	CLprintf(file, "  'teleporter\n");
+    }
+    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+        if (type->BoolFlag[i]) {
+            CLprintf(file, "  '%s\n", BoolFlagName[i]);
+        }
     }
 
 
@@ -1117,6 +1118,24 @@ local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
     }
 
     CLprintf(file, ") )\n");
+}
+
+ /**
+**	Save declaration of user defined flags.
+**
+**	@param file	Output file.
+*/
+global void SaveFlags(CLFile* file)
+{
+    int i;
+
+    if (NumberBoolFlag != 0) {
+        CLprintf(file, "(define-bool-flags");
+        for (i = 0; i < NumberBoolFlag; i++) {
+            CLprintf(file, " '%s", BoolFlagName[i]);
+        }
+        CLprintf(file, ")\n");
+    }
 }
 
 /**
@@ -1479,6 +1498,9 @@ global void CleanUnitTypes(void)
 	DebugCheck(!type->Name);
 	free(type->Name);
 
+	free(type->BoolFlag);
+	free(type->CanTargetFlag);
+
     	if (type->SameSprite) {
 	    free(type->SameSprite);
 	}
@@ -1562,6 +1584,13 @@ global void CleanUnitTypes(void)
 	UnitTypes[i] = 0;
     }
     NumUnitTypes = 0;
+
+    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+        free(BoolFlagName[i]);
+    }
+    free(BoolFlagName);
+    BoolFlagName = NULL;
+    NumberBoolFlag = 0;
 
     //
     //	Clean hardcoded unit types.

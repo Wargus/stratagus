@@ -3311,9 +3311,14 @@ global int IsSharedVision(const Player* player, const Unit* dest)
 */
 global int CanTarget(const UnitType* source, const UnitType* dest)
 {
-    //  Hack for snipers, can only target organic units.
-    if (!dest->Organic && source->Sniper) {
-	return 0;
+    int i;
+
+    for (i = 0; i < NumberBoolFlag; i++) {
+        if (source->CanTargetFlag[i] != CONDITION_TRUE) {
+            if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
+                return 0;
+            }
+        }
     }
     if (dest->UnitType == UnitTypeLand) {
 	if (dest->ShoreBuilding) {

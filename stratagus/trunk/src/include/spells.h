@@ -96,6 +96,11 @@ struct _spell_action_type_ {
     // FIXME" some time information doesn't work as it should.
     union {
 	struct {
+	    int HP;			/// Target HP gain.(can be negative)
+	    int Mana;			/// Target Mana gain.(can be negative)
+	} AreaAdjustVitals;
+
+	struct {
 	    int Damage;					/// Missile damage.
 	    int TTL;					/// Missile TTL.
 	    int Delay;					/// Missile original delay.
@@ -184,14 +189,12 @@ typedef struct ConditionInfo {
 #define CONDITION_FALSE 1
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
-    char Undead;		/// Target is undead.
     char Volatile;		/// Target is volatile (suicide bomber).
-    char Organic;		/// Target is organic.
-    char Hero;			/// Target is hero. Set this to false for instant-kill spells.
     char Coward;		/// Target is coward. Don't bloodlust them.
     char Alliance;		/// Target is allied.
     char Building;		/// Target is a building.
     char TargetSelf;		/// Target is the same as the caster.
+    char *BoolFlag;		/// User defined boolean flag.
 	/// FIXME: NOT IMPLEMENTED:
     char UnitBuffed;		/// Target is buffed(haste/slow/bloodlust). Dispel magic?
     //
@@ -218,7 +221,6 @@ typedef struct ConditionInfo {
 
 /**
 **	Informations about the autocasting mode.
-**
 */
 typedef struct {
     /// FIXME: this below is SQUARE!!!
@@ -322,10 +324,14 @@ extern SpellType* SpellTypeById(int Id);
 
 extern unsigned CclGetSpellByIdent(SCM value);
 
+// return 0, 1, 2 for true, only, false.
+extern char Scm2Condition(SCM value);
+
 /*
 **	Spelltype to cast.
 */
 
+SpellFunc CastAreaAdjustVitals;
 SpellFunc CastAdjustVitals;
 SpellFunc CastAdjustBuffs;
 SpellFunc CastPolymorph;
