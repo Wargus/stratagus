@@ -1507,11 +1507,15 @@ global void RescueUnits(void)
 		}
 		DebugLevel3(" = %d\n",n);
 		//
-		//	Look if human near the unit.
+		//	Look if ally near the unit.
 		//
 		for( i=0; i<n; ++i ) {
+#if 0
 		    if( around[i]->Type->CanAttack &&
 			    around[i]->Player->Type==PlayerPerson ) {
+#endif
+		    if( around[i]->Type->CanAttack &&
+			    IsAllied(unit->Player,around[i]) ) {
 			ChangeUnitOwner(unit,unit->Player,around[i]->Player);
 			// FIXME: more races?
 			if( unit->Player->Race==PlayerRaceHuman ) {
