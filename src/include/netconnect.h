@@ -194,6 +194,7 @@ extern void NetworkServerSetup(WorldMap *map);	/// Connection server setup
 extern void NetworkClientSetup(WorldMap *map);	/// Connection client setup
 extern void NetworkSetupArgs(void);		/// Setup command line connection parameters
 extern void NetworkServerStartGame(void);	/// Server user has finally hit the start game button
+extern void NetworkConnectSetupGame(void);	/// Assign Player slot, evaluate Setup state..
 
 extern void NetworkInitClientConnect(void); /// Setup network connect state machine for clients
 extern void NetworkExitClientConnect(void); /// Terminate network connect state machine for clients
