@@ -514,7 +514,10 @@ echo
 # libbz2
 LIBCHECK="-lbz2"; check_for_libs
 if test "$?" = 0 ; then HAVE_LIBBZ2=1; fi
-if test "$WIN32" = 1 ; then HAVE_LIBBZ2=0; fi	# Bzip2 not supported by Cygwin
+
+# libzzip
+LIBCHECK="-lzzip"; check_for_libs
+if test "$?" = 0 ; then HAVE_LIBZZIP=1; fi
 
 # Determine default compression option based on what's available
 
@@ -545,6 +548,9 @@ fi
 if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1) ; then
   echo "  O-Both GZ and Bzip2"$DEF4
 fi
+if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1 && test "$HAVE_LIBZZIP" = 1 ) ; then
+  echo "  A-All ZZip and GZ and Bzip2"$DEF5
+fi
 echo
 echo -n "Please enter selection ($COMPDEF): "
 read COMPOPT
@@ -570,6 +576,11 @@ case $COMPOPT in
 	echo "Using GZ and Bzip2 compression"
 	echo "ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB" >> $RULESFILE
 	echo "ZLIBS		= -lz -lbz2" >> $RULESFILE
+	;;
+  [aA])
+	echo "Using GZ, Bzip2, ZZip  compression"
+	echo "ZDEFS		= -DUSE_ZZIPLIB -DUSE_ZLIB -DUSE_BZ2LIB" >> $RULESFILE
+	echo "ZLIBS		= -lzzip -lz -lbz2" >> $RULESFILE
 	;;
 
   *)
