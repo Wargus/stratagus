@@ -292,7 +292,7 @@ local void MoveToTarget(Unit* unit)
 		&& MapDistance(unit->X,unit->Y
 		    ,unit->Orders[0].X,unit->Orders[0].Y)
 			<=unit->Stats->AttackRange ) {
-	    DebugLevel3Fn("Attacking wall or ground\n");
+	    DebugLevel2Fn("Attacking wall or ground\n");
 	    unit->State=0;
 	    if( !unit->Type->Tower ) {
 		UnitHeadingFromDeltaXY(unit,unit->Orders[0].X-unit->X
@@ -301,7 +301,7 @@ local void MoveToTarget(Unit* unit)
 		CheckUnitToBeDrawn(unit);
 	    }
 	    unit->SubAction&=WEAK_TARGET;
-	    unit->SubAction|=MOVE_TO_TARGET;
+	    unit->SubAction|=ATTACK_TARGET;
 	    return;
 	} else if( err<0 ) {
 	    unit->State=unit->SubAction=0;
