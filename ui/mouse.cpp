@@ -66,18 +66,18 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-enum _mouse_buttons_ MouseButtons;/// Current pressed mouse buttons
+enum _mouse_buttons_ MouseButtons;           ///< Current pressed mouse buttons
 
-enum _key_modifiers_ KeyModifiers;/// Current keyboard modifiers
+enum _key_modifiers_ KeyModifiers;           ///< Current keyboard modifiers
 
-Unit* UnitUnderCursor;				/// Unit under cursor
-int ButtonAreaUnderCursor = -1;  /// Button area under cursor
-int ButtonUnderCursor = -1;		/// Button under cursor
-char GameMenuButtonClicked;		/// Menu button was clicked
-char GameDiplomacyButtonClicked; /// Diplomacy button was clicked
-char LeaveStops;						/// Mouse leaves windows stops scroll
+Unit* UnitUnderCursor;                       ///< Unit under cursor
+int ButtonAreaUnderCursor = -1;              ///< Button area under cursor
+int ButtonUnderCursor = -1;                  ///< Button under cursor
+char GameMenuButtonClicked;                  ///< Menu button was clicked
+char GameDiplomacyButtonClicked;             ///< Diplomacy button was clicked
+char LeaveStops;                             ///< Mouse leaves windows stops scroll
 
-enum _cursor_on_ CursorOn = CursorOnUnknown;		/// Cursor on field
+enum _cursor_on_ CursorOn = CursorOnUnknown; ///< Cursor on field
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -567,7 +567,7 @@ static void HandleMouseOn(int x, int y)
 
 /**
 **  Handle cursor exits the game window (only for some videomodes)
-**  FIXME: make it so that the game is partially 'paused'.
+**  @todo FIXME: make it so that the game is partially 'paused'.
 **         Game should run (for network play), but not react on or show
 **         interactive events.
 */
@@ -1118,7 +1118,7 @@ static int SendSpellCast(int sx, int sy)
 
 	dest = UnitUnderCursor;
 
-	/*		NOTE: Vladi:
+	/* NOTE: Vladi:
 	   This is a high-level function, it sends target spot and unit
 	   (if exists). All checks are performed at spell cast handle
 	   function which will cancel function if cannot be executed
@@ -1506,7 +1506,7 @@ void UIHandleButtonDown(unsigned button)
 				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y)) &&
 						!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;                // if right click on building -- blink
-				} else {		// if not not click on building -- green cross
+				} else { // if not not click on building -- green cross
 					if (ClickMissile) {
 						MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 							TheUI.MouseViewport->MapX * TileSizeX +
@@ -1542,7 +1542,7 @@ void UIHandleButtonDown(unsigned button)
 	//
 	} else if (CursorOn == CursorOnButton) {
 		//
-		//		clicked on info panel - selection shown
+		// clicked on info panel - selection shown
 		//
 		if (NumSelected > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
 			DoSelectionButtons(ButtonUnderCursor, button);
@@ -1721,11 +1721,11 @@ void UIHandleButtonUp(unsigned button)
 	// FIXME: must selecting!  (lokh: what does this mean? is this done now?)
 
 	// SHIFT toggles select/unselect a single unit and
-	//				add the content of the rectangle to the selectection
+	// add the content of the rectangle to the selectection
 	// ALT takes group of unit
 	// CTRL takes all units of same type (st*rcr*ft)
 	if (CursorState == CursorStateRectangle &&
-			!(MouseButtons & LeftButton)) {				// leave select mode
+			!(MouseButtons & LeftButton)) { // leave select mode
 		int num;
 		Unit* unit;
 
@@ -1888,7 +1888,7 @@ static int GetPieUnderCursor(void)
 	y = CursorY - (CursorStartY - ICON_SIZE_Y / 2);
 	for (i = 0; i < 8; ++i) {
 		if (x > TheUI.PieX[i] && x < TheUI.PieX[i] + ICON_SIZE_X &&
-				y > TheUI.PieY[i] && y < TheUI.PieY[i] + ICON_SIZE_Y)	{
+				y > TheUI.PieY[i] && y < TheUI.PieY[i] + ICON_SIZE_Y) {
 			return i;
 		}
 	}
@@ -1909,7 +1909,7 @@ void DrawPieMenu(void)
 	if (CursorState != CursorStatePieMenu)
 		return;
 
-	if (!(buttons = CurrentButtons)) {		// no buttons
+	if (!(buttons = CurrentButtons)) { // no buttons
 		CursorState = CursorStatePoint;
 		return;
 	}
@@ -1936,7 +1936,7 @@ void DrawPieMenu(void)
 			// Draw icon
 			DrawIcon(player, buttons[i].Icon.Icon, x, y);
 
-			//	Tutorial show command key in icons
+			// Tutorial show command key in icons
 			if (ShowCommandKey) {
 				char* text;
 

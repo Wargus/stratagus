@@ -11,7 +11,7 @@
 /**@name mainscr.c - The main screen. */
 //
 //      (c) Copyright 1998-2004 by Lutz Sammer, Valery Shchedrin,
-//	                            and Jimmy Salmon
+//                             and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ static void UiDrawCompletedBar(int full, int ready)
 		VideoDrawVLine(ColorWhite, TheUI.CompletedBarX, TheUI.CompletedBarY, TheUI.CompletedBarH );
 		VideoDrawHLine(ColorWhite, TheUI.CompletedBarX, TheUI.CompletedBarY, f );
 	}
-		
+
 	if (TheUI.CompletedBarText) {
 		VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
 			TheUI.CompletedBarFont, TheUI.CompletedBarText);
@@ -522,7 +522,7 @@ static void DrawUnitInfo(const Unit* unit)
 	//  Non-attacking buildings.
 	//
 	if (type->Building && !type->CanAttack) {
-		if (type->Supply) {				// Supply unit
+		if (type->Supply) { // Supply unit
 			VideoDrawText(x + 16, y + 8 + 63, GameFont, "Usage");
 			VideoDrawText(x + 58, y + 8 + 78, GameFont, "Supply:");
 			VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->Player->Supply);
@@ -619,7 +619,7 @@ static void DrawUnitInfo(const Unit* unit)
 			// max mana can vary for the unit
 			i = (100 * unit->Mana) / unit->Type->_MaxMana;
 			i = (i * w) / 100;
-			VideoDrawRectangleClip(ColorGray, x + 16,     y + 8 + 140,     w + 4, 16	);
+			VideoDrawRectangleClip(ColorGray, x + 16,     y + 8 + 140,     w + 4, 16 );
 			VideoDrawRectangleClip(ColorBlack,x + 16 + 1, y + 8 + 140 + 1, w + 2, 16 - 2);
 			VideoFillRectangleClip(ColorBlue, x + 16 + 2, y + 8 + 140 + 2, i,     16 - 4);
 
@@ -1040,9 +1040,9 @@ void ClearStatusLine(void)
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-static int CostsFood;                        /// mana cost to display in status line
-static int CostsMana;						/// mana cost to display in status line
-static int Costs[MaxCosts];                  /// costs to display in status line
+static int CostsFood;                        ///< mana cost to display in status line
+static int CostsMana;                        ///< mana cost to display in status line
+static int Costs[MaxCosts];                  ///< costs to display in status line
 
 /**
 **  Draw costs in status line.
