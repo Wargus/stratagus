@@ -132,9 +132,6 @@ local void ChangeTile(int x, int y, int tile)
 **	@param x	X map tile coordinate.
 **	@param y	Y map tile coordinate.
 **	@param tile	Tile type to edit.
-**
-**	@todo	FIXME: The flags are currently used hardcoded and not from
-**		config file.
 */
 local void EditTile(int x, int y, int tile)
 {
@@ -211,6 +208,36 @@ local void EditTile(int x, int y, int tile)
     UpdateMinimapXY(x,y);
 }
 
+/**
+**	Edit tiles.
+**
+**	@param x	X map tile coordinate.
+**	@param y	Y map tile coordinate.
+**	@param tile	Tile type to edit.
+**	@param size	Size of rectangle
+*/
+local void EditTiles(int x, int y, int tile, int size)
+{
+    int ex;
+    int ey;
+    int i;
+
+    ex = x + size;
+    if (ex >= TheMap.Width) {
+	ex = TheMap.Width - 1;
+    }
+    ey = y + size;
+    if (ey >= TheMap.Height) {
+	ey = TheMap.Height - 1;
+    }
+    while (y < ey) {
+	for (i = x; i < ex; ++i) {
+	    EditTile(i, y, tile);
+	}
+	++y;
+    }
+}
+
 /*----------------------------------------------------------------------------
 --	Display
 ----------------------------------------------------------------------------*/
@@ -229,50 +256,59 @@ local void DrawTileIcons(void)
     int y;
     int i;
 
-
     x = TheUI.InfoPanelX + 46;
     y = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 11;
 
-    VideoDrawTextCentered(x, y,      GameFont, "1x1");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    if( CursorOn == CursorOnButton &&
+	    ButtonUnderCursor >= 300 && ButtonUnderCursor < 306 ) { 
+	VideoDrawRectangle(ColorGray, x - 42,
+		y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
+    }
+
+    VideoDrawTextCentered(x, y, GameFont, "1x1");
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
     y += 20;
     VideoDrawTextCentered(x, y, GameFont, "2x2");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
     y += 20;
     VideoDrawTextCentered(x, y, GameFont, "3x3");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
     y += 20;
     VideoDrawTextCentered(x, y, GameFont, "4x4");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
     y += 20;
     VideoDrawTextCentered(x, y, GameFont, "Random");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE - 1, x + 40, y - 3);
     y += 20;
     VideoDrawTextCentered(x, y, GameFont, "Filler");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE + 2, x + 40, y - 3);
+    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE - 1, x + 40, y - 3);
     y += 20;
 
-    tiles=TheMap.Tiles;
+    tiles = TheMap.Tiles;
 
-    y=TheUI.ButtonPanelY+4;
-    i=0;
+    y = TheUI.ButtonPanelY + 4;
+    i = 0;
 
-    while( y<TheUI.ButtonPanelY+100 ) {
-	x=TheUI.ButtonPanelX+4;
-	while( x<TheUI.ButtonPanelX+144 ) {
-	    VideoDrawTile(tiles[TheMap.Tileset->Table[0x10+i*16]],x,y);
-	    VideoDrawRectangle(ColorGray,x,y,32,32);
-	    if( TileCursor == i ) {
-		VideoDrawRectangle(ColorGreen,x+1,y+1,30,30);
+    while (y < TheUI.ButtonPanelY + 100) {
+	x = TheUI.ButtonPanelX + 4;
+	while (x < TheUI.ButtonPanelX + 144) {
+	    VideoDrawTile(tiles[TheMap.Tileset->Table[0x10 + i * 16]], x, y);
+	    VideoDrawRectangle(ColorGray, x, y, 32, 32);
+	    if (TileCursor == i) {
+		VideoDrawRectangle(ColorGreen, x + 1, y + 1, 30, 30);
 
 	    }
-	    if( CursorOn == CursorOnButton && ButtonUnderCursor == i + 100 ) {
-		VideoDrawRectangle(ColorWhite,x-1,y-1,34,34);
+	    if (CursorOn == CursorOnButton && ButtonUnderCursor == i + 100) {
+		VideoDrawRectangle(ColorWhite, x - 1, y - 1, 34, 34);
 	    }
-	    x+=34;
+	    x += 34;
 	    i++;
 	}
-	y+=34;
+	y += 34;
     }
 }
 
@@ -518,8 +554,8 @@ local void DrawMapCursor(void)
     //
     //  Draw map cursor
     //
-    v = TheUI.LastClickedVP;
-    if (v != -1 && !CursorBuilding ) {
+    v = TheUI.ActiveViewport;
+    if (v != -1 && !CursorBuilding) {
 	x = Viewport2MapX(v, CursorX);
 	y = Viewport2MapY(v, CursorY);
 	x = Map2ViewportX(v, x);
@@ -528,16 +564,31 @@ local void DrawMapCursor(void)
 	    int i;
 	    int j;
 
-	    for( i=0; i<TileCursorSize; ++i ) {
-		for( j=0; j<TileCursorSize; ++j ) {
+	    for (j = 0; j < TileCursorSize; ++j) {
+		int ty;
+
+		ty = y + j * TileSizeY;
+		if (ty >= TheUI.VP[v].EndY) {
+		    break;
+		}
+		for (i = 0; i < TileCursorSize; ++i) {
+		    int tx;
+
+		    tx = x + i * TileSizeX;
+		    if (tx >= TheUI.VP[v].EndX) {
+			break;
+		    }
 		    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 +
-			    TileCursor * 16]], x + i, y + j);
+				TileCursor * 16]], tx, ty);
 		}
 	    }
-	    VideoDrawRectangle(ColorWhite, x, y, 32 * TileCursorSize,
-		    32 * TileCursorSize);
+	    SetClipping (TheUI.VP[v].X, TheUI.VP[v].Y,
+		TheUI.VP[v].EndX, TheUI.VP[v].EndY);
+	    VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
+		TileSizeY * TileCursorSize);
+	    SetClipping(0,0,VideoWidth-1,VideoHeight-1);
 	} else {
-	    VideoDrawRectangle(ColorWhite, x, y, 32, 32);
+	    VideoDrawRectangle(ColorWhite, x, y, TileSizeX, TileSizeY);
 	}
     }
 }
@@ -769,6 +820,7 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
     //
     if (CursorOn == CursorOnButton) {
 	if (ButtonUnderCursor == SelectButton) {
+	    CursorBuilding = NULL;
 	    EditorState = EditorSelecting;
 	    return;
 	}
@@ -777,6 +829,7 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	    return;
 	}
 	if (ButtonUnderCursor == TileButton) {
+	    CursorBuilding = NULL;
 	    EditorState = EditorEditTile;
 	    return;
 	}
@@ -787,6 +840,23 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
     //
     if( CursorOn == CursorOnButton && ButtonUnderCursor >= 100 
 	    && EditorState == EditorEditTile ) {
+	switch( ButtonUnderCursor ) {
+	    case 300:
+		TileCursorSize = 1;
+		return;
+	    case 301:
+		TileCursorSize = 2;
+		return;
+	    case 302:
+		TileCursorSize = 3;
+		return;
+	    case 303:
+		TileCursorSize = 4;
+		return;
+	    case 304:			// FIXME:
+	    case 305:			// FIXME:
+		return;
+	}
 	TileCursor = ButtonUnderCursor - 100;
 	return;
     }
@@ -838,8 +908,9 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	MustRedraw = RedrawMinimapCursor | RedrawMap;
 
 	if( EditorState == EditorEditTile ) {
-	    EditTile(Viewport2MapX(TheUI.ActiveViewport, CursorX),
-		    Viewport2MapY(TheUI.ActiveViewport, CursorY),TileCursor);
+	    EditTiles(Viewport2MapX(TheUI.ActiveViewport, CursorX),
+		    Viewport2MapY(TheUI.ActiveViewport, CursorY),
+		    TileCursor,TileCursorSize);
 	}
 	if( EditorState == EditorEditUnit && CursorBuilding ) {
 	    if( CanBuildUnitType(NULL, CursorBuilding,
@@ -1017,13 +1088,14 @@ local void EditorCallbackMouse(int x, int y)
 	// FIXME: should scroll the map!
 	viewport = GetViewport(x, y);
 	if (viewport >= 0 && viewport == TheUI.ActiveViewport) {
-	    EditTile(Viewport2MapX(TheUI.ActiveViewport, CursorX),
-		Viewport2MapY(TheUI.ActiveViewport, CursorY),TileCursor);
+	    EditTiles(Viewport2MapX(TheUI.ActiveViewport, CursorX),
+		Viewport2MapY(TheUI.ActiveViewport, CursorY), TileCursor,
+		TileCursorSize);
 	}
 	return;
     }
 
-    OldCursorOn=CursorOn;
+    OldCursorOn = CursorOn;
 
     MouseScrollState = ScrollNone;
     GameCursor = TheUI.Point.Cursor;
@@ -1112,6 +1184,20 @@ local void EditorCallbackMouse(int x, int y)
     //  Handle tile area
     //
     if (EditorState == EditorEditTile) {
+	i = 0;
+	bx = TheUI.InfoPanelX + 4;
+	by = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 10;
+
+	while( i < 6 ) {
+	    if (bx < x && x < bx + 100 && by < y && y < by + 18) {
+		ButtonUnderCursor = i + 300;
+		CursorOn = CursorOnButton;
+		return;
+	    }
+	    ++i;
+	    by += 20;
+	}
+
 	i = 0;
 	by = TheUI.ButtonPanelY + 4;
 	while (by < TheUI.ButtonPanelY + 100) {
