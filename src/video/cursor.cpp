@@ -546,12 +546,13 @@ local void DrawBuildingCursor(void)
 		w = w0;
 		while (w--) {
 
-			// FIXME: The field is covered by fog of war!
 			if (f && (CursorBuilding->MustBuildOnTop ||
 					CanBuildOn(mx + w, my + h, mask & ((NumSelected &&
 						!CursorBuilding->BuilderOutside &&
 						Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
-							~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))
+							~(MapFieldLandUnit | MapFieldSeaUnit) : -1) &
+						(IsTileVisible(ThisPlayer, mx + w, my + h) == 1 ? 
+						~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding) : -1)))
 				  && IsMapFieldExplored(ThisPlayer, mx + w, my + h))  {
 				color = ColorGreen;
 			} else {
