@@ -10,12 +10,11 @@
 //
 /**@name sound.c	-	The sound. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -195,15 +194,14 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
 **	@param unit	Sound initiator, unit speaking
 **	@param voice	Type of sound wanted (Ready,Die,Yes,...)
 */
-global void PlayUnitSound(const Unit* unit,UnitVoiceGroup unit_voice_group)
+global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
 {
     InsertSoundRequest(unit,
 		       unit->Slot,
 		       ViewPointDistanceToUnit(unit),
-		       ChooseUnitVoiceSoundId(unit,unit_voice_group),
-		       unit_voice_group==VoiceAttacking,
-		       (unit_voice_group==VoiceSelected
-			||unit_voice_group==VoiceBuilding),
+		       ChooseUnitVoiceSoundId(unit,voice),
+		       voice==VoiceAttacking,
+		       (voice==VoiceSelected ||voice==VoiceBuilding),
 		       0);
 }
 
