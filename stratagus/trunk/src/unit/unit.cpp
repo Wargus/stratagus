@@ -1006,7 +1006,7 @@ global void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 	Unit* units[UnitMax];
 	Unit* unit;
 
-	n = SelectUnitsOnTile(x, y,units);
+	n = UnitCacheOnTile(x, y,units);
 	DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
 	while (n) {
 		unit = units[--n];
@@ -1046,7 +1046,7 @@ global void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 	Unit* units[UnitMax];
 	Unit* unit;
 
-	n = SelectUnitsOnTile(x, y, units);
+	n = UnitCacheOnTile(x, y, units);
 	DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
 	while (n) {
 		unit = units[--n];
@@ -1612,12 +1612,12 @@ global void RescueUnits(void)
 				// FIXME: Yes, but caller should check.
 				// NOTE: +1 right,bottom isn't inclusive :(
 				if (unit->Type->UnitType == UnitTypeLand) {
-					n = SelectUnits(
+					n = UnitCacheSelect(
 							unit->X - 1, unit->Y - 1,
 							unit->X + unit->Type->TileWidth + 1,
 							unit->Y + unit->Type->TileHeight + 1, around);
 				} else {
-					n = SelectUnits(
+					n = UnitCacheSelect(
 							unit->X - 2, unit->Y - 2,
 							unit->X + unit->Type->TileWidth + 2,
 							unit->Y + unit->Type->TileHeight + 2, around);

@@ -135,7 +135,7 @@ global int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unus
 	//		 Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (action->Data.Demolish.Damage) {
-		n = SelectUnits(xmin, ymin, xmax, ymax, table);
+		n = UnitCacheSelect(xmin, ymin, xmax, ymax, table);
 		for (i = 0; i < n; ++i) {
 			DebugLevel3("Hit an unit at %d %d?\n" _C_ table[i]->X _C_ table[i]->Y);
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP &&
@@ -235,7 +235,7 @@ global int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 	DebugCheck(!spell);
 	DebugCheck(!action);
 	// Get all the units around the unit
-	nunits = SelectUnits(x - spell->Range,
+	nunits = UnitCacheSelect(x - spell->Range,
 		y - spell->Range,
 		x + spell->Range + caster->Type->Width,
 		y + spell->Range + caster->Type->Height,
@@ -892,7 +892,7 @@ local Target* SelectTargetUnitsOfAutoCast(const Unit* caster, const SpellType* s
 	//
 	//		Select all units aroung the caster
 	//
-	nunits = SelectUnits(caster->X - range, caster->Y - range,
+	nunits = UnitCacheSelect(caster->X - range, caster->Y - range,
 		caster->X + range + caster->Type->TileWidth,
 		caster->Y + range + caster->Type->TileHeight, table);
 	//

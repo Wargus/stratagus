@@ -76,37 +76,30 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**		Select units in rectangle range.
+**		Select unit on X,Y of type naval,fly,land.
 **
-**		@param x1		Left column of selection rectangle
-**		@param y1		Top row of selection rectangle
-**		@param x2		Right column of selection rectangle
-**		@param y2		Bottom row of selection rectangle
-**		@param table		All units in the selection rectangle
+**		@param x		Map X tile position.
+**		@param y		Map Y tile position.
+**		@param type		UnitType::UnitType, naval,fly,land.
 **
-**		@return				Returns the number of units found
+**		@return				Unit, if an unit of correct type is on the field.
 */
-global int SelectUnits(int x1, int y1, int x2, int y2, Unit** table)
+global Unit* UnitCacheOnXY(int x, int y, unsigned type)
 {
-	if (x1 == x2 && y1 == y2) {
-		return UnitCacheOnTile(x1, y1, table);
-	} else {
-		return UnitCacheSelect(x1, y1, x2, y2, table);
-	}
-}
+	Unit* table[UnitMax];
+	int n;
 
-/**
-**		Select units on tile.
-**
-**		@param x		Map X tile position
-**		@param y		Map Y tile position
-**		@param table		All units in the selection rectangle
-**
-**		@return				Returns the number of units found
-*/
-global int SelectUnitsOnTile(int x, int y, Unit** table)
-{
-	return UnitCacheOnTile(x, y, table);
+	n = UnitCacheOnTile(x, y, table);
+	while (n--) {
+		if ((unsigned)table[n]->Type->UnitType == type) {
+			break;
+		}
+	}
+	if (n > -1) {
+		return table[n];
+	} else {
+		return NoUnitP;
+	}
 }
 
 /**
@@ -180,7 +173,7 @@ global Unit* UnitOnMapTile(int tx, int ty)
 	int n;
 	int i;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		// Note: this is less restrictive than UnitActionDie...
 		// Is it normal?
@@ -207,7 +200,7 @@ global Unit* RepairableOnMapTile(int tx, int ty)
 	int n;
 	int i;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type->RepairHP && table[i]->HP &&
 			table[i]->HP < table[i]->Stats->HitPoints) {
@@ -235,7 +228,7 @@ global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 	int n;
 	int i;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
@@ -282,7 +275,7 @@ global Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 	int n;
 	int i;
 
-	n = SelectUnits(x1, y1, x2, y2, table);
+	n = UnitCacheSelect(x1, y1, x2, y2, table);
 	best = NoUnitP;
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
@@ -322,7 +315,7 @@ global Unit* TransporterOnMapTile(int tx, int ty)
 	int n;
 	int i;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type->Transporter) {
 			return table[i];
@@ -380,7 +373,7 @@ global Unit* UnitTypeOnMap(int tx, int ty, UnitType* type)
 	int i;
 	int n;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type == type) {
 			return table[i];
@@ -404,7 +397,7 @@ global Unit* ResourceOnMap(int tx, int ty, int resource)
 	int i;
 	int n;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		if (UnitUnusable(table[i]) || !table[i]->Type->CanHarvest ||
 				table[i]->Value == 0) {
@@ -432,7 +425,7 @@ global Unit* ResourceDepositOnMap(int tx, int ty, int resource)
 	int i;
 	int n;
 
-	n = SelectUnitsOnTile(tx, ty, table);
+	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		if (UnitUnusable(table[i])) {
 			continue;
@@ -511,13 +504,13 @@ local Unit* FindRangeAttack(Unit* u, int range)
 	if (u->Removed) {
 		x = u->Container->X;
 		y = u->Container->Y;
-		n = SelectUnits(x - missile_range, y - missile_range,
+		n = UnitCacheSelect(x - missile_range, y - missile_range,
 			x + missile_range + u->Container->Type->TileWidth, 
 			y + missile_range + u->Container->Type->TileHeight, table);
 	} else {
 		x = u->X;
 		y = u->Y;
-		n = SelectUnits(x - missile_range, y - missile_range,
+		n = UnitCacheSelect(x - missile_range, y - missile_range,
 			x + missile_range + u->Type->TileWidth, 
 			y + missile_range + u->Type->TileHeight, table);
 	}
@@ -772,7 +765,7 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 	x = unit->X;
 	y = unit->Y;
 	type = unit->Type;
-	n = SelectUnits(x - range, y - range, x + range + type->TileWidth - 1,
+	n = UnitCacheSelect(x - range, y - range, x + range + type->TileWidth - 1,
 		y + range + type->TileHeight - 1, table);
 
 	best_unit = NoUnitP;

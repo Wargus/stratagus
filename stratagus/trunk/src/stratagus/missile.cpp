@@ -1035,7 +1035,7 @@ global void MissileHit(Missile* missile)
 	// Hits all units in range.
 	//
 	i = missile->Type->Range;
-	n = SelectUnits(x - i + 1, y - i + 1, x + i, y + i, table);
+	n = UnitCacheSelect(x - i + 1, y - i + 1, x + i, y + i, table);
 	DebugCheck(missile->SourceUnit == NULL);
 	for (i = 0; i < n; ++i) {
 		goal = table[i];
@@ -1807,7 +1807,7 @@ global void MissileActionFlameShield(Missile* missile)
 	if (missile->TTL & 7) {
 		return;
 	}
-	n = SelectUnits(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
+	n = UnitCacheSelect(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i] == unit) {
 			// cannot hit target unit
@@ -1837,7 +1837,7 @@ global void MissileActionLandMine(Missile* missile)
 	x = missile->X / TileSizeX;
 	y = missile->Y / TileSizeY;
 
-	n = SelectUnitsOnTile(x, y, table);
+	n = UnitCacheOnTile(x, y, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type->UnitType != UnitTypeFly &&
 				table[i]->HP &&
@@ -1988,7 +1988,7 @@ global void MissileActionDeathCoil(Missile* missile)
 			x = missile->DX / TileSizeX;
 			y = missile->DY / TileSizeY;
 
-			n = SelectUnits(x - 2, y - 2, x + 2, y + 2, table);
+			n = UnitCacheSelect(x - 2, y - 2, x + 2, y + 2, table);
 			if (n == 0) {
 				return;
 			}

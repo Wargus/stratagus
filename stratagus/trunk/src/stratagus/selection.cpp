@@ -347,7 +347,7 @@ global int SelectUnitsByType(Unit* base)
 	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	 * took parameters of the selection rectangle as arguments */
 	vp = TheUI.MouseViewport;
-	r = SelectUnits(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	r = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
 	// if unit is a cadaver or hidden (not on map)
@@ -445,7 +445,7 @@ global int ToggleUnitsByType(Unit* base)
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	// took parameters of the selection rectangle as arguments */
-	r = SelectUnits(TheUI.MouseViewport->MapX - 1,
+	r = UnitCacheSelect(TheUI.MouseViewport->MapX - 1,
 		TheUI.MouseViewport->MapY - 1,
 		TheUI.MouseViewport->MapX + TheUI.MouseViewport->MapWidth + 1,
 		TheUI.MouseViewport->MapY + TheUI.MouseViewport->MapHeight + 1, table);
@@ -674,7 +674,7 @@ global int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	}
 
 	//		If no unit in rectangle area... do nothing
-	toggle_num = SelectUnits((x0 / TileSizeX) - 2, (y0 / TileSizeY) - 2,
+	toggle_num = UnitCacheSelect((x0 / TileSizeX) - 2, (y0 / TileSizeY) - 2,
 		(x1 / TileSizeX) + 2 + 1, (y1 / TileSizeX) + 2 + 1, table);
 	if (!toggle_num) {
 		return NumSelected;
@@ -731,7 +731,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	tx1 = sx1 / TileSizeX;
 	ty1 = sy1 / TileSizeY;
 
-	r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+	r = UnitCacheSelect(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	//
@@ -826,7 +826,7 @@ global int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	tx1 = sx1 / TileSizeX;
 	ty1 = sy1 / TileSizeY;
 
-	r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+	r = UnitCacheSelect(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
@@ -881,7 +881,7 @@ global int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	tx1 = sx1 / TileSizeX;
 	ty1 = sy1 / TileSizeY;
 
-	r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+	r = UnitCacheSelect(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
@@ -950,7 +950,7 @@ global int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	tx1 = sx1 / TileSizeX;
 	ty1 = sy1 / TileSizeY;
 
-	r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+	r = UnitCacheSelect(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {
@@ -1024,7 +1024,7 @@ global int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	tx1 = sx1 / TileSizeX;
 	ty1 = sy1 / TileSizeY;
 
-	r = SelectUnits(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
+	r = UnitCacheSelect(tx0 - 2, ty0 - 2, tx1 + 2 + 1, ty1 + 2 + 1, table);
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	for (n = i = 0; i < r; ++i) {

@@ -821,14 +821,14 @@ local void DoNextReplay(void)
 			// Replay without the 'sync info
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "No sync info for this replay !");
 		} else {
-			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync (%lu)! ", GameCycle);
-			DebugLevel0("OUT OF SYNC %u != %u" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
+			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync (%lu) !", GameCycle);
+			DebugLevel0("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
 			// return;
 		}
 #else
-			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync !");
+		NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync !");
 		ReplayStep = 0;
 		NextLogCycle = ~0UL;
 		return;

@@ -408,7 +408,7 @@ local int CclChangeUnitsOwner(lua_State* l)
 	y2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
-	n = SelectUnits(x1, y1, x2, y2, table);
+	n = UnitCacheSelect(x1, y1, x2, y2, table);
 	oldp = LuaToNumber(l, 3);
 	newp = LuaToNumber(l, 4);
 	while (n) {
