@@ -109,7 +109,6 @@ static void SaveReplayOk(void);
 
 // Scenario select
 static void ScenSelectLBInit(Menuitem* mi);
-static void ScenSelectLBAction(Menuitem* mi, int i);
 static void ScenSelectTPMSAction(Menuitem* mi, int i);
 static void ScenSelectVSAction(Menuitem* mi);
 static void ScenSelectInit(Menuitem* mi);
@@ -260,7 +259,6 @@ static void SaveGameInit(Menuitem* mi);
 static void SaveGameExit(Menuitem* mi);
 static void SaveGameLBInit(Menuitem* mi);
 static void SaveGameEnterAction(Menuitem* mi, int key);
-static void SaveGameLBAction(Menuitem* mi, int i);
 static void SaveGameVSAction(Menuitem* mi);
 static void SaveGameOk(void);
 static void DeleteConfirmMenu(void);
@@ -271,7 +269,6 @@ static void CreateSaveDir(void);
 static void LoadGameInit(Menuitem* mi);
 static void LoadGameExit(Menuitem* mi);
 static void LoadGameLBInit(Menuitem* mi);
-static void LoadGameLBAction(Menuitem* mi, int i);
 static void LoadGameVSAction(Menuitem* mi);
 static void LoadGameOk(void);
 
@@ -306,7 +303,6 @@ static void EditorNewCancel(void);
 // Editor main load map
 static void EditorMainLoadInit(Menuitem* mi);
 static void EditorMainLoadLBInit(Menuitem* mi);
-static void EditorMainLoadLBAction(Menuitem* mi, int i);
 static void EditorMainLoadVSAction(Menuitem* mi);
 static void EditorMainLoadOk(void);
 static void EditorMainLoadCancel(void);
@@ -341,7 +337,6 @@ static void EditorEditAiPropertiesCancel(void);
 
 // Editor save
 static void EditorSaveLBInit(Menuitem* mi);
-static void EditorSaveLBAction(Menuitem* mi, int i);
 static void EditorSaveVSAction(Menuitem* mi);
 static void EditorSaveEnterAction(Menuitem* mi, int key);
 static void EditorSaveOk(void);
@@ -356,7 +351,6 @@ static void EditorSaveConfirmCancel(void);
 // Replay game
 static void ReplayGameInit(Menuitem* mi);
 static void ReplayGameLBInit(Menuitem* mi);
-static void ReplayGameLBAction(Menuitem* mi, int i);
 static void ReplayGameVSAction(Menuitem* mi);
 static void ReplayGameDisableFog(Menuitem* mi);
 static void ReplayGameOk(void);
@@ -407,17 +401,20 @@ static int EditorCancelled;
 ServerSetup ServerSetupState;
 ServerSetup LocalSetupState;
 
-static char ScenSelectPath[1024];        ///< Scenario selector path
-static char ScenSelectDisplayPath[1024]; ///< Displayed selector path
-static char ScenSelectFileName[128];     ///< Scenario selector name
+static char ScenSelectPath[1024];        /// Scenario selector path
+static char ScenSelectDisplayPath[1024]; /// Displayed selector path
+static char ScenSelectFileName[128];     /// Scenario selector name
+static char ScenSelectPathName[128];     /// path name
 
-char MenuMapFullPath[1024];              ///< Selected map path+name
+static char SelectedFileExist;           /// True if ScenSelectFileName is an existing file.
 
-static char *SaveDir;                    ///< Save game directory
-static char TempPathBuf[PATH_MAX];       ///< Temporary buffer for paths
+char MenuMapFullPath[1024];              /// Selected map path+name
 
-int nKeyStrokeHelps;                     ///< Number of keystroke help lines
-char **KeyStrokeHelps;                   ///< Array of keystroke help lines
+static char *SaveDir;                    /// Save game directory
+static char TempPathBuf[PATH_MAX];       /// Temporary buffer for paths
+
+int nKeyStrokeHelps;                     /// Number of keystroke help lines
+char **KeyStrokeHelps;                   /// Array of keystroke help lines
 
 /// FIXME: -> ccl...
 static unsigned char *mgptsoptions[] = {
@@ -453,7 +450,7 @@ static void InitNetMultiButtonStorage(void) {
 **
 **  @return 1 if path have changed.
 */
-static int ParentFolder(Menuitem* button)
+static int ParentFolder()
 {
 	char *cp;
 
@@ -464,14 +461,13 @@ static int ParentFolder(Menuitem* button)
 	if (cp) {
 		*cp = '\0';
 	} else {
-		button->Flags |= MenuButtonDisabled;
-		button->D.Button.Text = NULL;
 		ScenSelectDisplayPath[0] = '\0';
 	}
 	cp = strrchr(ScenSelectPath, '/');
 	Assert(cp);
 	*cp = 0;
-//	ScenSelectPathName[0] = '\0';
+	SelectedFileExist = 0;
+	ScenSelectPathName[0] = '\0';
 	ScenSelectFileName[0] = '\0';
 	return 1;
 }
@@ -481,7 +477,7 @@ static int ParentFolder(Menuitem* button)
 */
 static void ScenSelectFolder(void)
 {
-	if (ParentFolder(&CurrentMenu->Items[9])) {
+	if (ParentFolder()) {
 		ScenSelectLBInit(CurrentMenu->Items + 1);
 		CurrentMenu->Items[2].D.VSlider.percent = 0;
 		CurrentMenu->Items[2].D.HSlider.percent = 0;
@@ -492,7 +488,7 @@ static void ScenSelectFolder(void)
 */
 static void EditorMainLoadFolder(void)
 {
-	if (ParentFolder(&CurrentMenu->Items[5])) {
+	if (ParentFolder()) {
 		EditorMainLoadLBInit(CurrentMenu->Items + 1);
 		CurrentMenu->Items[2].D.VSlider.percent = 0;
 		CurrentMenu->Items[2].D.HSlider.percent = 0;
@@ -503,7 +499,7 @@ static void EditorMainLoadFolder(void)
 */
 static void EditorSaveFolder(void)
 {
-	if (ParentFolder(&CurrentMenu->Items[6])) {
+	if (ParentFolder()) {
 		EditorSaveLBInit(CurrentMenu->Items + 1);
 		CurrentMenu->Items[2].D.VSlider.percent = 0;
 		CurrentMenu->Items[2].D.HSlider.percent = 0;
@@ -514,7 +510,7 @@ static void EditorSaveFolder(void)
 */
 static void ReplayGameFolder(void)
 {
-	if (ParentFolder(&CurrentMenu->Items[5])) {
+	if (ParentFolder()) {
 		ReplayGameLBInit(CurrentMenu->Items + 1);
 		CurrentMenu->Items[2].D.VSlider.percent = 0;
 		CurrentMenu->Items[2].D.HSlider.percent = 0;
@@ -856,6 +852,77 @@ static void LBExit(Menuitem* mi)
 	mi[1].Flags |= MenuButtonDisabled;
 }
 
+////////////////
+//  LBAction  //
+////////////////
+
+/**
+**  Update path and file name with the listbox.
+**
+**  @param mi    listbox.
+**  @param i     line in the listbox.
+**
+**  @return 0 if nothing selected, 1 for file, 2 for directory.
+*/
+static int PathLBAction(const Menuitem* mi, int i)
+{
+	FileList *fl;
+
+	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(i >= 0);
+
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
+	SelectedFileExist = 0;
+	if (i >= mi->D.Listbox.noptions) {
+		return 0;
+	}
+	fl = mi->D.Listbox.options;
+	if (fl[i].type) {
+		Assert(strlen(fl[i].name) < sizeof(ScenSelectFileName));
+		strcpy(ScenSelectFileName, fl[i].name);
+		SelectedFileExist = 1;
+		return 1;
+	} else {
+		Assert(strlen(fl[i].name) < sizeof(ScenSelectPathName));
+		strcpy(ScenSelectPathName, fl[i].name);
+		return 2;
+	}
+}
+/**
+** Save game listbox action callback
+*/
+static void SaveGameLBAction(Menuitem* mi, int i)
+{
+	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(i >= 0);
+
+	int ret;
+
+	ret = PathLBAction(mi, i);
+	if (ret == 1) {
+		sprintf(mi->Menu->Items[1].D.Input.buffer, "%s~!_", ScenSelectFileName);
+		mi->Menu->Items[1].D.Input.nch = strlen(ScenSelectFileName);
+	}
+}
+/**
+**  Editor save listbox action callback
+*/
+static void EditorSaveLBAction(Menuitem* mi, int i)
+{
+	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(i >= 0);
+
+	int ret;
+
+	ret = PathLBAction(mi, i);
+	if (ret == 0) {
+		return ;
+	}
+	sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
+	mi->Menu->Items[3].D.Input.nch = strlen(ScenSelectFileName);
+}
+
 /**
 ** Initialize the hash table of menu functions
 */
@@ -880,6 +947,15 @@ void InitMenuFuncHash(void)
 	HASHADD(LBExit, "editor-save-lb-exit");
 	HASHADD(LBExit, "load-game-lb-exit");
 	HASHADD(LBExit, "save-game-lb-exit");
+
+	HASHADD(PathLBAction, "scen-select-lb-action");
+	HASHADD(SaveGameLBAction, "save-game-lb-action");
+	HASHADD(PathLBAction, "load-game-lb-action");
+	HASHADD(PathLBAction, "editor-main-load-lb-action");
+	HASHADD(PathLBAction, "editor-load-lb-action");
+	HASHADD(EditorSaveLBAction, "editor-save-lb-action");
+	HASHADD(PathLBAction, "replay-game-lb-action");
+
 #endif
 
 // Game menu
@@ -907,7 +983,6 @@ void InitMenuFuncHash(void)
 
 // Scenario select
 	HASHADD(ScenSelectLBInit,"scen-select-lb-init");
-	HASHADD(ScenSelectLBAction,"scen-select-lb-action");
 	HASHADD(ScenSelectTPMSAction,"scen-select-tpms-action");
 	HASHADD(ScenSelectVSAction,"scen-select-vs-action");
 	HASHADD(ScenSelectFolder,"scen-select-folder");
@@ -1065,7 +1140,6 @@ void InitMenuFuncHash(void)
 	HASHADD(SaveGameExit,"save-game-exit");
 	HASHADD(SaveGameLBInit,"save-game-lb-init");
 	HASHADD(SaveGameEnterAction,"save-game-enter-action");
-	HASHADD(SaveGameLBAction,"save-game-lb-action");
 	HASHADD(SaveGameVSAction,"save-game-vs-action");
 	HASHADD(SaveGameOk,"save-game-ok");
 	HASHADD(DeleteConfirmMenu,"delete-confirm-menu");
@@ -1074,7 +1148,6 @@ void InitMenuFuncHash(void)
 	HASHADD(LoadGameInit,"load-game-init");
 	HASHADD(LoadGameExit,"load-game-exit");
 	HASHADD(LoadGameLBInit,"load-game-lb-init");
-	HASHADD(LoadGameLBAction,"load-game-lb-action");
 	HASHADD(LoadGameVSAction,"load-game-vs-action");
 	HASHADD(LoadGameOk,"load-game-ok");
 
@@ -1109,7 +1182,6 @@ void InitMenuFuncHash(void)
 // Editor main load map
 	HASHADD(EditorMainLoadInit,"editor-main-load-init");
 	HASHADD(EditorMainLoadLBInit,"editor-main-load-lb-init");
-	HASHADD(EditorMainLoadLBAction,"editor-main-load-lb-action");
 	HASHADD(EditorMainLoadVSAction,"editor-main-load-vs-action");
 	HASHADD(EditorMainLoadOk,"editor-main-load-ok");
 	HASHADD(EditorMainLoadCancel,"editor-main-load-cancel");
@@ -1118,7 +1190,6 @@ void InitMenuFuncHash(void)
 // Editor load map
 	HASHADD(EditorMainLoadInit,"editor-load-init");
 	HASHADD(EditorMainLoadLBInit,"editor-load-lb-init");
-	HASHADD(EditorMainLoadLBAction,"editor-load-lb-action");
 	HASHADD(EditorMainLoadVSAction,"editor-load-vs-action");
 	HASHADD(EditorLoadOk,"editor-load-ok");
 	HASHADD(EditorLoadCancel,"editor-load-cancel");
@@ -1153,7 +1224,6 @@ void InitMenuFuncHash(void)
 // Editor save
 	HASHADD(EditorSaveLBInit,"editor-save-lb-init");
 	HASHADD(EditorSaveFolder,"editor-save-folder");
-	HASHADD(EditorSaveLBAction,"editor-save-lb-action");
 	HASHADD(EditorSaveVSAction,"editor-save-vs-action");
 	HASHADD(EditorSaveEnterAction,"editor-save-enter-action");
 	HASHADD(EditorSaveOk,"editor-save-ok");
@@ -1167,7 +1237,6 @@ void InitMenuFuncHash(void)
 // Replay game
 	HASHADD(ReplayGameInit,"replay-game-init");
 	HASHADD(ReplayGameLBInit,"replay-game-lb-init");
-	HASHADD(ReplayGameLBAction,"replay-game-lb-action");
 	HASHADD(ReplayGameVSAction,"replay-game-vs-action");
 	HASHADD(ReplayGameFolder,"replay-game-folder");
 	HASHADD(ReplayGameDisableFog,"replay-game-disable-fog");
@@ -1269,10 +1338,13 @@ static void SaveGameExit(Menuitem* mi)
 */
 static void SaveGameEnterAction(Menuitem* mi, int key)
 {
-	if (mi->D.Input.nch == 0) {
-		mi[3].Flags = MenuButtonDisabled; /* mi[i]: Save button! */
-	} else {
-		mi[3].Flags &= ~MenuButtonDisabled;
+	Assert(mi->MiType == MI_TYPE_INPUT);
+
+	strncpy(ScenSelectFileName, mi->D.Input.buffer, mi->D.Input.nch);
+	ScenSelectFileName[mi->D.Input.nch] = '\0';
+	ScenSelectPathName[0] = '\0';
+	SelectedFileExist = 0;
+	if (mi->D.Input.nch != 0) {
 		if (key == 10 || key == 13) {
 			SaveGameOk();
 			return;
@@ -1320,6 +1392,9 @@ static void SaveGameOk(void)
 			ProcessMenu("menu-save-confirm", 0);
 		}
 	}
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -1381,28 +1456,6 @@ static void SaveGameLBInit(Menuitem* mi)
 }
 
 /**
-** Save game listbox action callback
-*/
-static void SaveGameLBAction(Menuitem* mi, int i)
-{
-	FileList *fl;
-
-	Assert(i >= 0);
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			sprintf(mi->Menu->Items[1].D.Input.buffer, "%s~!_", fl[i].name);
-			mi->Menu->Items[1].D.Input.nch = strlen(mi->Menu->Items[1].D.Input.buffer) - 3;
-			mi->Menu->Items[4].Flags = MI_ENABLED;
-			mi->Menu->Items[5].Flags = MI_ENABLED;
-		} else {
-			mi->Menu->Items[4].Flags = MenuButtonDisabled;
-			mi->Menu->Items[5].Flags = MenuButtonDisabled;
-		}
-	}
-}
-
-/**
 **  Save game vertical slider callback
 */
 static void SaveGameVSAction(Menuitem* mi)
@@ -1447,26 +1500,6 @@ static void LoadGameLBInit(Menuitem* mi)
 }
 
 /**
-** Load game listbox action callback
-*/
-static void LoadGameLBAction(Menuitem* mi, int i)
-{
-	FileList *fl;
-
-	Assert(i >= 0);
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type) {
-			mi->Menu->Items[3].Flags = MI_ENABLED;
-		} else {
-			mi->Menu->Items[3].Flags = MI_DISABLED;
-		}
-	} else {
-		mi->Menu->Items[3].Flags = MI_DISABLED;
-	}
-}
-
-/**
 **  Load game vertical slider callback
 */
 static void LoadGameVSAction(Menuitem* mi)
@@ -1478,24 +1511,19 @@ static void LoadGameVSAction(Menuitem* mi)
 */
 static void LoadGameOk(void)
 {
-	FileList *fl;
-	Menuitem* mi;
-	Menu* menu;
-	int i;
-
-	menu = CurrentMenu;
-	mi = &menu->Items[1];
-	i = mi->D.Listbox.curopt;
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		sprintf(TempPathBuf, "%s/%s", SaveDir, fl[i].name);
-		SaveGameLoading = 1;
-		LoadGame(TempPathBuf);
-		Callbacks = &GameCallbacks;
-		SetMessage("Loaded game: %s", TempPathBuf);
-		GuiGameStarted = 1;
-		GameMenuReturn();
+	if (!ScenSelectFileName[0]) {
+		return ;
 	}
+	sprintf(TempPathBuf, "%s/%s", SaveDir, ScenSelectFileName);
+	SaveGameLoading = 1;
+	LoadGame(TempPathBuf);
+	Callbacks = &GameCallbacks;
+	SetMessage("Loaded game: %s", TempPathBuf);
+	GuiGameStarted = 1;
+	GameMenuReturn();
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -1546,6 +1574,9 @@ static void SaveConfirmOk(void)
 	SaveGame(TempPathBuf);
 	SetMessage("Saved game to: %s", TempPathBuf);
 	GameMenuReturn();
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -1606,6 +1637,10 @@ static void DeleteConfirmOk(void)
 	SaveGameLBInit(&CurrentMenu->Items[2]);
 	strcpy(CurrentMenu->Items[1].D.Input.buffer, "~!_");
 	CurrentMenu->Items[1].D.Input.nch = 0;
+
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -2402,10 +2437,13 @@ static void SaveReplayExit(Menuitem* mi)
 */
 static void SaveReplayEnterAction(Menuitem* mi, int key)
 {
-	if (mi->D.Input.nch == 0) {
-		mi[1].Flags = MenuButtonDisabled;
-	} else {
-		mi[1].Flags &= ~MenuButtonDisabled;
+	Assert(mi->MiType == MI_TYPE_INPUT);
+
+	strncpy(ScenSelectFileName, mi->D.Input.buffer, mi->D.Input.nch);
+	ScenSelectFileName[mi->D.Input.nch] = '\0';
+	ScenSelectPathName[0] = '\0';
+	SelectedFileExist = 0;
+	if (mi->D.Input.nch != 0) {
 		if (key == 10 || key == 13) {
 			SaveReplayOk();
 		}
@@ -2466,6 +2504,9 @@ static void SaveReplayOk(void)
 
 	free(buf);
 	EndMenu();
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -2851,32 +2892,10 @@ static void CampaignGameMenu(void)
 	}
 #endif
 
-	//
-	//  Setup campaign name.
-	//
-	for (i = 0; i < NumCampaigns && i < 4; ++i) {
-		char* s;
-
-		menu->Items[i].D.Button.Text = Campaigns[i].Name;
-		menu->Items[i].Flags &= ~MenuButtonDisabled;
-
-		if ((s = strchr(Campaigns[i].Name, '!'))) {
-			menu->Items[i].D.Button.HotKey = tolower(s[1]);
-		}
-	}
-	for (; i < 4; ++i) {
-		menu->Items[i].D.Button.Text = "Not available";
-		menu->Items[i].Flags |= MenuButtonDisabled;
-	}
-
 	GuiGameStarted = 0;
 	ProcessMenu("menu-campaign-select", 1);
 	if (GuiGameStarted) {
 		GameMenuReturn();
-	}
-
-	for (i = 0; i < 4; ++i) {
-		menu->Items[i].D.Button.Text = NULL;
 	}
 }
 
@@ -3276,30 +3295,6 @@ static void MultiPlayerInternetGame(void)
 */
 static void ScenSelectInit(Menuitem* mi)
 {
-	Assert(*ScenSelectPath);
-	mi->Menu->Items[9].Flags =
-		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	mi->Menu->Items[9].D.Button.Text = ScenSelectDisplayPath;
-	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-}
-
-/**
-**  Scenario select listbox action callback
-*/
-static void ScenSelectLBAction(Menuitem* mi, int i)
-{
-	FileList* fl;
-
-	Assert(i >= 0);
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(mi->Menu->Items[3].D.Button.Text);
-		if (fl[i].type) {
-			mi->Menu->Items[3].D.Button.Text = strdup("OK");
-		} else {
-			mi->Menu->Items[3].D.Button.Text = strdup("Open");
-		}
-	}
 }
 
 /**
@@ -3317,13 +3312,8 @@ static void ScenSelectLBInit(Menuitem* mi)
 	}
 	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
 		(FileList**)&(mi->D.Listbox.options));
-	if (i == 0) {
-		free(mi->Menu->Items[3].D.Button.Text);
-		mi->Menu->Items[3].D.Button.Text = strdup("OK");
-		mi->Menu->Items[3].Flags |= MenuButtonDisabled;
-	} else {
-		ScenSelectLBAction(mi, 0);
-		mi->Menu->Items[3].Flags &= ~MenuButtonDisabled;
+	if (i != 0) {
+		PathLBAction(mi, 0);
 		if (i > mi->D.Listbox.nlines) {
 			mi[1].Flags &= ~MenuButtonDisabled;
 		} else {
@@ -3458,38 +3448,30 @@ static void CdVolumeHSAction(Menuitem* mi __attribute__((unused)))
 */
 static void ScenSelectOk(void)
 {
-	FileList *fl;
 	Menu* menu;
 	Menuitem* mi;
-	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->D.Listbox.curopt;
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type == 0) {
-			strcat(ScenSelectPath, "/");
-			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[9].Flags & MenuButtonDisabled) {
-				menu->Items[9].Flags &= ~MenuButtonDisabled;
-				menu->Items[9].D.Button.Text = ScenSelectDisplayPath;
-			} else {
-				strcat(ScenSelectDisplayPath, "/");
-			}
-			strcat(ScenSelectDisplayPath, fl[i].name);
-			ScenSelectLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-			mi[1].D.HSlider.percent = 0;
-		} else {
-			strcpy(ScenSelectFileName, fl[i].name); // Final map name
-			EndMenu();
-			menu->Items[9].D.Button.Text = NULL;
+	if (ScenSelectPathName[0]) {
+		strcat(ScenSelectPath, "/");
+		strcat(ScenSelectPath, ScenSelectPathName);
+		if (ScenSelectDisplayPath[0]) {
+			strcat(ScenSelectDisplayPath, "/");
 		}
+		strcat(ScenSelectDisplayPath, ScenSelectPathName);
+		ScenSelectLBInit(mi);
+		mi->D.Listbox.cursel = -1;
+		mi->D.Listbox.startline = 0;
+		mi->D.Listbox.curopt = 0;
+		mi[1].D.VSlider.percent = 0;
+		mi[1].D.HSlider.percent = 0;
+	} else if (ScenSelectFileName[0]){
+		EndMenu();
 	}
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -3523,8 +3505,6 @@ static void ScenSelectCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 */
-	CurrentMenu->Items[9].D.Button.Text = NULL;
-
 	EndMenu();
 }
 
@@ -4700,11 +4680,6 @@ static void EditorMainLoadMap(void)
 */
 static void EditorMainLoadInit(Menuitem* mi)
 {
-	Assert(*ScenSelectPath);
-	mi->Menu->Items[5].Flags =
-		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	mi->Menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
-	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 /**
@@ -4718,13 +4693,8 @@ static void EditorMainLoadLBInit(Menuitem* mi)
 	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorMainLoadRDFilter,
 		(FileList **) & (mi->D.Listbox.options));
 
-	if (i == 0) {
-		free(mi->Menu->Items[3].D.Button.Text);
-		mi->Menu->Items[3].D.Button.Text = strdup("OK");
-		mi->Menu->Items[3].Flags |= MenuButtonDisabled;
-	} else {
-		EditorMainLoadLBAction(mi, 0);
-		mi->Menu->Items[3].Flags &= ~MenuButtonDisabled;
+	if (i != 0) {
+		PathLBAction(mi, 0);
 		if (i > mi->D.Listbox.nlines) {
 			mi[1].Flags &= ~MenuButtonDisabled;
 		}
@@ -4738,36 +4708,28 @@ static void EditorMainLoadOk(void)
 {
 	Menu* menu;
 	Menuitem* mi;
-	FileList *fl;
-	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->D.Listbox.curopt;
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type == 0) {
-			strcat(ScenSelectPath, "/");
-			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[5].Flags & MenuButtonDisabled) {
-				menu->Items[5].Flags &= ~MenuButtonDisabled;
-				menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
-			} else {
-				strcat(ScenSelectDisplayPath, "/");
-			}
-			strcat(ScenSelectDisplayPath, fl[i].name);
-			EditorMainLoadLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-			mi[1].D.HSlider.percent = 0;
-		} else {
-			strcpy(ScenSelectFileName, fl[i].name); // Final map name
-			EndMenu();
-			menu->Items[5].D.Button.Text = NULL;
+	if (ScenSelectPathName[0]) {
+		strcat(ScenSelectPath, "/");
+		strcat(ScenSelectPath, ScenSelectPathName);
+		if (ScenSelectDisplayPath[0]) {
+			strcat(ScenSelectDisplayPath, "/");
 		}
+		strcat(ScenSelectDisplayPath, ScenSelectPathName);
+		EditorMainLoadLBInit(mi);
+		mi->D.Listbox.cursel = -1;
+		mi->D.Listbox.startline = 0;
+		mi->D.Listbox.curopt = 0;
+		mi[1].D.VSlider.percent = 0;
+		mi[1].D.HSlider.percent = 0;
+	} else if (ScenSelectFileName[0]) {
+		EndMenu();
 	}
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -4801,28 +4763,7 @@ static void EditorMainLoadCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	CurrentMenu->Items[5].D.Button.Text = NULL;
-
 	EndMenu();
-}
-
-/**
-**  Editor main load listbox action callback
-*/
-static void EditorMainLoadLBAction(Menuitem* mi, int i)
-{
-	FileList *fl;
-
-	Assert(i >= 0);
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(mi->Menu->Items[3].D.Button.Text);
-		if (fl[i].type) {
-			mi->Menu->Items[3].D.Button.Text = strdup("OK");
-		} else {
-			mi->Menu->Items[3].D.Button.Text = strdup("Open");
-		}
-	}
 }
 
 /**
@@ -4873,36 +4814,28 @@ static void EditorLoadOk(void)
 {
 	Menu* menu;
 	Menuitem* mi;
-	FileList *fl;
-	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->D.Listbox.curopt;
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type == 0) {
-			strcat(ScenSelectPath, "/");
-			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[5].Flags & MenuButtonDisabled) {
-				menu->Items[5].Flags &= ~MenuButtonDisabled;
-				menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
-			} else {
-				strcat(ScenSelectDisplayPath, "/");
-			}
-			strcat(ScenSelectDisplayPath, fl[i].name);
-			EditorMainLoadLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-			mi[1].D.HSlider.percent = 0;
-		} else {
-			strcpy(ScenSelectFileName, fl[i].name); // Final map name
-			EndMenu();
-			menu->Items[5].D.Button.Text = NULL;
+	if (ScenSelectPathName[0]) {
+		strcat(ScenSelectPath, "/");
+		strcat(ScenSelectPath, ScenSelectPathName);
+		if (ScenSelectDisplayPath[0]) {
+			strcat(ScenSelectDisplayPath, "/");
 		}
+		strcat(ScenSelectDisplayPath, ScenSelectPathName);
+		EditorMainLoadLBInit(mi);
+		mi->D.Listbox.cursel = -1;
+		mi->D.Listbox.startline = 0;
+		mi->D.Listbox.curopt = 0;
+		mi[1].D.VSlider.percent = 0;
+		mi[1].D.HSlider.percent = 0;
+	} else if (ScenSelectFileName[0]) {
+		EndMenu();
 	}
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -4935,8 +4868,6 @@ static void EditorLoadCancel(void)
 	}
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-
-	CurrentMenu->Items[5].D.Button.Text = NULL;
 
 	EditorEndMenu();
 }
@@ -5299,11 +5230,6 @@ int EditorSaveMenu(void)
 	menu->Items[3].D.Input.buffer = path;
 	menu->Items[3].D.Input.maxch = PATH_MAX - 4;
 
-	Assert(*ScenSelectPath);
-	menu->Items[6].Flags =
-		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	menu->Items[6].D.Button.Text = ScenSelectDisplayPath;
-
 	ProcessMenu("menu-editor-save", 1);
 
 	if (!EditorCancelled) {
@@ -5332,15 +5258,10 @@ static void EditorSaveLBInit(Menuitem* mi)
 	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorSaveRDFilter,
 		(FileList **) & (mi->D.Listbox.options));
 
-	if (i == 0) {
-		free(mi->Menu->Items[4].D.Button.Text);
-		mi->Menu->Items[4].D.Button.Text = strdup("Save");
-		mi->Menu->Items[4].Flags |= MenuButtonDisabled;
-	} else {
+	if (i != 0) {
 		EditorSaveLBAction(mi, 0);
 		sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", ScenSelectFileName);
 		mi->Menu->Items[3].D.Input.nch = strlen(mi->Menu->Items[3].D.Input.buffer) - 3;
-		mi->Menu->Items[4].Flags &= ~MenuButtonDisabled;
 		if (i > mi->D.Listbox.nlines) {
 			mi[1].Flags &= ~MenuButtonDisabled;
 		}
@@ -5354,24 +5275,19 @@ static void EditorSaveOk(void)
 {
 	Menu* menu;
 	Menuitem* mi;
-	FileList *fl;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
 	i = mi->D.Listbox.curopt;
 	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (mi->Menu->Items[3].D.Input.nch == 0 && fl[i].type == 0) {
+		if (mi->Menu->Items[3].D.Input.nch == 0 && ScenSelectPathName[0]) {
 			strcat(ScenSelectPath, "/");
-			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[6].Flags & MenuButtonDisabled) {
-				menu->Items[6].Flags &= ~MenuButtonDisabled;
-				menu->Items[6].D.Button.Text = ScenSelectDisplayPath;
-			} else {
+			strcat(ScenSelectPath, ScenSelectPathName);
+			if (ScenSelectDisplayPath[0]) {
 				strcat(ScenSelectDisplayPath, "/");
 			}
-			strcat(ScenSelectDisplayPath, fl[i].name);
+			strcat(ScenSelectDisplayPath, ScenSelectPathName);
 			EditorSaveLBInit(mi);
 			mi->D.Listbox.cursel = -1;
 			mi->D.Listbox.startline = 0;
@@ -5380,7 +5296,7 @@ static void EditorSaveOk(void)
 		} else {
 			strcpy(ScenSelectFileName, menu->Items[3].D.Input.buffer); // Final map name
 			ScenSelectFileName[strlen(ScenSelectFileName) - 3] = '\0';
-			if (!strcasestr(ScenSelectFileName, ".smp\0")) {
+			if (!strcasestr(ScenSelectFileName, ".smp")) {
 				strcat(ScenSelectFileName, ".smp");
 			}
 			sprintf(TempPathBuf, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
@@ -5392,9 +5308,11 @@ static void EditorSaveOk(void)
 				}
 			}
 			EditorEndMenu();
-			menu->Items[6].D.Button.Text = NULL;
 		}
 	}
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -5402,37 +5320,8 @@ static void EditorSaveOk(void)
 */
 static void EditorSaveCancel(void)
 {
-	Menu* menu;
-
 	EditorCancelled = 1;
 	EditorEndMenu();
-
-	menu = FindMenu("menu-editor-save");
-	menu->Items[6].D.Button.Text = NULL;
-}
-
-/**
-**  Editor save listbox action callback
-*/
-static void EditorSaveLBAction(Menuitem* mi, int i)
-{
-	FileList* fl;
-
-	Assert(i >= 0);
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(mi->Menu->Items[4].D.Button.Text);
-		if (fl[i].type) {
-			sprintf(mi->Menu->Items[3].D.Input.buffer, "%s~!_", fl[i].name);
-			mi->Menu->Items[3].D.Input.nch = strlen(mi->Menu->Items[3].D.Input.buffer) - 3;
-			mi->Menu->Items[4].D.Button.Text = strdup("Save");
-		} else {
-			strcpy(mi->Menu->Items[3].D.Input.buffer, "~!_");
-			mi->Menu->Items[3].D.Input.nch = strlen(mi->Menu->Items[3].D.Input.buffer) - 3;
-			mi->Menu->Items[4].D.Button.Text = strdup("Open");
-		}
-		mi->Menu->Items[4].Flags &= ~MenuButtonDisabled;
-	}
 }
 
 /**
@@ -5447,14 +5336,13 @@ static void EditorSaveVSAction(Menuitem* mi)
 */
 static void EditorSaveEnterAction(Menuitem* mi, int key)
 {
-	if (mi->D.Input.nch == 0) {
-		mi->Menu->Items[4].Flags = MenuButtonDisabled;
-	} else {
-		if (mi->D.Input.nch == 1 && key != '\b' && key != '\177') {
-			free(mi->Menu->Items[4].D.Button.Text);
-			mi->Menu->Items[4].D.Button.Text = strdup("Save");
-		}
-		mi->Menu->Items[4].Flags &= ~MenuButtonDisabled;
+	Assert(mi->MiType == MI_TYPE_INPUT);
+
+	strncpy(ScenSelectFileName, mi->D.Input.buffer, mi->D.Input.nch);
+	ScenSelectFileName[mi->D.Input.nch] = '\0';
+	ScenSelectPathName[0] = '\0';
+	SelectedFileExist = 0;
+	if (mi->D.Input.nch != 0) {
 		if (key == 10 || key == 13) {
 			EditorSaveOk();
 		}
@@ -5476,6 +5364,9 @@ static void EditorSaveConfirmOk(void)
 {
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorEndMenu();
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -5486,6 +5377,9 @@ static void EditorSaveConfirmCancel(void)
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorCancelled = 1;
 	EditorEndMenu();
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -5498,6 +5392,9 @@ static void EditorQuitToMenu(void)
 	QuitToMenu = 1;
 	EditorRunning = EditorNotRunning;
 	EndMenu();
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -5551,9 +5448,7 @@ static void ReplayGameMenu(void)
 static void ReplayGameInit(Menuitem* mi)
 {
 	Assert(*ScenSelectPath);
-	mi->Menu->Items[5].Flags =
-		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-	mi->Menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
+
 	mi->Menu->Items[6].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
@@ -5569,36 +5464,12 @@ static void ReplayGameLBInit(Menuitem* mi)
 	i = mi->D.Listbox.noptions = ReadDataDirectory(ScenSelectPath, ReplayGameRDFilter,
 		(FileList **) & (mi->D.Listbox.options));
 
-	if (i == 0) {
-		free(mi->Menu->Items[3].D.Button.Text);
-		mi->Menu->Items[3].D.Button.Text = strdup("OK");
-		mi->Menu->Items[3].Flags |= MenuButtonDisabled;
-	} else {
-		ReplayGameLBAction(mi, 0);
-		mi->Menu->Items[3].Flags &= ~MenuButtonDisabled;
+	if (i != 0) {
+		PathLBAction(mi, 0);
 		if (i > mi->D.Listbox.nlines) {
 			mi[1].Flags &= ~MenuButtonDisabled;
 		} else {
 			mi[1].Flags |= MenuButtonDisabled;
-		}
-	}
-}
-
-/**
-** Replay game listbox action
-*/
-static void ReplayGameLBAction(Menuitem* mi, int i)
-{
-	FileList *fl;
-
-	Assert(i >= 0);
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		free(mi->Menu->Items[3].D.Button.Text);
-		if (fl[i].type) {
-			mi->Menu->Items[3].D.Button.Text = strdup("OK");
-		} else {
-			mi->Menu->Items[3].D.Button.Text = strdup("Open");
 		}
 	}
 }
@@ -5624,61 +5495,51 @@ static void ReplayGameOk(void)
 {
 	Menu* menu;
 	Menuitem* mi;
-	FileList *fl;
 	int i;
 
 	menu = CurrentMenu;
 	mi = &menu->Items[1];
-	i = mi->D.Listbox.curopt;
-	if (i < mi->D.Listbox.noptions) {
-		fl = mi->D.Listbox.options;
-		if (fl[i].type == 0) {
+	if (ScenSelectPathName[0]) {
+		strcat(ScenSelectPath, "/");
+		strcat(ScenSelectPath, ScenSelectPathName);
+		if (ScenSelectDisplayPath[0]) {
+			strcat(ScenSelectDisplayPath, "/");
+		}
+		strcat(ScenSelectDisplayPath, ScenSelectPathName);
+		ReplayGameLBInit(mi);
+		mi->D.Listbox.cursel = -1;
+		mi->D.Listbox.startline = 0;
+		mi->D.Listbox.curopt = 0;
+		mi[1].D.VSlider.percent = 0;
+		mi[1].D.HSlider.percent = 0;
+	} else if (ScenSelectFileName[0]) {
+		if (ScenSelectPath[0]) {
 			strcat(ScenSelectPath, "/");
-			strcat(ScenSelectPath, fl[i].name);
-			if (menu->Items[5].Flags & MenuButtonDisabled) {
-				menu->Items[5].Flags &= ~MenuButtonDisabled;
-				menu->Items[5].D.Button.Text = ScenSelectDisplayPath;
-			} else {
-				strcat(ScenSelectDisplayPath, "/");
-			}
-			strcat(ScenSelectDisplayPath, fl[i].name);
-			ReplayGameLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-			mi[1].D.HSlider.percent = 0;
+			strcat(ScenSelectPath, ScenSelectFileName);
 		} else {
-			strcpy(ScenSelectFileName, fl[i].name); // Final map name
+			strcpy(ScenSelectPath, ScenSelectFileName);
+		}
 
-			if (ScenSelectPath[0]) {
-				strcat(ScenSelectPath, "/");
-				strcat(ScenSelectPath, ScenSelectFileName);
-			} else {
-				strcpy(ScenSelectPath, ScenSelectFileName);
-			}
+		LoadReplay(ScenSelectPath);
 
-			LoadReplay(ScenSelectPath);
+		for (i = 0; i < MAX_OBJECTIVES; i++) {
+			free(GameIntro.Objectives[i]);
+			GameIntro.Objectives[i] = NULL;
+		}
+		GameIntro.Objectives[0] = strdup(DefaultObjective);
 
-			for (i = 0; i < MAX_OBJECTIVES; i++) {
-				if (GameIntro.Objectives[i]) {
-					free(GameIntro.Objectives[i]);
-					GameIntro.Objectives[i] = NULL;
-				}
-			}
-			GameIntro.Objectives[0] = strdup(DefaultObjective);
+		GuiGameStarted = 1;
+		EndMenu();
 
-			GuiGameStarted = 1;
-			EndMenu();
-			menu->Items[5].D.Button.Text = NULL;
-
-			if (menu->Items[6].D.Checkbox.State == MI_CSTATE_CHECKED) {
-				ReplayRevealMap = 1;
-			} else {
-				ReplayRevealMap = 0;
-			}
+		if (menu->Items[6].D.Checkbox.State == MI_CSTATE_CHECKED) {
+			ReplayRevealMap = 1;
+		} else {
+			ReplayRevealMap = 0;
 		}
 	}
+	SelectedFileExist = 0;
+	ScenSelectFileName[0] = '\0';
+	ScenSelectPathName[0] = '\0';
 }
 
 /**
@@ -5709,8 +5570,6 @@ static void ReplayGameCancel(void)
 	}
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-
-	CurrentMenu->Items[5].D.Button.Text = NULL;
 
 	EndMenu();
 }
@@ -6082,4 +5941,130 @@ static void MultiMetaServerClose(void)
 	MetaServerInUse = 0;
 	EndMenu();
 }
+
+/**
+**  Update menu item state. (disabled, ...)
+**
+**  @param Menuitem* Items
+*/
+void UpdateMenuItemButton(Menuitem* items)
+{
+	void (*handler)(void);
+
+	Assert(items);
+	Assert(items->MiType == MI_TYPE_BUTTON);
+
+	// Enable by default.
+	items->Flags &= ~MenuButtonDisabled;
+	handler = items->D.Button.Handler;
+	// restrict then
+	if (((handler == LoadGameOk || handler == SaveConfirmOk || handler == SaveGameOk) &&
+			(!ScenSelectFileName[0])) ||
+		(handler == DeleteConfirmOk && !SelectedFileExist) ||
+		(handler == DeleteConfirmMenu && !SelectedFileExist) ||
+		((handler == SaveGameMenu || handler == SaveGameOk) &&
+			(!GameRunning || IsNetworkGame() || ReplayGameType != ReplayNone)) ||
+		((handler == LoadGameMenu || handler == EndScenarioRestart) &&
+			(GameRunning && IsNetworkGame())) ||
+		(handler == SaveReplayOk && (CommandLogDisabled || !ScenSelectFileName[0])) ||
+		(handler == RestartConfirmMenu && (!GameRunning || IsNetworkGame())) ||
+		//
+		// MultiPlayer
+		//
+		(handler == MultiPlayerGameMenu && NetworkNumInterfaces == 0) ||
+		(handler == MultiClientReady && LocalSetupState.Ready[NetLocalHostsSlot]) ||
+		(handler == MultiClientNotReady && !LocalSetupState.Ready[NetLocalHostsSlot]) ||
+		//
+		// Campaign : FIXME make it more configurable (not only 4 campaign)
+		//
+		(handler == CampaignGameMenu && NumCampaigns < 1) ||
+		(handler == CampaignMenu1 && NumCampaigns < 1) ||
+		(handler == CampaignMenu2 && NumCampaigns < 2) ||
+		(handler == CampaignMenu3 && NumCampaigns < 3) ||
+		(handler == CampaignMenu4 && NumCampaigns < 4) ||
+		(handler == SelectCampaignMenu && 1 /*FIXME : not implemented */) ||
+		//
+		// Folder
+		//
+		((handler == EditorMainLoadFolder || handler == ReplayGameFolder ||
+			handler == ScenSelectFolder || handler == EditorSaveFolder) &&
+			(!*ScenSelectDisplayPath)) ||
+		((handler == ReplayGameOk || handler == EditorLoadOk ||
+			handler == ScenSelectOk || handler == EditorSaveOk) &&
+			(!ScenSelectFileName[0] && !ScenSelectPathName[0]))
+		) {
+		items->Flags = MenuButtonDisabled;
+	}
+
+	//
+	// Multiplayer
+	//
+	if (handler == MultiScenSelectMenu || handler == MultiGameStart) {
+		char plyrs; // other player has connected.
+		char ready; // all player are here.
+
+		plyrs = 0;
+		ready = 1;
+		int i;
+
+		// Calculate available slots from pudinfo
+		for (i = 1; i < PlayerMax; i++) {
+			if (TheMap.Info.PlayerType[i] == PlayerPerson) {
+				if (Hosts[i].PlyNr) {
+					plyrs = 1;
+					if (!ServerSetupState.Ready[i]) {
+						ready = 0;
+						break;
+					}
+				} else {
+					if (ServerSetupState.CompOpt[i] == 0) {
+						ready = 0;
+					}
+				}
+			}
+		}
+		if (handler == MultiScenSelectMenu && plyrs) {
+			items->Flags = MenuButtonDisabled;
+		}
+		if (handler == MultiGameStart && !ready) {
+			items->Flags = MenuButtonDisabled;
+		}
+	}
+
+#if 1 // FIXME : Remove it when lua modified.
+	//
+	//  Text modification.
+	//
+	if (handler == ReplayGameOk || handler == ScenSelectOk || handler == EditorLoadOk) {
+		free(items->D.Button.Text);
+		items->D.Button.Text = strdup(ScenSelectPathName[0] ? "Open" : "Ok");
+	} else if (handler == EditorSaveOk) {
+		free(items->D.Button.Text);
+		items->D.Button.Text = strdup(ScenSelectPathName[0] ? "Open" : "Save");
+	}
+	if (handler == EditorMainLoadFolder || handler == ReplayGameFolder ||
+			handler == ScenSelectFolder || handler == EditorSaveFolder) {
+		free(items->D.Button.Text);
+		items->D.Button.Text = strdup(ScenSelectDisplayPath);
+	}
+
+	int i;
+	const char* s;
+	void (*campaignhandler[])(void) = {CampaignMenu1, CampaignMenu2, CampaignMenu3, CampaignMenu4};
+
+	// Campaign name.
+	for (i = 0; i < 4; ++i) {
+		if (handler == campaignhandler[i]) {
+			free(items->D.Button.Text);
+			items->D.Button.Text =
+				strdup(i < NumCampaigns ? Campaigns[i].Name : "Not available");
+			if ((s = strchr(items->D.Button.Text, '!'))) {
+				items->D.Button.HotKey = tolower(s[1]);
+			}
+		}
+	}
+#endif
+}
+
+
 //@}

@@ -329,7 +329,8 @@ extern void InitMenuFuncHash(void);
 
 	/// Set-up menus for a specific race
 extern void InitMenus(int race);
-
+	/// Update menu item state. (disabled, ...)
+extern void UpdateMenuItemButton(Menuitem* items);
 	/// Draw menu
 extern void DrawMenu(Menu* menu);
 	/// Draw menu button
