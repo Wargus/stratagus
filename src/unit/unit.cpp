@@ -3157,16 +3157,12 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
 
-    {
-	Missile* missile;
-
-	missile=MakeLocalMissile(MissileTypeHit,
-	    target->X*TileSizeX+target->Type->Width/2,
-	    target->Y*TileSizeY+target->Type->Height/2,
-	    target->X*TileSizeX+target->Type->Width/2+3,
-	    target->Y*TileSizeY+target->Type->Height/2-MissileTypeHit->Range);
-	missile->Damage=damage;
-    }
+    MakeLocalMissile(MissileTypeHit,
+	    target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2,
+	    target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2,
+	    target->X*TileSizeX+target->Type->TileWidth*TileSizeX/2+3,
+	    target->Y*TileSizeY+target->Type->TileHeight*TileSizeY/2
+		    -MissileTypeHit->Range)->Damage=-damage;
 
 #if 0
     // FIXME: want to show hits.
@@ -3177,10 +3173,8 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     }
     if( type->Building ) {
 	MakeMissile(MissileSmallFire
-		,target->X*TileSizeX
-			+(type->TileWidth*TileSizeX)/2
-		,target->Y*TileSizeY
-			+(type->TileHeight*TileSizeY)/2
+		,target->X*TileSizeX+(type->TileWidth*TileSizeX)/2
+		,target->Y*TileSizeY+(type->TileHeight*TileSizeY)/2
 		,0,0);
     }
 #endif
@@ -3194,10 +3188,8 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    ; // No fire for this
 	} else if( f>50 ) {
 	    missile=MakeMissile(MissileTypeSmallFire
-		    ,target->X*TileSizeX
-			    +(type->TileWidth*TileSizeX)/2
-		    ,target->Y*TileSizeY
-			    +(type->TileHeight*TileSizeY)/2
+		    ,target->X*TileSizeX+(type->TileWidth*TileSizeX)/2
+		    ,target->Y*TileSizeY+(type->TileHeight*TileSizeY)/2
 			    -TileSizeY
 		    ,0,0);
 	    missile->SourceUnit=target;
@@ -3205,10 +3197,8 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    ++target->Refs;
 	} else {
 	    missile=MakeMissile(MissileTypeBigFire
-		    ,target->X*TileSizeX
-			    +(type->TileWidth*TileSizeX)/2
-		    ,target->Y*TileSizeY
-			    +(type->TileHeight*TileSizeY)/2
+		    ,target->X*TileSizeX+(type->TileWidth*TileSizeX)/2
+		    ,target->Y*TileSizeY+(type->TileHeight*TileSizeY)/2
 			    -TileSizeY
 		    ,0,0);
 	    missile->SourceUnit=target;
