@@ -140,19 +140,16 @@ struct _cursor_type_ {
 	const void* OType;  ///< Object type (future extensions)
 	char*       Ident;  ///< Identifier to reference it
 	char*       Race;   ///< Race name
-	char*       File;   ///< Graphic file of the cursor
 
 	int HotX;    ///< Hot point x
 	int HotY;    ///< Hot point y
-	int Width;   ///< Width of cursor
-	int Height;  ///< Height of cursor
 
 	int SpriteFrame;  ///< Current displayed cursor frame
 	int FrameRate;    ///< Rate of changing the frames
 
 // --- FILLED UP ---
 
-	struct _graphic_* Sprite; ///< Cursor sprite image
+	struct _graphic_* G; ///< Cursor sprite image
 };
 
 	/// Cursor config reference

@@ -480,12 +480,9 @@ static int CclDefineCursor(lua_State* l)
 		ct->Race = race ? strdup(race) : NULL;
 	}
 
-	free(ct->File);
-	ct->File = strdup(file);
+	ct->G = NewGraphic(file, w, h);
 	ct->HotX = hotx;
 	ct->HotY = hoty;
-	ct->Width = w;
-	ct->Height = h;
 	ct->FrameRate = rate;
 
 	return 0;
