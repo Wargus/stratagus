@@ -448,8 +448,8 @@ local void PrintHeader(void)
 #ifdef NEW_NETMENUS
     "NEW-NETMENUS "
 #endif
-#ifdef NEW_REGIONS
-    "NEW-REGIONS "
+#ifdef HIERARCHIC_PATHFINDER
+    "HIERARCHIC-PATHFINDER "
 #endif
 #ifdef SLOW_INPUT
     "SLOW-INPUT "
