@@ -1269,7 +1269,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 				if (EditorState == EditorEditUnit && CursorBuilding) {
 					if (CanBuildUnitType(NULL, CursorBuilding,
 							Viewport2MapX(TheUI.MouseViewport, CursorX),
-							Viewport2MapY(TheUI.MouseViewport, CursorY))) {
+							Viewport2MapY(TheUI.MouseViewport, CursorY), 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess.Sound,
 							MaxSampleVolume);
 						EditUnit(Viewport2MapX(TheUI.MouseViewport,CursorX),
@@ -1572,7 +1572,7 @@ local void EditorCallbackMouse(int x, int y)
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, CursorBuilding,
 					Viewport2MapX(TheUI.SelectedViewport, CursorX),
-					Viewport2MapY(TheUI.SelectedViewport, CursorY))) {
+					Viewport2MapY(TheUI.SelectedViewport, CursorY), 1)) {
 					EditUnit(Viewport2MapX(TheUI.SelectedViewport, CursorX),
 						Viewport2MapY(TheUI.SelectedViewport, CursorY),
 						CursorBuilding, Players + SelectedPlayer);
