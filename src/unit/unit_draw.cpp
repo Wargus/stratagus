@@ -126,18 +126,30 @@ global void DrawUnitSelection(const Unit* unit)
 	if (EditorRunning && unit == UnitUnderCursor &&
 			EditorState == EditorSelecting) {
 		color = ColorWhite;
-	} else if (unit->Selected || (unit->Blink & 1)) {
+	} else if (unit->Selected || unit->TeamSelected || (unit->Blink & 1)) {
 		if (unit->Player->Player == PlayerNumNeutral) {
 			color = ColorYellow;
-		} else if (unit->Player == ThisPlayer) {
-			// FIXME: better allied?
+		} else if (unit->Selected && (unit->Player == ThisPlayer ||
+			PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
 			color = ColorGreen;
 		} else if (IsEnemy(ThisPlayer, unit)) {
 			color = ColorRed;
 		} else {
-			color = unit->Player->Color;
+			int i;
+
+			for (i = 0; i < PlayerMax; ++i) {
+				if (unit->TeamSelected & (1 << i)) {
+					break;
+				}
+			}
+			if (i == PlayerMax) {
+				color = unit->Player->Color;
+			} else {
+				color = Players[i].Color;
+			}
 		}
-	} else if (CursorBuilding && unit->Type->Building && unit->Player == ThisPlayer) {
+	} else if (CursorBuilding && unit->Type->Building && 
+		(unit->Player == ThisPlayer || PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {

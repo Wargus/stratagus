@@ -241,7 +241,7 @@ local void GameTypeManVsMachine(void)
 	int j;
 
 	for (i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer ) {
+		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
 		}
 		for (j = 0; j < PlayerMax - 1; ++j) {
@@ -253,6 +253,36 @@ local void GameTypeManVsMachine(void)
 					CommandDiplomacy(i, DiplomacyEnemy, j);
 				}
 			}
+		}
+	}
+}
+
+/**
+**  Man vs Machine whith Humans on a Team
+*/
+local void GameTypeManTeamVsMachine(void)
+{
+	int i;
+	int j;
+
+	for (i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
+			continue;
+		}
+		for (j = 0; j < PlayerMax - 1; ++j) {
+			if (i != j) {
+				if (Players[i].Type == Players[j].Type) {
+					CommandDiplomacy(i, DiplomacyAllied, j);
+					Players[i].SharedVision |= (1 << j);
+				} else {
+					CommandDiplomacy(i, DiplomacyEnemy, j);
+				}
+			}
+		}
+		if (Players[i].Type == PlayerPerson) {
+			Players[i].Team = 2;
+		} else {
+			Players[i].Team = 1;
 		}
 	}
 }
@@ -374,6 +404,9 @@ global void CreateGame(char* filename, WorldMap* map)
 			case SettingsGameTypeManVsMachine:
 				GameTypeManVsMachine();
 				break;
+			case SettingsGameTypeManTeamVsMachine:
+				GameTypeManTeamVsMachine();
+
 
 			// Future game type ideas
 #if 0

@@ -136,6 +136,7 @@ local void UiBeginInput(void)
 local void UiUnselectAll(void)
 {
 	UnSelectAll();
+	NetworkSendSelection(NULL, 0);
 	SelectionChanged();
 }
 
