@@ -423,7 +423,7 @@ local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 
     length = AviReadNextAudioFrame(avi, &frame);
     DebugLevel3Fn("Bytes %d - %d\n" _C_ length _C_ avi->AudioBuffer->Length);
-    if (length<0) {
+    if ((int)length<0) {
 	return 0;
     }
     if (length > nmemb * size) {

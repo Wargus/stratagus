@@ -875,7 +875,7 @@ local int GameStatsDrawFunc(int frame)
 	}
 
 	Rank=Ranks[sizeof(RankScores)];
-	for( i=0; i<sizeof(RankScores); i++ ) {
+	for( i=0; i<(int)sizeof(RankScores); i++ ) {
 	    if( ThisPlayer->Score<RankScores[i] ) {
 		Rank=Ranks[i];
 		break;

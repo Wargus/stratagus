@@ -72,7 +72,7 @@ struct _settings_ {
     int		RevealMap;		/// Reveal map
 };
 
-#define SettingsPresetMapDefault	(~0ul)	/// Special: Use pud/cm supplied
+#define SettingsPresetMapDefault	(~0)	/// Special: Use pud/cm supplied
 
 /*
 **	Resource-Preset factor

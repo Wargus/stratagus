@@ -457,7 +457,7 @@ local void HandleMouseOn(int x,int y)
     //
     //	Handle buttons
     //
-    for( i=0; i<sizeof(TheUI.Buttons)/sizeof(*TheUI.Buttons); ++i ) {
+    for( i=0; i<(int)(sizeof(TheUI.Buttons)/sizeof(*TheUI.Buttons)); ++i ) {
 	if( x<TheUI.Buttons[i].X
 		|| x>TheUI.Buttons[i].X+TheUI.Buttons[i].Width
 		|| y<TheUI.Buttons[i].Y
