@@ -1710,8 +1710,8 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 	for( h=0; h<height; ++h ) {	// each line
 	    sp=graphic->Frames+(i%fl)*width+((i/fl)*height+h)*graphic->Width;
 
-	    for( counter=w=0; w<width; ++w ) {
-		if( *sp==255 ) {	// transparent
+	    for (counter=w=0; w<width; ++w ) {
+		if( *sp==255 || *sp==0) {			// start transparency
 		    ++sp;
 		    if( ++counter==256 ) {
 			*dp++=255;
@@ -1724,7 +1724,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 
 		cp=dp++;
 		counter=0;
-		for( ; w<width; ++w ) {		// opaque
+		for( ; w<width; ++w ) {			// opaque
 		    *dp++=*sp++;
 		    if( ++counter==255 ) {
 			*cp=255;
@@ -1733,7 +1733,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 			counter=0;
 		    }
 		    // ARI: FIXME: wrong position
-		    if( w+1!=width && *sp==255 ) {	// transparent
+		    if( w+1!=width && (*sp==255 || *sp==0) ) {	// end transparency
 			break;
 		    }
 		}
@@ -1742,7 +1742,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 	    }
 	    if( counter ) {
 		*dp++=counter;
-		*dp++=0;		// 1 byte more, 1 check less!
+		*dp++=0;		// 1 byte more, 1 check less! (phantom end transparency)
 	    }
 	}
     }
