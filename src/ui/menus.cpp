@@ -7399,9 +7399,9 @@ global void ProcessMenu(const char *menu_id, int loop)
 
     VideoLockScreen();
     DrawMenu(CurrentMenu);
-    InvalidateAreaAndCheckCursor(MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
     MustRedraw&=~RedrawMenu;
     VideoUnlockScreen();
+    InvalidateAreaAndCheckCursor(MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
 
     if (loop) {
 	while (CurrentMenu != NULL) {
