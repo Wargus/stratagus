@@ -410,7 +410,10 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 {
     Command* command;
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
 	return;
     }
 
@@ -434,7 +437,6 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x ? x-1 : x;
     command->Data.Move.DY=y ? y-1 : y;
 
-    unit->PendCommand=*command;
 }
 
 /**
@@ -448,7 +450,10 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 {
     Command* command;
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
 	return;
     }
 
@@ -467,8 +472,6 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Data.Move.DX=dest->X;
     command->Data.Move.DY=dest->Y;
 #endif
-
-    unit->PendCommand=*command;
 }
 
 /**
