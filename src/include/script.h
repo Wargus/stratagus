@@ -65,6 +65,7 @@
 
 #define gh_boolean_p(lisp)	(EQ(lisp,sym_t) || NULLP(lisp))
 #define gh_scm2bool(lisp)	(NNULLP(lisp))
+#define gh_bool2scm(n)		((n) ? SCM_BOOL_T : SCM_BOOL_F)
 
 #define gh_symbol_p(lisp)	SYMBOLP(lisp)
 #define gh_symbol2scm(str)	cintern(str)
