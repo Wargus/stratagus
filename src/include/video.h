@@ -225,7 +225,7 @@ typedef struct _graphic_type_ {
 	**	@param y	y coordinate on the screen
 	*/
     void (*DrawSub)	(const Graphic* o,int gx,int gy
-			,unsigned w,unsigned h,int x,int y);
+			,int w,int h,int x,int y);
 	/**
 	**	Draw part of the object unclipped and flipped in X direction.
 	**
@@ -238,7 +238,7 @@ typedef struct _graphic_type_ {
 	**	@param y	y coordinate on the screen
 	*/
     void (*DrawSubX)	(const Graphic* o,int gx,int gy
-			,unsigned w,unsigned h,int x,int y);
+			,int w,int h,int x,int y);
 	/**
 	**	Draw part of the object clipped to the current clipping.
 	**
@@ -251,7 +251,7 @@ typedef struct _graphic_type_ {
 	**	@param y	y coordinate on the screen
 	*/
     void (*DrawSubClip)	(const Graphic* o,int gx,int gy
-			,unsigned w,unsigned h,int x,int y);
+			,int w,int h,int x,int y);
 	/**
 	**	Draw part of the object clipped and flipped in X direction.
 	**
@@ -264,7 +264,7 @@ typedef struct _graphic_type_ {
 	**	@param y	y coordinate on the screen
 	*/
     void (*DrawSubClipX)(const Graphic* o,int gx,int gy
-			,unsigned w,unsigned h,int x,int y);
+			,int w,int h,int x,int y);
 
 	/**
 	**	Draw the object unclipped and zoomed.
