@@ -92,18 +92,18 @@ global unsigned char* CreateMatrix(void)
 
     matrix=Matrix;
     w=TheMap.Width+2;
-    h=TheMap.Height+2;
+    h=TheMap.Height;
 
-    memset(matrix,98,w+w);
-    memset(matrix+w+w,0,(w*h)-w*2);	// initialize matrix
+    i=w+w+1;
+    memset(matrix,98,i);		// +1 for ships!
+    memset(matrix+i,0,w*h);		// initialize matrix
 
-    e=w+w*TheMap.Height;
-    for( i=w+w; i<=e; ) {		// mark left and right border
+    for( e=i+w*h; i<e; ) {		// mark left and right border
 	matrix[i]=98;
 	i+=w;
 	matrix[i-1]=98;
     }
-    memset(matrix+i,98,w);
+    memset(matrix+i,98,w+1);		// +1 for ships!
 
     return matrix;
 }
@@ -141,7 +141,7 @@ local void MarkPlaceInMatrix(int x,int y,int w,int h,unsigned char* matrix)
     DebugCheck( h==0 || w==0 );
 
     mw=TheMap.Width+2;
-    matrix+=mw+mw+1;
+    matrix+=mw+mw+2;
     xe=x+w;
     while( h-- ) {			// mark the rectangle
 	for( xi=x; xi<xe; ++xi ) {
@@ -209,7 +209,7 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y,int n
     path[n*2+0]=x;
     path[n*2+1]=y;
 
-    m=matrix+w2+1+y*w;
+    m=matrix+w2+2+y*w;
 
     for( ;; ) {
 	DebugLevel3("%d,%d(%d)\n",x,y,n);
@@ -296,7 +296,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 
     points[0].X=x=unit->X;
     points[0].Y=y=unit->Y;
-    matrix+=w+w+1;
+    matrix+=w+w+2;
     matrix[x+y*w]=1;				// mark start point
     ep=1;
     wp=1;					// start with one point
@@ -588,10 +588,10 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 		? UnitNumber(unit->Command.Data.Move.Goal) : 0
 	    ,gx,gy,ox,oy);
 
-    matrix=CreateMatrix();
     w=TheMap.Width+2;
+    matrix=CreateMatrix();
+    matrix+=w+w+2;
     mask=UnitMovementMask(unit);
-    matrix+=w+w+1;
 
     points[0]=x=unit->X;
     points[1]=y=unit->Y;
@@ -655,7 +655,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
 		    //	Check if goal reached.
 		    //
 		    if( i==88 ) {
-			PathTraceBack(matrix-w-w-1,add,x,y,n,path);
+			PathTraceBack(matrix-w-w-2,add,x,y,n,path);
 			xd=path[2]-unit->X;
 			yd=path[3]-unit->Y;
 
@@ -768,7 +768,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy
     //
     DebugLevel3("Unreachable Best %d=%d,%d\n",bestn,bestx,besty);
 
-    PathTraceBack(matrix-w-w-1,add,bestx,besty,bestn,path);
+    PathTraceBack(matrix-w-w-2,add,bestx,besty,bestn,path);
     xd=path[2]-unit->X;
     yd=path[3]-unit->Y;
 
