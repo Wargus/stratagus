@@ -116,13 +116,14 @@ global void SaveGame(const char* filename)
     SaveDependencies(file);
     SaveButtons(file);
     SaveMissileTypes(file);
+    SaveAi(file);
     SavePlayers(file);
     SaveMap(file);
     SaveUnits(file);
     SaveSelections(file);
     SaveGroups(file);
     SaveMissiles(file);
-    SaveAi(file);
+    //SaveAi(file);
     SaveTriggers(file);
     SaveCampaign(file);
 
