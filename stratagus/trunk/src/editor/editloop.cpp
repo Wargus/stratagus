@@ -1844,15 +1844,12 @@ local void CreateEditor(void)
 	if ((s = strrchr(file, '.')) && s[1] == 'C') {
 	    fast_load(gh_str02scm(file), NIL);
 	} else {
-#if defined(USE_GUILE) || defined(USE_SIOD)
 	    vload(file, 0, 1);
-#elif defined(USE_LUA)
-	    LuaLoadFile(file);
-#endif
 	}
-	CclGarbageCollect(0);		// Cleanup memory after load
 #elif defined(USE_LUA)
+	LuaLoadFile(file);
 #endif
+	CclGarbageCollect(0);		// Cleanup memory after load
     }
 
     ThisPlayer = &Players[0];
