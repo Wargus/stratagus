@@ -437,7 +437,7 @@ global void ColorCycle(void)
 				colors, 0, 256);
 			curlink = curlink->Next;
 		}
-	} else {
+	} else if (TheMap.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		//
 		//  Color cycle tileset palette
 		//
