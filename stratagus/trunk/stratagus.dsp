@@ -740,10 +740,6 @@ SOURCE=.\src\include\pud.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\rdtsc.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\include\script.h
 # End Source File
 # Begin Source File
@@ -863,10 +859,6 @@ SOURCE=.\lib\SDLmain.lib
 # Begin Source File
 
 SOURCE=.\lib\vorbis_static.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\vorbisfile_static.lib
 # End Source File
 # Begin Source File
 
