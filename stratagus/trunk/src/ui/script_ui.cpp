@@ -10,7 +10,7 @@
 //
 /**@name ccl_ui.c	-	The ui ccl functions. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer
+//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -2302,9 +2302,21 @@ local SCM CclDefineMenu(SCM list)
 		    if (menu->items[i].d.text.text) {
 			free(menu->items[i].d.text.text);
 		    }
+		    if (menu->items[i].d.text.normalcolor) {
+			free(menu->items[i].d.text.normalcolor);
+		    }
+		    if (menu->items[i].d.text.reversecolor) {
+			free(menu->items[i].d.text.normalcolor);
+		    }
 		} else if (mitype == MI_TYPE_BUTTON) {
 		    if (menu->items[i].d.button.text) {
 			free(menu->items[i].d.button.text);
+		    }
+		    if (menu->items[i].d.button.normalcolor) {
+			free(menu->items[i].d.button.normalcolor);
+		    }
+		    if (menu->items[i].d.button.reversecolor) {
+			free(menu->items[i].d.button.normalcolor);
 		    }
 		} else if (mitype == MI_TYPE_PULLDOWN) {
 		    int j;
@@ -2313,6 +2325,33 @@ local SCM CclDefineMenu(SCM list)
 			free(menu->items[i].d.pulldown.options[j]);
 		    }
 		    free(menu->items[i].d.pulldown.options);
+		    if (menu->items[i].d.pulldown.normalcolor) {
+			free(menu->items[i].d.pulldown.normalcolor);
+		    }
+		    if (menu->items[i].d.pulldown.reversecolor) {
+			free(menu->items[i].d.pulldown.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_LISTBOX) {
+		    if (menu->items[i].d.listbox.normalcolor) {
+			free(menu->items[i].d.listbox.normalcolor);
+		    }
+		    if (menu->items[i].d.listbox.reversecolor) {
+			free(menu->items[i].d.listbox.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_INPUT) {
+		    if (menu->items[i].d.input.normalcolor) {
+			free(menu->items[i].d.input.normalcolor);
+		    }
+		    if (menu->items[i].d.input.reversecolor) {
+			free(menu->items[i].d.input.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_GEM) {
+		    if (menu->items[i].d.gem.normalcolor) {
+			free(menu->items[i].d.gem.normalcolor);
+		    }
+		    if (menu->items[i].d.gem.reversecolor) {
+			free(menu->items[i].d.gem.normalcolor);
+		    }
 		}
 	    }
 	    free(menu->items);
@@ -2640,11 +2679,11 @@ local SCM CclDefineMenuItem(SCM list)
 			item->d.button.button=scm2buttonid(value);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.button.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.button.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
@@ -2705,11 +2744,11 @@ local SCM CclDefineMenuItem(SCM list)
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.pulldown.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.pulldown.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
@@ -2779,11 +2818,11 @@ local SCM CclDefineMenuItem(SCM list)
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.listbox.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.listbox.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
@@ -2916,11 +2955,11 @@ local SCM CclDefineMenuItem(SCM list)
 			item->d.input.maxch=gh_scm2int(value);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.input.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.input.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
@@ -2972,11 +3011,11 @@ local SCM CclDefineMenuItem(SCM list)
 			item->d.gem.text=gh_scm2newstr(value, NULL);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-normal")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.gem.normalcolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else if ( gh_eq_p(value, gh_symbol2scm("color-reverse")) ) {
 			if ( !gh_null_p(gh_car(sublist)) ) {
-			    item->d.text.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
+			    item->d.gem.reversecolor=gh_scm2newstr(gh_car(sublist), NULL);
 			}
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
