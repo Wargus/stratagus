@@ -128,15 +128,11 @@ global void CreateMinimap(void)
 	Map2MinimapY[n] = (n * MinimapScaleY) / MINIMAP_FAC;
     }
 
+    // Palette updated from UpdateMinimapTerrain()
     MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TheUI.MinimapW, 
 	TheUI.MinimapH, 8, 0, 0, 0, 0);
-    SDL_SetPalette(MinimapTerrainSurface, SDL_LOGPAL, 
-	TheMap.TileGraphic->Surface->format->palette->colors, 0, 256);
-
     MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TheUI.MinimapW,
 	TheUI.MinimapH, 8, 0, 0, 0, 0);
-    SDL_SetPalette(MinimapSurface, SDL_LOGPAL, 
-	TheMap.TileGraphic->Surface->format->palette->colors, 0, 256);
 
     srect.x = TheUI.MinimapPosX - TheUI.MinimapPanelX;
     srect.y = TheUI.MinimapPosY - TheUI.MinimapPanelY;
@@ -176,6 +172,11 @@ global void UpdateMinimapTerrain(void)
     if (!(scaley = (MinimapScaleY / MINIMAP_FAC))) {
 	scaley = 1;
     }
+
+    SDL_SetPalette(MinimapTerrainSurface, SDL_LOGPAL, 
+	TheMap.TileGraphic->Surface->format->palette->colors, 0, 256);
+    SDL_SetPalette(MinimapSurface, SDL_LOGPAL, 
+	TheMap.TileGraphic->Surface->format->palette->colors, 0, 256);
 
     tilepitch = TheMap.TileGraphic->Surface->w / TileSizeX;
 
@@ -259,13 +260,10 @@ global void UpdateMinimapXY(int tx, int ty)
 	    xofs = TileSizeX * (tile % tilepitch);
 	    yofs = TileSizeY * (tile / tilepitch);
 
-	    // FIXME: does this work?
 	    ((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW] =
 		((Uint8*)TheMap.TileGraphic->Surface->pixels)
 		    [xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) 
 		    * TheMap.TileGraphic->Surface->w];
-//	    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW] =
-//		TheMap.Tiles[tile][7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
 	}
     }
     SDL_UnlockSurface(TheMap.TileGraphic->Surface);
