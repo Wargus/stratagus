@@ -667,7 +667,7 @@ struct _unit_ {
 */
 #define UnitUnusable(unit) \
 	((unit)->Removed || (unit)->Orders[0].Action == UnitActionDie || \
-	  (unit)->Orders[0].Action == UnitActionBuilded)
+	  (unit)->Orders[0].Action == UnitActionBuilded || (unit)->Destroyed)
 
 /**
 **		Returns unit number (unique to this unit)
