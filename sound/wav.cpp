@@ -122,9 +122,9 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 		sample->Len += comp;
 	}
 
-        if (sample->Len < len) {
-                len = sample->Len;
-        }
+	if (sample->Len < len) {
+		len = sample->Len;
+	}
 
 	memcpy(buf, sample->Buffer + sample->Pos, len);
 	sample->Pos += len;
@@ -154,22 +154,22 @@ static const SampleType WavStreamSampleType = {
 
 static int WavRead(Sample* sample, void* buf, int len)
 {
-        if (len > sample->Len) {
-                len = sample->Len;
-        }
+	if (len > sample->Len) {
+		len = sample->Len;
+	}
 
-        memcpy(buf, sample->Buffer + sample->Pos, len);
-        sample->Pos += len;
-        sample->Len -= len;
+	memcpy(buf, sample->Buffer + sample->Pos, len);
+	sample->Pos += len;
+	sample->Len -= len;
 
-        return len;
+	return len;
 }
 
 static void WavFree(Sample* sample)
 {
-        free(sample->User);
-        free(sample->Buffer);
-        free(sample);
+	free(sample->User);
+	free(sample->Buffer);
+	free(sample);
 }
 
 /**

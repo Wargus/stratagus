@@ -1121,7 +1121,7 @@ void InitCcl(void)
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
-    lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
+	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "SaveGame", CclSaveGame);

@@ -57,18 +57,18 @@
 
 char DefaultObjective[] = "-Destroy your enemies";
 
-int GameResult;  /// Outcome of the game
-char CurrentMapPath[1024];  /// Path of the current map
+int GameResult;                              /// Outcome of the game
+char CurrentMapPath[1024];                   /// Path of the current map
 char DefaultMap[1024] = "maps/default.pud";  /// Default map path
-int RestartScenario;  /// Restart the scenario
-int QuitToMenu;  /// Quit to menu
-Campaign* Campaigns;  /// Campaigns
-int NumCampaigns;  /// Number of campaigns
+int RestartScenario;                         /// Restart the scenario
+int QuitToMenu;                              /// Quit to menu
+Campaign* Campaigns;                         /// Campaigns
+int NumCampaigns;                            /// Number of campaigns
 
 static Campaign* CurrentCampaign;        /// Playing this campaign
 static CampaignChapter* CurrentChapter;  /// Playing this chapter of campaign
 static int SkipCurrentChapter = 1;       /// Skip the current chapter when
-                                        /// looking for the next one
+                                         /// looking for the next one
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -185,7 +185,7 @@ int MapFogFilterFlags(Player* player, int x, int y, int mask)
 	Unit* table[UnitMax];
 
 	// Calculate Mask for tile with fog
-    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 		return mask;
 	}
 
