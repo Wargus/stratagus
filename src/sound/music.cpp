@@ -263,9 +263,6 @@ global void PlaySectionMusic(PlaySectionType section)
 #ifdef USE_CDAUDIO
     if (CDMode == CDModeDefined) {
 	track = CDTrack;
-	if (track && track == Disco) {
-	    return;
-	}
 	newtrack = 0;
 	if ( (1 << track) & PlaySections[i].CDTracks ) {
 	    newtrack = 0;
