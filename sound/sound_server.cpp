@@ -257,7 +257,7 @@ global void StopMusic(void)
 global void CDRomCheck(void)
 {
 #ifdef USE_SDLCD
-    if (strcmp(CDMode, ":off") && SDL_CDStatus(CDRom) == 1) {
+    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped") && SDL_CDStatus(CDRom) == 1) {
 	if (!strcmp(CDMode, ":all")) {
 	    PlayMusic(":all");
 	} else if (!strcmp(CDMode, ":random")) {
@@ -267,7 +267,7 @@ global void CDRomCheck(void)
 #endif
 
 #ifdef USE_LIBCDA
-    if (strcmp(CDMode, ":off") && !cd_current_track()) {
+    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped") && !cd_current_track()) {
 	DebugLevel0Fn("Playing new track\n");
 	if (!strcmp(CDMode, ":all")) {
 	    PlayMusic(":all");
@@ -1225,16 +1225,19 @@ global void QuitSound(void)
 global void QuitCD(void)
 {
 #ifdef USE_SDLCD
-    if (strcmp(CDMode,":off"))
+    if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
 	SDL_CDStop(CDRom);
-    SDL_CDClose(CDRom);
+    if (strcmp(CDMode,":off"))
+        SDL_CDClose(CDRom);
 #endif
 
 #ifdef USE_LIBCDA
-    if (strcmp(CDMode,":off"))
+    if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
         cd_stop();
-    cd_close();
-    cd_exit();
+    if (strcmp(CDMode,":off")) {
+        cd_close();
+        cd_exit();
+    }
 #endif
 }
 
