@@ -879,11 +879,15 @@ extern int ViewPointDistance(int x, int y);
 extern int ViewPointDistanceToUnit(const Unit* dest);
 
 	/// Return true, if unit is an enemy of the player
-extern int IsEnemy(const Player* player,const Unit* dest);
-	/// Return true, if unit is allied with the player
-extern int IsAllied(const Player* player,const Unit* dest);
+#define IsEnemy(player, dest) \
+	((player)->Enemy & (1 << (dest)->Player->Player))
+	/// Return true, if unit is allied of the player
+#define IsAllied(player, dest) \
+	((player)->Allied & (1 << (dest)->Player->Player))
 	/// Return true, if unit is shared vision with the player
-extern int IsSharedVision(const Player* player,const Unit* dest);
+#define IsSharedVision(player, dest) \
+	(( (player)->SharedVision & (1 << (dest)->Player->Player)  ) && \
+	(  (dest)->Player->SharedVision & (1 << (player)->Player)))
 	/// Can this unit-type attack the other (destination)
 extern int CanTarget(const UnitType* type,const UnitType* dest);
 
