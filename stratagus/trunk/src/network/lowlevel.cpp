@@ -186,7 +186,7 @@ global unsigned long NetResolveHost(const char* host)
     return INADDR_NONE;
 }
 
-#ifdef NEW_NETMENUES
+#ifdef NEW_NETMENUS
 // ARI: I knew how to write this for a unix environment,
 //	but am quite certain that porting this can cause you
 //	trouble, esp. to win32. - winipcfg can do, so it's possible..
