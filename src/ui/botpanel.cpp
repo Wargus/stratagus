@@ -66,7 +66,7 @@
 global int CurrentButtonLevel;
 
 	/// Display the command key in the buttons.
-global int ShowCommandKey;
+global char ShowCommandKey;
 
 	/// All buttons for units
 local ButtonAction *UnitButtonTable[MAX_BUTTONS];
