@@ -77,6 +77,7 @@ local PlayerRanks Ranks[PlayerMax];	/// Ranks
 ----------------------------------------------------------------------------*/
 
 local int IntroNoEvent;			/// Flag got an event
+local int IntroButtonPressed;		/// Button pressed
 local int UseContinueButton;		/// Handle continue button
 local int ContinueButtonX;		/// Continue button position X
 local int ContinueButtonY;		/// Continue button position Y
@@ -97,6 +98,7 @@ local void IntroCallbackButton1(unsigned button)
     } else {
 	IntroNoEvent = 0;
     }
+    IntroButtonPressed = 1;
 }
 
 /**
@@ -130,6 +132,7 @@ local void IntroCallbackKey1(unsigned key, unsigned keychar)
     } else {
 	IntroNoEvent = 0;
     }
+    IntroButtonPressed = 1;
 }
 
 /**
@@ -834,6 +837,12 @@ local int GameStatsDrawFunc(int frame)
     draw_all=0;
 #endif
 
+    // If a button was pressed draw everything
+    if( IntroButtonPressed ) {
+	draw_all=1;
+	dodraw=99;
+    }
+
     percent=100;
     done=0;
 
@@ -843,7 +852,9 @@ local int GameStatsDrawFunc(int frame)
 
     x=TheUI.Offset640X;
     y=TheUI.Offset480Y;
-    dodraw=frame/stats_pause;
+    if( !IntroButtonPressed ) {
+	dodraw=frame/stats_pause;
+    }
 
     for( i=0,c=0; i<PlayerMax; i++) {
 	if(Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer) {
@@ -1214,6 +1225,7 @@ global void ShowStats(void)
     frame=1;
     done=0;
     IntroNoEvent=1;
+    IntroButtonPressed=0;
     while( 1 ) {
 	VideoLockScreen();
 	HideAnyCursor();
