@@ -772,7 +772,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	target->Y = y;
 	target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
 #ifdef NEW_FOW
-	target->CurrentSightRange=target->Type->Stats->SightRange;
+	target->CurrentSightRange=target->Stats->SightRange;
 	MapMarkSight(target->Player,x,y,target->CurrentSightRange);
 #endif
 	//target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
