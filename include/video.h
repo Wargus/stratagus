@@ -849,6 +849,22 @@ extern void InitSprite(void);
     /// Init line draw
 extern void InitLineDraw(void);
 
+    ///	Draw circle.
+extern void VideoDrawCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw 25% translucent circle.
+extern void VideoDraw25TransCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw 50% translucent circle.
+extern void VideoDraw50TransCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw 75% translucent circle.
+extern void VideoDraw75TransCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Draw translucent circle.
+extern void VideoDrawTransCircle(SysColors color,int x,int y,unsigned r
+	,int alpha);
+
     ///	Draw circle clipped.
 extern void VideoDrawCircleClip(SysColors color,int x,int y,unsigned r);
 
@@ -865,9 +881,61 @@ extern void VideoDraw75TransCircleClip(SysColors color,int x,int y,unsigned r);
 extern void VideoDrawTransCircleClip(SysColors color,int x,int y,unsigned r
 	,int alpha);
 
+    ///	Fill rectangle.
+extern void VideoFillRectangle(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    ///	Fill 25% translucent rectangle.
+extern void VideoFill25TransRectangle(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    ///	Fill 50% translucent rectangle.
+extern void VideoFill50TransRectangle(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    ///	Fill 75% translucent rectangle.
+extern void VideoFill75TransRectangle(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    ///	Fill translucent rectangle.
+extern void VideoFillTransRectangle(SysColors color,int x,int y
+	,unsigned w,unsigned h,int alpha);
+
     ///	Fill rectangle clipped.
 extern void VideoFillRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h);
+
+    ///	Fill 25% translucent rectangle clipped.
+extern void VideoFill25TransRectangleClip(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    ///	Fill 50% translucent rectangle clipped.
+extern void VideoFill50TransRectangleClip(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    ///	Fill 75% translucent rectangle clipped.
+extern void VideoFill75TransRectangleClip(SysColors color,int x,int y
+	,unsigned w,unsigned h);
+
+    ///	Fill translucent rectangle clipped.
+extern void VideoFillTransRectangleClip(SysColors color,int x,int y
+	,unsigned w,unsigned h,int alpha);
+
+    ///	Fill circle.
+extern void VideoFillCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill 25% translucent circle.
+extern void VideoFill25TransCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill 50% translucent circle.
+extern void VideoFill50TransCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill 75% translucent circle.
+extern void VideoFill75TransCircle(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill translucent circle.
+extern void VideoFillTransCircle(SysColors color,int x,int y,unsigned r
+	,int alpha);
 
     ///	Fill circle clipped.
 extern void VideoFillCircleClip(SysColors color,int x,int y,unsigned r);
