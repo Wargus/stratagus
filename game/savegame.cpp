@@ -59,6 +59,7 @@
 #include "spells.h"
 #include "commands.h"
 #include "script.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -106,6 +107,8 @@ global void SaveGame(const char* filename)
 	CLprintf(file, "---  \"map\",     \"%s\",\n", TheMap.Description);
 	CLprintf(file, "---  \"engine\",  {%d, %d, %d},\n",
 		StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
+	CLprintf(file, "  SyncHash = %d, \n", SyncHash);
+	CLprintf(file, "  SyncRandSeed = %d, \n", SyncRandSeed);
 	CLprintf(file, "  SaveFile = \"%s\"\n", TheMap.Info->Filename);
 	// Save media type
 	{
