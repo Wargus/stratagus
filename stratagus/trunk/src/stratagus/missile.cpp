@@ -101,8 +101,6 @@ global int NumMissileTypes;		/// number of missile-types made.
 /*
 **	Next missile-types are used hardcoded in the source.
 */
-global MissileType* MissileTypeSmallFire;	/// Small fire missile-type
-global MissileType* MissileTypeBigFire;		/// Big fire missile-type
     /// missile-type for the explosion missile
 global MissileType* MissileTypeExplosion;
 
@@ -127,6 +125,8 @@ local MissileType* MissileTypeHash[61];
 local hashtable(MissileType*,61) MissileTypeHash;
 
 #endif
+
+global BurningBuildingFrame *BurningBuildingFrames;  /// Burning building frames
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1367,26 +1367,20 @@ local void MissileAction(Missile* missile)
 	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
 		int f;
+		MissileType* fire;
 
 		missile->SpriteFrame=0;
 		f=(100*unit->HP)/unit->Stats->HitPoints;
-		if( f>75) {
+		fire = MissileBurningBuilding(f);
+		if( !fire ) {
 		    FreeMissile(missile);
 		    missile=NULL;
 		    unit->Burning=0;
-		} else if( f>50 ) {
-		    if( missile->Type!=MissileTypeSmallFire ) {
-			missile->X+=missile->Type->Width/2;
-			missile->Y+=missile->Type->Height/2;
-			missile->Type=MissileTypeSmallFire;
-			missile->X-=missile->Type->Width/2;
-			missile->Y-=missile->Type->Height/2;
-		    }
 		} else {
-		    if( missile->Type!=MissileTypeBigFire ) {
+		    if( missile->Type!=fire ) {
 			missile->X+=missile->Type->Width/2;
 			missile->Y+=missile->Type->Height/2;
-			missile->Type=MissileTypeBigFire;
+			missile->Type=fire;
 			missile->X-=missile->Type->Width/2;
 			missile->Y-=missile->Type->Height/2;
 		    }
@@ -1491,6 +1485,27 @@ global int ViewPointDistanceToMissile(const Missile* missile)
     DebugLevel3Fn("Missile %p at %d %d\n" _C_ missile _C_ x _C_ y);
 
     return ViewPointDistance(x,y);
+}
+
+/**
+**	Get the burning building missile based on hp percent.
+**
+**	@param percent	HP percent
+*/
+global MissileType* MissileBurningBuilding(int percent)
+{
+    BurningBuildingFrame *frame;
+    BurningBuildingFrame *tmp;
+
+    frame=tmp=BurningBuildingFrames;
+    while( tmp ) {
+	if( percent<tmp->Percent ) {
+	    break;
+	}
+	frame=tmp;
+	tmp=tmp->Next;
+    }
+    return frame->Missile;
 }
 
 /**
@@ -1639,8 +1654,6 @@ global void InitMissileTypes(void)
 	}
     }
 
-    MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
-    MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
     MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
 }
 
@@ -1665,9 +1678,6 @@ global void CleanMissileTypes(void)
     free(MissileTypes);
     MissileTypes=NULL;
     NumMissileTypes=0;
-
-    MissileTypeSmallFire=NULL;
-    MissileTypeBigFire=NULL;
 }
 
 /**

@@ -478,6 +478,12 @@ struct _missile_ {
     Missile**	MissileSlot;		/// pointer to missile slot
 };
 
+typedef struct _burning_building_frame_ {
+    int		    Percent;			/// HP percent
+    MissileType*    Missile;			/// Missile to draw
+    struct _burning_building_frame_* Next;	/// Next pointer
+} BurningBuildingFrame;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -485,11 +491,11 @@ struct _missile_ {
 extern char** MissileTypeWcNames;	/// Mapping wc-number 2 symbol
 
 extern MissileType* MissileTypes;		/// All missile-types
-extern MissileType* MissileTypeSmallFire;	/// Small fire missile-type
-extern MissileType* MissileTypeBigFire;		/// Big fire missile-type
 extern MissileType* MissileTypeExplosion;	/// Explosion missile-type
 
 extern const char* MissileClassNames[];		/// Missile class names
+
+extern BurningBuildingFrame *BurningBuildingFrames;  /// Burning building frames
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -525,6 +531,9 @@ extern int FindAndSortMissiles(const Viewport* vp, Missile** table);
 extern void MissileActions(void);
     /// distance from view point to missile
 extern int ViewPointDistanceToMissile(const Missile*);
+
+    /// Get the burning building missile based on hp percent
+extern MissileType* MissileBurningBuilding(int percent);
 
     /// Save missile-types
 extern void SaveMissileTypes(CLFile *);
