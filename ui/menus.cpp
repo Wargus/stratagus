@@ -2474,7 +2474,7 @@ local void CustomGameStart(void)
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
 	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
-	p=strchr(ScenSelectPath,'/')+1;
+	p=ScenSelectPath+strlen(FreeCraftLibPath)+1;
 	strcpy(CurrentMapPath, p);
     }
     else {
