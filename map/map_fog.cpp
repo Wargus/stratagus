@@ -78,7 +78,7 @@ static unsigned char* VisibleTable;
 
 #ifndef USE_OPENGL
 static SDL_Surface* OnlyFogSurface;
-static SDL_Surface* AlphaFogSurface;
+static Graphic AlphaFogG;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -629,8 +629,11 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 		if (tile && tile != tile2) {
-			// FIXME: Prerender to alpha
-			VideoDrawClipTrans(TheMap.FogGraphic, tile, dx, dy, FogOfWarOpacity);
+#ifdef USE_OPENGL
+			VideoDrawClipTrans(TheMap.TileGraphic, tile, dx, dy, FogOfWarOpacity);
+#else
+			VideoDrawClip(&AlphaFogG, tile, dx, dy);
+#endif
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
@@ -766,8 +769,8 @@ void InitMapFogOfWar(void)
 	// Generate Alpha Fog surface.
 	//
 	if (TheMap.FogGraphic->Surface->format->BytesPerPixel == 1) {
-		AlphaFogSurface = SDL_DisplayFormat(TheMap.FogGraphic->Surface);
-		SDL_SetAlpha(AlphaFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+		s = SDL_DisplayFormat(TheMap.FogGraphic->Surface);
+		SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 	} else {
 		int i;
 		int j;
@@ -803,8 +806,13 @@ void InitMapFogOfWar(void)
 			}
 		}
 		SDL_UnlockSurface(s);
-		AlphaFogSurface = s;
 	}
+	AlphaFogG.Surface = s;
+	AlphaFogG.Width = TileSizeX;
+	AlphaFogG.Height = TileSizeY;
+	AlphaFogG.GraphicWidth = s->w;
+	AlphaFogG.GraphicHeight = s->h;
+	AlphaFogG.NumFrames = 1;
 #endif
 
 	VisibleTable = malloc(TheMap.Width * TheMap.Height * sizeof(*VisibleTable));
@@ -828,9 +836,9 @@ void CleanMapFogOfWar(void)
 		SDL_FreeSurface(OnlyFogSurface);
 		OnlyFogSurface = NULL;
 	}
-	if (AlphaFogSurface) {
-		SDL_FreeSurface(AlphaFogSurface);
-		AlphaFogSurface = NULL;
+	if (AlphaFogG.Surface) {
+		SDL_FreeSurface(AlphaFogG.Surface);
+		AlphaFogG.Surface = NULL;
 	}
 #endif
 }
