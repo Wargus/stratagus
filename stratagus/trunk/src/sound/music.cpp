@@ -10,7 +10,7 @@
 //
 /**@name music.c		-	Background music support */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -355,7 +355,7 @@ global int PlayCDRom(int name)
     if (name == CDModeDefined) {
         CDMode = CDModeDefined;
         track = cd_current_track();
-        if (PlaySection == PlaySectionStats) {
+        if (CurrentPlaySection == PlaySectionStats) {
 	    if (GameResult == GameVictory) {
 		if (!ThisPlayer->Race && track != 8) {
 		    cd_play(8);
@@ -369,20 +369,20 @@ global int PlayCDRom(int name)
 		    cd_play(17);
 		}
 	    }
-	} else if (PlaySection == PlaySectionBriefing) {
+	} else if (CurrentPlaySection == PlaySectionBriefing) {
 	    if (!ThisPlayer->Race && track != 7) {
 	        cd_play(7);
 	    } else if (ThisPlayer->Race && track != 15) {
 	        cd_play(15);
 	    }
-	} else if ((PlaySection == PlaySectionMainMenu) && track != 15) {
+	} else if (CurrentPlaySection == PlaySectionMainMenu && track != 15) {
 	    cd_play(15);
-	} else if ((PlaySection == PlaySectionGame) && 
+	} else if (CurrentPlaySection == PlaySectionGame && 
 		    !ThisPlayer->Race && (track < 3 || track > 6)) {
 	    do CDTrack = (MyRand() % NumCDTracks) + 3;
 	    while (CDTrack < 3 || CDTrack > 7); 
 	    cd_play(CDTrack);
-	} else if ((PlaySection == PlaySectionGame) && 
+	} else if (CurrentPlaySection == PlaySectionGame && 
 		    ThisPlayer->Race && (track < 10 || track > 14)) {
 	    do CDTrack = (MyRand() % NumCDTracks) + 9;
 	    while (CDTrack < 11 || CDTrack > 14); 

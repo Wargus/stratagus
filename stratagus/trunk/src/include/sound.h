@@ -10,7 +10,7 @@
 //
 /**@name sound.h	-	The sound header file. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -67,6 +67,35 @@ typedef struct _game_sound_ {
     SoundConfig OrcRescue;		/// rescue units
 } GameSound;
 
+typedef enum _play_section_type_ {
+    PlaySectionGame,			/// Game
+    PlaySectionBriefing,		/// Briefing
+    PlaySectionStats,			/// Stats
+    PlaySectionMainMenu,		/// Main menu
+} PlaySectionType;
+
+typedef enum _play_section_order_ {
+    PlaySectionOrderAll,		/// Sequential order
+    PlaySectionOrderRandom,		/// Random order
+} PlaySectionOrder;
+
+typedef struct _play_section_ {
+    char *Race;				/// Race, NULL if for all races
+    PlaySectionType Type;		/// Type
+    unsigned long CDTracks;		/// Bit field of cd tracks. 32 enough?
+    PlaySectionOrder CDOrder;		/// CD order
+    char **Files;			/// Files
+    PlaySectionOrder FileOrder;		/// File order
+} PlaySection;
+
+typedef enum _cd_modes_ {
+    CDModeStopped = -1,			/// Stopped
+    CDModeOff,				/// Off
+    CDModeAll,				/// All
+    CDModeRandom,			/// Random
+    CDModeDefined,			/// Defined
+} CDModes;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -82,6 +111,12 @@ extern GameSound GameSounds;		/// Game sound configuration
 
 extern int PlayingMusic;		/// flag true if playing music
 extern int CallbackMusic;		/// flag true callback ccl if stops
+
+extern PlaySection *PlaySections;	/// Play sections
+extern int NumPlaySections;		/// Number of play sections
+extern PlaySectionType CurrentPlaySection;  /// Current play section type
+
+extern CDModes CDMode;			/// CD mode
 
 /*----------------------------------------------------------------------------
 --	Functions

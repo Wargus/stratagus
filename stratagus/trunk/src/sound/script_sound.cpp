@@ -10,7 +10,7 @@
 //
 /**@name ccl_sound.c	-	The sound ccl functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1999-2003 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -376,107 +376,128 @@ local SCM CclSetMusicVolume(SCM volume)
 local SCM CclSetCdMode(SCM mode)
 {
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
-    int cdmode;
-    char *str = gh_scm2newstr(mode, NULL);
+    CDModes cdmode;
 
-    if (!strcmp(str, "all")) {
-	cdmode = CDModeAll;
-    } else if (!strcmp(str, "random")) {
-	cdmode = CDModeRandom;
-    } else if (!strcmp(str, "defined")) {
-	cdmode = CDModeDefined;
+    if( gh_eq_p(mode,gh_symbol2scm("all")) ) {
+	cdmode=CDModeAll;
+    } else if( gh_eq_p(mode,gh_symbol2scm("random")) ) {
+	cdmode=CDModeRandom;
+    } else if( gh_eq_p(mode,gh_symbol2scm("defined")) ) {
+	cdmode=CDModeDefined;
     } else {
-	free(str);
-	return mode;
+	errl("Unsupported tag",mode);
     }
-
-    free(str);
 
     PlayCDRom(cdmode);
 #endif
     return mode;
 }
 
+/**
+**	Define play sections
+*/
 local SCM CclDefinePlaySections(SCM list)
 {
-    SCM value, sublist, sublist2, temp;
-    enum _race_ { racealliance, racemythical } race = -1;
-    enum _type_ { typegame, typebriefing, typestats, typemainmenu } type = -1;
-    enum _order_ { orderall, orderrandom } order = -1;
-    long tracks = 0;
+    SCM value;
+    SCM sublist;
+    PlaySection *p;
     int i;
-    char *filename;
 
-    while ( !gh_null_p(list) ) {
-	value = gh_car(list);
-	list = gh_cdr(list);
-	if (gh_eq_p(value, gh_symbol2scm("race"))) {
-	    value = gh_car(list);
-	    sublist = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("alliance"))) {
-		race = racealliance;
-	    } else if (gh_eq_p(value, gh_symbol2scm("mythical"))) {
-		race = racemythical;
+    ++NumPlaySections;
+    PlaySections=realloc(PlaySections,NumPlaySections*sizeof(PlaySection));
+    p=PlaySections+NumPlaySections-1;
+    memset(p,0,sizeof(PlaySection));
+
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("race")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    p->Race=gh_scm2newstr(value,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("type")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    if( gh_eq_p(value, gh_symbol2scm("game")) ) {
+		p->Type=PlaySectionGame;
+	    } else if( gh_eq_p(value,gh_symbol2scm("briefing")) ) {
+		p->Type=PlaySectionBriefing;
+	    } else if( gh_eq_p(value,gh_symbol2scm("stats")) ) {
+		p->Type=PlaySectionStats;
+	    } else if( gh_eq_p(value,gh_symbol2scm("main-menu")) ) {
+		p->Type=PlaySectionMainMenu;
+	    } else {
+		errl("Unsupported tag",value);
 	    }
-	}
-	if (gh_eq_p(value, gh_symbol2scm("type"))) {
-	    value = gh_car(list);
-	    sublist = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("game"))) {
-		type = typegame;
-	    } else if (gh_eq_p(value, gh_symbol2scm("briefing"))) {
-		type = typebriefing;
-	    } else if (gh_eq_p(value, gh_symbol2scm("stats"))) {
-		type = typestats;
-	    } else if (gh_eq_p(value, gh_symbol2scm("mainmenu"))) {
-		type = typemainmenu;
-	    }
-	}
-	if (gh_eq_p(value, gh_symbol2scm("cd"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while ( !gh_null_p(sublist) ) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("order"))) {
-		    value = gh_car(list);
-		    sublist = gh_cdr(sublist);
-		    if (gh_eq_p(value, gh_symbol2scm("all"))) {
-			order = orderall;
-		    } else if (gh_eq_p(value, gh_symbol2scm("random"))) {
-			order = orderrandom;
+	} else if( gh_eq_p(value,gh_symbol2scm("cd")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( gh_eq_p(value,gh_symbol2scm("order")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    if( gh_eq_p(value,gh_symbol2scm("all")) ) {
+			p->CDOrder=PlaySectionOrderAll;
+		    } else if( gh_eq_p(value,gh_symbol2scm("random")) ) {
+			p->CDOrder=PlaySectionOrderRandom;
+		    } else {
+			errl("Unsupported tag",value);
 		    }
-		}
-		if (gh_eq_p(value, gh_symbol2scm("tracks"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    for (i = 0; i < gh_vector_length(value); ++i) {
-			temp = gh_vector_ref(value, gh_int2scm(i));
-			tracks = tracks | (1 << gh_scm2int(temp));
+		} else if( gh_eq_p(value,gh_symbol2scm("tracks")) ) {
+		    SCM temp;
+
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    for( i=0; i<gh_vector_length(value); ++i ) {
+			temp=gh_vector_ref(value,gh_int2scm(i));
+			p->CDTracks|=(1<<gh_scm2int(temp));
 		    }
-		}
-	    }
-	}
-	if (gh_eq_p(value, gh_symbol2scm("no-cd"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while ( !gh_null_p(sublist) ) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("files"))) {
-		    sublist2 = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    while ( !gh_null_p(sublist2) ) {
-			value = gh_car(sublist2);
-			sublist2 = gh_cdr(sublist2);
-			filename = gh_scm2newstr(value, NULL);
-			printf("file %s\n", filename);
-			free(filename);
-		    }
+		} else {
+		    errl("Unsupported tag",value);
 		}
 	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("no-cd")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( gh_eq_p(value,gh_symbol2scm("order")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    if( gh_eq_p(value,gh_symbol2scm("all")) ) {
+			p->FileOrder=PlaySectionOrderAll;
+		    } else if( gh_eq_p(value,gh_symbol2scm("random")) ) {
+			p->FileOrder=PlaySectionOrderRandom;
+		    } else {
+			errl("Unsupported tag",value);
+		    }
+		} else if( gh_eq_p(value,gh_symbol2scm("files")) ) {
+		    SCM sublist2;
+
+		    sublist2=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    i=0;
+		    while( !gh_null_p(sublist2) ) {
+			value=gh_car(sublist2);
+			sublist2=gh_cdr(sublist2);
+			++i;
+			p->Files=realloc(p->Files,(i+1)*sizeof(char*));
+			p->Files[i-1]=gh_scm2newstr(value,NULL);
+			p->Files[i]=NULL;
+		    }
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	} else {
+	    errl("Unsupported tag",value);
 	}
     }
+
+    return SCM_UNSPECIFIED;
 }
 
 /**

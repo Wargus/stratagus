@@ -11,7 +11,7 @@
 /**@name sound_server.c		-	The sound server
 **                                      (hardware layer and so on) */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1269,20 +1269,25 @@ global void QuitSound(void)
 #endif // USE_SDLA
 }
 
+/**
+**	FIXME: docu
+*/
 global void QuitCD(void)
 {
 #if defined(USE_SDLCD)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped)
+    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
 	SDL_CDStop(CDRom);
 	CDMode = CDModeStopped;
+    }
     if (CDMode != CDModeStopped) {
         SDL_CDClose(CDRom);
 	CDMode = CDModeOff;
     }
 #elif defined(USE_LIBCDA)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped)
+    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
         cd_stop();
 	CDMode = CDModeStopped;
+    }
     if (CDMode == CDModeStopped) {
         cd_close();
         cd_exit();
