@@ -54,7 +54,7 @@ local SCM CclRevealMap(void)
 **
 **	@param flag	True = turning fog of war on, false = off.
 **
-**	@returns	The old state of fog of war.
+**	@return		The old state of fog of war.
 */
 local SCM CclSetFogOfWar(SCM flag)
 {

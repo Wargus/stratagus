@@ -186,7 +186,7 @@ global unsigned long NetResolveHost(const char* host)
 **
 **	@param port	!=0 Port to bind in host notation.
 **
-**	@returns	If success the socket fildes, -1 otherwise.
+**	@return		If success the socket fildes, -1 otherwise.
 */
 global int NetOpenUDP(int port)
 {
@@ -225,7 +225,7 @@ global int NetOpenUDP(int port)
 **	@param sockfd	Socket fildes to prove.
 **	@param timeout	Timeout in 1/1000 seconds.
 **
-**	@returns	1 if data is available, 0 if not, -1 if failure.
+**	@return		1 if data is available, 0 if not, -1 if failure.
 */
 global int NetSocketReady(int sockfd,int timeout)
 {

@@ -1151,7 +1151,7 @@ extern void LoadRGB(Palette* pal,const char* name);
     **
     **	@param palette	System independ palette structure.
     **
-    **	@returns	A palette in hardware  dependend format.
+    **	@return		A palette in hardware  dependend format.
     */
 extern VMemType* VideoCreateNewPalette(const Palette* palette);
 

@@ -429,7 +429,7 @@ global void PreprocessMap(void)
 **
 **	@param x	X screen coordinate.
 **
-**	@returns	X tile number.
+**	@return		X tile number.
 */
 global int Screen2MapX(int x)
 {
@@ -441,7 +441,7 @@ global int Screen2MapX(int x)
 **
 **	@param y	Y screen coordinate.
 **
-**	@returns	Y tile number.
+**	@return		Y tile number.
 */
 global int Screen2MapY(int y)
 {
@@ -453,7 +453,7 @@ global int Screen2MapY(int y)
 **
 **	@param x	X tile number.
 **
-**	@returns	X screen coordinate.
+**	@return		X screen coordinate.
 */
 global int Map2ScreenX(int x)
 {
@@ -465,7 +465,7 @@ global int Map2ScreenX(int x)
 **
 **	@param y	Y tile number.
 **
-**	@returns	Y screen coordinate.
+**	@return		Y screen coordinate.
 */
 global int Map2ScreenY(int y)
 {

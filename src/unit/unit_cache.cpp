@@ -707,7 +707,7 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **	@param y	Map Y tile position.
 **	@param type	UnitType::UnitType, naval,fly,land.
 **
-**	@returns	Unit, if an unit of correct type is on the field.
+**	@return		Unit, if an unit of correct type is on the field.
 */
 global Unit* UnitCacheOnXY(int x,int y,int type)
 {
@@ -916,7 +916,7 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **	@param y	Map Y tile position.
 **	@param type	UnitType::UnitType, naval,fly,land.
 **
-**	@returns	Unit, if an unit of correct type is on the field.
+**	@return		Unit, if an unit of correct type is on the field.
 */
 global Unit* UnitCacheOnXY(int x,int y,int type)
 {
