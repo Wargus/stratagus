@@ -1,16 +1,16 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//           Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_returngoods.c -	The return goods action. */
+/**@name action_returngoods.c - The return goods action. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//      (c) Copyright 1998,2000-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---      Include
+--  Include
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -48,50 +48,50 @@
 #include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
---      Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Return goods to gold/wood deposit.
+**  Return goods to gold/wood deposit.
 **
-**	@param unit	pointer to unit.
+**  @param unit  pointer to unit.
 **
-**	FIXME: move this into action_resource?
+**  @todo  FIXME: move this into action_resource?
 */
 global void HandleActionReturnGoods(Unit* unit)
 {
-    const UnitType* type;
-    Unit* destu;
+	const UnitType* type;
+	Unit* destu;
 
-    type = unit->Type;
-    //
-    //	Select target to return goods. 
-    // 
-    DebugCheck(!type->Harvester );
-    if ((!unit->CurrentResource) && (!unit->Value)) {
-	DebugLevel0("Unit can't return resources, it doesn't carry any.\n");
-    }
-    if (!unit->Orders[0].Goal) {
-	if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
-		unit->CurrentResource))) {
-	    DebugLevel3Fn("No deposit -> can't return\n");
-	    unit->Orders[0].Action = UnitActionStill;
-	    return;
+	type = unit->Type;
+	//
+	// Select target to return goods.
+	//
+	DebugCheck(!type->Harvester );
+	if ((!unit->CurrentResource) && (!unit->Value)) {
+		DebugLevel0("Unit can't return resources, it doesn't carry any.\n");
 	}
-	unit->Orders[0].Goal = destu;
-	RefsIncrease(destu);
-    }
-    DebugLevel3("Return to %d=%d,%d\n" _C_
-	UnitNumber(unit->Orders[0].Goal) _C_
-	unit->Orders[0].X _C_ unit->Orders[0].Y);
-    unit->Orders[0].Action = UnitActionResource;
-    // Somewhere on the way the loaded worker could have change Arg1
-    // Bummer, go get the closest resource to the depot
-    unit->Orders[0].Arg1 = (void*)-1;
-    NewResetPath(unit);
-    unit->SubAction = 70;
-    unit->Wait = 1;
-    return;
+	if (!unit->Orders[0].Goal) {
+		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
+				unit->CurrentResource))) {
+			DebugLevel3Fn("No deposit -> can't return\n");
+			unit->Orders[0].Action = UnitActionStill;
+			return;
+		}
+		unit->Orders[0].Goal = destu;
+		RefsIncrease(destu);
+	}
+	DebugLevel3("Return to %d=%d,%d\n" _C_
+		UnitNumber(unit->Orders[0].Goal) _C_
+		unit->Orders[0].X _C_ unit->Orders[0].Y);
+	unit->Orders[0].Action = UnitActionResource;
+	// Somewhere on the way the loaded worker could have change Arg1
+	// Bummer, go get the closest resource to the depot
+	unit->Orders[0].Arg1 = (void*)-1;
+	NewResetPath(unit);
+	unit->SubAction = 70;
+	unit->Wait = 1;
+	return;
 }
 
 //@}
