@@ -1,3 +1,33 @@
-SRC += src/sound/arts_audio.c src/sound/script_sound.c src/sound/cdaudio.c src/sound/flac.c src/sound/libcda.c src/sound/mad.c src/sound/music.c src/sound/ogg.c src/sound/oss_audio.c src/sound/sdl_audio.c src/sound/sound.c src/sound/sound_id.c src/sound/sound_server.c src/sound/unitsound.c src/sound/wav.c src/sound/cdda.c
-HDRS +=
-OBJ += src/sound/$(OBJDIR)/arts_audio.o src/sound/$(OBJDIR)/script_sound.o src/sound/$(OBJDIR)/flac.o src/sound/$(OBJDIR)/libcda.o src/sound/$(OBJDIR)/mad.o src/sound/$(OBJDIR)/music.o src/sound/$(OBJDIR)/ogg.o src/sound/$(OBJDIR)/oss_audio.o src/sound/$(OBJDIR)/sdl_audio.o src/sound/$(OBJDIR)/sound.o src/sound/$(OBJDIR)/sound_id.o src/sound/$(OBJDIR)/sound_server.o src/sound/$(OBJDIR)/unitsound.o src/sound/$(OBJDIR)/wav.o src/sound/$(OBJDIR)/cdda.c
+##       _________ __                 __
+##      /   _____//  |_____________ _/  |______     ____  __ __  ______
+##      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+##      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
+##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+##             \/                  \/          \//_____/            \/
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   Stratagus - A free fantasy real time strategy game engine
+##
+##	Module.make	-	Module Makefile (included from Makefile).
+##
+##	(c) Copyright 2004 by The Stratagus Team
+##
+##      This program is free software; you can redistribute it and/or modify
+##      it under the terms of the GNU General Public License as published by
+##      the Free Software Foundation; version 2 dated June, 1991.
+##
+##      This program is distributed in the hope that it will be useful,
+##      but WITHOUT ANY WARRANTY; without even the implied warranty of
+##      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##      GNU General Public License for more details.
+##
+##      You should have received a copy of the GNU General Public License
+##      along with this program; if not, write to the Free Software
+##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+MODULE = src/sound
+MSRC =   arts_audio.c script_sound.c cdaudio.c flac.c libcda.c mad.c music.c \
+         ogg.c oss_audio.c sdl_audio.c sound.c sound_id.c sound_server.c \
+         unitsound.c wav.c cdda.c
+
+SRC +=   $(addprefix $(MODULE)/,$(MSRC))
