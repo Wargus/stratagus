@@ -2813,10 +2813,14 @@ local void CampaignGameMenu(void)
     int i;
     Menu* menu;
 
+#ifdef USE_SDL_SURFACE
+    MenusSetBackground();
+#else
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
+#endif
 
     menu = FindMenu("menu-campaign-select");
     DebugLevel0Fn("%d campaigns available\n" _C_ NumCampaigns);
