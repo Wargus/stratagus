@@ -188,6 +188,8 @@ local void TerminateNetConnect(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
+local EventCallback callbacks;
+
     /// Name, Version, Copyright
 extern char NameLine[];
 
@@ -3905,19 +3907,19 @@ global void NetClientUpdateState(void)
 **	@param key	Key scancode.
 **	@param keychar	ASCII character code of key.
 **
-**	@return		True, if key is handled; otherwise false.
-**
 **	@todo FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
 **      to implement button animation (depress before action)
 */
-global int MenuHandleKeyboard(int key, int keychar)
+local void MenuHandleKeyDown(unsigned key,unsigned keychar)
 {
     int i, n;
     Menuitem *mi;
     Menu *menu;
 
+    HandleKeyModifiersDown(key,keychar);
+
     if (CurrentMenu < 0) {
-	return 0;
+	return;
     }
     menu = Menus + CurrentMenu;
 
@@ -3960,7 +3962,7 @@ inkey:
 	    if (mi->d.input.action) {
 		(*mi->d.input.action)(mi, key);
 	    }
-	    return 1;
+	    return;
 	}
     }
 
@@ -3975,7 +3977,7 @@ normkey:
 			if (mi->d.button.handler) {
 			    (*mi->d.button.handler)();
 			}
-			return 1;
+			return;
 		    }
 		default:
 		    break;
@@ -3992,22 +3994,22 @@ normkey:
 			if (mi->d.button.handler) {
 			    (*mi->d.button.handler)();
 			}
-			return 1;
+			return;
 		    case MI_TYPE_LISTBOX:
 			if (mi->d.listbox.handler) {
 			    (*mi->d.listbox.handler)();
 			}
-			return 1;
+			return;
 		    case MI_TYPE_VSLIDER:
 			if (mi->d.vslider.handler) {
 			    (*mi->d.vslider.handler)();
 			}
-			return 1;
+			return;
 		    case MI_TYPE_HSLIDER:
 			if (mi->d.hslider.handler) {
 			    (*mi->d.hslider.handler)();
 			}
-			return 1;
+			return;
 		    default:
 			break;
 		}
@@ -4102,7 +4104,7 @@ normkey:
 			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
 			    MenuButtonCurSel = mi - menu->items;
 			    MustRedraw |= RedrawMenu;
-			    return 1;
+			    return;
 			default:
 			    break;
 		    }
@@ -4133,11 +4135,21 @@ normkey:
 		mi++;
 	    }
 	    DebugLevel3("Key %d\n",key);
-	    return 0;
+	    return;
     }
-    return 1;
+    return;
 }
 
+/**
+**	Handle keys in menu mode.
+**
+**	@param key	Key scancode.
+**	@param keychar	ASCII character code of key.
+*/
+local void MenuHandleKeyUp(unsigned key,unsigned keychar)
+{
+    HandleKeyModifiersUp(key,keychar);
+}
 
 /**
 **	Handle movement of the cursor.
@@ -4145,12 +4157,14 @@ normkey:
 **	@param x	Screen X position.
 **	@param y	Screen Y position.
 */
-global void MenuHandleMouseMove(int x,int y)
+local void MenuHandleMouseMove(int x,int y)
 {
     int h, w, i, j, n, xs, ys;
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
     int RedrawFlag = 0;
+
+    HandleCursorMove(&x,&y);
 
     if (CurrentMenu == -1)
 	return;
@@ -4380,7 +4394,7 @@ global void MenuHandleMouseMove(int x,int y)
 **
 **	@param b	button code
 */
-global void MenuHandleButtonDown(int b __attribute__((unused)))
+local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
@@ -4453,7 +4467,7 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
 **
 **	@param b	button code
 */
-global void MenuHandleButtonUp(int b)
+local void MenuHandleButtonUp(unsigned b)
 {
     int i, n;
     Menuitem *mi;
@@ -4668,7 +4682,7 @@ global void ProcessMenu(int menu_id, int loop)
 	    }
 	    RealizeVideoMemory();
 	    oldncr = NetConnectRunning;
-	    WaitEventsAndKeepSync();
+	    WaitEventsOneFrame(&callbacks);
 	    if (NetConnectRunning == 2) {
 		NetworkProcessClientRequest();
 	    }
@@ -4730,6 +4744,16 @@ global void InitMenus(unsigned int race)
 
     if (last_race == -1 && VideoWidth != 640) {
 	MoveButtons();
+    }
+    if (last_race == -1) {
+	callbacks.ButtonPressed=&MenuHandleButtonDown;
+	callbacks.ButtonReleased=&MenuHandleButtonUp;
+	callbacks.MouseMoved=&MenuHandleMouseMove;
+	callbacks.MouseExit=&HandleMouseExit;
+	callbacks.KeyPressed=&MenuHandleKeyDown;
+	callbacks.KeyReleased=&MenuHandleKeyUp;
+	callbacks.NetworkEvent=NetworkEvent;
+	callbacks.SoundReady=WriteSound;
     }
 
     if (race == last_race) {	// same race? already loaded!
