@@ -778,7 +778,8 @@ local void DrawGem(Menuitem *mi, int mx, int my)
 */
 local void DrawInput(Menuitem *mi, int mx, int my)
 {
-    int nc, rc;
+    int nc;
+    int rc;
     char *text;
     unsigned flags;
     MenuButtonId rb;
@@ -786,6 +787,7 @@ local void DrawInput(Menuitem *mi, int mx, int my)
     int h;
     int x;
     int y;
+    int p;
 
     flags = mi->flags;
     rb = mi->d.input.button;
@@ -795,24 +797,41 @@ local void DrawInput(Menuitem *mi, int mx, int my)
     h = mi->d.input.ysize;
 
     GetDefaultTextColors(&nc, &rc);
-    if (flags&MenuButtonDisabled) {
-	rb--;
-	SetDefaultTextColors(FontGrey,FontGrey);
-    }
-
-    PushClipping();
-    SetClipping(0,0,x+w,VideoHeight-1);
-    VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
-    PopClipping();
-    text = mi->d.input.buffer;
-    if (text) {
-	VideoDrawText(x+2,y+2,mi->font,text);
-    }
-    if (flags&MenuButtonSelected) {
+    if (mi->d.input.button == MBUTTON_SC_PULLDOWN) {
+	rb = MBUTTON_SC_INPUT;
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w+4,h);
-	} else {
-	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w+4,h);
+	    rb -= 3;
+	    SetDefaultTextColors(FontGrey,FontGrey);
+	}
+	VideoDraw(MenuButtonGfx.Sprite, rb - 1, x, y);
+	for (p = x+16; p < x+w-1-16; p += 16) {
+	    VideoDraw(MenuButtonGfx.Sprite, rb, p, y);
+	}
+	VideoDraw(MenuButtonGfx.Sprite, rb + 1, x + w-1 - 16, y);
+	text = mi->d.input.buffer;
+	if (text) {
+	    VideoDrawText(x+4,y+2,mi->font,text);
+	}
+    } else {
+	if (flags&MenuButtonDisabled) {
+	    rb--;
+	    SetDefaultTextColors(FontGrey,FontGrey);
+	}
+
+	PushClipping();
+	SetClipping(0,0,x+w,VideoHeight-1);
+	VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
+	PopClipping();
+	text = mi->d.input.buffer;
+	if (text) {
+	    VideoDrawText(x+2,y+2,mi->font,text);
+	}
+	if (flags&MenuButtonSelected) {
+	    if (flags&MenuButtonDisabled) {
+		VideoDrawRectangleClip(ColorGray,x-2,y-2,w+4,h);
+	    } else {
+		VideoDrawRectangleClip(ColorYellow,x-2,y-2,w+4,h);
+	    }
 	}
     }
     SetDefaultTextColors(nc,rc);
