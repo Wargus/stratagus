@@ -100,6 +100,7 @@ local void DrawMouseCoordsOnMap(int x,int y)
     sprintf(buf,"%3d,%3d=%02X|%04X|%c%c%c%c%c%c%c%c%c",x,y
 	    ,TheMap.Fields[x+y*TheMap.Width].Value
 	    ,flags
+	    //,TheMap.Fields[x+y*TheMap.Width].Tile
 	    ,flags&MapFieldUnpassable	?'u':'-'
 	    ,flags&MapFieldNoBuilding	?'n':'-'
 	    ,flags&MapFieldForest	?'f':'-'
