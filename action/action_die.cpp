@@ -155,6 +155,8 @@ global char UnitCorpse[UnitTypeInternalMax] = {
 
 #endif
 
+extern Animation ** UnitCorpse;
+
 /**
 **	Unit dies!
 **
@@ -180,8 +182,8 @@ global int HandleActionDie(Unit* unit)
 	    break;
 
 	default:
-	    if( type<UnitTypeInternalMax && UnitDie[type] ) {
-		UnitShowAnimation(unit,UnitDie[type]);	      
+	    if( unit->Type->Animations ) {
+		UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    } else {
 		DebugLevel0("FIXME: die animation missing\n");
 		unit->Reset=1;
@@ -201,7 +203,7 @@ global int HandleActionDie(Unit* unit)
 	    return 1;
 	}
 	unit->SubAction=type;
-	unit->Type=&UnitTypes[UnitDeadBody];
+	unit->Type=UnitTypeByIdent("unit-dead-body");
 	unit->Frame=0;
 	unit->State=0;
 	unit->Reset=0;

@@ -17,6 +17,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,9 +37,9 @@
 #include "sound_server.h"
 #include "missile.h"
 
-#ifndef USE_CCL2
-extern Animation* UnitStillAnimation[UnitTypeInternalMax];
-#endif
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Unit stands ground!
@@ -60,10 +64,9 @@ global void HandleActionStandGround(Unit* unit)
 	//
 	//	Still animation
 	//
-	DebugCheck( type->Type>=UnitTypeInternalMax
-	    || !UnitStillAnimation[type->Type] );
+        DebugCheck( !type->Animations || !type->Animations->Still );
 
-	UnitShowAnimation(unit,UnitStillAnimation[type->Type]);
+	UnitShowAnimation(unit,type->Animations->Still);
 
 	//
 	//	FIXME: this a workaround of a bad code.
@@ -83,7 +86,7 @@ global void HandleActionStandGround(Unit* unit)
     }
 
     //
-    //	Building:	burning
+    //	Building:	burning FIXME: must moved to general point
     //
     if( type->Building ) {
 	if( unit->HP ) {
@@ -112,6 +115,8 @@ global void HandleActionStandGround(Unit* unit)
 	}
     }
 
+#if 0
+    // JOHNS: critters removed here
     //
     //	Critters:	are moving random around.
     //
@@ -160,6 +165,7 @@ global void HandleActionStandGround(Unit* unit)
 
 	}
     }
+#endif
 
     //
     //	Workers and mage didn't attack automatic

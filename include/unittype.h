@@ -341,13 +341,8 @@ struct _unit_type_ {
 ----------------------------------------------------------------------------*/
 
 extern char	UnitTypeType[];			/// unit type type
+// FIXME: this limit must be removed!
 extern UnitType UnitTypes[UnitTypeInternalMax];	/// all unit types
-
-#ifdef USE_CCL2
-extern Animation ** UnitDie;
-extern Animation ** UnitCorpse;
-extern Animation ** UnitStillAnimation;
-#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
