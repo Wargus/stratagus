@@ -70,8 +70,8 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
     int h;
     int w;
 
-    DebugCheck( UnitTypes[UnitWallOrc]._HitPoints>=256
-	    || UnitTypes[UnitWallHuman]._HitPoints>=256 );
+    DebugCheck( UnitTypeByIdent("unit-orc-wall")->_HitPoints>=256
+	    || UnitTypeByIdent("unit-human-wall")->_HitPoints>=256 );
 
     if( map->Terrain<TilesetMax ) {
 	ctab=Tilesets[map->Terrain].Table;
