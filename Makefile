@@ -98,7 +98,7 @@ tools::
 
 clean::
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clean ; done
-	$(RM) core gmon.out *.doc etlib/*.o .#*
+	$(RM) core gmon.out cscope.out *.doc etlib/*.o .#*
 
 clobber:	clean
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clobber ; done
