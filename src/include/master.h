@@ -56,8 +56,8 @@ extern int MetaServerInUse;
 
 extern int MetaInit(void);
 extern int MetaClose(void);
-extern int MetaServerOK(char **reply);
+extern int MetaServerOK(char* reply);
 extern int SendMetaCommand(char* command, char* format, ...);
-extern int RecvMetaReply(char **reply);
+extern int RecvMetaReply(char** reply);
 
 #endif	// !__MASTER_H__

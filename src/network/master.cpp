@@ -113,7 +113,7 @@ global int MetaInit(void)
 	//TODO: Notify player that connection was aborted...
 	return -1;
     } else {
-	if (MetaServerOK(&reply)) {
+	if (MetaServerOK(reply)) {
 	    free(reply);
 	    return 0;
 	} else {
@@ -140,9 +140,9 @@ global int MetaClose(void)
 **
 **	@return 1 OK, 0 Error.
 */
-global int MetaServerOK(char** reply)
+global int MetaServerOK(char* reply)
 {
-    return !strcmp("OK\r\n", *reply) || !strcmp("OK\n", *reply);
+    return !strcmp("OK\r\n", reply) || !strcmp("OK\n", reply);
 }
 
 /**
@@ -243,7 +243,7 @@ global int RecvMetaReply(char** reply)
     if (!(p = malloc(n + 1))) {
 	return -1;
     }
-    buf[n]='\0';
+    buf[n] = '\0';
     strcpy(p, buf);
 
     *reply = p;
