@@ -48,6 +48,12 @@ void cmdline(int argc, char** argv,
             option_version=1;
             DEBUG(1,"[cmdl] Version information requested\n");
         }
+        /* help */
+        else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
+        {
+            option_help=1;
+            DEBUG(1,"[cmdl] Help requested\n");
+        }
         else if (!strcmp(argv[i], "-f"))
         {
             option_force=1;
@@ -194,17 +200,26 @@ void cmdline(int argc, char** argv,
             }
         }
     }
-    switch (status)
+    if (!option_version)
+    switch (option_help ? 0 : status)
     {
       case 0:
         printf(
           "%s [-Vvf] [-p palette] input1 [output1] [-s input2 [output2]] "
           "--player-color <color>\n"
-          " -V        : print version information and exit\n"
-          " -v        : show verbose information\n"
-          " -f        : force writing to input files when output filenames are "
-                       "obmitted\n"
-          " -p <file> : specify filename for palette needed by conversion\n"
+          " -V         : print version information and exit\n"
+          " -h, --help : print this help\n"
+          " -v         : show verbose information\n"
+          " -f         : force writing to input files when output "
+                         "filenames are obmitted\n"
+          " -p <file> : specify filename for palette needed by conversion\n\n"
+          " PNG text informations:\n"
+          "--title      <string> : Set the title of the image\n"
+          "--author     <string> : Set the author of the image\n"
+          "--copyright  <string> : Set copyright information about the image\n"
+          "--disclaimer <string> : Set a disclaimer about the image\n"
+          "--source     <string> : Set information about the source of the "
+                                  "image\n\n"
           " BOS (Stratagus) specific options:\n"
           " -s <files>: specify filenames for input and output files of "
                        "shadow extraction\n"
@@ -216,8 +231,7 @@ void cmdline(int argc, char** argv,
           "                            0 : red\n"
           "                          120 : green\n"
           "                          240 : blue\n"
-          ,
-               argv[0]);
+          , argv[0]);
         exit(1);
         break;
       case 1:

@@ -1,3 +1,9 @@
+0.6  07.03.2004
+	* fixed the version option (Was not implemented, but documented)
+	* impoved the help, documented PNG text options) and help itself
+	* fixed some typos
+	* added version information in "Software" text field
+
 0.5  21.12.2004
 	* optimised palette creation (a lot)
 	* a lot more debug output (with multiple -v)

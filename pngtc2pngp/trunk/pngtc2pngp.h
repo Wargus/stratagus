@@ -21,7 +21,7 @@
 
 #include <png.h>
 
-#define VERSION "0.5"
+#define VERSION "0.6"
 
 /* To simulate varargs macros */
 #define _C_ ,
@@ -64,7 +64,7 @@ typedef struct rgba_image
 #define RGBA_IMAGE_NULL (rgba_image*)NULL
 
 /* global variables */
-extern int option_verbose, option_version, option_force,
+extern int option_verbose, option_version, option_force, option_help,
            option_player_color_hue;
 
 /* global functions */

@@ -28,7 +28,8 @@
 
 #include "pngtc2pngp.h"
 
-int option_verbose, option_version, option_force, option_player_color_hue=-1;
+int option_verbose=0, option_version=0, option_force=0, option_help=0,
+    option_player_color_hue=-1;
 
 char *fn_input1=NULL, *fn_palette1=NULL, *fn_output1=NULL,
      *fn_input2=NULL,                    *fn_output2=NULL,
@@ -232,7 +233,7 @@ rgba_image *read_rgba_image(const char* filename)
     int num_text;
     png_text *text_ptr;
     png_get_text(png_ptr, info_ptr, &text_ptr, &num_text);
-    DEBUG(1,"[read] Number of Text fields: %d\n" _C_ num_text);
+    DEBUG(1,"[read] Number of text fields: %d\n" _C_ num_text);
     for (int i=0; i<num_text; i++)
     {
         if (text_ptr[i].key && text_ptr[i].text)
@@ -427,7 +428,7 @@ int write_rgba_palette_image(const char* filename,
     }
     png_set_rows(png_ptr, info_ptr, row_pointers);
 
-    /* set some Text fields */
+    /* set some text fields */
     int num_text = 1+(title!=NULL)+(author!=NULL)+(copyright!=NULL)+
                      (disclaimer!=NULL)+(source!=NULL);
     int text_counter=0;
@@ -435,8 +436,16 @@ int write_rgba_palette_image(const char* filename,
                          png_malloc(png_ptr, num_text*sizeof(png_text));
     /* mention ourselfes here */
     text_ptr[text_counter].compression = PNG_TEXT_COMPRESSION_zTXt;
+    char *software;
+    software = calloc(sizeof(char), 100);
+    if (!software)
+    {
+        printf("Out of memory\n");
+        exit(1);
+    }
     text_ptr[text_counter].key = "Software";
-    text_ptr[text_counter].text= "pngtc2pngp";
+    snprintf(software, 99, "pngtc2pngp version %s", VERSION);
+    text_ptr[text_counter].text= software;
     /* specifiable fields */
     if (title != NULL)
     {
@@ -478,6 +487,7 @@ int write_rgba_palette_image(const char* filename,
     int png_transforms = PNG_TRANSFORM_IDENTITY;
     png_write_png(png_ptr, info_ptr, png_transforms, NULL);
 
+    free(software);
     free(palette);
     fclose(fp);
 
@@ -1382,6 +1392,12 @@ int main(int argc, char **argv)
     cmdline(argc, argv,
             &fn_input1, &fn_palette1, &fn_output1, &fn_input2, &fn_output2,
             &title, &author, &copyright, &disclaimer, &source);
+
+    if (option_version)
+    {
+        printf("%s version %s\n", argv[0], VERSION);
+        return 0;
+    }
 
     rgba_image *input1 = NULL, *input2 = NULL;
     rgba_color *palette1 = NULL;
