@@ -158,14 +158,15 @@ local int MoveToResource(Unit* unit,const Resource* resource)
     //	Place unit inside the resource
     //
     RemoveUnit(unit);
-#if 1
+#if 0
+    // This breaks the drop out code complete
     // FIXME: this is a hack, but solves the problem, a better solution is
     // FIXME: still wanted.
 
     // Place unit where pathfinder is more likely to work
     if (unit->X < goal->X) {
 	PlaceUnit(unit,goal->X,unit->Y);
- 	RemoveUnit(unit);		// Unit removal necessary to free map tiles
+ 	RemoveUnit(unit);	// Unit removal necessary to free map tiles
     }
     if (unit->X > goal->X+goal->Type->TileWidth-1) {
 	PlaceUnit(unit,goal->X+goal->Type->TileWidth-1,unit->Y);
@@ -225,11 +226,14 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 		abort();
 	    } );
 
+	DebugCheck( source->Value>655350 );
+
 	//
 	//	Update the resource.
 	//	Remove what we can carry, FIXME: always this?
 	//
 	source->Value-=DEFAULT_INCOMES[resource->Cost];
+
 	DebugLevel3Fn("-%d\n",source->Data.Resource.Active);
 	if( !--source->Data.Resource.Active ) {
 	    source->Frame=0;
@@ -243,6 +247,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//	End of resource: destroy the resource.
 	//
 	if( source->Value<DEFAULT_INCOMES[resource->Cost] ) {
+	    DebugLevel0Fn("Resource is destroyed\n");
 	    DropOutAll(source);
 	    LetUnitDie(source);
 	    source=NULL;

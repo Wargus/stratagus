@@ -225,7 +225,8 @@ global void HandleActionBuild(Unit* unit)
     }
 
     RemoveUnit(unit);	// automaticly: CheckUnitToBeDrawn(unit)
-#if 1
+#if 0
+    // FIXME: breaks drop out code
     // FIXME: this is a hack, but solves the problem, a better solution is
     // FIXME: still wanted.
 

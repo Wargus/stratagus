@@ -228,6 +228,8 @@
 **
 **	Unit::Value
 **
+**		This values hold the amount of gold in a goldmine, amount of
+**		oil in an oil patch or oil platform.
 **		FIXME: continue documentation
 **
 **	Unit::SubAction

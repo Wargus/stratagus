@@ -125,7 +125,8 @@ local int MoveToGoldMine(Unit* unit)
     }
 
     RemoveUnit(unit);
-#if 1
+#if 0
+    // This breaks the drop out code
     // FIXME: this is a hack, but solves the problem, a better solution is
     // FIXME: still wanted.
 
@@ -174,6 +175,7 @@ local int MineInGoldmine(Unit* unit)
     Unit* destu;
 
     DebugLevel3Fn("Waiting\n");
+
     if( !unit->Value ) {
 	//
 	//	Have gold
@@ -186,6 +188,8 @@ local int MineInGoldmine(Unit* unit)
 		abort();
 	    } );
 
+	DebugCheck( mine->Value>655350 );
+
 	//
 	//	Update gold mine.
 	//
@@ -194,8 +198,8 @@ local int MineInGoldmine(Unit* unit)
 	    mine->Value = 0;
 	    unit->Rs = OptionUseDepletedMines;
 	    // vladi: income reduced to 5% (mine depleted)
-	} else {
-	    mine->Value-=DEFAULT_INCOMES[GoldCost];	// remove gold from store
+	} else {	// remove gold from store
+	    mine->Value-=DEFAULT_INCOMES[GoldCost];
   	    unit->Rs = 100;		// vladi: normal income 100%
 	}
 	if( !--mine->Data.Resource.Active ) {

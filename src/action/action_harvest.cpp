@@ -326,7 +326,8 @@ local int ReturnWithWood(Unit* unit)
     }
 
     RemoveUnit(unit);
-#if 1
+#if 0
+    // FIXME: this breaks the drop out code.
     // FIXME: this is a hack, but solves the problem, a better solution is
     // FIXME: still wanted.
 
