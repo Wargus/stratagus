@@ -810,6 +810,7 @@ static int CclDefineFontColor(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	color = strdup(LuaToString(l, 1));
+	fcm = NULL;
 
 	if (!NumFontColorMappings) {
 		FontColorMappings = calloc(sizeof(*FontColorMappings), 1);
