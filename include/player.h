@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name player.h	-	The player headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
@@ -32,6 +31,7 @@ typedef struct _player_ Player;
 #include "upgrade_structs.h"
 #include "unittype.h"
 #include "unit.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --	Player type
@@ -59,6 +59,7 @@ struct _player_ {
     unsigned	Resources[MaxCosts];	/// resources in store
     int		Incomes[MaxCosts];	/// income of the resources.
 
+//  FIXME: needed again? if not remove
 //    unsigned	UnitFlags[
 //	(UnitTypeInternalMax+BitsOf(unsigned)-1)
 //	    /BitsOf(unsigned)];		/// flags what units are available
@@ -79,7 +80,6 @@ struct _player_ {
 // Display video
     unsigned	Color;			/// color of units on minimap
 
-    // FIXME: not used
     union {
 	struct __4pixel8__ {
 	    VMemType8	Pixels[4];	/// palette colors #0 ... #3
@@ -95,14 +95,7 @@ struct _player_ {
 	}	Depth32;		/// player colors for 32bpp
     }		UnitColors;		/// Unit colors for faster setup
 
-    // FIXME: this should be removed, use UnitColors insteed
-    //unsigned	UnitColor1;		/// Unit color 1 on map and icons
-    //unsigned	UnitColor2;		/// Unit color 2 on map and icons
-    //unsigned	UnitColor3;		/// Unit color 3 on map and icons
-    //unsigned	UnitColor4;		/// Unit color 4 on map and icons
-
 //  Upgrades/Allows:
-
     Allow		Allow;		/// Allowed for player
     UpgradeTimers	UTimers;	/// Timer for the upgrades
 };
@@ -189,26 +182,18 @@ extern int HaveUnitTypeByType(const Player* player,const UnitType* type);
     /// Has the player units of that type
 extern int HaveUnitTypeByIdent(const Player* player,const char* ident);
 
-    /// FIXME: write short docu
+    /// Initialize the computer opponent AI
 extern void PlayersInitAi(void);
-    /// FIXME: write short docu
+    /// Called each frame for player handlers (AI)
 extern void PlayersEachFrame(void);
-    /// FIXME: write short docu
+    /// Called each second for player handlers (AI)
 extern void PlayersEachSecond(void);
 
-#ifdef NEW_VIDEO
     /// Change current color set to new player.
 extern void PlayerPixels(const Player* player);
 
     /// Change current color set to new player of the sprite
 extern void GraphicPlayerPixels(const Player* player, const Graphic * sprite);
-#else
-    /// Change current color set to new player.
-extern void PlayerPixels(const Player* player);
-
-    /// Change current color set to new player of the sprite
-extern void RLEPlayerPixels(const Player* player, const RleSprite * sprite);
-#endif
 
     /// Output debug informations for players
 extern void DebugPlayers(void);

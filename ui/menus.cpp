@@ -35,11 +35,6 @@
 #include "interface.h"
 #include "menus.h"
 #include "cursor.h"
-#include "new_video.h"
-
-#ifndef NEW_VIDEO
-//#error ONLY WORKS WITH NEW VIDEO!
-#endif
 
 /*----------------------------------------------------------------------------
 --	Prototypes for action handlers

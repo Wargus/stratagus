@@ -2289,13 +2289,8 @@ global void DestroyUnit(Unit* unit)
 	    unit->State=unit->Type->CorpseScript;
 	    unit->Type=type;
 
-#ifdef NEW_VIDEO
 	    unit->IX=(type->Width-VideoGraphicWidth(type->Sprite))/2;
 	    unit->IY=(type->Height-VideoGraphicHeight(type->Sprite))/2;
-#else
-	    unit->IX=(type->Width-type->RleSprite->Width)/2;
-	    unit->IY=(type->Height-type->RleSprite->Height)/2;
-#endif
 
 	    unit->SubAction=0;
 	    unit->Removed=0;

@@ -65,11 +65,7 @@ struct _missile_type_ {
     MissileType*ImpactMissile;		/// Missile produces an impact
 
 // --- FILLED UP ---
-#ifdef NEW_VIDEO
     Graphic*	Sprite;			/// missile sprite image
-#else
-    RleSprite*	RleSprite;		/// missile sprite image
-#endif
 };
 
     /// how many missile type are maximal supported

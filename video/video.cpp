@@ -8,14 +8,18 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name video.c	-	The video. */
+/**@name video.c	-	The universal video functions. */
 /*
-**	(c) Copyright 1998,2000 by Lutz Sammer
+**	(c) Copyright 1999,2000 by Lutz Sammer
 **
 **	$Id$
 */
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,24 +27,130 @@
 #include "freecraft.h"
 #include "video.h"
 
-#ifndef NEW_VIDEO	// { should be removed with new video code final
+#include "map.h"
+#include "ui.h"
+#include "cursor.h"
 
-#ifdef DEBUG
-global unsigned AllocatedGraphicMemory;
-global unsigned CompressedGraphicMemory;
+#ifdef USE_SDL
+#include <SDL/SDL.h>
 #endif
 
 /*----------------------------------------------------------------------------
---	Clipping
+--	Declarations
 ----------------------------------------------------------------------------*/
+
+// JOHNS: This is needed, because later I want to support it all with the same
+//	  executable, choosable at runtime.
+#ifdef USE_X11
+#define UseX11		1
+#define UseSdl		0
+#define UseSVGALib	0
+#define UseWin32	0
+#endif
+
+#ifdef USE_SDL
+#define UseX11		0
+#define UseSdl		1
+#define UseSVGALib	0
+#define UseWin32	0
+#endif
+
+#ifdef USE_SVGALIB
+#define UseX11		0
+#define UseSdl		0
+#define UseSVGALib	1
+#define UseWin32	0
+#endif
+
+#ifdef noUSE_WIN32
+#define UseX11		0
+#define UseSdl		0
+#define UseSVGALib	0
+#define UseWin32	1
+#endif
+
+/**
+**	Structure of pushed clippings.
+*/
+typedef struct _clip_ {
+    struct _clip_*	Next;		/// next pushed clipping.
+    int			X1;		/// pushed clipping top left
+    int			Y1;		/// pushed clipping top left
+    int			X2;		/// pushed clipping bottom right
+    int			Y2;		/// pushed clipping bottom right
+} Clip;
+
+/*----------------------------------------------------------------------------
+--	Externals
+----------------------------------------------------------------------------*/
+
+extern void InitVideoSdl(void);
+extern void InitVideoX11(void);
+extern void InitVideoSVGA(void);
+extern void InitVideoWin32(void);
+
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+global char VideoFullScreen;		/// true fullscreen wanted
 
 global int ClipX1;			/// current clipping top left
 global int ClipY1;			/// current clipping top left
 global int ClipX2;			/// current clipping bottom right
 global int ClipY2;			/// current clipping bottom right
 
-/*
-**	Set clipping for sprite/line routines.
+local Clip* Clips;			/// stack of all clips.
+
+#ifdef DEBUG
+global unsigned AllocatedGraphicMemory;	/// Allocated memory for objects
+global unsigned CompressedGraphicMemory;/// memory for compressed objects
+#endif
+
+    /**
+    **	Architecture-dependant video depth. Set by InitVideoXXX, if 0.
+    **	(8,15,16,24,32)
+    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
+    **	@see InitVideoWin32 @see main
+    */
+global int VideoDepth;
+
+    /**
+    **	Architecture-dependant videomemory. Set by InitVideoXXX.
+    **	FIXME: need a new function to set it, see #ifdef SDL code
+    **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
+    **	@see InitVideoWin32 @see VMemType
+    */
+global VMemType* VideoMemory;
+
+    /**
+    **	Architecture-dependant system palette. Applies as conversion between
+    **	GlobalPalette colors and their representation in videomemory.
+    **	Set by VideoCreatePalette or VideoSetPalette.
+    **	@see VideoCreatePalette @VideoSetPalette
+    */
+global VMemType* Pixels;
+
+global int VideoSyncSpeed=100;		/// 0 disable interrupts
+global volatile int VideoInterrupts;	/// be happy, were are quicker
+
+    ///	Loaded system palette. 256-entries long, active system palette.
+global Palette GlobalPalette[256];
+
+    /// Does ColorCycling..
+global void (*ColorCycle)(void);
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
+
+/**
+**	Set clipping for graphic routines.
+**
+**	@param left	Left X screen coordinate.
+**	@param top	Top Y screen coordinate.
+**	@param right	Right X screen coordinate.
+**	@param bottom	Bottom Y screen coordinate.
 */
 global void SetClipping(int left,int top,int right,int bottom)
 {
@@ -54,7 +164,7 @@ global void SetClipping(int left,int top,int right,int bottom)
 
     if( left>=VideoWidth )	left=VideoWidth-1;
     if( right>=VideoWidth )	right=VideoWidth-1;
-    if( bottom>=VideoHeight ) bottom=VideoHeight-1;
+    if( bottom>=VideoHeight )	bottom=VideoHeight-1;
     if( top>=VideoHeight )	top=VideoHeight-1;
     
     ClipX1=left;
@@ -63,1540 +173,88 @@ global void SetClipping(int left,int top,int right,int bottom)
     ClipY2=bottom;
 }
 
-/*----------------------------------------------------------------------------
---	RLE Sprites
-----------------------------------------------------------------------------*/
-
-//	FIXME: can also compress same bytes
-//	Count:	transparent
-
-/*----------------------------------------------------------------------------
---	RLE Sprites 8bit
-----------------------------------------------------------------------------*/
-
-/*
-**	Draw rle compressed sprite.
+/**
+**	Push current clipping.
 */
-global void DrawRleSprite8(RleSprite* sprite,unsigned frame,int x,int y)
+global void PushClipping(void)
 {
-    const unsigned char* sp;
-    unsigned w;
-    VMemType8* dp;
-    VMemType8* lp;
-    VMemType8* ep;
-    VMemType8* pp;
-    unsigned da;
+    Clip* clip;
 
-    sp=sprite->Frames[frame];
-    w=sprite->Width;
-    da=VideoWidth-w;
-    dp=VideoMemory8+x+y*VideoWidth;
-    ep=dp+VideoWidth*sprite->Height;
-
-    while( dp<ep ) {			// all lines
-	lp=dp+w;
-	do {				// 1 line
-	    dp+=*sp++;			// transparent
-	    if( dp>=lp ) {
-		break;
-	    }
-	    pp=dp-1+*sp++;		// non-transparent
-	    while( dp<pp ) {
-		*dp++=((VMemType8*)sprite->Pixels)[*sp++];
-		*dp++=((VMemType8*)sprite->Pixels)[*sp++];
-	    }
-	    if( dp<=pp ) {
-		*dp++=((VMemType8*)sprite->Pixels)[*sp++];
-	    }
-	} while( dp<lp );
-	IfDebug( 
-	    if( dp!=lp )
-		printf(__FUNCTION__": ERROR\n");
-	)
-	dp+=da;
-    }
+    clip=malloc(sizeof(Clip));
+    clip->Next=Clips;
+    clip->X1=ClipX1;
+    clip->Y1=ClipY1;
+    clip->X2=ClipX2;
+    clip->Y2=ClipY2;
+    Clips=clip;
 }
-
-/*
-**	Draw rle compressed sprite with clipping.
-*/
-global void DrawRleSpriteClipped8(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    int ox;
-    int oy;
-    int w;
-    int h;
-    const unsigned char* sp;
-    unsigned sw;
-    VMemType8* dp;
-    VMemType8* lp;
-    VMemType8* ep;
-    VMemType8* pp;
-    unsigned da;
-
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
-
-    //
-    //	Draw the clipped sprite
-    //
-    sp=sprite->Frames[frame];
-
-    //
-    // Skip top lines
-    //
-    while( oy-- ) {
-	da=0;
-	do {
-	    da+=*sp++;			// transparent
-	    if( da>=sw ) {
-		break;
-	    }
-	    da+=*sp;			// non-transparent
-	    sp+=*sp+1;
-	} while( da<sw );
-    }
-
-    da=VideoWidth-sw;
-    dp=VideoMemory8+x+y*VideoWidth;
-    ep=dp+VideoWidth*h;
-
-    if( w==sw ) {			// Unclipped horizontal
-
-	while( dp<ep ) {		// all lines
-	    lp=dp+sw;
-	    do {			// 1 line
-		dp+=*sp++;		// transparent
-		if( dp>=lp ) {
-		    break;
-		}
-		pp=dp-1+*sp++;		// non-transparent
-		while( dp<pp ) {
-		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
-		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
-		}
-		if( dp<=pp ) {
-		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
-		}
-	    } while( dp<lp );
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-
-    } else {				// Clip horizontal
-	//printf("CLIPPING ox %d w %d\n",ox,w);
-
-	da+=ox;
-	while( dp<ep ) {		// all lines
-	    lp=dp+w;
-	    //
-	    //	Clip left
-	    //
-	    pp=dp-ox;
-	    for( ;; ) {
-		pp+=*sp++;		// transparent
-		//printf("T%d-",sp[-1]);
-		if( pp>=dp ) {
-		    dp=pp;
-		    //printf("C");
-		    goto middle_trans;
-		}
-		pp+=*sp;		// non-transparent
-		//printf("P%d-",sp[0]);
-		if( pp>=dp ) {
-		    sp+=*sp-(pp-dp)+1;
-		    //printf("C");
-		    goto middle_pixel;
-		}
-		sp+=*sp+1;
-	    }
-
-	    //
-	    //	Draw middle
-	    //
-	    for( ;; ) {
-		dp+=*sp++;		// transparent
-		//printf("T%d-",sp[-1]);
-middle_trans:
-		if( dp>=lp ) {
-		    lp+=sw-w-ox;
-		    //printf("C");
-		    goto right_trans;
-		}
-		pp=dp+*sp++;		// non-transparent
-		//printf("P%d-",sp[-1]);
-middle_pixel:
-		//printf("%p, %p, %p\n",dp,pp,lp);
-		if( pp<lp ) {
-		    while( dp<pp ) {
-			*dp++=((VMemType8*)sprite->Pixels)[*sp++];
-		    }
-		    continue;
-		}
-		while( dp<lp ) {
-		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
-		}
-		sp+=pp-dp;
-		dp=pp;
-		//printf("C");
-		break;
-	    }
-
-	    //
-	    //	Clip right
-	    //
-	    lp+=sw-w-ox;
-	    while( dp<lp ) {
-		dp+=*sp++;		// transparent
-right_trans:
-		if( dp>=lp ) {
-		    break;
-		}
-		dp+=*sp;		// non-transparent
-		sp+=*sp+1;
-	    }
-	    //printf("\n");
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-    }
-}
-
-/*
-**	Draw rle compressed sprite, flipped in X.
-*/
-global void DrawRleSpriteX8(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    const unsigned char* sp;
-    unsigned w;
-    VMemType8* dp;
-    VMemType8* lp;
-    VMemType8* ep;
-    VMemType8* pp;
-    unsigned da;
-
-    sp=sprite->Frames[frame];
-    w=sprite->Width;
-    dp=VideoMemory8+x+y*VideoWidth+w;
-    da=VideoWidth+w;
-    ep=dp+VideoWidth*sprite->Height;
-
-    while( dp<ep ) {			// all lines
-	lp=dp-w;
-	do {				// 1 line
-	    dp-=*sp++;			// transparent
-	    if( dp<=lp ) {
-		break;
-	    }
-	    pp=dp+1-*sp++;		// non-transparent
-	    while( dp>pp ) {
-		*dp--=((VMemType8*)sprite->Pixels)[*sp++];
-		*dp--=((VMemType8*)sprite->Pixels)[*sp++];
-	    }
-	    if( dp>=pp ) {
-		*dp--=((VMemType8*)sprite->Pixels)[*sp++];
-	    }
-	} while( dp>lp );
-	IfDebug( 
-	    if( dp!=lp )
-		printf(__FUNCTION__": ERROR\n");
-	)
-	dp+=da;
-    }
-}
-
-/*
-**	Draw rle compressed sprite with clipping, flipped in X.
-*/
-global void DrawRleSpriteClippedX8(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    int ox;
-    int oy;
-    int w;
-    int h;
-    const unsigned char* sp;
-    unsigned sw;
-    VMemType8* dp;
-    VMemType8* lp;
-    VMemType8* ep;
-    VMemType8* pp;
-    unsigned da;
-
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
-
-    //
-    //	Draw the clipped sprite
-    //
-    sp=sprite->Frames[frame];
-
-    //
-    // Skip top lines
-    //
-    while( oy-- ) {
-	da=0;
-	do {
-	    da+=*sp++;			// transparent
-	    if( da>=sw ) {
-		break;
-	    }
-	    da+=*sp;			// non-transparent
-	    sp+=*sp+1;
-	} while( da<sw );
-    }
-
-    da=VideoWidth+sw;
-    dp=VideoMemory8+x+y*VideoWidth+w;
-    ep=dp+VideoWidth*h;
-
-    if( w==sw ) {			// Unclipped horizontal
-
-	while( dp<ep ) {		// all lines
-	    lp=dp-w;
-	    do {			// 1 line
-		dp-=*sp++;		// transparent
-		if( dp<=lp ) {
-		    break;
-		}
-		pp=dp+1-*sp++;		// non-transparent
-		while( dp>pp ) {
-		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
-		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
-		}
-		if( dp>=pp ) {
-		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
-		}
-	    } while( dp>lp );
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-
-    } else {				// Clip horizontal
-	//printf("CLIPPING %d %d\n",ox,w);
-
-	da-=sw-w-ox;
-	while( dp<ep ) {		// all lines
-	    lp=dp-w;
-	    //
-	    //	Clip right side
-	    //
-	    pp=dp+sw-w-ox;
-	    for( ;; ) {
-		pp-=*sp++;		// transparent
-		//printf("T%d ",sp[-1]);
-		if( pp<=dp ) {
-		    dp=pp;
-		    goto middle_trans;
-		}
-		pp-=*sp;		// non-transparent
-		//printf("P%d ",sp[0]);
-		if( pp<=dp ) {
-		    sp+=*sp-(dp-pp)+1;
-		    goto middle_pixel;
-		}
-		sp+=*sp+1;
-	    }
-
-	    //
-	    //	Draw middle
-	    //
-	    for( ;; ) {
-		dp-=*sp++;		// transparent
-		//printf("T%d ",sp[-1]);
-middle_trans:
-		if( dp<=lp ) {
-		    //printf("CLIP TRANS\n");
-		    lp-=ox;
-		    goto right_trans;
-		}
-		pp=dp-*sp++;		// non-transparent
-		//printf("P%d ",sp[-1]);
-middle_pixel:
-		if( pp>lp ) {
-		    while( dp>pp ) {
-			*dp--=((VMemType8*)sprite->Pixels)[*sp++];
-		    }
-		    continue;
-		}
-		//printf("%d ",sp[-1]);
-		while( dp>lp ) {
-		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
-		}
-		//printf("%d: ",dp-pp);
-		sp+=dp-pp;
-		//printf("CLIP PIXEL %d,%d,%d\n",*sp,sp[-1],sp[1]);
-		dp=pp;
-		break;
-	    }
-
-	    //
-	    //	Clip left side
-	    //
-	    lp-=ox;
-	    while( dp>lp ) {
-		dp-=*sp++;		// transparent
-right_trans:
-		if( dp<=lp ) {
-		    break;
-		}
-		dp-=*sp;		// non-transparent
-		sp+=*sp+1;
-	    }
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-    }
-}
-
-/*----------------------------------------------------------------------------
---	RLE Sprites 16bit
-----------------------------------------------------------------------------*/
-
-/*
-**	Draw rle compressed sprite.
-*/
-global void DrawRleSprite16(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    const unsigned char* sp;
-    unsigned w;
-    VMemType16* dp;
-    VMemType16* lp;
-    VMemType16* ep;
-    VMemType16* pp;
-    unsigned da;
-
-    sp=sprite->Frames[frame];
-    w=sprite->Width;
-    da=VideoWidth-w;
-    dp=VideoMemory16+x+y*VideoWidth;
-    ep=dp+VideoWidth*sprite->Height;
-
-    while( dp<ep ) {			// all lines
-	lp=dp+w;
-	do {				// 1 line
-	    dp+=*sp++;			// transparent
-	    if( dp>=lp ) {
-		break;
-	    }
-	    pp=dp-1+*sp++;		// non-transparent
-	    while( dp<pp ) {
-		*dp++=((VMemType16*)sprite->Pixels)[*sp++];
-		*dp++=((VMemType16*)sprite->Pixels)[*sp++];
-	    }
-	    if( dp<=pp ) {
-		*dp++=((VMemType16*)sprite->Pixels)[*sp++];
-	    }
-	} while( dp<lp );
-	IfDebug( 
-	    if( dp!=lp )
-		printf(__FUNCTION__": ERROR\n");
-	)
-	dp+=da;
-    }
-}
-
-/*
-**	Draw rle compressed sprite with clipping.
-*/
-global void DrawRleSpriteClipped16(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    int ox;
-    int oy;
-    int w;
-    int h;
-    const unsigned char* sp;
-    unsigned sw;
-    VMemType16* dp;
-    VMemType16* lp;
-    VMemType16* ep;
-    VMemType16* pp;
-    unsigned da;
-
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
-
-    //
-    //	Draw the clipped sprite
-    //
-    sp=sprite->Frames[frame];
-
-    //
-    // Skip top lines
-    //
-    while( oy-- ) {
-	da=0;
-	do {
-	    da+=*sp++;			// transparent
-	    if( da>=sw ) {
-		break;
-	    }
-	    da+=*sp;			// non-transparent
-	    sp+=*sp+1;
-	} while( da<sw );
-    }
-
-    da=VideoWidth-sw;
-    dp=VideoMemory16+x+y*VideoWidth;
-    ep=dp+VideoWidth*h;
-
-    if( w==sw ) {			// Unclipped horizontal
-
-	while( dp<ep ) {		// all lines
-	    lp=dp+sw;
-	    do {			// 1 line
-		dp+=*sp++;		// transparent
-		if( dp>=lp ) {
-		    break;
-		}
-		pp=dp-1+*sp++;		// non-transparent
-		while( dp<pp ) {
-		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
-		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
-		}
-		if( dp<=pp ) {
-		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
-		}
-	    } while( dp<lp );
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-
-    } else {				// Clip horizontal
-	//printf("CLIPPING ox %d w %d\n",ox,w);
-
-	da+=ox;
-	while( dp<ep ) {		// all lines
-	    lp=dp+w;
-	    //
-	    //	Clip left
-	    //
-	    pp=dp-ox;
-	    for( ;; ) {
-		pp+=*sp++;		// transparent
-		//printf("T%d-",sp[-1]);
-		if( pp>=dp ) {
-		    dp=pp;
-		    //printf("C");
-		    goto middle_trans;
-		}
-		pp+=*sp;		// non-transparent
-		//printf("P%d-",sp[0]);
-		if( pp>=dp ) {
-		    sp+=*sp-(pp-dp)+1;
-		    //printf("C");
-		    goto middle_pixel;
-		}
-		sp+=*sp+1;
-	    }
-
-	    //
-	    //	Draw middle
-	    //
-	    for( ;; ) {
-		dp+=*sp++;		// transparent
-		//printf("T%d-",sp[-1]);
-middle_trans:
-		if( dp>=lp ) {
-		    lp+=sw-w-ox;
-		    //printf("C");
-		    goto right_trans;
-		}
-		pp=dp+*sp++;		// non-transparent
-		//printf("P%d-",sp[-1]);
-middle_pixel:
-		//printf("%p, %p, %p\n",dp,pp,lp);
-		if( pp<lp ) {
-		    while( dp<pp ) {
-			*dp++=((VMemType16*)sprite->Pixels)[*sp++];
-		    }
-		    continue;
-		}
-		while( dp<lp ) {
-		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
-		}
-		sp+=pp-dp;
-		dp=pp;
-		//printf("C");
-		break;
-	    }
-
-	    //
-	    //	Clip right
-	    //
-	    lp+=sw-w-ox;
-	    while( dp<lp ) {
-		dp+=*sp++;		// transparent
-right_trans:
-		if( dp>=lp ) {
-		    break;
-		}
-		dp+=*sp;		// non-transparent
-		sp+=*sp+1;
-	    }
-	    //printf("\n");
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-    }
-}
-
-/*
-**	Draw rle compressed sprite, flipped in X.
-*/
-global void DrawRleSpriteX16(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    const unsigned char* sp;
-    unsigned w;
-    VMemType16* dp;
-    VMemType16* lp;
-    VMemType16* ep;
-    VMemType16* pp;
-    unsigned da;
-
-    sp=sprite->Frames[frame];
-    w=sprite->Width;
-    dp=VideoMemory16+x+y*VideoWidth+w;
-    da=VideoWidth+w;
-    ep=dp+VideoWidth*sprite->Height;
-
-    while( dp<ep ) {			// all lines
-	lp=dp-w;
-	do {				// 1 line
-	    dp-=*sp++;			// transparent
-	    if( dp<=lp ) {
-		break;
-	    }
-	    pp=dp+1-*sp++;		// non-transparent
-	    while( dp>pp ) {
-		*dp--=((VMemType16*)sprite->Pixels)[*sp++];
-		*dp--=((VMemType16*)sprite->Pixels)[*sp++];
-	    }
-	    if( dp>=pp ) {
-		*dp--=((VMemType16*)sprite->Pixels)[*sp++];
-	    }
-	} while( dp>lp );
-	IfDebug( 
-	    if( dp!=lp )
-		printf(__FUNCTION__": ERROR\n");
-	)
-	dp+=da;
-    }
-}
-
-/*
-**	Draw rle compressed sprite with clipping, flipped in X.
-*/
-global void DrawRleSpriteClippedX16(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    int ox;
-    int oy;
-    int w;
-    int h;
-    const unsigned char* sp;
-    unsigned sw;
-    VMemType16* dp;
-    VMemType16* lp;
-    VMemType16* ep;
-    VMemType16* pp;
-    unsigned da;
-
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
-
-    //
-    //	Draw the clipped sprite
-    //
-    sp=sprite->Frames[frame];
-
-    //
-    // Skip top lines
-    //
-    while( oy-- ) {
-	da=0;
-	do {
-	    da+=*sp++;			// transparent
-	    if( da>=sw ) {
-		break;
-	    }
-	    da+=*sp;			// non-transparent
-	    sp+=*sp+1;
-	} while( da<sw );
-    }
-
-    da=VideoWidth+sw;
-    dp=VideoMemory16+x+y*VideoWidth+w;
-    ep=dp+VideoWidth*h;
-
-    if( w==sw ) {			// Unclipped horizontal
-
-	while( dp<ep ) {		// all lines
-	    lp=dp-w;
-	    do {			// 1 line
-		dp-=*sp++;		// transparent
-		if( dp<=lp ) {
-		    break;
-		}
-		pp=dp+1-*sp++;		// non-transparent
-		while( dp>pp ) {
-		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
-		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
-		}
-		if( dp>=pp ) {
-		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
-		}
-	    } while( dp>lp );
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-
-    } else {				// Clip horizontal
-	//printf("CLIPPING %d %d\n",ox,w);
-
-	da-=sw-w-ox;
-	while( dp<ep ) {		// all lines
-	    lp=dp-w;
-	    //
-	    //	Clip right side
-	    //
-	    pp=dp+sw-w-ox;
-	    for( ;; ) {
-		pp-=*sp++;		// transparent
-		//printf("T%d ",sp[-1]);
-		if( pp<=dp ) {
-		    dp=pp;
-		    goto middle_trans;
-		}
-		pp-=*sp;		// non-transparent
-		//printf("P%d ",sp[0]);
-		if( pp<=dp ) {
-		    sp+=*sp-(dp-pp)+1;
-		    goto middle_pixel;
-		}
-		sp+=*sp+1;
-	    }
-
-	    //
-	    //	Draw middle
-	    //
-	    for( ;; ) {
-		dp-=*sp++;		// transparent
-		//printf("T%d ",sp[-1]);
-middle_trans:
-		if( dp<=lp ) {
-		    //printf("CLIP TRANS\n");
-		    lp-=ox;
-		    goto right_trans;
-		}
-		pp=dp-*sp++;		// non-transparent
-		//printf("P%d ",sp[-1]);
-middle_pixel:
-		if( pp>lp ) {
-		    while( dp>pp ) {
-			*dp--=((VMemType16*)sprite->Pixels)[*sp++];
-		    }
-		    continue;
-		}
-		//printf("%d ",sp[-1]);
-		while( dp>lp ) {
-		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
-		}
-		//printf("%d: ",dp-pp);
-		sp+=dp-pp;
-		//printf("CLIP PIXEL %d,%d,%d\n",*sp,sp[-1],sp[1]);
-		dp=pp;
-		break;
-	    }
-
-	    //
-	    //	Clip left side
-	    //
-	    lp-=ox;
-	    while( dp>lp ) {
-		dp-=*sp++;		// transparent
-right_trans:
-		if( dp<=lp ) {
-		    break;
-		}
-		dp-=*sp;		// non-transparent
-		sp+=*sp+1;
-	    }
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-    }
-}
-
-/*----------------------------------------------------------------------------
---	RLE Sprites 32bit
-----------------------------------------------------------------------------*/
-
-/*
-**	Draw rle compressed sprite.
-*/
-global void DrawRleSprite32(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    const unsigned char* sp;
-    unsigned w;
-    VMemType32* dp;
-    VMemType32* lp;
-    VMemType32* ep;
-    VMemType32* pp;
-    unsigned da;
-
-    sp=sprite->Frames[frame];
-    w=sprite->Width;
-    da=VideoWidth-w;
-    dp=VideoMemory32+x+y*VideoWidth;
-    ep=dp+VideoWidth*sprite->Height;
-
-    while( dp<ep ) {			// all lines
-	lp=dp+w;
-	do {				// 1 line
-	    dp+=*sp++;			// transparent
-	    if( dp>=lp ) {
-		break;
-	    }
-	    pp=dp-1+*sp++;		// non-transparent
-	    while( dp<pp ) {
-		*dp++=((VMemType32*)sprite->Pixels)[*sp++];
-		*dp++=((VMemType32*)sprite->Pixels)[*sp++];
-	    }
-	    if( dp<=pp ) {
-		*dp++=((VMemType32*)sprite->Pixels)[*sp++];
-	    }
-	} while( dp<lp );
-	IfDebug( 
-	    if( dp!=lp )
-		printf(__FUNCTION__": ERROR\n");
-	)
-	dp+=da;
-    }
-}
-
-/*
-**	Draw rle compressed sprite with clipping.
-*/
-global void DrawRleSpriteClipped32(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    int ox;
-    int oy;
-    int w;
-    int h;
-    const unsigned char* sp;
-    unsigned sw;
-    VMemType32* dp;
-    VMemType32* lp;
-    VMemType32* ep;
-    VMemType32* pp;
-    unsigned da;
-
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
-
-    //
-    //	Draw the clipped sprite
-    //
-    sp=sprite->Frames[frame];
-
-    //
-    // Skip top lines
-    //
-    while( oy-- ) {
-	da=0;
-	do {
-	    da+=*sp++;			// transparent
-	    if( da>=sw ) {
-		break;
-	    }
-	    da+=*sp;			// non-transparent
-	    sp+=*sp+1;
-	} while( da<sw );
-    }
-
-    da=VideoWidth-sw;
-    dp=VideoMemory32+x+y*VideoWidth;
-    ep=dp+VideoWidth*h;
-
-    if( w==sw ) {			// Unclipped horizontal
-
-	while( dp<ep ) {		// all lines
-	    lp=dp+sw;
-	    do {			// 1 line
-		dp+=*sp++;		// transparent
-		if( dp>=lp ) {
-		    break;
-		}
-		pp=dp-1+*sp++;		// non-transparent
-		while( dp<pp ) {
-		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
-		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
-		}
-		if( dp<=pp ) {
-		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
-		}
-	    } while( dp<lp );
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-
-    } else {				// Clip horizontal
-	//printf("CLIPPING ox %d w %d\n",ox,w);
-
-	da+=ox;
-	while( dp<ep ) {		// all lines
-	    lp=dp+w;
-	    //
-	    //	Clip left
-	    //
-	    pp=dp-ox;
-	    for( ;; ) {
-		pp+=*sp++;		// transparent
-		//printf("T%d-",sp[-1]);
-		if( pp>=dp ) {
-		    dp=pp;
-		    //printf("C");
-		    goto middle_trans;
-		}
-		pp+=*sp;		// non-transparent
-		//printf("P%d-",sp[0]);
-		if( pp>=dp ) {
-		    sp+=*sp-(pp-dp)+1;
-		    //printf("C");
-		    goto middle_pixel;
-		}
-		sp+=*sp+1;
-	    }
-
-	    //
-	    //	Draw middle
-	    //
-	    for( ;; ) {
-		dp+=*sp++;		// transparent
-		//printf("T%d-",sp[-1]);
-middle_trans:
-		if( dp>=lp ) {
-		    lp+=sw-w-ox;
-		    //printf("C");
-		    goto right_trans;
-		}
-		pp=dp+*sp++;		// non-transparent
-		//printf("P%d-",sp[-1]);
-middle_pixel:
-		//printf("%p, %p, %p\n",dp,pp,lp);
-		if( pp<lp ) {
-		    while( dp<pp ) {
-			*dp++=((VMemType32*)sprite->Pixels)[*sp++];
-		    }
-		    continue;
-		}
-		while( dp<lp ) {
-		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
-		}
-		sp+=pp-dp;
-		dp=pp;
-		//printf("C");
-		break;
-	    }
-
-	    //
-	    //	Clip right
-	    //
-	    lp+=sw-w-ox;
-	    while( dp<lp ) {
-		dp+=*sp++;		// transparent
-right_trans:
-		if( dp>=lp ) {
-		    break;
-		}
-		dp+=*sp;		// non-transparent
-		sp+=*sp+1;
-	    }
-	    //printf("\n");
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-    }
-}
-
-/*
-**	Draw rle compressed sprite, flipped in X.
-*/
-global void DrawRleSpriteX32(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    const unsigned char* sp;
-    unsigned w;
-    VMemType32* dp;
-    VMemType32* lp;
-    VMemType32* ep;
-    VMemType32* pp;
-    unsigned da;
-
-    sp=sprite->Frames[frame];
-    w=sprite->Width;
-    dp=VideoMemory32+x+y*VideoWidth+w;
-    da=VideoWidth+w;
-    ep=dp+VideoWidth*sprite->Height;
-
-    while( dp<ep ) {			// all lines
-	lp=dp-w;
-	do {				// 1 line
-	    dp-=*sp++;			// transparent
-	    if( dp<=lp ) {
-		break;
-	    }
-	    pp=dp+1-*sp++;		// non-transparent
-	    while( dp>pp ) {
-		*dp--=((VMemType32*)sprite->Pixels)[*sp++];
-		*dp--=((VMemType32*)sprite->Pixels)[*sp++];
-	    }
-	    if( dp>=pp ) {
-		*dp--=((VMemType32*)sprite->Pixels)[*sp++];
-	    }
-	} while( dp>lp );
-	IfDebug( 
-	    if( dp!=lp )
-		printf(__FUNCTION__": ERROR\n");
-	)
-	dp+=da;
-    }
-}
-
-/*
-**	Draw rle compressed sprite with clipping, flipped in X.
-*/
-global void DrawRleSpriteClippedX32(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    int ox;
-    int oy;
-    int w;
-    int h;
-    const unsigned char* sp;
-    unsigned sw;
-    VMemType32* dp;
-    VMemType32* lp;
-    VMemType32* ep;
-    VMemType32* pp;
-    unsigned da;
-
-    ox=oy=0;
-    sw=w=sprite->Width;
-    h=sprite->Height;
-
-    if( x<ClipX1 ) {			// reduce to visible range
-	ox=ClipX1-x;
-	w-=ox;
-	x=ClipX1;
-    }
-    if( x+w>ClipX2 ) {
-	w=ClipX2-x;
-    }
-
-    if( y<ClipY1 ) {
-	oy=ClipY1-y;
-	h-=oy;
-	y=ClipY1;
-    }
-    if( y+h>ClipY2 ) {
-	h=ClipY2-y;
-    }
-
-    if( w<=0 || h<=0 ) {		// nothing to draw
-	return;
-    }
-
-    //
-    //	Draw the clipped sprite
-    //
-    sp=sprite->Frames[frame];
-
-    //
-    // Skip top lines
-    //
-    while( oy-- ) {
-	da=0;
-	do {
-	    da+=*sp++;			// transparent
-	    if( da>=sw ) {
-		break;
-	    }
-	    da+=*sp;			// non-transparent
-	    sp+=*sp+1;
-	} while( da<sw );
-    }
-
-    da=VideoWidth+sw;
-    dp=VideoMemory32+x+y*VideoWidth+w;
-    ep=dp+VideoWidth*h;
-
-    if( w==sw ) {			// Unclipped horizontal
-
-	while( dp<ep ) {		// all lines
-	    lp=dp-w;
-	    do {			// 1 line
-		dp-=*sp++;		// transparent
-		if( dp<=lp ) {
-		    break;
-		}
-		pp=dp+1-*sp++;		// non-transparent
-		while( dp>pp ) {
-		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
-		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
-		}
-		if( dp>=pp ) {
-		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
-		}
-	    } while( dp>lp );
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-
-    } else {				// Clip horizontal
-	//printf("CLIPPING %d %d\n",ox,w);
-
-	da-=sw-w-ox;
-	while( dp<ep ) {		// all lines
-	    lp=dp-w;
-	    //
-	    //	Clip right side
-	    //
-	    pp=dp+sw-w-ox;
-	    for( ;; ) {
-		pp-=*sp++;		// transparent
-		//printf("T%d ",sp[-1]);
-		if( pp<=dp ) {
-		    dp=pp;
-		    goto middle_trans;
-		}
-		pp-=*sp;		// non-transparent
-		//printf("P%d ",sp[0]);
-		if( pp<=dp ) {
-		    sp+=*sp-(dp-pp)+1;
-		    goto middle_pixel;
-		}
-		sp+=*sp+1;
-	    }
-
-	    //
-	    //	Draw middle
-	    //
-	    for( ;; ) {
-		dp-=*sp++;		// transparent
-		//printf("T%d ",sp[-1]);
-middle_trans:
-		if( dp<=lp ) {
-		    //printf("CLIP TRANS\n");
-		    lp-=ox;
-		    goto right_trans;
-		}
-		pp=dp-*sp++;		// non-transparent
-		//printf("P%d ",sp[-1]);
-middle_pixel:
-		if( pp>lp ) {
-		    while( dp>pp ) {
-			*dp--=((VMemType32*)sprite->Pixels)[*sp++];
-		    }
-		    continue;
-		}
-		//printf("%d ",sp[-1]);
-		while( dp>lp ) {
-		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
-		}
-		//printf("%d: ",dp-pp);
-		sp+=dp-pp;
-		//printf("CLIP PIXEL %d,%d,%d\n",*sp,sp[-1],sp[1]);
-		dp=pp;
-		break;
-	    }
-
-	    //
-	    //	Clip left side
-	    //
-	    lp-=ox;
-	    while( dp>lp ) {
-		dp-=*sp++;		// transparent
-right_trans:
-		if( dp<=lp ) {
-		    break;
-		}
-		dp-=*sp;		// non-transparent
-		sp+=*sp+1;
-	    }
-	    IfDebug( 
-		if( dp!=lp )
-		    printf(__FUNCTION__": ERROR\n");
-	    )
-	    dp+=da;
-	}
-    }
-}
-
-global void DrawRleSprite(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    // FIXME: function pointer and move to new code structure
-    switch( VideoDepth ) {
-	case 8:
-	    DrawRleSprite8(sprite,frame,x,y);
-	    break;
-	case 15:
-	case 16:
-	    DrawRleSprite16(sprite,frame,x,y);
-	    break;
-	case 24:
-	case 32:
-	    DrawRleSprite32(sprite,frame,x,y);
-	    break;
-    }
-}
-
-global void DrawRleSpriteClipped(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    // FIXME: function pointer and move to new code structure
-    switch( VideoDepth ) {
-	case 8:
-	    DrawRleSpriteClipped8(sprite,frame,x,y);
-	    break;
-	case 15:
-	case 16:
-	    DrawRleSpriteClipped16(sprite,frame,x,y);
-	    break;
-	case 24:
-	case 32:
-	    DrawRleSpriteClipped32(sprite,frame,x,y);
-	    break;
-    }
-}
-
-global void DrawRleSpriteX(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    // FIXME: function pointer and move to new code structure
-    switch( VideoDepth ) {
-	case 8:
-	    DrawRleSpriteX8(sprite,frame,x,y);
-	    break;
-	case 15:
-	case 16:
-	    DrawRleSpriteX16(sprite,frame,x,y);
-	    break;
-	case 24:
-	case 32:
-	    DrawRleSpriteX32(sprite,frame,x,y);
-	    break;
-    }
-}
-
-global void DrawRleSpriteClippedX(RleSprite* sprite,unsigned frame,int x,int y)
-{
-    // FIXME: function pointer and move to new code structure
-    switch( VideoDepth ) {
-	case 8:
-	    DrawRleSpriteClippedX8(sprite,frame,x,y);
-	    break;
-	case 15:
-	case 16:
-	    DrawRleSpriteClippedX16(sprite,frame,x,y);
-	    break;
-	case 24:
-	case 32:
-	    DrawRleSpriteClippedX32(sprite,frame,x,y);
-	    break;
-    }
-}
-
-/*
-**	Load rle sprite from file.
-*/
-global RleSprite* LoadRleSprite(const char* name,unsigned width,unsigned height)
-{
-    RleSprite* sprite;
-    Graphic* graphic;
-    unsigned char* data;
-    unsigned char* sp;
-    unsigned char* dp;
-    unsigned char* cp;
-    int fl;
-    int n;
-    int counter;
-    int i;
-    int h;
-    int w;
-
-    graphic=LoadGraphic(name);
-    if( !width ) {			// FIXME: this is hack for cursors!
-	width=graphic->Width;
-    }
-    if( !height ) {
-	height=graphic->Height;
-    }
-
-    n=(graphic->Width/width)*(graphic->Height/height);
-    DebugLevel3(__FUNCTION__": %dx%d in %dx%d = %d frames.\n"
-	    ,width,height
-	    ,graphic->Width,graphic->Height,n);
-
-    // FIXME: new internal compressed sprite format!
-    sprite=malloc(sizeof(RleSprite)+n*sizeof(unsigned char*)+(graphic->Width*graphic->Height*2));
-    // FIXME: ARI: * 2 == very passive!
-    data=(unsigned char *)sprite;
-    dp=(unsigned char *)&sprite->Frames[n];
-
-    //
-    //	Compress all frames of the sprite.
-    //
-    fl=graphic->Width/width;
-    for( i=0; i<n; ++i ) {
-	sprite->Frames[i]=dp;
-	for( h=0; h<height; ++h ) {
-	    sp=graphic->Frames+(i%fl)*width+((i/fl)*height+h)*graphic->Width;
-
-	    for( counter=w=0; w<width; ++w ) {
-		if( *sp==255 ) {	// transparent
-		    ++sp;
-		    if( ++counter==256 ) {
-			*dp++=255;
-			*dp++=0;
-			counter=1;
-		    }
-		    continue;
-		}
-		*dp++=counter;
-
-		cp=dp++;
-		counter=0;
-#if 1
-		for( ; w<width; ++w ) {	// non-transparent
-		    *dp++=*sp++;
-		    if( ++counter==255 ) {
-			*cp=255;
-			*dp++=0;
-			cp=dp++;
-			counter=0;
-		    }
-		    if( w+1!=width && *sp==255 ) {	// transparent		// ARI: FIXME - wrong position
-			break;
-		    }
-		}
-#else
-		for( ; w<width && *sp!=255 ; ++w ) {	// non-transparent
-		    *dp++=*sp++;
-		    if( ++counter==256 ) {
-			*cp=255;
-			*dp++=0;
-			cp=dp++;
-			counter=1;
-		    }
-		}
-#endif
-		*cp=counter;
-		counter=0;
-	    }
-	    if( counter ) {
-		*dp++=counter;
-	    }
-	}
-    }
-
-    DebugLevel3("\t%d => %d RLE compressed\n"
-	    ,graphic->Width*graphic->Height,dp-data);
-
-    i=sizeof(*sprite)+n*sizeof(unsigned char*)+dp-data;
-    sprite=realloc(sprite,i);
-    if( (unsigned char*)sprite!=data ) {	// shrink only - happens rarely
-	for( h=0; h<n; ++h ) {			// convert address
-	    sprite->Frames[h]=sprite->Frames[h]-data+(unsigned char*)sprite;
-	}
-    }
-
-    IfDebug(CompressedGraphicMemory+=i;
-	     sprite->ByteSize=i; )
-
-    sprite->Width=width;
-    sprite->Height=height;
-    
-    sprite->Pixels = graphic->Pixels;
-    /*switch( VideoDepth ){
-    case 8:
-      sprite->Pixels=(GraphicData*)Pixels8;
-      break;
-    case 15:
-    case 16:
-      sprite->Pixels=(GraphicData*)Pixels16;
-      break;
-    case 24:
-    case 32:
-      sprite->Pixels=(GraphicData*)Pixels32;
-      break;
-    } */
-    //sprite->Pixels=NULL;		// FIXME: future extensions
-    sprite->NumFrames=n;
-
-    VideoFree(graphic);
-
-    return sprite;
-}
-
-/*
-**	Free rle sprite.
-*/
-global void FreeRleSprite(RleSprite* sprite)
-{
-    IfDebug (CompressedGraphicMemory-=sprite->ByteSize; )
-
-    free(sprite);
-}
-
 
 /**
-**	Load a RGB palette.
+**	Pop current clipping.
+*/
+global void PopClipping(void)
+{
+    Clip* clip;
+
+    clip=Clips;
+    if( clip ) {
+	Clips=clip->Next;
+	ClipX1=clip->X1;
+	ClipY1=clip->Y1;
+	ClipX2=clip->X2;
+	ClipY2=clip->Y2;
+	free(clip);
+    } else {
+	ClipX1=0;
+	ClipY1=0;
+	ClipX2=VideoWidth;
+	ClipY2=VideoHeight;
+    }
+}
+
+/**
+**	Load a picture and display it on the screen (full screen),
+**	changing the colormap and so on..
 **
-**	FIXME: Should or shouldn't this be removed???
+**	@param name	Name of the picture (file) to display.
+*/
+global void DisplayPicture(const char *name)
+{
+    Graphic* title;
+
+    title=LoadGraphic(name);
+    // FIXME: remove the casts :{
+    VideoSetPalette((VMemType*)title->Pixels);
+
+#ifdef USE_SDL
+    // FIXME: should be moved to system/hardware dependend part
+    { extern SDL_Surface *Screen;		/// internal screen
+    SDL_LockSurface(Screen);
+
+    VideoMemory=Screen->pixels;
+#endif
+
+    // FIXME: bigger window ?
+    VideoDrawSubClip(title,0,0
+	,title->Width,title->Height
+	,(VideoWidth-title->Width)/2,(VideoHeight-title->Height)/2);
+
+#ifdef USE_SDL
+    // FIXME: should be moved to system/hardware dependend part
+    SDL_UnlockSurface(Screen); }
+#endif
+    VideoFree(title);
+    // FIXME: (ARI:) New Palette got stuck in memory?
+}
+
+/**
+**	Load palette from resource. Just loads palette, to set it use
+**	VideoCreatePalette, which sets system palette.
+**
+**	@param pal buffer to store palette (256-entries long)
+**	@param name resource file name
+**
+**	@see VideoCreatePalette
 */
 global void LoadRGB(Palette *pal, const char *name)
 {
@@ -1604,7 +262,7 @@ global void LoadRGB(Palette *pal, const char *name)
     int i;
     
     if((fp=fopen(name,"rb")) == NULL) {
-	printf("Can't load palette %s\n", name);
+	fprintf(stderr,"Can't load palette %s\n",name);
 	exit(-1);
     }
 
@@ -1617,44 +275,253 @@ global void LoadRGB(Palette *pal, const char *name)
     fclose(fp);
 }
 
+// FIXME: this isn't 100% correct
+// Color cycling info - forest:
+// 3	flash red/green	(attacked building on minimap)
+// 38-47	cycle		(water)
+// 48-56	cycle		(water-coast boundary)
+// 202	pulsates red	(Circle of Power)
+// 240-244	cycle		(water around ships, Runestone, Dark Portal)
+// Color cycling info - swamp:
+// 3	flash red/green	(attacked building on minimap)
+// 4	pulsates red	(Circle of Power)
+// 5-9	cycle		(Runestone, Dark Portal)
+// 38-47	cycle		(water)
+// 88-95	cycle		(waterholes in coast and ground)
+// 240-244	cycle		(water around ships)
+// Color cycling info - wasteland:
+// 3	flash red/green	(attacked building on minimap)
+// 38-47	cycle		(water)
+// 64-70	cycle		(coast)
+// 202	pulsates red	(Circle of Power)
+// 240-244	cycle		(water around ships, Runestone, Dark Portal)
+// Color cycling info - winter:
+// 3	flash red/green	(attacked building on minimap)
+// 40-47	cycle		(water)
+// 48-54	cycle		(half-sunken ice-floe)
+// 202	pulsates red	(Circle of Power)
+// 205-207	cycle		(lights on christmas tree)
+// 240-244	cycle		(water around ships, Runestone, Dark Portal)
+
 /**
-**	Set palette -> Video
+**	Color cycle for 8 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
 */
-global void VideoSetPalette(const GraphicData *palette)
+global void ColorCycle8(void)
 {
-    // -> Video
-    switch( VideoDepth ) {
-	case 8:
-	    Pixels8 =(VMemType8  *)palette;
-	    break;
-	case 15:
-	case 16:
-	    Pixels16=(VMemType16 *)palette;
-	    break;
-	case 24:
-	    // FIXME: real 24bpp mode
-	case 32:
-	    Pixels32=(VMemType32 *)palette;
-	    break;
-	default:
-	    DebugLevel0(__FUNCTION__": Unknown depth\n");
-	    break;
+    int i;
+    int x;
+    VMemType8* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
     }
+    pixels[47] = x;
+
+    x=Pixels8[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels8[i]=Pixels8[i+1];
+    }
+    Pixels8[47]=x;
+
+    x=Pixels8[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels8[i]=Pixels8[i+1];
+    }
+    Pixels8[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Color cycle for 16 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
+*/
+global void ColorCycle16(void)
+{
+    int i;
+    int x;
+    VMemType16* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
+    }
+    pixels[47] = x;
+
+    x=Pixels16[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels16[i]=Pixels16[i+1];
+    }
+    Pixels16[47]=x;
+
+    x=Pixels16[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels16[i]=Pixels16[i+1];
+    }
+    Pixels16[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Color cycle for 24 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
+*/
+global void ColorCycle24(void)
+{
+    int i;
+    VMemType24 x;
+    VMemType24* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
+    }
+    pixels[47] = x;
+
+    x=Pixels24[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels24[i]=Pixels24[i+1];
+    }
+    Pixels24[47]=x;
+
+    x=Pixels24[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels24[i]=Pixels24[i+1];
+    }
+    Pixels24[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Color cycle for 32 bpp video mode.
+**
+**	FIXME: not correct cycles only palette of tileset.
+**	FIXME: Also icons and some units use color cycling.
+**	FIXME: must be configured by the tileset or global.
+*/
+global void ColorCycle32(void)
+{
+    int i;
+    int x;
+    VMemType32* pixels;
+
+    //
+    //	Color cycle tileset palette
+    //
+    pixels=TheMap.TileData->Pixels;
+    x = pixels[38];
+    for(i = 38; i < 47; ++i){
+	pixels[i] = pixels[i+1];
+    }
+    pixels[47] = x;
+
+    x=Pixels32[38];
+    for( i=38; i<47; ++i ) {	// tileset color cycle
+	Pixels32[i]=Pixels32[i+1];
+    }
+    Pixels32[47]=x;
+
+    x=Pixels32[240];
+    for( i=240; i<244; ++i ) {	// units/icons color cycle
+	Pixels32[i]=Pixels32[i+1];
+    }
+    Pixels32[244]=x;
+
+    MapColorCycle();		// FIXME: could be little more informativer
+    MustRedraw|=RedrawMap|RedrawInfoPanel;
+}
+
+/**
+**	Initializes system palette. Also calls SetPlayersPalette to set
+**	palette for all players.
+**
+**	@param palette VMemType structure, as created by VideoCreateNewPalette
+**	@see SetPlayersPalette
+*/
+global void VideoSetPalette(const VMemType* palette)
+{
+    if( Pixels ) {
+	free(Pixels);
+    }
+    Pixels=(VMemType*)palette;
     SetPlayersPalette();
 }
 
 /**
-**	Create palette.
+**	Set the system hardware palette from an independend Palette struct.
+**
+**	@param palette	System independ palette structure.
 */
 global void VideoCreatePalette(const Palette* palette)
 {
-    GraphicData * temp;
+    VMemType* temp;
 
     temp = VideoCreateNewPalette(palette);
 
     VideoSetPalette(temp);
 }
 
-#endif	// } !NEW_VIDEO
+/**
+**	Video initialize.
+*/
+global void InitVideo(void)
+{
+    if( UseSdl ) {
+	InitVideoSdl();
+    } else if( UseX11 ) {
+	InitVideoX11();
+    } else if( UseSVGALib ) {
+	InitVideoSVGA();
+    } else if( UseWin32 ) {
+	InitVideoWin32();
+    } else {
+	IfDebug( abort(); );
+    }
+
+    //
+    //	Init video sub modules
+    //
+    InitGraphic();
+    InitLineDraw();
+    InitSprite();
+    InitCursor();
+    switch( VideoDepth ) {
+	case  8: ColorCycle=ColorCycle8 ; break;
+	case 15:
+	case 16: ColorCycle=ColorCycle16; break;
+	case 24: ColorCycle=ColorCycle24; break;
+	case 32: ColorCycle=ColorCycle32; break;
+    }
+
+    DebugLevel3(__FUNCTION__": %d %d\n",MapWidth,MapHeight);
+}
 
 //@}

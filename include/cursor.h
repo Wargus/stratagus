@@ -25,6 +25,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "player.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --	Definitions
@@ -39,7 +40,6 @@ typedef struct _cursor_type_ CursorType;
 **	private type which specifies current cursor type
 */
 struct _cursor_type_ {
-#ifdef NEW_VIDEO
     const char*	File[PlayerMaxRaces];	/// resource filename one for each race
 
 // FIXME: this must be extra for each file (different sizes for the races)
@@ -52,20 +52,6 @@ struct _cursor_type_ {
 // --- FILLED UP ---
 
     Graphic*	Sprite;			/// cursor sprite image
-#else
-    const char*	File[PlayerMaxRaces];	/// resource filename one for each race
-
-// FIXME: this must be extra for each file (different sizes for the races)
-// FIXME: or must define that each image has the same size
-    int		HotX;			/// hot point x
-    int		HotY;			/// hot point y
-    int		Width;			/// width of cursor
-    int		Height;			/// height of cursor
-
-// --- FILLED UP ---
-
-    RleSprite*	RleSprite;		/// cursor sprite image
-#endif
 };
 
     /// cursor type (enumerated) FIXME: should remove the enumeration
