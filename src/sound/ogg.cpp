@@ -44,7 +44,9 @@
 #ifdef BSD
 #include <inttypes.h>
 #else
+#ifdef _MSC_VER
 #include <windows.h>
+#endif
 #include <stdint.h>
 #endif // BSD
 
