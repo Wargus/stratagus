@@ -74,20 +74,20 @@
 **	Icon::X
 **
 **		X pixel index into the graphic image.
-**		(Icon::Index%5)*ICON_WIDTH.
+**		(Icon::Index%5)*IconWidth.
 **
 **	Icon::Y
 **
 **		Y pixel index into the graphic image.
-**		(Icon::Index/5)*ICON_HEIGHT.
+**		(Icon::Index/5)*IconHeight.
 **
 **	Icon::Width
 **
-**		Icon width in pixels, defaults to ICON_WIDTH (46).
+**		Icon width in pixels.
 **
 **	Icon::Height
 **
-**		Icon height in pixels, defaults to ICON_WIDTH (38).
+**		Icon height in pixels.
 **
 **	Icon::Graphic
 **
@@ -141,9 +141,6 @@ typedef struct _player_ Player;
 #define IconActive	1		/// cursor on icon
 #define IconClicked	2		/// mouse button down on icon
 #define IconSelected	4		/// this the selected icon
-
-#define ICON_WIDTH	46		/// default icon width in panels
-#define ICON_HEIGHT	38		/// default icon height in panels
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -200,6 +197,10 @@ typedef struct _icon_config_ {
 ----------------------------------------------------------------------------*/
 
 extern char** IconWcNames;		/// pud original -> internal
+
+extern int IconWidth;			/// icon width in panels
+extern int IconHeight;	    		/// icon height in panels
+extern int IconsPerRow;			/// icons per row
 
 /*----------------------------------------------------------------------------
 --	Functions

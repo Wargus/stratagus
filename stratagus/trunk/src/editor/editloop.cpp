@@ -67,9 +67,9 @@ extern struct {
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define UNIT_ICON_X (ICON_WIDTH + 7)		/// Unit mode icon
+#define UNIT_ICON_X (IconWidth + 7)		/// Unit mode icon
 #define UNIT_ICON_Y (0)				/// Unit mode icon
-#define TILE_ICON_X (ICON_WIDTH * 2 + 16)	/// Tile mode icon
+#define TILE_ICON_X (IconWidth * 2 + 16)	/// Tile mode icon
 #define TILE_ICON_Y (2)				/// Tile mode icon
 
 #define TILE_WIDTH 32				/// Tile mode icon
@@ -384,7 +384,7 @@ local void DrawTileIcons(void)
     int i;
 
     x = TheUI.InfoPanelX + 46;
-    y = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 11;
+    y = TheUI.InfoPanelY + 4 + IconHeight + 11;
 
     if( CursorOn == CursorOnButton &&
 	    ButtonUnderCursor >= 300 && ButtonUnderCursor < 306 ) {
@@ -455,7 +455,7 @@ local void DrawUnitIcons(void)
     Icon *icon;
 
     x = TheUI.InfoPanelX + 8;
-    y = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 10;
+    y = TheUI.InfoPanelY + 4 + IconHeight + 10;
 
     for (i = 0; i < PlayerMax; ++i) {
 	if (i == PlayerMax / 2) {
@@ -631,7 +631,7 @@ local void DrawUnitIcons(void)
 
     i = UnitIndex;
     while( y < TheUI.ButtonPanelY
-	    + TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT ) {
+	    + TheUI.ButtonPanel.Graphic->Height - IconHeight ) {
 	if( i >= MaxShownUnits ) {
 	    break;
 	}
@@ -653,10 +653,10 @@ local void DrawUnitIcons(void)
 			icon->Width + 2, icon->Height + 2);
 	    }
 
-	    x += ICON_WIDTH + 8;
+	    x += IconWidth + 8;
 	    ++i;
 	}
-	y += ICON_HEIGHT + 2;
+	y += IconHeight + 2;
     }
 }
 
@@ -1508,7 +1508,7 @@ local void EditorCallbackMouse(int x, int y)
     //
     if (EditorState == EditorEditUnit) {
 	bx = TheUI.InfoPanelX + 8;
-	by = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 10;
+	by = TheUI.InfoPanelY + 4 + IconHeight + 10;
 	for( i = 0; i< PlayerMax; ++i ) {
 	    if( i == PlayerMax / 2 ) {
 		bx = TheUI.InfoPanelX + 8;
@@ -1528,7 +1528,7 @@ local void EditorCallbackMouse(int x, int y)
 	i = UnitIndex;
 	by = TheUI.ButtonPanelY + 24;
 	while (by < TheUI.ButtonPanelY
-		+ TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT) {
+		+ TheUI.ButtonPanel.Graphic->Height - IconHeight) {
 	    if( i >= MaxShownUnits || !ShownUnitTypes[i] ) {
 		break;
 	    }
@@ -1537,8 +1537,8 @@ local void EditorCallbackMouse(int x, int y)
 		if( i >= MaxShownUnits || !ShownUnitTypes[i] ) {
 		    break;
 		}
-		if (bx < x && x < bx + ICON_WIDTH
-			&& by < y && y < by + ICON_HEIGHT) {
+		if (bx < x && x < bx + IconWidth
+			&& by < y && y < by + IconHeight) {
 		    sprintf(buf,"%s \"%s\"",
 			    UnitTypeByIdent(ShownUnitTypes[i])->Ident,
 			    UnitTypeByIdent(ShownUnitTypes[i])->Name);
@@ -1548,10 +1548,10 @@ local void EditorCallbackMouse(int x, int y)
 		    //CursorOn = CursorOnButton;
 		    return;
 		}
-		bx += ICON_WIDTH + 8;
+		bx += IconWidth + 8;
 		i++;
 	    }
-	    by += ICON_HEIGHT + 2;
+	    by += IconHeight + 2;
 	}
     }
 
@@ -1561,7 +1561,7 @@ local void EditorCallbackMouse(int x, int y)
     if (EditorState == EditorEditTile) {
 	i = 0;
 	bx = TheUI.InfoPanelX + 4;
-	by = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 10;
+	by = TheUI.InfoPanelY + 4 + IconHeight + 10;
 
 	while( i < 6 ) {
 	    if (bx < x && x < bx + 100 && by < y && y < by + 18) {
@@ -1599,9 +1599,9 @@ local void EditorCallbackMouse(int x, int y)
     //  Handle buttons
     //
     if (TheUI.InfoPanelX + 4 < CursorX
-	    && CursorX < TheUI.InfoPanelX + 4 + ICON_WIDTH+7
+	    && CursorX < TheUI.InfoPanelX + 4 + IconWidth+7
 	    && TheUI.InfoPanelY + 4 < CursorY
-	    && CursorY < TheUI.InfoPanelY + 4 + ICON_HEIGHT+7) {
+	    && CursorY < TheUI.InfoPanelY + 4 + IconHeight+7) {
 	// FIXME: what is this button?
 	ButtonUnderCursor = SelectButton;
 	CursorOn = CursorOnButton;
@@ -1609,9 +1609,9 @@ local void EditorCallbackMouse(int x, int y)
 	return;
     }
     if (TheUI.InfoPanelX + 4 + UNIT_ICON_X < CursorX
-	    && CursorX < TheUI.InfoPanelX + 4 + UNIT_ICON_X + ICON_WIDTH+7
+	    && CursorX < TheUI.InfoPanelX + 4 + UNIT_ICON_X + IconWidth+7
 	    && TheUI.InfoPanelY + 4 + UNIT_ICON_Y < CursorY
-	    && CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + ICON_HEIGHT+7) {
+	    && CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + IconHeight+7) {
 	ButtonUnderCursor = UnitButton;
 	CursorOn = CursorOnButton;
 	SetStatusLine("Unit mode");

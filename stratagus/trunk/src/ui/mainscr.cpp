@@ -81,8 +81,8 @@ local void UiDrawLifeBar(const Unit* unit,int x,int y)
     int f;
     int color;
 
-    y+=ICON_HEIGHT+7;
-    VideoFillRectangleClip(ColorBlack,x,y,ICON_WIDTH+7,7);
+    y+=IconHeight+7;
+    VideoFillRectangleClip(ColorBlack,x,y,IconWidth+7,7);
     if( unit->HP ) {
 	f=(100*unit->HP)/unit->Stats->HitPoints;
 	if( f>75) {
@@ -94,7 +94,7 @@ local void UiDrawLifeBar(const Unit* unit,int x,int y)
 	} else {
 	    color=ColorRed;
 	}
-	f=(f*(ICON_WIDTH+5))/100;
+	f=(f*(IconWidth+5))/100;
 	VideoFillRectangleClip(color,x+1,y+1,f,5);
     }
 }
@@ -112,13 +112,13 @@ local void UiDrawManaBar(const Unit* unit,int x,int y)
 {
     int f;
 
-    y+=ICON_HEIGHT+7;
-    VideoFillRectangleClip(ColorBlack,x,y+3,ICON_WIDTH+7,4);
+    y+=IconHeight+7;
+    VideoFillRectangleClip(ColorBlack,x,y+3,IconWidth+7,4);
     if( unit->HP ) {
 	/* s0m3body: mana bar should represent proportional value of Mana with respect to
 	 * MaxMana (unit->Type->_MaxMana) for the unit */
 	f=(100*unit->Mana)/unit->Type->_MaxMana;
-	f=(f*(ICON_WIDTH+5))/100;
+	f=(f*(IconWidth+5))/100;
 	VideoFillRectangleClip(ColorBlue,x+1,y+3+1,f,2);
     }
 }
