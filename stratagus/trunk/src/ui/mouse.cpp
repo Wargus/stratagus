@@ -392,6 +392,7 @@ global void DoRightButton (int sx,int sy)
 		    SendCommandMove(unit,x,y,flush);
 		}
 	    }
+	    // FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
             continue;
         }
 
@@ -1153,6 +1154,38 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 */
 global void UIHandleButtonDown(unsigned button)
 {
+    static int OldShowOrders;
+    static int OldShowSightRange;
+    static int OldShowAttackRange;
+    static int OldShowReactionRange;
+    static int OldValid;
+
+/**
+**	Detect long selection click, FIXME: tempory hack to test the feature.
+*/
+#define LongSelected (MouseButtons&((LeftButton<<MouseHoldShift)))
+
+    if( LongSelected ) {
+	if( !OldValid ) {
+	    OldShowOrders=ShowOrders;
+	    OldShowSightRange=ShowSightRange;
+	    OldShowAttackRange=ShowAttackRange;
+	    OldShowReactionRange=ShowReactionRange;
+	    OldValid=1;
+
+	    ShowOrders=1;
+	    ShowSightRange=1;
+	    ShowAttackRange=1;
+	    ShowReactionRange=1;
+	}
+    } else if( OldValid ) {
+	ShowOrders=OldShowOrders;
+	ShowSightRange=OldShowSightRange;
+	ShowAttackRange=OldShowAttackRange;
+	ShowReactionRange=OldShowReactionRange;
+	OldValid=0;
+    }
+
     if( CursorState==CursorStateRectangle ) {	// select mode
 	return;
     }
@@ -1201,6 +1234,7 @@ global void UIHandleButtonDown(unsigned button)
 	    }
 	    return;
 	}
+
 	if( MouseButtons&LeftButton ) {	// enter select mode
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
@@ -1288,6 +1322,7 @@ global void UIHandleButtonUp(unsigned button)
 	GameCursor=TheUI.Point.Cursor;		// Reset
 	return;
     }
+
     if( (1<<button) == LeftButton && GameMenuButtonClicked == 1 ) {
 	GameMenuButtonClicked = 0;
 	MustRedraw|=RedrawMenuButton;
@@ -1301,6 +1336,7 @@ global void UIHandleButtonUp(unsigned button)
 
     // FIXME: should be completly rewritten
     // FIXME: must selecting!  (lokh: what does this mean? is this done now?)
+
     // SHIFT toggles select/unselect a single unit and
     //       add the content of the rectangle to the selectection
     // ALT takes group of unit
@@ -1349,6 +1385,7 @@ global void UIHandleButtonUp(unsigned button)
 	    int y1 = CursorY - TheUI.MapY + MapY*TileSizeY;
 	    if (x0>x1) {
 		int swap=x0;	// this is faster and more readable than xor's
+				// JOHNS: no it is slower and more readable
 		x0 = x1;
 		x1 = swap;
 	    }
@@ -1370,7 +1407,7 @@ global void UIHandleButtonUp(unsigned button)
 	    if( NumSelected==1 ) {
 		unit=Selected[0];
 	    }
-            //cade: cannot select unit on invisible space
+            // cade: cannot select unit on invisible space
 	    // FIXME: johns: only complete invisibile units
             if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
 		unit=UnitOnScreen(unit
