@@ -189,6 +189,7 @@ global char* NetworkArg;		/// Network command line argument
 //----------------------------------------------------------------------------
 
 // FIXME: should split the next into small modules!
+// FIXME: I (Johns) leave this for other people (this means you!)
 
 //----------------------------------------------------------------------------
 //	Commands input
@@ -215,7 +216,7 @@ global void NetworkSendCommand(int command,const Unit* unit,int x,int y
 {
     NetworkCommandQueue* ncq;
 
-    DebugLevel0(__FUNCTION__": %d,%d,(%d,%d),%d,%s,%s\n"
+    DebugLevel3(__FUNCTION__": %d,%d,(%d,%d),%d,%s,%s\n"
 	,command,unit->Slot,x,y,dest ? dest->Slot : -1
 	,type ? type->Ident : "-",status ? "flush" : "append");
 
@@ -721,11 +722,11 @@ global void SendCommandDemolish(Unit* unit,int x,int y,Unit* attack,int flush)
 //@{
 
 local unsigned long  NetLastHost;	/// Last host number (net format)
-local int NetLastPort;		/// Last port number (net format)
+local int NetLastPort;			/// Last port number (net format)
 
 #ifdef USE_SDL_NET	// {
 
-// FIXME: Not written
+// FIXME: Not written, I (johns) leave this for other peoples.
 
 /**
 **	Hardware dependend network init.
@@ -958,7 +959,7 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
     return sendto(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,n);
 }
 
-// FIXME: TCP support missing
+// FIXME: TCP support missing (not needed currently for freecraft)
 
 //@}
 
@@ -1229,10 +1230,12 @@ local void NetworkClientSetup(void)
 		exit(-1);
 	    }
 	    DebugLevel0(__FUNCTION__": receive reply\n");
-	    if( NetLastHost==MyHost && NetLastPort==MyPort  ) {
-		fprintf(stderr,"speaking with me self\n");
-		exit(-1);
-	    }
+	    IfDebug(
+		if( NetLastHost==MyHost && NetLastPort==MyPort  ) {
+		    fprintf(stderr,"speaking with me self\n");
+		    exit(-1);
+		}
+	    );
 	    if( NetLastHost==host && NetLastPort==port
 		    && message.Type==MessageInitReply ) {
 		break;
@@ -1268,33 +1271,11 @@ local void NetworkClientSetup(void)
 		    ,message.Num[i],message.Hosts[i].Host
 		    ,ntohs(message.Hosts[i].Port));
 	}
+	NetPlyNr[HostsCount]=message.Num[i];
 	//Hosts[HostsCount].Host=NetLastHost;
 	//Hosts[HostsCount++].Port=NetLastPort;
-	NetPlyNr[HostsCount]=message.Num[i];
 	Hosts[HostsCount].Host=host;
 	Hosts[HostsCount++].Port=port;
-
-#if 0
-	    // Own client
-	    if( message.Hosts[i].Host==MyHost
-		    && message.Hosts[i].Port==MyPort ) {
-		DebugLevel0(__FUNCTION__": SELF %d\n",message.Num[i]);
-		ThisPlayer=&Players[(int)message.Num[i]];
-	    } else {
-		NetPlyNr[HostsCount]=message.Num[i];
-		if( message.Hosts[i].Host || message.Hosts[i].Port ) {
-		    Hosts[HostsCount].Host=message.Hosts[i].Host;
-		    Hosts[HostsCount++].Port=message.Hosts[i].Port;
-		} else {
-		    Hosts[HostsCount].Host=NetLastHost;
-		    Hosts[HostsCount++].Port=NetLastPort;
-		}
-		DebugLevel0(__FUNCTION__": Client %d %ld:%d\n"
-			,message.Num[i],message.Hosts[i].Host
-			,ntohs(message.Hosts[i].Port));
-	    }
-	}
-#endif
 
 	// Acknowledge the packets.
 	message.Type=MessageInitReply;
@@ -1377,9 +1358,10 @@ global void InitNetwork(void)
 	    gethostname(buf,sizeof(buf));
 	    DebugLevel0(__FUNCTION__": %s\n",buf);
 	    MyHost=NetResolveHost(buf);
+	    MyPort=NetLastPort;
+	    DebugLevel0(__FUNCTION__": My host/port %ld:%d\n"
+		    ,MyHost,ntohs(MyPort));
 	});
-	MyPort=NetLastPort;
-	DebugLevel0(__FUNCTION__": My host/port %ld:%d\n",MyHost,ntohs(MyPort));
 
 	//
 	//	Server
@@ -1454,12 +1436,8 @@ global void NetworkEvent(void)
 	//	Handle some messages.
 	//
 	if( nc->Type==MessageQuit ) {
-	    DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
-		    ,FrameCounter,SlowFrameCounter      
-		    ,(SlowFrameCounter*100)/FrameCounter);
-	    IfDebug( UnitCacheStatistic(); );
 	    DebugLevel0("Got quit from network.\n");
-	    exit(0);
+	    Exit(0);
 	}
 
 	if( nc->Type==MessageResend ) {
@@ -1472,14 +1450,15 @@ global void NetworkEvent(void)
 		n-=0x100;
 	    }
 
-	    DebugLevel0(__FUNCTION__": resend for %d\n",n);
+	    DebugLevel3(__FUNCTION__": resend for %d\n",n);
 	    //
 	    //	Find the commands to resend
 	    //
 #if 0
+	    // Both directions are same fast/slow
 	    ncq=(NetworkCommandQueue*)(CommandsOut->last);
 	    while( ncq->List->prev ) {
-		DebugLevel2(__FUNCTION__": resend %d? %d\n",ncq->Time,n); 
+		DebugLevel3(__FUNCTION__": resend %d? %d\n",ncq->Time,n); 
 		if( ncq->Time==n ) {
 		    NetworkSendPacket(ncq);
 		    break;
@@ -1488,7 +1467,7 @@ global void NetworkEvent(void)
 		ncq=(NetworkCommandQueue*)(ncq->List->prev);
 	    }
 	    if( !ncq->List->prev ) {
-		DebugLevel0(__FUNCTION__": no packets for resend\n");
+		DebugLevel3(__FUNCTION__": no packets for resend\n");
 	    }
 #else
 	    ncq=(NetworkCommandQueue*)(CommandsOut->first);
@@ -1539,14 +1518,14 @@ global void NetworkEvent(void)
     if( !NetworkInSync ) {
 	NetworkInSync=1;
 	n=((FrameCounter)/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
-	DebugLevel0(__FUNCTION__": wait for %d - ",n);
+	DebugLevel3(__FUNCTION__": wait for %d - ",n);
 	for( player=0; player<HostsCount; ++player ) {
 	    if( NetworkIn[n&0xFF][NetPlyNr[player]].Time!=n ) {
 		NetworkInSync=0;
 		break;
 	    }
 	}
-	DebugLevel0("%d in sync %d\n",FrameCounter,NetworkInSync);
+	DebugLevel3("%d in sync %d\n",FrameCounter,NetworkInSync);
     }
 }
 
@@ -1560,7 +1539,8 @@ global void NetworkQuit(void)
     nc.Type=MessageQuit;
     nc.Frame=FrameCounter&0xFF;
     NetworkBroadcast(&nc,sizeof(NetworkCommand));
-    // FIXME: if lost?
+
+    // FIXME: if lost? Need an acknowledge for QuitMessages.
 }
 
 /**
@@ -1663,7 +1643,7 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 	    break;
 	case MessageCommandAttack:
 	    dest=NoUnitP;
-	    DebugLevel0(__FUNCTION__": %x\n",ntohs(ncq->Data.Dest));
+	    DebugLevel3(__FUNCTION__": %x\n",ntohs(ncq->Data.Dest));
 	    if( ntohs(ncq->Data.Dest)!=0xFFFF ) {
 		dest=UnitSlots[ntohs(ncq->Data.Dest)];
 		DebugCheck( !dest );
@@ -1857,7 +1837,7 @@ local void NetworkExecCommands(void)
 	    //
 	    while( !dl_empty(CommandsOut) ) {
 		ncq=(NetworkCommandQueue*)(CommandsOut->last);
-		// FIXME: how many packets must be keeped?
+		// FIXME: how many packets must be exact keeped?
 		//if( ncq->Time+NetworkLag+NetworkUpdates>=FrameCounter ) {
 		// THIS is too much if( ncq->Time>=FrameCounter ) 
 		if( ncq->Time+NetworkLag>=FrameCounter ) {
@@ -1956,7 +1936,7 @@ global void NetworkRecover(void)
     if( NetworkDelay<VideoInterrupts ) {
 	NetworkDelay+=NetworkUpdates;
 	if( !dl_empty(CommandsOut) ) {
-	    DebugLevel0(__FUNCTION__": %d %d\n",FrameCounter,VideoInterrupts);
+	    DebugLevel3(__FUNCTION__": %d %d\n",FrameCounter,VideoInterrupts);
 	    NetworkResendCommands();
 	}
     }
