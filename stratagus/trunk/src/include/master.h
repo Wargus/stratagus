@@ -41,8 +41,8 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#define MASTER_HOST "stratagus.dyndns.org"
-#define MASTER_PORT 8123
+#define MASTER_HOST "mohydine.no-ip.com"
+#define MASTER_PORT 7775
 
 /*----------------------------------------------------------------------------
 --	Declarations

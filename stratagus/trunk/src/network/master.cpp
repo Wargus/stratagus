@@ -85,7 +85,7 @@ global int MetaInit(void)
 {
     int TCPConnectStatus; // = 0 if not successful, -1 if not.
     int i; 
-    char** reply;
+    char* reply;
 
     reply = NULL;
     sockfd = NetworkFildes;
@@ -109,15 +109,15 @@ global int MetaInit(void)
 	return -1;
     }
 
-    if (RecvMetaReply(reply) == -1) {
+    if (RecvMetaReply(&reply) == -1) {
 	//TODO: Notify player that connection was aborted...
 	return -1;
     } else {
-	if (MetaServerOK(reply)) {
-	    free(*reply);
+	if (MetaServerOK(&reply)) {
+	    free(reply);
 	    return 0;
 	} else {
-	    free(*reply);
+	    free(reply);
 	    return -1;
 	}
     }
@@ -230,7 +230,6 @@ global int SendMetaCommand(char* command, char* format, ...)
 global int RecvMetaReply(char** reply)
 {
     int n;
-    int size;
     char* p;
     char buf[1024];
 
@@ -238,16 +237,15 @@ global int RecvMetaReply(char** reply)
 	return -1;
     }
    
-    size = 1;
     p = NULL;
-    while ((n = NetRecvTCP(sockfd, &buf, 1024))) {
-	size += n;
-	if ((p = realloc(p, size)) == NULL) {
-	    return -1;
-	}
-	strcat(p, buf);
+    
+    n = NetRecvTCP(sockfd, &buf, 1024);
+    if (!(p = malloc(n + 1))) {
+	return -1;
     }
+    buf[n]='\0';
+    strcpy(p, buf);
 
-    reply = &p;
-    return size;
+    *reply = p;
+    return n;
 }
