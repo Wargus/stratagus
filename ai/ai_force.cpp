@@ -223,15 +223,16 @@ global void AiAttackWithForceAt(int force,int x,int y)
 
     AiCleanForce(force);
 
-    AiPlayer->Force[force].Attacking=1;
-    aiunit=AiPlayer->Force[force].Units;
+    if( (aiunit=AiPlayer->Force[force].Units) ) {
+	AiPlayer->Force[force].Attacking=1;
 
-    //
-    //	Send all units in the force to enemy.
-    //
-    while( aiunit ) {
-	CommandAttack(aiunit->Unit, x, y, NULL,FlushCommands);
-	aiunit=aiunit->Next;
+	//
+	//	Send all units in the force to enemy.
+	//
+	while( aiunit ) {
+	    CommandAttack(aiunit->Unit, x, y, NULL,FlushCommands);
+	    aiunit=aiunit->Next;
+	}
     }
 }
 
@@ -247,20 +248,22 @@ global void AiAttackWithForce(int force)
 
     AiCleanForce(force);
 
-    AiPlayer->Force[force].Attacking=1;
-    aiunit=AiPlayer->Force[force].Units;
+    if( (aiunit=AiPlayer->Force[force].Units) ) {
+	AiPlayer->Force[force].Attacking=1;
 
-    enemy = AttackUnitsInDistance(aiunit->Unit, 1000);
-    if (!enemy) {
-	return;
-    }
+	enemy = AttackUnitsInDistance(aiunit->Unit, 1000);
+	if (!enemy) {
+	    return;
+	}
 
-    //
-    //	Send all units in the force to enemy.
-    //
-    while( aiunit ) {
-	CommandAttack(aiunit->Unit, enemy->X, enemy->Y, NULL, FlushCommands);
-	aiunit=aiunit->Next;
+	//
+	//	Send all units in the force to enemy.
+	//
+	while( aiunit ) {
+	    CommandAttack(aiunit->Unit, enemy->X, enemy->Y, NULL,
+		    FlushCommands);
+	    aiunit=aiunit->Next;
+	}
     }
 }
 
