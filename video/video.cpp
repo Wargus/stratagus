@@ -242,7 +242,7 @@ global VMemType* VideoMemory;
     */
 global VMemType* Pixels;
 
-global int VideoSyncSpeed=100;		/// 0 disable interrupts
+global int VideoSyncSpeed = 100;	/// 0 disable interrupts
 global volatile int VideoInterrupts;	/// be happy, were are quicker
 
     /// Loaded system palette. 256-entries long, active system palette.
@@ -278,19 +278,18 @@ global Palette GlobalPalette[256];
     **  VideoAllocPalette8:
     **  Funcytion to let hardware independent palette be converted (when set).
     */
-global Palette   *commonpalette;
+global Palette* commonpalette;
     // FIXME: docu
 global unsigned long commonpalette_defined[8];
     // FIXME: docu
-global VMemType8 *colorcube8;
+global VMemType8* colorcube8;
     // FIXME: docu
-global VMemType8 *lookup25trans8;
+global VMemType8* lookup25trans8;
     // FIXME: docu
-global VMemType8 *lookup50trans8;
+global VMemType8* lookup50trans8;
     // FIXME: docu
-global void (*VideoAllocPalette8)( Palette *palette,
-                                   Palette *syspalette,
-                                   unsigned long syspalette_defined[8] )=NULL;
+global void (*VideoAllocPalette8)(Palette* palette, Palette* syspalette,
+    unsigned long syspalette_defined[8]) = NULL;
 
 global int ColorWaterCycleStart;
 global int ColorWaterCycleEnd;
@@ -318,11 +317,13 @@ global void (*ColorCycle)(void);
 */
 global void SetClipping(int left, int top, int right, int bottom)
 {
-	if( left>right || top>bottom || left<0 || left>=VideoWidth
-		|| top<0 || top>=VideoHeight || right<0
-		|| right>=VideoWidth || bottom<0 || bottom>=VideoHeight ) {
-	    DebugLevel0Fn("Wrong clipping, write cleaner code.\n");
-	}
+#ifdef DEBUG
+    if (left > right || top > bottom || left < 0 || left >= VideoWidth ||
+	    top < 0 || top >= VideoHeight || right < 0 ||
+	    right >= VideoWidth || bottom < 0 || bottom >= VideoHeight) {
+	DebugLevel0Fn("Wrong clipping, write cleaner code.\n");
+    }
+#endif
 
     // Note this swaps the coordinates, if wrong ordered
     if (left > right) {
@@ -369,7 +370,7 @@ global void SetClipping(int left, int top, int right, int bottom)
 */
 global void PushClipping(void)
 {
-    Clip *clip;
+    Clip* clip;
 
     if ((clip = ClipsGarbage)) {
 	ClipsGarbage = ClipsGarbage->Next;
@@ -390,7 +391,7 @@ global void PushClipping(void)
 */
 global void PopClipping(void)
 {
-    Clip *clip;
+    Clip* clip;
 
     clip = Clips;
     if (clip) {
@@ -424,12 +425,12 @@ local long GetPaletteChecksum(const Palette* palette)
     long retVal;
     int i;
 
-    for(retVal = i = 0; i < 256; i++){
+    for (retVal = i = 0; i < 256; ++i){
 	//This is designed to return different values if
 	// the pixels are in a different order.
-	retVal = ((palette[i].r+i)&0xff)+retVal;
-	retVal = ((palette[i].g+i)&0xff)+retVal;
-	retVal = ((palette[i].b+i)&0xff)+retVal;
+	retVal = ((palette[i].r + i) & 0xff) + retVal;
+	retVal = ((palette[i].g + i) & 0xff) + retVal;
+	retVal = ((palette[i].b + i) & 0xff) + retVal;
     }
     return retVal;
 }
@@ -451,10 +452,10 @@ global VMemType* VideoCreateSharedPalette(const Palette* palette)
     pixels = VideoCreateNewPalette(palette);
     checksum = GetPaletteChecksum(palette);
     prev_link = &PaletteList;
-    while ((current_link=*prev_link)) {
-	if (current_link->Checksum == checksum
-		&& !memcmp(current_link->Palette,pixels,
-		    256*((VideoDepth+7)/8)) ) {
+    while ((current_link = *prev_link)) {
+	if (current_link->Checksum == checksum &&
+		!memcmp(current_link->Palette, pixels,
+		    256 * ((VideoDepth + 7) / 8))) {
 	    break;
 	}
 	prev_link = &current_link->Next;
@@ -488,7 +489,7 @@ global void VideoFreeSharedPalette(VMemType* pixels)
     PaletteLink* current_link;
     PaletteLink** prev_link;
 
-//    if( pixels==Pixels ) {
+//    if (pixels == Pixels) {
 //	DebugLevel3Fn("Freeing global palette\n");
 //    }
 
@@ -518,21 +519,20 @@ global void VideoFreeSharedPalette(VMemType* pixels)
 **
 **	@param name	Name of the picture (file) to display.
 */
-global void DisplayPicture(const char *name)
+global void DisplayPicture(const char* name)
 {
     Graphic* picture;
 
-    picture=LoadGraphic(name);
-    ResizeGraphic(picture,VideoWidth,VideoHeight);
+    picture = LoadGraphic(name);
+    ResizeGraphic(picture, VideoWidth, VideoHeight);
 #ifdef USE_OPENGL
-    MakeTexture(picture,picture->Width,picture->Height);
+    MakeTexture(picture, picture->Width, picture->Height);
 #endif
 
     VideoLockScreen();
 
-    VideoDrawSubClip(picture,0,0
-	,picture->Width,picture->Height
-	,(VideoWidth-picture->Width)/2,(VideoHeight-picture->Height)/2);
+    VideoDrawSubClip(picture, 0, 0, picture->Width, picture->Height,
+	(VideoWidth - picture->Width) / 2, (VideoHeight - picture->Height) / 2);
 
     VideoUnlockScreen();
 
@@ -548,23 +548,23 @@ global void DisplayPicture(const char *name)
 **
 **	@see VideoCreatePalette
 */
-global void LoadRGB(Palette *pal, const char *name)
+global void LoadRGB(Palette* pal, const char* name)
 {
-    CLFile *fp;
+    CLFile* fp;
     int i;
-    unsigned char *p;
-    unsigned char buffer[256*3];
+    unsigned char* p;
+    unsigned char buffer[256 * 3];
 
-    if( !(fp=CLopen(name,CL_OPEN_READ)) || CLread(fp,buffer,256*3)!=256*3 ) {
-	fprintf(stderr,"Can't load palette %s\n",name);
+    if (!(fp = CLopen(name, CL_OPEN_READ)) || CLread(fp, buffer, 256 * 3) != 256 * 3) {
+	fprintf(stderr, "Can't load palette %s\n", name);
 	ExitFatal(-1);
     }
 
-    p=buffer;
-    for( i=0;i<256;i++ ) {
-	pal[i].r=(*p++);
-	pal[i].g=(*p++);
-	pal[i].b=(*p++);
+    p = buffer;
+    for (i = 0; i < 256; ++i) {
+	pal[i].r = (*p++);
+	pal[i].g = (*p++);
+	pal[i].b = (*p++);
     }
 
     CLclose(fp);
@@ -608,33 +608,33 @@ local void ColorCycle8(void)
 {
     int i;
     int x;
-    VMemType8 *pixels;
+    VMemType8* pixels;
 
     if (ColorCycleAll) {
 	PaletteLink* current_link;
 
 	current_link = PaletteList;
 	while (current_link != NULL) {
-	    x = ((VMemType8 *) (current_link->Palette))[ColorWaterCycleStart];
+	    x = ((VMemType8*)(current_link->Palette))[ColorWaterCycleStart];
 	    for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {	// tileset color cycle
-		((VMemType8 *) (current_link->Palette))[i] =
-		    ((VMemType8 *) (current_link->Palette))[i + 1];
+		((VMemType8*)(current_link->Palette))[i] =
+		    ((VMemType8*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType8 *) (current_link->Palette))[ColorWaterCycleEnd] = x;
+	    ((VMemType8*)(current_link->Palette))[ColorWaterCycleEnd] = x;
 
-	    x = ((VMemType8 *) (current_link->Palette))[ColorIconCycleStart];
+	    x = ((VMemType8*)(current_link->Palette))[ColorIconCycleStart];
 	    for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {	// units/icons color cycle
-		((VMemType8 *) (current_link->Palette))[i] =
-		    ((VMemType8 *) (current_link->Palette))[i + 1];
+		((VMemType8*)(current_link->Palette))[i] =
+		    ((VMemType8*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType8 *) (current_link->Palette))[ColorIconCycleEnd] = x;
+	    ((VMemType8*) (current_link->Palette))[ColorIconCycleEnd] = x;
 
-	    x = ((VMemType8 *) (current_link->Palette))[ColorBuildingCycleStart];
+	    x = ((VMemType8*)(current_link->Palette))[ColorBuildingCycleStart];
 	    for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {	// buildings color cycle
-		((VMemType8 *) (current_link->Palette))[i] =
-		    ((VMemType8 *) (current_link->Palette))[i + 1];
+		((VMemType8*)(current_link->Palette))[i] =
+		    ((VMemType8*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType8 *) (current_link->Palette))[ColorBuildingCycleEnd] = x;
+	    ((VMemType8*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
 
 	    current_link = current_link->Next;
 	}
@@ -683,33 +683,33 @@ local void ColorCycle16(void)
 {
     int i;
     int x;
-    VMemType16 *pixels;
+    VMemType16* pixels;
 
     if (ColorCycleAll) {
 	PaletteLink* current_link;
 
 	current_link = PaletteList;
 	while (current_link != NULL) {
-	    x = ((VMemType16 *) (current_link->Palette))[ColorWaterCycleStart];
+	    x = ((VMemType16*)(current_link->Palette))[ColorWaterCycleStart];
 	    for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {	// tileset color cycle
-		((VMemType16 *) (current_link->Palette))[i] =
-		    ((VMemType16 *) (current_link->Palette))[i + 1];
+		((VMemType16*)(current_link->Palette))[i] =
+		    ((VMemType16*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType16 *) (current_link->Palette))[ColorWaterCycleEnd] = x;
+	    ((VMemType16*)(current_link->Palette))[ColorWaterCycleEnd] = x;
 
-	    x = ((VMemType16 *) (current_link->Palette))[ColorIconCycleStart];
+	    x = ((VMemType16*)(current_link->Palette))[ColorIconCycleStart];
 	    for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {	// units/icons color cycle
-		((VMemType16 *) (current_link->Palette))[i] =
-		    ((VMemType16 *) (current_link->Palette))[i + 1];
+		((VMemType16*)(current_link->Palette))[i] =
+		    ((VMemType16*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType16 *) (current_link->Palette))[ColorIconCycleEnd] = x;
+	    ((VMemType16*)(current_link->Palette))[ColorIconCycleEnd] = x;
 
-	    x = ((VMemType16 *) (current_link->Palette))[ColorBuildingCycleStart];
+	    x = ((VMemType16*)(current_link->Palette))[ColorBuildingCycleStart];
 	    for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {	// Buildings color cycle
-		((VMemType16 *) (current_link->Palette))[i] =
-		    ((VMemType16 *) (current_link->Palette))[i + 1];
+		((VMemType16*)(current_link->Palette))[i] =
+		    ((VMemType16*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType16 *) (current_link->Palette))[ColorBuildingCycleEnd] = x;
+	    ((VMemType16*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
 
 	    current_link = current_link->Next;
 	}
@@ -758,33 +758,33 @@ local void ColorCycle24(void)
 {
     int i;
     VMemType24 x;
-    VMemType24 *pixels;
+    VMemType24* pixels;
 
     if (ColorCycleAll) {
 	PaletteLink* current_link;
 
 	current_link = PaletteList;
 	while (current_link != NULL) {
-	    x = ((VMemType24 *) (current_link->Palette))[ColorWaterCycleStart];
+	    x = ((VMemType24*)(current_link->Palette))[ColorWaterCycleStart];
 	    for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {	// tileset color cycle
-		((VMemType24 *) (current_link->Palette))[i] =
-		    ((VMemType24 *) (current_link->Palette))[i + 1];
+		((VMemType24*)(current_link->Palette))[i] =
+		    ((VMemType24*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType24 *) (current_link->Palette))[ColorWaterCycleEnd] = x;
+	    ((VMemType24*)(current_link->Palette))[ColorWaterCycleEnd] = x;
 
-	    x = ((VMemType24 *) (current_link->Palette))[ColorIconCycleStart];
+	    x = ((VMemType24*)(current_link->Palette))[ColorIconCycleStart];
 	    for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {	// units/icons color cycle
-		((VMemType24 *) (current_link->Palette))[i] =
-		    ((VMemType24 *) (current_link->Palette))[i + 1];
+		((VMemType24*)(current_link->Palette))[i] =
+		    ((VMemType24*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType24 *) (current_link->Palette))[ColorIconCycleEnd] = x;
+	    ((VMemType24*)(current_link->Palette))[ColorIconCycleEnd] = x;
 
-	    x = ((VMemType24 *) (current_link->Palette))[ColorBuildingCycleStart];
+	    x = ((VMemType24*)(current_link->Palette))[ColorBuildingCycleStart];
 	    for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {	// Buildings color cycle
-		((VMemType24 *) (current_link->Palette))[i] =
-		    ((VMemType24 *) (current_link->Palette))[i + 1];
+		((VMemType24*)(current_link->Palette))[i] =
+		    ((VMemType24*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType24 *) (current_link->Palette))[ColorBuildingCycleEnd] = x;
+	    ((VMemType24*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
 
 	    current_link = current_link->Next;
 	}
@@ -833,33 +833,33 @@ local void ColorCycle32(void)
 {
     int i;
     int x;
-    VMemType32 *pixels;
+    VMemType32* pixels;
 
     if (ColorCycleAll) {
 	PaletteLink* current_link;
 
 	current_link = PaletteList;
 	while (current_link != NULL) {
-	    x = ((VMemType32 *) (current_link->Palette))[ColorWaterCycleStart];
+	    x = ((VMemType32*)(current_link->Palette))[ColorWaterCycleStart];
 	    for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) { // tileset color cycle
-		((VMemType32 *) (current_link->Palette))[i] =
-		    ((VMemType32 *) (current_link->Palette))[i + 1];
+		((VMemType32*)(current_link->Palette))[i] =
+		    ((VMemType32*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType32 *) (current_link->Palette))[ColorWaterCycleEnd] = x;
+	    ((VMemType32*)(current_link->Palette))[ColorWaterCycleEnd] = x;
 
-	    x = ((VMemType32 *) (current_link->Palette))[ColorIconCycleStart];
+	    x = ((VMemType32*)(current_link->Palette))[ColorIconCycleStart];
 	    for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {	// units/icons color cycle
-		((VMemType32 *) (current_link->Palette))[i] =
-		    ((VMemType32 *) (current_link->Palette))[i + 1];
+		((VMemType32*)(current_link->Palette))[i] =
+		    ((VMemType32*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType32 *) (current_link->Palette))[ColorIconCycleEnd] = x;
+	    ((VMemType32*)(current_link->Palette))[ColorIconCycleEnd] = x;
 
-	    x = ((VMemType32 *) (current_link->Palette))[ColorBuildingCycleStart];
+	    x = ((VMemType32*)(current_link->Palette))[ColorBuildingCycleStart];
 	    for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {	// Buildings color cycle
-		((VMemType32 *) (current_link->Palette))[i] =
-		    ((VMemType32 *) (current_link->Palette))[i + 1];
+		((VMemType32*)(current_link->Palette))[i] =
+		    ((VMemType32*)(current_link->Palette))[i + 1];
 	    }
-	    ((VMemType32 *) (current_link->Palette))[ColorBuildingCycleEnd] = x;
+	    ((VMemType32*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
 
 	    current_link = current_link->Next;
 	}
@@ -914,113 +914,132 @@ Following functions support a single common palette for 8bpp
 **      FIXME: Use TheUI settings (brightness, contrast and saturation) and
 **      visual color range knowledge to reduce the ammount of colors needed.
 */
-local void VideoFillCommonPalette8( Palette *palette )
+local void VideoFillCommonPalette8(Palette* palette)
 {
-#ifdef BPP8_WINSAFE /*---------------------------------------------------------
-  This pallete generator is consider safe for Windows(tm), as static colors used
-  by the system are kept and at the original locations.
-  ---------------------------------------------------------------------------*/
-  const unsigned char win_top[] = {
-      0,   0,   0,
-    128,   0,   0,
-      0, 128,   0,
-    128, 128,   0,
-      0,   0, 128,
-    128,   0, 128,
-      0, 128, 128,
-    192, 192, 192,
-    192, 220, 192,
-    166, 202, 240 };
-  const unsigned char win_bottom[] = {
-    255, 251, 240,
-    160, 160, 164,
-    128, 128, 128,
-    255,   0,   0,
-      0, 255,   0,
-    255, 255,   0,
-      0,   0, 255,
-    255,   0, 255,
-      0, 255, 255,
-    255, 255, 255 };
-  const unsigned char colorlevel[] = { 0, 87, 138, 181, 220, 255 };
-  const unsigned char graylevel[]  = {
+#ifdef BPP8_WINSAFE
+    /*--------------------------------------------------------------------
+    This pallete generator is considered safe for Windows(tm), as static
+    colors used by the system are kept and at the original locations.
+    --------------------------------------------------------------------*/
+    const unsigned char win_top[] = {
+	0, 0, 0,
+	128, 0, 0,
+	0, 128, 0,
+	128, 128, 0,
+	0, 0, 128,
+	128, 0, 128,
+	0, 128, 128,
+	192, 192, 192,
+	192, 220, 192,
+	166, 202, 240,
+    };
+    const unsigned char win_bottom[] = {
+	255, 251, 240,
+	160, 160, 164,
+	128, 128, 128,
+	255, 0, 0,
+	0, 255, 0,
+	255, 255, 0,
+	0, 0, 255,
+	255, 0, 255,
+	0, 255, 255,
+	255, 255, 255,
+    };
+    const unsigned char colorlevel[] = { 0, 87, 138, 181, 220, 255 };
+    const unsigned char graylevel[]  = {
     47,  67,  82,  95, 106, 116, 125, 134, 142, 150, 157, 164, 171, 177,
-   183, 189, 195, 201, 206, 212, 217, 222, 227, 232, 237, 241, 246, 251 };
+    183, 189, 195, 201, 206, 212, 217, 222, 227, 232, 237, 241, 246, 251 };
 
-  int i, r, g, b;
+    int i;
+    int r;
+    int g;
+    int b;
 
-  /* Fill top of palette with static system colors */
-  for ( i = 0; i <= 3*9; i += 3, palette++ )
-  {
-    palette->r = win_top[ i ];
-    palette->g = win_top[ i + 1 ];
-    palette->b = win_top[ i + 2 ];
-  }
+    /* Fill top of palette with static system colors */
+    for (i = 0; i <= 3 * 9; i += 3, ++palette) {
+	palette->r = win_top[i];
+	palette->g = win_top[i + 1];
+	palette->b = win_top[i + 2];
+    }
 
-  /* Fill 6*6*6 colorcube (without values already present in static parts) */
-  for ( r = 0; r <= 5; r++ )
-    for ( g = 0; g <= 5; g++ )
-      for ( b = 0; b <= 5; b++ )
-        if ( (r && r != 5) || (g && g != 5) || (b && b != 5) )
-        {
-          palette->r = colorlevel[ r ];
-          palette->g = colorlevel[ g ];
-          palette->b = colorlevel[ b ];
-          palette++;
-        }
+    /* Fill 6*6*6 colorcube (without values already present in static parts) */
+    for (r = 0; r <= 5; ++r) {
+	for (g = 0; g <= 5; ++g) {
+	    for (b = 0; b <= 5; ++b) {
+		if ((r && r != 5) || (g && g != 5) || (b && b != 5)) {
+		    palette->r = colorlevel[r];
+		    palette->g = colorlevel[g];
+		    palette->b = colorlevel[b];
+		    ++palette;
+		}
+	    }
+	}
+    }
 
-  /* Fill up remaining non-static part with grayshades */
-  for ( i = 0; i <= 27; i++, palette++ )
-    palette->r = palette->g = palette->b = graylevel[ i ];
+    /* Fill up remaining non-static part with grayshades */
+    for (i = 0; i <= 27; ++i, ++palette) {
+	palette->r = palette->g = palette->b = graylevel[i];
+    }
 
-  /* Fill bottom of palette with static system colors */
-  for ( i = 0; i <= 3*9; i += 3, palette++ )
-  {
-    palette->r = win_bottom[ i ];
-    palette->g = win_bottom[ i + 1 ];
-    palette->b = win_bottom[ i + 2 ];
-  }
+    /* Fill bottom of palette with static system colors */
+    for (i = 0; i <= 3 * 9; i += 3, ++palette) {
+	palette->r = win_bottom[i];
+	palette->g = win_bottom[i + 1];
+	palette->b = win_bottom[i + 2];
+    }
 
 #else
-#ifdef BPP8_IRGB /*------------------------------------------------------------
-  Palette generator using 8bit encoded as [IIRRGGBB], where I denotes the
-  intensity of the RGB values along a grayshade axis. Which delivers a better
-  spread out RGB range, but can not handle extreme values like 255:0:255
-  ---------------------------------------------------------------------------*/
-  int i, r, g, b;
+#ifdef BPP8_IRGB
+    /*---------------------------------------------------------------------------
+    Palette generator using 8bit encoded as [IIRRGGBB], where I denotes the
+    intensity of the RGB values along a grayshade axis. Which delivers a better
+    spread out RGB range, but can not handle extreme values like 255:0:255
+    ---------------------------------------------------------------------------*/
+    int i;
+    int r;
+    int g;
+    int b;
 
-  for ( i = 0; i <= 3*68; i+=68 )
-    for ( r = 0; r <= 3*17; r+=17 )
-      for ( g = 0; g <= 3*17; g+=17 )
-        for ( b = 0; b <= 3*17; b+=17, palette++ )
-        {
-          palette->r = i+r;
-          palette->g = i+g;
-          palette->b = i+b;
-        }
+    for (i = 0; i <= 3 * 68; i += 68) {
+	for (r = 0; r <= 3 * 17; r += 17) {
+	    for (g = 0; g <= 3 * 17; g += 17) {
+		for (b = 0; b <= 3 * 17; b += 17, ++palette) {
+		    palette->r = i + r;
+		    palette->g = i + g;
+		    palette->b = i + b;
+		}
+	    }
+	}
+    }
 
-#else /* default ------------------------------------------------------------
-  Experimental palette, defining a colorcube in a hshorter (most common) range
-  and defining remaining as 40 grayshades over total range.
-  This delivered best quality in 8bpp gameplay:
-  - the large range for grayshades is valuable as many items need them
-  - the shortened colorcube seems just to fit any colors needed.
-  ---------------------------------------------------------------------------*/
-  int i, r, g, b;
+#else
+    /* default ------------------------------------------------------------------
+    Experimental palette, defining a colorcube in a hshorter (most common) range
+    and defining remaining as 40 grayshades over total range.
+    This delivered best quality in 8bpp gameplay:
+    - the large range for grayshades is valuable as many items need them
+    - the shortened colorcube seems just to fit any colors needed.
+    ---------------------------------------------------------------------------*/
+    int i;
+    int r;
+    int g;
+    int b;
 
-  /* Fill 6*6*6 colorcube (shortend and in lower RGB range) */
-  for ( r = 0; r <= 5; r++ )
-    for ( g = 0; g <= 5; g++ )
-      for ( b = 0; b <= 5; b++, palette++ )
-      {
-        palette->r = 15+(127*r)/5;
-        palette->g = 15+(127*g)/5;
-        palette->b = 15+(127*b)/5;
-      }
+    /* Fill 6*6*6 colorcube (shortend and in lower RGB range) */
+    for (r = 0; r <= 5; ++r) {
+	for (g = 0; g <= 5; ++g) {
+	    for (b = 0; b <= 5; ++b, ++palette) {
+		palette->r = 15 + (127 * r) / 5;
+		palette->g = 15 + (127 * g) / 5;
+		palette->b = 15 + (127 * b) / 5;
+	    }
+	}
+    }
 
-  /* Fill up remaining part with grayshades */
-  for ( i = 0; i <= 39; i++, palette++ )
-    palette->r = palette->g = palette->b = ((i-216)*255)/39;
+    /* Fill up remaining part with grayshades */
+    for (i = 0; i <= 39; ++i, ++palette) {
+	palette->r = palette->g = palette->b = ((i - 216) * 255) / 39;
+    }
 #endif
 #endif
 }
@@ -1039,48 +1058,51 @@ local void VideoFillCommonPalette8( Palette *palette )
 **      @param cube     Array of 32768 (32*32*32) bytes with RGB value (each in
 **                      range 0..31) as index, delivers color index.
 */
-local void VideoFillColorcube8( const Palette *palette,
-                                 const unsigned long pal_def[8],
-                                       VMemType8 *cube )
+local void VideoFillColorcube8(const Palette* palette,
+    const unsigned long pal_def[8], VMemType8* cube)
 {
-  int r, g, b, i;
+    int r;
+    int g;
+    int b;
+    int i;
 
-  for ( r = 0; r <= 255; r+=8 )
-    for ( g = 0; g <= 255; g+=8 )
-      for ( b = 0; b <= 255; b+=8 )
-      {
-        const Palette *pal;
-        long int mindistance = 255*255*3+1;
-        int colorfound = 0;
+    for (r = 0; r <= 255; r += 8) {
+	for (g = 0; g <= 255; g += 8) {
+	    for (b = 0; b <= 255; b += 8) {
+		const Palette* pal;
+		long int mindistance = 255 * 255 * 3 + 1;
+		int colorfound = 0;
 
-      // seek closest color in given palette
-        for ( pal = palette, i = 0; i <= 255; pal++, i++ )
-        {
-          unsigned long bit;
+		// seek closest color in given palette
+		for (pal = palette, i = 0; i <= 255; ++pal, ++i) {
+		    unsigned long bit;
 
-          bit = 1 << (i&0x1F);
-          if ( pal_def[ i>>5 ] & bit )
-          {
-            long int distance, xr, xg, xb;
+		    bit = 1 << (i & 0x1F);
+		    if (pal_def[i >> 5] & bit) {
+			long int distance;
+			long int xr;
+			long int xg;
+			long int xb;
 
-            xr = (long int)pal->r - r;
-            xb = (long int)pal->b - b;
-            xg = (long int)pal->g - g;
-            distance = xr*xr + xb*xb + xg*xg;
-            if ( distance < mindistance )
-            {
-              mindistance=distance;
-              colorfound=i;
-            }
-          }
-        }
+			xr = (long int)pal->r - r;
+			xb = (long int)pal->b - b;
+			xg = (long int)pal->g - g;
+			distance = xr * xr + xb * xb + xg * xg;
+			if (distance < mindistance) {
+			    mindistance = distance;
+			    colorfound = i;
+			}
+		    }
+		}
 
-      // refer RGB to the system color (palette index) found
-        *cube++ = colorfound;
-      //  fprintf( stderr, "%d %d %d = %d %d %d\n",
-      //           r, g, b, palette[colorfound].r, palette[colorfound].g,
-      //           palette[colorfound].b );
-      }
+		// refer RGB to the system color (palette index) found
+		*cube++ = colorfound;
+//		fprintf(stderr, "%d %d %d = %d %d %d\n",
+//		    r, g, b, palette[colorfound].r, palette[colorfound].g,
+//		    palette[colorfound].b);
+	    }
+	}
+    }
 }
 
 /**
@@ -1094,32 +1116,34 @@ local void VideoFillColorcube8( const Palette *palette,
 **      @return         A hardware dependend 8bpp pixel table.
 **
 */
-global VMemType8* VideoFindNewPalette8( const VMemType8 *cube,
-                                        const Palette *palette )
+global VMemType8* VideoFindNewPalette8(const VMemType8* cube,
+    const Palette* palette)
 {
-  VMemType8 *newpixels, *p;
-  int i;
+    VMemType8* newpixels;
+    VMemType8* p;
+    int i;
 
-  newpixels=p=malloc(256*sizeof(VMemType8));
+    newpixels = p = malloc(256 * sizeof(VMemType8));
 
-  i=256;
-  do
-  {
-    int r, g, b;
+    i = 256;
+    do {
+	int r;
+	int g;
+	int b;
 
-    //FIXME: find a faster way, with rounding..
-    //r = palette->r>>3;
-    //g = palette->g>>3;
-    //b = palette->b>>3;
-    r = (palette->r*31+15)/255;
-    g = (palette->g*31+15)/255;
-    b = (palette->b*31+15)/255;
+	//FIXME: find a faster way, with rounding..
+//	r = palette->r >> 3;
+//	g = palette->g >> 3;
+//	b = palette->b >> 3;
+	r = (palette->r * 31 + 15) / 255;
+	g = (palette->g * 31 + 15) / 255;
+	b = (palette->b * 31 + 15) / 255;
 
-    palette++;
-    *p++ = cube[ (r<<10) | (g<<5) | b ];
-  } while ( --i > 0 );
+	++palette;
+	*p++ = cube[(r << 10) | (g << 5) | b];
+    } while (--i > 0);
 
-  return newpixels;
+    return newpixels;
 }
 
 /**
@@ -1138,34 +1162,38 @@ global VMemType8* VideoFindNewPalette8( const VMemType8 *cube,
 **
 **      @param alpha	value in 0..255 denoting 0..100% transparency
 */
-local void FillTransLookup8( const Palette *palette,
-                              const VMemType8 *cube,
-                                    VMemType8 *lookup,
-                                    unsigned char alpha )
-
+local void FillTransLookup8(const Palette* palette, const VMemType8* cube,
+    VMemType8* lookup, unsigned char alpha)
 {
-  const Palette *p1, *p2;
-  unsigned int i, j;
-  unsigned int alpha1,alpha2,r1, g1, b1, r2, g2, b2;
+    const Palette* p1;
+    const Palette* p2;
+    unsigned int i;
+    unsigned int j;
+    unsigned int alpha1;
+    unsigned int alpha2;
+    unsigned int r1;
+    unsigned int g1;
+    unsigned int b1;
+    unsigned int r2;
+    unsigned int g2;
+    unsigned int b2;
 
-  alpha1=255-alpha;
-  alpha2=alpha;
-  for ( p1=palette, i = 256; i > 0; i-- )
-  {
-    r1 = alpha1*(unsigned int)p1->r;
-    g1 = alpha1*(unsigned int)p1->g;
-    b1 = alpha1*(unsigned int)p1->b;
-    p1++;
-    for ( p2=palette, j = 256; j > 0; j-- )
-    {
-      r2 = (r1 + alpha2*(unsigned int)p2->r + 255*4)/(255*8);
-      g2 = (g1 + alpha2*(unsigned int)p2->g + 255*4)/(255*8);
-      b2 = (b1 + alpha2*(unsigned int)p2->b + 255*4)/(255*8);
-      p2++;
+    alpha1 = 255 - alpha;
+    alpha2 = alpha;
+    for (p1 = palette, i = 256; i > 0; --i) {
+	r1 = alpha1 * (unsigned int)p1->r;
+	g1 = alpha1 * (unsigned int)p1->g;
+	b1 = alpha1 * (unsigned int)p1->b;
+	++p1;
+	for (p2 = palette, j = 256; j > 0; --j) {
+	    r2 = (r1 + alpha2 * (unsigned int)p2->r + 255 * 4) / (255 * 8);
+	    g2 = (g1 + alpha2 * (unsigned int)p2->g + 255 * 4) / (255 * 8);
+	    b2 = (b1 + alpha2 * (unsigned int)p2->b + 255 * 4) / (255 * 8);
+	    ++p2;
 
-      *lookup++ = cube[ (r2<<10) | (g2<<5) | b2 ];
+	    *lookup++ = cube[(r2 << 10) | (g2 << 5) | b2];
+	}
     }
-  }
 }
 
 /**
@@ -1174,55 +1202,53 @@ local void FillTransLookup8( const Palette *palette,
 **      FIXME: should be called again when it gets dependent of TheUI settings
 **             then call VideoFreePalette first to prevent "can not allocate"
 */
-local void InitSingleCommonPalette8( void )
+local void InitSingleCommonPalette8(void)
 {
-  Palette *tmp;
-  int i;
+    Palette* tmp;
+    int i;
 
-  if ( (tmp=malloc(256*sizeof(Palette))) &&
-       (!VideoAllocPalette8 || (commonpalette=malloc(256*sizeof(Palette)))) &&
-       (colorcube8=malloc(32*32*32*sizeof(VMemType8))) &&
-       (lookup25trans8=malloc(256*256*sizeof(VMemType8))) &&
-       (lookup50trans8=malloc(256*256*sizeof(VMemType8))) )
-  {
-  // Create one allocated pallette of 256 colors to be used by all
-  // palettes created later.
-  // This prevents "can not allocate color" errors, but the downside is
-  // that a fullscreen graphic can not use its own pallette to the fullest
-  // (not all colors might be present in the system pallete).
-  VideoFillCommonPalette8(tmp);
-  //for ( i=0; i<=255; i++ )
-  //  fprintf( stderr, "%d %d %d\n", tmp[i].r, tmp[i].g, tmp[i].b );
+    if ((tmp = malloc(256 * sizeof(Palette))) &&
+	    (!VideoAllocPalette8 || (commonpalette = malloc(256 * sizeof(Palette)))) &&
+	    (colorcube8 = malloc(32 * 32 * 32 * sizeof(VMemType8))) &&
+	    (lookup25trans8 = malloc(256 * 256 * sizeof(VMemType8))) &&
+	    (lookup50trans8 = malloc(256 * 256 * sizeof(VMemType8)))) {
+	// Create one allocated pallette of 256 colors to be used by all
+	// palettes created later.
+	// This prevents "can not allocate color" errors, but the downside is
+	// that a fullscreen graphic can not use its own pallette to the fullest
+	// (not all colors might be present in the system pallete).
+	VideoFillCommonPalette8(tmp);
+	//for (i = 0; i <= 255; ++i) {
+	//  fprintf(stderr, "%d %d %d\n", tmp[i].r, tmp[i].g, tmp[i].b);
+	//}
 
-  if ( VideoAllocPalette8 )
-  { // Palette needs to be converted to hardware dependent palette
-    VideoAllocPalette8(tmp,commonpalette,commonpalette_defined);
-    free( tmp );
-  }
-  else
-  { // Use palette AS-IS FIXME: unused at the moment..
-    commonpalette = tmp;
-    for ( i=0; i<=7; i++ )
-      commonpalette_defined[i]=0xFFFFFFFF;
-  }
+	if (VideoAllocPalette8) {
+	    // Palette needs to be converted to hardware dependent palette
+	    VideoAllocPalette8(tmp, commonpalette, commonpalette_defined);
+	    free(tmp);
+	} else {
+	    // Use palette AS-IS FIXME: unused at the moment..
+	    commonpalette = tmp;
+	    for (i = 0; i <= 7; ++i) {
+		commonpalette_defined[i] = 0xFFFFFFFF;
+	    }
+	}
 
-  // Create a colorcube to easily get from RGB back to system color
-  VideoFillColorcube8(commonpalette,commonpalette_defined,colorcube8);
+	// Create a colorcube to easily get from RGB back to system color
+	VideoFillColorcube8(commonpalette, commonpalette_defined, colorcube8);
 
-  // Create lookup tables to get from one system color to another.
-  //FIXME: With max 256 unique colors in above colorcube, each RGB axis can
-  //       contain 3root(256)=6.3496.. variations. Currently only 5
-  //       supported (0,25,50,75,100% with/without use of lookup tables).
-  //       So extra levels 12.5% and 37.5% needed for better representation.
-  FillTransLookup8(commonpalette,colorcube8,lookup25trans8,(255+2)/4);
-  FillTransLookup8(commonpalette,colorcube8,lookup50trans8,(255+1)/2);
-  }
-  else
-  {
-    fprintf( stderr, "Out of memory for special 8bpp display mode\n"
-                     "Try another mode if you're low on memory\n" );
-    exit( -1 );
-  }
+	// Create lookup tables to get from one system color to another.
+	//FIXME: With max 256 unique colors in above colorcube, each RGB axis can
+	//       contain 3root(256)=6.3496.. variations. Currently only 5
+	//       supported (0,25,50,75,100% with/without use of lookup tables).
+	//       So extra levels 12.5% and 37.5% needed for better representation.
+	FillTransLookup8(commonpalette, colorcube8, lookup25trans8, (255 + 2) / 4);
+	FillTransLookup8(commonpalette, colorcube8, lookup50trans8, (255 + 1) / 2);
+    } else {
+	fprintf(stderr, "Out of memory for special 8bpp display mode\n"
+	    "Try another mode if you're low on memory\n");
+	exit(-1);
+    }
 }
 
 /*===========================================================================*/
@@ -1289,7 +1315,7 @@ global void VideoUnlockScreen(void)
 */
 global void VideoClearScreen(void)
 {
-    VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);
+    VideoFillRectangle(ColorBlack, 0, 0, VideoWidth, VideoHeight);
 }
 
 /**
@@ -1318,16 +1344,18 @@ global unsigned long GetTicks(void)
 global void InitVideo(void)
 {
 #ifdef __OPTIMIZE__
-    if( UseSdl ) {
+    if (UseSdl) {
 	InitVideoSdl();
-    } else if( UseX11 ) {
+    } else if (UseX11) {
 	InitVideoX11();
-    } else if( UseSVGALib ) {
+    } else if (UseSVGALib) {
 	InitVideoSVGA();
-    } else if( UseWin32 ) {
+    } else if (UseWin32) {
 	InitVideoWin32();
     } else {
-	IfDebug( abort(); );
+#ifdef DEBUG
+	abort();
+#endif
     }
 #else
     #if UseSdl
@@ -1352,13 +1380,13 @@ global void InitVideo(void)
     //
     //	General (video) modules and settings
     //
-    switch( VideoBpp ) {
-	case  8: ColorCycle=ColorCycle8 ; break;
+    switch (VideoBpp) {
+	case  8: ColorCycle = ColorCycle8; break;
 	case 15:
-	case 16: ColorCycle=ColorCycle16; break;
-	case 24: ColorCycle=ColorCycle24; break;
-	case 32: ColorCycle=ColorCycle32; break;
-        default: DebugLevel0Fn( "Video %d bpp unsupported\n" _C_ VideoBpp );
+	case 16: ColorCycle = ColorCycle16; break;
+	case 24: ColorCycle = ColorCycle24; break;
+	case 32: ColorCycle = ColorCycle32; break;
+        default: DebugLevel0Fn("Video %d bpp unsupported\n" _C_ VideoBpp);
     }
     VideoTypeSize = VideoBpp / 8;
 
@@ -1366,7 +1394,7 @@ global void InitVideo(void)
     //	Use single common palette to be used for all palettes in 8bpp
     //
 #ifndef BPP8_NORMAL
-    if ( UseX11 && VideoBpp == 8 ) {	// FIXME: to be extended for all video..
+    if (UseX11 && VideoBpp == 8) {	// FIXME: to be extended for all video..
       InitSingleCommonPalette8();
     }
 #endif
@@ -1382,7 +1410,6 @@ global void InitVideo(void)
 // Use the decoration mechanism to only redraw what is needed on screen update
     DecorationInit();
 #endif
-
 }
 
 //@}
