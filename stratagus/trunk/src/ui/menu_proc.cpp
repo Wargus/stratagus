@@ -1094,7 +1094,6 @@ void DrawMenu(Menu* menu)
 				SetDefaultTextColors(oldnc, oldrc);
 				break;
 			case MI_TYPE_BUTTON:
-				UpdateMenuItemButton(mi);
 				DrawMenuButton(mi->D.Button.Style, mi->Flags,
 					menu->X + mi->XOfs, menu->Y + mi->YOfs,
 					mi->D.Button.Text);
