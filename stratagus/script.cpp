@@ -157,6 +157,7 @@ local SCM CclTitleScreen(SCM title)
     return title;
 }
 
+// FIXME: remove this
 extern SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
 extern SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
 
@@ -449,6 +450,18 @@ local SCM CclUnits(void)
     return gh_int2scm(destroyed);
 #else
     return SCM_UNSPECIFIED;
+#endif
+}
+
+/**
+**	Compiled with sound.
+*/
+local SCM CclWithSound(void)
+{
+#ifdef WITH_SOUND
+    return SCM_BOOL_T;
+#else
+    return SCM_BOOL_F;
 #endif
 }
 
@@ -882,6 +895,7 @@ global void CclInit(void)
 
     gh_new_procedure0_0("mouse-scroll-off",CclMouseScrollOff);
     gh_new_procedure0_0("units",CclUnits);
+    gh_new_procedure0_0("with-sound",CclWithSound);
 
     print_welcome();
 
