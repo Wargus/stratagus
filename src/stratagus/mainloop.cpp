@@ -93,21 +93,14 @@ global jmp_buf main_loop;
 */
 local void MoveMapViewPointUp(unsigned step)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    Viewport* v;
 
+    v = &TheUI.VP[TheUI.LastClickedVP];
     if (v->MapY > step) {
 	v->MapY -= step;
     } else {
 	v->MapY = 0;
     }
-#else /* SPLIT_SCREEN_SUPPORT */
-    if (MapY > step) {
-	MapY -= step;
-    } else {
-	MapY = 0;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -353,7 +346,7 @@ local void DrawMenuButtonArea(void)
 **
 **	@note	Johns: I think parsing the viewport pointer is faster.
 */
-local void DrawMapViewport (int v)
+local void DrawMapViewport(int v)
 {
 #ifdef NEW_DECODRAW
     // Experimental new drawing mechanism, which can keep track of what is
@@ -361,8 +354,8 @@ local void DrawMapViewport (int v)
     // Every to-be-drawn item added to this mechanism, can be handed by this
     // call.
     if (InterfaceState == IfaceStateNormal) {
-      // DecorationRefreshDisplay();
-      DecorationUpdateDisplay();
+	// DecorationRefreshDisplay();
+	DecorationUpdateDisplay();
     }
 
 #else
@@ -372,6 +365,7 @@ local void DrawMapViewport (int v)
 #else
 	unsigned u;
 
+	// FIXME: Johns: this didn't work correct with viewports!
 	// FIXME: only needed until flags are correct set
 	for( u=0; u < TheUI.VP[v].MapHeight; ++u ) {
 	    MustRedrawRow[u]=1;
@@ -380,11 +374,21 @@ local void DrawMapViewport (int v)
 	    MustRedrawTile[u]=1;
 	}
 #endif
+	//
+	//	An unit is tracked, center viewport on this unit.
+	//
+	if (TheUI.VP[v].Unit) {
+	    if (TheUI.VP[v].Unit->Destroyed) {
+		TheUI.VP[v].Unit = NoUnitP;
+	    } else {
+		MapCenterViewport(v, TheUI.VP[v].Unit->X, TheUI.VP[v].Unit->Y);
+	    }
+	}
 
-	SetClipping (TheUI.VP[v].X, TheUI.VP[v].Y,
+	SetClipping(TheUI.VP[v].X, TheUI.VP[v].Y,
 		TheUI.VP[v].EndX, TheUI.VP[v].EndY);
 
-	DrawMapBackgroundInViewport (v, TheUI.VP[v].MapX, TheUI.VP[v].MapY);
+	DrawMapBackgroundInViewport(v, TheUI.VP[v].MapX, TheUI.VP[v].MapY);
 	DrawUnits(v);
 	DrawMapFogOfWar(v, TheUI.VP[v].MapX, TheUI.VP[v].MapY);
 	DrawMissiles(v);
