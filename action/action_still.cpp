@@ -93,7 +93,7 @@ global void HandleActionStill(Unit* unit)
 	    if( f>75) {
 		; // No fire for this
 	    } else if( f>50 ) {
-		MakeMissile(MissileSmallFire
+		MakeMissile(MissileTypeByIdent("missile-small-fire")
 			,unit->X*TileSizeX
 				+(type->TileWidth*TileSizeX)/2
 			,unit->Y*TileSizeY
@@ -101,7 +101,7 @@ global void HandleActionStill(Unit* unit)
 				-TileSizeY
 			,0,0);
 	    } else {
-		MakeMissile(MissileBigFire
+		MakeMissile(MissileTypeByIdent("missile-big-fire")
 			,unit->X*TileSizeX
 				+(type->TileWidth*TileSizeX)/2
 			,unit->Y*TileSizeY

@@ -1067,13 +1067,16 @@ global int DirectionToHeading(int delta_x,int delta_y)
 global void UnitUpdateHeading(Unit* unit)
 {
 #ifdef NEW_HEADING
-    // FIXME: depends on the unit directions wc 8, sc 32
+    // FIXME: depends on the possible unit directions wc 8, sc 32
+    unit->Frame&=127;
+    unit->Frame/=5;
+    unit->Frame*=5;
     if( unit->Direction<=LookingS ) {	// north->east->south
 	DebugLevel3(__FUNCTION__": %Zd>%d\n",UnitNumber(unit),unit->Direction);
-	unit->Frame=unit->Direction/32;
+	unit->Frame+=unit->Direction/32;
     } else {
 	DebugLevel3(__FUNCTION__": %Zd<%d\n",UnitNumber(unit),unit->Direction);
-	unit->Frame=128+256/32-unit->Direction/32;
+	unit->Frame+=128+256/32-unit->Direction/32;
     }
 #else
     switch( unit->Heading ) {
@@ -2291,8 +2294,8 @@ global void DestroyUnit(Unit* unit)
     //	Catapults,... explodes.
     //
     if( type->ExplodeWhenKilled ) {
-	// FIXME: 
-	MakeMissile(MissileExplosion
+	// FIXME: make it configurable? remove ident lookup
+	MakeMissile(MissileTypeByIdent("missile-explosion")
 	    ,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
 	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
 	    ,0,0);
@@ -2306,7 +2309,7 @@ global void DestroyUnit(Unit* unit)
     //	Building,... explodes.
     //
     if( type->Building ) {
-	MakeMissile(MissileExplosion
+	MakeMissile(MissileTypeByIdent("missile-explosion")
 	    ,unit->X*TileSizeX+type->TileWidth*TileSizeX/2
 	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
 	    ,0,0);
