@@ -87,8 +87,8 @@
 ;;			Summon "UnitType",
 ;;			Whirlwind (ttl #n)
 ;;				} )
-;;		'sound-when-casted "SoundConfig"
-;;		'missile-when-casted "MissileType"
+;;		'sound-when-cast "SoundConfig"
+;;		'missile-when-cast "MissileType"
 ;;		'condition '( {
 ;;			Enemypresence	(#t range #n),			// enemy in range
 ;;			DurationEffect	(#t flag #f_flag value #n),	// "f_flag" < #n
@@ -122,40 +122,6 @@ typedef void	f_ccl_spell(const char *id, SCM list, SpellType	*spell);
 //		Direct affectation for spell
 // **************************************************************************
 
-/**
-**	Parse the sound for spell.
-**	list = "soundname"
-*/
-local void ccl_spell_soundwhencast(const char *id, SCM list, SpellType *spell)
-{
-    char *NewSoundName = NULL;
-    char *OldSoundName = NULL;
-
-    assert (id != NULL);
-    assert (spell != NULL);
-
-    NewSoundName = gh_scm2newstr(list,NULL);
-    OldSoundName = spell->SoundWhenCast.Name;
-
-    if (OldSoundName && strcmp(NewSoundName,OldSoundName)) {
-	DebugLevel3Fn("Redefinition of sound when casted for '%s' : %s : '%s' -> '%s'\n"
-		_C_ spell->IdentName _C_ id _C_ OldSoundName _C_ NewSoundName);
-    }
-
-    //Free the old stuff.
-    free(spell->SoundWhenCast.Sound);
-    free(OldSoundName);
-
-    spell->SoundWhenCast.Sound = SoundIdForName(NewSoundName);
-    if (spell->SoundWhenCast.Sound == NULL) {
-	DebugLevel3Fn("in spell-type '%s' : %s : sound '%s' does not exist\n"
-		_C_ spell->IdentName _C_ id _C_  NewSoundName);
-	free(NewSoundName);
-	NewSoundName=NULL;
-    }
-    spell->SoundWhenCast.Name=NewSoundName;
-}
-
 /*
 **	Parse the missile for spell.
 **	list = "MissileType"
@@ -163,11 +129,9 @@ local void ccl_spell_soundwhencast(const char *id, SCM list, SpellType *spell)
 local void ccl_spell_missilewhencast(const char *id, SCM list, SpellType *spell)
 {
     char *missilewhencastname = NULL;
-
-   
-
     MissileType *missile = spell->Missile;
-	assert (id != NULL);
+
+    assert (id != NULL);
     assert (spell != NULL);
     missilewhencastname = gh_scm2newstr(list, NULL);
     spell->Missile = MissileTypeByIdent(missilewhencastname);
@@ -1033,7 +997,15 @@ local SCM CclDefineSpell(SCM list)
 	    ccl_spell_autocast("autocast",gh_car(list),spell);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("sound-when-cast"))) {
-	    ccl_spell_soundwhencast("sound-when-cast",gh_car(list),spell);
+	    //  Free the old name, get the new one
+	    free(spell->SoundWhenCast.Name);
+	    spell->SoundWhenCast.Name=gh_scm2newstr(gh_car(list),0);
+	    spell->SoundWhenCast.Sound=SoundIdForName(spell->SoundWhenCast.Name);
+	    //  Check for sound.
+	    if (!spell->SoundWhenCast.Sound) {
+		free(spell->SoundWhenCast.Name);
+		spell->SoundWhenCast.Name=0;
+	    }
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("missile-when-cast"))) {
 	    ccl_spell_missilewhencast("missile-when-cast",gh_car(list),spell);
