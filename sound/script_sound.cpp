@@ -10,12 +10,11 @@
 //
 /**@name ccl_sound.c	-	The sound ccl functions. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1999-2002 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -434,6 +433,16 @@ local SCM CclPlayMusic(SCM name)
 }
 
 /**
+**	Stop playing music.
+*/
+local SCM CclStopMusic(void)
+{
+    StopMusic();
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for sound.
 */
 global void SoundCclRegister(void)
@@ -457,6 +466,7 @@ global void SoundCclRegister(void)
     init_subr_1("play-sound",CclPlaySound);
 
     gh_new_procedure1_0("play-music",CclPlayMusic);
+    gh_new_procedure0_0("stop-music",CclStopMusic);
 }
 
 #else	// }{ WITH_SOUND

@@ -197,6 +197,20 @@ global void PlayMusic(const char* name)
 }
 
 /**
+**	Stop the current playing music.
+*/
+global void StopMusic(void)
+{
+    if( PlayingMusic ) {
+	if( ModFile ) {
+	    ModPlug_Unload(ModFile);
+	    ModFile=NULL;
+	}
+	PlayingMusic=0;
+    }
+}
+
+/**
 **	Mix music to stereo 32 bit.
 **
 **	@param buffer	Buffer for mixed samples.
@@ -252,6 +266,10 @@ local void MixMusicToStereo32(int* buffer,int size)
 #else
 
 global void PlayMusic(const char* name __attribute__((unused)))
+{
+}
+
+global void StopMusic(void)
 {
 }
 
