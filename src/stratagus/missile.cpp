@@ -10,7 +10,7 @@
 //
 /**@name missile.c - The missiles. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -398,15 +398,16 @@ static int CalculateDamageStats(const UnitStats* attacker_stats,
 	int basic_damage;
 	int piercing_damage;
 
-	basic_damage = attacker_stats->BasicDamage + isqrt(xp / 100) * XpDamage;
-	piercing_damage = attacker_stats->PiercingDamage;
+	basic_damage = attacker_stats->Variables[BASICDAMAGE_INDEX].Value
+					+ isqrt(xp / 100) * XpDamage;
+	piercing_damage = attacker_stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 	if (bloodlust) {
 		basic_damage *= 2;
 		piercing_damage *= 2;
 	}
 
-	damage = (basic_damage - goal_stats->Armor) > 1 ?
-		(basic_damage - goal_stats->Armor) : 1;
+	damage = (basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) > 1 ?
+		(basic_damage - goal_stats->Variables[ARMOR_INDEX].Value) : 1;
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);

@@ -10,7 +10,7 @@
 //
 /**@name unittype.c - The unit types. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -172,25 +172,18 @@ void UpdateStats(int reset)
 					stats->Variables[i] = type->Variable[i];
 				}
 				if (type->Building) {
-					stats->Level = 0; // Disables level display
+					stats->Variables[LEVEL_INDEX].Value = 0; // Disables level display
 				} else {
-					stats->Level = 1;
+					stats->Variables[LEVEL_INDEX].Value = 1;
+					stats->Variables[LEVEL_INDEX].Max = 1;
 				}
 				stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Max;
 				stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
-				stats->Armor = stats->Variables[ARMOR_INDEX].Value;
-				stats->BasicDamage = stats->Variables[BASICDAMAGE_INDEX].Value;
-				stats->PiercingDamage = stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 				stats->HitPoints = type->_HitPoints;
 				stats->RegenerationRate = stats->Variables[HP_INDEX].Increase;
 				stats->Mana = stats->Variables[MANA_INDEX].Max;
 
-				stats->Variables[LEVEL_INDEX].Value = stats->Level;
-				stats->Variables[LEVEL_INDEX].Max = stats->Level;
 				stats->Variables[SIGHTRANGE_INDEX].Max = stats->SightRange;
-				stats->Variables[ARMOR_INDEX].Max = stats->Armor;
-				stats->Variables[BASICDAMAGE_INDEX].Max = stats->BasicDamage;
-				stats->Variables[PIERCINGDAMAGE_INDEX].Max = stats->PiercingDamage;
 				stats->Variables[HP_INDEX].Max = stats->HitPoints;
 			}
 		}

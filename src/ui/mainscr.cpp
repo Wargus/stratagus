@@ -10,7 +10,7 @@
 //
 /**@name mainscr.c - The main screen. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Valery Shchedrin,
+//      (c) Copyright 1998-2005 by Lutz Sammer, Valery Shchedrin,
 //                              and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -215,31 +215,49 @@ typedef union {const char *s; int i;} UStrInt;
 **  @param unit   Unit.
 **  @param index  Index of the variable.
 **  @param e      Componant of the variable.
+**  @param t      Which var use (0:unit, 1:Type, 2:Stats)
 **
 **  @return       Value corresponding
 */
-UStrInt GetComponent(const Unit* unit, int index, EnumVariable e)
+UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t)
 {
 	UStrInt val;    // result.
+	VariableType* var;
 
 	Assert(unit);
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
+
+	switch (t) {
+		case 0 : // Unit :
+			var = &unit->Variable[index];
+			break;
+		case 1 : // Type :
+			var = &unit->Type->Variable[index];
+			break;
+		case 2 : // Stats :
+			var = &unit->Stats->Variables[index];
+			break;
+		default :
+			DebugPrint("Bad value for getComponent : t = %d" _C_ t);
+			var = &unit->Variable[index];
+			break;
+	}
 	switch (e) {
 		case VariableValue :
-			val.i = unit->Variable[index].Value;
+			val.i = var->Value;
 			break;
 		case VariableMax :
-			val.i = unit->Variable[index].Max;
+			val.i = var->Max;
 			break;
 		case VariableIncrease :
-			val.i = unit->Variable[index].Increase;
+			val.i = var->Increase;
 			break;
 		case VariableDiff :
-			val.i = unit->Variable[index].Max - unit->Variable[index].Value;
+			val.i = var->Max - var->Value;
 			break;
 		case VariablePercent :
 			Assert(unit->Variable[index].Max != 0);
-			val.i = 100 * unit->Variable[index].Value / unit->Variable[index].Max;
+			val.i = 100 * var->Value / var->Max;
 			break;
 		case VariableName :
 			if (index == GIVERESOURCE_INDEX) {
@@ -250,8 +268,6 @@ UStrInt GetComponent(const Unit* unit, int index, EnumVariable e)
 				val.s = UnitTypeVar.VariableName[index];
 			}
 			break;
-		default :
-			Assert(0);
 	}
 	return val;
 }
@@ -344,10 +360,10 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 			case VariableIncrease :
 			case VariableDiff :
 			case VariablePercent :
-			VideoDrawNumber(x, y, font, GetComponent(unit, index, component).i);
+			VideoDrawNumber(x, y, font, GetComponent(unit, index, component, 0).i);
 			break;
 			case VariableName :
-			VideoDrawText(x, y, font, GetComponent(unit, index, component).s);
+			VideoDrawText(x, y, font, GetComponent(unit, index, component, 0).s);
 			break;
 			default :
 			Assert(0);
@@ -394,7 +410,7 @@ void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
 	Assert(font != -1);
 	index = content->Data.FormattedText.Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	sprintf(buf, text, GetComponent(unit, index, content->Data.FormattedText.Component));
+	sprintf(buf, text, GetComponent(unit, index, content->Data.FormattedText.Component, 0));
 	if (content->Data.FormattedText.Centered) {
 		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
 	} else {
@@ -432,8 +448,8 @@ void DrawFormattedText2(const Unit* unit, ContentType* content, int defaultfont)
 	Assert(font != -1);
 	index1 = content->Data.FormattedText2.Index1;
 	index2 = content->Data.FormattedText2.Index2;
-	sprintf(buf, text, GetComponent(unit, index1, content->Data.FormattedText2.Component1),
-		GetComponent(unit, index2, content->Data.FormattedText2.Component2));
+	sprintf(buf, text, GetComponent(unit, index1, content->Data.FormattedText2.Component1, 0),
+		GetComponent(unit, index2, content->Data.FormattedText2.Component2, 0));
 	if (content->Data.FormattedText2.Centered) {
 		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
 	} else {

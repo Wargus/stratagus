@@ -10,7 +10,7 @@
 //
 /**@name script.h - The clone configuration language headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -173,6 +173,7 @@ struct _NumberDesc_ {
 			UnitDesc* Unit;            ///< Which unit.
 			int Index;                 ///< Which index variable.
 			EnumVariable Component;    ///< Which component.
+			int Loc;                   ///< Location of Variables[].
 		} UnitStat;
 		struct {
 			StringDesc* String; ///< String.

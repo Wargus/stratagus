@@ -497,7 +497,8 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 	missile_range = type->Missile.Missile->Range + range - 1;
 	attackrange = u->Stats->AttackRange;
 	// Evaluation of possible damage...
-	hp_damage_evaluate = u->Stats->BasicDamage + u->Stats->PiercingDamage;
+	hp_damage_evaluate = u->Stats->Variables[BASICDAMAGE_INDEX].Value
+						+ u->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 
 	Assert(2 * missile_range + 1 < 32);
 
