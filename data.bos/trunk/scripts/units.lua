@@ -48,7 +48,7 @@ end
 
 DefineUnitType("unit-gold-mine", {
 	Name = "Titanium Spike",
-	Files = {"tileset-desert", "nature/res/spike_1.png"}, Size = {128, 128},
+	Files = {"default", "nature/res/spike_1.png"}, Size = {128, 128},
 	Shadow = {"file", "nature/res/spike_1_s.png", "size", {128, 128}, "offset", {0, 0}},
 	Animations = "animations-building", Icon = "icon-tita",
 	Costs = {"time", 150}, VisibleUnderFog = true,
@@ -69,7 +69,7 @@ DefineUnitType("unit-gold-mine", {
 
 DefineUnitType("unit-dead-body", {
 	Name= "Dead Body",
-	Files = {"tileset-desert", "neutral/units/corpses.png"}, Size = {72, 72},
+	Files = {"default", "neutral/units/corpses.png"}, Size = {72, 72},
 	Animations = "animations-dead-body", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 30, Priority = 0,
 	TileSize = {1, 1}, BoxSize = {31, 31}, SightRange = 1,
@@ -78,8 +78,7 @@ DefineUnitType("unit-dead-body", {
 
 DefineUnitType("unit-destroyed-1x1-place", { Name = "Destroyed 1x1 Place",
 	Files = {
-		"tileset-desert", "tilesets/desert/neutral/buildings/small_destroyed_site.png",
-		"tileset-winter", "tilesets/winter/neutral/buildings/small_destroyed_site.png"},
+		"default", "tilesets/desert/neutral/buildings/small_destroyed_site.png",},
 	Size = {32, 32},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
@@ -89,9 +88,7 @@ DefineUnitType("unit-destroyed-1x1-place", { Name = "Destroyed 1x1 Place",
 	Building = true, VisibleUnderFog = true, Vanishes = true})
 
 DefineUnitType("unit-destroyed-2x2-place", { Name = "Destroyed 2x2 Place",
-	Files = {
-		"tileset-desert", "tilesets/desert/neutral/buildings/destroyed_site.png",
-		"tileset-winter", "tilesets/winter/neutral/buildings/destroyed_site.png"},
+	Files = {"default", "tilesets/desert/neutral/buildings/destroyed_site.png"},
 	Size = {64, 64},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
@@ -101,9 +98,7 @@ DefineUnitType("unit-destroyed-2x2-place", { Name = "Destroyed 2x2 Place",
 	Building = true, VisibleUnderFog = true, Vanishes = true})
 
 DefineUnitType("unit-destroyed-3x3-place", { Name = "Destroyed 3x3 Place",
-	Files = {
-		"tileset-desert", "tilesets/desert/neutral/buildings/destroyed_site.png",
-		"tileset-winter", "tilesets/winter/neutral/buildings/destroyed_site.png"},
+	Files = {"default", "tilesets/desert/neutral/buildings/destroyed_site.png"},
 	Size = {64, 64},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
@@ -113,9 +108,7 @@ DefineUnitType("unit-destroyed-3x3-place", { Name = "Destroyed 3x3 Place",
 	Building = true, VisibleUnderFog = true, Vanishes = true})
 
 DefineUnitType("unit-destroyed-4x4-place", { Name = "Destroyed 4x4 Place",
-	Files = {
-		"tileset-desert", "tilesets/desert/neutral/buildings/destroyed_site.png",
-		"tileset-winter", "tilesets/winter/neutral/buildings/destroyed_site.png"},
+	Files = {"default", "tilesets/desert/neutral/buildings/destroyed_site.png"},
 	Size = {64, 64},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
@@ -135,17 +128,7 @@ DefineUnitType("unit-revealer", {
 	Priority = 0, DecayRate = 1, Type = "land",
 	Building = true, Revealer = true, DetectCloak = true})
 
-DefineUnitType("unit-revealer", {
-	Name = "Dummy unit",
-	Size = {0, 0},
-	Animations = "animations-building", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 0,
-	TileSize = {1, 1}, BoxSize = {1, 1},
-	SightRange = 1,
-	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, DecayRate = 1, Type = "land",
-	Building = true, Revealer = true})
-
+-- Needed for stratagus otherwise it crashes
 DefineUnitType("unit-human-wall", {
 	Name = "Wall",
 	Files = {"tileset-desert", "tilesets/desert/neutral/buildings/wall.png"},
@@ -160,6 +143,7 @@ DefineUnitType("unit-human-wall", {
 	ExplodeWhenKilled = "missile-explosion",
 	Type = "land", Building = true})
 
+-- Needed to avoid a stratagus crash
 DefineUnitType("unit-orc-wall", {
 	Name = "Wall", 
 	Files = {"tileset-desert", "tilesets/desert/neutral/buildings/wall.png"},
