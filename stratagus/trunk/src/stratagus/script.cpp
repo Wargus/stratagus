@@ -157,6 +157,18 @@ local SCM CclTitleScreen(SCM title)
     return title;
 }
 
+local SCM CclColorCycleAll(void){
+  ColorCycleAll = 1;
+
+  return SCM_UNSPECIFIED;
+}
+
+local SCM CclNoColorCycleAll(void){
+  ColorCycleAll = 0;
+
+  return SCM_UNSPECIFIED;
+}
+
 // FIXME: remove this
 extern SCM CclManaSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
 extern SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h);
@@ -793,6 +805,8 @@ local void gh_main_prog(int argc,char* argv[])
 {
     gh_new_procedure0_0("library-path",CclFreeCraftLibraryPath);
     gh_new_procedure1_0("title-screen",CclTitleScreen);
+    gh_new_procedure0_0("color-cycle-all",CclColorCycleAll);
+    gh_new_procedure0_0("no-color-cycle-all",CclNoColorCycleAll);
 
     gh_new_procedure5_0("mana-sprite",CclManaSprite);
     gh_new_procedure5_0("health-sprite",CclHealthSprite);
@@ -905,6 +919,8 @@ global void CclInit(void)
 
     init_subr_5("mana-sprite",CclManaSprite);
     init_subr_5("health-sprite",CclHealthSprite);
+    init_subr_0("color-cycle-all",CclColorCycleAll);
+    init_subr_0("no-color-cycle-all",CclNoColorCycleAll);
 
     init_subr_0("show-health-bar",CclShowHealthBar);
     init_subr_0("show-health-dot",CclShowHealthDot);

@@ -32,6 +32,7 @@ typedef unsigned char VMemType8;	///  8 bpp modes pointer
 typedef unsigned short VMemType16;	/// 16 bpp modes pointer
 typedef struct { char a,b,c;} VMemType24;/// 24 bpp modes pointer
 typedef unsigned long VMemType32;	/// 32 bpp modes pointer
+extern global int ColorCycleAll;
 
 /**
 **	General video mode pointer.
@@ -44,6 +45,21 @@ typedef union __vmem_type__ {
     VMemType24	D24;			/// 24 bpp access
     VMemType32	D32;			/// 32 bpp access
 } VMemType;
+
+/**
+**	Typedef of lnode.
+*/
+typedef struct __lnode__ PaletteLink;
+
+/**
+**	sturct __lnode__, links all palettes together to join the same palettes.
+*/
+struct __lnode__ {
+    PaletteLink*	Next;		/// Next palette
+    VMemType*		Palette;	/// Palette in hardware format
+    long		Checksum;	/// Checksum for quick lookup
+};
+
 
     /// MACRO defines speed of colorcycling FIXME: should be made configurable
 #define COLOR_CYCLE_SPEED	(FRAMES_PER_SECOND/4)

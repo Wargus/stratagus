@@ -102,7 +102,7 @@ local GraphicType GraphicSprite16Type;	/// sprite type 16bit palette
 	const VMemType##bpp* pp;				\
 	unsigned da;						\
 								\
-	pixels=(VMemType##bpp*)sprite->Pixels;			\
+	pixels=(VMemType##bpp*)sprite->Pixels;		        \
 	sp=((unsigned char**)sprite->Frames)[frame];		\
 	w=sprite->Width;					\
 	da=VideoWidth-w;					\
