@@ -126,11 +126,12 @@ Try to avoid using names with other meanings (nothing from spell condition defin
 Some Flags are already defined in the engine : the UnitType flags.
 So following flags are the value of the unitType :
 "Building", "BuilderOutSide", "BuilderLost", "ShoreBuilding",
-"Coward", "Harvester", "Revealer",
+"Coward", "Harvester", "Revealer", "Teleporter",
 "LandUnit", "AirUnit", "SeaUnit",
 "ExplodeWhenKilled", "VisibleUnderFog", "PermanentCloack", "AttackFromTransporter",
 "GroundAttack", "CanAttack", "CanHarvest",
-"Vanishes", "Flip"
+"Vanishes", "Flip", "Decoration", "IsNotSelectable", "SelectableByRectangle",
+"Indestructible".
 
 <h4>Example</h4>
 
@@ -339,10 +340,12 @@ of a terrain tile, for an almost perfect fit.
 <dd>Define the number of directions a unit can face.  Default 1 for buildings and 8
 for units.  Can be adjusted from the default.  Useful for rotating buildings
 </dd>
-<dt>Selectable = boolean</dt>
-<dd>set whether the unit is able to be selected or not.  Used for decoration units in
-the game.
-</dd>
+<dt>IsNotSelectable = boolean</dt>
+<dd>set whether the unit is able to be selected or not.</dd>
+<dt>Decoration = boolean</dt>
+<dd>set whether the unit is a decoration (act like a tile) or not.</dd>
+<dt>Indestructible = boolean</dt>
+<dd>set whether the unit is indestructible not.</dd>
 <dt>NeutralMinimapColor = {r, g, b}</dt>
 <dd>sets the color of a unit when belonging to the neutral player. F.E. '(0 0 0) for a
 black oil patch.
