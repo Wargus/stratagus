@@ -7,7 +7,7 @@
 ##  ______________________                           ______________________
 ##			  T H E   W A R   B E G I N S
 ##	   FreeCraft - A free fantasy real time strategy game engine
-##	
+##
 ##	Rules.make	-	Make RULES (GNU MAKE).
 ##
 ##	(c) Copyright 1998-2001 by Lutz Sammer
@@ -17,7 +17,7 @@
 
 ############################################################################
 #	Configurable:
-#			Choose what you want to include and the correct 
+#			Choose what you want to include and the correct
 #			version.  Minimal is now the default.
 ############################################################################
 
@@ -55,7 +55,7 @@ CCLLIB	= -lm
 
 #------------------------------------------------------------------------------
 
-# Uncomment next to add threaded sound support 
+# Uncomment next to add threaded sound support
 #	You should have a thread safe X11 (libc6 or glibc)
 
 #THREAD		= -D_REENTRANT -DUSE_THREAD
@@ -67,7 +67,7 @@ CCLLIB	= -lm
 
 # Should work with >= 1.2
 #GLIB_CFLAGS	=	$(shell glib-config glib --cflags)
-#GLIBLIB 	=	$(shell glib-config glib --libs)
+#GLIBLIB	=	$(shell glib-config glib --libs)
 #GLIB		=	-DUSE_GLIB $(GLIB_CFLAGS)
 
 #------------------------------------------------------------------------------
@@ -77,18 +77,18 @@ CCLLIB	= -lm
 # Uncomment the next for the normal X11 support.
 
 VIDEO		= -DUSE_X11
-VIDEOLIB	= -lXext -lX11 -ldl 
+VIDEOLIB	= -lXext -lX11 -ldl
 
 # Uncomment the next to get the support for SDL.
 
 # Old SDL <1.0.0
-#SDL_CFLAGS	=	
+#SDL_CFLAGS	=
 #SDLLIB		= -lSDL -ldl -lpthread
 
 # New SDL >=1.0.0
 SDL_CFLAGS	= $(shell sdl-config --cflags)
-#SDLLIB		= $(shell sdl-config --static-libs)
-SDLLIB		= $(shell sdl-config --libs)
+SDLLIB		= $(shell sdl-config --static-libs)
+#SDLLIB		= $(shell sdl-config --libs)
 
 # Without SDL Sound (only not win32)
 #SDL		= -DUSE_SDL $(SDL_CFLAGS)
@@ -138,14 +138,14 @@ ZLIBS		= -lz
 #ZDEFS		= -DUSE_BZ2LIB
 #ZLIBS		= -lbz2
 # GZ + BZ2 compression
-ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
-ZLIBS		= -lz -lbz2
+#ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
+#ZLIBS		= -lz -lbz2
 
 #------------------------------------------------------------------------------
 
 # May be required on some distributions for libpng and libz!
 # extra linker flags and include directory
-# -L/usr/lib 
+# -L/usr/lib
 
 XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib \
 		  -L$(TOPDIR)/libpng-1.0.5 -L$(TOPDIR)/zlib-1.1.3
@@ -153,12 +153,12 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 		  -I$(TOPDIR)/libpng-1.0.5 -I$(TOPDIR)/zlib-1.1.3
 
 #------------------------------------------------------------------------------
- 
+
 # Uncomment next to profile
 #PROFILE=	-pg
 
 # Version
-VERSION=	'-DVERSION="1.17pre1-build9"'
+VERSION=	'-DVERSION="1.17pre1-build11"'
 
 ############################################################################
 # below this, nothing should be changed!
@@ -191,7 +191,7 @@ EXE=
 ## include flags
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## define flags
-DEBUG=	-DDEBUG # -DREFS_DEBUG -DFLAG_DEBUG
+DEBUG=	-DDEBUG # -DREFS_DEBUG # -DFLAG_DEBUG
 ##
 ## There are some still not well tested code parts or branches.
 ## UNITS_ON_MAP:	Faster lookup of units
@@ -200,8 +200,9 @@ DEBUG=	-DDEBUG # -DREFS_DEBUG -DFLAG_DEBUG
 ## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
+## NEW_SHIPS:		New correct ship movement.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DUNIT_ON_MAP -DNEW_MAPDRAW #-DNEW_ORDERS -DNEW_NAMES -DNEW_FOW -DNEW_AI
+	$(DEBUG) -DUNIT_ON_MAP -DNEW_SHIPS -DNEW_MAPDRAW #-DNEW_ORDERS #-DNEW_NAMES -DNEW_FOW -DNEW_AI
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
@@ -214,13 +215,13 @@ CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS)  $(DFLAGS)
 #CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
 #CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS) -static
 
-CC=gcc
+CC=cc
 RM=rm -f
 MAKE=make
 
 ## JOHNS: my ctags didn't support
-#CTAGSFLAGS=-i defmpstuvFS -a -f 
-CTAGSFLAGS=-i defptvS -a -f 
+#CTAGSFLAGS=-i defmpstuvFS -a -f
+CTAGSFLAGS=-i defptvS -a -f
 
 #
 #	Locks versions with symbolic name
