@@ -117,7 +117,7 @@ global int CursorAction;		/// action for selection
 global int CursorValue;			/// value for CursorAction (spell type f.e.)
 global UnitType* CursorBuilding;	/// building cursor
 
-global CursorType* GameCursor;		/// cursor type
+global CursorType* GameCursor;		/// current shown cursor type
 global int CursorX;			/// cursor position on screen X
 global int CursorY;			/// cursor position on screen Y
 global int CursorStartX;		/// rectangle started on screen X
@@ -245,6 +245,12 @@ global CursorType* CursorTypeByIdent(const char* ident)
 --	Internal Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	FIXME: docu missing, better use an inline function.
+**
+**	FIXME: this kind of macros are hard to single step with gdb.
+**	FIXME: inline functions should have the same speed and are debugable.
+*/
 #define LOADCURSORRECTANGLE(video,memtype,x,y,w,h)  { \
     const memtype* sp; \
     memtype* dp; \
@@ -263,6 +269,12 @@ global CursorType* CursorTypeByIdent(const char* ident)
     } \
 }
 
+/**
+**	FIXME: docu missing, better use an inline function.
+**
+**	FIXME: this kind of macros are hard to single step with gdb.
+**	FIXME: inline functions should have the same speed and are debugable.
+*/
 #define SAVECURSORRECTANGLE(video,memtype,x,y,w,h)  { \
     const memtype* sp; \
     memtype* dp; \
@@ -292,6 +304,7 @@ local void LoadCursorRectangle8(int x,int y,int w,int h) {
 
 /** Restore cursor rectangle for 16bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
+**	@see LoadCursorRectangle
 */
 local void LoadCursorRectangle16(int x,int y,int w,int h) {
     if( w && h ) {
@@ -301,6 +314,7 @@ local void LoadCursorRectangle16(int x,int y,int w,int h) {
 
 /** Restore cursor rectangle for 24bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
+**	@see LoadCursorRectangle
 */
 local void LoadCursorRectangle24(int x,int y,int w,int h) {
     if( w && h ) {
@@ -310,6 +324,7 @@ local void LoadCursorRectangle24(int x,int y,int w,int h) {
 
 /** Restore cursor rectangle for 32bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
+**	@see LoadCursorRectangle
 */
 local void LoadCursorRectangle32(int x,int y,int w,int h) {
     if( w && h ) {
@@ -319,6 +334,7 @@ local void LoadCursorRectangle32(int x,int y,int w,int h) {
 
 /** Save cursor rectangle for 8bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
+**	@see SaveCursorRectangle
 */
 local void SaveCursorRectangle8(int x,int y,int w,int h) {
     if( w && h ) {
@@ -328,6 +344,7 @@ local void SaveCursorRectangle8(int x,int y,int w,int h) {
 
 /** Save cursor rectangle for 16bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
+**	@see SaveCursorRectangle
 */
 local void SaveCursorRectangle16(int x,int y,int w,int h) {
     if( w && h ) {
@@ -337,6 +354,7 @@ local void SaveCursorRectangle16(int x,int y,int w,int h) {
 
 /** Save cursor rectangle for 24bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
+**	@see SaveCursorRectangle
 */
 local void SaveCursorRectangle24(int x,int y,int w,int h) {
     if( w && h ) {
@@ -346,6 +364,7 @@ local void SaveCursorRectangle24(int x,int y,int w,int h) {
 
 /** Save cursor rectangle for 32bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
+**	@see SaveCursorRectangle
 */
 local void SaveCursorRectangle32(int x,int y,int w,int h) {
     if( w && h ) {
@@ -704,10 +723,10 @@ local int RectangleCursor;		/// Flag: last cursor was rectangle
 local int BuildingCursor;		/// Flag: last cursor was building
 
 // area of tiles covered by building cursor (SX,SY;EX,EY)
-local int BuildingCursorSX;
-local int BuildingCursorSY;
-local int BuildingCursorEX;
-local int BuildingCursorEY;
+local int BuildingCursorSX;		/// FIXME: docu
+local int BuildingCursorSY;		/// FIXME: docu
+local int BuildingCursorEX;		/// FIXME: docu
+local int BuildingCursorEY;		/// FIXME: docu
 
 /**
 **	Draw cursor for selecting building position.
