@@ -1372,8 +1372,10 @@ global void FontsCclRegister(void)
 global void CleanFonts(void)
 {
     unsigned i;
+#ifndef USE_SDL_SURFACE
     FontColorMapping* fcm;
     FontColorMapping* temp;
+#endif
 
     for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 	free(Fonts[i].File);
@@ -1382,6 +1384,7 @@ global void CleanFonts(void)
 	Fonts[i].Graphic = NULL;
     }
 
+#ifndef USE_SDL_SURFACE
     fcm = FontColorMappings;
     while (fcm) {
 	temp = fcm->Next;
@@ -1389,6 +1392,7 @@ global void CleanFonts(void)
 	free(fcm);
 	fcm = temp;
     }
+#endif
     FontColorMappings = NULL;
 }
 
