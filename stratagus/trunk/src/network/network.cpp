@@ -532,7 +532,7 @@ local void NetworkClientSetup(void)
 */
 global void InitNetwork1(void)
 {
-    int i, n, port;
+    int i, port;
     char *cp;
 
     DebugLevel0Fn("\n");
@@ -608,17 +608,6 @@ global void InitNetwork1(void)
 	DebugLevel0Fn("My host:port %d.%d.%d.%d:%d\n", NIPQUAD(ntohl(MyHost)), ntohs(MyPort));
     });
 
-    //
-    //	Prepare first time without syncs.
-    //
-    for (i = 0; i <= NetworkLag; i += NetworkUpdates) {
-	for (n = 0; n < PlayerMax; ++n) {
-	    NetworkIn[i][n].Time = i;
-	    NetworkIn[i][n].Data.Frame = i;
-	    NetworkIn[i][n].Data.Type = MessageSync;
-	}
-    }
-
     dl_init(CommandsIn);
     dl_init(CommandsOut);
 }
@@ -641,6 +630,9 @@ global void ExitNetwork1(void)
 */
 global void InitNetwork2(void)
 {
+    int i;
+    int n;
+
     //
     //	Server
     //
@@ -654,6 +646,17 @@ global void InitNetwork2(void)
     } else {
 	NetworkClientSetup();
 	DebugLevel0Fn("Client setup ready\n");
+    }
+
+    //
+    //	Prepare first time without syncs.
+    //
+    for (i = 0; i <= NetworkLag; i += NetworkUpdates) {
+	for (n = 0; n < HostsCount; ++n) {
+	    NetworkIn[i][NetPlyNr[n]].Time = i;
+	    NetworkIn[i][NetPlyNr[n]].Data.Frame = i;
+	    NetworkIn[i][NetPlyNr[n]].Data.Type = MessageSync;
+	}
     }
 }
 
@@ -713,8 +716,6 @@ global void NetworkEvent(void)
 {
     NetworkPacket packet;
     int player, i, n;
-
-    DebugLevel3Fn("\n");
 
     //
     //	Read the packet.
@@ -826,7 +827,7 @@ global void NetworkEvent(void)
 		break;
 	    }
 	}
-	DebugLevel3("%d in sync %d\n", FrameCounter, NetworkInSync);
+	DebugLevel2("%d in sync %d\n", FrameCounter, NetworkInSync);
     }
 }
 
@@ -1028,9 +1029,10 @@ local void NetworkExecCommands(void)
 	    //
 	    ncq = &NetworkIn[FrameCounter & 0xFF][i];
 	    if (ncq->Time) {
-		DebugLevel3Fn("execute net %d,%d\n", FrameCounter, ncq->Time);
+		DebugLevel3Fn("execute net %d,%d(%x),%d\n",
+			FrameCounter,i,FrameCounter&0xFF, ncq->Time);
 		if (ncq->Time != FrameCounter) {
-		    DebugLevel3Fn("frame %d idx %d time %d\n",
+		    DebugLevel2Fn("frame %d idx %d time %d\n",
 			    FrameCounter, FrameCounter & 0xFF, ncq->Time);
 		    DebugCheck(ncq->Time != FrameCounter);
 		}
