@@ -667,7 +667,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     //	Prepare return, time for one frame is over.
     //
     VideoInterrupts=0;
-
     
     if( !SkipGameCycle-- ) {
 	SkipGameCycle=SkipFrames;
