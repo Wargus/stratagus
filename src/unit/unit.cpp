@@ -3976,12 +3976,14 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	    fprintf(file,")");
 	    break;
 	case UnitActionResearch:
-	    DebugLevel0Fn("FIXME: not written\n");
-	    fprintf(file,"\n  'data-reseach 'FIXME");
+	    fprintf(file,"\n  'data-research '(");
+	    fprintf(file,"ident %s", unit->Data.Research.Upgrade->Ident);
+	    fprintf(file,")");
 	    break;
 	case UnitActionUpgradeTo:
-	    DebugLevel0Fn("FIXME: not written\n");
-	    fprintf(file,"\n  'data-upgrade-to 'FIXME");
+	    fprintf(file,"\n  'data-upgrade-to '(");
+	    fprintf(file,"ticks %d", unit->Data.UpgradeTo.Ticks);
+	    fprintf(file,")");
 	    break;
 	case UnitActionTrain:
 	    fprintf(file,"\n  'data-train '(");
