@@ -122,6 +122,8 @@ global unsigned char* VisionTable[3];
 global int* VisionLookup;
 
 #ifdef USE_SDL_SURFACE
+SDL_Surface* SolidFog;
+
 local void (*VideoDrawUnexplored)(const int, int, int);
 local void (*VideoDrawFog)(const int, int, int);
 local void (*VideoDrawOnlyFog)(const int, int x, int y);
@@ -2762,8 +2764,14 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	}
     } else {
 #ifdef USE_SDL_SURFACE
+	SDL_Rect drect;
+	drect.x = dx;
+	drect.y = dy;
 	// Tile is fully FOW
+	SDL_BlitSurface(SolidFog, NULL, TheScreen, &drect);
+#else
 	VideoFillTransRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY, 128);
+#endif
 #else
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
 #endif
@@ -2939,6 +2947,14 @@ global void InitMapFogOfWar(void)
 #else
 
 #ifdef USE_SDL_SURFACE
+    if (!SolidFog) {
+	SDL_Surface* s;
+	s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
+	    32, RMASK, GMASK, BMASK, AMASK);
+	SDL_FillRect(s, NULL, SDL_MapRGBA(s->format, 0, 0, 0, 128));
+	SolidFog = SDL_DisplayFormatAlpha(s);
+	SDL_FreeSurface(s);
+    }
     if (!OriginalFogOfWar) {
 	VideoDrawFog = VideoDrawFogAlpha;
 	VideoDrawOnlyFog = VideoDrawOnlyFogAlpha;
