@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name deco.h 	-	Mechanism for all 2D decorations on screen */
+/**@name deco.h - Mechanism for all 2D decorations on screen */
 //
-//	(c) Copyright 2002 by Lutz Sammer and Stephan Rasenberg
+//      (c) Copyright 2002-2004 by Lutz Sammer and Stephan Rasenberg
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __DECO_H__
 #define __DECO_H__
@@ -34,7 +34,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	  Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
@@ -56,41 +56,45 @@ typedef struct DecorationSingle {
 } DecorationSingle;
 
 /**
-**		A 2D decoration as is supported by this mechanism, add any to be draw
-**		element (sprite/line/button/etc..) as a 2D decoration following this
-**		structu, so the mechanism can use it and automaticly update any other
-**		decoration overlapping it.
+**  A 2D decoration as is supported by this mechanism, add any to be draw
+**  element (sprite/line/button/etc..) as a 2D decoration following this
+**  structu, so the mechanism can use it and automaticly update any other
+**  decoration overlapping it.
 **
-**		draw		= an user given function that draws the decoration using
-**				  some vidoe functions based on the clip rectangle ClipX1,..
-**	  data	= an user given data-type given to above function, to be able
-**				  to provide a generic draw-function independent of its data.
-**		x,y,w,h = dimension as given to DecorationAdd..
-**				  @note now needed outside, but might be removed in the future
-**		l	   = decoration level as given to DecorationAdd (internal use only)
-**		singles = The sub-decoration type, as this decoration might be split
-**				  into multiple small/fixed-sized data-type (internal use only)
-**		prv		= prev decoration based on depth-level (internal use only)
-**		nxt		= next decoration based on depth-level (internal use only)
+**  draw = an user given function that draws the decoration using
+**         some vidoe functions based on the clip rectangle ClipX1,..
+**  data = an user given data-type given to above function, to be able
+**         to provide a generic draw-function independent of its data.
+**  x,y,w,h = dimension as given to DecorationAdd..
+**            @note now needed outside, but might be removed in the future
+**  l = decoration level as given to DecorationAdd (internal use only)
+**  singles = The sub-decoration type, as this decoration might be split
+**            into multiple small/fixed-sized data-type (internal use only)
+**  prv = prev decoration based on depth-level (internal use only)
+**  nxt = next decoration based on depth-level (internal use only)
 **/
 typedef struct Deco {
-  void *data;
-  void (*drawclip)(void *data);
-  struct DecorationSingle *singles;
-  struct Deco *prv, *nxt;
-  int x, y, w, h;
+  void* data;
+  void (*drawclip)(void* data);
+  struct DecorationSingle* singles;
+  struct Deco* prv;
+  struct Deco* nxt;
+  int x;
+  int y;
+  int w;
+  int h;
   int level;
 } Deco;
 
 /*----------------------------------------------------------------------------
---	  Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 
 extern void DecorationInit(void);
 
 extern Deco* DecorationAdd(void *data,void (*drawclip)(void *data),
-		int level, int x, int y, int w, int h );
+	int level, int x, int y, int w, int h );
 extern Deco* DecorationMove(Deco *d, int x, int y, int w, int h);
 extern void DecorationRemove(Deco *d);
 extern void DecorationRemoveLevels(int min, int max);
@@ -102,4 +106,4 @@ extern void DecorationUpdateDisplay(void);
 
 //@}
 
-#endif		// !__DECO_H__
+#endif // !__DECO_H__

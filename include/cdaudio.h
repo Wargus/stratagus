@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cdaudio.h		-	cd audio header file. */
+/**@name cdaudio.h - cd audio header file. */
 //
-//	(c) Copyright 2003 by Nehal Mistry
+//      (c) Copyright 2003-2004 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __CDAUDIO_H__
 #define __CDAUDIO_H__
@@ -44,7 +44,7 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #if defined(USE_SDLCD)
@@ -61,32 +61,32 @@
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 typedef enum _cd_modes_ {
-	CDModeStopped = -1,				 /// Stopped
-	CDModeOff,						  /// Off
-	CDModeAll,						  /// All
-	CDModeRandom,					   /// Random
-	CDModeDefined,					  /// Defined
+	CDModeStopped = -1,  /// Stopped
+	CDModeOff,           /// Off
+	CDModeAll,           /// All
+	CDModeRandom,        /// Random
+	CDModeDefined,       /// Defined
 } CDModes;
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-extern CDModes CDMode;				  /// CD mode
-extern int CDTrack;						/// Current track
-extern int NumCDTracks;						/// Number of tracks on CD
+extern CDModes CDMode;   /// CD mode
+extern int CDTrack;      /// Current track
+extern int NumCDTracks;  /// Number of tracks on CD
 
 #ifdef USE_CDDA
-extern int CDDrive;								/// CDRom device
-extern struct cdrom_tocentry CDtocentry[64];		/// TOC track header struct
+extern int CDDrive;  /// CDRom device
+extern struct cdrom_tocentry CDtocentry[64];  /// TOC track header struct
 #endif
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_CDDA
@@ -115,10 +115,10 @@ extern int CDRomCheck(void *);
 
 #else
 
-#define QuitCD()						/// Dummy macro for without cd
+#define QuitCD()  /// Dummy macro for without cd
 
 #endif
 
 //@}
 
-#endif		// !__CDAUDIO_H__
+#endif // !__CDAUDIO_H__
