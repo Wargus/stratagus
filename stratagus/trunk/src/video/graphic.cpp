@@ -650,6 +650,7 @@ global void MakeTexture(Graphic* graphic,int width,int height)
 	    }
 	);
     }
+    free(tex);
 }
 
 /**
@@ -733,6 +734,7 @@ global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsign
 	    DebugLevel0Fn("glTexImage2D(%x)\n" _C_ i);
 	}
     );
+    free(tex);
 }
 #endif
 
