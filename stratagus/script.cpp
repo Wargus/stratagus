@@ -10,7 +10,7 @@
 //
 /**@name ccl.c		-	The craft configuration language. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -907,19 +907,19 @@ global void SavePreferences(void)
     buf[0] = '\0';
     switch (CDMode) {
 	case CDModeAll:
-	    strcpy(buf, "'all");
+	    strcpy(buf, "all");
 	    break;
 	case CDModeRandom:
-	    strcpy(buf, "'random");
+	    strcpy(buf, "random");
 	    break;
 	case CDModeDefined:
-	    strcpy(buf, "'defined");
+	    strcpy(buf, "defined");
 	    break;
 	default:
 	    break;
     }
     if (buf[0]) {
-	fprintf(fd,"(set-cd-mode! \"%s\")\n", buf);
+	fprintf(fd,"(set-cd-mode! '%s)\n", buf);
     }
 #endif
 #endif
