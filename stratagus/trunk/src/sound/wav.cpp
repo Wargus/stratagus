@@ -54,6 +54,7 @@
 **	Load wav.
 **
 **	@param name	File name.
+**	@param flags	Load flags.
 **
 **	@return		Returns the loaded sample.
 **
@@ -61,7 +62,7 @@
 **
 **	@todo	Add ADPCM loading support!
 */
-global Sample* LoadWav(const char* name)
+global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 {
     CLFile* f;
     WavChunk chunk;
