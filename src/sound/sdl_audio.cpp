@@ -65,10 +65,10 @@ global int InitSdlSound(const char* dev __attribute__((unused)), int freq,
     if (size == 8) {
 	wanted.format = AUDIO_U8;
     } else if (size == 16) {
-	wanted.format = AUDIO_S16;
+	wanted.format = AUDIO_S16SYS;
     } else {
 	DebugLevel0Fn("Unexpected sample size %d\n" _C_ size);
-	wanted.format = AUDIO_S16;
+	wanted.format = AUDIO_S16SYS;
     }
     wanted.channels = 2;
     wanted.samples = 2048;
