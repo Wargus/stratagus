@@ -250,6 +250,7 @@ typedef struct _ui_ {
 	int           NumButtonButtons;     /// Number of button panel buttons
 	int           ButtonPanelX;         /// Button panel screen X position
 	int           ButtonPanelY;         /// Button panel screen Y position
+	int           CommandKeyFont;       /// Command key font
 
 	// Map area
 	ViewportMode ViewportMode;          /// Current viewport mode
