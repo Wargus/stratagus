@@ -264,6 +264,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	unit->Mana=MAGIC_FOR_NEW_UNITS;
     }
     unit->HP=type->Stats[player->Player].HitPoints;
+    unit->Active=1;
 
     unit->GroupId=-1;
 

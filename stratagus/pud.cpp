@@ -1236,8 +1236,9 @@ pawn:
 			    if( unit->Type->GoldMine || unit->Type->GivesOil
 				    || unit->Type->OilPatch ) {
 				unit->Value=v*2500;
-			    } else {
-				// FIXME: active/inactive AI units!!
+			    } else {	
+				// active/inactive AI units!!
+				unit->Active=v;
 			    }
 			    UpdateForNewUnit(unit,0);
 			}
