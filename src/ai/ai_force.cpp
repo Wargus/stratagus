@@ -356,10 +356,19 @@ global void AiAttackWithForce(int force)
     }
 }
 
+//----------------------------------------------------------------------------
+//	Handle attack of force with transporter.
+//----------------------------------------------------------------------------
+
 /**
+**	Step 1)
 **	Load force on transporters.
 **
 **	@param force	Force pointer.
+**
+**	@todo	If an unit can't reach the transporter the code hangs.
+**		We must the transporter land on a new position.
+**		Or the board action will be better written.
 */
 local void AiLoadForce(AiForce* force)
 {
@@ -427,9 +436,14 @@ local void AiLoadForce(AiForce* force)
 }
 
 /**
-**	Send force off transporters.
+**	Step 2)
+**	Send force awaay in transporters, to unload at target position.
 **
 **	@param force	Force pointer.
+**
+**	@todo	The transporter should avoid enemy contact and should land
+**		at an unfortified coast. If we send more transporters they
+**		should land on different positions.
 */
 local void AiSendTransporter(AiForce* force)
 {
@@ -440,8 +454,13 @@ local void AiSendTransporter(AiForce* force)
     //
     aiunit=force->Units;
     while( aiunit ) {
+	//	Transporter to unload units
 	if( aiunit->Unit->Type->Transporter ) {
-	    CommandMove(aiunit->Unit, force->GoalX, force->GoalY,
+	    CommandUnload(aiunit->Unit, force->GoalX, force->GoalY, NoUnitP,
+		    FlushCommands);
+	//	Ships to defend transporter
+	} else if( aiunit->Unit->Type->UnitType==UnitTypeNaval ) {
+	    CommandAttack(aiunit->Unit, force->GoalX, force->GoalY, NoUnitP,
 		    FlushCommands);
 	}
 	aiunit=aiunit->Next;
@@ -450,14 +469,19 @@ local void AiSendTransporter(AiForce* force)
 }
 
 /**
+**	Step 3)
 **	Wait for transporters landed.
 **
 **	@param force	Force pointer.
+**
+**	@todo	If units blocks the unload process we should move them away.
+**		FIXME: hangs if the unit can't unloaded.
 */
 local void AiWaitLanded(AiForce* force)
 {
     AiUnit* aiunit;
     int i;
+    int j;
 
     DebugLevel0Fn("Waiting\n");
     //
@@ -466,13 +490,20 @@ local void AiWaitLanded(AiForce* force)
     i=1;
     aiunit=force->Units;
     while( aiunit ) {
-	if( aiunit->Unit->Type->Transporter
-		&& aiunit->Unit->Orders[0].Action==UnitActionStill ) {
-	    DebugLevel0Fn("Unloading\n");
-	    CommandUnload(aiunit->Unit,aiunit->Unit->X,aiunit->Unit->Y,
-		    NoUnitP,FlushCommands);
-	} else {
-	    i=0;
+	if( aiunit->Unit->Type->Transporter ) {
+	    if( aiunit->Unit->Orders[0].Action==UnitActionStill ) {
+		DebugLevel0Fn("Unloading\n");
+		for( j=0; j<MAX_UNITS_ONBOARD; ++j ) {
+		    if( aiunit->Unit->OnBoard[j] ) {
+			CommandUnload(aiunit->Unit,force->GoalX,force->GoalY,
+			    NoUnitP,FlushCommands);
+			i=0;
+			break;
+		    }
+		}
+	    } else {
+		i=0;
+	    }
 	}
 	aiunit=aiunit->Next;
     }
@@ -482,7 +513,8 @@ local void AiWaitLanded(AiForce* force)
 }
 
 /**
-**	Force on attack ride.
+**	Step 4)
+**	Force on attack ride. We attack until there is no unit or enemy left.
 **
 **	@param force	Force pointer.
 */
