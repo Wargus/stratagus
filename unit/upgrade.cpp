@@ -1399,18 +1399,19 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 		Unit* sightupgrade[UnitMax];
 		
 		numunits = FindUnitsByType(&UnitTypes[z],sightupgrade);
-		numunits--; //Change to 0 Start not 1 start
+		numunits--; // Change to 0 Start not 1 start
 		while (numunits >= 0) {
 		    if (sightupgrade[numunits]->Player->Player == player->Player) {
+			/// Marking First is faster
+			MapMarkSight(player,
+					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
+					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
+					UnitTypes[z].Stats[pn].SightRange);
 			MapUnmarkSight(player,
 					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
 					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
 					sightupgrade[numunits]->CurrentSightRange);
 			sightupgrade[numunits]->CurrentSightRange=UnitTypes[z].Stats[pn].SightRange;
-			MapMarkSight(player,
-					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
-					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
-					sightupgrade[numunits]->CurrentSightRange);
 		    }                                   
 		    numunits--;
 		}
