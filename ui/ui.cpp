@@ -63,18 +63,18 @@ global UI TheUI = {
     MOUSESCALE,				// mouse scale
 };
 
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
 /**
 **	The available user interfaces.
 */
 global UI** UI_Table;
 
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
 /**
 **	Initialize the user interface.
 */
-global void InitUserInterface(void)
+global void InitUserInterface(char *RaceName)
 {
     int i;
     int best;
@@ -82,7 +82,7 @@ global void InitUserInterface(void)
     // select the correct slot
     best=0;
     for( i=0; UI_Table[i]; ++i ) {
-	if( !strcmp(ThisPlayer->RaceName,UI_Table[i]->Name) ) {
+	if( !strcmp(RaceName,UI_Table[i]->Name) ) {
 	    // perfect
 	    if( VideoWidth==UI_Table[i]->Width
 		    && VideoHeight==UI_Table[i]->Height  ) {
@@ -207,7 +207,7 @@ global void CleanUserInterface(void)
     int i;
 
     //
-    //	Free the graphics. FIXME: if shared this crashs.
+    //	Free the graphics. FIXME: if shared this will crash.
     //
     VideoSaveFree(TheUI.Filler1.Graphic);
     VideoSaveFree(TheUI.Resource.Graphic);
@@ -232,8 +232,9 @@ global void CleanUserInterface(void)
 
     memset(&TheUI,0,sizeof(TheUI));
 
+    // FIXME: Johns: Implement this correctly or we will lose memory!
 
-    DebugLevel0Fn("FIXME: not complete written\n");
+    DebugLevel0Fn("FIXME: not completely written\n");
 }
 
 //@}

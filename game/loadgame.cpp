@@ -86,7 +86,7 @@ global void InitModules(void)
 {
     InitIcons();
     InitCursors();
-    InitUserInterface();
+    // InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
     InitPlayers();
     InitMissileTypes();
     InitMissiles();

@@ -521,7 +521,7 @@ local Menuitem NetMultiClientMenuItems[] = {
 
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 40, 10+240, MenuButtonDisabled, GameFont, NULL, NULL,
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
 	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
@@ -1794,7 +1794,7 @@ local void GameDrawFunc(Menuitem *mi)
     SetDefaultTextColors(nc, rc);
 }
 
-local void GameRCSAction (Menuitem *mi __attribute__((unused)), int i)
+local void GameRCSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
@@ -1803,7 +1803,7 @@ local void GameRCSAction (Menuitem *mi __attribute__((unused)), int i)
     						/// FIXME : Do similar for clients
 }
 
-local void GameRESAction (Menuitem *mi __attribute__((unused)), int i)
+local void GameRESAction(Menuitem *mi __attribute__((unused)), int i)
 {
     int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
 		SettingsResourcesMedium, SettingsResourcesHigh };
@@ -1812,13 +1812,13 @@ local void GameRESAction (Menuitem *mi __attribute__((unused)), int i)
     ServerSetupState.ResOpt = i;		/// FIXME : mark: send update to clients
 }
 
-local void GameUNSAction (Menuitem *mi __attribute__((unused)), int i)
+local void GameUNSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
     ServerSetupState.UnsOpt = i;		/// FIXME : mark: send update to clients
 }
 
-local void GameTSSAction (Menuitem *mi __attribute__((unused)), int i)
+local void GameTSSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
@@ -1826,12 +1826,12 @@ local void GameTSSAction (Menuitem *mi __attribute__((unused)), int i)
     ServerSetupState.TssOpt = i;		/// FIXME : mark: send update to clients
 }
 
-local void CustomGameOPSAction (Menuitem *mi __attribute__((unused)), int i)
+local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
 
-local void MultiGameFWSAction (Menuitem *mi __attribute__((unused)), int i)
+local void MultiGameFWSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     FlagRevealMap = i;
     ServerSetupState.FwsOpt = i;		/// FIXME : mark: send update to clients
@@ -2044,7 +2044,26 @@ global void NetConnectForceDisplayUpdate(void)
 
 global void NetClientUpdateState(void)
 {
-    // FIXME: data in ServerSetupState now - update appropriate menu items..
+#if 0
+    // FIXME: Handle RACES!!!!!
+    GameSettings.Presets[0].Race = v[i];
+    ServerSetupState.Race[0] = i;
+#endif
+
+    GameRESAction(NULL, ServerSetupState.ResOpt);
+    NetMultiClientMenuItems[16].d.pulldown.curopt = ServerSetupState.ResOpt;
+ 
+    GameUNSAction(NULL, ServerSetupState.UnsOpt);
+    NetMultiClientMenuItems[18].d.pulldown.curopt = ServerSetupState.UnsOpt;
+
+    MultiGameFWSAction(NULL, ServerSetupState.FwsOpt);
+    NetMultiClientMenuItems[20].d.pulldown.curopt = ServerSetupState.FwsOpt;
+
+    GameTSSAction(NULL, ServerSetupState.TssOpt);
+    NetMultiClientMenuItems[22].d.pulldown.curopt = ServerSetupState.TssOpt;
+
+    MultiGameClientUpdate(0);
+
     MustRedraw |= RedrawMenu;
 }
 
@@ -2647,8 +2666,7 @@ global void ProcessMenu(int MenuId, int Loop)
     DestroyCursorBackground();
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
-    // FIXME: Not yet available :( GameCursor = TheUI.Point.Cursor;
-    GameCursor=CursorTypeByIdent("cursor-point");
+    GameCursor = TheUI.Point.Cursor;
     CurrentMenu = MenuId;
     menu = Menus + CurrentMenu;
     MenuButtonCurSel = -1;
