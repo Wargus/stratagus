@@ -187,19 +187,10 @@ local int HaulInOilWell(Unit* unit)
 	//
 	if( !(depot=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
 	    if( well ) {
-#ifdef NEW_HEADING
 		DropOutOnSide(unit,LookingW
 			,well->Type->TileWidth,well->Type->TileHeight);
-#else
-		DropOutOnSide(unit,HeadingW
-			,well->Type->TileWidth,well->Type->TileHeight);
-#endif
 	    } else {
-#ifdef NEW_HEADING
 		DropOutOnSide(unit,LookingW,1,1);
-#else
-		DropOutOnSide(unit,HeadingW,1,1);
-#endif
 	    }
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
@@ -350,13 +341,8 @@ local int WaitForOilDeliver(Unit* unit)
 
 	// FIXME: return to last position!
 	if( !(platform=FindOilPlatform(unit->Player,unit->X,unit->Y)) ) {
-#ifdef NEW_HEADING
 	    DropOutOnSide(unit,LookingW
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-#else
-	    DropOutOnSide(unit,HeadingW
-		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-#endif
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {

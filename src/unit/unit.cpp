@@ -328,11 +328,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 
     unit->SeenFrame=-1;
     if( !type->Building ) {
-#ifdef NEW_HEADING
         unit->Direction=(MyRand()>>8)&0xFF;// random heading
-#else
-        unit->Heading=(MyRand()>>13)&7;	// random heading
-#endif
         player->NumFoodUnits++;		// food needed
 	if( player==ThisPlayer ) {
 	    MustRedraw|=RedrawResources;// update food
@@ -1068,7 +1064,11 @@ global void RescueUnits(void)
 ----------------------------------------------------------------------------*/
 
 /**
-*	Fast arc tangent function.
+**	Fast arc tangent function.
+**
+**	@param val	atan argument
+**
+**	@returns	atan(val)
 */
 local int myatan(int val)
 {
@@ -1089,6 +1089,11 @@ local int myatan(int val)
 
 /**
 **	Convert direction to heading.
+**
+**	@param delta_x	Delta X.
+**	@param delta_y	Delta Y.
+**
+**	@returns 	Angle (0..255)
 */
 global int DirectionToHeading(int delta_x,int delta_y)
 {
@@ -1116,78 +1121,20 @@ global int DirectionToHeading(int delta_x,int delta_y)
 */
 global void UnitUpdateHeading(Unit* unit)
 {
-#ifdef NEW_HEADING
+    int dir;
+
     // FIXME: depends on the possible unit directions wc 8, sc 32
     unit->Frame&=127;
     unit->Frame/=5;
     unit->Frame*=5;
-    if( unit->Direction<=LookingS ) {	// north->east->south
-	DebugLevel3(__FUNCTION__": %Zd>%d\n",UnitNumber(unit),unit->Direction);
-	unit->Frame+=unit->Direction/32;
+    dir=((unit->Direction+NextDirection/2)&0xFF)/NextDirection;
+    if( dir<=LookingS/NextDirection ) {	// north->east->south
+	unit->Frame+=dir;
     } else {
-	DebugLevel3(__FUNCTION__": %Zd<%d\n",UnitNumber(unit),unit->Direction);
-	unit->Frame+=128+256/32-unit->Direction/32;
+	// Note: 128 is the flag for flip graphic in X.
+	unit->Frame+=128+256/NextDirection-dir;
     }
-#else
-    switch( unit->Heading ) {
-	case HeadingN:
-	case HeadingNE:
-	case HeadingE:
-	case HeadingSE:
-	case HeadingS:
-	    DebugLevel3(__FUNCTION__": %Zd>%d\n"
-		    ,UnitNumber(unit),unit->Heading);
-	    unit->Frame=unit->Heading;
-	    break;
-	case HeadingSW:			// this are mirros
-	case HeadingW:
-	case HeadingNW:
-	    DebugLevel3(__FUNCTION__": %Zd<%d\n"
-		    ,UnitNumber(unit),unit->Heading);
-	    unit->Frame=128+1+HeadingNW-unit->Heading;
-	    break;
-    }
-#endif
 }
-
-#if 0
-/**
-**	Heading from x1,y1 to x2,y2.
-*/
-global int HeadingFromXY2XY(int x,int y,int dx,int dy)
-{
-#ifdef NEW_HEADING
-    return DirectionToHeading(dx-x,dy-y);
-#else
-    DebugLevel3("Heading %d,%d -> %d,%d\n",x,y,dx,dy);
-    x=dx-x;
-    y=dy-y;
-    if( x==0 ) {
-	if( y<0 ) {
-	    return HeadingN;
-	} else {
-	    return HeadingS;
-	}
-    } else if( x>0 ) {
-	if( y<0 ) {
-	    return HeadingNE;
-	} else if( y==0 ) {
-	    return HeadingE;
-	} else {
-	    return HeadingSE;
-	}
-    } else {
-	if( y<0 ) {
-	    return HeadingNW;
-	} else if( y==0 ) {
-	    return HeadingW;
-	} else {
-	    return HeadingSW;
-	}
-    }
-#endif
-}
-#endif
 
 /**
 **	Change unit heading/frame from delta direction x,y.
@@ -1198,43 +1145,8 @@ global int HeadingFromXY2XY(int x,int y,int dx,int dy)
 */
 global void UnitHeadingFromDeltaXY(Unit* unit,int dx,int dy)
 {
-#ifdef NEW_HEADING
     unit->Direction=DirectionToHeading(dx,dy);
     UnitUpdateHeading(unit);
-#else
-    int heading;
-    int frame;
-
-    // Set new heading:
-    if( dx==0 ) {
-	if( dy<0 ) {
-	    heading=HeadingN;
-	} else {
-	    heading=HeadingS;
-	}
-	frame=heading;
-    } else if( dx>0 ) {
-	if( dy<0 ) {
-	    heading=HeadingNE;
-	} else if( dy==0 ) {
-	    heading=HeadingE;
-	} else {
-	    heading=HeadingSE;
-	}
-	frame=heading;
-    } else {
-	if( dy<0 ) {
-	    heading=HeadingNW;
-	} else if( dy==0 ) {
-	    heading=HeadingW;
-	} else {
-	    heading=HeadingSW;
-	}
-	frame=128+1+HeadingNW-heading;
-    }
-    unit->Heading=heading;
-    unit->Frame=frame;
-#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -1256,7 +1168,6 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     DebugLevel3("\tAdd: %d %d,%d\n",heading,addx,addy);
     mask=UnitMovementMask(unit);
 
-#ifdef NEW_HEADING
     if( heading<LookingNE || heading>LookingNW) {
 	x+=addx-1;
 	--y;
@@ -1273,28 +1184,6 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     }
     --x;
     goto startw;
-#else
-    switch( heading ) {
-	case HeadingN:
-	case HeadingNE:
-	    x+=addx-1;
-	    --y;
-	    goto startn;
-	case HeadingNW:
-	case HeadingW:
-	    --x;
-	    goto startw;
-	case HeadingSW:
-	case HeadingS:
-	    y+=addy;
-	    goto starts;
-	case HeadingSE:
-	case HeadingE:
-	    x+=addx;
-	    y+=addy-1;
-	    goto starte;
-    }
-#endif
 
     // FIXME: don't search outside of the map
     for( ;; ) {
@@ -1489,13 +1378,8 @@ global void DropOutAll(const Unit* source)
 	    continue;
 	}
 	if( unit->X==source->X && unit->Y==source->Y ) {
-#ifdef NEW_HEADING
 	    DropOutOnSide(unit,LookingW
 		    ,source->Type->TileWidth,source->Type->TileHeight);
-#else
-	    DropOutOnSide(unit,HeadingW
-		    ,source->Type->TileWidth,source->Type->TileHeight);
-#endif
 	}
     }
 #else
@@ -3001,20 +2885,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file,"\t(%d %d) ",unit->X,unit->Y);
     fprintf(file,"(%d %d) ",unit->IX,unit->IY);
     fprintf(file,"%d ",unit->Frame);
-#ifdef NEW_HEADING
     fprintf(file,"%d\n",(unit->Direction*360)/256);
-#else
-    switch( unit->Heading ) {
-	case HeadingN:	fprintf(file,"0\n");	break;
-	case HeadingNE:	fprintf(file,"45\n");	break;
-	case HeadingE:	fprintf(file,"90\n");	break;
-	case HeadingSE:	fprintf(file,"135\n");break;
-	case HeadingS:	fprintf(file,"180\n");break;
-	case HeadingSW:	fprintf(file,"225\n");break;
-	case HeadingW:	fprintf(file,"270\n");break;
-	case HeadingNW:	fprintf(file,"315\n");break;
-    }
-#endif
     if( unit->Attacked ) {
 	fprintf(file,"\t'attacked\n");
     }

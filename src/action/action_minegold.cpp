@@ -157,13 +157,8 @@ local int MineInGoldmine(Unit* unit)
 	// FIXME: I use goldmine after destory!!!
 
 	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
-#ifdef NEW_HEADING
 	    DropOutOnSide(unit,LookingW
 		    ,mine->Type->TileWidth,mine->Type->TileHeight);
-#else
-	    DropOutOnSide(unit,HeadingW
-		    ,mine->Type->TileWidth,mine->Type->TileHeight);
-#endif
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	    DebugLevel2("Mine without deposit\n");
@@ -332,13 +327,8 @@ local int StoreGoldInDeposit(Unit* unit)
 	// FIXME: return to last position!
 	// FIXME: Ari says, don't automatic search a new mine.
 	if( !(destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
-#ifdef NEW_HEADING
 	    DropOutOnSide(unit,LookingW
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-#else
-	    DropOutOnSide(unit,HeadingW
-		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-#endif
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {
