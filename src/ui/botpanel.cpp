@@ -10,7 +10,8 @@
 //
 /**@name botpanel.c	-	The bottom panel. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//	                        and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -588,8 +589,8 @@ local void UpdateButtonPanelMultipleUnits(void)
 	}
 
 	// any unit or unit in list
-	if ( UnitButtonTable[z]->UnitMask[0] != '*'
-		&& strstr( UnitButtonTable[z]->UnitMask, unit_ident ) ) {
+	if ( UnitButtonTable[z]->UnitMask[0] == '*'
+		|| strstr( UnitButtonTable[z]->UnitMask, unit_ident ) ) {
 	    int allow;
 
 	    allow=0;
@@ -619,6 +620,30 @@ local void UpdateButtonPanelMultipleUnits(void)
 		} else if ( UnitButtonTable[z]->Action == ButtonDemolish ) {
 		    for( i=NumSelected; --i; ) {
 			if( Selected[i]->Type->Volatile ) {
+			    allow = 1;
+			    break;
+			}
+		    }
+		} else if ( UnitButtonTable[z]->Action == ButtonCancel ) {
+		    allow = 1;
+		} else if ( UnitButtonTable[z]->Action == ButtonCancelUpgrade ) {
+		    for( i=NumSelected; --i; ) {
+			if( Selected[i]->Orders[0].Action==UnitActionUpgradeTo
+				|| Selected[i]->Orders[0].Action==UnitActionResearch ) {
+			    allow = 1;
+			    break;
+			}
+		    }
+		} else if ( UnitButtonTable[z]->Action == ButtonCancelTrain ) {
+		    for( i=NumSelected; --i; ) {
+			if( Selected[i]->Orders[0].Action==UnitActionTrain ) {
+			    allow = 1;
+			    break;
+			}
+		    }
+		} else if ( UnitButtonTable[z]->Action == ButtonCancelBuild ) {
+		    for( i=NumSelected; --i; ) {
+			if( Selected[i]->Orders[0].Action==UnitActionBuilded ) {
 			    allow = 1;
 			    break;
 			}
