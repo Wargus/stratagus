@@ -1490,7 +1490,6 @@ local void ShowSingleOrder(const Unit* unit,int x1,int y1,const Order* order)
 	VideoDrawLineClip(color,x1,y1,x2,y2);
 	VideoFillCircleClip(e_color,x2,y2,3);
     }
-
     //DrawPath(unit);
 }
 
