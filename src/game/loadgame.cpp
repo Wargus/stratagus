@@ -136,6 +136,7 @@ global void InitModules(void)
 #ifdef HIERARCHIC_PATHFINDER
     PfHierInitialize();
 #endif
+    InitMap();
     InitMapFogOfWar();			// build tables for fog of war
 }
 
