@@ -5961,9 +5961,9 @@ local int PlayerAiMenuToFc(int num)
 local void EditorPlayerPropertiesMenu(void)
 {
     Menu *menu;
-    char gold[16][15];
-    char lumber[16][15];
-    char oil[16][15];
+    char gold[PlayerMax][15];
+    char lumber[PlayerMax][15];
+    char oil[PlayerMax][15];
     int i;
 
     menu = FindMenu("menu-editor-player-properties");
@@ -5975,13 +5975,13 @@ local void EditorPlayerPropertiesMenu(void)
 #define LUMBER_POSITION 89
 #define OIL_POSITION 106
 
-    for (i=0; i<16; ++i) {
+    for (i=0; i<PlayerMax; ++i) {
 	menu->items[RACE_POSITION+i].d.pulldown.defopt = TheMap.Info->PlayerSide[i];
 	menu->items[TYPE_POSITION+i].d.pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info->PlayerType[i]];
 	menu->items[AI_POSITION+i].d.pulldown.defopt = PlayerAiFcToMenu(TheMap.Info->PlayerAi[i]);
-	sprintf(gold[i], "%d~!_", TheMap.Info->PlayerGold[i]);
-	sprintf(lumber[i], "%d~!_", TheMap.Info->PlayerWood[i]);
-	sprintf(oil[i], "%d~!_", TheMap.Info->PlayerOil[i]);
+	sprintf(gold[i], "%d~!_", TheMap.Info->PlayerResources[i][GoldCost]);
+	sprintf(lumber[i], "%d~!_", TheMap.Info->PlayerResources[i][WoodCost]);
+	sprintf(oil[i], "%d~!_", TheMap.Info->PlayerResources[i][OilCost]);
 	menu->items[GOLD_POSITION+i].d.input.buffer = gold[i];
 	menu->items[GOLD_POSITION+i].d.input.nch = strlen(gold[i]) - 3;
 	menu->items[GOLD_POSITION+i].d.input.maxch = 7;
@@ -5995,13 +5995,13 @@ local void EditorPlayerPropertiesMenu(void)
 
     ProcessMenu("menu-editor-player-properties", 1);
 
-    for (i=0; i<16; ++i) {
+    for (i=0; i<PlayerMax; ++i) {
 	TheMap.Info->PlayerSide[i] = menu->items[RACE_POSITION+i].d.pulldown.curopt;
 	TheMap.Info->PlayerType[i] = PlayerTypesMenuToFc[menu->items[TYPE_POSITION+i].d.pulldown.curopt];
 	TheMap.Info->PlayerAi[i] = PlayerAiMenuToFc(menu->items[AI_POSITION+i].d.pulldown.curopt);
-	TheMap.Info->PlayerGold[i] = atoi(gold[i]);
-	TheMap.Info->PlayerWood[i] = atoi(lumber[i]);
-	TheMap.Info->PlayerOil[i] = atoi(oil[i]);
+	TheMap.Info->PlayerResources[i][GoldCost] = atoi(gold[i]);
+	TheMap.Info->PlayerResources[i][WoodCost] = atoi(lumber[i]);
+	TheMap.Info->PlayerResources[i][OilCost] = atoi(oil[i]);
     }
 }
 
