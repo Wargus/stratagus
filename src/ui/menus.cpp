@@ -1668,8 +1668,11 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 	InitVideo();
 	DestroyCursorBackground();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	CleanModules();
+	CleanFonts();
 	LoadCcl();
-	LoadFonts();
+	PreMenuSetup();
+	GameCursor = TheUI.Point.Cursor;
 	menu = FindMenu("menu-program-start");
 	for (i=0; i<menu->nitems; ++i) {
 	    if (menu->items[i].initfunc) {
