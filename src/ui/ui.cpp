@@ -364,33 +364,36 @@ local void SaveUi(FILE* file,const UI* ui)
 		ui->Buttons2[i].Width,ui->Buttons2[i].Height);
     }
 
-    fprintf(file, "\n  'cursors '(");
-    fprintf(file, "\n    point %s", ui->Point.Name);
-    fprintf(file, "\n    glass %s", ui->Glass.Name);
-    fprintf(file, "\n    cross %s", ui->Cross.Name);
-    fprintf(file, "\n    yellow %s", ui->YellowHair.Name);
-    fprintf(file, "\n    green %s", ui->GreenHair.Name);
-    fprintf(file, "\n    red %s", ui->RedHair.Name);
-    fprintf(file, "\n    scroll %s", ui->Scroll.Name);
+    fprintf(file,"\n  'cursors '(");
+    fprintf(file,"\n    point %s", ui->Point.Name);
+    fprintf(file,"\n    glass %s", ui->Glass.Name);
+    fprintf(file,"\n    cross %s", ui->Cross.Name);
+    fprintf(file,"\n    yellow %s", ui->YellowHair.Name);
+    fprintf(file,"\n    green %s", ui->GreenHair.Name);
+    fprintf(file,"\n    red %s", ui->RedHair.Name);
+    fprintf(file,"\n    scroll %s", ui->Scroll.Name);
 
-    fprintf(file, "\n    arrow-e %s", ui->ArrowE.Name);
-    fprintf(file, "\n    arrow-ne %s", ui->ArrowNE.Name);
-    fprintf(file, "\n    arrow-n %s", ui->ArrowN.Name);
-    fprintf(file, "\n    arrow-nw %s", ui->ArrowNW.Name);
-    fprintf(file, "\n    arrow-w %s", ui->ArrowW.Name);
-    fprintf(file, "\n    arrow-sw %s", ui->ArrowSW.Name);
-    fprintf(file, "\n    arrow-s %s", ui->ArrowS.Name);
-    fprintf(file, "\n    arrow-se %s", ui->ArrowSE.Name);
-    fprintf(file, ")\n");
+    fprintf(file,"\n    arrow-e %s", ui->ArrowE.Name);
+    fprintf(file,"\n    arrow-ne %s", ui->ArrowNE.Name);
+    fprintf(file,"\n    arrow-n %s", ui->ArrowN.Name);
+    fprintf(file,"\n    arrow-nw %s", ui->ArrowNW.Name);
+    fprintf(file,"\n    arrow-w %s", ui->ArrowW.Name);
+    fprintf(file,"\n    arrow-sw %s", ui->ArrowSW.Name);
+    fprintf(file,"\n    arrow-s %s", ui->ArrowS.Name);
+    fprintf(file,"\n    arrow-se %s", ui->ArrowSE.Name);
+    fprintf(file,")\n");
 
+    fprintf(file,"\n  'menu-panels '(");
     menupanel=ui->MenuPanels;
     while( menupanel ) {
-	fprintf(file,"  (list \"%s\")\n",menupanel->Panel.File);
+	fprintf(file,"\n    %s \"%s\"",
+		menupanel->Ident,menupanel->Panel.File);
 	menupanel=menupanel->Next;
     }
+    fprintf(file,")\n");
 
-    fprintf(file,"  (list \"%s\")\n",ui->VictoryBackground.File);
-    fprintf(file,"  (list \"%s\")",ui->DefeatBackground.File);
+    fprintf(file,"\n  (list \"%s\")",ui->VictoryBackground.File);
+    fprintf(file,"\n  (list \"%s\")",ui->DefeatBackground.File);
 
     fprintf(file," )\n\n");
 }
