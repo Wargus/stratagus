@@ -214,8 +214,8 @@ global void InitNetwork1(void)
     if (NetworkFildes == -1) {
 	NetworkFildes = NetOpenUDP(++port);
 	if (NetworkFildes == -1) {
-	    fprintf(stderr,"NETWORK: No free ports %d-%d available, aborting\n"
-		    , port -1, port);
+	    fprintf(stderr,"NETWORK: No free ports %d-%d available, aborting\n",
+		    port - 1, port);
 	    NetExit();		// machine dependend network exit
 	    return;
 	}
@@ -255,15 +255,15 @@ global void InitNetwork1(void)
 */
 global void ExitNetwork1(void)
 {
-    if( NetworkFildes==-1 ) {	// No network running
+    if (NetworkFildes == -1) {	// No network running
 	return;
     }
 #ifdef DEBUG
     DebugLevel0("Received: %d packets, %d early, %d late, %d dups\n",
-	    NetworkReceivedPackets,NetworkReceivedEarly,NetworkReceivedLate,
+	    NetworkReceivedPackets, NetworkReceivedEarly, NetworkReceivedLate,
 	    NetworkReceivedDups);
     DebugLevel0("Send: %d packets, %d resend\n",
-	    NetworkSendPackets,NetworkSendResend);
+	    NetworkSendPackets, NetworkSendResend);
 #endif
     NetCloseUDP(NetworkFildes);
 
@@ -363,24 +363,24 @@ global void NetworkEvent(void)
     //
     //	Read the packet.
     //
-    if( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
+    if( (n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
 	//
 	//	Server or client gone?
 	//
 	DebugLevel0("Server/Client gone.\n");
 	Exit(0);
     }
-    packet=(NetworkPacket*)buf;
+    packet = (NetworkPacket *)buf;
     IfDebug( NetworkReceivedPackets++ );
 
-    if ( packet->Commands[0].Type <= MessageInitConfig ) {
+    if (packet->Commands[0].Type <= MessageInitConfig) {
 	NetworkParseSetupEvent(buf, n);
 	return;
     }
     //
     //	Minimal checks for good/correct packet.
     //
-    if ( n!=sizeof(NetworkPacket) && packet->Commands[0].Type != MessageQuit ) {
+    if (n != sizeof(NetworkPacket) && packet->Commands[0].Type != MessageQuit) {
 	DebugLevel0Fn("Bad packet\n");
 	return;
     }
@@ -389,11 +389,11 @@ global void NetworkEvent(void)
 	    break;
 	}
     }
-    if( i==HostsCount ) {
+    if (i == HostsCount) {
 	DebugLevel0Fn("Not a host in play\n");
 	return;
     }
-    player=Hosts[i].PlyNr;
+    player = Hosts[i].PlyNr;
 
     //
     //	Parse the packet commands.
@@ -424,7 +424,7 @@ global void NetworkEvent(void)
 	    // FIXME: not neccessary to send this packet multiple!!!!
 	    //	other side send re-send until its gets an answer.
 
-	    DebugLevel2Fn("Resend for %d got\n",n);
+	    DebugLevel2Fn("Resend for %d got\n", n);
 	    //
 	    //	Find the commands to resend
 	    //
@@ -452,7 +452,7 @@ global void NetworkEvent(void)
 		    break;
 		}
 
-		ncq =(NetworkCommandQueue *)(ncq->List->next);
+		ncq = (NetworkCommandQueue *)(ncq->List->next);
 	    }
 	    if (!ncq->List->next) {
 		DebugLevel3Fn("no packets for resend\n");
@@ -472,7 +472,7 @@ global void NetworkEvent(void)
 	    // FIXME: must support compressed sync slots.
 	}
 
-	if( NetworkIn[nc->Frame][player].Time != n ) {
+	if (NetworkIn[nc->Frame][player].Time != n) {
 	    DebugLevel3Fn("Command %3d for %8d(%02X) got\n",
 		    nc->Type, n, nc->Frame);
 	}
@@ -559,11 +559,11 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 
     switch (ncq->Data.Type) {
 	case MessageSync:
-	    ply=ntohs(ncq->Data.X)<<16;
-	    ply|=ntohs(ncq->Data.Y);
-	    if( ply!=NetworkSyncSeeds[FrameCounter&0xFF]
+	    ply = ntohs(ncq->Data.X) << 16;
+	    ply |= ntohs(ncq->Data.Y);
+	    if (ply != NetworkSyncSeeds[FrameCounter & 0xFF]
 		    || ntohs(ncq->Data.Unit)
-			!=NetworkSyncHashs[FrameCounter&0xFF] ) {
+			!= NetworkSyncHashs[FrameCounter & 0xFF]) {
 		DebugLevel0Fn("\n\aNetwork out of sync!\n\n");
 	    }
 	    return;
@@ -583,8 +583,8 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	    }
 	    break;
 	default:
-	    ParseCommand(ncq->Data.Type,ntohs(ncq->Data.Unit),
-		    ntohs(ncq->Data.X),ntohs(ncq->Data.Y),
+	    ParseCommand(ncq->Data.Type, ntohs(ncq->Data.Unit),
+		    ntohs(ncq->Data.X), ntohs(ncq->Data.Y),
 		    ntohs(ncq->Data.Dest));
 	    break;
     }
@@ -614,7 +614,7 @@ local void NetworkResendCommands(void)
     packet.Commands[0].Frame =
 	    (FrameCounter / NetworkUpdates) * NetworkUpdates + NetworkUpdates;
 
-    DebugLevel2Fn("In frame %d for frame %d(%x):",FrameCounter,
+    DebugLevel2Fn("In frame %d for frame %d(%x):", FrameCounter,
 	    (FrameCounter / NetworkUpdates) * NetworkUpdates + NetworkUpdates,
 	    packet.Commands[0].Frame);
 
@@ -659,7 +659,7 @@ local void NetworkSendCommands(void)
 	IfDebug(
 	if (ncq->Data.Type != MessageChat && ncq->Data.Type != MessageChatTerm) {
 	    // FIXME: we can send destoyed units over network :(
-	    if( UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed ) {
+	    if (UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed) {
 		DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n",
 			ntohs(ncq->Data.Unit));
 	    }
@@ -678,8 +678,8 @@ local void NetworkSendCommands(void)
 
     NetworkSendPacket(ncq);
 
-    NetworkSyncSeeds[ncq->Time&0xFF]=SyncRandSeed;
-    NetworkSyncHashs[ncq->Time&0xFF]=SyncHash&0xFFFF;	// FIXME: 32bit later
+    NetworkSyncSeeds[ncq->Time & 0xFF] = SyncRandSeed;
+    NetworkSyncHashs[ncq->Time & 0xFF] = SyncHash & 0xFFFF;	// FIXME: 32bit later
 }
 
 /**
@@ -729,7 +729,7 @@ local void NetworkExecCommands(void)
 	    ncq = &NetworkIn[FrameCounter & 0xFF][i];
 	    if (ncq->Time) {
 		DebugLevel3Fn("execute net %d,%d(%x),%d\n",
-			FrameCounter,i,FrameCounter&0xFF, ncq->Time);
+			FrameCounter, i, FrameCounter & 0xFF, ncq->Time);
 		if (ncq->Time != FrameCounter) {
 		    DebugLevel2Fn("frame %d idx %d time %d\n",
 			    FrameCounter, FrameCounter & 0xFF, ncq->Time);
