@@ -46,7 +46,7 @@
 #include "map.h"
 #include "menus.h"
 #include "font.h"
-#include "etlib/hash.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

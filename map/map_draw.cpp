@@ -47,7 +47,6 @@
 #include "pathfinder.h"
 #include "ui.h"
 
-#include "etlib/dllist.h"
 #if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
 #endif

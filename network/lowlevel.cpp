@@ -46,7 +46,6 @@
 
 #include "stratagus.h"
 #include "net_lowlevel.h"
-#include "etlib/dllist.h"
 #include "network.h"
 
 //----------------------------------------------------------------------------
