@@ -22,29 +22,22 @@
 ############################################################################
 
 # Uncomment next to get guile with gtk (and choose your gtklib version)
+# NO LONGER SUPPORTED
 
 #GUILEGTK	= -DGUILE_GTK $(shell gtk-config --cflags)
 #GUILEGTK	= -DGUILE_GTK -I/usr/X11R6/include -I/usr/lib/glib/include
-#GUILEGTKLIB	= -lguilegtk-1.0 $(shell gtk-config --libs)
 #GUILEGTKLIB	= -lguilegtk-1.2 $(shell gtk-config --libs)
-#GUILEGTKLIB	= -L/opt/gnome/lib -lguilegtk-1.1 \
-			$(shell /opt/gnome/bin/gtk-config --libs)
 
 #------------------------------------------------------------------------------
 
 # Uncomment next for a version with guile (GNU scheme interpreter)
 #	(and choose your guile version)
-
-# guile 1.2	old version
-# 	If you have unreferenced "gh_vector_ref" define LIBGUILE12
-#GUILE		= -DLIBGUILE12 -DUSE_CCL $(GUILEGTK)
-#GUILELIB	= $(GUILEGTKLIB) -lguile -ldl
+# NO LONGER SUPPORTED
 
 # guile 1.3	latest version
 #	-lreadline -lncurses are needed with the distribution SuSe 5.3
 #GUILE_CFLAGS	= $(shell guile-config compile)
 #GUILE		= -DUSE_CCL $(GUILEGTK) $(GUILE_CFLAGS)
-#GUILELIB	= $(GUILEGTKLIB) -lguile -lqthreads -ldl -lm
 #GUILELIB	= $(GUILEGTKLIB) $(shell guile-config link) -lreadline -lncurses
 #GUILELIB	= $(GUILEGTKLIB) $(shell guile-config link)
 
@@ -71,10 +64,6 @@ CCLLIB	= -lm
 #------------------------------------------------------------------------------
 
 # Choose correct version of glib (needed for gtk)
-
-# Where do you have installed your glib?
-#GLIB		=	-DUSE_GLIB -I/usr/lib/glib/include/
-#GLIBLIB 	=	-lglib
 
 # Should work with >= 1.2
 #GLIB_CFLAGS	=	$(shell glib-config glib --cflags)
@@ -109,14 +98,14 @@ SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
 # Uncomment the next for the SDL X11/SVGALIB support.
 
 #VIDEO		= $(SDL)
-#VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm
+#VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm -lslang -lgpm
 
 # Choose next to get svgalib support.
 
 #VIDEO		= -DUSE_SVGALIB
 #VIDEOLIB	= -lvga -lm -ldl
 
-# Uncomment the next for the win32/cygwin support.
+# Uncomment the next for the win32/cygwin support. (not working?)
 
 #VIDEO		= -DUSE_WIN32 $(SDL)
 #VIDEOLIB	= $(SDLLIB)
@@ -215,11 +204,11 @@ DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG) -DUNIT_ON_MAP #-DNEW_ORDERS -DNEW_MAPDRAW -DNEW_NAMES -DNEW_FOW -DNEW_AI
 
 ## choose optimise level
-#CFLAGS=-g -O0 $(PROFILE) -pipe -Wall -Werror $(IFLAGS) $(DFLAGS)
-#CFLAGS=-g -O1 $(PROFILE) -pipe -Wall -Werror $(IFLAGS) $(DFLAGS)
-#CFLAGS=-g -O2 $(PROFILE) -pipe -Wall -Werror $(IFLAGS)  $(DFLAGS)
-#CFLAGS=-g -O3 $(PROFILE) -pipe -Wall -Werror $(IFLAGS)  $(DFLAGS)
-#CFLAGS=-g -O3 $(PROFILE) -pipe -Wall $(IFLAGS)  $(DFLAGS)
+#CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
+#CFLAGS=-g -O1 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
+#CFLAGS=-g -O2 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS)  $(DFLAGS)
+#CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS)  $(DFLAGS)
+#CFLAGS=-g -O3 $(PROFILE) -pipe -Wcast-align -Wall $(IFLAGS)  $(DFLAGS)
 #CFLAGS=-g -O6 -pipe -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
 #-- Production
 CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
