@@ -5200,10 +5200,10 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = TheMap.Info.PlayerSide[i];
 		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info.PlayerType[i]];
-		PlayerSetAiToMenu(TheMap.Info.PlayerAi[i], &menu->Items[AI_POSITION + i].D.Pulldown);
-		sprintf(gold[i], "%d~!_", TheMap.Info.PlayerResources[i][GoldCost]);
-		sprintf(lumber[i], "%d~!_", TheMap.Info.PlayerResources[i][WoodCost]);
-		sprintf(oil[i], "%d~!_", TheMap.Info.PlayerResources[i][OilCost]);
+		PlayerSetAiToMenu(Players[i].AiName, &menu->Items[AI_POSITION + i].D.Pulldown);
+		sprintf(gold[i], "%d~!_", Players[i].Resources[GoldCost]);
+		sprintf(lumber[i], "%d~!_", Players[i].Resources[WoodCost]);
+		sprintf(oil[i], "%d~!_", Players[i].Resources[OilCost]);
 		menu->Items[GOLD_POSITION + i].D.Input.buffer = gold[i];
 		menu->Items[GOLD_POSITION + i].D.Input.nch = strlen(gold[i]) - 3;
 		menu->Items[GOLD_POSITION + i].D.Input.maxch = 7;
@@ -5220,11 +5220,11 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		TheMap.Info.PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
 		TheMap.Info.PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
-		strcpy(TheMap.Info.PlayerAi[i], 
+		strcpy(Players[i].AiName, 
 			PlayerGetAiFromMenu(&menu->Items[AI_POSITION + i].D.Pulldown));
-		TheMap.Info.PlayerResources[i][GoldCost] = atoi(gold[i]);
-		TheMap.Info.PlayerResources[i][WoodCost] = atoi(lumber[i]);
-		TheMap.Info.PlayerResources[i][OilCost] = atoi(oil[i]);
+		Players[i].Resources[GoldCost] = atoi(gold[i]);
+		Players[i].Resources[WoodCost] = atoi(lumber[i]);
+		Players[i].Resources[OilCost] = atoi(oil[i]);
 	}
 }
 

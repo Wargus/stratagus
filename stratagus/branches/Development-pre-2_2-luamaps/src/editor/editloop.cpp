@@ -1825,8 +1825,6 @@ static void CreateEditor(void)
 			strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
 		InitPlayers();
 		for (i = 0; i < PlayerMax; ++i) {
-			int j;
-
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
 				TheMap.Info.PlayerType[i] = PlayerNeutral;
@@ -1834,9 +1832,6 @@ static void CreateEditor(void)
 			} else {
 				CreatePlayer(PlayerNobody);
 				TheMap.Info.PlayerType[i] = PlayerNobody;
-			}
-			for (j = 1; j < MaxCosts; ++j) {
-				TheMap.Info.PlayerResources[i][j] = Players[i].Resources[j];
 			}
 		}
 
@@ -1877,23 +1872,20 @@ static void CreateEditor(void)
 			DebugPrint("Player nobody has a start position\n");
 		}
 	}
-#if 0
+
+	//MAPTODO
 	if (!EditorUnitTypes) {
 		//
 		// Build editor unit-type tables.
 		//
-		i = 0;
-		while (UnitTypeWcNames[i]) {
-			++i;
+		
+		EditorUnitTypes = malloc(sizeof(char*) * NumUnits);
+		for (i = 0; i < NumUnits + 1; ++i) {
+			//EditorUnitTypes[i] = UnitTypeWcNames[i];
 		}
-		n = i + 1;
-		EditorUnitTypes = malloc(sizeof(char*) * n);
-		for (i = 0; i < n; ++i) {
-			EditorUnitTypes[i] = UnitTypeWcNames[i];
-		}
-		MaxUnitIndex = n - 1;
+		MaxUnitIndex = NumUnits;
 	}
-	#endif
+
 	CalculateMaxIconSize();
 	ShowUnitsToSelect = 1; // Show all units as default
 	ShowBuildingsToSelect = 1;

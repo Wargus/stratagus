@@ -192,17 +192,17 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 		gzprintf(f, "SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
 		gzprintf(f, "SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[WoodCost], 
-				TheMap.Info.PlayerResources[i][WoodCost]);
+				Players[i].Resources[WoodCost]);
 		gzprintf(f, "SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[GoldCost], 
-				TheMap.Info.PlayerResources[i][GoldCost]);
+				Players[i].Resources[GoldCost]);
 		gzprintf(f, "SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[OilCost], 
-				TheMap.Info.PlayerResources[i][OilCost]);
+				Players[i].Resources[OilCost]);
 		gzprintf(f, "SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 				i, PlayerRaces.Name[Players[i].Race]);
 		gzprintf(f, "SetAiType(%d, \"%s\")\n",
-				i, TheMap.Info.PlayerAi[i]);
+				i, Players[i].AiName);
 	}
 	gzprintf(f, "\n");
 
