@@ -279,17 +279,17 @@ local void SpellDeathCoilController(Missile * missile)
 				// disperse damage between them
 				//NOTE: 1 is the minimal damage
 				if (table[i]->HP <= 50 / ec ) {
-				    source->Player->Score+=
+				    source->Player->Score +=
 					    table[i]->Type->Points;
-				    if( missile->TargetUnit->Type->Building ) {
+				    if( table[i]->Type->Building ) {
 					source->Player->TotalRazings++;
 				    } else {
 					source->Player->TotalKills++;
 				    }
 #ifdef USE_HP_FOR_XP
-				    source->XP+=table[i]->HP;
+				    source->XP += table[i]->HP;
 #else
-				    source->XP+=table[i]->Type->Points;
+				    source->XP += table[i]->Type->Points;
 #endif
 				    ++source->Kills;
 				    table[i]->HP = 0;
