@@ -2601,15 +2601,23 @@ local void JoinNetGameMenu(void)
 {
     char ServerHostBuf[32];
 
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
+
     EnterServerIPMenuItems[1].d.input.buffer = ServerHostBuf;
     strcpy(ServerHostBuf, "~!_");
     EnterServerIPMenuItems[1].d.input.nch = strlen(ServerHostBuf) - 3;
     EnterServerIPMenuItems[1].d.input.maxch = 24;
     EnterServerIPMenuItems[2].flags |= MenuButtonDisabled;
+
     ProcessMenu(MENU_NET_ENTER_SERVER_IP, 1);
+
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
+
     if (EnterServerIPMenuItems[1].d.input.nch == 0) {
 	return;
     }
@@ -2618,7 +2626,9 @@ local void JoinNetGameMenu(void)
     if (NetworkSetupServerAddress(ServerHostBuf, NetworkServerText) != 0) {
 	NetErrorMenuItems[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu(MENU_NET_ERROR, 1);
+	VideoLockScreen();
 	StartMenusSetBackground(NULL);
+	VideoUnlockScreen();
 	return;
     }
     NetworkInitClientConnect();
@@ -2629,7 +2639,9 @@ local void JoinNetGameMenu(void)
 
 local void NetConnectingCancel(void)
 {
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     NetworkExitClientConnect();
     NetLocalState = ccs_unreachable;	// Trigger TerminateNetConnect() to call us again and end the menu
     EndMenu();
@@ -2667,16 +2679,24 @@ local void MultiPlayerGameMenu(void)
 {
     char NameBuf[32];
 
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     Invalidate();
+
     EnterNameMenuItems[1].d.input.buffer = NameBuf;
     strcpy(NameBuf, NetworkName);
     strcat(NameBuf, "~!_");
     EnterNameMenuItems[1].d.input.nch = strlen(NameBuf) - 3;
     EnterNameMenuItems[1].d.input.maxch = 15;
     EnterNameMenuItems[2].flags &= ~MenuButtonDisabled;
+
     ProcessMenu(MENU_ENTER_NAME, 1);
+
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
+
     if (EnterNameMenuItems[1].d.input.nch == 0) {
 	return;
     }
