@@ -172,9 +172,6 @@ local void VideoDrawChar(const Graphic* sprite,
     SDL_SetColors(sprite->Surface, FontColor->Color, 0, NumFontColors);
 
     SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
-
-    SDL_UpdateRect(TheScreen, x, y, w, h);
-    InvalidateArea(x, y, w, h);
 }
 
 #else
