@@ -173,6 +173,7 @@ global void HandleActionBuild(Unit* unit)
 	// Release Temporary Building
         UnitClearOrders(unit->Orders[0].Goal);
         ReleaseUnit(unit->Orders[0].Goal);
+	unit->Orders[0].Goal=0;
 	unit->SubAction=0;
 	if( unit->Selected ) {	// update display for new action
 	    SelectedUnitChanged();

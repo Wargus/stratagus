@@ -591,8 +591,11 @@ struct _unit_ {
 	ConstructionFrame* Frame;	/// Construction frame
     }		Builded;		/// ActionBuilded,...
     struct _order_resource_ {
-	int	Active;			/// how much units are in the resource
+	int	Active;			/// how many units are harvesting from the resource.
     }		Resource;		/// Resource still
+    struct _order_resource_worker_ {
+	int	TimeToHarvest;		/// how much time until we harvest some more.
+    }		ResWorker;		/// Worker harvesting
     struct _order_research_ {
 	Upgrade* Upgrade;		/// Upgrade researched
     }		Research;		/// Research action
@@ -933,6 +936,8 @@ extern void DrawUnit(const Unit* unit);
 extern void DrawBuilding(const Unit* unit);
     /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const Viewport* vp, Unit** table);
+    /// Show an unit's orders.
+extern void ShowOrder(const Unit* unit);
 
 //	in unit_find.c
     /// Select units in rectangle range

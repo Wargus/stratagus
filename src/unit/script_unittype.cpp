@@ -404,6 +404,11 @@ local SCM CclDefineUnitType(SCM list)
 	    type->Coward=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("harvester")) ) {
 	    type->Harvester=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("harvest-from-outside")) ) {
+	    type->HarvestFromOutside=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("resource-step")) ) {
+	    type->ResourceStep=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("resource-harvested")) ) {
 	    type->ResourceHarvested=CclGetResourceByName(gh_car(list));
 	    list=gh_cdr(list);

@@ -320,6 +320,11 @@
 **
 **		Unit is a resource worker.
 **
+**	UnitType::HarvestFromOutside
+**
+**		Unit will harvest from the outside. The unit will use it's
+**		Attack animation (seems it turned into a generic Action anim.)
+**
 **      UnitType::ResourceHarvested
 **
 **		The resource it can harvest. Needs Harvester flag. An unit
@@ -390,11 +395,14 @@
 **
 **	UnitType::CanAttack
 **
-**		FIXME: docu
+**		Unit is able to attack.
 **
 **	UnitType::CanRepair
 **
-**		Unit can repair buildings.
+**		Unit can repair buildings. It will use the actack animation.
+**		It will heal 4 points for every repair cycle, and cost 1 of
+**		each resource, alternatively(1 cycle wood, 1 cycle gold)
+**		FIXME: The above should be more configurable.
 **
 **	UnitType::BuilderOutside
 **
@@ -417,6 +425,7 @@
 **	UnitType::Hero
 **
 **		FIXME:	Unit is a hero. Where is this used?
+**		FIXME:  I don't think w*rcr*ft 2 exp heroes have this flag.
 **		In st*rcr*ft heroes seem to be imune to spawn broodlings,
 **		maybe we could use it in the same way. Spawn broodlings is
 **		an instant kill for many units.
@@ -449,7 +458,7 @@
 **
 **	UnitType::Supply
 **
-**		Food supply
+**		How much food does this unit supply.
 **
 **	UnitType::Demand
 **
@@ -482,6 +491,7 @@
 **	UnitType::Property
 **
 **		CCL property storage
+**		FIXME: how is this used at runtime?
 **
 **	UnitType::Sprite
 **
@@ -670,6 +680,7 @@ struct _unit_type_ {
     unsigned MaxWorkers;		/// Maximum number of workers.
     unsigned CanHarvest : 1;		/// Resource can be harvested.
     unsigned Harvester : 1;		/// Unit is a resource worker.
+    unsigned HarvestFromOutside;	/// Unit harvests without entering the building.
     unsigned ResourceHarvested;		/// The resource it can harvest.
     unsigned WaitAtResource;		/// Cycles the unit waits while mining.
     unsigned ResourceStep;		/// Resources the unit gains per mining cycle.
