@@ -714,10 +714,15 @@ global void ShowCredits(Credits* credits)
 	VideoFree(background);
     }
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+    DestroyCursorBackground();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
     DestroyCursorBackground();
+#endif
 
     VideoSyncSpeed = old_video_sync;
     SetVideoSync();
@@ -814,6 +819,14 @@ global void ShowPicture(CampaignChapter* chapter)
     i = 0;
     max = chapter->Data.Picture.FadeIn;
     while (IntroNoEvent && i < max) {
+#ifdef USE_SDL_SURFACE
+	VideoDrawSubClipFaded(background, 0, 0,
+	    background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2,
+	    (VideoHeight - background->Height) / 2,
+	    255 - (255 * i / max));
+	PictureDrawText(chapter, lines);
+#else
 	VideoLockScreen();
 	VideoDrawSubClipFaded(background, 0, 0,
 	    background->Width, background->Height,
@@ -822,6 +835,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	    255 * i / max);
 	PictureDrawText(chapter, lines);
 	VideoUnlockScreen();
+#endif
 
 	Invalidate();
 	RealizeVideoMemory();
@@ -837,6 +851,13 @@ global void ShowPicture(CampaignChapter* chapter)
     j = 0;
     max = chapter->Data.Picture.DisplayTime;
     while (IntroNoEvent && j < max) {
+#ifdef USE_SDL_SURFACE
+	VideoDrawSubClip(background, 0, 0,
+	    background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2,
+	    (VideoHeight - background->Height) / 2);
+	PictureDrawText(chapter, lines);
+#else
 	VideoLockScreen();
 	VideoDrawSubClip(background, 0, 0,
 	    background->Width, background->Height,
@@ -844,6 +865,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	    (VideoHeight - background->Height) / 2);
 	PictureDrawText(chapter, lines);
 	VideoUnlockScreen();
+#endif
 
 	Invalidate();
 	RealizeVideoMemory();
@@ -857,6 +879,14 @@ global void ShowPicture(CampaignChapter* chapter)
     //
     max = chapter->Data.Picture.FadeOut;
     while (i >= 0) {
+#ifdef USE_SDL_SURFACE
+	VideoDrawSubClipFaded(background, 0, 0,
+	    background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2,
+	    (VideoHeight - background->Height) / 2,
+	    255 - (255 * i / max));
+	PictureDrawText(chapter, lines);
+#else
 	VideoLockScreen();
 	VideoDrawSubClipFaded(background, 0, 0,
 	    background->Width, background->Height,
@@ -865,6 +895,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	    255 * i / max);
 	PictureDrawText(chapter, lines);
 	VideoUnlockScreen();
+#endif
 
 	Invalidate();
 	RealizeVideoMemory();
@@ -884,9 +915,13 @@ global void ShowPicture(CampaignChapter* chapter)
 	lines = ptr;
     }
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 
     VideoSyncSpeed = old_video_sync;
     SetVideoSync();
@@ -1322,13 +1357,17 @@ global void ShowStats(void)
 #endif
     }
 
+#ifndef USE_SDL_SURFACE
     VideoLockScreen();
+#endif
     VideoClearScreen();
     if (background) {
 	VideoDrawSubClip(background, 0, 0, background->Width, background->Height,
 	    (VideoWidth - background->Width) / 2, (VideoHeight - background->Height) / 2);
     }
+#ifndef USE_SDL_SURFACE
     VideoUnlockScreen();
+#endif
 
     UseContinueButton = 1;
     InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
@@ -1340,7 +1379,9 @@ global void ShowStats(void)
     IntroNoEvent = 1;
     IntroButtonPressed = 0;
     while (1) {
+#ifndef USE_SDL_SURFACE
 	VideoLockScreen();
+#endif
 	HideAnyCursor();
 #ifdef USE_OPENGL
 	if (background) {
@@ -1355,7 +1396,9 @@ global void ShowStats(void)
 #endif
 	DrawContinueButton();
 	DrawAnyCursor();
+#ifndef USE_SDL_SURFACE
 	VideoUnlockScreen();
+#endif
 
 	Invalidate();
 	RealizeVideoMemory();
