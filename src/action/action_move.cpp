@@ -86,7 +86,7 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 
 		switch (d = NextPathElement(unit, &xd, &yd)) {
 			case PF_UNREACHABLE: // Can't reach, stop
-					if (unit->Player->AiEnabled) {
+				if (unit->Player->AiEnabled) {
 					AiCanNotMove(unit);
 				}
 
