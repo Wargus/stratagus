@@ -257,6 +257,63 @@ global void DrawSelectionRectangleWithTrans(const Unit* unit
 }
 
 /**
+**	Draw selected corners around the unit.
+**
+**	@param unit	Pointer to the unit.
+**	@param type	Type of the unit.
+**	@param x	Screen X position of the unit.
+**	@param y	Screen Y position of the unit.
+*/
+global void DrawSelectionCorners(const Unit* unit,const UnitType* type
+	,int x,int y)
+{
+    int color;
+
+    //
+    //	Select color for the rectangle
+    //
+    if( (color=SelectionColor(unit,type))<0 ) {
+	return;
+    }
+
+    VideoDrawVLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+	    ,4);
+    VideoDrawHLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+	    ,3);
+
+    VideoDrawVLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+	    ,4);
+    VideoDrawHLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth-3
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2
+	    ,3);
+
+    VideoDrawVLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight-3
+	    ,4);
+    VideoDrawHLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight
+	    ,3);
+
+    VideoDrawVLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight-3
+	    ,4);
+    VideoDrawHLineClip(color
+	    ,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+type->BoxWidth-3
+	    ,y+(type->TileHeight*TileSizeY-type->BoxHeight)/2+type->BoxHeight
+	    ,3);
+}
+
+/**
 **	Decoration: health, mana.
 */
 typedef struct _decoration_ {
