@@ -604,16 +604,16 @@ local SCM CclSetTitleScreens(SCM list)
 								labelvalue = gh_cdr(labelvalue);
 								poslist = gh_car(labelvalue);
 								labelvalue = gh_cdr(labelvalue);
-								TitleScreens[i]->Labels[j]->xofs = gh_scm2int(gh_car(poslist));
+								TitleScreens[i]->Labels[j]->Xofs = gh_scm2int(gh_car(poslist));
 								poslist = gh_cdr(poslist);
-								TitleScreens[i]->Labels[j]->yofs = gh_scm2int(gh_car(poslist));
+								TitleScreens[i]->Labels[j]->Yofs = gh_scm2int(gh_car(poslist));
 							} else if (gh_eq_p(gh_car(labelvalue), gh_symbol2scm("flags"))) {
 								labelvalue = gh_cdr(labelvalue);
 								flagslist = gh_car(labelvalue);
 								labelvalue = gh_cdr(labelvalue);
 								while (!gh_null_p(flagslist)) {
 									if (gh_eq_p(gh_car(flagslist), gh_symbol2scm("center"))) {
-										TitleScreens[i]->Labels[j]->flags |= TitleFlagCenter;
+										TitleScreens[i]->Labels[j]->Flags |= TitleFlagCenter;
 										flagslist = gh_cdr(flagslist);
 									} else {
 										s1 = gh_scm2newstr(gh_car(flagslist), NULL);
