@@ -774,7 +774,6 @@ global void GameMainLoop(void)
 	EnableDrawRefresh();
 	GameCursor = TheUI.Point.Cursor;
 	GameRunning = 1;
-	SaveGameLoading = 0;
 
 	showtip = 0;
 	RealVideoSyncSpeed = VideoSyncSpeed;
@@ -788,6 +787,9 @@ global void GameMainLoop(void)
 
 	while (GameRunning) {
 
+		// Can't find a better place.
+		// TODO: rewrite this mainloop junk. And menu system. MY BRAIN HURTS!!!
+		SaveGameLoading = 0;
 #if defined(DEBUG)
 		if (setjmp(MainLoopJmpBuf)) {
 			GamePaused = 1;
