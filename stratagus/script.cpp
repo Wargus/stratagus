@@ -1183,7 +1183,6 @@ local int ScriptStratagusGetValue(lua_State* l)
 
 	key = LuaToString(l, -1);
 	DebugCheck(!key);
-	DebugLevel0Fn("(%s)\n" _C_ key);
 
 	META_GET_STRING("LibraryPath", StratagusLibPath);
 	META_GET_INT("GameCycle", GameCycle);
@@ -1206,7 +1205,6 @@ local int ScriptStratagusSetValue(lua_State* l)
 	DebugCheck(lua_gettop(l) != 3);
 	key = LuaToString(l, -2);
 	DebugCheck(!key);
-	DebugLevel0Fn("(%s)\n" _C_ key);
 
 	// Here start the fields.
 	// Sorry, none yet.
