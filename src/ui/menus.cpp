@@ -7368,6 +7368,8 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	    menu->Items[j + 1].d.text.text = NULL;
 	    menu->Items[j + 2].d.text.text = NULL;
 	    menu->Items[j + 3].d.text.text = NULL;
+	    menu->Items[j + 4].d.text.text = NULL;
+	    menu->Items[j + 5].d.gem.state = MI_GSTATE_INVISIBLE;
 	} else {
 	    GetMetaParameter(reply, 0, &parameter);  // Player Name
 	    menu->Items[j].d.text.text = parameter;
@@ -7381,8 +7383,21 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	    menu->Items[j + 3].d.text.text = parameter;
 	    GetMetaParameter(reply, 8, &parameter);
 	    menu->Items[j + 4].d.text.text = parameter;
+	    menu->Items[j + 5].d.gem.state = MI_GSTATE_UNCHECKED;
 	}
 	++k;
+    }
+
+    // Don't display slots not in use
+    //FIXME: HardCoded Number of Items in list
+    for (; j <= 5 * (numparams + 1); j += numparams + 1) {
+	// fill the menus with the right info.
+	menu->Items[j].d.text.text = NULL;
+	menu->Items[j + 1].d.text.text = NULL;
+	menu->Items[j + 2].d.text.text = NULL;
+	menu->Items[j + 3].d.text.text = NULL;
+	menu->Items[j + 4].d.text.text = NULL;
+	menu->Items[j + 5].d.gem.state = MI_GSTATE_INVISIBLE;
     }
 }
 
