@@ -1131,6 +1131,8 @@ local int AiReduceMadeInBuilded2(const PlayerAi * pai, const UnitType * type)
 local void AiReduceMadeInBuilded(const PlayerAi * pai, const UnitType * type)
 {
     int i;
+    int equivs[UnitTypeMax + 1];
+    int equivnb;
 
     if (AiReduceMadeInBuilded2(pai, type)) {
 	return;
@@ -1138,12 +1140,11 @@ local void AiReduceMadeInBuilded(const PlayerAi * pai, const UnitType * type)
     //
     //  This could happen if an upgrade is ready, look for equivalent units.
     //
-    if (type->Type < AiHelpers.EquivCount && AiHelpers.Equiv[type->Type]) {
-	DebugLevel2Fn("Equivalence for %s\n" _C_ type->Ident);
-	for (i = 0; i < AiHelpers.Equiv[type->Type]->Count; ++i) {
-	    if (AiReduceMadeInBuilded2(pai, AiHelpers.Equiv[type->Type]->Table[i])) {
-		return;
-	    }
+    equivnb = AiFindUnitTypeEquiv(type, equivs);
+
+    for (i = 0; i < AiHelpers.Equiv[type->Type]->Count; ++i) {
+	if (AiReduceMadeInBuilded2(pai, UnitTypes[equivs[i]])) {
+	    return;
 	}
     }
 
