@@ -122,21 +122,6 @@ AC_SUBST(BZ2_CFLAGS)
 AC_SUBST(BZ2_LIBS)
 dnl ----------------------------
 
-dnl --- CHECK FOR ZZIPLIB ------
-AC_ARG_WITH(zziplib,
-    [  --with-zziplib	  [Use zziplib (default: no)]],, with_zziplib="yes")
-if test "$ZZIPLIB" != "yes"; then
-    ZZIPLIB_CFLAGS=""
-    ZZIPLIB_LIBS=""
-else
-    ZZIPLIB_CFLAGS="-DUSE_ZZIPLIB"
-    ZZIPLIB_LIBS="-lzzip"
-fi
-AC_SUBST(ZZIPLIB_CFLAGS)
-AC_SUBST(ZZIPLIB_LIBS)
-dnl ----------------------------
-
-
 dnl --- CHECK FOR OGG VORBIS ---
 AC_ARG_WITH(ogg, 
     [  --with-ogg		  [Use ogg (default: autodetect)]], OGG="$with_ogg")
