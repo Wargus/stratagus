@@ -234,7 +234,7 @@ extern SCM CclUnits(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global char* TitleScreen;		/// Titlescreen to show at startup
+global char** TitleScreen;		/// Titlescreen to show at startup
 global char* MenuBackground;		/// File for menu background
 global char* MenuBackgroundWithTitle;	/// File for menu with title
 global char* TitleMusic;		/// File for title music
@@ -451,7 +451,15 @@ local int WaitMouseY;			/// Mouse Y position
 local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 {
     DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
-    WaitNoEvent=0;
+    WaitNoEvent = 0;
+}
+
+/**
+**	Callback for input.
+*/
+local void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
+{
+    DebugLevel3Fn("Released %8x %8x\n" _C_ MouseButtons _C_ dummy);
 }
 
 /**
@@ -461,7 +469,7 @@ local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
     unsigned dummy2 __attribute__((unused)))
 {
     DebugLevel3Fn("Pressed %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
-    WaitNoEvent=0;
+    WaitNoEvent = 0;
 }
 
 /**
@@ -470,8 +478,17 @@ local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
     unsigned dummy2 __attribute__((unused)))
 {
+    DebugLevel3Fn("Released %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
+}
+
+/**
+**	Callback for input.
+*/
+local void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
+    unsigned dummy2 __attribute__((unused)))
+{
     DebugLevel3Fn("Repeated %8x %8x %8x\n" _C_ MouseButtons _C_ dummy1 _C_ dummy2);
-    WaitNoEvent=0;
+    WaitNoEvent = 0;
 }
 
 /**
@@ -856,7 +873,7 @@ local void VideoEffect0(int frame,
 }
 #endif
 
-#ifdef DEBUG
+#ifdef DEBUG_DRAWFONTS
 /**
 **	Draw the fonts, for screen shots.
 */
@@ -911,65 +928,52 @@ local void DebugDrawFonts(void)
 local void WaitForInput(int timeout)
 {
     EventCallback callbacks;
-#if defined(linux) && !defined(DEBUG)
-    char* s;
-    char ddate[72 + 1];
-    FILE* ddfile;
-#endif
 
     SetVideoSync();
 
     callbacks.ButtonPressed = WaitCallbackKey;
-    callbacks.ButtonReleased = WaitCallbackKey;
+    callbacks.ButtonReleased = WaitCallbackKey1;
     callbacks.MouseMoved = WaitCallbackMouse;
     callbacks.MouseExit = WaitCallbackExit;
     callbacks.KeyPressed = WaitCallbackKey2;
-    callbacks.KeyReleased = WaitCallbackKey2;
-    callbacks.KeyRepeated = WaitCallbackKey3;
+    callbacks.KeyReleased = WaitCallbackKey3;
+    callbacks.KeyRepeated = WaitCallbackKey4;
     callbacks.NetworkEvent = NetworkEvent;
     callbacks.SoundReady = WriteSound;
 
     //
     //	FIXME: more work needed, scrolling credits, animations, ...
-#ifdef DEBUG
     WaitNoEvent = 1;
+#ifdef DEBUG_DRAWFONTS
     while (WaitNoEvent) {
+	static int init = 0;
+	if (!init) {
+	    SetDefaultTextColors(FontYellow, FontWhite);
+	    LoadFonts();
+	    init = 1;
+	}
 	DebugDrawFonts();
 	WaitEventsOneFrame(&callbacks);
     }
 #else
-    VideoLockScreen();
-    VideoDrawTextCentered(VideoWidth / 2, 5, LargeFont, "Press SPACE to continue.");
-#ifdef linux
-    ddate[0] = '\0';
-    ddfile = popen("`which ddate`", "r");
-    fgets(ddate, 72, ddfile);
-    pclose(ddfile);
-    if ((s = strrchr(ddate, '\n'))) {
-	*s = '\0';
-    }
-    VideoDrawTextCentered(VideoWidth / 2, 20, LargeFont, ddate);
-#endif
-    VideoUnlockScreen();
-    Invalidate();
-    RealizeVideoMemory();
-
-    WaitNoEvent = 1;
     timeout *= CYCLES_PER_SECOND;
     while (timeout-- && WaitNoEvent) {
-	VideoEffect0(timeout, &callbacks);
+	// FIXME: make this configurable
+	if (0) {
+	    VideoEffect0(timeout, &callbacks);
+	}
 	WaitEventsOneFrame(&callbacks);
     }
-    VideoEffect0(-1, &callbacks);
+    if (0) {
+	VideoEffect0(-1, &callbacks);
+    }
 #endif
 
     VideoLockScreen();
-    VideoDrawTextCentered(VideoWidth / 2, 5, LargeFont,
-	"----------------------------");
+    VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
-
 }
 
 /**
@@ -1251,13 +1255,13 @@ Use it at your own risk.\n\n");
     //
     InitVideo();			// setup video display
 #ifdef WITH_SOUND
-    if (!SoundOff && InitSound()) {			// setup sound card
+    if (!SoundOff && InitSound()) {	// setup sound card
 	SoundOff = 1;
 	SoundFildes = -1;
     }
 #endif
 
-#ifndef DEBUG				// For debug its better not to have:
+#ifndef DEBUG				// For debug it's better not to have:
     srand(time(NULL));			// Random counter = random each start
 #endif
 
@@ -1266,22 +1270,21 @@ Use it at your own risk.\n\n");
     //
     //	Show title screen.
     //
-    i = 1;
     SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
     if (TitleScreen) {
-	if ((i = PlayMovie(TitleScreen,
-		PlayMovieZoomScreen | PlayMovieKeepAspect))) {
-	    DisplayPicture(TitleScreen);
-	    Invalidate();
+	for (i = 0; TitleScreen[i]; ++i) {
+	    if (PlayMovie(TitleScreen[i],
+		    PlayMovieZoomScreen | PlayMovieKeepAspect)) {
+		DisplayPicture(TitleScreen[i]);
+		Invalidate();
+		// FIXME: make the time configurable
+		WaitForInput(20);
+	    }
 	}
     }
 
     InitUnitsMemory();		// Units memory management
     PreMenuSetup();		// Load everything needed for menus
-
-    if (i) {
-	WaitForInput(20);	// Show game intro
-    }
 
     MenuLoop(MapName, &TheMap);	// Enter the menu loop
 
