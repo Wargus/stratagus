@@ -2187,7 +2187,6 @@ global void ProcessMenu(int MenuId, int Loop)
 	for( ; CurrentMenu != -1 ; ) {
 	    DebugLevel3("MustRedraw: 0x%08x\n",MustRedraw);
 	    UpdateDisplay();
-	    VideoInterrupts=0;
 	    RealizeVideoMemory();
 	    WaitEventsAndKeepSync();
 	}

@@ -33,7 +33,7 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-global PaletteLink *palette_list;	/// List of all used palettes.
+global PaletteLink *PaletteList;	/// List of all used palettes.
 
 /*----------------------------------------------------------------------------
 --	Externals
@@ -472,7 +472,7 @@ local long GetPaletteChecksum(const Palette* palette)
 */
 global Graphic* LoadGraphic(const char* name)
 {
-    PaletteLink * current_link = palette_list, * prev_link = NULL;
+    PaletteLink * current_link = PaletteList, * prev_link = NULL;
     VMemType * pixels;
     Graphic* graphic;
     long checksum;
@@ -498,10 +498,10 @@ global Graphic* LoadGraphic(const char* name)
 
       DebugLevel0("loading new palette with %s\n",name);
       if(prev_link == NULL){
-	palette_list = (PaletteLink *)malloc(sizeof(PaletteLink));
-	palette_list->Checksum = checksum;
-	palette_list->Next = NULL;
-	palette_list->Palette = pixels;
+	PaletteList = (PaletteLink *)malloc(sizeof(PaletteLink));
+	PaletteList->Checksum = checksum;
+	PaletteList->Next = NULL;
+	PaletteList->Palette = pixels;
       } else {
 	prev_link->Next = (PaletteLink *)malloc(sizeof(PaletteLink));
 	prev_link->Next->Checksum = checksum;

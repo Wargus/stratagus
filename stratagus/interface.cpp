@@ -420,27 +420,26 @@ local int InputKey(int key)
 **	Handle key down.
 **
 **	@param key	Key scancode.
-**	@return		True, if key is handled; otherwise false.
 */
-global int HandleKeyDown(int key)
+global void HandleKeyDown(unsigned key)
 {
     // Handle Modifier Keys
     switch( key ) {
 	case KeyCodeShift:
 	    KeyModifiers|=ModifierShift;
-	    return 1;
+	    return;
 	case KeyCodeControl:
 	    KeyModifiers|=ModifierControl;
-	    return 1;
+	    return;
 	case KeyCodeAlt:
 	    KeyModifiers|=ModifierAlt;
-	    return 1;
+	    return;
 	case KeyCodeSuper:
 	    KeyModifiers|=ModifierSuper;
-	    return 1;
+	    return;
 	case KeyCodeHyper:
 	    KeyModifiers|=ModifierHyper;
-	    return 1;
+	    return;
 	default:
 	    break;
     }
@@ -451,25 +450,26 @@ global int HandleKeyDown(int key)
 	    switch( KeyState ) {
 		case KeyStateCommand:
 		    if( DoButtonPanelKey(key) ) {
-			return 1;
+			return;
 		    }
-		    return CommandKey(key);
+		    CommandKey(key);
+		    return;
 		case KeyStateInput:
-		    return InputKey(key);
+		    InputKey(key);
+		    return;
 	    }
 	case IfaceStateMenu:			// Menu active
-	    return MenuKey(key);
+	    MenuKey(key);
+	    return;
     }
-    return 0;
 }
 
 /**
 **	Handle key up.
 **
 **	@param key	Key scancode.
-**	@return		True, if key is handles; otherwise false.
 */
-global int HandleKeyUp(int key)
+global void HandleKeyUp(unsigned key)
 {
     switch( key ) {
 	case KeyCodeShift:
@@ -507,7 +507,6 @@ global int HandleKeyUp(int key)
 	default:
 	    break;
     }
-    return 0;
 }
 
 /**
@@ -548,21 +547,16 @@ global void HandleMouseMove(int x,int y)
 /**
 **	Called if mouse button pressed down.
 **
-**	FIXME: the mouse handling should be complete rewritten
-**	FIXME: this is needed for double click, long click,...
-**
-**	@param b	Mouse button number (0 left, 1 middle, 2 right)
+**	@param button	Mouse button number (0 left, 1 middle, 2 right)
 */
-global void HandleButtonDown(int b)
+global void HandleButtonDown(unsigned button)
 {
-    MouseButtons|=1<<b;
-
     switch( InterfaceState ) {
 	case IfaceStateNormal:			// Normal Game state
-	    UIHandleButtonDown(b);
+	    UIHandleButtonDown(button);
 	    break;
 	case IfaceStateMenu:			// Menu active
-	    MenuHandleButtonDown(b);
+	    MenuHandleButtonDown(button);
 	    break;
     }
 }
@@ -573,19 +567,132 @@ global void HandleButtonDown(int b)
 **	FIXME: the mouse handling should be complete rewritten
 **	FIXME: this is needed for double click, long click,...
 **
-**	@param b	Mouse button number (0 left, 1 middle, 2 right)
+**	@param button	Mouse button number (0 left, 1 middle, 2 right)
 */
-global void HandleButtonUp(int b)
+global void HandleButtonUp(unsigned button)
 {
-    MouseButtons&=~(1<<b);
-
     switch( InterfaceState ) {
 	case IfaceStateNormal:			// Normal Game state
-	    UIHandleButtonUp(b);
+	    UIHandleButtonUp(button);
 	    break;
 	case IfaceStateMenu:			// Menu active
-	    MenuHandleButtonUp(b);
+	    MenuHandleButtonUp(button);
 	    break;
+    }
+}
+
+/*----------------------------------------------------------------------------
+--	Lowlevel input functions
+----------------------------------------------------------------------------*/
+
+global int DoubleClickDelay=250;	/// Time to detect double clicks.
+global int HoldClickDelay=1000;		/// Time to detect hold clicks.
+
+local enum {
+    InitialMouseState,			/// start state
+    ClickedMouseState,			/// button is clicked
+} 	MouseState;			/// Current state of mouse
+
+local int LastMouseButton;		/// last mouse button handled
+local int StartMouseTicks;		/// Ticks of first click
+local int LastMouseTicks;		/// Ticks of last mouse event 
+
+/**
+**	Called if any mouse button is pressed down
+**
+**	Handles event conversion to double click, dragging, hold. 
+**
+**	FIXME: dragging is not supported.
+**
+**	@param callbacks	Callback structure for events.
+**	@param button		Mouse button pressed.
+*/
+global void InputMouseButtonPress(const EventCallback* callbacks,
+	unsigned ticks,unsigned button)
+{ 
+    //
+    //	Button new pressed.
+    //
+    if( !(MouseButtons&(1<<button)) ) {
+	//
+	//	Detect double click
+	//
+	if( MouseState==ClickedMouseState
+		&& button==LastMouseButton
+		&& ticks<StartMouseTicks+DoubleClickDelay ) {
+	    MouseButtons|=(1<<button)<<MouseDoubleShift;
+	    MouseButtons|=1<<button;
+	    button|=button<<MouseDoubleShift;
+	} else {
+	    MouseState=InitialMouseState;
+	    StartMouseTicks=ticks;
+	    LastMouseButton=button;
+	    MouseButtons|=1<<button;
+	}
+    }
+    LastMouseTicks=ticks;
+
+    callbacks->ButtonPressed(button);
+}
+
+/**
+**	Called if any mouse button is released up
+**
+**	@param callbacks	Callback structure for events.
+**	@param button		Mouse button released.
+*/
+global void InputMouseButtonRelease(const EventCallback* callbacks,
+	unsigned ticks,unsigned button)
+{
+    //
+    //	Same button before pressed.
+    //
+    if( button==LastMouseButton && MouseState==InitialMouseState ) {
+	MouseState=ClickedMouseState;
+    } else {
+	LastMouseButton=0;
+	MouseState=InitialMouseState;
+    }
+    MouseButtons&=~(1<<button);
+    MouseButtons&=~(1<<button)<<MouseDoubleShift;
+    MouseButtons&=~(1<<button)<<MouseDragShift;
+    MouseButtons&=~(1<<button)<<MouseHoldShift;
+    LastMouseTicks=ticks;
+
+    callbacks->ButtonReleased(button);
+}
+
+/**
+**	Called if the mouse is moved
+**
+**	@param callbacks	Callback structure for events.
+**
+*/
+global void InputMouseMove(const EventCallback* callbacks,
+	unsigned ticks,int x,int y)
+{
+    MouseState=InitialMouseState;
+    LastMouseTicks=ticks;
+    callbacks->MouseMoved(x,y);
+}
+
+/**
+**	Called each frame to handle mouse time outs.
+**
+**	@param callbacks	Callback structure for events.
+*/
+global void InputMouseTimeout(const EventCallback* callbacks,unsigned ticks)
+{
+    if( MouseButtons&(1<<LastMouseButton) ) {
+	if( ticks>StartMouseTicks+DoubleClickDelay ) {
+	    MouseState=InitialMouseState;
+	}
+	if( ticks>LastMouseTicks+HoldClickDelay ) {
+	    LastMouseTicks=ticks;
+	    MouseButtons|=(1<<LastMouseButton)<<MouseHoldShift;
+	    callbacks->ButtonPressed(LastMouseButton|
+		    (LastMouseButton<<MouseHoldShift));
+	}
     }
 }
 

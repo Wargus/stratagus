@@ -217,18 +217,34 @@
 **
 **	Unit::OrderCount
 **
+**		The number of the orders unit to process. An unit has atleast
+**		one order. Unit::OrderCount should be a number between 1 and
+**		::MAX_ORDERS. The orders are in Unit::Orders[].
 **
 **	Unit::OrderFlush
 **
+**		A flag, which tells the unit to stop with the current order
+**		and immediately start with the next order.
 **
 **	Unit::Orders
 **
+**		Contains all orders of the unit. Slot 0 is always used.
+**		Up to ::MAX_ORDERS can be stored.
 **
 **	Unit::SavedOrder
 **
+**		This order is executed, if the current order is finished.
+**		This is used for attacking units, to return to the old
+**		place or for patrolling units to return to patrol after
+**		killing some enemies. Any new order given to the unit,
+**		clears this saved order.
 **
 **	Unit::NewOrder
 **
+**		This field is only used by buildings and this order is
+**		assigned to any by this building new trained unit.
+**		This is can be used to set the exit or gathering point of a
+**		building.
 **
 **	Unit::Data
 **

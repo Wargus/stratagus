@@ -810,6 +810,7 @@ global void NetworkCommands(void)
 global void NetworkRecover(void)
 {
     // Got no message just resent our oldest messages
+    // FIXME: must remove the use of VideoInterrupts!
     if (NetworkDelay < VideoInterrupts) {
 	NetworkDelay += NetworkUpdates;
 	if (!dl_empty(CommandsOut)) {
