@@ -324,7 +324,7 @@ local SCM CclDefineAi(SCM list)
 #ifdef DEBUG
     for( ait=AiTypes->Next; ait; ait=ait->Next ) {
 	if( !strcmp(aitype->Name,ait->Name) ) {
-	    DebugLevel0Fn("Warning two or more AI's with the same name '%s'\n",
+	    DebugLevel0Fn("Warning two or more AI's with the same name '%s'\n" _C_
 		    ait->Name);
 	}
     }

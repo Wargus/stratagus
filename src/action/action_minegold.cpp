@@ -182,9 +182,9 @@ local int MineInGoldmine(Unit* unit)
 	//
 	mine=GoldMineOnMap(unit->X,unit->Y);
 	IfDebug(
-	    DebugLevel3Fn("Found %d,%d=%d\n",unit->X,unit->Y,UnitNumber(mine));
+	    DebugLevel3Fn("Found %d,%d=%d\n" _C_ unit->X _C_ unit->Y _C_ UnitNumber(mine));
 	    if( !mine ) {
-		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
+		DebugLevel0Fn("No unit? (%d,%d)\n" _C_ unit->X _C_ unit->Y);
 		abort();
 	    } );
 

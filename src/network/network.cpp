@@ -445,11 +445,11 @@ global void InitNetwork1(void)
 	char buf[128];
 
 	gethostname(buf, sizeof(buf));
-	DebugLevel0Fn("%s\n", buf);
+	DebugLevel0Fn("%s\n" _C_ buf);
 	MyHost = NetResolveHost(buf);
 	MyPort = NetLastPort;
-	DebugLevel0Fn("My host:port %d.%d.%d.%d:%d\n",
-		NIPQUAD(ntohl(MyHost)), ntohs(MyPort));
+	DebugLevel0Fn("My host:port %d.%d.%d.%d:%d\n" _C_
+		NIPQUAD(ntohl(MyHost)) _C_ ntohs(MyPort));
     });
 
     dl_init(CommandsIn);
@@ -465,11 +465,11 @@ global void ExitNetwork1(void)
 	return;
     }
 #ifdef DEBUG
-    DebugLevel0("Received: %d packets, %d early, %d late, %d dups, %d lost.\n",
-	    NetworkReceivedPackets, NetworkReceivedEarly, NetworkReceivedLate,
-	    NetworkReceivedDups,NetworkReceivedLost);
-    DebugLevel0("Send: %d packets, %d resend\n",
-	    NetworkSendPackets, NetworkSendResend);
+    DebugLevel0("Received: %d packets, %d early, %d late, %d dups, %d lost.\n" _C_
+	    NetworkReceivedPackets _C_ NetworkReceivedEarly _C_ NetworkReceivedLate _C_
+	    NetworkReceivedDups _C_ NetworkReceivedLost);
+    DebugLevel0("Send: %d packets, %d resend\n" _C_
+	    NetworkSendPackets _C_ NetworkSendResend);
 #endif
     NetCloseUDP(NetworkFildes);
 
@@ -951,7 +951,7 @@ local void NetworkSendCommands(void)
 		&& ncq->Data.Type != MessageExtendedCommand) {
 	    // FIXME: we can send destoyed units over network :(
 	    if (UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed) {
-		DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n",
+		DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n" _C_
 			ntohs(ncq->Data.Unit));
 	    }
 	}

@@ -156,7 +156,7 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     // FIXME: not the fastest, remove UnitTypeByWcNum from loops!
     IfDebug(
 	if( length!=5694 && length!=5948 ) {
-	    DebugLevel0("\n"__FUNCTION__": ***\n"__FUNCTION__": %d\n",length);
+	    DebugLevel0("\n"__FUNCTION__": ***\n"__FUNCTION__": %d\n" _C_ length);
 	    DebugLevel0Fn("***\n\n");
 	}
     )
@@ -346,10 +346,10 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->Organic=BIT(27,v);
 
 #ifdef DEBUG
-	if( BIT(28,v) )	DebugLevel0("Unused bit 28 used in %d\n",i);
-	if( BIT(29,v) )	DebugLevel0("Unused bit 29 used in %d\n",i);
-	if( BIT(30,v) )	DebugLevel0("Unused bit 30 used in %d\n",i);
-	if( BIT(31,v) )	DebugLevel0("Unused bit 31 used in %d\n",i);
+	if( BIT(28,v) )	DebugLevel0("Unused bit 28 used in %d\n" _C_ i);
+	if( BIT(29,v) )	DebugLevel0("Unused bit 29 used in %d\n" _C_ i);
+	if( BIT(30,v) )	DebugLevel0("Unused bit 30 used in %d\n" _C_ i);
+	if( BIT(31,v) )	DebugLevel0("Unused bit 31 used in %d\n" _C_ i);
 #endif
 #undef BIT
     }
@@ -1194,7 +1194,7 @@ global UnitType* UnitTypeByIdent(const char* ident)
 
     IfDebug(
 	if( !NoWarningUnitType ) {
-	    DebugLevel0Fn("Name `%s' not found\n",ident);
+	    DebugLevel0Fn("Name `%s' not found\n" _C_ ident);
 	}
     );
 

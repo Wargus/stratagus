@@ -273,13 +273,13 @@ global void CreateGame(char* filename, WorldMap* map)
 
     IfDebug(
 	DebugLevel0("Graphics uses %d bytes (%d KB, %d MB)\n"
-		,AllocatedGraphicMemory
-		,AllocatedGraphicMemory/1024
-		,AllocatedGraphicMemory/1024/1024);
+		_C_ AllocatedGraphicMemory
+		_C_ AllocatedGraphicMemory/1024
+		_C_ AllocatedGraphicMemory/1024/1024);
 	DebugLevel0("Compressed graphics uses %d bytes (%d KB, %d MB)\n"
-		,CompressedGraphicMemory
-		,CompressedGraphicMemory/1024
-		,CompressedGraphicMemory/1024/1024);
+		_C_ CompressedGraphicMemory
+		_C_ CompressedGraphicMemory/1024
+		_C_ CompressedGraphicMemory/1024/1024);
     );
 
     CreateMinimap();			// create minimap for pud
@@ -302,13 +302,13 @@ global void CreateGame(char* filename, WorldMap* map)
 #ifdef WITH_SOUND
     IfDebug(
 	DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n"
-		,AllocatedSoundMemory
-		,AllocatedSoundMemory/1024
-		,AllocatedSoundMemory/1024/1024);
+		_C_ AllocatedSoundMemory
+		_C_ AllocatedSoundMemory/1024
+		_C_ AllocatedSoundMemory/1024/1024);
 	DebugLevel0("Compressed sounds uses %d bytes (%d KB, %d MB)\n"
-		,CompressedSoundMemory
-		,CompressedSoundMemory/1024
-		,CompressedSoundMemory/1024/1024);
+		_C_ CompressedSoundMemory
+		_C_ CompressedSoundMemory/1024
+		_C_ CompressedSoundMemory/1024/1024);
     );
 #endif
 

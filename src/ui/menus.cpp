@@ -2939,8 +2939,8 @@ local void CampaignGameMenu(void)
     DebugLevel0Fn("%d campaigns available\n" _C_ NumCampaigns);
     IfDebug(
 	for( i=0; i<NumCampaigns; ++i ) {
-	    DebugLevel0Fn("Campaign %d: %16.16s: %s\n",i,
-		Campaigns[i].Ident,
+	    DebugLevel0Fn("Campaign %d: %16.16s: %s\n" _C_ i _C_
+		Campaigns[i].Ident _C_
 		Campaigns[i].Name);
 	}
     );

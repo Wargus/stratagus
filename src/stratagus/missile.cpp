@@ -254,7 +254,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 
     IfDebug(
 	if( !NoWarningMissileType ) {
-	    DebugLevel0Fn("Missile %s not found\n",ident);
+	    DebugLevel0Fn("Missile %s not found\n" _C_ ident);
 	}
     );
     return NULL;
