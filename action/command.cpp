@@ -143,7 +143,7 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
+	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
     );
@@ -182,12 +182,12 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
+	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
 	// FIXME: dest until now not supported
 	if( dest ) {
-	    DebugLevel0(__FUNCTION__": not used %p\n",dest);
+	    DebugLevel0Fn("not used %p\n",dest);
 	}
     );
 
@@ -235,16 +235,16 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
+	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
 	if( unit->Type->Vanishes ) {
-	    DebugLevel0("Internal error\n");
+	    DebugLevel0Fn("Internal error\n");
 	    abort();
 	}
     );
 
-    DebugLevel3(__FUNCTION__": %Zd attacks %Zd\n"
+    DebugLevel3("%Zd attacks %Zd\n"
 	,UnitNumber(unit),attack ? UnitNumber(attack) : 0);
 
     if( unit->Type->Building ) {
@@ -291,7 +291,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
+	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
 	DebugCheck( unit->Type->Vanishes );
@@ -328,7 +328,7 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
+	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
     );
@@ -392,7 +392,7 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
+	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
     );
@@ -546,7 +546,7 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
-    DebugLevel0Fn("Mine gold refs %d\n",dest->Refs);
+    DebugLevel3Fn("Mine gold refs %d\n",dest->Refs);
 #if 1
     // FIXME: move to any point of gold mine.
     NearestOfUnit(dest,unit->X,unit->Y
@@ -753,7 +753,7 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
     unit->NextCount=1;
     unit->NextFlush=1;
 
-    DebugLevel0(__FUNCTION__": FIXME: must support command queing!!");
+    DebugLevel0Fn("FIXME: must support command queing!!");
     unit->NextCommand[0].Action=UnitActionResearch;
     unit->NextCommand[0].Data.Research.Ticks=0;
     unit->NextCommand[0].Data.Research.What=what;
@@ -795,7 +795,7 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	    DebugLevel0("Internal movement error\n");
+	    DebugLevel0Fn("Internal movement error\n");
 	    return;
 	}
     );
