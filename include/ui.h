@@ -205,6 +205,12 @@ typedef struct _ui_ {
 //    SoundConfig	PlacementSuccess;	/// played on placements success
 //    SoundConfig	Click;			/// click noice used often
 
+    GraphicConfig	GameMenuePanel;	/// Panel for in game menue
+    GraphicConfig	Menue1Panel;	/// Panel for menue (unused)
+    GraphicConfig	Menue2Panel;	/// Panel for menue (unused)
+    GraphicConfig	VictoryPanel;	/// Panel for victory message
+    GraphicConfig	ScenarioPanel;	/// Panel for scenary message
+
 } UI;
 
 /*----------------------------------------------------------------------------

@@ -976,6 +976,56 @@ local SCM CclDefineUI(SCM list)
     CclFree(ui->ArrowSE.Name);
     ui->ArrowSE.Name=str;
 
+    DebugLevel0Fn("Panels\n");
+
+    //
+    //	Panels
+    //
+    temp=gh_car(list);
+    list=gh_cdr(list);
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->GameMenuePanel.File);
+    ui->GameMenuePanel.File=str;
+
+    temp=gh_car(list);
+    list=gh_cdr(list);
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->Menue1Panel.File);
+    ui->Menue1Panel.File=str;
+
+    temp=gh_car(list);
+    list=gh_cdr(list);
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->Menue2Panel.File);
+    ui->Menue2Panel.File=str;
+
+    temp=gh_car(list);
+    list=gh_cdr(list);
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->VictoryPanel.File);
+    ui->VictoryPanel.File=str;
+
+    temp=gh_car(list);
+    list=gh_cdr(list);
+
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    str=gh_scm2newstr(value,NULL);
+    CclFree(ui->ScenarioPanel.File);
+    ui->ScenarioPanel.File=str;
+
     return SCM_UNSPECIFIED;
 }
 
