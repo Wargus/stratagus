@@ -2722,28 +2722,27 @@ global Unit* FindOilDeposit(const Unit* source,int x,int y)
     return best;
 }
 
-
 /**
-**	Find an idle worker and center on it.
+**	Find the next idle worker
+**
+**	@param player	Player's units to search through
+**	@param last	Previous idle worker selected
+**
+**	@return		NoUnitP or next idle worker
 */
-global void FindIdleWorker()
+global Unit* FindIdleWorker(const Player* player,const Unit* last)
 {
-    Unit* unit=NULL;
+    Unit* unit;
     Unit** units;
     Unit* FirstUnitFound;
     int nunits;
     int i;
     int SelectNextUnit;
-    int FoundUnit;
-    const Player* player;
-    static Unit* LastIdleWorker=NULL;
 
-    FoundUnit=0;
-    FirstUnitFound=NULL;
-    if( LastIdleWorker==NULL ) SelectNextUnit=1;
+    FirstUnitFound=NoUnitP;
+    if( last==NoUnitP ) SelectNextUnit=1;
     else SelectNextUnit=0;
 
-    player=ThisPlayer;
     nunits=player->TotalNumUnits;
     units=player->Units;
 
@@ -2752,33 +2751,23 @@ global void FindIdleWorker()
 	if( unit->Type->CowerWorker && !unit->Removed ) {
 	    if( unit->Orders[0].Action==UnitActionStill ) {
 		if( SelectNextUnit && !IsOnlySelected(unit) ) {
-		    FoundUnit=1;
-		    break;
+		    return unit;
 		}
 		if( FirstUnitFound==NULL ) {
 		    FirstUnitFound=unit;
 		}
 	    }
 	}
-	if( unit==LastIdleWorker ) {
+	if( unit==last ) {
 	    SelectNextUnit=1;
 	}
     }
-    if( i==nunits && FirstUnitFound!=NULL && !IsOnlySelected(FirstUnitFound) ) {
-	unit=FirstUnitFound;
-	FoundUnit=1;
+
+    if( FirstUnitFound!=NoUnitP && !IsOnlySelected(FirstUnitFound) ) {
+	return FirstUnitFound;
     }
 
-    if( FoundUnit ) {
-	LastIdleWorker=unit;
-	SelectSingleUnit(unit);
-	ClearStatusLine();
-	ClearCosts();
-	CurrentButtonLevel=0;
-	UpdateButtonPanel();
-	PlayUnitSound(Selected[0],VoiceSelected);
-	MapCenter(unit->X,unit->Y);
-    }
+    return NoUnitP;
 }
 
 /*----------------------------------------------------------------------------
