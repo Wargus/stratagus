@@ -722,37 +722,34 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 }
 
 /**
-**	FIXME: docu.
+**	Values used for offsets in GameStatsText
 */
 enum {
-    STATS_OUTCOME,			/// FIXME: docu
-    STATS_RANK,				/// FIXME: docu
-    STATS_SCORE,			/// FIXME: docu
-    STATS_UNITS,			/// FIXME: docu
-    STATS_BUILDINGS,			/// FIXME: docu
-    STATS_GOLD,				/// FIXME: docu
-    STATS_WOOD,				/// FIXME: docu
-    STATS_OIL,				/// FIXME: docu
-    STATS_KILLS,			/// FIXME: docu
-    STATS_RAZINGS,			/// FIXME: docu
+    STATS_OUTCOME,			/// Outcome position
+    STATS_RANK,				/// Rank position
+    STATS_SCORE,			/// Score position
+    STATS_UNITS,			/// Units position
+    STATS_BUILDINGS,			/// Buildings position
+    STATS_GOLD,				/// Gold position
+    STATS_WOOD,				/// Wood position
+    STATS_OIL,				/// Oil position
+    STATS_KILLS,			/// Kills position
+    STATS_RAZINGS,			/// Razings position
     MAX_STATS_TEXT
 };
 
-local char* GameStatsText[MAX_STATS_TEXT];	/// FIXME: docu
-local int OldVideoSyncSpeed;			/// FIXME: docu
-local int GameStatsFrameCounter;		/// FIXME: docu
+local char* GameStatsText[MAX_STATS_TEXT];	/// Strings for displaying stats
+local int GameStatsFrameCounter;		/// Counter used for interval
+						/// between showing stats
 
 /**
-**	FIXME: docu.
+**	Initialize game stats
 */
 local void GameStatsInit(void)
 {
     Graphic* background;
     char buf[20];
 
-    OldVideoSyncSpeed=VideoSyncSpeed;
-    VideoSyncSpeed=100;
-    SetVideoSync();
     GameStatsFrameCounter=0;
 
     background=LoadGraphic(MenuBackground);
@@ -797,7 +794,7 @@ local void GameStatsInit(void)
 }
 
 /**
-**	FIXME: docu.
+**	Draw the game stats
 */
 local int GameStatsDrawFunc(void)
 {
@@ -904,7 +901,7 @@ local int GameStatsDrawFunc(void)
 }
 
 /**
-**	FIXME: docu.
+**	Clean up game stats
 */
 local void GameStatsEnd(void)
 {
@@ -913,18 +910,20 @@ local void GameStatsEnd(void)
     for( i=2; i<MAX_STATS_TEXT; i++ ) {
 	free(GameStatsText[i]);
     }
-
-    VideoSyncSpeed=OldVideoSyncSpeed;
-    SetVideoSync();
 }
 
 /**
-**	FIXME: docu.
+**	Show the game stats
 */
 global void ShowStats(void)
 {
     EventCallback callbacks;
     int done;
+    int OldVideoSyncSpeed;
+
+    OldVideoSyncSpeed=VideoSyncSpeed;
+    VideoSyncSpeed=100;
+    SetVideoSync();
 
     callbacks.ButtonPressed=IntroCallbackButton1;
     callbacks.ButtonReleased=IntroCallbackButton2;
@@ -945,7 +944,6 @@ global void ShowStats(void)
 
     done=0;
     IntroNoEvent=1;
-    // FIXME: Need continue button at 455,480-40
     while( 1 ) {
 	VideoLockScreen();
 	HideAnyCursor();
@@ -966,6 +964,9 @@ global void ShowStats(void)
     }
 
     GameStatsEnd();
+
+    VideoSyncSpeed=OldVideoSyncSpeed;
+    SetVideoSync();
 }
 
 
