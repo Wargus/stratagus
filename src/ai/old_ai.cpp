@@ -508,7 +508,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
 {
     int wx, wy, x, y, addx, addy, num_goldmine, g;
     int end, state, best_x, best_y, d, cost;
-    Unit *goldmines[MAX_UNITS];
+    Unit *goldmines[UnitMax];
 
     DebugLevel3Fn("hall %d %d,%d\n", UnitNumber(hall), hall->X, hall->Y);
 
@@ -628,8 +628,8 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
 */
 local int AiBuildHall(int type)
 {
-    Unit *workers[MAX_UNITS];
-    Unit *goldmines[MAX_UNITS];
+    Unit *workers[UnitMax];
+    Unit *goldmines[UnitMax];
     int num_goldmine, g, best_w, best_g, best_x, best_y, cost;
     int x, y, d, num_worker, w;
 
@@ -705,7 +705,7 @@ local int AiBuildHall(int type)
 */
 local int AiBuildBuilding(int type)
 {
-    Unit *workers[MAX_UNITS];
+    Unit *workers[UnitMax];
     int num_worker, cost, best_w, best_x, best_y, x, y, d, w;
 
     DebugLevel3Fn("(%d)\n", type);
@@ -764,7 +764,7 @@ local int AiBuildBuilding(int type)
 */
 local int AiTrainCreature(int type)
 {
-    Unit *units[MAX_UNITS];
+    Unit *units[UnitMax];
     int nunits;
     Player *player;
 
@@ -917,7 +917,7 @@ local int AiHarvest(Unit * unit)
 */
 local void AiAssignWorker(void)
 {
-    Unit *workers[MAX_UNITS];
+    Unit *workers[UnitMax];
     int num_worker, num_gold, num_wood, num_repair, num_still;
     int action, w;
     const UnitType* type;
@@ -1300,7 +1300,7 @@ local int AiCommandAttack(int unittype, int attack, int home)
 {
     int nunits, i;
     Unit *enemy;
-    Unit *table[MAX_UNITS];
+    Unit *table[UnitMax];
 
     nunits = FindPlayerUnitsByType(AiPlayer->Player,
 	    UnitTypeByWcNum(AiChooseRace(unittype)), table);
@@ -1631,7 +1631,7 @@ global void AiInit(Player * player)
     int i;
     int j;
     PlayerAi *aip;
-    Unit *units[MAX_UNITS];
+    Unit *units[UnitMax];
 
     DebugLevel2Fn("Player %d\n" _C_ player->Player);
     player->Ai = aip = &Ais[player->Player];

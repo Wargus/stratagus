@@ -98,7 +98,7 @@ global SpellType SpellTypeTable[] = {
 { "spell-polymorph",		"polymorph",		  10, 200,  -1, SpellActionPolymorph	, { "polymorph" }      },
 { "spell-blizzard",		"blizzard",		  12,  25,  -1, SpellActionBlizzard	, { "blizzard" }       },
 //	---orc ogres---							 ---orc ogres---
-{ "spell-eye-of-kilrogg",	"eye of kilrogg",	0x7F,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg" } },
+{ "spell-eye-of-kilrogg",	"eye of kilrogg",	   6,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg" } },
 { "spell-bloodlust",		"bloodlust",		   6,  50,1000, SpellActionBloodlust	, { "bloodlust" }      },
 { "spell-runes",		"runes",		  10, 200,2000, SpellActionRunes	, { "runes" }	       },
 //	---orc death knights---						 ---orc death knights-
@@ -157,7 +157,7 @@ local MissileType* MissileTypeDeathCoil;
 */
 local void SpellFireballController(Missile *missile)
 {
-    Unit *table[MAX_UNITS];
+    Unit *table[UnitMax];
     int i;
     int n;
     int x;
@@ -199,7 +199,7 @@ local void SpellFireballController(Missile *missile)
 */
 local void SpellDeathCoilController(Missile * missile)
 {
-    Unit *table[MAX_UNITS];
+    Unit *table[UnitMax];
     int i;
     int n;
     Unit *source;
@@ -285,7 +285,7 @@ local void SpellDeathCoilController(Missile * missile)
 */
 local void SpellWhirlwindController(Missile *missile)
 {
-    Unit *table[MAX_UNITS];
+    Unit *table[UnitMax];
     int i;
     int n;
     int x;
@@ -353,7 +353,7 @@ local void SpellWhirlwindController(Missile *missile)
 */
 local void SpellRunesController(Missile * missile)
 {
-    Unit *table[MAX_UNITS];
+    Unit *table[UnitMax];
     int i;
     int n;
     int x;

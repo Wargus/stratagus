@@ -1346,7 +1346,7 @@ global void MissileHit(Missile* missile)
     Unit* goal;
     int x;
     int y;
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int n;
     int i;
 
