@@ -1493,7 +1493,7 @@ local void MenuHandleMouseMove(int x,int y)
 	    if (!(mi->flags&MenuButtonDisabled)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_TEXT:
-			if (!mi->d.text.text)
+			if (!mi->d.text.text || !mi->d.text.action)
 			    continue;
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
