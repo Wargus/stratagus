@@ -246,44 +246,43 @@ global int PlayCDRom(int name)
 {
     // Old mode off, starting cdrom play.
     if (CDMode == CDModeOff) {
-	if (!strncmp(name, ":", 1)) {
-	    if (SDL_Init(SDL_INIT_CDROM) < 0)
-		return 1;
-	    CDRom = SDL_CDOpen(0);
-	    if (!SDL_CDStatus(CDRom)) {
-		CDMode = CDModeOff;
-		return 1;
-	    }
+        if (SDL_Init(SDL_INIT_CDROM) < 0) {
+    	    return 1;
+	}
+	CDRom = SDL_CDOpen(0);
+	if (!SDL_CDStatus(CDRom)) {
+	    CDMode = CDModeOff;
+	    return 1;
 	}
     }
 
-    // CDPlayer command?
-    if (!strncmp(name, ":", 1)) {
+    StopMusic();
 
-	StopMusic();
-
-	if (!CDRom) {
-	    fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
+    if (!CDRom) {
+        fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
+        CDMode = CDModeStopped;
+        return 1;
+    }
+    // if mode is play all tracks
+    if (name == CDModeAll) {
+        CDMode = CDModeAll;
+        if (SDL_CDPlayTracks(CDRom, 0, 0, 0, 0) < 0)
+    	    CDMode = CDModeStopped;
+	return 1;
+    }
+    // if mode is play random tracks
+    if (name == CDModeRandom) {
+        CDMode = CDModeRandom;
+        CDTrack = MyRand() % CDRom->numtracks;
+        if (SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0) < 0) {
 	    CDMode = CDModeStopped;
-	    return 1;
-	}
-	// if mode is play all tracks
-	if (!strcmp(name, ":all")) {
-	    CDMode = CDModeAll;
-	    if (SDL_CDPlayTracks(CDRom, 0, 0, 0, 0) < 0)
-		CDMode = CDModeStopped;
-	    return 1;
-	}
-	// if mode is play random tracks
-	if (!strcmp(name, ":random")) {
-	    CDMode = CDModeRandom;
-	    CDTrack = MyRand() % CDRom->numtracks;
-	    if (SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0) < 0)
-		CDMode = CDModeStopped;
 	}
 	return 1;
     }
-
+    // if mode is defined (not supported with USE_SDLCD)
+    if (name == CDModeDefined) {
+	CDMode = CDModeRandom;
+    }
     return 0;
 }
 #elif defined(USE_LIBCDA)
