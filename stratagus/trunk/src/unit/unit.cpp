@@ -3714,7 +3714,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 			if (unit->Data.Move.Fast) {
 				CLprintf(file, "\"fast\", ");
 			}
-			if (unit->Data.Move.Length) {
+			if (unit->Data.Move.Length > 0) {
 				CLprintf(file, "\"path\", {");
 				for (i = 0; i < unit->Data.Move.Length; ++i) {
 					CLprintf(file, "%d, ", unit->Data.Move.Path[i]);
