@@ -289,7 +289,6 @@ typedef struct _map_info_ {
     int		PlayerType[PlayerMax];	/// Same player->Type
     int		PlayerSide[PlayerMax];	/// Same player->Side
     int		PlayerResources[PlayerMax][MaxCosts];	/// Same player->Gold
-    // FIXME: Add NEW RESOURCES
     int		PlayerAi[PlayerMax];	/// Same player->Ai
     unsigned int MapUID;		/// Unique Map ID (hash)
 } MapInfo;
