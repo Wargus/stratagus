@@ -203,9 +203,6 @@ global MissileType* MissileTypeByIdent(const char* ident)
 /**
 **  Allocate an empty missile-type slot.
 **
-**  @todo Don't allocate an array of missile-types, allocate an array
-**        of pointers.
-**
 **  @param ident  Identifier to identify the slot.
 **
 **  @return       New allocated (zeroed) missile-type pointer.
@@ -218,11 +215,7 @@ global MissileType* NewMissileTypeSlot(char* ident)
 	MissileTypes = realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType *));
 	mtype = MissileTypes[NumMissileTypes++] = (MissileType *)malloc(sizeof(MissileType));
 	memset(mtype, 0, sizeof(MissileType));
-
-	// Defaults.
 	mtype->Ident = ident;
-	mtype->CanHitOwner = 0;
-	mtype->FriendlyFire = 0;
 
 	// Rehash.
 	for (i = 0; i < NumMissileTypes; ++i) {

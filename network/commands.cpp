@@ -1367,7 +1367,7 @@ global void SendCommandSpellCast(Unit* unit, int x, int y, Unit* dest, int spell
 {
 	if (NetworkFildes == (Socket)-1) {
 		CommandLog("spell-cast", unit, flush, x, y, dest, NULL, spellid);
-		CommandSpellCast(unit, x, y, dest, SpellTypeById(spellid), flush);
+		CommandSpellCast(unit, x, y, dest, SpellTypeTable[spellid], flush);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
 			unit, x, y, dest, NULL, flush);
@@ -1386,7 +1386,7 @@ global void SendCommandAutoSpellCast(Unit* unit, int spellid, int on)
 	if (NetworkFildes == (Socket)-1) {
 		CommandLog("auto-spell-cast", unit, FlushCommands, on, -1, NoUnitP,
 			NULL, spellid);
-		CommandAutoSpellCast(unit, on ? SpellTypeById(spellid) : NULL);
+		CommandAutoSpellCast(unit, on ? SpellTypeTable[spellid] : NULL);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
 			unit, on, -1, NoUnitP, NULL, FlushCommands);
@@ -1655,10 +1655,10 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 					DebugCheck(!dest || !dest->Type);
 				}
 				CommandLog("spell-cast", unit, status, x, y, dest, NULL, id);
-				CommandSpellCast(unit, x, y, dest, SpellTypeById(id), status);
+				CommandSpellCast(unit, x, y, dest, SpellTypeTable[id], status);
 			} else {
 				CommandLog("auto-spell-cast", unit, status, x, -1, NoUnitP, NULL, id);
-				CommandAutoSpellCast(unit, x ? SpellTypeById(id) : NULL);
+				CommandAutoSpellCast(unit, x ? SpellTypeTable[id] : NULL);
 			}
 			break;
 	}

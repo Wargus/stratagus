@@ -985,30 +985,6 @@ global void InitSpells(void)
 {
 }
 
-// ****************************************************************************
-// Get Spell.
-// ****************************************************************************
-
-/**
-**		Get the numeric spell id by string identifer.
-**
-**		@param IdentName		Spell identifier
-**
-**		@return				Spell id (index in spell-type table)
-*/
-global int SpellIdByIdent(const char* ident)
-{
-	int id;
-
-	DebugCheck(!ident);
-	for (id = 0; id < SpellTypeCount; ++id) {
-		if (strcmp(SpellTypeTable[id]->IdentName, ident) == 0) {
-			return id;
-		}
-	}
-	return -1;
-}
-
 /**
 **		Get spell-type struct pointer by string identifier.
 **
@@ -1018,41 +994,15 @@ global int SpellIdByIdent(const char* ident)
 */
 global SpellType* SpellTypeByIdent(const char* ident)
 {
-	int id;
+	int i;
 
 	DebugCheck(!ident);
-	id = SpellIdByIdent(ident);
-	return (id == -1 ? NULL : SpellTypeTable[id]);
-}
-
-/**
-**		FIXME: docu
-*/
-global unsigned CclGetSpellByIdent(lua_State* l)
-{
-	int i;
-	const char* value;
-
-	value = LuaToString(l, -1);
 	for (i = 0; i < SpellTypeCount; ++i) {
-		if (!strcmp(value, SpellTypeTable[i]->IdentName)) {
-			return i;
+		if (strcmp(SpellTypeTable[i]->Ident, ident) == 0) {
+			return SpellTypeTable[i];
 		}
 	}
-	return -1;
-}
-
-/**
-**		Get spell-type struct ptr by id
-**
-**		@param id  Spell id (index in the spell-type table)
-**
-**		@return spell-type struct ptr
-*/
-global SpellType* SpellTypeById(int id)
-{
-	DebugCheck(!(0 <= id && id < SpellTypeCount));
-	return SpellTypeTable[id];
+	return 0;
 }
 
 // ****************************************************************************
@@ -1111,10 +1061,10 @@ global int CanCastSpell(const Unit* caster, const SpellType* spell,
 
 	// And caster must know the spell
 	// FIXME: spell->Ident < MaxSpell
-	DebugCheck(!(caster->Type->CanCastSpell && caster->Type->CanCastSpell[spell->Ident]));
+	DebugCheck(!(caster->Type->CanCastSpell && caster->Type->CanCastSpell[spell->Slot]));
 
 	if (!caster->Type->CanCastSpell ||
-			!caster->Type->CanCastSpell[spell->Ident] ||
+			!caster->Type->CanCastSpell[spell->Slot] ||
 			(spell->Target == TargetUnit && target == NULL)) {
 		return 0;
 	}
@@ -1136,9 +1086,9 @@ global int AutoCastSpell(Unit* caster, const SpellType* spell)
 
 	DebugCheck(!caster);
 	DebugCheck(!spell);
-	DebugCheck(!(0 <= spell->Ident && spell->Ident < SpellTypeCount));
+	DebugCheck(!(0 <= spell->Slot && spell->Slot < SpellTypeCount));
 	DebugCheck(!(caster->Type->CanCastSpell));
-	DebugCheck(!(caster->Type->CanCastSpell[spell->Ident]));
+	DebugCheck(!(caster->Type->CanCastSpell[spell->Slot]));
 
 	target = NULL;
 
@@ -1179,7 +1129,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	DebugCheck(!spell);
 	DebugCheck(!spell->Action->CastFunction);
 	DebugCheck(!caster);
-	DebugCheck(!SpellIsAvailable(caster->Player, spell->Ident));
+	DebugCheck(!SpellIsAvailable(caster->Player, spell->Slot));
 
 	caster->Invisible = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
@@ -1194,7 +1144,7 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 		y=caster->Y;
 		target=caster;
 	}
-	DebugLevel0Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->IdentName _C_
+	DebugLevel0Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
 		caster->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
 	if (CanCastSpell(caster, spell, target, x, y)) {
 		act=spell->Action;
@@ -1245,7 +1195,7 @@ void CleanSpells(void)
 	DebugLevel0("Cleaning spells.\n");
 	for (i = 0; i < SpellTypeCount; ++i) {
 		spell = SpellTypeTable[i];
-		free(spell->IdentName);
+		free(spell->Ident);
 		free(spell->Name);
 
 		act = spell->Action;

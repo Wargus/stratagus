@@ -221,7 +221,7 @@ local void AiCheckUnits(void)
 	//  Count the already made build requests.
 	//
 	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
-		counter[queue->Type->Type] += queue->Want;
+		counter[queue->Type->Slot] += queue->Want;
 		DebugLevel3Fn("Already in build queue: %s %d/%d\n" _C_
 			queue->Type->Ident _C_ queue->Made _C_ queue->Want);
 	}
@@ -232,7 +232,7 @@ local void AiCheckUnits(void)
 	n = AiPlayer->Player->TotalNumUnits;
 	for (i = 0; i < n; ++i) {
 		if (!AiPlayer->Player->Units[i]->Active) {
-			counter[AiPlayer->Player->Units[i]->Type->Type]--;
+			counter[AiPlayer->Player->Units[i]->Type->Slot]--;
 			DebugLevel3Fn("Removing non active unit: %s\n" _C_
 				AiPlayer->Player->Units[i]->Type->Ident);
 		}
@@ -244,7 +244,7 @@ local void AiCheckUnits(void)
 	//
 	n = AiPlayer->UnitTypeRequestsCount;
 	for (i = 0; i < n; ++i) {
-		t = AiPlayer->UnitTypeRequests[i].Table[0]->Type;
+		t = AiPlayer->UnitTypeRequests[i].Table[0]->Slot;
 		x = AiPlayer->UnitTypeRequests[i].Count;
 
 		//
@@ -255,7 +255,7 @@ local void AiCheckUnits(void)
 			DebugLevel3Fn("Equivalence for %s\n" _C_
 				AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
 			for (j = 0; j < AiHelpers.Equiv[t]->Count; ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
+				e += unit_types_count[AiHelpers.Equiv[t]->Table[j]->Slot];
 			}
 		}
 
@@ -276,7 +276,7 @@ local void AiCheckUnits(void)
 		const AiUnit* unit;
 
 		for (unit = AiPlayer->Force[i].Units; unit; unit = unit->Next) {
-			attacking[unit->Unit->Type->Type]++;
+			attacking[unit->Unit->Type->Slot]++;
 		}
 	}
 
@@ -293,7 +293,7 @@ local void AiCheckUnits(void)
 		}
 
 		for (aiut = AiPlayer->Force[i].UnitTypes; aiut; aiut = aiut->Next) {
-			t = aiut->Type->Type;
+			t = aiut->Type->Slot;
 			x = aiut->Want;
 			if (x > unit_types_count[t] + counter[t] - attacking[t]) {    // Request it.
 				DebugLevel2Fn("Force %d need %s * %d\n" _C_ i _C_ aiut->Type->
@@ -312,7 +312,7 @@ local void AiCheckUnits(void)
 	//
 	n = AiPlayer->UpgradeToRequestsCount;
 	for (i = 0; i < n; ++i) {
-		t = AiPlayer->UpgradeToRequests[i]->Type;
+		t = AiPlayer->UpgradeToRequests[i]->Slot;
 		x = 1;
 
 		//
@@ -323,7 +323,7 @@ local void AiCheckUnits(void)
 			DebugLevel3Fn("Equivalence for %s\n" _C_ AiPlayer->UpgradeToRequests[i]->
 				Ident);
 			for (j = 0; j < AiHelpers.Equiv[t]->Count; ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
+				e += unit_types_count[AiHelpers.Equiv[t]->Table[j]->Slot];
 			}
 		}
 
@@ -403,7 +403,7 @@ local void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n,
 		for (f = i = 0; i < n; ++i) {
 			if (table[i]) {
 				for (j = 0; j < table[i]->Count; ++j) {
-					if (table[i]->Table[j]->Type == t) {
+					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
 							CLprintf(file, "\n  (list '%s '%s\n	", name,
 								UnitTypes[t]->Ident);
@@ -481,7 +481,7 @@ local void SaveAiCostTable(CLFile* file, const char* name, int n,
 		for (f = i = 0; i < n; ++i) {
 			if (table[i]) {
 				for (j = 0; j < table[i]->Count; ++j) {
-					if (table[i]->Table[j]->Type == t) {
+					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
 							CLprintf(file, "\n  (list '%s '%s\n	", name,
 								UnitTypes[t]->Ident);
@@ -522,7 +522,7 @@ local void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
 		for (f = i = 0; i < n; ++i) {
 			if (table[i]) {
 				for (j = 0; j < table[i]->Count; ++j) {
-					if (table[i]->Table[j]->Type == t) {
+					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
 							CLprintf(file, "\n  (list '%s '%s\n	", name,
 								UnitTypes[t]->Ident);
@@ -1168,7 +1168,7 @@ local void AiReduceMadeInBuilded(const PlayerAi* pai, const UnitType* type)
 	//
 	equivnb = AiFindUnitTypeEquiv(type, equivs);
 
-	for (i = 0; i < AiHelpers.Equiv[type->Type]->Count; ++i) {
+	for (i = 0; i < AiHelpers.Equiv[type->Slot]->Count; ++i) {
 		if (AiReduceMadeInBuilded2(pai, UnitTypes[equivs[i]])) {
 			return;
 		}

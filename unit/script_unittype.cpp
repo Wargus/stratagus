@@ -645,7 +645,7 @@ local int CclDefineUnitType(lua_State* l)
 
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
-				id = CclGetSpellByIdent(l);
+				id = SpellTypeByIdent(value)->Slot;
 				lua_pop(l, 1);
 				DebugLevel3Fn("%d \n" _C_ id);
 				if (id == -1) {

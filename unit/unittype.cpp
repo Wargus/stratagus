@@ -1039,7 +1039,7 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 		CLprintf(file, "  'can-cast-spell '( ");
 		for (i = 0; i < SpellTypeCount; ++i) {
 			if (type->CanCastSpell[i]) {
-				CLprintf(file, "%s ", SpellTypeTable[i]->IdentName);
+				CLprintf(file, "%s ", SpellTypeTable[i]->Ident);
 			}
 		}
 		CLprintf(file, ")\n");
@@ -1276,7 +1276,7 @@ global UnitType* NewUnitTypeSlot(char* ident)
 		ExitFatal(-1);
 	}
 	memset(type, 0, sizeof(UnitType));
-	type->Type = NumUnitTypes;
+	type->Slot = NumUnitTypes;
 	DebugLevel3Fn("Making a new unit, called %s, branded %d\n"
 			_C_ ident _C_ type->Type);
 	type->Ident = ident;
@@ -1335,7 +1335,7 @@ global void InitUnitTypes(int reset_player_stats)
 		//
 		//		Initialize:
 		//
-		DebugCheck(UnitTypes[type]->Type != type);
+		DebugCheck(UnitTypes[type]->Slot != type);
 		//
 		//		Add idents to hash.
 		//

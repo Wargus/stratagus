@@ -261,7 +261,7 @@ local int CclIfUnit(lua_State* l)
 	} else {
 		for (; plynr < pn; ++plynr) {
 			DebugLevel3Fn("Player%d, %d == %s\n" _C_ plynr _C_ q _C_ unittype->Ident);
-			if (compare(Players[plynr].UnitTypesCount[unittype->Type], q)) {
+			if (compare(Players[plynr].UnitTypesCount[unittype->Slot], q)) {
 				lua_pushboolean(l, 1);
 				return 1;
 			}

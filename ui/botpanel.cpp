@@ -285,7 +285,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 		ba->ValueStr = strdup(value);
 		switch (action) {
 			case ButtonSpellCast:
-				ba->Value = SpellIdByIdent(value);
+				ba->Value = SpellTypeByIdent(value)->Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
 					DebugLevel0("Spell %s does not exist?\n" _C_ value);
@@ -486,7 +486,7 @@ global void DrawButtonPanel(void)
 					case ButtonSpellCast:
 						for (j = 0; j < NumSelected; ++j) {
 							if (Selected[j]->AutoCastSpell !=
-									SpellTypeById(buttons[i].Value)) {
+									SpellTypeTable[buttons[i].Value]) {
 								break;
 							}
 						}
@@ -532,7 +532,7 @@ global void DrawButtonPanel(void)
 						SetCosts(0, 0, Upgrades[v].Costs);
 						break;
 					case ButtonSpellCast:
-						SetCosts(SpellTypeById(v)->ManaCost, 0, NULL);
+						SetCosts(SpellTypeTable[v]->ManaCost, 0, NULL);
 						break;
 
 					default:
@@ -890,7 +890,7 @@ global void DoButtonButtonClicked(int button)
 				int autocast;
 				SpellType* spell;
 
-				spell = SpellTypeById(CurrentButtons[button].Value);
+				spell = SpellTypeTable[CurrentButtons[button].Value];
 				if (!CanAutoCastSpell(spell)) {
 					PlayGameSound(GameSounds.PlacementError.Sound,
 						MaxSampleVolume);

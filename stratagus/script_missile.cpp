@@ -439,7 +439,22 @@ local int ScriptMissileTypeSet(MissileType* missiletype, const char* key, lua_St
 */
 local int ScriptMissileTypesCreate(lua_State* l)
 {
-	LuaError(l, "Function not implemented.\n");
+	const char* name;
+	MissileType* mtype;
+
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "Incorrect number of arguments");
+	}
+	name = LuaToString(l, 1);
+
+	mtype = MissileTypeByIdent(name);
+	if (mtype != NULL) {
+		LuaError(l, "Spell allready exists");
+	} else {
+		ScriptCreateUserdata(l, NewMissileTypeSlot(strdup(name)),
+				ScriptMissileTypeGet, ScriptMissileTypeSet);
+		return 1;
+	}
 }
 
 /**
@@ -478,7 +493,7 @@ local int ScriptMissileTypesNamespaceGet(lua_State* l)
 		i = LuaToNumber(l, 2);
 		DebugLevel3Fn("(%d)\n" _C_ i);
 		if (i < 0 || i >= NumMissileTypes) {
-			LuaError(l, "Missile index out of range");
+			LuaError(l, "Missile type index out of range");
 		}
 		ScriptCreateUserdata(l, MissileTypes[i], ScriptMissileTypeGet, ScriptMissileTypeSet);
 		return 1;
@@ -494,7 +509,7 @@ local int ScriptMissileTypesNamespaceGet(lua_State* l)
 		return 1;
 	}
 
-	LuaError(l, "Spell \"%s\" doesn't exist.\n" _C_ key);
+	LuaError(l, "Missile type \"%s\" doesn't exist.\n" _C_ key);
 }
 
 /**

@@ -153,7 +153,7 @@ global int FindPlayerUnitsByType(const Player* player,const UnitType* type,
 
 	nunits = player->TotalNumUnits;
 	units = player->Units;
-	typecount = player->UnitTypesCount[type->Type];
+	typecount = player->UnitTypesCount[type->Slot];
 	for (num = 0, i = 0; i < nunits && typecount; ++i) {
 		unit = units[i];
 		if (unit->Type == type) {

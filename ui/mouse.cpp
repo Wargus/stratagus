@@ -1834,13 +1834,13 @@ global void UIHandleButtonUp(unsigned button)
 				}
 				if (Selected[0]->Player == ThisPlayer) {
 					char buf[64];
-					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type] > 1) {
+					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
 						sprintf(buf, "You have ~<%d~> %ss", 
-							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
+							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name);
 					} else {
 						sprintf(buf, "You have ~<%d~> %s(s)",
-							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
+							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name);
 					}
 					SetStatusLine(buf);

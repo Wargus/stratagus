@@ -632,6 +632,7 @@ typedef struct _unit_type_ UnitType;
 struct _unit_type_ {
 	char* Ident;                    /// Identifier
 	char* Name;                     /// Pretty name shown from the engine
+	int Slot;                       /// Type as number
 	char* SameSprite;               /// Unit-type shared sprites
 	char* File[TilesetMax];         /// Sprite files
 	char* ShadowFile;               /// Shadow file
@@ -761,9 +762,6 @@ struct _unit_type_ {
 
 	// FIXME: This stats should? be moved into the player struct
 	UnitStats Stats[PlayerMax];     /// Unit status for each player
-
-	// FIXME: Should use a general name f.e. Slot here?
-	int Type;                       /// Type as number
 
 	Graphic* Sprite;                /// Sprite images
 	Graphic* ShadowSprite;          /// Shadow sprite image
