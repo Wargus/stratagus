@@ -10,7 +10,7 @@
 //
 /**@name pud.c		-	The pud. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1248,7 +1248,10 @@ pawn:
 				unit->Value=v*2500;
 			    } else {	
 				// active/inactive AI units!!
-				unit->Active=v;
+				// Johns: it is better to have active buildings
+				if( !unit->Type->Building ) {
+				    unit->Active=v;
+				}
 			    }
 			    UpdateForNewUnit(unit,0);
 			}
