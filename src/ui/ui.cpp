@@ -10,7 +10,7 @@
 //
 /**@name ui.c		-	The user interface globals. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer and Andreas Arens
+//	(c) Copyright 1999-2003 by Lutz Sammer and Andreas Arens
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -149,11 +149,11 @@ global void InitUserInterface(const char *race_name)
 
     // FIXME: Can be removed after new config is working
     if( !strcmp(race_name,"human") || !strcmp(race_name,"alliance") ) {
-	TheUI.NormalFontColor=FontWhite;
-	TheUI.ReverseFontColor=FontYellow;
+	TheUI.NormalFontColor=strdup(FontWhite);
+	TheUI.ReverseFontColor=strdup(FontYellow);
     } else {
-	TheUI.NormalFontColor=FontYellow;
-	TheUI.ReverseFontColor=FontWhite;
+	TheUI.NormalFontColor=strdup(FontYellow);
+	TheUI.ReverseFontColor=strdup(FontWhite);
     }
     TheUI.ViewportCursorColor=ColorWhite;
 }
@@ -262,22 +262,22 @@ global void LoadUserInterface(void)
     TheUI.ArrowS.Cursor=CursorTypeByIdent(TheUI.ArrowS.Name);
     TheUI.ArrowSE.Cursor=CursorTypeByIdent(TheUI.ArrowSE.Name);
 
-    if( TheUI.GameMenuePanel.File ) {
-	TheUI.GameMenuePanel.Graphic=LoadGraphic(TheUI.GameMenuePanel.File);
+    if( TheUI.GameMenuPanel.File ) {
+	TheUI.GameMenuPanel.Graphic=LoadGraphic(TheUI.GameMenuPanel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.GameMenuePanel.Graphic,TheUI.GameMenuePanel.Graphic->Width,TheUI.GameMenuePanel.Graphic->Height);
+	MakeTexture(TheUI.GameMenuPanel.Graphic,TheUI.GameMenuPanel.Graphic->Width,TheUI.GameMenuPanel.Graphic->Height);
 #endif
     }
-    if( TheUI.Menue1Panel.File ) {
-	TheUI.Menue1Panel.Graphic=LoadGraphic(TheUI.Menue1Panel.File);
+    if( TheUI.Menu1Panel.File ) {
+	TheUI.Menu1Panel.Graphic=LoadGraphic(TheUI.Menu1Panel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Menue1Panel.Graphic,TheUI.Menue1Panel.Graphic->Width,TheUI.Menue1Panel.Graphic->Height);
+	MakeTexture(TheUI.Menu1Panel.Graphic,TheUI.Menu1Panel.Graphic->Width,TheUI.Menu1Panel.Graphic->Height);
 #endif
     }
-    if( TheUI.Menue2Panel.File ) {
-	TheUI.Menue2Panel.Graphic=LoadGraphic(TheUI.Menue2Panel.File);
+    if( TheUI.Menu2Panel.File ) {
+	TheUI.Menu2Panel.Graphic=LoadGraphic(TheUI.Menu2Panel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Menue2Panel.Graphic,TheUI.Menue2Panel.Graphic->Width,TheUI.Menue2Panel.Graphic->Height);
+	MakeTexture(TheUI.Menu2Panel.Graphic,TheUI.Menu2Panel.Graphic->Width,TheUI.Menu2Panel.Graphic->Height);
 #endif
     }
     if( TheUI.VictoryPanel.File ) {
@@ -400,9 +400,9 @@ local void OldSaveUi(FILE* file,const UI* ui)
     fprintf(file," '%s",ui->ArrowS.Name);
     fprintf(file," '%s)\n",ui->ArrowSE.Name);
 
-    fprintf(file,"  (list \"%s\")\n",ui->GameMenuePanel.File);
-    fprintf(file,"  (list \"%s\")\n",ui->Menue1Panel.File);
-    fprintf(file,"  (list \"%s\")\n",ui->Menue2Panel.File);
+    fprintf(file,"  (list \"%s\")\n",ui->GameMenuPanel.File);
+    fprintf(file,"  (list \"%s\")\n",ui->Menu1Panel.File);
+    fprintf(file,"  (list \"%s\")\n",ui->Menu2Panel.File);
     fprintf(file,"  (list \"%s\")\n",ui->VictoryPanel.File);
     fprintf(file,"  (list \"%s\")\n",ui->ScenarioPanel.File);
 
@@ -516,9 +516,9 @@ local void NewSaveUi(FILE * file, const UI * ui)
     fprintf(file, "    arrow-s %s\n", ui->ArrowS.Name);
     fprintf(file, "    arrow-se %s)\n", ui->ArrowSE.Name);
 
-    fprintf(file, "  'panels '(game-menu \"%s\"\n", ui->GameMenuePanel.File);
-    fprintf(file, "    menue-1 \"%s\"\n", ui->Menue1Panel.File);
-    fprintf(file, "    menue-2 \"%s\"\n", ui->Menue2Panel.File);
+    fprintf(file, "  'panels '(game-menu \"%s\"\n", ui->GameMenuPanel.File);
+    fprintf(file, "    menu-1 \"%s\"\n", ui->Menu1Panel.File);
+    fprintf(file, "    menu-2 \"%s\"\n", ui->Menu2Panel.File);
     fprintf(file, "    victory \"%s\"\n", ui->VictoryPanel.File);
     fprintf(file, "    scenario \"%s\")", ui->ScenarioPanel.File);
 
@@ -584,6 +584,7 @@ global void SaveUserInterface(FILE* file)
 global void CleanUserInterface(void)
 {
     int i;
+    UI* ui;
 
     //
     //	Free the graphics. FIXME: if they are shared this will crash.
@@ -603,24 +604,26 @@ global void CleanUserInterface(void)
     VideoSaveFree(TheUI.Minimap.Graphic);
     VideoSaveFree(TheUI.StatusLine.Graphic);
 
-    VideoSaveFree(TheUI.GameMenuePanel.Graphic);
-    VideoSaveFree(TheUI.Menue1Panel.Graphic);
-    VideoSaveFree(TheUI.Menue2Panel.Graphic);
+    VideoSaveFree(TheUI.GameMenuPanel.Graphic);
+    VideoSaveFree(TheUI.Menu1Panel.Graphic);
+    VideoSaveFree(TheUI.Menu2Panel.Graphic);
     VideoSaveFree(TheUI.VictoryPanel.Graphic);
     VideoSaveFree(TheUI.ScenarioPanel.Graphic);
 
-#if 0
     //
     //	Free the available user interfaces.
     //
     if( UI_Table ) {
 	for( i=0; UI_Table[i]; ++i ) {
-	    DebugLevel0Fn("FIXME: not completely written\n");
+	    ui=UI_Table[i];
+	    // FIXME: not completely written
+	    free(ui->NormalFontColor);
+	    free(ui->ReverseFontColor);
+	    free(ui);
 	}
 	free(UI_Table);
 	UI_Table=NULL;
     }
-#endif
 
     // FIXME: Johns: Implement this correctly or we will lose memory!
     DebugLevel0Fn("FIXME: not completely written\n");

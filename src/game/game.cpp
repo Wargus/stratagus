@@ -419,7 +419,6 @@ global void CreateGame(char* filename, WorldMap* map)
     PreprocessMap();			// Adjust map for use
     MapColorCycle();			// Setup color cycle
 
-    CleanUserInterface();
     InitUserInterface(ThisPlayer->RaceName);	// Setup the user interface
     LoadUserInterface();		// Load the user interface grafics
 
