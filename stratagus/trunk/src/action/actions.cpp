@@ -353,7 +353,7 @@ local int HandleDecay(Unit* unit)
     if( unit->TTL && unit->TTL<(GameCycle-unit->HP) ) {
 	DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL
 		_C_ GameCycle);
-	if( !--unit->HP ) {
+	if( --unit->HP<0 ) {
 	    LetUnitDie(unit);
 	    deadunit|=1;
 	}
@@ -585,10 +585,6 @@ global void UnitActions(void)
 	    continue;
 	}
 
-	if( --unit->Wait ) {		// Wait until counter reached
-	    continue;
-	}
-
 	if( blinkthiscycle && unit->Blink ) {	// clear blink flag
 	    --unit->Blink;
 	}
@@ -609,6 +605,10 @@ global void UnitActions(void)
 	}
 	if( burnthiscycle ) {
 	    BurnBuilding(unit);
+	}
+	
+	if( --unit->Wait ) {		// Wait until counter reached
+	    continue;
 	}
 
 	HandleUnitAction(unit);

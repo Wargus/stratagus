@@ -208,12 +208,14 @@ global void HandleActionSpellCast(Unit * unit)
 	    }
 	    return;
 	}
+	// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 	NewResetPath(unit);
 	unit->Value=0;		// repeat spell on next pass? (defaults to `no')
 	unit->SubAction=1;
 	// FALL THROUGH
     case 1:				// Move to the target.
-	if( (spell = unit->Orders[0].Arg1)->Range != 0x7F ) {
+	// FIXME: crashes with huge ranges.
+	if( (spell = unit->Orders[0].Arg1)->Range != INFINITE_RANGE ) {
 	    SpellMoveToTarget(unit);
 	    break;
 	} else {
