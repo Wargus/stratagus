@@ -105,9 +105,9 @@ global char* NextChapter(void)
 	}
 	while( CurrentChapter) {
 	    if( CurrentChapter->Type==ChapterShowPicture ) {
-		ShowPicture(CurrentChapter->d.picture.Act,
-		            CurrentChapter->d.picture.Title,
-		            CurrentChapter->d.picture.Background);
+		ShowPicture(CurrentChapter->Data.Picture.Act,
+		            CurrentChapter->Data.Picture.Title,
+		            CurrentChapter->Data.Picture.Background);
 	    }
 	    else if( CurrentChapter->Type==ChapterPlayLevel ) {
 		break;
@@ -124,7 +124,7 @@ global char* NextChapter(void)
 	return NULL;
     }
 
-    return CurrentChapter->d.level.Name;
+    return CurrentChapter->Data.Level.Name;
 }
 
 /**
@@ -262,24 +262,25 @@ local SCM CclDefineCampaign(SCM list)
 		    sublist=gh_cdr(sublist);
 
 		    chapter->Type=ChapterShowPicture;
-		    chapter->d.picture.Act=gh_scm2newstr(value,NULL);
+		    chapter->Data.Picture.Act=gh_scm2newstr(value,NULL);
 
 		    value=gh_car(sublist);
 		    sublist=gh_cdr(sublist);
 
-		    chapter->Type=ChapterShowPicture;
-		    chapter->d.picture.Title=gh_scm2newstr(value,NULL);
+		    chapter->Data.Picture.Title=gh_scm2newstr(value,NULL);
 
 		    value=gh_car(sublist);
 		    sublist=gh_cdr(sublist);
 
-		    chapter->d.picture.Background=gh_scm2newstr(value,NULL);
+		    chapter->Data.Picture.Background=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("play-movie")) ) {
+		    DebugLevel0Fn("FIXME: not supported\n");
 		} else if( gh_eq_p(value,gh_symbol2scm("play-level")) ) {
 		    value=gh_car(sublist);
 		    sublist=gh_cdr(sublist);
 
 		    chapter->Type=ChapterPlayLevel;
-		    chapter->d.level.Name=gh_scm2newstr(value,NULL);
+		    chapter->Data.Level.Name=gh_scm2newstr(value,NULL);
 		} else {
 		   // FIXME: this leaves a half initialized campaign
 		   errl("Unsupported tag",value);
