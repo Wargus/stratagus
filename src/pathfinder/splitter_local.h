@@ -8,10 +8,9 @@
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map.h		-	The map headerfile. */
+/**@name splitter_local.h		-	The map headerfile. */
 //
-//	(c) Copyright 1998-2003 by Vladi Shabanski, Lutz Sammer,
-//	                           and Jimmy Salmon
+//	(c) Copyright 1998-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

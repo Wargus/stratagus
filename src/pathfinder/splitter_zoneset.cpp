@@ -10,7 +10,7 @@
 //
 /**@name splitter_zoneset.c	-	Manipulation of zone set. 	*/
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer,Fabrice Rossi, Russell Smith
+//	(c) Copyright 1999-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
