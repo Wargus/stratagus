@@ -499,8 +499,6 @@ local void EnableDrawRefresh(void)
 */
 global void GameMainLoop(void)
 {
-    char *data;
-    
     EventCallback callbacks;
     int showtip;
 
@@ -594,7 +592,6 @@ global void GameMainLoop(void)
 
 #ifdef USE_LIBCDA
 		    CDRomCheck();
-
 #endif
 		    break;
 	    }
