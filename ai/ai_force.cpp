@@ -94,6 +94,7 @@ local void AiCleanForce(int force)
     memset(counter,0,sizeof(counter));
     aiunit=AiPlayer->Force[force].Units;
     while( aiunit ) {
+	// FIXME: Should I use equivalent unit types?
 	counter[aiunit->Unit->Type->Type]++;
 	aiunit=aiunit->Next;
     }
@@ -105,6 +106,7 @@ local void AiCleanForce(int force)
     aitype=AiPlayer->Force[force].UnitTypes;
     while( aitype ) {
 	if( aitype->Want>counter[aitype->Type->Type] ) {
+	    DebugLevel3Fn("%d: missing %s.\n",force,aitype->Type->Ident);
 	    AiPlayer->Force[force].Completed=0;
 	}
 	counter[aitype->Type->Type]-=aitype->Want;
@@ -168,6 +170,7 @@ local int AiCheckBelongsToForce(int force,const UnitType* type)
     //
     aiunit=AiPlayer->Force[force].Units;
     while( aiunit ) {
+	// FIXME: Should I use equivalent unit types?
 	counter[aiunit->Unit->Type->Type]++;
 	aiunit=aiunit->Next;
     }
@@ -203,12 +206,16 @@ global void AiAssignToForce(Unit* unit)
 {
     int force;
 
-    AiCleanForces();
-
     //
     //	Check to which force it belongs
     //
     for( force=0; force<AI_MAX_FORCES; ++force ) {
+	// No troops for attacking force
+	if( !AiPlayer->Force[force].Defending
+		&& AiPlayer->Force[force].Attacking ) {
+	    continue;
+	}
+
 	if( AiCheckBelongsToForce(force,unit->Type) ) {
 	    AiUnit* aiunit;
 
@@ -310,6 +317,7 @@ global void AiAttackWithForce(int force)
 
     AiCleanForce(force);
 
+    AiPlayer->Force[force].Attacking=0;
     if( (aiunit=AiPlayer->Force[force].Units) ) {
 	AiPlayer->Force[force].Attacking=1;
 
@@ -466,6 +474,31 @@ local void AiWaitLanded(AiForce* force)
 }
 
 /**
+**	Force on attack ride.
+**
+**	@param force	Force pointer.
+*/
+local void AiForceAttacks(AiForce* force)
+{
+    const AiUnit* aiunit;
+
+    if( (aiunit=force->Units) ) {
+	while( aiunit ) {
+	    // Still some action
+	    if( aiunit->Unit->Orders[0].Action!=UnitActionStill ) {
+		break;
+	    }
+	    aiunit=aiunit->Next;
+	}
+	if( !aiunit ) {
+	    AiAttackWithForce(force-AiPlayer->Force);
+	}
+    } else {
+	force->Attacking=0;
+    }
+}
+
+/**
 **	Handle an attack force.
 **
 **	@param force	Force pointer.
@@ -490,6 +523,13 @@ local void AiGuideAttackForce(AiForce* force)
 	case AttackNow:
 	    force->State=0;
 	    AiAttackWithForce(force-AiPlayer->Force);
+	    break;
+
+	    //
+	    //	Attacking!
+	    //
+	case 0:
+	    AiForceAttacks(force);
 	    break;
     }
 }
@@ -531,8 +571,7 @@ global void AiForceManager(void)
 	    AiGuideAttackForce(&AiPlayer->Force[force]);
 	}
     }
-
-    // AiAssignFreeUnitsToForce();
+    AiAssignFreeUnitsToForce();
 }
 
 //@}
