@@ -2150,9 +2150,10 @@ local void EndScenarioQuitMenu(void)
 */
 local void GameMenuEnd(void)
 {
-    InterfaceState = IfaceStateNormal;
+    InterfaceState=IfaceStateNormal;
     GameRunning=0;
-    EndMenu();
+    CursorOn=CursorOnUnknown;
+    CurrentMenu=-1;
 }
 
 local void KeystrokeHelpMenu(void)
