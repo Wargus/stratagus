@@ -268,31 +268,37 @@ global void DrawUnitInfo(const Unit* unit)
     if( type->StoresWood ) {
 	DrawText(x+20,y+8+78,GameFont,"Production");
 	DrawText(x+52,y+8+93,GameFont,"Lumber:");
-	// FIXME: if production plus isn't 25!
-	DrawText(x+108,y+8+93,GameFont,"100~<+25~>");
+	// I'm assuming that it will be short enough to fit in the space
+	// I'm also assuming that it won't be 100 - x
+	// and since the default is used for comparison we might as well
+	// use that in the printing too.
+	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
+
+	if( unit->Player->Incomes[WoodCost] != DEFAULT_INCOMES[WoodCost] ) {
+		sprintf(buf, "~<+%i~>", unit->Player->Incomes[WoodCost]);
+		DrawText(x+126,y+8+93,GameFont,buf);
+	}
     } else if( type->StoresGold ) {
 	DrawText(x+20,y+8+61,GameFont,"Production");
 	DrawText(x+73,y+8+77,GameFont,"Gold:");
 	DrawNumber(x+108,y+8+77,GameFont,DEFAULT_INCOMES[GoldCost]);
 	// Keep/Stronghold, Castle/Fortress
-	if( unit->Player->Incomes[GoldCost]==DEFAULT_INCOMES[GoldCost]+10 ) {
-	    DrawText(x+126,y+8+77,GameFont,"~<+10~>");
-	} else if( unit->Player->Incomes[GoldCost]
-		    ==DEFAULT_INCOMES[GoldCost]+20 ) {
-	    DrawText(x+126,y+8+77,GameFont,"~<+20~>");
+	if( unit->Player->Incomes[GoldCost] != DEFAULT_INCOMES[GoldCost] ) {
+		sprintf(buf, "~<+%i~>", unit->Player->Incomes[GoldCost]);
+		DrawText(x+126,y+8+77,GameFont,buf);
 	}
 	DrawText(x+52,y+8+93,GameFont,"Lumber:");
 	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 	// Lumber mill
 	if( unit->Player->Incomes[WoodCost]!=DEFAULT_INCOMES[WoodCost] ) {
-	    // FIXME: if production plus isn't 25!
-	    DrawText(x+126,y+8+93,GameFont,"~<+25~>");
+		sprintf(buf, "~+<%i~>", unit->Player->Incomes[WoodCost]);
+		DrawText(x+126,y+8+93,GameFont,buf);
 	}
 	DrawText(x+84,y+8+109,GameFont,"Oil:");
 	DrawNumber(x+108,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
 	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
-	    // FIXME: if production plus isn't 25!
-	    DrawText(x+126,y+8+109,GameFont,"~<+25~>");
+		sprintf(buf, "~+<%i~>", unit->Player->Incomes[OilCost]);
+	    DrawText(x+126,y+8+109,GameFont,buf);
 	}
     } else if( type->Transporter && unit->Value ) {
 	// FIXME: Level was centered?
