@@ -422,7 +422,7 @@ local void FreeMissile(Missile* missile)
 **		(BasicDamage-Armor)+PiercingDamage
 **	damage =----------------------------------
 **				    2
-**	damage is multiplied by random 1 or 2.
+**	damage is multiplied by random between 1 and 2.
 **
 **	@todo NOTE: different targets (big are hit by some missiles better)
 **	@todo NOTE: hidden targets are hit worser.
@@ -450,14 +450,18 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 	DebugLevel0Fn("bloodlust\n");
     }
 
-    damage = -goal_stats->Armor;
-    damage += basic_damage;
+    damage = basic_damage - goal_stats->Armor;
     if (damage < 0) {
-	damage = 0;
+	// Use minimum damage
+	if (piercing_damage < 30 && basic_damage < 30) {
+	    damage = (piercing_damage + 1) / 2;
+	} else {
+	    damage = (piercing_damage + basic_damage - 30) / 2;
+	}
+    } else {
+	damage += piercing_damage;
+	damage -= SyncRand() % ((damage + 2) / 2);
     }
-    damage += piercing_damage + 1;	// round up
-    damage /= 2;
-    damage *= ((SyncRand() >> 15) & 1) + 1;
     DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n" _C_ goal_stats->Armor _C_
 	    basic_damage _C_ piercing_damage _C_ damage);
 
