@@ -99,7 +99,7 @@ global EventCallback MenuCallbacks;		/// Menu callbacks
 /**
 **  Move map view point up (north).
 **
-**  @param step  How many tiles.
+**  @param step  How many pixels.
 */
 local void MoveMapViewPointUp(int step)
 {
@@ -121,7 +121,7 @@ local void MoveMapViewPointUp(int step)
 /**
 **  Move map view point left (west).
 **
-**  @param step  How many tiles.
+**  @param step  How many pixels.
 */
 local void MoveMapViewPointLeft(int step)
 {
@@ -143,7 +143,7 @@ local void MoveMapViewPointLeft(int step)
 /**
 **  Move map view point down (south).
 **
-**  @param step  How many tiles.
+**  @param step  How many pixels.
 */
 local void MoveMapViewPointDown(int step)
 {
@@ -165,7 +165,7 @@ local void MoveMapViewPointDown(int step)
 /**
 **  Move map view point right (east).
 **
-**  @param step  How many tiles.
+**  @param step  How many pixels.
 */
 local void MoveMapViewPointRight(int step)
 {
@@ -193,54 +193,62 @@ local void MoveMapViewPointRight(int step)
 **
 **  @todo  Support dynamic acceleration of scroll speed.
 **  @todo  If the scroll key is longer pressed the area is scrolled faster.
-**
 */
 global void DoScrollArea(enum _scroll_state_ state, int fast)
 {
+	Viewport* vp;
 	int stepx;
 	int stepy;
+	static int remx = 0;
+	static int remy = 0;
+
+	if (state == ScrollNone) {
+		return;
+	}
+
+	vp = TheUI.SelectedViewport;
 
 	if (fast) {
-		stepx = TheUI.SelectedViewport->MapWidth / 2 * TileSizeX;
-		stepy = TheUI.SelectedViewport->MapHeight / 2 * TileSizeY;
+		stepx = TheUI.SelectedViewport->MapWidth / 2 * TileSizeX * FRAMES_PER_SECOND;
+		stepy = TheUI.SelectedViewport->MapHeight / 2 * TileSizeY * FRAMES_PER_SECOND;
 	} else {				// dynamic: let these variables increase upto fast..
-		stepx = TileSizeX;
-		stepy = TileSizeY;
+		stepx = TileSizeX * FRAMES_PER_SECOND;
+		stepy = TileSizeY * FRAMES_PER_SECOND;
+	}
+	if (state & (ScrollLeft | ScrollRight)) {
+		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
+		remx += stepx - (stepx / 100) * 100;
+		stepx /= 100;
+		if (remx > 100) {
+			++stepx;
+			remx -= 100;
+		}
+	}
+	if (state & (ScrollUp | ScrollDown)) {
+		stepy = stepy * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
+		remy += stepy - (stepy / 100) * 100;
+		stepy /= 100;
+		if (remy > 100) {
+			++stepy;
+			remy -= 100;
+		}
 	}
 
-	switch (state) {
-		case ScrollUp:
-			MoveMapViewPointUp(stepy);
-			break;
-		case ScrollDown:
-			MoveMapViewPointDown(stepy);
-			break;
-		case ScrollLeft:
-			MoveMapViewPointLeft(stepx);
-			break;
-		case ScrollLeftUp:
-			MoveMapViewPointLeft(stepx);
-			MoveMapViewPointUp(stepy);
-			break;
-		case ScrollLeftDown:
-			MoveMapViewPointLeft(stepx);
-			MoveMapViewPointDown(stepy);
-			break;
-		case ScrollRight:
-			MoveMapViewPointRight(stepx);
-			break;
-		case ScrollRightUp:
-			MoveMapViewPointRight(stepx);
-			MoveMapViewPointUp(stepy);
-			break;
-		case ScrollRightDown:
-			MoveMapViewPointRight(stepx);
-			MoveMapViewPointDown(stepy);
-			break;
-		default:
-			return;						// skip marking map
+	if (state & ScrollUp) {
+		MoveMapViewPointUp(stepy);
 	}
-	HandleMouseMove(CursorX, CursorY);		// This recalulates some values
+	if (state & ScrollLeft) {
+		MoveMapViewPointLeft(stepx);
+	}
+	if (state & ScrollDown) {
+		MoveMapViewPointDown(stepy);
+	}
+	if (state & ScrollRight) {
+		MoveMapViewPointRight(stepx);
+	}
+
+	// This recalulates some values
+	HandleMouseMove(CursorX, CursorY);
 	MarkDrawEntireMap();
 	MustRedraw |= RedrawMinimap | RedrawCursors;
 }
@@ -902,12 +910,7 @@ global void GameMainLoop(void)
 		//
 		//		Map scrolling
 		//
-		if (TheUI.MouseScroll && !(FrameCounter % SpeedMouseScroll)) {
-			DoScrollArea(MouseScrollState, 0);
-		}
-		if (TheUI.KeyScroll && !(FrameCounter % SpeedKeyScroll)) {
-			DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
-		}
+		DoScrollArea(MouseScrollState | KeyScrollState, KeyModifiers & ModifierControl);
 
 		if (!(FrameCounter % COLOR_CYCLE_SPEED)) {
 			if (ColorCycleAll >= 0) {
