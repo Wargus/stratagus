@@ -373,7 +373,7 @@ global void HandleActionBuilded(Unit* unit)
     n=unit->Type->Construction->Sprite->NumFrames+2;
     for( i=(n+1)/2; i>=1; --i ) {
 	if( unit->Data.Builded.Sum*n/i >= unit->Stats->HitPoints ) {
-	    if( unit->Frame!=i ) {
+	    if( unit->Frame!=i && unit->Constructed ) {
 		CheckUnitToBeDrawn(unit);
 	    }
 	    if( i==(n+1)/2 ) {
