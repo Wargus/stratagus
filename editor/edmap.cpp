@@ -593,7 +593,7 @@ global void TileFill(int x, int y, int tile, int size)
 
     for( x = ix; x <= ax; x++ )
       for( y = iy; y <= ay; y++ )
-        EditTile( x, y, tile );
+        EditorChangeTile( x, y, tile, 15 );
 }
 
 #define WATER_TILE      0x10
@@ -631,8 +631,8 @@ global void EditorCreateRandomMap()
   TileFill( 0, 0, WATER_TILE, mz * 3 );
   
   EditorRandomizeTile( COAST_TILE, 10, 16 );
-  EditorRandomizeTile( GRASS_TILE, 10, 16 );
-  EditorRandomizeTile( WOOD_TILE,  60,  8 );
+  EditorRandomizeTile( GRASS_TILE, 20, 16 );
+  EditorRandomizeTile( WOOD_TILE,  60,  4 );
 }
 
 //@}
