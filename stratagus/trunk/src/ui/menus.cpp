@@ -754,9 +754,11 @@ local Menuitem CampaignContMenuItems[] = {
 local Menuitem GameOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "TEMP", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
-	{ text:{ "TEMP", MI_TFLAGS_CENTERED} } },
+	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 10, 42, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, EndMenu} } },
+    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
+	{ text:{ "CD Audio Enabled", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!TEST1", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
     { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL,
