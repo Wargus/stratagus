@@ -643,7 +643,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 #endif
 #endif
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || defined(USE_ZZIPLIB)
     if (dirp) {
 	while ((dp = readdir(dirp)) != NULL) {
 	    filename = dp->d_name;
@@ -758,7 +758,7 @@ zzentry:
 		    n++;
 		}
 	    }
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || defined(USE_ZZIPLIB)
 	}
 	closedir(dirp);
 #else
