@@ -7726,7 +7726,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 **	Move buttons so they're centered on different resolutions
 */
 #ifdef OLD_MENU
-local void MoveButtons()
+local void MoveButtons(void)
 {
     int menus = sizeof(Menus) / sizeof(Menu);
     int i;
@@ -7740,7 +7740,7 @@ local void MoveButtons()
     }
 }
 #else
-local void MoveButtons()
+local void MoveButtons(void)
 {
     OffsetX = (VideoWidth - 640) / 2;
     OffsetY = (VideoHeight - 480) / 2;
