@@ -1025,7 +1025,7 @@ fi
 
 if [ "$WIN32" = "0" ] ; then
     echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib $LDF_PNG_PATH $LOCAL_LDF" >> $RULESFILE
-    echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include $IF_PNG_PATH $LOCAL_IF" >> $RULESFILE
+    echo "XIFLAGS		= -I/usr/X11R6/include $IF_PNG_PATH $LOCAL_IF" >> $RULESFILE
 else
     echo "XLDFLAGS"	= >> $RULESFILE
     echo "XIFLAGS"	= >> $RULESFILE
