@@ -511,7 +511,7 @@ local void DrawUnitIcons(void)
     y += 18 * 1 + 4;
     if( SelectedPlayer != -1 ) {
 	i=sprintf(buf,"Plyr %d %s ",SelectedPlayer,
-		RaceWcNames[TheMap.Info->PlayerSide[SelectedPlayer]]);
+		PlayerRaces.Name[TheMap.Info->PlayerSide[SelectedPlayer]]);
 	// Players[SelectedPlayer].RaceName);
 
 	switch( TheMap.Info->PlayerType[SelectedPlayer] ) {

@@ -10,7 +10,7 @@
 //
 /**@name ai.c           -       The computer player AI main file. */
 //
-//      (c) Copyright 1998-2002 by Lutz Sammer
+//      (c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -219,18 +219,20 @@ local PlayerAi Ais[PlayerMax];		/// storage for all players
 ----------------------------------------------------------------------------*/
 
 /**
-**  Chooses which Race the building/unit needs to be.
+**	Chooses which Race the building/unit needs to be.
 **	FIXME: this is soon broken, must find better way!!!!
 */
 local int AiChooseRace(int type)
 {
-    if (AiPlayer->Player->Race == PlayerRaceHuman) {
-	if (type % 2 == 0)
+    if (AiPlayer->Player->Race == PlayerRaces.Race[0]) {
+	if (type % 2 == 0) {
 	    return type;
+	}
 	return type - 1;
     }
-    if (type % 2 == 1)
+    if (type % 2 == 1) {
 	return type;
+    }
     return type + 1;
 }
 
