@@ -757,7 +757,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
     case SpellActionHolyVision:
 	unit->Mana -= spell->ManaCost;	// get mana cost
 	// FIXME: Don't use UnitTypeByIdent during runtime.
-	target = MakeUnit(UnitTypeByIdent("unit-daemon"), unit->Player);
+	target = MakeUnit(UnitTypeByIdent("unit-revealer"), unit->Player);
 	target->Revealer = 1;
 	target->Orders[0].Action = UnitActionStill;
 	target->HP = 0;
@@ -765,7 +765,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	target->Y = y;
 	target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
 #ifdef NEW_FOW
-	target->CurrentSightRange = 10;
+	target->CurrentSightRange=target->Type->Stats->SightRange;
 	MapMarkSight(target->Player,x,y,target->CurrentSightRange);
 #endif
 	//target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
