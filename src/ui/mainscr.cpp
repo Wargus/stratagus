@@ -464,10 +464,17 @@ global void DrawUnitInfo(const Unit* unit)
 	    //		jugger has 50-130
 	    //		ship has 2-35
 	    if( stats->PiercingDamage!=type->_PiercingDamage ) {
-		sprintf(buf,"%d-%d~<+%d+%d~>"
-		    ,(stats->PiercingDamage+1)/2,i
-		    ,stats->BasicDamage-type->_BasicDamage
-		    ,stats->PiercingDamage-type->_PiercingDamage);
+		if( stats->PiercingDamage<30 && stats->BasicDamage<30 ) {
+		    sprintf(buf,"%d-%d~<+%d+%d~>"
+			,(stats->PiercingDamage+1)/2,i
+			,stats->BasicDamage-type->_BasicDamage
+			,stats->PiercingDamage-type->_PiercingDamage);
+		} else {
+		    sprintf(buf,"%d-%d~<+%d+%d~>"
+			,(stats->PiercingDamage+stats->BasicDamage-30)/2,i
+			,stats->BasicDamage-type->_BasicDamage
+			,stats->PiercingDamage-type->_PiercingDamage);
+		}
 	    } else if( stats->PiercingDamage || stats->BasicDamage<30 ) {
 		sprintf(buf,"%d-%d"
 		    ,(stats->PiercingDamage+1)/2,i);
