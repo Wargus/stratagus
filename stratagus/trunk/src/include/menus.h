@@ -327,6 +327,8 @@ extern void InitMenuFunctions(void);
 
     /// Edit resource properties
 extern void EditorEditResource(void);
+    /// Edit ai properties
+extern void EditorEditAiProperties(void);
 
 //@}
 
