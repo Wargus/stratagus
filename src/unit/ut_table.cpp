@@ -1102,11 +1102,13 @@ global UnitType UnitTypes[] = {
    ,FootmanAnimations	// animations
    ,{ "icon-footman" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     60,     0, {   60,   600,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     60,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  600,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     2,   60,       6,     3,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -1139,11 +1141,13 @@ global UnitType UnitTypes[] = {
    ,GruntAnimations	// animations
    ,{ "icon-grunt" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     60,     0, {   60,   600,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     60,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  600,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     2,   60,       6,     3,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -1176,11 +1180,13 @@ global UnitType UnitTypes[] = {
    ,PeasantAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1213,11 +1219,13 @@ global UnitType UnitTypes[] = {
    ,PeonAnimations	// animations
    ,{ "icon-peon" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1250,11 +1258,13 @@ global UnitType UnitTypes[] = {
    ,BallistaAnimations	// animations
    ,{ "icon-ballista" }
    ,{ "missile-ballista-bolt" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     5,      0,     9,    110,     0, {  250,   900,    300,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        8,     11,      9
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     5,      0,     9,    110,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  250,  900,  300,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        1,      8,    11,      9
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   70,      80,     0,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1287,11 +1297,13 @@ global UnitType UnitTypes[] = {
    ,CatapultAnimations	// animations
    ,{ "icon-catapult" }
    ,{ "missile-catapult-rock" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     5,      0,     9,    110,     0, {  250,   900,    300,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        8,     11,      9
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     5,      0,     9,    110,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  250,  900,  300,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        1,      8,    11,      9
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   70,      80,     0,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1324,11 +1336,13 @@ global UnitType UnitTypes[] = {
    ,KnightAnimations	// animations
    ,{ "icon-knight" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     4,     90,     0, {   90,   800,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     4,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  800,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     4,   63,       8,     4,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -1361,11 +1375,13 @@ global UnitType UnitTypes[] = {
    ,OgreAnimations	// animations
    ,{ "icon-ogre" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     4,     90,     0, {   90,   800,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      6,      4
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     4,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  800,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     4,   63,       8,     4,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -1398,11 +1414,13 @@ global UnitType UnitTypes[] = {
    ,ArcherAnimations	// animations
    ,{ "icon-archer" }
    ,{ "missile-arrow" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     5,     40,     0, {   70,   500,     50,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    33,     33,        4,      7,      5
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     5,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  500,   50,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    33,     33,        0,      4,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   55,       3,     6,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1435,11 +1453,13 @@ global UnitType UnitTypes[] = {
    ,AxethrowerAnimations	// animations
    ,{ "icon-axethrower" }
    ,{ "missile-axe" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     5,     40,     0, {   70,   500,     50,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    36,     36,        4,      7,      5
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     5,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  500,   50,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    36,     36,        0,      4,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   55,       3,     6,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1472,11 +1492,13 @@ global UnitType UnitTypes[] = {
    ,MageAnimations	// animations
    ,{ "icon-mage" }
    ,{ "missile-lightning" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     8,      0,     9,     60,     1, {  120,  1200,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    33,     33,        2,     11,      9
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     8,      0,     9,     60,     1
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  120, 1200,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    33,     33,        0,      2,    11,      9
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   70,       0,     9,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1509,11 +1531,13 @@ global UnitType UnitTypes[] = {
    ,DeathKnightAnimations	// animations
    ,{ "icon-death-knight" }
    ,{ "missile-touch-of-death" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     8,      0,     9,     60,     1, {  120,  1200,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    39,     39,        3,     11,      9
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     8,      0,     9,     60,     1
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  120, 1200,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    39,     39,        0,      3,    11,      9
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   70,       0,     9,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1546,11 +1570,13 @@ global UnitType UnitTypes[] = {
    ,PaladinAnimations	// animations
    ,{ "icon-paladin" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     5,     90,     0, {   90,   800,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      7,      5
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     5,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  800,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     4,   65,       8,     4,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -1583,11 +1609,13 @@ global UnitType UnitTypes[] = {
    ,OgreMageAnimations	// animations
    ,{ "icon-ogre-mage" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     5,     90,     0, {   90,   800,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      7,      5
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     5,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  800,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     4,   65,       8,     4,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -1620,11 +1648,13 @@ global UnitType UnitTypes[] = {
    ,DwarvesAnimations	// animations
    ,{ "icon-dwarves" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    11,      0,     4,     40,     0, {  200,   700,    250,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    32,     32,        1,      4,      2
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    11,      0,     4,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  700,  250,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    32,     32,        0,      1,     4,      2
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   55,       4,     2,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1657,11 +1687,13 @@ global UnitType UnitTypes[] = {
    ,GoblinSappersAnimations	// animations
    ,{ "icon-goblin-sappers" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    11,      0,     4,     40,     0, {  200,   700,    250,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    37,     37,        1,      4,      2
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    11,      0,     4,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  700,  250,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    37,     37,        0,      1,     4,      2
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   55,       4,     2,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1694,11 +1726,13 @@ global UnitType UnitTypes[] = {
    ,AttackPeasantAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1731,11 +1765,13 @@ global UnitType UnitTypes[] = {
    ,AttackPeonAnimations	// animations
    ,{ "icon-peon" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1768,11 +1804,13 @@ global UnitType UnitTypes[] = {
    ,RangerAnimations	// animations
    ,{ "icon-ranger" }
    ,{ "missile-arrow" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     6,     50,     0, {   70,   500,     50,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    33,     33,        4,      9,      6
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     6,     50,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  500,   50,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    33,     33,        0,      4,     9,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   57,       3,     6,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1805,11 +1843,13 @@ global UnitType UnitTypes[] = {
    ,BerserkerAnimations	// animations
    ,{ "icon-berserker" }
    ,{ "missile-axe" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     6,     50,     0, {   70,   500,     50,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    36,     36,        4,      9,      6
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     6,     50,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  500,   50,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    36,     36,        0,      4,     9,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   57,       3,     6,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1842,11 +1882,13 @@ global UnitType UnitTypes[] = {
    ,AlleriaAnimations	// animations
    ,{ "icon-alleria" }
    ,{ "missile-arrow" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     9,    120,     0, {   70,   500,     50,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    33,     33,        7,      7,      5
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     9,    120,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  500,   50,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    33,     33,        0,      7,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     5,   55,      10,    18,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1879,11 +1921,13 @@ global UnitType UnitTypes[] = {
    ,TeronGorefiendAnimations	// animations
    ,{ "icon-teron-gorefiend" }
    ,{ "missile-touch-of-death" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     8,      0,     9,    180,     1, {  120,  1200,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    39,     39,        4,     11,      9
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     8,      0,     9,    180,     1
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  120, 1200,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    39,     39,        0,      4,    11,      9
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     2,   70,       0,    16,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1916,11 +1960,13 @@ global UnitType UnitTypes[] = {
    ,KurdanAndSky_reeAnimations	// animations
    ,{ "icon-kurdan-and-sky'ree" }
    ,{ "missile-griffon-hammer" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    14,      0,     9,    250,     0, {  250,  2500,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        5,      8,      6
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    14,      0,     9,    250,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  250, 2500,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      5,     8,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     6,   65,       0,    25,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -1953,11 +1999,13 @@ global UnitType UnitTypes[] = {
    ,DentargAnimations	// animations
    ,{ "icon-dentarg" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     6,    300,     1, {   90,   800,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      6,      4
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     6,    300,     1
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  800,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     8,   63,      18,     6,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -1990,11 +2038,13 @@ global UnitType UnitTypes[] = {
    ,KhadgarAnimations	// animations
    ,{ "icon-khadgar" }
    ,{ "missile-lightning" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     8,      0,     9,    120,     1, {  120,  1200,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    33,     33,        6,     11,      9
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     8,      0,     9,    120,     1
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  120, 1200,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    33,     33,        0,      6,    11,      9
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     3,   70,       0,    16,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2027,11 +2077,13 @@ global UnitType UnitTypes[] = {
    ,GromHellscreamAnimations	// animations
    ,{ "icon-grom-hellscream" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     5,    240,     0, {   60,   600,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     5,    240,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  600,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     8,   60,      16,     6,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2064,11 +2116,13 @@ global UnitType UnitTypes[] = {
    ,TankerHumanAnimations	// animations
    ,{ "icon-human-oil-tanker" }
    ,{ "missile-none" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     90,     0, {   50,   400,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,      0,      0
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   50,  400,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   50,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2101,11 +2155,13 @@ global UnitType UnitTypes[] = {
    ,TankerOrcAnimations	// animations
    ,{ "icon-orc-oil-tanker" }
    ,{ "missile-none" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     90,     0, {   50,   400,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,      0,      0
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   50,  400,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   50,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2138,11 +2194,13 @@ global UnitType UnitTypes[] = {
    ,TransportHumanAnimations	// animations
    ,{ "icon-human-transport" }
    ,{ "missile-none" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,    150,     0, {   70,   600,    200,   500 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,      0,      0
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,    150,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  600,  200,  500,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   70,       0,     0,      0,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2175,11 +2233,13 @@ global UnitType UnitTypes[] = {
    ,TransportOrcAnimations	// animations
    ,{ "icon-orc-transport" }
    ,{ "missile-none" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,    150,     0, {   70,   600,    200,   500 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,      0,      0
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,    150,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  600,  200,  500,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   70,       0,     0,      0,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2212,11 +2272,13 @@ global UnitType UnitTypes[] = {
    ,ElvenDestroyerAnimations	// animations
    ,{ "icon-elven-destroyer" }
    ,{ "missile-small-cannon" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     8,    100,     0, {   90,   700,    350,   700 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        4,     10,      8
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     8,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  700,  350,  700,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      4,    10,      8
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   65,      35,     0,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2249,11 +2311,13 @@ global UnitType UnitTypes[] = {
    ,TrollDestroyerAnimations	// animations
    ,{ "icon-troll-destroyer" }
    ,{ "missile-small-cannon" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     8,    100,     0, {   90,   700,    350,   700 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        4,     10,      8
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     8,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  700,  350,  700,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      4,    10,      8
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   65,      35,     0,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2286,11 +2350,13 @@ global UnitType UnitTypes[] = {
    ,BattleshipAnimations	// animations
    ,{ "icon-battleship" }
    ,{ "missile-big-cannon" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     6,      0,     8,    150,     0, {  140,  1000,    500,  1000 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    70,     70,        6,     10,      8
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     6,      0,     8,    150,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  140, 1000,  500, 1000,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    70,     70,        0,      6,    10,      8
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    15,   63,     130,     0,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2323,11 +2389,13 @@ global UnitType UnitTypes[] = {
    ,JuggernaughtAnimations	// animations
    ,{ "icon-ogre-juggernaught" }
    ,{ "missile-big-cannon" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     6,      0,     8,    150,     0, {  140,  1000,    500,  1000 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    70,     70,        6,     10,      8
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     6,      0,     8,    150,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  140, 1000,  500, 1000,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    70,     70,        0,      6,    10,      8
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    15,   63,     130,     0,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2360,11 +2428,13 @@ global UnitType UnitTypes[] = {
    ,NothingAnimations	// animations
    ,{ "icon-cancel" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    99,      0,     0,      0,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     0,    0,     0,      0,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    99,      0,     0,      0,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     0,    0,     0,      0,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2397,11 +2467,13 @@ global UnitType UnitTypes[] = {
    ,DeathwingAnimations	// animations
    ,{ "icon-deathwing" }
    ,{ "missile-dragon-breath" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    14,      0,     9,    800,     0, {  250,  2500,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    71,     71,        5,      8,      6
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    14,      0,     9,    800,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  250, 2500,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    71,     71,        0,      5,     8,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   65,      10,    25,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2434,11 +2506,13 @@ global UnitType UnitTypes[] = {
    ,Nothing1Animations	// animations
    ,{ "icon-cancel" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    99,      0,     4,     60,     0, {   60,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,     20,     10
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    99,      0,     4,     60,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,    20,     10
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     2,   40,       9,     1,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2471,11 +2545,13 @@ global UnitType UnitTypes[] = {
    ,Nothing2Animations	// animations
    ,{ "icon-cancel" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    99,      0,     4,     60,     0, {   60,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,     20,     10
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    99,      0,     4,     60,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,    20,     10
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     2,   40,       9,     1,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2508,11 +2584,13 @@ global UnitType UnitTypes[] = {
    ,GnomishSubmarineAnimations	// animations
    ,{ "icon-gnomish-submarine" }
    ,{ "missile-submarine-missile" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     7,      0,     5,     60,     0, {  100,   800,    150,   900 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        4,      7,      5
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     7,      0,     5,     60,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100,  800,  150,  900,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      4,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   60,      50,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2545,11 +2623,13 @@ global UnitType UnitTypes[] = {
    ,GiantTurtleAnimations	// animations
    ,{ "icon-giant-turtle" }
    ,{ "missile-turtle-missile" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     7,      0,     5,     60,     0, {  100,   800,    150,   900 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        4,      7,      5
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     7,      0,     5,     60,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100,  800,  150,  900,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      4,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   60,      50,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2582,11 +2662,13 @@ global UnitType UnitTypes[] = {
    ,GnomishFlyingMachineAnimations	// animations
    ,{ "icon-gnomish-flying-machine" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    17,      0,     9,    150,     0, {   65,   500,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,     19,     15
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    17,      0,     9,    150,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   65,  500,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,    19,     15
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     2,   40,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2619,11 +2701,13 @@ global UnitType UnitTypes[] = {
    ,GoblinZeppelinAnimations	// animations
    ,{ "icon-goblin-zeppelin" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    17,      0,     9,    150,     0, {   65,   500,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,     19,     15
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    17,      0,     9,    150,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   65,  500,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,    19,     15
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     2,   40,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2656,11 +2740,13 @@ global UnitType UnitTypes[] = {
    ,GryphonRiderAnimations	// animations
    ,{ "icon-gryphon-rider" }
    ,{ "missile-griffon-hammer" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    14,      0,     6,    100,     0, {  250,  2500,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        4,      8,      6
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    14,      0,     6,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  250, 2500,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      4,     8,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     5,   65,       0,    16,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2693,11 +2779,13 @@ global UnitType UnitTypes[] = {
    ,DragonAnimations	// animations
    ,{ "icon-dragon" }
    ,{ "missile-dragon-breath" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    14,      0,     6,    100,     0, {  250,  2500,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    71,     71,        4,      8,      6
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    14,      0,     6,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  250, 2500,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    71,     71,        0,      4,     8,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     5,   65,       0,    16,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2730,11 +2818,13 @@ global UnitType UnitTypes[] = {
    ,TuralyonAnimations	// animations
    ,{ "icon-turalyon" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     6,    180,     0, {   90,   800,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      7,      5
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     6,    180,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   90,  800,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   65,      14,     5,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2767,11 +2857,13 @@ global UnitType UnitTypes[] = {
    ,EyeOfKilroggAnimations	// animations
    ,{ "icon-eye-of-kilrogg" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    42,      0,     3,    100,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,     20,     10
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    42,      0,     3,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,    20,     10
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       1,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2804,11 +2896,13 @@ global UnitType UnitTypes[] = {
    ,DanathAnimations	// animations
    ,{ "icon-danath" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     6,    220,     0, {   60,   600,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     6,    220,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  600,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     8,   60,      15,     8,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2841,11 +2935,13 @@ global UnitType UnitTypes[] = {
    ,KorgathBladefistAnimations	// animations
    ,{ "icon-korgath-bladefist" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     5,    240,     0, {   60,   600,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     5,    240,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  600,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     8,   60,      16,     6,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2878,11 +2974,13 @@ global UnitType UnitTypes[] = {
    ,Nothing3Animations	// animations
    ,{ "icon-cancel" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    99,      0,     0,      0,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     0,    0,     0,      0,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    99,      0,     0,      0,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     0,    0,     0,      0,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -2915,11 +3013,13 @@ global UnitType UnitTypes[] = {
    ,Cho_gallAnimations	// animations
    ,{ "icon-cho'gall" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     5,    100,     0, {  100,  1100,     50,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      7,      5
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     5,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100, 1100,   50,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   65,      10,     5,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2952,11 +3052,13 @@ global UnitType UnitTypes[] = {
    ,LotharAnimations	// animations
    ,{ "icon-lothar" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     5,     90,     0, {  100,   900,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      7,      5
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     5,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100,  900,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     4,   65,       8,     4,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -2989,11 +3091,13 @@ global UnitType UnitTypes[] = {
    ,Gul_danAnimations	// animations
    ,{ "icon-gul'dan" }
    ,{ "missile-touch-of-death" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     8,      0,     8,     40,     1, {  120,  1200,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    33,     33,        3,     10,      8
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     8,      0,     8,     40,     1
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  120, 1200,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    33,     33,        0,      3,    10,      8
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   70,       0,     3,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3026,11 +3130,13 @@ global UnitType UnitTypes[] = {
    ,UtherLightbringerAnimations	// animations
    ,{ "icon-uther-lightbringer" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    13,      0,     5,     90,     0, {  100,   900,    100,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    42,     42,        1,      7,      5
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    13,      0,     5,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100,  900,  100,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    42,     42,        0,      1,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     4,   65,       8,     4,      1,      1
 	//Type	Decay	Annoy	Mouse	Points
@@ -3063,11 +3169,13 @@ global UnitType UnitTypes[] = {
    ,ZuljinAnimations	// animations
    ,{ "icon-zuljin" }
    ,{ "missile-axe" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     6,     40,     0, {   70,   500,     50,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    36,     36,        5,      8,      6
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     6,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   70,  500,   50,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    36,     36,        0,      5,     8,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   55,       3,     6,      1,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3100,11 +3208,13 @@ global UnitType UnitTypes[] = {
    ,Nothing4Animations	// animations
    ,{ "icon-cancel" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    99,      0,     0,      0,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     0,    0,     0,      0,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    99,      0,     0,      0,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     0,    0,     0,      0,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3137,11 +3247,13 @@ global UnitType UnitTypes[] = {
    ,SkeletonAnimations	// animations
    ,{ "icon-skeleton" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    99,      0,     3,     40,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      4,      2
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    99,      0,     3,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     4,      2
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   55,       6,     3,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3174,11 +3286,13 @@ global UnitType UnitTypes[] = {
    ,DaemonAnimations	// animations
    ,{ "icon-daemon" }
    ,{ "missile-daemon-fire" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    99,      0,     5,     60,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        3,      7,      5
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    99,      0,     5,     60,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      3,     7,      5
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     3,   63,      10,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3211,11 +3325,13 @@ global UnitType UnitTypes[] = {
    ,CritterAnimations	// animations
    ,{ "icon-critter" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     3,      0,     2,      5,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,     20,     10
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     3,      0,     2,      5,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,    20,     10
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   37,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3248,11 +3364,13 @@ global UnitType UnitTypes[] = {
    ,FarmAnimations	// animations
    ,{ "icon-farm" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    400,     0, {  100,   500,    250,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        0,      0,      0
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    400,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100,  500,  250,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   20,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3285,11 +3403,13 @@ global UnitType UnitTypes[] = {
    ,PigFarmAnimations	// animations
    ,{ "icon-pig-farm" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    400,     0, {  100,   500,    250,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        0,      0,      0
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    400,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100,  500,  250,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   20,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3322,11 +3442,13 @@ global UnitType UnitTypes[] = {
    ,BarracksHumanAnimations	// animations
    ,{ "icon-human-barracks" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    800,     0, {  200,   700,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    800,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  700,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   30,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3359,11 +3481,13 @@ global UnitType UnitTypes[] = {
    ,BarracksOrcAnimations	// animations
    ,{ "icon-orc-barracks" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    800,     0, {  200,   700,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    800,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  700,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   30,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3396,11 +3520,13 @@ global UnitType UnitTypes[] = {
    ,ChurchAnimations	// animations
    ,{ "icon-church" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    700,     0, {  175,   900,    500,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    700,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  175,  900,  500,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3433,11 +3559,13 @@ global UnitType UnitTypes[] = {
    ,AltarOfStormsAnimations	// animations
    ,{ "icon-altar-of-storms" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    700,     0, {  175,   900,    500,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    700,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  175,  900,  500,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3470,11 +3598,13 @@ global UnitType UnitTypes[] = {
    ,ScoutTowerHumanAnimations	// animations
    ,{ "icon-human-watch-tower" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,    100,     0, {   60,   550,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        0,      0,      0
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  550,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   55,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3507,11 +3637,13 @@ global UnitType UnitTypes[] = {
    ,ScoutTowerOrcAnimations	// animations
    ,{ "icon-orc-watch-tower" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,    100,     0, {   60,   550,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        0,      0,      0
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,    100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   60,  550,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   55,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3544,11 +3676,13 @@ global UnitType UnitTypes[] = {
    ,StablesAnimations	// animations
    ,{ "icon-stables" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  150,  1000,    300,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150, 1000,  300,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3581,11 +3715,13 @@ global UnitType UnitTypes[] = {
    ,OgreMoundAnimations	// animations
    ,{ "icon-ogre-mound" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  150,  1000,    300,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150, 1000,  300,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3618,11 +3754,13 @@ global UnitType UnitTypes[] = {
    ,GnomishInventorAnimations	// animations
    ,{ "icon-gnomish-inventor" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150, 1000,  400,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3655,11 +3793,13 @@ global UnitType UnitTypes[] = {
    ,GoblinAlchemistAnimations	// animations
    ,{ "icon-goblin-alchemist" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150, 1000,  400,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3692,11 +3832,13 @@ global UnitType UnitTypes[] = {
    ,GryphonAviaryAnimations	// animations
    ,{ "icon-gryphon-aviary" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150, 1000,  400,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3729,11 +3871,13 @@ global UnitType UnitTypes[] = {
    ,DragonRoostAnimations	// animations
    ,{ "icon-dragon-roost" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  150,  1000,    400,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150, 1000,  400,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3766,11 +3910,13 @@ global UnitType UnitTypes[] = {
    ,ShipyardHumanAnimations	// animations
    ,{ "icon-human-shipyard" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      7,     3,   1100,     0, {  200,   800,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      7,     3,   1100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  800,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   30,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3803,11 +3949,13 @@ global UnitType UnitTypes[] = {
    ,ShipyardOrcAnimations	// animations
    ,{ "icon-orc-shipyard" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      8,     3,   1100,     0, {  200,   800,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      8,     3,   1100,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  800,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   30,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3840,11 +3988,13 @@ global UnitType UnitTypes[] = {
    ,TownHallAnimations	// animations
    ,{ "icon-town-hall" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite4x4
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     4,   1200,     0, {  255,  1200,    800,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   126,    126,        0,      0,      0
+   ,"unit-destroyed-4x4-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     4,   1200,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  255, 1200,  800,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   126,    126,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   35,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3877,11 +4027,13 @@ global UnitType UnitTypes[] = {
    ,GreatHallAnimations	// animations
    ,{ "icon-great-hall" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite4x4
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     4,   1200,     0, {  255,  1200,    800,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   127,    127,        0,      0,      0
+   ,"unit-destroyed-4x4-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     4,   1200,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  255, 1200,  800,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   127,    127,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   35,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3914,11 +4066,13 @@ global UnitType UnitTypes[] = {
    ,ElvenLumberMillAnimations	// animations
    ,{ "icon-elven-lumber-mill" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    600,     0, {  150,   600,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    600,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150,  600,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   25,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3951,11 +4105,13 @@ global UnitType UnitTypes[] = {
    ,TrollLumberMillAnimations	// animations
    ,{ "icon-troll-lumber-mill" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    600,     0, {  150,   600,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    600,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150,  600,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   25,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -3988,11 +4144,13 @@ global UnitType UnitTypes[] = {
    ,FoundryHumanAnimations	// animations
    ,{ "icon-human-foundry" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,     13,     3,    750,     0, {  175,   700,    400,   400 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,     13,     3,    750,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  175,  700,  400,  400,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4025,11 +4183,13 @@ global UnitType UnitTypes[] = {
    ,FoundryOrcAnimations	// animations
    ,{ "icon-orc-foundry" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,     14,     3,    750,     0, {  175,   700,    400,   400 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,     14,     3,    750,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  175,  700,  400,  400,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4062,11 +4222,13 @@ global UnitType UnitTypes[] = {
    ,MageTowerAnimations	// animations
    ,{ "icon-mage-tower" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  125,  1000,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  125, 1000,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   35,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4099,11 +4261,13 @@ global UnitType UnitTypes[] = {
    ,TempleOfTheDamnedAnimations	// animations
    ,{ "icon-temple-of-the-damned" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    500,     0, {  125,  1000,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  125, 1000,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   35,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4136,11 +4300,13 @@ global UnitType UnitTypes[] = {
    ,BlacksmithHumanAnimations	// animations
    ,{ "icon-human-blacksmith" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    775,     0, {  200,   800,    450,   100 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    775,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  800,  450,  100,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4173,11 +4339,13 @@ global UnitType UnitTypes[] = {
    ,BlacksmithOrcAnimations	// animations
    ,{ "icon-orc-blacksmith" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,    775,     0, {  200,   800,    450,   100 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,    775,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  800,  450,  100,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4210,11 +4378,13 @@ global UnitType UnitTypes[] = {
    ,RefineryHumanAnimations	// animations
    ,{ "icon-human-refinery" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,     11,     3,    600,     0, {  225,   800,    350,   200 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,     11,     3,    600,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  225,  800,  350,  200,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   25,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4247,11 +4417,13 @@ global UnitType UnitTypes[] = {
    ,RefineryOrcAnimations	// animations
    ,{ "icon-orc-refinery" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,     12,     3,    600,     0, {  225,   800,    350,   200 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,     12,     3,    600,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  225,  800,  350,  200,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   25,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4284,11 +4456,13 @@ global UnitType UnitTypes[] = {
    ,OilPlatformHumanAnimations	// animations
    ,{ "icon-human-oil-platform" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      9,     3,    650,     0, {  200,   700,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      9,     3,    650,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  700,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   20,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4321,11 +4495,13 @@ global UnitType UnitTypes[] = {
    ,OilPlatformOrcAnimations	// animations
    ,{ "icon-orc-oil-platform" }
    ,{ "missile-none" }		// Missile
-   ,CorpseWaterSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,     10,     3,    650,     0, {  200,   700,    450,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 3
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,     10,     3,    650,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200,  700,  450,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   20,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4358,11 +4534,13 @@ global UnitType UnitTypes[] = {
    ,KeepAnimations	// animations
    ,{ "icon-keep" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite4x4
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     6,   1400,     0, {  200,  2000,   1000,   200 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   127,    127,        0,      0,      0
+   ,"unit-destroyed-4x4-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     6,   1400,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200, 2000, 1000,  200,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   127,    127,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   37,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4395,11 +4573,13 @@ global UnitType UnitTypes[] = {
    ,StrongholdAnimations	// animations
    ,{ "icon-stronghold" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite4x4
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     6,   1400,     0, {  200,  2000,   1000,   200 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   127,    127,        0,      0,      0
+   ,"unit-destroyed-4x4-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     6,   1400,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200, 2000, 1000,  200,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   127,    127,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   37,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4432,11 +4612,13 @@ global UnitType UnitTypes[] = {
    ,CastleAnimations	// animations
    ,{ "icon-castle" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite4x4
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,   1600,     0, {  200,  2500,   1200,   500 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   127,    127,        0,      0,      0
+   ,"unit-destroyed-4x4-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,   1600,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200, 2500, 1200,  500,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   127,    127,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   40,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4469,11 +4651,13 @@ global UnitType UnitTypes[] = {
    ,FortressAnimations	// animations
    ,{ "icon-fortress" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite4x4
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,   1600,     0, {  200,  2500,   1200,   500 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   127,    127,        0,      0,      0
+   ,"unit-destroyed-4x4-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,   1600,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  200, 2500, 1200,  500,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   127,    127,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   40,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4506,11 +4690,13 @@ global UnitType UnitTypes[] = {
    ,GoldMineAnimations	// animations
    ,{ "icon-gold-mine" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite3x3
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     3,  25500,     0, {  150,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,"unit-destroyed-3x3-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     3,  25500,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  150,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4543,11 +4729,13 @@ global UnitType UnitTypes[] = {
    ,OilPatchAnimations	// animations
    ,{ "icon-oil-patch" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     0,      0,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4580,11 +4768,13 @@ global UnitType UnitTypes[] = {
    ,StartLocationHumanAnimations	// animations
    ,{ "icon-cancel" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     0,      0,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4617,11 +4807,13 @@ global UnitType UnitTypes[] = {
    ,StartLocationOrcAnimations	// animations
    ,{ "icon-cancel" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     0,      0,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4654,11 +4846,13 @@ global UnitType UnitTypes[] = {
    ,GuardTowerHumanAnimations	// animations
    ,{ "icon-human-guard-tower" }
    ,{ "missile-arrow" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,    130,     0, {  140,   500,    150,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        6,      6,      6
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,    130,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  140,  500,  150,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      6,     6,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   40,       4,    12,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4691,11 +4885,13 @@ global UnitType UnitTypes[] = {
    ,GuardTowerOrcAnimations	// animations
    ,{ "icon-orc-guard-tower" }
    ,{ "missile-arrow" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,    130,     0, {  140,   500,    150,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        6,      6,      6
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,    130,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  140,  500,  150,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      6,     6,      6
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   40,       4,    12,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4728,11 +4924,13 @@ global UnitType UnitTypes[] = {
    ,CannonTowerHumanAnimations	// animations
    ,{ "icon-human-cannon-tower" }
    ,{ "missile-small-cannon" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,    160,     0, {  190,  1000,    300,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        7,      7,      7
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,    160,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  190, 1000,  300,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        1,      7,     7,      7
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   40,      50,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4765,11 +4963,13 @@ global UnitType UnitTypes[] = {
    ,CannonTowerOrcAnimations	// animations
    ,{ "icon-orc-cannon-tower" }
    ,{ "missile-small-cannon" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     9,    160,     0, {  190,  1000,    300,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        7,      7,      7
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     9,    160,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  190, 1000,  300,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      7,     7,      7
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   40,      50,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4802,11 +5002,13 @@ global UnitType UnitTypes[] = {
    ,CircleofPowerAnimations	// animations
    ,{ "icon-circle-of-power" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     0,      0,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        0,      0,      0
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     0,      0,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4839,11 +5041,13 @@ global UnitType UnitTypes[] = {
    ,DarkPortalAnimations	// animations
    ,{ "icon-dark-portal" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite4x4
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     4,   5000,     0, {  100,  3000,   3000,  1000 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   127,    127,        0,      0,      0
+   ,"unit-destroyed-4x4-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     4,   5000,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  100, 3000, 3000, 1000,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   127,    127,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4876,11 +5080,13 @@ global UnitType UnitTypes[] = {
    ,RunestoneAnimations	// animations
    ,{ "icon-runestone" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite2x2
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      6,     4,   5000,     0, {  175,   900,    500,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        0,      0,      0
+   ,"unit-destroyed-2x2-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      6,     4,   5000,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{  175,  900,  500,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   15,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4913,11 +5119,13 @@ global UnitType UnitTypes[] = {
    ,WallHumanAnimations	// animations
    ,{ "icon-human-wall" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite1x1
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,     15,     1,     40,     0, {   30,    20,     10,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        0,      0,      0
+   ,"unit-destroyed-1x1-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,     15,     1,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   30,   20,   10,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4950,11 +5158,13 @@ global UnitType UnitTypes[] = {
    ,WallOrcAnimations	// animations
    ,{ "icon-orc-wall" }
    ,{ "missile-none" }		// Missile
-   ,CorpseLandSite1x1
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,     15,     1,     40,     0, {   30,    20,     10,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        0,      0,      0
+   ,"unit-destroyed-1x1-place", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,     15,     1,     40,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   30,   20,   10,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -4987,11 +5197,13 @@ global UnitType UnitTypes[] = {
    ,DeadBodyAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     1,    255,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     1,    255,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5024,11 +5236,13 @@ global UnitType UnitTypes[] = {
    ,Destroyed1x1PlaceAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     2,    255,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     2,    255,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5061,11 +5275,13 @@ global UnitType UnitTypes[] = {
    ,Destroyed2x2PlaceAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     2,    255,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     2,    2,    63,     63,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     2,    255,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     2,    2,    63,     63,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5098,11 +5314,13 @@ global UnitType UnitTypes[] = {
    ,Destroyed3x3PlaceAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     3,    255,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     3,    3,    95,     95,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     3,    255,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     3,    3,    95,     95,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5135,11 +5353,13 @@ global UnitType UnitTypes[] = {
    ,Destroyed4x4PlaceAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseNone
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     3,    255,     0, {    0,     0,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     4,    4,   127,    127,        0,      0,      0
+   ,NULL, NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,     0,      0,     3,    255,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{    0,    0,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     4,    4,   127,    127,        0,      0,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,    0,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5172,11 +5392,13 @@ global UnitType UnitTypes[] = {
    ,PeasantWithGoldAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5209,11 +5431,13 @@ global UnitType UnitTypes[] = {
    ,PeonWithGoldAnimations	// animations
    ,{ "icon-peon" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5246,11 +5470,13 @@ global UnitType UnitTypes[] = {
    ,PeasantWithWoodAnimations	// animations
    ,{ "icon-peasant" }
    ,{ "missile-none" }		// Missile
-   ,CorpseHuman
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 6
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5283,11 +5509,13 @@ global UnitType UnitTypes[] = {
    ,PeonWithWoodAnimations	// animations
    ,{ "icon-peon" }
    ,{ "missile-none" }		// Missile
-   ,CorpseOrc
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     30,     0, {   45,   400,      0,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    31,     31,        1,      6,      4
+   ,"unit-dead-body", NULL, 0
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     30,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   45,  400,    0,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    31,     31,        0,      1,     6,      4
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,     0,   50,       3,     2,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5320,11 +5548,13 @@ global UnitType UnitTypes[] = {
    ,TankerHumanFullAnimations	// animations
    ,{ "icon-human-oil-tanker" }
    ,{ "missile-none" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     90,     0, {   50,   400,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,      0,      0
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   50,  400,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   50,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
@@ -5357,11 +5587,13 @@ global UnitType UnitTypes[] = {
    ,TankerOrcFullAnimations	// animations
    ,{ "icon-orc-oil-tanker" }
    ,{ "missile-none" }		// Missile
-   ,CorpseShip
-	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,    10,      0,     4,     90,     0, {   50,   400,    200,     0 }
-	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
-	,     1,    1,    63,     63,        1,      0,      0
+   ,"unit-dead-body", NULL, 12
+	//Speed	Overlay	SightR	Hitpnt	Magic
+	,    10,      0,     4,     90,     0
+	// BTime  Gold  Wood   Oil   Ore Stone  Coal
+	,{   50,  400,  200,    0,    0,    0,    0 }
+	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
+	,     1,    1,    63,     63,        0,      1,     0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    10,   50,       0,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points

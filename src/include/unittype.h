@@ -118,6 +118,7 @@ struct _unit_type_ {
     int		TileHeight;		/// tile size on map height
     int		BoxWidth;		/// selected box size width
     int		BoxHeight;		/// selected box size height
+    int		MinAttackRange;		/// minimal attack range
     int		_AttackRange;		/// how far can the unit attack
     int		ReactRangeComputer;	/// reacts on enemy for computer
     int		ReactRangeHuman;	/// reacts on enemy for human player
