@@ -609,6 +609,7 @@ global void FireMissile(Unit* unit)
 local void GetMissileMapArea(const Missile* missile, int* sx, int* sy,
     int* ex, int* ey)
 {
+#define Bound(x, y) (x) < 0 ? 0 : ((x) > (y) ? (y) : (x))
     DebugCheck(missile == NULL);
     DebugCheck(sx == NULL);
     DebugCheck(sy == NULL);
@@ -617,10 +618,11 @@ local void GetMissileMapArea(const Missile* missile, int* sx, int* sy,
     DebugCheck(TileSizeX <= 0);
     DebugCheck(TileSizeY <= 0);
     DebugCheck(missile->Type == NULL);
-    *sx = missile->X / TileSizeX;
-    *sy = missile->Y / TileSizeY;
-    *ex = (missile->X + missile->Type->Width) / TileSizeX;
-    *ey = (missile->Y + missile->Type->Height) / TileSizeY;
+    *sx = Bound(missile->X / TileSizeX, TheMap.Width - 1);
+    *sy = Bound(missile->Y / TileSizeY, TheMap.Height - 1);
+    *ex = Bound((missile->X + missile->Type->Width) / TileSizeX, TheMap.Width - 1);
+    *ey = Bound((missile->Y + missile->Type->Height) / TileSizeY, TheMap.Height - 1);
+#undef Bound
 }
 
 /**
@@ -637,6 +639,8 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
     int max_x;
     int min_y;
     int max_y;
+    int x;
+    int y;
 
     DebugCheck(vp == NULL);
     DebugCheck(missile == NULL);
@@ -646,11 +650,15 @@ local int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_ min_x _C_ max_x _C_
 	min_y _C_ max_y);
-    if (!IsMapFieldVisible(ThisPlayer, (missile->X - TileSizeX / 2) / TileSizeX,
-	    (missile->Y - TileSizeY / 2) / TileSizeY) && !ReplayRevealMap) {
-	return 0;
+
+    for (x = min_x; x <= max_x; ++x) {
+	for ( y = min_y; y <= max_y; ++y) {
+	    if (ReplayRevealMap || IsMapFieldVisible(ThisPlayer, x, y)) {
+		return 1;
+	    }
+	}
     }
-    return 1;
+    return 0;
 }
 
 /**
