@@ -145,6 +145,42 @@ global int MetaServerOK(char* reply)
     return !strcmp("OK\r\n", reply) || !strcmp("OK\n", reply);
 }
 
+/**	Retrieves the value of the parameter at position paramNumber
+**
+**	@param	reply	The reply from the metaserver
+**	@param	pos	the parameter number
+**	@param	value	the returned value
+**
+**	@returns -1 if error.
+*/
+global int GetMetaParameter(char* reply, int pos, char** value)
+{
+    char* endline;
+
+    *value = reply;
+
+    while (pos-- && *value) {
+	*value = strstr(*value,"\n");
+    }
+
+    if (!*value) {
+	// Parameter our of bounds
+	return -1;
+    }
+
+    endline = strstr(*value,"\n");
+
+    if (!endline) {
+	return -1;
+    }
+
+    *endline = '\0';
+    *value = strdup(*value);
+    *endline = '\n';
+    return 0;
+}
+
+
 /**
 **	Send a command to the meta server
 **
@@ -238,12 +274,17 @@ global int RecvMetaReply(char** reply)
     }
    
     p = NULL;
-    
+
+    // FIXME: Allow for large packets
     n = NetRecvTCP(sockfd, &buf, 1024);
     if (!(p = malloc(n + 1))) {
 	return -1;
     }
-    buf[n] = '\0';
+
+    // We know we now have the whole command.
+    // Convert to standard notation
+    buf[n-1] = '\0';
+    buf[n-2] = '\n';
     strcpy(p, buf);
 
     *reply = p;
