@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 ##   ___________		     _________		      _____  __
 ##   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
 ##    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
@@ -140,7 +140,7 @@ HIGHOPT="-O3 -pipe -fsigned-char -fomit-frame-pointer -foptimize-sibling-calls -
 #------------------------------------------------------------------------------
 # Function declarations
 
-function check_for_libs() {
+check_for_libs() {
 
   TEMPFILE=temp$$
   cat << "  EOF" > $TEMPFILE.c
