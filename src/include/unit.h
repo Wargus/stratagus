@@ -511,6 +511,7 @@ struct _unit_ {
     unsigned	Constructed : 1;	/// Unit is in construction
     unsigned	SeenConstructed : 1;	/// Unit seen construction
     unsigned	SeenState : 3;		/// Unit seen build/upgrade state
+    unsigned	SeenDestroyed : 1;	/// Unit seen destroyed or not
     unsigned	Active : 1;		/// Unit is active for AI
     unsigned	Rescued : 1;		/// Unit is rescued
 
