@@ -225,11 +225,11 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 **
 **	@return		    Number of bytes read
 */
-local int FlacRead(Sample* sample, void* buf, unsigned len)
+local int FlacRead(Sample* sample, void* buf, int len)
 {
-    unsigned pos;
+    int pos;
 
-    pos = (unsigned)sample->User;
+    pos = (int)sample->User;
     if (pos + len > sample->Length) {		// Not enough data?
 	len = sample->Length - pos;
     }
