@@ -90,47 +90,33 @@ global int ShowManaBackgroundLong;
 global void (*DrawSelection)(const Unit* unit,const UnitType* type,int x,int y)
 	=DrawSelectionNone;
 
-#ifdef SPLIT_SCREEN_SUPPORT
-local int CurrentViewport;
-#endif /* SPLIT_SCREEN_SUPPORT */
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#ifdef SPLIT_SCREEN_SUPPORT
+// FIXME: clean split screen support
+// FIXME: integrate this with global versions of these functions in map.c
 
-/* FIXME: integrate this with global versions of these functions in map.c */
-#define Screen2MapX	Screen2MapXV
-#define Screen2MapY	Screen2MapYV
-#define Map2ScreenX	Map2ScreenXV
-#define Map2ScreenY	Map2ScreenYV
+local int CurrentViewport;		/// FIXME: quick hack for split screen
 
-local int Screen2MapXV (int x)
+#define Map2ScreenX	Map2ScreenXV	/// FIXME: quick hack for split screen
+#define Map2ScreenY	Map2ScreenYV	/// FIXME: quick hack for split screen
+
+/// FIXME: quick hack for split screen
+local inline int Map2ScreenXV(int x)
 {
-    return (((x)-TheUI.VP[CurrentViewport].X)/
-		TileSizeX+TheUI.VP[CurrentViewport].MapX);
+    return (TheUI.VP[CurrentViewport].X + ((x) -
+	    TheUI.VP[CurrentViewport].MapX) * TileSizeX);
 }
 
-local int Screen2MapYV (int y)
+/// FIXME: quick hack for split screen
+local inline int Map2ScreenYV(int y)
 {
-    return (((y)-TheUI.VP[CurrentViewport].Y)/
-		TileSizeY+TheUI.VP[CurrentViewport].MapY);
+    return (TheUI.VP[CurrentViewport].Y + ((y) -
+	    TheUI.VP[CurrentViewport].MapY) * TileSizeY);
 }
 
-local int Map2ScreenXV (int x)
-{
-    return (TheUI.VP[CurrentViewport].X+
-		((x)-TheUI.VP[CurrentViewport].MapX)*TileSizeX);
-}
-
-local int Map2ScreenYV (int y)
-{
-    return (TheUI.VP[CurrentViewport].Y+
-		((y)-TheUI.VP[CurrentViewport].MapY)*TileSizeY);
-}
-
-#endif /* SPLIT_SCREEN_SUPPORT */
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /**
 **	Choose color for selection.
