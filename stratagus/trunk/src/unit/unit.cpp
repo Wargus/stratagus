@@ -59,7 +59,12 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#define LimitSearch 1			/// Limit the search.
+#ifndef LimitSearch
+#define LimitSearch 1			/// Limit the search
+#endif
+#ifndef WorkerCanCapture
+#define WorkerCanCapture 0		/// Workers can capture buildings
+#endif
 
 global Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
 global Unit** UnitSlotFree;		/// First free unit slot
@@ -2898,6 +2903,17 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     }
 #endif
 
+    // david: capture enemy buildings
+    // Only worker types can capture.
+    // Still possible to destroy building if not careful (too many attackers)
+    if( WorkerCanCapture && type->Building && target->HP<=damage*3 &&
+	    (attacker->Type==UnitTypeOrcWorker
+	    || attacker->Type==UnitTypeHumanWorker) ) {
+	ChangeUnitOwner(target, target->Player, attacker->Player);
+	attacker->Orders[0].Action=UnitActionStill;
+	attacker->SubAction=attacker->State=0;
+    }
+
 #if 0
     // FIXME: want to show hits.
     if( type->Organic ) {
@@ -2914,6 +2930,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 		,0,0);
     }
 #endif
+
     if( type->Building && !target->Burning ) {
 	int f;
 	Missile* missile;
