@@ -2494,7 +2494,8 @@ local void SaveAction(void)
     strcpy(filename, SaveDir);
     strcat(filename, "/");
     strncat(filename, name, nameLength);
-    strcat(filename, ".sav");
+    if (strstr(filename, ".sav") == NULL)
+	strcat(filename, ".sav");
 
     if (access(filename,F_OK)) {
         SaveGame(filename);
@@ -3024,18 +3025,33 @@ local void SaveMenu(void)
 local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)))
 {
     static char name[PATH_MAX];
+    int fileLength;
+
+    fileLength = strlen(SaveGameMenuItems[1].d.input.buffer);
+    if (TypedFileName)
+	fileLength -=3;
+
     strcpy(name, "the file: ");
-    strcat(name, SaveGameMenuItems[1].d.input.buffer);
+    strncat(name, SaveGameMenuItems[1].d.input.buffer, fileLength);
+    if (strstr(name, ".sav") == NULL)
+	strcat(name, ".sav");
     ConfirmSaveMenuItems[2].d.text.text = name;
 }
 
 local void ConfirmSaveFile(void)
 {
     char name[PATH_MAX];
+    int fileLength;
+    
+    fileLength = strlen(SaveGameMenuItems[1].d.input.buffer);
+    if (TypedFileName)
+	fileLength -=3;
+
     strcpy(name, SaveDir);
     strcat(name, "/");
-    strcat(name, SaveGameMenuItems[1].d.input.buffer);
-    strcat(name, ".sav");
+    strncat(name, SaveGameMenuItems[1].d.input.buffer, fileLength);
+    if (strstr(name, ".sav") == NULL)
+	strcat(name, ".sav");
     SaveGame(name);
     SetMessage("Saved game to: %s", name);
     EndMenu();
@@ -3049,7 +3065,7 @@ local void FcDeleteMenu(void)
 
 local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
 {
-    static char name[128];
+    static char name[PATH_MAX];
     strcpy(name, "the file: ");
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
     ConfirmDeleteMenuItems[2].d.text.text = name;
@@ -3057,7 +3073,7 @@ local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
 
 local void FcDeleteFile(void)
 {
-    char name[256];
+    char name[PATH_MAX];
     strcpy(name, SaveDir);
     strcat(name, "/");
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
