@@ -159,7 +159,7 @@ global void NetCloseUDP(int sockfd)
 
 #endif	// } !USE_SDL_NET && !USE_WINSOCK
 
-// ARI: FIXME: Used by debug only? - i.e. IfDebug()?
+#ifdef DEBUG
 /**
 **	Resolve host in name or dotted quad notation.
 **
@@ -185,6 +185,7 @@ global unsigned long NetResolveHost(const char* host)
     }
     return INADDR_NONE;
 }
+#endif
 
 #ifdef NEW_NETMENUS
 // ARI: I knew how to write this for a unix environment,
@@ -355,7 +356,8 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
     // imagine what happens when an udp port scan hits the port...
     NetLastHost=sock_addr.sin_addr.s_addr;
     NetLastPort=sock_addr.sin_port;
-    DebugLevel3Fn(" %d.%d.%d.%d:%d\n",NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+    DebugLevel3Fn(" %d.%d.%d.%d:%d\n",
+	    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
     return 1;
 }
 
