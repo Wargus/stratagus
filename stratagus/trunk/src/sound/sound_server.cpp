@@ -152,10 +152,7 @@ SDL_mutex * MusicTerminatedMutex;
 */
 global void PlayListAdvance(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
 	int proceed;
-	SCM cb;
-	SCM value;
 
 #ifdef USE_SDLA
 	SDL_LockMutex(MusicTerminatedMutex);
@@ -167,17 +164,10 @@ global void PlayListAdvance(void)
 #endif
 
 	if (proceed) {
-		cb = gh_symbol2scm("music-stopped");
-		if (symbol_boundp(cb, NIL)) {
-
-			value = symbol_value(cb, NIL);
-			if (!gh_null_p(value)) {
-				gh_apply(value, NIL);
-			}
-		}
+		lua_pushstring(Lua, "MusicStopped");
+		lua_gettable(Lua, LUA_GLOBALSINDEX);
+		LuaCall(0, 1);
 	}
-#elif defined(USE_LUA)
-#endif
 }
 
 /**
