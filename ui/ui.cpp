@@ -63,6 +63,79 @@ global UI TheUI
     -1,					// warp y
     MOUSEADJUST,			// mouse speed
     MOUSESCALE,				// mouse scale
+
+    { NULL, NULL }, 0, 0,
+    { NULL, NULL }, 0, 0,
+
+    0,
+
+    {
+	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
+	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
+	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
+	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
+	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
+	{{ NULL, NULL }, 0, 0, 0, 0, 0, 0, 0 },
+    },
+    { NULL, NULL }, 0, 0, 0, 0, 0, 0, 0,
+    { NULL, NULL }, 0, 0, 0, 0, 0, 0, 0,
+
+    { NULL, NULL }, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+
+    { NULL, NULL }, 0, 0,
+
+    0, 0,
+    0, 0,
+
+    { NULL, NULL }, 0, 0,
+    { NULL, NULL }, 0, 0,
+    { NULL, NULL }, 0, 0,
+
+    {
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+    },
+    {
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+	{ 0,0, 0,0 },
+    },
+
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
+    { NULL, NULL },
 };
 #else
     ;
