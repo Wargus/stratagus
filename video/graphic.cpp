@@ -496,7 +496,7 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 
 	SDL_UnlockSurface(g->Surface);
 	memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
-	if (graphic->Surface->format->BytesPerPixel == 1) {
+	if (g->Surface->format->BytesPerPixel == 1) {
 		VideoPaletteListRemove(g->Surface);
 	}
 	ckey = g->Surface->format->colorkey;
