@@ -173,10 +173,6 @@ extern unsigned AllocatedSoundMemory;
 extern unsigned CompressedSoundMemory;
 #endif
 
-#ifdef USE_SDLCD 
-    /// SDL cdrom device
-extern SDL_CD *CDRom;
-#endif 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) 
     /// cd play mode, ":off" ":random" or ":all"
 extern char *CDMode;
@@ -191,6 +187,11 @@ extern int NumCDTracks;
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+extern Sample* LoadFlac(const char* name);	/// Load a flac file
+extern Sample* LoadWav(const char* name);	/// Load a wav file
+extern Sample* LoadOgg(const char* name);	/// Load a ogg file
+extern Sample* LoadMp3(const char* name);	/// Load a mp3 file
 
     ///	Register a sound (can be a simple sound or a group)
 extern SoundId RegisterSound(char* file[],unsigned number);

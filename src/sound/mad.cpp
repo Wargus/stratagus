@@ -35,6 +35,7 @@
 #if defined(WITH_SOUND) && defined(USE_MAD)	// {
 
 #include <stdlib.h>
+#include <memory.h>
 #include "mad.h"
 
 #include "iolib.h"
@@ -50,7 +51,7 @@
 typedef struct _my_user_ {
     CLFile* File;			// File handle
     Sample* Sample;			// Sample buffer
-    char Buffer[4096];			// Decoded buffer
+    unsigned char Buffer[4096];		// Decoded buffer
 } MyUser;
 
 /*----------------------------------------------------------------------------
@@ -68,6 +69,7 @@ typedef struct _my_user_ {
 local enum mad_flow MAD_read(void *user, struct mad_stream *stream)
 {
     int i;
+    int l;
     CLFile *f;
     MyUser *u;
 
@@ -76,13 +78,21 @@ local enum mad_flow MAD_read(void *user, struct mad_stream *stream)
     u = (MyUser *) user;
     f = u->File;
 
-    if ((i = CLread(f, u->Buffer, sizeof(u->Buffer))) != sizeof(u->Buffer)) {
-	if (!i) {
-	    return MAD_FLOW_STOP;
-	}
+    l = 0;
+    // Copy remaining bytes over
+    if (stream->next_frame) {
+	memmove(u->Buffer, stream->next_frame,
+	    l = &u->Buffer[sizeof(u->Buffer)] - stream->next_frame);
     }
-    DebugLevel3Fn("%d bytes\n", i);
-    mad_stream_buffer(stream, u->Buffer, i);
+
+    i = CLread(f, u->Buffer + l, sizeof(u->Buffer) - l);
+    //if (!(l + i)) {
+    if (!i) {
+	return MAD_FLOW_STOP;
+    }
+    DebugLevel3Fn("%d bytes\n", l + i);
+    mad_stream_buffer(stream, u->Buffer, l + i);
+
     return MAD_FLOW_CONTINUE;
 }
 
