@@ -144,7 +144,8 @@ local void MoveMapViewPointDown(unsigned step)
 #ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
-    if (v->MapY < TheMap.Height - v->MapHeight - step) {
+    if (TheMap.Height > v->MapHeight
+	    && v->MapY < TheMap.Height - v->MapHeight - step) {
 	v->MapY += step;
     } else {
 	v->MapY = TheMap.Height - v->MapHeight;
@@ -168,7 +169,8 @@ local void MoveMapViewPointRight(unsigned step)
 #ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
-    if (v->MapX < TheMap.Width - v->MapWidth - step) {
+    if (TheMap.Width > v->MapWidth
+	    && v->MapX < TheMap.Width - v->MapWidth - step) {
 	v->MapX += step;
     } else {
 	v->MapX = TheMap.Width - v->MapWidth;
@@ -757,7 +759,7 @@ global void GameMainLoop(void)
 		    }
 		    break;
 	    }
-	    
+
 	    //
 	    // Work todo each realtime second.
 	    //		Check cd-rom (every 2nd second)
