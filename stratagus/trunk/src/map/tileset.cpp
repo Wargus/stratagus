@@ -10,7 +10,7 @@
 //
 /**@name tileset.c - The tileset. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -133,11 +133,7 @@ void LoadTileset(void)
 	//
 	n = TheMap.Tileset->NumTiles;
 
-	if (n > MaxTilesInTileset) {
-		fprintf(stderr,
-			"Too many tiles in tileset. Increase MaxTilesInTileset and recompile.\n");
-		ExitFatal(-1);
-	}
+	TheMap.Tileset->MixedLookupTable = malloc(n * sizeof(int));
 
 	//
 	//  Build the TileTypeTable
@@ -502,6 +498,7 @@ void CleanTilesets(void)
 		free(Tilesets[i]->Table);
 		free(Tilesets[i]->FlagsTable);
 		free(Tilesets[i]->Tiles);
+		free(Tilesets[i]->MixedLookupTable);
 		free(Tilesets[i]->TileTypeTable);
 		free(Tilesets[i]->AnimationTable);
 		for (j = 0; j < Tilesets[i]->NumTerrainTypes; ++j) {

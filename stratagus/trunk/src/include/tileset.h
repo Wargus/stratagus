@@ -10,7 +10,7 @@
 //
 /**@name tileset.h - The tileset headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@
 **      Table for wood removable. This table contains the tile which
 **      is placed after a tree removement, depending on the surrounding.
 **
-**  Tileset::MixedLookupTable[MaxTilesInTileset]
+**  Tileset::MixedLookupTable[]
 **      Table for finding what part of the tile contains wood/rock,
 **      and which part is grass or bare ground.
 **
@@ -245,9 +245,6 @@
 extern int TileSizeX; /// Size of a tile in X
 extern int TileSizeY; /// Size of a tile in Y
 
-// This is only used for tile cache size
-#define MaxTilesInTileset 5056 /// Current limit of tiles in tileset
-
 /**
 **  These are used for lookup tiles types
 **  mainly used for the FOW implementation of the seen woods/rocks
@@ -310,12 +307,12 @@ typedef struct _tileset_ {
 	int RemovedTree;         /// Tile placed where trees are gone
 	unsigned GrowingTree[2]; /// Growing tree tiles
 	int WoodTable[20];       /// Table for tree removable
-	int MixedLookupTable[MaxTilesInTileset]; /// Lookup for what part of tile used
-	unsigned TopOneRock;    /// Tile for one rock top
-	unsigned MidOneRock;    /// Tile for one rock middle
-	unsigned BotOneRock;    /// Tile for one rock bottom
-	int RemovedRock;        /// Tile placed where rocks are gone
-	int RockTable[20];      /// Removed rock placement table
+	int* MixedLookupTable;   /// Lookup for what part of tile used
+	unsigned TopOneRock;     /// Tile for one rock top
+	unsigned MidOneRock;     /// Tile for one rock middle
+	unsigned BotOneRock;     /// Tile for one rock bottom
+	int RemovedRock;         /// Tile placed where rocks are gone
+	int RockTable[20];       /// Removed rock placement table
 
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
