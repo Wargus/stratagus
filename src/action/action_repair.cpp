@@ -10,7 +10,7 @@
 //
 /**@name action_repair.c - The repair action. */
 //
-//      (c) Copyright 1999-2004 by Vladi Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Vladi Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -74,7 +74,6 @@ static void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 **
 **  @param unit  unit repairing
 **  @param goal  unit being repaired
-**
 */
 static void RepairUnit(Unit* unit, Unit* goal)
 {
@@ -131,15 +130,18 @@ static void RepairUnit(Unit* unit, Unit* goal)
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
-		animlength = 0;
-		for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
-			animlength += anim->Sleep;
+		if (!unit->Type->NewAnimations) {
+			animlength = 0;
+			for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
+				animlength += anim->Sleep;
+			}
+		} else {
+			animlength = unit->Data.Repair.Cycles;
+			unit->Data.Repair.Cycles = 0;
 		}
 
 		// FIXME: implement this below:
-#if 0
-		unit->Data.Built.Worker->Type->BuilderSpeedFactor;
-#endif
+		//unit->Data.Built.Worker->Type->BuilderSpeedFactor;
 		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
 		goal->HP = (goal->Data.Built.Progress * goal->Stats->HitPoints) /
@@ -222,6 +224,7 @@ void HandleActionRepair(Unit* unit)
 						goal->HP < goal->Type->Stats[goal->Player->Player].HitPoints) {
 					unit->State = 0;
 					unit->SubAction = 2;
+					unit->Data.Repair.Cycles = 0;
 					unit->Reset = 1;
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
@@ -249,6 +252,7 @@ void HandleActionRepair(Unit* unit)
 		//
 		case 2:
 			AnimateActionRepair(unit);
+			unit->Data.Repair.Cycles++;
 			if ((!unit->Type->NewAnimations && unit->Reset) ||
 					(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
 				goal = unit->Orders[0].Goal;
