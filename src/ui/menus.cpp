@@ -4728,6 +4728,7 @@ local void MultiClientReady(void)
     menu = FindMenu("menu-net-multi-client");
     menu->items[2].flags = MenuButtonDisabled;
     menu->items[3].flags = 0;
+    menu->items[21].flags = MenuButtonDisabled;
     LocalSetupState.Ready[NetLocalHostsSlot] = 1;
     MultiClientUpdate(0);
 }
@@ -4742,6 +4743,7 @@ local void MultiClientNotReady(void)
     menu = FindMenu("menu-net-multi-client");
     menu->items[3].flags = MenuButtonDisabled;
     menu->items[2].flags = 0;
+    menu->items[21].flags = 0;
     LocalSetupState.Ready[NetLocalHostsSlot] = 0;
     MultiClientUpdate(0);
 }
