@@ -94,10 +94,11 @@ global GameSound GameSounds
 **	@param unit	Pointer to unit.
 **	@param id	Unit identifier, for pointer reuse detection.
 **	@param power	How loud to play the sound.
-**	@param sound
-**	@param fight
-**	@param selection
-**	@param volume
+**	@param sound	FIXME: docu
+**	@param fight	FIXME: docu
+**	@param selection	FIXME: docu
+**	@param volume	FIXME: docu
+**	@param stereo	FIXME: docu
 */
 local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
 			      SoundId sound,unsigned char fight,
