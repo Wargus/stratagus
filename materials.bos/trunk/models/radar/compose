@@ -33,6 +33,13 @@ function create
   rm tmp???.png
 }
 
-create normal unit_radar.png
-create shadow unit_radar_s.png
+create normal unit_radar_tc.png
+create shadow unit_radar_tc_s.png
 
+pngtc2pngp unit_radar_tc.png unit_radar.png \
+           -s unit_radar_tc_s.png unit_radar_s.png \
+           --player-color 0  \
+           --title "BOS, unit radar" \
+           --author "Francois Beerten" \
+           --copyright "GPL, v2" \
+           --source "radar.blend"
