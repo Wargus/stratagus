@@ -829,6 +829,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
     rp=0;
     matrix[x+y*w]=1;			// mark start point
     ep=wp=1;				// start with one point
+    bestmine=NoUnitP;
 
     //
     //	Pop a point from stack, push all neighbors which could be entered.
@@ -851,7 +852,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
 #ifdef NEW_FOW
 		if ( (mine=GoldMineOnMap(x,y)) && IsMapFieldExplored(unit->Player,x,y) ) {
 #else
-		if ( mine=GoldMineOnMap(x,y) ) {
+		if ( (mine=GoldMineOnMap(x,y)) ) {
 #endif
 		    if( destu ) {
 			n=max(abs(destx-x),abs(desty-y));
