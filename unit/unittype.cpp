@@ -784,7 +784,7 @@ void LoadUnitTypeSprite(UnitType* type)
 				if (resinfo->FileWhenEmpty) {
 					resinfo->SpriteWhenEmpty = NewGraphic(resinfo->FileWhenEmpty,
 						type->Width, type->Height);
-					LoadGraphic(resinfo->SpriteWhenLoaded);
+					LoadGraphic(resinfo->SpriteWhenEmpty);
 					FlipGraphic(resinfo->SpriteWhenEmpty);
 				}
 			}
