@@ -860,7 +860,7 @@ global void ShowLoadProgress(const char* fmt,...)
 /**
 **	Pre menu setup.
 */
-local void PreMenuSetup(void)
+global void PreMenuSetup(void)
 {
     char* s;
 
