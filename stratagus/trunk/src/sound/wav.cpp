@@ -35,6 +35,7 @@
 #if defined(WITH_SOUND) // {
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "myendian.h"
 
@@ -46,9 +47,48 @@
 --	Declaration
 ----------------------------------------------------------------------------*/
 
+/** 
+**      Private wav data structure to handle wav streaming. 
+*/
+typedef struct _wav_data_ {
+    char* PointerInBuffer;	/// Pointer into buffer
+    CLFile* WavFile;		/// Vorbis file handle
+} WavData;
+
+#define WAV_BUFFER_SIZE  (12 * 1024)            /// Buffer size to fill 
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+local int WavReadStream(Sample *sample, void *buf, int len)
+{
+    WavData* data;
+
+    data = (WavData*) sample->User;
+    printf("READ WAV DATA\n");
+
+    if (data->PointerInBuffer - sample->Data + len > sample->Length) {
+	printf("get more data\n");
+    }
+
+    memcpy(buf, data->PointerInBuffer, len);
+    data->PointerInBuffer += len;
+    return len;
+}
+
+local void WavFreeStream(Sample *sample)
+{
+    // FIXME
+}
+
+/** 
+**      wav object type structure. 
+*/
+local const SampleType WavStreamSampleType = {
+    WavReadStream,
+    WavFreeStream,
+};
 
 /**
 **	Load wav.
@@ -174,50 +214,66 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     //
     //  Read sample
     //
-    sample = malloc(sizeof(*sample));
+    sample = malloc(sizeof(*sample) + WAV_BUFFER_SIZE);
     sample->Channels = wavfmt.Channels;
     sample->SampleSize = wavfmt.SampleSize * 8;
     sample->Frequency = wavfmt.Frequency;
     sample->Length = 0;
-    for (;;) {
-	if ((i = CLread(f, &chunk, sizeof(chunk))) != sizeof(chunk)) {
-	    // FIXME: have 1 byte remaining, wrong wav or wrong code?
-	    // if( i ) printf("Rest: %d\n",i);
-	    break;
-	}
-	chunk.Magic = ConvertLE32(chunk.Magic);
-	chunk.Length = ConvertLE32(chunk.Length);
 
-	DebugLevel3("Magic: $%x\n" _C_ chunk.Magic);
-	DebugLevel3("Length: %d\n" _C_ chunk.Length);
-	if (chunk.Magic != DATA) {
-	    // FIXME: cleanup the wav files, remove this junk, and don't support
-	    // FIXME: this!!
-	    DebugLevel3("Wrong magic %x (not %x)\n" _C_ chunk.Magic _C_ DATA);
-	    DebugLevel3("Junk at end of file\n");
-	    break;
+    if (flags & PlayAudioStream) {
+	WavData* data;
+	printf("STREAM WAV\n");
+	data = malloc(sizeof(WavData));
+
+	data->WavFile = f;
+	data->PointerInBuffer = sample->Data;
+
+	sample->Type = &WavStreamSampleType;
+	sample->User = data;
+
+	DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + WAV_BUFFER_SIZE);
+	IfDebug( AllocatedSoundMemory += sizeof(*sample) + WAV_BUFFER_SIZE);
+    } else {
+	for (;;) {
+	    if ((i = CLread(f, &chunk, sizeof(chunk))) != sizeof(chunk)) {
+		// FIXME: have 1 byte remaining, wrong wav or wrong code?
+		// if( i ) printf("Rest: %d\n",i);
+	        break;
+	    }
+	    chunk.Magic = ConvertLE32(chunk.Magic);
+	    chunk.Length = ConvertLE32(chunk.Length);
+
+	    DebugLevel3("Magic: $%x\n" _C_ chunk.Magic);
+	    DebugLevel3("Length: %d\n" _C_ chunk.Length);
+	    if (chunk.Magic != DATA) {
+		// FIXME: cleanup the wav files, remove this junk, and don't support
+		// FIXME: this!!
+		DebugLevel3("Wrong magic %x (not %x)\n" _C_ chunk.Magic _C_ DATA);
+		DebugLevel3("Junk at end of file\n");
+		break;
+	    }
+
+	    i = chunk.Length;
+	    sample = realloc(sample, sizeof(*sample) + sample->Length + i);
+	    if (!sample) {
+		printf("Out of memory!\n");
+		CLclose(f);
+		ExitFatal(-1);
+	    }
+
+	    if (CLread(f, sample->Data + sample->Length, i) != i) {
+		printf("Unexpected end of file!\n");
+		CLclose(f);
+		free(sample);
+		ExitFatal(-1);
+	    }
+	    sample->Length += i;
 	}
 
-	i = chunk.Length;
-	sample = realloc(sample, sizeof(*sample) + sample->Length + i);
-	if (!sample) {
-	    printf("Out of memory!\n");
-	    CLclose(f);
-	    ExitFatal(-1);
-	}
+	CLclose(f);
 
-	if (CLread(f, sample->Data + sample->Length, i) != i) {
-	    printf("Unexpected end of file!\n");
-	    CLclose(f);
-	    free(sample);
-	    ExitFatal(-1);
-	}
-	sample->Length += i;
+	IfDebug( AllocatedSoundMemory += sample->Length; );
     }
-
-    CLclose(f);
-
-    IfDebug( AllocatedSoundMemory += sample->Length; );
 
     return sample;
 }
