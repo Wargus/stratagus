@@ -28,8 +28,15 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
     /// Editor is running
 extern char EditorRunning;
+
+    /// Editor CCL start file
+extern const char* EditorStartFile;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -39,6 +46,9 @@ extern char EditorRunning;
 extern void EditorMainLoop(void);
     /// Update editor display
 extern void EditorUpdateDisplay(void);
+
+    /// Register ccl features
+extern void EditorCclRegister(void);
 
 //@}
 

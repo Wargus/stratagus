@@ -39,6 +39,9 @@
 **	@li Save menu
 **	@li Edit upgrade section
 **	@li Edit allow section
+**	@li Create new puds
+**	@li Edit .cm files
+**	@li Edit amount of gold-mines, oil-patch, oil-platforms
 **
 */
 
@@ -57,6 +60,8 @@
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+global const char* EditorStartFile;	/// Editor CCL start file
 
 /*----------------------------------------------------------------------------
 --	Functions
