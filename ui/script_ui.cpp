@@ -285,51 +285,36 @@ local SCM CclSetVideoFullscreen(SCM fullscreen)
 **
 **	@return		None
 */
-local SCM CclSetTitleScreen(SCM list)
+local SCM CclSetTitleScreens(SCM list)
 {
     int i;
+    SCM value;
 
-    if (TitleScreen) {
-	for (i = 0; TitleScreen[i]; ++i) {
-	    free(TitleScreen[i]);
-	    TitleScreen[i]=NULL;
+    if (TitleScreens) {
+	for (i = 0; TitleScreens[i]; ++i) {
+	    free(TitleScreens[i]->File);
+	    free(TitleScreens[i]->Music);
+	    free(TitleScreens[i]);
 	}
+	free(TitleScreens);
+	TitleScreens = NULL;
     }
     if (!gh_null_p(list)) {
 	i = 0;
-	TitleScreen = calloc(gh_length(list) + 1, sizeof(*TitleScreen));
+	TitleScreens = calloc(gh_length(list) + 1, sizeof(*TitleScreens));
 	while (!gh_null_p(list)) {
-	    TitleScreen[i++] = gh_scm2newstr(gh_car(list), NULL);
+	    value = gh_car(list);
 	    list = gh_cdr(list);
+	    TitleScreens[i] = calloc(1, sizeof(**TitleScreens));
+	    TitleScreens[i]->File = gh_scm2newstr(gh_car(value), NULL);
+	    value = gh_cdr(value);
+	    if (!gh_null_p(value)) {
+		TitleScreens[i]->Music = gh_scm2newstr(gh_car(value), NULL);
+	    }
+	    ++i;
 	}
     }
     return SCM_UNSPECIFIED;
-}
-
-/**
-**	Default title music.
-**
-**	@param music	title music. (nil reports only)
-**
-**	@return		Old title music.
-*/
-local SCM CclSetTitleMusic(SCM music)
-{
-    SCM old;
-
-    old = NIL;
-    if (TitleMusic) {
-	old = gh_str02scm(TitleMusic);
-    }
-    if (!gh_null_p(music)) {
-	if (TitleMusic) {
-	    free(TitleMusic);
-	    TitleMusic = NULL;
-	}
-
-	TitleMusic = gh_scm2newstr(music, NULL);
-    }
-    return old;
 }
 
 /**
@@ -3242,11 +3227,10 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure2_0("set-video-resolution!", CclSetVideoResolution);
     gh_new_procedure1_0("set-video-fullscreen!", CclSetVideoFullscreen);
 
-    gh_new_procedureN("set-title-screen!", CclSetTitleScreen);
+    gh_new_procedureN("set-title-screens!", CclSetTitleScreens);
     gh_new_procedure1_0("set-menu-background!", CclSetMenuBackground);
     gh_new_procedure1_0("set-menu-background-with-title!",
 	CclSetMenuBackgroundWithTitle);
-    gh_new_procedure1_0("set-title-music!", CclSetTitleMusic);
     gh_new_procedure1_0("set-menu-music!", CclSetMenuMusic);
 
     gh_new_procedure1_0("display-picture", CclDisplayPicture);

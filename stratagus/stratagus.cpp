@@ -234,10 +234,9 @@ extern SCM CclUnits(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global char** TitleScreen;		/// Titlescreen to show at startup
+global TitleScreen** TitleScreens;	/// Title screens to show at startup
 global char* MenuBackground;		/// File for menu background
 global char* MenuBackgroundWithTitle;	/// File for menu with title
-global char* TitleMusic;		/// File for title music
 global char* MenuMusic;			/// File for menu music
 global char* StratagusLibPath;		/// Path for data directory
 global char LocalPlayerName[16];	/// Name of local player
@@ -1276,14 +1275,17 @@ Use it at your own risk.\n\n");
     //	Show title screen.
     //
     SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
-    if (TitleScreen) {
-	for (i = 0; TitleScreen[i]; ++i) {
-	    if (PlayMovie(TitleScreen[i],
-		    PlayMovieZoomScreen | PlayMovieKeepAspect)) {
-		if (!PlayingMusic && TitleMusic) {
-		    PlayMusic(TitleMusic);
+    if (TitleScreens) {
+	for (i = 0; TitleScreens[i]; ++i) {
+	    if (TitleScreens[i]->Music) {
+		if (!strcmp(TitleScreens[i]->Music, "none") ||
+			!PlayMusic(TitleScreens[i]->Music)) {
+		    StopMusic();
 		}
-		DisplayPicture(TitleScreen[i]);
+	    }
+	    if (PlayMovie(TitleScreens[i]->File,
+		    PlayMovieZoomScreen | PlayMovieKeepAspect)) {
+		DisplayPicture(TitleScreens[i]->File);
 		Invalidate();
 		// FIXME: make the time configurable
 		WaitForInput(20);
