@@ -75,19 +75,16 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/// Uncomment this to enable additionnal check on GC operations
-// #define DEBUG_GC
-
 global lua_State* Lua;
 
 global char* CclStartFile;              /// CCL start file
 global char* GameName;                  /// Game Preferences
 global int CclInConfigFile;             /// True while config file parsing
-global int SaveGameLoading;					/// If a Saved Game is Loading
+global int SaveGameLoading;             /// If a Saved Game is Loading
 
 global char* Tips[MAX_TIPS + 1];        /// Array of tips
-global int  ShowTips;                   /// Show tips at start of level
-global int  CurrentTip;                 /// Current tip to display
+global int ShowTips;                    /// Show tips at start of level
+global int CurrentTip;                  /// Current tip to display
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -245,10 +242,10 @@ local int CclSaveGame(lua_State* l)
 	const char* value;
 	char buf[1024];
 
-    if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
-    }
+	}
 
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
@@ -306,7 +303,7 @@ global int LuaToBoolean(lua_State* l, int narg)
 /**
 **  Perform CCL garbage collection
 **
-**  @param fast  set this flag to disable slow GC ( during game )
+**  @param fast  set this flag to disable slow GC (during game)
 */
 global void CclGarbageCollect(int fast)
 {
