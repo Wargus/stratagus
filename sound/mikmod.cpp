@@ -70,7 +70,7 @@ static BOOL Seek(struct MREADER* mreader, long off, int whence)
 
 static long Tell(struct MREADER* mreader)
 {
-	return CLseek(CurrentFile, 0, SEEK_CUR);
+	return CLtell(CurrentFile);
 }
 
 static BOOL Read(struct MREADER* mreader, void *buf, size_t len)
@@ -110,7 +110,7 @@ local int MikModStreamRead(Sample* sample, void* buf, int len)
 
 	// fill up the buffer
 	read = 0;
-	if (sample->Len < SOUND_BUFFER_SIZE / 2 && Player_Active()) {
+	while (sample->Len < SOUND_BUFFER_SIZE / 2 && Player_Active()) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
 		sample->Pos = 0;
 		CurrentFile = data->MikModFile;

@@ -80,15 +80,6 @@ typedef struct __wav_fmt__ {
 } WavFMT;
 
 /**
-**  Wav data
-*/
-typedef struct __wav_data__ {
-	unsigned int  DATAchunk;
-	unsigned int  DATAlength;
-	unsigned char Data[0];      ///< Wave PCM data follows...
-} WavDATA;
-
-/**
 **  General chunk found in the WAV file
 */
 typedef struct __wav_chunk__ {
