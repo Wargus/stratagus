@@ -371,7 +371,7 @@ local SCM CclReplayLog(SCM list)
 
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("local-player")) ) {
-	    ThisPlayer=&Players[gh_scm2int(gh_car(list))];
+	    NetLocalPlayerNumber=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	}
     }
