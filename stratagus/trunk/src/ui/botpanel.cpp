@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name botpanel.c	-	The bottom panel. */
+/**@name botpanel.c - The bottom panel. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Belperchinov-Shabanski,
-//	                        and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -53,14 +53,14 @@
 #include "spells.h"
 
 /*----------------------------------------------------------------------------
---	  Defines
+--  Defines
 ----------------------------------------------------------------------------*/
 
 	/// How many different buttons are allowed
-#define MAX_BUTTONS		2048
+#define MAX_BUTTONS  2048
 
 /*----------------------------------------------------------------------------
---	  Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 	/// Display the command key in the buttons.
@@ -73,35 +73,37 @@ local ButtonAction* UnitButtonTable[MAX_BUTTONS];
 	/// buttons in UnitButtonTable
 local int NumUnitButtons;
 
+global ButtonAction* CurrentButtons;        /// Pointer to current buttons
+local ButtonAction* _current_buttons;    /// FIXME: this is just for test
+
 /*----------------------------------------------------------------------------
---	  Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Initialize the buttons.
+**  Initialize the buttons.
 */
 global void InitButtons(void)
 {
 	int z;
 
 	//
-	//		Resolve the icon names.
+	//  Resolve the icon names.
 	//
 	for (z = 0; z < NumUnitButtons; ++z) {
 		UnitButtonTable[z]->Icon.Icon =
 			IconByIdent(UnitButtonTable[z]->Icon.Name);
 	}
+	_current_buttons = malloc(TheUI.NumButtonButtons * sizeof(ButtonAction));
 }
 
 /*----------------------------------------------------------------------------
---	  Buttons structures
+--  Buttons structures
 ----------------------------------------------------------------------------*/
 
-global ButtonAction* CurrentButtons;		/// Pointer to current buttons
-local ButtonAction  _current_buttons[9];		/// FIXME: this is just for test
-
-
-/// FIXME: docu
+/**
+**  FIXME: docu
+*/
 int AddButton(int pos, int level, const char* icon_ident,
 	enum _button_cmd_ action, const char* value, const ButtonCheckFunc func,
 	const void* allow, int key, const char* hint, const char* umask)
@@ -110,7 +112,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 	ButtonAction* ba;
 
 	ba = (ButtonAction*)malloc(sizeof(ButtonAction));
-	Assert(ba);						//FIXME: perhaps should return error?
+	Assert(ba);
 
 	ba->Pos = pos;
 	ba->Level = level;
@@ -159,8 +161,8 @@ int AddButton(int pos, int level, const char* icon_ident,
 	}
 	ba->Key = key;
 	ba->Hint = strdup(hint);
-	//FIXME: here should be added costs to the hint
-	//FIXME: johns: show should be nice done?
+	// FIXME: here should be added costs to the hint
+	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
 		strcpy(buf, umask);
 	} else {
@@ -175,7 +177,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 
 
 /**
-**		Cleanup buttons.
+**  Cleanup buttons.
 */
 global void CleanButtons(void)
 {
@@ -207,10 +209,11 @@ global void CleanButtons(void)
 
 	CurrentButtonLevel = 0;
 	CurrentButtons = NULL;
+	free(_current_buttons);
 }
 
 /**
-**		Draw bottom panel.
+**  Draw bottom panel.
 */
 global void DrawButtonPanel(void)
 {
@@ -222,7 +225,7 @@ global void DrawButtonPanel(void)
 	char buf[8];
 
 	//
-	//		Draw background
+	//  Draw background
 	//
 	if (TheUI.ButtonPanel.Graphic) {
 		VideoDrawSubClip(TheUI.ButtonPanel.Graphic, 0, 0,
@@ -230,7 +233,8 @@ global void DrawButtonPanel(void)
 			TheUI.ButtonPanelX, TheUI.ButtonPanelY);
 	}
 
-	if (!(buttons = CurrentButtons)) {		// no buttons
+	// No buttons
+	if (!(buttons = CurrentButtons)) {
 		return;
 	}
 
@@ -252,10 +256,10 @@ global void DrawButtonPanel(void)
 				v = 0;
 			}
 			//
-			//		Any better ideas?
-			//		Show the current action state of the unit with the buttons.
+			//  Any better ideas?
+			//  Show the current action state of the unit with the buttons.
 			//
-			//		FIXME: Should show the rally action of buildings.
+			//  FIXME: Should show the rally action of buildings.
 			//
 
 			// NEW_UI:
@@ -343,7 +347,7 @@ global void DrawButtonPanel(void)
 				v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y);
 
 			//
-			//		Update status line for this button
+			//  Update status line for this button
 			//
 			if (ButtonAreaUnderCursor == ButtonAreaButton &&
 					ButtonUnderCursor == i && KeyState != KeyStateInput) {
@@ -379,7 +383,7 @@ global void DrawButtonPanel(void)
 			}
 
 			//
-			//		Tutorial show command key in icons
+			//  Tutorial show command key in icons
 			//
 			if (ShowCommandKey) {
 				Button* b;
@@ -406,11 +410,11 @@ global void DrawButtonPanel(void)
 }
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Update bottom panel for multiple units.
+**  Update bottom panel for multiple units.
 */
 local void UpdateButtonPanelMultipleUnits(void)
 {
@@ -419,7 +423,7 @@ local void UpdateButtonPanelMultipleUnits(void)
 	int i;
 
 	// first clear the table
-	for (z = 0; z < 9; ++z) {
+	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
 		_current_buttons[z].Pos = -1;
 	}
 
@@ -489,7 +493,8 @@ local void UpdateButtonPanelMultipleUnits(void)
 				}
 			}
 
-			if (allow) {				// is button allowed after all?
+			// is button allowed after all?
+			if (allow) {
 				_current_buttons[UnitButtonTable[z]->Pos - 1] =
 					*UnitButtonTable[z];
 			}
@@ -500,7 +505,7 @@ local void UpdateButtonPanelMultipleUnits(void)
 }
 
 /**
-**		Update bottom panel.
+**  Update bottom panel.
 */
 global void UpdateButtonPanel(void)
 {
@@ -515,11 +520,13 @@ global void UpdateButtonPanel(void)
 
 	CurrentButtons = NULL;
 
-	if (!NumSelected) {				// no unit selected
+	// no unit selected
+	if (!NumSelected) {
 		return;
 	}
 
-	if (NumSelected > 1) {				// multiple selected
+	// multiple selected
+	if (NumSelected > 1) {
 		for (allow = z = 1; z < NumSelected; ++z) {
 			// if current type is equal to first one count it
 			if (Selected[z]->Type == Selected[0]->Type) {
@@ -541,18 +548,19 @@ global void UpdateButtonPanel(void)
 	player = unit->Player;
 	Assert(unit != NoUnitP);
 
+	// foreign unit
 	if (unit->Player != ThisPlayer &&
-		!PlayersTeamed(ThisPlayer->Player, player->Player)) {		// foreign unit
+			!PlayersTeamed(ThisPlayer->Player, player->Player)) {
 		return;
 	}
 
 	// first clear the table
-	for (z = 0; z < 9; ++z) {
+	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
 		_current_buttons[z].Pos = -1;
 	}
 
 	//
-	//		FIXME: johns: some hacks for cancel buttons
+	//  FIXME: johns: some hacks for cancel buttons
 	//
 	if (unit->Orders[0].Action == UnitActionBuilded) {
 		// Trick 17 to get the cancel-build button
@@ -568,8 +576,8 @@ global void UpdateButtonPanel(void)
 	}
 
 	for (z = 0; z < NumUnitButtons; ++z) {
-		int pos; //keep position, modified if alt-buttons required
-		//FIXME: we have to check and if these unit buttons are available
+		int pos; // keep position, modified if alt-buttons required
+		// FIXME: we have to check and if these unit buttons are available
 		//	   i.e. if button action is ButtonTrain for example check if
 		//		required unit is not restricted etc...
 
@@ -581,10 +589,10 @@ global void UpdateButtonPanel(void)
 			continue;
 		}
 
-		if (pos > 9) {		// VLADI: this allows alt-buttons
+		if (pos > TheUI.NumButtonButtons) {		// VLADI: this allows alt-buttons
 			if (KeyModifiers & ModifierAlt) {
-				// buttons with pos >9 are shown on if ALT is pressed
-				pos -= 9;
+				// buttons with pos >TheUI.NumButtonButtons are shown on if ALT is pressed
+				pos -= TheUI.NumButtonButtons;
 			} else {
 				continue;
 			}
@@ -666,7 +674,8 @@ global void UpdateButtonPanel(void)
 			}
 		}
 
-		if (allow) {				// is button allowed after all?
+		// is button allowed after all?
+		if (allow) {
 			_current_buttons[pos - 1] = (*buttonaction);
 		}
 	}
@@ -675,41 +684,42 @@ global void UpdateButtonPanel(void)
 }
 
 /**
-**		Handle bottom button clicked.
+**  Handle bottom button clicked.
 **
-**		@param button		Button that was clicked.
+**  @param button  Button that was clicked.
 */
 global void DoButtonButtonClicked(int button)
 {
 	int i;
 	UnitType* type;
+
 	DebugLevel3Fn("Button clicked %d\n" _C_ button);
 
-	if (!CurrentButtons) {				// no buttons
+	// no buttons
+	if (!CurrentButtons) {
 		return;
 	}
 	//
-	//		Button not available.
-	// or Not Teamed
+	//  Button not available.
+	//  or Not Teamed
 	//
 	if (CurrentButtons[button].Pos == -1 ||
-		!PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
+			!PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 		return;
 	}
 
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 
 	//
-	//		Handle action on button.
+	//  Handle action on button.
 	//
-
 	DebugLevel3Fn("Button clicked %d=%d\n" _C_ button _C_
 		CurrentButtons[button].Action);
 	switch (CurrentButtons[button].Action) {
 		case ButtonUnload:
 			//
-			//		Unload on coast, transporter standing, unload all units right now.
-			//		That or a bunker.
+			//  Unload on coast, transporter standing, unload all units right now.
+			//  That or a bunker.
 			//
 			if ((NumSelected == 1 && Selected[0]->Orders[0].Action == UnitActionStill &&
 					CoastOnMap(Selected[0]->X, Selected[0]->Y)) || Selected[0]->Type->Building) {
@@ -836,7 +846,7 @@ global void DoButtonButtonClicked(int button)
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
 			// FIXME: Johns: I want to place commands in queue, even if not
-			// FIXME:		enough resources are available.
+			// FIXME:        enough resources are available.
 			// FIXME: training queue full check is not correct for network.
 			// FIXME: this can be correct written, with a little more code.
 			if (Selected[0]->Orders[0].Action == UnitActionTrain &&
@@ -886,24 +896,23 @@ global void DoButtonButtonClicked(int button)
 
 
 /**
-**		Lookup key for bottom panel buttons.
+**  Lookup key for bottom panel buttons.
 **
-**		@param key		Internal key symbol for pressed key.
+**  @param key  Internal key symbol for pressed key.
 **
-**		@return				True, if button is handled (consumed).
+**  @return     True, if button is handled (consumed).
 */
 global int DoButtonPanelKey(int key)
 {
 	int i;
 
-	if (CurrentButtons) {				// buttons
-
-		// cade: this is required for action queues SHIFT+M should be `m'
-		if (key >= 'A' && key <= 'Z') {
+	if (CurrentButtons) {
+		// This is required for action queues SHIFT+M should be `m'
+		if (isupper(key)) {
 			key = tolower(key);
 		}
 
-		for (i = 0; i < 9; ++i) {
+		for (i = 0; i < TheUI.NumButtonButtons; ++i) {
 			if (CurrentButtons[i].Pos != -1 && key == CurrentButtons[i].Key) {
 				DoButtonButtonClicked(i);
 				return 1;
