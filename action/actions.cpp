@@ -183,6 +183,7 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				unit->Anim.Unbreakable = unit->Anim.Anim->D.Unbreakable.Begin;
 				break;
 
+			case NewAnimationNone:
 			case NewAnimationLabel:
 				break;
 
