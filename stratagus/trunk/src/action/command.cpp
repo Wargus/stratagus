@@ -907,39 +907,45 @@ global void CommandCancelTraining(Unit* unit,int slot)
 
     // FIXME: over network we could cancel the wrong slot.
 
+
     //
     //	Check if unit is still training 'slot'? (NETWORK!)
     //
-    if( unit->Orders[0].Action==UnitActionTrain
-	    && slot<(n=unit->Data.Train.Count) ) {
-
-	PlayerAddCostsFactor(unit->Player,
-		unit->Data.Train.What[slot]->Stats[unit->Player->Player].Costs,
-		CancelTrainingCostsFactor);
-
-	if ( --n ) {
-	    for( i = slot; i < n; i++ ) {
-		unit->Data.Train.What[i] = unit->Data.Train.What[i+1];
-	    }
-	    if( !slot ) {
-		unit->Data.Train.Ticks=0;
-	    }
-	    unit->Data.Train.Count=n;
-	} else {
-	    DebugLevel0Fn("Last slot\n");
-	    unit->Orders[0].Action=UnitActionStill;
-	    unit->SubAction=0;
+    if( unit->Orders[0].Action==UnitActionTrain ) {
+	if( slot==-1 ) {		// default last slot!
+	    slot+=unit->Data.Train.Count;
 	}
+	if( slot<(n=unit->Data.Train.Count) ) {
 
-	//
-	//	Update interface.
-	//
-	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
+	    PlayerAddCostsFactor(unit->Player,
+		    unit->Data.Train.What[slot]
+			->Stats[unit->Player->Player].Costs,
+		    CancelTrainingCostsFactor);
+
+	    if ( --n ) {
+		for( i = slot; i < n; i++ ) {
+		    unit->Data.Train.What[i] = unit->Data.Train.What[i+1];
+		}
+		if( !slot ) {
+		    unit->Data.Train.Ticks=0;
+		}
+		unit->Data.Train.Count=n;
+	    } else {
+		DebugLevel0Fn("Last slot\n");
+		unit->Orders[0].Action=UnitActionStill;
+		unit->SubAction=0;
+	    }
+
+	    //
+	    //	Update interface.
+	    //
+	    if( unit->Player==ThisPlayer && unit->Selected ) {
+		UpdateButtonPanel();
+		MustRedraw|=RedrawPanels;
+	    }
+
+	    unit->Wait=unit->Reset=1;	// immediately start next training
 	}
-
-	unit->Wait=unit->Reset=1;	// immediately start next training
     }
     ClearSavedAction(unit);
 }
