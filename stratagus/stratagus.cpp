@@ -354,7 +354,7 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 	return res;
 }
 
-#if !defined(BSD) || defined(__APPLE__)
+#if !defined(BSD)
 /**
 **  Case insensitive version of strstr
 **
@@ -968,9 +968,9 @@ global int main(int argc, char** argv)
 	//
 	//  Setup some defaults.
 	//
-#ifndef __APPLE__
-	StratagusLibPath = STRATAGUS_LIB_PATH;
-#endif
+//#ifndef __APPLE__
+//	StratagusLibPath = STRATAGUS_LIB_PATH;
+//#endif
 	CclStartFile = "scripts/stratagus.lua";
 	EditorStartFile = "scripts/editor.lua";
 
