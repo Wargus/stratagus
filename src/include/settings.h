@@ -97,12 +97,22 @@ typedef struct _intro_ {
     char*	Objectives[MAX_OBJECTIVES];	/// Objectives text
 } Intro;					/// Intro definition
 
+
+// ----------------------------------------------------------------------------
+
+typedef struct _credits_ {
+    char*	Background;		/// Background picture
+    char*	Names;			/// Names
+} Credits;
+
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
 extern Settings GameSettings;		/// Game settings
 extern Intro	GameIntro;		/// Game intro
+extern Credits	GameCredits;		/// Game credits
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -110,6 +120,12 @@ extern Intro	GameIntro;		/// Game intro
 
     /// Show level intro
 extern void ShowIntro(const Intro* intro);
+    /// Show game credits
+extern void ShowCredits();
+    /// Show picture
+extern void ShowPicture(const char* name);
+    /// Register Ccl
+extern void CreditsCclRegister(void);
     /// Create a game
 extern void CreateGame(char* filename,WorldMap* map);
     /// Init Setting to default values
