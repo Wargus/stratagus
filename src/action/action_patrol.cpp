@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_patrol.c	-	The patrol action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -50,6 +49,20 @@ global void HandleActionPatrol(Unit* unit)
 
     if( HandleActionMove(unit)<0 ) {	// reached end-point or stop
 
+#ifdef NEW_ORDERS
+	Order order;
+
+	unit->Orders[0].Action=UnitActionPatrol;
+
+	//
+	//	Swap the points.
+	//
+	order=unit->Orders[0];
+
+	DebugLevel0Fn("FIXME: patrol not written\n");
+
+	ResetPath(unit->Orders[0]);
+#else
 	unit->Command.Action=UnitActionPatrol;
 
 	//	Swap the points:
@@ -62,6 +75,7 @@ global void HandleActionPatrol(Unit* unit)
 	unit->Command.Data.Move.SY^=unit->Command.Data.Move.DY;
 
 	ResetPath(unit->Command);
+#endif
     }
 
     if( unit->Reset ) {
@@ -76,8 +90,13 @@ global void HandleActionPatrol(Unit* unit)
 		DebugLevel0("Patrol attack %Zd\n",UnitNumber(goal));
 		CommandAttack(unit,goal->X,goal->Y,NULL,1);
 		// Save current command to come back.
+#ifdef NEW_ORDERS
+		unit->SavedOrder=unit->Orders[0];
+		unit->SavedOrder.Action=UnitActionPatrol;
+#else
 		unit->SavedCommand=unit->Command;
 		unit->SavedCommand.Action=UnitActionPatrol;
+#endif
 	    }
 	}
     }
