@@ -193,6 +193,8 @@ extern void InitCursors(void);
 extern void SaveCursors(FILE*);
     /// Cleanup the cursor module
 extern void CleanCursors(void);
+    /// Destroy image behind cursor.
+extern void DestroyCursorBackground(void);
 
 //@}
 

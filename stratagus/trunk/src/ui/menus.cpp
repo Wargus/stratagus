@@ -1160,9 +1160,7 @@ global void DrawMenu(int MenuId)
 */
 local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 {
-    //Doesn't seem to be needed
-    //HideAnyCursor();
-
+    DestroyCursorBackground();
     // FIXME: make this configurable from CCL.
     DisplayPicture("graphics/ui/Menu background without title.png");
 }
@@ -1257,6 +1255,7 @@ local void MultiScenSelectMenu(void)
 
 local void SinglePlayerGameMenu(void)
 {
+    DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
     if (GuiGameStarted) {
@@ -1343,6 +1342,7 @@ local void TerminateNetConnect(void)
     }
     DebugLevel1Fn("NetLocalState %d\n", NetLocalState);
     NetConnectRunning = 2;
+    DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu(MENU_NET_MULTI_CLIENT, 1);
     if (GuiGameStarted) {
@@ -1354,6 +1354,7 @@ local void TerminateNetConnect(void)
 
 local void CreateNetGameMenu(void)
 {
+    DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu(MENU_NET_MULTI_SETUP, 1);
     if (GuiGameStarted) {
@@ -2744,6 +2745,7 @@ global void ProcessMenu(int MenuId, int Loop)
     }
 
     InterfaceState = IfaceStateMenu;
+    DestroyCursorBackground();
     HideAnyCursor();
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
