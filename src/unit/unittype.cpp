@@ -466,7 +466,6 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->CanCastSpell=BIT(17,v);
 	unittype->CanStore[WoodCost]=BIT(18,v);
 	unittype->CanAttack=BIT(19,v);
-	unittype->Tower=BIT(20,v);
 	unittype->Hero=BIT(23,v);
 	unittype->CanStore[OilCost]=BIT(24,v);
 	unittype->Volatile=BIT(25,v);
@@ -991,9 +990,6 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 
     if( type->Vanishes ) {
 	CLprintf(file,"  'vanishes\n");
-    }
-    if( type->Tower ) {
-	CLprintf(file,"  'tower\n");
     }
     if( type->Hero ) {
 	CLprintf(file,"  'hero\n");

@@ -1590,7 +1590,7 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 		    ,(stats->SightRange+(type->TileWidth-1)/2)*TileSizeX*2);
 	    }
 	}
-	if( type->CanAttack || type->Tower ) {
+	if( type->CanAttack ) {
 	    if( ShowReactionRange ) {
 		r= (unit->Player->Type==PlayerPerson)
 			? type->ReactRangePerson

@@ -170,7 +170,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	//
 	//	Normal units react in reaction range.
 	//
-	if( !type->Tower && !ground ) {
+	if( unit->Stats->Speed && !ground ) {
 	    if( (goal=AttackUnitsInReactRange(unit)) ) {
 		// Weak goal, can choose other unit, come back after attack
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
@@ -214,7 +214,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->Reset=0;
 		unit->State=0;
 		unit->SubAction=1;	// Mark attacking.
-		if( !type->Tower ) {
+		if( type->Stats->Speed ) {
 		    UnitHeadingFromDeltaXY(unit,
 			goal->X+(goal->Type->TileWidth-1)/2-unit->X,
 			goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);

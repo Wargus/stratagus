@@ -3324,7 +3324,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     //	Attack units in range (which or the attacker?)
     //
     if( !type->Coward ) {
-	if( type->CanAttack && !type->Tower ) {
+	if( type->CanAttack && target->Stats->Speed ) {
 	    goal=AttackUnitsInReactRange(target);
 	    if( goal ) {
 		if( target->SavedOrder.Action==UnitActionStill ) {
