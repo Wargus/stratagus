@@ -237,6 +237,8 @@ extern char GameObserve;
 extern char SkipGameCycle;
 	/// Invincibility cheat
 extern int GodMode;
+	/// Whether the map is the only thing displayed or not
+extern char BigMapMode;
 
 	/// pressed mouse buttons (normal,double,dragged,long)
 extern enum _mouse_buttons_ MouseButtons;

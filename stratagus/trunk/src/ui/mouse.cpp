@@ -388,7 +388,7 @@ local void HandleMouseOn(int x, int y)
 	//		Handle buttons
 	//
 	if (NetworkFildes == (Socket)-1) {
-		if (TheUI.MenuButton.X != -1) {
+		if (TheUI.MenuButton.X != -1 && !BigMapMode) {
 			if (x >= TheUI.MenuButton.X &&
 					x < TheUI.MenuButton.X + TheUI.MenuButton.Width &&
 					y >= TheUI.MenuButton.Y &&
@@ -401,7 +401,7 @@ local void HandleMouseOn(int x, int y)
 			}
 		}
 	} else {
-		if (TheUI.NetworkMenuButton.X != -1) {
+		if (TheUI.NetworkMenuButton.X != -1 && !BigMapMode) {
 			if (x >= TheUI.NetworkMenuButton.X &&
 					x < TheUI.NetworkMenuButton.X + TheUI.NetworkMenuButton.Width &&
 					y >= TheUI.NetworkMenuButton.Y &&
@@ -413,7 +413,7 @@ local void HandleMouseOn(int x, int y)
 				return;
 			}
 		}
-		if (TheUI.NetworkDiplomacyButton.X != -1) {
+		if (TheUI.NetworkDiplomacyButton.X != -1 && !BigMapMode) {
 			if (x >= TheUI.NetworkDiplomacyButton.X &&
 					x < TheUI.NetworkDiplomacyButton.X + TheUI.NetworkDiplomacyButton.Width &&
 					y >= TheUI.NetworkDiplomacyButton.Y &&
@@ -426,7 +426,7 @@ local void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	for (i = 0; i < TheUI.NumButtonButtons; ++i) {
+	for (i = 0; i < TheUI.NumButtonButtons && !BigMapMode; ++i) {
 		if (x >= TheUI.ButtonButtons[i].X &&
 				x < TheUI.ButtonButtons[i].X + TheUI.ButtonButtons[i].Width + 7 &&
 				y >= TheUI.ButtonButtons[i].Y &&
@@ -440,7 +440,8 @@ local void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->BoardCount) {
+	if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->BoardCount &&
+		!BigMapMode) {
 		for (i = Selected[0]->BoardCount - 1; i >= 0; --i) {
 			if (x >= TheUI.TransportingButtons[i].X &&
 					x < TheUI.TransportingButtons[i].X + TheUI.TransportingButtons[i].Width + 7 &&
@@ -454,7 +455,7 @@ local void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	if (NumSelected == 1 && Selected[0]->Type->Building) {
+	if (NumSelected == 1 && Selected[0]->Type->Building && !BigMapMode) {
 		if (Selected[0]->Orders[0].Action == UnitActionTrain) {
 			if (Selected[0]->Data.Train.Count == 1) {
 				if (TheUI.SingleTrainingButton &&
@@ -483,7 +484,7 @@ local void HandleMouseOn(int x, int y)
 					}
 				}
 			}
-		} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo) {
+		} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo && !BigMapMode) {
 			if (x >= TheUI.UpgradingButton->X &&
 					x < TheUI.UpgradingButton->X + TheUI.UpgradingButton->Width + 7 &&
 					y >= TheUI.UpgradingButton->Y &&
@@ -494,7 +495,7 @@ local void HandleMouseOn(int x, int y)
 				MustRedraw |= RedrawInfoPanel;
 				return;
 			}
-		} else if (Selected[0]->Orders[0].Action == UnitActionResearch) {
+		} else if (Selected[0]->Orders[0].Action == UnitActionResearch && !BigMapMode) {
 			if (x >= TheUI.ResearchingButton->X &&
 					x < TheUI.ResearchingButton->X + TheUI.ResearchingButton->Width + 7 &&
 					y >= TheUI.ResearchingButton->Y &&
@@ -508,7 +509,7 @@ local void HandleMouseOn(int x, int y)
 		}
 	}
 	if (NumSelected == 1) {
-		if (TheUI.SingleSelectedButton &&
+		if (TheUI.SingleSelectedButton && !BigMapMode &&
 				x >= TheUI.SingleSelectedButton->X &&
 				x < TheUI.SingleSelectedButton->X + TheUI.SingleSelectedButton->Width + 7 &&
 				y >= TheUI.SingleSelectedButton->Y &&
@@ -520,6 +521,7 @@ local void HandleMouseOn(int x, int y)
 			return;
 		}
 	} else {
+		if (!BigMapMode) {
 			i = NumSelected > TheUI.NumSelectedButtons ?
 				TheUI.NumSelectedButtons - 1 : NumSelected - 1;
 			for (; i >= 0; --i) {
@@ -532,6 +534,7 @@ local void HandleMouseOn(int x, int y)
 				CursorOn = CursorOnButton;
 				MustRedraw |= RedrawInfoPanel;
 				return;
+				}
 			}
 		}
 	}
@@ -556,7 +559,8 @@ local void HandleMouseOn(int x, int y)
 	//		Minimap
 	//
 	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
-			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
+			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH &&
+			!BigMapMode) {
 		CursorOn = CursorOnMinimap;
 		return;
 	}
