@@ -634,6 +634,11 @@ global void GameMainLoop(void)
 	SetStatusLine("You have won!");
 	ProcessMenu(MENU_VICTORY, 1);
     }
+
+    if( GameResult==GameVictory || GameResult==GameDefeat ) {
+	ShowStats();
+    }
+
     GamePaused=0;
 }
 

@@ -357,6 +357,7 @@ local int ReturnWithWood(Unit* unit)
     //	Update wood.
     //
     unit->Player->Resources[WoodCost]+=unit->Player->Incomes[WoodCost];
+    unit->Player->TotalResources[WoodCost]+=unit->Player->Incomes[WoodCost];
     if( unit->Player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
     }

@@ -400,6 +400,8 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
     //
     unit->Player->Resources[resource->Cost]
 	+=unit->Player->Incomes[resource->Cost];
+    unit->Player->TotalResources[resource->Cost]
+	+=unit->Player->Incomes[resource->Cost];
     if( unit->Player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
     }

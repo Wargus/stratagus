@@ -124,6 +124,8 @@ extern void ShowIntro(const Intro* intro);
 extern void ShowCredits();
     /// Show picture
 extern void ShowPicture(const char* act,const char* title,const char* picture);
+    /// Show stats
+extern void ShowStats();
     /// Register Ccl
 extern void CreditsCclRegister(void);
     /// Create a game

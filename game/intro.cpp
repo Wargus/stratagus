@@ -41,6 +41,10 @@
 #include "sound.h"
 #include "settings.h"
 #include "ccl.h"
+#include "campaign.h"
+#include "cursor.h"
+#include "menus.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -67,45 +71,89 @@ global Credits	GameCredits;		/// Game credits
 ----------------------------------------------------------------------------*/
 
 local int IntroNoEvent;			/// Flag got an event.
+local int UseContinueButton;
+local int ContinueButtonX;
+local int ContinueButtonY;
+local int ContinueButtonFlags;
 
 /**
 **	Callback for input.
 */
-local void IntroCallbackButton1(unsigned dummy __attribute__((unused)))
+local void IntroCallbackButton1(unsigned button)
 {
-    IntroNoEvent=0;
+    if( UseContinueButton ) {
+	if( (1<<button)==LeftButton &&
+	    ContinueButtonX<=CursorX && CursorX<=ContinueButtonX+106 &&
+	    ContinueButtonY<=CursorY && CursorY<=ContinueButtonY+27 ) {
+	    ContinueButtonFlags|=MenuButtonClicked;
+	}
+    }
+    else {
+	IntroNoEvent=0;
+    }
 }
 
 /**
 **	Callback for input.
 */
-local void IntroCallbackButton2(unsigned dummy __attribute__((unused)))
+local void IntroCallbackButton2(unsigned button)
 {
+    if( UseContinueButton ) {
+	if( (1<<button)==LeftButton &&
+	    ContinueButtonX<=CursorX && CursorX<=ContinueButtonX+106 &&
+	    ContinueButtonY<=CursorY && CursorY<=ContinueButtonY+27 &&
+	    (ContinueButtonFlags&MenuButtonClicked) ) {
+	    IntroNoEvent=0;
+	}
+	ContinueButtonFlags&=~MenuButtonClicked;
+    }
 }
 
 /**
 **	Callback for input.
 */
-local void IntroCallbackKey1(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
+local void IntroCallbackKey1(unsigned key, unsigned keychar)
 {
-    IntroNoEvent=0;
+    if( UseContinueButton ) {
+	if( keychar=='c' || keychar=='\r' ) {
+	    ContinueButtonFlags|=MenuButtonClicked;
+	}
+    }
+    else {
+	IntroNoEvent=0;
+    }
 }
 
 /**
 **	Callback for input.
 */
-local void IntroCallbackKey2(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
+local void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
+    if( UseContinueButton ) {
+	if( keychar=='c' || keychar=='\r' ) {
+	    IntroNoEvent=0;
+	    ContinueButtonFlags&=~MenuButtonClicked;
+	}
+    }
 }
 
 /**
 **	Callback for input.
 */
-local void IntroCallbackMouse(int dummy_x __attribute__((unused)),
-	int dummy_y __attribute__((unused)))
+local void IntroCallbackMouse(int x, int y)
 {
+    CursorX=x;
+    CursorY=y;
+
+    if( UseContinueButton ) {
+	if( ContinueButtonX<=CursorX && CursorX<=ContinueButtonX+106 &&
+	    ContinueButtonY<=CursorY && CursorY<=ContinueButtonY+27 ) {
+	    ContinueButtonFlags|=MenuButtonActive;
+	}
+	else {
+	    ContinueButtonFlags&=~MenuButtonActive;
+	}
+    }
 }
 
 /**
@@ -114,6 +162,24 @@ local void IntroCallbackMouse(int dummy_x __attribute__((unused)),
 local void IntroCallbackExit(void)
 {
     DebugLevel3Fn("Exit\n");
+}
+
+/**
+**	Draws a continue button at x,y
+*/
+local void DrawContinueButton()
+{
+    DrawMenuButton(MBUTTON_GM_HALF,ContinueButtonFlags,
+	106,27,
+	ContinueButtonX,ContinueButtonY,
+	LargeFont,"~!Continue");
+}
+
+local void InitContinueButton(int x,int y)
+{
+    ContinueButtonX=x;
+    ContinueButtonY=y;
+    ContinueButtonFlags=MenuButtonSelected;
 }
 
 /**
@@ -259,6 +325,8 @@ global void ShowIntro(const Intro *intro)
     TextLines* ObjectivesText[MAX_OBJECTIVES];
     int OldVideoSyncSpeed;
 
+    UseContinueButton=0;
+
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
@@ -356,8 +424,6 @@ global void ShowIntro(const Intro *intro)
 	    }
 	}
 
-	// FIXME: draw Continue button
-
 	VideoUnlockScreen();
 
 	// FIXME: update only the changed area!!!!
@@ -437,14 +503,19 @@ global void ShowCredits(Credits *credits)
 	SplitTextIntoLines(credits->Names,320,&ScrollingCredits);
     }
 
+    UseContinueButton=1;
+    InitContinueButton(455,480-40);
+    DestroyCursorBackground();
+
     x=(VideoWidth-640)/2;
     y=(VideoHeight-480)/2;
     IntroNoEvent=1;
     line=0;
     scrolling=1;
-    while( IntroNoEvent ) {
+    while( 1 ) {
 
 	VideoLockScreen();
+	HideAnyCursor();
 
 	//
 	//	Draw background
@@ -463,7 +534,8 @@ global void ShowCredits(Credits *credits)
 	    scrolling=ScrollText(x+140,y+80,320,275,line,ScrollingCredits);
 	}
 
-	// FIXME: draw Continue button
+	DrawContinueButton();
+	DrawAnyCursor();
 
 	VideoUnlockScreen();
 
@@ -471,6 +543,9 @@ global void ShowCredits(Credits *credits)
 
 	Invalidate();
 	RealizeVideoMemory();
+
+	if( !IntroNoEvent )
+	    break;
 
 	WaitEventsOneFrame(&callbacks);
 
@@ -531,6 +606,8 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     int DoFadeOut;
     int maxi;
     int i;
+
+    UseContinueButton=0;
 
     OldVideoSyncSpeed=VideoSyncSpeed;
     VideoSyncSpeed=100;
@@ -639,6 +716,237 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 
     VideoSyncSpeed=OldVideoSyncSpeed;
     SetVideoSync();
+}
+
+enum {
+    STATS_OUTCOME,
+    STATS_RANK,
+    STATS_SCORE,
+    STATS_UNITS,
+    STATS_BUILDINGS,
+    STATS_GOLD,
+    STATS_WOOD,
+    STATS_OIL,
+    STATS_KILLS,
+    STATS_RAZINGS,
+    MAX_STATS_TEXT
+};
+
+local char* GameStatsText[MAX_STATS_TEXT];
+local int OldVideoSyncSpeed;
+local int GameStatsFrameCounter;
+
+local void GameStatsInit()
+{
+    Graphic* background;
+    char buf[20];
+
+    OldVideoSyncSpeed=VideoSyncSpeed;
+    VideoSyncSpeed=100;
+    SetVideoSync();
+    GameStatsFrameCounter=0;
+
+    background=LoadGraphic(MenuBackground);
+    VideoCreatePalette(GlobalPalette);
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoDrawSubClip(background,0,0,background->Width,background->Height,
+	(VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+    VideoUnlockScreen();
+
+    if( GameResult==GameVictory )
+	GameStatsText[STATS_OUTCOME]="Victory!";
+    else
+	GameStatsText[STATS_OUTCOME]="Defeat!";
+
+    GameStatsText[STATS_RANK]="Overlord";
+
+    sprintf(buf,"%u",ThisPlayer->Score);
+    GameStatsText[STATS_SCORE]=strdup(buf);
+
+    sprintf(buf,"%u",ThisPlayer->TotalUnits);
+    GameStatsText[STATS_UNITS]=strdup(buf);
+
+    sprintf(buf,"%u",ThisPlayer->TotalBuildings);
+    GameStatsText[STATS_BUILDINGS]=strdup(buf);
+
+    sprintf(buf,"%u",ThisPlayer->TotalResources[GoldCost]);
+    GameStatsText[STATS_GOLD]=strdup(buf);
+
+    sprintf(buf,"%u",ThisPlayer->TotalResources[WoodCost]);
+    GameStatsText[STATS_WOOD]=strdup(buf);
+
+    sprintf(buf,"%u",ThisPlayer->TotalResources[OilCost]);
+    GameStatsText[STATS_OIL]=strdup(buf);
+
+    sprintf(buf,"%u",ThisPlayer->TotalKills);
+    GameStatsText[STATS_KILLS]=strdup(buf);
+
+    sprintf(buf,"%u",ThisPlayer->TotalRazings);
+    GameStatsText[STATS_RAZINGS]=strdup(buf);
+}
+
+local int GameStatsDrawFunc()
+{
+    int x;
+    int y;
+    int dodraw;
+    int done;
+    const int StatsPause=30;  // Wait one second between each stat
+
+    done=0;
+    GameStatsFrameCounter++;
+
+    if( (GameStatsFrameCounter%StatsPause)!=0 )
+	return done;
+
+    x=(VideoWidth-640)/2;
+    y=(VideoHeight-480)/2;
+    dodraw=GameStatsFrameCounter/StatsPause;
+
+
+    if( dodraw==1 ) {
+	VideoDrawTextCentered(x+106,y+57,LargeFont,"Outcome");
+	VideoDrawTextCentered(x+106,y+78,LargeTitleFont,
+	    GameStatsText[STATS_OUTCOME]);
+    }
+
+    if( dodraw==2 ) {
+	VideoDrawTextCentered(x+324,y+57,LargeFont,"Rank");
+	VideoDrawTextCentered(x+324,y+78,SmallTitleFont,
+	    GameStatsText[STATS_RANK]);
+    }
+
+    if( dodraw==3 ) {
+	VideoDrawTextCentered(x+540,y+57,LargeFont,"Score");
+	VideoDrawTextCentered(x+540,y+78,SmallTitleFont,
+	    GameStatsText[STATS_SCORE]);
+    }
+
+    if( dodraw==4 ) {
+	VideoDrawTextCentered(x+50,y+178,LargeFont,"Units");
+	VideoDrawRectangleClip(ColorBlack,x+10,y+208,80,24);
+	VideoDrawRectangleClip(ColorYellow,x+11,y+209,78,22);
+	VideoFillRectangleClip(ColorBlack,x+12,y+210,76,20);
+	VideoDrawTextCentered(x+50,y+213,LargeFont,
+	    GameStatsText[STATS_UNITS]);
+    }
+
+    if( dodraw==5 ) {
+	VideoDrawTextCentered(x+140,y+178,LargeFont,"Buildings");
+	VideoDrawRectangleClip(ColorBlack,x+100,y+208,80,24);
+	VideoDrawRectangleClip(ColorYellow,x+101,y+209,78,22);
+	VideoFillRectangleClip(ColorBlack,x+102,y+210,76,20);
+	VideoDrawTextCentered(x+140,y+213,LargeFont,
+	    GameStatsText[STATS_BUILDINGS]);
+    }
+
+    if( dodraw==6 ) {
+	VideoDrawTextCentered(x+230,y+178,LargeFont,"Gold");
+	VideoDrawRectangleClip(ColorBlack,x+190,y+208,80,24);
+	VideoDrawRectangleClip(ColorYellow,x+191,y+209,78,22);
+	VideoFillRectangleClip(ColorBlack,x+192,y+210,76,20);
+	VideoDrawTextCentered(x+230,y+213,LargeFont,
+	    GameStatsText[STATS_GOLD]);
+    }
+
+    if( dodraw==7 ) {
+	VideoDrawTextCentered(x+320,y+178,LargeFont,"Lumber");
+	VideoDrawRectangleClip(ColorBlack,x+280,y+208,80,24);
+	VideoDrawRectangleClip(ColorYellow,x+281,y+209,78,22);
+	VideoFillRectangleClip(ColorBlack,x+282,y+210,76,20);
+	VideoDrawTextCentered(x+320,y+213,LargeFont,
+	    GameStatsText[STATS_WOOD]);
+    }
+
+    if( dodraw==8 ) {
+	VideoDrawTextCentered(x+410,y+178,LargeFont,"Oil");
+	VideoDrawRectangleClip(ColorBlack,x+370,y+208,80,24);
+	VideoDrawRectangleClip(ColorYellow,x+371,y+209,78,22);
+	VideoFillRectangleClip(ColorBlack,x+372,y+210,76,20);
+	VideoDrawTextCentered(x+410,y+213,LargeFont,
+	    GameStatsText[STATS_OIL]);
+    }
+
+    if( dodraw==9 ) {
+	VideoDrawTextCentered(x+500,y+178,LargeFont,"Kills");
+	VideoDrawRectangleClip(ColorBlack,x+460,y+208,80,24);
+	VideoDrawRectangleClip(ColorYellow,x+461,y+209,78,22);
+	VideoFillRectangleClip(ColorBlack,x+462,y+210,76,20);
+	VideoDrawTextCentered(x+500,y+213,LargeFont,
+	    GameStatsText[STATS_KILLS]);
+    }
+
+    if( dodraw==10 ) {
+	VideoDrawTextCentered(x+590,y+178,LargeFont,"Razings");
+	VideoDrawRectangleClip(ColorBlack,x+550,y+208,80,24);
+	VideoDrawRectangleClip(ColorYellow,x+551,y+209,78,22);
+	VideoFillRectangleClip(ColorBlack,x+552,y+210,76,20);
+	VideoDrawTextCentered(x+590,y+213,LargeFont,
+	    GameStatsText[STATS_RAZINGS]);
+	done=1;
+    }
+
+    return done;
+}
+
+local void GameStatsEnd(void)
+{
+    int i;
+
+    for( i=0; i<MAX_STATS_TEXT; i++ ) {
+	free(GameStatsText[i]);
+    }
+
+    VideoSyncSpeed=OldVideoSyncSpeed;
+    SetVideoSync();
+}
+
+global void ShowStats()
+{
+    EventCallback callbacks;
+    int done;
+
+    callbacks.ButtonPressed=IntroCallbackButton1;
+    callbacks.ButtonReleased=IntroCallbackButton2;
+    callbacks.MouseMoved=IntroCallbackMouse;
+    callbacks.MouseExit=IntroCallbackExit;
+    callbacks.KeyPressed=IntroCallbackKey1;
+    callbacks.KeyReleased=IntroCallbackKey2;
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+
+
+    GameStatsInit();
+
+    UseContinueButton=1;
+    InitContinueButton(455,480-40);
+    DestroyCursorBackground();
+
+    done=0;
+    IntroNoEvent=1;
+    // FIXME: Need continue button at 455,480-40
+    while( 1 ) {
+	VideoLockScreen();
+	HideAnyCursor();
+	if( !done ) {
+	    done=GameStatsDrawFunc();
+	}
+	DrawContinueButton();
+	DrawAnyCursor();
+	VideoUnlockScreen();
+
+	Invalidate();
+	RealizeVideoMemory();
+
+	if( !IntroNoEvent )
+	    break;
+
+	WaitEventsOneFrame(&callbacks);
+    }
+
+    GameStatsEnd();
 }
 
 
