@@ -43,6 +43,8 @@
 #include "font.h"
 #include "etlib/hash.h"
 
+global int CclFontByIdentifier(SCM type);
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -2383,34 +2385,9 @@ local SCM CclDefineMenuItem(SCM list)
 		}
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
-	    // FIXME: should use the names of the real fonts.
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    if( gh_eq_p(value,gh_symbol2scm("small")) ) {
-		item->font=SmallFont;
-	    } else if( gh_eq_p(value,gh_symbol2scm("game")) ) {
-		item->font=GameFont;
-	    } else if( gh_eq_p(value,gh_symbol2scm("large")) ) {
-		item->font=LargeFont;
-	    } else if( gh_eq_p(value,gh_symbol2scm("small-title")) ) {
-		item->font=SmallTitleFont;
-	    } else if( gh_eq_p(value,gh_symbol2scm("large-title")) ) {
-		item->font=LargeTitleFont;
-	    } else if( gh_eq_p(value,gh_symbol2scm("user1")) ) {
-		item->font=User1Font;
-	    } else if( gh_eq_p(value,gh_symbol2scm("user2")) ) {
-		item->font=User2Font;
-	    } else if( gh_eq_p(value,gh_symbol2scm("user3")) ) {
-		item->font=User3Font;
-	    } else if( gh_eq_p(value,gh_symbol2scm("user4")) ) {
-		item->font=User4Font;
-	    } else if( gh_eq_p(value,gh_symbol2scm("user5")) ) {
-		item->font=User5Font;
-	    } else {
-		s1=gh_scm2newstr(value,NULL);
-		fprintf(stderr,"Unsupported font %s\n",s1);
-		free(s1);
-	    }
+	    item->font=CclFontByIdentifier(value);
 	} else if( gh_eq_p(value,gh_symbol2scm("init")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -3043,6 +3020,7 @@ local SCM CclDefineButton(SCM list)
 		s2=gh_scm2newstr(gh_car(value),NULL);
 		s1=realloc(s1,strlen(s1)+strlen(s2)+2);
 		strcat(s1,s2);
+		free(s2);
 		value=gh_cdr(value);
 		if( !gh_null_p(value) ) {
 		    strcat(s1,",");
@@ -3060,6 +3038,7 @@ local SCM CclDefineButton(SCM list)
 	    list=gh_cdr(list);
 	    ba.Hint=gh_scm2newstr(value,NULL);
 	} else if( gh_eq_p(value,gh_symbol2scm("for-unit")) ) {
+	    // FIXME: ba.UnitMask shouldn't be a string
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    s1=strdup(",");
@@ -3069,6 +3048,7 @@ local SCM CclDefineButton(SCM list)
 		strcat(s1,s2);
 		strcat(s1,",");
 		value=gh_cdr(value);
+		free(s2);
 	    }
 	    ba.UnitMask=s1;
 	    if( !strncmp(ba.UnitMask,",*,",3) ) {
