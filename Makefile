@@ -55,6 +55,11 @@ OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 SRC_ALL = $(SRC)
 OBJ_ALL = $(OBJ)
 
+METASERVER_SRC :=
+include src/metaserver/Module.make
+METASERVER_OBJ := $(patsubst %.c, %.o, $(METASERVER_SRC))
+METASERVER_OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(METASERVER_OBJ))),$(notdir $(METASERVER_OBJ)))
+
 .SUFFIXES: .c .o
 
 .PHONY:	make-objdir all-src
@@ -124,6 +129,12 @@ stratagus.exe:	$(OBJ) \
 strip:
 	@if [ -f stratagus ]; then strip stratagus; fi
 	@if [ -f stratagus.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip stratagus.exe; fi
+
+src/metaserver/$(OBJDIR):
+	mkdir $@
+
+metaserver: src/metaserver/$(OBJDIR) $(METASERVER_OBJ)
+	$(CCLD) -o $@ $(METASERVER_OBJ) $(STRATAGUS_LIBS)
 
 src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
