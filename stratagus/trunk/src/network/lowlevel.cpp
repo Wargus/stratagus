@@ -540,8 +540,8 @@ int NetRecvUDP(Socket sockfd, void* buf, int len)
 		return -1;
 	}
 
-	// FIXME: ARI: verify that it _really_ is from one of our hosts...
-	// imagine what happens when an udp port scan hits the port...
+	// Packet check for validness is done higher up, we don't know who should be
+	// sending us packets at this level
 
 	NetLastHost = sock_addr.sin_addr.s_addr;
 	NetLastPort = sock_addr.sin_port;

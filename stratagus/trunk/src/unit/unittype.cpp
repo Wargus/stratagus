@@ -442,8 +442,9 @@ UnitType* NewUnitTypeSlot(char* ident)
 **  Draw unit-type on map.
 **
 **  @param type    Unit-type pointer.
-**  @param frame   Animation frame of unit-type.
 **  @param sprite  Sprite to use for drawing
+**  @param player  Player number for color substitution.
+**  @param frame   Animation frame of unit-type.
 **  @param x       Screen X pixel postion to draw unit-type.
 **  @param y       Screen Y pixel postion to draw unit-type.
 **
