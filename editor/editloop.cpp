@@ -55,6 +55,7 @@
 extern void PreMenuSetup(void);		/// FIXME: not here!
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
+// FIXME: export+import the structure correct
 extern struct {
     const char*	File[PlayerMaxRaces];	/// Resource filename one for each race
     int		Width;			/// Width of button
@@ -100,6 +101,8 @@ enum _mode_buttons_ {
 global char** EditorUnitTypes;		/// Sorted editor unit-type table
 global int MaxUnitIndex;		/// Max unit icon draw index
 
+local char** ShownUnitTypes;		/// Shown editor unit-type table
+local int MaxShownUnits;		/// Max unit icon draw index
 local char ShowUnitsToSelect;		/// Show units in unit list
 local char ShowBuildingsToSelect;	/// Show buildings in unit list
 local char ShowHeroesToSelect;		/// Show heroes in unit list
@@ -200,58 +203,6 @@ global void EditTile(int x, int y, int tile)
     UpdateMinimapXY(x, y);
 
     EditorTileChanged(x, y);
-
-#if 0
-    //
-    //  Fix the wood tiles.
-    //
-    if (mf->Flags & MapFieldForest) {
-	if( y ) {
-	    ChangeTile(x, y - 1, GetTileNumber(tile, TileToolRandom,
-		TileToolDecoration));
-	    (mf-TheMap.Width)->Flags |=
-		TheMap.Tileset->FlagsTable[16 + tile * 16];
-	} else {
-	    ChangeTile(x, y + 1, GetTileNumber(tile, TileToolRandom,
-		TileToolDecoration));
-	    mf[+TheMap.Width].Flags |=
-		TheMap.Tileset->FlagsTable[16 + tile * 16];
-	}
-	MapFixWoodTile(x + 1, y + 0);
-	MapFixWoodTile(x + 0, y + 1);
-	MapFixWoodTile(x - 1, y + 0);
-	MapFixWoodTile(x + 0, y - 1);
-	MapFixWoodTile(x + 0, y + 0);
-    } else if (mf->Flags & MapFieldRocks) {
-	if( y ) {
-	    ChangeTile(x, y - 1, GetTileNumber(tile, TileToolRandom,
-		TileToolDecoration));
-	    (mf-TheMap.Width)->Flags |=
-		TheMap.Tileset->FlagsTable[16 + tile * 16];
-	} else {
-	    ChangeTile(x, y + 1, GetTileNumber(tile, TileToolRandom,
-		TileToolDecoration));
-	    mf[+TheMap.Width].Flags |=
-		TheMap.Tileset->FlagsTable[16 + tile * 16];
-	}
-	MapFixRockTile(x + 1, y + 0);
-	MapFixRockTile(x + 0, y + 1);
-	MapFixRockTile(x - 1, y + 0);
-	MapFixRockTile(x + 0, y - 1);
-	MapFixRockTile(x + 0, y + 0);
-    } else if (mf->Flags & MapFieldWall) {
-	if (mf->Flags & MapFieldHuman) {
-	    mf->Value = UnitTypeHumanWall->_HitPoints;
-	} else {
-	    mf->Value = UnitTypeOrcWall->_HitPoints;
-	}
-	MapFixWallTile(x + 0, y + 0);
-	MapFixWallTile(x + 1, y + 0);
-	MapFixWallTile(x + 0, y + 1);
-	MapFixWallTile(x - 1, y + 0);
-	MapFixWallTile(x + 0, y - 1);
-    }
-#endif
 }
 
 /**
@@ -305,6 +256,53 @@ local void EditUnit(int x, int y, UnitType* type, Player* player)
     if (unit->Type->GoldMine) {
 	unit->Value = 100000;
     }
+}
+
+/**
+**	Recalculate the shown units.
+*/
+local void RecalculateShownUnits(void)
+{
+    int i;
+    int n;
+    const UnitType *type;
+
+    if (!ShownUnitTypes) {
+	ShownUnitTypes = malloc(sizeof(char *) * MaxUnitIndex);
+    }
+
+    for (n = i = 0; i < MaxUnitIndex; ++i) {
+	type = UnitTypeByIdent(EditorUnitTypes[i]);
+
+	if (type->Building && !ShowBuildingsToSelect) {
+	    continue;
+	}
+	if (!type->Building && !ShowUnitsToSelect) {
+	    continue;
+	}
+	if (type->Hero && !ShowHeroesToSelect) {
+	    continue;
+	}
+	if (type->UnitType == UnitTypeLand && !ShowLandToSelect) {
+	    continue;
+	}
+	if (type->UnitType == UnitTypeNaval && !ShowWaterToSelect) {
+	    continue;
+	}
+	if (type->UnitType == UnitTypeFly && !ShowAirToSelect) {
+	    continue;
+	}
+
+	ShownUnitTypes[n++] = EditorUnitTypes[i];
+    }
+    MaxShownUnits = n;
+
+    if( UnitIndex >= MaxShownUnits ) {
+	UnitIndex = MaxShownUnits / 9 * 9;
+    }
+    // Quick & dirty make them invalid
+    CursorUnitIndex = -1;
+    SelectedUnitIndex = -1;
 }
 
 /*----------------------------------------------------------------------------
@@ -396,23 +394,28 @@ local void DrawUnitIcons(void)
     char buf[256];
     Icon *icon;
 
-    x = TheUI.InfoPanelX + 16;
+    x = TheUI.InfoPanelX + 8;
     y = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 10;
 
     for (i = 0; i < PlayerMax; ++i) {
 	if (i == PlayerMax / 2) {
-	    y += 18;
+	    y += 20;
+	}
+	if( i==CursorPlayer ) {
+	    VideoDrawRectangle(ColorWhite,x + i % 8 * 20, y, 20, 20);
 	}
 	VideoDrawRectangle(
 	    i==CursorPlayer ? ColorWhite : ColorGray,
-	    x + i % 8 * 18, y, 15, 15);
-	VideoFillRectangle(Players[i].Color, x + 1 + i % 8 * 18, y + 1, 13,
-	    13);
+	    x + i % 8 * 20, y, 19, 19);
+	if( TheMap.Info->PlayerType[i] != PlayerNobody ) {
+	    VideoFillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
+		17, 17);
+	}
 	if( i==SelectedPlayer ) {
-	    VideoDrawRectangle(ColorGreen, x + 1 + i % 8 * 18, y + 1, 13, 13);
+	    VideoDrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
 	}
 	sprintf(buf,"%d",i);
-	VideoDrawTextCentered(x + i % 8 * 18 + 8, y + 5, SmallFont, buf);
+	VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
     }
 
     x = TheUI.InfoPanelX + 4;
@@ -470,10 +473,10 @@ local void DrawUnitIcons(void)
 	MBUTTON_GEM_SQUARE + (ShowAirToSelect ? 2 : 0), x + 28 * 5, y + 16);
 #if 0
     j = 0;
-    for (i = 0; EditorUnitTypes[i]; ++i) {
+    for (i = 0; ShownUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
+	if ((type = UnitTypeByIdent(ShownUnitTypes[i]))) {
 	    if (type->Building) {
 		++j;
 	    }
@@ -484,10 +487,10 @@ local void DrawUnitIcons(void)
     y += 16;
 
     j = 0;
-    for (i = 0; EditorUnitTypes[i]; ++i) {
+    for (i = 0; ShownUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
+	if ((type = UnitTypeByIdent(ShownUnitTypes[i]))) {
 	    if (!type->Building && type->UnitType == UnitTypeLand) {
 		++j;
 	    }
@@ -498,10 +501,10 @@ local void DrawUnitIcons(void)
     y += 16;
 
     j = 0;
-    for (i = 0; EditorUnitTypes[i]; ++i) {
+    for (i = 0; ShownUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
+	if ((type = UnitTypeByIdent(ShownUnitTypes[i]))) {
 	    if (!type->Building && type->UnitType == UnitTypeFly) {
 		++j;
 	    }
@@ -512,10 +515,10 @@ local void DrawUnitIcons(void)
     y += 16;
 
     j = 0;
-    for (i = 0; EditorUnitTypes[i]; ++i) {
+    for (i = 0; ShownUnitTypes[i]; ++i) {
 	const UnitType *type;
 
-	if ((type = UnitTypeByIdent(EditorUnitTypes[i]))) {
+	if ((type = UnitTypeByIdent(ShownUnitTypes[i]))) {
 	    if (!type->Building && type->UnitType == UnitTypeNaval) {
 		++j;
 	    }
@@ -556,7 +559,8 @@ local void DrawUnitIcons(void)
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
     }
 
-    percent = UnitIndex * 100 / (MaxUnitIndex / 9 * 9);
+    //percent = UnitIndex * 100 / ((MaxShownUnits ? MaxShownUnits : 9) / 9 * 9);
+    percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
     i = (percent * (j - 54)) / 100;
     VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
@@ -568,15 +572,15 @@ local void DrawUnitIcons(void)
     i = UnitIndex;
     while( y < TheUI.ButtonPanelY
 	    + TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT ) {
-	if( !EditorUnitTypes[i] ) {
+	if( i >= MaxShownUnits ) {
 	    break;
 	}
 	x = TheUI.ButtonPanelX + 10;
 	while( x < TheUI.ButtonPanelX + 146 ) {
-	    if( !EditorUnitTypes[i] ) {
+	    if( i >= MaxShownUnits ) {
 		break;
 	    }
-	    icon = UnitTypeByIdent(EditorUnitTypes[i])->Icon.Icon;
+	    icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
 	    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width,
 		icon->Height, x, y);
 
@@ -740,22 +744,26 @@ local void DrawMapCursor(void)
 */
 local void DrawEditorInfo(void)
 {
-    int v;
+    int tile;
+    int i;
     int x;
     int y;
     unsigned flags;
     char buf[256];
 
-    v = TheUI.LastClickedVP;
+    i = TheUI.LastClickedVP;
     x = y = 0;
-    if (v != -1) {
-	x = Viewport2MapX(v, CursorX);
-	y = Viewport2MapY(v, CursorY);
+    if (i != -1) {
+	x = Viewport2MapX(i, CursorX);
+	y = Viewport2MapY(i, CursorY);
     }
 
-    sprintf(buf, "Editor: (%d %d)", x, y);
+    sprintf(buf, "Editor (%d %d)", x, y);
     VideoDrawText(TheUI.ResourceX + 2, TheUI.ResourceY + 2, GameFont, buf);
 
+    //
+    //	Flags info
+    //
     flags = TheMap.Fields[x + y * TheMap.Width].Flags;
     sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
 	TheMap.Fields[x + y * TheMap.Width].Value, flags,
@@ -772,9 +780,26 @@ local void DrawEditorInfo(void)
 	flags & MapFieldAirUnit		? 'a' : '-',
 	flags & MapFieldSeaUnit		? 's' : '-',
 	flags & MapFieldBuilding	? 'b' : '-');
-    VideoDrawText(TheUI.ResourceX + 152, TheUI.ResourceY + 2, GameFont, buf);
-    sprintf(buf, "Tile: %d", TheMap.Fields[x + y * TheMap.Width].Tile);
-    VideoDrawText(TheUI.ResourceX + 302, TheUI.ResourceY + 2, GameFont, buf);
+    VideoDrawText(TheUI.ResourceX + 118, TheUI.ResourceY + 2, GameFont, buf);
+
+    //
+    //	Tile info
+    //
+    tile = TheMap.Fields[x + y * TheMap.Width].Tile;
+
+    for (i = 0; i < TheMap.Tileset->NumTiles; ++i) {
+	if (tile == TheMap.Tileset->Table[i]) {
+	    break;
+	}
+    }
+    DebugCheck(i == TheMap.Tileset->NumTiles);
+
+    sprintf(buf, "%d %s %s", tile,
+	TheMap.Tileset->TileNames[TheMap.Tileset->BasicNameTable[i]],
+	TheMap.Tileset->MixedNameTable[i]
+	    ? TheMap.Tileset->TileNames[TheMap.Tileset->MixedNameTable[i]]
+	    : "");
+    VideoDrawText(TheUI.ResourceX + 252, TheUI.ResourceY + 2, GameFont, buf);
 }
 
 /**
@@ -931,8 +956,6 @@ local void EditorCallbackButtonUp(unsigned button)
 local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 {
     int i;
-    int percent = UnitIndex * 100 / (MaxUnitIndex / 9 * 9);
-    int j = (percent * (176 - 8 - 54)) / 100;
 
     DebugLevel3Fn("%x %x\n" _C_ button _C_ MouseButtons);
 
@@ -1011,6 +1034,13 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     //  Click on unit area
     //
     if (EditorState == EditorEditUnit) {
+	int percent;
+	int j;
+
+	percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
+	j = (percent * (176 - 8 - 54)) / 100;
+
+	// Unit icons scroll left area
 	if (TheUI.ButtonPanelX + 4 < CursorX
 		&& CursorX < TheUI.ButtonPanelX + 4 + 18 + j
 		&& TheUI.ButtonPanelY + 4 < CursorY
@@ -1021,24 +1051,76 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	    }
 	    return;
 	}
+	// Unit icons scroll right area
 	if (TheUI.ButtonPanelX + 4 + 18 + j + 18 < CursorX
 		&& CursorX < TheUI.ButtonPanelX + 176 - 4
 		&& TheUI.ButtonPanelY + 4 < CursorY
 		&& CursorY < TheUI.ButtonPanelY + 24) {
 
-	    if (UnitIndex + 9 <= MaxUnitIndex) {
+	    if (UnitIndex + 9 <= MaxShownUnits) {
 		UnitIndex += 9;
 	    }
 	    return;
 	}
+	// Cursor on unit icons
 	if (CursorUnitIndex != -1) {
 	    SelectedUnitIndex = CursorUnitIndex;
-	    CursorBuilding = UnitTypeByIdent(EditorUnitTypes[CursorUnitIndex]);
+	    CursorBuilding = UnitTypeByIdent(ShownUnitTypes[CursorUnitIndex]);
 	    ThisPlayer = Players + SelectedPlayer;
 	    return;
 	}
+	// Cursor on player icons
 	if (CursorPlayer != -1) {
 	    SelectedPlayer = CursorPlayer;
+	    return;
+	}
+	// Cursor on unit selection icons
+	if (TheUI.InfoPanelX + 10 + 28 * 0 < CursorX
+		&& CursorX < TheUI.InfoPanelX + 10 + 28 * 1
+		&& TheUI.InfoPanelY + 140 < CursorY
+		&& CursorY < TheUI.InfoPanelY + 140 + 28) {
+	    ShowUnitsToSelect ^= 1;
+	    RecalculateShownUnits();
+	    return;
+	}
+	if (TheUI.InfoPanelX + 10 + 28 * 1 < CursorX
+		&& CursorX < TheUI.InfoPanelX + 10 + 28 * 2
+		&& TheUI.InfoPanelY + 140 < CursorY
+		&& CursorY < TheUI.InfoPanelY + 140 + 28) {
+	    ShowBuildingsToSelect ^= 1;
+	    RecalculateShownUnits();
+	    return;
+	}
+	if (TheUI.InfoPanelX + 10 + 28 * 2 < CursorX
+		&& CursorX < TheUI.InfoPanelX + 10 + 28 * 3
+		&& TheUI.InfoPanelY + 140 < CursorY
+		&& CursorY < TheUI.InfoPanelY + 140 + 28) {
+	    ShowHeroesToSelect ^= 1;
+	    RecalculateShownUnits();
+	    return;
+	}
+	if (TheUI.InfoPanelX + 10 + 28 * 3 < CursorX
+		&& CursorX < TheUI.InfoPanelX + 10 + 28 * 4
+		&& TheUI.InfoPanelY + 140 < CursorY
+		&& CursorY < TheUI.InfoPanelY + 140 + 28) {
+	    ShowLandToSelect ^= 1;
+	    RecalculateShownUnits();
+	    return;
+	}
+	if (TheUI.InfoPanelX + 10 + 28 * 4 < CursorX
+		&& CursorX < TheUI.InfoPanelX + 10 + 28 * 5
+		&& TheUI.InfoPanelY + 140 < CursorY
+		&& CursorY < TheUI.InfoPanelY + 140 + 28) {
+	    ShowWaterToSelect ^= 1;
+	    RecalculateShownUnits();
+	    return;
+	}
+	if (TheUI.InfoPanelX + 10 + 28 * 5 < CursorX
+		&& CursorX < TheUI.InfoPanelX + 10 + 28 * 6
+		&& TheUI.InfoPanelY + 140 < CursorY
+		&& CursorY < TheUI.InfoPanelY + 140 + 28) {
+	    ShowAirToSelect ^= 1;
+	    RecalculateShownUnits();
 	    return;
 	}
     }
@@ -1358,14 +1440,14 @@ local void EditorCallbackMouse(int x, int y)
     //  Handle edit unit area
     //
     if (EditorState == EditorEditUnit) {
+	bx = TheUI.InfoPanelX + 8;
 	by = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 10;
-	bx = TheUI.InfoPanelX + 16;
 	for( i = 0; i< PlayerMax; ++i ) {
 	    if( i == PlayerMax / 2 ) {
-		bx = TheUI.InfoPanelX + 16;
-		by += 18;
+		bx = TheUI.InfoPanelX + 8;
+		by += 20;
 	    }
-	    if (bx < x && x < bx + 15 && by < y && y < by + 15) {
+	    if (bx < x && x < bx + 20 && by < y && y < by + 20) {
 		sprintf(buf,"Select player #%d",i);
 		SetStatusLine(buf);
 		CursorPlayer = i;
@@ -1373,26 +1455,26 @@ local void EditorCallbackMouse(int x, int y)
 		//CursorOn = CursorOnButton;
 		return;
 	    }
-	    bx += 18;
+	    bx += 20;
 	}
 
 	i = UnitIndex;
 	by = TheUI.ButtonPanelY + 24;
 	while (by < TheUI.ButtonPanelY
 		+ TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT) {
-	    if( !EditorUnitTypes[i] ) {
+	    if( i >= MaxShownUnits || !ShownUnitTypes[i] ) {
 		break;
 	    }
 	    bx = TheUI.ButtonPanelX + 10;
 	    while (bx < TheUI.ButtonPanelX + 146) {
-		if( !EditorUnitTypes[i] ) {
+		if( i >= MaxShownUnits || !ShownUnitTypes[i] ) {
 		    break;
 		}
 		if (bx < x && x < bx + ICON_WIDTH
 			&& by < y && y < by + ICON_HEIGHT) {
 		    sprintf(buf,"%s \"%s\"",
-			    UnitTypeByIdent(EditorUnitTypes[i])->Ident,
-			    UnitTypeByIdent(EditorUnitTypes[i])->Name);
+			    UnitTypeByIdent(ShownUnitTypes[i])->Ident,
+			    UnitTypeByIdent(ShownUnitTypes[i])->Name);
 		    SetStatusLine(buf);
 		    CursorUnitIndex = i;
 		    //ButtonUnderCursor = i + 100;
@@ -1670,6 +1752,15 @@ local void CreateEditor(void)
 	MaxUnitIndex = n - 1;
     }
 
+    ShowUnitsToSelect = 1;		// Show all units as default
+    ShowBuildingsToSelect = 1;
+    ShowHeroesToSelect = 1;
+    ShowAirToSelect = 1;
+    ShowLandToSelect = 1;
+    ShowWaterToSelect = 1;
+
+    RecalculateShownUnits();
+
     if (1) {
 	DestroyCursorBackground();
 	ProcessMenu("menu-editor-tips", 1);
@@ -1785,10 +1876,6 @@ global void EditorMainLoop(void)
     VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
-}
-
-local void paul(void)
-{
 }
 
 //@}

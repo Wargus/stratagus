@@ -36,13 +36,15 @@
 **
 **      @section Missing Missing features
 **
-**	@li Save menu
 **	@li Edit upgrade section
 **	@li Edit allow section
-**	@li Create new puds
 **	@li Edit .cm files
 **	@li Upgraded unit-types should be shown different on map
-**
+**	@li Good keyboard bindings
+**	@li Script support
+**	@li Commandline support
+**	@li Cut&Paste
+**	@li More random map functions.
 */
 
 /*----------------------------------------------------------------------------
