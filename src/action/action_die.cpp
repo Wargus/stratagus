@@ -72,18 +72,22 @@ global void HandleActionDie(Unit* unit)
 		DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
 
 		if (!unit->Type->CorpseType) {
+			// Unmark corpse sight, if it has any
+			MapUnmarkUnitSight(unit);
 			ReleaseUnit(unit);
 			return;
 		}
-
-		// Fixes sight from death
-		MapUnmarkUnitSight(unit);
 
 		unit->State = unit->Type->CorpseScript;
 
 		DebugCheck(unit->Type->TileWidth != unit->Type->CorpseType->TileWidth ||
 				unit->Type->TileHeight != unit->Type->CorpseType->TileHeight);
 		unit->Type = unit->Type->CorpseType;
+
+		// Update sight for new corpse
+		MapUnmarkUnitSight(unit);
+		unit->CurrentSightRange = unit->Type->Stats->SightRange;
+		MapMarkUnitSight(unit);
 
 		CommandStopUnit(unit);			// This clears all order queues
 #ifdef DEBUG
