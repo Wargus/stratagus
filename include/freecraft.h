@@ -121,6 +121,7 @@
 #ifndef _WIN32_WCE
 #pragma warning(disable:4018)		// signed/unsigned mismatch
 #pragma warning(disable:4244)		// conversion from double to uchar
+#pragma warning(disable:4761)		// integral size mismatch
 #define access(x,y) _access((x),(y))
 #define snprintf _snprintf
 #endif
