@@ -849,6 +849,8 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	    if (ply != NetworkSyncSeeds[GameCycle & 0xFF]
 		    || ntohs(ncq->Data.Unit)
 			!= NetworkSyncHashs[GameCycle & 0xFF]) {
+
+		SetMessage("Network out of sync");
 		DebugLevel0Fn("\n\aNetwork out of sync %x!=%x!\n\n" _C_ 
 			ply _C_ NetworkSyncSeeds[GameCycle & 0xFF]);
 	    }
