@@ -66,7 +66,9 @@ local Unit** ReleasedTail;		/// List tail of released units.
 
 global Unit* Units[MAX_UNIT_SLOTS];	/// Array of used slots
 global int NumUnits;			/// Number of slots used
+
 global int HitPointRegeneration;	/// Enable hit point regeneration for all units
+global int EnableTrainingQueue;		/// Config: training queues enabled
 
 /*----------------------------------------------------------------------------
 --	Functions
