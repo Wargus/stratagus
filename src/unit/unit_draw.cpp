@@ -799,7 +799,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Health bar on left side of unit.
     //
     stats=unit->Stats;
-    if( (!type->Critter || unit->Player->Type!=PlayerRaceNeutral)
+    //  Why remove the neutral race?
+    if( (unit->Player->Type!=PlayerRaceNeutral)
 		&& ShowHealthBar ) {
 	if( stats->HitPoints
 		&& !(ShowNoFull && unit->HP==stats->HitPoints) ) {
@@ -878,8 +879,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 
     //
     //	Health dot on left side of unit.
+    //  Why skip the neutral units?
     //
-    if( (!type->Critter || unit->Player->Type!=PlayerRaceNeutral)
+    if( (unit->Player->Type!=PlayerRaceNeutral)
 		&& ShowHealthDot ) {
 	if( stats->HitPoints
 		&& !(ShowNoFull && unit->HP==stats->HitPoints) ) {
