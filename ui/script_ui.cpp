@@ -323,7 +323,11 @@ local int CclSetContrast(lua_State* l)
 	lua_error(l);
     }
     TheUI.Contrast = i;
+#ifdef USE_SDL_SURFACE
+    // FIXME
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     lua_pushnumber(l, old);
@@ -377,7 +381,11 @@ local int CclSetBrightness(lua_State* l)
 	lua_error(l);
     }
     TheUI.Brightness = i;
+#ifdef USE_SDL_SURFACE
+    // FIXME:
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     lua_pushnumber(l, old);
@@ -431,7 +439,11 @@ local int CclSetSaturation(lua_State* l)
 	lua_error(l);
     }
     TheUI.Saturation = i;
+#ifdef USE_SDL_SURFACE
+    // FIXME:
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     lua_pushnumber(l, old);
@@ -483,7 +495,7 @@ local int CclSetVideoResolution(lua_State* l)
 **	@return			Old fullscreen mode
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetVideoFullscreen(SCM fullscreen)
+local SCM CclSetVideoFullScreen(SCM fullscreen)
 {
     SCM old;
 
@@ -494,7 +506,7 @@ local SCM CclSetVideoFullscreen(SCM fullscreen)
     return old;
 }
 #elif defined(USE_LUA)
-local int CclSetVideoFullscreen(lua_State* l)
+local int CclSetVideoFullScreen(lua_State* l)
 {
     int old;
 
@@ -3022,13 +3034,25 @@ local int CclDefineUI(lua_State* l)
 				lua_error(l);
 			    }
 			    lua_rawgeti(l, -1, 1);
+#ifdef USE_SDL_SURFACE
+			    ui->CompletedBarColorRGB.r = LuaToNumber(l, -1);
+#else
 			    ui->CompletedBarColorRGB.D24.a = LuaToNumber(l, -1);
+#endif
 			    lua_pop(l, 1);
 			    lua_rawgeti(l, -1, 2);
+#ifdef USE_SDL_SURFACE
+			    ui->CompletedBarColorRGB.g = LuaToNumber(l, -1);
+#else
 			    ui->CompletedBarColorRGB.D24.b = LuaToNumber(l, -1);
+#endif
 			    lua_pop(l, 1);
 			    lua_rawgeti(l, -1, 3);
+#ifdef USE_SDL_SURFACE
+			    ui->CompletedBarColorRGB.b = LuaToNumber(l, -1);
+#else
 			    ui->CompletedBarColorRGB.D24.c = LuaToNumber(l, -1);
+#endif
 			    lua_pop(l, 1);
 			    lua_pop(l, 1);
 			} else if (!strcmp(value, "pos")) {
@@ -3040,7 +3064,7 @@ local int CclDefineUI(lua_State* l)
 			    lua_rawgeti(l, -1, 1);
 			    ui->CompletedBarX = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
-			    lua_rawgeti(l, -1, 1);
+			    lua_rawgeti(l, -1, 2);
 			    ui->CompletedBarY = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
 			    lua_pop(l, 1);
@@ -3053,7 +3077,7 @@ local int CclDefineUI(lua_State* l)
 			    lua_rawgeti(l, -1, 1);
 			    ui->CompletedBarW = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
-			    lua_rawgeti(l, -1, 1);
+			    lua_rawgeti(l, -1, 2);
 			    ui->CompletedBarH = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
 			    lua_pop(l, 1);
@@ -3795,12 +3819,12 @@ local SCM CclSetGrabMouse(SCM flag)
 #elif defined(USE_LUA)
 local int CclSetGrabMouse(lua_State* l)
 {
-    if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isnumber(l, 1))) {
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    if (lua_isboolean(l, 1)) {
-	ToggleGrabMouse(lua_toboolean(l, 1));
+    if (lua_toboolean(l, 1)) {
+	ToggleGrabMouse(1);
     } else {
 	ToggleGrabMouse(-1);
     }
@@ -4470,6 +4494,7 @@ local int scm2style(lua_State* l, const char* value)
     } else {
 	lua_pushfstring(l, "Unsupported style: %s", value);
 	lua_error(l);
+	return 0;
     }
     return id;
 }
@@ -4505,9 +4530,7 @@ local SCM CclDefineMenuItem(SCM list)
 	    item->xofs = gh_scm2int(gh_car(value));
 	    value = gh_cdr(value);
 	    item->yofs = gh_scm2int(gh_car(value));
-		// Addition of the transparent flag
-	} else if (gh_eq_p(value, gh_symbol2scm("transparent"))) {
-		item->transparent = 1; 
+
 	} else if (gh_eq_p(value, gh_symbol2scm("menu"))) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
@@ -6343,7 +6366,7 @@ local int CclDefineButton(lua_State* l)
     char buf[64];
     const char* value;
     char* s1;
-    char* s2;
+    const char* s2;
     ButtonAction ba;
     int args;
     int j;
@@ -6416,7 +6439,7 @@ local int CclDefineButton(lua_State* l)
 		lua_error(l);
 	    }
 	    if (lua_isnumber(l, j + 1)) {
-		sprintf(buf, "%ld", lua_tonumber(l, j + 1));
+		sprintf(buf, "%ld", (long int)lua_tonumber(l, j + 1));
 		s1 = strdup(buf);
 	    } else {
 		s1 = strdup(lua_tostring(l, j + 1));
@@ -6466,14 +6489,11 @@ local int CclDefineButton(lua_State* l)
 	    subargs = luaL_getn(l, j + 1);
 	    for (k = 0; k < subargs; ++k) {
 		lua_rawgeti(l, j + 1, k + 1);
-		s2 = strdup(LuaToString(l, -1));
+		s2 = LuaToString(l, -1);
 		lua_pop(l, 1);
 		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
 		strcat(s1, s2);
-		free(s2);
-		if (k == subargs) {
-		    strcat(s1, ",");
-		}
+		strcat(s1, ",");
 	    }
 	    ba.AllowStr = s1;
 	} else if (!strcmp(value, "key")) {
@@ -6493,11 +6513,10 @@ local int CclDefineButton(lua_State* l)
 	    subargs = luaL_getn(l, j + 1);
 	    for (k = 0; k < subargs; ++k) {
 		lua_rawgeti(l, j + 1, k + 1);
-		s2 = strdup(LuaToString(l, -1));
+		s2 = LuaToString(l, -1);
 		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
 		strcat(s1, s2);
 		strcat(s1, ",");
-		free(s2);
 	    }
 	    ba.UnitMask = s1;
 	    if (!strncmp(ba.UnitMask, ",*,", 3)) {
@@ -7218,7 +7237,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-saturation!", CclSetSaturation);
 
     gh_new_procedure2_0("set-video-resolution!", CclSetVideoResolution);
-    gh_new_procedure1_0("set-video-fullscreen!", CclSetVideoFullscreen);
+    gh_new_procedure1_0("set-video-fullscreen!", CclSetVideoFullScreen);
 
     gh_new_procedureN("set-title-screens!", CclSetTitleScreens);
     gh_new_procedure1_0("set-menu-background!", CclSetMenuBackground);
@@ -7298,7 +7317,7 @@ global void UserInterfaceCclRegister(void)
     lua_register(Lua, "SetSaturation", CclSetSaturation);
 
     lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
-    lua_register(Lua, "SetVideoFullscreen", CclSetVideoFullscreen);
+    lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
 
     lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
     lua_register(Lua, "SetMenuBackground", CclSetMenuBackground);

@@ -107,16 +107,6 @@ typedef struct _graphic_type_ {
 	///	Draw the object clipped and flipped in X direction.
     void (*DrawClipX)(const Graphic* o, unsigned f, int x, int y);
 	///	Draw the shadow object clipped to the current clipping.
-///50% Transparent functions
-	void (*DrawTrans50)(const Graphic* o, unsigned f, int x, int y);
-	///	Draw the object unclipped and flipped in X direction.
-    void (*DrawXTrans50)(const Graphic* o, unsigned f, int x, int y);
-	///	Draw the object clipped to the current clipping.
-    void (*DrawClipTrans50)(const Graphic* o, unsigned f, int x, int y);
-	///	Draw the object clipped and flipped in X direction.
-    void (*DrawClipXTrans50)(const Graphic* o, unsigned f, int x, int y);
-	///	Draw the shadow object clipped to the current clipping.
-
     void (*DrawShadowClip)(const Graphic* o, unsigned f, int x, int y);
 	///	Draw the shadow object clipped and flipped in X direction.
     void (*DrawShadowClipX)(const Graphic* o, unsigned f, int x, int y);
@@ -343,18 +333,15 @@ extern EventCallback* Callbacks;	/// Current callbacks
 extern EventCallback GameCallbacks;	/// Game callbacks
 extern EventCallback MenuCallbacks;	/// Menu callbacks
 
-    ///	Maps RGB to a hardware dependent pixel.
-extern SDL_Color VideoMapRGB(int r, int g, int b);
-
-extern SDL_Color ColorBlack;
-extern SDL_Color ColorDarkGreen;
-extern SDL_Color ColorBlue;
-extern SDL_Color ColorOrange;
-extern SDL_Color ColorWhite;
-extern SDL_Color ColorGray;
-extern SDL_Color ColorRed;
-extern SDL_Color ColorGreen;
-extern SDL_Color ColorYellow;
+extern Uint32 ColorBlack;
+extern Uint32 ColorDarkGreen;
+extern Uint32 ColorBlue;
+extern Uint32 ColorOrange;
+extern Uint32 ColorWhite;
+extern Uint32 ColorGray;
+extern Uint32 ColorRed;
+extern Uint32 ColorGreen;
+extern Uint32 ColorYellow;
 
 extern int ColorWaterCycleStart;	/// color # start for color cycling
 extern int ColorWaterCycleEnd;		/// color # end   for color cycling
@@ -366,80 +353,81 @@ extern int ColorBuildingCycleEnd;	/// color # end   for color cycling
 // FIXME: check these out, clean up if we can
 // FIXME: check these out, clean up if we can
 // FIXME: check these out, clean up if we can
+
     ///	Draw pixel unclipped.
-extern void VideoDrawPixel(SDL_Color color, int x, int y);
+extern void (*VideoDrawPixel)(Uint32 color, int x, int y);
 
     ///	Draw translucent pixel unclipped.
-extern void VideoDrawTransPixel(SDL_Color color, int x, int y,
+extern void (*VideoDrawTransPixel)(Uint32 color, int x, int y,
     unsigned char alpha);
 
     ///	Draw pixel clipped to current clip setting.
-extern void VideoDrawPixelClip(SDL_Color color, int x, int y);
+extern void VideoDrawPixelClip(Uint32 color, int x, int y);
 
     ///	Draw translucent pixel clipped to current clip setting.
-extern void VideoDrawTransPixelClip(SDL_Color color, int x, int y,
+extern void VideoDrawTransPixelClip(Uint32 color, int x, int y,
     unsigned char alpha);
 
     ///	Draw vertical line unclipped.
-extern void VideoDrawVLine(SDL_Color color, int x, int y,
+extern void VideoDrawVLine(Uint32 color, int x, int y,
     int height);
 
     ///	Draw translucent vertical line unclipped.
-extern void VideoDrawTransVLine(SDL_Color color, int x, int y,
+extern void VideoDrawTransVLine(Uint32 color, int x, int y,
     int height, unsigned char alpha);
 
     ///	Draw vertical line clipped to current clip setting
-extern void VideoDrawVLineClip(SDL_Color color, int x, int y,
+extern void VideoDrawVLineClip(Uint32 color, int x, int y,
     int height);
 
     ///	Draw translucent vertical line clipped to current clip setting
-extern void VideoDrawTransVLineClip(SDL_Color color, int x, int y,
+extern void VideoDrawTransVLineClip(Uint32 color, int x, int y,
     int height, unsigned char alpha);
 
     ///	Draw horizontal line unclipped.
-extern void VideoDrawHLine(SDL_Color color, int x, int y,
+extern void VideoDrawHLine(Uint32 color, int x, int y,
     int width);
 
     ///	Draw translucent horizontal line unclipped.
-extern void VideoDrawTransHLine(SDL_Color color, int x, int y,
+extern void VideoDrawTransHLine(Uint32 color, int x, int y,
     int width, unsigned char alpha);
 
     ///	Draw horizontal line clipped to current clip setting
-extern void VideoDrawHLineClip(SDL_Color color, int x, int y,
+extern void VideoDrawHLineClip(Uint32 color, int x, int y,
     int width);
 
     ///	Draw translucent horizontal line clipped to current clip setting
-extern void VideoDrawTransHLineClip(SDL_Color color, int x, int y,
+extern void VideoDrawTransHLineClip(Uint32 color, int x, int y,
     int width, unsigned char alpha);
 
     ///	Draw line unclipped.
-extern void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy);
+extern void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy);
 
     ///	Draw translucent line unclipped.
-extern void VideoDrawTransLine(SDL_Color color, int sx, int sy, int dx, int dy,
+extern void VideoDrawTransLine(Uint32 color, int sx, int sy, int dx, int dy,
     unsigned char alpha);
 
     ///	Draw line clipped to current clip setting
-extern void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy);
+extern void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy);
 
     ///	Draw translucent line clipped to current clip setting
-extern void VideoDrawTransLineClip(SDL_Color color, int sx, int sy,
+extern void VideoDrawTransLineClip(Uint32 color, int sx, int sy,
     int dx, int dy, unsigned char alpha);
 
     ///	Draw rectangle.
-extern void VideoDrawRectangle(SDL_Color color, int x, int y,
+extern void VideoDrawRectangle(Uint32 color, int x, int y,
     int w, int h);
 
     ///	Draw translucent rectangle.
-extern void VideoDrawTransRectangle(SDL_Color color, int x, int y,
+extern void VideoDrawTransRectangle(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha);
 
     ///	Draw rectangle clipped.
-extern void VideoDrawRectangleClip(SDL_Color color, int x, int y,
+extern void VideoDrawRectangleClip(Uint32 color, int x, int y,
     int w, int h);
 
     ///	Draw translucent rectangle clipped.
-extern void VideoDrawTransRectangleClip(SDL_Color color, int x, int y,
+extern void VideoDrawTransRectangleClip(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha);
 
     ///	Draw 8bit raw graphic data clipped, using given pixel pallette
@@ -453,47 +441,47 @@ extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
     int w, int h, int x, int y, unsigned char fade);
 
     ///	Draw circle.
-extern void VideoDrawCircle(SDL_Color color, int x, int y, int r);
+extern void VideoDrawCircle(Uint32 color, int x, int y, int r);
 
     ///	Draw translucent circle.
-extern void VideoDrawTransCircle(SDL_Color color, int x, int y, int r,
+extern void VideoDrawTransCircle(Uint32 color, int x, int y, int r,
     unsigned char alpha);
 
     ///	Draw circle clipped.
-extern void VideoDrawCircleClip(SDL_Color color, int x, int y, int r);
+extern void VideoDrawCircleClip(Uint32 color, int x, int y, int r);
 
     ///	Draw translucent circle clipped.
-extern void VideoDrawTransCircleClip(SDL_Color color, int x, int y, int r,
+extern void VideoDrawTransCircleClip(Uint32 color, int x, int y, int r,
     unsigned char alpha);
 
     ///	Fill rectangle.
-extern void VideoFillRectangle(SDL_Color color, int x, int y,
+extern void VideoFillRectangle(Uint32 color, int x, int y,
     int w, int h);
 
     ///	Fill translucent rectangle.
-extern void VideoFillTransRectangle(SDL_Color color, int x, int y,
+extern void VideoFillTransRectangle(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha);
 
     ///	Fill rectangle clipped.
-extern void VideoFillRectangleClip(SDL_Color color, int x, int y,
+extern void VideoFillRectangleClip(Uint32 color, int x, int y,
     int w, int h);
 
     ///	Fill translucent rectangle clipped.
-extern void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
+extern void VideoFillTransRectangleClip(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha);
 
     ///	Fill circle.
-extern void VideoFillCircle(SDL_Color color, int x, int y, int r);
+extern void VideoFillCircle(Uint32 color, int x, int y, int r);
 
     ///	Fill translucent circle.
-extern void VideoFillTransCircle(SDL_Color color, int x, int y, int r,
+extern void VideoFillTransCircle(Uint32 color, int x, int y, int r,
     unsigned char alpha);
 
     ///	Fill circle clipped.
-extern void VideoFillCircleClip(SDL_Color color, int x, int y, int r);
+extern void VideoFillCircleClip(Uint32 color, int x, int y, int r);
 
     ///	Fill translucent circle clipped.
-extern void VideoFillTransCircleClip(SDL_Color color, int x, int y, int r,
+extern void VideoFillTransCircleClip(Uint32 color, int x, int y, int r,
     unsigned char alpha);
 
     ///	Draw a graphic object unclipped.
@@ -515,41 +503,27 @@ extern void VideoDrawX(const Graphic*, unsigned frame, int x, int y);
     ///	Draw a graphic object clipped and flipped in X direction.
 extern void VideoDrawClipX(const Graphic*, unsigned frame, int x, int y);
 
+    ///	Draw a shadow graphic object clipped to the current clipping.
+extern void VideoDrawShadowClip(const Graphic*, unsigned frame,
+    int x, int y);
+    ///	Draw a shadow graphic object clipped and flipped in X direction.
+extern void VideoDrawShadowClipX(const Graphic*, unsigned frame,
+    int x, int y);
+
 // FIXME FIXME FIXME: need to implement all of this
-    ///	Draw a graphic object unclipped.
-//#define VideoDraw(o, f, x, y)	//((o)->Type->Draw)((o), (f), (x), (y))
     ///	Free a graphic object.
 #define VideoFree(o)	//((o)->Type->Free)((o))
     ///	Save (NULL) free a graphic object.
 #define VideoSaveFree(o) // do { if ((o)) ((o)->Type->Free)((o)); } while(0)
-//#define VideoDrawSub(a,b,c,d,e,f,g)
-    ///	Draw a graphic object clipped to the current clipping.
-//#define VideoDrawSubClip(o, ix, iy, w, h, x, y)
-    ///	Draw a shadow graphic object clipped to the current clipping.
-#define VideoDrawShadowClip(o, f, x, y)	//((o)->Type->DrawShadowClip)((o),(f),(x),(y))
-    ///	Draw a shadow graphic object clipped and flipped in X direction.
-#define VideoDrawShadowClipX(o, f, x, y)    //((o)->Type->DrawShadowClipX)((o),(f),(x),(y))
 
     /// Get the width of a single frame of a graphic object
 #define VideoGraphicWidth(o)	((o)->Width)
     /// Get the height of a single frame of a graphic object
 #define VideoGraphicHeight(o)	((o)->Height)
 #define VideoGraphicFrames(o) ((o)->NumFrames)
-//    ((o)->Type->DrawSubClip)((o), (ix), (iy), (w), (h), (x), (y))
-
 
     /// MACRO defines speed of colorcycling FIXME: should be made configurable
 #define COLOR_CYCLE_SPEED	(CYCLES_PER_SECOND/4)
-
-extern SDL_Surface* MainSurface;
-
-/*
-#define VideoMemory8	(&VideoMemory->D8)	/// video memory  8bpp
-#define VideoMemory16	(&VideoMemory->D16)	/// video memory 16bpp
-#define VideoMemory24	(&VideoMemory->D24)	/// video memory 24bpp
-#define VideoMemory32	(&VideoMemory->D32)	/// video memory 32bpp
-*/
-
 
 #else
 
@@ -702,16 +676,6 @@ typedef struct _graphic_type_ {
     void (*DrawClip)(const Graphic* o, unsigned f, int x, int y);
 	///	Draw the object clipped and flipped in X direction.
     void (*DrawClipX)(const Graphic* o, unsigned f, int x, int y);
-///50% Transparent functions
-	///	Draw the object unclipped.
-    void (*DrawTrans50)(const Graphic* o, unsigned f, int x, int y);
-	///	Draw the object unclipped and flipped in X direction.
-    void (*DrawXTrans50)(const Graphic* o, unsigned f, int x, int y);
-	///	Draw the object clipped to the current clipping.
-    void (*DrawClipTrans50)(const Graphic* o, unsigned f, int x, int y);
-	///	Draw the object clipped and flipped in X direction.
-    void (*DrawClipXTrans50)(const Graphic* o, unsigned f, int x, int y);
-
 	///	Draw the shadow object clipped to the current clipping.
     void (*DrawShadowClip)(const Graphic* o, unsigned f, int x, int y);
 	///	Draw the shadow object clipped and flipped in X direction.
@@ -1153,18 +1117,6 @@ extern void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
     ///	Draw a graphic object clipped and flipped in X direction.
 #define VideoDrawClipX(o, f, x, y)	((o)->Type->DrawClipX)((o), (f), (x), (y))
     ///	Draw a shadow graphic object clipped to the current clipping.
-///Transparent Functions
-   ///	Draw a graphic object unclipped.
-#define VideoDrawTrans50(o, f, x, y)	((o)->Type->DrawTrans50)((o), (f), (x), (y))
-    ///	Draw a graphic object unclipped and flipped in X direction.
-#define VideoDrawXTrans50(o, f, x, y)	((o)->Type->DrawXTrans50)((o), (f), (x), (y))
-    ///	Draw a graphic object clipped to the current clipping.
-#define VideoDrawClipTrans50(o, f, x, y)	((o)->Type->DrawClipTrans50)((o), (f), (x), (y))
-    ///	Draw a graphic object clipped and flipped in X direction.
-#define VideoDrawClipXTrans50(o, f, x, y)	((o)->Type->DrawClipXTrans50)((o), (f), (x), (y))
-    ///	Draw a shadow graphic object clipped to the current clipping.
-///Shadows
-
 #define VideoDrawShadowClip(o, f, x, y)	((o)->Type->DrawShadowClip)((o),(f),(x),(y))
     ///	Draw a shadow graphic object clipped and flipped in X direction.
 #define VideoDrawShadowClipX(o, f, x, y)    ((o)->Type->DrawShadowClipX)((o),(f),(x),(y))

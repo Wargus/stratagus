@@ -222,7 +222,6 @@ typedef struct _menuitem_ {
     int yofs;
     unsigned flags;
     int font;
-	int transparent;			/// Add the transparent flag to draw a transparent flag
     void (*initfunc)(struct _menuitem_ *);	/// constructor
     void (*exitfunc)(struct _menuitem_ *);	/// destructor
     struct _menus_ *menu;			/// backpointer for speedups
@@ -348,7 +347,7 @@ extern void InitMenus(int race);
     /// Draw menu
 extern void DrawMenu(Menu *menu);
     /// Draw menu button
-extern void DrawMenuButton(MenuButtonId button,unsigned flags,int transparent,int w,int h,
+extern void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,
 			   int x,int y,const int font,const unsigned char *text,
 			   char *normalcolor, char *reversecolor);
     /// Set menu backgound and draw it

@@ -36,6 +36,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "video.h"
@@ -90,6 +91,8 @@ local SCM CclDefineMissileType(SCM list)
     }
 
     mtype->NumDirections = 1;
+    // Ensure we don't divide by zero.
+    mtype->SplashFactor = 100;
     //
     //	Parse the arguments, already the new tagged format.
     //
@@ -108,8 +111,6 @@ local SCM CclDefineMissileType(SCM list)
 	    mtype->SpriteFrames = gh_scm2int(gh_car(list));
 	} else if (gh_eq_p(value, gh_symbol2scm("num-directions"))) {
 	    mtype->NumDirections = gh_scm2int(gh_car(list));
-	} else if (gh_eq_p(value, gh_symbol2scm("transparency"))) {
-	    mtype->Transparency = gh_scm2int(gh_car(list));
 	} else if (gh_eq_p(value, gh_symbol2scm("fired-sound"))) {
 	    free(mtype->FiredSound.Name);
 	    mtype->FiredSound.Name = gh_scm2newstr(gh_car(list), NULL);
@@ -117,10 +118,13 @@ local SCM CclDefineMissileType(SCM list)
 	    free(mtype->ImpactSound.Name);
 	    mtype->ImpactSound.Name = gh_scm2newstr(gh_car(list), NULL);
 	} else if (gh_eq_p(value, gh_symbol2scm("class"))) {
+	    const char* name;
+
 	    value = gh_car(list);
+	    name = get_c_string(value);
 	    for (i = 0; MissileClassNames[i]; ++i) {
-		if (gh_eq_p(value, gh_symbol2scm((char*)MissileClassNames[i]))) {
-		    mtype->Class=i;
+		if (!strcmp(name, MissileClassNames[i])) {
+		    mtype->Class = i;
 		    break;
 		}
 	    }
@@ -132,13 +136,13 @@ local SCM CclDefineMissileType(SCM list)
 	    mtype->NumBounces = gh_scm2int(gh_car(list));
 	} else if (gh_eq_p(value, gh_symbol2scm("delay"))) {
 	    mtype->StartDelay = gh_scm2int(gh_car(list));
-	} else if (gh_eq_p(value, gh_symbol2scm("sleep")) ) {
+	} else if (gh_eq_p(value, gh_symbol2scm("sleep"))) {
 	    mtype->Sleep = gh_scm2int(gh_car(list));
-	} else if (gh_eq_p(value, gh_symbol2scm("speed")) ) {
+	} else if (gh_eq_p(value, gh_symbol2scm("speed"))) {
 	    mtype->Speed = gh_scm2int(gh_car(list));
-	} else if (gh_eq_p(value, gh_symbol2scm("draw-level")) ) {
+	} else if (gh_eq_p(value, gh_symbol2scm("draw-level"))) {
 	    mtype->DrawLevel = gh_scm2int(gh_car(list));
-	} else if (gh_eq_p(value, gh_symbol2scm("range")) ) {
+	} else if (gh_eq_p(value, gh_symbol2scm("range"))) {
 	    mtype->Range = gh_scm2int(gh_car(list));
 	} else if (gh_eq_p(value, gh_symbol2scm("impact-missile"))) {
 	    free(mtype->ImpactName);
@@ -147,9 +151,11 @@ local SCM CclDefineMissileType(SCM list)
 	    free(mtype->ImpactName);
 	    mtype->SmokeName = gh_scm2newstr(gh_car(list), NULL);
 	} else if (gh_eq_p(value, gh_symbol2scm("can-hit-owner"))) {
-	    mtype->CanHitOwner = gh_scm2bool(gh_car(list));
+	    mtype->CanHitOwner = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("friendly-fire"))) {
-	    mtype->FriendlyFire = gh_scm2bool(gh_car(list));
+	    mtype->FriendlyFire = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("splash-factor"))) {
+	    mtype->SplashFactor = gh_scm2int(gh_car(list));;
 	} else {
 	    // FIXME: this leaves a half initialized missile-type
 	    errl("Unsupported tag", value);
@@ -160,6 +166,116 @@ local SCM CclDefineMissileType(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineMissileType(lua_State* l)
+{
+    const char* value;
+    char* str;
+    MissileType* mtype;
+    unsigned i;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    //	Slot identifier
+
+    str = strdup(LuaToString(l, j + 1));
+    ++j;
+#ifdef DEBUG
+    i = NoWarningMissileType;
+    NoWarningMissileType = 1;
+#endif
+    mtype = MissileTypeByIdent(str);
+#ifdef DEBUG
+    NoWarningMissileType = i;
+#endif
+    if (mtype) {
+	DebugLevel0Fn("Redefining missile-type `%s'\n" _C_ str);
+	free(str);
+    } else {
+	mtype = NewMissileTypeSlot(str);	// str consumed!
+    }
+
+    mtype->NumDirections = 1;
+    // Ensure we don't divide by zero.
+    mtype->SplashFactor = 100;
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    for (; j < args; ++j) {
+	value = LuaToString(l, j + 1);
+	++j;
+	if (!strcmp(value, "file")) {
+	    free(mtype->File);
+	    mtype->File = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "size")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    mtype->Width = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    mtype->Height = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value,"frames")) {
+	    mtype->SpriteFrames = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "num-directions")) {
+	    mtype->NumDirections = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "fired-sound")) {
+	    free(mtype->FiredSound.Name);
+	    mtype->FiredSound.Name = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "impact-sound")) {
+	    free(mtype->ImpactSound.Name);
+	    mtype->ImpactSound.Name = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "class")) {
+	    value = LuaToString(l, j + 1);
+	    for (i = 0; MissileClassNames[i]; ++i) {
+		if (!strcmp(value, MissileClassNames[i])) {
+		    mtype->Class = i;
+		    break;
+		}
+	    }
+	    if (!MissileClassNames[i]) {
+		// FIXME: this leaves a half initialized missile-type
+		lua_pushfstring(l, "Unsupported class: %s", value);
+		lua_error(l);
+	    }
+	} else if (!strcmp(value, "num-bounces")) {
+	    mtype->NumBounces = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "delay")) {
+	    mtype->StartDelay = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "sleep")) {
+	    mtype->Sleep = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "speed")) {
+	    mtype->Speed = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "draw-level")) {
+	    mtype->DrawLevel = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "range")) {
+	    mtype->Range = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "impact-missile")) {
+	    free(mtype->ImpactName);
+	    mtype->ImpactName = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "smoke-missile")) {
+	    free(mtype->ImpactName);
+	    mtype->SmokeName = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "can-hit-owner")) {
+	    mtype->CanHitOwner = 1;
+	} else if (!strcmp(value, "friendly-fire")) {
+	    mtype->FriendlyFire = 1;
+	} else if (!strcmp(value, "splash-factor")) {
+	    mtype->SplashFactor = LuaToNumber(l, j + 1);
+	} else {
+	    // FIXME: this leaves a half initialized missile-type
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -367,6 +483,10 @@ local SCM CclMissile(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclMissile(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -420,6 +540,56 @@ local SCM CclDefineBurningBuilding(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineBurningBuilding(lua_State* l)
+{
+    const char* value;
+    BurningBuildingFrame** frame;
+    BurningBuildingFrame* ptr;
+    BurningBuildingFrame* next;
+    int args;
+    int j;
+    int subargs;
+    int k;
+
+    ptr = BurningBuildingFrames;
+    while (ptr) {
+	next = ptr->Next;
+	free(ptr);
+	ptr = next;
+    }
+    BurningBuildingFrames = NULL;
+
+    frame = &BurningBuildingFrames;
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_istable(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+
+	*frame = calloc(1, sizeof(BurningBuildingFrame));
+	subargs = luaL_getn(l, j + 1);
+	for (k = 0; k < subargs; ++k) {
+	    lua_rawgeti(l, j + 1, k + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++k;
+
+	    if (!strcmp(value, "percent")) {
+		lua_rawgeti(l, j + 1, k + 1);
+		(*frame)->Percent = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    } else if (!strcmp(value, "missile")) {
+		lua_rawgeti(l, j + 1, k + 1);
+		(*frame)->Missile = MissileTypeByIdent(LuaToString(l, -1));
+		lua_pop(l, 1);
+	    }
+	}
+	frame = &((*frame)->Next);
+    }
+    return 0;
+}
 #endif
 
 /**
@@ -436,9 +606,9 @@ global void MissileCclRegister(void)
 #elif defined(USE_LUA)
     lua_register(Lua, "DefineMissileTypeWcNames",
 	CclDefineMissileTypeWcNames);
-//    lua_register("DefineMissileType", CclDefineMissileType);
-//    lua_register("Missile", CclMissile);
-//    lua_register("DefineBurningBuilding", CclDefineBurningBuilding);
+    lua_register(Lua, "DefineMissileType", CclDefineMissileType);
+    lua_register(Lua, "Missile", CclMissile);
+    lua_register(Lua, "DefineBurningBuilding", CclDefineBurningBuilding);
 #endif
 }
 
