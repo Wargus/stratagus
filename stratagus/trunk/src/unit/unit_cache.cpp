@@ -297,7 +297,7 @@ local void QuadTreeInsert(QuadTree* tree,QuadTreeValue* value)
 */
 local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
 {
-    QuadTreeNode** stack[tree->Levels+2];
+    QuadTreeNode*** stack;
     QuadTreeNode** nodep;
     QuadTreeLeaf** leafp;
     QuadTreeNode* node;
@@ -305,6 +305,7 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
     int level;
     int branch;
 
+    stack=alloca(sizeof(QuadTreeNode**)*(tree->Levels+2);
     StatisticDelete(tree);
 
     nodep=&tree->Root;
