@@ -189,6 +189,21 @@ static int CclSetVideoResolution(lua_State* l)
 }
 
 /**
+**  Get the video resolution.
+**
+**  @param l  Lua state.
+*/
+static int CclGetVideoResolution(lua_State* l)
+{
+	if (lua_gettop(l) != 0) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushnumber(l, VideoWidth);
+	lua_pushnumber(l, VideoHeight);
+	return 2;
+}
+
+/**
 **  Set the video fullscreen mode.
 **
 **  @param l  Lua state.
@@ -205,6 +220,20 @@ static int CclSetVideoFullScreen(lua_State* l)
 		}
 	}
 	return 0;
+}
+
+/**
+**  Get the video fullscreen mode.
+**
+**  @param l  Lua state.
+*/
+static int CclGetVideoFullScreen(lua_State* l)
+{
+	if (lua_gettop(l) != 0) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushboolean(l, VideoFullScreen);
+	return 1;
 }
 
 /**
@@ -4520,7 +4549,9 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "SetDamageMissile", CclSetDamageMissile);
 
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
+	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
+	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 	lua_register(Lua, "SetMenuMusic", CclSetMenuMusic);
