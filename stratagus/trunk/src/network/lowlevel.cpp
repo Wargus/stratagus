@@ -299,7 +299,7 @@ global int NetSocketAddr(const Socket sock)
 	    sizeof(localAddr), &bytesReturned, NULL, NULL);
 	if (wsError == SOCKET_ERROR) {
 	    DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %ld\n" _C_
-		WSA_GetLastError());
+		WSAGetLastError());
 	}
 
 	// parse interface information
