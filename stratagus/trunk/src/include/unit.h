@@ -10,7 +10,7 @@
 //
 /**@name unit.h		-	The unit headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -216,18 +216,28 @@
 **
 **	Unit::Value
 **
+**		FIXME: continue documentation
 **
 **	Unit::SubAction
 **
+**		This is an action private variable, it is zero on the first
+**		entry of an action. Must be set to zero, if an action finishes.
+**		It should only be used inside of actions.
 **
 **	Unit::Wait
 **
+**		FIXME: continue documentation
 **
 **	Unit::State
+**
+**		Animation state, currently position in the animation script.
+**		0 if an animation has just started, it should only be changed
+**		inside of actions.
 **
 **
 **	Unit::Reset
 **
+**		FIXME: continue documentation
 **
 **	Unit::Blink
 **
