@@ -2172,9 +2172,9 @@ global void SaveMenus(FILE* file)
     /// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_STATE	5
     /// Offsets into NetMultiSetupMenuItems
-#define SERVER_PLAYER_READY	30
+#define SERVER_PLAYER_READY	32
     /// Offsets into NetMultiSetupMenuItems
-#define SERVER_PLAYER_LAG	44
+#define SERVER_PLAYER_LAG	46
 
     /// Offsets into NetMultiClientMenuItems
 #define CLIENT_PLAYER_STATE	5
@@ -2188,7 +2188,9 @@ global void SaveMenus(FILE* file)
 #define CLIENT_FOG_OF_WAR	27
     /// Offsets into NetMultiClientMenuItems
 #define CLIENT_TILESET		29
+	/// Offsets into NetMultiClientMenuItems
+#define CLIENT_GAMETYPE		31
     /// Offsets into NetMultiClientMenuItems
-#define CLIENT_PLAYER_READY	30
+#define CLIENT_PLAYER_READY	32
 
 //@}

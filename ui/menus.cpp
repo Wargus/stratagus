@@ -3543,8 +3543,8 @@ local void GameGATAction(Menuitem *mi, int i)
 {
     if (!mi || mi->d.pulldown.curopt == i) {
 	// FIXME: not supported
-	// GameSettings.GameType = i-1;
-	// ServerSetupState.GaTOpt = i;
+	GameSettings.GameType = i ? SettingsGameTypeMelee + i-1 : SettingsGameTypeMapDefault;
+	ServerSetupState.GaTOpt = i;
 	if (mi) {
 	    NetworkServerResyncClients();
 	}
@@ -3564,7 +3564,24 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 local void MultiGameFWSAction(Menuitem *mi, int i)
 {
     if (!mi || mi->d.pulldown.curopt == i) {
-	FlagRevealMap = i;
+	switch (i) {
+	    case 0:
+		TheMap.NoFogOfWar = 0;
+		FlagRevealMap = 0;
+		break;
+	    case 1:
+		TheMap.NoFogOfWar = 1;
+		FlagRevealMap = 0;
+		break;
+	    case 2:
+		TheMap.NoFogOfWar = 0;
+		FlagRevealMap = 1;
+		break;
+	    case 3:
+		TheMap.NoFogOfWar = 1;
+		FlagRevealMap = 1;
+		break;
+	}
 	ServerSetupState.FwsOpt = i;
 	if (mi) {
 	    NetworkServerResyncClients();
@@ -3933,7 +3950,6 @@ local void MultiGameSetupInit(Menuitem *mi)
 	*CurrentMapPath='\0';
     }
 
-    FlagRevealMap = 0;
     GameSetupInit(mi);
     NetworkInitServerConnect();
     menu->items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
@@ -4194,6 +4210,10 @@ global void NetClientUpdateState(void)
     GameTSSAction(NULL, ServerSetupState.TssOpt);
     menu->items[CLIENT_TILESET].d.pulldown.curopt =
 	ServerSetupState.TssOpt;
+
+    GameGATAction(NULL, ServerSetupState.GaTOpt);
+    menu->items[CLIENT_GAMETYPE].d.pulldown.curopt =
+	ServerSetupState.GaTOpt;
 
     MultiClientUpdate(0);
     DebugLevel1Fn("MultiClientMenuRedraw\n");
