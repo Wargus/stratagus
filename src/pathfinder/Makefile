@@ -10,12 +10,11 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 1999,2000 by Lutz Sammer
+##	(c) Copyright 1999,2000,2002 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; either version 2 of the License,
-##	or (at your option) any later version.
+##	by the Free Software Foundation; only version 2 of the License.
 ##
 ##	FreeCraft is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,13 +36,13 @@ ifeq (HIERARCHIC_PATHFINDER, $(findstring HIERARCHIC_PATHFINDER, $(CFLAGS)))
 	  pf_low_open.h region.h types.h
     SRCS = pathfinder.c astar.c ccl_pathfinder.c avl_tree.c hierarchical.c \
 	  regid.c region.c region_set.c region_groups.c pf_highlevel.c \
-	  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c
+	  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c floodfill.c
 else
     INCL = avl_tree.h pf_high_open.h pf_lowlevel.h region_groups.h \
 	  hierarchical.h pf_highlevel.h regid.h region_set.h pf_goal.h	\
 	  pf_low_open.h region.h types.h avl_tree.c hierarchical.c \
 	  regid.c region.c region_set.c region_groups.c pf_highlevel.c \
-	  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c
+	  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c floodfill.c
     SRCS = pathfinder.c astar.c ccl_pathfinder.c
 endif
 
