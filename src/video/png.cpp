@@ -169,8 +169,8 @@ global Graphic* LoadGraphicPNG(const char* name)
     w=info_ptr->width;
     h=info_ptr->height;
     if( info_ptr->width!=info_ptr->rowbytes ) {
-	DebugLevel0("width(%ld)!=rowbytes(%ld)\n"
-	    ,info_ptr->width,info_ptr->rowbytes);
+	DebugLevel0("width(%ld)!=rowbytes(%ld) in file:%s\n"
+	    ,info_ptr->width,info_ptr->rowbytes,name);
 	abort();
     }
 
