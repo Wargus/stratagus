@@ -245,8 +245,7 @@ local int CclGroup(lua_State* l)
 	int j;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	InitGroups();

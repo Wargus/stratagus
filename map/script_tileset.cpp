@@ -195,8 +195,7 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 		} else if (!strcmp(value, "human")) {
 			flags |= MapFieldHuman;
 		} else {
-			lua_pushfstring(l, "solid: unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "solid: unsupported tag: %s" _C_ value);
 		}
 	}
 	*back = flags;
@@ -216,8 +215,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 	int j;
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, -1);
 
@@ -262,12 +260,10 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			if (luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "growing-tree: Wrong table length");
-				lua_error(l);
+				LuaError(l, "growing-tree: Wrong table length");
 			}
 			for (i = 0; i < 2; ++i) {
 				lua_rawgeti(l, -1, i + 1);
@@ -303,8 +299,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 			tileset->RemovedRock = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else {
-			lua_pushfstring(l, "special: unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "special: unsupported tag: %s" _C_ value);
 		}
 	}
 }
@@ -328,8 +323,7 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	ExtendTilesetTables(tileset, index + 16);
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	j = 0;
 	lua_rawgeti(l, -1, j + 1);
@@ -345,8 +339,7 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	//
 	lua_rawgeti(l, -1, j + 1);
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	tt->NumSolidTiles = len = luaL_getn(l, -1);
 
@@ -401,8 +394,7 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 	ExtendTilesetTables(tileset, new_index);
 
 	if (!lua_istable(l, -1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	j = 0;
 	args = luaL_getn(l, -1);
@@ -420,8 +412,7 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 	for (; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 		if (!lua_istable(l, -1)) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		//
 		//  Vector: the tiles.
@@ -528,8 +519,7 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 			index = DefineTilesetParseMixed(l, tileset, index);
 			lua_pop(l, 1);
 		} else {
-			lua_pushfstring(l, "slots: unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "slots: unsupported tag: %s" _C_ value);
 		}
 	}
 	tileset->NumTiles = index;
@@ -641,8 +631,7 @@ local int CclDefineTileset(lua_State* l)
 			tileset->ImageFile = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "size")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			tileset->TileSizeX = LuaToNumber(l, -1);
@@ -652,8 +641,7 @@ local int CclDefineTileset(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			DefineTilesetParseSlot(l, tileset, j + 1);
 		} else if (!strcmp(value, "animations")) {
@@ -662,13 +650,11 @@ local int CclDefineTileset(lua_State* l)
 			DebugLevel0Fn("Objects not supported.\n");
 		} else if (!strcmp(value, "item-mapping")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			DefineTilesetParseItemMapping(l, tileset, j + 1);
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	return 0;

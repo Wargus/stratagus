@@ -429,8 +429,7 @@ local int CclDefineIcon(lua_State* l)
 	int index;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	width = height = index = 0;
 	ident = tileset = filename = NULL;
@@ -444,8 +443,7 @@ local int CclDefineIcon(lua_State* l)
 			tileset = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			width = LuaToNumber(l, -1);
@@ -458,8 +456,7 @@ local int CclDefineIcon(lua_State* l)
 		} else if (!strcmp(value, "Index")) {
 			index = LuaToNumber(l, -1);
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
@@ -479,8 +476,7 @@ local int CclDefineIcon(lua_State* l)
 local int CclDefineIconAlias(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	IconAliases = realloc(IconAliases, sizeof(char*) * 2 * (NumIconAliases + 1));
 	IconAliases[NumIconAliases * 2 + 0] = strdup(LuaToString(l, 1));

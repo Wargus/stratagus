@@ -281,8 +281,7 @@ local int CclDefineConstruction(lua_State* l)
 	int k;
 
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	// Slot identifier
@@ -330,8 +329,7 @@ local int CclDefineConstruction(lua_State* l)
 
 				lua_rawgeti(l, -1, k + 1);
 				if (!lua_istable(l, -1)) {
-					lua_pushstring(l, "incorrect argument");
-					lua_error(l);
+					LuaError(l, "incorrect argument");
 				}
 				lua_pushnil(l);
 				while (lua_next(l, -2)) {
@@ -353,8 +351,7 @@ local int CclDefineConstruction(lua_State* l)
 							}
 							if (i == NumTilesets) {
 								fprintf(stderr, "Tileset `%s' not available\n", value);
-								lua_pushfstring(l, "tileset not available: %s", value);
-								lua_error(l);
+								LuaError(l, "tileset not available: %s" _C_ value);
 							}
 						}
 						tileset = i;
@@ -362,8 +359,7 @@ local int CclDefineConstruction(lua_State* l)
 						file = strdup(LuaToString(l, -1));
 					} else if (!strcmp(value, "Size")) {
 						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-							lua_pushstring(l, "incorrect argument");
-							lua_error(l);
+							LuaError(l, "incorrect argument");
 						}
 						lua_rawgeti(l, -1, 1);
 						w = LuaToNumber(l, -1);
@@ -372,8 +368,7 @@ local int CclDefineConstruction(lua_State* l)
 						h = LuaToNumber(l, -1);
 						lua_pop(l, 1);
 					} else {
-						lua_pushfstring(l, "Unsupported tag: %s", value);
-						lua_error(l);
+						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 					lua_pop(l, 1);
 				}
@@ -404,8 +399,7 @@ local int CclDefineConstruction(lua_State* l)
 
 				lua_rawgeti(l, -1, k + 1);
 				if (!lua_istable(l, -1)) {
-					lua_pushstring(l, "incorrect argument");
-					lua_error(l);
+					LuaError(l, "incorrect argument");
 				}
 				lua_pushnil(l);
 				while (lua_next(l, -2)) {
@@ -420,14 +414,12 @@ local int CclDefineConstruction(lua_State* l)
 						} else if (!strcmp(value, "main")) {
 							file = ConstructionFileMain;
 						} else {
-							lua_pushfstring(l, "Unsupported tag: %s", value);
-							lua_error(l);
+							LuaError(l, "Unsupported tag: %s" _C_ value);
 						}
 					} else if (!strcmp(value, "Frame")) {
 						frame = LuaToNumber(l, -1);
 					} else {
-						lua_pushfstring(l, "Unsupported tag: %s", value);
-						lua_error(l);
+						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 					lua_pop(l, 1);
 				}
@@ -443,8 +435,7 @@ local int CclDefineConstruction(lua_State* l)
 				(*cframe)->Next = NULL;
 			}
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}

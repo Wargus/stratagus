@@ -1401,8 +1401,7 @@ local int CclAddObjective(lua_State* l)
 	j = 0;
 
 	if (args != 1 && args != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	obj = LuaToString(l, j + 1);
@@ -1422,8 +1421,7 @@ local int CclAddObjective(lua_State* l)
 			++i;
 		}
 		if (i == MAX_OBJECTIVES) {
-			lua_pushfstring(l, "Too many objectives: %s", obj);
-			lua_error(l);
+			LuaError(l, "Too many objectives: %s" _C_ obj);
 		}
 		if (num > i) {
 			num = i;
@@ -1439,8 +1437,7 @@ local int CclAddObjective(lua_State* l)
 			++i;
 		}
 		if (i == MAX_OBJECTIVES) {
-			lua_pushfstring(l, "Too many objectives: %s", obj);
-			lua_error(l);
+			LuaError(l, "Too many objectives: %s" _C_ obj);
 		}
 		GameIntro.Objectives[i] = strdup(obj);
 	}
@@ -1456,18 +1453,15 @@ local int CclRemoveObjective(lua_State* l)
 	int num;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	num = LuaToNumber(l, 1);
 	if (num < 0 || num >= MAX_OBJECTIVES) {
-		lua_pushfstring(l, "remove-objective: Invalid number: %d", num);
-		lua_error(l);
+		LuaError(l, "remove-objective: Invalid number: %d" _C_ num);
 	}
 	if (!GameIntro.Objectives[num]) {
-		lua_pushfstring(l, "remove-objective: No objective at location: %d", num);
-		lua_error(l);
+		LuaError(l, "remove-objective: No objective at location: %d" _C_ num);
 	}
 
 	free(GameIntro.Objectives[num]);
@@ -1518,8 +1512,7 @@ local int CclDefineRanks(lua_State* l)
 	int args;
 
 	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	rank = NULL;
 	race = LuaToString(l, 1);
@@ -1530,8 +1523,7 @@ local int CclDefineRanks(lua_State* l)
 		}
 	}
 	if (i == PlayerRaces.Count) {
-		lua_pushfstring(l, "Invalid race name: %s", race);
-		lua_error(l);
+		LuaError(l, "Invalid race name: %s" _C_ race);
 	}
 
 	if (rank->Ranks) {

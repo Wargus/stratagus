@@ -119,8 +119,7 @@ local int CclPlayer(lua_State* l)
 			} else if (!strcmp(value, "rescue-active")) {
 				player->Type = PlayerRescueActive;
 			} else {
-			   lua_pushfstring(l, "Unsupported tag: %s", value);
-			   lua_error(l);
+				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "race")) {
 			value = LuaToString(l, j + 1);
@@ -132,8 +131,7 @@ local int CclPlayer(lua_State* l)
 				}
 			}
 			if (i == PlayerRaces.Count) {
-				lua_pushfstring(l, "Unsupported race: %s", value);
-				lua_error(l);
+				LuaError(l, "Unsupported race: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "ai")) {
 			player->AiNum = LuaToNumber(l, j + 1);
@@ -168,8 +166,7 @@ local int CclPlayer(lua_State* l)
 			}
 		} else if (!strcmp(value, "start")) {
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			player->StartX = LuaToNumber(l, -1);
@@ -179,8 +176,7 @@ local int CclPlayer(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -198,14 +194,12 @@ local int CclPlayer(lua_State* l)
 					}
 				}
 				if (i == MaxCosts) {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "last-resources")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -223,14 +217,12 @@ local int CclPlayer(lua_State* l)
 					}
 				}
 				if (i == MaxCosts) {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "incomes")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -248,14 +240,12 @@ local int CclPlayer(lua_State* l)
 					}
 				}
 				if (i == MaxCosts) {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "revenue")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
@@ -273,8 +263,7 @@ local int CclPlayer(lua_State* l)
 					}
 				}
 				if (i == MaxCosts) {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "ai-enabled")) {
@@ -305,13 +294,11 @@ local int CclPlayer(lua_State* l)
 			player->TotalKills = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-resources")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			if (subargs != MaxCosts) {
-				lua_pushfstring(l, "Wrong number of total-resources: %d", i);
-				lua_error(l);
+				LuaError(l, "Wrong number of total-resources: %d" _C_ i);
 			}
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
@@ -324,8 +311,7 @@ local int CclPlayer(lua_State* l)
 			int b;
 
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 3) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			r = LuaToNumber(l, -1);
@@ -339,13 +325,11 @@ local int CclPlayer(lua_State* l)
 			player->Color = SDL_MapRGB(TheScreen->format, r, g, b);
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			if (subargs != UpgradeMax) {
-				lua_pushfstring(l, "Wrong upgrade timer length: %d", i);
-				lua_error(l);
+				LuaError(l, "Wrong upgrade timer length: %d" _C_ i);
 			}
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
@@ -353,8 +337,7 @@ local int CclPlayer(lua_State* l)
 				lua_pop(l, 1);
 			}
 		} else {
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -381,12 +364,10 @@ local int CclChangeUnitsOwner(lua_State* l)
 	int y2;
 
 	if (lua_gettop(l) != 4 || !lua_istable(l, 1) || !lua_istable(l, 2)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	if (luaL_getn(l, 1) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 1, 1);
 	x1 = LuaToNumber(l, -1);
@@ -396,8 +377,7 @@ local int CclChangeUnitsOwner(lua_State* l)
 	lua_pop(l, 1);
 
 	if (luaL_getn(l, 2) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_rawgeti(l, 2, 1);
 	x2 = LuaToNumber(l, -1);
@@ -427,8 +407,7 @@ local int CclChangeUnitsOwner(lua_State* l)
 local int CclGetThisPlayer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushnumber(l, ThisPlayer - Players);
 	return 1;
@@ -444,8 +423,7 @@ local int CclSetThisPlayer(lua_State* l)
 	int plynr;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	plynr = LuaToNumber(l, 1);
 	ThisPlayer = &Players[plynr];
@@ -462,8 +440,7 @@ local int CclSetThisPlayer(lua_State* l)
 local int CclSetMaxSelectable(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	MaxSelectable = LuaToNumber(l, 1);
 
@@ -481,8 +458,7 @@ local int CclSetAllPlayersUnitLimit(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		Players[i].UnitLimit = LuaToNumber(l, 1);
@@ -502,8 +478,7 @@ local int CclSetAllPlayersBuildingLimit(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		Players[i].BuildingLimit = LuaToNumber(l, 1);
@@ -523,8 +498,7 @@ local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 	int i;
 
 	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		Players[i].TotalUnitLimit = LuaToNumber(l, 1);
@@ -552,8 +526,7 @@ local int CclSetDiplomacy(lua_State* l)
 	const char* state;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	base = LuaToNumber(l, 1);
 	plynr = LuaToNumber(l, 3);
@@ -603,8 +576,7 @@ local int CclSetSharedVision(lua_State* l)
 	int shared;
 
 	if (lua_gettop(l) != 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	base = LuaToNumber(l, 1);
@@ -650,8 +622,7 @@ local int CclDefineRaceNames(lua_State* l)
 		if (!strcmp(value, "race")) {
 			++j;
 			if (!lua_istable(l, j + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, j + 1);
 			i = PlayerRaces.Count++;
@@ -681,13 +652,11 @@ local int CclDefineRaceNames(lua_State* l)
 				} else if (!strcmp(value, "visible")) {
 					PlayerRaces.Visible[i] = 1;
 				} else {
-					lua_pushfstring(l, "Unsupported tag: %s", value);
-					lua_error(l);
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 
@@ -700,8 +669,7 @@ local int CclDefineRaceNames(lua_State* l)
 local int CclNewPlayerColors(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	SetPlayersPalette();
 
@@ -719,8 +687,7 @@ local int CclGetPlayerData(lua_State* l)
 	const char* data;
 
 	if (lua_gettop(l) < 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	p = CclGetPlayer(l);
@@ -738,8 +705,7 @@ local int CclGetPlayerData(lua_State* l)
 		int i;
 
 		if (lua_gettop(l) != 3) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
@@ -748,8 +714,7 @@ local int CclGetPlayerData(lua_State* l)
 			}
 		}
 		if (i == MaxCosts) {
-			lua_pushfstring(l, "Invalid resource \"%s\"", res);
-			lua_error(l);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res);
 		}
 		lua_pushnumber(l, p->Resources[i]);
 		return 1;
@@ -757,8 +722,7 @@ local int CclGetPlayerData(lua_State* l)
 		UnitType* type;
 
 		if (lua_gettop(l) != 3) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		type = CclGetUnitType(l);
 		lua_pushnumber(l, p->UnitTypesCount[type->Slot]);
@@ -801,8 +765,7 @@ local int CclGetPlayerData(lua_State* l)
 		int i;
 
 		if (lua_gettop(l) != 3) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
@@ -811,8 +774,7 @@ local int CclGetPlayerData(lua_State* l)
 			}
 		}
 		if (i == MaxCosts) {
-			lua_pushfstring(l, "Invalid resource \"%s\"", res);
-			lua_error(l);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res);
 		}
 		lua_pushnumber(l, p->TotalResources[i]);
 		return 1;
@@ -823,8 +785,7 @@ local int CclGetPlayerData(lua_State* l)
 		lua_pushnumber(l, p->TotalKills);
 		return 1;
 	} else {
-		lua_pushfstring(l, "Invalid field: %s", data);
-		lua_error(l);
+		LuaError(l, "Invalid field: %s" _C_ data);
 	}
 
 	return 0;
@@ -839,8 +800,7 @@ local int CclSetPlayerData(lua_State* l)
 	const char* data;
 
 	if (lua_gettop(l) < 3) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
 	p = CclGetPlayer(l);
@@ -856,8 +816,7 @@ local int CclSetPlayerData(lua_State* l)
 		int i;
 
 		if (lua_gettop(l) != 4) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
@@ -866,8 +825,7 @@ local int CclSetPlayerData(lua_State* l)
 			}
 		}
 		if (i == MaxCosts) {
-			lua_pushfstring(l, "Invalid resource \"%s\"", res);
-			lua_error(l);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res);
 		}
 		p->Resources[i] = LuaToNumber(l, 4);
 //	} else if (!strcmp(data, "UnitTypesCount")) {
@@ -893,8 +851,7 @@ local int CclSetPlayerData(lua_State* l)
 		int i;
 
 		if (lua_gettop(l) != 3) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
@@ -903,8 +860,7 @@ local int CclSetPlayerData(lua_State* l)
 			}
 		}
 		if (i == MaxCosts) {
-			lua_pushfstring(l, "Invalid resource \"%s\"", res);
-			lua_error(l);
+			LuaError(l, "Invalid resource \"%s\"" _C_ res);
 		}
 		p->TotalResources[i] = LuaToNumber(l, 4);
 	} else if (!strcmp(data, "TotalRazings")) {
@@ -912,8 +868,7 @@ local int CclSetPlayerData(lua_State* l)
 	} else if (!strcmp(data, "TotalKills")) {
 		p->TotalKills = LuaToNumber(l, 3);
 	} else {
-		lua_pushfstring(l, "Invalid field: %s", data);
-		lua_error(l);
+		LuaError(l, "Invalid field: %s" _C_ data);
 	}
 
 	return 0;

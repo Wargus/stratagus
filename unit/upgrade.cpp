@@ -629,8 +629,7 @@ local int CclDefineModifier(lua_State* l)
 
 	for (; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
-			lua_pushstring(l, "incorrect argument");
-			lua_error(l);
+			LuaError(l, "incorrect argument");
 		}
 		lua_rawgeti(l, j + 1, 1);
 		temp = LuaToString(l, -1);
@@ -671,8 +670,7 @@ local int CclDefineModifier(lua_State* l)
 			int i;
 
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, j + 1, 1);
 			value = LuaToString(l, -1);
@@ -683,8 +681,7 @@ local int CclDefineModifier(lua_State* l)
 				}
 			}
 			if (i == MaxCosts) {
-				lua_pushfstring(l, "Resource not found: %s", value);
-				lua_error(l);
+				LuaError(l, "Resource not found: %s" _C_ value);
 			}
 			lua_rawgeti(l, j + 1, 2);
 			costs[i] = LuaToNumber(l, -1);
@@ -699,8 +696,7 @@ local int CclDefineModifier(lua_State* l)
 				units[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "unit expected");
-				lua_error(l);
+				LuaError(l, "unit expected");
 			}
 		} else if (!strcmp(temp, "allow")) {
 			lua_rawgeti(l, j + 1, 2);
@@ -712,8 +708,7 @@ local int CclDefineModifier(lua_State* l)
 				upgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
-				lua_pushfstring(l, "upgrade expected");
-				lua_error(l);
+				LuaError(l, "upgrade expected");
 			}
 		} else if (!strcmp(temp, "apply-to")) {
 			lua_rawgeti(l, j + 1, 2);
@@ -726,8 +721,7 @@ local int CclDefineModifier(lua_State* l)
 			lua_pop(l, 1);
 			convert_to = UnitTypeByIdent(value);
 		} else {
-			lua_pushfstring(l, "wrong tag: %s", temp);
-			lua_error(l);
+			LuaError(l, "wrong tag: %s" _C_ temp);
 		}
 	}
 
@@ -773,13 +767,11 @@ local int CclDefineUpgrade(lua_State* l)
 		} else if (!strcmp(value, "costs")) {
 			// Costs
 			if (!lua_istable(l, k + 1)) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			n = luaL_getn(l, k + 1);
 			if (n > MaxCosts) {
-				lua_pushfstring(l, "%s: Wrong vector length", ident);
-				lua_error(l);
+				LuaError(l, "%s: Wrong vector length" _C_ ident);
 			}
 			for (j = 0; j < n; ++j) {
 				lua_rawgeti(l, k + 1, j + 1);
@@ -790,8 +782,7 @@ local int CclDefineUpgrade(lua_State* l)
 				costs[j++] = 0;
 			}
 		} else {
-			lua_pushfstring(l, "%s: Wrong tag `%s'", ident, value);
-			lua_error(l);
+			LuaError(l, "%s: Wrong tag `%s'" _C_ ident _C_ value);
 		}
 	}
 

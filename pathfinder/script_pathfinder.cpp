@@ -99,8 +99,7 @@ local int CclAStar(lua_State* l)
 				AStarUnknownTerrainCost = i;
 			}
 		} else {
-			lua_pushfstring(l, "Unsupported tag: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 

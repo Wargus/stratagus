@@ -517,8 +517,7 @@ local int CclLog(lua_State* l)
 	const char* value;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	DebugCheck(!CurrentReplay);
@@ -556,8 +555,7 @@ local int CclLog(lua_State* l)
 		} else if (!strcmp(value, "SyncRandSeed")) {
 			log->SyncRandSeed = LuaToNumber(l, -1);
 		} else {
-			lua_pushfstring(l, "Unsupported key: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported key: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
@@ -583,8 +581,7 @@ local int CclReplayLog(lua_State* l)
 	int j;
 
 	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
+		LuaError(l, "incorrect argument");
 	}
 
 	DebugCheck(CurrentReplay != NULL);
@@ -616,16 +613,14 @@ local int CclReplayLog(lua_State* l)
 			replay->LocalPlayer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Players")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != PlayerMax) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			for (j = 0; j < PlayerMax; ++j) {
 				int top;
 
 				lua_rawgeti(l, -1, j + 1);
 				if (!lua_istable(l, -1)) {
-					lua_pushstring(l, "incorrect argument");
-					lua_error(l);
+					LuaError(l, "incorrect argument");
 				}
 				top = lua_gettop(l);
 				lua_pushnil(l);
@@ -640,8 +635,7 @@ local int CclReplayLog(lua_State* l)
 					} else if (!strcmp(value, "Type")) {
 						replay->Players[j].Type = LuaToNumber(l, -1);
 					} else {
-						lua_pushfstring(l, "Unsupported key: %s", value);
-						lua_error(l);
+						LuaError(l, "Unsupported key: %s" _C_ value);
 					}
 					lua_pop(l, 1);
 				}
@@ -663,8 +657,7 @@ local int CclReplayLog(lua_State* l)
 			replay->Opponents = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			replay->Engine[0] = LuaToNumber(l, -1);
@@ -677,8 +670,7 @@ local int CclReplayLog(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Network")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
+				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
 			replay->Network[0] = LuaToNumber(l, -1);
@@ -690,8 +682,7 @@ local int CclReplayLog(lua_State* l)
 			replay->Network[2] = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else {
-			lua_pushfstring(l, "Unsupported key: %s", value);
-			lua_error(l);
+			LuaError(l, "Unsupported key: %s" _C_ value);
 		}
 		lua_pop(l, 1);
 	}
