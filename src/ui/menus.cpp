@@ -7356,7 +7356,6 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	    GetMetaParameter(reply, 3, &parameter);   // IP
 	    GetMetaParameter(reply, 4, &port);		  // port	
 	    sprintf(parameter, "%s:%s", parameter, port); // IP:Port
-	    strcat(parameter, "~!_"); // ok
 	    menu->Items[j + 1].d.text.text = parameter;
 	    GetMetaParameter(reply, 6, &parameter);
 	    menu->Items[j + 2].d.text.text = parameter;
