@@ -196,11 +196,14 @@ local enum mad_flow MAD_error(void* user __attribute__((unused)),
 **
 **  @return         Number of bytes read
 */
-local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
+local int MadRead(Sample *sample, unsigned char* buf, int len)
 {
+	struct mad_decoder *decoder;
 	struct mad_stream* stream;
 	struct mad_frame* frame;
 	struct mad_synth* synth;
+
+	decoder = &((MadData*)sample->User)->MadDecoder;
 
 	DebugLevel0Fn("%p %p %d\n" _C_ decoder _C_ buf _C_ len);
 
@@ -208,6 +211,19 @@ local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
 	frame = &decoder->sync->frame;
 	synth = &decoder->sync->synth;
 	DebugLevel0Fn("Error: %d\n" _C_ stream->error);
+
+	MAD_read(sample, stream);
+
+	if (mad_frame_decode(frame, stream) == -1) {
+		Assert(0);
+	}
+	mad_synth_frame (synth, frame);
+	
+	decoder->output_func(decoder->cb_data, &frame->header, &synth->pcm);
+
+
+	return 0;
+
 	do {
 		DebugLevel0Fn("Read stream\n");
 		switch (MAD_read(decoder->cb_data, stream)) {
@@ -274,46 +290,45 @@ local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
 */
 local int Mp3ReadStream(Sample* sample, void* buf, int len)
 {
-return 0;
-/*
 	MadData* data;
 	int i;
 	int n;
+	int divide;
+	char sndbuf[SOUND_BUFFER_SIZE];
 
 	DebugLevel0Fn("%p %d\n" _C_ buf _C_ len);
 
 	data = sample->User;
 
-	// see if we have enough read already
-	if (data->PointerInBuffer - sample->Data + len > sample->Length) {
-		// not enough in buffer, read more
-		n = sample->Length - (data->PointerInBuffer - sample->Data);
-		memcpy(sample->Data, data->PointerInBuffer, n);
-		sample->Length = n;
-		data->PointerInBuffer = sample->Data;
+        if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
+                memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
+                sample->Pos = 0;
+        }
 
-		n = MP3_BUFFER_SIZE - n;
-		for (;;) {
-			i = MadRead(data->Decoder, data->PointerInBuffer + sample->Length,
-					n);
-			if (i <= 0) {
-				break;
-			}
-			sample->Length += i;
-			n -= i;
-			if (n < 4096) {
-				break;
-			}
+	divide = 176400 / (sample->Frequency * 2 * sample->Channels);
+
+	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
+		// not enough in buffer, read more
+		n = (SOUND_BUFFER_SIZE - sample->Len) / divide;
+
+		i = MadRead(sample, sndbuf, n);
+		if (i <= 0) {
+			break;
 		}
-		if (sample->Length < len) {
-			len = sample->Length;
-		}
+
+		sample->Len += i;
 	}
 
-	memcpy(buf, data->PointerInBuffer, len);
-	data->PointerInBuffer += len;
+	if (sample->Len < len) {
+		len = sample->Len;
+	}
+
+	memcpy(buf, sample->Buffer + sample->Pos, len);
+	sample->Pos += len;
+	sample->Len -= len;
+
 	return len;
-*/
+
 }
 
 /**
@@ -328,17 +343,16 @@ local void Mp3FreeStream(Sample* sample)
 	data = sample->User;
 
 	// release the decoder
-
 	mad_synth_finish(data->MadDecoder.sync->synth);
 	mad_frame_finish(&data->MadDecoder.sync->frame);
 	mad_stream_finish(&data->MadDecoder.sync->stream);
 
-	free(data->MadDecoder.sync);
-	data->MadDecoder.sync = NULL;
+//	free(data->MadDecoder.sync);
 	mad_decoder_finish(&data->MadDecoder);
 
 	CLclose(data->MadFile);
 
+	free(data->Buffer);
 	free(data);
 	free(sample);
 }
@@ -434,45 +448,26 @@ global Sample* LoadMp3(const char* name, int flags)
 	sample->SampleSize = 0;
 
 	// streaming currently broken
-	if (0 && (flags & PlayAudioStream)) {
-/*
+	if (0 && flags & PlayAudioStream) {
 		sample->SampleSize = 0;
 
 		sample->Type = &Mp3StreamSampleType;
 
-		data->User->File = f;
-		data->User->Sample = sample;
-
 		// configure input, output, and error functions
-*/
-//		mad_decoder_init(data->Decoder, data->User,
-//			MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
-//			MAD_error, NULL /* message */);
-/*
-		data->Decoder->sync = malloc(sizeof(*data->Decoder->sync));
-		if (!data->Decoder->sync) {
-			fprintf(stderr, "Out of memory\n");
-			mad_decoder_finish(data->Decoder);
-			free(data);
-			free(sample);
-			CLclose(f);
-			return NULL;
-		}
+		mad_decoder_init(&data->MadDecoder, sample,
+			MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
+			MAD_error, NULL /* message */);
 
-		mad_stream_init(&data->Decoder->sync->stream);
-		mad_frame_init(&data->Decoder->sync->frame);
-		mad_synth_init(&data->Decoder->sync->synth);
-		mad_stream_options(&data->Decoder->sync->stream,
-			data->Decoder->options);
+		data->MadDecoder.sync = malloc(sizeof(*data->MadDecoder.sync));
 
-		// Read first frame for channels, ...
-		data->PointerInBuffer = sample->Data;
-		sample->Length = MadRead(data->Decoder, sample->Data, MP3_BUFFER_SIZE);
+		mad_stream_init(&data->MadDecoder.sync->stream);
+		mad_frame_init(&data->MadDecoder.sync->frame);
+		mad_synth_init(&data->MadDecoder.sync->synth);
+		mad_stream_options(&data->MadDecoder.sync->stream,
+			data->MadDecoder.options);
 
-		DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + MP3_BUFFER_SIZE);
+		MadRead(sample, sample->Buffer, SOUND_BUFFER_SIZE);
 
-		return sample;
-*/
 	} else {
 		sample->Buffer = malloc(55000000);
 		Assert(sample->Buffer);
