@@ -557,6 +557,33 @@ local void HandleMouseOn(int x,int y)
 }
 
 /**
+**	Handle cursor exits the game window (only for some videomodes)
+**      FIXME: make it so that the game is partially 'paused'.
+**             Game should run (for network play), but not react on or show
+**             interactive events. 
+*/
+global void HandleMouseExit(void)
+{
+    //
+    // Denote cursor not on anything in window (used?)
+    //
+    CursorOn=-1;
+
+    //
+    // Prevent scrolling while out of focus (on other applications) */
+    //
+    KeyScrollState = MouseScrollState = ScrollNone;
+
+    //
+    // Show hour-glass (to denote to the user, the game is waiting)
+    // FIXME: couldn't define a hour-glass that easily, so used pointer
+    //
+    CursorX    = VideoWidth/2;
+    CursorY    = VideoHeight/2;
+    GameCursor = TheUI.Point.Cursor;
+}
+
+/**
 **	Handle movement of the cursor.
 **
 **	@param x	Screen X position.

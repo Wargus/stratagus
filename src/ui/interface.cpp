@@ -910,6 +910,7 @@ local int LastMouseTicks;		/// Ticks of last mouse event
 **	FIXME: dragging is not supported.
 **
 **	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
 **	@param button		Mouse button pressed.
 */
 global void InputMouseButtonPress(const EventCallback* callbacks,
@@ -943,6 +944,7 @@ global void InputMouseButtonPress(const EventCallback* callbacks,
 **	Called if any mouse button is released up
 **
 **	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
 **	@param button		Mouse button released.
 */
 global void InputMouseButtonRelease(const EventCallback* callbacks,
@@ -980,6 +982,7 @@ global void InputMouseButtonRelease(const EventCallback* callbacks,
 **	Called if the mouse is moved
 **
 **	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
 **
 */
 global void InputMouseMove(const EventCallback* callbacks,
@@ -991,9 +994,23 @@ global void InputMouseMove(const EventCallback* callbacks,
 }
 
 /**
+**	Called if the mouse exits the game window (when supported by videomode)
+**
+**	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
+**
+*/
+global void InputMouseExit(const EventCallback* callbacks, unsigned ticks)
+{
+//FIXME: should we do anything here with ticks? don't know, but conform others
+    callbacks->MouseExit();
+}
+
+/**
 **	Called each frame to handle mouse time outs.
 **
 **	@param callbacks	Callback structure for events.
+**	@param ticks		Denotes time-stamp of video-system
 */
 global void InputMouseTimeout(const EventCallback* callbacks,unsigned ticks)
 {
