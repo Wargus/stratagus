@@ -65,15 +65,10 @@ Everything around the C UnitType structure.
 
 <h2>Functions</h2>
 <a name="define-animations"></a>
-<h3>define-animations</h3>
-
-<h4>Description</h4>
+<h3>(define-animations ident 'still script 'move script 'die script 'attack script)</h3>
 
 Define animations.
 
-<h4>Syntax</h4>
-
-<code>(define-animations ident 'still script 'move script 'die script 'attack script)</code>
 
 <dl>
 <dt>ident</dt>
@@ -81,18 +76,22 @@ Define animations.
 </dd>
 <dt>script</dt>
 <dd><pre>
-	A script is a list of quad numbers.
-		(#(Flags Pixel Sleep Frame) (#Flags Pixel Sleep Frame) ...)
-	* Format of quad numbers:
-		#(Flags Pixel Sleep Frame)
-	o Flags are the sum of the following:
-		1 Restart - restart animation
-		2 Reset   - animation could here be aborted (switch to another)
-		4 Sound   - play a sound with the animation
-		8 Missile - fire a missile at this point
-	o Pixel is the number of pixels to move (if this is a moving animation)
-	o Sleep is the number of frames to wait for the next animation
-	o Frame is increment to the frame of the image
+        A script has this format:
+                (#(Flags Pixel Sleep Frame)
+                 #(Flags Pixel Sleep Frame)
+		 ...)
+        o Flags are the sum of the following:
+                1 Restart - restart animation
+                2 Reset   - animation could here be aborted (switch to another)
+                4 Sound   - play a sound with the animation
+                8 Missile - fire a missile at this point
+        o Pixel is the number of pixels to move (if this is a moving animation)
+          the sum of a walking animation should be 16 (the tile size in pixels)
+        o Sleep is the number of frames to wait for the next animation
+          (this seems to be a way to control the unit speed)
+	  FIXME: what is the speed tag from the unittype definition used for then?
+        o Frame is the tile position on the image. Usually 5*tilerows.
+          The engine will add something between 0 and 4 for the heading.
 </pre></dd>
 </dl>
 
@@ -111,27 +110,12 @@ Define animations.
         #( 0 0  10   0) #( 3 0   1   0))
       'die '(	; #107
         #( 0 0   3  45) #( 0 0   3  50) #( 0 0 100  55) #( 3 0   1  55)))
-
 </pre>
 
-<p>Defines the animations for the footman.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/anim.ccl"> $LIBRARYPATH/ccl/anim.ccl </a>
-
 <a name="define-unit-stats"></a>
-<h3>define-unit-stats</h3>
-
-<h4>Description</h4>
+<h3>(define-unit-stats ident player 'tag1 value1 'tag2 value2 ...)</h3>
 
 Define unit stats.
-
-<h4>Syntax</h4>
-
-<code>(define-unit-stats ident player 'level level 'speed speed 'attack-range arange
-'sight-range srange 'armor armor 'basic-damage bdamage 'piercing-damage pdamage 
-'hit-points hp 'costs costs)</code>
 
 <dl>
 <dt>ident</dt>
@@ -140,6 +124,9 @@ Define unit stats.
 <dt>player</dt>
 <dd>Player number.
 </dd>
+</dl>
+Possible tags:
+<dl>
 <dt>level</dt>
 <dd>.
 </dd>
@@ -172,7 +159,11 @@ Define unit stats.
 <h4>Example</h4>
 
 <pre>
-    (define-unit-stats)
+    ;; seems to be used only in savegames
+    (define-unit-stats 'unit-archer 14
+      'level 1 'speed 10 'attack-range 4 'sight-range 5
+      'armor 0 'basic-damage 3 'piercing-damage 6 'hit-points 40
+      'costs '(time 70 gold 500 wood 50 oil 0 ore 0 stone 0 coal 0) )
 </pre>
 
 <p>.
@@ -180,34 +171,19 @@ Define unit stats.
 <h4>Not Used</h4>
 
 <a name="define-unit-type"></a>
-<h3>define-unit-type</h3>
+<h3>(define-unit-type ident 'tag1 value1 'tag2 value2 ...)</h3>
 
-<h4>Description</h4>
-
-    Define the unit types in game it is based on the UDTA.<p>
-
-    The default unit types are defined in <a href="../../data/ccl/units.ccl">
-    $STRATAGUS_LIBRARY/data/units.ccl</a> and
-    <a href="../../data/ccl/human/units.ccl">
-    $STRATAGUS_LIBRARY/data/human/units.ccl</a> and
-    <a href="../../data/ccl/orc/units.ccl">
-    $STRATAGUS_LIBRARY/data/orc/units.ccl</a>. This could also be defined in
-    own levels. <p>
-
-<h4>Syntax</h4>
-
-<code>(define-unit-type ident name graphics pixel_size animations icon
-    speed overlay sight_range hitpoints magic costs improve_production tile_size
-    box_size attack_range computer_reaction_range human_reaction_range armor
-    priorty damage piercing_damge weapon_upgradable armor_upgradeable
-    decay annoy_factor points missle corpse type right_mouse can_target
-    repair_range flags sounds attack_sound)</code>
+    Define the unit types in game it is based on the UDTA (FIXME:
+    what is UDTA?)<p>
 
 <dl>
 <dt>ident</dt>
 <dd>The unit-type unique identifier.  It is used to reference unit-types in
 game. F.E: "unit-knight", "unit-gold-mine".
 </dd>
+</dl>
+Possible tags:
+<dl>
 <dt>name</dt>
 <dd>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
 If the name is too long, it is split at space.
@@ -373,7 +349,6 @@ F.E. '( 1 1 ), '( 2 2 ).
 	"footman-dead" )
       "footman-attack" )
 </pre>
-	Define the unit-type "unit-footman" as footman.<p>
 
 <!--
 
@@ -408,15 +383,10 @@ F.E. '( 1 1 ), '( 2 2 ).
 -->
 
 <a name="define-unittype-wc-names"></a>
-<h3>define-unittype-wc-names</h3>
-
-<h4>Description</h4>
+<h3>(define-unittype-wc-names footman grunt ...)</h3>
 
 Define unit-type mapping from original number to internal symbol.
 
-<h4>Syntax</h4>
-
-<code>(define-unittype-wc-names footman grunt ...)</code>
 
 <h4>Example</h4>
 
@@ -431,15 +401,10 @@ Define unit-type mapping from original number to internal symbol.
 <a href="../../data/ccl/wc2.ccl"> $LIBRARYPATH/ccl/wc2.ccl </a>
 
 <a name="get-unit-type-ident"></a>
-<h3>get-unit-type-ident</h3>
-
-<h4>Description</h4>
+<h3>(get-unit-type-ident unit-type)</h3>
 
 Get the ident of the unit-type structure.
 
-<h4>Syntax</h4>
-
-<code>(get-unit-type-ident unit-type)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -458,15 +423,10 @@ Get the ident of the unit-type structure.
 <h4>Not Used</h4>
 
 <a name="get-unit-type-property"></a>
-<h3>get-unit-type-property</h3>
-
-<h4>Description</h4>
+<h3>(get-unit-type-property unit-type)</h3>
 
 Get the property of the unit-type structure.
 
-<h4>Syntax</h4>
-
-<code>(get-unit-type-property unit-type)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -485,15 +445,10 @@ Get the property of the unit-type structure.
 <h4>Not Used</h4>
 
 <a name="get-unit-type-name"></a>
-<h3>get-unit-type-name</h3>
-
-<h4>Description</h4>
+<h3>(get-unit-type-name unit-type)</h3>
 
 Get the name of the unit-type structure.
 
-<h4>Syntax</h4>
-
-<code>(get-unit-type-name unit-type)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -512,15 +467,10 @@ Get the name of the unit-type structure.
 <h4>Not Used</h4>
 
 <a name="set-unit-type-name!"></a>
-<h3>set-unit-type-name!</h3>
-
-<h4>Description</h4>
+<h3>(set-unit-type-name! unit-type name)</h3>
 
 Set the name of the unit-type structure.
 
-<h4>Syntax</h4>
-
-<code>(set-unit-type-name! unit-type name)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -542,15 +492,10 @@ Set the name of the unit-type structure.
 <h4>Not Used</h4>
 
 <a name="set-unit-type-property"></a>
-<h3>set-unit-type-property</h3>
-
-<h4>Description</h4>
+<h3>(set-unit-type-property unit-type property)</h3>
 
 Set the property of the unit-type structure.
 
-<h4>Syntax</h4>
-
-<code>(set-unit-type-property unit-type property)</code>
 
 <dl>
 <dt>unit-type</dt>
@@ -572,15 +517,10 @@ Set the property of the unit-type structure.
 <h4>Not Used</h4>
 
 <a name="unit-type"></a>
-<h3>unit-type</h3>
-
-<h4>Description</h4>
+<h3>(unit-type ident)</h3>
 
 Get unit-type structure.
 
-<h4>Syntax</h4>
-
-<code>(unit-type ident)</code>
 
 <dl>
 <dt>ident</dt>
@@ -601,15 +541,10 @@ Get unit-type structure.
 <a href="../../data/ccl/ai.ccl"> $LIBRARYPATH/ccl/ai.ccl </a>
 
 <a name="unit-type-array"></a>
-<h3>unit-type-array</h3>
-
-<h4>Description</h4>
+<h3>(unit-type-array)</h3>
 
 Get all unit-type structures.
 
-<h4>Syntax</h4>
-
-<code>(unit-type-array)</code>
 
 <h4>Example</h4>
 

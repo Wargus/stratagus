@@ -128,9 +128,7 @@ General configurations.
 
 <h2>Functions</h2>
 <a name="a-star"></a>
-<h3>a-star</h3>
-
-<h4>Description</h4>
+<h3>(a-star on fixed_unit_cost moving_unit_cost unseen_terrain unseen_terrain_cost)</h3>
 
 Configures the A-star pathfinder to be on or off.  Also sets variables about the pathfinder.
 What the movement cost for unseen terrian is and whether units are aware of what's under unseen terrain.
@@ -139,9 +137,6 @@ the amount the pathfinder is used at the start of a game while the map is being 
 the performance, turn it off.
 
 The Cost of a move it 1 if moving straight, or 2 if moving diagonal.
-<h4>Syntax</h4>
-
-<code>(a-star on fixed_unit_cost moving_unit_cost unseen_terrain unseen_terrain_cost)</code>
 
 <dl>
 <dt>on</dt>
@@ -168,15 +163,10 @@ The Cost of a move it 1 if moving straight, or 2 if moving diagonal.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="alpha-fog-of-war"></a>
-<h3>alpha-fog-of-war</h3>
-
-<h4>Description</h4>
+<h3>(alpha-fog-of-war)</h3>
 
 Use alpha style fog of war.
 
-<h4>Syntax</h4>
-
-<code>(alpha-fog-of-war)</code>
 
 <h4>Example</h4>
 
@@ -191,15 +181,10 @@ Use alpha style fog of war.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="decoration-on-top"></a>
-<h3>decoration-on-top</h3>
-
-<h4>Description</h4>
+<h3>(decoration-on-top)</h3>
 
 Show bars and dots always on top. (Planned feature)
 
-<h4>Syntax</h4>
-
-<code>(decoration-on-top)</code>
 
 <h4>Example</h4>
 
@@ -214,15 +199,9 @@ Show bars and dots always on top. (Planned feature)
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="health-sprite"></a>
-<h3>health-sprite</h3>
+<h3>(health-sprite file hotx hoty width height)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(health-sprite file hotx hoty width height)</code>
+Define health-sprite.
 
 <dl>
 <dt>file</dt>
@@ -252,15 +231,9 @@ Show bars and dots always on top. (Planned feature)
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="mana-sprite"></a>
-<h3>mana-sprite</h3>
-
-<h4>Description</h4>
+<h3>(mana-sprite file hotx hoty width height))</h3>
 
 .
-
-<h4>Syntax</h4>
-
-<code>(mana-sprite file hotx hoty width height))</code>
 
 <dl>
 <dt>file</dt>
@@ -279,25 +252,14 @@ Show bars and dots always on top. (Planned feature)
 <h4>Example</h4>
 
 <pre>
-    (mana-sprite graphics/ui/mana2.png" 0 -1 31 4)
+    (mana-sprite "graphics/ui/mana2.png" 0 -1 31 4)
 </pre>
 
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="original-fog-of-war"></a>
-<h3>original-fog-of-war</h3>
-
-<h4>Description</h4>
+<h3>(original-fog-of-war)</h3>
 
 Use original style fog of war.
 
-<h4>Syntax</h4>
-
-<code>(original-fog-of-war)</code>
 
 <h4>Example</h4>
 
@@ -312,15 +274,10 @@ Use original style fog of war.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="reveal-map"></a>
-<h3>reveal-map</h3>
-
-<h4>Description</h4>
+<h3>(reveal-map)</h3>
 
 Reveal the entire map.
 
-<h4>Syntax</h4>
-
-<code>(reveal-map)</code>
 
 <h4>Example</h4>
 
@@ -335,15 +292,10 @@ Reveal the entire map.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="right-button-attacks"></a>
-<h3>right-button-attacks</h3>
-
-<h4>Description</h4>
+<h3>(right-button-attacks)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(right-button-attacks)</code>
 
 <h4>Example</h4>
 
@@ -358,15 +310,10 @@ Reveal the entire map.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="right-button-moves"></a>
-<h3>right-button-moves</h3>
-
-<h4>Description</h4>
+<h3>(right-button-moves)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(right-button-moves)</code>
 
 <h4>Example</h4>
 
@@ -381,15 +328,10 @@ Reveal the entire map.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-all-players-building-limit!"></a>
-<h3>set-all-players-building-limit!</h3>
-
-<h4>Description</h4>
+<h3>(set-all-players-building-limit! limit)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-all-players-building-limit! limit)</code>
 
 <dl>
 <dt>limit</dt>
@@ -410,15 +352,10 @@ Reveal the entire map.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-all-players-food-unit-limit!"></a>
-<h3>set-all-players-food-unit-limit!</h3>
-
-<h4>Description</h4>
+<h3>(set-all-players-food-unit-limit! limit)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-all-players-food-unit-limit! limit)</code>
 
 <dl>
 <dt>limit</dt>
@@ -439,15 +376,10 @@ Reveal the entire map.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-all-players-total-unit-limit!"></a>
-<h3>set-all-players-total-unit-limit!</h3>
-
-<h4>Description</h4>
+<h3>(set-all-players-total-unit-limit! limit)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-all-players-total-unit-limit! limit)</code>
 
 <dl>
 <dt>limit</dt>
@@ -468,16 +400,11 @@ Reveal the entire map.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-brightness!"></a>
-<h3>set-brightness!</h3>
-
-<h4>Description</h4>
+<h3>(set-brightness! brightness)</h3>
 
 Change the global game brightness. Use this to adapt Stratagus to your monitor
 settings.
 
-<h4>Syntax</h4>
-
-<code>(set-brightness! brightness)</code>
 
 <dl>
 <dt>brightness</dt>
@@ -498,15 +425,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-building-capture!"></a>
-<h3>set-building-capture!</h3>
-
-<h4>Description</h4>
+<h3>(set-building-capture! capture)</h3>
 
 Enable or disable building capture.
 
-<h4>Syntax</h4>
-
-<code>(set-building-capture! capture)</code>
 
 <dl>
 <dt>capture</dt>
@@ -527,15 +449,10 @@ Enable or disable building capture.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-burn-buildings!"></a>
-<h3>set-burn-buildings!</h3>
-
-<h4>Description</h4>
+<h3>(set-burn-buildings! percent rate)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-burn-buildings! percent rate)</code>
 
 <dl>
 <dt>percent</dt>
@@ -558,16 +475,11 @@ Enable or disable building capture.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-color-cycle-all!"></a>
-<h3>set-color-cycle-all!</h3>
-
-<h4>Description</h4>
+<h3>(set-color-cycle-all! flag)</h3>
 
 Change how the color cycling is working. This is used to make the water moving
 or the circle in the dark portal rotating.
 
-<h4>Syntax</h4>
-
-<code>(set-color-cycle-all! flag)</code>
 
 <dl>
 <dt>flag</dt>
@@ -588,16 +500,11 @@ or the circle in the dark portal rotating.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-contrast!"></a>
-<h3>set-contrast!</h3>
-
-<h4>Description</h4>
+<h3>(set-contrast! contrast)</h3>
 
 Change the global game contrast. Use this to adapt Stratagus to your monitor
 settings.
 
-<h4>Syntax</h4>
-
-<code>(set-contrast! contrast)</code>
 
 <dl>
 <dt>contrast</dt>
@@ -618,15 +525,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-double-click-delay!"></a>
-<h3>set-double-click-delay!</h3>
-
-<h4>Description</h4>
+<h3>(set-double-click-delay! delay)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-double-click-delay! delay)</code>
 
 <dl>
 <dt>delay</dt>
@@ -647,15 +549,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-editor-select-icon!"></a>
-<h3>set-editor-select-icon!</h3>
-
-<h4>Description</h4>
+<h3>(set-editor-select-icon! icon)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-editor-select-icon! icon)</code>
 
 <dl>
 <dt>icon</dt>
@@ -676,15 +573,10 @@ settings.
 <a href="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </a>
 
 <a name="set-editor-units-icon!"></a>
-<h3>set-editor-units-icon!</h3>
-
-<h4>Description</h4>
+<h3>(set-editor-units-icon! icon)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-editor-units-icon! icon)</code>
 
 <dl>
 <dt>icon</dt>
@@ -705,15 +597,10 @@ settings.
 <a href="../../data/ccl/editor.ccl"> $LIBARYPATH/ccl/editor.ccl </a>
 
 <a name="set-fancy-buildings!"></a>
-<h3>set-fancy-buildings!</h3>
-
-<h4>Description</h4>
+<h3>(set-fancy-buildings! fancy)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-fancy-buildings! fancy)</code>
 
 <dl>
 <dt>fancy</dt>
@@ -734,15 +621,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-fog-of-war!"></a>
-<h3>set-fog-of-war!</h3>
-
-<h4>Description</h4>
+<h3>(set-fog-of-war! fow)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-fog-of-war! fow)</code>
 
 <dl>
 <dt>fow</dt>
@@ -763,15 +645,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-fog-of-war-brightness!"></a>
-<h3>set-fog-of-war-brightness!</h3>
-
-<h4>Description</h4>
+<h3>(set-fog-of-war-brightness! brightness)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-fog-of-war-brightness! brightness)</code>
 
 <dl>
 <dt>brightness</dt>
@@ -792,15 +669,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-fog-of-war-contrast!"></a>
-<h3>set-fog-of-war-contrast!</h3>
-
-<h4>Description</h4>
+<h3>(set-fog-of-war-contrast! contrast)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-fog-of-war-contrast! contrast)</code>
 
 <dl>
 <dt>contrast</dt>
@@ -821,15 +693,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-fog-of-war-saturation!"></a>
-<h3>set-fog-of-war-saturation!</h3>
-
-<h4>Description</h4>
+<h3>(set-fog-of-war-saturation! saturation)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-fog-of-war-saturation! saturation)</code>
 
 <dl>
 <dt>saturation</dt>
@@ -850,15 +717,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-forest-regeneration!"></a>
-<h3>set-forest-regeneration!</h3>
-
-<h4>Description</h4>
+<h3>(set-forest-regeneration! speed)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-forest-regeneration! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -879,15 +741,10 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-goldmine-depleted!"></a>
-<h3>set-goldmine-depleted!</h3>
-
-<h4>Description</h4>
+<h3>(set-goldmine-depleted! percent)</h3>
 
 Set the option to use depleted goldmines.
 
-<h4>Syntax</h4>
-
-<code>(set-goldmine-depleted! percent)</code>
 
 <dl>
 <dt>percent</dt>
@@ -909,15 +766,10 @@ players mine depleted mines and gives them 20% of the default amount of gold.
 <h4>Not Used</h4>
 
 <a name="set-grab-mouse!"></a>
-<h3>set-grab-mouse!</h3>
-
-<h4>Description</h4>
+<h3>(set-grab-mouse! grab)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-grab-mouse! grab)</code>
 
 <dl>
 <dt>grab</dt>
@@ -938,15 +790,10 @@ players mine depleted mines and gives them 20% of the default amount of gold.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-hitpoint-regeneration!"></a>
-<h3>set-hitpoint-regeneration!</h3>
-
-<h4>Description</h4>
+<h3>(set-hitpoint-regeneration! regen)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-hitpoint-regeneration! regen)</code>
 
 <dl>
 <dt>regen</dt>
@@ -967,15 +814,10 @@ players mine depleted mines and gives them 20% of the default amount of gold.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-hold-click-delay!"></a>
-<h3>set-hold-click-delay!</h3>
-
-<h4>Description</h4>
+<h3>(set-hold-click-delay! delay)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-hold-click-delay! delay)</code>
 
 <dl>
 <dt>delay</dt>
@@ -996,15 +838,10 @@ players mine depleted mines and gives them 20% of the default amount of gold.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-key-scroll!"></a>
-<h3>set-key-scroll!</h3>
-
-<h4>Description</h4>
+<h3>(set-key-scroll! scroll)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-key-scroll! scroll)</code>
 
 <dl>
 <dt>scroll</dt>
@@ -1025,15 +862,10 @@ players mine depleted mines and gives them 20% of the default amount of gold.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-key-scroll-speed!"></a>
-<h3>set-key-scroll-speed!</h3>
-
-<h4>Description</h4>
+<h3>(set-key-scroll-speed! speed)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-key-scroll-speed! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1054,15 +886,10 @@ players mine depleted mines and gives them 20% of the default amount of gold.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-leave-stops!"></a>
-<h3>set-leave-stops!</h3>
-
-<h4>Description</h4>
+<h3>(set-leave-stops! leave)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-leave-stops! leave)</code>
 
 <dl>
 <dt>leave</dt>
@@ -1083,15 +910,10 @@ players mine depleted mines and gives them 20% of the default amount of gold.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-menu-background!"></a>
-<h3>set-menu-background!</h3>
-
-<h4>Description</h4>
+<h3>(set-menu-background! image)</h3>
 
 Set the default menu background.
 
-<h4>Syntax</h4>
-
-<code>(set-menu-background! image)</code>
 
 <dl>
 <dt>image</dt>
@@ -1113,15 +935,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-menu-background-with-title!"></a>
-<h3>set-menu-background-with-title!</h3>
-
-<h4>Description</h4>
+<h3>(set-menu-background-with-title! image)</h3>
 
 Set the default menu background with title.
 
-<h4>Syntax</h4>
-
-<code>(set-menu-background-with-title! image)</code>
 
 <dl>
 <dt>image</dt>
@@ -1143,15 +960,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-minimap-terrain!"></a>
-<h3>set-minimap-terrain!</h3>
-
-<h4>Description</h4>
+<h3>(set-minimap-terrain! terrain)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-minimap-terrain! terrain)</code>
 
 <dl>
 <dt>terrain</dt>
@@ -1172,15 +984,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-mouse-adjust!"></a>
-<h3>set-mouse-adjust!</h3>
-
-<h4>Description</h4>
+<h3>(set-mouse-adjust! speed)</h3>
 
 (Only with SVGALIB).
 
-<h4>Syntax</h4>
-
-<code>(set-mouse-adjust! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1201,15 +1008,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-mouse-scale!"></a>
-<h3>set-mouse-scale!</h3>
-
-<h4>Description</h4>
+<h3>(set-mouse-scale! scale)</h3>
 
 (Only with SVGALIB).
 
-<h4>Syntax</h4>
-
-<code>(set-mouse-scale! scale)</code>
 
 <dl>
 <dt>scale</dt>
@@ -1230,15 +1032,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-mouse-scroll!"></a>
-<h3>set-mouse-scroll!</h3>
-
-<h4>Description</h4>
+<h3>(set-mouse-scroll! scroll)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-mouse-scroll! scroll)</code>
 
 <dl>
 <dt>scroll</dt>
@@ -1259,15 +1056,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-mouse-scroll-speed!"></a>
-<h3>set-mouse-scroll-speed!</h3>
-
-<h4>Description</h4>
+<h3>(set-mouse-scroll-speed! speed)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-mouse-scroll-speed! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1288,15 +1080,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-original-resources!"></a>
-<h3>set-original-resources!</h3>
-
-<h4>Description</h4>
+<h3>(set-original-resources! resources)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-original-resources! resources)</code>
 
 <dl>
 <dt>resources</dt>
@@ -1317,15 +1104,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-reveal-attacker!"></a>
-<h3>set-reveal-attacker!</h3>
-
-<h4>Description</h4>
+<h3>(set-reveal-attacker! reveal)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-reveal-attacker! reveal)</code>
 
 <dl>
 <dt>reveal</dt>
@@ -1346,15 +1128,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-reverse-map-move!"></a>
-<h3>set-reverse-map-move!</h3>
-
-<h4>Description</h4>
+<h3>(set-reverse-map-move! reverse)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-reverse-map-move! reverse)</code>
 
 <dl>
 <dt>reverse</dt>
@@ -1375,15 +1152,11 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-saturation!"></a>
-<h3>set-saturation!</h3>
-<h4>Description</h4>
+<h3>(set-saturation! saturation)</h3>
 
 Change the global game saturation. Use this to adapt Stratagus to your monitor
 settings.
 
-<h4>Syntax</h4>
-
-<code>(set-saturation! saturation)</code>
 
 <dl>
 <dt>saturation</dt>
@@ -1404,19 +1177,19 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-selection-style!"></a>
-<h3>set-selection-style!</h3>
-
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(set-selection-style! style)</code>
+<h3>(set-selection-style! style)</h3>
+Set selection style, show what units the user had selected.
 
 <dl>
 <dt>style</dt>
-<dd>#f,'rectangle,'circle,'alpha-rectangle,'alpha-circle,'corners.
+<dd>Possible values:<pre>
+#f                      None
+'rectangle              Rectangle around unit
+'circle                 Circle around unit
+'alpha-rectangle        Rectangle with alpha around unit
+'alpha-circle           Circle with alpha around unit
+'corners                Draw corners of rectangle
+</pre>
 </dd>
 </dl>
 
@@ -1426,26 +1199,18 @@ settings.
     (set-selection-style! 'corners)
 </pre>
 
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-show-attack-range!"></a>
-<h3>set-show-attack-range!</h3>
+<h3>(set-show-attack-range! show)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(set-show-attack-range! show)</code>
+Enable/disable display of attack range of the selected unit on map.
 
 <dl>
 <dt>show</dt>
-<dd>.
+<dd>#f or #t
 </dd>
 </dl>
 
@@ -1455,22 +1220,15 @@ settings.
     (set-show-attack-range! #f)
 </pre>
 
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-show-command-key!"></a>
-<h3>set-show-command-key!</h3>
-
-<h4>Description</h4>
+<h3>(set-show-command-key! show)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-show-command-key! show)</code>
 
 <dl>
 <dt>show</dt>
@@ -1491,15 +1249,9 @@ settings.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-show-orders!"></a>
-<h3>set-show-orders!</h3>
+<h3>(set-show-orders! show)</h3>
 
-<h4>Description</h4>
-
-Show unit orders.
-
-<h4>Syntax</h4>
-
-<code>(set-show-orders! show)</code>
+Enable/disable display of the orders of the selected unit on map.
 
 <dl>
 <dt>show</dt>
@@ -1511,27 +1263,16 @@ number to specify the number of seconds an order should be shown.
 <h4>Example</h4>
 
 <pre>
+    ;; never show unit orders
     (set-show-orders! #f)
+    ;; show orders for 2 seconds
     (set-show-orders! 2)
 </pre>
 
-<p>The first example never shows unit orders.  The second example only shows
-orders for 2 seconds.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
-
 <a name="set-show-reaction-range!"></a>
-<h3>set-show-reaction-range!</h3>
+<h3>(set-show-reaction-range! show)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(set-show-reaction-range! show)</code>
+Enable/disable display of reaction range of the selected unit on map.
 
 <dl>
 <dt>show</dt>
@@ -1552,19 +1293,18 @@ orders for 2 seconds.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-show-sight-range!"></a>
-<h3>set-show-sight-range!</h3>
+<h3>(set-show-sight-range! range)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(set-show-sight-range! range)</code>
+How the sight range of the selected unit is shown on map.
 
 <dl>
 <dt>range</dt>
-<dd>#f,'rectangle,'circle,'#t.
+<dd>Possible values:
+<pre>
+#f                      None
+'rectangle              Alpha rectangle around unit
+'circle                 Alpha circle around unit
+#t                      Rectangle around unit
 </dd>
 </dl>
 
@@ -1581,15 +1321,10 @@ orders for 2 seconds.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-show-tips!"></a>
-<h3>set-show-tips!</h3>
-
-<h4>Description</h4>
+<h3>(set-show-tips! tips)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-show-tips! tips)</code>
 
 <dl>
 <dt>tips</dt>
@@ -1610,15 +1345,10 @@ orders for 2 seconds.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-build!"></a>
-<h3>set-speed-build!</h3>
-
-<h4>Description</h4>
+<h3>(set-speed-build! speed)</h3>
 
 Set build speed.
 
-<h4>Syntax</h4>
-
-<code>(set-speed-build! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1639,15 +1369,10 @@ Set build speed.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-research!"></a>
-<h3>set-speed-research!</h3>
-
-<h4>Description</h4>
+<h3>(set-speed-research! speed)</h3>
 
 Set research speed.
 
-<h4>Syntax</h4>
-
-<code>(set-speed-research! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1668,15 +1393,10 @@ Set research speed.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-resources-harvest!"></a>
-<h3>set-speed-resources-harvest!</h3>
-
-<h4>Description</h4>
+<h3>(set-speed-resources-harvest! resource speed)</h3>
 
 Set the harvesting speed of a resource.
 
-<h4>Syntax</h4>
-
-<code>(set-speed-resources-harvest! resource speed)</code>
 
 <dl>
 <dt>resource</dt>
@@ -1700,15 +1420,10 @@ Set the harvesting speed of a resource.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-resources-return!"></a>
-<h3>set-speed-resources-return!</h3>
-
-<h4>Description</h4>
+<h3>(set-speed-resources-return! resource speed)</h3>
 
 Set the returning speed of a resource.
 
-<h4>Syntax</h4>
-
-<code>(set-speed-resources-return! resource speed)</code>
 
 <dl>
 <dt>resource</dt>
@@ -1732,15 +1447,10 @@ Set the returning speed of a resource.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-train!"></a>
-<h3>set-speed-train!</h3>
-
-<h4>Description</h4>
+<h3>(set-speed-train! speed)</h3>
 
 Set train speed.
 
-<h4>Syntax</h4>
-
-<code>(set-speed-train! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1761,15 +1471,10 @@ Set train speed.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speed-upgrade!"></a>
-<h3>set-speed-upgrade!</h3>
-
-<h4>Description</h4>
+<h3>(set-speed-upgrade! speed)</h3>
 
 Set upgrade speed.
 
-<h4>Syntax</h4>
-
-<code>(set-speed-upgrade! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1790,15 +1495,10 @@ Set upgrade speed.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-speeds!"></a>
-<h3>set-speeds!</h3>
-
-<h4>Description</h4>
+<h3>(set-speeds! speed)</h3>
 
 Set all speeds.
 
-<h4>Syntax</h4>
-
-<code>(set-speeds! speed)</code>
 
 <dl>
 <dt>speed</dt>
@@ -1819,15 +1519,10 @@ Set all speeds.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-title-screen!"></a>
-<h3>set-title-screen!</h3>
-
-<h4>Description</h4>
+<h3>(set-title-screen! image)</h3>
 
 Change the default title screen.
 
-<h4>Syntax</h4>
-
-<code>(set-title-screen! image)</code>
 
 <dl>
 <dt>image</dt>
@@ -1849,15 +1544,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-training-queue!"></a>
-<h3>set-training-queue!</h3>
-
-<h4>Description</h4>
+<h3>(set-training-queue! queue)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-training-queue! queue)</code>
 
 <dl>
 <dt>queue</dt>
@@ -1878,15 +1568,10 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-xp-damage!"></a>
-<h3>set-xp-damage!</h3>
-
-<h4>Description</h4>
+<h3>(set-xp-damage! damage)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(set-xp-damage! damage)</code>
 
 <dl>
 <dt>damage</dt>
@@ -1907,15 +1592,9 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="shadow-sprite"></a>
-<h3>shadow-sprite</h3>
+<h3>(shadow-sprite file hotx hoty width height)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(shadow-sprite file hotx hoty width height)</code>
+Define shadow-sprite.
 
 <dl>
 <dt>file</dt>
@@ -1937,22 +1616,15 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
     (shadow-sprite "graphics/missiles/unit shadow.png" 3 42 32 32)
 </pre>
 
-<p>.
-
 <h4>Used</h4>
 
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="show-energy-selected-only"></a>
-<h3>show-energy-selected-only</h3>
-
-<h4>Description</h4>
+<h3>(show-energy-selected-only)</h3>
 
 .
 
-<h4>Syntax</h4>
-
-<code>(show-energy-selected-only)</code>
 
 <h4>Example</h4>
 
@@ -1967,245 +1639,59 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="show-full"></a>
-<h3>show-full</h3>
+<h3>(show-full)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-full)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-full)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Use to show always bars or dots. No parameters.
 
 <a name="show-health-bar"></a>
-<h3>show-health-bar</h3>
+<h3>(show-health-bar)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-health-bar)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-health-bar)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Adds a health bar to the left of the unit. No parameters.
 
 <a name="show-health-dot"></a>
-<h3>show-health-dot</h3>
+<h3>(show-health-dot)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-health-dot)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-health-dot)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Adds a health dot to the left of the unit. No parameters.
 
 <a name="show-health-horizontal"></a>
-<h3>show-health-horizontal</h3>
+<h3>(show-health-horizontal)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-health-horizontal)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-health-horizontal)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Show health bars horizontal. No parameters.
 
 <a name="show-health-vertical"></a>
-<h3>show-health-vertical</h3>
+<h3>(show-health-vertical)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-health-vertical)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-health-vertical)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Show health bars vertical. No parameters.
 
 <a name="show-mana-bar"></a>
-<h3>show-mana-bar</h3>
+<h3>(show-mana-bar)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-mana-bar)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-mana-bar)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Show a mana bar to the right of the unit. No parameters.
 
 <a name="show-mana-dot"></a>
-<h3>show-mana-dot</h3>
+<h3>(show-mana-dot)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-mana-dot)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-mana-dot)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Show a mana dot to the right of the unit. No parameters.
 
 <a name="show-mana-horizontal"></a>
-<h3>show-mana-horizontal</h3>
+<h3>(show-mana-horizontal)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-mana-horizontal)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-mana-horizontal)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Show mana bars horizontal. No parameters.
 
 <a name="show-mana-vertical"></a>
-<h3>show-mana-vertical</h3>
+<h3>(show-mana-vertical)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-mana-vertical)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-mana-vertical)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Show mana bars vertical. No parameters.
 
 <a name="show-no-full"></a>
-<h3>show-no-full</h3>
+<h3>(show-no-full)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(show-no-full)</code>
-
-<h4>Example</h4>
-
-<pre>
-    (show-no-full)
-</pre>
-
-<p>.
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
+Use to get no full bars or dots. No parameters.
 
 <a name="spell-sprite"></a>
-<h3>spell-sprite</h3>
+<h3>(spell-sprite file hotx hoty width height)</h3>
 
-<h4>Description</h4>
-
-.
-
-<h4>Syntax</h4>
-
-<code>(spell-sprite file hotx hoty width height)</code>
+Define spell-sprite.
 
 <dl>
 <dt>file</dt>
@@ -2226,8 +1712,6 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <pre>
     (spell-sprite "graphics/ui/bloodlust,haste,slow,invisible,shield.png" 1 1 16 16)
 </pre>
-
-<p>.
 
 <h4>Used</h4>
 
