@@ -821,7 +821,8 @@ Use it at your own risk.\n\n");
 
 	// Init player data
 	ThisPlayer = NULL;
-	memset(Players, 0, sizeof(Players));
+	//Don't clear the Players strucure as it would erase the allowed units.
+	// memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 
 	InitUnitsMemory();  // Units memory management
