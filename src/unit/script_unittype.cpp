@@ -1726,6 +1726,7 @@ void UpdateUnitVariables(const Unit* unit)
 	int i;
 	const UnitType* type; // unit->Type.
 
+	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit->Variable[i].Value = 0;
 		unit->Variable[i].Max = 0;
@@ -1739,7 +1740,15 @@ void UpdateUnitVariables(const Unit* unit)
 	// Build
 	if (unit->Orders[0].Action == UnitActionBuilded) {
 		unit->Variable[BUILD_INDEX].Value = unit->Data.Builded.Progress;
-		unit->Variable[BUILD_INDEX].Max = unit->Type->Stats[unit->Player->Player].Costs[TimeCost] * 600;
+		unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Player].Costs[TimeCost] * 600;
+
+		// This should happen when building unit with several peons
+		// Maybe also with only one.
+		// FIXME : Should be better to fix it in action_{build,repair}.c ?
+		if (unit->Variable[BUILD_INDEX].Value > unit->Variable[BUILD_INDEX].Max) {
+			// assume value is wrong.
+			unit->Variable[BUILD_INDEX].Value = unit->Variable[BUILD_INDEX].Max;
+		}
 	}
 
 	// Mana.
@@ -1867,11 +1876,19 @@ void UpdateUnitVariables(const Unit* unit)
 
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit->Variable[i].Enable &= unit->Variable[i].Max > 0;
+#ifdef DEBUG
+		if (unit->Variable[i].Value > unit->Variable[i].Max) {
+			DebugPrint("Value out of range: '%s'(%d), for variable '%s',"
+						" value = %d, max = %d\n"
+						_C_ type->Ident _C_ unit->Slot _C_ UnitTypeVar.VariableName[i]
+						_C_ unit->Variable[i].Value _C_ unit->Variable[i].Max);
+		}
+#endif
 		Assert(unit->Variable[i].Value <= unit->Variable[i].Max);
 	}
 
 	// BoolFlag
-	type = unit->Type;
+
 	type->BoolFlag[COWARD_INDEX]                = type->Coward;
 	type->BoolFlag[BUILDING_INDEX]              = type->Building;
 	type->BoolFlag[FLIP_INDEX]                  = type->Flip;
