@@ -1021,8 +1021,8 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 	//  Update interface.
 	//
 	if (unit->Player == ThisPlayer && unit->Selected) {
-	    UpdateButtonPanel();
-	    MustRedraw |= RedrawPanels;
+	    SelectedUnitChanged();
+	    MustRedraw |= RedrawInfoPanel;
 	}
     }
 }
@@ -1098,8 +1098,8 @@ global void CommandCancelUpgradeTo(Unit* unit)
 	//	Update interface.
 	//
 	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
+	    SelectedUnitChanged();
+	    MustRedraw|=RedrawInfoPanel;
 	}
 
 	unit->Wait=unit->Reset=1;	// immediately start next command.
@@ -1194,8 +1194,8 @@ global void CommandCancelResearch(Unit* unit)
 	//	Update interface.
 	//
 	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
+	    SelectedUnitChanged();
+	    MustRedraw|=RedrawInfoPanel;
 	}
 
 	unit->Wait=unit->Reset=1;	// immediately start next command.

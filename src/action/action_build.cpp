@@ -121,7 +121,7 @@ global void HandleActionBuild(Unit* unit)
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	    if( unit->Selected ) {	// update display for new action
-		UpdateButtonPanel();
+		SelectedUnitChanged();
 	    }
 	    return;
 
@@ -166,7 +166,7 @@ global void HandleActionBuild(Unit* unit)
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	if( unit->Selected ) {	// update display for new action
-	    UpdateButtonPanel();
+	    SelectedUnitChanged();
 	}
 
 	return;
@@ -195,7 +195,7 @@ global void HandleActionBuild(Unit* unit)
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	if( unit->Selected ) {	// update display for new action
-	    UpdateButtonPanel();
+	    SelectedUnitChanged();
 	}
 	return;
     }
@@ -213,7 +213,7 @@ global void HandleActionBuild(Unit* unit)
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	if( unit->Selected ) {	// update display for new action
-	    UpdateButtonPanel();
+	    SelectedUnitChanged();
 	}
 	return;
     }
@@ -414,10 +414,10 @@ global void HandleActionBuilded(Unit* unit)
 	UpdateForNewUnit(unit,0);
 
 	if( IsOnlySelected(unit) ) {
-	    UpdateButtonPanel();
-	    MustRedraw|=RedrawPanels;
+	    SelectedUnitChanged();
+	    MustRedraw|=RedrawInfoPanel;
 	} else if( unit->Player==ThisPlayer ) {
-	    UpdateButtonPanel();
+	    SelectedUnitChanged();
 	}
 	unit->CurrentSightRange=unit->Stats->SightRange;
 	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2,

@@ -443,6 +443,9 @@
 #include "upgrade_structs.h"
 #include "construct.h"
 #include "etlib/hash.h"
+#ifdef NEW_UI
+#include "ccl.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -628,6 +631,10 @@ struct _unit_type_ {
     Graphic*	ShadowSprite;		/// Shadow sprite image
 #ifdef USE_OPENGL
     Graphic*	PlayerColorSprite[PlayerMax];	/// Sprites with player colors
+#endif
+#ifdef NEW_UI
+
+    SCM		AddButtonsHook;		/// Script called to add UI buttons
 #endif
 };
 

@@ -140,31 +140,15 @@ global void LoadConstructions(void)
 */
 global void SaveConstructions(FILE* file)
 {
-    int i;
     int j;
-    char** cp;
     Construction** cop;
     ConstructionFrame* cframe;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: constructions $Id$\n\n");
 
-    //
-    //	Dump table wc2 construction numbers -> internal symbol.
-    //
-    if( (cp=ConstructionWcNames) ) {
-	fprintf(file,"(define-construction-wc-names");
-
-	i=90;
-	while( *cp ) {
-	    if( i+strlen(*cp)>79 ) {
-		i=fprintf(file,"\n ");
-	    }
-	    i+=fprintf(file," '%s",*cp++);
-	}
-	fprintf(file,")\n\n");
-    }
-
+    // FIXME: needed?
+    
     //
     //	Dump table of all constructions
     //

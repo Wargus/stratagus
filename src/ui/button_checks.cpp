@@ -30,6 +30,7 @@
 
 //@{
 
+#ifndef NEW_UI
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
@@ -278,3 +279,6 @@ global int ButtonCheckSingleResearch(const Unit* unit,
 }
 
 //@}
+#else
+// FIXME: maxy: remove this file.
+#endif

@@ -419,58 +419,6 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 }
 
 /**
-**	Save state of the icons to file.
-**
-**	@param file	Output file.
-*/
-global void SaveIcons(FILE* file)
-{
-    char* const* cp;
-    int i;
-
-    fprintf(file, "\n;;; -----------------------------------------\n");
-    fprintf(file, ";;; MODULE: icons $Id$\n\n");
-
-    //
-    //  Mapping the original icon numbers in puds to our internal strings
-    //
-    if ((cp = IconWcNames)) {
-	fprintf(file, "(define-icon-wc-names");
-
-	i = 90;
-	while (*cp) {
-	    if (i + strlen(*cp) > 79) {
-		i = fprintf(file, "\n ");
-	    }
-	    i += fprintf(file, " '%s", *cp++);
-	}
-	fprintf(file, ")\n\n");
-    }
-
-    //
-    //  Icons
-    //
-    for (i = 0; i < NumIcons; ++i) {
-	fprintf(file, "(define-icon '%s", Icons[i]->Ident);
-	if (Icons[i]->Tileset) {
-	    fprintf(file, " 'tileset '%s", Icons[i]->Tileset);
-	}
-	fprintf(file, "\n  'size '(%d %d) 'normal '(%d \"%s\"))\n",
-	    Icons[i]->Width, Icons[i]->Height,
-	    Icons[i]->Index, Icons[i]->File->FileName);
-    }
-    fprintf(file, "\n");
-
-    //
-    //  Icons aliases
-    //
-    for (i = 0; i < NumIconAliases; ++i) {
-	fprintf(file, "(define-icon-alias '%s '%s)\n",
-	    IconAliases[i * 2 + 0], IconAliases[i * 2 + 1]);
-    }
-}
-
-/**
 **	@brief Parse icon definition.
 **
 **	@param list	Icon definition list.

@@ -272,69 +272,6 @@ try_or:
 global void InitDependencies(void){}
 
 /**
-**	Save state of the dependencies to file.
-**
-**	@param file	Output file.
-*/
-global void SaveDependencies(FILE* file)
-{
-    unsigned u;
-    const DependRule* node;
-    const DependRule* rule;
-    const DependRule* temp;
-
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: dependencies $Id$\n\n");
-
-    // Save all dependencies
-
-    for( u=0; u<sizeof(DependHash)/sizeof(*DependHash); ++u ) {
-	node=DependHash[u];
-	while( node ) {			// all hash links
-	    fprintf(file,"(define-dependency '");
-	    switch( node->Type ) {
-		case DependRuleUnitType:
-		    fprintf(file,"%s",node->Kind.UnitType->Ident);
-		    break;
-		case DependRuleUpgrade:
-		    fprintf(file,"%s",node->Kind.Upgrade->Ident);
-		    break;
-	    }
-	    // All or cases
-
-	    fprintf(file,"\n  '(");
-	    rule=node->Rule;
-	    for( ;; ) {
-		temp=rule;
-		while( temp ) {
-		    switch( temp->Type ) {
-		    case DependRuleUnitType:
-			fprintf(file,"%s",temp->Kind.UnitType->Ident);
-			break;
-		    case DependRuleUpgrade:
-			fprintf(file,"%s",temp->Kind.Upgrade->Ident);
-			break;
-		    }
-		    temp=temp->Rule;
-		    if( temp ) {
-			fprintf(file," ");
-		    }
-		}
-		fprintf(file,")");
-		if( !(rule=rule->Next) ) {
-		    break;
-		}
-		fprintf(file,"\n  'or '( ");
-	    }
-
-	    fprintf(file,")\n");
-
-	    node=node->Next;
-	}
-    }
-}
-
-/**
 **	Clean up unit and upgrade dependencies.
 */
 global void CleanDependencies(void)

@@ -218,7 +218,11 @@ local int ChopWood(Unit* unit)
 	    //
             CheckUnitToBeDrawn(unit);
 	    if( IsOnlySelected(unit) ) {	// update display
+#ifndef NEW_UI
 		UpdateButtonPanel();
+#else
+		SelectedUnitChanged();
+#endif
 	    }
 
 	    //

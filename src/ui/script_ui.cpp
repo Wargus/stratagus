@@ -10,7 +10,7 @@
 //
 /**@name ccl_ui.c	-	The ui ccl functions. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
+//	(c) Copyright 1999-2003 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -47,10 +47,565 @@
 #include "menus.h"
 #include "font.h"
 #include "etlib/hash.h"
+#ifdef NEW_UI
+#include "commands.h"
+#include "spells.h"
+#include "depend.h"
+#endif
+
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+#ifdef NEW_UI
+local SCM SelectionChangedHook;    /// Script to add/remove buttons
+local SCM SelectedUnitChangedHook; /// Script to refresh buttons
+local SCM ChooseTargetBeginHook;   /// Script to draw target selection buttons
+local SCM ChooseTargetFinishHook;  /// Script to draw target selection buttons
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+#ifdef NEW_UI
+// Note, the commands all operate on the selected unit(s) and are
+// called from ccl hooks during the game when a button is pressed.
+
+// helper functions used for actions that need target selection
+global void ChooseTargetBegin(int action)
+{
+    CursorState=CursorStateSelect;
+    GameCursor=TheUI.YellowHair.Cursor;
+    CursorAction=action;
+    MustRedraw|=RedrawCursor;
+    
+    if( ChooseTargetBeginHook == NIL ) {
+	DebugLevel0Fn("Hook is NIL!\n");
+    } else {
+	gh_apply(ChooseTargetBeginHook,NIL);
+    }
+    // FIXME: maybe write this from ccl?
+    SetStatusLine("Select Target");
+}
+
+global void ChooseTargetFinish(void)
+{
+    if( CursorState!=CursorStateSelect ) {
+	return;
+    }
+    ClearStatusLine();
+    CursorState=CursorStatePoint;
+    GameCursor=TheUI.Point.Cursor;
+    MustRedraw|=RedrawCursor;
+    CursorBuilding=0;
+    
+    if( ChooseTargetFinishHook == NIL ) {
+	DebugLevel0Fn("Hook is NIL!\n");
+    } else {
+	gh_apply(ChooseTargetFinishHook,NIL);
+    }
+}
+
+/**
+**	FIXME: docu for command-patrol
+*/
+local SCM CclCommandPatrol(void)
+{
+    ChooseTargetBegin(ButtonPatrol);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-harvest
+*/
+local SCM CclCommandHarvest(void)
+{
+    ChooseTargetBegin(ButtonHarvest);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-attack
+*/
+local SCM CclCommandAttack(void)
+{
+    ChooseTargetBegin(ButtonAttack);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-cancel-upgrade
+*/
+local SCM CclCommandCancelUpgrade(void)
+{
+    if( Selected[0]->Orders[0].Action==UnitActionUpgradeTo ) {
+	SendCommandCancelUpgradeTo(Selected[0]);
+    } else if( Selected[0]->Orders[0].Action==UnitActionResearch ) {
+	SendCommandCancelResearch(Selected[0]);
+    }
+    // FIXME: must call SelectedUnitChanged() here?
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Build the given unit type (a building).
+*/
+local SCM CclCommandBuild(SCM arg)
+{
+    char * ident;
+    ident = gh_scm2newstr(arg, NULL);
+    UnitType * type;
+    type=UnitTypeByIdent(ident);
+    free(ident);
+
+    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
+	ChooseTargetBegin(ButtonBuild);
+	GameCursor=TheUI.Point.Cursor;
+	CursorBuilding=type;
+	MustRedraw|=RedrawCursor;
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Train an unit with given type
+*/
+local SCM CclCommandTrainUnit(SCM arg)
+{
+    char * ident;
+    ident = gh_scm2newstr(arg, NULL);
+    UnitType * type;
+    type=UnitTypeByIdent(ident);
+    free(ident);
+
+    // FIXME: Johns: I want to place commands in queue, even if not
+    // FIXME:	enough resources are available.
+    // FIXME: training queue full check is not correct for network.
+    // FIXME: this can be correct written, with a little more code.
+    if( Selected[0]->Orders[0].Action==UnitActionTrain
+	&& (Selected[0]->Data.Train.Count==MAX_UNIT_TRAIN
+	    || !EnableTrainingQueue) ) {
+	NotifyPlayer(Selected[0]->Player,NotifyYellow,Selected[0]->X,
+		     Selected[0]->Y, "Unit training queue is full" );
+    } else if( PlayerCheckFood(ThisPlayer,type)
+	       && !PlayerCheckUnitType(ThisPlayer,type) ) {
+	//PlayerSubUnitType(ThisPlayer,type);
+	SendCommandTrainUnit(Selected[0],type
+			     ,!(KeyModifiers&ModifierShift));
+	ClearStatusLine();
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-cast-spell
+*/
+local SCM CclCommandCastSpell(SCM arg)
+{
+    int i;
+    char * spell_str;
+    SpellType * spell;
+    int spell_id;
+
+    spell_str=gh_scm2newstr(arg,NULL);
+    spell=SpellTypeByIdent(spell_str);
+    spell_id=SpellIdByIdent(spell_str);
+    free(spell_str);
+
+    // FIXME: maxy: make the modifiers available from ccl (and maybe
+    // which mouse button was pressed, too, for the action scripts)
+
+    if( KeyModifiers&ModifierControl ) {
+	// auto-cast the spell
+	int autocast;
+	if( !CanAutoCastSpell(spell) ) {
+	    PlayGameSound(GameSounds.PlacementError.Sound
+			  ,MaxSampleVolume);
+	    return SCM_UNSPECIFIED;
+	}
+
+	autocast=0;
+	// If any selected unit doesn't have autocast on turn it on
+	// for everyone
+	for( i=0; i<NumSelected; ++i ) {
+	    if( Selected[i]->AutoCastSpell!=spell) {
+		autocast=1;
+		break;
+	    }
+	}
+	for( i=0; i<NumSelected; ++i ) {
+	    if( !autocast || Selected[i]->AutoCastSpell!=spell ) {
+		SendCommandAutoSpellCast(Selected[i],spell_id,autocast);
+	    }
+	}
+    } else {
+	// select spell target
+	CursorSpell = spell_id;
+	ChooseTargetBegin(ButtonSpellCast);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-move
+*/
+local SCM CclCommandMove(void)
+{
+    ChooseTargetBegin(ButtonMove);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-stop
+*/
+local SCM CclCommandStop(void)
+{
+    int i;
+    for( i=0; i<NumSelected; ++i ) {
+	SendCommandStopUnit(Selected[i]);
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-research
+*/
+local SCM CclCommandResearch(SCM arg)
+{
+    char * what;
+    Upgrade * upgrade;
+
+    what = gh_scm2newstr(arg,NULL);
+    upgrade=UpgradeByIdent( what );
+    free(what);
+
+    if( !PlayerCheckCosts(ThisPlayer,upgrade->Costs) ) {
+	//PlayerSubCosts(ThisPlayer,Upgrades[i].Costs);
+	// FIXME: key modifier check does not belong here
+	SendCommandResearch(Selected[0],upgrade
+			    ,!(KeyModifiers&ModifierShift));
+	ClearStatusLine();
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-unload
+*/
+local SCM CclCommandUnload(void)
+{
+    ChooseTargetBegin(ButtonUnload);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Build a string with unit/upgrade costs
+*/
+local SCM CclGetCostString(SCM arg)
+{
+    char s[80];
+    char * pos;
+    char * ident;
+    int i;
+    int * costs;
+    ident = gh_scm2newstr(arg, NULL);
+    UnitType * type;
+    Upgrade * upgrade;
+    costs = NULL;
+    type=UnitTypeByIdent(ident);
+    if( type ) {
+	costs=type->Stats[ThisPlayer->Player].Costs;
+    } else {
+	upgrade=UpgradeByIdent(ident);
+	if( upgrade ) {
+	    costs=upgrade->Costs;
+	}
+	/* TODO: mana costs
+	   SetCosts(SpellTypeById( v )->ManaCost,0,NULL);
+	*/
+    }
+    if( !costs ) {
+	sprintf(s, "[NO COSTS: '%s']", ident);
+	free(ident);
+	return gh_str02scm(s);
+    }
+    free(ident);
+
+    pos = s;
+    // do not draw time cost
+    for( i=1; i<MaxCosts; i++ ) {
+	if( costs[i] ) {
+	    pos += sprintf(pos, "$%d %d  ", i, costs[i]);
+	}
+    }
+    return gh_str02scm(s);
+}
+
+/**
+**	Check whether unit or upgrade is allowed
+*/
+local SCM CclCheckAllowed(SCM arg)
+{
+    int allow;
+    char * what;
+    what = gh_scm2newstr(arg,NULL);
+    allow = CheckDependByIdent( ThisPlayer,what );
+    if( allow && !strncmp( what, "upgrade-", 8 ) ) {
+	allow=UpgradeIdentAllowed( ThisPlayer, what )=='A';
+    }
+    free(what);
+    return allow?SCM_BOOL_T:SCM_BOOL_F;
+}
+
+/**
+**	FIXME: docu for command-upgrade-to
+*/
+local SCM CclCommandUpgradeTo(SCM arg)
+{
+    char * what;
+    UnitType * type;
+    what = gh_scm2newstr(arg,NULL);
+    type = UnitTypeByIdent(what);
+    free(what);
+
+    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
+	DebugLevel3("Upgrade to %s %d %d\n"
+		    _C_ type->Ident
+		    _C_ type->_Costs[GoldCost]
+		    _C_ type->_Costs[WoodCost]);
+	// FIXME: should not check for key modifiers here
+	SendCommandUpgradeTo(Selected[0],type
+			     ,!(KeyModifiers&ModifierShift));
+	ClearStatusLine();
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-attack-ground
+*/
+local SCM CclCommandAttackGround(void)
+{
+    ChooseTargetBegin(ButtonAttackGround);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-return-goods
+*/
+local SCM CclCommandReturnGoods(void)
+{
+    int i;
+    for( i=0; i<NumSelected; ++i ) {
+	// FIXME: should not check for key modifiers here
+	SendCommandReturnGoods(Selected[i],NoUnitP
+			       ,!(KeyModifiers&ModifierShift));
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	generic cancel command
+**      mainly used when in target selection mode
+*/
+local SCM CclCommandCancel(void)
+{
+    if( CursorState==CursorStateSelect ) {
+	ClearStatusLine();
+	GameCursor=TheUI.Point.Cursor;
+	CursorBuilding=NULL;
+	CursorState=CursorStatePoint;
+	MustRedraw|=RedrawCursor;
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**      FIXME: docu for command-cancel-build
+*/
+local SCM CclCommandCancelBuilding(void)
+{
+    SendCommandCancelBuilding(Selected[0],
+			      Selected[0]->Data.Builded.Worker);
+    ClearStatusLine();
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-cancel-train-unit
+*/
+local SCM CclCommandCancelTrainUnit(void)
+{
+    DebugCheck( Selected[0]->Orders[0].Action!=UnitActionTrain
+		|| !Selected[0]->Data.Train.Count );
+    SendCommandCancelTraining(Selected[0],-1,NULL);
+    ClearStatusLine();
+    // The SelectedUnitChanged hook will be called when the command
+    // finally got through, I hope.
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-repair
+*/
+local SCM CclCommandRepair(void)
+{
+    ChooseTargetBegin(ButtonRepair);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-stand-ground
+*/
+local SCM CclCommandStandGround(void)
+{
+    int i;
+    for( i=0; i<NumSelected; ++i ) {
+	// FIXME: key modifiers don't belong here
+	SendCommandStandGround(Selected[i]
+			       ,!(KeyModifiers&ModifierShift));
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu for command-demolish
+*/
+local SCM CclCommandDemolish(void)
+{
+    ChooseTargetBegin(ButtonDemolish);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	FIXME: docu
+**      FIXME: a bit a confusing name, see below
+*/
+local SCM CclSelectedIsBuilding(void)
+{
+    if( NumSelected == 0) {
+	return SCM_UNSPECIFIED;
+    }
+    if( Selected[0]->Type->Building ) {
+	return SCM_BOOL_T;
+    } else {
+	return SCM_BOOL_F;
+    }
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedIsTraining(void)
+{
+    if( NumSelected == 0) {
+	return SCM_UNSPECIFIED;
+    }
+    if( Selected[0]->Orders[0].Action==UnitActionTrain ) {
+	return SCM_BOOL_T;
+    } else {
+	return SCM_BOOL_F;
+    }
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedIsUpgrading(void)
+{
+    if( NumSelected == 0) {
+	return SCM_UNSPECIFIED;
+    }
+    if( Selected[0]->Orders[0].Action==UnitActionResearch 
+	|| Selected[0]->Orders[0].Action==UnitActionUpgradeTo ) {
+	return SCM_BOOL_T;
+    } else {
+	return SCM_BOOL_F;
+    }
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedGetRace(void)
+{
+    if( NumSelected == 0 ) {
+	return SCM_UNSPECIFIED;
+    }
+    DebugLevel0Fn("RaceString: %s\n" _C_ Selected[0]->Player->RaceName);
+    return gh_str02scm(Selected[0]->Player->RaceName);
+    //return gh_symbol2scm(Selected[0]->Player->RaceName);
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedGetSpeed(void)
+{
+    if( NumSelected == 0 ) {
+	return SCM_UNSPECIFIED;
+    }
+   return gh_int2scm(Selected[0]->Stats->Speed);
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedOwnedByPlayer(void)
+{
+    if( NumSelected == 0) {
+	return SCM_BOOL_F;
+    }
+    if( Selected[0]->Player==ThisPlayer ) {
+	return SCM_BOOL_T;
+    } else {
+	return SCM_BOOL_F;
+    }
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedMixedUnits(void)
+{
+    int i;
+    UnitType * type;
+    if( NumSelected<2 ) {
+	return SCM_BOOL_F;
+    }
+
+    type = Selected[0]->Type;
+    for ( i=1; i<NumSelected; i++ ) {
+	if ( Selected[i]->Type != type ) {
+	    return SCM_BOOL_T;
+	}
+    }
+    return SCM_BOOL_F;
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedDrawButtons(void)
+{
+    if( NumSelected > 0 ) {
+	if( Selected[0]->Type->AddButtonsHook == NIL ) {
+	    DebugLevel0Fn("Hook is NIL!\n");
+	} else {
+	    /*
+	    DebugLevel0Fn("Running hook:\n");
+	    gh_display(Selected[0]->Type->AddButtonsHook);
+	    gh_newline();
+	    */
+	    gh_apply(Selected[0]->Type->AddButtonsHook,NIL);
+	}
+    }
+    return SCM_UNSPECIFIED;
+}
+#endif
 
 /**
 **	Enable/disable the global color cycling.
@@ -186,7 +741,6 @@ local SCM CclSetSaturation(SCM saturation)
     SCM old;
 
     old=gh_int2scm(TheUI.Saturation);
-
     i=gh_scm2int(saturation);
     if( i<-100 || i>200 ) {
 	PrintFunction();
@@ -617,6 +1171,24 @@ local MenuButtonId scm2buttonid(SCM value)
     return id;
 }
 
+/// Get an integer value from a list.
+local int SCM_PopInt(SCM * list)
+{
+    SCM value;
+    value=gh_car(*list);
+    *list=gh_cdr(*list);
+    return gh_scm2int(value);
+}
+
+/// Get a string value from a list.
+local char* SCM_PopNewStr(SCM * list)
+{
+    SCM value;
+    value=gh_car(*list);
+    *list=gh_cdr(*list);
+    return gh_scm2newstr(value, NULL);
+}
+
 /**
 **	Define the look+feel of the user interface.
 **
@@ -626,7 +1198,6 @@ local MenuButtonId scm2buttonid(SCM value)
 local SCM CclDefineUI(SCM list)
 {
     SCM value;
-    SCM temp;
     SCM sublist;
     char* str;
     int	x;
@@ -696,661 +1267,527 @@ local SCM CclDefineUI(SCM list)
 
     ui->OriginalResources=TheUI.OriginalResources;
 
+    ui->Resource.File=NULL;
+    ui->ResourceX=-1;
+    ui->ResourceY=-1;
+
+    ui->InfoPanel.File=NULL;
+    ui->InfoPanelX=-1;
+    ui->InfoPanelY=-1;
+
+    ui->ButtonPanel.File=NULL;
+    ui->ButtonPanelX=-1;
+    ui->ButtonPanelY=-1;
+
+    ui->MenuButtonGraphic.File=NULL;
+    ui->MenuButtonGraphicX=-1;
+    ui->MenuButtonGraphicY=-1;
+
+    ui->MinimapPanel.File=NULL;
+    ui->MinimapPanelX=-1;
+    ui->MinimapPanelY=-1;
+
+    ui->MinimapPosX=-1;
+    ui->MinimapPosY=-1;
+
     //
-    //	Now the real values.
+    //	Parse the arguments, already the new tagged format.
+    //  maxy: this could be much simpler
     //
 
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("normal-font-color")) ) {
+    while( !gh_null_p(list) ) {
 	value=gh_car(list);
 	list=gh_cdr(list);
-	ui->NormalFontColor=gh_scm2newstr(value,NULL);
-    }
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("reverse-font-color")) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-	ui->ReverseFontColor=gh_scm2newstr(value,NULL);
-    }
 
-    //	Filler
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("filler")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	ui->NumFillers++;
-	ui->Filler=realloc(ui->Filler,ui->NumFillers*sizeof(*ui->Filler));
-	ui->FillerX=realloc(ui->FillerX,ui->NumFillers*sizeof(*ui->FillerX));
-	ui->FillerY=realloc(ui->FillerY,ui->NumFillers*sizeof(*ui->FillerY));
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+	if( gh_eq_p(value,gh_symbol2scm("normal-font-color")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->NormalFontColor=gh_scm2newstr(value,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("reverse-font-color")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->ReverseFontColor=gh_scm2newstr(value,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("filler")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->NumFillers++;
+	    ui->Filler=realloc(ui->Filler,ui->NumFillers*sizeof(*ui->Filler));
+	    ui->FillerX=realloc(ui->FillerX,ui->NumFillers*sizeof(*ui->FillerX));
+	    ui->FillerY=realloc(ui->FillerY,ui->NumFillers*sizeof(*ui->FillerY));
+	    while( !gh_null_p(sublist) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		ui->Filler[ui->NumFillers-1].File=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->FillerX[ui->NumFillers-1]=gh_scm2int(gh_car(value));
-		ui->FillerY[ui->NumFillers-1]=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else {
-		errl("Unsupported tag",value);
-	    }
-	}
-    }
-
-    //	Resource
-    temp=gh_car(list);
-    if( !gh_list_p(temp) ) {
-        str=NULL;
-        x=-1;
-        y=-1;
-    } else {
-	list=gh_cdr(list);
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-        str=gh_scm2newstr(value,NULL);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        x=gh_scm2int(value);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        y=gh_scm2int(value);
-    }
-
-    ui->Resource.File=str;
-    ui->ResourceX=x;
-    ui->ResourceY=y;
-
-    //	Resource Icons
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("resources")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    SCM slist;
-	    int res;
-	    char* name;
-
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    name=gh_scm2newstr(value,NULL);
-	    for( res=0; res<MaxCosts; ++res ) {
-		if( !strcmp(name,DefaultResourceNames[res]) ) {
-		    break;
-		}
-	    }
-	    if( res==MaxCosts ) {
-		if( !strcmp(name,"food") ) {
-		    res=FoodCost;
-		} else if( !strcmp(name,"score") ) {
-		    res=ScoreCost;
+		if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->Filler[ui->NumFillers-1].File=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->FillerX[ui->NumFillers-1]=gh_scm2int(gh_car(value));
+		    ui->FillerY[ui->NumFillers-1]=gh_scm2int(gh_car(gh_cdr(value)));
 		} else {
-		    errl("Resource not found",value);
+		    errl("Unsupported tag",value);
 		}
 	    }
-	    free(name);
-	    slist=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    while( !gh_null_p(slist) ) {
-		value=gh_car(slist);
-		slist=gh_cdr(slist);
-		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("resource-line")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->Resource.File=SCM_PopNewStr(&sublist);
+	    ui->ResourceX=SCM_PopInt(&sublist);
+	    ui->ResourceY=SCM_PopInt(&sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("resources")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		SCM slist;
+		int res;
+		char* name;
+
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		name=gh_scm2newstr(value,NULL);
+		for( res=0; res<MaxCosts; ++res ) {
+		    if( !strcmp(name,DefaultResourceNames[res]) ) {
+			break;
+		    }
+		}
+		if( res==MaxCosts ) {
+		    if( !strcmp(name,"food") ) {
+			res=FoodCost;
+		    } else if( !strcmp(name,"score") ) {
+			res=ScoreCost;
+		    } else {
+			errl("Resource not found",value);
+		    }
+		}
+		free(name);
+		slist=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		while( !gh_null_p(slist) ) {
 		    value=gh_car(slist);
 		    slist=gh_cdr(slist);
-		    ui->Resources[res].IconX=gh_scm2int(gh_car(value));
-		    ui->Resources[res].IconY=gh_scm2int(gh_car(gh_cdr(value)));
-		} else if( gh_eq_p(value,gh_symbol2scm("file")) ) {
-		    value=gh_car(slist);
-		    slist=gh_cdr(slist);
-		    ui->Resources[res].Icon.File=gh_scm2newstr(value,NULL);
-		} else if( gh_eq_p(value,gh_symbol2scm("row")) ) {
-		    value=gh_car(slist);
-		    slist=gh_cdr(slist);
-		    ui->Resources[res].IconRow=gh_scm2int(value);
+		    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+			value=gh_car(slist);
+			slist=gh_cdr(slist);
+			ui->Resources[res].IconX=gh_scm2int(gh_car(value));
+			ui->Resources[res].IconY=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+			value=gh_car(slist);
+			slist=gh_cdr(slist);
+			ui->Resources[res].Icon.File=gh_scm2newstr(value,NULL);
+		    } else if( gh_eq_p(value,gh_symbol2scm("row")) ) {
+			value=gh_car(slist);
+			slist=gh_cdr(slist);
+			ui->Resources[res].IconRow=gh_scm2int(value);
+		    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+			value=gh_car(slist);
+			slist=gh_cdr(slist);
+			ui->Resources[res].IconW=gh_scm2int(gh_car(value));
+			ui->Resources[res].IconH=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
+			value=gh_car(slist);
+			slist=gh_cdr(slist);
+			ui->Resources[res].TextX=gh_scm2int(gh_car(value));
+			ui->Resources[res].TextY=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else {
+			errl("Unsupported tag",value);
+		    }
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("info-panel")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->InfoPanel.File=SCM_PopNewStr(&sublist);
+	    ui->InfoPanelX=SCM_PopInt(&sublist);
+	    ui->InfoPanelY=SCM_PopInt(&sublist);
+	    ui->InfoPanelW=SCM_PopInt(&sublist);
+	    ui->InfoPanelH=SCM_PopInt(&sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("completed-bar")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( gh_eq_p(value,gh_symbol2scm("color")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->CompleteBarColor=gh_scm2int(value);
+		} else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->CompleteBarX=gh_scm2int(gh_car(value));
+		    ui->CompleteBarY=gh_scm2int(gh_car(gh_cdr(value)));
 		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		    value=gh_car(slist);
-		    slist=gh_cdr(slist);
-		    ui->Resources[res].IconW=gh_scm2int(gh_car(value));
-		    ui->Resources[res].IconH=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->CompleteBarW=gh_scm2int(gh_car(value));
+		    ui->CompleteBarH=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->CompleteBarText=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->CompleteBarFont=CclFontByIdentifier(value);
 		} else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
-		    value=gh_car(slist);
-		    slist=gh_cdr(slist);
-		    ui->Resources[res].TextX=gh_scm2int(gh_car(value));
-		    ui->Resources[res].TextY=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->CompleteTextX=gh_scm2int(gh_car(value));
+		    ui->CompleteTextY=gh_scm2int(gh_car(gh_cdr(value)));
 		} else {
 		    errl("Unsupported tag",value);
 		}
 	    }
-	}
-    }
-
-    //	Info Panel
-    temp=gh_car(list);
-    if( !gh_list_p(temp) ) {
-	str=NULL;
-	x=-1;
-	y=-1;
-    } else {
-	list=gh_cdr(list);
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	str=gh_scm2newstr(value,NULL);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        x=gh_scm2int(value);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        y=gh_scm2int(value);
-    }
-
-    ui->InfoPanel.File=str;
-    ui->InfoPanelX=x;
-    ui->InfoPanelY=y;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->InfoPanelW=x;
-    ui->InfoPanelH=y;
-
-    //	Completed Bar
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("completed-bar")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("color")) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("button-panel")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->ButtonPanel.File=SCM_PopNewStr(&sublist);
+	    ui->ButtonPanelX=SCM_PopInt(&sublist);
+	    ui->ButtonPanelY=SCM_PopInt(&sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("map-area")) ) {
+	    int w;
+	    int h;
+	    
+	    w=0;
+	    h=0;
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		ui->CompleteBarColor=gh_scm2int(value);
-	    } else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->CompleteBarX=gh_scm2int(gh_car(value));
-		ui->CompleteBarY=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->CompleteBarW=gh_scm2int(gh_car(value));
-		ui->CompleteBarH=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->CompleteBarText=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->CompleteBarFont=CclFontByIdentifier(value);
-	    } else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->CompleteTextX=gh_scm2int(gh_car(value));
-		ui->CompleteTextY=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else {
-		errl("Unsupported tag",value);
-	    }
-	}
-    }
-
-    //	Button Panel
-    temp=gh_car(list);
-    if( !gh_list_p(temp) ) {
-	str=NULL;
-	x=-1;
-	y=-1;
-    } else {
-	list=gh_cdr(list);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        str=gh_scm2newstr(value,NULL);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        x=gh_scm2int(value);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        y=gh_scm2int(value);
-    }
-
-    ui->ButtonPanel.File=str;
-    ui->ButtonPanelX=x;
-    ui->ButtonPanelY=y;
-
-    // The Map
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("map-area")) ) {
-	int w;
-	int h;
-
-	w=0;
-	h=0;
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->MapArea.X=gh_scm2int(gh_car(value));
-		ui->MapArea.Y=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		w=gh_scm2int(gh_car(value));
-		h=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else {
-		errl("Unsupported tag",value);
-	    }
-	}
-	ui->MapArea.EndX=ui->MapArea.X+w-1;
-	ui->MapArea.EndY=ui->MapArea.Y+h-1;
-    }
-
-    //	Menu Button
-    temp=gh_car(list);
-    if( !gh_list_p(temp) ) {
-	str=NULL;
-	x=-1;
-	y=-1;
-    } else {
-	list=gh_cdr(list);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        str=gh_scm2newstr(value,NULL);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        x=gh_scm2int(value);
-        value=gh_car(temp);
-        temp=gh_cdr(temp);
-        y=gh_scm2int(value);
-
-    }
-
-    ui->MenuButtonGraphic.File=str;
-    ui->MenuButtonGraphicX=x;
-    ui->MenuButtonGraphicY=y;
-
-    //	Minimap
-    temp=gh_car(list);
-    list=gh_cdr(list);
-
-    if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
-    }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-
-    ui->Minimap.File=str;
-    ui->MinimapX=x;
-    ui->MinimapY=y;
-
-    //	Status Line
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("status-line")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("file")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->StatusLine.File=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->StatusLineX=gh_scm2int(gh_car(value));
-		ui->StatusLineY=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->StatusLineTextX=gh_scm2int(gh_car(value));
-		ui->StatusLineTextY=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->StatusLineFont=CclFontByIdentifier(value);
-	    } else {
-		errl("Unsupported tag",value);
-	    }
-	}
-    }
-
-    //	Buttons
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("menu-button")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->MenuButton.X=gh_scm2int(gh_car(value));
-		ui->MenuButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->MenuButton.Width=gh_scm2int(gh_car(value));
-		ui->MenuButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->MenuButton.Text=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->MenuButton.Button=scm2buttonid(value);
-	    } else {
-		errl("Unsupported tag",value);
-	    }
-	}
-    }
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("network-menu-button")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkMenuButton.X=gh_scm2int(gh_car(value));
-		ui->NetworkMenuButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkMenuButton.Width=gh_scm2int(gh_car(value));
-		ui->NetworkMenuButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkMenuButton.Text=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkMenuButton.Button=scm2buttonid(value);
-	    } else {
-		errl("Unsupported tag",value);
-	    }
-	}
-    }
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("network-diplomacy-button")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkDiplomacyButton.X=gh_scm2int(gh_car(value));
-		ui->NetworkDiplomacyButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkDiplomacyButton.Width=gh_scm2int(gh_car(value));
-		ui->NetworkDiplomacyButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
-	    } else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkDiplomacyButton.Text=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->NetworkDiplomacyButton.Button=scm2buttonid(value);
-	    } else {
-		errl("Unsupported tag",value);
-	    }
-	}
-    }
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("info-buttons")) ) {
-	SCM slist;
-	SCM sslist;
-	Button* b;
-
-	slist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(slist) ) {
-	    sslist=gh_car(slist);
-	    slist=gh_cdr(slist);
-	    ui->NumInfoButtons++;
-	    ui->InfoButtons=realloc(ui->InfoButtons,
-		    ui->NumInfoButtons*sizeof(*ui->InfoButtons));
-	    b=&ui->InfoButtons[ui->NumInfoButtons-1];
-	    while( !gh_null_p(sslist) ) {
-		value=gh_car(sslist);
-		sslist=gh_cdr(sslist);
 		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		    value=gh_car(sslist);
-		    sslist=gh_cdr(sslist);
-		    b->X=gh_scm2int(gh_car(value));
-		    b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->MapArea.X=gh_scm2int(gh_car(value));
+		    ui->MapArea.Y=gh_scm2int(gh_car(gh_cdr(value)));
 		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		    value=gh_car(sslist);
-		    sslist=gh_cdr(sslist);
-		    b->Width=gh_scm2int(gh_car(value));
-		    b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    w=gh_scm2int(gh_car(value));
+		    h=gh_scm2int(gh_car(gh_cdr(value)));
 		} else {
 		    errl("Unsupported tag",value);
 		}
 	    }
-	}
-    }
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("training-buttons")) ) {
-	SCM slist;
-	SCM sslist;
-	Button* b;
-
-	slist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(slist) ) {
-	    sslist=gh_car(slist);
-	    slist=gh_cdr(slist);
-	    ui->NumTrainingButtons++;
-	    ui->TrainingButtons=realloc(ui->TrainingButtons,
-		    ui->NumTrainingButtons*sizeof(*ui->TrainingButtons));
-	    b=&ui->TrainingButtons[ui->NumTrainingButtons-1];
-	    while( !gh_null_p(sslist) ) {
-		value=gh_car(sslist);
-		sslist=gh_cdr(sslist);
+	    ui->MapArea.EndX=ui->MapArea.X+w-1;
+	    ui->MapArea.EndY=ui->MapArea.Y+h-1;
+	} else if( gh_eq_p(value,gh_symbol2scm("menu-panel")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->MenuButtonGraphic.File=SCM_PopNewStr(&sublist);
+	    ui->MenuButtonGraphicX=SCM_PopInt(&sublist);
+	    ui->MenuButtonGraphicY=SCM_PopInt(&sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("minimap-panel")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->MinimapPanel.File=SCM_PopNewStr(&sublist);
+	    ui->MinimapPanelX=SCM_PopInt(&sublist);
+	    ui->MinimapPanelY=SCM_PopInt(&sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("minimap-pos")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    ui->MinimapPosX=SCM_PopInt(&sublist);
+	    ui->MinimapPosY=SCM_PopInt(&sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("status-line")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->StatusLine.File=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->StatusLineX=gh_scm2int(gh_car(value));
+		    ui->StatusLineY=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->StatusLineTextX=gh_scm2int(gh_car(value));
+		    ui->StatusLineTextY=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->StatusLineFont=CclFontByIdentifier(value);
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("menu-button")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
 		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		    value=gh_car(sslist);
-		    sslist=gh_cdr(sslist);
-		    b->X=gh_scm2int(gh_car(value));
-		    b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->MenuButton.X=gh_scm2int(gh_car(value));
+		    ui->MenuButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
 		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		    value=gh_car(sslist);
-		    sslist=gh_cdr(sslist);
-		    b->Width=gh_scm2int(gh_car(value));
-		    b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->MenuButton.Width=gh_scm2int(gh_car(value));
+		    ui->MenuButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->MenuButton.Text=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->MenuButton.Button=scm2buttonid(value);
 		} else {
 		    errl("Unsupported tag",value);
 		}
 	    }
-	}
-    }
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("button-buttons")) ) {
-	SCM slist;
-	SCM sslist;
-	Button* b;
-
-	slist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(slist) ) {
-	    sslist=gh_car(slist);
-	    slist=gh_cdr(slist);
-	    ui->NumButtonButtons++;
-	    ui->ButtonButtons=realloc(ui->ButtonButtons,
-		    ui->NumButtonButtons*sizeof(*ui->ButtonButtons));
-	    b=&ui->ButtonButtons[ui->NumButtonButtons-1];
-	    while( !gh_null_p(sslist) ) {
-		value=gh_car(sslist);
-		sslist=gh_cdr(sslist);
+	} else if( gh_eq_p(value,gh_symbol2scm("network-menu-button")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
 		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
-		    value=gh_car(sslist);
-		    sslist=gh_cdr(sslist);
-		    b->X=gh_scm2int(gh_car(value));
-		    b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkMenuButton.X=gh_scm2int(gh_car(value));
+		    ui->NetworkMenuButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
 		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
-		    value=gh_car(sslist);
-		    sslist=gh_cdr(sslist);
-		    b->Width=gh_scm2int(gh_car(value));
-		    b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkMenuButton.Width=gh_scm2int(gh_car(value));
+		    ui->NetworkMenuButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkMenuButton.Text=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkMenuButton.Button=scm2buttonid(value);
 		} else {
 		    errl("Unsupported tag",value);
 		}
 	    }
-	}
-    }
+	} else if( gh_eq_p(value,gh_symbol2scm("network-diplomacy-button")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkDiplomacyButton.X=gh_scm2int(gh_car(value));
+		    ui->NetworkDiplomacyButton.Y=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkDiplomacyButton.Width=gh_scm2int(gh_car(value));
+		    ui->NetworkDiplomacyButton.Height=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("caption")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkDiplomacyButton.Text=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("style")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->NetworkDiplomacyButton.Button=scm2buttonid(value);
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("info-buttons")) ) {
+	    SCM slist;
+	    SCM sslist;
+	    Button* b;
 
-    //	Cursors
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("cursors")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    if( gh_eq_p(value,gh_symbol2scm("point")) ) {
+	    slist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(slist) ) {
+		sslist=gh_car(slist);
+		slist=gh_cdr(slist);
+		ui->NumInfoButtons++;
+		ui->InfoButtons=realloc(ui->InfoButtons,
+					ui->NumInfoButtons*sizeof(*ui->InfoButtons));
+		b=&ui->InfoButtons[ui->NumInfoButtons-1];
+		while( !gh_null_p(sslist) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+			value=gh_car(sslist);
+			sslist=gh_cdr(sslist);
+			b->X=gh_scm2int(gh_car(value));
+			b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+			value=gh_car(sslist);
+			sslist=gh_cdr(sslist);
+			b->Width=gh_scm2int(gh_car(value));
+			b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else {
+			errl("Unsupported tag",value);
+		    }
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("training-buttons")) ) {
+	    SCM slist;
+	    SCM sslist;
+	    Button* b;
+
+	    slist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(slist) ) {
+		sslist=gh_car(slist);
+		slist=gh_cdr(slist);
+		ui->NumTrainingButtons++;
+		ui->TrainingButtons=realloc(ui->TrainingButtons,
+					    ui->NumTrainingButtons*sizeof(*ui->TrainingButtons));
+		b=&ui->TrainingButtons[ui->NumTrainingButtons-1];
+		while( !gh_null_p(sslist) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+			value=gh_car(sslist);
+			sslist=gh_cdr(sslist);
+			b->X=gh_scm2int(gh_car(value));
+			b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+			value=gh_car(sslist);
+			sslist=gh_cdr(sslist);
+			b->Width=gh_scm2int(gh_car(value));
+			b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else {
+			errl("Unsupported tag",value);
+		    }
+
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("button-buttons")) ) {
+	    SCM slist;
+	    SCM sslist;
+	    Button* b;
+	    
+	    slist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(slist) ) {
+		sslist=gh_car(slist);
+		slist=gh_cdr(slist);
+		ui->NumButtonButtons++;
+		ui->ButtonButtons=realloc(ui->ButtonButtons,
+					  ui->NumButtonButtons*sizeof(*ui->ButtonButtons));
+		b=&ui->ButtonButtons[ui->NumButtonButtons-1];
+		while( !gh_null_p(sslist) ) {
+		    value=gh_car(sslist);
+		    sslist=gh_cdr(sslist);
+		    if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+			value=gh_car(sslist);
+			sslist=gh_cdr(sslist);
+			b->X=gh_scm2int(gh_car(value));
+			b->Y=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+			value=gh_car(sslist);
+			sslist=gh_cdr(sslist);
+			b->Width=gh_scm2int(gh_car(value));
+			b->Height=gh_scm2int(gh_car(gh_cdr(value)));
+		    } else {
+			errl("Unsupported tag",value);
+		    }
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("cursors")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		ui->Point.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("glass")) ) {
+		if( gh_eq_p(value,gh_symbol2scm("point")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->Point.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("glass")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->Glass.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("cross")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->Cross.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("yellow")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->YellowHair.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("green")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->GreenHair.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("red")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->RedHair.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("scroll")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->Scroll.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-e")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowE.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-ne")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowNE.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-n")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowN.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-nw")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowNW.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-w")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowW.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-sw")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowSW.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-s")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowS.Name=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("arrow-se")) ) {
+		    value=gh_car(sublist);
+		    sublist=gh_cdr(sublist);
+		    ui->ArrowSE.Name=gh_scm2newstr(value,NULL);
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("menu-panels")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    while( !gh_null_p(sublist) ) {
+		MenuPanel** menupanel;
+
+		menupanel=&ui->MenuPanels;
+		while( *menupanel ) {
+		    menupanel=&(*menupanel)->Next;
+		}
+		*menupanel=calloc(1,sizeof(**menupanel));
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		ui->Glass.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("cross")) ) {
+		(*menupanel)->Ident=gh_scm2newstr(value,NULL);
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		ui->Cross.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("yellow")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->YellowHair.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("green")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->GreenHair.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("red")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->RedHair.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("scroll")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->Scroll.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-e")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowE.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-ne")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowNE.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-n")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowN.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-nw")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowNW.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-w")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowW.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-sw")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowSW.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-s")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowS.Name=gh_scm2newstr(value,NULL);
-	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-se")) ) {
-		value=gh_car(sublist);
-		sublist=gh_cdr(sublist);
-		ui->ArrowSE.Name=gh_scm2newstr(value,NULL);
-	    } else {
-		errl("Unsupported tag",value);
+		(*menupanel)->Panel.File=gh_scm2newstr(value,NULL);
 	    }
 	}
-    }
-
-    //	Menu Panels
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("menu-panels")) ) {
-	sublist=gh_car(list);
-	list=gh_cdr(list);
-	while( !gh_null_p(sublist) ) {
-	    MenuPanel** menupanel;
-
-	    menupanel=&ui->MenuPanels;
-	    while( *menupanel ) {
-		menupanel=&(*menupanel)->Next;
-	    }
-	    *menupanel=calloc(1,sizeof(**menupanel));
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    (*menupanel)->Ident=gh_scm2newstr(value,NULL);
-	    value=gh_car(sublist);
-	    sublist=gh_cdr(sublist);
-	    (*menupanel)->Panel.File=gh_scm2newstr(value,NULL);
-	}
-    }
-
-    //	Backgrounds
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("victory-background")) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-	ui->VictoryBackground.File=gh_scm2newstr(value,NULL);
-    }
-    value=gh_car(list);
-    list=gh_cdr(list);
-    if( gh_eq_p(value,gh_symbol2scm("defeat-background")) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
-	ui->DefeatBackground.File=gh_scm2newstr(value,NULL);
     }
 
     return SCM_UNSPECIFIED;
@@ -1512,7 +1949,11 @@ local SCM CclSetShowCommandKey(SCM flag)
 
     old=ShowCommandKey;
     ShowCommandKey=gh_scm2bool(flag);
+#ifndef NEW_UI
     UpdateButtonPanel();
+#else
+    MustRedraw |= RedrawButtonPanel;
+#endif
 
     return gh_bool2scm(old);
 }
@@ -2434,6 +2875,7 @@ local SCM CclDefineMenuGraphics(SCM list)
     return SCM_UNSPECIFIED;
 }
 
+#ifndef NEW_UI
 /**
 **	Define a button.
 **
@@ -2629,6 +3071,205 @@ local SCM CclDefineButton(SCM list)
     }
 
     return SCM_UNSPECIFIED;
+}
+#else
+/**
+**	Define a button.
+**
+**	FIXME: need some general data structure to make this parsing easier.
+**
+**	@param list	List describing the button.
+*/
+local SCM CclAddButton(SCM list)
+{
+    SCM value;
+    char* s1;
+    int pos;
+    ButtonAction ba;
+    pos = -1;
+
+    //DebugLevel3Fn("Add button\n");
+    DebugLevel0Fn("Add button\n");
+
+    memset(&ba,0,sizeof(ba));
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    pos=gh_scm2int(value);
+	} else if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ba.Icon.Name=gh_scm2newstr(value,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("action")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    // Protect the action script against the garbage collector
+	    CclGcProtect(value);
+	    ba.Action=value;
+	} else if( gh_eq_p(value,gh_symbol2scm("key")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    s1=gh_scm2newstr(value,NULL);
+	    ba.Key=*s1;
+	    free(s1);
+	} else if( gh_eq_p(value,gh_symbol2scm("hint")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ba.Hint=gh_scm2newstr(value,NULL);
+	} else {
+	    s1=gh_scm2newstr(value,NULL);
+	    fprintf(stderr,"Unsupported tag %s\n",s1);
+	    free(s1);
+	}
+    }
+
+
+    // maxy: allocated memory goes into currentButtons[], must not be freed
+    AddButton(pos,ba.Icon.Name,ba.Action,ba.Key,ba.Hint);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Remove all displayed buttons from the command panel.
+*/
+local SCM CclRemoveAllButtons(void)
+{
+    CleanButtons();
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Remove a single button from the command panel.
+**
+**	@param id	The button number.
+*/
+local SCM CclRemoveButton(SCM id)
+{
+    RemoveButton(gh_scm2int(id));
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the hook called when the ui enters "set-destination" mode
+**
+**	@param script	The script to run.
+*/
+local SCM CclSetChooseTargetBeginHook(SCM script)
+{
+    if( ChooseTargetBeginHook ) {
+	CclGcUnprotect(ChooseTargetBeginHook);
+    }
+    CclGcProtect(script);
+    ChooseTargetBeginHook = script;
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the hook called when the ui leaves "set-destination" mode
+**
+**	@param script	The script to run.
+*/
+local SCM CclSetChooseTargetFinishHook(SCM script)
+{
+    if( ChooseTargetFinishHook ) {
+	CclGcUnprotect(ChooseTargetFinishHook);
+    }
+    CclGcProtect(script);
+    ChooseTargetFinishHook = script;
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the hook called when the units selection was changed.
+**
+**	@param script	The script to run.
+*/
+local SCM CclSetSelectionChangedHook(SCM script)
+{
+    if( SelectionChangedHook ) {
+	CclGcUnprotect(SelectionChangedHook);
+    }
+    CclGcProtect(script);
+    SelectionChangedHook = script;
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set the hook when the selected unit was updated.
+**
+**	@param script	The script to run.
+*/
+local SCM CclSetSelectedUnitChangedHook(SCM script)
+{
+    if( SelectedUnitChangedHook ) {
+	CclGcUnprotect(SelectedUnitChangedHook);
+    }
+    CclGcProtect(script);
+    SelectedUnitChangedHook = script;
+    return SCM_UNSPECIFIED;
+}
+#endif
+
+/**
+**	Run the set-selection-changed-hook.
+*/
+global void SelectionChanged(void)
+{
+#ifndef NEW_UI
+    UpdateButtonPanel();
+    MustRedraw|=RedrawInfoPanel;
+#else
+    // could be in the middle of choosing a place to build when a
+    // worker gets killed
+    ChooseTargetFinish();
+
+    if (!GameRunning) {
+	return;
+    }
+    DebugLevel0Fn("Calling the selection-changed-hook.\n");
+    if( !gh_null_p(SelectionChangedHook) ) {
+	//if( [ccl debugging] ) {               // display executed command
+	gh_display(SelectionChangedHook);
+	gh_newline();
+	//}
+	gh_apply(SelectionChangedHook, NIL);
+    } else {
+	DebugLevel0Fn("Hook empty!\n");
+    }
+    MustRedraw|=RedrawInfoPanel;
+#endif
+}
+
+/**
+**      The selected unit has been altered.
+*/
+global void SelectedUnitChanged(void)
+{
+#ifndef NEW_UI
+    UpdateButtonPanel();
+#else
+    DebugLevel0Fn("Calling the selected-unit-changed-hook.\n");
+    if (!GameRunning) {
+	return;
+    }
+    if( !gh_null_p(SelectionChangedHook) ) {
+	//if( [ccl debugging] ) {               // display executed command
+	//gh_display(gh_car(SelectedUnitChangedHook));
+	//gh_display(SelectedUnitChangedHook);
+	//gh_newline();
+	//}
+	gh_apply(SelectedUnitChangedHook, NIL);
+    } else {
+	DebugLevel0Fn("Hook empty!\n");
+    }
+#endif
 }
 
 /**
@@ -2962,7 +3603,17 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("right-button-moves",CclRightButtonMoves);
     gh_new_procedure1_0("set-fancy-buildings!",CclSetFancyBuildings);
 
+#ifndef NEW_UI
     gh_new_procedureN("define-button",CclDefineButton);
+#else
+    gh_new_procedure1_0("set-selection-changed-hook",CclSetSelectionChangedHook);
+    gh_new_procedure1_0("set-selected-unit-changed-hook",CclSetSelectedUnitChangedHook);
+    gh_new_procedure1_0("set-choose-target-begin-hook",CclSetChooseTargetBeginHook);
+    gh_new_procedure1_0("set-choose-target-finish-hook",CclSetChooseTargetFinishHook);
+    gh_new_procedureN("add-button",CclAddButton);
+    gh_new_procedure1_0("remove-button",CclRemoveButton);
+    gh_new_procedure0_0("remove-all-buttons",CclRemoveAllButtons);
+#endif
 
     gh_new_procedureN("define-menu-item",CclDefineMenuItem);
     gh_new_procedureN("define-menu",CclDefineMenu);
@@ -2999,6 +3650,48 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("reset-keystroke-help",CclResetKeystrokeHelp);
     gh_new_procedureN("add-keystroke-help",CclAddKeystrokeHelp);
 
+#ifdef NEW_UI
+    //
+    //  Commands for buttons
+    //
+    gh_new_procedure0_0("command-patrol",CclCommandPatrol);
+    gh_new_procedure0_0("command-harvest",CclCommandHarvest);
+    gh_new_procedure0_0("command-attack",CclCommandAttack);
+    gh_new_procedure0_0("command-cancel-upgrade",CclCommandCancelUpgrade);
+    gh_new_procedure1_0("command-build",CclCommandBuild);
+    gh_new_procedure1_0("command-train-unit",CclCommandTrainUnit);
+    gh_new_procedure1_0("command-cast-spell",CclCommandCastSpell);
+    gh_new_procedure0_0("command-move",CclCommandMove);
+    gh_new_procedure0_0("command-stop",CclCommandStop);
+    gh_new_procedure1_0("command-research",CclCommandResearch);
+    gh_new_procedure0_0("command-unload",CclCommandUnload);
+    gh_new_procedure1_0("command-upgrade-to",CclCommandUpgradeTo);
+    gh_new_procedure0_0("command-attack-ground",CclCommandAttackGround);
+    gh_new_procedure0_0("command-return-goods",CclCommandReturnGoods);
+    gh_new_procedure0_0("command-cancel",CclCommandCancel);
+    gh_new_procedure0_0("command-cancel-building",CclCommandCancelBuilding);
+    gh_new_procedure0_0("command-cancel-train-unit",CclCommandCancelTrainUnit);
+    gh_new_procedure0_0("command-repair",CclCommandRepair);
+    gh_new_procedure0_0("command-stand-ground",CclCommandStandGround);
+    gh_new_procedure0_0("command-demolish",CclCommandDemolish);
+
+    gh_new_procedure1_0("check-allowed",CclCheckAllowed);
+    gh_new_procedure1_0("get-cost-string",CclGetCostString);
+
+    //
+    //  FIXME: make those functions use an unit handle instead
+    //  and add (get-selected-unit).
+    //
+    gh_new_procedure0_0("selected-is-building",CclSelectedIsBuilding);
+    gh_new_procedure0_0("selected-is-training",CclSelectedIsTraining);
+    gh_new_procedure0_0("selected-is-upgrading",CclSelectedIsUpgrading);
+    gh_new_procedure0_0("selected-get-race",CclSelectedGetRace);
+    gh_new_procedure0_0("selected-get-speed",CclSelectedGetSpeed);
+    gh_new_procedure0_0("selected-owned-by-player",CclSelectedOwnedByPlayer);
+    gh_new_procedure0_0("selected-mixed-units",CclSelectedMixedUnits);
+    gh_new_procedure0_0("selected-draw-buttons",CclSelectedDrawButtons);
+
+#endif
     InitMenuFuncHash();
 }
 

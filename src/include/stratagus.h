@@ -404,7 +404,10 @@ enum _must_redraw_flags_ {
     RedrawButtonPanel	= 1<<16,	/// Unit buttons
     RedrawFillers	= 1<<17,	/// Fillers
     RedrawMinimapBorder	= 1<<18,	/// Area around minimap
+    
+#ifndef NEW_UI
     RedrawCosts		= 1<<19,	/// Costs in status line
+#endif
     RedrawMenuButton	= 1<<20,	/// Area above minimap
     RedrawMinimapCursor	= 1<<21,	/// Minimap cursor changed
     RedrawMenu		= 1<<22,	/// Menu

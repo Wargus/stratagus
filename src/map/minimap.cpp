@@ -101,7 +101,8 @@ global void UpdateMinimapXY(int tx,int ty)
     int y;
     int scale;
 
-    if( !(scale=(MinimapScale/MINIMAP_FAC)) ) {
+    scale=MinimapScale/MINIMAP_FAC;
+    if( scale == 0 ) {
 	scale=1;
     }
     //
@@ -257,14 +258,12 @@ global void UpdateMinimap(void)
     }
 
     //
-    //	Draw the mini-map background.	Note draws a little too much.
+    //	Set the pixels on the minimap background to transparent (0).
     //
-    // FIXME: position of the minimap in the graphic is hardcoded (24x2)
-    for( h=0; h<MINIMAP_H; ++h ) {
-	memcpy(&((unsigned char*)MinimapGraphic->Frames)[h*MINIMAP_W],
-	    &((unsigned char*)TheUI.Minimap.Graphic->Frames)[24+(h+2)*TheUI.Minimap.Graphic->Width],
-	    TheUI.Minimap.Graphic->Width);
-    }
+    // FIXME: make the image really use colorkey
+    // FIXME: I think this is only necessary on each map size change?
+    //        Or maybe if you disable displaying terrain, too?
+    memset(MinimapGraphic->Frames, 0, MINIMAP_W*MINIMAP_H);
 
     //
     //	Draw the terrain
@@ -405,9 +404,13 @@ global void UpdateMinimap(void)
 global void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))
 {
+   // draw background
+    VideoDrawSub(TheUI.MinimapPanel.Graphic,0,0
+	    ,TheUI.MinimapPanel.Graphic->Width,TheUI.MinimapPanel.Graphic->Height
+	    ,TheUI.MinimapPanelX,TheUI.MinimapPanelY);
     VideoDrawSub(MinimapGraphic,0,0
 	    ,MinimapGraphic->Width,MinimapGraphic->Height
-	    ,TheUI.MinimapX+24,TheUI.MinimapY+2);
+	    ,TheUI.MinimapPosX,TheUI.MinimapPosY);
 }
 
 /**
@@ -440,9 +443,9 @@ global void DrawMinimapCursor(int vx, int vy)
     // Determine and save region below minimap cursor
     // FIXME: position of the minimap in the graphic is hardcoded (24x2)
     OldMinimapCursorX=x=
-	TheUI.MinimapX+24+MinimapX+(vx*MinimapScale)/MINIMAP_FAC;
+	TheUI.MinimapPosX+MinimapX+(vx*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorY=y=
-	TheUI.MinimapY+2+MinimapY+(vy*MinimapScale)/MINIMAP_FAC;
+	TheUI.MinimapPosY+MinimapY+(vy*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorW=w=
 	(TheUI.SelectedViewport->MapWidth*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorH=h=
@@ -473,7 +476,7 @@ global int ScreenMinimap2MapX(int x)
 {
     int tx;
 
-    tx=((((x)-TheUI.MinimapX-24-MinimapX)*MINIMAP_FAC)/MinimapScale);
+    tx=((((x)-TheUI.MinimapPosX-MinimapX)*MINIMAP_FAC)/MinimapScale);
     if( tx<0 ) {
 	return 0;
     }
@@ -490,7 +493,7 @@ global int ScreenMinimap2MapY(int y)
 {
     int ty;
 
-    ty=((((y)-TheUI.MinimapY-2-MinimapY)*MINIMAP_FAC)/MinimapScale);
+    ty=((((y)-TheUI.MinimapPosY-MinimapY)*MINIMAP_FAC)/MinimapScale);
     if( ty<0 ) {
 	return 0;
     }

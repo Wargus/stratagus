@@ -106,13 +106,14 @@ global void HandleActionResearch(Unit* unit)
 	unit->SubAction=0;
 
 	// Upgrade can change all
-	UpdateButtonPanel();
-	MustRedraw|=RedrawPanels;
+	SelectedUnitChanged();
+	MustRedraw|=RedrawInfoPanel;
 
 	return;
     }
 
     if( IsOnlySelected(unit) ) {
+	// refresh info panel (to show progress, I think)
 	MustRedraw|=RedrawInfoPanel;
     }
 

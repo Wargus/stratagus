@@ -256,9 +256,11 @@ typedef struct _ui_ {
 		NetworkDiplomacyButton;
 
     // The minimap
-    GraphicConfig Minimap;		/// minimap panel background
-    int		MinimapX;		/// minimap screen X position
-    int		MinimapY;		/// minimap screen Y position
+    GraphicConfig MinimapPanel;		/// minimap panel background
+    int		MinimapPanelX;		/// minimap panel screen X position
+    int		MinimapPanelY;		/// minimap panel screen Y position
+    int		MinimapPosX;		/// minimap screen X position
+    int		MinimapPosY;		/// minimap screen Y position
     int		ViewportCursorColor;	/// minimap cursor color
 
     // The status line
