@@ -35,13 +35,6 @@
 
 #define MINIMAP_FAC	(16*3)		/// integer scale factor
 
-    ///	Convert minimap cursor X position to tile map coordinate.
-#define Minimap2MapX(x)	\
-    ((((x)-TheUI.MinimapX-24-MinimapX)*MINIMAP_FAC)/MinimapScale)
-
-    ///	Convert minimap cursor Y position to tile map coordinate.
-#define Minimap2MapY(y)	\
-    ((((y)-TheUI.MinimapY-2-MinimapY)*MINIMAP_FAC)/MinimapScale)
 
     /// Update seen tile change in minimap
 #define UpdateMinimapSeenXY(tx,ty)
@@ -64,16 +57,21 @@ extern int MinimapShowSelected;		/// highlight selected units
 
     /// Update tile change in minimap
 extern void UpdateMinimapXY(int tx,int ty);
-    /// Update complete minimap.
+    /// Update complete minimap
 extern void UpdateMinimap(void);
-    /// Create new minimap.
+    /// Create new minimap
 extern void CreateMinimap(void);
-    /// Draw minimap with viewpoint.
+    /// Draw minimap with viewpoint
 extern void DrawMinimap(int vx,int vy);
-    /// Hide minimap cursor.
+    /// Hide minimap cursor
 extern void HideMinimapCursor(void);
-    /// Draw minimap viewpoint cursor.
+    /// Draw minimap viewpoint cursor
 extern void DrawMinimapCursor(int vx,int vy);
+
+    ///	Convert minimap cursor X position to tile map coordinate
+extern int ScreenMinimap2MapX(int);
+    ///	Convert minimap cursor Y position to tile map coordinate
+extern int ScreenMinimap2MapY(int);
 
 //@}
 
