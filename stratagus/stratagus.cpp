@@ -31,132 +31,132 @@
 //@{
 
 /**
-**		@mainpage
+** @mainpage
 **
-**		@section Introduction Introduction
+** @section Introduction Introduction
 **
-**		Welcome to the source code documentation of the Stratagus engine.
-**		For an open source project it is very important to have a good
-**		source code documentation, I have tried to do this with the help
-**		of doxygen (http://www.doxygen.org) or doc++
-**		(http://www.zib.de/Visual/software/doc++/index.html). Please read the
-**		documentation of this nice open source programs, to see how this all
-**		works.
+** Welcome to the source code documentation of the Stratagus engine.
+** For an open source project it is very important to have a good
+** source code documentation, I have tried to do this with the help
+** of doxygen (http://www.doxygen.org) or doc++
+** (http://www.zib.de/Visual/software/doc++/index.html). Please read the
+** documentation of this nice open source programs, to see how this all
+** works.
 **
-**		Any help to improve this documention is welcome. If you didn't
-**		understand something or you found a failure or a wrong spelling
-**		or wrong grammer please write an email (including a patch :).
+** Any help to improve this documention is welcome. If you didn't
+** understand something or you found a failure or a wrong spelling
+** or wrong grammer please write an email (including a patch :).
 **
-**		@section Informations Informations
+** @section Informations Informations
 **
-**		Visit the http://Stratagus.Org web page for the latest news and
-**		../doc/readme.html for other documentations.
+** Visit the http://Stratagus.Org web page for the latest news and
+** ../doc/readme.html for other documentations.
 **
-**		@section Modules Modules
+** @section Modules Modules
 **
-**		This are the main modules of the Stratagus engine.
+** This are the main modules of the Stratagus engine.
 **
-**		@subsection Map Map
+** @subsection Map Map
 **
-**				Handles the map. A map is made from tiles.
+** Handles the map. A map is made from tiles.
 **
-**				@see map.h @see map.c @see tileset.h @see tileset.c
+** @see map.h @see map.c @see tileset.h @see tileset.c
 **
-**		@subsection Unit Unit
+** @subsection Unit Unit
 **
-**				Handles units. Units are ships, flyers, buildings, creatures,
-**				machines.
+** Handles units. Units are ships, flyers, buildings, creatures,
+** machines.
 **
-**				@see unit.h @see unit.c @see unittype.h @see unittype.c
+** @see unit.h @see unit.c @see unittype.h @see unittype.c
 **
-**		@subsection Missile Missile
+** @subsection Missile Missile
 **
-**				Handles missiles. Missiles are all other sprites on map
-**				which are no unit.
+** Handles missiles. Missiles are all other sprites on map
+** which are no unit.
 **
-**				@see missile.h @see missile.c
+** @see missile.h @see missile.c
 **
-**		@subsection Player Player
+** @subsection Player Player
 **
-**				Handles players, all units are owned by a player. A player
-**				could be controlled by a human or a computer.
+** Handles players, all units are owned by a player. A player
+** could be controlled by a human or a computer.
 **
-**				@see player.h @see player.c @see ::Player
+** @see player.h @see player.c @see ::Player
 **
-**		@subsection Sound Sound
+** @subsection Sound Sound
 **
-**				Handles the high and low level of the sound. There are the
-**				background music support, voices and sound effects.
-**				Following low level backends are supported: OSS and SDL.
+** Handles the high and low level of the sound. There are the
+** background music support, voices and sound effects.
+** Following low level backends are supported: OSS and SDL.
 **
-**				@todo adpcm file format support for sound effects
-**				@todo better separation of low and high level, assembler mixing
-**						support.
-**				@todo Streaming support of ogg/mp3 files.
+** @todo adpcm file format support for sound effects
+** @todo better separation of low and high level, assembler mixing
+** support.
+** @todo Streaming support of ogg/mp3 files.
 **
-**				@see sound.h @see sound.c
-**				@see ccl_sound.c @see sound_id.c @see sound_server.c
-**				@see unitsound.c
-**				@see oss_audio.c @see sdl_audio.c
-**				@see mad.c @see ogg.c @see flac.c @see wav.c
+** @see sound.h @see sound.c
+** @see ccl_sound.c @see sound_id.c @see sound_server.c
+** @see unitsound.c
+** @see oss_audio.c @see sdl_audio.c
+** @see mad.c @see ogg.c @see flac.c @see wav.c
 **
-**		@subsection Video Video
+** @subsection Video Video
 **
-**				Handles the high and low level of the graphics.
-**				This also contains the sprite and linedrawing routines.
+** Handles the high and low level of the graphics.
+** This also contains the sprite and linedrawing routines.
 **
-**				See page @ref VideoModule for more information upon supported
-**				features and video platforms.
+** See page @ref VideoModule for more information upon supported
+** features and video platforms.
 **
-**				@see video.h @see video.c
+** @see video.h @see video.c
 **
-**		@subsection Network Network
+** @subsection Network Network
 **
-**				Handles the high and low level of the network protocol.
-**				The network protocol is needed for multiplayer games.
+** Handles the high and low level of the network protocol.
+** The network protocol is needed for multiplayer games.
 **
-**				See page @ref NetworkModule for more information upon supported
-**				features and API.
+** See page @ref NetworkModule for more information upon supported
+** features and API.
 **
-**				@see network.h @see network.c
+** @see network.h @see network.c
 **
-**		@subsection Pathfinder Pathfinder
+** @subsection Pathfinder Pathfinder
 **
-**				@see pathfinder.h @see pathfinder.c
+** @see pathfinder.h @see pathfinder.c
 **
-**		@subsection AI AI
+** @subsection AI AI
 **
-**				There are currently two AI's. The old one is very hardcoded,
-**				but does things like placing buildings better than the new.
-**				The old AI shouldn't be used.  The new is very flexible, but
-**				very basic. It includes none optimations.
+** There are currently two AI's. The old one is very hardcoded,
+** but does things like placing buildings better than the new.
+** The old AI shouldn't be used.  The new is very flexible, but
+** very basic. It includes none optimations.
 **
-**				See page @ref AiModule for more information upon supported
-**				features and API.
+** See page @ref AiModule for more information upon supported
+** features and API.
 **
-**				@see new_ai.c ai_local.h
-**				@see ai.h @see ai.c
+** @see new_ai.c ai_local.h
+** @see ai.h @see ai.c
 **
-**		@subsection CCL CCL
+** @subsection CCL CCL
 **
-**				CCL is Craft Configuration Language, which is used to
-**				configure and customize Stratagus.
+** CCL is Craft Configuration Language, which is used to
+** configure and customize Stratagus.
 **
-**				@see script.h @see script.c
+** @see script.h @see script.c
 **
-**		@subsection Icon Icon
+** @subsection Icon Icon
 **
-**				@see icons.h @see icons.c
+** @see icons.h @see icons.c
 **
-**		@subsection Editor Editor
+** @subsection Editor Editor
 **
-**				This is the integrated editor, it shouldn't be a perfect
-**				editor. It is used to test new features of the engine.
+** This is the integrated editor, it shouldn't be a perfect
+** editor. It is used to test new features of the engine.
 **
-**				See page @ref EditorModule for more information upon supported
-**				features and API.
+** See page @ref EditorModule for more information upon supported
+** features and API.
 **
-**				@see editor.h @see editor.c
+** @see editor.h @see editor.c
 */
 
 /*----------------------------------------------------------------------------
@@ -230,45 +230,45 @@ extern int CclUnits(lua_State* l);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-TitleScreen** TitleScreens;          /// Title screens to show at startup
-char* MenuMusic;                     /// File for menu music
-char* StratagusLibPath;              /// Path for data directory
-char LocalPlayerName[16];            /// Name of local player
+TitleScreen** TitleScreens;          ///< Title screens to show at startup
+char* MenuMusic;                     ///< File for menu music
+char* StratagusLibPath;              ///< Path for data directory
+char LocalPlayerName[16];            ///< Name of local player
 
 	/// Name, Version, Copyright
 char NameLine[] =
 	"Stratagus V" VERSION ", (c) 1998-2004 by The Stratagus Project.";
 
-static char* MapName;                        /// Filename of the map to load
-char* CompileOptions;                /// Compile options.
+static char* MapName;                ///< Filename of the map to load
+char* CompileOptions;                ///< Compile options.
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
 
-int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
-int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
-int SpeedBuild = 1;                  /// speed factor for building
-int SpeedTrain = 1;                  /// speed factor for training
-int SpeedUpgrade = 1;                /// speed factor for upgrading
-int SpeedResearch = 1;               /// speed factor for researching
+int SpeedResourcesHarvest[MaxCosts]; ///< speed factor for harvesting resources
+int SpeedResourcesReturn[MaxCosts];  ///< speed factor for returning resources
+int SpeedBuild = 1;                  ///< speed factor for building
+int SpeedTrain = 1;                  ///< speed factor for training
+int SpeedUpgrade = 1;                ///< speed factor for upgrading
+int SpeedResearch = 1;               ///< speed factor for researching
 
 /*============================================================================
 ==  DISPLAY
 ============================================================================*/
 
 // FIXME: not the correct place
-int MustRedraw = RedrawEverything;   /// Redraw flags
-int EnableRedraw = RedrawEverything; /// Enable flags
+int MustRedraw = RedrawEverything;   ///< Redraw flags
+int EnableRedraw = RedrawEverything; ///< Enable flags
 
-unsigned long GameCycle;             /// Game simulation cycle counter
-unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
+unsigned long GameCycle;             ///< Game simulation cycle counter
+unsigned long FastForwardCycle;      ///< Cycle to fastforward to in a replay
 
 /*----------------------------------------------------------------------------
 --  Random
 ----------------------------------------------------------------------------*/
 
-unsigned SyncRandSeed;               /// sync random seed value.
+unsigned SyncRandSeed;               ///< sync random seed value.
 
 /**
 **  Inititalize sync rand seed.
@@ -426,9 +426,9 @@ long isqrt(long num)
 ==  MAIN
 ============================================================================*/
 
-static int WaitNoEvent;                      /// Flag got an event
-static int WaitMouseX;                       /// Mouse X position
-static int WaitMouseY;                       /// Mouse Y position
+static int WaitNoEvent;                      ///< Flag got an event
+static int WaitMouseX;                       ///< Mouse X position
+static int WaitMouseY;                       ///< Mouse Y position
 
 /**
 **  Callback for input.
@@ -943,7 +943,7 @@ int main(int argc, char** argv)
 		CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
 	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,
 		 kCFURLPOSIXPathStyle);
-	const char* pathPtr = CFStringGetCStringPtr(macPath, 
+	const char* pathPtr = CFStringGetCStringPtr(macPath,
 		CFStringGetSystemEncoding());
 	Assert(pathPtr);
 	StratagusLibPath = malloc(strlen(pathPtr) + 1);

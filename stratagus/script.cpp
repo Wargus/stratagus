@@ -76,19 +76,19 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-lua_State* Lua;
+lua_State* Lua;                       ///< Structure to work with lua files.
 
-char* CclStartFile;              /// CCL start file
-char* GameName;                  /// Game Preferences
-int CclInConfigFile;             /// True while config file parsing
-int SaveGameLoading;             /// If a Saved Game is Loading
+char* CclStartFile;                   ///< CCL start file
+char* GameName;                       ///< Game Preferences
+int CclInConfigFile;                  ///< True while config file parsing
+int SaveGameLoading;                  ///< If a Saved Game is Loading
 
-char* Tips[MAX_TIPS + 1];        /// Array of tips
-int ShowTips;                    /// Show tips at start of level
-int CurrentTip;                  /// Current tip to display
-int NoRandomPlacementMultiplayer = 0;///Disable the random placement of players in muliplayer mode
+char* Tips[MAX_TIPS + 1];             ///< Array of tips
+int ShowTips;                         ///< Show tips at start of level
+int CurrentTip;                       ///< Current tip to display
+int NoRandomPlacementMultiplayer = 0; ///< Disable the random placement of players in muliplayer mode
 
-char UseHPForXp = 0;             /// true if gain XP by dealing damage, false if by killing.
+char UseHPForXp = 0;                  ///< true if gain XP by dealing damage, false if by killing.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -194,7 +194,7 @@ int LuaLoadFile(const char* file)
 		perror("Can't open file");
 		return -1;
 	}
-					
+
 	size = 10000;
 	buf = (char*)malloc(size);
 	location = 0;
@@ -254,7 +254,7 @@ static int CclSaveGame(lua_State* l)
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
 		value = LuaToString(l, -2);
-		
+
 		if (!strcmp(value, "SaveFile")) {
 			strcpy(CurrentMapPath, LuaToString(l, -1));
 			// If .pud, we don't need to load anything from it
@@ -465,7 +465,7 @@ static int CclSetLocalPlayerName(lua_State* l)
 **
 **  @param l  Lua state.
 **
-**	@return 0.
+** @return 0.
 */
 static int ScriptSetUseHPForXp(lua_State* l)
 {
