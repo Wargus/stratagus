@@ -10,7 +10,7 @@
 //
 /**@name X11.c		-	XWindows support. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer and Valery Shchedrin
+//	(c) Copyright 1998-2002 by Lutz Sammer and Valery Shchedrin
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -88,7 +88,9 @@ local struct timeval X11TicksStart;	/// My counter start
 --	Sync
 ----------------------------------------------------------------------------*/
 
-#if 1
+#define USE_ITIMER
+
+#ifdef USE_ITIMER
 
 /*
 **	The timer resolution is 10ms, which make the timer useless for us.
@@ -135,20 +137,6 @@ global void SetVideoSync(void)
 	itv.it_interval.tv_sec,itv.it_interval.tv_usec);
 }
 
-#if 0
-/**
-**	Watch opening/closing of X11 connections
-*/
-local void MyConnectionWatch
-	(Display* display,XPointer client,int fd,Bool flag,XPointer* data)
-{
-    DebugLevel0Fn(": fildes %d flag %d\n",fd,flag);
-    if( flag ) {			// file handle opened
-    } else {				// file handle closed
-    }
-}
-#endif
-
 #else
 
 /**
@@ -158,6 +146,20 @@ global void SetVideoSync(void)
 {
 }
 
+#endif
+
+#if 0
+/**
+**	Watch opening/closing of X11 connections. (not needed)
+*/
+local void MyConnectionWatch
+	(Display* display,XPointer client,int fd,Bool flag,XPointer* data)
+{
+    DebugLevel0Fn(": fildes %d flag %d\n",fd,flag);
+    if( flag ) {			// file handle opened
+    } else {				// file handle closed
+    }
+}
 #endif
 
 /**
@@ -190,77 +192,75 @@ global unsigned long X11GetTicks(void)
 **	@param palette	   Array denoting which entries in above palette are
 **                         defined by this function.
 */
-local void AllocPalette8( Palette *palette,
-                          Palette *syspalette,
-                          unsigned long syspalette_defined[8] )
+local void AllocPalette8(Palette * palette, Palette * syspalette,
+    unsigned long syspalette_defined[8])
 {
-  XWindowAttributes xwa;
-  XColor color;
-  int average, i, warning_given;
+    XWindowAttributes xwa;
+    XColor color;
+    int average;
+    int i;
+    int warning_given;
 
-  XGetWindowAttributes( TheDisplay, TheMainWindow, &xwa );
-  average     = 0;
-  color.pad   = 0;
-  color.flags = DoRed | DoGreen | DoBlue;
-  warning_given=0;
+    XGetWindowAttributes(TheDisplay, TheMainWindow, &xwa);
+    average = 0;
+    color.pad = 0;
+    color.flags = DoRed | DoGreen | DoBlue;
+    warning_given = 0;
 
-  for ( i = 0; i <= 7; i++ )
-    syspalette_defined[i]=0;
-
-  for ( i = 0; i <= 255; i++, palette++ )
-  {
-    unsigned int r, g, b;
-
-  // -> Video
-    color.red   = (r=palette->r) << 8;
-    color.green = (g=palette->g) << 8;
-    color.blue  = (b=palette->b) << 8;
-    if ( XAllocColor( TheDisplay, xwa.colormap, &color ) )
-    {
-      unsigned long bit;
-      int j;
-
-      if ( color.pixel > 255 ) // DEBUG: should not happen?
-      {
-        fprintf( stderr, "System 8bit color above unsupported 255\n" );
-        exit( -1 );
-      }
-
-    // Fill palette, to get from system to RGB
-      j   = color.pixel>>5;
-      bit = 1 << (color.pixel&0x1F);
-      if ( syspalette_defined[j] & bit )
-      {
-      // multiple RGB matches for one sytem color, average RGB values
-      // Note: happens when a palette with duplicate RGB values is used, but
-      //       might also happen for another reason?
-        r += syspalette[color.pixel].r + 1;
-        r >>= 1;
-        g += syspalette[color.pixel].g + 1;
-        g >>= 1;
-        b += syspalette[color.pixel].b + 1;
-        b >>= 1;
-        average++;
-      }
-      else syspalette_defined[j] |= bit;
-
-      syspalette[color.pixel].r = r;
-      syspalette[color.pixel].g = g;
-      syspalette[color.pixel].b = b;
+    for (i = 0; i <= 7; i++) {
+	syspalette_defined[i] = 0;
     }
-    else if ( !warning_given )
-    {//Note: this may also happen when more then 256 colors are tried..
-     //      Use VideoFreePalette to unallocate..
-      warning_given=1;
-      fprintf( stderr,
-               "Cannot allocate 8pp color\n"
-               "Probably another application has taken some colors..\n" );
+
+    for (i = 0; i <= 255; i++, palette++) {
+	unsigned int r, g, b;
+
+	// -> Video
+	color.red = (r = palette->r) << 8;
+	color.green = (g = palette->g) << 8;
+	color.blue = (b = palette->b) << 8;
+	if (XAllocColor(TheDisplay, xwa.colormap, &color)) {
+	    unsigned long bit;
+	    int j;
+
+	    if (color.pixel > 255) {	// DEBUG: should not happen?
+		fprintf(stderr, "System 8bit color above unsupported 255\n");
+		exit(-1);
+	    }
+	    // Fill palette, to get from system to RGB
+	    j = color.pixel >> 5;
+	    bit = 1 << (color.pixel & 0x1F);
+	    if (syspalette_defined[j] & bit) {
+		// multiple RGB matches for one sytem color, average RGB values
+		// Note: happens when a palette with duplicate RGB values is
+		//       used, but might also happen for another reason?
+		r += syspalette[color.pixel].r + 1;
+		r >>= 1;
+		g += syspalette[color.pixel].g + 1;
+		g >>= 1;
+		b += syspalette[color.pixel].b + 1;
+		b >>= 1;
+		average++;
+	    } else {
+		syspalette_defined[j] |= bit;
+	    }
+
+	    syspalette[color.pixel].r = r;
+	    syspalette[color.pixel].g = g;
+	    syspalette[color.pixel].b = b;
+	} else if (!warning_given) {	// Note: this may also happen when
+					// more then 256 colors are tried..
+	    //      Use VideoFreePalette to unallocate..
+	    warning_given = 1;
+	    fprintf(stderr,
+		"Cannot allocate 8pp color\n"
+		"Probably another application has taken some colors..\n");
+	}
     }
-  }
 
 // Denote missing colors
- if ( average )
-   fprintf( stderr, "Only %d unique colors available\n", 256-average );
+    if (average) {
+	fprintf(stderr, "Only %d unique colors available\n", 256 - average);
+    }
 }
 
 /**
@@ -1385,8 +1385,10 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	case 24:
 	    // Disliked by gcc 2.95.2, maybe due to size mismatch
 	    // ((VMemType24*)pixels)[i]=color.pixel;
-	    // ARI: Let's hope XAllocColor did correct RGB/BGR DAC mapping into color.pixel
-	    // The following brute force hack then should be endian safe, well maybe except for vaxen..
+	    // ARI: Let's hope XAllocColor did correct RGB/BGR DAC mapping
+	    // into color.pixel
+	    // The following brute force hack then should be endian safe, well
+	    // maybe except for vaxen..
 	    // Now just tell users to stay away from strict-aliasing..
 	    vp = (char *)(&color.pixel);
 	    ((VMemType24*)pixels)[i].a=vp[0];
