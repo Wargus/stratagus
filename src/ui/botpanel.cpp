@@ -313,10 +313,7 @@ global void DrawButtonPanel(void)
 			SetCosts(0,Upgrades[v].Costs);
 			break;
 		    case B_SpellCast:
-		        {
-			const SpellType* spell = SpellTypeById( v );
-			SetCosts(spell->ManaCost,NULL);
-			}
+			SetCosts(SpellTypeById( v )->ManaCost,NULL);
 			break;
 
 		    default:
@@ -677,10 +674,9 @@ global void DoButtonButtonClicked(int button)
 	case B_CancelTrain:
 	    DebugCheck( Selected[0]->Command.Action!=UnitActionTrain
 		    || !Selected[0]->Command.Data.Train.Count );
+	    SendCommandCancelTraining(Selected[0],0);
 	    ClearStatusLine();
 	    ClearCosts();
-	    SendCommandCancelTraining(Selected[0],0);
-	    UpdateButtonPanel();
 	    break;
 
 	case B_CancelBuild:
@@ -693,6 +689,8 @@ global void DoButtonButtonClicked(int button)
 		        Selected[0]->Command.Data.Builded.Worker);
 #endif
 	    }
+	    ClearStatusLine();
+	    ClearCosts();
 	    break;
 
 	case B_Build:
@@ -723,13 +721,7 @@ global void DoButtonButtonClicked(int button)
 		SetMessage( "Unit training queue is full" );
 	    } else if( PlayerCheckFood(ThisPlayer,type)
 			&& !PlayerCheckUnitType(ThisPlayer,type) ) {
-		PlayerSubUnitType(ThisPlayer,type);
-		DebugLevel0Fn("Train %d - %d,%d,%d\n",
-		    Selected[0]->Command.Action==UnitActionTrain
-			? Selected[0]->Command.Data.Train.Count : 0,
-		    ThisPlayer->Resources[GoldCost],
-		    ThisPlayer->Resources[WoodCost],
-		    ThisPlayer->Resources[OilCost]);
+		//PlayerSubUnitType(ThisPlayer,type);
 		SendCommandTrainUnit(Selected[0],type
 			,!(KeyModifiers&ModifierShift));
 		ClearStatusLine();
@@ -744,25 +736,21 @@ global void DoButtonButtonClicked(int button)
 			,type->Ident
 			,type->_Costs[GoldCost]
 			,type->_Costs[WoodCost]);
-		PlayerSubUnitType(ThisPlayer,type);
+		//PlayerSubUnitType(ThisPlayer,type);
 		SendCommandUpgradeTo(Selected[0],type
 			,!(KeyModifiers&ModifierShift));
 		ClearStatusLine();
 		ClearCosts();
-		UpdateButtonPanel();
-		MustRedraw|=RedrawInfoPanel;
 	    }
 	    break;
 	case B_Research:
 	    i=CurrentButtons[button].Value;
 	    if( !PlayerCheckCosts(ThisPlayer,Upgrades[i].Costs) ) {
-		PlayerSubCosts(ThisPlayer,Upgrades[i].Costs);
+		//PlayerSubCosts(ThisPlayer,Upgrades[i].Costs);
 		SendCommandResearch(Selected[0],&Upgrades[i]
 			,!(KeyModifiers&ModifierShift));
 		ClearStatusLine();
 		ClearCosts();
-//		FIXME: ? Johns CurrentButtons=CancelUpgradeButtons;
-		MustRedraw|=RedrawInfoPanel;
 	    }
 	    break;
 	default:
