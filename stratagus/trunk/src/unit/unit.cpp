@@ -1240,7 +1240,7 @@ global void UnitIncrementMana(void)
 	    --unit->Blink;
 	}
 
-	if( unit->Type->CanCastSpell && unit->Mana!=255 ) {
+	if( unit->Type->CanCastSpell && unit->Mana!=MaxMana ) {
 	    unit->Mana++;
 
 	    // some frames delayed done my color cycling
