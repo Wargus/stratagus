@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ccl_unit.c	-	The unit ccl functions. */
 //
-//	(c) Copyright 2001-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -282,6 +282,7 @@ local void CclParseOrder(lua_State* l, Order* order)
 			++j;
 			lua_rawgeti(l, -1, j + 1);
 			order->Type = UnitTypeByIdent(LuaToString(l, -1));
+			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "patrol")) {
 			int x1;
