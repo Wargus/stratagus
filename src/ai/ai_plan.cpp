@@ -360,35 +360,70 @@ local int AiFindTarget(const Unit* unit,unsigned char* matrix,
 
 /**
 **	Plan an attack with a force.
+**	We know, that we must use a transporter.
 **
 **	@param force	Pointer on the force.
 **
 **	@return		True if target found, false otherwise.
 **
-**	@todo Perfect planning.
+**	@todo	Perfect planning.
+**		Only works for water transporter!
 */
 global int AiPlanAttack(AiForce* force)
 {
     char* watermatrix;
-    AiUnit* aiunit;
+    const AiUnit* aiunit;
     int x;
     int y;
+    int i;
     int state;
+    Unit* transporter;
 
-    DebugLevel0Fn("Planning for force %d\n" _C_ force-AiPlayer->Force);
+    DebugLevel0Fn("Planning for force #%d of player #%d\n"
+	_C_ force-AiPlayer->Force _C_ AiPlayer->Player->Player);
 
     watermatrix=CreateMatrix();
+
     //
     //	Transporter must be already assigned to the force.
     //	NOTE: finding free transportes was too much work for me.
     //
     aiunit=force->Units;
+    state=1;
     while( aiunit ) {
 	if( aiunit->Unit->Type->Transporter ) {
-	    DebugLevel0Fn("Transporter %d\n" _C_ UnitNumber(aiunit->Unit));
+	    DebugLevel0Fn("Transporter #%d\n" _C_ UnitNumber(aiunit->Unit));
 	    AiMarkWaterTransporter(aiunit->Unit,watermatrix);
+	    state=0;
 	}
 	aiunit=aiunit->Next;
+    }
+
+    //
+    //	No transport that belongs to the force.
+    //
+    transporter=NULL;
+    if( state ) {
+	for( i=0; i<AiPlayer->Player->TotalNumUnits; ++i ) { 
+	    Unit* unit;
+
+	    unit=AiPlayer->Player->Units[i];
+	    if( unit->Type->Transporter 
+		    && unit->Orders[0].Action==UnitActionStill
+		    && unit->OrderCount==1 && !unit->OnBoard[0] ) {
+		DebugLevel0Fn("Assign any transporter\n");
+		AiMarkWaterTransporter(unit,watermatrix);
+		// FIXME: can be the wrong transporter.
+		transporter=unit;
+		state=0;
+	    }
+	}
+    }
+
+    if( state ) {			// Absolute no transporter
+	DebugLevel0Fn("No transporter available\n");
+	// FIXME: should tell the resource manager we need a transporter!
+	return 0;
     }
 
     //
@@ -410,6 +445,17 @@ global int AiPlanAttack(AiForce* force)
     }
 
     if( AiFindTarget(aiunit->Unit,watermatrix,&x,&y,&state) ) {
+	AiUnit* aiunit;
+
+	if( transporter ) {
+	    aiunit=malloc(sizeof(*aiunit));
+	    aiunit->Next=force->Units;
+	    force->Units=aiunit;
+	    aiunit->Unit=transporter;
+	    RefsDebugCheck( transporter->Destroyed || !transporter->Refs );
+	    ++transporter->Refs;
+	}
+
 	DebugLevel0Fn("Can attack\n");
 	force->GoalX=x;
 	force->GoalY=y;
