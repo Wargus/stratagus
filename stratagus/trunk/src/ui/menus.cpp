@@ -5402,12 +5402,12 @@ global void InitMenuData(void)
 */
 global void InitMenuFunctions(void)
 {
+#ifdef HAVE_EXPANSION
     Menu *menu;
 
     //
     //	Autodetect the swamp tileset
     //
-#ifdef HAVE_EXPANSION
     strcpy(ScenSelectFullPath, FreeCraftLibPath);
     if (ScenSelectFullPath[0]) {
 	strcat(ScenSelectFullPath, "/graphics/tilesets/");
