@@ -279,67 +279,80 @@ local SCM CclDisplaySounds(void) {
 */
 local SCM CclDefineGameSounds(SCM list)
 {
-    //based on Johns CclGameMap function
-    //FIXME: need much more error checking and handling
     //FIXME: should allow to define ALL the game sounds
-    SCM name;
+    SCM value;
     SCM data;
+    SCM sublist;
     char* str;
+    int i;
 
     while( !gh_null_p(list) ) {
 
-	name=gh_car(list);
+	value=gh_car(list);
 	list=gh_cdr(list);
-	if( !gh_symbol_p(name) ) {
+	if( !gh_symbol_p(value) ) {
 	    PrintFunction();
 	    fprintf(stdout,"Symbol expected\n");
 	    return list;
 	}
 	// prepare for next iteration
-	data=gh_car(list);
-	list=gh_cdr(list);
 
 	// let's handle now the different cases
-	if( gh_eq_p(name,gh_symbol2scm("click")) ) {
-	    if ( !CCL_SOUNDP(data) ) {
+	if( gh_eq_p(value,gh_symbol2scm("click")) ) {
+	    data=gh_car(list);
+	    list=gh_cdr(list);
+	    if( !CCL_SOUNDP(data) ) {
 		fprintf(stderr,"Sound id expected\n");
 		return list;
 	    }
 	    GameSounds.Click.Sound=CCL_SOUND_ID(data);
-	} else if ( gh_eq_p(name,gh_symbol2scm("placement-error")) ) {
-	    if ( !CCL_SOUNDP(data) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("placement-error")) ) {
+	    data=gh_car(list);
+	    list=gh_cdr(list);
+	    if( !CCL_SOUNDP(data) ) {
 		fprintf(stderr,"Sound id expected\n");
 		return list;
 	    }
 	    GameSounds.PlacementError.Sound=CCL_SOUND_ID(data);
-	} else if ( gh_eq_p(name,gh_symbol2scm("placement-success")) ) {
-	    if ( !CCL_SOUNDP(data) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("placement-success")) ) {
+	    data=gh_car(list);
+	    list=gh_cdr(list);
+	    if( !CCL_SOUNDP(data) ) {
 		fprintf(stderr,"Sound id expected\n");
 		return list;
 	    }
 	    GameSounds.PlacementSuccess.Sound=CCL_SOUND_ID(data);
-	} else if ( gh_eq_p(name,gh_symbol2scm("repair")) ) {
-	    if ( !CCL_SOUNDP(data) ) {
+	} else if( gh_eq_p(value,gh_symbol2scm("repair")) ) {
+	    data=gh_car(list);
+	    list=gh_cdr(list);
+	    if( !CCL_SOUNDP(data) ) {
 		GameSounds.Repair.Sound=(void*)-1;
 	    } else {
 		GameSounds.Repair.Sound=CCL_SOUND_ID(data);
 	    }
-	} else if ( gh_eq_p(name,gh_symbol2scm("human-rescue")) ) {
-	    if ( !CCL_SOUNDP(data) ) {
-		fprintf(stderr,"Sound id expected\n");
-		return list;
+	} else if( gh_eq_p(value,gh_symbol2scm("rescue")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    str=gh_scm2newstr(gh_car(sublist),NULL);
+	    for( i=0; i<PlayerRaces.Count; ++i ) {
+		if( !strcmp(PlayerRaces.Name[i],str) ) {
+		    break;
+		}
 	    }
-	    GameSounds.HumanRescue.Sound=CCL_SOUND_ID(data);
-	} else if ( gh_eq_p(name,gh_symbol2scm("orc-rescue")) ) {
-	    if ( !CCL_SOUNDP(data) ) {
-		fprintf(stderr,"Sound id expected\n");
-		return list;
-	    }
-	    GameSounds.OrcRescue.Sound=CCL_SOUND_ID(data);
-	} else {
-	    fprintf(stderr,"Incorrect symbol %s\n",
-		    str=gh_scm2newstr(name,NULL));
 	    free(str);
+	    if( i==PlayerRaces.Count ) {
+		fprintf(stderr,"Unknown race: %s\n",str);
+		ExitFatal(1);
+	    }
+	    sublist=gh_cdr(sublist);
+	    data=gh_car(sublist);
+	    if( !CCL_SOUNDP(data) ) {
+		fprintf(stderr,"Sound id expected\n");
+		ExitFatal(1);
+	    }
+	    GameSounds.Rescue[i].Sound=CCL_SOUND_ID(data);
+	} else {
+	    errl("Unsupported tag",value);
 	    return list;
 	}
     }

@@ -10,7 +10,7 @@
 //
 /**@name sound.c	-	The sound. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -80,8 +80,9 @@ global GameSound GameSounds
     { "peasant work complete" , NULL },
     { "basic orc voices work complete" , NULL },
     { "repair" , NULL },
-    { "rescue (human)" , NULL },
-    { "rescue (orc)" , NULL },
+    {	{ "rescue (human) UNUSED" , NULL },
+	{ "rescue (orc) UNUSED" , NULL },
+    }
 }
 #endif
     ;
@@ -311,6 +312,8 @@ global void SetMusicVolume(int volume)
 */
 global void InitSoundClient(void)
 {
+    int i;
+
     if( SoundFildes==-1 ) {		// No sound enabled
 	return;
     }
@@ -355,13 +358,11 @@ global void InitSoundClient(void)
 	GameSounds.Repair.Sound=
 		SoundIdForName(GameSounds.Repair.Name);
     }
-    if( !GameSounds.HumanRescue.Sound ) {
-	GameSounds.HumanRescue.Sound=
-		SoundIdForName(GameSounds.HumanRescue.Name);
-    }
-    if( !GameSounds.OrcRescue.Sound ) {
-	GameSounds.OrcRescue.Sound=
-		SoundIdForName(GameSounds.OrcRescue.Name);
+    for( i=0; i<PlayerRaces.Count; ++i ) {
+	if( !GameSounds.Rescue[i].Sound && GameSounds.Rescue[i].Name ) {
+	    GameSounds.Rescue[i].Sound=
+		    SoundIdForName(GameSounds.Rescue[i].Name);
+	}
     }
 }
 

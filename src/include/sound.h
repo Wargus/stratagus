@@ -63,8 +63,7 @@ typedef struct _game_sound_ {
 
     SoundConfig Repair;			/// repair sound
 
-    SoundConfig HumanRescue;		/// rescue units
-    SoundConfig OrcRescue;		/// rescue units
+    SoundConfig Rescue[MAX_RACES];	/// rescue units
 } GameSound;
 
 typedef enum _play_section_type_ {
