@@ -64,7 +64,7 @@ local SCM CclDefineTilesetWcNames(SCM list)
     TilesetWcNames=cp=malloc((i+1)*sizeof(char*));
     if( !cp ) {
 	fprintf(stderr,"out of memory.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     while( i-- ) {
 	*cp++=gh_scm2newstr(gh_car(list),NULL);
@@ -181,7 +181,7 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
     tileset->Table=realloc(tileset->Table,(index+16)*sizeof(*tileset->Table));
     if( !tileset->Table ) {
 	fprintf(stderr,"out of memory.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     value=gh_car(list);			// name
@@ -243,7 +243,7 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
     tileset->Table=realloc(tileset->Table,(index+256)*sizeof(*tileset->Table));
     if( !tileset->Table ) {
 	fprintf(stderr,"out of memory.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     value=gh_car(list);			// base name
@@ -317,7 +317,7 @@ local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
     tileset->Table=malloc(16*sizeof(*tileset->Table));
     if( !tileset->Table ) {
 	fprintf(stderr,"out of memory.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     //
@@ -399,12 +399,12 @@ local SCM CclDefineTileset(SCM list)
     }
     if( !Tilesets ) {
 	fprintf(stderr,"out of memory.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     Tilesets[type]=tileset=calloc(sizeof(Tileset),1);
     if( !tileset ) {
 	fprintf(stderr,"out of memory.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     Tilesets[type]->Ident=ident;
 

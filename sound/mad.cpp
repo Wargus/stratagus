@@ -131,7 +131,7 @@ local enum mad_flow MAD_write(void *user, struct mad_header const *header,
     if (!sample) {
 	fprintf(stderr, "Out of memory!\n");
 	CLclose(((MyUser *) user)->File);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     p = (short*)(sample->Data + sample->Length);
     sample->Length += i;

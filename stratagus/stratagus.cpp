@@ -730,7 +730,7 @@ global volatile void Exit(int err)
     exit(err);
 }
 
-global volatile void FatalExit(int err)
+global volatile void ExitFatal(int err)
 {
 #ifdef USE_SDLCD 
     if (strcmp(CDMode,":off")) {
@@ -870,7 +870,7 @@ global int main(int argc,char** argv)
 			continue;
 		    default:
 			Usage();
-			FatalExit(-1);
+			ExitFatal(-1);
 		}
 		continue;
 
@@ -883,7 +883,7 @@ global int main(int argc,char** argv)
 		if( !NetworkLag ) {
 		    fprintf(stderr,"FIXME: zero lag not supported\n");
 		    Usage();
-		    FatalExit(-1);
+		    ExitFatal(-1);
 		}
 		continue;
 	    case 'U':
@@ -909,7 +909,7 @@ global int main(int argc,char** argv)
 	    case 'h':
 	    default:
 		Usage();
-		FatalExit(-1);
+		ExitFatal(-1);
 	}
 	break;
     }
@@ -917,7 +917,7 @@ global int main(int argc,char** argv)
     if( argc-optind>1 ) {
 	fprintf(stderr,"too many files\n");
 	Usage();
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     if( argc-optind ) {

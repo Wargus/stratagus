@@ -281,7 +281,7 @@ global MissileType* NewMissileTypeSlot(char* ident)
     mtype=calloc(NumMissileTypes+2,sizeof(MissileType));
     if( !mtype ) {
 	fprintf(stderr,"Out of memory\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     memcpy(mtype,MissileTypes,sizeof(MissileType)*NumMissileTypes);
     if( MissileTypes ) {

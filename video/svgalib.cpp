@@ -190,17 +190,17 @@ global void InitVideoSVGA(void)
     if(vga_init() == -1) {
 	fprintf(stderr, "Cannot initialize svgalib.\n"
                         "(You are possibly not user 'root')\n" );
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     VideoMemory =malloc(VideoWidth * VideoHeight * ((VideoDepth+7) >> 3));
     if(VideoMemory == NULL) {
 	fprintf(stderr, "Cannot allocate virtual screen.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if(atexit(CloseDisplay) == -1) {
 	fprintf(stderr, "Cannot register CloseDisplay.\n");
 	free(VideoMemory);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     mode=G640x480x64K;
@@ -290,7 +290,7 @@ global void InitVideoSVGA(void)
     if(vga_setmode(mode) == -1) {
 	fprintf(stderr, "%dbpp %dx%d mode is not available.\n"
 		,VideoDepth,VideoWidth,VideoHeight);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     vga_info =vga_getmodeinfo(mode);
@@ -306,20 +306,20 @@ global void InitVideoSVGA(void)
     if(mouse_init("/dev/mouse", vga_getmousetype(),
 		MOUSE_DEFAULTSAMPLERATE) == -1) {
 	fprintf(stderr, "Cannot enable mouse.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if(atexit(mouse_close) == -1) {
 	fprintf(stderr, "Cannot register mouse_close.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if(keyboard_init() == -1) {
 	fprintf(stderr, "Cannot switch keyboard to raw mode.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if(atexit(keyboard_close) == -1) {
 	keyboard_close();
 	fprintf(stderr, "Cannot register keyboard_close.\n");
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     setuid(real_uid);

@@ -97,7 +97,7 @@ global Sample* LoadWav(const char* name)
     if (t != WAVE) {
 	printf("Wrong magic %lx (not %x)\n", t, WAVE);
 	CLclose(f);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     CLread(f, &wavfmt, sizeof(wavfmt));
@@ -118,7 +118,7 @@ global Sample* LoadWav(const char* name)
     if (wavfmt.FMTchunk != FMT) {
 	printf("Wrong magic %x (not %x)\n", wavfmt.FMTchunk, FMT);
 	CLclose(f);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if (wavfmt.FMTlength != 16 && wavfmt.FMTlength != 18) {
 	DebugLevel2("Encoding\t%d\t", wavfmt.Encoding);
@@ -130,7 +130,7 @@ global Sample* LoadWav(const char* name)
 
 	printf("Wrong length %d (not %d)\n", wavfmt.FMTlength, 16);
 	CLclose(f);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
 
     if (wavfmt.FMTlength == 18) {
@@ -151,22 +151,22 @@ global Sample* LoadWav(const char* name)
     if (wavfmt.Encoding != WAV_PCM_CODE) {
 	printf("Unsupported encoding %d\n", wavfmt.Encoding);
 	CLclose(f);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if (wavfmt.Channels != WAV_MONO && wavfmt.Channels != WAV_STEREO) {
 	printf("Unsupported channels %d\n", wavfmt.Channels);
 	CLclose(f);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2) {
 	printf("Unsupported sample size %d\n", wavfmt.SampleSize);
 	CLclose(f);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     if (wavfmt.BitsPerSample != 8 && wavfmt.BitsPerSample != 16) {
 	printf("Unsupported bits per sample %d\n", wavfmt.BitsPerSample);
 	CLclose(f);
-	FatalExit(-1);
+	ExitFatal(-1);
     }
     // FIXME: should check it more. Sample frequence
 
@@ -202,14 +202,14 @@ global Sample* LoadWav(const char* name)
 	if (!sample) {
 	    printf("Out of memory!\n");
 	    CLclose(f);
-	    FatalExit(-1);
+	    ExitFatal(-1);
 	}
 
 	if (CLread(f, sample->Data + sample->Length, i) != i) {
 	    printf("Unexpected end of file!\n");
 	    CLclose(f);
 	    free(sample);
-	    FatalExit(-1);
+	    ExitFatal(-1);
 	}
 	sample->Length += i;
     }
