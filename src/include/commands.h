@@ -97,8 +97,12 @@ extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 extern void SendCommandDiplomacy(int player,int state,int opponent);
 
     /// Parse a command (from network).
-extern void ParseCommand(unsigned short Type,UnitRef Unum,unsigned short x
-	,unsigned short y,UnitRef Dest);
+extern void ParseCommand(unsigned char type,UnitRef unum,unsigned short x,
+	unsigned short y,UnitRef dest);
+    /// Parse an extended command (from network).
+extern void ParseExtendedCommand(unsigned char type,int status,
+	unsigned char arg1, unsigned short arg2,unsigned short arg3,
+	unsigned short arg4);
 
 //@}
 

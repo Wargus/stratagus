@@ -104,9 +104,14 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     //
     //	Frame, unit, (type-ident only for better readable.
     //
-    fprintf(logf,"(log %lu 'U%d '%s '%s '%s",
-	    GameCycle,UnitNumber(unit),unit->Type->Ident,name,
-	    flag ? "flush" : "append");
+    if( unit ) {
+	fprintf(logf,"(log %lu 'U%d '%s '%s '%s",
+		GameCycle,UnitNumber(unit),unit->Type->Ident,name,
+		flag ? "flush" : "append");
+    } else {
+	fprintf(logf,"(log %lu '%s '%s",
+		GameCycle,name, flag ? "flush" : "append");
+    }
 
     //
     //	Coordinates given.
@@ -132,7 +137,12 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     if( num!=-1 ) {
 	fprintf(logf," %d",num);
     }
-    fprintf(logf,") ;%d:%d %X",unit->Player->Player,unit->Refs,SyncRandSeed);
+    if( unit ) {
+	fprintf(logf,") ;%d:%d %X",unit->Player->Player,unit->Refs,
+		SyncRandSeed);
+    } else {
+	fprintf(logf,") ;-:- %X",SyncRandSeed);
+    }
 
     fprintf(logf,"\n");
     fflush(logf);
@@ -577,6 +587,41 @@ global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
     }
 }
 
+/**
+**	Send command: Diplomacy changed.
+**
+**	@param player	Player which changes his state.
+**	@param state	New diplomacy state.
+**	@param opponent	Opponent.
+*/
+global void SendCommandDiplomacy(int player,int state,int opponent)
+{
+    if( NetworkFildes==-1 ) {
+	switch( state ) {
+	    case DiplomacyNeutral:
+		CommandLog("diplomacy",NoUnitP,0,player,opponent,
+			NoUnitP,"neutral",-1);
+		break;
+	    case DiplomacyAllied:
+		CommandLog("diplomacy",NoUnitP,0,player,opponent,
+			NoUnitP,"allied",-1);
+		break;
+	    case DiplomacyEnemy:
+		CommandLog("diplomacy",NoUnitP,0,player,opponent,
+			NoUnitP,"enemy",-1);
+		break;
+	    case DiplomacyCrazy:
+		CommandLog("diplomacy",NoUnitP,0,player,opponent,
+			NoUnitP,"crazy",-1);
+		break;
+	}
+	CommandDiplomacy(player,state,opponent);
+    } else {
+	NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
+		-1,player,state,opponent,0);
+    }
+}
+
 //@}
 
 //----------------------------------------------------------------------------
@@ -595,11 +640,13 @@ global void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 **	@param y	optional y map position.
 **	@param dstnr	optional destination unit.
 */
-global void ParseCommand(unsigned short msgnr,UnitRef unum,
+global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	unsigned short x,unsigned short y,UnitRef dstnr)
 {
-    Unit *unit, *dest;
-    int id, status;
+    Unit* unit;
+    Unit* dest;
+    int id;
+    int status;
 
     DebugLevel3Fn(" %d cycle %lu\n", msgnr, GameCycle);
 
@@ -791,6 +838,53 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandSpellCast(unit,x,y,dest,SpellTypeById(id),status);
+	    break;
+    }
+}
+
+/**
+**	Parse an extended command (from network).
+**
+**	@param type	Network extended message type
+**	@param status	Bit 7 of message type
+**	@param arg1	Messe argument 1
+**	@param arg2	Messe argument 2
+**	@param arg3	Messe argument 3
+**	@param arg4	Messe argument 4
+*/
+global void ParseExtendedCommand(unsigned char type,int status,
+	unsigned char arg1, unsigned short arg2, unsigned short arg3,
+	unsigned short arg4)
+{
+    DebugLevel3Fn(" %d cycle %lu\n", msgnr, GameCycle);
+
+    // Note: destroyed units are handled by the action routines.
+
+    switch( type ) {
+	case ExtendedMessageDiplomacy:
+	    switch( arg3 ) {
+		case DiplomacyNeutral:
+		    CommandLog("diplomacy",NoUnitP,0,arg2,arg4,
+			    NoUnitP,"neutral",-1);
+		    break;
+		case DiplomacyAllied:
+		    CommandLog("diplomacy",NoUnitP,0,arg2,arg4,
+			    NoUnitP,"allied",-1);
+		    break;
+		case DiplomacyEnemy:
+		    CommandLog("diplomacy",NoUnitP,0,arg2,arg4,
+			    NoUnitP,"enemy",-1);
+		    break;
+		case DiplomacyCrazy:
+		    CommandLog("diplomacy",NoUnitP,0,arg2,arg4,
+			    NoUnitP,"crazy",-1);
+		    break;
+	    }
+	    CommandDiplomacy(arg2,arg3,arg4);
+	    break;
+	default:
+	    DebugLevel0Fn("Unknown message %u/%s %u %u %u %u\n",
+		type,status ? "flush" : "-", arg1,arg2,arg3,arg4);
 	    break;
     }
 }
