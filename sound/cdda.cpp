@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-global struct cdrom_read_audio data;
+global struct cdrom_read_audio readdata;
 local void *bufstart;
 
 /*----------------------------------------------------------------------------
@@ -48,29 +48,35 @@ local int CDRead(Sample *sample, void *buf, int len)
 {
     static int pos = 0;
     static int count = 0;
+    int end = (int)bufstart + 2352 * 28;
 
     ++count;
 
-    data.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos / 2352;
-    data.addr_format = CDROM_LBA;
-    data.nframes = 14;
+    readdata.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos / 2352;
+    readdata.addr_format = CDROM_LBA;
+    readdata.nframes = 14;
 
-    if (count == 4) {
-	data.buf = bufstart;
-	ioctl(CDDrive, CDROMREADAUDIO, &data);
-    } else if (count == 8) {
-	count = 0;
-	sample->User = bufstart;
-	data.buf = sample->User + 2352 * 14;
-	ioctl(CDDrive, CDROMREADAUDIO, &data);
-    } 
+    if (count == 5) {
+	readdata.buf = bufstart;
+	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
+    } else if (count == 1) {
+	readdata.buf = bufstart + 2352 * 14;
+	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
+    }
     
-    if (count)
-	sample->User += len;
-
     pos += len;
+    sample->User += len;
 
-    memcpy(buf, sample->User, len);
+    if ((int)sample->User + len <= end) {
+	memcpy(buf, sample->User, len);
+    } else {
+	count = 0;
+	memcpy(buf, sample->User, end - (int)sample->User);
+	memcpy(buf + (end - (int)sample->User), bufstart, 
+	       len - (end - (int)sample->User));
+//	sample->User = bufstart + len - (end - (int)sample->User);
+	sample->User = bufstart + (end - (int)sample->User);
+    }
 
     return len;
 }
@@ -103,7 +109,7 @@ global Sample* LoadCD(const char* name __attribute__((unused)),
     sample->Channels = 2;
     sample->SampleSize = 16;
     sample->Frequency = 44100;
-    sample->User = malloc(8192 * 10);
+    sample->User = malloc(2352 * 28);
     sample->Type = &CDStreamSampleType;
     sample->Length = 0;
     
