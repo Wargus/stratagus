@@ -175,7 +175,6 @@ global void LoadModules(void)
     }
 #endif
 
-    LoadTileset();
     LoadRGB(GlobalPalette,
 	    s=strdcat3(FreeCraftLibPath,"/graphics/",
 		TheMap.Tileset->PaletteFile));

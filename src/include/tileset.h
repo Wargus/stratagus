@@ -245,9 +245,10 @@ typedef enum _tile_type_ {
     ///	Tileset definition
 typedef struct _tileset_ {
     char*	Ident;			/// Tileset identifier
+    char*	File;			/// CCL file containing tileset data
     char*	Class;			/// Class for future extensions
     char*	Name;			/// Nice name to display
-    char*	File;			/// File containing image data
+    char*	ImageFile;		/// File containing image data
     char*	PaletteFile;		/// File containing the global palette
 
     int		NumTiles;		/// Number of tiles in the tables
