@@ -23,8 +23,6 @@
 #include "freecraft.h"
 #include "video.h"
 
-//	FIXME: this functions only supports 16 bit displays!!!!
-
 #ifdef DEBUG
 global unsigned AllocatedGraphicMemory;
 global unsigned CompressedGraphicMemory;
@@ -1452,7 +1450,6 @@ global void DrawRleSpriteClippedX(RleSprite* sprite,unsigned frame,int x,int y)
     }
 }
 
-
 /*
 **	Load rle sprite from file.
 */
@@ -1595,6 +1592,8 @@ global void FreeRleSprite(RleSprite* sprite)
     free(sprite);
 }
 
+#endif	// } !NEW_VIDEO
+
 /**
 **	Load a RGB palette.
 **
@@ -1624,24 +1623,25 @@ global void LoadRGB(Palette *pal, const char *name)
 */
 global void VideoSetPalette(const GraphicData *palette)
 {
-  // -> Video
-  switch( VideoDepth ) {
-  case 8:
-    Pixels8 =(VMemType8  *)palette;
-    break;
-  case 15:
-  case 16:
-    Pixels16=(VMemType16 *)palette;
-    break;
-  case 24:
-  case 32:
-    Pixels32=(VMemType32 *)palette;
-    break;
-  default:
-    DebugLevel0(__FUNCTION__": Unknown depth\n");
-    break;
-  }
-  SetPlayersPalette();
+    // -> Video
+    switch( VideoDepth ) {
+	case 8:
+	    Pixels8 =(VMemType8  *)palette;
+	    break;
+	case 15:
+	case 16:
+	    Pixels16=(VMemType16 *)palette;
+	    break;
+	case 24:
+	    // FIXME: real 24bpp mode
+	case 32:
+	    Pixels32=(VMemType32 *)palette;
+	    break;
+	default:
+	    DebugLevel0(__FUNCTION__": Unknown depth\n");
+	    break;
+    }
+    SetPlayersPalette();
 }
 
 /**
@@ -1649,13 +1649,11 @@ global void VideoSetPalette(const GraphicData *palette)
 */
 global void VideoCreatePalette(const Palette* palette)
 {
-  GraphicData * temp;
+    GraphicData * temp;
 
-  temp = VideoCreateNewPalette(palette);
+    temp = VideoCreateNewPalette(palette);
 
-  VideoSetPalette(temp);
+    VideoSetPalette(temp);
 }
-
-#endif	// } !NEW_VIDEO
 
 //@}
