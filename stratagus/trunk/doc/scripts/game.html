@@ -1367,7 +1367,7 @@ Sets shared vision.
 <DD>Player number to set shared vision.
 </DD>
 <DT>state</DT>
-<DD>Use 1 to turn on shared vision, 0 to turn off.
+<DD>Use #t to turn on shared vision, #f to turn off.
 </DD>
 <DT>opponent</DT>
 <DD>Player number to change.
@@ -1377,7 +1377,7 @@ Sets shared vision.
 <H4>Example</H4>
 
 <PRE>
-    (set-shared-vision! 0 1 2)
+    (set-shared-vision! 0 #t 2)
 </PRE>
 
 <P>Sets shared vision for player 0 to on with player 2.
@@ -1451,11 +1451,11 @@ Sets shared vision for the player at the computer.
 
 <H4>Syntax</H4>
 
-<CODE>(shared-vision)</CODE>
+<CODE>(shared-vision state opponent)</CODE>
 
 <DL>
 <DT>state</DT>
-<DD>Use 1 to turn on shared vision, 0 to turn off.
+<DD>Use #t to turn on shared vision, #f to turn off.
 </DD>
 <DT>opponent</DT>
 <DD>Player number to change.
@@ -1465,7 +1465,7 @@ Sets shared vision for the player at the computer.
 <H4>Example</H4>
 
 <PRE>
-    (shared-vision 1 3)
+    (shared-vision #t 3)
 </PRE>
 
 <P>Sets shared vision on with player number 3.
