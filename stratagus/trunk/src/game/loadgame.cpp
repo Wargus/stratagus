@@ -242,7 +242,6 @@ global void LoadGame(char* filename)
 	GameCycle = game_cycle;
 	SelectionChanged();
 	MustRedraw = RedrawEverything;
-	SaveGameLoading = 0;
 }
 
 /**
