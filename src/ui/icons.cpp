@@ -368,16 +368,20 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 
 	DebugCheck(!icon);
 
+	width = icon->Width;
+	height = icon->Height;
+
 	//
 	//  Black border around icon with gray border if active.
 	//
 	color = (flags & (IconActive | IconClicked)) ? ColorGray : ColorBlack;
 
-	width = icon->Width;
-	height = icon->Height;
-	VideoDrawRectangleClip(color, x, y, width + 7, height + 7);
-	VideoDrawRectangleClip(ColorBlack, x + 1, y + 1,
-		width + 5, height + 5);
+	// FIXME: BAD HACK to not draw border for Magnant
+	if (strcmp(GameName, "Magnant")) {
+		VideoDrawRectangleClip(color, x, y, width + 7, height + 7);
+		VideoDrawRectangleClip(ColorBlack, x + 1, y + 1,
+			width + 5, height + 5);
+	}
 
 	// _|  Shadow
 	VideoDrawVLine(ColorGray, x + width + 3, y + 2, height + 1);
