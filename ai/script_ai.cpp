@@ -953,7 +953,7 @@ local SCM CclAiDump(void)
     //
     //	PrintForce
     //
-    for( i=0; i<AI_MAX_FORCES; ++i) {
+    for( i=0; i<AI_MAX_ATTACKING_FORCES; ++i) {
 	printf("Force(%d%s%s%s):\n",i,
 		AiPlayer->Force[i].Completed ? ",complete" : ",recruit",
 		AiPlayer->Force[i].Attacking ? ",attack" : "",

@@ -148,7 +148,7 @@ global void AiCleanForces(void)
     //
     //	Release all killed units.
     //
-    for( force=0; force<AI_MAX_FORCES; ++force ) {
+    for( force=0; force<AI_MAX_ATTACKING_FORCES; ++force ) {
 	AiCleanForce(force);
     }
 }
@@ -253,7 +253,7 @@ global void AiAssignFreeUnitsToForce(void)
     //
     //	Remove all units already in forces.
     //
-    for( f=0; f<AI_MAX_FORCES; ++f ) {
+    for( f=0; f<AI_MAX_ATTACKING_FORCES; ++f ) {
 	aiunit=AiPlayer->Force[f].Units;
 	while( aiunit ) {
 	    unit=aiunit->Unit;
@@ -317,6 +317,46 @@ global void AiAttackWithForce(int force)
     const Unit* enemy;
     int x;
     int y;
+    int f;
+
+    // Move the force to a free position so it can be used for a new
+    // attacking party
+    if( force<AI_MAX_FORCES ) {
+	AiUnitType *aiut;
+	AiUnitType *temp;
+	AiUnitType **aiut2;
+
+	f=AI_MAX_FORCES;
+	while( AiPlayer->Force[f].Attacking ) {
+	    ++f;
+	    if( f==AI_MAX_ATTACKING_FORCES ) {
+		DebugLevel0Fn("No free attacking forces\n");
+		f=force;
+		break;
+	    }
+	}
+	if( f!=AI_MAX_ATTACKING_FORCES ) {
+	    for( aiut=AiPlayer->Force[f].UnitTypes; aiut; aiut=temp ) {
+		temp=aiut->Next;
+		free(aiut);
+	    }
+
+	    AiPlayer->Force[f]=AiPlayer->Force[force];
+	    memset(&AiPlayer->Force[force],0,sizeof(AiForce));
+	    aiut=AiPlayer->Force[force].UnitTypes;
+	    aiut2=&AiPlayer->Force[force].UnitTypes;
+	    while( aiut ) {
+		*aiut2=malloc(sizeof(**aiut2));
+		(*aiut2)->Next=NULL;
+		(*aiut2)->Want=aiut->Want;
+		(*aiut2)->Type=aiut->Type;
+		aiut=aiut->Next;
+		aiut2=&(*aiut2)->Next;
+	    }
+	}
+
+	force=f;
+    }
 
     AiCleanForce(force);
 
@@ -590,7 +630,7 @@ global void AiForceManager(void)
     //
     //	Look if our defenders still have enemies in range.
     //
-    for( force=0; force<AI_MAX_FORCES; ++force ) {
+    for( force=0; force<AI_MAX_ATTACKING_FORCES; ++force ) {
 	if( AiPlayer->Force[force].Defending ) {
 	    const AiUnit* aiunit;
 
