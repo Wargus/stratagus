@@ -52,8 +52,9 @@ global void HandleActionResearch(Unit* unit)
 
 #ifdef NEW_ORDERS
     if( !unit->SubAction ) {		// first entry
-	unit->Data.Research.Ticks=0;
 	unit->SubAction=1;
+	unit->Data.Research.Ticks=0;
+	unit->Data.Research.Upgrade=unit->Orders[0].Arg1;
     }
     upgrade=unit->Data.Research.Upgrade;
     unit->Data.Research.Ticks+=SpeedResearch;
