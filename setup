@@ -78,6 +78,7 @@ CCLD=$CC
 RM="rm -f"
 if [ "`uname -a | grep -is bsd` x" != " x" ] ; then
   MAKE=gmake
+  EXTRA_CFLAGS="$EXTRA_CFLAGS -DBSD"
 else
   MAKE=make
 fi
