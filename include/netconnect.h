@@ -148,7 +148,6 @@ extern NetworkHost Hosts[PlayerMax];	/// Host, port, and number of all players.
 extern NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
 extern int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
 extern char NetworkName[16];		/// Network menu: Name of local player
-extern unsigned long NetworkServerIP;	/// Network menu: IP of server to join
 extern int NetConnectRunning;		/// Network menu: Setup mode active
 extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
 
@@ -166,6 +165,7 @@ extern void NetworkInitServerConnect(void); /// setup network connect state mach
 extern void NetworkExitServerConnect(void); /// terminate network connect state machine for the server
 extern void NetworkParseSetupEvent(const char *buf, int size); /// parse a network connect event
 extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
+extern int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf); /// Menu: Setup the server IP
 
 //@}
 

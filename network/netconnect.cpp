@@ -69,13 +69,13 @@ global NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
 global NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
 global int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
 global char NetworkName[16];		/// Network menu: Name of local player
-global unsigned long NetworkServerIP;	/// Network menu: Client: IP of server to join
 global int NetConnectRunning;		/// Network menu: Setup mode active
 global unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
 
 local int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
 local unsigned char LastStateMsgType;	/// Subtype of last InitConfig message sent
 local struct timeval NetLastPacketSent;	/// Time the last network packet was sent
+local unsigned long NetworkServerIP;	/// Network Client: IP of server to join
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
@@ -624,7 +624,6 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
     int n;
 
 #ifndef USE_WIN32
-    DebugLevel0Fn("Didn't work with win32\n");
     gettimeofday(&now, NULL);
 #endif
     s = now.tv_sec - NetLastPacketSent.tv_sec;
@@ -646,6 +645,31 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
 }
 
 /**
+**	Setup the IP-Address of the network server to connect to
+**
+**	@param serveraddr	the serveraddress the user has entered
+**	@param ipbuf		buffer to store the text representation of the IP-address
+**
+**	@return			True, if error; otherwise false.
+*/
+global int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf)
+{
+    unsigned long addr;
+
+    addr = NetResolveHost(serveraddr);
+    if (addr == INADDR_NONE) {
+	return 1;
+    }
+    NetworkServerIP = addr;
+
+    DebugLevel1Fn("SELECTED SERVER: %s (%d.%d.%d.%d)\n", serveraddr,
+		    NIPQUAD(ntohl(addr)));
+
+    sprintf(ipbuf, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
+    return 0;
+}
+
+/**
 **	Setup Network connect state machine for clients
 */
 global void NetworkInitClientConnect(void)
@@ -654,7 +678,6 @@ global void NetworkInitClientConnect(void)
 
     NetConnectRunning = 2;
 #ifndef USE_WIN32
-    DebugLevel0Fn("Didn't work with win32\n");
     gettimeofday(&NetLastPacketSent, NULL);
 #endif
     NetLocalState = ccs_connecting;
