@@ -949,7 +949,7 @@ settings.
 
 <H4>Description</H4>
 
-.
+Set the option to use depleted goldmines.
 
 <H4>Syntax</H4>
 
@@ -957,7 +957,8 @@ settings.
 
 <DL>
 <DT>percent</DT>
-<DD>.
+<DD>Players mining a depleted mine receive this percent of the default amount
+of gold.  Use 0 to disable using depleted mines.
 </DD>
 </DL>
 
@@ -965,13 +966,13 @@ settings.
 
 <PRE>
     (set-goldmine-depleted! 0)
+    (set-goldmine-depleted! 20)
 </PRE>
 
-<P>.
+<P>The first example disables using depleted mines.  The second example lets
+players mine depleted mines and gives them 20% of the default amount of gold.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="set-grab-mouse!"></A>
 <H3>set-grab-mouse!</H3>
