@@ -416,15 +416,9 @@ void PreprocessMap(void)
 void FreeMapInfo(MapInfo* info)
 {
 	if (info) {
-		if (info->Description) {
-			free(info->Description);
-		}
-		if (info->MapTerrainName) {
-			free(info->MapTerrainName);
-		}
-		if (info->Filename) {
-			free(info->Filename);
-		}
+		free(info->Description);
+		free(info->MapTerrainName);
+		free(info->Filename);
 		memset(info, 0, sizeof(MapInfo));
 	}
 }
