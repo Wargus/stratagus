@@ -109,36 +109,36 @@ local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spel
 
     memset(spellaction, 0, sizeof(*spellaction));
     if (gh_eq_p(value,gh_symbol2scm("area-bombardment"))) {
-	spell->CastFunction=CastAreaBombardment;
+	spellaction->CastFunction=CastAreaBombardment;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list=gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("fields"))) {
-		spellaction->AreaBombardment.Fields = gh_scm2int(gh_car(list));
+		spellaction->Data.AreaBombardment.Fields = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("shards"))) {
-		spellaction->AreaBombardment.Shards = gh_scm2int(gh_car(list));
+		spellaction->Data.AreaBombardment.Shards = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->AreaBombardment.Damage = gh_scm2int(gh_car(list));
+		spellaction->Data.AreaBombardment.Damage = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("start-offset-x"))) {
-		spellaction->AreaBombardment.StartOffsetX = gh_scm2int(gh_car(list));
+		spellaction->Data.AreaBombardment.StartOffsetX = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("start-offset-y"))) {
-		spellaction->AreaBombardment.StartOffsetY = gh_scm2int(gh_car(list));
+		spellaction->Data.AreaBombardment.StartOffsetY = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported area-bombardment tag",value);
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("flame-shield"))) {
-	spell->CastFunction=CastFlameShield;
+	spellaction->CastFunction=CastFlameShield;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list=gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("duration"))) {
-		spellaction->FlameShield.TTL = gh_scm2int(gh_car(list));
+		spellaction->Data.FlameShield.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 		/// FIXME:damage, missiles, rotation speed?
 	    } else {
@@ -146,107 +146,107 @@ local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spel
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("fireball"))) {
-	spell->CastFunction=CastFireball;
+	spellaction->CastFunction=CastFireball;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list=gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Fireball.Damage = gh_scm2int(gh_car(list));
+		spellaction->Data.Fireball.Damage = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
-		spellaction->Fireball.TTL = gh_scm2int(gh_car(list));
+		spellaction->Data.Fireball.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported fireball tag",value);
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("runes"))) {
-	spell->CastFunction=CastRunes;
+	spellaction->CastFunction=CastRunes;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list=gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Fireball.Damage = gh_scm2int(gh_car(list));
+		spellaction->Data.Fireball.Damage = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
-		spellaction->Fireball.TTL = gh_scm2int(gh_car(list));
+		spellaction->Data.Fireball.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported runes tag",value);
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("whirlwind"))) {
-	spell->CastFunction=CastWhirlwind;
+	spellaction->CastFunction=CastWhirlwind;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list=gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("duration"))) {
-		spellaction->Whirlwind.TTL = gh_scm2int(gh_car(list));
+		spellaction->Data.Whirlwind.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported runes tag",value);
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("adjust-buffs"))) {
-	spell->CastFunction=CastAdjustBuffs;
-	spellaction->AdjustBuffs.HasteTicks=BUFF_NOT_AFFECTED;
-	spellaction->AdjustBuffs.SlowTicks=BUFF_NOT_AFFECTED;
-	spellaction->AdjustBuffs.BloodlustTicks=BUFF_NOT_AFFECTED;
-	spellaction->AdjustBuffs.InvisibilityTicks=BUFF_NOT_AFFECTED;
-	spellaction->AdjustBuffs.InvincibilityTicks=BUFF_NOT_AFFECTED;
+	spellaction->CastFunction=CastAdjustBuffs;
+	spellaction->Data.AdjustBuffs.HasteTicks=BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.SlowTicks=BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.BloodlustTicks=BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.InvisibilityTicks=BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.InvincibilityTicks=BUFF_NOT_AFFECTED;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list=gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("haste-ticks"))) {
-		spellaction->AdjustBuffs.HasteTicks = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.HasteTicks = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("slow-ticks"))) {
-		spellaction->AdjustBuffs.SlowTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.SlowTicks  = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("bloodlust-ticks"))) {
-		spellaction->AdjustBuffs.BloodlustTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.BloodlustTicks  = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("invisibility-ticks"))) {
-		spellaction->AdjustBuffs.InvisibilityTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.InvisibilityTicks  = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("invincibility-ticks"))) {
-		spellaction->AdjustBuffs.InvincibilityTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.InvincibilityTicks  = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported adjust-buffs tag",value);
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("summon"))) {
-	spell->CastFunction=CastSummon;
+	spellaction->CastFunction=CastSummon;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("unit-type"))) {
 		str = gh_scm2newstr(gh_car(list),0);
-		spellaction->Summon.UnitType = UnitTypeByIdent(str);
-		if (!spellaction->Summon.UnitType) {
-		    spellaction->Summon.UnitType = 0;
+		spellaction->Data.Summon.UnitType = UnitTypeByIdent(str);
+		if (!spellaction->Data.Summon.UnitType) {
+		    spellaction->Data.Summon.UnitType = 0;
 		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ str);
 		}
 		free(str);
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("time-to-live"))) {
-		spellaction->Summon.TTL = gh_scm2int(gh_car(list));
+		spellaction->Data.Summon.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported summon tag",value);
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("spawn-portal"))) {
-	spell->CastFunction=CastSpawnPortal;
+	spellaction->CastFunction=CastSpawnPortal;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("portal-type"))) {
 		str = gh_scm2newstr(gh_car(list),0);
-		spellaction->SpawnPortal.PortalType = UnitTypeByIdent(str);
-		if (!spellaction->SpawnPortal.PortalType) {
-		    spellaction->SpawnPortal.PortalType = 0;
+		spellaction->Data.SpawnPortal.PortalType = UnitTypeByIdent(str);
+		if (!spellaction->Data.SpawnPortal.PortalType) {
+		    spellaction->Data.SpawnPortal.PortalType = 0;
 		    DebugLevel0("unit type \"%s\" not found for spawn-portal.\n" _C_ str);
 		}
 		free(str);
@@ -256,36 +256,36 @@ local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spel
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("raise-dead"))) {
-	spell->CastFunction=CastRaiseDead;
+	spellaction->CastFunction=CastRaiseDead;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("unit-raised"))) {
 		str = gh_scm2newstr(gh_car(list),0);
-		spellaction->RaiseDead.UnitRaised = UnitTypeByIdent(str);
-		if (!spellaction->RaiseDead.UnitRaised) {
-		    spellaction->RaiseDead.UnitRaised = 0;
+		spellaction->Data.RaiseDead.UnitRaised = UnitTypeByIdent(str);
+		if (!spellaction->Data.RaiseDead.UnitRaised) {
+		    spellaction->Data.RaiseDead.UnitRaised = 0;
 		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ str);
 		}
 		free(str);
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("time-to-live"))) {
-		spellaction->RaiseDead.TTL = gh_scm2int(gh_car(list));
+		spellaction->Data.RaiseDead.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported raise-dead tag",value);
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("polymorph"))) {
-	spell->CastFunction=CastPolymorph;
+	spellaction->CastFunction=CastPolymorph;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("new-form"))) {
 		str = gh_scm2newstr(gh_car(list),0);
-		spellaction->Summon.UnitType = UnitTypeByIdent(str);
-		if (!spellaction->Summon.UnitType) {
-		    spellaction->Summon.UnitType = 0;
+		spellaction->Data.Summon.UnitType = UnitTypeByIdent(str);
+		if (!spellaction->Data.Summon.UnitType) {
+		    spellaction->Data.Summon.UnitType = 0;
 		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ str);
 		}
 		free(str);
@@ -296,18 +296,18 @@ local void CclParseSpellAction(SCM list, SpellType* spell, SpellActionType *spel
 	    }
 	}
     } else if (gh_eq_p(value,gh_symbol2scm("adjust-vitals"))) {
-	spell->CastFunction=CastAdjustVitals;
+	spellaction->CastFunction=CastAdjustVitals;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list=gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("hit-points"))) {
-		spellaction->AdjustVitals.HP = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustVitals.HP = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("mana-points"))) {
-		spellaction->AdjustVitals.Mana = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustVitals.Mana = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("max-multi-cast"))) {
-		spellaction->AdjustVitals.MaxMultiCast = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustVitals.MaxMultiCast = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported adjust-vitals tag",value);
@@ -396,7 +396,7 @@ local void CclSpellParseCondition(SCM list, ConditionInfo* condition)
 	    condition->TargetSelf=Scm2Condition(gh_car(list));
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("min-hp-percent"))) {
-	    condition->MaxHpPercent=gh_scm2int(gh_car(list));
+	    condition->MinHpPercent=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("max-hp-percent"))) {
 	    condition->MaxHpPercent=gh_scm2int(gh_car(list));
@@ -525,8 +525,8 @@ local SCM CclDefineSpell(SCM list)
 	    }
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("action"))) {
-	    spell->SpellAction=(SpellActionType*)malloc(sizeof(SpellActionType));
-	    CclParseSpellAction(gh_car(list),spell,spell->SpellAction);
+	    spell->Action=(SpellActionType*)malloc(sizeof(SpellActionType));
+	    CclParseSpellAction(gh_car(list),spell,spell->Action);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("condition"))) {
 	    spell->Conditions=(ConditionInfo*)malloc(sizeof(ConditionInfo));
@@ -572,6 +572,136 @@ local SCM CclDefineSpell(SCM list)
 global void SpellCclRegister(void)
 {
     gh_new_procedureN("define-spell", CclDefineSpell);
+}
+
+/*
+**	Save a spell action to a file.
+**
+** 	@param file	File pointer to save to
+**	@param action	Pointer to action to save.
+*/
+local void SaveSpellCondition(CLFile *file,ConditionInfo* condition)
+{
+    char condstrings [3][10] = {
+	"true",			/// CONDITION_TRUE
+	"false",		/// CONDITION_FALSE
+	"only"			/// CONDITION_ONLY
+    };
+
+    DebugCheck(!file);
+    DebugCheck(!condition);
+
+    CLprintf(file,"'( ");
+    //
+    //	First save data related to flags.
+    //	NOTE: (int) is there to keep compilers happy.
+    //
+    CLprintf(file,"undead %s ",condstrings[(int)condition->Undead]);
+    CLprintf(file,"organic %s ",condstrings[(int)condition->Organic]);
+    CLprintf(file,"hero %s ",condstrings[(int)condition->Hero]);
+    CLprintf(file,"coward %s ",condstrings[(int)condition->Coward]);
+    CLprintf(file,"alliance %s ",condstrings[(int)condition->Alliance]);
+    CLprintf(file,"building %s ",condstrings[(int)condition->Building]);
+    CLprintf(file,"self %s ",condstrings[(int)condition->TargetSelf]);
+    //
+    //	Min/Max vital percents
+    //
+    CLprintf(file,"min-hp-percent %d ",condition->MinHpPercent);
+    CLprintf(file,"max-hp-percent %d ",condition->MaxHpPercent);
+    CLprintf(file,"min-mana-percent %d ",condition->MinManaPercent);
+    CLprintf(file,"max-mana-percent %d ",condition->MaxManaPercent);
+    //
+    //	Max buff ticks stuff
+    //
+    CLprintf(file,"max-slow-ticks %d ",condition->MaxSlowTicks);
+    CLprintf(file,"max-haste-ticks %d ",condition->MaxHasteTicks);
+    CLprintf(file,"max-bloodlust-ticks %d ",condition->MaxBloodlustTicks);
+    CLprintf(file,"max-invisibility-ticks %d ",condition->MaxInvisibilityTicks);
+    CLprintf(file,"max-invincibility-ticks %d ",condition->MaxInvincibilityTicks);
+    //
+    //	The end.
+    //
+    CLprintf(file,")\n");
+}
+
+/*
+**	Save a spell action to a file.
+**
+** 	@param file	File pointer to save to
+**	@param action	Pointer to action to save.
+*/
+local void SaveSpellAction(CLFile *file,SpellActionType* action)
+{
+    if (action->CastFunction==CastAreaBombardment) {
+	CLprintf(file," '(area-bombardment fields %d shards %d damage %d start-offset-x %d start-offset-y %d)",
+		action->Data.AreaBombardment.Fields,
+		action->Data.AreaBombardment.Shards,
+		action->Data.AreaBombardment.Damage,
+		action->Data.AreaBombardment.StartOffsetX,
+		action->Data.AreaBombardment.StartOffsetY);
+    } else if (action->CastFunction==CastFireball) {
+	CLprintf(file," '(fireball ttl %d damage %d)",
+		action->Data.Fireball.TTL,
+		action->Data.Fireball.Damage);
+    } else if (action->CastFunction==CastAdjustVitals) {
+	CLprintf(file," '(adjust-vitals");
+	if (action->Data.AdjustVitals.HP) {
+	    CLprintf(file," hit-points %d",action->Data.AdjustVitals.HP);
+	}
+	if (action->Data.AdjustVitals.Mana) {
+	    CLprintf(file," mana-points %d",action->Data.AdjustVitals.Mana);
+	}
+	if (action->Data.AdjustVitals.MaxMultiCast) {
+	    CLprintf(file," max-multi-cast %d",action->Data.AdjustVitals.MaxMultiCast);
+	}
+	CLprintf(file,")\n");
+    } else if (action->CastFunction==CastSummon) {
+	CLprintf(file," '(summon unit-type %s time-to-live %d)",
+		action->Data.Summon.UnitType->Ident,
+		action->Data.Summon.TTL);
+    } else if (action->CastFunction==CastAdjustBuffs) {
+	CLprintf(file," '(adjust-buffs");
+	if (action->Data.AdjustBuffs.HasteTicks!=BUFF_NOT_AFFECTED) {
+	    CLprintf(file," haste-ticks %d",action->Data.AdjustBuffs.HasteTicks);
+	}
+	if (action->Data.AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
+	    CLprintf(file," slow-ticks %d",action->Data.AdjustBuffs.SlowTicks);
+	}
+	if (action->Data.AdjustBuffs.BloodlustTicks!=BUFF_NOT_AFFECTED) {
+	    CLprintf(file," bloodlust-ticks %d",action->Data.AdjustBuffs.BloodlustTicks);
+	}
+	if (action->Data.AdjustBuffs.InvisibilityTicks!=BUFF_NOT_AFFECTED) {
+	    CLprintf(file," invisibility-ticks %d",action->Data.AdjustBuffs.InvisibilityTicks);
+	}
+	if (action->Data.AdjustBuffs.InvincibilityTicks!=BUFF_NOT_AFFECTED) {
+	    CLprintf(file," invincibility-ticks %d",action->Data.AdjustBuffs.InvincibilityTicks);
+	}
+	CLprintf(file,")");
+    } else if (action->CastFunction==CastPolymorph) {
+	CLprintf(file," '(polymorph new-form %s)",
+		action->Data.Polymorph.NewForm->Ident);
+    } else if (action->CastFunction==CastRaiseDead) {
+	CLprintf(file," '(raise-dead unit-raised %s time-to-live %d)",
+		action->Data.RaiseDead.UnitRaised->Ident,
+		action->Data.RaiseDead.TTL);
+    } else if (action->CastFunction==CastFlameShield) {
+	CLprintf(file," '(flame-shield duration %d)",
+		action->Data.FlameShield.TTL);
+    } else if (action->CastFunction==CastRunes) {
+	CLprintf(file," '(runes ttl %d damage %d)",
+		action->Data.Runes.TTL,
+		action->Data.Runes.Damage);
+    } else if (action->CastFunction==CastSpawnPortal) {
+	CLprintf(file," '(spawn-portal portal-type %s)",
+		action->Data.SpawnPortal.PortalType->Ident);
+    } else if (action->CastFunction==CastDeathCoil) {
+	CLprintf(file," '(death-coil)");
+	// FIXME: more?
+    } else if (action->CastFunction==CastWhirlwind) {
+	CLprintf(file," '(whirlwind duration %d)",
+		action->Data.Whirlwind.TTL);
+	// FIXME: more?
+    } 
 }
 
 /**
@@ -624,81 +754,17 @@ global void SaveSpells(CLFile *file)
 	//
 	//  Save the action(effect of the spell)
 	//
-	CLprintf(file,"    'action");
-	if (spell->CastFunction==CastAreaBombardment) {
-	    CLprintf(file," '(area-bombardment fields %d shards %d damage %d start-offset-x %d start-offset-y %d)\n",
-		    spell->SpellAction->AreaBombardment.Fields,
-		    spell->SpellAction->AreaBombardment.Shards,
-		    spell->SpellAction->AreaBombardment.Damage,
-		    spell->SpellAction->AreaBombardment.StartOffsetX,
-		    spell->SpellAction->AreaBombardment.StartOffsetY);
-	} else if (spell->CastFunction==CastFireball) {
-	    CLprintf(file," '(fireball ttl %d damage %d)\n",
-		    spell->SpellAction->Fireball.TTL,
-		    spell->SpellAction->Fireball.Damage);
-	} else if (spell->CastFunction==CastAdjustVitals) {
-	    CLprintf(file," '(adjust-vitals");
-	    if (spell->SpellAction->AdjustVitals.HP) {
-		CLprintf(file," hit-points %d",spell->SpellAction->AdjustVitals.HP);
-	    }
-	    if (spell->SpellAction->AdjustVitals.Mana) {
-		CLprintf(file," mana-points %d",spell->SpellAction->AdjustVitals.Mana);
-	    }
-	    if (spell->SpellAction->AdjustVitals.MaxMultiCast) {
-		CLprintf(file," max-multi-cast %d",spell->SpellAction->AdjustVitals.MaxMultiCast);
-	    }
-	    CLprintf(file,")\n");
-	} else if (spell->CastFunction==CastSummon) {
-	    CLprintf(file," '(summon unit-type %s time-to-live %d)\n",
-		    spell->SpellAction->Summon.UnitType->Ident,
-		    spell->SpellAction->Summon.TTL);
-	} else if (spell->CastFunction==CastAdjustBuffs) {
-	    CLprintf(file," '(adjust-buffs");
-	    if (spell->SpellAction->AdjustBuffs.HasteTicks!=BUFF_NOT_AFFECTED) {
-		CLprintf(file," haste-ticks %d",spell->SpellAction->AdjustBuffs.HasteTicks);
-	    }
-	    if (spell->SpellAction->AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
-		CLprintf(file," slow-ticks %d",spell->SpellAction->AdjustBuffs.SlowTicks);
-	    }
-	    if (spell->SpellAction->AdjustBuffs.BloodlustTicks!=BUFF_NOT_AFFECTED) {
-		CLprintf(file," bloodlust-ticks %d",spell->SpellAction->AdjustBuffs.BloodlustTicks);
-	    }
-	    if (spell->SpellAction->AdjustBuffs.InvisibilityTicks!=BUFF_NOT_AFFECTED) {
-		CLprintf(file," invisibility-ticks %d",spell->SpellAction->AdjustBuffs.InvisibilityTicks);
-	    }
-	    if (spell->SpellAction->AdjustBuffs.InvincibilityTicks!=BUFF_NOT_AFFECTED) {
-		CLprintf(file," invincibility-ticks %d",spell->SpellAction->AdjustBuffs.InvincibilityTicks);
-	    }
-	    CLprintf(file,")\n");
-	} else if (spell->CastFunction==CastPolymorph) {
-	    CLprintf(file," '(polymorph new-form %s)\n",
-		    spell->SpellAction->Polymorph.NewForm->Ident);
-	} else if (spell->CastFunction==CastRaiseDead) {
-	    CLprintf(file," '(raise-dead unit-raised %s time-to-live %d)\n",
-		    spell->SpellAction->RaiseDead.UnitRaised->Ident,
-		    spell->SpellAction->RaiseDead.TTL);
-	} else if (spell->CastFunction==CastFlameShield) {
-	    CLprintf(file," '(flame-shield duration %d)\n",
-		    spell->SpellAction->FlameShield.TTL);
-	} else if (spell->CastFunction==CastRunes) {
-	    CLprintf(file," '(runes ttl %d damage %d)\n",
-		    spell->SpellAction->Runes.TTL,
-		    spell->SpellAction->Runes.Damage);
-	} else if (spell->CastFunction==CastSpawnPortal) {
-	    CLprintf(file," '(spawn-portal portal-type %s)\n",
-		    spell->SpellAction->SpawnPortal.PortalType->Ident);
-	} else if (spell->CastFunction==CastDeathCoil) {
-	    CLprintf(file," '(death-coil)\n");
-	    // FIXME: more?
-	} else if (spell->CastFunction==CastWhirlwind) {
-	    CLprintf(file," '(whirlwind duration %d)\n",
-		    spell->SpellAction->Whirlwind.TTL);
-	    // FIXME: more?
-	} 
+	CLprintf(file,"    'action ");
+	SaveSpellAction(file,spell->Action);
+	CLprintf(file,"\n");
 	//
 	//  FIXME: Save conditions
 	//
-	
+	if (spell->Conditions) {
+	    CLprintf(file,"    'condition ");
+	    SaveSpellCondition(file,spell->Conditions);
+	    CLprintf(file,"\n");
+	}
 	//
 	//  FIXME: Save autocast and AI info
 	//

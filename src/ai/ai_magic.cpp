@@ -74,7 +74,8 @@ global void AiCheckMagic(void)
 	if(unit->Type->CanCastSpell) {
 	    for (j = 0; j < SpellTypeCount; j++) {
 		//  Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-		if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j))	{
+		if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
+			SpellTypeById(j)->AutoCast) {
 #ifdef DEBUG
 		    success = // Follow on next line (AutoCastSpell).
 #endif
