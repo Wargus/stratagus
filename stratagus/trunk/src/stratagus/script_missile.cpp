@@ -207,13 +207,13 @@ local SCM CclMissile(SCM list)
 	    dx = gh_scm2int (gh_car (sublist));
 	    dy = gh_scm2int (gh_cdr (sublist));
 	} else if (gh_eq_p (value, gh_symbol2scm ("local"))) {
-	    missile->Local = 1;
 	    DebugCheck (!type);
 	    missile = MakeLocalMissile (type, x, y, dx, dy);
+	    missile->Local = 1;
 	} else if (gh_eq_p (value, gh_symbol2scm ("global"))) {
-	    missile->Local = 0;
 	    DebugCheck (!type);
 	    missile = MakeMissile (type, x, y, dx, dy);
+	    missile->Local = 0;
 	} else if (gh_eq_p (value, gh_symbol2scm ("frame"))) {
 	    DebugCheck (!missile);
 	    missile->SpriteFrame = gh_scm2int (gh_car (list));
