@@ -923,8 +923,8 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	    }
 	    NetMsgBufLen[ply] += sizeof(ncm->Text);
 	    if (ncq->Data.Type == MessageChatTerm) {
-		NetMsgBuf[127][ply] = '\0';
-		SetMessage(NetMsgBuf[ply]);
+		NetMsgBuf[ply][127] = '\0';
+		SetMessage("%s", NetMsgBuf[ply]);
 		NetMsgBufLen[ply] = 0;
 	    }
 	    }
