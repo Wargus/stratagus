@@ -576,6 +576,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     #define closedir zzip_closedir
     int i, entvalid;
     char zzbasepath[PATH_MAX];
+    struct stat st;
 #else
 #ifndef _MSC_VER
     DIR *dirp;
