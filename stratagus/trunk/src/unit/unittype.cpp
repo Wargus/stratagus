@@ -917,6 +917,9 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     if (type->Building) {
 	CLprintf(file, "  'building");
     }
+    if (type->VisibleUnderFog) {
+	CLprintf(file, "  'visible-under-fog");
+    }
     if (type->BuilderOutside) {
 	CLprintf(file, "  'builder-outside");
     }
@@ -1300,7 +1303,7 @@ global UnitType* NewUnitTypeSlot(char* ident)
 **	@todo	Do screen position caculation in high level.
 **		Better way to handle in x mirrored sprites.
 */
-global void DrawUnitType(const UnitType* type, int frame, int x, int y)
+global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y)
 {
     // FIXME: move this calculation to high level.
     x -= (type->Width - type->TileWidth * TileSizeX) / 2;
@@ -1308,9 +1311,9 @@ global void DrawUnitType(const UnitType* type, int frame, int x, int y)
 
     // FIXME: This is a hack for mirrored sprites
     if (frame < 0) {
-	VideoDrawClipX(type->Sprite, -frame, x, y);
+	VideoDrawClipX(sprite, -frame, x, y);
     } else {
-	VideoDrawClip(type->Sprite, frame, x, y);
+	VideoDrawClip(sprite, frame, x, y);
     }
 }
 

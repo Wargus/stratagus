@@ -423,6 +423,8 @@ local SCM CclDefineUnitType(SCM list)
 
 	} else if (gh_eq_p(value, gh_symbol2scm("building"))) {
 	    type->Building = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("visible-under-fog"))) {
+	    type->VisibleUnderFog = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("builder-outside"))) {
 	    type->BuilderOutside = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("builder-lost"))) {

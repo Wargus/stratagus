@@ -1215,7 +1215,7 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
     for (; h-- > 0;) {
 	for (w = w0; w-- > 0;) {
 	    if (IsMapFieldVisible(ThisPlayer, x + w, y + h) || ReplayRevealMap ||
-		    (unit->Type->Building && unit->SeenFrame != UnitNotSeen &&
+		    (unit->Type->VisibleUnderFog && unit->SeenFrame != UnitNotSeen &&
 			IsMapFieldExplored(ThisPlayer, x + w, y + h))) {
 		return 1;
 	    }
