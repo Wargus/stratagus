@@ -2812,6 +2812,19 @@ local void SaveCommand(const Command* command,FILE* file)
 	    }
 	    fprintf(file," %d",command->Data.Move.Range);
 	    break;
+	case UnitActionAttackGround:
+	    fprintf(file,"'attack-ground");
+	    fprintf(file," (%d %d)"
+		,command->Data.Move.SX,command->Data.Move.SY);
+	    fprintf(file," (%d %d)"
+		,command->Data.Move.DX,command->Data.Move.DY);
+	    if( command->Data.Move.Goal ) {
+		ref=UnitReference(command->Data.Move.Goal);
+		fprintf(file," %s",ref);
+		free(ref);
+	    }
+	    fprintf(file," %d",command->Data.Move.Range);
+	    break;
 	case UnitActionDie:
 	    fprintf(file,"'die");
 	    fprintf(file," \"FIXME:\"");
