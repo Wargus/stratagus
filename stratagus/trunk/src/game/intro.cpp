@@ -401,9 +401,13 @@ global void ShowIntro(const Intro* intro)
     GameCursor = TheUI.Point.Cursor;
     DestroyCursorBackground();
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 
     old_video_sync = VideoSyncSpeed;
     VideoSyncSpeed = 100;
@@ -487,7 +491,9 @@ global void ShowIntro(const Intro* intro)
 	    }
 	}
 #endif
+#ifndef USE_SDL_SURFACE
 	VideoLockScreen();
+#endif
 	HideAnyCursor();
 	//
 	//	Draw background
@@ -529,7 +535,9 @@ global void ShowIntro(const Intro* intro)
 	DrawContinueButton();
 	DrawAnyCursor();
 
+#ifndef USE_SDL_SURFACE
 	VideoUnlockScreen();
+#endif
 
 	if (!line && !c) {
 	    Invalidate();
@@ -564,9 +572,13 @@ global void ShowIntro(const Intro* intro)
     free(text);
     VideoFree(background);
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 
     VideoSyncSpeed = old_video_sync;
     SetVideoSync();
@@ -595,9 +607,13 @@ global void ShowCredits(Credits* credits)
     TextLines* scrolling_credits;
     int old_video_sync;
 
+#ifdef USE_SDL_SURFACE
+    VideoClearScreen();
+#else
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+#endif
 
     old_video_sync = VideoSyncSpeed;
     VideoSyncSpeed = 100;
@@ -642,7 +658,9 @@ global void ShowCredits(Credits* credits)
     scrolling = 1;
     while (1) {
 
+#ifndef USE_SDL_SURFACE
 	VideoLockScreen();
+#endif
 	HideAnyCursor();
 
 	//
@@ -665,7 +683,9 @@ global void ShowCredits(Credits* credits)
 	DrawContinueButton();
 	DrawAnyCursor();
 
+#ifndef USE_SDL_SURFACE
 	VideoUnlockScreen();
+#endif
 
 	// FIXME: update only the changed area!!!!
 
