@@ -197,7 +197,7 @@ global Sample *LoadMp3(const char* name)
 	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }
-    CLread(f, &magic, sizeof(magic));
+    CLread(f, magic, sizeof(magic));
     // 0xFF 0xE? for mp3 stream
     if (magic[0] != 0xFF || (magic[1]&0xE0) != 0xE0 ) {
 	CLclose(f);

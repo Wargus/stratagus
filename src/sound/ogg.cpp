@@ -44,6 +44,7 @@
 #include "vorbis/codec.h"
 #include "vorbis/vorbisfile.h"
 
+#include "myendian.h"
 #include "iolib.h"
 #include "sound_server.h"
 
@@ -125,7 +126,7 @@ global Sample *LoadOgg(const char* name)
     CLFile* f;
     Sample* sample;
     OggVorbis_File vf[1];
-    unsigned long magic;
+    unsigned long magic[1];
     vorbis_info* info;
     static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, OGG_tell };
     int n;
@@ -135,8 +136,8 @@ global Sample *LoadOgg(const char* name)
 	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }
-    CLread(f, &magic, sizeof(magic));
-    if (magic != 0x5367674F) {		// "OggS" in ASCII
+    CLread(f, magic, sizeof(magic));
+    if (AccessLE32(magic) != 0x5367674F) {	// "OggS" in ASCII
 	CLclose(f);
 	return NULL;
     }
