@@ -789,14 +789,14 @@ global void DrawMissiles(const Viewport* vp)
     do {
 	for( ; missiles<missiles_end; ++missiles ) {
 	    missile=*missiles;
-	    if( missile->Type->Class == MissileClassCustom ) {
+	    if( missile->Type->Class==MissileClassCustom ) {
 		continue;	// custom are handled by Controller() only
 	    }
 	    if( missile->Delay ) {
 		continue;	// delayed aren't shown
 	    }
 	    // Draw only visible missiles
-	    if (MissileVisibleInViewport (vp, missile)) {
+	    if( !flag || MissileVisibleInViewport(vp,missile) ) {
 		x = missile->X - vp->MapX * TileSizeX + vp->X;
 		y = missile->Y - vp->MapY * TileSizeY + vp->Y;
 		// FIXME: I should copy SourcePlayer for second level missiles.
@@ -806,7 +806,7 @@ global void DrawMissiles(const Viewport* vp)
 		}
 		switch( missile->Type->Class ) {
 		    case MissileClassHit:
-			VideoDrawNumberClip(x,y,GameFont, missile->Damage);
+			VideoDrawNumberClip(x,y,GameFont,missile->Damage);
 			break;
 		    default:
 			DrawMissile(missile->Type,missile->SpriteFrame,x,y);
