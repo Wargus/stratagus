@@ -342,8 +342,10 @@ global void InitUnit(Unit* unit, UnitType* type)
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	DebugCheck(unit->Orders[0].Goal);
 	unit->NewOrder.Action = UnitActionStill;
+	unit->NewOrder.X = unit->NewOrder.Y = -1;
 	DebugCheck(unit->NewOrder.Goal);
 	unit->SavedOrder.Action = UnitActionStill;
+	unit->SavedOrder.X = unit->SavedOrder.Y = -1;
 	DebugCheck(unit->SavedOrder.Goal);
 }
 
