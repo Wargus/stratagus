@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_build.c -	The build building action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -279,6 +278,8 @@ global void HandleActionBuilded(Unit* unit)
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawPanels;
+	} else if( unit->Player==ThisPlayer ) {
+	    UpdateButtonPanel();
 	}
 	if( UnitVisible(unit) ) {
 	    MustRedraw|=RedrawMap;
