@@ -496,6 +496,7 @@ static int CclDefineUnitType(lua_State* l)
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxAttackRange")) {
+			type->Variable[ATTACKRANGE_INDEX].Value = LuaToNumber(l, -1);
 			type->Variable[ATTACKRANGE_INDEX].Max = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Priority")) {
 			type->Priority = LuaToNumber(l, -1);
