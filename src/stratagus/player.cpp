@@ -65,7 +65,7 @@ global int NoRescueCheck;		/// Disable rescue check
 /**
 **	Colors used for minimap.	FIXME: make this configurable
 */
-local int PlayerColors[PlayerMax] = {
+global int PlayerColors[PlayerMax] = {
     208,	// red
     1,		// blue
     216,	// green
