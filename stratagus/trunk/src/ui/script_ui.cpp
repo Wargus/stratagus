@@ -3010,19 +3010,12 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 			}
 		} else if (!strcmp(value, "caption")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			if (lua_isstring(l, -1)) {
-				s1 = strdup(lua_tostring(l, -1));
-				item->D.Text.text = s1;
+			if (lua_isnil(l, -1)) {
+				item->D.Text.text = 0;
+				lua_pop(l, 1);
 			} else {
-				lua_pushnumber(l, 0);
-				lua_rawseti(l, j + 1, k + 1);
-				subargs = luaL_getn(l, j + 1);
-				item->D.Text.text = NULL;
+				item->D.Text.text = CclParseStringDesc(l);
 			}
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
 			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
