@@ -96,8 +96,8 @@ local void AddButtonTable(const ButtonAction* button)
 {
     for( ;button->Pos; ++button ) {
 	AddButton(button->Pos,button->Level,button->Icon.Name
-	    ,button->Action,button->ValueStr,button->Allowed
-	    ,button->AllowStr,button->Key,button->Hint,button->UnitMask);
+		,button->Action,button->ValueStr,button->Allowed
+		,button->AllowStr,button->Key,button->Hint,button->UnitMask);
     }
 }
 
@@ -266,6 +266,12 @@ global void SaveButtons(FILE* file)
 	}
 	fprintf(file,"))\n\n");
     }
+
+    fprintf(file,";;(set-show-command-key! %s)\n\n",
+	    ShowCommandKey ? "#t" : "#f");
+    if( ShowCommandKey ) {
+	fprintf(file,"(show-command-key)\n");
+    }
 }
 
 
@@ -286,8 +292,8 @@ global void SaveButtons(FILE* file)
 --      Buttons structures
 ----------------------------------------------------------------------------*/
 
-global ButtonAction* CurrentButtons;
-global ButtonAction  _current_buttons[9]; //FIXME: this is just for test
+global ButtonAction* CurrentButtons;	/// Pointer to current buttons
+local ButtonAction  _current_buttons[9];	/// FIXME: this is just for test
 
 /// FIXME: docu
 int AddButton(int pos, int level, const char *icon_ident,
@@ -364,6 +370,9 @@ global void CleanButtons(void)
 {
     int z;
 
+    //
+    //	Free the allocated buttons.
+    //
     for (z = 0; z < UnitButtonCount; z++) {
 	DebugCheck(!UnitButtonTable[z]);
 	if( UnitButtonTable[z]->ValueStr ) {
@@ -378,6 +387,9 @@ global void CleanButtons(void)
 	free(UnitButtonTable[z]);
     }
     UnitButtonCount = 0;
+
+    CurrentButtonLevel=0;
+    CurrentButtons=NULL;
 }
 
 /**
