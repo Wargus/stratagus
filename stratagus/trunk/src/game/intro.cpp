@@ -540,6 +540,8 @@ global void ShowIntro(const Intro *intro)
     // FIXME: should this be GameMusic?
     if( !strcmp(CDMode, ":off") ) {
 	PlayMusic(MenuMusic);
+    } else {
+	CDRomCheck(NULL);
     }
 }
 

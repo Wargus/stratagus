@@ -49,7 +49,7 @@
 #include "iocompat.h"
 #include "sound.h"
 #include "sound_server.h"
-#include "menus.h"
+#include "interface.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -300,6 +300,7 @@ global int PlayCDRom(const char* name)
 {
     int i;
     int data_cd;
+    int track;
 
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
@@ -358,8 +359,18 @@ global int PlayCDRom(const char* name)
 	// FIXME: remove :wc2
 	if (!strcmp(name, ":wc2")) {
 	    CDMode = ":wc2";
-	    if (GuiGameStarted == 0)
+	    track = cd_current_track();
+	    if (!GameRunning && track != 15) {
 		cd_play(15);
+	    } else if (GameRunning && !ThisPlayer->Race && (track < 3 || track > 7)) {
+		do CDTrack = (MyRand() % NumCDTracks) + 3;
+		while (CDTrack < 3 || CDTrack > 7); 
+		cd_play(CDTrack);
+	    } else if (GameRunning && ThisPlayer->Race && (track < 11 || track > 14)) {
+		do CDTrack = (MyRand() % NumCDTracks) + 9;
+		while (CDTrack < 11 || CDTrack > 14); 
+		cd_play(CDTrack);
+	    }
 	}
 	return 1;
     }

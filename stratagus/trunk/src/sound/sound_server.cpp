@@ -241,10 +241,13 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
     }
 #elif defined(USE_LIBCDA)
     if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
-	    && !cd_current_track()) {
+	    && !cd_current_track() && strcmp(CDMode, ":wc2")) {
 	DebugLevel0Fn("Playing new track\n");
 	PlayCDRom(CDMode);
     } else if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")) {
+	if (!strcmp(CDMode, ":wc2")) {
+	    PlayCDRom(CDMode);
+	}
 	DebugLevel0Fn("get track\n");
 	CDTrack = cd_current_track() + 1;
 	if (CDTrack > NumCDTracks) {
