@@ -1802,7 +1802,7 @@ global void DrawMapFogOfWar(int v, int x,int y)
 #endif
 #endif
 
-#ifdef HIERARCHIC_PATHFINDER
+#if defined(HIERARCHIC_PATHFINDER) && defined(DEBUG)
 		    {
 			char regidstr[8];
 			char groupstr[8];
