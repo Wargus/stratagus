@@ -61,94 +61,94 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**		Unit-type type definition
+**  Unit-type type definition
 */
 global const char UnitTypeType[] = "unit-type";
 
 #ifdef DEBUG
-global int NoWarningUnitType;						/// quiet ident lookup
+global int NoWarningUnitType;  /// quiet ident lookup
 #endif
 
-global UnitType* UnitTypes[UnitTypeMax];		/// unit-types definition
-global int NumUnitTypes;						/// number of unit-types made
+global UnitType* UnitTypes[UnitTypeMax];  /// unit-types definition
+global int NumUnitTypes;  /// number of unit-types made
 
 /*
-**		Next unit type are used hardcoded in the source.
+**  Next unit type are used hardcoded in the source.
 **
-**		FIXME: find a way to make it configurable!
+**  @todo find a way to make it configurable!
 */
-global UnitType* UnitTypeHumanWall;				/// Human wall
-global UnitType* UnitTypeOrcWall;				/// Orc wall
+global UnitType* UnitTypeHumanWall; /// Human wall
+global UnitType* UnitTypeOrcWall;   /// Orc wall
 
 /**
-**		Mapping of W*rCr*ft number to our internal unit-type symbol.
-**		The numbers are used in puds.
+**  Mapping of W*rCr*ft number to our internal unit-type symbol.
+**  The numbers are used in puds.
 */
 global char** UnitTypeWcNames;
 
-#ifdef DOXYGEN						  // no real code, only for document
+#ifdef DOXYGEN // no real code, only for document
 
 /**
-**		Lookup table for unit-type names
+**  Lookup table for unit-type names
 */
 local UnitType* UnitTypeHash[UnitTypeMax];
 
 #else
 
 /**
-**		Lookup table for unit-type names
+**  Lookup table for unit-type names
 */
 local hashtable(UnitType*, UnitTypeMax) UnitTypeHash;
 
 #endif
 
 /**
-**		Default resources for a new player.
+**  Default resources for a new player.
 */
 global int DefaultResources[MaxCosts];
 
 /**
-**		Default resources for a new player with low resources.
+**  Default resources for a new player with low resources.
 */
 global int DefaultResourcesLow[MaxCosts];
 
 /**
-**		Default resources for a new player with mid resources.
+**  Default resources for a new player with mid resources.
 */
 global int DefaultResourcesMedium[MaxCosts];
 
 /**
-**		Default resources for a new player with high resources.
+**  Default resources for a new player with high resources.
 */
 global int DefaultResourcesHigh[MaxCosts];
 
 /**
-**		Default incomes for a new player.
+**  Default incomes for a new player.
 */
 global int DefaultIncomes[MaxCosts];
 
 /**
-**		Default action for the resources.
+**  Default action for the resources.
 */
 global char* DefaultActions[MaxCosts];
 
 /**
-**		Default names for the resources.
+**  Default names for the resources.
 */
 global char* DefaultResourceNames[MaxCosts];
 
 /**
-**		Default amounts for the resources.
+**  Default amounts for the resources.
 */
 global int DefaultResourceAmounts[MaxCosts];
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Update the player stats for changed unit types.
-**	  @param reset indicates wether default value should be set to each stat (level, upgrades)
+**  Update the player stats for changed unit types.
+**  @param reset indicates wether default value should be set to each stat (level, upgrades)
 */
 global void UpdateStats(int reset)
 {
@@ -178,7 +178,7 @@ global void UpdateStats(int reset)
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (type->Building) {
-					stats->Level = 0;		// Disables level display
+					stats->Level = 0; // Disables level display
 				} else {
 					stats->Level = 1;
 				}
@@ -186,37 +186,37 @@ global void UpdateStats(int reset)
 		}
 
 		//
-		//	  As side effect we calculate the movement flags/mask here.
+		//  As side effect we calculate the movement flags/mask here.
 		//
 		switch (type->UnitType) {
-			case UnitTypeLand:				// on land
+			case UnitTypeLand:                              // on land
 				type->MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
-					MapFieldBuilding |		// already occuppied
+					MapFieldBuilding | // already occuppied
 					MapFieldCoastAllowed |
-					MapFieldWaterAllowed |		// can't move on this
+					MapFieldWaterAllowed | // can't move on this
 					MapFieldUnpassable;
 				break;
-			case UnitTypeFly:				// in air
+			case UnitTypeFly:                               // in air
 				type->MovementMask =
-					MapFieldAirUnit;		// already occuppied
+					MapFieldAirUnit; // already occuppied
 				break;
-			case UnitTypeNaval:				// on water
+			case UnitTypeNaval:                             // on water
 				if (type->Transporter) {
 					type->MovementMask =
 						MapFieldLandUnit |
 						MapFieldSeaUnit |
-						MapFieldBuilding |		// already occuppied
-						MapFieldLandAllowed;		// can't move on this
+						MapFieldBuilding | // already occuppied
+						MapFieldLandAllowed; // can't move on this
 					// Johns: MapFieldUnpassable only for land units?
 				} else {
 					type->MovementMask =
 						MapFieldLandUnit |
 						MapFieldSeaUnit |
-						MapFieldBuilding |		// already occuppied
+						MapFieldBuilding | // already occuppied
 						MapFieldCoastAllowed |
-						MapFieldLandAllowed |		// can't move on this
+						MapFieldLandAllowed | // can't move on this
 						MapFieldUnpassable;
 				}
 				break;
@@ -231,13 +231,13 @@ global void UpdateStats(int reset)
 				type->MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
-					MapFieldBuilding |		// already occuppied
-					MapFieldLandAllowed;		// can't build on this
+					MapFieldBuilding | // already occuppied
+					MapFieldLandAllowed; // can't build on this
 			}
 			type->MovementMask |= MapFieldNoBuilding;
 			//
-			//		A little chaos, buildings without HP can be entered.
-			//		The oil-patch is a very special case.
+			// A little chaos, buildings without HP can be entered.
+			// The oil-patch is a very special case.
 			//
 			if (type->_HitPoints) {
 				type->FieldFlags = MapFieldBuilding;
@@ -245,13 +245,13 @@ global void UpdateStats(int reset)
 				type->FieldFlags = MapFieldNoBuilding;
 			}
 		} else switch (type->UnitType) {
-			case UnitTypeLand:				// on land
+			case UnitTypeLand: // on land
 				type->FieldFlags = MapFieldLandUnit;
 				break;
-			case UnitTypeFly:				// in air
+			case UnitTypeFly: // in air
 				type->FieldFlags = MapFieldAirUnit;
 				break;
-			case UnitTypeNaval:				// on water
+			case UnitTypeNaval: // on water
 				type->FieldFlags = MapFieldSeaUnit;
 				break;
 			default:
@@ -266,10 +266,10 @@ global void UpdateStats(int reset)
 #define Fetch8(p)   (*((unsigned char*)(p))++)
 
 /**
-**		Parse UDTA area from puds.
+**  Parse UDTA area from puds.
 **
-**		@param udta		Pointer to udta area.
-**		@param length		length of udta area.
+**  @param udta    Pointer to udta area.
+**  @param length  length of udta area.
 */
 global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 {
@@ -289,58 +289,58 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	DebugLevel0Fn("This PUD has an UDTA section, we are not sure it works.\n");
 	start = udta;
 
-	for (i = 0; i < 110; ++i) {				// overlap frames
+	for (i = 0; i < 110; ++i) { // overlap frames
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE16(udta);
 		unittype->Construction = ConstructionByWcNum(v);
 	}
-	for (i = 0; i < 508; ++i) {				// skip obsolete data
+	for (i = 0; i < 508; ++i) { // skip obsolete data
 		v = FetchLE16(udta);
 	}
-	for (i = 0; i < 110; ++i) {				// sight range
+	for (i = 0; i < 110; ++i) { // sight range
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE32(udta);
 		unittype->_SightRange = v;
 	}
-	for (i = 0; i < 110; ++i) {				// hit points
+	for (i = 0; i < 110; ++i) { // hit points
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE16(udta);
 		unittype->_HitPoints = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Flag if unit is magic
+	for (i = 0; i < 110; ++i) { // Flag if unit is magic
 //		unittype = UnitTypeByWcNum(i);
 //		v = Fetch8(udta);
 //		unittype->Magic = v;
 		Fetch8(udta);
 	}
-	for (i = 0; i < 110; ++i) {				// Build time * 6 = one second FRAMES
+	for (i = 0; i < 110; ++i) { // Build time * 6 = one second FRAMES
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_Costs[TimeCost] = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Gold cost / 10
+	for (i = 0; i < 110; ++i) { // Gold cost / 10
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_Costs[GoldCost] = v * 10;
 	}
-	for (i = 0; i < 110; ++i) {				// Lumber cost / 10
+	for (i = 0; i < 110; ++i) { // Lumber cost / 10
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_Costs[WoodCost] = v * 10;
 	}
-	for (i = 0; i < 110; ++i) {				// Oil cost / 10
+	for (i = 0; i < 110; ++i) { // Oil cost / 10
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_Costs[OilCost] = v * 10;
 	}
-	for (i = 0; i < 110; ++i) {				// Unit size in tiles
+	for (i = 0; i < 110; ++i) { // Unit size in tiles
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE16(udta);
 		//unittype->TileWidth = v;
 		v = FetchLE16(udta);
 		//unittype->TileHeight = v
 	}
-	for (i = 0; i < 110; ++i) {				// Box size in pixel
+	for (i = 0; i < 110; ++i) { // Box size in pixel
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE16(udta);
 		unittype->BoxWidth = v;
@@ -348,42 +348,42 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		unittype->BoxHeight = v;
 	}
 
-	for (i = 0; i < 110; ++i) {				// Attack range
+	for (i = 0; i < 110; ++i) { // Attack range
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_AttackRange = v;
 	}
-	for (i = 0; i < 110; ++i) {				// React range
+	for (i = 0; i < 110; ++i) { // React range
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->ReactRangeComputer = v;
 	}
-	for (i = 0; i < 110; ++i) {				// React range
+	for (i = 0; i < 110; ++i) { // React range
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->ReactRangePerson = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Armor
+	for (i = 0; i < 110; ++i) { // Armor
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_Armor = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Selectable via rectangle
+	for (i = 0; i < 110; ++i) { // Selectable via rectangle
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->SelectableByRectangle = v != 0;
 	}
-	for (i = 0; i < 110; ++i) {				// Priority
+	for (i = 0; i < 110; ++i) { // Priority
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->Priority = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Basic damage
+	for (i = 0; i < 110; ++i) { // Basic damage
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_BasicDamage = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Piercing damage
+	for (i = 0; i < 110; ++i) { // Piercing damage
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->_PiercingDamage = v;
@@ -394,66 +394,66 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	// Maybe we could use this one day, not sure.
 	//
 #if 0
-	for (i = 0; i < 110; ++i) {				// Weapons upgradable
+	for (i = 0; i < 110; ++i) { // Weapons upgradable
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->WeaponsUpgradable = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Armor upgradable
+	for (i = 0; i < 110; ++i) { // Armor upgradable
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->ArmorUpgradable = v;
 	}
 #else
-	for (i = 0; i < 110; ++i) {				// Skip weapons upgradable
+	for (i = 0; i < 110; ++i) { // Skip weapons upgradable
 		Fetch8(udta);
 	}
-	for (i = 0; i < 110; ++i) {				// Skip armor upgradable
+	for (i = 0; i < 110; ++i) { // Skip armor upgradable
 		Fetch8(udta);
 	}
 #endif
-	for (i = 0; i < 110; ++i) {				// Missile Weapon
+	for (i = 0; i < 110; ++i) { // Missile Weapon
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->Missile.Name = strdup(MissileTypeWcNames[v]);
 		DebugCheck(unittype->Missile.Missile);
 	}
-	for (i = 0; i < 110; ++i) {				// Unit type
+	for (i = 0; i < 110; ++i) { // Unit type
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->UnitType = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Decay rate * 6 = secs
+	for (i = 0; i < 110; ++i) { // Decay rate * 6 = secs
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->DecayRate = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Annoy computer factor
+	for (i = 0; i < 110; ++i) { // Annoy computer factor
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->AnnoyComputerFactor = v;
 	}
-	for (i = 0; i < 58; ++i) {				// 2nd mouse button action
+	for (i = 0; i < 58; ++i) { // 2nd mouse button action
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->MouseAction = v;
 	}
-	for (; i < 110; ++i) {				// 2nd mouse button action
+	for (; i < 110; ++i) { // 2nd mouse button action
 		unittype = UnitTypeByWcNum(i);
 		unittype->MouseAction = 0;
 	}
-	for (i = 0; i < 110; ++i) {				// Point value for killing unit
+	for (i = 0; i < 110; ++i) { // Point value for killing unit
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE16(udta);
 		unittype->Points = v;
 	}
-	for (i = 0; i < 110; ++i) {				// Can target (1 land, 2 sea, 4 air)
+	for (i = 0; i < 110; ++i) { // Can target (1 land, 2 sea, 4 air)
 		unittype = UnitTypeByWcNum(i);
 		v = Fetch8(udta);
 		unittype->CanTarget = v;
 	}
 
-	for (i = 0; i < 110; ++i) {				// Flags
+	for (i = 0; i < 110; ++i) { // Flags
 		unittype = UnitTypeByWcNum(i);
 		v = FetchLE32(udta);
 	/// Nice looking bit macro
@@ -502,10 +502,10 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 		}
 
 #ifdef DEBUG
-		if (BIT(28, v))		DebugLevel0("Unused bit 28 used in %d\n" _C_ i);
-		if (BIT(29, v))		DebugLevel0("Unused bit 29 used in %d\n" _C_ i);
-		if (BIT(30, v))		DebugLevel0("Unused bit 30 used in %d\n" _C_ i);
-		if (BIT(31, v))		DebugLevel0("Unused bit 31 used in %d\n" _C_ i);
+		if (BIT(28, v)) DebugLevel0("Unused bit 28 used in %d\n" _C_ i);
+		if (BIT(29, v)) DebugLevel0("Unused bit 29 used in %d\n" _C_ i);
+		if (BIT(30, v)) DebugLevel0("Unused bit 30 used in %d\n" _C_ i);
+		if (BIT(31, v)) DebugLevel0("Unused bit 31 used in %d\n" _C_ i);
 #endif
 #undef BIT
 	}
@@ -519,12 +519,12 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 }
 
 /**
-**		Get the animations structure by ident.
+**  Get the animations structure by ident.
 **
-**		@param ident		Identifier for the animation.
-**		@return				Pointer to the animation structure.
+**  @param ident  Identifier for the animation.
+**  @return  Pointer to the animation structure.
 **
-**		@todo		Remove the use of scheme symbols to store, use own hash.
+**  @todo Remove the use of scheme symbols to store, use own hash.
 */
 global Animations* AnimationsByIdent(const char* ident)
 {
@@ -712,7 +712,7 @@ global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x
 }
 
 /**
-**		Init unit types.
+**  Init unit types.
 */
 global void InitUnitTypes(int reset_player_stats)
 {
@@ -720,21 +720,21 @@ global void InitUnitTypes(int reset_player_stats)
 
 	for (type = 0; type < NumUnitTypes; ++type) {
 		//
-		//		Initialize:
+		//  Initialize:
 		//
 		DebugCheck(UnitTypes[type]->Slot != type);
 		//
-		//		Add idents to hash.
+		//  Add idents to hash.
 		//
 		*(UnitType**)hash_add(UnitTypeHash, UnitTypes[type]->Ident) =
 			UnitTypes[type];
 	}
 
 	// LUDO : called after game is loaded -> don't reset stats !
-	UpdateStats(reset_player_stats);		// Calculate the stats
+	UpdateStats(reset_player_stats); // Calculate the stats
 
 	//
-	//		Setup hardcoded unit types. FIXME: should be moved to some configs.
+	// Setup hardcoded unit types. FIXME: should be moved to some configs.
 	//
 	UnitTypeHumanWall = UnitTypeByIdent("unit-human-wall");
 	UnitTypeOrcWall = UnitTypeByIdent("unit-orc-wall");
@@ -797,7 +797,7 @@ global void LoadUnitTypeSprite(UnitType* unittype)
 	}
 
 	file = type->File[TheMap.Terrain];
-	if (!file) {						// default one
+	if (!file) { // default one
 		file = type->File[0];
 	}
 	if (file) {
@@ -807,9 +807,9 @@ global void LoadUnitTypeSprite(UnitType* unittype)
 		FlipGraphic(type->Sprite);
 	}
 }
-				
+
 /**
-**		Load the graphics for the unit-types.
+** Load the graphics for the unit-types.
 */
 global void LoadUnitTypes(void)
 {
@@ -820,7 +820,7 @@ global void LoadUnitTypes(void)
 		type = UnitTypes[i];
 
 		//
-		//		Lookup icons.
+		// Lookup icons.
 		//
 		type->Icon.Icon = IconByIdent(type->Icon.Name);
 		if (!type->Icon.Icon) {
@@ -828,19 +828,19 @@ global void LoadUnitTypes(void)
 			ExitFatal(-1);
 		}
 		//
-		//		Lookup missiles.
+		// Lookup missiles.
 		//
 		type->Missile.Missile = MissileTypeByIdent(type->Missile.Name);
 		if (type->Explosion.Name) {
 			type->Explosion.Missile = MissileTypeByIdent(type->Explosion.Name);
 		}
 		//
-		//		Lookup corpse.
+		// Lookup corpse.
 		//
 		if (type->CorpseName) {
 			type->CorpseType = UnitTypeByIdent(type->CorpseName);
 		}
-		
+
 		//
 		// Load Sprite
 		//
@@ -871,7 +871,7 @@ global void CleanUnitTypes(void)
 	//
 	//  Mapping the original unit-type numbers in puds to our internal strings
 	//
-	if ((ptr = (void**)UnitTypeWcNames)) {		// Free all old names
+	if ((ptr = (void**)UnitTypeWcNames)) { // Free all old names
 		while (*ptr) {
 			free(*ptr++);
 		}
@@ -886,10 +886,10 @@ global void CleanUnitTypes(void)
 	for (i = 0; i < NumUnitTypes; ++i) {
 		type = UnitTypes[i];
 
-		if (!(anims = type->Animations)) {		// Must be handled?
+		if (!(anims = type->Animations)) { // Must be handled?
 			continue;
 		}
-		for (j = i; j < NumUnitTypes; ++j) {		// Remove all uses.
+		for (j = i; j < NumUnitTypes; ++j) { // Remove all uses.
 			if (anims == UnitTypes[j]->Animations) {
 				UnitTypes[j]->Animations = NULL;
 			}
@@ -976,7 +976,7 @@ global void CleanUnitTypes(void)
 		}
 
 		//
-		//		FIXME: Sounds can't be freed, they still stuck in sound hash.
+		// FIXME: Sounds can't be freed, they still stuck in sound hash.
 		//
 		if (type->Sound.Selected.Name) {
 			free(type->Sound.Selected.Name);
@@ -1005,7 +1005,7 @@ global void CleanUnitTypes(void)
 			free(type->Weapon.Attack.Name);
 		}
 
-		if (!type->SameSprite) {		// our own graphics
+		if (!type->SameSprite) { // our own graphics
 			VideoSafeFree(type->Sprite);
 		}
 #ifdef USE_OPENGL
@@ -1026,7 +1026,7 @@ global void CleanUnitTypes(void)
 	NumberBoolFlag = 0;
 
 	//
-	//		Clean hardcoded unit types.
+	// Clean hardcoded unit types.
 	//
 	UnitTypeHumanWall = NULL;
 	UnitTypeOrcWall = NULL;
