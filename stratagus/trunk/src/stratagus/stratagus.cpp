@@ -394,7 +394,7 @@ global char* strcasestr(const char* a, const char* b)
 /**
 **	Compute a square root using ints
 **
-**	Uses John Halleck's method, see 
+**	Uses John Halleck's method, see
 **	http://www.cc.utah.edu/~nahaj/factoring/isqrt.legalize.c.html
 **
 **	@param num	Calculate the square root of this number
@@ -417,8 +417,8 @@ global long isqrt(long num)
     //	is even, and the one bit is as far left as is consistant
     //	with that condition.)
     //
-    //	This portable load replaces the loop that used to be 
-    //	here, and was donated by  legalize@xmission.com 
+    //	This portable load replaces the loop that used to be
+    //	here, and was donated by  legalize@xmission.com
     //
     squaredbit  = (long)((((unsigned long)~0L) >> 1) & ~(((unsigned long)~0L) >> 2));
 
@@ -433,7 +433,7 @@ global long isqrt(long num)
 	} else {
 	    root >>= 1;
 	}
-	squaredbit >>= 2; 
+	squaredbit >>= 2;
     }
 
     return root;
@@ -1210,7 +1210,15 @@ local void PrintHeader(void)
     "\n  SDL Copyright by Sam Lantinga."
 #endif
     "\nCompile options "
-    "CCL "
+#ifdef USE_SIOD
+    "SIOD "
+#endif
+#ifdef USE_GUILE
+    "GUILE "
+#endif
+#ifdef USE_LUA
+    "LUA "
+#endif
 #ifdef USE_THREAD
     "THREAD "
 #endif
@@ -1231,6 +1239,9 @@ local void PrintHeader(void)
 #endif
 #ifdef USE_SDL
     "SDL "
+#endif
+#ifdef USE_SDL_SURFACE
+    "SDL-SURFACE "
 #endif
 #ifdef USE_SDLA
     "SDL-AUDIO "
@@ -1461,9 +1472,9 @@ global int main(int argc, char** argv)
 	    case 'c':
 		CclStartFile = optarg;
 		continue;
-            case 'd':
-                StratagusLibPath = optarg;
-                continue;
+	    case 'd':
+		StratagusLibPath = optarg;
+		continue;
 	    case 'e':
 		EditorRunning = 2;
 		continue;
