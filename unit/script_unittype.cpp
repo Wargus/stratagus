@@ -630,6 +630,8 @@ local SCM CclPrintUnitTypeTable(void)
 
 // ----------------------------------------------------------------------------
 
+#if 0	// Old animation code, no longer needed
+
 /**
 **	Get a single animation sequence.
 */
@@ -770,6 +772,8 @@ local SCM CclAnimType(SCM list)
 
   }
 }
+
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -1084,8 +1088,10 @@ global void UnitTypeCclRegister(void)
 
     gh_new_procedureN("define-unittype-wc-names",CclDefineUnitTypeWcNames);
 
+#if 0
     // FIXME: could be removed, if FGP animations are converted.
     gh_new_procedureN("anim-type",CclAnimType);
+#endif
 
     gh_new_procedureN("define-animations",CclDefineAnimations);
 
