@@ -64,9 +64,6 @@ OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
 MAKERULE = @if [ ! -d $(shell dirname $@) ]; then mkdir $(shell dirname $@); fi ;
 MAKERULE += echo $(CC) -c \$(CFLAGS) $< -o $@ ; $(CC) -c \$(CFLAGS) $< -o $@ ;
 
-src/action/$(OBJDIR)/%.o: src/action/%.c
-	$(MAKERULE)
-
 src/ai/$(OBJDIR)/%.o: src/ai/%.c
 	$(MAKERULE)
 
@@ -196,27 +193,17 @@ echo::
 	@-echo CFLAGS: $(CFLAGS)
 	@-echo LIBS: $(CLONELIBS)
 
-tools: tools/aledoc$(EXE) tools/wartool$(EXE) tools/startool$(EXE)
-
-tools/aledoc$(EXE): tools/aledoc.c
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
-
-tools/wartool$(EXE): tools/wartool.c
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
-
-tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
-
 clean::
-	@for i in $(MODULES) ; do \
+	for i in $(MODULES); do \
 	$(RM) -rf $$i/$(OBJDIR)/*.o $$i/*.doc; done
-	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)/*.$(OE) .#*
+	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)/*.$(OE)
 	@echo
 
 distclean:	clean
-	[ $(OBJDIR) == "." ] || $(RM) -rf $(OBJDIR)
-	$(RM) freecraft$(EXE) gmon.sum *~ stderr.txt stdout.txt
-	$(RM) $$i/.depend $$i/.#* $$i/*~
+	for i in $(MODULES); do \
+	[ $(OBJDIR) == "." ] || $(RM) -rf $$i/$(OBJDIR); \
+	$(RM) $$i/.#* $$i/*~; done
+	$(RM) freecraft$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt
 	$(RM) -r srcdoc/*
 	@echo
 
@@ -233,6 +220,36 @@ tags:
 	ctags --c-types=defmpstuvx -a -f tags `pwd`/$$i ; done
 
 depend:
+	@echo -n >.depend
+	@for i in $(SRC) ; do\
+	echo -n `dirname $$i`/$(OBJDIR)/ >> .depend;\
+	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
+
+##############################################################################
+#
+#	include dependency files, if they exist
+#
+
+$(OBJS):	$(RULESFILE)
+
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif
+
+##############################################################################
+#	TOOLS
+##############################################################################
+
+tools: tools/aledoc$(EXE) tools/wartool$(EXE) tools/startool$(EXE)
+
+tools/aledoc$(EXE): tools/aledoc.c
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
+
+tools/wartool$(EXE): tools/wartool.c
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
+
+tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS) $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
 
 ##############################################################################
 #	Distributions
@@ -278,7 +295,7 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz \
-	  contrib/FreeCraft-beos.proj \
+	  contrib/FreeCraft-beos.proj.gz \
 	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h \
 	  contrib/campaigns/*/*.cm
 
@@ -367,7 +384,7 @@ win32-bin-dist2: win32
 	@echo $(CONTRIB) >>$(DISTLIST)
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
-	@echo SDL.dll doc/README-SDL.txt doc/ZIP-LICENSE >>$(DISTLIST)
+	@echo doc/README-SDL.txt doc/ZIP-LICENSE >>$(DISTLIST)
 	@echo freecraft$(EXE) >>$(DISTLIST)
 	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@echo tools/build.bat >>$(DISTLIST)
