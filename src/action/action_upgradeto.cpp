@@ -62,55 +62,55 @@ global void HandleActionUpgradeTo(Unit* unit)
 
     DebugLevel3Fn(" %d\n" _C_ UnitNumber(unit));
 
-    player=unit->Player;
-    if( !unit->SubAction ) {		// first entry
-	unit->Data.UpgradeTo.Ticks=0;
-	unit->SubAction=1;
+    player = unit->Player;
+    if (!unit->SubAction) {		// first entry
+	unit->Data.UpgradeTo.Ticks = 0;
+	unit->SubAction = 1;
     }
-    type=unit->Orders[0].Type;
-    stats=&type->Stats[player->Player];
+    type = unit->Orders[0].Type;
+    stats = &type->Stats[player->Player];
 
     UnitMarkSeen(unit);
     // FIXME: Should count down here
-    unit->Data.UpgradeTo.Ticks+=SpeedUpgrade;
-    if( unit->Data.UpgradeTo.Ticks>=stats->Costs[TimeCost] ) {
+    unit->Data.UpgradeTo.Ticks += SpeedUpgrade;
+    if (unit->Data.UpgradeTo.Ticks >= stats->Costs[TimeCost]) {
 
-	unit->HP+=stats->HitPoints-unit->Type->Stats[player->Player].HitPoints;
+	unit->HP += stats->HitPoints - unit->Type->Stats[player->Player].HitPoints;
 	// don't have such unit now
 	player->UnitTypesCount[unit->Type->Type]--;
-	unit->Type=type;
-	unit->Stats=(UnitStats*)stats;
+	unit->Type = type;
+	unit->Stats = (UnitStats*)stats;
 	// and we have new one...
 	player->UnitTypesCount[unit->Type->Type]++;
-	UpdateForNewUnit(unit,1);
+	UpdateForNewUnit(unit, 1);
 
-	NotifyPlayer(player,NotifyGreen,unit->X,unit->Y,
-	    "Upgrade to %s complete",unit->Type->Name );
-	if( unit->Player->Ai ) {
-	    AiUpgradeToComplete(unit,type);
+	NotifyPlayer(player, NotifyGreen, unit->X, unit->Y,
+	    "Upgrade to %s complete", unit->Type->Name);
+	if (unit->Player->Ai) {
+	    AiUpgradeToComplete(unit, type);
 	}
-	unit->Reset=unit->Wait=1;
-	unit->Orders[0].Action=UnitActionStill;
-	unit->SubAction=0;
+	unit->Reset = unit->Wait = 1;
+	unit->Orders[0].Action = UnitActionStill;
+	unit->SubAction = 0;
 
 	//
 	//	Update possible changed buttons.
 	//
-	if( IsOnlySelected(unit) || player==ThisPlayer ) {
+	if (IsOnlySelected(unit) || player == ThisPlayer) {
 	    // could affect the buttons of any selected unit
 	    SelectedUnitChanged();
-	    MustRedraw|=RedrawInfoPanel;
+	    MustRedraw |= RedrawInfoPanel;
 	}
 
 	return;
     }
 
-    if( IsOnlySelected(unit) ) {
-	MustRedraw|=RedrawInfoPanel;
+    if (IsOnlySelected(unit)) {
+	MustRedraw |= RedrawInfoPanel;
     }
 
-    unit->Reset=1;
-    unit->Wait=CYCLES_PER_SECOND/6;
+    unit->Reset = 1;
+    unit->Wait = CYCLES_PER_SECOND / 6;
 }
 
 //@}
