@@ -179,6 +179,7 @@ enum _key_modifiers_ {
 
 	/// pressed mouse button flags
 enum _mouse_buttons_ {
+	NoButton = 0,      ///< No button
 	LeftButton = 2,    ///< Left button on mouse
 	MiddleButton = 4,  ///< Middle button on mouse
 	RightButton = 8,   ///< Right button on mouse
@@ -390,6 +391,10 @@ extern void DrawTimer(void);
 extern void UpdateTimer(void);
 	/// Draw the unit button panel
 extern void DrawButtonPanel(void);
+	/// Update the status line with hints from the button
+extern void UpdateStatusLineForButton(const ButtonAction*);
+	/// Draw the Pie Menu
+extern void DrawPieMenu(void);
 	/// Update the content of the unit button panel
 extern void UpdateButtonPanel(void);
 	/// Handle button click in button panel area

@@ -99,6 +99,7 @@ local void CleanUIGraphics(UI* ui)
 	VideoSafeFree(ui->MenuPanel.Graphic);
 	VideoSafeFree(ui->MinimapPanel.Graphic);
 	VideoSafeFree(ui->StatusLine.Graphic);
+	VideoSafeFree(ui->PieMenuBackground.Graphic);
 
 	menupanel = ui->MenuPanels;
 	while (menupanel) {
@@ -238,6 +239,10 @@ global void LoadUserInterface(void)
 	if (TheUI.ButtonPanel.File) {
 		TheUI.ButtonPanel.Graphic = LoadGraphic(TheUI.ButtonPanel.File);
 	}
+	if (TheUI.PieMenuBackground.File) {
+		TheUI.PieMenuBackground.Graphic =
+			LoadGraphic(TheUI.PieMenuBackground.File);
+	}
 	if (TheUI.MenuPanel.File) {
 		TheUI.MenuPanel.Graphic = LoadGraphic(TheUI.MenuPanel.File);
 	}
@@ -361,6 +366,9 @@ global void CleanUI(UI* ui)
 
 	// Menu Button
 	free(ui->MenuPanel.File);
+
+	// Pie Menu
+	free(ui->PieMenuBackground.File);
 
 	// Minimap
 	free(ui->MinimapPanel.File);

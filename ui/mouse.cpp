@@ -30,12 +30,16 @@
 
 //@{
 
+#define ICON_SIZE_X (TheUI.ButtonButtons[0].Width)
+#define ICON_SIZE_Y (TheUI.ButtonButtons[0].Height)
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "stratagus.h"
 #include "tileset.h"
@@ -78,6 +82,7 @@ global enum _cursor_on_ CursorOn = CursorOnUnknown;		/// Cursor on field
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+local void HandlePieMenuMouseSelection(void);
 
 /**
 **  Cancel building cursor mode.
@@ -655,6 +660,23 @@ global void UIHandleMouseMove(int x, int y)
 	//
 	if (CursorState == CursorStateRectangle) {
 		return;
+	}
+
+	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
+		// in the map area
+		// make the piemenu "follow" the mouse
+		if (CursorX - CursorStartX > TheUI.PieX[2]) {
+			CursorStartX = CursorX - TheUI.PieX[2];
+		}
+		if (CursorStartX - CursorX > TheUI.PieX[2]) {
+			CursorStartX = CursorX + TheUI.PieX[2];
+		}
+		if (CursorStartY - CursorY > TheUI.PieY[4]) {
+			CursorStartY = CursorY + TheUI.PieY[4];
+		}
+		if (CursorY - CursorStartY > TheUI.PieY[4]) {
+			CursorStartY = CursorY - TheUI.PieY[4];
+		}
 	}
 
 	//
@@ -1320,6 +1342,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	UpdateButtonPanel();
 }
 
+
 /**
 **  Called if mouse button pressed down.
 **
@@ -1371,6 +1394,16 @@ global void UIHandleButtonDown(unsigned button)
 	//
 	if (CursorState == CursorStateSelect) {
 		UISelectStateButtonDown(button);
+		return;
+	}
+
+	if (CursorState == CursorStatePieMenu) {
+		if (CursorOn == CursorOnMap) {
+			HandlePieMenuMouseSelection();
+		} else {
+			// Pie Menu canceled
+			CursorState = CursorStatePoint;
+		}
 		return;
 	}
 
@@ -1431,7 +1464,15 @@ global void UIHandleButtonDown(unsigned button)
 			return;
 		}
 
-		if (MouseButtons & LeftButton) { // enter select mode
+		if (MouseButtons & TheUI.PieMouseButton) { // enter pie menu
+			CursorStartX = CursorX;
+			CursorStartY = CursorY;
+			if (NumSelected && Selected[0]->Player == ThisPlayer &&
+					CursorState == CursorStatePoint) {
+				CursorState = CursorStatePieMenu;
+				MustRedraw |= RedrawCursor;
+			}
+		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 			CursorStartScrMapX = CursorStartX - TheUI.MouseViewport->X +
@@ -1458,8 +1499,8 @@ global void UIHandleButtonDown(unsigned button)
 				y = Viewport2MapY(TheUI.MouseViewport, CursorY);
 
 				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y)) &&
-					!UnitUnderCursor->Type->Decoration) {
-					unit->Blink = 4;		// if right click on building -- blink
+						!UnitUnderCursor->Type->Decoration) {
+					unit->Blink = 4;                // if right click on building -- blink
 				} else {		// if not not click on building -- green cross
 					if (ClickMissile) {
 						MakeLocalMissile(MissileTypeByIdent(ClickMissile),
@@ -1525,7 +1566,7 @@ global void UIHandleButtonDown(unsigned button)
 				if (ButtonUnderCursor == 0 && NumSelected == 1) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					ViewportCenterViewpoint(TheUI.SelectedViewport, Selected[0]->X,
-						Selected[0]->Y, Selected[0]->IX + TileSizeX / 2, 
+						Selected[0]->Y, Selected[0]->IX + TileSizeX / 2,
 						Selected[0]->IY + TileSizeY / 2);
 				}
 			//
@@ -1559,7 +1600,7 @@ global void UIHandleButtonDown(unsigned button)
 			//  clicked on researching button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
-				if (!GameObserve && !GamePaused && 
+				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugPrint("Cancel research %s\n" _C_
@@ -1626,6 +1667,18 @@ global void UIHandleButtonUp(unsigned button)
 	if (GameCursor == TheUI.Scroll.Cursor) {
 		GameCursor = TheUI.Point.Cursor;
 		return;
+	}
+
+	//
+	//  Pie Menu
+	//
+	if (CursorState == CursorStatePieMenu) {
+		if (CursorStartX == CursorX && CursorStartY == CursorY) {
+			// no move; wait for a click to select the pie
+		} else {
+			// there was a move, handle the selected button/pie
+			HandlePieMenuMouseSelection();
+		}
 	}
 
 	//
@@ -1797,7 +1850,7 @@ global void UIHandleButtonUp(unsigned button)
 				if (Selected[0]->Player == ThisPlayer) {
 					char buf[64];
 					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
-						sprintf(buf, "You have ~<%d~> %ss", 
+						sprintf(buf, "You have ~<%d~> %ss",
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name);
 					} else {
@@ -1816,5 +1869,119 @@ global void UIHandleButtonUp(unsigned button)
 		CursorState = CursorStatePoint;
 	}
 }
+
+/**
+**  Get pie menu under the cursor
+*/
+local int GetPieUnderCursor(void)
+{
+	int i;
+	int x;
+	int y;
+
+	x = CursorX - (CursorStartX - ICON_SIZE_X / 2);
+	y = CursorY - (CursorStartY - ICON_SIZE_Y / 2);
+	for (i = 0; i < 8; ++i) {
+		if (x > TheUI.PieX[i] && x < TheUI.PieX[i] + ICON_SIZE_X &&
+				y > TheUI.PieY[i] && y < TheUI.PieY[i] + ICON_SIZE_Y)	{
+			return i;
+		}
+	}
+	return -1; // no pie under cursor
+}
+
+/**
+**  Draw Pie Menu
+*/
+global void DrawPieMenu(void)
+{
+	int i;
+	const ButtonAction* buttons;
+	Viewport* vp;
+	Player* player;
+	char buf[2] = "?";
+
+	if(CursorState != CursorStatePieMenu)
+		return;
+
+	if (!(buttons = CurrentButtons)) {		// no buttons
+		CursorState = CursorStatePoint;
+		return;
+	}
+
+	vp = TheUI.SelectedViewport;
+	PushClipping();
+	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
+
+	// Draw background
+	if (TheUI.PieMenuBackground.Graphic) {
+		VideoDrawClip(TheUI.PieMenuBackground.Graphic, 0,
+			CursorStartX - TheUI.PieMenuBackground.Graphic->Width / 2,
+			CursorStartY - TheUI.PieMenuBackground.Graphic->Height / 2);
+	}
+	player = Selected[0]->Player;
+
+	for (i = 0; i < TheUI.NumButtonButtons && i < 8; ++i) {
+		if (buttons[i].Pos != -1) {
+			int x;
+			int y;
+
+			x = CursorStartX - ICON_SIZE_X / 2 + TheUI.PieX[i];
+			y = CursorStartY - ICON_SIZE_Y / 2 + TheUI.PieY[i];
+			// Draw icon
+			DrawIcon(player, buttons[i].Icon.Icon, x, y);
+
+			//	Tutorial show command key in icons
+			if (ShowCommandKey) {
+				char* text;
+
+				if (CurrentButtons[i].Key == 27) {
+					text = "ESC";
+				} else {
+					buf[0] = toupper(CurrentButtons[i].Key);
+					text = buf;
+				}
+				VideoDrawText(x + 4, y + 4, GameFont, text);
+			}
+		}
+	}
+
+	PopClipping();
+
+	i = GetPieUnderCursor();
+	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos!=-1) {
+		UpdateStatusLineForButton(&buttons[i]);
+	}
+}
+
+/**
+**  Handle pie menu mouse selection
+*/
+local void HandlePieMenuMouseSelection(void)
+{
+	int pie;
+
+	if (!CurrentButtons) {  // no buttons
+		return;
+	}
+
+	pie = GetPieUnderCursor();
+	if (pie != -1) {
+		if (CurrentButtons[pie].Action == ButtonButton) {
+			// there is a submenu => stay in piemenu mode
+			// and recenter the piemenu around the cursor
+			CursorStartX = CursorX;
+			CursorStartY = CursorY;
+		} else {
+			CursorState = CursorStatePoint;
+		}
+		DoButtonButtonClicked(pie);
+	} else {
+		CursorState = CursorStatePoint;
+	}
+
+	return;
+}
+
 
 //@}

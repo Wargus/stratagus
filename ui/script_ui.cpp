@@ -1574,6 +1574,57 @@ local int CclDefineUI(lua_State* l)
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
+		} else if (!strcmp(value, "piemenu")) {
+			k = 0;
+			if (!lua_istable(l, j + 1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			subargs = luaL_getn(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
+				if (!strcmp(value, "file")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					ui->PieMenuBackground.File = strdup(LuaToString(l, -1));
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "radius")) {
+					// Position of the pies in a piemenu
+					int coeffX[] = {    0,  193, 256, 193,   0, -193, -256, -193};
+					int coeffY[] = { -256, -193,   0, 193, 256,  193,    0, -193};
+					int pie;
+					int radius;
+
+					lua_rawgeti(l, j + 1, k + 1);
+					radius = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					for (pie = 0; pie < 8; ++pie) {
+						ui->PieX[pie]= (coeffX[pie] * radius) >> 8;
+						ui->PieY[pie]= (coeffY[pie] * radius) >> 8;
+					}
+				} else if (!strcmp(value, "mouse-button")) {
+					const char *button;
+
+					lua_rawgeti(l, j + 1, k + 1);
+					button = LuaToString(l, -1);
+					if (!strcmp(button, "right")) {
+						ui->PieMouseButton = RightButton;
+					} else if (!strcmp(button, "middle")) {
+						ui->PieMouseButton = MiddleButton;
+					} else if (!strcmp(button, "left")) {
+						ui->PieMouseButton = LeftButton;
+					} else {
+						ui->PieMouseButton = NoButton;
+					}
+					lua_pop(l, 1);
+				} else {
+					lua_pushfstring(l, "Unsupported tag: %s", value);
+					lua_error(l);
+				}
+			}
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "map-area")) {
 			int w;
 			int h;
