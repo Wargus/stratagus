@@ -79,7 +79,9 @@ typedef int MenuButtonId;
 #define MBUTTON_VTHIN		48
 #define MBUTTON_FOLDER		51	/* expansion gfx only */
 
-#define MBUTTON_SC_BUTTON	101
+#define MBUTTON_SC_BUTTON_LEFT	107
+#define MBUTTON_SC_BUTTON	116
+#define MBUTTON_SC_BUTTON_RIGHT	125
 
 //	For the game speed slider in the speed settings screen.
 #define MIN_GAME_SPEED		50
