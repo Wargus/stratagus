@@ -846,6 +846,7 @@ void PlayersEachSecond(int player)
 */
 void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 {
+#ifndef USE_OPENGL
 	SDL_LockSurface(sprite->Surface);
 	SDL_SetColors(sprite->Surface, ((Player*)player)->UnitColors.Colors, 208, 4);
 	if (sprite->SurfaceFlip) {
@@ -853,6 +854,7 @@ void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 			((Player*)player)->UnitColors.Colors, 208, 4);
 	}
 	SDL_UnlockSurface(sprite->Surface);
+#endif
 }
 
 /**

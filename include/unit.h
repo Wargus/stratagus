@@ -936,6 +936,11 @@ extern void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 	int x, int y);
 	/// Draw A single Unit
 extern void DrawUnit(const Unit* unit);
+#ifdef USE_OPENGL
+	/// Draw the sprite with the player colors
+extern void DrawUnitPlayerColor(const UnitType* type, Graphic* sprite, Graphic** glsprite,
+	int player, int frame, int x, int y);
+#endif
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const Viewport* vp, Unit** table);
 	/// Show an unit's orders.

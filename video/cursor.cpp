@@ -291,6 +291,10 @@ static void DrawBuildingCursor(void)
 	DrawShadow(NULL, CursorBuilding, frame, x, y);
 	GraphicPlayerPixels(ThisPlayer, CursorBuilding->Sprite);
 	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, frame, x, y);
+#ifdef USE_OPENGL
+	DrawUnitPlayerColor(CursorBuilding, CursorBuilding->Sprite, (Graphic**)CursorBuilding->PlayerColorSprite,
+		ThisPlayer->Player, frame, x, y);
+#endif
 
 	//
 	//  Draw the allow overlay
