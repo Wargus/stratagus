@@ -304,6 +304,66 @@ local void UiEnterMenu(void)
 }
 
 /**
+**	Enter Options menu
+*/
+local void UiEnterOptionsMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    ProcessMenu(MENU_GAME_OPTIONS, 1);
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+/**
+**	Enter Sound Options menu
+*/
+local void UiEnterSoundOptionsMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    ProcessMenu(MENU_SOUND_OPTIONS, 1);
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+/**
+**	Enter Speed Options menu
+*/
+local void UiEnterSpeedOptionsMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    ProcessMenu(MENU_SPEED_SETTINGS, 1);
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+/**
+**	Enter Preferences Options menu
+*/
+local void UiEnterPreferencesOptionsMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    ProcessMenu(MENU_PREFERENCES, 1);
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+/**
 **	Toggle big map mode.
 */
 local void UiToggleBigMap(void)
@@ -558,7 +618,34 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&ModifierAlt) ) {
 		break;
 	    }
-	case KeyCodeF10:
+
+	case KeyCodeF5:			// Options menu
+	    if( KeyState!=KeyStateInput ) {
+		UiEnterOptionsMenu();
+	    }
+	    break;
+
+	case KeyCodeF7:			// Sound Options menu
+	    if( KeyState!=KeyStateInput ) {
+		UiEnterSoundOptionsMenu();
+	    }
+	    break;
+
+	case KeyCodeF8:			// Speed Options menu
+	    if( KeyState!=KeyStateInput ) {
+		// FIXME: Enable when this works
+//		UiEnterSpeedOptionsMenu();
+	    }
+	    break;
+
+	case KeyCodeF9:			// Preferences menu
+	    if( KeyState!=KeyStateInput ) {
+		// FIXME: Enable when this works
+//		UiEnterPreferencesOptionsMenu();
+	    }
+	    break;
+
+	case KeyCodeF10:		// Game Options menu
 	    if( KeyState!=KeyStateInput ) {
 		UiEnterMenu();
 	    }
