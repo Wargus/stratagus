@@ -759,6 +759,9 @@ global void WaitEventsAndKeepSync(void)
 		maxfd=NetworkFildes;
 	    }
 	    FD_SET(NetworkFildes,&rfds);
+	    if( !NetworkInSync ) {
+		NetworkRecover();	// recover network
+	    }
 	}
 
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
