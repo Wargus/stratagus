@@ -259,6 +259,9 @@ global void EditTiles(int x, int y, int tile, int size)
     if ( !MirrorEdit ) return;
     
     EditTilesInternal( mx - x - size, y, tile, size );
+    
+    if ( MirrorEdit == 1 ) return;
+    
     EditTilesInternal( x, my - y - size, tile, size );
     EditTilesInternal( mx - x - size, my - y - size, tile, size );
 }
@@ -308,6 +311,9 @@ local void EditUnit(int x, int y, UnitType* type, Player* player)
     if ( !MirrorEdit ) return;
     
     EditUnitInternal( mx - x - 1, y, type, player );
+    
+    if ( MirrorEdit == 1 ) return;
+    
     EditUnitInternal( x, my - y - 1, type, player );
     EditUnitInternal( mx - x - 1, my - y - 1, type, player );
 }
@@ -1281,9 +1287,17 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	case 'M':			// CTRL+M Mirror edit
 	    if( KeyModifiers & ModifierControl ) 
             {
-  	        MirrorEdit = !MirrorEdit;
-                SetStatusLine( MirrorEdit ? "Miror editing enabled" 
-                                          : "Miror editing disabled" );
+  	        MirrorEdit++;
+		if ( MirrorEdit == 3 ) MirrorEdit = 0;
+                switch( MirrorEdit )
+		  {
+		  case 1:
+		      SetStatusLine( "Mirror editing enabled: 2-side" ); break;
+		  case 2:
+		      SetStatusLine( "Mirror editing enabled: 4-side" ); break;
+		  default:
+		      SetStatusLine( "Mirror editing disabled" ); break;
+		  }
 	    }
 	    break;
 
