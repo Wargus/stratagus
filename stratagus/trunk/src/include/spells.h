@@ -91,7 +91,7 @@ typedef struct _spell_type_ {
     char* Name;			/// spell name shown by the engine
 
     int  Range;			/// spell range
-    int  ManaCost;		/// required mana for each cast
+    unsigned  ManaCost : 8;	/// required mana for each cast
     int  TTL;			/// time to live (ticks)
 
     SpellActionType  Action;	/// SpellAction...
