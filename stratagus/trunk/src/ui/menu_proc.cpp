@@ -827,11 +827,11 @@ local void DrawHSlider(Menuitem* mi, int mx, int my)
 	    PushClipping();
 	    SetClipping(0, 0, x + w - 20, VideoHeight - 1);
 		if (mi->transparent) {
-	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
-	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
+		VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+		VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
 		} else {
 		VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
-	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
+		VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
 		}
 	    PopClipping();
 	    if (mi->d.hslider.cflags & MI_CFLAGS_LEFT) {
@@ -978,9 +978,9 @@ local void DrawInput(Menuitem* mi, int mx, int my)
 	PushClipping();
 	SetClipping(0, 0, x + w, VideoHeight - 1);
 	if (mi->transparent) {
-	VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+		VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
 	} else {
-	VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+		VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
 	}
 	PopClipping();
 	text = mi->d.input.buffer;
