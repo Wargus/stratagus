@@ -256,10 +256,6 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 
 /**
 **  Draw menu button area.
-**
-**  With debug it shows the used frame time and arrival of network packets.
-**
-**  @todo  Must be more configurable. Adding diplomacy menu here?
 */
 local void DrawMenuButtonArea(void)
 {
@@ -271,35 +267,35 @@ local void DrawMenuButtonArea(void)
 	}
 	if (!IsNetworkGame()) {
 		if (TheUI.MenuButton.X != -1) {
-		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
+			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(TheUI.MenuButton.Button,
-				(ButtonAreaUnderCursor == ButtonAreaMenu
-					&& ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
-				(GameMenuButtonClicked ? MenuButtonClicked : 0), /*Transparent */ 0,
+				(ButtonAreaUnderCursor == ButtonAreaMenu &&
+					ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
+				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
 				TheUI.MenuButton.Width, TheUI.MenuButton.Height,
 				TheUI.MenuButton.X, TheUI.MenuButton.Y,
-				GameFont, TheUI.MenuButton.Text, NULL, NULL);
+				TheUI.MenuButton.Font, TheUI.MenuButton.Text, NULL, NULL);
 		}
 	} else {
 		if (TheUI.NetworkMenuButton.X != -1) {
-		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
+			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(TheUI.NetworkMenuButton.Button,
-				(ButtonAreaUnderCursor == ButtonAreaMenu
-					&& ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
-				(GameMenuButtonClicked ? MenuButtonClicked : 0), /*Transparent */ 0,
+				(ButtonAreaUnderCursor == ButtonAreaMenu &&
+					ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
+				(GameMenuButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
 				TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
 				TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
-				GameFont, TheUI.NetworkMenuButton.Text, NULL, NULL);
+				TheUI.NetworkMenuButton.Font, TheUI.NetworkMenuButton.Text, NULL, NULL);
 		}
 		if (TheUI.NetworkDiplomacyButton.X != -1) {
-		//FIX ME: Transparent flag, 3rd param, has been hardcoded.
+			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(TheUI.NetworkDiplomacyButton.Button,
-				(ButtonAreaUnderCursor == ButtonAreaMenu
-					&& ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
-				(GameDiplomacyButtonClicked ? MenuButtonClicked : 0), /*Transparent */ 0,
+				(ButtonAreaUnderCursor == ButtonAreaMenu &&
+					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
+				(GameDiplomacyButtonClicked ? MenuButtonClicked : 0), /* Transparent */ 0,
 				TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
 				TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
-				GameFont, TheUI.NetworkDiplomacyButton.Text, NULL, NULL);
+				TheUI.NetworkDiplomacyButton.Font, TheUI.NetworkDiplomacyButton.Text, NULL, NULL);
 		}
 	}
 

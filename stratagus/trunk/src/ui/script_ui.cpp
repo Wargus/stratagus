@@ -1681,6 +1681,10 @@ local int CclDefineUI(lua_State* l)
 							lua_rawgeti(l, -1, subk + 1);
 							ui->MenuButton.Text = strdup(LuaToString(l, -1));
 							lua_pop(l, 1);
+						} else if (!strcmp(value, "font")) {
+							lua_rawgeti(l, -1, subk + 1);
+							ui->MenuButton.Font = FontByIdent(LuaToString(l, -1));
+							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
 							ui->MenuButton.Button = scm2buttonid(l, LuaToString(l, -1));
@@ -1728,6 +1732,10 @@ local int CclDefineUI(lua_State* l)
 							lua_rawgeti(l, -1, subk + 1);
 							ui->NetworkMenuButton.Text = strdup(LuaToString(l, -1));
 							lua_pop(l, 1);
+						} else if (!strcmp(value, "font")) {
+							lua_rawgeti(l, -1, subk + 1);
+							ui->NetworkMenuButton.Font = FontByIdent(LuaToString(l, -1));
+							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
 							ui->NetworkMenuButton.Button = scm2buttonid(l, LuaToString(l, -1));
@@ -1774,6 +1782,10 @@ local int CclDefineUI(lua_State* l)
 						} else if (!strcmp(value, "caption")) {
 							lua_rawgeti(l, -1, subk + 1);
 							ui->NetworkDiplomacyButton.Text = strdup(LuaToString(l, -1));
+							lua_pop(l, 1);
+						} else if (!strcmp(value, "font")) {
+							lua_rawgeti(l, -1, subk + 1);
+							ui->NetworkDiplomacyButton.Font = FontByIdent(LuaToString(l, -1));
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
