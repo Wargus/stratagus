@@ -349,7 +349,8 @@ local void SaveUi(CLFile* file, const UI* ui)
 	ui->InfoPanelW, ui->InfoPanelH);
 
     CLprintf(file, "\n  'completed-bar '(");
-    CLprintf(file, "\n    color %d", ui->CompleteBarColor);
+    CLprintf(file, "\n    color (%d %d %d)", ui->CompleteBarColorRGB.D24.a,
+	ui->CompleteBarColorRGB.D24.b, ui->CompleteBarColorRGB.D24.c);
     CLprintf(file, "\n    pos (%3d %3d)", ui->CompleteBarX, ui->CompleteBarY);
     CLprintf(file, "\n    size (%d %d)", ui->CompleteBarW, ui->CompleteBarH);
     CLprintf(file, "\n    text \"%s\"", ui->CompleteBarText);
