@@ -637,30 +637,32 @@ global void DrawResources(void)
 
 #define MESSAGES_TIMEOUT  (FRAMES_PER_SECOND*5)	/// Message timeout 5 seconds
 
-local unsigned long   MessageFrameTimeout;	/// frame to expire message
+local unsigned long   MessagesFrameTimeout;	/// Frame to expire message
 
 
-#define MESSAGES_MAX  10			/// Howmany can be displayed
+#define MESSAGES_MAX  10			/// How many can be displayed
 
-local char Messages[MESSAGES_MAX][64];		/// FIXME: docu
-local int  MessagesCount;			/// FIXME: docu
-local int  SameMessageCount;			/// Counts same message repeats
+local char Messages[MESSAGES_MAX][128];		/// Array of messages
+local int  MessagesCount;			/// Number of messages
+local int  MessagesSameCount;			/// Counts same message repeats
+local int  MessagesScrollY;			/// Used for smooth scrolling
 
-local char MessagesEvent[ MESSAGES_MAX ][64];	/// FIXME: docu
-local int  MessagesEventX[ MESSAGES_MAX ];	/// FIXME: docu
-local int  MessagesEventY[ MESSAGES_MAX ];	/// FIXME: docu
-local int  MessagesEventCount;			/// FIXME: docu
+local char MessagesEvent[MESSAGES_MAX][64];	/// Array of event messages
+local int  MessagesEventX[MESSAGES_MAX];	/// X coordinate of event
+local int  MessagesEventY[MESSAGES_MAX];	/// Y coordinate of event
+local int  MessagesEventCount;			/// Number of event messages
 local int  MessagesEventIndex;			/// FIXME: docu
 
+
 /**
-**	Shift messages array with one.
+**	Shift messages array by one.
 */
 local void ShiftMessages(void)
 {
     int z;
 
     if (MessagesCount) {
-	MessagesCount--;
+	--MessagesCount;
 	for (z = 0; z < MessagesCount; z++) {
 	    strcpy(Messages[z], Messages[z + 1]);
 	}
@@ -668,14 +670,14 @@ local void ShiftMessages(void)
 }
 
 /**
-**	Shift messages events array with one.
+**	Shift messages events array by one.
 */
 local void ShiftMessagesEvent(void)
 {
     int z;
 
     if (MessagesEventCount ) {
-	MessagesEventCount--;
+	--MessagesEventCount;
 	for (z = 0; z < MessagesEventCount; z++) {
 	    MessagesEventX[z] = MessagesEventX[z + 1];
 	    MessagesEventY[z] = MessagesEventY[z + 1];
@@ -685,28 +687,55 @@ local void ShiftMessagesEvent(void)
 }
 
 /**
+**	Update messages
+**
+**	@todo FIXME: make scroll speed configurable.
+*/
+global void UpdateMessages(void)
+{
+    if (!MessagesCount) {
+	return;
+    }
+
+    // Scroll/remove old message line
+    if (MessagesFrameTimeout < FrameCounter) {
+	++MessagesScrollY;
+	if (MessagesScrollY == VideoTextHeight(GameFont) + 1) {
+	    MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT - MessagesScrollY;
+	    MessagesScrollY = 0;
+	    ShiftMessages();
+	}
+	MustRedraw |= RedrawMessage;
+	// FIXME: for performance the minimal area covered by msg's should be used
+	MarkDrawEntireMap();
+    }
+}
+
+/**
 **	Draw message(s).
 **
-**	@todo FIXME: make message font and scroll speed configurable.
-**	      FIXME: let the messages soft scroll.
+**	@todo FIXME: make message font configurable.
 */
-global void DrawMessage(void)
+global void DrawMessages(void)
 {
     int z;
 
-    // Remove old message line
-    if (MessageFrameTimeout < FrameCounter) {
-	ShiftMessages();
-	MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
-    }
     // Draw message line(s)
     for (z = 0; z < MessagesCount; z++) {
-	VideoDrawText(TheUI.MapArea.X + 8,
-	    TheUI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1),
+	if (z == 0) {
+	    PushClipping();
+	    SetClipping(TheUI.MapArea.X + 8, TheUI.MapArea.Y + 8, VideoWidth,
+		VideoHeight);
+	}
+	VideoDrawTextClip(TheUI.MapArea.X + 8,
+	    TheUI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1) - MessagesScrollY,
 	    GameFont, Messages[z]);
+	if (z == 0) {
+	    PopClipping();
+	}
     }
     if (MessagesCount < 1) {
-	SameMessageCount = 0;
+	MessagesSameCount = 0;
     }
 }
 
@@ -721,8 +750,15 @@ local void AddMessage(const char *msg)
     char *message;
     char *next;
 
+    if (!MessagesCount) {
+	MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+    }
+
     if (MessagesCount == MESSAGES_MAX) {
+	// Out of space to store messages, can't scroll smoothly
 	ShiftMessages();
+	MessagesFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
+	MessagesScrollY = 0;
     }
 
     message = Messages[MessagesCount];
@@ -771,7 +807,7 @@ local void AddMessage(const char *msg)
 	}
     }
 
-    MessagesCount++;
+    ++MessagesCount;
 
     if (strlen(msg) != (size_t)(ptr-message)) {
 	AddMessage(msg+(next-message));
@@ -784,21 +820,21 @@ local void AddMessage(const char *msg)
 **	@param msg	Message to check.
 **	@return		non-zero to skip this message
 */
-global int CheckRepeatMessage(const char *msg)
+local int CheckRepeatMessage(const char *msg)
 {
     if (MessagesCount < 1) {
 	return 0;
     }
     if (!strcmp(msg, Messages[MessagesCount - 1])) {
-	SameMessageCount++;
+	++MessagesSameCount;
 	return 1;
     }
-    if (SameMessageCount > 0) {
+    if (MessagesSameCount > 0) {
 	char temp[128];
 	int n;
 
-	n = SameMessageCount;
-	SameMessageCount = 0;
+	n = MessagesSameCount;
+	MessagesSameCount = 0;
 	// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
 	sprintf(temp, "Last message repeated ~<%d~> times", n + 1);
 	AddMessage(temp);
@@ -824,9 +860,8 @@ global void SetMessage(const char *fmt, ...)
     }
     AddMessage(temp);
     MustRedraw |= RedrawMessage;
-    //FIXME: for performance the minimal area covered by msg's should be used
+    // FIXME: for performance the minimal area covered by msg's should be used
     MarkDrawEntireMap();
-    MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
 }
 
 /**
@@ -839,32 +874,31 @@ global void SetMessage(const char *fmt, ...)
 **	@note FIXME: vladi: I know this can be just separated func w/o msg but
 **		it is handy to stick all in one call, someone?
 */
-global void SetMessageEvent( int x, int y, const char* fmt, ... )
+global void SetMessageEvent(int x, int y, const char* fmt, ...)
 {
     char temp[128];
     va_list va;
 
-    va_start( va, fmt );
-    vsprintf( temp, fmt, va );
-    va_end( va );
-    if ( CheckRepeatMessage( temp ) == 0 ) {
-	AddMessage( temp );
+    va_start(va, fmt);
+    vsprintf(temp, fmt, va);
+    va_end(va);
+    if (CheckRepeatMessage(temp) == 0) {
+	AddMessage(temp);
     }
 
-    if ( MessagesEventCount == MESSAGES_MAX ) {
+    if (MessagesEventCount == MESSAGES_MAX) {
 	ShiftMessagesEvent();
     }
 
-    strcpy( MessagesEvent[ MessagesEventCount ], temp );
-    MessagesEventX[ MessagesEventCount ] = x;
-    MessagesEventY[ MessagesEventCount ] = y;
+    strcpy(MessagesEvent[MessagesEventCount], temp);
+    MessagesEventX[MessagesEventCount] = x;
+    MessagesEventY[MessagesEventCount] = y;
     MessagesEventIndex = MessagesEventCount;
-    MessagesEventCount++;
+    ++MessagesEventCount;
 
-    MustRedraw|=RedrawMessage;
+    MustRedraw |= RedrawMessage;
     //FIXME: for performance the minimal area covered by msg's should be used
     MarkDrawEntireMap();
-    MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
 }
 
 /**
@@ -881,7 +915,7 @@ global void CenterOnMessage(void)
     ViewportCenterViewpoint(TheUI.SelectedViewport,
 	MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]);
     SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
-    MessagesEventIndex++;
+    ++MessagesEventIndex;
 }
 
 /**
@@ -890,9 +924,10 @@ global void CenterOnMessage(void)
 global void CleanMessages(void)
 {
     MessagesCount = 0;
-    SameMessageCount = 0;
+    MessagesSameCount = 0;
     MessagesEventCount = 0;
     MessagesEventIndex = 0;
+    MessagesScrollY = 0;
 }
 
 /*----------------------------------------------------------------------------
