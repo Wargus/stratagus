@@ -80,7 +80,7 @@ typedef struct _sample_type_ {
 	**
 	**	@return		Number of bytes filled.
 	*/
-    int (*Read)		(Sample* o, void* buf, int len);
+    int (*Read)		(Sample* o, void* buf, unsigned len);
 	/**
 	**	Free the sample object.
 	**

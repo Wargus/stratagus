@@ -137,7 +137,7 @@ local int OGG_close(void* user)
 **
 **	@return		    Number of bytes read
 */
-local int OggReadStream(Sample* sample, void* buf, int len)
+local int OggReadStream(Sample* sample, void* buf, unsigned len)
 {
     OggData* data;
     int i;
@@ -147,7 +147,7 @@ local int OggReadStream(Sample* sample, void* buf, int len)
     data = (OggData*) sample->User;
 
     // see if we have enough read already
-    if (data->PointerInBuffer + len - sample->Data > sample->Length) {
+    if (data->PointerInBuffer - sample->Data + len > sample->Length) {
 	// not enough in buffer, read more
 	n = sample->Length - (data->PointerInBuffer - sample->Data);
 	memcpy(sample->Data, data->PointerInBuffer, n);
@@ -212,7 +212,7 @@ local const SampleType OggStreamSampleType = {
 **
 **	@return		    Number of bytes read
 */
-local int OggRead(Sample* sample, void* buf, int len)
+local int OggRead(Sample* sample, void* buf, unsigned len)
 {
     unsigned pos;
 
@@ -401,7 +401,7 @@ global Sample* LoadOgg(const char* name,int flags)
 local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 {
     AviFile* avi;
-    int length;
+    size_t length;
     unsigned char* frame;
 
     DebugLevel3Fn("%p: %p %d*%d\n" _C_ user _C_ ptr _C_ size _C_ nmemb);
