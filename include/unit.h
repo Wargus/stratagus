@@ -942,15 +942,10 @@ extern void LoadDecorations(void);
 extern void CleanDecorations(void);
 
 	/// Draw unit's shadow
-extern void DrawShadow(const Unit* unit, const struct _unit_type_* type, int frame,
-	int x, int y);
+extern void DrawShadow(const Unit* unit, const struct _unit_type_* type,
+	int frame, int x, int y);
 	/// Draw A single Unit
 extern void DrawUnit(const Unit* unit);
-#ifdef USE_OPENGL
-	/// Draw the sprite with the player colors
-extern void DrawUnitPlayerColor(const struct _unit_type_* type, struct _graphic_* sprite, 
-	struct _graphic_** glsprite, int player, int frame, int x, int y);
-#endif
 	/// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const Viewport* vp, Unit** table);
 	/// Show an unit's orders.

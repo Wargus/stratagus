@@ -687,17 +687,29 @@ UnitType* NewUnitTypeSlot(char* ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y)
+void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
+	int x, int y)
 {
+#ifdef USE_OPENGL
+	if (!sprite->PlayerColorTextures[player]) {
+		MakePlayerColorTexture(sprite, player);
+	}
+#else
+	SDL_SetColors(sprite->Surface, Players[player].UnitColors.Colors, 208, 4);
+	if (sprite->SurfaceFlip) {
+		SDL_SetColors(sprite->SurfaceFlip, Players[player].UnitColors.Colors, 208, 4);
+	}
+#endif
+
 	// FIXME: move this calculation to high level.
 	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
 	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
 
 	if (type->Flip) {
 		if (frame < 0) {
-			VideoDrawClipX(sprite, -frame - 1, x, y);
+			VideoDrawPlayerColorClipX(sprite, player, -frame - 1, x, y);
 		} else {
-			VideoDrawClip(sprite, frame, x, y);
+			VideoDrawPlayerColorClip(sprite, player, frame, x, y);
 		}
 	} else {
 		int row;
@@ -708,7 +720,7 @@ void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x, int y
 		} else {
 			frame = (frame / row) * type->NumDirections + frame % row;
 		}
-		VideoDrawClip(sprite, frame, x, y);
+		VideoDrawPlayerColorClip(sprite, player, frame, x, y);
 	}
 }
 
@@ -1057,11 +1069,7 @@ void CleanUnitTypes(void)
 		if (!type->SameSprite) { // our own graphics
 			VideoSafeFree(type->Sprite);
 		}
-#ifdef USE_OPENGL
-		for (j = 0; j < PlayerMax; ++j) {
-			VideoSafeFree(type->PlayerColorSprite[j]);
-		}
-#endif
+
 		free(UnitTypes[i]);
 		UnitTypes[i] = 0;
 	}
