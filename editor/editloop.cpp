@@ -1742,7 +1742,7 @@ local void CreateEditor(void)
     FlagRevealMap = 1;			// editor without fog and all visible
     TheMap.NoFogOfWar = 1;
     if (!*CurrentMapPath) {		// new map!
-	InitUnitTypes();
+	InitUnitTypes(1);
 #if 0
 	//
 	//      Inititialize TheMap / Players.
