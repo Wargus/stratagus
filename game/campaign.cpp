@@ -313,7 +313,7 @@ local SCM CclDefineCampaign(SCM list)
     if( Campaigns ) {
 	for( i=0; i<NumCampaigns; ++i ) {
 	    if( !strcmp(Campaigns[i].Ident, ident) ) {
-		if( Campaigns[i].Chapters ) {
+		if( !strcmp(ident, "current") && Campaigns[i].Chapters ) {
 		    FreeChapters(&Campaigns[i].Chapters);
 		}
 		campaign=Campaigns+i;
