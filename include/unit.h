@@ -968,11 +968,11 @@ extern Unit* OilDepositOnMap(int tx,int ty);
 extern Unit* WoodDepositOnMap(int tx,int ty);
 
     /// Find best enemy in numeric range to attack
-extern Unit* AttackUnitsInDistance(const Unit* unit,int range);
+extern Unit* AttackUnitsInDistance(Unit* unit,int range);
     /// Find best enemy in attack range to attack
-extern Unit* AttackUnitsInRange(const Unit* unit);
+extern Unit* AttackUnitsInRange(Unit* unit);
     /// Find best enemy in reaction range to attack
-extern Unit* AttackUnitsInReactRange(const Unit* unit);
+extern Unit* AttackUnitsInReactRange(Unit* unit);
 
 //      in groups.c
 

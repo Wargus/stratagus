@@ -730,9 +730,9 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 	}
 
 	order->Action=UnitActionHarvest;
-	order->X=x-1;
-	order->Y=y-1;
-	order->RangeX=order->RangeY=2;
+	order->X=x;
+	order->Y=y;
+	order->RangeX=order->RangeY=1;
 	order->Goal=NoUnitP;
 	order->Type=NULL;
 	order->Arg1=NULL;

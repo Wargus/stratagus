@@ -73,9 +73,7 @@ newtry:
 
 	    // Move to new wood position
 	    unit->Orders[0].Goal=NoUnitP;
-	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=2;
-	    unit->Orders[0].X--;
-	    unit->Orders[0].Y--;
+	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	    NewResetPath(unit);
 	    return 0;
 	}
@@ -86,8 +84,8 @@ newtry:
 	return 0;
     }
 
-    x=unit->Orders[0].X+1;
-    y=unit->Orders[0].Y+1;
+    x=unit->Orders[0].X;
+    y=unit->Orders[0].Y;
 
     if( !CheckedForestOnMap(x,y) ) {
 	//
@@ -116,6 +114,7 @@ newtry:
 	    ++x;
 	    ++y;
 	} else {
+	    DebugLevel3Fn("No Wood, Trying a better spot\n");
 	    goto newtry;
 	}
     }
@@ -177,7 +176,7 @@ local int ChopWood(Unit* unit)
 	if( !ForestOnMap(unit->Orders[0].X,unit->Orders[0].Y) ) {
 	    if( FindWoodInSight(unit,&unit->Orders[0].X,&unit->Orders[0].Y) ) {
 		unit->Orders[0].Goal=NoUnitP;
-		unit->Orders[0].RangeX=unit->Orders[0].RangeY=2;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
 		unit->Orders[0].X--;
 		unit->Orders[0].Y--;
@@ -243,7 +242,7 @@ local int ChopWood(Unit* unit)
 		unit->Orders[0].Action=UnitActionStill;
 		unit->SubAction=0;
 	    } else {
-		unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		unit->Orders[0].Goal=destu;
 		RefsDebugCheck( !destu->Refs );
 		destu->Refs++;
