@@ -144,6 +144,16 @@ local void UiDrawCompleted(int full, int ready)
 	VideoFillRectangleClip(TheUI.CompletedBarColor,
 		TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
 
+	if (TheUI.CompletedBarShadow) {
+		//Shadow
+		VideoDrawVLine(ColorGray, TheUI.CompletedBarX + f, TheUI.CompletedBarY, TheUI.CompletedBarH );
+		VideoDrawHLine(ColorGray, TheUI.CompletedBarX, TheUI.CompletedBarY + TheUI.CompletedBarH, f );
+
+		// |~  Light
+		VideoDrawVLine(ColorWhite, TheUI.CompletedBarX, TheUI.CompletedBarY, TheUI.CompletedBarH );
+		VideoDrawHLine(ColorWhite, TheUI.CompletedBarX, TheUI.CompletedBarY, f );
+	}
+		
 	if (TheUI.CompletedBarText) {
 		VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
 			TheUI.CompletedBarFont, TheUI.CompletedBarText);
