@@ -188,17 +188,6 @@ local Animation _DefaultStill[] = {
     {0, 0, 4, 0}, {3, 0, 1, 0}
 };
 
-///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
-local Animation _GruntAttack[] = {
-    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
-    { 3, 0, 1,  0}
-};
-
-///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
-local Animation _GruntDie[] = {
-    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
-};
-
 /*----------------------------------------------------------------------------
 --	Move Table
 ----------------------------------------------------------------------------*/
@@ -400,6 +389,316 @@ local Animation CritterMove[] = {
 };
 
 /*----------------------------------------------------------------------------
+--	Attack
+----------------------------------------------------------------------------*/
+
+///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
+local Animation GruntAttack[] = {
+    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
+    { 3, 0, 1,  0}
+};
+
+///	Peon, Peasant, Attacking Peon, Attacking Peasant.
+global Animation PeonAttack[] = {
+    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0, 3,  5},
+    { 0, 0, 7,-20},{ 3, 0, 1,  0}
+};
+
+///	Ballista
+local Animation BallistaAttack[] = {
+    { 0, 0,25, 10},{12, 0,25,  5},{ 0, 0,100, 0},{ 0, 0,49,-15},{ 3, 0, 1,  0}
+};
+
+///	Catapult
+local Animation CatapultAttack[] = {
+    {12, 0, 4, 15},{ 0, 0, 4,- 5},{ 0, 0, 3,  5},{ 0, 0, 2,- 5},{ 0, 0, 2,  5},
+    { 0, 0,30,- 5},{ 0, 0, 4,  5},{ 0, 0,100, 0},{ 0, 0,50,-15},{ 3, 0, 1,  0}
+};
+
+///	Knight, Paladin, Turalyon, Lothar, Uther Lightbringer
+local Animation KnightAttack[] = {
+    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
+    { 3, 0, 1,  0}
+};
+
+///	Ogre, Ogre-mage, Dentarg, Cho'gall
+local Animation OgreAttack[] = {
+    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
+    { 3, 0, 1,  0}
+};
+
+///	Archer, Ranger, Alleria
+local Animation ArcherAttack[] = {
+    { 0, 0,10, 25},{12, 0,10,  5},{ 0, 0,44,-30},
+    { 3, 0, 1,  0}
+};
+
+///	Axethrower, Berserker, Zuljin
+local Animation AxethrowerAttack[] = {
+    { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 3,  5},{ 0, 0,52,-40},
+    { 3, 0, 1,  0}
+};
+
+///	Mage, Khadar
+local Animation MageAttack[] = {
+    { 0, 0, 5, 25},{ 0, 0, 5,  5},{12, 0, 7,  5},{ 0, 0, 5,  5},{ 0, 0,17,-40},
+    { 3, 0, 1,  0}
+};
+
+///	Death Knight, Teron Gorefiend, Gul'dan
+local Animation DeathKnightAttack[] = {
+    { 0, 0, 5, 25},{ 0, 0, 5,  5},{12, 0, 7,  5},{ 0, 0, 5,  5},{ 0, 0,17,-40},
+    { 3, 0, 1,  0}
+};
+
+///	Dwarves
+local Animation DwarvesAttack[] = {
+    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{ 3, 0, 1,  0}
+};
+
+///	Goblin Sappers
+local Animation GoblinSappersAttack[] = {
+    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{ 3, 0, 1,  0}
+};
+
+///	Gryphon Rider, Kurdan and Sky'ree:
+local Animation GryphonRiderAttack[] = {
+    { 0, 0, 6,  0},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 2, 0, 1,  0},
+    { 0, 0, 6,  5},{ 0, 0, 6,  5},{12, 0, 8,  5},{ 0, 0, 6,-30},{ 0, 0, 6,  5},
+    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
+    { 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
+    { 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},
+    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},
+    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 1, 0, 1,-15}
+};
+
+///	Dragon, Deathwing
+local Animation DragonAttack[] = {
+    { 0, 0, 6,  0},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 2, 0, 1,  0},
+    {12, 0,20,  5},{ 0, 0, 6,-20},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
+    { 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},
+    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},
+    { 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
+    { 0, 0, 6,  5},{ 0, 0, 6,-15},{ 0, 0, 6,  5},{ 0, 0, 6,  5},{ 0, 0, 6,  5},
+    { 1, 0, 1,-15}
+};
+
+///	Eye of kilrogg
+local Animation EyeOfKilroggAttack[] = {
+    { 3, 0, 1,  0}
+};
+
+///	Human tanker, orc tanker:
+local Animation TankerAttack[] = {
+    {12, 0,30,  0},{ 0, 0,99,  0},{ 3, 0, 1,  0}
+};
+
+///	Human transporter, orc transporter:
+local Animation TransportAttack[] = {
+    {12, 0,119,  0},{ 3, 0, 1,  0}
+};
+
+///	Elven destroyer, Troll destroyer:
+local Animation DestroyerAttack[] = {
+    {12, 0,119,  0},{ 3, 0, 1,  0}
+};
+
+///	Battleship, Juggernaught
+local Animation BattleshipAttack[] = {
+    {12, 0,127,  0},{ 0, 0,102,  0},{ 3, 0, 1,  0}
+};
+
+///	Gnomish submarine, giant turtle
+local Animation SubmarineAttack[] = {
+    { 0, 0,10,  5},{ 0, 0,25,  5},{12, 0,25,  0},{ 0, 0,25,- 5},{ 0, 0,29,- 5},
+    { 3, 0, 1,  0}
+};
+
+///	Gnomish flying machine
+local Animation GnomishFlyingMachineAttack[] = {
+    { 3, 0, 1,  0}
+};
+
+///	Goblin zeppelin
+local Animation GoblinZeppelinAttack[] = {
+    { 3, 0, 1,  0}
+};
+
+///	Critter
+local Animation CritterAttack[] = {
+    { 3, 0, 1,  0}
+};
+
+///	Skeleton
+local Animation SkeletonAttack[] = {
+    { 0, 0, 4, 15},{ 0, 0, 4, 15},{12, 0, 4, 15},{ 0, 0, 4, 15},{ 0, 0,18,-60},
+    { 3, 0, 1,  0}
+};
+
+///	Daemon
+local Animation DaemonAttack[] = {
+    { 0, 0, 4,  0},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{ 0, 0, 4,  5},
+    { 2, 0, 1,  0},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{ 0, 0, 4,  5},{12, 0, 4,  5},
+    { 0, 0, 4,  5},{ 1, 0, 1,-45}
+};
+
+///	Guard tower
+local Animation GuardTowerAttack[] = {
+    {12, 0,59,  0},{ 3, 0, 1,  0},
+};
+
+///	Cannon tower
+local Animation CannonTowerAttack[] = {
+    {12, 0,150,  0},{ 3, 0, 1,  0},
+};
+
+/*----------------------------------------------------------------------------
+--	Die
+----------------------------------------------------------------------------*/
+
+///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
+local Animation GruntDie[] = {
+    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+};
+
+///	Peon, Peasant, Attacking Peon, Attacking Peasant.
+local Animation PeonDie[] = {
+    { 0, 0, 3, 50},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+};
+
+///	Knight, Paladin, Turalyon, Lothar, Uther Lightbringer
+local Animation KnightDie[] = {
+    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100, 5},{ 0, 0,200, 5},
+    { 0, 0,200, 5},{ 3, 0, 1,  0}
+};
+
+///	Ogre, Ogre-mage, Dentarg, Cho'gall
+local Animation OgreDie[] = {
+    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100, 5},{ 0, 0,200, 5},
+    { 0, 0,200, 5},{ 3, 0, 1,  0}
+};
+
+///	Archer, Ranger, Alleria
+local Animation ArcherDie[] = {
+    { 0, 0, 3, 35},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+};
+
+///	Axethrower, Berserker, Zuljin
+local Animation AxethrowerDie[] = {
+    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+};
+
+///	Mage, Khadar
+local Animation MageDie[] = {
+    { 0, 0, 5, 45},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
+    { 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 3, 0, 1,  0}
+};
+
+///	Death Knight, Teron Gorefiend, Gul'dan
+local Animation DeathKnightDie[] = {
+    { 0, 0, 5, 45},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
+    { 3, 0, 1,  0}
+};
+
+///	Dwarves
+local Animation DwarvesDie[] = {
+    { 0, 0, 3,  5},{ 0, 0, 3, 15},{ 0, 0, 3, 15},{ 0, 0, 3, 15},
+    { 0, 0, 3, 10},{ 3, 0, 1,  0}
+};
+
+///	Goblin Sappers
+local Animation GoblinSappersDie[] = {
+    { 0, 0, 3,  5},{ 0, 0, 3, 15},{ 0, 0, 3, 15},{ 0, 0, 3, 15},
+    { 0, 0, 3, 10},{ 0, 0, 3, 10},{ 3, 0, 1,  0}
+};
+
+///	Gryphon Rider, Kurdan and Sky'ree:
+local Animation GryphonRiderDie[] = {
+    { 0, 0, 5, 35},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
+    { 0, 0, 5,  5},{ 0, 0, 5,  5},{ 3, 0, 1,  0}
+};
+
+///	Dragon, Deathwing
+local Animation DragonDie[] = {
+    { 0, 0, 5, 25},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
+    { 0, 0, 5,  5},{ 3, 0, 1,  0}
+};
+
+///	Human tanker, orc tanker:
+local Animation TankerDie[] = {
+    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+};
+
+///	Human transporter, orc transporter:
+local Animation TransportDie[] = {
+    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+};
+
+///	Elven destroyer, Troll destroyer:
+local Animation DestroyerDie[] = {
+    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+};
+
+///	Battleship, Juggernaught
+local Animation BattleshipDie[] = {
+    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+};
+
+///	Gnomish submarine, giant turtle
+local Animation SubmarineDie[] = {
+    { 3, 0, 1,  0}
+};
+
+///	Gnomish flying machine
+local Animation GnomishFlyingMachineDie[] = {
+    { 3, 0, 1,  0}
+};
+
+///	Critter
+local Animation CritterDie[] = {
+    { 0, 0,200,  5},{ 3, 0, 1,  0}
+};
+
+///	Skeleton
+local Animation SkeletonDie[] = {
+    { 0, 0, 3,  5},{ 0, 0, 3, 15},{ 0, 0, 3, 15},{ 0, 0, 3, 15},
+    { 0, 0, 3, 15},{ 3, 0, 1,  0}
+};
+
+///	Daemon
+local Animation DaemonDie[] = {
+    { 0, 0, 5, 50},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
+    { 3, 0, 1,  0}
+};
+
+///	Corpse:		Orcish
+local Animation CorpseOrcishDie[] = {
+    {0, 0,200, 5}, {0, 0,200,  5}, {0, 0,200, 5}, {0, 0,200, 5},
+    {0, 0,200, 5}, {3, 0,  1,-25}
+};
+
+///	Corpse:		Human
+local Animation CorpseHumanDie[] = {
+    {0, 0,200, 0}, {0, 0,200, 10}, {0, 0,200, 5}, {0, 0,200, 5},
+    {0, 0,200, 5}, {3, 0,  1,-25}
+};
+
+///	Corpse:		Ships
+local Animation CorpseShipsDie[] = {
+    {0, 0,100,30}, {0, 0,100, 0}, {3, 0,  1,  0}
+};
+
+///	Destroyed site:
+local Animation DestroyedSiteDie[] = {
+    {0, 0,200,0}, {0, 0,200,1}, {3, 0,  1,0}
+};
+
+///	Destroyed water site:
+local Animation DestroyedWaterSiteDie[] = {
+    {0, 0,200,2}, {0, 0,200,1}, {3, 0,  1,0}
+};
+
+/*----------------------------------------------------------------------------
 --	Animations
 ----------------------------------------------------------------------------*/
 
@@ -408,8 +707,8 @@ local Animation CritterMove[] = {
 local Animations GruntAnimations[] = {
 {   _DefaultStill,
     GruntMove,
-    _GruntAttack,
-    _GruntDie,
+    GruntAttack,
+    GruntDie,
     NULL	}
 };
 
@@ -418,15 +717,15 @@ local Animations GruntAnimations[] = {
 local Animations PeonAnimations[] = {
 {   NULL,
     PeonMove,
-    NULL,
-    NULL,
+    PeonAttack,
+    PeonDie,
     NULL	}
 };
 
 local Animations BallistaAnimations[] = {
 {   NULL,
     BallistaMove,
-    NULL,
+    BallistaAttack,
     NULL,
     NULL	}
 };
@@ -434,7 +733,7 @@ local Animations BallistaAnimations[] = {
 local Animations CatapultAnimations[] = {
 {   NULL,
     CatapultMove,
-    NULL,
+    CatapultAttack,
     NULL,
     NULL	}
 };
@@ -443,7 +742,7 @@ local Animations KnightAnimations[] = {
 {   NULL,
     KnightMove,
     NULL,
-    NULL,
+    KnightDie,
     NULL	}
 };
 
@@ -451,7 +750,7 @@ local Animations OgreAnimations[] = {
 {   NULL,
     OgreMove,
     NULL,
-    NULL,
+    OgreDie,
     NULL	}
 };
 
@@ -459,7 +758,7 @@ local Animations ArcherAnimations[] = {
 {   NULL,
     ArcherMove,
     NULL,
-    NULL,
+    ArcherDie,
     NULL	}
 };
 
@@ -467,7 +766,7 @@ local Animations AxethrowerAnimations[] = {
 {   NULL,
     AxethrowerMove,
     NULL,
-    NULL,
+    AxethrowerDie,
     NULL	}
 };
 
@@ -475,7 +774,7 @@ local Animations MageAnimations[] = {
 {   NULL,
     MageMove,
     NULL,
-    NULL,
+    MageDie,
     NULL	}
 };
 
@@ -483,7 +782,7 @@ local Animations DeathKnightAnimations[] = {
 {   NULL,
     DeathKnightMove,
     NULL,
-    NULL,
+    DeathKnightDie,
     NULL	}
 };
 
@@ -494,7 +793,7 @@ local Animations DwarvesAnimations[] = {
 {   NULL,
     DwarvesMove,
     NULL,
-    NULL,
+    DwarvesDie,
     NULL	}
 };
 
@@ -502,7 +801,7 @@ local Animations GoblinSappersAnimations[] = {
 {   NULL,
     GoblinSappersMove,
     NULL,
-    NULL,
+    GoblinSappersDie,
     NULL	}
 };
 
@@ -524,7 +823,7 @@ local Animations TankerOrcAnimations[] = {
 {   NULL,
     TankerMove,
     NULL,
-    NULL,
+    TankerDie,
     NULL	}
 };
 
@@ -533,7 +832,7 @@ local Animations TransportOrcAnimations[] = {
 {   NULL,
     TransportMove,
     NULL,
-    NULL,
+    TransportDie,
     NULL	}
 };
 
@@ -542,7 +841,7 @@ local Animations TrollDestroyerAnimations[] = {
 {   NULL,
     DestroyerMove,
     NULL,
-    NULL,
+    DestroyerDie,
     NULL	}
 };
 
@@ -551,7 +850,7 @@ local Animations JuggernaughtAnimations[] = {
 {   NULL,
     BattleshipMove,
     NULL,
-    NULL,
+    BattleshipDie,
     NULL	}
 };
 
@@ -566,7 +865,7 @@ local Animations GiantTurtleAnimations[] = {
 {   NULL,
     SubmarineMove,
     NULL,
-    NULL,
+    SubmarineDie,
     NULL	}
 };
 
@@ -574,7 +873,7 @@ local Animations GnomishFlyingMachineAnimations[] = {
 {   NULL,
     GnomishFlyingMachineMove,
     NULL,
-    NULL,
+    GnomishFlyingMachineDie,
     NULL	}
 };
 
@@ -590,7 +889,7 @@ local Animations GryphonRiderAnimations[] = {
 {   NULL,
     GryphonRiderMove,
     NULL,
-    NULL,
+    GryphonRiderDie,
     NULL	}
 };
 
@@ -598,7 +897,7 @@ local Animations DragonAnimations[] = {
 {   NULL,
     DragonMove,
     NULL,
-    NULL,
+    DragonDie,
     NULL	}
 };
 
@@ -626,7 +925,7 @@ local Animations SkeletonAnimations[] = {
 {   NULL,
     SkeletonMove,
     NULL,
-    NULL,
+    SkeletonDie,
     NULL	}
 };
 
@@ -634,7 +933,7 @@ local Animations DaemonAnimations[] = {
 {   NULL,
     DaemonMove,
     NULL,
-    NULL,
+    DaemonDie,
     NULL	}
 };
 
@@ -642,25 +941,25 @@ local Animations CritterAnimations[] = {
 {   NULL,
     CritterMove,
     NULL,
-    NULL,
+    CritterDie,
     NULL	}
 };
 
 #define FarmAnimations			NULL
 #define PigFarmAnimations		NULL
-#define BarracksHumanAnimations	NULL
+#define BarracksHumanAnimations		NULL
 #define BarracksOrcAnimations		NULL
 #define ChurchAnimations		NULL
-#define AltarOfStormsAnimations	NULL
+#define AltarOfStormsAnimations		NULL
 #define ScoutTowerHumanAnimations	NULL
-#define ScoutTowerOrcAnimations	NULL
+#define ScoutTowerOrcAnimations		NULL
 #define StablesAnimations		NULL
 #define OgreMoundAnimations		NULL
 #define GnomishInventorAnimations	NULL
 #define GoblinAlchemistAnimations	NULL
-#define GryphonAviaryAnimations	NULL
+#define GryphonAviaryAnimations		NULL
 #define DragonRoostAnimations		NULL
-#define ShipyardHumanAnimations	NULL
+#define ShipyardHumanAnimations		NULL
 #define ShipyardOrcAnimations		NULL
 #define TownHallAnimations		NULL
 #define GreatHallAnimations		NULL
@@ -671,8 +970,8 @@ local Animations CritterAnimations[] = {
 #define MageTowerAnimations		NULL
 #define TempleOfTheDamnedAnimations	NULL
 #define BlacksmithHumanAnimations	NULL
-#define BlacksmithOrcAnimations	NULL
-#define RefineryHumanAnimations	NULL
+#define BlacksmithOrcAnimations		NULL
+#define RefineryHumanAnimations		NULL
 #define RefineryOrcAnimations		NULL
 #define OilPlatformHumanAnimations	NULL
 #define OilPlatformOrcAnimations	NULL
@@ -685,10 +984,10 @@ local Animations CritterAnimations[] = {
 #define StartLocationHumanAnimations	NULL
 #define StartLocationOrcAnimations	NULL
 #define GuardTowerHumanAnimations	NULL
-#define GuardTowerOrcAnimations	NULL
+#define GuardTowerOrcAnimations		NULL
 #define CannonTowerHumanAnimations	NULL
 #define CannonTowerOrcAnimations	NULL
-#define CircleofPowerAnimations	NULL
+#define CircleofPowerAnimations		NULL
 #define DarkPortalAnimations		NULL
 #define RunestoneAnimations		NULL
 #define WallHumanAnimations		NULL
@@ -706,131 +1005,6 @@ local Animations CritterAnimations[] = {
 #define TankerHumanFullAnimations	TankerHumanAnimations	
 #define TankerOrcFullAnimations		TankerOrcAnimations
 
-//#ifndef USE_CCL2
-#if 0
-
-/*
-**	Move animation. FIXME: move this to unit-type, CCL configurable
-*/
-global Animation* UnitMoveAnimation[UnitTypeInternalMax] = {
-    GruntMove,			// UnitFootman
-    GruntMove,			// UnitGrunt
-    PeonMove,			// UnitPeasant
-    PeonMove,			// UnitPeon
-    BallistaMove,		// UnitBallista
-    CatapultMove,		// UnitCatapult
-    KnightMove,			// UnitKnight
-    OgreMove,			// UnitOgre
-    ArcherMove,			// UnitArcher
-    AxethrowerMove,		// UnitAxethrower
-    MageMove,			// UnitMage
-    DeathKnightMove,		// UnitDeathKnight
-    KnightMove,			// UnitPaladin
-    OgreMove,			// UnitOgreMage
-    DwarvesMove,		// UnitDwarves
-    GoblinSappersMove,		// UnitGoblinSappers
-    PeonMove,			// UnitAttackPeasant
-    PeonMove,			// UnitAttackPeon
-    ArcherMove,			// UnitRanger
-    AxethrowerMove,		// UnitBerserker
-    ArcherMove,			// UnitAlleria
-    DeathKnightMove,		// UnitTeronGorefiend
-    GryphonRiderMove,		// UnitKurdanAndSky_ree
-    OgreMove,			// UnitDentarg
-    MageMove,			// UnitKhadgar
-    GruntMove,			// UnitGromHellscream
-    TankerMove,			// UnitTankerHuman
-    TankerMove,			// UnitTankerOrc
-    TransportMove,		// UnitTransportHuman
-    TransportMove,		// UnitTransportOrc
-    DestroyerMove,		// UnitElvenDestroyer
-    DestroyerMove,		// UnitTrollDestroyer
-    BattleshipMove,		// UnitBattleship
-    BattleshipMove,		// UnitJuggernaught
-    0,				// UnitNothing
-    DragonMove,			// UnitDeathwing
-    0,				// UnitNothing1
-    0,				// UnitNothing2
-    SubmarineMove,		// UnitGnomishSubmarine
-    SubmarineMove,		// UnitGiantTurtle
-    GnomishFlyingMachineMove,	// UnitGnomishFlyingMachine
-    GoblinZeppelinMove,		// UnitGoblinZeppelin
-    GryphonRiderMove,		// UnitGryphonRider
-    DragonMove,			// UnitDragon
-    KnightMove,			// UnitTuralyon
-    EyeOfKilroggMove,		// UnitEyeOfKilrogg
-    GruntMove,			// UnitDanath
-    GruntMove,			// UnitKorgathBladefist
-    0,				// UnitNothing3
-    OgreMove,			// UnitCho_gall
-    KnightMove,			// UnitLothar
-    DeathKnightMove,		// UnitGul_dan
-    KnightMove,			// UnitUtherLightbringer
-    AxethrowerMove,		// UnitZuljin
-    0,				// UnitNothing4
-    SkeletonMove,		// UnitSkeleton
-    DaemonMove,			// UnitDaemon
-    CritterMove,		// UnitCritter
-    0,				// UnitFarm
-    0,				// UnitPigFarm
-    0,				// UnitBarracksHuman
-    0,				// UnitBarracksOrc
-    0,				// UnitChurch
-    0,				// UnitAltarOfStorms
-    0,				// UnitScoutTowerHuman
-    0,				// UnitScoutTowerOrc
-    0,				// UnitStables
-    0,				// UnitOgreMound
-    0,				// UnitGnomishInventor
-    0,				// UnitGoblinAlchemist
-    0,				// UnitGryphonAviary
-    0,				// UnitDragonRoost
-    0,				// UnitShipyardHuman
-    0,				// UnitShipyardOrc
-    0,				// UnitTownHall
-    0,				// UnitGreatHall
-    0,				// UnitElvenLumberMill
-    0,				// UnitTrollLumberMill
-    0,				// UnitFoundryHuman
-    0,				// UnitFoundryOrc
-    0,				// UnitMageTower
-    0,				// UnitTempleOfTheDamned
-    0,				// UnitBlacksmithHuman
-    0,				// UnitBlacksmithOrc
-    0,				// UnitRefineryHuman
-    0,				// UnitRefineryOrc
-    0,				// UnitOilPlatformHuman
-    0,				// UnitOilPlatformOrc
-    0,				// UnitKeep
-    0,				// UnitStronghold
-    0,				// UnitCastle
-    0,				// UnitFortress
-    0,				// UnitGoldMine
-    0,				// UnitOilPatch
-    0,				// UnitStartLocationHuman
-    0,				// UnitStartLocationOrc
-    0,				// UnitGuardTowerHuman
-    0,				// UnitGuardTowerOrc
-    0,				// UnitCannonTowerHuman
-    0,				// UnitCannonTowerOrc
-    0,				// UnitCircleofPower
-    0,				// UnitDarkPortal
-    0,				// UnitRunestone
-    0,				// UnitWallHuman
-    0,				// UnitWallOrc
-    0,				// UnitDeadBody
-    0,				// UnitDestroyed1x1Place
-    0,				// UnitDestroyed2x2Place
-    0,				// UnitDestroyed3x3Place
-    0,				// UnitDestroyed4x4Place
-    PeonMove,			// UnitPeasantWithGold
-    PeonMove,			// UnitPeonWithGold
-    PeonMove,			// UnitPeasantWithWood
-    PeonMove,			// UnitPeonWithWood
-    TankerMove,			// UnitTankerHumanFull
-    TankerMove,			// UnitTankerOrcFull
-};
-#endif
 /*----------------------------------------------------------------------------
 --	Unit types table
 ----------------------------------------------------------------------------*/
