@@ -122,7 +122,7 @@ global void HandleActionFollow(Unit* unit)
 	      //FIXME: SoundIdForName() should be called once
 	      PlayGameSound(SoundIdForName("invisibility"),MaxSampleVolume);
 	      //FIXME: MissileTypeByIdent() should be called once
-	      MakeMissile(MissileTypeByIdent("missile-heal-effect"),
+	      MakeMissile(MissileTypeByIdent("missile-normal-spell"),
 	        	unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2,
 			unit->X*TileSizeX+TileSizeX/2, unit->Y*TileSizeY+TileSizeY/2 );
 	      }
