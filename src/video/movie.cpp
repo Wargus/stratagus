@@ -164,7 +164,6 @@ static int TheoraProcessData(OggData* data)
 			ogg_stream_pagein(&data->vstream, &data->page);
 		} else {
 			theora_decode_packetin(&data->tstate, &packet);
-			data->tstate.internal_encode = NULL;  // needed, maybe a bug in libtheora?
 			return 0;
 		}
 	}
