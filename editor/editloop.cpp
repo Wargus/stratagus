@@ -54,14 +54,6 @@
 
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
-// FIXME: export+import the structure correct
-extern struct {
-    const char*	File[PlayerMaxRaces];	/// Resource filename one for each race
-    int		Width;			/// Width of button
-    int		Height;			/// Height of button
-    Graphic*	Sprite;			/// Sprite : FILLED
-} MenuButtonGfx;
-
 /*----------------------------------------------------------------------------
 --	Defines
 ----------------------------------------------------------------------------*/
