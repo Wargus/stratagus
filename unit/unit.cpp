@@ -1427,36 +1427,41 @@ global int CheckUnitToBeDrawn(const Unit* unit)
     }
 #else
 #ifdef NEW_DECODRAW
-    if ( !unit->Removed && UnitVisibleOnScreen(unit) ) {
-    // FIXME: Inaccurate dimension to take unit's extras into account..
-    //        Should be solved by adding each unit extra as separate decoration
-        int x = Map2ScreenX(unit->X)+unit->IX-10;
-        int y = Map2ScreenY(unit->Y)+unit->IY-10;
-        int w = unit->Type->Width+20;
-        int h = unit->Type->Height+20;
+    if (!unit->Removed && UnitVisibleOnScreen(unit)) {
+	int x;
+	int y;
+	int w;
+	int h;
 
-        if ( unit->deco )
-        {
-        // FIXME: its very expensive to remove+add a decoration to satify a
-        //        new location, a decoration update function should be added
-          Deco *d = unit->deco;
-          if ( d->x != x || d->y != y || d->w != w || d->h != h )
-          {
-            DecorationRemove( unit->deco );
-            AddUnitDeco( (Unit *)unit, x, y, w, h );
-          }
-          else DecorationMark( unit->deco );
-        }
-        else AddUnitDeco( (Unit *)unit, x, y, w, h );
+	// FIXME: Inaccurate dimension to take unit's extras into account..
+	//        Should be solved by adding each unit extra as separate decoration
+	x = Map2ScreenX(unit->X)+unit->IX-10;
+	y = Map2ScreenY(unit->Y)+unit->IY-10;
+	w = unit->Type->Width+20;
+	h = unit->Type->Height+20;
+
+	if (unit->deco) {
+	    // FIXME: its very expensive to remove+add a decoration to satify a
+	    //        new location, a decoration update function should be added
+	    Deco *d = unit->deco;
+	    if ( d->x != x || d->y != y || d->w != w || d->h != h ) {
+		DecorationRemove( unit->deco );
+		AddUnitDeco((Unit *)unit, x, y, w, h);
+	    }
+	    else {
+		DecorationMark(unit->deco);
+	    }
+	}
+        else {
+	    AddUnitDeco((Unit *)unit, x, y, w, h);
+	}
 
 	return 1;
-    }
-    else if ( unit->deco )
-    {
-    // not longer visible: so remove from auto decoration redraw
-      Unit *u = (Unit *)unit;
-      DecorationRemove( unit->deco );
-      u->deco = NULL;
+    } else if (unit->deco) {
+	// not longer visible: so remove from auto decoration redraw
+	Unit *u = (Unit *)unit;
+	DecorationRemove(unit->deco);
+	u->deco = NULL;
     }
 #else
     if (UnitVisibleOnScreen(unit)) {
@@ -1496,6 +1501,55 @@ global int UnitGetNextPathSegment(const Unit* unit, int *dx, int *dy)
 }
 
 #endif // } HIERARCHIC_PATHFINDER
+
+/**
+**	Do the runestone work each second.
+*/
+global void DoRunestones(void)
+{
+    Unit* units[UnitMax];
+    Unit* stones[UnitMax];
+    int nstones;
+    int nunits;
+    int i;
+    int j;
+    unsigned tmp;
+
+    // FIXME: Don't use UnitTypeByIdent during runtime
+    nstones = FindUnitsByType(UnitTypeByIdent("unit-runestone"),stones);
+    for (i = 0; i < nstones; ++i) {
+	// Get all the units around the runestone
+	nunits = SelectUnits(stones[i]->X - stones[i]->Stats->SightRange,
+			     stones[i]->Y - stones[i]->Stats->SightRange,
+			     stones[i]->X + stones[i]->Stats->SightRange+1,
+			     stones[i]->Y + stones[i]->Stats->SightRange+1,
+			     units);
+	// Runestone Mana and HP on units, 2 every time
+	for (j = 0; j < nunits; ++j) {
+	    if (units[j] == stones[i]) {
+		continue;
+	    }
+
+	    // Restore HP in everything but buildings (even in other player's units)
+	    if (!units[j]->Type->Building && units[j]->HP != units[j]->Stats->HitPoints) {
+		tmp = units[j]->Stats->HitPoints - units[j]->HP;
+		if (tmp > 2) {
+		    tmp = 2;
+		}
+		units[j]->HP += tmp;
+	    }
+
+	    // Restore mana in all magical units
+	    if(units[j]->Type->CanCastSpell && units[j]->Mana != MaxMana)  {	
+		tmp = MaxMana - units[j]->Mana;
+		if (tmp > 2) {
+		    tmp = 2;
+		}
+		units[j]->Mana += tmp;
+	    }
+	}
+    }
+}
 
 // FIXME: perhaps I should write a function UnitSelectable?
 
