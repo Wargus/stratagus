@@ -4206,8 +4206,6 @@ local void MultiGameSetupExit(Menuitem *mi)
 {
     int i;
 
-    NetworkExitServerConnect();
-
     // ugly hack to prevent NetMultiButtonStorage[0].d.pulldown.options
     // from being freed
     for (i=0; i<PlayerMax-1; ++i) {
@@ -4220,6 +4218,8 @@ local void MultiGameSetupExit(Menuitem *mi)
 */
 local void MultiGameCancel(void)
 {
+    NetworkExitServerConnect();
+
     NetPlayers = 0;		// Make single player menus work again!
     GameCancel();
 }
