@@ -760,18 +760,14 @@ global void VideoFillTransRectangle(SDL_Color color, int x, int y,
 {
     SDL_Rect drect;
     SDL_Surface* s;
+    Uint32 c;
 
-    s = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCALPHA, w, h, 
+    s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 
 	32, RMASK, GMASK, BMASK, AMASK);
 
-    Uint32 c = SDL_MapRGBA(s->format, color.r, color.g, color.b, alpha);
+    c = SDL_MapRGBA(s->format, color.r, color.g, color.b, alpha);
 
-    drect.x = 0;
-    drect.y = 0;
-    drect.w = w;
-    drect.h = h;
-
-    SDL_FillRect(s, &drect, c);
+    SDL_FillRect(s, NULL, c);
 
     drect.x = x;
     drect.y = y;
