@@ -1023,14 +1023,23 @@ global void RescueUnits(void)
 	    for( j=0; j<l; j++ ) {
 		unit=table[j];
 		DebugLevel3("Checking %Zd\n",UnitNumber(unit));
-		// FIXME: I hope SelectUnits checks bounds? NO
 #ifdef UNIT_ON_MAP
 		// FIXME: could be done faster?
 #endif
-		n=SelectUnits(
+		// FIXME: I hope SelectUnits checks bounds?
+		// FIXME: Yes, but caller should check.
+		// NOTE: +1 right,bottom isn't inclusive :(
+		if( unit->Type->UnitType==UnitTypeLand ) {
+		    n=SelectUnits(
+			unit->X-1,unit->Y-1,
+			unit->X+unit->Type->TileWidth+1,
+			unit->Y+unit->Type->TileHeight+1,near);
+		} else {
+		    n=SelectUnits(
 			unit->X-2,unit->Y-2,
 			unit->X+unit->Type->TileWidth+2,
 			unit->Y+unit->Type->TileHeight+2,near);
+		}
 		//
 		//	Look if human near the unit.
 		//
