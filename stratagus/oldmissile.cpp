@@ -452,6 +452,8 @@ local Missile Missiles[MAX_MISSILES];	/// all missiles on map
     /// lookup table for missile names
 local hashtable(MissileType*,65) MissileHash;
 
+local int BlizzardMissileHit;		/// Flag for blizzards.
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -950,15 +952,13 @@ local int PointToPointMissile(Missile* missile)
 	}
 
 	// FIXME: could be better written
-	if( missile->Type->Class == MissileClassWhirlwind )
-	  {
-	  // must not call MissileNewHeading nor frame change
-	  }
-	else
-	if( missile->Type->Class == MissileClassBlizzard )
-	  missile->Frame = 0;
-	else
-	  MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
+	if( missile->Type->Class == MissileClassWhirlwind ) {
+	    // must not call MissileNewHeading nor frame change
+	} else if( missile->Type->Class == MissileClassBlizzard ) {
+	    missile->Frame = 0;
+	} else {
+	    MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
+	}
 
 	if( dy==0 ) {		// horizontal line
 	    if( dx==0 ) {
@@ -1054,7 +1054,6 @@ local int PointToPointMissile(Missile* missile)
     return 0;
 }
 
-local int BlizzardMissileHit = 0;
 /**
 **	Work for missile hit.
 */
@@ -1069,15 +1068,19 @@ global void MissileHit(const Missile* missile)
     if( missile->Type->ImpactSound.Sound ) {
 	PlayMissileSound(missile,missile->Type->ImpactSound.Sound);
     }
+
     x=missile->X+missile->Type->Width/2;
     y=missile->Y+missile->Type->Height/2;
     if( missile->Type->ImpactMissile ) {
-	Missile* mis = MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
+	Missile* mis;
+
+	mis = MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
 	mis->Damage = missile->Damage; // direct damage, spells mostly
 	mis->SourceUnit = missile->SourceUnit;
     }
-    if( !missile->SourceUnit ) {	// no target
-       //FIXME: should be removed?
+
+    if( !missile->SourceUnit ) {	// no owner
+	//FIXME: should be removed?
 	return;
     }
 
@@ -1087,37 +1090,48 @@ global void MissileHit(const Missile* missile)
 
     x/=TileSizeX;
     y/=TileSizeY;
+
+    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	return;				// outside the map.
+    }
+
     goal=UnitOnMapTile(x,y);
     if( !goal || !goal->HP ) {
 	if( WallOnMap(x,y) ) {
 	    DebugLevel3Fn("Missile on wall?\n");
 	    // FIXME: don't use UnitTypeByIdent here, this is slow!
 	    if( HumanWallOnMap(x,y) ) {
-                if ( missile->Damage )
-		  HitWall(x,y,missile->Damage); // direct damage, spells mostly
-		else
-		  HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-			  UnitTypeByIdent("unit-human-wall")->Stats,0));
+                if ( missile->Damage ) {	// direct damage, spells mostly
+		    HitWall(x,y,missile->Damage);
+		} else {
+		    HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
+			UnitTypeByIdent("unit-human-wall")->Stats,0));
+		}
 	    } else {
-                if ( missile->Damage )
-		  HitWall(x,y,missile->Damage); // direct damage, spells mostly
-		else
-		  HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
-			  UnitTypeByIdent("unit-orc-wall")->Stats,0));
+                if ( missile->Damage ) {	// direct damage, spells mostly
+		    HitWall(x,y,missile->Damage);
+		} else {
+		    HitWall(x,y,CalculateDamageStats(missile->SourceUnit->Stats,
+			UnitTypeByIdent("unit-orc-wall")->Stats,0));
+		}
 	    }
 	    return;
 	}
 	DebugLevel3Fn("Oops nothing to hit (%d,%d)?\n",x,y);
 	return;
     }
-    if ( BlizzardMissileHit && goal == missile->SourceUnit )
-      return; // blizzard cannot hit owner unit
+
+    if ( BlizzardMissileHit && goal == missile->SourceUnit ) {
+	return;		// blizzard cannot hit owner unit
+    }
     BlizzardMissileHit = 0;
-    if ( missile->Damage )
-      HitUnit(goal,missile->Damage); // direct damage, spells mostly
-    else
-      HitUnit(goal,CalculateDamage(missile->SourceUnit->Stats,goal,
-                                   missile->SourceUnit->Bloodlust));
+
+    if ( missile->Damage ) {	// direct damage, spells mostly
+	HitUnit(goal,missile->Damage);
+    } else {
+	HitUnit(goal,CalculateDamage(missile->SourceUnit->Stats,goal,
+	    missile->SourceUnit->Bloodlust));
+    }
 }
 
 /**
@@ -1138,21 +1152,21 @@ global void MissileActions(void)
 	}
 
 	if ( missile->TTL != -1 ) {
-	  missile->TTL--; // overall time to live if specified
+	    missile->TTL--;	// overall time to live if specified
 	}
 
 	if ( missile->Controller ) {
-	  missile->Controller( missile );
+	    missile->Controller( missile );
 	}
 
 	if ( missile->TTL == 0 ) {
-	  missile->Type=MissileFree;
-	  continue;
+	    missile->Type=MissileFree;
+	    continue;
 	}
 
 	if ( missile->Type->Class == MissileClassCustom ) {
-	  missile->Wait=missile->Type->Speed;
-	  continue; // custom missiles are handled by Controller() only
+	    missile->Wait=missile->Type->Speed;
+	    continue;	// custom missiles are handled by Controller() only
 	}
 
 	CheckMissileToBeDrawn(missile); //StephanR FIXME:needed here?
