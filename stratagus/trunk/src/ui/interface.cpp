@@ -369,7 +369,7 @@ local void UiEnterSoundOptionsMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    SoundOptions();
+    SoundOptionsMenu();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -384,7 +384,7 @@ local void UiEnterSpeedOptionsMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    SpeedSettings();
+    SpeedOptionsMenu();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -399,7 +399,7 @@ local void UiEnterPreferencesOptionsMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    Preferences();
+    PreferencesMenu();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -414,7 +414,7 @@ local void UiEnterSaveGameMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    GameMenuSave();
+    SaveGameMenu();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -429,7 +429,7 @@ local void UiEnterLoadGameMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    GameMenuLoad();
+    LoadGameMenu();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
