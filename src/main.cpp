@@ -25,10 +25,14 @@
 
 //@{
 
+#if 0
+
 /**
 **	Main entry point. This is needed for mingw32 and SDL.
 **	@attention
 **	This combination didn't likes if main is in the freecraft lib.
+**
+**	There is no freecraft lib anymore.  This will be removed soon.
 */
 
 #if defined(USE_SDL)
@@ -41,5 +45,7 @@ int main(int argc,char** argv)
 
     return mymain(argc,argv);
 }
+
+#endif
 
 //@}
