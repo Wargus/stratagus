@@ -89,6 +89,36 @@ local SCM CclDefineEditorUnitTypes(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineEditorUnitTypes(lua_State* l)
+{
+    char** cp;
+    int args;
+    int j;
+
+    if ((cp = EditorUnitTypes)) {		// Free all old names
+	while (*cp) {
+	    free(*cp++);
+	}
+	free(EditorUnitTypes);
+    }
+
+    //
+    //	Get new table.
+    //
+    args = lua_gettop(l);
+    EditorUnitTypes = cp = malloc((args + 1) * sizeof(char*));
+    MaxUnitIndex = args;
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	*cp++ = strdup(lua_tostring(l, j + 1));
+    }
+    *cp = NULL;
+
+    return 0;
+}
 #endif
 
 /**
@@ -102,6 +132,16 @@ local SCM CclSetEditorSelectIcon(SCM icon)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSetEditorSelectIcon(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    free(EditorSelectIcon);
+    EditorSelectIcon = strdup(lua_tostring(l, 1));
+    return 0;
+}
 #endif
 
 /**
@@ -115,6 +155,16 @@ local SCM CclSetEditorUnitsIcon(SCM icon)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSetEditorUnitsIcon(lua_State* l)
+{
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    free(EditorUnitsIcon);
+    EditorUnitsIcon = strdup(lua_tostring(l, 1));
+    return 0;
+}
 #endif
 
 /**
@@ -123,12 +173,13 @@ local SCM CclSetEditorUnitsIcon(SCM icon)
 global void EditorCclRegister(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    //gh_new_procedureN("player", CclPlayer);
-    //gh_new_procedure0_0("get-this-player", CclGetThisPlayer);
-    //gh_new_procedure1_0("set-this-player!", CclSetThisPlayer);
     gh_new_procedureN("define-editor-unittypes", CclDefineEditorUnitTypes);
     gh_new_procedure1_0("set-editor-select-icon!", CclSetEditorSelectIcon);
     gh_new_procedure1_0("set-editor-units-icon!", CclSetEditorUnitsIcon);
+#elif defined(USE_LUA)
+    lua_register(Lua, "DefineEditorUnitTypes", CclDefineEditorUnitTypes);
+    lua_register(Lua, "SetEditorSelectIcon", CclSetEditorSelectIcon);
+    lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
 #endif
 }
 
