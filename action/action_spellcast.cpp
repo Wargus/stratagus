@@ -89,14 +89,18 @@ global void AnimateActionSpellCast(Unit * unit)
 **
 **	@param unit	Unit, for that the spell cast is handled.
 */
-local void SpellMoveToTarget(Unit * unit)
+local void SpellMoveToTarget(Unit* unit)
 {
-    Unit *goal;
+    Unit* goal;
     int err;
 
-    err = DoActionMove(unit);
-    if (!unit->Reset) {
-	return;
+    // Unit can't move
+    err = 1;
+    if( unit->Type->Animations && unit->Type->Animations->Move ) {
+	err = DoActionMove(unit);
+	if (!unit->Reset) {
+	    return;
+	}
     }
 
     // when reached DoActionMove changes unit action
@@ -168,13 +172,22 @@ global void HandleActionSpellCast(Unit * unit)
 	spell = unit->Orders[0].Arg1;
 	if( !CanCastSpell(unit,spell,unit->Orders[0].Goal,
 		unit->Orders[0].X,unit->Orders[0].Y) ) {
-	    // FIXME: Use the general unified message system.
+
+	    //
+	    //	Notify player about this problem
+	    //
 	    if (unit->Mana < spell->ManaCost) {
-		if (unit->Player == ThisPlayer) {
-		    SetMessage("%s: not enough mana for spell: %s",
-			       unit->Type->Name, spell->Name);
-		}
-		// FIXME: need we an AI callback?
+		NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+			"%s: not enough mana for spell: %s",
+			unit->Type->Name, spell->Name);
+	    } else {
+		NotifyPlayer(unit->Player,NotifyYellow,unit->X,unit->Y,
+			"%s: can't cast spell: %s",
+			unit->Type->Name, spell->Name);
+	    }
+
+	    if( unit->Player->Ai ) {
+		DebugLevel0Fn("FIXME: need we an AI callback?\n");
 	    }
 	    unit->Orders[0].Action = UnitActionStill;
 	    unit->SubAction = 0;
@@ -194,9 +207,13 @@ global void HandleActionSpellCast(Unit * unit)
 	unit->SubAction=1;
 	// FALL THROUGH
     case 1:				// Move to the target.
-	SpellMoveToTarget(unit);
-	break;
-
+	if( (spell = unit->Orders[0].Arg1)->Range != 0x7F ) {
+	    SpellMoveToTarget(unit);
+	    break;
+	} else {
+	    unit->SubAction=2;
+	}
+	// FALL THROUGH
     case 2:				// Cast spell on the target.
 	// FIXME: should use AnimateActionSpellCast here
 	if (unit->Type->Animations && unit->Type->Animations->Attack ) {
