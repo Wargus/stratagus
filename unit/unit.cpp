@@ -292,8 +292,10 @@ global void InitUnit (Unit *unit, UnitType *type)
 	}
     }
 
-    if( !type->Building ) {
+    if( !type->Building && type->Sprite
+	    && VideoGraphicFrames(type->Sprite)>5 ) {
         unit->Direction=(MyRand()>>8)&0xFF;	// random heading
+	UnitUpdateHeading(unit);
     }
 
     if( type->CanCastSpell ) {
