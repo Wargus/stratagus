@@ -61,12 +61,16 @@ OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
 
 .SUFFIXES: .c .o
 
-%.o: $(dir $@)../%.c
-	@if [ ! -d $(shell dirname $@) ]; then \
-	mkdir $(shell dirname $@); fi
-	$(CC) -c \$(CFLAGS) $< -o $@
+.PHONY:	make-objdir all-src
 
 all:	all-src freecraft$(EXE) tools
+
+make-objdir:
+	@for i in $(MODULES_ALL); do \
+	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
+
+%.o: $(@D)../%.c
+	$(CC) -c $(CFLAGS) $< -o $@
 
 help:
 	@-echo "make cycle			clean,depend,tags,all"
@@ -113,10 +117,10 @@ doc++::
 	@if [ ! -d srcdoc ]; then mkdir srcdoc; fi
 	@$(DOCPP) -v -H -A -a -b -c -j -d srcdoc `find . -name "*.doc" -print`
 
-all-src: $(OBJ)
+all-src: make-objdir $(OBJ)
 
 # UNIX-TARGET
-freecraft:	$(OBJ) 
+freecraft: $(OBJ) 
 	$(CCLD) -o freecraft $^ $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
