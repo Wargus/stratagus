@@ -315,6 +315,10 @@ local SCM CclDefineCampaign(SCM list)
 	    if( !strcmp(Campaigns[i].Ident, ident) ) {
 		if( !strcmp(ident, "current") && Campaigns[i].Chapters ) {
 		    FreeChapters(&Campaigns[i].Chapters);
+		} else if( Campaigns[i].Chapters ) {
+		    // Redefining campaigns causes problems if a campaign is
+		    // playing.
+		    return SCM_UNSPECIFIED;
 		}
 		campaign=Campaigns+i;
 		free(campaign->Ident);
