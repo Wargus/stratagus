@@ -230,7 +230,7 @@ global void ReleaseUnit(Unit* unit)
     //
     *ReleasedTail=unit;
     ReleasedTail=&unit->Next;
-    unit->Refs=FrameCounter+NetworkLag;	// could reuse after this.
+    unit->Refs=FrameCounter+NetworkMaxLag;	// could be reuse after this.
     unit->Type=NULL;			// for debugging.
 #else
     FreeUnitMemory(unit);
