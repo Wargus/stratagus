@@ -265,6 +265,7 @@ typedef struct _ui_ {
     int		MinimapH;		/// minimap screen Height
     int		MinimapPosX;		/// minimap screen X position
     int		MinimapPosY;		/// minimap screen Y position
+    int		MinimapTransparent;     /// unexplored areas are transparent
     int		ViewportCursorColor;	/// minimap cursor color
 
     // The status line
