@@ -29,6 +29,8 @@ TOPDIR=		.
 RULESFILE ?= Rules.make
 WINRULESFILE = Rules.make.WIN32
 
+CROSSDIR=/usr/local/cross-tools
+
 include $(TOPDIR)/$(RULESFILE)
 
 MAKEFLAGS= TOPDIR=$(shell pwd)
@@ -304,7 +306,7 @@ win32-bin-dist2:: win32
 	du -h freecraft-$(mydate)-win32bin.zip
 
 win32-bin-dist: win32
-	@export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
+	@export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
 	$(MAKE) RULESFILE=$(WINRULESFILE) $(WIN32) win32-bin-dist2
 
 win32-exe-dist:	win32-bin-dist
@@ -412,23 +414,23 @@ WIN32=	\
     XLDFLAGS='' \
     XIFLAGS='' \
     VIDEO='-DUSE_WIN32 $(SDL)'  \
-    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32' \
+    VIDEOLIB='-L$(CROSSDIR)/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32' \
     RULESFILE=$(WINRULESFILE)
 
 win32new:
 	@$(MAKE) RULESFILE=$(WINRULESFILE) distclean
-	export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
+	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
 	$(MAKE) $(WIN32) depend
 
 win32_2:
 	$(MAKE) $(WIN32) all
 
 win32:
-	export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
+	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
 	$(MAKE) win32_2
 
 win32distclean:
-	export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
+	export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
 	$(MAKE) $(WIN32) distclean
 
 ##############################################################################
