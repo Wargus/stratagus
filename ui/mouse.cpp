@@ -583,6 +583,37 @@ global void HandleMouseExit(void)
 }
 
 /**
+**	Restrict mouse cursor to minimap
+*/
+local void RestrictCursorToMinimap(void)
+{
+    if( CursorX<TheUI.MinimapX+24 ) {
+	CursorStartX=TheUI.MinimapX+24;
+    }
+    else if( CursorX>=TheUI.MinimapX+24+MINIMAP_W ) {
+	CursorStartX=TheUI.MinimapX+24+MINIMAP_W-1;
+    }
+    else {
+	CursorStartX=CursorX;
+    }
+
+    if( CursorY<TheUI.MinimapY+2 ) {
+	CursorStartY=TheUI.MinimapY+2;
+    }
+    else if( CursorY>=TheUI.MinimapY+2+MINIMAP_H ) {
+	CursorStartY=TheUI.MinimapY+2+MINIMAP_H-1;
+    }
+    else {
+	CursorStartY=CursorY;
+    }
+
+    CursorX=TheUI.WarpX=CursorStartX;
+    CursorY=TheUI.WarpY=CursorStartY;
+    CursorOn=CursorOnMinimap;
+}
+
+
+/**
 **	Handle movement of the cursor.
 **
 **	@param x	Screen X position.
@@ -592,7 +623,9 @@ global void UIHandleMouseMove(int x,int y)
 {
     int mx;
     int my;
+    enum _cursor_on_ OldCursorOn;
 
+    OldCursorOn=CursorOn;
     //
     //	Selecting units.
     //
@@ -645,6 +678,15 @@ global void UIHandleMouseMove(int x,int y)
     GameCursor=TheUI.Point.Cursor;		// Reset
     HandleMouseOn(x,y);
     DebugLevel3("MouseOn %d\n",CursorOn);
+
+    //	Restrict mouse to minimap when dragging
+    if( OldCursorOn==CursorOnMinimap && CursorOn!=CursorOnMinimap &&
+	(MouseButtons&LeftButton) ) {
+	RestrictCursorToMinimap();
+	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
+		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
+	return;
+    }
 
     //
     //	User may be draging with button pressed.
@@ -732,6 +774,8 @@ global void UIHandleMouseMove(int x,int y)
 	//
 	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
 		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
+	CursorStartX=CursorX;
+	CursorStartY=CursorY;
 	return;
     }
 }
