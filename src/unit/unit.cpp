@@ -2627,9 +2627,11 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
     }
 
     DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    /*	Oil platforms are our own, they should be known
     if( LimitSearch && (best_d>TheMap.Width/5 || best_d>TheMap.Height/5) ) {
 	return NoUnitP;
     }
+    */
     return best;
 }
 
