@@ -31,18 +31,20 @@
 #ifndef __SPLITTER_H__
 #define __SPLITTER_H__
 
+//@{
+
 /*----------------------------------------------------------------------------
---		Constants
+--  Constants
 ----------------------------------------------------------------------------*/
 
 // Should be enough for every one :-)
-#define MaxZoneNumber				512		/// Max number of zone ( separated area )
-#define MaxRegionNumber				4096		/// Max number of regions ( divisions of zones )
+#define MaxZoneNumber    512   /// Max number of zone ( separated area )
+#define MaxRegionNumber  4096  /// Max number of regions ( divisions of zones )
 
 #define NoRegion 				((RegionId)~0UL)
 
 /*----------------------------------------------------------------------------
---		Structures
+--  Structures
 ----------------------------------------------------------------------------*/
 
 /// Region identifier
@@ -51,14 +53,14 @@ typedef unsigned short int RegionId;
 
 /// Zone marque list. Must be a global variable, with MarqueId initialised to 0
 typedef struct _zone_set_ {
-	int				Id;						/// Internal - must be initialised to 0
-	int				ZoneCount;				/// N° of marqued zones
-	int				Marks[MaxZoneNumber];		/// ZoneMarque[zone] ?= MarqueId
-	int				Zones[MaxZoneNumber];		/// List of marqued zones
-}ZoneSet;
+	int Id;                   ///< Internal - must be initialised to 0
+	int ZoneCount;            ///< N° of marqued zones
+	int Marks[MaxZoneNumber]; ///< ZoneMarque[zone] ?= MarqueId
+	int Zones[MaxZoneNumber]; ///< List of marqued zones
+} ZoneSet;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /// Initialise the region system
@@ -71,15 +73,15 @@ void MapSplitterClean(void);
 void MapSplitterEachCycle(void);
 
 /// Call this when some tiles become available ( no wood / rock / building )
-void MapSplitterTilesCleared(int x0,int y0,int x1,int y1);
+void MapSplitterTilesCleared(int x0, int y0, int x1, int y1);
 
 /// Call this when some tiles become unavailable ( wood / rock / building appeared )
-void MapSplitterTilesOccuped(int x0,int y0,int x1,int y1);
+void MapSplitterTilesOccuped(int x0, int y0, int x1, int y1);
 
 /// Clear a ZoneSet object ( must be a global object )
 void ZoneSetClear(ZoneSet* m);
 
-void ZoneSetAddCell(ZoneSet * m,int x,int y);
+void ZoneSetAddCell(ZoneSet * m, int x, int y);
 
 /// Add a zone to a ZoneSet
 int ZoneSetAddZone(ZoneSet* m, int zone);
@@ -98,7 +100,8 @@ void ZoneSetDebug(ZoneSet * set);
 
 void ZoneSetAddUnitZones(ZoneSet * set,Unit * unit);
 
-void ZoneSetAddGoalZones(ZoneSet* set,Unit* unit, int gx, int gy,int gw,int gh,int minrange,int maxrange);
+void ZoneSetAddGoalZones(ZoneSet* set,Unit* unit,
+	int gx, int gy, int gw, int gh, int minrange, int maxrange);
 
 /**
 ** Add zones connected to src to dst
@@ -110,5 +113,7 @@ int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen);
 
 // Return a point in destzone connected to srczone
 void ZoneFindConnexion(int destzone,int srczone,int refX,int refY,int* x,int* y);
+
+//@}
 
 #endif // __MAP_REGIONS_H__
