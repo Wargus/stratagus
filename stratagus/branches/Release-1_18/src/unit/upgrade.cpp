@@ -1280,9 +1280,10 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	    player->UnitTypesCount[src->Type]--;
 #ifdef NEW_FOW
 	    // UnMark the Unit sight for conversion
-	    if (unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 		src->TileWidth != dst->TileWidth ||
-		src->TileHeight != dst->TileHeight) {
+		src->TileHeight != dst->TileHeight) && 
+		    !sightupgrade[numunits]->Removed) {
 		MapUnmarkSight(player,
 			unit->X+unit->Type->TileWidth/2,
 			unit->Y+unit->Type->TileHeight/2,
@@ -1298,9 +1299,10 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 		unit->Mana=MAGIC_FOR_NEW_UNITS;
 	    }
 #ifdef NEW_FOW
-	    if (unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+	    if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
 		src->TileWidth != dst->TileWidth ||
-		src->TileHeight != dst->TileHeight) {
+		src->TileHeight != dst->TileHeight) &&
+	   	!sightupgrade[numunits]->Removed) {
 		unit->CurrentSightRange=dst->Stats[player->Player].SightRange;
 		MapMarkSight(player,
 			unit->X+unit->Type->TileWidth/2,
@@ -1401,7 +1403,8 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 		numunits = FindUnitsByType(&UnitTypes[z],sightupgrade);
 		numunits--; // Change to 0 Start not 1 start
 		while (numunits >= 0) {
-		    if (sightupgrade[numunits]->Player->Player == player->Player) {
+		    if (sightupgrade[numunits]->Player->Player == player->Player &&
+			    !sightupgrade[numunits]->Removed) {
 			/// Marking First is faster
 			MapMarkSight(player,
 					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
