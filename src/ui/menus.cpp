@@ -5211,11 +5211,14 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags = 0;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
 	} else {
-	    if (initial < 2 && !(NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].flags&MenuButtonClicked)) {
-		// don't allow network and button events to intercept server player's action on pulldown buttons!
-		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[0];
-		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = 0;
-		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+	    // don't allow network and button events to intercept server player's action on pulldown buttons!
+	    if (!(NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].flags&MenuButtonClicked)) {
+		if (initial == 1 ||
+		    (initial == 2 && NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].mitype != MI_TYPE_PULLDOWN)) {
+		    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[0];
+		    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = 0;
+		    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+		}
 	    }
 	    if (i < h && ServerSetupState.CompOpt[i] != 0) {
 		avail--;
