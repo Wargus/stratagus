@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_die.c	-	The die action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -77,11 +76,21 @@ global int HandleActionDie(Unit* unit)
 
 	unit->State=unit->Type->CorpseScript;
 	unit->Type=unit->Type->CorpseType;
+#ifdef NEW_ORDERS
+	CommandStopUnit(unit);		// This clears all order queues
+	IfDebug(
+	    if( unit->Orders[0].Action!=UnitActionDie ) {
+		DebugLevel0Fn("Reset to die is really needed\n");
+	    }
+	);
+	unit->Orders[0].Action=UnitActionDie;
+#else
 	unit->Command.Action=UnitActionDie;
 	if( unit->NextCount ) {
-	    DebugLevel0(__FUNCTION__": NextCount = %d\n",unit->NextCount);
+	    DebugLevel0Fn("NextCount = %d\n",unit->NextCount);
 	}
 	unit->NextCount=0;
+#endif
 	unit->SubAction=0;
 	unit->Frame=0;
 	UnitUpdateHeading(unit);
