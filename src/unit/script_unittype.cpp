@@ -1451,9 +1451,6 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 		LuaError(l, "Unknown animation: %s" _C_ op1);
 	}
 
-	NewAnimationsArray[NumNewAnimations++] = anim;
-	Assert(NumNewAnimations != ANIMATIONS_MAXANIM);
-
 	free(op1);
 	return anim;
 }
@@ -1490,6 +1487,9 @@ static NewAnimation* ParseAnimation(lua_State* l, int idx)
 		}
 	}
 	FixLabels(l);
+
+	NewAnimationsArray[NumNewAnimations++] = anim;
+	Assert(NumNewAnimations != ANIMATIONS_MAXANIM);
 
 	return anim;
 }
