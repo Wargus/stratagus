@@ -246,8 +246,11 @@ extern void MenuHandleButtonDown(int b);
 extern void MenuHandleButtonUp(int b);
 
     /// The scenario path received from server
-    /// Prepare the client menu.
+    /// Update the client menu.
 extern int NetClientSelectScenario(void);
+    /// State info received from server
+    /// Update the client menu.
+extern void NetClientUpdateState(void);
     /// Notify menu display code to update info
 extern void NetConnectForceDisplayUpdate(void);
 

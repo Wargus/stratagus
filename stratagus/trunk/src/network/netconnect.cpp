@@ -923,7 +923,8 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		    switch(msg->SubType) {
 
 			case ICMState:		/// Server has sent us new state info
-			    /// FIXME: Implement passed state info here
+			    ServerSetupState = msg->u.State;
+			    NetClientUpdateState();
 			    NetLocalState = ccs_synced;
 			    break;
 
@@ -1096,8 +1097,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 					/// by falling back to ICMWaiting with prev. State synced
 					message.Type = MessageInitReply;
 					message.SubType = ICMState;		/// Send State info to the client
-					/// FIXME: Implement and setup the menu state info here...
-
+					message.u.State = ServerSetupState;
 					message.HostsCount = (char)(HostsCount & 0xff);
 					message.MapUID = htonl(ScenSelectPudInfo->MapUID);
 					n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -1105,7 +1105,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 						    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 					NetStates[h].MsgCnt++;
 					if (NetStates[h].MsgCnt > 50) {
-					    // FIXME: Client sends mapinfo, but doesn't receive our state....
+					    // FIXME: Client sends mapinfo, but doesn't receive our state info....
 					    ;
 					}
 					break;
