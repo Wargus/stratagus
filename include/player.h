@@ -10,7 +10,7 @@
 //
 /**@name player.h - The player headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -462,6 +462,7 @@ extern int NumPlayers;             /// How many player slots used
 extern Player Players[PlayerMax];  /// All players
 extern Player* ThisPlayer;         /// Player on local computer
 extern int NoRescueCheck;          /// Disable rescue check
+extern SDL_Color PlayerColorsRGB[PlayerMax][4]; /// Player colors
 extern Uint32 PlayerColors[PlayerMax][4];  /// Player colors
 extern char* PlayerColorNames[PlayerMax];  /// Player color names
 

@@ -10,7 +10,7 @@
 //
 /**@name script_player.c - The player ccl functions. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -656,6 +656,53 @@ static int CclDefineRaceNames(lua_State* l)
 }
 
 /**
+**  Define player colors
+**
+**  @param l  Lua state.
+*/
+static int CclDefinePlayerColors(lua_State* l)
+{
+	int i;
+	int args;
+	int j;
+
+	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	args = luaL_getn(l, 1);
+	for (i = 0; i < args; ++i) {
+		lua_rawgeti(l, 1, i + 1);
+		free(PlayerColorNames[i / 2]);
+		PlayerColorNames[i / 2] = strdup(LuaToString(l, -1));
+		lua_pop(l, 1);
+		++i;
+		lua_rawgeti(l, 1, i + 1);
+		if (!lua_istable(l, -1) || luaL_getn(l, -1) != 4) {
+			LuaError(l, "incorrect argument");
+		}
+		for (j = 0; j < 4; ++j) {
+			lua_rawgeti(l, -1, j + 1);
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			PlayerColorsRGB[i / 2][j].r = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			PlayerColorsRGB[i / 2][j].g = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 3);
+			PlayerColorsRGB[i / 2][j].b = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_pop(l, 1);
+		}
+	}
+
+	return 0;
+}
+
+/**
 **  Make new player colors
 **
 **  @param l  Lua state.
@@ -947,6 +994,7 @@ void PlayerCclRegister(void)
 	lua_register(Lua, "SharedVision", CclSharedVision);
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
+	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 
 	lua_register(Lua, "NewColors", CclNewPlayerColors);
 

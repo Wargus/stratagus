@@ -10,7 +10,7 @@
 //
 /**@name player.c - The players. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -66,29 +66,11 @@ int NoRescueCheck;               /// Disable rescue check
 
 /**
 **  Colors used for minimap.
-** @todo FIXME: make this configurable
 */
-static SDL_Color PlayerColorsRGB[PlayerMax][4];
+SDL_Color PlayerColorsRGB[PlayerMax][4];
 Uint32 PlayerColors[PlayerMax][4];
 
-char* PlayerColorNames[PlayerMax] = {
-	"red",
-	"blue",
-	"green",
-	"violet",
-	"orange",
-	"black",
-	"white",
-	"yellow",
-	"red",
-	"blue",
-	"green",
-	"violet",
-	"orange",
-	"black",
-	"white",
-	"yellow",
-};
+char* PlayerColorNames[PlayerMax];
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -122,36 +104,6 @@ void InitPlayers(void)
 {
 	int p;
 	int x;
-	// FIXME: make this configurable
-	struct {
-		int R; int G; int B;
-	} PColors[PlayerMax][4] = {
-		{{ 164, 0, 0 }, { 124, 0, 0 }, { 92, 4, 0 }, { 68, 4, 0 }},
-		{{ 12, 72, 204 }, { 4, 40, 160 }, { 0, 20, 116 }, { 0, 4, 76 }},
-		{{ 44, 180, 148 }, { 20, 132, 92 }, { 4, 84, 44 }, { 0, 40, 12 }},
-		{{ 152, 72, 176 }, { 116, 44, 132 }, { 80, 24, 88 }, { 44, 8, 44 }},
-		{{ 248, 140, 20 }, { 200, 96, 16 }, { 152, 60, 16 }, { 108, 32, 12 }},
-		{{ 40, 40, 60 }, { 28, 28, 44 }, { 20, 20, 32}, { 12, 12, 20 }},
-		{{ 224, 224, 224 }, { 152, 152, 180 }, { 84, 84, 128 }, { 36, 40, 76 }},
-		{{ 252, 252, 72 }, { 228, 204, 40 }, { 204, 160, 16 }, { 180, 116, 0 }},
-		{{ 164, 0, 0 }, { 124, 0, 0 }, { 92, 4, 0 }, { 68, 4, 0 }},
-		{{ 12, 72, 204 }, { 4, 40, 160 }, { 0, 20, 116 }, { 0, 4, 76 }},
-		{{ 44, 180, 148 }, { 20, 132, 92 }, { 4, 84, 44 }, { 0, 40, 12 }},
-		{{ 152, 72, 176 }, { 116, 44, 132 }, { 80, 24, 88 }, { 44, 8, 44 }},
-		{{ 248, 140, 20 }, { 200, 96, 16 }, { 152, 60, 16 }, { 108, 32, 12 }},
-		{{ 40, 40, 60 }, { 28, 28, 44 }, { 20, 20, 32}, { 12, 12, 20 }},
-		{{ 224, 224, 224 }, { 152, 152, 180 }, { 84, 84, 128 }, { 36, 40, 76 }},
-		{{ 252, 252, 72 }, { 228, 204, 40 }, { 204, 160, 16 }, { 180, 116, 0 }},
-	};
-
-	// FIXME: remove this
-	for (p = 0; p < PlayerMax; ++p) {
-		for (x = 0; x < 4; ++x) {
-			PlayerColorsRGB[p][x].r = PColors[p][x].R;
-			PlayerColorsRGB[p][x].g = PColors[p][x].G;
-			PlayerColorsRGB[p][x].b = PColors[p][x].B;
-		}
-	}
 
 	for (p = 0; p < PlayerMax; ++p) {
 		Players[p].Player = p;
