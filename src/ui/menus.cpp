@@ -1373,7 +1373,7 @@ local void LoadAction(void)
     menu = CurrentMenu;
     fl = menu->items[1].d.listbox.options;
 
-    name = fl[menu->items[1].d.listbox.curopt].name;
+    name = fl[menu->items[1].d.listbox.curopt + menu->items[1].d.listbox.startline].name;
     nameLength = strlen(name);
 
     strcpy(filename, SaveDir);
