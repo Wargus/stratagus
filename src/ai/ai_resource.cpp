@@ -396,6 +396,103 @@ global void AiAddResearchRequest(Upgrade* upgrade)
 }
 
 /**
+**	Check if we can upgrade to unit-type.
+**
+**	@param type	Unit that can upgrade to unit-type
+**	@param what	To what should be upgraded.
+**	@return		True if made, false if can't be made.
+**
+**	@note 	We must check if the dependencies are fulfilled.
+*/
+local int AiUpgradeTo(const UnitType* type,UnitType* what)
+{
+    Unit* table[UnitMax];
+    Unit* unit;
+    int nunits;
+    int i;
+    int num;
+
+    DebugLevel0Fn("%s can upgrade-to %s\n" _C_ type->Ident _C_ what->Ident);
+
+    IfDebug( unit=NoUnitP; );
+    //
+    //  Remove all units already doing something.
+    //
+    nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
+    for (num = i = 0; i < nunits; i++) {
+	unit = table[i];
+	if (unit->Orders[0].Action==UnitActionStill && unit->OrderCount==1 ) {
+	    table[num++] = unit;
+	}
+    }
+
+    for( i=0; i<num; ++i ) {
+
+	unit=table[i];
+	DebugLevel0Fn("Have an unit to upgrade-to %d :)\n" _C_
+		UnitNumber(unit));
+
+	CommandUpgradeTo(unit, what,FlushCommands);
+
+	return 1;
+    }
+
+    return 0;
+}
+
+/**
+**	Check if the upgrade-to can be done.
+*/
+global void AiAddUpgradeToRequest(UnitType* type)
+{
+    int i;
+    int n;
+    const int* unit_count;
+    AiUnitTypeTable* const* tablep;
+    const AiUnitTypeTable* table;
+
+    //
+    //	Check if resources are available.
+    //
+    if( (i=AiCheckUnitTypeCosts(type)) ) {
+	AiPlayer->NeededMask|=i;
+	return;
+    }
+
+    //
+    //	Check if we have a place for the upgrade to.
+    //
+    n=AiHelpers.UpgradeCount;
+    tablep=AiHelpers.Upgrade;
+
+    if( type->Type>n ) {		// Oops not known.
+	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+	return;
+    }
+    table=tablep[type->Type];
+    if( !table ) {			// Oops not known.
+	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+	return;
+    }
+    i=0;
+    n=table->Count;
+
+    unit_count=AiPlayer->Player->UnitTypesCount;
+    for( i=0; i<n; ++i ) {
+	//
+	//	The type is available
+	//
+	if( unit_count[table->Table[i]->Type] ) {
+	    if( AiUpgradeTo(table->Table[i],type) ) {
+		return;
+	    }
+	}
+    }
+
+    return;
+}
+
+/**
 **	Check what must be builded / trained.
 */
 local void AiCheckingWork(void)

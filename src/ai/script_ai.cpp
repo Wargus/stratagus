@@ -700,6 +700,16 @@ local SCM CclAiRestart(void)
     return SCM_BOOL_T;
 }
 
+/**
+**	Execute new script
+*/
+local SCM CclAiScript(SCM value)
+{
+    AiPlayer->Script=value;
+
+    return SCM_BOOL_T;
+}
+
 #else
 
 /**
@@ -742,6 +752,7 @@ global void AiCclRegister(void)
     gh_new_procedure1_0("ai:sleep",CclAiSleep);
     gh_new_procedure1_0("ai:research",CclAiResearch);
     gh_new_procedure1_0("ai:upgrade-to",CclAiUpgradeTo);
+    gh_new_procedure1_0("ai:script",CclAiScript);
     gh_new_procedure0_0("ai:restart",CclAiRestart);
 #endif
 
