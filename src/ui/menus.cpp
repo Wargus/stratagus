@@ -214,10 +214,47 @@ local Menuitem PrgStartMenuItems[] = {
 /**
 **	Items for the Custom Game Setup Menu
 */
+local unsigned char *cgrcsoptions[] = {
+    "Human",
+    "Orc",
+    "Map Default",
+};
+
+local unsigned char *cgresoptions[] = {
+    "Map Default",
+    "Low",
+    "Medium",
+    "High",
+};
+
+local unsigned char *cgunsoptions[] = {
+    "Map Default",
+    "One Peasant Only",
+};
+
+local unsigned char *cgopsoptions[] = {
+    "Map Default",
+    "1 Opponent",
+    "2 Opponents",
+    "3 Opponents",
+    "4 Opponents",
+    "5 Opponents",
+    "6 Opponents",
+    "7 Opponents",
+};
+
+local unsigned char *cgtssoptions[] = {
+    "Map Default",
+    "Forest",
+    "Winter",
+    "Wasteland",
+    "Orc Swamp",	// hmm. need flag if XPN-GFX is present!
+};
+
 local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, CustomGameSetupInit, NULL,
 	{ drawfunc:{ CustomGameDrawFunc } } },
-    { MI_TYPE_TEXT, 640/2, 216, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 640/2+12, 192, 0, LargeFont, NULL, NULL,
 	{ text:{ "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
 	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'} } },
@@ -225,6 +262,26 @@ local Menuitem CustomGameMenuItems[] = {
 	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },
+    { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Your Race:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ cgrcsoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 3, 2, 2, 0} } },
+    { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Resources:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ cgresoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 4, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Units:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ cgunsoptions, 190, 20, MBUTTON_PULLDOWN, NULL, 2, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Opponents:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
+	{ pulldown:{ cgopsoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 8, 0, 0, 0} } },
+    { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
+	{ text:{ "~<Map Tileset:~>", 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
+	{ pulldown:{ cgtssoptions, 152, 20, MBUTTON_PULLDOWN, NULL, 5, 0, 0, 0} } },
 };
 
 /**
@@ -282,7 +339,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	3, 5,
+	3, 15,
 	CustomGameMenuItems
     },
 };
@@ -545,7 +602,7 @@ global void DrawMenu(int MenuId)
 {
     int i, n, l;
     Menu *menu;
-    Menuitem *mi;
+    Menuitem *mi, *mip;
 
     if (MenuId == -1) {
 	return;
@@ -556,6 +613,7 @@ global void DrawMenu(int MenuId)
     }
     n = menu->nitems;
     mi = menu->items;
+    mip = NULL;
     for (i = 0; i < n; i++) {
 	switch (mi->mitype) {
 	    case MI_TYPE_TEXT:
@@ -577,7 +635,11 @@ global void DrawMenu(int MenuId)
 			mi->font,mi->d.button.text);
 		break;
 	    case MI_TYPE_PULLDOWN:
-		DrawPulldown(mi,menu->x,menu->y);
+		if (mi->flags&MenuButtonClicked) {
+		    mip = mi;	// Delay, due to possible overlaying!
+		} else {
+		    DrawPulldown(mi,menu->x,menu->y);
+		}
 		break;
 	    case MI_TYPE_LISTBOX:
 		DrawListbox(mi,menu->x,menu->y);
@@ -594,6 +656,9 @@ global void DrawMenu(int MenuId)
 		break;
 	}
 	mi++;
+    }
+    if (mip) {
+	DrawPulldown(mip,menu->x,menu->y);
     }
     InvalidateArea(menu->x,menu->y,menu->xsize,menu->ysize);
 }
@@ -1023,6 +1088,9 @@ local void CustomGameStart(void)
 
 local void CustomGameSetupInit(Menuitem *mi __attribute__((unused)))
 {
+    extern int lcm_prevent_recurse;			// FIXME: quickhack
+    lcm_prevent_recurse = 0;
+
     strcpy(ScenSelectPath, FreeCraftLibPath);
     strcpy(ScenSelectFileName, "default.pud");
     if (ScenSelectPath[0]) {

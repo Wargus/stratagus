@@ -45,7 +45,7 @@ global unsigned MapX;			/// Map tile X start on display
 global unsigned MapY;			/// Map tile Y start on display
 global unsigned MapWidth;		/// map width in tiles
 global unsigned MapHeight;		/// map height in tiles
-local int lcm_prevent_recurse = 0;	/// prevent recursion through LoadGameMap
+global int lcm_prevent_recurse = 0;	/// prevent recursion through LoadGameMap
 
 /*----------------------------------------------------------------------------
 --	Map loading/saving
