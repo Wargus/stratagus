@@ -451,9 +451,10 @@ enum {
 
 typedef struct _title_screen_label_ {
     char* Text;
-    int xofs;
-    int yofs;
-    int flags;
+    int Font;
+    int Xofs;
+    int Yofs;
+    int Flags;
 } TitleScreenLabel;
 
 typedef struct _title_screen_ {
