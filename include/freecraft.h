@@ -26,10 +26,15 @@
 
 #define noDEBUG				/// Define to include debug code
 #define noFLAG_DEBUG		/// ARI: Define to include map flag debug
+
 #define noUSE_CCL			/// Remove no for version with guile
+#define noUSE_CCL2			/// Remove no for version with siod
 #define noUSE_THREAD			/// Remove no for version with thread
+
 #define noUSE_SDL			/// Remove no for sdl support
+#define noUSE_SDLA			/// Remove no for sdl audio support
 #define noUSE_X11			/// Remove no for x11 support
+#define noUSE_SVGALIB			/// Remove no for svgalib support
 
 /**
 **	Define this to support load of compressed (gzip) pud files
@@ -44,6 +49,9 @@
 */
 #define noUSE_BZ2LIB
 
+//
+//	Default speed for many things, set it higher for faster actions.
+//
 #define SPEED_MINE	1		/// speed factor for mine gold
 #define SPEED_GOLD	1		/// speed factor for getting gold
 #define SPEED_CHOP	1		/// speed factor for chop
@@ -70,7 +78,7 @@
 **	Debug check condition
 */
 #define DebugCheck(cond)	do{ if( cond ) { \
-	printf("DebugCheck at %s:%d\n",__FILE__,__LINE__); \
+	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
 
 /**
