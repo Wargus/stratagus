@@ -365,7 +365,7 @@ global Sample* LoadFlac(const char* name, int flags)
 	return NULL;
     }
 
-    DebugLevel2Fn("Have flac file %s\n" _C_ name);
+    DebugLevel2Fn("Loading flac file: %s\n" _C_ name);
 
     // FIXME: ugly way to seek to start of file
     CLclose(f);
