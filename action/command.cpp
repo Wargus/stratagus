@@ -1188,8 +1188,9 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
     }
 #endif
 
-    DebugLevel0Fn(": %d spell-casts on %d\n" _C_
-	UnitNumber(unit) _C_ dest ? UnitNumber(dest) : 0);
+    DebugLevel0Fn(": %d casts %s at %d %d on %d\n" _C_
+	UnitNumber(unit) _C_ spell->IdentName _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
+    DebugCheck(!unit->Type->CanCastSpell[spell->Ident]);
 
     //
     //	Check if unit is still valid? (NETWORK!)
@@ -1197,16 +1198,6 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
     if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
 	// FIXME: should I check here, if there is still enough mana?
 
-	/*
-	FIXME: vladi: any unit can cast spell, like dark-portal
-	if (unit->Type->Building) {
-	    // FIXME: should find a better way for pending orders.
-	    order=&unit->NewOrder;
-	    ReleaseOrder(order);
-	} else if (!(order=GetNextOrder(unit,flush))) {
-	    return;
-	}
-	*/
 	if (!(order = GetNextOrder(unit, flush))) {
 	    return;
 	}
@@ -1233,9 +1224,8 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 		dest->Refs++;
 	    }
 	} else {
-	    order->X = x-order->Range;
-	    order->Y = y-order->Range;
-	    order->Goal = NoUnitP;
+	    order->X = x;
+	    order->Y = y;
 	    order->Range <<= 1;
 	}
 	order->Type = NULL;
