@@ -113,8 +113,11 @@ typedef struct _io_flag_def_ {
 */
 typedef struct _io_field_def_ {
     char*		name;		/// Name of the field ( used as ccl ident )
+#if defined(USE_GUILE) || defined(USE_SIOD)
     void                (*convertfunc) (SCM scmfrom, void* binaryform, void* para);
     					/// Function to load/save the field
+#elif defined(USE_LUA)
+#endif
     void*		offset;		/// Offset of the field in the structure
     void*		para;		/// Parameter passed to the field
 } IOFieldDef;
@@ -145,6 +148,7 @@ extern CLFile      *IOOutFile;		/// When saving to ccl, output file
 
     /// Print "IOTabLevel" tabs on the ccl output
 extern void IOPrintTabs();
+#if defined(USE_GUILE) || defined(USE_SIOD)
     /// Handle saving/loading of structure
 extern void IOStruct(SCM scmform, void* binaryform, void* para);
     /// Handle saving/loading a pointer to a structure.
@@ -183,6 +187,8 @@ extern void IOUnitPtr(SCM scmfrom, void* binaryform, void* para);
 extern void IOUpgradePtr(SCM scmfrom, void* binaryform, void* para);
     /// Handle saving/loading a reference to a player (Player*)
 extern void IOPlayerPtr(SCM scmfrom, void* binaryform, void* para);
+#elif defined(USE_LUA)
+#endif
 
 //@}
 
