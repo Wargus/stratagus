@@ -275,35 +275,31 @@ typedef struct _decoration_ {
 } Decoration;
 
 /**
-**		Sprite to display the mana.
+**  Sprite to display the mana.
 */
 global Decoration ManaSprite;
 
 /**
-**		Sprite to display the health.
+**  Sprite to display the health.
 */
 global Decoration HealthSprite;
 
 /**
-**		Sprite to display as the shadow of flying units.
+**  Sprite to display as the shadow of flying units.
 **
-**		@todo		Made this configurable with CCL.
+**  @todo  Made this configurable with CCL.
 */
 global Decoration ShadowSprite;
 
 /**
-**		Sprite to display the active spells on an unit.
+**  Sprite to display the active spells on an unit.
 */
 global Decoration SpellSprite;
 
 /**
-**		Define mana sprite.
+**  Define mana sprite.
 **
-**		@param file		Mana graphic file.
-**		@param x		Mana X position.
-**		@param y		Mana Y position.
-**		@param w		Mana width.
-**		@param h		Mana height.
+**  @param l  Lua state
 */
 local int CclManaSprite(lua_State* l)
 {
@@ -322,13 +318,9 @@ local int CclManaSprite(lua_State* l)
 }
 
 /**
-**		Define health sprite.
+**  Define health sprite.
 **
-**		@param file		Health graphic file.
-**		@param x		Health X position.
-**		@param y		Health Y position.
-**		@param w		Health width.
-**		@param h		Health height.
+**  @param l  Lua state
 */
 local int CclHealthSprite(lua_State* l)
 {
@@ -347,13 +339,9 @@ local int CclHealthSprite(lua_State* l)
 }
 
 /**
-**		Define shadow sprite.
+**  Define shadow sprite.
 **
-**		@param file		Shadow graphic file.
-**		@param x		Shadow X position.
-**		@param y		Shadow Y position.
-**		@param w		Shadow width.
-**		@param h		Shadow height.
+**  @param l  Lua state
 */
 local int CclShadowSprite(lua_State* l)
 {
@@ -372,13 +360,9 @@ local int CclShadowSprite(lua_State* l)
 }
 
 /**
-**		Define spell sprite.
+**  Define spell sprite.
 **
-**		@param file		Spell graphic file.
-**		@param x		Spell X position.
-**		@param y		Spell Y position.
-**		@param w		Spell width.
-**		@param h		Spell height.
+**  @param l  Lua state
 */
 local int CclSpellSprite(lua_State* l)
 {
@@ -397,7 +381,9 @@ local int CclSpellSprite(lua_State* l)
 }
 
 /**
-**		Enable display health as health-bar.
+**  Enable display health as health-bar.
+**
+**  @param l  Lua state
 */
 local int CclShowHealthBar(lua_State* l)
 {
@@ -411,7 +397,9 @@ local int CclShowHealthBar(lua_State* l)
 }
 
 /**
-**		Enable display health as health-dot.
+**  Enable display health as health-dot.
+**
+**  @param l  Lua state
 */
 local int CclShowHealthDot(lua_State* l)
 {
@@ -425,7 +413,9 @@ local int CclShowHealthDot(lua_State* l)
 }
 
 /**
-**		Enable display health as horizontal bar.
+**  Enable display health as horizontal bar.
+**
+**  @param l  Lua state
 */
 local int CclShowHealthHorizontal(lua_State* l)
 {
@@ -440,7 +430,9 @@ local int CclShowHealthHorizontal(lua_State* l)
 }
 
 /**
-**		Enable display health as vertical bar.
+**  Enable display health as vertical bar.
+**
+**  @param l  Lua state
 */
 local int CclShowHealthVertical(lua_State* l)
 {
@@ -455,7 +447,9 @@ local int CclShowHealthVertical(lua_State* l)
 }
 
 /**
-**		Enable display mana as mana-bar.
+**  Enable display mana as mana-bar.
+**
+**  @param l  Lua state
 */
 local int CclShowManaBar(lua_State* l)
 {
@@ -469,7 +463,9 @@ local int CclShowManaBar(lua_State* l)
 }
 
 /**
-**		Enable display mana as mana-dot.
+**  Enable display mana as mana-dot.
+**
+**  @param l  Lua state
 */
 local int CclShowManaDot(lua_State* l)
 {
@@ -483,7 +479,9 @@ local int CclShowManaDot(lua_State* l)
 }
 
 /**
-**		Enable energy bars and dots only for selected units
+**  Enable energy bars and dots only for selected units
+**
+**  @param l  Lua state
 */
 local int CclShowEnergySelected(lua_State* l)
 {
@@ -496,7 +494,9 @@ local int CclShowEnergySelected(lua_State* l)
 }
 
 /**
-**		Enable display of full bars/dots.
+**  Enable display of full bars/dots.
+**
+**  @param l  Lua state
 */
 local int CclShowFull(lua_State* l)
 {
@@ -509,7 +509,9 @@ local int CclShowFull(lua_State* l)
 }
 
 /**
-**		Enable display mana as horizontal bar.
+**  Enable display mana as horizontal bar.
+**
+**  @param l  Lua state
 */
 local int CclShowManaHorizontal(lua_State* l)
 {
@@ -524,7 +526,9 @@ local int CclShowManaHorizontal(lua_State* l)
 }
 
 /**
-**		Enable display mana as vertical bar.
+**  Enable display mana as vertical bar.
+**
+**  @param l  Lua state
 */
 local int CclShowManaVertical(lua_State* l)
 {
@@ -539,7 +543,9 @@ local int CclShowManaVertical(lua_State* l)
 }
 
 /**
-**		Disable display of full bars/dots.
+**  Disable display of full bars/dots.
+**
+**  @param l  Lua state
 */
 local int CclShowNoFull(lua_State* l)
 {
@@ -552,7 +558,9 @@ local int CclShowNoFull(lua_State* l)
 }
 
 /**
-**		Draw decorations always on top.
+**  Draw decorations always on top.
+**
+**  @param l  Lua state
 */
 local int CclDecorationOnTop(lua_State* l)
 {
@@ -565,7 +573,7 @@ local int CclDecorationOnTop(lua_State* l)
 }
 
 /**
-**		Register CCL features for decorations.
+**  Register CCL features for decorations.
 */
 global void DecorationCclRegister(void)
 {
@@ -592,7 +600,7 @@ global void DecorationCclRegister(void)
 }
 
 /**
-**		Load decoration.
+**  Load decoration.
 */
 global void LoadDecorations(void)
 {
@@ -620,7 +628,7 @@ global void LoadDecorations(void)
 }
 
 /**
-**		Clean decorations.
+**  Clean decorations.
 */
 global void CleanDecorations(void)
 {
@@ -654,13 +662,13 @@ global void CleanDecorations(void)
 }
 
 /**
-**		Draw mana/working sprite.
+**  Draw mana/working sprite.
 **
-**		@param x		X screen pixel position
-**		@param y		Y screen pixel position
-**		@param type		Unit type pointer
-**		@param full		Full value
-**		@param ready		Ready value
+**  @param x      X screen pixel position
+**  @param y      Y screen pixel position
+**  @param type   Unit type pointer
+**  @param full   Full value
+**  @param ready  Ready value
 */
 local void DrawManaSprite(int x, int y, const UnitType* type, int full, int ready)
 {
@@ -695,13 +703,13 @@ local void DrawManaSprite(int x, int y, const UnitType* type, int full, int read
 }
 
 /**
-**		Draw mana/working bar.
+**  Draw mana/working bar.
 **
-**		@param x		X screen pixel position
-**		@param y		Y screen pixel position
-**		@param type		Unit type pointer
-**		@param full		Full value
-**		@param ready		Ready value
+**  @param x      X screen pixel position
+**  @param y      Y screen pixel position
+**  @param type   Unit type pointer
+**  @param full   Full value
+**  @param ready  Ready value
 */
 local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 {
@@ -747,12 +755,12 @@ local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 }
 
 /**
-**		Draw decoration (invis, for the unit.)
+**  Draw decoration (invis, for the unit.)
 **
-**		@param unit		Pointer to the unit.
-**		@param type		Type of the unit.
-**		@param x		Screen X position of the unit.
-**		@param y		Screen Y position of the unit.
+**  @param unit  Pointer to the unit.
+**  @param type  Type of the unit.
+**  @param x     Screen X position of the unit.
+**  @param y     Screen Y position of the unit.
 */
 local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 {
@@ -1096,14 +1104,15 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 }
 
 /**
-**		Draw unit's shadow.
+**  Draw unit's shadow.
 **
-**		@param unit		Pointer to the unit.
-**		@param type		Pointer to the unit type.
-**		@param x		Screen X position of the unit.
-**		@param y		Screen Y position of the unit.
+**  @param unit   Pointer to the unit.
+**  @param type   Pointer to the unit type.
+**  @param frame  Frame number
+**  @param x      Screen X position of the unit.
+**  @param y      Screen Y position of the unit.
 **
-**		@todo FIXME: combine new shadow code with old shadow code.
+**  @todo FIXME: combine new shadow code with old shadow code.
 */
 global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 	int x, int y)
@@ -1201,14 +1210,14 @@ global void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 }
 
 /**
-**		Draw path from current postion to the destination of the move.
+**  Draw path from current postion to the destination of the move.
 **
-**		@param unit		Pointer to the unit.
+**  @param unit  Pointer to the unit.
 **
-**		@todo FIXME: this is the start of the routine which shows the orders
-**		FIXME: of the current selected unit.
-**		FIXME: should be extend to show waypoints, which order (repair...)
-**		FIXME: remove or reduce the Map2ViewportX and Map2ViewportY.
+**  @todo FIXME: this is the start of the routine which shows the orders
+**  FIXME: of the current selected unit.
+**  FIXME: should be extend to show waypoints, which order (repair...)
+**  FIXME: remove or reduce the Map2ViewportX and Map2ViewportY.
 */
 global void DrawPath(const Unit* unit)
 {
@@ -1333,12 +1342,12 @@ global void DrawPath(const Unit* unit)
 }
 
 /**
-**		Get the location of an unit's order.
+**  Get the location of an unit's order.
 **
-**		@param unit		Pointer to unit.
-**		@param order		Pointer to order.
-**		@param x		Resulting screen X cordinate.
-**		@param y		Resulting screen Y cordinate.
+**  @param unit   Pointer to unit.
+**  @param order  Pointer to order.
+**  @param x      Resulting screen X cordinate.
+**  @param y      Resulting screen Y cordinate.
 */
 local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y)
 {
@@ -1373,12 +1382,12 @@ local void GetOrderPosition(const Unit* unit, const Order* order, int* x, int* y
 }
 
 /**
-**		Show the order on map.
+**  Show the order on map.
 **
-**		@param unit		Unit pointer.
-**		@param x1		X pixel coordinate.
-**		@param y1		Y pixel coordinate.
-**		@param order		Order to display.
+**  @param unit   Unit pointer.
+**  @param x1     X pixel coordinate.
+**  @param y1     Y pixel coordinate.
+**  @param order  Order to display.
 */
 local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 {
@@ -1507,9 +1516,9 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 }
 
 /**
-**		Show the current order of an unit.
+**  Show the current order of an unit.
 **
-**		@param unit		Pointer to the unit.
+**  @param unit  Pointer to the unit.
 */
 global void ShowOrder(const Unit* unit)
 {
@@ -1539,14 +1548,14 @@ global void ShowOrder(const Unit* unit)
 }
 
 /**
-**		Draw additional informations of an unit.
+**  Draw additional informations of an unit.
 **
-**		@param unit		Unit pointer of drawn unit.
-**		@param type		Unit-type pointer.
-**		@param x		X screen pixel position of unit.
-**		@param y		Y screen pixel position of unit.
+**  @param unit  Unit pointer of drawn unit.
+**  @param type  Unit-type pointer.
+**  @param x     X screen pixel position of unit.
+**  @param y     Y screen pixel position of unit.
 **
-**		@todo FIXME: The different styles should become a function call.
+**  @todo FIXME: The different styles should become a function call.
 */
 local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y)
 {
@@ -1629,7 +1638,7 @@ local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 
 #ifdef USE_OPENGL
 /**
-**		FIXME: docu?
+**  FIXME: docu
 */
 local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int x, int y)
 {
@@ -1686,12 +1695,12 @@ local void DrawUnitPlayerColor(const UnitType* type, int player, int frame, int 
 #endif
 
 /**
-**		Draw construction shadow.
+**  Draw construction shadow.
 **
-**		@param unit		Unit pointer.
-**		@param frame		Frame number to draw.
-**		@param x		X position.
-**		@param y		Y position.
+**  @param unit   Unit pointer.
+**  @param frame  Frame number to draw.
+**  @param x      X position.
+**  @param y      Y position.
 */
 local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 {
@@ -1753,15 +1762,17 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 }
 
 /**
-**		Draw construction.
+**  Draw construction.
 **
-**		@param unit		Unit pointer.
-**		@param frame		Frame number to draw.
-**		@param x		X position.
-**		@param y		Y position.
+**  @param unit    Unit pointer.
+**  @param cframe  Construction frame to draw.
+**  @param type    Unit type.
+**  @param frame   Frame number.
+**  @param x       X position.
+**  @param y       Y position.
 */
 local void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
-		const UnitType* type, int frame, int x, int y)
+	const UnitType* type, int frame, int x, int y)
 {
 	if (cframe->File == ConstructionFileConstruction) {
 		const Construction* construction;
@@ -1787,13 +1798,13 @@ local void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 }
 
 /**
-**		Units on map:
+**  Units on map:
 */
 
 /**
-**		Draw unit on map.
+**  Draw unit on map.
 **
-**		@param unit		Pointer to the unit.
+**  @param unit  Pointer to the unit.
 */
 global void DrawUnit(const Unit* unit)
 {
@@ -1961,12 +1972,12 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 	}
 }
 /**
-**		Find all units to draw in viewport.
+**  Find all units to draw in viewport.
 **
-**		@param vp		Viewport to be drawn.
-**		@param table
+**  @param vp     Viewport to be drawn.
+**  @param table  FIXME: docu
 **
-**		@todo FIXME: Must use the redraw tile flags in this function
+**  @todo FIXME: Must use the redraw tile flags in this function
 */
 global int FindAndSortUnits(const Viewport* vp, Unit** table)
 {
