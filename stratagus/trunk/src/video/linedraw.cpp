@@ -868,11 +868,18 @@ global void VideoFillRectangleClip(Uint32 color, int x, int y,
 global void VideoFillTransRectangle(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha)
 {
+    // FIXME: optimize
     SDL_Rect drect;
     SDL_Surface* s;
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
 
     s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
 	32, RMASK, GMASK, BMASK, AMASK);
+
+    SDL_GetRGB(color, TheScreen->format, &r, &g, &b);
+    color = SDL_MapRGBA(s->format, r, g, b, alpha);
 
     SDL_FillRect(s, NULL, color);
 
