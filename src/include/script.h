@@ -197,6 +197,9 @@ extern void CclGcProtect(SCM* obj);	/// Protect scm var for GC
 extern void CclGcUnprotect(SCM* obj);	/// Unprotect scm var for GC
 extern void CclGcProtectedAssign(SCM* obj, SCM value); /// Alter garbage protected scm var.
 #elif defined(USE_LUA)
+extern const char* LuaToString(lua_State* l, int narg);
+extern lua_Number LuaToNumber(lua_State* l, int narg);
+extern int LuaToBoolean(lua_State* l, int narg);
 #endif
 extern void CclGarbageCollect(int fast);/// Perform garbage collection
 extern void CclFlushOutput();		/// Flush ccl output

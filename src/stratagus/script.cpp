@@ -205,6 +205,24 @@ local int CclLoad(lua_State* l)
     LuaLoadFile(buf);
     return 0;
 }
+
+global const char* LuaToString(lua_State* l, int narg)
+{
+    luaL_checktype(l, narg, LUA_TSTRING);
+    return lua_tostring(l, narg);
+}
+
+global lua_Number LuaToNumber(lua_State* l, int narg)
+{
+    luaL_checktype(l, narg, LUA_TNUMBER);
+    return lua_tonumber(l, narg);
+}
+
+global int LuaToBoolean(lua_State* l, int narg)
+{
+    luaL_checktype(l, narg, LUA_TBOOLEAN);
+    return lua_toboolean(l, narg);
+}
 #endif
 
 /** 
