@@ -1518,7 +1518,8 @@ global void RescueUnits(void)
 		//	Look if human near the unit.
 		//
 		for( i=0; i<n; ++i ) {
-		    if( around[i]->Player->Type==PlayerPerson ) {
+		    if( around[i]->Type->CanAttack &&
+			    around[i]->Player->Type==PlayerPerson ) {
 			ChangeUnitOwner(unit,unit->Player,around[i]->Player);
 			// FIXME: more races?
 			if( unit->Player->Race==PlayerRaceHuman ) {
