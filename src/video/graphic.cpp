@@ -470,6 +470,7 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	unsigned char* data;
 	int x;
 	SDL_Color pal[256];
+	Uint32 ckey;
 
 	// FIXME: Support more formats
 	if (g->Surface->format->BytesPerPixel != 1) {
@@ -496,6 +497,7 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 	SDL_UnlockSurface(g->Surface);
 	memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
 	VideoPaletteListRemove(g->Surface);
+	ckey = g->Surface->format->colorkey;
 	SDL_FreeSurface(g->Surface);
 
 	g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
@@ -503,7 +505,7 @@ global void ResizeGraphic(Graphic* g, int w, int h)
 		VideoPaletteListAdd(g->Surface);
 	}
 	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
-	SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, 255);
+	SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
 
 	g->Width = w;
 	g->Height = h;
