@@ -314,6 +314,8 @@ local void AiRequestSupply(void)
 	AiBuildQueue* queue;
 	int counter[UnitTypeMax];
 
+	DebugCheck(!AiHelpers.UnitLimit);
+
 	//
 	// Count the already made build requests.
 	//
