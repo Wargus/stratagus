@@ -2494,6 +2494,69 @@ global SCM CclSetMessage(SCM message)
 }
 
 /**
+**	Reset the keystroke help array
+*/
+local SCM CclResetKeystrokeHelp(void)
+{
+    int n;
+    
+    n = nKeyStrokeHelps * 2;
+    while (n--) {
+	free(KeyStrokeHelps[n]);
+    }
+    if (KeyStrokeHelps) {
+	free(KeyStrokeHelps);
+	KeyStrokeHelps = NULL;
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Add a keystroke help
+**
+**	@param list	pair describing the keystroke.
+*/
+local SCM CclAddKeystrokeHelp(SCM list)
+{
+    SCM value;
+    char *s1, *s2;
+    int n;
+
+    if (!gh_null_p(list)) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	s1=gh_scm2newstr(value,NULL);
+    }
+    if (!gh_null_p(list)) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	s2=gh_scm2newstr(value,NULL);
+
+	n = nKeyStrokeHelps;
+	if (!n) {
+	    n = 1;
+	    KeyStrokeHelps = malloc(2 * sizeof(char *));
+	} else {
+	    n++;
+	    KeyStrokeHelps = realloc(KeyStrokeHelps, n * 2 * sizeof(char *));
+	}
+	if (KeyStrokeHelps) {
+	    nKeyStrokeHelps = n;
+	    n--;
+	    KeyStrokeHelps[n * 2] = s1;
+	    KeyStrokeHelps[n * 2 + 1] = s2;
+	}
+    }
+
+    while( !gh_null_p(list) ) {
+	list=gh_cdr(list);
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
@@ -2558,6 +2621,12 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-show-reaction-range!",CclSetShowReactionRange);
     gh_new_procedure1_0("set-show-attack-range!",CclSetShowAttackRange);
     gh_new_procedure1_0("set-show-orders!",CclSetShowOrders);
+
+    //
+    //	Keystroke helps
+    //
+    gh_new_procedure0_0("reset-keystroke-help",CclResetKeystrokeHelp);
+    gh_new_procedureN("add-keystroke-help",CclAddKeystrokeHelp);
 
     InitMenuFuncHash();
 }

@@ -254,6 +254,9 @@ extern const char *CurrentMenu;		/// Currently processed menu
 extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
 extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
 
+extern int nKeyStrokeHelps;		/// Number of loaded keystroke helps
+extern char **KeyStrokeHelps;		/// Keystroke help pairs
+
 #define MENUS_MAXMENU 128		/// FIXME: wrong place, docu
 #define MENUS_MAXFUNC 128		/// FIXME: wrong place, docu
     /// FIXME: docu
