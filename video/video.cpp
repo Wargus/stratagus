@@ -308,7 +308,7 @@ void DisplayPicture(const char* name)
 {
 	Graphic* g;
 
-	g = LoadGraphic(name);
+	g = LoadSprite(name, 0, 0);
 	// FIXME: make resizing optional?
 	// FIXME: keep aspect ratio?
 	ResizeGraphic(g, VideoWidth, VideoHeight);

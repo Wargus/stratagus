@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -150,22 +150,18 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 	//  Image
 	//
 	pimage = p;
-	if (!p->Sprite && !p->File && !(flags & MenuButtonDisabled)) {
+	if (!p->Sprite && !(flags & MenuButtonDisabled)) {
 		// No image.  Try hover, selected, then default
-		if ((flags & MenuButtonActive) && (style->Hover.Sprite || style->Hover.File)) {
+		if ((flags & MenuButtonActive) && style->Hover.Sprite) {
 			pimage = &style->Hover;
-		} else if ((flags & MenuButtonSelected) && (style->Selected.Sprite || style->Selected.File)) {
+		} else if ((flags & MenuButtonSelected) && style->Selected.Sprite) {
 			pimage = &style->Selected;
-		} else if (style->Default.Sprite || style->Default.File) {
+		} else if (style->Default.Sprite) {
 			pimage = &style->Default;
 		}
 	}
-	if (!pimage->Sprite && pimage->File) {
-		char* buf;
-
-		buf = alloca(strlen(pimage->File) + 9 + 1);
-		strcat(strcpy(buf, "graphics/"), pimage->File);
-		pimage->Sprite = LoadSprite(buf, pimage->Width, pimage->Height);
+	if (pimage->Sprite && !GraphicLoaded(pimage->Sprite)) {
+		LoadGraphic(pimage->Sprite);
 	}
 	if (pimage->Sprite) {
 		VideoDraw(pimage->Sprite, pimage->Frame, x, y);
@@ -820,40 +816,40 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
 	//  Image
 	//
 	pimage = p;
-	if (!p->Sprite && !p->File) {
+	if (!p->Sprite && !p->Sprite->File) {
 		// No image
 		if ((flags & MenuButtonDisabled)) {
 			// Try unchecked disabled
-			if (checked && (style->Disabled.Sprite || style->Disabled.File)) {
+			if (checked && (style->Disabled.Sprite || style->Disabled.Sprite->File)) {
 				pimage = &style->Disabled;
 			}
 		} else {
 			// Try hover, selected, then default
 			if (checked) {
-				if ((flags & MenuButtonActive) && (style->CheckedHover.Sprite || style->CheckedHover.File)) {
+				if ((flags & MenuButtonActive) && (style->CheckedHover.Sprite || style->CheckedHover.Sprite->File)) {
 					pimage = &style->CheckedHover;
-				} else if ((flags & MenuButtonSelected) && (style->CheckedSelected.Sprite || style->CheckedSelected.File)) {
+				} else if ((flags & MenuButtonSelected) && (style->CheckedSelected.Sprite || style->CheckedSelected.Sprite->File)) {
 					pimage = &style->CheckedSelected;
-				} else if (style->Checked.Sprite || style->Checked.File) {
+				} else if (style->Checked.Sprite || style->Checked.Sprite->File) {
 					pimage = &style->Checked;
 				}
 			} else {
-				if ((flags & MenuButtonActive) && (style->Hover.Sprite || style->Hover.File)) {
+				if ((flags & MenuButtonActive) && (style->Hover.Sprite || style->Hover.Sprite->File)) {
 					pimage = &style->Hover;
-				} else if ((flags & MenuButtonSelected) && (style->Selected.Sprite || style->Selected.File)) {
+				} else if ((flags & MenuButtonSelected) && (style->Selected.Sprite || style->Selected.Sprite->File)) {
 					pimage = &style->Selected;
-				} else if (style->Default.Sprite || style->Default.File) {
+				} else if (style->Default.Sprite || style->Default.Sprite->File) {
 					pimage = &style->Default;
 				}
 			}
 		}
 	}
-	if (!pimage->Sprite && pimage->File) {
+	if (!pimage->Sprite && pimage->Sprite->File) {
 		char* buf;
 
-		buf = alloca(strlen(pimage->File) + 9 + 1);
-		strcat(strcpy(buf, "graphics/"), pimage->File);
-		pimage->Sprite = LoadSprite(buf, pimage->Width, pimage->Height);
+		buf = alloca(strlen(pimage->Sprite->File) + 9 + 1);
+		strcat(strcpy(buf, "graphics/"), pimage->Sprite->File);
+		pimage->Sprite = LoadSprite(buf, pimage->Sprite->Width, pimage->Sprite->Height);
 	}
 	if (pimage->Sprite) {
 		VideoDraw(pimage->Sprite, pimage->Frame, x, y);
@@ -1015,7 +1011,7 @@ void DrawMenu(Menu* menu)
 
 	if (menu->Background) {
 		if (!menu->BackgroundG) {
-			menu->BackgroundG = LoadGraphic(menu->Background);
+			menu->BackgroundG = LoadSprite(menu->Background, 0, 0);
 			ResizeGraphic(menu->BackgroundG, VideoWidth, VideoHeight);
 		}
 		VideoDraw(menu->BackgroundG, 0, 0, 0);
