@@ -120,6 +120,7 @@ typedef struct _OLD_INTERFACE_INFO
 --	Variables
 ----------------------------------------------------------------------------*/
 
+extern int NetLastSocket;		/// Last socket
 extern unsigned long NetLastHost;	/// Last host number (net format)
 extern int NetLastPort;			/// Last port number (net format)
 extern unsigned long NetLocalAddrs[];	/// Local IP-Addrs of this host (net format)

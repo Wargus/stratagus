@@ -54,6 +54,7 @@
 //	Variables
 //----------------------------------------------------------------------------
 
+global int NetLastSocket;		/// Last socket
 global unsigned long NetLastHost;	/// Last host number (net format)
 global int NetLastPort;			/// Last port number (net format)
 
@@ -477,6 +478,7 @@ global int NetOpenTCP(int port)
 	NetLastHost=sock_addr.sin_addr.s_addr;
 	NetLastPort=sock_addr.sin_port;
     }
+    NetLastSocket=sockfd;
     return sockfd;
 }
 
@@ -617,6 +619,7 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 */
 global int NetRecvTCP(int sockfd,void* buf,int len)
 {
+    NetLastSocket=sockfd;
     return recv(sockfd,buf,len,0);
 }
 
@@ -686,7 +689,10 @@ global int NetAcceptTCP(int sockfd)
     int len;
 
     len = sizeof(struct sockaddr_in);
-    return accept(sockfd,(struct sockaddr*)&sa,&len);
+    NetLastSocket = accept(sockfd,(struct sockaddr*)&sa,&len);
+    NetLastHost=sa.sin_addr.s_addr;
+    NetLastPort=sa.sin_port;
+    return NetLastSocket;
 }
 
 //@}
