@@ -942,6 +942,13 @@ global void ToggleFullScreen(void)
 	}
     }
 
+#ifdef USE_WIN32
+    // Windows shows the SDL cursor when starting in fullscreen mode
+    // then switching to window mode.  This hides the cursor again.
+    SDL_ShowCursor(SDL_ENABLE);
+    SDL_ShowCursor(SDL_DISABLE);
+#endif
+
     SDL_LockSurface(Screen);
     memcpy(Screen->pixels, pixels, framesize);
     free(pixels);
