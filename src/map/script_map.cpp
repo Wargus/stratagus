@@ -287,6 +287,25 @@ static int CclCenterMap(lua_State* l)
 }
 
 /**
+**  Define the starting viewpoint for a given player.
+**
+**  @param l  Lua state.
+*/
+static int CclSetStartView(lua_State* l)
+{
+	int p;
+
+	if (lua_gettop(l) != 3) {
+		LuaError(l, "incorrect arguments");
+	}
+	p = LuaToNumber(l, 1);
+	Players[p].StartX = LuaToNumber(l, 2);
+	Players[p].StartY = LuaToNumber(l, 3);
+
+	return 0;
+}
+
+/**
 **  Show Map Location
 **
 **  @param l  Lua state.
@@ -488,6 +507,7 @@ void MapCclRegister(void)
 	lua_register(Lua, "StratagusMap", CclStratagusMap);
 	lua_register(Lua, "RevealMap", CclRevealMap);
 	lua_register(Lua, "CenterMap", CclCenterMap);
+	lua_register(Lua, "SetStartView", CclSetStartView);
 	lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
 
 	lua_register(Lua, "SetDefaultMap", CclSetDefaultMap);
