@@ -1551,7 +1551,7 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Set the resolution
 */
 local void SetRes(Menuitem *mi)
 {
@@ -1581,18 +1581,22 @@ local void SetRes(Menuitem *mi)
 	DestroyCursorBackground();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
 	LoadCcl();
+	LoadFonts();
 	menu = FindMenu("menu-program-start");
 	for (i=0; i<menu->nitems; ++i) {
 	    if (menu->items[i].initfunc) {
 		(*menu->items[i].initfunc)(menu->items + i);
 	    }
 	}
+	VideoLockScreen();
+	DrawMenu(menu);
+	VideoUnlockScreen();
     }
     InitGlobalOptions(NULL);
 }
 
 /**
-**	FIXME: docu
+**	Set fullscreen mode on or off
 */
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 {
@@ -1601,7 +1605,7 @@ local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Set shadow fog alpha mode
 */
 local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
 {
@@ -1610,7 +1614,7 @@ local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	FIXME: docu
+**	Set shadow fog gray mode
 */
 local void SetShadowFogGray(Menuitem *mi __attribute__((unused)))
 {
