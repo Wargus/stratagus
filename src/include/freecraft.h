@@ -98,13 +98,19 @@
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
 
+#ifndef __GNUC__	// { disable GNU C Compiler features
+
+#define __attribute__()			// does nothing
+
+#endif	// }
+
 #ifdef _MSC_VER	// { m$ auto detection
 
 #define inline __inline			// fix m$ brain damage
-#define __attribute__()			// does nothing
 #ifndef __FUNCTION__
     // I don't know, but eVC didn't has it, even it is documented
 #define __FUNCTION__ __FILE__ ":" /* __LINE__ */
+
 #endif
 
 /**
