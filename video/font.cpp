@@ -64,9 +64,9 @@ local const unsigned char* DefaultTextColor;
     /// Reverse text color
 local const unsigned char* ReverseTextColor;
     /// Default normal color index
-local int nc_font_idx;
+local int DefaultNormalColorIndex;
     /// Default reverse color index
-local int rc_font_idx;
+local int DefaultReverseColorIndex;
 
     /// Draw character with current video depth.
 local void (*VideoDrawChar)(const Graphic*,int,int,int,int,int,int);
@@ -305,8 +305,8 @@ local void VideoDrawChar32(const Graphic* sprite,
 */
 global void SetDefaultTextColors(int normal,int reverse)
 {
-    nc_font_idx=normal;
-    rc_font_idx=reverse;
+    DefaultNormalColorIndex=normal;
+    DefaultReverseColorIndex=reverse;
     LastTextColor=TextColor=DefaultTextColor=FontColors[normal];
     ReverseTextColor=FontColors[reverse];
 }
@@ -319,8 +319,8 @@ global void SetDefaultTextColors(int normal,int reverse)
 */
 global void GetDefaultTextColors(int *normalp,int *reversep)
 {
-    *normalp=nc_font_idx;
-    *reversep=rc_font_idx;
+    *normalp=DefaultNormalColorIndex;
+    *reversep=DefaultReverseColorIndex;
 }
 
 /**
@@ -376,15 +376,33 @@ global int VideoTextHeight(unsigned font)
 **	@param y	Y screen position
 */
 local void VideoDrawCharClip(const Graphic* graphic,int gx,int gy,int w,int h,
-			     int x,int y)
+	int x,int y)
 {
     int ox,oy,ex;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
     VideoDrawChar(graphic,gx+ox,gy+oy,w,h,x,y);
 }
 
-local int DrawText(int x,int y,unsigned font,const unsigned char* text,
-			int clip)
+/**
+**	Draw text with font at x,y clipped/unclipped.
+**
+**	~	is special prefix.
+**	~~	is the ~ character self.
+**	~!	print next character reverse.
+**	~n	0123456789abcdef print text in color 1-16.
+**	~<	start reverse.
+**	~>	switch back to last used color.
+**
+**	@param x	X screen position
+**	@param y	Y screen position
+**	@param font	Font number
+**	@param text	Text to be displayed.
+**	@param clip	Flag if TRUE clip, otherwise not.
+**
+**	@return		The length of the printed text.
+*/
+local int DoDrawText(int x,int y,unsigned font,const unsigned char* text,
+	int clip)
 {
     int w;
     int height;
@@ -393,10 +411,11 @@ local int DrawText(int x,int y,unsigned font,const unsigned char* text,
     const unsigned char* rev;
     void (*DrawChar)(const Graphic*,int,int,int,int,int,int);
 
-    if( clip )
+    if( clip ) {
 	DrawChar=VideoDrawCharClip;
-    else
+    } else {
 	DrawChar=VideoDrawChar;
+    }
 
     fp=Fonts+font;
     height=fp->Height;
@@ -478,7 +497,7 @@ local int DrawText(int x,int y,unsigned font,const unsigned char* text,
 */
 global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
 {
-    return DrawText(x,y,font,text,0);
+    return DoDrawText(x,y,font,text,0);
 }
 
 /**
@@ -491,7 +510,7 @@ global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
 global int VideoDrawTextClip(int x,int y,unsigned font,
 			     const unsigned char* text)
 {
-    return DrawText(x,y,font,text,1);
+    return DoDrawText(x,y,font,text,1);
 }
 
 /**
@@ -506,7 +525,8 @@ global int VideoDrawTextClip(int x,int y,unsigned font,
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawReverseText(int x,int y,unsigned font,const unsigned char* text)
+global int VideoDrawReverseText(int x,int y,unsigned font,
+	const unsigned char* text)
 {
     int w;
 
@@ -529,7 +549,8 @@ global int VideoDrawReverseText(int x,int y,unsigned font,const unsigned char* t
 **
 **	@return		The length of the printed text.
 */
-global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* text)
+global int VideoDrawTextCentered(int x,int y,unsigned font,
+	const unsigned char* text)
 {
     int dx;
 
@@ -551,22 +572,21 @@ global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* 
 */
 global int VideoDrawNumber(int x, int y, unsigned font, int number)
 {
-    //char buf[sizeof(int)*10+2];
-    //sprintf(buf,"%d",number);
-    char bufs[16];
-    char bufd[16];
-    int sl, s, d;
+    char bufs[sizeof(int) * 10 + 2];
+    char bufd[sizeof(int) * 10 + 2];
+    int sl;
+    int s;
+    int d;
 
     sl = s = d = 0;
     sprintf(bufs, "%d", number);
     sl = strlen(bufs);
-    while (4) {
-	if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0)
+    do {
+	if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
 	    bufd[d++] = ',';
+	}
 	bufd[d++] = bufs[s++];
-	if (s > sl)
-	    break;
-    }
+    } while (s <= sl);
     return VideoDrawText(x, y, font, bufd);
 }
 
@@ -612,26 +632,29 @@ global int VideoDrawReverseNumber(int x,int y,unsigned font,int number)
 // FIXME: ARI: This is runtime and fairly slow!
 // FIXME: ARI: Maybe integrate into wartool and load from file!
 */
-local void FontMeasureWidths(ColorFont* fp)
+local void FontMeasureWidths(ColorFont * fp)
 {
     int y;
-    const unsigned char* sp;
-    const unsigned char* lp;
-    const unsigned char* gp;
+    const unsigned char *sp;
+    const unsigned char *lp;
+    const unsigned char *gp;
 
-    for (y = 1; y < 207; y++){
-      fp->CharWidth[y] = 0;
+    for (y = 1; y < 207; y++) {
+	fp->CharWidth[y] = 0;
     }
 
     for (y = 1; y < 207; y++) {
-	sp = (const unsigned char*)fp->Graphic->Frames + y * fp->Height * fp->Graphic->Width - 1;
+	sp = (const unsigned char *)fp->Graphic->Frames +
+	    y * fp->Height * fp->Graphic->Width - 1;
 	gp = sp + fp->Graphic->Width * fp->Height;
-	//	fp->CharWidth[y] = 0;
-	if(gp >= ((const unsigned char*)fp->Graphic->Frames+fp->Graphic->Width*fp->Graphic->Height))
-	  break; //Bail out cause there are no letters left
+	//	Bail out cause there are no letters left
+	if (gp >= ((const unsigned char *)fp->Graphic->Frames +
+		fp->Graphic->Width * fp->Graphic->Height)) {
+	    break;
+	}
 	while (sp < gp) {
 	    lp = sp + fp->Graphic->Width - 1;
-	    for (;sp < lp; --lp) {
+	    for (; sp < lp; --lp) {
 		if (*lp != 255) {
 		    if (lp - sp > fp->CharWidth[y]) {	// max width
 			fp->CharWidth[y] = lp - sp;
@@ -641,7 +664,7 @@ local void FontMeasureWidths(ColorFont* fp)
 	    sp += fp->Graphic->Width;
 	}
     }
-    fp->CharWidth[0] = fp->Width / 2; // a reasonable value for SPACE
+    fp->CharWidth[0] = fp->Width / 2;	// a reasonable value for SPACE
 }
 
 /**
@@ -750,6 +773,8 @@ local SCM CclDefineFontColors(SCM list)
 
 /**
 **	Register CCL features for fonts.
+**
+**	@todo FIXME: Make the remaining functions accessable from CCL.
 */
 global void FontsCclRegister(void)
 {
