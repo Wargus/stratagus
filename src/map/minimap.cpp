@@ -279,6 +279,9 @@ global void DrawMinimap(int vx,int vy)
 	if( unit->Invisible ) {		// Can't be seen
 	    continue;
 	}
+	if( !unit->Visible ) {		// Submarine not visible
+	    continue;
+	}
 
 
 #ifdef NEW_FOW

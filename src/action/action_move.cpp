@@ -124,6 +124,9 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	    MapMarkNewSight(unit->X,unit->Y,unit->Stats->SightRange,xd,yd);
 	}
 #endif
+	if( unit->Type->CanSeeSubmarine ) {
+	    MarkSubmarineSeen(unit->X,unit->Y,unit->Stats->SightRange);
+	}
 
 	unit->IX=-xd*TileSizeX;
 	unit->IY=-yd*TileSizeY;

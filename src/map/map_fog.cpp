@@ -439,6 +439,9 @@ global void MapUpdateVisible(void)
 		,unit->Y+unit->Type->TileHeight/2
 		,unit->Stats->SightRange);
 #endif
+	if( unit->Type->CanSeeSubmarine ) {
+	    MarkSubmarineSeen(unit->X,unit->Y,unit->Stats->SightRange);
+	}
     }
 }
 
