@@ -1589,7 +1589,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		}
 		if (k == 0) {	// it is a new client
 		    for (n = i = 1; i < PlayerMax-1; i++) {
-			DebugLevel0Fn("SSS.CO[%d] = %d, Hosts[%d].PlyNr = %d\n", i,
+			DebugLevel3Fn("SSS.CO[%d] = %d, Hosts[%d].PlyNr = %d\n", i,
 					 ServerSetupState.CompOpt[i], i, Hosts[i].PlyNr);
 			// occupy first available slot
 			if (ServerSetupState.CompOpt[i] == 0) {
@@ -1654,8 +1654,10 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		for (h = 0; h < PlayerMax-1; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
 			switch (NetStates[h].State) {
-			    // client has recvd welcome and is waiting for info
+			    case ccs_mapinfo:
+				// a delayed ack - fall through..
 			    case ccs_async:
+				// client has recvd welcome and is waiting for info
 				NetStates[h].State = ccs_synced;
 				NetStates[h].MsgCnt = 0;
 				/* Fall through */
