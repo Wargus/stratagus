@@ -185,6 +185,7 @@ global int HandleActionRepair(Unit* unit)
 			unit->Orders[0].X=goal->X;
 			unit->Orders[0].Y=goal->Y;
 			unit->Orders[0].Goal=goal=NULL;
+			ResetPath(unit->Orders[0]);
 		    } else if( !goal->HP ||
 				goal->Orders[0].Action==UnitActionDie ) {
 #else
@@ -192,6 +193,7 @@ global int HandleActionRepair(Unit* unit)
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
 			unit->Command.Data.Move.Goal=goal=NULL;
+			ResetPath(unit->Command);
 		    } else if( !goal->HP ||
 				goal->Command.Action==UnitActionDie ) {
 #endif
@@ -204,10 +206,12 @@ global int HandleActionRepair(Unit* unit)
 			unit->Orders[0].X=goal->X;
 			unit->Orders[0].Y=goal->Y;
 			unit->Orders[0].Goal=goal=NULL;
+			ResetPath(unit->Orders[0]);
 #else
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
 			unit->Command.Data.Move.Goal=goal=NULL;
+			ResetPath(unit->Command);
 #endif
 		    }
 		}
@@ -221,20 +225,21 @@ global int HandleActionRepair(Unit* unit)
 		} else if( err<0 ) {
 #ifdef NEW_ORDERS
 		    DebugCheck( unit->Orders[0].Action!=UnitActionStill );
-#else
-		    DebugCheck( unit->Command.Action!=UnitActionStill );
-#endif
 		    if( goal ) {		// release reference
 			RefsDebugCheck( !goal->Refs );
 			goal->Refs--;
 			RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
 			unit->Orders[0].Goal=NoUnitP;
 		    }
 		    return 1;
 		}
 		unit->Orders[0].Action=UnitActionRepair;
 #else
+		    DebugCheck( unit->Command.Action!=UnitActionStill );
+		    if( goal ) {		// release reference
+			RefsDebugCheck( !goal->Refs );
+			goal->Refs--;
+			RefsDebugCheck( !goal->Refs );
 			unit->Command.Data.Move.Goal=NoUnitP;
 		    }
 		    return 1;
@@ -273,23 +278,27 @@ global int HandleActionRepair(Unit* unit)
 			unit->Orders[0].X=goal->X;
 			unit->Orders[0].Y=goal->Y;
 			unit->Orders[0].Goal=goal=NULL;
+			ResetPath(unit->Orders[0]);
 		    } else if( !goal->HP
 				|| goal->Orders[0].Action==UnitActionDie ) {
 			// FIXME: should I clear this here?
 			unit->Orders[0].X=goal->X;
 			unit->Orders[0].Y=goal->Y;
 			unit->Orders[0].Goal=goal=NULL;
+			ResetPath(unit->Orders[0]);
 #else
 			// FIXME: should I clear this here?
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
 			unit->Command.Data.Move.Goal=goal=NULL;
+			ResetPath(unit->Command);
 		    } else if( !goal->HP
 				|| goal->Command.Action==UnitActionDie ) {
 			// FIXME: should I clear this here?
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
 			unit->Command.Data.Move.Goal=goal=NULL;
+			ResetPath(unit->Command);
 #endif
 		    }
 		}
