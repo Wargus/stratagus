@@ -208,9 +208,6 @@
 **	@todo FIXME: continue docu
 */
 
-// FIXME: should split the next into small modules!
-// FIXME: I (Johns) leave this for other people (this means you!)
-
 //----------------------------------------------------------------------------
 //	Includes
 //----------------------------------------------------------------------------
@@ -304,7 +301,6 @@ local int PlayerQuit[PlayerMax];	/// Player quit
 **	@param buf	Buffer of outgoing message.
 **	@param len	Buffer length.
 **
-**	@todo FIXME: should support multicast and proxy clients/server.
 */
 global void NetworkBroadcast(const void* buf, int len)
 {
@@ -607,10 +603,6 @@ global void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3
     NetworkCommandQueue* ncq;
     NetworkExtendedCommand* nec;
 
-    //
-    //	FIXME: look if we can ignore this command.
-    //		Duplicate commands can be ignored.
-    //
     ncq = malloc(sizeof(NetworkCommandQueue));
     dl_insert_first(CommandsIn, ncq->List);
 
