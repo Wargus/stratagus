@@ -74,7 +74,7 @@ global int GoalGone(const Unit* unit, const Unit* goal)
 	// Check for dead/removed goals.
 	//
 	if (goal->Destroyed || !goal->HP || goal->Removed ||
-		goal->Orders[0].Action == UnitActionDie) {
+			goal->Orders[0].Action == UnitActionDie) {
 		return 1;
 	}
 	//
@@ -82,11 +82,12 @@ global int GoalGone(const Unit* unit, const Unit* goal)
 	//
 	if (unit) {
 		// SharedVision makes all the rest of the checks meaningless
-		if (IsSharedVision(unit->Player, goal) || unit->Player==goal->Player) {
+		if (IsSharedVision(unit->Player, goal) || unit->Player == goal->Player) {
 			return 0;
 		} else {
 			int x;
 			int y;
+
 			// Goal is invisible (by spell)
 			if (goal->Invisible) {
 				return 1;
@@ -102,8 +103,8 @@ global int GoalGone(const Unit* unit, const Unit* goal)
 			if (goal->Type->VisibleUnderFog) {
 				return 0;
 			}
-			for (x = goal->X; x < goal->X + goal->Type->TileWidth; x++) {
-				for (y = goal->Y; y < goal->Y + goal->Type->TileHeight; y++) {
+			for (x = goal->X; x < goal->X + goal->Type->TileWidth; ++x) {
+				for (y = goal->Y; y < goal->Y + goal->Type->TileHeight; ++y) {
 					if (IsMapFieldVisible(unit->Player, x, y)) {
 						return 0;
 					}
@@ -195,9 +196,9 @@ local void HandleActionNone(Unit* unit __attribute__((unused)))
 }
 
 /**
-**  Unit has notwritten function.
+**  Unit has not written function.
 **
-**  @param unit  Unit pointer for notwritten action.
+**  @param unit  Unit pointer for not written action.
 */
 local void HandleActionNotWritten(Unit* unit __attribute__((unused)))
 {
@@ -325,8 +326,9 @@ local void (*HandleActionTable[256])(Unit*) = {
 local void HandleRegenerations(Unit* unit)
 {
 	int f;
+
 	// Mana
-	if (unit->Type->CanCastSpell && unit->Mana!=unit->Type->_MaxMana) {
+	if (unit->Type->CanCastSpell && unit->Mana != unit->Type->_MaxMana) {
 		unit->Mana++;
 
 		if (unit->Mana > unit->Type->_MaxMana) {
@@ -339,8 +341,8 @@ local void HandleRegenerations(Unit* unit)
 
 	f = 0;
 	// Burn
-	if (!unit->Removed && !unit->Destroyed && unit->Stats->HitPoints
-			&& unit->Orders[0].Action!=UnitActionBuilded ) {
+	if (!unit->Removed && !unit->Destroyed && unit->Stats->HitPoints &&
+			unit->Orders[0].Action != UnitActionBuilded ) {
 		f = (100 * unit->HP) / unit->Stats->HitPoints;
 		if (f <= unit->Type->BurnPercent) {
 			HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);
@@ -353,13 +355,13 @@ local void HandleRegenerations(Unit* unit)
 	// Health doesn't regenerate while burning.
 	if (!f && unit->Stats) {
 		// Unit may not have stats assigned to it
-		if (unit->Stats->RegenerationRate && unit->HP<unit->Stats->HitPoints) {
+		if (unit->Stats->RegenerationRate && unit->HP < unit->Stats->HitPoints) {
 			unit->HP += unit->Stats->RegenerationRate;
 			if (unit->HP > unit->Stats->HitPoints) {
 				unit->HP = unit->Stats->HitPoints;
 			}
 			if (unit->Selected) {
-				MustRedraw|=RedrawInfoPanel;
+				MustRedraw |= RedrawInfoPanel;
 			}
 		}
 	}
@@ -370,9 +372,8 @@ local void HandleRegenerations(Unit* unit)
 /**
 **  Handle things about the unit that decay over time
 **
-**  @param  unit    The unit that the decay is handled for
-**  @param  amount  The amount of time to make up for.(in cycles)
-**
+**  @param unit    The unit that the decay is handled for
+**  @param amount  The amount of time to make up for.(in cycles)
 */
 local void HandleBuffs(Unit* unit, int amount)
 {
@@ -474,7 +475,7 @@ local void HandleUnitAction(Unit* unit)
 		// o Or the order queue should be flushed.
 		//
 		if (unit->OrderCount > 1 &&
-			(unit->Orders[0].Action == UnitActionStill || unit->OrderFlush)) {
+				(unit->Orders[0].Action == UnitActionStill || unit->OrderFlush)) {
 
 			if (unit->Removed) {	// FIXME: johns I see this as an error
 				DebugLevel0Fn("Flushing removed unit\n");
@@ -548,9 +549,8 @@ global void UnitActions(void)
 	int buffsthiscycle;
 	int regenthiscycle;
 
-	buffsthiscycle = !(GameCycle % CYCLES_PER_SECOND);
-	regenthiscycle = !(GameCycle % CYCLES_PER_SECOND);
-	blinkthiscycle = !(GameCycle % CYCLES_PER_SECOND);
+	buffsthiscycle = regenthiscycle =
+		blinkthiscycle = !(GameCycle % CYCLES_PER_SECOND);
 
 	//
 	// Must copy table, units could be removed.
@@ -615,7 +615,7 @@ global void UnitActions(void)
 		}
 
 #if defined(UNIT_ON_MAP) && 0		// debug unit store
-		 { const Unit* list;
+		{ const Unit* list;
 
 		list = TheMap.Fields[unit->Y * TheMap.Width + unit->X].Here.Units;
 		while (list) {					// find the unit
