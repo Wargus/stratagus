@@ -466,12 +466,23 @@ static void HandleMouseOn(int x, int y)
 	int on_ui;
 
 	MouseScrollState = ScrollNone;
+	ButtonAreaUnderCursor = -1;
+	ButtonUnderCursor = -1;
 
+	// BigMapMode is the mode which show only the map (without panel, minimap)
+	if (BigMapMode) {
+		CursorOn = CursorOnMap;
+		//
+		//  Scrolling Region Handling.
+		//
+		HandleMouseScrollArea(x, y);
+		return;
+	}
 	//
 	//  Handle buttons
 	//
 	if (!IsNetworkGame()) {
-		if (TheUI.MenuButton.X != -1 && !BigMapMode) {
+		if (TheUI.MenuButton.X != -1) {
 			if (OnButton(x, y, &TheUI.MenuButton)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderMenu;
@@ -480,7 +491,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	} else {
-		if (TheUI.NetworkMenuButton.X != -1 && !BigMapMode) {
+		if (TheUI.NetworkMenuButton.X != -1) {
 			if (OnButton(x, y, &TheUI.NetworkMenuButton)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
@@ -488,7 +499,7 @@ static void HandleMouseOn(int x, int y)
 				return;
 			}
 		}
-		if (TheUI.NetworkDiplomacyButton.X != -1 && !BigMapMode) {
+		if (TheUI.NetworkDiplomacyButton.X != -1) {
 			if (OnButton(x, y, &TheUI.NetworkDiplomacyButton)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
@@ -497,7 +508,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	for (i = 0; i < TheUI.NumButtonButtons && !BigMapMode; ++i) {
+	for (i = 0; i < TheUI.NumButtonButtons; ++i) {
 		if (OnButton(x, y, &TheUI.ButtonButtons[i])) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
 			if (CurrentButtons && CurrentButtons[i].Pos != -1) {
@@ -508,7 +519,7 @@ static void HandleMouseOn(int x, int y)
 		}
 	}
 	if (NumSelected == 1 && Selected[0]->Type->CanTransport &&
-			Selected[0]->BoardCount && !BigMapMode) {
+			Selected[0]->BoardCount) {
 		for (i = Selected[0]->BoardCount - 1; i >= 0; --i) {
 			if (OnButton(x, y, &TheUI.TransportingButtons[i])) {
 				ButtonAreaUnderCursor = ButtonAreaTransporting;
@@ -518,7 +529,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	if (NumSelected == 1 && !BigMapMode) {
+	if (NumSelected == 1) {
 		if (Selected[0]->Orders[0].Action == UnitActionTrain) {
 			if (Selected[0]->OrderCount == 1) {
 				if (OnButton(x, y, TheUI.SingleTrainingButton)) {
@@ -539,14 +550,14 @@ static void HandleMouseOn(int x, int y)
 					}
 				}
 			}
-		} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo && !BigMapMode) {
+		} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo) {
 			if (OnButton(x, y, TheUI.UpgradingButton)) {
 				ButtonAreaUnderCursor = ButtonAreaUpgrading;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
 				return;
 			}
-		} else if (Selected[0]->Orders[0].Action == UnitActionResearch && !BigMapMode) {
+		} else if (Selected[0]->Orders[0].Action == UnitActionResearch) {
 			if (OnButton(x, y, TheUI.ResearchingButton)) {
 				ButtonAreaUnderCursor = ButtonAreaResearching;
 				ButtonUnderCursor = 0;
@@ -556,40 +567,30 @@ static void HandleMouseOn(int x, int y)
 		}
 	}
 	if (NumSelected == 1) {
-		if (TheUI.SingleSelectedButton && !BigMapMode &&
-				OnButton(x, y, TheUI.SingleSelectedButton)) {
+		if (TheUI.SingleSelectedButton && OnButton(x, y, TheUI.SingleSelectedButton)) {
 			ButtonAreaUnderCursor = ButtonAreaSelected;
 			ButtonUnderCursor = 0;
 			CursorOn = CursorOnButton;
 			return;
 		}
 	} else {
-		if (!BigMapMode) {
-			i = NumSelected > TheUI.NumSelectedButtons ?
-				TheUI.NumSelectedButtons - 1 : NumSelected - 1;
-			for (; i >= 0; --i) {
-				if (OnButton(x, y, &TheUI.SelectedButtons[i])) {
-					ButtonAreaUnderCursor = ButtonAreaSelected;
-					ButtonUnderCursor = i;
-					CursorOn = CursorOnButton;
-					return;
-				}
+		i = NumSelected > TheUI.NumSelectedButtons ?
+			TheUI.NumSelectedButtons - 1 : NumSelected - 1;
+		for (; i >= 0; --i) {
+			if (OnButton(x, y, &TheUI.SelectedButtons[i])) {
+				ButtonAreaUnderCursor = ButtonAreaSelected;
+				ButtonUnderCursor = i;
+				CursorOn = CursorOnButton;
+				return;
 			}
 		}
-	}
-
-	// remove old display
-	if (ButtonUnderCursor != -1) {
-		ButtonAreaUnderCursor = -1;
-		ButtonUnderCursor = -1;
 	}
 
 	//
 	//  Minimap
 	//
 	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
-			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH &&
-			!BigMapMode) {
+			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
 		CursorOn = CursorOnMinimap;
 		return;
 	}
@@ -623,7 +624,7 @@ static void HandleMouseOn(int x, int y)
 		// Note cursor on map can be in scroll area
 		CursorOn = CursorOnMap;
 	} else {
-		CursorOn = -1;
+		CursorOn = CursorOnUnknown;
 	}
 
 	//
@@ -1467,7 +1468,8 @@ void UIHandleButtonDown(unsigned button)
 	if (CursorState == CursorStateRectangle) {
 		return;
 	}
-
+	// CursorOn should have changed with BigMapMode, so recompute it.
+	HandleMouseOn(CursorX, CursorY);
 	//
 	//  Selecting target. (Move,Attack,Patrol,... commands);
 	//
