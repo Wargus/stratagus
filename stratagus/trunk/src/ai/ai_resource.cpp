@@ -294,8 +294,7 @@ local int AiBuildBuilding(const UnitType * type, UnitType * building)
 	    continue;
 	}
 
-	DebugLevel3Fn("Have a building place %d,%d for %s:)\n" _C_ x _C_ y _C_ building->
-	    Name);
+	DebugLevel3Fn("Have a building place %d,%d for %s:)\n" _C_ x _C_ y _C_ building->Name);
 
 	CommandBuildBuilding(unit, x, y, building, FlushCommands);
 
@@ -918,13 +917,13 @@ local void AiCollectResources(void)
 	if (!unit->Type->Harvester) {
 	    continue;
 	}
-
+	
 	c = unit->CurrentResource;
 
 	//
 	//      See if it's assigned already
 	//
-	if (unit->Orders[0].Action == UnitActionResource && c) {
+	if (unit->Orders[0].Action == UnitActionResource && unit->OrderCount == 1 && c) {
 	    units_assigned[num_units_assigned[c]++][c] = unit;
 	    total_harvester++;
 	    continue;
