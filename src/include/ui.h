@@ -265,7 +265,7 @@ typedef struct _content_type_ {
 			int Index;                   ///< Index of the variable to show.
 			EnumVariable Component;      ///< Component of the variable.
 			char Centered;               ///< if true, center the display.
-		} FormatedText;   ///< Show formated text with variable value.
+		} FormattedText;   ///< Show formatted text with variable value.
 		struct {
 			char* Format;                ///< Text to display
 			int Font;                    ///< Font to use.
@@ -274,7 +274,7 @@ typedef struct _content_type_ {
 			int Index2;                  ///< Index of the variable to show.
 			EnumVariable Component2;     ///< Component of the variable.
 			char Centered;               ///< if true, center the display.
-		} FormatedText2;   ///< Show formated text with 2 variable value.
+		} FormattedText2;   ///< Show formatted text with 2 variable value.
 		struct {
 			EnumUnit UnitRef;           ///< Which unit icon to display.(itself, container, ...)
 		} Icon;         ///< Show icon of the unit
@@ -567,8 +567,8 @@ extern void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int of
 extern void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety);
 
 extern FDrawData DrawSimpleText;
-extern FDrawData DrawFormatedText;
-extern FDrawData DrawFormatedText2;
+extern FDrawData DrawFormattedText;
+extern FDrawData DrawFormattedText2;
 extern FDrawData DrawPanelIcon;
 extern FDrawData DrawLifeBar;
 extern FDrawData DrawCompleteBar;
