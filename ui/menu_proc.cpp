@@ -947,10 +947,10 @@ global void DrawMenu(Menu *menu)
 					    VideoTextHeight(mi->font)+5);
 		    SetDefaultTextColors(rc,rc);
 		}
-		if (mi->d.text.tflags&MI_TFLAGS_CENTERED)
+		if (mi->d.text.align&MI_TFLAGS_CENTERED)
 		    VideoDrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
-		else if (mi->d.text.tflags&MI_TFLAGS_RALIGN) {
+		else if (mi->d.text.align&MI_TFLAGS_RALIGN) {
 		    l = VideoTextLength(mi->font,mi->d.text.text);
 		    VideoDrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
