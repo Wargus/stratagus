@@ -137,6 +137,7 @@ local SCM CclSetShowTips(SCM flag)
 **	@param tip	A new tip to be displayed before level.
 **
 **	@todo	FIXME:	Memory for tips is never freed.
+**		FIXME:	Make Tips dynamic.
 */
 local SCM CclAddTip(SCM tip)
 {

@@ -2494,10 +2494,11 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
     int font;
     int l;
 
-    if( ShowTips )
+    if( ShowTips ) {
 	TipsMenuItems[1].d.gem.state=MI_GSTATE_CHECKED;
-    else
+    } else {
 	TipsMenuItems[1].d.gem.state=MI_GSTATE_UNCHECKED;
+    }
 
     FreeTips();
 
@@ -2507,8 +2508,9 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
     line=5;
 
     p=Tips[CurrentTip];
-    if( !p )
+    if( !p ) {
 	return;
+    }
 
     l=0;
     s=str=strdup(p);
@@ -2527,8 +2529,9 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
 		fprintf(stderr, "line too long: \"%s\"\n", s);
 		break;
 	    }
-	    if( space )
+	    if( space ) {
 		*space=' ';
+	    }
 	    space=s1;
 	    *space='\0';
 	}
@@ -5391,7 +5394,7 @@ global void InitMenus(unsigned int race)
     MenuButtonGfx.Sprite = LoadSprite(file, 300, 144);	// 50/53 images!
 
     //
-    //	Autodetect the swamp tileset 
+    //	Autodetect the swamp tileset
     //
 #ifdef HAVE_EXPANSION
     strcpy(ScenSelectFullPath, FreeCraftLibPath);
