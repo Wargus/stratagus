@@ -502,7 +502,7 @@ global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
 {
     int i;
 
-    for (i = 1; i < height; ++i) {
+    for (i = 0; i < height; ++i) {
 	VideoDrawPixel(color, x, y + i);
     }
 }
@@ -512,7 +512,7 @@ global void VideoDrawTransVLine(SDL_Color color, int x, int y,
 {
     int i;
 
-    for (i = 1; i < height; ++i) {
+    for (i = 0; i < height; ++i) {
 	VideoDrawPixel(color, x, y + i);
     }
 }
@@ -521,7 +521,7 @@ global void VideoDrawVLineClip(SDL_Color color, int x, int y, int height)
 {
     int i;
 
-    for (i = 1; i < height; ++i) {
+    for (i = 0; i < height; ++i) {
 	VideoDrawPixel(color, x, y + i);
     }
 }
@@ -530,7 +530,7 @@ global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
 {
     int i;
 
-    for (i = 1; i < width; ++i) {
+    for (i = 0; i < width; ++i) {
 	VideoDrawPixel(color, x + i, y);
     }
 }
@@ -539,7 +539,7 @@ global void VideoDrawHLineClip(SDL_Color color, int x, int y, int width)
 {
     int i;
 
-    for (i = 1; i < width; ++i) {
+    for (i = 0; i < width; ++i) {
 	VideoDrawPixel(color, x + i, y);
     }
 }
@@ -549,25 +549,123 @@ global void VideoDrawTransHLine(SDL_Color color, int x, int y,
 {
     int i;
 
-    for (i = 1; i < width; ++i) {
+    for (i = 0; i < width; ++i) {
 	VideoDrawPixel(color, x + i, y);
     }
 }
 
 global void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy)
 {
-//    DebugCheck(1);
+    int x;
+    int y;
+    int xlen;
+    int ylen;
+    int incr;
+
+    if (sx == dx) {
+	if (sy < dy) {
+	    VideoDrawVLine(color, sx, sy, dy - sy + 1);
+	} else {
+	    VideoDrawVLine(color, dx, dy, sy - dy + 1);
+	}
+	return;
+    }
+
+    if (sy == dy) {
+	if (sx < dx) {
+	    VideoDrawHLine(color, sx, sy, dx - sx + 1);
+	} else {
+	    VideoDrawHLine(color, dx, dy, sx - dx + 1);
+	}
+	return;
+    }
+
+    // exchange coordinates
+    if (sy > dy) {
+	int t;
+	t = dx;
+	dx = sx;
+	sx = t;
+	t = dy;
+	dy = sy;
+	sy = t;
+    }
+    ylen = dy - sy;
+
+    if (sx > dx) {
+	xlen = sx - dx;
+	incr = -1;
+    } else {
+	xlen = dx - sx;
+	incr = 1;
+    }
+
+    y = sy;
+    x = sx;
+
+    if (xlen > ylen) {
+	int p;
+
+	if (sx > dx) {
+	    int t;
+	    t = sx;
+	    sx = dx;
+	    dx = t;
+	    y = dy;
+	}
+
+	p = (ylen << 1) - xlen;
+
+	for (x = sx; x < dx; ++x) {
+	    VideoDrawPixel(color, x, y);
+	    if (p >= 0) {
+		y += incr;
+		p += (ylen - xlen) << 1;
+	    } else {
+		p += (ylen << 1);
+	    }
+	}
+	return;
+    }
+
+    if (ylen > xlen) {
+	int p;
+
+	p = (xlen << 1) - ylen;
+
+	for (y = sy; y < dy; ++y) {
+	    VideoDrawPixel(color, x, y);
+	    if (p >= 0) {
+		x += incr;
+		p += (xlen - ylen) << 1;
+	    } else {
+		p += (xlen << 1);
+	    }
+	}
+	return;
+    }
+
+    // Draw a diagonal line
+    if (ylen == xlen) {
+	while (y != dy) {
+	    VideoDrawPixel(color, x, y);
+	    x += incr;
+	    ++y;
+	}
+    }
 }
 
 global void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy)
 {
-//    DebugCheck(1);
+    // FIXME:
+    VideoDrawLine(color, sx, sy, dx, dy);
 }
 
 global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
     int dx, int dy, unsigned char alpha)
 {
-//    DebugCheck(1);
+    // FIXME:
+    VideoDrawLine(color, sx, sy, dx, dy);
 }
 
 global void VideoDrawRectangle(SDL_Color color, int x, int y,
