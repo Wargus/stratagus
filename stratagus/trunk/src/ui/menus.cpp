@@ -1963,17 +1963,21 @@ local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
     }
 }											
 
-local void SetCdModeAll(Menuitem *mi)
+local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 {
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":all";
+#endif
     EndMenu();
     SoundOptions();
 
 }
 
-local void SetCdModeRandom(Menuitem *mi)
+local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":random";
+#endif
     EndMenu();
     SoundOptions();
 
