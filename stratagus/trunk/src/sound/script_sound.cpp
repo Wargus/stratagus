@@ -397,6 +397,71 @@ local SCM CclSetCdMode(SCM mode)
     return mode;
 }
 
+local SCM CclDefinePlaySections(SCM list)
+{
+    SCM value, sublist, temp;
+    enum _race_ { racealliance, racemythical } race = -1;
+    enum _type_ { typegame, typebriefing, typestats, typemainmenu } type = -1;
+    enum _order_ { orderall, orderrandom } order = -1;
+    long tracks = 0;
+    int i;
+
+    while ( !gh_null_p(list) ) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("race"))) {
+	    value = gh_car(list);
+	    sublist = gh_cdr(list);
+	    if (gh_eq_p(value, gh_symbol2scm("alliance"))) {
+		race = racealliance;
+	    } else if (gh_eq_p(value, gh_symbol2scm("mythical"))) {
+		race = racemythical;
+	    }
+	}
+	if (gh_eq_p(value, gh_symbol2scm("type"))) {
+	    value = gh_car(list);
+	    sublist = gh_cdr(list);
+	    if (gh_eq_p(value, gh_symbol2scm("game"))) {
+		type = typegame;
+	    } else if (gh_eq_p(value, gh_symbol2scm("briefing"))) {
+		type = typebriefing;
+	    } else if (gh_eq_p(value, gh_symbol2scm("stats"))) {
+		type = typestats;
+	    } else if (gh_eq_p(value, gh_symbol2scm("mainmenu"))) {
+		type = typemainmenu;
+	    }
+	}
+	if (gh_eq_p(value, gh_symbol2scm("cd"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while ( !gh_null_p(sublist) ) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("order"))) {
+		    value = gh_car(list);
+		    sublist = gh_cdr(sublist);
+		    if (gh_eq_p(value, gh_symbol2scm("all"))) {
+			order = orderall;
+		    } else if (gh_eq_p(value, gh_symbol2scm("random"))) {
+			order = orderrandom;
+		    }
+		}
+		if (gh_eq_p(value, gh_symbol2scm("tracks"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    for (i = 0; i < gh_vector_length(value); ++i) {
+			temp = gh_vector_ref(value, gh_int2scm(i));
+			tracks = tracks | (1 << gh_scm2int(temp));
+		    }
+		}
+	    }
+	}
+    }
+    printf("race %d\n", race);
+    printf("type %d\n", type);
+    exit(0);
+}
+
 /**
 **	Turn Off Sound (client side)
 */
@@ -547,6 +612,8 @@ global void SoundCclRegister(void)
     gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
     gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);
     gh_new_procedure1_0("set-cd-mode!",CclSetCdMode);
+
+    gh_new_procedureN("define-play-sections",CclDefinePlaySections);
 
     init_subr_0("sound-off",CclSoundOff);
     init_subr_0("sound-on",CclSoundOn);
