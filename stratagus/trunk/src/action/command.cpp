@@ -285,22 +285,27 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
 	}
     );
 
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	command=&unit->PendCommand;
-    } else if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending commands.
+	    command=&unit->PendCommand;
+	} else if( !(command=GetNextCommand(unit,flush)) ) {
+	    return;
+	}
+
+	command->Action=UnitActionMove;
+	ResetPath(*command);
+	command->Data.Move.Goal=NoUnitP;
+	command->Data.Move.Range=0;
+	command->Data.Move.SX=unit->X;
+	command->Data.Move.SY=unit->Y;
+	command->Data.Move.DX=x;
+	command->Data.Move.DY=y;
     }
-
-    command->Action=UnitActionMove;
-    ResetPath(*command);
-    command->Data.Move.Goal=NoUnitP;
-    command->Data.Move.Range=0;
-    command->Data.Move.SX=unit->X;
-    command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=x;
-    command->Data.Move.DY=y;
-
 #endif
     ClearSavedAction(unit);
 }
@@ -884,10 +889,7 @@ global void CommandCancelTraining(Unit* unit,int slot)
     n=unit->Command.Data.Train.Count;
     if( unit->Command.Action==UnitActionTrain && slot<n ) {
 
-	DebugLevel0Fn("Cancel %d of %d - ",slot,n);
 	PlayerAddUnitType(unit->Player,unit->Command.Data.Train.What[slot]);
-	DebugLevel0Fn("%d,%d,%d\n",unit->Player->Resources[GoldCost],
-	    unit->Player->Resources[WoodCost],unit->Player->Resources[OilCost]);
 
 	if ( --n ) {
 	    for( i = slot; i < n; i++ ) {
