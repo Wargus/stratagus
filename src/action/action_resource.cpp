@@ -10,7 +10,7 @@
 //
 /**@name action_resource.c -	The generic resource action. */
 //
-//	(c) Copyright 2001-2003 by Lutz Sammer
+//	(c) Copyright 2001-2003 by Lutz Sammer and Crestez Leonard
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -136,12 +136,7 @@ local int MoveToResource(Unit* unit)
     //	Activate the resource
     //
     goal->Data.Resource.Active++;
-    DebugLevel3Fn("+%d\n" _C_ goal->Data.Resource.Active);
 
-    if( !goal->Frame ) {		// show resource working
-	goal->Frame=1;
-	CheckUnitToBeDrawn(goal);
-    }
     UnitMarkSeen(goal);
     //
     //	Place unit inside the resource
@@ -191,10 +186,8 @@ local int WaitInResource(Unit* unit)
 	source->Value-=unit->Type->ResourceCapacity;
     }
     
-    if( !--source->Data.Resource.Active ) {
-	source->Frame=0;
-	CheckUnitToBeDrawn(source);
-    }
+    source->Data.Resource.Active--;
+    DebugCheck(source->Data.Resource.Active<0);
     
     UnitMarkSeen(source);
     if( IsOnlySelected(source) ) {

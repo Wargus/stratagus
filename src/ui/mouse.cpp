@@ -134,8 +134,10 @@ global void DoRightButton(int sx,int sy)
     //	Right mouse with SHIFT appends command to old commands.
     //
     flush=!(KeyModifiers&ModifierShift);
+
+    dest=UnitUnderCursor;
     
-    if( UnitUnderCursor && (dest=TransporterOnMapTile(x,y))) {
+    if( dest && dest->Type->Transporter ) {
         // n0b0dy: So we are clicking on a transporter. We have to:
         // 1) Flush the transporters orders.
         // 2) Tell the transporter to follow the units. We have to queue all
@@ -153,7 +155,7 @@ global void DoRightButton(int sx,int sy)
     acknowledged=0;
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
-        // If we are telling units to board a tranasporter,
+        // If we are telling units to board a transporter,
         // don't give the transport extra orders.
         if (unit==desttransporter) {
             continue;
@@ -170,41 +172,34 @@ global void DoRightButton(int sx,int sy)
 	//
 	//	Control + right click on unit is follow anything.
 	//
-	if( KeyModifiers&ModifierControl && UnitUnderCursor ) {
-	    // FIXME: what todo if more than one unit on that tile?
-	    dest=UnitOnMapTile(x,y);
-	    if( dest ) {
-		if( dest!=unit ) {
-		    dest->Blink=4;
-		    SendCommandFollow(unit,dest,flush);
-		    continue;
-		}
-	    }
+	if( KeyModifiers&ModifierControl && dest && dest!=unit) {
+	    dest->Blink=4;
+	    SendCommandFollow(unit,dest,flush);
+	    continue;
 	}
 
 	//
 	//	Enter transporters?
 	//
-	if( UnitUnderCursor && (dest=TransporterOnMapTile(x,y))) {
-	    if( dest->Player==unit->Player
-		    && unit->Type->UnitType==UnitTypeLand ) {
-		dest->Blink=4;
-		DebugLevel0Fn("Board transporter\n");
-		//	Let the transporter move to passenger
-		SendCommandFollow(dest,unit,0);
-		SendCommandBoard(unit,-1,-1,dest,flush);
-		continue;
-	    }
+	if( dest && dest->Type->Transporter &&
+		dest->Player==unit->Player
+		&& unit->Type->UnitType==UnitTypeLand ) {
+	    dest->Blink=4;
+	    DebugLevel0Fn("Board transporter\n");
+	    //  Let the transporter move to the unit. And QUEUE!!!
+	    SendCommandFollow(dest,unit,0);
+	    SendCommandBoard(unit,-1,-1,dest,flush);
+	    continue;
 	}
 
 	//
-	//	Worker of human or orcs
+	//	Handle resource workers.
 	//
 	if( action==MouseActionHarvest ) {
 	    //	Return wood cutter home
 	    if( (type==UnitTypeOrcWorkerWithWood ||
 		    type==UnitTypeHumanWorkerWithWood) &&
-		    (dest=ResourceDepositOnMap(x,y,WoodCost)) &&
+		    dest && dest->Type->CanStore[WoodCost] &&
 		    dest->Player==unit->Player) {
 		DebugLevel3("send to wood deposit.\n");
 		dest->Blink=4;
@@ -218,11 +213,11 @@ global void DoRightButton(int sx,int sy)
 		SendCommandHarvest(unit,x,y,flush);
 		continue;
 	    }
-	    if (unit->Type->Harvester&&UnitUnderCursor) {
+	    if (unit->Type->Harvester && dest) {
 		//  Return a loaded harvester to deposit
-		if( (unit->Value>0) &&
-			(dest=ResourceDepositOnMap(x,y,unit->Type->ResourceHarvested)) &&
-			(dest->Player==unit->Player)) {
+		if( unit->Value>0 &&
+			dest->Type->CanStore[unit->Type->ResourceHarvested] &&
+			dest->Player==unit->Player) {
 		    dest->Blink=4;
 		    DebugLevel3Fn("Return to deposit.\n");
 		    SendCommandReturnGoods(unit,dest,flush);
@@ -230,31 +225,29 @@ global void DoRightButton(int sx,int sy)
 		} 
 		//  Go and harvest
 		if( (unit->Value<unit->Type->ResourceCapacity) &&
-			(dest=ResourceOnMap(x,y,unit->Type->ResourceHarvested)) &&
-			((dest->Player==unit->Player) ||
-			 (dest->Player->Player==PlayerMax-1))) {
+			dest->Type->GivesResource==unit->Type->ResourceHarvested &&
+			(dest->Player==unit->Player ||
+			 dest->Player->Player==PlayerMax-1)) {
 		    dest->Blink=4;
 		    SendCommandResource(unit,dest,flush);
 		    continue;
 		}
 	    }
 	    //  Go and repair
-	    if ( (unit->Type->CanRepair) &&
-		    (UnitUnderCursor) &&
-		    (dest=RepairableOnMapTile(x,y)) &&
-		    ((dest->Player==unit->Player) || (IsAllied(dest->Player,dest)))) {
+	    if ( (unit->Type->CanRepair) && dest &&
+		    (dest->Type->Building || dest->Type->Transporter) &&
+		    dest->HP < dest->Stats->HitPoints  &&
+		    (dest->Player==unit->Player || IsAllied(dest->Player,dest)) ) {
 		dest->Blink=4;
 		SendCommandRepair(unit,x,y,dest,flush);
 		continue;
 	    }
 	    //  Follow another unit
-	    if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
-		if( (dest->Player==unit->Player || IsAllied(unit->Player,dest))
-			&& dest!=unit ) {
-		    dest->Blink=4;
-		    SendCommandFollow(unit,dest,flush);
-		    continue;
-		}
+	    if( UnitUnderCursor && dest && dest!=unit &&
+		    (dest->Player==unit->Player || IsAllied(unit->Player,dest)) ) {
+		dest->Blink=4;
+		SendCommandFollow(unit,dest,flush);
+		continue;
 	    }
 	    //  Move 
 	    SendCommandMove(unit,x,y,flush);
@@ -265,19 +258,16 @@ global void DoRightButton(int sx,int sy)
 	//	Fighters
 	//
 	if( action==MouseActionDemolish || action==MouseActionAttack ) {
-	    if( UnitUnderCursor ) {
-		// Picks the enemy with highest priority and can be attacked
-		dest=TargetOnMapTile(unit, x, y);
-		if( dest ) {
-		    if( IsEnemy(unit->Player,dest) ) {
-			dest->Blink=4;
-			if( action==MouseActionDemolish ) {
-			    SendCommandDemolish(unit,x,y,dest,flush);
-			} else {
-			    SendCommandAttack(unit,x,y,dest,flush);
-			}
-			continue;
+	    if( dest ) {
+		if( IsEnemy(unit->Player,dest) ) {
+		    dest->Blink=4;
+		    if( action==MouseActionDemolish ) {
+			// This is for demolition squads and such
+			SendCommandDemolish(unit,x,y,dest,flush);
+		    } else {
+			SendCommandAttack(unit,x,y,dest,flush);
 		    }
+		    continue;
 		}
 
 		if( WallOnMap(x,y) ) {
@@ -296,14 +286,11 @@ global void DoRightButton(int sx,int sy)
 		    }
 		}
 
-		dest=UnitOnMapTile(x,y);
-		if( dest ) {
-		    if( (dest->Player==unit->Player
-			    || IsAllied(unit->Player,dest)) && dest!=unit ) {
-			dest->Blink=4;
-			SendCommandFollow(unit,dest,flush);
-			continue;
-		    }
+		if( (dest->Player==unit->Player||IsAllied(unit->Player,dest))
+			&& dest!=unit ) {
+		    dest->Blink=4;
+		    SendCommandFollow(unit,dest,flush);
+		    continue;
 		}
 
 #ifdef NEW_SHIPS
@@ -334,16 +321,12 @@ global void DoRightButton(int sx,int sy)
 	}
 
 	// FIXME: attack/follow/board ...
-	if( action==MouseActionMove || action==MouseActionSail ) {
-	    if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
-		// Follow allied units, but not self.
-		if( (dest->Player==unit->Player
-			|| IsAllied(unit->Player,dest)) && dest!=unit ) {
-		    dest->Blink=4;
-		    SendCommandFollow(unit,dest,flush);
-		    continue;
-		}
-	    }
+	if( (action==MouseActionMove || action==MouseActionSail) &&
+		(dest && dest!=unit) &&
+		(dest->Player==unit->Player|| IsAllied(unit->Player,dest))) {
+	    dest->Blink=4;
+	    SendCommandFollow(unit,dest,flush);
+	    continue;
 	}
 
 	//
@@ -361,13 +344,13 @@ global void DoRightButton(int sx,int sy)
 #endif
 
         if (type->Building) {
-	    if( UnitUnderCursor && (dest=ResourceOnMap(x,y,OilCost)) ) {
+	    if( dest && dest->Type->GivesResource==OilCost ) {
                 dest->Blink=4;
 	        DebugLevel3("RALY POINT TO PLATFORM\n");
                 SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	        continue;
             }
-            if( UnitUnderCursor && (dest=ResourceOnMap(x,y,GoldCost)) ) {
+	    if( dest && dest->Type->GivesResource==GoldCost ) {
 	        dest->Blink=4;
                 DebugLevel3("RALY POINT TO GOLD-MINE\n");
 	        SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
@@ -788,23 +771,17 @@ local void SendRepair(int sx,int sy)
     x=sx/TileSizeX;
     y=sy/TileSizeY;
 
-    if( UnitUnderCursor ) {
-	dest=RepairableOnMapTile(x,y);
-    } else {
-	dest=NoUnitP;
-    }
-    for( i=0; i<NumSelected; ++i ) {
-	unit=Selected[i];
-	if( unit->Type->CanRepair ) {
-	    // FIXME: Should move test in repairable
-	    if( dest && dest->Type && (dest->Player==unit->Player
-		    || IsAllied(unit->Player,dest)) ) {
+    // Check if the dest is repairable!
+    if( (dest=UnitUnderCursor) && (dest->HP<dest->Stats->HitPoints) &&
+	    (dest->Type->Building || dest->Type->Transporter) &&
+	    (dest->Player==ThisPlayer||IsAllied(ThisPlayer,dest))) {
+	for( i=0; i<NumSelected; ++i ) {
+	    unit=Selected[i];
+	    if( unit->Type->CanRepair ) {
 		SendCommandRepair(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	    } else {
-		SendCommandRepair(unit,x,y,NoUnitP,!(KeyModifiers&ModifierShift));
+		DebugLevel0Fn("Non-worker repairs\n");
 	    }
-	} else {
-	    DebugLevel0Fn("Non-worker repairs\n");
 	}
     }
 }
@@ -812,45 +789,39 @@ local void SendRepair(int sx,int sy)
 /**
 **	Send selected units to point.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param sx	X screen tile position.
+**	@param sy	Y screen tile position.
 **
 **	@todo	To reduce the CPU load for pathfinder, we should check if
 **		the destination is reachable and handle nice group movements.
 */
-local void SendMove(int x,int y)
+local void SendMove(int sx,int sy)
 {
     int i;
     int flush;
     Unit* unit;
     Unit* transporter;
 
-    if( UnitUnderCursor ) {
-	transporter=TransporterOnMapTile(x,y);
+    //  Move to a transporter.
+    if( (transporter=UnitUnderCursor) &&
+	    (transporter->Type->Transporter) &&
+	    (transporter->Player==ThisPlayer)){
+	SendCommandStopUnit(transporter);
     } else {
-	transporter=NoUnitP;
+	transporter=NULL;
     }
+
     flush=!(KeyModifiers&ModifierShift);
 
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
-	if( transporter && transporter->Player==unit->Player
-		&& unit->Type->UnitType==UnitTypeLand ) {
+	if( transporter && unit->Type->UnitType==UnitTypeLand ) {
 	    transporter->Blink=4;
 	    DebugLevel3Fn("Board transporter\n");
-	    //	Let the transporter move to passenger
-	    //		It should do nothing and not already on coast.
-	    //		FIXME: perhaps force move if not reachable.
-	    if( transporter->Orders[0].Action==UnitActionStill
-		    && transporter->OrderCount==1
-		    && !CoastOnMap(transporter->X,transporter->Y) ) {
-		SendCommandFollow(transporter,unit,FlushCommands);
-	    }
+	    SendCommandFollow(transporter,unit,0);
 	    SendCommandBoard(unit,-1,-1,transporter,flush);
 	} else {
-//	    if( !unit->Type->Building ) {
-		SendCommandMove(unit,x,y,flush);
-//	    }
+	    SendCommandMove(unit,sx/TileSizeX,sy/TileSizeY,flush);
 	}
     }
 }
@@ -882,8 +853,7 @@ local void SendAttack(int sx,int sy)
     for( i=0; i<NumSelected; i++ ) {
 	unit=Selected[i];
 	if( unit->Type->CanAttack || unit->Type->Building ) {
-	    if( UnitUnderCursor
-		    && (dest=TargetOnMapTile(unit,x,y)) ) {
+	    if( (dest=UnitUnderCursor) && CanTarget(unit->Type,dest->Type)) {
 		DebugLevel3Fn("Attacking %p\n" _C_ dest);
 		dest->Blink=4;
 	    } else {
@@ -901,10 +871,10 @@ local void SendAttack(int sx,int sy)
 /**
 **	Send the current selected group ground attacking.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param sx	X screen map position.
+**	@param sy	Y screen map position.
 */
-local void SendAttackGround(int x,int y)
+local void SendAttackGround(int sx,int sy)
 {
     int i;
     Unit* unit;
@@ -912,25 +882,26 @@ local void SendAttackGround(int x,int y)
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
 	if( unit->Type->CanAttack ) {
-	    SendCommandAttackGround(unit,x,y,!(KeyModifiers&ModifierShift));
+	    SendCommandAttackGround(unit,sx/TileSizeX,sy/TileSizeY,!(KeyModifiers&ModifierShift));
 	} else {
-	    SendCommandMove(unit,x,y,!(KeyModifiers&ModifierShift));
+	    SendCommandMove(unit,sx/TileSizeX,sy/TileSizeY,!(KeyModifiers&ModifierShift));
 	}
     }
 }
 
 /**
 **	Let units patrol between current postion and the selected.
+**	@param sx	X screen map position.
+**	@param sy	Y screen map position.
 */
-local void SendPatrol(int x,int y)
+local void SendPatrol(int sx,int sy)
 {
     int i;
     Unit* unit;
 
     for( i=0; i<NumSelected; i++ ) {
 	unit=Selected[i];
-	// FIXME: Can the unit patrol ?
-	SendCommandPatrol(unit,x,y,!(KeyModifiers&ModifierShift));
+	SendCommandPatrol(unit,sx/TileSizeX,sy/TileSizeY,!(KeyModifiers&ModifierShift));
     }
 }
 
@@ -954,15 +925,12 @@ local void SendDemolish(int sx,int sy)
 	unit=Selected[i];
 	if( unit->Type->Volatile ) {
 	    // FIXME: choose correct unit no flying ...
-	    if( UnitUnderCursor ) {
-		dest=TargetOnMapTile(unit,x,y);
-		if( dest==unit ) {	// don't let a unit self destruct
-		    dest=NoUnitP;
-		}
+	    if( (dest=UnitUnderCursor) && CanTarget(unit->Type,dest->Type)) {
+		dest->Blink=4;
 	    } else {
 		dest=NoUnitP;
 	    }
-	    SendCommandDemolish(unit,x,y,dest,!(KeyModifiers&ModifierShift));
+	    SendCommandDemolish(unit,sx/TileSizeX,sy/TileSizeY,dest,!(KeyModifiers&ModifierShift));
 	} else {
 	    DebugLevel0Fn("can't demolish %p\n" _C_ unit);
 	}
@@ -972,46 +940,45 @@ local void SendDemolish(int sx,int sy)
 /**
 **	Let units harvest wood/mine gold/haul oil
 **
-**	@param x	X map coordinate of the destination
-**	@param y	Y map coordinate of the destination
+**	@param sx	X screen map position
+**	@param sy	Y screen map position 
 **
 **	@see Selected
 */
-local void SendHarvest(int x,int y)
+local void SendHarvest(int sx,int sy)
 {
     int i;
     Unit* dest;
 
     for( i=0; i<NumSelected; ++i ) {
-	if( UnitUnderCursor && (dest=ResourceOnMap(x,y,OilCost)) ) {
+	DebugCheck(!Selected[i]->Type->Harvester);
+	if ((dest=UnitUnderCursor) &&
+		(Selected[i]->Type->ResourceHarvested==dest->Type->GivesResource)) {
 	    dest->Blink=4;
-	    DebugLevel3("PLATFORM\n");
+	    DebugLevel3("RESOURCE\n");
 	    SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
-	if( UnitUnderCursor && (dest=ResourceOnMap(x,y,GoldCost)) ) {
-	    dest->Blink=4;
-	    DebugLevel3("GOLD-MINE\n");
-	    SendCommandResource(Selected[i],dest,!(KeyModifiers&ModifierShift));
-	    continue;
+	if( IsMapFieldExplored(Selected[i]->Player,sx/TileSizeX,sy/TileSizeY) &&
+		ForestOnMap(sx/TileSizeX,sy/TileSizeY) ) {
+	    SendCommandHarvest(Selected[i],sx/TileSizeY,sy/TileSizeY,!(KeyModifiers&ModifierShift));
 	}
-	SendCommandHarvest(Selected[i],x,y,!(KeyModifiers&ModifierShift));
     }
 }
 
 /**
 **	Send selected units to unload passengers.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param sx	X screen map position.
+**	@param sy	Y screen map position.
 */
-local void SendUnload(int x,int y)
+local void SendUnload(int sx,int sy)
 {
     int i;
 
     for( i=0; i<NumSelected; i++ ) {
 	// FIXME: not only transporter selected?
-	SendCommandUnload(Selected[i],x,y,NoUnitP
+	SendCommandUnload(Selected[i],sx/TileSizeX,sy/TileSizeY,NoUnitP
 		,!(KeyModifiers&ModifierShift));
     }
 }
@@ -1038,11 +1005,9 @@ local void SendSpellCast(int sx, int sy)
 
     x=sx/TileSizeX;
     y=sy/TileSizeY;
-    if( UnitUnderCursor ) {
-	dest=UnitOnMapTile(x, y);
-    } else {
-	dest=NoUnitP;
-    }
+    
+    dest=UnitUnderCursor;
+    
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n" _C_ dest _C_ x _C_ y);
     /*	NOTE: Vladi:
        This is a high-level function, it sends target spot and unit
@@ -1056,6 +1021,7 @@ local void SendSpellCast(int sx, int sy)
 	}
 	if( dest && unit==dest ) {
 	    continue;			// no unit can cast spell on himself
+	    // n0b0dy: why not?
 	}
 #ifndef NEW_UI
 	// CursorValue here holds the spell type id
@@ -1072,10 +1038,8 @@ local void SendSpellCast(int sx, int sy)
 /**
 **	Send a command to selected units.
 **
-**	@param sx	X screen map position in pixels.
-**	@param sy	Y screen map position in pixels.
-**
-**	@todo pure chaos the arguments of the Send... functions are no equal.
+**	@param sx	X screen map position
+**	@param sy	Y screen map position
 */
 local void SendCommand(int sx, int sy)
 {
@@ -1091,7 +1055,7 @@ local void SendCommand(int sx, int sy)
 #endif
     switch( CursorAction ) {
 	case ButtonMove:
-	    SendMove(x,y);
+	    SendMove(sx,sy);
 	    break;
 	case ButtonRepair:
 	    SendRepair(sx,sy);
@@ -1100,16 +1064,16 @@ local void SendCommand(int sx, int sy)
 	    SendAttack(sx,sy);
 	    break;
 	case ButtonAttackGround:
-	    SendAttackGround(x,y);
+	    SendAttackGround(sx,sy);
 	    break;
 	case ButtonPatrol:
-	    SendPatrol(x,y);
+	    SendPatrol(sx,sy);
 	    break;
 	case ButtonHarvest:
-	    SendHarvest(x,y);
+	    SendHarvest(sx,sy);
 	    break;
 	case ButtonUnload:
-	    SendUnload(x,y);
+	    SendUnload(sx,sy);
 	    break;
 	case ButtonDemolish:
 	    SendDemolish(sx,sy);

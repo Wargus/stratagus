@@ -91,12 +91,12 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	UnitShowAnimation(unit,type->Animations->Still);
 
 	//
-	//	FIXME: this a workaround of a bad code.
+	//	FIXME: this a workaround for some bad code.
 	//		UnitShowAnimation resets frame.
 	//	FIXME: the frames are hardcoded they should be configurable
 	//
 	if( unit->State==1 && type->GivesResource==GoldCost ) {
-	    unit->Frame=!!unit->Data.Resource.Active;
+	    unit->Frame=unit->Data.Resource.Active ? 1 : 0;
 	}
 	if( unit->State==1 && type->GivesResource==OilCost ) {
 	    unit->Frame=unit->Data.Resource.Active ? 2 : 0;
@@ -242,7 +242,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     //
-    //	Land units:	are turning left/right.
+    //	Land units are turning left/right.
     //
     if( type->LandUnit ) {
 	switch( (MyRand()>>8)&0x0FF ) {
@@ -263,19 +263,10 @@ global void ActionStillGeneric(Unit* unit,int ground)
     }
 
     //
-    //	Sea units:	are floating up/down.
-    //
-    if( type->SeaUnit ) {
+    //	Sea and air units are floating up/down.
+    //	
+    if( unit->Type->SeaUnit||unit->Type->AirUnit ) {
 	unit->IY=(MyRand()>>15)&1;
-	return;
-    }
-
-    //
-    //	Air units:	are floating up/down.
-    //
-    if( type->AirUnit ) {
-	unit->IY=(MyRand()>>15)&1;
-	return;
     }
 }
 

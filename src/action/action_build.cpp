@@ -151,9 +151,9 @@ global void HandleActionBuild(Unit* unit)
 	//	Some tries to build the building.
 	//
 	if( unit->SubAction++<10 ) {
-	    //	To keep the load low, retry each 1/4 second.
+	    //	To keep the load low, retry each 10 cycles
 	    // NOTE: we can already inform the AI about this problem?
-	    unit->Wait=CYCLES_PER_SECOND/4+unit->SubAction;
+	    unit->Wait=10;
 	    return;
 	}
 
@@ -256,6 +256,7 @@ global void HandleActionBuild(Unit* unit)
 
     build->Orders[0].Action=UnitActionBuilded;
     build->Data.Builded.Sum=0;  // FIXME: Is it necessary?
+    build->Data.Builded.Cancel=0; // FIXME: Is it necessary?
     build->Data.Builded.Val=stats->HitPoints;
     n=(stats->Costs[TimeCost]*CYCLES_PER_SECOND/6)/(SpeedBuild*5);
     if( n ) {
@@ -266,22 +267,37 @@ global void HandleActionBuild(Unit* unit)
 	DebugCheck( build->Data.Builded.Add!=stats->HitPoints );
     }
     build->Data.Builded.Sub=n;
-    build->Data.Builded.Cancel=0; // FIXME: Is it necessary?
-    build->Data.Builded.Worker=unit;
-    DebugLevel3Fn("Build Sum %d, Add %d, Val %d, Sub %d\n"
-	_C_ build->Data.Builded.Sum _C_ build->Data.Builded.Add
-	_C_ build->Data.Builded.Val _C_ build->Data.Builded.Sub);
     build->Wait=CYCLES_PER_SECOND/6;
     UpdateConstructionFrame(build);
 
-    unit->Value=build->Value;		// worker holding value while building
-
-    RemoveUnit(unit,build);		// automaticly: CheckUnitToBeDrawn(unit)
-    build->CurrentSightRange=0;
-    unit->X=x;
-    unit->Y=y;
-    unit->Orders[0].Action=UnitActionStill;
-    unit->SubAction=0;
+    if (type->BuilderInside) {
+	//  Place the builder inside the building
+    	build->Data.Builded.Worker=unit;
+	RemoveUnit(unit,build);
+	build->CurrentSightRange=0;
+	unit->X=x;
+	unit->Y=y;
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+    } else {
+	//  Make the builder repair the newly spawned building.
+	unit->Orders[0].Action=UnitActionRepair;
+	unit->Orders[0].Goal=build;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	unit->Orders[0].RangeX=unit->Orders[0].RangeY=REPAIR_RANGE;
+	//unit->Orders[0].Type=unit->Orders[0].Arg1=NULL;
+	unit->SubAction=0;
+	unit->Wait=1;
+//	unit->Reset=1;
+	RefsDebugCheck( !build->Refs );
+	build->Refs++;
+	UnitMarkSeen(unit);
+	// We need somebody to work on it.
+	build->Data.Builded.Sub=build->Data.Builded.Add=0;
+	build->HP=1;
+    }
+    build->Wait=CYCLES_PER_SECOND/6;
+    UpdateConstructionFrame(build);
     UnitMarkSeen(build);
 }
 
@@ -303,14 +319,13 @@ global void HandleActionBuilded(Unit* unit)
     //
     if( unit->Data.Builded.Cancel ) {
 	// Drop out unit
-	worker=unit->Data.Builded.Worker;
-	worker->Orders[0].Action=UnitActionStill;
-	unit->Data.Builded.Worker=NoUnitP;
-	worker->Reset=worker->Wait=1;
-	worker->SubAction=0;
-
-	unit->Value=worker->Value;	// worker holding value while building
-	DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
+	if ((worker=unit->Data.Builded.Worker)) {
+	    worker->Orders[0].Action=UnitActionStill;
+	    unit->Data.Builded.Worker=NoUnitP;
+	    worker->Reset=worker->Wait=1;
+	    worker->SubAction=0;
+	    DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
+	}
 
 	// Player gets back 75% of the original cost for a building.
 	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
@@ -320,23 +335,26 @@ global void HandleActionBuilded(Unit* unit)
 	return;
     }
 
-    //
-    //	Fixed point HP calculation
-    //
-    unit->Data.Builded.Val-=unit->Data.Builded.Sub;
-    if( unit->Data.Builded.Val<0 ) {
-	unit->Data.Builded.Val+=unit->Stats->HitPoints;
-	unit->HP++;
-	unit->Data.Builded.Sum++;
-    }
+    if (type->BuilderInside) {
+	//
+	//	Fixed point HP calculation
+	//
+	unit->Data.Builded.Val-=unit->Data.Builded.Sub;
+	if( unit->Data.Builded.Val<0 ) {
+	    unit->Data.Builded.Val+=unit->Stats->HitPoints;
+	    unit->HP++;
+	    unit->Data.Builded.Sum++;
+	}
 
-    n=(unit->Stats->Costs[TimeCost]*CYCLES_PER_SECOND/6)/(SpeedBuild*5);
-    if( unit->Data.Builded.Add!=unit->Stats->HitPoints/(n?n:1) ) {
-	unit->Data.Builded.Add=unit->Stats->HitPoints/(n?n:1);
-    }
+	
+	n=(unit->Stats->Costs[TimeCost]*CYCLES_PER_SECOND/6)/(SpeedBuild*5);
+	if( unit->Data.Builded.Add!=unit->Stats->HitPoints/(n?n:1) ) {
+	    unit->Data.Builded.Add=unit->Stats->HitPoints/(n?n:1);
+	}
 
-    unit->HP+=unit->Data.Builded.Add;
-    unit->Data.Builded.Sum+=unit->Data.Builded.Add;
+	unit->HP+=unit->Data.Builded.Add;
+	unit->Data.Builded.Sum+=unit->Data.Builded.Add;
+    }
 
     //
     //	Check if building ready. Note we can build and repair.
@@ -352,37 +370,49 @@ global void HandleActionBuilded(Unit* unit)
 	unit->Constructed=0;
 	unit->Frame=0;
 	unit->Reset=unit->Wait=1;
-	worker=unit->Data.Builded.Worker;
-	worker->Orders[0].Action=UnitActionStill;
-	worker->SubAction=0;
-	worker->Reset=worker->Wait=1;
-	DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
-	//
-	//	Whe
-	//
-	if( type->MustBuildOnTop ) {
+
+	if ((worker=unit->Data.Builded.Worker)) {
+	    // Bye bye worker.
+	    if (type->BuilderLost) {
+		// FIXME: enough?
+		LetUnitDie(worker);
+	    // Drop out the worker.
+	    } else {
+		worker->Orders[0].Action=UnitActionStill;
+		worker->SubAction=0;
+		worker->Reset=worker->Wait=1;
+		DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
+		//
+		//	If we can harvest from the new building, do it.
+		//
+		if (worker->Type->Harvester&&worker->Type->ResourceHarvested==type->GivesResource) {
+		    CommandResource(worker,unit,0);
+		}
+		//
+		//	Building lumber mill, let worker automatic chopping wood.
+		//
+		if( type->CanStore[WoodCost] ) {
+		    CommandHarvest(worker,unit->X+unit->Type->TileWidth/2,
+			    unit->Y+unit->Type->TileHeight/2,0);
+		}
+	    }
+	}
+	
+	if( type->GivesResource ) {
 	    // FIXME: nobody: shouldn't this be already 0?
-	    // It holds the number of units inside a resource.
+	    // FIXME: wierd condition.
+	    // FIXME: It holds the number of units inside a resource.
 	    unit->Data.Resource.Active=0;
-	}
-	//
-	//	If we can harvest from the new building, do it.
-	//
-	if (worker->Type->Harvester&&worker->Type->ResourceHarvested==type->GivesResource) {
-	    CommandResource(worker,unit,0);
-	}
-	//
-	//	Building lumber mill, let worker automatic chopping wood.
-	//
-	if( type->CanStore[WoodCost] ) {
-	    CommandHarvest(worker,unit->X+unit->Type->TileWidth/2,
-		    unit->Y+unit->Type->TileHeight/2,0);
 	}
 
 	NotifyPlayer(unit->Player,NotifyGreen,unit->X,unit->Y,
 	    "New %s done", type->Name);
 	if( unit->Player==ThisPlayer ) {
-	    PlayUnitSound(worker,VoiceWorkCompleted);
+	    if (worker) {
+	    	PlayUnitSound(worker,VoiceWorkCompleted);
+	    } else {
+		PlayUnitSound(unit,VoiceBuilding);
+	    }
 	} else if( unit->Player->Ai ) {
 	    AiWorkComplete(worker,unit);
 	}
