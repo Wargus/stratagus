@@ -79,8 +79,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Command.Data.Move.Range=1;
-	unit->Command.Data.Move.DX=-1;
-	unit->Command.Data.Move.DY=-1;
+	unit->Command.Data.Move.DX=unit->Command.Data.Move.DY=-1;
 	unit->Command.Action=UnitActionMineGold;
 #endif
 	unit->SubAction=65;	// FIXME: hardcoded
@@ -101,9 +100,10 @@ global void HandleActionReturnGoods(Unit* unit)
 	RefsDebugCheck( !destu->Refs );
 	++destu->Refs;
 	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
-	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	unit->Orders[0].X=unit->X;
+	unit->Orders[0].Y=unit->Y;	// Return point to continue.
 	DebugLevel3("Return to %Zd=%d,%d\n"
-	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
+		,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHarvest;
 	NewResetPath(unit);
 #else
