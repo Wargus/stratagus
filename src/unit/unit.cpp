@@ -323,7 +323,7 @@ global void InitUnit(Unit* unit, UnitType* type)
 	SCM fun;
 
 	fun = gh_symbol2scm("gen-unit-name");
-	if (!gh_null_p(symbol_boundp(fun, NIL))) {
+	if (symbol_boundp(fun, NIL)) {
 	    SCM value;
 
 	    value = symbol_value(fun, NIL);

@@ -98,7 +98,7 @@ local void LoadStratagusMap(const char* filename,
     }
     InitPlayers();
     lcm_prevent_recurse = 1;
-    gh_eval_file((char*)filename);
+    gh_load((char*)filename);
     lcm_prevent_recurse = 0;
 
 #if 0

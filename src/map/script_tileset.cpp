@@ -34,6 +34,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -509,7 +510,7 @@ local void DefineTilesetParseItemMapping(Tileset* tileset,SCM list)
 	num=gh_scm2int(value);
 	value=gh_car(list);
 	list=gh_cdr(list);
-	unit=gh_scm2newstr(value,NIL);
+	unit=gh_scm2newstr(value, 0);
 	sprintf(buf,"%d",num);
 	if( (h=(char**)hash_find(tileset->ItemsHash,buf)) != NULL ) {
 	    free(*h);

@@ -71,6 +71,10 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_GUILE
+int siod_verbose_level;
+#endif
+
 global char* CclStartFile;		/// CCL start file
 global char* GameName;			/// Game Preferences
 global int CclInConfigFile;		/// True while config file parsing
@@ -83,6 +87,108 @@ global int	CurrentTip;		/// Current tip to display
 --	Functions
 ----------------------------------------------------------------------------*/
 
+/** 
+ * Convert a SCM to a string, SCM must be a symbol or string, else 0
+ * is returned
+ * 
+ * @param scm the SCM to convert to string
+ * 
+ * @return a string representing the SCM or 0 in case the conversion
+ * failed, caller must free() the returned value
+ */
+global char* CclConvertToString(SCM scm)
+{
+#ifdef USE_GUILE
+  if (gh_string_p(scm))
+    return gh_scm2newstr(scm, NULL);
+  else if (gh_symbol_p(scm))
+    return gh_symbol2newstr(scm, NULL);
+  else 
+    return 0;
+#else
+  char* str = try_get_c_string(scm);
+  if (str)
+    return strdup(str);
+  else 
+    return 0;
+#endif
+}
+
+/** 
+ * Return the type of a smob
+ * 
+ * @param smob
+ * 
+ * @return type id of the smob
+ */
+global ccl_smob_type_t CclGetSmobType(SCM smob)
+{
+#ifdef USE_GUILE
+  if (SCM_NIMP (smob))
+    return (ccl_smob_type_t)SCM_CAR (smob);
+  else
+    return 0;
+#else  
+  return TYPE(smob);
+#endif
+}
+
+/** 
+ * Return the pointer that is stored in a smob
+ * 
+ * @param smob the smob that contains the pointer
+ * 
+ * @return pointer that was inside the smob
+ */
+global void* CclGetSmobData(SCM smob)
+{
+#ifdef USE_GUILE
+  return (void*)SCM_SMOB_DATA(smob);
+#else
+  return smob->storage_as.cons.cdr;
+#endif
+}
+
+/** 
+ * Store a pointer inside a SMOB, aka convert a pointer to a SCM
+ * 
+ * @param tag The type of the pointer/smob
+ * @param ptr the pointer that should be converted to a SCM
+ */
+global SCM CclMakeSmobObj(ccl_smob_type_t tag, void* ptr)
+{
+#ifdef USE_GUILE
+  SCM_RETURN_NEWSMOB (tag, ptr);
+#else
+  SCM value   = cons(NIL,NIL);
+
+  value->type                = tag;
+  value->storage_as.cons.cdr = (SCM)ptr;
+
+  return value;
+#endif
+}
+
+/** 
+ * Create a tag for a new type.
+ * 
+ * @param name 
+ * 
+ * @return The newly generated SMOB type
+ */
+global ccl_smob_type_t CclMakeSmobType(const char* name)
+{
+  ccl_smob_type_t new_type;
+
+#ifdef USE_GUILE
+  new_type = scm_make_smob_type ((char*)name, 0);
+#else
+  new_type = allocate_user_tc();
+#endif
+
+  return new_type;
+}
+
 /**
 **	Protect SCM object against garbage collector.
 **
@@ -90,10 +196,13 @@ global int	CurrentTip;		/// Current tip to display
 */
 global void CclGcProtect(SCM obj)
 {
+#ifdef USE_GUILE
+    scm_gc_protect_object(obj);
+#else
     SCM var;
-
     var=gh_symbol2scm("*ccl-protect*");
     setvar(var,cons(obj,symbol_value(var,NIL)),NIL);
+#endif
 }
 
 /**
@@ -103,6 +212,9 @@ global void CclGcProtect(SCM obj)
 */
 global void CclGcUnprotect(SCM obj)
 {
+#ifdef USE_GUILE
+    scm_gc_unprotect_object(obj);
+#else
     // Remove obj from the list *ccl-protect*
     SCM sym;
     SCM old_lst;
@@ -112,6 +224,7 @@ global void CclGcUnprotect(SCM obj)
     old_lst = symbol_value(sym, NIL);
     new_lst = NIL;
 
+    // FIXME: Doesn't handle nested protect/unprotects
     while( !gh_null_p(old_lst) ) {
         SCM el = gh_car(old_lst);
 
@@ -122,6 +235,7 @@ global void CclGcUnprotect(SCM obj)
       }
     
     setvar(sym, new_lst, NIL);
+#endif
 }
 
 /*............................................................................
@@ -211,7 +325,7 @@ local SCM CclSetLocalPlayerName(SCM name)
 {
     char* str;
 
-    str=gh_scm2newstr(name,NIL);
+    str=gh_scm2newstr(name, 0);
     strncpy(LocalPlayerName,str,sizeof(LocalPlayerName)-1);
     LocalPlayerName[sizeof(LocalPlayerName)-1]='\0';
     return SCM_UNSPECIFIED;
@@ -459,7 +573,7 @@ local SCM CclDefineDefaultActions(SCM list)
 	DefaultActions[i]=NULL;
     }
     for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
-	DefaultActions[i]=gh_scm2newstr(gh_car(list),NIL);
+	DefaultActions[i] = gh_scm2newstr(gh_car(list), 0);
 	list=gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
@@ -477,7 +591,7 @@ local SCM CclDefineDefaultResourceNames(SCM list)
 	DefaultResourceNames[i]=NULL;
     }
     for( i=0; i<MaxCosts && !gh_null_p(list); ++i ) {
-	DefaultResourceNames[i]=gh_scm2newstr(gh_car(list),NIL);
+	DefaultResourceNames[i] = gh_scm2newstr(gh_car(list), 0);
 	list=gh_cdr(list);
     }
     return SCM_UNSPECIFIED;
@@ -650,14 +764,18 @@ local SCM CclDefineMap(SCM width,SCM height)
 global void CclCommand(const char* command)
 {
     char msg[80];
+#ifndef USE_GUILE
     int retval;
-
+#endif
     strncpy(msg,command,sizeof(msg));
 
     // FIXME: cheat protection
-    retval=repl_c_string(msg,0,0,sizeof(msg));
+#ifdef USE_GUILE
+    gh_eval_str(msg);
+#else
+    retval = repl_c_string(msg,0,0,sizeof(msg));
     DebugLevel3("\n%d=%s\n" _C_ retval _C_ msg);
-
+#endif
     SetMessage("%s",msg);
 }
 
@@ -670,8 +788,18 @@ global void CclCommand(const char* command)
 */
 global void InitCcl(void)
 {
+#ifdef USE_GUILE
+  scm_init_guile();
+
+  gh_eval_str("(display \"Guile: Enabling debugging...\\n\")"
+              "(debug-enable 'debug)"
+              "(debug-enable 'backtrace)"
+              "(read-enable 'positions)"
+              "(define *scheme* 'guile)");
+#else
     char* sargv[5];
     char* buf;
+    char  msg[] = "(define *scheme* 'siod)";
 
     sargv[0] = "Stratagus";
     sargv[1] = "-v1";
@@ -680,8 +808,10 @@ global void InitCcl(void)
     buf=malloc(strlen(StratagusLibPath)+4);
     sprintf(buf,"-l%s",StratagusLibPath);
     sargv[4] = buf;			// never freed
+    
     siod_init(5,sargv);
-
+    repl_c_string(msg, 0,0,sizeof(msg));
+#endif
     gh_new_procedure0_0("library-path",CclStratagusLibraryPath);
     gh_new_procedure0_0("game-cycle",CclGameCycle);
     gh_new_procedure1_0("set-game-name!",CclSetGameName);
@@ -996,7 +1126,6 @@ global void LoadCcl(void)
     char* file;
     char* s;
     char buf[1024];
-    extern LISP fast_load(LISP lfname,LISP noeval);
 
     //
     //	Load and evaluate configuration file
@@ -1022,17 +1151,19 @@ global void LoadCcl(void)
 */
 global void SaveCcl(FILE* file)
 {
+#ifdef USE_GUILE
+#else
     SCM list;
     extern SCM oblistvar;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: CCL $Id$\n\n");
 
-    for( list=oblistvar; CONSP(list); list=CDR(list) ) {
+    for(list = oblistvar; gh_list_p(list); list = gh_cdr(list) ) {
 	SCM sym;
 
-	sym=CAR(list);
-	if( !gh_null_p(symbol_boundp(sym, NIL)) ) {
+	sym=gh_car(list);
+	if(symbol_boundp(sym, NIL)) {
 	    SCM value;
 
 	    fprintf(file,";;(define %s\n",get_c_string(sym));
@@ -1046,6 +1177,7 @@ global void SaveCcl(FILE* file)
 #endif
 	}
     }
+#endif
 }
 
 //@}

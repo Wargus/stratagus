@@ -38,11 +38,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ccl.h"
 #include "stratagus.h"
 #include "tileset.h"
 #include "map.h"
 #include "iolib.h"
-#include "siod.h"
 
 /*----------------------------------------------------------------------------
 --	Variables

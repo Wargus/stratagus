@@ -1802,7 +1802,6 @@ local void CreateEditor(void)
     char *s;
     char buf[PATH_MAX];
     CLFile *clf;
-    extern LISP fast_load(LISP lfname, LISP noeval);
     int scm;
 
     scm = 0;
