@@ -52,6 +52,15 @@ extern void PreMenuSetup(void);		/// FIXME: not here!
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 
 /*----------------------------------------------------------------------------
+--	Defines
+----------------------------------------------------------------------------*/
+
+#define UNIT_ICON_X (ICON_WIDTH + 6)		// Unit mode icon
+#define UNIT_ICON_Y (0)				// Unit mode icon
+#define TILE_ICON_X (ICON_WIDTH * 2 + 14)	// Tile mode icon
+#define TILE_ICON_Y (2)				// Tile mode icon
+
+/*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
@@ -60,6 +69,7 @@ local char EditorRunning;		/// True editor is running
 local enum _editor_state_ {
     EditorSelecting,			/// Select
     EditorEditTile,			/// Edit tiles
+    EditorEditUnit,			/// Edit units
 } EditorState;				/// Current editor state
 
 // FIXME: support for bigger tools 2x2, 3x3, 4x4.
@@ -209,6 +219,142 @@ local void DrawTileIcons(void)
 }
 
 /**
+**	Draw unit icons.
+*/
+local void DrawUnitIcons(void)
+{
+    int x;
+    int y;
+    int i;
+    int j;
+    char buf[256];
+    Icon *icon;
+
+    x = TheUI.InfoPanelX + 4;
+    y = TheUI.InfoPanelY + 4 + ICON_HEIGHT + 8;
+
+    for (i = 0; i < PlayerMax; ++i) {
+	if (i == PlayerMax / 2) {
+	    y += 17;
+	}
+	VideoDrawRectangle(ColorGray, x + i % 8 * 17, y, 15, 15);
+	VideoFillRectangle(Players[i].Color, x + 1 + i % 8 * 17, y + 1, 13,
+	    13);
+	VideoDrawNumber(x + i % 8 * 17 + 2, y + 4, SmallFont, i);
+    }
+
+    x = TheUI.InfoPanelX + 4;
+    y += 17 + 4;
+
+    j = 0;
+    for (i = 0; UnitTypeWcNames[i]; ++i) {
+	const UnitType *type;
+
+	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	    if (type->Building) {
+		++j;
+	    }
+	}
+    }
+    sprintf(buf, "Buildings %d\n", j);
+    VideoDrawText(x, y, GameFont, buf);
+    y += 16;
+
+    j = 0;
+    for (i = 0; UnitTypeWcNames[i]; ++i) {
+	const UnitType *type;
+
+	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	    if (!type->Building && type->UnitType == UnitTypeLand) {
+		++j;
+	    }
+	}
+    }
+    sprintf(buf, "Land units %d\n", j);
+    VideoDrawText(x, y, GameFont, buf);
+    y += 16;
+
+    j = 0;
+    for (i = 0; UnitTypeWcNames[i]; ++i) {
+	const UnitType *type;
+
+	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	    if (!type->Building && type->UnitType == UnitTypeFly) {
+		++j;
+	    }
+	}
+    }
+    sprintf(buf, "Sea units %d\n", j);
+    VideoDrawText(x, y, GameFont, buf);
+    y += 16;
+
+    j = 0;
+    for (i = 0; UnitTypeWcNames[i]; ++i) {
+	const UnitType *type;
+
+	if ((type = UnitTypeByIdent(UnitTypeWcNames[i]))) {
+	    if (!type->Building && type->UnitType == UnitTypeNaval) {
+		++j;
+	    }
+	}
+    }
+    sprintf(buf, "Air units %d\n", j);
+    VideoDrawText(x, y, GameFont, buf);
+
+    y = TheUI.ButtonPanelY + 4;
+
+    icon = IconByIdent("icon-footman");
+    while( y < TheUI.ButtonPanelY
+	    + TheUI.ButtonPanel.Graphic->Height - ICON_HEIGHT / 2 ) { 
+	x = TheUI.ButtonPanelX + 4;
+	while( x < TheUI.ButtonPanelX + 146 ) {
+	    VideoDrawSub(icon->Graphic, icon->X, icon->Y, icon->Width / 2,
+		icon->Height / 2, x, y);
+	    x += ICON_WIDTH / 2 + 2;
+	}
+	y += ICON_HEIGHT / 2 + 2;
+    }
+}
+
+/**
+**	Draw the editor panels.
+*/
+local void DrawEditorPanel(void)
+{
+    int x;
+    int y;
+    Icon *icon;
+
+    x = TheUI.InfoPanelX + 4;
+    y = TheUI.InfoPanelY + 4;
+
+    //
+    //  Select / Units / Tiles
+    //
+    icon = IconByIdent("icon-human-patrol-land");
+    DebugCheck(!icon);
+    DrawUnitIcon(Players, icon, 0, x, y);
+    icon = IconByIdent("icon-footman");
+    DebugCheck(!icon);
+    DrawUnitIcon(Players, icon, 0, x + UNIT_ICON_X, y + UNIT_ICON_Y);
+
+    VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 + 4 * 16]],
+	x + TILE_ICON_X, y + TILE_ICON_Y);
+    VideoDrawRectangle(ColorGray, x + TILE_ICON_X, y + TILE_ICON_Y, 32, 32);
+
+    switch (EditorState) {
+	case EditorSelecting:
+	    break;
+	case EditorEditTile:
+	    DrawTileIcons();
+	    break;
+	case EditorEditUnit:
+	    DrawUnitIcons();
+	    break;
+    }
+}
+
+/**
 **	Draw special cursor on map.
 **
 **	@todo support for bigger cursors (2x2, 3x3 ...)
@@ -250,36 +396,35 @@ local void DrawEditorInfo(void)
 
     v = TheUI.LastClickedVP;
     x = y = 0;
-    if( v != -1 ) {
+    if (v != -1) {
 	x = Viewport2MapX(v, CursorX);
 	y = Viewport2MapY(v, CursorY);
     }
 
-    sprintf(buf,"Editor: (%d %d)",x, y);
-    flags=TheMap.Fields[x+y*TheMap.Width].Flags;
+    sprintf(buf, "Editor: (%d %d)", x, y);
+    flags = TheMap.Fields[x + y * TheMap.Width].Flags;
 
-    x=TheUI.ResourceX+2;
-    y=TheUI.ResourceY+2;
+    x = TheUI.ResourceX + 2;
+    y = TheUI.ResourceY + 2;
 
-    VideoDrawText(x,y,GameFont,buf);
+    VideoDrawText(x, y, GameFont, buf);
 
-    sprintf(buf,"%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-	    TheMap.Fields[x+y*TheMap.Width].Value,
-	    flags,
-	    flags&MapFieldUnpassable	?'u':'-',
-	    flags&MapFieldNoBuilding	?'n':'-',
-	    flags&MapFieldHuman		?'h':'-',
-	    flags&MapFieldWall		?'w':'-',
-	    flags&MapFieldRocks		?'r':'-',
-	    flags&MapFieldForest	?'f':'-',
-	    flags&MapFieldLandAllowed	?'L':'-',
-	    flags&MapFieldCoastAllowed	?'C':'-',
-	    flags&MapFieldWaterAllowed	?'W':'-',
-	    flags&MapFieldLandUnit	?'l':'-',
-	    flags&MapFieldAirUnit	?'a':'-',
-	    flags&MapFieldSeaUnit	?'s':'-',
-	    flags&MapFieldBuilding	?'b':'-' );
-    VideoDrawText(x+150,y,GameFont,buf);
+    sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	TheMap.Fields[x + y * TheMap.Width].Value, flags,
+	flags & MapFieldUnpassable	? 'u' : '-',
+	flags & MapFieldNoBuilding	? 'n' : '-',
+	flags & MapFieldHuman		? 'h' : '-',
+	flags & MapFieldWall		? 'w' : '-',
+	flags & MapFieldRocks		? 'r' : '-',
+	flags & MapFieldForest		? 'f' : '-',
+	flags & MapFieldLandAllowed	? 'L' : '-',
+	flags & MapFieldCoastAllowed	? 'C' : '-',
+	flags & MapFieldWaterAllowed	? 'W' : '-',
+	flags & MapFieldLandUnit	? 'l' : '-',
+	flags & MapFieldAirUnit		? 'a' : '-',
+	flags & MapFieldSeaUnit		? 's' : '-',
+	flags & MapFieldBuilding	? 'b' : '-');
+    VideoDrawText(x + 150, y, GameFont, buf);
 }
 
 /**
@@ -366,7 +511,8 @@ local void EditorUpdateDisplay(void)
 	    TheUI.ButtonPanel.Graphic->Height, TheUI.ButtonPanelX,
 	    TheUI.ButtonPanelY);
     }
-    DrawTileIcons();
+    DrawEditorPanel();
+
     //
     //  Resource
     //
@@ -460,10 +606,27 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 #endif
     }
     //
+    //	Click on mode area
+    //
+    if (TheUI.InfoPanelX + 4 + UNIT_ICON_X < CursorX
+	    && CursorX < TheUI.InfoPanelX + 4 + UNIT_ICON_X + ICON_WIDTH
+	    && TheUI.InfoPanelY + 4 + UNIT_ICON_Y < CursorY
+	    && CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + ICON_HEIGHT) {
+	EditorState = EditorEditUnit;
+	return;
+    }
+    if (TheUI.InfoPanelX + 4 + TILE_ICON_X < CursorX
+	    && CursorX < TheUI.InfoPanelX + 4 + TILE_ICON_X + 32
+	    && TheUI.InfoPanelY + 4 + TILE_ICON_Y < CursorY
+	    && CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + 32) {
+	EditorState = EditorEditTile;
+	return;
+    }
+    //
     //	Click on tile area
     //
-    if( CursorOn == CursorOnButton && ButtonUnderCursor >= 100 ) {
-	EditorState = EditorEditTile;
+    if( CursorOn == CursorOnButton && ButtonUnderCursor >= 100 
+	    && EditorState == EditorEditTile ) {
 	TileCursor = ButtonUnderCursor - 100;
 	return;
     }
