@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+// T H E   W A R   B E G I N S
+// Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_wall.c	-	The map wall handling. */
+/**@name map_wall.c - The map wall handling. */
 //
-//	(c) Copyright 1999-2002 by Vladi Shabanski
+// (c) Copyright 1999-2002 by Vladi Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -45,19 +45,19 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Declarations
+-- Declarations
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Fix walls (connections)
+-- Fix walls (connections)
 ----------------------------------------------------------------------------*/
 
 /*
@@ -71,11 +71,11 @@
 */
 
 /**
-**		Check if the seen tile-type is wall.
+** Check if the seen tile-type is wall.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
-**		@param walltype		Walltype to check. (-1 any kind)
+** @param x Map X tile-position.
+** @param y Map Y tile-position.
+** @param walltype Walltype to check. (-1 any kind)
 */
 int MapIsSeenTileWall(int x, int y, int walltype)
 {
@@ -90,10 +90,10 @@ int MapIsSeenTileWall(int x, int y, int walltype)
 }
 
 /**
-**		Correct the seen wall field, depending on the surrounding.
+** Correct the seen wall field, depending on the surrounding.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x Map X tile-position.
+** @param y Map Y tile-position.
 */
 void MapFixSeenWallTile(int x, int y)
 {
@@ -131,35 +131,35 @@ void MapFixSeenWallTile(int x, int y)
 	if (t == TileTypeHumanWall) {
 		tile = TheMap.Tileset->HumanWallTable[tile];
 		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
-			while (TheMap.Tileset->Table[tile]){		// Skip good tiles
+			while (TheMap.Tileset->Table[tile]){ // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+			while (!TheMap.Tileset->Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	} else {
 		tile = TheMap.Tileset->OrcWallTable[tile];
 		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
-			while (TheMap.Tileset->Table[tile]) {		// Skip good tiles
+			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+			while (!TheMap.Tileset->Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	}
 	if (mf->Value == 0) {
-		while (TheMap.Tileset->Table[tile]) {		// Skip good tiles
+		while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 			++tile;
 		}
-		while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+		while (!TheMap.Tileset->Table[tile]) { // Skip separator
 			++tile;
 		}
 	}
 	tile = TheMap.Tileset->Table[tile];
 
-	if (mf->SeenTile != tile) {				// Already there!
+	if (mf->SeenTile != tile) { // Already there!
 		mf->SeenTile = tile;
 
 		// FIXME: can this only happen if seen?
@@ -171,24 +171,24 @@ void MapFixSeenWallTile(int x, int y)
 }
 
 /**
-**		Correct the surrounding seen wall fields.
+** Correct the surrounding seen wall fields.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x Map X tile-position.
+** @param y Map Y tile-position.
 */
 void MapFixSeenWallNeighbors(int x, int y)
 {
-	MapFixSeenWallTile(x + 1, y);				// side neighbors
+	MapFixSeenWallTile(x + 1, y); // side neighbors
 	MapFixSeenWallTile(x - 1, y);
 	MapFixSeenWallTile(x, y + 1);
 	MapFixSeenWallTile(x, y - 1);
 }
 
 /**
-**		Correct the real wall field, depending on the surrounding.
+** Correct the real wall field, depending on the surrounding.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x Map X tile-position.
+** @param y Map Y tile-position.
 */
 void MapFixWallTile(int x, int y)
 {
@@ -230,29 +230,29 @@ void MapFixWallTile(int x, int y)
 	if (t & MapFieldHuman) {
 		tile = TheMap.Tileset->HumanWallTable[tile];
 		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
-			while (TheMap.Tileset->Table[tile]) {		// Skip good tiles
+			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+			while (!TheMap.Tileset->Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	} else {
 		tile = TheMap.Tileset->OrcWallTable[tile];
 		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
-			while (TheMap.Tileset->Table[tile]) {		// Skip good tiles
+			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
-			while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+			while (!TheMap.Tileset->Table[tile]) { // Skip separator
 				++tile;
 			}
 		}
 	}
 	if (mf->Value == 0) {
-		while (TheMap.Tileset->Table[tile]) {		// Skip good tiles
+		while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 			++tile;
 		}
-		while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+		while (!TheMap.Tileset->Table[tile]) { // Skip separator
 			++tile;
 		}
 	}
@@ -271,24 +271,24 @@ void MapFixWallTile(int x, int y)
 }
 
 /**
-**		Correct the surrounding real wall fields.
+** Correct the surrounding real wall fields.
 **
-**		@param x		Map X tile-position.
-**		@param y		Map Y tile-position.
+** @param x Map X tile-position.
+** @param y Map Y tile-position.
 */
 static void MapFixWallNeighbors(int x, int y)
 {
-	MapFixWallTile(x + 1, y);				// side neighbors
+	MapFixWallTile(x + 1, y); // side neighbors
 	MapFixWallTile(x - 1, y);
 	MapFixWallTile(x, y + 1);
 	MapFixWallTile(x, y - 1);
 }
 
 /**
-**		Remove wall from the map.
+** Remove wall from the map.
 **
-**		@param x		Map X position.
-**		@param y		Map Y position.
+** @param x  Map X position.
+** @param y  Map Y position.
 */
 void MapRemoveWall(unsigned x, unsigned y)
 {
@@ -313,13 +313,13 @@ void MapRemoveWall(unsigned x, unsigned y)
 }
 
 /**
-**		Set wall onto the map.
+** Set wall onto the map.
 **
-**		@param x		Map X position.
-**		@param y		Map Y position.
-**		@param humanwall		Flag, if true set a human wall.
+** @param x  Map X position.
+** @param y  Map Y position.
+** @param humanwall Flag, if true set a human wall.
 **
-**		@todo		FIXME: support for more races.
+** @todo FIXME: support for more races.
 */
 void MapSetWall(unsigned x, unsigned y, int humanwall)
 {
@@ -355,11 +355,11 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 }
 
 /**
-**		Wall is hit with damage.
+** Wall is hit with damage.
 **
-**		@param x		Map X tile-position of wall.
-**		@param y		Map Y tile-position of wall.
-**		@param damage		Damage done to wall.
+** @param x       Map X tile-position of wall.
+** @param y       Map Y tile-position of wall.
+** @param damage  Damage done to wall.
 */
 void HitWall(unsigned x, unsigned y, unsigned damage)
 {

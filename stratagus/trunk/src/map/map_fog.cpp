@@ -277,11 +277,11 @@ void MapUnmarkTileSight(const Player* player, int x, int y)
 }
 
 /**
-**	Mark a tile for cloak detection.
+** Mark a tile for cloak detection.
 **
-**	@param player  Player to mark sight.
-**	@param x       X tile to mark.
-**	@param y       Y tile to mark.
+** @param player  Player to mark sight.
+** @param x       X tile to mark.
+** @param y       Y tile to mark.
 */
 void MapMarkTileDetectCloak(const Player* player, int x, int y)
 {
@@ -297,11 +297,11 @@ void MapMarkTileDetectCloak(const Player* player, int x, int y)
 }
 
 /**
-**	Unmark a tile for cloak detection.
+** Unmark a tile for cloak detection.
 **
-**	@param player  Player to mark sight.
-**	@param x       X tile to mark.
-**	@param y       Y tile to mark.
+** @param player  Player to mark sight.
+** @param x       X tile to mark.
+** @param y       Y tile to mark.
 */
 void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 {
@@ -936,7 +936,7 @@ void InitMapFogOfWar(void)
 	SDL_Surface* s;
 
 	//
-	//	Generate Only Fog surface.
+	// Generate Only Fog surface.
 	//
 	s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
 		32, RMASK, GMASK, BMASK, AMASK);
@@ -951,7 +951,7 @@ void InitMapFogOfWar(void)
 	SDL_FreeSurface(s);
 
 	//
-	//	Generate Alpha Fog surface.
+	// Generate Alpha Fog surface.
 	//
 	if (TheMap.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		AlphaFogSurface = SDL_DisplayFormat(TheMap.TileGraphic->Surface);

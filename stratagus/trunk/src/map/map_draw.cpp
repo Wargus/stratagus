@@ -247,23 +247,23 @@ int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
 **
 ** StephanR: variables explained below for screen:<PRE>
 ** *---------------------------------------*
-** |										   |
-** |			  *-----------------------*		   |<-TheUi.MapY,dy (in pixels)
-** |			  |		  |   |		  |   |		  |   |		   |  |
-** |			  |		  |   |		  |   |		  |   |		   |  |
-** |			  |---+---+---+---+---+---|		   |  |
-** |			  |		  |   |		  |   |		  |   |		   |  |MapHeight (in tiles)
-** |			  |		  |   |		  |   |		  |   |		   |  |
-** |			  |---+---+---+---+---+---|		   |  |
-** |			  |		  |   |		  |   |		  |   |		   |  |
-** |			  |		  |   |		  |   |		  |   |		   |  |
-** |			  *-----------------------*		   |<-ey,TheUI.MapEndY (in pixels)
-** |										   |
-** |										   |
+** |                                       |
+** |        *-----------------------*      |<-TheUi.MapY,dy (in pixels)
+** |        |   |   |   |   |   |   |      |        |
+** |        |   |   |   |   |   |   |      |        |
+** |        |---+---+---+---+---+---|      |        |
+** |        |   |   |   |   |   |   |      |        |MapHeight (in tiles)
+** |        |   |   |   |   |   |   |      |        |
+** |        |---+---+---+---+---+---|      |        |
+** |        |   |   |   |   |   |   |      |        |
+** |        |   |   |   |   |   |   |      |        |
+** |        *-----------------------*      |<-ey,TheUI.MapEndY (in pixels)
+** |                                       |
+** |                                       |
 ** *---------------------------------------*
-**			  ^							  ^
-**			dx|-----------------------|ex,TheUI.MapEndX (in pixels)
-** TheUI.MapX		 MapWidth (in tiles)
+**          ^                       ^
+**        dx|-----------------------|ex,TheUI.MapEndX (in pixels)
+**            TheUI.MapX MapWidth (in tiles)
 ** (in pixels)
 ** </PRE>
 */

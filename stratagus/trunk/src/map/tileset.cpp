@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+// T H E   W A R   B E G I N S
+// Stratagus - A free fantasy real time strategy game engine
 //
-/**@name tileset.c	-	The tileset. */
+/**@name tileset.c - The tileset. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+// (c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -45,46 +45,46 @@
 #include "iolib.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		Mapping of wc numbers to our internal tileset symbols.
-**		The numbers are used in puds.
-**		0=summer, 1=winter, 2=wasteland, 3=swamp.
+** Mapping of wc numbers to our internal tileset symbols.
+** The numbers are used in puds.
+** 0 = summer, 1 = winter, 2 = wasteland, 3 = swamp.
 */
 char** TilesetWcNames;
 
 /**
-**		Number of available Tilesets.
+** Number of available Tilesets.
 */
 int NumTilesets;
 
 /**
-**		Tileset information.
+** Tileset information.
 **
-**		@see TilesetMax, @see NumTilesets
+** @see TilesetMax, @see NumTilesets
 */
 Tileset** Tilesets;
 
 /**
-**		Size of a tile in X
+** Size of a tile in X
 */
 int TileSizeX = 32;
 
 /**
-**		Size of a tile in Y
+** Size of a tile in Y
 */
 int TileSizeY = 32;
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Load tileset and setup ::TheMap for this tileset.
+** Load tileset and setup ::TheMap for this tileset.
 **
-**		@see TheMap @see Tilesets.
+** @see TheMap @see Tilesets.
 */
 void LoadTileset(void)
 {
@@ -218,7 +218,7 @@ void LoadTileset(void)
 			i += 256;
 		} else {
 			if (TheMap.Tileset->Tiles[i].BaseTerrain != 0 &&
-				TheMap.Tileset->Tiles[i].MixTerrain == 0)		{
+				TheMap.Tileset->Tiles[i].MixTerrain == 0) {
 					if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
 						solid = i;
 				}
@@ -295,7 +295,7 @@ void LoadTileset(void)
 				break;
 			case 10:
 				TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
-		 		break;
+				break;
 			case 11:
 				TheMap.Tileset->MixedLookupTable[table[i]] = 2 + 1;
 				break;
@@ -384,7 +384,7 @@ void LoadTileset(void)
 				break;
 			case 10:
 				TheMap.Tileset->MixedLookupTable[table[i]] = 8 + 4 + 2;
-		 		break;
+				break;
 			case 11:
 				TheMap.Tileset->MixedLookupTable[table[i]] = 2 + 1;
 				break;
@@ -425,7 +425,7 @@ void LoadTileset(void)
 	TheMap.Tileset->RockTable[18] = TheMap.Tileset->TopOneRock;
 	TheMap.Tileset->RockTable[19] = TheMap.Tileset->MidOneRock;
 	//
-	//		FIXME: Build wall replacement tables
+	// FIXME: Build wall replacement tables
 	//
 	TheMap.Tileset->HumanWallTable[ 0] = 0x090;
 	TheMap.Tileset->HumanWallTable[ 1] = 0x830;
@@ -465,19 +465,19 @@ void LoadTileset(void)
 	for (i = 0; i < 16; ++i) {
 		n = 0;
 		tile = TheMap.Tileset->HumanWallTable[i];
-		while (TheMap.Tileset->Table[tile]) {		// Skip good tiles
+		while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 			++tile;
 			++n;
 		}
-		while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+		while (!TheMap.Tileset->Table[tile]) { // Skip separator
 			++tile;
 			++n;
 		}
-		while (TheMap.Tileset->Table[tile]) {		// Skip good tiles
+		while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 			++tile;
 			++n;
 		}
-		while (!TheMap.Tileset->Table[tile]) {		// Skip separator
+		while (!TheMap.Tileset->Table[tile]) { // Skip separator
 			++tile;
 			++n;
 		}
@@ -491,9 +491,9 @@ void LoadTileset(void)
 }
 
 /**
-**		Cleanup the tileset module.
+** Cleanup the tileset module.
 **
-**		@note		this didn't frees the configuration memory.
+** @note this didn't frees the configuration memory.
 */
 void CleanTilesets(void)
 {
@@ -502,7 +502,7 @@ void CleanTilesets(void)
 	char** ptr;
 
 	//
-	//		Free the tilesets
+	// Free the tilesets
 	//
 	for (i = 0; i < NumTilesets; ++i) {
 		free(Tilesets[i]->Ident);
@@ -527,15 +527,15 @@ void CleanTilesets(void)
 	NumTilesets = 0;
 
 	//
-	//		Should this be done by the map?
+	// Should this be done by the map?
 	//
 	VideoSafeFree(TheMap.TileGraphic);
 	TheMap.TileGraphic = NULL;
 
 	//
-	//		Mapping the original tileset numbers in puds to our internal strings
+	// Mapping the original tileset numbers in puds to our internal strings
 	//
-	if ((ptr = TilesetWcNames)) {		// Free all old names
+	if ((ptr = TilesetWcNames)) { // Free all old names
 		while (*ptr) {
 			free(*ptr++);
 		}
