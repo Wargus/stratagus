@@ -1188,41 +1188,6 @@ global void InitUnitTypes(int reset_player_stats)
 	//
 	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[type]->Ident)
 		=UnitTypes[type];
-	//
-	//	Hardcoded incomes, FIXME: should be moved to some configs.
-	//
-	if( !strcmp(UnitTypes[type]->Ident,"unit-elven-lumber-mill") ) {
-	    UnitTypes[type]->ImproveIncomes[WoodCost]=
-		    DefaultIncomes[WoodCost]+25;
-	}
-	if( !strcmp(UnitTypes[type]->Ident,"unit-troll-lumber-mill") ) {
-	    UnitTypes[type]->ImproveIncomes[WoodCost]=
-		    DefaultIncomes[WoodCost]+25;
-	}
-	if( !strcmp(UnitTypes[type]->Ident,"unit-human-refinery") ) {
-	    UnitTypes[type]->ImproveIncomes[OilCost]=
-		    DefaultIncomes[OilCost]+25;
-	}
-	if( !strcmp(UnitTypes[type]->Ident,"unit-orc-refinery") ) {
-	    UnitTypes[type]->ImproveIncomes[OilCost]=
-		    DefaultIncomes[OilCost]+25;
-	}
-	if( !strcmp(UnitTypes[type]->Ident,"unit-keep") ) {
-	    UnitTypes[type]->ImproveIncomes[GoldCost]=
-		    DefaultIncomes[GoldCost]+10;
-	}
-	if( !strcmp(UnitTypes[type]->Ident,"unit-stronghold") ) {
-	    UnitTypes[type]->ImproveIncomes[GoldCost]=
-		    DefaultIncomes[GoldCost]+10;
-	}
-	if( !strcmp(UnitTypes[type]->Ident,"unit-castle") ) {
-	    UnitTypes[type]->ImproveIncomes[GoldCost]=
-		    DefaultIncomes[GoldCost]+20;
-	}
-	if( !strcmp(UnitTypes[type]->Ident,"unit-fortress") ) {
-	    UnitTypes[type]->ImproveIncomes[GoldCost]=
-		    DefaultIncomes[GoldCost]+20;
-	}
     }
 
     // LUDO : called after game is loaded -> don't reset stats !
