@@ -676,7 +676,7 @@ global void SaveUpgrades(CLFile* file)
 /**
 **  Define a new upgrade modifier.
 **
-**  @param list  List of modifiers.
+**  @param l  List of modifiers.
 */
 local int CclDefineModifier(lua_State* l)
 {
@@ -834,7 +834,7 @@ local int CclDefineModifier(lua_State* l)
 /**
 **  Define a new upgrade.
 **
-**  @param list  List defining the upgrade.
+**  @param l  List defining the upgrade.
 */
 local int CclDefineUpgrade(lua_State* l)
 {
@@ -974,7 +974,7 @@ local int CclDefineAllow(lua_State* l)
 /**
 **  Define upgrade mapping from original number to internal symbol
 **
-**  @param list  List of all names.
+**  @param l  List of all names.
 */
 local int CclDefineUpgradeWcNames(lua_State* l)
 {
@@ -1028,19 +1028,20 @@ global void UpgradesCclRegister(void)
 /**
 **  Add a upgrade modifier.
 **
-**  @param uid              Upgrade identifier of the modifier.
-**  @param attack_range     Attack range modification.
-**  @param sight_range      Sight range modification.
-**  @param basic_damage     Basic damage modification.
-**  @param piercing_damage  Piercing damage modification.
-**  @param armor            Armor modification.
-**  @param speed            Speed modification (Currently not possible).
-**  @param hit_points       Hitpoint modification.
-**  @param costs            Costs modification.
-**  @param units            Changes in allowed units.
-**  @param af_upgrades      Changes in allow upgrades.
-**  @param apply_to         Applies to this units.
-**  @param convert_to       Converts units to this unit-type.
+**  @param uid                Upgrade identifier of the modifier.
+**  @param attack_range       Attack range modification.
+**  @param sight_range        Sight range modification.
+**  @param basic_damage       Basic damage modification.
+**  @param piercing_damage    Piercing damage modification.
+**  @param armor              Armor modification.
+**  @param speed              Speed modification (Currently not possible).
+**  @param hit_points         Hitpoint modification.
+**  @param regeneration_rate  Regenerations modification.
+**  @param costs              Costs modification.
+**  @param units              Changes in allowed units.
+**  @param af_upgrades        Changes in allow upgrades.
+**  @param apply_to           Applies to this units.
+**  @param convert_to         Converts units to this unit-type.
 **
 **  @return                 upgrade modifier id or -1 for error
 **                          (actually this id is useless, just error checking)
