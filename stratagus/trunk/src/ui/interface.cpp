@@ -456,8 +456,8 @@ local void UiToggleBigMap(void)
 
 		TheUI.MapArea.X = 0;
 		TheUI.MapArea.Y = 0;
-		TheUI.MapArea.EndX = ((VideoWidth / TileSizeX) * TileSizeX) - 1;
-		TheUI.MapArea.EndY = ((VideoHeight / TileSizeY) * TileSizeY) - 1;
+		TheUI.MapArea.EndX = VideoWidth - 1;
+		TheUI.MapArea.EndY = VideoHeight - 1;
 
 		SetViewportMode(TheUI.ViewportMode);
 
