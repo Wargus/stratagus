@@ -153,7 +153,7 @@ static void MixMusicToStereo32(int* buffer, int size)
 		size = MusicSample->Type->Read(MusicSample, tmp, len / div);
 
 		n = ConvertToStereo32((char*)(tmp), (char*)buf, MusicSample->Frequency,
-			MusicSample->SampleSize / 8, MusicSample->Channels, len / div);
+			MusicSample->SampleSize / 8, MusicSample->Channels, size);
 
 		for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 			// Add to our samples
