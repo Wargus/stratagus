@@ -29,17 +29,12 @@ startool.dsp
 startool.plg
 startool___Win32_Debug
 startool___Win32_Release
-wartool.dsp
-wartool.plg
-wartool___Win32_Debug
-wartool___Win32_Release
 war1tool.dsp
 war1tool.plg
 war1tool___Win32_Debug
 war1tool___Win32_Release
 *.log
 preferences*
-data.wc2
 screen*
 *.pud.gz
 autom4te.cache
