@@ -3790,15 +3790,21 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
     GetInfoFromSelectPath();
 
     menu = FindMenu("menu-custom-game");
-    for (n = j = 0; j < PlayerMax; j++) {
-	t = ScenSelectPudInfo->PlayerType[j];
-	if (t == PlayerPerson || t == PlayerComputer) {
-	    n++;
-	}
-    }
-    menu->items[12].d.pulldown.noptions = n;
-    if (menu->items[12].d.pulldown.curopt >= n) {
+    // FIXME: This check is only needed until GetCmInfo works
+    if (!ScenSelectPudInfo) {
+	menu->items[12].d.pulldown.noptions = PlayerMax-1;
 	menu->items[12].d.pulldown.curopt = 0;
+    } else {
+	for (n = j = 0; j < PlayerMax; ++j) {
+	    t = ScenSelectPudInfo->PlayerType[j];
+	    if (t == PlayerPerson || t == PlayerComputer) {
+		n++;
+	    }
+	}
+	menu->items[12].d.pulldown.noptions = n;
+	if (menu->items[12].d.pulldown.curopt >= n) {
+	    menu->items[12].d.pulldown.curopt = 0;
+	}
     }
 }
 
