@@ -1763,9 +1763,13 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 
 			XFlush(display);
 
-			XGetWindowProperty(display, window, XA_STRING, 0, 1024, False, 
-			    AnyPropertyType, &rettype, &retform, &nitem, 
-			    &dummy, (unsigned char **)&clipboard);
+			// FIXME: loops 4 times or until we get selection, need to use proper way
+			clipboard = NULL;
+			for ( i = 0; i < 5 && !clipboard; ++i) {
+			    XGetWindowProperty(display, window, XA_STRING, 0, 1024, False, 
+				AnyPropertyType, &rettype, &retform, &nitem, 
+				&dummy, (unsigned char **)&clipboard);
+			}
 
 			XDestroyWindow(display, window);
 			XCloseDisplay(display);
