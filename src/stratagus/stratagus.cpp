@@ -550,11 +550,26 @@ local void PrintHeader(void)
 #ifdef USE_SDLA
     "SDL-AUDIO "
 #endif
+#ifdef USE_SDLCD
+    "SDL-CD "
+#endif
 #ifdef USE_X11
     "X11 "
 #endif
 #ifdef WITH_SOUND
     "SOUND "
+#endif
+#ifdef USE_LIBCDA
+    "LIBCDA "
+#endif
+#ifdef USE_FLAC
+    "FLAC "
+#endif
+#ifdef USE_OGG
+    "OGG "
+#endif
+#ifdef USE_MAD
+    "MP3 "
 #endif
     // New features:
     "\nCompile feature "
