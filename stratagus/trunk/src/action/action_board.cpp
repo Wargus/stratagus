@@ -57,7 +57,7 @@ local int WaitForTransporter(Unit* unit)
 {
     Unit* trans;
 
-    unit->Wait=1;
+    unit->Wait=6;
     unit->Reset=1;
 
     trans=unit->Command.Data.Move.Goal;
@@ -66,6 +66,21 @@ local int WaitForTransporter(Unit* unit)
 	DebugLevel3("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
 	return 0;
     }
+#ifdef NEW_UNIT
+    if( trans->Destroyed ) {
+	DebugLevel0(__FUNCTION__": destroyed unit\n");
+	if( !--trans->Refs ) {
+	    ReleaseUnit(trans);
+	}
+	unit->Command.Data.Move.Goal=trans=NoUnitP;
+	return 0;
+    } else if( trans->Removed ||
+	    !trans->HP || trans->Command.Action==UnitActionDie ) {
+	--trans->Refs;
+	unit->Command.Data.Move.Goal=trans=NoUnitP;
+	return 0;
+    }
+#endif
 
     if( MapDistanceToUnit(unit->X,unit->Y,trans)==1 ) {
 	DebugLevel3("Enter transporter\n");
@@ -92,6 +107,21 @@ local void EnterTransporter(Unit* unit)
     unit->SubAction=0;
 
     transporter=unit->Command.Data.Move.Goal;
+#ifdef NEW_UNIT
+    if( transporter->Destroyed ) {
+	DebugLevel0(__FUNCTION__": destroyed unit\n");
+	if( !--transporter->Refs ) {
+	    ReleaseUnit(transporter);
+	}
+	return;
+    } else if( transporter->Removed ||
+	    !transporter->HP || transporter->Command.Action==UnitActionDie ) {
+	--transporter->Refs;
+	return;
+    }
+    --transporter->Refs;
+#endif
+
     //
     //	Find free slot in transporter.
     //
@@ -151,6 +181,9 @@ global void HandleActionBoard(Unit* unit)
 		    if( i==-1 ) {
 			if( ++unit->SubAction==200 ) {
 			    unit->Command.Action=UnitActionStill;
+			    if( unit->Command.Data.Move.Goal ) {
+				--unit->Command.Data.Move.Goal->Refs;
+			    }
 			    unit->SubAction=0;
 			}
 		    } else {
