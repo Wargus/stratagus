@@ -26,12 +26,12 @@
 <body>
     <h1>Stratagus Configuration Language Description: Config</h1>
 <hr><pre width=80>
-         _________ __                 __                               
+         _________ __                 __
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \ 
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-               \/                  \/          \//_____/            \/ 
+               \/                  \/          \//_____/            \/
     ______________________                           ______________________
 			  T H E   W A R   B E G I N S
 	   Stratagus - A free fantasy real time strategy game engine
@@ -39,13 +39,13 @@
 <p><b>(C) Copyright 2002-2003 by The Stratagus Project. Distributed under the
 <a href="../gpl.html">"GNU General Public License"</a></b>
 <hr>
-<a href="../stratagus.html">Stratagus</a> 
-<a href="../readme.html">Readme</a> 
-<a href="../faq.html">FAQ</a> 
-<a href="ccl.html">Script</a> 
-<a href="ai.html">PREV</a> 
-<a href="game.html">NEXT</a> 
-<a href="ccl-index.html">Index</a> 
+<a href="../stratagus.html">Stratagus</a>
+<a href="../readme.html">Readme</a>
+<a href="../faq.html">FAQ</a>
+<a href="ccl.html">Script</a>
+<a href="ai.html">PREV</a>
+<a href="game.html">NEXT</a>
+<a href="ccl-index.html">Index</a>
 <hr>
 <a href="#a-star">AStar()</a>
 <a href="#alpha-fog-of-war">AlphaFogOfWar()</a>
@@ -132,19 +132,23 @@ the performance, turn it off.
 The Cost of a move it 1 if moving straight, or 2 if moving diagonal.
 
 <dl>
-<dt>"fixed-unit-cost", number</dt>
-<dd>cost to move over a unit that is standing still. (must be greater than 3)</dd>
-<dt>"moving-unit-cost", number</dt>
-<dd>cost to move over a unit that is moving to somewhere. (must be greater than 3)</dd>
-<dt>"unseen-terrain", number</dt>
-<dd>Whether the pathfinder treats unknown terrain as visible when calculating paths or not. &lt;'dont-know-unseen-terrain|'know-unseen-terrain&gt;</dd>
-<dt>"unseen-terrain-cost", number</dt>
-<dd>Extra cost to move on unseen terrain, makes units tend towards know areas when finding paths.</dd>
-<dt>"know-unseen-terrain"</dt>
-<dd>consider (FIXME ? AI and human ?) know(s) all the terrain.</dd>
-<dt>"dont-know-unseen-terrain"</dt>
-<dd>consider (FIXME ? AI and human ?) do(es)n't know all the terrain.</dd>
-
+  <dt>"fixed-unit-cost", number</dt>
+  <dd>cost to move over a unit that is standing still. (must be greater than 3)
+  </dd>
+  <dt>"moving-unit-cost", number</dt>
+  <dd>cost to move over a unit that is moving to somewhere. (must be greater than 3)
+  </dd>
+  <dt>"unseen-terrain", number</dt>
+  <dd>Whether the pathfinder treats unknown terrain as visible when calculating paths or not. &lt;'dont-know-unseen-terrain|'know-unseen-terrain&gt;
+  </dd>
+  <dt>"unseen-terrain-cost", number</dt>
+  <dd>Extra cost to move on unseen terrain, makes units tend towards know areas when finding paths.
+  </dd>
+  <dt>"know-unseen-terrain"</dt>
+  <dd>consider (FIXME ? AI and human ?) know(s) all the terrain.</dd>
+  <dt>"dont-know-unseen-terrain"</dt>
+  <dd>consider (FIXME ? AI and human ?) do(es)n't know all the terrain.</dd>
+</dl>
 <h4>Example</h4>
 <pre>
 AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "unseen-terrain-cost", 2)
@@ -463,7 +467,7 @@ Set the default menu background.
 
 <dl>
   <dt>"image-file"</dt>
-  <dd>Image to be displayed as menu background, this is the second screen 
+  <dd>Image to be displayed as menu background, this is the second screen
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
   </dd>
 </dl>
@@ -647,7 +651,7 @@ Possible tags:
 
 <dl>
   <dt>Image = "filepath"</dt>
-  <dd>Image or video to be displayed as title screen, this is the first screen 
+  <dd>Image or video to be displayed as title screen, this is the first screen
 displayed. The image should be a png file with 640x480 8-bit indexed colormap.
   </dd>
 <dt>Music = "filepath" or "none"</dt>
