@@ -32,9 +32,187 @@
 /**
 **      @page NetworkModule Module - Network
 **
-**      @subsection Basics How does it work.
+**      @section Basics How does it work.
 **
-**      @subsection API How should it be used.
+**	FreeCraft uses an UDP peer to peer protocol (p2p). The default port
+**	is 6660.
+**
+**	@subsection udp_vs_tcp UDP vs. TCP
+**
+**	UDP is a connectionless protocol. This means it does not perform
+**	retransmission of data and therefore provides very few error recovery
+**	services. UDP instead offers a direct way to send and receive
+**	datagrams (packets) over the network; it is used primarily for
+**	broadcasting messages.
+**
+**	TCP, on the other hand, provides a connection-based, reliable data
+**	stream.  TCP guarantees delivery of data and also guarantees that
+**	packets will be delivered in the same order in which they were sent.
+**
+**	TCP is a simple and effective way of transmitting data. For making sure
+**	that a client and server can talk to each other it is very good.
+**	However, it carries with it a lot of overhead and extra network lag.
+**
+**	UDP needs less overhead and has a smaller lag. Which is very important
+**	for real time games. The disadvantages includes:
+**
+**	@li You won't have an individual socket for each client.
+**	@li Given that clients don't need to open a unique socket in order to
+**		transmit data there is the very real possibility that a client
+**		who is not logged into the game will start sending all kinds of
+**		garbage to your server in some kind of attack. It becomes much
+**		more difficult to stop them at this point.
+**	@li Likewise, you won't have a clear disconnect/leave game message
+**		unless you write one yourself.
+**	@li Some data may not reach the other machine, so you may have to send
+**		important stuff many times.
+**	@li Some data may arrive in the wrong order. Imagine that you get
+**		package 3 before package 1. Even a package can come duplicate.
+**	@li UDP is connectionless and therefore has problems with firewalls.
+**
+**	I have choosen UDP. Additional support for the TCP protocol is welcome.
+**
+**	@subsection sc_vs_p2p server/client vs. peer to peer
+**
+**	@li server to client
+**
+**	The player input is send to the server. The server collects the input
+**	of all players and than send the commands to all clients.
+**
+**	@li peer to peer (p2p)
+**
+**	The player input is direct send to all others clients in game.
+**
+**	p2p has the advantage of a smaller lag, but needs a higher bandwidth
+**	by the clients.
+**
+**	I have choosen p2p. Additional support for a server to client protocol
+**	is welcome.
+**
+**	@subsection bandwidth bandwidth
+**
+**	I wanted to support up to 8 players with 28.8kbit modems.
+**
+**	Most modems have a bandwidth of 28.8K bits/second (both directions) to
+**	56K bits/second (33.6K uplink) It takes actually 10 bits to send 1 byte.
+**	This makes calculating how many bytes you are sending easy however, as
+**	you just need to divide 28800 bits/second by 10 and end up with 2880
+**	bytes per second.
+**
+**	We want to send many packets, more updated pro second and big packets,
+**	less protocol overhead.
+**
+**	If we do an update 6 times per second, leaving approximately 480 bytes
+**	per update in an ideal environment.
+**
+**	For the TCP/IP protocol we need following:
+**	IP  Header 20 bytes
+**	UDP Header 8  bytes
+**
+**	With 10 bytes per command and 4 commands this are 68 (20+8+4*10) bytes
+**	pro packet.  Sending it to 7 other players, gives 476 bytes pro update.
+**	This means we could do 6 updates (each 166ms) pro second.
+**
+**	@subsection a_packet Network packet
+**
+**	@li [IP  Header - 20 bytes]
+**	@li [UDP Header -  8 bytes]
+**	@li [Type 1 byte][Frame 1 byte][Data 8 bytes] - Slot 0
+**	@li [Type 1 byte][Frame 1 byte][Data 8 bytes] - Slot 1
+**	@li [Type 1 byte][Frame 1 byte][Data 8 bytes] - Slot 2
+**	@li [Type 1 byte][Frame 1 byte][Data 8 bytes] - Slot 3
+**
+**	@subsection internals Putting it together
+**
+**	All computers in play must run absolute syncron. Only user commands
+**	are send over the network to the other computers. The command needs
+**	some time to reach the other clients (lag), so the command is not
+**	executed immediatly on the local computer, it is stored in a delay
+**	queue and send to all other clients. After a delay of ::NetworkLag
+**	frames the commands of the other players are received and executed
+**	together with the local command. Each ::NetworkUpdates frames there
+**	must a package send, to keep the clients in sync, if there is no user
+**	command, a dummy sync package is send.
+**	To avoid too much trouble with lost packages, a package contains 
+**	::NetworkDups commands, the latest and ::NetworkDups-1 old.
+**	If there are missing packages, the game is paused and old commands
+**	are resend to all clients.
+**
+**	@section missing What features are missing
+**
+**	@li A possible improvement is to compress the sync message, this allows
+**	    to lose more packets.
+**
+**	@li The recover from lost packets can be improved, if the server knows
+**	    which packets the clients have received.
+**
+**	@li The UDP protocol isn't good for firewalls, we need also support
+**	    for the TCP protocol.
+**
+**	@li Add a server / client protocol, which allows more players pro
+**	    game.
+**
+**	@li Lag (latency) and bandwidth are set over the commandline. This
+**	    should be automatic detected during game setup and later during
+**	    game automatic adapted.
+**
+**	@li Also it would be nice, if we support viewing clients. This means
+**	    other people can view the game in progress. 
+**
+**	@li The current protocol only uses single cast, for local LAN we
+**	    should also support broadcast and multicast.
+**
+**      @li Proxy and relays should be supported, to improve the playable
+**	    over the internet.
+**
+**	@li Currently the 4 slots are filled with package in sequence, but
+**	    dropouts are normal short and then hits the same package. If we
+**	    interleave the package, we are more resistent against short
+**	    dropouts.
+**
+**	@li If we move groups, the commands are send for each unit separated.
+**	    It would be better to transfer the group first and than only a
+**	    single command for the complete group.
+**
+**	@li The frame is transfered for each slot, this is not needed. We
+**	    can save some bytes if we compress this.
+**
+**	@li We can sort the command by importants, currently all commands are
+**	    send in order, only chat messages are send if there are free slots.
+**
+**	@li password protection the login process (optional), to prevent that
+**	    the wrong player join an open network game.
+**
+**	@li add meta server support, i have planned to use bnetd and its
+**	    protocol.
+**
+**      @section api API How should it be used.
+**
+**	::InitNetwork1()
+**
+**	::InitNetwork2()
+**
+**	::ExitNetwork1()
+**
+**	::NetworkSendCommand()
+**
+**	::NetworkEvent()
+**
+**	::NetworkQuit()
+**
+**	::NetworkChatMessage()
+**
+**	::NetworkEvent()
+**
+**	::NetworkRecover()
+**
+**	::NetworkCommands()
+**
+**	::NetworkFildes
+**
+**	::NetworkInSync
+**
+**	@todo FIXME: continue docu
 */
 
 // FIXME: should split the next into small modules!
