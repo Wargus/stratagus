@@ -1390,7 +1390,6 @@ void CleanMissiles(void)
 {
 	Missile** missiles;
 	Missile* missile;
-	char** sp;
 
 	for (missiles = GlobalMissiles; (missile = *missiles); ++missiles) {
 		free(missile);
