@@ -74,7 +74,7 @@ char	**argv, *opts;
     optopt = c = argv[optind][sp];
     if (c == ':' || (cp = strchr(opts, c)) == NULL)
     {
-	getopt_err(argv[0], ": illegal option -", c);
+	getopt_err(argv[0], ": illegal option -", (char)c);
 	cp = "xx";	/* make the next if false */
 	c = '?';
     }
@@ -86,7 +86,7 @@ char	**argv, *opts;
 	    optarg = argv[optind++];
 	else
 	{
-	    getopt_err(argv[0], ": option requires an argument -", c);
+	    getopt_err(argv[0], ": option requires an argument -", (char)c);
 	    c = (*opts == ':') ? ':' : '?';
 	}
 	sp = 1;

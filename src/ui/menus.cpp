@@ -821,6 +821,9 @@ local Menuitem NetMultiSetupMenuItems[] = {
     //{ MI_TYPE_GEM, 538, 32+22*7, 0, LargeFont, NULL, NULL,
     //	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
 #else
+#define SERVER_PLAYER_STATE	5
+#define SERVER_PLAYER_READY	30
+#define SERVER_PLAYER_LAG	44
     { 0 }
 #endif
 };
@@ -956,6 +959,13 @@ local Menuitem NetMultiClientMenuItems[] = {
     //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL,
     //	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
 #else
+#define CLIENT_PLAYER_STATE	5
+#define CLIENT_RACE	21
+#define CLIENT_RESOURCE	23
+#define CLIENT_UNITS	25
+#define CLIENT_FOG_OF_WAR	27
+#define CLIENT_TILESET	29
+#define CLIENT_PLAYER_READY	30
     { 0 }
 #endif
 };
