@@ -10,7 +10,7 @@
 //
 /**@name ccl_ui.c	-	The ui ccl functions. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//	(c) Copyright 1999-2004 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -5804,6 +5804,7 @@ local int CclDefineMenuItem(lua_State* l)
 					lua_error(l);
 				}
 				item->mitype = MI_TYPE_VSLIDER;
+				item->d.vslider.defper = -1;
 
 				subargs = luaL_getn(l, j + 1);
 				for (k = 0; k < subargs; ++k) {
@@ -6099,6 +6100,7 @@ local int CclDefineMenuItem(lua_State* l)
 					lua_error(l);
 				}
 				item->mitype = MI_TYPE_HSLIDER;
+				item->d.hslider.defper = -1;
 
 				subargs = luaL_getn(l, j + 1);
 				for (k = 0; k < subargs; ++k) {
