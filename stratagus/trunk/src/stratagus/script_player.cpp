@@ -814,7 +814,7 @@ local ScriptProxyType ScriptProxyPlayerEnemy;
 	/// Proxy type for Player->SharedVision
 local ScriptProxyType ScriptProxyPlayerSharedVision;
 	/// Proxy type for Player->UnitTypesCount
-local ScriptProxyType ScriptProxtPlayerUnitTypesCount;
+local ScriptProxyType ScriptProxyPlayerUnitTypesCount;
 
 /**
 **	Get function for the big Players namespace, with int index
@@ -852,6 +852,12 @@ local int ScriptPlayerGet(Player* player, const char* key, lua_State* l)
 	META_GET_INT("TotalBuildings", player->TotalBuildings);
 	META_GET_INT("TotalRazings", player->TotalRazings);
 	META_GET_INT("TotalKills", player->TotalKills);
+
+	META_GET_USERDATA("Allied", player, &ScriptProxyPlayerAllied);
+	META_GET_USERDATA("Enemy", player, &ScriptProxyPlayerEnemy);
+	META_GET_USERDATA("SharedVision", player, &ScriptProxyPlayerSharedVision);
+	META_GET_USERDATA("UnitTypesCount", player, &ScriptProxyPlayerUnitTypesCount);
+	META_GET_USERDATA("Research", player, &ScriptProxyPlayer);
 
 	LuaError(l, "Field \"%s\" is innexistent or write-only (yes, we have those).\n" _C_ key);
 }
@@ -995,6 +1001,10 @@ global void ScriptPlayerInit(void)
 	ScriptProxyTypeInitBlock(&ScriptProxyPlayerSharedVision);
 	ScriptProxyPlayerSharedVision.GetInt = (ScriptGetSetIntFunction *)ScriptPlayerSharedVisionGet;
 	ScriptProxyPlayerSharedVision.SetInt = (ScriptGetSetIntFunction *)ScriptPlayerSharedVisionSet;
+
+	ScriptProxyTypeInitBlock(&ScriptProxyPlayerUnitTypesCount);
+	ScriptProxyPlayerUnitTypesCount.GetStr = (ScriptGetSetStrFunction *)ScriptPlayerUnitTypesCountGetStr;
+	ScriptProxyPlayerUnitTypesCount.GetInt = (ScriptGetSetIntFunction *)ScriptPlayerUnitTypesCountGetInt;
 
 	// Create Stratagus.Players namespace.
 	lua_pushstring(Lua, "Players");

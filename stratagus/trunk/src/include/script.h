@@ -211,6 +211,14 @@ extern int ScriptGetSetIntBlock(void* object, int index, lua_State* l);
 	} \
 }*/
 
+#define META_GET_USERDATA(keyval, obj, type) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		ScriptCreateUserdata(l, obj, type); \
+		return 1; \
+	} \
+}
+
 #endif // META_LUA
 
 //@}
