@@ -508,7 +508,11 @@ local void EnableDrawRefresh(void)
 global void GameMainLoop(void)
 {
     EventCallback callbacks;
+#ifdef DEBUG
+    static int showtip;
+#else
     int showtip;
+#endif
 
     callbacks.ButtonPressed=(void*)HandleButtonDown;
     callbacks.ButtonReleased=(void*)HandleButtonUp;
