@@ -56,6 +56,8 @@ extern UnitType* CclGetUnitType(SCM ptr);
 #define ALL_FOODUNITS	((const UnitType*)-2)
 #define ALL_BUILDINGS	((const UnitType*)-3)
 
+#define MAX_SWITCH	256		/// Maximum number of switches
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -65,6 +67,7 @@ global Timer GameTimer;			/// The game timer
 local unsigned long WaitFrame;		/// Frame to wait for
 local SCM WaitScript;			/// Script to run after wait is over
 local SCM WaitTrigger;			/// Old Trigger value during wait
+local unsigned char Switch[MAX_SWITCH];	/// Switches
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -752,6 +755,34 @@ local SCM CclIfTimer(SCM operation,SCM quantity)
     return SCM_BOOL_F;
 }
 
+/**
+**	Check the switch value
+*/
+local SCM CclIfSwitch(SCM number,SCM set)
+{
+    int i;
+    unsigned char s;
+
+    i=gh_scm2int(number);
+    if( i<0 || i>=MAX_SWITCH ) {
+	errl("Invalid switch number",number);
+    }
+
+    if( gh_boolean_p(set) ) {
+	s=gh_scm2bool(set);
+    } else {
+	s=gh_scm2int(set);
+	if( s ) {
+	    s=1;
+	}
+    }
+
+    if( Switch[i]==s ) {
+	return SCM_BOOL_T;
+    }
+    return SCM_BOOL_F;
+}
+
 // --------------------------------------------------------------------------
 //	Actions
 
@@ -828,6 +859,32 @@ local SCM CclActionWait(SCM ms)
     WaitFrame=FrameCounter+
 	(FRAMES_PER_SECOND*VideoSyncSpeed/100*gh_scm2int(ms)+999)/1000;
     return SCM_UNSPECIFIED;
+}
+
+/**
+**	Action stop timer
+*/
+local SCM CclActionSetSwitch(SCM number,SCM set)
+{
+    int i;
+    unsigned char s;
+
+    i=gh_scm2int(number);
+    if( i<0 || i>=MAX_SWITCH ) {
+	errl("Invalid switch number",number);
+    }
+
+    if( gh_boolean_p(set) ) {
+	s=gh_scm2bool(set);
+    } else {
+	s=gh_scm2int(set);
+	if( s ) {
+	    s=1;
+	}
+    }
+
+    Switch[i]=s;
+    return set;
 }
 
 /**
@@ -1005,6 +1062,7 @@ global void TriggerCclRegister(void)
     gh_new_procedure3_0("if-score",CclIfScore);
     gh_new_procedure2_0("if-elapsed",CclIfElapsed);
     gh_new_procedure2_0("if-timer",CclIfTimer);
+    gh_new_procedure2_0("if-switch",CclIfSwitch);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);
     gh_new_procedure0_0("action-defeat",CclActionDefeat);
@@ -1013,6 +1071,7 @@ global void TriggerCclRegister(void)
     gh_new_procedure0_0("action-start-timer",CclActionStartTimer);
     gh_new_procedure0_0("action-stop-timer",CclActionStopTimer);
     gh_new_procedure1_0("action-wait",CclActionWait);
+    gh_new_procedure2_0("action-set-switch",CclActionSetSwitch);
 
     gh_define("*triggers*",NIL);
 }
@@ -1161,6 +1220,8 @@ global void InitTriggers(void)
 	DebugLevel0Fn("Default triggers\n");
 	gh_apply(symbol_value(gh_symbol2scm("single-player-triggers"),NIL),NIL);
     }
+
+    memset(Switch,0,sizeof(Switch));
 }
 
 /**
