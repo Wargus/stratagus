@@ -518,7 +518,7 @@ local SCM CclSetGlobalSoundRange(SCM distance)
 **	@param sound the sound id or name of the sound
 *	@range the new range for this sound
 */
-local SCM CclSetSoundRange(SCM sound,SCM range)
+local SCM CclSetSoundRange(SCM sound,SCM range __attribute((unused)))
 {
     return sound;
 }
@@ -544,7 +544,7 @@ local SCM CclDisplaySounds(void)
 **	Glue between c and scheme. Ask the sound system to associate a sound
 **	id to a sound name.
 */
-local SCM CclSoundForName(SCM name)
+local SCM CclSoundForName(SCM name __attribute((unused)))
 {
     return NIL;
 }
@@ -553,7 +553,7 @@ local SCM CclSoundForName(SCM name)
 **	Glue between c and scheme. Allows to specify some global game sounds
 **	in a ccl file.
 */
-local SCM CclDefineGameSounds(SCM list)
+local SCM CclDefineGameSounds(SCM list __attribute((unused)))
 {
     return NIL;
 }
@@ -567,7 +567,7 @@ local SCM CclDefineGameSounds(SCM list)
 **
 **	@return the sound object
 */
-local SCM CclMapSound(SCM name,SCM sound)
+local SCM CclMapSound(SCM name __attribute((unused)),SCM sound)
 {
     return sound;
 }
@@ -577,7 +577,7 @@ local SCM CclMapSound(SCM name,SCM sound)
 **
 **	@param name	Name of the music file to play.
 */
-local SCM CclPlayMusic(SCM name)
+local SCM CclPlayMusic(SCM name __attribute((unused)))
 {
     return SCM_UNSPECIFIED;
 }
