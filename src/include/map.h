@@ -381,6 +381,8 @@ extern int AnyAreaVisibleInMap( int sx, int sy, int ex, int ey );
 extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
     /// Set all entries in MustRedrawRow and MustRedrawTile
 extern  void MarkDrawEntireMap(void);
+    /// Check if any part of an area is visible
+extern int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
 
 //
 //	in map_fog.c
