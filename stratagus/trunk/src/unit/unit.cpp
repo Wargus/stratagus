@@ -198,9 +198,6 @@ global void ReleaseUnit(Unit* unit)
 		//
 		unit->Destroyed = 1;				// mark as destroyed
 
-#ifdef HIERARCHIC_PATHFINDER
-		PfHierReleaseData(unit);
-#endif
 		if (--unit->Refs > 0) {
 			DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle _C_
 			UnitNumber(unit) _C_ unit->Refs);
@@ -463,16 +460,6 @@ global void PlaceUnit(Unit* unit, int x, int y)
 		}
 	}
 
-#ifdef not_needed_JOHNS_HIERARCHIC_PATHFINDER
-	//
-	//		Update hierarchic pathfinder structures.
-	//
-	if (type->Building) {
-		PfHierMapChangedCallback(x, y,
-			x + type->TileWidth - 1, y + type->TileHeight - 1);
-	}
-#endif
-
 #ifdef MAP_REGIONS
 	if (type->Building &&
 			(type->FieldFlags &
@@ -645,15 +632,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 			TheMap.Fields[unit->X + w + (unit->Y + h) * TheMap.Width].Flags &= flags;
 		}
 	}
-#ifdef HIERARCHIC_PATHFINDER
-	//
-	//		Update hierarchic pathfinder structures.
-	//
-	if (type->Building) {
-		PfHierMapChangedCallback(unit->X, unit->Y,
-			unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
-	}
-#endif
 
 #ifdef MAP_REGIONS
 	//
@@ -1467,35 +1445,6 @@ global int CheckUnitToBeDrawn(Unit* unit)
 #endif
 	return 0;
 }
-
-#ifdef HIERARCHIC_PATHFINDER		// {
-
-// hack
-#include "../pathfinder/pf_lowlevel.h"
-
-/**
-**		FIXME: Docu
-*/
-global int UnitGetNextPathSegment(const Unit* unit, int* dx, int* dy)
-{
-	int segment;
-	int shift;
-	int neighbor;
-
-	if (unit->Data.Move.Length <= 0) {
-		return 0;
-		// *dx and *dy returned to the caller are invalid
-	}
-
-	segment = unit->Data.Move.Length - 1;
-	shift = segment % 2 ? 4 : 0;
-	neighbor = (unit->Data.Move.Path[segment / 2] >> shift) & 0xf;
-	*dx = Neighbor[neighbor].dx;
-	*dy = Neighbor[neighbor].dy;
-	return 1;
-}
-
-#endif // } HIERARCHIC_PATHFINDER
 
 /**
 **		Change the unit's owner
