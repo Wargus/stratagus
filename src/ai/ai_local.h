@@ -354,6 +354,8 @@ extern int AiFindBuildingPlace(const Unit*, const UnitType * , int *, int *);
 //
 //	Forces
 //
+    /// Cleanup units in force
+extern void AiCleanForces(void);
     /// Assign a new unit to a force
 extern void AiAssignToForce(Unit* unit);
     /// Assign a free units to a force
