@@ -2328,23 +2328,22 @@ local char *SaveDir;
 local void SaveAction(void)
 {
     char *filename;
-    char *prefix = SaveGameMenuItems[1].d.input.buffer;
-    size_t prefixLength;
+    char *name = SaveGameMenuItems[1].d.input.buffer;
+    size_t nameLength;
 
-    prefixLength = strlen(prefix);
-    prefixLength -= 3;
-    if ( (filename = malloc(prefixLength)) == NULL)
+    nameLength = strlen(name);
+    nameLength -= 3;
+    if ( (filename = malloc(256)) == NULL)
     {
         fprintf(stderr,
-                  "Can't save \"%s\": %s", prefix, strerror(errno));
-        SetMessage("Can't save \"%s\": %s", prefix, strerror(errno));
+                  "Can't save \"%s\": %s", name, strerror(errno));
+        SetMessage("Can't save \"%s\": %s", name, strerror(errno));
         return;
     }
-    
-    strcpy(filename, "/");
-    strncpy(filename, SaveDir, strlen(SaveDir)+1);
-    strncat(filename + strlen(SaveDir), "/", 1+1);
-    strncat(filename + 1+1, prefix, prefixLength);
+
+    strcpy(filename, SaveDir);
+    strcat(filename, "/");
+    strncat(filename, name, nameLength);
 
     SaveGame(filename);
 
@@ -2363,7 +2362,7 @@ local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 SaveDir="save";
 mkdir(SaveDir);
 #else
-char *path = malloc(1);
+char *path = malloc(256);
 
 strcpy(path,getenv("HOME"));
 strcat(path,"/");
@@ -2371,7 +2370,9 @@ strcat(path,FREECRAFT_HOME_PATH);
 mkdir(path,0777);
 strcat(path,"/save");
 mkdir(path,0777);
-strncpy(SaveDir, buffer, strlen(buffer));
+SaveDir = malloc(strlen(path)+1);
+strcpy(SaveDir, path);
+free(path);
 #endif
 }
 
