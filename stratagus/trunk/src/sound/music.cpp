@@ -363,12 +363,12 @@ global void PlayMusic(const char* name)
 #endif
 #ifdef USE_MAD
     if ((sample = LoadMp3(name, PlayAudioStream))) {
-	if (sample->Channels != 2 || sample->SampleSize != 16
-	    || sample->Frequency != SoundFrequency) {
-	    DebugLevel0Fn("Not supported music format\n");
-	    SoundFree(sample);
-	    return;
-	}
+//	if (sample->Channels != 2 || sample->SampleSize != 16
+//	    || sample->Frequency != SoundFrequency) {
+//	    DebugLevel0Fn("Not supported music format\n");
+//	    SoundFree(sample);
+//	    return;
+//	}
 	StopMusic();
 	MusicSample = sample;
 	PlayingMusic = 1;
