@@ -17,7 +17,7 @@
 //		Real quad tree.
 //		Priority search tree.
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1010,6 +1010,8 @@ global void InitUnitCache(void)
 #include "unit.h"
 #include "map.h"
 
+#define InvalidUnit 0xffff
+
 #define STATISTICS
 
 #ifdef STATISTICS
@@ -1030,39 +1032,40 @@ static struct unit_cache_stats UnitCacheStats;
 global void UnitCacheInsert(Unit* unit)
 {
     MapField* mf;
-    int x, y;
+    int x;
+    int y;
 
 #ifdef STATISTICS
     UnitCacheStats.Inserts++;
 #endif
-    mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
-    for (y=0; y<unit->Type->TileHeight; y++) {
-	for (x=0; x<unit->Type->TileWidth; x++) {
+    mf = TheMap.Fields + unit->Y*TheMap.Width + unit->X;
+    for (y = 0; y < unit->Type->TileHeight; ++y) {
+	for (x = 0; x < unit->Type->TileWidth; ++x) {
 	    switch (unit->Type->UnitType) {
-	    case UnitTypeLand:
-		if (unit->Type->Building) {
-		    DebugCheck (mf->Building != 0xffff);
-		    mf->Building = UnitNumber (unit);
-		} else {
-		    DebugCheck (mf->LandUnit != 0xffff);
-		    mf->LandUnit = UnitNumber (unit);
-		}
-		break;
-	    case UnitTypeNaval:
-		if (unit->Type->Building) {
-		    DebugCheck (mf->Building != 0xffff);
-		    mf->Building = UnitNumber (unit);
-		} else {
-		    DebugCheck (mf->SeaUnit != 0xffff);
-		    mf->SeaUnit = UnitNumber (unit);
-		}
-		break;
-	    case UnitTypeFly:
-		DebugCheck (mf->AirUnit != 0xffff);
-		mf->AirUnit = UnitNumber (unit);
-		break;
-	    default:
-		break;
+		case UnitTypeLand:
+		    if (unit->Type->Building) {
+			DebugCheck(mf->Building != InvalidUnit);
+			mf->Building = UnitNumber(unit);
+		    } else {
+			DebugCheck(mf->LandUnit != InvalidUnit);
+			mf->LandUnit = UnitNumber(unit);
+		    }
+		    break;
+		case UnitTypeNaval:
+		    if (unit->Type->Building) {
+			DebugCheck(mf->Building != InvalidUnit);
+			mf->Building = UnitNumber(unit);
+		    } else {
+			DebugCheck(mf->SeaUnit != InvalidUnit);
+			mf->SeaUnit = UnitNumber(unit);
+		    }
+		    break;
+		case UnitTypeFly:
+		    DebugCheck(mf->AirUnit != InvalidUnit);
+		    mf->AirUnit = UnitNumber(unit);
+		    break;
+		default:
+		    break;
 	    }
 	    ++mf;
 	}
@@ -1077,40 +1080,41 @@ global void UnitCacheInsert(Unit* unit)
 */
 global void UnitCacheRemove(Unit* unit)
 {
-    MapField *mf;
-    int x, y;
+    MapField* mf;
+    int x;
+    int y;
 
 #ifdef STATISTICS
     UnitCacheStats.Removals++;
 #endif
-    mf=TheMap.Fields+unit->Y*TheMap.Width+unit->X;
-    for (y=0; y < unit->Type->TileHeight; y++) {
-	for (x=0; x < unit->Type->TileWidth; x++) {
+    mf = TheMap.Fields + unit->Y*TheMap.Width + unit->X;
+    for (y = 0; y < unit->Type->TileHeight; ++y) {
+	for (x = 0; x < unit->Type->TileWidth; ++x) {
 	    switch (unit->Type->UnitType) {
-	    case UnitTypeLand:
-		if (unit->Type->Building) {
-		    DebugCheck ( !(mf->Building == UnitNumber (unit)));
-		    mf->Building = 0xffff;
-		} else {
-		    DebugCheck ( !(mf->LandUnit == UnitNumber (unit)));
-		    mf->LandUnit = 0xffff;
-		}
-		break;
-	    case UnitTypeNaval:
-		if (unit->Type->Building) {
-		    DebugCheck ( !(mf->Building == UnitNumber (unit)));
-		    mf->Building = 0xffff;
-		} else {
-		    DebugCheck ( !(mf->SeaUnit == UnitNumber (unit)));
-		    mf->SeaUnit = 0xffff;
-		}
-		break;
-	    case UnitTypeFly:
-		DebugCheck ( !(mf->AirUnit == UnitNumber (unit)));
-		mf->AirUnit = 0xffff;
-		break;
-	    default:
-		break;
+		case UnitTypeLand:
+		    if (unit->Type->Building) {
+			DebugCheck(!(mf->Building == UnitNumber(unit)));
+			mf->Building = InvalidUnit;
+		    } else {
+			DebugCheck(!(mf->LandUnit == UnitNumber(unit)));
+			mf->LandUnit = InvalidUnit;
+		    }
+		    break;
+		case UnitTypeNaval:
+		    if (unit->Type->Building) {
+			DebugCheck(!(mf->Building == UnitNumber(unit)));
+			mf->Building = InvalidUnit;
+		    } else {
+			DebugCheck(!(mf->SeaUnit == UnitNumber(unit)));
+			mf->SeaUnit = InvalidUnit;
+		    }
+		    break;
+		case UnitTypeFly:
+		    DebugCheck(!(mf->AirUnit == UnitNumber(unit)));
+		    mf->AirUnit = InvalidUnit;
+		    break;
+		default:
+		    break;
 	    }
 	    ++mf;
 	}
@@ -1138,25 +1142,27 @@ global void UnitCacheChange(Unit* unit)
 **
 **	@return		True if both fields are occupied by the same unit
 */
-local int CheckLeft (const MapField *mf, int type)
+local int CheckLeft(const MapField* mf, int type)
 {
-    const MapField *left=mf-1;		// left neighbor of mf
+    const MapField* left;		// left neighbor of mf
+    
+    left = mf - 1;
 
     switch (type) {
-    case MapFieldBuilding:
-	return (BuildingOnMapField (left) && mf->Building==left->Building);
-	break;
-    case MapFieldLandUnit:
-	return (LandUnitOnMapField (left) && mf->LandUnit==left->LandUnit);
-	break;
-    case MapFieldSeaUnit:
-	return (SeaUnitOnMapField (left) && mf->SeaUnit==left->SeaUnit);
-	break;
-    case MapFieldAirUnit:
-	return (AirUnitOnMapField (left) && mf->AirUnit==left->AirUnit);
-	break;
-    default:
-	break;
+	case MapFieldBuilding:
+	    return (BuildingOnMapField(left) && mf->Building==left->Building);
+	    break;
+	case MapFieldLandUnit:
+	    return (LandUnitOnMapField(left) && mf->LandUnit==left->LandUnit);
+	    break;
+	case MapFieldSeaUnit:
+	    return (SeaUnitOnMapField(left) && mf->SeaUnit==left->SeaUnit);
+	    break;
+	case MapFieldAirUnit:
+	    return (AirUnitOnMapField(left) && mf->AirUnit==left->AirUnit);
+	    break;
+	default:
+	    break;
     }
     return 0;
 }
@@ -1170,25 +1176,27 @@ local int CheckLeft (const MapField *mf, int type)
 **
 **	@return		True if both fields are occupied by the same unit
 */
-local int CheckUpper (const MapField *mf, int type)
+local int CheckUpper(const MapField* mf, int type)
 {
-    const MapField *top=mf-TheMap.Width;	// top neighbor of mf
+    const MapField* top;	// top neighbor of mf
+    
+    top = mf - TheMap.Width;
 
     switch (type) {
-    case MapFieldBuilding:
-	return (BuildingOnMapField (top) && mf->Building==top->Building);
-	break;
-    case MapFieldLandUnit:
-	return (LandUnitOnMapField (top) && mf->LandUnit==top->LandUnit);
-	break;
-    case MapFieldSeaUnit:
-	return (SeaUnitOnMapField (top) && mf->SeaUnit==top->SeaUnit);
-	break;
-    case MapFieldAirUnit:
-	return (AirUnitOnMapField (top) && mf->AirUnit==top->AirUnit);
-	break;
-    default:
-	break;
+	case MapFieldBuilding:
+	    return (BuildingOnMapField(top) && mf->Building==top->Building);
+	    break;
+	case MapFieldLandUnit:
+	    return (LandUnitOnMapField(top) && mf->LandUnit==top->LandUnit);
+	    break;
+	case MapFieldSeaUnit:
+	    return (SeaUnitOnMapField(top) && mf->SeaUnit==top->SeaUnit);
+	    break;
+	case MapFieldAirUnit:
+	    return (AirUnitOnMapField(top) && mf->AirUnit==top->AirUnit);
+	    break;
+	default:
+	    break;
     }
     return 0;
 }
@@ -1231,18 +1239,19 @@ local int CheckUpper (const MapField *mf, int type)
 **	@return			Returns true if all of the fields requested
 **				by checktype are occupied by the same unit
 */
-local int NeighborCheck (const MapField *mf, int unittype, int checktype)
+local int NeighborCheck(const MapField* mf, int unittype, int checktype)
 {
     switch (checktype) {
-    case CHECK_NONE:
-    default:
-	return 1;
-    case CHECK_LEFT:
-	return ! CheckLeft (mf, unittype);
-    case CHECK_TOP:
-	return ! CheckUpper (mf, unittype);
-    case CHECK_BOTH:
-	return ! CheckLeft (mf, unittype) && ! CheckUpper (mf, unittype);
+	case CHECK_NONE:
+	    return 1;
+	case CHECK_LEFT:
+	    return !CheckLeft(mf, unittype);
+	case CHECK_TOP:
+	    return !CheckUpper(mf, unittype);
+	case CHECK_BOTH:
+	    return !CheckLeft(mf, unittype) && !CheckUpper(mf, unittype);
+	default:
+	    return 1;
     }
 }
 
@@ -1259,103 +1268,114 @@ local int NeighborCheck (const MapField *mf, int unittype, int checktype)
 **	@return		Returns the number of units found
 */
 //#include "rdtsc.h"
-global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
+global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 {
     int x;
     int y;
     int n;
-    const MapField *mf;
-    const MapField *mfptr;
+    const MapField* mf;
+    const MapField* mfptr;
 //  int ts0=rdtsc(), ts1;
 
 #ifdef STATISTICS
-    int i, fields_searched=(x2-x1)*(y2-y1);
-    for (i=1; i<=16; i++)
-	if ( (fields_searched >> i) == 0)
+    int i;
+    int fields_searched;
+    
+    fields_searched = (x2-x1) * (y2-y1);
+    for (i = 1; i <= 16; ++i) {
+	if ((fields_searched >> i) == 0) {
 	    break;
-    UnitCacheStats.Selects[i-1]++;
+	}
+    }
+    UnitCacheStats.Selects[i - 1]++;
 #endif /* STATISTICS */
 
-    if (x1<0) x1=0;
-    if (y1<0) y1=0;
-    if( x2>TheMap.Width-1 ) {
-	x2=TheMap.Width-1;
+    if (x1 < 0) {
+	x1 = 0;
     }
-    if( y2>TheMap.Height-1 ) {
-	y2=TheMap.Height-1;
+    if (y1 < 0) {
+	y1 = 0;
+    }
+    if (x2 > TheMap.Width-1) {
+	x2 = TheMap.Width-1;
+    }
+    if (y2 > TheMap.Height-1) {
+	y2 = TheMap.Height-1;
     }
 
     mf = TheMap.Fields + y1*TheMap.Width + x1;
 
     // the first row
-    for (x=x1, n=0, mfptr=mf; x<x2; x++, mfptr++) {
+    for (x = x1, n = 0, mfptr = mf; x < x2; ++x, ++mfptr) {
 	int checktype;
 
-	if (x==x1)
-	    checktype=CHECK_NONE;
-	else
-	    checktype=CHECK_LEFT;
+	if (x == x1) {
+	    checktype = CHECK_NONE;
+	} else {
+	    checktype = CHECK_LEFT;
+	}
 
-	if (BuildingOnMapField (mfptr))
-	    if (NeighborCheck (mfptr, MapFieldBuilding, checktype)) {
-		DebugCheck (!UnitSlots[mfptr->Building]);
-		table[n++]=UnitSlots[mfptr->Building];
+	if (BuildingOnMapField(mfptr))
+	    if (NeighborCheck(mfptr, MapFieldBuilding, checktype)) {
+		DebugCheck(!UnitSlots[mfptr->Building]);
+		table[n++] = UnitSlots[mfptr->Building];
 	    }
-	if (LandUnitOnMapField (mfptr))
-	    if (NeighborCheck (mfptr, MapFieldLandUnit, checktype)) {
-		DebugCheck (!UnitSlots[mfptr->LandUnit]);
-		table[n++]=UnitSlots[mfptr->LandUnit];
+	if (LandUnitOnMapField(mfptr))
+	    if (NeighborCheck(mfptr, MapFieldLandUnit, checktype)) {
+		DebugCheck(!UnitSlots[mfptr->LandUnit]);
+		table[n++] = UnitSlots[mfptr->LandUnit];
 	    }
-	if (SeaUnitOnMapField (mfptr))
-	    if (NeighborCheck (mfptr, MapFieldSeaUnit, checktype)) {
-		DebugCheck (!UnitSlots[mfptr->SeaUnit]);
-		table[n++]=UnitSlots[mfptr->SeaUnit];
+	if (SeaUnitOnMapField(mfptr))
+	    if (NeighborCheck(mfptr, MapFieldSeaUnit, checktype)) {
+		DebugCheck(!UnitSlots[mfptr->SeaUnit]);
+		table[n++] = UnitSlots[mfptr->SeaUnit];
 	    }
-	if (AirUnitOnMapField (mfptr))
-	    if (NeighborCheck (mfptr, MapFieldAirUnit, checktype)) {
-		DebugCheck (!UnitSlots[mfptr->AirUnit]);
-		table[n++]=UnitSlots[mfptr->AirUnit];
+	if (AirUnitOnMapField(mfptr))
+	    if (NeighborCheck(mfptr, MapFieldAirUnit, checktype)) {
+		DebugCheck(!UnitSlots[mfptr->AirUnit]);
+		table[n++] = UnitSlots[mfptr->AirUnit];
 	    }
     }
 
     // the rest
-    for (y=y1+1, mfptr=mf+TheMap.Width; y<y2; y++) {
-	for (x=x1; x<x2; x++) {
+    for (y = y1 + 1, mfptr = mf + TheMap.Width; y<y2; ++y) {
+	for (x = x1; x < x2; ++x) {
 	    int checktype;
 
-	    if (x==x1)
-		checktype=CHECK_TOP;
-	    else
-		checktype=CHECK_BOTH;
+	    if (x == x1) {
+		checktype = CHECK_TOP;
+	    } else {
+		checktype = CHECK_BOTH;
+	    }
 
-	    if (BuildingOnMapField (mfptr))
-		if (NeighborCheck (mfptr, MapFieldBuilding, checktype)) {
-		    DebugCheck (!UnitSlots[mfptr->Building]);
-		    table[n++]=UnitSlots[mfptr->Building];
+	    if (BuildingOnMapField(mfptr))
+		if (NeighborCheck(mfptr, MapFieldBuilding, checktype)) {
+		    DebugCheck(!UnitSlots[mfptr->Building]);
+		    table[n++] = UnitSlots[mfptr->Building];
 		}
-	    if (LandUnitOnMapField (mfptr))
-		if (NeighborCheck (mfptr, MapFieldLandUnit, checktype)) {
-		    DebugCheck (!UnitSlots[mfptr->LandUnit]);
-		    table[n++]=UnitSlots[mfptr->LandUnit];
+	    if (LandUnitOnMapField(mfptr))
+		if (NeighborCheck(mfptr, MapFieldLandUnit, checktype)) {
+		    DebugCheck(!UnitSlots[mfptr->LandUnit]);
+		    table[n++] = UnitSlots[mfptr->LandUnit];
 		}
-	    if (SeaUnitOnMapField (mfptr))
-		if (NeighborCheck (mfptr, MapFieldSeaUnit, checktype)) {
-		    DebugCheck (!UnitSlots[mfptr->SeaUnit]);
-		    table[n++]=UnitSlots[mfptr->SeaUnit];
+	    if (SeaUnitOnMapField(mfptr))
+		if (NeighborCheck(mfptr, MapFieldSeaUnit, checktype)) {
+		    DebugCheck(!UnitSlots[mfptr->SeaUnit]);
+		    table[n++] = UnitSlots[mfptr->SeaUnit];
 		}
-	    if (AirUnitOnMapField (mfptr))
-		 if (NeighborCheck (mfptr, MapFieldAirUnit, checktype)) {
-		    DebugCheck (!UnitSlots[mfptr->AirUnit]);
-		    table[n++]=UnitSlots[mfptr->AirUnit];
+	    if (AirUnitOnMapField(mfptr))
+		 if (NeighborCheck(mfptr, MapFieldAirUnit, checktype)) {
+		    DebugCheck(!UnitSlots[mfptr->AirUnit]);
+		    table[n++] = UnitSlots[mfptr->AirUnit];
 		}
-	    mfptr++;
+	    ++mfptr;
 	}
 	mfptr += TheMap.Width - (x2-x1);
     }
 
 #if 0
     ts1 = rdtsc ();
-    printf ("UnitCacheSelect on %dx%d took %d cycles, found %d units\n",
+    printf("UnitCacheSelect on %dx%d took %d cycles, found %d units\n",
 		x2-x1, y2-y1, ts1-ts0, n);
 #endif
 
@@ -1371,24 +1391,31 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 **
 **	@return		Returns the number of units found
 */
-global int UnitCacheOnTile(int x,int y,Unit** table)
+global int UnitCacheOnTile(int x, int y, Unit** table)
 {
 #if 0
-    return UnitCacheSelect(x,y,x+1,y+1,table);
+    return UnitCacheSelect(x, y, x+1, y+1, table);
 #endif
 
 //  optimized version:
-    int n=0;
-    const MapField *mf = TheMap.Fields + y*TheMap.Width + x;
+    int n;
+    const MapField* mf;
+    
+    n = 0;
+    mf = TheMap.Fields + y*TheMap.Width + x;
 
-    if (BuildingOnMapField (mf))
-	table[n++]=UnitSlots[mf->Building];
-    if (LandUnitOnMapField (mf))
-	table[n++]=UnitSlots[mf->LandUnit];
-    if (SeaUnitOnMapField (mf))
-	table[n++]=UnitSlots[mf->SeaUnit];
-    if (AirUnitOnMapField (mf))
-	table[n++]=UnitSlots[mf->AirUnit];
+    if (BuildingOnMapField(mf)) {
+	table[n++] = UnitSlots[mf->Building];
+    }
+    if (LandUnitOnMapField(mf)) {
+	table[n++] = UnitSlots[mf->LandUnit];
+    }
+    if (SeaUnitOnMapField(mf)) {
+	table[n++] = UnitSlots[mf->SeaUnit];
+    }
+    if (AirUnitOnMapField(mf)) {
+	table[n++] = UnitSlots[mf->AirUnit];
+    }
 
     return n;
 }
@@ -1402,53 +1429,56 @@ global int UnitCacheOnTile(int x,int y,Unit** table)
 **
 **	@return		Unit, if an unit of correct type is on the field.
 */
-global Unit* UnitCacheOnXY(int x,int y,unsigned type)
+global Unit* UnitCacheOnXY(int x, int y, unsigned type)
 {
-    const MapField *mf = TheMap.Fields + y*TheMap.Width + x;
+    const MapField* mf;
+
+    mf = TheMap.Fields + y*TheMap.Width + x;
 
     switch (type) {
-    case UnitTypeLand:
-	if (LandUnitOnMapField (mf)) {
-	    return Units[mf->LandUnit];
-	} else if (BuildingOnMapField (mf)) {
-	    return Units[mf->Building];
-	} else {
+	case UnitTypeLand:
+	    if (LandUnitOnMapField(mf)) {
+		return UnitSlots[mf->LandUnit];
+	    } else if (BuildingOnMapField(mf)) {
+		return UnitSlots[mf->Building];
+	    } else {
+		return NULL;
+	    }
+	    break;
+	case UnitTypeFly:
+	    if (AirUnitOnMapField(mf)) {
+		return UnitSlots[mf->AirUnit];
+	    } else {
+		return NULL;
+	    }
+	    break;
+	case UnitTypeNaval:
+	    if (SeaUnitOnMapField(mf)) {
+		return UnitSlots[mf->SeaUnit];
+	    } else {
+		return NULL;
+	    }
+	    break;
+	default:
 	    return NULL;
-	}
-	break;
-    case UnitTypeFly:
-	if (AirUnitOnMapField (mf)) {
-	    return Units[mf->AirUnit];
-	} else {
-	    return NULL;
-	}
-	break;
-    case UnitTypeNaval:
-	if (SeaUnitOnMapField (mf)) {
-	    return Units[mf->SeaUnit];
-	} else {
-	    return NULL;
-	}
-	break;
-    default:
-	return NULL;
-	break;
+	    break;
     }
 }
 
 /**
 **	Print unit-cache statistics.
 */
-global void UnitCacheStatistic (void)
+global void UnitCacheStatistic(void)
 {
 #ifdef STATISTICS
     int i;
 
-    printf ("UNITS_ON_MAP Statistics:\n");
-    printf ("  Inserts: %d\n", UnitCacheStats.Inserts);
-    printf ("  Removals: %d\n", UnitCacheStats.Removals);
-    for (i=0; i<16; i++)
+    printf("UNITS_ON_MAP Statistics:\n");
+    printf("  Inserts: %d\n", UnitCacheStats.Inserts);
+    printf("  Removals: %d\n", UnitCacheStats.Removals);
+    for (i = 0; i < 16; ++i) {
 	printf ("  Selects <%d: %d\n", 1 << (i+1), UnitCacheStats.Selects[i]);
+    }
 #endif /* STATISTICS */
 }
 
@@ -1462,12 +1492,11 @@ global void InitUnitCache(void)
 {
     int m;
 
-    for (m=0; m < TheMap.Width * TheMap.Height; m++) {
-	// 0xffff is an invalid UnitRef
-	TheMap.Fields[m].Building = 0xffff;
-	TheMap.Fields[m].AirUnit = 0xffff;
-	TheMap.Fields[m].LandUnit = 0xffff;
-	TheMap.Fields[m].SeaUnit = 0xffff;
+    for (m = 0; m < TheMap.Width * TheMap.Height; ++m) {
+	TheMap.Fields[m].Building = InvalidUnit;
+	TheMap.Fields[m].AirUnit = InvalidUnit;
+	TheMap.Fields[m].LandUnit = InvalidUnit;
+	TheMap.Fields[m].SeaUnit = InvalidUnit;
     }
 }
 
@@ -1477,10 +1506,10 @@ global void InitUnitCache(void)
 **
 **	@param unit	Unit pointer to insert into list
 **/
-global void DeadCacheInsert(Unit* unit,Unit** List)
+global void DeadCacheInsert(Unit* unit, Unit** List)
 {
-    unit->Next=*List;
-    *List=unit;
+    unit->Next = *List;
+    *List = unit;
 }
 
 /**
@@ -1488,20 +1517,20 @@ global void DeadCacheInsert(Unit* unit,Unit** List)
 **
 **	@param unit	Unit pointer to remove from list
 **/
-global void DeadCacheRemove(Unit* unit, Unit** List )
+global void DeadCacheRemove(Unit* unit, Unit** List)
 {
     Unit** prev;
 
-    prev=List;
-    DebugCheck( !*prev );
-    while( *prev ) {			// find the unit, be bug friendly
-	if( *prev==unit ) {
-	    *prev=unit->Next;
-	    unit->Next=NULL;
+    prev = List;
+    DebugCheck(!*prev);
+    while (*prev) {			// find the unit, be bug friendly
+	if (*prev == unit) {
+	    *prev = unit->Next;
+	    unit->Next = NULL;
 	    return;
 	}
-	prev=&(*prev)->Next;
-	DebugCheck( !*prev );
+	prev = &(*prev)->Next;
+	DebugCheck(!*prev);
     }
 }
 
