@@ -40,6 +40,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "SDL_byteorder.h"
 #include "SDL_endian.h"
 
 /*----------------------------------------------------------------------------
@@ -124,6 +125,15 @@ extern unsigned inline _FetchLE32(unsigned char **pp) {
 
 #define FetchLE32(p) SDL_SwapLE32(*((unsigned int*)(p))++)
 
+#endif
+
+/* byte order defines */
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define STRATAGUS_LITTLE_ENDIAN
+#elif SDL_BYTEORDER == SDL_BIG_ENDIAN
+#define STRATAGUS_BIG_ENDIAN
+#else
+#error Neither SDL_BIG_ENDIAN nor SDL_LIL_ENDIAN is set
 #endif
 
 // ============================================================================

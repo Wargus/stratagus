@@ -172,7 +172,7 @@ local int OggReadStream(Sample* sample, void* buf, int len)
 		divide = freqratio * brratio / chanratio;
 
 		for (;;) {
-#ifdef WORDS_BIGENDIAN
+#ifdef STRATAGUS_BIG_ENDIAN
 			i = ov_read(data->VorbisFile, sndbuf, n / divide, 1, 2, 1,
 				&bitstream);
 #else
@@ -394,7 +394,7 @@ global Sample* LoadOgg(const char* name,int flags)
 				p = sample->Data + sample->Length;
 			}
 
-			#ifdef WORDS_BIGENDIAN
+			#ifdef STRATAGUS_BIG_ENDIAN
 			i = ov_read(vf, p, 4096, 1, 2, 1, &bitstream);
 			#else
 			i = ov_read(vf, p, 4096, 0, 2, 1, &bitstream);
