@@ -368,7 +368,10 @@ global void TriggersEachFrame(void)
 	pair=gh_car(Trigger);
 	Trigger=gh_cdr(Trigger);
 	if( !gh_null_p(val=gh_apply(car(pair),NIL)) ) {
-	    gh_apply(cdr(pair),NIL);
+	    val=gh_apply(cdr(pair),NIL);
+	    if( gh_null_p(val) ) {
+		DebugLevel0Fn("FIXME: should remove trigger\n");
+	    }
 	}
     } else {
 	Trigger=NULL;
