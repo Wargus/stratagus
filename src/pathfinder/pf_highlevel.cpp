@@ -85,24 +85,24 @@ struct path_cache {
 };
 static struct path_cache PathCache;
 
-local void HighMarkGoal (Unit * );
+//local void HighMarkGoal (Unit * );
 local Region *HighAstarLoop (Unit * );
 local HighlevelPath *HighTraceback (Region * );
 local unsigned short GetAdditionalPathRegion (Region * );
 local int GetPathLength (Region * );
-local void HighMarkGoalSubstitute (Unit * , int , int , int , int );
-local int CheckGoalFieldConnectivity (int , int , int );
-local void MarkGoalField (int , int , int );
+//local void HighMarkGoalSubstitute (Unit * , int , int , int , int );
+//local int CheckGoalFieldConnectivity (int , int , int );
+//local void MarkGoalField (int , int , int );
 
 local PathCacheEntry *CacheAdd (Region * , RectBounds * , HighlevelPath * );
 local void CacheFlush (void);
 local void CacheInsertEntry (PathCacheEntry * );
 local void CacheDeleteEntry (PathCacheEntry * );
 local void CacheReleaseEntry (PathCacheEntry * );
-local void CacheRef (HighlevelPath * );
-local void CachePrint (void);
+//local void CacheRef (HighlevelPath * );
+//local void CachePrint (void);
 local PathCacheEntry *CacheLookup (Region * , RectBounds * );
-local PathCacheEntry *CacheFindEntryByPath (HighlevelPath * );
+//local PathCacheEntry *CacheFindEntryByPath (HighlevelPath * );
 local PathCacheEntry *CacheEntryNew (Region * , RectBounds * , HighlevelPath *);
 local void CacheEntryDestroy (PathCacheEntry * );
 local void CacheEntryRef (PathCacheEntry * );
@@ -662,6 +662,7 @@ void HighInvalidateCacheEntries (unsigned short RegId)
 	}
 }
 
+#if 0
 local PathCacheEntry *CacheFindEntryByPath (HighlevelPath *hp)
 {
 	PathCacheEntry *pce;
@@ -673,6 +674,7 @@ local PathCacheEntry *CacheFindEntryByPath (HighlevelPath *hp)
 	}
 	return NULL;
 }
+#endif
 
 local PathCacheEntry *CacheLookup (Region *Start, RectBounds *Goal)
 {
@@ -703,6 +705,7 @@ local void CacheFlush (void)
 	}
 }
 
+#if 0
 local void CacheRef (HighlevelPath *hp)
 {
 	PathCacheEntry *pce=CacheFindEntryByPath (hp);
@@ -710,6 +713,7 @@ local void CacheRef (HighlevelPath *hp)
 	DebugCheck (!CacheEntryValid (pce));
 	CacheEntryRef (pce);
 }
+#endif
 
 local PathCacheEntry *CacheAdd (Region *Start, RectBounds *Goal,
 						HighlevelPath *Path)
@@ -760,6 +764,7 @@ local void CacheReleaseEntry (PathCacheEntry *pce)
 	}
 }
 
+#if 0
 local void CachePrint (void)
 {
 	PathCacheEntry *pce;
@@ -772,6 +777,7 @@ local void CachePrint (void)
 				pce->GoalRect.XMax, pce->GoalRect.YMax, pce->RefCnt,pce->Valid);
 	}
 }
+#endif
 
 local PathCacheEntry *CacheEntryNew (Region *Start, RectBounds *Goal,
 								HighlevelPath *Path)
