@@ -470,6 +470,8 @@ global void VideoDrawPixel(SDL_Color color, int x, int y)
 
 global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alpha)
 {
+    // FIXME: trans?
+
     int bpp;
     int ofs;
     unsigned int c;
@@ -485,17 +487,10 @@ global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alp
 
 global void VideoDrawPixelClip(SDL_Color color, int x, int y)
 {
-    int bpp;
-    int ofs;
-    unsigned int c;
-
-    c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
-    bpp = TheScreen->format->BytesPerPixel;
-    ofs = TheScreen->pitch * y + x * bpp;
-
-    SDL_LockSurface(TheScreen);
-    memcpy(TheScreen->pixels + ofs, &c, bpp);
-    SDL_UnlockSurface(TheScreen);
+    int w = 1;
+    int h = 1;
+    CLIP_RECTANGLE(x, y, w, h);
+    VideoDrawPixel(color, x, y);
 }
 
 global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
@@ -510,6 +505,7 @@ global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
 global void VideoDrawTransVLine(SDL_Color color, int x, int y,
     int height, unsigned char alpha)
 {
+    // FIXME: trans
     int i;
 
     for (i = 0; i < height; ++i) {
@@ -519,11 +515,9 @@ global void VideoDrawTransVLine(SDL_Color color, int x, int y,
 
 global void VideoDrawVLineClip(SDL_Color color, int x, int y, int height)
 {
-    int i;
-
-    for (i = 0; i < height; ++i) {
-	VideoDrawPixel(color, x, y + i);
-    }
+    int w = 1;
+    CLIP_RECTANGLE(x, y, w, height);
+    VideoDrawVLine(color, x, y, height);
 }
 
 global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
@@ -537,16 +531,15 @@ global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
 
 global void VideoDrawHLineClip(SDL_Color color, int x, int y, int width)
 {
-    int i;
-
-    for (i = 0; i < width; ++i) {
-	VideoDrawPixel(color, x + i, y);
-    }
+    int h = 1;
+    CLIP_RECTANGLE(x, y, width, h);
+    VideoDrawHLine(color, x, y, width);
 }
 
 global void VideoDrawTransHLine(SDL_Color color, int x, int y,
     int width, unsigned char alpha)
 {
+    // FIXME: trans
     int i;
 
     for (i = 0; i < width; ++i) {
@@ -657,14 +650,43 @@ global void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy)
 
 global void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy)
 {
-    // FIXME:
+    int w;
+    int h;
+
+    // FIXME: messy
+    if (dx > sx && dy > sy) {
+	w = dx - sx;
+	h = dy - sy;
+	CLIP_RECTANGLE(sx, sy, w, h);
+	dx = sx + w;
+	dy = sy + h;
+    } else if (dx > sx && dy < sy) {
+	w = dx - sx;
+	h = sy - dy;
+	CLIP_RECTANGLE(sx, dy, w, h);
+	dx = sx + w;
+	sy = dy + h;
+    } else if (dx < sx && dy > sy) {
+	w = sx - dx;
+	h = dy - sy;
+	CLIP_RECTANGLE(dx, sy, w, h);
+	sx = dx + w;
+	dy = sy + h;
+    } else if (dx < sx && dy < sy) {
+	w = sx - dx;
+	h = sy - dy;
+	CLIP_RECTANGLE(dx, dy, w, h);
+	sx = dx + w;
+	sy = dy + h;
+    }
+
     VideoDrawLine(color, sx, sy, dx, dy);
 }
 
 global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
     int dx, int dy, unsigned char alpha)
 {
-    // FIXME:
+    // FIXME: trans
     VideoDrawLine(color, sx, sy, dx, dy);
 }
 
@@ -689,20 +711,8 @@ global void VideoDrawRectangle(SDL_Color color, int x, int y,
 global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
-    int i;
-
-    // FIXME: should be able to optimize this
-    // FIXME: do clipping
-
-    for (i = 0; i <= w; ++i) {
-	VideoDrawPixel(color, x + i, y);
-	VideoDrawPixel(color, x + i, y + h);
-    }
-
-    for (i = 1; i < h; ++i) {
-	VideoDrawPixel(color, x, y + i);
-	VideoDrawPixel(color, x + w, y + i);
-    }
+    CLIP_RECTANGLE(x, y, w, h);
+    VideoDrawRectangle(color, x, y, w, h);
 }
 
 global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
@@ -758,23 +768,16 @@ global void VideoFillTransRectangle(SDL_Color color, int x, int y,
 global void VideoFillRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
-    // FIXME: do clipping
-
-    SDL_Rect drect;
-    Uint32 c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
-
-    drect.x = x;
-    drect.y = y;
-    drect.w = w;
-    drect.h = h;
-
-    SDL_FillRect(TheScreen, &drect, c);
+    CLIP_RECTANGLE(x, y, w, h);
+    VideoFillRectangle(color, x, y, w, h);
 }
 
 global void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
-//    DebugCheck(1);
+    // FIXME: trans
+    CLIP_RECTANGLE(x, y, w, h);
+    VideoFillRectangle(color, x, y, w, h);
 }
 
 global void VideoDrawCircleClip(SDL_Color color, int x, int y,
