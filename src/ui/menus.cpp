@@ -3023,7 +3023,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
 		    mi[1].d.vslider.percent = mi[1].d.vslider.curper;
 		}
-		mi[1].d.vslider.percent = mi[1].d.vslider.curper / increments * increments;
+		mi[1].d.vslider.percent = (mi[1].d.vslider.curper + 8) / increments * increments;
 		for (j=3; j < nitems; ++j) {
 		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 9 - 3) / 100 * (-20) ) + 40 + (j-3)*20;
 		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
@@ -4252,6 +4252,7 @@ global void MenuHandleMouseMove(int x,int y)
 			    continue;
 			}
 			j = y - ys;
+			j -= 8;
 			if (j < 20) {
 			    mi->d.vslider.cursel |= MI_CFLAGS_UP;
 			} else if (j > mi->d.vslider.ysize - 20) {
