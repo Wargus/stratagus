@@ -75,11 +75,12 @@ local void gzseek(CLFile* file,unsigned offset,int whence)
 
 #ifdef USE_BZ2LIB
 
-#if defined(__FreeBSD__)
+/* libbzip2 version 1.0 has a naming change in the API - how bright! */
+#ifdef BZ_CONFIG_ERROR	// { defined only if LIBBZIP2_VERSION >= "1.0"
 #define bzread BZ2_bzread
 #define bzopen BZ2_bzopen
 #define bzclose BZ2_bzclose
-#endif /* __FreeBSD__ */
+#endif	// } LIBBZIP2_VERSION >= "1.0"
 
 /**
 **	Seek on compressed input. (I hope newer libs support it directly)
