@@ -7068,7 +7068,6 @@ global void InitMenuFunctions(void)
 	strcat(MenuMapFullPath, "/graphics/tilesets/");
     }
     strcat(MenuMapFullPath, "swamp");
-    menu = FindMenu("menu-custom-game");
     //
     //	FIXME: Johns: this didn't work if the files are in ZIP archive.
     //
@@ -7079,7 +7078,10 @@ global void InitMenuFunctions(void)
 	// With new dynamic tileset configuration this
 	// should read what siod-config gave us and
 	// build the menu from that..
+	menu = FindMenu("menu-custom-game");
 	menu->items[14].d.pulldown.noptions = 4;
+	menu = FindMenu("menu-multi-setup");
+	menu->items[29].d.pulldown.noptions = 4;
     }
 
 #ifdef SAVE_MENU_CCL
