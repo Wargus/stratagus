@@ -555,37 +555,6 @@ global void UnitActions(void)
 			continue;
 		}
 
-#if defined(UNIT_ON_MAP) && 0		// debug unit store
-		{ const Unit* list;
-
-		list = TheMap.Fields[unit->Y * TheMap.Width + unit->X].Here.Units;
-		while (list) {					// find the unit
-			if (list == unit) {
-				break;
-			}
-			list = list->Next;
-		}
-		if (!unit->Removed) {
-			if (!list && (!unit->Type->Vanishes &&
-					!unit->Orders[0].Action == UnitActionDie)) {
-				DebugLevel0Fn("!removed not on map %d\n" _C_ UnitNumber(unit));
-				abort();
-			}
-		} else if (list) {
-			DebugLevel0Fn("remove on map %d\n" _C_ UnitNumber(unit));
-			abort();
-		}
-		list = unit->Next;
-		while (list) {
-			if (list->X != unit->X || list->Y != unit->Y) {
-				DebugLevel0Fn("Wrong X,Y %d %d,%d\n" _C_ UnitNumber(list) _C_
-					list->X _C_ list->Y);
-				abort();
-			}
-			list = list->Next;
-		} }
-#endif
-
 		if (--unit->Wait) {			// Wait until counter reached
 			continue;
 		}
