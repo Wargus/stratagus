@@ -10,7 +10,7 @@
 //
 /**@name interface.h	-	The user interface header file. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -403,6 +403,8 @@ extern int ButtonCheckUnitsOr(const Unit*,const ButtonAction*);
 extern int ButtonCheckUnitsAnd(const Unit*,const ButtonAction*);
     /// Check if have network play
 extern int ButtonCheckNetwork(const Unit*,const ButtonAction*);
+    /// Check if don't have network play
+extern int ButtonCheckNoNetwork(const Unit*,const ButtonAction*);
     /// Check if unit isn't working (train,upgrade,research)
 extern int ButtonCheckNoWork(const Unit*,const ButtonAction*);
     /// Check if unit isn't researching or upgrading
