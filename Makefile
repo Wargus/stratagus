@@ -152,8 +152,8 @@ distclean:	clean
 	[ $(OBJDIR) == "." ] || $(RM) -rf $$i/$(OBJDIR); \
 	$(RM) $$i/.#* $$i/*~; done
 	$(RM) stratagus$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt \
-	srcdoc/* .depend Rules.make config.log config.status configure \
-	autom4te.cache/
+	srcdoc/* .depend Rules.make config.log config.status configure
+	$(RM) -rf autom4te.cache/
 	@echo
 
 lockver:
