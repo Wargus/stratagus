@@ -10,12 +10,11 @@
 //
 /**@name action_minegold.c -	The mine gold action. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -190,12 +189,14 @@ local int MineInGoldmine(Unit* unit)
 	//
 	//	Update gold mine.
 	//
-	if ( OptionUseDepletedMines && mine->Value < DEFAULT_INCOMES[GoldCost] ) {
+	if ( OptionUseDepletedMines
+		&& mine->Value < DEFAULT_INCOMES[GoldCost] ) {
 	    mine->Value = 0;
-	    unit->Rs = 5; // vladi: income reduced to 5% (mine depleted)
+	    unit->Rs = OptionUseDepletedMines;
+	    // vladi: income reduced to 5% (mine depleted)
 	} else {
 	    mine->Value-=DEFAULT_INCOMES[GoldCost];	// remove gold from store
-  	    unit->Rs = 100; // vladi: normal income 100%
+  	    unit->Rs = 100;		// vladi: normal income 100%
 	}
 	if( !--mine->Data.Resource.Active ) {
 	    mine->Frame=0;
@@ -361,9 +362,11 @@ local int MoveToGoldDeposit(Unit* unit)
     //
     //	Update gold.
     //
-    if ( OptionUseDepletedMines && unit->Rs == 5 ) {
-        unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost] / 20;
-    } else {  
+    if ( OptionUseDepletedMines && unit->Rs == OptionUseDepletedMines ) {
+        unit->Player->Resources[GoldCost]+=
+		(unit->Player->Incomes[GoldCost] * 100)
+			/ OptionUseDepletedMines;
+    } else {
         unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost];
     }
     if( unit->Player==ThisPlayer ) {
