@@ -230,7 +230,7 @@ typedef struct _unit_type_  {
     int		Speed;			/// movement speed
 
 // this is taken from the UDTA section
-    int		OverlapFrame;
+    int		Constuction;
     int		SightRange;
     unsigned	HitPoints;
     int		Magic;
@@ -1417,7 +1417,7 @@ void DumpUdtaAsScm(void)
 	}
 	printf("\t\t\t;;; Icon\n");
 	printf("  %d\t\t\t\t;;; Speed\n",UnitTypes[i].Speed);
-	printf("  %d\t\t\t\t;;; Overlap frame\n",UnitTypes[i].OverlapFrame);
+	printf("  %d\t\t\t\t;;; Constuction frame\n",UnitTypes[i].Constuction);
 	printf("  %d\t\t\t\t;;; Sight-range\n",UnitTypes[i].SightRange);
 	printf("  %d\t\t\t\t;;; Hit-points\n",UnitTypes[i].HitPoints);
 	printf("  %d\t\t\t\t;;; Magic\n",UnitTypes[i].Magic);
@@ -1602,7 +1602,7 @@ int main(int argc,char** argv)
 
     for( i=0; i<110; ++i ) {		// overlap frames
 	v=PudReadWord(stdin);
-	UnitTypes[i].OverlapFrame=v;
+	UnitTypes[i].Constuction=v;
     }
     for( i=0; i<508; ++i ) {		// skip obselete data
 	v=PudReadWord(stdin);
@@ -1761,7 +1761,7 @@ int main(int argc,char** argv)
 if( 0 )
     for( i=0; i<sizeof(UnitTypes)/sizeof(*UnitTypes); ++i ) {
 	printf("Unit: %d %x %s\n",i,i,UnitTypes[i].Name);
-	printf("\tOverlapFrame\t%d\n",UnitTypes[i].OverlapFrame);
+	printf("\tConstuction\t%d\n",UnitTypes[i].Constuction);
 	printf("\tSightRange\t%d\n",UnitTypes[i].SightRange);
 	printf("\tHitPoints\t%d\n",UnitTypes[i].HitPoints);
 	printf("\tMagic\t\t%d\n",UnitTypes[i].Magic);
@@ -1869,7 +1869,7 @@ if( 0 )
 
 	printf("\t,%2d,%2d,%1d,%5d,%1d,%3d"
 	    ,UnitTypes[i].Speed
-	    ,UnitTypes[i].OverlapFrame
+	    ,UnitTypes[i].Constuction
 	    ,UnitTypes[i].SightRange
 	    ,UnitTypes[i].HitPoints
 	    ,UnitTypes[i].Magic
