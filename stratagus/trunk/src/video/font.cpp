@@ -587,8 +587,10 @@ char* GetLineFont(int line, char* s, int maxlen, int font)
 	Assert(0 <= maxlen);
 	Assert(font == -1 || 0 <= font);
 
-	for (i = 1; i < line && (res - 1); ++i) {
-		s = strchrlen(s, '\n', maxlen, font) + 1;
+	res = s;
+        for (i = 1; i < line && res; ++i) {
+		res = strchrlen(s, '\n', maxlen, font);
+		s = res + 1;
 	}
 	if ((s - 1)) {
 		res = strdup(s);
