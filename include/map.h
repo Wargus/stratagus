@@ -212,6 +212,8 @@ typedef struct _map_field_ {
 	unsigned char Value;               ///< HP for walls/ Wood Regeneration
 	unsigned char Visible[PlayerMax];  ///< Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax]; ///< Visiblity for cloaking.
+	unsigned char Radar[PlayerMax];    ///< Visiblity for radar.
+	unsigned char RadarJammer[PlayerMax]; ///< Jamming Capabilities.
 	struct _unit_list_item_* UnitCache;///< A unit on the map field
 } MapField;
 
@@ -363,6 +365,23 @@ extern void InitVisionTable(void);
 extern void FreeVisionTable(void);
 
 //
+// in map_radar.c
+//
+
+	/// Check if a unit is visible on radar
+extern unsigned char UnitVisibleOnRadar(const struct _player_* pradar, const struct _unit_* punit);
+	/// Check if a tile is visible on radar
+extern unsigned char IsTileRadarVisible(const struct _player_* pradar, const struct _player_* punit, int x, int y);
+	/// Mark a tile as radar visible, or incrase radar vision
+extern void MapMarkTileRadar(const struct _player_* player, int x, int y);
+	/// Unmark a tile as radar visible, decrease is visible by other radar
+extern void MapUnmarkTileRadar(const struct _player_* player, int x, int y);
+	/// Mark a tile as radar jammed, or incrase radar jamming'ness
+extern void MapMarkTileRadarJammer(const struct _player_* player, int x, int y);
+	/// Unmark a tile as jammed, decrease is jamming'ness
+extern void MapUnmarkTileRadarJammer(const struct _player_* player, int x, int y);
+
+//
 // in map_wall.c
 //
 	/// Check if the seen tile-type is wall
@@ -466,6 +485,17 @@ void MapUnmarkUnitSight(struct _unit_* unit);
 	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileSight)
 #define MapUnmarkSight(player, x, y, w, h, range) \
 	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileSight)
+
+	/// Handle Marking and Unmarking of radar vision
+#define MapMarkRadar(player, x, y, w, h, range) \
+	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileRadar)
+#define MapUnmarkRadar(player, x, y, w, h, range) \
+	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileRadar)
+	/// Handle Marking and Unmarking of radar vision
+#define MapMarkRadarJammer(player, x, y, w, h, range) \
+	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileRadarJammer)
+#define MapUnmarkRadarJammer(player, x, y, w, h, range) \
+	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileRadarJammer)
 
 	/// Check if a field for the user is explored
 #define IsMapFieldExplored(player, x, y) \
