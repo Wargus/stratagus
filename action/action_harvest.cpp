@@ -69,7 +69,7 @@ local int MoveToWood(Unit* unit)
 
     if( i==PF_UNREACHABLE ) {
 newtry:
-	if( !FindWoodInSight(unit,&unit->Orders[0].X,&unit->Orders[0].Y) ) {
+	if( FindWoodInSight(unit,&unit->Orders[0].X,&unit->Orders[0].Y) ) {
 
 	    // Move to new wood position
 	    unit->Orders[0].Goal=NoUnitP;
