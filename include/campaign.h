@@ -91,7 +91,7 @@ typedef struct _campaign_ {
     char*		Ident;		/// Unique identifier
     char*		Name;		/// Campaign name
     int			Players;	/// Campaign for X players
-    // FIXME: next not yet used
+
     char*		File;		/// File containing the campaign
 
     CampaignChapter*	Chapters;	/// Campaign chapters
