@@ -214,6 +214,8 @@ global void LoadModules(void)
 global void LoadGame(char* filename)
 {
 	unsigned long game_cycle;
+	unsigned syncrand;
+	unsigned synchash;
 
 	CleanModules();
 	// log will be enabled if found in the save game
@@ -231,6 +233,8 @@ global void LoadGame(char* filename)
 	CclGarbageCollect(0);
 
 	game_cycle = GameCycle;
+	syncrand = SyncRandSeed;
+	synchash = SyncHash;
 
 	InitModules();
 	LoadModules();
@@ -240,6 +244,8 @@ global void LoadGame(char* filename)
 #endif
 
 	GameCycle = game_cycle;
+	SyncRandSeed = syncrand;
+	SyncHash = synchash;
 	SelectionChanged();
 	MustRedraw = RedrawEverything;
 }
