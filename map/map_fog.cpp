@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name map_fog.c	-	The map fog of war handling. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Shabanski,
-//	                           Russell Smith, and Jimmy Salmon
+//      (c) Copyright 1999-2003 by Lutz Sammer, Vladi Shabanski,
+//	                              Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -52,7 +52,7 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 #ifdef DEBUG
@@ -1953,15 +1953,19 @@ global void InitMapFogOfWar(void)
 		unsigned char g;
 		unsigned char b;
 		Uint32 color;
+		SDL_Surface* s;
 
-		// FIXME: optimize
-		OnlyFogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
 			32, RMASK, GMASK, BMASK, AMASK);
 
+		// FIXME: Make the color configurable
 		SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
-		color = SDL_MapRGBA(OnlyFogSurface->format, r, g, b, FogOfWarOpacity);
+		color = SDL_MapRGB(s->format, r, g, b);
 
-		SDL_FillRect(OnlyFogSurface, NULL, color);
+		SDL_FillRect(s, NULL, color);
+		OnlyFogSurface = SDL_DisplayFormat(s);
+		SDL_SetAlpha(OnlyFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+		SDL_FreeSurface(s);
 	}
 	VideoDrawUnexplored = VideoDrawUnexploredSDL;
 	VideoDrawFog = VideoDrawFogSDL;
