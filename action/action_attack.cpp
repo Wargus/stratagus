@@ -240,12 +240,12 @@ static void MoveToTarget(Unit* unit)
 	Unit* goal;
 	int err;
 
-	if (!unit->Orders[0].Goal) {
-		if (unit->Orders[0].X == -1 || unit->Orders[0].Y == -1) {
-			DebugPrint("FIXME: Wrong goal position, check where set!\n");
-			unit->Orders[0].X = unit->Orders[0].Y = 0;
-		}
-	}
+	Assert(unit);
+	Assert(!unit->Type->Vanishes && !unit->Destroyed && !unit->Removed);
+	Assert(unit->Orders[0].Action == UnitActionAttack ||
+		unit->Orders[0].Action == UnitActionAttackGround);
+	Assert(CanMove(unit));
+	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
 
 	err = DoActionMove(unit);
 
@@ -330,9 +330,6 @@ static void MoveToTarget(Unit* unit)
 
 		return;
 	}
-	Assert(!unit->Type->Vanishes && !unit->Destroyed && !unit->Removed);
-	Assert(unit->Orders[0].Action == UnitActionAttack ||
-		unit->Orders[0].Action == UnitActionAttackGround);
 }
 
 /**
@@ -345,12 +342,8 @@ static void AttackTarget(Unit* unit)
 	Unit* goal;
 	Unit* temp;
 
-	if (!unit->Orders[0].Goal) {
-		if (unit->Orders[0].X == -1 || unit->Orders[0].Y == -1) {
-			DebugPrint("FIXME: Wrong goal position, check where set!\n");
-			unit->Orders[0].X = unit->Orders[0].Y = 0;
-		}
-	}
+	Assert(unit);
+	Assert(unit->Orders[0].Goal || (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1));
 
 	AnimateActionAttack(unit);
 	if (unit->Reset) {

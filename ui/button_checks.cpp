@@ -187,7 +187,7 @@ int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
 int ButtonCheckNoWork(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
 {
-	return unit->Type->Building &&
+	return
 		unit->Orders[0].Action != UnitActionTrain &&
 		unit->Orders[0].Action != UnitActionUpgradeTo &&
 		unit->Orders[0].Action != UnitActionResearch;
@@ -204,7 +204,7 @@ int ButtonCheckNoWork(const Unit* unit,
 int ButtonCheckNoResearch(const Unit* unit,
 	const ButtonAction* button __attribute__((unused)))
 {
-	return unit->Type->Building &&
+	return
 		unit->Orders[0].Action != UnitActionUpgradeTo &&
 		unit->Orders[0].Action != UnitActionResearch;
 }

@@ -187,7 +187,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 		// Normal units react in reaction range.
 		// Removed units can only attack in AttackRange, from bunker
 		//
-		if (!type->Building && !unit->Removed && !ground) {
+		if (CanMove(unit) && !unit->Removed && !ground) {
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);

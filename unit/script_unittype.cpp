@@ -1705,7 +1705,7 @@ void UpdateUnitVariables(const Unit* unit)
 		unit->Variable[i].Enable = 1;
 	}
 
-	// HP (do also building under construction :) ).
+	// HP.
 	unit->Variable[HP_INDEX].Value = unit->HP;
 	unit->Variable[HP_INDEX].Max = unit->Stats->HitPoints;
 

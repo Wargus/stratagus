@@ -101,7 +101,7 @@ static void SpellMoveToTarget(Unit* unit)
 
 	// Unit can't move
 	err = 1;
-	if (unit->Type->Animations && unit->Type->Animations->Move) {
+	if (CanMove(unit)) {
 		err = DoActionMove(unit);
 		if (!unit->Reset) {
 			return;

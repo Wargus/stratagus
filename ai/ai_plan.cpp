@@ -697,7 +697,7 @@ void AiSendExplorers(void)
 
 			type = (*unit)->Type;
 
-			if (type->Building) {
+			if (!CanMove(*unit)) {
 				continue;
 			}
 
