@@ -209,6 +209,8 @@ global void CreateGame(char* filename, WorldMap* map)
 
     }
 
+    GameCycle=0;
+
     if( NetworkFildes!=-1 ) {		// Prepare network play
 	DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
 	InitNetwork2();
