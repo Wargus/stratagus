@@ -1825,12 +1825,15 @@ void UpdateUnitVariables(const Unit* unit)
 	}
 	unit->Variable[DAMAGE_INDEX].Max = unit->Type->_BasicDamage + unit->Type->_PiercingDamage;
 
+	// Position
+	unit->Variable[POSX_INDEX].Value = unit->X;
+	unit->Variable[POSX_INDEX].Max = TheMap.Width;
+	unit->Variable[POSY_INDEX].Value = unit->Y;
+	unit->Variable[POSY_INDEX].Max = TheMap.Height;
+
 	// SlotNumber
-#ifdef DEBUG
-	// Could Draw unit number for debug purposes
 	unit->Variable[SLOT_INDEX].Value = unit->Slot;
-	unit->Variable[SLOT_INDEX].Max = unit->Slot;
-#endif
+	unit->Variable[SLOT_INDEX].Max = UnitSlotFree - UnitSlots - 1;
 
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit->Variable[i].Enable &= unit->Variable[i].Max > 0;
@@ -1846,7 +1849,8 @@ void InitDefinedVariables()
 	const char* var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
 		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "Speed", "SightRange",
-		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage", "Slot"
+		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage",
+		"PosX", "PosY", "Slot"
 		}; // names of the variable.
 	int i;
 
