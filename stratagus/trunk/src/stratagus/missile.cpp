@@ -676,9 +676,9 @@ global void DrawMissile(MissileType* mtype, int frame, int x, int y)
 	if (mtype->Flip) {
 		if (frame < 0) {
 			if (mtype->Transparency == 50) {
-				VideoDrawClipXTrans50(mtype->Sprite, -frame, x, y);
+				VideoDrawClipXTrans50(mtype->Sprite, -frame - 1, x, y);
 			} else {
-				VideoDrawClipX(mtype->Sprite, -frame, x, y);
+				VideoDrawClipX(mtype->Sprite, -frame - 1, x, y);
 			}
 		} else {
 			if (mtype->Transparency == 50) {
@@ -692,7 +692,7 @@ global void DrawMissile(MissileType* mtype, int frame, int x, int y)
 
 		row = mtype->NumDirections / 2 + 1;
 		if (frame < 0) {
-			frame = (-frame / row) * mtype->NumDirections + mtype->NumDirections - -frame % row;
+			frame = ((-frame - 1) / row) * mtype->NumDirections + mtype->NumDirections - (-frame - 1) % row;
 		} else {
 			frame = (frame / row) * mtype->NumDirections + frame % row;
 		}
@@ -787,7 +787,7 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 	}
 	// reinitialise the direction but with skipping Animation step.
 	if (missile->SpriteFrame < 0) {
-		missile->SpriteFrame = -missile->SpriteFrame;
+		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
 	missile->SpriteFrame /= missile->Type->NumDirections / 2 + 1;
 	missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
@@ -801,6 +801,9 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 	DebugCheck(dir >= missile->Type->NumDirections);
 	DebugCheck(dir < -missile->Type->NumDirections + 1);
 	missile->SpriteFrame = dir;
+	if (missile->SpriteFrame < 0) {
+		missile->SpriteFrame = -missile->SpriteFrame - 1;
+	}
 }
 
 /**
@@ -1124,7 +1127,7 @@ local int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 	NumDirections = missile->Type->NumDirections;
 	if (missile->SpriteFrame < 0) {
 		neg = 1;
-		missile->SpriteFrame = -missile->SpriteFrame;
+		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
 	if (LongAnimation) {
 		int totalf;   // Total number of frame (for one direction).
@@ -1154,7 +1157,7 @@ local int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 		}
 	}
 	if (neg) {
-		missile->SpriteFrame = -missile->SpriteFrame;
+		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
 	DebugLevel3Fn("Frame %d of %d\n" _C_
 		missile->SpriteFrame _C_ missile->Type->SpriteFrames);
@@ -1179,7 +1182,7 @@ local void NextMissileFrameCycle(Missile* missile)
 	neg = 0;
 	if (missile->SpriteFrame < 0) {
 		neg = 1;
-		missile->SpriteFrame = -missile->SpriteFrame;
+		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
 	totalx = abs(missile->DX - missile->SourceX);
 	dx = abs(missile->X - missile->SourceX);
@@ -1198,7 +1201,7 @@ local void NextMissileFrameCycle(Missile* missile)
 		}
 	}
 	if (neg) {
-		missile->SpriteFrame = -missile->SpriteFrame;
+		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
 }
 

@@ -1307,7 +1307,7 @@ global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x
 
 	if (type->Flip) {
 		if (frame < 0) {
-			VideoDrawClipX(sprite, -frame, x, y);
+			VideoDrawClipX(sprite, -frame - 1, x, y);
 		} else {
 			VideoDrawClip(sprite, frame, x, y);
 		}
@@ -1316,7 +1316,7 @@ global void DrawUnitType(const UnitType* type, Graphic* sprite, int frame, int x
 
 		row = type->NumDirections / 2 + 1;
 		if (frame < 0) {
-			frame = (-frame / row) * type->NumDirections + type->NumDirections - -frame % row;
+			frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
 		} else {
 			frame = (frame / row) * type->NumDirections + frame % row;
 		}
