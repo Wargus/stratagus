@@ -863,7 +863,7 @@ local int FindInUpgradeToRequests(const UnitType * type)
     int i;
     int n;
 
-    n = AiPlayer->UnitTypeRequestsCount;
+    n = AiPlayer->UpgradeToRequestsCount;
     for (i = 0; i < n; ++i) {
 	if (AiPlayer->UpgradeToRequests[i] == type) {
 	    return 1;

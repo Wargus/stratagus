@@ -217,7 +217,7 @@ local void debugForces(void)
 	
 	for (i = 0; i < UnitTypeMax; i++) {
 	    if (count[i] || want[i]) {
-		DebugLevel2(" %s(%d/%d)" _C_ UnitTypes[i]->Ident _C_ count[i] _C_ want[i]);
+		DebugLevel2(" %s(%d/%d)" _C_ UnitTypes[i]->Ident _C_ count[i] _C_ (-want[i]));
 	    }
 	}
 
