@@ -183,8 +183,11 @@ local int OffsetY = 0;
 
 /**
 **	Items for the Game Menu
+**
+**	@todo FIXME: Configure with CCL.
 */
 local Menuitem GameMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Game Menu", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
@@ -201,12 +204,17 @@ local Menuitem GameMenuItems[] = {
 	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'e'} } },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
 **	Items for the Victory Menu
+**	@todo FIXME: Configure with CCL.
 */
 local Menuitem VictoryMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Congratulations!", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
@@ -215,18 +223,26 @@ local Menuitem VictoryMenuItems[] = {
 	{ button:{ "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
     { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF11} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
 **	Items for the Lost Menu
+**	@todo FIXME: Configure with CCL.
 */
 local Menuitem LostMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "You failed to", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
 	{ text:{ "achieve victory!", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
@@ -253,7 +269,13 @@ local char ScenSelectPath[1024];
 global char ScenSelectFullPath[1024];
 global MapInfo *ScenSelectPudInfo = NULL;
 
+/**
+**	Scenario selectio menu.
+**
+**	@todo FIXME: Configure with CCL.
+*/
 local Menuitem ScenSelectMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL,
 	{ text:{ "Select scenario", MI_TFLAGS_CENTERED} } },
 
@@ -278,12 +300,16 @@ local Menuitem ScenSelectMenuItems[] = {
 	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 5, 0, 0, 0, 0} } },
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL,
 	{ button:{ NULL, 36, 24, MBUTTON_FOLDER, ScenSelectFolder, 0} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
 **	Items for the Prg Start Menu
 */
 local Menuitem PrgStartMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
 	{ drawfunc:{ NameLineDrawFunc } } },
     { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
@@ -292,6 +318,9 @@ local Menuitem PrgStartMenuItems[] = {
 	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'x'} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
@@ -348,6 +377,7 @@ local unsigned char *mgptsoptions[] = {
 };
 
 local Menuitem CustomGameMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, GameSetupInit, NULL,
 	{ drawfunc:{ GameDrawFunc } } },
     { MI_TYPE_TEXT, 640/2+12, 192, 0, LargeFont, NULL, NULL,
@@ -378,12 +408,16 @@ local Menuitem CustomGameMenuItems[] = {
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
 	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
 **	Items for the Enter Name Menu
 */
 local Menuitem EnterNameMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL,
 	{ text:{ "Enter your name:", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL,
@@ -392,12 +426,16 @@ local Menuitem EnterNameMenuItems[] = {
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
     { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterNameCancel, 'c'} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
 **	Items for the Enter Server Menu
 */
 local Menuitem EnterServerIPMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_TEXT, 144, 11, 0, GameFont, NULL, NULL,
 	{ text:{ "Enter server IP-address:", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_INPUT, 40, 38, 0, GameFont, NULL, NULL,
@@ -406,18 +444,25 @@ local Menuitem EnterServerIPMenuItems[] = {
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
     { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EnterServerIPCancel, 'c'} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
 **	Items for the Net Create Join Menu
 */
 local Menuitem NetCreateJoinMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
 	{ button:{ "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
+#else
+    { 0 }
+#endif
 };
 
 
@@ -425,13 +470,18 @@ local Menuitem NetCreateJoinMenuItems[] = {
 **	Items for the Net Multiplayer Setup Menu
 */
 local Menuitem NetMultiButtonStorage[] = {
+#ifdef __GNUC__
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
 	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, 0, 0, 0, 0} } },
     { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL,
 	{ drawfunc:{ NetMultiPlayerDrawFunc } } },
+#else
+    { 0 }
+#endif
 };
 
 local Menuitem NetMultiSetupMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameSetupInit, NULL,
 	{ drawfunc:{ MultiGameDrawFunc } } },
     { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL,
@@ -495,11 +545,14 @@ local Menuitem NetMultiSetupMenuItems[] = {
 	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-
+#else
+    { 0 }
+#endif
 };
 
 
 local Menuitem NetMultiClientMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameClientInit, NULL,
 	{ drawfunc:{ MultiGameClientDrawFunc } } },
 
@@ -566,19 +619,25 @@ local Menuitem NetMultiClientMenuItems[] = {
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
-
+#else
+    { 0 }
+#endif
 };
 
 /**
 **	Items for the Connecting Network Menu
 */
 local Menuitem ConnectingMenuItems[] = {
+#ifdef __GNUC__
     { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Connecting to server", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
 	{ text:{ NetworkServerText, MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel", 224, 27, MBUTTON_GM_FULL, NetConnectingCancel, 'c'} } },
+#else
+    { 0 }
+#endif
 };
 
 /**
