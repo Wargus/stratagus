@@ -568,6 +568,7 @@ global void SaveUpgrades(CLFile* file)
 	}
 	CLprintf(file, "\n");
 
+#if 0
 	//
 	//  Save all upgrade modifiers.
 	//
@@ -643,6 +644,7 @@ global void SaveUpgrades(CLFile* file)
 
 		CLprintf(file, ")\n\n");
 	}
+#endif
 
 	//
 	//  Save the allow
