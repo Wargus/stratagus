@@ -37,6 +37,7 @@
 #include "map.h"
 #include "minimap.h"
 #include "actions.h"
+#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -258,6 +259,28 @@ local SCM CclRevealMap(void)
 }
 
 /**
+**	Set the default map.
+**
+**	@param map	Path to the default map.
+**
+**	@return		The old default map.
+*/
+local SCM CclSetDefaultMap(SCM map)
+{
+    SCM old;
+    char* str;
+
+    old=NIL;
+    if( !gh_null_p(map) ) {
+	old=gh_str02scm(DefaultMap);
+	str=gh_scm2newstr(map,NULL);
+	strcpy(DefaultMap,str);
+	free(str);
+    }
+    return old;
+}
+
+/**
 **	Set fog of war on/off.
 **
 **	@param flag	True = turning fog of war on, false = off.
@@ -476,6 +499,7 @@ global void MapCclRegister(void)
     gh_new_procedureN("freecraft-map",CclFreeCraftMap);
     gh_new_procedure0_0("reveal-map",CclRevealMap);
 
+    gh_new_procedure1_0("set-default-map!",CclSetDefaultMap);
     gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);
     gh_new_procedure1_0("set-minimap-terrain!",CclSetMinimapTerrain);
 
