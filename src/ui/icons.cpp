@@ -317,7 +317,7 @@ global Icon* IconByIdent(const char *ident)
 {
     Icon* const* icon;
 
-    icon = hash_find(IconHash, ident);
+    icon = (Icon* const*)hash_find(IconHash, ident);
 
     if (icon) {
 	return *icon;
