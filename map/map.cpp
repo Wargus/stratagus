@@ -653,7 +653,9 @@ global void CleanMap(void)
 
     CleanMapFogOfWar();
 
+    // FIXME: don't need to call both of these
     CleanPud();
+    CleanScm();
 }
 
 //@}
