@@ -3423,9 +3423,6 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	int sz;
 	static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
 	Menu *menu;
-#ifdef USE_ZZIPLIB
-	ZZIP_FILE *zzf;
-#endif
 
 	menu = FindMenu("menu-select-scenario");
 
@@ -3448,15 +3445,6 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 		np = pathbuf;
 	}
 	fl->type = -1;
-#ifdef USE_ZZIPLIB
-	if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
-		sz = zzip_file_real(zzf);
-		zzip_close(zzf);
-		if (!sz) {
-			goto usezzf;
-		}
-	}
-#endif
 	u = 0;
 	lcp = 0;
 	while (suf[u]) {
@@ -3488,9 +3476,6 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 		}
 #endif
 		if (*cp == 0) {
-#ifdef USE_ZZIPLIB
-usezzf:
-#endif
 			if (curopt == 0) {
 				// info = GetCmInfo(pathbuf);
 				info = NULL;
@@ -5243,10 +5228,6 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 	char *cp;
 	char *lcp;
 	unsigned u;
-#ifdef USE_ZZIPLIB
-	int sz;
-	ZZIP_FILE *zzf;
-#endif
 
 	np = strrchr(pathbuf, '/');
 	if (np) {
@@ -5255,15 +5236,6 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 		np = pathbuf;
 	}
 	fl->type = -1;
-#ifdef USE_ZZIPLIB
-	if ((zzf = zzip_open(pathbuf, O_RDONLY | O_BINARY))) {
-		sz = zzip_file_real(zzf);
-		zzip_close(zzf);
-		if (!sz) {
-			goto usezzf;
-		}
-	}
-#endif
 	suf[0] = ".pud";
 	suf[1] = ".scm";
 	suf[2] = ".chk";
@@ -5299,9 +5271,6 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 		}
 #endif
 		if (*cp == 0) {
-#ifdef USE_ZZIPLIB
-usezzf:
-#endif
 			if (strcasestr(np, ".pud")) {
 				info = GetPudInfo(pathbuf);
 				if (info) {
@@ -6145,10 +6114,6 @@ local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 	char *np;
 	char *cp;
 	char *lcp;
-#ifdef USE_ZZIPLIB
-	int sz;
-	ZZIP_FILE *zzf;
-#endif
 
 	suf = ".pud";
 	np = strrchr(pathbuf, '/');
@@ -6160,15 +6125,6 @@ local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 	cp = np;
 	cp--;
 	fl->type = -1;
-#ifdef USE_ZZIPLIB
-	if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
-		sz = zzip_file_real(zzf);
-		zzip_close(zzf);
-		if (!sz) {
-			goto usezzf;
-		}
-	}
-#endif
 	do {
 		lcp = cp++;
 		cp = strcasestr(cp, suf);
@@ -6186,9 +6142,6 @@ local int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 		}
 #endif
 		if (*cp == 0) {
-#ifdef USE_ZZIPLIB
-usezzf:
-#endif
 			if (strcasestr(pathbuf, ".pud")) {
 				fl->type = 1;
 				fl->name = strdup(np);
@@ -6617,10 +6570,6 @@ local int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 	char *np;
 	char *cp;
 	char *lcp;
-#ifdef USE_ZZIPLIB
-	int sz;
-	ZZIP_FILE *zzf;
-#endif
 
 	suf = ".log";
 	np = strrchr(pathbuf, '/');
@@ -6632,15 +6581,6 @@ local int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 	cp = np;
 	cp--;
 	fl->type = -1;
-#ifdef USE_ZZIPLIB
-	if ((zzf = zzip_open(pathbuf, O_RDONLY | O_BINARY))) {
-		sz = zzip_file_real(zzf);
-		zzip_close(zzf);
-		if (!sz) {
-			goto usezzf;
-		}
-	}
-#endif
 	do {
 		lcp = cp++;
 		cp = strcasestr(cp, suf);
@@ -6658,9 +6598,6 @@ local int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 		}
 #endif
 		if (*cp == 0) {
-#ifdef USE_ZZIPLIB
-usezzf:
-#endif
 			if (strcasestr(pathbuf, ".log")) {
 				fl->type = 1;
 				fl->name = strdup(np);

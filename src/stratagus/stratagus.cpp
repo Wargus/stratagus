@@ -755,9 +755,6 @@ local void PrintHeader(void)
 #ifdef USE_BZ2LIB
 	"BZ2LIB "
 #endif
-#ifdef USE_ZZIPLIB
-	"ZZIPLIB "
-#endif
 #ifdef USE_SDL
 	"SDL "
 #endif

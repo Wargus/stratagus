@@ -604,7 +604,7 @@ local int CclSetIconSize(lua_State* l)
 /**
 **  Register CCL features for icons.
 **
-**  @todo  Add more functions for CCL. (draw-icon)
+**  @todo  Add more functions for CCL. (DrawIcon)
 */
 global void IconCclRegister(void)
 {
