@@ -49,6 +49,12 @@
 
 #define SC_IsUnitMineral(x) ((x)==176 || (x)==177 || (x)==178)	/// sc unit mineral
 #define SC_UnitGeyser	    188	    /// sc unit geyser
+#define SC_TerranSCV	    7	    /// terran scv
+#define SC_ZergDrone	    41	    /// zerg drone
+#define SC_ProtossProbe	    64	    /// protoss probe
+#define SC_TerranCommandCenter	106 /// terran command center
+#define SC_ZergHatchery	    131	    /// zerg hatchery
+#define SC_ProtossNexus	    154	    /// protoss nexus
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -966,6 +972,8 @@ global void LoadScm(const char* scm,WorldMap* map)
 	//	
 	//
 	if( !memcmp(header, "UNIT",4) ) {
+	    int i;
+
 //	    if( length== ) {
 	    if( length%36==0 ) {
 		int x;
@@ -981,6 +989,7 @@ global void LoadScm(const char* scm,WorldMap* map)
 		int nh;
 		int st;
 		int s;
+		int v;
 		Unit* unit;
 		UnitType* type;
 
@@ -1013,21 +1022,22 @@ global void LoadScm(const char* scm,WorldMap* map)
 			Players[o].StartY=MapOffsetY+y;
 			if (GameSettings.NumUnits == SettingsNumUnits1
 				&& Players[o].Type != PlayerNobody) {
-#if 0
-			    // FIXME: Use the peasant for each race
-			    if () {
-				t = SC_UnitPeasant;
-			    } else {
-				t = SC_UnitPeon;
+			    if (t == SC_StartLocation) {
+				if( Players[i].Race==0 ) {
+				    t=SC_ZergDrone;
+				} else if( Players[i].Race==1 ) {
+				    t=SC_TerranSCV;
+				} else {
+				    t=SC_ProtossProbe;
+				}
 			    }
 			    v = 1;
 			    goto pawn;
-#endif
 			}
 		    } else {
 			if ( GameSettings.NumUnits == SettingsNumUnitsMapDefault ||
 			    SC_IsUnitMineral(t) || t == SC_UnitGeyser ) {
-//pawn:
+pawn:
 			    if( !SC_IsUnitMineral(t) && t != SC_UnitGeyser ) {
 				if( (s = GameSettings.Presets[o].Race) != SettingsPresetMapDefault ) {
 #if 0
@@ -1060,6 +1070,38 @@ global void LoadScm(const char* scm,WorldMap* map)
 #endif
 				    }
 				}
+				UpdateForNewUnit(unit,0);
+			    }
+			}
+		    }
+		}
+
+		for( i=0; i<12; ++i ) {
+		    if( Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer ) {
+			if( Players[i].TotalUnits == 0 ) {
+			    // If the player has no units use 4 peasants and a town hall as default
+			    int j;
+			    int t1;
+			    Unit* unit;
+			    UnitType* type;
+			    if( Players[i].Race==0 ) {
+				t1=SC_ZergDrone;
+				type=UnitTypeByWcNum(SC_ZergHatchery);
+			    } else if( Players[i].Race==1 ) {
+				t1=SC_TerranSCV;
+				type=UnitTypeByWcNum(SC_TerranCommandCenter);
+			    } else {
+				t1=SC_ProtossProbe;
+				type=UnitTypeByWcNum(SC_ProtossNexus);
+			    }
+			    unit=MakeUnitAndPlace(Players[i].StartX,Players[i].StartY,
+				type,&Players[i]);
+			    UpdateForNewUnit(unit,0);
+			    for( j=0; j<4; ++j ) {
+				unit=MakeUnit(UnitTypeByWcNum(t1),&Players[i]);
+				unit->X=Players[i].StartX;
+				unit->Y=Players[i].StartY;
+				DropOutOnSide(unit,LookingS,type->TileWidth,type->TileHeight);
 				UpdateForNewUnit(unit,0);
 			    }
 			}
