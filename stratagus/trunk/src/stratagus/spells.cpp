@@ -153,133 +153,138 @@ global int SpellFireballController( void* missile )
   return 0;
 };
 
-/*
-** Death-Coil controller
+/**
+**	Death-Coil controller
 */
-global int SpellDeathCoilController( void* missile )
+global int SpellDeathCoilController(void *missile)
 {
-  Unit* table[MAX_UNITS];
-  int i;
-  int n;
+    Unit *table[MAX_UNITS];
+    int i;
+    int n;
 
-  Missile* mis = (Missile*)missile;
-  RefsDebugCheck( !mis->SourceUnit->Refs );
-  mis->SourceUnit->Refs--;
-  RefsDebugCheck( !mis->SourceUnit->Refs );
-  if ( mis->TargetUnit ) {
-    RefsDebugCheck( !mis->TargetUnit->Refs );
-    mis->TargetUnit->Refs--;
-    RefsDebugCheck( !mis->TargetUnit->Refs );
-  }
-  if ( mis->X == mis->DX && mis->Y == mis->DY )
-    { // missile has reached target unit/spot
-    if ( !mis->SourceUnit->Destroyed )
-      { // source unit still exists
-      if ( mis->TargetUnit && !mis->TargetUnit->Destroyed )
-        { // target unit still exists
-	int hp = mis->TargetUnit->HP;
-	hp -= 50;
-	mis->SourceUnit->HP += 50;
-	if ( hp <= 0 )
-	  {
-	  mis->TargetUnit->HP = 0;
-	  DestroyUnit( mis->TargetUnit );
-	  }
-	else
-	  mis->TargetUnit->HP = hp;
-	if ( mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints )
-	  mis->SourceUnit->HP = mis->SourceUnit->Stats->HitPoints;
-	}
-      else
-        { // no target unit -- try enemies in range 5x5
-	int ec = 0; // enemy count
-	int x = mis->DX / TileSizeX;
-	int y = mis->DY / TileSizeY;
-	n = SelectUnits(x-2,y-2, x+2, y+2,table);
-	if ( n > 0 )
-	  {
-	  // calculate organic enemy count
-	  for( i=0; i<n; ++i )
-	    ec += ( IsEnemy(mis->SourceUnit->Player,table[i])
-	            && table[i]->Type->Organic != 0);
-	  if ( ec > 0 )
-	    { // yes organic enemies found
-	    for( i=0; i<n; ++i )
-	      if ( IsEnemy(mis->SourceUnit->Player,table[i])
-	            && table[i]->Type->Organic != 0 )
-	        {
-		// disperse dabage between them
-		int hp = table[i]->HP;
-		hp -= 50/ec; //NOTE: 1 is the minimal damage
-		if ( hp <= 0 )
-		  {
-		  table[i]->HP = 0;
-		  DestroyUnit( table[i] ); // too much damage
-		  }
-		else
-		  table[i]->HP = hp;
-		}
-	    mis->SourceUnit->HP += 50;
-	    if ( mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints )
-	      mis->SourceUnit->HP = mis->SourceUnit->Stats->HitPoints;
-	    }
-	  }
-	}
-      }
+    Missile *mis = (Missile *) missile;
+
+    RefsDebugCheck(!mis->SourceUnit->Refs);
+    mis->SourceUnit->Refs--;
+    RefsDebugCheck(!mis->SourceUnit->Refs);
+    if (mis->TargetUnit) {
+	RefsDebugCheck(!mis->TargetUnit->Refs);
+	mis->TargetUnit->Refs--;
+	RefsDebugCheck(!mis->TargetUnit->Refs);
     }
-  return 0;
-}
 
-/*
-** Whirlwind controller
+    //
+    //	missile has reached target unit/spot
+    //
+    if (mis->X == mis->DX && mis->Y == mis->DY) {
+	if (!mis->SourceUnit->Destroyed) {	// source unit still exists
+	    // target unit still exists
+	    if (mis->TargetUnit
+		    && !mis->TargetUnit->Destroyed && mis->TargetUnit->HP ) {
+		int hp;
+
+		hp = mis->TargetUnit->HP;
+		hp -= 50;
+		mis->SourceUnit->HP += 50;
+		if (hp <= 0) {
+		    mis->TargetUnit->HP = 0;
+		    DestroyUnit(mis->TargetUnit);
+		} else
+		    mis->TargetUnit->HP = hp;
+		if (mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints)
+		    mis->SourceUnit->HP = mis->SourceUnit->Stats->HitPoints;
+	    } else {
+		// no target unit -- try enemies in range 5x5
+		int ec = 0;		// enemy count
+		int x = mis->DX / TileSizeX;
+		int y = mis->DY / TileSizeY;
+
+		n = SelectUnits(x - 2, y - 2, x + 2, y + 2, table);
+		if (n > 0) {
+		    // calculate organic enemy count
+		    for (i = 0; i < n; ++i)
+			ec += (IsEnemy(mis->SourceUnit->Player, table[i])
+			       && table[i]->Type->Organic != 0);
+		    if (ec > 0) {	// yes organic enemies found
+			for (i = 0; i < n; ++i)
+			    if (IsEnemy(mis->SourceUnit->Player, table[i])
+				    && table[i]->Type->Organic != 0) {
+				// disperse dabage between them
+				int hp = table[i]->HP;
+
+				hp -= 50 / ec;	//NOTE: 1 is the minimal damage
+				if (hp <= 0) {
+				    table[i]->HP = 0;
+				    DestroyUnit(table[i]);	// too much damage
+				} else
+				    table[i]->HP = hp;
+			    }
+			mis->SourceUnit->HP += 50;
+			if (mis->SourceUnit->HP >
+			    mis->SourceUnit->Stats->HitPoints)
+			    mis->SourceUnit->HP =
+				    mis->SourceUnit->Stats->HitPoints;
+		    }
+		}
+	    }
+	}
+    }
+    return 0;
+}
+/**
+**	Whirlwind controller
 */
 /*
   FIXME: vladi: whirlwind is particulary bad! :)
   we need slow smooth missile movement that we don't
   have yet... should be fixed later
 */
-global int SpellWhirlwindController( void* missile )
+global int SpellWhirlwindController(void *missile)
 {
-  Unit* table[MAX_UNITS];
-  int i;
-  int n;
-  int x;
-  int y;
+    Unit *table[MAX_UNITS];
+    int i;
+    int n;
+    int x;
+    int y;
 
-  Missile* mis = (Missile*)missile;
-  x = mis->X / TileSizeX;
-  y = mis->Y / TileSizeY;
+    Missile *mis = (Missile *) missile;
 
-  n = SelectUnitsOnTile( x, y, table);
-  for( i=0; i<n; ++i ) {
-    HitUnit(table[i],WHIRLWIND_DAMAGE1);
-  }
-  n = SelectUnits( x - 1, y - 1, x + 1, y + 1, table);
-  for( i=0; i<n; ++i ) {
-    HitUnit(table[i],WHIRLWIND_DAMAGE2);
-  }
-  //printf( "Whirlwind: %d, %d, TTL: %d\n", mis->X, mis->Y, mis->TTL );
-  if ( mis->TTL % 100 == 0 ) // changes direction every 3 seconds (approx.)
-    { // missile has reached target unit/spot
-    int nx, ny;
-    do
-      {
-      // find new destination in the map
-      nx = x  +  SyncRand() % 5 - 2;
-      ny = y  +  SyncRand() % 5 - 2;
-      }
-    while(  nx < 0 && ny < 0 && nx >= TheMap.Width && ny >= TheMap.Height );
-    mis->X = mis->DX;
-    mis->Y = mis->DY;
-    mis->DX = nx * TileSizeX + TileSizeX/2;
-    mis->DY = ny * TileSizeY + TileSizeY/2;
-    //printf( "Whirlwind new direction: %d, %d, TTL: %d\n", mis->X, mis->Y, mis->TTL );
+    x = mis->X / TileSizeX;
+    y = mis->Y / TileSizeY;
+
+    n = SelectUnitsOnTile(x, y, table);
+    for (i = 0; i < n; ++i) {
+	HitUnit(table[i], WHIRLWIND_DAMAGE1);
     }
-  return 0;
+    n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
+    for (i = 0; i < n; ++i) {
+	HitUnit(table[i], WHIRLWIND_DAMAGE2);
+    }
+    //printf( "Whirlwind: %d, %d, TTL: %d\n", mis->X, mis->Y, mis->TTL );
+
+    //
+    //	Changes direction every 3 seconds (approx.)
+    //
+    if (mis->TTL % 100 == 0) {		// missile has reached target unit/spot
+	int nx, ny;
+
+	do {
+	    // find new destination in the map
+	    nx = x + SyncRand() % 5 - 2;
+	    ny = y + SyncRand() % 5 - 2;
+	} while (nx < 0 && ny < 0 && nx >= TheMap.Width && ny >= TheMap.Height);
+	mis->X = mis->DX;
+	mis->Y = mis->DY;
+	mis->DX = nx * TileSizeX + TileSizeX / 2;
+	mis->DY = ny * TileSizeY + TileSizeY / 2;
+	//printf( "Whirlwind new direction: %d, %d, TTL: %d\n",
+	//	mis->X, mis->Y, mis->TTL );
+    }
+    return 0;
 }
 
-/*
-** Runes controller
+/**
+**	Runes controller
 */
 global int SpellRunesController( void* missile )
 {
