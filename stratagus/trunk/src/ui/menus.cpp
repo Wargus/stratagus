@@ -111,6 +111,7 @@ local void MultiClientReady(void);
 local void MultiClientNotReady(void);
 local void MultiClientGemAction(Menuitem *mi);
 
+local void MultiGameCancel(void);
 local void MultiGameSetupInit(Menuitem *mi);	// master init
 local void MultiGameSetupExit(Menuitem *mi);	// master exit
 local void MultiGameDrawFunc(Menuitem *mi);
@@ -438,7 +439,7 @@ local Menuitem NetMultiSetupMenuItems[] = {
     { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, GameCancel, 'c'} } },
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiGameCancel, 'c'} } },
 
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
 	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
@@ -1989,8 +1990,14 @@ local void MultiGameSetupInit(Menuitem *mi)
 
 local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))
 {
-    // FIXME : Not called yet
     NetworkExitServerConnect();
+}
+
+local void MultiGameCancel(void)
+{
+    MultiGameSetupExit(NULL);
+    NetPlayers = 0;		// Make single player menus work again!
+    GameCancel();
 }
 
 local void NetMultiPlayerDrawFunc(Menuitem *mi)
