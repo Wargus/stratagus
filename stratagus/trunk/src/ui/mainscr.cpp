@@ -1128,9 +1128,7 @@ void ClearCosts(void)
 static void DrawInfoPanelBackground(unsigned frame)
 {
 	if (TheUI.InfoPanelG) {
-		VideoDrawSubClip(TheUI.InfoPanelG, 0,
-			TheUI.InfoPanelG->Height * frame,
-			TheUI.InfoPanelG->Width, TheUI.InfoPanelG->Height,
+		VideoDrawClip(TheUI.InfoPanelG, frame,
 			TheUI.InfoPanelX, TheUI.InfoPanelY);
 	}
 }
