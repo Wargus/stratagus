@@ -744,9 +744,18 @@ local SCM CclUnit(SCM list)
 		unit->Player->UnitTypesCount[type->Type]--;
 	    }
 	    // FIXME: Does not load CorpseList Properly
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+	    if( unit->Type->Building &&
+		( unit->Orders[0].Action==UnitActionDie || unit->Destroyed )) {
+		DeadBuildingCacheInsert(unit);
+	    } else if( unit->Orders[0].Action==UnitActionDie ) {
+		CorpseCacheInsert(unit);
+	    }
+#else
 	    if( unit->Orders[0].Action==UnitActionDie ) {
 		CorpseCacheInsert(unit);
 	    }
+#endif
 #ifdef NEW_FOW
 	    if( unit->Orders[0].Action==UnitActionDie &&
 		unit->Type->CorpseScript ) {
