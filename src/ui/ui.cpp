@@ -34,6 +34,8 @@
 #include <string.h>
 
 #include "freecraft.h"
+#include "video.h"
+#include "font.h"
 #include "interface.h"
 #include "map.h"
 #include "ui.h"
@@ -113,7 +115,16 @@ global void InitUserInterface(const char *race_name)
     //
     TheUI.LastClickedVP = 0;
 
-    SetViewportMode (VIEWPORT_SINGLE);
+    SetViewportMode(VIEWPORT_SINGLE);
+
+    // FIXME: Can be removed after new config is working
+    if( !strcmp(race_name,"human") || !strcmp(race_name,"alliance") ) {
+	TheUI.NormalFontColor = FontWhite;
+	TheUI.ReverseFontColor = FontYellow;
+    } else {
+	TheUI.NormalFontColor = FontYellow;
+	TheUI.ReverseFontColor = FontWhite;
+    }
 }
 
 /**
@@ -253,12 +264,240 @@ global void LoadUserInterface(void)
 }
 
 /**
-**	Save the user interface module.
+**	Save the UI structure.
+**
+**	@param file	Save file handle
+**	@param ui	User interface to save
 */
-global void SaveUserInterface(FILE* file)
+local void OldSaveUi(FILE* file,const UI* ui)
 {
     int i;
 
+    fprintf(file,"(define-old-ui '%s %d %d\t; Selector\n",
+	    ui->Name,ui->Width,ui->Height);
+    fprintf(file,"  ; Filler 1\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    ui->Filler1.File,ui->Filler1X,ui->Filler1Y);
+    fprintf(file,"  ; Resource line\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
+
+    for( i=1; i<MaxCosts; ++i ) {
+	fprintf(file,"  ; Resource %s\n",DEFAULT_NAMES[i]);
+	fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
+		ui->Resources[i].Icon.File,ui->Resources[i].IconRow,
+		ui->Resources[i].IconX,ui->Resources[i].IconY,
+		ui->Resources[i].IconW,ui->Resources[i].IconH,
+		ui->Resources[i].TextX,ui->Resources[i].TextY);
+    }
+    fprintf(file,"  ; Food\n");
+    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
+	    ui->FoodIcon.File,ui->FoodIconRow,
+	    ui->FoodIconX,ui->FoodIconY,
+	    ui->FoodIconW,ui->FoodIconH,
+	    ui->FoodTextX,ui->FoodTextY);
+    fprintf(file,"  ; Score\n");
+    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
+	    ui->ScoreIcon.File,ui->ScoreIconRow,
+	    ui->ScoreIconX,ui->ScoreIconY,
+	    ui->ScoreIconW,ui->ScoreIconH,
+	    ui->ScoreTextX,ui->ScoreTextY);
+
+    fprintf(file,"  ; Info panel\n");
+    fprintf(file,"  (list \"%s\" %d %d %d %d)\n",
+	    ui->InfoPanel.File,
+	    ui->InfoPanelX,ui->InfoPanelY,
+	    ui->InfoPanelW,ui->InfoPanelH);
+
+    fprintf(file,"  ; Complete bar\n");
+    fprintf(file,"  (list %d %d %d %d %d)\n",
+	    ui->CompleteBarColor,
+	    ui->CompleteBarX,ui->CompleteBarY,
+	    ui->CompleteTextX,ui->CompleteTextY);
+
+    fprintf(file,"  ; Button panel\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    ui->ButtonPanel.File,ui->ButtonPanelX,ui->ButtonPanelY);
+
+    fprintf(file,"  ; The map area\n");
+    fprintf(file,"  (list %d %d %d %d)\n",
+	    ui->MapArea.X, ui->MapArea.Y,
+	    ui->MapArea.EndX+1,ui->MapArea.EndY+1);
+
+    fprintf(file,"  ; Menu button background\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    ui->MenuButton.File,ui->MenuButtonX,ui->MenuButtonY);
+
+    fprintf(file,"  ; Minimap background\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    ui->Minimap.File,ui->MinimapX,ui->MinimapY);
+
+    fprintf(file,"  ; Status line\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    ui->StatusLine.File,ui->StatusLineX,ui->StatusLineY);
+
+    fprintf(file,"  ; Buttons\n");
+    for( i=0; i<MaxButtons; ++i ) {
+	fprintf(file,"  (list %3d %3d %4d %3d)\n",
+		ui->Buttons[i].X,ui->Buttons[i].Y,
+		ui->Buttons[i].Width,ui->Buttons[i].Height);
+    }
+
+    fprintf(file,"  ; Buttons II\n");
+    for( i=0; i<6; ++i ) {
+	fprintf(file,"  (list %3d %3d %4d %3d)\n",
+		ui->Buttons2[i].X,ui->Buttons2[i].Y,
+		ui->Buttons2[i].Width,ui->Buttons2[i].Height);
+    }
+
+    fprintf(file,"  ; Cursors\n");
+    fprintf(file,"  (list");
+    fprintf(file," '%s",ui->Point.Name);
+    fprintf(file," '%s",ui->Glass.Name);
+    fprintf(file," '%s\n",ui->Cross.Name);
+    fprintf(file,"    '%s",ui->YellowHair.Name);
+    fprintf(file," '%s",ui->GreenHair.Name);
+    fprintf(file,"    '%s\n",ui->RedHair.Name);
+    fprintf(file,"    '%s\n",ui->Scroll.Name);
+
+    fprintf(file,"    '%s",ui->ArrowE.Name);
+    fprintf(file," '%s",ui->ArrowNE.Name);
+    fprintf(file," '%s",ui->ArrowN.Name);
+    fprintf(file," '%s\n",ui->ArrowNW.Name);
+    fprintf(file,"    '%s",ui->ArrowW.Name);
+    fprintf(file," '%s",ui->ArrowSW.Name);
+    fprintf(file," '%s",ui->ArrowS.Name);
+    fprintf(file," '%s)\n",ui->ArrowSE.Name);
+
+    fprintf(file,"  (list \"%s\")\n",ui->GameMenuePanel.File);
+    fprintf(file,"  (list \"%s\")\n",ui->Menue1Panel.File);
+    fprintf(file,"  (list \"%s\")\n",ui->Menue2Panel.File);
+    fprintf(file,"  (list \"%s\")\n",ui->VictoryPanel.File);
+    fprintf(file,"  (list \"%s\")",ui->ScenarioPanel.File);
+
+    fprintf(file," )\n\n");
+}
+
+/**
+**	Save the UI structure.
+**
+**	@param file	Save file handle
+**	@param ui	User interface to save
+*/
+local void NewSaveUi(FILE * file, const UI * ui)
+{
+    int i;
+
+    fprintf(file, "(define-ui '%s %d %d\t; Selector\n",
+	ui->Name, ui->Width, ui->Height);
+
+    fprintf(file, "  'normal-font-color %d 'reverse-font-color %d\n",
+	ui->NormalFontColor, ui->ReverseFontColor);
+
+    fprintf(file, "  'filler-1 '(pos (%d %d) image \"%s\")\n",
+	ui->Filler1X, ui->Filler1Y, ui->Filler1.File);
+
+    fprintf(file, "  'resources '(pos (%d %d) image \"%s\"",
+	ui->ResourceX, ui->ResourceY, ui->Resource.File);
+    for (i = 1; i < MaxCosts; ++i) {
+	// FIXME: use slot 0 for time displays!
+	fprintf(file, "\n    %s (icon-pos (%d %d) icon-file \"%s\"\n",
+	    DEFAULT_NAMES[i],
+	    ui->Resources[i].IconX, ui->Resources[i].IconY,
+	    ui->Resources[i].Icon.File);
+	fprintf(file,"      icon-frame %d icon-size (%d %d) text-pos (%d %d))",
+	    ui->Resources[i].IconRow,
+	    ui->Resources[i].IconW, ui->Resources[i].IconH,
+	    ui->Resources[i].TextX, ui->Resources[i].TextY);
+    }
+    fprintf(file, "\n    food (icon-pos (%d %d) icon-file \"%s\"\n",
+	ui->FoodIconX, ui->FoodIconY, ui->FoodIcon.File);
+    fprintf(file,"      icon-frame %d icon-size (%d %d) text-pos (%d %d))",
+	ui->FoodIconRow,
+	ui->FoodIconW, ui->FoodIconH, ui->FoodTextX, ui->FoodTextY);
+    fprintf(file, "\n    score (icon-pos (%d %d) icon-file \"%s\"\n",
+	ui->ScoreIconX, ui->ScoreIconY, ui->ScoreIcon.File);
+    fprintf(file,"      icon-frame %d icon-size (%d %d) text-pos (%d %d))",
+	ui->ScoreIconRow,
+	ui->ScoreIconW, ui->ScoreIconH, ui->ScoreTextX, ui->ScoreTextY);
+    fprintf(file, ")\n");
+
+    fprintf(file, "  'info-panel '(pos (%d %d) image \"%s\"\n",
+	ui->InfoPanelX, ui->InfoPanelY,
+	ui->InfoPanel.File);
+    fprintf(file, "    size (%d %d)\n",
+	ui->InfoPanelW, ui->InfoPanelH);
+
+    fprintf(file, "    complete-bar (color %d pos (%d %d) text-pos (%d %d)))\n",
+	ui->CompleteBarColor,
+	ui->CompleteBarX, ui->CompleteBarY,
+	ui->CompleteTextX, ui->CompleteTextY);
+
+    fprintf(file, "  'button-panel '(pos (%d %d) image \"%s\")\n",
+	ui->ButtonPanelX, ui->ButtonPanelY, ui->ButtonPanel.File);
+
+    fprintf(file, "  'map-area '(pos (%d %d) size (%d %d))\n",
+	ui->MapArea.X, ui->MapArea.Y,
+	ui->MapArea.EndX + 1, ui->MapArea.EndY + 1);
+
+    fprintf(file, "  'menu-button '(pos (%d %d) image \"%s\")\n",
+	ui->MenuButtonX, ui->MenuButtonY, ui->MenuButton.File);
+
+    fprintf(file, "  'minimap '(pos (%d %d) image \"%s\")\n",
+	ui->MinimapX, ui->MinimapY, ui->Minimap.File);
+
+    fprintf(file, "  'status-line '(pos (%d %d) image \"%s\")\n",
+	ui->StatusLineX, ui->StatusLineY, ui->StatusLine.File);
+
+    fprintf(file, "; 0 Menu 1-9 Info 10-19 Button\n");
+    fprintf(file, "  'buttons '(");
+    for (i = 0; i < MaxButtons; ++i) {
+	fprintf(file, "\n    (pos (%3d %3d) size (%4d %3d))",
+	    ui->Buttons[i].X, ui->Buttons[i].Y,
+	    ui->Buttons[i].Width, ui->Buttons[i].Height);
+    }
+
+    fprintf(file, ")\n; 0-5 Training\n");
+    fprintf(file, "  'buttons-2 '(");
+    for (i = 0; i < 6; ++i) {
+	fprintf(file, "\n    (pos (%3d %3d) size (%4d %3d))",
+	    ui->Buttons2[i].X, ui->Buttons2[i].Y,
+	    ui->Buttons2[i].Width, ui->Buttons2[i].Height);
+    }
+
+    fprintf(file, ")\n  'cursors '(point %s\n", ui->Point.Name);
+    fprintf(file, "    glass %s\n", ui->Glass.Name);
+    fprintf(file, "    cross %s\n", ui->Cross.Name);
+    fprintf(file, "    yellow %s\n", ui->YellowHair.Name);
+    fprintf(file, "    green %s\n", ui->GreenHair.Name);
+    fprintf(file, "    red %s\n", ui->RedHair.Name);
+    fprintf(file, "    scroll %s\n", ui->Scroll.Name);
+
+    fprintf(file, "    arrow-e %s\n", ui->ArrowE.Name);
+    fprintf(file, "    arrow-ne %s\n", ui->ArrowNE.Name);
+    fprintf(file, "    arrow-n %s\n", ui->ArrowN.Name);
+    fprintf(file, "    arrow-nw %s\n", ui->ArrowNW.Name);
+    fprintf(file, "    arrow-w %s\n", ui->ArrowW.Name);
+    fprintf(file, "    arrow-sw %s\n", ui->ArrowSW.Name);
+    fprintf(file, "    arrow-s %s\n", ui->ArrowS.Name);
+    fprintf(file, "    arrow-se %s)\n", ui->ArrowSE.Name);
+
+    fprintf(file, "  'panels '(game-menu \"%s\"\n", ui->GameMenuePanel.File);
+    fprintf(file, "    menue-1 \"%s\"\n", ui->Menue1Panel.File);
+    fprintf(file, "    menue-2 \"%s\"\n", ui->Menue2Panel.File);
+    fprintf(file, "    victory \"%s\"\n", ui->VictoryPanel.File);
+    fprintf(file, "    scenario \"%s\")", ui->ScenarioPanel.File);
+
+    fprintf(file, " )\n\n");
+}
+
+/**
+**	Save the user interface module.
+**
+**	@param file	Save file handle
+*/
+global void SaveUserInterface(FILE* file)
+{
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: ui $Id$\n\n");
 
@@ -281,110 +520,8 @@ global void SaveUserInterface(FILE* file)
 	    TheUI.OriginalResources ? "#t" : "#f");
 
     // Save the current UI
-
-    fprintf(file,"(define-ui '%s %d %d\t; Selector\n",
-	    TheUI.Name,TheUI.Width,TheUI.Height);
-    fprintf(file,"  ; Filler 1\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    TheUI.Filler1.File,TheUI.Filler1X,TheUI.Filler1Y);
-    fprintf(file,"  ; Resource line\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    TheUI.Resource.File,TheUI.ResourceX,TheUI.ResourceY);
-
-    for( i=1; i<MaxCosts; ++i ) {
-	fprintf(file,"  ; Resource %s\n",DEFAULT_NAMES[i]);
-	fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
-		TheUI.Resources[i].Icon.File,TheUI.Resources[i].IconRow,
-		TheUI.Resources[i].IconX,TheUI.Resources[i].IconY,
-		TheUI.Resources[i].IconW,TheUI.Resources[i].IconH,
-		TheUI.Resources[i].TextX,TheUI.Resources[i].TextY);
-    }
-    fprintf(file,"  ; Food\n");
-    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
-	    TheUI.FoodIcon.File,TheUI.FoodIconRow,
-	    TheUI.FoodIconX,TheUI.FoodIconY,
-	    TheUI.FoodIconW,TheUI.FoodIconH,
-	    TheUI.FoodTextX,TheUI.FoodTextY);
-    fprintf(file,"  ; Score\n");
-    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
-	    TheUI.ScoreIcon.File,TheUI.ScoreIconRow,
-	    TheUI.ScoreIconX,TheUI.ScoreIconY,
-	    TheUI.ScoreIconW,TheUI.ScoreIconH,
-	    TheUI.ScoreTextX,TheUI.ScoreTextY);
-
-    fprintf(file,"  ; Info panel\n");
-    fprintf(file,"  (list \"%s\" %d %d %d %d)\n",
-	    TheUI.InfoPanel.File,
-	    TheUI.InfoPanelX,TheUI.InfoPanelY,
-	    TheUI.InfoPanelW,TheUI.InfoPanelH);
-
-    fprintf(file,"  ; Complete bar\n");
-    fprintf(file,"  (list %d %d %d %d %d)\n",
-	    TheUI.CompleteBarColor,
-	    TheUI.CompleteBarX,TheUI.CompleteBarY,
-	    TheUI.CompleteTextX,TheUI.CompleteTextY);
-
-    fprintf(file,"  ; Button panel\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    TheUI.ButtonPanel.File,TheUI.ButtonPanelX,TheUI.ButtonPanelY);
-
-    fprintf(file,"  ; The map area\n");
-    fprintf(file,"  (list %d %d %d %d)\n",
-	    TheUI.MapArea.X, TheUI.MapArea.Y,
-	    TheUI.MapArea.EndX+1,TheUI.MapArea.EndY+1);
-
-    fprintf(file,"  ; Menu button background\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    TheUI.MenuButton.File,TheUI.MenuButtonX,TheUI.MenuButtonY);
-
-    fprintf(file,"  ; Minimap background\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    TheUI.Minimap.File,TheUI.MinimapX,TheUI.MinimapY);
-
-    fprintf(file,"  ; Status line\n");
-    fprintf(file,"  (list \"%s\" %d %d)\n",
-	    TheUI.StatusLine.File,TheUI.StatusLineX,TheUI.StatusLineY);
-
-    fprintf(file,"  ; Buttons\n");
-    for( i=0; i<MaxButtons; ++i ) {
-	fprintf(file,"  (list %3d %3d %4d %3d)\n",
-		TheUI.Buttons[i].X,TheUI.Buttons[i].Y,
-		TheUI.Buttons[i].Width,TheUI.Buttons[i].Height);
-    }
-
-    fprintf(file,"  ; Buttons II\n");
-    for( i=0; i<6; ++i ) {
-	fprintf(file,"  (list %3d %3d %4d %3d)\n",
-		TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y,
-		TheUI.Buttons2[i].Width,TheUI.Buttons2[i].Height);
-    }
-
-    fprintf(file,"  ; Cursors\n");
-    fprintf(file,"  (list");
-    fprintf(file," '%s",TheUI.Point.Name);
-    fprintf(file," '%s",TheUI.Glass.Name);
-    fprintf(file," '%s\n",TheUI.Cross.Name);
-    fprintf(file,"    '%s",TheUI.YellowHair.Name);
-    fprintf(file," '%s",TheUI.GreenHair.Name);
-    fprintf(file,"    '%s\n",TheUI.RedHair.Name);
-    fprintf(file,"    '%s\n",TheUI.Scroll.Name);
-
-    fprintf(file,"    '%s",TheUI.ArrowE.Name);
-    fprintf(file," '%s",TheUI.ArrowNE.Name);
-    fprintf(file," '%s",TheUI.ArrowN.Name);
-    fprintf(file," '%s\n",TheUI.ArrowNW.Name);
-    fprintf(file,"    '%s",TheUI.ArrowW.Name);
-    fprintf(file," '%s",TheUI.ArrowSW.Name);
-    fprintf(file," '%s",TheUI.ArrowS.Name);
-    fprintf(file," '%s)\n",TheUI.ArrowSE.Name);
-
-    fprintf(file,"  (list \"%s\")\n",TheUI.GameMenuePanel.File);
-    fprintf(file,"  (list \"%s\")\n",TheUI.Menue1Panel.File);
-    fprintf(file,"  (list \"%s\")\n",TheUI.Menue2Panel.File);
-    fprintf(file,"  (list \"%s\")\n",TheUI.VictoryPanel.File);
-    fprintf(file,"  (list \"%s\")",TheUI.ScenarioPanel.File);
-
-    fprintf(file," )\n\n");
+    OldSaveUi(file,&TheUI);
+    NewSaveUi(file,&TheUI);
 }
 
 /**
@@ -447,14 +584,15 @@ global void CleanUserInterface(void)
 **	@return		viewport number (index into TheUI.VP) or -1
 **			if this pixel is not inside any of the viewports.
 */
-global int GetViewport (int x, int y)
+global int GetViewport(int x, int y)
 {
     int i;
 
-    for (i=0; i < TheUI.NumViewports; i++) {
-	if (x >= TheUI.VP[i].X && x <= TheUI.VP[i].EndX &&
-		y >= TheUI.VP[i].Y && y <= TheUI.VP[i].EndY)
+    for (i = 0; i < TheUI.NumViewports; i++) {
+	if (x >= TheUI.VP[i].X && x <= TheUI.VP[i].EndX
+		&& y >= TheUI.VP[i].Y && y <= TheUI.VP[i].EndY) {
 	    return i;
+	}
     }
     return -1;
 }
@@ -474,15 +612,18 @@ global int GetViewport (int x, int y)
 **			than one viewports (may well happen) this function
 **			returns the first one it finds.
 */
-global int MapTileGetViewport (int tx, int ty)
+global int MapTileGetViewport(int tx, int ty)
 {
     int i;
+    const Viewport *vp;
 
-    for (i=0; i < TheUI.NumViewports; i++) {
-	Viewport *vp = &TheUI.VP[i];
-	if (tx >= vp->MapX && tx < vp->MapX + vp->MapWidth &&
-		ty >= vp->MapY && ty < vp->MapY + vp->MapHeight)
+    for (i = 0; i < TheUI.NumViewports; i++) {
+
+	vp = &TheUI.VP[i];
+	if (tx >= vp->MapX && tx < vp->MapX + vp->MapWidth
+		&& ty >= vp->MapY && ty < vp->MapY + vp->MapHeight) {
 	    return i;
+	}
     }
     return -1;
 }
@@ -498,19 +639,19 @@ global int MapTileGetViewport (int tx, int ty)
 **	@param new_vps	The array of the new viewports
 **	@param num_vps	The number of elements in the new_vps[] array.
 */
-local void FinishViewportModeConfiguration (Viewport new_vps[], int num_vps)
+local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 {
     int i;
     int active;
 
-    /* If the number of viewports increases we need to compute what to display
-     * in the newly created ones.  We need to do this before we store new
-     * geometry information in the TheUI.VP field because we use the old
-     * geometry information for map origin computation.
-     */
+    // If the number of viewports increases we need to compute what to display
+    // in the newly created ones.  We need to do this before we store new
+    // geometry information in the TheUI.VP field because we use the old
+    // geometry information for map origin computation.
     if (TheUI.NumViewports < num_vps) {
 	for (i=0; i < num_vps; i++) {
 	    int v;
+
 	    v = GetViewport (new_vps[i].X, new_vps[i].Y);
 	    if (v != -1) {
 		TheUI.VP[i].MapX = Viewport2MapX (v, new_vps[i].X);
@@ -522,29 +663,33 @@ local void FinishViewportModeConfiguration (Viewport new_vps[], int num_vps)
 	}
     }
 
-    for (i=0; i < num_vps; i++) {
+    for (i = 0; i < num_vps; i++) {
 	TheUI.VP[i].X = new_vps[i].X;
 	TheUI.VP[i].EndX = new_vps[i].EndX;
 	TheUI.VP[i].Y = new_vps[i].Y;
 	TheUI.VP[i].EndY = new_vps[i].EndY;
-	TheUI.VP[i].MapWidth = (new_vps[i].EndX - new_vps[i].X + TileSizeX) /
-		TileSizeX;
-	TheUI.VP[i].MapHeight = (new_vps[i].EndY - new_vps[i].Y + TileSizeY) /
-		TileSizeY;
+	TheUI.VP[i].MapWidth =
+	    (new_vps[i].EndX - new_vps[i].X + TileSizeX) / TileSizeX;
+	TheUI.VP[i].MapHeight =
+	    (new_vps[i].EndY - new_vps[i].Y + TileSizeY) / TileSizeY;
 
-	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width)
-	    TheUI.VP[i].MapX -= (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) -
-					TheMap.Width;
-	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height)
-	    TheUI.VP[i].MapY -= (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) -
-					TheMap.Height;
+	if (TheUI.VP[i].MapWidth + TheUI.VP[i].MapX > TheMap.Width) {
+	    TheUI.VP[i].MapX -=
+		(TheUI.VP[i].MapWidth + TheUI.VP[i].MapX) - TheMap.Width;
+	}
+	if (TheUI.VP[i].MapHeight + TheUI.VP[i].MapY > TheMap.Height) {
+	    TheUI.VP[i].MapY -=
+		(TheUI.VP[i].MapHeight + TheUI.VP[i].MapY) - TheMap.Height;
+	}
     }
     TheUI.NumViewports = num_vps;
-    active = GetViewport (CursorX, CursorY);
-    if (active != -1)
+    active = GetViewport(CursorX, CursorY);
+    if (active != -1) {
 	TheUI.ActiveViewport = active;
-    if (TheUI.LastClickedVP >= TheUI.NumViewports)
+    }
+    if (TheUI.LastClickedVP >= TheUI.NumViewports) {
 	TheUI.LastClickedVP = TheUI.NumViewports - 1;
+    }
 }
 
 /**
@@ -563,7 +708,7 @@ local void FinishViewportModeConfiguration (Viewport new_vps[], int num_vps)
 **			However, they can be smaller according to the place
 **			the viewport v takes in context of current ViewportMode.
 */
-local void ClipViewport (Viewport *v, int ClipX, int ClipY)
+local void ClipViewport(Viewport* v, int ClipX, int ClipY)
 {
     // begin with maximum possible viewport size
     v->EndX = v->X + TheMap.Width * TileSizeX - 1;
@@ -742,37 +887,28 @@ local void SetViewportModeQuad (void)
 **
 **	@param new_mode		New mode's number.
 */
-global void SetViewportMode (ViewportMode new_mode)
+global void SetViewportMode(ViewportMode new_mode)
 {
-    TheUI.ViewportMode = new_mode;
-
-    switch (TheUI.ViewportMode) {
-    case VIEWPORT_SINGLE:
-	SetViewportModeSingle ();
-	break;
-    case VIEWPORT_SPLIT_HORIZ:
-	SetViewportModeSplitHoriz ();
-	break;
-    case VIEWPORT_SPLIT_HORIZ3:
-	SetViewportModeSplitHoriz3 ();
-	break;
-    case VIEWPORT_SPLIT_VERT:
-	SetViewportModeSplitVert ();
-	break;
-    case VIEWPORT_QUAD:
-	SetViewportModeQuad ();
-	break;
-    default:
-	DebugLevel0Fn ("trying to set an unknown mode!!\n");
-	break;
+    switch (TheUI.ViewportMode = new_mode) {
+	case VIEWPORT_SINGLE:
+	    SetViewportModeSingle();
+	    break;
+	case VIEWPORT_SPLIT_HORIZ:
+	    SetViewportModeSplitHoriz();
+	    break;
+	case VIEWPORT_SPLIT_HORIZ3:
+	    SetViewportModeSplitHoriz3();
+	    break;
+	case VIEWPORT_SPLIT_VERT:
+	    SetViewportModeSplitVert();
+	    break;
+	case VIEWPORT_QUAD:
+	    SetViewportModeQuad();
+	    break;
+	default:
+	    DebugLevel0Fn("trying to set an unknown mode!!\n");
+	    break;
     }
-#if 0
-    VideoLockScreen ();
-    VideoFillRectangleClip (ColorBlack, TheUI.MapArea.X, TheUI.MapArea.Y,
-		TheUI.MapArea.EndX - TheUI.MapArea.X + 1,
-		TheUI.MapArea.EndY - TheUI.MapArea.Y + 1);
-    VideoUnlockScreen ();
-#endif
 }
 
 /**
@@ -783,18 +919,18 @@ global void SetViewportMode (ViewportMode new_mode)
 **			make sense are mostly 1 (next viewport mode) and
 *			-1 (previous viewport mode).
 */
-global void CycleViewportMode (int step)
+global void CycleViewportMode(int step)
 {
     int new_mode;
 
     new_mode = TheUI.ViewportMode + step;
-
-    if (new_mode >= NUM_VIEWPORT_MODES)
+    if (new_mode >= NUM_VIEWPORT_MODES) {
 	new_mode = 0;
-    if (new_mode < 0)
+    }
+    if (new_mode < 0) {
 	new_mode = NUM_VIEWPORT_MODES - 1;
-    SetViewportMode (new_mode);
+    }
+    SetViewportMode(new_mode);
 }
-
 
 //@}
