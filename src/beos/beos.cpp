@@ -5,19 +5,19 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name beos.cpp	-	The BeOS functions */
+/**@name beos.cpp - The BeOS functions */
 //
-//	(c) Copyright 2000 by Kenneth Sanislo
+//      (c) Copyright 2000-2004 by Kenneth Sanislo
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_BEOS
@@ -26,16 +26,21 @@
 #include <unistd.h>
 
 /*----------------------------------------------------------------------------
---	Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 extern "C" {
 
-void beos_init( int argc, char **argv )
+/**
+**  Need init function for beos.
+**
+**  @param argc  Number of command line argurments
+*/
+void beos_init(int argc, char **argv)
 { 
-  BPath path( argv[0] );
-  path.GetParent( &path );
-  chdir( path.Path() );
+	BPath path( argv[0] );
+	path.GetParent( &path );
+	chdir( path.Path() );
 }
 
 }
