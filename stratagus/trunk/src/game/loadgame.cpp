@@ -118,6 +118,7 @@ global void CleanModules(void)
 global void InitModules(void)
 {
     GameCycle = 0;
+    FastForwardCycle = 0;
     SyncHash = 0;
 
     CallbackMusicOn();

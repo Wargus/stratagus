@@ -292,6 +292,7 @@ global void CreateGame(char* filename, WorldMap* map)
     }
 
     GameCycle = 0;
+    FastForwardCycle = 0;
     SyncHash = 0;
     InitSyncRand();
 

@@ -614,7 +614,8 @@ global void GameMainLoop(void)
 #else
     int showtip;
 #endif
-
+    int RealVideoSyncSpeed;
+    
     GameCallbacks.ButtonPressed=(void*)HandleButtonDown;
     GameCallbacks.ButtonReleased=(void*)HandleButtonUp;
     GameCallbacks.MouseMoved=(void*)HandleMouseMove;
@@ -633,6 +634,7 @@ global void GameMainLoop(void)
     GameRunning=1;
 
     showtip=0;
+    RealVideoSyncSpeed = VideoSyncSpeed;
     if( NetworkFildes==-1 ) {		// Don't show them for net play
 	showtip=ShowTips;
     }
@@ -755,8 +757,15 @@ global void GameMainLoop(void)
 #if defined(DEBUG) && !defined(FLAG_DEBUG)
 	MustRedraw|=RedrawMenuButton;
 #endif
-
-	if( MustRedraw /* && !VideoInterrupts */ ) {
+        if( FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed ) {
+	    RealVideoSyncSpeed = VideoSyncSpeed;
+	    VideoSyncSpeed = 3000;
+	}
+	if( FastForwardCycle == GameCycle-1 ) {
+	    MustRedraw = RedrawEverything;
+	}
+	if( MustRedraw /* && !VideoInterrupts */ &&
+		(FastForwardCycle <= GameCycle || GameCycle <= 10)) {
 	    if( Callbacks==&MenuCallbacks ) {
 		MustRedraw|=RedrawMenu;
 	    }
@@ -785,7 +794,12 @@ global void GameMainLoop(void)
 
 	CheckVideoInterrupts();		// look if already an interrupt
 
-	WaitEventsOneFrame(Callbacks);
+	if( FastForwardCycle == GameCycle ) {
+	    VideoSyncSpeed = RealVideoSyncSpeed;
+	}
+	if( FastForwardCycle <= GameCycle ) {
+	    WaitEventsOneFrame(Callbacks);
+	}
 	if( !NetworkInSync ) {
 	    NetworkRecover();		// recover network
 	}
