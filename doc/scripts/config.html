@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2003 by Lutz Sammer
+----	(c) Copyright 2002-2004 by Lutz Sammer, Russell Smith
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -33,29 +33,28 @@
        /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
                \/                  \/          \//_____/            \/
     ______________________                           ______________________
-			  T H E   W A R   B E G I N S
+                          T H E   W A R   B E G I N S
 	   Stratagus - A free fantasy real time strategy game engine
 </pre>
-<p><b>(C) Copyright 2002-2003 by The Stratagus Project. Distributed under the
+<p><b>(C) Copyright 2002-2004 by The Stratagus Project. Distributed under the
 <a href="../gpl.html">"GNU General Public License"</a></b>
 <hr>
-<a href="../stratagus.html">Stratagus</a>
-<a href="../readme.html">Readme</a>
+<a href="../index.html">Stratagus</a>
 <a href="../faq.html">FAQ</a>
-<a href="ccl.html">Script</a>
 <a href="ai.html">PREV</a>
 <a href="game.html">NEXT</a>
-<a href="ccl-index.html">Index</a>
+<a href="ccl-index.html">CCL Index</a>
 <hr>
 <a href="#AStar">AStar</a>
 <a href="#DecorationOnTop">DecorationOnTop</a>
-<a href="#+DefineDefaultIncomes">DefineDefaultIncomes</a>
-<a href="#+DefineDefaultResourceAmounts">DefineDefaultResourceAmounts</a>
-<a href="#+DefineDefaultResourceNames">DefineDefaultResourceNames</a>
-<a href="#+DefineDefaultResources">DefineDefaultResources</a>
-<a href="#+DefineDefaultResourcesHigh">DefineDefaultResourcesHigh</a>
-<a href="#+DefineDefaultResourcesLow">DefineDefaultResourcesLow</a>
-<a href="#+DefineDefaultResourcesMedium">DefineDefaultResourcesMedium</a>
+<a href="#DefineDefaultActions">DefineDefaultActions</a>
+<a href="#DefineDefaultIncomes">DefineDefaultIncomes</a>
+<a href="#DefineDefaultResourceAmounts">DefineDefaultResourceAmounts</a>
+<a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
+<a href="#DefineDefaultResources">DefineDefaultResources</a>
+<a href="#DefineDefaultResourcesHigh">DefineDefaultResourcesHigh</a>
+<a href="#DefineDefaultResourcesLow">DefineDefaultResourcesLow</a>
+<a href="#DefineDefaultResourcesMedium">DefineDefaultResourcesMedium</a>
 <a href="#HealthSprite">HealthSprite</a>
 <a href="#ManaSprite">ManaSprite</a>
 <a href="#RevealMap">RevealMap</a>
@@ -146,8 +145,8 @@ What the movement cost for unseen terrian is and whether units are aware of what
 Items can be turned on and off to give desired behaviour, however dont-know-unseen-terrain will increase
 the amount the pathfinder is used at the start of a game while the map is being discovered.  If you need
 the performance, turn it off.
-
-The Cost of a move it 1 if moving straight, or 2 if moving diagonal.
+<p>
+The Cost of a move is 1 if moving straight, or 2 if moving diagonal.
 
 <dl>
   <dt>"fixed-unit-cost", number</dt>
@@ -166,8 +165,12 @@ The Cost of a move it 1 if moving straight, or 2 if moving diagonal.
   <dd>consider (FIXME ? AI and human ?) know(s) all the terrain.</dd>
   <dt>"dont-know-unseen-terrain"</dt>
   <dd>consider (FIXME ? AI and human ?) do(es)n't know all the terrain.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
 </dl>
+
 <h4>Example</h4>
+
 <pre>
 AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "unseen-terrain-cost", 2)
 </pre>
@@ -176,6 +179,36 @@ AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "u
 <h3>DecorationOnTop()</h3>
 
 Show bars and dots always on top.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DecorationOnTop()
+</pre>
+
+<a name="DefineDefaultActions"></a>
+<h3>DefineDefaultActions("name", ...)</h3>
+
+Defines the names of the actions used to harvest/get resources. eg mine gold, or drill oil.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name to give to the action associated with the resource.</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- In the same order as resources are defined.
+    DefineDefaultActions("stop", "mine", "chop", "drill", "mine", "mine", "mine")
+</pre>
 
 <a name="DefineDefaultIncomes"></a>
 <h3>DefineDefaultIncomes([number, number, ...])</h3>
@@ -194,26 +227,126 @@ When collecting gold for example you get 100 gold for a single pickup.
 
 <pre>
     -- Define 7 default incomes
-	-- Resources "time", "gold", "wood", "oil", "ore", "stone", "coal"
+    -- Resources "time", "gold", "wood", "oil", "ore", "stone", "coal"
     DefineDefaultIncomes(0, 100, 100, 100, 100, 100, 100)
 </pre>
 
 <a name="DefineDefaultResourceAmounts"></a>
-<h3>DefineDefaultResourceAmounts()</h3>
+<h3>DefineDefaultResourceAmounts("name", amount ...)</h3>
 
+Defines the default amounts to give to a resource producing unit when placing it for the first
+time in the editor.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name of the resource for the default to be applied to</dd>
+<dt>amount</dt>
+<dd>The amount to set the default too.</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefineDefaultResourceAmounts(
+        "gold", 100000,
+        "oil", 50000)
+</pre>
 
 <a name="DefineDefaultResourceNames"></a>
-<h3>DefineDefaultResourceNames()</h3>
+<h3>DefineDefaultResourceNames("name", ...)</h3>
+
+Names the resources in a given order.
+
+<dl>
+<dt>name</dt>
+<dd>Name to give to the resource
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Define Resource names
+    DefineDefaultResourceNames(
+        "time", "gold", "wood", "oil", "ore", "stone", "coal")
+</pre>
+
 <a name="DefineDefaultResources"></a>
-<h3>DefineDefaultResources()</h3>
+<h3>DefineDefaultResources(amount, ...)</h3>
+
+Defines the default amount of starting resources when you begin a game. the Map can redefine this,
+or it can be chosen from the menu.
+
+<dl>
+<dt>amount</dt>
+<dd>The amount of a resource to start with</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Defines starting resources
+	DefineDefaultResources(0, 2000, 1000, 1000, 1000, 1000, 1000)
+</pre>
+
 <a name="DefineDefaultResourcesHigh"></a>
-<h3>DefineDefaultResourcesHigh()</h3>
+<h3>DefineDefaultResourcesHigh(amount, ...)</h3>
+
+Defines the default amount of starting resources when you begin a game by selecting "High Resources".
+
+<dl>
+<dt>amount</dt>
+<dd>The amount of a resource to start with</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefineDefaultResourcesHigh(0, 10000, 5000, 5000, 5000, 5000, 5000)
+</pre>
+
 <a name="DefineDefaultResourcesLow"></a>
-<h3>DefineDefaultResourcesLow()</h3>
+<h3>DefineDefaultResourcesLow(amount, ...)</h3>
+
+Defines the default amount of starting resources when you begin a game by selecting "Low Resources".
+
+<dl>
+<dt>amount</dt>
+<dd>The amount of a resource to start with</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefineDefaultResourcesLow(0, 2000, 1000, 1000, 1000, 1000, 1000)
+</pre>
+  
 <a name="DefineDefaultResourcesMedium"></a>
-<h3>DefineDefaultResourcesMedium()</h3>
+<h3>DefineDefaultResourcesMedium(amount, ...)</h3>
 
+Defines the default amount of starting resources when you begin a game by selecting "Medium Resources".
 
+<dl>
+<dt>amount</dt>
+<dd>The amount of a resource to start with</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefineDefaultResourcesMedium(0, 5000, 2000, 2000, 2000, 2000, 2000)
+</pre>
 
 <a name="HealthSprite"></a>
 <h3>HealthSprite(file, hotx, hoty, width, height)</h3>
@@ -221,30 +354,33 @@ When collecting gold for example you get 100 gold for a single pickup.
 Define health-sprite.
 
 <dl>
-  <dt>file</dt>
+  <dt>"file"</dt>
   <dd>file where is the image.</dd>
   <dt>hotx, hoty</dt>
-  <dd>offset when it is drawn.</dd>
+  <dd>offset from the sprite when it is drawn.</dd>
   <dt>width, height</dt>
-  <dd>Size of the image.</dd>
+  <dd>Size of the health sprite image.</dd>
 </dl>
+
 <h4>Example</h4>
 <pre>
-HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
+    HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
 </pre>
 
 <a name="ManaSprite"></a>
 <h3>ManaSprite(file, hotx, hoty, width, height)</h3>
 
-define mana-sprite.
+Define mana-sprite.
 
 <dl>
-  <dt>file</dt>
+  <dt>"file"</dt>
   <dd>file where is the image.</dd>
   <dt>hotx, hoty</dt>
-  <dd>offset when it is drawn.</dd>
+  <dd>offset from teh sprite when it is drawn.</dd>
   <dt>width, height</dt>
   <dd>Size of the image.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
 </dl>
 <h4>Example</h4>
 <pre>
@@ -256,33 +392,58 @@ ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
 
 Reveal the entire map.
 
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+<h4>Example</h4>
+<pre>
+    RevealMap()
+</pre>
+
 <a name="RightButtonAttacks"></a>
 <h3>RightButtonAttacks()</h3>
 
 If you prefer fighters are attacking by right clicking empty space.
 
-FIXME: this option will be renamed
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+<h4>Example</h4>
+<pre>
+    RightButtonAttacks()
+</pre>
 
 <a name="RightButtonMoves"></a>
 <h3>RightButtonMoves()</h3>
 
 If you prefer fighters are moving by right clicking empty space.
 
-FIXME: this option will be renamed
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+<h4>Example</h4>
+<pre>
+    RightButtonMoves()
+</pre>
 
 <a name="SetAllPlayersBuildingLimit"></a>
 <h3>SetAllPlayersBuildingLimit(limit)</h3>
 
-.
+Set the limit on the number of buildings a player is allowed to have at one time.
 
 <dl>
   <dt>limit</dt>
   <dd>The maximum number of buildings a player can have.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
-SetAllPlayersBuildingLimit(200)
+    SetAllPlayersBuildingLimit(200)
 </pre>
 
 <a name="SetAllPlayersUnitLimit"></a>
@@ -293,11 +454,13 @@ Sets the number of non-building type units a player can have.
 <dl>
   <dt>limit</dt>
   <dd>Number of non-building unit the player can have</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
-SetAllPlayersUnitLimit(200)
+    SetAllPlayersUnitLimit(200)
 </pre>
 
 <a name="SetAllPlayersTotalUnitLimit"></a>
@@ -305,15 +468,16 @@ SetAllPlayersUnitLimit(200)
 
 Sets the total number of units a player may have, building or non-building.
 
-
 <dl>
   <dt>limit</dt>
   <dd>The number of units to set the limit to.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
-SetAllPlayersTotalUnitLimit(400)
+    SetAllPlayersTotalUnitLimit(400)
 </pre>
 
 <a name="SetBuildingCapture"></a>
@@ -324,6 +488,8 @@ Enable or disable building capture.
 <dl>
   <dt>boolean</dt>
   <dd>true or false, depending on if you want building capture enabled.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Old value of Building Capture</dd>
 </dl>
 
 <h4>Example</h4>
@@ -339,11 +505,13 @@ Sets the missile to use for displaying when a player clicks on a location on the
 <dl>
   <dt>missile-type</dt>
   <dd>The missile to use, as defined in the missiles section</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Old value of the click missile</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
-  SetClickMissile("missile-green-cross")
+    SetClickMissile("missile-green-cross")
 </pre>
 
 <a name="SetColorCycleAll"></a>
@@ -356,12 +524,14 @@ Change how the color cycling is working. This is used to make the water moving.
   <dd>If flag is true all images are color cycled.
   If flag is false  only the tileset and global palettes are color cycled.
   </dd>
+<dt><i>RETURNS</i></dt>
+<dd>1 or 0 for the old value of ColorCycle</dd>
 </dl>
 
 <h4>Example</h4>
 <pre>
--- This is the default, all images are color cycled.
-SetColorCycleAll(true)
+    -- This is the default, all images are color cycled.
+    SetColorCycleAll(true)
 </pre>
 
 <a name="SetColorBuildingCycleEnd"></a>
@@ -544,6 +714,8 @@ Sets the missile to use for displaying the damage done to units.
 <dl>
   <dt>"missile-type"</dt>
   <dd>missile name to use to display the damage</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Old missile type defined as the Damage Missile</dd>
 </dl>
 
 <h4>Example</h4>
