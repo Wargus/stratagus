@@ -44,6 +44,7 @@ enum _move_return_ {
 **	To remove pathfinder internals. Called if path destination changed.
 */
 #ifdef NEW_ORDERS
+// FIXME: Must check, if it is always correct called
 #define ResetPath(command) // Hope I didn't need this?
 #else
 #define ResetPath(command) ((command).Data.Move.Fast=1)
@@ -53,7 +54,7 @@ enum _move_return_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern unsigned char Matrix[(MaxMapWidth+1)*(MaxMapHeight+1)];  /// Path matrix
+extern unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+2)];  /// Path matrix
 
 extern int AStarOn; /// are we using a* or the old path finder
 extern int AStarFixedUnitCrossingCost; /// cost associated to move on a tile
