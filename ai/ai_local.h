@@ -165,6 +165,14 @@ struct _ai_unit_ {
 };
 
 /**
+**	Roles for forces
+*/
+enum _ai_force_role_ {
+    AiForceRoleAttack,			/// Force should attack
+    AiForceRoleDefend,			/// Force should defend
+};
+
+/**
 **	AI force typedef.
 */
 typedef struct _ai_force_ AiForce;
@@ -175,9 +183,12 @@ typedef struct _ai_force_ AiForce;
 **	A force is a group of units belonging together.
 */
 struct _ai_force_ {
-    int			Completed;	/// Flag saying force is complete build
-    int			Defending;	/// Flag saying force is defending
-    int			Attacking;	/// Flag saying force is attacking
+    char		Completed;	/// Flag saying force is complete build
+    char		Defending;	/// Flag saying force is defending
+    char		Attacking;	/// Flag saying force is attacking
+
+    char		Role;		/// Role of the force
+
     AiUnitType*		UnitTypes;	/// Count and types of unit-type
     AiUnit*		Units;		/// Units in the force
 	//
