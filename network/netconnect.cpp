@@ -734,7 +734,8 @@ changed:
 **
 **	@param msg	message received
 */
-local void ClientParseDisconnected(const InitMessage* msg)
+local void ClientParseDisconnected(
+	const InitMessage* msg __attribute__((unused)))
 {
     DebugLevel0Fn("ccs_disconnected: Server sending GoodBye dups %d\n" _C_
 	    msg->SubType);
