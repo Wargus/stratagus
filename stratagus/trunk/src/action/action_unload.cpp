@@ -167,7 +167,7 @@ found:
 */
 local int MoveToCoast(Unit* unit)
 {
-    DebugLevel3Fn("%p\n",unit->Command.Data.Move.Goal);
+    DebugLevel3Fn("%p\n",unit->Orders[0].Goal);
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
