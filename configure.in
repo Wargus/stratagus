@@ -228,7 +228,7 @@ dnl ----------------------------
 
 dnl ---- CHECK FOR LUA ---------
 AC_ARG_WITH(lua, 
-    [	--with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")
+    [  --with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")
 if test "x$LUAPFX" != "x"; then
     LUA_CFLAGS="-I$LUAPFX/include"
     LUA_LIBS="-L$LUAPFX/lib"
