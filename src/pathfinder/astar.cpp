@@ -528,6 +528,13 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
     int num_in_close;
     int mask;
 
+#ifdef MAP_REGIONS
+    // Abort in few cycle lot of astar invocations
+    if (! PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange)) {
+	return PF_UNREACHABLE;
+    }
+#endif
+    
     DebugLevel3Fn("%d %d,%d->%d,%d\n" _C_
 	    UnitNumber(unit) _C_
 	    unit->X _C_ unit->Y _C_ x _C_ y);

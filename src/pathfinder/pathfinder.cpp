@@ -74,7 +74,6 @@
 */
 global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];	/// Path matrix
 local unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
-global int PlaceReachable(Unit* src,int x,int y,int w,int h,int range);
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -368,6 +367,7 @@ local void FillMatrix(Unit* unit,unsigned int* matrix)
 --	PATH-FINDER USE
 ----------------------------------------------------------------------------*/
 
+#ifndef MAP_REGIONS
 /**
 **	Can the unit 'src' reach the place x,y.
 **
@@ -376,11 +376,12 @@ local void FillMatrix(Unit* unit,unsigned int* matrix)
 **	@param y	Map Y tile position.
 **	@param w	Width of Goal
 **	@param h	Height of Goal
+**	@param minrange min range to the tile
 **	@param range	Range to the tile.
 **
 **	@return		Distance to place.
 */
-global int PlaceReachable(Unit* src,int x,int y,int w,int h,int range)
+global int PlaceReachable(Unit* src,int x,int y,int w,int h,int minrange __attribute__((unused)),int range)
 {
     int depth;
     static unsigned long LastGameCycle;
@@ -408,8 +409,9 @@ global int PlaceReachable(Unit* src,int x,int y,int w,int h,int range)
     }
 
     return depth;
-
 }
+
+#endif
 
 /**
 **	Can the unit 'src' reach the unit 'dst'.
@@ -431,7 +433,7 @@ global int UnitReachable(Unit* src,Unit* dst,int range)
     //
     //	Find a path to the goal.
     //
-    depth=PlaceReachable(src,dst->X,dst->Y,dst->Type->TileWidth,dst->Type->TileHeight,range);
+    depth=PlaceReachable(src,dst->X,dst->Y,dst->Type->TileWidth,dst->Type->TileHeight,0,range);
     if( depth <= 0 ) {
 	DebugLevel3("NO WAY\n");
 	return 0;

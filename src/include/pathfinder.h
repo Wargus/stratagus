@@ -100,7 +100,7 @@ extern int NewPath(Unit* unit);
     /// Return distance to unit.
 extern int UnitReachable(Unit* unit,Unit* dst,int range);
 
-extern int PlaceReachable(Unit* src,int x,int y,int w,int h,int range);
+extern int PlaceReachable(Unit* src,int x,int y,int w,int h,int minrange,int maxrange);
 
 //
 //	in astar.c
@@ -127,5 +127,9 @@ extern void PathfinderCclRegister(void);
 #ifdef HIERARCHIC_PATHFINDER
 #include "../pathfinder/hierarchical.h"
 #endif /* HIERARCHIC_PATHFINDER */
+
+#ifdef MAP_REGIONS
+#include "../pathfinder/splitter.h"
+#endif /* MAP_REGIONS */
 
 #endif	// !__PATH_FINDER_H__
