@@ -516,6 +516,8 @@ local void LoadCursorBackground(int x, int y, int w, int h)
     SDL_Rect drect;
     SDL_Rect srect;
 
+    printf("call LOAD\n");
+
     srect.x = 0;
     srect.y = 0;
     srect.w = w;
@@ -524,7 +526,8 @@ local void LoadCursorBackground(int x, int y, int w, int h)
     drect.x = x;
     drect.y = y;
 
-    SDL_BlitSurface(OldCursorImage, NULL, TheScreen, &drect);
+    SDL_BlitSurface(OldCursorImage, &srect, TheScreen, &drect);
+    InvalidateArea(x, y, w, h);
 }
 
 local void SaveCursorBackground(int x, int y, int w, int h)
@@ -532,15 +535,16 @@ local void SaveCursorBackground(int x, int y, int w, int h)
     SDL_Rect srect;
     SDL_Rect drect;
 
-    srect.x = 0;
-    srect.y = 0;
+    printf("call SAVE\n");
+    srect.x = x;
+    srect.y = y;
     srect.w = w;
     srect.h = h;
 
-    drect.x = x;
-    drect.y = y;
+    drect.x = 0;
+    drect.y = 0;
 
-    SDL_BlitSurface(TheScreen, &srect, OldCursorImage, NULL);
+    SDL_BlitSurface(TheScreen, &srect, OldCursorImage, &drect);
 }
 #else
 /**
