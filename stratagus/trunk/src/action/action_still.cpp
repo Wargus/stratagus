@@ -191,26 +191,16 @@ global void ActionStillGeneric(Unit* unit, int ground)
 	    //
 	    temp = unit->Orders[0].Goal;
 	    if (temp && temp->Destroyed) {
-		DebugLevel3Fn(" destroyed unit %d #%d\n" _C_
-		    UnitNumber(temp) _C_ temp->Refs);
-		RefsDebugCheck(!temp->Refs);
-		if (!--temp->Refs) {
-		    ReleaseUnit(temp);
-		}
-		unit->Orders[0].Goal = temp=NoUnitP;
+		RefsDecrease(temp);
+		unit->Orders[0].Goal = temp = NoUnitP;
 	    }
 	    if (!unit->SubAction || temp != goal) {
 		// New target.
 		if (temp) {
-		    DebugLevel3Fn(" old unit %d #%d\n" _C_
-			UnitNumber(temp) _C_ temp->Refs);
-		    RefsDebugCheck(!temp->Refs);
-		    temp->Refs--;
-		    RefsDebugCheck(!temp->Refs);
+		    RefsDecrease(temp);
 		}
 		unit->Orders[0].Goal = goal;
-		RefsDebugCheck(!goal->Refs);
-		goal->Refs++;
+		RefsIncrease(goal);
 		unit->Reset = 0;
 		unit->State = 0;
 		unit->SubAction = 1;	// Mark attacking.
@@ -227,16 +217,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 
     if (unit->SubAction) {		// was attacking.
 	if ((temp = unit->Orders[0].Goal)) {
-	    if (temp->Destroyed) {
-		RefsDebugCheck(!temp->Refs);
-		if (!--temp->Refs) {
-		    ReleaseUnit(temp);
-		}
-	    } else {
-		RefsDebugCheck(!temp->Refs);
-		temp->Refs--;
-		RefsDebugCheck(!temp->Refs);
-	    }
+	    RefsDecrease(temp);
 	    unit->Orders[0].Goal = NoUnitP;
 	}
 	unit->SubAction = unit->State = 0;	// No attacking, restart

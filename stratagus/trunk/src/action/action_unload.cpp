@@ -333,16 +333,11 @@ local void LeaveTransporter(Unit* unit)
     if (goal) {
 	unit->Orders[0].Goal = NoUnitP;
 	if (goal->Destroyed) {
-	    DebugLevel0Fn("destroyed unit\n");
-	    RefsDebugCheck(!goal->Refs);
-	    if (!--goal->Refs) {
-		ReleaseUnit(goal);
-	    }
+	    DebugLevel0Fn("destroyed unit unloading?\n");
+	    RefsDecrease(goal);
 	    return;
 	}
-	RefsDebugCheck(!goal->Refs);
-	--goal->Refs;
-	RefsDebugCheck(!goal->Refs);
+	RefsDecrease(goal);
 	goal->X = unit->X;
 	goal->Y = unit->Y;
 	// Try to unload the unit. If it doesn't work there is no problem.

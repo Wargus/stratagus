@@ -276,8 +276,7 @@ global void HandleActionBuild(Unit* unit)
 	unit->Orders[0].Range = unit->Type->RepairRange;
 	unit->SubAction = 0;
 	unit->Wait = 1;
-	RefsDebugCheck(!build->Refs);
-	build->Refs++;
+	RefsIncrease(build);
 	UnitMarkSeen(unit);
 	//  Mark the new building seen.
 	MapMarkUnitSight(build);

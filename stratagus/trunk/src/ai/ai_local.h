@@ -63,7 +63,7 @@ struct _ai_type_{
 
     // nice flags
     //unsigned char     AllExplored : 1;/// Ai sees unexplored area
-    //unsigned char     AllVisibile : 1;/// Ai sees invisibile area
+    //unsigned char     AllVisbile : 1;/// Ai sees invisibile area
 
     SCM			Script;		/// Main script (gc-protected!)
 };

@@ -374,17 +374,12 @@ global void AiCleanForce(int force)
     prev = &AiPlayer->Force[force].Units;
     while ((aiunit = *prev)) {
 	if (aiunit->Unit->Destroyed) {
-	    RefsDebugCheck(!aiunit->Unit->Refs);
-	    if (!--aiunit->Unit->Refs) {
-		ReleaseUnit(aiunit->Unit);
-	    }
+	    RefsDecrease(aiunit->Unit);
 	    *prev = aiunit->Next;
 	    free(aiunit);
 	    continue;
 	} else if (!aiunit->Unit->HP || aiunit->Unit->Orders[0].Action == UnitActionDie) {
-	    RefsDebugCheck(!aiunit->Unit->Refs);
-	    --aiunit->Unit->Refs;
-	    RefsDebugCheck(!aiunit->Unit->Refs);
+	    RefsDecrease(aiunit->Unit);
 	    *prev = aiunit->Next;
 	    free(aiunit);
 	    continue;
@@ -413,9 +408,7 @@ global void AiCleanForce(int force)
 	    if (counter[aiunit->Unit->Type->Type] > 0) {
 		DebugLevel3Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
 		counter[aiunit->Unit->Type->Type]--;
-		RefsDebugCheck(!aiunit->Unit->Refs);
-		--aiunit->Unit->Refs;
-		RefsDebugCheck(!aiunit->Unit->Refs);
+		RefsDecrease(aiunit->Unit);
 		*prev = aiunit->Next;
 
 		// Move this unit somewhere else...             
@@ -453,8 +446,7 @@ global void AiEraseForce(int force)
     aiu = AiPlayer->Force[force].Units;
     while (aiu) {
 	// Decrease usage count
-	RefsDebugCheck(!aiu->Unit->Refs);
-	--aiu->Unit->Refs;
+	RefsDecrease(aiu->Unit);
 
 	next_u = aiu->Next;
 	free(aiu);
@@ -542,8 +534,7 @@ global void AiAssignToForce(Unit * unit)
 	    aiunit->Next = AiPlayer->Force[force].Units;
 	    AiPlayer->Force[force].Units = aiunit;
 	    aiunit->Unit = unit;
-	    RefsDebugCheck(unit->Destroyed || !unit->Refs);
-	    ++unit->Refs;
+	    RefsIncrease(unit);
 	    return;
 	}
     }
@@ -554,8 +545,7 @@ global void AiAssignToForce(Unit * unit)
     aiunit->Next = AiPlayer->Force[0].Units;
     AiPlayer->Force[0].Units = aiunit;
     aiunit->Unit = unit;
-    RefsDebugCheck(unit->Destroyed || !unit->Refs);
-    ++unit->Refs;
+    RefsIncrease(unit);
 }
 
 /**

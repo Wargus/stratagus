@@ -62,11 +62,7 @@
 local void ReleaseOrder(Order* order)
 {
     if (order->Goal) {
-	RefsDebugCheck(!order->Goal->Refs);
-	if (!--order->Goal->Refs) {
-	    DebugCheck(!order->Goal->Destroyed);
-	    ReleaseUnit(order->Goal);
-	}
+	RefsDecrease(order->Goal);
 	order->Goal = NoUnitP;
     }
 }
@@ -269,8 +265,7 @@ global void CommandFollow(Unit* unit, Unit* dest, int flush)
 	} else {
 	    order->X = order->Y = -1;
 	    order->Goal = dest;
-	    RefsDebugCheck(!dest->Refs);
-	    dest->Refs++;
+	    RefsIncrease(dest);
 	    order->Range = 1;
 	}
 	order->Type = NULL;
@@ -374,8 +369,7 @@ global void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 		order->X = order->Y = -1;
 		order->Width = order->Height = 0;
 		order->Goal = dest;
-		RefsDebugCheck(!dest->Refs);
-		dest->Refs++;
+		RefsIncrease(dest);
 		order->Range = unit->Type->RepairRange;
 	    }
 	} else {
@@ -438,8 +432,7 @@ global void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 		// Removed, Dying handled by action routine.
 		order->X = order->Y = -1;
 		order->Goal = attack;
-		RefsDebugCheck(!attack->Refs);
-		attack->Refs++;
+		RefsIncrease(attack);
 		order->Range = unit->Stats->AttackRange;
 		order->MinRange = unit->Type->MinAttackRange;
 	    }
@@ -589,8 +582,7 @@ global void CommandBoard(Unit* unit, Unit* dest, int flush)
 	order->Action = UnitActionBoard;
 	order->X = order->Y = -1;
 	order->Goal = dest;
-	RefsDebugCheck(!dest->Refs);
-	dest->Refs++;
+	RefsIncrease(dest);
 	order->Range = 1;
 	order->Type = NULL;
 	order->Arg1 = NULL;
@@ -630,8 +622,7 @@ global void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 	order->Goal = NoUnitP;
 	if (what && !what->Destroyed) {
 	    order->Goal = what;
-	    RefsDebugCheck(!what->Refs);
-	    what->Refs++;
+	    RefsIncrease(what);
 	}
 	order->Range = 0;
 	order->Type = NULL;
@@ -801,8 +792,7 @@ global void CommandResource(Unit* unit, Unit* dest, int flush)
 	order->Action = UnitActionResource;
 	order->X = order->Y = -1;
 	order->Goal = dest;
-	RefsDebugCheck(!dest->Refs);
-	dest->Refs++;
+	RefsIncrease(dest);
 	order->Range = 1;
 	order->Type = NULL;
 	order->Arg1 = NULL;
@@ -847,8 +837,7 @@ global void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 	//
 	if (goal && !goal->Destroyed) {
 	    order->Goal = goal;
-	    RefsDebugCheck(!goal->Refs);
-	    goal->Refs++;
+	    RefsIncrease(goal);
 	}
 	order->Range = 1;
 	order->Type = NULL;
@@ -1220,8 +1209,7 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 	    } else {
 		order->X = order->Y = -1;
 		order->Goal = dest;
-		RefsDebugCheck(!dest->Refs);
-		dest->Refs++;
+		RefsIncrease(dest);
 	    }
 	} else {
 	    order->X = x;
