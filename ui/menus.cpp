@@ -992,36 +992,40 @@ local Menuitem HelpMenuItems[] = {
 
 local Menuitem KeystrokeHelpMenuItems[] = {
 #ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Keystroke Help Menu", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_VSLIDER, 256 - 18 - 16, 40, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 10*18, ScenSelectVSKeystrokeHelpAction, -1, 0, 0, 0, NULL} } },
-    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
+    { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL,
+	{ vslider:{ 0, 18, 12*18, ScenSelectVSKeystrokeHelpAction, -1, 0, 0, 0, NULL} } },
+    { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
-    { MI_TYPE_TEXT, 16, 40, 0, GameFont, NULL, NULL,
+    { MI_TYPE_TEXT, 16, 40+20, 0, GameFont, NULL, NULL,
 	{ text:{ "Alt-F  - toggle full screen", MI_TFLAGS_LALIGN} } },
-    { MI_TYPE_TEXT, 16, 40+20*1, 0, GameFont, NULL, NULL,
-	{ text:{ "Ctrl-S - mute sound", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*2, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-Q  - quit to main menu", MI_TFLAGS_LALIGN} } },
+	{ text:{ "Ctrl-S - mute sound", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*3, 0, GameFont, NULL, NULL,
-	{ text:{ "+      - increase game speed", MI_TFLAGS_LALIGN} } },
+	{ text:{ "Alt-Q  - quit to main menu", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*4, 0, GameFont, NULL, NULL,
-	{ text:{ "-      - decrease game speed", MI_TFLAGS_LALIGN} } },
+	{ text:{ "+      - increase game speed", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*5, 0, GameFont, NULL, NULL,
-	{ text:{ "Ctrl-P - pause game", MI_TFLAGS_LALIGN} } },
+	{ text:{ "-      - decrease game speed", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*6, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-G  - toggle grab mouse", MI_TFLAGS_LALIGN} } },
+	{ text:{ "Ctrl-P - pause game", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*7, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-X  - quit game", MI_TFLAGS_LALIGN} } },
+	{ text:{ "Alt-G  - toggle grab mouse", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*8, 0, GameFont, NULL, NULL,
-	{ text:{ "Alt-B  - toggle expand map", MI_TFLAGS_LALIGN} } },
+	{ text:{ "Alt-X  - quit game", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*9, 0, GameFont, NULL, NULL,
-	{ text:{ "ENTER  - write a message", MI_TFLAGS_LALIGN} } },
+	{ text:{ "Alt-B  - toggle expand map", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*10, 0, GameFont, NULL, NULL,
-	{ text:{ "TAB    - hide/unhide terrain", MI_TFLAGS_LALIGN} } },
+	{ text:{ "ENTER  - write a message", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_TEXT, 16, 40+20*11, 0, GameFont, NULL, NULL,
+	{ text:{ "TAB    - hide/unhide terrain", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*12, 0, GameFont, NULL, NULL,
 	{ text:{ "Alt-I  - find idle peon", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*13, 0, GameFont, NULL, NULL,
+	{ text:{ "F10    - game menu", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*14, 0, GameFont, NULL, NULL,
+	{ text:{ "F5     - game options", MI_TFLAGS_LALIGN} } },
 
 
 #else
@@ -1278,11 +1282,11 @@ global Menu Menus[] = {
     },
     {
 	// Keystroke Help Menu
-	176+(14*TileSizeX-256)/2,
-	16+(14*TileSizeY-288)/2,
-	256, 288,
-	ImagePanel1,
-	15, 15,
+	176+(14*TileSizeX-352)/2,
+	16+(14*TileSizeY-352)/2,
+	352, 352,
+	ImagePanel5,
+	17, 17,
 	KeystrokeHelpMenuItems,
 	NULL,
     },
@@ -2161,10 +2165,10 @@ local void KeystrokeHelpMenu(void)
     int j;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
 
-    KeystrokeHelpMenuItems[1].d.hslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 100 / (nitems - 9 - 3);
+    KeystrokeHelpMenuItems[1].d.hslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - (40+20*1)) / -20 ) * 100 / (nitems - 11 - 3);
 
     for (j=3; j < nitems ;++j) {
-	if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
+	if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
 	    KeystrokeHelpMenuItems[j].mitype = 0;
 	else
 	    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
@@ -2983,35 +2987,35 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 {
     int j = 3;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
-    int increments = 100 / (nitems - j - 9);
+    int increments = 100 / (nitems - j - 11);
 
     mi--;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN && KeystrokeHelpMenuItems[nitems-1].yofs > 40*5) {
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN && KeystrokeHelpMenuItems[nitems-1].yofs > (40+20*11)) {
 		    for (j=3; j < nitems ;++j) {
 			KeystrokeHelpMenuItems[j].yofs -= 20;
-			if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
+			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
 			    KeystrokeHelpMenuItems[j].mitype = 0;
 			else
 			    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
 		    }
 		    MustRedraw |= RedrawMenu;
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP && KeystrokeHelpMenuItems[3].yofs < 40) {
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP && KeystrokeHelpMenuItems[3].yofs < (40+20*1)) {
 		    for (j=3; j < nitems ;++j) {
-		    KeystrokeHelpMenuItems[j].yofs += 20;
-		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
-			KeystrokeHelpMenuItems[j].mitype = 0;
-		    else
-			KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
+			KeystrokeHelpMenuItems[j].yofs += 20;
+			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
+			    KeystrokeHelpMenuItems[j].mitype = 0;
+			else
+			    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
 		    }
 		    MustRedraw |= RedrawMenu;
 	    }
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
-	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 100 / (nitems - 9 - 3);
+	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - (40+20*1)) / -20 ) * 100 / (nitems - 11 - 3);
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
@@ -3022,8 +3026,8 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 		}
 		mi[1].d.vslider.percent = (mi[1].d.vslider.curper + 8) / increments * increments;
 		for (j=3; j < nitems; ++j) {
-		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 9 - 3) / 100 * (-20) ) + 40 + (j-3)*20;
-		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
+		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 11 - 3) / 100 * (-20) ) + (40+20*1) + (j-3)*20;
+		    if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
 			KeystrokeHelpMenuItems[j].mitype = 0;
 		    else
 			KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
