@@ -463,8 +463,9 @@ global void ShowIntro(const Intro *intro)
     IntroNoEvent=1;
     c=0;
     while( 1 ) {
-	if( (!Channels[soundfree].Command) && stage<MAX_BRIEFING_VOICES &&
-		(soundout != NextSoundRequestOut) && intro->VoiceFile[stage] ) {
+	if( soundfree != -1 && (!Channels[soundfree].Command) && 
+		stage<MAX_BRIEFING_VOICES && soundout != NextSoundRequestOut && 
+		intro->VoiceFile[stage]) {
 	    // FIXME: is there a better way to do this?
 	    if (soundcount == 15) {
 		soundfree = NextFreeChannel;
@@ -555,8 +556,10 @@ global void ShowIntro(const Intro *intro)
     VideoSyncSpeed=old_video_sync;
     SetVideoSync();
 
+    if (Channels[soundfree].Command) {
+	FreeOneChannel(soundfree);
+    }
     CallbackMusicOn();
-    FreeOneChannel(soundfree);
 }
 
 /**
