@@ -480,6 +480,99 @@ local SCM CclIfOpponents(SCM player,SCM operation,SCM quantity)
     return SCM_BOOL_F;
 }
 
+/**
+**	Player has the quantity of resource.
+*/
+local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
+{
+    int plynr;
+    int q;
+    int pn;
+    const char* res;
+    const char* op;
+    CompareFunction Compare;
+
+    plynr=TriggerGetPlayer(player);
+    op=get_c_string(operation);
+    q=gh_scm2int(quantity);
+    res=get_c_string(resource);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-unit: %s\n",op);
+	Exit(1);
+    }
+
+    if( plynr==-1 ) {
+	plynr=0;
+	pn=PlayerMax;
+    } else {
+	pn=plynr+1;
+    }
+
+    if( !strcmp(res, DEFAULT_NAMES[GoldCost]) ) {
+	for( ; plynr<pn; ++plynr ) {
+	    if( Compare(Players[plynr].Resources[GoldCost],q) ) {
+		return SCM_BOOL_T;
+	    }
+	}
+    } else if( !strcmp(res, DEFAULT_NAMES[WoodCost]) ) {
+	for( ; plynr<pn; ++plynr ) {
+	    if( Compare(Players[plynr].Resources[WoodCost],q) ) {
+		return SCM_BOOL_T;
+	    }
+	}
+    } else if( !strcmp(res, DEFAULT_NAMES[OilCost]) ) {
+	for( ; plynr<pn; ++plynr ) {
+	    if( Compare(Players[plynr].Resources[OilCost],q) ) {
+		return SCM_BOOL_T;
+	    }
+	}
+    } else if( !strcmp(res, DEFAULT_NAMES[OreCost]) ) {
+	for( ; plynr<pn; ++plynr ) {
+	    if( Compare(Players[plynr].Resources[OreCost],q) ) {
+		return SCM_BOOL_T;
+	    }
+	}
+    } else if( !strcmp(res, DEFAULT_NAMES[StoneCost]) ) {
+	for( ; plynr<pn; ++plynr ) {
+	    if( Compare(Players[plynr].Resources[StoneCost],q) ) {
+		return SCM_BOOL_T;
+	    }
+	}
+    } else if( !strcmp(res, DEFAULT_NAMES[CoalCost]) ) {
+	for( ; plynr<pn; ++plynr ) {
+	    if( Compare(Players[plynr].Resources[CoalCost],q) ) {
+		return SCM_BOOL_T;
+	    }
+	}
+    } else if( !strcmp(res, "all") ) {
+	int j;
+	int sum;
+
+	for( ; plynr<pn; ++plynr ) {
+	    for( j=1,sum=0; j<MaxCosts; ++j ) {
+		sum += Players[plynr].Resources[j];
+	    }
+	}
+	if( Compare(sum,q) ) {
+	    return SCM_BOOL_T;
+	}
+    } else if( !strcmp(res, "any") ) {
+	int j;
+
+	for( ; plynr<pn; ++plynr ) {
+	    for( j=1; j<MaxCosts; ++j ) {
+		if( Compare(Players[plynr].Resources[j],q) ) {
+		    return SCM_BOOL_T;
+		}
+	    }
+	}
+    }
+
+    return SCM_BOOL_F;
+}
+
 // --------------------------------------------------------------------------
 //	Actions
 
@@ -573,6 +666,7 @@ global void TriggerCclRegister(void)
     gh_new_procedure5_0("if-near-unit",CclIfNearUnit);
     gh_new_procedure5_0("if-rescued-near-unit",CclIfRescuedNearUnit);
     gh_new_procedure3_0("if-opponents",CclIfOpponents);
+    gh_new_procedure4_0("if-resource",CclIfResource);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);
     gh_new_procedure0_0("action-defeat",CclActionDefeat);
