@@ -1244,20 +1244,20 @@ local int CclDefineAnimations(lua_State* l)
 **		Define boolean flag.
 **
 **		@param list : list of flags' name.
+**      @return 0.
 */
 local int CclDefineBoolFlags(lua_State* l)
 {
-	char* str;
+	const char* str;
 	int i;
 	int args;
 	int j;
+	int old;
 
-	if (NumberBoolFlag != 0) {
-		DebugLevel0("Warning, Redefine Bool flags\n");
-	}
+	old = NumberBoolFlag;
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
-		str = strdup(LuaToString(l, j + 1));
+		str = LuaToString(l, j + 1);
 		for (i = 0; i < NumberBoolFlag; ++i) {
 			if (!strcmp(str, BoolFlagName[i])) {
 				DebugLevel0("Warning, Bool flags already defined\n");
@@ -1265,10 +1265,23 @@ local int CclDefineBoolFlags(lua_State* l)
 			}
 		}
 		if (i != NumberBoolFlag) {
-			break;
+			DebugLevel0("Warning, Bool flags '%s' already defined\n" _C_ BoolFlagName[i]);
+			continue;
 		}
 		BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof(*BoolFlagName));
-		BoolFlagName[NumberBoolFlag++] = str;
+		BoolFlagName[NumberBoolFlag++] = strdup(str);
+	}
+	if (0 < old && old != NumberBoolFlag) {
+		for (i = 0; i < NumUnitTypes; i++) { // adjust array for unit already defined
+			UnitTypes[i]->BoolFlag = realloc(UnitTypes[i]->BoolFlag,
+				NumberBoolFlag * sizeof((*UnitTypes)->BoolFlag));
+			UnitTypes[i]->CanTargetFlag = realloc(UnitTypes[i]->CanTargetFlag,
+				NumberBoolFlag * sizeof((*UnitTypes)->CanTargetFlag));
+			memset(UnitTypes[i]->BoolFlag + old, 0,
+				(NumberBoolFlag - old) * sizeof((*UnitTypes)->BoolFlag));
+			memset(UnitTypes[i]->CanTargetFlag + old, 0,
+				(NumberBoolFlag - old) * sizeof((*UnitTypes)->CanTargetFlag));
+		}
 	}
 	return 0;
 }
