@@ -1266,7 +1266,7 @@ local void Usage(void)
 \t-e\t\tStart editor\n\
 \t-f factor\tComputer units cost factor\n\
 \t-h\t\tHelp shows this page\n\
-\t-l\t\tEnable command log to \"command.log\"\n\
+\t-l\t\tDisable command log\n\
 \t-P port\t\tNetwork port to use\n\
 \t-n server\tNetwork server host preset\n\
 \t-L lag\t\tNetwork lag in # frames (default 10 = 333ms)\n\
