@@ -166,7 +166,7 @@ local int MineInGoldmine(Unit* unit)
 #endif
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
-	    DebugLevel3("Mine without goldmine\n");
+	    DebugLevel2("Mine without deposit\n");
 	} else {
 	    DropOutNearest(unit
 		    ,destu->X,destu->Y
@@ -188,6 +188,7 @@ local int MineInGoldmine(Unit* unit)
 	    unit->Command.Data.Move.DY=destu->Y;
 #endif
 	    unit->Command.Action=UnitActionMineGold;
+	    DebugLevel3("Mine with deposit %d,%d\n",destu->X,destu->Y);
 	}
 
 	if( unit->Type==UnitTypeOrcWorker ) {
