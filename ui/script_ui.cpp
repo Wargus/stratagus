@@ -535,12 +535,25 @@ local int CclSetVideoFullScreen(lua_State* l)
 local SCM CclSetTitleScreens(SCM list)
 {
 	int i;
+	int j;
 	SCM value;
+	SCM labelvalue;
+	SCM labellist;
+	SCM poslist;
+	SCM flagslist;
+	char* s1;
 
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
 			free(TitleScreens[i]->File);
 			free(TitleScreens[i]->Music);
+			if (TitleScreens[i]->Labels) {
+				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
+					free(TitleScreens[i]->Labels[j]->Text);
+					free (TitleScreens[i]->Labels[j]);
+				}
+				free(TitleScreens[i]->Labels);
+			}
 			free(TitleScreens[i]);
 		}
 		free(TitleScreens);
@@ -553,27 +566,102 @@ local SCM CclSetTitleScreens(SCM list)
 			value = gh_car(list);
 			list = gh_cdr(list);
 			TitleScreens[i] = calloc(1, sizeof(**TitleScreens));
+			TitleScreens[i]->Timeout = 20; // Default timeout
+			while (!gh_null_p(value)) {
+				if (gh_eq_p(gh_car(value), gh_symbol2scm("image"))) {
+					value = gh_cdr(value);
 			TitleScreens[i]->File = gh_scm2newstr(gh_car(value), NULL);
 			value = gh_cdr(value);
-			if (!gh_null_p(value)) {
+				} else if (gh_eq_p(gh_car(value), gh_symbol2scm("music"))) {
+					value = gh_cdr(value);
 				TitleScreens[i]->Music = gh_scm2newstr(gh_car(value), NULL);
+					value = gh_cdr(value);
+				} else if (gh_eq_p(gh_car(value), gh_symbol2scm("timeout"))) {
+					value = gh_cdr(value);
+					TitleScreens[i]->Timeout = gh_scm2int(gh_car(value));
+					value = gh_cdr(value);
+				} else if (gh_eq_p(gh_car(value), gh_symbol2scm("label"))) {
+					value = gh_cdr(value);
+					labellist = gh_car (value);
+					value = gh_cdr (value);
+
+					j = 0;
+					TitleScreens[i]->Labels = calloc(gh_length(labellist) + 1, sizeof(*TitleScreens[i]->Labels));
+					while (!gh_null_p(labellist)) {
+						labelvalue = gh_car(labellist);
+						labellist = gh_cdr(labellist);
+						TitleScreens[i]->Labels[j] = calloc(1, sizeof(**TitleScreens[i]->Labels));
+						while (!gh_null_p(labelvalue)) {
+							if (gh_eq_p(gh_car(labelvalue), gh_symbol2scm("text"))) {
+								labelvalue = gh_cdr(labelvalue);
+								TitleScreens[i]->Labels[j]->Text = gh_scm2newstr(gh_car(labelvalue), NULL);
+								labelvalue = gh_cdr(labelvalue);
+							} else if (gh_eq_p(gh_car(labelvalue), gh_symbol2scm("pos"))) {
+								labelvalue = gh_cdr(labelvalue);
+								poslist = gh_car(labelvalue);
+								labelvalue = gh_cdr(labelvalue);
+								TitleScreens[i]->Labels[j]->xofs = gh_scm2int(gh_car(poslist));
+								poslist = gh_cdr(poslist);
+								TitleScreens[i]->Labels[j]->yofs = gh_scm2int(gh_car(poslist));
+							} else if (gh_eq_p(gh_car(labelvalue), gh_symbol2scm("flags"))) {
+								labelvalue = gh_cdr(labelvalue);
+								flagslist = gh_car(labelvalue);
+								labelvalue = gh_cdr(labelvalue);
+								while (!gh_null_p(flagslist)) {
+									if (gh_eq_p(gh_car(flagslist), gh_symbol2scm("center"))) {
+										TitleScreens[i]->Labels[j]->flags |= TitleFlagCenter;
+										flagslist = gh_cdr(flagslist);
+									} else {
+										s1 = gh_scm2newstr(gh_car(flagslist), NULL);
+										fprintf(stderr, "Unsupported flag %s\n", s1);
+										free(s1);
+										flagslist = gh_cdr(flagslist);
+									}
+								}
+							} else {
+								s1 = gh_scm2newstr(gh_car(labelvalue), NULL);
+								fprintf(stderr, "Unsupported tag %s\n", s1);
+								free(s1);
+								labelvalue = gh_cdr(labelvalue);
+							}
+						}
+						++j;
+					}
+				} else {
+					s1 = gh_scm2newstr(gh_car(value), NULL);
+					fprintf(stderr, "Unsupported tag %s\n", s1);
+					free(s1);
+					value = gh_cdr(value);
+				}
 			}
 			++i;
 		}
 	}
 	return SCM_UNSPECIFIED;
+
 }
 #elif defined(USE_LUA)
 local int CclSetTitleScreens(lua_State* l)
 {
 	int i;
+	int j;
+	int k;
 	int tables;
 	int args;
+	int subargs;
+	int narg;
 
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
 			free(TitleScreens[i]->File);
 			free(TitleScreens[i]->Music);
+			if (TitleScreens[i]->Labels) {
+				for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
+					free(TitleScreens[i]->Labels[j]->Text);
+					free (TitleScreens[i]->Labels[j]);
+				}
+				free(TitleScreens[i]->Labels);
+			}
 			free(TitleScreens[i]);
 		}
 		free(TitleScreens);
@@ -584,20 +672,85 @@ local int CclSetTitleScreens(lua_State* l)
 	TitleScreens = calloc(tables + 1, sizeof(*TitleScreens));
 
 	for (i = 0; i < tables; ++i) {
-		args = luaL_getn(l, i + 1);
-		if (!lua_istable(l, i + 1) || (args != 1 && args != 2)) {
+		if (!lua_istable(l, i + 1)) {
 			lua_pushstring(l, "incorrect argument");
 			lua_error(l);
 		}
 		TitleScreens[i] = calloc(1, sizeof(**TitleScreens));
-		lua_rawgeti(l, i + 1, 1);
+		lua_pushstring(l, "Image");
+		lua_gettable(l, i + 1);
 		TitleScreens[i]->File = strdup(LuaToString(l, -1));
 		lua_pop(l, 1);
-		if (args == 2) {
-			lua_rawgeti(l, i + 1, 2);
+		lua_pushstring(l, "Music");
+		lua_gettable(l, i + 1);
+		if (!lua_isnil(l, -1)) {
 			TitleScreens[i]->Music = strdup(LuaToString(l, -1));
-			lua_pop(l, 1);
 		}
+		lua_pop(l, 1);
+		lua_pushstring(l, "Timeout");
+		lua_gettable(l, i + 1);
+		if (!lua_isnil(l, -1)) {
+			TitleScreens[i]->Timeout = LuaToNumber(l, -1);
+		} else {
+			TitleScreens[i]->Timeout = 20;
+		}
+		lua_pop(l,1);
+		lua_pushstring(l, "Label");
+		lua_gettable(l, i + 1);
+		if (!lua_isnil(l, -1)) {
+			if (!lua_istable(l, tables + 1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			args = luaL_getn(l, tables + 1);
+			lua_pushnil(l);
+			TitleScreens[i]->Labels = calloc(args + 1, sizeof(*TitleScreens[i]->Labels));
+			j = 0;
+			while (lua_next(l, tables + 1)) {
+				k = lua_gettop(l);
+				TitleScreens[i]->Labels[j] = calloc(1, sizeof(**TitleScreens[i]->Labels));
+				lua_pushstring(l, "Text");
+				lua_gettable(l, k);
+				TitleScreens[i]->Labels[j]->Text = strdup(LuaToString(l, -1));
+			lua_pop(l, 1);
+				lua_pushstring(l, "Pos");
+				lua_gettable(l, k);
+				if (!lua_istable(l, k + 1)) {
+					lua_pushstring(l, "incorrect argument");
+					lua_error(l);
+		}
+				if (luaL_getn(l, k + 1) != 2) {
+					lua_pushstring(l, "you need two args to give a position");
+					lua_error(l);
+				}
+				lua_rawgeti(l, k + 1, 1);
+				TitleScreens[i]->Labels[j]->xofs = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				lua_rawgeti(l, k + 1, 2);
+				TitleScreens[i]->Labels[j]->yofs = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				lua_pop(l, 1);
+				lua_pushstring(l, "Flags");
+				lua_gettable(l, k);
+				if (!lua_isnil(l, -1)) {
+					subargs = luaL_getn(l, k + 1);
+					for (narg = 1; narg <= subargs; ++narg) {
+						lua_rawgeti(l, k + 1, narg);
+						if (!strcmp (LuaToString(l, -1), "center")) {
+							TitleScreens[i]->Labels[j]->flags |= TitleFlagCenter;
+						} else {
+							lua_pushstring(l, "incorrect flag");
+							lua_error(l);
+						}
+						lua_pop(l, 1);
+					}
+				}
+				lua_pop(l, 1);
+				lua_pop(l, 1);
+				++j;
+			}
+		}
+		lua_pop(l, 1);
 	}
 
 	return 0;

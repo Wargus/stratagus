@@ -444,9 +444,23 @@ extern int SlowFrameCounter;
 	*/
 #define MyRand()		rand()
 
+enum {
+    TitleFlagCenter	= 1 << 0,	/// Center Text
+    TitleFlagBlink	= 1 << 1,	/// Blinking Text (FIXME: Implement it.)
+};
+
+typedef struct _title_screen_label_ {
+    char* Text;
+    int xofs;
+    int yofs;
+    int flags;
+} TitleScreenLabel;
+
 typedef struct _title_screen_ {
 	char* File;
 	char* Music;
+	int Timeout;
+	TitleScreenLabel** Labels;
 } TitleScreen;
 extern TitleScreen** TitleScreens;		/// File for title screen
 extern char* GameName;						/// Name of the game (wc2,wc1)
