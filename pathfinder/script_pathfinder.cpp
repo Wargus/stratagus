@@ -195,6 +195,17 @@ local SCM CclPfHierShowGroupIds (SCM flag __attribute__((unused)))
 {
     return SCM_UNSPECIFIED;
 }
+
+#ifdef MAP_REGIONS
+global void MapSplitterDebug(void);
+
+local SCM CclDebugRegions(SCM flag __attribute__((unused)))
+{
+    MapSplitterDebug();
+    return SCM_UNSPECIFIED;
+}
+#endif // MAP_REGIONS
+
 #elif defined(USE_LUA)
 #endif
 #endif
@@ -207,6 +218,9 @@ global void PathfinderCclRegister(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("a-star",CclAStar);
+#ifdef MAP_REGIONS
+    gh_new_procedureN("debug-regions",CclDebugRegions);
+#endif // MAP_REGIONS
     gh_new_procedure1_0 ("pf-show-regids!", CclPfHierShowRegIds);
     gh_new_procedure1_0 ("pf-show-groupids!", CclPfHierShowGroupIds);
 #elif defined(USE_LUA)

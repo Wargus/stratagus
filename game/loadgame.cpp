@@ -111,6 +111,9 @@ global void CleanModules(void)
 #ifdef HIERARCHIC_PATHFINDER
     PfHierClean ();
 #endif
+#ifdef MAP_REGIONS
+    MapSplitterClean();
+#endif
     FreeAStar();
 
     //
@@ -255,6 +258,10 @@ global void LoadGame(char* filename)
 
     InitModules();
     LoadModules();
+
+#ifdef MAP_REGIONS
+    MapSplitterInit();
+#endif
 
     GameCycle = game_cycle;
     SelectionChanged();

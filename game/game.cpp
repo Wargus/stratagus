@@ -523,7 +523,9 @@ global void CreateGame(char* filename, WorldMap* map)
 #ifdef HIERARCHIC_PATHFINDER
     PfHierInitialize();
 #endif // HIERARCHIC_PATHFINDER
-
+#ifdef MAP_REGIONS
+    MapSplitterInit();
+#endif
     //
     //	FIXME: The palette is loaded after the units are created.
     //	FIXME: This loops fixes the colors of the units.
