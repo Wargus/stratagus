@@ -166,7 +166,7 @@ global void DoRightButton(int sx, int sy)
 		if (unit == desttransporter) {
 			continue;
 		}
-		DebugCheck(!unit);
+		Assert(unit);
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
@@ -276,10 +276,10 @@ global void DoRightButton(int sx, int sy)
 					dest->Blink = 4;
 					if (action == MouseActionSpellCast) {
 						// This is for demolition squads and such
-						DebugCheck(!unit->Type->CanCastSpell);
+						Assert(unit->Type->CanCastSpell);
 						for (spellnum = 0; !unit->Type->CanCastSpell[spellnum] &&
 								spellnum < SpellTypeCount ; spellnum++) ;
-						DebugCheck(spellnum == SpellTypeCount);
+						Assert(spellnum != SpellTypeCount);
 						SendCommandSpellCast(unit, x, y, dest, spellnum, flush);
 					} else {
 						if (CanTarget(unit->Type, dest->Type)) {
@@ -552,7 +552,7 @@ local void HandleMouseOn(int x, int y)
 
 		DebugLevel3Fn("viewport %d, %d\n" _C_ x _C_ y);
 		vp = GetViewport(x, y);
-		DebugCheck(!vp);
+		Assert(vp);
 		if (TheUI.MouseViewport != vp) {		// viewport changed
 			TheUI.MouseViewport = vp;
 			DebugLevel0Fn("current viewport changed to %d.\n" _C_
@@ -1391,7 +1391,7 @@ global void UIHandleButtonDown(unsigned button)
 	//		Cursor is on the map area
 	//
 	if (CursorOn == CursorOnMap) {
-		DebugCheck(!TheUI.MouseViewport);
+		Assert(TheUI.MouseViewport);
 
 		if ((MouseButtons & LeftButton) &&
 				TheUI.SelectedViewport != TheUI.MouseViewport) {
@@ -1599,7 +1599,7 @@ global void UIHandleButtonDown(unsigned button)
 								--i;
 							}
 						}
-						DebugCheck(!uins->Boarded);
+						Assert(uins->Boarded);
 						SendCommandUnload(Selected[0],
 							Selected[0]->X, Selected[0]->Y, uins,
 							!(KeyModifiers & ModifierShift));

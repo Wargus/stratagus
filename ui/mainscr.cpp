@@ -288,7 +288,7 @@ local void DrawUnitInfo(const Unit* unit)
 		const char* s;
 
 		s = strchr(type->Name, ' ');
-		DebugCheck(!s);
+		Assert(s);
 		i = s-type->Name;
 		memcpy(buf, type->Name, i);
 		buf[i] = '\0';
