@@ -28,14 +28,16 @@
 --
 --	$Id$
 
-DefineAnimations("animations-cam",
-   "still", {
-        {0, 0, 2, 0}, {0, 0, 2, 1}, {0, 0, 2, 2}, {0, 0, 2, 3},
-        {0, 0, 2, 4}, {0, 0, 2, 5}, {0, 0, 2, 6}, {0, 0, 2, 7},
-        {0, 0, 2, 8}, {0, 0, 2, 9}, {0, 0, 2,10}, {0, 0, 2,11},
-        {0, 0, 2,12}, {0, 0, 2,13}, {0, 0, 2,14}, {3, 0, 2,15}},
-   "die", {
-        {0, 0,100, 0}, {0, 0,100, 1}, {3, 0, 1, 1}})
+DefineNewAnimations("animations-cam", {
+    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2",
+        "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
+        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", 
+        "frame 9", "wait 2", "frame 10", "wait 2", "frame 11", "wait 2", 
+        "frame 12", "wait 2", "frame 13", "wait 2", "frame 14", "wait 2", 
+        "frame 15", "wait 2", },
+    Death = {"unbreakable begin", "frame 0", "wait 10", 
+        "frame 1", "wait 150", "frame 1", "unbreakable end", "wait 1", },
+    })
 
 DefineIcon({
 	Name = "icon-cam",
@@ -69,7 +71,7 @@ DefineUnitType("unit-cam", {
         Files = {"tileset-desert", "elites/build/camera.png"}, Size = {32, 64},
         Offset = {0, -16},
         Shadow = {"file", "elites/build/camera_s.png", "size", {64, 64}, "offset", {16,0}},
-        Animations = "animations-cam", Icon = "icon-cam",
+        NewAnimations = "animations-cam", Icon = "icon-cam",
         Costs = {"time", 20, "titanium", 7, "crystal", 35},
         RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-cam",
         Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {28, 28},
@@ -85,7 +87,7 @@ DefineUnitType("unit-cam", {
 DefineUnitType("camera_destroyed", {
         Name = "CameraCrater",
         Files = {"tileset-desert", "elites/build/camera_c.png"}, Size = {32, 64},
-        Animations = "animations-cam", Icon = "icon-cancel",
+        NewAnimations = "animations-cam", Icon = "icon-cancel",
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
         BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",

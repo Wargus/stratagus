@@ -26,13 +26,16 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: unit-radar.lua,v 1.2 2004/12/12 16:07:28 feb Exp $
+--	$Id$
 
-DefineAnimations("animations-gturret",
-        "still", {{3, 0, 1, 4}},
-        "attack", {
-                {0, 0, 1, 0}, {0, 0, 1, 5}, {0, 0, 1, 0}, {0, 0, 1, 5},{0, 0, 1, 0}, {12, 0, 1, 5},
-                {3, 0, 1, 0}})
+DefineNewAnimations("animations-gturret", {
+    Still = {"frame 4", "wait 1", },
+    Attack = {"unbreakable begin", "frame 0", "wait 1", "frame 5", "wait 1",
+        "frame 0", "wait 1", "frame 5", "wait 1", "frame 0", "wait 1", 
+        "frame 5", "sound assault-attack", "attack", "wait 1", 
+        "frame 0", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 10", "unbreakable end", "wait 50", },
+    })
 
 DefineIcon({
         Name = "icon-gturret",
@@ -60,7 +63,7 @@ DefineUnitType("unit-gturret", {
         Name = "Gun Turret",
         Files = {"tileset-desert", "elites/build/gturret.png"}, Size = {64, 64},
         Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
-        Animations = "animations-gturret", Icon = "icon-gturret",
+        NewAnimations = "animations-gturret", Icon = "icon-gturret",
         Costs = {"time", 130, "titanium", 250, "crystal", 50},
         RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-gturret",
         Speed = 0, HitPoints = 160, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},
@@ -88,8 +91,5 @@ DefineButton({
         Value = "unit-gturret", Key = "g", Hint = "BUILD ~!GUN TURRET",
         ForUnit = {"unit-engineer"}})
 -- DefineButton for the 'stop' and 'attack' actions are defined in buttons.lua.
-
-
-
 
 

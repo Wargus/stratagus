@@ -28,10 +28,12 @@
 --
 --	$Id$
 
-DefineAnimations("animations-tree",
-   "still", {
-	{0, 0, 255, 0}, {0, 0, 6, 1}, {0, 0, 6, 2},
-	{0, 0, 6, 3}, {0, 0, 6, 2}, {3, 0, 6, 1}})
+DefineNewAnimations("animations-tree", {
+    Still = {"frame 0", "wait 255", "frame 1", "wait 6", 
+        "frame 2", "wait 6", "frame 3", "wait 6", "frame 2", "wait 6", 
+        "frame 1", "wait 6", },
+    Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 10", },
+    })
 
 DefineIcon({
         Name = "icon-tree",
@@ -50,7 +52,7 @@ DefineUnitType("unit-tree", {
         Files = {"default", "nature/tree01.png"}, Size = {105, 105},
 	Offset = {16, -24},
         Shadow = {"file", "nature/tree01_s.png", "size", {105, 105}},
-        Animations = "animations-tree", Icon = "icon-tree",
+        NewAnimations = "animations-tree", Icon = "icon-tree",
         Costs = {"time", 1},
         Construction = "construction-tree",
         Speed = 0, HitPoints = 50, DrawLevel = 2, 
@@ -58,7 +60,7 @@ DefineUnitType("unit-tree", {
         SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
         Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
         Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-        Corpse = {"radar_destroyed", 0}, 
+        Corpse = {"unit-destroyed-1x1-place", 0}, 
         Type = "land",
 	Building = true, BuilderOutside = true,
         VisibleUnderFog = false,

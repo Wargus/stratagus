@@ -26,19 +26,32 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: unit-buggy.lua,v 1.1 2004/11/30 21:16:44 gorm Exp $
+--	$Id$
 
-DefineAnimations("animations-buggy",
-   "still",  {{3, 0, 1, 0}},
-   "move",   {{0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0},
-              {0, 2, 1, 5}, {0, 2, 1, 5}, {0, 2, 1,10}, {0, 2, 1,10},
-              {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0}, {0, 2, 1, 0},
-              {0, 2, 1,15}, {0, 2, 1,15}, {0, 2, 1,20}, {3, 2, 1,20}},
-   "attack", {{0, 0,10, 0}, {12, 0, 1,25}, {3, 0, 1, 0}},
-   "die",    {{3, 0, 1, 30}})
-DefineAnimations("animations-dead_buggy",
-   "die",    {{0, 0,  50, 30}, {4, 0, 1, 35},  {0, 0, 1, 40}, {0, 0, 1, 45},
-              {0, 0,   1, 50}, {0, 0, 1, 55},  {0, 0, 1, 60}, {0, 0, 2, 65}})
+DefineNewAnimations("animations-dead_buggy", {
+    Death = {"unbreakable begin", "frame 30", "wait 50", 
+        "frame 35", "sound grenade-impact", "wait 1", "frame 40", "wait 1", 
+        "frame 45", "wait 1", "frame 50", "wait 1", "frame 55", "wait 1", 
+        "frame 60", "wait 1","frame 65", "wait 2", 
+        "unbreakable end", "wait 1", },
+    })
+ 
+DefineNewAnimations("animations-buggy", {
+    Still = {"frame 0", "wait 1", },
+    Move = {"unbreakable begin", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 5", "move 2", "wait 1", 
+        "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
+        "frame 10", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+        "frame 0", "move 2", "wait 1", "frame 15", "move 2", "wait 1", 
+        "frame 15", "move 2", "wait 1", "frame 20", "move 2", "wait 1", 
+        "frame 20", "move 2", "unbreakable end", "wait 1", },
+    Attack = {"unbreakable begin", "frame 0", "wait 10", 
+        "frame 25", "sound assault-attack", "attack", "wait 1", 
+        "frame 0", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "frame 30", "unbreakable end", "wait 1", },
+    })
 
 DefineIcon({
 	Name = "icon-buggy",
@@ -57,7 +70,7 @@ DefineUnitType("buggy_destroyed", {
         Files = {"tileset-desert", "elites/units/unit_buggy.png"},
         Size = {64, 64},
         Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
-        Animations = "animations-dead_buggy", Icon = "icon-cancel",
+        NewAnimations = "animations-dead_buggy", Icon = "icon-cancel",
         Flip = false,
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {62, 62}, SightRange = 2,
@@ -73,7 +86,7 @@ DefineUnitType("unit-buggy", {
         Files = {"tileset-desert", "elites/units/unit_buggy.png"},
         Size = {64, 64},
         Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
-        Animations = "animations-buggy", Icon = "icon-buggy",
+        NewAnimations = "animations-buggy", Icon = "icon-buggy",
         Flip = false,
         Costs = {"time", 100, "titanium", 100, "crystal", 200},
         RepairHp = 1, RepairCosts = {"crystal", 3},
