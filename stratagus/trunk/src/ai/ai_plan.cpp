@@ -631,7 +631,7 @@ void AiSendExplorers(void)
     }
 
     // Nothing => abort
-    if (! requestcount) {
+    if (!requestcount) {
 	return;
     }
 
@@ -666,9 +666,9 @@ void AiSendExplorers(void)
 
 	    ray = 3 * ray / 2;
 	    trycount ++;
-	} while (trycount < 8 && ! targetok);
+	} while (trycount < 8 && !targetok);
 
-	if (! targetok) {
+	if (!targetok) {
 	    continue;
 	}
 

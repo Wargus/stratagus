@@ -566,6 +566,7 @@ local int AiFindUnusedScript(void)
 local int AiEvaluateScript(SCM script)
 {
     SCM get_need_lambda, rslt, willeval;
+
     get_need_lambda = gh_cadr(gh_car(script));
     willeval =
 	cons(get_need_lambda,
@@ -864,7 +865,7 @@ global void AiFindDefendScript(int attackX, int attackY)
     if (leftCost <= ((7 * totalCost) / 10)) {
     	DebugLevel3Fn("launch defense script\n");
     	AiStartScript(bestScriptAction, "defend");
-    }else{
+    } else {
 	DebugLevel3Fn("not ready for defense\n");
     	AiStartScript(bestScriptAction, "defend");
     }
@@ -951,7 +952,7 @@ local void AiRemoveFirstAiPlayerEvaluation(void)
     AiActionEvaluation *actionEvaluation = AiPlayer->FirstEvaluation;
 
     AiPlayer->FirstEvaluation = actionEvaluation->Next;
-    if (! AiPlayer->FirstEvaluation) {
+    if (!AiPlayer->FirstEvaluation) {
 	AiPlayer->LastEvaluation = 0;
     }
 
@@ -1059,7 +1060,7 @@ global void AiPeriodicAttack(void)
 	actionEvaluation = actionEvaluation->Next;
     }
 
-    if ((! bestActionEvaluation) && bestValue != -1 ){
+    if ((!bestActionEvaluation) && bestValue != -1 ){
 	// If nothing available, try the best compromis ( value - hotspot )
 	actionEvaluation = AiPlayer->FirstEvaluation;
 	bestDelta=0;
