@@ -1136,12 +1136,6 @@ global void SavePreferences(void)
 		fprintf(fd, "AlphaFogOfWar()\n");
 	}
 	fprintf(fd, "SetVideoFullScreen(%s)\n", VideoFullScreen ? "true" : "false");
-#if 0
-	// FIXME: Uncomment when this is configurable in the menus
-	fprintf(fd, "SetContrast(%d)\n", TheUI.Contrast);
-	fprintf(fd, "SetBrightness(%d)\n", TheUI.Brightness);
-	fprintf(fd, "SetSaturation(%d)\n", TheUI.Saturation);
-#endif
 	fprintf(fd, "SetLocalPlayerName(\"%s\")\n", LocalPlayerName);
 
 	// Game options
