@@ -183,6 +183,19 @@
 #define DEMOLISH_DAMAGE		400	/// damage for demolish attack
 
 /*----------------------------------------------------------------------------
+--	MacOS X fixes
+----------------------------------------------------------------------------*/
+
+#if defined(__APPLE__)
+
+#define MenuKey FreeCraftMenuKey
+#define HideCursor FreeCraftHideCursor
+#define InitCursor FreeCraftInitCursor
+#define DrawText FreeCraftDrawText
+
+#endif // defined(__APPLE__)
+
+/*----------------------------------------------------------------------------
 --	Screen
 ----------------------------------------------------------------------------*/
 

@@ -37,10 +37,11 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build10\""
+VERSION="-DVERSION=\"1.17pre1-build11\""
 UNIX=0
 BEOS=0
 WIN32=0
+DARWIN=0
 
 # Choose optimization level
 #DEBUG_CFLAGS="-g -O0 \$(PROFILE) -pipe -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
@@ -73,7 +74,7 @@ while test $# != 0 ; do
   case $1 in
     "-?"|"--help")
       echo
-      echo "usage: setup [--static] [--unix] [--beos] [--win32] [--debug] [--profile]"
+      echo "usage: setup [--static] [--unix] [--beos] [--win32] [--darwin] [--debug] [--profile]"
       echo
       echo "Setup will create a Rules.make file that Freecraft needs to compile."
       echo "Supported command-line arguments (you may use more than one at a time):"
@@ -81,6 +82,7 @@ while test $# != 0 ; do
       echo "  unix    : Force Unix/Linux compile options (default auto check)"
       echo "  beos    : Force BeOS compile options (default auto check)"
       echo "  win32   : Force WIN32 compile options (default auto check)"
+      echo "  darwin  : Force Darwin compile options (default auto check)"
       echo "  debug   : Compile with debug options (default no)"
       echo "  profile : Compile with profile support (default off)"
       echo
@@ -95,18 +97,28 @@ while test $# != 0 ; do
       UNIX=1
       BEOS=0
       WIN32=0
+      DARWIN=0
       ;;
 
     "--beos")
       UNIX=0
       BEOS=1
       WIN32=0
+      DARWIN=0
       ;;
 
     "--win32")
       UNIX=0
       BEOS=0
       WIN32=1
+      DARWIN=0
+      ;;
+
+    "--darwin")
+      UNIX=0
+      BEOS=0
+      WIN32=0
+      DARWIN=1
       ;;
 
     "--profile")
@@ -140,14 +152,16 @@ echo; echo
 if [ "$UNIX" != "1" ] ; then
   if [ "$BEOS" != "1" ] ; then
     if [ "$WIN32" != "1" ] ; then
+      if [ "$DARWIN" != "1" ] ; then
 
 if [ "$WIN32" = "0" ] ; then
   if [ "`uname | grep -is cygwin` x" != " x" ] ; then
     UNIX=0
     BEOS=0
     WIN32=1
+    DARWIN=0
     echo "It appears that you are in a Cygwin/win32 environment..."
-    echo "Use --unix or --beos to override"
+    echo "Use --darwin, --unix or --beos to override"
   fi
 fi
 
@@ -156,25 +170,43 @@ if [ "$BEOS" = "0" ] ; then
     UNIX=0
     BEOS=1
     WIN32=0
+    DARWIN=0
     echo "It appears that you are in a BeOS environment..."
-    echo "Use --unix or --win32 to override"
+    echo "Use --darwin, --unix or --win32 to override"
+  fi
+fi
+
+if [ "$DARWIN" = "0" ] ; then
+  if [ "`uname -a | grep -is darwin` x" != " x" ] ; then
+    DARWIN=1
+    UNIX=0
+    BEOS=0
+    WIN32=0
+    CC=cc
+   CFLAGS="-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS) -traditional-cpp"
+    echo "It appears that you are in a Darwin environment..."
+    echo "Use --beos, --win32 or --unix to override"
   fi
 fi
 
 if [ "$UNIX" = "0" ] ; then
   if [ "$BEOS" = "0" ] ; then
     if [ "$WIN32" = "0" ] ; then
-      UNIX=1
-      BEOS=0
-      WIN32=0
-      echo "It appears that you are in a UNIX environment..."
-      echo "Use --beos or --win32 to override"
+      if [ "$DARWIN" = "0" ] ; then
+        UNIX=1
+	BEOS=0
+        WIN32=0
+	DARWIN=0
+	echo "It appears that you are in a UNIX environment..."
+	echo "Use --beos or --win32 or --darwin to override"
+      fi
     fi
   fi  
 fi
 
-    fi
-  fi
+fi
+fi
+fi
 fi
 
 echo
@@ -191,8 +223,13 @@ echo >> $RULESFILE
 
 echo "# Use SIOD support" >> $RULESFILE
 if [ "$BEOS" != "1" ] ; then
-  echo "CCL		= -DUSE_CCL2" >> $RULESFILE
-  echo "CCLLIB		= -lm -ldl" >> $RULESFILE
+  if [ "$DARWIN" != "1" ] ; then
+    echo "CCL		= -DUSE_CCL2" >> $RULESFILE
+    echo "CCLLIB		= -lm -ldl" >> $RULESFILE
+  else
+    echo "CCL             = -DUSE_CCL2" >> $RULESFILE
+    echo "CCLLIB		= -dl" >> $RULESFILE
+  fi
 else
   echo "CCL             = -DUSE_CCL2 -DUSE_BEOS" >> $RULESFILE
   echo "CCLLIB		=" >> $RULESFILE
@@ -215,13 +252,15 @@ fi
 
 if [ "$BEOS" != "1" ] ; then
 
-# Check for SVGALIB
-LIBCHECK="-lvga -lvgagl"
-check_for_libs
-if test "$?" = 0 ; then
-  HAVESVGA=1
-else
-  echo "...You do not appear to have SVGALIB installed"
+if [ "$DARWIN" != "1" ] ; then
+  # Check for SVGALIB
+  LIBCHECK="-lvga -lvgagl"
+  check_for_libs
+  if test "$?" = 0 ; then
+    HAVESVGA=1
+  else
+    echo "...You do not appear to have SVGALIB installed"
+  fi
 fi
 
 echo
@@ -452,10 +491,17 @@ echo "" >> $RULESFILE
 # extra linker flags and include directory
 # -L/usr/lib 
 
-echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib \\" >> $RULESFILE
-echo "		  -L\$(TOPDIR)/libpng-1.0.5 -L\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
-echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \\" >> $RULESFILE
-echo "		  -I\$(TOPDIR)/libpng-1.0.5 -I\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
+if [ "$DARWIN" != 1 ] ; then
+  echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib \\" >> $RULESFILE
+  echo "		  -L\$(TOPDIR)/libpng-1.0.5 -L\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
+  echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \\" >> $RULESFILE
+  echo "		  -I\$(TOPDIR)/libpng-1.0.5 -I\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
+else
+  echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib" >> $RULESFILE
+  echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \\" >> $RULESFILE
+  echo "                  -I/usr/include -I/usr/include/machine" >> $RULESFILE
+fi
+
 echo >> $RULESFILE
 
 # Add the last bits
@@ -470,12 +516,21 @@ echo "PROFILE=$PROFILE" >> $RULESFILE
 echo >> $RULESFILE
 
 if [ "$BEOS" != 1 ] ; then
-  # Libraries needed to build tools
-  echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
+  if [ "$DARWIN" != 1 ] ; then
+    # Libraries needed to build tools
+    echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
 
-  # Libraries needed to build freecraft
-  echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
-  echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+    # Libraries needed to build freecraft
+    echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
+    echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+  else
+    # Libraries needed to build tools
+    echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
+
+    # Libraries needed to build freecraft
+    echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
+    echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+  fi
 else
   # Libraries needed to build tools
   echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
@@ -552,6 +607,10 @@ echo >> $RULESFILE
 echo "%.o: %.c" >> $RULESFILE
 echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
 echo "	@ar cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
+
+if [ "$DARWIN" = "1" ] ; then
+  echo "	ranlib \$(TOPDIR)/src/libclone.a" >> $RULESFILE
+fi
 
 #
 # Source code documentation

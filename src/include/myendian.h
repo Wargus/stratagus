@@ -82,6 +82,9 @@
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 #include <byteswap.h>
 #endif
+#if defined(__APPLE__)
+#include <architecture/byte_order.h>
+#endif
 #endif
 
 /*----------------------------------------------------------------------------
@@ -102,6 +105,20 @@
 
 #else
 
+#if defined(__APPLE__)
+
+/**
+**	Convert a 16 bit value in little endian and return it in native format.
+*/
+#define	ConvertLE16(v)	NXSwapLittleShortToHost(v)
+
+/**
+**	Convert a 32 bit value in little endian and return it in native format.
+*/
+#define	ConvertLE32(v)	NXSwapLittleIntToHost(v)
+
+#else
+
 /**
 **	Convert a 16 bit value in little endian and return it in native format.
 */
@@ -111,6 +128,8 @@
 **	Convert a 32 bit value in little endian and return it in native format.
 */
 #define	ConvertLE32(v)	(v)
+
+#endif  // defined(__APPLE__)
 
 #endif	// ! defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
 
