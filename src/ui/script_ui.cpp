@@ -1643,17 +1643,35 @@ local SCM CclDefineUI(SCM list)
 	    ui->MenuButtonGraphic.File = SCM_PopNewStr(&sublist);
 	    ui->MenuButtonGraphicX = SCM_PopInt(&sublist);
 	    ui->MenuButtonGraphicY = SCM_PopInt(&sublist);
-	} else if (gh_eq_p(value, gh_symbol2scm("minimap-panel"))) {
+	} else if (gh_eq_p(value, gh_symbol2scm("minimap"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);
-	    ui->MinimapPanel.File = SCM_PopNewStr(&sublist);
-	    ui->MinimapPanelX = SCM_PopInt(&sublist);
-	    ui->MinimapPanelY = SCM_PopInt(&sublist);
-	} else if (gh_eq_p(value, gh_symbol2scm("minimap-pos"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    ui->MinimapPosX = SCM_PopInt(&sublist);
-	    ui->MinimapPosY = SCM_PopInt(&sublist);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("file"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->MinimapPanel.File = gh_scm2newstr(value, NULL);
+		} else if (gh_eq_p(value, gh_symbol2scm("panel-pos"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->MinimapPanelX = gh_scm2int(gh_car(value));
+		    ui->MinimapPanelY = gh_scm2int(gh_car(gh_cdr(value)));
+		} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->MinimapPosX = gh_scm2int(gh_car(value));
+		    ui->MinimapPosY = gh_scm2int(gh_car(gh_cdr(value)));
+		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    ui->MinimapW = gh_scm2int(gh_car(value));
+		    ui->MinimapH = gh_scm2int(gh_car(gh_cdr(value)));
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("status-line"))) {
 	    sublist = gh_car(list);
 	    list = gh_cdr(list);

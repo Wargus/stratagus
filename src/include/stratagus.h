@@ -356,9 +356,6 @@ extern char NameLine[];
 #define MAXMAP_W	50		/// Maximum map width in tiles on screen
 #define MAXMAP_H	40		/// Maximum map height in tiles
 
-#define MINIMAP_W	128		/// Minimap width in pixels
-#define MINIMAP_H	128		/// Minimap height in pixels
-
     /// Scrolling area (<= 15 y)
 #define SCROLL_UP	15
     /// Scrolling area (>= VideoHeight-16 y)
