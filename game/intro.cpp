@@ -205,7 +205,7 @@ local void DrawContinueButton(void)
     DrawMenuButton(MBUTTON_GM_HALF,ContinueButtonFlags,
 	106,27,
 	ContinueButtonX,ContinueButtonY,
-	LargeFont,"~!Continue");
+	LargeFont,"~!Continue",NULL,NULL);
 }
 
 /**

@@ -169,14 +169,24 @@ global void MenusSetBackground(void)
 **	@param text	text to print on button
 */
 global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,int y,
-	const int font,const unsigned char *text)
+	const int font,const unsigned char *text,char *normalcolor,char *reversecolor)
 {
     MenuButtonId rb;
     int s;
     char* nc;
     char* rc;
+    char* oldnc;
+    char* oldrc;
 
-    GetDefaultTextColors(&nc, &rc);
+    GetDefaultTextColors(&oldnc, &oldrc);
+    if (normalcolor || reversecolor) {
+	nc = normalcolor ? normalcolor : oldnc;
+	rc = reversecolor ? reversecolor : oldrc;
+	SetDefaultTextColors(nc,rc);
+    } else {
+	nc = oldnc;
+	rc = oldrc;
+    }
     if (button == MBUTTON_SC_BUTTON || button == MBUTTON_SC_BUTTON_LEFT
 	    || button == MBUTTON_SC_BUTTON_RIGHT) {
 	if (flags&MenuButtonDisabled) {
@@ -250,7 +260,7 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
 	    }
 	}
     }
-    SetDefaultTextColors(nc,rc);
+    SetDefaultTextColors(oldnc,oldrc);
 }
 
 /**
@@ -265,7 +275,9 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
     int i;
     char* nc;
     char* rc;
-    char *text;
+    char* oldnc;
+    char* oldrc;
+    char* text;
     unsigned flags;
     MenuButtonId rb;
     MenuButtonId db;
@@ -281,7 +293,15 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
     flags = mi->flags;
     rb = mi->d.pulldown.button;
 
-    GetDefaultTextColors(&nc, &rc);
+    GetDefaultTextColors(&oldnc,&oldrc);
+    if (mi->d.pulldown.normalcolor || mi->d.pulldown.reversecolor) {
+	nc = mi->d.pulldown.normalcolor ? mi->d.pulldown.normalcolor : oldnc;
+	rc = mi->d.pulldown.reversecolor ? mi->d.pulldown.reversecolor : oldrc;
+	SetDefaultTextColors(nc,rc);
+    } else {
+	nc = oldnc;
+	rc = oldrc;
+    }
     if (rb == MBUTTON_SC_PULLDOWN) {
 	h = mi->d.pulldown.ysize;
 	if (flags&MenuButtonClicked) {
@@ -478,7 +498,7 @@ local void DrawPulldown(Menuitem *mi, int mx, int my)
 	    }
 	}
     }
-    SetDefaultTextColors(nc,rc);
+    SetDefaultTextColors(oldnc,oldrc);
 }
 
 /**
@@ -494,7 +514,9 @@ local void DrawListbox(Menuitem *mi, int mx, int my)
     int s;
     char* nc;
     char* rc;
-    char *text;
+    char* oldnc;
+    char* oldrc;
+    char* text;
     MenuButtonId rb;
     unsigned flags;
     int w;
@@ -509,7 +531,15 @@ local void DrawListbox(Menuitem *mi, int mx, int my)
     x = mx+mi->xofs;
     y = my+mi->yofs;
 
-    GetDefaultTextColors(&nc, &rc);
+    GetDefaultTextColors(&oldnc,&oldrc);
+    if (mi->d.listbox.normalcolor || mi->d.listbox.reversecolor) {
+	nc = mi->d.listbox.normalcolor ? mi->d.listbox.normalcolor : oldnc;
+	rc = mi->d.listbox.reversecolor ? mi->d.listbox.reversecolor : oldrc;
+	SetDefaultTextColors(nc,rc);
+    } else {
+	nc = oldnc;
+	rc = oldrc;
+    }
 
     if (flags&MenuButtonDisabled) {
 	rb--;
@@ -526,10 +556,11 @@ local void DrawListbox(Menuitem *mi, int mx, int my)
 		SetDefaultTextColors(nc,rc);
 		text = (*mi->d.listbox.retrieveopt)(mi, i + s);
 		if (text) {
-		    if (i == mi->d.listbox.curopt)
+		    if (i == mi->d.listbox.curopt) {
 			SetDefaultTextColors(rc,rc);
-		    else
+		    } else {
 			SetDefaultTextColors(nc,rc);
+		    }
 		    VideoDrawText(x+2,y+2 + 18*i ,mi->font,text);
 		}
 	    }
@@ -543,7 +574,7 @@ local void DrawListbox(Menuitem *mi, int mx, int my)
 	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w+1,h+2);
 	}
     }
-    SetDefaultTextColors(nc,rc);
+    SetDefaultTextColors(oldnc,oldrc);
 }
 
 /**
@@ -747,6 +778,8 @@ local void DrawGem(Menuitem *mi, int mx, int my)
     int y;
     char* nc;
     char* rc;
+    char* oldnc;
+    char* oldrc;
 
     flags = mi->flags;
     rb = mi->d.gem.button;
@@ -768,15 +801,23 @@ local void DrawGem(Menuitem *mi, int mx, int my)
     }
     VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
 
-    GetDefaultTextColors(&nc, &rc);
     if (mi->d.gem.text) {
+	GetDefaultTextColors(&oldnc,&oldrc);
+	if (mi->d.gem.normalcolor || mi->d.gem.reversecolor) {
+	    nc = mi->d.gem.normalcolor ? mi->d.gem.normalcolor : oldnc;
+	    rc = mi->d.gem.reversecolor ? mi->d.gem.reversecolor : oldrc;
+	    SetDefaultTextColors(nc,rc);
+	} else {
+	    nc = oldnc;
+	    rc = oldrc;
+	}
 	VideoDrawText(x+24, y+4, GameFont, mi->d.gem.text);
 	if (mi->flags&MenuButtonActive) {
 	    SetDefaultTextColors(rc,rc);
 	    VideoDrawRectangleClip(ColorGray,mx+mi->xofs-4,my+mi->yofs-4,
 		    VideoTextLength(GameFont, mi->d.gem.text)+30,VideoTextHeight(GameFont)+12);
-	    SetDefaultTextColors(nc,rc);
 	}
+	SetDefaultTextColors(oldnc,oldrc);
     }
 }
 
@@ -791,7 +832,9 @@ local void DrawInput(Menuitem *mi, int mx, int my)
 {
     char* nc;
     char* rc;
-    char *text;
+    char* oldnc;
+    char* oldrc;
+    char* text;
     unsigned flags;
     MenuButtonId rb;
     int w;
@@ -807,7 +850,15 @@ local void DrawInput(Menuitem *mi, int mx, int my)
     w = mi->d.input.xsize;
     h = mi->d.input.ysize;
 
-    GetDefaultTextColors(&nc, &rc);
+    GetDefaultTextColors(&oldnc,&oldrc);
+    if (mi->d.input.normalcolor || mi->d.input.reversecolor) {
+	nc = mi->d.input.normalcolor ? mi->d.input.normalcolor : oldnc;
+	rc = mi->d.input.reversecolor ? mi->d.input.reversecolor : oldrc;
+	SetDefaultTextColors(nc,rc);
+    } else {
+	nc = oldnc;
+	rc = oldrc;
+    }
     if (mi->d.input.button == MBUTTON_SC_PULLDOWN) {
 	rb = MBUTTON_SC_INPUT;
 	if (flags&MenuButtonDisabled) {
@@ -845,7 +896,7 @@ local void DrawInput(Menuitem *mi, int mx, int my)
 	    }
 	}
     }
-    SetDefaultTextColors(nc,rc);
+    SetDefaultTextColors(oldnc,oldrc);
 }
 
 
@@ -861,6 +912,8 @@ global void DrawMenu(Menu *menu)
     int l;
     char* nc;
     char* rc;
+    char* oldnc;
+    char* oldrc;
     Menuitem *mi;
     Menuitem *mip;
 
@@ -938,32 +991,43 @@ global void DrawMenu(Menu *menu)
     for (i = 0; i < n; i++) {
 	switch (mi->mitype) {
 	    case MI_TYPE_TEXT:
-		if (!mi->d.text.text)
+		if (!mi->d.text.text) {
 		    break;
-		GetDefaultTextColors(&nc, &rc);
+		}
+		GetDefaultTextColors(&oldnc,&oldrc);
+		if (mi->d.text.normalcolor || mi->d.text.reversecolor) {
+		    nc = mi->d.text.normalcolor ? mi->d.text.normalcolor : oldnc;
+		    rc = mi->d.text.reversecolor ? mi->d.text.reversecolor : oldrc;
+		    SetDefaultTextColors(nc,rc);
+		} else {
+		    nc = oldnc;
+		    rc = oldrc;
+		}
 		if (mi->flags&MenuButtonActive && mi->d.text.action) {
 		    VideoDrawRectangleClip(ColorGray,menu->x+mi->xofs-4,menu->y+mi->yofs-4,
 					    VideoTextLength(mi->font, mi->d.text.text)+5,
 					    VideoTextHeight(mi->font)+5);
 		    SetDefaultTextColors(rc,rc);
 		}
-		if (mi->d.text.align&MI_TFLAGS_CENTERED)
+		if (mi->d.text.align&MI_TFLAGS_CENTERED) {
 		    VideoDrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
-		else if (mi->d.text.align&MI_TFLAGS_RALIGN) {
+		} else if (mi->d.text.align&MI_TFLAGS_RALIGN) {
 		    l = VideoTextLength(mi->font,mi->d.text.text);
 		    VideoDrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
-		} else
+		} else {
 		    VideoDrawText(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
-		SetDefaultTextColors(nc, rc);
+		}
+		SetDefaultTextColors(oldnc,oldrc);
 		break;
 	    case MI_TYPE_BUTTON:
 		DrawMenuButton(mi->d.button.button,mi->flags,
 			mi->d.button.xsize,mi->d.button.ysize,
 			menu->x+mi->xofs,menu->y+mi->yofs,
-			mi->font,mi->d.button.text);
+			mi->font,mi->d.button.text,
+			mi->d.button.normalcolor,mi->d.button.reversecolor);
 		break;
 	    case MI_TYPE_PULLDOWN:
 		if (mi->flags&MenuButtonClicked) {

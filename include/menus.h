@@ -10,7 +10,7 @@
 //
 /**@name menus.h	-	The menu headerfile. */
 //
-//	(c) Copyright 1999-2002 by Andreas Arens
+//	(c) Copyright 1999-2003 by Andreas Arens
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -338,7 +338,9 @@ extern void InitMenus(int race);
     /// Draw menu
 extern void DrawMenu(Menu *menu);
     /// Draw menu button
-extern void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,int y,const int font,const unsigned char *text);
+extern void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,
+			   int x,int y,const int font,const unsigned char *text,
+			   char *normalcolor, char *reversecolor);
     /// Set menu backgound and draw it
 extern void MenusSetBackground(void);
     /// Draw and process a menu
