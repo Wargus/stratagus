@@ -246,7 +246,7 @@ local void DrawEditorInfo(void)
     int x;
     int y;
     unsigned flags;
-    char buf[1024];
+    char buf[256];
 
     v = TheUI.LastClickedVP;
     x = y = 0;
@@ -280,6 +280,26 @@ local void DrawEditorInfo(void)
 	    flags&MapFieldSeaUnit	?'s':'-',
 	    flags&MapFieldBuilding	?'b':'-' );
     VideoDrawText(x+150,y,GameFont,buf);
+}
+
+/**
+**	Show info about unit.
+**
+**	@param unit	Unit pointer.
+*/
+local void ShowUnitInfo(const Unit* unit)
+{
+    char buf[256];
+    int i;
+
+    i=sprintf(buf, "#%d '%s' Player:%d %s", UnitNumber(unit),
+	unit->Type->Name, unit->Player->Player,
+	unit->Active ? "active" : "passive");
+    if( unit->Type->OilPatch || unit->Type->GivesOil
+	    || unit->Type->GoldMine ) {
+	sprintf(buf+i," Amount %d\n",unit->Value);
+    }
+    SetStatusLine(buf);
 }
 
 /**
@@ -367,11 +387,15 @@ local void EditorUpdateDisplay(void)
     //
     //  Status line
     //
+    DrawStatusLine();
+
+#if 0
     if (TheUI.StatusLine.Graphic) {
 	VideoDrawSub(TheUI.StatusLine.Graphic, 0, 0,
 	    TheUI.StatusLine.Graphic->Width, TheUI.StatusLine.Graphic->Height,
 	    TheUI.StatusLineX, TheUI.StatusLineY);
     }
+#endif
 
     DrawAnyCursor();
 
@@ -560,7 +584,6 @@ local void EditorCallbackMouse(int x, int y)
     enum _cursor_on_ OldCursorOn;
     int viewport;
 
-
     DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
     HandleCursorMove(&x, &y);		// Reduce to screen
@@ -668,7 +691,25 @@ local void EditorCallbackMouse(int x, int y)
 	    DebugLevel0Fn("active viewport changed to %d.\n" _C_ viewport);
 	}
 	CursorOn = CursorOnMap;
-	return;
+    }
+    //
+    //	Look if there is an unit under the cursor.
+    //
+    if (CursorOn == CursorOnMap) {
+	viewport = TheUI.ActiveViewport;
+	if( UnitUnderCursor ) {
+	    ClearStatusLine();
+	}
+	UnitUnderCursor = UnitOnScreen(NULL,
+	    CursorX - TheUI.VP[viewport].X
+		+ TheUI.VP[viewport].MapX * TileSizeX,
+	    CursorY - TheUI.VP[viewport].Y
+		+ TheUI.VP[viewport].MapY * TileSizeY);
+	if( UnitUnderCursor ) {
+	    ShowUnitInfo(UnitUnderCursor);
+	}
+    } else {
+	UnitUnderCursor = NULL;
     }
     //
     //  Scrolling Region Handling
@@ -749,6 +790,7 @@ global void EditorMainLoop(void)
 	}
 
 	WaitEventsOneFrame(&callbacks);
+
     }
 
     //
@@ -767,6 +809,10 @@ global void EditorMainLoop(void)
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
+}
+
+local void paul(void)
+{
 }
 
 //@}
