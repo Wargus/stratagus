@@ -319,6 +319,7 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
 	tileset->Table[index+i]=gh_scm2int(data);
 	tileset->FlagsTable[index+i]=f;
 	tileset->BasicNameTable[index+i]=basic_name;
+	tileset->MixedNameTable[index+i]=0;
     }
     while( i<16 ) {
 	tileset->Table[index+i]=0;
@@ -423,11 +424,13 @@ local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
-    tileset->TileNames = malloc(4);
+    tileset->TileNames = malloc(sizeof(char*));
     if (!tileset->TileNames) {
 	fprintf(stderr, "out of memory.\n");
 	ExitFatal(-1);
     }
+    tileset->TileNames[0] = strdup("unused");
+    tileset->NumNames = 1;
 
     //
     //	Parse the list:	(still everything could be changed!)
