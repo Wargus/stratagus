@@ -57,18 +57,17 @@ global void SaveMap(FILE* file)
 
     fprintf(file,"(freecraft-map\n");
 
-    // FreeCraftFormatString
-    fprintf(file,"  'version '(%d.%d.%d)\n",
+    fprintf(file,"  'version \"" FreeCraftFormatString "\"\n",
 	    FreeCraftFormatArgs(FreeCraftVersion));
     fprintf(file,"  'description \"%s\"\n",TheMap.Description);
-    fprintf(file,"  'terrain '(\"%s\" \"%s\"))\n"
+    fprintf(file,"  'terrain '(%s \"%s\")\n"
 	    ,TheMap.TerrainName,Tilesets[TheMap.Terrain].Name);
-    fprintf(file,")\n");
 
-    fprintf(file,"(the-map\n");
-    fprintf(file,"  'size (%d %d)\n",TheMap.Width,TheMap.Height);
-    fprintf(file,"  %s\n",TheMap.NoFogOfWar ? "'no-fog-of-war" : "'fog-of-war");
+    fprintf(file,"  'the-map '(\n");
+    fprintf(file,"  size (%d %d)\n",TheMap.Width,TheMap.Height);
+    fprintf(file,"  %s\n",TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 
+    fprintf(file,"  map-fields (\n");
     for( h=0; h<TheMap.Height; ++h ) {
 	fprintf(file,"  ; %d\n",h);
 	for( w=0; w<TheMap.Width; ++w ) {
@@ -131,7 +130,7 @@ global void SaveMap(FILE* file)
 	    }
 	}
     }
-    fprintf(file,")\n");
+    fprintf(file,")))\n");
 }
 
 //@}
