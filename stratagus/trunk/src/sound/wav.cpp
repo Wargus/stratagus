@@ -77,21 +77,21 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 	// need to read new data
 	sample->Length -= data->PointerInBuffer - sample->Data;
 	memcpy(sample->Data, data->PointerInBuffer, sample->Length);
-	data->PointerInBuffer = sample->Data + sample->Length;
+	data->PointerInBuffer = sample->Data;
 
 	n = WAV_BUFFER_SIZE - sample->Length;
 
 	rate = 44100 / sample->Frequency;
-	i = CLread(data->WavFile, sndbuf, (n+4)/rate);
+	i = CLread(data->WavFile, sndbuf, n/rate);
 
-	for (x = 0; x < n; x += 4) {
+	for (x = 0; x < i*rate; x += 4) {
 	    for (y = 0; y < 4; ++y) {
-		DebugCheck(x/rate+y >= i);
-		data->PointerInBuffer[x + y] = sndbuf[x/rate+y];
+		DebugCheck(x/rate+(y&1) >= i);
+		data->PointerInBuffer[sample->Length + x + y] = sndbuf[x/rate+(y&1)];
 	    }
 	}
 
-	sample->Length += n;
+	sample->Length += i*rate;
 
         if (sample->Length < len) {
             len = sample->Length;
