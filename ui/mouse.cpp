@@ -984,7 +984,9 @@ local void UISelectStateButtonDown(unsigned button)
 	if( MouseButtons&LeftButton ) {
 	    MakeMissile(MissileTypeGreenCross
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
-		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
+		    ,MapY*TileSizeY+CursorY-TheUI.MapY
+		    ,MapX*TileSizeX+CursorX-TheUI.MapX
+		    ,MapY*TileSizeY+CursorY-TheUI.MapY);
 	    SendCommand(mx,my);
 	}
 	return;
