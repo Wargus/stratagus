@@ -496,6 +496,7 @@ global void InitNetwork2(void)
     //
     //	Prepare first time without syncs.
     //
+    memset(NetworkIn,0,sizeof(NetworkIn));
     for (i = 0; i <= NetworkLag; i += NetworkUpdates) {
 	for (n = 0; n < HostsCount; ++n) {
 	    NetworkIn[i][Hosts[n].PlyNr].Time = i;
