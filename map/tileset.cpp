@@ -52,7 +52,7 @@ extern int RockTable[20];		/// Table for rock removable.
 */
 global char** TilesetWcNames;
 
-#if 1		//	FIXME: only support ccl version.
+#ifndef laterUSE_CCL	//	FIXME: only support ccl version.
 
 /**
 **	Table to convert summer pud tile numbers to internal.
