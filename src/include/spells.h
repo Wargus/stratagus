@@ -51,47 +51,58 @@
 --	Definitons
 ----------------------------------------------------------------------------*/
 
-enum {
-    flag_slow,
-    flag_haste,
-    flag_bloodlust,
-    flag_invisibility,
-    flag_unholyarmor,
-    flag_flameshield,
-    flag_HP,
-    flag_Mana,
-    flag_HP_percent,
-    flag_Mana_percent,
-    flag_coward,
-    flag_organic,
-    flag_isundead,
-    flag_canattack,
-    flag_building
-};
+/**
+**	Different targets.
+*/
+typedef enum {
+    TargetSelf,
+    TargetPosition,
+    TargetUnit
+}   TargetType;
+
+typedef struct _spell_action_type_ SpellActionType;
+/*
+**	Pointer on function that cast the spell.
+*/
+typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell,
+	const struct _spell_action_type_* action, Unit* target, int x, int y);
 
 /**
 **	Different targets.
 */
 typedef enum {
-	TargetSelf,
-	TargetPosition,
-	TargetUnit
-#if 0
-		,
-	TargetUnits
-#endif
-}	TargetType;
+    LocBaseCaster,
+    LocBaseTarget
+}   LocBaseType;
 
 /*
-**	Pointer on function that cast the spell.
-*/
-typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell, Unit* target,int x, int y);
+**	This struct is used for defining a missile start/stop location.
+**
+**	It's evaluated like this, and should be more or less flexible.:	
+**	base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
+** 
+**/
+typedef struct {
+    LocBaseType	Base;	/// The base for the location (caster/target)
+    int AddX;		/// Add to the X coordinate 
+    int AddY;		/// Add to the X coordinate 
+    int AddRandX;	/// Random add to the X coordinate 
+    int AddRandY;	/// Random add to the X coordinate 
+} SpellActionMissileLocation;
 
-typedef struct
-{
+struct _spell_action_type_ {
     SpellFunc* CastFunction;
+
+    // FIXME" some time information doesn't work as it should.
     union {
-// FIXME time information doesn't work as it should.
+	struct {
+	    int Damage;					/// Missile damage
+	    int TTL;					/// Missile TTL
+	    int Delay;					/// Missile original delay
+	    SpellActionMissileLocation StartPoint;	/// Start point description
+	    SpellActionMissileLocation EndPoint;	/// Start point description
+	} SpawnMissile;
+
 	struct {
 	    int Fields;			/// The size of the affected square
 	    int Shards;			/// Number of shards thrown.
@@ -105,16 +116,6 @@ typedef struct
 	    UnitType *PortalType;	/// The unit type spawned
 	} SpawnPortal;
 	
-	struct {
-	    int TTL;			/// time to live (ticks)
-	    int Damage;			/// Damage.
-	} Fireball;
-	
-	struct {
-	    int TTL;			/// time to live (ticks)
-	    int Damage;			/// Damage.
-	} FlameShield;
-
 	struct {
 	    int HasteTicks;		/// Number of ticks to set Haste to.
 	    int SlowTicks;		/// Number of ticks to set Slow to.
@@ -143,18 +144,9 @@ typedef struct
 	    int RequireCorpse;		/// Corpse consumed while summoning.
 	} Summon;
 	//  What about a resurection spell?
-
-	struct {
-	    int TTL;			/// time to live (ticks)
-	    int Damage;			/// Damage.
-	} Runes;
-	
-	struct {
-	    int TTL;			/// time to live (ticks)
-	    int Damage;			/// Damage.
-	} Whirlwind;
     } Data;
-} SpellActionType;
+    SpellActionType* Next;		/// Next action.
+};
 
 /*
 ** *******************
@@ -331,15 +323,12 @@ extern unsigned CclGetSpellByIdent(SCM value);
 
 SpellFunc CastAdjustVitals;
 SpellFunc CastAdjustBuffs;
-SpellFunc CastFireball;
-SpellFunc CastFlameShield;
 SpellFunc CastPolymorph;
 SpellFunc CastAreaBombardment;
 SpellFunc CastSummon;
-SpellFunc CastRunes;
 SpellFunc CastDeathCoil;
-SpellFunc CastWhirlwind;
 SpellFunc CastSpawnPortal;
+SpellFunc CastSpawnMissile;
 
 //@}
 
