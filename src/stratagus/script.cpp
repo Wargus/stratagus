@@ -112,7 +112,32 @@ local SCM CclGameCycle(void)
 {
     return gh_int2scm(GameCycle);
 }
+/**
+**      Return of game name.
+**
+**      @param name    SCM name. (nil reports only)
+**
+**      @return         Old game name.
+*/
+local SCM CclSetGameName(SCM gamename)
+{
+    SCM old;
 
+    old=NIL;
+    if( GameName ) {
+	old=gh_str02scm(GameName);
+    }
+    if( !gh_null_p(gamename) ) {
+	if( GameName ) {
+	    free(GameName);
+	    GameName=NULL;
+	}
+
+	GameName=gh_scm2newstr(gamename,NULL);
+    }
+    return old;
+}
+										    
 /**
 **	Set the freecraft game-cycle
 */
@@ -489,10 +514,12 @@ local SCM CclGetFreeCraftHomePath(void)
     char* buf;
 
     cp=getenv("HOME");
-    buf=alloca(strlen(cp)+sizeof(FREECRAFT_HOME_PATH)+2);
+    buf=alloca(strlen(cp)+strlen(GameName)+sizeof(FREECRAFT_HOME_PATH)+3);
     strcpy(buf,cp);
     strcat(buf,"/");
     strcat(buf,FREECRAFT_HOME_PATH);
+    strcat(buf,"/");
+    strcat(buf,GameName);
 
     return gh_str02scm(buf);
 }
@@ -622,6 +649,7 @@ global void InitCcl(void)
 
     gh_new_procedure0_0("library-path",CclFreeCraftLibraryPath);
     gh_new_procedure0_0("game-cycle",CclGameCycle);
+    gh_new_procedure1_0("set-game-name!",CclSetGameName);
     gh_new_procedure1_0("set-game-cycle!",CclSetGameCycle);
     gh_new_procedure1_0("set-video-sync-speed!",CclSetVideoSyncSpeed);
     gh_new_procedure1_0("set-local-player-name!",CclSetLocalPlayerName);
@@ -794,9 +822,9 @@ local void LoadPreferences2(void)
     char buf[1024];
 
 #ifdef USE_WIN32
-    strcpy(buf,"preferences2.ccl");
+    strcpy(buf,"%s/preferences2.ccl",GameName);
 #else
-    sprintf(buf,"%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH,GameName);
 #endif
 
     fd=fopen(buf,"r");
@@ -846,9 +874,9 @@ global void SavePreferences(void)
     //
 
 #ifdef USE_WIN32
-    strcpy(buf,"preferences2.ccl");
+    strcpy(buf,"%s/preferences2.ccl",GameName);
 #else
-    sprintf(buf,"%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH);
+    sprintf(buf,"%s/%s/%s/preferences2.ccl",getenv("HOME"),FREECRAFT_HOME_PATH,GameName);
 #endif
 
     fd=fopen(buf,"w");
@@ -942,9 +970,9 @@ global void LoadCcl(void)
     //	Load and evaluate configuration file
     //
     CclInConfigFile=1;
-    LoadPreferences1();
     file=LibraryFileName(CclStartFile,buf);
     ShowLoadProgress("Script %s\n",file);
+    LoadPreferences1();
     if( (s=strrchr(file,'.')) && s[1]=='C' ) {
 	fast_load(gh_str02scm(file),NIL);
     } else {

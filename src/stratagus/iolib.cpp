@@ -424,24 +424,24 @@ global char* LibraryFileName(const char* file,char* buffer)
 	//
 	//	In user home directory
 	//
-	sprintf(buffer,"%s/%s/%s",s,FREECRAFT_HOME_PATH,file);
+	sprintf(buffer,"%s/%s/%s/%s",s,FREECRAFT_HOME_PATH,GameName,file);
 	if( !access(buffer,R_OK) ) {
 	    return buffer;
 	}
 #ifdef USE_ZLIB		// gzip or bzip2 in user home directory
-	sprintf(buffer,"%s/%s/%s.gz",s,FREECRAFT_HOME_PATH,file);
+	sprintf(buffer,"%s/%s/%s/%s.gz",s,FREECRAFT_HOME_PATH,GameName,file);
 	if( !access(buffer,R_OK) ) {
 	    return buffer;
 	}
 #endif
 #ifdef USE_BZ2LIB
-	sprintf(buffer,"%s/%s/%s.bz2",s,FREECRAFT_HOME_PATH,file);
+	sprintf(buffer,"%s/%s/%s/%s.bz2",s,FREECRAFT_HOME_PATH,GameName,file);
 	if( !access(buffer,R_OK) ) {
 	    return buffer;
 	}
 #endif
 #ifdef USE_ZZIPLIB
-	sprintf(buffer,"%s/%s/%s",s,FREECRAFT_HOME_PATH,file);
+	sprintf(buffer,"%s/%s/%s/%s",s,FREECRAFT_HOME_PATH,GameName,file);
 	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
 	    zzip_close(zp);
 	    return buffer;
