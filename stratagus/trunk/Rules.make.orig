@@ -259,14 +259,6 @@ CTAGSFLAGS=--c-types=defmpstuvx -a -f
 #
 LOCKVER=	rcs -q -n$(NAME)
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
-	@$(AR) cru $(TOPDIR)/src/libclone.a $@
-
-%.o: %.cpp
-	$(CC) -c $(CFLAGS) $< -o $@
-	@$(AR) cru $(TOPDIR)/src/libclone.a $@
-
 #------------
 #	Source code documentation
 #
