@@ -1426,6 +1426,75 @@ local int CclDefineAiPlayer(lua_State* l)
 		} else if (!strcmp(value, "need-supply")) {
 			ai->NeedSupply = 1;
 			--j;
+		} else if (!strcmp(value, "exploration")) {
+			AiExplorationRequest** queue;
+
+			if (!lua_istable(l, j + 1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			subargs = luaL_getn(l, j + 1);
+			queue = &ai->FirstExplorationRequest;
+			for (k = 0; k < subargs; ++k) {
+				int x;
+				int y;
+				int mask;
+
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+					lua_pushstring(l, "incorrect argument");
+					lua_error(l);
+				}
+				lua_rawgeti(l, -1, 1);
+				x = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				lua_rawgeti(l, -1, 2);
+				y = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				lua_rawgeti(l, -1, 3);
+				mask = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				lua_pop(l, 1);
+				*queue = malloc(sizeof(AiExplorationRequest));
+				(*queue)->Next = NULL;
+				(*queue)->X = x;
+				(*queue)->Y = y;
+				(*queue)->Mask = mask;
+				queue = &(*queue)->Next;
+			}
+		} else if (!strcmp(value, "last-exploration-cycle")) {
+			ai->LastExplorationGameCycle = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "transport")) {
+			AiTransportRequest** queue;
+
+			if (!lua_istable(l, j + 1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			subargs = luaL_getn(l, j + 1);
+			queue = &ai->TransportRequests;
+			for (k = 0; k < subargs; ++k) {
+				int unit;
+
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+					lua_pushstring(l, "incorrect argument");
+					lua_error(l);
+				}
+				lua_rawgeti(l, -1, 1);
+				unit = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				*queue = malloc(sizeof(AiTransportRequest));
+				(*queue)->Next = NULL;
+				(*queue)->Unit = UnitSlots[unit];
+				lua_rawgeti(l, -1, 2);
+				CclParseOrder(l, &(*queue)->Order);
+				lua_pop(l, 1);
+				queue = &(*queue)->Next;
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "last-can-not-move-cycle")) {
+			ai->LastCanNotMoveGameCycle = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "unit-type")) {
 			if (!lua_istable(l, j + 1)) {
 				lua_pushstring(l, "incorrect argument");

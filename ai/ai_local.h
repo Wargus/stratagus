@@ -196,9 +196,9 @@ typedef struct _player_ai_ {
 	int NeedSupply;        /// Flag need food
 
 	AiExplorationRequest* FirstExplorationRequest;  /// Requests for exploration
-	unsigned int          LastExplorationGameCycle; /// When did the last explore occur ?
-	AiTransportRequest*   TransportRequests;
-	unsigned int          LastCanNotMoveGameCycle;  /// number of elements in UnitTypeRequests
+	unsigned long         LastExplorationGameCycle; /// When did the last explore occur?
+	AiTransportRequest*   TransportRequests;        /// Requests for transport
+	unsigned long         LastCanNotMoveGameCycle;  /// Last can not move cycle
 	int                   UnitTypeRequestsCount;    /// unit-types to build/train request,priority list
 	AiUnitTypeTable*      UnitTypeRequests;         /// number of elements in UpgradeRequests
 	int                   UpgradeToRequestsCount;   /// Upgrade to unit-type requested and priority list
