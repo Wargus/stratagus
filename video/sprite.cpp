@@ -995,18 +995,18 @@ local void VideoDrawClipOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
 
     stx=(GLfloat)ox/sprite->Width*sprite->TextureWidth;
     etx=(GLfloat)(ox+w)/sprite->Width*sprite->TextureWidth;
-    sty=(GLfloat)oy/sprite->Height;
-    ety=(GLfloat)(oy+h)/sprite->Height*sprite->TextureHeight;
+    ety=1.0f-(GLfloat)oy/sprite->Height*sprite->TextureHeight;
+    sty=1.0f-(GLfloat)(oy+h)/sprite->Height*sprite->TextureHeight;
 
     glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
     glBegin(GL_QUADS);
-    glTexCoord2f(stx, 1.0f-ety);
+    glTexCoord2f(stx, sty);
     glVertex3f(svx, svy, 0.0f);
-    glTexCoord2f(stx, 1.0f-sty);
+    glTexCoord2f(stx, ety);
     glVertex3f(svx, evy, 0.0f);
-    glTexCoord2f(etx, 1.0f-sty);
+    glTexCoord2f(etx, ety);
     glVertex3f(evx, evy, 0.0f);
-    glTexCoord2f(etx, 1.0f-ety);
+    glTexCoord2f(etx, sty);
     glVertex3f(evx, svy, 0.0f);
     glEnd();
 }
@@ -1593,20 +1593,27 @@ local void VideoDrawClipXOpenGL(const Graphic* sprite,unsigned frame
     evy=1.0f-(GLfloat)y/VideoHeight;
     svy=evy-(GLfloat)h/VideoHeight;
 
+    if( w<sprite->Width ) {
+	if( ox==0 ) {
+	    ox += sprite->Width-w;
+	} else {
+	    ox = 0;
+	}
+    }
     stx=(GLfloat)ox/sprite->Width*sprite->TextureWidth;
     etx=(GLfloat)(ox+w)/sprite->Width*sprite->TextureWidth;
-    sty=(GLfloat)oy/sprite->Height;
-    ety=(GLfloat)(oy+h)/sprite->Height*sprite->TextureHeight;
+    ety=1.0f-(GLfloat)oy/sprite->Height*sprite->TextureHeight;
+    sty=1.0f-(GLfloat)(oy+h)/sprite->Height*sprite->TextureHeight;
 
     glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
     glBegin(GL_QUADS);
-    glTexCoord2f(stx, 1.0f-ety);
+    glTexCoord2f(stx, sty);
     glVertex3f(evx, svy, 0.0f);
-    glTexCoord2f(stx, 1.0f-sty);
+    glTexCoord2f(stx, ety);
     glVertex3f(evx, evy, 0.0f);
-    glTexCoord2f(etx, 1.0f-sty);
+    glTexCoord2f(etx, ety);
     glVertex3f(svx, evy, 0.0f);
-    glTexCoord2f(etx, 1.0f-ety);
+    glTexCoord2f(etx, sty);
     glVertex3f(svx, svy, 0.0f);
     glEnd();
 }
