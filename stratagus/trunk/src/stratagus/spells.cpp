@@ -1167,15 +1167,16 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionRaiseDead:
     {
-	int i;
+	Unit **corpses;
+	corpses = &CorpseList;
 
-	for (i = 0; i < NumUnits; ++i) {
+	while( *corpses ) {
 	    // FIXME: this tries to raise all corps, ohje
 	    // FIXME: I can raise ships?
-	    if ((Units[i]->Type->Vanishes && !Units[i]->Type->Building
-		    && Units[i]->Orders[0].Action == UnitActionDie)
-		    && Units[i]->X >= x-1 && Units[i]->X <= x+1
-		    && Units[i]->Y >= y-1 && Units[i]->Y <= y+1) {
+	    if ( (*corpses)->Orders[0].Action == UnitActionDie
+		    && !(*corpses)->Type->Building
+		    && (*corpses)->X >= x-1 && (*corpses)->X <= x+1
+		    && (*corpses)->Y >= y-1 && (*corpses)->Y <= y+1) {
 
 		// FIXME: did they count on food?
 		// Can there be more than 1 skeleton created on the same tile?
@@ -1187,15 +1188,14 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 			target->Type->DecayRate*6*CYCLES_PER_SECOND;
 		CheckUnitToBeDrawn(target);
 
-		ReleaseUnit( Units[i] );
-		 // Ugly hack again, release changes Units[i] !
-		--i;
+		ReleaseUnit( *corpses );
 
 		unit->Mana -= spell->ManaCost;
 		if( unit->Mana < spell->ManaCost ) {
 		    break;
 		}
 	    }
+	    corpses=&(*corpses)->Next;
 	}
 
 	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);

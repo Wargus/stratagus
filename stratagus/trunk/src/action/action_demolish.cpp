@@ -146,7 +146,6 @@ global void HandleActionDemolish(Unit* unit)
 	    if (ymin<0) ymin=0;
 	    if (ymax > TheMap.Height-1) ymax = TheMap.Height-1;
 
-            LetUnitDie(unit);
 	    // FIXME: Must play explosion sound
 
 	    //	FIXME: Currently we take the X fields, the original only the O
@@ -162,7 +161,8 @@ global void HandleActionDemolish(Unit* unit)
 	    //
             n=SelectUnits(xmin,ymin, xmax, ymax,table);
             for( i=0; i<n; ++i ) {
-		if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
+		if( table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP
+		    && table[i] != unit ) {
 		    // Don't hit flying units!
 		    HitUnit(unit,table[i],DEMOLISH_DAMAGE);
 		}
@@ -183,6 +183,7 @@ global void HandleActionDemolish(Unit* unit)
 		    }
 		}
 	    }
+            LetUnitDie(unit);
 #ifdef HIERARCHIC_PATHFINDER
 	    PfHierMapChangedCallback (xmin, ymin, xmax, ymax);
 #endif

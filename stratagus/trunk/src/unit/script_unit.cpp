@@ -736,6 +736,10 @@ local SCM CclUnit(SCM list)
 		// HACK: the building is not ready yet
 		unit->Player->UnitTypesCount[type->Type]--;
 	    }
+	    // FIXME: Does not load CorpseList Properly
+	    if( unit->Orders[0].Action==UnitActionDie ) {
+		CorpseCacheInsert(unit);
+	    }
 #ifdef NEW_FOW
 	    if( unit->Orders[0].Action==UnitActionDie &&
 		unit->Type->CorpseScript ) {

@@ -296,7 +296,7 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
 			break;
 		    case 255:		// Overflow
-			DebugLevel0Fn("Visible overflow: Slow Lookup Needed\n");
+			DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ p);
 			break;
 
 		    default:		// seen -> seen
@@ -364,6 +364,9 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 	for( i=x; i<=x+width; ++i ) {
 	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
 		v=TheMap.Fields[i+y*TheMap.Width].Visible[p];
+		if( IsTileVisible(ThisPlayer,i,y) > 1) {
+		    MapMarkSeenTile(i,y);
+		}
 		switch( v ) {
 		    case 255:
 			TheMap.Fields[i+y*TheMap.Width].Visible[p] =
@@ -1969,8 +1972,10 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	int x=(dx-vp->X)/TileSizeX + vp->MapX;
 	int y=(dy-vp->Y)/TileSizeY + vp->MapY;
 	//sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsTileVisible(ThisPlayer,x,y));
-	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player]);
-	VideoDrawText(dx,dy, GameFont,seen);
+	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[1]);
+	if( TheMap.Fields[y*TheMap.Width+x].Visible[1] ) {
+	    VideoDrawText(dx,dy, GameFont,seen);
+	}
 	}
 #endif 
 #if defined(HIERARCHIC_PATHFINDER) && defined(DEBUG)

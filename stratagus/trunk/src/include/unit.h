@@ -683,6 +683,8 @@ extern Unit** UnitSlotFree;		/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
 extern int NumUnits;			/// Number of units used
+extern Unit* DestroyedBuildings;	/// List of DestroyedBuildings
+extern Unit* CorpseList;		/// List of Corpses On Map
 
 //	in unit_draw.c (FIXME: could be moved into the user interface?)
 extern int ShowHealthBar;		/// Flag: show health bar
@@ -865,6 +867,10 @@ extern Unit* UnitCacheOnXY(int x,int y,unsigned type);
 extern void UnitCacheStatistic(void);
     /// Initialize unit-cache
 extern void InitUnitCache(void);
+    /// Inserts a corpse into the corpse list cache
+extern void CorpseCacheInsert(Unit* unit);
+    /// Removes a corpse from the corpse cache
+extern void CorpseCacheRemove(Unit* unit);
 
 //	in unit_draw.c
 //--------------------
