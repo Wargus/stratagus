@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name movie.h	-	The movie header file. */
+/**@name movie.h - The movie header file. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2002-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __MOVIE_H__
 #define __MOVIE_H__
@@ -34,39 +34,39 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Documentation
+--  Documentation
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Play movie flags.
+**  Play movie flags.
 */
 enum _play_movie_flags_ {
-	PlayMovieFullScreen = 1,				/// Switch to full screen
-	PlayMovieZoomScreen = 2,				/// Zoom to screen size
-	PlayMovieKeepAspect = 4,				/// Keep the aspect while zooming
+	PlayMovieFullScreen = 1,  /// Switch to full screen
+	PlayMovieZoomScreen = 2,  /// Zoom to screen size
+	PlayMovieKeepAspect = 4,  /// Keep the aspect while zooming
 };
 
 /**
-**		Movie handle.
+**  Movie handle.
 */
 typedef struct _movie_ {
-	void*		File;						/// Demux handler
+	void* File;  /// Demux handler
 } Movie;
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 	/// Play a movie file
@@ -79,4 +79,4 @@ extern void CleanMovie(void);
 
 //@}
 
-#endif		// !__MOVIE_H__
+#endif // !__MOVIE_H__
