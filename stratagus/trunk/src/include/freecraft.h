@@ -304,7 +304,6 @@ extern void SetMessage2( int x, int y, char* fmt, ... );
 extern void SetMessageDup(const char* message);
 extern void SetMessageDupCat(const char* message);
 extern void CenterOnMessage();
-extern void ClearMessage(void);
 extern void SetStatusLine(char* status);
 extern void ClearStatusLine(void);
 extern void UpdateDisplay(void);
