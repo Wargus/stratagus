@@ -65,6 +65,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "netconnect.h"
+#include "network.h"
 #include "cdaudio.h"
 #include "spells.h"
 
@@ -72,6 +73,9 @@
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+/// Uncomment this to enable additionnal check on GC operations
+// #define DEBUG_GC
 
 #ifdef USE_GUILE
 #define GC_PROTECT_VALUE 1
@@ -92,6 +96,24 @@ global int CclInConfigFile;		/// True while config file parsing
 global char*	Tips[MAX_TIPS + 1];	/// Array of tips
 global int	ShowTips;		/// Show tips at start of level
 global int	CurrentTip;		/// Current tip to display
+
+#ifdef DEBUG_GC
+
+#ifdef USE_GUILE
+#define CHECK_GC_VALUES 1
+#else
+#ifdef SIOD_HEAP_GC
+#define CHECK_GC_VALUES 1
+#endif
+#endif
+
+local SCM*   ProtectedCells[16384];
+local int    ProtectedCellCount=0;
+#ifdef CHECK_GC_VALUES
+local SCM    ProtectedCellValues[16384];
+#endif
+
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -206,7 +228,69 @@ global ccl_smob_type_t CclMakeSmobType(const char* name)
 }
 
 
+#ifdef DEBUG_GC
+
+/**
+**	Check if a cell is already protected
+**
+**	@param val	the cell to find
+**	@return 	the index of the cell or -1
+*/
+local int FindProtectedCell(SCM * val)
+{
+    int i;
+    for (i = 0; i < ProtectedCellCount; i++) {
+	if (ProtectedCells[i] == val) {
+	    return i;
+	}
+    }
+    return -1;
+}
+
+local void AddProtectedCell(SCM * var)
+{
+    DebugCheck(ProtectedCellCount >= 16384);
+    ProtectedCells[ProtectedCellCount] = var;
+#ifdef CHECK_GC_VALUES
+    ProtectedCellValues[ProtectedCellCount] = *var;
+#endif
+
+    ProtectedCellCount++;
+}
+
+local void DelProtectedCell(int id)
+{
+    ProtectedCellCount--;
+    
+    ProtectedCells[id]=ProtectedCells[ProtectedCellCount];
+#ifdef CHECK_GC_VALUES
+    ProtectedCellValues[id]=ProtectedCellValues[ProtectedCellCount];
+#endif
+}
+
+local void CheckProtectedCell(SCM* obj,int id)
+{
+#ifdef CHECK_GC_VALUES
+    DebugCheck(ProtectedCellValues[id] != *obj);
+#endif
+}
+
+local void SetProtectedCell(int id,SCM obj)
+{
+#ifdef CHECK_GC_VALUES
+    ProtectedCellValues[id] = obj;
+#endif
+}
+
+#endif
+
 #ifdef GC_PROTECT_VALUE
+/**
+**	Check if it is usefull to GC-protect a given value
+**
+**	@param val the value to GC-protect
+**	@return 1 if the value is neither SCM_UNSPECIFIED nor NULL
+*/
 local int CclNeedProtect(SCM val)
 {
     return (val != SCM_UNSPECIFIED) && (!gh_null_p(val));
@@ -220,6 +304,12 @@ local int CclNeedProtect(SCM val)
 */
 global void CclGcProtect(SCM * obj)
 {
+#ifdef DEBUG_GC
+    // Protecting an already protected cell ?
+    DebugCheck(FindProtectedCell(obj) >= 0);
+    AddProtectedCell(obj);
+#endif
+
 #ifdef GC_PROTECT_VALUE
     if (!CclNeedProtect(*obj)) {
 	return;
@@ -247,6 +337,16 @@ global void CclGcProtect(SCM * obj)
 */
 global void CclGcUnprotect(SCM * obj)
 {
+#ifdef DEBUG_GC
+    int id;
+
+    // Check if already protected
+    id = FindProtectedCell(obj);
+    DebugCheck( id == -1);
+    CheckProtectedCell(obj,id);
+    DelProtectedCell(id);
+#endif
+
 #ifdef GC_PROTECT_VALUE
     if (!CclNeedProtect(*obj)) {
 	return;
@@ -286,10 +386,21 @@ global void CclGcUnprotect(SCM * obj)
 global void CclGcProtectedAssign(SCM* obj, SCM value)
 {
 #ifdef GC_PROTECT_VALUE
-    CclGcProtect(&value);
     CclGcUnprotect(obj);
-#endif
     (*obj) = value;
+    CclGcProtect(obj);
+#else
+#ifdef DEBUG_GC
+    int id;
+    
+    // Check if already protected
+    id = FindProtectedCell(obj);
+    DebugCheck(id == -1);
+    CheckProtectedCell(obj,id);
+    SetProtectedCell(id,value);
+#endif 	// DEBUG_GC
+    (*obj) = value;
+#endif	// GC_PROTECT_VALUE
 }
 
 global void CclFlushOutput(void)
@@ -923,7 +1034,7 @@ global void InitCcl(void)
 #else
     // Stop & copy GC : scan only allocated cells
     sargv[2] = "-g1";
-    sargv[3] = "-h800000";
+    sargv[3] = "-h4000000";
 #endif
     buf = malloc(strlen(StratagusLibPath) + 4);
     sprintf(buf, "-l%s", StratagusLibPath);
@@ -961,6 +1072,7 @@ global void InitCcl(void)
     gh_new_procedureN("define-default-resource-names", CclDefineDefaultResourceNames);
     gh_new_procedureN("define-default-resource-amounts", CclDefineDefaultResourceAmounts);
 
+    NetworkCclRegister();
     IconCclRegister();
     MissileCclRegister();
     PlayerCclRegister();
@@ -1056,7 +1168,9 @@ global void InitCcl(void)
     gh_define("stratagus-feature-libcda", SCM_BOOL_T);
 #endif
 
+#ifndef SIOD_HEAP_GC
     gh_define("*ccl-protect*", NIL);
+#endif
 
     print_welcome();
 }

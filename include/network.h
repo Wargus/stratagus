@@ -197,7 +197,8 @@ extern void NetworkSendCommand(int command,const Unit* unit,int x,int y,
     /// Send extended network command.
 extern void NetworkSendExtendedCommand(int command,int arg1,int arg2,int arg3,
 	int arg4,int status);
-
+    /// Register ccl functions related to network
+extern void NetworkCclRegister(void);
 //@}
 
 #endif	// !__NETWORK_H__
