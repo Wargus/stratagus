@@ -818,13 +818,13 @@ global ButtonAction AllButtons[] = {
 {   2, 0, { "icon-human-shield2" },
     B_Research,		0, "upgrade-human-shield1",
     bc_CheckUpgrade,	NULL,
-    's', "UPGRADE ~!SHIELDS (Damage +2)",
+    's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-human-blacksmith"
 },
 {   2, 0, { "icon-human-shield3" },
     B_Research,		0, "upgrade-human-shield2",
     bc_CheckUpgrade,	NULL,
-    's', "UPGRADE ~!SHIELDS (Damage +2)",
+    's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-human-blacksmith"
 },
 {   3, 0, { "icon-ballista1" },
@@ -1561,13 +1561,13 @@ global ButtonAction AllButtons[] = {
 {   2, 0, { "icon-orc-shield2" },
     B_Research,		0, "upgrade-orc-shield1",
     bc_CheckUpgrade,	NULL,
-    's', "UPGRADE ~!SHIELDS (Damage +2)",
+    's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-orc-blacksmith"
 },
 {   2, 0, { "icon-orc-shield3" },
     B_Research,		0, "upgrade-orc-shield2",
     bc_CheckUpgrade,	NULL,
-    's', "UPGRADE ~!SHIELDS (Damage +2)",
+    's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-orc-blacksmith"
 },
 {   3, 0, { "icon-catapult1" },

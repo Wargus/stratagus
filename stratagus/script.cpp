@@ -79,6 +79,7 @@ extern void sgtk_init_gtk_gdk_glue();
 #include "ccl_sound.h"
 #include "ui.h"
 #include "font.h"
+#include "ai.h"
 
 #endif // USE_CCL2
 
@@ -763,6 +764,8 @@ global void CclInit(void)
 {
     char* sargv[5];
     char buf[1024];
+    char* file;
+    extern char* LibraryFileName(const char* file,char* buffer);
 
     sargv[0] = "FreeCraft";
     sargv[1] = "-v1";
@@ -773,7 +776,7 @@ global void CclInit(void)
 #else
     sprintf(buf,"-l%s",FreeCraftLibPath);
 #endif
-    sargv[4] = buf;
+    sargv[4] = strdup(buf);
     siod_init(5,sargv);
 
     init_subr_0("library-path",CclFreeCraftLibraryPath);
@@ -816,6 +819,7 @@ global void CclInit(void)
     SoundCclRegister();
     FontsCclRegister();
     UserInterfaceCclRegister();
+    AiCclRegister();
 
     init_subr_1("load-pud",CclLoadPud);
     init_subr_2("define-map",CclDefineMap);
@@ -830,7 +834,9 @@ global void CclInit(void)
     //	Load and evaluate configuration file
     //
     CclInConfigFile=1;
-    vload("data/ccl/freecraft.ccl",0,1);
+    //file=LibraryFileName("freecraft.ccl",buf);
+    file=LibraryFileName("ccl/freecraft.ccl",buf);
+    vload(file,0,1);
     CclInConfigFile=0;
 }
 
