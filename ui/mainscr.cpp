@@ -235,9 +235,9 @@ global void DrawUnitInfo(const Unit* unit)
     if( type->GoldMine ) {
 	VideoDrawText(x+37,y+8+78,GameFont,"Gold Left:");
 	if ( !unit->Value ) {
- 	    VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
+	    VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
 	} else {
- 	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
 	}
 	return;
     }
@@ -639,11 +639,12 @@ global void DrawResources(void)
 
 local unsigned long   MessageFrameTimeout;	/// frame to expire message
 
-#define MESSAGES_MAX  10			/// FIXME: docu
 
-local char Messages[ MESSAGES_MAX ][64];	/// FIXME: docu
+#define MESSAGES_MAX  10			/// Howmany can be displayed
+
+local char Messages[MESSAGES_MAX][64];		/// FIXME: docu
 local int  MessagesCount;			/// FIXME: docu
-local int  SameMessageCount;			/// FIXME: docu
+local int  SameMessageCount;			/// Counts same message repeats
 
 local char MessagesEvent[ MESSAGES_MAX ][64];	/// FIXME: docu
 local int  MessagesEventX[ MESSAGES_MAX ];	/// FIXME: docu
@@ -685,18 +686,24 @@ local void ShiftMessagesEvent(void)
 
 /**
 **	Draw message(s).
+**
+**	@todo FIXME: make message font and scroll speed configurable.
+**	      FIXME: let the messages soft scroll.
 */
 global void DrawMessage(void)
 {
     int z;
 
+    // Remove old message line
     if (MessageFrameTimeout < FrameCounter) {
 	ShiftMessages();
 	MessageFrameTimeout = FrameCounter + MESSAGES_TIMEOUT;
     }
+    // Draw message line(s)
     for (z = 0; z < MessagesCount; z++) {
-	VideoDrawText(TheUI.MapArea.X + 8, TheUI.MapArea.Y + 8 + z * 16,
-		GameFont, Messages[z]);
+	VideoDrawText(TheUI.MapArea.X + 8,
+	    TheUI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1),
+	    GameFont, Messages[z]);
     }
     if (MessagesCount < 1) {
 	SameMessageCount = 0;
@@ -719,6 +726,7 @@ local void AddMessage(const char *msg)
     }
 
     message = Messages[MessagesCount];
+    // Split long message into lines
     if (strlen(msg) >= sizeof(Messages[0])) {
 	strncpy(message, msg, sizeof(Messages[0])-1);
 	ptr = message + sizeof(Messages[0])-1;
@@ -740,6 +748,7 @@ local void AddMessage(const char *msg)
 	next = ptr = message + strlen(message);
     }
 
+    // FIXME: 440+(VideoWidth-640) is the wrong value.
     while (VideoTextLength(GameFont, message) >= 440+(VideoWidth-640) ) {
 	while (1) {
 	    --ptr;
@@ -870,7 +879,7 @@ global void CenterOnMessage(void)
 	return;
     }
     MapViewportCenter(TheUI.LastClickedVP, MessagesEventX[MessagesEventIndex],
-	    MessagesEventY[MessagesEventIndex]);
+	MessagesEventY[MessagesEventIndex]);
     SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
     MessagesEventIndex++;
 }
@@ -992,8 +1001,8 @@ global void DrawCosts(void)
 /**
 **	Set costs in status line.
 **
-**	@param mana  Mana costs.
-**  @param food     Food costs.
+**	@param mana	Mana costs.
+**	@param food	Food costs.
 **	@param costs	Resource costs, NULL pointer if all are zero.
 */
 global void SetCosts(int mana,int food,const int* costs)
@@ -1163,9 +1172,8 @@ global void DrawInfoPanel(void)
 		    SetDefaultTextColors(nc, rc);
 		}
 
-		
 		VideoDrawNumber(x+15,y,GameFont,i);
-		
+
 		VideoDrawRectangle(ColorWhite,x, y, 12, 12);
 		VideoFillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
 
