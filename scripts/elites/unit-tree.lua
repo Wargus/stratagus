@@ -29,7 +29,7 @@
 --	$Id$
 
 DefineNewAnimations("animations-tree", {
-    Still = {"frame 0", "wait 255", "frame 1", "wait 6", 
+    Still = {"frame 0", "random-wait 255 5000", "frame 1", "wait 6", 
         "frame 2", "wait 6", "frame 3", "wait 6", "frame 2", "wait 6", 
         "frame 1", "wait 6", },
     Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 10", },
