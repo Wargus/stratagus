@@ -1252,9 +1252,9 @@ static int CclDefineAnimations(lua_State* l)
 /**
 **  Define the field of the UserDefined variables.
 **
-**  @param l            lua_state.
-**  @param var_index    index of variable to set.
-**  @param var_index    index of the table where are the infos
+**  @param l          Lua state.
+**  @param var_index  index of variable to set.
+**  @param var_index  index of the table where are the infos
 **
 **  @internal Use to not duplicate code.
 */
