@@ -2062,7 +2062,7 @@ global void EndMenu(void)
     MustRedraw = RedrawEverything;
     PopMenu();
 
-    if (!CurrentMenu && Callbacks != &GameCallbacks) {
+    if (!CurrentMenu && Callbacks != &GameCallbacks && GameRunning) {
 	InterfaceState = IfaceStateNormal;
 	Callbacks = &GameCallbacks;
 	GamePaused = 0;
