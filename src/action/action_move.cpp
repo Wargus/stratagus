@@ -44,6 +44,7 @@
 #include "sound.h"
 #include "interface.h"
 #include "map.h"
+#include "ai.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -102,6 +103,9 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	    case PF_UNREACHABLE:	// Can't reach, stop
 		unit->Reset = unit->Wait = 1;
 		unit->Moving = 0;
+		if (unit->Player->AiEnabled) {
+		    AiCanNotMove(unit);
+		}
 		return d;
 	    case PF_REACHED:		// Reached goal, stop
 		unit->Reset = unit->Wait = 1;
