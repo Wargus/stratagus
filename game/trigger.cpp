@@ -257,6 +257,86 @@ local SCM CclIfNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
 }
 
 /**
+**	Player has the quantity of rescued unit-type near to unit-type.
+*/
+local SCM CclIfRescuedNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
+{
+    int plynr;
+    int q;
+    int n;
+    int i;
+    const UnitType* unittype;
+    const UnitType* ut2;
+    Unit* table[UnitMax];
+
+    plynr=TriggerGetPlayer(player);
+    q=gh_scm2int(quantity);
+    unittype=TriggerGetUnitType(unit);
+    ut2=CclGetUnitType(near);
+
+    //
+    //	Get all unit types 'near'.
+    //
+    n=FindUnitsByType(ut2,table);
+    DebugLevel3Fn("%s: %d\n",ut2->Ident,n);
+    for( i=0; i<n; ++i ) {
+	Unit* unit;
+	Unit* around[UnitMax];
+	int an;
+	int j;
+	int s;
+
+	unit=table[i];
+
+#ifdef UNIT_ON_MAP
+	// FIXME: could be done faster?
+#endif
+	// FIXME: I hope SelectUnits checks bounds?
+	// FIXME: Yes, but caller should check.
+	// NOTE: +1 right,bottom isn't inclusive :(
+	if( unit->Type->UnitType==UnitTypeLand ) {
+	    an=SelectUnits(
+		unit->X-1,unit->Y-1,
+		unit->X+unit->Type->TileWidth+1,
+		unit->Y+unit->Type->TileHeight+1,around);
+	} else {
+	    an=SelectUnits(
+		unit->X-2,unit->Y-2,
+		unit->X+unit->Type->TileWidth+2,
+		unit->Y+unit->Type->TileHeight+2,around);
+	}
+	DebugLevel3Fn("Units around %d: %d\n",UnitNumber(unit),an);
+	//
+	//	Count the requested units
+	//
+	for( j=s=0; j<an; ++j ) {
+	    unit=around[j];
+	    if( unit->Rescued ) {	// only rescued units
+		//
+		//	Check unit type
+		//
+		if( (unittype==ANY_UNIT && unittype==ALL_UNITS)
+			|| (unittype==ALL_FOODUNITS && !unit->Type->Building)
+			|| (unittype==ALL_BUILDINGS && unit->Type->Building)
+			|| (unittype==unit->Type) ) {
+		    //
+		    //	Check the player
+		    //
+		    if( plynr==-1 || plynr==unit->Player->Player ) {
+			++s;
+		    }
+		}
+	    }
+	}
+	if( s==q ) {
+	    return SCM_BOOL_T;
+	}
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
 **	Player has n opponents left.
 */
 local SCM CclIfOpponents(SCM player,SCM quantity)
@@ -387,6 +467,7 @@ global void TriggerCclRegister(void)
     // Conditions
     gh_new_procedure3_0("if-unit",CclIfUnit);
     gh_new_procedure4_0("if-near-unit",CclIfNearUnit);
+    gh_new_procedure4_0("if-rescued-near-unit",CclIfRescuedNearUnit);
     gh_new_procedure2_0("if-opponents",CclIfOpponents);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);

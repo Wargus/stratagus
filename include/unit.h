@@ -464,9 +464,9 @@ struct _unit_ {
     int		X;			/// Map position X
     int		Y;			/// Map position Y
 
-    UnitType*	Type;			/// pointer to unit-type (peon,...)
-    Player*     Player;			/// owner of this unit
-    UnitStats*	Stats;			/// current unit stats
+    UnitType*	Type;			/// Pointer to unit-type (peon,...)
+    Player*     Player;			/// Owner of this unit
+    UnitStats*	Stats;			/// Current unit stats
 
 //	DISPLAY:
     UnitColors	Colors;			/// Player colors
@@ -484,9 +484,10 @@ struct _unit_ {
     unsigned	Removed : 1;		/// unit is removed (not on map)
     unsigned	Selected : 1;		/// unit is selected
 
-    unsigned	Visible : 16;		/// unit is visible (submarine)
-    unsigned	Constructed : 1;	/// unit is in construction
-    unsigned	Active : 1;		/// unit is active for AI
+    unsigned	Visible : 16;		/// Unit is visible (submarine)
+    unsigned	Constructed : 1;	/// Unit is in construction
+    unsigned	Active : 1;		/// Unit is active for AI
+    unsigned	Rescued : 1;		/// Unit is rescued
 
 #define MaxMana	255			/// maximal mana for units
     unsigned	Mana : 8;		/// mana points

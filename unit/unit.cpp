@@ -1448,6 +1448,8 @@ local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
     for( i=0; i<n; i++ ) {
 	unit=table[i];
 	ChangeUnitOwner(unit,oldplayer,newplayer);
+	unit->Blink=5;
+	unit->Rescued=1;
     }
 }
 
@@ -1517,6 +1519,8 @@ global void RescueUnits(void)
 		    if( around[i]->Type->CanAttack &&
 			    IsAllied(unit->Player,around[i]) ) {
 			ChangeUnitOwner(unit,unit->Player,around[i]->Player);
+			unit->Blink=5;
+			unit->Rescued=1;
 			// FIXME: more races?
 			if( unit->Player->Race==PlayerRaceHuman ) {
 			    PlayGameSound(GameSounds.HumanRescue.Sound
