@@ -797,6 +797,12 @@ global void GameMainLoop(void)
 	}
     }
 
+    if( Callbacks==&MenuCallbacks ) {
+	while( CurrentMenu ) {
+	    EndMenu();
+	}
+    }
+
     //
     //	Game over
     //
