@@ -203,6 +203,7 @@ global void CreateGame(char* filename, WorldMap* map)
     } else {
 	CallbackMusicOn();
     }
+    //GamePaused=1;
 
     if( FlagRevealMap ) {
 	RevealMap();
