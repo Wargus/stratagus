@@ -69,7 +69,7 @@ local int SavedMapPositionX[4];	/// Saved map position X
 local int SavedMapPositionY[4];	/// Saved map position Y
 local char Input[80];		/// line input for messages/long commands
 local int InputIndex;		/// current index into input
-local char InputStatusLine[80];	/// Last input status line
+local char InputStatusLine[99];	/// Last input status line
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
 global char OrdersDuringPause;	/// Allow giving orders in pause mode.
@@ -864,6 +864,8 @@ local int CommandKey(int key)
 */
 local int InputKey(int key)
 {
+    char ChatMessage[sizeof(Input)+40];
+
     switch (key) {
 	case '\r':
 	    if (Input[0] == '(') {
@@ -953,7 +955,8 @@ local int InputKey(int key)
 		    // FIXME: only to selected players ...
 		}
 	    }
-	    NetworkChatMessage(Input);
+	    sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
+	    NetworkChatMessage(ChatMessage);
 
 	case '\033':
 	    ClearStatusLine();
