@@ -229,7 +229,8 @@ if [ "$UNIX" != "1" ] ; then
       if [ "$DARWIN" != "1" ] ; then
 
 if [ "$WIN32" = "0" ] ; then
-  if [ "`uname | grep -is cygwin` x" != " x" ] ; then
+  if [ "`uname | grep -is cygwin` x" != " x" ] \
+  || [ "`uname | grep -is MINGW` x" != " x" ] ; then
     UNIX=0
     BEOS=0
     WIN32=1
