@@ -66,6 +66,8 @@
 #include "libcda.h"
 #endif
 
+#define OLD_MENU			/// CCL menus not used
+
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
 ----------------------------------------------------------------------------*/
@@ -233,6 +235,8 @@ local void EditorLoadOk(void);
 local void EditorLoadCancel(void);
 local void EditorLoadVSAction(Menuitem *mi, int i);
 
+local Menu *FindMenu(const char *menu_id);
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -266,7 +270,7 @@ local struct {
 /**
 **	The currently processed menu
 */
-global int CurrentMenu = -1;
+global const char *CurrentMenu = NULL;
 
 /**
 **	X, Y, Width, and Height of menu are to redraw
@@ -314,6 +318,7 @@ local Menuitem GameMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitGameMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0 = { "Game Menu", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11};
     MenuitemButton i2 = { "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12};
@@ -330,6 +335,7 @@ local void InitGameMenuItems() {
     GameMenuItems[5].d.button = i5;
     GameMenuItems[6].d.button = i6;
     GameMenuItems[7].d.button = i7;
+#endif
 }
 
 /**
@@ -344,6 +350,7 @@ local Menuitem VictoryMenuItems[] = {
 };
 
 local void InitVictoryMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0 = { "Congratulations!", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { "You are victorious!", MI_TFLAGS_CENTERED};
     MenuitemButton i2 = { "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'};
@@ -352,6 +359,7 @@ local void InitVictoryMenuItems() {
     VictoryMenuItems[1].d.text   = i1;
     VictoryMenuItems[2].d.button = i2;
     VictoryMenuItems[3].d.button = i3;
+#endif
 }
 
 /**
@@ -364,12 +372,14 @@ local Menuitem LostMenuItems[] = {
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitLostMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0 = { "You failed to", MI_TFLAGS_CENTERED};
     MenuitemText   i1 = { "achieve victory!", MI_TFLAGS_CENTERED};
     MenuitemButton i2 = { "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'};
     LostMenuItems[0].d.text   = i0;
     LostMenuItems[1].d.text   = i1;
     LostMenuItems[2].d.button = i2;
+#endif
 }
 
 local Menuitem TipsMenuItems[] = {
@@ -388,6 +398,7 @@ local Menuitem TipsMenuItems[] = {
     { MI_TYPE_TEXT, 14, 35+16*7, 0, GameFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitTipsMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0  = { "Freecraft Tips", MI_TFLAGS_CENTERED};
     MenuitemGem    i1  = { MI_GSTATE_CHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetTips};
     MenuitemText   i2  = { "Show tips at startup", MI_TFLAGS_LALIGN};
@@ -414,6 +425,7 @@ local void InitTipsMenuItems() {
     TipsMenuItems[10].d.text  = i10;
     TipsMenuItems[11].d.text  = i11;
     TipsMenuItems[12].d.text  = i12;
+#endif
 }
 
 local Menuitem ObjectivesMenuItems[] = {
@@ -430,6 +442,7 @@ local Menuitem ObjectivesMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitObjectivesMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0  = { "Objectives", MI_TFLAGS_CENTERED};
     MenuitemText   i1  = { NULL, 0};
     MenuitemButton i10 = { "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'};
@@ -444,6 +457,7 @@ local void InitObjectivesMenuItems() {
     ObjectivesMenuItems[8].d.text    = i1;
     ObjectivesMenuItems[9].d.text    = i1;
     ObjectivesMenuItems[10].d.button = i10;
+#endif
 }
 
 local Menuitem EndScenarioMenuItems[] = {
@@ -455,6 +469,7 @@ local Menuitem EndScenarioMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitEndScenarioMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0 = { "End Scenario", MI_TFLAGS_CENTERED};
     MenuitemButton i1 = { "~!Restart Scenario", 224, 27, MBUTTON_GM_FULL, EndScenarioRestart, 'r'};
     MenuitemButton i2 = { "~!Surrender", 224, 27, MBUTTON_GM_FULL, EndScenarioSurrender, 's'};
@@ -467,6 +482,7 @@ local void InitEndScenarioMenuItems() {
     EndScenarioMenuItems[3].d.button = i3;
     EndScenarioMenuItems[4].d.button = i4;
     EndScenarioMenuItems[5].d.button = i5;
+#endif
 }
 
 /**
@@ -520,6 +536,7 @@ local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitScenSelectMenuItems() {
+#ifdef OLD_MENU
     MenuitemText    i0 = { "Select scenario", MI_TFLAGS_CENTERED};
 
     MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0, 0,
@@ -544,6 +561,7 @@ local void InitScenSelectMenuItems() {
     ScenSelectMenuItems[7].d.text     = i7;
     ScenSelectMenuItems[8].d.pulldown = i8;
     ScenSelectMenuItems[9].d.button   = i9;
+#endif
 }
 
 /**
@@ -561,6 +579,7 @@ local Menuitem PrgStartMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 145 + 36 * 7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitPrgStartMenuItems() {
+#ifdef OLD_MENU
     MenuitemDrawfunc i0 = { NameLineDrawFunc };
     MenuitemButton   i1 = { "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'};
     MenuitemButton   i2 = { "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'};
@@ -579,6 +598,7 @@ local void InitPrgStartMenuItems() {
     PrgStartMenuItems[6].d.button   = i6;
     PrgStartMenuItems[7].d.button   = i7;
     PrgStartMenuItems[8].d.button   = i8;
+#endif
 }
 
 /**
@@ -683,6 +703,7 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_PULLDOWN, 640-224-16, 10+300, 0, GameFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitCustomGameMenuItems() {
+#ifdef OLD_MENU
     MenuitemDrawfunc i0  = { GameDrawFunc };
     MenuitemText     i1  = { "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED};
     MenuitemButton   i2  = { "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'};
@@ -717,6 +738,7 @@ local void InitCustomGameMenuItems() {
     CustomGameMenuItems[14].d.pulldown = i14;
     CustomGameMenuItems[15].d.text     = i15;
     CustomGameMenuItems[16].d.pulldown = i16;
+#endif
 }
 
 /**
@@ -729,6 +751,7 @@ local Menuitem EnterNameMenuItems[] = {
     { MI_TYPE_BUTTON, 154, 80, 0, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitEnterNameMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0 = { "Enter your name:", MI_TFLAGS_CENTERED};
     MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterNameAction, 0, 0};
     MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
@@ -737,6 +760,7 @@ local void InitEnterNameMenuItems() {
     EnterNameMenuItems[1].d.input  = i1;
     EnterNameMenuItems[2].d.button = i2;
     EnterNameMenuItems[3].d.button = i3;
+#endif
 }
 
 /**
@@ -749,6 +773,7 @@ local Menuitem EnterServerIPMenuItems[] = {
     { MI_TYPE_BUTTON, 154, 80, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitEnterServerIPMenuItems() {
+#ifdef OLD_MENU
     MenuitemText   i0 = { "Enter server IP-address:", MI_TFLAGS_CENTERED};
     MenuitemInput  i1 = { NULL, 212, 20, MBUTTON_PULLDOWN, EnterServerIPAction, 0, 0};
     MenuitemButton i2 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
@@ -757,6 +782,7 @@ local void InitEnterServerIPMenuItems() {
     EnterServerIPMenuItems[1].d.input  = i1;
     EnterServerIPMenuItems[2].d.button = i2;
     EnterServerIPMenuItems[3].d.button = i3;
+#endif
 }
 
 /**
@@ -768,12 +794,14 @@ local Menuitem NetCreateJoinMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitNetCreateJoinMenuItems() {
+#ifdef OLD_MENU
     MenuitemButton i0 = { "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'};
     MenuitemButton i1 = { "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'};
     MenuitemButton i2 = { "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'};
     NetCreateJoinMenuItems[0].d.button = i0;
     NetCreateJoinMenuItems[1].d.button = i1;
     NetCreateJoinMenuItems[2].d.button = i2;
+#endif
 }
 
 
@@ -1945,6 +1973,87 @@ global Menu Menus[] = {
 --	Functions
 ----------------------------------------------------------------------------*/
 
+global void InitMenuFuncHash(void) {
+    *(void **)hash_add(MenuFuncHash, "game-menu-save") = (void *)GameMenuSave;
+    *(void **)hash_add(MenuFuncHash, "game-options") = (void *)GameOptions;
+    *(void **)hash_add(MenuFuncHash, "help-menu") = (void *)HelpMenu;
+    *(void **)hash_add(MenuFuncHash, "game-menu-objectives") = (void *)GameMenuObjectives;
+    *(void **)hash_add(MenuFuncHash, "game-menu-end-scenario") = (void *)GameMenuEndScenario;
+    *(void **)hash_add(MenuFuncHash, "game-menu-return") = (void *)GameMenuReturn;
+
+    *(void **)hash_add(MenuFuncHash,"end-menu") = (void *)EndMenu;
+    *(void **)hash_add(MenuFuncHash,"game-menu-end") = (void *)GameMenuEnd;
+
+    *(void **)hash_add(MenuFuncHash,"name-line-draw") = (void *)NameLineDrawFunc;
+    *(void **)hash_add(MenuFuncHash,"single-player-game-menu") = (void *)SinglePlayerGameMenu;
+    *(void **)hash_add(MenuFuncHash,"multi-player-game-menu") = (void *)MultiPlayerGameMenu;
+    *(void **)hash_add(MenuFuncHash,"campaign-game-menu") = (void *)CampaignGameMenu;
+    *(void **)hash_add(MenuFuncHash,"game-menu-load") = (void *)GameMenuLoad;
+    *(void **)hash_add(MenuFuncHash,"game-start-editor") = (void *)StartEditor;
+    *(void **)hash_add(MenuFuncHash,"game-global-options") = (void *)GameGlobalOptionsMenu;
+    *(void **)hash_add(MenuFuncHash,"game-show-credits") = (void *)GameShowCredits;
+    *(void **)hash_add(MenuFuncHash,"game-menu-exit") = (void *)GameMenuExit;
+
+    *(void **)hash_add(MenuFuncHash,"end-scenario-quit-menu") = (void *)EndScenarioQuitMenu;
+
+    *(void **)hash_add(MenuFuncHash,"program-start") = (void *)PrgStartInit;
+
+// Tips
+    *(void **)hash_add(MenuFuncHash,"init-tips") = (void *)InitTips;
+    *(void **)hash_add(MenuFuncHash,"show-next-tip") = (void *)ShowNextTip;
+    *(void **)hash_add(MenuFuncHash,"tips-menu-end") = (void *)TipsMenuEnd;
+
+// Campaign select
+    *(void **)hash_add(MenuFuncHash,"campaign-1") = (void *)CampaignMenu1;
+    *(void **)hash_add(MenuFuncHash,"campaign-2") = (void *)CampaignMenu2;
+    *(void **)hash_add(MenuFuncHash,"campaign-3") = (void *)CampaignMenu3;
+    *(void **)hash_add(MenuFuncHash,"campaign-4") = (void *)CampaignMenu4;
+
+// Scene select
+    *(void **)hash_add(MenuFuncHash,"scen-select-menu") = (void *)ScenSelectMenu;
+    *(void **)hash_add(MenuFuncHash,"scen-select-lb-exit") = (void *)ScenSelectLBExit;
+    *(void **)hash_add(MenuFuncHash,"scen-select-lb-init") = (void *)ScenSelectLBInit;
+    *(void **)hash_add(MenuFuncHash,"scen-select-lb-retrieve") = (void *)ScenSelectLBRetrieve;
+    *(void **)hash_add(MenuFuncHash,"scen-select-lb-action") = (void *)ScenSelectLBAction;
+    *(void **)hash_add(MenuFuncHash,"scen-select-tpms-action") = (void *)ScenSelectTPMSAction;
+    *(void **)hash_add(MenuFuncHash,"scen-select-vs-action") = (void *)ScenSelectVSAction;
+    *(void **)hash_add(MenuFuncHash,"scen-select-folder") = (void *)ScenSelectFolder;
+    *(void **)hash_add(MenuFuncHash,"scen-select-init") = (void *)ScenSelectInit;
+    *(void **)hash_add(MenuFuncHash,"scen-select-ok") = (void *)ScenSelectOk;
+    *(void **)hash_add(MenuFuncHash,"scen-select-cancel") = (void *)ScenSelectCancel;
+    *(void **)hash_add(MenuFuncHash,"scen-select-rd-filter") = (void *)ScenSelectRDFilter;
+
+// Custom game setup
+    *(void **)hash_add(MenuFuncHash,"game-setup-init") = (void *)GameSetupInit;
+    *(void **)hash_add(MenuFuncHash,"game-draw-func") = (void *)GameDrawFunc;
+    *(void **)hash_add(MenuFuncHash,"game-rcs-action") = (void *)GameRCSAction;
+    *(void **)hash_add(MenuFuncHash,"game-res-action") = (void *)GameRESAction;
+    *(void **)hash_add(MenuFuncHash,"game-uns-action") = (void *)GameUNSAction;
+    *(void **)hash_add(MenuFuncHash,"game-tss-action") = (void *)GameTSSAction;
+    *(void **)hash_add(MenuFuncHash,"game-cancel") = (void *)GameCancel;
+    *(void **)hash_add(MenuFuncHash,"custom-game-start") = (void *)CustomGameStart;
+    *(void **)hash_add(MenuFuncHash,"custom-game-ops-action") = (void *)CustomGameOPSAction;
+}
+
+/**
+**	Find a menu by ident.
+**
+**	@param menu_id	Unique identifier for the menu.
+**
+**	@return		Pointer to the menu.
+*/
+local Menu *FindMenu(const char *menu_id)
+{
+    Menu **menu;
+
+    menu = (Menu **) hash_find(MenuHash, (char *)menu_id);
+    if (menu == NULL) {
+	return NULL;
+    } else {
+	return *menu;
+    }
+}
+
 /**
 **	Draw menu button 'button' on x,y
 **
@@ -2334,18 +2443,17 @@ local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
 **
 **	@param menu_id	The menu number to display
 */
-global void DrawMenu(int menu_id)
+global void DrawMenu(const char *menu_id)
 {
     int i, n, l;
     Menu *menu;
     Menuitem *mi, *mip;
 
-    if (menu_id == -1) {
+    if (menu_id == NULL || !(menu = FindMenu(menu_id))) {
 	MustRedraw &= ~RedrawMenu;
 	return;
     }
 
-    menu = Menus + menu_id;
     switch (menu->image) {
 	case ImagePanel1:
 	    VideoDrawSub(TheUI.GameMenuePanel.Graphic,0,0,
@@ -2543,12 +2651,17 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 local void SaveAction(void)
 {
     char filename[PATH_MAX];
-    char *name = SaveGameMenuItems[1].d.input.buffer;
+    char *name;
+    Menu *menu;
     size_t nameLength;
+  
+    menu = FindMenu(MENU_SAVE_GAME);
+    name = menu->items[1].d.input.buffer;
 
     nameLength = strlen(name);
-    if (TypedFileName)
+    if (TypedFileName) {
 	nameLength -= 3;
+    }
 
     strcpy(filename, SaveDir);
     strcat(filename, "/");
@@ -2589,12 +2702,14 @@ local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 global void GameMenuSave(void)
 {
     char savegame_buffer[32];
+    Menu *menu;
 
+    menu = FindMenu(MENU_SAVE_GAME);
     strcpy(savegame_buffer, "~!_");
-    SaveGameMenuItems[1].d.input.buffer = savegame_buffer;
-    SaveGameMenuItems[1].d.input.nch = 0; /* strlen(savegame_buffer) - 3; */
-    SaveGameMenuItems[1].d.input.maxch = 24;
-    SaveGameMenuItems[4].flags = MenuButtonDisabled;	/* Save button! */
+    menu->items[1].d.input.buffer = savegame_buffer;
+    menu->items[1].d.input.nch = 0; /* strlen(savegame_buffer) - 3; */
+    menu->items[1].d.input.maxch = 24;
+    menu->items[4].flags = MenuButtonDisabled;	/* Save button! */
     ProcessMenu(MENU_SAVE_GAME, 1);
 }
 
@@ -2612,19 +2727,21 @@ local void SaveLBExit(Menuitem *mi)
     }
 }
 
-local void SaveLBInit(Menuitem *mi)
+local void SaveLBInit(Menuitem * mi)
 {
     int i;
+    Menu *menu;
 
+    menu = FindMenu(MENU_SAVE_GAME);
     SaveLBExit(mi);
-    
-    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveRDFilter,
-						     (FileList **)&(mi->d.listbox.options));
+
+    i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir,
+	    NULL, (FileList **) & (mi->d.listbox.options));
     if (i != 0) {
 	if (i > 7) {
-	    SaveGameMenuItems[3].flags = MenuButtonSelected;
+	    menu->items[3].flags = MenuButtonSelected;
 	} else {
-	    SaveGameMenuItems[3].flags = MenuButtonDisabled;
+	    menu->items[3].flags = MenuButtonDisabled;
 	}
     }
     mi->d.listbox.curopt = -1;
@@ -2644,7 +2761,7 @@ local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-		    menu = Menus + MENU_SCEN_SELECT;
+		    menu = FindMenu(MENU_SCEN_SELECT);
 		    if (info->Description) {
 			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
 		    }
@@ -2676,7 +2793,9 @@ local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 local void SaveLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
+    Menu *menu;
 
+    menu = FindMenu(MENU_SAVE_GAME);
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
@@ -2685,11 +2804,11 @@ local void SaveLBAction(Menuitem *mi, int i)
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
 	if (fl[i].type) {
-	    strcpy(SaveGameMenuItems[1].d.input.buffer, fl[i].name);
-	    SaveGameMenuItems[1].d.input.nch = strlen(fl[i].name);
-	    SaveGameMenuItems[4].flags = MenuButtonSelected;
+	    strcpy(menu->items[1].d.input.buffer, fl[i].name);
+	    menu->items[1].d.input.nch = strlen(fl[i].name);
+	    menu->items[4].flags = MenuButtonSelected;
 	} else {
-	    SaveGameMenuItems[4].flags = MenuButtonDisabled;
+	    menu->items[4].flags = MenuButtonDisabled;
 	}
     }
     TypedFileName = 0;
@@ -2878,7 +2997,7 @@ local void LoadLBInit(Menuitem *mi)
     int i;
 
     LoadLBExit(mi);
-    
+
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i != 0) {
@@ -2905,7 +3024,7 @@ local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-		    menu = Menus + MENU_SCEN_SELECT;
+		    menu = FindMenu(MENU_SCEN_SELECT);
 		    if (info->Description) {
 			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
 		    }
@@ -3081,36 +3200,45 @@ local void SaveMenu(void)
 }
 #endif
 
-local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)))
+local void ConfirmSaveInit(Menuitem * mi __attribute__ ((unused)))
 {
-    static char name[PATH_MAX];
+    static char name[PATH_MAX];		// FIXME: much memory wasted
     int fileLength;
+    Menu *menu;
 
-    fileLength = strlen(SaveGameMenuItems[1].d.input.buffer);
-    if (TypedFileName)
-	fileLength -=3;
+    menu = FindMenu(MENU_SAVE_GAME);
+    fileLength = strlen(menu->items[1].d.input.buffer);
+    if (TypedFileName) {
+	fileLength -= 3;
+    }
 
     strcpy(name, "the file: ");
     strncat(name, SaveGameMenuItems[1].d.input.buffer, fileLength);
-    if (strstr(name, ".sav") == NULL)
+    if (strstr(name, ".sav") == NULL) {
 	strcat(name, ".sav");
-    ConfirmSaveMenuItems[2].d.text.text = name;
+    }
+    menu = FindMenu(MENU_CONFIRM_SAVE);
+    menu->items[2].d.text.text = name;
 }
 
 local void ConfirmSaveFile(void)
 {
     char name[PATH_MAX];
     int fileLength;
-    
-    fileLength = strlen(SaveGameMenuItems[1].d.input.buffer);
-    if (TypedFileName)
-	fileLength -=3;
+    Menu *menu;
+
+    menu = FindMenu(MENU_SAVE_GAME);
+    fileLength = strlen(menu->items[1].d.input.buffer);
+    if (TypedFileName) {
+	fileLength -= 3;
+    }
 
     strcpy(name, SaveDir);
     strcat(name, "/");
-    strncat(name, SaveGameMenuItems[1].d.input.buffer, fileLength);
-    if (strstr(name, ".sav") == NULL)
+    strncat(name, menu->items[1].d.input.buffer, fileLength);
+    if (strstr(name, ".sav") == NULL) {
 	strcat(name, ".sav");
+    }
     SaveGame(name);
     SetMessage("Saved game to: %s", name);
     EndMenu();
@@ -3124,15 +3252,20 @@ local void FcDeleteMenu(void)
 
 local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
 {
-    static char name[PATH_MAX];
-    strcpy(name, "the file: ");
-    strcat(name, SaveGameMenuItems[1].d.input.buffer);
-    ConfirmDeleteMenuItems[2].d.text.text = name;
-}
+    static char name[PATH_MAX];		// FIXME: much memory wasted
+    Menu *menu;
 
+    menu = FindMenu(MENU_SAVE_GAME);
+    strcpy(name, "the file: ");
+    strcat(name, menu->items[1].d.input.buffer);
+    menu = FindMenu(MENU_CONFIRM_DELETE);
+    menu->items[2].d.text.text = name;
+}
+  
 local void FcDeleteFile(void)
 {
     char name[PATH_MAX];
+
     strcpy(name, SaveDir);
     strcat(name, "/");
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
@@ -3147,11 +3280,11 @@ local void LoadAction(void)
 {
     char filename[256];
     FileList *fl;
-    char *name; 
+    char *name;
     size_t nameLength;
 
     fl = LoadGameMenuItems[1].d.listbox.options;
-    
+
     name = fl[LoadGameMenuItems[1].d.listbox.curopt].name;
     nameLength = strlen(name);
 
@@ -3167,8 +3300,11 @@ local void LoadAction(void)
 
 global void GameMenuLoad(void)
 {
+    Menu *menu;
+
+    menu = FindMenu(MENU_LOAD_GAME);
+    menu->items[3].flags = MenuButtonDisabled;		// Load button!
     GameLoaded=0;
-    LoadGameMenuItems[3].flags = MenuButtonDisabled;	/* Load button! */
     ProcessMenu(MENU_LOAD_GAME, 1);
     if( GameLoaded ) {
 	GameMenuReturn();
@@ -3272,7 +3408,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
     }
 #endif
 #endif // with sound
-    CurrentMenu=-1;
+    CurrentMenu=NULL;
     SoundOptions();
 }
 
@@ -3297,7 +3433,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 	}
     }
 #endif // with sound
-    CurrentMenu=-1;
+    CurrentMenu=NULL;
     SoundOptions();
 }
 
@@ -3325,7 +3461,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 	CDMode = ":stopped";
     }
 #endif
-    CurrentMenu=-1;
+    CurrentMenu=NULL;
     SoundOptions();
 }
 
@@ -3365,7 +3501,7 @@ local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":all";
 #endif
-    CurrentMenu=-1;
+    CurrentMenu=NULL;
     SoundOptions();
 
 }
@@ -3375,7 +3511,7 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     CDMode = ":random";
 #endif
-    CurrentMenu=-1;
+    CurrentMenu=NULL;
     SoundOptions();
 
 }
@@ -3502,7 +3638,7 @@ local void GameMenuEnd(void)
     InterfaceState=IfaceStateNormal;
     GameRunning=0;
     CursorOn=CursorOnUnknown;
-    CurrentMenu=-1;
+    CurrentMenu=NULL;
 }
 
 local void KeystrokeHelpMenu(void)
@@ -3518,10 +3654,12 @@ local void HelpMenu(void)
 
 local void ShowTipsMenu(void)
 {
+    Menu *menu;
+    menu = FindMenu(MENU_TIPS);
     if (ShowTips)
-	TipsMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[1].d.gem.state = MI_GSTATE_CHECKED;
     else
-	TipsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+	menu->items[1].d.gem.state = MI_GSTATE_UNCHECKED;
 
     ProcessMenu(MENU_TIPS, 1);
 }
@@ -3532,11 +3670,13 @@ local void ShowTipsMenu(void)
 local void FreeTips()
 {
     int i;
+    Menu *menu;
 
+    menu = FindMenu(MENU_TIPS);
     for( i=5; i<13; i++ ) {
-	if( TipsMenuItems[i].d.text.text ) {
-	    free(TipsMenuItems[i].d.text.text);
-	    TipsMenuItems[i].d.text.text=NULL;
+	if( menu->items[i].d.text.text ) {
+	    free(menu->items[i].d.text.text);
+	    menu->items[i].d.text.text=NULL;
 	}
     }
 }
@@ -3554,17 +3694,19 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
     int w;
     int font;
     int l;
+    Menu *menu;
 
+    menu = FindMenu(MENU_TIPS);
     if( ShowTips ) {
-	TipsMenuItems[1].d.gem.state=MI_GSTATE_CHECKED;
+	menu->items[1].d.gem.state=MI_GSTATE_CHECKED;
     } else {
-	TipsMenuItems[1].d.gem.state=MI_GSTATE_UNCHECKED;
+	menu->items[1].d.gem.state=MI_GSTATE_UNCHECKED;
     }
 
     FreeTips();
 
-    w=Menus[MENU_TIPS].xsize-2*TipsMenuItems[5].xofs;
-    font=TipsMenuItems[5].font;
+    w=menu->xsize-2*menu->items[5].xofs;
+    font=menu->items[5].font;
     i=0;
     line=5;
 
@@ -3596,7 +3738,7 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
 	    space=s1;
 	    *space='\0';
 	}
-	TipsMenuItems[line++].d.text.text=strdup(s);
+	menu->items[line++].d.text.text=strdup(s);
 	l+=strlen(s);
 	if( !p[l] ) {
 	    break;
@@ -3613,7 +3755,10 @@ local void InitTips(Menuitem *mi __attribute__((unused)))
 */
 local void SetTips(Menuitem* mi __attribute__((unused)))
 {
-    if( TipsMenuItems[1].d.gem.state==MI_GSTATE_CHECKED ) {
+    Menu *menu;
+
+    menu = FindMenu(MENU_TIPS);
+    if( menu->items[1].d.gem.state==MI_GSTATE_CHECKED ) {
 	ShowTips=1;
     } else {
 	ShowTips=0;
@@ -3669,9 +3814,11 @@ local void SetMenuObjectives()
     int w;
     int font;
     int l;
+    Menu *menu;
 
-    w=Menus[MENU_OBJECTIVES].xsize-2*ObjectivesMenuItems[1].xofs;
-    font=ObjectivesMenuItems[1].font;
+    menu = FindMenu(MENU_OBJECTIVES);
+    w=menu->xsize-2*menu->items[1].xofs;
+    font=menu->items[1].font;
     i=0;
     line=1;
 
@@ -3698,7 +3845,7 @@ local void SetMenuObjectives()
 		space=s1;
 		*space='\0';
 	    }
-	    ObjectivesMenuItems[line++].d.text.text=strdup(s);
+	    menu->items[line++].d.text.text=strdup(s);
 	    l+=strlen(s);
 	    if( !p[l] ) {
 		break;
@@ -3706,7 +3853,7 @@ local void SetMenuObjectives()
 	    ++l;
 	    s=str+l;
 
-	    if( line==Menus[MENU_OBJECTIVES].nitems-1 ) {
+	    if( line==menu->nitems-1 ) {
 		break;
 	    }
 	}
@@ -3720,11 +3867,13 @@ local void SetMenuObjectives()
 local void FreeMenuObjectives()
 {
     int i;
+    Menu *menu;
 
-    for( i=1;i<Menus[MENU_OBJECTIVES].nitems-1;i++ ) {
-	if( ObjectivesMenuItems[i].d.text.text ) {
-	    free(ObjectivesMenuItems[i].d.text.text);
-	    ObjectivesMenuItems[i].d.text.text=NULL;
+    menu = FindMenu(MENU_OBJECTIVES);
+    for( i=1;i<menu->nitems-1;i++ ) {
+	if( menu->items[i].d.text.text ) {
+	    free(menu->items[i].d.text.text);
+	    menu->items[i].d.text.text=NULL;
 	}
     }
 }
@@ -3805,12 +3954,14 @@ local void SinglePlayerGameMenu(void)
 local void CampaignGameMenu(void)
 {
     int i;
+    Menu *menu;
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
     VideoUnlockScreen();
     Invalidate();
 
+    menu = FindMenu(MENU_CAMPAIGN_SELECT);
     DebugLevel0Fn("%d campaigns available\n" _C_ NumCampaigns);
     IfDebug(
 	for( i=0; i<NumCampaigns; ++i ) {
@@ -3826,16 +3977,16 @@ local void CampaignGameMenu(void)
     for( i=0; i<NumCampaigns && i<4; ++i ) {
 	char* s;
 
-	CampaignSelectMenuItems[i].d.button.text=Campaigns[i].Name;
-	CampaignSelectMenuItems[i].flags&=~MenuButtonDisabled;
+	menu->items[i].d.button.text=Campaigns[i].Name;
+	menu->items[i].flags&=~MenuButtonDisabled;
 
 	if( (s=strchr(Campaigns[i].Name,'!')) ) {
-	    CampaignSelectMenuItems[i].d.button.hotkey=tolower(s[1]);
+	    menu->items[i].d.button.hotkey=tolower(s[1]);
 	}
     }
     for( ; i<4; ++i ) {
-	CampaignSelectMenuItems[i].d.button.text="Not available";
-	CampaignSelectMenuItems[i].flags|=MenuButtonDisabled;
+	menu->items[i].d.button.text="Not available";
+	menu->items[i].flags|=MenuButtonDisabled;
     }
 
     GuiGameStarted = 0;
@@ -3845,7 +3996,7 @@ local void CampaignGameMenu(void)
     }
 
     for( i=0; i<4; ++i ) {
-	CampaignSelectMenuItems[i].d.button.text=NULL;
+	menu->items[i].d.button.text=NULL;
     }
 }
 
@@ -3937,7 +4088,9 @@ local void SelectCampaignMenu(void)
 */
 local void EnterNameCancel(void)
 {
-    EnterNameMenuItems[1].d.input.nch = 0;
+    Menu *menu;
+    menu = FindMenu(MENU_ENTER_NAME);
+    menu->items[1].d.input.nch = 0;
     EndMenu();
 }
 
@@ -3961,7 +4114,9 @@ local void EnterNameAction(Menuitem *mi, int key)
 */
 local void EnterServerIPCancel(void)
 {
-    EnterServerIPMenuItems[1].d.input.nch = 0;
+    Menu *menu;
+    menu = FindMenu(MENU_NET_ENTER_SERVER_IP);
+    menu->items[1].d.input.nch = 0;
     EndMenu();
 }
 
@@ -3986,6 +4141,7 @@ local void EnterServerIPAction(Menuitem *mi, int key)
 local void JoinNetGameMenu(void)
 {
     char server_host_buffer[32];
+    Menu *menu;
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
@@ -4000,14 +4156,15 @@ local void JoinNetGameMenu(void)
     } else {
 	server_host_buffer[0] = '\0';
     }
+    menu = FindMenu(MENU_NET_ENTER_SERVER_IP);
     strcat(server_host_buffer, "~!_");
-    EnterServerIPMenuItems[1].d.input.buffer = server_host_buffer;
-    EnterServerIPMenuItems[1].d.input.nch = strlen(server_host_buffer) - 3;
-    EnterServerIPMenuItems[1].d.input.maxch = 24;
-    if (EnterServerIPMenuItems[1].d.input.nch) {
-	EnterServerIPMenuItems[2].flags &= ~MenuButtonDisabled;
+    menu->items[1].d.input.buffer = server_host_buffer;
+    menu->items[1].d.input.nch = strlen(server_host_buffer) - 3;
+    menu->items[1].d.input.maxch = 24;
+    if (menu->items[1].d.input.nch) {
+	menu->items[2].flags &= ~MenuButtonDisabled;
     } else {
-	EnterServerIPMenuItems[2].flags |= MenuButtonDisabled;
+	menu->items[2].flags |= MenuButtonDisabled;
     }
 
     ProcessMenu(MENU_NET_ENTER_SERVER_IP, 1);
@@ -4016,13 +4173,13 @@ local void JoinNetGameMenu(void)
     StartMenusSetBackground(NULL);
     VideoUnlockScreen();
 
-    if (EnterServerIPMenuItems[1].d.input.nch == 0) {
+    if (menu->items[1].d.input.nch == 0) {
 	return;
     }
     // Now finally here is the address
-    server_host_buffer[EnterServerIPMenuItems[1].d.input.nch] = 0;
+    server_host_buffer[menu->items[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(server_host_buffer)) {
-	NetErrorMenuItems[1].d.text.text = "Unable to lookup host.";
+	menu->items[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu(MENU_NET_ERROR, 1);
 	VideoLockScreen();
 	StartMenusSetBackground(NULL);
@@ -4155,18 +4312,20 @@ local void MultiGameStart(void)
 local void MultiPlayerGameMenu(void)
 {
     char NameBuf[32];
+    Menu *menu;
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
     VideoUnlockScreen();
     Invalidate();
 
-    EnterNameMenuItems[1].d.input.buffer = NameBuf;
+    menu = FindMenu(MENU_ENTER_NAME);
+    menu->items[1].d.input.buffer = NameBuf;
     strcpy(NameBuf, NetworkName);
     strcat(NameBuf, "~!_");
-    EnterNameMenuItems[1].d.input.nch = strlen(NameBuf) - 3;
-    EnterNameMenuItems[1].d.input.maxch = 15;
-    EnterNameMenuItems[2].flags &= ~MenuButtonDisabled;
+    menu->items[1].d.input.nch = strlen(NameBuf) - 3;
+    menu->items[1].d.input.maxch = 15;
+    menu->items[2].flags &= ~MenuButtonDisabled;
 
     ProcessMenu(MENU_ENTER_NAME, 1);
 
@@ -4174,11 +4333,11 @@ local void MultiPlayerGameMenu(void)
     StartMenusSetBackground(NULL);
     VideoUnlockScreen();
 
-    if (EnterNameMenuItems[1].d.input.nch == 0) {
+    if (menu->items[1].d.input.nch == 0) {
 	return;
     }
 
-    NameBuf[EnterNameMenuItems[1].d.input.nch] = 0;	// Now finally here is the name
+    NameBuf[menu->items[1].d.input.nch] = 0;	// Now finally here is the name
     memset(NetworkName, 0, 16);
     strcpy(NetworkName, NameBuf);
 
@@ -4209,24 +4368,28 @@ local void FreeMapInfos(FileList *fl, int n)
 */
 local void ScenSelectInit(Menuitem * mi __attribute__ ((unused)))
 {
+    Menu *menu;
+    menu = FindMenu(MENU_SCEN_SELECT);
     DebugCheck(!*ScenSelectPath);
-    ScenSelectMenuItems[9].flags =
+    menu->items[9].flags =
 	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
-    ScenSelectMenuItems[9].d.button.text = ScenSelectDisplayPath;
+    menu->items[9].d.button.text = ScenSelectDisplayPath;
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 local void ScenSelectLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
+    Menu *menu;
 
+    menu = FindMenu(MENU_SCEN_SELECT);
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
-	    ScenSelectMenuItems[3].d.button.text = "OK";
+	    menu->items[3].d.button.text = "OK";
 	} else {
-	    ScenSelectMenuItems[3].d.button.text = "Open";
+	    menu->items[3].d.button.text = "Open";
 	}
 	if (mi->d.listbox.noptions > 5) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
@@ -4255,17 +4418,20 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     char *suf, *cp, *lcp, *np;
     int p, sz;
     static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
+    Menu *menu;
 #ifdef USE_ZZIPLIB
     ZZIP_FILE *zzf;
 #endif
 
+    menu = FindMenu(MENU_SCEN_SELECT);
+
 #if 0
-    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
+    if (menu->items[6].d.pulldown.curopt == 0) {
 	suf = NULL;
 	p = -1;
     } else
 #endif
-    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
+    if (menu->items[6].d.pulldown.curopt == 0) {
 	suf = ".cm";
 	p = 0;
     } else {
@@ -4337,7 +4503,7 @@ usezzf:
 		    info = GetPudInfo(pathbuf);
 		    if (info) {
 			DebugLevel3Fn("GetPudInfo(%s) : %p\n" _C_ pathbuf _C_ info);
-			sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
+			sz = szl[menu->items[8].d.pulldown.curopt];
 			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
 			    fl->type = 1;
 			    fl->name = strdup(np);
@@ -4367,21 +4533,24 @@ usezzf:
 local void ScenSelectLBInit(Menuitem *mi)
 {
     int i;
+    Menu *menu;
 
+    menu = FindMenu(MENU_SCEN_SELECT);
     ScenSelectLBExit(mi);
-    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
-	ScenSelectMenuItems[8].flags |= MenuButtonDisabled;
+    if (menu->items[6].d.pulldown.curopt == 0) {
+	menu->items[8].flags |= MenuButtonDisabled;
     } else {
-	ScenSelectMenuItems[8].flags &= ~MenuButtonDisabled;
+	menu->items[8].flags &= ~MenuButtonDisabled;
     }
+    strcpy(ScenSelectPath,"/home/mouse");
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i == 0) {
-	ScenSelectMenuItems[3].d.button.text = "OK";
-	ScenSelectMenuItems[3].flags |= MenuButtonDisabled;
+	menu->items[3].d.button.text = "OK";
+	menu->items[3].flags |= MenuButtonDisabled;
     } else {
 	ScenSelectLBAction(mi, 0);
-	ScenSelectMenuItems[3].flags &= ~MenuButtonDisabled;
+	menu->items[3].flags &= ~MenuButtonDisabled;
 	if (i > 5) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
@@ -4401,7 +4570,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-		    menu = Menus + MENU_SCEN_SELECT;
+		    menu = FindMenu(MENU_SCEN_SELECT);
 		    if (info->Description) {
 			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
 		    }
@@ -4432,7 +4601,9 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 
 local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
-    mi = ScenSelectMenuItems + 1;
+    Menu *menu;
+    menu = FindMenu(MENU_SCEN_SELECT);
+    mi = menu->items + 1;
     ScenSelectLBInit(mi);
     mi->d.listbox.cursel = -1;
     mi->d.listbox.startline = 0;
@@ -4564,7 +4735,7 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 local void KeystrokeHelpDrawFunc(Menuitem *mi)
 {
     int i, j, nitems = sizeof(keystrokehelptexts) / sizeof(unsigned char *);
-    Menu *menu = Menus + MENU_KEYSTROKE_HELP;
+    Menu *menu = FindMenu(MENU_KEYSTROKE_HELP);
 
     j = ((mi[-2].d.vslider.percent + 1) * (nitems - 11)) / 100;
     for (i = 0; i < 11; i++) {
@@ -4838,16 +5009,19 @@ local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)),
 local void ScenSelectFolder(void)
 {
     char *cp;
-    Menuitem *mi = ScenSelectMenuItems + 1;
+    Menu *menu;
+    Menuitem *mi;
 
+    menu = FindMenu(MENU_SCEN_SELECT);
+    mi = menu->items + 1;
     if (ScenSelectDisplayPath[0]) {
 	cp = strrchr(ScenSelectDisplayPath, '/');
 	if (cp) {
 	    *cp = 0;
 	} else {
 	    ScenSelectDisplayPath[0] = 0;
-	    ScenSelectMenuItems[9].flags |= MenuButtonDisabled;
-	    ScenSelectMenuItems[9].d.button.text = NULL;
+	    menu->items[9].flags |= MenuButtonDisabled;
+	    menu->items[9].d.button.text = NULL;
 	}
 	cp = strrchr(ScenSelectPath, '/');
 	if (cp) {
@@ -4866,17 +5040,21 @@ local void ScenSelectFolder(void)
 local void ScenSelectOk(void)
 {
     FileList *fl;
-    Menuitem *mi = ScenSelectMenuItems + 1;
-    int i = mi->d.listbox.curopt + mi->d.listbox.startline;
+    Menu *menu;
+    Menuitem *mi;
+    int i;
 
+    menu = FindMenu(MENU_SCEN_SELECT);
+    mi = menu->items + 1;
+    i = mi->d.listbox.curopt + mi->d.listbox.startline;
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type == 0) {
 	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
-	    if (ScenSelectMenuItems[9].flags&MenuButtonDisabled) {
-		ScenSelectMenuItems[9].flags &= ~MenuButtonDisabled;
-		ScenSelectMenuItems[9].d.button.text = ScenSelectDisplayPath;
+	    if (menu->items[9].flags&MenuButtonDisabled) {
+		menu->items[9].flags &= ~MenuButtonDisabled;
+		menu->items[9].d.button.text = ScenSelectDisplayPath;
 	    } else {
 		strcat(ScenSelectDisplayPath, "/");
 	    }
@@ -5598,11 +5776,11 @@ local void MultiClientNotReady(void)
     MultiClientUpdate(0);
 }
 
-/*
- * Callback from netconnect loop in Client-Sync state:
- * Compare local state with server's information
- * and force update when changes have occured.
- */
+/**
+**	Callback from netconnect loop in Client-Sync state:
+**	Compare local state with server's information
+**	and force update when changes have occured.
+*/
 global void NetClientCheckLocalState(void)
 {
     if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
@@ -5969,7 +6147,7 @@ local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i)
 	if (fl[i].type) {
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
-		    menu = Menus + MENU_EDITOR_LOAD_MAP;
+		    menu = FindMenu(MENU_EDITOR_LOAD_MAP);
 		    if (info->Description) {
 			VideoDrawText(menu->x+8,menu->y+234,LargeFont,info->Description);
 		    }
@@ -6122,10 +6300,14 @@ local void MenuHandleKeyDown(unsigned key,unsigned keychar)
 
     HandleKeyModifiersDown(key,keychar);
 
-    if (CurrentMenu < 0) {
+    if (CurrentMenu == NULL) { // < 0
 	return;
     }
-    menu = Menus + CurrentMenu;
+
+    menu = FindMenu(CurrentMenu);
+    if (menu == NULL) {
+	return;
+    }
 
     if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
 	mi = menu->items + MenuButtonCurSel;
@@ -6370,10 +6552,14 @@ local void MenuHandleKeyRepeat(unsigned key,unsigned keychar)
 
     HandleKeyModifiersDown(key,keychar);
 
-    if (CurrentMenu < 0) {
+    if (CurrentMenu == NULL) { // < 0
 	return;
     }
-    menu = Menus + CurrentMenu;
+
+    menu = FindMenu(CurrentMenu);
+    if (menu == NULL) {
+	return;
+    }
 
     if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
 	MenuHandleKeyDown(key,keychar);
@@ -6390,13 +6576,19 @@ local void MenuHandleMouseMove(int x,int y)
 {
     int h, w, i, j, n, xs, ys;
     Menuitem *mi;
-    Menu *menu = Menus + CurrentMenu;
+    Menu *menu;
     int RedrawFlag = 0;
 
     HandleCursorMove(&x,&y);
 
-    if (CurrentMenu == -1)
+    if (CurrentMenu == NULL) {
 	return;
+    }
+
+    menu = FindMenu(CurrentMenu);
+    if (menu == NULL) {
+	return;
+    }
 
     n = menu->nitems;
     MenuButtonUnderCursor = -1;
@@ -6637,10 +6829,16 @@ local void MenuHandleMouseMove(int x,int y)
 local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
     Menuitem *mi;
-    Menu *menu = Menus + CurrentMenu;
+    Menu *menu;
 
-    if (CurrentMenu == -1)
+    if (CurrentMenu == NULL) {
 	return;
+    }
+
+    menu = FindMenu(CurrentMenu);
+    if (menu == NULL) {
+	return;
+    }
 
     if (MouseButtons&(LeftButton<<MouseHoldShift))
 	return;
@@ -6715,11 +6913,17 @@ local void MenuHandleButtonUp(unsigned b)
 {
     int i, n;
     Menuitem *mi;
-    Menu *menu = Menus + CurrentMenu;
+    Menu *menu;
     int RedrawFlag = 0;
 
-    if (CurrentMenu == -1)
+    if (CurrentMenu == NULL) {
 	return;
+    }
+
+    menu = FindMenu(CurrentMenu);
+    if (menu == NULL) {
+	return;
+    }
 
     if ((1<<b) == LeftButton) {
 	n = menu->nitems;
@@ -6825,7 +7029,7 @@ local void MenuHandleButtonUp(unsigned b)
 local void EndMenu(void)
 {
     CursorOn = CursorOnUnknown;
-    CurrentMenu = -1;
+    CurrentMenu = NULL;
 
     MustRedraw = RedrawEverything;
     InterfaceState = IfaceStateNormal;
@@ -6842,12 +7046,12 @@ local void EndMenu(void)
 **
 **	@todo FIXME: This function is called from the event handler!!
 */
-global void ProcessMenu(int menu_id, int loop)
+global void ProcessMenu(const char *menu_id, int loop)
 {
     int i, oldncr;
     Menu *menu;
     Menuitem *mi;
-    int CurrentMenuSave = -1;
+    const char *CurrentMenuSave = NULL;
     int MenuButtonUnderCursorSave = -1;
     int MenuButtonCurSelSave = -1;
 
@@ -6868,8 +7072,11 @@ global void ProcessMenu(int menu_id, int loop)
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
     GameCursor = TheUI.Point.Cursor;
+    menu = FindMenu(menu_id);
+    if (menu == NULL) {
+	return;
+    }
     CurrentMenu = menu_id;
-    menu = Menus + CurrentMenu;
     MenuButtonCurSel = -1;
     for (i = 0; i < menu->nitems; ++i) {
 	mi = menu->items + i;
@@ -6933,7 +7140,7 @@ global void ProcessMenu(int menu_id, int loop)
     VideoUnlockScreen();
 
     if (loop) {
-	while (CurrentMenu != -1) {
+	while (CurrentMenu != NULL) {
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
 		UpdateDisplay();
@@ -7001,6 +7208,7 @@ global void InitMenus(unsigned int race)
     static int last_race = -1;
     const char *file;
     char *buf;
+    Menu *menu;
 
     if (race == last_race) {	// same race? already loaded!
 	return;
@@ -7046,6 +7254,39 @@ global void InitMenus(unsigned int race)
 	    MoveButtons();
 	}
 
+#ifdef OLD_MENU
+	*(Menu **)hash_add(MenuHash,MENU_GAME) = Menus + 0;
+	*(Menu **)hash_add(MenuHash,MENU_VICTORY) = Menus + 1;
+	*(Menu **)hash_add(MenuHash,MENU_LOST) = Menus + 2;
+	*(Menu **)hash_add(MenuHash,MENU_SCEN_SELECT) = Menus + 3;
+	*(Menu **)hash_add(MenuHash,MENU_PRG_START) = Menus + 4;
+	*(Menu **)hash_add(MenuHash,MENU_CUSTOM_GAME_SETUP) = Menus + 5;
+	*(Menu **)hash_add(MenuHash,MENU_ENTER_NAME) = Menus + 6;
+	*(Menu **)hash_add(MenuHash,MENU_NET_CREATE_JOIN) = Menus + 7;
+	*(Menu **)hash_add(MenuHash,MENU_NET_MULTI_SETUP) = Menus + 8;
+	*(Menu **)hash_add(MenuHash,MENU_NET_ENTER_SERVER_IP) = Menus + 9;
+	*(Menu **)hash_add(MenuHash,MENU_NET_MULTI_CLIENT) = Menus + 10;
+	*(Menu **)hash_add(MenuHash,MENU_NET_CONNECTING) = Menus + 11;
+	*(Menu **)hash_add(MenuHash,MENU_CAMPAIGN_SELECT) = Menus + 12;
+	*(Menu **)hash_add(MenuHash,MENU_CAMPAIGN_CONT) = Menus + 13;
+	*(Menu **)hash_add(MenuHash,MENU_OBJECTIVES) = Menus + 14;
+	*(Menu **)hash_add(MenuHash,MENU_END_SCENARIO) = Menus + 15;
+	*(Menu **)hash_add(MenuHash,MENU_SOUND_OPTIONS) = Menus + 16;
+	*(Menu **)hash_add(MenuHash,MENU_PREFERENCES) = Menus + 17;
+	*(Menu **)hash_add(MenuHash,MENU_SPEED_SETTINGS) = Menus + 18;
+	*(Menu **)hash_add(MenuHash,MENU_GAME_OPTIONS) = Menus + 19;
+	*(Menu **)hash_add(MenuHash,MENU_NET_ERROR) = Menus + 20;
+	*(Menu **)hash_add(MenuHash,MENU_TIPS) = Menus + 21;
+	*(Menu **)hash_add(MenuHash,MENU_HELP) = Menus + 22;
+	*(Menu **)hash_add(MenuHash,MENU_KEYSTROKE_HELP) = Menus + 23;
+	*(Menu **)hash_add(MenuHash,MENU_SAVE_GAME) = Menus + 24;
+	*(Menu **)hash_add(MenuHash,MENU_LOAD_GAME) = Menus + 25;
+	*(Menu **)hash_add(MenuHash,MENU_CONFIRM_SAVE) = Menus + 26;
+	*(Menu **)hash_add(MenuHash,MENU_CONFIRM_DELETE) = Menus + 27;
+	*(Menu **)hash_add(MenuHash,MENU_EDITOR_SELECT) = Menus + 28;
+	*(Menu **)hash_add(MenuHash,MENU_EDITOR_LOAD_MAP) = Menus + 29;
+#endif
+
 	callbacks.ButtonPressed = &MenuHandleButtonDown;
 	callbacks.ButtonReleased = &MenuHandleButtonUp;
 	callbacks.MouseMoved = &MenuHandleMouseMove;
@@ -7057,7 +7298,7 @@ global void InitMenus(unsigned int race)
 	callbacks.SoundReady = WriteSound;
 
     } else {
-    	// free previous sprites for different race
+	// free previous sprites for different race
 	VideoFree(MenuButtonGfx.Sprite);
     }
     last_race = race;
@@ -7075,6 +7316,7 @@ global void InitMenus(unsigned int race)
 	strcat(ScenSelectFullPath, "/graphics/tilesets/");
     }
     strcat(ScenSelectFullPath, "swamp");
+    menu = FindMenu(MENU_CUSTOM_GAME_SETUP);
     if (access(ScenSelectFullPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
@@ -7082,10 +7324,14 @@ global void InitMenus(unsigned int race)
 	// With new dynamic tileset configuration this
 	// should read what siod-config gave us and
 	// build the menu from that..
-	CustomGameMenuItems[14].d.pulldown.noptions = 4;
+	menu->items[14].d.pulldown.noptions = 4;
     }
 #else
-    CustomGameMenuItems[14].d.pulldown.noptions = 4;
+    //
+    // HACK_MOUSE
+    //
+    //menu->items[14].d.pulldown.noptions = 4;
+    //
 #endif
 }
 

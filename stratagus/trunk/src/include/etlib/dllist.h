@@ -49,9 +49,9 @@ dl_insert_after(struct dl_node *p, struct dl_node *n)
 
 	/* A constructor for static list heads. */
 #define DL_LIST(id)	struct dl_head id[1] = {{		\
-			    (struct dl_node *)&id->null,	\
+			    (struct dl_node *)&id[0].null,	\
 			    0,					\
-			    (struct dl_node *)&id->first	\
+			    (struct dl_node *)&id[0].first	\
 			}}
 
 #define dl_empty(h)             ((h)->first->next == 0)
