@@ -271,7 +271,7 @@ AC_SUBST(LUA_LIBS)
 	
 dnl ---- end of lua check ------
 
-if test "x$prefix" = "x"; then
+if test "$prefix" = "NONE"; then
     PREFIX=/usr/local
 else
     PREFIX="$prefix"
