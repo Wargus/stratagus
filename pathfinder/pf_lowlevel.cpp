@@ -194,11 +194,13 @@ int LowlevelPath (Unit *unit, HighlevelPath *HighPath)
 	MapField *start, *end;
 	int retval;
 
-	if ( !HighPath->Studied) {
-		StudyHighlevelPath (HighPath);
-		HighPath->Studied = 1;
-	}
+	// This fixes a GCC bug in 2.95-3.0.4
 	Lowlevel.HighPath = HighPath;
+	if ( !Lowlevel.HighPath->Studied) {
+		StudyHighlevelPath (Lowlevel.HighPath);
+		Lowlevel.HighPath->Studied = 1;
+	}
+
 	//LowlevelReset ();
 	//LowMarkGoal (unit);
 
