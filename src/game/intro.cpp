@@ -68,8 +68,8 @@ typedef struct TextLines {
 **	Player ranks
 */
 typedef struct PlayerRanks {
-    char **Ranks;			/// Array of ranks
-    int *Scores;			/// Array of scores
+    char** Ranks;			/// Array of ranks
+    int* Scores;			/// Array of scores
 } PlayerRanks;
 
 /**
@@ -156,13 +156,13 @@ local void IntroCallbackKey1(unsigned key, unsigned keychar)
 */
 local void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
-    HandleKeyModifiersDown(key,keychar);
+    HandleKeyModifiersDown(key, keychar);
 
-    if( UseContinueButton ) {
-	if( (key =='c' || key =='\r') &&
-	    (ContinueButtonFlags&MenuButtonClicked) ) {
-	    IntroNoEvent=0;
-	    ContinueButtonFlags&=~MenuButtonClicked;
+    if (UseContinueButton) {
+	if ((key == 'c' || key == '\r') &&
+		(ContinueButtonFlags & MenuButtonClicked)) {
+	    IntroNoEvent = 0;
+	    ContinueButtonFlags &= ~MenuButtonClicked;
 	}
     }
 }
@@ -180,16 +180,16 @@ local void IntroCallbackKey3(unsigned key __attribute__((unused)),
 */
 local void IntroCallbackMouse(int x, int y)
 {
-    CursorX=x;
-    CursorY=y;
+    CursorX = x;
+    CursorY = y;
 
-    if( UseContinueButton ) {
-	if( ContinueButtonX<=CursorX && CursorX<=ContinueButtonX+106 &&
-	    ContinueButtonY<=CursorY && CursorY<=ContinueButtonY+27 ) {
-	    ContinueButtonFlags|=MenuButtonActive;
+    if (UseContinueButton) {
+	if( ContinueButtonX <= CursorX && CursorX <= ContinueButtonX + 106 &&
+	    ContinueButtonY <= CursorY && CursorY <= ContinueButtonY + 27 ) {
+	    ContinueButtonFlags |= MenuButtonActive;
 	}
 	else {
-	    ContinueButtonFlags&=~MenuButtonActive;
+	    ContinueButtonFlags &= ~MenuButtonActive;
 	}
     }
 }
@@ -207,10 +207,10 @@ local void IntroCallbackExit(void)
 */
 local void DrawContinueButton(void)
 {
-    DrawMenuButton(MBUTTON_GM_HALF,ContinueButtonFlags,
-	106,27,
-	ContinueButtonX,ContinueButtonY,
-	LargeFont,"~!Continue",NULL,NULL);
+    DrawMenuButton(MBUTTON_GM_HALF, ContinueButtonFlags,
+	106, 27,
+	ContinueButtonX, ContinueButtonY,
+	LargeFont, "~!Continue", NULL, NULL);
 }
 
 /**
@@ -219,11 +219,11 @@ local void DrawContinueButton(void)
 **	@param x	X screen pixel position of continue button.
 **	@param y	Y screen pixel position of continue button.
 */
-local void InitContinueButton(int x,int y)
+local void InitContinueButton(int x, int y)
 {
-    ContinueButtonX=x;
-    ContinueButtonY=y;
-    ContinueButtonFlags=MenuButtonSelected;
+    ContinueButtonX = x;
+    ContinueButtonY = y;
+    ContinueButtonFlags = MenuButtonSelected;
 }
 
 /**
@@ -233,7 +233,7 @@ local void InitContinueButton(int x,int y)
 **	@param w	Maximum width of a line.
 **	@param lines	Pointer to linked list structure.
 */
-local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
+local void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 {
     int l;
     char* s;
@@ -241,61 +241,61 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
     char* s1;
     TextLines** ptr;
 
-    l=0;
-    s=str=strdup(text);
-    ptr=lines;
+    l = 0;
+    s = str = strdup(text);
+    ptr = lines;
 
     // Convert \r, \r\n, and \n\r to \n
     s1 = s;
-    while( s1 ) {
+    while (s1) {
 	char* x1;
 	char* x2;
-	if( (s1=strpbrk(s1,"\n\r")) ) {
-	    if( (s1[0]=='\n' && s1[1]=='\r') ||
-		(s1[0]=='\r' && s1[1]=='\n') ) {
-		x1=s1+1;
-		x2=s1+2;
-		while( (*x1++ = *x2++) ) {
+	if ((s1 = strpbrk(s1, "\n\r"))) {
+	    if ((s1[0] == '\n' && s1[1] == '\r') ||
+		    (s1[0] == '\r' && s1[1] == '\n')) {
+		x1 = s1 + 1;
+		x2 = s1 + 2;
+		while ((*x1++ = *x2++)) {
 		}
 	    }
-	    *s1++='\n';
+	    *s1++ = '\n';
 	}
     }
 
-    for( ;; ) {
+    for (;;) {
 	char* space;
 
-	if( (s1=strchr(s,'\n')) ) {
-	    *s1='\0';
+	if ((s1 = strchr(s, '\n'))) {
+	    *s1 = '\0';
 	}
-	space=NULL;
-	for( ;; ) {
-	    if( VideoTextLength(LargeFont,s)<w ) {
+	space = NULL;
+	for (;;) {
+	    if (VideoTextLength(LargeFont, s) < w) {
 		break;
 	    }
-	    s1=strrchr(s,' ');
-	    if( !s1 ) {
+	    s1 = strrchr(s, ' ');
+	    if (!s1) {
 		fprintf(stderr, "line too long: \"%s\"\n", s);
 		break;
 	    }
-	    if( space ) {
-		*space=' ';
+	    if (space) {
+		*space = ' ';
 	    }
-	    space=s1;
-	    *space='\0';
+	    space = s1;
+	    *space = '\0';
 	}
 
-	*ptr=(TextLines*)malloc(sizeof(TextLines));
-	(*ptr)->Text=strdup(s);
-	(*ptr)->Next=NULL;
-	ptr=&((*ptr)->Next);
+	*ptr = (TextLines*)malloc(sizeof(TextLines));
+	(*ptr)->Text = strdup(s);
+	(*ptr)->Next = NULL;
+	ptr = &((*ptr)->Next);
 
-	l+=strlen(s);
-	if( !text[l] ) {
+	l += strlen(s);
+	if (!text[l]) {
 	    break;
 	}
 	++l;
-	s=str+l;
+	s = str + l;
     }
 
     free(str);
@@ -310,11 +310,11 @@ local void FreeTextLines(TextLines** lines)
 {
     TextLines* ptr;
 
-    while( *lines ) {
-	ptr=(*lines)->Next;
+    while (*lines) {
+	ptr = (*lines)->Next;
 	free((*lines)->Text);
 	free(*lines);
-	*lines=ptr;
+	*lines = ptr;
     }
 }
 
@@ -330,38 +330,38 @@ local void FreeTextLines(TextLines** lines)
 **
 **	@return		1 if there is more to scroll, 0 if it is done
 */
-local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
+local int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
 {
     int miny;
     int endy;
     TextLines* ptr;
     int scrolling;
 
-    scrolling=1;
+    scrolling = 1;
 
     PushClipping();
-    SetClipping(x,y,x+w,y+h);
+    SetClipping(x, y, x + w, y + h);
 
-    miny=y-24;
-    endy=y+h;
-    y=endy-i;
-    ptr=lines;
+    miny = y - 24;
+    endy = y + h;
+    y = endy - i;
+    ptr = lines;
 
-    for( ; y<endy; ) {
-	if( !ptr ) {
+    while (y < endy) {
+	if (!ptr) {
 	    break;
 	}
 
-	if( y>=miny ) {
-	    VideoDrawTextClip(x,y,LargeFont,ptr->Text);
+	if (y >= miny) {
+	    VideoDrawTextClip(x, y, LargeFont, ptr->Text);
 	}
-	y+=24;
+	y += 24;
 
-	ptr=ptr->Next;
+	ptr = ptr->Next;
     }
 
-    if( y<miny+24 ) {
-	scrolling=0;
+    if (y < miny + 24) {
+	scrolling = 0;
     }
 
     PopClipping();
@@ -374,7 +374,7 @@ local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
 **
 **	@param intro	Intro struct
 */
-global void ShowIntro(const Intro *intro)
+global void ShowIntro(const Intro* intro)
 {
     EventCallback callbacks;
     Graphic* background;
@@ -396,50 +396,50 @@ global void ShowIntro(const Intro *intro)
     int soundcount;
 #endif
 
-    UseContinueButton=1;
-    InitContinueButton(455*VideoWidth/640,440*VideoHeight/480);
-    GameCursor=TheUI.Point.Cursor;
+    UseContinueButton = 1;
+    InitContinueButton(455 * VideoWidth / 640, 440 * VideoHeight / 480);
+    GameCursor = TheUI.Point.Cursor;
     DestroyCursorBackground();
 
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
 
-    old_video_sync=VideoSyncSpeed;
-    VideoSyncSpeed=100;
+    old_video_sync = VideoSyncSpeed;
+    VideoSyncSpeed = 100;
     SetVideoSync();
 
-    callbacks.ButtonPressed=IntroCallbackButton1;
-    callbacks.ButtonReleased=IntroCallbackButton2;
-    callbacks.MouseMoved=IntroCallbackMouse;
-    callbacks.MouseExit=IntroCallbackExit;
-    callbacks.KeyPressed=IntroCallbackKey1;
-    callbacks.KeyReleased=IntroCallbackKey2;
-    callbacks.KeyRepeated=IntroCallbackKey3;
+    callbacks.ButtonPressed = IntroCallbackButton1;
+    callbacks.ButtonReleased = IntroCallbackButton2;
+    callbacks.MouseMoved = IntroCallbackMouse;
+    callbacks.MouseExit = IntroCallbackExit;
+    callbacks.KeyPressed = IntroCallbackKey1;
+    callbacks.KeyReleased = IntroCallbackKey2;
+    callbacks.KeyRepeated = IntroCallbackKey3;
 
-    callbacks.NetworkEvent=NetworkEvent;
-    callbacks.SoundReady=WriteSound;
+    callbacks.NetworkEvent = NetworkEvent;
+    callbacks.SoundReady = WriteSound;
 
-    background=LoadGraphic(intro->Background);
-    ResizeGraphic(background,VideoWidth,VideoHeight);
+    background = LoadGraphic(intro->Background);
+    ResizeGraphic(background, VideoWidth, VideoHeight);
 #ifdef USE_OPENGL
-    MakeTexture(background,background->Width,background->Height);
+    MakeTexture(background, background->Width, background->Height);
 #endif
 
-    LibraryFileName(intro->TextFile,buf);
-    if( !(file=CLopen(buf,CL_OPEN_READ)) ) {
-	fprintf(stderr,"Can't open file `%s'\n",intro->TextFile);
+    LibraryFileName(intro->TextFile, buf);
+    if (!(file = CLopen(buf, CL_OPEN_READ))) {
+	fprintf(stderr, "Can't open file `%s'\n", intro->TextFile);
 	ExitFatal(-1);
     }
-    l=0;
-    text=malloc(8192);
-    while( (i=CLread(file,text+l,8192))==8192 ) {
-	l+=8192;
-	text=realloc(text,l+8192);
+    l = 0;
+    text = malloc(8192);
+    while ((i = CLread(file, text + l, 8192)) == 8192) {
+	l += 8192;
+	text = realloc(text, l + 8192);
     }
-    text[l+i]='\0';
-    l+=i+1;
-    text=realloc(text,l);
+    text[l + i] = '\0';
+    l += i + 1;
+    text = realloc(text, l);
     CLclose(file);
 
     CallbackMusicOff();
@@ -448,32 +448,32 @@ global void ShowIntro(const Intro *intro)
     soundfree = -1;
     soundout = -1;
     soundcount = 0;
-    if ( intro->VoiceFile[0] ) {
+    if (intro->VoiceFile[0]) {
 	soundfree = NextFreeChannel;
 	soundout = NextSoundRequestOut;
 	PlayFile(intro->VoiceFile[0]);
     }
 #endif
 
-    SplitTextIntoLines(text,320,&scrolling_text);
-    for( i=0; i<MAX_OBJECTIVES; ++i) {
-	if( intro->Objectives[i] ) {
-	    SplitTextIntoLines(intro->Objectives[i],260*VideoWidth/640,
+    SplitTextIntoLines(text, 320, &scrolling_text);
+    for (i = 0; i < MAX_OBJECTIVES; ++i) {
+	if (intro->Objectives[i]) {
+	    SplitTextIntoLines(intro->Objectives[i], 260 * VideoWidth / 640,
 		&objectives_text[i]);
 	} else {
-	    objectives_text[i]=NULL;
+	    objectives_text[i] = NULL;
 	}
     }
 
-    line=0;
-    stage=1;
-    IntroNoEvent=1;
-    c=0;
-    while( 1 ) {
+    line = 0;
+    stage = 1;
+    IntroNoEvent = 1;
+    c = 0;
+    while (1) {
 #ifdef WITH_SOUND
 	// FIXME: move sound specific code to the sound files
-	if( soundfree != -1 && (!Channels[soundfree].Command) && 
-		stage<MAX_BRIEFING_VOICES && soundout != NextSoundRequestOut && 
+	if (soundfree != -1 && (!Channels[soundfree].Command) && 
+		stage < MAX_BRIEFING_VOICES && soundout != NextSoundRequestOut && 
 		intro->VoiceFile[stage]) {
 	    // FIXME: is there a better way to do this?
 	    if (soundcount == 15) {
@@ -492,36 +492,36 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw background
 	//
-	VideoDrawSubClip(background,0,0,
-		background->Width,background->Height,
-		(VideoWidth-background->Width)/2,
-		(VideoHeight-background->Height)/2);
+	VideoDrawSubClip(background, 0, 0,
+		background->Width, background->Height,
+		(VideoWidth - background->Width) / 2,
+		(VideoHeight - background->Height) / 2);
 	//
 	//	Draw title
 	//
 	SetDefaultTextColors(FontWhite, FontYellow);
-	VideoDrawTextCentered((70+340)/2*VideoWidth/640,28*VideoHeight/480,
+	VideoDrawTextCentered((70 + 340) / 2 * VideoWidth / 640, 28 * VideoHeight / 480,
 	    LargeFont,intro->Title);
 	//
 	//	Draw scrolling text
 	//
-	ScrollText(70*VideoWidth/640,80*VideoHeight/480,70*VideoWidth/640+320,
-	    170*VideoHeight/480,line,scrolling_text);
+	ScrollText(70 * VideoWidth / 640, 80 * VideoHeight / 480, 70 * VideoWidth / 640 + 320,
+	    170 * VideoHeight / 480, line, scrolling_text);
 
 	//
 	//	Draw objectives
 	//
-	y=306*VideoHeight/480;
-	VideoDrawText(372*VideoWidth/640,y,LargeFont,"Objectives:");
-	y+=30;
-	for( i=0; i<MAX_OBJECTIVES && objectives_text[i]; ++i ) {
+	y = 306 * VideoHeight / 480;
+	VideoDrawText(372 * VideoWidth / 640, y, LargeFont, "Objectives:");
+	y += 30;
+	for (i = 0; i < MAX_OBJECTIVES && objectives_text[i]; ++i) {
 	    TextLines* ptr;
 
-	    ptr=objectives_text[i];
-	    while( ptr ) {
-		VideoDrawText(372*VideoWidth/640,y,LargeFont,ptr->Text);
-		y+=22;
-		ptr=ptr->Next;
+	    ptr = objectives_text[i];
+	    while (ptr) {
+		VideoDrawText(372 * VideoWidth / 640, y, LargeFont, ptr->Text);
+		y += 22;
+		ptr = ptr->Next;
 	    }
 	}
 
@@ -531,32 +531,32 @@ global void ShowIntro(const Intro *intro)
 
 	VideoUnlockScreen();
 
-	if( !line && !c ) {
+	if (!line && !c) {
 	    Invalidate();
 	} else {
-	    InvalidateAreaAndCheckCursor(70*VideoWidth/640,80*VideoHeight/480,
-		70*VideoWidth/640+320+1,170*VideoHeight/480+1);
-	    InvalidateAreaAndCheckCursor(ContinueButtonX,ContinueButtonY,
-		106,27);
+	    InvalidateAreaAndCheckCursor(70 * VideoWidth / 640, 80 * VideoHeight / 480,
+		70 * VideoWidth / 640 + 320 + 1, 170 * VideoHeight / 480 + 1);
+	    InvalidateAreaAndCheckCursor(ContinueButtonX, ContinueButtonY,
+		106, 27);
 	    InvalidateCursorAreas();
 	}
 	RealizeVideoMemory();
 
-	if( !IntroNoEvent ) {
+	if (!IntroNoEvent) {
 	    break;
 	}
 	WaitEventsOneFrame(&callbacks);
-	if( c==0 ) {
-	    c=1;
+	if (c == 0) {
+	    c = 1;
 	} else {
-	    c=0;
+	    c = 0;
 	    ++line;
 	}
     }
 
     FreeTextLines(&scrolling_text);
-    for( i=0; i<MAX_OBJECTIVES; ++i ) {
-	if( objectives_text[i] ) {
+    for (i = 0; i < MAX_OBJECTIVES; ++i) {
+	if (objectives_text[i]) {
 	    FreeTextLines(&objectives_text[i]);
 	}
     }
@@ -568,7 +568,7 @@ global void ShowIntro(const Intro *intro)
     VideoClearScreen();
     VideoUnlockScreen();
 
-    VideoSyncSpeed=old_video_sync;
+    VideoSyncSpeed = old_video_sync;
     SetVideoSync();
 
 #ifdef WITH_SOUND
@@ -584,7 +584,7 @@ global void ShowIntro(const Intro *intro)
 **
 **	@param credits	Credits structure
 */
-global void ShowCredits(Credits *credits)
+global void ShowCredits(Credits* credits)
 {
     EventCallback callbacks;
     Graphic* background;
@@ -599,48 +599,48 @@ global void ShowCredits(Credits *credits)
     VideoClearScreen();
     VideoUnlockScreen();
 
-    old_video_sync=VideoSyncSpeed;
-    VideoSyncSpeed=100;
+    old_video_sync = VideoSyncSpeed;
+    VideoSyncSpeed = 100;
     SetVideoSync();
 
-    callbacks.ButtonPressed=IntroCallbackButton1;
-    callbacks.ButtonReleased=IntroCallbackButton2;
-    callbacks.MouseMoved=IntroCallbackMouse;
-    callbacks.MouseExit=IntroCallbackExit;
-    callbacks.KeyPressed=IntroCallbackKey1;
-    callbacks.KeyReleased=IntroCallbackKey2;
-    callbacks.KeyRepeated=IntroCallbackKey3;
+    callbacks.ButtonPressed = IntroCallbackButton1;
+    callbacks.ButtonReleased = IntroCallbackButton2;
+    callbacks.MouseMoved = IntroCallbackMouse;
+    callbacks.MouseExit = IntroCallbackExit;
+    callbacks.KeyPressed = IntroCallbackKey1;
+    callbacks.KeyReleased = IntroCallbackKey2;
+    callbacks.KeyRepeated = IntroCallbackKey3;
 
-    callbacks.NetworkEvent=NetworkEvent;
-    callbacks.SoundReady=WriteSound;
+    callbacks.NetworkEvent = NetworkEvent;
+    callbacks.SoundReady = WriteSound;
 
-    background=NULL;
-    if( credits->Background ) {
-	background=LoadGraphic(credits->Background);
-	ResizeGraphic(background,VideoWidth,VideoHeight);
+    background = NULL;
+    if (credits->Background) {
+	background = LoadGraphic(credits->Background);
+	ResizeGraphic(background, VideoWidth, VideoHeight);
 #ifdef USE_OPENGL
-	MakeTexture(background,background->Width,background->Height);
+	MakeTexture(background, background->Width, background->Height);
 #endif
     }
 
     // play different music?
 
-    scrolling_credits=NULL;
-    if( credits->Names ) {
-	SplitTextIntoLines(credits->Names,320,&scrolling_credits);
+    scrolling_credits = NULL;
+    if (credits->Names) {
+	SplitTextIntoLines(credits->Names, 320, &scrolling_credits);
     }
 
-    UseContinueButton=1;
-    InitContinueButton(TheUI.Offset640X+455,TheUI.Offset480Y+440);
-    GameCursor=TheUI.Point.Cursor;
+    UseContinueButton = 1;
+    InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
+    GameCursor = TheUI.Point.Cursor;
     DestroyCursorBackground();
 
-    x=TheUI.Offset640X;
-    y=TheUI.Offset480Y;
-    IntroNoEvent=1;
-    line=0;
-    scrolling=1;
-    while( 1 ) {
+    x = TheUI.Offset640X;
+    y = TheUI.Offset480Y;
+    IntroNoEvent = 1;
+    line = 0;
+    scrolling = 1;
+    while (1) {
 
 	VideoLockScreen();
 	HideAnyCursor();
@@ -648,18 +648,18 @@ global void ShowCredits(Credits *credits)
 	//
 	//	Draw background
 	//
-	if( background ) {
-	    VideoDrawSubClip(background,0,0,
-		background->Width,background->Height,
-		(VideoWidth-background->Width)/2,
-		(VideoHeight-background->Height)/2);
+	if (background) {
+	    VideoDrawSubClip(background, 0, 0,
+		background->Width, background->Height,
+		(VideoWidth - background->Width) / 2,
+		(VideoHeight - background->Height) / 2);
 	}
 
 	//
 	//	Draw scrolling text
 	//
-	if( scrolling_credits ) {
-	    scrolling=ScrollText(x+140,y+80,320,275,line,scrolling_credits);
+	if (scrolling_credits) {
+	    scrolling = ScrollText(x + 140, y + 80, 320, 275, line, scrolling_credits);
 	}
 
 	DrawContinueButton();
@@ -672,7 +672,7 @@ global void ShowCredits(Credits *credits)
 	Invalidate();
 	RealizeVideoMemory();
 
-	if( !IntroNoEvent ) {
+	if (!IntroNoEvent) {
 	    break;
 	}
 
@@ -681,16 +681,16 @@ global void ShowCredits(Credits *credits)
 	++line;
 
 	// Loop if we're done scrolling
-	if( !scrolling ) {
-	    line=0;
+	if (!scrolling) {
+	    line = 0;
 	}
     }
 
-    if( scrolling_credits ) {
+    if (scrolling_credits) {
 	FreeTextLines(&scrolling_credits);
     }
 
-    if( background ) {
+    if (background) {
 	VideoFree(background);
     }
 
@@ -699,7 +699,7 @@ global void ShowCredits(Credits *credits)
     VideoUnlockScreen();
     DestroyCursorBackground();
 
-    VideoSyncSpeed=old_video_sync;
+    VideoSyncSpeed = old_video_sync;
     SetVideoSync();
 
     // CallbackMusicOn();
@@ -710,31 +710,31 @@ global void ShowCredits(Credits *credits)
 /**
 **	Draw text
 */
-local void PictureDrawText(CampaignChapter* chapter,ChapterTextLines* chlines)
+local void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 {
     ChapterPictureText* text;
     TextLines* lines;
     int x;
     int y;
-    int (*draw)(int,int,unsigned,const unsigned char*);
+    int (*draw)(int, int, unsigned, const unsigned char*);
 
-    text=chapter->Data.Picture.Text;
-    while( text ) {
-	if( text->Align==PictureTextAlignLeft ) {
-	    draw=VideoDrawText;
+    text = chapter->Data.Picture.Text;
+    while (text) {
+	if (text->Align == PictureTextAlignLeft) {
+	    draw = VideoDrawText;
 	} else {
-	    draw=VideoDrawTextCentered;
+	    draw = VideoDrawTextCentered;
 	}
-	x=text->X*VideoWidth/640;
-	y=text->Y*VideoHeight/480;
-	lines=chlines->Text;
-	while( lines ) {
-	    draw(x,y,text->Font,lines->Text);
-	    y+=text->Height;
-	    lines=lines->Next;
+	x = text->X * VideoWidth / 640;
+	y = text->Y * VideoHeight / 480;
+	lines = chlines->Text;
+	while (lines) {
+	    draw(x, y, text->Font, lines->Text);
+	    y += text->Height;
+	    lines = lines->Next;
 	}
-	text=text->Next;
-	chlines=chlines->Next;
+	text = text->Next;
+	chlines = chlines->Next;
     }
 }
 
@@ -755,52 +755,52 @@ global void ShowPicture(CampaignChapter* chapter)
     ChapterTextLines** linesptr;
     ChapterPictureText* text;
 
-    UseContinueButton=0;
+    UseContinueButton = 0;
 
-    old_video_sync=VideoSyncSpeed;
-    VideoSyncSpeed=100;
+    old_video_sync = VideoSyncSpeed;
+    VideoSyncSpeed = 100;
     SetVideoSync();
 
-    callbacks.ButtonPressed=IntroCallbackButton1;
-    callbacks.ButtonReleased=IntroCallbackButton2;
-    callbacks.MouseMoved=IntroCallbackMouse;
-    callbacks.MouseExit=IntroCallbackExit;
-    callbacks.KeyPressed=IntroCallbackKey1;
-    callbacks.KeyReleased=IntroCallbackKey2;
-    callbacks.KeyRepeated=IntroCallbackKey3;
+    callbacks.ButtonPressed = IntroCallbackButton1;
+    callbacks.ButtonReleased = IntroCallbackButton2;
+    callbacks.MouseMoved = IntroCallbackMouse;
+    callbacks.MouseExit = IntroCallbackExit;
+    callbacks.KeyPressed = IntroCallbackKey1;
+    callbacks.KeyReleased = IntroCallbackKey2;
+    callbacks.KeyRepeated = IntroCallbackKey3;
 
-    callbacks.NetworkEvent=NetworkEvent;
-    callbacks.SoundReady=WriteSound;
+    callbacks.NetworkEvent = NetworkEvent;
+    callbacks.SoundReady = WriteSound;
 
-    background=LoadGraphic(chapter->Data.Picture.Image);
-    ResizeGraphic(background,VideoWidth,VideoHeight);
+    background = LoadGraphic(chapter->Data.Picture.Image);
+    ResizeGraphic(background, VideoWidth, VideoHeight);
 #ifdef USE_OPENGL
-    MakeTexture(background,background->Width,background->Height);
+    MakeTexture(background, background->Width, background->Height);
 #endif
-    IntroNoEvent=1;
+    IntroNoEvent = 1;
 
-    text=chapter->Data.Picture.Text;
-    linesptr=&lines;
-    while( text ) {
-	(*linesptr)=calloc(sizeof(ChapterTextLines),1);
-	SplitTextIntoLines(text->Text,text->Width, &(*linesptr)->Text);
-	linesptr=&((*linesptr)->Next);
-	text=text->Next;
+    text = chapter->Data.Picture.Text;
+    linesptr = &lines;
+    while (text) {
+	(*linesptr) = calloc(sizeof(ChapterTextLines), 1);
+	SplitTextIntoLines(text->Text, text->Width, &(*linesptr)->Text);
+	linesptr = &((*linesptr)->Next);
+	text = text->Next;
     }
 
     //
     //	Fade in background and title
     //
-    i=0;
-    max=chapter->Data.Picture.FadeIn;
-    while( IntroNoEvent && i<max ) {
+    i = 0;
+    max = chapter->Data.Picture.FadeIn;
+    while (IntroNoEvent && i < max) {
 	VideoLockScreen();
-	VideoDrawSubClipFaded(background,0,0,
-	    background->Width,background->Height,
-	    (VideoWidth-background->Width)/2,
-	    (VideoHeight-background->Height)/2,
-	    255*i/max);
-	PictureDrawText(chapter,lines);
+	VideoDrawSubClipFaded(background, 0, 0,
+	    background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2,
+	    (VideoHeight - background->Height) / 2,
+	    255 * i / max);
+	PictureDrawText(chapter, lines);
 	VideoUnlockScreen();
 
 	Invalidate();
@@ -809,20 +809,20 @@ global void ShowPicture(CampaignChapter* chapter)
 	WaitEventsOneFrame(&callbacks);
 	++i;
     }
-    i=chapter->Data.Picture.FadeOut*i/max;
+    i = chapter->Data.Picture.FadeOut * i / max;
 
     //
     //	Draw background and title
     //
-    j=0;
-    max=chapter->Data.Picture.DisplayTime;
-    while( IntroNoEvent && j<max ) {
+    j = 0;
+    max = chapter->Data.Picture.DisplayTime;
+    while (IntroNoEvent && j < max) {
 	VideoLockScreen();
-	VideoDrawSubClip(background,0,0,
-	    background->Width,background->Height,
-	    (VideoWidth-background->Width)/2,
-	    (VideoHeight-background->Height)/2);
-	PictureDrawText(chapter,lines);
+	VideoDrawSubClip(background, 0, 0,
+	    background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2,
+	    (VideoHeight - background->Height) / 2);
+	PictureDrawText(chapter, lines);
 	VideoUnlockScreen();
 
 	Invalidate();
@@ -835,15 +835,15 @@ global void ShowPicture(CampaignChapter* chapter)
     //
     //	Fade out background and title
     //
-    max=chapter->Data.Picture.FadeOut;
-    while( i>=0 ) {
+    max = chapter->Data.Picture.FadeOut;
+    while (i >= 0) {
 	VideoLockScreen();
-	VideoDrawSubClipFaded(background,0,0,
-	    background->Width,background->Height,
-	    (VideoWidth-background->Width)/2,
-	    (VideoHeight-background->Height)/2,
-	    255*i/max);
-	PictureDrawText(chapter,lines);
+	VideoDrawSubClipFaded(background, 0, 0,
+	    background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2,
+	    (VideoHeight - background->Height) / 2,
+	    255 * i / max);
+	PictureDrawText(chapter, lines);
 	VideoUnlockScreen();
 
 	Invalidate();
@@ -855,20 +855,20 @@ global void ShowPicture(CampaignChapter* chapter)
 
     VideoFree(background);
 
-    while( lines ) {
+    while (lines) {
 	ChapterTextLines* ptr;
 
-	ptr=lines->Next;
+	ptr = lines->Next;
 	FreeTextLines(&lines->Text);
 	free(lines);
-	lines=ptr;
+	lines = ptr;
     }
 
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
 
-    VideoSyncSpeed=old_video_sync;
+    VideoSyncSpeed = old_video_sync;
     SetVideoSync();
 }
 
@@ -876,12 +876,12 @@ global void ShowPicture(CampaignChapter* chapter)
 /**
 **	Draw a box with the text inside
 */
-local void DrawStatBox(int x,int y,char* text,unsigned color,int percent)
+local void DrawStatBox(int x, int y, char* text, unsigned color, int percent)
 {
-    VideoFillRectangleClip(ColorBlack,x,y,80,24);
-    VideoDrawRectangleClip(ColorYellow,x+1,y+1,78,22);
-    VideoFillRectangleClip(color,x+3,y+3,percent*74/100,18);
-    VideoDrawTextCentered(x+40,y+5,LargeFont,text);
+    VideoFillRectangleClip(ColorBlack, x, y, 80, 24);
+    VideoDrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);
+    VideoFillRectangleClip(color, x + 3, y + 3, percent * 74 / 100, 18);
+    VideoDrawTextCentered(x + 40, y + 5, LargeFont, text);
 }
 
 /**
@@ -893,8 +893,8 @@ local int GameStatsDrawFunc(int frame)
     int y;
     int dodraw;
     int done;
-    const int stats_pause=30;  // Wait one second between each stat
-    Player *p;
+    const int stats_pause = 30;  // Wait one second between each stat
+    Player* p;
     int i;
     int c;
     char buf[50];
@@ -908,346 +908,346 @@ local int GameStatsDrawFunc(int frame)
     int draw_all;
 
 #ifdef USE_OPENGL
-    draw_all=1;
+    draw_all = 1;
 #else
-    draw_all=0;
+    draw_all = 0;
 #endif
 
 #ifndef USE_OPENGL
     // If a button was pressed draw everything
-    if( IntroButtonPressed ) {
-	draw_all=1;
+    if (IntroButtonPressed) {
+	draw_all = 1;
     }
 #endif
 
-    done=0;
+    done = 0;
 
-    if( !draw_all && (frame%stats_pause)!=0 ) {
+    if (!draw_all && (frame % stats_pause) != 0) {
 	return done;
     }
 
-    percent=100;
-    x=TheUI.Offset640X;
-    y=TheUI.Offset480Y;
-    dodraw=99;
-    if( !IntroButtonPressed ) {
-	dodraw=frame/stats_pause;
+    percent = 100;
+    x = TheUI.Offset640X;
+    y = TheUI.Offset480Y;
+    dodraw = 99;
+    if (!IntroButtonPressed) {
+	dodraw = frame / stats_pause;
     }
 
-    for( i=0,c=0; i<PlayerMax-1; ++i) {
-	if( Players[i].Type!=PlayerNobody ) {
+    for (i = 0, c = 0; i < PlayerMax - 1; ++i) {
+	if (Players[i].Type != PlayerNobody) {
 	    ++c;
 	}
     }
-    if( c<=4 ) {
-	names_font=SmallTitleFont;
-	top_offset=57;
-	bottom_offset=178;
-	description_offset=30;
+    if (c <= 4) {
+	names_font = SmallTitleFont;
+	top_offset = 57;
+	bottom_offset = 178;
+	description_offset = 30;
+    } else {
+	names_font = LargeFont;
+	top_offset = 6;
+	bottom_offset = 90;
+	description_offset = 20;
     }
-    else {
-	names_font=LargeFont;
-	top_offset=6;
-	bottom_offset=90;
-	description_offset=20;
-    }
-    line_spacing=(432-bottom_offset-description_offset)/c;
+    line_spacing = (432 - bottom_offset - description_offset) / c;
 
-    if( !draw_all || (dodraw<=10 && (frame%stats_pause)==0) ) {
-	PlayGameSound(SoundIdForName("statsthump"),MaxSampleVolume);
+    if (!draw_all || (dodraw <= 10 && (frame % stats_pause) == 0)) {
+	PlayGameSound(SoundIdForName("statsthump"), MaxSampleVolume);
     }
 
 
-    if( dodraw==1 || (draw_all && dodraw>=1) ) {
-	char* Outcome;
+    if (dodraw==1 || (draw_all && dodraw >= 1)) {
+	char* outcome;
 
-	VideoDrawTextCentered(x+106,y+top_offset,LargeFont,"Outcome");
-	if( GameResult==GameVictory ) {
-	    Outcome="Victory!";
+	VideoDrawTextCentered(x + 106, y + top_offset, LargeFont, "Outcome");
+	if (GameResult == GameVictory) {
+	    outcome = "Victory!";
 	} else {
-	    Outcome="Defeat!";
+	    outcome = "Defeat!";
 	}
-	VideoDrawTextCentered(x+106,y+top_offset+21,LargeTitleFont,Outcome);
+	VideoDrawTextCentered(x + 106, y + top_offset + 21, LargeTitleFont,
+	    outcome);
     }
 
-    if( dodraw==2 || (draw_all && dodraw>=2) ) {
+    if (dodraw == 2 || (draw_all && dodraw >= 2)) {
 	char* rank;
 	char** ranks;
 	int* scores;
 
 	ranks = NULL;
 	scores = NULL;
-	for( i=0; i<PlayerRaces.Count; ++i ) {
-	    if( !strcmp(PlayerRaces.Name[i],ThisPlayer->RaceName) ) {
-		ranks=Ranks[i].Ranks;
-		scores=Ranks[i].Scores;
+	for (i = 0; i < PlayerRaces.Count; ++i) {
+	    if (!strcmp(PlayerRaces.Name[i], ThisPlayer->RaceName)) {
+		ranks = Ranks[i].Ranks;
+		scores = Ranks[i].Scores;
 		break;
 	    }
 	}
-	DebugCheck( i==PlayerRaces.Count );
+	DebugCheck(i == PlayerRaces.Count);
 
-	rank=ranks[0];
-	i=0;
-	while( 1 ) {
-	    if( ThisPlayer->Score<scores[i] || !ranks[i] ) {
+	rank = ranks[0];
+	i = 0;
+	while (1) {
+	    if (ThisPlayer->Score < scores[i] || !ranks[i]) {
 		break;
 	    }
-	    rank=ranks[i];
+	    rank = ranks[i];
 	    ++i;
 	}
 
-	VideoDrawTextCentered(x+324,y+top_offset,LargeFont,"Rank");
-	VideoDrawTextCentered(x+324,y+top_offset+21,SmallTitleFont,rank);
+	VideoDrawTextCentered(x + 324, y + top_offset, LargeFont, "Rank");
+	VideoDrawTextCentered(x + 324, y + top_offset + 21, SmallTitleFont, rank);
     }
 
-    if( dodraw==3 || (draw_all && dodraw>=3) ) {
-	VideoDrawTextCentered(x+540,y+top_offset,LargeFont,"Score");
-	sprintf(buf,"%u",ThisPlayer->Score);
-	VideoDrawTextCentered(x+540,y+top_offset+21,SmallTitleFont,buf);
+    if (dodraw == 3 || (draw_all && dodraw >= 3)) {
+	VideoDrawTextCentered(x + 540, y + top_offset, LargeFont, "Score");
+	sprintf(buf, "%u", ThisPlayer->Score);
+	VideoDrawTextCentered(x + 540, y + top_offset + 21, SmallTitleFont, buf);
     }
 
-    if( dodraw==4 || (draw_all && dodraw>=4) ) {
-	max=Players[0].TotalUnits;
-	for( i=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p->Type==PlayerNobody ) {
+    if (dodraw == 4 || (draw_all && dodraw >= 4)) {
+	max = Players[0].TotalUnits;
+	for (i = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( p->TotalUnits>max ) {
-		max=p->TotalUnits;
+	    if (p->TotalUnits > max) {
+		max = p->TotalUnits;
 	    }
 	}
-	if( max==0 ) {
-	    max=1;
+	if (max == 0) {
+	    max = 1;
 	}
 
-	sprintf(buf,"%s - You",ThisPlayer->Name);
-	VideoDrawTextCentered(x+320,y+bottom_offset+description_offset+26,
-	                      names_font,buf);
-	VideoDrawTextCentered(x+50,y+bottom_offset,LargeFont,"Units");
-	sprintf(buf,"%u",ThisPlayer->TotalUnits);
-	percent=ThisPlayer->TotalUnits*100/max;
-	DrawStatBox(x+10,y+bottom_offset+description_offset,buf,
-	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
+	sprintf(buf, "%s - You", ThisPlayer->Name);
+	VideoDrawTextCentered(x + 320, y + bottom_offset + description_offset + 26,
+	    names_font, buf);
+	VideoDrawTextCentered(x + 50, y + bottom_offset, LargeFont, "Units");
+	sprintf(buf, "%u", ThisPlayer->TotalUnits);
+	percent = ThisPlayer->TotalUnits * 100 / max;
+	DrawStatBox(x + 10, y + bottom_offset + description_offset, buf,
+	            ThisPlayer->Color, percent);
+	for (i = 0, c = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( ThisPlayer->Enemy&(1<<i) ) {
-		sprintf(buf,"%s - Enemy",p->Name);
-	    } else if( ThisPlayer->Allied&(1<<i) ) {
-		sprintf(buf,"%s - Ally",p->Name);
+	    if (ThisPlayer->Enemy & (1 << i)) {
+		sprintf(buf, "%s - Enemy", p->Name);
+	    } else if (ThisPlayer->Allied & (1 << i)) {
+		sprintf(buf, "%s - Ally", p->Name);
 	    } else {
-		sprintf(buf,"%s - Neutral",p->Name);
+		sprintf(buf, "%s - Neutral", p->Name);
 	    }
-	    VideoDrawTextCentered(x+320,y+bottom_offset+description_offset+26+line_spacing*c,
-	                          names_font,buf);
-	    sprintf(buf,"%u",p->TotalUnits);
-	    percent=p->TotalUnits*100/max;
-	    DrawStatBox(x+10,y+bottom_offset+description_offset+line_spacing*c,
-	                buf,p->Color,percent);
+	    VideoDrawTextCentered(x + 320, y + bottom_offset + description_offset + 26 + line_spacing * c,
+		names_font, buf);
+	    sprintf(buf, "%u", p->TotalUnits);
+	    percent = p->TotalUnits * 100 / max;
+	    DrawStatBox(x + 10, y + bottom_offset + description_offset + line_spacing * c,
+		buf, p->Color, percent);
 	    ++c;
 	}
     }
 
-    if( dodraw==5 || (draw_all && dodraw>=5) ) {
-	max=Players[0].TotalBuildings;
-	for( i=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p->Type==PlayerNobody ) {
+    if (dodraw == 5 || (draw_all && dodraw >= 5)) {
+	max = Players[0].TotalBuildings;
+	for (i = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( p->TotalBuildings>max ) {
-		max=p->TotalBuildings;
+	    if (p->TotalBuildings > max) {
+		max = p->TotalBuildings;
 	    }
 	}
-	if( max==0 ) {
-	    max=1;
+	if (max == 0) {
+	    max = 1;
 	}
 
-	VideoDrawTextCentered(x+140,y+bottom_offset,LargeFont,"Buildings");
-	sprintf(buf,"%u",ThisPlayer->TotalBuildings);
-	percent=ThisPlayer->TotalBuildings*100/max;
-	DrawStatBox(x+100,y+bottom_offset+description_offset,buf,
-	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
+	VideoDrawTextCentered(x + 140, y + bottom_offset, LargeFont, "Buildings");
+	sprintf(buf, "%u", ThisPlayer->TotalBuildings);
+	percent = ThisPlayer->TotalBuildings * 100 / max;
+	DrawStatBox(x + 100, y + bottom_offset + description_offset, buf,
+	    ThisPlayer->Color, percent);
+	for (i = 0, c = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-	    sprintf(buf,"%u",p->TotalBuildings);
-	    percent=p->TotalBuildings*100/max;
-	    DrawStatBox(x+100,y+bottom_offset+description_offset+line_spacing*c,
-	                buf,p->Color,percent);
+	    sprintf(buf, "%u", p->TotalBuildings);
+	    percent = p->TotalBuildings * 100 / max;
+	    DrawStatBox(x + 100, y + bottom_offset + description_offset + line_spacing * c,
+		buf, p->Color, percent);
 	    ++c;
 	}
     }
 
-    if( dodraw==6 || (draw_all && dodraw>=6) ) {
-	max=Players[0].TotalResources[GoldCost];
-	for( i=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p->Type==PlayerNobody ) {
+    if (dodraw == 6 || (draw_all && dodraw >= 6)) {
+	max = Players[0].TotalResources[GoldCost];
+	for (i = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( p->TotalResources[GoldCost]>max ) {
-		max=p->TotalResources[GoldCost];
+	    if (p->TotalResources[GoldCost] > max) {
+		max = p->TotalResources[GoldCost];
 	    }
 	}
-	if( max==0 ) {
-	    max=1;
+	if (max == 0) {
+	    max = 1;
 	}
 
-	VideoDrawTextCentered(x+230,y+bottom_offset,LargeFont,"Gold");
-	sprintf(buf,"%u",ThisPlayer->TotalResources[GoldCost]);
-	percent=ThisPlayer->TotalResources[GoldCost]*100/max;
-	DrawStatBox(x+190,y+bottom_offset+description_offset,buf,
-	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
+	VideoDrawTextCentered(x + 230, y + bottom_offset, LargeFont, "Gold");
+	sprintf(buf, "%u", ThisPlayer->TotalResources[GoldCost]);
+	percent = ThisPlayer->TotalResources[GoldCost] * 100 / max;
+	DrawStatBox(x + 190, y + bottom_offset + description_offset, buf,
+	    ThisPlayer->Color, percent);
+	for (i = 0, c = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-            sprintf(buf,"%u",p->TotalResources[GoldCost]);
-	    percent=p->TotalResources[GoldCost]*100/max;
-	    DrawStatBox(x+190,y+bottom_offset+description_offset+line_spacing*c,
-	                buf,p->Color,percent);
+            sprintf(buf, "%u", p->TotalResources[GoldCost]);
+	    percent = p->TotalResources[GoldCost] * 100 / max;
+	    DrawStatBox(x + 190, y + bottom_offset + description_offset + line_spacing * c,
+		buf, p->Color, percent);
 	    ++c;
 	}
     }
 
-    if( dodraw==7 || (draw_all && dodraw>=7) ) {
-	max=Players[0].TotalResources[WoodCost];
-	for( i=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p->Type==PlayerNobody ) {
+    if (dodraw == 7 || (draw_all && dodraw >= 7)) {
+	max = Players[0].TotalResources[WoodCost];
+	for (i = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( p->TotalResources[WoodCost]>max ) {
-		max=p->TotalResources[WoodCost];
+	    if (p->TotalResources[WoodCost] > max) {
+		max = p->TotalResources[WoodCost];
 	    }
 	}
-	if( max==0 ) {
-	    max=1;
+	if (max == 0) {
+	    max = 1;
 	}
 
-	VideoDrawTextCentered(x+320,y+bottom_offset,LargeFont,"Lumber");
-	sprintf(buf,"%u",ThisPlayer->TotalResources[WoodCost]);
-	percent=ThisPlayer->TotalResources[WoodCost]*100/max;
-	DrawStatBox(x+280,y+bottom_offset+description_offset,buf,
-	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
+	VideoDrawTextCentered(x + 320, y + bottom_offset, LargeFont, "Lumber");
+	sprintf(buf, "%u", ThisPlayer->TotalResources[WoodCost]);
+	percent = ThisPlayer->TotalResources[WoodCost] * 100 / max;
+	DrawStatBox(x + 280, y + bottom_offset + description_offset, buf,
+	    ThisPlayer->Color, percent);
+	for (i = 0, c = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-            sprintf(buf,"%u",p->TotalResources[WoodCost]);
-	    percent=p->TotalResources[WoodCost]*100/max;
-	    DrawStatBox(x+280,y+bottom_offset+description_offset+line_spacing*c,
-	                buf,p->Color,percent);
+            sprintf(buf, "%u", p->TotalResources[WoodCost]);
+	    percent = p->TotalResources[WoodCost] * 100 / max;
+	    DrawStatBox(x + 280, y + bottom_offset + description_offset + line_spacing * c,
+		buf, p->Color,percent);
 	    ++c;
 	}
     }
 
-    if( dodraw==8 || (draw_all && dodraw>=8) ) {
-	max=Players[0].TotalResources[OilCost];
-	for( i=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p->Type==PlayerNobody ) {
+    if (dodraw == 8 || (draw_all && dodraw >= 8)) {
+	max = Players[0].TotalResources[OilCost];
+	for (i = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( p->TotalResources[OilCost]>max ) {
-		max=p->TotalResources[OilCost];
+	    if (p->TotalResources[OilCost] > max) {
+		max = p->TotalResources[OilCost];
 	    }
 	}
-	if( max==0 ) {
-	    max=1;
+	if (max == 0) {
+	    max = 1;
 	}
 
-	VideoDrawTextCentered(x+410,y+bottom_offset,LargeFont,"Oil");
-	sprintf(buf,"%u",ThisPlayer->TotalResources[OilCost]);
-	percent=ThisPlayer->TotalResources[OilCost]*100/max;
-	DrawStatBox(x+370,y+bottom_offset+description_offset,buf,
-	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
+	VideoDrawTextCentered(x + 410, y + bottom_offset, LargeFont, "Oil");
+	sprintf(buf, "%u", ThisPlayer->TotalResources[OilCost]);
+	percent = ThisPlayer->TotalResources[OilCost] * 100 / max;
+	DrawStatBox(x + 370, y + bottom_offset + description_offset, buf,
+	    ThisPlayer->Color, percent);
+	for (i = 0, c = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-	    sprintf(buf,"%u",p->TotalResources[OilCost]);
-	    percent=p->TotalResources[OilCost]*100/max;
-	    DrawStatBox(x+370,y+bottom_offset+description_offset+line_spacing*c,
-	                buf,p->Color,percent);
+	    sprintf(buf, "%u", p->TotalResources[OilCost]);
+	    percent = p->TotalResources[OilCost] * 100 / max;
+	    DrawStatBox(x + 370, y + bottom_offset + description_offset + line_spacing * c,
+		buf, p->Color,percent);
 	    ++c;
 	}
     }
 
-    if( dodraw==9 || (draw_all && dodraw>=9) ) {
-	max=Players[0].TotalKills;
-	for( i=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p->Type==PlayerNobody ) {
+    if (dodraw == 9 || (draw_all && dodraw >= 9)) {
+	max = Players[0].TotalKills;
+	for (i = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( p->TotalKills>max ) {
-		max=p->TotalKills;
+	    if (p->TotalKills > max) {
+		max = p->TotalKills;
 	    }
 	}
-	if( max==0 ) {
-	    max=1;
+	if (max == 0) {
+	    max = 1;
 	}
 
-	VideoDrawTextCentered(x+500,y+bottom_offset,LargeFont,"Kills");
-	percent=ThisPlayer->TotalKills*100/max;
-	sprintf(buf,"%u",ThisPlayer->TotalKills);
-	DrawStatBox(x+460,y+bottom_offset+description_offset,buf,
-	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
+	VideoDrawTextCentered(x + 500, y + bottom_offset, LargeFont, "Kills");
+	percent = ThisPlayer->TotalKills * 100 / max;
+	sprintf(buf, "%u", ThisPlayer->TotalKills);
+	DrawStatBox(x + 460, y + bottom_offset + description_offset, buf,
+	    ThisPlayer->Color, percent);
+	for (i = 0, c = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-	    sprintf(buf,"%u",p->TotalKills);
-	    percent=p->TotalKills*100/max;
-	    DrawStatBox(x+460,y+bottom_offset+description_offset+line_spacing*c,
-	                buf,p->Color,percent);
+	    sprintf(buf, "%u", p->TotalKills);
+	    percent = p->TotalKills * 100 / max;
+	    DrawStatBox(x + 460, y + bottom_offset + description_offset + line_spacing * c,
+		buf, p->Color,percent);
 	    ++c;
 	}
     }
 
-    if( dodraw==10 || (draw_all && dodraw>=10) ) {
-	max=Players[0].TotalRazings;
-	for( i=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p->Type==PlayerNobody ) {
+    if (dodraw == 10 || (draw_all && dodraw >= 10)) {
+	max = Players[0].TotalRazings;
+	for (i = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p->Type == PlayerNobody) {
 		continue;
 	    }
-	    if( p->TotalRazings>max ) {
-		max=p->TotalRazings;
+	    if (p->TotalRazings > max) {
+		max = p->TotalRazings;
 	    }
 	}
-	if( max==0 ) {
-	    max=1;
+	if (max == 0) {
+	    max = 1;
 	}
 
-	VideoDrawTextCentered(x+590,y+bottom_offset,LargeFont,"Razings");
-	sprintf(buf,"%u",ThisPlayer->TotalRazings);
-	percent=ThisPlayer->TotalRazings*100/max;
-	DrawStatBox(x+550,y+bottom_offset+description_offset,buf,
-	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax-1; ++i ) {
-	    p=&Players[i];
-	    if( p==ThisPlayer || p->Type==PlayerNobody ) {
+	VideoDrawTextCentered(x + 590, y + bottom_offset, LargeFont, "Razings");
+	sprintf(buf, "%u", ThisPlayer->TotalRazings);
+	percent = ThisPlayer->TotalRazings * 100 / max;
+	DrawStatBox(x + 550, y + bottom_offset + description_offset, buf,
+	    ThisPlayer->Color, percent);
+	for (i = 0, c = 1; i < PlayerMax - 1; ++i) {
+	    p = &Players[i];
+	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-	    sprintf(buf,"%u",p->TotalRazings);
-	    percent=p->TotalRazings*100/max;
-	    DrawStatBox(x+550,y+bottom_offset+description_offset+line_spacing*c,
-	                buf,p->Color,percent);
+	    sprintf(buf, "%u", p->TotalRazings);
+	    percent = p->TotalRazings * 100 / max;
+	    DrawStatBox(x + 550, y + bottom_offset + description_offset + line_spacing * c,
+		buf, p->Color, percent);
 	    ++c;
 	}
-	done=1;
+	done = 1;
     }
 
     return done;
@@ -1264,69 +1264,69 @@ global void ShowStats(void)
     Graphic* background;
     int frame;
 
-    old_video_sync=VideoSyncSpeed;
-    VideoSyncSpeed=100;
+    old_video_sync = VideoSyncSpeed;
+    VideoSyncSpeed = 100;
     SetVideoSync();
 
-    callbacks.ButtonPressed=IntroCallbackButton1;
-    callbacks.ButtonReleased=IntroCallbackButton2;
-    callbacks.MouseMoved=IntroCallbackMouse;
-    callbacks.MouseExit=IntroCallbackExit;
-    callbacks.KeyPressed=IntroCallbackKey1;
-    callbacks.KeyReleased=IntroCallbackKey2;
-    callbacks.KeyRepeated=IntroCallbackKey3;
-    callbacks.NetworkEvent=NetworkEvent;
-    callbacks.SoundReady=WriteSound;
+    callbacks.ButtonPressed = IntroCallbackButton1;
+    callbacks.ButtonReleased = IntroCallbackButton2;
+    callbacks.MouseMoved = IntroCallbackMouse;
+    callbacks.MouseExit = IntroCallbackExit;
+    callbacks.KeyPressed = IntroCallbackKey1;
+    callbacks.KeyReleased = IntroCallbackKey2;
+    callbacks.KeyRepeated = IntroCallbackKey3;
+    callbacks.NetworkEvent = NetworkEvent;
+    callbacks.SoundReady = WriteSound;
 
-    if (GameResult==GameVictory) {
-	if ( TheUI.VictoryBackground.File ) {
-	    background=LoadGraphic(TheUI.VictoryBackground.File);
+    if (GameResult == GameVictory) {
+	if (TheUI.VictoryBackground.File) {
+	    background = LoadGraphic(TheUI.VictoryBackground.File);
 	} else {
-	    background=NULL;
+	    background = NULL;
 	}
     } else {
-	if ( TheUI.DefeatBackground.File ) {
-	    background=LoadGraphic(TheUI.DefeatBackground.File);
+	if (TheUI.DefeatBackground.File) {
+	    background = LoadGraphic(TheUI.DefeatBackground.File);
 	} else {
-	    background=NULL;
+	    background = NULL;
 	}
     }
     if (background) {
-	ResizeGraphic(background,VideoWidth,VideoHeight);
+	ResizeGraphic(background, VideoWidth, VideoHeight);
 #ifdef USE_OPENGL
-	MakeTexture(background,background->Width,background->Height);
+	MakeTexture(background, background->Width, background->Height);
 #endif
     }
 
     VideoLockScreen();
     VideoClearScreen();
     if (background) {
-	VideoDrawSubClip(background,0,0,background->Width,background->Height,
-	    (VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+	VideoDrawSubClip(background, 0, 0, background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2, (VideoHeight - background->Height) / 2);
     }
     VideoUnlockScreen();
 
-    UseContinueButton=1;
-    InitContinueButton(TheUI.Offset640X+455,TheUI.Offset480Y+440);
-    GameCursor=TheUI.Point.Cursor;
+    UseContinueButton = 1;
+    InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
+    GameCursor = TheUI.Point.Cursor;
     DestroyCursorBackground();
 
-    frame=1;
-    done=0;
-    IntroNoEvent=1;
-    IntroButtonPressed=0;
-    while( 1 ) {
+    frame = 1;
+    done = 0;
+    IntroNoEvent = 1;
+    IntroButtonPressed = 0;
+    while (1) {
 	VideoLockScreen();
 	HideAnyCursor();
 #ifdef USE_OPENGL
 	if (background) {
-	    VideoDrawSubClip(background,0,0,background->Width,background->Height,
-		(VideoWidth-background->Width)/2,(VideoHeight-background->Height)/2);
+	    VideoDrawSubClip(background, 0, 0, background->Width, background->Height,
+		(VideoWidth - background->Width) / 2, (VideoHeight - background->Height) / 2);
 	}
 	GameStatsDrawFunc(frame);
 #else
-	if( !done ) {
-	    done=GameStatsDrawFunc(frame);
+	if (!done) {
+	    done = GameStatsDrawFunc(frame);
 	}
 #endif
 	DrawContinueButton();
@@ -1336,7 +1336,7 @@ global void ShowStats(void)
 	Invalidate();
 	RealizeVideoMemory();
 
-	if( !IntroNoEvent ) {
+	if (!IntroNoEvent) {
 	    break;
 	}
 
@@ -1344,10 +1344,10 @@ global void ShowStats(void)
 	++frame;
     }
 
-    if( background ) {
+    if (background) {
 	VideoFree(background);
     }
-    VideoSyncSpeed=old_video_sync;
+    VideoSyncSpeed = old_video_sync;
     SetVideoSync();
 }
 
@@ -1356,13 +1356,13 @@ global void ShowStats(void)
 */
 global void CleanCclCredits()
 {
-    if( GameCredits.Background ) {
+    if (GameCredits.Background) {
 	free(GameCredits.Background);
-	GameCredits.Background=NULL;
+	GameCredits.Background = NULL;
     }
-    if( GameCredits.Names ) {
+    if (GameCredits.Names) {
 	free(GameCredits.Names);
-	GameCredits.Names=NULL;
+	GameCredits.Names = NULL;
     }
 }
 
@@ -1380,37 +1380,37 @@ local SCM CclCredits(SCM list)
     int nlen;
     int len;
 
-    if( GameCredits.Background ) {
+    if (GameCredits.Background) {
 	free(GameCredits.Background);
     }
-    GameCredits.Background=NULL;
-    if( GameCredits.Names ) {
+    GameCredits.Background = NULL;
+    if (GameCredits.Names) {
 	free(GameCredits.Names);
-	GameCredits.Names=(char*)malloc(1);
-	GameCredits.Names[0]='\0';
+	GameCredits.Names = (char*)malloc(1);
+	GameCredits.Names[0] = '\0';
     }
     len=0;
 
-    while( !gh_null_p(list) ) {
-	value=gh_car(list);
-	list=gh_cdr(list);
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-	if( gh_eq_p(value,gh_symbol2scm("background")) ) {
-	    GameCredits.Background=gh_scm2newstr(gh_car(list),NULL);
-	    list=gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("background"))) {
+	    GameCredits.Background = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
 	}
-	if( gh_eq_p(value,gh_symbol2scm("name"))
-		|| gh_eq_p(value,gh_symbol2scm("title"))
-		|| gh_eq_p(value,gh_symbol2scm("comment")) ) {
-	    n=get_c_string(gh_car(list));
-	    nlen=strlen(n);
-	    GameCredits.Names=(char*)realloc(GameCredits.Names,len+nlen+2);
-	    if( len!=0 ) {
-		GameCredits.Names[len++]='\n';
+	if (gh_eq_p(value, gh_symbol2scm("name")) ||
+		gh_eq_p(value, gh_symbol2scm("title")) ||
+		gh_eq_p(value, gh_symbol2scm("comment")) ) {
+	    n = get_c_string(gh_car(list));
+	    nlen = strlen(n);
+	    GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
+	    if (len != 0) {
+		GameCredits.Names[len++] = '\n';
 	    }
-	    strcpy(GameCredits.Names+len,n);
-	    len+=nlen;
-	    list=gh_cdr(list);
+	    strcpy(GameCredits.Names + len, n);
+	    len += nlen;
+	    list = gh_cdr(list);
 	}
     }
 
@@ -1422,9 +1422,9 @@ local SCM CclCredits(SCM list)
 */
 global void CreditsCclRegister(void)
 {
-    GameCredits.Background=NULL;
-    GameCredits.Names=NULL;
-    gh_new_procedureN("credits",CclCredits);
+    GameCredits.Background = NULL;
+    GameCredits.Names = NULL;
+    gh_new_procedureN("credits", CclCredits);
 }
 
 /**
@@ -1437,46 +1437,46 @@ global void CreditsCclRegister(void)
 local SCM CclAddObjective(SCM list)
 {
     int i;
-    const char *obj;
+    const char* obj;
 
-    obj=get_c_string(gh_car(list));
+    obj = get_c_string(gh_car(list));
 
-    list=gh_cdr(list);
-    if( !gh_null_p(list) ) {
+    list = gh_cdr(list);
+    if (!gh_null_p(list)) {
 	// Optional location number given
 	int num;
 
-	num=gh_scm2int(gh_car(list));
-	if( num<0 ) {
-	    num=0;
+	num = gh_scm2int(gh_car(list));
+	if (num < 0) {
+	    num = 0;
 	}
 
-	i=0;
-	while( i!=MAX_OBJECTIVES && GameIntro.Objectives[i] ) {
+	i = 0;
+	while (i != MAX_OBJECTIVES && GameIntro.Objectives[i]) {
 	    ++i;
 	}
-	if( i==MAX_OBJECTIVES ) {
-	    fprintf(stderr,"Too many objectives: %s\n",obj);
+	if (i == MAX_OBJECTIVES) {
+	    fprintf(stderr, "Too many objectives: %s\n", obj);
 	    ExitFatal(-1);
 	}
-	if( num>i ) {
-	    num=i;
+	if (num > i) {
+	    num = i;
 	}
-	for( ; i>num; --i ) {
-	    GameIntro.Objectives[i]=GameIntro.Objectives[i-1];
+	for (; i > num; --i) {
+	    GameIntro.Objectives[i] = GameIntro.Objectives[i - 1];
 	}
-	GameIntro.Objectives[num]=strdup(obj);
+	GameIntro.Objectives[num] = strdup(obj);
     } else {
 	// Add objective to the end of the list
-	i=0;
-	while( i!=MAX_OBJECTIVES && GameIntro.Objectives[i] ) {
+	i = 0;
+	while (i != MAX_OBJECTIVES && GameIntro.Objectives[i]) {
 	    ++i;
 	}
-	if( i==MAX_OBJECTIVES ) {
-	    fprintf(stderr,"Too many objectives: %s\n",obj);
+	if (i == MAX_OBJECTIVES) {
+	    fprintf(stderr, "Too many objectives: %s\n", obj);
 	    ExitFatal(-1);
 	}
-	GameIntro.Objectives[i]=strdup(obj);
+	GameIntro.Objectives[i] = strdup(obj);
     }
 
     return SCM_UNSPECIFIED;
@@ -1489,23 +1489,23 @@ local SCM CclRemoveObjective(SCM objective)
 {
     int num;
 
-    num=gh_scm2int(objective);
-    if( num<0 || num>=MAX_OBJECTIVES ) {
-	fprintf(stderr,"remove-objective: Invalid number: %d\n",num);
+    num = gh_scm2int(objective);
+    if (num < 0 || num >= MAX_OBJECTIVES) {
+	fprintf(stderr, "remove-objective: Invalid number: %d\n", num);
 	ExitFatal(-1);
     }
-    if( !GameIntro.Objectives[num] ) {
-	fprintf(stderr,"remove-objective: No objective at location: %d\n",num);
+    if (!GameIntro.Objectives[num]) {
+	fprintf(stderr, "remove-objective: No objective at location: %d\n", num);
 	ExitFatal(-1);
     }
 
     free(GameIntro.Objectives[num]);
 
-    if( num==MAX_OBJECTIVES-1 ) {
-	GameIntro.Objectives[num]=NULL;
+    if (num == MAX_OBJECTIVES - 1) {
+	GameIntro.Objectives[num] = NULL;
     }
-    for( ; num<MAX_OBJECTIVES-1 && GameIntro.Objectives[num]; ++num ) {
-	GameIntro.Objectives[num]=GameIntro.Objectives[num+1];
+    for (; num < MAX_OBJECTIVES - 1 && GameIntro.Objectives[num]; ++num) {
+	GameIntro.Objectives[num] = GameIntro.Objectives[num + 1];
     }
 
     return SCM_UNSPECIFIED;
@@ -1519,15 +1519,15 @@ local SCM CclSetObjectives(SCM list)
     int i;
 
     // Clean old objectives
-    for( i=0; i<MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i ) {
+    for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
 	free(GameIntro.Objectives[i]);
-	GameIntro.Objectives[i]=NULL;
+	GameIntro.Objectives[i] = NULL;
     }
 
-    i=0;
-    while( !gh_null_p(list) ) {
-	GameIntro.Objectives[i]=gh_scm2newstr(gh_car(list),NULL);
-	list=gh_cdr(list);
+    i = 0;
+    while (!gh_null_p(list)) {
+	GameIntro.Objectives[i] = gh_scm2newstr(gh_car(list), NULL);
+	list = gh_cdr(list);
 	++i;
     }
 
@@ -1539,45 +1539,45 @@ local SCM CclSetObjectives(SCM list)
 */
 local SCM CclDefineRanks(SCM list)
 {
-    PlayerRanks *rank;
-    const char *race;
+    PlayerRanks* rank;
+    const char* race;
     int i;
     int len;
 
-    rank=NULL;
-    race=get_c_string(gh_car(list));
-    for( i=0; i<PlayerRaces.Count; ++i ) {
-	if( !strcmp(PlayerRaces.Name[i], race) ) {
-	    rank=&Ranks[i];
+    rank = NULL;
+    race = get_c_string(gh_car(list));
+    for (i = 0; i < PlayerRaces.Count; ++i) {
+	if (!strcmp(PlayerRaces.Name[i], race)) {
+	    rank = &Ranks[i];
 	    break;
 	}
     }
-    if( i==PlayerRaces.Count ) {
-	fprintf(stderr,"define-ranks: Invalid race name: %s\n",race);
+    if (i == PlayerRaces.Count) {
+	fprintf(stderr, "define-ranks: Invalid race name: %s\n", race);
 	ExitFatal(-1);
     }
 
-    if( rank->Ranks ) {
-	for( i=0; rank->Ranks[i]; ++i ) {
+    if (rank->Ranks) {
+	for (i = 0; rank->Ranks[i]; ++i) {
 	    free(rank->Ranks[i]);
 	}
 	free(rank->Ranks);
 	free(rank->Scores);
     }
 
-    list=gh_car(gh_cdr(list));
-    len=gh_length(list)/2;
+    list = gh_car(gh_cdr(list));
+    len = gh_length(list) / 2;
 
-    rank->Ranks=(char**)malloc((len+1)*sizeof(char*));
-    rank->Ranks[len]=NULL;
-    rank->Scores=(int*)malloc(len*sizeof(int));
+    rank->Ranks = (char**)malloc((len + 1) * sizeof(char*));
+    rank->Ranks[len] = NULL;
+    rank->Scores = (int*)malloc(len * sizeof(int));
 
-    i=0;
-    while( !gh_null_p(list) ) {
-	rank->Scores[i]=gh_scm2int(gh_car(list));
-	list=gh_cdr(list);
-	rank->Ranks[i]=gh_scm2newstr(gh_car(list),NULL);
-	list=gh_cdr(list);
+    i = 0;
+    while (!gh_null_p(list)) {
+	rank->Scores[i] = gh_scm2int(gh_car(list));
+	list = gh_cdr(list);
+	rank->Ranks[i] = gh_scm2newstr(gh_car(list), NULL);
+	list = gh_cdr(list);
 	++i;
     }
 
@@ -1589,25 +1589,25 @@ local SCM CclDefineRanks(SCM list)
 */
 global void ObjectivesCclRegister(void)
 {
-    gh_new_procedureN("add-objective",CclAddObjective);
-    gh_new_procedure1_0("remove-objective",CclRemoveObjective);
-    gh_new_procedureN("set-objectives!",CclSetObjectives);
-    gh_new_procedureN("define-ranks",CclDefineRanks);
+    gh_new_procedureN("add-objective", CclAddObjective);
+    gh_new_procedure1_0("remove-objective", CclRemoveObjective);
+    gh_new_procedureN("set-objectives!", CclSetObjectives);
+    gh_new_procedureN("define-ranks", CclDefineRanks);
 }
 
 /**
 **	Save the objectives.
 */
-global void SaveObjectives(CLFile *file)
+global void SaveObjectives(CLFile* file)
 {
     int i;
 
-    if( GameIntro.Objectives[0] ) {
-	CLprintf(file,"(set-objectives!");
-	for( i=0; i<MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i ) {
-	    CLprintf(file,"\n  \"%s\"",GameIntro.Objectives[i]);
+    if (GameIntro.Objectives[0]) {
+	CLprintf(file, "(set-objectives!");
+	for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
+	    CLprintf(file, "\n  \"%s\"", GameIntro.Objectives[i]);
 	}
-	CLprintf(file,")\n");
+	CLprintf(file, ")\n");
     }
 }
 
