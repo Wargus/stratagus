@@ -585,10 +585,7 @@ struct _unit_ {
     }		Move;			/// ActionMove,...
     struct _order_builded_ {
 	Unit*	Worker;			/// Worker building this unit
-	int	Sum;			/// HP sum for building
-	int	Add;			/// + to HP and sum
-	int	Val;			/// Counter (fixed point trick)
-	int	Sub;			/// - to counter
+	int	Progress;		/// Progress counter, in 1/100 cycles.
 	int	Cancel;			/// Cancel construction
 	ConstructionFrame* Frame;	/// Construction frame
     }		Builded;		/// ActionBuilded,...

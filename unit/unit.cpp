@@ -358,6 +358,7 @@ global void InitUnit(Unit* unit, UnitType* type)
 
     unit->OrderCount = 1;		// No orders
     unit->Orders[0].Action = UnitActionStill;
+    unit->Orders[0].X=unit->Orders[0].Y=-1;
     DebugCheck(unit->Orders[0].Goal);
     unit->NewOrder.Action = UnitActionStill;
     DebugCheck(unit->NewOrder.Goal);
@@ -565,7 +566,7 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 global void AddUnitInContainer(Unit* unit, Unit* host)
 {
     if (unit->Container) {
-	printf("Unit is already contained.\n");
+	DebugLevel0Fn("Unit is already contained.\n");
 	exit(0);
     }
     unit->Container=host;
@@ -591,11 +592,11 @@ global void RemoveUnitFromContainer(Unit* unit)
     Unit* host;
     host=unit->Container;
     if (!unit->Container) {
-	printf("Unit not contained.\n");
+	DebugLevel0Fn("Unit not contained.\n");
 	exit(0);
     }
     if (host->InsideCount==0) {
-	printf("host's inside count reached -1.");
+	DebugLevel0Fn("host's inside count reached -1.");
 	exit(0);
     }
     host->InsideCount--;
@@ -3798,10 +3799,8 @@ global void SaveUnit(const Unit* unit,CLFile* file)
 		CLprintf(file,"\n  'data-builded '(worker %s",
 			ref=UnitReference(unit->Data.Builded.Worker));
 		free(ref);
-		CLprintf(file," sum %d add %d val %d sub %d frame %d",
-			unit->Data.Builded.Sum,unit->Data.Builded.Add,
-			unit->Data.Builded.Val,unit->Data.Builded.Sub,
-			frame);
+		CLprintf(file," progress %d frame %d",
+			unit->Data.Builded.Progress,frame);
 		if( unit->Data.Builded.Cancel ) {
 		    CLprintf(file," cancel");
 		}

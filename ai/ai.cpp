@@ -1281,7 +1281,7 @@ global void AiWorkComplete(Unit* unit,Unit* what)
 */
 global void AiCanNotBuild(Unit* unit,const UnitType* what)
 {
-    DebugLevel1Fn("%d: %d(%s) Can't build %s at %d,%d\n" _C_
+    DebugLevel0Fn("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident
 	    _C_ what->Ident _C_ unit->X _C_ unit->Y);
 
@@ -1298,7 +1298,7 @@ global void AiCanNotBuild(Unit* unit,const UnitType* what)
 */
 global void AiCanNotReach(Unit* unit,const UnitType* what)
 {
-    DebugLevel1Fn("%d: %d(%s) Can't reach %s at %d,%d\n" _C_
+    DebugLevel3Fn("%d: %d(%s) Can't reach %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
@@ -1316,7 +1316,7 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 global void AiNeedMoreFarms(Unit* unit,
 	const UnitType* what __attribute__((unused)))
 {
-    DebugLevel1Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
+    DebugLevel3Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 

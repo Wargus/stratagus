@@ -84,13 +84,14 @@ local void RepairUnit(Unit* unit, Unit* goal)
     Player* player;
     int costs[MaxCosts];
     int i;
+    int animlength;
+    Animation* anim;
     int hp;
     int lrr;
+    char buf[100];
 
 #define GIVES_HP	4
 #define COSTS		1
-
-    player = unit->Player;
 
     //
     //  Calculate the repair points
@@ -98,78 +99,102 @@ local void RepairUnit(Unit* unit, Unit* goal)
     //
     hp = GIVES_HP;
 
-    //
-    //  Calculate the repair costs.
-    //
-    DebugCheck(!goal->Stats->HitPoints);
+    player = unit->Player;
 
-    for (i = 1; i < MaxCosts; ++i) {
-	if (goal->Stats->Costs[i]) {
-	    costs[i] = COSTS;
-	} else {			// Prepare for repair cycles
+    if (goal->Orders[0].Action!=UnitActionBuilded||(!goal->Type->BuilderOutside)) {
+	//
+	//  Calculate the repair costs.
+	//
+	DebugCheck(!goal->Stats->HitPoints);
+
+	for (i = 1; i < MaxCosts; ++i) {
+	    if (goal->Stats->Costs[i]) {
+		costs[i] = COSTS;
+	    } else {			// Prepare for repair cycles
+		costs[i] = 0;
+	    }
+	}
+	lrr = player->LastRepairResource;
+	for (i = player->LastRepairResource; i < MaxCosts; ++i) {
+	    if (costs[i] && lrr == player->LastRepairResource) {
+		lrr = i;
+	    }				// Find next higher resource or...
+	}
+	if (lrr == player->LastRepairResource) {
+	    for (i = player->LastRepairResource; i > 0; --i) {
+		if (costs[i]) {
+		    lrr = i;
+		}
+	    }				// ...go through the beginning
+	}
+	player->LastRepairResource = lrr;
+	// Thanx for the help, costs, you are reset!
+	for (i = 1; i < MaxCosts; ++i) {
 	    costs[i] = 0;
 	}
-    }
-
-    //
-    //  Check if enough resources are available
-    //
-    for (i = 1; i < MaxCosts; ++i) {
-	if (player->Resources[i] < costs[i]) {
-	    // FIXME: we should say what resource
-	    NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,
-		    "We need resources for repair!");
-	    if( player->Ai ) {
-		// FIXME: call back to AI?
-
-		RefsDebugCheck(!goal->Refs);
-		if (!--goal->Refs) {
-		    ReleaseUnit(goal);
+	costs[player->LastRepairResource] = COSTS;	// The one we need
+	//
+	//  Check if enough resources are available
+	//
+	for (i = 1; i < MaxCosts; ++i) {
+	    if (player->Resources[i] < costs[i]) {
+		snprintf(buf,100,"We need more %s for repair!",DefaultResourceNames[i]);
+		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,buf);
+		if( player->Ai ) {
+		    // FIXME: call back to AI?
+		    RefsDebugCheck(!goal->Refs);
+		    if (!--goal->Refs) {
+			ReleaseUnit(goal);
+		    }
+		    unit->Orders[0].Goal = NULL;
+		    unit->Orders[0].Action = UnitActionStill;
+		    unit->State = unit->SubAction = 0;
+		    if (unit->Selected) {	// update display for new action
+			SelectedUnitChanged();
+		    }
 		}
-		unit->Orders[0].Goal = NULL;
-		unit->Orders[0].Action = UnitActionStill;
-		unit->State = unit->SubAction = 0;
-		if (unit->Selected) {	// update display for new action
-		    SelectedUnitChanged();
-		}
+		// FIXME: We shouldn't animate if no resources are available.
+		return;
 	    }
-	    // FIXME: We shouldn't animate if no resources are available.
-	    return;
 	}
+	//
+	//  Subtract the resources
+	//
+	PlayerSubCosts(player, costs);
     }
-
-    lrr = player->LastRepairResource;
-    for (i = player->LastRepairResource; i < MaxCosts; ++i) {
-	if (costs[i] && lrr == player->LastRepairResource) {
-	    lrr = i;
-	}				// Find next higher resource or...
-    }
-    if (lrr == player->LastRepairResource) {
-	for (i = player->LastRepairResource; i > 0; --i) {
-	    if (costs[i]) {
-		lrr = i;
-	    }
-	}				// ...go through the beginning
-    }
-    player->LastRepairResource = lrr;
-
-    // Thanx for the help, costs, you are reset!
-    for (i = 1; i < MaxCosts; ++i) {
-	costs[i] = 0;
-    }
-    costs[player->LastRepairResource] = COSTS;	// The one we need
-
+    
     //
     //  Repair the unit
     //
-    goal->HP += hp;
-    if (goal->HP > goal->Stats->HitPoints) {
-	goal->HP = goal->Stats->HitPoints;
+    if (goal->Type->BuilderOutside) {
+	//  hp is the current damage taken by the unit.
+	hp=(goal->Data.Builded.Progress*goal->Stats->HitPoints)/
+		(goal->Type->Stats->Costs[TimeCost]*600)-goal->HP;
+	//
+	//  Calculate the length of the attack (repair) anim.
+	//
+	animlength=0;
+	for (anim=unit->Type->Animations->Attack;!(anim->Flags&AnimationReset);anim++) {
+	    animlength+=anim->Sleep;
+	}
+	
+	DebugLevel3("Repair animation is %d cycles long\n" _C_ animlength);
+	// FIXME: implement this below:
+	//unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
+	goal->Data.Builded.Progress+=100*animlength;
+	//  Keep the same level of damage while increasing HP.
+	goal->HP=(goal->Data.Builded.Progress*goal->Stats->HitPoints)/
+		(goal->Type->Stats->Costs[TimeCost]*600)-hp;
+	if (goal->HP>goal->Stats->HitPoints) {
+	    goal->HP=goal->Stats->HitPoints;
+	}
+	//  HandleActionBuilded will deal with most stuff.
+    } else {
+	goal->HP += hp;
+	if (goal->HP > goal->Stats->HitPoints) {
+	    goal->HP = goal->Stats->HitPoints;
+	}
     }
-    //
-    //  Subtract the resources
-    //
-    PlayerSubCosts(player, costs);
 
     if (CheckUnitToBeDrawn(goal)) {
 	MustRedraw |= RedrawMinimap;
@@ -260,10 +285,11 @@ global void HandleActionRepair(Unit* unit)
 		//
 		//	Have reached target? FIXME: could use return value
 		//
-		if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
-			<=REPAIR_RANGE ) {
+		if(goal&&MapDistanceToUnit(unit->X,unit->Y,goal)<=REPAIR_RANGE
+			&&goal->HP<goal->Type->Stats->HitPoints) {
 		    unit->State=0;
 		    unit->SubAction=2;
+		    unit->Reset=1;
 		    UnitHeadingFromDeltaXY(unit,
 			goal->X+(goal->Type->TileWidth-1)/2-unit->X,
 			goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);

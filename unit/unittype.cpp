@@ -995,9 +995,9 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
 	CLFile* file)
 {
-    DebugCheck(plynr>=PlayerMax);
     int j;
-
+    
+    DebugCheck(plynr>=PlayerMax);
     CLprintf(file,"(define-unit-stats '%s %d\n  ",ident,plynr);
     CLprintf(file,"'level %d ",stats->Level);
     CLprintf(file,"'speed %d ",stats->Speed);
@@ -1327,6 +1327,7 @@ global void CleanUnitTypes(void)
     void** ptr;
     int i;
     int j;
+    Animations* anims;
 
     DebugLevel0Fn("FIXME: icon, sounds not freed.\n");
 
@@ -1348,7 +1349,6 @@ global void CleanUnitTypes(void)
     for( i=0; i<NumUnitTypes; ++i )
     {
 	type=UnitTypes[i];
-	Animations* anims;
 
 	if( !(anims=type->Animations) ) {	// Must be handled?
 	    continue;
