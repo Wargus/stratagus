@@ -34,6 +34,9 @@
 #ifdef USE_SDL	// {
 
 #include <stdlib.h>
+#ifdef BSD
+#include <string.h>
+#endif
 #include <limits.h>
 #ifndef _MSC_VER
 #include <sys/time.h>
