@@ -210,7 +210,7 @@ local SCM CclDefineUnitType(SCM list)
     value=gh_car(list);
     i=gh_scm2int(value);
     DebugLevel3("\tOverlay frame: %d\n",i);
-    type->OverlapFrame=i;
+    type->Construction=ConstructionByWcNum(i);
 
     // Sight range
 
