@@ -610,7 +610,11 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
 	}
 	if (canplace) {
 		caster->Mana -= spell->ManaCost;
-		MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
+		if (action->Data.Polymorph.PlayerNeutral) {
+			MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
+		} else {
+			MakeUnitAndPlace(x, y, type, target->Player);
+		}
 		UnitLost(target);
 		UnitClearOrders(target);
 		ReleaseUnit(target);
