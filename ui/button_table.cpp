@@ -152,9 +152,15 @@ local int CheckUnits(const Unit* unit,const ButtonAction* button)
 */
 local int CheckUpgradeTo(const Unit* unit,const ButtonAction* button)
 {
+#ifdef NEW_ORDERS
+    if ( unit->Orders[0].Action != UnitActionStill ) {
+	return 0;
+    }
+#else
     if ( unit->Command.Action != UnitActionStill ) {
 	return 0;
     }
+#endif
     DebugLevel3("%s\n",button->ValueStr);
     return CheckDependByIdent(unit->Player,button->ValueStr);
 }
@@ -196,10 +202,17 @@ local int CheckNetwork(const Unit* unit,const ButtonAction* button)
 */
 local int CheckNoWork(const Unit* unit,const ButtonAction* button)
 {
+#ifdef NEW_ORDERS
+    return unit->Type->Building
+	    && unit->Orders[0].Action != UnitActionTrain
+	    && unit->Orders[0].Action != UnitActionUpgradeTo
+	    && unit->Orders[0].Action != UnitActionResearch;
+#else
     return unit->Type->Building
 	    && unit->Command.Action != UnitActionTrain
 	    && unit->Command.Action != UnitActionUpgradeTo
 	    && unit->Command.Action != UnitActionResearch;
+#endif
 }
 
 /**
@@ -211,9 +224,15 @@ local int CheckNoWork(const Unit* unit,const ButtonAction* button)
 */
 local int CheckNoResearch(const Unit* unit,const ButtonAction* button)
 {
+#ifdef NEW_ORDERS
+    return unit->Type->Building
+	    && unit->Orders[0].Action != UnitActionUpgradeTo
+	    && unit->Orders[0].Action != UnitActionResearch;
+#else
     return unit->Type->Building
 	    && unit->Command.Action != UnitActionUpgradeTo
 	    && unit->Command.Action != UnitActionResearch;
+#endif
 }
 
 /**
@@ -225,7 +244,11 @@ local int CheckNoResearch(const Unit* unit,const ButtonAction* button)
 */
 local int CheckTraining(const Unit* unit,const ButtonAction* button)
 {
+#ifdef NEW_ORDERS
+    return unit->Type->Building && unit->Orders[0].Action == UnitActionTrain;
+#else
     return unit->Type->Building && unit->Command.Action == UnitActionTrain;
+#endif
 }
 
 /**
