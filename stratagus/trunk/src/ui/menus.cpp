@@ -4387,7 +4387,7 @@ int NetClientSelectScenario(void)
 	} else {
 		LuaLoadFile(MenuMapFullPath);
 	}
-	return 1;
+	return 0;
 }
 
 /**
