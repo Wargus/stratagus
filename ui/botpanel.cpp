@@ -334,25 +334,28 @@ global void CleanButtons(void)
     int z;
 
     //
-    //	Free the allocated buttons.
+    //  Free the allocated buttons.
     //
     for (z = 0; z < NumUnitButtons; z++) {
 	DebugCheck(!UnitButtonTable[z]);
-	if( UnitButtonTable[z]->ValueStr ) {
+	if (UnitButtonTable[z]->Icon.Name) {
+	    free(UnitButtonTable[z]->Icon.Name);
+	}
+	if (UnitButtonTable[z]->ValueStr) {
 	    free(UnitButtonTable[z]->ValueStr);
 	}
-	if( UnitButtonTable[z]->Hint ) {
+	if (UnitButtonTable[z]->Hint) {
 	    free(UnitButtonTable[z]->Hint);
 	}
-	if( UnitButtonTable[z]->UnitMask ) {
+	if (UnitButtonTable[z]->UnitMask) {
 	    free(UnitButtonTable[z]->UnitMask);
 	}
 	free(UnitButtonTable[z]);
     }
     NumUnitButtons = 0;
 
-    CurrentButtonLevel=0;
-    CurrentButtons=NULL;
+    CurrentButtonLevel = 0;
+    CurrentButtons = NULL;
 }
 
 /**
