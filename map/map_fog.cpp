@@ -462,27 +462,46 @@ global void MapUpdateVisible(void)
     int nunits;
     int i;
     int j;
+    int shared_vision;
 #ifdef DEBUG
     unsigned long t;
 #endif
 
+    shared_vision=0;
+
     // No fog - only update revealers for holy vision
     if ( TheMap.NoFogOfWar ) {
-	nunits=ThisPlayer->TotalNumUnits;
-	units=ThisPlayer->Units;
-	for( i=0; i<nunits; ++i ) {
-	    unit=units[i];
-	    x=unit->X+unit->Type->TileWidth/2;
-	    y=unit->Y+unit->Type->TileHeight/2;
-	    if( unit->Removed && unit->Revealer ) {
+	for( j=0; j<NumPlayers; ++j ) {
+	    if( &Players[j]!=ThisPlayer &&
+		!( (ThisPlayer->SharedVision&(1<<j)) &&
+		   (Players[j].SharedVision&(1<<ThisPlayer->Player)) ) ) {
+		continue;
+	    }
+
+	    nunits=Players[j].TotalNumUnits;
+	    units=Players[j].Units;
+
+	    if( &Players[j]==ThisPlayer ) {
+		for( i=0; i<nunits; ++i ) {
+		    unit=units[i];
+		    x=unit->X+unit->Type->TileWidth/2;
+		    y=unit->Y+unit->Type->TileHeight/2;
+		    if( unit->Removed && unit->Revealer ) {
 #ifdef NEW_FOW
-		MapMarkSight(unit->Player,x,y,10);
+			MapMarkSight(unit->Player,x,y,10);
 #else
-		MapMarkSight(x,y,10);
+			MapMarkSight(x,y,10);
 #endif
+		    }
+		}
+	    } else {
+		shared_vision=1;
 	    }
 	}
-	return;
+	if( !shared_vision ) {
+	    // No shared vision, nothing else to update
+	    return;
+	}
     }
 
 #ifdef NEW_FOW
@@ -497,7 +516,9 @@ global void MapUpdateVisible(void)
     //
     //	Clear all visible flags.
     //
-    memset(TheMap.Visible[0],0,(TheMap.Width*TheMap.Height)/8);
+    if( !shared_vision ) {
+	memset(TheMap.Visible[0],0,(TheMap.Width*TheMap.Height)/8);
+    }
 
     DebugLevel3Fn("Ticks Clear %lu\n" _C_ GetTicks()-t);
 
