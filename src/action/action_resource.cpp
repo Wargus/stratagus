@@ -10,7 +10,7 @@
 //
 /**@name action_resource.c - The generic resource action. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer and Crestez Leonard
+//      (c) Copyright 2001-2004 by Crestez Leonard
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
