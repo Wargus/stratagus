@@ -10,7 +10,7 @@
 //
 /**@name tileset.h	-	The tileset headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -233,8 +233,10 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-#define TileSizeX	32		/// Size of a tile in X
-#define TileSizeY	32		/// Size of a tile in Y
+    /// Size of a tile in X
+extern int TileSizeX;
+    /// Size of a tile in Y
+extern int TileSizeY;
 
 // This is only used for tile cache size
 #define MaxTilesInTileset	5056	/// Current limit of tiles in tileset
@@ -266,6 +268,8 @@ typedef struct _tileset_ {
     char*	PaletteFile;		/// File containing the global palette
 
     int		NumTiles;		/// Number of tiles in the tables
+    int		TileSizeX;		/// Size of a tile in X
+    int		TileSizeY;		/// Size of a tile in Y
     unsigned short*	Table;		/// Pud to internal conversion table
     unsigned short*	FlagsTable;	/// Flag table for editor
 

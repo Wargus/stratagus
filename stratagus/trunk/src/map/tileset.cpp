@@ -10,7 +10,7 @@
 //
 /**@name tileset.c	-	The tileset. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -61,6 +61,16 @@ global int NumTilesets;
 **	@see TilesetMax, @see NumTilesets
 */
 global Tileset** Tilesets;
+
+/**
+**	Size of a tile in X
+*/
+global int TileSizeX = 32;
+
+/**
+**	Size of a tile in Y
+*/
+global int TileSizeY = 32;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -115,6 +125,9 @@ global void LoadTileset(void)
 #ifdef USE_OPENGL
     MakeTexture(TheMap.TileData,TheMap.TileData->Width,TheMap.TileData->Height);
 #endif
+
+    TileSizeX = Tilesets[i]->TileSizeX;
+    TileSizeY = Tilesets[i]->TileSizeY;
 
     //
     //  Calculate number of tiles in graphic tile
