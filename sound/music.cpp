@@ -325,7 +325,6 @@ local int PlayCDRom(const char* name)
 		CDMode = ":off";
 		return 1;
 	    }
-	    --CDTrack;
 	}
     }
 
@@ -340,8 +339,8 @@ local int PlayCDRom(const char* name)
 	if (!strcmp(name, ":all")) {
 	    CDMode = ":all";
 	    do {
-		if (CDTrack > NumCDTracks)
-		    CDTrack = 1;
+		if (CDTrack >= NumCDTracks)
+		    CDTrack = 0;
 	    } while (cd_is_audio(++CDTrack) < 1);
 	    if (cd_play(CDTrack))
 		CDMode = ":stopped";
@@ -389,13 +388,12 @@ local int PlayCDRom(const char* name)
 		CDtocentry[i].cdte_track = i;
 		ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
 	    }
-	    NumCDTracks = i + 1;
-	    
+	    NumCDTracks = i - 1;
+
 	    if (NumCDTracks == 0) {
 		CDMode = ":off";
 		return 1;
 	    }
-	    --CDTrack;
 	}
     }
 
@@ -406,22 +404,18 @@ local int PlayCDRom(const char* name)
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
 	    CDMode = ":all";
-	    
 	    do {
-		if (CDTrack > NumCDTracks)
+		if (CDTrack >= NumCDTracks)
 		    CDTrack = 0;
 	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
 	}
 	// if mode is play random tracks
 	if (!strcmp(name, ":random")) {
 	    CDMode = ":random";
-
 	    do {
 		CDTrack = MyRand() % NumCDTracks;
-	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
+	    } while (CDtocentry[CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
 	}
-
-	CDTrack = 3; // temporary
 
 	sample = LoadCD(NULL, CDTrack);
 	MusicSample = sample;
