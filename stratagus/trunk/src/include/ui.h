@@ -214,6 +214,8 @@ typedef struct _ui_ {
 extern UI TheUI;			/// The user interface
 extern UI** UI_Table;			/// All available user interfaces
 
+extern char RightButtonAttacks;		/// right button 0 move, 1 attack
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
