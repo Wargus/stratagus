@@ -169,6 +169,8 @@
 **	WorldMap::Info
 **
 **		Descriptive information of the map.
+**		@see ::_map_info_
+**		@todo This structure contains duplicate informations of the map.
 */
 
 /*----------------------------------------------------------------------------
