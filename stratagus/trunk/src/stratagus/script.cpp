@@ -259,7 +259,9 @@ local int CclSaveGame(lua_State* l)
 			strcpy(CurrentMapPath, LuaToString(l, -1));
 			// If .pud, we don't need to load anything from it
 			if (!strcasestr(LuaToString(l, -1), ".pud")) {
-				LibraryFileName(LuaToString(l, -1), buf);
+				strcpy(buf, StratagusLibPath);
+				strcat(buf, "/");
+				strcat(buf, LuaToString(l, -1));
 				if (LuaLoadFile(buf) == -1) {
 					DebugPrint("Load failed: %s" _C_ value);
 				}
