@@ -2854,36 +2854,38 @@ static int CclDefineMenu(lua_State* l)
 			*(Menu**)hash_add(MenuHash, name) = menu;
 		} else {
 			int i;
-			int mitype;
 
 			free(menu->Panel);
 			FreeGraphic(menu->BackgroundG);
 			for (i = 0; i < menu->NumItems; ++i) {
-				mitype = menu->Items[i].MiType;
-				if (mitype == MI_TYPE_TEXT) {
-					if (menu->Items[i].D.Text.text) {
-						free(menu->Items[i].D.Text.text);
+				switch (menu->Items[i].MiType) {
+					case MiTypeText:
+						if (menu->Items[i].D.Text.text) {
+							free(menu->Items[i].D.Text.text);
+						}
+						if (menu->Items[i].D.Text.normalcolor) {
+							free(menu->Items[i].D.Text.normalcolor);
+						}
+						if (menu->Items[i].D.Text.reversecolor) {
+							free(menu->Items[i].D.Text.normalcolor);
+						}
+						break;
+					case MiTypeButton:
+						if (menu->Items[i].D.Button.Text) {
+							free(menu->Items[i].D.Button.Text);
+						}
+						break;
+					case MiTypePulldown: {
+						int j;
+						j = menu->Items[i].D.Pulldown.noptions-1;
+						for (; j >= 0; --j) {
+							free(menu->Items[i].D.Pulldown.options[j]);
+						}
+						free(menu->Items[i].D.Pulldown.options);
+						break;
 					}
-					if (menu->Items[i].D.Text.normalcolor) {
-						free(menu->Items[i].D.Text.normalcolor);
-					}
-					if (menu->Items[i].D.Text.reversecolor) {
-						free(menu->Items[i].D.Text.normalcolor);
-					}
-				} else if (mitype == MI_TYPE_BUTTON) {
-					if (menu->Items[i].D.Button.Text) {
-						free(menu->Items[i].D.Button.Text);
-					}
-				} else if (mitype == MI_TYPE_PULLDOWN) {
-					int j;
-					j = menu->Items[i].D.Pulldown.noptions-1;
-					for (; j >= 0; --j) {
-						free(menu->Items[i].D.Pulldown.options[j]);
-					}
-					free(menu->Items[i].D.Pulldown.options);
-				} else if (mitype == MI_TYPE_LISTBOX) {
-				} else if (mitype == MI_TYPE_INPUT) {
-				} else if (mitype == MI_TYPE_CHECKBOX) {
+					default:
+						break;
 				}
 			}
 			free(menu->Items);
@@ -2988,7 +2990,7 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_TEXT;
+	item->MiType = MiTypeText;
 	item->D.Text.text = NULL;
 
 	subargs = luaL_getn(l, j + 1);
@@ -3102,7 +3104,7 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_BUTTON;
+	item->MiType = MiTypeButton;
 
 	subargs = luaL_getn(l, j + 1);
 	for (k = 0; k < subargs; ++k) {
@@ -3181,7 +3183,7 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_PULLDOWN;
+	item->MiType = MiTypePulldown;
 
 	subargs = luaL_getn(l, j + 1);
 	for (k = 0; k < subargs; ++k) {
@@ -3292,7 +3294,7 @@ static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_LISTBOX;
+	item->MiType = MiTypeListbox;
 
 	subargs = luaL_getn(l, j + 1);
 	for (k = 0; k < subargs; ++k) {
@@ -3414,7 +3416,7 @@ static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_VSLIDER;
+	item->MiType = MiTypeVslider;
 	item->D.VSlider.defper = -1;
 
 	subargs = luaL_getn(l, j + 1);
@@ -3540,7 +3542,7 @@ static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_HSLIDER;
+	item->MiType = MiTypeHslider;
 	item->D.HSlider.defper = -1;
 
 	subargs = luaL_getn(l, j + 1);
@@ -3664,7 +3666,7 @@ static void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
 	if (!lua_isstring(l, j + 1) && !lua_isnil(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_DRAWFUNC;
+	item->MiType = MiTypeDrawfunc;
 
 	if (lua_isstring(l, j + 1)) {
 		value = lua_tostring(l, j + 1);
@@ -3693,7 +3695,7 @@ static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_INPUT;
+	item->MiType = MiTypeInput;
 
 	subargs = luaL_getn(l, j + 1);
 	for (k = 0; k < subargs; ++k) {
@@ -3777,7 +3779,7 @@ static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
 	if (!lua_istable(l, j + 1)) {
 		LuaError(l, "incorrect argument");
 	}
-	item->MiType = MI_TYPE_CHECKBOX;
+	item->MiType = MiTypeCheckbox;
 
 	subargs = luaL_getn(l, j + 1);
 	for (k = 0; k < subargs; ++k) {
@@ -3898,6 +3900,8 @@ static int CclDefineMenuItem(lua_State* l)
 					LuaError(l, "Unknown flag: %s" _C_ value);
 				}
 			}
+		} else if (!strcmp(value, "id")) {
+			item->Id = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "font")) {
 			item->Font = FontByIdent(LuaToString(l, j + 1));
 /* Menu types */

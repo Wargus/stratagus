@@ -694,7 +694,7 @@ static unsigned char* LBRetrieve(const Menuitem* mi, int i)
 	FileList* fl;
 	static char buffer[1024];
 
-	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
 
 	if (i >= mi->D.Listbox.noptions) {
@@ -723,7 +723,7 @@ static unsigned char* LBRetrieveAndInfo(const Menuitem* mi, int i)
 	FileList* fl;
 	MapInfo* info;
 
-	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
 
 	if (i >= mi->D.Listbox.noptions) {
@@ -776,7 +776,7 @@ static int PathLBAction(const Menuitem* mi, int i)
 {
 	FileList *fl;
 
-	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
 
 	ScenSelectFileName[0] = '\0';
@@ -802,7 +802,7 @@ static int PathLBAction(const Menuitem* mi, int i)
 */
 static void SaveGameLBAction(Menuitem* mi, int i)
 {
-	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
 
 	PathLBAction(mi, i);
@@ -814,7 +814,7 @@ static void SaveGameLBAction(Menuitem* mi, int i)
 */
 static void EditorSaveLBAction(Menuitem* mi, int i)
 {
-	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(mi->MiType == MiTypeListbox);
 	Assert(i >= 0);
 
 	PathLBAction(mi, i);
@@ -835,7 +835,7 @@ static void LBExit(Menuitem* mi)
 {
 	FileList *fl;
 
-	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(mi->MiType == MiTypeListbox);
 
 	if (!mi->D.Listbox.noptions) {
 		return ;
@@ -857,7 +857,7 @@ static void LBInit(Menuitem* mi, const char* path, int (*filter)(char*, FileList
 {
 	int noptions;
 
-	Assert(mi->MiType == MI_TYPE_LISTBOX);
+	Assert(mi->MiType == MiTypeListbox);
 	Assert(path);
 
 	LBExit(mi);
@@ -1400,7 +1400,7 @@ static void SaveGameExit(Menu* menu)
 */
 static void SaveGameEnterAction(Menuitem* mi, int key)
 {
-	Assert(mi->MiType == MI_TYPE_INPUT);
+	Assert(mi->MiType == MiTypeInput);
 
 	strncpy(ScenSelectFileName, mi->D.Input.buffer, mi->D.Input.nch);
 	ScenSelectFileName[mi->D.Input.nch] = '\0';
@@ -2429,7 +2429,7 @@ static void SaveReplayExit(Menu* menu)
 */
 static void SaveReplayEnterAction(Menuitem* mi, int key)
 {
-	Assert(mi->MiType == MI_TYPE_INPUT);
+	Assert(mi->MiType == MiTypeInput);
 
 	strncpy(ScenSelectFileName, mi->D.Input.buffer, mi->D.Input.nch);
 	ScenSelectFileName[mi->D.Input.nch] = '\0';
@@ -3767,7 +3767,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 		}
 		if (Hosts[i].PlyNr) {
 			menu->Items[SERVER_PLAYER_STATE + i].MiType = 0;
-			menu->Items[SERVER_PLAYER_TEXT + i].MiType = MI_TYPE_DRAWFUNC;
+			menu->Items[SERVER_PLAYER_TEXT + i].MiType = MiTypeDrawfunc;
 
 			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = 0;
 			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
@@ -3783,8 +3783,8 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			// don't allow network and button events to intercept server player's action on pulldown buttons!
 			if (!(menu->Items[SERVER_PLAYER_STATE + i].Flags & MenuButtonClicked)) {
 				if (initial == 1 ||
-					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].MiType != MI_TYPE_PULLDOWN)) {
-					menu->Items[SERVER_PLAYER_STATE + i].MiType = MI_TYPE_PULLDOWN;
+					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].MiType != MiTypePulldown)) {
+					menu->Items[SERVER_PLAYER_STATE + i].MiType = MiTypePulldown;
 					menu->Items[SERVER_PLAYER_TEXT + i].MiType = 0;
 					menu->Items[SERVER_PLAYER_STATE + i].Flags = 0;
 					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = 0;
@@ -3887,7 +3887,7 @@ static void MultiClientUpdate(int initial)
 	//
 	if (initial) {
 		menu->Items[CLIENT_PLAYER_STATE].MiType = 0;
-		menu->Items[CLIENT_PLAYER_TEXT].MiType = MI_TYPE_DRAWFUNC;
+		menu->Items[CLIENT_PLAYER_TEXT].MiType = MiTypeDrawfunc;
 		memset(&ServerSetupState, 0, sizeof(ServerSetup));
 		memset(&LocalSetupState, 0, sizeof(ServerSetup));
 	}
@@ -3897,7 +3897,7 @@ static void MultiClientUpdate(int initial)
 		//
 		if (Hosts[i].PlyNr || i == NetLocalHostsSlot) {
 			menu->Items[CLIENT_PLAYER_STATE + i].MiType = 0;
-			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = MI_TYPE_DRAWFUNC;
+			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = MiTypeDrawfunc;
 			if (i == NetLocalHostsSlot) {
 				menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State = 0;
 			} else {
@@ -3905,7 +3905,7 @@ static void MultiClientUpdate(int initial)
 					MI_CSTATE_PASSIVE;
 			}
 		} else {
-			menu->Items[CLIENT_PLAYER_STATE + i].MiType = MI_TYPE_PULLDOWN;
+			menu->Items[CLIENT_PLAYER_STATE + i].MiType = MiTypePulldown;
 			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = 0;
 			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.state =
 				MI_PSTATE_PASSIVE;
@@ -5102,7 +5102,7 @@ static void EditorSaveVSAction(Menuitem* mi)
 */
 static void EditorSaveEnterAction(Menuitem* mi, int key)
 {
-	Assert(mi->MiType == MI_TYPE_INPUT);
+	Assert(mi->MiType == MiTypeInput);
 
 	strncpy(ScenSelectFileName, mi->D.Input.buffer, mi->D.Input.nch);
 	ScenSelectFileName[mi->D.Input.nch] = '\0';
@@ -5713,7 +5713,7 @@ void UpdateMenuItemButton(Menuitem* items)
 	void (*handler)(void);
 
 	Assert(items);
-	Assert(items->MiType == MI_TYPE_BUTTON);
+	Assert(items->MiType == MiTypeButton);
 
 	// Enable by default.
 	items->Flags &= ~MenuButtonDisabled;
