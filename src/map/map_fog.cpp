@@ -2664,18 +2664,6 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 */
 global void InitMapFogOfWar(void)
 {
-    int *visionlist;
-    int maxsize;
-    int sizex;
-    int sizey;
-    int maxsearchsize;
-    int i;
-    int VisionTablePosition;
-    int marker;
-    int direction;
-    int right;
-    int up;
-    int repeat;
 
 #ifdef USE_OPENGL
     VideoDrawFog=VideoDrawFogAlphaOpenGL;
@@ -2952,6 +2940,37 @@ build_table:
 	}
     }
 #endif
+}
+
+/**
+**	Cleanup the fog of war.
+*/
+global void CleanMapFogOfWar(void)
+{
+    if( FogOfWarAlphaTable ) {
+	free(FogOfWarAlphaTable);
+	FogOfWarAlphaTable=NULL;
+    }
+}
+
+/**
+**	Initialize Vision and Goal Tables.
+*/
+global void InitVisionTable(void)
+{
+    int *visionlist;
+    int maxsize;
+    int sizex;
+    int sizey;
+    int maxsearchsize;
+    int i;
+    int VisionTablePosition;
+    int marker;
+    int direction;
+    int right;
+    int up;
+    int repeat;
+
     // Initialize Visiontable to large size, can't be more entries than tiles.
     VisionTable[0]=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
     VisionTable[1]=malloc(MaxMapWidth*MaxMapWidth*sizeof(int));
@@ -3082,18 +3101,15 @@ build_table:
     realloc(VisionTable[1],(VisionTablePosition+2)*sizeof(int));
     realloc(VisionTable[2],(VisionTablePosition+2)*sizeof(int));
 #endif
+
 }
 
 /**
-**	Cleanup the fog of war.
+**	Clean Up Generated Vision and Goal Tables.
 */
-global void CleanMapFogOfWar(void)
+global void FreeVisionTable(void)
 {
-    if( FogOfWarAlphaTable ) {
-	free(FogOfWarAlphaTable);
-	FogOfWarAlphaTable=NULL;
-    }
-    // Free Vision Data
+   // Free Vision Data
     if( VisionTable[0] ) {
 	free(VisionTable[0]);
 	VisionTable[0]=NULL;
@@ -3111,5 +3127,4 @@ global void CleanMapFogOfWar(void)
 	VisionLookup=NULL;
     }
 }
-
 //@}
