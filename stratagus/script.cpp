@@ -498,25 +498,24 @@ local SCM CclUnits(void)
     //
     //	Look how many slots are used
     //
-    i=nullrefs=0;
+    destroyed=nullrefs=0;
     for( slot=UnitSlots; slot<UnitSlots+MAX_UNIT_SLOTS; ++slot ) {
 	if( *slot
 		&& (*slot<(Unit*)UnitSlots
 			|| *slot>(Unit*)(UnitSlots+MAX_UNIT_SLOTS)) ) {
 	    if( (*slot)->Destroyed ) {
-		++i;
+		++destroyed;
 	    } else if( !(*slot)->Refs ) {
 		++nullrefs;
 	    }
 	}
     }
-    destroyed=i;
 
-    sprintf(buf,"%d free %d used %d destroyed slots %d"
-	    ,freeslots,MAX_UNIT_SLOTS-2-freeslots,destroyed,nullrefs);
+    sprintf(buf,"%d free, %d(%d) used, %d, destroyed, %d null"
+	    ,freeslots,MAX_UNIT_SLOTS-1-freeslots,NumUnits,destroyed,nullrefs);
     SetStatusLine(buf);
-    fprintf(stderr,"%d free %d used %d destroyed slots %d\n"
-	    ,freeslots,MAX_UNIT_SLOTS-2-freeslots,destroyed,nullrefs);
+    fprintf(stderr,"%d free, %d(%d) used, %d destroyed, %d null\n"
+	    ,freeslots,MAX_UNIT_SLOTS-1-freeslots,NumUnits,destroyed,nullrefs);
 
     return gh_int2scm(destroyed);
 }
