@@ -92,7 +92,14 @@ int PfHierComputePath (Unit *unit, int *dx, int *dy)
 	unsigned int ts0, ts1, ts2, ts3, hightime, lowtime;
 	unsigned int low_reset, low_mark, low_path;
 	HighlevelPath *HighPath;
+	UnitType *type = unit->Type;
 	int retval;
+
+	if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
+		Neighbor = &NeighborEveryOther[0];
+	} else {
+		Neighbor = &NeighborEvery[0];
+	}
 
 	if (unit->Data.Move.Length) {
 		/* there are still precomputed path segments left */
@@ -477,16 +484,25 @@ void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
 	printf ("MapChanged: (%d,%d)->(%d,%d), groups %s need to be recomputed\n",
 					x0, y0, x1, y1, RecomputeGroups ? "" : "don't");
 
-	/* FIXME: if changed rectangle touches Area boundary we need to process
+	/* if changed rectangle touches Area boundary we need to process
 	 * that other Area too. */
+	if (x0 % AreaGetWidth() == 0)
+		ax0 = ax0-1>=0 ? ax0-1 : 0;
+	if (y0 % AreaGetHeight() == 0)
+		ay0 = ay0-1>=0 ? ay0-1 : 0;
+	if (x1 % AreaGetWidth() == AreaGetWidth()-1)
+		ax1 = ax1+1<H.AMapWidth ? ax1+1 : H.AMapWidth-1;
+	if (y1 % AreaGetHeight() == AreaGetHeight()-1)
+		ay1 = ay1+1<H.AMapHeight ? ay1+1 : H.AMapHeight-1;
+
 	x0 = ax0 * AreaGetWidth();
 	y0 = ay0 * AreaGetHeight();
-	x1 = (ax1 + 1) * AreaGetWidth();
-	y1 = (ay1 + 1) * AreaGetHeight();
+	x1 = (ax1 + 1) * AreaGetWidth() - 1;
+	y1 = (ay1 + 1) * AreaGetHeight()- 1;
 
 	/* reset regids in concerned area to zero */
-	for (y=y0; y<y1; y++) {
-		for (x=x0; x<x1; x++)
+	for (y=y0; y<=y1; y++) {
+		for (x=x0; x<=x1; x++)
 			MapFieldSetRegId (x, y, 0);
 	}
 
@@ -507,7 +523,7 @@ void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
 		}
 
 	/* restore neighborship information */
-	--x0; --y0;
+	--x0; --y0; ++x1; ++y1;
 	CheckBounds (&x0, &y0, &x1, &y1);
 	RegionSetCreateNeighborLists (x0, y0, x1, y1);
 	if (RecomputeGroups) {
