@@ -35,6 +35,7 @@
 #if defined(WITH_SOUND) && defined(USE_MAD)	// {
 
 #include <stdlib.h>
+#include <string.h>
 #include <memory.h>
 #include "mad.h"
 

@@ -32,8 +32,7 @@
 #include <stdio.h>
 #include "freecraft.h"
 
-#ifdef WITH_SOUND	// {
-#ifndef USE_SDLA
+#if defined(WITH_SOUND) && !defined(USE_SDLA)	// {
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -157,7 +156,6 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
     return 0;
 }
 
-#endif
-#endif	// } WITH_SOUND
+#endif	// } WITH_SOUND && !USE_SDLA
 
 //@}
