@@ -645,7 +645,8 @@ global void NetworkEvent(void)
 	}
     }
     if (i == HostsCount) {
-	DebugLevel0Fn("Not a host in play\n");
+	DebugLevel0Fn("Not a host in play: %d.%d.%d.%d:%d\n",
+		 NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 	return;
     }
     player = Hosts[i].PlyNr;
