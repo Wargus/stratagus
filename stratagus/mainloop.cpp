@@ -229,35 +229,6 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	MustRedraw |= RedrawMinimap | RedrawCursors;
 }
 
-#ifdef DEBUG		// {
-
-/**
-**		FOR DEBUG PURPOSE ONLY, BUT DON'T REMOVE PLEASE !!!
-**
-**		Will try all kinds of possible linedraw routines (only one time) upon
-**		current display, making the job of debugging them more eassier..
-*/
-global void DebugTestDisplay(void)
-{
-	static int a = 0;
-	extern void DebugTestDisplayLines(void);
-
-	if (a) {
-		return;
-	}
-	a = 1;
-
-	//Enable one function-call as type of test to show one time
-	DebugTestDisplayLines();
-	//DebugTestDisplayVarious();
-	//DebugTestDisplayColorCube();
-
-	// put it all on screen (when it is not already there ;)
-	InvalidateArea(0, 0, VideoWidth, VideoHeight);
-}
-
-#endif		// } DEBUG
-
 /**
 **		Draw menu button area.
 **
@@ -591,8 +562,6 @@ global void UpdateDisplay(void)
 			TheUI.MinimapPanelX, TheUI.MinimapPanelY);
 	}
 
-	PlayerPixels(Players);				// Reset to default colors
-
 	if (MustRedraw & RedrawMinimap) {
 		// FIXME: redraw only 1* per second!
 		// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
@@ -607,11 +576,9 @@ global void UpdateDisplay(void)
 
 	if (MustRedraw & RedrawInfoPanel) {
 		DrawInfoPanel();
-		PlayerPixels(Players);				// Reset to default colors
 	}
 	if (MustRedraw & RedrawButtonPanel) {
 		DrawButtonPanel();
-		PlayerPixels(Players);				// Reset to default colors
 	}
 	if (MustRedraw & RedrawResources) {
 		DrawResources();
@@ -931,13 +898,10 @@ global void GameMainLoop(void)
 				MustRedraw = RedrawEverything;
 			}
 
-			//For debuggin only: replace UpdateDisplay by DebugTestDisplay when
-			//						 debugging linedraw routines..
 			//FIXME: this might be better placed somewhere at front of the
 			//			 program, as we now still have a game on the background and
 			//			 need to go through hte game-menu or supply a pud-file
 			UpdateDisplay();
-			//DebugTestDisplay();
 
 			//
 			// If double-buffered mode, we will display the contains of

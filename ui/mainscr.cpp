@@ -1113,7 +1113,6 @@ global void DrawInfoPanel(void)
 			//
 			//  If there are more units selected draw their pictures and a health bar
 			//
-			PlayerPixels(ThisPlayer);		// can only be own!
 			DrawInfoPanelBackground(0);
 			for (i = 0; i < (NumSelected > TheUI.NumSelectedButtons ?
 					TheUI.NumSelectedButtons : NumSelected); ++i) {

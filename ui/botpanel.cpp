@@ -396,9 +396,6 @@ global void DrawButtonPanel(void)
 		return;
 	}
 
-	// FIXME: this is unneeded DrawUnitIcon does it self
-	PlayerPixels(ThisPlayer);				// could only select own units.
-
 	for (i = 0; i < TheUI.NumButtonButtons; ++i) {
 		if (buttons[i].Pos != -1) {
 			int j;
@@ -502,7 +499,7 @@ global void DrawButtonPanel(void)
 				}
 			}
 
-			DrawUnitIcon(ThisPlayer,buttons[i].Icon.Icon,
+			DrawUnitIcon(ThisPlayer, buttons[i].Icon.Icon,
 				v, TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y);
 
 			//

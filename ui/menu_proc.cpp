@@ -285,11 +285,11 @@ global void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent,
 			}
 		}
 		if (rb < MenuButtonGfx.Sprite->NumFrames) {
-				if (transparent) {
-						VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x, y);
-				} else {
-						VideoDrawClip(MenuButtonGfx.Sprite, rb, x, y);
-				}
+			if (transparent) {
+				VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x, y);
+			} else {
+				VideoDrawClip(MenuButtonGfx.Sprite, rb, x, y);
+			}
 
 		} else {
 			if (rb < button) {

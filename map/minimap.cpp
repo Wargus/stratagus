@@ -733,7 +733,7 @@ global void CreateMinimap(void)
 		for (x = 0; x < TheUI.MinimapW; ++x) {
 			Palette p;
 			// this only copies the panel background... honest.
-			p = GlobalPalette[
+			p = TheMap.TileData->Palette[
 				((unsigned char*)TheUI.MinimapPanel.Graphic->Frames)[
 					x + (TheUI.MinimapPosX - TheUI.MinimapPanelX) +
 					(y + TheUI.MinimapPosY - TheUI.MinimapPanelY) *
@@ -805,7 +805,7 @@ global void UpdateMinimap(void)
 			}
 			if (MinimapWithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {
 				Palette p;
-				p = GlobalPalette[
+				p = TheMap.TileData->Palette[
 					((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW]];
 				MinimapGraphic[mx + my * TheUI.MinimapW] = VideoMapRGB(p.r, p.g, p.b);
 			} else if (visiontype > 0) {
