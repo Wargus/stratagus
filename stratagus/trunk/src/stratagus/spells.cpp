@@ -105,7 +105,7 @@ global SpellType SpellTypeTable[]
 { "spell-polymorph",		"polymorph",		  10, 200,  -1, SpellActionPolymorph	, { "polymorph", NULL }      , { NULL, NULL} },
 { "spell-blizzard",		"blizzard",		  12,  25,  -1, SpellActionBlizzard	, { "blizzard", NULL }       , { NULL, NULL} },
 //	---orc ogres---							 ---orc ogres---
-{ "spell-eye-of-kilrogg",	"eye of kilrogg",	   6,  70,  -1, SpellActionEyeOfKilrogg , { "eye of kilrogg", NULL } , { NULL, NULL} },
+{ "spell-eye-of-vision",	"eye of vision",	   6,  70,  -1, SpellActionEyeOfKilrogg , { "eye of vision", NULL } , { NULL, NULL} },
 { "spell-bloodlust",		"bloodlust",		   6,  50,1000, SpellActionBloodlust	, { "bloodlust", NULL }      , { NULL, NULL} },
 { "spell-runes",		"runes",		  10, 200,2000, SpellActionRunes	, { "runes", NULL }	     , { NULL, NULL} },
 //	---orc death knights---						 ---orc death knights-
@@ -751,6 +751,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 //  ---human paladins---
     case SpellActionHolyVision:
 	unit->Mana -= spell->ManaCost;	// get mana cost
+	// FIXME: Don't use UnitTypeByIdent during runtime.
 	target = MakeUnit(UnitTypeByIdent("unit-daemon"), unit->Player);
 	target->Revealer = 1;
 	target->Orders[0].Action = UnitActionStill;
@@ -1069,7 +1070,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	unit->Mana -= spell->ManaCost;
 
 	// FIXME: johns: the unit is placed on the wrong position
-	target=MakeUnit(UnitTypeByIdent("unit-eye-of-kilrogg"),unit->Player);
+	// FIXME: Don't use UnitTypeByIdent during runtime.
+	target=MakeUnit(UnitTypeByIdent("unit-eye-of-vision"),unit->Player);
 	target->X=x;
 	target->Y=y;
 	DropOutOnSide(target,LookingW,0,0);
@@ -1221,6 +1223,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
 		// FIXME: did they count on food?
 		// Can there be more than 1 skeleton created on the same tile?
+		// FIXME: Don't use UnitTypeByIdent during runtime.
 		target=MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-skeleton"),
 			unit->Player);
 		// set life span
@@ -1333,6 +1336,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionCircleOfPower:
     {
+    // FIXME: Don't use UnitTypeByIdent during runtime.
     Unit *cop = MakeUnitAndPlace(x, y, UnitTypeByIdent( "unit-circle-of-power" ),
 	         unit->Player);
     MakeMissile(MissileTypeSpell,
