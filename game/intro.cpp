@@ -55,14 +55,25 @@
 **	Linked list struct used to split text up into lines
 */
 typedef struct TextLines {
-    char* text;			/// line of text
-    struct TextLines* next;	/// pointer to next line
+    char* Text;				/// Line of text
+    struct TextLines* Next;		/// Pointer to next line
 } TextLines;
 
+/**
+**	Player ranks
+*/
 typedef struct PlayerRanks {
-    char **Ranks;
-    int *Scores;
+    char **Ranks;			/// Array of ranks
+    int *Scores;			/// Array of scores
 } PlayerRanks;
+
+/**
+**	Linked list of TextLines 
+*/
+typedef struct ChapterTextLines {
+    struct TextLines* Text;		/// TextLines struct
+    struct ChapterTextLines* Next;	/// Pointer to next TextLines
+} ChapterTextLines;
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -270,9 +281,9 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 	}
 
 	*ptr=(TextLines*)malloc(sizeof(TextLines));
-	(*ptr)->text=strdup(s);
-	(*ptr)->next=NULL;
-	ptr=&((*ptr)->next);
+	(*ptr)->Text=strdup(s);
+	(*ptr)->Next=NULL;
+	ptr=&((*ptr)->Next);
 
 	l+=strlen(s);
 	if( !text[l] ) {
@@ -293,9 +304,10 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 local void FreeTextLines(TextLines** lines)
 {
     TextLines* ptr;
+
     while( *lines ) {
-	ptr=(*lines)->next;
-	free((*lines)->text);
+	ptr=(*lines)->Next;
+	free((*lines)->Text);
 	free(*lines);
 	*lines=ptr;
     }
@@ -315,7 +327,8 @@ local void FreeTextLines(TextLines** lines)
 */
 local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
 {
-    int miny,endy;
+    int miny;
+    int endy;
     TextLines* ptr;
     int scrolling;
 
@@ -335,11 +348,11 @@ local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
 	}
 
 	if( y>=miny ) {
-	    VideoDrawTextClip(x,y,LargeFont,ptr->text);
+	    VideoDrawTextClip(x,y,LargeFont,ptr->Text);
 	}
 	y+=24;
 
-	ptr=ptr->next;
+	ptr=ptr->Next;
     }
 
     if( y<miny+24 ) {
@@ -427,7 +440,7 @@ global void ShowIntro(const Intro *intro)
     }
 
     SplitTextIntoLines(text,320,&scrolling_text);
-    for( i=0; i<MAX_OBJECTIVES; i++) {
+    for( i=0; i<MAX_OBJECTIVES; ++i) {
 	if( intro->Objectives[i] ) {
 	    SplitTextIntoLines(intro->Objectives[i],260,&objectives_text[i]);
 	} else {
@@ -445,7 +458,7 @@ global void ShowIntro(const Intro *intro)
 	if( !PlayingMusic && stage<MAX_BRIEFING_VOICES &&
 		intro->VoiceFile[stage] ) {
 	    PlayFile(intro->VoiceFile[stage]);
-	    stage++;
+	    ++stage;
 	}
 	VideoLockScreen();
 	HideAnyCursor();
@@ -476,9 +489,9 @@ global void ShowIntro(const Intro *intro)
 
 	    ptr=objectives_text[i];
 	    while( ptr ) {
-		VideoDrawText(x+372,y,LargeFont,ptr->text);
+		VideoDrawText(x+372,y,LargeFont,ptr->Text);
 		y+=22;
-		ptr=ptr->next;
+		ptr=ptr->Next;
 	    }
 	}
 
@@ -506,7 +519,7 @@ global void ShowIntro(const Intro *intro)
     }
 
     FreeTextLines(&scrolling_text);
-    for( i=0; i<MAX_OBJECTIVES; i++ ) {
+    for( i=0; i<MAX_OBJECTIVES; ++i ) {
 	if( objectives_text[i] ) {
 	    FreeTextLines(&objectives_text[i]);
 	}
@@ -656,19 +669,33 @@ global void ShowCredits(Credits *credits)
     // PlayMusic(MenuMusic);
 }
 
-local void DrawTitle(const char* act,const char* title)
+/**
+**	Draw text
+*/
+local void DrawText(CampaignChapter* chapter,ChapterTextLines* chlines)
 {
-    VideoDrawTextCentered(
-	VideoWidth/2,
-	VideoHeight/2 - VideoTextHeight(LargeTitleFont) -
-	    VideoTextHeight(SmallTitleFont)/2,
-	SmallTitleFont,
-	act);
-    VideoDrawTextCentered(
-	VideoWidth/2,
-	VideoHeight/2 - VideoTextHeight(LargeTitleFont)/2,
-	LargeTitleFont,
-	title);
+    ChapterPictureText* text;
+    TextLines* lines;
+    int y;
+    int (*draw)(int,int,unsigned,const unsigned char*);
+
+    text=chapter->Data.Picture.Text;
+    while( text ) {
+	y=text->Y;
+	if( text->Align==PictureTextAlignLeft ) {
+	    draw=VideoDrawText;
+	} else {
+	    draw=VideoDrawTextCentered;
+	}
+	lines=chlines->Text;
+	while( lines ) {
+	    draw(text->X,y,text->Font,lines->Text);
+	    y+=text->Height;
+	    lines=lines->Next;
+	}
+	text=text->Next;
+	chlines=chlines->Next;
+    }
 }
 
 /**
@@ -678,14 +705,17 @@ local void DrawTitle(const char* act,const char* title)
 **	@param title	Title text
 **	@param picture	Name of the picture file to show.
 */
-global void ShowPicture(const char* act,const char* title,const char* picture)
+global void ShowPicture(CampaignChapter* chapter)
 {
     EventCallback callbacks;
     Graphic* background;
     int old_video_sync;
-    int do_fade_out;
-    int maxi;
+    int max;
     int i;
+    int j;
+    ChapterTextLines* lines;
+    ChapterTextLines** linesptr;
+    ChapterPictureText* text;
 
     UseContinueButton=0;
 
@@ -704,95 +734,94 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
-    background=LoadGraphic(picture);
+    background=LoadGraphic(chapter->Data.Picture.Image);
     ResizeGraphic(background,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
     MakeTexture(background,background->Width,background->Height);
 #endif
-    do_fade_out=1;
-
-    //
-    // Show title then fade in background
-    //
-    VideoLockScreen();
-    VideoClearScreen();
-    DrawTitle(act,title);
-    VideoUnlockScreen();
-
-    Invalidate();
-    RealizeVideoMemory();
     IntroNoEvent=1;
-    i=0;
-    maxi=2*30;
-    while( IntroNoEvent && i<maxi ) {
-	WaitEventsOneFrame(&callbacks);
-	i++;
-    }
-    if( !IntroNoEvent ) {
-	do_fade_out=0;
+
+    text=chapter->Data.Picture.Text;
+    linesptr=&lines;
+    while( text ) {
+	(*linesptr)=calloc(sizeof(ChapterTextLines),1);
+	SplitTextIntoLines(text->Text,text->Width, &(*linesptr)->Text);
+	linesptr=&((*linesptr)->Next);
+	text=text->Next;
     }
 
+    //
+    //	Fade in background and title
+    //
     i=0;
-    maxi=1*30;
-    while( IntroNoEvent && i<maxi ) {
+    max=chapter->Data.Picture.FadeIn;
+    while( IntroNoEvent && i<max ) {
 	VideoLockScreen();
 	VideoDrawSubClipFaded(background,0,0,
 	    background->Width,background->Height,
 	    (VideoWidth-background->Width)/2,
 	    (VideoHeight-background->Height)/2,
-	    255*i/maxi);
-	DrawTitle(act,title);
+	    255*i/max);
+	DrawText(chapter,lines);
 	VideoUnlockScreen();
 
 	Invalidate();
 	RealizeVideoMemory();
 
 	WaitEventsOneFrame(&callbacks);
-	i++;
+	++i;
     }
+    i=chapter->Data.Picture.FadeOut*i/max;
 
     //
     //	Draw background and title
     //
-    if( IntroNoEvent ) {
+    j=0;
+    max=chapter->Data.Picture.DisplayTime;
+    while( IntroNoEvent && j<max ) {
 	VideoLockScreen();
 	VideoDrawSubClip(background,0,0,
 	    background->Width,background->Height,
 	    (VideoWidth-background->Width)/2,
 	    (VideoHeight-background->Height)/2);
-	DrawTitle(act,title);
+	DrawText(chapter,lines);
 	VideoUnlockScreen();
 
 	Invalidate();
 	RealizeVideoMemory();
 
-	while( IntroNoEvent ) {
-	    WaitEventsOneFrame(&callbacks);
-	}
+	WaitEventsOneFrame(&callbacks);
+	++j;
     }
 
-    // Fade out background and title
-    if( do_fade_out ) {
-	while( i>=0 ) {
-	    VideoLockScreen();
-	    VideoDrawSubClipFaded(background,0,0,
-		background->Width,background->Height,
-		(VideoWidth-background->Width)/2,
-		(VideoHeight-background->Height)/2,
-		255*i/maxi);
-	    DrawTitle(act,title);
-	    VideoUnlockScreen();
+    //
+    //	Fade out background and title
+    //
+    max=chapter->Data.Picture.FadeOut;
+    while( i>=0 ) {
+	VideoLockScreen();
+	VideoDrawSubClipFaded(background,0,0,
+	    background->Width,background->Height,
+	    (VideoWidth-background->Width)/2,
+	    (VideoHeight-background->Height)/2,
+	    255*i/max);
+	DrawText(chapter,lines);
+	VideoUnlockScreen();
 
-	    Invalidate();
-	    RealizeVideoMemory();
+	Invalidate();
+	RealizeVideoMemory();
 
-	    WaitEventsOneFrame(&callbacks);
-	    i--;
-	}
+	WaitEventsOneFrame(&callbacks);
+	--i;
     }
-
 
     VideoFree(background);
+
+    linesptr=&lines;
+    while( *linesptr ) {
+	FreeTextLines(&(*linesptr)->Text);
+	linesptr=&((*linesptr)->Next);
+    }
 
     VideoLockScreen();
     VideoClearScreen();
@@ -864,9 +893,9 @@ local int GameStatsDrawFunc(int frame)
 	dodraw=frame/stats_pause;
     }
 
-    for( i=0,c=0; i<PlayerMax; i++) {
+    for( i=0,c=0; i<PlayerMax; ++i) {
 	if(Players[i].Type==PlayerPerson || Players[i].Type==PlayerComputer) {
-	    c++;
+	    ++c;
 	}
     }
     if( c<=4 ) {
@@ -938,7 +967,7 @@ local int GameStatsDrawFunc(int frame)
 
     if( dodraw==4 || (draw_all && dodraw>=4) ) {
 	max=Players[0].TotalUnits;
-	for( i=1; i<PlayerMax; i++ ) {
+	for( i=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
@@ -959,7 +988,7 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalUnits*100/max;
 	DrawStatBox(x+10,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; i++ ) {
+	for( i=0,c=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
 		    (p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
@@ -976,13 +1005,13 @@ local int GameStatsDrawFunc(int frame)
 	    percent=p->TotalUnits*100/max;
 	    DrawStatBox(x+10,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
-	    c++;
+	    ++c;
 	}
     }
 
     if( dodraw==5 || (draw_all && dodraw>=5) ) {
 	max=Players[0].TotalBuildings;
-	for( i=1; i<PlayerMax; i++ ) {
+	for( i=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
@@ -1000,7 +1029,7 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalBuildings*100/max;
 	DrawStatBox(x+100,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; i++ ) {
+	for( i=0,c=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
@@ -1010,13 +1039,13 @@ local int GameStatsDrawFunc(int frame)
 	    percent=p->TotalBuildings*100/max;
 	    DrawStatBox(x+100,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
-	    c++;
+	    ++c;
 	}
     }
 
     if( dodraw==6 || (draw_all && dodraw>=6) ) {
 	max=Players[0].TotalResources[GoldCost];
-	for( i=1; i<PlayerMax; i++ ) {
+	for( i=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
@@ -1034,7 +1063,7 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalResources[GoldCost]*100/max;
 	DrawStatBox(x+190,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; i++ ) {
+	for( i=0,c=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
@@ -1044,13 +1073,13 @@ local int GameStatsDrawFunc(int frame)
 	    percent=p->TotalResources[GoldCost]*100/max;
 	    DrawStatBox(x+190,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
-	    c++;
+	    ++c;
 	}
     }
 
     if( dodraw==7 || (draw_all && dodraw>=7) ) {
 	max=Players[0].TotalResources[WoodCost];
-	for( i=1; i<PlayerMax; i++ ) {
+	for( i=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
@@ -1068,7 +1097,7 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalResources[WoodCost]*100/max;
 	DrawStatBox(x+280,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; i++ ) {
+	for( i=0,c=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
@@ -1078,13 +1107,13 @@ local int GameStatsDrawFunc(int frame)
 	    percent=p->TotalResources[WoodCost]*100/max;
 	    DrawStatBox(x+280,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
-	    c++;
+	    ++c;
 	}
     }
 
     if( dodraw==8 || (draw_all && dodraw>=8) ) {
 	max=Players[0].TotalResources[OilCost];
-	for( i=1; i<PlayerMax; i++ ) {
+	for( i=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
@@ -1102,7 +1131,7 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalResources[OilCost]*100/max;
 	DrawStatBox(x+370,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; i++ ) {
+	for( i=0,c=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
@@ -1112,13 +1141,13 @@ local int GameStatsDrawFunc(int frame)
 	    percent=p->TotalResources[OilCost]*100/max;
 	    DrawStatBox(x+370,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
-	    c++;
+	    ++c;
 	}
     }
 
     if( dodraw==9 || (draw_all && dodraw>=9) ) {
 	max=Players[0].TotalKills;
-	for( i=1; i<PlayerMax; i++ ) {
+	for( i=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
@@ -1136,7 +1165,7 @@ local int GameStatsDrawFunc(int frame)
 	sprintf(buf,"%u",ThisPlayer->TotalKills);
 	DrawStatBox(x+460,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; i++ ) {
+	for( i=0,c=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
@@ -1146,13 +1175,13 @@ local int GameStatsDrawFunc(int frame)
 	    percent=p->TotalKills*100/max;
 	    DrawStatBox(x+460,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
-	    c++;
+	    ++c;
 	}
     }
 
     if( dodraw==10 || (draw_all && dodraw>=10) ) {
 	max=Players[0].TotalRazings;
-	for( i=1; i<PlayerMax; i++ ) {
+	for( i=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer ) {
 		continue;
@@ -1170,7 +1199,7 @@ local int GameStatsDrawFunc(int frame)
 	percent=ThisPlayer->TotalRazings*100/max;
 	DrawStatBox(x+550,y+bottom_offset+description_offset,buf,
 	            ThisPlayer->Color,percent);
-	for( i=0,c=1; i<PlayerMax; i++ ) {
+	for( i=0,c=1; i<PlayerMax; ++i ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
@@ -1180,7 +1209,7 @@ local int GameStatsDrawFunc(int frame)
 	    percent=p->TotalRazings*100/max;
 	    DrawStatBox(x+550,y+bottom_offset+description_offset+line_spacing*c,
 	                buf,p->Color,percent);
-	    c++;
+	    ++c;
 	}
 	done=1;
     }
@@ -1258,7 +1287,7 @@ global void ShowStats(void)
 	}
 
 	WaitEventsOneFrame(&callbacks);
-	frame++;
+	++frame;
     }
 
     VideoFree(background);
