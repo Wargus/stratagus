@@ -98,7 +98,7 @@ global int SpellTypeCount;
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused)),
-    Unit* target __attribute__((unused)), int x, int y)
+	const SpellActionType* action,Unit* target __attribute__((unused)), int x, int y)
 {
     // FIXME: vladi: cop should be placed only on explored land
     Unit* portal;
@@ -146,7 +146,7 @@ global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((u
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastAreaBombardment(Unit* caster, const SpellType* spell,
-    Unit* target __attribute__((unused)), int x, int y)
+	const SpellActionType* action,Unit* target __attribute__((unused)), int x, int y)
 {
     int fields;
     int shards;
@@ -198,13 +198,47 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 	    caster->Refs++;
 	}
     }
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    caster->Mana -= spell->ManaCost;
     return caster->Mana > spell->ManaCost;
 }
 
 /**
-**	Cast fireball.
+**	Evaluate missile location description.
+**
+**	@param caster	Unit that casts the spell
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@param resx	pointer to X coord of the result
+**	@param resy	pointer to Y coord of the result
+*/
+local void EvaluateMissileLocation(const SpellActionMissileLocation* location,
+	Unit* caster,Unit* target, int x, int y,int* resx, int* resy)
+{
+    if (location->Base==LocBaseCaster) {
+	*resx = caster->X * TileSizeX + TileSizeX / 2;
+	*resy = caster->Y * TileSizeY + TileSizeY / 2;
+    } else {
+	if (target) {
+	    *resx = target->X * TileSizeX + TileSizeX / 2;
+	    *resy = target->Y * TileSizeY + TileSizeY / 2;
+	} else {
+	    *resx = x * TileSizeX + TileSizeX / 2;
+	    *resy = y * TileSizeY + TileSizeY / 2;
+	}
+    }
+    *resx += location->AddX;
+    if (location->AddRandX) {
+	*resx += rand()%location->AddRandX;
+    }
+    *resy += location->AddY;
+    if (location->AddRandY) {
+	*resy += rand()%location->AddRandY;
+    }
+}
+
+/**
+**	Cast spawn missile.
 **
 **	@param caster	Unit that casts the spell
 **	@param spell	Spell-type pointer
@@ -214,12 +248,14 @@ global int CastAreaBombardment(Unit* caster, const SpellType* spell,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastFireball(Unit* caster, const SpellType* spell,
-    Unit* target __attribute__((unused)), int x, int y)
+global int CastSpawnMissile(Unit* caster, const SpellType* spell,
+	const SpellActionType* action, Unit* target, int x, int y)
 {
     Missile* missile;
     int sx;
     int sy;
+    int dx;
+    int dy;
 
     DebugCheck(!caster);
     DebugCheck(!spell);
@@ -228,60 +264,19 @@ global int CastFireball(Unit* caster, const SpellType* spell,
 
     missile = NULL;
 
-    // NOTE: fireball can be casted on spot
-    sx = caster->X * TileSizeX + TileSizeX / 2;
-    sy = caster->Y * TileSizeY + TileSizeY / 2;
-    x = x * TileSizeX + TileSizeX / 2;
-    y = y * TileSizeY + TileSizeY / 2;
-    caster->Mana -= spell->ManaCost;
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    missile = MakeMissile(spell->Missile, sx, sy, x, y);
-//    missile->TTL = spell->Action->Data.Fireball.TTL;
-    missile->Damage = spell->Action->Data.Fireball.Damage;
+    EvaluateMissileLocation(&action->Data.SpawnMissile.StartPoint,
+	    caster,target,x,y,&sx,&sy);
+    EvaluateMissileLocation(&action->Data.SpawnMissile.EndPoint,
+	    caster,target,x,y,&dx,&dy);
+
+    missile = MakeMissile(spell->Missile, sx, sy, dx, dy);
+    missile->TTL = action->Data.SpawnMissile.TTL;
+    missile->Delay = action->Data.SpawnMissile.Delay;
+    missile->Damage = action->Data.SpawnMissile.Damage;
     missile->SourceUnit = caster;
+    missile->TargetUnit = target;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
     caster->Refs++;
-    return 0;
-}
-
-/**
-**	Cast flame shield.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
-    int x __attribute__((unused)), int y __attribute__((unused)))
-{
-    Missile* mis;
-    int	i;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->Action);
-    DebugCheck(!target);
-//  DebugCheck(x in range, y in range);
-    DebugCheck(!spell->Missile);
-
-    mis = NULL;
-
-    // get mana cost
-    caster->Mana -= spell->ManaCost;
-    target->FlameShield = spell->Action->Data.FlameShield.TTL;
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    for (i = 0; i < 5; ++i) {
-	mis = MakeMissile(spell->Missile, 0, 0, 0, 0);
-	mis->TTL = spell->Action->Data.FlameShield.TTL + i * 7;
-	mis->TargetUnit = target;
-	mis->Damage = spell->Action->Data.FlameShield.Damage;
-	RefsDebugCheck(!target->Refs || target->Destroyed);
-	target->Refs++;
-    }
     return 0;
 }
 
@@ -296,16 +291,13 @@ global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastAdjustBuffs(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
+	const SpellActionType* action, Unit* target, int x, int y)
 {
     DebugCheck(!caster);
     DebugCheck(!spell);
     DebugCheck(!spell->Action);
     DebugCheck(!target);
-
-    // get mana cost
-    caster->Mana -= spell->ManaCost;
 
     if (spell->Action->Data.AdjustBuffs.HasteTicks!=BUFF_NOT_AFFECTED) {
 	target->Haste = spell->Action->Data.AdjustBuffs.HasteTicks;
@@ -323,7 +315,6 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell, Unit* target,
 	target->UnholyArmor = spell->Action->Data.AdjustBuffs.InvincibilityTicks;
     }
     CheckUnitToBeDrawn(target);
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	x * TileSizeX+TileSizeX / 2, y * TileSizeY+TileSizeY / 2,
 	x * TileSizeX+TileSizeX / 2, y * TileSizeY+TileSizeY / 2);
@@ -341,8 +332,8 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastAdjustVitals(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastAdjustVitals(Unit* caster, const SpellType* spell,
+	const SpellActionType* action,Unit* target,int x, int y)
 {
     int castcount;
     int diffHP;
@@ -415,7 +406,6 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell, Unit* target,
 
     DebugLevel3Fn("Unit now has %d hp and %d mana.\n" _C_
 	target->HP _C_ target->Mana);
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
@@ -433,8 +423,8 @@ global int CastAdjustVitals(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastPolymorph(Unit* caster, const SpellType* spell,
+	const SpellActionType* action, Unit* target,int x, int y)
 {
     UnitType* type;
 
@@ -466,61 +456,9 @@ global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,
     if (UnitTypeCanMoveTo(x, y, type)) {
 	MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
     }
-    caster->Mana -= spell->ManaCost;
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    return 0;
-}
-
-/**
-**	Cast runes.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastRunes(Unit* caster, const SpellType* spell,
-    Unit* target __attribute__((unused)), int x, int y)
-{
-    Missile* mis;
-    const int xx[] = {-1,+1, 0, 0, 0};
-    const int yy[] = { 0, 0, 0,-1,+1};
-    int oldx;
-    int oldy;
-    int i;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->Action);
-//  DebugCheck(x in range, y in range);
-
-    mis = NULL;
-    oldx = x;
-    oldy = y;
-
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    for (i = 0; i < 5; ++i) {
-	x = oldx + xx[i];
-	y = oldy + yy[i];
-	    
-	if (IsMapFieldEmpty(x, y)) {
-	    mis = MakeMissile(spell->Missile,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2);
-	    mis->TTL = spell->Action->Data.Runes.TTL;
- 	    mis->Damage = spell->Action->Data.Runes.Damage;
- 	    mis->SourceUnit = caster;
-	    caster->Mana -= spell->ManaCost / 5;
-	}
-    }
     return 0;
 }
 
@@ -535,8 +473,8 @@ global int CastRunes(Unit* caster, const SpellType* spell,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastSummon(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastSummon(Unit* caster, const SpellType* spell,
+	const SpellActionType* action,Unit* target,int x, int y)
 {
     int ttl;
     int cansummon;
@@ -611,44 +549,9 @@ global int CastSummon(Unit* caster, const SpellType* spell, Unit* target,
 	caster->Mana -= spell->ManaCost;
     }
 
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    return 0;
-}
-
-/**
-**	Cast whirlwind.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastWhirlwind(Unit* caster, const SpellType* spell,
-    Unit* target __attribute__((unused)), int x, int y)
-{
-    Missile* mis;
-
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->Action);
-//  DebugCheck(x in range, y in range);
-
-    mis = NULL;
-
-    caster->Mana -= spell->ManaCost;
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    mis = MakeMissile(spell->Missile,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    mis->TTL = spell->Action->Data.Whirlwind.TTL;
-    mis->Damage = spell->Action->Data.Whirlwind.Damage;
-    mis->SourceUnit = caster;
     return 0;
 }
 
@@ -1144,6 +1047,7 @@ global int AutoCastSpell(Unit* caster, const SpellType* spell)
 global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
+    SpellActionType* act;
     DebugCheck(!spell);
     DebugCheck(!spell->Action->CastFunction);
     DebugCheck(!caster);
@@ -1159,8 +1063,21 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
     }
     DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->IdentName _C_
 	unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
-    return CanCastSpell(caster, spell, target, x, y) &&
-	spell->Action->CastFunction(caster, spell, target, x, y);
+    if (CanCastSpell(caster, spell, target, x, y)) {
+	act=spell->Action;
+	//
+	//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
+	//
+	if (act->CastFunction!=CastAdjustVitals) {
+	    caster->Mana -= spell->ManaCost;
+	}
+	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
+	while (act) {
+	    act->CastFunction(caster, spell, act, target, x, y);
+	    act=act->Next;
+	}
+    }
+    return 0;
 }
 
 /*
