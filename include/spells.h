@@ -291,9 +291,6 @@ extern void SpellCclRegister(void);
 /// init spell tables
 extern void InitSpells(void);
 
-/// save spell tables
-extern void SaveSpells(CLFile * file);
-
 /// done spell tables
 extern void CleanSpells(void);
 

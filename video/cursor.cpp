@@ -820,51 +820,6 @@ global void InitVideoCursors(void)
 }
 
 /**
-**  Save cursor state.
-*/
-global void SaveCursors(CLFile* file)
-{
-#if 0
-	int i;
-
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: cursors $Id$\n\n");
-
-	for (i = 0; Cursors[i].OType; ++i) {
-		CLprintf(file, "(define-cursor '%s '%s\n",
-			Cursors[i].Ident, Cursors[i].Race ? Cursors[i].Race : "any");
-		CLprintf(file, "  'image \"%s\"\n", Cursors[i].File);
-		CLprintf(file, "  'hot-spot '(%d %d) ", Cursors[i].HotX, Cursors[i].HotY);
-		CLprintf(file, "'size '(%d %d) ", Cursors[i].Width, Cursors[i].Height);
-		CLprintf(file, ")\n\n");
-	}
-
-	// Not ready:
-	CLprintf(file, ";;(set-game-cursor! '%s)\n", GameCursor->Ident);
-	// FIXME: what about the other variables???
-	switch (CursorState) {
-		case CursorStatePoint:
-			CLprintf(file, ";;(cursor-state 'point)\n");
-			break;
-		case CursorStateSelect:
-			CLprintf(file, ";;(cursor-state 'select)\n");
-			break;
-		case CursorStateRectangle:
-			CLprintf(file, ";;(cursor-state 'rectangle)\n");
-			break;
-	}
-	CLprintf(file, ";;(cursor-action %d)\n", CursorAction);
-	CLprintf(file, ";;(cursor-value %d)\n", CursorValue);
-	CLprintf(file, ";;(cursor-building '%s)\n",
-		CursorBuilding ? CursorBuilding->Ident : "()");
-	CLprintf(file, ";;(cursor-position '(%d %d)\n", CursorX, CursorY);
-	CLprintf(file, ";;(cursor-start '(%d %d)\n", CursorStartX, CursorStartY);
-	CLprintf(file, ";;(unit-under-cursor %s\n",
-		UnitUnderCursor ? UnitReference(UnitUnderCursor) : "()");
-#endif
-}
-
-/**
 **  Cleanup cursor module
 */
 global void CleanCursors(void)
