@@ -397,8 +397,10 @@ global void DrawButtonPanel(void)
 	    }
 	    //
 	    //	Any better ideas?
-	    //	Show the current action state of the unit
-	    //	with the buttons.
+	    //	Show the current action state of the unit with the buttons.
+	    //
+	    //	FIXME: Must also show, if all units have the same action!!!
+	    //	FIXME: very useful for contolling stand and stop.
 	    //
 	    if( NumSelected==1 ) {
 		switch( buttons[i].Action ) {
