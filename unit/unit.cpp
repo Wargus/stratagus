@@ -1867,7 +1867,7 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
 	}
     }
     if (!nb) {	//Check if there actually is a building.
-	DebugLevel0Fn("No building?");
+	DebugLevel0Fn("No building?\n");
 	x=unit->X;
 	y=unit->Y;
     }
