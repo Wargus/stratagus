@@ -309,9 +309,19 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	const unsigned char* sp;
 	int fl;
 	Uint32 ckey;
+	int bpp;
+	int size;
+
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
+	if (width > size || height > size) {
+		DebugLevel0Fn("Image too large (%d,%d), max size: %d\n" _C_
+			width _C_ height _C_ size);
+		return;
+	}
 
 	n = (graphic->Width / width) * (graphic->Height / height);
 	fl = graphic->Width / width;
+	bpp = graphic->Surface->format->BytesPerPixel;
 	ckey = graphic->Surface->format->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -337,23 +347,34 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		SDL_LockSurface(graphic->Surface);
 		for (i = 0; i < height; ++i) {
-			sp = (const unsigned char*)graphic->Surface->pixels + (x % fl) * width +
+			sp = (const unsigned char*)graphic->Surface->pixels + (x % fl) * width * bpp +
 				((x / fl) * height + i) * graphic->Surface->pitch;
 			for (j = 0; j < width; ++j) {
 				int c;
 				SDL_Color p;
 
 				c = i * w * 4 + j * 4;
-				if (*sp == ckey) {
-					tex[c + 3] = 0;
+				if (bpp == 1) {
+					if (*sp == ckey) {
+						tex[c + 3] = 0;
+					} else {
+						p = graphic->Surface->format->palette->colors[*sp];
+						tex[c + 0] = p.r;
+						tex[c + 1] = p.g;
+						tex[c + 2] = p.b;
+						tex[c + 3] = 0xff;
+					}
+					++sp;
 				} else {
-					p = graphic->Surface->format->palette->colors[*sp];
-					tex[c + 0] = p.r;
-					tex[c + 1] = p.g;
-					tex[c + 2] = p.b;
-					tex[c + 3] = 0xff;
+					tex[c + 0] = *sp++;
+					tex[c + 1] = *sp++;
+					tex[c + 2] = *sp++;
+					if (bpp == 4) {
+						tex[c + 3] = *sp++;
+					} else {
+						tex[c + 3] = 0xff;
+					}
 				}
-				++sp;
 			}
 		}
 		SDL_UnlockSurface(graphic->Surface);
