@@ -236,9 +236,7 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 /**
 **	Play music from cdrom.
 **
-**	CDModeAll CDModeRandom CDModeOff
-**
-**	@param name	Name starting with ":".
+**	@param name	CDModeAll CDModeRandom CDModeDefined CDModeOff.
 **
 **	@return		True if name is handled by the cdrom module.
 */
@@ -266,8 +264,9 @@ global int PlayCDRom(int name)
     // if mode is play all tracks
     if (name == CDModeAll) {
         CDMode = CDModeAll;
-        if (SDL_CDPlayTracks(CDRom, 0, 0, 0, 0) < 0)
+        if (SDL_CDPlayTracks(CDRom, 0, 0, 0, 0) < 0) {
     	    CDMode = CDModeStopped;
+	}
 	return 1;
     }
     // if mode is play random tracks
@@ -282,6 +281,7 @@ global int PlayCDRom(int name)
     // if mode is defined (not supported with USE_SDLCD)
     if (name == CDModeDefined) {
 	CDMode = CDModeRandom;
+	return 1;
     }
     return 0;
 }
@@ -289,9 +289,7 @@ global int PlayCDRom(int name)
 /**
 **	Play music from cdrom.
 **
-**	CDModeAll CDModeRandom CDModeDefined CDModeOff
-**
-**	@param name	Name starting with ":".
+**	@param name	CDModeAll CDModeRandom CDModeDefined CDModeOff.
 **
 **	@return		True if name is handled by the cdrom module.
 */
@@ -327,18 +325,21 @@ global int PlayCDRom(int name)
 
     StopMusic();
 
-    if (cd_get_tracks(NULL, NULL) == -1)
+    if (cd_get_tracks(NULL, NULL) == -1) {
         return 1;
+    }
 
     // if mode is play all tracks
     if (name == CDModeAll) {
         CDMode = CDModeAll;
 	do {
-	    if (CDTrack >= NumCDTracks)
+	    if (CDTrack >= NumCDTracks) {
 	        CDTrack = 0;
+	    }
 	} while (cd_is_audio(++CDTrack) < 1);
-	if (cd_play(CDTrack))
+	if (cd_play(CDTrack)) {
 	    CDMode = CDModeStopped;
+	}
 	return 1;
     }
     // if mode is play random tracks
@@ -347,8 +348,9 @@ global int PlayCDRom(int name)
         do {
 	    CDTrack = MyRand() % NumCDTracks;
 	} while (cd_is_audio(CDTrack) < 1);
-	if (cd_play(CDTrack))
+	if (cd_play(CDTrack)) {
 	    CDMode = CDModeStopped;
+	}
 	return 1;
     }
 
@@ -363,9 +365,7 @@ global int PlayCDRom(int name)
 /**
 **	Play music from cdrom.
 **
-**	CDModeAll CDModeRandom CDModeOff
-**
-**	@param name	Name starting with ":".
+**	@param name	CDModeAll CDModeRandom CDModeDefined CDModeOff.
 **
 **	@return		True if name is handled by the cdrom module.
 */
@@ -403,8 +403,9 @@ local int PlayCDRom(const char* name)
 	if (!strcmp(name, ":all")) {
 	    CDMode = CDModeAll;
 	    do {
-		if (CDTrack >= NumCDTracks)
+		if (CDTrack >= NumCDTracks) {
 		    CDTrack = 0;
+		}
 	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
 	}
 	// if mode is play random tracks
