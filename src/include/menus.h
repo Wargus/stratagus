@@ -40,9 +40,10 @@ typedef unsigned MenuButtonId;
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
-#define MBUTTON_MAIN	4
-#define MBUTTON_GM_HALF	10
-#define MBUTTON_GM_FULL	16
+#define MBUTTON_MAIN		 4
+#define MBUTTON_GM_HALF		10
+#define MBUTTON_132		13
+#define MBUTTON_GM_FULL		16
 
 /*----------------------------------------------------------------------------
 --	Menus
@@ -87,10 +88,12 @@ typedef struct _menuitem_ {
 **	Menu definition.
 */
 typedef struct _menus_ {
-    unsigned x;				/// panel x pos
-    unsigned y;				/// panel y pos
-    int	image;				/// panel image
-    enum MustRedraw_e area;		/// invalidate area for redraws
+    unsigned x;				/// menu area x pos
+    unsigned y;				/// menu area y pos
+    unsigned xsize;			/// menu area x size
+    unsigned ysize;			/// menu area y size
+    int	image;				/// optional background panel image #
+    int defsel;				/// initial selected item number (or -1)
     int nitems;				/// number of items to follow
     Menuitem *items;			/// buttons, etc
 } Menu;
@@ -99,7 +102,8 @@ typedef struct _menus_ {
 #define MENU_GAME 0
 #define MENU_VICTORY 1
 #define MENU_LOST 2
-#define MENU_MAX  2			/// highest available menu id (for ccl)
+#define MENU_SCEN_SELECT 3		/// FIXME: WIP
+#define MENU_MAX  3			/// highest available menu id (for ccl)
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
