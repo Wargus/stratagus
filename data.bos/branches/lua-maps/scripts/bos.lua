@@ -40,8 +40,6 @@ DefineRaceNames(
 		"display", "Neutral"}
 )
 
-DefineTilesetWcNames("tileset-desert", "tileset-winter")
-
 SetColorWaterCycleStart(38)
 SetColorWaterCycleEnd(47)
 SetColorIconCycleStart(240)

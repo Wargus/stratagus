@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: stratagus.lua,v 1.23 2004/12/12 20:05:57 feb Exp $
+--	$Id$
 
 -- For documentation see stratagus/doc/ccl/ccl.html
 
@@ -194,9 +194,8 @@ end
 --	Tables-Part
 -------------------------------------------------------------------------------
 SetFogOfWarGraphics("general/fog.png")
-DefineTileset("tileset-desert", "class", "desert", "name", "Desert", "file", "scripts/tilesets/desert.lua")
--- FIXME: todo winter
-DefineTileset("tileset-winter", "class", "winter", "name", "Winter (incomplete)", "file", "scripts/tilesets/winter.lua")
+--DefineTileset("tileset-desert", "class", "desert", "name", "Desert", "file", "scripts/tilesets/desert.lua")
+--DefineTileset("tileset-winter", "class", "winter", "name", "Winter (incomplete)", "file", "scripts/tilesets/winter.lua")
 
 Load("preferences1.lua")
 
