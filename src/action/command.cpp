@@ -123,7 +123,7 @@ static void ClearSavedAction(Unit* unit)
 {
 	ReleaseOrder(&unit->SavedOrder);
 
-	unit->SavedOrder.Action = UnitActionStill;		// clear saved action
+	unit->SavedOrder.Action = UnitActionStill; // clear saved action
 	unit->SavedOrder.X = unit->SavedOrder.Y = -1;
 	unit->SavedOrder.Type = NULL;
 	unit->SavedOrder.Arg1 = NULL;
@@ -144,7 +144,7 @@ void CommandStopUnit(Unit* unit)
 
 	// Ignore that the unit could be removed.
 
-	order = GetNextOrder(unit, FlushCommands);		// Flush them.
+	order = GetNextOrder(unit, FlushCommands); // Flush them.
 	order->Action = UnitActionStill;
 	order->X = order->Y = -1;
 	order->Goal = NoUnitP;
@@ -588,7 +588,7 @@ void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
 		//
-		//	For bunkers, don't go into an action. Just drop everything here and now.
+		// For bunkers, don't go into an action. Just drop everything here and now.
 		//
 		if (unit->Type->Building) {
 			int i;
@@ -837,7 +837,7 @@ void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 		order->X = order->Y = -1;
 		order->Goal = NoUnitP;
 		//
-		//		Destination could be killed. NETWORK!
+		// Destination could be killed. NETWORK!
 		//
 		if (goal && !goal->Destroyed) {
 			order->Goal = goal;
@@ -865,8 +865,8 @@ void CommandTrainUnit(Unit* unit, UnitType* type,
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
 		//
-		//		Check if enough resources remains? (NETWORK!)
-		//		FIXME: wrong if append to message queue!!!
+		// Check if enough resources remains? (NETWORK!)
+		// FIXME: wrong if append to message queue!!!
 		//
 		if (PlayerCheckLimits(unit->Player, type) < 0 ||
 				PlayerCheckUnitType(unit->Player, type)) {
@@ -931,7 +931,7 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 	if (unit->Orders[0].Action == UnitActionTrain) {
 		n = unit->Data.Train.Count;
 		Assert(n >= 1);
-		if (slot == -1) {				// default last slot!
+		if (slot == -1) { // default last slot!
 			slot += n;
 		}
 		//
@@ -953,9 +953,9 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 			for (i = slot; i < n; ++i) {
 				unit->Data.Train.What[i] = unit->Data.Train.What[i + 1];
 			}
-			if (!slot) {				// Canceled in work slot
+			if (!slot) { // Canceled in work slot
 				unit->Data.Train.Ticks = 0;
-				unit->Wait = unit->Reset = 1;		// immediately start next training
+				unit->Wait = unit->Reset = 1; // immediately start next training
 			}
 			unit->Data.Train.Count = n;
 		} else {
@@ -1022,7 +1022,7 @@ void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
 */
 void CommandCancelUpgradeTo(Unit* unit)
 {
-	ReleaseOrders(unit);				// empty command queue
+	ReleaseOrders(unit); // empty command queue
 
 	//
 	// Check if unit is still upgrading? (NETWORK!)
@@ -1048,7 +1048,7 @@ void CommandCancelUpgradeTo(Unit* unit)
 			SelectedUnitChanged();
 		}
 
-		unit->Wait = unit->Reset = 1;		// immediately start next command.
+		unit->Wait = unit->Reset = 1; // immediately start next command.
 	}
 	ClearSavedAction(unit);
 }
@@ -1087,7 +1087,7 @@ void CommandResearch(Unit* unit, Upgrade* what, int flush)
 				PlayerAddCostsFactor(unit->Player,upgrade->Costs,
 					CancelResearchCostsFactor);
 				unit->SubAction = 0;
-				unit->Wait = unit->Reset = 1;	// immediately start next command.
+				unit->Wait = unit->Reset = 1; // immediately start next command.
 			}
 		}
 
@@ -1114,7 +1114,7 @@ void CommandResearch(Unit* unit, Upgrade* what, int flush)
 */
 void CommandCancelResearch(Unit* unit)
 {
-	ReleaseOrders(unit);				// empty command queue
+	ReleaseOrders(unit); // empty command queue
 
 	//
 	// Check if unit is still researching? (NETWORK!)
@@ -1143,7 +1143,7 @@ void CommandCancelResearch(Unit* unit)
 			SelectedUnitChanged();
 		}
 
-		unit->Wait = unit->Reset = 1;		// immediately start next command.
+		unit->Wait = unit->Reset = 1; // immediately start next command.
 	}
 	ClearSavedAction(unit);
 }
@@ -1274,7 +1274,7 @@ void CommandSharedVision(int player, int state, int opponent)
 	int i;
 
 	//
-	//	Do a real hardcore seen recount. First we unmark EVERYTHING.
+	// Do a real hardcore seen recount. First we unmark EVERYTHING.
 	//
 	for (i = 0; i < NumUnits; ++i) {
 		if (!Units[i]->Destroyed) {
@@ -1283,7 +1283,7 @@ void CommandSharedVision(int player, int state, int opponent)
 	}
 
 	//
-	//	Compute Before and after.
+	// Compute Before and after.
 	//
 	before = PlayersShareVision(player, opponent);
 	if (state == 0) {
@@ -1295,7 +1295,7 @@ void CommandSharedVision(int player, int state, int opponent)
 
 	if (before && !after) {
 		//
-		//	Don't share vision anymore. Give each other explored terrain for good-bye.
+		// Don't share vision anymore. Give each other explored terrain for good-bye.
 		//
 		for (x = 0; x < TheMap.Width; ++x) {
 			for (y = 0; y < TheMap.Height; ++y) {
@@ -1317,7 +1317,7 @@ void CommandSharedVision(int player, int state, int opponent)
 	}
 
 	//
-	//	Do a real hardcore seen recount. Now we remark EVERYTHING
+	// Do a real hardcore seen recount. Now we remark EVERYTHING
 	//
 	for (i = 0; i < NumUnits; ++i) {
 		if (!Units[i]->Destroyed) {
@@ -1352,7 +1352,7 @@ void CommandQuit(int player)
 			ChangeTeamSelectedUnits(&Players[player], NULL, 0, 0);
 		}
 	}
-	
+
 	if (Players[player].TotalNumUnits != 0) {
 		SetMessage("Player \"%s\" has left the game", Players[player].Name);
 	} else {

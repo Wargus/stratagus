@@ -109,13 +109,13 @@ void HandleActionFollow(Unit* unit)
 		unit->SubAction = 0;
 	}
 
-	if (!unit->SubAction) {			// first entry
+	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
 		NewResetPath(unit);
 		Assert(unit->State == 0);
 	}
 
-	switch (DoActionMove(unit)) {		// reached end-point?
+	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//
 			// Some tries to reach the goal

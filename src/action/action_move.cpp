@@ -133,7 +133,7 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 		UnitCacheRemove(unit);
 
 		//
-		//	Trick for fog of war speed. first mark the new location then unmark the first.
+		// Trick for fog of war speed. first mark the new location then unmark the first.
 		//
 			x = unit->X += xd;
 			y = unit->Y += yd;
@@ -152,7 +152,7 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 				MapUnmarkUnitOnBoardSight(uninside, unit);
 			}
 		//
-		//	End fog of war trick
+		// End fog of war trick
 		//
 
 		x = unit->X += xd;

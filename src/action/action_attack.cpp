@@ -81,9 +81,9 @@ static void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 		PlayUnitSound(unit, VoiceAttacking);
 	}
 
-	if (flags & AnimationMissile) {		// time to fire projectil
+	if (flags & AnimationMissile) { // time to fire projectil
 		FireMissile(unit);
-		unit->Invisible = 0;		// unit is invisible until attacks
+		unit->Invisible = 0; // unit is invisible until attacks
 	}
 }
 
@@ -194,7 +194,7 @@ static int CheckForTargetInRange(Unit* unit)
 			unit->Orders[0].MinRange = unit->Type->MinAttackRange;
 			unit->Orders[0].Range = unit->Stats->AttackRange;
 			unit->Orders[0].X = unit->Orders[0].Y = -1;
-			unit->SubAction |= WEAK_TARGET;				// weak target
+			unit->SubAction |= WEAK_TARGET; // weak target
 			NewResetPath(unit);
 		}
 
