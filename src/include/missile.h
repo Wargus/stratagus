@@ -10,7 +10,7 @@
 //
 /**@name missile.h	-	The missile headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -93,11 +93,13 @@
 **		Class of the missile-type, defines the basic effects of the
 **		missile. Look at the different class identifiers for more
 **		informations (::_missile_class_ ::MissileClassNone ...).
+**		This isn't used if the missile is handled by
+**		Missile::Controller.
 **
 **	MissileType::Delay
 **
-**		Delay after the missile generation, until the missile animation
-**		starts.
+**		Delay in frames after the missile generation, until the
+**		missile animation starts.
 **
 **	MissileType::Sleep
 **
@@ -113,6 +115,8 @@
 **		move, 1 is the slowest speed and 32 the fastest supported
 **		speed. This is how many pixels the missiles moves with each
 **		animation step.
+**		@note Perhaps we should later allow animation scripts for
+**		more complex animations.
 **
 **	MissileType::Range
 **
@@ -162,8 +166,9 @@
 **	Missile::DX Missile::DY
 **
 **		Missile destination on the map in pixels. If
-**		Missile::X==MissileDX and Missile::Y==Missile::DY the missile
-**		stays at its position.
+**		Missile::X==Missile::DX and Missile::Y==Missile::DY the missile
+**		stays at its position. But the movement also depends on
+**		the Missile::Controller and MissileType::Class.
 **
 **	Missile::Type
 **
@@ -174,12 +179,12 @@
 **
 **		Current animation frame of the missile. Animation scripts
 **		aren't currently supported for missiles, everything is
-**		handled by the MissileType::Class. If wanted we can add
-**		animation scripts support to the engine.
+**		handled by the MissileType::Class or Missile::Controller.
+**		If wanted we can add animation scripts support to the engine.
 **
 **	Missile::State
 **
-**		Current state of the missile.
+**		Current state of the missile. Used for a simple state machine.
 **
 **	Missile::Wait
 **
@@ -206,28 +211,34 @@
 **
 **	Missile::TTL
 **
-**	FIXME: not written documentation
+**		Time to live in frames of the missile, if it reaches zero
+**		the missile is automatic removed from the map. If -1 the
+**		missile lives for ever and the lifetime is handled by
+**		Missile::Type:Class or Missile::Controller.
 **
 **	Missile::Controller
 **
-**	FIXME: not written documentation
+**		A function pointer to the function which controls the missile.
+**		Overwrites Missile::Type:Class.
 **
 **	Missile::D
 **
-**	FIXME: not written documentation
+**		Delta for Bresenham's line algorithm (point to point missiles).
 **
 **	Missile::Dx Missile::Dy
 **
-**	FIXME: not written documentation
+**		Delta x and y for Bresenham's line algorithm (point to point
+**		missiles).
 **
 **	Missile::Xstep Missile::Ystep
 **
-**	FIXME: not written documentation
+**		X and y step for Bresenham's line algorithm (point to point
+**		missiles).
 **
 **	Missile::Local
 **
 **		This is a local missile, which can be different on all
-**		computer in play. Used for user interface.
+**		computer in play. Used for the user interface.
 **
 **	Missile::MissileSlot
 **
@@ -259,7 +270,7 @@ typedef struct _missile_type_ MissileType;
 
     ///		Base structure of missile-types
 struct _missile_type_ {
-    const void* OType;			/// Object type (future extensions)
+    const void* OType;			/// object type (future extensions)
 
     char*	Ident;			/// missile name
     char*	File;			/// missile sprite file
@@ -281,8 +292,8 @@ struct _missile_type_ {
     int		Speed;			/// missile speed
 
     int		Range;			/// missile damage range
-    char*	ImpactName;		/// Impact missile-type name
-    MissileType*ImpactMissile;		/// Missile produces an impact
+    char*	ImpactName;		/// impact missile-type name
+    MissileType*ImpactMissile;		/// missile produces an impact
 
 // --- FILLED UP ---
     Graphic*	Sprite;			/// missile sprite image
