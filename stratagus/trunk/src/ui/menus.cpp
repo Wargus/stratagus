@@ -1450,7 +1450,10 @@ global void SoundOptions(void)
 
 local void GlobalOptions(void)
 {
-    ProcessMenu("menu-global-options", 1);
+    if (InterfaceState == IfaceStateMenu)
+	ProcessMenu("menu-global-options", 0);
+    else
+	ProcessMenu("menu-global-options", 1);
 }
 
 local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
@@ -1464,6 +1467,13 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 #endif
     menu = FindMenu("menu-global-options");
     
+    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[15].d.gem.state = MI_GSTATE_UNCHECKED;
+    menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
 
     if (VideoWidth == 640)
 	menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
@@ -1480,6 +1490,11 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
     if (flags & SDL_FULLSCREEN)
 	menu->items[12].d.gem.state = MI_GSTATE_CHECKED;
 #endif
+
+    if (OriginalFogOfWar)
+	menu->items[15].d.gem.state = MI_GSTATE_CHECKED;
+    else
+	menu->items[17].d.gem.state = MI_GSTATE_CHECKED;
 }
 
 local void SetRes640(Menuitem *mi __attribute__((unused)))
@@ -1493,14 +1508,8 @@ local void SetRes640(Menuitem *mi __attribute__((unused)))
 #endif
     menu = FindMenu("menu-global-options");
     
-    menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
-    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
-
     if (VideoWidth != 640) {
-	VideoWidth=600;
+	VideoWidth=640;
 	VideoHeight=480;
 	InitVideo();
 #ifdef USE_SDL
@@ -1508,7 +1517,7 @@ local void SetRes640(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
-
+    GlobalOptions();
 }
 
 local void SetRes800(Menuitem *mi __attribute__((unused)))
@@ -1522,12 +1531,6 @@ local void SetRes800(Menuitem *mi __attribute__((unused)))
 #endif
     menu = FindMenu("menu-global-options");    
     
-    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
-    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
-    
     if (VideoWidth != 800) {
 	VideoWidth=800;
 	VideoHeight=600;
@@ -1537,6 +1540,7 @@ local void SetRes800(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    GlobalOptions();
 }
 
 local void SetRes1024(Menuitem *mi __attribute__((unused)))
@@ -1550,12 +1554,6 @@ local void SetRes1024(Menuitem *mi __attribute__((unused)))
 #endif
     menu = FindMenu("menu-global-options");
 
-    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
-    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
-
     if (VideoWidth != 1024) {
 	VideoWidth=1024;
 	VideoHeight=768;
@@ -1565,6 +1563,7 @@ local void SetRes1024(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    GlobalOptions();
 }
 
 local void SetRes1280(Menuitem *mi __attribute__((unused)))
@@ -1578,12 +1577,6 @@ local void SetRes1280(Menuitem *mi __attribute__((unused)))
 #endif
     menu = FindMenu("menu-global-options");    
 
-    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
-    menu->items[10].d.gem.state = MI_GSTATE_UNCHECKED;
-
     if (VideoWidth != 1280) {
 	VideoWidth=1280;
 	VideoHeight=960;
@@ -1593,6 +1586,7 @@ local void SetRes1280(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    GlobalOptions();
 }
 
 local void SetRes1600(Menuitem *mi __attribute__((unused)))
@@ -1605,12 +1599,6 @@ local void SetRes1600(Menuitem *mi __attribute__((unused)))
     flags = Screen->flags;
 #endif
     menu = FindMenu("menu-global-options");
-    
-    menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[4].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[6].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[8].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
 
     if (VideoWidth != 1600) {
 	VideoWidth=1600;
@@ -1621,19 +1609,25 @@ local void SetRes1600(Menuitem *mi __attribute__((unused)))
 	ToggleFullScreen();
 #endif
     }
+    GlobalOptions();
 }
 
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 {
     ToggleFullScreen();
+    GlobalOptions();
 }
 
 local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
 {
+    OriginalFogOfWar=1;
+    GlobalOptions();
 }
 
 local void SetShadowFogGray(Menuitem *mi __attribute__((unused)))
 {
+    OriginalFogOfWar=0;
+    GlobalOptions();
 }
 
 local void SetMasterPower(Menuitem *mi __attribute__((unused)))
