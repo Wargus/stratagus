@@ -647,6 +647,7 @@ global MapInfo* GetScmInfo(const char* scm)
     }
 
     free(scmdata);
+    CleanMpq();
 
     return info;
 }
@@ -1280,6 +1281,8 @@ global void LoadScm(const char* scm,WorldMap* map)
 	MapOffsetX=0;
 	MapOffsetY+=height;
     }
+
+    CleanMpq();
 }
 
 /**
