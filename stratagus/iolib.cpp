@@ -663,16 +663,14 @@ int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), File
 						fl = nfl = malloc(sizeof(FileList));
 					}
 					if (nfl) {
+						memset(nfl, 0, sizeof(*nfl));
 						if (isdir) {
 							nfl->name = strdup(np);
-							nfl->type = 0;
-							nfl->xdata = NULL;
 						} else {
 							nfl->type = -1;
 							if (filter == NULL) {
 								nfl->name = strdup(np);
 								nfl->type = 1;
-								nfl->xdata = NULL;
 							} else if ((*filter)(buffer, nfl) == 0) {
 								if (n == 0) {
 									free(fl);
