@@ -237,7 +237,7 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw title
 	//
-	VideoDrawTextCentered(x+424,y+28,LargeFont,intro->Title);
+	VideoDrawTextCentered(x+422,y+28,LargeFont,intro->Title);
 	//
 	//	Draw scrolling text
 	//
