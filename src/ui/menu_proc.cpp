@@ -1185,12 +1185,21 @@ local void MenuHandleMouseMove(int x,int y)
 				char* s;
 
 				j = strtol(mi->d.input.buffer, &s, 0);
-				if (!*s || s[0]=='~' ) {
-				    mi->d.input.nch =
-					sprintf(mi->d.input.buffer, "%d~!_",
-						j + x - ox
-						+ (y - oy)*1000);
-				    redraw_flag = 1;
+				if ((!*s || s[0]=='~') && (j!=0 || *mi->d.input.buffer=='0') ) {
+				    int num;
+				    num = j + x - ox + (y - oy)*1000;
+				    if (num < 0) {
+					num = 0;
+				    }
+				    if ((mi->d.input.maxch == 3 && num < 1000) ||
+					(mi->d.input.maxch == 4 && num < 10000) ||
+					(mi->d.input.maxch == 5 && num < 100000) ||
+					(mi->d.input.maxch == 6 && num < 1000000) ||
+					(mi->d.input.maxch >= 7)) {
+					mi->d.input.nch =
+					    sprintf(mi->d.input.buffer, "%d~!_", num) - 3;
+					redraw_flag = 1;
+				    }
 				}
 			    }
 			}
