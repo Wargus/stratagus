@@ -561,6 +561,7 @@ local void Usage(void)
 \t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
 \t-L lag\t\tNetwork lag in # frames (default 5 = 165ms)\n\
 \t-U update\tNetwork update frequence in # frames (default 5 = 6x pro s)\n\
+\t-N name\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
@@ -601,13 +602,16 @@ global int main(int argc,char** argv)
     CclStartFile="ccl/freecraft.ccl";
 #endif
 
+    memset(NetworkName, 0, 16);
+    strcpy(NetworkName, "Anonymous");
+
     // FIXME: Parse options before or after ccl?
 
     //
     //	Parse commandline
     //
     for( ;; ) {
-	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:FL:S:U:W?") ) {
+	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:N:FL:S:U:W?") ) {
 #if defined(USE_CCL)
 	    case 'c':
 		CclStartFile=optarg;
@@ -627,6 +631,10 @@ global int main(int argc,char** argv)
 		continue;
 	    case 'n':
 		NetworkArg=strdup(optarg);
+		continue;
+	    case 'N':
+		memset(NetworkName, 0, 16);
+		strncpy(NetworkName, optarg, 16);
 		continue;
 	    case 's':
 		AiSleep=atoi(optarg);

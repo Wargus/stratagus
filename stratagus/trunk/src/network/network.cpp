@@ -285,9 +285,9 @@ global void InitNetwork2(void)
     //
     for (i = 0; i <= NetworkLag; i += NetworkUpdates) {
 	for (n = 0; n < HostsCount; ++n) {
-	    NetworkIn[i][NetPlyNr[n]].Time = i;
-	    NetworkIn[i][NetPlyNr[n]].Data.Frame = i;
-	    NetworkIn[i][NetPlyNr[n]].Data.Type = MessageSync;
+	    NetworkIn[i][Hosts[n].PlyNr].Time = i;
+	    NetworkIn[i][Hosts[n].PlyNr].Data.Frame = i;
+	    NetworkIn[i][Hosts[n].PlyNr].Data.Type = MessageSync;
 	}
     }
 }
@@ -393,7 +393,7 @@ global void NetworkEvent(void)
 	DebugLevel0Fn("Not a host in play\n");
 	return;
     }
-    player=NetPlyNr[i];
+    player=Hosts[i].PlyNr;
 
     //
     //	Parse the packet commands.
@@ -490,7 +490,7 @@ global void NetworkEvent(void)
 	n = ((FrameCounter) / NetworkUpdates) * NetworkUpdates + NetworkUpdates;
 	DebugLevel3Fn("wait for %d - ", n);
 	for (player = 0; player < HostsCount; ++player) {
-	    if (NetworkIn[n & 0xFF][NetPlyNr[player]].Time != n) {
+	    if (NetworkIn[n & 0xFF][Hosts[player].PlyNr].Time != n) {
 		NetworkInSync = 0;
 		break;
 	    }
@@ -756,8 +756,8 @@ local void NetworkSyncCommands(void)
     NetworkInSync = 1;
     n = FrameCounter + NetworkUpdates;
     for (i = 0; i < HostsCount; ++i) {
-	DebugLevel3Fn("sync %d\n", NetPlyNr[i]);
-	ncq = &NetworkIn[n & 0xFF][NetPlyNr[i]];
+	DebugLevel3Fn("sync %d\n", Hosts[i].PlyNr);
+	ncq = &NetworkIn[n & 0xFF][Hosts[i].PlyNr];
 	DebugLevel3Fn("sync %d==%d\n", ncq->Time, n);
 	if (ncq->Time != n) {
 	    NetworkInSync = 0;
