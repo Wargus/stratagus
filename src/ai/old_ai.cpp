@@ -163,7 +163,7 @@ local AiCommand AiTable1[] = {
 
 /**
 **	Define the AI goals.
-**	All conditions the AI must check each frame.
+**	All conditions the AI must check each game cycle.
 */
 typedef struct _ai_goal_ AiGoal;
 
@@ -1564,11 +1564,11 @@ global void AiResearchComplete(Unit* unit,const Upgrade* what)
 }
 
 /**
-**      This is called for each player, each frame.
+**      This is called for each player, each game cycle.
 **
 **      @param player   The player structure pointer.
 */
-global void AiEachFrame(Player * player)
+global void AiEachCycle(Player * player)
 {
     AiCommand command;
 

@@ -140,6 +140,7 @@ extern int NetworkFildes;		/// Network file descriptor
 extern int NetworkInSync;		/// Network is in sync
 extern int NetworkUpdates;		/// Network update each # game cycles
 extern int NetworkLag;			/// Network lag (# game cycles)
+extern int NetworkStatus[PlayerMax];	/// Network status
 
 /*----------------------------------------------------------------------------
 --	Functions

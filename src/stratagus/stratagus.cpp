@@ -830,6 +830,11 @@ global int main(int argc,char** argv)
 
 	    case 'L':
 		NetworkLag=atoi(optarg);
+		if( !NetworkLag ) {
+		    fprintf(stderr,"FIXME: zero lag not supported\n");
+		    Usage();
+		    exit(-1);
+		}
 		continue;
 	    case 'U':
 		NetworkUpdates=atoi(optarg);

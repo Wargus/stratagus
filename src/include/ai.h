@@ -46,7 +46,7 @@ extern int AiCostFactor;		/// Adjust the AI costs
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachFrame(Player* player);/// Called each frame
+extern void AiEachCycle(Player* player);/// Called each game cycle
 extern void AiEachSecond(Player* player);/// Called each second
 
 extern void AiInit(Player* player);	/// Init AI for this player

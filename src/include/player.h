@@ -488,8 +488,8 @@ extern int HaveUnitTypeByIdent(const Player* player,const char* ident);
 
     /// Initialize the computer opponent AI
 extern void PlayersInitAi(void);
-    /// Called each frame for player handlers (AI)
-extern void PlayersEachFrame(void);
+    /// Called each game cycle for player handlers (AI)
+extern void PlayersEachCycle(void);
     /// Called each second for player handlers (AI)
 extern void PlayersEachSecond(void);
 

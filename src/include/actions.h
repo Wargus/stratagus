@@ -174,7 +174,7 @@ extern void HandleActionSpellCast(Unit* unit);
 
     /// handle the animation of a unit
 extern int UnitShowAnimation(Unit* unit,const Animation* animation);
-    /// Handle the actions of all units each frame
+    /// Handle the actions of all units each game cycle
 extern void UnitActions(void);
 
 //@}
