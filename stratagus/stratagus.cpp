@@ -911,6 +911,10 @@ global int main(int argc,char** argv)
 			VideoWidth=1600;
 			VideoHeight=1200;
 			continue;
+		    case 5:
+			VideoWidth=1280;
+			VideoHeight=1024;
+			continue;
 		    default:
 			Usage();
 			ExitFatal(-1);
