@@ -134,6 +134,7 @@ global void InitPlayers(void)
 
     for( p=0; p<PlayerMax; ++p ) {
 	Players[p].Player=p;
+	Players[p].Type=PlayerNobody;
     }
 }
 
