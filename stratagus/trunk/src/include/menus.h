@@ -99,6 +99,7 @@ typedef int MenuButtonId;
 #define SERVER_PLAYER_STATE 5
 #define SERVER_PLAYER_READY 32
 #define SERVER_PLAYER_LAG   46
+#define SERVER_PLAYER_TEXT  60
 
 	/// Offsets into NetMultiClientMenuItems
 #define CLIENT_PLAYER_STATE  5
@@ -109,6 +110,7 @@ typedef int MenuButtonId;
 #define CLIENT_TILESET      29
 #define CLIENT_GAMETYPE     31
 #define CLIENT_PLAYER_READY 32
+#define CLIENT_PLAYER_TEXT  46
 
 // For the game speed slider in the speed settings screen.
 #define MIN_GAME_SPEED 50
