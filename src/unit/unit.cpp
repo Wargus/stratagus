@@ -62,9 +62,6 @@
 #ifndef LimitSearch
 #define LimitSearch 1			/// Limit the search
 #endif
-#ifndef WorkerCanCapture
-#define WorkerCanCapture 0		/// Workers can capture buildings
-#endif
 
 global Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
 global Unit** UnitSlotFree;		/// First free unit slot
@@ -76,6 +73,7 @@ global int NumUnits;			/// Number of slots used
 
 global int HitPointRegeneration;	/// Enable hit point regeneration for all units
 global int EnableTrainingQueue;		/// Config: training queues enabled
+global int EnableBuildingCapture;	/// Config: capture buildings enabled
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -2906,7 +2904,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     // david: capture enemy buildings
     // Only worker types can capture.
     // Still possible to destroy building if not careful (too many attackers)
-    if( WorkerCanCapture && type->Building && target->HP<=damage*3 &&
+    if( EnableBuildingCapture && type->Building && target->HP<=damage*3 &&
 	    (attacker->Type==UnitTypeOrcWorker
 	    || attacker->Type==UnitTypeHumanWorker) ) {
 	ChangeUnitOwner(target, target->Player, attacker->Player);
