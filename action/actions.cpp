@@ -566,7 +566,7 @@ global void UnitActions(void)
 		HandleUnitAction(unit);
 		DebugCheck(*tpos != unit);		// Removed is evil.
 
-#if 1
+#ifdef DEBUG_ACTIONS
 		//
 		// Dump the unit to find the network sync bugs.
 		//
