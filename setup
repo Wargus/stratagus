@@ -616,7 +616,7 @@ case $CDMode in
   [sS])
     echo "Using SDL cdrom support"
     echo
-    USE_SDLCD = 1
+    USE_SDLCD=1
     USE_LIBCDA=0
     echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
     echo >> $RULESFILE
