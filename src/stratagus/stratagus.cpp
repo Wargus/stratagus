@@ -279,6 +279,7 @@ global int MustRedraw=RedrawEverything;	/// Redraw flags
 global int EnableRedraw=RedrawEverything;/// Enable flags
 
 global unsigned long GameCycle;		/// Game simulation cycle counter
+global unsigned long FastForwardCycle;	/// Cycle to fastforward to in a replay
 
 /*----------------------------------------------------------------------------
 --	Random

@@ -477,6 +477,7 @@ extern int OptionUseDepletedMines;      /// Use depleted mines or destroy them
 extern unsigned SyncRandSeed;		/// Sync random seed value
 
 extern unsigned long GameCycle;		/// Game simulation cycle counter
+extern unsigned long FastForwardCycle;	/// Game Replay Fast Forward Counter
 
 extern void LoadGame(char*);		/// Load saved game back
 extern void SaveGame(const char*);	/// Save game for later load
