@@ -270,7 +270,7 @@ global void HandleActionBuild(Unit* unit)
     build->Wait=CYCLES_PER_SECOND/6;
     UpdateConstructionFrame(build);
 
-    if (type->BuilderInside) {
+    if (!type->BuilderOutside) {
 	//  Place the builder inside the building
     	build->Data.Builded.Worker=unit;
 	RemoveUnit(unit,build);
@@ -336,7 +336,7 @@ global void HandleActionBuilded(Unit* unit)
 	return;
     }
 
-    if (type->BuilderInside) {
+    if (!type->BuilderOutside) {
 	//
 	//	Fixed point HP calculation
 	//

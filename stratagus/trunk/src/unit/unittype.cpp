@@ -450,7 +450,8 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->Building=BIT(5,v);
 	unittype->Submarine=BIT(6,v);
 	unittype->CanSeeSubmarine=BIT(7,v);
-	unittype->CowerWorker=BIT(8,v);
+	// Cowards
+	unittype->Coward=BIT(8,v)|BIT(26,v);
 	if (BIT(9,v)) {
 	    unittype->Harvester=1;
 	    unittype->ResourceHarvested=OilCost;
@@ -468,7 +469,6 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 	unittype->Hero=BIT(23,v);
 	unittype->CanStore[OilCost]=BIT(24,v);
 	unittype->Volatile=BIT(25,v);
-	unittype->CowerMage=BIT(26,v);
 	unittype->Organic=BIT(27,v);
 	
 	if (BIT(11,v)||BIT(21,v)) {
@@ -842,8 +842,8 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->Building ) {
 	CLprintf(file,"  'building");
     }
-    if( type->BuilderInside ) {
-	CLprintf(file,"  'builder-inside");
+    if( type->BuilderOutside ) {
+	CLprintf(file,"  'builder-outside");
     }
     if( type->BuilderLost ) {
 	CLprintf(file,"  'builder-lost");
@@ -883,8 +883,8 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
 	CLprintf(file,"  'max-on-board %d\n",type->MaxOnBoard);
     }
 
-    if( type->CowerWorker ) {
-	CLprintf(file,"  'cower-worker\n");
+    if( type->Coward ) {
+	CLprintf(file,"  'coward\n");
     }
     if( type->Harvester ) {
 	CLprintf(file,"  'harvester 'resource-harvested '%s",DefaultResourceNames[type->ResourceHarvested]);
@@ -907,7 +907,10 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->GivesResource ) {
 	CLprintf(file,"  'gives-resource '%s\n",DefaultResourceNames[type->GivesResource]);
     }
-    
+    if( type->MaxWorkers ) {
+	CLprintf(file,"  'max-workers '%d\n",type->MaxWorkers);
+    }
+   
     // Save store info.
     for (flag=i=0;i<MaxCosts;i++)
 	if (type->CanStore[i]) {
@@ -939,9 +942,6 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     }
     if( type->Volatile ) {
 	CLprintf(file,"  'volatile\n");
-    }
-    if( type->CowerMage ) {
-	CLprintf(file,"  'cower-mage\n");
     }
     if( type->IsUndead ) {
 	CLprintf(file,"  'isundead\n");

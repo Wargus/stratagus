@@ -2368,7 +2368,7 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
     //	Remove unit that is building!
     //
     IfDebug( j=0; );
-    if( unit ) {
+    if( unit&&!type->BuilderOutside ) {
 	// FIXME: This only works with 1x1 big units
 	DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
 	j=unit->Type->FieldFlags;
@@ -2462,7 +2462,7 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 	    }
 	}
     }
-    if( unit ) {
+    if( unit&&!type->BuilderOutside ) {
 	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
     }
 
@@ -2793,7 +2793,7 @@ global Unit* FindIdleWorker(const Player* player,const Unit* last)
 
     for( i=0; i<nunits; i++ ) {
 	unit=units[i];
-	if( unit->Type->CowerWorker && !unit->Removed ) {
+	if( unit->Type->Harvester && !unit->Removed ) {
 	    if( unit->Orders[0].Action==UnitActionStill ) {
 		if( SelectNextUnit && !IsOnlySelected(unit) ) {
 		    return unit;
@@ -3237,7 +3237,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     //
     //	Attack units in range (which or the attacker?)
     //
-    if( !type->CowerWorker && !type->CowerMage ) {
+    if( !type->Coward ) {
 	if( type->CanAttack && !type->Tower ) {
 	    goal=AttackUnitsInReactRange(target);
 	    if( goal ) {
