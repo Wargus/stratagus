@@ -100,7 +100,7 @@
 **    }
 */
 {
-  unsigned int f, left, right, top, bottom;
+  int f, left, right, top, bottom;
 
 // Ensure non-empty rectangle
   if ( !(_w && _h ) ) {

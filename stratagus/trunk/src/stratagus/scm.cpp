@@ -172,7 +172,7 @@ local int ScmReadByte(void)
 local void ExtractMap(FILE *mpqfd,unsigned char** entry,int* size)
 {
     int i;
-    int max;
+    unsigned long max;
     int maxi;
 
     *entry=NULL;

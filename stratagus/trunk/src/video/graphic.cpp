@@ -452,7 +452,7 @@ global void VideoDrawSubClipFaded(
 **	@return		New graphic object (malloced).
 */
 global Graphic* MakeGraphic(
-	unsigned depth,unsigned width,unsigned height,void* data,unsigned size)
+	unsigned depth,int width,int height,void* data,unsigned size)
 {
     Graphic* graphic;
 
@@ -492,7 +492,7 @@ global Graphic* MakeGraphic(
 **	@param height	Pixel height.
 */
 global Graphic* NewGraphic(
-	unsigned depth,unsigned width,unsigned height)
+	unsigned depth,int width,int height)
 {
     void* data;
     int size;
