@@ -363,6 +363,9 @@ extern void DoButtonButtonClicked(int button);
     /// Lookup key for bottom panel buttons
 extern int DoButtonPanelKey(int key);
 
+    /// Handle the mouse in scroll area
+extern int HandleMouseScrollArea(int,int);
+
 //
 //	in button_checks.c
 //
