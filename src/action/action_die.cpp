@@ -24,9 +24,6 @@
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -57,8 +54,7 @@ global void HandleActionDie(Unit* unit)
 	UnitShowAnimation(unit,unit->Type->Animations->Die);
     } else {
 	// some units has no death animation
-	unit->Reset=1;
-	unit->Wait=1;
+	unit->Reset=unit->Wait=1;
     }
 
     //
@@ -73,7 +69,6 @@ global void HandleActionDie(Unit* unit)
 
 	unit->State=unit->Type->CorpseScript;
 	unit->Type=unit->Type->CorpseType;
-#ifdef NEW_ORDERS
 	CommandStopUnit(unit);		// This clears all order queues
 	IfDebug(
 	    if( unit->Orders[0].Action!=UnitActionDie ) {
@@ -82,17 +77,9 @@ global void HandleActionDie(Unit* unit)
 	);
 	unit->Orders[0].Action=UnitActionDie;
 	--unit->OrderCount;		// remove the stop command
-#else
-	unit->Command.Action=UnitActionDie;
-	if( unit->NextCount ) {
-	    DebugLevel0Fn("NextCount = %d\n",unit->NextCount);
-	}
-	unit->NextCount=0;
-#endif
 	unit->SubAction=0;
 	unit->Frame=0;
 	UnitUpdateHeading(unit);
-	DebugCheck( !unit->Type->Animations || !unit->Type->Animations->Die );
 	UnitShowAnimation(unit,unit->Type->Animations->Die);
 
 	// FIXME: perhaps later or never is better
