@@ -353,7 +353,6 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 {
     Order* order;
-    Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
@@ -409,13 +408,6 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 	order->Type=NULL;
 	order->Arg1=NULL;
 
-	/* FIXME: this draws directly over a GreenCross, 
-	which should be removed by someone please */
-        MakeLocalMissile(MissileTypeRedCross
-	    ,v->MapX*TileSizeX+CursorX - v->X
-	    ,v->MapY*TileSizeY+CursorY - v->Y
-	    ,v->MapX*TileSizeX+CursorX - v->X
-	    ,v->MapY*TileSizeY+CursorY - v->Y);    
     }
     ClearSavedAction(unit);
 }
