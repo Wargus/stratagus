@@ -135,18 +135,10 @@ global void DrawUnitInfo(Unit* unit)
     //
     x=TheUI.Buttons[1].X;
     y=TheUI.Buttons[1].Y;
-#ifdef NEW_VIDEO
     DrawUnitIcon(unit->Player,type->Icon.Icon
 	    ,(ButtonUnderCursor==1)
 		? (IconActive|(MouseButtons&LeftButton)) : 0
 	    ,x,y);
-#else
-    PlayerPixels(unit->Player);
-    DrawUnitIcon(type->Icon.Icon
-	    ,(ButtonUnderCursor==1)
-		? (IconActive|(MouseButtons&LeftButton)) : 0
-	    ,x,y);
-#endif
     DrawLifeBar(unit,x,y);
 
     x=TheUI.InfoPanelX;
@@ -187,14 +179,9 @@ global void DrawUnitInfo(Unit* unit)
 	if( unit->Command.Action==UnitActionTrain ) {
 	    if( OriginalTraining || unit->Command.Data.Train.Count==1 ) {
 		DrawText(x+37,y+8+78,GameFont,"Training:");
-#ifdef NEW_VIDEO
 		DrawUnitIcon(unit->Player
 			,unit->Command.Data.Train.What[0]->Icon.Icon
 			,0,x+107,y+8+70);
-#else
-		DrawUnitIcon(unit->Command.Data.Train.What[0]->Icon.Icon
-			,0,x+107,y+8+70);
-#endif
 
 		DrawCompleted(
 			unit->Command.Data.Train.What[0]
@@ -204,18 +191,11 @@ global void DrawUnitInfo(Unit* unit)
 		DrawTextCentered(x+114,y+8+29,GameFont,"Training...");
 
 		for( i = 0; i < unit->Command.Data.Train.Count; i++ ) {
-#ifdef NEW_VIDEO
 		    DrawUnitIcon(unit->Player
 			    ,unit->Command.Data.Train.What[i]->Icon.Icon
 			    ,(ButtonUnderCursor==i+4)
 				? (IconActive|(MouseButtons&LeftButton)) : 0
 			    ,TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y);
-#else
-		    DrawUnitIcon(unit->Command.Data.Train.What[i]->Icon.Icon
-			    ,(ButtonUnderCursor==i+4)
-				? (IconActive|(MouseButtons&LeftButton)) : 0
-			    ,TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y);
-#endif
 		}
 
 		DrawCompleted(
@@ -227,14 +207,9 @@ global void DrawUnitInfo(Unit* unit)
 	}
 	if( unit->Command.Action==UnitActionUpgradeTo ) {
 	    DrawText(x+29,y+8+78,GameFont,"Upgrading:");
-#ifdef NEW_VIDEO
 	    DrawUnitIcon(unit->Player
 		    ,unit->Command.Data.UpgradeTo.What->Icon.Icon
 		    ,0,x+107,y+8+70);
-#else
-	    DrawUnitIcon(unit->Command.Data.UpgradeTo.What->Icon.Icon
-		    ,0,x+107,y+8+70);
-#endif
 
 	    DrawCompleted(
 		    unit->Command.Data.UpgradeTo.What
@@ -244,14 +219,9 @@ global void DrawUnitInfo(Unit* unit)
 	}
 	if( unit->Command.Action==UnitActionResearch ) {
 	    DrawText(16,y+8+78,GameFont,"Researching:");
-#ifdef NEW_VIDEO
 	    DrawUnitIcon(unit->Player
 		    ,unit->Command.Data.Research.What->Icon
 		    ,0,x+107,y+8+70);
-#else
-	    DrawUnitIcon(unit->Command.Data.Research.What->Icon
-		    ,0,x+107,y+8+70);
-#endif
 
 	    DrawCompleted(
 		    unit->Command.Data.Research.What->Costs[TimeCost]
@@ -301,18 +271,11 @@ global void DrawUnitInfo(Unit* unit)
 	DrawText(x+91,y+8+33,GameFont,buf);
 	for( i=0; i<6; ++i ) {
 	    if( unit->OnBoard[i]!=NoUnitP ) {
-#ifdef NEW_VIDEO
 		DrawUnitIcon(unit->Player
 		    ,unit->OnBoard[i]->Type->Icon.Icon
 		    ,(ButtonUnderCursor==i+4)
 			? (IconActive|(MouseButtons&LeftButton)) : 0
 			    ,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
-#else
-		DrawUnitIcon(unit->OnBoard[i]->Type->Icon.Icon
-		    ,(ButtonUnderCursor==i+4)
-			? (IconActive|(MouseButtons&LeftButton)) : 0
-			    ,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
-#endif
 		DrawLifeBar(unit->OnBoard[i]
 			,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
 		// FIXME: show also the magic bar :) I want this always.
@@ -730,18 +693,11 @@ global void DrawInfoPanel(void)
 	    PlayerPixels(ThisPlayer);	// can only be own!
 	    DrawInfoPanelBackground(0);
             for( i=0; i<NumSelected; ++i ) {
-#ifdef NEW_VIDEO
 	        DrawUnitIcon(ThisPlayer
 			,Selected[i]->Type->Icon.Icon
 			,(ButtonUnderCursor==i+1)
 			    ? (IconActive|(MouseButtons&LeftButton)) : 0
 				,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
-#else
-	        DrawUnitIcon(Selected[i]->Type->Icon.Icon
-			,(ButtonUnderCursor==i+1)
-			    ? (IconActive|(MouseButtons&LeftButton)) : 0
-				,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
-#endif
 		DrawLifeBar(Selected[i]
 			,TheUI.Buttons[i+1].X,TheUI.Buttons[i+1].Y);
 

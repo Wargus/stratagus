@@ -23,9 +23,9 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DSLOW_INPUT -DNEW_UNIT -DNEW_NETWORK -DNEW_VIDEO"
+EXTRA_CFLAGS="-DSLOW_INPUT -DNEW_UNIT -DUNIT_ON_MAP -DNEW_NETWORK"
 # This could be used for experimental versions
-# -DNEW_UNIT -DNEW_NETWORK -DNEW_FOW -DNEW_NAMES -DNEW_VIDEO
+# -DNEW_UNIT -DNEW_NETWORK -DNEW_FOW -DUNIT_ON_MAP -DNEW_NAMES
 
 # Compile commands
 CC=gcc
@@ -35,7 +35,7 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build6\""
+VERSION="-DVERSION=\"1.17pre1-build7\""
 WIN32=-1
 
 # Choose optimization level

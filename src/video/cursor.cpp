@@ -139,18 +139,14 @@ global int OldCursorH;			/// saved cursor height in pixel
 global int OldCursorSize;		/// size of saved cursor image
 global void* OldCursorImage;		/// background saved behind cursor	
 
-#ifdef NEW_VIDEO
-	/// Save background behind cursor
+	/// Function pointer: Save background behind cursor
 local void (*SaveCursorBackground)(int,int,int,int);
-	/// Load background behind cursor
+	/// Function pointer: Load background behind cursor
 local void (*LoadCursorBackground)(int,int,int,int);
-#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
-
-#ifdef NEW_VIDEO
 
 /**
 **	Restore cursor background for 8bpp frame buffer.
@@ -368,8 +364,6 @@ local void SaveCursorBackground32(int x,int y,int w,int h)
     }
 }
 
-#endif
-
 /**
 **	Load all cursor sprites.
 **
@@ -387,15 +381,8 @@ global void LoadCursors(unsigned int race)
 
     if (last_race != -1) {	// free previous sprites for different race
 	for( i=0; i<sizeof(Cursors)/sizeof(*Cursors); ++i ) {
-#ifdef NEW_VIDEO
 	    VideoSaveFree(Cursors[i].Sprite);
 	    Cursors[i].Sprite = NULL;
-#else
-	    if (Cursors[i].RleSprite) {
-		FreeRleSprite(Cursors[i].RleSprite);
-		Cursors[i].RleSprite = NULL;
-	    }
-#endif
 	}
     }
     last_race = race;
@@ -414,14 +401,8 @@ global void LoadCursors(unsigned int race)
 	    buf=alloca(strlen(file)+9+1);
 	    file=strcat(strcpy(buf,"graphic/"),file);
 	    ShowLoadProgress("\tCursor %s\n",file);
-#ifdef NEW_VIDEO
-	    Cursors[i].Sprite=LoadSprite(file,0,0);
 	    // FIXME: real size?
-#else
-	    Cursors[i].RleSprite=LoadRleSprite(file,0,0);
-	    // FIXME: this is hack!!
-		    //,Cursors[i].Width,Cursors[i].Height);
-#endif
+	    Cursors[i].Sprite=LoadSprite(file,0,0);
 	}
     }
 }
@@ -431,9 +412,6 @@ global void LoadCursors(unsigned int race)
 */
 local void SaveCursor(void)
 {
-#ifndef NEW_VIDEO
-    int i;
-#endif
     int w;
     int h;
     int x;
@@ -465,72 +443,7 @@ local void SaveCursor(void)
 	return;
     }
 
-#ifdef NEW_VIDEO
     SaveCursorBackground(x,y,w,h);
-#else
-    // FIXME: use function pointer
-    switch( VideoDepth ) {
-    case 8:
-	i=w*h*sizeof(VMemType8);
-	break;
-    case 15:
-    case 16:
-	i=w*h*sizeof(VMemType16);
-	break;
-    case 24:
-    case 32:
-    default:
-	i=w*h*sizeof(VMemType32);
-	break;
-    }
-    if( OldCursorSize<i ) {
-	if( OldCursorImage ) {
-	    OldCursorImage=realloc(OldCursorImage,i);
-	} else {
-	    OldCursorImage=malloc(i);
-	}
-	DebugLevel3("Cursor memory %d\n",i);
-	OldCursorSize=i;
-    }
-    // FIXME: use function pointer
-    switch( VideoDepth ) {
-    case 8:
-	{ VMemType8 *dp;
-	VMemType8 *sp;
-	dp=OldCursorImage;
-	sp=VideoMemory8+y*VideoWidth+x;
-	while( h-- ) {
-	    memcpy(dp,sp,w*sizeof(VMemType8));
-	    dp+=w;
-	    sp+=VideoWidth;
-	}
-	break; }
-    case 15:
-    case 16:
-	{ VMemType16 *dp;
-	VMemType16 *sp;
-	dp=OldCursorImage;
-	sp=VideoMemory16+y*VideoWidth+x;
-	while( h-- ) {
-	    memcpy(dp,sp,w*sizeof(VMemType16));
-	    dp+=w;
-	    sp+=VideoWidth;
-	}
-	break; }
-    case 24:
-    case 32:
-	{ VMemType32 *dp;
-	VMemType32 *sp;
-	dp=OldCursorImage;
-	sp=VideoMemory32+y*VideoWidth+x;
-	while( h-- ) {
-	    memcpy(dp,sp,w*sizeof(VMemType32));
-	    dp+=w;
-	    sp+=VideoWidth;
-	}
-	break; }
-    }
-#endif
 }
 
 /**
@@ -538,24 +451,14 @@ local void SaveCursor(void)
 */
 local void RestoreCursor(void)
 {
-#ifndef NEW_VIDEO
-    void *dp;
-    void *sp;
-#endif
     int w;
     int h;
     int x;
     int y;
 
-#ifdef NEW_VIDEO
     if( !OldCursorImage ) {		// no cursor saved
 	return;
     }
-#else
-    if( !(sp=OldCursorImage) ) {	// no cursor saved
-	return;
-    }
-#endif
 
     // FIXME: I should better store the correct values on save.
     x=OldCursorX;
@@ -584,38 +487,7 @@ local void RestoreCursor(void)
 	return;
     }
 
-#ifdef NEW_VIDEO
     LoadCursorBackground(x,y,w,h);
-#else
-    switch( VideoDepth ) {
-    case 8:
-	dp=VideoMemory8+y*VideoWidth+x;
-	while( h-- ) {
-	    memcpy(dp,sp,w*sizeof(VMemType8));
-	    ((VMemType8*)sp)+=w;
-	    ((VMemType8*)dp)+=VideoWidth;
-	}
-	break;
-    case 15:
-    case 16:
-	dp=VideoMemory16+y*VideoWidth+x;
-	while( h-- ) {
-	    memcpy(dp,sp,w*sizeof(VMemType16));
-	    ((VMemType16*)sp)+=w;
-	    ((VMemType16*)dp)+=VideoWidth;
-	}
-	break;
-    case 24:
-    case 32:
-	dp=VideoMemory32+y*VideoWidth+x;
-	while( h-- ) {
-	    memcpy(dp,sp,w*sizeof(VMemType32));
-	    ((VMemType32*)sp)+=w;
-	    ((VMemType32*)dp)+=VideoWidth;
-	}
-	break;
-    }
-#endif
 }
 
 /**
@@ -626,7 +498,6 @@ local void RestoreCursor(void)
 */
 global void DrawCursor(CursorType* type,int x,int y,int frame)
 {
-#ifdef NEW_VIDEO
     OldCursorX=x-=type->HotX;
     OldCursorY=y-=type->HotY;
     OldCursorW=VideoGraphicWidth(type->Sprite);
@@ -634,15 +505,6 @@ global void DrawCursor(CursorType* type,int x,int y,int frame)
 
     SaveCursor();
     VideoDrawClip(type->Sprite,frame,x,y);
-#else
-    OldCursorX=x-=type->HotX;
-    OldCursorY=y-=type->HotY;
-    OldCursorW=type->RleSprite->Width;
-    OldCursorH=type->RleSprite->Height;
-
-    SaveCursor();
-    DrawRleSpriteClipped(type->RleSprite,frame,x,y);
-#endif
 }
 
 /**
@@ -686,12 +548,11 @@ local void DrawBuildingCursor(void)
     //
     //	Draw building
     //
-    PlayerPixels(ThisPlayer);
-    SetClipping(TheUI.MapX,TheUI.MapY
-	    ,TheUI.MapWidth,TheUI.MapHeight);
+    PushClipping();
+    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapWidth,TheUI.MapHeight);
+    GraphicPlayerPixels(ThisPlayer,CursorBuilding->Sprite);
     DrawUnitType(CursorBuilding,0,x,y);
-    // FIXME: This is dangerous here
-    SetClipping(0,0,VideoWidth,VideoHeight);
+    PopClipping();
 
     //
     //	Draw the allow overlay
@@ -867,7 +728,6 @@ global int HideAnyCursor(void)
 */
 global void InitCursor(void)
 {
-#ifdef NEW_VIDEO
     switch( VideoDepth ) {
 	case 8:
 	    SaveCursorBackground=SaveCursorBackground8;
@@ -890,7 +750,6 @@ global void InitCursor(void)
 	    DebugLevel0(__FUNCTION__": unsupported %d bpp\n",VideoDepth);
 	    abort();
     }
-#endif
 }
 
 //@}

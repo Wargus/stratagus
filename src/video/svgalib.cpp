@@ -17,9 +17,16 @@
 
 //@{
 
-#ifdef USE_SVGALIB
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+
+#include "freecraft.h"
+
+#ifdef USE_SVGALIB
+
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -31,7 +38,6 @@
 #include <vgamouse.h>
 #include <vgakeyboard.h>
 
-#include "freecraft.h"
 #include "video.h"
 #include "tileset.h"
 #include "sound_id.h"
@@ -52,29 +58,17 @@
 #include "ui.h"
 #include "new_video.h"
 
-#ifndef NEW_VIDEO
-
-/**
-**	Architecture-dependant videomemory. Set by GameInitDisplay.
-*/
-global void* VideoMemory;
-
-/**
-**	Architecture-dependant video depth. Set by GameInitDisplay.
-**
-**	@see GameInitDisplay
-*/
-global int VideoDepth;
-
-global VMemType8 * Pixels8;		/// 8 bpp palette FIXME: remove pointer
-global VMemType16 * Pixels16;		/// 16 bpp palette
-global VMemType32 * Pixels32;		/// 32 bpp palette
-
-#endif
+/*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
 
 local int old_button;			/// FIXME: docu?
 local int mouse_x;			/// FIXME: docu?
 local int mouse_y;			/// FIXME: docu?
+
+/*----------------------------------------------------------------------------
+--	Forwards
+----------------------------------------------------------------------------*/
 
     /// FIXME: docu?
 local void MouseEvent(int button,int dx,int dy,int dz,int drx,int dry,int drz);
@@ -82,22 +76,19 @@ local void MouseEvent(int button,int dx,int dy,int dz,int drx,int dry,int drz);
 local void KeyboardEvent(int scancode,int press);
 
 /*----------------------------------------------------------------------------
---	Sync
+--	Functions
 ----------------------------------------------------------------------------*/
 
-#ifndef NEW_VIDEO
-
-global int VideoSyncSpeed=100;		// 0 disable interrupts
-volatile int VideoInterrupts;		// be happy, were are quicker
-
-#endif
+/*----------------------------------------------------------------------------
+--	Sync
+----------------------------------------------------------------------------*/
 
 /**
 **	Called from SIGALRM.
 */
 local void VideoSyncHandler(int unused)
 {
-    DebugLevel3("Interrupt\n");
+    DebugLevel3Fn("Interrupt\n");
     ++VideoInterrupts;
 }
 
@@ -129,7 +120,7 @@ global void SetVideoSync(void)
 	fprintf(stderr,"Can't set itimer\n");
     }
 
-    // DebugLevel1("Timer installed\n");
+    DebugLevel3Fn("Timer installed\n");
 }
 
 local void CloseDisplay(void)
@@ -330,27 +321,27 @@ global void Invalidate(void)
 */
 local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int drz) {
     if((old_button == 0) && (button == MOUSE_LEFTBUTTON)) {
-	DebugLevel3("first down\n");
+	DebugLevel3Fn("first down\n");
 	HandleButtonDown(1);
     }
     if((old_button == 0) && (button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON))) {
-	DebugLevel3("second down\n");
+	DebugLevel3Fn("second down\n");
 	HandleButtonDown(2);
     }
     if((old_button == 0) && (button == MOUSE_RIGHTBUTTON)) {
-	DebugLevel3("third down\n");
+	DebugLevel3Fn("third down\n");
 	HandleButtonDown(3);
     }
     if((old_button == MOUSE_LEFTBUTTON) && (button == 0)) {
-	DebugLevel3("first up\n");
+	DebugLevel3Fn("first up\n");
 	HandleButtonUp(1);
     }
     if((old_button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON)) && (button == 0)) {
-	DebugLevel3("second up\n");
+	DebugLevel3Fn("second up\n");
 	HandleButtonUp(2);
     }
     if((old_button == MOUSE_RIGHTBUTTON) && (button == 0)) {
-	DebugLevel3("third up\n");
+	DebugLevel3Fn("third up\n");
 	HandleButtonUp(3);
     }
     old_button = button;
@@ -968,20 +959,10 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@returns	A hardware dependend pixel table.
 */
-#ifdef NEW_VIDEO
 global VMemType* VideoCreateNewPalette(const Palette *palette)
-#else
-global GraphicData * VideoCreateNewPalette(const Palette *palette)
-#endif
 {
     int i;
     void* pixels;
-
-/*
-    if( !Screen ) {			// no init
-      return NULL;
-    }
-*/
 
     switch( VideoDepth ) {
     case 8:
@@ -992,11 +973,14 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
 	pixels=malloc(256*sizeof(VMemType16));
 	break;
     case 24:
+	// pixels=malloc(256*sizeof(VMemType24));
+	// break;
+	// FIXME: real 24bpp
     case 32:
 	pixels=malloc(256*sizeof(VMemType32));
 	break;
     default:
-	DebugLevel0(__FUNCTION__": Unknown depth\n");
+	DebugLevel0Fn("Unknown depth\n");
 	return NULL;
     }
 
@@ -1047,101 +1031,12 @@ global GraphicData * VideoCreateNewPalette(const Palette *palette)
 	case 32:
 	    // FIXME: write this please
 	default:
-	    DebugLevel0(__FUNCTION__": Depth not written\n");
+	    DebugLevel0Fn("Depth not written\n");
 	}
     }
 
     return pixels;
 }
-
-#ifndef NEW_VIDEO
-
-/**
-**	Color cycle.
-*/
-global void ColorCycle(void)
-{
-    int i;
-    int x;
-
-    // FIXME: this isn't 100% correct
-    // Color cycling info - forest:
-    // 3	flash red/green	(attacked building on minimap)
-    // 38-47	cycle		(water)
-    // 48-56	cycle		(water-coast boundary)
-    // 202	pulsates red	(Circle of Power)
-    // 240-244	cycle		(water around ships, Runestone, Dark Portal)
-    // Color cycling info - swamp:
-    // 3	flash red/green	(attacked building on minimap)
-    // 4	pulsates red	(Circle of Power)
-    // 5-9	cycle		(Runestone, Dark Portal)
-    // 38-47	cycle		(water)
-    // 88-95	cycle		(waterholes in coast and ground)
-    // 240-244	cycle		(water around ships)
-    // Color cycling info - wasteland:
-    // 3	flash red/green	(attacked building on minimap)
-    // 38-47	cycle		(water)
-    // 64-70	cycle		(coast)
-    // 202	pulsates red	(Circle of Power)
-    // 240-244	cycle		(water around ships, Runestone, Dark Portal)
-    // Color cycling info - winter:
-    // 3	flash red/green	(attacked building on minimap)
-    // 40-47	cycle		(water)
-    // 48-54	cycle		(half-sunken ice-floe)
-    // 202	pulsates red	(Circle of Power)
-    // 205-207	cycle		(lights on christmas tree)
-    // 240-244	cycle		(water around ships, Runestone, Dark Portal)
-
-    // FIXME: function pointer
-    switch( VideoDepth ) {
-    case 8:
-	x=Pixels8[38];
-	for( i=38; i<47; ++i ) {	// tileset color cycle
-	    Pixels8[i]=Pixels8[i+1];
-	}
-	Pixels8[47]=x;
-
-	x=Pixels8[240];
-	for( i=240; i<244; ++i ) {	// units/icons color cycle
-	    Pixels8[i]=Pixels8[i+1];
-	}
-	Pixels8[244]=x;
-	break;
-    case 15:
-    case 16:
-	x=Pixels16[38];
-	for( i=38; i<47; ++i ) {	// tileset color cycle
-	    Pixels16[i]=Pixels16[i+1];
-	}
-	Pixels16[47]=x;
-
-	x=Pixels16[240];
-	for( i=240; i<244; ++i ) {	// units/icons color cycle
-	    Pixels16[i]=Pixels16[i+1];
-	}
-	Pixels16[244]=x;
-	break;
-    case 24:
-    case 32:
-	x=Pixels32[38];
-	for( i=38; i<47; ++i ) {	// tileset color cycle
-	    Pixels32[i]=Pixels32[i+1];
-	}
-	Pixels32[47]=x;
-
-	x=Pixels32[240];
-	for( i=240; i<244; ++i ) {	// units/icons color cycle
-	    Pixels32[i]=Pixels32[i+1];
-	}
-	Pixels32[244]=x;
-	break;
-    }
-
-    MapColorCycle();		// FIXME: could be little more informativer
-    MustRedraw|=RedrawMap|RedrawInfoPanel;
-}
-
-#endif
 
 /**
 **	Check video interrupt.
@@ -1151,7 +1046,7 @@ global void ColorCycle(void)
 global void CheckVideoInterrupts(void)
 {
     if( VideoInterrupts ) {
-        //DebugLevel1("Slow frame\n");
+        //DebugLevel1Fn("Slow frame\n");
 	IfDebug(
 	    DrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	);

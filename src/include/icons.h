@@ -13,7 +13,6 @@
 //	(c) Copyright 1998-2000 by Lutz Sammer
 //
 //	$Id$
-//
 
 #ifndef __ICONS_H__
 #define __ICONS_H__
@@ -66,13 +65,8 @@ extern void CleanIcons(void);				/// cleanup
 extern IconId IconByIdent(const char* ident);		/// name -> icon
 extern const char* IdentOfIcon(IconId icon);		/// icon -> name
 
-#ifdef NEW_VIDEO
     /// draw icons of an unit
 extern void DrawUnitIcon(const void*,IconId,unsigned,unsigned,unsigned);
-#else
-    /// draw icons of an unit
-extern void DrawUnitIcon(IconId num,unsigned flags,unsigned x,unsigned y);
-#endif
 
 //@}
 
