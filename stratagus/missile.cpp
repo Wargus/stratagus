@@ -99,11 +99,6 @@ static FuncController *MissileClassFunctions[] = {
 	MissileActionDeathCoil
 };
 
-/**
-**  Missile type type definition
-*/
-const char MissileTypeType[] = "missile-type";
-
 MissileType** MissileTypes;              /// Missile types.
 int NumMissileTypes;                     /// number of missile-types made.
 
@@ -210,6 +205,8 @@ MissileType* NewMissileTypeSlot(char* ident)
 
 /**
 **  Allocate memory for a new global missile.
+**
+**  @return the new global missile.
 */
 static Missile* NewGlobalMissile(void)
 {
@@ -232,6 +229,8 @@ static Missile* NewGlobalMissile(void)
 
 /**
 **  Allocate memory for a new local missile.
+**
+**  @return the new local missile.
 */
 static Missile* NewLocalMissile(void)
 {
@@ -427,6 +426,8 @@ static int CalculateDamageStats(const UnitStats* attacker_stats,
 */
 static int CalculateDamage(const Unit* attacker, const Unit* goal)
 {
+	int res;  // result.
+
 	Assert(attacker);
 	Assert(goal);
 
@@ -440,9 +441,10 @@ static int CalculateDamage(const Unit* attacker, const Unit* goal)
 	UpdateUnitVariables((Unit *) goal);
 	TriggerData.Attacker = (Unit *) attacker;
 	TriggerData.Defender = (Unit *) goal;
-	return EvalNumber(Damage);
+	res = EvalNumber(Damage);
 	TriggerData.Attacker = NULL;
 	TriggerData.Defender = NULL;
+	return res;
 }
 
 /**
@@ -528,7 +530,7 @@ void FireMissile(Unit* unit)
 		//
 		if (MapDistanceBetweenUnits(unit, goal) < unit->Type->MinAttackRange) {
 			DebugPrint("Missile target too near %d,%d\n" _C_
-				MapDistanceBetweenUnits(unit,goal) _C_ unit->Type->MinAttackRange);
+				MapDistanceBetweenUnits(unit, goal) _C_ unit->Type->MinAttackRange);
 			// FIXME: do something other?
 			return;
 		}
@@ -605,7 +607,7 @@ static int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 	}
 
 	for (x = min_x; x <= max_x; ++x) {
-		for ( y = min_y; y <= max_y; ++y) {
+		for (y = min_y; y <= max_y; ++y) {
 			if (ReplayRevealMap || IsMapFieldVisible(ThisPlayer, x, y)) {
 				return 1;
 			}
@@ -683,12 +685,12 @@ static int MissileDrawLevelCompare(const void* v1, const void* v2)
 	}
 }
 /**
-**  Draw all missiles on map.
+**  Sort visible missiles on map for display.
 **
 **  @param vp     Viewport pointer.
-**  @param table  FIXME: docu
+**  @param table  OUT : array of missile to display sorted by DrawLevel.
 **
-**  @return       FIXME: docu
+**  @return       number of missiles, (size of table).
 */
 int FindAndSortMissiles(const Viewport* vp, Missile** table)
 {
@@ -845,16 +847,16 @@ static int ParabolicMissile(Missile* missile)
 	int orig_y;   // position before moving.
 	int xstep;
 	int ystep;
-	int K;        // Coefficient of the parabol.
-	int ZprojToX; // Projection of Z axis on axis X.
-	int ZprojToY; // Projection of Z axis on axis Y.
-	int Z;        // should be missile->Z later.
+	int k;        // Coefficient of the parabol.
+	int zprojToX; // Projection of Z axis on axis X.
+	int zprojToY; // Projection of Z axis on axis Y.
+	int z;        // should be missile->Z later.
 	int x;
 	int y;
 
-	K = -2048; //-1024; // Should be initialised by an other method (computed with distance...)
-	ZprojToX = 4;
-	ZprojToY = 1024;
+	k = -2048; //-1024; // Should be initialised by an other method (computed with distance...)
+	zprojToX = 4;
+	zprojToY = 1024;
 	if (MissileInitMove(missile) == 1) {
 		return 1;
 	}
@@ -868,11 +870,11 @@ static int ParabolicMissile(Missile* missile)
 	ystep = ystep * 1000 / missile->TotalStep;
 	missile->X = missile->SourceX + xstep * missile->CurrentStep / 1000;
 	missile->Y = missile->SourceY + ystep * missile->CurrentStep / 1000;
-	Assert(K != 0);
-	Z = missile->CurrentStep * (missile->TotalStep - missile->CurrentStep) / K;
+	Assert(k != 0);
+	z = missile->CurrentStep * (missile->TotalStep - missile->CurrentStep) / k;
 	// Until Z is used for drawing, modify X and Y.
-	missile->X += Z * ZprojToX / 64;
-	missile->Y += Z * ZprojToY / 64;
+	missile->X += z * zprojToX / 64;
+	missile->Y += z * zprojToY / 64;
 	MissileNewHeadingFromXY(missile, missile->X - orig_x, missile->Y - orig_y);
 	if (missile->Type->SmokeMissile && missile->CurrentStep) {
 		x = missile->X + missile->Type->Width / 2;
@@ -892,7 +894,7 @@ static int ParabolicMissile(Missile* missile)
 static void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 {
 	if (!missile->Type->CanHitOwner && goal == missile->SourceUnit) {
-		return;  // blizzard cannot hit owner unit
+		return;
 	}
 
 	if (goal->HP && goal->Orders[0].Action != UnitActionDie) {
@@ -918,27 +920,25 @@ static void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 */
 static void MissileHitsWall(const Missile* missile, int x, int y, int splash)
 {
-	if (WallOnMap(x, y)) {
-		if (HumanWallOnMap(x, y)) {
-			if (missile->Damage) {  // direct damage, spells mostly
-				HitWall(x, y, missile->Damage / splash);
-			} else {
-				HitWall(x, y,
-					CalculateDamageStats(missile->SourceUnit->Stats,
-						UnitTypeHumanWall->Stats, 0, 0) / splash);
-			}
-		} else {
-			if (missile->Damage) {  // direct damage, spells mostly
-				HitWall(x, y, missile->Damage / splash);
-			} else {
-				Assert(missile->SourceUnit != NULL);
-				HitWall(x, y,
-					CalculateDamageStats(missile->SourceUnit->Stats,
-						UnitTypeOrcWall->Stats, 0, 0) / splash);
-			}
-		}
+	UnitStats* stats; // stat of the wall.
+
+	if (!WallOnMap(x, y)) {
 		return;
 	}
+	if (missile->Damage) {  // direct damage, spells mostly
+		HitWall(x, y, missile->Damage / splash);
+		return;
+	}
+
+	Assert(missile->SourceUnit != NULL);
+	if (HumanWallOnMap(x, y)) {
+		stats = UnitTypeHumanWall->Stats;
+	} else {
+		Assert(OrcWallOnMap(x, y));
+		stats = UnitTypeOrcWall->Stats;
+	}
+	HitWall(x, y, CalculateDamageStats(missile->SourceUnit->Stats, stats, 0, 0) / splash);
+
 }
 
 /**
@@ -967,19 +967,7 @@ void MissileHit(Missile* missile)
 	// The impact generates a new missile.
 	//
 	if (missile->Type->ImpactMissile) {
-// Missile* mis;
-
-// mis =
 		MakeMissile(missile->Type->ImpactMissile, x, y, x, y);
-		// Impact missiles didn't generate any damage now.
-#if 0
-		mis->Damage = missile->Damage; // direct damage, spells mostly
-		mis->SourceUnit = missile->SourceUnit;
-		// FIXME: should copy target also?
-		if (mis->SourceUnit) {
-			RefsIncrease(mis->SourceUnit);
-		}
-#endif
 	}
 
 	if (!missile->SourceUnit) {  // no owner - green-cross ...
@@ -1063,27 +1051,27 @@ void MissileHit(Missile* missile)
 **
 **  @param missile        missile to animate.
 **  @param sign           1 for next frame, -1 for previous frame.
-**  @param LongAnimation  1 if Frame is conditionned by covered distance, 0 else.
+**  @param longAnimation  1 if Frame is conditionned by covered distance, 0 else.
 **
 **  @return               1 if animation is finished, 0 else.
 */
-static int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
+static int NextMissileFrame(Missile* missile, char sign, char longAnimation)
 {
 	int neg;                 // True for mirroring sprite.
-	int AnimationIsFinished; // returned value.
-	int NumDirections;       // Number of direction of the missile.
+	int animationIsFinished; // returned value.
+	int numDirections;       // Number of direction of the missile.
 
 	//
 	// Animate missile, cycle through frames
 	//
 	neg = 0;
-	AnimationIsFinished = 0;
-	NumDirections = missile->Type->NumDirections;
+	animationIsFinished = 0;
+	numDirections = missile->Type->NumDirections;
 	if (missile->SpriteFrame < 0) {
 		neg = 1;
 		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
-	if (LongAnimation) {
+	if (longAnimation) {
 		int totalf;   // Total number of frame (for one direction).
 		int df;       // Current frame (for one direction).
 		int totalx;   // Total distance to cover.
@@ -1091,30 +1079,30 @@ static int NextMissileFrame(Missile* missile, char sign, char LongAnimation)
 
 		totalx = MapDistance(missile->DX, missile->DY, missile->SourceX, missile->SourceY);
 		dx = MapDistance(missile->X, missile->Y, missile->SourceX, missile->SourceY);
-		totalf = missile->Type->SpriteFrames / NumDirections;
-		df = missile->SpriteFrame / NumDirections;
+		totalf = missile->Type->SpriteFrames / numDirections;
+		df = missile->SpriteFrame / numDirections;
 		if ((sign == 1 && dx * totalf <= df * totalx) ||
 				(sign == -1 && dx * totalf > df * totalx)) {
-			return AnimationIsFinished;
+			return animationIsFinished;
 		}
 	}
-	missile->SpriteFrame += sign * NumDirections;
+	missile->SpriteFrame += sign * numDirections;
 	if (sign > 0) {
 		if (missile->SpriteFrame >= missile->Type->SpriteFrames) {
 			missile->SpriteFrame -= missile->Type->SpriteFrames;
-			AnimationIsFinished = 1;
+			animationIsFinished = 1;
 		}
 	} else {
 		if (missile->SpriteFrame < 0) {
 			missile->SpriteFrame += missile->Type->SpriteFrames;
-			AnimationIsFinished = 1;
+			animationIsFinished = 1;
 		}
 	}
 	if (neg) {
 		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
 
-	return AnimationIsFinished;
+	return animationIsFinished;
 }
 
 /**
@@ -1185,6 +1173,7 @@ static void MissilesActionLoop(Missile** missiles)
 			continue;
 		}
 
+		Assert(missile->Wait);
 		if (--missile->Wait) {  // wait until time is over
 			++missiles;
 			continue;
@@ -1216,6 +1205,8 @@ void MissileActions(void)
 **  Calculate distance from view-point to missle.
 **
 **  @param missile  Missile pointer for distance.
+**
+**  @return the computed value.
 */
 int ViewPointDistanceToMissile(const Missile* missile)
 {
@@ -1232,6 +1223,8 @@ int ViewPointDistanceToMissile(const Missile* missile)
 **  Get the burning building missile based on hp percent.
 **
 **  @param percent  HP percent
+**
+**  @return  the missile used for burning.
 */
 MissileType* MissileBurningBuilding(int percent)
 {
@@ -1301,7 +1294,7 @@ void SaveMissiles(CLFile* file)
 	Missile* const* missiles;
 
 	CLprintf(file,"\n--- -----------------------------------------\n");
-	CLprintf(file,"--- MODULE: missiles $Id$\n\n");
+	CLprintf(file, "--- MODULE: missiles $Id$\n\n");
 
 	for (missiles = GlobalMissiles; *missiles; ++missiles) {
 		SaveMissile(*missiles, file);
@@ -1411,7 +1404,7 @@ void CleanMissiles(void)
 // Actions for the missiles
 // ****************************************************************************
 
-/**
+/*
 **  Missile controllers
 **
 **  To cancel a missile set it's TTL to 0, it will be handled right after
@@ -1658,7 +1651,7 @@ void MissileActionFlameShield(Missile* missile)
 	// FIXME: conf, do we hide if the unit is contained or not?
 	//
 	while (unit->Container) {
-		unit=unit->Container;
+		unit = unit->Container;
 	}
 	ux = unit->X;
 	uy = unit->Y;
@@ -1739,6 +1732,8 @@ void MissileActionLandMine(Missile* missile)
 **  Whirlwind controller
 **
 **  @param missile  Controlled missile
+**
+**  @todo do it more configurable.
 */
 void MissileActionWhirlwind(Missile* missile)
 {
@@ -1775,7 +1770,7 @@ void MissileActionWhirlwind(Missile* missile)
 		for (i = 0; i < n; ++i) {
 			if (table[i]->HP) {
 				// should be missile damage ?
-				HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE1);
+				HitUnit(missile->SourceUnit, table[i], WHIRLWIND_DAMAGE1);
 			}
 		}
 	}
@@ -1786,13 +1781,13 @@ void MissileActionWhirlwind(Missile* missile)
 		// we should parameter this
 		n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 		for (i = 0; i < n; ++i) {
-			if( (table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
+			if((table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
 				// should be in missile
-				HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE2);
+				HitUnit(missile->SourceUnit, table[i], WHIRLWIND_DAMAGE2);
 			}
 		}
 	}
-	DebugPrint( "Whirlwind: %d, %d, TTL: %d state: %d\n" _C_
+	DebugPrint("Whirlwind: %d, %d, TTL: %d state: %d\n" _C_
 			missile->X _C_ missile->Y _C_ missile->TTL _C_ missile->State);
 #else
 	if (!(missile->TTL % CYCLES_PER_SECOND / 10)) {
@@ -1817,8 +1812,8 @@ void MissileActionWhirlwind(Missile* missile)
 		missile->SourceX = missile->X;
 		missile->SourceY = missile->Y;
 		missile->State = 0;
-		DebugPrint( "Whirlwind new direction: %d, %d, TTL: %d\n" _C_
-			missile->DX _C_ missile->DY _C_ missile->TTL );
+		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_
+			missile->DX _C_ missile->DY _C_ missile->TTL);
 	}
 }
 
@@ -1826,6 +1821,8 @@ void MissileActionWhirlwind(Missile* missile)
 **  Death-Coil class. Damages organic units and gives to the caster.
 **
 **  @param missile  Controlled missile
+**
+**  @todo  do it configurable.
 */
 void MissileActionDeathCoil(Missile* missile)
 {
@@ -1847,7 +1844,7 @@ void MissileActionDeathCoil(Missile* missile)
 		//
 		if (missile->TargetUnit && !missile->TargetUnit->Destroyed
 				&& missile->TargetUnit->HP)  {
-			HitUnit(source,missile->TargetUnit,missile->Damage);
+			HitUnit(source, missile->TargetUnit, missile->Damage);
 			if (source->Orders[0].Action != UnitActionDie) {
 				source->HP += missile->Damage;
 				if (source->HP > source->Stats->HitPoints) {
@@ -1881,7 +1878,7 @@ void MissileActionDeathCoil(Missile* missile)
 					if (IsEnemy(source->Player, table[i])/* && table[i]->Type->Organic != 0*/) {
 						// disperse damage between them
 						// NOTE: 1 is the minimal damage
-						HitUnit(source,table[i], missile->Damage / ec);
+						HitUnit(source, table[i], missile->Damage / ec);
 					}
 				}
 				if (source->Orders[0].Action != UnitActionDie) {
