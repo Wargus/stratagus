@@ -86,6 +86,7 @@
 <A HREF="#set-default-map!">set-default-map!</A>
 <A HREF="#set-diplomacy!">set-diplomacy!</A>
 <A HREF="#set-game-cycle!">set-game-cycle!</A>
+<A HREF="#set-game-paused!">set-game-paused!</A>
 <A HREF="#set-group-id!">set-group-id!</A>
 <A HREF="#set-player-resource!">set-player-resource!</A>
 <A HREF="#set-shared-vision!">set-shared-vision!</A>
@@ -1463,6 +1464,33 @@ Set the current game cycle number.
 </PRE>
 
 <P>Set the game cycle number to 100.
+
+<H4>Not Used</H4>
+
+<A NAME="set-game-paused!"></A>
+<H3>set-game-cycle!</H3>
+
+<H4>Description</H4>
+
+Pause or unpause the game.
+
+<H4>Syntax</H4>
+
+<CODE>(set-game-paused! paused)</CODE>
+
+<DL>
+<DT>paused</DT>
+<DD>#t for paused, #f for unpaused.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-game-paused! #t)
+</PRE>
+
+<P>Pauses the game.
 
 <H4>Not Used</H4>
 
