@@ -39,31 +39,23 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <H2> This should be done for the release (1.17):</H2>
 <!-- ---- ====== -- ---- --- --- ------- ------- -->
 <UL>
-<LI>Worker with gold/wood could go to depot under construction!
-<LI>Some scanline are missing with 640x480 resolution and SDL-win32.
-<LI>Worker stops, if a nearer mine cannot be reached.
-<LI>Ai can't find any way, tries this to often.
-<LI>Decoration on top not supported.
-<LI>Must combine new animation config with old one.
-<LI>Regenerating forest looks wierd.
-<LI>Touch of darkness has wrong time for damage.
-<LI>SVGALIB version does not support 3 mouse button.
-<LI>Sometime it seems that the command buttons aren't changed.
-<LI>DONE: Full tanker didn't return goods on right click.
-<LI>Let target of attack command blink, if selected (like right click)
-<LI>gryphon rider attack animation could trigger oops (internal error).
-<LI>Wood counter should be reseted, avoiding evil tricks.
-<LI>internal21 no AI.
-<LI>More suggestions?
+<LI>Any suggestions?
 </UL>
 
 <H2> This should be done for the release (1.18):</H2>
 <!-- ---- ====== -- ---- --- --- ------- ------- -->
 <UL>
+<LI>Worker with gold/wood could go to depot under construction!
+<LI>Worker stops, if a nearer mine cannot be reached.
+<LI>Ai can't find any way, tries this to often.
+<LI>Decoration on top not supported.
+<LI>Regenerating forest looks wierd.
+<LI>Touch of darkness has wrong time for damage.
+<LI>SVGALIB version does not support 3 mouse button.
+<LI>Sometime it seems that the command buttons aren't changed.
+<LI>Let target of attack command blink, if selected (like right click)
 <LI>Should rewrite the create player code.
-<LI>GroupID is wrongly used, ALT does always select the last group.
-<LI>FIXED: Can't attack buildings under constructions.
-<LI>Should show buildings, if I build with ctrl+shift more than one.
+<LI>Should show planed buildings, if I build with ctrl+shift more than one.
 <LI>Canceled buildings stills shows gray rectangle, if new building is build.
 <LI>New show actions produces new errors, buttons aren't correctly updated.
 <LI>The color cycling isn't 100% correct. See FIXME: in ColorCycle()
@@ -72,9 +64,6 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>Small ships show an explosion if missile hits target add source.
 <LI>Ships do not go up and down, if attacking.
 <LI>my unit cannot attack enemy building when it is not finished yet (building)
-<LI>FIXED: when I put more units into train queue than food suply, I produce these units
-    even I do not have enough food - solution before unit is started to train
-    you have to check if there is enough food.
 <LI>I cannot change unit 'pending' or however you call it (command aplied to new
     trained units) when there is a unit in train queue, I think I could.
 <LI>Resource line isn't correctly updated for new units and food.
@@ -84,17 +73,15 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>The thing is, if whatever is blocking the path to the wood moves, the
     worker will stay locked up.
 <LI>Building tower I start see in it range before it completed
-<LI>FIXED: I stoped ship with 'T' and it newer start moving.
 <LI>Works: Building a peon and seting relay point to gold mine it will not enter
     it but will be standing near it.
-<LI>FIXED: About attacking sounds 2 destroyers attack silently each other.
 <LI>First sound of attack i never hear, only second,..
-<LI>FIXED: I cannot create more than 1 tanker at once but peons can.
 <LI>4map of orc compain - I cann't get option for creation of transport
    (can't upgrade townhall)
 <LI>I can' hear sounds of enemy peons geting lumber when moving to it
     place with cursor while not see it. bug?
 <LI>Let single player maps played as multiplayer.
+<LI>More suggestions?
 </UL>
 
 <H2> Known  bugs scheduled to next release (1.19):</H2>
@@ -114,31 +101,24 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>defaulth.pud: AttackUnitsInDistance: HP==0 QuadTreeDelete: Value not found
 <LI>Ships should first attack units with distance weapon.
 <LI>Units attacked, which can't reattack should go out of range.
-<LI>FIXED: Catapult has a wrong death sound.
 <LI>Wrong unit to mine gold 113, find the problem.
 </UL>
 
 <H2> Next to implement: </H2>
 <!-- ==== == ========== -->
 <UL>
-<LI>[DONE] Repair code should be rewritten. (Was only quick hack)
 <LI>Document all functions with doc++ or doxygen comments.
-<LI>[DONE] Rescue of units.
 <LI>Should be fixed: Search bug peon on the way for building, and than let him build an other.
 <LI>Show the units in a transporter on map.
 <LI>New spell "show units in enemy transporters"
 <LI>Make a spy unit.
 <LI>Costs Spells
-<LI>[DONE] Regeneration of berserks
 <LI>Constructions have an own sight-range.
 <LI>Corpse have a sight-range which will slowy reduced.
-<LI>[DONE] Gold-mines with peons have an sight-range.
-<LI>[DONE] Show bloodlust,invis,shield,...
 <LI>Reduce memory use. (16 MB)
 <LI>Unit moves away from magni.., glas must disappear.
 <LI>Speed for daemon and skeleton.
 <LI>Buildings/Units blink red even after they aren't being hurt.
-<LI>FIXED: You can build an oil platform anywhere but where the oil is. :)
 <LI>The price and name of something to be built/upgraded doesn't disappear,
 	and will remain on the screen until another price comes up.
 <LI>The brown background is never updated, and it will build a mass of
@@ -147,7 +127,6 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>Selecting with rectangle and scrolling with keyboard: some solutions??
 <LI>Transporter and party didn't meet automatic!
 <LI>Multiple orc units selected shows human units!
-<LI>FIXED: Playing with + and -, the game stops updating (Should test)?
 <LI>Another big thing I noticed - When loading 
 data/puds/multi/jimland.pud, before the player stats appear,
 MANY lines saying "REGM:  contains unknown action 0x4100" are
@@ -171,22 +150,13 @@ is very slow and dumps core.
 <H2>In the near future:</H2>
 <!-- == === ==== ======= -->
 <UL>
-<LI>Missiles must be completed
-<LI>Attack must be completed
 <LI>Computer AI should be improved
 <LI>Add map-specific AI strategies
 <LI>Fog of war (correct)
 <LI>Exploration (correct)
-<LI>Interface: shift mouse select/unselect ...
-<LI>Show unit state in buttons.
 <LI>Never chop the same wood twice.
 <LI>DGA X11 supported.
-<LI>Improve network (internet) support
-<LI>Faster and better extraction (build.sh)
-<LI>Slow down speed (not only speed up)
 <LI>Invidual speeds for players.
-<LI>The enemies do not develop... they just harvest...
-<LI>death knight magic doesn't seem to drop at all...
 <LI>Training queues without resources.
 <LI>Hear range, and sound handling of only hearable sounds.
 </UL>
@@ -207,15 +177,12 @@ is very slow and dumps core.
 <LI>Editing Build list for buildings (building queue)
 <LI>Z coordinates
 <LI>Ground effects (roads faster,...)
-<LI>800x600 resolution support ( requres just 800x600 mode border/interface graphics )
 <LI>Animated cursors
 <LI>Automatic repairs
 <LI>Show how time of bloodlust... (blink if short before end)
 <LI>Show invisible better, (transparent...)
 <LI>Radar minimap. (Edgar!)
-<LI>Unit groups on 1-9,0. 
 <LI>Map zoom factor 1,2,4 like anno 1602
-<LI>Add TrueColor 24 bit support
 <LI>Add support for SHM-Extensions without pixmap support
 </UL>
 
