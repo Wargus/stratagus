@@ -34,8 +34,8 @@ CCLLIB	= -lm
 #	Any modern linux distribution are thread safe.
 #	Don't enable, if you use SDL sound support.
 
-THREAD		= -D_REENTRANT -DUSE_THREAD
-THREADLIB	= -lpthread
+#THREAD		= -D_REENTRANT -DUSE_THREAD
+#THREADLIB	= -lpthread
 
 #------------------------------------------------------------------------------
 #	Video driver part
@@ -70,8 +70,8 @@ VIDEOLIB	= -lXext -lX11 -ldl
 
 # Uncomment the next for the generic SDL support.
 
-#VIDEO		= $(SDL)
-#VIDEOLIB	= $(SDLLIB)
+VIDEO		= $(SDL)
+VIDEOLIB	= $(SDLLIB)
 
 # Uncomment the next for the SDL X11/SVGALIB support.
 
@@ -137,7 +137,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #------------------------------------------------------------------------------
 
 # Uncomment next to profile
-PROFILE=	-pg
+#PROFILE=	-pg
 
 # Compile Version
 VERSION=	'-DVERSION="1.17pre1-build12"'
@@ -177,15 +177,15 @@ DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ##
 ## There are some still not well tested code parts or branches.
 ## UNITS_ON_MAP:	Faster lookup of units
-## MEW_ORDERS:		Johns new none memory leaking order code
 ## NEW_MAPDRAW:		Stephans new map draw code
+## This aren't working:
 ## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Include new network menues.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -D_NEW_SHIPS -DNEW_ORDERS -DNEW_NETMENUS #-DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_AI -DNEW_NAMES
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_NETMENUS #-DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_AI -DNEW_NAMES -DNEW_SHIPS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)

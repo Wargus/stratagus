@@ -30,6 +30,7 @@ EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP -DNEW_SHIPS"
 ## There are some still not well tested code parts or branches.
 ## UNITS_ON_MAP:	Faster lookup of units
 ## NEW_MAPDRAW:		Stephans new map draw code
+## This aren't working yet:
 ## NEW_NAMES:		New unit names without copyleft problems
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_AI:		New better improved AI code
