@@ -3600,8 +3600,12 @@ local void SaveOrder(const Order* order,FILE* file)
 	    case UnitActionResearch:
 		fprintf(file," upgrade %s",((Upgrade*)order->Arg1)->Ident);
 		break;
+	    case UnitActionMineGold:
+		fprintf(file," mine (%d %d)",
+			(int)order->Arg1>>16,(int)order->Arg1&0xFFFF);
+		break;
 	    default:
-		fprintf(file," arg1 %08X",(int)order->Arg1);
+		fprintf(file," arg1 %d",(int)order->Arg1);
 		break;
 	}
     }
