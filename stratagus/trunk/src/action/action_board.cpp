@@ -54,9 +54,15 @@
 */
 local int MoveToTransporter(Unit* unit)
 {
-    int i;
+    int i,x,y;
 
+    x=unit->X;
+    y=unit->Y;
     i=DoActionMove(unit);
+    // We have to reset a lot, or else they will circle each other and stuff.
+    if (x!=unit->X||y!=unit->Y) {
+        NewResetPath(unit);
+    }
     // New code has this as default.
     DebugCheck( unit->Orders[0].Action!=UnitActionBoard );
     return i;
@@ -79,8 +85,8 @@ local int WaitForTransporter(Unit* unit)
 
     if( !trans || !trans->Type->Transporter ) {
 	// FIXME: destination destroyed??
-	DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
-	return 0;
+        DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
+        return 0;
     }
 
     if( trans->Destroyed ) {
@@ -110,7 +116,17 @@ local int WaitForTransporter(Unit* unit)
     //	FIXME: any enemies in range attack them, while waiting.
     //
 
-    DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
+    DebugLevel3Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
+    //  n0b0dy: This means we have to search with a smaller range.
+    //  It happens only when you reach the shore,and the transporter
+    //  is not there. The unit searches with a big range, so it thinks
+    //  it's there. This is why we reset the search. The transporter
+    //  should be a lot closer now, so it's not as bad as it seems.
+    unit->SubAction=0;
+    unit->Orders[0].RangeX=1;
+    unit->Orders[0].RangeY=1;
+    //Uhh wait a bit.
+    unit->Wait=10;
 
     return 0;
 }
@@ -162,6 +178,10 @@ local void EnterTransporter(Unit* unit)
 	    // FIXME: reference counts?
 	    transporter->Value++;
 	    RemoveUnit(unit,transporter);
+            //Don't make anything funny after going out of the transporter.
+            // FIXME: This is probably wrong, but it works for me (n0b0dy)
+            unit->OrderCount=1;
+            unit->Orders[0].Action=UnitActionStill;
 	    if( IsOnlySelected(transporter) ) {
 		UpdateButtonPanel();
 		MustRedraw|=RedrawPanels;
@@ -175,9 +195,8 @@ local void EnterTransporter(Unit* unit)
 /**
 **	The unit boards a transporter.
 **
-**	@todo FIXME: the transporter must drive to the meating point.
-**		While waiting for the transporter the units must defend
-**		themselfs.
+**	@todo FIXME:
+**      While waiting for the transporter the units must defend themselfs.
 **
 **	@param unit	Pointer to unit.
 */
@@ -221,7 +240,6 @@ global void HandleActionBoard(Unit* unit)
 			if( ++unit->SubAction==200 ) {
 			    unit->Orders[0].Action=UnitActionStill;
 			    if( (goal=unit->Orders[0].Goal) ) {
-
 				RefsDebugCheck(!goal->Refs);
 				if( !--goal->Refs ) {
 				    RefsDebugCheck(!goal->Destroyed);
@@ -233,7 +251,15 @@ global void HandleActionBoard(Unit* unit)
 			    }
 			    unit->SubAction=0;
 			} else {
-			    unit->Wait=unit->SubAction;
+                            //
+                            // Try with a bigger range.
+                            //
+                            if( unit->Orders[0].RangeX <= TheMap.Width
+                 	        || unit->Orders[0].RangeX <= TheMap.Height) {
+		                unit->Orders[0].RangeX++;
+		                unit->Orders[0].RangeY++;
+                                unit->SubAction--;
+                            }
 			}
 		    } else if( i==PF_REACHED ) {
 			unit->SubAction=201;

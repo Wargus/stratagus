@@ -99,6 +99,7 @@ global void DoRightButton(int sx,int sy)
     int y;
     Unit* dest;
     Unit* unit;
+    Unit* desttransporter=0;
     UnitType* type;
     int action;
     int acknowledged;
@@ -126,6 +127,18 @@ global void DoRightButton(int sx,int sy)
     //	Right mouse with SHIFT appends command to old commands.
     //
     flush=!(KeyModifiers&ModifierShift);
+    
+    if( UnitUnderCursor && (dest=TransporterOnScreenMapPosition(sx,sy))) {
+        // n0b0dy: So we are clicking on a transporter. We have to:
+        // 1) Flush the transporters orders.
+        // 2) Tell the transporter to follow the units. We have to queue all
+        //    these follow orders, so the transport wil go and pick the up 
+        // 3) Tell all selected land units to go board the transporter.
+        //
+        // Here we flush the order queue
+        SendCommandStopUnit(dest);
+        desttransporter=dest;
+    }
 
     // FIXME: the next should be rewritten, must select the units with
     // FIXME: the box size and not with the tile position
@@ -133,6 +146,11 @@ global void DoRightButton(int sx,int sy)
     acknowledged=0;
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
+        // If we are telling units to board a tranasporter,
+        // don't give the transport extra orders.
+        if (unit==desttransporter) {
+            continue;
+        }
 	DebugCheck( !unit );
 	if( !acknowledged ) {
 	    PlayUnitSound(unit,VoiceAcknowledging);
@@ -164,15 +182,9 @@ global void DoRightButton(int sx,int sy)
 	    if( dest->Player==unit->Player
 		    && unit->Type->UnitType==UnitTypeLand ) {
 		dest->Blink=4;
-		DebugLevel3Fn("Board transporter\n");
+		DebugLevel0Fn("Board transporter\n");
 		//	Let the transporter move to passenger
-		//		It should do nothing and not already on coast.
-		//		FIXME: perhaps force move if not reachable.
-		if( dest->Orders[0].Action==UnitActionStill
-			&& dest->OrderCount==1
-			&& !CoastOnMap(dest->X,dest->Y) ) {
-		    SendCommandFollow(dest,unit,FlushCommands);
-		}
+		SendCommandFollow(dest,unit,0);
 		SendCommandBoard(unit,-1,-1,dest,flush);
 		continue;
 	    }
@@ -395,10 +407,28 @@ global void DoRightButton(int sx,int sy)
 	}
 #endif
 
-
-//	    if( !unit->Type->Building ) {
+        if (type->Building) {
+	    if( UnitUnderCursor && (dest=PlatformOnMap(x,y)) ) {
+                dest->Blink=4;
+	        DebugLevel3("RALY POINT TO PLATFORM\n");
+                SendCommandHaulOil(Selected[i],dest,!(KeyModifiers&ModifierShift));
+	        continue;
+            }
+            if( UnitUnderCursor && (dest=GoldMineOnMap(x,y)) ) {
+	        dest->Blink=4;
+                DebugLevel3("RALY POINT TO GOLD-MINE\n");
+	        SendCommandMineGold(Selected[i],dest,!(KeyModifiers&ModifierShift));
+	        continue;
+	    }
+	    if( IsMapFieldExplored(unit->Player,x,y) && ForestOnMap(x,y) ) {
+                DebugLevel3("RALY POINT TO FOREST\n");                
+	        SendCommandHarvest(Selected[i],x,y,!(KeyModifiers&ModifierShift));
+                continue;
+            }
+	    SendCommandMove(unit,x,y,flush);
+            continue;
+        }
 	SendCommandMove(unit,x,y,flush);
-//	    }
     }
     ShowOrdersCount=GameCycle+ShowOrders*CYCLES_PER_SECOND;
 }

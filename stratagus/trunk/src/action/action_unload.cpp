@@ -45,6 +45,75 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+
+#define LandUnitMask ( \
+    MapFieldLandUnit | \
+    MapFieldBuilding | \
+    MapFieldWall | \
+    MapFieldRocks | \
+    MapFieldForest | \
+    MapFieldCoastAllowed | \
+    MapFieldWaterAllowed | \
+    MapFieldUnpassable)
+
+/**
+**	Find a free position close to x, y
+**
+**	@param x	Original x search position.
+**	@param y	Original y search position
+**	@param resx	Unload x position.
+**	@param resy	Unload y position.
+**      @param mask     Movement mask for the unit to be droped.
+**
+**	@return		True if a position was found, False otherwise.
+**      @note           resx and resy are undefined if a position is not found.
+**
+**	@bug FIXME: Place unit only on fields reachable from the transporter
+*/
+local int FindUnloadPosition(int x,int y,int *resx,int *resy,int mask)
+{
+    int i,n,addx,addy;
+    addx=addy=1;
+    --x;
+    for( n=0; n<2; ++n ) {
+        //  Nobody: There was some code here to check for unloading units that can
+        //  only go on even tiles. It's useless, since we can only unload land units.
+	for( i=addy; i--; y++ ) {
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
+	    }
+	}
+	++addx;
+	for( i=addx; i--; x++ ) {
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
+	    }
+	}
+	++addy;
+	for( i=addy; i--; y-- ) {
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
+	    }
+	}
+	++addx;
+	for( i=addx; i--; x-- ) {
+	    if( CheckedCanMoveToMask(x,y,mask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
+	    }
+	}
+	++addy;
+    }
+    return 0;
+}
+
 /**
 **	Reappear unit on map.
 **
@@ -56,79 +125,88 @@
 **
 **	@bug FIXME: Place unit only on fields reachable from the transporter
 */
-global int UnloadUnit(Unit* unit,int addx,int addy)
+global int UnloadUnit(Unit* unit)
 {
-    int x;
-    int y;
-    int i;
-    int mask;
-    int n;
-
+    int x,y;
     DebugCheck( !unit->Removed );
+    if ( !FindUnloadPosition(unit->X,unit->Y,&x,&y,UnitMovementMask(unit)) ) {
+        return 0;
+    }
+    unit->X=x;
+    unit->Y=y;
+    unit->Wait=1;		// should be correct unit has still action
+    PlaceUnit(unit,x,y);
+    return 1;
+}
 
-    x=unit->X;
-    y=unit->Y;
-    mask=UnitMovementMask(unit);
 
-    --x;
-    // FIXME: don't search outside of the map
-    for( n=0; n<2; ++n ) {
+/**
+**      Find the closest piece of coast you can unload units on
+**      
+**      @param  x       start location for the search
+**      @param  y       start location for the search
+**      @param  resx    coast x position
+**      @param  resy    coast y position
+**      @return 1 if a location was found, 0 otherwise
+*/
+local int ClosestFreeCoast(int x,int y,int* resx,int* resy)
+{
+    int i,addx,addy,nullx,nully,n;
+    addx=addy=1;
+    if( CoastOnMap(x,y) &&
+        FindUnloadPosition(x,y,&nullx,&nully,LandUnitMask) ) {
+        *resx=x;
+        *resy=y;
+        return 1;
+    }
+    x--;
+    // The maximum distance to the coast. We have to stop somewhere...
+    n=20;
+    while (n--)
+    {
 	for( i=addy; i--; y++ ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		goto found;
+            if( x>=0 && y>=0 && x<TheMap.Width && y<TheMap.Height &&
+                CoastOnMap(x,y) && !UnitOnMapTile(x,y) &&
+                FindUnloadPosition(x,y,&nullx,&nully,LandUnitMask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
 	    }
 	}
 	++addx;
 	for( i=addx; i--; x++ ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		goto found;
+            if( x>=0 && y>=0 && x<TheMap.Width && y<TheMap.Height &&
+                CoastOnMap(x,y) && !UnitOnMapTile(x,y) &&
+                FindUnloadPosition(x,y,&nullx,&nully,LandUnitMask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
 	    }
 	}
 	++addy;
 	for( i=addy; i--; y-- ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		goto found;
+            if( x>=0 && y>=0 && x<TheMap.Width && y<TheMap.Height &&
+                CoastOnMap(x,y) && !UnitOnMapTile(x,y) &&
+                FindUnloadPosition(x,y,&nullx,&nully,LandUnitMask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
 	    }
 	}
 	++addx;
 	for( i=addx; i--; x-- ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
-	    if( CheckedCanMoveToMask(x,y,mask) ) {
-		goto found;
+            if( x>=0 && y>=0 && x<TheMap.Width && y<TheMap.Height &&
+                CoastOnMap(x,y) && !UnitOnMapTile(x,y) &&
+                FindUnloadPosition(x,y,&nullx,&nully,LandUnitMask) ) {
+                *resx=x;
+                *resy=y;
+		return 1;
 	    }
 	}
 	++addy;
     }
+    DebugLevel0Fn("Try clicking closer to an actual coast.\n");
     return 0;
-
-found:
-    unit->X=x;
-    unit->Y=y;
-
-    unit->Wait=1;		// should be correct unit has still action
-
-    PlaceUnit(unit,x,y);
-
-    return 1;
 }
 
 /**
@@ -140,10 +218,10 @@ found:
 local int MoveToCoast(Unit* unit)
 {
     DebugLevel3Fn("%p\n" _C_ unit->Orders[0].Goal);
-
+    
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
-	    DebugLevel2Fn("COAST NOT REACHED\n");
+	    DebugLevel2Fn("COAST NOT REACHABLE\n");
 	    return -1;
 	case PF_REACHED:
 	    break;
@@ -169,8 +247,9 @@ local int MoveToCoast(Unit* unit)
 */
 local void LeaveTransporter(Unit* unit)
 {
-    int i;
+    int i,stillonboard;
     Unit* goal;
+    stillonboard=0;
 
     goal=unit->Orders[0].Goal;
     DebugLevel3Fn("Goal %p\n" _C_ goal);
@@ -191,8 +270,7 @@ local void LeaveTransporter(Unit* unit)
 	    if( goal==unit->OnBoard[i] ) {
 		goal->X=unit->X;
 		goal->Y=unit->Y;
-		if( UnloadUnit(goal,
-			unit->Type->TileWidth,unit->Type->TileHeight) ) {
+		if( UnloadUnit(goal) ) {
 		    unit->OnBoard[i]=NoUnitP;
 		    unit->Value--;
 		}
@@ -204,11 +282,12 @@ local void LeaveTransporter(Unit* unit)
 	    if( (goal=unit->OnBoard[i]) ) {
 		goal->X=unit->X;
 		goal->Y=unit->Y;
-		if( UnloadUnit(goal,
-			unit->Type->TileWidth,unit->Type->TileHeight) ) {
+		if( UnloadUnit(goal) ) {
 		    unit->OnBoard[i]=NoUnitP;
 		    unit->Value--;
-		}
+		} else {
+                    stillonboard++;
+                }
 	    }
 	}
     }
@@ -216,9 +295,23 @@ local void LeaveTransporter(Unit* unit)
 	UpdateButtonPanel();
 	MustRedraw|=RedrawPanels;
     }
-    unit->Wait=1;
-    unit->Orders[0].Action=UnitActionStill;
-    unit->SubAction=0;
+    
+    // We still have some units to unload, find a piece of free coast.
+    if (stillonboard) {
+        //  We tell it to unload at it's current position. This can't be done,
+        //  so it will search for a piece of free coast nearby.
+        unit->Orders[0].Action=UnitActionUnload;
+        unit->Orders[0].Goal=NoUnitP;
+        unit->Orders[0].X=unit->X;
+        unit->Orders[0].Y=unit->Y;
+        unit->SubAction=0;
+        unit->Reset=0;
+        unit->Wait=0;
+    } else {
+        unit->Wait=1;
+        unit->Orders[0].Action=UnitActionStill;
+        unit->SubAction=0;
+    }
 }
 
 /**
@@ -228,7 +321,7 @@ local void LeaveTransporter(Unit* unit)
 */
 global void HandleActionUnload(Unit* unit)
 {
-    int i;
+    int i,x,y;
 
     DebugLevel3Fn("%p(%d) SubAction %d\n"
 	    _C_ unit _C_ UnitNumber(unit) _C_ unit->SubAction);
@@ -238,12 +331,22 @@ global void HandleActionUnload(Unit* unit)
 	//	Move the transporter
 	//
 	case 0:
-	    NewResetPath(unit);
-	    unit->SubAction=1;
-	    // FALL THROUGH
+            if ( !unit->Orders[0].Goal ) {
+                if ( !ClosestFreeCoast(unit->Orders[0].X,unit->Orders[0].Y,&x,&y) ) {
+                    // Sorry... I give up.
+		    unit->Orders[0].Action=UnitActionStill;
+		    unit->SubAction=0;
+                    return;
+                }
+                unit->Orders[0].X=x;
+                unit->Orders[0].Y=y;
+            }
+            NewResetPath(unit);
+            unit->SubAction=1;
 	case 1:
+            //  The Goal is the unit that we have to unload.
 	    if( !unit->Orders[0].Goal ) {
-		// NOTE: the Move clears the goal!!
+                // We have to unload everything
 		if( (i=MoveToCoast(unit)) ) {
 		    if( i==-1 ) {
 			if( ++unit->SubAction==1 ) {
@@ -262,6 +365,9 @@ global void HandleActionUnload(Unit* unit)
 	case 2:
 	    // FIXME: show still animations ?
 	    LeaveTransporter(unit);
+            if ( unit->Orders[0].Action!=UnitActionStill ) {
+                HandleActionUnload(unit);
+            }
 	    break;
     }
 }

@@ -102,11 +102,12 @@ global void HandleActionFollow(Unit* unit)
 	    //
 	    //	Some tries to reach the goal
 	    //
-	    if( unit->SubAction++<10 ) {
-		//	To keep the load low, retry delayed.
-		unit->Wait=CYCLES_PER_SECOND/10+unit->SubAction;
+	    if( unit->Orders[0].RangeX <= TheMap.Width
+	        || unit->Orders[0].RangeX <= TheMap.Height) {
+		unit->Orders[0].RangeX++;
+		unit->Orders[0].RangeY++;
 		break;
-	    }
+            }
 	    // FALL THROUGH
 	case PF_REACHED:
 	    // FIXME: dark portal teleportation: Goal is used for target circle of power
