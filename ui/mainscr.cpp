@@ -566,6 +566,8 @@ global void DrawResources(void)
 		    TheUI.Resources[i].IconRow * TheUI.Resources[i].IconH,
 		    TheUI.Resources[i].IconW, TheUI.Resources[i].IconH,
 		    TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
+	    }
+	    if (TheUI.Resources[i].TextX != -1) {
 		v = ThisPlayer->Resources[i];
 		VideoDrawNumber(TheUI.Resources[i].TextX,
 		    TheUI.Resources[i].TextY + (v > 99999) * 3,
@@ -578,13 +580,15 @@ global void DrawResources(void)
 		TheUI.Resources[FoodCost].IconW, TheUI.Resources[FoodCost].IconH,
 		TheUI.Resources[FoodCost].IconX, TheUI.Resources[FoodCost].IconY);
 	}
-	sprintf(tmp, "%d/%d", ThisPlayer->NumFoodUnits, ThisPlayer->Food);
-	if (ThisPlayer->Food < ThisPlayer->NumFoodUnits) {
-	    VideoDrawReverseText(TheUI.Resources[FoodCost].TextX,
-		TheUI.Resources[FoodCost].TextY, GameFont, tmp);
-	} else {
-	    VideoDrawText(TheUI.Resources[FoodCost].TextX,
-		TheUI.Resources[FoodCost].TextY, GameFont, tmp);
+	if (TheUI.Resources[FoodCost].TextX != -1) {
+	    sprintf(tmp, "%d/%d", ThisPlayer->NumFoodUnits, ThisPlayer->Food);
+	    if (ThisPlayer->Food < ThisPlayer->NumFoodUnits) {
+		VideoDrawReverseText(TheUI.Resources[FoodCost].TextX,
+		    TheUI.Resources[FoodCost].TextY, GameFont, tmp);
+	    } else {
+		VideoDrawText(TheUI.Resources[FoodCost].TextX,
+		    TheUI.Resources[FoodCost].TextY, GameFont, tmp);
+	    }
 	}
 
 	if (TheUI.Resources[ScoreCost].Icon.Graphic) {
@@ -593,10 +597,12 @@ global void DrawResources(void)
 		TheUI.Resources[ScoreCost].IconW, TheUI.Resources[ScoreCost].IconH,
 		TheUI.Resources[ScoreCost].IconX, TheUI.Resources[ScoreCost].IconY);
 	}
-	v = ThisPlayer->Score;
-	VideoDrawNumber(TheUI.Resources[ScoreCost].TextX,
-	    TheUI.Resources[ScoreCost].TextY + (v > 99999) * 3,
-	    v > 99999 ? SmallFont : GameFont, v);
+	if (TheUI.Resources[ScoreCost].TextX != -1) {
+	    v = ThisPlayer->Score;
+	    VideoDrawNumber(TheUI.Resources[ScoreCost].TextX,
+		TheUI.Resources[ScoreCost].TextY + (v > 99999) * 3,
+		v > 99999 ? SmallFont : GameFont, v);
+	}
     }
 }
 
