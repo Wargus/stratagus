@@ -109,6 +109,22 @@ local const int FogTable[16] = {
 };
 
 /**
+**	Pythagorus table tree for use in fow calculations
+*/
+local const int PythagTree[12][12] = {
+    {   0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121},
+    {   1,   2,   5,  10,  17,  26,  37,  50,  65,  82, 101, 122},
+    {   4,   5,   8,  13,  20,  29,  40,  53,  68,  85, 104, 125},
+    {   9,  10,  13,  18,  25,  34,  45,  58,  73,  90, 109, 130},
+    {  16,  17,  20,  25,  32,  41,  52,  65,  80,  97, 116, 137},
+    {  25,  26,  29,  34,  41,  50,  61,  74,  89, 106, 125, 146},
+    {  36,  37,  40,  45,  52,  61,  72,  85, 100, 117, 136, 157},
+    {  49,  50,  53,  58,  65,  74,  85,  98, 113, 130, 149, 170},
+    {  64,  65,  68,  73,  80,  89, 100, 113, 128, 145, 164, 185},
+    {  81,  82,  85,  90,  97, 106, 117, 130, 145, 162, 181, 202},
+    { 100, 101, 104, 109, 116, 125, 136, 149, 164, 181, 200, 221},
+    { 121, 122, 125, 130, 137, 146, 157, 170, 185, 202, 221, 242}};
+/**
 **	Draw unexplored area function pointer. (display and video mode independ)
 */
 local void (*VideoDrawUnexplored)(const GraphicData*,int,int);
@@ -266,11 +282,11 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 
     p=player->Player;
     ++range;
+    range = range*range;
     // FIXME: Can be speed optimized, no * += ...
     while( height-->=0 ) {
 	for( i=x; i<=x+width; ++i ) {
-	    // FIXME: Can use quadrat table!
-	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<=range*range ) {
+	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
 		v=TheMap.Fields[i+y*TheMap.Width].Visible[p];
 		switch( v ) {
 		    case 0:		// Unexplored
@@ -340,11 +356,11 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 
     p=player->Player;
     ++range;
+    range=range*range;
     // FIXME: Can be speed optimized, no * += ...
     while( height-->=0 ) {
 	for( i=x; i<=x+width; ++i ) {
-	    // FIXME: Can use quadrat table!
-	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<=range*range ) {
+	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
 		v=TheMap.Fields[i+y*TheMap.Width].Visible[p];
 		switch( v ) {
 		    case 255:
@@ -440,10 +456,10 @@ global void MapMarkSight(int tx,int ty,int range)
     }
 
     ++range;
+    range=range*range;
     while( height-->=0 ) {
 	for( i=x; i<=x+width; ++i ) {
-	    // FIXME: Can use quadrat table!
-	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<=range*range ) {
+	    if( PythagTree[abs(i-tx)][abs(y-ty)]<=range ) {
 		// FIXME: can combine more bits
 		if( !IsMapFieldVisible(i,y) ) {
 		    TheMap.Fields[i+y*TheMap.Width].Flags |= MapFieldExplored;
