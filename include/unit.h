@@ -656,14 +656,17 @@ struct _unit_ {
 		int TimeToHarvest;          ///< how much time until we harvest some more.
 		unsigned DoneHarvesting:1;  ///< Harvesting done, wait for action to break.
 	} ResWorker; ///< Worker harvesting
+	struct _order_repair_ {
+		int Cycles;                 ///< Cycles unit has been repairing for
+	} Repair; ///< Repairing unit
 	struct _order_research_ {
-		struct _upgrade_* Upgrade; ///< Upgrade researched
+		struct _upgrade_* Upgrade;  ///< Upgrade researched
 	} Research; ///< Research action
 	struct _order_upgradeto_ {
 		int Ticks; ///< Ticks to complete
 	} UpgradeTo; ///< Upgrade to action
 	struct _order_train_ {
-		int Ticks;                      ///< Ticks to complete
+		int Ticks;                  ///< Ticks to complete
 	} Train; ///< Train units action
 	} Data; ///< Storage room for different commands
 
