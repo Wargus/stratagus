@@ -33,6 +33,8 @@
 --      Defines
 ----------------------------------------------------------------------------*/
 
+#ifndef USE_CCL
+
 #define USE_EXTENSIONS		/// Enable our extensions
 
 // Unit lists
@@ -79,10 +81,11 @@
 #define ORC_AIR_FORCES \
     "unit-eye-of-kilrogg,unit-dragon,unit-goblin-zeppelin"
 
+#endif
+
 /*----------------------------------------------------------------------------
 --      Declaration
 ----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------
 --      Variables
@@ -127,7 +130,6 @@ global int ButtonCheckFalse(const Unit* unit,const ButtonAction* button)
 */
 global int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button)
 {
-    DebugLevel2Fn("%s\n",button->AllowStr);
     return UpgradeIdentAllowed(unit->Player,button->AllowStr)=='R';
 }
 
@@ -140,7 +142,6 @@ global int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button)
 */
 global int ButtonCheckUnit(const Unit* unit,const ButtonAction* button)
 {
-    DebugLevel3("%s\n",button->AllowStr);
     return HaveUnitTypeByIdent(unit->Player,button->AllowStr);
 }
 
@@ -157,7 +158,6 @@ global int ButtonCheckUnits(const Unit* unit,const ButtonAction* button)
     const char* s;
     Player* player;
 
-    DebugLevel3("%s\n",button->AllowStr);
     player=unit->Player;
     buf=alloca(strlen(button->AllowStr)+1);
     strcpy(buf,button->AllowStr);
@@ -186,6 +186,7 @@ global int ButtonCheckNetwork(const Unit* unit,const ButtonAction* button)
 
 /**
 **	Check for button enabled, if the unit isn't working.
+**		Working is training, upgrading, researching.
 **
 **	@param unit	Pointer to unit for button.
 **	@param button	Pointer to button to check/enable.
@@ -193,17 +194,10 @@ global int ButtonCheckNetwork(const Unit* unit,const ButtonAction* button)
 */
 global int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button)
 {
-#ifdef NEW_ORDERS
     return unit->Type->Building
 	    && unit->Orders[0].Action != UnitActionTrain
 	    && unit->Orders[0].Action != UnitActionUpgradeTo
 	    && unit->Orders[0].Action != UnitActionResearch;
-#else
-    return unit->Type->Building
-	    && unit->Command.Action != UnitActionTrain
-	    && unit->Command.Action != UnitActionUpgradeTo
-	    && unit->Command.Action != UnitActionResearch;
-#endif
 }
 
 /**
@@ -215,15 +209,9 @@ global int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button)
 */
 global int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button)
 {
-#ifdef NEW_ORDERS
     return unit->Type->Building
 	    && unit->Orders[0].Action != UnitActionUpgradeTo
 	    && unit->Orders[0].Action != UnitActionResearch;
-#else
-    return unit->Type->Building
-	    && unit->Command.Action != UnitActionUpgradeTo
-	    && unit->Command.Action != UnitActionResearch;
-#endif
 }
 
 /**
@@ -236,16 +224,9 @@ global int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button)
 */
 global int ButtonCheckUpgradeTo(const Unit* unit,const ButtonAction* button)
 {
-#ifdef NEW_ORDERS
     if ( unit->Orders[0].Action != UnitActionStill ) {
 	return 0;
     }
-#else
-    if ( unit->Command.Action != UnitActionStill ) {
-	return 0;
-    }
-#endif
-    DebugLevel3("%s\n",button->ValueStr);
     return CheckDependByIdent(unit->Player,button->ValueStr);
 }
 
@@ -274,7 +255,6 @@ global int ButtonCheckResearch(const Unit* unit,const ButtonAction* button)
 	return 0;
     }
 
-    DebugLevel3("%s\n",button->ValueStr);
     // check if allowed
     if ( !CheckDependByIdent( ThisPlayer, button->ValueStr ) ) {
 	return 0;
