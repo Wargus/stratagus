@@ -452,6 +452,10 @@ local void SpellFlameShieldController(Missile * missile)
     missile->X = ux * TileSizeX + ix + uw / 2 + dx - 32;
     missile->Y = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
 
+    if (missile->TargetUnit->Orders[0].Action == UnitActionDie) {
+	missile->TTL = i;
+    }
+
     if (missile->TTL == 0) {
 	missile->TargetUnit->FlameShield = 0;
     }
