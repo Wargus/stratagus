@@ -10,7 +10,7 @@
 //
 /**@name button_checks.c	-	The button checks. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -154,6 +154,20 @@ global int ButtonCheckUnitsAnd(const Unit* unit,const ButtonAction* button)
 global int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
 {
     return NetworkFildes!=-1;
+}
+
+/**
+**	Check if network play is disabled.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if disabled.
+**
+**	NOTE: this check could also be moved into intialisation.
+*/
+global int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),const ButtonAction* button __attribute__((unused)))
+{
+    return NetworkFildes==-1;
 }
 
 /**
