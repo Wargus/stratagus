@@ -31,13 +31,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-
-#include "freecraft.h"
-
-#if defined(USE_CCL) // {
-
 #include <stdlib.h>
 
+#include "freecraft.h"
 #include "player.h"
 #include "ccl.h"
 
@@ -390,7 +386,5 @@ global void PlayerCclRegister(void)
 
     gh_new_procedureN("define-race-wc-names",CclDefineRaceWcNames);
 }
-
-#endif	// } USE_CCL
 
 //@}

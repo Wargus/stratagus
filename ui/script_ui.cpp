@@ -35,9 +35,6 @@
 #include <string.h>
 
 #include "freecraft.h"
-
-#if defined(USE_CCL)	// {
-
 #include "ccl.h"
 #include "interface.h"
 #include "ui.h"
@@ -1306,7 +1303,5 @@ global void UserInterfaceCclRegister(void)
 
     gh_new_procedureN("define-button",CclDefineButton);
 }
-
-#endif	// } USE_CCL
 
 //@}

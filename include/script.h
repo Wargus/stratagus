@@ -40,8 +40,6 @@
 --	Macros
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_CCL
-
 //
 //	Macros for compatibility with guile high level interface.
 //
@@ -101,8 +99,6 @@
 extern LISP sym_t;
 
 //extern SCM CclEachSecond;		/// Scheme function called each second
-
-#endif	// USE_CCL
 
 /*----------------------------------------------------------------------------
 --	Variables

@@ -45,29 +45,12 @@
 extern int WoodTable[16];		/// Table for wood removable.
 extern int RockTable[20];		/// Table for rock removable.
 
-#if !defined(USE_CCL)
-/**
-**	Default without CCL support.
-*/
-local char* DefaultTilesetWcNames[] = {
-    "tileset-summer",
-    "tileset-winter",
-    "tileset-wasteland",
-    "tileset-swamp",
-    NULL
-};
-#endif
-
 /**
 **	Mapping of wc numbers to our internal tileset symbols.
 **	The numbers are used in puds.
 **	0=summer, 1=winter, 2=wasteland, 3=swamp.
 */
-global char** TilesetWcNames
-#if !defined(USE_CCL)
-    =DefaultTilesetWcNames
-#endif
-    ;
+global char** TilesetWcNames;
 
 #if 1		//	FIXME: only support ccl version.
 

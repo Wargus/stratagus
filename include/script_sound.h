@@ -33,7 +33,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_CCL) && defined(WITH_SOUND)	// {
+#ifdef WITH_SOUND	// {
 
 #include "ccl.h"
 
@@ -47,15 +47,13 @@ extern SoundId ccl_sound_id(SCM sound);	/// scheme -> sound id
 
 extern void SoundCclRegister(void);	/// register ccl features
 
-#endif	// } defined(USE_CCL) && defined(WITH_SOUND)
+#else	// }{ defined(WITH_SOUND)
 
 //-----------------------------------------------------------------------------
 
-#if defined(USE_CCL) && !defined(WITH_SOUND) // {
-
 extern void SoundCclRegister(void);	/// register ccl features
 
-#endif	// } defined(USE_CCL) && !defined(WITH_SOUND)
+#endif	// } !defined(WITH_SOUND)
 
 //@}
 

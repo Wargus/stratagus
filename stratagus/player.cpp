@@ -401,12 +401,6 @@ global void CreatePlayer(int type)
     player->TotalNumUnits=0;
     player->Score=0;
 
-#ifndef USE_CCL
-    player->FoodUnitLimit=200;
-    player->BuildingLimit=200;
-    player->TotalUnitLimit=400;
-#endif
-
     player->Color=PlayerColors[NumPlayers];
 
     if( Players[NumPlayers].Type==PlayerComputer

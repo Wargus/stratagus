@@ -284,6 +284,7 @@ global Decoration HealthSprite;
 */
 global Decoration ShadowSprite
 #ifndef laterUSE_CCL
+// FIXME: Must make this configurable through CCL.
 #ifdef NEW_NAMES
      = { "graphics/missiles/unit shadow.png",	0,42, 32,32 };
 #else
@@ -296,8 +297,6 @@ global Decoration ShadowSprite
 **	Sprite to display the active spells on units.
 */
 global Graphic* SpellSprites;
-
-#if defined(USE_CCL)
 
 /**
 **	Define mana sprite.
@@ -340,8 +339,6 @@ global SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 
     return SCM_UNSPECIFIED;
 }
-
-#endif	// defined(USE_CCL)
 
 /**
 **	Load decoration.

@@ -1744,11 +1744,7 @@ local void GameSetupInit(Menuitem *mi __attribute__((unused)))
 {
     strcpy(ScenSelectPath, FreeCraftLibPath);
 #if 0	// FIXME: as soon as .cm is supported..
-#if defined(USE_CCL)
     strcpy(ScenSelectFileName, "default.cm");
-#else
-    strcpy(ScenSelectFileName, "default.pud");
-#endif
 #endif
     strcpy(ScenSelectFileName, "default.pud");
     if (ScenSelectPath[0]) {

@@ -31,13 +31,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-
-#include "freecraft.h"
-
-#if defined(USE_CCL) // {
-
 #include <stdlib.h>
 
+#include "freecraft.h"
 #include "unittype.h"
 #include "ccl.h"
 #include "ai_local.h"
@@ -816,9 +812,6 @@ global void AiCclRegister(void)
     gh_new_procedure1_0("ai:script",CclAiScript);
     gh_new_procedure0_0("ai:restart",CclAiRestart);
 #endif
-
 }
-
-#endif	// } USE_CCL
 
 //@}
