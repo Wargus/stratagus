@@ -458,6 +458,7 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawStats(x+108,y+8+125,stats->Speed,type->_Speed);
 
         // Show how much wood is harvested already in percents! :) //vladi
+	// FIXME: Make this optional
         if( unit->Orders[0].Action==UnitActionHarvest && unit->SubAction==64 ) {
 	    sprintf(buf,"W%%:%d"
 		    ,(100*(CHOP_FOR_WOOD-unit->Value))/CHOP_FOR_WOOD);
@@ -466,11 +467,11 @@ global void DrawUnitInfo(const Unit* unit)
 
 	if( type->CanCastSpell ) {
 	    DrawText(x+59,y+8+140+1,GameFont,"Magic:");
-	    VideoDrawRectangleClip(ColorGray,x+108,y+8+140,59,13);
-	    VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,59-2,13-2);
+	    VideoDrawRectangleClip(ColorGray,x+108,y+8+140,61,14);
+	    VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,61-2,14-2);
 	    i=(100*unit->Mana)/255;
-	    i=(i*(59-3))/100;
-	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,13-3);
+	    i=(i*(61-4))/100;
+	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
 
 	    DrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
 	}

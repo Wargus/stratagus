@@ -364,7 +364,7 @@ global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
     VideoDrawSub(icon->Graphic,icon->X,icon->Y,icon->Width,icon->Height,x,y);
 
     if( flags&IconSelected ) {
-	VideoDrawRectangleClip(ColorGreen,x,y,ICON_WIDTH-1,ICON_HEIGHT-1);
+	VideoDrawRectangleClip(ColorGreen,x,y,ICON_WIDTH,ICON_HEIGHT);
     }
 }
 
