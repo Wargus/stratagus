@@ -78,7 +78,7 @@ local char Input[80];		/// line input for messages/long commands
 local int InputIndex;		/// current index into input
 local char InputStatusLine[99];	/// Last input status line
 local int SpeedCheat;		/// Speed up cheat
-local char* UiGroupKeys="0123456789`";/// Up to 11 keys, last unselect. Default for qwerty
+local char* UiGroupKeys = "0123456789`";/// Up to 11 keys, last unselect. Default for qwerty
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
 global char GameObserve;	/// Observe mode
@@ -211,7 +211,7 @@ local void UiAddGroupToSelection(unsigned group)
     int n;
 
     if (!(n = GetNumberUnitsOfGroup(group))) {
-        return;
+	return;
     }
 
     //
@@ -662,7 +662,7 @@ local void UiTrackUnit(void)
 local int CommandKey(int key)
 {
     char* ptr;
-    
+
     // FIXME: don't handle unicode well. Should work on all latin keyboard.
     if ((ptr = strchr(UiGroupKeys, key))) {
 	key = '0' + ptr - UiGroupKeys;
@@ -670,7 +670,7 @@ local int CommandKey(int key)
 	    key = '`';
 	}
     }
-    
+
     switch (key) {
 	case '\r':			// Return enters chat/input mode.
 	    UiBeginInput();
@@ -679,13 +679,13 @@ local int CommandKey(int key)
 	case '^':			// Unselect everything
 	case '`':
 	    UiUnselectAll();
-            break;
+	    break;
 
-        case '0': case '1': case '2':	// Group selection
-        case '3': case '4': case '5':
-        case '6': case '7': case '8':
-        case '9':
-            if (KeyModifiers & ModifierShift) {
+	case '0': case '1': case '2':	// Group selection
+	case '3': case '4': case '5':
+	case '6': case '7': case '8':
+	case '9':
+	    if (KeyModifiers & ModifierShift) {
 		if (KeyModifiers & ModifierAlt) {
 		    //UiAddToAlternateGroup(key-'0');
 		    UiCenterOnGroup(key - '0');
@@ -704,7 +704,7 @@ local int CommandKey(int key)
 		    UiSelectGroup(key - '0');
 		}
 	    }
-            break;
+	    break;
 
 #if 0
 #ifdef DEBUG
@@ -732,7 +732,7 @@ local int CommandKey(int key)
 	    if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 		break;
 	    }
-        case KeyCodePause:
+	case KeyCodePause:
 	    UiTogglePause();
 	    break;
 
@@ -792,7 +792,7 @@ local int CommandKey(int key)
 	    break;
 
 	case '+':			// + Faster
-        case '=': // plus is shift-equals.
+	case '=': // plus is shift-equals.
 	case KeyCodeKPPlus:
 	    UiIncrementGameSpeed();
 	    break;
@@ -889,9 +889,9 @@ local int CommandKey(int key)
 	    UiEnterHelpMenu();
 	    break;
 
-        case ' ':			// center on last action
-            CenterOnMessage();
-            break;
+	case ' ':			// center on last action
+	    CenterOnMessage();
+	    break;
 
 	case '\t':			// TAB toggles minimap.
 					// FIXME: more...
@@ -1134,7 +1134,7 @@ local int InputKey(int key)
 		    }
 		}
 	    }
-	    
+
 	    // Check for Replay and ffw x
 #ifdef DEBUG
 	    if (strncmp(Input,"ffw ",4) == 0) {
@@ -1143,7 +1143,7 @@ local int InputKey(int key)
 #endif
 		FastForwardCycle = atoi(&Input[4]);
 	    }
-	    
+
 	    if (Input[0]) {
 		// Replace ~ with ~~
 		for (p = Input; *p; ++p) {

@@ -187,7 +187,7 @@ local SCM CclSetClickMissile(SCM missile)
     SCM old;
 
     old = NIL;
-    
+
     if (ClickMissile) {
 	old = gh_str02scm(ClickMissile);
 	free(ClickMissile);
@@ -1069,70 +1069,70 @@ local MenuButtonId scm2buttonid(SCM value)
     MenuButtonId id;
 
     if (gh_eq_p(value, gh_symbol2scm("main"))) {
-        id = MBUTTON_MAIN;
+	id = MBUTTON_MAIN;
     } else if (gh_eq_p(value, gh_symbol2scm("network"))) {
-        id = MBUTTON_NETWORK;
+	id = MBUTTON_NETWORK;
     } else if (gh_eq_p(value, gh_symbol2scm("gm-half"))) {
-        id = MBUTTON_GM_HALF;
+	id = MBUTTON_GM_HALF;
     } else if (gh_eq_p(value, gh_symbol2scm("132"))) {
-        id = MBUTTON_132;
+	id = MBUTTON_132;
     } else if (gh_eq_p(value, gh_symbol2scm("gm-full"))) {
-        id = MBUTTON_GM_FULL;
+	id = MBUTTON_GM_FULL;
     } else if (gh_eq_p(value, gh_symbol2scm("gem-round"))) {
-        id = MBUTTON_GEM_ROUND;
+	id = MBUTTON_GEM_ROUND;
     } else if (gh_eq_p(value, gh_symbol2scm("gem-square"))) {
-        id = MBUTTON_GEM_SQUARE;
+	id = MBUTTON_GEM_SQUARE;
     } else if (gh_eq_p(value, gh_symbol2scm("up-arrow"))) {
-        id = MBUTTON_UP_ARROW;
+	id = MBUTTON_UP_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("down-arrow"))) {
-        id = MBUTTON_DOWN_ARROW;
+	id = MBUTTON_DOWN_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("left-arrow"))) {
-        id = MBUTTON_LEFT_ARROW;
+	id = MBUTTON_LEFT_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("right-arrow"))) {
-        id = MBUTTON_RIGHT_ARROW;
+	id = MBUTTON_RIGHT_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("s-knob"))) {
-        id = MBUTTON_S_KNOB;
+	id = MBUTTON_S_KNOB;
     } else if (gh_eq_p(value, gh_symbol2scm("s-vcont"))) {
-        id = MBUTTON_S_VCONT;
+	id = MBUTTON_S_VCONT;
     } else if (gh_eq_p(value, gh_symbol2scm("s-hcont"))) {
-        id = MBUTTON_S_HCONT;
+	id = MBUTTON_S_HCONT;
     } else if (gh_eq_p(value, gh_symbol2scm("pulldown"))) {
-        id = MBUTTON_PULLDOWN;
+	id = MBUTTON_PULLDOWN;
     } else if (gh_eq_p(value, gh_symbol2scm("vthin"))) {
-        id = MBUTTON_VTHIN;
+	id = MBUTTON_VTHIN;
     } else if (gh_eq_p(value, gh_symbol2scm("folder"))) {
-        id = MBUTTON_FOLDER;
+	id = MBUTTON_FOLDER;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-gem-round"))) {
-        id = MBUTTON_SC_GEM_ROUND;
+	id = MBUTTON_SC_GEM_ROUND;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-gem-square"))) {
-        id = MBUTTON_SC_GEM_SQUARE;
+	id = MBUTTON_SC_GEM_SQUARE;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-up-arrow"))) {
-        id = MBUTTON_SC_UP_ARROW;
+	id = MBUTTON_SC_UP_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-down-arrow"))) {
-        id = MBUTTON_SC_DOWN_ARROW;
+	id = MBUTTON_SC_DOWN_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-left-arrow"))) {
-        id = MBUTTON_SC_LEFT_ARROW;
+	id = MBUTTON_SC_LEFT_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-right-arrow"))) {
-        id = MBUTTON_SC_RIGHT_ARROW;
+	id = MBUTTON_SC_RIGHT_ARROW;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-s-knob"))) {
-        id = MBUTTON_SC_S_KNOB;
+	id = MBUTTON_SC_S_KNOB;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-s-vcont"))) {
-        id = MBUTTON_SC_S_VCONT;
+	id = MBUTTON_SC_S_VCONT;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-s-hcont"))) {
-        id = MBUTTON_SC_S_HCONT;
+	id = MBUTTON_SC_S_HCONT;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-pulldown"))) {
-        id = MBUTTON_SC_PULLDOWN;
+	id = MBUTTON_SC_PULLDOWN;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-button-left"))) {
-        id = MBUTTON_SC_BUTTON_LEFT;
+	id = MBUTTON_SC_BUTTON_LEFT;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-button"))) {
-        id = MBUTTON_SC_BUTTON;
+	id = MBUTTON_SC_BUTTON;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-button-right"))) {
-        id = MBUTTON_SC_BUTTON_RIGHT;
+	id = MBUTTON_SC_BUTTON_RIGHT;
     } else {
-	char *s1;
+	char* s1;
 	s1 = gh_scm2newstr(value, NULL);
-        fprintf(stderr, "Unsupported button %s\n", s1);
-        free(s1);
+	fprintf(stderr, "Unsupported button %s\n", s1);
+	free(s1);
 	return 0;
     }
     return id;
@@ -1161,67 +1161,67 @@ local MenuButtonId scm2buttonid(lua_State* l, const char* value)
     MenuButtonId id;
 
     if (!strcmp(value, "main")) {
-        id = MBUTTON_MAIN;
+	id = MBUTTON_MAIN;
     } else if (!strcmp(value, "network")) {
-        id = MBUTTON_NETWORK;
+	id = MBUTTON_NETWORK;
     } else if (!strcmp(value, "gm-half")) {
-        id = MBUTTON_GM_HALF;
+	id = MBUTTON_GM_HALF;
     } else if (!strcmp(value, "132")) {
-        id = MBUTTON_132;
+	id = MBUTTON_132;
     } else if (!strcmp(value, "gm-full")) {
-        id = MBUTTON_GM_FULL;
+	id = MBUTTON_GM_FULL;
     } else if (!strcmp(value, "gem-round")) {
-        id = MBUTTON_GEM_ROUND;
+	id = MBUTTON_GEM_ROUND;
     } else if (!strcmp(value, "gem-square")) {
-        id = MBUTTON_GEM_SQUARE;
+	id = MBUTTON_GEM_SQUARE;
     } else if (!strcmp(value, "up-arrow")) {
-        id = MBUTTON_UP_ARROW;
+	id = MBUTTON_UP_ARROW;
     } else if (!strcmp(value, "down-arrow")) {
-        id = MBUTTON_DOWN_ARROW;
+	id = MBUTTON_DOWN_ARROW;
     } else if (!strcmp(value, "left-arrow")) {
-        id = MBUTTON_LEFT_ARROW;
+	id = MBUTTON_LEFT_ARROW;
     } else if (!strcmp(value, "right-arrow")) {
-        id = MBUTTON_RIGHT_ARROW;
+	id = MBUTTON_RIGHT_ARROW;
     } else if (!strcmp(value, "s-knob")) {
-        id = MBUTTON_S_KNOB;
+	id = MBUTTON_S_KNOB;
     } else if (!strcmp(value, "s-vcont")) {
-        id = MBUTTON_S_VCONT;
+	id = MBUTTON_S_VCONT;
     } else if (!strcmp(value, "s-hcont")) {
-        id = MBUTTON_S_HCONT;
+	id = MBUTTON_S_HCONT;
     } else if (!strcmp(value, "pulldown")) {
-        id = MBUTTON_PULLDOWN;
+	id = MBUTTON_PULLDOWN;
     } else if (!strcmp(value, "vthin")) {
-        id = MBUTTON_VTHIN;
+	id = MBUTTON_VTHIN;
     } else if (!strcmp(value, "folder")) {
-        id = MBUTTON_FOLDER;
+	id = MBUTTON_FOLDER;
     } else if (!strcmp(value, "sc-gem-round")) {
-        id = MBUTTON_SC_GEM_ROUND;
+	id = MBUTTON_SC_GEM_ROUND;
     } else if (!strcmp(value, "sc-gem-square")) {
-        id = MBUTTON_SC_GEM_SQUARE;
+	id = MBUTTON_SC_GEM_SQUARE;
     } else if (!strcmp(value, "sc-up-arrow")) {
-        id = MBUTTON_SC_UP_ARROW;
+	id = MBUTTON_SC_UP_ARROW;
     } else if (!strcmp(value, "sc-down-arrow")) {
-        id = MBUTTON_SC_DOWN_ARROW;
+	id = MBUTTON_SC_DOWN_ARROW;
     } else if (!strcmp(value, "sc-left-arrow")) {
-        id = MBUTTON_SC_LEFT_ARROW;
+	id = MBUTTON_SC_LEFT_ARROW;
     } else if (!strcmp(value, "sc-right-arrow")) {
-        id = MBUTTON_SC_RIGHT_ARROW;
+	id = MBUTTON_SC_RIGHT_ARROW;
     } else if (!strcmp(value, "sc-s-knob")) {
-        id = MBUTTON_SC_S_KNOB;
+	id = MBUTTON_SC_S_KNOB;
     } else if (!strcmp(value, "sc-s-vcont")) {
-        id = MBUTTON_SC_S_VCONT;
+	id = MBUTTON_SC_S_VCONT;
     } else if (!strcmp(value, "sc-s-hcont")) {
-        id = MBUTTON_SC_S_HCONT;
+	id = MBUTTON_SC_S_HCONT;
     } else if (!strcmp(value, "sc-pulldown")) {
-        id = MBUTTON_SC_PULLDOWN;
+	id = MBUTTON_SC_PULLDOWN;
     } else if (!strcmp(value, "sc-button-left")) {
-        id = MBUTTON_SC_BUTTON_LEFT;
+	id = MBUTTON_SC_BUTTON_LEFT;
     } else if (!strcmp(value, "sc-button")) {
-        id = MBUTTON_SC_BUTTON;
+	id = MBUTTON_SC_BUTTON;
     } else if (!strcmp(value, "sc-button-right")) {
-        id = MBUTTON_SC_BUTTON_RIGHT;
+	id = MBUTTON_SC_BUTTON_RIGHT;
     } else {
-        lua_pushfstring(l, "Unsupported button: %s", value);
+	lua_pushfstring(l, "Unsupported button: %s", value);
 	lua_error(l);
 	id = 0;
     }
@@ -2102,7 +2102,7 @@ local SCM CclDefineUI(SCM list)
     ui->MenuPanel.File = NULL;
     ui->MenuPanelX = -1;
     ui->MenuPanelY = -1;
-    
+
     ui->MinimapPanel.File = NULL;
     ui->MinimapPanelX = -1;
     ui->MinimapPanelY = -1;
@@ -2356,7 +2356,7 @@ local SCM CclDefineUI(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("map-area"))) {
 	    int w;
 	    int h;
-	    
+
 	    w = 0;
 	    h = 0;
 	    sublist = gh_car(list);
@@ -2754,7 +2754,7 @@ local int CclDefineUI(lua_State* l)
     ui->MenuPanel.File = NULL;
     ui->MenuPanelX = -1;
     ui->MenuPanelY = -1;
-    
+
     ui->MinimapPanel.File = NULL;
     ui->MinimapPanelX = -1;
     ui->MinimapPanelY = -1;
@@ -4416,14 +4416,14 @@ local int scm2style(SCM value)
     int id;
 
     if (gh_eq_p(value, gh_symbol2scm("sc-vslider"))) {
-        id = MI_STYLE_SC_VSLIDER;
+	id = MI_STYLE_SC_VSLIDER;
     } else if (gh_eq_p(value, gh_symbol2scm("sc-hslider"))) {
-        id = MI_STYLE_SC_HSLIDER;
+	id = MI_STYLE_SC_HSLIDER;
     } else {
 	char* s1;
 	s1 = gh_scm2newstr(value, NULL);
-        fprintf(stderr, "Unsupported style %s\n", s1);
-        free(s1);
+	fprintf(stderr, "Unsupported style %s\n", s1);
+	free(s1);
 	return 0;
     }
     return id;
@@ -4464,11 +4464,11 @@ local int scm2style(lua_State* l, const char* value)
     int id;
 
     if (!strcmp(value, "sc-vslider")) {
-        id = MI_STYLE_SC_VSLIDER;
+	id = MI_STYLE_SC_VSLIDER;
     } else if (!strcmp(value, "sc-hslider")) {
-        id = MI_STYLE_SC_HSLIDER;
+	id = MI_STYLE_SC_HSLIDER;
     } else {
-        lua_pushfstring(l, "Unsupported style: %s", value);
+	lua_pushfstring(l, "Unsupported style: %s", value);
 	lua_error(l);
     }
     return id;
@@ -4515,10 +4515,10 @@ local SCM CclDefineMenuItem(SCM list)
 	    list = gh_cdr(list);
 
 	    while (!gh_null_p(sublist)) {
-	    
+
 		value = gh_car(sublist);
 		sublist = gh_cdr(sublist);
-	    
+
 		if (gh_eq_p(value, gh_symbol2scm("active"))) {
 		    item->flags |= MenuButtonActive;
 		} else if (gh_eq_p(value, gh_symbol2scm("clicked"))) {
@@ -4827,10 +4827,10 @@ local SCM CclDefineMenuItem(SCM list)
 
 			slist = gh_car(sublist);
 			while (!gh_null_p(slist)) {
-	    
+
 			    value = gh_car(slist);
 			    slist = gh_cdr(slist);
-	    
+
 			    if (gh_eq_p(value, gh_symbol2scm("up"))) {
 				item->d.vslider.cflags |= MI_CFLAGS_UP;
 			    } else if (gh_eq_p(value, gh_symbol2scm("down"))) {
@@ -5020,10 +5020,10 @@ local SCM CclDefineMenuItem(SCM list)
 
 			slist = gh_car(sublist);
 			while (!gh_null_p(slist)) {
-	    
+
 			    value = gh_car(slist);
 			    slist = gh_cdr(slist);
-	    
+
 			    if (gh_eq_p(value, gh_symbol2scm("up"))) {
 				item->d.hslider.cflags |= MI_CFLAGS_UP;
 			    } else if (gh_eq_p(value, gh_symbol2scm("down"))) {
@@ -5634,7 +5634,7 @@ local int CclDefineMenuItem(lua_State* l)
 			    lua_rawgeti(l, -1, subk + 1);
 			    value = LuaToString(l, -1);
 			    lua_pop(l, 1);
-	    
+
 			    if (!strcmp(value, "up")) {
 				item->d.vslider.cflags |= MI_CFLAGS_UP;
 			    } else if (!strcmp(value, "down")) {
@@ -5929,7 +5929,7 @@ local int CclDefineMenuItem(lua_State* l)
 			    lua_rawgeti(l, -1, subk + 1);
 			    value = LuaToString(l, -1);
 			    lua_pop(l, 1);
-	    
+
 			    if (!strcmp(value, "up")) {
 				item->d.hslider.cflags |= MI_CFLAGS_UP;
 			    } else if (!strcmp(value, "down")) {
@@ -6327,10 +6327,10 @@ local SCM CclDefineButton(SCM list)
 	free(ba.AllowStr);
     }
     if (ba.Hint) {
-        free(ba.Hint);
+	free(ba.Hint);
     }
     if (ba.UnitMask) {
-        free(ba.UnitMask);
+	free(ba.UnitMask);
     }
 
     return SCM_UNSPECIFIED;
@@ -6516,10 +6516,10 @@ local int CclDefineButton(lua_State* l)
 	free(ba.AllowStr);
     }
     if (ba.Hint) {
-        free(ba.Hint);
+	free(ba.Hint);
     }
     if (ba.UnitMask) {
-        free(ba.UnitMask);
+	free(ba.UnitMask);
     }
 
     return 0;
@@ -7060,7 +7060,7 @@ local int CclAddMessage(lua_State* l)
 local SCM CclResetKeystrokeHelp(void)
 {
     int n;
-    
+
     n = nKeyStrokeHelps * 2;
     while (n--) {
 	free(KeyStrokeHelps[n]);
@@ -7102,6 +7102,16 @@ local SCM CclSetGroupKeys(SCM list)
 {
     UiGroupKeys = gh_scm2newstr(list, NULL);
     return SCM_UNSPECIFIED;
+}
+#elif defined(USE_LUA)
+local int CclSetGroupKeys(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    UIGroupKeys = strdup(LuaToString(l, 1));
+    return 0;
 }
 #endif
 
@@ -7350,6 +7360,7 @@ global void UserInterfaceCclRegister(void)
     //
     lua_register(Lua, "ResetKeystrokeHelp", CclResetKeystrokeHelp);
     lua_register(Lua, "AddKeystrokeHelp", CclAddKeystrokeHelp);
+    lua_register(Lua, "SetGroupKeys", CclSetGroupKeys);
 #endif
 
     InitMenuFuncHash();
