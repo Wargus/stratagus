@@ -66,6 +66,8 @@
 global Sample* MusicSample;		/// Music samples
 #endif
 
+global char* CurrentMusicFile = NULL;
+
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
 #endif
@@ -459,6 +461,63 @@ local int PlayCDRom(const char* name)
 }
 #endif
 
+global void PlaySectionMusic(PlaySectionType section)
+{
+    int track, newtrack = 0;
+    int i;
+    int j = 0;
+    int found, numfiles;
+
+    track = cd_current_track();
+
+    for (i = 0;; ++i) {
+	if (PlaySections[i].Type == section && (!PlaySections[i].Race || 
+		!(strcmp(PlaySections[i].Race, ThisPlayer->RaceName)))) {
+	    break;
+	}
+    }
+
+    if (CDMode != CDModeStopped && CDMode != CDModeOff) {
+	if ( (1 << track) & PlaySections[i].CDTracks ) {
+	    newtrack = 0;
+	} else {
+	    if (PlaySections[i].CDOrder == PlaySectionOrderAll) {
+		for (j = 1; j < 32; ++j) {
+		    if ( (1 << j) & PlaySections[i].CDTracks ) {
+			newtrack = j;
+			break;
+		    }
+		}
+	    } else if (PlaySections[i].CDOrder == PlaySectionOrderRandom) {
+    		do {
+		    newtrack = MyRand() % NumCDTracks;
+		} while ( ((newtrack << j) & PlaySections[i].CDTracks) && 
+		    (cd_is_audio(CDTrack) < 1) );
+	    }
+	}
+	if (newtrack) {
+	    cd_play(newtrack);
+	}
+    } else {
+	found = 0;
+	numfiles = 0;
+	for (j = 0; PlaySections[i].Files[j] && !found; ++j) {
+	    if (!strcmp(PlaySections[i].Files[j], CurrentMusicFile)) {
+		found = 1;
+		++numfiles;
+	    }
+	}
+	if (!found) {
+	    if (PlaySections[i].FileOrder == PlaySectionOrderAll) {
+		PlayMusic(PlaySections[i].Files[0]);
+	    } else if (PlaySections[i].FileOrder == PlaySectionOrderRandom) {
+		j = MyRand() % numfiles;
+		PlayMusic(PlaySections[i].Files[j]);
+	    }
+	}
+    }
+}
+
 /**
 **	Play a music file.
 **
@@ -478,6 +537,11 @@ global void PlayMusic(const char* name)
     if (MusicOff) {
 	return;
     }
+
+    if (CurrentMusicFile) {
+	free(CurrentMusicFile);
+    }
+    CurrentMusicFile = strdup(name);
 
     name = LibraryFileName(name, buffer);
 
