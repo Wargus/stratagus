@@ -620,7 +620,7 @@ struct _unit_ {
 #endif	// HIERARCHIC_PATHFINDER
 
 #ifdef NEW_DECODRAW
-    Deco*  deco;           /// Decoration when visible on screen
+    Deco*  Decoration;           /// Decoration when visible on screen
 #endif
 };
 
@@ -768,8 +768,8 @@ extern void UnitMarkSeen(Unit* unit);
     /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
 
-    /// FIXME: more docu
-extern int CheckUnitToBeDrawn(const Unit* unit);
+    /// To be called when the look of the unit changes.
+extern int CheckUnitToBeDrawn(Unit* unit);
     /// FIXME: more docu
 extern void GetUnitMapArea(const Unit* unit, int *sx, int *sy,
     int *ex, int *ey);

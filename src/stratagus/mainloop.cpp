@@ -107,10 +107,6 @@ local void MoveMapViewPointUp(int step)
     vp = TheUI.SelectedViewport;
     if (vp->MapY >= step) {
 	vp->MapY -= step;
-#ifdef NEW_DECODRAW
-	//  Redraw the map deco.
-	DecorationMark(MapDecoration);
-#endif
     } else {
 	vp->MapY = 0;
     }
@@ -128,10 +124,6 @@ local void MoveMapViewPointLeft(int step)
     vp = TheUI.SelectedViewport;
     if (vp->MapX >= step) {
 	vp->MapX -= step;
-#ifdef NEW_DECODRAW
-	//  Redraw the map deco.
-	DecorationMark(MapDecoration);
-#endif
     } else {
 	vp->MapX = 0;
     }
@@ -150,10 +142,6 @@ local void MoveMapViewPointDown(int step)
     if (TheMap.Height > vp->MapHeight &&
 	    vp->MapY <= TheMap.Height - vp->MapHeight - step) {
 	vp->MapY += step;
-#ifdef NEW_DECODRAW
-	//  Redraw the map deco.
-	DecorationMark(MapDecoration);
-#endif
     } else {
 	vp->MapY = TheMap.Height - vp->MapHeight;
     }
@@ -172,10 +160,6 @@ local void MoveMapViewPointRight(int step)
     if (TheMap.Width > vp->MapWidth &&
 	    vp->MapX <= TheMap.Width - vp->MapWidth - step) {
 	vp->MapX += step;
-#ifdef NEW_DECODRAW
-	//  Redraw the map deco.
-	DecorationMark(MapDecoration);
-#endif
     } else {
 	vp->MapX = TheMap.Width - vp->MapWidth;
     }
@@ -381,8 +365,9 @@ local void DrawMapViewport(Viewport* vp)
     // Every to-be-drawn item added to this mechanism, can be handed by this
     // call.
     if (InterfaceState == IfaceStateNormal) {
-	DecorationRefreshDisplay();
-//	DecorationUpdateDisplay();
+	CurrentViewport=TheUI.SelectedViewport;
+//	DecorationRefreshDisplay();
+	DecorationUpdateDisplay();
     }
 
 #else
