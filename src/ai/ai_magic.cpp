@@ -189,7 +189,9 @@ local int AiEyeOfVisionSpell(Unit* unit)
 		&& UpgradeIdentAvailable(AiPlayer->Player,
 		    "upgrade-ogre-mage") ) {
 	    r=SyncRand();
-	    if( unit->Mana>MaxMana-10 && !(r%32) ) {
+	    /* s0m3body: each unit can have different MaxMana, the original condition is testing MaxMana-10,
+	     * so let's take unit's maxmana * 245/255 as a new treshold */
+	    if( unit->Mana>((unit->Type->Magic * 245 ) / 255) && !(r%32) ) {
 		if( unit->Mana>AiEyeOfVision->ManaCost ) {
 		    DebugLevel0Fn("`%s' cast eye of vision\n"
 			_C_ unit->Type->Ident);
@@ -239,7 +241,10 @@ local int AiHolyVisionSpell(Unit* unit)
 		&& UpgradeIdentAvailable(AiPlayer->Player,
 		    "upgrade-paladin") ) {
 	    r=SyncRand();
-	    if( unit->Mana>MaxMana-10 && !(r%32) ) {
+	        /* s0m3body: each unit can have different MaxMana, the original condition is testing MaxMana-10,
+		 *              * so let's take unit's maxmana * 245/255 as a new treshold */
+
+	    if( unit->Mana>((unit->Type->Magic * 245)/255) && !(r%32) ) {
 		if( unit->Mana>AiHolyVision->ManaCost ) {
 		    int x;
 		    int y;

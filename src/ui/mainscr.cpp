@@ -115,7 +115,9 @@ local void UiDrawManaBar(const Unit* unit,int x,int y)
     y+=ICON_HEIGHT+7;
     VideoFillRectangleClip(ColorBlack,x,y+3,ICON_WIDTH+7,4);
     if( unit->HP ) {
-	f=(100*unit->Mana)/MaxMana;
+	/* s0m3body: mana bar should represent proportional value of Mana with respect to
+	 * MaxMana (unit->Type->Magic) for the unit */
+	f=(100*unit->Mana)/unit->Type->Magic;
 	f=(f*(ICON_WIDTH+5))/100;
 	VideoFillRectangleClip(ColorBlue,x+1,y+3+1,f,2);
     }
@@ -523,25 +525,28 @@ global void DrawUnitInfo(const Unit* unit)
 
     }
 	if( type->CanCastSpell ) {
-	/*
-	    VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
-	    VideoDrawRectangleClip(ColorGray,x+108,y+8+140,61,14);
-	    VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,61-2,14-2);
-	    i=(100*unit->Mana)/MaxMana;
-	    i=(i*(61-4))/100;
-	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
+	    if( 0 ) {
+		VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
+		VideoDrawRectangleClip(ColorGray,x+108,y+8+140,61,14);
+		VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,61-2,14-2);
+		i=(100*unit->Mana)/unit->Type->Magic;
+		i=(i*(61-4))/100;
+		VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
 
-	    VideoDrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
-	*/
-	    int w = 130;
-	    i=(100*unit->Mana)/MaxMana;
-	    i=(i*w)/100;
-	    VideoDrawRectangleClip(ColorGray, x+16,  y+8+140,  x+16+w,  16  );
-	    VideoDrawRectangleClip(ColorBlack,x+16+1,y+8+140+1,x+16+w-2,16-2);
-	    VideoFillRectangleClip(ColorBlue, x+16+2,y+8+140+2,i,       16-4);
+		VideoDrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
+	    } else {
+		int w = 140;
+		/* s0m3body: fix to display mana bar properly for any maxmana
+		   value */
+		/* s0m3body: max mana can vary for the unit */
+		i=(100*unit->Mana)/unit->Type->Magic;
+		i=(i*w)/100;
+		VideoDrawRectangleClip(ColorGray, x+16,  y+8+140, w+4,  16  );
+		VideoDrawRectangleClip(ColorBlack,x+16+1,y+8+140+1,w+2,16-2);
+		VideoFillRectangleClip(ColorBlue, x+16+2,y+8+140+2,i, 16-4);
 
-	    // VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
-	    VideoDrawNumber(x+16+w/2,y+8+140+1,GameFont,unit->Mana);
+		VideoDrawNumber(x+16+w/2,y+8+140+1,GameFont,unit->Mana);
+	    }
 	}
 }
 
