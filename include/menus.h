@@ -312,6 +312,11 @@ extern void SpeedSettings(void);
     /// Preferences menu
 extern void Preferences(void);
 
+    /// Save game menu
+extern void GameMenuSave(void);
+    /// Load game menu
+extern void GameMenuLoad(void);
+
 //@}
 
 #endif	// !__MENUS_H__
