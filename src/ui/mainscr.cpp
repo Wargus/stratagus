@@ -147,6 +147,9 @@ local void UiDrawCompleted(int full, int ready)
 	f = (f * TheUI.CompletedBarW) / 100;
 	VideoFillRectangleClip(TheUI.CompletedBarColor,
 		TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
+#ifdef USE_MAGNANT
+    VideoDraw50TransRectangle(ColorBlack, TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
+#endif
 	if (TheUI.CompletedBarText) {
 		VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
 			TheUI.CompletedBarFont, TheUI.CompletedBarText);
@@ -1100,7 +1103,7 @@ local void DrawInfoPanelBackground(unsigned frame)
 **		Panel:
 **				neutral				- neutral or opponent
 **				normal				- not 1,3,4
-**				magic unit		- magic units
+**				magic unit		    - magic units
 **				construction		- under construction
 */
 global void DrawInfoPanel(void)

@@ -437,7 +437,10 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	drect.y = TheUI.MinimapPosY;
 
 	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
-    //FIX ME: Add a Rectangle around the map here
+    
+#ifdef USE_MAGNANT
+    VideoDraw50TransRectangle(ColorYellow, TheUI.MinimapPosX, TheUI.MinimapPosY, TheUI.MinimapW, TheUI.MinimapH);
+#endif
 }
 
 
