@@ -1006,7 +1006,7 @@ global void WriteSound(void)
 	audio_buf_info info;
 
 	ioctl(SoundFildes,SNDCTL_DSP_GETOSPACE,&info);
-	DebugLevel0("%lu Free bytes %d\n",GameCycle,info.bytes);
+	DebugLevel0("%lu Free bytes %d\n" _C_ GameCycle _C_ info.bytes);
 	if( info.bytes<sizeof(buffer) ) {
 	    return;
 	}
