@@ -45,6 +45,18 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	Get a player pointer
+**
+**	@param value	Player slot number.
+**
+**	@return		The player pointer
+*/
+local Player* CclGetPlayer(SCM value)
+{
+    return &Players[gh_scm2int(value)];
+}
+
+/**
 **	Parse the player configuration.
 **
 **	@param list	Tagged list of all informations.
@@ -313,6 +325,45 @@ local SCM CclSetAllPlayersTotalUnitLimit(SCM limit)
 }
 
 /**
+**	Change the diplomacy from player to another player.
+**
+**	@param player	Player to change diplomacy.
+**	@param opponent	Player number to change.
+**	@param state	To which state this should be changed.
+**
+**	@return		FIXME: should return old state.
+**
+**	@todo diplomacy must send of the network
+*/
+local SCM CclSetDiplomacy(SCM player,SCM state,SCM opponent)
+{
+    int plynr;
+    Player* base;
+
+    base=CclGetPlayer(player);
+    plynr=gh_scm2int(opponent);
+
+    if( gh_eq_p(state,gh_symbol2scm("allied")) ) {
+	base->Enemy&=~(1<<plynr);
+	base->Allied|=1<<plynr;
+    } else if( gh_eq_p(state,gh_symbol2scm("neutral")) ) {
+	base->Enemy&=~(1<<plynr);
+	base->Allied&=~(1<<plynr);
+    } else if( gh_eq_p(state,gh_symbol2scm("crazy")) ) {
+	base->Enemy|=1<<plynr;
+	base->Allied|=1<<plynr;
+    } else if( gh_eq_p(state,gh_symbol2scm("enemy")) ) {
+	base->Enemy|=1<<plynr;
+	base->Allied&=~(1<<plynr);
+    }
+
+    // FIXME: must send over network!!
+
+    // FIXME: we can return the old state
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Change the diplomacy from ThisPlayer to another player.
 **
 **	@param player	Player number to change.
@@ -390,18 +441,6 @@ local SCM CclNewPlayerColors(void)
 // ----------------------------------------------------------------------------
 
 /**
-**	Get a player pointer
-**
-**	@param value	Player slot number.
-**
-**	@return		The player pointer
-*/
-local Player* CclGetPlayer(SCM value)
-{
-    return &Players[gh_scm2int(value)];
-}
-
-/**
 **	Get player resources.
 **
 **	@param ptr	Player
@@ -463,6 +502,7 @@ global void PlayerCclRegister(void)
     gh_new_procedure1_0("set-all-players-total-unit-limit!",
 		CclSetAllPlayersTotalUnitLimit);
 
+    gh_new_procedure3_0("set-diplomacy!",CclSetDiplomacy);
     gh_new_procedure2_0("diplomacy",CclDiplomacy);
 
     gh_new_procedureN("define-race-wc-names",CclDefineRaceWcNames);
