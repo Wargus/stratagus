@@ -26,7 +26,7 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/action
-MSRC =	 action_attack.c action_board.c action_build.c action_demolish.c \
+MSRC =	 action_attack.c action_board.c action_build.c \
 	 action_die.c action_follow.c action_move.c action_patrol.c \
 	 action_repair.c action_research.c action_resource.c \
 	 action_returngoods.c action_spellcast.c action_stand.c \

@@ -121,8 +121,6 @@ extern void CommandResearch(Unit* unit,Upgrade* what,int flush);
 extern void CommandCancelResearch(Unit* unit);
     /// Prepare command upgrade
 //extern void CommandUpgradeUnit(Unit* unit,int what,int flush);
-    /// Prepare command demolish
-extern void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Prepare command spellcast
 extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 	,SpellType* spell,int flush);
@@ -179,8 +177,6 @@ extern void HandleActionUpgradeTo(Unit* unit);
 extern void HandleActionUpgrade(Unit* unit);
     /// Handle command research
 extern void HandleActionResearch(Unit* unit);
-    /// Handle command demolish
-extern void HandleActionDemolish(Unit* unit);
     /// Handle command spellcast
 extern void HandleActionSpellCast(Unit* unit);
 

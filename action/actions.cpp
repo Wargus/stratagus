@@ -177,7 +177,7 @@ local void (*HandleActionTable[256])(Unit*) = {
     HandleActionRepair,
     HandleActionResource,
     HandleActionReturnGoods,
-    HandleActionDemolish,
+    HandleActionNotWritten,
     HandleActionNotWritten,
 
     // Enough for the future ?

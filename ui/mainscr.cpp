@@ -527,7 +527,10 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 
     }
-    if (type->CanCastSpell) {
+    //
+    //	Unit can cast spell without mana, so only show mana bar for units with mana
+    //
+    if (type->_MaxMana) {
 	if (0) {
 	    VideoDrawText(x + 59, y + 8 + 140 + 1, GameFont, "Magic:");
 	    VideoDrawRectangleClip(ColorGray, x + 108, y + 8 + 140, 61, 14);

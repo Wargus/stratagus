@@ -215,8 +215,6 @@ local void CclParseOrder(SCM list,Order* order)
 	    order->Action = UnitActionResource;
 	} else if (gh_eq_p(value, gh_symbol2scm("action-return-goods"))) {
 	    order->Action = UnitActionReturnGoods;
-	} else if (gh_eq_p(value, gh_symbol2scm("action-demolish"))) {
-	    order->Action = UnitActionDemolish;
 
 	} else if (gh_eq_p(value, gh_symbol2scm("flags"))) {
 	    value = gh_car(list);

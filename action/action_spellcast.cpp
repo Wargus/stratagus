@@ -95,6 +95,7 @@ global void AnimateActionSpellCast(Unit* unit)
 */
 local void SpellMoveToTarget(Unit* unit)
 {
+    SpellType* spell;
     Unit* goal;
     int err;
 
@@ -139,17 +140,29 @@ local void SpellMoveToTarget(Unit* unit)
 	unit->SubAction++;		// cast the spell
 	return;
     } else if (err) {
-	// goal/spot out of range -- move to target
-	unit->Orders[0].Action = UnitActionStill;
-	unit->State = unit->SubAction = 0;
+	//
+	//	Target self-> we don't really have to get in range,
+	//	just as close as possible, since the spell is centered
+	//	on the caster anyway.
+	//
+	if ((spell = unit->Orders[0].Arg1)->Target == TargetSelf) {
+	    DebugLevel0Fn("Increase range for spellcast.");
+	    unit->Orders->Range++;
+	} else {
+	    //
+	    //	goal/spot out of range -- give up
+	    // 
+	    unit->Orders[0].Action = UnitActionStill;
+	    unit->State = unit->SubAction = 0;
 
-	if (unit->Orders[0].Goal) {	// Release references
-	    RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-	    if (!--unit->Orders[0].Goal->Refs) {
-		RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
-		ReleaseUnit(unit->Orders[0].Goal);
+	    if (unit->Orders[0].Goal) {	// Release references
+		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+		if (!--unit->Orders[0].Goal->Refs) {
+		    RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
+		    ReleaseUnit(unit->Orders[0].Goal);
+		}
+		unit->Orders[0].Goal = NoUnitP;
 	    }
-	    unit->Orders[0].Goal = NoUnitP;
 	}
     }
     DebugCheck(unit->Type->Vanishes || unit->Destroyed);

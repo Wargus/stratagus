@@ -421,9 +421,7 @@ enum _unit_action_ {
 
     UnitActionRepair,			/// unit repairing
     UnitActionResource,			/// unit harvesting resources
-    UnitActionReturnGoods,		/// unit returning any resource
-
-    UnitActionDemolish,			/// unit demolish at position/unit
+    UnitActionReturnGoods		/// unit returning any resource
 };
 
 /**
