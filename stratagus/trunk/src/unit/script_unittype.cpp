@@ -683,7 +683,7 @@ local SCM CclDefineUnitStats(SCM list)
 		sublist=gh_cdr(sublist);
 
 		for( i=0; i<MaxCosts; ++i ) {
-		    if( gh_eq_p(value,gh_symbol2scm(DEFAULT_NAMES[i])) ) {
+		    if( gh_eq_p(value,gh_symbol2scm((char*)DEFAULT_NAMES[i])) ) {
 			stats->Costs[i]=gh_scm2int(gh_car(sublist));
 			break;
 		    }
