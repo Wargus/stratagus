@@ -157,7 +157,7 @@ typedef struct _network_selection_header_ {
 	unsigned Remove : 1;       ///< Removing from Selection
 	unsigned char Type[MaxNetworkCommands];  ///< Command
 } NetworkSelectionHeader;
-	
+
 /**
 **  Network Selection Update
 */

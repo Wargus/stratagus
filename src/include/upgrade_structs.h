@@ -11,7 +11,7 @@
 /**@name upgrade_structs.h - The upgrade/allow headerfile. */
 //
 //      (c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and
-//	                               Jimmy Salmon
+// Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ typedef enum _costs_ {
 	Cost5,                                  ///< resource 5
 	Cost6,                                  ///< resource 6
 
-	MaxCosts								///< how many different costs
+	MaxCosts                                ///< how many different costs
 } CostType;
 
 #define FoodCost MaxCosts

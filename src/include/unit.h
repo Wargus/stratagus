@@ -390,7 +390,7 @@
 -- Declarations
 ----------------------------------------------------------------------------*/
 
-typedef struct _unit_ Unit;	           ///< unit itself
+typedef struct _unit_ Unit;            ///< unit itself
 typedef enum _unit_action_ UnitAction; ///< all possible unit actions
 struct _spell_type_;                   ///< base structure of a spell type
 
@@ -704,7 +704,7 @@ extern Unit** UnitSlotFree;             ///< First free unit slot
 extern Unit* Units[MAX_UNIT_SLOTS]; ///< Units used
 extern int NumUnits;                ///< Number of units used
 
-//		in unit_draw.c
+// in unit_draw.c
 /// @todo could be moved into the user interface ?
 extern int ShowHealthBar;               ///< Flag: show health bar
 extern int ShowHealthDot;               ///< Flag: show health dot
@@ -1054,7 +1054,7 @@ extern void SelectionCclRegister(void);
 extern void CclParseOrder(lua_State* l, Order* order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
-	
+
 //@}
 
-#endif		// !__UNIT_H__
+#endif // !__UNIT_H__

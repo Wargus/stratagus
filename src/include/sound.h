@@ -114,7 +114,7 @@ extern char* CurrentMusicFile;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/** 
+/**
 **  Ask to the sound server to play a sound attached to an unit. The
 **  sound server may discard the sound if needed (e.g., when the same
 **  Unit is already speaking).

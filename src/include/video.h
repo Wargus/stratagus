@@ -518,4 +518,4 @@ extern void VideoFree(Graphic* o);
 
 //@}
 
-#endif		// !__VIDEO_H__
+#endif // !__VIDEO_H__

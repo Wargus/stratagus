@@ -8,7 +8,7 @@
 //            T H E   W A R   B E G I N S
 //     Stratagus - A free fantasy real time strategy game engine
 //
-/**@name wav.h		-	The wav file format header file. */
+/**@name wav.h - The wav file format header file. */
 //
 //  (c) Copyright 1998-2001 by Lutz Sammer
 //
@@ -90,4 +90,4 @@ typedef struct __wav_chunk__ {
 
 //@}
 
-#endif		// !__WAV_H__
+#endif // !__WAV_H__

@@ -6,11 +6,11 @@
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //                        T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+// Stratagus - A free fantasy real time strategy game engine
 //
-/**@name spells.h	-	The Spells. */
+/**@name spells.h - The Spells. */
 //
-//	(c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and Joris DAUPHIN
+// (c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 #ifndef __SPELLS_H__
 #define __SPELLS_H__
@@ -34,7 +34,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -329,7 +329,7 @@ extern unsigned CclGetSpellByIdent(lua_State* l);
 extern char Ccl2Condition(lua_State* l, const char* value);
 
 /*
-**		Spelltype to cast.
+** Spelltype to cast.
 */
 
 SpellFunc CastAreaAdjustVitals;
