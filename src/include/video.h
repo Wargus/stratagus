@@ -469,13 +469,19 @@ extern void InitSprite(void);
     /// Init line draw
 extern void InitLineDraw(void);
 
-    ///	Draw rectangle.
-extern void VideoDrawRectangle(SysColors color,int x,int y
+    ///	Draw rectangle clipped.
+extern void VideoDrawRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h);
 
-    ///	Fill rectangle.
-extern void VideoFillRectangle(SysColors color,int x,int y
+    ///	Draw circle clipped.
+extern void VideoDrawCircleClip(SysColors color,int x,int y,unsigned r);
+
+    ///	Fill rectangle clipped.
+extern void VideoFillRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h);
+
+    ///	Fill circle clipped.
+extern void VideoFillCircleClip(SysColors color,int x,int y,unsigned r);
 
     /**
     **	Set clipping for nearly all vector primitives. Functions which support

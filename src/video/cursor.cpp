@@ -666,7 +666,7 @@ global void DrawRectangleCursor(void)
 	h=y1-y;
     }
 
-    VideoDrawRectangle(ColorGreen,x,y,w,h);
+    VideoDrawRectangleClip(ColorGreen,x,y,w,h);
 }
 
 /**

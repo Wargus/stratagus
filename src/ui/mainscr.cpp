@@ -56,7 +56,7 @@ local void DrawLifeBar(const Unit* unit,int x,int y)
     int color;
 
     y+=ICON_HEIGHT+8;
-    VideoFillRectangle(ColorBlack,x,y,ICON_WIDTH+8,7);
+    VideoFillRectangleClip(ColorBlack,x,y,ICON_WIDTH+8,7);
     if( unit->HP ) {
 	f=(100*unit->HP)/unit->Stats->HitPoints;
 	if( f>75) {
@@ -67,7 +67,7 @@ local void DrawLifeBar(const Unit* unit,int x,int y)
 	    color=ColorRed;
 	}
 	f=(f*(ICON_WIDTH+4))/100;
-	VideoFillRectangle(color,x+2,y,f,5);
+	VideoFillRectangleClip(color,x+2,y,f,5);
     }
 }
 
@@ -83,7 +83,7 @@ local void DrawCompleted(int full,int ready)
 
     f=(100*ready)/full;
     f=(f*152)/100;
-    VideoFillRectangle(TheUI.CompleteBarColor
+    VideoFillRectangleClip(TheUI.CompleteBarColor
 	    ,TheUI.CompleteBarX,TheUI.CompleteBarY,f,14);
     DrawText(TheUI.CompleteTextX,TheUI.CompleteTextY,GameFont,"% Complete");
 }
@@ -353,11 +353,11 @@ global void DrawUnitInfo(Unit* unit)
 
 	if( type->CanCastSpell ) {
 	    DrawText(x+59,y+8+140+1,GameFont,"Magic:");
-	    VideoDrawRectangle(ColorGray,x+108,y+8+140,59,13);
-	    VideoDrawRectangle(ColorBlack,x+108+1,y+8+140+1,59-2,13-2);
+	    VideoDrawRectangleClip(ColorGray,x+108,y+8+140,59,13);
+	    VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,59-2,13-2);
 	    i=(100*unit->Mana)/255;
 	    i=(i*(59-3))/100;
-	    VideoFillRectangle(ColorBlue,x+108+2,y+8+140+2,i,13-3);
+	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,13-3);
 
 	    DrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
 	}

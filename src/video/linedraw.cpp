@@ -742,7 +742,7 @@ local void DrawVLineClip32(SysColors color,int x,int y,unsigned height)
 }
 
 /**
-**	Draw rectangle.
+**	Draw rectangle clipped.
 **
 **	@param color	Color index.
 **	@param x	x coordinate on the screen
@@ -750,7 +750,7 @@ local void DrawVLineClip32(SysColors color,int x,int y,unsigned height)
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void VideoDrawRectangle(SysColors color,int x,int y
+global void VideoDrawRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h)
 {
     //	FIXME: Clip here
@@ -761,7 +761,72 @@ global void VideoDrawRectangle(SysColors color,int x,int y
 }
 
 /**
-**	Fill rectangle.
+**	Draw circle clipped.
+**
+**	@param color	Color index.
+**	@param x	Center x coordinate on the screen
+**	@param y	Center y coordinate on the screen
+**	@param r	radius of circle
+*/
+global void VideoDrawCircleClip(SysColors color,int x,int y,unsigned r)
+{
+    int cx;
+    int cy;
+    int df;
+    int d_e;
+    int d_se;
+
+    cx=0;
+    cy=r;
+    df=1-r;
+    d_e=3;
+    d_se=-2*r+5;
+
+    // FIXME: could much improved :)
+    do {
+	if( cx != cy ) {
+		VideoDrawPixelClip(color,x+cy,y+cx);
+		VideoDrawPixelClip(color,x+cx,y+cy);
+	    if( cx ) {
+		VideoDrawPixelClip(color,x-cy,y+cx);
+		VideoDrawPixelClip(color,x-cx,y+cy);
+	    }
+	    if( cy ) {
+		VideoDrawPixelClip(color,x+cy,y-cx);
+		VideoDrawPixelClip(color,x+cx,y-cy);
+	    }
+	    if( cx && cy ) {
+		VideoDrawPixelClip(color,x-cy,y-cx);
+		VideoDrawPixelClip(color,x-cx,y-cy);
+	    }
+	} else {
+		VideoDrawPixelClip(color,x+cx,y+cy);
+	    if( cx ) {
+		VideoDrawPixelClip(color,x-cx,y+cy);
+	    }
+	    if( cy ) {
+		VideoDrawPixelClip(color,x+cx,y-cy);
+	    }
+	    if( cx && cy ) {
+		VideoDrawPixelClip(color,x-cx,y-cy);
+	    }
+	}
+	if( df<0 ) {
+	    df+=d_e;
+	    d_se+=2;
+	} else {
+	    df+=d_se;
+	    d_se+=4;
+	    cy--;
+	}
+	d_e+=2;
+	cx++;
+
+    } while( cx <= cy );
+}
+
+/**
+**	Fill rectangle clipped.
 **
 **	@param color	Color index.
 **	@param x	x coordinate on the screen
@@ -769,7 +834,7 @@ global void VideoDrawRectangle(SysColors color,int x,int y
 **	@param h	height of rectangle.
 **	@param w	width of rectangle.
 */
-global void VideoFillRectangle(SysColors color,int x,int y
+global void VideoFillRectangleClip(SysColors color,int x,int y
 	,unsigned w,unsigned h)
 {
     //	FIXME: Clip here
