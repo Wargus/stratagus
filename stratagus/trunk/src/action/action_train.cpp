@@ -114,7 +114,9 @@ global void HandleActionTrain(Unit* unit)
 	DropOutOnSide(nunit,LookingW,type->TileWidth,type->TileHeight);
 
 	// set life span
-	nunit->TTL=GameCycle+type->DecayRate*6*CYCLES_PER_SECOND;
+	if( type->DecayRate ) {
+	    nunit->TTL=GameCycle+type->DecayRate*6*CYCLES_PER_SECOND;
+	}
 
 	// FIXME: GameMessage
 	if( player==ThisPlayer ) {
