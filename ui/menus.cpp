@@ -4713,12 +4713,12 @@ local void EditorPlayerProperties(void)
 #define OIL_POSITION 106
 
     for (i=0; i<16; ++i) {
-	menu->items[RACE_POSITION+i].d.pulldown.defopt = Players[i].Race;
-	menu->items[TYPE_POSITION+i].d.pulldown.defopt = player_types_fc_to_menu[Players[i].Type];
-	menu->items[AI_POSITION+i].d.pulldown.defopt = player_ai_fc_to_menu(Players[i].AiNum);
-	sprintf(gold[i], "%d~!_", Players[i].Resources[GoldCost]);
-	sprintf(lumber[i], "%d~!_", Players[i].Resources[WoodCost]);
-	sprintf(oil[i], "%d~!_", Players[i].Resources[OilCost]);
+	menu->items[RACE_POSITION+i].d.pulldown.defopt = TheMap.Info->PlayerSide[i];
+	menu->items[TYPE_POSITION+i].d.pulldown.defopt = player_types_fc_to_menu[TheMap.Info->PlayerType[i]];
+	menu->items[AI_POSITION+i].d.pulldown.defopt = player_ai_fc_to_menu(TheMap.Info->PlayerAi[i]);
+	sprintf(gold[i], "%d~!_", TheMap.Info->PlayerGold[i]);
+	sprintf(lumber[i], "%d~!_", TheMap.Info->PlayerWood[i]);
+	sprintf(oil[i], "%d~!_", TheMap.Info->PlayerOil[i]);
 	menu->items[GOLD_POSITION+i].d.input.buffer = gold[i];
 	menu->items[GOLD_POSITION+i].d.input.nch = strlen(gold[i]) - 3;
 	menu->items[GOLD_POSITION+i].d.input.maxch = 7;
@@ -4733,12 +4733,12 @@ local void EditorPlayerProperties(void)
     ProcessMenu("menu-editor-player-properties", 1);
 
     for (i=0; i<16; ++i) {
-	Players[i].Race = menu->items[RACE_POSITION+i].d.pulldown.curopt;
-	Players[i].Type = player_types_menu_to_fc[menu->items[TYPE_POSITION+i].d.pulldown.curopt];
-	Players[i].AiNum = player_ai_menu_to_fc(menu->items[AI_POSITION+i].d.pulldown.curopt);
-	Players[i].Resources[GoldCost] = atoi(gold[i]);
-	Players[i].Resources[WoodCost] = atoi(lumber[i]);
-	Players[i].Resources[OilCost] = atoi(oil[i]);
+	TheMap.Info->PlayerSide[i] = menu->items[RACE_POSITION+i].d.pulldown.curopt;
+	TheMap.Info->PlayerType[i] = player_types_menu_to_fc[menu->items[TYPE_POSITION+i].d.pulldown.curopt];
+	TheMap.Info->PlayerAi[i] = player_ai_menu_to_fc(menu->items[AI_POSITION+i].d.pulldown.curopt);
+	TheMap.Info->PlayerGold[i] = atoi(gold[i]);
+	TheMap.Info->PlayerWood[i] = atoi(lumber[i]);
+	TheMap.Info->PlayerOil[i] = atoi(oil[i]);
     }
 
     VideoCreatePalette(GlobalPalette);
