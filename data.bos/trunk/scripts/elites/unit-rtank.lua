@@ -30,16 +30,21 @@
 
 DefineNewAnimations("animations-rtank", {
     Still = {"frame 0", "wait 1", },
-    Move = {"unbreakable begin", "frame 5", "move 4", "wait 3", 
-        "frame 10", "move 4", "wait 3", "frame 5", "move 4", "wait 3", 
-        "frame 10", "move 4", "wait 3", "frame 5", "move 4", "wait 3", 
-        "frame 10", "move 4", "wait 3", "frame 5", "move 4", "wait 3", 
-        "frame 10", "move 4", "unbreakable end", "wait 3", },
+    Move = {"unbreakable begin", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "unbreakable end", "wait 1", },
     Attack = {"unbreakable begin", "frame 0", "wait 4", 
-        "frame 20", "sound bazoo-attack", "attack", "wait 1", 
-        "frame 20", "sound bazoo-attack", "attack", "wait 10", 
+        "frame 5", "sound bazoo-attack", "attack", "wait 1", 
+        "frame 0", "wait 2", 
+        "frame 5", "attack", "wait 1", 
         "frame 0", "unbreakable end", "wait 60", },
-    Death = {"unbreakable begin", "frame 30", "unbreakable end", "wait 2", },
+    Death = {"unbreakable begin", "frame 10", "wait 5", "frame 15", "wait 5", "frame 20", "unbreakable end", "wait 20", },
     })
 
 DefineIcon({
@@ -50,8 +55,8 @@ DefineIcon({
 
 DefineUnitType("unit-rtank", {
         Name = "Rocket Tank",
-        Files = {"default", "elites/units/unit_rtank.png"}, Size = {64, 64},
-        Shadow = {"file", "elites/units/unit_rtank_s.png", "size", {64, 64}},
+        Files = {"default", "elites/units/unit_rtank.png"}, Size = {96, 96},
+        Shadow = {"file", "elites/units/unit_rtank_s.png", "size", {96, 96}},
         NewAnimations = "animations-rtank", Icon = "icon-rtank",
         Flip = false,
         Costs = {"time", 100, "titanium", 100, "crystal", 150},
