@@ -306,9 +306,9 @@
 **
 **		We get here oil
 **
-**	UnitType::StoresGold
+**	UnitType::CanStore[::MaxCosts]
 **
-**		We can store oil/gold/wood here
+**		What resource types we can store here.
 **
 **	UnitType::Vanishes
 **
@@ -330,10 +330,6 @@
 **
 **		Unit is able to use spells
 **
-**	UnitType::StoresWood
-**
-**		We can store wood here
-**
 **	UnitType::CanAttack
 **
 **		FIXME: docu
@@ -353,10 +349,6 @@
 **	UnitType::Hero
 **
 **		FIXME: docu
-**
-**	UnitType::StoresOil
-**
-**		We can store oil here
 **
 **	UnitType::Volatile
 **
@@ -591,10 +583,7 @@ struct _unit_type_ {
     unsigned Transporter : 1;		/// Can transport units
     unsigned MaxOnBoard;		/// Number of Transporter slots.
     unsigned GivesOil : 1;		/// We get here oil
-/*    unsigned StoresWood : 1;		/// We can store wood here
-    unsigned StoresGold : 1;		/// We can store oil/gold/wood here
-    unsigned StoresOil : 1;		/// We can store oil here*/
-    unsigned Stores[MaxCosts];		/// Resources that we can store here.
+    unsigned CanStore[MaxCosts];		/// Resources that we can store here.
     unsigned Vanishes : 1;		/// Corpes & destroyed places
     unsigned GroundAttack : 1;		/// Can do command ground attack
     unsigned IsUndead : 1;		/// Unit is already dead

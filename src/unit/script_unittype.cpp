@@ -382,7 +382,7 @@ local SCM CclDefineUnitType(SCM list)
 		sublist=gh_cdr(sublist);
 	    	for( i=0; i<MaxCosts; ++i ) {
 		    if( gh_eq_p(value,gh_symbol2scm(DefaultResourceNames[i])) ) {
-			type->Stores[i]=1;
+			type->CanStore[i]=1;
 			break;
 		    }
 		}

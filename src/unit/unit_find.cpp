@@ -574,7 +574,7 @@ global Unit* ResourceDepositOnMap(int tx,int ty,int resource)
 	if( UnitUnusable(table[i]) ) {
 	    continue;
 	}
-	if( table[i]->Type->Stores[resource] ) {
+	if( table[i]->Type->CanStore[resource] ) {
 	    return table[i];
 	}
     }
