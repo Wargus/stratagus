@@ -120,7 +120,10 @@ local SCM CclDefineTilesetWcNames(SCM list)
 */
 local SCM CclDefineTileset(SCM list)
 {
+    DebugLevel0Fn("FIXME: define-tileset not supported\n");
+
     // FIXME: write this
+
     return list;
 }
 
