@@ -115,9 +115,12 @@ local SCM CclDefineMissileType(SCM list)
 	    free(mtype->ImpactSound.Name);
 	    mtype->ImpactSound.Name = gh_scm2newstr(gh_car(list), NULL);
 	} else if (gh_eq_p(value, gh_symbol2scm("class"))) {
+	    const char* name;
+
 	    value = gh_car(list);
+	    name = get_c_string(value);
 	    for (i = 0; MissileClassNames[i]; ++i) {
-		if (gh_eq_p(value, gh_symbol2scm(MissileClassNames[i]))) {
+		if (!strcmp(name, MissileClassNames[i])) {
 		    mtype->Class = i;
 		    break;
 		}
