@@ -148,8 +148,8 @@ local int MoveToGoldMine(Unit* unit)
 	RemoveUnit(unit);
     }
 #else
-    unit->X=dest->X;
-    unit->Y=dest->Y;
+    unit->X=destu->X;
+    unit->Y=destu->Y;
 #endif
 
     if( MINE_FOR_GOLD<MAX_UNIT_WAIT ) {
